@@ -5089,7 +5089,7 @@ asc_docs_api.prototype.asyncServerIdStartLoaded = function()
 	//TODO: Вынести шрифты в коммоны, SetFontPath заменить на SetCommonPath,
 	//пердаваемый путь использовать для загрузки шрифтов и настороек.
 	if(true == ASC_DOCS_API_LOAD_COAUTHORING_SETTINGS){
-		this.ScriptLoader.LoadScriptAsync( this.FontLoader.fontFilesPath + "../../../OfficeWebCommon/docscoapisettings.js",
+		this.ScriptLoader.LoadScriptAsync( this.FontLoader.fontFilesPath + "../../../Common/docscoapisettings.js",
 											this._coAuthoringInitCallBack, this);
 	}else{
 		this._coAuthoringInitCallBack(this);
@@ -6100,7 +6100,7 @@ function sendCommand(editor, fCallback, rdata){
 								url += outputData.url.substring(nIndexFormat);
 						}
 						if( editor.isMobileVersion ){
-							window.open("../../../../OfficeWebCommon/MobileDownloader/download.html?file="+url,"_parent","",false);
+							window.open("../../../../Common/MobileDownloader/download.html?file="+url,"_parent","",false);
 						}
 						else {
 							getFile(url);

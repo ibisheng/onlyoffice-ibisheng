@@ -471,7 +471,7 @@
 		console.log("Cell Edit State - " + state);
 	});
 
-	api.asc_Init("../OfficeWebWord/FontsFreeType/FontFiles/");
+	api.asc_Init("../Word/FontsFreeType/FontFiles/");
 	//api.asc_setViewerMode(true);
 
 	function getURLParameter(name) {

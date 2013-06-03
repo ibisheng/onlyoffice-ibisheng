@@ -79,7 +79,7 @@
 		iframe.onload = onloadFrame;
 		iframe.setAttribute("id", _iframeName);
 		iframe.setAttribute("name", _iframeName);
-		iframe.setAttribute("src", "http://192.168.3.20/OfficeWebExcel/Spreadsheettestmenu.html?doctype=spreadsheet&charteditor=1");
+		iframe.setAttribute("src", "http://192.168.3.20/Excel/Spreadsheettestmenu.html?doctype=spreadsheet&charteditor=1");
 		iframe.setAttribute("width", "100%");
 		iframe.setAttribute("height", "100%");
 		
