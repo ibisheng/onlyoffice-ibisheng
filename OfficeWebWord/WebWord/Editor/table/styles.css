@@ -1,0 +1,71 @@
+.columnresizes  {
+    cursor: col-resize;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: -moz-none;
+    -o-user-select: none;
+    user-select: none;
+}
+.lineresizes {
+    cursor: row-resize;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: -moz-none;
+    -o-user-select: none;
+    user-select: none;
+}
+.moves {
+    cursor: move;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: -moz-none;
+    -o-user-select: none;
+    user-select: none;
+}
+.crosshairs{
+    cursor: crosshair;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: -moz-none;
+    -o-user-select: none;
+    user-select: none;
+}
+.seresizes{
+    cursor: se-resize;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: -moz-none;
+    -o-user-select: none;
+    user-select: none;
+}
+.eraser {
+    cursor:url(images/eraser.png), default;
+}
+
+/*---- tracking styles ----*/
+
+.tableMoveThumb {
+    border : 1px solid black;
+    color : #000000;
+    position : absolute;
+    display : block;
+    background-image : url(images/drag.jpg);
+}
+.tableMoveBound {
+    border : 1px dashed blue;
+    color : #000000;
+    position : absolute;
+    display : block;
+}
+.tableColumnSplitter{
+    width           :   2px;
+    border-left:    1px dotted blue;
+    color           :   #000000;
+    position       :   absolute;
+}
+.tableLineSplitter{
+    height : 2px;
+    border-bottom : 1px dotted blue;
+    color : #000000;
+    position : absolute;
+}

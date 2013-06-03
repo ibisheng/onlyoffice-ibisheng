@@ -1,0 +1,12 @@
+.buttonZoomOut
+{
+	background-image: url(buttonZoom.png);
+    background-position: 0px 0px;
+    background-repeat: no-repeat;
+}
+.buttonZoomIn
+{
+    background-image: url(buttonZoom.png);
+    background-position: 0px -60px;
+    background-repeat: no-repeat;
+}

@@ -1,0 +1,59 @@
+0. Установка Java
+ - Скачать Java
+ - Установить Java
+
+1. Установка минимизаторов
+ - Ниже перечисленные минимизаторы желательно скачать от сюда \\mediaserver\Exchange\Golubev\Tools что бы среда компиляции была у всех одинаковой.
+ - Скачать gcc, архив доступен по адресу http://closure-compiler.googlecode.com/files/compiler-latest.zip
+ - Разархивировать его содержимое, например в C:\Program Files (x86)\Google\Closure-compiler
+ 
+ - Скачать YUICompressor, архив доступен по адресу http://yui.zenfs.com/releases/yuicompressor/yuicompressor-2.4.7.zip
+ - Разархивировать его содержимое, например в C:\Program Files (x86)\Yahoo\yuicompressor-2.4.7\build\
+ - Прописать пути к минимизаторам в переменную среды CLASSPATH, у меня получилось так: C:\Program Files (x86)\Google\Closure-compiler\compiler.jar; C:\Program Files (x86)\Yahoo\yuicompressor-2.4.7\build\yuicompressor-2.4.7.jar
+
+2. Установка консольного svn-клиента.
+ - Скачать установщик клиента, я пользовался этим http://www.sliksvn.com, в принципе интерфейс у них должен быть одинаковым. 
+У меня версия 1.6.18, она далеко не последня, но с новыми возможны проблемы так на 1.7 сменился формат хранения данных, на сайте нашел ссылки на версию 1.6.17:
+ http://www.sliksvn.com/pub/Slik-Subversion-1.6.17-win32.msi
+ http://www.sliksvn.com/pub/Slik-Subversion-1.6.17-x64.msi
+ - Запустить инсталяцию.
+ 
+3. Собираем сдк редактора документов для отдела разработки приложений.
+ - Открываем папку куда сделан сheckout этого репозитория svn://fileserver/activex/AVS/Sources/AVSOfficeStudio/OfficeWebWord/Build
+(далее в скобках пути у меня на машине E:\Subversion\AVS\Sources\AVSOfficeStudio\OfficeWebWord\Build)
+
+ - Читаем дальше, что делает скрипт и убеждаемся что имеем права, на доступ к папкам, которые нужны скрипту для работы.
+    Скрипт делает следующие действия:
+   - Делает апдейт svn://fileserver/activex/AVS/Sources/AVSOfficeStudio/OfficeWebWord (E:\Subversion\AVS\Sources\AVSOfficeStudio\OfficeWebWord)
+   - Собирает сдк
+   - Генерит комментарий
+   - коммитит сдк и файлы апи в svn://fileserver/activex/ASC/Redist/WEB/sdk/OfficeWebWord (E:\Subversion\ASC\Redist\WEB\sdk\OfficeWebWord)
+   
+ - Запускаем commit_new_sdk_all.bat
+ 
+4. Собираем редактор документов
+ - Получам исходники меню, у меня они рассположены в C:\Hg
+ - если путь к исходникам отличается, то изменяем в build.bat значение переменной MENU_FOLDER
+ - делаем до нужной версии апдейт svn://fileserver/activex/AVS/Sources/AVSOfficeStudio/OfficeWebWord (E:\Subversion\AVS\Sources\AVSOfficeStudio\OfficeWebWord)
+ - запускаем build.bat
+	Скрипт делает следующее:
+	 - собирает сдк редактора.
+	 - собирает меню редактора.
+	 - проводит обфускацию
+	Результаты находятся в папке deploy
+	
+ - убеждаемся в работоспособности минимизированного кода (для этого дополнительно из кода меню нужно скопировать папку 3rdparty).
+	Редактор документов - десктоп версия:
+	deploy/apps/api/documents/index.html?doctype=text
+
+	Просмотр документов - мобильная версия:
+	deploy/apps/api/documents/index.html?doctype=text&type=mobile
+
+	Просмотр таблиц - десктоп версия:
+	deploy/apps/api/documents/index.html?doctype=spreadsheet
+
+	Просмотр таблиц - мобильная версия:
+	deploy/apps/api/documents/index.html?doctype=spreadsheet&type=mobile
+ 
+ - Коммитим логи в папке svn://fileserver/activex/AVS/Sources/AVSOfficeStudio/OfficeWebWord/Build/Log (E:\Subversion\AVS\Sources\AVSOfficeStudio\OfficeWebWord\Build\Log)
+ 
