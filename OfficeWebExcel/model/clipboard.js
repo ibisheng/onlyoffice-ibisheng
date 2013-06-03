@@ -1,0 +1,2533 @@
+﻿
+(	/**
+	 * @param {jQuery} $
+	 * @param {Window} window
+	 * @param {undefined} undefined
+	 */
+	function ($, window, undefined) {
+
+		/*
+		 * Import
+		 * -----------------------------------------------------------------------------
+		 */
+		var doc = window.document;
+
+
+		var kElementId = "clipboard-helper";
+		var kElementTextId = "clipboard-helper-text";
+
+		var kBorder = {
+			"thick"            : ["solid", 3],
+			"thin"             : ["solid", 1],
+			"medium"           : ["solid", 2],
+			"dashDot"          : ["dashed", 1],
+			"dashDotDot"       : ["dashed", 1],
+			"dashed"           : ["dashed", 1],
+			"dotted"           : ["dotted", 1],
+			"double"           : ["double", 3],
+			"hair"             : ["dotted", 1],
+			"mediumDashDot"    : ["dashed", 2],
+			"mediumDashDotDot" : ["dashed", 2],
+			"mediumDashed"     : ["dashed", 2],
+			"slantDashDot"     : ["dashed", 2]
+		};
+		
+		var isTruePaste = false;
+		//activate local buffer
+		var activateLocalStorage = true;
+		
+		var Base64 = {
+		 
+			 // private property
+			 _keyStr : "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
+			 
+			 // public method for encoding
+			 encode : function (input) {
+			  var output = "";
+			  var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
+			  var i = 0;
+			 
+			  input = Base64._utf8_encode(input);
+			 
+			  while (i < input.length) {
+			 
+			   chr1 = input.charCodeAt(i++);
+			   chr2 = input.charCodeAt(i++);
+			   chr3 = input.charCodeAt(i++);
+			 
+			   enc1 = chr1 >> 2;
+			   enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
+			   enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
+			   enc4 = chr3 & 63;
+			 
+			   if (isNaN(chr2)) {
+				enc3 = enc4 = 64;
+			   } else if (isNaN(chr3)) {
+				enc4 = 64;
+			   }
+			 
+			   output = output +
+			   this._keyStr.charAt(enc1) + this._keyStr.charAt(enc2) +
+			   this._keyStr.charAt(enc3) + this._keyStr.charAt(enc4);
+			 
+			  }
+			 
+			  return output;
+			 },
+			 
+			 // public method for decoding
+			 decode : function (input) {
+			  var output = "";
+			  var chr1, chr2, chr3;
+			  var enc1, enc2, enc3, enc4;
+			  var i = 0;
+			 
+			  input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
+			 
+			  while (i < input.length) {
+			 
+			   enc1 = this._keyStr.indexOf(input.charAt(i++));
+			   enc2 = this._keyStr.indexOf(input.charAt(i++));
+			   enc3 = this._keyStr.indexOf(input.charAt(i++));
+			   enc4 = this._keyStr.indexOf(input.charAt(i++));
+			 
+			   chr1 = (enc1 << 2) | (enc2 >> 4);
+			   chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+			   chr3 = ((enc3 & 3) << 6) | enc4;
+			 
+			   output = output + String.fromCharCode(chr1);
+			 
+			   if (enc3 != 64) {
+				output = output + String.fromCharCode(chr2);
+			   }
+			   if (enc4 != 64) {
+				output = output + String.fromCharCode(chr3);
+			   }
+			 
+			  }
+			 
+			  output = Base64._utf8_decode(output);
+			 
+			  return output;
+			 
+			 },
+			 
+			 // private method for UTF-8 encoding
+			 _utf8_encode : function (string) {
+			  string = string.replace(/\r\n/g,"\n");
+			  var utftext = "";
+			 
+			  for (var n = 0; n < string.length; n++) {
+			 
+			   var c = string.charCodeAt(n);
+			 
+			   if (c < 128) {
+				utftext += String.fromCharCode(c);
+			   }
+			   else if((c > 127) && (c < 2048)) {
+				utftext += String.fromCharCode((c >> 6) | 192);
+				utftext += String.fromCharCode((c & 63) | 128);
+			   }
+			   else {
+				utftext += String.fromCharCode((c >> 12) | 224);
+				utftext += String.fromCharCode(((c >> 6) & 63) | 128);
+				utftext += String.fromCharCode((c & 63) | 128);
+			   }
+			 
+			  }
+			 
+			  return utftext;
+			 },
+			 
+			 // private method for UTF-8 decoding
+			 _utf8_decode : function (utftext) {
+			  var string = "";
+			  var i = 0;
+			  var c = c1 = c2 = 0;
+			 
+			  while ( i < utftext.length ) {
+			 
+			   c = utftext.charCodeAt(i);
+			 
+			   if (c < 128) {
+				string += String.fromCharCode(c);
+				i++;
+			   }
+			   else if((c > 191) && (c < 224)) {
+				c2 = utftext.charCodeAt(i+1);
+				string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
+				i += 2;
+			   }
+			   else {
+				c2 = utftext.charCodeAt(i+1);
+				c3 = utftext.charCodeAt(i+2);
+				string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
+				i += 3;
+			   }
+			 
+			  }
+			 
+			  return string;
+			 }
+
+		}
+
+		function number2color(n) {
+			if( typeof(n)=="string" && n.indexOf("rgb")>-1)
+				return n;
+			return "rgb(" + (n >> 16 & 0xFF) + "," + (n >> 8 & 0xFF) + "," + (n & 0xFF) + ")";
+		}
+
+
+		/** @constructor */
+		function Clipboard() {
+			if ( !(this instanceof Clipboard) ) {return new Clipboard();}
+
+			this.element = undefined;
+			this.ppix = 96;
+			this.ppiy = 96;
+			this.Api = null;
+
+			return this;
+		}
+
+		Clipboard.prototype = {
+
+			constructor: Clipboard,
+
+			init: function () {
+				var t = this;
+				var found = true;
+
+				if (!t.element) {
+					t.element = doc.getElementById(kElementId);
+					if (!t.element) {found = false; t.element = doc.createElement("DIV");}
+				}
+
+				t.element.id = kElementId;
+				t.element.style.position = "absolute";
+				// Если сделать width маленьким, то параграф будет постоянно переноситься по span
+				// И например в таком случае пропадает пробел <span>1</span><span> </span><span>2</span>
+				t.element.style.top = '-100px';
+				t.element.style.left = '0px';
+				t.element.style.width = '10000px';
+				t.element.style.height = '100px';
+				t.element.style.overflow = 'hidden';
+				t.element.style.zIndex = -1000;
+				t.element.style.display = "none";
+				t.element.setAttribute("contentEditable", true);
+
+				if (!found) {doc.body.appendChild(t.element);}
+				
+				//fix for ipad
+				if( !window.g_isMobileVersion)
+				{
+					var foundText = true;
+	
+					if (!t.elementText) {
+						t.elementText = doc.getElementById(kElementTextId);
+						if (!t.elementText) {foundText = false; t.elementText = doc.createElement("textarea");}
+					}
+	
+					t.elementText.id = kElementTextId;
+					t.elementText.style.position = "absolute";
+					// Если сделать width маленьким, то параграф будет постоянно переноситься по span
+					// И например в таком случае пропадает пробел <span>1</span><span> </span><span>2</span>
+					t.elementText.style.width = '10000px';
+					t.elementText.style.height = '100px';
+					t.elementText.style.left = '0px';
+					t.elementText.style.top = '-100px';
+					t.elementText.style.overflow = 'hidden';
+					t.elementText.style.zIndex = -1000;
+					//if(/MSIE/g.test(navigator.userAgent))
+						t.elementText.style.display = "none";
+					t.elementText.setAttribute("contentEditable", true);
+	
+					if (!foundText) {doc.body.appendChild(t.elementText);}
+				}
+				var div = doc.createElement("DIV");
+				div.setAttribute("style","position:absolute; visibility:hidden; padding:0; height:1in; width:1in;");
+				doc.body.appendChild(div);
+
+				this.ppix = div.clientWidth;
+				this.ppiy = div.clientHeight;
+
+				doc.body.removeChild(div);
+			},
+
+			destroy: function () {
+				var p;
+				if (this.element) {
+					p = this.element.parentNode;
+					if (p) {p.removeChild(this.element);}
+					this.element = undefined;
+				}
+			},
+
+			copyRange: function (range, worksheet) {
+				var t = this;
+				t._cleanElement();
+				var text = t._makeTableNode(range, worksheet);
+				if(text == false)
+					return;
+				//исключения для opera в случае копирования пустой html
+				if($(text).find('td')[0] && $(text).find('td')[0].innerText == '' && $.browser['opera'])
+					$(text).find('td')[0].innerHTML = '&nbsp;';
+				t.element.appendChild(text);
+				t.copyText = t._getTextFromTable(t.element.children[0]);
+				if($(text).find('img')[0] && $.browser['opera'])
+				{
+					$(text)[0].innerHTML = "<tr><td>&nbsp;</td></tr>";
+					if(t.copyText.isImage)
+						t.copyText.text = ' ';
+				}
+
+				if($.browser["mozilla"])
+					t._selectElement(t._getStylesSelect);
+				else
+					t._selectElement();
+			},
+			
+
+			copyRangeButton: function (range, worksheet) {
+				if(/MSIE/g.test(navigator.userAgent))
+				{
+					this._cleanElement();
+					this.element.appendChild(this._makeTableNode(range, worksheet));
+					
+					var t = this, selection, rangeToSelect;
+
+					if (window.getSelection) {// all browsers, except IE before version 9
+						selection = window.getSelection();
+						rangeToSelect = doc.createRange();
+						if (window.navigator.userAgent.toLowerCase().indexOf('gecko/') >= 0) {
+							t.element.appendChild(doc.createTextNode('\xa0'));
+							t.element.insertBefore(doc.createTextNode('\xa0'), t.element.firstChild);
+							rangeToSelect.setStartAfter(t.element.firstChild);
+							rangeToSelect.setEndBefore(t.element.lastChild);
+						} else {
+							rangeToSelect.selectNodeContents(t.element);
+						}
+						selection.removeAllRanges();
+						selection.addRange(rangeToSelect);
+					} else {
+						if (doc.body.createTextRange) {// Internet Explorer
+							rangeToSelect = doc.body.createTextRange();
+							rangeToSelect.moveToElementText(t.element);
+							rangeToSelect.select();
+						}
+					}
+					document.execCommand("copy");
+					// ждем выполнения copy
+					window.setTimeout(
+					function() {
+						// отменяем возможность выделения
+						t.element.style.display = "none";
+						doc.body.style.MozUserSelect = "none";
+						doc.body.style["-khtml-user-select"] = "none";
+						doc.body.style["-o-user-select"] = "none";
+						doc.body.style["user-select"] = "none";
+						doc.body.style["-webkit-user-select"] = "none";
+					},
+					0);
+					return true;
+				}
+				else if(activateLocalStorage)
+				{
+					var t = this;
+					var  table = t._makeTableNode(range,worksheet);
+					t.copyText = t._getTextFromTable(table);
+					return true;
+				}
+				return false;
+			},
+			
+			pasteRangeButton: function (worksheet)
+			{
+				if(/MSIE/g.test(navigator.userAgent))
+				{
+					var t = this;
+					document.body.style.MozUserSelect = "text";
+					delete document.body.style["-khtml-user-select"];
+					delete document.body.style["-o-user-select"];
+					delete document.body.style["user-select"];
+					document.body.style["-webkit-user-select"] = "text";
+				
+					var pastebin = t._editorPasteGetElem(worksheet,true);
+					
+					pastebin.style.display  = "block";
+					pastebin.focus();
+					
+					var selection = window.getSelection();
+					var rangeToSelect = document.createRange();
+					rangeToSelect.selectNodeContents (pastebin);
+					selection.removeAllRanges ();
+					selection.addRange(rangeToSelect);
+					
+					//rangeToSelect.execCommand("paste", false);
+					document.execCommand("paste");
+					
+					pastebin.blur();
+					pastebin.style.display  = "none";
+					
+					document.body.style.MozUserSelect = "none";
+					document.body.style["-khtml-user-select"] = "none";
+					document.body.style["-o-user-select"] = "none";
+					document.body.style["user-select"] = "none";
+					document.body.style["-webkit-user-select"] = "none";
+					
+					t._editorPasteExec(worksheet,pastebin)
+					return true;
+				}
+				else if(activateLocalStorage)
+				{
+					var t = this;
+					var onlyFromLocalStorage = true;
+					t._editorPasteExec(worksheet,t.lStorage,false,onlyFromLocalStorage);
+					return true;
+				}
+				return false;
+			},
+			
+			copyCellValue: function (value, background) {
+				var t = this;
+				if(activateLocalStorage)
+					t._addValueToLocalStrg(value);
+				var nodes = t._makeNodesFromCellValue(value);
+				var outer;
+
+				// Workaround: webkit неправильно селектит один узел
+				if (window.navigator.userAgent.toLowerCase().indexOf('webkit') >= 0 && nodes.length === 1) {
+					outer = doc.createElement("B");
+					outer.style.fontWeight = "normal";
+					outer.appendChild(nodes[0]);
+					nodes[0] = outer;
+				}
+
+				t._cleanElement();
+				nodes.forEach(
+						function(node){
+							node.style.backgroundColor = background !== null ? background : "transparent";
+							t.element.appendChild(node);
+						});
+				if($.browser["mozilla"])
+					t._selectElement(t._getStylesSelect);
+				else
+					t._selectElement();
+			},
+			
+			copyCellValueButton: function (value, background) {
+				if(/MSIE/g.test(navigator.userAgent))
+				{
+					var t = this;
+					var nodes = t._makeNodesFromCellValue(value);
+					var outer;
+
+					// Workaround: webkit неправильно селектит один узел
+					if (window.navigator.userAgent.toLowerCase().indexOf('webkit') >= 0 && nodes.length === 1) {
+						outer = doc.createElement("B");
+						outer.style.fontWeight = "normal";
+						outer.appendChild(nodes[0]);
+						nodes[0] = outer;
+					}
+
+					t._cleanElement();
+					nodes.forEach(
+							function(node){
+								node.style.backgroundColor = background !== null ? background : "transparent";
+								t.element.appendChild(node);
+							});
+					var t = this, selection, rangeToSelect;
+
+					if (window.getSelection) {// all browsers, except IE before version 9
+						selection = window.getSelection();
+						rangeToSelect = doc.createRange();
+						if (window.navigator.userAgent.toLowerCase().indexOf('gecko/') >= 0) {
+							t.element.appendChild(doc.createTextNode('\xa0'));
+							t.element.insertBefore(doc.createTextNode('\xa0'), t.element.firstChild);
+							rangeToSelect.setStartAfter(t.element.firstChild);
+							rangeToSelect.setEndBefore(t.element.lastChild);
+						} else {
+							rangeToSelect.selectNodeContents(t.element);
+						}
+						selection.removeAllRanges();
+						selection.addRange(rangeToSelect);
+					} else {
+						if (doc.body.createTextRange) {// Internet Explorer
+							rangeToSelect = doc.body.createTextRange();
+							rangeToSelect.moveToElementText(t.element);
+							rangeToSelect.select();
+						}
+					}
+					document.execCommand('copy');
+					// ждем выполнения copy
+					window.setTimeout(
+							function() {
+								// отменяем возможность выделения
+								t.element.style.display = "none";
+								doc.body.style.MozUserSelect = "none";
+								doc.body.style["-khtml-user-select"] = "none";
+								doc.body.style["-o-user-select"] = "none";
+								doc.body.style["user-select"] = "none";
+								doc.body.style["-webkit-user-select"] = "none";
+								// for paste event
+							},
+							0);
+					return true;
+				}
+				else if(activateLocalStorage)
+				{
+					var t = this;
+					t._addValueToLocalStrg(value)
+					return true;
+				}
+				return false;
+			},
+
+			pasteRange: function (worksheet) {
+				var t = this;
+				if($.browser["mozilla"])
+					t._editorPaste(worksheet,t._getStylesSelect);
+				else
+					t._editorPaste(worksheet);
+			},
+
+			pasteCellValue: function (callback) {
+				var t = this;
+				t._paste(function(){t._makeCellValueFromHtml(callback)});
+			},
+			
+			pasteAsText: function (callback) {
+				var t = this;
+				//t._paste(function(){t._makeCellValueFromHtml(callback)});
+				t.elementText.style.display = "block";
+				t.elementText.value = '\xa0';
+				t.elementText.focus();
+				t.elementText.select();
+				
+				
+				// делаем возможным выделение
+				delete doc.body.style["-khtml-user-select"];
+				delete doc.body.style["-o-user-select"];
+				delete doc.body.style["user-select"];
+				doc.body.style["-webkit-user-select"] = "text";
+				doc.body.style.MozUserSelect = "text";
+						
+				// ждем выполнения
+				window.setTimeout(
+						function() {
+							// отменяем возможность выделения
+							t.element.style.display = "none";
+							doc.body.style.MozUserSelect = "none";
+							doc.body.style["-khtml-user-select"] = "none";
+							doc.body.style["-o-user-select"] = "none";
+							doc.body.style["user-select"] = "none";
+							doc.body.style["-webkit-user-select"] = "none";
+							t.elementText.style.display = "none";
+							// for paste event
+							callback(t.elementText.value, []);
+							if($.browser["mozilla"])
+								t._getStylesSelect();
+						},
+						0);
+			},
+			
+			pasteAsTextButton: function (callback) {
+				var t = this;
+				if(/MSIE/g.test(navigator.userAgent))
+				{
+					//t._paste(function(){t._makeCellValueFromHtml(callback)});
+					t.elementText.style.display = "block";
+					t.elementText.value = '\xa0';
+					t.elementText.focus();
+					t.elementText.select();
+					
+					
+					// делаем возможным выделение
+					delete doc.body.style["-khtml-user-select"];
+					delete doc.body.style["-o-user-select"];
+					delete doc.body.style["user-select"];
+					doc.body.style["-webkit-user-select"] = "text";
+					doc.body.style.MozUserSelect = "text";
+							
+					document.execCommand('paste');
+					// ждем выполнения
+					window.setTimeout(
+							function() {
+								// отменяем возможность выделения
+								t.element.style.display = "none";
+								doc.body.style.MozUserSelect = "none";
+								doc.body.style["-khtml-user-select"] = "none";
+								doc.body.style["-o-user-select"] = "none";
+								doc.body.style["user-select"] = "none";
+								doc.body.style["-webkit-user-select"] = "none";
+								t.elementText.style.display = "none";
+								// for paste event
+								callback(t.elementText.value, []);
+							},
+							0);
+					return true;
+				}
+				else if(activateLocalStorage)
+				{
+					if(t.lStorageText)
+						callback(t.lStorageText, []);
+					return true;
+				}
+				return false;
+			},
+			
+			pastedTextToRange: function (text, ws) {
+				var range = ws.activeRange.clone(true);
+				text = text.replace(/\r/g, '');
+				if(text.length > 0 && '\n' == text[text.length - 1])
+					text = text.substring(0, text.length - 1);
+				var nMaxRowIndex = 1;
+				var nMaxColIndex = 1;
+
+				var aLines = text.split('\n');
+				//собираем массив с текстом для вставки
+				var aTextLines = new Array();
+				for(var i = 0, length = aLines.length; i < length; ++i)
+				{
+					var aCells = aLines[i].split('\t');
+					var aTextCells = new Array();
+					for(var j = 0, length2 = aCells.length; j < length2; ++j)
+					{
+						var sCellText  = aCells[j];
+						if(sCellText)
+							aTextCells.push(sCellText);
+						else
+							aTextCells.push(null);
+					}
+					if(nMaxColIndex < aCells.length)
+						nMaxColIndex = aCells.length;
+					aTextLines.push(aTextCells);
+				}
+				if(nMaxRowIndex < aLines.length)
+					nMaxRowIndex = aLines.length;
+				var oPasteRange = null;
+				//Если вставляется только колонка и она меньше чем область выделения, то заполняем весь диапазон, иначе втавляем только то что есть.
+				if(1 != nMaxColIndex || nMaxRowIndex > range.r2 - range.r1 + 1)
+				{
+					range.c2 = range.c1 + nMaxColIndex - 1;
+					range.r2 = range.r1 + nMaxRowIndex - 1;
+					//делаем проверку чтобы не изменять часть замерженой ячейки
+					var bCorrect = true;
+					var fCheckMergedRowCol = function()
+					{
+						bCorrect = false;
+					}
+					var fCheckMergedRange = function(row, nRowIndex, nColIndex)
+					{
+						if(false == bCorrect)
+							return;
+						var merged = row[nColIndex];
+						if(null != merged)
+						{
+							var oCurBBox = merged.getBBox0();
+							var bR1In = range.r1 <= oCurBBox.r1 && oCurBBox.r1 <= range.r2;
+							var bR2In = range.r1 <= oCurBBox.r2 && oCurBBox.r2 <= range.r2;
+							var bC1In = range.c1 <= oCurBBox.c1 && oCurBBox.c1 <= range.c2;
+							var bC2In = range.c1 <= oCurBBox.c2 && oCurBBox.c2 <= range.c2;
+							if(false == (bR1In && bR2In && bC1In && bC2In) && true == (bR1In || bR2In || bC1In || bC2In))
+								bCorrect = false;
+						}
+					}
+					ws.model.oMergedCache._forEachBBox({r1: range.r1, c1: range.c1, r2: range.r2, c2: range.c2}, fCheckMergedRowCol, fCheckMergedRowCol, fCheckMergedRange, null);
+					if(false == bCorrect)
+						return false;
+				}
+				var rangeToSelect = new Asc.Range(range.c1, range.r1, range.c2, range.r2);
+				History.Create_NewPoint();
+				History.SetSelection(rangeToSelect.clone(true));
+				History.StartTransaction();
+				
+				//проверяем случай когда вставляем одну ячейку в одну замерженую. в остальных случаях размерживаем ячейки
+				var bOneCellToMerged = false;
+				var oRangeWithMerged = ws.model.getRange(new CellAddress(range.r1, range.c1, 0), new CellAddress(range.r2, range.c2, 0));
+				if(1 == nMaxColIndex && 1 == nMaxRowIndex)
+				{
+					var merged = oRangeWithMerged.hasMerged();
+					if(null != merged && merged.r1 == range.r1 && merged.r2 == range.r2 && merged.c1 == range.c1 && merged.c2 == range.c2)
+					{
+						bOneCellToMerged = true;
+						
+						var aTextCells = aTextLines[0];
+						var sCellText  = aTextCells[0];
+						var bEmptyInsertText = false;
+						if(null == sCellText || 0 == sCellText.length)
+							bEmptyInsertText = true;
+						var oCurCell = null;
+						if(bEmptyInsertText)
+							oCurCell = ws.model._getCellNoEmpty(range.r1, range.c1);
+						else
+							oCurCell = ws.model._getCell(range.r1, range.c1);
+						if(null != oCurCell)
+						{
+							if(false == bEmptyInsertText || false == oCurCell.isEmptyText())
+								oCurCell.setValue(sCellText);
+						}
+					}
+				}
+				if(false == bOneCellToMerged)
+				{
+					//убираем merge
+					oRangeWithMerged.unmerge();
+
+					var nTextRowIndex = 0;
+					var nTextColIndex = 0;
+					for(var i = 0; i < range.r2 - range.r1 + 1; ++i)
+					{
+						var aTextCells = aTextLines[nTextRowIndex];
+						for(var j = 0; j < range.c2 - range.c1 + 1; ++j)
+						{
+							var sCellText  = aTextCells[nTextColIndex];
+							var bEmptyInsertText = false;
+							if(null == sCellText || 0 == sCellText.length)
+								bEmptyInsertText = true;
+							var oCurCell = null;
+							if(bEmptyInsertText)
+								oCurCell = ws.model._getCellNoEmpty(range.r1 + i, range.c1 + j);
+							else
+								oCurCell = ws.model._getCell(range.r1 + i, range.c1 + j);
+							if(null != oCurCell)
+							{
+								if(false == bEmptyInsertText || false == oCurCell.isEmptyText())
+									oCurCell.setValue(sCellText);
+							}
+							nTextColIndex++;
+							if(nTextColIndex >= nMaxColIndex)
+								nTextColIndex = 0;
+						}
+						nTextRowIndex++;
+						if(nTextRowIndex >= nMaxRowIndex)
+							nTextRowIndex = 0;
+					}
+				}
+				History.EndTransaction();
+				
+				range.c1 = 0;
+				range.c2 = gc_nMaxCol0;
+
+				// Для увеличения visibleRange нужно добавить недостающие строки/столбцы
+				ws._calcRowHeights(/*fullRecalc*/2);
+				ws._calcColumnWidths(/*fullRecalc*/2);
+				ws.changeWorksheet("updateRange", {range: range, isLockDraw: false});
+				ws.setSelection(rangeToSelect);
+				
+				return true;
+			},
+
+			// Private
+
+			_cleanElement: function () {
+				this.element.style.left = doc.body.offsetWidth + "px";
+				this.element.style.top = doc.body.offsetHeight + "px";
+				this.element.style.display = "block";
+
+				while (this.element.hasChildNodes()) {
+					this.element.removeChild(this.element.lastChild);
+				}
+
+				// делаем возможным выделение
+				delete doc.body.style["-khtml-user-select"];
+				delete doc.body.style["-o-user-select"];
+				delete doc.body.style["user-select"];
+				doc.body.style["-webkit-user-select"] = "text";
+				doc.body.style.MozUserSelect = "text";
+			},
+
+			 _getStylesSelect: function (worksheet){
+				document.body.style.MozUserSelect = "";
+				delete document.body.style["-khtml-user-select"];
+				delete document.body.style["-o-user-select"];
+				delete document.body.style["user-select"];
+				document.body.style["-webkit-user-select"] = "text";
+			},
+			
+            _editorPaste: function (worksheet,callback) {
+                var t = this;
+                var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
+                document.body.style.MozUserSelect = "text";
+                delete document.body.style["-khtml-user-select"];
+                delete document.body.style["-o-user-select"];
+                delete document.body.style["user-select"];
+                document.body.style["-webkit-user-select"] = "text";
+
+                var Text;
+                var pastebin = t._editorPasteGetElem(worksheet,true);
+                pastebin.style.display  = "block";
+                pastebin.focus();
+                // Safari requires a filler node inside the div to have the content pasted into it. (#4882)
+                pastebin.appendChild( document.createTextNode( '\xa0' ) );
+
+                if (window.getSelection) {  // all browsers, except IE before version 9
+                    var selection = document.defaultView.getSelection ();
+                    selection.removeAllRanges ();
+                    var rangeToSelect = document.createRange ();
+                    rangeToSelect.selectNodeContents (pastebin);
+
+                    selection.removeAllRanges ();
+                    selection.addRange (rangeToSelect);
+                } else {
+                    if (document.body.createTextRange) {    // Internet Explorer
+                        var rangeToSelect = document.body.createTextRange ();
+                        rangeToSelect.moveToElementText (pastebin);
+                        rangeToSelect.select ();
+                    }
+                }
+                //ждем выполнения paste
+                window.setTimeout( function()
+                {
+                    document.body.style.MozUserSelect = "none";
+                    document.body.style["-khtml-user-select"] = "none";
+                    document.body.style["-o-user-select"] = "none";
+                    document.body.style["user-select"] = "none";
+                    document.body.style["-webkit-user-select"] = "none";
+                    
+                    if(!is_chrome)
+                        t._editorPasteExec(worksheet, pastebin);
+					else if(is_chrome && !isTruePaste)
+						t._editorPasteExec(worksheet, pastebin);
+                    //else
+                        pastebin.style.display  = "none";
+						
+					if(/MSIE/g.test(navigator.userAgent))
+						pastebin.style.display  = "none";
+					
+					if (callback && callback.call) {callback();}
+                }, 0 );
+            },
+            
+            _editorPasteGetElem: function (worksheet, bClean)
+            {
+                //var oWordControl = api.WordControl;
+                var t = this;
+                var pastebin = document.getElementById('wrd_pastebin');
+                if(!pastebin){
+                    pastebin = document.createElement("div");
+                    pastebin.setAttribute( 'id', 'wrd_pastebin' );
+                    pastebin.style.position = 'absolute';
+                    pastebin.style.top = '-100px';
+                    pastebin.style.left = '0px';
+                    pastebin.style.width = '10000px';
+                    pastebin.style.height = '100px';
+                    pastebin.style.overflow = 'hidden';
+                    pastebin.style.zIndex = -1000;
+                    //настройки шрифта выставляются, чтобы избежать ситуации когда pastebin содержит span с текстом без настроек шрифта и computedStyle возвращает неизвестные настройки документа по умолчанию
+                    /*var Def_rPr = oWordControl.m_oLogicDocument.Styles.Default.TextPr;
+                    pastebin.style.fontFamily = Def_rPr.FontFamily.Name;
+                    pastebin.style.fontSize = Def_rPr.FontSize + "pt";*/
+                    pastebin.style.lineHeight = "1px";//todo FF всегда возвращает computedStyle в px, поэтому лучше явно указать default значнение
+                    pastebin.setAttribute("contentEditable", true);
+                    
+                    pastebin.onpaste = function(e){t._bodyPaste(worksheet,e);};
+                    document.body.appendChild( pastebin );
+                }
+                else if(bClean){
+                    //Удаляем содержимое
+                    var aChildNodes = pastebin.childNodes;
+                    for (var length = aChildNodes.length, i = length - 1; i >= 0; i--)
+                    {
+                        pastebin.removeChild(aChildNodes[i]);
+                    }
+					pastebin.onpaste = function(e){t._bodyPaste(worksheet,e);};
+                }
+                return pastebin;
+            },
+
+			_getTableFromText: function (sText)
+			{
+				var t = this; 
+				var sHtml = "<html><body><table>";
+				var sCurPar = "";
+				var sCurChar = "";
+				for ( var i = 0, length = sText.length; i < length; i++ )
+				{
+					var Char = sText.charAt(i);
+					var Code = sText.charCodeAt(i);
+					var Item = null;
+
+					if ( '\n' === Char )
+					{
+						if("" == sCurChar && sCurPar == '')
+							sHtml += "<tr><td style='font-family:Calibri'>&nbsp;</td></tr>";
+						else if(sCurPar == '')
+						{
+							sHtml += "<tr><td><span style='font-family:Calibri;font-size:11pt;white-space:nowrap'>" + sCurChar + "</span></td></tr>";
+							sCurChar = "";
+						}
+						else if(sCurPar != '')
+						{
+							if(sCurChar == '')
+								sCurPar += "<td style='font-family:Calibri'>&nbsp;</td>";
+							else
+								sCurPar += "<td><span style='font-family:Calibri;font-size:11pt;white-space:nowrap'>" + sCurChar + "</span></td>";
+							sHtml += "<tr>" + sCurPar + "</tr>";
+							sCurChar = "";
+							sCurPar = "";
+						}
+					}
+					else if ( 13 === Code )
+					{
+						continue;
+					}
+					else
+					{
+						if(32 == Code || 160 == Code) //160 - nbsp
+							sCurChar += " ";
+						else if ( 9 === Code )//tab
+						{
+							sCurPar += "<td><span style='font-family:Calibri;font-size:11pt;white-space:nowrap'>" +  sCurChar + "</span></td>";
+							if(i == length - 1)
+							{
+								sHtml += "<tr>" + sCurPar + "</tr>";
+							}
+							sCurChar = '';
+						}   
+						else
+						{
+							sCurChar += t._copyPasteCorrectString(Char);
+							if(i == length - 1)
+							{
+								sCurPar += "<td><span style='font-family:Calibri;font-size:11pt;white-space:nowrap'>" +  sCurChar + "</span></td>";
+								sHtml += "<tr>" + sCurPar + "</tr>";
+							}
+						}
+							
+					}
+				}
+				sHtml += "</table></body></html>";
+				return sHtml;
+			},
+			
+			_getTextFromTable: function (table)
+			{
+				//если присутсвуют только изображения
+				var images = $(table).find('img')
+				if(images.length != 0 && images.length == $(table).children().length)
+				{
+					var stringImg = {};
+					stringImg.isImage = true;
+					stringImg.text = '';
+					for(i = 0; i < images.length; i++)
+					{
+						stringImg.text += images[i].name + ';';
+					}
+					return stringImg;
+				}
+				if(table.children && table.children[0] && table.children[0].nodeName.toLowerCase() == 'br')
+					$(table.children[0]).remove();
+				//проверяем наличие одной таблицы, кроме неё ничего быть не должно
+				if((table.children[0] && table.children[0].tagName.toLowerCase() == 'table' && table.children.length == 1))
+					table = table.children[0];
+				var textNode = {};
+				if(table.tagName.toLowerCase() != 'table')
+				{
+					textNode.text = $(table).text();
+				}
+				else
+				{
+					textNode.text = $(table).text();
+					if(table.rows)
+						textNode.rows = table.rows.length;
+					else
+						textNode.rows = 0;
+					if(table.rows[0] && table.rows[0].cells)
+						textNode.cols = table.rows[0].cells.length + table.rows[0].cells[0].colSpan - 1;
+				}
+				return textNode;
+			},
+			
+            _bodyPaste: function (worksheet, e)
+            {
+                //var oWordControl = api.WordControl;
+                var t = this;
+                if (e && e.clipboardData && e.clipboardData.getData) {// Webkit - get data from clipboard, put into editdiv, cleanup, then cancel event
+                    var bExist = false;
+                    //только chrome разрешает получать 'text/html', safari только 'text/plain'
+                    var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
+                    var sHtml = null;
+					var isText = false;
+                    if (/text\/html/.test(e.clipboardData.types))
+                    {
+                        var sHtml = e.clipboardData.getData('text/html');
+                        //Иногда при выделении одной строки из Word в chrome добавляем непонятные символы после </html>, обрезаем их.
+                        var nIndex = sHtml.lastIndexOf("</html>");
+                        if(-1 != nIndex)
+                            sHtml = sHtml.substring(0, nIndex + "</html>".length);
+                    }
+                    else if (is_chrome && /text\/plain/.test(e.clipboardData.types))
+                    {
+                        bExist = true;
+                        var sText = e.clipboardData.getData('text/plain');
+						sHtml = t._getTableFromText(sText);
+						isText = true;
+                    }
+                    if(null != sHtml)
+                    {
+                       t._addHtmlToIframe(worksheet,sHtml,isText);
+                    }
+					else
+					{
+						var items = e.clipboardData.items;
+						if(null != items)
+						{
+							for (var i = 0; i < items.length; ++i) {
+								if (items[i].kind == 'file' &&
+									items[i].type.indexOf('image/') !== -1) {
+
+									var blob = items[i].getAsFile();
+									var reader = new FileReader();
+
+									reader.onload = function(evt) {
+										//t._editorPasteExec(worksheet,"<html><body><img src=\"" + evt.target.result + "\"/></body></html>",isText);
+										t._addHtmlToIframe(worksheet,"<html><body><img src=\"" + evt.target.result + "\"/></body></html>",isText);
+										//fPasteHtml("<html><body><img src=\"" + evt.target.result + "\"/></body></html>");
+									};
+									reader.readAsDataURL(blob);
+								}
+							}
+						}
+					}
+                    //preventDefault
+                }
+            },
+			
+			_addHtmlToIframe: function(worksheet,sHtml,isText)
+			{
+				var t = this;
+				//Записываем html в IFrame
+				var ifr = document.getElementById("pasteFrame");
+				if (!ifr) 
+				{
+					ifr = document.createElement("iframe");
+					ifr.name = "pasteFrame";
+					ifr.id = "pasteFrame";
+					ifr.style.position = 'absolute';
+					ifr.style.top = '-100px';
+					ifr.style.left = '0px';
+					ifr.style.width = '10000px';
+					ifr.style.height = '100px';
+					ifr.style.overflow = 'hidden';
+					ifr.style.zIndex = -1000;
+					document.body.appendChild(ifr);
+				}
+				ifr.style.display  = "block";
+				var frameWindow = window.frames["pasteFrame"];
+				if(frameWindow)
+				{
+					frameWindow.document.open();
+					frameWindow.document.write(sHtml);
+					frameWindow.document.close();
+					var bodyFrame = frameWindow.document.body;
+					isTruePaste = false;
+					if(bodyFrame && bodyFrame != null)
+					{
+						t._editorPasteExec(worksheet, frameWindow.document.body,isText);
+						isTruePaste = true;
+					}
+					bExist = true;
+				}
+				ifr.style.display  = "none";
+			},
+			_copyPasteCorrectString: function (str)
+			{
+				var res = str;
+				res = res.replace(/&/g,'&amp;');
+				res = res.replace(/</g,'&lt;');
+				res = res.replace(/>/g,'&gt;');
+				res = res.replace(/'/g,'&apos;');
+				res = res.replace(/"/g,'&quot;');
+				return res;
+			},
+
+			_setStylesTextPaste: function (spanObject)
+			{
+				var t = this;
+				var defaultColor = 'rgb(0, 0, 0)';
+				var oNewItem = new Object();
+				oNewItem.text = $(spanObject).text().replace(/(\r|\t|\n|)/g,'');
+
+				oNewItem.format = {};
+				oNewItem.format.fn = t._checkFonts(spanObject.style.fontFamily.replace(/'/g,"").split(',')[0]);
+
+				if(oNewItem.format.fn == null || oNewItem.format.fn == '')
+					oNewItem.format.fn = 'Calibri';
+
+				if($(spanObject).css('vertical-align')  == 'sub' || $(spanObject).css('vertical-align')  == 'super')
+				{
+					if(($(spanObject.parentNode).css('font-size')).indexOf('pt') > -1)
+						oNewItem.format.fs = parseInt($(spanObject.parentNode).css('font-size'));
+					else
+						oNewItem.format.fs = parseInt((3/4)*Math.round(parseFloat($(spanObject.parentNode).css('font-size'))));
+				}
+				else
+				{
+					if(spanObject.style.fontSize.indexOf('pt') > -1)
+						oNewItem.format.fs = parseInt(spanObject.style.fontSize);
+					else
+						oNewItem.format.fs = parseInt((3/4)*Math.round(parseFloat(spanObject.style.fontSize)));
+				}
+				if(isNaN(oNewItem.format.fs))
+					oNewItem.format.fs = 11;
+				if($(spanObject).css('font-weight') == 'bold')
+					oNewItem.format.b = true;
+				else
+					oNewItem.format.b = false;
+
+				if($(spanObject).css('font-style') == 'italic')
+					oNewItem.format.i = true;
+				else
+					oNewItem.format.i = false;
+
+				if($(spanObject).css('text-decoration') == 'underline')
+					oNewItem.format.u = "single";
+				else
+					oNewItem.format.u = "none";
+
+				if($(spanObject).css('text-decoration') == 'line-through')
+					oNewItem.format.s = true;
+				else
+					oNewItem.format.s = false;
+				
+				if($(spanObject).css('vertical-align') != null)
+					oNewItem.format.va = $(spanObject).css('vertical-align');
+				if( $(spanObject).css('vertical-align') == 'baseline')
+					oNewItem.format.va = '';
+
+				oNewItem.format.c = $(spanObject).css('color');
+				
+				if(oNewItem.format.c == '')
+					oNewItem.format.c = null;
+				
+				if($(spanObject).css('vertical-align') != null)
+					oNewItem.format.va = $(spanObject).css('vertical-align')  === 'sub' ? 'subscript' : $(spanObject).css('vertical-align') === 'super' ? 'superscript' : 'baseline';
+					return oNewItem;
+			},
+
+            
+			_getDefaultCell: function ()
+			{
+				res = [];
+				res.push({
+					format: {
+						fn: 'Arial',
+						fs: '11',
+						b: false,
+						i: false,
+						u: false,
+						s: false,
+						va: 'none'
+					},
+					text: ''});
+				return res; 
+			},
+			
+			_getTrueWidth: function (borderWidth)
+			{
+				if(borderWidth == '0.5pt')
+					borderWidth = '1px';
+				else if(borderWidth == '1pt')
+					borderWidth = '2px';
+				else if(borderWidth == '1.5pt')
+					borderWidth = '3px';
+				return borderWidth;
+			},
+			
+			_getArray: function (node, isText)
+            {
+                var aResult = new Array();
+                var oNewItem = new Object();
+                var t = this;
+                var kBorderRev = ["solid3","solid1","solid2","dashed1","double3","dotted1","dashed2","dashed2"]
+                var kBorderRevVal = ["thick","thin","medium","dashDot","double","hair","mediumDashDot","slantDashDot"]
+				
+				if(node == undefined)
+					node = document.createElement('span');
+				
+                oNewItem = [];
+				
+				if(node == undefined || node == null)
+				{
+					oNewItem[0] = t._getDefaultCell();
+					oNewItem.fonts = [];
+					oNewItem.fonts[0] = 'Arial';
+				}
+				//style for text
+				else if(node.children != undefined && node.children.length == 0)
+				{
+					oNewItem[0] = t._setStylesTextPaste(node)
+					oNewItem.fonts = [];
+					oNewItem.fonts[0] = oNewItem[0].format.fn;
+				}
+				else
+				{
+					if(typeof(node) == 'string' || node.children.length == 0 || node.children.length == 1  && node.children[0].nodeName == '#text')
+						oNewItem =t._makeCellValuesHtml(node,isText)
+					else
+						oNewItem =t._makeCellValuesHtml(node.childNodes,isText)
+				}
+				
+				//borders
+                oNewItem.borders = {};
+                oNewItem.borders.l  = {};oNewItem.borders.r  = {};oNewItem.borders.b  = {};oNewItem.borders.t  = {};
+                if($(node).css('border-top-style') != 'none' && $(node).css('border-top-style') != null)
+                {
+                    var borderTopWidth = node.style.borderTopWidth;
+					if(borderTopWidth == '')
+						borderTopWidth = $(node).css('border-top-width');
+					borderTopWidth = t._getTrueWidth(borderTopWidth);
+					
+					var borderTopStyle = node.style.borderTopStyle;
+					if(borderTopStyle == '')
+						borderTopStyle = $(node).css('border-top-style');
+					
+					/*var borderTopColor = node.style.borderTopColor;
+					if(borderTopColor == '')
+						borderTopColor = $(node).css('border-top-color');*/
+					var borderTopColor = 0;
+					
+					oNewItem.borders.t.c = borderTopColor;
+                    var style = borderTopStyle + parseInt(borderTopWidth).toString();
+					if(undefined != kBorderRevVal[$.inArray(style, kBorderRev)])
+						oNewItem.borders.t.s =  kBorderRevVal[$.inArray(style, kBorderRev)];
+                }
+                if($(node).css('border-bottom-style') != 'none' && $(node).css('border-bottom-style') != null)
+                {
+					var borderBottomWidth = node.style.borderBottomWidth;
+					if(borderBottomWidth == '')
+						borderBottomWidth = $(node).css('border-bottom-width');
+					borderBottomWidth = t._getTrueWidth(borderBottomWidth);
+					
+					var borderBottomStyle = node.style.borderBottomStyle;
+					if(borderBottomStyle == '')
+						borderBottomStyle = $(node).css('border-bottom-style');
+					
+					/*var borderBottomColor = node.style.borderBottomColor;
+					if(borderBottomColor == '')
+						borderBottomColor = $(node).css('border-bottom-color');*/
+					var borderBottomColor = 0;
+					
+					oNewItem.borders.b.c = borderBottomColor;
+                     var style = borderBottomStyle + parseInt(borderBottomWidth).toString();
+					if(undefined != kBorderRevVal[$.inArray(style, kBorderRev)])
+						 oNewItem.borders.b.s =  kBorderRevVal[$.inArray(style, kBorderRev)];
+                    
+                }
+                if($(node).css('border-left-style') != 'none' && $(node).css('border-left-style') != null)
+                {
+
+                    var borderLeftWidth = node.style.borderLeftWidth;
+					if(borderLeftWidth == '')
+						borderLeftWidth = $(node).css('border-left-width');
+					borderLeftWidth = t._getTrueWidth(borderLeftWidth);
+					
+					var borderLeftStyle = node.style.borderLeftStyle;
+					if(borderLeftStyle == '')
+						borderLeftStyle = $(node).css('border-left-style');
+					
+					/*var borderLeftColor = node.style.borderLeftColor;
+					if(borderLeftColor == '')
+						borderLeftColor = $(node).css('border-left-color');*/
+					var borderLeftColor = 0;
+					
+					oNewItem.borders.l.c = borderLeftColor;
+                      var style = borderLeftStyle + parseInt(borderLeftWidth).toString();
+					if(undefined != kBorderRevVal[$.inArray(style, kBorderRev)])
+						 oNewItem.borders.l.s =  kBorderRevVal[$.inArray(style, kBorderRev)];
+                }
+                if($(node).css('border-right-style') != 'none' && $(node).css('border-right-style') != null)
+                {
+                    var borderRightWidth = node.style.borderRightWidth;
+					if(borderRightWidth == '')
+						borderRightWidth = $(node).css('border-right-width');
+					borderRightWidth = t._getTrueWidth(borderRightWidth);
+					
+					var borderRightStyle = node.style.borderRightStyle;
+					if(borderRightStyle == '')
+						borderRightStyle = $(node).css('border-right-style');
+					
+					/*var borderRightColor = node.style.borderRightColor;
+					if(borderRightColor == '')
+						borderRightColor = $(node).css('border-right-color'); */
+					var borderRightColor = 0;
+					
+					oNewItem.borders.r.c = borderRightColor;
+                      var style = borderRightStyle + parseInt(borderRightWidth).toString();
+					if(undefined != kBorderRevVal[$.inArray(style, kBorderRev)])
+						 oNewItem.borders.r.s =  kBorderRevVal[$.inArray(style, kBorderRev)];
+                }
+				
+				//wrap
+				if(node.style.whiteSpace == 'nowrap')
+					oNewItem.wrap = false;
+				else if(node.style.whiteSpace == 'normal')
+					oNewItem.wrap = true;
+				else
+					oNewItem.wrap = false;
+				
+				//merge
+				if(node != undefined && node.colSpan != undefined)
+					oNewItem.colSpan = node.colSpan;
+				else
+					oNewItem.colSpan = 1;
+				if(node != undefined && node.rowSpan != undefined)
+					oNewItem.rowSpan = node.rowSpan;
+				else
+					oNewItem.rowSpan = 1;
+				
+                if(node.style.textAlign != null && node.style.textAlign != '')
+                    oNewItem.a = node.style.textAlign;
+				else if(node.children[0] && node.children[0].style.textAlign != null && node.children[0].style.textAlign != '')
+					oNewItem.a = node.children[0].style.textAlign;
+				else if(node.nodeName.toLowerCase() == "th")
+					oNewItem.a = 'center';
+
+                if( $(node).css('background-color') != 'none' &&  $(node).css('background-color') != null)
+                {
+                     oNewItem.bc =  $(node).css('background-color');
+                }
+				
+				if(node.style.verticalAlign != undefined  && node.style.verticalAlign != null && node.style.verticalAlign != '' && node.style.verticalAlign != 'middle')
+					oNewItem.va = node.style.verticalAlign
+				else if(node.style.verticalAlign == 'middle')
+					oNewItem.va = 'center';
+				else
+					oNewItem.va = 'bottom';
+				
+				//check format
+				if( node.getAttribute("class") != null ){
+					cL = node.getAttribute("class").split(" ");
+					for (var i = 0; i < cL.length; i++){
+						if(cL[i].indexOf("nFormat") > -1)
+						{
+							var format = cL[i].split('nFormat');
+							oNewItem.format = format[1];
+						}
+					}
+				}
+				
+				//link
+				if($(node).children('a').length == 1 && oNewItem[0] != undefined)
+				{
+					oNewItem.hyperLink =  $(node).children('a').attr('href');
+					if($(node).children('a').attr('title'))
+						oNewItem.toolTip = $(node).children('a').attr('title');
+					else
+						oNewItem.toolTip = null;
+				}
+				else if(node.nodeName.toLowerCase() == 'a')
+				{
+					oNewItem.hyperLink =  $(node).attr('href');
+					if($(node).attr('title'))
+						oNewItem.toolTip = $(node).attr('title');
+					else
+						oNewItem.toolTip = null;
+				}
+                
+                aResult.push(oNewItem)
+                return aResult
+            },
+
+			_IsBlockElem : function(name)
+			{
+				if( "p" == name || "div" == name || "ul" == name || "ol" == name || "li" == name || "table" == name ||
+					"h1" == name || "h2" == name || "h3" == name || "h4" == name || "h5" == name || "h6" == name || "center" == name)
+					return true;
+				return false;
+			},
+			
+			_countTags: function(node,array) 
+			{
+				var t = this;
+				if (node && 1 == node.nodeType) {
+					// берем его первый дочерний узел
+					var child = node.firstChild;
+					// пока узлы не закончились
+					while (child) {
+						//проверка на блочные элементы в родительском контенте
+						var parent = $(child).parent();
+						var checkBlockParent = false;
+						while (parent.length != 0)
+						{
+							if(t._IsBlockElem(parent[0].nodeName.toLowerCase()))
+							{
+								checkBlockParent = true;
+								break;
+							}
+							parent = parent.parent();
+						}
+						
+						if (t._IsBlockElem(child.nodeName.toLowerCase()) && $(child).find("p,div,ul,ol,li,table,h1,h2,h3,h4,h5,h6,center").length == 0 || child.nodeName.toLowerCase() == 'table' ) {
+							array[array.length] = child;
+						}
+						else if(!checkBlockParent && $(child).find("p,div,ul,ol,li,table,h1,h2,h3,h4,h5,h6,center").length == 0 && !t._IsBlockElem(child.nodeName.toLowerCase()) && (child.nodeName.toLowerCase() == 'span' || child.nodeName.toLowerCase() == 'a'))
+							array[array.length] = child;
+						
+							// рекурсивно перечисляем дочерние узлы
+							if(child.nodeName.toLowerCase() != 'table')
+								t._countTags(child,array);
+						child = child.nextSibling;
+					};
+				};
+				return array;
+			},
+			
+			_getSignTags: function(nodes)
+			{
+				 var newArr = [];
+				 var k = 0;
+				 for (n = 0;n < nodes.length; ++n)
+				 {
+					if(!(nodes[n].nodeName.toLowerCase() == '#comment' || (nodes[n].nodeName.toLowerCase() == '#text' && nodes[n].textContent.replace(/(\r|\t|\n| )/g, '') == '')))
+					{
+						/*if($(nodes[n]).find("img").length != 0 && nodes[n].nodeName.toLowerCase() != 'table')//если в вставляемом фрагменте присутствует изображение
+						{
+							var images = $(nodes[n]).find("img");
+							for(i = 0; i < images.length; ++i)
+							{
+								newArr[k] = images[i];
+								k++;
+							}
+						}*/
+						if($(nodes[n]).find("p,div,ul,ol,li,table,h1,h2,h3,h4,h5,h6,center,img").length != 0 && nodes[n].nodeName.toLowerCase() != 'table' && nodes[n].nodeName.toLowerCase() != 'img')
+						{
+							var isWrap = '';
+							if(nodes[n].style && nodes[n].style.whiteSpace)
+								isWrap = nodes[n].style.whiteSpace;
+							Array.prototype.forEach.call(nodes[n].childNodes, function processElement(elem) {
+								if(elem.style && elem.style.whiteSpace && elem.nodeName.toLowerCase() == 'div')
+									isWrap = elem.style.whiteSpace;
+								if (($(elem).find("p,div,ul,ol,li,table,h1,h2,h3,h4,h5,h6,center,img").length == 0 && elem.textContent.replace(/(\r|\t|\n| )/g, '') != '') || elem.nodeName.toLowerCase() == 'table' || elem.nodeName.toLowerCase() == 'img') {
+									newArr[k] = elem;
+									if(elem.style)
+										newArr[k].style.whiteSpace = isWrap;
+									k++;
+								}
+								if($(elem).find("p,div,ul,ol,li,table,h1,h2,h3,h4,h5,h6,center,img").length != 0 && elem.nodeName.toLowerCase() != 'table' && elem.nodeName.toLowerCase() != 'img')
+									Array.prototype.forEach.call(elem.childNodes, processElement);
+							});
+						}
+						else
+						{
+							newArr[k] = nodes[n];
+							k++;
+						}
+					}
+						
+				 }
+				 return newArr;
+			},
+			
+            _editorPasteExec: function (worksheet, node, isText,onlyFromLocalStorage)
+            {
+                var pasteFragment = node;
+                var t = this;
+				
+				if(activateLocalStorage)
+				{
+					//в случае вставки по нажатию на правую кнопку мыши
+					if(onlyFromLocalStorage)
+					{
+						if(t.lStorage)
+						{
+							if(t.copyText && t.copyText.isImage)
+							{
+								if(t._insertImages(worksheet,t.lStorage))
+									return;
+							}
+							else
+							{
+								worksheet.setSelectionInfo('paste',t,false,true);
+							}	
+						}
+						return;
+					}
+					
+					//проверяем на равенство содержимому локального буфера
+					var textNode = t._getTextFromTable(node);
+					if(t._isEqualText(textNode))
+					{
+						if(t.copyText.isImage)
+						{
+							if(t._insertImages(worksheet,t.lStorage))
+								return;
+						}
+						else
+						{
+							worksheet.setSelectionInfo('paste',t,false,true);
+							return;
+						}	
+					}
+				}
+				
+                var aResult = new Array();
+                var range = worksheet.activeRange.clone(true);
+                var isMerge  = worksheet.model.getRange(new CellAddress(range.r1, range.c1, 0), new CellAddress(range.r2, range.c2, 0));
+				var testFragment = $.extend(true, {},node);
+				var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
+				$(testFragment).children('br').remove()
+				
+				//в случае если приходит простой текст, преращаем его в корректную html - проблема характерна для FF
+				if(testFragment.children.length == 0)
+				{
+					var allChild = node.childNodes;
+					var sHtml = '';
+					for (n = 0; n < allChild.length; ++n) {
+						text = allChild[n].nodeValue.replace(/(\r|\t|\n)/g, '');
+						if(allChild[n].nodeName.toLowerCase() == '#text' && text != '')
+						{
+							sHtml += "<p><span style='font-family:Calibri;font-size:11pt;white-space:nowrap'>" + text + "</span></p>"
+						}
+					}
+					if(sHtml == '')
+						return;
+					pasteFragment.innerHTML = sHtml;
+					if(!is_chrome)
+					  isText = true;
+				}
+				/*else
+				{
+					$(pasteFragment).children('br').remove()
+				}*/
+				
+                
+                //var children = t._getSignChildNodes(pasteFragment.childNodes);
+				var mainChildrens = t._getSignTags(pasteFragment.childNodes);
+				var countChild = mainChildrens.length;
+				
+                //определяем размер квадрата вставки
+                var arrMax = [];
+                for (n = 0;n < $(pasteFragment).find('table').length; ++n) {
+                    arrMax[n] = $($(pasteFragment).find('table')[n]).find('tr')[0].children.length;
+                }
+                if(arrMax.length != 0)
+                {
+                    var max = Math.max.apply( Math, arrMax );
+					if(max != 0)
+						range.c2 = range.c2 + max - 1;
+                }
+				var cellCountAll = [];
+                var mergeArr = [];
+				var fontsNew = [];
+				
+				var rowSpanPlus = 0;
+				var tableRowCount = 0;
+				var l = 0;
+                var n = 0;
+				var s = 0;
+				var countEmptyRow = 0;
+				var rowCount = 0;
+				if(null != $(pasteFragment).find('table') && 1 == countChild && pasteFragment.children[0] != undefined && pasteFragment.children[0].children[0] != undefined && pasteFragment.children[0].children[0].nodeName.toLowerCase() == 'table')
+				{
+					pasteFragment = pasteFragment.children[0];
+				}
+				var arrTags = [];
+				var countTrueTags = t._countTags(mainChildrens,arrTags);
+
+				if(countTrueTags.length != 0 && node.length != countTrueTags.length && node.children[0] != countTrueTags[0])
+				{
+					var p = document.createElement('p');
+					$(p).append(countTrueTags);
+					pasteFragment = p;
+					countChild = p.childNodes.length;
+					mainChildrens = pasteFragment.childNodes;
+				}
+				if(!mainChildrens)
+				{
+					countChild = pasteFragment.children.length;
+					mainChildrens = pasteFragment.children;
+				}
+				
+				var addImages = null;
+				var imCount = 0;
+				//пробегаемся по html
+                for (r = range.r1;r - range.r1 < countChild; ++r) {//цикл по r
+					var firstRow = mainChildrens[r - range.r1 - countEmptyRow];
+                    if(firstRow.nodeName.toLowerCase() == 'br')
+                        r++;
+                    aResult[r + tableRowCount] = new Array();
+                    var tag = mainChildrens[r - range.r1 - countEmptyRow];
+					if(pasteFragment.children.length == 1 && pasteFragment.children[0].nodeName.toLowerCase() == 'table')
+						aResult.isOneTable = true;
+                    for (c = range.c1; c <= range.c2; ++c) {
+                        if((tag.nodeName.toLowerCase() == 'div' || tag.nodeName.toLowerCase() == 'p' || tag.nodeName.toLowerCase() == 'h' ||  tag.nodeName.toLowerCase().search('h') != -1) && c == range.c1 || tag.nodeName.toLowerCase() == 'li')
+						{
+							var prevSib = mainChildrens[r - range.r1 - countEmptyRow -1];
+							//в случае если тег р следует за таблицей или таким же тегом, пропускаем строчку
+							if(prevSib)
+							{
+								if(prevSib.nodeName.toLowerCase() == 'table')
+								{
+									var emtyTag =  document.createElement('p');
+									aResult[r + tableRowCount][c] = t._getArray(emtyTag,isText);
+									countChild++;
+									r++;
+									countEmptyRow++;
+									aResult[r + tableRowCount] = new Array();
+								}
+							}
+							tag.innerHTML = tag.innerHTML.replace(/(\n)/g, '');
+							aResult[r + tableRowCount][c] = t._getArray(tag,isText);
+							fontsNew[l] = aResult[r + tableRowCount][c][0].fonts;
+							c = range.c2;
+							cellCountAll[s] = 1;
+							s++;
+							l++;
+						}
+						else if(tag.nodeName.toLowerCase() == '#text')
+						{
+								var prevSib = $(tag).prev();
+								//в случае если тег р следует за таблицей или таким же тегом, пропускаем строчку
+								if(prevSib.length != 0)
+								{
+									if(prevSib[prevSib.length - 1].nodeName.toLowerCase() == 'p' || prevSib[prevSib.length - 1].nodeName.toLowerCase() == 'table')
+									{
+										var emtyTag =  document.createElement('p');
+										aResult[r + tableRowCount][c] = t._getArray(emtyTag,isText);
+										countChild++;
+										r++;
+										countEmptyRow++;
+										aResult[r + tableRowCount] = new Array();
+									}
+								}
+								var span = document.createElement('p');
+								$(span).append(tag);
+								aResult[r + tableRowCount][c] = t._getArray(span,isText);
+								fontsNew[l] = aResult[r + tableRowCount][c][0].fonts;
+								c = range.c2;
+								cellCountAll[s] = 1;
+								s++;
+								l++;
+							
+						}
+                        else if(tag.nodeName.toLowerCase() == 'span' || tag.nodeName.toLowerCase() == 'a' || tag.nodeName.toLowerCase() == 'form')
+						{
+							aResult[r + tableRowCount][c] = t._getArray(tag,isText);
+							fontsNew[l] = aResult[r + tableRowCount][c][0].fonts;
+							cellCountAll[s] = 1;
+							c = range.c2;
+							s++;
+							l++;
+						}
+                        else if(tag.nodeName.toLowerCase() == 'table')
+                        {
+                            var startNum = r + tableRowCount;
+                            var tableBody = tag.getElementsByTagName('tbody')[0];
+                            var n = 0;
+							var arrCount = [];
+                            var cellCount = 0;
+							for(i = 0;i < tableBody.children.length;++i)
+                            {
+								arrCount[i]  = 0;
+								for(j = 0;j < tableBody.children[i].children.length;++j)
+								{
+									arrCount[i] += tableBody.children[i].children[j].colSpan;
+								}
+                            }
+							cellCount = Math.max.apply({}, arrCount);
+							for(i = 0;i < tableBody.children.length;++i)
+                            {
+                                if(tableBody.children[i].children[0] != undefined && (tableBody.children[i].children.length == cellCount|| tableBody.children[i].children[0].colSpan == cellCount))
+									rowCount += tableBody.children[i].children[0].rowSpan;
+                            }
+							aResult.rowCount = tag.rows.length;
+							if(tag.rows[0].children[0] != undefined && rowCount > tag.rows.length)
+							{
+								aResult.rowCount = rowCount;
+							}
+								
+							
+                            var mergeArr = [];
+                            
+							if(tableBody.children.length == 1 && tableBody.children[0].children.length == 1 && tableBody.children[0].children[0].rowSpan != '' && tableBody.children[0].children[0].rowSpan != null)
+								rowSpanPlus = tableBody.children[0].children[0].rowSpan - 1;
+                            //aResult.cellCount = cellCount;
+							cellCountAll[s] = cellCount;
+							s++;
+							/*if(tag.children.length == 1 && tag.children[0].children.length == 1 && tag.offsetParent != null && tag.offsetParent != undefined && tag.offsetParent.children.length == 1 && $(tag).find('td')[0].rowSpan == 1 && $(tag).find('td')[0].colSpan == 1 && isMerge.hasMerged() == null && tableBody.children.length == 1 && tableBody.children[0].children != undefined && tableBody.children[0].children.length == 1)//сделать ещё для вставки из Excel
+							{
+								for (tR = startNum; tR <= range.r2; ++tR) {
+									aResult[tR] = new Array();
+									var cNew = 0;
+									for(tC = range.c1; tC <= range.c2; ++tC) {
+										var _tBody = tableBody.children[0].children[0];
+										aResult[tR][tC] = t._getArray(_tBody);
+									}
+								}
+								cellCountAll[s] = range.c2 - range.c1 + 1;
+								s++;
+								r = tR;
+								break;
+							}
+							else
+							{*/
+								for (tR = startNum; tR < tableBody.children.length + startNum; ++tR) {
+									aResult[tR] = new Array();
+									var cNew = 0;
+									for(tC = range.c1; tC < range.c1 + cellCount; ++tC) {
+										
+										if(0 != mergeArr.length)
+										{
+											for(k = 0; k < mergeArr.length; ++k)
+											{
+												if(tC >= mergeArr[k].c1 && tC <= mergeArr[k].c2 && tR >= mergeArr[k].r1 && tR <= mergeArr[k].r2)
+												{
+													break;
+												}
+												else if (k == mergeArr.length -1)
+												{	
+													var _tBody = tableBody.children[tR -startNum ].children[cNew];
+													var findImg = $(_tBody).find('img');
+													if(findImg.length != 0)
+													{
+														for(var imgCol = 0; imgCol < findImg.length; imgCol++)
+														{
+															if(addImages == null)
+																addImages = [];
+															var curCell = {
+																col: tC ,
+																row: tR + imgCol
+															}
+															var tag = $(_tBody).find('img')[imgCol];
+															addImages[imCount] = 
+															{
+																curCell: curCell,
+																tag: tag
+															}
+															imCount++;
+														}
+														
+														//worksheet.objectRender.addImageDrawingObject(tag.src, false, { cell: curCell, width: tag.width, height: tag.height });
+													}
+													if(_tBody == undefined)
+														_tBody = document.createElement('td');
+													aResult[tR][tC] = t._getArray(_tBody,isText);
+													fontsNew[l] = aResult[tR][tC][0].fonts;
+													l++;
+													if(undefined != _tBody && (_tBody.colSpan > 1 || _tBody.rowSpan > 1))
+													{
+														mergeArr[n++] = {
+															r1: tR,
+															r2: tR + _tBody.rowSpan - 1,
+															c1: tC,
+															c2: tC + _tBody.colSpan - 1
+														}
+													}
+													 cNew++;
+												}
+											}
+										}
+										else
+										{
+											var _tBody = tableBody.children[tR -startNum ].children[cNew];
+											var findImg = $(_tBody).find('img');
+											if(findImg.length != 0)
+											{
+												for(var imgCol = 0; imgCol < findImg.length; imgCol++)
+												{
+													if(addImages == null)
+														addImages = [];
+													var curCell = {
+														col: tC,
+														row: tR + imgCol
+													}
+													var tag = $(_tBody).find('img')[imgCol];
+													addImages[imCount] = 
+													{
+														curCell: curCell,
+														tag: tag
+													}
+													imCount++;
+												}
+												
+												//worksheet.objectRender.addImageDrawingObject(tag.src, false, { cell: curCell, width: tag.width, height: tag.height });
+											}
+											aResult[tR][tC] = t._getArray(_tBody,isText);
+											fontsNew[l] = aResult[tR][tC][0].fonts;
+											l++;
+											if(undefined != _tBody && (_tBody.colSpan > 1 || _tBody.rowSpan > 1))
+											{
+												mergeArr[n++] = {
+													r1: tR,
+													r2: tR + _tBody.rowSpan - 1,
+													c1: tC,
+													c2: tC + _tBody.colSpan - 1
+												}
+											}
+											cNew++;
+										}
+									}
+								}
+								//tableRowCount += tableBody.children.length + 1;
+								if(countChild == 1)//если только таблица приходит
+									r = tR;
+								else//если помимо таблицы есть ещё и прочее содержимое
+									tableRowCount += tableBody.children.length -1;
+								break;
+							//}
+                            
+                        }
+						else if(tag.nodeName.toLowerCase() == 'img')
+						{
+							var curCell = {
+								col: c,
+								row: r + tableRowCount
+							}
+							if(addImages == null)
+								addImages = [];
+							addImages[imCount] = 
+							{
+								curCell: curCell,
+								tag: tag
+							}
+							imCount++;
+							c = range.c2;
+						}
+                        else
+						{
+							var textArr;
+							if((mainChildrens[r - range.r1] == undefined || mainChildrens[r - range.r1].innerText == undefined || mainChildrens[r - range.r1].innerText == null) && ($(mainChildrens[r - range.r1]).text() == undefined || $(mainChildrens[r - range.r1]).text() == null))
+							{
+								textArr = [];
+								textArr[0] = '';
+							}
+							else
+							{
+								var text = tag.innerText;
+								if(text == undefined)
+									text = $(tag).text();
+								textArr = text.split('\n');
+							}
+								
+							for(k=0;k < textArr.length ; ++k)
+							{
+								aResult[r + tableRowCount] = new Array();
+								var newP = document.createElement('p');
+								var newSpan = document.createElement('span');
+								$(newP).append(newSpan);
+								newSpan.innerText = textArr[k];
+								$(newSpan).text(textArr[k]);
+								aResult[r + tableRowCount][c] = t._getArray(newP,isText);
+								fontsNew[l] = aResult[r + tableRowCount][c][0].fonts;
+								l++;
+								if(textArr.length != 1 && (textArr.length - 1) != k)
+									r++;
+							}
+							c = range.c2;
+							cellCountAll[s] = 1;
+							s++;
+						}
+                    }
+                }
+				if(cellCountAll.length == 0)
+					aResult.cellCount = 0;
+				else
+					aResult.cellCount = Math.max.apply(Math, cellCountAll);
+				aResult.rowSpanSpCount = rowSpanPlus;
+				aResult.addImages = addImages;
+				aResult.fontsNew = fontsNew;
+				worksheet.setSelectionInfo('paste',aResult,t);
+            },
+			
+			_isEqualText: function(node){
+				var t = this;
+				if(undefined == t.copyText || node == undefined)
+					return false;
+				if(t.copyText.text && $.browser['opera'] && node.text.replace(/(\r|\t|\n| |\s)/g, "") == t.copyText.text.replace(/(\r|\t|\n| |\s)/g, ""))
+					return true;
+				if($.browser['msie'] && t.copyText.text != undefined && node.text != undefined &&  node.text == "" && t.copyText.isImage)
+					return true;
+				if(t.copyText.text != undefined && node.text != undefined && node.text == t.copyText.text)
+				{
+					if(t.copyText.isImage)
+						return true;
+					else if(node.rows && t.copyText.rows && node.rows == t.copyText.rows && node.cols && t.copyText.cols && node.cols == t.copyText.cols)
+						return true;
+				}
+				return false;
+					
+				
+				/*var localText = t.copyText;
+				var insertText = node.innerText;
+				if(localText == insertText)
+					return true;
+				var tabSpl = localText.split('\t');
+				for(i = 0;i < tabSpl.length ;i++)
+				{
+					for(j = 0;j < tabSpl[i].split('\n').length ;j++)
+					{
+						if(i == tabSpl.length -1 && j == tabSpl[i].split('\n').length -1 && tabSpl[i].split('\n')[j] == '')
+							return true;
+						if(tabSpl[i].split('\n')[j] != insertText.split('\t')[i].split('\n')[j])
+							return false;
+					}
+				}
+				return true;*/
+			},
+			
+			_selectElement: function (callback) {
+				var t = this, selection, rangeToSelect;
+
+				if (window.getSelection) {// all browsers, except IE before version 9
+					selection = window.getSelection();
+					rangeToSelect = doc.createRange();
+					// в FF 8 после выделения selectNodeContents копируется и родительский div,
+					// чтобы этого избежать в FF8 и других браузерах новых или стаых версий
+					// добавляем дополнительные node
+					// Оставить этот код для остальных браузеров не получилось. Chrome начала
+					// вставлять разрыв линии перед первым параграфом
+					if (window.navigator.userAgent.toLowerCase().indexOf('gecko/') >= 0) {
+						t.element.appendChild(doc.createTextNode('\xa0'));
+						t.element.insertBefore(doc.createTextNode('\xa0'), t.element.firstChild);
+						rangeToSelect.setStartAfter(t.element.firstChild);
+						rangeToSelect.setEndBefore(t.element.lastChild);
+					} else {
+						rangeToSelect.selectNodeContents(t.element);
+					}
+					selection.removeAllRanges();
+					selection.addRange(rangeToSelect);
+				} else {
+					if (doc.body.createTextRange) {// Internet Explorer
+						rangeToSelect = doc.body.createTextRange();
+						rangeToSelect.moveToElementText(t.element);
+						rangeToSelect.select();
+					}
+				}
+				// ждем выполнения copy
+				window.setTimeout(
+						function() {
+							// отменяем возможность выделения
+							t.element.style.display = "none";
+							doc.body.style.MozUserSelect = "none";
+							doc.body.style["-khtml-user-select"] = "none";
+							doc.body.style["-o-user-select"] = "none";
+							doc.body.style["user-select"] = "none";
+							doc.body.style["-webkit-user-select"] = "none";
+							// for paste event
+							if (callback && callback.call) {callback();}
+						},
+						0);
+			},
+
+			_makeNodesFromCellValue: function (val, defFN, defFS,isQPrefix,isFormat,cell) {
+				var i, res, span, f;
+
+				function getTextDecoration(format) {
+					var res = [];
+					if (format.u !== "none") {res.push("underline");}
+					if (format.s) {res.push("line-through");}
+					return res.length > 0 ? res.join(",") : "";
+				}
+
+				for (res = [], i = 0; i < val.length; ++i) {
+					if(val[i] && val[i].format && val[i].format.skip)
+						continue;
+					if(cell == undefined || (cell != undefined && (cell.getHyperlink() == null || (cell.getHyperlink() != null && cell.getHyperlink().Location != null))))
+						span = doc.createElement("SPAN");
+					else
+					{
+						span = doc.createElement("A");
+						if(cell.getHyperlink().Hyperlink != null)
+							span.href = cell.getHyperlink().Hyperlink;
+						else if(cell.getHyperlink().Location != null)
+							span.href = "#" + cell.getHyperlink().Location;
+						if(cell.getHyperlink().Tooltip != null)
+							span.title = cell.getHyperlink().Tooltip;
+					}
+					if( val[i].sFormula ){
+						span.textContent = "="+val[i].sFormula;
+						$(span).addClass("cellFrom_"+val[i].sId);
+					}
+					else{
+						span.textContent = val[i].text;
+						if(isQPrefix)
+							$(span).addClass("qPrefix");
+						else if(isFormat && isFormat.f && isFormat.wFormat)
+						{
+							var text = '';
+							for (k = 0; k < val.length; ++k) {
+								text += val[k].text;
+							}
+							span.textContent = text;
+							i = val.length - 1;
+						}
+					}
+					f = val[i].format;
+					if (f.c) {span.style.color = number2color(f.c);}
+					if (f.fn !== defFN) {span.style.fontFamily = f.fn;}
+					if (f.fs !== defFS) {span.style.fontSize = f.fs + 'pt';}
+					if (f.b) {span.style.fontWeight = 'bold';}
+					if (f.i) {span.style.fontStyle = 'italic';}
+					span.style.textDecoration = getTextDecoration(f);
+					span.style.verticalAlign = f.va === 'subscript' ? 'sub' : f.va === 'superscript' ? 'super' : 'baseline';
+					span.innerHTML = span.innerHTML.replace(/\n/g,'<br>');
+					res.push(span);
+				}
+				return res;
+			},
+
+			_addValueToLocalStrg: function (value) {
+				var t = this;
+				var isNull = 0;
+				if(!value || !value[isNull])
+					return;
+				
+				t.lStorage = [];
+				t.lStorage.fromRow = isNull;
+				t.lStorage.fromCol = isNull;
+				t.lStorageText = value[isNull].text;
+				var val2 = [];
+				val2[isNull] = 
+				{
+					text: value[isNull].text,
+					format: value[isNull].format
+				};
+				t.lStorage[isNull] = [];
+				t.lStorage[isNull][isNull] = 
+				{
+					value2: val2,
+					wrap: true,
+					format: false
+				}
+			},
+			
+			_makeTableNode: function (range, worksheet) {
+				var fn = range.worksheet.workbook.getDefaultFont();
+				var fs = range.worksheet.workbook.getDefaultSize();
+				var bbox = range.getBBox0();
+				var merged = [];
+				var t = this;
+				var table, tr, td, cell, j, row, col, mbbox, h, w, b;
+
+				function skipMerged() {
+					var m = merged.filter(function(e){return row>=e.r1 && row<=e.r2 && col>=e.c1 && col<=e.c2});
+					if (m.length > 0) {
+						col = m[0].c2;
+						return true;
+					}
+					return false;
+				}
+
+				function makeBorder(border) {
+					return !border || !border.s || border.s === "none" ?
+							"" :
+							kBorder[border.s][1] + "px " + kBorder[border.s][0] + " " + number2color(border.c);
+				}
+
+				table = doc.createElement("TABLE");
+				table.cellPadding = "0";
+				table.cellSpacing = "0";
+				table.style.borderCollapse = "collapse";
+				table.style.fontFamily = fn;
+				table.style.fontSize = fs + "pt";
+				table.style.color = "#000";
+				table.style.backgroundColor = "transparent";
+				
+				var isSelectedImages = t._getSelectedDrawingIndex(worksheet);
+				var isImage = false;
+				var isChart = false;
+				
+				//копируем изображения
+				if(isSelectedImages && isSelectedImages != -1)
+				{
+					if(this.Api && this.Api.isChartEditor)
+						return false;
+						
+					var nLoc = 0;
+					var table = document.createElement('span');
+					var drawings = worksheet.model.Drawings;
+					t.lStorage = [];
+					for (j = 0; j < isSelectedImages.length; ++j) {
+						var image = drawings[isSelectedImages[j]];
+						var cloneImg = worksheet.objectRender.cloneDrawingObject(image);
+						var curImage = new Image();
+						curImage.src = cloneImg.image.src;
+						curImage.width = cloneImg.getWidthFromTo();
+						curImage.height = cloneImg.getHeightFromTo();
+						curImage.name = image.guid;
+						
+						table.appendChild(curImage);
+						
+						//add image or chart in local buffer
+						if(image.isChart())
+						{
+							isChart = {};
+							isChart.chart = cloneImg.chart;
+							isChart.src = cloneImg.src;
+							isChart.height = curImage.height;
+							isChart.width = curImage.width;
+						}
+						else
+						{
+							t.lStorage[nLoc] = {};
+							t.lStorage[nLoc].image = curImage;
+							t.lStorage[nLoc].fromCol = cloneImg.from.col;
+							t.lStorage[nLoc].fromRow = cloneImg.from.row;
+							isImage = true;
+							
+						}
+						
+						t._addLocalStorage(isImage,isChart,range.worksheet.getCell( new CellAddress(row, col, 0) ),bbox.r1,bbox.c1, image.from.row, image.from.col);
+					}
+
+				}
+				else
+				{
+					if(activateLocalStorage)
+					{
+						var localStText = '';
+						//add local buffer
+						for (row = bbox.r1; row <= bbox.r2; ++row) {
+							if(row != bbox.r1)
+								localStText += '\n'
+							for (col = bbox.c1; col <= bbox.c2; ++col) {
+								if(col != bbox.c1)
+									localStText += ' ';
+								var currentRange = range.worksheet.getCell( new CellAddress(row, col, 0) )
+								//добавляем текст
+								var textRange = currentRange.getValue();
+								if(textRange == '')
+									localStText += '\t';
+								else
+									localStText += textRange;
+								//добавляем ноды
+								t._addLocalStorage(false,false,currentRange,bbox.r1,bbox.c1,row,col);
+							}
+						}
+						t.lStorageText = localStText;
+					}
+					for (row = bbox.r1; row <= bbox.r2; ++row) {
+						tr = doc.createElement("TR");
+						h = range.worksheet.getRowHeight(row);
+						if (h > 0) {tr.style.height = h + "pt";}
+
+						for (col = bbox.c1; col <= bbox.c2; ++col) {
+							if (skipMerged()) {continue;}
+
+							cell = range.worksheet.getCell( new CellAddress(row, col, 0) );
+							td = doc.createElement("TD");
+
+							mbbox = cell.hasMerged();
+							if (mbbox) {
+								merged.push(mbbox);
+								td.colSpan = mbbox.c2 - mbbox.c1 + 1;
+								td.rowSpan = mbbox.r2 - mbbox.r1 + 1;
+								for (w = 0, j = mbbox.c1; j <= mbbox.c2; ++j) {w += worksheet.getColumnWidth(j, 1/*pt*/);}
+								td.style.width = w + "pt";
+							} else {
+								td.style.width = worksheet.getColumnWidth(col, 1/*pt*/) + "pt";
+							}
+
+							if (!cell.getWrap()) {td.style.whiteSpace = "nowrap";}else {td.style.whiteSpace = "normal";} 
+
+							if(cell.getAlignHorizontal() != 'none')
+								td.style.textAlign = cell.getAlignHorizontal();
+							td.style.verticalAlign = cell.getAlignVertical();
+							if(cell.getAlignVertical() == 'center')
+								td.style.verticalAlign = 'middle'
+
+							b = cell.getBorderFull();
+							if(mbbox)
+							{
+								var cellMergeFinish = range.worksheet.getCell( new CellAddress(mbbox.r2, mbbox.c2, 0) );
+								var borderMergeCell = cellMergeFinish.getBorderFull();
+								td.style.borderRight = makeBorder(borderMergeCell.r);
+								td.style.borderBottom = makeBorder(borderMergeCell.b);
+							}
+							else
+							{
+								td.style.borderRight = makeBorder(b.r);
+								td.style.borderBottom = makeBorder(b.b);
+							}	
+							td.style.borderLeft = makeBorder(b.l);
+							td.style.borderTop = makeBorder(b.t);
+
+							
+							var isFormat = {};
+							isFormat.f = false;
+							isFormat.wFormat = false;
+							//add format
+							if(cell.getNumFormat() != null && cell.getNumFormat() != undefined && cell.getNumFormat().oTextFormat.formatString != '' && cell.getNumFormat().oTextFormat.formatString != null && (cell.getType() == 'n' || cell.getType() == null || cell.getType() == 0) && cell.getNumFormatStr() != 'General')
+							{
+								var formatStr = t._encode(cell.getNumFormatStr());
+								var valStr = t._encode(cell.getValueWithoutFormat());
+								$(td).addClass("nFormat" + formatStr + ';' + valStr);
+								isFormat.f = cell.getValueWithoutFormat();
+								isFormat.wFormat = true;
+							}
+								
+							
+							b = cell.getFill();
+							// если b==0 мы не зайдем в if, хотя b==0 это ни что иное, как черный цвет заливки.
+							if (b!=null) {td.style.backgroundColor = number2color(b);}
+
+							var isQPrefix = cell.getQuotePrefix()
+							this._makeNodesFromCellValue(cell.getValue2(), fn ,fs,isQPrefix,isFormat,cell).forEach(
+									function(node){
+										td.appendChild(node);
+									});
+
+							tr.appendChild(td);
+						}
+						table.appendChild(tr);
+					}
+				}
+				
+
+				return table;
+			},
+			
+			_addLocalStorage : function (isImage,isChart,cell,numRow,numCol,trueRow,trueCol) {
+				var t = this;
+				if(isChart)
+				{
+					t.lStorage = [];
+					t.lStorage[0] = {};
+					t.lStorage[0].isChart = isChart;
+					//t.lStorage[trueRow][trueCol] = isChart;
+				}
+				else if(!isImage)
+				{
+					var row = trueRow - numRow;
+					var col = trueCol - numCol;
+					if(row == 0 && col == 0)
+					{
+						t.lStorage = [];
+						t.lStorage.fromRow = numRow;
+						t.lStorage.fromCol = numCol;
+					}
+					if(t.lStorage[row] == undefined)
+						t.lStorage[row] = [];
+					t.lStorage[row][col] = 
+					{
+						value2:  Asc.clone(cell.getValue2()),
+						borders: cell.getBorderFull(),
+						merge: cell.hasMerged(),
+						format: cell.getNumFormat(),
+						verAlign: cell.getAlignVertical(),
+						horAlign: cell.getAlignHorizontal(),
+						wrap: cell.getWrap(),
+						fill: cell.getFill(),
+						hyperlink: cell.getHyperlink(),
+						valWithoutFormat: cell.getValueWithoutFormat()
+					}
+					if(cell.getQuotePrefix() && t.lStorage[row][col] && t.lStorage[row][col].value2 && t.lStorage[row][col].value2[0])
+						t.lStorage[row][col].value2[0].text = "'" + t.lStorage[row][col].value2[0].text;
+					
+				}
+			},
+
+			_paste: function (callback) {
+				var t = this;
+				t._cleanElement();
+				t.element.focus();
+				// Safari requires a filler node inside the div to have the content pasted into it. (#4882)
+				t.element.appendChild(doc.createTextNode('\xa0'));
+				t._selectElement(callback);
+			},
+
+			_makeCellValueFromHtml: function (callback) {
+				if (!callback || !callback.call) {return;}
+				
+				var defaultFontName = 'Arial';
+				var t = this, i;
+				var res = [];
+				var fonts = [];
+				var reQuotedStr = /['"]([^'"]+)['"]/;
+				var reSizeStr = /\s*(\d+\.*\d*)\s*(em|ex|cm|mm|in|pt|pc|px|%)?\s*/i;
+
+				function getFontName(style) {
+					var fn = style.fontFamily.split(",")[0];
+					var m = reQuotedStr.exec(fn);
+					if (m) {fn = m[1];}
+					switch (fn.toLowerCase()) {
+						case "sans-serif": return "Arial";
+						case "serif":      return "Times";
+						case "monospace":  return "Courier";
+					}
+					return fn;
+				}
+
+				function getFontSize(style) {
+					var fs = style.fontSize.toLowerCase();
+					var m = reSizeStr.exec(fs);
+					var sz = m ? parseFloat(m[1]) : 0;
+					return m[2] === "px" ? (sz / t.ppix * 72).toFixed(1)-0 : 0;
+				}
+
+				Array.prototype.forEach.call(t.element.childNodes, function processElement(elem) {
+					if (elem.nodeType === Node.TEXT_NODE) {
+						var style = window.getComputedStyle(elem.parentNode);
+						//var fn = getFontName(style);
+						var fn = defaultFontName;
+						var fs = getFontSize(style);
+						var fb = style.fontWeight.toLowerCase();
+						var fi = style.fontStyle.toLowerCase();
+						var td = style.textDecoration.toLowerCase();
+						var va = style.verticalAlign.toLowerCase();
+						res.push({
+							/*format: {
+								fn: t._checkFonts(fn),
+								fs: fs,
+								c: style.getPropertyValue("color"),
+								b: fb.indexOf("bold") >= 0 || parseInt(fb, 10) > 500,
+								i: fi.indexOf("italic") >= 0,
+								u: td.indexOf("underline") >= 0 ? "single" : "none",
+								s: td.indexOf("line-through") >= 0,
+								va: va.indexOf("sub") >=0 ? "subscript" : va.indexOf("sup") >=0 ? "superscript" : "none"
+							},*/
+							format: {//дефолтовые значения для вставленного текста.чтобы сделать поддержку стилей раскомментировать то, что сверху
+								fn: t._checkFonts(fn),
+								fs: fs,
+								b: false,
+								i: false,
+								u: 'none',
+								s: false,
+								va: "none"
+							},
+							text: elem.textContent});
+						if (fn !== "") {fonts.push(fn);}
+						return;
+					}
+
+					Array.prototype.forEach.call(elem.childNodes, processElement);
+					var n = elem.tagName ? elem.tagName.toUpperCase() : "";
+					if (/H\d|LABEL|LI|P|PRE|TR|DD|BR/.test(n) && res.length > 0) {
+						res[res.length - 1].text += "\n";
+					} else if (/DT/.test(n) && res.length > 0) {
+						res[res.length - 1].text += "\t";
+					}
+				});
+
+				fonts.sort();
+				for (i = 0; i < fonts.length; ) {
+					if (i+1 < fonts.length && fonts[i] === fonts[i+1]) {fonts.splice(i+1, 1); continue;}
+					++i;
+				}
+				callback(res, fonts);
+			},
+
+			_makeCellValuesHtml: function (node,isText) {
+				//if (!callback || !callback.call) {return;}
+
+				var t = this, i;
+				var res = [];
+				var fonts = [];
+				var reQuotedStr = /['"]([^'"]+)['"]/;
+				var reSizeStr = /\s*(\d+\.*\d*)\s*(em|ex|cm|mm|in|pt|pc|px|%)?\s*/i;
+
+				function getFontName(style) {
+					var fn = style.fontFamily.split(",")[0];
+					var m = reQuotedStr.exec(fn);
+					if (m) {fn = m[1];}
+					switch (fn.toLowerCase()) {
+						case "sans-serif": return "Arial";
+						case "serif":      return "Times";
+						case "monospace":  return "Courier";
+					}
+					return fn;
+				}
+
+				function getFontSize(style) {
+					var fs = style.fontSize.toLowerCase();
+					var defaultValue = '11';
+					if(fs == undefined || fs == '')
+						return defaultValue;
+					var m = reSizeStr.exec(fs);
+					var sz = m ? parseFloat(m[1]) : 0;
+					return m[2] === "px" ? (sz / t.ppix * 72).toFixed(1)-0 : 0;
+				}
+
+				Array.prototype.forEach.call(node, function processElement(elem) {
+					if (elem.nodeType === Node.TEXT_NODE || (elem.nodeName.toLowerCase() == 'br' && $(node).children('br').length != 0 && elem.parentNode.nodeName.toLowerCase() == 'span') || (elem.parentNode.getAttribute != undefined && elem.parentNode.getAttribute("class") != null && elem.parentNode.getAttribute("class") == "qPrefix") || (elem.getAttribute != undefined && elem.getAttribute("class") != null&& elem.getAttribute("class") == "qPrefix")) {
+						if(elem.textContent.replace(/(\r|\t|\n| )/g, '') != '' || elem.textContent == ' ')
+						{
+						var parent = elem.parentNode;
+						if(elem.getAttribute != undefined && elem.getAttribute("class") == "qPrefix")
+							var parent = elem;
+						var style = window.getComputedStyle(parent);
+						var fn = getFontName(style);
+						if(fn == '')
+							fn = parent.style.fontFamily.replace(/'/g,""); 
+						fn = t._checkFonts(fn);
+						var fs = Math.round(getFontSize(style));
+						var fb = style.fontWeight.toLowerCase();
+						var fi = style.fontStyle.toLowerCase();
+						var td = style.textDecoration.toLowerCase();
+						var va = style.verticalAlign.toLowerCase();
+						var prefix = "";
+						
+						var cL = null ,cellFrom = null;
+						if( parent.getAttribute("class") != null ){
+							cL = parent.getAttribute("class").split(" ");
+							for (var i = 0; i < cL.length; i++){
+								if(cL[i].indexOf("cellFrom_") > -1){
+									cellFrom = cL[i].replace("cellFrom_","");
+									break;
+								}
+								else if(cL[i].indexOf("qPrefix") > -1)
+								{
+									prefix = "'";
+									break;
+								}
+							}
+						}
+						var text = elem.textContent.replace('\t','');
+						if(elem.nodeName.toLowerCase() == 'br')
+							text = '\n';
+						var colorText = style.getPropertyValue("color"); 
+						if(isText || (isText == '' && typeof isText == 'string'))
+							colorText = null;
+						res.push({
+							format: {
+								fn: fn,
+								fs: fs,
+								c: colorText,
+								b: fb.indexOf("bold") >= 0 || parseInt(fb, 10) > 500,
+								i: fi.indexOf("italic") >= 0,
+								u: td.indexOf("underline") >= 0 ? "single" : "none",
+								s: td.indexOf("line-through") >= 0,
+								va: va.indexOf("sub") >=0 ? "subscript" : va.indexOf("sup") >=0 ? "superscript" : "none"
+							},
+							text: prefix + text,
+							cellFrom : cellFrom
+							});
+						if (fn !== "") {fonts.push(fn);}
+						return;
+						}
+					}
+					if(elem.childNodes == undefined)
+						Array.prototype.forEach.call(elem, processElement);
+					else
+						Array.prototype.forEach.call(elem.childNodes, processElement);
+				});
+			/* 	if(res.format == undefined)//Что это? Нипанятнаааа! res.format - ни где не определяется для res, и после кода выполнения кода в этом if у res не появится элемент format.
+				{
+					res.push({
+					format: {
+						fn: 'Arial',
+						fs: '11',
+						b: false,
+						i: false,
+						u: false,
+						s: false,
+						va: 'none'
+					},
+					text: ''});
+				} */
+				fonts.sort();
+				for (i = 0; i < fonts.length; ) {
+					if (i+1 < fonts.length && fonts[i] === fonts[i+1]) {fonts.splice(i+1, 1); continue;}
+					++i;
+				}
+				res.fonts = fonts;
+				return res;
+			},
+
+			_makeRangeFromHtml: function (callback) {
+				if (!callback || !callback.call) {return;}
+				var t = this;
+				var res = {};
+				callback(res);
+			},
+			
+			_checkFonts: function (fontName) {
+				//var defaultFont = 'Arial';
+				var defaultFont = 'Calibri';
+				if (null === this.Api)
+					return defaultFont;
+				if(this.Api.FontLoader.map_font_index[fontName] != undefined)
+					return fontName;
+				var arrName = fontName.toLowerCase().split(' ');
+				var newFontName = ''
+				for(i = 0;i < arrName.length;i++)
+				{
+					arrName[i] = arrName[i].substr(0,1).toUpperCase() + arrName[i].substr(1).toLowerCase();
+					if(i == arrName.length - 1)
+						newFontName += arrName[i];
+					else
+						newFontName += arrName[i] + ' ';
+				}
+				if(this.Api.FontLoader.map_font_index[newFontName] != undefined)
+					return newFontName;
+				else
+					return defaultFont;
+			},
+			
+			_encode : function (input) {
+				return Base64.encode(input).replace(/\//g, "_s").replace(/\+/g, "_p").replace(/=/g, "_e");
+			},
+
+			_decode : function (input) {
+				return Base64.decode(input.replace(/_s/g, "/").replace(/_p/g, "+").replace(/_e/g, "="));
+			},
+			
+			_getSelectedDrawingIndex : function(worksheet) {
+				if(!worksheet)
+					return false;
+				var images = worksheet.model.Drawings;
+				var n = 0;
+				var arrImages = [];
+				if(images)
+				{
+					for (var i = 0; i < images.length; i++) {
+						if (images[i].flags.selected == true)
+						{
+							arrImages[n] = i;
+							n++;
+						}
+					}
+				}
+				if(n == 0)
+					return -1;
+				else
+					return arrImages;
+			},
+			
+			_insertImages: function (ws, array) {
+				//object{images:,fromCol,fromRow}
+				if(!array || array && array.length == 0)
+					return false;
+				ws.collaborativeEditing.onStartCheckLock();
+				var firstRange = ws.activeRange.clone(true);
+				for(i=0;i < array.length;i++)
+				{
+					if(typeof array[i].isChart == 'object')
+					{
+						var activeRange = ws.activeRange;
+						var left = ws.cols[activeRange.c1].left;
+						var top =  ws.rows[activeRange.r1].top;
+						var options = 
+						{
+							height: array[i].isChart.height,
+							width: array[i].isChart.width,
+							left: left,
+							top: top
+						}
+						ws.objectRender.addChartDrawingObject(array[i].isChart.chart,null,options);
+					}
+					else
+					{
+						var curCell = {
+							col: firstRange.c1 + (array[i].fromCol - array[0].fromCol),
+							row: firstRange.r1 + (array[i].fromRow - array[0].fromRow)
+						}
+						ws.objectRender.addImageDrawingObject(array[i].image.src, true, { cell: curCell, width: array[i].image.width, height: array[i].image.height });
+					}
+				}
+				ws.collaborativeEditing.onEndCheckLock();
+				return true;
+			}
+
+		};
+		/*
+		 * Export
+		 * -----------------------------------------------------------------------------
+		 */
+		window["Asc"].Clipboard = Clipboard;
+
+	}
+)(jQuery, window);

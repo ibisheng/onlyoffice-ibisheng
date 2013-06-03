@@ -1,0 +1,2829 @@
+﻿/** @define {boolean} */
+var ASC_DOCS_API_LOAD_COAUTHORING_SETTINGS = true;
+
+/** @define {boolean} */
+var ASC_SPREADSHEET_API_CO_AUTHORING_ENABLE = true;
+
+var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
+(
+	/**
+	 * @param {jQuery} $
+	 * @param {Window} window
+	 * @param {undefined} undefined
+	 */
+	function ($, window, undefined) {
+
+
+		var asc = window["Asc"];
+		var asc_CCollaborativeEditing = asc.CCollaborativeEditing;
+		var asc_CAdjustPrint = asc.asc_CAdjustPrint;
+		var asc_user  = asc.asc_CUser;
+		var prot;
+
+
+		function spreadsheet_api(name, inputName, eventsController, eventsHandlers, options) {
+			/************ private!!! **************/
+			this.HtmlElementName = name;
+			this.topLineEditorName = inputName;
+
+			if ("function" === typeof(eventsController)) {
+				var prot = eventsController.prototype;
+				prot.init = prot["init"];
+				prot.destroy = prot["destroy"];
+				prot.enableKeyEventsHandler = prot["enableKeyEventsHandler"];
+				prot.reinitializeScroll = prot["reinitializeScroll"];
+				prot.scrollVertical = prot["scrollVertical"];
+				prot.scrollHorizontal = prot["scrollHorizontal"];
+
+				this.controller = new eventsController();
+			} else {
+				this.controller	= new asc.asc_CEventsController();
+			}
+
+			this.handlers = new asc.asc_CHandlersList(eventsHandlers);
+			this.options = options;
+			// Вид печати
+			this.adjustPrint = null;
+			// Рассчитанные данные для печати
+			this.printPagesData = null;
+
+			this.isMobileVersion = false;
+
+			this.fontRenderingMode = c_oAscFontRenderingModeType.noHinting;
+			this.wb = null;
+			this.wbModel = null;
+
+			this.FontLoader = window.g_font_loader;
+			this.FontLoader.put_Api(this);
+
+			this.FontLoader.SetStandartFonts();
+			this.LoadedObject = null;
+			this.DocumentType = 0; // 0 - empty, 1 - test, 2 - document (from json)
+
+			this.DocumentName = "";
+			this.documentId = undefined;
+			this.documentUrl = "null";
+			this.documentTitle = "null";
+			this.documentFormat = "null";
+			this.documentVKey = "null";
+			this.documentOrigin = "";
+			this.cCharDelimiter = String.fromCharCode(5);
+			this.chartEditor = undefined;
+			this.documentOpenOptions = undefined;		// Опции при открытии (пока только опции для CSV)
+
+			// объекты, нужные для отправки в тулбар (шрифты, стили)
+			this.guiFonts = null;		// Переменная для сохранения фонтов для облегченной версии (переход в edit mod)
+			this._gui_control_colors = null;
+			this._gui_color_schemes = null;
+			this.GuiControlColorsMap = null;
+			this.IsSendStandartColors = false;
+
+			this.tablePictures = null;  
+			
+			this.asyncMethodCallback = undefined;
+
+			this.ScriptLoader = window.g_script_loader;
+
+			// Тип состояния на данный момент (сохранение, открытие или никакое)
+			this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
+			// Переменная отвечает, загрузились ли фонты
+			this.FontLoadWaitComplete = false;
+			// Переменная отвечает, получили ли мы ответ с сервера совместного редактирования
+			this.ServerIdWaitComplete = false;
+			// Переменная отвечает, отрисовали ли мы все (иначе при рестарте, получится переинициализация)
+			this.DocumentLoadComplete = false;
+			// Переменная, которая хранит пришедшие изменения при открытии
+			this.FirstLoadChanges = null;
+			// Переменная, которая отвечает, послали ли мы окончание открытия документа
+			this.IsSendDocumentLoadCompleate = false;
+
+			// CoAuthoring and Chat
+			this.User = undefined;
+			this.CoAuthoringApi = new CDocsCoApi();
+			this.collaborativeEditing = null;
+			this.isCoAuthoringEnable = true;
+			
+			// Режим вставки диаграмм в редакторе документов
+			this.isChartEditor = false;
+			this.chartStyleManager = new ChartStyleManager();
+			this.chartPreviewManager = new ChartPreviewManager();
+			/**************************************/
+
+			this.OpenDocumentProgress = {
+				Type: c_oAscAsyncAction.Open,
+				FontsCount: 0,
+				CurrentFont: 0,
+				ImagesCount: 0,
+				CurrentImage: 0
+			};
+			
+			// На этапе сборки значение переменной ASC_DOCS_API_USE_EMBEDDED_FONTS может менятся.
+			// По дефолту встроенные шрифты использоваться не будут, как и при любом значении
+			// ASC_DOCS_API_USE_EMBEDDED_FONTS, кроме "true"(написание от регистра не зависит).
+			
+			// Использовать ли обрезанные шрифты
+			this.isUseEmbeddedCutFonts = ("true" == ASC_DOCS_API_USE_EMBEDDED_FONTS.toLowerCase());
+		}
+
+		spreadsheet_api.prototype = {
+		
+			asc_CheckGuiControlColors : function()
+			{
+				// потом реализовать проверку на то, что нужно ли посылать
+				var _theme  = this.wbModel.theme;
+				var _clrMap = this.wbModel.clrSchemeMap.color_map;
+
+				var arr_colors = new Array(10);
+				var rgba = {R:0, G:0, B:0, A:255};
+				// bg1,tx1,bg2,tx2,accent1 - accent6
+				var array_colors_types = [6, 15, 7, 16, 0, 1, 2, 3, 4, 5];
+				var _count = array_colors_types.length;
+
+				var color = new CUniColor();
+				color.color = new CSchemeColor();
+				for (var i = 0; i < _count; ++i)
+				{
+					color.color.id = array_colors_types[i];
+					color.Calculate(_theme, _clrMap, rgba);
+
+					var _rgba = color.RGBA;
+					arr_colors[i] = new CColor(_rgba.R, _rgba.G, _rgba.B);
+				}
+
+				// теперь проверим
+				var bIsSend = false;
+				if (this.GuiControlColorsMap != null)
+				{
+					for (var i = 0; i < _count; ++i)
+					{
+						var _color1 = this.GuiControlColorsMap[i];
+						var _color2 = arr_colors[i];
+
+						if ((_color1.r !== _color2.r) || (_color1.g !== _color2.g) || (_color1.b !== _color2.b))
+						{
+							bIsSend = true;
+							break;
+						}
+					}
+				}
+				else
+				{
+					this.GuiControlColorsMap = new Array(_count);
+					bIsSend = true;
+				}
+
+				if (bIsSend)
+				{
+					for (var i = 0; i < _count; ++i)
+					{
+						this.GuiControlColorsMap[i] = arr_colors[i];
+					}
+
+					this.asc_SendControlColors();
+				}
+			},
+			asc_SendControlColors : function()
+			{
+				var standart_colors = null;
+				if (!this.IsSendStandartColors)
+				{
+					var _c_s = g_oStandartColors.length;
+					standart_colors = new Array(_c_s);
+
+					for (var i = 0; i < _c_s; ++i)
+					{
+						standart_colors[i] = new CColor(g_oStandartColors[i]["R"], g_oStandartColors[i]["G"], g_oStandartColors[i]["B"]);
+					}
+
+					this.IsSendStandartColors =  true;
+				}
+
+				var _count = this.GuiControlColorsMap.length;
+
+				var _ret_array = new Array(_count * 6);
+				var _cur_index = 0;
+
+				for (var i = 0; i < _count; ++i)
+				{
+					var _color_src = this.GuiControlColorsMap[i];
+
+					_ret_array[_cur_index] = new CColor(_color_src.r, _color_src.g, _color_src.b);
+					_cur_index++;
+
+					// теперь с модификаторами
+					var _count_mods = g_oThemeColorsDefaultMods.length;
+					for (var j = 0; j < _count_mods; ++j)
+					{
+						var _mods = g_oThemeColorsDefaultMods[j];
+						var dst_mods = new CColorModifiers();
+						var _ind = 0;
+						for (var k in _mods)
+						{
+							dst_mods.Mods[_ind] = new CColorMod();
+							dst_mods.Mods[_ind].name = k;
+							dst_mods.Mods[_ind].val = _mods[k];
+							_ind++;
+						}
+
+						var _rgba = {R:_color_src.r, G: _color_src.g, B:_color_src.b, A: 255};
+						dst_mods.Apply(_rgba);
+
+						_ret_array[_cur_index] = new CColor(_rgba.R, _rgba.G, _rgba.B);
+						_cur_index++;
+					}
+				}
+
+				this.asc_SendThemeColors(_ret_array, standart_colors);
+			},
+			asc_SendThemeColorScheme : function()
+			{
+				var infos = new Array();
+				var _index = 0;
+
+				var _c = null;
+
+				// user scheme
+				var _count_defaults = g_oUserColorScheme.length;
+				for (var i = 0; i < _count_defaults; ++i)
+				{
+					var _obj = g_oUserColorScheme[i];
+					infos[_index] = new CAscColorScheme();
+					infos[_index].Name = _obj["name"];
+
+					_c = _obj["dk1"];
+					infos[_index].Colors[0] = new CColor(_c["R"], _c["G"], _c["B"]);
+
+					_c = _obj["lt1"];
+					infos[_index].Colors[1] = new CColor(_c["R"], _c["G"], _c["B"]);
+
+					_c = _obj["dk2"];
+					infos[_index].Colors[2] = new CColor(_c["R"], _c["G"], _c["B"]);
+
+					_c = _obj["lt2"];
+					infos[_index].Colors[3] = new CColor(_c["R"], _c["G"], _c["B"]);
+
+					_c = _obj["accent1"];
+					infos[_index].Colors[4] = new CColor(_c["R"], _c["G"], _c["B"]);
+
+					_c = _obj["accent2"];
+					infos[_index].Colors[5] = new CColor(_c["R"], _c["G"], _c["B"]);
+
+					_c = _obj["accent3"];
+					infos[_index].Colors[6] = new CColor(_c["R"], _c["G"], _c["B"]);
+
+					_c = _obj["accent4"];
+					infos[_index].Colors[7] = new CColor(_c["R"], _c["G"], _c["B"]);
+
+					_c = _obj["accent5"];
+					infos[_index].Colors[8] = new CColor(_c["R"], _c["G"], _c["B"]);
+
+					_c = _obj["accent6"];
+					infos[_index].Colors[9] = new CColor(_c["R"], _c["G"], _c["B"]);
+
+					_c = _obj["hlink"];
+					infos[_index].Colors[10] = new CColor(_c["R"], _c["G"], _c["B"]);
+
+					_c = _obj["folHlink"];
+					infos[_index].Colors[11] = new CColor(_c["R"], _c["G"], _c["B"]);
+
+					++_index;
+				}
+
+				// theme colors
+				var _theme = this.wbModel.theme;
+				var _extra = _theme.extraClrSchemeLst;
+				var _count = _extra.length;
+				var _rgba = {R:0, G: 0, B: 0, A: 255};
+				for (var i = 0; i < _count; ++i)
+				{
+					var _scheme = _extra[i].clrScheme;
+
+					infos[_index] = new CAscColorScheme();
+					infos[_index].Name = _scheme.name;
+
+					_scheme.colors[8].Calculate(_theme, null, null, null, _rgba);
+					_c = _scheme.colors[8].RGBA;
+					infos[_index].Colors[0] = new CColor(_c.R, _c.G, _c.B);
+
+					_scheme.colors[12].Calculate(_theme, null, null, null, _rgba);
+					_c = _scheme.colors[12].RGBA;
+					infos[_index].Colors[1] = new CColor(_c.R, _c.G, _c.B);
+
+					_scheme.colors[9].Calculate(_theme, null, null, null, _rgba);
+					_c = _scheme.colors[9].RGBA;
+					infos[_index].Colors[2] = new CColor(_c.R, _c.G, _c.B);
+
+					_scheme.colors[13].Calculate(_theme, null, null, null, _rgba);
+					_c = _scheme.colors[13].RGBA;
+					infos[_index].Colors[3] = new CColor(_c.R, _c.G, _c.B);
+
+					_scheme.colors[0].Calculate(_theme, null, null, null, _rgba);
+					_c = _scheme.colors[0].RGBA;
+					infos[_index].Colors[4] = new CColor(_c.R, _c.G, _c.B);
+
+					_scheme.colors[1].Calculate(_theme, null, null, null, _rgba);
+					_c = _scheme.colors[1].RGBA;
+					infos[_index].Colors[5] = new CColor(_c.R, _c.G, _c.B);
+
+					_scheme.colors[2].Calculate(_theme, null, null, null, _rgba);
+					_c = _scheme.colors[2].RGBA;
+					infos[_index].Colors[6] = new CColor(_c.R, _c.G, _c.B);
+
+					_scheme.colors[3].Calculate(_theme, null, null, null, _rgba);
+					_c = _scheme.colors[3].RGBA;
+					infos[_index].Colors[7] = new CColor(_c.R, _c.G, _c.B);
+
+					_scheme.colors[4].Calculate(_theme, null, null, null, _rgba);
+					_c = _scheme.colors[4].RGBA;
+					infos[_index].Colors[8] = new CColor(_c.R, _c.G, _c.B);
+
+					_scheme.colors[5].Calculate(_theme, null, null, null, _rgba);
+					_c = _scheme.colors[5].RGBA;
+					infos[_index].Colors[9] = new CColor(_c.R, _c.G, _c.B);
+
+					_scheme.colors[11].Calculate(_theme, null, null, null, _rgba);
+					_c = _scheme.colors[11].RGBA;
+					infos[_index].Colors[10] = new CColor(_c.R, _c.G, _c.B);
+
+					_scheme.colors[10].Calculate(_theme, null, null, null, _rgba);
+					_c = _scheme.colors[10].RGBA;
+					infos[_index].Colors[11] = new CColor(_c.R, _c.G, _c.B);
+
+					_index++;
+				}
+
+				this.asc_SendThemeColorSchemes(infos);
+			},
+
+			// для диаграмм в редакторе документов
+			asc_openChartSpreadsheet: function (wBin) { 
+				
+				var chartBinTemplate;
+				if ( wBin )
+					chartBinTemplate = wBin;
+				else
+					chartBinTemplate = getChartBinTemplate() + "";
+					
+				if	( chartBinTemplate.length && (c_oSerFormat.Signature === chartBinTemplate.substring(0, c_oSerFormat.Signature.length)) ) {
+					var wb = new Workbook("", this.handlers);
+					wb.initGlobalObjects();
+					var oBinaryFileReader = new BinaryFileReader("");
+					oBinaryFileReader.Read(chartBinTemplate, wb);
+					
+					this._startOpenDocument({returnCode: 0, val:wb});					
+				}				
+			},
+
+			asc_Init: function(fontsPath) {
+				var t = this;
+				asc["editor"] = ( asc["editor"] || t );
+				t.FontLoader.fontFilesPath = fontsPath;
+				t.asc_registerCallback("loadFonts", function (fonts, callback){t._loadFonts(fonts, callback);});
+			},
+
+			asc_LoadDocument: function (c_DocInfo) {
+				var t = this;
+				if(c_DocInfo){
+					this.documentId     		= c_DocInfo["Id"];
+					this.documentUrl    		= c_DocInfo["Url"];
+					this.documentTitle  		= c_DocInfo["Title"];
+					this.documentFormat 		= c_DocInfo["Format"];
+					this.documentVKey   		= c_DocInfo["VKey"];
+					this.documentOrigin 		= c_DocInfo["Origin"];
+					this.chartEditor			= c_DocInfo["ChartEditor"];
+					this.documentOpenOptions 	= c_DocInfo["Options"];
+
+					// Выставляем пользователя
+					this.User = new asc_user();
+					this.User.asc_setId(c_DocInfo["UserId"]);
+					this.User.asc_setUserName(c_DocInfo["UserName"]);
+
+					//Взято из редактора документов
+					var sProtocol = window.location.protocol;
+					var sHost = window.location.host;
+					this.documentOrigin = "";
+					if(sProtocol && sProtocol.length > 0)
+						this.documentOrigin = sProtocol + "//" + sHost;
+					else
+						this.documentOrigin = sHost;
+				}
+
+                if (c_DocInfo["OfflineApp"] && (true == c_DocInfo["OfflineApp"])) {
+                    this.isCoAuthoringEnable = false;
+
+                    window['scriptBridge'] = {};
+                    this.offlineModeInit();
+                    this.offlineModeLoadDocument();
+                    return;
+                }
+
+				this.asc_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
+				if ( !this.chartEditor )
+					this._asc_open(function (response) {t._startOpenDocument(response);});
+			},
+			
+			asc_LoadEmptyDocument: function () {
+				
+				var emptyWorkbook = getEmptyWorkbook() + "";
+				if	( emptyWorkbook.length && (c_oSerFormat.Signature === emptyWorkbook.substring(0, c_oSerFormat.Signature.length)) ) {
+					this.isChartEditor = true;
+					var wb = new Workbook("", this.handlers);
+					wb.initGlobalObjects();
+					var oBinaryFileReader = new BinaryFileReader("");
+					oBinaryFileReader.Read(emptyWorkbook, wb);
+					
+					this._startOpenDocument({returnCode: 0, val:wb});
+				}
+			},
+
+			asc_DownloadAs : function(typeFile){//передаем число соответствующее своему формату. например  c_oAscFileType.XLSX
+                if (undefined != window['appBridge']) {
+                    window['appBridge']['dummyCommandDownloadAs'] ();     // TEST
+                    return;
+                }
+
+				this.asc_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
+				var that = this;
+				// Меняем тип состояния (на сохранение)
+				this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Save;
+				this._asc_downloadAs(typeFile, function(){
+					// Меняем тип состояния (на никакое)
+					that.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
+					that.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
+				}, true);
+			},
+
+			asc_Save : function(){
+                if (undefined != window['appBridge']) {
+                    window['appBridge']['dummyCommandSave'] ();     // TEST
+                    return;
+                }
+
+				if (this.collaborativeEditing.m_bGlobalLock || this.isChartEditor)
+					return;
+				this.asc_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
+				// Нужно закрыть редактор
+				this.asc_closeCellEditor();
+				
+				var t = this;
+
+				// Не даем пользователю что-нибудь менять пока не закончится сохранение
+				this.collaborativeEditing.m_bGlobalLock = true;
+
+				this.CoAuthoringApi.askSaveChanges (function (e) { t.onSaveCallback (e); });
+			},
+
+			asc_OnSaveEnd : function (isDocumentSaved) {
+				this.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
+				// Cбросим флаги модификации
+				History.Save();
+
+				if (isDocumentSaved) {
+					// Пересылаем свои изменения
+					this.collaborativeEditing.sendChanges();
+					// Шлем update для toolbar-а, т.к. когда select в lock ячейке нужно заблокировать toolbar
+					this.wb._onWSSelectionChanged(/*info*/null);
+					this.CoAuthoringApi.unSaveChanges();
+				} else {
+					this.CoAuthoringApi.unSaveChanges();
+					this.CoAuthoringApi.disconnect();
+				}
+			},
+
+			asc_Print: function(adjustPrint){
+				if (adjustPrint)
+					this.adjustPrint = adjustPrint;
+				else {
+					this.adjustPrint = new asc_CAdjustPrint();
+				}
+
+                if (undefined != window['appBridge']) {
+                    this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Save;
+                    window['appBridge']['dummyCommandPrint'] ();
+                    this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
+                    return;
+                }
+
+				this.asc_DownloadAs(c_oAscFileType.PDFPRINT);
+			},
+
+			asc_Copy:function(){
+				var result = this.wb.copyToClipboardButton();
+				this.wb.restoreFocus();
+				return result;
+			},
+
+			asc_Paste:function(){
+				var result = this.wb.pasteFromClipboardButton();
+				this.wb.restoreFocus();
+				return result;
+			},
+
+			asc_Cut:function(){
+				var result = this.wb.cutToClipboardButton();
+				this.wb.restoreFocus();
+				return result;
+			},
+
+			asc_Undo: function(){
+				this.wb.undo();
+				this.wb.restoreFocus();
+			},
+
+			asc_Redo: function(){
+				this.wb.redo();
+				this.wb.restoreFocus();
+			},
+
+			asc_Resize: function(){
+				if (this.wb)
+					this.wb.resize();
+			},
+			
+			asc_addAutoFilter: function(lTable){
+				var ws = this.wb.getWorksheet();
+				var result = ws.addAutoFilter(lTable);
+				return result;
+			},
+			
+			asc_applyAutoFilter: function(type,autoFilterObject){
+				var ws = this.wb.getWorksheet();
+				ws.applyAutoFilter(type,autoFilterObject);
+			},
+			
+			asc_sortColFilter: function(type,cellId) {
+				var ws = this.wb.getWorksheet();
+				ws.sortColFilter(type,cellId);
+			},
+			
+			asc_setMobileVersion: function (isMobile){
+				this.isMobileVersion = isMobile;
+				this.options = (this.options || {});
+				this.options.worksheetDefaults = (this.options.worksheetDefaults || {});
+				this.options.worksheetDefaults.isMobile = isMobile;
+				window.g_isMobileVersion = isMobile;
+			},
+
+			asc_getViewerMode: function () {
+				return this.controller.getViewerMode ? this.controller.getViewerMode() : true;
+			},
+
+			asc_setViewerMode: function (isViewerMode) {
+				// Для совместного редактирования важен переход из режима просмотра в режим редактирования
+				if (true === this.ServerIdWaitComplete && true === this.FontLoadWaitComplete) {
+					this.CoAuthoringApi.set_isViewerMode(!!isViewerMode);
+				}
+				if (this.controller.setViewerMode) {
+					this.controller.setViewerMode(isViewerMode);
+					if (false === isViewerMode) {
+						// Загружаем не обрезанные шрифты для полной версии (при редактировании)
+						if (this.FontLoader.embedded_cut_manager.bIsCutFontsUse) {
+							this.FontLoader.embedded_cut_manager.bIsCutFontsUse = false;
+							this.asyncMethodCallback = function () {};
+							var fonts = $.map(this.wbModel.generateFontMap(), function (fname) {return new CFont(fname, 0, "", 0);});
+							this.FontLoader.LoadDocumentFonts(fonts);
+						}
+						
+						this.isUseEmbeddedCutFonts = false;
+					}
+				}
+			},
+			
+			asc_setUseEmbeddedCutFonts: function (bUse) {
+				this.isUseEmbeddedCutFonts = bUse;
+			},
+
+			asc_setCoAuthoringEnable: function (isCoAuthoringEnable) {
+				this.isCoAuthoringEnable = !!isCoAuthoringEnable;
+			},
+
+			/*
+				idOption идентификатор дополнительного параметра, пока c_oAscAdvancedOptionsID.CSV.
+				option - какие свойства применить, пока массив. для CSV объект asc_CCSVAdvancedOptions(codepage, delimiter)
+				exp:	asc_setAdvancedOptions(c_oAscAdvancedOptionsID.CSV, new Asc.asc_CCSVAdvancedOptions(1200, c_oAscCsvDelimiter.Comma) );
+			*/
+			asc_setAdvancedOptions:function(idOption,option){
+				var t = this;
+				switch(idOption){
+					case c_oAscAdvancedOptionsID.CSV:
+						// Проверяем тип состояния в данный момент
+						if (this.advancedOptionsAction === c_oAscAdvancedOptionsAction.Open) {
+							var v = {"id":this.documentId, "format": this.documentFormat, "vkey": this.documentVKey, "editorid": c_oEditorId.Speadsheet, "c":"reopen", "url": this.documentUrl, "title": this.documentTitle, "embeddedfonts": this.isUseEmbeddedCutFonts, "delimiter": option.asc_getDelimiter(), "codepage": option.asc_getCodePage()};
+							this._asc_sendCommand(function (response) {t._startOpenDocument(response);}, JSON.stringify(v));
+						} else if (this.advancedOptionsAction === c_oAscAdvancedOptionsAction.Save)
+							this._asc_downloadAs(c_oAscFileType.CSV, function(){
+								// Меняем тип состояния (на никакое)
+								t.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
+								t.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
+							}, true, option);
+					break;
+				}
+			},
+
+			// Опции страницы (для печати)
+			asc_setPageOptions: function (options, index) {
+				var sheetIndex = (undefined !== index && null !== index) ? index : this.wbModel.getActive();
+				this.wbModel.getWorksheet(sheetIndex).PagePrintOptions = options;
+			},
+
+			asc_getPageOptions: function (index) {
+				var sheetIndex = (undefined !== index && null !== index) ? index : this.wbModel.getActive();
+				return this.wbModel.getWorksheet(sheetIndex).PagePrintOptions;
+			},
+
+			_asc_sendCommand: function (callback, rdata) {
+				var oThis = this;
+				$.ajax({
+					type: 'POST',
+					url: g_sMainServiceLocalUrl,
+					data: rdata,
+					error: function(jqXHR, textStatus, errorThrown){
+						var result = {returnCode: c_oAscError.Level.Critical, val:c_oAscError.ID.Unknown};
+						oThis.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
+						if(callback)
+							callback(result);
+					},
+					success: function(msg){
+						var result;
+						if(!msg || msg.length < 1){
+							result = {returnCode: c_oAscError.Level.Critical, val:c_oAscError.ID.Unknown};
+							oThis.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
+							if(callback)
+								callback(result);
+							return;
+						}
+						else{
+							var incomeObject = JSON.parse(msg);
+							switch( incomeObject.type ){
+								case "open":
+									var sJsonUrl = g_sResourceServiceLocalUrl + incomeObject.data;
+									asc_ajax({
+										url: sJsonUrl,
+										dataType: "text",
+										success: function(result, textStatus) {
+											//получаем url к папке с файлом
+											var url;
+											var nIndex = sJsonUrl.lastIndexOf("/");
+											if(-1 !== nIndex)
+												url = sJsonUrl.substring(0, nIndex + 1);
+											else
+												url = sJsonUrl;
+											if( c_oSerFormat.Signature === result.substring(0, c_oSerFormat.Signature.length))
+											{
+												var wb = new Workbook(url, oThis.handlers, oThis);
+												wb.initGlobalObjects();
+												var oBinaryFileReader = new BinaryFileReader(url);
+												oBinaryFileReader.Read(result, wb);
+												if (callback)
+													callback({returnCode: 0, val:wb});
+											}
+											else
+											{
+												oResult = {returnCode: c_oAscError.Level.Critical, val:c_oAscError.ID.Unknown};
+												oThis.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
+												if(callback)
+													callback(oResult);
+											}
+										},
+										error:function(){
+											result = {returnCode: c_oAscError.Level.Critical, val:c_oAscError.ID.Unknown};
+											oThis.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
+											if(callback)
+												callback(result);
+										}
+									});
+									break;
+								case "needparams":
+									// Проверяем, возможно нам пришли опции для CSV
+									if (oThis.documentOpenOptions) {
+										var codePageCsv = oThis.documentOpenOptions["codePage"];
+										var delimiterCsv = oThis.documentOpenOptions["delimiter"];
+										if (null !== codePageCsv && undefined !== codePageCsv &&
+											null !== delimiterCsv && undefined !== delimiterCsv) {
+											oThis.asc_setAdvancedOptions(c_oAscAdvancedOptionsID.CSV,
+												new asc.asc_CCSVAdvancedOptions(codePageCsv, delimiterCsv));
+											break;
+										}
+									}
+									asc_ajax({
+										url: incomeObject.data,
+										dataType: "text",
+										success: function(result, textStatus) {
+											var cp = JSON.parse(result);
+											oThis.handlers.trigger("asc_onAdvancedOptions",  new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV,cp), oThis.advancedOptionsAction);
+											//var value = {url: oThis.documentUrl, delimiter: c_oAscCsvDelimiter.Comma, codepage: 65001}; //65001 - utf8
+											//oThis._asc_sendCommand(callback, "opencsv", oThis.documentTitle, JSON.stringify(value));
+										},
+										error:function(){
+											result = {returnCode: c_oAscError.Level.Critical, val:c_oAscError.ID.Unknown};
+											oThis.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
+											if(callback)
+												callback(result);
+										}
+									});
+									break;
+								case "getcodepage":
+									// Проверяем, возможно нам пришли опции для CSV
+									if (oThis.documentOpenOptions) {
+										var codePageCsv = oThis.documentOpenOptions["codePage"];
+										var delimiterCsv = oThis.documentOpenOptions["delimiter"];
+										if (null !== codePageCsv && undefined !== codePageCsv &&
+											null !== delimiterCsv && undefined !== delimiterCsv) {
+											oThis.asc_setAdvancedOptions(c_oAscAdvancedOptionsID.CSV,
+												new asc.asc_CCSVAdvancedOptions(codePageCsv, delimiterCsv));
+											break;
+										}
+									}
+									var cp = JSON.parse(incomeObject.data);
+									oThis.handlers.trigger("asc_onAdvancedOptions",  new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV,cp), oThis.advancedOptionsAction);
+									//var value = {url: oThis.documentUrl, delimiter: c_oAscCsvDelimiter.Comma, codepage: 65001}; //65001 - utf8
+									//oThis._asc_sendCommand(callback, "opencsv", oThis.documentTitle, JSON.stringify(value));
+									break;
+								case "save":
+									var outputData = JSON.parse(incomeObject.data);
+									if(c_oAscFileType.INNER != outputData.format)
+									{
+										var url = g_sResourceServiceLocalUrl + encodeURIComponent(outputData.url);
+										var nIndex = oThis.documentTitle.lastIndexOf(".");
+										if(-1 != nIndex)
+										{
+											var nIndexFormat = outputData.url.lastIndexOf(".");
+											var sDocumentFilename = oThis.documentTitle.substring(0, nIndex);
+											url += "&filename=" + encodeURIComponent(sDocumentFilename);
+											if(-1 != nIndexFormat)
+												url += outputData.url.substring(nIndexFormat);
+										}
+										if( oThis.isMobileVersion ){
+											window.open("../../../sdk/OfficeWebCommon/MobileDownloader/download.html?file="+url,"_parent","",false);
+										}
+										else {
+											getFile(url);
+										}
+										if(callback)
+											callback({returnCode: 0, val:incomeObject.data});
+									}
+									else
+									{
+										var sUrl = oThis.documentOrigin + g_sResourceServiceLocalUrl + encodeURIComponent(outputData.url);
+										oThis.handlers.trigger("asc_onSaveUrl", sUrl, function(hasError){
+											if (hasError){
+												;//oThis._asc_sendCommand(/*callback*/null, /*command*/"cc");
+											}
+										});
+										if(callback)
+											callback(incomeObject);
+									}
+									break;
+								case "waitopen":
+									var rData = {"id":oThis.documentId, "format": oThis.documentFormat, "vkey": oThis.documentVKey, "editorid": c_oEditorId.Spreadsheet, "c":"chopen"};
+									setTimeout(function(){oThis._asc_sendCommand(callback, JSON.stringify(rData));}, 3000);
+									break;
+								case "waitsave":
+									var rData = {"id":oThis.documentId, "format": oThis.documentFormat, "c":"chsave", "data":incomeObject.data};
+									setTimeout(function(){oThis._asc_sendCommand(callback, JSON.stringify(rData));}, 3000);
+									break;
+								case "savepart":
+									var outputData = JSON.parse(incomeObject.data);
+									oThis._asc_downloadAs(outputData.format, callback, false, null, outputData.savekey);
+									break;
+								case "err":
+									result = {returnCode: c_oAscError.Level.Critical, val:parseInt(incomeObject.data)};
+									oThis.handlers.trigger("asc_onError", _mapAscServerErrorToAscError(parseInt(incomeObject.data)), c_oAscError.Level.Critical);
+									if(callback)
+										callback(result);
+									break;
+							}
+						}
+					},
+					dataType: "text"});
+			},
+
+			_asc_open: function (fCallback) { //fCallback({returnCode:"", val:obj, ...})
+				if ( this.chartEditor ) {
+				}
+				else if ( !this.documentId ) {
+					var data = getTestWorkbook();
+					var sData = data + "";
+					if( c_oSerFormat.Signature === sData.substring(0, c_oSerFormat.Signature.length))
+					{
+						var sUrlPath = "offlinedocs/test-workbook9/";
+						var wb = new Workbook(sUrlPath, this.handlers, this);
+						wb.initGlobalObjects();
+						var oBinaryFileReader = new BinaryFileReader(sUrlPath);
+						oBinaryFileReader.Read(sData, wb);
+						fCallback({returnCode: 0, val:wb});
+					}
+				}
+				else {
+					// Меняем тип состояния (на открытие)
+					this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Open;
+					var v = {"id":this.documentId, "format": this.documentFormat, "vkey": this.documentVKey, "editorid": c_oEditorId.Speadsheet, "c":"open", "url": this.documentUrl, "title": this.documentTitle, "embeddedfonts": this.isUseEmbeddedCutFonts};
+					this._asc_sendCommand (fCallback, JSON.stringify(v));
+				}
+			},
+
+			_asc_save: function () {
+				this.wb._initCommentsToSave();
+				var oBinaryFileWriter = new BinaryFileWriter(this.wbModel);
+				var data = oBinaryFileWriter.Write();
+				var oAdditionalData = new Object();
+				oAdditionalData["c"] = "save";
+				oAdditionalData["id"] = this.documentId;
+				oAdditionalData["vkey"] = this.documentVKey;
+				oAdditionalData["outputformat"] = c_oAscFileType.XLSY;
+				oAdditionalData["savetype"] = "completeall";
+				this._asc_sendCommand (/*callback*/ null, "mnuSaveAs" + this.cCharDelimiter + JSON.stringify(oAdditionalData) + this.cCharDelimiter + data);
+			},
+
+			_asc_downloadAs: function (sFormat, fCallback, bStart, options, sSaveKey) { //fCallback({returnCode:"", ...})
+				//sFormat: xlsx, xls, ods, csv, html
+				var oAdditionalData = new Object();
+				oAdditionalData["c"] = "save";
+				oAdditionalData["id"] = this.documentId;
+				oAdditionalData["vkey"] = this.documentVKey;
+				oAdditionalData["outputformat"] = sFormat;
+				if(null != sSaveKey)
+					oAdditionalData["savekey"] = sSaveKey;
+				var data;
+				if(c_oAscFileType.PDFPRINT === sFormat)
+				{
+					if (null === this.printPagesData) {
+						// Рассчитываем данные о страницах
+						this.printPagesData = this.wb.calcPagesPrint(this.adjustPrint);
+					}
+
+					var pdf_writer = new CPdfPrinter(this.wbModel.sUrlPath);
+					var isEndPrint = this.wb.printSheet(pdf_writer, this.printPagesData);
+
+					data = pdf_writer.DocumentRenderer.Memory.GetBase64Memory();
+
+					if (isEndPrint) {
+						// Закончили печатить
+						if (bStart) {
+							// Первый раз отправляем данные
+							oAdditionalData["savetype"] = "completeall";
+						} else {
+							// Не в первый раз отправляем данные
+							oAdditionalData["savetype"] = "complete";
+						}
+						// Очищаем данные о печати
+						this.printPagesData = null;
+					} else {
+						// Продолжаем печать
+						if (bStart) {
+							// Первый раз отправляем данные
+							oAdditionalData["savetype"] = "partstart";
+						} else {
+							// Не в первый раз отправляем данные
+							oAdditionalData["savetype"] = "part";
+						}
+					}
+				} else if (c_oAscFileType.CSV === sFormat && !options) {
+					var v = {"id":this.documentId, "c":"getcodepage"};
+					return this._asc_sendCommand (fCallback, JSON.stringify(v));
+				} else {
+					this.wb._initCommentsToSave();
+					var oBinaryFileWriter = new BinaryFileWriter(this.wbModel);
+					oAdditionalData["savetype"] = "completeall";
+					if (c_oAscFileType.CSV === sFormat) {
+						if (options instanceof asc.asc_CCSVAdvancedOptions) {
+							oAdditionalData["codepage"] = options.asc_getCodePage();
+							oAdditionalData["delimiter"] = options.asc_getDelimiter();
+						}
+					}
+					data = oBinaryFileWriter.Write();
+				}
+				this._asc_sendCommand (fCallback, "mnuSaveAs" + this.cCharDelimiter + JSON.stringify(oAdditionalData) + this.cCharDelimiter + data);
+			},
+
+
+			asc_getDocumentName: function () {
+				return this.documentTitle;
+			},
+
+			asc_getDocumentFormat: function () {
+				return this.documentFormat;
+			},
+
+			asc_isDocumentModified: function () {
+				if (History && History.Is_Modified) {
+					return History.Is_Modified();
+				}
+			},
+
+
+			// Actions and callbacks interface
+
+			/*
+			 * asc_onStartAction			(type, id)
+			 * asc_onEndAction				(type, id)
+			 * asc_onInitEditorFonts		(gui_fonts)
+			 * asc_onOpenDocumentProgress	(_OpenDocumentProgress)
+			 * asc_onAdvancedOptions		(asc_CAdvancedOptions, ascAdvancedOptionsAction)			- эвент на получение дополнительных опций (открытие/сохранение CSV)
+			 * asc_onError					(c_oAscError.ID, c_oAscError.Level)
+			 * asc_onEditCell				(c_oAscCellEditorState)										- эвент на редактирование ячейки с состоянием (переходами из формулы и обратно)
+			 * asc_onCellTextChanged		(text, cursorPosition, isFormula, formulaPos, formulaName)
+			 * asc_onSelectionChanged		(asc_CCellInfo);											- эвент на смену информации о выделении
+			 * asc_onSelectionNameChanged	(sName);													- эвент на смену имени выделения (Id-ячейки, число выделенных столбцов/строк, имя диаграммы и др.)
+			 * asc_onZoomChanged			(zoom)
+			 * asc_onSheetsChanged			()															- эвент на обновление списка листов
+			 * asc_onActiveSheetChanged		(indexActiveSheet)											- эвент на обновление активного листа
+			 * asc_onCanUndoChanged			(bCanUndo)													- эвент на обновление возможности undo
+			 * asc_onCanRedoChanged			(bCanRedo)													- эвент на обновление возможности redo
+			 * asc_onSaveUrl				(sUrl, callback(hasError))									- эвент на сохранение файла на сервер по url
+			 * asc_onDocumentModifiedChanged(bIsModified)												- эвент на обновление статуса "изменен ли файл"
+			 * asc_onMouseMove				(asc_CMouseMoveData)										- эвент на наведение мышкой на гиперлинк или комментарий
+			 * asc_onHyperlinkClick			(sUrl)														- эвент на нажатие гиперлинка
+			 * asc_onСoAuthoringDisconnect	()															- эвент об отключении от сервера без попытки reconnect
+			 */
+
+			asc_StartAction: function (type, id) {
+				this.handlers.trigger("asc_onStartAction", type, id);
+			},
+
+			asc_EndAction: function (type, id) {
+				this.handlers.trigger("asc_onEndAction", type, id);
+			},
+			
+			asc_SetAFDialog: function(val){
+				this.handlers.trigger("asc_onSetAFDialog", val);
+			},
+
+			asc_registerCallback: function (name, callback, replaceOldCallback) {
+				this.handlers.add(name, callback, replaceOldCallback);
+
+				/*
+				 Не самая хорошая схема для отправки эвентов:
+				 проверяем, подписан ли кто-то на эвент? Если да, то отправляем и больше ничего не делаем.
+				 Если никто не подписан, то сохраняем у себя переменную и как только кто-то подписывается - отправляем ее
+				 */
+				if (null !== this.guiFonts && "asc_onInitEditorFonts" === name) {
+					this.handlers.trigger("asc_onInitEditorFonts", this.guiFonts);
+				}
+				else if (null !== this.tablePictures && "asc_onInitTablePictures" === name) {
+					this.handlers.trigger("asc_onInitTablePictures", this.tablePictures);
+				}
+				else if ("asc_onSendThemeColors" == name)
+				{
+					if (this._gui_control_colors != null)
+					{
+						this.handlers.trigger("asc_onSendThemeColors", this._gui_control_colors.Colors, this._gui_control_colors.StandartColors);
+						this._gui_control_colors = null;
+					}
+				}
+				else if ("asc_onSendThemeColorSchemes" == name)
+				{
+					if (this._gui_color_schemes != null)
+					{
+						this.handlers.trigger("asc_onSendThemeColorSchemes", this._gui_color_schemes);
+						this._gui_color_schemes = null;
+					}
+				}
+			},
+
+			asc_unregisterCallback: function (name, callback) {
+				this.handlers.remove(name, callback);
+			},
+
+			asc_getController: function() {
+				return this.controller;
+			},
+
+			// Посылает эвент о том, что обновились листы
+			sheetsChanged: function () {
+				this.handlers.trigger("asc_onSheetsChanged");
+			},
+
+
+			// Fonts loading interface
+
+			sync_InitEditorFonts: function (gui_fonts) {
+				/*
+				 Не самая хорошая схема для отправки эвентов:
+				 проверяем, подписан ли кто-то на эвент? Если да, то отправляем и больше ничего не делаем.
+				 Если никто не подписан, то сохраняем у себя переменную и как только кто-то подписывается - отправляем ее
+				 */
+				if (false === this.handlers.trigger("asc_onInitEditorFonts", gui_fonts))
+					this.guiFonts = gui_fonts;
+				else
+					this.guiFonts = null;
+			},
+
+			asyncFontsDocumentStartLoaded: function () {
+				this.OpenDocumentProgress.Type = c_oAscAsyncAction.LoadDocumentFonts;
+				this.OpenDocumentProgress.FontsCount = this.FontLoader.fonts_loading.length;
+				this.OpenDocumentProgress.CurrentFont = 0;
+				this.asc_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadDocumentFonts);
+			},
+
+			asyncFontsDocumentEndLoaded: function () {
+				this.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadDocumentFonts);
+
+				if (this.asyncMethodCallback !== undefined) {
+					this.asyncMethodCallback();
+					this.asyncMethodCallback = undefined;
+				} else {
+					this.asc_CheckGuiControlColors();
+					this.asc_SendThemeColorScheme();
+					this.asc_ApplyColorScheme(false);
+					// Шрифты загрузились, возможно стоит подождать совместное редактирование
+					this.FontLoadWaitComplete = true;
+					if (this.ServerIdWaitComplete)
+						this._openDocumentEndCallback();
+				}
+			},
+
+			asyncFontStartLoaded: function () {
+				this.asc_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
+			},
+
+			asyncFontEndLoaded: function (font) {
+				this.asc_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
+			},
+
+			SendOpenProgress: function () {
+				var _OpenDocumentProgress = {
+				"Type": this.OpenDocumentProgress.Type,
+				"FontsCount": this.OpenDocumentProgress.FontsCount,
+				"CurrentFont": this.OpenDocumentProgress.CurrentFont,
+				"ImagesCount": this.OpenDocumentProgress.ImagesCount,
+				"CurrentImage": this.OpenDocumentProgress.CurrentImage
+				};
+				this.handlers.trigger("asc_onOpenDocumentProgress", _OpenDocumentProgress);
+
+                if (undefined != window['appBridge']) {
+                    var progress = (this.OpenDocumentProgress.CurrentFont +
+                        this.OpenDocumentProgress.CurrentImage) /
+                        (this.OpenDocumentProgress.ImagesCount + this.OpenDocumentProgress.FontsCount);
+
+                    window['appBridge']['dummyCommandOpenDocumentProgress'] (progress * 100);
+                }
+			},
+
+			IsNeedDefaultFonts: function () {
+				return false;
+			},
+
+			_loadFonts: function (fonts, callback) {
+				this.asyncMethodCallback = callback;
+				this.FontLoader.LoadDocumentFonts2(fonts.map(function(f){return {name: f};}));
+			},
+
+			_startOpenDocument: function (response) {
+				if (response.returnCode !== 0) {return;}
+				
+				this.asc_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadDocumentFonts);
+
+				this.wbModel = response.val;
+
+				// Начинаем соединение для совместного редактирования
+				this.asyncServerIdStartLoaded();
+				var fonts = $.map(this.wbModel.generateFontMap(), function (fname) {return new CFont(fname, 0, "", 0);});
+				this.FontLoader.LoadDocumentFonts(fonts);
+			},
+
+			// Стартуем соединение с сервером для совместного редактирования
+			asyncServerIdStartLoaded: function() {
+				//Загружаем скрипт с настройками, по окончанию инициализируем контрол для совместного редактирования
+				//TODO: Вынести шрифты в коммоны, SetFontPath заменить на SetCommonPath,
+				//пердаваемый путь использовать для загрузки шрифтов и настороек.
+				if(true == ASC_DOCS_API_LOAD_COAUTHORING_SETTINGS){
+					this.ScriptLoader.LoadScriptAsync( this.FontLoader.fontFilesPath + "../../../OfficeWebCommon/docscoapisettings.js", this._onLoadCoAuthoringSetings, this);
+				}
+				else{
+					this._onLoadCoAuthoringSetings(this);
+				}
+			},
+
+			// Соединились с сервером
+			asyncServerIdEndLoaded: function(){
+				// С сервером соединились, возможно стоит подождать загрузку шрифтов
+				this.ServerIdWaitComplete = true;
+				if (this.FontLoadWaitComplete)
+					this._openDocumentEndCallback();
+			},
+
+			// Эвент о пришедщих изменениях
+			syncCollaborativeChanges: function () {
+				this.handlers.trigger("asc_onCollaborativeChanges");
+			},
+
+			// Применение изменений документа, пришедших при открытии
+			// Их нужно применять после того, как мы создали WorkbookView
+			// т.к. автофильтры, диаграммы, изображения и комментарии завязаны на WorksheetView (ToDo переделать)
+			_applyFirstLoadChanges: function () {
+				if (this.DocumentLoadComplete && null !== this.FirstLoadChanges) {
+					this.CoAuthoringApi.onSaveChanges(this.FirstLoadChanges, false);
+					this.FirstLoadChanges = null;
+					if (this.collaborativeEditing.applyChanges() && !this.IsSendDocumentLoadCompleate) {
+						this.IsSendDocumentLoadCompleate = true;
+						this.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
+					}
+				} else if (this.DocumentLoadComplete && !this.IsSendDocumentLoadCompleate) {
+					this.IsSendDocumentLoadCompleate = true;
+					this.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
+				}
+			},
+
+			/////////////////////////////////////////////////////////////////////////
+			///////////////////CoAuthoring and Chat api//////////////////////////////
+			/////////////////////////////////////////////////////////////////////////
+			_coAuthoringInit: function(docId, user) {
+				var t = this;
+
+				this.collaborativeEditing = new asc_CCollaborativeEditing(/*handlers*/{
+					"askLock":					function () {t.CoAuthoringApi.askLock.apply(t.CoAuthoringApi, arguments);},
+					"releaseLocks":				function () {t.CoAuthoringApi.releaseLocks.apply(t.CoAuthoringApi, arguments);},
+					"sendChanges":				function () {t._onSaveChanges.apply(t, arguments);},
+					"applyChanges":				function () {t._onApplyChanges.apply(t, arguments);},
+					"updateAfterApplyChanges":	function () {t._onUpdateAfterApplyChanges.apply(t, arguments);},
+					"drawSelection":			function () {t._onDrawSelection.apply(t, arguments);},
+					"showDrawingObjects":		function () {t._onShowDrawingObjects.apply(t, arguments);},
+					"showComments":				function () {t._onShowComments.apply(t, arguments);},
+					"cleanSelection":			function () {t._onCleanSelection.apply(t, arguments);},
+					"resetDrawingObject":		function () {t._onResetDrawingObject.apply(t, arguments);}
+				});
+
+				if (!this.CoAuthoringApi) {
+					this.asyncServerIdEndLoaded ();
+					return; // Error
+				}
+				this.CoAuthoringApi.onParticipantsChanged   	= function (e) { t.handlers.trigger("asc_onParticipantsChanged", e); };
+				this.CoAuthoringApi.onAuthParticipantsChanged  	= function (e) { t.handlers.trigger("asc_onAuthParticipantsChanged", e ); };
+				this.CoAuthoringApi.onMessage               	= function (e) { t.handlers.trigger("asc_onCoAuthoringChatReceiveMessage", e ); };
+				this.CoAuthoringApi.onConnectionStateChanged	= function (e) { t.handlers.trigger("asc_onConnectionStateChanged", e ); };
+				this.CoAuthoringApi.onUserStateChanged			= function (e) { t.handlers.trigger("asc_onUserStateChanged", e ); };
+				this.CoAuthoringApi.onLocksAcquired				= function (e) {
+					if ( 2 != e["state"] )
+					{
+						var elementValue = e["blockValue"];
+						var lockElem = t.collaborativeEditing.getLockByElem (elementValue, c_oAscLockTypes.kLockTypeOther);
+						if (null === lockElem) {
+							lockElem = new asc.CLock (elementValue);
+							t.collaborativeEditing.addUnlock (lockElem);
+						}
+
+						if (null != lockElem) {
+							var oldType = lockElem.getType();
+							if (c_oAscLockTypes.kLockTypeOther2 === oldType || c_oAscLockTypes.kLockTypeOther3 === oldType)
+								lockElem.setType (c_oAscLockTypes.kLockTypeOther3, true);
+							else
+								lockElem.setType (c_oAscLockTypes.kLockTypeOther, true);
+
+							// Выставляем ID пользователя, залочившего данный элемент
+							lockElem.setUserId (e["user"]);
+						}
+
+						if (t.wb) {
+							// Шлем update для toolbar-а, т.к. когда select в lock ячейке нужно заблокировать toolbar
+							t.wb._onWSSelectionChanged(/*info*/null);
+							var ws = t.wb.getWorksheet();
+							ws.cleanSelection();
+							ws._drawSelection();
+						}
+					}
+				};
+				this.CoAuthoringApi.onLocksReleased				= function (e, bChanges) {
+					var element = e["block"];
+					var lockElem = t.collaborativeEditing.getLockByElem (element, c_oAscLockTypes.kLockTypeOther);
+					if (null != lockElem) {
+						var curType = lockElem.getType();
+
+						var newType = c_oAscLockTypes.kLockTypeNone;
+						if (curType === c_oAscLockTypes.kLockTypeOther) {
+							if (true != bChanges) {
+								newType = c_oAscLockTypes.kLockTypeNone;
+							}
+							else
+							{
+								newType = c_oAscLockTypes.kLockTypeOther2;
+							}
+						}
+						else if (curType === c_oAscLockTypes.kLockTypeMine){
+							// Такого быть не должно
+							newType = c_oAscLockTypes.kLockTypeMine;
+						}
+						else if (curType === c_oAscLockTypes.kLockTypeOther2 || curType === c_oAscLockTypes.kLockTypeOther3)
+							newType = c_oAscLockTypes.kLockTypeOther2;
+
+						if (t.wb) {
+							t.wb.getWorksheet().cleanSelection();
+						}
+
+						if (c_oAscLockTypes.kLockTypeNone !== newType)
+							lockElem.setType (newType, true);
+						else {
+							// Удаляем из lock-ов, тот, кто правил ушел и не сохранил
+							t.collaborativeEditing.removeUnlock (lockElem);
+						}
+
+						if (t.wb) {
+							// Шлем update для toolbar-а, т.к. когда select в lock ячейке нужно сбросить блокировку toolbar
+							t.wb._onWSSelectionChanged(/*info*/null);
+
+							var worksheet = t.wb.getWorksheet();
+							worksheet.objectRender.resetLockedDrawingObjects();
+							worksheet.objectRender.showDrawingObjects(true);
+							worksheet.cellCommentator.unlockComments();
+							worksheet._drawSelection();
+							worksheet.objectRender.raiseLayerDrawingObjects(true);
+							worksheet.objectRender.selectDrawingObject(worksheet.objectRender.getSelectedDrawingObjectIndex());
+						}
+					}
+				};
+				this.CoAuthoringApi.onSaveChanges				= function (e, bSendEvent) {
+					// bSendEvent = false - это означает, что мы загружаем имеющиеся изменения при открытии
+					var bAddChanges = false;
+					var nCount = e.length;
+					var nIndex = 0;
+					var oElement = null;
+					var oRecalcIndexColumns = null, oRecalcIndexRows = null;
+					for (; nIndex < nCount; ++nIndex) {
+						oElement = e[nIndex];
+						if ("string" === typeof oElement) {
+							t.collaborativeEditing.addChanges(oElement);
+							bAddChanges = true;
+						} else if (false !== bSendEvent && "object" === typeof oElement) {
+							if ("0" === oElement["type"]) {
+								// Это мы получили recalcIndexColumns
+								oRecalcIndexColumns = t.collaborativeEditing.addRecalcIndex(oElement["type"], oElement["index"]);
+							} else if ("1" === oElement["type"]) {
+								// Это мы получили recalcIndexRows
+								oRecalcIndexRows = t.collaborativeEditing.addRecalcIndex(oElement["type"], oElement["index"]);
+							}
+						}
+
+						// Теперь нужно пересчитать индексы для lock-элементов
+						if (null !== oRecalcIndexColumns && null !== oRecalcIndexRows) {
+							t.collaborativeEditing._recalcLockArray(c_oAscLockTypes.kLockTypeMine, oRecalcIndexColumns, oRecalcIndexRows);
+							t.collaborativeEditing._recalcLockArray(c_oAscLockTypes.kLockTypeOther, oRecalcIndexColumns, oRecalcIndexRows);
+
+							oRecalcIndexColumns = null;
+							oRecalcIndexRows = null;
+						}
+					}
+
+					// т.е. если bSendEvent не задан, то посылаем  сообщение
+					if (true === bAddChanges && false !== bSendEvent)
+						t.syncCollaborativeChanges();
+				};
+				this.CoAuthoringApi.onFirstLoadChanges			= function (e) {
+					t.FirstLoadChanges = e;
+					t._applyFirstLoadChanges();
+				};
+				this.CoAuthoringApi.onSetIndexUser				= function (e) {
+					t.asyncServerIdEndLoaded ();
+				};
+				this.CoAuthoringApi.onStartCoAuthoring			= function (isStartEvent) {
+					t.startCollaborationEditing();
+
+					// На старте не нужно ничего делать
+					if (!isStartEvent) {
+						// Принимаем чужие изменения
+						t.collaborativeEditing.applyChanges();
+						// Пересылаем свои изменения
+						t.collaborativeEditing.sendChanges();
+					}
+				};
+				/**
+				 * Event об отсоединении от сервера
+				 * @param {jQuery} e  event об отсоединении с причиной
+				 * @param {Bool} isDisconnectAtAll  окончательно ли отсоединяемся(true) или будем пробовать сделать reconnect(false) + сами отключились
+				 */
+				this.CoAuthoringApi.onDisconnect				= function (e, isDisconnectAtAll, isCloseCoAuthoring) {
+					if (0 === t.CoAuthoringApi.get_state())
+						t.asyncServerIdEndLoaded();
+					if (isDisconnectAtAll) {
+						// Посылаем наверх эвент об отключении от сервера
+						t.handlers.trigger("asc_onСoAuthoringDisconnect");
+						// И переходим в режим просмотра т.к. мы не можем сохранить таблицу
+						t.asc_setViewerMode(true);
+						if (!isCloseCoAuthoring) {
+							t.handlers.trigger("asc_onError", c_oAscError.ID.CoAuthoringDisconnect, c_oAscError.Level.NoCritical);
+						}
+					}
+				};
+
+				this.CoAuthoringApi.init (user, docId, this.asc_getViewerMode(), 'fghhfgsjdgfjs', window.location.host, g_sMainServiceLocalUrl, function(){
+				}, /*isExcel*/true);
+			},
+
+			// Set CoAuthoring server url
+			_coAuthoringSetServerUrl: function(url){
+				if (!this.CoAuthoringApi)
+					return; // Error
+
+				this.CoAuthoringApi.set_url(url);
+			},
+
+			// End load settings coAuthoring
+			_onLoadCoAuthoringSetings : function(that){
+				if(undefined !== window['g_cAscCoAuthoringUrl'])
+					window.g_cAscCoAuthoringUrl = window['g_cAscCoAuthoringUrl'];
+					
+				if(undefined !== window.g_cAscCoAuthoringUrl)
+				{
+					//Turn off CoAuthoring feature if it disabled
+					if(!that.isCoAuthoringEnable)
+						window.g_cAscCoAuthoringUrl = "";
+
+					// Если есть в настройках сервер, то выставляем его для соединения
+					that._coAuthoringSetServerUrl(window.g_cAscCoAuthoringUrl);
+				}
+				
+				//Если User не задан, отключаем коавторинг.
+				if (undefined === that.User || null === that.User ||
+					undefined === that.User.asc_getId() || null === that.User.asc_getId()) {
+					that.User = new asc_user();
+					that.User.asc_setId("Unknown");
+					that.User.asc_setUserName("Unknown");
+					that._coAuthoringSetServerUrl("");
+				}
+				
+				that._coAuthoringInit(that.documentId, that.User);
+			},
+
+			_onSaveChanges: function (recalcIndexColumns, recalcIndexRows) {
+				var arrChanges = this.wbModel.SerializeHistory();
+				arrChanges.push({"index" : recalcIndexColumns, "type" : "0"});
+				arrChanges.push({"index" : recalcIndexRows, "type" : "1"});
+				this.CoAuthoringApi.saveChanges(arrChanges);
+			},
+
+			_onApplyChanges: function (changes, fCallback) {
+				this.wbModel.DeserializeHistory(changes, fCallback);
+			},
+
+			_onUpdateAfterApplyChanges: function () {
+				if (!this.IsSendDocumentLoadCompleate) {
+					// При открытии после принятия изменений мы должны сбросить пересчетные индексы
+					this.collaborativeEditing.clearRecalcIndex();
+					this.IsSendDocumentLoadCompleate = true;
+					this.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
+				}
+
+				if (this.wb) {
+					this.wb.getWorksheet().cellCommentator.unlockComments();
+					// Нужно послать обновить свойства (иначе для удаления данных не обновится строка формул).
+					// ToDo Возможно стоит обновлять только строку формул
+					this.wb._onWSSelectionChanged(null);
+
+					this.wb.getWorksheet().updateVisibleRange();
+				}
+			},
+
+			_onCleanSelection: function () {
+				if (this.wb)
+					this.wb.getWorksheet().cleanSelection();
+			},
+
+			_onDrawSelection: function () {
+				if (this.wb)
+					this.wb.getWorksheet()._drawSelection();
+			},
+
+			_onResetDrawingObject: function (idObject) {
+				if (this.wb) {
+					this.wb.getWorksheet().objectRender.resetLockedDrawingObject(idObject);
+				}
+			},
+			
+			_onShowDrawingObjects: function () {
+				if (this.wb) {
+					this.wb.getWorksheet().objectRender.showDrawingObjects(true, /*printOptions*/null, /*bMouseUp*/false, /*bUpdateCharts*/false);						
+				}
+			},
+			
+			_onShowComments: function () {
+				if (this.wb) {
+					this.wb.getWorksheet().cellCommentator.drawCommentCells(false);
+				}
+			},
+
+			startCollaborationEditing: function () {
+				// Начинаем совместное редактирование
+				this.collaborativeEditing.startCollaborationEditing();
+			},
+
+			// End Load document
+			_openDocumentEndCallback: function () {
+				// Не инициализируем дважды
+				if (this.DocumentLoadComplete)
+					return;
+
+				this.wb = new asc.WorkbookView(
+					this.wbModel,
+					this.controller,
+					this.handlers,
+					$("#" + this.HtmlElementName),
+					$("#" + this.topLineEditorName),
+					this,
+					this.collaborativeEditing,
+					this.fontRenderingMode,
+					this.options);
+
+				this.DocumentLoadComplete = true;
+				// Применяем пришедшие при открытии изменения
+				this._applyFirstLoadChanges();
+				// Меняем тип состояния (на никакое)
+				this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
+				//this.asc_Resize(); // Убрал, т.к. сверху приходит resize (http://bugzserver/show_bug.cgi?id=14680)
+				if( this.wbModel.startActionOn == false ){
+					this.wbModel.startActionOn = true;
+				}
+				else{
+					var thas = this;
+					setTimeout(function(){thas.asc_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Recalc)},500);
+				}
+
+                if (undefined != window['appBridge']) {
+                    window['appBridge']['dummyCommandOpenDocumentProgress'] (10000);
+                }
+			},
+
+			// Переход на диапазон в листе
+			_asc_setWorksheetRange: function (val) {
+				// Получаем sheet по имени
+				var ws = this.wbModel.getWorksheetByName (val.asc_getSheet());
+				if (!ws || ws.getHidden())
+					return;
+				// Индекс листа
+				var sheetIndex = ws.getIndex();
+				// Если не совпали индекс листа и индекс текущего, то нужно сменить
+				if (this.asc_getActiveWorksheetIndex() !== sheetIndex) {
+					// Меняем активный лист
+					this.asc_showWorksheet (sheetIndex);
+					// Посылаем эвент о смене активного листа
+					this.handlers.trigger ("asc_onActiveSheetChanged", sheetIndex);
+				}
+				var range = ws.getRange2 (val.asc_getRange());
+				if (null !== range) {
+					this.wb._onSetSelection (range.getBBox0(), /*validRange*/ true);
+				}
+			},
+
+			onSaveCallback: function (e) {
+				var t = this;
+				var nState;
+				if (false == e["savelock"]) {
+					// Снимаем глобальный lock
+					this.collaborativeEditing.m_bGlobalLock = false;
+
+					// Принимаем чужие изменения
+					t.collaborativeEditing.applyChanges();
+
+					// Сохраняем файл на сервер
+					this._asc_save();
+				} else {
+					nState = t.CoAuthoringApi.get_state();
+					if (3 === nState) {
+						// Отключаемся от сохранения, соединение потеряно
+						this.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
+					} else {
+						setTimeout(function () {
+							t.CoAuthoringApi.askSaveChanges(function (event) {
+								// Функция может быть долгой (и в IE10 происходит disconnect). Поэтому вызовем через timeout
+								window.setTimeout(function () {
+									t.onSaveCallback(event);
+								}, 10);
+							})
+						}, 1000);
+					}
+				}
+			},
+
+			_getIsLockObjectSheet: function (lockInfo, callback) {
+				if (false === this.collaborativeEditing.isCoAuthoringExcellEnable()) {
+					// Запрещено совместное редактирование
+					if ($.isFunction(callback)) {callback(true);}
+					return;
+				}
+
+				if (false === this.collaborativeEditing.getCollaborativeEditing()) {
+					// Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
+					callback(true);
+					callback = undefined;
+				} else if (false !== this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/false)) {
+					// Редактируем сами
+					callback(true);
+					return;
+				}
+				else if (false !== this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false)) {
+					// Уже ячейку кто-то редактирует
+					callback(false);
+					return;
+				}
+
+				this.collaborativeEditing.onStartCheckLock();
+				this.collaborativeEditing.addCheckLock(lockInfo);
+				this.collaborativeEditing.onEndCheckLock(callback);
+			},
+			
+			// Workbook interface
+
+			asc_getWorksheetsCount: function () {
+				return this.wbModel.getWorksheetCount();
+			},
+
+			asc_getWorksheetName: function (index) {
+				return this.wbModel.getWorksheet(index).getName();
+			},
+
+			asc_getActiveWorksheetIndex: function () {
+				return this.wbModel.getActive();
+			},
+			
+			asc_getActiveWorksheetId: function () {
+				var activeIndex = this.wbModel.getActive();
+				return this.wbModel.getWorksheet(activeIndex).getId();
+			},
+			
+			asc_getWorksheetId: function (index) {
+				return this.wbModel.getWorksheet(index).getId();
+			},
+
+			asc_isWorksheetHidden: function (index) {
+				return this.wbModel.getWorksheet(index).getHidden();
+			},
+
+			// Залочена ли работа с листом
+			asc_isWorksheetLockedOrDeleted: function (index) {
+				var ws = this.wbModel.getWorksheet(index);
+				var sheetId = null;
+				if (null === ws || undefined === ws)
+					sheetId = this.asc_getActiveWorksheetId();
+				else
+					sheetId = ws.getId();
+
+				if (false === this.collaborativeEditing.isCoAuthoringExcellEnable()) {
+					// Запрещено совместное редактирование
+					return false;
+				}
+
+				var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Sheet, /*subType*/null, sheetId, sheetId);
+				// Проверим, редактирует ли кто-то лист
+				return (false !== this.collaborativeEditing.getLockIntersection(lockInfo,
+					c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false));
+			},
+
+			// Залочена ли работа с листами
+			asc_isWorkbookLocked: function () {
+				if (false === this.collaborativeEditing.isCoAuthoringExcellEnable()) {
+					// Запрещено совместное редактирование
+					return false;
+				}
+
+				var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Sheet, /*subType*/null, null, null);
+				// Проверим, редактирует ли кто-то лист
+				return (false !== this.collaborativeEditing.getLockIntersection(lockInfo,
+					c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false));
+			},
+
+			asc_getHiddenWorksheets: function () {
+				var model = this.wbModel;
+				var len = model.getWorksheetCount();
+				var i, ws, res = [];
+
+				for (i = 0; i < len; ++i) {
+					ws = model.getWorksheet(i);
+					if (ws.getHidden()) {
+						res.push({"index": i, "name": ws.getName()});
+					}
+				}
+				return res;
+			},
+
+			asc_showWorksheet: function (index) {
+				if (typeof index === "number" && undefined !== index && null !== index) {
+					var t = this;
+					var ws = this.wbModel.getWorksheet(index);
+					var isHidden = ws.getHidden();
+					var showWorksheetCallback = function (res) {
+						if (res) {
+							t.wbModel.getWorksheet(index).setHidden(false);
+							t.wb.showWorksheet(index);
+							if (isHidden) {
+								// Посылаем callback об изменении списка листов
+								t.sheetsChanged();
+							}
+						}
+					};
+					if (isHidden) {
+						var sheetId = this.wbModel.getWorksheet(index).getId();
+						var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Sheet, /*subType*/null, sheetId, sheetId);
+						this._getIsLockObjectSheet(lockInfo, showWorksheetCallback);
+					}
+					else
+						showWorksheetCallback(true);
+				}
+			},
+
+			asc_showActiveWorksheet: function () {
+				this.wb.showWorksheet(this.wbModel.getActive());
+			},
+
+			asc_hideWorksheet: function () {
+				var t = this;
+				// Колличество листов
+				var countWorksheets = this.asc_getWorksheetsCount();
+				// Колличество скрытых листов
+				var arrHideWorksheets = this.asc_getHiddenWorksheets();
+				var countHideWorksheets = arrHideWorksheets.length;
+				// Вдруг остался один лист
+				if (countWorksheets <= countHideWorksheets + 1)
+					return false;
+
+				var model = this.wbModel;
+				// Активный лист
+				var activeWorksheet = model.getActive();
+				var sheetId = this.wbModel.getWorksheet(activeWorksheet).getId();
+				var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Sheet, /*subType*/null, sheetId, sheetId);
+
+				var hideWorksheetCallback = function (res) {
+					if (res) {
+						t.wbModel.getWorksheet(activeWorksheet).setHidden(true);
+						// Покажем следующий лист или предыдущий (если больше нет)
+						var i, ws;
+						for (i = activeWorksheet + 1; i < countWorksheets; ++i) {
+							ws = model.getWorksheet(i);
+							if (false === ws.getHidden()) {
+								t.asc_showWorksheet (i);
+								// Посылаем callback об изменении списка листов
+								t.sheetsChanged();
+								return;
+							}
+						}
+						// Не нашли справа, ищем слева от текущего
+						for (i = activeWorksheet - 1; i >= 0; --i) {
+							ws = model.getWorksheet(i);
+							if (false === ws.getHidden()) {
+								t.asc_showWorksheet (i);
+								// Посылаем callback об изменении списка листов
+								t.sheetsChanged();
+								return;
+							}
+						}
+					}
+				};
+
+				this._getIsLockObjectSheet(lockInfo, hideWorksheetCallback);
+				return true;
+			},
+
+			asc_renameWorksheet: function (name) {
+				// Проверка глобального лока
+				if (this.collaborativeEditing.getGlobalLock())
+					return false;
+
+				var i = this.wbModel.getActive();
+				var sheetId = this.wbModel.getWorksheet(i).getId();
+				var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Sheet, /*subType*/null, sheetId, sheetId);
+
+				var t = this;
+				var renameCallback = function (res) {
+					if (res) {
+						t.wbModel.getWorksheet(i).setName(name);
+					}
+				};
+
+				this._getIsLockObjectSheet(lockInfo, renameCallback);
+				return true;
+			},
+
+			asc_addWorksheet: function () {
+				var active = this.wbModel.createWorksheet();
+				this.asc_showWorksheet (active);
+				// Посылаем callback об изменении списка листов
+				this.sheetsChanged();
+			},
+
+			asc_insertWorksheet: function (name) {
+				var i = this.wbModel.getActive();
+				var j = this.wbModel.createWorksheet(i, name);
+				this.wb.spliceWorksheet(i, 0, null);
+				this.asc_showWorksheet (i);
+				// Посылаем callback об изменении списка листов
+				this.sheetsChanged();
+			},
+
+			// Удаление листа
+			asc_deleteWorksheet: function () {
+				// Проверка глобального лока
+				if (this.collaborativeEditing.getGlobalLock())
+					return false;
+
+				var i = this.wbModel.getActive();
+				var sheetId = this.wbModel.getWorksheet(i).getId();
+				var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Sheet, /*subType*/null, sheetId, sheetId);
+
+				var t = this;
+				var deleteCallback = function (res) {
+					if (res) {
+						// Удаляем Worksheet и получаем новый активный индекс (-1 означает, что ничего не удалилось)
+						var activeNow = t.wbModel.removeWorksheet(i);
+						if (-1 !== activeNow){
+							t.wb.removeWorksheet(i);
+							t.asc_showWorksheet (activeNow);
+							// Посылаем callback об изменении списка листов
+							t.sheetsChanged();
+						}
+					}
+				};
+
+				this._getIsLockObjectSheet(lockInfo, deleteCallback);
+				return true;
+			},
+
+			asc_moveWorksheet: function (where) {
+				var i = this.wbModel.getActive();
+				var d = i < where ? +1 : -1;
+				// Мы должны поместить слева от заданного значения, поэтому если идем вправо, то вычтем 1
+				if (1 === d)
+					where -= 1;
+
+				this.wbModel.replaceWorksheet(i, where);
+				this.wb.replaceWorksheet(i, where);
+
+				// Обновим текущий номер
+				this.asc_showWorksheet(where);
+				// Посылаем callback об изменении списка листов
+				this.sheetsChanged();
+			},
+
+			asc_copyWorksheet: function (where, newName) {
+				var scale = this.asc_getZoom();
+				var i = this.wbModel.getActive();
+
+				// ToDo уйти от lock для листа при копировании
+				var sheetId = this.wbModel.getWorksheet(i).getId();
+				var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Sheet, /*subType*/null, sheetId, sheetId);
+				var t = this;
+				var copyWorksheet = function (res) {
+					if (res) {
+						t.wbModel.copyWorksheet(i, where, newName);
+						t.wb.copyWorksheet(i, where);
+						// Делаем активным скопированный
+						t.asc_showWorksheet(where);
+						t.asc_setZoom(scale);
+						// Посылаем callback об изменении списка листов
+						t.sheetsChanged();
+					}
+				};
+
+				this._getIsLockObjectSheet(lockInfo, copyWorksheet);
+			},
+
+			asc_cleanSelection: function(){
+				this.wb.getWorksheet().cleanSelection();
+			},
+
+			asc_getZoom: function () {
+				return this.wb.getZoom();
+			},
+
+			asc_setZoom: function (scale) {
+				this.wb.changeZoom(scale);
+			},
+
+			asc_enableKeyEvents: function (isEnabled) {
+				if (this.wb)
+					this.wb.enableKeyEventsHandler(isEnabled);
+			},
+
+			asc_findText: function (text, scanByRows, scanForward) {
+				var d = this.wb.findCellText(text, scanByRows, scanForward);
+				if (d) {
+					if (d.deltaX) {this.controller.scrollHorizontal(d.deltaX);}
+					if (d.deltaY) {this.controller.scrollVertical(d.deltaY);}
+				}
+				return !!d;
+			},
+
+			/**
+			 * Делает активной указанную ячейку
+			 * @param {String} reference  Ссылка на ячейку вида A1 или R1C1
+			 */
+			asc_findCell: function(reference) {
+				var d = this.wb.findCell(reference);
+				if (d) {
+					if (d.deltaX) {this.controller.scrollHorizontal(d.deltaX);}
+					if (d.deltaY) {this.controller.scrollVertical(d.deltaY);}
+				}
+			},
+
+//			не используется (и не стоит так делать)
+//			asc_openCellEditor: function (text, cursorPos) {
+//				this.wb.openCellEditor(text, cursorPos, /*isFocus*/false);
+//			},
+
+			asc_closeCellEditor: function () {
+				this.wb.closeCellEditor();
+			},
+
+
+			// Spreadsheet interface
+
+			asc_getColumnWidth: function () {
+				var ws = this.wb.getWorksheet();
+				return ws.getColumnWidthInSymbols(ws.getSelectedColumnIndex());
+			},
+
+			asc_setColumnWidth: function (width) {
+				this.wb.getWorksheet().changeWorksheet("colWidth", width);
+			},
+
+			asc_insertColumnsBefore: function (count) {
+				this.wb.getWorksheet().changeWorksheet("insColBefore", count);
+			},
+
+			asc_insertColumnsAfter: function (count){
+				this.wb.getWorksheet().changeWorksheet("insColAfter", count);
+			},
+
+			asc_deleteColumns: function() {
+				this.wb.getWorksheet().changeWorksheet("delCol");
+			},
+
+			asc_showColumns: function () {
+				this.wb.getWorksheet().changeWorksheet("showCols");
+			},
+
+			asc_hideColumns: function () {
+				this.wb.getWorksheet().changeWorksheet("hideCols");
+			},
+
+			asc_getRowHeight: function () {
+				var ws = this.wb.getWorksheet();
+				return ws.getRowHeight(ws.getSelectedRowIndex(), 1/*pt*/);
+			},
+
+			asc_setRowHeight: function (height) {
+				this.wb.getWorksheet().changeWorksheet("rowHeight", height);
+			},
+
+			asc_insertRowsBefore: function(count) {
+				this.wb.getWorksheet().changeWorksheet("insRowBefore", count);
+			},
+
+			asc_insertRowsAfter: function (count) {
+				this.wb.getWorksheet().changeWorksheet("insRowAfter", count);
+			},
+
+			asc_deleteRows: function () {
+				this.wb.getWorksheet().changeWorksheet("delRow");
+			},
+
+			asc_showRows: function () {
+				this.wb.getWorksheet().changeWorksheet("showRows");
+			},
+
+			asc_hideRows: function () {
+				this.wb.getWorksheet().changeWorksheet("hideRows");
+			},
+
+			asc_insertCells: function (options) {
+				this.wb.getWorksheet().changeWorksheet("insCell", options);
+			},
+
+			asc_deleteCells: function (options) {
+				this.wb.getWorksheet().changeWorksheet("delCell", options);
+			},
+
+			asc_mergeCells: function (options) {
+				this.wb.getWorksheet().setSelectionInfo("merge", options);
+			},
+
+			asc_sortCells: function (options) {
+				this.wb.getWorksheet().setSelectionInfo("sort", options);
+			},
+
+			asc_emptyCells: function (options) {
+				this.wb.emptyCells(options);
+			},
+
+			asc_drawDepCells:function(se){
+				if( se != c_oAscDrawDepOptions.Clear )
+					this.wb.getWorksheet().prepareDepCells(se);
+				else
+					this.wb.getWorksheet().cleanDepCells();
+			},
+			
+			// Потеряем ли мы что-то при merge ячеек
+			asc_mergeCellsDataLost: function (options) {
+				return this.wb.getWorksheet().getSelectionMergeInfo(options);
+			},
+
+			// Images & Charts
+
+			asc_drawingObjectsExist: function(chart) {
+				for (var i = 0; i < this.wb.model.aWorksheets.length; i++) {
+					if ( this.wb.model.aWorksheets[i].Drawings && this.wb.model.aWorksheets[i].Drawings.length )
+						return true;
+				}
+				return false;
+			},
+
+			asc_getChartObject: function() {		// Return new or existing chart. For image return null
+				var ws = this.wb.getWorksheet();
+				return ws.objectRender.getAscChartObject();
+			},
+
+			asc_addChartDrawingObject: function(chart) {
+				this.wb.controller.isSelectDrawingObject = true;
+				var ws = this.wb.getWorksheet();
+				return ws.objectRender.addChartDrawingObject(chart, this.isChartEditor);
+			},
+
+			asc_editChartDrawingObject: function(chart) {
+				this.wb.controller.isSelectDrawingObject = true;
+				var ws = this.wb.getWorksheet();
+				return ws.objectRender.editChartDrawingObject(chart);
+			},
+
+			asc_addImageDrawingObject: function(imageUrl) {
+				this.wb.controller.isSelectDrawingObject = true;
+				var ws = this.wb.getWorksheet();
+				return ws.objectRender.addImageDrawingObject(imageUrl, false, null);
+			},
+
+			asc_deleteSelectedDrawingObject: function() {
+				var ws = this.wb.getWorksheet();
+				return ws.objectRender.deleteSelectedDrawingObject();
+			},
+
+			asc_showImageFileDialog: function (options) {
+                if (undefined != window['appBridge']) {
+                    window['appBridge']['dummyCommandAddImage'] ();
+                    return;
+                }
+
+				var ws = this.wb.getWorksheet();
+				ws.objectRender.showImageFileDialog(this.documentId, this.documentFormat);
+			},
+
+			asc_setSelectedDrawingObjectLayer: function(layerType) {
+				var ws = this.wb.getWorksheet();
+				return ws.objectRender.setSelectedDrawingObjectLayer(layerType);
+			},
+			
+			asc_getChartPreviews: function(chartType, chartSubType) {
+				
+				if ( this.chartPreviewManager.isReady() ) {
+					return this.chartPreviewManager.getChartPreviews(chartType, chartSubType);
+				}
+			},
+			
+			// Для вставки диаграмм в Word
+			asc_getBinaryFileWriter: function() {
+				this.wb._initCommentsToSave();
+				return new BinaryFileWriter(this.wbModel);
+			},
+			
+			asc_getWordChartObject: function() {
+				var ws = this.wb.getWorksheet();
+				return ws.objectRender.getWordChartObject();
+			},
+			
+			asc_cleanWorksheet: function() {
+				var ws = this.wb.getWorksheet();	// Для удаления данных листа и диаграмм
+				ws.objectRender.cleanWorksheet();
+			},
+			
+			// Cell comment interface
+			asc_addComment: function(oComment) {
+				var ws = this.wb.getWorksheet();
+				ws.cellCommentator.asc_addComment(oComment);					
+			},
+			
+			asc_changeComment: function(id, oComment) {
+				var ws = this.wb.getWorksheet();
+				ws.cellCommentator.asc_changeComment(id, oComment);
+			},
+			
+			asc_selectComment: function(id) {
+				var ws = this.wb.getWorksheet();
+				ws.cellCommentator.asc_selectComment(id);
+			},
+			
+			asc_showComment: function(id) {
+				var ws = this.wb.getWorksheet();
+				ws.cellCommentator.asc_showComment(id);
+			},
+			
+			asc_findComment: function(id) {
+				var ws = this.wb.getWorksheet();
+				return ws.cellCommentator.asc_findComment(id);
+			},
+			
+			asc_removeComment: function(id) {
+				var ws = this.wb.getWorksheet();
+				ws.cellCommentator.asc_removeComment(id);
+			},
+			
+			asc_getComments: function(col, row) {
+				var ws = this.wb.getWorksheet();
+				return ws.cellCommentator.asc_getComments(col, row);
+			},
+			
+			asc_getDocumentComments: function() {
+				var ws = this.wb.getWorksheet();
+				return ws.cellCommentator.asc_getDocumentComments();
+			},
+			
+			asc_showComments: function() {
+				var ws = this.wb.getWorksheet();
+				return ws.cellCommentator.asc_showComments();
+			},
+			
+			asc_hideComments: function() {
+				var ws = this.wb.getWorksheet();
+				return ws.cellCommentator.asc_hideComments();
+			},
+			
+			asc_getWorkbookComments: function() {				
+				var _this = this, comments = [];
+				if ( _this.wb ) {
+					for (var i = 0; i < _this.wb.model.aWorksheets.length; i++) {
+						for (var j = 0; j < _this.wb.model.aWorksheets[i].aComments.length; j++) {
+							comments.push(_this.wb.model.aWorksheets[i].aComments[j]);
+						}
+					}
+				}
+				return comments;
+			},
+
+			// Cell interface
+
+			asc_getCellInfo: function (bExt) {
+				return this.wb.getWorksheet().getSelectionInfo(!!bExt);
+			},
+
+			// Получить координаты активной ячейки
+			asc_getActiveCellCoord: function () {
+				return this.wb.getWorksheet().getActiveCellCoord();
+			},
+
+			asc_setCellFontName: function (fontName) {
+				var t = this;
+				t._loadFonts([fontName], function () {
+					t.wb.setFontAttributes("fn", fontName);
+					t.wb.restoreFocus();
+				});
+			},
+
+			asc_setCellFontSize: function (fontSize) {
+				this.wb.setFontAttributes("fs", fontSize);
+				this.wb.restoreFocus();
+			},
+
+			asc_setCellBold: function (isBold) {
+				this.wb.setFontAttributes("b", isBold);
+				this.wb.restoreFocus();
+			},
+
+			asc_setCellItalic: function (isItalic) {
+				this.wb.setFontAttributes("i", isItalic);
+				this.wb.restoreFocus();
+			},
+
+			asc_setCellUnderline: function (isUnderline) {
+				this.wb.setFontAttributes("u", isUnderline ? "single" : "none");
+				this.wb.restoreFocus();
+			},
+
+			asc_setCellStrikeout: function (isStrikeout) {
+				this.wb.setFontAttributes("s", isStrikeout);
+				this.wb.restoreFocus();
+			},
+
+			asc_setCellSubscript: function (isSubscript) {
+				this.wb.setFontAttributes("fa", isSubscript ? "subscript" : "none");
+				this.wb.restoreFocus();
+			},
+
+			asc_setCellSuperscript: function (isSuperscript) {
+				this.wb.setFontAttributes("fa", isSuperscript ? "superscript" : "none");
+				this.wb.restoreFocus();
+			},
+
+			asc_setCellAlign: function (align) {
+				this.wb.getWorksheet().setSelectionInfo("a", align);
+				this.wb.restoreFocus();
+			},
+
+			asc_setCellVertAlign: function (align) {
+				this.wb.getWorksheet().setSelectionInfo("va", align);
+				this.wb.restoreFocus();
+			},
+
+			asc_setCellTextWrap: function (isWrapped) {
+				this.wb.getWorksheet().setSelectionInfo("wrap", isWrapped);
+				this.wb.restoreFocus();
+			},
+
+			asc_setCellTextShrink: function (isShrinked) {
+				this.wb.getWorksheet().setSelectionInfo("shrink", isShrinked);
+				this.wb.restoreFocus();
+			},
+
+			asc_setCellTextColor: function (color) {
+				if(color instanceof CAscColor)
+				{
+					//преобразуем в css
+					color = asc.numberToCSSColor((color.get_r() << 16) | (color.get_g() << 8) | color.get_b());
+				}
+				this.wb.setFontAttributes("c", color);
+				this.wb.restoreFocus();
+			},
+
+			asc_setCellBackgroundColor: function (color) {
+				if(color instanceof CAscColor)
+				{
+					//преобразуем в css
+					color = asc.numberToCSSColor((color.get_r() << 16) | (color.get_g() << 8) | color.get_b());
+				}
+				this.wb.getWorksheet().setSelectionInfo("bc", color);
+				this.wb.restoreFocus();
+			},
+
+			asc_setCellBorders: function (borders) {
+				this.wb.getWorksheet().setSelectionInfo("border", borders);
+				this.wb.restoreFocus();
+			},
+
+//			/**
+//			 * Устанавливает текст в ячейке или в редакторе ячейки
+//			 * @param {String} v    новый текст
+//			 * @param {Number} pos  позиция текста в редакторе (для редактора ячейки)
+//			 * @param {Number} len  длина замещаемого текста (для редактора ячейки)
+//			 */
+//			asc_setCellValue: function (v, pos, len) {
+//				this.wb.setCellValue(v, pos, len);
+//			}, - не используется (и не стоит так делать)
+
+			asc_setCellFormat: function (format) {
+				this.wb.getWorksheet().setSelectionInfo("format", format);
+				this.wb.restoreFocus();
+			},
+
+            asc_setCellAngle: function (angle) {
+                this.wb.getWorksheet().setSelectionInfo("angle", angle);
+                this.wb.restoreFocus();
+            },
+
+			asc_setCellFinancialFormat: function (format) {
+				this.wb.getWorksheet().setSelectionInfo("format", c_oAscFormatOptions.Accounting);
+				this.wb.restoreFocus();
+			},
+
+			asc_setCellPercentFormat: function () {
+				this.wb.getWorksheet().setSelectionInfo("format", '0%');
+				this.wb.restoreFocus();
+			},
+
+			asc_setCellDelimitedFormat: function () {
+				this.wb.getWorksheet().setSelectionInfo("format", '_(* #,##0.00_);_(* (#,##0.00);_(* "-"??_);_(@_)');
+				this.wb.restoreFocus();
+			},
+
+			asc_increaseCellDigitNumbers: function () {
+				this.wb.getWorksheet().setSelectionInfo("changeDigNum", +1);
+				this.wb.restoreFocus();
+			},
+
+			asc_decreaseCellDigitNumbers: function () {
+				this.wb.getWorksheet().setSelectionInfo("changeDigNum", -1);
+				this.wb.restoreFocus();
+			},
+
+			asc_onMouseUp: function (x, y) {
+				this.controller._onWindowMouseUpExternal(x, y);
+			},
+
+
+			//
+
+			asc_selectFunction: function () {
+
+			},
+
+			asc_insertHyperlink: function (options) {
+				// На всякий случай проверка (вдруг кто собирается вызвать...)
+				this.wb.closeCellEditor();
+				this.wb.getWorksheet().setSelectionInfo("hyperlink", options);
+				this.wb.restoreFocus();
+			},
+
+			asc_insertFormula: function (functionName, autoComplet) {
+				this.wb.insertFormulaInEditor(functionName, autoComplet);
+				this.wb.restoreFocus();
+			},
+
+			asc_getFormulasInfo: function () {
+				return getFormulasInfo();
+			},
+
+			asc_recalc : function(){
+				this.wbModel.recalc();
+				// this.wb.getWorksheet().changeWorksheet("update");
+			},
+
+			asc_setFontRenderingMode: function (mode) {
+				if (mode !== this.fontRenderingMode) {
+					this.fontRenderingMode = mode;
+					if (this.wb)
+						this.wb.setFontRenderingMode(mode);
+				}
+			},
+
+			asc_SendThemeColors : function(colors,standart_colors)
+			{
+				this._gui_control_colors = { Colors : colors, StandartColors : standart_colors };
+				var ret = this.handlers.trigger("asc_onSendThemeColors", colors,standart_colors);
+				if (ret)
+					this._gui_control_colors = null;
+			},
+			
+			asc_SendThemeColorSchemes : function(param)
+			{
+				this._gui_color_schemes = param;
+				var ret = this.handlers.trigger("asc_onSendThemeColorSchemes", param);
+				if (ret)
+					this._gui_color_schemes = null;
+			},
+			asc_ChangeColorScheme : function (index_scheme) {
+				var t = this;
+				var onChangeColorScheme = function (res) {
+					if (res) {
+						var theme = t.wbModel.theme;
+
+						var oldClrScheme = theme.themeElements.clrScheme;
+						var _count_defaults = g_oUserColorScheme.length;
+						if (index_scheme < _count_defaults) {
+							var _obj = g_oUserColorScheme[index_scheme];
+							var scheme = new ClrScheme();
+							var _c;
+
+							_c = _obj["dk1"];
+							scheme.colors[8] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+
+							_c = _obj["lt1"];
+							scheme.colors[12] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+
+							_c = _obj["dk2"];
+							scheme.colors[9] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+
+							_c = _obj["lt2"];
+							scheme.colors[13] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+
+							_c = _obj["accent1"];
+							scheme.colors[0] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+
+							_c = _obj["accent2"];
+							scheme.colors[1] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+
+							_c = _obj["accent3"];
+							scheme.colors[2] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+
+							_c = _obj["accent4"];
+							scheme.colors[3] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+
+							_c = _obj["accent5"];
+							scheme.colors[4] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+
+							_c = _obj["accent6"];
+							scheme.colors[5] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+
+							_c = _obj["hlink"];
+							scheme.colors[11] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+
+							_c = _obj["folHlink"];
+							scheme.colors[10] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+
+							theme.themeElements.clrScheme = scheme;
+						} else {
+							index_scheme -= _count_defaults;
+
+							if (index_scheme < 0 || index_scheme >= theme.extraClrSchemeLst.length)
+								return;
+
+							theme.themeElements.clrScheme = theme.extraClrSchemeLst[index_scheme].clrScheme.createDuplicate();
+						}
+						History.Create_NewPoint();
+						//не делаем Duplicate потому что предполагаем что схема не будет менять частями, а только обьектом целиком.
+						History.Add(g_oUndoRedoWorkbook, historyitem_Workbook_ChangeColorScheme, null, null, new UndoRedoData_ClrScheme(oldClrScheme, theme.themeElements.clrScheme));
+						t.asc_AfterChangeColorScheme();
+					}
+				};
+				// ToDo поправить заглушку, сделать новый тип lock element-а
+				var sheetId = -1; // Делаем не существующий лист и не существующий объект
+				var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, /*subType*/null, sheetId, sheetId);
+				this._getIsLockObjectSheet(lockInfo, onChangeColorScheme);
+			},
+			asc_AfterChangeColorScheme : function() {
+				this.wbModel.rebuildColors();
+				this.asc_CheckGuiControlColors();
+				this.asc_ApplyColorScheme(true);
+				this.handlers.trigger("asc_onUpdateChartStyles");
+			},
+			asc_ApplyColorScheme : function(bRedraw) {
+				this.chartStyleManager.init();
+				this.chartPreviewManager.init();
+				
+				var asc_AF = asc.AutoFilters;
+				var autoFilters = new asc_AF();
+				var tablePictures = autoFilters.getTablePictures(this.wbModel);
+				var bResult = this.handlers.trigger("asc_onInitTablePictures", tablePictures);
+				if (false === bResult)
+					this.tablePictures = tablePictures;
+				else
+					this.tablePictures = null;
+					
+				if (bRedraw) {
+					var ws = this.wb.getWorksheet();
+					// ToDo - от _reDrawFilters в будущем стоит избавиться, ведь она проставляет стили ячейкам, а это не нужно делать (сменить отрисовку)
+					// ToDo - и еще, в _reDrawFilters делается отрисовка + в drawWS делается отрисовка
+					autoFilters._reDrawFilters(ws,true);
+					this.wb.drawWS();
+				}
+			},
+			
+			/////////////////////////////////////////////////////////////////////////
+			///////////////////CoAuthoring and Chat api//////////////////////////////
+			/////////////////////////////////////////////////////////////////////////
+			// send chart message
+			asc_coAuthoringChatSendMessage: function(message) {
+				if (!this.CoAuthoringApi)
+					return; // Error
+				this.CoAuthoringApi.sendMessage(message);
+			},
+			// get chart messages, возвращается массив CChatMessage
+			asc_coAuthoringChatGetMessages: function() {
+				if (!this.CoAuthoringApi)
+					return; // Error
+				this.CoAuthoringApi.getMessages();
+			},
+			// get users, возвращается массив users
+			asc_coAuthoringGetUsers: function() {
+				if (!this.CoAuthoringApi)
+					return; // Error
+				this.CoAuthoringApi.getUsers();
+			},
+			// server disconnect
+			asc_coAuthoringDisconnect: function () {
+				if (!this.CoAuthoringApi)
+					return; // Error
+				this.CoAuthoringApi.disconnect();
+			},
+
+            // offline mode
+
+            offlineModeInit: function() {
+                var t = this;
+
+                if (window['scriptBridge']) {
+                    if (!window['scriptBridge']['_self']) {
+                        window['scriptBridge']['_self'] = t;
+                    }
+
+                    if (!window['scriptBridge']['workPath']) {
+                        window['scriptBridge']['workPath'] = function () {
+                            return t.documentUrl;
+                        };
+                    }
+
+                    if (!window['scriptBridge']['print']) {
+                        window['scriptBridge']['print'] = function() {
+
+                            var oAdditionalData = new Object();
+                            oAdditionalData["documentId"] = t.documentId+ "." + t.documentFormat;
+                            oAdditionalData["vkey"] = t.documentVKey;
+                            oAdditionalData["outputformat"] = c_oAscFileType.PDFPRINT;
+
+                            var bStart = false;
+
+                            t.adjustPrint = new asc_CAdjustPrint();
+                            t.printPagesData = t.wb.calcPagesPrint(t.adjustPrint);
+
+                            var pdf_writer = new CPdfPrinter(t.wbModel.sUrlPath);
+                            var isEndPrint = t.wb.printSheet(pdf_writer, t.printPagesData);
+
+                            return pdf_writer.DocumentRenderer.Memory.GetBase64Memory();
+                        };
+                    }
+
+                    if (!window['scriptBridge']['addFileImage']) {
+                        window['scriptBridge']['addFileImage'] = function(imageUrl) {
+                            t.wb.controller.isSelectDrawingObject = true;
+
+                            var ws = t.wb.getWorksheet();
+                            ws.model.workbook.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+                            ws.objectRender.addImageDrawingObject(imageUrl, false, null);
+                            ws.model.workbook.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+                        };
+                    }
+
+                    if (!window['scriptBridge']['isDocumentModified']) {
+                        window['scriptBridge']['isDocumentModified'] = function() {
+                            var f = t.asc_isDocumentModified();
+                            t.isDocumentModify = false;
+                            t.handlers.trigger("asc_onDocumentModifiedChanged", false);
+                            return f;
+                        };
+                    }
+
+                    if (!window['scriptBridge']['save']) {
+                        window['scriptBridge']['save'] = function(sFormat) {
+                            var oAdditionalData = new Object();
+                            oAdditionalData["documentId"] = t.documentId+ "." + t.documentFormat;
+                            oAdditionalData["vkey"] = t.documentVKey;
+                            oAdditionalData["outputformat"] = sFormat;
+
+                            t.wb._initCommentsToSave();
+                            var oBinaryFileWriter = new BinaryFileWriter(t.wbModel);
+                            oAdditionalData["savetype"] = "completeall";
+
+                            // TODO: csv
+                            // if (c_oAscFileType.CSV === sFormat) {
+                            //     if (options instanceof asc.asc_CCSVAdvancedOptions) {
+                            //         oAdditionalData["saveparams"] = options.asc_getCodePage() + "-" + options.asc_getDelimiter();
+                            //     }
+                            // }
+
+                            var data = oBinaryFileWriter.Write();
+                            t.asc_OnSaveEnd(true);
+                            return data;
+                        }
+                    }
+
+                    if (!window['scriptBridge']['saveEnd']) {
+                        window['scriptBridge']['saveEnd'] = function() {
+                            t.asc_OnSaveEnd(true);
+                        }
+                    }
+
+                    if (!window['scriptBridge']['loadDocumentFromString']) {
+                        window['scriptBridge']['loadDocumentFromString'] = function(workbook) {
+                            var wb = new Workbook("", t.handlers, t);
+                            wb.initGlobalObjects();
+
+                            var oBinaryFileReader = new BinaryFileReader("");
+                            oBinaryFileReader.Read(workbook, wb);
+
+                            t._startOpenDocument({returnCode: 0, val:wb});
+                        }
+                    }
+                }
+            },
+            offlineModeLoadDocument: function() {
+                var t = this;
+
+                t.asc_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
+
+                function loadDocument (data) {
+
+                    var workbook = data;
+                    if (!data || c_oSerFormat.Signature !== data.substring(0, c_oSerFormat.Signature.length)) {
+                        workbook = "XLSY;v1;1001;BAKAAgAAAwwDAAAEHwMAAADgAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIgAAAAAHgAAAAEZAAAAAAAAAAABAAAAAAIAAAAABAAAAAAFAAAAAAIdAAAAAxgAAAAGBAAAAAAHBAAAAAAIBAAAAAAJBAAAAAAECgAAAAUAAAAABQAAAAAGLwAAAAcqAAAAAQYGAAAAAAQAAAD/BAYOAAAAQwBhAGwAaQBiAHIAaQAGBQAAAAAAACZADwAAAAAAAAAAAQUAAAACAAAAAL0AAAAAOgAAAAEYAAAAAAYMAAAAUwBoAGUAZQB0ADEAAQQBAAAABAQAAABBADEACwoAAAABBQAAAAAAAC5ACQAAAAAAOgAAAAEYAAAAAAYMAAAAUwBoAGUAZQB0ADIAAQQCAAAABAQAAABBADEACwoAAAABBQAAAAAAAC5ACQAAAAAAOgAAAAEYAAAAAAYMAAAAUwBoAGUAZQB0ADMAAQQDAAAABAQAAABBADEACwoAAAABBQAAAAAAAC5ACQAAAAAFAAAAAAAAAAA=";
+                    }
+
+                    var wb = new Workbook("", t.handlers, t);
+                    wb.initGlobalObjects();
+
+                    var oBinaryFileReader = new BinaryFileReader("");
+                    oBinaryFileReader.Read(workbook, wb);
+
+                    t._startOpenDocument({returnCode: 0, val:wb});
+                }
+
+                $.ajax({
+                    type: 'GET',
+                    url : t.documentUrl + "editor.js?callback=?",
+                    jsonpCallback: 'jsonCallback',
+                    async: false,
+                    cache: false,
+                    dataType: 'jsonp',
+                    contentType: "application/json",
+                    crossDomain: true,
+                    success: function(data) {
+                        loadDocument(data);
+                    },
+                    error: function(jqXHR, textStatus, ex) {
+                        // console.log(textStatus + "," + ex + "," + jqXHR.responseText);
+                        loadDocument(undefined);
+                    }
+                });
+            },
+
+            asc_openNewDocument: function () {
+                if (undefined != window['appBridge']) {
+                     window['appBridge']['dummyCommandNewDocument'] ();
+                 }
+            },
+            asc_loadDocumentFromDisk: function () {
+                if (undefined != window['appBridge']) {
+                    window['appBridge']['dummyCommandLoadDocumentFromDisk'] ();
+                }
+            }
+		};
+
+		function asc_ajax(obj){
+			var url = "", type = "GET",
+				async = true, data = null, dataType = "text/xml",
+				error = null, success = null, httpRequest = null,
+
+			init = function (obj){
+
+				if ( typeof obj.url !== 'undefined' ){
+					url = obj.url;
+				}
+				if ( typeof obj.type !== 'undefined' ){
+					type = obj.type;
+				}
+				if ( typeof obj.async !== 'undefined' ){
+					async = obj.async;
+				}
+				if ( typeof obj.data !== 'undefined' ){
+					data = obj.data;
+				}
+				if ( typeof obj.dataType !== 'undefined' ){
+					dataType = obj.dataType;
+				}
+				if ( typeof obj.error !== 'undefined' ){
+					error = obj.error;
+				}
+				if ( typeof obj.success !== 'undefined' ){
+					success = obj.success;
+				}
+
+				if (window.XMLHttpRequest) { // Mozilla, Safari, ...
+					httpRequest = new XMLHttpRequest();
+					if (httpRequest.overrideMimeType) {
+						httpRequest.overrideMimeType(dataType);
+					}
+				}
+				else if (window.ActiveXObject) { // IE
+					try {
+						httpRequest = new ActiveXObject("Msxml2.XMLHTTP");
+					}
+					catch (e) {
+						try {
+							httpRequest = new ActiveXObject("Microsoft.XMLHTTP");
+						}
+						catch (e) {}
+					}
+				}
+
+				httpRequest.onreadystatechange = function(){
+					respons(this);
+				};
+				send();
+			},
+
+			send = function(){
+				httpRequest.open(type, url, async);
+				if (type === "POST")
+					httpRequest.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+				httpRequest.send(data);
+			},
+
+			respons = function(httpRequest){
+				switch (httpRequest.readyState)
+				{
+					case 0:
+						// The object has been created, but not initialized (the open method has not been called).
+						break;
+					case 1:
+						// A request has been opened, but the send method has not been called.
+						break;
+					case 2:
+						// The send method has been called. No data is available yet.
+						break;
+					case 3:
+						// Some data has been received; however, neither responseText nor responseBody is available.
+						break;
+					case 4:
+						if (httpRequest.status === 200 || httpRequest.status === 1223) {
+							if (typeof success === "function")
+								success(httpRequest.responseText);
+						} else {
+							if (typeof error === "function")
+								error(httpRequest,httpRequest.statusText,httpRequest.status);
+						}
+						break;
+				}
+			};
+
+			init(obj);
+		};
+		function _mapAscServerErrorToAscError(nServerError)
+		{
+			var nRes = c_oAscError.ID.Unknown;
+			switch(nServerError)
+			{
+				case c_oAscServerError.NoError : nRes = c_oAscError.ID.No;break;
+				case c_oAscServerError.TaskQueue :
+				case c_oAscServerError.TaskResult : nRes = c_oAscError.ID.Database;break;
+				case c_oAscServerError.ConvertDownload : nRes = c_oAscError.ID.DownloadError;break;
+				case c_oAscServerError.ConvertTimeout : nRes = c_oAscError.ID.ConvertationTimeout;break;
+				case c_oAscServerError.ConvertUnknownFormat :
+				case c_oAscServerError.ConvertReadFile :
+				case c_oAscServerError.Convert : nRes = c_oAscError.ID.ConvertationError;break;
+				case c_oAscServerError.UploadContentLength : nRes = c_oAscError.ID.UplImageSize;break;
+				case c_oAscServerError.UploadExtension : nRes = c_oAscError.ID.UplImageExt;break;
+				case c_oAscServerError.UploadCountFiles : nRes = c_oAscError.ID.UplImageFileCount;break;
+				case c_oAscServerError.VKey : nRes = c_oAscError.ID.FileVKey;break;
+				case c_oAscServerError.VKeyEncrypt : nRes = c_oAscError.ID.VKeyEncrypt;break;
+				case c_oAscServerError.VKeyKeyExpire : nRes = c_oAscError.ID.KeyExpire;break;
+				case c_oAscServerError.VKeyUserCountExceed : nRes = c_oAscError.ID.UserCountExceed;break;
+				case c_oAscServerError.Storage :
+				case c_oAscServerError.StorageFileNoFound :
+				case c_oAscServerError.StorageRead :
+				case c_oAscServerError.StorageWrite :
+				case c_oAscServerError.StorageRemoveDir :
+				case c_oAscServerError.StorageCreateDir :
+				case c_oAscServerError.StorageGetInfo :
+				case c_oAscServerError.Upload :
+				case c_oAscServerError.ReadRequestStream :
+				case c_oAscServerError.Unknown : nRes = c_oAscError.ID.Unknown;break;
+			}
+			return nRes;
+		}
+		/*
+		 * Export
+		 * -----------------------------------------------------------------------------
+		 */
+
+		asc["spreadsheet_api"] = spreadsheet_api;
+		prot = spreadsheet_api.prototype;
+
+		prot["asc_Init"] = prot.asc_Init;
+		prot["asc_openChartSpreadsheet"] = prot.asc_openChartSpreadsheet;
+		prot["asc_LoadDocument"] = prot.asc_LoadDocument;
+		prot["asc_LoadEmptyDocument"] = prot.asc_LoadEmptyDocument;
+		prot["asc_DownloadAs"] = prot.asc_DownloadAs;
+		prot["asc_Save"] = prot.asc_Save;
+		prot["asc_OnSaveEnd"] = prot.asc_OnSaveEnd;
+		prot["asc_Print"] = prot.asc_Print;
+		prot["asc_Resize"] = prot.asc_Resize;
+		prot["asc_Copy"] = prot.asc_Copy;
+		prot["asc_Paste"] = prot.asc_Paste;
+		prot["asc_Cut"] = prot.asc_Cut;
+		prot["asc_Undo"] = prot.asc_Undo;
+		prot["asc_Redo"] = prot.asc_Redo;
+
+		prot["asc_getDocumentName"] = prot.asc_getDocumentName;
+		prot["asc_getDocumentFormat"] = prot.asc_getDocumentFormat;
+		prot["asc_isDocumentModified"] = prot.asc_isDocumentModified;
+
+		prot["asc_setMobileVersion"] = prot.asc_setMobileVersion;
+		prot["asc_setViewerMode"] = prot.asc_setViewerMode;
+		prot["asc_setUseEmbeddedCutFonts"] = prot.asc_setUseEmbeddedCutFonts;
+		prot["asc_setCoAuthoringEnable"] = prot.asc_setCoAuthoringEnable;
+		prot["asc_setAdvancedOptions"] = prot.asc_setAdvancedOptions;
+		prot["asc_setPageOptions"] = prot.asc_setPageOptions;
+		prot["asc_getPageOptions"] = prot.asc_getPageOptions;
+
+		prot["asc_registerCallback"] = prot.asc_registerCallback;
+		prot["asc_unregisterCallback"] = prot.asc_unregisterCallback;
+
+		prot["asc_getController"] = prot.asc_getController;
+
+		// Workbook interface
+
+		prot["asc_getWorksheetsCount"] = prot.asc_getWorksheetsCount;
+		prot["asc_getWorksheetName"] = prot.asc_getWorksheetName;
+		prot["asc_getActiveWorksheetIndex"] = prot.asc_getActiveWorksheetIndex;
+		prot["asc_getActiveWorksheetId"] = prot.asc_getActiveWorksheetId;
+		prot["asc_getWorksheetId"] = prot.asc_getWorksheetId;
+		prot["asc_isWorksheetHidden"] = prot.asc_isWorksheetHidden;
+		prot["asc_isWorksheetLockedOrDeleted"] = prot.asc_isWorksheetLockedOrDeleted;
+		prot["asc_isWorkbookLocked"] = prot.asc_isWorkbookLocked;
+		prot["asc_getHiddenWorksheets"] = prot.asc_getHiddenWorksheets;
+		prot["asc_showWorksheet"] = prot.asc_showWorksheet;
+		prot["asc_showActiveWorksheet"] = prot.asc_showActiveWorksheet;
+		prot["asc_hideWorksheet"] = prot.asc_hideWorksheet;
+		prot["asc_renameWorksheet"] = prot.asc_renameWorksheet;
+		prot["asc_addWorksheet"] = prot.asc_addWorksheet;
+		prot["asc_insertWorksheet"] = prot.asc_insertWorksheet;
+		prot["asc_deleteWorksheet"] = prot.asc_deleteWorksheet;
+		prot["asc_moveWorksheet"] = prot.asc_moveWorksheet;
+		prot["asc_copyWorksheet"] = prot.asc_copyWorksheet;
+		prot["asc_cleanSelection"] = prot.asc_cleanSelection;
+		prot["asc_getZoom"] = prot.asc_getZoom;
+		prot["asc_setZoom"] = prot.asc_setZoom;
+		prot["asc_enableKeyEvents"] = prot.asc_enableKeyEvents;
+		prot["asc_findText"] = prot.asc_findText;
+		prot["asc_findCell"] = prot.asc_findCell;
+		//prot["asc_openCellEditor"] = prot.asc_openCellEditor; - не используется (и не стоит так делать)
+		prot["asc_closeCellEditor"] = prot.asc_closeCellEditor;
+
+		// Spreadsheet interface
+
+		prot["asc_getColumnWidth"] = prot.asc_getColumnWidth;
+		prot["asc_setColumnWidth"] = prot.asc_setColumnWidth;
+		prot["asc_insertColumnsBefore"] = prot.asc_insertColumnsBefore;
+		prot["asc_insertColumnsAfter"] = prot.asc_insertColumnsAfter;
+		prot["asc_deleteColumns"] = prot.asc_deleteColumns;
+		prot["asc_showColumns"] = prot.asc_showColumns;
+		prot["asc_hideColumns"] = prot.asc_hideColumns;
+		prot["asc_getRowHeight"] = prot.asc_getRowHeight;
+		prot["asc_setRowHeight"] = prot.asc_setRowHeight;
+		prot["asc_insertRowsBefore"] = prot.asc_insertRowsBefore;
+		prot["asc_insertRowsAfter"] = prot.asc_insertRowsAfter;
+		prot["asc_deleteRows"] = prot.asc_deleteRows;
+		prot["asc_showRows"] = prot.asc_showRows;
+		prot["asc_hideRows"] = prot.asc_hideRows;
+		prot["asc_insertCells"] = prot.asc_insertCells;
+		prot["asc_deleteCells"] = prot.asc_deleteCells;
+		prot["asc_mergeCells"] = prot.asc_mergeCells;
+		prot["asc_sortCells"] = prot.asc_sortCells;
+		prot["asc_emptyCells"] = prot.asc_emptyCells;
+		prot["asc_mergeCellsDataLost"] = prot.asc_mergeCellsDataLost;
+		
+		// Auto filters interface
+		prot["asc_addAutoFilter"] = prot.asc_addAutoFilter;
+		prot["asc_applyAutoFilter"] = prot.asc_applyAutoFilter;
+		prot["asc_sortColFilter"] = prot.asc_sortColFilter;
+		
+		// Drawing objects interface
+
+		prot["asc_showDrawingObjects"] = prot.asc_showDrawingObjects;
+		prot["asc_drawingObjectsExist"] = prot.asc_drawingObjectsExist;
+		prot["asc_getChartObject"] = prot.asc_getChartObject;
+		prot["asc_addChartDrawingObject"] = prot.asc_addChartDrawingObject;
+		prot["asc_editChartDrawingObject"] = prot.asc_editChartDrawingObject;
+		prot["asc_addImageDrawingObject"] = prot.asc_addImageDrawingObject;
+		prot["asc_deleteSelectedDrawingObject"] = prot.asc_deleteSelectedDrawingObject;
+		prot["asc_setSelectedDrawingObjectLayer"] = prot.asc_setSelectedDrawingObjectLayer;
+		prot["asc_getChartPreviews"] = prot.asc_getChartPreviews;
+		prot["asc_getBinaryFileWriter"] = prot.asc_getBinaryFileWriter;
+		prot["asc_getWordChartObject"] = prot.asc_getWordChartObject;
+		prot["asc_cleanWorksheet"] = prot.asc_cleanWorksheet;
+		prot["asc_showImageFileDialog"] = prot.asc_showImageFileDialog;
+		
+		// Cell comment interface
+		prot["asc_addComment"] = prot.asc_addComment;
+		prot["asc_changeComment"] = prot.asc_changeComment;
+		prot["asc_findComment"] = prot.asc_findComment;
+		prot["asc_removeComment"] = prot.asc_removeComment;
+		prot["asc_showComment"] = prot.asc_showComment;
+		prot["asc_selectComment"] = prot.asc_selectComment;
+		
+		prot["asc_showComments"] = prot.asc_showComments;
+		prot["asc_hideComments"] = prot.asc_hideComments;		
+		
+		prot["asc_getComments"] = prot.asc_getComments;
+		prot["asc_getDocumentComments"] = prot.asc_getDocumentComments;
+		prot["asc_getWorkbookComments"] = prot.asc_getWorkbookComments;		
+
+		// Cell interface
+
+		prot["asc_getCellInfo"] = prot.asc_getCellInfo;
+		prot["asc_getActiveCellCoord"] = prot.asc_getActiveCellCoord;
+		prot["asc_setCellFontName"] = prot.asc_setCellFontName;
+		prot["asc_setCellFontSize"] = prot.asc_setCellFontSize;
+		prot["asc_setCellBold"] = prot.asc_setCellBold;
+		prot["asc_setCellItalic"] = prot.asc_setCellItalic;
+		prot["asc_setCellUnderline"] = prot.asc_setCellUnderline;
+		prot["asc_setCellStrikeout"] = prot.asc_setCellStrikeout;
+		prot["asc_setCellSubscript"] = prot.asc_setCellSubscript;
+		prot["asc_setCellSuperscript"] = prot.asc_setCellSuperscript;
+		prot["asc_setCellAlign"] = prot.asc_setCellAlign;
+		prot["asc_setCellVertAlign"] = prot.asc_setCellVertAlign;
+		prot["asc_setCellTextWrap"] = prot.asc_setCellTextWrap;
+		prot["asc_setCellTextShrink"] = prot.asc_setCellTextShrink;
+		prot["asc_setCellTextColor"] = prot.asc_setCellTextColor;
+		prot["asc_setCellBackgroundColor"] = prot.asc_setCellBackgroundColor;
+		prot["asc_setCellBorders"] = prot.asc_setCellBorders;
+		//prot["asc_setCellValue"] = prot.asc_setCellValue; - не используется (и не стоит так делать)
+		prot["asc_setCellFormat"] = prot.asc_setCellFormat;
+        prot["asc_setCellAngle"] = prot.asc_setCellAngle;
+		prot["asc_setCellFinancialFormat"] = prot.asc_setCellFinancialFormat;
+		prot["asc_setCellPercentFormat"] = prot.asc_setCellPercentFormat;
+		prot["asc_setCellDelimitedFormat"] = prot.asc_setCellDelimitedFormat;
+		prot["asc_increaseCellDigitNumbers"] = prot.asc_increaseCellDigitNumbers;
+		prot["asc_decreaseCellDigitNumbers"] = prot.asc_decreaseCellDigitNumbers;
+
+		prot["asc_onMouseUp"] = prot.asc_onMouseUp;
+
+		prot["asc_selectFunction"] = prot.asc_selectFunction;
+		prot["asc_insertHyperlink"] = prot.asc_insertHyperlink;
+		prot["asc_insertFormula"] = prot.asc_insertFormula;
+		prot["asc_getFormulasInfo"] = prot.asc_getFormulasInfo;
+		prot["asc_setFontRenderingMode"] = prot.asc_setFontRenderingMode;
+		prot["asc_ChangeColorScheme"] = prot.asc_ChangeColorScheme;
+		/////////////////////////////////////////////////////////////////////////
+		///////////////////CoAuthoring and Chat api//////////////////////////////
+		/////////////////////////////////////////////////////////////////////////
+		prot["asc_coAuthoringChatSendMessage"] = prot.asc_coAuthoringChatSendMessage;
+		prot["asc_coAuthoringGetUsers"] = prot.asc_coAuthoringGetUsers;
+		prot["asc_coAuthoringChatGetMessages"] = prot.asc_coAuthoringChatGetMessages;
+		prot["asc_coAuthoringDisconnect"] = prot.asc_coAuthoringDisconnect;
+
+        // offline mode
+
+        prot["asc_openNewDocument"] = prot.asc_openNewDocument;
+        prot["asc_loadDocumentFromDisk"] = prot. asc_loadDocumentFromDisk;
+	}
+)(jQuery, window);

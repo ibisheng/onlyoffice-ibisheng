@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<!--[if lte IE 8]>
+	    <meta http-equiv="X-UA-Compatible" content="chrome=1"/>
+		<![endif]-->
+		<!--[if gte IE 9]>
+		<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+		<![endif]-->
+		
+		
+		<title>Spreadsheet Test</title>
+
+		<link rel="stylesheet" type="text/css" href="css/main.css"/>
+
+		<script type="text/javascript" src="jquery/jquery-1.7.1.js"></script>
+		<script type="text/javascript" src="jquery/jquery.mousewheel-3.0.6.js"></script>
+		<script type="text/javascript" src="../OfficeWebCommon/3rdparty/XregExp/xregexp-all.js"></script>
+
+		<script type="text/javascript">
+			//<![CDATA[
+			window.g_debug_mode = true;
+			//window.g_isMobileVersion = true;
+			//]]>
+		</script>
+
+		<script src="../OfficeWebCommon/downloaderfiles.js"></script>
+		<script type="text/javascript" src="../OfficeWebCommon/3rdparty/Underscore/underscore-min.js"></script>
+		<script type="text/javascript" src="../OfficeWebCommon/3rdparty/Sockjs/sockjs-0.3.min.js"></script>
+		<script type="text/javascript" src="../OfficeWebCommon/docscoapicommon.js"></script>
+		<script type="text/javascript" src="../OfficeWebCommon/docscoapi.js"></script>
+		<script type="text/javascript" src="../OfficeWebCommon/Charts/DrawingObjects.js"></script>
+
+		<script type="text/javascript" src="../OfficeWebWord/FontsFreeType/font_engine.js"></script>
+		<script type="text/javascript" src="../OfficeWebWord/FontsFreeType/FontFile.js"></script>
+		<script type="text/javascript" src="../OfficeWebWord/FontsFreeType/FontManager.js"></script>
+
+		<script type="text/javascript" src="../OfficeWebWord/WebWord/Drawing/Externals.js"></script>
+		<script type="text/javascript" src="../OfficeWebWord/WebWord/Drawing/Metafile.js"></script>
+		<script type="text/javascript" src="../OfficeWebWord/WebWord/Drawing/AllFonts.js"></script>
+		<script type="text/javascript" src="../OfficeWebWord/WebWord/Drawing/GlobalLoaders.js"></script>
+
+		<script type="text/javascript" src="utils/utils.js"></script>
+		<script type="text/javascript" src="model/autofilters.js"></script>
+		<script type="text/javascript" src="model/clipboard.js"></script>
+		<!--for chart-->
+		<script type="text/javascript" src="model/charts.js"></script>
+
+		<script type="text/javascript" src="graphics/DrawingContext.js"></script>
+		<script type="text/javascript" src="graphics/pdfprinter.js"></script>
+
+		<!--TODO: remove test data-->
+		<script type="text/javascript" src="offlinedocs/test-workbook9/Editor.js"></script>
+
+		<script type="text/javascript" src="model/CollaborativeEditing.js"></script>
+		<script type="text/javascript" src="model/parserFormula.js"></script>
+		<script type="text/javascript" src="model/NumFormat.js"></script>
+		<script type="text/javascript" src="model/Serialize.js"></script>
+		<script type="text/javascript" src="model/WorkbookElems.js"></script>
+		<script type="text/javascript" src="model/Workbook.js"></script>
+		<script type="text/javascript" src="model/CellInfo.js"></script>
+		<script type="text/javascript" src="model/AdvancedOptions.js"></script>
+		<script type="text/javascript" src="model/History.js"></script>
+
+		<script type="text/javascript" src="view/scroll.js"></script>
+		<script type="text/javascript" src="view/StringRender.js"></script>
+		<script type="text/javascript" src="view/CellTextRender.js"></script>
+		<script type="text/javascript" src="view/CellEditorView.js"></script>
+		<script type="text/javascript" src="view/WorksheetView.js"></script>
+		<script type="text/javascript" src="view/HandlerList.js"></script>
+		<script type="text/javascript" src="view/EventsController.js"></script>
+		<script type="text/javascript" src="view/WorkbookView.js"></script>
+
+		<script type="text/javascript" src="apiDefines.js"></script>
+		<script type="text/javascript" src="api.js"></script>
+
+		<!--for chart-->
+		<script src="../OfficeWebCommon/Charts/libraries/OfficeExcel.common.core.js"></script>
+
+		<script src="../OfficeWebCommon/Charts/libraries/OfficeExcel.common.annotate.js"></script>
+		<script src="../OfficeWebCommon/Charts/libraries/OfficeExcel.common.context.js"></script>
+		<script src="../OfficeWebCommon/Charts/libraries/OfficeExcel.common.effects.js"></script>
+		<script src="../OfficeWebCommon/Charts/libraries/OfficeExcel.common.key.js"></script>
+		<script src="../OfficeWebCommon/Charts/libraries/OfficeExcel.common.resizing.js"></script>
+		<script src="../OfficeWebCommon/Charts/libraries/OfficeExcel.common.tooltips.js"></script>
+		<script src="../OfficeWebCommon/Charts/libraries/OfficeExcel.common.zoom.js"></script>
+
+		<script src="../OfficeWebCommon/Charts/libraries/OfficeExcel.bar.js"></script>
+		<script src="../OfficeWebCommon/Charts/libraries/OfficeExcel.bipolar.js"></script>
+
+		<script src="../OfficeWebCommon/Charts/libraries/OfficeExcel.gantt.js"></script>
+
+		<script src="../OfficeWebCommon/Charts/libraries/OfficeExcel.hbar.js"></script>
+
+		<script src="../OfficeWebCommon/Charts/libraries/OfficeExcel.line.js"></script>
+
+		<script src="../OfficeWebCommon/Charts/libraries/OfficeExcel.pie.js"></script>
+		<script src="../OfficeWebCommon/Charts/libraries/OfficeExcel.radar.js"></script>
+		<script src="../OfficeWebCommon/Charts/libraries/OfficeExcel.rose.js"></script>
+		<script src="../OfficeWebCommon/Charts/libraries/OfficeExcel.rscatter.js"></script>
+		<script src="../OfficeWebCommon/Charts/libraries/OfficeExcel.scatter.js"></script>
+
+		<script src="../OfficeWebCommon/Charts/libraries/OfficeExcel.waterfall.js"></script>
+		<script src="../OfficeWebCommon/Charts/libraries/OfficeExcel.chartProperties.js"></script>
+
+		<!--for colors-->
+		<script src="../OfficeWebCommon/Charts/libraries/hsv.js"></script>
+		<script src="../OfficeWebCommon/Charts/libraries/rgbcolor.js"></script>
+
+
+		<script type="text/javascript">
+			//<![CDATA[
+			$(function() {
+
+				var docTitle = window.location.toString().match(/&title=([^&]+)&/);
+				if (docTitle) {
+					$("#teamlab-title").append('<span>' + window.decodeURI(docTitle[1]) + '</span>');
+				}
+
+				//--Bottom panel--
+
+				// init tab navigation
+				$("#ws-navigation .nav-buttons .btn").click(onTabNavigationBtnClicked);
+				// init scaling buttons
+				$("#ws-navigation .ws-zoom-button").click(onZoomBtnClicked);
+
+				function renderTabs() {
+					var r = $(),
+							l = api.asc_getWorksheetsCount(),
+							isFirst = true,
+							hiddenSheets = api.asc_getHiddenWorksheets();
+					var isHidden = function(index) {
+						for (var i = 0; i < hiddenSheets.length; ++i) {
+							if (index == hiddenSheets[i].index) {
+								return true;
+							}
+							else if (index < hiddenSheets[i].index)
+								break;
+						}
+						return false;
+					};
+					for (var i = 0; i < l; ++i) {
+						if (isHidden(i))
+							continue;
+						var li = $(
+								'<li' + (isFirst ? ' class="first"' : '') + '>' +
+								'<div class="tab-prefix"/>' +
+								'<div class="tab-name">' + api.asc_getWorksheetName(i) + '</div>' +
+								'<div class="tab-suffix"/>' +
+								'</li>')
+								.data("ws-index", i)
+								.on("click", function(event) {
+							onTabClicked($(this).data("ws-index"));
+						});
+						r = r.add(li);
+						isFirst = false;
+					}
+					return r;
+				}
+
+				function onSheetsChanged() {
+					$("#ws-navigation .tabs")
+							.empty()
+							.append(renderTabs());
+					onTabClicked(api.asc_getActiveWorksheetIndex());
+				}
+
+				function showZoomValue() {
+					$("#ws-navigation .ws-zoom-input")
+							.val(Math.round(api.asc_getZoom() * 100) + "%");
+				}
+
+				//--Event handlers--
+
+				function onError(id, level) {
+					if (window.g_debug_mode)
+						console.log("id " + id + " level " + level)
+				}
+
+				function onStartAction() {
+					if (window.g_debug_mode)
+						console.log("onStartAction " + arguments[0] + " " + arguments[1]);
+				}
+
+				function onEndAction(type, id) {
+					if (type === c_oAscAsyncActionType.BlockInteraction) {
+						switch (id) {
+							case c_oAscAsyncAction.Open:
+								$("#ws-navigation .tabs")
+										.empty()
+										.append(renderTabs());
+								onTabClicked(api.asc_getActiveWorksheetIndex());
+								showZoomValue();
+								break;
+						}
+					}
+					if (window.g_debug_mode)
+						console.log("onEndAction " + arguments[0] + " " + arguments[1]);
+				}
+
+				function onTabNavigationBtnClicked(event) {
+					var btn = $(event.currentTarget),
+							tablist = $("#ws-navigation .tabs"),
+							items, first, last, width;
+
+					if (btn.hasClass("first")) {
+						tablist.children().removeClass("first")
+								.filter(":first").addClass("first")
+								.end().show();
+						return true;
+					}
+
+					if (btn.hasClass("last")) {
+						items = tablist.children(":visible").removeClass("first");
+						last = items.last();
+						width = tablist.width();
+						while (last.position().left + last.outerWidth() > width) {
+							first = items.first().hide();
+							items = items.not(first);
+						}
+						items.first().addClass("first");
+						return true;
+					}
+
+					if (btn.hasClass("prev")) {
+						first = tablist.children(":visible:first");
+						last = first.prev();
+						if (last.length > 0) {
+							first.removeClass("first");
+							last.addClass("first").show();
+						}
+						return true;
+					}
+
+					if (btn.hasClass("next")) {
+						items = tablist.children();
+						last = items.last();
+						width = tablist.width();
+						if (last.position().left + last.outerWidth() > width) {
+							items.filter(":visible:first").removeClass("first").hide()
+									.next().addClass("first");
+						}
+						return true;
+					}
+
+					return true;
+				}
+
+				function onTabClicked(index) {
+					$("#ws-navigation .tabs").children()
+							.removeClass("active")
+							.eq(index).addClass("active");
+					api.asc_showWorksheet(index);
+					return true;
+				}
+
+				function onZoomBtnClicked(event) {
+					var btn = $(event.currentTarget),
+							f = api.asc_getZoom(),
+							df = btn.hasClass("plus") ? 0.05 : (btn.hasClass("minus") ? - 0.05 : 0);
+
+					if (f + df > 0) {
+						api.asc_setZoom(f + df);
+					}
+
+					showZoomValue();
+
+					return true;
+				}
+
+				function updateCellInfo(info) {
+//					info : {
+//						"name":      "A1",
+//						"text":      текст ячейки
+//						"halign":    "left / right / center",
+//						"valign":    "top / bottom / center",
+//						"flags": {
+//							"merge":       true / false,
+//							"shrinkToFit": true / false,
+//							"wrapText":    true / false
+//						},
+//						"font": {
+//							"name":        "Arial",
+//							"size":        10,
+//							"bold":        true / false,
+//							"italic":      true / false,
+//							"underline":   true / false,
+//							"strikeout":   false,//TODO:,
+//							"subscript":   false,//TODO:,
+//							"superscript": false,//TODO:,
+//							"color":       "#RRGGBB" / "#RGB"
+//						},
+//						"fill": {
+//							"color": "#RRGGBB" / "#RGB"
+//						},
+//						"border": {
+//							"left": {
+//								"width": 0-3 пиксела,
+//								"style": "none / thick / thin / medium / dashDot / dashDotDot / dashed / dotted / double / hair / mediumDashDot / mediumDashDotDot / mediumDashed / slantDashDot"
+//								"color": "#RRGGBB" / "#RGB"
+//							},
+//							"top": {
+//								"width":
+//								"style":
+//								"color":
+//							},
+//							"right": {
+//								"width":
+//								"style":
+//								"color":
+//							},
+//							"bottom": {
+//								"width":
+//								"style":
+//								"color":
+//							},
+//							"diagDown": { диагональная линия слева сверху вправо вниз
+//								"width":
+//								"style":
+//								"color":
+//							},
+//							"diagUp": { диагональная линия слева снизу вправо вверх
+//								"width":
+//								"style":
+//								"color":
+//							}
+//						},
+//						formula: "SUM(C1:C6)"
+//					}
+					$("#cellInfo").text(
+							"cell: " + info.asc_getName() + ", " +
+							"font: " + info.asc_getFont().asc_getName() + " " + info.asc_getFont().asc_getSize() + (info.asc_getFont().asc_getBold() ? " bold" : "") + (info.asc_getFont().asc_getItalic() ? " italic" : "") + ", " +
+							"color: " + info.asc_getFont().asc_getColor() + ", " +
+							"fill: " + info.asc_getFill().asc_getColor() + ", " +
+							"border:" + (info.asc_getBorders().asc_getLeft().asc_getWidth() > 0 ? " l" : "") + (info.asc_getBorders().asc_getTop().asc_getWidth() > 0 ? " t" : "") + (info.asc_getBorders().asc_getRight().asc_getWidth() > 0 ? " r" : "") + (info.asc_getBorders().asc_getBottom().asc_getWidth() > 0 ? " b" : "") + (info.asc_getBorders().asc_getDiagDown().asc_getWidth() > 0 ? " dd" : "") + (info.asc_getBorders().asc_getDiagUp().asc_getWidth() > 0 ? " du" : "") + ", " +
+							"text: " + info.asc_getText() + ", formula: " + info.asc_getFormula());
+					$("#colWidth").val(api.asc_getColumnWidth());
+				}
+
+				//------API---------
+
+				var api = new Asc.spreadsheet_api("wb-widget", "tlCellEditor");
+
+				api.asc_registerCallback("asc_onStartAction", onStartAction);
+				api.asc_registerCallback("asc_onEndAction", onEndAction);
+				api.asc_registerCallback("asc_onError", onError);
+				api.asc_registerCallback("asc_onSelectionChanged", updateCellInfo);
+				api.asc_registerCallback("asc_onSheetsChanged", onSheetsChanged);
+				api.asc_registerCallback("asc_onZoomChanged", function() {
+					if (window.g_debug_mode)
+						console.log(arguments[0]);
+				});
+				api.asc_registerCallback("asc_onCellTextChanged", function() {
+					if (window.g_debug_mode)
+						console.log(arguments);
+				});
+
+				api.asc_Init("../OfficeWebWord/FontsFreeType/FontFiles/");
+
+				function getURLParameter(name) {
+					return (RegExp(name + '=' + '(.+?)(&|$)').exec(location.search) || [, null])[1];
+				}
+
+				var sProtocol = window.location.protocol;
+				var sHost = window.location.host;
+				var key = !!getURLParameter("key");
+
+				api.asc_LoadDocument({
+					"Id": key ? decodeURIComponent(getURLParameter("key")) : undefined,
+					"Url": key ? decodeURIComponent(getURLParameter("url")) : undefined,
+					"Title": key ? decodeURIComponent(getURLParameter("title")).replace(new RegExp("\\+", 'g'), " ") : undefined,
+					"Format": key ? decodeURIComponent(getURLParameter("filetype")) : undefined,
+					"VKey": key ? decodeURIComponent(getURLParameter("vkey")) : undefined,
+					"Origin": (sProtocol.search(/\w+/) >= 0 ? sProtocol + "//" : "") + sHost
+				});
+				$("#saveAsXLSX").click(function() {
+					api.asc_DownloadAs(c_oAscFileType.XLSX);
+				})
+				$("#saveAsXLS").click(function() {
+					api.asc_DownloadAs(c_oAscFileType.XLS);
+				})
+				$("#saveAsODS").click(function() {
+					api.asc_DownloadAs(c_oAscFileType.ODS);
+				})
+				$("#saveAsCSV").click(function() {
+					api.asc_DownloadAs(c_oAscFileType.CSV);
+				})
+				$("#saveAsHTML").click(function() {
+					api.asc_DownloadAs(c_oAscFileType.HTML);
+				})
+				$("#enableKE").data("state", true).click(function() {
+					var $this = $(this), s = $this.data("state");
+					api.asc_enableKeyEvents(!s);
+					$this.data("state", !s);
+					$this.val("key events: " + (!s ? "enabled" : "disabled"));
+				});
+				$("#searchText").click(function() {
+					if (!api.asc_findText($("#pattern").val(), $("#searchRow").is(":checked"), $("#searchFwd").is(":checked"))) {
+						alert("no more such text");
+					}
+				});
+				$("#setFont").click(function() {
+					api.asc_setCellFontSize(24);
+					api.asc_setCellFontName("Cambria");
+				});
+				$("#sum").click(function() {
+					api.asc_insertFormula("SUM", true);
+				});
+				$("#border").click(function() {
+					var t = Math.floor(Math.random() * 5);
+					var r = Math.floor(Math.random() * 255);
+					var g = Math.floor(Math.random() * 255);
+					var b = Math.floor(Math.random() * 255);
+					val = [];
+					val[t] = new window.Asc.asc_CBorder(null, "thick", "rgb(" + r + "," + g + "," + b + ")");
+					api.asc_setCellBorders(val);
+				});
+				$("#copyws").click(function() {
+					var n = api.asc_getWorksheetName(api.asc_getActiveWorksheetIndex()) + " copy";
+					api.asc_copyWorksheet(0, n);
+					onSheetsChanged();
+					showZoomValue();
+				});
+				$("#getCoord").click(function() {
+					var coord = api.asc_getActiveCellCoord();
+					var offset = $("#wb-widget").offset();
+					var x = coord.asc_getX() + coord.asc_getWidth() + offset.left;
+					var y = coord.asc_getY() + coord.asc_getHeight() + offset.top;
+					$("body").append("<div style='position: absolute; width: 50px; height: 50px; left: " + x + "px; top: " + y + "px;'><img src='http://static3.grsites.com/archive/textures/blue/blue205.jpg' style='width: 50px; height: 50px;' alt='Девочка' /></div>");
+				});
+				$("#insAfter").click(function() {
+					api.asc_insertCells(c_oAscInsertOptions.InsertCellsAndShiftDown);
+				});
+				$("#colWidth")
+						.focus(function () {
+							api.asc_enableKeyEvents(false);
+						})
+						.blur(function () {
+							api.asc_enableKeyEvents(true);
+						})
+						.change(function(e) {
+							api.asc_setColumnWidth($(this).val());
+						});
+			});
+			//]]>
+		</script>
+
+		<style type="text/css">
+			#teamlab-title {
+				position: fixed;
+				left: 0;
+				top: 0;
+				right: 0;
+				height: 30px;
+				background-color: #242829;
+				color: #FFF;
+				font-size: 14px;
+				line-height: 30px;
+				padding-left: 10px;
+			}
+			#teamlab-title > img {
+				display: inline-block;
+				position: relative;
+				top: 1px;
+				height: 17px;
+				margin-top: 5px;
+			}
+
+			#wb-panel {
+				position: fixed;
+				left: 0;
+				top: 30px;
+				right: 0;
+				height: 100px;
+				background: #EDEDED;
+				background: -moz-linear-gradient(top,#EDEDED 0,#CBCBCB 100%);
+				background: -webkit-gradient(linear,left top,left bottom,color-stop(0%,#EDEDED),color-stop(100%,#CBCBCB));
+				background: -webkit-linear-gradient(top,#EDEDED 0,#CBCBCB 100%);
+				background: -o-linear-gradient(top,#EDEDED 0,#CBCBCB 100%);
+				background: -ms-linear-gradient(top,#EDEDED 0,#CBCBCB 100%);
+				background: linear-gradient(top,#EDEDED 0,#CBCBCB 100%);
+				filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ededed',endColorstr='#cbcbcb',GradientType=0);
+				border: 0;
+				border-top: 1px solid white;
+				border-bottom: 1px Solid #929292;
+			}
+
+			#wb-widget {
+				position: fixed;
+				left: 0;
+				top: 130px;
+				right: 0;
+				bottom: 22px;
+			}
+
+			/*
+			* Navigation
+			* --------------------------------------------------------
+			*/
+
+			#ws-navigation {
+				position: fixed;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				height: 20px;
+				margin: 0;
+				padding: 0;
+				background-color: #DCE2E8;
+				border-color: #C1C6CC;
+				border-style: solid;
+				border-width: 1px 0;
+			}
+
+			/* Buttons for choosing worksheets */
+
+			#ws-navigation .nav-buttons {
+				float: left;
+				position: relative;
+				z-index: 1;
+				height: 19px;
+				cursor: pointer;
+			}
+
+			#ws-navigation .nav-buttons .btn {
+				float: left;
+				width: 18px;
+				height: 17px;
+				margin: 0 1px;
+				border: 1px solid transparent;
+			}
+			#ws-navigation .nav-buttons .btn > .inner {
+				position: relative;
+				left: 50%;
+				top: 50%;
+				margin-left: -6px;
+				margin-top: -5px;
+				width: 11px;
+				height: 11px;
+				background-image: url("css/nav-buttons.png");
+				background-repeat: no-repeat;
+			}
+
+			#ws-navigation .nav-buttons .btn.first > .inner {
+				background-position: 0px 0px;
+			}
+			#ws-navigation .nav-buttons .btn.prev > .inner {
+				background-position: -11px 0px;
+			}
+			#ws-navigation .nav-buttons .btn.next > .inner {
+				background-position: -22px 0px;
+			}
+			#ws-navigation .nav-buttons .btn.last > .inner {
+				background-position: -33px 0px;
+			}
+
+			#ws-navigation .nav-buttons .btn:hover {
+				background-color: #FDE47B;
+				border-color: #E8BF3A;
+			}
+			#ws-navigation .nav-buttons .btn.first:hover > .inner {
+				background-position: 0px -11px;
+			}
+			#ws-navigation .nav-buttons .btn.prev:hover > .inner {
+				background-position: -11px -11px;
+			}
+			#ws-navigation .nav-buttons .btn.next:hover > .inner {
+				background-position: -22px -11px;
+			}
+			#ws-navigation .nav-buttons .btn.last:hover > .inner {
+				background-position: -33px -11px;
+			}
+
+			/* Worksheet's tabs */
+
+			#ws-navigation .tabs {
+				position: absolute;
+				left: 88px;
+				right: 25%;
+				height: 22px;
+				border-right: 1px solid #C1C6CC;
+				padding: 0;
+				margin: -1px 0 0;
+				font-family: Verdana, Arial, sans-serif;
+				font-size: 12px;
+				line-height: 100%;
+				overflow: hidden;
+				white-space: nowrap;
+			}
+			#ws-navigation .tabs * {
+				display: inline-block;
+			}
+
+			/* Default tab */
+
+			#ws-navigation .tabs li {
+				position: relative;
+				height: 20px;
+				padding: 0;
+				margin: 0 0 0 -1px;
+				background-color: #D7DADD;
+				border-color: #B6BABF;
+				border-style: solid;
+				border-width: 1px;
+				border-radius: 5px;
+				cursor: pointer;
+			}
+			#ws-navigation .tabs li.first {
+				margin-left: 0;
+			}
+
+			#ws-navigation .tabs .tab-prefix {
+				display: none;
+			}
+			#ws-navigation .tabs .tab-suffix {
+				display: none;
+			}
+
+			#ws-navigation .tabs .tab-name {
+				height: 20px;
+				padding: 0 .5em;
+				line-height: 20px;
+			}
+
+			/* Highlighted tab */
+
+			#ws-navigation .tabs li:hover {
+				background-color: #A0A5AA;
+			}
+
+			/* Selected tab */
+
+			#ws-navigation .tabs li.active {
+				background-color: #FFF;
+				z-index: 10;
+			}
+
+			/*
+			* Scale
+			* --------------------------------------------------------
+			*/
+
+			.ws-zoom-widget {
+				position: absolute;
+				height: 19px;
+				line-height: 100%;
+				right: 0;
+				top: 1px;
+				margin: 0;
+				padding: 0 5px;
+			}
+
+			.ws-zoom-button {
+				display: inline-block;
+				position: relative;
+				width: 17px;
+				height: 17px;
+				margin: 0;
+				padding: 0;
+				cursor: pointer;
+
+				font-family: "Verdana","sans-serif";
+				font-size: 13px;
+				font-weight: bold;
+				line-height: 17px;
+				text-decoration: none;
+				text-align: center;
+				vertical-align: top;
+
+				color: #111;
+				text-shadow: 1px 1px 0 rgba(255,255,255,.67);
+
+				border-color: #7F8994;
+				/*border-color: rgba(0, 0, 0, 0.56);*/
+				border-radius: 10px;
+				border-width: 1px;
+				border-style: solid;
+				outline: none;
+
+				background-color: #F2F5F7;
+				background-image: url("gradient.png");
+				background-image: -moz-linear-gradient(top, rgba(255,255,255,.75), rgba(255,255,255,0));
+				background-image: -o-linear-gradient(top, rgba(255,255,255,.75), rgba(255,255,255,0));
+				background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(255,255,255,.75)), to(rgba(255,255,255,0)));
+				background-image: linear-gradient(top, rgba(255,255,255,.75), rgba(255,255,255,0));
+				background-repeat: repeat-x;
+				box-shadow: 1px 1px 0 rgba(255,255,255,.5) inset, -1px -1px 0 rgba(255,255,255,.5) inset;
+				-webkit-transition: background .185s linear;
+				-moz-transition: all .185s linear;
+				-o-transition: all .185s linear;
+				transition: all .185s linear;
+
+				/** Make the text unselectable **/
+				-moz-user-select: none;
+				-webkit-user-select: none;
+			}
+
+			.ws-zoom-button:hover, .ws-zoom-button:focus {
+				background-color: #F9E390; /*#a8c0cb;*/
+			}
+
+			.ws-zoom-button:active {
+				box-shadow:
+					0 2px 5px rgba(0,0,0,.67) inset,
+					1px 1px 0 rgba(255,255,255,.25) inset,
+					-1px -1px 0 rgba(255,255,255,.25) inset;
+				-webkit-transition: line-height .1s linear;
+				-moz-transition: all .1s linear;
+				-o-transition: all .1s linear;
+				transition: all .1s linear;
+			}
+
+			.ws-zoom-button > div {
+				position: relative;
+				display: inline-block;
+				cursor: pointer;
+			}
+
+			.ws-zoom-button:active > div {
+				top: 1px;
+				left: 1px;
+			}
+
+			.ws-zoom-input {
+				width: 3em;
+				height: 15px;
+				margin: 0 5px;
+				padding: 1px 1px;
+				border: 1px solid #C0C0C0;
+				font-size: 15px;
+				text-align: center;
+				vertical-align: top;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="teamlab-title"><img src="../../../img/tmdocs_logo.png"/> Spreadsheets | </div>
+
+		<div id="wb-panel" style="display:inline-block;padding-left:10px;">
+			<input  id="saveAsXLSX" type="button" value="saveAsXLSX"/>
+			<input  id="saveAsXLS" type="button" value="saveAsXLS"/>
+			<input  id="saveAsODS" type="button" value="saveAsODS"/>
+			<input  id="saveAsCSV" type="button" value="saveAsCSV"/>
+			<input  id="saveAsHTML" type="button" value="saveAsHTML"/>
+			<input  id="enableKE" type="button" value="key events: enabled"/>
+			<input  id="pattern" type="text" value="search text"/>
+			<input  id="searchText" type="button" value="search"/>
+			<input  id="searchRow" type="checkbox" value="1" checked /> search by row
+			<input  id="searchFwd" type="checkbox" value="1" checked /> search forward
+			<input  id="setFont" type="button" value="set font"/>
+			<input  id="sum" type="button" value="SUM"/>
+			<input  id="border" type="button" value="border"/>
+			<input  id="copyws" type="button" value="copy sheet"/>
+			<input  id="getCoord" type="button" value="get Coord"/>
+			<input  id="insAfter" type="button" value="insert after"/>
+			<label>Col width: <input id="colWidth" type="text" value="" size="6"/></label>
+			<br/>
+			<div id="cellInfo">info</div>
+			<textarea id="tlCellEditor" cols="150" rows="1" style="resize:none;"></textarea>
+		</div>
+
+		<div id="wb-widget"></div>
+
+		<div id="ws-navigation">
+			<div class="nav-buttons">
+				<div class="btn first"><div class="inner"></div></div>
+				<div class="btn prev"><div class="inner"></div></div>
+				<div class="btn next"><div class="inner"></div></div>
+				<div class="btn last"><div class="inner"></div></div>
+			</div>
+			<ul class="tabs"></ul>
+			<div class="ws-zoom-widget">
+				<div class="ws-zoom-button minus"><div>&#8211;</div></div>
+				<input class="ws-zoom-input" type="text"/>
+				<div class="ws-zoom-button plus"><div>+</div></div>
+			</div>
+		</div>
+
+	</body>
+</html>

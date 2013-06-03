@@ -1,0 +1,955 @@
+/*
+ * Author: Alexander.Trofimov
+ * Date: 30.10.12
+ */
+
+(	/**
+ 	* @param {jQuery} $
+ 	* @param {Window} window
+ 	* @param {undefined} undefined
+ 	*/
+	function ($, window, undefined) {
+		/*
+		 * Import
+		 * -----------------------------------------------------------------------------
+		 */
+		var asc				= window["Asc"];
+		var asc_lockInfo	= asc.asc_CLockInfo;
+		var asc_Range		= asc.Range;
+
+		/**
+		 * Отвечает за совместное редактирование
+		 * -----------------------------------------------------------------------------
+		 *
+		 * @constructor
+		 * @memberOf Asc
+		 */
+		function CCollaborativeEditing (handlers) {
+			if ( !(this instanceof CCollaborativeEditing) ) {
+				return new CCollaborativeEditing ();
+			}
+
+			this.handlers					= new asc.asc_CHandlersList(handlers);
+			this.m_bIsCollaborative			= false; // Совместное ли редактирование
+			this.m_bGlobalLock				= false; // Глобальный lock
+			this.m_bGlobalLockEditCell		= false; // Глобальный lock (для редактирования ячейки) - отключаем смену select-а, но разрешаем сразу вводить
+			this.m_arrCheckLocks			= [];    // Массив для проверки залоченности объектов, которые мы собираемся изменять
+
+			this.m_arrNeedUnlock			= []; // Массив со списком залоченных объектов(которые были залочены другими пользователями)
+			this.m_arrNeedUnlock2			= []; // Массив со списком залоченных объектов(которые были залочены на данном клиенте)
+
+			this.m_arrChanges				= []; // Массив с изменениями других пользователей
+
+			this.m_oRecalcIndexColumns		= {};
+			this.m_oRecalcIndexRows			= {};
+
+			this.m_oInsertColumns			= {}; // Массив листов с массивами списков добавленных колонок
+			this.m_oInsertRows				= {}; // Массив листов с массивами списков добавленных строк
+
+			this.init();
+
+			return this;
+		}
+
+		CCollaborativeEditing.prototype = {
+			/** @type CCollaborativeEditing */
+			constructor: CCollaborativeEditing,
+
+			init: function () {
+
+			},
+
+			// Очищаем индексы пересчета (при открытии это необходимо)
+			clearRecalcIndex: function () {
+				delete this.m_oRecalcIndexColumns;
+				delete this.m_oRecalcIndexRows;
+				this.m_oRecalcIndexColumns = {};
+				this.m_oRecalcIndexRows = {};
+			},
+
+			// Разрешено ли совместное редактирование
+			isCoAuthoringExcellEnable: function() {
+				return ASC_SPREADSHEET_API_CO_AUTHORING_ENABLE;
+			},
+
+			// Начало совместного редактирования
+			startCollaborationEditing: function() {
+				this.m_bIsCollaborative = true;
+			},
+
+			getCollaborativeEditing: function () {
+				if (true !== this.isCoAuthoringExcellEnable())
+					return false;
+				return this.m_bIsCollaborative;
+			},
+
+			//-----------------------------------------------------------------------------------
+			// Функции для проверки залоченности объектов
+			//-----------------------------------------------------------------------------------
+			getGlobalLock: function () {
+				return this.m_bGlobalLock;
+			},
+			getGlobalLockEditCell: function () {
+				return this.m_bGlobalLockEditCell;
+			},
+			onStartEditCell: function () {
+				// Вызывать эту функцию только в случае редактирования ячейки и если мы не одни редактируем!!!
+				if (this.getCollaborativeEditing())
+					this.m_bGlobalLockEditCell = true;
+			},
+			onStopEditCell: function () {
+				// Вызывать эту функцию только в случае окончания редактирования ячейки!!!
+				this.m_bGlobalLockEditCell = false;
+			},
+			onStartCheckLock: function () {
+				this.m_arrCheckLocks.length = 0;
+			},
+			addCheckLock: function (oItem) {
+				this.m_arrCheckLocks.push (oItem);
+			},
+			onEndCheckLock: function (callback) {
+				var t = this;
+				if (this.m_arrCheckLocks.length > 0) {
+					// Отправляем запрос на сервер со списком элементов
+					this.handlers.trigger("askLock", this.m_arrCheckLocks, function (result) {t.onCallbackAskLock (result, callback);});
+
+					if (undefined !== callback) {
+						// Ставим глобальный лок (только если мы не одни и ждем ответа!)
+						this.m_bGlobalLock = true;
+					}
+				}
+				else {
+					if ($.isFunction(callback)) {callback(true);}
+
+					// Снимаем глобальный лок (для редактирования ячейки)
+					this.m_bGlobalLockEditCell = false;
+				}
+			},
+			onCallbackAskLock: function(result, callback) {
+				// Снимаем глобальный лок
+				this.m_bGlobalLock = false;
+				// Снимаем глобальный лок (для редактирования ячейки)
+				this.m_bGlobalLockEditCell = false;
+
+				if (result["lock"]) {
+					// Пробегаемся по массиву и проставляем, что залочено нами
+					var count = this.m_arrCheckLocks.length;
+					for (var i = 0; i < count; ++i) {
+						var oItem = this.m_arrCheckLocks[i];
+
+						if (true !== oItem && false !== oItem) // сравниваем по значению и типу обязательно
+						{
+							var oNewLock = new asc.CLock(oItem);
+							oNewLock.setType (c_oAscLockTypes.kLockTypeMine);
+							this.addUnlock2 (oNewLock);
+						}
+					}
+
+					if ($.isFunction(callback)) { callback(true); }
+				} else if (result["error"]) {
+					if ($.isFunction(callback)) { callback(false); }
+				}
+			},
+			addUnlock: function (LockClass) {
+				this.m_arrNeedUnlock.push (LockClass);
+			},
+			addUnlock2: function (Lock) {
+				// Если мы добавили или удалили строку/столбец, нужно добавить в пересчет
+				if (null !== Lock.Element["subType"]) {
+					switch (Lock.Element["subType"]) {
+						case c_oAscLockTypeElemSubType.InsertColumns:
+							this.addCols(Lock.Element["sheetId"], Lock.Element["rangeOrObjectId"]["c1"], Lock.Element["rangeOrObjectId"]["c2"] - Lock.Element["rangeOrObjectId"]["c1"] + 1);
+							break;
+						case c_oAscLockTypeElemSubType.InsertRows:
+							this.addRows(Lock.Element["sheetId"], Lock.Element["rangeOrObjectId"]["r1"], Lock.Element["rangeOrObjectId"]["r2"] - Lock.Element["rangeOrObjectId"]["r1"] + 1);
+							break;
+					}
+				}
+				this.m_arrNeedUnlock2.push (Lock);
+			},
+
+			removeUnlock: function (Lock) {
+				for (var i = 0; i < this.m_arrNeedUnlock.length; ++i)
+					if (Lock.Element["guid"] === this.m_arrNeedUnlock[i].Element["guid"]) {
+						this.m_arrNeedUnlock.splice(i, 1);
+						return true;
+					}
+				return false;
+			},
+
+			addChanges: function (oChanges) {
+				this.m_arrChanges.push (oChanges);
+			},
+
+			// Возвращает - нужно ли отправлять end action
+			applyChanges: function () {
+				if (!this.isCoAuthoringExcellEnable())
+					return true;
+
+				var t = this;
+				// Отправляем на сервер изменения
+				if (0 < this.m_arrChanges.length) {
+					this.handlers.trigger("applyChanges", this.m_arrChanges, function () {
+						t.m_arrChanges.splice(0, t.m_arrChanges.length);
+						t.handlers.trigger("updateAfterApplyChanges");
+					});
+
+					return false;
+				}
+
+				return true;
+			},
+
+			sendChanges: function () {
+				if (!this.isCoAuthoringExcellEnable())
+					return;
+
+				var bCheckRedraw = false;
+				if (0 < this.m_arrNeedUnlock.length ||
+					0 < this.m_arrNeedUnlock2.length) {
+					bCheckRedraw = true;
+					this.handlers.trigger("cleanSelection");
+				}
+
+				var oLock = null;
+				// Очищаем свои изменения
+				while (0 < this.m_arrNeedUnlock2.length) {
+					oLock = this.m_arrNeedUnlock2.shift();
+					oLock.setType(c_oAscLockTypes.kLockTypeNone, false);
+
+					this.handlers.trigger("releaseLocks", oLock.Element["guid"]);
+					if (c_oAscLockTypeElem.Object === oLock.Element["type"]) {
+						// Для объектов нужно сбросить тип блокировки
+						this.handlers.trigger("resetDrawingObject", oLock.Element["rangeOrObjectId"]);
+					}
+				}
+				// Очищаем примененные чужие изменения
+				var nIndex = 0;
+				var nCount = this.m_arrNeedUnlock.length;
+				for (; nIndex < nCount; ++nIndex) {
+					oLock = this.m_arrNeedUnlock[nIndex];
+					if (c_oAscLockTypes.kLockTypeOther2 === oLock.getType()) {
+						if (c_oAscLockTypeElem.Object === oLock.Element["type"]) {
+							// Для объектов нужно сбросить тип блокировки
+							this.handlers.trigger("resetDrawingObject", oLock.Element["rangeOrObjectId"]);
+						}
+
+						this.m_arrNeedUnlock.splice(nIndex, 1);
+						--nIndex;
+						--nCount;
+					}
+				}
+
+				// Отправляем на сервер изменения
+				this.handlers.trigger("sendChanges", this.m_oRecalcIndexColumns, this.m_oRecalcIndexRows);
+
+				// Пересчитываем lock-и от чужих пользователей
+				this._recalcLockArrayOthers();
+
+				// Очищаем свои изменения (удаляем массив добавленных строк/столбцов)
+				delete this.m_oInsertColumns;
+				delete this.m_oInsertRows;
+				this.m_oInsertColumns = {};
+				this.m_oInsertRows = {};
+				// Очищаем свои пересчетные индексы
+				this.clearRecalcIndex();
+
+				// Чистим Undo/Redo
+				History.Clear();
+
+				// Перерисовываем
+				if (bCheckRedraw) {
+					this.handlers.trigger("drawSelection");
+					this.handlers.trigger("showDrawingObjects");
+					this.handlers.trigger("showComments");
+				}
+			},
+
+			S4: function () {
+				return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+			},
+			createGUID: function () {
+				return (this.S4() + this.S4() + "-" + this.S4() + "-" + this.S4() + "-" + this.S4() + "-" + this.S4() + this.S4() + this.S4());
+			},
+
+			getLockInfo: function (typeElem, subType, sheetId, info) {
+				var oLockInfo = new asc_lockInfo();
+				oLockInfo["sheetId"] = sheetId;
+				oLockInfo["type"] = typeElem;
+				oLockInfo["subType"] = subType;
+				oLockInfo["guid"] = this.createGUID();
+				oLockInfo["rangeOrObjectId"] = info;
+				return oLockInfo;
+			},
+
+			getLockByElem: function (element, type) {
+				var arrayElements = (c_oAscLockTypes.kLockTypeMine === type) ? this.m_arrNeedUnlock2 : this.m_arrNeedUnlock;
+				for (var i = 0; i < arrayElements.length; ++i)
+					if (element["guid"] === arrayElements[i].Element["guid"])
+						return arrayElements[i];
+				return null;
+			},
+
+			/**
+			 * Проверка lock для элемента
+			 * @param {asc_CLockInfo} element  элемент для проверки lock
+			 * @param {c_oAscLockTypes} type сами(kLockTypeMine) или кто-то другой
+			 * @param {Boolean} bCheckOnlyLockAll проверять только lock для свойств всего листа (либо только проверять удален ли лист, а не просто залочен)
+			 */
+			getLockIntersection: function (element, type, bCheckOnlyLockAll) {
+				var arrayElements = (c_oAscLockTypes.kLockTypeMine === type) ? this.m_arrNeedUnlock2 : this.m_arrNeedUnlock;
+				var oUnlockElement = null, rangeTmp1, rangeTmp2;
+				for (var i = 0; i < arrayElements.length; ++i) {
+					oUnlockElement = arrayElements[i].Element;
+					if (c_oAscLockTypeElem.Sheet === element["type"] && element["type"] === oUnlockElement["type"]) {
+						// Проверка только на удаление листа (если проверка для себя, то выходим не сразу, т.к. нужно проверить lock от других элементов)
+						if ((c_oAscLockTypes.kLockTypeMine !== type && false === bCheckOnlyLockAll) ||
+							element["sheetId"] === oUnlockElement["sheetId"]) {
+							// Если кто-то залочил sheet, то больше никто не может лочить sheet-ы (иначе можно удалить все листы)
+							return arrayElements[i];
+						}
+					}
+					if (element["sheetId"] !== oUnlockElement["sheetId"])
+						continue;
+
+					if (null !== element["subType"] && null !== oUnlockElement["subType"])
+						return arrayElements[i];
+
+					// Не учитываем lock от ChangeProperties (только если это не lock листа)
+					if (true === bCheckOnlyLockAll ||
+						(c_oAscLockTypeElemSubType.ChangeProperties === oUnlockElement["subType"]
+							&& c_oAscLockTypeElem.Sheet !== element["type"]))
+						continue;
+
+					if (element["type"] === oUnlockElement["type"]) {
+						if (element["type"] === c_oAscLockTypeElem.Object) {
+							if (element["rangeOrObjectId"] === oUnlockElement["rangeOrObjectId"])
+								return arrayElements[i];
+						} else if (element["type"] === c_oAscLockTypeElem.Range) {
+							// Не учитываем lock от Insert
+							if (c_oAscLockTypeElemSubType.InsertRows === oUnlockElement["subType"] || c_oAscLockTypeElemSubType.InsertColumns === oUnlockElement["subType"])
+								continue;
+							rangeTmp1 = oUnlockElement["rangeOrObjectId"];
+							rangeTmp2 = element["rangeOrObjectId"];
+							if (rangeTmp2["c1"] > rangeTmp1["c2"] || rangeTmp2["c2"] < rangeTmp1["c1"] || rangeTmp2["r1"] > rangeTmp1["r2"] || rangeTmp2["r2"] < rangeTmp1["r1"])
+								continue;
+							return arrayElements[i];
+						}
+					} else if (oUnlockElement["type"] === c_oAscLockTypeElem.Sheet ||
+						(element["type"] === c_oAscLockTypeElem.Sheet && c_oAscLockTypes.kLockTypeMine !== type)) {
+						// Если кто-то уже залочил лист или мы пытаемся сами залочить и проверяем на чужие lock
+						return arrayElements[i];
+					}
+				}
+				return false;
+			},
+
+			getLockElem: function (typeElem, type, sheetId) {
+				var arrayElements = (c_oAscLockTypes.kLockTypeMine === type) ? this.m_arrNeedUnlock2 : this.m_arrNeedUnlock;
+				var count = arrayElements.length;
+				var element = null, oRangeOrObjectId = null;
+				var result = [];
+				var c1, c2, r1, r2;
+
+				if (!this.m_oRecalcIndexColumns.hasOwnProperty(sheetId)) {
+					this.m_oRecalcIndexColumns[sheetId] = new CRecalcIndex();
+				}
+				if (!this.m_oRecalcIndexRows.hasOwnProperty(sheetId)) {
+					this.m_oRecalcIndexRows[sheetId] = new CRecalcIndex();
+				}
+
+				for (var i = 0; i < count; ++i) {
+					element = arrayElements[i].Element;
+					if (element["sheetId"] !== sheetId || element["type"] !== typeElem)
+						continue;
+
+					// Отображать залоченность удаленных текущим пользователем строк/столбцов не нужно (уже нечего отображать)
+					if (c_oAscLockTypes.kLockTypeMine === type && c_oAscLockTypeElem.Range === typeElem &&
+						(c_oAscLockTypeElemSubType.DeleteColumns === element["subType"] ||
+							c_oAscLockTypeElemSubType.DeleteRows === element["subType"]))
+						continue;
+					// Отображать залоченность добавленных другим пользователем строк/столбцов не нужно (еще нечего отображать)
+					if (c_oAscLockTypeElem.Range === typeElem &&
+						(c_oAscLockTypeElemSubType.InsertColumns === element["subType"] ||
+							c_oAscLockTypeElemSubType.InsertRows === element["subType"]))
+						continue;
+					// Отображать lock-диапазон для lockAll(всего листа) не нужно
+					if (c_oAscLockTypeElemSubType.ChangeProperties === element["subType"])
+						continue;
+
+					oRangeOrObjectId = element["rangeOrObjectId"];
+					// Для диапазона нужно сделать пересчет с учетом удаленных или добавленных строк/столбцов
+					if (c_oAscLockTypeElem.Range === typeElem) {
+						c1 = this.m_oRecalcIndexColumns[sheetId].getLockOther(oRangeOrObjectId["c1"], type);
+						c2 = this.m_oRecalcIndexColumns[sheetId].getLockOther(oRangeOrObjectId["c2"], type);
+						r1 = this.m_oRecalcIndexRows[sheetId].getLockOther(oRangeOrObjectId["r1"], type);
+						r2 = this.m_oRecalcIndexRows[sheetId].getLockOther(oRangeOrObjectId["r2"], type);
+						if (null === c1 || null === c2 || null === r1 || null === r2)
+							continue;
+
+						oRangeOrObjectId = new asc_Range(c1, r1, c2, r2);
+					}
+
+					result.push(oRangeOrObjectId);
+				}
+
+				return result;
+			},
+
+			getLockCellsMe: function (sheetId) {
+				return this.getLockElem(c_oAscLockTypeElem.Range, c_oAscLockTypes.kLockTypeMine, sheetId);
+			},
+			getLockCellsOther: function (sheetId) {
+				return this.getLockElem(c_oAscLockTypeElem.Range, c_oAscLockTypes.kLockTypeOther, sheetId);
+			},
+			getLockObjectsMe: function (sheetId) {
+				return this.getLockElem(c_oAscLockTypeElem.Object, c_oAscLockTypes.kLockTypeMine, sheetId);
+			},
+			getLockObjectsOther: function (sheetId) {
+				return this.getLockElem(c_oAscLockTypeElem.Object, c_oAscLockTypes.kLockTypeOther, sheetId);
+			},
+			/**
+			 * Проверка lock для всего листа
+			 * @param {Number} sheetId  элемент для проверки lock
+			 * @return {c_oAscMouseMoveLockedObjectType} oLockedObjectType
+			 */
+			isLockAllOther: function (sheetId) {
+				var arrayElements = this.m_arrNeedUnlock;
+				var count = arrayElements.length;
+				var element = null;
+				var oLockedObjectType = c_oAscMouseMoveLockedObjectType.None;
+
+				for (var i = 0; i < count; ++i) {
+					element = arrayElements[i].Element;
+					if (element["sheetId"] === sheetId) {
+						if (element["type"] === c_oAscLockTypeElem.Sheet) {
+							oLockedObjectType = c_oAscMouseMoveLockedObjectType.Sheet;
+							break;
+						} else if (element["type"] === c_oAscLockTypeElem.Range && null !== element["subType"])
+							oLockedObjectType = c_oAscMouseMoveLockedObjectType.TableProperties;
+					}
+				}
+				return oLockedObjectType;
+			},
+
+			_recalcLockArray: function (typeLock, oRecalcIndexColumns, oRecalcIndexRows) {
+				var arrayElements = (c_oAscLockTypes.kLockTypeMine === typeLock) ? this.m_arrNeedUnlock2 : this.m_arrNeedUnlock;
+				var count = arrayElements.length;
+				var element = null, oRangeOrObjectId = null;
+				var i;
+				var sheetId = -1;
+
+				for (i = 0; i < count; ++i) {
+					element = arrayElements[i].Element;
+					if (c_oAscLockTypeElem.Range !== element["type"] ||
+						c_oAscLockTypeElemSubType.InsertColumns === element["subType"] ||
+						c_oAscLockTypeElemSubType.InsertRows === element["subType"])
+						continue;
+					sheetId = element["sheetId"];
+
+					oRangeOrObjectId = element["rangeOrObjectId"];
+
+					if (oRecalcIndexColumns.hasOwnProperty(sheetId)) {
+						// Пересчет колонок
+						oRangeOrObjectId["c1"] = oRecalcIndexColumns[sheetId].getLockMe(oRangeOrObjectId["c1"]);
+						oRangeOrObjectId["c2"] = oRecalcIndexColumns[sheetId].getLockMe(oRangeOrObjectId["c2"]);
+					}
+					if (oRecalcIndexRows.hasOwnProperty(sheetId)) {
+						// Пересчет строк
+						oRangeOrObjectId["r1"] = oRecalcIndexRows[sheetId].getLockMe(oRangeOrObjectId["r1"]);
+						oRangeOrObjectId["r2"] = oRecalcIndexRows[sheetId].getLockMe(oRangeOrObjectId["r2"]);
+					}
+				}
+			},
+			// Пересчет только для чужих Lock при сохранении на клиенте, который добавлял/удалял строки или столбцы
+			_recalcLockArrayOthers: function () {
+				var typeLock = c_oAscLockTypes.kLockTypeOther;
+				var arrayElements = (c_oAscLockTypes.kLockTypeMine === typeLock) ? this.m_arrNeedUnlock2 : this.m_arrNeedUnlock;
+				var count = arrayElements.length;
+				var element = null, oRangeOrObjectId = null;
+				var i;
+				var sheetId = -1;
+
+				for (i = 0; i < count; ++i) {
+					element = arrayElements[i].Element;
+					if (c_oAscLockTypeElem.Range !== element["type"] ||
+						c_oAscLockTypeElemSubType.InsertColumns === element["subType"] ||
+						c_oAscLockTypeElemSubType.InsertRows === element["subType"])
+						continue;
+					sheetId = element["sheetId"];
+
+					oRangeOrObjectId = element["rangeOrObjectId"];
+
+					if (this.m_oRecalcIndexColumns.hasOwnProperty(sheetId)) {
+						// Пересчет колонок
+						oRangeOrObjectId["c1"] = this.m_oRecalcIndexColumns[sheetId].getLockOther(oRangeOrObjectId["c1"]);
+						oRangeOrObjectId["c2"] = this.m_oRecalcIndexColumns[sheetId].getLockOther(oRangeOrObjectId["c2"]);
+					}
+					if (this.m_oRecalcIndexRows.hasOwnProperty(sheetId)) {
+						// Пересчет строк
+						oRangeOrObjectId["r1"] = this.m_oRecalcIndexRows[sheetId].getLockOther(oRangeOrObjectId["r1"]);
+						oRangeOrObjectId["r2"] = this.m_oRecalcIndexRows[sheetId].getLockOther(oRangeOrObjectId["r2"]);
+					}
+				}
+			},
+
+			addRecalcIndex: function (type, oRecalcIndex) {
+				var nIndex = 0;
+				var nRecalcType = c_oAscRecalcIndexTypes.RecalcIndexAdd;
+				var oRecalcIndexElement = null;
+				var oRecalcIndexResult = {};
+
+				var oRecalcIndexTmp = ("0" === type) ? this.m_oRecalcIndexColumns : this.m_oRecalcIndexRows;
+				for (var sheetId in oRecalcIndex) {
+					if (oRecalcIndex.hasOwnProperty(sheetId)) {
+						if (!oRecalcIndexTmp.hasOwnProperty(sheetId)) {
+							oRecalcIndexTmp[sheetId] = new CRecalcIndex();
+						}
+						if (!oRecalcIndexResult.hasOwnProperty(sheetId)) {
+							oRecalcIndexResult[sheetId] = new CRecalcIndex();
+						}
+						for (; nIndex < oRecalcIndex[sheetId]._arrElements.length; ++nIndex) {
+							oRecalcIndexElement = oRecalcIndex[sheetId]._arrElements[nIndex];
+							if (true === oRecalcIndexElement.m_bIsSaveIndex)
+								continue;
+							nRecalcType = (c_oAscRecalcIndexTypes.RecalcIndexAdd === oRecalcIndexElement._recalcType) ?
+								c_oAscRecalcIndexTypes.RecalcIndexRemove : c_oAscRecalcIndexTypes.RecalcIndexAdd;
+							oRecalcIndexTmp[sheetId].add(nRecalcType, oRecalcIndexElement._position,
+								oRecalcIndexElement._count, /*bIsSaveIndex*/true);
+							// Дублируем для возврата результата (нам нужно пересчитать только по последнему индексу
+							oRecalcIndexResult[sheetId].add(nRecalcType, oRecalcIndexElement._position,
+								oRecalcIndexElement._count, /*bIsSaveIndex*/true);
+						}
+					}
+				}
+
+				return oRecalcIndexResult;
+			},
+
+			removeCols: function (sheetId, position, count) {
+				if (this.isCoAuthoringExcellEnable()) {
+					if (!this.m_oRecalcIndexColumns.hasOwnProperty(sheetId)) {
+						this.m_oRecalcIndexColumns[sheetId] = new CRecalcIndex();
+					}
+					this.m_oRecalcIndexColumns[sheetId].add(c_oAscRecalcIndexTypes.RecalcIndexRemove, position,
+						count, /*bIsSaveIndex*/false);
+				}
+			},
+			addCols: function (sheetId, position, count) {
+				if (this.isCoAuthoringExcellEnable()) {
+					if (!this.m_oRecalcIndexColumns.hasOwnProperty(sheetId)) {
+						this.m_oRecalcIndexColumns[sheetId] = new CRecalcIndex();
+					}
+					this.m_oRecalcIndexColumns[sheetId].add(c_oAscRecalcIndexTypes.RecalcIndexAdd, position,
+						count, /*bIsSaveIndex*/false);
+				}
+			},
+			removeRows: function (sheetId, position, count) {
+				if (this.isCoAuthoringExcellEnable()) {
+					if (!this.m_oRecalcIndexRows.hasOwnProperty(sheetId)) {
+						this.m_oRecalcIndexRows[sheetId] = new CRecalcIndex();
+					}
+					this.m_oRecalcIndexRows[sheetId].add(c_oAscRecalcIndexTypes.RecalcIndexRemove, position,
+						count, /*bIsSaveIndex*/false);
+				}
+			},
+			addRows: function (sheetId, position, count) {
+				if (this.isCoAuthoringExcellEnable()) {
+					if (!this.m_oRecalcIndexRows.hasOwnProperty(sheetId)) {
+						this.m_oRecalcIndexRows[sheetId] = new CRecalcIndex();
+					}
+					this.m_oRecalcIndexRows[sheetId].add(c_oAscRecalcIndexTypes.RecalcIndexAdd, position,
+						count, /*bIsSaveIndex*/false);
+				}
+			},
+			addColsRange: function (sheetId, range) {
+				if (!this.m_oInsertColumns.hasOwnProperty(sheetId)) {
+					this.m_oInsertColumns[sheetId] = [];
+				}
+				var arrInsertColumns = this.m_oInsertColumns[sheetId];
+				// Перед добавлением нужно передвинуть имеющиеся
+				var countCols = range.c2 - range.c1 + 1;
+				var isAddNewRange = true;
+				for (var i = 0; i < arrInsertColumns.length; ++i) {
+					if (arrInsertColumns[i].c1 > range.c1) {
+						arrInsertColumns[i].c1 += countCols;
+						arrInsertColumns[i].c2 += countCols;
+					} else if (arrInsertColumns[i].c1 <= range.c1 && arrInsertColumns[i].c2 >= range.c1) {
+						arrInsertColumns[i].c2 += countCols;
+						isAddNewRange = false;
+					}
+				}
+				if (isAddNewRange)
+					arrInsertColumns.push(range);
+			},
+			addRowsRange: function (sheetId, range) {
+				if (!this.m_oInsertRows.hasOwnProperty(sheetId)) {
+					this.m_oInsertRows[sheetId] = [];
+				}
+				var arrInsertRows = this.m_oInsertRows[sheetId];
+				// Перед добавлением нужно передвинуть имеющиеся
+				var countRows = range.c2 - range.c1 + 1;
+				var isAddNewRange = true;
+				for (var i = 0; i < arrInsertRows.length; ++i) {
+					if (arrInsertRows[i].r1 > range.r1) {
+						arrInsertRows[i].r1 += countRows;
+						arrInsertRows[i].r2 += countRows;
+					} else if (arrInsertRows[i].r1 <= range.r1 && arrInsertRows[i].r2 >= range.r1) {
+						arrInsertRows[i].r2 += countRows;
+						isAddNewRange = false;
+					}
+				}
+				if (isAddNewRange)
+					arrInsertRows.push(range);
+			},
+			removeColsRange: function (sheetId, range) {
+				if (!this.m_oInsertColumns.hasOwnProperty(sheetId)) {
+					this.m_oInsertColumns[sheetId] = [];
+				}
+				var arrInsertColumns = this.m_oInsertColumns[sheetId];
+				// Нужно убрать те колонки, которые входят в диапазон
+				var countCols = range.c2 - range.c1 + 1;
+				for (var i = 0; i < arrInsertColumns.length; ++i) {
+					if (arrInsertColumns[i].c1 > range.c2) {
+						// Справа от удаляемого диапазона
+						arrInsertColumns[i].c1 -= countCols;
+						arrInsertColumns[i].c2 -= countCols;
+					} else if (arrInsertColumns[i].c1 >= range.c1 && arrInsertColumns[i].c2 <= range.c2) {
+						// Полностью включение в удаляемый диапазон
+						arrInsertColumns.splice(i, 1);
+						i -= 1;
+					} else if (arrInsertColumns[i].c1 >= range.c1 && arrInsertColumns[i].c1 <= range.c2 && arrInsertColumns[i].c2 > range.c2) {
+						// Частичное включение начала диапазона
+						arrInsertColumns[i].c1 = range.c2 + 1;
+						arrInsertColumns[i].c1 -= countCols;
+						arrInsertColumns[i].c2 -= countCols;
+					} else if (arrInsertColumns[i].c1 < range.c1 && arrInsertColumns[i].c2 >= range.c1 && arrInsertColumns[i].c2 <= range.c2) {
+						// Частичное включение окончания диапазона
+						arrInsertColumns[i].c2 = range.c1 - 1;
+					} else if (arrInsertColumns[i].c1 < range.c1 && arrInsertColumns[i].c2 > range.c2) {
+						// Удаляемый диапазон внутри нашего диапазона
+						arrInsertColumns[i].c2 -= countCols;
+					}
+				}
+			},
+			removeRowsRange: function (sheetId, range) {
+				if (!this.m_oInsertRows.hasOwnProperty(sheetId)) {
+					this.m_oInsertRows[sheetId] = [];
+				}
+				var arrInsertRows = this.m_oInsertRows[sheetId];
+				// Нужно убрать те строки, которые входят в диапазон
+				var countRows = range.r2 - range.r1 + 1;
+				for (var i = 0; i < arrInsertRows.length; ++i) {
+					if (arrInsertRows[i].r1 > range.r2) {
+						// Снизу от удаляемого диапазона
+						arrInsertRows[i].r1 -= countRows;
+						arrInsertRows[i].r2 -= countRows;
+					} else if (arrInsertRows[i].r1 >= range.r1 && arrInsertRows[i].r2 <= range.r2) {
+						// Полностью включение в удаляемый диапазон
+						arrInsertRows.splice(i, 1);
+						i -= 1;
+					} else if (arrInsertRows[i].r1 >= range.r1 && arrInsertRows[i].r1 <= range.r2 && arrInsertRows[i].r2 > range.r2) {
+						// Частичное включение начала диапазона
+						arrInsertRows[i].r1 = range.r2 + 1;
+						arrInsertRows[i].r1 -= countRows;
+						arrInsertRows[i].r2 -= countRows;
+					} else if (arrInsertRows[i].r1 < range.r1 && arrInsertRows[i].r2 >= range.r1 && arrInsertRows[i].r2 <= range.r2) {
+						// Частичное включение окончания диапазона
+						arrInsertRows[i].r2 = range.r1 - 1;
+					} else if (arrInsertRows[i].r1 < range.r1 && arrInsertRows[i].r2 > range.r2) {
+						// Удаляемый диапазон внутри нашего диапазона
+						arrInsertRows[i].r2 -= countRows;
+					}
+				}
+			},
+			isIntersectionInCols: function (sheetId, col) {
+				if (!this.m_oInsertColumns.hasOwnProperty(sheetId)) {
+					this.m_oInsertColumns[sheetId] = [];
+				}
+				var arrInsertColumns = this.m_oInsertColumns[sheetId];
+				for (var i = 0; i < arrInsertColumns.length; ++i) {
+					if (arrInsertColumns[i].c1 <= col && col <= arrInsertColumns[i].c2)
+						return true;
+				}
+				return false;
+			},
+			isIntersectionInRows: function (sheetId, row) {
+				if (!this.m_oInsertRows.hasOwnProperty(sheetId)) {
+					this.m_oInsertRows[sheetId] = [];
+				}
+				var arrInsertRows = this.m_oInsertRows[sheetId];
+				for (var i = 0; i < arrInsertRows.length; ++i) {
+					if (arrInsertRows[i].r1 <= row && row <= arrInsertRows[i].r2)
+						return true;
+				}
+				return false;
+			},
+			getArrayInsertColumnsBySheetId: function (sheetId) {
+				if (!this.m_oInsertColumns.hasOwnProperty(sheetId)) {
+					this.m_oInsertColumns[sheetId] = [];
+				}
+				return this.m_oInsertColumns[sheetId];
+			},
+			getArrayInsertRowsBySheetId: function (sheetId) {
+				if (!this.m_oInsertRows.hasOwnProperty(sheetId)) {
+					this.m_oInsertRows[sheetId] = [];
+				}
+				return this.m_oInsertRows[sheetId];
+			},
+			getLockMeColumn: function (sheetId, col) {
+				if (!this.m_oRecalcIndexColumns.hasOwnProperty(sheetId)) {
+					this.m_oRecalcIndexColumns[sheetId] = new CRecalcIndex();
+				}
+				return this.m_oRecalcIndexColumns[sheetId].getLockMe(col);
+			},
+			getLockMeRow: function (sheetId, row) {
+				if (!this.m_oRecalcIndexRows.hasOwnProperty(sheetId)) {
+					this.m_oRecalcIndexRows[sheetId] = new CRecalcIndex();
+				}
+				return this.m_oRecalcIndexRows[sheetId].getLockMe(row);
+			},
+			// Только когда от других пользователей изменения колонок (для пересчета)
+			getLockMeColumn2: function (sheetId, col) {
+				if (!this.m_oRecalcIndexColumns.hasOwnProperty(sheetId)) {
+					this.m_oRecalcIndexColumns[sheetId] = new CRecalcIndex();
+				}
+				return this.m_oRecalcIndexColumns[sheetId].getLockMe2(col);
+			},
+			// Только когда от других пользователей изменения строк (для пересчета)
+			getLockMeRow2: function (sheetId, row) {
+				if (!this.m_oRecalcIndexRows.hasOwnProperty(sheetId)) {
+					this.m_oRecalcIndexRows[sheetId] = new CRecalcIndex();
+				}
+				return this.m_oRecalcIndexRows[sheetId].getLockMe2(row);
+			},
+			// Только для принятия изменений от других пользователей! (для пересчета только в сохранении)
+			getLockOtherColumn2: function (sheetId, col) {
+				if (!this.m_oRecalcIndexColumns.hasOwnProperty(sheetId)) {
+					this.m_oRecalcIndexColumns[sheetId] = new CRecalcIndex();
+				}
+				return this.m_oRecalcIndexColumns[sheetId].getLockSaveOther(col);
+			},
+			// Только для принятия изменений от других пользователей! (для пересчета только в сохранении)
+			getLockOtherRow2: function (sheetId, row) {
+				if (!this.m_oRecalcIndexRows.hasOwnProperty(sheetId)) {
+					this.m_oRecalcIndexRows[sheetId] = new CRecalcIndex();
+				}
+				return this.m_oRecalcIndexRows[sheetId].getLockSaveOther(row);
+			}
+		};
+
+		/**
+		 * Отвечает за лок в совместном редактировании
+		 * -----------------------------------------------------------------------------
+		 *
+		 * @constructor
+		 * @memberOf Asc
+		 */
+		function CLock(element) {
+			if ( !(this instanceof CLock) ) {
+				return new CLock (element);
+			}
+
+			this.Type   = c_oAscLockTypes.kLockTypeNone;
+			this.UserId = null;
+			this.Element = element;
+
+			this.init();
+
+			return this;
+		}
+
+		CLock.prototype = {
+			/** @type CLock */
+			constructor: CLock,
+
+			init: function () {
+
+			},
+
+			getType: function () {
+				return this.Type;
+			},
+			setType: function (newType) {
+				if (newType === c_oAscLockTypes.kLockTypeNone)
+					this.UserId = null;
+
+				this.Type = newType;
+			},
+
+			Lock: function(bMine) {
+				if (c_oAscLockTypes.kLockTypeNone === this.Type)
+				{
+					if (true === bMine)
+						this.Type = c_oAscLockTypes.kLockTypeMine;
+					else
+						this.Type = c_oAscLockTypes.kLockTypeOther;
+				}
+			},
+
+			setUserId: function(UserId) {
+				this.UserId = UserId;
+			},
+
+			getUserId: function() {
+				return this.UserId;
+			}
+		}
+
+		function CRecalcIndexElement(recalcType, position, bIsSaveIndex) {
+			if ( !(this instanceof CRecalcIndexElement) ) {
+				return new CRecalcIndexElement (recalcType, position, bIsSaveIndex);
+			}
+
+			this._recalcType	= recalcType;		// Тип изменений (удаление или добавление)
+			this._position		= position;			// Позиция, в которой произошли изменения
+			this._count			= 1;				// Считаем все изменения за простейшие
+			this.m_bIsSaveIndex	= !!bIsSaveIndex;	// Это индексы из изменений других пользователей (которые мы еще не применили)
+
+			return this;
+		}
+
+		CRecalcIndexElement.prototype = {
+			constructor: CRecalcIndexElement,
+
+			// Пересчет для других
+			getLockOther: function (position, type) {
+				var inc = (c_oAscRecalcIndexTypes.RecalcIndexAdd === this._recalcType) ? +1 : -1;
+				if (position === this._position && c_oAscRecalcIndexTypes.RecalcIndexRemove === this._recalcType &&
+					true === this.m_bIsSaveIndex) {
+					// Мы еще не применили чужие изменения (поэтому для insert не нужно отрисовывать)
+					// RecalcIndexRemove (потому что перевертываем для правильной отработки, от другого пользователя
+					// пришло RecalcIndexAdd
+					return null;
+				} else if (position === this._position &&
+					c_oAscRecalcIndexTypes.RecalcIndexRemove === this._recalcType &&
+					c_oAscLockTypes.kLockTypeMine === type && false === this.m_bIsSaveIndex) {
+					// Для пользователя, который удалил столбец, рисовать залоченные ранее в данном столбце ячейки
+					// не нужно
+					return null;
+				} else if (position < this._position)
+					return position;
+				else
+					return (position + inc);
+			},
+			// Пересчет для других (только для сохранения)
+			getLockSaveOther: function (position, type) {
+				if (this.m_bIsSaveIndex)
+					return position;
+
+				var inc = (c_oAscRecalcIndexTypes.RecalcIndexAdd === this._recalcType) ? +1 : -1;
+				if (position === this._position && c_oAscRecalcIndexTypes.RecalcIndexRemove === this._recalcType &&
+					true === this.m_bIsSaveIndex) {
+					// Мы еще не применили чужие изменения (поэтому для insert не нужно отрисовывать)
+					// RecalcIndexRemove (потому что перевертываем для правильной отработки, от другого пользователя
+					// пришло RecalcIndexAdd
+					return null;
+				} else if (position === this._position &&
+					c_oAscRecalcIndexTypes.RecalcIndexRemove === this._recalcType &&
+					c_oAscLockTypes.kLockTypeMine === type && false === this.m_bIsSaveIndex) {
+					// Для пользователя, который удалил столбец, рисовать залоченные ранее в данном столбце ячейки
+					// не нужно
+					return null;
+				} else if (position < this._position)
+					return position;
+				else
+					return (position + inc);
+			},
+			// Пересчет для себя
+			getLockMe: function (position) {
+				var inc = (c_oAscRecalcIndexTypes.RecalcIndexAdd === this._recalcType) ? -1 : +1;
+				if (position < this._position)
+					return position;
+				else
+					return (position + inc);
+			},
+			// Только когда от других пользователей изменения (для пересчета)
+			getLockMe2: function (position) {
+				var inc = (c_oAscRecalcIndexTypes.RecalcIndexAdd === this._recalcType) ? -1 : +1;
+				if (true !== this.m_bIsSaveIndex || position < this._position)
+					return position;
+				else
+					return (position + inc);
+			}
+		}
+
+		function CRecalcIndex() {
+			if ( !(this instanceof CRecalcIndex) ) {
+				return new CRecalcIndex ();
+			}
+
+			this._arrElements = [];		// Массив CRecalcIndexElement
+
+			return this;
+		}
+
+		CRecalcIndex.prototype = {
+			constructor: CRecalcIndex,
+			add: function (recalcType, position, count, bIsSaveIndex) {
+				for (var i = 0; i < count; ++i)
+					this._arrElements.push(new CRecalcIndexElement(recalcType, position, bIsSaveIndex));
+			},
+			clear: function () {
+				this._arrElements.length = 0;
+			},
+
+			// Пересчет для других
+			getLockOther: function (position, type) {
+				var newPosition = position;
+				var count = this._arrElements.length;
+				for (var i = 0; i < count; ++i) {
+					newPosition = this._arrElements[i].getLockOther(newPosition, type);
+					if (null === newPosition)
+						break;
+				}
+
+				return newPosition;
+			},
+			// Пересчет для других (только для сохранения)
+			getLockSaveOther: function (position, type) {
+				var newPosition = position;
+				var count = this._arrElements.length;
+				for (var i = 0; i < count; ++i) {
+					newPosition = this._arrElements[i].getLockSaveOther(newPosition, type);
+					if (null === newPosition)
+						break;
+				}
+
+				return newPosition;
+			},
+			// Пересчет для себя
+			getLockMe: function (position) {
+				var newPosition = position;
+				var count = this._arrElements.length;
+				for (var i = count - 1; i >= 0; --i) {
+					newPosition = this._arrElements[i].getLockMe(newPosition);
+					if (null === newPosition)
+						break;
+				}
+
+				return newPosition;
+			},
+			// Только когда от других пользователей изменения (для пересчета)
+			getLockMe2: function (position) {
+				var newPosition = position;
+				var count = this._arrElements.length;
+				for (var i = count - 1; i >= 0; --i) {
+					newPosition = this._arrElements[i].getLockMe2(newPosition);
+					if (null === newPosition)
+						break;
+				}
+
+				return newPosition;
+			}
+		}
+
+		/*
+		 * Export
+		 * -----------------------------------------------------------------------------
+		 */
+		asc.CCollaborativeEditing = CCollaborativeEditing;
+		asc.CLock = CLock;
+		asc.CRecalcIndexElement = CRecalcIndexElement;
+		asc.CRecalcIndex = CRecalcIndex;
+	}
+)(jQuery, window);

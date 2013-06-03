@@ -1,0 +1,58 @@
+1. Установка минимизаторов
+ - Скачать gcc, архив доступен по адресу http://closure-compiler.googlecode.com/files/compiler-latest.zip
+ - Разархивировать его содержимое, например в C:\Program Files (x86)\Google\Closure-compiler
+ 
+ - Скачать YUICompressor, архив доступен по адресу http://yui.zenfs.com/releases/yuicompressor/yuicompressor-2.4.7.zip
+ - Разархивировать его содержимое, например в C:\Program Files (x86)\Yahoo\yuicompressor-2.4.7\build\
+ - Прописать пути к минимизаторам в переменную среды CLASSPATH, у меня получилось так: C:\Program Files (x86)\Google\Closure-compiler\compiler.jar; C:\Program Files (x86)\Yahoo\yuicompressor-2.4.7\build\yuicompressor-2.4.7.jar
+
+2. Установка консольного svn-клиента.
+ - В дистрибутиве TortoiseSVN уже есть консольный клиент. Если в папке TortoiseSVN/bin нет файла svn.exe, то надо повторно запустить инсталляцию и выбрать снятые галочки.
+ - Прописать папку TortoiseSVN/bin в системную переменную PATH
+ 
+3. Собираем сдк редактора документов для отдела разработки приложений.
+ - Открываем папку куда сделан сheckout этого репозитория svn://fileserver/activex/AVS/Sources/AVSOfficeStudio/OfficeWebExcel/.build
+(далее в скобках пути у меня на машине E:\Subversion\AVS\Sources\AVSOfficeStudio\OfficeWebExcel\.build)
+
+ - Читаем дальше, что делает скрипт и убеждаемся что имеем права, на доступ к папкам, которые нужны скрипту для работы.
+    Скрипт делает следующие действия:
+   - Делает апдейт svn://fileserver/activex/AVS/Sources/AVSOfficeStudio/OfficeWebExcel (E:\Subversion\AVS\Sources\AVSOfficeStudio\OfficeWebExcel)
+   - Собирает сдк
+   - Генерит комментарий
+   - коммитит сдк и файлы апи в svn://fileserver/activex/ASC/Redist/WEB/sdk/OfficeWebExcel (E:\Subversion\ASC\Redist\WEB\sdk\OfficeWebExcel)
+   
+ - Запускаем commit_new_sdk_all.bat
+ 
+4. Собираем редактор документов
+ - Получам исходники меню, у меня они рассположены в C:\Hg
+ - если путь к исходникам отличается, то изменяем в build.bat значение переменной MENU_FOLDER
+ - делаем до нужной версии апдейт svn://fileserver/activex/AVS/Sources/AVSOfficeStudio/OfficeWebExcel (E:\Subversion\AVS\Sources\AVSOfficeStudio\OfficeWebExcel)
+ - запускаем build.bat
+	Скрипт делает следующее:
+	 - собирает сдк редактора.
+	 - собирает меню редактора.
+	 - проводит обфускацию
+	Результаты находятся в папке ../../OfficeWebWord/Build/deploy (E:\Subversion\AVS\Sources\AVSOfficeStudio\OfficeWebWord\Build)
+	
+ - убеждаемся в работоспособности минимизированного кода (для этого дополнительно из исходников меню нужно скопировать папку 3rdparty).
+	Редактор документов - десктоп версия:
+	deploy/apps/api/documents/index.html?doctype=text
+
+	Просмотр документов - мобильная версия:
+	deploy/apps/api/documents/index.html?doctype=text&type=mobile
+
+	Просмотр таблиц - десктоп версия:
+	deploy/apps/api/documents/index.html?doctype=spreadsheet
+
+	Просмотр таблиц - мобильная версия:
+	deploy/apps/api/documents/index.html?doctype=spreadsheet&type=mobile
+ 
+ - Коммитим логи в папке svn://fileserver/activex/AVS/Sources/AVSOfficeStudio/OfficeWebExcel/.build/Log (E:\Subversion\AVS\Sources\AVSOfficeStudio\OfficeWebExcel\.build\Log)
+ 
+
+
+
+// минимизация без меню:
+1. запустить build_test.bat
+2. отредактировать файл ..\OfficeWebWord\Build\deploy\sdk\OfficeWebExcel\SpreadsheetTestMenu.html
+чтоб грузился минимизированный скрипт "sdk-all.js" вместо неминимизированной версии.

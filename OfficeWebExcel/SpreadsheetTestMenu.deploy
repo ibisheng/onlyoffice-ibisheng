@@ -1,0 +1,1785 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+		<title>Spreadsheet Test</title>
+
+		<link rel="stylesheet" type="text/css" href="css/main.css"/>
+		<link rel="stylesheet" type="text/css" href="menu/styles/MenuStyle.css" />
+		<link rel="stylesheet" type="text/css" href="menu/styles/clickmenu.css" />
+		<link rel="stylesheet" type="text/css" href="menu/styles/xlStyles.css" />
+		<link rel="stylesheet" type="text/css" href="menu/js/jquery-ui.css"/> 
+		
+		<link rel="stylesheet" type="text/css" href="menu/styles/jquery-custom.css" />
+		<link rel="stylesheet" type="text/css" href="menu/js/ui.spinner.css" />
+
+		<link rel="stylesheet" type="text/css" href="../OfficeWebExcelChart/examples/css/jquery-ui.css"/>
+		<link rel="stylesheet" type="text/css" href="../OfficeWebExcelChart/examples/css/diagram.css"/>
+
+		<script type="text/javascript" src="jquery/jquery-1.7.1.js"></script>
+		<script type="text/javascript" src="jquery/jquery.mousewheel-3.0.6.js"></script>
+		<script type="text/javascript" src="menu/js/jquery.clickmenu.js"></script>
+		<script type="text/javascript" src="menu/js/jquery-ui-1.8.13.custom.min.js"></script>
+		<script type="text/javascript" src="menu/js/ui.spinner.min.js"></script>
+		<script type="text/javascript" src="../../3rdparty/XRegExp/xregexp-all-min.js"></script>
+
+		<script type="text/javascript">
+			//<![CDATA[
+			window.g_debug_mode = true;
+			//window.g_isMobileVersion = true;
+			//]]>
+		</script>
+		<script type="text/javascript" src="sdk-all.js"></script>
+		<script type="text/javascript" src="menu/menu.js"></script>
+
+
+
+		<style type="text/css">
+			#teamlab-title {
+				position: fixed;
+				left: 0;
+				top: 0;
+				right: 0;
+				height: 30px;
+				background-color: #242829;
+				color: #FFF;
+				font-size: 14px;
+				line-height: 30px;
+				padding-left: 10px;
+			}
+			#teamlab-title > img {
+				display: inline-block;
+				position: relative;
+				top: 1px;
+				height: 17px;
+				margin-top: 5px;
+			}
+
+			#wb-panel {
+				position: fixed;
+				left: 0;
+				top: 30px;
+				right: 0;
+				height: 66px;
+				background: #EDEDED;
+				background: -moz-linear-gradient(top,#EDEDED 0,#CBCBCB 100%);
+				background: -webkit-gradient(linear,left top,left bottom,color-stop(0%,#EDEDED),color-stop(100%,#CBCBCB));
+				background: -webkit-linear-gradient(top,#EDEDED 0,#CBCBCB 100%);
+				background: -o-linear-gradient(top,#EDEDED 0,#CBCBCB 100%);
+				background: -ms-linear-gradient(top,#EDEDED 0,#CBCBCB 100%);
+				background: linear-gradient(top,#EDEDED 0,#CBCBCB 100%);
+				filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ededed',endColorstr='#cbcbcb',GradientType=0);
+				border: 0;
+				border-top: 1px solid white;
+				border-bottom: 1px Solid #929292;
+			}
+
+			#wb-widget {
+				position: fixed;
+				left: 0;
+				top: 110px;
+				right: 0;
+				bottom: 22px;
+				overflow: hidden;
+			}
+
+			/*
+			* Navigation
+			* --------------------------------------------------------
+			*/
+
+			#ws-navigation {
+				position: fixed;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				height: 20px;
+				margin: 0;
+				padding: 0;
+				background-color: #DCE2E8;
+				border-color: #C1C6CC;
+				border-style: solid;
+				border-width: 1px 0;
+			}
+
+			/* Buttons for choosing worksheets */
+
+			#ws-navigation .nav-buttons {
+				float: left;
+				position: relative;
+				z-index: 1;
+				height: 19px;
+				cursor: pointer;
+			}
+
+			#ws-navigation .nav-buttons .btn {
+				float: left;
+				width: 18px;
+				height: 17px;
+				margin: 0 1px;
+				border: 1px solid transparent;
+			}
+			#ws-navigation .nav-buttons .btn > .inner {
+				position: relative;
+				left: 50%;
+				top: 50%;
+				margin-left: -6px;
+				margin-top: -5px;
+				width: 11px;
+				height: 11px;
+				background-image: url("css/nav-buttons.png");
+				background-repeat: no-repeat;
+			}
+
+			#ws-navigation .nav-buttons .btn.first > .inner {
+				background-position: 0px 0px;
+			}
+			#ws-navigation .nav-buttons .btn.prev > .inner {
+				background-position: -11px 0px;
+			}
+			#ws-navigation .nav-buttons .btn.next > .inner {
+				background-position: -22px 0px;
+			}
+			#ws-navigation .nav-buttons .btn.last > .inner {
+				background-position: -33px 0px;
+			}
+
+			#ws-navigation .nav-buttons .btn:hover {
+				background-color: #FDE47B;
+				border-color: #E8BF3A;
+			}
+			#ws-navigation .nav-buttons .btn.first:hover > .inner {
+				background-position: 0px -11px;
+			}
+			#ws-navigation .nav-buttons .btn.prev:hover > .inner {
+				background-position: -11px -11px;
+			}
+			#ws-navigation .nav-buttons .btn.next:hover > .inner {
+				background-position: -22px -11px;
+			}
+			#ws-navigation .nav-buttons .btn.last:hover > .inner {
+				background-position: -33px -11px;
+			}
+
+			/* Worksheet's tabs */
+
+			#ws-navigation .tabs {
+				position: absolute;
+				left: 88px;
+				right: 25%;
+				height: 22px;
+				border-right: 1px solid #C1C6CC;
+				padding: 0;
+				margin: -1px 0 0;
+				font-family: Verdana, Arial, sans-serif;
+				font-size: 12px;
+				line-height: 100%;
+				overflow: hidden;
+				white-space: nowrap;
+			}
+			#ws-navigation .tabs * {
+				display: inline-block;
+			}
+
+			/* Default tab */
+
+			#ws-navigation .tabs li {
+				position: relative;
+				height: 20px;
+				padding: 0;
+				margin: 0 0 0 -1px;
+				background-color: #D7DADD;
+				border-color: #B6BABF;
+				border-style: solid;
+				border-width: 1px;
+				border-radius: 5px;
+				cursor: pointer;
+			}
+			#ws-navigation .tabs li.first {
+				margin-left: 0;
+			}
+
+			#ws-navigation .tabs .tab-prefix {
+				display: none;
+			}
+			#ws-navigation .tabs .tab-suffix {
+				display: none;
+			}
+
+			#ws-navigation .tabs .tab-name {
+				height: 20px;
+				padding: 0 .5em;
+				line-height: 20px;
+			}
+
+			/* Highlighted tab */
+
+			#ws-navigation .tabs li:hover {
+				background-color: #A0A5AA;
+			}
+
+			/* Selected tab */
+
+			#ws-navigation .tabs li.active {
+				background-color: #FFF;
+				z-index: 10;
+			}
+
+			/*
+			* Scale
+			* --------------------------------------------------------
+			*/
+
+			.ws-zoom-widget {
+				position: absolute;
+				height: 19px;
+				line-height: 100%;
+				right: 0;
+				top: 1px;
+				margin: 0;
+				padding: 0 5px;
+			}
+
+			.ws-zoom-button {
+				display: inline-block;
+				position: relative;
+				width: 17px;
+				height: 17px;
+				margin: 0;
+				padding: 0;
+				cursor: pointer;
+
+				font-family: "Verdana","sans-serif";
+				font-size: 13px;
+				font-weight: bold;
+				line-height: 17px;
+				text-decoration: none;
+				text-align: center;
+				vertical-align: top;
+
+				color: #111;
+				text-shadow: 1px 1px 0 rgba(255,255,255,.67);
+
+				border-color: #7F8994;
+				/*border-color: rgba(0, 0, 0, 0.56);*/
+				border-radius: 10px;
+				border-width: 1px;
+				border-style: solid;
+				outline: none;
+
+				background-color: #F2F5F7;
+				background-image: url("gradient.png");
+				background-image: -moz-linear-gradient(top, rgba(255,255,255,.75), rgba(255,255,255,0));
+				background-image: -o-linear-gradient(top, rgba(255,255,255,.75), rgba(255,255,255,0));
+				background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(255,255,255,.75)), to(rgba(255,255,255,0)));
+				background-image: linear-gradient(top, rgba(255,255,255,.75), rgba(255,255,255,0));
+				background-repeat: repeat-x;
+				box-shadow: 1px 1px 0 rgba(255,255,255,.5) inset, -1px -1px 0 rgba(255,255,255,.5) inset;
+				-webkit-transition: background .185s linear;
+				-moz-transition: all .185s linear;
+				-o-transition: all .185s linear;
+				transition: all .185s linear;
+
+				/** Make the text unselectable **/
+				-moz-user-select: none;
+				-webkit-user-select: none;
+			}
+
+			.ws-zoom-button:hover, .ws-zoom-button:focus {
+				background-color: #F9E390; /*#a8c0cb;*/
+			}
+
+			.ws-zoom-button:active {
+				box-shadow:
+					0 2px 5px rgba(0,0,0,.67) inset,
+					1px 1px 0 rgba(255,255,255,.25) inset,
+					-1px -1px 0 rgba(255,255,255,.25) inset;
+				-webkit-transition: line-height .1s linear;
+				-moz-transition: all .1s linear;
+				-o-transition: all .1s linear;
+				transition: all .1s linear;
+			}
+
+			.ws-zoom-button > div {
+				position: relative;
+				display: inline-block;
+				cursor: pointer;
+			}
+
+			.ws-zoom-button:active > div {
+				top: 1px;
+				left: 1px;
+			}
+
+			.ws-zoom-input {
+				width: 3em;
+				height: 15px;
+				margin: 0 5px;
+				padding: 1px 1px;
+				border: 1px solid #C0C0C0;
+				font-size: 15px;
+				text-align: center;
+				vertical-align: top;
+			}
+		</style>
+	</head>
+	<body>
+
+<!-- 		<div id="teamlab-title"><img src="../../../img/tmdocs_logo.png"/> Spreadsheets | </div>
+
+		<div id="wb-panel" style="display:inline-block;padding-left:10px;">
+			<input  id="saveAsXLSX" type="button" value="saveAsXLSX"/>
+			<input  id="saveAsXLS" type="button" value="saveAsXLS"/>
+			<input  id="saveAsODS" type="button" value="saveAsODS"/>
+			<input  id="saveAsCSV" type="button" value="saveAsCSV"/>
+			<input  id="saveAsHTML" type="button" value="saveAsHTML"/>
+			<input  id="enableKE" type="button" value="key events: enabled"/>
+			<input  id="pattern" type="text" value="search text"/>
+			<input  id="searchText" type="button" value="search"/>
+			<input  id="searchRow" type="checkbox" value="1" checked /> search by row
+			<input  id="searchFwd" type="checkbox" value="1" checked /> search forward
+			<br/>
+			<div id="cellInfo"></div>
+		</div> -->
+
+<table id="menu" class="tbgnd utilFont" >
+<tr class="headerstyle">
+<td id="logo" class="logo" > <img src ='menu/img/top_logo.gif'/></td>
+
+	<td id="header" colspan="2" >
+		<div class="buttonHolderStyle" style="">
+			<span style="position:absolute;background: url(menu/img/leftAngle.png) no-repeat 0 0;height: 38px;width: 33px; margin-left: -33px;"></span>
+			<a id="ShareButton" class="big_button3 buttonBack" style="display:none;margin-left: 7px;"><span class="buttonBackSpan">ShareButton</span></a>
+			<a id="SaveButton" class="big_button3 buttonBack" style="display:none;"><span class="buttonBackSpan">Save</span></a>
+		</div>
+		<div  id="buttonPanel">
+			<span id="titleSP">SpreadSheet Editor |</span>
+			<span id="docName"></span>
+		</div>
+	</td>
+</tr> 
+<tr id="topmenu" style="display:none;">
+	<td style="padding-left: 3px;"colspan="3">
+		<ul id="mainmenu" visible="false"> 
+			<li class="item">
+				File
+				<ul class="margin_top_10">
+					<li id ="mnuSave" class="SubItem" style="display:none;">
+						<p class="MenubarIcon MenubarSaveAs">&nbsp;</p>
+						Save
+					</li>
+					<li id ="mnuSaveAs" class ="SubItem">
+						<p class="MenubarIcon MenubarSaveAs">&nbsp;</p>
+						SaveAs
+						<span class="MenuArrow">&#9658;</span>
+						
+						<ul class="uimargin" >
+							<li id ="mnuSaveXls" class ="SubItem">XLS</li>
+							<li id ="mnuSaveXlsx" class ="SubItem">XLSX</li>
+							<li id ="mnuSaveOds" class ="SubItem">ODS</li>
+							<li id ="mnuSaveCsv" class ="SubItem">CSV</li>
+							<li id ="mnuSaveHtml" class ="SubItem">HTML</li>
+						</ul>
+					</li>
+					<div class="MenuSeparator">
+					</div>
+					<li id ="mnuPrint" class ="SubItem">
+						<p class="MenubarIcon MenubarPrint">&nbsp;</p>
+						Print
+						<span class="MenuQuickButton">Ctrl+P</span>
+					</li>
+					<li id="sm" class="SubItem">HideMenuTab</li>
+				</ul> 
+			</li> 
+			<li class="item">
+				Edit
+				<ul class="margin_top_10">
+					<li id ="mnuUndo" class ="SubItem">
+						<p class="MenubarIcon MenubarUndo">&nbsp;</p>
+						Undo
+						<span class="MenuQuickButton">Ctrl+Z</span>
+					</li>
+					<li id ="mnuRedo" class ="SubItem">
+						<p class="MenubarIcon MenubarRedo">&nbsp;</p>
+						Redo
+						<span class="MenuQuickButton">Ctrl+Y</span>
+					</li>
+					<div class="MenuSeparator"></div>
+					<li id ="mnuCopy" class ="SubItem">
+						<p class="MenubarIcon MenubarCopy">&nbsp;</p>
+						Copy
+						<span class="MenuQuickButton">Ctrl+C</span>
+					</li>
+					<li id ="mnuPaste" class ="SubItem">
+						<p class="MenubarIcon MenubarPaste">&nbsp;</p>
+						Paste
+						<span class="MenuQuickButton">Ctrl+V</span>
+					</li>
+					<li id ="mnuDelete" class ="SubItem">DeleteValue</li>
+					<div class="MenuSeparator"></div>
+					<li id ="mnuClearStyle" class ="SubItem">
+						<p class="MenubarIcon MenubarStyle">&nbsp;</p>
+						ClearStyle
+					</li>
+					<li id ="mnuSheetRename" class ="SubItem">RenameSheet</li>
+					<li id ="mnuSheetHide" class ="SubItem">HideSheet</li>
+					<li id ="mnuMoveSheet" class ="SubItem">
+						MoveSheet
+						<span class="MenuArrow">&#9658;</span>
+						<ul class="uimargin" >
+							<li id ="mnuMoveRight" class ="SubItem">MoveRight</li>
+							<li id ="mnuMoveLeft" class ="SubItem">MoveLeft</li>
+						</ul>
+					</li>
+					<div class="MenuSeparator"></div>
+					<li id ="mnuDelColumn" class ="SubItem">DeleteColumn</li> 
+					<li id ="mnuDelRow" class ="SubItem">DeleteRow</li>
+					<li id ="mnuDelSheet" class ="SubItem">DeleteSheet</li> 		
+					<li id ="mnuRemoveHyperlink" class ="SubItem">RemoveLink</li>
+				</ul> 
+			</li>
+			<li class="item">
+				Insert
+				<ul class="margin_top_10">
+					<li id ="mnuAddImage" class ="SubItem">
+						<p class="MenubarIcon MenubarImage">&nbsp;</p>
+						Image
+					</li>
+					<li id ="mnuAddChart" class ="SubItem">
+						<p class="MenubarIcon MenubarChart">&nbsp;</p>
+						Chart
+					</li>
+					<li id ="mnuAddColumn" class ="SubItem">Columns
+						<span class="MenuArrow">&#9658;</span>
+						<ul class="uimargin" >
+							<li id ="mnuAddColumnLeft" class ="SubItem">
+								<p class="MenubarIcon">&nbsp;</p>
+								Слева
+							</li>
+							<li id ="mnuAddColumnRight" class ="SubItem">
+								<p class="MenubarIcon">&nbsp;</p>
+								Справа
+							</li>
+						</ul>
+					</li>
+					<li id ="mnuAddRow" class ="SubItem">Rows
+						<span class="MenuArrow">&#9658;</span>
+						<ul class="uimargin" >
+							<li id ="mnuAddRowBelow" class ="SubItem">
+								<p class="MenubarIcon">&nbsp;</p>
+								Ниже
+							</li>
+							<li id ="mnuAddColumnabove" class ="SubItem">
+								<p class="MenubarIcon">&nbsp;</p>
+								Выше
+							</li>
+						</ul>
+					</li>
+					<li id ="mnuAddSheet" class ="SubItem">Sheet</li>
+					<li id ="mnuAddHyperlink" class ="SubItem"><p class="MenubarIcon MenubarLink">&nbsp;</p>AddLink</li>
+					<div class="MenuSeparator">
+					</div>
+					<li id ="mnuFunction" class ="SubItem">
+						<p class="MenubarIcon MenubarFunction">&nbsp;</p>
+						Function
+						<span class="MenuArrow">&#9658;</span>
+						
+						<ul class="uimargin" >
+							<li id ="mnuSum" class ="SubItem" name="SUM">SUM</li>
+							<li id ="mnuMin" class ="SubItem" name="MIN">MIN</li>
+							<li id ="mnuMax" class ="SubItem" name="MAX">MAX</li>
+							<li id ="mnuCount" class ="SubItem" name="COUNT">COUNT</li>
+							<div class="MenuSeparator">
+							</div>
+							<li id ="mnuMore" class ="SubItem">MoreFunctions</li>
+						</ul>
+					</li>
+				</ul>
+			</li>
+			<li class="item">
+				Format
+				<ul class="margin_top_10">
+					<li id ="mnuNumber" class ="SubItem">
+						Number
+						<span class="MenuArrow">&#9658;</span>
+						<ul class="uimargin" >
+							<li class ="DigitItem selectable SubItem" fmt="0" grp="digit">
+								General
+								<span class="NumberShortCut">1050.105</span>
+							</li>
+							<li class ="DigitItem selectable SubItem" fmt="1" grp="digit">
+								Integer
+								<span class="NumberShortCut">1050</span>
+							</li>
+							<li class ="DigitItem selectable SubItem" fmt="11" grp="digit">
+								Scientific
+								<span class="NumberShortCut">1.05E+03</span>
+							</li>
+							<div class ="MenuSeparator"></div>
+							<li id ="mnuDate" class ="SubItem">Date
+								<span class="MenuArrow">&#9658;</span>
+								<ul class="uimargin"  style="width:232px;">
+									<li class ="DateItem selectable SubItem" fmt="14" grp="date">
+										07-24-88
+										<span class="DateShortCut">MM-dd-yy</span>
+									</li>
+									<li class ="DateItem selectable SubItem" fmt="=mm-dd-yyyy" grp="date">
+										07-24-1988
+										<span class="DateShortCut">MM-dd-yyyy</span>
+									</li>
+									<li class ="DateItem selectable SubItem" fmt="=dd-mm-yy" grp="date">
+										24-07-88
+										<span class="DateShortCut">dd-MM-yy</span>
+									</li>
+									<li class ="DateItem selectable SubItem" fmt="=dd-mm-yyyy" grp="date">
+										24-07-1988
+										<span class="DateShortCut">dd-MM-yyyy</span>
+									</li>
+									<li class ="DateItem selectable SubItem" fmt="15" grp="date">
+										24-Jul-88
+										<span class="DateShortCut">dd-MMM-yy</span>
+									</li>
+									<li class ="DateItem selectable SubItem" fmt="16" grp="date">
+										24-Jul
+										<span class="DateShortCut">dd-MMM</span>
+									</li>
+									<li class ="DateItem selectable SubItem" fmt="17" grp="date">
+										Jul-88
+										<span class="DateShortCut">MMM-yy</span>
+									</li>
+								</ul>
+							</li>
+							<li id ="mnuTime" class ="SubItem">Time
+								<span class="MenuArrow">&#9658;</span>
+								<ul class="uimargin" style="width:232px;">
+									<li class ="DateItem selectable SubItem" fmt="20" grp="date">
+										10:56
+										<span class="DateShortCut">HH:mm</span>
+									</li>
+									<li class ="DateItem selectable SubItem" fmt="21" grp="date">
+										21:56:00
+										<span class="DateShortCut">HH:MM:ss</span>
+									</li>
+									<li class ="DateItem selectable SubItem" fmt="18" grp="date">
+										05:56 AM
+										<span class="DateShortCut">hh:mm tt</span>
+									</li>
+									<li class ="DateItem selectable SubItem" fmt="19" grp="date">
+										05:56:00 AM
+										<span class="DateShortCut">hh:mm:ss tt</span>
+									</li>
+								</ul>
+							</li>		
+							<li id ="mnuDateAndTime" class ="SubItem">DateAndTime
+								<span class="MenuArrow">&#9658;</span>
+								<ul class="uimargin" style="width:232px;">		
+									<li class ="DateItem selectable SubItem" fmt="22" grp="date">
+										7/24/88 21:56
+										<span class="DateShortCut">MM/dd/yy HH:mm</span>
+									</li>
+								</ul>
+							</li>
+							<li id ="mnuPercent" class ="SubItem">PercentStyle</li>
+							<li id ="mnuCurrency" class ="SubItem">Currency
+								<span class="MenuArrow">&#9658;</span>
+								<ul class="uimargin" style="width: 130px;">
+									<li class ="MoneyItem selectable SubItem" fmt="=$#,##0.00" grp="money">
+										$
+										<span class="MoneyShortCut">Dollar</span>
+									</li>
+									<li class ="MoneyItem selectable SubItem" fmt="=&#8364;#,##0.00" grp="money">
+										&#8364;
+										<span class="MoneyShortCut">Euro</span>
+									</li>
+									<li class ="MoneyItem selectable SubItem" fmt="=#,##0.00&#1088;." grp="money">
+										p.
+										<span class="MoneyShortCut">Rubl</span>
+									</li>
+									<li class ="MoneyItem selectable SubItem" fmt="=&pound;#,##0.00" grp="money">
+										&#163;
+										<span class="MoneyShortCut">Pound</span>
+									</li>
+									<li class ="MoneyItem selectable SubItem" fmt="=&yen;#,##0.00" grp="money">
+										&#165;
+										<span class="MoneyShortCut">Yen</span>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</li>
+					<div class ="MenuSeparator"></div>
+					<li id ="mnuFontStyle" class ="SubItem">
+						FontStyle
+						<span class="MenuArrow">&#9658;</span>
+						<ul class="uimargin" >
+							<li id="mnuArial" class="SubItem" style="font-family:Arial;" value="Arial">Arial</li>
+							<li id="mnuArialBlack" class="SubItem" value="Arial Black" style="font-family:Arial Black;">Arial Black</li>
+							<li id="mnuArialCyr" class="SubItem" value="Arial Cyr" style="font-family:Arial Cyr;">Arial Cyr</li>
+							<li id="mnuCalibri" 	class="SubItem" style="font-family:Calibri;" value="Calibri">Calibri</li>
+							<li id="mnuCourierNew" 	class="SubItem" style="font-family:Courier New;" value="Courier New">Courier New</li>
+							<li id="mnuLucidaConsole" 	class="SubItem" value="Lucida Console" style="font-family:Lucida Console;">Lucida Console</li>
+							<li id="mnuMsSansSerif" class="SubItem" value="Ms Sans Serif" style="font-family:Ms Sans Serif;">Ms Sans Serif</li>
+							<li id="mnuTahoma" 	class="SubItem" style="font-family:Tahoma;" value="Tahoma">Tahoma</li>
+							<li id="mnuTimesNewRoman" 		class="SubItem" style="font-family:Times New Roman;" value="Times New Roman">Times New Roman</li>
+							<li id="mnuVerdana" 	class="SubItem" style="font-family:Verdana;" value="Verdana">Verdana</li>
+						</ul>
+					</li>
+					<li id ="mnuFontSize" class ="SubItem">
+						FontSize
+						<span class="MenuArrow">&#9658;</span>
+						<ul class="uimargin" style="min-width: 0 !important;">
+							<li id="mnu8" class="SubItem" value="8pt">8</li>
+							<li id="mnu9" class="SubItem" value="9pt">9</li>
+							<li id="mnu10" class="SubItem" value="10pt">10</li>
+							<li id="mnu11" class="SubItem" value="11pt">11</li>
+							<li id="mnu12" class="SubItem" value="12pt">12</li>
+							<li id="mnu14" class="SubItem" value="14pt">14</li>
+							<li id="mnu16" class="SubItem" value="16pt">16</li>
+							<li id="mnu18" class="SubItem" value="18pt">18</li>
+							<li id="mnu20" class="SubItem" value="20pt">20</li>
+							<li id="mnu22" class="SubItem" value="22pt">22</li>
+							<li id="mnu24" class="SubItem" value="24pt">24</li>
+							<li id="mnu26" class="SubItem" value="26pt">26</li>
+							<li id="mnu28" class="SubItem" value="28pt">28</li>
+							<li id="mnu30" class="SubItem" value="30pt">30</li>
+							<li id="mnu36" class="SubItem" value="36pt">36</li>
+						</ul>
+					</li>
+					<div class ="MenuSeparator"></div>
+					<li id ="mnuBold" class ="SubItem"><p class="MenubarIcon MenubarBold">&nbsp;</p>Bold<span class="MenuQuickButton">Ctrl+B</span></li>
+					<li id ="mnuItalic" class ="SubItem"><p class="MenubarIcon MenubarItalic">&nbsp;</p>Italic<span class="MenuQuickButton">Ctrl+I</span></li>
+					<li id ="mnuUnderline" class ="SubItem"><p class="MenubarIcon MenubarUnderline">&nbsp;</p>Underline<span class="MenuQuickButton">Ctrl+U</span></li>
+					<div class ="MenuSeparator"></div>
+					<li id ="mnuHorizontAlign" class ="SubItem">
+						AlignHor
+						<span class="MenuArrow">&#9658;</span>
+						<ul class="uimargin" >
+							<li id="mnuAlignTextLeft" class="SubItem">
+								<p class="MenubarIcon MenubarLeft">&nbsp;</p>
+								AlignTextLeft
+							</li>
+							<li id="mnuAlignTextCenter" class="SubItem">
+								<p class="MenubarIcon MenubarCenter">&nbsp;</p>
+								AlignTextCenter
+							</li>
+							<li id="mnuAlignTextRight" class="SubItem">
+								<p class="MenubarIcon MenubarRight">&nbsp;</p>
+								AlignTextRight
+							</li>
+							<li id="mnuAlignTextJustify" class=" SubItem">
+								<p class="MenubarIcon MenubarJustified">&nbsp;</p>
+								AlignTextJustify
+							</li>
+						</ul>
+					</li>
+					<li id ="mnuVerticalAlign" class ="SubItem">
+						AlignVert
+						<span class="MenuArrow">&#9658;</span>
+						<ul class="uimargin" >
+							<li id="mnuVerticalAlignTextTop" class="SubItem">
+								<p class="MenubarIcon MenubarTop">&nbsp;</p>
+								VerticalAlignTextTop
+							</li>
+							<li id="mnuVerticalAlignTextMiddle" class="SubItem">
+								<p class="MenubarIcon MenubarMiddle">&nbsp;</p>
+								VerticalAlignTextMiddle
+							</li>
+							<li id="mnuVerticalAlignTextBottom" class="SubItem">
+								<p class="MenubarIcon MenubarBottom">&nbsp;</p>
+								VerticalAlignTextBottom
+							</li>
+						</ul>
+					</li>				
+					<li id ="mnuWrap" class ="SubItem"><p class="MenubarIcon MenubarWrap">&nbsp;</p>WrapText</li>
+					<li id ="mnuFontColor" class ="SubItem">TextColor
+						<p class="MenubarIcon MenubarFontColor">&nbsp;</p>
+						<span class="MenuArrow">&#9658;</span>
+						<ul class="uimargin" >
+							<li id="colorBox3" style="min-width: 0;width: 125px;">
+							</li>
+						</ul>
+					</li>
+					<li id ="mnuBGColor" class ="SubItem">
+						<p class="MenubarIcon MenubarBGColor">&nbsp;</p>
+						TextBG
+						<span class="MenuArrow">&#9658;</span>
+						<ul class="uimargin" >
+							<li id="colorBox4" style="min-width: 0;width: 125px;">
+							</li>
+						</ul>
+					</li>
+					<li id ="mnuBorders" class ="SubItem">
+						Borders
+						<p class="MenubarIcon mnu_brd_st1365">&nbsp;</p>
+						<span class="MenuArrow">&#9658;</span>
+						<ul class="uimargin" >
+							<li id="mnubrd_options" style="height: 40px;width: 105px;">
+								<table><tr>
+								<td class="icon selectable" id = "brd_st1365"><img class="brdImg brd_st1365" src="menu/img/spacer.gif"/></td>
+								<td class="icon selectable" id = "brd_st85"><img class="brdImg brd_st85" src="menu/img/spacer.gif"/></td>
+								<td class="icon selectable" id = "brd_st64"><img class="brdImg brd_st64" src="menu/img/spacer.gif"/></td>
+								<td class="icon selectable" id = "brd_st1"><img class="brdImg brd_st1" src="menu/img/spacer.gif"/></td>
+								<td class="icon selectable" id = "brd_st16"><img class="brdImg brd_st16" src="menu/img/spacer.gif"/></td>
+								<td class="icon selectable" id = "brd_st4"><img class="brdImg brd_st4" src="menu/img/spacer.gif"/></td>
+								<td class="icon selectable" id = "brd_st0"><img class="brdImg brd_st0" src="menu/img/spacer.gif"/></td></tr><tr>
+								<td class="icon selectable" id = "brd_st1280"><img class="brdImg brd_st1280" src="menu/img/spacer.gif"/></td>
+								<td class="icon selectable" id = "brd_st324"><img class="brdImg brd_st324" src="menu/img/spacer.gif"/></td>
+								<td class="icon selectable" id = "brd_st1041"><img class="brdImg brd_st1041" src="menu/img/spacer.gif"/></td>
+								<td class="icon selectable" id = "brd_st341"><img class="brdImg brd_st341" src="menu/img/spacer.gif"/></td>
+								<td class="icon selectable" id = "brd_st1109"><img class="brdImg brd_st1109" src="menu/img/spacer.gif"/></td>
+								<td class="icon selectable" id = "brd_st170"><img class="brdImg brd_st170" src="menu/img/spacer.gif"/></td>
+								<td class="icon selectable" id = "brd_st1450"><img class="brdImg brd_st1450" src="menu/img/spacer.gif"/></td>
+								</tr></table>
+							</li>
+						</ul>
+					</li>
+					<li id ="mnuMerge" class ="SubItem"><p class="MenubarIcon MenubarMerge">&nbsp;</p>MergeCells</li>
+					<li id ="mnuDecimal" class ="SubItem">Decimal
+						<span class="MenuArrow">&#9658;</span>
+						<ul class="uimargin" >
+							<li id="mnutd_fmt_up"  class="SubItem"><p class="MenubarIcon MenubarIncreaseXLS">&nbsp;</p>IncreaseDecimal</li>
+							<li id="mnutd_fmt_down"  class="SubItem"><p class="MenubarIcon MenubarDecreaseXLS">&nbsp;</p>DecreaseDecimal</li>
+						</ul>
+					</li>
+				</ul>
+			</li> 
+			<li class="item">
+				Data
+				<ul class="margin_top_10">
+					<li id ="mnuSortAscending" class ="SubItem"><p class="MenubarIcon MenubarSortAscending">&nbsp;</p>SortAscending</li> 
+					<li id ="mnuSortDescending" class ="SubItem"><p class="MenubarIcon MenubarSortDescending">&nbsp;</p>SortDescending</li>
+				</ul>
+			</li>
+			<li class="item">
+				Help
+				<ul class="margin_top_10">
+					<!--<li id ="mnuAbout" class ="SubItem"><p class="MenubarIcon MenubarAbout">&nbsp;</p>About</li>-->
+					<li id ="mnuShortcuts" class ="SubItem">KeyboardShortcuts</li>
+				</ul> 
+			</li> 
+		</ul> 
+	</td>
+</tr>
+<tr  class="buttonholderhelper" style="display:none;">
+	<td colspan="3" style="    background-color: #EEF0F2;height: 40px;    padding-left: 2px;    padding-right: 2px;    top: 21px;    vertical-align: middle;">
+		<table id="tableHelper" style="padding-left: 10px;height:22px; vertical-align:top; border-collapse: separate;">
+			<tr class="cpholder"></tr>
+		</table>
+	</td>
+</tr>
+<tr class="buttonholderhelper" style="display:none;"><td colspan="3" class="separatingLine"></td></tr>
+<tr>
+	<td  id="toolbar" colspan="3">
+		
+		<table style="padding-left: 10px;height:22px; vertical-align:top; border-collapse: separate">
+		<tr>
+			<td class="cp ToolbarIconOut selectableIcon" title="Back">
+				<div id="td_backButton" class="iconToolbar" style="background:url('menu/img/butt_back.png') no-repeat -6px -6px">
+							<img class=""  src="menu/img/spacer.gif"/>
+						</div>
+			</td>
+			<td class="sepTD toolbarSep cp" style="width: 10px;min-width:10px;"></td>
+			
+			<td id="menuButtonHolder" style="vertical-align:middle;background-color: #EEF0F2;min-width:82px;" class="cp">
+				
+				<ul id="menuButton" style="width: 68px;">
+					<span class="menuButtonLeft"></span>
+					<li class="item main menuButtonLiTop" style="width:79px;line-height: 20px;z-index:5;padding:0;">
+						<span class="menuTitle">Menu</span>
+						<ul class="positionmenubatton">
+							<li id ="mnuSave" class="SubItem" style="display:none;">
+								<p class="MenubarIcon MenubarSaveAs">&nbsp;</p>
+								Save
+							</li>
+							<li id ="mnuSaveAs" class ="SubItem">
+								<p class="MenubarIcon MenubarSaveAs">&nbsp;</p>
+								SaveAs
+								<span class="MenuArrow">&#9658;</span>
+								
+								<ul class="uimargin" >
+									<li id ="mnuSaveXls" class ="SubItem">XLS</li>
+									<li id ="mnuSaveXlsx" class ="SubItem">XLSX</li>
+									<li id ="mnuSaveOds" class ="SubItem">ODS</li>
+									<li id ="mnuSaveCsv" class ="SubItem">CSV</li>
+									<li id ="mnuSaveHtml" class ="SubItem">HTML</li>
+								</ul>
+							</li>
+							<li id ="mnuPrint" class ="SubItem">
+								<p class="MenubarIcon MenubarPrint">&nbsp;</p>
+								Print
+								<span class="MenuQuickButton">Ctrl+P</span>
+							</li>
+							<div class="MenuSeparator"></div>
+							<li class="SubItem">
+								Edit
+								<span class="MenuArrow">&#9658;</span>
+								<ul class="uimargin" >
+									<li id ="mnuUndo" class ="SubItem">
+										<p class="MenubarIcon MenubarUndo">&nbsp;</p>
+										Undo
+										<span class="MenuQuickButton">Ctrl+Z</span>
+									</li>
+									<li id ="mnuRedo" class ="SubItem">
+										<p class="MenubarIcon MenubarRedo">&nbsp;</p>
+										Redo
+										<span class="MenuQuickButton">Ctrl+Y</span>
+									</li>
+									<div class="MenuSeparator"></div>
+									<li id ="mnuCopy" class ="SubItem">
+										<p class="MenubarIcon MenubarCopy">&nbsp;</p>
+										Copy
+										<span class="MenuQuickButton">Ctrl+C</span>
+									</li>
+									<li id ="mnuPaste" class ="SubItem">
+										<p class="MenubarIcon MenubarPaste">&nbsp;</p>
+										Paste
+										<span class="MenuQuickButton">Ctrl+V</span>
+									</li>
+									<li id ="mnuDelete" class ="SubItem">DeleteValue</li>
+									<div class="MenuSeparator"></div>
+									<li id ="mnuClearStyle" class ="SubItem">
+										<p class="MenubarIcon MenubarStyle">&nbsp;</p>
+										ClearStyle
+									</li>
+									<li id ="mnuSheetRename" class ="SubItem">RenameSheet</li>
+									<li id ="mnuSheetHide" class ="SubItem">HideSheet</li>
+									<li id ="mnuMoveSheet" class ="SubItem">
+										MoveSheet
+										<span class="MenuArrow">&#9658;</span>
+										<ul class="uimargin" >
+											<li id ="mnuMoveRight" class ="SubItem">MoveRight</li>
+											<li id ="mnuMoveLeft" class ="SubItem">MoveLeft</li>
+										</ul>
+									</li>
+									<div class="MenuSeparator"></div>
+									<li id ="mnuDelColumn" class ="SubItem">DeleteColumn</li> 
+									<li id ="mnuDelRow" class ="SubItem">DeleteRow</li>
+									<li id ="mnuDelSheet" class ="SubItem">DeleteSheet</li> 		
+									<li id ="mnuRemoveHyperlink" class ="SubItem">RemoveLink</li>
+								</ul> 
+							</li>
+							<li class="SubItem">
+								Insert
+								<span class="MenuArrow">&#9658;</span>
+								<ul class="uimargin" >
+									<li id ="mnuAddImage" class ="SubItem">
+										<p class="MenubarIcon MenubarImage">&nbsp;</p>
+										Image
+									</li>
+									<li id ="mnuAddChart" class ="SubItem">
+										<p class="MenubarIcon MenubarChart">&nbsp;</p>
+										Chart
+									</li>
+									<li id ="mnuAddColumn" class ="SubItem">Columns
+										<span class="MenuArrow">&#9658;</span>
+										<ul class="uimargin" >
+											<li id ="mnuAddColumnLeft" class ="SubItem">
+												<p class="MenubarIcon">&nbsp;</p>
+												Слева
+											</li>
+											<li id ="mnuAddColumnRight" class ="SubItem">
+												<p class="MenubarIcon">&nbsp;</p>
+												Справа
+											</li>
+										</ul>
+									</li>
+									<li id ="mnuAddRow" class ="SubItem">Rows<span class="MenuArrow">&#9658;</span>
+										<ul class="uimargin" >
+											<li id ="mnuAddRowBelow" class ="SubItem">
+												<p class="MenubarIcon">&nbsp;</p>
+												Ниже
+											</li>
+											<li id ="mnuAddColumnabove" class ="SubItem">
+												<p class="MenubarIcon">&nbsp;</p>
+												Выше
+											</li>
+										</ul>
+									</li>
+									<li id ="mnuAddSheet" class ="SubItem">Sheet</li>
+									<li id ="mnuAddHyperlink" class ="SubItem"><p class="MenubarIcon MenubarLink">&nbsp;</p>AddLink</li>
+									<div class="MenuSeparator">
+									</div>
+									<li id ="mnuFunction" class ="SubItem">
+										<p class="MenubarIcon MenubarFunction">&nbsp;</p>
+										Function
+										<span class="MenuArrow">&#9658;</span>
+										
+										<ul class="uimargin" >
+											<li id ="mnuSum" class ="SubItem" name="SUM">SUM</li>
+											<li id ="mnuMin" class ="SubItem" name="MIN">MIN</li>
+											<li id ="mnuMax" class ="SubItem" name="MAX">MAX</li>
+											<li id ="mnuCount" class ="SubItem" name="COUNT">COUNT</li>
+											<div class="MenuSeparator">
+											</div>
+											<li id ="mnuMore" class ="SubItem">MoreFunctions</li>
+										</ul>
+									</li>
+								</ul>
+							</li>
+							<li class="SubItem">
+								Format
+								<span class="MenuArrow">&#9658;</span>
+								<ul class="uimargin" >
+									<li id ="mnuNumber" class ="SubItem">
+										Number
+										<span class="MenuArrow">&#9658;</span>
+										<ul class="uimargin" >
+											<li class ="DigitItem selectable SubItem" fmt="0" grp="digit">
+												General
+												<span class="NumberShortCut">1050.105</span>
+											</li>
+											<li class ="DigitItem selectable SubItem" fmt="1" grp="digit">
+												Integer
+												<span class="NumberShortCut">1050</span>
+											</li>
+											<li class ="DigitItem selectable SubItem" fmt="11" grp="digit">
+												Scientific
+												<span class="NumberShortCut">1.05E+03</span>
+											</li>
+											<div class ="MenuSeparator"></div>
+											<li id ="mnuDate" class ="SubItem">Date
+												<span class="MenuArrow">&#9658;</span>
+												<ul class="uimargin" style="width:232px;">
+													<li class ="DateItem selectable SubItem" fmt="14" grp="date">
+														07-24-88
+														<span class="DateShortCut">MM-dd-yy</span>
+													</li>
+													<li class ="DateItem selectable SubItem" fmt="=mm-dd-yyyy" grp="date">
+														07-24-1988
+														<span class="DateShortCut">MM-dd-yyyy</span>
+													</li>
+													<li class ="DateItem selectable SubItem" fmt="=dd-mm-yy" grp="date">
+														24-07-88
+														<span class="DateShortCut">dd-MM-yy</span>
+													</li>
+													<li class ="DateItem selectable SubItem" fmt="=dd-mm-yyyy" grp="date">
+														24-07-1988
+														<span class="DateShortCut">dd-MM-yyyy</span>
+													</li>
+													<li class ="DateItem selectable SubItem" fmt="15" grp="date">
+														24-Jul-88
+														<span class="DateShortCut">dd-MMM-yy</span>
+													</li>
+													<li class ="DateItem selectable SubItem" fmt="16" grp="date">
+														24-Jul
+														<span class="DateShortCut">dd-MMM</span>
+													</li>
+													<li class ="DateItem selectable SubItem" fmt="17" grp="date">
+														Jul-88
+														<span class="DateShortCut">MMM-yy</span>
+													</li>
+												</ul>
+											</li>
+											<li id ="mnuTime" class ="SubItem">Time
+												<span class="MenuArrow">&#9658;</span>
+												<ul class="uimargin" style="width:232px;">
+													<li class ="DateItem selectable SubItem" fmt="20" grp="date">
+														10:56
+														<span class="DateShortCut">HH:mm</span>
+													</li>
+													<li class ="DateItem selectable SubItem" fmt="21" grp="date">
+														21:56:00
+														<span class="DateShortCut">HH:MM:ss</span>
+													</li>
+													<li class ="DateItem selectable SubItem" fmt="18" grp="date">
+														05:56 AM
+														<span class="DateShortCut">hh:mm tt</span>
+													</li>
+													<li class ="DateItem selectable SubItem" fmt="19" grp="date">
+														05:56:00 AM
+														<span class="DateShortCut">hh:mm:ss tt</span>
+													</li>
+												</ul>
+											</li>		
+											<li id ="mnuDateAndTime" class ="SubItem">DateAndTime
+												<span class="MenuArrow">&#9658;</span>
+												<ul class="uimargin" style="width:232px;">		
+													<li class ="DateItem selectable SubItem" fmt="22" grp="date">
+														7/24/88 21:56
+														<span class="DateShortCut">MM/dd/yy HH:mm</span>
+													</li>
+												</ul>
+											</li>
+											<li id ="mnuPercent" class ="SubItem">PercentStyle</li>
+											<li id ="mnuCurrency" class ="SubItem">Currency
+												<span class="MenuArrow">&#9658;</span>
+												<ul class="uimargin" style="width: 130px;">
+													<li class ="MoneyItem selectable SubItem" fmt="=$#,##0.00" grp="money">
+														$
+														<span class="MoneyShortCut">Dollar</span>
+													</li>
+													<li class ="MoneyItem selectable SubItem" fmt="=&#8364;#,##0.00" grp="money">
+														&#8364;
+														<span class="MoneyShortCut">Euro</span>
+													</li>
+													<li class ="MoneyItem selectable SubItem" fmt="=#,##0.00&#1088;." grp="money">
+														p.
+														<span class="MoneyShortCut">Rubl</span>
+													</li>
+													<li class ="MoneyItem selectable SubItem" fmt="=&pound;#,##0.00" grp="money">
+														&#163;
+														<span class="MoneyShortCut">Pound</span>
+													</li>
+													<li class ="MoneyItem selectable SubItem" fmt="=&yen;#,##0.00" grp="money">
+														&#165;
+														<span class="MoneyShortCut">Yen</span>
+													</li>
+												</ul>
+											</li>
+										</ul>
+									</li>
+									<div class ="MenuSeparator"></div>
+									<li id ="mnuFontStyle" class ="SubItem">
+										FontStyle
+										<span class="MenuArrow">&#9658;</span>
+										<ul class="uimargin" >
+											<li id="mnuArial" class="SubItem" style="font-family:Arial;" value="Arial">Arial</li>
+											<li id="mnuArialBlack" class="SubItem" value="Arial Black" style="font-family:Arial Black;">Arial Black</li>
+											<li id="mnuArialCyr" class="SubItem" value="Arial Cyr" style="font-family:Arial Cyr;">Arial Cyr</li>
+											<li id="mnuCalibri" 	class="SubItem" style="font-family:Calibri;" value="Calibri">Calibri</li>
+											<li id="mnuCourierNew" 	class="SubItem" style="font-family:Courier New;" value="Courier New">Courier New</li>
+											<li id="mnuLucidaConsole" 	class="SubItem" value="Lucida Console" style="font-family:Lucida Console;">Lucida Console</li>
+											<li id="mnuMsSansSerif" class="SubItem" value="Ms Sans Serif" style="font-family:Ms Sans Serif;">Ms Sans Serif</li>
+											<li id="mnuTahoma" 	class="SubItem" style="font-family:Tahoma;" value="Tahoma">Tahoma</li>
+											<li id="mnuTimesNewRoman" 		class="SubItem" style="font-family:Times New Roman;" value="Times New Roman">Times New Roman</li>
+											<li id="mnuVerdana" 	class="SubItem" style="font-family:Verdana;" value="Verdana">Verdana</li>
+										</ul>
+									</li>
+									<li id ="mnuFontSize" class ="SubItem">
+										FontSize
+										<span class="MenuArrow">&#9658;</span>
+										<ul class="uimargin" >
+											<li id="mnu8" class="SubItem" value="8pt">8</li>
+											<li id="mnu9" class="SubItem" value="9pt">9</li>
+											<li id="mnu10" class="SubItem" value="10pt">10</li>
+											<li id="mnu11" class="SubItem" value="11pt">11</li>
+											<li id="mnu12" class="SubItem" value="12pt">12</li>
+											<li id="mnu14" class="SubItem" value="14pt">14</li>
+											<li id="mnu16" class="SubItem" value="16pt">16</li>
+											<li id="mnu18" class="SubItem" value="18pt">18</li>
+											<li id="mnu20" class="SubItem" value="20pt">20</li>
+											<li id="mnu22" class="SubItem" value="22pt">22</li>
+											<li id="mnu24" class="SubItem" value="24pt">24</li>
+											<li id="mnu26" class="SubItem" value="26pt">26</li>
+											<li id="mnu28" class="SubItem" value="28pt">28</li>
+											<li id="mnu30" class="SubItem" value="30pt">30</li>
+											<li id="mnu36" class="SubItem" value="36pt">36</li>
+										</ul>
+									</li>
+									<div class ="MenuSeparator"></div>
+									<li id ="mnuBold" class ="SubItem"><p class="MenubarIcon MenubarBold">&nbsp;</p>Bold<span class="MenuQuickButton">Ctrl+B</span></li>
+									<li id ="mnuItalic" class ="SubItem"><p class="MenubarIcon MenubarItalic">&nbsp;</p>Italic<span class="MenuQuickButton">Ctrl+I</span></li>
+									<li id ="mnuUnderline" class ="SubItem"><p class="MenubarIcon MenubarUnderline">&nbsp;</p>Underline<span class="MenuQuickButton">Ctrl+U</span></li>
+									<div class ="MenuSeparator"></div>
+									<li id ="mnuHorizontAlign" class ="SubItem">
+										AlignHor
+										<span class="MenuArrow">&#9658;</span>
+										<ul class="uimargin" >
+											<li id="mnuAlignTextLeft" class="SubItem">
+												<p class="MenubarIcon MenubarLeft">&nbsp;</p>
+												AlignTextLeft
+											</li>
+											<li id="mnuAlignTextCenter" class="SubItem">
+												<p class="MenubarIcon MenubarCenter">&nbsp;</p>
+												AlignTextCenter
+											</li>
+											<li id="mnuAlignTextRight" class="SubItem">
+												<p class="MenubarIcon MenubarRight">&nbsp;</p>
+												AlignTextRight
+											</li>
+											<li id="mnuAlignTextJustify" class=" SubItem">
+												<p class="MenubarIcon MenubarJustified">&nbsp;</p>
+												AlignTextJustify
+											</li>
+										</ul>
+									</li>
+									<li id ="mnuVerticalAlign" class ="SubItem">
+										AlignVert
+										<span class="MenuArrow">&#9658;</span>
+										<ul class="uimargin" >
+											<li id="mnuVerticalAlignTextTop" class="SubItem">
+												<p class="MenubarIcon MenubarTop">&nbsp;</p>
+												VerticalAlignTextTop
+											</li>
+											<li id="mnuVerticalAlignTextMiddle" class="SubItem">
+												<p class="MenubarIcon MenubarMiddle">&nbsp;</p>
+												VerticalAlignTextMiddle
+											</li>
+											<li id="mnuVerticalAlignTextBottom" class="SubItem">
+												<p class="MenubarIcon MenubarBottom">&nbsp;</p>
+												VerticalAlignTextBottom
+											</li>
+										</ul>
+									</li>				
+									<li id ="mnuWrap" class ="SubItem"><p class="MenubarIcon MenubarWrap">&nbsp;</p>WrapText</li>
+									<li id ="mnuFontColor" class ="SubItem">TextColor
+										<p class="MenubarIcon MenubarFontColor">&nbsp;</p>
+										<span class="MenuArrow">&#9658;</span>
+										<ul class="uimargin" >
+											<li id="colorBox3" style="min-width: 0;width: 125px;">
+											</li>
+										</ul>
+									</li>
+									<li id ="mnuBGColor" class ="SubItem">
+										<p class="MenubarIcon MenubarBGColor">&nbsp;</p>
+										TextBG
+										<span class="MenuArrow">&#9658;</span>
+										<ul class="uimargin" >
+											<li id="colorBox4" style="min-width: 0;width: 125px;">
+											</li>
+										</ul>
+									</li>
+									<li id ="mnuBorders" class ="SubItem">
+										Borders
+										<p class="MenubarIcon mnu_brd_st1365">&nbsp;</p>
+										<span class="MenuArrow">&#9658;</span>
+										<ul class="uimargin" >
+											<li id="mnubrd_options" style="height: 40px;width: 105px;">
+												<table><tr>
+												<td class="icon selectable" id = "brd_st1365"><img class="brdImg brd_st1365" src="menu/img/spacer.gif"/></td>
+												<td class="icon selectable" id = "brd_st85"><img class="brdImg brd_st85" src="menu/img/spacer.gif"/></td>
+												<td class="icon selectable" id = "brd_st64"><img class="brdImg brd_st64" src="menu/img/spacer.gif"/></td>
+												<td class="icon selectable" id = "brd_st1"><img class="brdImg brd_st1" src="menu/img/spacer.gif"/></td>
+												<td class="icon selectable" id = "brd_st16"><img class="brdImg brd_st16" src="menu/img/spacer.gif"/></td>
+												<td class="icon selectable" id = "brd_st4"><img class="brdImg brd_st4" src="menu/img/spacer.gif"/></td>
+												<td class="icon selectable" id = "brd_st0"><img class="brdImg brd_st0" src="menu/img/spacer.gif"/></td></tr><tr>
+												<td class="icon selectable" id = "brd_st1280"><img class="brdImg brd_st1280" src="menu/img/spacer.gif"/></td>
+												<td class="icon selectable" id = "brd_st324"><img class="brdImg brd_st324" src="menu/img/spacer.gif"/></td>
+												<td class="icon selectable" id = "brd_st1041"><img class="brdImg brd_st1041" src="menu/img/spacer.gif"/></td>
+												<td class="icon selectable" id = "brd_st341"><img class="brdImg brd_st341" src="menu/img/spacer.gif"/></td>
+												<td class="icon selectable" id = "brd_st1109"><img class="brdImg brd_st1109" src="menu/img/spacer.gif"/></td>
+												<td class="icon selectable" id = "brd_st170"><img class="brdImg brd_st170" src="menu/img/spacer.gif"/></td>
+												<td class="icon selectable" id = "brd_st1450"><img class="brdImg brd_st1450" src="menu/img/spacer.gif"/></td>
+												</tr></table>
+											</li>
+										</ul>
+									</li>
+									<li id ="mnuMerge1" class ="SubItem"><p class="MenubarIcon MenubarMerge">&nbsp;</p>MergeCells</li>
+									<li id ="mnuDecimal" class ="SubItem">Decimal
+										<span class="MenuArrow">&#9658;</span>
+										<ul class="uimargin" >
+											<li id="mnutd_fmt_up"  class="SubItem"><p class="MenubarIcon MenubarIncreaseXLS">&nbsp;</p>IncreaseDecimal</li>
+											<li id="mnutd_fmt_down"  class="SubItem"><p class="MenubarIcon MenubarDecreaseXLS">&nbsp;</p>DecreaseDecimal</li>
+										</ul>
+									</li>
+								</ul>
+							</li> 
+							<li class="SubItem">
+								Data
+								<span class="MenuArrow">&#9658;</span>
+								<ul class="uimargin" >
+									<li id ="mnuSortAscending" class ="SubItem"><p class="MenubarIcon MenubarSortAscending">&nbsp;</p>SortAscending</li> 
+									<li id ="mnuSortDescending" class ="SubItem"><p class="MenubarIcon MenubarSortDescending">&nbsp;</p>SortDescending</li>
+								</ul>
+							</li>
+							<div class="MenuSeparator"></div>
+							<li id="sm" class="SubItem">ShowMenu</li>
+							<li id ="mnuShortcuts" class ="SubItem">KeyboardShortcuts</li>
+						</ul>
+						<div class="ToolbarDropDown dropDownMenu" style="margin-bottom:4px;float: left;z-index:1;"></div>
+					</li>
+					<span class="menuButtonRight"></span>
+				</ul>
+				
+			</td>
+			
+			<td class="cp toolbarSep" style="vertical-align: top; width: 15px;min-width:15px;">
+				<div class="sepMenu ToolbarIconOut" style="position: absolute; background: url('menu/img/sep.png') no-repeat scroll 0pt 0pt transparent; margin-top: -7px; height: 40px; margin-left: 6px;"></div>
+			</td>
+			
+			<td class="printholder ToolbarIconOut selectableIcon" title="Print (Ctrl+P)">
+				<div id="td_print" class="iconToolbar">
+					<img class="ToolbarIcon ToolbarPrint" src="menu/img/spacer.gif"/>
+				</div>
+			</td>
+			<td class="ToolbarIconOut selectableIcon" title="Undo (Ctrl+Z)">
+				<div id="td_undo" class="iconToolbar">
+					<img class="ToolbarIcon ToolbarUndo" src="menu/img/spacer.gif"/>
+				</div>
+			</td>
+			<td class="ToolbarIconOut selectableIcon" title="Redo (Ctrl+Y)">
+				<div id="td_redo" class="iconToolbar">
+					<img class="ToolbarIcon ToolbarRedo" src="menu/img/spacer.gif"/>
+				</div>
+			</td>
+			<td class="toolbarSep">
+				<div class="ToolbarIconOut">
+					<img src="menu/img/Border.png"/>
+				</div>
+			</td>
+			<td style="min-width: 211px;vertical-align:middle;">
+				<div>
+				<ul id="textMenu">
+					<li id="fontSelect" class="item main textSelect textSelectBoard ToolbarIconOut" value="Arial">
+					<span id="fontSelectVal">Arial</span>
+						<ul style="width: 250px; height: 250px;overflow-y: scroll;">
+							<li id="Arial" class="SubItem" style="font-family:Arial;" value="Arial">Arial</li>
+							<li id="ArialBlack" class="SubItem" value="Arial Black" style="font-family:Arial Black;">Arial Black</li>
+							<li id="ArialCyr" class="SubItem" value="Arial Cyr" style="font-family:Arial Cyr;">Arial Cyr</li>
+							<li id="Calibri" 	class="SubItem" style="font-family:Calibri;" value="Calibri">Calibri</li>
+							<li id="CourierNew" 	class="SubItem" style="font-family:Courier New;" value="Courier New">Courier New</li>
+							<li id="LucidaConsole" 	class="SubItem" value="Lucida Console" style="font-family:Lucida Console;">Lucida Console</li>
+							<li id="MsSansSerif" class="SubItem" value="Ms Sans Serif" style="font-family:Ms Sans Serif;">Ms Sans Serif</li>
+							<li id="Tahoma" 	class="SubItem" style="font-family:Tahoma;" value="Tahoma">Tahoma</li>
+							<li id="TimesNewRoman" 		class="SubItem" style="font-family:Times New Roman;" value="Times New Roman">Times New Roman</li>
+							<li id="Verdana" 	class="SubItem" style="font-family:Verdana;" value="Verdana">Verdana</li>
+						</ul>
+						<div class="ToolbarDropDown dropdown" style="margin-top: 5px;margin-right: -3px;"></div>
+					</li>
+					<li id="fontSizeSelect" class="item main textSelect textSelectBoard ToolbarIconOut" value="12">
+					<span id="fontSizeSelectVal">12</span>
+						<ul style="width:45px;text-align:center;">
+							<li id="8" class="SubItem" value="8pt">8</li>
+							<li id="9" class="SubItem" value="9pt">9</li>
+							<li id="10" class="SubItem" value="10pt">10</li>
+							<li id="11" class="SubItem" value="11pt">11</li>
+							<li id="12" class="SubItem" value="12pt">12</li>
+							<li id="14" class="SubItem" value="14pt">14</li>
+							<li id="16" class="SubItem" value="16pt">16</li>
+							<li id="18" class="SubItem" value="18pt">18</li>
+							<li id="20" class="SubItem" value="20pt">20</li>
+							<li id="22" class="SubItem" value="22pt">22</li>
+							<li id="24" class="SubItem" value="24pt">24</li>
+							<li id="26" class="SubItem" value="26pt">26</li>
+							<li id="28" class="SubItem" value="28pt">28</li>
+							<li id="30" class="SubItem" value="30pt">30</li>
+							<li id="36" class="SubItem" value="36pt">36</li>
+						</ul>
+						<div class="ToolbarDropDown dropdown" style="margin-top: 5px;margin-right: -3px;"></div>
+					</li>
+				</ul>
+				</div>
+			</td>
+			<td id="td_bold" class="ToolbarIconOut selectableIcon iconToolbar" title="Bold (Ctrl+B)">
+				<img class="toolbarImg bold" src="menu/img/spacer.gif"/>
+			</td>
+			<td id="td_italic" class="ToolbarIconOut selectableIcon iconToolbar" title="Italic (Ctrl+I)">
+				<img class="toolbarImg italic" src="menu/img/spacer.gif"/>
+			</td>
+			<td id="td_underline" class="ToolbarIconOut selectableIcon iconToolbar" title="Underline (Ctrl+U)">
+				<img class="toolbarImg underline" src="menu/img/spacer.gif"/>
+			</td>
+			<td class="toolbarSep">
+				<div class="ToolbarIconOut">
+					<img src="menu/img/Border.png"/>
+				</div>
+			</td>
+			<td id="td_ta_left" class="ToolbarIconOut selectableIcon iconToolbar" title="AlignTextLeft">
+				<img class="toolbarImg align_left" src="menu/img/spacer.gif"/>
+			</td>
+			<td id="td_ta_center" class="ToolbarIconOut selectableIcon iconToolbar" title="AlignTextCenter">
+				<img class="toolbarImg align_center" src="menu/img/spacer.gif"/>
+			</td>
+			<td id="td_ta_right" class="ToolbarIconOut selectableIcon iconToolbar" title="AlignTextRight">
+				<img class="toolbarImg align_right" src="menu/img/spacer.gif"/>
+			</td>
+			<td id="td_ta_justify" class="ToolbarIconOut selectableIcon iconToolbar" title="AlignTextJustify">
+				<img class="toolbarImg align_justify" src="menu/img/spacer.gif"/>
+			</td>
+			<td id="td_verticalAlign" class="ToolbarIconOut selectableIcon iconToolbar" title="AlignVert" style="padding: 0px;">
+				<div id="td_va" class="ToolbarButtonCaption" al="bottom">
+					<div class="toolbarImg valign_bottom"></div>
+				</div>
+				<div id="td_va_choose" class="ToolbarDropDownInner">
+					<div class="ToolbarDropDown"></div>
+				</div>
+			</td>
+			<td id="td_text_wrap" class="ToolbarIconOut selectableIcon iconToolbar" title="WrapText">
+				<img class="toolbarImg text_wrap" src="menu/img/spacer.gif"/>
+			</td>
+			<td class="toolbarSep">
+				<div class="ToolbarIconOut">
+					<img src="menu/img/Border.png"/>
+				</div>
+			</td>
+			<td id="td_BackgroundColor" class="ToolbarIconOut selectableIcon iconToolbar" title="TextBG" style="padding: 0px;">
+					<div class="ToolbarButtonCaption clrSelector1">
+						<div class="ToolbarColorIndicator">
+							<div class="toolbarImg bg_fill"></div>
+						</div>
+					</div>
+				<div class="ToolbarDropDownInner clrPicker1">
+					<div class="ToolbarDropDown"></div>
+				</div>
+			</td>
+			<td id="td_TextColor" class="ToolbarIconOut selectableIcon iconToolbar" title="TextColor" style="padding: 0px;">
+				<div class="ToolbarButtonCaption clrSelector2">
+					<div class="ToolbarColorIndicator2">
+						<div class="toolbarImg txt_color"></div>
+					</div>
+				</div>
+				<div class="ToolbarDropDownInner clrPicker2">
+					<div class="ToolbarDropDown"></div>
+				</div>
+			</td>
+			<td id="td_Border" class="ToolbarIconOut selectableIcon iconToolbar" title="Borders" style="padding: 0px;">
+				<div id="td_cellBorder" class="ToolbarButtonCaption" vid="1365">
+					<div class="brdImg brd_st0"></div>
+				</div>
+				<div id="td_border_choose" class="ToolbarDropDownInner">
+					<div class="ToolbarDropDown"></div>
+				</div>
+			</td>
+			<td id="td_mergeCells" class="ToolbarIconOut selectableIcon iconToolbar" title="Merge">
+				<img class="toolbarImg merge_cells" src="menu/img/spacer.gif"/>
+			</td>
+			<td class="toolbarSep">
+				<div class="ToolbarIconOut">
+					<img src="menu/img/Border.png"/>
+				</div>
+			</td>
+			<td class="ToolbarIconOut selectableIcon" title="SortAtoZ">
+				<div id="td_sort_asc" class="iconToolbar">
+					<img class="toolbarImg sort_asc" src="menu/img/spacer.gif"/>
+				</div>
+			</td>
+			<td class="ToolbarIconOut selectableIcon" title="SortZtoA">
+				<div id="td_sort_desc" class="iconToolbar">
+					<img class="toolbarImg sort_desc" src="menu/img/spacer.gif"/>
+				</div>
+			</td>
+			<td class="toolbarSep">
+				<div class="ToolbarIconOut">
+					<img src="menu/img/Border.png"/>
+				</div>
+			</td>
+			<td id="td_Formulas" class="ToolbarIconOut selectableIcon iconToolbar" title="Function" style="padding: 0px;">
+				<div id="td_sum" class="ToolbarButtonCaption">
+					<div class="toolbarImg sum"></div>
+				</div>
+				<div id="td_func_choose" class="ToolbarDropDownInner">
+					<div class="ToolbarDropDown"></div>
+				</div>
+			</td>
+			<td class="toolbarSep">
+				<div class="ToolbarIconOut">
+					<img src="menu/img/Border.png"/>
+				</div>
+			</td>
+			<td class="ToolbarIconOut selectableIcon" title="IncreaseDecimal">
+				<div id="td_fmt_up" class="iconToolbar">
+					<img class="toolbarImg fmt_up" src="menu/img/spacer.gif"/>
+				</div>
+			</td>
+			<td class="ToolbarIconOut selectableIcon" title="DecreaseDecimal">
+				<div id="td_fmt_down" class="iconToolbar">
+					<img class="toolbarImg fmt_down" src="menu/img/spacer.gif"/>
+				</div>
+			</td>
+			<td class="ToolbarIconOut selectableIcon" title="NumberFormat">
+				<div id="td_fmt_digit" class="iconToolbar" grp="digit">
+					<img class="toolbarImg fmt_digit" src="menu/img/spacer.gif"/>
+				</div>
+			</td>
+			<td class="ToolbarIconOut selectableIcon" title="DateTimeFormat">
+				<div id="td_fmt_date" class="iconToolbar" grp="date">
+					<img class="toolbarImg fmt_date" src="menu/img/spacer.gif"/>
+				</div>
+			</td>
+			<td class="ToolbarIconOut selectableIcon" title="PercentStyle">
+				<div id="td_fmt_perc" class="iconToolbar" fmt="10">
+					<img class="toolbarImg fmt_perc" src="menu/img/spacer.gif"/>
+				</div>
+			</td>
+			<td class="ToolbarIconOut selectableIcon" title="Currency">
+				<div id="td_fmt_money" class="iconToolbar" grp="money">
+					<img class="toolbarImg fmt_money" src="menu/img/spacer.gif"/>
+				</div>
+			</td>
+			<td class="toolbarSep">
+				<div class="ToolbarIconOut">
+					<img src="menu/img/Border.png"/>
+				</div>
+			</td>
+            <td id="td_add_hyperlink" class="ToolbarIconOut selectableIcon iconToolbar" title="Link">
+                <img class="ToolbarIcon ToolbarLink" src="menu/img/spacer.gif"/>
+            </td>
+			<td id="td_filter_as_table" class="ToolbarIconOut selectableIcon iconToolbar" title="Filter">
+				<img class="ToolbarIcon ToolbarFormatTable" src="menu/img/spacer.gif"/>
+			</td>
+			<td class="ToolbarIconOut selectableIcon" title="Insert image url">
+				<div id="td_insert_image_url" class="iconToolbar">
+					<img class="ToolbarIcon ToolbarImage" src="menu/img/spacer.gif"/>
+				</div>
+			</td>
+			<td class="ToolbarIconOut selectableIcon" title="Insert image file">
+				<div id="td_insert_image_file" class="iconToolbar">
+					<img class="ToolbarIcon ToolbarImage" src="menu/img/spacer.gif"/>
+				</div>
+			</td>
+			<td class="ToolbarIconOut selectableIcon" title="Insert chart(need icon!)">
+				<div id="td_insert_chart" class="iconToolbar">
+					<img class="ToolbarIcon ToolbarImage" src="menu/img/spacer.gif"/>
+				</div>
+			</td>
+			<td id="td_recalc" class="ToolbarIconOut selectableIcon iconToolbar" title="Recalc formulas">
+				<img class="toolbarImg recalc" src="menu/img/spacer.gif"/>
+			</td>
+		</tr>
+		</table>
+		<div id="toolSelector"></div>
+	</td>
+</tr>
+<tr><td colspan="3" class="separatingLine"></td></tr>
+<tr><td id="formulabar" colspan="3">
+	<table style="width:100%"><tr>
+		<td style="width:2px; vertical-align:middle"></td>
+		<td style="width:75px;vertical-align:middle"><textarea id="cc1" class="utilFont" disabled="disabled"></textarea></td>
+		<td style="width:20px;height:26px;vertical-align:middle"></td>
+		<td id="td_function" class="ToolbarIconOut selectableIcon iconToolbar" title="InsertFunction">
+			<img class="toolbarImg func" src="menu/img/spacer.gif"/></td>
+		<td style="width:100%;vertical-align:middle"><textarea id="cv1" style="width:95%; height:16px;" class="utilFont" cols="50" rows="1" title="FormulaBar"></textarea></td>
+	</tr></table>
+</td></tr>
+<tr><td colspan="3" class="separatingLine"></td></tr>
+</table>
+<div id="formulaList2" class="PopUpMenuStyle hidden">
+	<div class ="formulaItem selectable" name="SUM" args="SUM(number1, number2, ...)">SUM</div>
+	<div class ="formulaItem selectable" name="MIN" args="MIN(number1, number2, ...)">MIN</div>
+	<div class ="formulaItem selectable" name="MAX" args="MAX(number1, number2, ...)">MAX</div>
+	<div class ="formulaItem selectable" name="COUNT" args="COUNT(number1, number2, ...)">COUNT</div>
+	<div style="border-top: 1px solid gray;	margin: 2px 0;height: 0px;"></div>
+	<div id="moreFunc" class ="formulaItem  selectable" >MoreFunctions</div>
+</div>
+<div id="formulaMore" class="hidden">
+	<table>
+		<tbody>
+			<tr>
+				<td>
+					<p class="TextStyle">SelectFunctionGroup:</p>
+					<select id="formulaSelect" class="dialogEntry"></select>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p class="TextStyle">SelectFunction:</p>
+					<div id="fListMore"></div>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+		<div id="wb-widget"></div>
+
+		<div id="ws-navigation">
+			<div class="nav-buttons">
+				<div class="btn first"><div class="inner"></div></div>
+				<div class="btn prev"><div class="inner"></div></div>
+				<div class="btn next"><div class="inner"></div></div>
+				<div class="btn last"><div class="inner"></div></div>
+			</div>
+			<ul class="tabs"></ul>
+			<div class="ws-zoom-widget">
+				<div class="ws-zoom-button minus"><div>&#8211;</div></div>
+				<input class="ws-zoom-input" type="text"/>
+				<div class="ws-zoom-button plus"><div>+</div></div>
+			</div>
+		</div>
+		<div id="dialogColorSelector">
+			<canvas id="myCanvas" width="170" height="128" style="top:5px;left:5px;"></canvas>
+			<div style="position: absolute; top: 53px; left: 16px; height: 128px; width: 170px;">
+				<div style="position:absolute; left:11em;width: 100px;">
+					<div><span style="margin-right:10px">R:</span><input style="height:18px;width:50px;" id="redChannel" type="text"></input></div>
+					<div><span style="margin-right:9px;">G:</span><input style="height:18px;width:50px;" type="text" id="greenChannel"></input></div>
+					<div><span style="margin-right:11px;">B:</span><input style="height:18px;width:50px;" type="text" id="blueChannel"></input></div>
+					<div style="margin-top:10px;font-size: 11pt;font-weight: bold;">
+						<div id="currentColor" style="width:45px;height:25px;background-color:#000000"><span style="margin-left:50px;">Current</span></div>
+						<div id="lastColor" style="width:45px;height:25px;background-color:#32CD32"><span style="margin-left:50px;">Last</span></div>
+					</div>
+				</div>
+				<div id="colorSelectHolder" style="position:absolute;top:0px;left:0px;width:128px;height:128px;">
+					<div id="colorSelecter" style="position:absolute;background: url('menu/img/marker.png') no-repeat scroll 0 0 transparent;height:17px;margin:-8px 0 0 -8px;overflow: hidden;width: 17px;"></div>
+				</div>
+				<div id="gradientSelectHolder" style="position:absolute;width:9px;height:128px;left:160px;">
+					<div id="gradSelecter" style="position:absolute;background: url('menu/img/marker2.png') no-repeat scroll 0 0 transparent;height:11px;margin:-6px 0 0 -8px;overflow: hidden;width: 25px;"></div>
+				</div>
+				
+			</div>
+		</div>
+		<div id="colorBox1" class="options hidden">
+		<table class="paletteTable"><tr>
+		<td colspan="7" class="none colorSelect1" style="text-align:center; vertical-align:middle;"><div  style="background-color:none;cursor:default;" title="none">none</div></td>
+		</tr><tr>
+		<td class="" colspan="10" style="height: 5px;"></td>
+		</tr><tr>
+		<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#ffff00;" title="RGB (255, 255, 0)"></div></td>
+		<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#00ff00;" title="RGB (0, 255, 0)"></div></td>
+		<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#00ffff;" title="RGB (0, 255, 255)"></div></td>	
+		<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#ff00ff;" title="RGB (255, 0, 255)"></div></td>
+		</tr><tr>
+		<td class="colorSelect1 bordered"><div  class="colorHighlight" style="background-color:#0000ff;" title="RGB (0, 0, 255)"></div></td>
+		<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#ff0000;" title="RGB (255, 0, 0)"></div></td>
+		<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#00008b;" title="RGB (0, 0, 139)"></div></td>	
+		<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#008b8b;" title="RGB (0, 139, 139)"></div></td>
+		</tr><tr>
+		<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#006400;" title="RGB (0, 100, 0)"></div></td>
+		<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#800080;" title="RGB (128, 0, 128)"></div></td>
+		<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#8b0000;" title="RGB (139, 0, 0)"></div></td>
+		<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#808000;" title="RGB (128, 128, 0)"></div></td>
+		</tr><tr>
+		<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#ffffff;" title="RGB (255, 255, 255)"></div></td>
+		<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#d3d3d3;" title="RGB (211, 211, 211)"></div></td>
+		<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#a9a9a9;" title="RGB (169, 169, 169)"></div></td>
+		<td class="colorSelect1 bordered"><div  class="colorHighlight" style="background-color:#000000;" title="RGB (0, 0, 0)"></div></td>
+		</tr></table>
+	</div>
+		<div id="colorBox2" class="options hidden">
+			<table class="paletteTable"><tr>
+			<td colspan="10" class="none colorSelect2" style="text-align:center; vertical-align:middle;"><div style="background-color:none;cursor:default;" title="none">Default</div></td>
+			</tr><tr>
+			<td class="" colspan="10" style="height: 5px;"></td>
+			</tr><tr>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#C00000;" title="RGB (192, 0, 0)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FF0000;" title="RGB (255, 0, 0)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FFC000;" title="RGB (255, 192, 0)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FFFF00;" title="RGB (255, 255, 0)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#92D050;" title="RGB (146, 208, 80)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#00B050;" title="RGB (0, 176, 80)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#00B0F0;" title="RGB (0, 176, 240)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#0070C0;" title="RGB (0, 112, 192)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#002060;" title="RGB (0, 32, 96)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#7030A0;" title="RGB (112, 48, 160)"></div></td>
+			</tr><tr>
+			<td class="" colspan="10" style="height: 20px;"></td>
+			</tr><tr>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FFFFFF;" title="RGB (255, 255, 255)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#000000;" title="RGB (0, 0, 0)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#EEECE1;" title="RGB (238, 236, 225)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#1F497D;" title="RGB (31, 73, 125)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#4F81BD;" title="RGB (79, 129, 189)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#C0504D;" title="RGB (192, 80, 77)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#9BBB59;" title="RGB (155, 187, 89)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#8064A2;" title="RGB (128, 100, 162)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#4BACC6;" title="RGB (75, 172, 198)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#F79646;" title="RGB (247, 150, 70)"></div></td>
+			</tr><tr>
+			<td class="" colspan="10" style="height: 10px;"></td>
+			</tr><tr>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#F2F2F2;" title="RGB (255, 0, 0)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#7F7F7F;" title="RGB (255, 153, 0)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#DDD9C3;" title="RGB (153, 204, 0)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#C6D9F0;" title="RGB (51, 153, 102)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#DBE5F1;" title="RGB (51, 204, 204)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#F2DCDB;" title="RGB (51, 102, 255)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#EBF1DD;" title="RGB (128, 0, 128)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#E5E0EC;" title="RGB (128, 0, 128)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#DBEEF3;" title="RGB (128, 0, 128)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FDEADA;" title="RGB (128, 0, 128)"></div></td>
+			</tr><tr>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#D8D8D8;" title="RGB (255, 0, 255)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#595959;" title="RGB (255, 204, 0)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#C4BD97;" title="RGB (255, 255, 0)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#8DB3E2;" title="RGB (0, 255, 0)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#B8CCE4;" title="RGB (0, 255, 255)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#E5B9B7;" title="RGB (0, 204, 255)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#D7E3BC;" title="RGB (0, 204, 255)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#CCC1D9;" title="RGB (0, 204, 255)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#B7DDE8;" title="RGB (0, 204, 255)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FBD5B5;" title="RGB (153, 51, 102)"></div></td>
+			</tr><tr>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#BFBFBF;" title="RGB (255, 153, 204)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#3F3F3F;" title="RGB (250, 220, 179)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#938953;" title="RGB (255, 255, 153)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#548DD4;" title="RGB (204, 255, 204)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#95B3D7;" title="RGB (204, 255, 204)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#D99694;" title="RGB (204, 255, 204)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#C3D69B;" title="RGB (204, 255, 204)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#B2A2C7;" title="RGB (204, 255, 255)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#92CDDC;" title="RGB (194, 209, 240)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FAC08F;" title="RGB (225, 199, 225)"></div></td>
+			</tr><tr>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#A5A5A5;" title="RGB (230, 153, 153)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#262626;" title="RGB (230, 153, 153)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#494429;" title="RGB (230, 153, 153)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#17365D;" title="RGB (230, 153, 153)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#366092;" title="RGB (255, 204, 153)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#953734;" title="RGB (235, 215, 128)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#76923C;" title="RGB (179, 213, 128)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#5F497A;" title="RGB (189, 230, 225)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#31859B;" title="RGB (153, 204, 255)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#E36C09;" title="RGB (204, 153, 255)"></div></td>
+			</tr><tr>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#7F7F7F;" title="RGB (230, 153, 153)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#0C0C0C;" title="RGB (230, 153, 153)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#1D1B10;" title="RGB (230, 153, 153)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#0F243E;" title="RGB (230, 153, 153)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#244061;" title="RGB (255, 204, 153)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#632423;" title="RGB (235, 215, 128)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#4F6128;" title="RGB (179, 213, 128)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#3F3151;" title="RGB (189, 230, 225)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#205867;" title="RGB (153, 204, 255)"></div></td>
+			<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#974806;" title="RGB (204, 153, 255)"></div></td>
+			</tr><tr>
+			<td class="" colspan="10" style="height: 10px;"></td>
+			</tr><tr id="customColorFont">
+			<td class="colorSelect2 bordered2"><div class="colorWatch" style="background-color:#ffffff;"></div></td>
+			<td class="colorSelect2 bordered2"><div class="colorWatch" style="background-color:#ffffff;"></div></td>
+			<td class="colorSelect2 bordered2"><div class="colorWatch" style="background-color:#ffffff;"></div></td>
+			<td class="colorSelect2 bordered2"><div class="colorWatch" style="background-color:#ffffff;"></div></td>
+			<td class="colorSelect2 bordered2"><div class="colorWatch" style="background-color:#ffffff;"></div></td>
+			<td class="colorSelect2 bordered2"><div class="colorWatch" style="background-color:#ffffff;"></div></td>
+			<td class="colorSelect2 bordered2"><div class="colorWatch" style="background-color:#ffffff;"></div></td>
+			<td class="colorSelect2 bordered2"><div class="colorWatch" style="background-color:#ffffff;"></div></td>
+			<td class="colorSelect2 bordered2"><div class="colorWatch" style="background-color:#ffffff;"></div></td>
+			<td class="colorSelect2 bordered2"><div class="colorWatch" style="background-color:#ffffff;"></div></td>
+			</tr><tr>
+			<td class="" colspan="10" style="height: 10px;"></td>
+			</tr><tr>
+			<td colspan="10" id="dialogNewColorOpen" class="bordered" style="text-align:center; vertical-align:middle;"><div style="background-color:none;cursor:pointer;">New color</div></td>
+			</tr></table>
+			<div id="colorSelectorHover" style="display:none;position:fixed;z-index:100;height:20px;width:20px;"><img src="menu/img/colorSelectorHover.png"/></div>
+		</div>	
+	<div id="brd_options" class="icon_options hidden" style="min-width:155px;">
+		<table>
+			<tr>
+				<td class="icon selectable" id = "brd_st0"><img class="brdImg brd_st0" src="../img/spacer.gif"/></td>
+				<td class="icon selectable" id = "brd_st1"><img class="brdImg brd_st1" src="../img/spacer.gif"/></td>
+				<td class="icon selectable" id = "brd_st4"><img class="brdImg brd_st4" src="../img/spacer.gif"/></td>
+				<td class="icon selectable" id = "brd_st16"><img class="brdImg brd_st16" src="../img/spacer.gif"/></td>
+				<td class="icon selectable" id = "brd_st64"><img class="brdImg brd_st64" src="../img/spacer.gif"/></td>
+				<td class="icon selectable" id = "brd_st85"><img class="brdImg brd_st85" src="../img/spacer.gif"/></td>
+				<td class="icon selectable" id = "brd_st170"><img class="brdImg brd_st170" src="../img/spacer.gif"/></td>
+			</tr>
+			<tr>
+				<td class="icon selectable" id = "brd_st324"><img class="brdImg brd_st324" src="../img/spacer.gif"/></td>
+				<td class="icon selectable" id = "brd_st341"><img class="brdImg brd_st341" src="../img/spacer.gif"/></td>
+				<!-- <td class="icon selectable" id = "brd_st1041"><img class="brdImg brd_st1041" src="../img/spacer.gif"/></td>
+				<td class="icon selectable" id = "brd_st1109"><img class="brdImg brd_st1109" src="../img/spacer.gif"/></td>
+				<td class="icon selectable" id = "brd_st1280"><img class="brdImg brd_st1280" src="../img/spacer.gif"/></td>
+				<td class="icon selectable" id = "brd_st1365"><img class="brdImg brd_st1365" src="../img/spacer.gif"/></td>
+				<td class="icon selectable" id = "brd_st1450"><img class="brdImg brd_st1450" src="../img/spacer.gif"/></td> -->
+			</tr>
+		</table>
+	</div>
+	<div id="va_options" class="icon_options hidden" style="min-width:66px;">
+		<table><tr>
+		<td id="td_vo_top" class="icon selectable"><img class="toolbarImg valign_top valign_margin" src="menu/img/spacer.gif"/></td>
+		<td id="td_vo_middle" class="icon selectable"><img class="toolbarImg valign_middle valign_margin" src="menu/img/spacer.gif"/></td>
+		<td id="td_vo_bottom" class="icon selectable"><img class="toolbarImg valign_bottom valign_margin" src="menu/img/spacer.gif"/></td>
+		</tr></table>
+	</div>
+	<div id="DateList" class="PopUpMenuStyle hidden">
+		<div class ="DateItemRoot">Дата:</div>
+		<div class ="DateItem selectable" fmt="14" grp="date">
+			07-24-88
+			<span class="DateShortCut">MM-dd-yy</span>
+		</div>
+		<div class ="DateItem selectable" fmt="mm-dd-yyyy" grp="date">
+			07-24-1988
+			<span class="DateShortCut">MM-dd-yyyy</span>
+		</div>
+		<div class ="DateItem selectable" fmt="dd-mm-yy" grp="date">
+			24-07-88
+			<span class="DateShortCut">dd-MM-yy</span>
+		</div>
+		<div class ="DateItem selectable" fmt="dd-mm-yyyy" grp="date">
+			24-07-1988
+			<span class="DateShortCut">dd-MM-yyyy</span>
+		</div>
+		<div class ="DateItem selectable" fmt="15" grp="date">
+			24-Jul-88
+			<span class="DateShortCut">dd-MMM-yy</span>
+		</div>
+		<div class ="DateItem selectable" fmt="16" grp="date">
+			24-Jul
+			<span class="DateShortCut">dd-MMM</span>
+		</div>
+		<div class ="DateItem selectable" fmt="17" grp="date">
+			Jul-88
+			<span class="DateShortCut">MMM-yy</span>
+		</div>
+		
+		<div class ="MenuSeparator"></div>
+		<div class ="DateItemRoot">Время:</div>
+		<div class ="DateItem selectable" fmt="20" grp="date">
+			10:56
+			<span class="DateShortCut">HH:mm</span>
+		</div>
+		<div class ="DateItem selectable" fmt="21" grp="date">
+			21:56:00
+			<span class="DateShortCut">HH:MM:ss</span>
+		</div>
+		<div class ="DateItem selectable" fmt="18" grp="date">
+			05:56 AM
+			<span class="DateShortCut">hh:mm tt</span>
+		</div>
+		<div class ="DateItem selectable" fmt="19" grp="date">
+			05:56:00 AM
+			<span class="DateShortCut">hh:mm:ss tt</span>
+		</div>
+		
+		<div class ="MenuSeparator"></div>
+		<div class ="DateItemRoot">Дата и Время:</div>
+		<div class ="DateItem selectable" fmt="22" grp="date">
+			7/24/88 21:56
+			<span class="DateShortCut">MM/dd/yy HH:mm</span>
+		</div>
+	</div>
+	<div id="DigitList" class="PopUpMenuStyle hidden" style="min-width: 150px;">
+	<div class ="DigitItem selectable" fmt="0" grp="digit">
+		General
+		<span class="NumberShortCut">1050.105</span>
+	</div>
+		<div class ="DigitItem selectable" fmt="1" grp="digit">
+			Integer
+			<span class="NumberShortCut">1050</span>
+		</div>
+		<div class ="DigitItem selectable" fmt="11" grp="digit">
+			Scientific
+			<span class="NumberShortCut">1.05E+03</span>
+		</div>
+		<!--<div class ="DigitItem selectable" fmt="12" grp="digit">Fractional single</div>
+		<div class ="DigitItem selectable" fmt="13" grp="digit">Fractional extended</div>-->
+	</div>
+	<div id="MoneyList" class="PopUpMenuStyle hidden" style="min-width: 100px;">
+		<div class ="MoneyItem selectable" fmt="$#,##0.00" grp="money">
+			$
+			<span class="MoneyShortCut">Dollar</span>
+		</div>
+		<div class ="MoneyItem selectable" fmt="&#8364;#,##0.00" grp="money">
+			&#8364;
+			<span class="MoneyShortCut">Euro</span>
+		</div>
+		<div class ="MoneyItem selectable" fmt="#,##0.00&#1088;." grp="money">
+			p.
+			<span class="MoneyShortCut">Rubl</span>
+		</div>
+		<div class ="MoneyItem selectable" fmt="&pound;#,##0.00" grp="money">
+			&#163;
+			<span class="MoneyShortCut">Pound</span>
+		</div>
+		<div class ="MoneyItem selectable" fmt="=yen;#,##0.00" grp="money">
+			&#165;
+			<span class="MoneyShortCut">Yen</span>
+		</div>
+	</div>
+	
+	<div id="dialogRenameWS" title="Set Name" class="utilFont dialog">
+		<p id="setNameDialogText">EnterName<p>
+		<input class="dialogEntry" style="width:250px"></input>
+	</div>
+    <div id="dialogAddHyperlink" class ="hidden dialog">
+        <div style="padding-bottom:11px;">
+            <select id="selectTypeLink">
+                <option>URL</option>
+                <option>Place in document</option>
+            </select>
+            Text to display:<input id="addHyperlink_text" class ="dialogEntry">
+        </div>
+        <table>
+            <tr id="urlLink">
+                <td>
+                    URL:<input id="addHyperlink_url" class ="dialogEntry"/>
+                </td>
+            </tr>
+            <tr id="locationLink" style="display:none;">
+                <td>
+                    Sheet:<select id="addHyperlink_she" class="dialogEntry"></select>
+                    Range:<input id="addHyperlink_ran" class="dialogEntry" value="A1"/>
+                </td>
+        </table>
+        <span id='addHyperlink_err' class="hidden" style="color:Red" ></span>
+    </div>
+	</body>
+</html>
