@@ -1,0 +1,15 @@
+X:\AVS\Sources\AVSOfficeStudio\Test\HtmlTextEditor\TM_Fonts_Generator\Project\TM_Fonts_Generator\bin\Debug\TM_Fonts_Generator.exe
+X:\AVS\Sources\AVSOfficeStudio\Test\HtmlTextEditor\TM_Fonts_Generator\Project\TM_Fonts_Generator\bin\Debug\TM_Fonts_Generator.pdb
+X:\AVS\Sources\AVSOfficeStudio\Test\HtmlTextEditor\TM_Fonts_Generator\Project\TM_Fonts_Generator\obj\Debug\ResolveAssemblyReference.cache
+X:\AVS\Sources\AVSOfficeStudio\Test\HtmlTextEditor\TM_Fonts_Generator\Project\TM_Fonts_Generator\obj\Debug\TM_Fonts_Generator.Form1.resources
+X:\AVS\Sources\AVSOfficeStudio\Test\HtmlTextEditor\TM_Fonts_Generator\Project\TM_Fonts_Generator\obj\Debug\TM_Fonts_Generator.Properties.Resources.resources
+X:\AVS\Sources\AVSOfficeStudio\Test\HtmlTextEditor\TM_Fonts_Generator\Project\TM_Fonts_Generator\obj\Debug\TM_Fonts_Generator.csproj.GenerateResource.Cache
+X:\AVS\Sources\AVSOfficeStudio\Test\HtmlTextEditor\TM_Fonts_Generator\Project\TM_Fonts_Generator\obj\Debug\TM_Fonts_Generator.exe
+X:\AVS\Sources\AVSOfficeStudio\Test\HtmlTextEditor\TM_Fonts_Generator\Project\TM_Fonts_Generator\obj\Debug\TM_Fonts_Generator.pdb
+X:\AVS\Sources\AVSOfficeStudio\Test\HtmlTextEditor\TM_Fonts_Generator\Project\TM_Fonts_Generator\bin\Debug\Interop.AVSGraphics.dll
+X:\AVS\Sources\AVSOfficeStudio\Test\HtmlTextEditor\TM_Fonts_Generator\Project\TM_Fonts_Generator\obj\Debug\Interop.AVSGraphics.dll
+X:\AVS\Sources\AVSOfficeStudio\Test\HtmlTextEditor\TM_Fonts_Generator\Project\TM_Fonts_Generator\obj\Debug\TM_Fonts_Generator.csproj.ResolveComReference.cache
+X:\AVS\Sources\AVSOfficeStudio\OfficeWebCommon\TM_Fonts_Generator\Project\TM_Fonts_Generator\obj\Debug\Interop.AVSGraphics.dll
+X:\AVS\Sources\AVSOfficeStudio\OfficeWebCommon\TM_Fonts_Generator\Project\TM_Fonts_Generator\obj\Debug\TM_Fonts_Generator.csproj.ResolveComReference.cache
+X:\AVS\Sources\AVSOfficeStudio\OfficeWebCommon\TM_Fonts_Generator\Project\TM_Fonts_Generator\obj\Debug\TM_Fonts_Generator.exe
+X:\AVS\Sources\AVSOfficeStudio\OfficeWebCommon\TM_Fonts_Generator\Project\TM_Fonts_Generator\obj\Debug\TM_Fonts_Generator.pdb

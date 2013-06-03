@@ -1,0 +1,58 @@
+
+var g_bDate1904 = false;
+
+var CellValueType = 
+{
+	Number:0,
+	String:1,	
+	Bool:2,
+	Error:3
+}
+
+// Chart defines
+var c_oAscChartType = {
+	line: "Line",
+	bar: "Bar",
+	hbar: "HBar",
+	area: "Area",
+	pie: "Pie",
+	scatter: "Scatter",
+	stock: "Stock"
+ };
+
+ var c_oAscChartSubType = {
+	normal: "normal",
+	stacked: "stacked",
+	stackedPer: "stackedPer"
+ };
+
+ var c_oAscChartLegend = {
+	left: "left",
+	right: "right",
+	top: "top",
+	bottom: "bottom"
+ };
+
+ var c_oAscObjectLockState = {
+	No: 1,
+	On: 2,
+	Off: 3
+ };
+ 
+ var c_oAscDrawingLayerType = {
+	BringToFront: 0,
+	SendToBack: 1,
+	BringForward: 2,
+	SendBackward: 3
+ };
+ 
+ var c_oAscChartStyle = {
+	Dark: 1,
+	Standart: 2,
+	Accent1: 3,
+	Accent2: 4,
+	Accent3: 5,
+	Accent4: 6,
+	Accent5: 7,
+	Accent6: 8
+};

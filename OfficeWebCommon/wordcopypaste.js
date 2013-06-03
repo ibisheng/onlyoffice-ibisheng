@@ -1,0 +1,4257 @@
+﻿function CDocumentReaderMode()
+{
+    this.DefaultFontSize = 12;
+
+    this.CorrectDefaultFontSize = function(size)
+    {
+        if (size < 6)
+            return;
+
+        this.DefaultFontSize = size;
+    }
+
+    this.CorrectFontSize = function(size)
+    {
+        var dRes = size / this.DefaultFontSize;
+        dRes = (1 + dRes) / 2;
+        dRes = (100 * dRes) >> 0;
+        dRes /= 100;
+
+        return "" + dRes + "em";
+    }
+}
+
+var g_bIsDocumentCopyPaste = true;
+function Editor_Copy_GetElem(api)
+{
+    var ElemToSelect = document.getElementById( "SelectId" );
+    if ( !ElemToSelect )
+    {
+        ElemToSelect = document.createElement("div");
+        ElemToSelect.id = "SelectId";
+        ElemToSelect.style.position = "absolute";
+        //���� ������� width ���������, �� �������� ����� ��������� ������������ �� span
+        //� �������� � ����� ������ ��������� ������ <span>1</span><span> </span><span>2</span>
+        //style.left = 0px, ���� ������� ���������� ������ ������� ������� ����, �� ����� ������� ������ �������� �����, �� � ����������� ����(� iframe) ������� ������������� � ����� ������ ��� ����� ������� ������ ����������.
+        ElemToSelect.style.left = '0px';
+        ElemToSelect.style.top = '-100px';
+        ElemToSelect.style.width = '10000px';
+        ElemToSelect.style.height = '100px';
+        ElemToSelect.style.overflow = 'hidden';
+        ElemToSelect.style.zIndex = -1000;
+        ElemToSelect.style.MozUserSelect = "text";
+        ElemToSelect.style["-khtml-user-select"] = "text";
+        ElemToSelect.style["-o-user-select"] = "text";
+        ElemToSelect.style["user-select"] = "text";
+        ElemToSelect.style["-webkit-user-select"] = "text";
+        ElemToSelect.setAttribute("contentEditable", true);
+
+        if (!api || !api.GetCopyPasteDivId)
+            document.body.appendChild( ElemToSelect );
+        else
+        {
+            var _div_id = api.GetCopyPasteDivId();
+            if ("" == _div_id)
+                document.body.appendChild( ElemToSelect );
+            else
+            {
+                var _div = document.getElementById(_div_id);
+                _div.appendChild( ElemToSelect );
+            }
+        }
+    }
+    return ElemToSelect;
+}
+function Editor_Copy_Button(api, bCut)
+{
+    if(false == g_bIsDocumentCopyPaste)
+    {
+        switch(api.WordControl.Thumbnails.FocusObjType)
+        {
+            case FOCUS_OBJECT_MAIN:
+            {
+                var _logic_document = api.WordControl.m_oLogicDocument;
+                if(_logic_document && _logic_document.CurPos.Type != docpostype_FlowObjects )
+                {
+                    _logic_document.slidesBuffer.length = 0;
+                    _logic_document.glyphsBuffer = _logic_document.Slides[_logic_document.CurPage].elementsManipulator.glyphsCopy();
+                    return true;
+                }
+                break;
+            }
+            case FOCUS_OBJECT_THUMBNAILS :
+            {
+                var _selected_array = api.WordControl.m_oLogicDocument.DrawingDocument.m_oWordControl.Thumbnails.GetSelectedArray();
+                api.WordControl.m_oLogicDocument.glyphsBuffer.length = 0;
+                api.WordControl.m_oLogicDocument.slidesCopy(_selected_array);
+                return true;
+            }
+        }
+    }
+    if(/MSIE/g.test(navigator.userAgent))
+    {
+        var ElemToSelect = Editor_Copy_GetElem(api);
+        ElemToSelect.style.display  = "block";
+
+        while ( ElemToSelect.hasChildNodes() )
+            ElemToSelect.removeChild( ElemToSelect.lastChild );
+
+        //������ ��������� ���������
+        document.body.style.MozUserSelect = "text";
+        delete document.body.style["-khtml-user-select"];
+        delete document.body.style["-o-user-select"];
+        delete document.body.style["user-select"];
+        document.body.style["-webkit-user-select"] = "text";
+
+        if (null != api.WordControl.m_oLogicDocument)
+        {
+            var oCopyProcessor = new CopyProcessor(api, ElemToSelect);
+            oCopyProcessor.Start();
+        }
+        else
+        {
+            ElemToSelect.innerHTML = api.WordControl.m_oDrawingDocument.m_oDocumentRenderer.Copy();
+        }
+
+        var selection = window.getSelection();
+        var rangeToSelect = document.createRange();
+        rangeToSelect.selectNodeContents (ElemToSelect);
+        selection.removeAllRanges ();
+        selection.addRange(rangeToSelect);
+
+        document.execCommand("copy");
+        //rangeToSelect.execCommand("copy");
+
+        //�������� ����������� ���������
+        ElemToSelect.style.display  = "none";
+        document.body.style.MozUserSelect = "none";
+        document.body.style["-khtml-user-select"] = "none";
+        document.body.style["-o-user-select"] = "none";
+        document.body.style["user-select"] = "none";
+        document.body.style["-webkit-user-select"] = "none";
+
+        if(true == bCut)
+        {
+            //������� ���������� ��������
+            api.WordControl.m_oLogicDocument.Remove(1, true, true);
+            api.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
+        }
+        return true;
+    }
+	else
+	{
+		var ElemToSelect = Editor_Copy_GetElem(api);
+		while ( ElemToSelect.hasChildNodes() )
+			ElemToSelect.removeChild( ElemToSelect.lastChild );
+		if (null != api.WordControl.m_oLogicDocument)
+		{
+			var oCopyProcessor = new CopyProcessor(api, ElemToSelect);
+			oCopyProcessor.Start();
+		}
+		else
+		{
+			ElemToSelect.innerHTML = api.WordControl.m_oDrawingDocument.m_oDocumentRenderer.Copy();
+		}
+		if(true == bCut)
+        {
+            //������� ���������� ��������
+            api.WordControl.m_oLogicDocument.Remove(1, true, true);
+            api.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
+        }
+		return true;
+	}
+    return false;
+}
+function Editor_Copy(api, bCut)
+{
+    //todo ��������� �����
+    //������� ������� ����� ����������� ����������
+    var ElemToSelect = Editor_Copy_GetElem(api);
+    ElemToSelect.style.display  = "block";
+
+    while ( ElemToSelect.hasChildNodes() )
+        ElemToSelect.removeChild( ElemToSelect.lastChild );
+
+    //������ ��������� ���������
+    document.body.style.MozUserSelect = "text";
+    delete document.body.style["-khtml-user-select"];
+    delete document.body.style["-o-user-select"];
+    delete document.body.style["user-select"];
+    document.body.style["-webkit-user-select"] = "text";
+
+    if (null != api.WordControl.m_oLogicDocument)
+    {
+        var oCopyProcessor = new CopyProcessor(api, ElemToSelect);
+        oCopyProcessor.Start();
+    }
+    else
+    {
+        ElemToSelect.innerHTML = api.WordControl.m_oDrawingDocument.m_oDocumentRenderer.Copy();
+    }
+    //��������
+    if (window.getSelection) // all browsers, except IE before version 9
+    {
+        var selection = window.getSelection ();
+        var rangeToSelect = document.createRange ();
+
+        //� FF 8 ����� ��������� selectNodeContents ���������� � ������������ div, ����� ����� �������� � FF8 � ������ ��������� ����� ��� ����� ������ ��������� �������������� node
+        //�������� ���� ��� ��� ��������� ��������� �� ����������. Chrome ������ ��������� ������ ����� ����� ������ ����������
+        var is_gecko = window.navigator.userAgent.indexOf('Gecko/') >= 0;
+        if(is_gecko)
+        {
+            ElemToSelect.appendChild( document.createTextNode( '\xa0' ) );
+            ElemToSelect.insertBefore( document.createTextNode( '\xa0' ), ElemToSelect.firstChild );
+            rangeToSelect.setStartAfter (ElemToSelect.firstChild);
+            rangeToSelect.setEndBefore (ElemToSelect.lastChild);
+        }
+        else
+        {
+            //�������� � webkit: ���� ���������� ����� ���� ��������, �� ���������� ������ ��� ������������
+            //������ ��� docs.google ����������� ��� � ��� <b>
+            var is_webkit = navigator.userAgent.toLowerCase().indexOf('webkit') > -1;
+            if(is_webkit)
+            {
+                var aChildNodes = ElemToSelect.childNodes;
+                if(aChildNodes.length == 1)
+                {
+                    var elem = aChildNodes[0];
+                    var wrap = document.createElement("b");
+                    wrap.setAttribute("style", "font-weight:normal");
+                    elem = ElemToSelect.removeChild(elem);
+                    wrap.appendChild(elem);
+                    ElemToSelect.appendChild(wrap);
+                }
+            }
+            rangeToSelect.selectNodeContents (ElemToSelect);
+        }
+
+        selection.removeAllRanges ();
+        selection.addRange (rangeToSelect);
+    }
+    else
+    {
+        if (document.body.createTextRange) // Internet Explorer
+        {
+            var rangeToSelect = document.body.createTextRange ();
+            rangeToSelect.moveToElementText (ElemToSelect);
+            rangeToSelect.select ();
+        }
+    }
+    //���� ���������� copy
+    window.setTimeout( function()
+    {
+        //�������� ����������� ���������
+        ElemToSelect.style.display  = "none";
+        document.body.style.MozUserSelect = "none";
+        document.body.style["-khtml-user-select"] = "none";
+        document.body.style["-o-user-select"] = "none";
+        document.body.style["user-select"] = "none";
+        document.body.style["-webkit-user-select"] = "none";
+        if(true == bCut)
+        {
+            //������� ���������� ��������
+            api.WordControl.m_oLogicDocument.Remove(1, true, true);
+            api.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
+        }
+    }, 0);
+    /*
+     if (e.dataTransfer)
+     {
+     e.dataTransfer.setData('text', '2|16|190');
+     }
+
+     if (e.clipboardData)
+     {
+     e.preventDefault();
+     e.clipboardData.setData('text/xcustom', 'Added this custom data at copy');
+     e.clipboardData.setData('text/plain', 'This is not the text you copied, it was changed by the copy event handler');
+
+     var TempXCustom = e.clipboardData.getData('text/xcustom');
+     var TempPlain = e.clipboardData.getData('text/plain');
+     var Temp = "sdf";
+     }
+     if (window.clipboardData)
+     {
+     e.returnValue = false;
+     var setStatus = window.clipboardData.setData('Text', 'This is not the text you copied, it was changed by the copy event handler');
+     }
+     */
+};
+function CopyProcessor(api, ElemToSelect)
+{
+	this.api = api;
+    this.oDocument = api.WordControl.m_oLogicDocument;
+    this.fontsArray = api.FontLoader.fontInfos;
+    this.ElemToSelect = ElemToSelect;
+    this.Ul = document.createElement( "ul" );
+    this.Ol = document.createElement( "ul" );
+    this.oTagPr;
+    this.orPr;
+    this.aInnerHtml;
+    this.Para;
+    this.bOccurEndPar;
+    this.oCurHyperlink = null;
+    this.oCurHyperlinkElem = null;
+};
+CopyProcessor.prototype =
+{
+    getSrc : function(src)
+    {
+        //������� ����������� �� �� ��� editor.DocumentUrl ������������� ����.
+        //���������� ����� ����� ��� ����������� � word � docs.google
+        var start = src.substring(0, 6);
+        if(0 != src.indexOf("http:") && 0 != src.indexOf("data:") && 0 != src.indexOf("https:") && 0 != src.indexOf("ftp:") && 0 != src.indexOf("file:"))
+            return documentOrigin + src;
+        else
+            return src;
+    },
+    RGBToCSS : function(rgb)
+    {
+        var sResult = "#";
+        var sR = rgb.r.toString(16);
+        if(sR.length == 1)
+            sR = "0" + sR;
+        var sG = rgb.g.toString(16);
+        if(sG.length == 1)
+            sG = "0" + sG;
+        var sB = rgb.b.toString(16);
+        if(sB.length == 1)
+            sB = "0" + sB;
+        return "#" + sR + sG + sB;
+    },
+    CommitList : function(oDomTarget)
+    {
+        if(this.Ul.childNodes.length > 0)
+        {
+            oDomTarget.appendChild( this.Ul );
+            this.Ul = document.createElement( "ul" );
+        }
+        if(this.Ol.childNodes.length > 0)
+        {
+            oDomTarget.appendChild( this.Ol );
+            this.Ol = document.createElement( "ol" );
+        }
+    },
+    Commit_pPr : function(Item)
+    {
+        //pPr
+        var apPr = new Array();
+        var Def_pPr = this.oDocument.Styles.Default.ParaPr;
+        var Item_pPr = Item.CompiledPr.Pr.ParaPr;
+        if(Item_pPr)
+        {
+            //Ind
+            if(Def_pPr.Ind.Left != Item_pPr.Ind.Left)
+                apPr.push("margin-left:" + (Item_pPr.Ind.Left * g_dKoef_mm_to_pt) + "pt");
+            if(Def_pPr.Ind.Right != Item_pPr.Ind.Right)
+                apPr.push("margin-right:" + ( Item_pPr.Ind.Right * g_dKoef_mm_to_pt) + "pt");
+            if(Def_pPr.Ind.FirstLine != Item_pPr.Ind.FirstLine)
+                apPr.push("text-indent:" + (Item_pPr.Ind.FirstLine * g_dKoef_mm_to_pt) + "pt");
+            //Jc
+            if(Def_pPr.Jc != Item_pPr.Jc){
+                switch(Item_pPr.Jc)
+                {
+                    case align_Left: apPr.push("text-align:left");break;
+                    case align_Center: apPr.push("text-align:center");break;
+                    case align_Right: apPr.push("text-align:right");break;
+                    case align_Justify: apPr.push("text-align:justify");break;
+                }
+            }
+            //KeepLines , WidowControl
+            if(Def_pPr.KeepLines != Item_pPr.KeepLines || Def_pPr.WidowControl != Item_pPr.WidowControl)
+            {
+                if(Def_pPr.KeepLines != Item_pPr.KeepLines && Def_pPr.WidowControl != Item_pPr.WidowControl)
+                    apPr.push("mso-pagination:none lines-together");
+                else if(Def_pPr.KeepLines != Item_pPr.KeepLines)
+                    apPr.push("mso-pagination:widow-orphan lines-together");
+                else if(Def_pPr.WidowControl != Item_pPr.WidowControl)
+                    apPr.push("mso-pagination:none");
+            }
+            //KeepNext
+            if(Def_pPr.KeepNext != Item_pPr.KeepNext)
+                apPr.push("page-break-after:avoid");
+            //PageBreakBefore
+            if(Def_pPr.PageBreakBefore != Item_pPr.PageBreakBefore)
+                apPr.push("page-break-before:always");
+            //Spacing
+            if(Def_pPr.Spacing.Line != Item_pPr.Spacing.Line)
+            {
+                if(linerule_AtLeast == Item_pPr.Spacing.LineRule)
+                    apPr.push("line-height:"+(Item_pPr.Spacing.Line * g_dKoef_mm_to_pt)+"pt");
+                else if( linerule_Auto == Item_pPr.Spacing.LineRule)
+                {
+                    if(1 == Item_pPr.Spacing.Line)
+                        apPr.push("line-height:normal");
+                    else
+                        apPr.push("line-height:"+parseInt(Item_pPr.Spacing.Line * 100)+"%");
+                }
+            }
+            if(Def_pPr.Spacing.LineRule != Item_pPr.Spacing.LineRule)
+            {
+                if(linerule_Exact == Item_pPr.Spacing.LineRule)
+                    apPr.push("mso-line-height-rule:exactly");
+            }
+            //��� ������� � word ����� ����� ��� �������� ������������ ������
+            //if(Def_pPr.Spacing.Before != Item_pPr.Spacing.Before)
+            apPr.push("margin-top:" + (Item_pPr.Spacing.Before * g_dKoef_mm_to_pt) + "pt");
+            //if(Def_pPr.Spacing.After != Item_pPr.Spacing.After)
+            apPr.push("margin-bottom:" + (Item_pPr.Spacing.After * g_dKoef_mm_to_pt) + "pt");
+            //Shd
+            if(Def_pPr.Shd.Value != Item_pPr.Shd.Value)
+                apPr.push("background-color:" + this.RGBToCSS(Item_pPr.Shd.Color));
+            //Tabs
+            if(Item_pPr.Tabs.Get_Count() > 0)
+            {
+                var sRes = "";
+                //tab-stops:1.0cm 3.0cm 5.0cm
+                for(var i = 0, length = Item_pPr.Tabs.Get_Count(); i < length; i++)
+                {
+                    if(0 != i)
+                        sRes += " ";
+                    sRes += Item_pPr.Tabs.Get(i).Pos / 10 + "cm";
+                }
+                apPr.push("tab-stops:" + sRes);
+            }
+            //Border
+            if(null != Item_pPr.Brd)
+            {
+                apPr.push("border:none");
+                var borderStyle = this._BordersToStyle(Item_pPr.Brd, "mso-", "-alt");
+                if(null != borderStyle)
+                {
+                    var nborderStyleLength = borderStyle.length;
+                    if(nborderStyleLength> 0)
+                        borderStyle = borderStyle.substring(0, nborderStyleLength - 1);
+                    apPr.push(borderStyle);
+                }
+            }
+        }
+        if(apPr.length > 0)
+            this.Para.setAttribute("style", apPr.join(';'));
+    },
+    InitRun : function(bInitPr)
+    {
+        if(bInitPr)
+        {
+            this.oTagPr = new Object();
+            this.orPr = new Object();
+        }
+        this.aInnerHtml = new Array();
+    },
+    CommitSpan : function(bInitPr)
+    {
+        if(this.aInnerHtml.length > 0)
+        {
+            var Run = document.createElement( "span" );
+            //Run.setAttribute("xml:space", "preserve");
+            var sStyle = "";
+            for(prop in this.orPr)
+                sStyle += prop + ":" + this.orPr[prop] + ";";
+            if("" != sStyle)
+                Run.setAttribute("style", sStyle);
+            if(this.aInnerHtml.length > 0)
+            {
+                var sText = this.aInnerHtml.join('');
+                //���� � ������ ��������� ���������, �� ��� ����� ��������
+                //�������� ��� ����� ������ ������� �� &nbsp;
+                sText = sText.replace(/\s+/g, function(str)
+                {
+                    var sResult = "";
+                    for(var i = 0, length = str.length; i < length - 1; i++)
+                    {
+                        sResult += "&nbsp;";
+                    }
+                    sResult += " ";
+                    return sResult;
+                });
+                //����������� ����� � ���� ������
+                var sStart = "";
+                var aEnd = new Array();
+                for(prop in this.oTagPr)
+                {
+                    sStart += "<" + prop + ">";
+                    aEnd.push("</" + prop + ">");
+                }
+                if("" != sStart && aEnd.length > 0)
+                {
+                    aEnd.reverse();
+                    sText = sStart + sText + aEnd.join('');
+                }
+
+                Run.innerHTML = sText;
+            }
+            if(null != this.oCurHyperlinkElem)
+                this.oCurHyperlinkElem.appendChild(Run);
+            else
+                this.Para.appendChild(Run);
+        }
+        this.InitRun(bInitPr);
+    },
+    parse_para_TextPr : function(Value)
+    {
+        //���������� ������� span
+        this.CommitSpan( false);
+        //���������� ����� ���������
+        for( var prop in Value )
+        {
+            this.SetProp(prop, Value[prop]);
+        }
+    },
+    SetProp : function(prop, val)
+    {
+        var oPropMap =
+        {
+            FontFamily: function( oThis, val )
+            {
+                var sFontName = val.Name;
+                if (sFontName == "" && 0 <= val.Index)
+                    sFontName = oThis.fontsArray[val.Index].Name;
+                oThis.orPr["font-family"] = "'" + sFontName + "'";
+            },
+
+            FontSize: function( oThis, val )
+            {
+                if (!oThis.api.DocumentReaderMode)
+                    oThis.orPr["font-size"] = val + "pt";//font-size � pt ��� ��������� ������� � mm
+                else
+                {
+                    oThis.orPr["font-size"] = oThis.api.DocumentReaderMode.CorrectFontSize(val);
+                }
+            },
+
+            Bold: function( oThis, val )
+            {
+                if(val)
+                    oThis.oTagPr["b"] = 1;//arPr.push("font-weight:bold");
+                else
+                    delete oThis.oTagPr["b"];
+            },
+
+            Italic: function( oThis, val )
+            {
+                if(val)
+                    oThis.oTagPr["i"] = 1;//arPr.push("font-style:italic");
+                else
+                    delete oThis.oTagPr["i"];
+            },
+
+            Underline:  function( oThis, val )
+            {
+                if(val)
+                    oThis.oTagPr["u"] = 1;
+                else
+                    delete oThis.oTagPr["u"];
+            },
+
+            Strikeout:  function( oThis, val )
+            {
+                if(val)
+                    oThis.oTagPr["s"] = 1;
+                else
+                    delete oThis.oTagPr["s"];
+            },
+
+            HighLight:  function( oThis, val )
+            {
+                if(val != highlight_None){
+                    oThis.orPr["background-color"] = oThis.RGBToCSS(val);
+                }
+                else
+                    delete oThis.orPr["background-color"];
+            },
+
+            Color:  function( oThis, val )
+            {
+                var color = oThis.RGBToCSS(val);
+                oThis.orPr["color"] = color;
+                oThis.orPr["mso-style-textfill-fill-color"] = color;
+            },
+
+            VertAlign:  function( oThis, val )
+            {
+                if(vertalign_SuperScript == val)
+                    oThis.orPr["vertical-align"] = "super";
+                else if(vertalign_SubScript == val)
+                    oThis.orPr["vertical-align"] = "sub";
+                else
+                    delete oThis.orPr["vertical-align"];
+            }
+        };
+
+        if( "undefined" != typeof( oPropMap[prop] ) )
+        {
+            oPropMap[prop]( this, val );
+        }
+    },
+    ParseItem : function(ParaItem, Par, nParIndex, aDocumentContent, nDocumentContentIndex)
+    {
+        switch ( ParaItem.Type )
+        {
+            case para_Text:
+                //���������� �����������
+                var sValue = ParaItem.Value;
+                if(sValue)
+                {
+                    sValue = CopyPasteCorrectString(sValue);
+                    this.aInnerHtml.push(sValue);
+                }
+                break;
+            case para_Space:    this.aInnerHtml.push(" "); break;
+            case para_Tab:        this.aInnerHtml.push("<span style='mso-tab-count:1'>    </span>"); break;
+            case para_NewLine:
+                if( break_Page == ParaItem.BreakType)
+                {
+                    //todo ��������� ���� �������� � ������ �����
+                    this.aInnerHtml.push("<br clear=\"all\" style=\"mso-special-character:line-break;page-break-before:always;\" />");
+                }
+                else
+                    this.aInnerHtml.push("<br style=\"mso-special-character:line-break;\" />");
+                break;
+            //������� ������� ����� ��������� ������ �� ���������� ��������
+            case para_End:        this.bOccurEndPar = true; break;
+            case para_TextPr:
+                if(null != Par)
+                {
+                    var oCalculateTextPr = Par.Internal_CalculateTextPr(nParIndex);
+                    this.parse_para_TextPr(oCalculateTextPr);
+                }
+                break;
+            case para_Drawing:
+                var oGraphicObj = ParaItem.GraphicObj;
+                var sSrc = oGraphicObj.getBase64Img();
+                if(sSrc.length > 0)
+                {
+                    sSrc = this.getSrc(sSrc);
+                    this.aInnerHtml.push("<img width=\""+Math.round(ParaItem.W * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(ParaItem.H * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\"  alt=\""+ParaItem.writeToBinaryForCopyPaste()+"\"/>"); break;
+                }
+                // var _canvas     = document.createElement('canvas');
+                // var w = img.width;
+                // var h = img.height;
+
+                // _canvas.width   = w;
+                // _canvas.height  = h;
+
+                // var _ctx        = _canvas.getContext('2d');
+                // _ctx.globalCompositeOperation = "copy";
+                // _ctx.drawImage(img, 0, 0);
+
+                // var _data = _ctx.getImageData(0, 0, w, h);
+                // _ctx = null;
+                // delete _canvas;
+                break;
+            case para_FlowObjectAnchor:
+                var oFlowObj = ParaItem.FlowObject;
+                if(flowobject_Image == oFlowObj.Get_Type())
+                {
+                    var sSrc = oFlowObj.Img;
+                    if(sSrc.length > 0)
+                    {
+                        sSrc = this.getSrc(sSrc);
+						var sStyle = "";
+						var nLeft = oFlowObj.X;
+						var nRight = nLeft + oFlowObj.W;
+						if(Math.abs(nLeft - X_Left_Margin) < Math.abs(Page_Width - nRight - X_Right_Margin))
+							sStyle = "float:left;";
+						else
+							sStyle = "float:right;";
+						if(!this.api.DocumentReaderMode)
+						{
+							if(null != oFlowObj.Paddings)
+								sStyle += "margin:" + (oFlowObj.Paddings.Top * g_dKoef_mm_to_pt) + "pt " + (oFlowObj.Paddings.Right * g_dKoef_mm_to_pt) + "pt " +  + (oFlowObj.Paddings.Bottom * g_dKoef_mm_to_pt) + "pt " + + (oFlowObj.Paddings.Left * g_dKoef_mm_to_pt) + "pt;";
+						}
+						else
+							sStyle += "margin:0pt 10pt 0pt 10pt;";
+						this.aInnerHtml.push("<img style=\""+sStyle+"\" width=\""+Math.round(oFlowObj.W * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(oFlowObj.H * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />"); break;
+                    }
+                }
+                break;
+            case para_HyperlinkStart:
+				if(null == this.oCurHyperlinkElem)
+				{
+					this.CommitSpan(false);
+					this.oCurHyperlink = ParaItem;
+					this.oCurHyperlinkElem = document.createElement( "a" );
+					if(null != this.oCurHyperlink.Value)
+						this.oCurHyperlinkElem.href = this.oCurHyperlink.Value;
+					if(null != this.oCurHyperlink.Tooltip)
+						this.oCurHyperlinkElem.setAttribute("title", this.oCurHyperlink.Tooltip);
+				}
+                break;
+            case para_HyperlinkEnd:
+                this.CommitSpan(false);
+                if(null != this.oCurHyperlinkElem)
+                {
+                    //������ hyperlink ������ � ���������
+                    this.Para.appendChild(this.oCurHyperlinkElem);
+                }
+                else
+                {
+                    //������ hyperlink �� ������ � ���������, ����� ��� �����
+                    var oHyperlink = null;
+                    //������� ���� � ������� ���������
+                    for(var i = nParIndex - 1; i >= 0; --i)
+                    {
+                        var item = Par.Content[i];
+                        if(para_HyperlinkStart == item.Type)
+                        {
+                            oHyperlink = item;
+                            break;
+                        }
+                    }
+                    //���� � ���������� ����������
+                    if(null == oHyperlink)
+                    {
+                        for(var i = nDocumentContentIndex - 1; i >= 0; --i)
+                        {
+                            var item = aDocumentContent[i];
+                            if(type_Paragraph == item.Type)
+                            {
+                                for(var j = item.Content.length -1 ; j >= 0; --j)
+                                {
+                                    var Paritem = item.Content[ji];
+                                    if(para_HyperlinkStart == Paritem.Type)
+                                    {
+                                        oHyperlink = Paritem;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if(null != oHyperlink)
+                    {
+                        bReset = false;
+                        this.CommitSpan(false);
+                        this.oCurHyperlink = oHyperlink;
+                        this.oCurHyperlinkElem = document.createElement( "a" );
+                        if(null != this.oCurHyperlink.Value)
+                            this.oCurHyperlinkElem.href = this.oCurHyperlink.Value;
+                        if(null != this.oCurHyperlink.Tooltip)
+                            this.oCurHyperlinkElem.setAttribute("title", this.oCurHyperlink.Tooltip);
+                        //���������� ��� �������������� �������� � ������
+                        for(var i = 0; i < this.Para.childNodes.length; i++)
+                        {
+                            var child = this.Para.childNodes[i];
+                            child = this.Para.removeChild(child);
+                            this.oCurHyperlinkElem.appendChild( child );
+                        }
+                        this.Para.appendChild(this.oCurHyperlinkElem);
+                    }
+                }
+                this.oCurHyperlink = null;
+                this.oCurHyperlinkElem = null;
+                break;
+        }
+    },
+    CopyParagraph : function(oDomTarget, Item, bLast, bUseSelection, aDocumentContent, nDocumentContentIndex)
+    {
+        var oDocument = this.oDocument;
+        this.Para = null;
+        //��� heading ����� � h1
+        var styleId = Item.Style_Get();
+        if(styleId)
+        {
+            var styleName = oDocument.Styles.Get_Name( styleId ).toLowerCase();
+            //������ "heading n" (n=1:6)
+            if(0 == styleName.indexOf("heading"))
+            {
+                var nLevel = parseInt(styleName.substring("heading".length));
+                if(1 <= nLevel && nLevel <= 6)
+                    this.Para = document.createElement( "h" + nLevel );
+            }
+        }
+        if(null == this.Para)
+            this.Para = document.createElement( "p" );
+
+        this.bOccurEndPar = false;
+        var oNumPr;
+        var bIsNullNumPr = false;
+        if(g_bIsDocumentCopyPaste)
+        {
+            oNumPr = Item.Numbering_Get();
+            bIsNullNumPr = (null == oNumPr || 0 == oNumPr.NumId);
+        }
+        else
+        {
+            oNumPr = Item.PresentationPr.Bullet;
+            bIsNullNumPr = (0 == oNumPr.m_nType);
+        }
+        if(bIsNullNumPr)
+            this.CommitList(oDomTarget);
+        else
+        {
+            var bBullet = false;
+            var sListStyle = "";
+            if(g_bIsDocumentCopyPaste)
+            {
+				var aNum = this.oDocument.Numbering.Get_AbstractNum( oNumPr.NumId );
+				if(null != aNum)
+				{
+					var LvlPr = aNum.Lvl[oNumPr.Lvl];
+					if(null != LvlPr)
+					{
+						switch(LvlPr.Format)
+						{
+							case numbering_numfmt_Decimal: sListStyle = "decimal";break;
+							case numbering_numfmt_LowerRoman: sListStyle = "lower-roman";break;
+							case numbering_numfmt_UpperRoman: sListStyle = "upper-roman";break;
+							case numbering_numfmt_LowerLetter: sListStyle = "lower-alpha";break;
+							case numbering_numfmt_UpperLetter: sListStyle = "upper-alpha";break;
+							default:
+								sListStyle = "disc";
+								bBullet = true;
+								break;
+						}
+					}
+				}
+            }
+            else
+            {
+                var _presentation_bullet = Item.PresentationPr.Bullet;
+                switch(_presentation_bullet.m_nType)
+                {
+                    case numbering_presentationnumfrmt_ArabicPeriod:
+                    case numbering_presentationnumfrmt_ArabicParenR:
+                    {
+                        sListStyle = "decimal";
+                        break;
+                    }
+                    case numbering_presentationnumfrmt_RomanLcPeriod: sListStyle = "lower-roman";break;
+                    case numbering_presentationnumfrmt_RomanUcPeriod: sListStyle = "upper-roman";break;
+
+                    case numbering_presentationnumfrmt_AlphaLcParenR:
+                    case numbering_presentationnumfrmt_AlphaLcPeriod:
+                    {
+                        sListStyle = "lower-alpha";
+                        break;
+                    }
+                    case numbering_presentationnumfrmt_AlphaUcParenR:
+                    case numbering_presentationnumfrmt_AlphaUcPeriod:
+                    {
+                        sListStyle = "upper-alpha";
+                        break;
+                    }
+
+                    default:
+                        sListStyle = "disc";
+                        bBullet = true;
+                        break;
+                }
+            }
+            var Li = document.createElement( "li" );
+            Li.setAttribute("style", "list-style-type: " + sListStyle);
+            Li.appendChild( this.Para );
+            if(bBullet)
+                this.Ul.appendChild( Li );
+            else
+                this.Ol.appendChild( Li );
+        }
+        //pPr
+        this.Commit_pPr(Item);
+        //run
+        this.InitRun(true);
+
+        var ParaStart = 0;
+        var ParaEnd   = Item.Content.length - 1;
+        if(true == bUseSelection)
+        {
+            ParaStart = Item.Selection.StartPos;
+            ParaEnd   = Item.Selection.EndPos;
+            if ( ParaStart > ParaEnd )
+            {
+                var Temp2 = ParaEnd;
+                ParaEnd = ParaStart;
+                ParaStart = Temp2;
+            }
+        }
+
+        //���� ������ ��������� ����� �� ParaStart
+        var oCalculateTextPr = Item.Internal_CalculateTextPr(ParaStart);
+        this.parse_para_TextPr(oCalculateTextPr);
+
+        //��� hyperlink: ���� ������ ���� �� ��������� ����������, �� � ����� ��������� ���� �������� �� ������
+        if(null != this.oCurHyperlink)
+        {
+            this.oCurHyperlinkElem = document.createElement( "a" );
+            if(null != this.oCurHyperlink.Value)
+                this.oCurHyperlinkElem.href = this.oCurHyperlink.Value;
+            if(null != this.oCurHyperlink.Tooltip)
+                this.oCurHyperlinkElem.setAttribute("title", this.oCurHyperlink.Tooltip);
+        }
+        // TODO : ����������� ��������, ���  ������ ������� Hyperlink. ������� �� ����������.
+        if ( ParaStart > 0 )
+        {
+            while ( Item.Content[ParaStart - 1].Type === para_TextPr || Item.Content[ParaStart - 1].Type === para_HyperlinkStart )
+            {
+                ParaStart--;
+                if(0 == ParaStart)
+                    break;
+            }
+        }
+        //����������� �� �������� ���������
+        for ( var Index2 = ParaStart; Index2 < ParaEnd; Index2++ )
+        {
+            var ParaItem = Item.Content[Index2];
+            this.ParseItem(ParaItem, Item, Index2, aDocumentContent, nDocumentContentIndex);
+        }
+        this.CommitSpan(true);
+
+        //��� hyperlink: ���� ������ ���� � ���������� ����������, �� ���� ��������� ������ � ������� ���������
+        if(null != this.oCurHyperlinkElem)
+            this.Para.appendChild(this.oCurHyperlinkElem);
+        this.oCurHyperlink = null;
+        this.oCurHyperlinkElem = null;
+
+
+        if(bLast && false == this.bOccurEndPar)
+        {
+            if(false == bIsNullNumPr)
+            {
+                //������ �������� � ������. ������� ������� �� ������. ���������� ����� ��� span
+                var li = this.Para.parentNode;
+                var ul = li.parentNode;
+                ul.removeChild(li);
+                this.CommitList(oDomTarget);
+            }
+            for(var i = 0; i < this.Para.childNodes.length; i++)
+                oDomTarget.appendChild( this.Para.childNodes[i].cloneNode(true) );
+        }
+        else
+        {
+            //����� ��������� ������ ���������
+            if(this.Para.childNodes.length == 0)
+                this.Para.appendChild( document.createTextNode( '\xa0' ) );
+            if(bIsNullNumPr)
+                oDomTarget.appendChild( this.Para );
+        }
+    },
+    _BorderToStyle : function(border, name)
+    {
+        var res = "";
+        if(border_None == border.Value)
+            res += name + ":none;";
+        else
+        {
+            bBorder = true;
+            var size = 0.5;
+            var color = { r : 0, g : 0, b : 0 };
+            if(null != border.Size)
+                size = border.Size * g_dKoef_mm_to_pt;
+            if(null != border.Color)
+                color = border.Color;
+            res += name + ":"+size+"pt solid "+this.RGBToCSS(color)+";";
+        }
+        return res;
+    },
+    _MarginToStyle : function(margins, styleName)
+    {
+        var res = "";
+        var nMarginLeft = 1.9;
+        var nMarginTop = 0;
+        var nMarginRight = 1.9;
+        var nMarginBottom = 0;
+        if(null != margins.Left && tblwidth_Mm == margins.Left.Type && null != margins.Left.W)
+            nMarginLeft = margins.Left.W;
+        if(null != margins.Top && tblwidth_Mm == margins.Top.Type && null != margins.Top.W)
+            nMarginTop = margins.Top.W;
+        if(null != margins.Right && tblwidth_Mm == margins.Right.Type && null != margins.Right.W)
+            nMarginRight = margins.Right.W;
+        if(null != margins.Bottom && tblwidth_Mm == margins.Bottom.Type && null != margins.Bottom.W)
+            nMarginBottom = margins.Bottom.W;
+        res = styleName + ":"+(nMarginTop * g_dKoef_mm_to_pt)+"pt "+(nMarginRight * g_dKoef_mm_to_pt)+"pt "+(nMarginBottom * g_dKoef_mm_to_pt)+"pt "+(nMarginLeft * g_dKoef_mm_to_pt)+"pt;";
+        return res;
+    },
+    _BordersToStyle : function(borders, mso, alt)
+    {
+        var res = "";
+        if(null == mso)
+            mso = "";
+        if(null == alt)
+            alt = "";
+        if(null != borders.Left)
+            res += this._BorderToStyle(borders.Left, mso + "border-left" + alt);
+        if(null != borders.Top)
+            res += this._BorderToStyle(borders.Top, mso + "border-top" + alt);
+        if(null != borders.Right)
+            res += this._BorderToStyle(borders.Right, mso + "border-right" + alt);
+        if(null != borders.Bottom)
+            res += this._BorderToStyle(borders.Bottom, mso + "border-bottom" + alt);
+        if(null != borders.InsideV)
+            res += this._BorderToStyle(borders.InsideV, "mso-border-insidev");
+        if(null != borders.InsideH)
+            res += this._BorderToStyle(borders.InsideH, "mso-border-insideh");
+        if(null != borders.Between)
+            res += this._BorderToStyle(borders.Between, "mso-border-between");
+        return res;
+    },
+    _MergeProp : function(elem1, elem2)
+    {
+        if( !elem1 || !elem2 )
+        {
+            return;
+        }
+
+        var p, v;
+        for(p in elem2)
+        {
+            if(elem2.hasOwnProperty(p) && false == elem1.hasOwnProperty(p))
+            {
+                v = elem2[p];
+                if(null != v)
+                    elem1[p] = v;
+            }
+        }
+    },
+    CopyCell : function(tr, cell, tablePr, width, rowspan)
+    {
+        var tc = document.createElement( "td" );
+        //Pr
+        var tcStyle = "";
+        if(width > 0)
+        {
+            tc.setAttribute("width", Math.round(width * g_dKoef_mm_to_pix));
+            tcStyle += "width:"+(width * g_dKoef_mm_to_pt)+"pt;";
+        }
+        if(rowspan > 1)
+            tc.setAttribute("rowspan", rowspan);
+        var cellPr = null;
+        if(null != cell.CompiledPr && null != cell.CompiledPr.Pr)
+        {
+            cellPr = cell.CompiledPr.Pr;
+            //��� ������ � �������� ����� ������������ margin � �� colspan
+            if(null != cellPr.GridSpan && cellPr.GridSpan > 1)
+                tc.setAttribute("colspan", cellPr.GridSpan);
+        }
+        if(null != cellPr && null != cellPr.Shd)
+        {
+            if(shd_Nil != cellPr.Shd.Value)
+                tcStyle += "background-color:"+this.RGBToCSS(cellPr.Shd.Color)+";";
+        }
+        else if(null != tablePr && null != tablePr.Shd)
+        {
+            if(shd_Nil != tablePr.Shd.Value)
+                tcStyle += "background-color:"+this.RGBToCSS(tablePr.Shd.Color)+";";
+        }
+        var oCellMar = new Object();
+        if(null != cellPr && null != cellPr.TableCellMar)
+            this._MergeProp(oCellMar, cellPr.TableCellMar);
+        if(null != tablePr && null != tablePr.TableCellMar)
+            this._MergeProp(oCellMar, tablePr.TableCellMar);
+        tcStyle += this._MarginToStyle(oCellMar, "padding");
+
+        var oCellBorder = new Object();
+        if(null != cellPr && null != cellPr.TableCellBorders)
+            this._MergeProp(oCellBorder, cellPr.TableCellBorders);
+        if(null != tablePr && null != tablePr.TableBorders)
+            this._MergeProp(oCellBorder, tablePr.TableBorders);
+        tcStyle += this._BordersToStyle(oCellBorder);
+
+        if("" != tcStyle)
+            tc.setAttribute("style", tcStyle);
+        //Content
+        this.CopyDocument(tc, cell.Content, false);
+
+        tr.appendChild(tc);
+    },
+    CopyRow : function(oDomTarget, table, nCurRow, start, end)
+    {
+        var row = table.Content[nCurRow];
+        var tr = document.createElement( "tr" );
+        //Pr
+        var grid = table.TableGrid;
+        var trStyle = "";
+        var nGridBefore = 0;
+		var rowPr = null;
+		if(null != row.CompiledPr && null != row.CompiledPr.Pr)
+			rowPr = row.CompiledPr.Pr;
+        if(null != rowPr)
+        {
+            //WBefore
+            if(null != rowPr.GridBefore)
+            {
+                if(rowPr.GridBefore > 0)
+                {
+                    nGridBefore = rowPr.GridBefore;
+                    var nWBefore = 0;
+                    for(var i = 0, length = grid.length; i < nGridBefore && i < length; ++i)
+                        nWBefore += grid[i];
+                    //���������� margin
+                    trStyle += "mso-row-margin-left:"+(nWBefore * g_dKoef_mm_to_pt)+"pt";
+                    //��������� td ��� ��� ��� �� �������� mso-row-margin-left
+                    var oNewTd = document.createElement( "td" );
+                    oNewTd.setAttribute("style", "mso-cell-special:placeholder;border:none;padding:0cm 0cm 0cm 0cm");
+                    oNewTd.setAttribute("width", Math.round(nWBefore * g_dKoef_mm_to_pix));
+                    if(nGridBefore > 1)
+                        oNewTd.setAttribute("colspan", nGridBefore);
+                    var oNewP = document.createElement( "p" );
+                    oNewP.appendChild(document.createTextNode( '\xa0' ));
+                    oNewTd.appendChild(oNewP);
+                    tr.appendChild(oNewTd);
+                }
+            }
+            //height
+            if(null != rowPr.Height && heightrule_Auto != rowPr.Height.HRule && null != rowPr.Height.Value)
+            {
+                trStyle += "height:"+(rowPr.Height.Value * g_dKoef_mm_to_pt)+"pt";
+            }
+        }
+        if("" != trStyle)
+            tr.setAttribute("style", trStyle);
+        //tc
+		var nSumGridSpan = nGridBefore;
+        for(var i = start.Cell, length = row.Content.length; i <= end.Cell && i < length; ++i)
+        {
+            var cell = row.Content[i];
+            var nGridSpan = 1;
+            if(null != cell.Pr && null != cell.Pr.GridSpan)
+                nGridSpan = cell.Pr.GridSpan;			
+            if(null != cell.Pr && vmerge_Continue == cell.Pr.VMerge)
+			{
+				nSumGridSpan += nGridSpan;
+                continue;
+			}
+            var width = 0;
+            for(var j = 0, length2 = grid.length; j < nGridSpan && nGridBefore + nSumGridSpan + j < length2; ++j)
+                width += grid[nGridBefore + nSumGridSpan + j];
+			//��������� rowspan
+            var nRowSpan = 1;
+            for(var j = nCurRow + 1, length2 = table.Content.length; j <= end.Row && j < length2; ++j)
+            {
+                var bContinue = false;
+				var oBottomRow = table.Content[j];
+				var bottomCell = null;
+				var nTempSumGridSpan = 0;
+				if(null != oBottomRow.Pr && null != oBottomRow.Pr.GridBefore)
+					nTempSumGridSpan = oBottomRow.Pr.GridBefore;
+				
+				for(var k = 0, length3 = oBottomRow.Content.length; k < length3; ++k)
+				{
+					var oTempCell = oBottomRow.Content[k];
+					if(nTempSumGridSpan >= nSumGridSpan)
+					{
+						bottomCell = oTempCell;
+						break;
+					}
+					else
+					{
+						if(null != oTempCell.Pr && null != oTempCell.Pr.GridSpan)
+							nTempSumGridSpan += oTempCell.Pr.GridSpan;
+						else
+							nTempSumGridSpan += 1;
+					}
+				}
+                if(null != bottomCell && null != bottomCell.Pr && vmerge_Continue == bottomCell.Pr.VMerge)
+                    bContinue = true;
+                if(false != bContinue)
+                    nRowSpan++;
+                else
+                    break;
+            };
+			nSumGridSpan += nGridSpan;
+			var tablePr = null;
+			if(null != table.CompiledPr && null != table.CompiledPr.Pr && null != table.CompiledPr.Pr.TablePr)
+				tablePr = table.CompiledPr.Pr.TablePr;
+            this.CopyCell(tr, cell, tablePr, width, nRowSpan);
+        }
+        //WAfter
+        if(null != rowPr)
+        {
+            if(null != rowPr.GridAfter)
+            {
+                if(rowPr.GridAfter > 0)
+                {
+                    var nGridAfter = rowPr.GridAfter;
+                    var nWAfter = 0;
+                    for(var i = 0, length = grid.length; i < nGridAfter && i < length; ++i)
+                        nWAfter += grid[length - i - 1];
+                    //���������� margin
+                    trStyle += "mso-row-margin-right:"+(nWAfter * g_dKoef_mm_to_pt)+"pt";
+                    //��������� td ��� ��� ��� �� �������� mso-row-margin-left
+                    var oNewTd = document.createElement( "td" );
+                    oNewTd.setAttribute("style", "mso-cell-special:placeholder;border:none;padding:0cm 0cm 0cm 0cm");
+                    oNewTd.setAttribute("width", Math.round(nWAfter * g_dKoef_mm_to_pix));
+                    if(nGridAfter > 1)
+                        oNewTd.setAttribute("colspan", nGridAfter);
+                    var oNewP = document.createElement( "p" );
+                    oNewP.appendChild(document.createTextNode( '\xa0' ));
+                    oNewTd.appendChild(oNewP);
+                    tr.appendChild(oNewTd);
+                }
+            }
+        }
+
+        oDomTarget.appendChild(tr);
+    },
+    CopyTable : function(oDomTarget, table, start, end)
+    {
+        this.CommitList(oDomTarget);
+        var resItem;
+        var DomTable = document.createElement( "table" );
+        resItem = DomTable;
+        var Pr = null;
+        if(null != table.CompiledPr && null != table.CompiledPr.Pr && null != table.CompiledPr.Pr.TablePr)
+            Pr = table.CompiledPr.Pr.TablePr;
+        var tblStyle = "";
+        var bBorder = false;
+        if(null != Pr)
+        {
+            if(null != Pr.Jc)
+            {
+                var align = "";
+                switch(Pr.Jc)
+                {
+                    case align_Center:align = "center";break;
+                    case align_Right:align = "right";break;
+                }
+                if("" != align)
+                {
+                    //�������� ����������� � div
+                    var wrapDiv = document.createElement( "div" );
+                    wrapDiv.setAttribute("align", align);
+                    wrapDiv.appendChild(DomTable);
+                    resItem = wrapDiv;
+                }
+            }
+            if(null != Pr.TableInd)
+                tblStyle += "margin-left:"+(Pr.TableInd * g_dKoef_mm_to_pt)+"pt;";
+            if(null != Pr.Shd && shd_Nil != Pr.Shd.Value)
+                tblStyle += "background:"+this.RGBToCSS(Pr.Shd.Color)+";";
+            if(null != Pr.TableCellMar)
+                tblStyle += this._MarginToStyle(Pr.TableCellMar, "mso-padding-alt");
+            if(null != Pr.TableBorders)
+                tblStyle += this._BordersToStyle(Pr.TableBorders);
+        }
+        //���� cellSpacing
+        var bAddSpacing = false;
+        if(table.Content.length > 0)
+        {
+            var firstRow = table.Content[0];
+            if(null != firstRow.Pr && null != firstRow.Pr.TableCellSpacing)
+            {
+                bAddSpacing = true;
+                var cellSpacingMM = firstRow.Pr.TableCellSpacing;
+                tblStyle += "mso-cellspacing:"+(cellSpacingMM * g_dKoef_mm_to_pt)+"pt;";
+                DomTable.setAttribute("cellspacing", Math.round(cellSpacingMM * g_dKoef_mm_to_pix));
+            }
+        }
+        if(!bAddSpacing)
+            DomTable.setAttribute("cellspacing", 0);
+        DomTable.setAttribute("border", false == bBorder ? 0 : 1);
+        DomTable.setAttribute("cellpadding", 0);
+        if("" != tblStyle)
+            DomTable.setAttribute("style", tblStyle);
+
+        //rows
+        for(var i = start.Row, length = table.Content.length; i < length && i <= end.Row; i++)
+            this.CopyRow(DomTable, table, i ,start, end);
+
+        oDomTarget.appendChild(resItem);
+    },
+    CopyDocument : function(oDomTarget, oDocument, bUseSelection)
+    {
+        var Start = 0;
+        var End = 0;
+        if(bUseSelection)
+        {
+            if ( true === oDocument.Selection.Use)
+            {
+                if ( selectionflag_DrawingObject === oDocument.Selection.Flag )
+                {
+                    this.Para = document.createElement( "p" );
+                    //������ ���� �������� ������ ���� ��������
+                    this.InitRun();
+                    this.ParseItem(oDocument.Selection.Data.DrawingObject);
+                    this.CommitSpan(false);
+
+                    for(var i = 0; i < this.Para.childNodes.length; i++)
+                        this.ElemToSelect.appendChild( this.Para.childNodes[i].cloneNode(true) );
+                }
+                else
+                {
+                    Start = oDocument.Selection.StartPos;
+                    End = oDocument.Selection.EndPos;
+                    if ( Start > End )
+                    {
+                        var Temp = End;
+                        End = Start;
+                        Start = Temp;
+                    }
+                }
+            }
+        }
+        else
+        {
+            Start = 0;
+            End = oDocument.Content.length - 1;
+        }
+        // HtmlText
+        for ( var Index = Start; Index <= End; Index++ )
+        {
+            var Item = oDocument.Content[Index];
+            if(type_Table === Item.GetType() )
+            {
+                if(bUseSelection)
+                {
+                    if(table_Selection_Text == Item.Selection.Type)
+                    {
+                        //������� ����� � ������.
+                        var rowIndex = Item.Selection.StartPos.Pos.Row;
+                        var colIndex = Item.Selection.StartPos.Pos.Cell;
+                        if(rowIndex < Item.Content.length)
+                        {
+                            var row = Item.Content[rowIndex];
+                            if(colIndex < row.Content.length)
+                            {
+                                var cell = row.Content[colIndex];
+                                this.CopyDocument(oDomTarget, cell.Content, bUseSelection);
+                            }
+                        }
+                    }
+                    else if(table_Selection_Cell == Item.Selection.Type)
+                    {
+                        //������� �������� �����
+						var start = {Row:Item.Rows, Cell: Item.Cols};
+						var end = {Row:0, Cell: 0};
+						for(var i = 0, length = Item.Selection.Data.length; i < length; ++i)
+						{
+							var elem = Item.Selection.Data[i];
+							if(elem.Row > end.Row)
+								end.Row = elem.Row;
+							if(elem.Row < start.Row)
+								start.Row = elem.Row;
+							if(elem.Cell > end.Cell)
+								end.Cell = elem.Cell;
+							if(elem.Cell < start.Cell)
+								start.Cell = elem.Cell;
+						}
+						if(Item.Selection.Data.length > 0)
+                        	this.CopyTable(oDomTarget, Item, start, end);
+                    }
+                }
+                else
+                    this.CopyTable(oDomTarget, Item, {Row:0, Cell: 0}, {Row:Item.Rows, Cell: Item.Cols});
+            }
+            else if ( type_Paragraph === Item.GetType() )
+            {
+                //todo ����� ������ ��� �������� ������ ���� Index == End
+                this.CopyParagraph(oDomTarget, Item, Index == End, bUseSelection, oDocument.Content, Index);
+            }
+        }
+        this.CommitList(oDomTarget);
+    },
+    Start : function(node)
+    {
+        var oDocument = this.oDocument;
+        if(g_bIsDocumentCopyPaste)
+        {
+			if(!this.api.DocumentReaderMode)
+			{
+				var Def_pPr = oDocument.Styles.Default.ParaPr;
+				if(docpostype_HdrFtr === oDocument.CurPos.Type)
+				{
+					if(null != oDocument.HdrFtr && null != oDocument.HdrFtr.CurHdrFtr && null != oDocument.HdrFtr.CurHdrFtr.Content)
+						oDocument = oDocument.HdrFtr.CurHdrFtr.Content;
+				}
+				if ( oDocument.CurPos.Type == docpostype_FlowObjects )
+				{
+					var oData = oDocument.Selection.Data.FlowObject;
+					switch ( oData.Get_Type() )
+					{
+						case flowobject_Image:
+						{
+							this.Para = document.createElement( "p" );
+							//������ ���� �������� ������ ���� ��������
+							this.InitRun();
+							this.ParseItem(oData);
+							var oImg = oData;
+							var sSrc = oImg.Img;
+							if(sSrc.length > 0)
+							{
+								sSrc = this.getSrc(sSrc);
+								this.aInnerHtml.push("<img width=\""+Math.round(oImg.W * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(oImg.H * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />");
+							}
+							this.CommitSpan(false);
+							this.ElemToSelect.appendChild( this.Para );
+							return;
+						}
+						case flowobject_Table:
+						{
+							if(null != oData.Table && null != oData.Table.CurCell && null != oData.Table.CurCell.Content)
+								oDocument = oData.Table.CurCell.Content;
+							break;
+						}
+					}
+				}
+
+                if(oDocument.CurPos.Type === docpostype_DrawingObjects)
+                {
+                    switch(oDocument.DrawingObjects.curState.id)
+                    {
+                        case STATES_ID_TEXT_ADD:
+                        {
+                            var text_object = oDocument.DrawingObjects.curState.textObject;
+                            if(text_object != null && text_object.GraphicObj != null && text_object.GraphicObj.textBoxContent != null)
+                                oDocument = text_object.GraphicObj.textBoxContent;
+                            break;
+                        }
+                        case STATES_ID_TEXT_ADD_IN_GROUP:
+                        {
+                            text_object = oDocument.DrawingObjects.curState.textObject;
+                            if(text_object != null &&  text_object.textBoxContent != null)
+                                oDocument = text_object.textBoxContent;
+                            break;
+                        }
+
+                        case STATES_ID_GROUP:
+                        {
+                            var s_arr = oDocument.DrawingObjects.curState.group.selectionInfo.selectionArray;
+
+                            this.Para = document.createElement( "span" );
+                            this.InitRun();
+                            for(var i = 0; i < s_arr.length; ++i)
+                            {
+                                var cur_element = s_arr[i];
+                                if(isRealObject(cur_element.parent))
+                                {
+                                    var base64_img = cur_element.parent.getBase64Img();
+                                    var src = this.getSrc(base64_img);
+                                    var alt_content = cur_element.parent.writeToBinaryForCopyPaste();
+
+                                    this.aInnerHtml.push("<img width=\""+Math.round(/*cur_element.W*/5 * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(/*cur_element.H*/5 * g_dKoef_mm_to_pix)+"\" src=\""+src+"\" alt=\""+alt_content+"\" />");
+
+                                    this.ElemToSelect.appendChild( this.Para );
+                                }
+
+                            }
+                            this.CommitSpan(false);
+                            return;
+                        }
+                        default :
+                        {
+                            var gr_objects = oDocument.DrawingObjects;
+                            var selection_array = gr_objects.selectionInfo.selectionArray;
+
+                            this.Para = document.createElement( "span" );
+                            this.InitRun();
+                            for(var i = 0; i < selection_array.length; ++i)
+                            {
+                                var cur_element = selection_array[i];
+                                var base64_img = cur_element.getBase64Img();
+                                var src = this.getSrc(base64_img);
+                                var alt_content = cur_element.writeToBinaryForCopyPaste();
+
+                                this.aInnerHtml.push("<img width=\""+Math.round(/*cur_element.W*/5 * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(/*cur_element.H*/5 * g_dKoef_mm_to_pix)+"\" src=\""+src+"\" alt=\""+alt_content+"\" />");
+
+                                this.ElemToSelect.appendChild( this.Para );
+                            }
+                            this.CommitSpan(false);
+                            return;
+                        }
+
+                    }
+                }
+				if ( true === oDocument.Selection.Use )
+				{
+					this.CopyDocument(this.ElemToSelect, oDocument, true);
+				}
+			}
+			else
+				this.CopyDocument(this.ElemToSelect, oDocument, false);
+        }
+        else
+        {
+            if ( oDocument.CurPos.Type == docpostype_FlowObjects )
+            {
+                var _cur_slide_elements = oDocument.Slides[oDocument.CurPage].elementsManipulator;
+                if(_cur_slide_elements.obj != undefined && _cur_slide_elements.obj.txBody && _cur_slide_elements.obj.txBody.content)
+                {
+                    oDocument = _cur_slide_elements.obj.txBody.content;
+                    if ( true === oDocument.Selection.Use )
+                    {
+                        this.CopyDocument(this.ElemToSelect, oDocument, true);
+                    }
+                }
+                else
+                {
+                    if(_cur_slide_elements.obj != undefined && _cur_slide_elements.obj.graphicObject && _cur_slide_elements.obj.graphicObject.CurCell && _cur_slide_elements.obj.graphicObject.CurCell.Content)
+                    {
+                        oDocument = _cur_slide_elements.obj.graphicObject.CurCell.Content;
+                        if ( true === oDocument.Selection.Use )
+                        {
+                            this.CopyDocument(this.ElemToSelect, oDocument, true);
+                        }
+                    }
+                }
+            }
+        }
+    }
+};
+
+function Editor_Paste_GetElem(api, bClean)
+{
+    var oWordControl = api.WordControl;
+    var pastebin = document.getElementById('wrd_pastebin');
+    if(!pastebin){
+        pastebin = document.createElement("div");
+        pastebin.setAttribute( 'id', 'wrd_pastebin' );
+        pastebin.style.position = 'absolute';
+        pastebin.style.top = '-100px';
+        pastebin.style.left = '0px';
+        pastebin.style.width = '10000px';
+        pastebin.style.height = '100px';
+        pastebin.style.overflow = 'hidden';
+        pastebin.style.zIndex = -1000;
+        //��������� ������ ������������, ����� �������� �������� ����� pastebin �������� span � ������� ��� �������� ������ � computedStyle ���������� ����������� ��������� ��������� �� ���������
+        var Def_rPr = oWordControl.m_oLogicDocument.Styles.Default.TextPr;
+        pastebin.style.fontFamily = Def_rPr.FontFamily.Name;
+
+        if (!api.DocumentReaderMode)
+            pastebin.style.fontSize = Def_rPr.FontSize + "pt";
+        else
+        {
+            api.DocumentReaderMode.CorrectDefaultFontSize(Def_rPr.FontSize);
+            pastebin.style.fontSize = "1em";
+        }
+        pastebin.style.lineHeight = "1px";//todo FF ������ ���������� computedStyle � px, ������� ����� ���� ������� default ���������
+        pastebin.style.MozUserSelect = "text";
+        pastebin.style["-khtml-user-select"] = "text";
+        pastebin.style["-o-user-select"] = "text";
+        pastebin.style["user-select"] = "text";
+        pastebin.style["-webkit-user-select"] = "text";
+        pastebin.setAttribute("contentEditable", true);
+
+        pastebin.onpaste = function(e){Body_Paste(api,e);};
+        document.body.appendChild( pastebin );
+    }
+    else if(bClean){
+        //������� ����������
+        var aChildNodes = pastebin.childNodes;
+        for (var length = aChildNodes.length, i = length - 1; i >= 0; i--)
+        {
+            pastebin.removeChild(aChildNodes[i]);
+        }
+    }
+    return pastebin;
+}
+function Editor_Paste_Button(api)
+{
+    if(false == g_bIsDocumentCopyPaste)
+    {
+        var _logic_document = api.WordControl.m_oLogicDocument;
+        switch(api.WordControl.Thumbnails.FocusObjType)
+        {
+            case FOCUS_OBJECT_MAIN:
+            {
+                if(_logic_document && _logic_document.CurPos.Type != docpostype_FlowObjects )
+                {
+                    _logic_document.Slides[_logic_document.CurPage].elementsManipulator.glyphsPaste();
+                    return true;
+                }
+                break;
+            }
+            case FOCUS_OBJECT_THUMBNAILS :
+            {
+                _logic_document.slidesPaste(_logic_document.CurPage);
+                return true;
+            }
+        }
+    }
+    if(/MSIE/g.test(navigator.userAgent))
+    {
+        document.body.style.MozUserSelect = "text";
+        delete document.body.style["-khtml-user-select"];
+        delete document.body.style["-o-user-select"];
+        delete document.body.style["user-select"];
+        document.body.style["-webkit-user-select"] = "text";
+
+        var pastebin = Editor_Paste_GetElem(api, true);
+
+        pastebin.style.display  = "block";
+        pastebin.focus();
+
+        var selection = window.getSelection();
+        var rangeToSelect = document.createRange();
+        rangeToSelect.selectNodeContents (pastebin);
+        selection.removeAllRanges ();
+        selection.addRange(rangeToSelect);
+
+        //rangeToSelect.execCommand("paste", false);
+        document.execCommand("paste");
+
+        pastebin.blur();
+        pastebin.style.display  = "none";
+
+        document.body.style.MozUserSelect = "none";
+        document.body.style["-khtml-user-select"] = "none";
+        document.body.style["-o-user-select"] = "none";
+        document.body.style["user-select"] = "none";
+        document.body.style["-webkit-user-select"] = "none";
+
+        Editor_Paste(api, false);
+        return true;
+    }
+	else
+	{
+		 var ElemToSelect = document.getElementById( "SelectId" );
+		 if(ElemToSelect)
+            Editor_Paste_Exec(api, ElemToSelect);
+		return true;
+	}
+    return false;
+}
+function CanPaste(oDocument)
+{
+    //����� ������ paste ����� Select � ���������
+    //�� ����� ������ paste ����� select �� ������� �������, ��������, ������
+    var oTargetDoc = oDocument;
+    if(g_bIsDocumentCopyPaste)
+    {
+        if ( docpostype_HdrFtr === oTargetDoc.CurPos.Type )
+        {
+            if(null != oTargetDoc.HdrFtr.CurHdrFtr)
+                oTargetDoc = oTargetDoc.HdrFtr.CurHdrFtr.Content;
+            else
+                return false;
+        }
+        if ( docpostype_FlowObjects == oTargetDoc.CurPos.Type )
+        {
+            var nType = oTargetDoc.Selection.Data.FlowObject.Get_Type();
+            if(flowobject_Table == nType)
+            {
+                var oTable = oTargetDoc.Selection.Data.FlowObject.Table;
+                if(true == oTable.Selection.Use && table_Selection_Cell == oTable.Selection.Type)
+                    return false;
+                if(null != oTable.CurCell && null != oTable.CurCell.Content)
+                {
+                    oTargetDoc = oTable.CurCell.Content;
+                }
+            }
+        }
+    }
+    else
+    {
+        if ( docpostype_FlowObjects == oTargetDoc.CurPos.Type )
+        {
+            var _cur_slide_elements = oTargetDoc.Slides[oTargetDoc.CurPage].elementsManipulator;
+            if(_cur_slide_elements.obj != undefined && _cur_slide_elements.obj.txBody && _cur_slide_elements.obj.txBody.content)
+            {
+                return true;
+            }
+        }
+    }
+    return true;
+};
+function Editor_Paste(api, bClean)
+{
+    var oWordControl = api.WordControl;
+    oWordControl.bIsEventPaste = false;
+    var oDocument = oWordControl.m_oLogicDocument;
+    if(false == CanPaste(oDocument))
+        return;
+
+    document.body.style.MozUserSelect = "text";
+    delete document.body.style["-khtml-user-select"];
+    delete document.body.style["-o-user-select"];
+    delete document.body.style["user-select"];
+    document.body.style["-webkit-user-select"] = "text";
+
+    var Text;
+    var pastebin = Editor_Paste_GetElem(api, bClean);
+    pastebin.style.display  = "block";
+    pastebin.focus();
+    // Safari requires a filler node inside the div to have the content pasted into it. (#4882)
+    pastebin.appendChild( document.createTextNode( '\xa0' ) );
+
+    if (window.getSelection) {  // all browsers, except IE before version 9
+        var selection = document.defaultView.getSelection ();
+        selection.removeAllRanges ();
+        var rangeToSelect = document.createRange ();
+        rangeToSelect.selectNodeContents (pastebin);
+
+        selection.removeAllRanges ();
+        selection.addRange (rangeToSelect);
+    } else {
+        if (document.body.createTextRange) {    // Internet Explorer
+            var rangeToSelect = document.body.createTextRange ();
+            rangeToSelect.moveToElementText (pastebin);
+            rangeToSelect.select ();
+        }
+    }
+    //���� ���������� paste
+    window.setTimeout( function()
+    {
+        document.body.style.MozUserSelect = "none";
+        document.body.style["-khtml-user-select"] = "none";
+        document.body.style["-o-user-select"] = "none";
+        document.body.style["user-select"] = "none";
+        document.body.style["-webkit-user-select"] = "none";
+
+        if(!oWordControl.bIsEventPaste)
+            Editor_Paste_Exec(api, pastebin);
+        else
+            pastebin.style.display  = "none";
+    }, 0 );
+};
+function CopyPasteCorrectString(str)
+{
+    var res = str;
+    res = res.replace(/&/g,'&amp;');
+    res = res.replace(/</g,'&lt;');
+    res = res.replace(/>/g,'&gt;');
+    res = res.replace(/'/g,'&apos;');
+    res = res.replace(/"/g,'&quot;');
+    return res;
+};
+function Body_Paste(api, e)
+{
+    var oWordControl = api.WordControl;
+    if (e && e.clipboardData && e.clipboardData.getData) {// Webkit - get data from clipboard, put into editdiv, cleanup, then cancel event
+        var bExist = false;
+        //������ chrome ��������� �������� 'text/html', safari ������ 'text/plain'
+        var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
+        var sHtml = null;
+
+        var fPasteHtml = function(sHtml)
+        {
+            if(null != sHtml)
+            {
+                //���������� html � IFrame
+                var ifr = document.getElementById("pasteFrame");
+                if (!ifr)
+                {
+                    ifr = document.createElement("iframe");
+                    ifr.name = "pasteFrame";
+                    ifr.id = "pasteFrame";
+                    ifr.style.position = 'absolute';
+                    ifr.style.top = '-100px';
+                    ifr.style.left = '0px';
+                    ifr.style.width = '10000px';
+                    ifr.style.height = '100px';
+                    ifr.style.overflow = 'hidden';
+                    ifr.style.zIndex = -1000;
+                    document.body.appendChild(ifr);
+                }
+                ifr.style.display  = "block";
+                var frameWindow = window.frames["pasteFrame"];
+                if(frameWindow)
+                {
+                    frameWindow.document.open();
+                    frameWindow.document.write(sHtml);
+                    frameWindow.document.close();
+					if(null != frameWindow.document && null != frameWindow.document.body)
+					{
+						Editor_Paste_Exec(api, frameWindow.document.body);
+						bExist = true;
+					}
+                }
+                ifr.style.display  = "none";
+            }
+
+            if(bExist)
+            {
+                oWordControl.bIsEventPaste = true;
+                if (e.preventDefault)
+                {
+                    e.stopPropagation();
+                    e.preventDefault();
+                }
+                return false;
+            }
+        }
+        if (/text\/html/.test(e.clipboardData.types))
+        {
+            var sHtml = e.clipboardData.getData('text/html');
+            //������ ��� ��������� ����� ������ �� Word � chrome ��������� ���������� ������� ����� </html>, �������� ��.
+            var nIndex = sHtml.lastIndexOf("</html>");
+            if(-1 != nIndex)
+                sHtml = sHtml.substring(0, nIndex + "</html>".length);
+        }
+        else if (is_chrome && /text\/plain/.test(e.clipboardData.types))
+        {
+            bExist = true;
+            var sText = e.clipboardData.getData('text/plain');
+            sHtml = "<html><body>";
+            var sCurPar = "";
+            var nParCount = 0;
+            for ( var i = 0, length = sText.length; i < length; i++ )
+            {
+                var Char = sText.charAt(i);
+                var Code = sText.charCodeAt(i);
+                var Item = null;
+
+                if ( '\n' === Char )
+                {
+                    if("" == sCurPar)
+                        sHtml += "<p><span>&nbsp;</span></p>";
+                    else
+                    {
+                        sHtml += "<p><span>" + sCurPar + "</span></p>";
+                        sCurPar = "";
+                    }
+                    nParCount++;
+                }
+                else if ( 13 === Code )
+                {
+                    continue;
+                }
+                else
+                {
+                    if(32 == Code || 160 == Code) //160 - nbsp
+                        sCurPar += " ";
+                    else if ( 9 === Code )
+                        sCurPar += "<span style='mso-tab-count:1'>    </span>";
+                    else
+                        sCurPar += CopyPasteCorrectString(Char);
+                }
+            }
+            if("" != sCurPar)
+            {
+                if(0 == nParCount)
+                    sHtml += "<span>" + sCurPar + "</span>";
+                else
+                    sHtml += "<p><span>" + sCurPar + "</span></p>";
+                sCurPar = "";
+            }
+            sHtml += "</body></html>";
+        }
+        if(sHtml)
+            fPasteHtml(sHtml);
+        else
+        {
+            var items = e.clipboardData.items;
+            if(null != items)
+            {
+                for (var i = 0; i < items.length; ++i) {
+                    if (items[i].kind == 'file' &&
+                        items[i].type.indexOf('image/') !== -1) {
+
+                        var blob = items[i].getAsFile();
+                        var reader = new FileReader();
+
+                        reader.onload = function(evt) {
+                            fPasteHtml("<html><body><img src=\"" + evt.target.result + "\"/></body></html>");
+                        };
+                        reader.readAsDataURL(blob);
+                    }
+                }
+            }
+        }
+    }
+}
+function Editor_Paste_Exec(api, pastebin)
+{
+    var oPasteProcessor = new PasteProcessor(api, true, true, false);
+    oPasteProcessor.Start(pastebin);
+};
+function trimString( str ){
+    return str.replace(/^\s+|\s+$/g, '') ;
+};
+function PasteProcessor(api, bUploadImage, bUploadFonts, bNested)
+{
+    this.oRootNode = null;
+    this.api = api;
+    this.bIsDoublePx  = api.WordControl.bIsDoublePx;
+    this.oDocument = api.WordControl.m_oLogicDocument;
+    this.oLogicDocument = this.oDocument;
+    this.oRecalcDocument = this.oDocument;
+    this.map_font_index = api.FontLoader.map_font_index;
+    this.bUploadImage = bUploadImage;
+    this.bUploadFonts = bUploadFonts;
+    this.bNested = bNested;//��� ���������� � ��������
+    this.oFonts = new Object();
+    this.oImages = new Object();
+
+    //��� ������� ������ � ������, ��� ����������� �� word � chrome ���������� ������ ������� ��� <p>
+    this.bIgnoreNoBlockText = false;
+
+    this.oCurPar = null;
+    this.oCur_rPr = new CTextPr();
+
+    //Br ������� ������ ��� ���� ������ ����� �� ���� �������� br, ���� �� � ������������.
+    this.nBrCount = 0;
+    //bInBlock ��������� ������� �� �������(��������������� ������ �������� �������� �� child)
+    //���� ����� ��������� ������� true != this.bInBlock ������ ��������� ������� �� �������� � �� ���� ��������� ����� ��������
+    this.bInBlock = null;
+
+    //������ �������� � ������� ��������� �������� ��� ������
+    this.dMaxWidth = Page_Width;
+    //���������� ������(�������� ��� ������� ������� �������, ������ ��� ������� ����������� ������ � ��������� � ������� ����� �������� ���� �����������)
+    this.dScaleKoef = 1;
+    this.bUseScaleKoef = false;
+
+    this.MsoStyles = {"mso-style-type": 1, "mso-pagination": 1, "mso-line-height-rule": 1, "mso-style-textfill-fill-color": 1, "mso-tab-count": 1,
+        "tab-stops": 1, "list-style-type": 1, "mso-special-character": 1, "mso-padding-alt": 1, "mso-border-insidev": 1,
+        "mso-border-insideh": 1, "mso-row-margin-left": 1, "mso-row-margin-right": 1, "mso-cellspacing": 1, "mso-border-alt": 1,
+        "mso-border-left-alt": 1, "mso-border-top-alt": 1, "mso-border-right-alt": 1, "mso-border-bottom-alt": 1, "mso-border-between": 1};
+    this.oBorderCache = new Object();
+}
+PasteProcessor.prototype =
+{
+    _GetTargetDocument : function(oDocument)
+    {
+        if(g_bIsDocumentCopyPaste)
+        {
+            if(docpostype_HdrFtr === oDocument.CurPos.Type)
+            {
+                if(null != oDocument.HdrFtr && null != oDocument.HdrFtr.CurHdrFtr && null != oDocument.HdrFtr.CurHdrFtr.Content)
+                {
+                    oDocument = oDocument.HdrFtr.CurHdrFtr.Content;
+                    this.oRecalcDocument = oDocument;
+                }
+            }
+            
+            if ( docpostype_FlowObjects == oDocument.CurPos.Type )
+            {
+                var oData = oDocument.Selection.Data.FlowObject;
+                switch ( oData.Get_Type() )
+                {
+                    case flowobject_Table:
+                    {
+                        if(null != oData.Table && null != oData.Table.CurCell && null != oData.Table.CurCell.Content)
+                        {
+                            oDocument = this._GetTargetDocument(oData.Table.CurCell.Content);
+                            this.oRecalcDocument = oDocument;
+                            this.dMaxWidth = this._CalcMaxWidthByCell(oData.Table.CurCell);
+                        }
+                        break;
+                    }
+                }
+            }
+
+            if(oDocument.CurPos.Type === docpostype_DrawingObjects)
+            {
+                switch(oDocument.DrawingObjects.curState.id)
+                {
+                    case STATES_ID_TEXT_ADD:
+                    {
+                        var text_object = oDocument.DrawingObjects.curState.textObject;
+                        if(text_object != null && text_object.GraphicObj != null && text_object.GraphicObj.textBoxContent != null)
+                            oDocument = text_object.GraphicObj.textBoxContent;
+                        break;
+                    }
+                    case STATES_ID_TEXT_ADD_IN_GROUP:
+                    {
+                        text_object = oDocument.DrawingObjects.curState.textObject;
+                        if(text_object != null &&  text_object.textBoxContent != null)
+                            oDocument = text_object.textBoxContent;
+                        break;
+                    }
+                }
+            }
+
+            //��� ��������� ������
+            var Item = oDocument.Content[oDocument.CurPos.ContentPos];
+            if( type_Table == Item.GetType() && null != Item.CurCell)
+            {
+                this.dMaxWidth = this._CalcMaxWidthByCell(Item.CurCell);
+                oDocument = this._GetTargetDocument(Item.CurCell.Content);
+            }
+        }
+        else
+        {
+            if ( docpostype_FlowObjects == oDocument.CurPos.Type )
+            {
+                var _cur_lide_elements = oDocument.Slides[oDocument.CurPage].elementsManipulator;
+                if(_cur_lide_elements.obj && _cur_lide_elements.obj.txBody && _cur_lide_elements.obj.txBody.content)
+                {
+                    oDocument = _cur_lide_elements.obj.txBody.content;
+                }
+                else
+                {
+                    if(_cur_lide_elements.obj && _cur_lide_elements.obj.graphicObject && _cur_lide_elements.obj.graphicObject.CurCell && _cur_lide_elements.obj.graphicObject.CurCell.Content)
+                    {
+                        oDocument = _cur_lide_elements.obj.graphicObject.CurCell.Content;
+                    }
+                }
+            }
+        }
+        return oDocument;
+    },
+    _CalcMaxWidthByCell : function(cell)
+    {
+        var row = cell.Row;
+        var table = row.Table;
+        var grid = table.TableGrid;
+        var nGridBefore = 0;
+        if(null != row.Pr && null != row.Pr.GridBefore)
+            nGridBefore = row.Pr.GridBefore;
+        var nCellIndex = cell.Index;
+        var nCellGrid = 1;
+        if(null != cell.Pr && null != cell.Pr.GridSpan)
+            nCellGrid = cell.Pr.GridSpan;
+        var nMarginLeft = 0;
+        if(null != cell.Pr && null != cell.Pr.TableCellMar && null != cell.Pr.TableCellMar.Left && tblwidth_Mm == cell.Pr.TableCellMar.Left.Type && null != cell.Pr.TableCellMar.Left.W)
+            nMarginLeft = cell.Pr.TableCellMar.Left.W;
+        else if(null != table.Pr && null != table.Pr.TableCellMar && null != table.Pr.TableCellMar.Left && tblwidth_Mm == table.Pr.TableCellMar.Left.Type && null != table.Pr.TableCellMar.Left.W)
+            nMarginLeft = table.Pr.TableCellMar.Left.W;
+        var nMarginRight = 0;
+        if(null != cell.Pr && null != cell.Pr.TableCellMar && null != cell.Pr.TableCellMar.Right && tblwidth_Mm == cell.Pr.TableCellMar.Right.Type && null != cell.Pr.TableCellMar.Right.W)
+            nMarginRight = cell.Pr.TableCellMar.Right.W;
+        else if(null != table.Pr && null != table.Pr.TableCellMar && null != table.Pr.TableCellMar.Right && tblwidth_Mm == table.Pr.TableCellMar.Right.Type && null != table.Pr.TableCellMar.Right.W)
+            nMarginRight = table.Pr.TableCellMar.Right.W;
+        var nPrevSumGrid = nGridBefore;
+        for(var i = 0; i < nCellIndex; ++i)
+        {
+            var oTmpCell = row.Content[i];
+            var nGridSpan = 1;
+            if(null != cell.Pr && null != cell.Pr.GridSpan)
+                nGridSpan = cell.Pr.GridSpan;
+            nPrevSumGrid += nGridSpan;
+        }
+        var dCellWidth = 0;
+        for(var i = nPrevSumGrid, length = grid.length; i < nPrevSumGrid + nCellGrid && i < length; ++i)
+            dCellWidth += grid[i];
+
+        if(dCellWidth - nMarginLeft - nMarginRight <= 0)
+            dCellWidth = 4;
+        else
+            dCellWidth -= nMarginLeft + nMarginRight;
+        return dCellWidth;
+    },
+    InsertInDocument : function()
+    {
+        var oDocument = this.oDocument;
+
+        if(false == this.bNested)
+        {
+            //������� ���������
+            this.oRecalcDocument.Remove(1, true, true);
+        }
+
+        var nInsertLength = this.aContent.length;
+        if(nInsertLength > 0)
+        {
+            this.InsertInPlace(oDocument, this.aContent);
+            if(false == g_bIsDocumentCopyPaste)
+            {
+                oDocument.Recalculate();
+                if(oDocument.Parent != null && oDocument.Parent.txBody != null)
+                {
+                    oDocument.Parent.txBody.recalculate();
+                }
+            }
+        }
+
+        if(false == this.bNested && nInsertLength > 0)
+        {
+            this.oRecalcDocument.Recalculate();
+            this.oLogicDocument.Document_UpdateInterfaceState();
+        }
+    },
+    InsertInPlace : function(oDoc, aNewContent)
+    {
+        var nNewContentLength = aNewContent.length;
+        //����� ���� �� Document.Add_NewParagraph
+        var Item = oDoc.Content[oDoc.CurPos.ContentPos];
+
+        if( type_Paragraph == Item.GetType() )
+        {
+            if(true != this.bInBlock && 1 == nNewContentLength && type_Paragraph == aNewContent[0].GetType())
+            {
+                //������� ������ � ��������
+                var oInsertPar = aNewContent[0];
+                var nContentLength = oInsertPar.Content.length;
+                if(nContentLength > 2)
+                {
+                    var TextPr = Item.Internal_CalculateTextPr(Item.CurPos.ContentPos);
+                    for(var i = 0; i < nContentLength - 2; ++i)// -2 �� ����������� ����� ���������
+                    {
+                        var oCurInsItem = oInsertPar.Content[i];
+                        if(para_Numbering != oCurInsItem.Type)
+                            Item.Internal_Content_Add(Item.CurPos.ContentPos, oCurInsItem);
+                    }
+                    Item.Internal_Content_Add(Item.CurPos.ContentPos, new ParaTextPr(TextPr));
+                }
+				Item.RecalcInfo.Set_Type_0(pararecalc_0_All);
+                this.oRecalcDocument.ContentLastChangePos = this.oRecalcDocument.CurPos.ContentPos;
+            }
+            else
+            {
+                var LastPos = this.oRecalcDocument.CurPos.ContentPos;
+                var LastPosCurDoc = oDoc.CurPos.ContentPos;
+                //����� ��������� ��������
+                var oSourceFirstPar = Item;
+                var oSourceLastPar = new Paragraph(oDoc.DrawingDocument, oDoc, 0, 50, 50, X_Right_Field, Y_Bottom_Field );
+                oSourceFirstPar.Split(oSourceLastPar);
+                var oInsFirstPar = aNewContent[0];
+                var oInsLastPar = null;
+                if(nNewContentLength > 1)
+                    oInsLastPar = aNewContent[nNewContentLength - 1];
+
+                var nStartIndex = 0;
+                var nEndIndex = nNewContentLength - 1;
+
+                if(type_Paragraph == oInsFirstPar.GetType())
+                {
+                    //�������� �������� ������� ������������ ��������� � ������ �������� ��������
+                    //CopyPr_Open - ������� � �������, �.�. ���� �������� ��� � ���������
+                    oInsFirstPar.CopyPr_Open( oSourceFirstPar );
+                    //�������� ���������� ������������ ���������
+                    oSourceFirstPar.Concat(oInsFirstPar);
+                    //�������� ��������� ������ ����� ������ �� ��������� ���� ��������
+                    nStartIndex++;
+                }
+                else if(type_Table == oInsFirstPar.GetType())
+                {
+                    //���� ��������� ������� � ������ ��������, �� �� ��������� ���
+                    if(oSourceFirstPar.IsEmpty())
+                    {
+                        oSourceFirstPar = null;
+                    }
+                }
+                //���� �� ���������� ������ ����� ���������, �� ��������� ���������� ���������� ��������� � ������ ������ �������� ��������� ���������
+                if(null != oInsLastPar && type_Paragraph == oInsLastPar.GetType() && true != this.bInBlock)
+                {
+                    var nNewContentPos = oInsLastPar.Content.length - 2;
+                    //�������� �������� ���������� ��������� ��������� � ���������  ����������� ��������
+                    //CopyPr - �� ������� � �������, �.�. � ������� ��������� ������� ����� ��������� � ��������
+                    if(null != oInsLastPar)
+                        oSourceLastPar.CopyPr( oInsLastPar );
+                    oInsLastPar.Concat(oSourceLastPar);
+                    oInsLastPar.CurPos.ContentPos = nNewContentPos;
+                    oSourceLastPar = oInsLastPar;
+                    nEndIndex--;
+                }
+                //���������
+                for(var i = nStartIndex; i <= nEndIndex; ++i )
+                {
+                    var oElemToAdd = aNewContent[i];
+                    oDoc.CurPos.ContentPos++;
+                    oDoc.Internal_Content_Add(oDoc.CurPos.ContentPos, oElemToAdd);
+                }
+                if(null != oSourceLastPar)
+                {
+                    //��������� ��������� ��������
+                    oDoc.CurPos.ContentPos++;
+                    oDoc.Internal_Content_Add(oDoc.CurPos.ContentPos, oSourceLastPar);
+                }
+                if(null == oSourceFirstPar)
+                {
+                    //������� ������ ��������, ������ ��� ����� ������ ���� � ��������� �� ����� �� ������ ���������
+                    oDoc.Internal_Content_Remove(LastPosCurDoc, 1);
+                    oDoc.CurPos.ContentPos--;
+                }
+                this.oRecalcDocument.ContentLastChangePos = LastPos;
+                //oDoc.CurPos.ContentPos = LastPos + (nEndIndex - nStartIndex + 1) + 1;
+            }
+        }
+
+    },
+    Start : function(node)
+    {
+        this.oRootNode = node;
+        var oThis = this;
+        this._Prepeare(node,
+            function(){
+                oThis.aContent = new Array();
+                oThis.oDocument = oThis._GetTargetDocument(oThis.oDocument);
+                //�� ����� ���������� �������� ��� ������� ��������� �������
+                oThis._Execute(node, {}, true, true, false);
+
+                oThis._AddNextPrevToContent(oThis.oDocument);
+                if(false == oThis.bNested)
+                {
+                    oThis.InsertInDocument();
+                }
+
+                node.blur();
+                node.style.display  = "none";
+            });
+    },
+    _Prepeare : function(node, fCallback)
+    {
+        if(true == this.bUploadImage || true == this.bUploadFonts)
+        {
+            //����������� �� ��������� �������� ������ ������� � ��������.
+            this._Prepeare_recursive(node, true);
+
+            var aPrepeareFonts = new Array();
+            for(font_family in this.oFonts)
+            {
+                //todo ��������� �����, ������ �� ��������
+                var oFontItem = this.oFonts[font_family];
+                //���� ����� ����� �������
+                var index = this.map_font_index[oFontItem.Name];
+                if(null != index)
+                {
+                    this.oFonts[font_family].Index = index;
+                    aPrepeareFonts.push(new CFont(oFontItem.Name, 0, "", 0));
+                }
+                else
+                {
+                    this.oFonts[font_family] = {Name:"Arial", Index: -1};
+                    aPrepeareFonts.push(new CFont("Arial", 0, "", 0));
+                }
+            }
+			var aImagesToDownload = new Array();
+			for(image in this.oImages)
+            {
+				var src = this.oImages[image];
+				if(0 == src.indexOf("file:"))
+					this.oImages[image] = "local";
+				else if(false == (0 == src.indexOf("data:") ||  0 == src.indexOf(documentOrigin + this.api.DocumentUrl) && 0 == src.indexOf(this.api.DocumentUrl)))
+					aImagesToDownload.push(src);
+			}
+			var oThis = this;
+			var nCurIndex = 0;
+			var fDownloadImages = function(){
+				if(nCurIndex < aImagesToDownload.length)
+				{
+					var src = aImagesToDownload[nCurIndex];
+					var rData = {"id":documentId, "c":"imgurl", "data": src};
+					sendCommand( oThis.api, function(incomeObject){
+						if(null != incomeObject && "imgurl" ==incomeObject.type)
+							oThis.oImages[src] = incomeObject.data;
+						else
+							oThis.oImages[src] = "error";
+						nCurIndex++;
+						fDownloadImages();
+						}, JSON.stringify(rData) );
+				}
+				else
+				{
+					var oPrepeareImages = new Object();
+					var nImagesCount = 0;
+					for(image in oThis.oImages)
+					{
+						oPrepeareImages[nImagesCount] = oThis.oImages[image];
+						nImagesCount++;
+					}
+					oThis.api.pre_Paste(aPrepeareFonts, oPrepeareImages, fCallback);
+				}
+			};
+			fDownloadImages();
+        }
+        else
+            fCallback();
+    },
+    _Prepeare_recursive : function(node, bIgnoreStyle)
+    {
+        //����������� �� ����� ������, �������� ��� ������ � ��������
+        var nodeName = node.nodeName.toLowerCase();
+        var nodeType = node.nodeType;
+        if(!bIgnoreStyle)
+        {
+            if(Node.TEXT_NODE == nodeType)
+            {
+                var defaultView = node.ownerDocument.defaultView;
+                var computedStyle = defaultView.getComputedStyle( node.parentNode, null );
+                if ( computedStyle )
+                {
+                    var fontFamily = computedStyle.getPropertyValue( "font-family" );
+                    var sNewFF;
+                    var nIndex = fontFamily.indexOf(",");
+                    if(-1 != nIndex)
+                        sNewFF = fontFamily.substring(0, nIndex);
+                    else
+                        sNewFF = fontFamily;
+                    //trim ' � "
+                    var nLength = sNewFF.length
+                    if(nLength >= 2)
+                    {
+                        var nStart = 0;
+                        var nStop = nLength;
+                        var cFirstChar = sNewFF[0];
+                        var cLastChar = sNewFF[nLength - 1];
+                        var bTrim = false;
+                        if('\'' == cFirstChar || '\"' == cFirstChar)
+                        {
+                            bTrim = true;
+                            nStart = 1;
+                        }
+                        if('\'' == cLastChar || '\"' == cLastChar)
+                        {
+                            bTrim = true;
+                            nStop = nLength - 1;
+                        }
+                        if(bTrim)
+                            sNewFF = sNewFF.substring(nStart, nStop);
+                    }
+                    this.oFonts[fontFamily] = {Name:sNewFF, Index: -1};
+                }
+            }
+            else
+            {
+                var src = node.getAttribute("src");
+                if(src)
+                    this.oImages[src] = src;
+
+                var binary_shape = node.getAttribute("alt");
+                if(binary_shape)
+                {
+                    var b_history_is_on = History.Is_On();
+                    if(b_history_is_on)
+                        History.TurnOff();
+
+                    var sub;
+                    if(typeof binary_shape === "string")
+                        sub = binary_shape.substr(0, 12);
+                    if(typeof binary_shape === "string" &&( sub === "TeamLabShape" || sub === "TeamLabImage" || sub === "TeamLabChart" || sub === "TeamLabGroup"))
+                    {
+                        var reader = CreateBinaryReader(binary_shape, 12, binary_shape.length);
+                        var first_string = null;
+                        if(reader !== null && typeof  reader === "object")
+                        {
+                            first_string = sub;
+                        }
+                        var Drawing;
+                        var src_string;
+                        switch(first_string)
+                        {
+                            case "TeamLabImage":
+                            case "TeamLabChart":
+                            {
+                                Drawing = CreateParaDrawingFromBinary(reader, true);
+                                if(isRealObject(Drawing)
+                                    && isRealObject(Drawing.GraphicObj)
+                                    && isRealObject(Drawing.GraphicObj.blipFill)
+                                    && typeof Drawing.GraphicObj.blipFill.RasterImageId === "string")
+                                {
+                                    src_string = Drawing.GraphicObj.blipFill.RasterImageId;
+                                    if(typeof src_string === "string")
+										this.oImages[src_string] = documentOrigin + src_string;
+                                }
+                                break;
+                            }
+                            case "TeamLabShape":
+                            case "TeamLabGroup":
+                            {
+                                Drawing = CreateParaDrawingFromBinary(reader, true);
+                                if(isRealObject(Drawing) && isRealObject(Drawing.GraphicObj))
+                                {
+                                    if(typeof Drawing.GraphicObj.isShape === "function" && Drawing.GraphicObj.isShape() === true)
+                                    {
+                                        if(isRealObject(Drawing.GraphicObj.spPr)
+                                            && isRealObject(Drawing.GraphicObj.spPr.Fill)
+                                            && isRealObject(Drawing.GraphicObj.spPr.Fill.fill)
+                                            && typeof Drawing.GraphicObj.spPr.Fill.fill.RasterImageId === "string")
+                                        {
+                                            src_string = Drawing.GraphicObj.spPr.Fill.fill.RasterImageId;
+                                            if(typeof src_string === "string")
+												this.oImages[src_string] = documentOrigin + src_string;
+                                        }
+                                    }
+                                    if(typeof Drawing.GraphicObj.isGroup === "function" && Drawing.GraphicObj.isGroup() === true)
+                                    {
+                                        var sp_tree = Drawing.GraphicObj.getSpTree2();
+                                        if(Array.isArray(sp_tree))
+                                        {
+                                            for(var index = 0; index < sp_tree.length; ++index)
+                                            {
+                                                var sp = sp_tree[index];
+                                                if(isRealObject(sp))
+                                                {
+                                                    if(typeof sp.isImage === "function" && sp.isImage())
+                                                    {
+                                                        if(isRealObject(sp.blipFill) && typeof sp.blipFill.RasterImageId === "string")
+                                                        {
+                                                            src_string = sp.blipFill.RasterImageId;
+
+                                                            if(typeof src_string === "string")
+																this.oImages[src_string] = documentOrigin + src_string;
+                                                        }
+                                                    }
+                                                    if(typeof sp.isShape === "function" && sp.isShape())
+                                                    {
+                                                        if(isRealObject(sp.spPr)
+                                                            && isRealObject(sp.spPr.Fill)
+                                                            && isRealObject(sp.spPr.Fill.fill)
+                                                            && typeof sp.spPr.Fill.fill.RasterImageId === "string")
+                                                        {
+                                                            src_string = sp.spPr.Fill.fill.RasterImageId;
+                                                            if(typeof src_string === "string")
+																this.oImages[src_string] = documentOrigin + src_string;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    }
+
+                    if(b_history_is_on)
+                        History.TurnOn();
+                }
+            }
+        }
+        for(var i = 0, length = node.childNodes.length; i < length; i++)
+        {
+            var child = node.childNodes[i];
+            var child_nodeType = child.nodeType;
+            if(!(Node.ELEMENT_NODE == child_nodeType || Node.TEXT_NODE == child_nodeType))
+                continue;
+            //�������� ������� ��������� ������ �� \t,\n,\r
+            if( Node.TEXT_NODE == child.nodeType)
+            {
+                var value = child.nodeValue;
+                if(!value)
+                    continue;
+                value = value.replace(/(\r|\t|\n)/g, '');
+                if("" == value)
+                    continue;
+            }
+            this._Prepeare_recursive(child, false);
+        }
+    },
+    _IsBlockElem : function(name)
+    {
+        if( "p" == name || "div" == name || "ul" == name || "ol" == name || "li" == name || "table" == name || "tbody" == name || "tr" == name || "td" == name || "th" == name ||
+            "h1" == name || "h2" == name || "h3" == name || "h4" == name || "h5" == name || "h6" == name || "center" == name)
+            return true;
+        return false;
+    },
+    _ValueToMm : function(value)
+    {
+        var obj = this._ValueToMmType(value);
+        if(obj && "%" != obj.type && "none" != obj.type)
+            return obj.val;
+        return null;
+    },
+    _ValueToMmType : function(value)
+    {
+        var oVal = parseFloat(value);
+        var oType;
+        if(NaN != oVal)
+        {
+            if(-1 != value.indexOf("%"))
+            {
+                oType = "%";
+                oVal /= 100;
+            }
+            else if(-1 != value.indexOf("px"))
+            {
+                oType = "px";
+                oVal *= g_dKoef_pix_to_mm;
+            }
+            else if(-1 != value.indexOf("in"))
+            {
+                oType = "in";
+                oVal *= g_dKoef_in_to_mm;
+            }
+            else if(-1 != value.indexOf("cm"))
+            {
+                oType = "cm";
+                oVal *= 10;
+            }
+            else if(-1 != value.indexOf("mm"))
+            {
+                oType = "mm";
+            }
+            else if(-1 != value.indexOf("pt"))
+            {
+                oType = "pt";
+                oVal *= g_dKoef_pt_to_mm;
+            }
+            else if(-1 != value.indexOf("pc"))
+            {
+                oType = "pc";
+                oVal *= g_dKoef_pc_to_mm;
+            }
+            else
+                oType = "none";
+            return {val: oVal, type: oType};
+        }
+        return null;
+    },
+    _ParseColor : function(color)
+    {
+        if(!color || color.length == 0)
+            return null;
+        if("transparent" == color)
+            return null;
+        if("aqua" == color)
+            return new CDocumentColor(0, 255, 255);
+        else if("black" == color)
+            return new CDocumentColor(0, 0, 0);
+        else if("blue" == color)
+            return new CDocumentColor(0, 0, 255);
+        else if("fuchsia" == color)
+            return new CDocumentColor(255, 0, 255);
+        else if("gray" == color)
+            return new CDocumentColor(128, 128, 128);
+        else if("green" == color)
+            return new CDocumentColor(0, 128, 0);
+        else if("lime" == color)
+            return new CDocumentColor(0, 255, 0);
+        else if("maroon" == color)
+            return new CDocumentColor(128, 0, 0);
+        else if("navy" == color)
+            return new CDocumentColor(0, 0, 128);
+        else if("olive" == color)
+            return new CDocumentColor(128, 128, 0);
+        else if("purple" == color)
+            return new CDocumentColor(128, 0, 128);
+        else if("red" == color)
+            return new CDocumentColor(255, 0, 0);
+        else if("silver" == color)
+            return new CDocumentColor(192, 192, 192);
+        else if("teal" == color)
+            return new CDocumentColor(0, 128, 128);
+        else if("white" == color)
+            return new CDocumentColor(255, 255, 255);
+        else if("yellow" == color)
+            return new CDocumentColor(255, 255, 0);
+        else
+        {
+            if(0 == color.indexOf("#"))
+            {
+                var hex = color.substring(1);
+                if(hex.length == 3)
+                    hex = hex.charAt(0) + hex.charAt(0) + hex.charAt(1) + hex.charAt(1) + hex.charAt(2) + hex.charAt(2);
+                if(hex.length == 6)
+                {
+                    var r = parseInt("0x" + hex.substring(0,2));
+                    var g = parseInt("0x" + hex.substring(2,4));
+                    var b = parseInt("0x" + hex.substring(4,6));
+                    return new CDocumentColor(r, g, b);
+                }
+            }
+            if(0 == color.indexOf("rgb"))
+            {
+                var nStart = color.indexOf('(');
+                var nEnd = color.indexOf(')');
+                if(-1 != nStart && -1 != nEnd && nStart < nEnd)
+                {
+                    var temp = color.substring(nStart + 1, nEnd);
+                    var aParems = temp.split(',');
+                    if(aParems.length >= 3)
+                    {
+                        if(aParems.length >= 4)
+                        {
+                            var oA = this._ValueToMmType(aParems[3]);
+                            if(0 == oA .val)//��������� ����������
+                                return null;
+                        }
+                        var oR = this._ValueToMmType(aParems[0]);
+                        var oG = this._ValueToMmType(aParems[1]);
+                        var oB = this._ValueToMmType(aParems[2]);
+                        var r,g,b;
+                        if(oR && "%" == oR.type)
+                            r = parseInt(255 * oR.val / 100);
+                        else
+                            r = oR.val;
+                        if(oG && "%" == oG.type)
+                            g = parseInt(255 * oG.val / 100);
+                        else
+                            g = oG.val;
+                        if(oB && "%" == oB.type)
+                            b = parseInt(255 * oB.val / 100);
+                        else
+                            b = oB.val;
+                        return new CDocumentColor(r, g, b);
+                    }
+                }
+            }
+        }
+        return null;
+    },
+    _isEmptyProperty : function(prop)
+    {
+        var bIsEmpty = true;
+        for(var i in prop)
+        {
+            if(null != prop[i])
+            {
+                bIsEmpty = false;
+                break;
+            }
+        }
+        return bIsEmpty;
+    },
+    _set_pPr : function(node, Para,  pNoHtmlPr)
+    {
+        //����������� ����� �� ������ � ������� �������� ��������
+        if(node != this.oRootNode)
+        {
+            while(false == this._IsBlockElem(node.nodeName.toLowerCase()))
+            {
+                if(this.oRootNode != node.parentNode)
+                    node = node.parentNode;
+                else
+                    break;
+            }
+        }
+        var oDocument = this.oDocument;
+        //Heading
+        if(null != pNoHtmlPr.hLevel)
+            Para.Style_Add(oDocument.Styles.Get_Default_Heading(pNoHtmlPr.hLevel));
+
+        var pPr = Para.Pr;
+
+        //Borders
+        var oNewBorder = {Left: null, Top: null, Right: null, Bottom: null, Between: null};
+        var sBorder = pNoHtmlPr["mso-border-alt"];
+        if(null != sBorder)
+        {
+            var oNewBrd = this._ExecuteParagraphBorder(sBorder);
+            oNewBorder.Left = oNewBrd;
+            oNewBorder.Top = oNewBrd.Copy();
+            oNewBorder.Right = oNewBrd.Copy();
+            oNewBorder.Bottom = oNewBrd.Copy();
+        }
+        else
+        {
+            sBorder = pNoHtmlPr["mso-border-left-alt"];
+            if(null != sBorder)
+            {
+                var oNewBrd = this._ExecuteParagraphBorder(sBorder);
+                oNewBorder.Left = oNewBrd;
+            }
+            sBorder = pNoHtmlPr["mso-border-top-alt"];
+            if(null != sBorder)
+            {
+                var oNewBrd = this._ExecuteParagraphBorder(sBorder);
+                oNewBorder.Top = oNewBrd;
+            }
+            sBorder = pNoHtmlPr["mso-border-right-alt"];
+            if(null != sBorder)
+            {
+                var oNewBrd = this._ExecuteParagraphBorder(sBorder);
+                oNewBorder.Right = oNewBrd;
+            }
+            sBorder = pNoHtmlPr["mso-border-bottom-alt"];
+            if(null != sBorder)
+            {
+                var oNewBrd = this._ExecuteParagraphBorder(sBorder);
+                oNewBorder.Bottom = oNewBrd;
+            }
+        }
+        sBorder = pNoHtmlPr["mso-border-between"];
+        if(null != sBorder)
+        {
+            var oNewBrd = this._ExecuteParagraphBorder(sBorder);
+            oNewBorder.Between = oNewBrd;
+        }
+
+        var defaultView = node.ownerDocument.defaultView;
+        var computedStyle = defaultView.getComputedStyle( node, null );
+        if (computedStyle)
+        {
+            //Ind
+            var Ind = new CParaInd();
+            var margin_left = computedStyle.getPropertyValue( "margin-left" );
+            if(margin_left && null != (margin_left = this._ValueToMm(margin_left)))
+                Ind.Left = margin_left;
+            var margin_right = computedStyle.getPropertyValue( "margin-right" );
+            if(margin_right && null != (margin_right = this._ValueToMm(margin_right)))
+                Ind.Right = margin_right;
+            //scale
+            // if(null != pPr.Ind.Left && true == this.bUseScaleKoef)
+            // pPr.Ind.Left = pPr.Ind.Left * this.dScaleKoef;
+            // if(null != pPr.Ind.Right && true == this.bUseScaleKoef)
+            // pPr.Ind.Right = pPr.Ind.Right * this.dScaleKoef;
+            //�������� ����� ������ margin �� ������� �� ����� ��� �� ����������� ����� ��� �� �������
+            if(null != Ind.Left && null != Ind.Right)
+            {
+                //30 ����������� ��� � �� �������
+                var dif = Page_Width - X_Left_Margin - X_Right_Margin - Ind.Left - Ind.Right;
+                if(dif < 30)
+                    Ind.Right = Page_Width - X_Left_Margin - X_Right_Margin - Ind.Left - 30;
+            }
+            var text_indent = computedStyle.getPropertyValue( "text-indent" );
+            if(text_indent && null != (text_indent = this._ValueToMm(text_indent)))
+                Ind.FirstLine = text_indent;
+            // if(null != pPr.Ind.FirstLine && true == this.bUseScaleKoef)
+            // pPr.Ind.FirstLine = pPr.Ind.FirstLine * this.dScaleKoef;
+            if(false == this._isEmptyProperty(Ind))
+                Para.Set_Ind(Ind);
+            //Jc
+            var text_align = computedStyle.getPropertyValue( "text-align" );
+            if(text_align)
+            {
+                //����� ��������� -webkit-right
+                var Jc = null;
+                if(-1 != text_align.indexOf('center'))
+                    Jc = align_Center;
+                else if(-1 != text_align.indexOf('right'))
+                    Jc = align_Right;
+                else if(-1 != text_align.indexOf('justify'))
+                    Jc = align_Justify;
+                if(null != Jc)
+                    Para.Set_Align(Jc, false);
+            }
+            //Spacing
+            var line_height = computedStyle.getPropertyValue( "line-height" );
+            if(null != line_height)
+            {
+                var Spacing = new CParaSpacing();
+                if("normal" == line_height || "1px" == line_height)
+                {
+                    Spacing.Line = 1;
+                    Spacing.LineRule = linerule_Auto;
+                }
+                else
+                {
+                    var obj = this._ValueToMmType(line_height);
+                    if(obj)
+                    {
+                        if("%" == obj.type)
+                        {
+                            Spacing.Line = obj.val;
+                            Spacing.LineRule = linerule_Auto;
+                        }
+                        else
+                        {
+                            // pPr.Spacing.LineRule = linerule_AtLeast;
+                            // pPr.Spacing.Line = obj.val;
+
+                            //Todo ����� ����� ��������� � ���������, ���� ��� ������������.
+                            //����� �������� � chrome ��� �������� line-height:100% � ��������� �� ��������� � �������
+                            //� �������� html ��������� ���. ��������� �������� ��� �� �� �����
+                            //�� ���� � ��������� ���� ������ ������������ ����������� ��������, �� ����������� ��� �������� �� ������ ������
+                            var font_size = computedStyle.getPropertyValue( "font-size" );
+                            if(font_size && null != (font_size = this._ValueToMm(font_size)))
+                            {
+                                Spacing.Line = parseInt(100 * obj.val / font_size) / 100;
+                                Spacing.LineRule = linerule_Auto;
+                            }
+                        }
+                    }
+                }
+            }
+            // if("exactly" == pNoHtmlPr["mso-line-height-rule"])
+                // Spacing.LineRule = linerule_Exact;
+            var margin_top = computedStyle.getPropertyValue( "margin-top" );
+            if(margin_top && null != (margin_top = this._ValueToMm(margin_top)))
+                Spacing.Before = margin_top;
+            var margin_bottom = computedStyle.getPropertyValue( "margin-bottom" );
+            if(margin_bottom && null != (margin_bottom = this._ValueToMm(margin_bottom)))
+                Spacing.After = margin_bottom;
+            if(false == this._isEmptyProperty(Spacing))
+                Para.Set_Spacing(Spacing);
+            //Shd
+            //background-color �� ����������� ��������� ��������, ���� �������� ������������ ��������
+            var background_color = null;
+            var oTempNode = node;
+            while(true)
+            {
+                var tempComputedStyle = defaultView.getComputedStyle( oTempNode, null );
+                if(null == tempComputedStyle)
+                    break;
+                background_color = tempComputedStyle.getPropertyValue( "background-color" );
+                if(null != background_color && (background_color = this._ParseColor(background_color)))
+                    break;
+                oTempNode = oTempNode.parentNode;
+                if(this.oRootNode == oTempNode || "body" == oTempNode.nodeName.toLowerCase() || true == this._IsBlockElem(oTempNode.nodeName.toLowerCase()))
+                    break;
+            }
+            if(g_bIsDocumentCopyPaste)
+            {
+                if(background_color)
+                {
+                    var Shd = new CDocumentShd();
+                    Shd.Value = shd_Clear;
+                    Shd.Color = background_color;
+                    Para.Set_Shd(Shd);
+                }
+            }
+
+            if(null == oNewBorder.Left)
+                oNewBorder.Left = this._ExecuteBorder(computedStyle, node, "left", "Left", false);
+            if(null == oNewBorder.Top)
+                oNewBorder.Top = this._ExecuteBorder(computedStyle, node, "top", "Top", false);
+            if(null == oNewBorder.Right)
+                oNewBorder.Right = this._ExecuteBorder(computedStyle, node, "left", "Left", false);
+            if(null == oNewBorder.Bottom)
+                oNewBorder.Bottom = this._ExecuteBorder(computedStyle, node, "bottom", "Bottom", false);
+        }
+        if(false == this._isEmptyProperty(oNewBorder))
+            Para.Set_Borders(oNewBorder);
+
+        //KeepLines , WidowControl
+        var pagination = pNoHtmlPr["mso-pagination"];
+        if(pagination)
+        {
+            //todo WidowControl
+            if("none" == pagination)
+                ;//pPr.WidowControl = !Def_pPr.WidowControl;
+            else if(-1 != pagination.indexOf("widow-orphan") && -1 != pagination.indexOf("lines-together"))
+                Para.Set_KeepLines(true);
+            else if(-1 != pagination.indexOf("none") && -1 != pagination.indexOf("lines-together"))
+            {
+                ;//pPr.WidowControl = !Def_pPr.WidowControl;
+                Para.Set_KeepLines(true);
+            }
+        }
+        //todo KeepNext
+        if("avoid" == pNoHtmlPr["page-break-after"])
+            ;//pPr.KeepNext = !Def_pPr.KeepNext;
+        //PageBreakBefore
+        if("always" == pNoHtmlPr["page-break-before"])
+            Para.Set_PageBreakBefore(true);
+        //Tabs
+        var tab_stops = pNoHtmlPr["tab-stops"]
+        if(tab_stops && "" != pNoHtmlPr["tab-stops"])
+        {
+            var aTabs = tab_stops.split(' ');
+            var nTabLen = aTabs.length;
+            if(nTabLen > 0)
+            {
+                var Tabs = new CParaTabs();
+                for(var i = 0; i < nTabLen; i++)
+                {
+                    var val = this._ValueToMm(aTabs[i]);
+                    if(val)
+                        Tabs.Add(new CParaTab(tab_Left, val));
+                }
+                Para.Set_Tabs(Tabs);
+            }
+        }
+
+        //num
+        if(g_bIsDocumentCopyPaste)
+        {
+            if(true == pNoHtmlPr.bNum)
+            {
+                var num = numbering_numfmt_Bullet;
+                if(null != pNoHtmlPr.numType)
+                    num = pNoHtmlPr.numType;
+                var type = pNoHtmlPr["list-style-type"];
+                if(type)
+                {
+                    switch(type)
+                    {
+                        case "disc": num = numbering_numfmt_Bullet;break;
+                        case "decimal": num = numbering_numfmt_Decimal;break;
+                        case "lower-roman": num = numbering_numfmt_LowerRoman;break;
+                        case "upper-roman": num = numbering_numfmt_UpperRoman;break;
+                        case "lower-alpha": num = numbering_numfmt_LowerLetter;break;
+                        case "upper-alpha": num = numbering_numfmt_UpperLetter;break;
+                    }
+                }
+                //����� ���� ����������� �� Document.Set_ParagraphNumbering
+                
+                //������� ����������� ��������, ���� ��� ������ ���������, �� ����� ��� ������ �� ����������� ���������
+                var NumId = null;
+                if(this.aContent.length > 1)
+                {
+                    var prevElem = this.aContent[this.aContent.length - 2];
+                    if(null != prevElem && type_Paragraph === prevElem.GetType())
+                    {
+                        var PrevNumPr = prevElem.Numbering_Get();
+                        if ( null != PrevNumPr && true === this.oLogicDocument.Numbering.Check_Format( PrevNumPr.NumId, PrevNumPr.Lvl, num ) )
+                            NumId  = PrevNumPr.NumId;
+                    }
+                }
+                if(null == NumId)
+                {
+                    //������� ����� ������
+                    NumId  = this.oLogicDocument.Numbering.Create_AbstractNum();
+                    NumLvl = 0;
+
+                    var AbstractNum = this.oLogicDocument.Numbering.Get_AbstractNum( NumId );
+                    AbstractNum.Create_Default_Bullet();
+                    switch(num)
+                    {
+                        case numbering_numfmt_Decimal: AbstractNum.Set_Lvl_Numbered_2(0);break;
+                        case numbering_numfmt_LowerRoman: AbstractNum.Set_Lvl_Numbered_5(0);break;
+                        case numbering_numfmt_UpperRoman: AbstractNum.Set_Lvl_Numbered_9(0);break;
+                        case numbering_numfmt_LowerLetter: AbstractNum.Set_Lvl_Numbered_8(0);break;
+                        case numbering_numfmt_UpperLetter: AbstractNum.Set_Lvl_Numbered_6(0);break;
+                    }
+                    //��������� ��������� ������ ����� �� ���������� ������� ���������� ��������
+                    var oFirstTextChild = node;
+                    while(true)
+                    {
+                        var bContinue = false;
+                        for(var i = 0, length = oFirstTextChild.childNodes.length; i < length; i++)
+                        {
+                            var child = oFirstTextChild.childNodes[i];
+                            var nodeType = child.nodeType;
+
+                            if(!(Node.ELEMENT_NODE == nodeType || Node.TEXT_NODE == nodeType))
+                                continue;
+                            //�������� ������� ��������� ������ �� \t,\n,\r
+                            if( Node.TEXT_NODE == child.nodeType)
+                            {
+                                var value = child.nodeValue;
+                                if(!value)
+                                    continue;
+                                value = value.replace(/(\r|\t|\n)/g, '');
+                                if("" == value)
+                                    continue;
+                            }
+                            if(Node.ELEMENT_NODE == nodeType)
+                            {
+                                oFirstTextChild = child;
+                                bContinue = true;
+                                break;
+                            }
+                        }
+                        if(false == bContinue)
+                            break;
+                    }
+                    if(node != oFirstTextChild)
+                    {
+                        var oLvl = AbstractNum.Lvl[0];
+                        var sFontFamily = null;
+                        if(numbering_numfmt_Bullet == num)
+                            sFontFamily = oLvl.TextPr.FontFamily;
+                        //�������� ��������� �� node
+                        oLvl.TextPr = this._read_rPr(oFirstTextChild);
+                        if(null != sFontFamily)
+                            oLvl.TextPr.FontFamily = sFontFamily;
+                    }
+                }
+                Para.Numbering_Add( NumId, 0 );
+            }
+            else
+            {
+                var numPr = Para.Numbering_Get();
+                if(numPr)
+                    Para.Numbering_Remove();
+            }
+        }
+        else
+        {
+            if(true == pNoHtmlPr.bNum)
+            {
+                var num = numbering_presentationnumfrmt_Char;
+                if(null != pNoHtmlPr.numType)
+                    num = pNoHtmlPr.numType;
+                var type = pNoHtmlPr["list-style-type"];
+                if(type)
+                {
+                    switch(type)
+                    {
+                        case "disc": num = numbering_presentationnumfrmt_Char;break;
+                        case "decimal": num = numbering_presentationnumfrmt_ArabicPeriod;break;
+                        case "lower-roman": num = numbering_presentationnumfrmt_RomanLcPeriod;break;
+                        case "upper-roman": num = numbering_presentationnumfrmt_RomanUcPeriod;break;
+                        case "lower-alpha": num = numbering_presentationnumfrmt_AlphaLcPeriod;break;
+                        case "upper-alpha": num = numbering_presentationnumfrmt_AlphaUcPeriod;break;
+                        default:
+                        {
+                            num = numbering_presentationnumfrmt_Char;
+                        }
+                    }
+                }
+                var _bullet = new CPresentationBullet();
+                _bullet.m_nType = num;
+                if(num == numbering_presentationnumfrmt_Char)
+                {
+                    _bullet.m_sChar = "�";
+                }
+                _bullet.m_nStartAt = 1;
+                Para.Add_PresentationNumbering2(_bullet );
+            }
+            else
+            {
+               Para.Remove_PresentationNumbering();
+            }
+        }
+        Para.CompiledPr.NeedRecalc = true;
+    },
+    _commit_rPr : function(node)
+    {
+        var rPr = this._read_rPr(node);
+        //���� ��������� ��������� ���������� ��������� �������
+        if(false == Common_CmpObj2(this.oCur_rPr, rPr))
+        {
+            this._Paragraph_Add( new ParaTextPr( rPr ) );
+            this.oCur_rPr = rPr;
+        }
+    },
+    _read_rPr : function(node)
+    {
+        var oDocument = this.oDocument;
+        var rPr = new CTextPr();
+        if(false == g_bIsDocumentCopyPaste)
+        {
+            rPr.Set_FromObject({
+                Bold       : false,
+                Italic     : false,
+                Underline  : false,
+                Strikeout  : false,
+                FontFamily :
+                {
+                    Name  : "Arial",
+                    Index : -1
+                },
+                FontSize   : 11,
+                Color      :
+                {
+                    r : 0,
+                    g : 0,
+                    b : 0
+                },
+                VertAlign : vertalign_Baseline,
+                HighLight : highlight_None
+            });
+        }
+        var defaultView = node.ownerDocument.defaultView;
+        var computedStyle = defaultView.getComputedStyle( node, null );
+        if ( computedStyle )
+        {
+            var font_family = computedStyle.getPropertyValue( "font-family" );
+            if(font_family && "" != font_family)
+            {
+                var oFontItem = this.oFonts[font_family];
+                if(null != oFontItem && null != oFontItem.Name)
+                    rPr.FontFamily = {Name: oFontItem.Name, Index: oFontItem.Index};
+            }
+            var font_size = node.style.fontSize;
+            if(!font_size)
+                font_size = computedStyle.getPropertyValue( "font-size" );
+            if(font_size)
+            {
+                var obj = this._ValueToMmType(font_size);
+                if(obj && "%" != obj.type && "none" != obj.type)
+                {
+                    font_size = obj.val;
+                    //���� ������� �� ������������ ������� ������� �������� ���������� ������, ��� ���������� ��� ������� 8, 11, 14, 20, 26pt
+                    if("px" == obj.type && false == this.bIsDoublePx)
+                        font_size = Math.round(font_size * g_dKoef_mm_to_pt);
+                    else
+                        font_size = Math.round(2 * font_size * g_dKoef_mm_to_pt) / 2;//���������� �������� ���������.
+                    rPr.FontSize = font_size;
+                }
+            }
+            var font_weight = computedStyle.getPropertyValue( "font-weight" );
+            if(font_weight)
+            {
+                if("bold" == font_weight || "bolder" == font_weight || 400 < font_weight)
+                    rPr.Bold = true;
+            }
+            var font_style = computedStyle.getPropertyValue( "font-style" );
+            if("italic" == font_style)
+                rPr.Italic = true;
+            var color = computedStyle.getPropertyValue( "color" );
+            if(color && (color = this._ParseColor(color)))
+            {
+                rPr.Color = color;
+            }
+            //������� �� ��������, ������� �� �����������, ���� �������� ������������ ��������
+            var background_color = null;
+            var underline = null;
+            var Strikeout = null;
+            var vertical_align = null;
+            var oTempNode = node;
+            while(true)
+            {
+                var tempComputedStyle = defaultView.getComputedStyle( oTempNode, null );
+                if(null == tempComputedStyle)
+                    break;
+                if(null == underline || null == Strikeout)
+                {
+                    text_decoration = tempComputedStyle.getPropertyValue( "text-decoration" );
+                    if(text_decoration)
+                    {
+                        if(-1 != text_decoration.indexOf("underline"))
+                            underline = true;
+                        if(-1 != text_decoration.indexOf("line-through"))
+                            Strikeout = true;
+                    }
+                }
+                if(null == background_color)
+                {
+                    background_color = tempComputedStyle.getPropertyValue( "background-color" );
+                    if(background_color)
+                        background_color = this._ParseColor(background_color);
+                    else
+                        background_color = null;
+                }
+                if(null == vertical_align || "baseline" == vertical_align)
+                {
+                    vertical_align = tempComputedStyle.getPropertyValue( "vertical-align" );
+                    if(!vertical_align)
+                        vertical_align = null;
+                }
+                if(vertical_align && background_color && Strikeout && underline)
+                    break;
+                oTempNode = oTempNode.parentNode;
+                if(this.oRootNode == oTempNode || "body" == oTempNode.nodeName.toLowerCase()  || true == this._IsBlockElem(oTempNode.nodeName.toLowerCase()))
+                    break;
+            }
+            if(g_bIsDocumentCopyPaste)
+            {
+                if(background_color)
+                    rPr.HighLight = background_color;
+            }
+            else
+                delete rPr.HighLight;
+            if(null != underline)
+                rPr.Underline = underline;
+            if(null != Strikeout)
+                rPr.Strikeout = Strikeout;
+            switch(vertical_align)
+            {
+                case "sub": rPr.VertAlign = vertalign_SubScript;break;
+                case "super": rPr.VertAlign = vertalign_SuperScript;break;
+            }
+        }
+        return rPr;
+    },
+    _parseCss : function(sStyles, pPr)
+    {
+        var aStyles = sStyles.split(';');
+        if(aStyles)
+        {
+            for(var i = 0, length = aStyles.length; i < length; i++)
+            {
+                var style = aStyles[i];
+                var aPair = style.split(':');
+                if(aPair && aPair.length > 1)
+                {
+                    var prop_name = trimString(aPair[0]);
+                    var prop_value = trimString(aPair[1]);
+                    if(null != this.MsoStyles[prop_name])
+                        pPr[prop_name] = prop_value;
+                }
+            }
+        }
+    },
+    _PrepareContent : function()
+    {
+        //�� �������� ����� ������� ������������ �� �������, ����� ������ �������� �������� �����
+        if(this.aContent.length > 0)
+        {
+            var last = this.aContent[this.aContent.length - 1];
+            if(type_Table == last.GetType())
+            {
+                this._Add_NewParagraph();
+            }
+        }
+    },
+    _AddNextPrevToContent : function(oDoc)
+    {
+        var prev = null;
+        for(var i = 0, length = this.aContent.length; i < length; ++i)
+        {
+            var cur = this.aContent[i];
+            cur.Set_DocumentPrev( prev );
+            cur.Parent = oDoc;
+            if(prev)
+                prev.Set_DocumentNext( cur );
+            prev = cur;
+        }
+    },
+    _Paragraph_Add : function(elem)
+    {
+        if(null != this.oCurPar)
+            this.oCurPar.Internal_Content_Add( this.oCurPar.CurPos.ContentPos, elem );
+    },
+    _Add_NewParagraph : function()
+    {
+        this.oCurPar = new Paragraph(this.oDocument.DrawingDocument, this.oDocument, 0, 50, 50, X_Right_Field, Y_Bottom_Field );
+        this.aContent.push(this.oCurPar);
+        //���������� ��������� �����
+        this.oCur_rPr = new CTextPr();
+    },
+    _Execute_AddParagraph : function(node, pPr)
+    {
+        this._Add_NewParagraph();
+        //������������� ����� ���������
+        this._set_pPr(node, this.oCurPar, pPr);
+    },
+    _Decide_AddParagraph : function(node, pPr, bParagraphAdded, bCommitBr)
+    {
+        //���������� ������ ���������(��� ��������, ��� MS), ��������� �������� ������ ����� ������ �����
+        if(true == bParagraphAdded)
+        {
+            if(false != bCommitBr)
+                this._Commit_Br(2, node, pPr);//word ���������� 2 ��������� br
+            this._Execute_AddParagraph(node, pPr);
+        }
+        else if(false != bCommitBr)
+            this._Commit_Br(0, node, pPr);
+        return false;
+    },
+    _Commit_Br : function(nIgnore, node, pPr)
+    {
+        for(var i = 0, length = this.nBrCount - nIgnore; i < length; i++)
+        {
+            if(this.bInBlock)
+                this._Paragraph_Add( new ParaNewLine( break_Line ) );
+            else
+                this._Execute_AddParagraph(node, pPr);
+        }
+        this.nBrCount = 0;
+    },
+    _StartExecuteTable : function(node, pPr)
+    {
+        var oDocument = this.oDocument;
+        var defaultView = node.ownerDocument.defaultView;
+        var tableNode = node;
+        //���� ���� ���� tbody
+        for(var i = 0, length = node.childNodes.length; i < length; ++i)
+        {
+            if("tbody" == node.childNodes[i].nodeName.toLowerCase())
+            {
+                node = node.childNodes[i];
+                break;
+            }
+        }
+        //��������� �����. � ������� �� ����� ���� ����� ��������� �� ����������� ���������� �����.
+        var nRowCount = 0;
+        var nMinColCount = 0;
+        var nMaxColCount = 0;
+        var aColsCountByRow = new Array();
+        var oRowSums = new Object();
+        oRowSums[0] = 0;
+        var dMaxSum = 0;
+        var nCurColWidth = 0;
+        var nCurSum = 0;
+        var oRowSpans = new Object();
+        var fParseSpans = function()
+        {
+            var spans = oRowSpans[nCurColWidth];
+            while(null != spans && spans.row > 0)
+            {
+                spans.row--;
+                nCurColWidth += spans.col;
+                nCurSum += spans.width;
+                spans = oRowSpans[nCurColWidth];
+            }
+        };
+        for(var i = 0, length = node.childNodes.length; i < length; ++i)
+        {
+            var tr = node.childNodes[i];
+            if("tr" == tr.nodeName.toLowerCase())
+            {
+                nCurSum = 0;
+                nCurColWidth = 0;
+                var nMinRowSpanCount = null;//����������� rowspan ����� ������
+                for(var j = 0, length2 = tr.childNodes.length; j < length2; ++j)
+                {
+                    var tc = tr.childNodes[j];
+                    var tcName = tc.nodeName.toLowerCase();
+                    if("td" == tcName || "th" == tcName)
+                    {
+                        fParseSpans();
+
+                        var dWidth = null;
+                        var computedStyle = defaultView.getComputedStyle( tc, null );
+                        if ( computedStyle )
+                        {
+                            var computedWidth = computedStyle.getPropertyValue( "width" );
+                            if(null != computedWidth && null != (computedWidth = this._ValueToMm(computedWidth)))
+                                dWidth = computedWidth;
+                        }
+                        if(null == dWidth)
+                            dWidth = tc.clientWidth * g_dKoef_pix_to_mm;
+
+                        var nColSpan = tc.getAttribute("colspan");
+                        if(null != nColSpan)
+                            nColSpan = nColSpan - 0;
+                        else
+                            nColSpan = 1;
+                        var nCurRowSpan = tc.getAttribute("rowspan");
+                        if(null != nCurRowSpan)
+                        {
+                            nCurRowSpan = nCurRowSpan - 0;
+                            if(null == nMinRowSpanCount)
+                                nMinRowSpanCount = nCurRowSpan;
+                            else if(nMinRowSpanCount > nCurRowSpan)
+                                nMinRowSpanCount = nCurRowSpan;
+                            if(nCurRowSpan > 1)
+                                oRowSpans[nCurColWidth] = {row: nCurRowSpan - 1, col: nColSpan, width: dWidth};
+                        }
+                        else
+                            nMinRowSpanCount = 0;
+
+                        nCurSum += dWidth;
+                        if(null == oRowSums[nCurColWidth + nColSpan])
+                            oRowSums[nCurColWidth + nColSpan] = nCurSum;
+                        nCurColWidth += nColSpan;
+                    }
+                }
+                fParseSpans();
+                //������� ������ rowspan
+                if(nMinRowSpanCount > 1)
+                {
+                    for(var j = 0, length2 = tr.childNodes.length; j < length2; ++j)
+                    {
+                        var tc = tr.childNodes[j];
+                        var tcName = tc.nodeName.toLowerCase();
+                        if("td" == tcName || "th" == tcName)
+                        {
+                            var nCurRowSpan = tc.getAttribute("rowspan");
+                            if(null != nCurRowSpan)
+                                tc.setAttribute("rowspan", nCurRowSpan - nMinRowSpanCount);
+                        }
+                    }
+                }
+                if(dMaxSum < nCurSum)
+                    dMaxSum = nCurSum;
+                //������� ������ tr
+                if(0 == nCurColWidth)
+				{
+                    node.removeChild(tr);
+					length--;
+					i--;
+				}
+                else
+                {
+                    if(0 == nMinColCount || nMinColCount > nCurColWidth)
+                        nMinColCount = nCurColWidth;
+                    if(nMaxColCount < nCurColWidth)
+                        nMaxColCount = nCurColWidth;
+                    nRowCount++;
+                    aColsCountByRow.push(nCurColWidth);
+                }
+            }
+        }
+        if(nMaxColCount != nMinColCount)
+        {
+            for(var i = 0, length = aColsCountByRow.length; i < length; ++i)
+                aColsCountByRow[i] = nMaxColCount - aColsCountByRow[i];
+        }
+        if(nRowCount > 0 && nMaxColCount > 0)
+        {
+            var bUseScaleKoef = this.bUseScaleKoef;
+            var dScaleKoef = this.dScaleKoef;
+            if(dMaxSum * dScaleKoef > this.dMaxWidth)
+            {
+                dScaleKoef = dScaleKoef * this.dMaxWidth / dMaxSum;
+                bUseScaleKoef = true;
+            }
+            //������ Grid
+            var aGrid = new Array();
+            var nPrevIndex = null;
+            var nPrevVal = 0;
+            for(var i in oRowSums)
+            {
+                var nCurIndex = i - 0;
+                var nCurVal = oRowSums[i];
+                var nCurWidth = nCurVal - nPrevVal;
+                if(bUseScaleKoef)
+                    nCurWidth *= dScaleKoef;
+                if(null != nPrevIndex)
+                {
+                    var nDif = nCurIndex - nPrevIndex;
+                    if(1 == nDif)
+                        aGrid.push(nCurWidth);
+                    else
+                    {
+                        var nPartVal = nCurWidth / nDif;
+                        for(var i = 0; i < nDif; ++i)
+                            aGrid.push(nPartVal);
+                    }
+                }
+                nPrevVal = nCurVal;
+                nPrevIndex = nCurIndex;
+            }
+			var CurPage = 0;
+            var table = new CTable(oDocument.DrawingDocument, oDocument, true, 0, 0, 0, X_Right_Field, Y_Bottom_Field, nRowCount, nMaxColCount, aGrid);
+			var RecalcResult = table.Recalculate_Page(CurPage);
+            while ( recalcresult_NextPage == RecalcResult  )
+			{
+				CurPage++;
+				RecalcResult = table.Recalculate_Page( CurPage );
+			}
+            //�������� content
+            this._ExecuteTable(tableNode, node, table, nMaxColCount != nMinColCount ? aColsCountByRow : null, pPr, bUseScaleKoef, dScaleKoef);
+            table.Cursor_MoveToStartPos();
+            this.aContent.push(table);
+        }
+    },
+    _ExecuteBorder : function(computedStyle, node, type, type2, bAddIfNull)
+    {
+        var res = null;
+        var style = computedStyle.getPropertyValue( "border-"+type+"-style" );
+        if(null != style)
+        {
+            res = new CDocumentBorder();
+            if("none" == style)
+                res.Value = border_None;
+            else
+            {
+                res.Value = border_Single;
+                var width = node.style["border"+type2+"Width"];
+                if(!width)
+                    computedStyle.getPropertyValue( "border-"+type+"-width" );
+                if(null != width && null != (width = this._ValueToMm(width)))
+                    res.Size = width;
+                var color = computedStyle.getPropertyValue( "border-"+type+"-color" );
+                if(null != color && (color = this._ParseColor(color)))
+                    res.Color = color;
+            }
+        }
+        if(bAddIfNull && null == res)
+            res = new CDocumentBorder();
+        return res;
+    },
+    _ExecuteParagraphBorder : function(border)
+    {
+        var res = this.oBorderCache[border];
+        if(null != res)
+            return res.Copy();
+        else
+        {
+            //������� ����� dom ����� �� ������ ������� ������� ������� ������
+            //todo ������� ��� dom, ���������� �����.
+            res = new CDocumentBorder();;
+            var oTestDiv = document.createElement("div");
+            oTestDiv.setAttribute("style", "border-left:"+border);
+            document.body.appendChild( oTestDiv );
+            var defaultView = oTestDiv.ownerDocument.defaultView;
+            var computedStyle = defaultView.getComputedStyle( oTestDiv, null );
+            if(null != computedStyle)
+            {
+                res = this._ExecuteBorder(computedStyle, oTestDiv, "left", "Left", true);
+            }
+            document.body.removeChild( oTestDiv );
+            this.oBorderCache[border] = res;
+            return res;
+        }
+    },
+    _ExecuteTable : function(tableNode, node, table, aColsCountByRow, pPr, bUseScaleKoef, dScaleKoef)
+    {
+        //Pr
+        var Pr = table.Pr;
+        var defaultView = tableNode.ownerDocument.defaultView;
+        //align ������� � parent tableNode
+		var sTableAlign = null;
+		if(null != tableNode.align)
+			sTableAlign = tableNode.align
+        else if(null != tableNode.parentNode && this.oRootNode != tableNode.parentNode)
+        {
+            computedStyleParent = defaultView.getComputedStyle(tableNode.parentNode, null);
+            if(null != computedStyleParent)
+            {
+                //����� ��������� -webkit-right
+                sTableAlign = computedStyleParent.getPropertyValue( "text-align" );
+            }
+        }
+		if(null != sTableAlign)
+		{
+			if(-1 != sTableAlign.indexOf('center'))
+				table.Set_TableAlign(align_Center);
+			else if(-1 != sTableAlign.indexOf('right'))
+				table.Set_TableAlign(align_Right);
+		}
+        var spacing = null;
+        table.Set_TableBorder_InsideH(new CDocumentBorder());
+        table.Set_TableBorder_InsideV(new CDocumentBorder());
+
+        var style = tableNode.getAttribute("style");
+        if(style)
+        {
+            var tblPrMso = new Object();
+            this._parseCss(style, tblPrMso);
+            var spacing = tblPrMso["mso-cellspacing"];
+            if(null != spacing && null != (spacing = this._ValueToMm(spacing)))
+                ;
+            var padding = tblPrMso["mso-padding-alt"];
+            if(null != padding)
+            {
+                padding = trimString(padding);
+                var aMargins = padding.split(" ");
+                if(4 == aMargins.length)
+                {
+                    var top = aMargins[0];
+                    if(null != top && null != (top = this._ValueToMm(top)))
+                        ;
+                    else
+                        top = Pr.TableCellMar.Top.W;
+                    var right = aMargins[1];
+                    if(null != right && null != (right = this._ValueToMm(right)))
+                        ;
+                    else
+                        right = Pr.TableCellMar.Right.W;
+                    var bottom = aMargins[2];
+                    if(null != bottom && null != (bottom = this._ValueToMm(bottom)))
+                        ;
+                    else
+                        bottom = Pr.TableCellMar.Bottom.W;
+                    var left = aMargins[3];
+                    if(null != left && null != (left = this._ValueToMm(left)))
+                        ;
+                    else
+                        left = Pr.TableCellMar.Left.W;
+                    table.Set_TableCellMar(left, top, right, bottom);
+                }
+            }
+            var insideh = tblPrMso["mso-border-insideh"];
+            if(null != insideh)
+                table.Set_TableBorder_InsideH(this._ExecuteParagraphBorder(insideh));
+            var insidev = tblPrMso["mso-border-insidev"];
+            if(null != insidev)
+                table.Set_TableBorder_InsideV(this._ExecuteParagraphBorder(insidev));
+        }
+        var computedStyle = defaultView.getComputedStyle(tableNode, null);
+        if(computedStyle)
+        {
+			if(align_Left == table.Get_TableAlign())
+			{
+				var margin_left = computedStyle.getPropertyValue( "margin-left" );
+				//todo возможно надо еще учесть ширину таблицы
+				if(margin_left && null != (margin_left = this._ValueToMm(margin_left)) && margin_left < Page_Width - X_Left_Margin)
+					table.Set_TableInd(margin_left);
+			}
+            background_color = computedStyle.getPropertyValue( "background-color" );
+            if(null != background_color && (background_color = this._ParseColor(background_color)))
+                table.Set_TableShd(shd_Clear, background_color.r, background_color.g, background_color.b);
+            var oLeftBorder = this._ExecuteBorder(computedStyle, tableNode, "left", "Left", false);
+            if(null != oLeftBorder)
+                table.Set_TableBorder_Left(oLeftBorder);
+            var oTopBorder = this._ExecuteBorder(computedStyle, tableNode, "top", "Top", false);
+            if(null != oTopBorder)
+                table.Set_TableBorder_Top(oTopBorder);
+            var oRightBorder = this._ExecuteBorder(computedStyle, tableNode, "right", "Right", false);
+            if(null != oRightBorder)
+                table.Set_TableBorder_Right(oRightBorder);
+            var oBottomBorder = this._ExecuteBorder(computedStyle, tableNode, "bottom", "Bottom", false);
+            if(null != oBottomBorder)
+                table.Set_TableBorder_Bottom(oBottomBorder);
+
+            if(null == spacing)
+            {
+                spacing = computedStyle.getPropertyValue( "padding" );
+                if(!spacing)
+                    spacing = tableNode.style.padding;
+                if(!spacing)
+                    spacing = null;
+                if(spacing && null != (spacing = this._ValueToMm(spacing)))
+                    ;
+            }
+        }
+
+        //content
+        var nRowIndex = 0;
+        var oRowSpans = new Object();
+        var aVerticalMerge = new Array();
+        var aAfterBefore = new Object();
+        for(var i = 0, length = node.childNodes.length; i < length; ++i)
+        {
+            var tr = node.childNodes[i];
+            if("tr" == tr.nodeName.toLowerCase())
+            {
+                this._ExecuteTableRow(tr, table.Content[nRowIndex], nRowIndex, aAfterBefore, spacing, oRowSpans, aVerticalMerge, bUseScaleKoef, dScaleKoef);
+                nRowIndex++;
+            }
+        }
+        for(var i = 0, length = aVerticalMerge.length; i < length; ++i)
+        {
+            var item = aVerticalMerge[i];
+            this._MergeCells(table, item.start, item.rowspan, item.colspan);
+        }
+        //After,Before
+        for(var i = 0; i < table.Rows; ++i)
+        {
+            var Row = table.Content[i];
+            var nRowLength = Row.Content.length;
+            var nAfterCell = 0;
+            var nBeforeCell = 0;
+            var nAfterGrid = 0;
+            var nBeforeGrid = 0;
+            if(null != aColsCountByRow)
+            {
+                nAfterCell += aColsCountByRow[i];
+                nAfterGrid += aColsCountByRow[i];
+            }
+            var item = aAfterBefore[i];
+            if(null != item)
+            {
+                if(null != item.Before && item.Before > 0)
+                {
+                    var oFirstcell = Row.Content[0];
+                    if(null != oFirstcell && null != oFirstcell.Pr && null != oFirstcell.Pr.GridSpan)
+                        nBeforeGrid += oFirstcell.Pr.GridSpan;
+                    else
+                        nBeforeGrid += 1;
+                    nBeforeCell += 1;
+                }
+                if(null != item.After && item.After > 0)
+                {
+                    var oLastcell = Row.Content[nRowLength - 1];
+                    if(null != oLastcell && null != oLastcell.Pr && null != oLastcell.Pr.GridSpan)
+                        nAfterGrid += oLastcell.Pr.GridSpan;
+                    else
+                        nAfterGrid += 1;
+                    nAfterCell += 1;
+                }
+            }
+            if(nAfterCell >= 0 && nBeforeCell >= 0 && (nAfterCell + nBeforeCell) < nRowLength)
+            {
+                if(nAfterCell > 0)
+                {
+                    Row.Set_After(nAfterGrid);
+                    for(var j = nRowLength - 1; j >= nRowLength - nAfterCell; --j )
+                        Row.Remove_Cell(j);
+                }
+                if(nBeforeCell > 0)
+                {
+                    Row.Set_Before(nBeforeGrid);
+                    Row.Remove_Cell(0);
+                }
+            }
+        }
+    },
+    _MergeCells : function(table, StartPos, rowSpan, colSpan)
+    {
+        //�������� ������, ������� ���� ���������
+        table.Selection.Use  = true;
+        table.Selection.Type = table_Selection_Cell;
+        table.Selection.StartPos.Pos = StartPos;
+        if(1 == rowSpan)
+        {
+            table.Selection.EndPos.Pos = {Row: StartPos.Row, Cell: StartPos.Cell + colSpan - 1};
+            table.Selection.Data = new Array();
+            for( var i = StartPos.Cell; i <= StartPos.Cell + colSpan - 1; ++i )
+                table.Selection.Data.push( {Cell : i, Row : StartPos.Row} );
+        }
+        else
+        {
+            table.Selection.Data = new Array();
+            table.Selection.Data.push( StartPos );
+            //������� ������ ������
+            var nColIndexSpan = 0;
+            var oFirstRow = table.Content[StartPos.Row];
+            for(var i = 0; i < StartPos.Cell; ++i)
+            {
+                var Cell = oFirstRow.Content[i];
+                if(null != Cell && null != Cell.Pr && null != Cell.Pr.GridSpan)
+                    nColIndexSpan += Cell.Pr.GridSpan;
+                else
+                    nColIndexSpan += 1;
+            }
+            var nCurColIndexSpan = 0;
+            for( var i = StartPos.Row + 1; i <= StartPos.Row + rowSpan - 1; ++i )
+            {
+                var oCurRow = table.Content[i];
+                nCurColIndexSpan = 0;
+                for(var j = 0; j < oCurRow.Content.length; ++j)
+                {
+                    if(nColIndexSpan == nCurColIndexSpan)
+                    {
+                        table.Selection.Data.push( {Cell : j, Row : i} );
+                        break;
+                    }
+                    var Cell = oCurRow.Content[j];
+                    if(null != Cell && null != Cell.Pr && null != Cell.Pr.GridSpan)
+                        nCurColIndexSpan += Cell.Pr.GridSpan;
+                    else
+                        nCurColIndexSpan += 1;
+                }
+            }
+            table.Selection.EndPos.Pos = {Row: StartPos.Row + rowSpan - 1, Cell: nCurColIndexSpan};
+        }
+        //merge
+        table.Cell_Merge();
+    },
+    _ExecuteTableRow : function(node, row, index, aAfterBefore, spacing, oRowSpans, aVerticalMerge, bUseScaleKoef, dScaleKoef)
+    {
+        var oThis = this;
+        var table = row.Table;
+        if(null != spacing && spacing >= tableSpacingMinValue)
+            row.Set_CellSpacing(spacing);
+        if(node.style.height)
+        {
+            var height = node.style.height;
+            if(!("auto" == height || "inherit" == height || -1 != height.indexOf("%")) && null != (height = this._ValueToMm(height)))
+                row.Set_Height(height, heightrule_AtLeast);
+        }
+        var style = node.getAttribute("style");
+        if(null != style)
+        {
+            var tcPr = new Object();
+            this._parseCss(style, tcPr);
+            var margin_left = tcPr["mso-row-margin-left"];
+            var item = {After: null, Before: null};
+            if(margin_left && null != (margin_left = this._ValueToMm(margin_left)))
+                item.Before = margin_left;
+            var margin_right = tcPr["mso-row-margin-right"];
+            if(margin_right && null != (margin_right = this._ValueToMm(margin_right)))
+                item.After = margin_right;
+            aAfterBefore[index] = item;
+        }
+
+        //content
+        var nCellIndex = 0;
+        var nCellIndexSpan = 0;
+        var fParseSpans = function()
+        {
+            var spans = oRowSpans[nCellIndexSpan];
+            while(null != spans && spans.row > 0)
+            {
+                if(spans.col > 1)
+                    oThis._MergeCells(table, {Row: index, Cell: nCellIndex}, 1, spans.col);
+                spans.row--;
+                nCellIndex++;
+                nCellIndexSpan+= spans.col;
+                spans = oRowSpans[nCellIndexSpan];
+            }
+        };
+        for(var i = 0, length = node.childNodes.length; i < length; ++i)
+        {
+            //����� ����� ���� ��� ��� ����� ����������� td, ������ ��� ����������� ���������� ������ ����������� � dom
+            fParseSpans();
+
+            var tc = node.childNodes[i];
+            var tcName = tc.nodeName.toLowerCase();
+            if("td" == tcName || "th" == tcName)
+            {
+                var nColSpan = tc.getAttribute("colspan");
+                if(null != nColSpan)
+                    nColSpan = nColSpan - 0;
+                else
+                    nColSpan = 1;
+
+                var oCurCell = row.Content[nCellIndex];
+
+                var nRowSpan = tc.getAttribute("rowspan");
+                if(null != nRowSpan)
+                    nRowSpan = nRowSpan - 0;
+                else
+                    nRowSpan = 1;
+                if(nColSpan > 1 || nRowSpan > 1)
+                {
+                    if(nRowSpan > 1)
+                    {
+                        oRowSpans[nCellIndexSpan] = {row: nRowSpan - 1, col: nColSpan};
+                        aVerticalMerge.push({start: {Row: index, Cell: nCellIndex}, rowspan: nRowSpan, colspan: nColSpan});
+                    }
+                    this._MergeCells(table, {Row: index, Cell: nCellIndex}, 1, nColSpan);
+                }
+                this._ExecuteTableCell(tc, oCurCell, bUseScaleKoef, dScaleKoef, spacing);
+                nCellIndex ++;
+                nCellIndexSpan+=nColSpan;
+            }
+        }
+        fParseSpans();
+    },
+    _ExecuteTableCell : function(node, cell, bUseScaleKoef, dScaleKoef, spacing)
+    {
+        //Pr
+        var Pr = cell.Pr;
+        var bAddIfNull = false;
+        if(null != spacing)
+            bAddIfNull = true;
+        var defaultView = node.ownerDocument.defaultView;
+        var computedStyle = defaultView.getComputedStyle(node, null);
+        if(null != computedStyle)
+        {
+            background_color = computedStyle.getPropertyValue( "background-color" );
+            if(null != background_color && (background_color = this._ParseColor(background_color)))
+            {
+                var Shd = new CDocumentShd();
+                Shd.Value = shd_Clear;
+                Shd.Color = background_color;
+                cell.Set_Shd(Shd);
+            }
+            var border = this._ExecuteBorder(computedStyle, node, "left", "Left", bAddIfNull);
+            if(null != border)
+                cell.Set_Border(border, 3);
+            var border = this._ExecuteBorder(computedStyle, node, "top", "Top", bAddIfNull);
+            if(null != border)
+                cell.Set_Border(border, 0);
+            var border = this._ExecuteBorder(computedStyle, node, "right", "Right", bAddIfNull);
+            if(null != border)
+                cell.Set_Border(border, 1);
+            var border = this._ExecuteBorder(computedStyle, node, "bottom", "Bottom", bAddIfNull);
+            if(null != border)
+                cell.Set_Border(border, 2);
+
+            var top = computedStyle.getPropertyValue( "padding-top" );
+            if(null != top && null != (top = this._ValueToMm(top)))
+                cell.Set_Margins({ W : top, Type : tblwidth_Mm }, 0);
+            var right = computedStyle.getPropertyValue( "padding-right" );
+            if(null != right && null != (right = this._ValueToMm(right)))
+                cell.Set_Margins({ W : right, Type : tblwidth_Mm }, 1);
+            var bottom = computedStyle.getPropertyValue( "padding-bottom" );
+            if(null != bottom && null != (bottom = this._ValueToMm(bottom)))
+                cell.Set_Margins({ W : bottom, Type : tblwidth_Mm }, 2);
+            var left = computedStyle.getPropertyValue( "padding-left" );
+            if(null != left && null != (left = this._ValueToMm(left)))
+                cell.Set_Margins({ W : left, Type : tblwidth_Mm }, 3);
+        }
+
+        //content
+        var oPasteProcessor = new PasteProcessor(this.api, false, false, true);
+        oPasteProcessor.oFonts = this.oFonts;
+        oPasteProcessor.oImages = this.oImages;
+        oPasteProcessor.oDocument = cell.Content;
+        oPasteProcessor.bIgnoreNoBlockText = true;
+        oPasteProcessor.dMaxWidth = this._CalcMaxWidthByCell(cell);
+        if(true == bUseScaleKoef)
+        {
+            oPasteProcessor.bUseScaleKoef = bUseScaleKoef;
+            oPasteProcessor.dScaleKoef = dScaleKoef;
+        }
+        oPasteProcessor.Start(node);
+        oPasteProcessor._PrepareContent();
+        oPasteProcessor._AddNextPrevToContent(cell.Content);
+        if(0 == oPasteProcessor.aContent.length)
+        {
+            var oDocContent = cell.Content;
+            var oNewPar = new Paragraph(oDocContent.DrawingDocument, oDocContent, 0, 50, 50, X_Right_Field, Y_Bottom_Field );
+            //���������� ��������� ��������� - ����� ��� ����������� �� ������ � ������ ���� ��� ����������� ������ ������
+            oNewPar.Set_Spacing({After: 0, Before: 0, Line: linerule_Auto});
+            oPasteProcessor.aContent.push(oNewPar);
+        }
+        //��������� ����� ���������
+        for(var i = 0, length = oPasteProcessor.aContent.length; i < length; ++i)
+            cell.Content.Internal_Content_Add(i + 1, oPasteProcessor.aContent[i]);
+        //������� ��������, ������� ��������� � ������� �� ���������
+        cell.Content.Internal_Content_Remove(0, 1);
+    },
+    _Execute : function(node, pPr, bRoot, bAddParagraph, bInBlock)
+    {
+        //bAddParagraph ���� �������� �� ������� _Decide_AddParagraph, ��������� �������� ��� ���.
+        //bAddParagraph ������������ � true, ����� ���������� ������� ������� � �� ��������� �������� ��������
+        var oDocument = this.oDocument;
+        var bRootHasBlock = false;//���� root ���� ������� �������, �� ���� ��� child ������� �����������
+        //��� Root node �� ������� ����� � �� ��������� �����
+        if(true == bRoot)
+        {
+            //���� ������� ��������� ���, �� �������� ����
+            var bExist = false;
+            for(var i = 0, length = node.childNodes.length; i < length; i++)
+            {
+                var child = node.childNodes[i];
+                var bIsBlockChild = this._IsBlockElem(child.nodeName.toLowerCase());
+                if(true == bIsBlockChild)
+                {
+                    bRootHasBlock = true;
+                    bExist = true;
+                    break;
+                }
+            }
+            if(false == bExist && true == this.bIgnoreNoBlockText)
+                this.bIgnoreNoBlockText = false;
+        }
+        else
+        {
+            if(Node.TEXT_NODE == node.nodeType)
+            {
+                if(false == this.bIgnoreNoBlockText || true == bInBlock)
+                {
+                    var value = node.nodeValue;
+                    if(!value)
+                        value = "";
+                    //������� � ����� �������� \r|\t|\n, � �������� ������ �������� �� �� �������
+                    //������ ���(�������� ������ chrome ��� ������� ��������� ������ � ������� \n)
+                    value = value.replace(/^(\r|\t|\n)+|(\r|\t|\n)+$/g, '') ;
+                    value = value.replace(/(\r|\t|\n)/g, ' ');
+                    if(value.length > 0)
+                    {
+                        bAddParagraph = this._Decide_AddParagraph(node.parentNode, pPr, bAddParagraph);
+
+                        //��������� ������� ����� ���� �� ���������
+                        this._commit_rPr(node.parentNode);
+                        for(var i = 0, length = value.length; i < length; i++)
+                        {
+                            var Char = value.charAt(i);
+                            var Code = value.charCodeAt(i);
+                            var Item;
+                            if(32 == Code || 160 == Code) //160 - nbsp
+                                Item = new ParaSpace();
+                            else
+                                Item = new ParaText( value[i] );
+                            this._Paragraph_Add( Item );
+                        }
+                    }
+                }
+                return bAddParagraph;
+            }
+            var sNodeName = node.nodeName.toLowerCase();
+            if("table" == sNodeName)
+            {
+                if(g_bIsDocumentCopyPaste)
+                {
+                    this._StartExecuteTable(node, pPr);
+                    return bAddParagraph;
+                }
+                else
+                    return false;
+            }
+
+            //�������� �� html �������� ���������(�� ��� ������ �������� �� getComputedStyle)
+            var style = node.getAttribute("style");
+            if(style)
+                this._parseCss(style, pPr);
+
+            if("h1" == sNodeName)
+                pPr.hLevel = 0;
+            else if("h2" == sNodeName)
+                pPr.hLevel = 1;
+            else if("h3" == sNodeName)
+                pPr.hLevel = 2;
+            else if("h4" == sNodeName)
+                pPr.hLevel = 3;
+            else if("h5" == sNodeName)
+                pPr.hLevel = 4;
+            else if("h6" == sNodeName)
+                pPr.hLevel = 5;
+
+            if("ul" == sNodeName || "ol" == sNodeName || "li" == sNodeName)
+            {
+                pPr.bNum = true;
+                if(g_bIsDocumentCopyPaste)
+                {
+                    if("ul" == sNodeName)
+                        pPr.numType = numbering_numfmt_Bullet;
+                    else if("ol" == sNodeName)
+                        pPr.numType = numbering_numfmt_Decimal;
+                }
+                else
+                {
+                    if("ul" == sNodeName)
+                        pPr.numType = numbering_presentationnumfrmt_Char;
+                    else if("ol" == sNodeName)
+                        pPr.numType = numbering_presentationnumfrmt_ArabicPeriod;
+                }
+            }
+
+            if("img" == sNodeName)
+            {
+                if(g_bIsDocumentCopyPaste)
+                {
+                    bAddParagraph = this._Decide_AddParagraph(node, pPr, bAddParagraph);
+                    
+                    var nWidth = parseInt(node.getAttribute("width"));
+                    var nHeight = parseInt(node.getAttribute("height"));
+                    if(!nWidth || !nHeight)
+                    {
+                        var defaultView = node.ownerDocument.defaultView;
+                        var computedStyle = defaultView.getComputedStyle( node, null );
+                        if ( computedStyle )
+                        {
+                            nWidth = parseInt(computedStyle.getPropertyValue("width"));
+                            nHeight = parseInt(computedStyle.getPropertyValue("height"));
+                        }
+                    }
+                    var sSrc = node.getAttribute("src");
+                    if(isNaN(nWidth) || isNaN(nHeight) || !(typeof nWidth === "number") || !(typeof nHeight === "number")
+                        ||  nWidth === 0 ||  nHeight === 0)
+                    {
+                        var img_prop = new CImgProperty();
+                        img_prop.put_ImageUrl(sSrc);
+                        var or_sz = img_prop.get_OriginSize(editor);
+                        nWidth = or_sz.Width / g_dKoef_pix_to_mm;
+                        nHeight = or_sz.Height / g_dKoef_pix_to_mm;
+                    }
+                    if(nWidth && nHeight && sSrc)
+                    {
+                        var sSrc = this.oImages[sSrc];
+                        if(sSrc)
+                        {
+                            nWidth = nWidth * g_dKoef_pix_to_mm;
+                            nHeight = nHeight * g_dKoef_pix_to_mm;
+                            //��������� � this.dMaxWidth
+                            var bUseScaleKoef = this.bUseScaleKoef;
+                            var dScaleKoef = this.dScaleKoef;
+                            if(nWidth * dScaleKoef > this.dMaxWidth)
+                            {
+                                dScaleKoef = dScaleKoef * this.dMaxWidth / nWidth;
+                                bUseScaleKoef = true;
+                            }
+                            if(bUseScaleKoef)
+                            {
+                                var dTemp = nWidth;
+                                nWidth *= dScaleKoef;
+                                nHeight *= dScaleKoef;
+                            }
+                            var oTargetDocument = this.oDocument;
+                            var oDrawingDocument = this.oDocument.DrawingDocument;
+                            if(oTargetDocument && oDrawingDocument)
+                            {
+                                var binary_shape = node.getAttribute("alt");
+                                var sub;
+                                if(typeof binary_shape === "string")
+                                    sub = binary_shape.substr(0, 12);
+                                if(typeof binary_shape === "string" &&( sub === "TeamLabShape" || sub === "TeamLabImage" || sub === "TeamLabChart" || sub === "TeamLabGroup"))
+                                {
+                                    var reader = CreateBinaryReader(binary_shape, 12, binary_shape.length);
+                                    if(isRealObject(reader))
+                                        reader.oImages = this.oImages;
+                                    var first_string = null;
+                                    if(reader !== null && typeof  reader === "object")
+                                    {
+                                        first_string = sub;
+                                    }
+                                    var Drawing;
+                                    switch(first_string)
+                                    {
+                                        case "TeamLabImage":
+                                        case "TeamLabChart":
+                                        {
+                                            Drawing = CreateParaDrawingFromBinary(reader);
+                                            break;
+                                        }
+                                        case "TeamLabShape":
+                                        case "TeamLabGroup":
+                                        {
+                                            if(this.oDocument.Is_TopDocument())
+                                                Drawing = CreateParaDrawingFromBinary(reader);
+                                            else
+                                            {
+                                                var cur_parent = this.oDocument;
+                                                if(cur_parent.Is_TableCellContent())
+                                                {
+                                                    while(isRealObject(cur_parent) && cur_parent.Is_TableCellContent())
+                                                    {
+                                                        cur_parent = cur_parent.Parent.Row.Table.Parent;
+                                                    }
+                                                }
+                                                if(cur_parent.Parent instanceof WordShape)
+                                                {
+                                                    Drawing = CreateImageFromBinary(sSrc);
+                                                }
+                                                else
+                                                {
+                                                    Drawing = CreateParaDrawingFromBinary(reader);
+                                                }
+                                            }
+
+                                            break;
+                                        }
+                                        default :
+                                        {
+                                            Drawing = CreateImageFromBinary(sSrc);
+                                            break;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    Drawing = CreateImageFromBinary(sSrc);
+                                    // oTargetDocument.DrawingObjects.Add( Drawing );
+                                }
+
+                                this._Paragraph_Add( Drawing );
+
+                                    //oDocument.Add_InlineImage(nWidth, nHeight, img);
+                            }
+                        }
+                    }
+                    else if (nWidth && nHeight && (/msie/i.test(navigator.userAgent)))
+                    {
+                        var binary_shape = node.getAttribute("alt");
+                        if (typeof binary_shape === "string")
+                        {
+                            nWidth = nWidth * g_dKoef_pix_to_mm;
+                            nHeight = nHeight * g_dKoef_pix_to_mm;
+                            //��������� � this.dMaxWidth
+                            var bUseScaleKoef = this.bUseScaleKoef;
+                            var dScaleKoef = this.dScaleKoef;
+                            if(nWidth * dScaleKoef > this.dMaxWidth)
+                            {
+                                dScaleKoef = dScaleKoef * this.dMaxWidth / nWidth;
+                                bUseScaleKoef = true;
+                            }
+                            if(bUseScaleKoef)
+                            {
+                                var dTemp = nWidth;
+                                nWidth *= dScaleKoef;
+                                nHeight *= dScaleKoef;
+                            }
+                            var oTargetDocument = this.oDocument;
+                            var oDrawingDocument = this.oDocument.DrawingDocument;
+                            if(oTargetDocument && oDrawingDocument)
+                            {
+                                var sub;
+                                if(typeof binary_shape === "string")
+                                    sub = binary_shape.substr(0, 12);
+                                if(typeof binary_shape === "string" &&( sub === "TeamLabShape" || sub === "TeamLabImage" || sub === "TeamLabChart" || sub === "TeamLabGroup"))
+                                {
+                                    var reader = CreateBinaryReader(binary_shape, 12, binary_shape.length);
+                                    if(isRealObject(reader))
+                                        reader.oImages = this.oImages;
+                                    var first_string = null;
+                                    if(reader !== null && typeof  reader === "object")
+                                    {
+                                        first_string = sub;
+                                    }
+                                    var Drawing;
+                                    switch(first_string)
+                                    {
+                                        case "TeamLabImage":
+                                        case "TeamLabChart":
+                                        {
+                                            Drawing = CreateParaDrawingFromBinary(reader);
+
+                                            this._Paragraph_Add( Drawing );
+                                            break;
+                                        }
+                                        case "TeamLabShape":
+                                        case "TeamLabGroup":
+                                        {
+                                            if(this.oDocument.Is_TopDocument())
+                                                Drawing = CreateParaDrawingFromBinary(reader);
+                                            else
+                                            {
+                                                var cur_parent = this.oDocument;
+                                                if(cur_parent.Is_TableCellContent())
+                                                {
+                                                    while(isRealObject(cur_parent) && cur_parent.Is_TableCellContent())
+                                                    {
+                                                        cur_parent = cur_parent.Parent.Row.Table.Parent;
+                                                    }
+                                                }
+                                                if(cur_parent.Parent instanceof WordShape)
+                                                {
+                                                    Drawing = CreateParaDrawingFromBinary(reader);
+                                                    var bounds = Drawing.getBounds();
+                                                    Drawing =  CreateImageFromBinary2(Drawing.GraphicObj.getBase64Img(), bounds.r - bounds.l, bounds.b - bounds.t);
+                                                }
+                                                else
+                                                {
+                                                    Drawing = CreateParaDrawingFromBinary(reader);
+                                                }
+                                            }
+                                            this._Paragraph_Add( Drawing );
+                                            break;
+                                        }
+                                      /*  default :
+                                        {
+                                            Drawing = CreateImageFromBinary(sSrc);
+                                            break;
+                                        }  */
+                                    }
+
+                                }
+
+                                //oDocument.Add_InlineImage(nWidth, nHeight, img);
+                            }
+                        }
+                    }
+                    return bAddParagraph;
+                }
+                else
+                    return false;
+            }
+
+            //��������� linebreak, ���� �� �� ��������� ������� �������� � �� ����� ��� ������� �������
+            if("br" == sNodeName || "always" == node.style.pageBreakBefore)
+            {
+                if("always" == node.style.pageBreakBefore)
+                {
+                    bAddParagraph = this._Decide_AddParagraph(node.parentNode, pPr, bAddParagraph);
+                    bAddParagraph = true;
+                    this._Commit_Br(0, node, pPr);
+                    this._Paragraph_Add( new ParaNewLine( break_Page ) );
+                }
+                else
+                {
+                    bAddParagraph = this._Decide_AddParagraph(node.parentNode, pPr, bAddParagraph, false);
+                    this.nBrCount++;//this._Paragraph_Add( new ParaNewLine( break_Line ) );
+                    if("line-break" == pPr["mso-special-character"])
+                        this._Commit_Br(0, node, pPr);
+					return bAddParagraph;
+                }
+            }
+
+            //�������� �� tab
+            if("span" == sNodeName)
+            {
+                var nTabCount = parseInt(pPr["mso-tab-count"] || 0);
+                if(nTabCount > 0)
+                {
+                    bAddParagraph = this._Decide_AddParagraph(node, pPr, bAddParagraph);
+                    this._commit_rPr(node);
+                    for(var i = 0; i < nTabCount; i++)
+                        this._Paragraph_Add( new ParaTab() );
+                    return bAddParagraph;
+                }
+            }
+        }
+        //���������� �������� ��� childNodes
+        for(var i = 0, length = node.childNodes.length; i < length; i++)
+        {
+            var child = node.childNodes[i];
+            var nodeType = child.nodeType;
+            //��� ����������� �� word ����� ����������� ����������� �� �������
+            //����������� ����������, ������ ������ ������
+            if(Node.COMMENT_NODE == nodeType)
+            {
+                var value = child.nodeValue;
+                var bSkip = false;
+                if(value)
+                {
+                    if(-1 != value.indexOf("supportLists"))
+                    {
+                        //todo ���������� ��� ������
+                        pPr.bNum = true;
+                        bSkip = true;
+                    }
+                    if(-1 != value.indexOf("supportLineBreakNewLine"))
+                        bSkip = true;
+                }
+                if(true == bSkip)
+                {
+                    //���������� ��� �� �������������� �����������
+                    var j = i + 1;
+                    for(; j < length; j++)
+                    {
+                        var tempNode = node.childNodes[j];
+                        var tempNodeType = tempNode.nodeType;
+                        if(Node.COMMENT_NODE == tempNodeType)
+                        {
+                            var tempvalue = tempNode.nodeValue;
+                            if(tempvalue && -1 != tempvalue.indexOf("endif"))
+                                break;
+                        }
+                    }
+                    i = j;
+                    continue;
+                }
+            }
+
+            if(!(Node.ELEMENT_NODE == nodeType || Node.TEXT_NODE == nodeType))
+                continue;
+            //�������� ������� ��������� ������ �� \t,\n,\r
+            if( Node.TEXT_NODE == child.nodeType)
+            {
+                var value = child.nodeValue;
+                if(!value)
+                    continue;
+                value = value.replace(/(\r|\t|\n)/g, '');
+                if("" == value)
+                    continue;
+            }
+            var sChildNodeName = child.nodeName.toLowerCase();
+            var bIsBlockChild = this._IsBlockElem(sChildNodeName);
+            if(bRoot)
+                this.bInBlock = false;
+            if(bIsBlockChild)
+            {
+                bAddParagraph = true;
+                this.bInBlock = true;
+            }
+
+            var bHyperlink = false;
+            if("a" == sChildNodeName)
+            {
+                var href = child.href;
+                if(null != href)
+                {
+                    var sDecoded;
+                    //decodeURI ����� �������� malformed exception, ������ ��� ��� ���� � utf8, � ��������� ����� ����� ���������� url � ����� ���������(�������� windows-1251)
+                    try
+                    {
+                        sDecoded = decodeURI(href);
+                    }
+                    catch(e) { sDecoded = href; }
+                    href = sDecoded;
+                    bHyperlink = true;
+                    var title = child.getAttribute("title");
+
+                    bAddParagraph = this._Decide_AddParagraph(child, pPr, bAddParagraph);
+                    var oHyperlink = new ParaHyperlinkStart();
+                    oHyperlink.Set_Value( href );
+                    if(null != title)
+                        oHyperlink.Set_ToolTip(title);
+                    this._Paragraph_Add( oHyperlink );
+                }
+            }
+
+            bAddParagraph = this._Execute(child, Common_CopyObj(pPr), false, bAddParagraph, bIsBlockChild || bInBlock);
+            if(bIsBlockChild)
+                bAddParagraph = true;
+            if("a" == sChildNodeName && true == bHyperlink)
+                this._Paragraph_Add( new ParaHyperlinkEnd() );
+        }
+        if(bRoot)
+        {
+            this._Commit_Br(2, node, pPr);//word ���������� 2 ��������� br
+        }
+        return bAddParagraph;
+    }
+};

@@ -1,0 +1,11 @@
+X:\AVS\Sources\AVSOfficeStudio\Test\HtmlTextEditor\TM_Fonts_Generator\Project\TM_Fonts_Generator\obj\Release\Interop.AVSGraphics.dll
+X:\AVS\Sources\AVSOfficeStudio\Test\HtmlTextEditor\TM_Fonts_Generator\Project\TM_Fonts_Generator\obj\Release\TM_Fonts_Generator.csproj.ResolveComReference.cache
+X:\AVS\Sources\AVSOfficeStudio\Test\HtmlTextEditor\TM_Fonts_Generator\Project\TM_Fonts_Generator\bin\Release\TM_Fonts_Generator.exe
+X:\AVS\Sources\AVSOfficeStudio\Test\HtmlTextEditor\TM_Fonts_Generator\Project\TM_Fonts_Generator\bin\Release\TM_Fonts_Generator.pdb
+X:\AVS\Sources\AVSOfficeStudio\Test\HtmlTextEditor\TM_Fonts_Generator\Project\TM_Fonts_Generator\bin\Release\Interop.AVSGraphics.dll
+X:\AVS\Sources\AVSOfficeStudio\Test\HtmlTextEditor\TM_Fonts_Generator\Project\TM_Fonts_Generator\obj\Release\ResolveAssemblyReference.cache
+X:\AVS\Sources\AVSOfficeStudio\Test\HtmlTextEditor\TM_Fonts_Generator\Project\TM_Fonts_Generator\obj\Release\TM_Fonts_Generator.Form1.resources
+X:\AVS\Sources\AVSOfficeStudio\Test\HtmlTextEditor\TM_Fonts_Generator\Project\TM_Fonts_Generator\obj\Release\TM_Fonts_Generator.Properties.Resources.resources
+X:\AVS\Sources\AVSOfficeStudio\Test\HtmlTextEditor\TM_Fonts_Generator\Project\TM_Fonts_Generator\obj\Release\TM_Fonts_Generator.csproj.GenerateResource.Cache
+X:\AVS\Sources\AVSOfficeStudio\Test\HtmlTextEditor\TM_Fonts_Generator\Project\TM_Fonts_Generator\obj\Release\TM_Fonts_Generator.exe
+X:\AVS\Sources\AVSOfficeStudio\Test\HtmlTextEditor\TM_Fonts_Generator\Project\TM_Fonts_Generator\obj\Release\TM_Fonts_Generator.pdb
