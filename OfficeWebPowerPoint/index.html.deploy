@@ -1,0 +1,2197 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	    <title>AVS Document Editor</title>
+	    <meta http-equiv="X-UA-Compatible" content="IE=9"/>
+		<link rel="stylesheet" type="text/css" href="menu/styles/MenuStyle.css" />
+		<link rel="stylesheet" type="text/css" href="menu/styles/clickmenu.css" />
+		<link rel="stylesheet" type="text/css" href="menu/styles/docStyles.css" />
+		<link rel="stylesheet" type="text/css" href="menu/js/jquery-ui.css"/> 
+		<link rel="stylesheet" type="text/css" href="menu/styles/jquery-custom.css" />
+		<link rel="stylesheet" type="text/css" href="menu/js/ui.spinner.css" />
+		<script type="text/javascript" src="menu/js/jquery-1.6.1.min.js"></script>
+		<script type="text/javascript" src="menu/js/jquery.clickmenu.js"></script>
+		<script type="text/javascript" src="menu/js/jquery-ui-1.8.13.custom.min.js"></script>
+		<script type="text/javascript" src="menu/js/ui.spinner.min.js"></script>
+		<script type="text/javascript" src="menu/main_menu.js"></script>
+        <script type="text/javascript" src="menu/Statusbar.js"></script>
+
+        <link type="text/css" href="../OfficeWebWord/WebWord/Drawing/styles/word.css" rel="stylesheet"/>
+		<script type="text/javascript" src="sdk-all.js"></script>
+    </head>
+    <body id="id_body" class="block_elem" style="-moz-user-select:none;-khtml-user-select:none;user-select:none;width:100%;height:100%;background-color:#B0B0B0;overflow:hidden;position:fixed;" UNSELECTABLE="on">
+		<div id="id_menu" class="block_elem" style="width:100%;height:21mm;background-color:#F4F5F6;">
+		<table id="menu" class="utilFont" style="">
+			<tr class="headerstyle">
+				<td id="logo" class="logo" > <img src ='menu/img/tmdocs_logo.png'/></td>
+				<td id="header" colspan="2">
+					<div id="id_doc_info" class="block_elem" style="font-family:Arial;font-size:10pt;color:#fff;">
+					
+						<div id="id_info" class="block_elem" style="font-family:Arial;font-size:10pt;color:#fff;width:861px;"></div>
+						<div id="id_doc_info_spinner" class="block_elem" style="font-family:Arial;font-size:10pt;right:0;color:#fff;"></div>
+					</div>
+				</td>
+			</tr>
+			<tr id="topmenu" style="display:none;">
+			<td colspan="3" style="padding-left: 3px;background-color: #EEF0F2;">
+				<ul id="mainmenu"  visible="false">
+					<li class="item main">File
+						<ul class="margin_top_10">
+						<li id ="mnuOpenFile" class="SubItem" style="display:none;">
+							<p class="MenubarIcon MenubarSaveAs">&nbsp;</p>
+							Open
+						</li>
+						<li id ="mnuSave" class="SubItem">
+							<p class="MenubarIcon MenubarSaveAs">&nbsp;</p>
+							Save
+							<span class="MenuQuickButton">Ctrl+S</span>
+						</li>
+						<li id ="mnuSaveAs" class="SubItem">
+							<p class="MenubarIcon MenubarSaveAs">&nbsp;</p>
+							SaveAs
+							<span class="MenuArrow">&#9658;</span>
+							<ul>
+							<li id ="mnuSaveAsDocx" typecode="0" class="SubItem">Docx</li> 
+							<li id ="mnuSaveAsDoc"  typecode="1" class="SubItem">Doc</li> 
+							<li id ="mnuSaveAsOdt" typecode="2" class="SubItem">Odt</li> 
+							<li id ="mnuSaveAsRtf" typecode="3" class="SubItem">Rtf</li> 
+							<li id ="mnuSaveAsTxt" typecode="4" class="SubItem">Txt</li> 
+							<li id ="mnuSaveAsHtml" typecode="5" class="SubItem">Html (Zipped)</li> 
+							<li id ="mnuSaveAsMht" typecode="6" class="SubItem">Mht</li> 
+							<li id ="mnuSaveAsPdf" typecode="7" class="SubItem">Pdf</li> 
+							</ul> 
+						</li>
+						<li id ="saveAsFile" class="SubItem" style="display:none;">
+							<p class="MenubarIcon MenubarSaveAs">&nbsp;</p>
+							SaveAs
+						</li>
+						<div class="MenuSeparator"></div>
+						<li id ="mnupreview" class="SubItem">
+							<p class="MenubarIcon MenubarPrintPreview">&nbsp;</p>
+							PrintPreview
+						</li>
+						<li id ="mnuPrint" class="SubItem">
+							<p class="MenubarIcon MenubarPrint">&nbsp;</p>
+							Print
+						</li>
+						<div class="MenuSeparator"></div>
+						<!-- <li id="sm" class="SubItem">Show Menu</li> -->
+						</ul>
+					</li>
+					<li class="item">Edit
+						<ul class="margin_top_10">
+							<li id ="td_menu_undo" class ="SubItem">
+								<p class="MenubarIcon MenubarUndo">&nbsp;</p>
+								Undo
+								<span class="MenuQuickButton">Ctrl+Z</span>
+							</li>
+							<li id ="td_menu_redo" class ="SubItem">
+								<p class="MenubarIcon MenubarRedo">&nbsp;</p>
+								Redo
+								<span class="MenuQuickButton">Ctrl+Y</span>
+							</li>
+							<div class="MenuSeparator">
+							</div>
+							<li id ="td_cut" class ="SubItem">
+								<p class="MenubarIcon MenubarCut">&nbsp;</p>
+								Cut
+								<span class="MenuQuickButton">Ctrl+X</span>
+							</li>
+							<li id ="td_menu_copy" class ="SubItem">
+								<p class="MenubarIcon MenubarCopy">&nbsp;</p>
+								Copy
+								<span class="MenuQuickButton">Ctrl+C</span>
+							</li>
+							<li id ="td_menu_paste" class ="SubItem">
+								<p class="MenubarIcon MenubarPaste">&nbsp;</p>
+								Paste
+								<span class="MenuQuickButton">Ctrl+V</span>
+							</li>
+							<div class="MenuSeparator">
+							</div>
+							<li id ="td_selectAll" class ="SubItem">
+								<p class="MenubarIcon MenubarSelectAll">&nbsp;</p>
+								SelectAll
+								<span class="MenuQuickButton">Ctrl+A</span>
+							</li>
+							<div class="MenuSeparator">
+							</div>
+							<li id ="td_find" class ="SubItem">
+								<p class="MenubarIcon MenubarFindReplace">&nbsp;</p>
+								FindAndReplace
+							</li>
+						</ul> 
+					</li>
+					<li class="item">Insert
+						<ul class="margin_top_10">
+							<li id ="td_image_menu" class ="SubItem">
+								<p class="MenubarIcon MenubarImage">&nbsp;</p>
+								Image
+							</li>
+							<li id ="td_link_menu" class ="SubItem">
+								<p class="MenubarIcon MenubarLink">&nbsp;</p>
+								Link
+							</li>
+							<li id ="td_drawing_menu" class ="SubItem">
+							<p class="MenubarIcon iconDrawing">&nbsp;</p>
+								Drawing
+							</li>
+							<div class="MenuSeparator">
+							</div>
+							<li id ="td_specialchar" class ="SubItem">
+								<p class="MenubarIcon MenubarCharacters">&nbsp;</p>
+								SpecialCharacters
+							</li>
+							<li id ="td_horizontalrule" class ="SubItem">
+								<p class="MenubarIcon MenubarLine">&nbsp;</p>
+								HorizontalLine
+							</li>
+							<div class="MenuSeparator">
+							</div>
+							<li id ="td_pagebreak" class ="SubItem">
+								<p class="MenubarIcon MenubarPagebreak">&nbsp;</p>
+								PageBreak
+							</li>
+							<li id ="td_table" class ="SubItem">
+								<p class="MenubarIcon MenubarTable">&nbsp;</p>
+								Table
+							</li>
+						</ul> 
+					</li>
+					<li class="item">Format
+						<ul class="margin_top_10">
+							<li id ="mnuFontStyle" class ="SubItem">
+								FontStyle
+								<span class="MenuArrow">&#9658;</span>
+								<ul class="uimargin">
+									<li id="Arial" class="SubItem" style="font-family:Arial;" value="Arial">Arial</li>
+									<li id="Calibri" class="SubItem" style="font-family:Calibri;" value="Calibri">Calibri</li>
+									<li id="ComicSansMS" class="SubItem" style="font-family:Comic Sans MS;" value="Comic Sans MS">Comic Sans MS</li>
+									<li id="CourierNew" class="SubItem" style="font-family:Courier New;" value="Courier New">Courier New</li>
+									<li id="Georgia" class="SubItem" style="font-family:Georgia;" value="Georgia">Georgia</li>
+									<li id="LucidaSansUnicode" class="SubItem" style="font-family:Lucida Sans Unicode;" value="Lucida Sans Unicode">Lucida Sans Unicode</li>
+									<li id="Tahoma" class="SubItem" style="font-family:Tahoma;" value="Tahoma">Tahoma</li>
+									<li id="TimesNewRoman" class="SubItem" style="font-family:Times New Roman;" value="Times New Roman">Times New Roman</li>
+									<li id="TrebuchetMS" class="SubItem" style="font-family:Trebuchet MS;" value="Trebuchet MS">Trebuchet MS</li>
+									<li id="Verdana" class="SubItem" style="font-family:Verdana;" value="Verdana">Verdana</li>
+								</ul>
+							</li>
+							<li id ="mnuFontSize" class ="SubItem">
+								FontSize
+								<span class="MenuArrow">&#9658;</span>
+								<ul class="uimargin">
+									<li id="8" class="SubItem" value="8">8pt</li>
+									<li id="9" class="SubItem" value="9">9pt</li>
+									<li id="10" class="SubItem" value="10">10pt</li>
+									<li id="11" class="SubItem" value="11">11pt</li>
+									<li id="12" class="SubItem" value="12">12pt</li>
+									<li id="14" class="SubItem" value="14">14pt</li>
+									<li id="18" class="SubItem" value="18">18pt</li>
+									<li id="24" class="SubItem" value="24">24pt</li>
+									<li id="36" class="SubItem" value="36">36pt</li>
+									<li id="48" class="SubItem" value="48">48pt</li>
+									<li id="72" class="SubItem" value="72">72pt</li>
+								</ul>
+							</li>
+							<div class="MenuSeparator"></div>
+							<li id ="td_menu_bold" class ="SubItem">
+								<p class="MenubarIcon MenubarBold">&nbsp;</p>
+								Bold
+								<span class="MenuQuickButton">Ctrl+B</span>
+							</li>
+							<li id ="td_menu_italic" class ="SubItem">
+								<p class="MenubarIcon MenubarItalic">&nbsp;</p>
+								Italic
+								<span class="MenuQuickButton">Ctrl+I</span>
+							</li>
+							<li id ="td_menu_underline" class ="SubItem">
+								<p class="MenubarIcon MenubarUnderline">&nbsp;</p>
+								Underline
+								<span class="MenuQuickButton">Ctrl+U</span>
+							</li>
+							<li id ="td_strike" class ="SubItem">
+								<p class="MenubarIcon MenubarUnwritten">&nbsp;</p>
+								Unwritten
+							</li>
+							<li id ="td_superscript" class ="SubItem">
+								<p class="MenubarIcon MenubarSup">&nbsp;</p>
+								SuperScript
+								<span class="MenuQuickButton">Ctrl+.</span>
+							</li>
+							<li id ="td_subscript" class ="SubItem">
+								<p class="MenubarIcon MenubarSub">&nbsp;</p>
+								SubScript
+								<span class="MenuQuickButton">Ctrl+,</span>
+							</li>
+							<div class="MenuSeparator"></div>
+							<li id ="mnuAlign" class="SubItem">
+								AlignHor
+								<span class="MenuArrow">&#9658;</span>
+								<ul>
+									<li id ="mnuLeft" class="SubItem">
+										<p class="MenubarIcon MenubarLeft">&nbsp;</p>
+										AlignTextLeft
+									</li>
+									<li id ="mnuCenter"  class="SubItem">
+										<p class="MenubarIcon MenubarCenter">&nbsp;</p>
+										AlignTextCenter
+									</li>
+									<li id ="mnuRight" class="SubItem">
+										<p class="MenubarIcon MenubarRight">&nbsp;</p>
+										AlignTextRight
+									</li>
+									<li id ="mnuJustified"  class="SubItem">
+										<p class="MenubarIcon MenubarJustified">&nbsp;</p>
+										AlignTextJustify
+									</li>
+								</ul>
+							</li>
+							<li id ="mnuAlign" class="SubItem">
+								ParagraphStyles
+								<span class="MenuArrow">&#9658;</span>
+								<ul>
+									<li id ="mnuDecrease" class="SubItem">
+										<p class="MenubarIcon MenubarDecrease1">&nbsp;</p>
+										DecreaseIndent
+									</li>
+									<li id ="mnuIncrease"  class="SubItem">
+										<p class="MenubarIcon MenubarIncrease1">&nbsp;</p>
+										IncreaseIndent
+									</li>
+									<div class="MenuSeparator">
+									</div>
+									<li id="p" class="SubItem">Normal</li>
+									<li id="h1" class="SubItem">Heading 1</li>
+									<li id="h2" class="SubItem">Heading 2</li>
+									<li id="h3" class="SubItem">Heading 3</li>
+									<li id="h4" class="SubItem">Heading 4</li>
+									<li id="h5" class="SubItem">Heading 5</li>
+									<li id="h6" class="SubItem">Heading 6</li>
+								</ul>
+							</li>
+							<div class="MenuSeparator"></div>
+							<li id ="mnuTypeOfList" class ="SubItem">
+								TypeOfList
+								<span class="MenuArrow">&#9658;</span>
+								<ul class="uimargin">
+									<li id="mnuNumberedList" class="SubItem">
+										<p class="MenubarIcon MenubarNumbered">&nbsp;</p>
+										Numbered
+									</li>
+									<li id="mnuBulletedList" class="SubItem">
+										<p class="MenubarIcon MenubarBulleted">&nbsp;</p>
+										Bulleted
+									</li>
+								</ul>
+							</li>
+							<li id ="mnuFontColor" class ="SubItem">TextColor
+								<p class="MenubarIcon MenubarFontColor">&nbsp;</p>
+								<span class="MenuArrow">&#9658;</span>
+								<ul style="margin: 0;">
+									<li id="colorBox3" style="min-width: 0;width: 125px;">
+										<table class="paletteTable"><tr>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#000000;" title="RGB (0, 0, 0)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#333333;" title="RGB (51, 51, 51)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#808080;" title="RGB (128, 128, 128)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#969696;" title="RGB (150, 150, 150)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#C0C0C0;" title="RGB (192, 192, 192)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#DDDDDD;" title="RGB (221, 221, 221)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FFFFFF;" title="RGB (255, 255, 255)"></div></td>
+										</tr><tr>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FF0000;" title="RGB (255, 0, 0)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FF9900;" title="RGB (255, 153, 0)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#99CC00;" title="RGB (153, 204, 0)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#339966;" title="RGB (51, 153, 102)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#33CCCC;" title="RGB (51, 204, 204)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#3366FF;" title="RGB (51, 102, 255)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#800080;" title="RGB (128, 0, 128)"></div></td>
+										</tr><tr>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FF00FF;" title="RGB (255, 0, 255)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FFCC00;" title="RGB (255, 204, 0)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FFFF00;" title="RGB (255, 255, 0)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#00FF00;" title="RGB (0, 255, 0)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#00FFFF;" title="RGB (0, 255, 255)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#00CCFF;" title="RGB (0, 204, 255)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#993366;" title="RGB (153, 51, 102)"></div></td>
+										</tr><tr>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FF99CC;" title="RGB (255, 153, 204)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FADCB3;" title="RGB (250, 220, 179)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FFFF99;" title="RGB (255, 255, 153)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#CCFFCC;" title="RGB (204, 255, 204)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#CCFFFF;" title="RGB (204, 255, 255)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#C2D1F0;" title="RGB (194, 209, 240)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#E1C7E1;" title="RGB (225, 199, 225)"></div></td>
+										</tr><tr>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#E69999;" title="RGB (230, 153, 153)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FFCC99;" title="RGB (255, 204, 153)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#EBD780;" title="RGB (235, 215, 128)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#B3D580;" title="RGB (179, 213, 128)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#BDE6E1;" title="RGB (189, 230, 225)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#99CCFF;" title="RGB (153, 204, 255)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#CC99FF;" title="RGB (204, 153, 255)"></div></td>
+										</tr><tr>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FF0000;" title="RGB (255, 0, 0)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FF6600;" title="RGB (255, 102, 0)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#808000;" title="RGB (128, 128, 0)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#008000;" title="RGB (0, 128, 0)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#008080;" title="RGB (0, 128, 128)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#0000FF;" title="RGB (0, 0, 255)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#6666CC;" title="RGB (102, 102, 204)"></div></td>
+										</tr><tr>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#800000;" title="RGB (128, 0, 0)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#993300;" title="RGB (153, 51, 0)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#333300;" title="RGB (51, 51, 0)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#003300;" title="RGB (0, 51, 0)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#003366;" title="RGB (0, 51, 102)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#000080;" title="RGB (0, 0, 128)"></div></td>
+											<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#333399;" title="RGB (51, 51, 153)"></div></td>
+										</tr></table>
+									</li>
+								</ul>
+							</li>
+							<li id ="mnuBGColor" class ="SubItem">TextBG
+								<p class="MenubarIcon MenubarBGColor">&nbsp;</p>
+								<span class="MenuArrow">&#9658;</span>
+								<ul style="margin: 0;">
+									<li id="colorBox4" style="min-width: 0;width: 125px;">
+										<table class="paletteTable"><tr>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#000000;" title="RGB (0, 0, 0)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#333333;" title="RGB (51, 51, 51)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#808080;" title="RGB (128, 128, 128)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#969696;" title="RGB (150, 150, 150)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#C0C0C0;" title="RGB (192, 192, 192)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#DDDDDD;" title="RGB (221, 221, 221)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#FFFFFF;" title="RGB (255, 255, 255)"></div></td>
+										</tr><tr>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#FF0000;" title="RGB (255, 0, 0)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#FF9900;" title="RGB (255, 153, 0)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#99CC00;" title="RGB (153, 204, 0)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#339966;" title="RGB (51, 153, 102)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#33CCCC;" title="RGB (51, 204, 204)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#3366FF;" title="RGB (51, 102, 255)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#800080;" title="RGB (128, 0, 128)"></div></td>
+										</tr><tr>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#FF00FF;" title="RGB (255, 0, 255)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#FFCC00;" title="RGB (255, 204, 0)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#FFFF00;" title="RGB (255, 255, 0)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#00FF00;" title="RGB (0, 255, 0)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#00FFFF;" title="RGB (0, 255, 255)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#00CCFF;" title="RGB (0, 204, 255)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#993366;" title="RGB (153, 51, 102)"></div></td>
+										</tr><tr>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#FF99CC;" title="RGB (255, 153, 204)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#FADCB3;" title="RGB (250, 220, 179)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#FFFF99;" title="RGB (255, 255, 153)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#CCFFCC;" title="RGB (204, 255, 204)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#CCFFFF;" title="RGB (204, 255, 255)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#C2D1F0;" title="RGB (194, 209, 240)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#E1C7E1;" title="RGB (225, 199, 225)"></div></td>
+										</tr><tr>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#E69999;" title="RGB (230, 153, 153)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#FFCC99;" title="RGB (255, 204, 153)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#EBD780;" title="RGB (235, 215, 128)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#B3D580;" title="RGB (179, 213, 128)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#BDE6E1;" title="RGB (189, 230, 225)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#99CCFF;" title="RGB (153, 204, 255)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#CC99FF;" title="RGB (204, 153, 255)"></div></td>
+										</tr><tr>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#FF0000;" title="RGB (255, 0, 0)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#FF6600;" title="RGB (255, 102, 0)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#808000;" title="RGB (128, 128, 0)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#008000;" title="RGB (0, 128, 0)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#008080;" title="RGB (0, 128, 128)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#0000FF;" title="RGB (0, 0, 255)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#6666CC;" title="RGB (102, 102, 204)"></div></td>
+										</tr><tr>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#800000;" title="RGB (128, 0, 0)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#993300;" title="RGB (153, 51, 0)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#333300;" title="RGB (51, 51, 0)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#003300;" title="RGB (0, 51, 0)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#003366;" title="RGB (0, 51, 102)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#000080;" title="RGB (0, 0, 128)"></div></td>
+											<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#333399;" title="RGB (51, 51, 153)"></div></td>
+										</tr></table>
+									</li>
+								</ul>
+							</li>
+							<li id ="td_removeFormat" class ="SubItem">
+								<p class="MenubarIcon MenubarClear">&nbsp;</p>
+								ClearFormatting
+							</li>
+						</ul>
+					</li>
+					<li class="item main">Help
+						<ul class="margin_top_10">
+							<!--<li id ="mnuAbout" class="SubItem"><p class="MenubarIcon MenubarAbout">&nbsp;</p>About</li>-->
+							<li id = "mnuShortcuts" class = "SubItem">KeyboardShortcuts</li>
+						</ul>
+					</li>
+				</ul>
+				</td>
+			</tr>
+			<tr>
+
+			<td  id="toolbar" colspan="3">
+
+			<table style="height:22px; vertical-align:top; border-collapse: separate; border-bottom: 0px solid #C0C0C0">
+			<tr>
+			<td id="menuButtonHolder" style="vertical-align:middle;">
+				<ul id="menuButton" style="width:108px;">
+					<li class="item main" style="margin-left: 22px;width:50px;">
+					
+						<span>Menu</span>
+						<ul class="positionmenubatton">
+							<li id ="mnuOpenFile" class="SubItem" style="display:none;">
+								<p class="MenubarIcon MenubarSaveAs">&nbsp;</p>
+								Open
+							</li>
+							<li id ="mnuSave" class="SubItem">
+								<p class="MenubarIcon MenubarSaveAs">&nbsp;</p>
+								Save
+								<span class="MenuQuickButton">Ctrl+S</span>
+							</li>
+							<li id ="mnuSaveAs" class="SubItem">
+								<p class="MenubarIcon MenubarSaveAs">&nbsp;</p>
+								SaveAs
+								<span class="MenuArrow">&#9658;</span>
+								<ul>
+								<li id ="mnuSaveAsDocx" typecode="0" class="SubItem">Docx</li> 
+								<li id ="mnuSaveAsDoc"  typecode="1" class="SubItem">Doc</li> 
+								<li id ="mnuSaveAsOdt" typecode="2" class="SubItem">Odt</li> 
+								<li id ="mnuSaveAsRtf" typecode="3" class="SubItem">Rtf</li> 
+								<li id ="mnuSaveAsTxt" typecode="4" class="SubItem">Txt</li> 
+								<li id ="mnuSaveAsHtml" typecode="5" class="SubItem">Html (Zipped)</li> 
+								<li id ="mnuSaveAsMht" typecode="6" class="SubItem">Mht</li> 
+								<li id ="mnuSaveAsPdf" typecode="7" class="SubItem">Pdf</li> 
+								</ul> 
+							</li>
+							<li id ="saveAsFile" class="SubItem" style="display:none;">
+								<p class="MenubarIcon MenubarSaveAs">&nbsp;</p>
+								SaveAs
+							</li>
+							<div class="MenuSeparator"></div>
+							<li class="SubItem">Edit
+								<span class="MenuArrow">&#9658;</span>
+								<ul>
+									<li id ="td_menu_undo" class ="SubItem">
+										<p class="MenubarIcon MenubarUndo">&nbsp;</p>
+										Undo
+										<span class="MenuQuickButton">Ctrl+Z</span>
+									</li>
+									<li id ="td_menu_redo" class ="SubItem">
+										<p class="MenubarIcon MenubarRedo">&nbsp;</p>
+										Redo
+										<span class="MenuQuickButton">Ctrl+Y</span>
+									</li>
+									<div class="MenuSeparator">
+									</div>
+									<li id ="td_cut" class ="SubItem">
+										<p class="MenubarIcon MenubarCut">&nbsp;</p>
+										Cut
+										<span class="MenuQuickButton">Ctrl+X</span>
+									</li>
+									<li id ="td_menu_copy" class ="SubItem">
+										<p class="MenubarIcon MenubarCopy">&nbsp;</p>
+										Copy
+										<span class="MenuQuickButton">Ctrl+C</span>
+									</li>
+									<li id ="td_menu_paste" class ="SubItem">
+										<p class="MenubarIcon MenubarPaste">&nbsp;</p>
+										Paste
+										<span class="MenuQuickButton">Ctrl+V</span>
+									</li>
+									<div class="MenuSeparator">
+									</div>
+									<li id ="td_selectAll" class ="SubItem">
+										<p class="MenubarIcon MenubarSelectAll">&nbsp;</p>
+										SelectAll
+										<span class="MenuQuickButton">Ctrl+A</span>
+									</li>
+									<div class="MenuSeparator">
+									</div>
+									<li id ="td_find" class ="SubItem">
+										<p class="MenubarIcon MenubarFindReplace">&nbsp;</p>
+										FindAndReplace
+									</li>
+								</ul> 
+							</li>
+							<li class="SubItem">Insert
+								<span class="MenuArrow">&#9658;</span>
+								<ul>
+									<li id ="td_image_menu" class ="SubItem">
+										<p class="MenubarIcon MenubarImage">&nbsp;</p>
+										Image
+									</li>
+									<li id ="td_link_menu" class ="SubItem">
+										<p class="MenubarIcon MenubarLink">&nbsp;</p>
+										Link
+									</li>
+									<li id ="td_drawing_menu" class ="SubItem">
+									<p class="MenubarIcon iconDrawing">&nbsp;</p>
+										Drawing
+									</li>
+									<div class="MenuSeparator">
+									</div>
+									<li id ="td_specialchar" class ="SubItem">
+										<p class="MenubarIcon MenubarCharacters">&nbsp;</p>
+										SpecialCharacters
+									</li>
+									<li id ="td_horizontalrule" class ="SubItem">
+										<p class="MenubarIcon MenubarLine">&nbsp;</p>
+										HorizontalLine
+									</li>
+									<div class="MenuSeparator">
+									</div>
+									<li id ="td_pagebreak" class ="SubItem">
+										<p class="MenubarIcon MenubarPagebreak">&nbsp;</p>
+										PageBreak
+									</li>
+									<li id ="td_table" class ="SubItem">
+										<p class="MenubarIcon MenubarTable">&nbsp;</p>
+										Table
+									</li>
+								</ul> 
+							</li>
+							<li class="SubItem">Format
+								<span class="MenuArrow">&#9658;</span>
+								<ul>
+									<li id ="mnuFontStyle" class ="SubItem">
+										FontStyle
+										<span class="MenuArrow">&#9658;</span>
+										<ul class="uimargin">
+											<li id="Arial" class="SubItem" style="font-family:Arial;" value="Arial">Arial</li>
+											<li id="Calibri" class="SubItem" style="font-family:Calibri;" value="Calibri">Calibri</li>
+											<li id="ComicSansMS" class="SubItem" style="font-family:Comic Sans MS;" value="Comic Sans MS">Comic Sans MS</li>
+											<li id="CourierNew" class="SubItem" style="font-family:Courier New;" value="Courier New">Courier New</li>
+											<li id="Georgia" class="SubItem" style="font-family:Georgia;" value="Georgia">Georgia</li>
+											<li id="LucidaSansUnicode" class="SubItem" style="font-family:Lucida Sans Unicode;" value="Lucida Sans Unicode">Lucida Sans Unicode</li>
+											<li id="Tahoma" class="SubItem" style="font-family:Tahoma;" value="Tahoma">Tahoma</li>
+											<li id="TimesNewRoman" class="SubItem" style="font-family:Times New Roman;" value="Times New Roman">Times New Roman</li>
+											<li id="TrebuchetMS" class="SubItem" style="font-family:Trebuchet MS;" value="Trebuchet MS">Trebuchet MS</li>
+											<li id="Verdana" class="SubItem" style="font-family:Verdana;" value="Verdana">Verdana</li>
+										</ul>
+									</li>
+									<li id ="mnuFontSize" class ="SubItem">
+										FontSize
+										<span class="MenuArrow">&#9658;</span>
+										<ul class="uimargin">
+											<li id="8" class="SubItem" value="8">8pt</li>
+											<li id="9" class="SubItem" value="9">9pt</li>
+											<li id="10" class="SubItem" value="10">10pt</li>
+											<li id="11" class="SubItem" value="11">11pt</li>
+											<li id="12" class="SubItem" value="12">12pt</li>
+											<li id="14" class="SubItem" value="14">14pt</li>
+											<li id="18" class="SubItem" value="18">18pt</li>
+											<li id="24" class="SubItem" value="24">24pt</li>
+											<li id="36" class="SubItem" value="36">36pt</li>
+											<li id="48" class="SubItem" value="48">48pt</li>
+											<li id="72" class="SubItem" value="72">72pt</li>
+										</ul>
+									</li>
+									<div class="MenuSeparator"></div>
+									<li id ="td_menu_bold" class ="SubItem">
+										<p class="MenubarIcon MenubarBold">&nbsp;</p>
+										Bold
+										<span class="MenuQuickButton">Ctrl+B</span>
+									</li>
+									<li id ="td_menu_italic" class ="SubItem">
+										<p class="MenubarIcon MenubarItalic">&nbsp;</p>
+										Italic
+										<span class="MenuQuickButton">Ctrl+I</span>
+									</li>
+									<li id ="td_menu_underline" class ="SubItem">
+										<p class="MenubarIcon MenubarUnderline">&nbsp;</p>
+										Underline
+										<span class="MenuQuickButton">Ctrl+U</span>
+									</li>
+									<li id ="td_strike" class ="SubItem">
+										<p class="MenubarIcon MenubarUnwritten">&nbsp;</p>
+										Unwritten
+									</li>
+									<li id ="td_superscript" class ="SubItem">
+										<p class="MenubarIcon MenubarSup">&nbsp;</p>
+										SuperScript
+										<span class="MenuQuickButton">Ctrl+.</span>
+									</li>
+									<li id ="td_subscript" class ="SubItem">
+										<p class="MenubarIcon MenubarSub">&nbsp;</p>
+										SubScript
+										<span class="MenuQuickButton">Ctrl+,</span>
+									</li>
+									<div class="MenuSeparator"></div>
+									<li id ="mnuAlign" class="SubItem">
+										AlignHor
+										<span class="MenuArrow">&#9658;</span>
+										<ul>
+											<li id ="mnuLeft" class="SubItem">
+												<p class="MenubarIcon MenubarLeft">&nbsp;</p>
+												AlignTextLeft
+											</li>
+											<li id ="mnuCenter"  class="SubItem">
+												<p class="MenubarIcon MenubarCenter">&nbsp;</p>
+												AlignTextCenter
+											</li>
+											<li id ="mnuRight" class="SubItem">
+												<p class="MenubarIcon MenubarRight">&nbsp;</p>
+												AlignTextRight
+											</li>
+											<li id ="mnuJustified"  class="SubItem">
+												<p class="MenubarIcon MenubarJustified">&nbsp;</p>
+												AlignTextJustify
+											</li>
+										</ul>
+									</li>
+									<li id ="mnuAlign" class="SubItem">
+										ParagraphStyles
+										<span class="MenuArrow">&#9658;</span>
+										<ul>
+											<li id ="mnuDecrease" class="SubItem">
+												<p class="MenubarIcon MenubarDecrease1">&nbsp;</p>
+												DecreaseIndent
+											</li>
+											<li id ="mnuIncrease"  class="SubItem">
+												<p class="MenubarIcon MenubarIncrease1">&nbsp;</p>
+												IncreaseIndent
+											</li>
+											<div class="MenuSeparator">
+											</div>
+											<li id="p" class="SubItem">Normal</li>
+											<li id="h1" class="SubItem">Heading 1</li>
+											<li id="h2" class="SubItem">Heading 2</li>
+											<li id="h3" class="SubItem">Heading 3</li>
+											<li id="h4" class="SubItem">Heading 4</li>
+											<li id="h5" class="SubItem">Heading 5</li>
+											<li id="h6" class="SubItem">Heading 6</li>
+										</ul>
+									</li>
+									<div class="MenuSeparator"></div>
+									<li id ="mnuTypeOfList" class ="SubItem">
+										TypeOfList
+										<span class="MenuArrow">&#9658;</span>
+										<ul class="uimargin">
+											<li id="mnuNumberedList" class="SubItem">
+												<p class="MenubarIcon MenubarNumbered">&nbsp;</p>
+												Numbered
+											</li>
+											<li id="mnuBulletedList" class="SubItem">
+												<p class="MenubarIcon MenubarBulleted">&nbsp;</p>
+												Bulleted
+											</li>
+										</ul>
+									</li>
+									<li id ="mnuFontColor" class ="SubItem">TextColor
+										<p class="MenubarIcon MenubarFontColor">&nbsp;</p>
+										<span class="MenuArrow">&#9658;</span>
+										<ul style="margin: 0;">
+											<li id="colorBox3" style="min-width: 0;width: 125px;">
+												<table class="paletteTable"><tr>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#000000;" title="RGB (0, 0, 0)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#333333;" title="RGB (51, 51, 51)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#808080;" title="RGB (128, 128, 128)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#969696;" title="RGB (150, 150, 150)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#C0C0C0;" title="RGB (192, 192, 192)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#DDDDDD;" title="RGB (221, 221, 221)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FFFFFF;" title="RGB (255, 255, 255)"></div></td>
+												</tr><tr>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FF0000;" title="RGB (255, 0, 0)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FF9900;" title="RGB (255, 153, 0)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#99CC00;" title="RGB (153, 204, 0)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#339966;" title="RGB (51, 153, 102)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#33CCCC;" title="RGB (51, 204, 204)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#3366FF;" title="RGB (51, 102, 255)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#800080;" title="RGB (128, 0, 128)"></div></td>
+												</tr><tr>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FF00FF;" title="RGB (255, 0, 255)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FFCC00;" title="RGB (255, 204, 0)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FFFF00;" title="RGB (255, 255, 0)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#00FF00;" title="RGB (0, 255, 0)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#00FFFF;" title="RGB (0, 255, 255)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#00CCFF;" title="RGB (0, 204, 255)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#993366;" title="RGB (153, 51, 102)"></div></td>
+												</tr><tr>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FF99CC;" title="RGB (255, 153, 204)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FADCB3;" title="RGB (250, 220, 179)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FFFF99;" title="RGB (255, 255, 153)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#CCFFCC;" title="RGB (204, 255, 204)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#CCFFFF;" title="RGB (204, 255, 255)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#C2D1F0;" title="RGB (194, 209, 240)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#E1C7E1;" title="RGB (225, 199, 225)"></div></td>
+												</tr><tr>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#E69999;" title="RGB (230, 153, 153)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FFCC99;" title="RGB (255, 204, 153)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#EBD780;" title="RGB (235, 215, 128)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#B3D580;" title="RGB (179, 213, 128)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#BDE6E1;" title="RGB (189, 230, 225)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#99CCFF;" title="RGB (153, 204, 255)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#CC99FF;" title="RGB (204, 153, 255)"></div></td>
+												</tr><tr>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FF0000;" title="RGB (255, 0, 0)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FF6600;" title="RGB (255, 102, 0)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#808000;" title="RGB (128, 128, 0)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#008000;" title="RGB (0, 128, 0)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#008080;" title="RGB (0, 128, 128)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#0000FF;" title="RGB (0, 0, 255)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#6666CC;" title="RGB (102, 102, 204)"></div></td>
+												</tr><tr>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#800000;" title="RGB (128, 0, 0)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#993300;" title="RGB (153, 51, 0)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#333300;" title="RGB (51, 51, 0)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#003300;" title="RGB (0, 51, 0)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#003366;" title="RGB (0, 51, 102)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#000080;" title="RGB (0, 0, 128)"></div></td>
+													<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#333399;" title="RGB (51, 51, 153)"></div></td>
+												</tr></table>
+											</li>
+										</ul>
+									</li>
+									<li id ="mnuBGColor" class ="SubItem">TextBG
+										<p class="MenubarIcon MenubarBGColor">&nbsp;</p>
+										<span class="MenuArrow">&#9658;</span>
+										<ul style="margin: 0;">
+											<li id="colorBox4" style="min-width: 0;width: 125px;">
+												<table class="paletteTable"><tr>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#000000;" title="RGB (0, 0, 0)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#333333;" title="RGB (51, 51, 51)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#808080;" title="RGB (128, 128, 128)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#969696;" title="RGB (150, 150, 150)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#C0C0C0;" title="RGB (192, 192, 192)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#DDDDDD;" title="RGB (221, 221, 221)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#FFFFFF;" title="RGB (255, 255, 255)"></div></td>
+												</tr><tr>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#FF0000;" title="RGB (255, 0, 0)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#FF9900;" title="RGB (255, 153, 0)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#99CC00;" title="RGB (153, 204, 0)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#339966;" title="RGB (51, 153, 102)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#33CCCC;" title="RGB (51, 204, 204)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#3366FF;" title="RGB (51, 102, 255)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#800080;" title="RGB (128, 0, 128)"></div></td>
+												</tr><tr>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#FF00FF;" title="RGB (255, 0, 255)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#FFCC00;" title="RGB (255, 204, 0)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#FFFF00;" title="RGB (255, 255, 0)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#00FF00;" title="RGB (0, 255, 0)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#00FFFF;" title="RGB (0, 255, 255)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#00CCFF;" title="RGB (0, 204, 255)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#993366;" title="RGB (153, 51, 102)"></div></td>
+												</tr><tr>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#FF99CC;" title="RGB (255, 153, 204)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#FADCB3;" title="RGB (250, 220, 179)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#FFFF99;" title="RGB (255, 255, 153)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#CCFFCC;" title="RGB (204, 255, 204)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#CCFFFF;" title="RGB (204, 255, 255)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#C2D1F0;" title="RGB (194, 209, 240)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#E1C7E1;" title="RGB (225, 199, 225)"></div></td>
+												</tr><tr>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#E69999;" title="RGB (230, 153, 153)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#FFCC99;" title="RGB (255, 204, 153)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#EBD780;" title="RGB (235, 215, 128)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#B3D580;" title="RGB (179, 213, 128)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#BDE6E1;" title="RGB (189, 230, 225)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#99CCFF;" title="RGB (153, 204, 255)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#CC99FF;" title="RGB (204, 153, 255)"></div></td>
+												</tr><tr>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#FF0000;" title="RGB (255, 0, 0)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#FF6600;" title="RGB (255, 102, 0)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#808000;" title="RGB (128, 128, 0)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#008000;" title="RGB (0, 128, 0)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#008080;" title="RGB (0, 128, 128)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#0000FF;" title="RGB (0, 0, 255)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#6666CC;" title="RGB (102, 102, 204)"></div></td>
+												</tr><tr>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#800000;" title="RGB (128, 0, 0)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#993300;" title="RGB (153, 51, 0)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#333300;" title="RGB (51, 51, 0)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#003300;" title="RGB (0, 51, 0)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#003366;" title="RGB (0, 51, 102)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#000080;" title="RGB (0, 0, 128)"></div></td>
+													<td class="colorSelect1 bordered"><div class="colorWatch" style="background-color:#333399;" title="RGB (51, 51, 153)"></div></td>
+												</tr></table>
+											</li>
+										</ul>
+									</li>
+									<li id ="td_removeFormat" class ="SubItem">
+										<p class="MenubarIcon MenubarClear">&nbsp;</p>
+										ClearFormatting
+									</li>
+								</ul>
+							</li>
+							<div class="MenuSeparator"></div>
+							<li id ="mnupreview" class="SubItem">
+								<p class="MenubarIcon MenubarPrintPreview">&nbsp;</p>
+								PrintPreview
+							</li>
+							<li id ="mnuPrint" class="SubItem">
+								<p class="MenubarIcon MenubarPrint">&nbsp;</p>
+								Print
+							</li>
+							<!-- <li id="sm" class="SubItem">Show Menu Tab</li> -->
+							<li  id = "mnuShortcuts"class="SubItem">Help</li>
+						</ul>
+						<div class="ToolbarDropDown" style="margin-bottom:4px;float: left;"></div>
+					</li>
+				</ul>
+			</td>
+
+			<td class="ToolbarIconOut selectableIcon" title="Print (Ctrl+P)">
+				<div id="td_print" class="iconToolbar">
+							<img class="ToolbarIcon ToolbarPrint" src="menu/img/spacer.gif"/>
+						</div>
+			</td>
+			<td id="td_undo_td" class="ToolbarIconOut selectableIcon" title="Undo (Ctrl+Z)">
+				<div id="td_undo" class="iconToolbar">
+					<img id="td_undo_img" class="ToolbarIcon ToolbarUndo" src="menu/img/spacer.gif"/>
+				</div>
+            </td>
+            <td id="td_redo_td" class="ToolbarIconOut selectableIcon" title="Redo (Ctrl+Y)">
+				<div id="td_redo" class="iconToolbar">
+					<img id="td_redo_img" class="ToolbarIcon ToolbarRedo" src="menu/img/spacer.gif"/>
+				</div>
+			</td>
+			<td class="toolbarSep">
+				<div class="ToolbarIconOut">
+					<img src="menu/img/Border.png"/>
+				</div>
+			</td>
+			<td class="ToolbarIconOut selectableIcon" title="Copy (Ctrl+C)">
+				<div id="td_copy" class="iconToolbar">
+					<img class="ToolbarIcon ToolbarCopy" src="menu/img/spacer.gif"/>
+				</div>
+			</td>
+			<td class="ToolbarIconOut selectableIcon" title="Paste (Ctrl+V)">
+				<div id="td_paste" class="iconToolbar">
+					<img class="ToolbarIcon ToolbarPaste" src="menu/img/spacer.gif"/>
+				</div>
+			</td>
+			<td class="toolbarSep">
+				<div class="ToolbarIconOut">
+					<img src="menu/img/Border.png"/>
+				</div>
+			</td>
+			<td style="min-width: 320px;vertical-align:middle;">
+				<div>
+				<ul id="textMenu">
+					<li id="fontFormat" class="item main textSelect textSelectBoard ToolbarIconOut" value="p">
+					<span id="fontFormatVal">Normal</span>
+						<ul class="uimargin">
+							<li id="p" ind="0" class="SubItem">Normal</li>
+							<li id="h1" ind="1" class="SubItem">Heading 1</li>
+							<li id="h2" ind="2" class="SubItem">Heading 2</li>
+							<li id="h3" ind="3" class="SubItem">Heading 3</li>
+							<li id="h4" ind="4" class="SubItem">Heading 4</li>
+							<li id="h5" ind="5" class="SubItem">Heading 5</li>
+							<li id="h6" ind="6" class="SubItem">Heading 6</li>
+							<li id="h7" ind="7" class="SubItem">Heading 7</li>
+							<li id="h8" ind="8" class="SubItem">Heading 8</li>
+							<li id="h9" ind="9" class="SubItem">Heading 9</li>
+							<li id="h10" ind="10" class="SubItem">Paragraph List</li>
+                            <li id="h11" ind="11" class="SubItem">No Spacing</li>
+						</ul>
+						<div class="ToolbarDropDown dropdown" style="margin-top: 5px;margin-right:-3px;"></div>
+					</li>
+					<li id="fontSelect" class="item main textSelect textSelectBoard ToolbarIconOut" value="Arial">
+					<span id="fontSelectVal">Calibri</span>
+						<ul style="height: 300px;overflow-x: hidden;width: 220px;" class="uimargin">
+							<li id="Arial" class="SubItem" style="font-family:Arial;" value="Arial">Arial</li>
+							<li id="Calibri" class="SubItem" style="font-family:Calibri;" value="Calibri">Calibri</li>
+							<li id="ComicSansMS" class="SubItem" style="font-family:Comic Sans MS;" value="Comic Sans MS">Comic Sans MS</li>
+							<li id="CourierNew" class="SubItem" style="font-family:Courier New;" value="Courier New">Courier New</li>
+							<li id="Georgia" class="SubItem" style="font-family:Georgia;" value="Georgia">Georgia</li>
+							<li id="LucidaSansUnicode" class="SubItem" style="font-family:Lucida Sans Unicode;" value="Lucida Sans Unicode">Lucida Sans Unicode</li>
+							<li id="Tahoma" class="SubItem" style="font-family:Tahoma;" value="Tahoma">Tahoma</li>
+							<li id="TimesNewRoman" class="SubItem" style="font-family:Times New Roman;" value="Times New Roman">Times New Roman</li>
+							<li id="TrebuchetMS" class="SubItem" style="font-family:Trebuchet MS;" value="Trebuchet MS">Trebuchet MS</li>
+							<li id="Verdana" class="SubItem" style="font-family:Verdana;" value="Verdana">Verdana</li>
+						</ul>
+						<div class="ToolbarDropDown dropdown" style="margin-top: 5px;margin-right: -3px;"></div>
+					</li>
+					<li id="fontSizeSelect" class="item main textSelect textSelectBoard ToolbarIconOut">
+					<span id="fontSizeSelectVal">11pt</span>
+						<ul style="width:44px;" class="uimargin">
+							<li id="8" class="SubItem" value="8">8pt</li>
+							<li id="9" class="SubItem" value="9">9pt</li>
+							<li id="10" class="SubItem" value="10">10pt</li>
+							<li id="11" class="SubItem" value="11">11pt</li>
+							<li id="12" class="SubItem" value="12">12pt</li>
+							<li id="14" class="SubItem" value="14">14pt</li>
+							<li id="18" class="SubItem" value="18">18pt</li>
+							<li id="24" class="SubItem" value="24">24pt</li>
+							<li id="36" class="SubItem" value="36">36pt</li>
+							<li id="48" class="SubItem" value="48">48pt</li>
+							<li id="72" class="SubItem" value="72">72pt</li>
+						</ul>
+						<div class="ToolbarDropDown dropdown" style="margin-top: 5px;margin-right: -3px;"></div>
+					</li>
+					<li id="lineSpacing" class="item main textSelect textSelectBoard ToolbarIconOut" title="LineSpacing">
+					<span id="lineSpacingVal">1</span>
+						<ul style="width:60px;" class="uimargin">
+							<li id="lineSpacing05" class="SubItem" value="0.5">0.5</li>
+							<li id="lineSpacing1" class="SubItem" value="1">1</li>
+							<li id="lineSpacing15" class="SubItem" value="1.5">1.5</li>
+							<li id="lineSpacing2" class="SubItem" value="2">2</li>
+							<li id="lineSpacing25" class="SubItem" value="2.5">2.5</li>
+							<li id="lineSpacingBefore" class="SubItem" value="Before">Before</li>
+							<li id="lineSpacingAfter" class="SubItem" value="After">After</li>
+						</ul>
+						<div class="ToolbarDropDown dropdown" style="margin-top: 5px;margin-right: -3px;"></div>
+					</li>
+				</ul>
+				</div>
+			</td>
+			<td id="td_fontsizeIn" class="ToolbarIconOut selectableIcon iconToolbar" title="FontSizeIn">
+				<img class="toolbarImg fontsizeIn" src="menu/img/spacer.gif"/>
+			</td>
+			<td id="td_fontsizeOut" class="ToolbarIconOut selectableIcon iconToolbar" title="FontSizeOut">
+				<img class="toolbarImg fontsizeOut" src="menu/img/spacer.gif"/>
+			</td>
+			<td id="td_bold" class="ToolbarIconOut selectableIcon iconToolbar" title="Bold (Ctrl+B)">
+				<img class="toolbarImg bold" src="menu/img/spacer.gif"/>
+			</td>
+			<td id="td_italic" class="ToolbarIconOut selectableIcon iconToolbar" title="Italic (Ctrl+I)">
+				<img class="toolbarImg italic" src="menu/img/spacer.gif"/>
+			</td>
+			<td id="td_underline" class="ToolbarIconOut selectableIcon iconToolbar" title="Underline (Ctrl+U)">
+				<img class="toolbarImg underline" src="menu/img/spacer.gif"/>
+			</td>
+
+            <td id="td_shape" class="ToolbarIconOut selectableIcon iconToolbar" title="Add Shape">
+                <img src="menu/img/drawing-16.png"/>
+            </td>
+			<td class="toolbarSep">
+				<div class="ToolbarIconOut">
+					<img src="menu/img/Border.png"/>
+				</div>
+			</td>
+			<td id="td_link" class="ToolbarIconOut selectableIcon iconToolbar" title="AddLink">
+				<img class="toolbarImg link" src="menu/img/spacer.gif"/>
+			</td>
+			<td id="td_image" class="ToolbarIconOut selectableIcon iconToolbar" title="AddImage">
+				<img class="toolbarImg image" src="menu/img/spacer.gif"/>
+			</td>
+			<td id="td_image2" class="ToolbarIconOut selectableIcon iconToolbar" title="AddImage">
+				<img class="toolbarImg image" src="menu/img/spacer.gif"/>
+			</td>
+			<td id="td_imageInText" class="ToolbarIconOut selectableIcon iconToolbar" title="AddImage">
+				<img class="toolbarImg imageInText" src="menu/img/spacer.gif"/>
+			</td>
+			<td id="td_imageInText2" class="ToolbarIconOut selectableIcon iconToolbar" title="AddImage2">
+				<img class="toolbarImg imageInText" src="menu/img/spacer.gif"/>
+			</td>
+			<td class="toolbarSep">
+				<div class="ToolbarIconOut">
+					<img src="menu/img/Border.png"/>
+				</div>
+			</td>
+			<td id="td_numberedlist" class="ToolbarIconOut iconToolbar" title="Numbered">
+				
+				<div id="numberedlist" class="ToolbarButtonCaption lstSelector1" style="padding: 0;">
+					<img class="toolbarImg align_numbered" src="menu/img/spacer.gif"/>
+				</div>
+				<div id="td_lst" class="lstPicker1" style="display: inline-block;height: 21px;margin-left: 0px;">
+					<div class="ToolbarDropDown"></div>
+				</div>	
+			</td>
+			<td id="td_bulletedlist" class="ToolbarIconOut  iconToolbar" title="Bulleted">
+				<div id="bulletedlist" class="ToolbarButtonCaption lstSelector2" style="padding: 0;">
+					<img class="toolbarImg align_bulleted" src="menu/img/spacer.gif"/>
+				</div>
+				<div id="td_mrk" class="lstPicker2" style="display: inline-block;height: 21px;margin-left: 0px;">
+					<div class="ToolbarDropDown"></div>
+				</div>
+				
+			</td>
+			<td id="td_multilist" class="ToolbarIconOut  iconToolbar" title="Bulleted">
+				<div id="multilist" class="ToolbarButtonCaption lstSelector2" style="padding: 0;">
+					<img class="toolbarImg align_multi" src="menu/img/spacer.gif"/>
+				</div>
+				<div id="td_mlt" class="lstPicker3" style="display: inline-block;height: 21px;margin-left: 0px;">
+					<div class="ToolbarDropDown"></div>
+				</div>
+			</td>
+			<td id="td_headertitle" class="ToolbarIconOut iconToolbar" title="Numbered">
+				
+				<div id="headertitle" class="ToolbarButtonCaption htSelector1" style="padding: 0;">
+					<img class="toolbarImg headertitle" src="menu/img/spacer.gif"/>
+				</div>
+				<div id="td_ht" class="htPicker1" style="display: inline-block;height: 21px;margin-left: 0px;">
+					<div class="ToolbarDropDown"></div>
+				</div>	
+			</td>
+			<td id="td_outdent" class="ToolbarIconOut selectableIcon iconToolbar" title="DecreaseIndent">
+				<img class="ToolbarIcon2 ToolbarDecrease" src="menu/img/spacer.gif"/>
+			</td>
+			<td id="td_indent" class="ToolbarIconOut selectableIcon iconToolbar" title="IncreaseIndent">
+				<img class="ToolbarIcon2 ToolbarIncrease" src="menu/img/spacer.gif"/>
+			</td>
+			<td id="td_paragraphMarks" class="ToolbarIconOut selectableIcon iconToolbar" title="ParagraphMarks">
+				<img class="toolbarImg paragraphMarks" src="menu/img/spacer.gif"/>
+			</td>
+			<td id="td_justifyleft" class="ToolbarIconOut selectableIcon iconToolbar" title="AlignTextLeft">
+				<img class="toolbarImg align_left" src="menu/img/spacer.gif"/>
+			</td>
+			<td id="td_justifycenter" class="ToolbarIconOut selectableIcon iconToolbar" title="AlignTextCenter">
+				<img class="toolbarImg align_center" src="menu/img/spacer.gif"/>
+			</td>
+			<td id="td_justifyright" class="ToolbarIconOut selectableIcon iconToolbar" title="AlignTextRight">
+				<img class="toolbarImg align_right" src="menu/img/spacer.gif"/>
+			</td>
+			<td id="td_justifyblock" class="ToolbarIconOut selectableIcon iconToolbar" title="AlignTextJustify">
+				<img class="toolbarImg align_justify" src="menu/img/spacer.gif"/>
+			</td>
+			<td class="toolbarSep">
+				<div class="ToolbarIconOut">
+					<img src="menu/img/Border.png"/>
+				</div>
+			</td>
+				<td id="td_BackgroundColor" class="ToolbarIconOut selectableIcon iconToolbar" title="TextBG" style="padding: 0px;">
+					<div class="ToolbarButtonCaption clrSelector1">
+						<div class="ToolbarColorIndicator">
+							<div class="toolbarImg bg_fill"></div>
+						</div>
+					</div>
+				<div id="td_color_fon" class="ToolbarDropDownInner clrPicker1">
+					<div class="ToolbarDropDown"></div>
+				</div>
+			</td>
+			<td id="td_TextColor" class="ToolbarIconOut selectableIcon iconToolbar" title="TextColor" style="padding: 0px;">
+				<div class="ToolbarButtonCaption clrSelector2">
+					<div class="ToolbarColorIndicator2">
+						<div class="toolbarImg txt_color"></div>
+					</div>
+				</div>
+				<div id="td_color" class="ToolbarDropDownInner clrPicker2">
+					<div class="ToolbarDropDown"></div>
+				</div>
+			</td>
+			<td id="td_paragraph" class="ToolbarIconOut selectableIcon iconToolbar" title="TextColor" style="padding: 0px;">
+				<div class="ToolbarButtonCaption clrSelector3">
+					<div class="ToolbarColorIndicator3">
+						<div class="paragraph_color"></div>
+					</div>
+				</div>
+				<div id="td_prg" class="ToolbarDropDownInner clrPicker3">
+					<div class="ToolbarDropDown"></div>
+				</div>
+			</td>
+			<!--<td class="toolbarSep">
+				<div class="ToolbarIconOut">
+					<img src="menu/img/Border.png"/>
+				</div>
+			</td>
+			<td id="td_checkspell" class="ToolbarIconOut selectableIcon iconToolbar" title="Checkspell">
+				<img class="toolbarImg check" src="menu/img/spacer.gif"/>
+			</td>-->
+			<td class="toolbarSep">
+				<div class="ToolbarIconOut">
+					<img src="menu/img/Border.png"/>
+				</div>
+			</td>
+			<td id="td_tl_superscript" class="ToolbarIconOut selectableIcon iconToolbar" title="Superscript">
+				<img class="toolbarImg superscript" src="menu/img/spacer.gif"/>
+			</td>
+			<td id="td_tl_subscript" class="ToolbarIconOut selectableIcon iconToolbar" title="Subscript">
+				<img class="toolbarImg subscript" src="menu/img/spacer.gif"/>
+			</td>
+			<td id="td_orient" class="ToolbarIconOut selectableIcon iconToolbar" title="Orientation list">
+				<img class="toolbarImg orientList" src="menu/img/spacer.gif"/>
+			</td>
+			<td id="td_instbl" class="ToolbarIconOut selectableIcon iconToolbar" title="Insert table">
+				<img class="toolbarImg ToolbarTable" style="height: 16px;margin-left: 5px;margin-top: 4px;width: 16px;" src="menu/img/spacer.gif"/>
+			</td>
+			<td id="td_info" class="ToolbarIconOut selectableIcon iconToolbar" title="Info">
+				<img class="toolbarImg" style="height: 16px;margin-left: 5px;margin-top: 4px;width: 16px;background-position:-1010px 50%;" src="menu/img/spacer.gif"/>
+			</td>
+			<td id="td_formatmodel" class="ToolbarIconOut selectableIcon iconToolbar" title="Formating model">
+				<img class="toolbarImg" style="height: 16px;margin-left: 5px;margin-top: 4px;width: 16px;background-position:-1120px 50%;" src="menu/img/spacer.gif"/>
+			</td>
+			
+			</tr>
+			</table>
+			</td></tr>
+			<!--</tr>-->
+			<tr><td  id="topmenuSep" colspan="3" class="separatingLine"></td></tr>
+		</table>
+		</div>
+        <div id="id_status" style="overflow:hidden;background-color:#B0B0B0;border-top-style:solid;border-bottom-width:1px;border-color:#939AA3;border-bottom-color:#939AA3" class="block_elem">
+            <div id="id_status_text" class="block_elem" style="font-family:Arial;font-size:10pt;"></div>
+            <div id="id_buttonZoomOut" class="block_elem buttonZoomOut"></div>
+            <div id="id_TextZoomValue" class="block_elem" style="-moz-user-select:none;-khtml-user-select:none;user-select:none;text-align:center;font-family:Arial;font-size:10pt;">100%</div>
+            <div id="id_buttonZoomIn" class="block_elem buttonZoomIn"></div>
+        </div>
+		<div id="editor_sdk" style="position:absolute;left:0px;top:80px;">
+            <script type="text/javascript">
+                var html_element = document.getElementById("editor_sdk");
+                html_element.style.left = "0px";
+                html_element.style.top = "80px";
+                html_element.style.width = _checkBodyWidth() + "px";
+                html_element.style.height = (_checkBodyHeight() - 80 - 22) + "px";
+
+                var editor = new asc_docs_api("editor_sdk");
+                editor.CreateComponents();
+                editor.SetFontsPath("../OfficeWebWord/FontsFreeType/FontFiles/");
+                editor.SetThemesPath("themes/");
+                editor.Init();
+                //editor.LoadDocument();
+
+                window.onresize = function()
+                {
+                    if (false === editor.bInit_word_control)
+                        return;
+
+                    //ResizeStatus();
+
+                    var html_element = document.getElementById("editor_sdk");
+                    html_element.style.left = "0px";
+                    html_element.style.top = "80px";
+                    html_element.style.width = _checkBodyWidth() + "px";
+                    html_element.style.height = (_checkBodyHeight() - 80 - 22) + "px";
+
+                    editor.Resize();
+                }
+
+                //InitStatus();
+                // на всякий случай. Наверное этого не надо, сообщение пошлется в конце
+                editor.Resize();
+                //ResizeStatus();
+
+            </script>
+        </div>
+        <style type="text/css">
+            .cell
+            {
+
+            }
+        </style>
+        <div id="shapeBox" class="options hidden">
+        <table>
+        <tr>
+            <td class="cell" title="line"><img src="MenuIcons/line.bmp"></td>
+            <td class="cell" title="textRect"><img src="MenuIcons/Irregular2.bmp"></td>
+            <td class="cell" title="splineBezier"><img src="MenuIcons/ellipse.bmp"></td>
+            <td class="cell" title="curvedConnector2"><img src="MenuIcons/star5.bmp"></td>
+            <td class="cell" title="mathDivide"><img src="MenuIcons/star6.bmp"></td>
+            <td class="cell" title="leftRightArrow"><img src="MenuIcons/star7.bmp"></td>
+            <td class="cell" title="star8"><img src="MenuIcons/star8.bmp"></td>
+            <td class="cell" title="star10"><img src="MenuIcons/star10.bmp"></td>
+            <td class="cell" title="star12"><img src="MenuIcons/star12.bmp"></td>
+            <td class="cell" title="star16"><img src="MenuIcons/star16.bmp"></td>
+            <td class="cell" title="polyline1"><img src="MenuIcons/star24.bmp"></td>
+            <td class="cell" title="polyline2"><img src="MenuIcons/star32.bmp"></td>
+        </tr>
+        <tr>
+            <td class="cell" title="ribbon"><img src="MenuIcons/ribbon.bmp">
+            <td class="cell" title="ribbon2"><img src="MenuIcons/ribbon2.bmp">
+            <td class="cell" title="ellipseRibbon"><img src="MenuIcons/ellipseRibbon.bmp">
+
+            <td class="cell" title="ellipseRibbon2"><img src="MenuIcons/ellipseRibbon2.bmp">
+
+            <td class="cell" title="verticalScroll"><img src="MenuIcons/verticalScroll.bmp">
+
+            <td class="cell" title="horizontalScroll"><img src="MenuIcons/horizontalScroll.bmp">
+            <td class="cell" title="wave"><img src="MenuIcons/wave.bmp">
+            <td class="cell" title="doubleWave"><img src="MenuIcons/dowbleWave.bmp">
+            <td class="cell" title="triangle"><img src="MenuIcons/triangle.bmp">
+            <td class="cell" title="rtTriangle"><img src="MenuIcons/rtTriangle.bmp">
+            <td class="cell" title="smileyFace"><img src="MenuIcons/smileyFace.bmp">
+            <td class="cell" title="heart"><img src="MenuIcons/heart.bmp"></td>
+        </tr>
+        <tr>
+            <td class="cell" title="wedgeRectCallout"><img src="MenuIcons/wedgeRectCallout.bmp"></td>
+            <td class="cell" title="wedgeRoundRectCallout"><img src="MenuIcons/wedgeRoundRectCallout.bmp"></td>
+            <td class="cell" title="wedgeEllipseCallout"><img src="MenuIcons/wedgeEllipseCallout.bmp"></td>
+            <td class="cell" title="cloudCallout"><img src="MenuIcons/cloudCallout.bmp"></td>
+            <td class="cell" title="borderCallout1"><img src="MenuIcons/borderCallout1.bmp"></td>
+            <td class="cell" title="borderCallout2"><img src="MenuIcons/borderCallout2.bmp"></td>
+            <td class="cell" title="borderCallout3"><img src="MenuIcons/borderCallout3.bmp"></td>
+            <td class="cell" title="accentCallout1"><img src="MenuIcons/accentCallout1.bmp"></td>
+            <td class="cell" title="accentCallout2"><img src="MenuIcons/accentCallout2.bmp"></td>
+            <td class="cell" title="accentCallout3"><img src="MenuIcons/accentCallout3.bmp"></td>
+            <td class="cell" title="callout1"><img src="MenuIcons/callout1.bmp"></td>
+            <td class="cell" title="callout2"><img src="MenuIcons/callout2.bmp"></td>
+        </tr>
+        <tr>
+            <td class="cell" title="callout3"><img src="MenuIcons/callout3.bmp"></td>
+            <td class="cell" title="accentBorderCallout1"><img src="MenuIcons/accentBorderCallout1.bmp"></td>
+            <td class="cell" title="accentBorderCallout2"><img src="MenuIcons/accentBorderCallout2.bmp"></td>
+            <td class="cell" title="accentBorderCallout3"><img src="MenuIcons/accentBorderCallout3.bmp"></td>
+            <td class="cell" title="lightningBolt"><img src="MenuIcons/lightningBolt.bmp"></td>
+            <td class="cell" title="sun"><img src="MenuIcons/sun.bmp"></td>
+            <td class="cell" title="moon"><img src="MenuIcons/moon.bmp"></td>
+            <td class="cell" title="cloud"><img src="MenuIcons/cloud.bmp"></td>
+            <td class="cell" title="nonIsoscelesTrapezoid"><img src="MenuIcons/nonIsoscelesTrapezoid.bmp"></td>
+            <td class="cell" title="noSmoking"><img src="MenuIcons/noSmoking.bmp"></td>
+            <td class="cell" title="notchedRightArrow"><img src="MenuIcons/notchedRightArrow.bmp"></td>
+            <td class="cell" title="octagon"><img src="MenuIcons/octagon.bmp"></td>
+        </tr>
+        <tr>
+            <td class="cell" title="parallelogram"><img src="MenuIcons/parallelogram.bmp"></td>
+            <td class="cell" title="pentagon"><img src="MenuIcons/pentagon.bmp"></td>
+            <td class="cell" title="pie"><img src="MenuIcons/pie.bmp"></td>
+            <td class="cell" title="plaque"><img src="MenuIcons/plaque.bmp"></td>
+            <td class="cell" title="quadArrow"><img src="MenuIcons/quadArrow.bmp"></td>
+            <td class="cell" title="quadArrowCallout"><img src="MenuIcons/quadArrowCallout.bmp"></td>
+            <td class="cell" title="curvedDownArrow"><img src="MenuIcons/curvedDownArrow.bmp"></td>
+            <td class="cell" title="curvedLeftArrow"><img src="MenuIcons/curvedLeftArrow.bmp"></td>
+            <td class="cell" title="curvedRightArrow"><img src="MenuIcons/curvedRightArrow.bmp"></td>
+            <td class="cell" title="curvedUpArrow"><img src="MenuIcons/curvedUpArrow.bmp"></td>
+            <td class="cell" title="octagon"><img src="MenuIcons/octagon.bmp"></td>
+            <td class="cell" title="octagon"><img src="MenuIcons/octagon.bmp"></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        </table>
+        </div>
+<div id="colorBox1" class="options hidden">
+	<table class="paletteTable"><tr>
+	<td colspan="7" class="none colorSelect1" style="text-align:center; vertical-align:middle;"><div  style="background-color:none;cursor:default;" title="none">none</div></td>
+	</tr><tr>
+	<td class="" colspan="10" style="height: 5px;"></td>
+	</tr><tr>
+	<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#ffff00;" title="RGB (255, 255, 0)"></div></td>
+	<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#00ff00;" title="RGB (0, 255, 0)"></div></td>
+	<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#00ffff;" title="RGB (0, 255, 255)"></div></td>	
+	<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#ff00ff;" title="RGB (255, 0, 255)"></div></td>
+	</tr><tr>
+	<td class="colorSelect1 bordered"><div  class="colorHighlight" style="background-color:#0000ff;" title="RGB (0, 0, 255)"></div></td>
+	<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#ff0000;" title="RGB (255, 0, 0)"></div></td>
+	<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#00008b;" title="RGB (0, 0, 139)"></div></td>	
+	<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#008b8b;" title="RGB (0, 139, 139)"></div></td>
+	</tr><tr>
+	<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#006400;" title="RGB (0, 100, 0)"></div></td>
+	<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#800080;" title="RGB (128, 0, 128)"></div></td>
+	<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#8b0000;" title="RGB (139, 0, 0)"></div></td>
+	<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#808000;" title="RGB (128, 128, 0)"></div></td>
+	</tr><tr>
+	<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#ffffff;" title="RGB (255, 255, 255)"></div></td>
+	<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#d3d3d3;" title="RGB (211, 211, 211)"></div></td>
+	<td class="colorSelect1 bordered"><div class="colorHighlight" style="background-color:#a9a9a9;" title="RGB (169, 169, 169)"></div></td>
+	<td class="colorSelect1 bordered"><div  class="colorHighlight" style="background-color:#000000;" title="RGB (0, 0, 0)"></div></td>
+	</tr></table>
+</div>
+<div id="colorBox2" class="options hidden">
+	<table class="paletteTable"><tr>
+	<td colspan="10" class="none colorSelect2" style="text-align:center; vertical-align:middle;"><div style="background-color:none;cursor:default;" title="none">Default</div></td>
+	</tr><tr>
+	<td class="" colspan="10" style="height: 5px;"></td>
+	</tr><tr>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#C00000;" title="RGB (192, 0, 0)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FF0000;" title="RGB (255, 0, 0)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FFC000;" title="RGB (255, 192, 0)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FFFF00;" title="RGB (255, 255, 0)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#92D050;" title="RGB (146, 208, 80)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#00B050;" title="RGB (0, 176, 80)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#00B0F0;" title="RGB (0, 176, 240)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#0070C0;" title="RGB (0, 112, 192)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#002060;" title="RGB (0, 32, 96)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#7030A0;" title="RGB (112, 48, 160)"></div></td>
+	</tr><tr>
+	<td class="" colspan="10" style="height: 20px;"></td>
+	</tr><tr>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FFFFFF;" title="RGB (255, 255, 255)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#000000;" title="RGB (0, 0, 0)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#EEECE1;" title="RGB (238, 236, 225)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#1F497D;" title="RGB (31, 73, 125)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#4F81BD;" title="RGB (79, 129, 189)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#C0504D;" title="RGB (192, 80, 77)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#9BBB59;" title="RGB (155, 187, 89)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#8064A2;" title="RGB (128, 100, 162)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#4BACC6;" title="RGB (75, 172, 198)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#F79646;" title="RGB (247, 150, 70)"></div></td>
+	</tr><tr>
+	<td class="" colspan="10" style="height: 10px;"></td>
+	</tr><tr>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#F2F2F2;" title="RGB (255, 0, 0)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#7F7F7F;" title="RGB (255, 153, 0)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#DDD9C3;" title="RGB (153, 204, 0)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#C6D9F0;" title="RGB (51, 153, 102)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#DBE5F1;" title="RGB (51, 204, 204)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#F2DCDB;" title="RGB (51, 102, 255)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#EBF1DD;" title="RGB (128, 0, 128)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#E5E0EC;" title="RGB (128, 0, 128)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#DBEEF3;" title="RGB (128, 0, 128)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FDEADA;" title="RGB (128, 0, 128)"></div></td>
+	</tr><tr>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#D8D8D8;" title="RGB (255, 0, 255)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#595959;" title="RGB (255, 204, 0)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#C4BD97;" title="RGB (255, 255, 0)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#8DB3E2;" title="RGB (0, 255, 0)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#B8CCE4;" title="RGB (0, 255, 255)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#E5B9B7;" title="RGB (0, 204, 255)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#D7E3BC;" title="RGB (0, 204, 255)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#CCC1D9;" title="RGB (0, 204, 255)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#B7DDE8;" title="RGB (0, 204, 255)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FBD5B5;" title="RGB (153, 51, 102)"></div></td>
+	</tr><tr>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#BFBFBF;" title="RGB (255, 153, 204)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#3F3F3F;" title="RGB (250, 220, 179)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#938953;" title="RGB (255, 255, 153)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#548DD4;" title="RGB (204, 255, 204)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#95B3D7;" title="RGB (204, 255, 204)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#D99694;" title="RGB (204, 255, 204)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#C3D69B;" title="RGB (204, 255, 204)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#B2A2C7;" title="RGB (204, 255, 255)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#92CDDC;" title="RGB (194, 209, 240)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#FAC08F;" title="RGB (225, 199, 225)"></div></td>
+	</tr><tr>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#A5A5A5;" title="RGB (230, 153, 153)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#262626;" title="RGB (230, 153, 153)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#494429;" title="RGB (230, 153, 153)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#17365D;" title="RGB (230, 153, 153)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#366092;" title="RGB (255, 204, 153)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#953734;" title="RGB (235, 215, 128)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#76923C;" title="RGB (179, 213, 128)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#5F497A;" title="RGB (189, 230, 225)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#31859B;" title="RGB (153, 204, 255)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#E36C09;" title="RGB (204, 153, 255)"></div></td>
+	</tr><tr>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#7F7F7F;" title="RGB (230, 153, 153)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#0C0C0C;" title="RGB (230, 153, 153)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#1D1B10;" title="RGB (230, 153, 153)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#0F243E;" title="RGB (230, 153, 153)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#244061;" title="RGB (255, 204, 153)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#632423;" title="RGB (235, 215, 128)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#4F6128;" title="RGB (179, 213, 128)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#3F3151;" title="RGB (189, 230, 225)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#205867;" title="RGB (153, 204, 255)"></div></td>
+	<td class="colorSelect2 bordered"><div class="colorWatch" style="background-color:#974806;" title="RGB (204, 153, 255)"></div></td>
+	</tr><tr>
+	<td class="" colspan="10" style="height: 10px;"></td>
+	</tr><tr id="customColorFont">
+	<td class="colorSelect2 bordered2"><div class="colorWatch" style="background-color:#ffffff;"></div></td>
+	<td class="colorSelect2 bordered2"><div class="colorWatch" style="background-color:#ffffff;"></div></td>
+	<td class="colorSelect2 bordered2"><div class="colorWatch" style="background-color:#ffffff;"></div></td>
+	<td class="colorSelect2 bordered2"><div class="colorWatch" style="background-color:#ffffff;"></div></td>
+	<td class="colorSelect2 bordered2"><div class="colorWatch" style="background-color:#ffffff;"></div></td>
+	<td class="colorSelect2 bordered2"><div class="colorWatch" style="background-color:#ffffff;"></div></td>
+	<td class="colorSelect2 bordered2"><div class="colorWatch" style="background-color:#ffffff;"></div></td>
+	<td class="colorSelect2 bordered2"><div class="colorWatch" style="background-color:#ffffff;"></div></td>
+	<td class="colorSelect2 bordered2"><div class="colorWatch" style="background-color:#ffffff;"></div></td>
+	<td class="colorSelect2 bordered2"><div class="colorWatch" style="background-color:#ffffff;"></div></td>
+	</tr><tr>
+	<td class="" colspan="10" style="height: 10px;"></td>
+	</tr><tr>
+	<td colspan="10" id="dialogNewColorOpen" class="bordered" style="text-align:center; vertical-align:middle;"><div style="background-color:none;cursor:pointer;">New color</div></td>
+	</tr></table>
+	<div id="colorSelectorHover" style="display:none;position:fixed;z-index:100;height:20px;width:20px;"><img src="menu/img/colorSelectorHover.png"/></div>
+</div>		
+<div id="listSelect" class="options hidden">
+	<table class="listTable"><tr>
+	<td class="listSelected bordered" type="listType1"><div class="listWatch" style="background: url('menu/img/numberlist.png') -2px -2px"  ></div></td>
+	<td class="listSelected bordered" type="listType2"><div class="listWatch" style="background: url('menu/img/numberlist.png') -86px -2px" ></div></td>
+	<td class="listSelected bordered" type="listType3"><div class="listWatch" style="background: url('menu/img/numberlist.png') -170px -2px" ></div></td>
+	</tr><tr>                                                
+	<td class="listSelected bordered" type="listType4"><div class="listWatch" style="background: url('menu/img/numberlist.png') -2px -86px" ></div></td>
+	<td class="listSelected bordered" type="listType5"><div class="listWatch" style="background: url('menu/img/numberlist.png') -86px -86px" ></div></td>
+	<td class="listSelected bordered" type="listType6"><div class="listWatch" style="background: url('menu/img/numberlist.png') -170px -86px" ></div></td>
+	</tr><tr>                                                
+	<td class="listSelected bordered" type="listType7"><div class="listWatch" style="background: url('menu/img/numberlist.png') -2px -170px" ></div></td>
+	<td class="listSelected bordered" type="listType8"><div class="listWatch" style="background: url('menu/img/numberlist.png') -86px -170px" ></div></td>
+	
+	</tr></table>
+</div>
+<div id="markerSelect" class="options hidden">
+	<table class="listTable"><tr>
+	<td class="markerSelected bordered" type="markerType1"><div class="listMarkerWatch" style="background: url('menu/img/MarkerType.png') -2px -2px"  ></div></td>
+	<td class="markerSelected bordered" type="markerType2"><div class="listMarkerWatch" style="background: url('menu/img/MarkerType.png') -50px -2px" ></div></td>
+	<td class="markerSelected bordered" type="markerType3"><div class="listMarkerWatch" style="background: url('menu/img/MarkerType.png') -98px -2px" ></div></td>
+	</tr><tr>                                                
+	<td class="markerSelected bordered" type="markerType4"><div class="listMarkerWatch" style="background: url('menu/img/MarkerType.png') -146px -2px" ></div></td>
+	<td class="markerSelected bordered" type="markerType5"><div class="listMarkerWatch" style="background: url('menu/img/MarkerType.png') -194px -2px" ></div></td>
+	<td class="markerSelected bordered" type="markerType6"><div class="listMarkerWatch" style="background: url('menu/img/MarkerType.png') -242px -2px" ></div></td>
+	</tr><tr>                                                
+	<td class="markerSelected bordered" type="markerType7"><div class="listMarkerWatch" style="background: url('menu/img/MarkerType.png') -2px -50px" ></div></td>
+	<td class="markerSelected bordered" type="markerType8"><div class="listMarkerWatch" style="background: url('menu/img/MarkerType.png') -50px -50px" ></div></td>
+	</tr></table>
+</div>
+<div id="multiSelect" class="options hidden">
+	<table class="listTable"><tr>
+	<td class="multiSelected bordered" type="multiType1"><div class="listWatch" style="background: url('menu/img/MultiList.png') -2px -2px"  ></div></td>
+	<td class="multiSelected bordered" type="multiType2"><div class="listWatch" style="background: url('menu/img/MultiList.png') -86px -2px" ></div></td>
+	<td class="multiSelected bordered" type="multiType3"><div class="listWatch" style="background: url('menu/img/MultiList.png') -170px -2px" ></div></td>
+	<td class="multiSelected bordered" type="multiType4"><div class="listWatch" style="background: url('menu/img/MultiList.png') -2px -86px" ></div></td>
+	</tr></table>
+</div>
+<div id="hdSelect" class="options hidden">
+	<table class="htTable"><tr>
+	<td class="" type="" colspan="3">Page number:</td>
+	</tr><tr>
+	<td class="" type="" colspan="3">Top</td>
+	</tr><tr>
+	<td class="htSelected bordered slc" type="htType1"><div class="" style="" >Left</div></td>
+	<td class="htSelected bordered slc" type="htType2"><div class="" style="" >Middle</div></td>
+	<td class="htSelected bordered slc" type="htType3"><div class="" style="" >Right</div></td>
+	</tr><tr>
+	<td class="" colspan="10" style="height: 5px;"></td>
+	</tr><tr>
+	<td class="" type="" colspan="3">Bottom</td>
+	</tr><tr>
+	<td class="htSelected bordered slc" type="htType4"><div class="" style="" >Left</div></td>
+	<td class="htSelected bordered slc" type="htType5"><div class="" style="" >Middle</div></td>
+	<td class="htSelected bordered slc" type="htType6"><div class="" style="" >Right</div></td>
+	</tr><tr>
+	<td class="htSelected bordered slc" type="htType7" colspan="3" >Current position</td>
+	</tr><tr>
+	<td class="" colspan="10" style="height: 5px;"></td>
+	</tr><tr>
+	<td class="" type="" style="width: 76px;">Header</td>
+	<td class="" type="" style="width: 76px;"><input id="specialHeaderForFirstPage" type="checkbox"/>special for first page </td>
+	<td class="" type="" style="width: 76px;"><input id="differentHeaderForOddAndEvenPages" type="checkbox"/>different for odd and even pages</td>
+	</tr></table>
+</div>
+<div id="tblSelect" class="options hidden">
+	<div  style="padding:0.4em;">
+		<div style="height:100%;width:100%;font-size: 18px;position: relative;">
+			<div class="cover-position" style="width:10em;height:10em;left:0;top:0;position:absolute;z-index:10;"></div>
+			<div class="unhoverhighlight" style="width:10em;height:10em;background:url(menu/img/dimension-unhighlighted.png);position:relative;"></div>
+			<div class="hoverhighlight" style="width:1em;height:1em;background:url(menu/img/dimension-highlighted.png);position:absolute;top:0;left:0;display:none;"></div>
+		</div>
+		<div id="countCells" style="height:1em;text-align: center;">0x0</div>
+		<input type="checkbox" id="inline_flow" style="height:1em;text-align: left;"/>Flow Table
+
+	</div>
+</div>
+
+
+    <div id="dialogColorSelector">
+		<canvas id="myCanvas" width="170" height="128" style="top:5px;left:5px;"></canvas>
+		<div style="position: absolute; top: 49px; left: 19px; height: 128px; width: 170px;">
+			<div style="position:absolute; left:11em;width: 100px;">
+				<div><span style="margin-right:10px">R:</span><input style="height:18px;width:50px;" id="redChannel" type="text"></input></div>
+				<div><span style="margin-right:9px;">G:</span><input style="height:18px;width:50px;" type="text" id="greenChannel"></input></div>
+				<div><span style="margin-right:11px;">B:</span><input style="height:18px;width:50px;" type="text" id="blueChannel"></input></div>
+				<div style="margin-top:10px;font-size: 11pt;font-weight: bold;">
+					<div id="currentColor" style="width:45px;height:25px;background-color:#000000"><span style="margin-left:50px;">Current</span></div>
+					<div id="lastColor" style="width:45px;height:25px;background-color:#32CD32"><span style="margin-left:50px;">Last</span></div>
+				</div>
+			</div>
+			<div id="colorSelectHolder" style="position:absolute;top:0px;left:0px;width:128px;height:128px;">
+				<div id="colorSelecter" style="position:absolute;background: url('menu/img/marker.png') no-repeat scroll 0 0 transparent;height:17px;margin:-8px 0 0 -8px;overflow: hidden;width: 17px;"></div>
+			</div>
+			<div id="gradientSelectHolder" style="position:absolute;width:9px;height:128px;left:160px;">
+				<div id="gradSelecter" style="position:absolute;background: url('menu/img/marker2.png') no-repeat scroll 0 0 transparent;height:11px;margin:-6px 0 0 -8px;overflow: hidden;width: 25px;"></div>
+			</div>
+			
+		</div>
+	</div>
+	
+	<div id="imgProp" style="display:none;width:210px;background-color:#fff;top:245px;left:25px;z-index:100;position:absolute;padding-left: 5px;padding-top: 5px;border: 4px ridge silver;">
+		<b>IMAGE</b>
+		<div>
+			<input id="imgW" style="width:50px;" value=""/> Width
+			<br/>
+			<input id="imgH" style="width:50px;" value=""/> Height
+			<br/>
+			<input id="imgConstPropert" type="checkbox"/> ConstPropert
+		</div>
+			<input id="imgOrignSize" type="button"  value="imgOrignSize"/>
+		<div>
+			<input id="imgWrapStyleInline" type="radio" name="img"/> Inline
+			<input id="imgWrapStyleFlow" type="radio" name="img"/> Flow
+		</div>
+		<div>
+			Distance from text
+			<br/>
+			<input id="imgLeft" style="width:50px;" value=""/> Left
+			<br/>
+			<input id="imgTop" style="width:50px;" value=""/> Top
+			<br/>
+			<input id="imgRight" style="width:50px;" value=""/> Right
+			<br/>
+			<input id="imgBottom" style="width:50px;" value=""/> Bottom
+		</div>
+		<div>
+			Position
+			<br/>
+			<input id="imgX" style="width:50px;" value=""/> X
+			<input id="imgY" style="width:50px;" value=""/> Y
+		</div>
+		<div>
+			Image URL<br/>
+			<input id="imgURL"/>
+		</div>
+			<input id="imgApply" type="button"  value="imgApply"/>
+	</div>
+	<div id="prProp" style="display:none;width:300px;background-color:#fff;top:315px;left:25px;z-index:100;position:absolute;padding-top: 5px;border: 4px ridge silver;">
+        <div style="float:left;width:300px;text-align: center;">
+            <b>Paragraph</b>
+        </div>
+        <div style="float:left;border-top: 2px ridge silver;width:300px">
+            <div style="float:left;width:300px;height:25px;text-align: center;">Indent</div>
+            <div style="float:left;width:140px;padding-left: 10px">
+                <div style="float:left;width:140px;">
+                    <input id="prLeft" style="width:30px;" value=""/> Left
+                </div>
+                <div style="float:left;width:140px;">
+                    <input id="prRight"  style="width:30px;"/> Right
+                </div>
+            </div>
+            <div style="float:left;width:140px;padding-left: 10px">
+                <input id="prFirst" style="width:30px;" value=""/> First
+            </div>
+        </div>
+        <div style="float:left;border-top: 2px ridge silver;width:300px">
+            <div style="float:left;width:300px;height:25px;text-align: center;">Spacing</div>
+            <div style="float:left;width:140px;padding-left: 10px">
+                <div style="float:left;width:140px;">
+                    <input id="prAfter" style="width:30px;"/> After
+                </div>
+                <div style="float:left;width:140px;">
+                    <input id="prBefore" style="width:30px;"/> Before
+                </div>
+            </div>
+
+            <div style="float:left;width:140px;padding-left: 10px">
+                <div style="float:left;width:140px">
+                    <select id="prLineRule">
+                        <option value="0">Multiply</option>
+                        <option value="1">At least</option>
+                        <option value="2">Exact</option>
+                    </select>
+                    Type
+                </div>
+
+                <div style="float:left;width:110px;padding-left:2px;">
+                    <input id="prLineHeight" style="width:30px;"/> Value
+                </div>
+
+            </div>
+
+            <div style="float:left;width:300px;padding-left: 10px">
+                <input id="prIntervBetween" type="checkbox"/> IntervBetween
+            </div>
+
+        </div>
+        <div style="float:left;border-top: 2px ridge silver;width:300px">
+            <div style="float:left;width:300px;height:25px;text-align: center;">Pagination</div>
+            <div style="float:left;width:300px;padding-left: 10px">
+                <input id="prPageBreak" type="checkbox"/> Page break
+            </div>
+            <div style="float:left;width:300px;padding-left: 10px">
+                <input id="prKeepLines" type="checkbox"/> Keep Lines
+            </div>
+        </div>
+        <div style="float:left;border-top: 2px ridge silver;width:300px">
+            <div style="float:left;width:300px;height:25px;text-align: center;">Borders</div>
+            <div style="float:left;width:150px;">
+                <div id="prBrdSize" style="float:left;width:75px;">
+                    <select id="prBrdSizeVals" >
+                        <option value="0">0.25 pt</option>
+                        <option value="1">0.5  pt</option>
+                        <option value="2">0.75 pt</option>
+                        <option value="3">1    pt</option>
+                        <option value="4">1.5 pt</option>
+                        <option value="5">2.25 pt</option>
+                        <option value="6">3 pt</option>
+                        <option value="7">4.5 pt</option>
+                        <option value="8">6 pt</option>
+                    </select>
+                </div>
+                <div style="float:left;width:75px;">
+                    <div style="float:left;width:75px;" onclick="document.getElementById('prBrdColorChart').style.visibility='visible';">
+                        <div id="prBrdColor" style="background-color:black;float:left;width:30px;height: 20px;"></div><div style="float:left;width:30px;height: 20px;">Color</div>
+                    </div>
+                    <table id="prBrdColorChart" style="position:absolute; width: 200px;height:200px; visibility: hidden;">
+                        <tbody>
+                        <tr><td bgcolor="#FBEFEF"></td><td bgcolor="#FBF2EF"></td><td bgcolor="#FBF5EF"></td><td bgcolor="#FBF8EF"></td><td bgcolor="#FBFBEF"></td><td bgcolor="#F8FBEF"></td><td bgcolor="#F5FBEF"></td><td bgcolor="#F2FBEF"></td><td bgcolor="#EFFBEF"></td><td bgcolor="#EFFBF2"></td><td bgcolor="#EFFBF5"></td><td bgcolor="#EFFBF8"></td><td bgcolor="#EFFBFB"></td><td bgcolor="#EFF8FB"></td><td bgcolor="#EFF5FB"></td><td bgcolor="#EFF2FB"></td><td bgcolor="#EFEFFB"></td><td bgcolor="#F2EFFB"></td><td bgcolor="#F5EFFB"></td><td bgcolor="#F8EFFB"></td><td bgcolor="#FBEFFB"></td><td bgcolor="#FBEFF8"></td><td bgcolor="#FBEFF5"></td><td bgcolor="#FBEFF2"></td><td bgcolor="#FFFFFF"></td></tr>
+                        <tr><td bgcolor="#F8E0E0"></td><td bgcolor="#F8E6E0"></td><td bgcolor="#F8ECE0"></td><td bgcolor="#F7F2E0"></td><td bgcolor="#F7F8E0"></td><td bgcolor="#F1F8E0"></td><td bgcolor="#ECF8E0"></td><td bgcolor="#E6F8E0"></td><td bgcolor="#E0F8E0"></td><td bgcolor="#E0F8E6"></td><td bgcolor="#E0F8EC"></td><td bgcolor="#E0F8F1"></td><td bgcolor="#E0F8F7"></td><td bgcolor="#E0F2F7"></td><td bgcolor="#E0ECF8"></td><td bgcolor="#E0E6F8"></td><td bgcolor="#E0E0F8"></td><td bgcolor="#E6E0F8"></td><td bgcolor="#ECE0F8"></td><td bgcolor="#F2E0F7"></td><td bgcolor="#F8E0F7"></td><td bgcolor="#F8E0F1"></td><td bgcolor="#F8E0EC"></td><td bgcolor="#F8E0E6"></td><td bgcolor="#FAFAFA"></td></tr>
+                        <tr><td bgcolor="#F6CECE"></td><td bgcolor="#F6D8CE"></td><td bgcolor="#F6E3CE"></td><td bgcolor="#F5ECCE"></td><td bgcolor="#F5F6CE"></td><td bgcolor="#ECF6CE"></td><td bgcolor="#E3F6CE"></td><td bgcolor="#D8F6CE"></td><td bgcolor="#CEF6CE"></td><td bgcolor="#CEF6D8"></td><td bgcolor="#CEF6E3"></td><td bgcolor="#CEF6EC"></td><td bgcolor="#CEF6F5"></td><td bgcolor="#CEECF5"></td><td bgcolor="#CEE3F6"></td><td bgcolor="#CED8F6"></td><td bgcolor="#CECEF6"></td><td bgcolor="#D8CEF6"></td><td bgcolor="#E3CEF6"></td><td bgcolor="#ECCEF5"></td><td bgcolor="#F6CEF5"></td><td bgcolor="#F6CEEC"></td><td bgcolor="#F6CEE3"></td><td bgcolor="#F6CED8"></td><td bgcolor="#F2F2F2"></td></tr>
+                        <tr><td bgcolor="#F5A9A9"></td><td bgcolor="#F5BCA9"></td><td bgcolor="#F5D0A9"></td><td bgcolor="#F3E2A9"></td><td bgcolor="#F2F5A9"></td><td bgcolor="#E1F5A9"></td><td bgcolor="#D0F5A9"></td><td bgcolor="#BCF5A9"></td><td bgcolor="#A9F5A9"></td><td bgcolor="#A9F5BC"></td><td bgcolor="#A9F5D0"></td><td bgcolor="#A9F5E1"></td><td bgcolor="#A9F5F2"></td><td bgcolor="#A9E2F3"></td><td bgcolor="#A9D0F5"></td><td bgcolor="#A9BCF5"></td><td bgcolor="#A9A9F5"></td><td bgcolor="#BCA9F5"></td><td bgcolor="#D0A9F5"></td><td bgcolor="#E2A9F3"></td><td bgcolor="#F5A9F2"></td><td bgcolor="#F5A9E1"></td><td bgcolor="#F5A9D0"></td><td bgcolor="#F5A9BC"></td><td bgcolor="#E6E6E6"></td></tr>
+                        <tr><td bgcolor="#F78181"></td><td bgcolor="#F79F81"></td><td bgcolor="#F7BE81"></td><td bgcolor="#F5DA81"></td><td bgcolor="#F3F781"></td><td bgcolor="#D8F781"></td><td bgcolor="#BEF781"></td><td bgcolor="#9FF781"></td><td bgcolor="#81F781"></td><td bgcolor="#81F79F"></td><td bgcolor="#81F7BE"></td><td bgcolor="#81F7D8"></td><td bgcolor="#81F7F3"></td><td bgcolor="#81DAF5"></td><td bgcolor="#81BEF7"></td><td bgcolor="#819FF7"></td><td bgcolor="#8181F7"></td><td bgcolor="#9F81F7"></td><td bgcolor="#BE81F7"></td><td bgcolor="#DA81F5"></td><td bgcolor="#F781F3"></td><td bgcolor="#F781D8"></td><td bgcolor="#F781BE"></td><td bgcolor="#F7819F"></td><td bgcolor="#D8D8D8"></td></tr>
+                        <tr><td bgcolor="#FA5858"></td><td bgcolor="#FA8258"></td><td bgcolor="#FAAC58"></td><td bgcolor="#F7D358"></td><td bgcolor="#F4FA58"></td><td bgcolor="#D0FA58"></td><td bgcolor="#ACFA58"></td><td bgcolor="#82FA58"></td><td bgcolor="#58FA58"></td><td bgcolor="#58FA82"></td><td bgcolor="#58FAAC"></td><td bgcolor="#58FAD0"></td><td bgcolor="#58FAF4"></td><td bgcolor="#58D3F7"></td><td bgcolor="#58ACFA"></td><td bgcolor="#5882FA"></td><td bgcolor="#5858FA"></td><td bgcolor="#8258FA"></td><td bgcolor="#AC58FA"></td><td bgcolor="#D358F7"></td><td bgcolor="#FA58F4"></td><td bgcolor="#FA58D0"></td><td bgcolor="#FA58AC"></td><td bgcolor="#FA5882"></td><td bgcolor="#BDBDBD"></td></tr>
+                        <tr><td bgcolor="#FE2E2E"></td><td bgcolor="#FE642E"></td><td bgcolor="#FE9A2E"></td><td bgcolor="#FACC2E"></td><td bgcolor="#F7FE2E"></td><td bgcolor="#C8FE2E"></td><td bgcolor="#9AFE2E"></td><td bgcolor="#64FE2E"></td><td bgcolor="#2EFE2E"></td><td bgcolor="#2EFE64"></td><td bgcolor="#2EFE9A"></td><td bgcolor="#2EFEC8"></td><td bgcolor="#2EFEF7"></td><td bgcolor="#2ECCFA"></td><td bgcolor="#2E9AFE"></td><td bgcolor="#2E64FE"></td><td bgcolor="#2E2EFE"></td><td bgcolor="#642EFE"></td><td bgcolor="#9A2EFE"></td><td bgcolor="#CC2EFA"></td><td bgcolor="#FE2EF7"></td><td bgcolor="#FE2EC8"></td><td bgcolor="#FE2E9A"></td><td bgcolor="#FE2E64"></td><td bgcolor="#A4A4A4"></td></tr>
+                        <tr><td bgcolor="#FF0000"></td><td bgcolor="#FF4000"></td><td bgcolor="#FF8000"></td><td bgcolor="#FFBF00"></td><td bgcolor="#FFFF00"></td><td bgcolor="#BFFF00"></td><td bgcolor="#80FF00"></td><td bgcolor="#40FF00"></td><td bgcolor="#00FF00"></td><td bgcolor="#00FF40"></td><td bgcolor="#00FF80"></td><td bgcolor="#00FFBF"></td><td bgcolor="#00FFFF"></td><td bgcolor="#00BFFF"></td><td bgcolor="#0080FF"></td><td bgcolor="#0040FF"></td><td bgcolor="#0000FF"></td><td bgcolor="#4000FF"></td><td bgcolor="#8000FF"></td><td bgcolor="#BF00FF"></td><td bgcolor="#FF00FF"></td><td bgcolor="#FF00BF"></td><td bgcolor="#FF0080"></td><td bgcolor="#FF0040"></td><td bgcolor="#848484"></td></tr>
+                        <tr><td bgcolor="#DF0101"></td><td bgcolor="#DF3A01"></td><td bgcolor="#DF7401"></td><td bgcolor="#DBA901"></td><td bgcolor="#D7DF01"></td><td bgcolor="#A5DF00"></td><td bgcolor="#74DF00"></td><td bgcolor="#3ADF00"></td><td bgcolor="#01DF01"></td><td bgcolor="#01DF3A"></td><td bgcolor="#01DF74"></td><td bgcolor="#01DFA5"></td><td bgcolor="#01DFD7"></td><td bgcolor="#01A9DB"></td><td bgcolor="#0174DF"></td><td bgcolor="#013ADF"></td><td bgcolor="#0101DF"></td><td bgcolor="#3A01DF"></td><td bgcolor="#7401DF"></td><td bgcolor="#A901DB"></td><td bgcolor="#DF01D7"></td><td bgcolor="#DF01A5"></td><td bgcolor="#DF0174"></td><td bgcolor="#DF013A"></td><td bgcolor="#6E6E6E"></td></tr>
+                        <tr><td bgcolor="#B40404"></td><td bgcolor="#B43104"></td><td bgcolor="#B45F04"></td><td bgcolor="#B18904"></td><td bgcolor="#AEB404"></td><td bgcolor="#86B404"></td><td bgcolor="#5FB404"></td><td bgcolor="#31B404"></td><td bgcolor="#04B404"></td><td bgcolor="#04B431"></td><td bgcolor="#04B45F"></td><td bgcolor="#04B486"></td><td bgcolor="#04B4AE"></td><td bgcolor="#0489B1"></td><td bgcolor="#045FB4"></td><td bgcolor="#0431B4"></td><td bgcolor="#0404B4"></td><td bgcolor="#3104B4"></td><td bgcolor="#5F04B4"></td><td bgcolor="#8904B1"></td><td bgcolor="#B404AE"></td><td bgcolor="#B40486"></td><td bgcolor="#B4045F"></td><td bgcolor="#B40431"></td><td bgcolor="#585858"></td></tr>
+                        <tr><td bgcolor="#8A0808"></td><td bgcolor="#8A2908"></td><td bgcolor="#8A4B08"></td><td bgcolor="#886A08"></td><td bgcolor="#868A08"></td><td bgcolor="#688A08"></td><td bgcolor="#4B8A08"></td><td bgcolor="#298A08"></td><td bgcolor="#088A08"></td><td bgcolor="#088A29"></td><td bgcolor="#088A4B"></td><td bgcolor="#088A68"></td><td bgcolor="#088A85"></td><td bgcolor="#086A87"></td><td bgcolor="#084B8A"></td><td bgcolor="#08298A"></td><td bgcolor="#08088A"></td><td bgcolor="#29088A"></td><td bgcolor="#4B088A"></td><td bgcolor="#6A0888"></td><td bgcolor="#8A0886"></td><td bgcolor="#8A0868"></td><td bgcolor="#8A084B"></td><td bgcolor="#8A0829"></td><td bgcolor="#424242"></td></tr>
+                        <tr><td bgcolor="#610B0B"></td><td bgcolor="#61210B"></td><td bgcolor="#61380B"></td><td bgcolor="#5F4C0B"></td><td bgcolor="#5E610B"></td><td bgcolor="#4B610B"></td><td bgcolor="#38610B"></td><td bgcolor="#21610B"></td><td bgcolor="#0B610B"></td><td bgcolor="#0B6121"></td><td bgcolor="#0B6138"></td><td bgcolor="#0B614B"></td><td bgcolor="#0B615E"></td><td bgcolor="#0B4C5F"></td><td bgcolor="#0B3861"></td><td bgcolor="#0B2161"></td><td bgcolor="#0B0B61"></td><td bgcolor="#210B61"></td><td bgcolor="#380B61"></td><td bgcolor="#4C0B5F"></td><td bgcolor="#610B5E"></td><td bgcolor="#610B4B"></td><td bgcolor="#610B38"></td><td bgcolor="#610B21"></td><td bgcolor="#2E2E2E"></td></tr>
+                        <tr><td bgcolor="#3B0B0B"></td><td bgcolor="#3B170B"></td><td bgcolor="#3B240B"></td><td bgcolor="#3A2F0B"></td><td bgcolor="#393B0B"></td><td bgcolor="#2E3B0B"></td><td bgcolor="#243B0B"></td><td bgcolor="#173B0B"></td><td bgcolor="#0B3B0B"></td><td bgcolor="#0B3B17"></td><td bgcolor="#0B3B24"></td><td bgcolor="#0B3B2E"></td><td bgcolor="#0B3B39"></td><td bgcolor="#0B2F3A"></td><td bgcolor="#0B243B"></td><td bgcolor="#0B173B"></td><td bgcolor="#0B0B3B"></td><td bgcolor="#170B3B"></td><td bgcolor="#240B3B"></td><td bgcolor="#2F0B3A"></td><td bgcolor="#3B0B39"></td><td bgcolor="#3B0B2E"></td><td bgcolor="#3B0B24"></td><td bgcolor="#3B0B17"></td><td bgcolor="#1C1C1C"></td></tr>
+                        <tr><td bgcolor="#2A0A0A"></td><td bgcolor="#2A120A"></td><td bgcolor="#2A1B0A"></td><td bgcolor="#29220A"></td><td bgcolor="#292A0A"></td><td bgcolor="#222A0A"></td><td bgcolor="#1B2A0A"></td><td bgcolor="#122A0A"></td><td bgcolor="#0A2A0A"></td><td bgcolor="#0A2A12"></td><td bgcolor="#0A2A1B"></td><td bgcolor="#0A2A22"></td><td bgcolor="#0A2A29"></td><td bgcolor="#0A2229"></td><td bgcolor="#0A1B2A"></td><td bgcolor="#0A122A"></td><td bgcolor="#0A0A2A"></td><td bgcolor="#120A2A"></td><td bgcolor="#1B0A2A"></td><td bgcolor="#220A29"></td><td bgcolor="#2A0A29"></td><td bgcolor="#2A0A22"></td><td bgcolor="#2A0A1B"></td><td bgcolor="#2A0A12"></td><td bgcolor="#151515"></td></tr>
+                        <tr><td bgcolor="#190707"></td><td bgcolor="#190B07"></td><td bgcolor="#191007"></td><td bgcolor="#181407"></td><td bgcolor="#181907"></td><td bgcolor="#141907"></td><td bgcolor="#101907"></td><td bgcolor="#0B1907"></td><td bgcolor="#071907"></td><td bgcolor="#07190B"></td><td bgcolor="#071910"></td><td bgcolor="#071914"></td><td bgcolor="#071918"></td><td bgcolor="#071418"></td><td bgcolor="#071019"></td><td bgcolor="#070B19"></td><td bgcolor="#070719"></td><td bgcolor="#0B0719"></td><td bgcolor="#100719"></td><td bgcolor="#140718"></td><td bgcolor="#190718"></td><td bgcolor="#190714"></td><td bgcolor="#190710"></td><td bgcolor="#19070B"></td><td bgcolor="#000000"></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div style="float:left;width:150px;">
+                    <input id="prBrdType" type="checkbox" checked="true"/> Single
+                </div>
+                <div style="float:left;width:150px">
+                    <input id="prBrdApply" type="button" value="Apply Borders"/>
+                </div>
+            </div>
+            <div style="float:left;width:150px;">
+                <div style="float:left;width:80px;">
+                    <div style="float:left;width:80px;">
+                        <input id="prBrdLeft"    type="checkbox"/> Left
+                    </div>
+                    <div style="float:left;width:80px;">
+                        <input id="prBrdTop"     type="checkbox"/> Top
+                    </div>
+                    <div style="float:left;width:80px;">
+                        <input id="prBrdBetween" type="checkbox"/> Between
+                    </div>
+                </div>
+                <div style="float:left;width:70px;">
+                    <input id="prBrdRight"   type="checkbox"/> Right
+                    <input id="prBrdBottom"  type="checkbox"/> Bottom
+                </div>
+            </div>
+        </div>
+	</div>
+
+
+    <div id="shapeProp" style="display:none;width:400px;background-color:#fff;top:87px;right:25px;z-index:100;position:absolute;padding-top: 5px;border: 4px ridge silver;">
+
+    </div>
+
+    <div id="tblProp" style="display:none;width:400px;background-color:#fff;top:87px;right:25px;z-index:100;position:absolute;padding-top: 5px;border: 4px ridge silver;">
+        <div style="float:left;width:400px;text-align: center;">
+            <b>TABLE</b>
+        </div>
+        <div style="float:left;border-top: 2px ridge silver;padding-left:5px;width:400px">
+            <div style="float:left;width:200px">
+                <input id="tblWOn" type="checkbox" onchange="Table_AllowWidth_OnChange()"/> AllowWidth
+                <br/>
+                <input id="tblW" style="width:50px;"/> Width
+            </div>
+            <div style="float:left;width:200px">
+                <input id="tblAllowSpacing" type="checkbox" onchange="Table_AllowSpacing_OnChange()"/> AllowSpacing
+                <br/>
+                <input id="tblCS" style="width:50px;"/> cellSpacing
+            </div>
+        </div>
+		<div style="float:left;border-top: 2px ridge silver;padding-left:5px;width:400px">
+			<div style="float:left;width:400px;text-align: center;">Margins</div>
+
+            <div style="float:left;width:200px">
+                <div style="float:left;width:200px">
+                    CellMargins
+                </div>
+                <div style="float:left;width:200px">
+                    <input id="tblMarLeft" style="width:50px;"/> Left
+                </div>
+                <div style="float:left;width:200px">
+                    <input id="tblMarTop" style="width:50px;"/> Top
+                </div>
+                <div style="float:left;width:200px">
+                    <input id="tblMarRight" style="width:50px;"/> Right
+                </div>
+                <div style="float:left;width:200px">
+                    <input id="tblMarBottom" style="width:50px;"/> Bottom
+                </div>
+                <div style="float:left;width:200px">
+                    <select id="tblMarType" onchange="Table_TableMarType_OnChange()">
+                        <option value="0">Table Def</option>
+                        <option value="1">Table Def & Cell</option>
+                        <option value="2">Cell</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="float:left;width:200px">
+                <div style="float:left;width:200px">
+                    DefMargins
+                </div>
+
+                <div style="float:left;width:200px">
+                    <input id="tblDefMarLeft" style="width:50px;"/> Left
+                </div>
+                <div style="float:left;width:200px">
+                    <input id="tblDefMarTop" style="width:50px;"/> Top
+                </div>
+                <div style="float:left;width:200px">
+                    <input id="tblDefMarRight" style="width:50px;"/> Right
+                </div>
+                <div style="float:left;width:200px">
+                    <input id="tblDefMarBottom" style="width:50px;"/> Bottom
+                </div>
+
+            </div>
+        </div>
+        <div style="float:left;border-top: 2px ridge silver;padding-left:5px;width:400px">
+            <div style="float:left;width:400px;text-align: center;">Wrap</div>
+            <div style="float:left;width:400px">
+                <input id="tblWrapStyle1" type="radio" name="tbl2" onchange="Table_UpdateTableInlineOrFlowProps()"/> Inline
+            </div>
+            <div style="float:left;width:400px">
+                <input id="tblWrapStyle2" type="radio" name="tbl2" onchange="Table_UpdateTableInlineOrFlowProps()"/> Flow
+            </div>
+        </div>
+        <div style="float:left;border-top: 2px ridge silver;padding-left:5px;width:400px" id="tblInlineTableProps_div">
+            <div style="float:left;width:400px;">Align Table</div>
+
+            <div style="float:left;width:200px">
+                <div style="float:left;width:200px">
+                    <input id="tblAlignLeft" type="radio" name="tbl" onchange="Table_AlignLeft_OnChange()"/> Left
+                </div>
+                <div style="float:left;width:200px">
+                    <input id="tblAlignCenter" type="radio" name="tbl" onchange="Table_AlignLeft_OnChange()"/> Center
+                </div>
+                <div style="float:left;width:200px">
+                    <input id="tblAlignRight" type="radio" name="tbl" onchange="Table_AlignLeft_OnChange()"/> Right
+                </div>
+            </div>
+            <div style="float:left;width:200px">
+                <input id="tblIndentLeft" style="width:50px;"/> Indent Left
+            </div>
+        </div>
+		<div style="float:left;border-top: 2px ridge silver;padding-left:5px;width:400px;" id="tblFlowTableProps_div">
+            <div style="float:left;width:250px">
+                <div style="float:left;width:250px;text-align: center;">
+                    Distance from text
+                </div>
+                <div style="float:left;width:100px">
+                    <div style="float:left;width:100px">
+                        <input id="tblLeft" style="width:50px;"/> Left
+                    </div>
+                    <div style="float:left;width:100px">
+                        <input id="tblTop" style="width:50px;"/> Top
+                    </div>
+                </div>
+                <div style="float:left;width:150px">
+                    <div style="float:left;width:150px">
+                        <input id="tblRight" style="width:50px;"/> Right
+                    </div>
+                    <div style="float:left;width:150px">
+                        <input id="tblBottom" style="width:50px;"/> Bottom
+                    </div>
+                </div>
+            </div>
+            <div style="float:left;width:150px">
+                <div style="float:left;width:150px">
+                    Position
+                </div>
+                <div style="float:left;width:150px">
+                    <input id="tblX" style="width:50px;"/> X
+                </div>
+                <div style="float:left;width:150px">
+                    <input id="tblY" style="width:50px;"/> Y
+                </div>
+            </div>
+        </div>
+		<div style="float:left;border-top: 2px ridge silver;padding-left:5px;width:400px;">
+            <div style="float:left;width:200px;">
+                <div style="float:left;width:200px;">
+                    Cell Border
+                </div>
+                <div style="float:left;width:200px;">
+                    <div style="float:left;width:50px;">
+                        <input id="tblCellBrdLeft" type="checkbox"/> Left
+                        <input id="tblCellBrdTop" type="checkbox"/> Top
+                    </div>
+                    <div style="float:left;width:75px;">
+                        <div style="float:left;width:75px;" id="tblCellBrdInsideV_div">
+                            <input id="tblCellBrdInsideV" type="checkbox"/> InsideV
+                        </div>
+                        <div style="float:left;width:75px;" id="tblCellBrdInsideH_div">
+                            <input id="tblCellBrdInsideH" type="checkbox"/> InsideH
+                        </div>
+                    </div>
+                    <div style="float:left;width:75px;">
+                        <input id="tblCellBrdRight" type="checkbox"/> Right
+                        <input id="tblCellBrdBottom" type="checkbox"/> Bottom
+                    </div>
+                    <div style="float:left;width:200px;" id="tblCellBrd_div">
+                        <div id="tblCellBrdSize" style="float:left;width:100px;">
+                            <select id="tblCellBrdSizeVals" >
+                                <option value="0">0.25 pt</option>
+                                <option value="1">0.5  pt</option>
+                                <option value="2">0.75 pt</option>
+                                <option value="3">1    pt</option>
+                                <option value="4">1.5 pt</option>
+                                <option value="5">2.25 pt</option>
+                                <option value="6">3 pt</option>
+                                <option value="7">4.5 pt</option>
+                                <option value="8">6 pt</option>
+                            </select>
+                        </div>
+                        <div style="float:left;width:100px;">
+                            <div style="float:left;width:100px;" onclick="document.getElementById('tblCellBrdColorChart').style.visibility='visible';">
+                                <div id="tblCellBrdColor" style="background-color:black;float:left;width:30px;height: 20px;"></div><div style="float:left;width:30px;height: 20px;">Color</div>
+                            </div>
+                            <table id="tblCellBrdColorChart" style="position:absolute; width: 200px;height:200px; visibility: hidden;">
+                                <tbody>
+                                <tr><td bgcolor="#FBEFEF"></td><td bgcolor="#FBF2EF"></td><td bgcolor="#FBF5EF"></td><td bgcolor="#FBF8EF"></td><td bgcolor="#FBFBEF"></td><td bgcolor="#F8FBEF"></td><td bgcolor="#F5FBEF"></td><td bgcolor="#F2FBEF"></td><td bgcolor="#EFFBEF"></td><td bgcolor="#EFFBF2"></td><td bgcolor="#EFFBF5"></td><td bgcolor="#EFFBF8"></td><td bgcolor="#EFFBFB"></td><td bgcolor="#EFF8FB"></td><td bgcolor="#EFF5FB"></td><td bgcolor="#EFF2FB"></td><td bgcolor="#EFEFFB"></td><td bgcolor="#F2EFFB"></td><td bgcolor="#F5EFFB"></td><td bgcolor="#F8EFFB"></td><td bgcolor="#FBEFFB"></td><td bgcolor="#FBEFF8"></td><td bgcolor="#FBEFF5"></td><td bgcolor="#FBEFF2"></td><td bgcolor="#FFFFFF"></td></tr>
+                                <tr><td bgcolor="#F8E0E0"></td><td bgcolor="#F8E6E0"></td><td bgcolor="#F8ECE0"></td><td bgcolor="#F7F2E0"></td><td bgcolor="#F7F8E0"></td><td bgcolor="#F1F8E0"></td><td bgcolor="#ECF8E0"></td><td bgcolor="#E6F8E0"></td><td bgcolor="#E0F8E0"></td><td bgcolor="#E0F8E6"></td><td bgcolor="#E0F8EC"></td><td bgcolor="#E0F8F1"></td><td bgcolor="#E0F8F7"></td><td bgcolor="#E0F2F7"></td><td bgcolor="#E0ECF8"></td><td bgcolor="#E0E6F8"></td><td bgcolor="#E0E0F8"></td><td bgcolor="#E6E0F8"></td><td bgcolor="#ECE0F8"></td><td bgcolor="#F2E0F7"></td><td bgcolor="#F8E0F7"></td><td bgcolor="#F8E0F1"></td><td bgcolor="#F8E0EC"></td><td bgcolor="#F8E0E6"></td><td bgcolor="#FAFAFA"></td></tr>
+                                <tr><td bgcolor="#F6CECE"></td><td bgcolor="#F6D8CE"></td><td bgcolor="#F6E3CE"></td><td bgcolor="#F5ECCE"></td><td bgcolor="#F5F6CE"></td><td bgcolor="#ECF6CE"></td><td bgcolor="#E3F6CE"></td><td bgcolor="#D8F6CE"></td><td bgcolor="#CEF6CE"></td><td bgcolor="#CEF6D8"></td><td bgcolor="#CEF6E3"></td><td bgcolor="#CEF6EC"></td><td bgcolor="#CEF6F5"></td><td bgcolor="#CEECF5"></td><td bgcolor="#CEE3F6"></td><td bgcolor="#CED8F6"></td><td bgcolor="#CECEF6"></td><td bgcolor="#D8CEF6"></td><td bgcolor="#E3CEF6"></td><td bgcolor="#ECCEF5"></td><td bgcolor="#F6CEF5"></td><td bgcolor="#F6CEEC"></td><td bgcolor="#F6CEE3"></td><td bgcolor="#F6CED8"></td><td bgcolor="#F2F2F2"></td></tr>
+                                <tr><td bgcolor="#F5A9A9"></td><td bgcolor="#F5BCA9"></td><td bgcolor="#F5D0A9"></td><td bgcolor="#F3E2A9"></td><td bgcolor="#F2F5A9"></td><td bgcolor="#E1F5A9"></td><td bgcolor="#D0F5A9"></td><td bgcolor="#BCF5A9"></td><td bgcolor="#A9F5A9"></td><td bgcolor="#A9F5BC"></td><td bgcolor="#A9F5D0"></td><td bgcolor="#A9F5E1"></td><td bgcolor="#A9F5F2"></td><td bgcolor="#A9E2F3"></td><td bgcolor="#A9D0F5"></td><td bgcolor="#A9BCF5"></td><td bgcolor="#A9A9F5"></td><td bgcolor="#BCA9F5"></td><td bgcolor="#D0A9F5"></td><td bgcolor="#E2A9F3"></td><td bgcolor="#F5A9F2"></td><td bgcolor="#F5A9E1"></td><td bgcolor="#F5A9D0"></td><td bgcolor="#F5A9BC"></td><td bgcolor="#E6E6E6"></td></tr>
+                                <tr><td bgcolor="#F78181"></td><td bgcolor="#F79F81"></td><td bgcolor="#F7BE81"></td><td bgcolor="#F5DA81"></td><td bgcolor="#F3F781"></td><td bgcolor="#D8F781"></td><td bgcolor="#BEF781"></td><td bgcolor="#9FF781"></td><td bgcolor="#81F781"></td><td bgcolor="#81F79F"></td><td bgcolor="#81F7BE"></td><td bgcolor="#81F7D8"></td><td bgcolor="#81F7F3"></td><td bgcolor="#81DAF5"></td><td bgcolor="#81BEF7"></td><td bgcolor="#819FF7"></td><td bgcolor="#8181F7"></td><td bgcolor="#9F81F7"></td><td bgcolor="#BE81F7"></td><td bgcolor="#DA81F5"></td><td bgcolor="#F781F3"></td><td bgcolor="#F781D8"></td><td bgcolor="#F781BE"></td><td bgcolor="#F7819F"></td><td bgcolor="#D8D8D8"></td></tr>
+                                <tr><td bgcolor="#FA5858"></td><td bgcolor="#FA8258"></td><td bgcolor="#FAAC58"></td><td bgcolor="#F7D358"></td><td bgcolor="#F4FA58"></td><td bgcolor="#D0FA58"></td><td bgcolor="#ACFA58"></td><td bgcolor="#82FA58"></td><td bgcolor="#58FA58"></td><td bgcolor="#58FA82"></td><td bgcolor="#58FAAC"></td><td bgcolor="#58FAD0"></td><td bgcolor="#58FAF4"></td><td bgcolor="#58D3F7"></td><td bgcolor="#58ACFA"></td><td bgcolor="#5882FA"></td><td bgcolor="#5858FA"></td><td bgcolor="#8258FA"></td><td bgcolor="#AC58FA"></td><td bgcolor="#D358F7"></td><td bgcolor="#FA58F4"></td><td bgcolor="#FA58D0"></td><td bgcolor="#FA58AC"></td><td bgcolor="#FA5882"></td><td bgcolor="#BDBDBD"></td></tr>
+                                <tr><td bgcolor="#FE2E2E"></td><td bgcolor="#FE642E"></td><td bgcolor="#FE9A2E"></td><td bgcolor="#FACC2E"></td><td bgcolor="#F7FE2E"></td><td bgcolor="#C8FE2E"></td><td bgcolor="#9AFE2E"></td><td bgcolor="#64FE2E"></td><td bgcolor="#2EFE2E"></td><td bgcolor="#2EFE64"></td><td bgcolor="#2EFE9A"></td><td bgcolor="#2EFEC8"></td><td bgcolor="#2EFEF7"></td><td bgcolor="#2ECCFA"></td><td bgcolor="#2E9AFE"></td><td bgcolor="#2E64FE"></td><td bgcolor="#2E2EFE"></td><td bgcolor="#642EFE"></td><td bgcolor="#9A2EFE"></td><td bgcolor="#CC2EFA"></td><td bgcolor="#FE2EF7"></td><td bgcolor="#FE2EC8"></td><td bgcolor="#FE2E9A"></td><td bgcolor="#FE2E64"></td><td bgcolor="#A4A4A4"></td></tr>
+                                <tr><td bgcolor="#FF0000"></td><td bgcolor="#FF4000"></td><td bgcolor="#FF8000"></td><td bgcolor="#FFBF00"></td><td bgcolor="#FFFF00"></td><td bgcolor="#BFFF00"></td><td bgcolor="#80FF00"></td><td bgcolor="#40FF00"></td><td bgcolor="#00FF00"></td><td bgcolor="#00FF40"></td><td bgcolor="#00FF80"></td><td bgcolor="#00FFBF"></td><td bgcolor="#00FFFF"></td><td bgcolor="#00BFFF"></td><td bgcolor="#0080FF"></td><td bgcolor="#0040FF"></td><td bgcolor="#0000FF"></td><td bgcolor="#4000FF"></td><td bgcolor="#8000FF"></td><td bgcolor="#BF00FF"></td><td bgcolor="#FF00FF"></td><td bgcolor="#FF00BF"></td><td bgcolor="#FF0080"></td><td bgcolor="#FF0040"></td><td bgcolor="#848484"></td></tr>
+                                <tr><td bgcolor="#DF0101"></td><td bgcolor="#DF3A01"></td><td bgcolor="#DF7401"></td><td bgcolor="#DBA901"></td><td bgcolor="#D7DF01"></td><td bgcolor="#A5DF00"></td><td bgcolor="#74DF00"></td><td bgcolor="#3ADF00"></td><td bgcolor="#01DF01"></td><td bgcolor="#01DF3A"></td><td bgcolor="#01DF74"></td><td bgcolor="#01DFA5"></td><td bgcolor="#01DFD7"></td><td bgcolor="#01A9DB"></td><td bgcolor="#0174DF"></td><td bgcolor="#013ADF"></td><td bgcolor="#0101DF"></td><td bgcolor="#3A01DF"></td><td bgcolor="#7401DF"></td><td bgcolor="#A901DB"></td><td bgcolor="#DF01D7"></td><td bgcolor="#DF01A5"></td><td bgcolor="#DF0174"></td><td bgcolor="#DF013A"></td><td bgcolor="#6E6E6E"></td></tr>
+                                <tr><td bgcolor="#B40404"></td><td bgcolor="#B43104"></td><td bgcolor="#B45F04"></td><td bgcolor="#B18904"></td><td bgcolor="#AEB404"></td><td bgcolor="#86B404"></td><td bgcolor="#5FB404"></td><td bgcolor="#31B404"></td><td bgcolor="#04B404"></td><td bgcolor="#04B431"></td><td bgcolor="#04B45F"></td><td bgcolor="#04B486"></td><td bgcolor="#04B4AE"></td><td bgcolor="#0489B1"></td><td bgcolor="#045FB4"></td><td bgcolor="#0431B4"></td><td bgcolor="#0404B4"></td><td bgcolor="#3104B4"></td><td bgcolor="#5F04B4"></td><td bgcolor="#8904B1"></td><td bgcolor="#B404AE"></td><td bgcolor="#B40486"></td><td bgcolor="#B4045F"></td><td bgcolor="#B40431"></td><td bgcolor="#585858"></td></tr>
+                                <tr><td bgcolor="#8A0808"></td><td bgcolor="#8A2908"></td><td bgcolor="#8A4B08"></td><td bgcolor="#886A08"></td><td bgcolor="#868A08"></td><td bgcolor="#688A08"></td><td bgcolor="#4B8A08"></td><td bgcolor="#298A08"></td><td bgcolor="#088A08"></td><td bgcolor="#088A29"></td><td bgcolor="#088A4B"></td><td bgcolor="#088A68"></td><td bgcolor="#088A85"></td><td bgcolor="#086A87"></td><td bgcolor="#084B8A"></td><td bgcolor="#08298A"></td><td bgcolor="#08088A"></td><td bgcolor="#29088A"></td><td bgcolor="#4B088A"></td><td bgcolor="#6A0888"></td><td bgcolor="#8A0886"></td><td bgcolor="#8A0868"></td><td bgcolor="#8A084B"></td><td bgcolor="#8A0829"></td><td bgcolor="#424242"></td></tr>
+                                <tr><td bgcolor="#610B0B"></td><td bgcolor="#61210B"></td><td bgcolor="#61380B"></td><td bgcolor="#5F4C0B"></td><td bgcolor="#5E610B"></td><td bgcolor="#4B610B"></td><td bgcolor="#38610B"></td><td bgcolor="#21610B"></td><td bgcolor="#0B610B"></td><td bgcolor="#0B6121"></td><td bgcolor="#0B6138"></td><td bgcolor="#0B614B"></td><td bgcolor="#0B615E"></td><td bgcolor="#0B4C5F"></td><td bgcolor="#0B3861"></td><td bgcolor="#0B2161"></td><td bgcolor="#0B0B61"></td><td bgcolor="#210B61"></td><td bgcolor="#380B61"></td><td bgcolor="#4C0B5F"></td><td bgcolor="#610B5E"></td><td bgcolor="#610B4B"></td><td bgcolor="#610B38"></td><td bgcolor="#610B21"></td><td bgcolor="#2E2E2E"></td></tr>
+                                <tr><td bgcolor="#3B0B0B"></td><td bgcolor="#3B170B"></td><td bgcolor="#3B240B"></td><td bgcolor="#3A2F0B"></td><td bgcolor="#393B0B"></td><td bgcolor="#2E3B0B"></td><td bgcolor="#243B0B"></td><td bgcolor="#173B0B"></td><td bgcolor="#0B3B0B"></td><td bgcolor="#0B3B17"></td><td bgcolor="#0B3B24"></td><td bgcolor="#0B3B2E"></td><td bgcolor="#0B3B39"></td><td bgcolor="#0B2F3A"></td><td bgcolor="#0B243B"></td><td bgcolor="#0B173B"></td><td bgcolor="#0B0B3B"></td><td bgcolor="#170B3B"></td><td bgcolor="#240B3B"></td><td bgcolor="#2F0B3A"></td><td bgcolor="#3B0B39"></td><td bgcolor="#3B0B2E"></td><td bgcolor="#3B0B24"></td><td bgcolor="#3B0B17"></td><td bgcolor="#1C1C1C"></td></tr>
+                                <tr><td bgcolor="#2A0A0A"></td><td bgcolor="#2A120A"></td><td bgcolor="#2A1B0A"></td><td bgcolor="#29220A"></td><td bgcolor="#292A0A"></td><td bgcolor="#222A0A"></td><td bgcolor="#1B2A0A"></td><td bgcolor="#122A0A"></td><td bgcolor="#0A2A0A"></td><td bgcolor="#0A2A12"></td><td bgcolor="#0A2A1B"></td><td bgcolor="#0A2A22"></td><td bgcolor="#0A2A29"></td><td bgcolor="#0A2229"></td><td bgcolor="#0A1B2A"></td><td bgcolor="#0A122A"></td><td bgcolor="#0A0A2A"></td><td bgcolor="#120A2A"></td><td bgcolor="#1B0A2A"></td><td bgcolor="#220A29"></td><td bgcolor="#2A0A29"></td><td bgcolor="#2A0A22"></td><td bgcolor="#2A0A1B"></td><td bgcolor="#2A0A12"></td><td bgcolor="#151515"></td></tr>
+                                <tr><td bgcolor="#190707"></td><td bgcolor="#190B07"></td><td bgcolor="#191007"></td><td bgcolor="#181407"></td><td bgcolor="#181907"></td><td bgcolor="#141907"></td><td bgcolor="#101907"></td><td bgcolor="#0B1907"></td><td bgcolor="#071907"></td><td bgcolor="#07190B"></td><td bgcolor="#071910"></td><td bgcolor="#071914"></td><td bgcolor="#071918"></td><td bgcolor="#071418"></td><td bgcolor="#071019"></td><td bgcolor="#070B19"></td><td bgcolor="#070719"></td><td bgcolor="#0B0719"></td><td bgcolor="#100719"></td><td bgcolor="#140718"></td><td bgcolor="#190718"></td><td bgcolor="#190714"></td><td bgcolor="#190710"></td><td bgcolor="#19070B"></td><td bgcolor="#000000"></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div style="float:left;width:200px;">
+                            <input id="tblCellBrdType" type="checkbox" checked="true"/> Single
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="float:left;width:200px;">
+                <div style="float:left;width:200px;">
+                    Table Border
+                </div>
+                <div style="float:left;width:200px;">
+                    <div style="float:left;width:50px;">
+                        <input id="tblBrdLeft" type="checkbox"/> Left
+                        <input id="tblBrdTop" type="checkbox"/> Top
+                    </div>
+                    <div style="float:left;width:75px;">
+                        <input id="tblBrdInsideV" type="checkbox"/> InsideV
+                        <input id="tblBrdInsideH" type="checkbox"/> InsideH
+                    </div>
+                    <div style="float:left;width:75px;">
+                        <input id="tblBrdRight" type="checkbox"/> Right
+                        <input id="tblBrdBottom" type="checkbox"/> Bottom
+                    </div>
+                </div>
+                <div style="float:left;width:200px;">
+                    <div id="tblTableBrdSize" style="float:left;width:100px;">
+                        <select id="tblTableBrdSizeVals" >
+                            <option value="0">0.25 pt</option>
+                            <option value="1">0.5  pt</option>
+                            <option value="2">0.75 pt</option>
+                            <option value="3">1    pt</option>
+                            <option value="4">1.5 pt</option>
+                            <option value="5">2.25 pt</option>
+                            <option value="6">3 pt</option>
+                            <option value="7">4.5 pt</option>
+                            <option value="8">6 pt</option>
+                        </select>
+                    </div>
+                    <div style="float:left;width:100px;">
+                        <div style="float:left;width:100px;" onclick="document.getElementById('tblTableBrdColorChart').style.visibility='visible';">
+                            <div id="tblTableBrdColor" style="background-color:black;float:left;width:30px;height: 20px;"></div><div style="float:left;width:30px;height: 20px;">Color</div>
+                        </div>
+                        <table id="tblTableBrdColorChart" style="position:absolute; left:200px; width: 200px;height:200px; visibility: hidden;">
+                            <tbody>
+                            <tr><td bgcolor="#FBEFEF"></td><td bgcolor="#FBF2EF"></td><td bgcolor="#FBF5EF"></td><td bgcolor="#FBF8EF"></td><td bgcolor="#FBFBEF"></td><td bgcolor="#F8FBEF"></td><td bgcolor="#F5FBEF"></td><td bgcolor="#F2FBEF"></td><td bgcolor="#EFFBEF"></td><td bgcolor="#EFFBF2"></td><td bgcolor="#EFFBF5"></td><td bgcolor="#EFFBF8"></td><td bgcolor="#EFFBFB"></td><td bgcolor="#EFF8FB"></td><td bgcolor="#EFF5FB"></td><td bgcolor="#EFF2FB"></td><td bgcolor="#EFEFFB"></td><td bgcolor="#F2EFFB"></td><td bgcolor="#F5EFFB"></td><td bgcolor="#F8EFFB"></td><td bgcolor="#FBEFFB"></td><td bgcolor="#FBEFF8"></td><td bgcolor="#FBEFF5"></td><td bgcolor="#FBEFF2"></td><td bgcolor="#FFFFFF"></td></tr>
+                            <tr><td bgcolor="#F8E0E0"></td><td bgcolor="#F8E6E0"></td><td bgcolor="#F8ECE0"></td><td bgcolor="#F7F2E0"></td><td bgcolor="#F7F8E0"></td><td bgcolor="#F1F8E0"></td><td bgcolor="#ECF8E0"></td><td bgcolor="#E6F8E0"></td><td bgcolor="#E0F8E0"></td><td bgcolor="#E0F8E6"></td><td bgcolor="#E0F8EC"></td><td bgcolor="#E0F8F1"></td><td bgcolor="#E0F8F7"></td><td bgcolor="#E0F2F7"></td><td bgcolor="#E0ECF8"></td><td bgcolor="#E0E6F8"></td><td bgcolor="#E0E0F8"></td><td bgcolor="#E6E0F8"></td><td bgcolor="#ECE0F8"></td><td bgcolor="#F2E0F7"></td><td bgcolor="#F8E0F7"></td><td bgcolor="#F8E0F1"></td><td bgcolor="#F8E0EC"></td><td bgcolor="#F8E0E6"></td><td bgcolor="#FAFAFA"></td></tr>
+                            <tr><td bgcolor="#F6CECE"></td><td bgcolor="#F6D8CE"></td><td bgcolor="#F6E3CE"></td><td bgcolor="#F5ECCE"></td><td bgcolor="#F5F6CE"></td><td bgcolor="#ECF6CE"></td><td bgcolor="#E3F6CE"></td><td bgcolor="#D8F6CE"></td><td bgcolor="#CEF6CE"></td><td bgcolor="#CEF6D8"></td><td bgcolor="#CEF6E3"></td><td bgcolor="#CEF6EC"></td><td bgcolor="#CEF6F5"></td><td bgcolor="#CEECF5"></td><td bgcolor="#CEE3F6"></td><td bgcolor="#CED8F6"></td><td bgcolor="#CECEF6"></td><td bgcolor="#D8CEF6"></td><td bgcolor="#E3CEF6"></td><td bgcolor="#ECCEF5"></td><td bgcolor="#F6CEF5"></td><td bgcolor="#F6CEEC"></td><td bgcolor="#F6CEE3"></td><td bgcolor="#F6CED8"></td><td bgcolor="#F2F2F2"></td></tr>
+                            <tr><td bgcolor="#F5A9A9"></td><td bgcolor="#F5BCA9"></td><td bgcolor="#F5D0A9"></td><td bgcolor="#F3E2A9"></td><td bgcolor="#F2F5A9"></td><td bgcolor="#E1F5A9"></td><td bgcolor="#D0F5A9"></td><td bgcolor="#BCF5A9"></td><td bgcolor="#A9F5A9"></td><td bgcolor="#A9F5BC"></td><td bgcolor="#A9F5D0"></td><td bgcolor="#A9F5E1"></td><td bgcolor="#A9F5F2"></td><td bgcolor="#A9E2F3"></td><td bgcolor="#A9D0F5"></td><td bgcolor="#A9BCF5"></td><td bgcolor="#A9A9F5"></td><td bgcolor="#BCA9F5"></td><td bgcolor="#D0A9F5"></td><td bgcolor="#E2A9F3"></td><td bgcolor="#F5A9F2"></td><td bgcolor="#F5A9E1"></td><td bgcolor="#F5A9D0"></td><td bgcolor="#F5A9BC"></td><td bgcolor="#E6E6E6"></td></tr>
+                            <tr><td bgcolor="#F78181"></td><td bgcolor="#F79F81"></td><td bgcolor="#F7BE81"></td><td bgcolor="#F5DA81"></td><td bgcolor="#F3F781"></td><td bgcolor="#D8F781"></td><td bgcolor="#BEF781"></td><td bgcolor="#9FF781"></td><td bgcolor="#81F781"></td><td bgcolor="#81F79F"></td><td bgcolor="#81F7BE"></td><td bgcolor="#81F7D8"></td><td bgcolor="#81F7F3"></td><td bgcolor="#81DAF5"></td><td bgcolor="#81BEF7"></td><td bgcolor="#819FF7"></td><td bgcolor="#8181F7"></td><td bgcolor="#9F81F7"></td><td bgcolor="#BE81F7"></td><td bgcolor="#DA81F5"></td><td bgcolor="#F781F3"></td><td bgcolor="#F781D8"></td><td bgcolor="#F781BE"></td><td bgcolor="#F7819F"></td><td bgcolor="#D8D8D8"></td></tr>
+                            <tr><td bgcolor="#FA5858"></td><td bgcolor="#FA8258"></td><td bgcolor="#FAAC58"></td><td bgcolor="#F7D358"></td><td bgcolor="#F4FA58"></td><td bgcolor="#D0FA58"></td><td bgcolor="#ACFA58"></td><td bgcolor="#82FA58"></td><td bgcolor="#58FA58"></td><td bgcolor="#58FA82"></td><td bgcolor="#58FAAC"></td><td bgcolor="#58FAD0"></td><td bgcolor="#58FAF4"></td><td bgcolor="#58D3F7"></td><td bgcolor="#58ACFA"></td><td bgcolor="#5882FA"></td><td bgcolor="#5858FA"></td><td bgcolor="#8258FA"></td><td bgcolor="#AC58FA"></td><td bgcolor="#D358F7"></td><td bgcolor="#FA58F4"></td><td bgcolor="#FA58D0"></td><td bgcolor="#FA58AC"></td><td bgcolor="#FA5882"></td><td bgcolor="#BDBDBD"></td></tr>
+                            <tr><td bgcolor="#FE2E2E"></td><td bgcolor="#FE642E"></td><td bgcolor="#FE9A2E"></td><td bgcolor="#FACC2E"></td><td bgcolor="#F7FE2E"></td><td bgcolor="#C8FE2E"></td><td bgcolor="#9AFE2E"></td><td bgcolor="#64FE2E"></td><td bgcolor="#2EFE2E"></td><td bgcolor="#2EFE64"></td><td bgcolor="#2EFE9A"></td><td bgcolor="#2EFEC8"></td><td bgcolor="#2EFEF7"></td><td bgcolor="#2ECCFA"></td><td bgcolor="#2E9AFE"></td><td bgcolor="#2E64FE"></td><td bgcolor="#2E2EFE"></td><td bgcolor="#642EFE"></td><td bgcolor="#9A2EFE"></td><td bgcolor="#CC2EFA"></td><td bgcolor="#FE2EF7"></td><td bgcolor="#FE2EC8"></td><td bgcolor="#FE2E9A"></td><td bgcolor="#FE2E64"></td><td bgcolor="#A4A4A4"></td></tr>
+                            <tr><td bgcolor="#FF0000"></td><td bgcolor="#FF4000"></td><td bgcolor="#FF8000"></td><td bgcolor="#FFBF00"></td><td bgcolor="#FFFF00"></td><td bgcolor="#BFFF00"></td><td bgcolor="#80FF00"></td><td bgcolor="#40FF00"></td><td bgcolor="#00FF00"></td><td bgcolor="#00FF40"></td><td bgcolor="#00FF80"></td><td bgcolor="#00FFBF"></td><td bgcolor="#00FFFF"></td><td bgcolor="#00BFFF"></td><td bgcolor="#0080FF"></td><td bgcolor="#0040FF"></td><td bgcolor="#0000FF"></td><td bgcolor="#4000FF"></td><td bgcolor="#8000FF"></td><td bgcolor="#BF00FF"></td><td bgcolor="#FF00FF"></td><td bgcolor="#FF00BF"></td><td bgcolor="#FF0080"></td><td bgcolor="#FF0040"></td><td bgcolor="#848484"></td></tr>
+                            <tr><td bgcolor="#DF0101"></td><td bgcolor="#DF3A01"></td><td bgcolor="#DF7401"></td><td bgcolor="#DBA901"></td><td bgcolor="#D7DF01"></td><td bgcolor="#A5DF00"></td><td bgcolor="#74DF00"></td><td bgcolor="#3ADF00"></td><td bgcolor="#01DF01"></td><td bgcolor="#01DF3A"></td><td bgcolor="#01DF74"></td><td bgcolor="#01DFA5"></td><td bgcolor="#01DFD7"></td><td bgcolor="#01A9DB"></td><td bgcolor="#0174DF"></td><td bgcolor="#013ADF"></td><td bgcolor="#0101DF"></td><td bgcolor="#3A01DF"></td><td bgcolor="#7401DF"></td><td bgcolor="#A901DB"></td><td bgcolor="#DF01D7"></td><td bgcolor="#DF01A5"></td><td bgcolor="#DF0174"></td><td bgcolor="#DF013A"></td><td bgcolor="#6E6E6E"></td></tr>
+                            <tr><td bgcolor="#B40404"></td><td bgcolor="#B43104"></td><td bgcolor="#B45F04"></td><td bgcolor="#B18904"></td><td bgcolor="#AEB404"></td><td bgcolor="#86B404"></td><td bgcolor="#5FB404"></td><td bgcolor="#31B404"></td><td bgcolor="#04B404"></td><td bgcolor="#04B431"></td><td bgcolor="#04B45F"></td><td bgcolor="#04B486"></td><td bgcolor="#04B4AE"></td><td bgcolor="#0489B1"></td><td bgcolor="#045FB4"></td><td bgcolor="#0431B4"></td><td bgcolor="#0404B4"></td><td bgcolor="#3104B4"></td><td bgcolor="#5F04B4"></td><td bgcolor="#8904B1"></td><td bgcolor="#B404AE"></td><td bgcolor="#B40486"></td><td bgcolor="#B4045F"></td><td bgcolor="#B40431"></td><td bgcolor="#585858"></td></tr>
+                            <tr><td bgcolor="#8A0808"></td><td bgcolor="#8A2908"></td><td bgcolor="#8A4B08"></td><td bgcolor="#886A08"></td><td bgcolor="#868A08"></td><td bgcolor="#688A08"></td><td bgcolor="#4B8A08"></td><td bgcolor="#298A08"></td><td bgcolor="#088A08"></td><td bgcolor="#088A29"></td><td bgcolor="#088A4B"></td><td bgcolor="#088A68"></td><td bgcolor="#088A85"></td><td bgcolor="#086A87"></td><td bgcolor="#084B8A"></td><td bgcolor="#08298A"></td><td bgcolor="#08088A"></td><td bgcolor="#29088A"></td><td bgcolor="#4B088A"></td><td bgcolor="#6A0888"></td><td bgcolor="#8A0886"></td><td bgcolor="#8A0868"></td><td bgcolor="#8A084B"></td><td bgcolor="#8A0829"></td><td bgcolor="#424242"></td></tr>
+                            <tr><td bgcolor="#610B0B"></td><td bgcolor="#61210B"></td><td bgcolor="#61380B"></td><td bgcolor="#5F4C0B"></td><td bgcolor="#5E610B"></td><td bgcolor="#4B610B"></td><td bgcolor="#38610B"></td><td bgcolor="#21610B"></td><td bgcolor="#0B610B"></td><td bgcolor="#0B6121"></td><td bgcolor="#0B6138"></td><td bgcolor="#0B614B"></td><td bgcolor="#0B615E"></td><td bgcolor="#0B4C5F"></td><td bgcolor="#0B3861"></td><td bgcolor="#0B2161"></td><td bgcolor="#0B0B61"></td><td bgcolor="#210B61"></td><td bgcolor="#380B61"></td><td bgcolor="#4C0B5F"></td><td bgcolor="#610B5E"></td><td bgcolor="#610B4B"></td><td bgcolor="#610B38"></td><td bgcolor="#610B21"></td><td bgcolor="#2E2E2E"></td></tr>
+                            <tr><td bgcolor="#3B0B0B"></td><td bgcolor="#3B170B"></td><td bgcolor="#3B240B"></td><td bgcolor="#3A2F0B"></td><td bgcolor="#393B0B"></td><td bgcolor="#2E3B0B"></td><td bgcolor="#243B0B"></td><td bgcolor="#173B0B"></td><td bgcolor="#0B3B0B"></td><td bgcolor="#0B3B17"></td><td bgcolor="#0B3B24"></td><td bgcolor="#0B3B2E"></td><td bgcolor="#0B3B39"></td><td bgcolor="#0B2F3A"></td><td bgcolor="#0B243B"></td><td bgcolor="#0B173B"></td><td bgcolor="#0B0B3B"></td><td bgcolor="#170B3B"></td><td bgcolor="#240B3B"></td><td bgcolor="#2F0B3A"></td><td bgcolor="#3B0B39"></td><td bgcolor="#3B0B2E"></td><td bgcolor="#3B0B24"></td><td bgcolor="#3B0B17"></td><td bgcolor="#1C1C1C"></td></tr>
+                            <tr><td bgcolor="#2A0A0A"></td><td bgcolor="#2A120A"></td><td bgcolor="#2A1B0A"></td><td bgcolor="#29220A"></td><td bgcolor="#292A0A"></td><td bgcolor="#222A0A"></td><td bgcolor="#1B2A0A"></td><td bgcolor="#122A0A"></td><td bgcolor="#0A2A0A"></td><td bgcolor="#0A2A12"></td><td bgcolor="#0A2A1B"></td><td bgcolor="#0A2A22"></td><td bgcolor="#0A2A29"></td><td bgcolor="#0A2229"></td><td bgcolor="#0A1B2A"></td><td bgcolor="#0A122A"></td><td bgcolor="#0A0A2A"></td><td bgcolor="#120A2A"></td><td bgcolor="#1B0A2A"></td><td bgcolor="#220A29"></td><td bgcolor="#2A0A29"></td><td bgcolor="#2A0A22"></td><td bgcolor="#2A0A1B"></td><td bgcolor="#2A0A12"></td><td bgcolor="#151515"></td></tr>
+                            <tr><td bgcolor="#190707"></td><td bgcolor="#190B07"></td><td bgcolor="#191007"></td><td bgcolor="#181407"></td><td bgcolor="#181907"></td><td bgcolor="#141907"></td><td bgcolor="#101907"></td><td bgcolor="#0B1907"></td><td bgcolor="#071907"></td><td bgcolor="#07190B"></td><td bgcolor="#071910"></td><td bgcolor="#071914"></td><td bgcolor="#071918"></td><td bgcolor="#071418"></td><td bgcolor="#071019"></td><td bgcolor="#070B19"></td><td bgcolor="#070719"></td><td bgcolor="#0B0719"></td><td bgcolor="#100719"></td><td bgcolor="#140718"></td><td bgcolor="#190718"></td><td bgcolor="#190714"></td><td bgcolor="#190710"></td><td bgcolor="#19070B"></td><td bgcolor="#000000"></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div style="float:left;width:200px;">
+                        <input id="tblTableBrdType" type="checkbox" checked="true"/> Single
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="float:left;border-top: 2px ridge silver;padding-left:5px;width:400px">
+            <div style="float:left;width:200px;">
+                <div style="float:left;width:200px;">
+                    Table Background color
+                </div>
+                <div style="float:left;width:200px;">
+                    <input id="tblBrdBGColorTran" type="checkbox" onchange="Table_TableBGTransparent_OnChange()" /> Transparent
+                </div>
+
+                <div id="tblTableBGColor_div" style="float:left;width:200px;" onclick="document.getElementById('tblTableBGColorChart').style.visibility='visible';">
+                    <div id="tblTableBGColor" style="background-color:white;float:left;width:100px;height: 20px;"></div><div style="float:left;width:30px;height: 20px;">BGColor</div>
+                </div>
+
+                <table id="tblTableBGColorChart" style="position:absolute; width: 200px;height:200px; visibility: hidden;">
+                    <tbody>
+                    <tr><td bgcolor="#FBEFEF"></td><td bgcolor="#FBF2EF"></td><td bgcolor="#FBF5EF"></td><td bgcolor="#FBF8EF"></td><td bgcolor="#FBFBEF"></td><td bgcolor="#F8FBEF"></td><td bgcolor="#F5FBEF"></td><td bgcolor="#F2FBEF"></td><td bgcolor="#EFFBEF"></td><td bgcolor="#EFFBF2"></td><td bgcolor="#EFFBF5"></td><td bgcolor="#EFFBF8"></td><td bgcolor="#EFFBFB"></td><td bgcolor="#EFF8FB"></td><td bgcolor="#EFF5FB"></td><td bgcolor="#EFF2FB"></td><td bgcolor="#EFEFFB"></td><td bgcolor="#F2EFFB"></td><td bgcolor="#F5EFFB"></td><td bgcolor="#F8EFFB"></td><td bgcolor="#FBEFFB"></td><td bgcolor="#FBEFF8"></td><td bgcolor="#FBEFF5"></td><td bgcolor="#FBEFF2"></td><td bgcolor="#FFFFFF"></td></tr>
+                    <tr><td bgcolor="#F8E0E0"></td><td bgcolor="#F8E6E0"></td><td bgcolor="#F8ECE0"></td><td bgcolor="#F7F2E0"></td><td bgcolor="#F7F8E0"></td><td bgcolor="#F1F8E0"></td><td bgcolor="#ECF8E0"></td><td bgcolor="#E6F8E0"></td><td bgcolor="#E0F8E0"></td><td bgcolor="#E0F8E6"></td><td bgcolor="#E0F8EC"></td><td bgcolor="#E0F8F1"></td><td bgcolor="#E0F8F7"></td><td bgcolor="#E0F2F7"></td><td bgcolor="#E0ECF8"></td><td bgcolor="#E0E6F8"></td><td bgcolor="#E0E0F8"></td><td bgcolor="#E6E0F8"></td><td bgcolor="#ECE0F8"></td><td bgcolor="#F2E0F7"></td><td bgcolor="#F8E0F7"></td><td bgcolor="#F8E0F1"></td><td bgcolor="#F8E0EC"></td><td bgcolor="#F8E0E6"></td><td bgcolor="#FAFAFA"></td></tr>
+                    <tr><td bgcolor="#F6CECE"></td><td bgcolor="#F6D8CE"></td><td bgcolor="#F6E3CE"></td><td bgcolor="#F5ECCE"></td><td bgcolor="#F5F6CE"></td><td bgcolor="#ECF6CE"></td><td bgcolor="#E3F6CE"></td><td bgcolor="#D8F6CE"></td><td bgcolor="#CEF6CE"></td><td bgcolor="#CEF6D8"></td><td bgcolor="#CEF6E3"></td><td bgcolor="#CEF6EC"></td><td bgcolor="#CEF6F5"></td><td bgcolor="#CEECF5"></td><td bgcolor="#CEE3F6"></td><td bgcolor="#CED8F6"></td><td bgcolor="#CECEF6"></td><td bgcolor="#D8CEF6"></td><td bgcolor="#E3CEF6"></td><td bgcolor="#ECCEF5"></td><td bgcolor="#F6CEF5"></td><td bgcolor="#F6CEEC"></td><td bgcolor="#F6CEE3"></td><td bgcolor="#F6CED8"></td><td bgcolor="#F2F2F2"></td></tr>
+                    <tr><td bgcolor="#F5A9A9"></td><td bgcolor="#F5BCA9"></td><td bgcolor="#F5D0A9"></td><td bgcolor="#F3E2A9"></td><td bgcolor="#F2F5A9"></td><td bgcolor="#E1F5A9"></td><td bgcolor="#D0F5A9"></td><td bgcolor="#BCF5A9"></td><td bgcolor="#A9F5A9"></td><td bgcolor="#A9F5BC"></td><td bgcolor="#A9F5D0"></td><td bgcolor="#A9F5E1"></td><td bgcolor="#A9F5F2"></td><td bgcolor="#A9E2F3"></td><td bgcolor="#A9D0F5"></td><td bgcolor="#A9BCF5"></td><td bgcolor="#A9A9F5"></td><td bgcolor="#BCA9F5"></td><td bgcolor="#D0A9F5"></td><td bgcolor="#E2A9F3"></td><td bgcolor="#F5A9F2"></td><td bgcolor="#F5A9E1"></td><td bgcolor="#F5A9D0"></td><td bgcolor="#F5A9BC"></td><td bgcolor="#E6E6E6"></td></tr>
+                    <tr><td bgcolor="#F78181"></td><td bgcolor="#F79F81"></td><td bgcolor="#F7BE81"></td><td bgcolor="#F5DA81"></td><td bgcolor="#F3F781"></td><td bgcolor="#D8F781"></td><td bgcolor="#BEF781"></td><td bgcolor="#9FF781"></td><td bgcolor="#81F781"></td><td bgcolor="#81F79F"></td><td bgcolor="#81F7BE"></td><td bgcolor="#81F7D8"></td><td bgcolor="#81F7F3"></td><td bgcolor="#81DAF5"></td><td bgcolor="#81BEF7"></td><td bgcolor="#819FF7"></td><td bgcolor="#8181F7"></td><td bgcolor="#9F81F7"></td><td bgcolor="#BE81F7"></td><td bgcolor="#DA81F5"></td><td bgcolor="#F781F3"></td><td bgcolor="#F781D8"></td><td bgcolor="#F781BE"></td><td bgcolor="#F7819F"></td><td bgcolor="#D8D8D8"></td></tr>
+                    <tr><td bgcolor="#FA5858"></td><td bgcolor="#FA8258"></td><td bgcolor="#FAAC58"></td><td bgcolor="#F7D358"></td><td bgcolor="#F4FA58"></td><td bgcolor="#D0FA58"></td><td bgcolor="#ACFA58"></td><td bgcolor="#82FA58"></td><td bgcolor="#58FA58"></td><td bgcolor="#58FA82"></td><td bgcolor="#58FAAC"></td><td bgcolor="#58FAD0"></td><td bgcolor="#58FAF4"></td><td bgcolor="#58D3F7"></td><td bgcolor="#58ACFA"></td><td bgcolor="#5882FA"></td><td bgcolor="#5858FA"></td><td bgcolor="#8258FA"></td><td bgcolor="#AC58FA"></td><td bgcolor="#D358F7"></td><td bgcolor="#FA58F4"></td><td bgcolor="#FA58D0"></td><td bgcolor="#FA58AC"></td><td bgcolor="#FA5882"></td><td bgcolor="#BDBDBD"></td></tr>
+                    <tr><td bgcolor="#FE2E2E"></td><td bgcolor="#FE642E"></td><td bgcolor="#FE9A2E"></td><td bgcolor="#FACC2E"></td><td bgcolor="#F7FE2E"></td><td bgcolor="#C8FE2E"></td><td bgcolor="#9AFE2E"></td><td bgcolor="#64FE2E"></td><td bgcolor="#2EFE2E"></td><td bgcolor="#2EFE64"></td><td bgcolor="#2EFE9A"></td><td bgcolor="#2EFEC8"></td><td bgcolor="#2EFEF7"></td><td bgcolor="#2ECCFA"></td><td bgcolor="#2E9AFE"></td><td bgcolor="#2E64FE"></td><td bgcolor="#2E2EFE"></td><td bgcolor="#642EFE"></td><td bgcolor="#9A2EFE"></td><td bgcolor="#CC2EFA"></td><td bgcolor="#FE2EF7"></td><td bgcolor="#FE2EC8"></td><td bgcolor="#FE2E9A"></td><td bgcolor="#FE2E64"></td><td bgcolor="#A4A4A4"></td></tr>
+                    <tr><td bgcolor="#FF0000"></td><td bgcolor="#FF4000"></td><td bgcolor="#FF8000"></td><td bgcolor="#FFBF00"></td><td bgcolor="#FFFF00"></td><td bgcolor="#BFFF00"></td><td bgcolor="#80FF00"></td><td bgcolor="#40FF00"></td><td bgcolor="#00FF00"></td><td bgcolor="#00FF40"></td><td bgcolor="#00FF80"></td><td bgcolor="#00FFBF"></td><td bgcolor="#00FFFF"></td><td bgcolor="#00BFFF"></td><td bgcolor="#0080FF"></td><td bgcolor="#0040FF"></td><td bgcolor="#0000FF"></td><td bgcolor="#4000FF"></td><td bgcolor="#8000FF"></td><td bgcolor="#BF00FF"></td><td bgcolor="#FF00FF"></td><td bgcolor="#FF00BF"></td><td bgcolor="#FF0080"></td><td bgcolor="#FF0040"></td><td bgcolor="#848484"></td></tr>
+                    <tr><td bgcolor="#DF0101"></td><td bgcolor="#DF3A01"></td><td bgcolor="#DF7401"></td><td bgcolor="#DBA901"></td><td bgcolor="#D7DF01"></td><td bgcolor="#A5DF00"></td><td bgcolor="#74DF00"></td><td bgcolor="#3ADF00"></td><td bgcolor="#01DF01"></td><td bgcolor="#01DF3A"></td><td bgcolor="#01DF74"></td><td bgcolor="#01DFA5"></td><td bgcolor="#01DFD7"></td><td bgcolor="#01A9DB"></td><td bgcolor="#0174DF"></td><td bgcolor="#013ADF"></td><td bgcolor="#0101DF"></td><td bgcolor="#3A01DF"></td><td bgcolor="#7401DF"></td><td bgcolor="#A901DB"></td><td bgcolor="#DF01D7"></td><td bgcolor="#DF01A5"></td><td bgcolor="#DF0174"></td><td bgcolor="#DF013A"></td><td bgcolor="#6E6E6E"></td></tr>
+                    <tr><td bgcolor="#B40404"></td><td bgcolor="#B43104"></td><td bgcolor="#B45F04"></td><td bgcolor="#B18904"></td><td bgcolor="#AEB404"></td><td bgcolor="#86B404"></td><td bgcolor="#5FB404"></td><td bgcolor="#31B404"></td><td bgcolor="#04B404"></td><td bgcolor="#04B431"></td><td bgcolor="#04B45F"></td><td bgcolor="#04B486"></td><td bgcolor="#04B4AE"></td><td bgcolor="#0489B1"></td><td bgcolor="#045FB4"></td><td bgcolor="#0431B4"></td><td bgcolor="#0404B4"></td><td bgcolor="#3104B4"></td><td bgcolor="#5F04B4"></td><td bgcolor="#8904B1"></td><td bgcolor="#B404AE"></td><td bgcolor="#B40486"></td><td bgcolor="#B4045F"></td><td bgcolor="#B40431"></td><td bgcolor="#585858"></td></tr>
+                    <tr><td bgcolor="#8A0808"></td><td bgcolor="#8A2908"></td><td bgcolor="#8A4B08"></td><td bgcolor="#886A08"></td><td bgcolor="#868A08"></td><td bgcolor="#688A08"></td><td bgcolor="#4B8A08"></td><td bgcolor="#298A08"></td><td bgcolor="#088A08"></td><td bgcolor="#088A29"></td><td bgcolor="#088A4B"></td><td bgcolor="#088A68"></td><td bgcolor="#088A85"></td><td bgcolor="#086A87"></td><td bgcolor="#084B8A"></td><td bgcolor="#08298A"></td><td bgcolor="#08088A"></td><td bgcolor="#29088A"></td><td bgcolor="#4B088A"></td><td bgcolor="#6A0888"></td><td bgcolor="#8A0886"></td><td bgcolor="#8A0868"></td><td bgcolor="#8A084B"></td><td bgcolor="#8A0829"></td><td bgcolor="#424242"></td></tr>
+                    <tr><td bgcolor="#610B0B"></td><td bgcolor="#61210B"></td><td bgcolor="#61380B"></td><td bgcolor="#5F4C0B"></td><td bgcolor="#5E610B"></td><td bgcolor="#4B610B"></td><td bgcolor="#38610B"></td><td bgcolor="#21610B"></td><td bgcolor="#0B610B"></td><td bgcolor="#0B6121"></td><td bgcolor="#0B6138"></td><td bgcolor="#0B614B"></td><td bgcolor="#0B615E"></td><td bgcolor="#0B4C5F"></td><td bgcolor="#0B3861"></td><td bgcolor="#0B2161"></td><td bgcolor="#0B0B61"></td><td bgcolor="#210B61"></td><td bgcolor="#380B61"></td><td bgcolor="#4C0B5F"></td><td bgcolor="#610B5E"></td><td bgcolor="#610B4B"></td><td bgcolor="#610B38"></td><td bgcolor="#610B21"></td><td bgcolor="#2E2E2E"></td></tr>
+                    <tr><td bgcolor="#3B0B0B"></td><td bgcolor="#3B170B"></td><td bgcolor="#3B240B"></td><td bgcolor="#3A2F0B"></td><td bgcolor="#393B0B"></td><td bgcolor="#2E3B0B"></td><td bgcolor="#243B0B"></td><td bgcolor="#173B0B"></td><td bgcolor="#0B3B0B"></td><td bgcolor="#0B3B17"></td><td bgcolor="#0B3B24"></td><td bgcolor="#0B3B2E"></td><td bgcolor="#0B3B39"></td><td bgcolor="#0B2F3A"></td><td bgcolor="#0B243B"></td><td bgcolor="#0B173B"></td><td bgcolor="#0B0B3B"></td><td bgcolor="#170B3B"></td><td bgcolor="#240B3B"></td><td bgcolor="#2F0B3A"></td><td bgcolor="#3B0B39"></td><td bgcolor="#3B0B2E"></td><td bgcolor="#3B0B24"></td><td bgcolor="#3B0B17"></td><td bgcolor="#1C1C1C"></td></tr>
+                    <tr><td bgcolor="#2A0A0A"></td><td bgcolor="#2A120A"></td><td bgcolor="#2A1B0A"></td><td bgcolor="#29220A"></td><td bgcolor="#292A0A"></td><td bgcolor="#222A0A"></td><td bgcolor="#1B2A0A"></td><td bgcolor="#122A0A"></td><td bgcolor="#0A2A0A"></td><td bgcolor="#0A2A12"></td><td bgcolor="#0A2A1B"></td><td bgcolor="#0A2A22"></td><td bgcolor="#0A2A29"></td><td bgcolor="#0A2229"></td><td bgcolor="#0A1B2A"></td><td bgcolor="#0A122A"></td><td bgcolor="#0A0A2A"></td><td bgcolor="#120A2A"></td><td bgcolor="#1B0A2A"></td><td bgcolor="#220A29"></td><td bgcolor="#2A0A29"></td><td bgcolor="#2A0A22"></td><td bgcolor="#2A0A1B"></td><td bgcolor="#2A0A12"></td><td bgcolor="#151515"></td></tr>
+                    <tr><td bgcolor="#190707"></td><td bgcolor="#190B07"></td><td bgcolor="#191007"></td><td bgcolor="#181407"></td><td bgcolor="#181907"></td><td bgcolor="#141907"></td><td bgcolor="#101907"></td><td bgcolor="#0B1907"></td><td bgcolor="#071907"></td><td bgcolor="#07190B"></td><td bgcolor="#071910"></td><td bgcolor="#071914"></td><td bgcolor="#071918"></td><td bgcolor="#071418"></td><td bgcolor="#071019"></td><td bgcolor="#070B19"></td><td bgcolor="#070719"></td><td bgcolor="#0B0719"></td><td bgcolor="#100719"></td><td bgcolor="#140718"></td><td bgcolor="#190718"></td><td bgcolor="#190714"></td><td bgcolor="#190710"></td><td bgcolor="#19070B"></td><td bgcolor="#000000"></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div style="float:left;width:200px;">
+                <div style="float:left;width:200px;">
+                    Cell Background color
+                </div>
+                <div style="float:left;width:200px;">
+                    <input id="tblCellBrdBGColorTran" type="checkbox" onchange="Table_CellBGTransparent_OnChange()"/> Transparent
+                </div>
+
+                <div id="tblCellBGColor_div" style="float:left;width:200px;" onclick="document.getElementById('tblCellBGColorChart').style.visibility='visible';">
+                    <div id="tblCellBGColor" style="background-color:white;float:left;width:100px;height: 20px;"></div><div style="float:left;width:30px;height: 20px;">BGColor</div>
+                </div>
+
+                <table id="tblCellBGColorChart" style="position:absolute; width: 200px;height:200px; visibility: hidden;">
+                    <tbody>
+                    <tr><td bgcolor="#FBEFEF"></td><td bgcolor="#FBF2EF"></td><td bgcolor="#FBF5EF"></td><td bgcolor="#FBF8EF"></td><td bgcolor="#FBFBEF"></td><td bgcolor="#F8FBEF"></td><td bgcolor="#F5FBEF"></td><td bgcolor="#F2FBEF"></td><td bgcolor="#EFFBEF"></td><td bgcolor="#EFFBF2"></td><td bgcolor="#EFFBF5"></td><td bgcolor="#EFFBF8"></td><td bgcolor="#EFFBFB"></td><td bgcolor="#EFF8FB"></td><td bgcolor="#EFF5FB"></td><td bgcolor="#EFF2FB"></td><td bgcolor="#EFEFFB"></td><td bgcolor="#F2EFFB"></td><td bgcolor="#F5EFFB"></td><td bgcolor="#F8EFFB"></td><td bgcolor="#FBEFFB"></td><td bgcolor="#FBEFF8"></td><td bgcolor="#FBEFF5"></td><td bgcolor="#FBEFF2"></td><td bgcolor="#FFFFFF"></td></tr>
+                    <tr><td bgcolor="#F8E0E0"></td><td bgcolor="#F8E6E0"></td><td bgcolor="#F8ECE0"></td><td bgcolor="#F7F2E0"></td><td bgcolor="#F7F8E0"></td><td bgcolor="#F1F8E0"></td><td bgcolor="#ECF8E0"></td><td bgcolor="#E6F8E0"></td><td bgcolor="#E0F8E0"></td><td bgcolor="#E0F8E6"></td><td bgcolor="#E0F8EC"></td><td bgcolor="#E0F8F1"></td><td bgcolor="#E0F8F7"></td><td bgcolor="#E0F2F7"></td><td bgcolor="#E0ECF8"></td><td bgcolor="#E0E6F8"></td><td bgcolor="#E0E0F8"></td><td bgcolor="#E6E0F8"></td><td bgcolor="#ECE0F8"></td><td bgcolor="#F2E0F7"></td><td bgcolor="#F8E0F7"></td><td bgcolor="#F8E0F1"></td><td bgcolor="#F8E0EC"></td><td bgcolor="#F8E0E6"></td><td bgcolor="#FAFAFA"></td></tr>
+                    <tr><td bgcolor="#F6CECE"></td><td bgcolor="#F6D8CE"></td><td bgcolor="#F6E3CE"></td><td bgcolor="#F5ECCE"></td><td bgcolor="#F5F6CE"></td><td bgcolor="#ECF6CE"></td><td bgcolor="#E3F6CE"></td><td bgcolor="#D8F6CE"></td><td bgcolor="#CEF6CE"></td><td bgcolor="#CEF6D8"></td><td bgcolor="#CEF6E3"></td><td bgcolor="#CEF6EC"></td><td bgcolor="#CEF6F5"></td><td bgcolor="#CEECF5"></td><td bgcolor="#CEE3F6"></td><td bgcolor="#CED8F6"></td><td bgcolor="#CECEF6"></td><td bgcolor="#D8CEF6"></td><td bgcolor="#E3CEF6"></td><td bgcolor="#ECCEF5"></td><td bgcolor="#F6CEF5"></td><td bgcolor="#F6CEEC"></td><td bgcolor="#F6CEE3"></td><td bgcolor="#F6CED8"></td><td bgcolor="#F2F2F2"></td></tr>
+                    <tr><td bgcolor="#F5A9A9"></td><td bgcolor="#F5BCA9"></td><td bgcolor="#F5D0A9"></td><td bgcolor="#F3E2A9"></td><td bgcolor="#F2F5A9"></td><td bgcolor="#E1F5A9"></td><td bgcolor="#D0F5A9"></td><td bgcolor="#BCF5A9"></td><td bgcolor="#A9F5A9"></td><td bgcolor="#A9F5BC"></td><td bgcolor="#A9F5D0"></td><td bgcolor="#A9F5E1"></td><td bgcolor="#A9F5F2"></td><td bgcolor="#A9E2F3"></td><td bgcolor="#A9D0F5"></td><td bgcolor="#A9BCF5"></td><td bgcolor="#A9A9F5"></td><td bgcolor="#BCA9F5"></td><td bgcolor="#D0A9F5"></td><td bgcolor="#E2A9F3"></td><td bgcolor="#F5A9F2"></td><td bgcolor="#F5A9E1"></td><td bgcolor="#F5A9D0"></td><td bgcolor="#F5A9BC"></td><td bgcolor="#E6E6E6"></td></tr>
+                    <tr><td bgcolor="#F78181"></td><td bgcolor="#F79F81"></td><td bgcolor="#F7BE81"></td><td bgcolor="#F5DA81"></td><td bgcolor="#F3F781"></td><td bgcolor="#D8F781"></td><td bgcolor="#BEF781"></td><td bgcolor="#9FF781"></td><td bgcolor="#81F781"></td><td bgcolor="#81F79F"></td><td bgcolor="#81F7BE"></td><td bgcolor="#81F7D8"></td><td bgcolor="#81F7F3"></td><td bgcolor="#81DAF5"></td><td bgcolor="#81BEF7"></td><td bgcolor="#819FF7"></td><td bgcolor="#8181F7"></td><td bgcolor="#9F81F7"></td><td bgcolor="#BE81F7"></td><td bgcolor="#DA81F5"></td><td bgcolor="#F781F3"></td><td bgcolor="#F781D8"></td><td bgcolor="#F781BE"></td><td bgcolor="#F7819F"></td><td bgcolor="#D8D8D8"></td></tr>
+                    <tr><td bgcolor="#FA5858"></td><td bgcolor="#FA8258"></td><td bgcolor="#FAAC58"></td><td bgcolor="#F7D358"></td><td bgcolor="#F4FA58"></td><td bgcolor="#D0FA58"></td><td bgcolor="#ACFA58"></td><td bgcolor="#82FA58"></td><td bgcolor="#58FA58"></td><td bgcolor="#58FA82"></td><td bgcolor="#58FAAC"></td><td bgcolor="#58FAD0"></td><td bgcolor="#58FAF4"></td><td bgcolor="#58D3F7"></td><td bgcolor="#58ACFA"></td><td bgcolor="#5882FA"></td><td bgcolor="#5858FA"></td><td bgcolor="#8258FA"></td><td bgcolor="#AC58FA"></td><td bgcolor="#D358F7"></td><td bgcolor="#FA58F4"></td><td bgcolor="#FA58D0"></td><td bgcolor="#FA58AC"></td><td bgcolor="#FA5882"></td><td bgcolor="#BDBDBD"></td></tr>
+                    <tr><td bgcolor="#FE2E2E"></td><td bgcolor="#FE642E"></td><td bgcolor="#FE9A2E"></td><td bgcolor="#FACC2E"></td><td bgcolor="#F7FE2E"></td><td bgcolor="#C8FE2E"></td><td bgcolor="#9AFE2E"></td><td bgcolor="#64FE2E"></td><td bgcolor="#2EFE2E"></td><td bgcolor="#2EFE64"></td><td bgcolor="#2EFE9A"></td><td bgcolor="#2EFEC8"></td><td bgcolor="#2EFEF7"></td><td bgcolor="#2ECCFA"></td><td bgcolor="#2E9AFE"></td><td bgcolor="#2E64FE"></td><td bgcolor="#2E2EFE"></td><td bgcolor="#642EFE"></td><td bgcolor="#9A2EFE"></td><td bgcolor="#CC2EFA"></td><td bgcolor="#FE2EF7"></td><td bgcolor="#FE2EC8"></td><td bgcolor="#FE2E9A"></td><td bgcolor="#FE2E64"></td><td bgcolor="#A4A4A4"></td></tr>
+                    <tr><td bgcolor="#FF0000"></td><td bgcolor="#FF4000"></td><td bgcolor="#FF8000"></td><td bgcolor="#FFBF00"></td><td bgcolor="#FFFF00"></td><td bgcolor="#BFFF00"></td><td bgcolor="#80FF00"></td><td bgcolor="#40FF00"></td><td bgcolor="#00FF00"></td><td bgcolor="#00FF40"></td><td bgcolor="#00FF80"></td><td bgcolor="#00FFBF"></td><td bgcolor="#00FFFF"></td><td bgcolor="#00BFFF"></td><td bgcolor="#0080FF"></td><td bgcolor="#0040FF"></td><td bgcolor="#0000FF"></td><td bgcolor="#4000FF"></td><td bgcolor="#8000FF"></td><td bgcolor="#BF00FF"></td><td bgcolor="#FF00FF"></td><td bgcolor="#FF00BF"></td><td bgcolor="#FF0080"></td><td bgcolor="#FF0040"></td><td bgcolor="#848484"></td></tr>
+                    <tr><td bgcolor="#DF0101"></td><td bgcolor="#DF3A01"></td><td bgcolor="#DF7401"></td><td bgcolor="#DBA901"></td><td bgcolor="#D7DF01"></td><td bgcolor="#A5DF00"></td><td bgcolor="#74DF00"></td><td bgcolor="#3ADF00"></td><td bgcolor="#01DF01"></td><td bgcolor="#01DF3A"></td><td bgcolor="#01DF74"></td><td bgcolor="#01DFA5"></td><td bgcolor="#01DFD7"></td><td bgcolor="#01A9DB"></td><td bgcolor="#0174DF"></td><td bgcolor="#013ADF"></td><td bgcolor="#0101DF"></td><td bgcolor="#3A01DF"></td><td bgcolor="#7401DF"></td><td bgcolor="#A901DB"></td><td bgcolor="#DF01D7"></td><td bgcolor="#DF01A5"></td><td bgcolor="#DF0174"></td><td bgcolor="#DF013A"></td><td bgcolor="#6E6E6E"></td></tr>
+                    <tr><td bgcolor="#B40404"></td><td bgcolor="#B43104"></td><td bgcolor="#B45F04"></td><td bgcolor="#B18904"></td><td bgcolor="#AEB404"></td><td bgcolor="#86B404"></td><td bgcolor="#5FB404"></td><td bgcolor="#31B404"></td><td bgcolor="#04B404"></td><td bgcolor="#04B431"></td><td bgcolor="#04B45F"></td><td bgcolor="#04B486"></td><td bgcolor="#04B4AE"></td><td bgcolor="#0489B1"></td><td bgcolor="#045FB4"></td><td bgcolor="#0431B4"></td><td bgcolor="#0404B4"></td><td bgcolor="#3104B4"></td><td bgcolor="#5F04B4"></td><td bgcolor="#8904B1"></td><td bgcolor="#B404AE"></td><td bgcolor="#B40486"></td><td bgcolor="#B4045F"></td><td bgcolor="#B40431"></td><td bgcolor="#585858"></td></tr>
+                    <tr><td bgcolor="#8A0808"></td><td bgcolor="#8A2908"></td><td bgcolor="#8A4B08"></td><td bgcolor="#886A08"></td><td bgcolor="#868A08"></td><td bgcolor="#688A08"></td><td bgcolor="#4B8A08"></td><td bgcolor="#298A08"></td><td bgcolor="#088A08"></td><td bgcolor="#088A29"></td><td bgcolor="#088A4B"></td><td bgcolor="#088A68"></td><td bgcolor="#088A85"></td><td bgcolor="#086A87"></td><td bgcolor="#084B8A"></td><td bgcolor="#08298A"></td><td bgcolor="#08088A"></td><td bgcolor="#29088A"></td><td bgcolor="#4B088A"></td><td bgcolor="#6A0888"></td><td bgcolor="#8A0886"></td><td bgcolor="#8A0868"></td><td bgcolor="#8A084B"></td><td bgcolor="#8A0829"></td><td bgcolor="#424242"></td></tr>
+                    <tr><td bgcolor="#610B0B"></td><td bgcolor="#61210B"></td><td bgcolor="#61380B"></td><td bgcolor="#5F4C0B"></td><td bgcolor="#5E610B"></td><td bgcolor="#4B610B"></td><td bgcolor="#38610B"></td><td bgcolor="#21610B"></td><td bgcolor="#0B610B"></td><td bgcolor="#0B6121"></td><td bgcolor="#0B6138"></td><td bgcolor="#0B614B"></td><td bgcolor="#0B615E"></td><td bgcolor="#0B4C5F"></td><td bgcolor="#0B3861"></td><td bgcolor="#0B2161"></td><td bgcolor="#0B0B61"></td><td bgcolor="#210B61"></td><td bgcolor="#380B61"></td><td bgcolor="#4C0B5F"></td><td bgcolor="#610B5E"></td><td bgcolor="#610B4B"></td><td bgcolor="#610B38"></td><td bgcolor="#610B21"></td><td bgcolor="#2E2E2E"></td></tr>
+                    <tr><td bgcolor="#3B0B0B"></td><td bgcolor="#3B170B"></td><td bgcolor="#3B240B"></td><td bgcolor="#3A2F0B"></td><td bgcolor="#393B0B"></td><td bgcolor="#2E3B0B"></td><td bgcolor="#243B0B"></td><td bgcolor="#173B0B"></td><td bgcolor="#0B3B0B"></td><td bgcolor="#0B3B17"></td><td bgcolor="#0B3B24"></td><td bgcolor="#0B3B2E"></td><td bgcolor="#0B3B39"></td><td bgcolor="#0B2F3A"></td><td bgcolor="#0B243B"></td><td bgcolor="#0B173B"></td><td bgcolor="#0B0B3B"></td><td bgcolor="#170B3B"></td><td bgcolor="#240B3B"></td><td bgcolor="#2F0B3A"></td><td bgcolor="#3B0B39"></td><td bgcolor="#3B0B2E"></td><td bgcolor="#3B0B24"></td><td bgcolor="#3B0B17"></td><td bgcolor="#1C1C1C"></td></tr>
+                    <tr><td bgcolor="#2A0A0A"></td><td bgcolor="#2A120A"></td><td bgcolor="#2A1B0A"></td><td bgcolor="#29220A"></td><td bgcolor="#292A0A"></td><td bgcolor="#222A0A"></td><td bgcolor="#1B2A0A"></td><td bgcolor="#122A0A"></td><td bgcolor="#0A2A0A"></td><td bgcolor="#0A2A12"></td><td bgcolor="#0A2A1B"></td><td bgcolor="#0A2A22"></td><td bgcolor="#0A2A29"></td><td bgcolor="#0A2229"></td><td bgcolor="#0A1B2A"></td><td bgcolor="#0A122A"></td><td bgcolor="#0A0A2A"></td><td bgcolor="#120A2A"></td><td bgcolor="#1B0A2A"></td><td bgcolor="#220A29"></td><td bgcolor="#2A0A29"></td><td bgcolor="#2A0A22"></td><td bgcolor="#2A0A1B"></td><td bgcolor="#2A0A12"></td><td bgcolor="#151515"></td></tr>
+                    <tr><td bgcolor="#190707"></td><td bgcolor="#190B07"></td><td bgcolor="#191007"></td><td bgcolor="#181407"></td><td bgcolor="#181907"></td><td bgcolor="#141907"></td><td bgcolor="#101907"></td><td bgcolor="#0B1907"></td><td bgcolor="#071907"></td><td bgcolor="#07190B"></td><td bgcolor="#071910"></td><td bgcolor="#071914"></td><td bgcolor="#071918"></td><td bgcolor="#071418"></td><td bgcolor="#071019"></td><td bgcolor="#070B19"></td><td bgcolor="#070719"></td><td bgcolor="#0B0719"></td><td bgcolor="#100719"></td><td bgcolor="#140718"></td><td bgcolor="#190718"></td><td bgcolor="#190714"></td><td bgcolor="#190710"></td><td bgcolor="#19070B"></td><td bgcolor="#000000"></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div style="float:left;border-top: 2px ridge silver;padding-left:5px;width:400px">
+            <input id="tblApply" type="button" value="Apply"/>
+        </div>
+        <div style="float:left;border-top: 2px ridge silver;padding-left:5px;width:400px">
+            <div id="tblMerge_div" style="float:left;width:20px;height:20px" onmousemove="document.getElementById('tblMerge_div').style.backgroundColor = 'RGB(249, 201, 16)';" onmouseout="document.getElementById('tblMerge_div').style.backgroundColor = 'RGB(255, 255, 255)' ">
+                <img id="tblMerge" src="menu/img/Table_Merge.png" title="Merge"/>
+            </div>
+            <div id="tblSplit_div" style="float:left;width:20px;height:20px" onmousemove="document.getElementById('tblSplit_div').style.backgroundColor = 'RGB(249, 201, 16)';" onmouseout="document.getElementById('tblSplit_div').style.backgroundColor = 'RGB(255, 255, 255)' ">
+                <img id="tblSplit" src="menu/img/Table_Split.png" title="Split"/>
+            </div>
+            <div id="tblRowDelete_div" style="float:left;width:20px;height:20px" onmousemove="document.getElementById('tblRowDelete_div').style.backgroundColor = 'RGB(249, 201, 16)';" onmouseout="document.getElementById('tblRowDelete_div').style.backgroundColor = 'RGB(255, 255, 255)' ">
+                <img id="tblRowDelete" src="menu/img/Table_RowD.png" title="Delete row"/>
+            </div>
+            <div id="tblColDelete_div" style="float:left;width:20px;height:20px" onmousemove="document.getElementById('tblColDelete_div').style.backgroundColor = 'RGB(249, 201, 16)';" onmouseout="document.getElementById('tblColDelete_div').style.backgroundColor = 'RGB(255, 255, 255)' ">
+                <img id="tblColDelete" src="menu/img/Table_ColD.png" title="Delete column"/>
+            </div>
+            <div id="tblRowAdd_B_div" style="float:left;width:20px;height:20px" onmousemove="document.getElementById('tblRowAdd_B_div').style.backgroundColor = 'RGB(249, 201, 16)';" onmouseout="document.getElementById('tblRowAdd_B_div').style.backgroundColor = 'RGB(255, 255, 255)' ">
+                <img id="tblRowAdd_B" src="menu/img/Table_RowB.png" title="Add row before"/>
+            </div>
+            <div id="tblRowAdd_A_div" style="float:left;width:20px;height:20px" onmousemove="document.getElementById('tblRowAdd_A_div').style.backgroundColor = 'RGB(249, 201, 16)';" onmouseout="document.getElementById('tblRowAdd_A_div').style.backgroundColor = 'RGB(255, 255, 255)' ">
+                <img id="tblRowAdd_A" src="menu/img/Table_RowA.png" title="Add row after"/>
+            </div>
+            <div id="tblColAdd_B_div" style="float:left;width:20px;height:20px" onmousemove="document.getElementById('tblColAdd_B_div').style.backgroundColor = 'RGB(249, 201, 16)';" onmouseout="document.getElementById('tblColAdd_B_div').style.backgroundColor = 'RGB(255, 255, 255)' ">
+                <img id="tblColAdd_B" src="menu/img/Table_ColB.png" title="Add column before"/>
+            </div>
+            <div id="tblColAdd_A_div" style="float:left;width:20px;height:20px" onmousemove="document.getElementById('tblColAdd_A_div').style.backgroundColor = 'RGB(249, 201, 16)';" onmouseout="document.getElementById('tblColAdd_A_div').style.backgroundColor = 'RGB(255, 255, 255)' ">
+                <img id="tblColAdd_A" src="menu/img/Table_ColA.png" title="Add column after"/>
+            </div>
+            <div id="tblRemove_div" style="float:left;width:20px;height:20px" onmousemove="document.getElementById('tblRemove_div').style.backgroundColor = 'RGB(249, 201, 16)';" onmouseout="document.getElementById('tblRemove_div').style.backgroundColor = 'RGB(255, 255, 255)' ">
+                <img id="tblRemove" src="menu/img/Table_Remove.png" title="Remove table"/>
+            </div>
+        </div>
+        <div style="float:left;border-top: 2px ridge silver;padding-left:5px;width:400px">
+            <div id="tblSelectTable_div" style="float:left;width:20px;height:20px" onmousemove="document.getElementById('tblSelectTable_div').style.backgroundColor = 'RGB(249, 201, 16)';" onmouseout="document.getElementById('tblSelectTable_div').style.backgroundColor = 'RGB(255, 255, 255)' ">
+                <img id="tblSelectTable" src="menu/img/Table_SelectTable.png" title="Select table"/>
+            </div>
+            <div id="tblSelectCell_div" style="float:left;width:20px;height:20px" onmousemove="document.getElementById('tblSelectCell_div').style.backgroundColor = 'RGB(249, 201, 16)';" onmouseout="document.getElementById('tblSelectCell_div').style.backgroundColor = 'RGB(255, 255, 255)' ">
+                <img id="tblSelectCell" src="menu/img/Table_SelectCell.png" title="Select Cell"/>
+            </div>
+            <div id="tblSelectRow_div" style="float:left;width:20px;height:20px" onmousemove="document.getElementById('tblSelectRow_div').style.backgroundColor = 'RGB(249, 201, 16)';" onmouseout="document.getElementById('tblSelectRow_div').style.backgroundColor = 'RGB(255, 255, 255)' ">
+                <img id="tblSelectRow" src="menu/img/Table_SelectRow.png" title="Select row"/>
+            </div>
+            <div id="tblSelectColumn_div" style="float:left;width:20px;height:20px" onmousemove="document.getElementById('tblSelectColumn_div').style.backgroundColor = 'RGB(249, 201, 16)';" onmouseout="document.getElementById('tblSelectColumn_div').style.backgroundColor = 'RGB(255, 255, 255)' ">
+                <img id="tblSelectColumn" src="menu/img/Table_SelectCol.png" title="Select column"/>
+            </div>
+        </div>
+    </div>
+	
+	<div id="hafProp" style="display:none;width:210px;height:150px;background-color:#fff;top:87px;left:25px;z-index:100;position:absolute;padding-top: 5px;border: 4px ridge silver;">
+		<b>HEADER & FOOTERS</b>
+		<div>
+			Position
+			<br/>
+			<input id="hafHF" style="width:50px;"/> <span id="hafType">From Top/Bottom</span>
+		</div>
+		<div style="border-top: 2px ridge silver;">
+			Options
+			<br/>
+			<input id="hafFP" type="checkbox"/> Different first page
+			<br/>
+			<input id="hafOE" type="checkbox"/> Different Odd and Even Pages
+		</div>
+		
+	</div>
+	
+	
+	</body>
+</html>

@@ -1,0 +1,3260 @@
+var g_dDpiX = 96.0;
+var g_dDpiY = 96.0;
+
+var g_dKoef_mm_to_pix = g_dDpiX / 25.4;
+var g_dKoef_pix_to_mm = 25.4 / g_dDpiX;
+
+var g_bIsMobile =  /android|avantgo|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od|ad)|iris|kindle|lge |maemo|midp|mmp|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(navigator.userAgent || navigator.vendor || window.opera);
+var g_bIsMouseUpLockedSend = false;
+
+var Page_Width     = 297;
+var Page_Height    = 210;
+
+var X_Left_Margin   = 30;  // 3   cm
+var X_Right_Margin  = 15;  // 1.5 cm
+var Y_Bottom_Margin = 20;  // 2   cm
+var Y_Top_Margin    = 20;  // 2   cm
+
+var Y_Default_Header = 12.5; // 1.25 cm
+var Y_Default_Footer = 12.5; // 1.25 cm
+
+var X_Left_Field   = X_Left_Margin;
+var X_Right_Field  = Page_Width  - X_Right_Margin;
+var Y_Bottom_Field = Page_Height - Y_Bottom_Margin;
+var Y_Top_Field    = Y_Top_Margin;
+
+var docpostype_Content     = 0x00;
+var docpostype_FlowObjects = 0x01;
+var docpostype_HdrFtr      = 0x02;
+
+var selectionflag_Common        = 0x00;
+var selectionflag_Numbering     = 0x01;
+var selectionflag_DrawingObject = 0x002;
+
+var orientation_Portrait  = 0x00;
+var orientation_Landscape = 0x01;
+
+function CEditorPage(api)
+{
+    // ------------------------------------------------------------------
+    this.Name = "";
+    this.IsSupportNotes = false;
+
+    this.X = 0;
+    this.Y = 0;
+    this.Width      = 10;
+    this.Height     = 10;
+
+    // body
+    this.m_oBody            = null;
+
+    // thumbnails
+    this.m_oThumbnailsContainer = null;
+    this.m_oThumbnailsBack      = null;
+    this.m_oThumbnails          = null;
+    this.m_oThumbnails_scroll   = null;
+
+    // notes
+    this.m_oNotesContainer      = null;
+    this.m_oNotes               = null;
+    this.m_oNotes_scroll        = null;
+
+    // main
+    this.m_oMainContent         = null;
+    // <-
+    // horizontal scroll
+    this.m_oScrollHor           = null;
+
+    // right panel (vertical scroll & buttons (page & rulersEnabled))
+    this.m_oPanelRight                  = null;
+    this.m_oPanelRight_buttonRulers     = null;
+    this.m_oPanelRight_vertScroll       = null;
+    this.m_oPanelRight_buttonPrevPage   = null;
+    this.m_oPanelRight_buttonNextPage   = null;
+
+    // vertical ruler (left panel)
+    this.m_oLeftRuler                   = null;
+    this.m_oLeftRuler_buttonsTabs       = null;
+    this.m_oLeftRuler_vertRuler         = null;
+
+    // horizontal ruler (top panel)
+    this.m_oTopRuler                    = null;
+    this.m_oTopRuler_horRuler           = null;
+
+    this.ScrollWidthPx      = 16;
+
+    // main view
+    this.m_oMainView        = null;
+    this.m_oEditor          = null;
+    this.m_oOverlay         = null;
+    this.m_oOverlayApi      = new COverlay();
+    this.m_oOverlayApi.m_bIsAlwaysUpdateOverlay = true;
+    // ->
+    // ------------------------------------------------------------------
+
+    // scrolls api
+    this.m_oScrollHor_      = null;
+    this.m_oScrollVer_      = null;
+    this.m_oScrollThumb_    = null;
+    this.m_oScrollNotes_    = null;
+
+    this.m_oScrollHorApi    = null;
+    this.m_oScrollVerApi    = null;
+    this.m_oScrollThumbApi  = null;
+    this.m_oScrollNotesApi  = null;
+
+    // properties
+    this.m_bIsHorScrollVisible = false;
+    this.m_bIsCheckHeedHorScrollRepeat = false;
+    this.m_bIsRuler         = false;
+
+    this.m_nZoomValue       = 100;
+    this.zoom_values = [50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200];
+    this.m_nZoomType = 2; // 0 - custom, 1 - fitToWodth, 2 - fitToPage
+
+    this.m_oBoundsController = new CBoundsController();
+    this.m_nTabsType        = 0;
+
+    this.m_dScrollY         = 0;
+    this.m_dScrollX         = 0;
+    this.m_dScrollY_max     = 1;
+    this.m_dScrollX_max     = 1;
+    this.m_bIsRePaintOnScroll = true;
+
+    this.m_dDocumentWidth   = 0;
+    this.m_dDocumentHeight  = 0;
+    this.m_dDocumentPageWidth = 0;
+    this.m_dDocumentPageHeight = 0;
+
+    this.m_bIsScroll        = false;
+    this.m_nPaintTimerId    = -1;
+
+    this.m_oHorRuler        = new CHorRuler();
+    this.m_oHorRuler.IsCanMoveMargins = false;
+    this.m_oHorRuler.IsCanMoveAnyMarkers = false;
+    this.m_oHorRuler.IsDrawAnyMarkers = false;
+
+    this.m_oVerRuler        = new CVerRuler();
+
+    this.m_oDrawingDocument = new CDrawingDocument();
+    this.m_oLogicDocument   = null;
+
+    this.m_oDrawingDocument.m_oWordControl = this;
+    this.m_oDrawingDocument.m_oLogicDocument = this.m_oLogicDocument;
+
+    this.m_bIsUpdateHorRuler    = false;
+    this.m_bIsUpdateVerRuler    = false;
+    this.m_bIsUpdateTargetNoAttack = false;
+
+    this.arrayEventHandlers     = new Array();
+
+    this.m_oTimerScrollSelect   = -1;
+    this.IsFocus = true;
+    this.m_bIsMouseLock = false;
+
+    this.m_oHorRuler.m_oWordControl = this;
+    this.m_oVerRuler.m_oWordControl = this;
+
+    this.Thumbnails = new CThumbnailsManager();
+    this.SlideDrawer = new CSlideDrawer();
+    this.MainScrollsEnabledFlag = 0;
+
+    this.bIsUseKeyPress = true;
+    this.bIsEventPaste = false;
+
+    // сплиттеры (для табнейлов и для заметок)
+    this.Splitter1Pos = 0;
+    this.Splitter1PosMin = 0;
+    this.Splitter1PosMax = 0;
+
+    this.Splitter2Pos = 0;
+    this.Splitter2PosMin = 0;
+    this.Splitter2PosMax = 0;
+
+    this.SplitterDiv = null;
+    this.SplitterType = 0;
+
+    this.OldSplitter1Pos = 0;
+
+    // ----
+    this.OldDocumentWidth = 0;
+    this.OldDocumentHeight = 0;
+
+    // axis Y
+    this.SlideScrollMIN = 0;
+    this.SlideScrollMAX = 0;
+
+    // поддерживает ли браузер нецелые пикселы -------------------------------
+    this.bIsDoublePx = true;
+    var oTestSpan = document.createElement("span");
+    oTestSpan.setAttribute("style", "font-size:8pt");
+    document.body.appendChild( oTestSpan );
+    var defaultView = oTestSpan.ownerDocument.defaultView;
+    var computedStyle = defaultView.getComputedStyle( oTestSpan, null );
+    if(null != computedStyle)
+    {
+        var fontSize = computedStyle.getPropertyValue( "font-size" );
+        if(-1 != fontSize.indexOf("px") && parseFloat(fontSize) == parseInt(fontSize))
+            this.bIsDoublePx = false;
+    }
+    document.body.removeChild( oTestSpan );
+
+    // -----------------------------------------------------------------------
+
+    this.m_nTimerScrollInterval = 40;
+    this.m_nCurrentTimeClearCache = 0;
+
+    this.StartVerticalScroll = false;
+    this.VerticalScrollOnMouseUp = { SlideNum : 0, ScrollY : 0, ScrollY_max : 0};
+    this.IsGoToPageMAXPosition = false;
+
+    this.MasterLayouts = null; // мастер, от которого посылались в меню последние шаблоны
+
+    // demonstrationMode
+    this.DemonstrationMode = false;
+    this.DemonstrationDiv = null;
+    this.DemonstrationCanvas = null;
+    this.DemonstrationSlideNum = -1;
+    this.DemonstrationDivEndPresentation = null;
+    this.PresentationPlayTimerId = -1;
+    this.DemonstrationEndShowMessage = "";
+    this.DefaultSlideDuration = 30000;
+
+    // ввод текста через дивку (привет китайцам)
+    this.TextBoxInputMode = false;
+    this.TextBoxInput = null;
+    this.TextBoxInputFocus = false;
+    this.TextBoxChangedValueEvent = true;
+    this.TextBoxMaxWidth = 20;
+    this.TextBoxMaxHeight = 20;
+
+    this.IsEnabledRulerMarkers = false;
+
+    this.IsUpdateOverlayOnlyEnd = false;
+    this.IsUpdateOverlayOnEndCheck = false;
+
+    this.m_oApi = api;
+    var oThis = this;
+
+    this.MainScrollLock = function()
+    {
+        this.MainScrollsEnabledFlag++;
+    }
+    this.MainScrollUnLock = function()
+    {
+        this.MainScrollsEnabledFlag--;
+        if (this.MainScrollsEnabledFlag < 0)
+            this.MainScrollsEnabledFlag = 0;
+    }
+
+    this.checkBodySize = function()
+    {
+        var off = jQuery("#" + this.Name).offset();
+        this.X = off.left;
+        this.Y = off.top;
+
+        var el = document.getElementById(this.Name);
+
+        if (this.Width != el.offsetWidth || this.Height != el.offsetHeight)
+        {
+            this.Width = el.offsetWidth;
+            this.Height = el.offsetHeight;
+            return true;
+        }
+        return false;
+    }
+
+    this.Init = function()
+    {
+        this.m_oBody = CreateControlContainer(this.Name);
+        this.m_oBody.HtmlElement.style.backgroundColor = "#D3D3D3";
+
+        this.Splitter1Pos = 70;
+        this.Splitter2Pos = (this.IsSupportNotes === true) ? 20 : 0;
+        this.OldSplitter1Pos = this.Splitter1Pos;
+
+        this.Splitter1PosMin = 20;
+        this.Splitter1PosMax = 80;
+        this.Splitter2PosMin = 0;
+        this.Splitter2PosMax = 100;
+
+        var ScrollWidthMm = this.ScrollWidthPx * g_dKoef_pix_to_mm;
+
+        this.Thumbnails.m_oWordControl = this;
+
+        // thumbnails -----
+        this.m_oThumbnailsContainer = CreateControlContainer("id_panel_thumbnails");
+        this.m_oThumbnailsContainer.Bounds.SetParams(0, 0, this.Splitter1Pos, 1000, false, false, true, false, this.Splitter1Pos, -1);
+        this.m_oThumbnailsContainer.Anchor = (g_anchor_left | g_anchor_top | g_anchor_bottom);
+        this.m_oBody.AddControl(this.m_oThumbnailsContainer);
+
+        this.m_oThumbnailsBack = CreateControl("id_thumbnails_background");
+        this.m_oThumbnailsBack.Bounds.SetParams(0,0,ScrollWidthMm,1000,false,false,true,false,-1,-1);
+        this.m_oThumbnailsBack.Anchor = (g_anchor_left | g_anchor_top | g_anchor_right |g_anchor_bottom);
+        this.m_oThumbnailsContainer.AddControl(this.m_oThumbnailsBack);
+
+        this.m_oThumbnails = CreateControl("id_thumbnails");
+        this.m_oThumbnails.Bounds.SetParams(0,0,ScrollWidthMm,1000,false,false,true,false,-1,-1);
+        this.m_oThumbnails.Anchor = (g_anchor_left | g_anchor_top | g_anchor_right |g_anchor_bottom);
+        this.m_oThumbnailsContainer.AddControl(this.m_oThumbnails);
+
+        this.m_oThumbnails_scroll = CreateControl("id_vertical_scroll_thmbnl");
+        this.m_oThumbnails_scroll.Bounds.SetParams(0,0,1000,1000,false,false,false,false,ScrollWidthMm,-1);
+        this.m_oThumbnails_scroll.Anchor = (g_anchor_top | g_anchor_right |g_anchor_bottom);
+        this.m_oThumbnailsContainer.AddControl(this.m_oThumbnails_scroll);
+        // ----------------
+
+        // main content -------------------------------------------------------------
+        this.m_oMainContent = CreateControlContainer("id_main");
+        this.m_oMainContent.Bounds.SetParams(this.Splitter1Pos + 1.5,0,g_dKoef_pix_to_mm,this.Splitter2Pos + 1.5,true,false,true,true,-1,-1);
+        this.m_oMainContent.Anchor = (g_anchor_left | g_anchor_top | g_anchor_right | g_anchor_bottom);
+        this.m_oBody.AddControl(this.m_oMainContent);
+
+        // panel right --------------------------------------------------------------
+        this.m_oPanelRight = CreateControlContainer("id_panel_right");
+        this.m_oPanelRight.Bounds.SetParams(0,0,1000,0,false,false,false,true,ScrollWidthMm,-1);
+        this.m_oPanelRight.Anchor = (g_anchor_top | g_anchor_right | g_anchor_bottom);
+
+        this.m_oMainContent.AddControl(this.m_oPanelRight);
+
+        this.m_oPanelRight_buttonRulers = CreateControl("id_buttonRulers");
+        this.m_oPanelRight_buttonRulers.Bounds.SetParams(0,0,1000,1000,false,false,false,false,-1,ScrollWidthMm);
+        this.m_oPanelRight_buttonRulers.Anchor = (g_anchor_left | g_anchor_top | g_anchor_right);
+        this.m_oPanelRight.AddControl(this.m_oPanelRight_buttonRulers);
+
+        this.m_oPanelRight_buttonNextPage = CreateControl("id_buttonNextPage");
+        this.m_oPanelRight_buttonNextPage.Bounds.SetParams(0,0,1000,1000,false,false,false,false,-1,ScrollWidthMm);
+        this.m_oPanelRight_buttonNextPage.Anchor = (g_anchor_left | g_anchor_bottom | g_anchor_right);
+        this.m_oPanelRight.AddControl(this.m_oPanelRight_buttonNextPage);
+
+        this.m_oPanelRight_buttonPrevPage = CreateControl("id_buttonPrevPage");
+        this.m_oPanelRight_buttonPrevPage.Bounds.SetParams(0,0,1000,ScrollWidthMm,false,false,false,true,-1,ScrollWidthMm);
+        this.m_oPanelRight_buttonPrevPage.Anchor = (g_anchor_left | g_anchor_bottom | g_anchor_right);
+        this.m_oPanelRight.AddControl(this.m_oPanelRight_buttonPrevPage);
+
+        this.m_oPanelRight_vertScroll = CreateControl("id_vertical_scroll");
+        this.m_oPanelRight_vertScroll.Bounds.SetParams(0,ScrollWidthMm,1000,2*ScrollWidthMm,false,true,false,true,-1,-1);
+        this.m_oPanelRight_vertScroll.Anchor = (g_anchor_left | g_anchor_top | g_anchor_right | g_anchor_bottom);
+        this.m_oPanelRight.AddControl(this.m_oPanelRight_vertScroll);
+        // --------------------------------------------------------------------------
+
+        // --- left ---
+        this.m_oLeftRuler = CreateControlContainer("id_panel_left");
+        this.m_oLeftRuler.Bounds.SetParams(0,0,1000,1000,false,false,false,false,5,-1);
+        this.m_oLeftRuler.Anchor = (g_anchor_left | g_anchor_top | g_anchor_bottom);
+        this.m_oMainContent.AddControl(this.m_oLeftRuler);
+
+        this.m_oLeftRuler_buttonsTabs = CreateControl("id_buttonTabs");
+        this.m_oLeftRuler_buttonsTabs.Bounds.SetParams(0,0.8,1000,1000,false,true,false,false,-1,5);
+        this.m_oLeftRuler_buttonsTabs.Anchor = (g_anchor_left | g_anchor_top | g_anchor_right);
+        this.m_oLeftRuler.AddControl(this.m_oLeftRuler_buttonsTabs);
+
+        this.m_oLeftRuler_vertRuler = CreateControl("id_vert_ruler");
+        this.m_oLeftRuler_vertRuler.Bounds.SetParams(0,7,1000,1000,false,true,false,false,-1,-1);
+        this.m_oLeftRuler_vertRuler.Anchor = (g_anchor_left | g_anchor_right | g_anchor_top | g_anchor_bottom);
+        this.m_oLeftRuler.AddControl(this.m_oLeftRuler_vertRuler);
+        // ------------
+
+        // --- top ----
+        this.m_oTopRuler = CreateControlContainer("id_panel_top");
+        this.m_oTopRuler.Bounds.SetParams(5,0,1000,1000,true,false,false,false,-1,7);
+        this.m_oTopRuler.Anchor = (g_anchor_left | g_anchor_top | g_anchor_right);
+        this.m_oMainContent.AddControl(this.m_oTopRuler);
+
+        this.m_oTopRuler_horRuler = CreateControl("id_hor_ruler");
+        this.m_oTopRuler_horRuler.Bounds.SetParams(0,0,1000,1000,false,false,false,false,-1,-1);
+        this.m_oTopRuler_horRuler.Anchor = (g_anchor_left | g_anchor_right | g_anchor_top | g_anchor_bottom);
+        this.m_oTopRuler.AddControl(this.m_oTopRuler_horRuler);
+        // ------------
+
+        // scroll hor --
+        this.m_oScrollHor = CreateControlContainer("id_horscrollpanel");
+        this.m_oScrollHor.Bounds.SetParams(0,0,ScrollWidthMm,1000,false,false,true,false,-1,ScrollWidthMm);
+        this.m_oScrollHor.Anchor = (g_anchor_left | g_anchor_right | g_anchor_bottom);
+        this.m_oMainContent.AddControl(this.m_oScrollHor);
+        // -------------
+
+        // notes ----
+        this.m_oNotesContainer = CreateControlContainer("id_panel_notes");
+        this.m_oNotesContainer.Bounds.SetParams(this.Splitter1Pos + 1.5, 0, g_dKoef_pix_to_mm, 1000, true, true, true, false, -1, this.Splitter2Pos);
+        this.m_oNotesContainer.Anchor = (g_anchor_left | g_anchor_right | g_anchor_bottom);
+        this.m_oBody.AddControl(this.m_oNotesContainer);
+
+        this.m_oNotes = CreateControl("id_notes");
+        this.m_oNotes.Bounds.SetParams(0,0,ScrollWidthMm,1000,false,false,true,false,-1,-1);
+        this.m_oNotes.Anchor = (g_anchor_left | g_anchor_top | g_anchor_right |g_anchor_bottom);
+        this.m_oNotesContainer.AddControl(this.m_oNotes);
+
+        this.m_oNotes_scroll = CreateControl("id_vertical_scroll_notes");
+        this.m_oNotes_scroll.Bounds.SetParams(0,0,1000,1000,false,false,false,false,ScrollWidthMm,-1);
+        this.m_oNotes_scroll.Anchor = (g_anchor_top | g_anchor_right |g_anchor_bottom);
+        this.m_oNotesContainer.AddControl(this.m_oNotes_scroll);
+        // ----------
+
+        this.m_oMainView = CreateControlContainer("id_main_view");
+        this.m_oMainView.Bounds.SetParams(5,7,5,0,true,true,true,true,-1,-1);
+        this.m_oMainView.Anchor = (g_anchor_left | g_anchor_right | g_anchor_top | g_anchor_bottom);
+        this.m_oMainContent.AddControl(this.m_oMainView);
+
+        this.m_oEditor = CreateControl("id_viewer");
+        this.m_oEditor.Bounds.SetParams(0,0,1000,1000,false,false,false,false,-1,-1);
+        this.m_oEditor.Anchor = (g_anchor_left | g_anchor_top | g_anchor_right |g_anchor_bottom);
+        this.m_oMainView.AddControl(this.m_oEditor);
+
+        this.m_oOverlay = CreateControl("id_viewer_overlay");
+        this.m_oOverlay.Bounds.SetParams(0,0,1000,1000,false,false,false,false,-1,-1);
+        this.m_oOverlay.Anchor = (g_anchor_left | g_anchor_top | g_anchor_right |g_anchor_bottom);
+        this.m_oMainView.AddControl(this.m_oOverlay);
+        // --------------------------------------------------------------------------
+
+        this.m_oDrawingDocument.TargetHtmlElement = document.getElementById('id_target_cursor');
+
+        this.UnShowOverlay();
+        this.m_oOverlayApi.m_oControl = this.m_oOverlay;
+        this.m_oOverlayApi.m_oHtmlPage = this;
+        this.m_oOverlayApi.Clear();
+
+        this.m_oDrawingDocument.AutoShapesTrack = new CAutoshapeTrack();
+        this.m_oDrawingDocument.AutoShapesTrack.init2(this.m_oOverlayApi);
+
+        this.SlideDrawer.m_oWordControl = this;
+
+        this.checkNeedRules();
+        this.initEvents();
+        this.OnResize(true);
+    }
+
+    this.ShowOverlay = function()
+    {
+        this.m_oOverlayApi.Show();
+    }
+    this.UnShowOverlay = function()
+    {
+        this.m_oOverlayApi.UnShow();
+    }
+    this.CheckUnShowOverlay = function()
+    {
+        var drDoc = this.m_oDrawingDocument;
+
+        /*
+        if (!drDoc.m_bIsSearching && !drDoc.m_bIsSelection)
+        {
+            this.UnShowOverlay();
+            return false;
+        }
+        */
+
+        return true;
+    }
+    this.CheckShowOverlay = function()
+    {
+        var drDoc = this.m_oDrawingDocument;
+        if (drDoc.m_bIsSearching || drDoc.m_bIsSelection)
+            this.ShowOverlay();
+    }
+
+    this.initEvents = function()
+    {
+        this.arrayEventHandlers[0] = new button_eventHandlers("","0px 0px","0px -16px", "0px -32px",this.m_oPanelRight_buttonRulers,this.onButtonRulersClick);
+        this.arrayEventHandlers[1] = new button_eventHandlers("","0px 0px","0px -16px", "0px -32px",this.m_oPanelRight_buttonPrevPage,this.onPrevPage);
+        this.arrayEventHandlers[2] = new button_eventHandlers("","0px -48px","0px -64px", "0px -80px",this.m_oPanelRight_buttonNextPage,this.onNextPage);
+
+        this.m_oLeftRuler_buttonsTabs.HtmlElement.onclick = this.onButtonTabsClick;
+
+        this.m_oEditor.HtmlElement.onmousedown  = this.onMouseDown;
+        this.m_oEditor.HtmlElement.onmousemove  = this.onMouseMove;
+        this.m_oEditor.HtmlElement.onmouseup    = this.onMouseUp;
+
+        this.m_oOverlay.HtmlElement.onmousedown  = this.onMouseDown;
+        this.m_oOverlay.HtmlElement.onmousemove  = this.onMouseMove;
+        this.m_oOverlay.HtmlElement.onmouseup    = this.onMouseUp;
+
+        var _cur = document.getElementById('id_target_cursor');
+        _cur.onmousedown  = this.onMouseDown;
+        _cur.onmousemove  = this.onMouseMove;
+        _cur.onmouseup    = this.onMouseUp;
+
+        this.m_oMainContent.HtmlElement.onmousewheel = this.onMouseWhell;
+        if (this.m_oMainContent.HtmlElement.addEventListener)
+            this.m_oMainContent.HtmlElement.addEventListener("DOMMouseScroll", this.onMouseWhell, false);
+
+        this.m_oTopRuler_horRuler.HtmlElement.onmousedown = this.horRulerMouseDown;
+        this.m_oTopRuler_horRuler.HtmlElement.onmouseup   = this.horRulerMouseUp;
+        this.m_oTopRuler_horRuler.HtmlElement.onmousemove = this.horRulerMouseMove;
+
+        this.m_oLeftRuler_vertRuler.HtmlElement.onmousedown = this.verRulerMouseDown;
+        this.m_oLeftRuler_vertRuler.HtmlElement.onmouseup   = this.verRulerMouseUp;
+        this.m_oLeftRuler_vertRuler.HtmlElement.onmousemove = this.verRulerMouseMove;
+
+        window.onkeydown = this.onKeyDown;
+        window.onkeypress = this.onKeyPress;
+        window.onkeyup = this.onKeyUp;
+
+        this.m_oBody.HtmlElement.onmousemove = this.onBodyMouseMove;
+        this.m_oBody.HtmlElement.onmousedown = this.onBodyMouseDown;
+        this.m_oBody.HtmlElement.onmouseup = this.onBodyMouseUp;
+
+        this.initEvents2MobileAdvances();
+
+        this.Thumbnails.initEvents();
+    }
+
+    this.initEvents2MobileAdvances = function()
+    {
+        this.m_oEditor.HtmlElement["ontouchstart"] = function (e){
+            oThis.onMouseDown(e.touches[0]);
+            return false;
+        }
+        this.m_oEditor.HtmlElement["ontouchmove"] = function (e){
+            oThis.onMouseMove(e.touches[0]);
+            return false;
+        }
+        this.m_oEditor.HtmlElement["ontouchend"] = function (e){
+            oThis.onMouseUp(e.changedTouches[0]);
+            return false;
+        }
+
+        this.m_oOverlay.HtmlElement["ontouchstart"] = function (e){
+            oThis.onMouseDown(e.touches[0]);
+            return false;
+        }
+        this.m_oOverlay.HtmlElement["ontouchmove"] = function (e){
+            oThis.onMouseMove(e.touches[0]);
+            return false;
+        }
+        this.m_oOverlay.HtmlElement["ontouchend"] = function (e){
+            oThis.onMouseUp(e.changedTouches[0]);
+            return false;
+        }
+
+        this.m_oTopRuler_horRuler.HtmlElement["ontouchstart"] = function (e){
+            oThis.horRulerMouseDown(e.touches[0]);
+            return false;
+        }
+        this.m_oTopRuler_horRuler.HtmlElement["ontouchmove"] = function (e){
+            oThis.horRulerMouseMove(e.touches[0]);
+            return false;
+        }
+        this.m_oTopRuler_horRuler.HtmlElement["ontouchend"] = function (e){
+            oThis.horRulerMouseUp(e.changedTouches[0]);
+            return false;
+        }
+
+        this.m_oLeftRuler_vertRuler.HtmlElement["ontouchstart"] = function (e){
+            oThis.verRulerMouseDown(e.touches[0]);
+            return false;
+        }
+        this.m_oLeftRuler_vertRuler.HtmlElement["ontouchmove"] = function (e){
+            oThis.verRulerMouseMove(e.touches[0]);
+            return false;
+        }
+        this.m_oLeftRuler_vertRuler.HtmlElement["ontouchend"] = function (e){
+            oThis.verRulerMouseUp(e.changedTouches[0]);
+            return false;
+        }
+    }
+    this.onButtonRulersClick = function()
+    {
+        if (false === oThis.m_oApi.bInit_word_control || true === oThis.m_oApi.isViewMode)
+            return;
+
+        oThis.m_bIsRuler = !oThis.m_bIsRuler;
+        oThis.checkNeedRules();
+        oThis.OnResize(true);
+    }
+
+    this.HideRulers = function()
+    {
+        if (false === oThis.m_oApi.bInit_word_control)
+            return;
+
+        if (oThis.m_bIsRuler === false)
+            return;
+
+        oThis.m_bIsRuler = !oThis.m_bIsRuler;
+        oThis.checkNeedRules();
+        oThis.OnResize(true);
+    }
+
+    this.zoom_FitToWidth = function()
+    {
+        if (null == this.m_oLogicDocument)
+        {
+            this.m_nZoomType = 1;
+            return;
+        }
+
+        var w = this.m_oEditor.HtmlElement.width;
+
+        var Zoom = 100;
+        var _pageWidth = this.m_oLogicDocument.Width * g_dKoef_mm_to_pix;
+        if (0 != _pageWidth)
+        {
+            Zoom = 100 * (w - 2 * this.SlideDrawer.CONST_BORDER) / _pageWidth;
+
+            if (Zoom < 5)
+                Zoom = 5;
+        }
+        var _new_value = Zoom >> 0;
+
+        this.m_nZoomType = 1;
+        if (_new_value != this.m_nZoomValue)
+        {
+            this.m_nZoomValue = _new_value;
+            this.zoom_Fire(1);
+            return true;
+        }
+        return false;
+    }
+    this.zoom_FitToPage = function()
+    {
+        if (null == this.m_oLogicDocument)
+        {
+            this.m_nZoomType = 2;
+            return;
+        }
+
+        var w = this.m_oEditor.HtmlElement.width;
+        var h = (((this.m_oBody.AbsolutePosition.B - this.m_oBody.AbsolutePosition.T) -
+            (this.m_oTopRuler.AbsolutePosition.B - this.m_oTopRuler.AbsolutePosition.T)) * g_dKoef_mm_to_pix) >> 0;
+
+        var _pageWidth = this.m_oLogicDocument.Width * g_dKoef_mm_to_pix;
+        var _pageHeight = this.m_oLogicDocument.Height * g_dKoef_mm_to_pix;
+
+        var _hor_Zoom = 100;
+        if (0 != _pageWidth)
+            _hor_Zoom = (100 * (w - 2 * this.SlideDrawer.CONST_BORDER)) / _pageWidth;
+        var _ver_Zoom = 100;
+        if (0 != _pageHeight)
+            _ver_Zoom = (100 * (h - 2 * this.SlideDrawer.CONST_BORDER)) / _pageHeight;
+
+        var _new_value = (Math.min(_hor_Zoom, _ver_Zoom) - 0.5) >> 0;
+
+        if (_new_value < 5)
+            _new_value = 5;
+
+        this.m_nZoomType = 2;
+        if (_new_value != this.m_nZoomValue)
+        {
+            this.m_nZoomValue = _new_value;
+            this.zoom_Fire(2);
+            return true;
+        }
+        return false;
+    }
+
+    this.zoom_Fire = function(type)
+    {
+        if (false === oThis.m_oApi.bInit_word_control)
+            return;
+
+        this.m_nZoomType = type;
+
+        // нужно проверить режим и сбросить кеш грамотно (ie version)
+        g_fontManager.ClearRasterMemory();
+
+        var oWordControl = oThis;
+
+        oWordControl.m_bIsRePaintOnScroll = false;
+        var dPosition = 0;
+        if (oWordControl.m_dScrollY_max != 0)
+        {
+            dPosition = oWordControl.m_dScrollY / oWordControl.m_dScrollY_max;
+        }
+        oWordControl.CheckZoom();
+        oWordControl.CalculateDocumentSize();
+        var lCurPage = oWordControl.m_oDrawingDocument.SlideCurrent;
+        this.GoToPage(lCurPage);
+
+        if (-1 != lCurPage)
+        {
+            this.CreateBackgroundHorRuler();
+            oWordControl.m_bIsUpdateHorRuler = true;
+            this.CreateBackgroundVerRuler();
+            oWordControl.m_bIsUpdateVerRuler = true;
+        }
+        var lPosition = parseInt(dPosition * oWordControl.m_oScrollVerApi.getMaxScrolledY());
+        oWordControl.m_oScrollVerApi.scrollToY(lPosition);
+
+        oWordControl.m_oApi.sync_zoomChangeCallback(this.m_nZoomValue, type);
+        oWordControl.m_bIsUpdateTargetNoAttack = true;
+        oWordControl.m_bIsRePaintOnScroll = true;
+        oWordControl.OnScroll();
+
+        oWordControl.m_oLogicDocument.Document_UpdateInterfaceState();
+    }
+
+    this.zoom_Out = function()
+    {
+        if (false === oThis.m_oApi.bInit_word_control)
+            return;
+
+        var _zooms = oThis.zoom_values;
+        var _count = _zooms.length;
+
+        var _Zoom = _zooms[0];
+        for (var i = (_count - 1); i >= 0; i--)
+        {
+            if (this.m_nZoomValue > _zooms[i])
+            {
+                _Zoom = _zooms[i];
+                break;
+            }
+        }
+
+        oThis.m_nZoomValue = _Zoom;
+        oThis.zoom_Fire(0);
+    }
+
+    this.zoom_In = function()
+    {
+        if (false === oThis.m_oApi.bInit_word_control)
+            return;
+
+        var _zooms = oThis.zoom_values;
+        var _count = _zooms.length;
+
+        var _Zoom = _zooms[_count - 1];
+        for (var i = 0; i < _count; i++)
+        {
+            if (this.m_nZoomValue < _zooms[i])
+            {
+                _Zoom = _zooms[i];
+                break;
+            }
+        }
+
+        oThis.m_nZoomValue = _Zoom;
+        oThis.zoom_Fire(0);
+    }
+
+    this.DisableRulerMarkers = function()
+    {
+        if (!this.IsEnabledRulerMarkers)
+            return;
+
+        this.IsEnabledRulerMarkers = false;
+        this.m_oHorRuler.RepaintChecker.BlitAttack = true;
+        this.m_oHorRuler.IsCanMoveAnyMarkers = false;
+        this.m_oHorRuler.IsDrawAnyMarkers = false;
+        this.m_oHorRuler.m_dMarginLeft = 0;
+        this.m_oHorRuler.m_dMarginRight = this.m_oLogicDocument.Width;
+
+        this.m_oVerRuler.m_dMarginTop = 0;
+        this.m_oVerRuler.m_dMarginBottom = this.m_oLogicDocument.Width;
+        this.m_oVerRuler.RepaintChecker.BlitAttack = true;
+
+        if (this.m_bIsRuler)
+        {
+            this.UpdateHorRuler();
+            this.UpdateVerRuler();
+        }
+    }
+
+    this.EnableRulerMarkers = function()
+    {
+        if (this.IsEnabledRulerMarkers)
+            return;
+
+        this.IsEnabledRulerMarkers = true;
+        this.m_oHorRuler.RepaintChecker.BlitAttack = true;
+        this.m_oHorRuler.IsCanMoveAnyMarkers = true;
+        this.m_oHorRuler.IsDrawAnyMarkers = true;
+
+        if (this.m_bIsRuler)
+            this.UpdateHorRuler();
+    }
+
+    this.ToSearchResult = function()
+    {
+        var naviG = this.m_oDrawingDocument.CurrentSearchNavi;
+        if (naviG.Page == -1)
+            return;
+
+        var navi = naviG.Place[0];
+        var x = navi.X;
+        var y = navi.Y;
+
+        var rectSize = (navi.H * this.m_nZoomValue * g_dKoef_mm_to_pix / 100);
+        var pos = this.m_oDrawingDocument.ConvertCoordsToCursor2(x, y, navi.PageNum);
+
+        if (true === pos.Error)
+            return;
+
+        var boxX = 0;
+        var boxY = 0;
+        var boxR = this.m_oEditor.HtmlElement.width - 2;
+        var boxB = this.m_oEditor.HtmlElement.height - rectSize;
+
+        var nValueScrollHor = 0;
+        if (pos.X < boxX)
+            nValueScrollHor = this.GetHorizontalScrollTo(x, navi.PageNum);
+
+        if (pos.X > boxR)
+        {
+            var _mem = x - g_dKoef_pix_to_mm * this.m_oEditor.HtmlElement.width * 100 / this.m_nZoomValue;
+            nValueScrollHor = this.GetHorizontalScrollTo(_mem, navi.PageNum);
+        }
+
+        var nValueScrollVer = 0;
+        if (pos.Y < boxY)
+            nValueScrollVer = this.GetVerticalScrollTo(y, navi.PageNum);
+
+        if (pos.Y > boxB)
+        {
+            var _mem = y + navi.H + 10 - g_dKoef_pix_to_mm * this.m_oEditor.HtmlElement.height * 100 / this.m_nZoomValue;
+            nValueScrollVer = this.GetVerticalScrollTo(_mem, navi.PageNum);
+        }
+
+        var isNeedScroll = false;
+        if (0 != nValueScrollHor)
+        {
+            isNeedScroll = true;
+            this.m_bIsUpdateTargetNoAttack = true;
+            var temp = nValueScrollHor * this.m_dScrollX_max / (this.m_dDocumentWidth - this.m_oEditor.HtmlElement.width);
+            this.m_oScrollHorApi.scrollToX(parseInt(temp), false);
+        }
+        if (0 != nValueScrollVer)
+        {
+            isNeedScroll = true;
+            this.m_bIsUpdateTargetNoAttack = true;
+            var temp = nValueScrollVer * this.m_dScrollY_max / (this.m_dDocumentHeight - this.m_oEditor.HtmlElement.height);
+            this.m_oScrollVerApi.scrollToY(parseInt(temp), false);
+        }
+
+        if (true === isNeedScroll)
+        {
+            this.OnScroll();
+            return;
+        }
+
+        this.OnUpdateOverlay();
+    }
+
+    this.onButtonTabsClick = function()
+    {
+        if (false === oThis.m_oApi.bInit_word_control)
+            return;
+
+        // пока только левые табы
+        return;
+
+        var oWordControl = oThis;
+        if (oWordControl.m_nTabsType == g_tabtype_left)
+        {
+            oWordControl.m_nTabsType = g_tabtype_right;
+            oWordControl.m_oLeftRuler_buttonsTabs.HtmlElement.style.backgroundPosition = "0px -18px";
+        }
+        else
+        {
+            oWordControl.m_nTabsType = g_tabtype_left;
+            oWordControl.m_oLeftRuler_buttonsTabs.HtmlElement.style.backgroundPosition = "0px 0px";
+        }
+    }
+
+    this.onPrevPage = function()
+    {
+        if (false === oThis.m_oApi.bInit_word_control)
+            return;
+
+        var oWordControl = oThis;
+        if (0 < oWordControl.m_oDrawingDocument.SlideCurrent)
+        {
+            oWordControl.GoToPage(oWordControl.m_oDrawingDocument.SlideCurrent - 1);
+        }
+        else
+        {
+            oWordControl.GoToPage(0);
+        }
+    }
+    this.onNextPage = function()
+    {
+        if (false === oThis.m_oApi.bInit_word_control)
+            return;
+
+        var oWordControl = oThis;
+        if ((oWordControl.m_oDrawingDocument.SlidesCount - 1) > oWordControl.m_oDrawingDocument.SlideCurrent)
+        {
+            oWordControl.GoToPage(oWordControl.m_oDrawingDocument.SlideCurrent + 1);
+        }
+        else if (oWordControl.m_oDrawingDocument.SlidesCount > 0)
+        {
+            oWordControl.GoToPage(oWordControl.m_oDrawingDocument.SlidesCount - 1);
+        }
+    }
+
+    this.horRulerMouseDown = function(e)
+    {
+        if (false === oThis.m_oApi.bInit_word_control)
+            return;
+
+        if (e.preventDefault)
+            e.preventDefault();
+        else
+            e.returnValue = false;
+
+        var oWordControl = oThis;
+
+        if (-1 != oWordControl.m_oDrawingDocument.SlideCurrent)
+            oWordControl.m_oHorRuler.OnMouseDown(oWordControl.m_oDrawingDocument.SlideCurrectRect.left, 0, e);
+    }
+    this.horRulerMouseUp = function(e)
+    {
+        if (false === oThis.m_oApi.bInit_word_control)
+            return;
+
+        if (e.preventDefault)
+            e.preventDefault();
+        else
+            e.returnValue = false;
+
+        var oWordControl = oThis;
+
+        if (-1 != oWordControl.m_oDrawingDocument.SlideCurrent)
+            oWordControl.m_oHorRuler.OnMouseUp(oWordControl.m_oDrawingDocument.SlideCurrectRect.left, 0, e);
+    }
+    this.horRulerMouseMove = function(e)
+    {
+        if (false === oThis.m_oApi.bInit_word_control)
+            return;
+
+        if (e.preventDefault)
+            e.preventDefault();
+        else
+            e.returnValue = false;
+
+        var oWordControl = oThis;
+
+        if (-1 != oWordControl.m_oDrawingDocument.SlideCurrent)
+            oWordControl.m_oHorRuler.OnMouseMove(oWordControl.m_oDrawingDocument.SlideCurrectRect.left, 0, e);
+    }
+
+    this.verRulerMouseDown = function(e)
+    {
+        if (false === oThis.m_oApi.bInit_word_control)
+            return;
+
+        if (e.preventDefault)
+            e.preventDefault();
+        else
+            e.returnValue = false;
+
+        var oWordControl = oThis;
+
+        if (-1 != oWordControl.m_oDrawingDocument.SlideCurrent)
+            oWordControl.m_oVerRuler.OnMouseDown(0, oWordControl.m_oDrawingDocument.SlideCurrectRect.top, e);
+    }
+    this.verRulerMouseUp = function(e)
+    {
+        if (false === oThis.m_oApi.bInit_word_control)
+            return;
+
+        if (e.preventDefault)
+            e.preventDefault();
+        else
+            e.returnValue = false;
+
+        var oWordControl = oThis;
+
+        if (-1 != oWordControl.m_oDrawingDocument.SlideCurrent)
+            oWordControl.m_oVerRuler.OnMouseUp(0, oWordControl.m_oDrawingDocument.SlideCurrectRect.top, e);
+    }
+    this.verRulerMouseMove = function(e)
+    {
+        if (false === oThis.m_oApi.bInit_word_control)
+            return;
+
+        if (e.preventDefault)
+            e.preventDefault();
+        else
+            e.returnValue = false;
+
+        var oWordControl = oThis;
+
+        if (-1 != oWordControl.m_oDrawingDocument.SlideCurrent)
+            oWordControl.m_oVerRuler.OnMouseMove(0, oWordControl.m_oDrawingDocument.SlideCurrectRect.top, e);
+    }
+
+    this.SelectWheel = function()
+    {
+        if (false === oThis.m_oApi.bInit_word_control)
+            return;
+
+        var oWordControl = oThis;
+        var positionMinY = oWordControl.m_oMainContent.AbsolutePosition.T * g_dKoef_mm_to_pix + oWordControl.Y;
+        if (oWordControl.m_bIsRuler)
+            positionMinY = (oWordControl.m_oMainContent.AbsolutePosition.T + oWordControl.m_oTopRuler_horRuler.AbsolutePosition.B) * g_dKoef_mm_to_pix +
+                oWordControl.Y;
+
+        var positionMaxY = oWordControl.m_oMainContent.AbsolutePosition.B * g_dKoef_mm_to_pix + oWordControl.Y;
+
+        var scrollYVal = 0;
+        if (global_mouseEvent.Y < positionMinY)
+        {
+            var delta = 30;
+            if (20 > (positionMinY - global_mouseEvent.Y))
+                delta = 10;
+
+            scrollYVal = -delta;
+        }
+        else if (global_mouseEvent.Y > positionMaxY)
+        {
+            var delta = 30;
+            if (20 > (global_mouseEvent.Y - positionMaxY))
+                delta = 10;
+
+            scrollYVal = delta;
+        }
+
+        var scrollXVal = 0;
+        if (oWordControl.m_bIsHorScrollVisible)
+        {
+            var positionMinX = oWordControl.m_oMainContent.AbsolutePosition.L * g_dKoef_mm_to_pix + oWordControl.X;
+            if (oWordControl.m_bIsRuler)
+                positionMinX += oWordControl.m_oLeftRuler.AbsolutePosition.R * g_dKoef_mm_to_pix;
+
+            var positionMaxX = oWordControl.m_oMainContent.AbsolutePosition.R * g_dKoef_mm_to_pix + oWordControl.X - oWordControl.ScrollWidthPx;
+
+            if (global_mouseEvent.X < positionMinX)
+            {
+                var delta = 30;
+                if (20 > (positionMinX - global_mouseEvent.X))
+                    delta = 10;
+
+                scrollXVal = -delta;
+            }
+            else if (global_mouseEvent.X > positionMaxX)
+            {
+                var delta = 30;
+                if (20 > (global_mouseEvent.X - positionMaxX))
+                    delta = 10;
+
+                scrollXVal = delta;
+            }
+        }
+
+        if (0 != scrollYVal)
+        {
+            if (((oWordControl.m_dScrollY + scrollYVal) >= oWordControl.SlideScrollMIN) && ((oWordControl.m_dScrollY + scrollYVal) <= oWordControl.SlideScrollMAX))
+                oWordControl.m_oScrollVerApi.scrollByY(scrollYVal, false);
+        }
+        if (0 != scrollXVal)
+            oWordControl.m_oScrollHorApi.scrollByX(scrollXVal, false);
+
+        if (scrollXVal != 0 || scrollYVal != 0)
+            oWordControl.onMouseMove2();
+    }
+
+    this.createSplitterDiv = function(bIsVert)
+    {
+        var Splitter = document.createElement("div");
+        Splitter.id = "splitter_id";
+        Splitter.style.position = "absolute";
+
+        // skin
+        //Splitter.style.backgroundColor = "#000000";
+        //Splitter.style.backgroundImage = "url(Images/splitter.png)";
+        Splitter.style.backgroundImage = "url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAABh0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjMxN4N3hgAAAB9JREFUGFdj+P//PwsDAwOQ+m8PooEYwQELwmRwqgAAbXwhnmjs9sgAAAAASUVORK5CYII=)";
+
+        if (bIsVert)
+        {
+            Splitter.style.left = parseInt(this.Splitter1Pos * g_dKoef_mm_to_pix) + "px";
+            Splitter.style.top = "0px";
+            Splitter.style.width = parseInt(1.5 * g_dKoef_mm_to_pix) + "px";
+            Splitter.style.height = this.Height + "px";
+            this.SplitterType = 1;
+
+            Splitter.style.backgroundRepeat = "repeat-y";
+        }
+        else
+        {
+            Splitter.style.left = parseInt((this.Splitter1Pos + 1.5) * g_dKoef_mm_to_pix) + "px";
+            Splitter.style.top = this.Height - parseInt((this.Splitter2Pos + 1.5) * g_dKoef_mm_to_pix) + "px";
+            Splitter.style.width = this.Width - parseInt((this.Splitter1Pos + 1.5) * g_dKoef_mm_to_pix) + "px";
+            Splitter.style.height = parseInt(1.5 * g_dKoef_mm_to_pix) + "px";
+            this.SplitterType = 2;
+
+            Splitter.style.backgroundRepeat = "repeat-x";
+        }
+
+        Splitter.style.overflow = 'hidden';
+        Splitter.style.zIndex = 1000;
+        Splitter.setAttribute("contentEditable", false);
+
+        this.SplitterDiv = Splitter;
+        this.m_oBody.HtmlElement.appendChild( this.SplitterDiv );
+    }
+
+    this.onBodyMouseDown = function(e)
+    {
+        if (false === oThis.m_oApi.bInit_word_control)
+            return;
+
+        if (e.preventDefault)
+            e.preventDefault();
+        else
+            e.returnValue = false;
+
+        var downClick = global_mouseEvent.ClickCount;
+        check_MouseDownEvent(e, true);
+        global_mouseEvent.ClickCount = downClick;
+        global_mouseEvent.LockMouse();
+
+        var oWordControl = oThis;
+
+        var x1 = oWordControl.Splitter1Pos * g_dKoef_mm_to_pix;
+        var x2 = (oWordControl.Splitter1Pos + 1.5) * g_dKoef_mm_to_pix;
+        var y1 = oWordControl.Height - ((oWordControl.Splitter2Pos + 1.5) * g_dKoef_mm_to_pix);
+        var y2 = oWordControl.Height - (oWordControl.Splitter2Pos * g_dKoef_mm_to_pix);
+
+        var _x = global_mouseEvent.X - oWordControl.X;
+        var _y = global_mouseEvent.Y - oWordControl.Y;
+
+        if (_x >= x1 && _x <= x2 && _y >= 0 && _y <= oWordControl.Height)
+        {
+            oWordControl.m_oBody.HtmlElement.style.cursor = "w-resize";
+            oWordControl.createSplitterDiv(true);
+        }
+        else if (_x >= x2 && _x <= oWordControl.Width && _y >= y1 && _y <= y2)
+        {
+            oWordControl.m_oBody.HtmlElement.style.cursor = "s-resize";
+            oWordControl.createSplitterDiv(false);
+        }
+        else
+        {
+            oWordControl.m_oBody.HtmlElement.style.cursor = "default";
+        }
+    }
+
+    this.onBodyMouseMove = function(e)
+    {
+        if (false === oThis.m_oApi.bInit_word_control)
+            return;
+
+        if (e.preventDefault)
+            e.preventDefault();
+        else
+            e.returnValue = false;
+
+        check_MouseMoveEvent(e, true);
+
+        var oWordControl = oThis;
+
+        if (null == oWordControl.SplitterDiv)
+        {
+            var x1 = oWordControl.Splitter1Pos * g_dKoef_mm_to_pix;
+            var x2 = (oWordControl.Splitter1Pos + 1.5) * g_dKoef_mm_to_pix;
+            var y1 = oWordControl.Height - ((oWordControl.Splitter2Pos + 1.5) * g_dKoef_mm_to_pix);
+            var y2 = oWordControl.Height - (oWordControl.Splitter2Pos * g_dKoef_mm_to_pix);
+
+            var _x = global_mouseEvent.X - oWordControl.X;
+            var _y = global_mouseEvent.Y - oWordControl.Y;
+
+            if (_x >= x1 && _x <= x2 && _y >= 0 && _y <= oWordControl.Height)
+            {
+                oWordControl.m_oBody.HtmlElement.style.cursor = "w-resize";
+            }
+            else if (_x >= x2 && _x <= oWordControl.Width && _y >= y1 && _y <= y2)
+            {
+                oWordControl.m_oBody.HtmlElement.style.cursor = "s-resize";
+            }
+            else
+            {
+                oWordControl.m_oBody.HtmlElement.style.cursor = "default";
+            }
+        }
+        else
+        {
+            var _x = global_mouseEvent.X - oWordControl.X;
+            var _y = global_mouseEvent.Y - oWordControl.Y;
+
+            if (1 == oWordControl.SplitterType)
+            {
+                var _min = parseInt(oWordControl.Splitter1PosMin * g_dKoef_mm_to_pix);
+                var _max = parseInt(oWordControl.Splitter1PosMax * g_dKoef_mm_to_pix);
+                if (_x > _max)
+                    _x = _max;
+                else if (_x < (_min / 2))
+                    _x = 0;
+                else if (_x < _min)
+                    _x = _min;
+
+                oWordControl.m_oBody.HtmlElement.style.cursor = "w-resize";
+                oWordControl.SplitterDiv.style.left = _x + "px";
+            }
+            else
+            {
+                var _max = oWordControl.Height - parseInt(oWordControl.Splitter2PosMin * g_dKoef_mm_to_pix);
+                var _min = oWordControl.Height - parseInt(oWordControl.Splitter2PosMax * g_dKoef_mm_to_pix);
+                if (_y < _min)
+                    _y = _min;
+                else if (_y > _max)
+                    _y = _max;
+
+                oWordControl.m_oBody.HtmlElement.style.cursor = "s-resize";
+                oWordControl.SplitterDiv.style.top = (_y - parseInt(1.5 * g_dKoef_mm_to_pix)) + "px";
+            }
+        }
+    }
+
+    this.OnResizeSplitter = function()
+    {
+        this.OldSplitter1Pos = this.Splitter1Pos;
+
+        this.m_oThumbnailsContainer.Bounds.R = this.Splitter1Pos;
+        this.m_oThumbnailsContainer.Bounds.AbsW = this.Splitter1Pos;
+
+        if (!this.IsSupportNotes)
+            this.Splitter2Pos = 0;
+
+        this.m_oMainContent.Bounds.L = this.Splitter1Pos + 1.5;
+        this.m_oMainContent.Bounds.B = this.Splitter2Pos + 1.5;
+
+        this.m_oNotesContainer.Bounds.L = this.Splitter1Pos + 1.5;
+        this.m_oNotesContainer.Bounds.AbsH = this.Splitter2Pos;
+
+        this.OnResize2(true);
+    }
+
+    this.onBodyMouseUp = function(e)
+    {
+        if (false === oThis.m_oApi.bInit_word_control)
+            return;
+
+        if (e.preventDefault)
+            e.preventDefault();
+        else
+            e.returnValue = false;
+
+        check_MouseUpEvent(e, true);
+
+        var oWordControl = oThis;
+        oWordControl.m_oDrawingDocument.UnlockCursorType();
+
+        if (null != oWordControl.SplitterDiv)
+        {
+            var _x = parseInt(oWordControl.SplitterDiv.style.left);
+            var _y = parseInt(oWordControl.SplitterDiv.style.top);
+
+            if (oWordControl.SplitterType == 1)
+            {
+                var _posX = _x * g_dKoef_pix_to_mm;
+                if (Math.abs(oWordControl.Splitter1Pos - _posX) > 1)
+                {
+                    oWordControl.Splitter1Pos = _posX;
+                    oWordControl.OnResizeSplitter();
+                    oWordControl.m_oApi.syncOnThumbnailsShow();
+                }
+            }
+            else
+            {
+                var _posY = (oWordControl.Height - _y) * g_dKoef_pix_to_mm - 1.5;
+                if (Math.abs(oWordControl.Splitter2Pos - _posY) > 1)
+                {
+                    oWordControl.Splitter2Pos = _posY;
+                    oWordControl.OnResizeSplitter();
+                }
+            }
+
+            oWordControl.m_oBody.HtmlElement.removeChild(oWordControl.SplitterDiv);
+            oWordControl.SplitterDiv = null;
+            oWordControl.SplitterType = 0;
+        }
+    }
+
+    this.onMouseDown = function(e)
+    {
+        if (false === oThis.m_oApi.bInit_word_control)
+            return;
+
+        var oWordControl = oThis;
+
+        if (e.preventDefault)
+            e.preventDefault();
+        else
+            e.returnValue = false;
+
+        oWordControl.Thumbnails.SetFocusElement(FOCUS_OBJECT_MAIN);
+        if (oWordControl.DemonstrationMode)
+            return false;
+
+        var _xOffset = oWordControl.X;
+        var _yOffset = oWordControl.Y;
+
+        if (true === oWordControl.m_bIsRuler)
+        {
+            _xOffset += (5 * g_dKoef_mm_to_pix);
+            _yOffset += (7 * g_dKoef_mm_to_pix);
+        }
+
+        if (window.closeDialogs != undefined)
+            closeDialogs();
+
+        check_MouseDownEvent(e, true);
+        global_mouseEvent.LockMouse();
+
+        if ((0 == global_mouseEvent.Button) || (undefined == global_mouseEvent.Button))
+        {
+            global_mouseEvent.Button = 0;
+            oWordControl.m_bIsMouseLock = true;
+        }
+
+        if ((0 == global_mouseEvent.Button) || (undefined == global_mouseEvent.Button) || (2 == global_mouseEvent.Button))
+        {
+            var pos = oWordControl.m_oDrawingDocument.ConvertCoordsFromCursor2(global_mouseEvent.X, global_mouseEvent.Y);
+            if (pos.Page == -1)
+                return;
+
+            oWordControl.m_oDrawingDocument.m_lCurrentPage = pos.Page;
+            oWordControl.m_oLogicDocument.OnMouseDown(global_mouseEvent, pos.X, pos.Y, pos.Page);
+        }
+        else
+        {
+            var pos = oWordControl.m_oDrawingDocument.ConvertCoordsFromCursor2(global_mouseEvent.X, global_mouseEvent.Y);
+            if (pos.Page == -1)
+                return;
+
+            oWordControl.m_oDrawingDocument.m_lCurrentPage = pos.Page;
+        }
+
+        if (-1 == oWordControl.m_oTimerScrollSelect)
+        {
+            oWordControl.m_oTimerScrollSelect = setInterval(oWordControl.SelectWheel, 20);
+        }
+
+        oWordControl.Thumbnails.SetFocusElement(FOCUS_OBJECT_MAIN);
+    }
+
+    this.onMouseMove = function(e)
+    {
+        if (false === oThis.m_oApi.bInit_word_control)
+            return;
+
+        var oWordControl = oThis;
+
+        if (e.preventDefault)
+            e.preventDefault();
+        else
+            e.returnValue = false;
+
+        if (oWordControl.DemonstrationMode)
+            return false;
+
+        check_MouseMoveEvent(e);
+        var pos = oWordControl.m_oDrawingDocument.ConvertCoordsFromCursor2(global_mouseEvent.X, global_mouseEvent.Y);
+        if (pos.Page == -1)
+            return;
+
+        if (oWordControl.m_oDrawingDocument.m_sLockedCursorType != "")
+            oWordControl.m_oDrawingDocument.SetCursorType("default");
+
+        oWordControl.m_oLogicDocument.OnMouseMove(global_mouseEvent, pos.X, pos.Y, pos.Page);
+    }
+    this.onMouseMove2 = function()
+    {
+        if (false === oThis.m_oApi.bInit_word_control)
+            return;
+
+        var oWordControl = oThis;
+        var pos = oWordControl.m_oDrawingDocument.ConvertCoordsFromCursor2(global_mouseEvent.X, global_mouseEvent.Y);
+        if (pos.Page == -1)
+            return;
+
+        oWordControl.m_oLogicDocument.OnMouseMove(global_mouseEvent, pos.X, pos.Y, pos.Page);
+    }
+    this.onMouseUp = function(e, bIsWindow)
+    {
+        if (false === oThis.m_oApi.bInit_word_control)
+            return;
+        //if (true == global_mouseEvent.IsLocked)
+        //    return;
+
+        var oWordControl = oThis;
+
+        if (oWordControl.DemonstrationMode)
+        {
+            if (e.preventDefault)
+                e.preventDefault();
+            else
+                e.returnValue = false;
+            return false;
+        }
+
+        check_MouseUpEvent(e);
+        var pos = oWordControl.m_oDrawingDocument.ConvertCoordsFromCursor2(global_mouseEvent.X, global_mouseEvent.Y);
+        if (pos.Page == -1)
+            return;
+
+        oWordControl.m_oDrawingDocument.UnlockCursorType();
+        oWordControl.m_bIsMouseLock = false;
+        if (oWordControl.m_oDrawingDocument.TableOutlineDr.bIsTracked)
+        {
+            oWordControl.m_oDrawingDocument.TableOutlineDr.checkMouseUp(global_mouseEvent.X, global_mouseEvent.Y, oWordControl);
+            oWordControl.m_oLogicDocument.Document_UpdateInterfaceState();
+            oWordControl.m_oLogicDocument.Document_UpdateRulersState();
+
+            if (-1 != oWordControl.m_oTimerScrollSelect)
+            {
+                clearInterval(oWordControl.m_oTimerScrollSelect);
+                oWordControl.m_oTimerScrollSelect = -1;
+            }
+            oWordControl.OnUpdateOverlay();
+            return;
+        }
+
+        if (-1 != oWordControl.m_oTimerScrollSelect)
+        {
+            clearInterval(oWordControl.m_oTimerScrollSelect);
+            oWordControl.m_oTimerScrollSelect = -1;
+        }
+
+        oWordControl.m_bIsMouseUpSend = true;
+
+        oWordControl.m_oLogicDocument.OnMouseUp(global_mouseEvent, pos.X, pos.Y, pos.Page);
+        oWordControl.m_bIsMouseUpSend = false;
+//        oWordControl.m_oLogicDocument.Document_UpdateInterfaceState();
+        oWordControl.m_oLogicDocument.Document_UpdateRulersState();
+    }
+
+    this.onMouseUpExternal = function(x, y)
+    {
+        if (false === oThis.m_oApi.bInit_word_control)
+            return;
+
+        var oWordControl = oThis;
+
+        if (oWordControl.DemonstrationMode)
+            return oWordControl.onMouseUpDemonstration(e);
+
+        //---
+        global_mouseEvent.X = x;
+        global_mouseEvent.Y = y;
+
+        global_mouseEvent.Type = g_mouse_event_type_up;
+
+        g_bIsMouseUpLockedSend = true;
+        global_mouseEvent.Sender = null;
+
+        global_mouseEvent.UnLockMouse();
+
+        global_mouseEvent.IsPressed = false;
+
+        //---
+        var pos = oWordControl.m_oDrawingDocument.ConvertCoordsFromCursor2(global_mouseEvent.X, global_mouseEvent.Y);
+        if (pos.Page == -1)
+            return;
+
+        oWordControl.m_oDrawingDocument.UnlockCursorType();
+
+        oWordControl.m_bIsMouseLock = false;
+
+        if (-1 != oWordControl.m_oTimerScrollSelect)
+        {
+            clearInterval(oWordControl.m_oTimerScrollSelect);
+            oWordControl.m_oTimerScrollSelect = -1;
+        }
+
+        oWordControl.m_bIsMouseUpSend = true;
+
+        oWordControl.m_oLogicDocument.OnMouseUp(global_mouseEvent, pos.X, pos.Y, pos.Page);
+        oWordControl.m_bIsMouseUpSend = false;
+        oWordControl.m_oLogicDocument.Document_UpdateInterfaceState();
+        oWordControl.m_oLogicDocument.Document_UpdateRulersState();
+    }
+
+    this.onMouseWhell = function(e)
+    {
+        if (false === oThis.m_oApi.bInit_word_control)
+            return;
+
+        if (oThis.DemonstrationMode)
+        {
+            if (e.preventDefault)
+                e.preventDefault();
+            else
+                e.returnValue = false;
+            return false;
+        }
+
+        var delta = 0;
+
+        if (undefined != e.wheelDelta)
+            delta = (e.wheelDelta > 0) ? -45 : 45;
+        else
+            delta = (e.detail > 0) ? 45 : -45;
+
+        oThis.m_oScrollVerApi.scrollBy(0, delta, false);
+
+        if (e.preventDefault)
+            e.preventDefault();
+        else
+            e.returnValue = false;
+        return false;
+    }
+
+    this.onKeyUp = function(e)
+    {
+        global_keyboardEvent.AtlKey     = false;
+        global_keyboardEvent.CtrlKey    = false;
+        global_keyboardEvent.ShiftKey   = false;
+
+    }
+
+    this.onKeyDown = function(e)
+    {
+        var oWordControl = oThis;
+        if (false === oWordControl.m_oApi.bInit_word_control || oWordControl.IsFocus === false || oWordControl.m_bIsMouseLock === true)
+            return;
+
+        if (oWordControl.DemonstrationMode)
+        {
+            oWordControl.onKeyDownDemonstration(e);
+            return;
+        }
+
+        if (oWordControl.Thumbnails.FocusObjType == FOCUS_OBJECT_THUMBNAILS)
+        {
+            var ret = oWordControl.Thumbnails.onKeyDown(e);
+            if (!ret)
+                return false;
+        }
+
+        if (oThis.TextBoxInputMode)
+        {
+            oThis.onKeyDownTBIM(e);
+            return;
+        }
+
+        var oWordControl = oThis;
+        if (false === oWordControl.m_oApi.bInit_word_control || oWordControl.IsFocus === false || oWordControl.m_bIsMouseLock === true)
+            return;
+
+        if (oWordControl.DemonstrationMode)
+        {
+            oWordControl.onKeyDownDemonstration(e);
+            return;
+        }
+
+        check_KeyboardEvent(e);
+
+        oWordControl.IsKeyDownButNoPress = true;
+        oWordControl.bIsUseKeyPress = (oWordControl.m_oLogicDocument.OnKeyDown(global_keyboardEvent) === true) ? false : true;
+        if (false === oWordControl.bIsUseKeyPress || true === global_keyboardEvent.AltKey)
+        {
+            e.preventDefault();
+        }
+    }
+
+    this.onKeyDownTBIM = function(e)
+    {
+        var oWordControl = oThis;
+        if (false === oWordControl.m_oApi.bInit_word_control || oWordControl.IsFocus === false || oWordControl.m_bIsMouseLock === true)
+            return;
+
+        check_KeyboardEvent(e);
+
+        oWordControl.IsKeyDownButNoPress = true;
+
+        if (oWordControl.TextBoxInputFocus)
+        {
+            // нужно проверить на enter
+            // вся остальная обработка - в текстбоксе
+
+            if (global_keyboardEvent.KeyCode == 13)
+            {
+                oWordControl.TextBoxInputFocus = false;
+                oWordControl.onChangeTB();
+
+                oWordControl.bIsUseKeyPress = false;
+
+                e.preventDefault();
+                return false;
+            }
+            else if (global_keyboardEvent.KeyCode == 27)
+            {
+                oWordControl.TextBoxInputFocus = false;
+
+                CollaborativeEditing.m_bGlobalLock = false;
+                this.TextBoxInput.style.zIndex = -1;
+                this.TextBoxInput.style.top = "-1000px";
+                this.TextBoxInputFocus = false;
+                this.ReinitTB();
+
+                oWordControl.bIsUseKeyPress = false;
+
+                e.preventDefault();
+                return false;
+            }
+
+            // вся обработка - в текстбоксе
+            return;
+        }
+
+        oWordControl.bIsUseKeyPress = (oWordControl.m_oLogicDocument.OnKeyDown(global_keyboardEvent) === true) ? false : true;
+        if (false === oWordControl.bIsUseKeyPress || true === global_keyboardEvent.AltKey)
+        {
+            e.preventDefault();
+            return false;
+        }
+    }
+
+    this.onKeyPress = function(e)
+    {
+        if (oThis.Thumbnails.FocusObjType == FOCUS_OBJECT_THUMBNAILS)
+        {
+            return;
+        }
+
+        if (oThis.TextBoxInputMode)
+        {
+            if (oThis.bIsUseKeyPress === false)
+                return;
+
+            check_KeyboardEvent(e);
+
+            var Code;
+            if (null != global_keyboardEvent.Which)
+                Code = global_keyboardEvent.Which;
+            else if (global_keyboardEvent.KeyCode)
+                Code = global_keyboardEvent.KeyCode;
+            else
+                Code = 0;//special char
+
+            var bRetValue = false;
+            if (Code <= 0x20)
+            {
+                // это всякие клавиши типа f1-12
+                return;
+            }
+
+            oThis.TextBoxFocus();
+            return;
+        }
+
+        var oWordControl = oThis;
+        if (false === oWordControl.m_oApi.bInit_word_control || oWordControl.IsFocus === false || oWordControl.m_bIsMouseLock === true)
+            return;
+
+        if (window.opera && !oWordControl.IsKeyDownButNoPress)
+        {
+            oWordControl.onKeyDown(e);
+        }
+
+        oWordControl.IsKeyDownButNoPress = false;
+
+        if (oWordControl.DemonstrationMode)
+            return;
+
+        if (false === oWordControl.bIsUseKeyPress)
+            return;
+
+        if (null == oWordControl.m_oLogicDocument)
+            return;
+
+        check_KeyboardEvent(e);
+
+        var retValue = oWordControl.m_oLogicDocument.OnKeyPress(global_keyboardEvent);
+        if ( true === retValue )
+        {
+            e.preventDefault();
+        }
+    }
+
+    // -------------------------------------------------------- //
+    // ---------------------demonstration---------------------- //
+    // -------------------------------------------------------- //
+    this.onKeyDownDemonstration = function(e)
+    {
+        check_KeyboardEvent(e);
+
+        switch (global_keyboardEvent.KeyCode)
+        {
+            case 13:    // enter
+            case 32:    // space
+            case 34:    // PgDn
+            case 39:    // right arrow
+            case 40:    // bottom arrow
+            {
+                // next slide
+                this.DemonstrationSlideNum++;
+                if (this.DemonstrationSlideNum > this.m_oDrawingDocument.SlidesCount)
+                    this.EndDemonstration();
+                else
+                {
+                    this.OnPaintDemonstration();
+                    this.m_oApi.sync_DemonstrationSlideChanged(this.DemonstrationSlideNum);
+                }
+                break;
+            }
+            case 33:
+            case 37:
+            case 38:
+            {
+                // prev slide
+                if (0 != this.DemonstrationSlideNum)
+                {
+                    this.DemonstrationSlideNum--;
+                    this.OnPaintDemonstration();
+                    this.m_oApi.sync_DemonstrationSlideChanged(this.DemonstrationSlideNum);
+                }
+                break;
+            }
+            case 36:    // home
+            {
+                if (0 != this.DemonstrationSlideNum)
+                {
+                    this.DemonstrationSlideNum = 0;
+                    this.OnPaintDemonstration();
+                    this.m_oApi.sync_DemonstrationSlideChanged(this.DemonstrationSlideNum);
+                }
+                break;
+            }
+            case 35:    // end
+            {
+                if (this.DemonstrationSlideNum != (this.m_oDrawingDocument.SlidesCount - 1))
+                {
+                    this.DemonstrationSlideNum = this.m_oDrawingDocument.SlidesCount - 1;
+                    this.OnPaintDemonstration();
+                    this.m_oApi.sync_DemonstrationSlideChanged(this.DemonstrationSlideNum);
+                }
+                break;
+            }
+            case 27:    // escape
+            {
+                this.EndDemonstration();
+                break;
+            }
+            default:
+                break;
+        }
+
+        this.IsKeyDownButNoPress = true;
+        return false;
+    }
+
+    this.onMouseDownDemonstration = function(e)
+    {
+        e.preventDefault();
+        return false;
+    }
+
+    this.onMouseMoveDemonstration = function(e)
+    {
+        e.preventDefault();
+        return false;
+    }
+
+    this.onMouseUpDemonstration = function(e)
+    {
+        // next slide
+        oThis.DemonstrationSlideNum++;
+        if (oThis.DemonstrationSlideNum > oThis.m_oDrawingDocument.SlidesCount)
+            oThis.EndDemonstration();
+        else
+        {
+            oThis.OnPaintDemonstration();
+            oThis.m_oApi.sync_DemonstrationSlideChanged(oThis.DemonstrationSlideNum);
+        }
+
+        e.preventDefault();
+        return false;
+    }
+
+    this.onMouseWhellDemonstration = function(e)
+    {
+        var delta = 0;
+        if (undefined != e.wheelDelta)
+            delta = (e.wheelDelta > 0) ? -1 : 1;
+        else
+            delta = (e.detail > 0) ? 1 : -1;
+
+        if (delta > 0)
+        {
+            oThis.DemonstrationSlideNum++;
+            if (oThis.DemonstrationSlideNum > oThis.m_oDrawingDocument.SlidesCount)
+                oThis.EndDemonstration();
+            else
+            {
+                oThis.OnPaintDemonstration();
+                oThis.m_oApi.sync_DemonstrationSlideChanged(oThis.DemonstrationSlideNum);
+            }
+        }
+        else
+        {
+            if (0 != oThis.DemonstrationSlideNum)
+            {
+                oThis.DemonstrationSlideNum--;
+                oThis.OnPaintDemonstration();
+                oThis.m_oApi.sync_DemonstrationSlideChanged(oThis.DemonstrationSlideNum);
+            }
+        }
+
+        e.preventDefault();
+        return false;
+    }
+
+    this.DemonstrationNextSlide = function()
+    {
+        if (!this.DemonstrationMode)
+            return;
+
+        this.DemonstrationSlideNum++;
+        if (this.DemonstrationSlideNum > this.m_oDrawingDocument.SlidesCount)
+            this.EndDemonstration();
+        else
+        {
+            this.m_oApi.sync_DemonstrationSlideChanged(this.DemonstrationSlideNum);
+            this.OnPaintDemonstration();
+        }
+    }
+
+    this.DemonstrationPrevSlide = function()
+    {
+        if (!this.DemonstrationMode)
+            return;
+
+        if (0 != this.DemonstrationSlideNum)
+        {
+            this.DemonstrationSlideNum--;
+            this.OnPaintDemonstration();
+            this.m_oApi.sync_DemonstrationSlideChanged(this.DemonstrationSlideNum);
+        }
+    }
+
+    this.DemonstrationGoToSlide = function(slideNum)
+    {
+        if (!this.DemonstrationMode)
+            return;
+
+        if ((slideNum == this.DemonstrationSlideNum) || (slideNum < 0) || (slideNum >= this.m_oDrawingDocument.SlidesCount))
+            return;
+
+        this.DemonstrationSlideNum = slideNum;
+        this.OnPaintDemonstration();
+        this.m_oApi.sync_DemonstrationSlideChanged(this.DemonstrationSlideNum);
+    }
+
+    this.StartDemonstration = function(div_id, slidestart_num)
+    {
+        this.DemonstrationDiv = document.getElementById(div_id);
+        if (this.DemonstrationDiv == null || slidestart_num < 0 || slidestart_num >= this.m_oDrawingDocument.SlidesCount)
+            return;
+
+        var _width = this.DemonstrationDiv.clientWidth;
+        var _height = this.DemonstrationDiv.clientHeight;
+
+        this.DemonstrationMode = true;
+        this.DemonstrationCanvas = document.createElement('canvas');
+        this.DemonstrationCanvas.style = "position:absolute;margin:0;padding:0;left:0px;top:0px;width:100%;height:100%;zIndex:2;";
+        this.DemonstrationCanvas.width = _width;
+        this.DemonstrationCanvas.height = _height;
+
+        this.DemonstrationSlideNum = slidestart_num;
+
+        this.m_oApi.sync_DemonstrationSlideChanged(this.DemonstrationSlideNum);
+
+        //this.DemonstrationCanvas.onmousedown  = this.onMouseDownDemonstration;
+        //this.DemonstrationCanvas.onmousemove  = this.onMouseMoveDemonstration;
+        this.DemonstrationCanvas.onmouseup    = this.onMouseUpDemonstration;
+
+        this.DemonstrationCanvas.onmousewheel = this.onMouseWhellDemonstration;
+        if (this.DemonstrationCanvas.addEventListener)
+            this.DemonstrationCanvas.addEventListener("DOMMouseScroll", this.onMouseWhellDemonstration, false);
+
+        this.DemonstrationDiv.appendChild(this.DemonstrationCanvas);
+        this.OnPaintDemonstration();
+    }
+
+    this.DemonstrationPlay = function()
+    {
+        if (-1 != this.PresentationPlayTimerId)
+            clearTimeout(this.PresentationPlayTimerId);
+
+        if (this.DemonstrationMode === false)
+            return;
+
+        // интервал - должен зависеть от слайда. Пока так.
+        this.PresentationPlayTimerId = setTimeout(this.OnPlayDemonstration, this.DefaultSlideDuration);
+    }
+
+    this.DemonstrationPause = function()
+    {
+        if (-1 != this.PresentationPlayTimerId)
+            clearTimeout(this.PresentationPlayTimerId);
+    }
+
+    this.OnPlayDemonstration = function()
+    {
+        if (oThis.DemonstrationMode === false)
+            return;
+
+        oThis.DemonstrationSlideNum++;
+        if (oThis.DemonstrationSlideNum > oThis.m_oDrawingDocument.SlidesCount)
+            oThis.DemonstrationSlideNum = oThis.m_oDrawingDocument.SlidesCount;
+
+        oThis.m_oApi.sync_DemonstrationSlideChanged(oThis.DemonstrationSlideNum);
+
+        oThis.OnPaintDemonstration();
+
+        // интервал - должен зависеть от слайда. Пока так.
+        oThis.PresentationPlayTimerId = setTimeout(oThis.OnPlayDemonstration,  oThis.DefaultSlideDuration);
+    }
+
+    this.DemonstrationResize = function()
+    {
+        if (!this.DemonstrationMode)
+            return;
+
+        var _width = this.DemonstrationDiv.clientWidth;
+        var _height = this.DemonstrationDiv.clientHeight;
+
+        if (this.DemonstrationCanvas.width != _width || this.DemonstrationCanvas.height != _height)
+        {
+            this.DemonstrationCanvas.width = _width;
+            this.DemonstrationCanvas.height = _height;
+            this.OnPaintDemonstration();
+        }
+    }
+
+    this.EndDemonstration = function()
+    {
+        if (!this.DemonstrationMode)
+            return;
+
+        if (null != this.DemonstrationDivEndPresentation)
+        {
+            this.DemonstrationDiv.removeChild(this.DemonstrationDivEndPresentation);
+            this.DemonstrationDivEndPresentation = null;
+        }
+
+        this.DemonstrationDiv.removeChild(this.DemonstrationCanvas);
+        this.DemonstrationCanvas = null;
+        this.DemonstrationSlideNum = -1;
+        this.DemonstrationDiv = null;
+        this.DemonstrationMode = false;
+
+        this.m_oApi.sync_endDemonstration();
+
+        if (-1 != this.PresentationPlayTimerId)
+            clearTimeout(this.PresentationPlayTimerId);
+    }
+
+    this.OnPaintDemonstration = function()
+    {
+        if (!this.DemonstrationMode)
+            return;
+
+        var _width = this.DemonstrationCanvas.width;
+        var _height = this.DemonstrationCanvas.height;
+
+        var _w_mm = this.m_oLogicDocument.Width;
+        var _h_mm = this.m_oLogicDocument.Height;
+
+        // проверим аспект
+        var aspectDisplay = _width / _height;
+        var aspectPres = _w_mm / _h_mm;
+
+        var _l = 0;
+        var _t = 0;
+        var _w = 0;
+        var _h = 0;
+
+        if (aspectPres > aspectDisplay)
+        {
+            _w = _width;
+            _h = _w / aspectPres;
+            _l = 0;
+            _t = (_height - _h) >> 1;
+        }
+        else
+        {
+            _h = _height;
+            _w = _h * aspectPres;
+            _t = 0;
+            _l = (_width - _w) >> 1;
+        }
+
+        var ctx = this.DemonstrationCanvas.getContext('2d');
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = "#000000";
+        ctx.fillRect(0, 0, _width, _height);
+        ctx.beginPath();
+
+        if (this.DemonstrationSlideNum < this.m_oDrawingDocument.SlidesCount)
+        {
+            if (null != this.DemonstrationDivEndPresentation)
+            {
+                this.DemonstrationDiv.removeChild(this.DemonstrationDivEndPresentation);
+                this.DemonstrationDivEndPresentation = null;
+            }
+
+            var g = new CGraphics();
+            g.init(ctx, _w, _h, _w_mm, _h_mm);
+            g.m_oFontManager = g_fontManager;
+
+            g.m_oCoordTransform.tx = _l;
+            g.m_oCoordTransform.ty = _t;
+            g.transform(1,0,0,1,0,0);
+
+            g.IsNoDrawingEmptyPlaceholder = true;
+
+            this.m_oLogicDocument.DrawPage(this.DemonstrationSlideNum, g);
+        }
+        else
+        {
+            if (null == this.DemonstrationDivEndPresentation)
+            {
+                this.DemonstrationDivEndPresentation = document.createElement('div');
+                this.DemonstrationDivEndPresentation.setAttribute("style", "position:absolute;margin:0px;padding:0px;left:0px;top:0px;width:100%;height:100%;z-index:3;text-align:center;font-family:monospace;font-size:12pt;color:#FFFFFF;");
+                //this.DemonstrationDivEndPresentation.innerHTML = "Конец показа слайдов. Щелкните для выхода.";
+                this.DemonstrationDivEndPresentation.innerHTML = this.DemonstrationEndShowMessage;
+
+                //this.DemonstrationDivEndPresentation.onmousedown  = this.onMouseDownDemonstration;
+                //this.DemonstrationDivEndPresentation.onmousemove  = this.onMouseMoveDemonstration;
+                this.DemonstrationDivEndPresentation.onmouseup    = this.onMouseUpDemonstration;
+
+                this.DemonstrationDivEndPresentation.onmousewheel = this.onMouseWhellDemonstration;
+                if (this.DemonstrationDivEndPresentation.addEventListener)
+                    this.DemonstrationDivEndPresentation.addEventListener("DOMMouseScroll", this.onMouseWhellDemonstration, false);
+
+                this.DemonstrationDiv.appendChild(this.DemonstrationDivEndPresentation);
+            }
+        }
+    }
+
+    // -------------------------------------------------------- //
+    // -----------------end demonstration---------------------- //
+    // -------------------------------------------------------- //
+
+    this.verticalScroll = function(sender,scrollPositionY,maxY,isAtTop,isAtBottom)
+    {
+        if (false === oThis.m_oApi.bInit_word_control)
+            return;
+
+        if (0 != this.MainScrollsEnabledFlag)
+            return;
+
+        if (this.StartVerticalScroll)
+        {
+            this.VerticalScrollOnMouseUp.ScrollY = scrollPositionY;
+            this.VerticalScrollOnMouseUp.ScrollY_max = maxY;
+
+            this.VerticalScrollOnMouseUp.SlideNum = (scrollPositionY * this.m_oDrawingDocument.SlidesCount / Math.max(1, maxY)) >> 0;
+            if (this.VerticalScrollOnMouseUp.SlideNum >= this.m_oDrawingDocument.SlidesCount)
+                this.VerticalScrollOnMouseUp.SlideNum = this.m_oDrawingDocument.SlidesCount - 1;
+
+            this.m_oApi.asc_fireCallback("asc_onPaintSlideNum", this.VerticalScrollOnMouseUp.SlideNum);
+            return;
+        }
+
+        var lNumSlide = ((scrollPositionY / this.m_dDocumentPageHeight) + 0.1) >> 0; // 0.1 - ошибка округления!!
+        if (lNumSlide != this.m_oDrawingDocument.SlideCurrent)
+        {
+            if (this.IsGoToPageMAXPosition)
+            {
+                if (lNumSlide >= this.m_oDrawingDocument.SlideCurrent)
+                    this.IsGoToPageMAXPosition = false;
+            }
+
+            this.GoToPage(lNumSlide);
+            return;
+        }
+        else if (this.SlideScrollMAX < scrollPositionY)
+        {
+            this.IsGoToPageMAXPosition = false;
+            this.GoToPage(this.m_oDrawingDocument.SlideCurrent + 1);
+            return;
+        }
+
+        var oWordControl = oThis;
+        oWordControl.m_dScrollY         = Math.max(0, Math.min(scrollPositionY, maxY));
+        oWordControl.m_dScrollY_max     = maxY;
+        oWordControl.m_bIsUpdateVerRuler = true;
+        oWordControl.m_bIsUpdateTargetNoAttack = true;
+
+        oWordControl.IsGoToPageMAXPosition = false;
+
+        if (oWordControl.m_bIsRePaintOnScroll === true)
+            oWordControl.OnScroll();
+    }
+    this.verticalScrollMouseUp = function(sender, e)
+    {
+        if (0 != this.MainScrollsEnabledFlag || !this.StartVerticalScroll)
+            return;
+
+        if (this.VerticalScrollOnMouseUp.SlideNum != this.m_oDrawingDocument.SlideCurrent)
+            this.GoToPage(this.VerticalScrollOnMouseUp.SlideNum);
+        else
+        {
+            this.StartVerticalScroll = false;
+            this.m_oApi.asc_fireCallback("asc_onEndPaintSlideNum");
+
+            this.m_oScrollVerApi.scrollByY(0, false);
+        }
+    }
+    this.CorrectSpeedVerticalScroll = function(newScrollPos)
+    {
+        if (0 != this.MainScrollsEnabledFlag)
+            return;
+
+        this.StartVerticalScroll = true;
+
+        var res = { isChange : false, Pos : newScrollPos };
+        return res;
+    }
+    this.CorrectVerticalScrollByYDelta = function(delta)
+    {
+        if (0 != this.MainScrollsEnabledFlag)
+            return;
+
+        this.IsGoToPageMAXPosition = true;
+        var res = { isChange : false, Pos : delta };
+
+        if (this.m_dScrollY > this.SlideScrollMIN && (this.m_dScrollY + delta) < this.SlideScrollMIN)
+        {
+            res.Pos = this.SlideScrollMIN - this.m_dScrollY;
+            res.isChange = true;
+        }
+        else if (this.m_dScrollY < this.SlideScrollMAX && (this.m_dScrollY + delta) > this.SlideScrollMAX)
+        {
+            res.Pos = this.SlideScrollMAX - this.m_dScrollY;
+            res.isChange = true;
+        }
+
+        return res;
+    }
+
+    this.horizontalScroll = function(sender,scrollPositionX,maxX,isAtLeft,isAtRight)
+    {
+        if (false === oThis.m_oApi.bInit_word_control)
+            return;
+
+        if (0 != this.MainScrollsEnabledFlag)
+            return;
+
+        var oWordControl = oThis;
+        oWordControl.m_dScrollX         = scrollPositionX;
+        oWordControl.m_dScrollX_max     = maxX;
+        oWordControl.m_bIsUpdateHorRuler = true;
+        oWordControl.m_bIsUpdateTargetNoAttack = true;
+
+        if (oWordControl.m_bIsRePaintOnScroll === true)
+        {
+            oWordControl.OnScroll();
+        }
+    }
+
+    this.UpdateScrolls = function()
+    {
+        var settings = {
+            showArrows: true,
+            animateScroll: false,
+            scrollBackgroundColor:"#D3D3D3",
+            scrollerColor:"#EDEDED",
+            screenW: this.m_oEditor.HtmlElement.width,
+            screenH: this.m_oEditor.HtmlElement.height,
+            vsscrollStep: 45,
+            hsscrollStep: 45
+        };
+
+        if (this.m_bIsHorScrollVisible)
+        {
+            if (this.m_oScrollHor_)
+                this.m_oScrollHor_.Repos(settings);//unbind("scrollhorizontal")
+            else {
+                this.m_oScrollHor_ = new ScrollObject( "id_horizontal_scroll",settings);
+                this.m_oScrollHor_.bind("scrollhorizontal",function(evt){
+                    oThis.horizontalScroll(this,evt.scrollD,evt.maxScrollX);
+                });
+
+                this.m_oScrollHor_.onLockMouse = function(evt){
+                    check_MouseDownEvent(evt, true);
+                    global_mouseEvent.LockMouse();
+                };
+                this.m_oScrollHor_.offLockMouse = function(evt){
+                    check_MouseUpEvent(evt);
+                };
+
+                this.m_oScrollHorApi = this.m_oScrollHor_;
+            }
+        }
+
+        if (this.m_oScrollVer_){
+            this.m_oScrollVer_.Repos(settings);//unbind("scrollvertical")
+        }
+        else {
+
+            this.m_oScrollVer_ = new ScrollObject( "id_vertical_scroll",
+                settings
+            );
+
+            this.m_oScrollVer_.onLockMouse = function(evt){
+                check_MouseDownEvent(evt, true);
+                global_mouseEvent.LockMouse();
+            };
+            this.m_oScrollVer_.offLockMouse = function(evt){
+                check_MouseUpEvent(evt);
+            };
+
+            this.m_oScrollVer_.bind("scrollvertical",function(evt){
+                oThis.verticalScroll(this,evt.scrollD,evt.maxScrollY);
+            });
+            this.m_oScrollVer_.bind("mouseup.presentations",function(evt){
+                oThis.verticalScrollMouseUp(this,evt);
+            });
+            this.m_oScrollVer_.bind("correctVerticalScroll",function(yPos){
+                return oThis.CorrectSpeedVerticalScroll(yPos);
+            });
+            this.m_oScrollVer_.bind("correctVerticalScrollDelta",function(delta){
+                return oThis.CorrectVerticalScrollByYDelta(delta);
+            });
+            this.m_oScrollVerApi = this.m_oScrollVer_;
+        }
+
+        if (this.m_oScrollNotes_)
+        {
+            this.m_oScrollNotes_.Repos(settings);
+        }
+        else
+        {
+            this.m_oScrollNotes_ = new ScrollObject( "id_vertical_scroll_notes",settings);
+            this.m_oScrollNotes_.bind("scrollvertical",function(evt){
+            });
+            this.m_oScrollNotesApi = this.m_oScrollNotes_;
+        }
+
+        this.m_oApi.asc_fireCallback("asc_onUpdateScrolls", this.m_dDocumentWidth, this.m_dDocumentHeight);
+
+        this.m_dScrollX_max = this.m_bIsHorScrollVisible ? this.m_oScrollHorApi.getMaxScrolledX() : 0;
+        this.m_dScrollY_max = this.m_oScrollVerApi.getMaxScrolledY();
+
+        if (this.m_dScrollX >= this.m_dScrollX_max)
+            this.m_dScrollX = this.m_dScrollX_max;
+        if (this.m_dScrollY >= this.m_dScrollY_max)
+            this.m_dScrollY = this.m_dScrollY_max;
+    }
+
+    this.OnRePaintAttack = function()
+    {
+        this.m_bIsFullRepaint = true;
+        this.OnScroll();
+    }
+
+    this.OnResize = function(isAttack)
+    {
+        var isNewSize = this.checkBodySize();
+        if (!isNewSize && false === isAttack)
+        {
+            this.DemonstrationResize();
+            return;
+        }
+
+        //console.log("resize");
+        this.m_oBody.Resize(this.Width * g_dKoef_pix_to_mm, this.Height * g_dKoef_pix_to_mm);
+        this.DemonstrationResize();
+
+        if (this.checkNeedHorScroll())
+            return;
+
+        // теперь проверим необходимость перезуммирования
+        if (1 == this.m_nZoomType && 0 != this.m_dDocumentPageWidth && 0 != this.m_dDocumentPageHeight)
+        {
+            if (true === this.zoom_FitToWidth())
+            {
+                this.m_oBoundsController.ClearNoAttack();
+                this.onTimerScroll_sync();
+                return;
+            }
+        }
+        if (2 == this.m_nZoomType && 0 != this.m_dDocumentPageWidth && 0 != this.m_dDocumentPageHeight)
+        {
+            if (true === this.zoom_FitToPage())
+            {
+                this.m_oBoundsController.ClearNoAttack();
+                this.onTimerScroll_sync();
+                return;
+            }
+        }
+
+        this.m_bIsUpdateHorRuler = true;
+        this.m_bIsUpdateVerRuler = true;
+
+        this.m_oHorRuler.RepaintChecker.BlitAttack = true;
+        this.m_oVerRuler.RepaintChecker.BlitAttack = true;
+
+        this.Thumbnails.m_bIsUpdate = true;
+        this.CalculateDocumentSize();
+
+        this.m_bIsUpdateTargetNoAttack = true;
+        this.m_bIsRePaintOnScroll = true;
+
+        this.m_oBoundsController.ClearNoAttack();
+        this.OnScroll();
+        this.onTimerScroll_sync(true);
+
+        if (this.DemonstrationMode)
+            this.OnPaintDemonstration();
+    }
+
+    this.OnResize2 = function(isAttack)
+    {
+        this.m_oBody.Resize(this.Width * g_dKoef_pix_to_mm, this.Height * g_dKoef_pix_to_mm);
+        this.DemonstrationResize();
+
+        if (this.checkNeedHorScroll())
+            return;
+
+        // теперь проверим необходимость перезуммирования
+        if (1 == this.m_nZoomType)
+        {
+            if (true === this.zoom_FitToWidth())
+            {
+                this.m_oBoundsController.ClearNoAttack();
+                this.onTimerScroll_sync();
+                return;
+            }
+        }
+        if (2 == this.m_nZoomType)
+        {
+            if (true === this.zoom_FitToPage())
+            {
+                this.m_oBoundsController.ClearNoAttack();
+                this.onTimerScroll_sync();
+                return;
+            }
+        }
+
+        this.m_bIsUpdateHorRuler = true;
+        this.m_bIsUpdateVerRuler = true;
+
+        this.m_oHorRuler.RepaintChecker.BlitAttack = true;
+        this.m_oVerRuler.RepaintChecker.BlitAttack = true;
+
+        this.Thumbnails.m_bIsUpdate = true;
+        this.CalculateDocumentSize();
+
+        this.m_bIsUpdateTargetNoAttack = true;
+        this.m_bIsRePaintOnScroll = true;
+
+        this.m_oBoundsController.ClearNoAttack();
+        this.OnScroll();
+        this.onTimerScroll_sync(true);
+
+        if (this.DemonstrationMode)
+            this.OnPaintDemonstration();
+    }
+
+    this.checkNeedRules = function()
+    {
+        if (this.m_bIsRuler)
+        {
+            this.m_oLeftRuler.HtmlElement.style.display = 'block';
+            this.m_oTopRuler.HtmlElement.style.display = 'block';
+
+            this.m_oMainView.Bounds.L = 5;
+            this.m_oMainView.Bounds.T = 7;
+        }
+        else
+        {
+            this.m_oLeftRuler.HtmlElement.style.display = 'none';
+            this.m_oTopRuler.HtmlElement.style.display = 'none';
+
+            this.m_oMainView.Bounds.L = 0;
+            this.m_oMainView.Bounds.T = 0;
+        }
+    }
+    this.checkNeedHorScroll = function()
+    {
+        var oldVisible = this.m_bIsHorScrollVisible;
+        if (this.m_dDocumentWidth <= this.m_oEditor.HtmlElement.width)
+        {
+            this.m_bIsHorScrollVisible = false;
+        }
+        else
+        {
+            this.m_bIsHorScrollVisible = true;
+        }
+
+        var hor_scroll = document.getElementById('panel_hor_scroll');
+        hor_scroll.style.width = this.m_dDocumentWidth + "px";
+
+        if (this.m_bIsHorScrollVisible)
+        {
+            this.m_oScrollHor.HtmlElement.style.display = 'block';
+
+            this.m_oPanelRight.Bounds.B = this.ScrollWidthPx * g_dKoef_pix_to_mm;
+            this.m_oMainView.Bounds.B = this.ScrollWidthPx * g_dKoef_pix_to_mm;
+
+            if (this.m_oApi.isMobileVersion)
+            {
+                this.m_oPanelRight.Bounds.B = 0;
+                this.m_oMainView.Bounds.B = 0;
+            }
+        }
+        else
+        {
+            if (this.m_bIsCheckHeedHorScrollRepeat && oldVisible == true)
+            {
+                this.m_bIsHorScrollVisible = true;
+                this.m_dScrollX = 0;
+            }
+            else
+            {
+                this.m_oPanelRight.Bounds.B = 0;
+                this.m_oMainView.Bounds.B = 0;
+                this.m_oScrollHor.HtmlElement.style.display = 'none';
+            }
+        }
+
+        if (this.m_bIsHorScrollVisible != oldVisible)
+        {
+            this.m_bIsCheckHeedHorScrollRepeat = true;
+            this.m_dScrollX = 0;
+            this.OnResize(true);
+            return true;
+        }
+        this.m_bIsCheckHeedHorScrollRepeat = false;
+        return false;
+    }
+
+    this.StartUpdateOverlay = function()
+    {
+        this.IsUpdateOverlayOnlyEnd = true;
+    }
+    this.EndUpdateOverlay = function()
+    {
+        this.IsUpdateOverlayOnlyEnd = false;
+        if (this.IsUpdateOverlayOnEndCheck)
+            this.OnUpdateOverlay();
+        this.IsUpdateOverlayOnEndCheck = false;
+    }
+
+    this.OnUpdateOverlay = function()
+    {
+        if (this.IsUpdateOverlayOnlyEnd)
+        {
+            this.IsUpdateOverlayOnEndCheck = true;
+            return false;
+        }
+
+        var overlay = this.m_oOverlayApi;
+
+        overlay.Clear();
+        var ctx = overlay.m_oContext;
+
+        var drDoc = this.m_oDrawingDocument;
+
+        if (drDoc.m_bIsSearching)
+        {
+            ctx.fillStyle = "rgba(255,200,0,1)";
+            ctx.beginPath();
+
+            var drDoc = this.m_oDrawingDocument;
+            drDoc.DrawSearch(overlay);
+
+            ctx.globalAlpha = 0.5;
+            ctx.fill();
+            ctx.beginPath();
+            ctx.globalAlpha = 1.0;
+
+            if (null != drDoc.CurrentSearchNavi)
+            {
+                ctx.globalAlpha = 0.2;
+                ctx.fillStyle = "rgba(51,102,204,255)";
+
+                var places = drDoc.CurrentSearchNavi.Place;
+                for (var i = 0; i < places.length; i++)
+                {
+                    var place = places[i];
+                    if (drDoc.SlideCurrent == place.PageNum)
+                    {
+                        drDoc.DrawSearchCur(overlay, place);
+                    }
+                }
+
+                ctx.fill();
+                ctx.globalAlpha = 1.0;
+            }
+        }
+
+        if (drDoc.m_bIsSelection)
+        {
+            ctx.fillStyle = "rgba(51,102,204,255)";
+            ctx.strokeStyle = "#9ADBFE";
+            //ctx.strokeStyle = "rgba(206,238,255,255)";
+            //ctx.strokeStyle = "#FFFFFF";
+            ctx.beginPath();
+
+            if (drDoc.SlideCurrent != -1)
+                drDoc.DrawSelection(overlay);
+
+            ctx.globalAlpha = 0.2;
+            ctx.fill();
+            ctx.globalAlpha = 1.0;
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.globalAlpha = 1.0;
+        }
+
+        ctx.globalAlpha = 1.0;
+        ctx = null;
+
+        if (this.m_oLogicDocument != null)
+        {
+            this.m_oLogicDocument.Slides[drDoc.SlideCurrent].drawSelect();
+
+            var elements = this.m_oLogicDocument.Slides[this.m_oLogicDocument.CurPage].elementsManipulator;
+            if (elements.State.id!=0 && -1 != drDoc.SlideCurrent)
+            {
+                var drawPage = drDoc.SlideCurrectRect;
+                drDoc.AutoShapesTrack.init(overlay, drawPage.left, drawPage.top, drawPage.right, drawPage.bottom, this.m_oLogicDocument.Width, this.m_oLogicDocument.Height);
+
+                elements.DrawOnOverlay(drDoc.AutoShapesTrack);
+                drDoc.AutoShapesTrack.CorrectOverlayBounds();
+            }
+        }
+
+        return true;
+    }
+
+    this.GetDrawingPageInfo = function(nPageIndex)
+    {
+        return {
+            drawingPage : this.m_oDrawingDocument.SlideCurrectRect,
+            width_mm : this.m_oLogicDocument.Width,
+            height_mm : this.m_oLogicDocument.Height
+        };
+    }
+
+    this.OnCalculatePagesPlace = function()
+    {
+        if (false === oThis.m_oApi.bInit_word_control)
+            return;
+
+        var canvas = this.m_oEditor.HtmlElement;
+        if (null == canvas)
+            return;
+
+        var dKoef = (this.m_nZoomValue * g_dKoef_mm_to_pix / 100);
+        var _bounds_slide = this.SlideDrawer.BoundsChecker.Bounds;
+
+        var _slideW = (dKoef * this.m_oLogicDocument.Width) >> 0;
+        var _slideH = (dKoef * this.m_oLogicDocument.Height) >> 0;
+
+        var _centerX = (this.m_oEditor.HtmlElement.width / 2) >> 0;
+        var _centerSlideX = (dKoef * this.m_oLogicDocument.Width / 2) >> 0;
+        var _hor_width_left = Math.min(0, _centerX - (_centerSlideX - _bounds_slide.min_x) - this.SlideDrawer.CONST_BORDER);
+        var _hor_width_right = Math.max(this.m_oEditor.HtmlElement.width - 1, _centerX + (_bounds_slide.max_x - _centerSlideX) + this.SlideDrawer.CONST_BORDER);
+
+        var _centerY = (this.m_oEditor.HtmlElement.height / 2) >> 0;
+        var _centerSlideY = (dKoef * this.m_oLogicDocument.Height / 2) >> 0;
+        var _ver_height_top = Math.min(0, _centerY - (_centerSlideY - _bounds_slide.min_y) - this.SlideDrawer.CONST_BORDER);
+        var _ver_height_bottom = Math.max(this.m_oEditor.HtmlElement.height - 1, _centerX + (_bounds_slide.max_y - _centerSlideY) + this.SlideDrawer.CONST_BORDER);
+
+        if (this.m_dScrollY <= this.SlideScrollMIN)
+            this.m_dScrollY = this.SlideScrollMIN;
+        if (this.m_dScrollY >= this.SlideScrollMAX)
+            this.m_dScrollY = this.SlideScrollMAX;
+
+        var _x = -this.m_dScrollX + _centerX - _centerSlideX - _hor_width_left;
+        var _y = -(this.m_dScrollY - this.SlideScrollMIN) + _centerY - _centerSlideY - _ver_height_top;
+
+        this.m_oDrawingDocument.SlideCurrectRect.left = _x;
+        this.m_oDrawingDocument.SlideCurrectRect.top = _y;
+        this.m_oDrawingDocument.SlideCurrectRect.right = _x + _slideW;
+        this.m_oDrawingDocument.SlideCurrectRect.bottom = _y + _slideH;
+
+        if (this.m_oApi.isMobileVersion || this.m_oApi.isViewMode)
+        {
+            var lPage = this.m_oApi.GetCurrentVisiblePage();
+            this.m_oApi.asc_fireCallback("asc_onCurrentVisiblePage", this.m_oApi.GetCurrentVisiblePage());
+        }
+    }
+
+    this.OnPaint = function()
+    {
+        if (false === oThis.m_oApi.bInit_word_control)
+            return;
+
+        var canvas = this.m_oEditor.HtmlElement;
+        if (null == canvas)
+            return;
+
+        var context = canvas.getContext("2d");
+        var _width  = canvas.width;
+        var _height = canvas.height;
+
+        context.fillStyle = "#B0B0B0";
+        context.fillRect(0, 0, _width, _height);
+        //context.clearRect(0, 0, _width, _height);
+
+        this.SlideDrawer.DrawSlide(context, this.m_dScrollX, this.m_dScrollX_max,
+            this.m_dScrollY - this.SlideScrollMIN, this.m_dScrollY_max, this.m_oDrawingDocument.SlideCurrent);
+
+        this.OnUpdateOverlay();
+
+        if (this.m_bIsUpdateHorRuler)
+        {
+            this.UpdateHorRuler();
+            this.m_bIsUpdateHorRuler = false;
+        }
+        if (this.m_bIsUpdateVerRuler)
+        {
+            this.UpdateVerRuler();
+            this.m_bIsUpdateVerRuler = false;
+        }
+        if (this.m_bIsUpdateTargetNoAttack)
+        {
+            this.m_oDrawingDocument.UpdateTargetNoAttack();
+            this.m_bIsUpdateTargetNoAttack = false;
+        }
+    }
+
+    this.CheckFontCache = function()
+    {
+        var _c = oThis;
+        _c.m_nCurrentTimeClearCache++;
+        if (_c.m_nCurrentTimeClearCache > 750) // 30 ������. �������������� ��� ����� ��������� �������� �������!!!
+        {
+            _c.m_nCurrentTimeClearCache = 0;
+            _c.m_oDrawingDocument.CheckFontCache();
+        }
+    }
+    this.OnScroll = function()
+    {
+        this.OnCalculatePagesPlace();
+        this.m_bIsScroll = true;
+    }
+
+    this.CheckZoom = function()
+    {
+        this.m_oDrawingDocument.ClearCachePages();
+    }
+
+    this.CalculateDocumentSize = function(bIsAttack)
+    {
+        if (false === oThis.m_oApi.bInit_word_control)
+        {
+            oThis.UpdateScrolls();
+            return;
+        }
+
+        this.m_dDocumentWidth   = 0;
+        this.m_dDocumentHeight  = 0;
+        this.m_dDocumentPageWidth = 0;
+        this.m_dDocumentPageHeight = 0;
+
+        var dKoef = (this.m_nZoomValue * g_dKoef_mm_to_pix / 100);
+
+        var _bounds_slide = this.SlideDrawer.BoundsChecker.Bounds;
+
+        var _centerX = (this.m_oEditor.HtmlElement.width / 2) >> 0;
+        var _centerSlideX = (dKoef * this.m_oLogicDocument.Width / 2) >> 0;
+        var _hor_width_left = Math.min(0, _centerX - (_centerSlideX - _bounds_slide.min_x) - this.SlideDrawer.CONST_BORDER);
+        var _hor_width_right = Math.max(this.m_oEditor.HtmlElement.width - 1, _centerX + (_bounds_slide.max_x - _centerSlideX) + this.SlideDrawer.CONST_BORDER);
+
+        var _centerY = (this.m_oEditor.HtmlElement.height / 2) >> 0;
+        var _centerSlideY = (dKoef * this.m_oLogicDocument.Height / 2) >> 0;
+        var _ver_height_top = Math.min(0, _centerY - (_centerSlideY - _bounds_slide.min_y) - this.SlideDrawer.CONST_BORDER);
+        var _ver_height_bottom = Math.max(this.m_oEditor.HtmlElement.height - 1, _centerY + (_bounds_slide.max_y - _centerSlideY) + this.SlideDrawer.CONST_BORDER);
+
+        var lWSlide = _hor_width_right - _hor_width_left + 1;
+        var lHSlide = _ver_height_bottom - _ver_height_top + 1;
+
+        var one_slide_width = lWSlide;
+        var one_slide_height = Math.max(lHSlide, this.m_oEditor.HtmlElement.height);
+
+        this.m_dDocumentPageWidth = one_slide_width;
+        this.m_dDocumentPageHeight = one_slide_height;
+
+        this.m_dDocumentWidth = one_slide_width;
+        this.m_dDocumentHeight = (one_slide_height * this.m_oDrawingDocument.SlidesCount) >> 0;
+
+        if (!bIsAttack && this.OldDocumentWidth == this.m_dDocumentWidth && this.OldDocumentHeight == this.m_dDocumentHeight)
+        {
+            /*
+            this.Thumbnails.SlideWidth = this.m_oLogicDocument.Width;
+            this.Thumbnails.SlideHeight = this.m_oLogicDocument.Height;
+            this.Thumbnails.SlidesCount = this.m_oDrawingDocument.SlidesCount;
+            this.Thumbnails.CheckSizes();
+            return;
+            */
+        }
+
+        this.OldDocumentWidth = this.m_dDocumentWidth;
+        this.OldDocumentHeight = this.m_dDocumentHeight;
+
+        this.SlideScrollMIN = this.m_oDrawingDocument.SlideCurrent * one_slide_height;
+        this.SlideScrollMAX = this.SlideScrollMIN + one_slide_height - this.m_oEditor.HtmlElement.height;
+
+        // теперь проверим необходимость перезуммирования
+        if (1 == this.m_nZoomType)
+        {
+            if (true === this.zoom_FitToWidth())
+                return;
+        }
+        if (2 == this.m_nZoomType)
+        {
+            if (true === this.zoom_FitToPage())
+                return;
+        }
+
+        this.MainScrollLock();
+
+        this.checkNeedHorScroll();
+
+        var ver_scroll = document.getElementById('id_vertical_scroll');
+        document.getElementById('panel_right_scroll').style.height = this.m_dDocumentHeight + "px";
+
+        this.UpdateScrolls();
+
+        this.MainScrollUnLock();
+
+        this.Thumbnails.SlideWidth = this.m_oLogicDocument.Width;
+        this.Thumbnails.SlideHeight = this.m_oLogicDocument.Height;
+        this.Thumbnails.SlidesCount = this.m_oDrawingDocument.SlidesCount;
+        this.Thumbnails.CheckSizes();
+    }
+
+    this.InitDocument = function(bIsEmpty)
+    {
+        this.m_oDrawingDocument.m_oWordControl = this;
+        this.m_oDrawingDocument.m_oLogicDocument = this.m_oLogicDocument;
+
+        if (false === bIsEmpty)
+        {
+            this.m_oLogicDocument.LoadTestDocument();
+        }
+
+        this.CalculateDocumentSize();
+        this.StartMainTimer();
+
+        this.CreateBackgroundHorRuler();
+        this.CreateBackgroundVerRuler();
+        this.UpdateHorRuler();
+        this.UpdateVerRuler();
+    }
+
+    this.InitControl = function()
+    {
+        this.Thumbnails.Init();
+
+        this.CalculateDocumentSize();
+        this.StartMainTimer();
+
+        this.CreateBackgroundHorRuler();
+        this.CreateBackgroundVerRuler();
+        this.UpdateHorRuler();
+        this.UpdateVerRuler();
+
+        this.m_oApi.syncOnThumbnailsShow();
+    }
+
+    this.StartMainTimer = function()
+    {
+        if (-1 == this.m_nPaintTimerId)
+            this.onTimerScroll();
+    }
+
+    this.onTimerScroll = function(isThUpdateSync)
+    {
+        var oWordControl = oThis;
+        oWordControl.m_nTimeDrawingLast = new Date().getTime();
+        if (oWordControl.m_bIsScroll)
+        {
+            oWordControl.m_bIsScroll = false;
+            oWordControl.OnPaint();
+
+            if (isThUpdateSync !== undefined)
+            {
+                oWordControl.Thumbnails.onCheckUpdate();
+            }
+        }
+        else
+        {
+            oWordControl.Thumbnails.onCheckUpdate();
+        }
+        if (null != oWordControl.m_oLogicDocument)
+        {
+            oWordControl.m_oDrawingDocument.UpdateTargetFromPaint = true;
+            oWordControl.m_oLogicDocument.CheckTargetUpdate();
+            oWordControl.m_oDrawingDocument.CheckTargetShow();
+            oWordControl.m_oDrawingDocument.UpdateTargetFromPaint = false;
+
+            oWordControl.CheckFontCache();
+        }
+
+        this.m_nPaintTimerId = setTimeout(oWordControl.onTimerScroll, oWordControl.m_nTimerScrollInterval);
+        //window.requestAnimationFrame(oWordControl.onTimerScroll);
+    }
+
+    this.onTimerScroll_sync = function(isThUpdateSync)
+    {
+        var oWordControl = oThis;
+        oWordControl.m_nTimeDrawingLast = new Date().getTime();
+        if (oWordControl.m_bIsScroll)
+        {
+            oWordControl.m_bIsScroll = false;
+            oWordControl.OnPaint();
+
+            if (isThUpdateSync !== undefined)
+            {
+                oWordControl.Thumbnails.onCheckUpdate();
+            }
+        }
+        else
+        {
+            oWordControl.Thumbnails.onCheckUpdate();
+        }
+        if (null != oWordControl.m_oLogicDocument)
+        {
+            oWordControl.m_oDrawingDocument.UpdateTargetFromPaint = true;
+            oWordControl.m_oLogicDocument.CheckTargetUpdate();
+            oWordControl.m_oDrawingDocument.CheckTargetShow();
+            oWordControl.m_oDrawingDocument.UpdateTargetFromPaint = false;
+
+            oWordControl.CheckFontCache();
+        }
+    }
+
+    this.UpdateHorRuler = function()
+    {
+        if (!this.m_bIsRuler)
+            return;
+
+        if (this.m_oDrawingDocument.SlideCurrent == -1)
+            return;
+
+        var drawRect = this.m_oDrawingDocument.SlideCurrectRect;
+        var _left = drawRect.left;
+        this.m_oHorRuler.BlitToMain(_left, 0, this.m_oTopRuler_horRuler.HtmlElement);
+    }
+    this.UpdateVerRuler = function()
+    {
+        if (!this.m_bIsRuler)
+            return;
+
+        if (this.m_oDrawingDocument.SlideCurrent == -1)
+            return;
+
+        var drawRect = this.m_oDrawingDocument.SlideCurrectRect;
+        var _top = drawRect.top;
+        this.m_oVerRuler.BlitToMain(0, _top, this.m_oLeftRuler_vertRuler.HtmlElement);
+    }
+
+    this.SetCurrentPage = function()
+    {
+        var drDoc = this.m_oDrawingDocument;
+        if (0 <= drDoc.SlideCurrent && drDoc.SlideCurrent < drDoc.SlidesCount)
+        {
+            this.CreateBackgroundHorRuler();
+            this.CreateBackgroundVerRuler();
+        }
+
+        this.m_bIsUpdateHorRuler = true;
+        this.m_bIsUpdateVerRuler = true;
+
+        this.OnScroll();
+
+        this.m_oApi.sync_currentPageCallback(drDoc.m_lCurrentPage);
+    }
+
+    this.UpdateHorRulerBack = function()
+    {
+        var drDoc = this.m_oDrawingDocument;
+        if (0 <= drDoc.m_lCurrentPage && drDoc.m_lCurrentPage < drDoc.m_lPagesCount)
+        {
+            this.CreateBackgroundHorRuler();
+        }
+        this.UpdateHorRuler();
+    }
+    this.UpdateVerRulerBack = function()
+    {
+        var drDoc = this.m_oDrawingDocument;
+        if (0 <= drDoc.m_lCurrentPage && drDoc.m_lCurrentPage < drDoc.m_lPagesCount)
+        {
+            this.CreateBackgroundVerRuler();
+        }
+        this.UpdateVerRuler();
+    }
+
+    this.CreateBackgroundHorRuler = function(margins)
+    {
+        var cachedPage = new Object();
+        cachedPage.width_mm = this.m_oLogicDocument.Width;
+        cachedPage.height_mm = this.m_oLogicDocument.Height;
+
+        if (margins !== undefined)
+        {
+            cachedPage.margin_left    = margins.L;
+            cachedPage.margin_top     = margins.T;
+            cachedPage.margin_right   = margins.R;
+            cachedPage.margin_bottom  = margins.B;
+        }
+        else
+        {
+            cachedPage.margin_left    = 0;
+            cachedPage.margin_top     = 0;
+            cachedPage.margin_right   = this.m_oLogicDocument.Width;
+            cachedPage.margin_bottom  = this.m_oLogicDocument.Height;
+        }
+
+        this.m_oHorRuler.CreateBackground(cachedPage);
+    }
+    this.CreateBackgroundVerRuler = function(margins)
+    {
+        var cachedPage = new Object();
+        cachedPage.width_mm = this.m_oLogicDocument.Width;
+        cachedPage.height_mm = this.m_oLogicDocument.Height;
+
+        if (margins !== undefined)
+        {
+            cachedPage.margin_left    = margins.L;
+            cachedPage.margin_top     = margins.T;
+            cachedPage.margin_right   = margins.R;
+            cachedPage.margin_bottom  = margins.B;
+        }
+        else
+        {
+            cachedPage.margin_left    = 0;
+            cachedPage.margin_top     = 0;
+            cachedPage.margin_right   = this.m_oLogicDocument.Width;
+            cachedPage.margin_bottom  = this.m_oLogicDocument.Height;
+        }
+
+        this.m_oVerRuler.CreateBackground(cachedPage);
+    }
+
+    this.CheckLayouts = function(bIsAttack)
+    {
+        if (-1 == this.m_oDrawingDocument.SlideCurrent)
+            return;
+
+        var master = this.m_oLogicDocument.Slides[this.m_oDrawingDocument.SlideCurrent].Layout.Master;
+        if (this.MasterLayouts != master || bIsAttack === true)
+        {
+            this.MasterLayouts = master;
+
+            var _len = master.sldLayoutLst.length;
+            var arr = new Array(_len);
+
+            for (var i = 0; i < _len; i++)
+            {
+                arr[i] = new CLayoutThumbnail();
+                arr[i].Index = i;
+
+                var __type = master.sldLayoutLst[i].type;
+                if (__type !== undefined && __type != null)
+                    arr[i].Type = __type;
+
+                arr[i].Name = master.sldLayoutLst[i].cSld.name;
+                arr[i].Image = "data:image/png;base64," + master.sldLayoutLst[i].ImageBase64;
+            }
+
+            editor.asc_fireCallback("asc_onUpdateLayout", arr);
+            editor.asc_fireCallback("asc_onUpdateThemeIndex", this.MasterLayouts.ThemeIndex);
+
+            this.m_oDrawingDocument.SendThemeColorScheme();
+        }
+
+        this.m_oDrawingDocument.CheckGuiControlColors();
+    }
+
+    this.GoToPage = function(lPageNum)
+    {
+        var drDoc = this.m_oDrawingDocument;
+        if (lPageNum < 0 || lPageNum >= drDoc.SlidesCount)
+            return;
+
+        this.Thumbnails.LockMainObjType = true;
+        this.StartVerticalScroll = false;
+        this.m_oApi.asc_fireCallback("asc_onEndPaintSlideNum");
+
+        drDoc.SlideCurrent = lPageNum;
+        this.m_oLogicDocument.Set_CurPage(lPageNum);
+
+        // теперь пошлем все шаблоны первой темы
+        this.CheckLayouts();
+
+        this.SlideDrawer.CheckSlide(drDoc.SlideCurrent);
+        this.CalculateDocumentSize(false);
+
+        this.Thumbnails.SelectPage(lPageNum);
+
+        this.CreateBackgroundHorRuler();
+        this.CreateBackgroundVerRuler();
+
+        this.m_bIsUpdateHorRuler = true;
+        this.m_bIsUpdateVerRuler = true;
+
+        //this.m_oScrollVerApi.scrollTo(0, drDoc.SlideCurrent * this.m_dDocumentPageHeight);
+        if (this.IsGoToPageMAXPosition)
+        {
+            this.m_oScrollVerApi.scrollToY(this.SlideScrollMAX);
+            this.IsGoToPageMAXPosition = false;
+        }
+        else
+        {
+            this.m_oScrollVerApi.scrollToY(this.SlideScrollMIN);
+        }
+
+        if (this.m_oApi.isViewMode === false && null != this.m_oLogicDocument)
+        {
+			//this.m_oLogicDocument.Set_CurPage( drDoc.SlideCurrent );
+			//this.m_oLogicDocument.Cursor_MoveAt(0, 0, false);
+			this.m_oLogicDocument.RecalculateCurPos();
+
+            this.m_oApi.sync_currentPageCallback(drDoc.SlideCurrent);
+        }
+        else
+        {
+            this.m_oApi.sync_currentPageCallback(drDoc.SlideCurrent);
+        }
+
+        this.Thumbnails.LockMainObjType = false;
+    }
+
+    this.GetVerticalScrollTo = function(y, page)
+    {
+        var dKoef = g_dKoef_mm_to_pix * this.m_nZoomValue / 100;
+
+        var lYPos = page * this.m_oLogicDocument.Height * dKoef;
+        lYPos += y * dKoef;
+        return lYPos;
+    }
+
+    this.GetHorizontalScrollTo = function(x, page)
+    {
+        var dKoef = g_dKoef_mm_to_pix * this.m_nZoomValue / 100;
+        return 5 + dKoef * x;
+    }
+
+    // -------------------------------------------------------- //
+    // -------------------- east asian fonts ------------------ //
+    // -------------------------------------------------------- //
+
+    this.ReinitTB = function()
+    {
+        this.TextBoxChangedValueEvent = false;
+        this.TextBoxInput.value = "";
+        this.TextBoxChangedValueEvent = true;
+    }
+
+    this.SetTextBoxMode = function(isEA)
+    {
+        if (!this.m_oApi.bInit_word_control)
+            return;
+
+        this.TextBoxInputMode = isEA;
+        if (isEA)
+        {
+            if (null == this.TextBoxInput)
+            {
+                this.TextBoxInput = document.createElement('textarea');
+                this.TextBoxInput.id = "area_id";
+
+                this.TextBoxInput.setAttribute("style", "font-family:arial;font-size:12pt;position:absolute;resize:none;padding:2px;margin:0px;font-weight:normal;box-sizing:content-box;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;");
+                this.TextBoxInput.style.border = "2px solid #4363A4";
+
+                this.TextBoxInput.style.width = "100px";
+                //this.TextBoxInput.style.height = "40px";
+                this.TextBoxInput.rows = 1;
+
+                this.m_oMainView.HtmlElement.appendChild(this.TextBoxInput);
+
+                this.TextBoxInput["oninput"] = this.OnTextBoxInput;
+                this.TextBoxInput.onkeydown = this.TextBoxOnKeyDown;
+            }
+
+            if (this.TextBoxInputFocus)
+            {
+                this.onChangeTB();
+            }
+            else
+            {
+                this.TextBoxInputFocus = false;
+                this.ReinitTB();
+                this.TextBoxInput.style.overflow = 'hidden';
+                this.TextBoxInput.style.zIndex = -1;
+                this.TextBoxInput.style.top = "-1000px";
+
+            }
+
+            this.TextBoxInput.focus();
+        }
+        else
+        {
+            if (this.TextBoxInputFocus)
+                this.onChangeTB();
+
+            // удаляем текстбокс
+            if (null != this.TextBoxInput)
+            {
+                this.m_oMainView.HtmlElement.removeChild(this.TextBoxInput);
+                this.TextBoxInput = null;
+            }
+        }
+    }
+
+    this.TextBoxFocus = function()
+    {
+        if (null == oThis.TextBoxInput || oThis.TextBoxInputFocus === true || oThis.TextBoxChangedValueEvent == false)
+            return;
+
+        oThis.TextBoxInputFocus = true;
+        CollaborativeEditing.m_bGlobalLock = true;
+        oThis.CheckTextBoxInputPos();
+        oThis.TextBoxInput.style.zIndex = 1000;
+    }
+
+    this.OnTextBoxInput = function()
+    {
+        oThis.TextBoxFocus();
+        oThis.CheckTextBoxSize();
+    }
+
+    this.CheckTextBoxSize = function()
+    {
+        if (null == this.TextBoxInput || !this.TextBoxInputFocus)
+            return;
+
+        // теперь нужно расчитать ширину/высоту текстбокса
+        var _p = document.createElement('p');
+        _p.style.zIndex = "-1";
+        _p.style.position = "absolute";
+        _p.style.fontFamily = "arial";
+        _p.style.fontSize = "12pt";
+        _p.style.left = "0px";
+        _p.style.width = oThis.TextBoxMaxWidth + "px";
+
+        this.m_oMainView.HtmlElement.appendChild(_p);
+
+        var _t = this.TextBoxInput.value;
+        _t = _t.replace(" ", "&nbsp;");
+        _p.innerHTML = "<span>" + _t + "</span>";
+        var _width = _p.firstChild.offsetWidth;
+        _width = Math.min(_width + 10, this.TextBoxMaxWidth);
+
+        var area = document.createElement('textarea');
+        area.style.zIndex = "-1";
+        area.id = "area2_id";
+        area.rows = 1;
+        area.setAttribute("style", "font-family:arial;font-size:12pt;position:absolute;resize:none;padding:2px;margin:0px;font-weight:normal;box-sizing:content-box;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;");
+        area.style.overflow = "hidden";
+        area.style.width = _width + "px";
+        this.m_oMainView.HtmlElement.appendChild(area);
+
+        area.value = this.TextBoxInput.value;
+
+        var _height = area.clientHeight;
+        if (area.scrollHeight > _height)
+            _height = area.scrollHeight;
+
+        if (_height > oThis.TextBoxMaxHeight)
+            _height = oThis.TextBoxMaxHeight;
+
+        this.m_oMainView.HtmlElement.removeChild(_p);
+        this.m_oMainView.HtmlElement.removeChild(area);
+
+        this.TextBoxInput.style.width = _width + "px";
+        this.TextBoxInput.style.height = _height + "px";
+
+        // вот такая заглушка под firefox если этого не делать, то будет плохо перерисовываться border)
+        var oldZindex = parseInt(this.TextBoxInput.style.zIndex);
+        var newZindex = (oldZindex == 1000) ? "999" : "1000";
+        this.TextBoxInput.style.zIndex = newZindex;
+    }
+
+    this.TextBoxOnKeyDown = function(e)
+    {
+        check_KeyboardEvent(e);
+        if (global_keyboardEvent.KeyCode == 9)
+        {
+            e.preventDefault();
+            return false;
+        }
+    }
+
+    this.onChangeTB = function()
+    {
+        CollaborativeEditing.m_bGlobalLock = false;
+        this.TextBoxInput.style.zIndex = -1;
+        this.TextBoxInput.style.top = "-1000px";
+        this.TextBoxInputFocus = false;
+        oThis.m_oLogicDocument.TextBox_Put(oThis.TextBoxInput.value);
+        this.ReinitTB();
+    }
+    this.CheckTextBoxInputPos = function()
+    {
+        if (this.TextBoxInput == null || !this.TextBoxInputFocus)
+            return;
+
+        var _left = parseInt(this.m_oDrawingDocument.TargetHtmlElement.style.left);
+        var _top = parseInt(this.m_oDrawingDocument.TargetHtmlElement.style.top);
+
+        var _h = (this.m_oDrawingDocument.m_dTargetSize * this.m_nZoomValue * g_dKoef_mm_to_pix / 100) >> 0;
+
+        var _r_max = (this.m_oEditor.AbsolutePosition.R * g_dKoef_mm_to_pix) >> 0;
+        _r_max -= 20;
+        if ((_r_max - _left) > 50)
+        {
+            this.TextBoxMaxWidth = _r_max - _left;
+        }
+        else
+        {
+            _left = _r_max - 50;
+            this.TextBoxMaxWidth = 50;
+        }
+        var _b_max = (this.m_oEditor.AbsolutePosition.B * g_dKoef_mm_to_pix) >> 0;
+        _b_max -= 40;
+        if ((_b_max - _top) > 50)
+        {
+            this.TextBoxMaxHeight = _b_max - _top;
+        }
+        else
+        {
+            _top = _b_max - 50;
+            this.TextBoxMaxHeight = 50;
+        }
+
+        this.TextBoxInput.style.left = _left + "px";
+        this.TextBoxInput.style.top = (_top + _h) + "px";
+
+        this.CheckTextBoxSize();
+
+        this.TextBoxInput.focus();
+    }
+
+    this.SaveDocument = function()
+    {
+        var writer = new CBinaryFileWriter();
+        var str = writer.WriteDocument(this.m_oLogicDocument);
+		return str;
+        //console.log(str);
+    }
+}
+
+var _message_update = "zero_delay_update";
+function handleMessage(event)
+{
+    if (event.source == window && event.data == _message_update)
+    {
+        var oWordControl = editor.WordControl;
+        event.stopPropagation();
+        oWordControl.OnPaint();
+        if (null != oWordControl.m_oLogicDocument)
+        {
+            oWordControl.m_oDrawingDocument.UpdateTargetFromPaint = true;
+            oWordControl.m_oLogicDocument.CheckTargetUpdate();
+            oWordControl.m_oDrawingDocument.UpdateTargetFromPaint = false;
+            //setTimeout("oWordControl.OnPaint();", 10);
+        }
+    }
+}
+if(window.addEventListener)
+    window.addEventListener("message", handleMessage, true);
+
+function sendStatus(Message)
+{
+    editor.sync_StatusMessage(Message);
+}

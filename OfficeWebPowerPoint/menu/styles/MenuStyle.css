@@ -1,0 +1,936 @@
+#mainmenu
+{
+	background: none repeat scroll 0 0 #454a50;
+	/*border-top: 2px solid #1d6192;*/
+	clear: both;
+	cursor: default;
+	font-size: 13px;
+	margin: 0;
+	outline: medium none;
+	position: relative;
+	text-align: left;
+	vertical-align: top;
+
+}
+
+#textMenu, #shapeMenu, #AutoShapesMenu
+{
+	background: none repeat scroll 0 0 #E3E9FF;
+	clear: both;
+	cursor: default;
+	font-size: 13px;
+	margin: 0;
+	outline: medium none;
+	position: relative;
+	text-align: left;
+	vertical-align: top;
+}
+
+#fontFormat
+{
+	min-width: 110px;
+	width: 110px;
+	height: 26px;
+}
+
+#fontSelect
+{
+	min-width: 140px;
+	width:  210px;
+	height: 26px;
+}
+
+#fontSizeSelect
+{
+	min-width: 35px;
+	width: 35px;
+	height: 26px;
+}
+
+.PopUpMenuStyle
+{
+	font: 13px Arial,sans-serif;
+	background: none repeat scroll 0 0 #FFFFFF;
+	border-collapse: collapse;
+	border-color: #CCCCCC #676767 #676767 #CCCCCC;
+	border-style: solid;
+	border-width: 1px;
+	color: #333333;
+	cursor: default;
+	font-weight: normal;
+	margin: 0;
+	outline: medium none;
+	padding: 4px 0;
+	position: absolute;
+	white-space: nowrap;
+	z-index: 20000;
+}
+
+.PopUpMenuStyle2
+{
+	font: 13px Arial,sans-serif;
+	background: none repeat scroll 0 0 #EEF0F2;
+	border-collapse: collapse;
+	border-color: #CCCCCC #676767 #676767 #CCCCCC;
+	border-style: solid;
+	border-width: 1px;
+	color: #333333;
+	cursor: default;
+	font-weight: normal;
+	margin: 0;
+	outline: medium none;
+	padding: 4px 0;
+	position: absolute;
+	white-space: nowrap;
+	z-index: 20000;
+	
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	user-select: none;
+}
+#formulaMore
+{
+	font: 13px Arial,sans-serif;
+	background: none repeat scroll 0 0 #EEF0F2;
+	border-collapse: collapse;
+	border-color: #CCCCCC #676767 #676767 #CCCCCC;
+	border-style: solid;
+	border-width: 1px;
+	color: #333333;
+	cursor: default;
+	font-weight: normal;
+	margin: 0;
+	outline: medium none;
+	padding: 4px 0;
+	white-space: nowrap;
+	
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	user-select: none;
+}
+#formulaMore .TextStyle
+{
+	padding: 2px 0px 2px 10px;
+}
+
+#formulaList1 .formulaItem, #formulaList2 .formulaItem
+{
+	vertical-align: top;
+	padding: 5px 14px 5px 18px;
+	margin-left: 3px;
+    margin-right: 3px;
+}
+#fmtList .fmtItem, #DigitList .DigitItem, #DateList .DateItem, #MoneyList .MoneyItem
+{
+	vertical-align: top;
+	padding: 5px 14px 5px 18px;
+	margin-left: 3px;
+    margin-right: 3px;
+}
+#MenuColumn .MenuColumnItem, #MenuRow .MenuRowItem, #MenuCell .MenuCellItem, #MenuSheet .MenuSheetItem, #HiddenSheets .MenuSheetItem
+{
+	padding: 4px 7em 4px 28px;
+	vertical-align: top;
+}
+#DigitItem, #DateList, #MoneyList, #MenuColumn, #MenuRow, #MenuCell, #MenuSheet, #HiddenSheets
+{
+	cursor: pointer;
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	user-select: none;
+}
+.DateItemRoot, #DateList .DateItemRoot
+{
+	font: italic bold 11px Arial;
+	padding: 3px 14px 0px 18px;
+	min-width: 200px;
+	
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	user-select: none;
+}
+.MoneyShortCut, .DateShortCut, .NumberShortCut, #DigitList .NumberShortCut, #DateList .DateShortCut, #MoneyList .MoneyShortCut
+{
+	font: 8pt Tahoma;
+	
+	color: #999999;
+	position: absolute;
+	right: 0;
+	text-align: right;
+	padding: 0 10px;
+	
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	user-select: none;	
+}
+
+.MenubarIcon
+{
+	margin: 0px;
+	padding: 0px;
+	vertical-align: baseline;
+	
+	float: left;
+	margin-left: -21px;
+	margin-top: -1px;
+	background: url(../img/MainMenu_TM.png) no-repeat scroll 0 0 transparent;
+	height: 16px;
+	width: 16px;
+}
+.MenubarIcon2
+{
+	margin: 0px;
+	padding: 0px;
+	vertical-align: baseline;
+	
+	float: left;
+	margin-left: -21px;
+	margin-top: -1px;
+	background: url(../img/MainMenu.png) no-repeat scroll 0 0 transparent;
+	height: 16px;
+	width: 16px;
+}
+.MenubarIcon3
+{
+	margin: 0px;
+	padding: 0px;
+	vertical-align: baseline;
+	
+	float: left;
+	margin-left: -21px;
+	margin-top: -1px;
+	background: url(../img/MainMenu1.png) no-repeat scroll 0 0 transparent;
+	height: 16px;
+	width: 16px;
+}
+.MenubarIcon4
+{
+	margin: 0px;
+	padding: 0px;
+	vertical-align: baseline;
+	
+	float: left;
+	margin-left: -21px;
+	margin-top: -1px;
+	background: url(../img/MainMenu2.png) no-repeat scroll 0 0 transparent;
+	height: 16px;
+	width: 16px;
+}
+.MenubarIcon5
+{
+	margin: 0px;
+	padding: 0px;
+	vertical-align: baseline;
+	
+	float: left;
+	margin-left: -21px;
+	margin-top: -1px;
+	background: url(../img/toolbar.png) no-repeat scroll 0 0 transparent;
+	height: 16px;
+	width: 16px;
+}
+.ToolbarIconOut
+{
+	border-style: solid;
+	border-width: 1px 1px;
+	padding: 2px 2px;
+	border-color: transparent;
+	
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	user-select: none;
+}
+
+.ToolbarIconOut2
+{
+    padding: 3px 3px;
+
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    user-select: none;
+}
+
+.ToolbarColorIndicator, .ToolbarColorIndicator2
+{
+	width: 16px;
+	border-bottom: 4px solid;
+}
+.ToolbarColorIndicator
+{
+	border-bottom-color: #FFFF00;
+}
+.ToolbarColorIndicator2
+{
+	border-bottom-color: #FF0000;
+}
+.ToolbarButtonCaption
+{
+	padding: 5px 4px 0;
+	display: inline-block;
+	height: 21px;
+}
+.ToolbarDropDown
+{
+	/*margin-left:2px;*/
+	padding-right: 2px;
+	vertical-align: middle;
+	margin-top: 3px;
+	height: 12px;
+	margin-right: 2px;
+	width: 7px;
+	height: 12px;
+	background: url(../img/MainMenuBackground.png) no-repeat scroll 0 0 transparent;
+	background-position: -5px -50px;
+	display:inline-block;
+	position: relative;
+}
+.ToolbarDropDownInner
+{
+	height: 21px;
+	display: inline-block;
+	margin-left: -2px;
+	padding-top: 5px;
+}
+.ToolbarIconOutSelect
+{
+	border-color: #D6D8D9;
+}
+
+.ToolbarIcon
+{
+	margin: 0px;
+	padding: 0px;
+	vertical-align: top;
+	
+	float: left;
+	margin-left: 3px;
+	margin-top: 3px;
+	background: url(../img/MainMenu_TM.png) no-repeat scroll 0 0 transparent;
+	height: 16px;
+	width: 16px;
+}
+.ToolbarIcon2
+{
+	margin: 0px;
+	padding: 0px;
+	vertical-align: top;
+	
+	float: left;
+	margin-left: 3px;
+	margin-top: 3px;
+	background: url(../img/MainMenu_TM.png) no-repeat scroll 0 0 transparent;
+	height: 16px;
+	width: 16px;
+}
+.MenubarRedo, .ToolbarRedo
+{
+	background-position: -144px 50%;
+}
+.MenubarBold, .ToolbarBold
+{
+	background-position: -178px 50%;
+}
+.MenubarLeft, .ToolbarLeft
+{
+	background-position: -16px 50%;
+}
+.MenubarCenter, .ToolbarCenter
+{
+	background-position: -32px 50%;
+}
+.MenubarRight, .ToolbarRight
+{
+	background-position: -48px 50%;
+}
+.MenubarItalic, .ToolbarItalic
+{
+	background-position: -192px 50%;
+}
+.MenubarDecrease, .ToolbarDecrease
+{
+	background-position: -384px 50%;
+}
+.MenubarFind, .ToolbarFind
+{
+	background-position: -398px 50%;
+}
+.MenubarIncrease, .ToolbarIncrease
+{
+	background-position: -368px 50%;
+}
+.MenubarUnderline, .ToolbarUnderline
+{
+	background-position: -209px 50%;
+}
+.MenubarSup, .ToolbarSup
+{
+	background-position: -832px 50%;
+}
+.MenubarSub, .ToolbarSub
+{
+	background-position: -848px 50%;
+}
+.MenubarIncrease1, .ToolbarIncrease1
+{
+	background-position: -368px 50%;
+}
+.MenubarDecrease1, .ToolbarDecrease1
+{
+	background-position: -384px 50%;
+}
+.MenubarUndo, .ToolbarUndo
+{
+	background-position: -128px 50%;
+}
+
+.MenubarUndoD, .ToolbarUndoD
+{
+    background-position: -1414px 50%;
+}
+
+.MenubarRedoD, .ToolbarRedoD
+{
+    background-position: -1430px 50%;
+}
+
+.MenubarCharacters, .ToolbarCharacters
+{
+	background-position: -815px 50%;
+}
+.MenubarPagebreak, .ToolbarPagebreak
+{
+	background-position: -929px 50%;
+}
+.MenubarTable, .ToolbarTable
+{
+	background-position: -786px 50%;
+}
+.MenubarCopy, .ToolbarCopy
+{
+	background-position: -529px 50%;
+}
+.MenubarCut, .ToolbarCut
+{
+	background-position: -978px 50%;
+}
+.MenubarUnwritten, .ToolbarUnwritten
+{
+	background-position: -802px 50%;
+}
+
+.MenubarJustified, .ToolbarJustified
+{
+	background-position: -1px 50%;
+}
+.MenubarImage, .ToolbarImage
+{
+	background-position: -304px 50%;
+}
+.MenubarLink, .ToolbarLink
+{
+	background-position: -336px 50%;
+}
+.MenubarLine, .ToolbarLine
+{
+	background-position: -945px 50%;
+}
+.MenubarPaste, .ToolbarPaste
+{
+	background-position: -288px 50%;
+}
+.MenubarStyle, .ToolbarStyle 
+{
+    background-position: -994px 50%;
+}
+.MenubarPrint, .ToolbarPrint
+{
+	background-position: -320px 50%;
+}
+.MenubarSave
+{
+	background-position: -896px 50%;
+}
+.MenubarSaveAs
+{
+	background-position: -880px 50%;
+}
+.MenubarFunction
+{
+	background-position: -1025px 50%;
+}
+.MenubarClear, .ToolbarClear
+{
+    background-position: -994px 50%;
+}
+.MenubarAbout, .ToolbarAbout
+{
+	background-position: -1010px 50%;
+}
+.MenubarPrintPreview, .ToolbarPrintPreview
+{
+	background-position: -910px 50%;
+}
+.MenubarSelectAll, .ToolbarSelectAll
+{
+	background-position: -865px 50%;
+}
+.MenubarFindReplace, .ToolbarFindReplace
+{
+	background-position: -961px 50%;
+}
+.MenuSeparator
+{
+	border-top: 1px solid #CCCCCC;
+	margin: 4px 0;
+	padding: 0;
+	
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	user-select: none;
+}
+
+.MenuArrow
+{
+	color: #000000;
+	left: auto;
+	padding-right: 6px;
+	position: absolute;
+	right: 0;
+	text-align: right;
+}
+
+li.SubItem.hover
+{
+	background-color: #4D81A5;
+    color: #FFFFFF;
+	/*background-color: #e8e9e9;*/
+	/*width: 40%;*/
+	/*border: 1px solid #E0EDFF;*/
+}
+
+.dropdown
+{
+	float:right;
+}
+
+.textSelectBoard, .shapeSelectBoard
+{
+	border: 1px ridge #C9CBCC;
+}
+
+/*#mainmenu .item.hover
+{
+	color:#FFFFFF;
+	background-color: #6688EE;
+}*/
+#mainmenu .item.hover, #mainmenu .item2.hover
+{
+	color:#fff;
+	background-color: #4D81A5;
+	border-collapse: collapse;
+    border-color: #CCCCCC #676767 #676767 #CCCCCC;
+    border-width: medium 1px 1px;
+	border-bottom: none;
+}
+#menuButton .item.hover, #menuButton .item2.hover
+{
+	color:#fff;
+	background-color: #4D81A5;
+	border-collapse: collapse;
+    border-color: #CCCCCC #676767 #676767 #CCCCCC;
+    border-width: medium 1px 1px;
+	border-bottom: none;
+	padding: 3px 10px;
+}
+.item
+{
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	-pie-border-radius: 5px;
+	behavior: url(../js/PIE.htc);
+}
+.item2
+{
+	-moz-border-radius-bottomright: 0px;
+	-moz-border-radius-bottomleft: 0px;
+
+	-webkit-border-bottom-left-radius: 0px;
+	-webkit-border-bottom-right-radius: 0px;
+
+	-pie-border-bottom-left-radius: 0px;
+	-pie-border-bottom-right-radius: 0px;
+	border-bottom-left-radius: 0px;
+	border-bottom-right-radius: 0px;
+	behavior: url(../js/PIE.htc);
+}
+#mainmenu .item, #mainmenu .item2
+{
+	vertical-align: top;
+	padding: 5px 10px;
+	/*margin-left: 10px;*/
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	user-select: none;
+	color: #000;
+	font-size: 14px;
+	behavior: url(../js/PIE.htc);
+	-moz-border-radius-topright: 5px;
+	-moz-border-radius-topleft: 5px;
+	
+	-webkit-border-top-right-radius: 5px;
+	-webkit-border-top-left-radius: 5px;
+
+	-pie-border-top-right-radius: 5px;
+	-pie-border-top-left-radius: 5px;
+	
+	border-top-right-radius: 5px;
+	border-top-left-radius: 5px;
+	
+	/*-pie-border-radius-topright: 5px;
+	-pie-border-radius-topleft: 5px;
+	border-radius-topright: 5px;
+	border-radius-topleft: 5px;*/
+
+}
+#textMenu .item, #shapeMenu .item
+{
+	margin-left: 2px;
+	vertical-align: top;
+	padding: 0px 5px 0px 5px;
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	user-select: none;
+}
+#AutoShapesMenu .item
+{
+	margin-left: 12px;
+	vertical-align: top;
+	padding: 0px 4px;
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	user-select: none;
+	min-width: 254px;
+}
+#textMenu span, #AutoShapesMenu span, #shapeMenu span
+{
+	border-top: 15px;
+	margin-top: 2px;
+    vertical-align: middle;
+	padding-top: 3px;
+}
+
+#mainmenu .innerBox
+{
+	border-right: 1px solid #676767;
+	border-left:1px solid #676767;
+	font:13px Arial,sans-serif;
+	background:none repeat scroll 0 0 #FFFFFF;
+	border-collapse:collapse;
+	border-color:#676767 #676767 #676767 #676767;
+	border-style:solid;
+	border-width:1px;
+	//border-top: none;
+	color:#333333;
+	cursor:default;
+	font-weight:normal;
+	margin:5px 0;
+	outline:medium none;
+	padding:4px 0;
+	position:absolute;
+	white-space:nowrap;
+	z-index:20000;
+	margin-left: -1px;
+}
+#menuButton .innerBox
+{
+	border-right: 1px solid #676767;
+	border-left:1px solid #676767;
+	font:13px Arial,sans-serif;
+	background:none repeat scroll 0 0 #FFFFFF;
+	border-collapse:collapse;
+	border-color:#676767 #676767 #676767 #676767;
+	border-style:solid;
+	border-width:1px;
+	color:#333333;
+	cursor:default;
+	font-weight:normal;
+	margin:5px 0;
+	outline:medium none;
+	padding:4px 0;
+	position:absolute;
+	white-space:nowrap;
+	z-index:20000;
+	margin-left: -1px;
+}
+#mainmenu.clickMenu li.main div.outerbox ul.innerBox li.SubItem div.outerbox ul.innerBox{
+	border-top: 1px solid #CCC !important;
+	border-left-color: #CCC !important;
+	border-bottom-color:#ACACAC !important;
+	border-right-color: #ACACAC !important;
+}
+#textMenu .innerBox, #shapeMenu .innerBox, #AutoShapesMenu .innerBox
+{
+	font:12px Arial,sans-serif;
+	background:none repeat scroll 0 0 #FFFFFF;
+	border-collapse:collapse;
+	border-color:#CCCCCC #676767 #676767 #CCCCCC;
+	border-style:solid;
+	border-width:1px;
+	color:#333333;
+	cursor:default;
+	font-weight:normal;
+	margin:5px -6px;
+	outline:medium none;
+	padding:4px 0;
+	position:absolute;
+	white-space:nowrap;
+	z-index:20000;
+	min-width: 30px;
+}
+#actionMenu .innerBox
+{
+	font:12px Arial,sans-serif;
+	background:none repeat scroll 0 0 #FFFFFF;
+	border-collapse:collapse;
+	border-color:#CCCCCC #676767 #676767 #CCCCCC;
+	border-style:solid;
+	border-width:1px;
+	color:#333333;
+	cursor:default;
+	font-weight:normal;
+	margin:5px 0px;
+	outline:medium none;
+	padding:4px 0;
+	position:absolute;
+	white-space:nowrap;
+	z-index:20000;
+	min-width: 30px;
+}
+
+#mainmenu .SubItem, #actionMenu .SubItem, #menuButton .SubItem
+{
+	list-style:none outside none;
+	margin:0 3px;
+	white-space:nowrap;
+	padding:4px 7em 4px 28px;
+}
+
+#textMenu .SubItem, #shapeMenu .SubItem, #AutoShapesMenu .SubItem
+{
+	list-style:none outside none;
+	margin:0 3px;
+	white-space:nowrap;
+	padding:4px 6px;
+}
+
+.SubItem ul.innerBox
+{
+	border-color:#676767;
+}
+
+.InnerLiRow, .InnerLiColumn, .InnerLiCell
+{
+	display: none;
+	margin-left: 185px;
+	position: absolute;
+	border-color: #CCCCCC #676767 #676767 #CCCCCC;
+	border-style: solid;
+	border-width: 1px;
+	border-left: 1px solid #ccc;
+	margin-top: -22px;
+	background: #fff;
+	padding: 4px 0;
+}
+
+.FirstLiColumn, .AnotherLiColumn, .FirstLiRow, .AnotherLiRow, .AnotherLiCell, .AnotherLiSheet
+{
+}
+.noselectable
+{
+	color:#CCCCCC !important;
+	cursor:default;
+}
+.MenuQuickButton
+{
+	color: #999999;
+	left: auto;
+	padding-right: 6px;
+	position: absolute;
+	right: 0;
+	text-align: right;
+}
+
+.logo{
+	width: 127px;
+	padding-left: 13px;
+	margin-top: 8px;
+}
+.logo img{
+	margin-top: 8px;
+	cursor: pointer;
+}
+
+.headerstyle{
+	height: 36px;
+	background:#454a50;
+	background: -webkit-gradient(linear, 0 0, 0 bottom, from(#454a50), to(#373d43));
+	background: -moz-linear-gradient(#454a50, #373d43);
+	background: linear-gradient(#454a50, #373d43);
+	-pie-background: linear-gradient(#454a50, #373d43);
+	-moz-user-select: none;
+	-khtml-user-select: none;
+}
+#ph_toolsHide  , #ph_slidesHide{
+	background-color: #E0E0E0;
+	width:20px;
+	height:110px;
+	cursor: pointer;
+}
+#ph_toolsHide{
+	border-radius:5px 0px 0px 5px;
+	border-bottom:1px solid #999999; 
+	border-left:1px solid #999999; 
+	border-top:1px solid #999999;
+}
+#ph_slidesHide{
+	border-radius:0px 5px 5px 0px;
+	border-bottom:1px solid #999999; 
+	border-right:1px solid #999999; 
+	border-top:1px solid #999999;
+}
+.boxRotateLeft, .boxRotateRight{
+  -webkit-transform: rotate(270deg);  /* Saf3.1+, Chrome */
+					transform-origin:30px 30px;
+						 -moz-transform: rotate(270deg);  /* FF3.5+ */
+						  -ms-transform: rotate(270deg);  /* IE9 */
+						   -o-transform: rotate(270deg);  /* Opera 10.5 */
+							  transform: rotate(270deg);  
+					display:inline-block;
+					text-align:center;
+	font-family:Arial,sans-serif,sans;
+	font-size: 10pt; 
+}
+.imageRotateRight{
+  -webkit-transform: rotate(180deg);  /* Saf3.1+, Chrome */
+	 -moz-transform: rotate(180deg);  /* FF3.5+ */
+	  -ms-transform: rotate(180deg);  /* IE9 */
+	   -o-transform: rotate(180deg);  /* Opera 10.5 */
+		  transform: rotate(180deg);  
+}
+.unselectableText{
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	user-select: none;
+}
+#header{
+    padding-right: 8px;
+    text-align: right;
+    vertical-align: middle;
+	overflow:hidden;
+}
+#docName{
+    color: #FFFFFF;
+    font-size: 14px;
+    padding-right: 8px;
+	line-height: 24px;
+}
+#buttonPanel{
+    //float:right;
+}
+/*#SaveButton{
+	margin-bottom: 3px;
+    color: #000;
+	font-size: 14px;
+	background-image: url("../../img/button_inheader1.png");
+    background-repeat: repeat-x;
+	background-position:0px 0px;
+	border: none;
+	height: 24px;
+	width: 74px;
+	/*-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	-pie-border-radius: 3px;
+	behavior: url(../js/PIE.htc);*/
+}*/
+#textMenu ul, #shapeMenu ul, #AutoShapesMenu ul{min-width:15px !important; }
+a.big_button3 {
+    cursor: pointer;
+    display: block;
+    float: right;
+    height: 24px;
+    /*outline: medium none;*/
+    padding-left: 20px;
+    text-decoration: none;
+    white-space: nowrap;
+	margin-left: 4px;
+}
+a.big_button4 {
+    cursor: pointer;
+    display: block;
+    float: none;
+    height: 24px;
+    /*outline: medium none;*/
+    padding-left: 20px;
+    text-decoration: none;
+    white-space: nowrap;
+	margin-left: 5px;
+	margin-right: 20px;
+}
+.buttonBack{
+	background: url("../img/button_inheader.png") no-repeat scroll 0 0 transparent;
+}
+.iconDrawing{
+	background: url("../img/drawing-16.png") no-repeat scroll 0 0 transparent;
+}
+.buttonBackSpan{
+    background: url("../img/button_inheader.png") no-repeat scroll right -24px transparent;
+}
+a.big_button3 span {
+    -moz-user-select: none;
+    /*color: #373737;*/
+    display: block;
+    font-family: Arial;
+    font-size: 14px;
+    /*font-weight: bold;*/
+    height: 24px;
+    line-height: 24px;
+    /*margin-right: -20px;*/
+    padding-right: 20px;
+    /*text-shadow: 0 1px 0 #F7F7F7;*/
+}
+a.big_button4 span {
+    -moz-user-select: none;
+    /*color: #373737;*/
+    text-align:center;
+    display: block;
+    font-family: Arial;
+    font-size: 14px;
+    /*font-weight: bold;*/
+    height: 24px;
+    line-height: 24px;
+    padding-right: 20px;
+    /*text-shadow: 0 1px 0 #F7F7F7;*/
+}
+/*#SaveButton :hover{
+	background: url("../../img/button_inheader.png") no-repeat scroll 0 -48px transparent;
+}
+#SaveButton span :hover{
+	background: url("../../img/button_inheader.png") no-repeat scroll right -48px transparent;
+}*/
+.hoverbutton{
+	background: url("../img/button_inheader.png") no-repeat scroll 0 -48px transparent;
+}
+.hoverbuttonSpan{
+	background: url("../img/button_inheader.png") no-repeat scroll right -72px transparent;
+}
+.hoverbuttonClick{
+	background: url("../img/button_inheader.png") no-repeat scroll 0 -96px transparent;
+}
+.hoverbuttonSpanClick{
+	background: url("../img/button_inheader.png") no-repeat scroll right -120px transparent;
+}
+
+input, textarea {outline:none;}
+.margin_top_10{margin-top:10px !important;}
+.uimargin{margin:3px -6px !important;}
+.positionmenubatton {margin-left: -10px !important;}

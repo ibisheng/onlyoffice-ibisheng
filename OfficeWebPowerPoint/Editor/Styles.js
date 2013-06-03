@@ -1,0 +1,5616 @@
+/**
+ * User: Ilja.Kirillov
+ * Date: 11.11.11
+ * Time: 14:46
+ */
+
+var Default_Tab_Stop = 12.5;
+
+var Default_Heading_Font = "Arial";
+
+var styles_Paragraph = 0x01;
+var styles_Numbering = 0x02;
+var styles_Table     = 0x03;
+var styles_Character = 0x04;
+
+var align_Right   = 0;
+var align_Left    = 1;
+var align_Center  = 2;
+var align_Justify = 3;
+
+var vertalign_Baseline    = 0;
+var vertalign_SuperScript = 1;
+var vertalign_SubScript   = 2;
+
+var highlight_None = -1;
+
+var shd_Clear = 0;
+var shd_Nil   = 1;
+
+var vertalign_Koef_Size  =  0.65;  // Коэффициент изменения размера текста для верхнего и нижнего индексов
+var vertalign_Koef_Super =  0.35;  // Позиция верхнего индекса (относительно размера текста)
+var vertalign_Koef_Sub   = -0.141; // Позиция нижнего индекса (относительно размера текста)
+
+var g_dKoef_pt_to_mm = 25.4 / 72;
+var g_dKoef_pc_to_mm = g_dKoef_pt_to_mm / 12;
+var g_dKoef_in_to_mm = 25.4;
+var g_dKoef_mm_to_pt = 1 / g_dKoef_pt_to_mm;
+
+var tblwidth_Auto = 0x00;
+var tblwidth_Mm   = 0x01;
+var tblwidth_Nil  = 0x02;
+var tblwidth_Pct  = 0x03;
+
+var border_None   = 0x0000;
+var border_Single = 0x0001;
+
+var heightrule_AtLeast = 0x00;
+var heightrule_Auto    = 0x01;
+var heightrule_Exact   = 0x02;
+
+var vertalignjc_Top    = 0x00;
+var vertalignjc_Center = 0x01;
+var vertalignjc_Bottom = 0x02;
+
+var vmerge_Restart  = 0x01;
+var vmerge_Continue = 0x02;
+
+var spacing_Auto = -1;
+
+var styletype_Character = 0x01;
+var styletype_Numbering = 0x02;
+var styletype_Paragraph = 0x03;
+var styletype_Table = 0x04;
+
+function CTableStylePr()
+{
+    this.TextPr      = new CTextPr();
+    this.ParaPr      = new CParaPr();
+    this.TablePr     = new CTablePr();
+    this.TableRowPr  = new CTableRowPr();
+    this.TableCellPr = new CTableCellPr();
+}
+
+CTableStylePr.prototype =
+{
+    Merge : function(TableStylePr)
+    {
+        this.TextPr.Merge( TableStylePr.TextPr );
+        this.ParaPr.Merge( TableStylePr.ParaPr );
+        this.TablePr.Merge( TableStylePr.TablePr );
+        this.TableRowPr.Merge( TableStylePr.TableRowPr );
+        this.TableCellPr.Merge( TableStylePr.TableCellPr );
+    },
+
+    Copy : function()
+    {
+        var TableStylePr = new CTableStylePr();
+        TableStylePr.TextPr      = this.TextPr.Copy();
+        TableStylePr.ParaPr      = this.ParaPr.Copy();
+        TableStylePr.TablePr     = this.TablePr.Copy();
+        TableStylePr.TableRowPr  = this.TableRowPr.Copy();
+        TableStylePr.TableCellPr = this.TableCellPr.Copy();
+        return TableStylePr;
+    }
+}
+
+function CStyle(Name, BasedOnId, NextId, type)
+{
+    this.Name    = Name;
+    this.BasedOn = BasedOnId;
+    this.Next    = NextId;
+    if(null != type)
+        this.Type = type;
+    else
+        this.Type = styletype_Paragraph;
+
+    this.qFormat        = null;// false
+    this.uiPriority     = null;// -1
+    this.hidden         = null;// false
+    this.semiHidden     = null;// false
+    this.unhideWhenUsed = null;// false
+    
+    this.TextPr = new CTextPr();
+    this.ParaPr = new CParaPr();
+
+    if ( styletype_Table === this.Type )
+    {
+        this.TablePr     = new CTablePr();
+        this.TableRowPr  = new CTableRowPr();
+        this.TableCellPr = new CTableCellPr();
+
+        // Условные типы форматирования стилей таблицы
+        this.TableBand1Horz  = new CTableStylePr();
+        this.TableBand1Vert  = new CTableStylePr();
+        this.TableBand2Horz  = new CTableStylePr();
+        this.TableBand2Vert  = new CTableStylePr();
+        this.TableFirstCol   = new CTableStylePr();
+        this.TableFirstRow   = new CTableStylePr();
+        this.TableLastCol    = new CTableStylePr();
+        this.TableLastRow    = new CTableStylePr();
+        this.TableTLCell     = new CTableStylePr();
+        this.TableTRCell     = new CTableStylePr();
+        this.TableBLCell     = new CTableStylePr();
+        this.TableBRCell     = new CTableStylePr();
+        this.TableWholeTable = new CTableStylePr();
+    }
+    this.stylesId = ++editor.tableStylesIdCounter + "";
+}
+
+CStyle.prototype =
+{
+
+
+
+    isEmptyTableStyle: function()
+    {
+
+    },
+
+    Set_Type : function(Type)
+    {
+        this.Type = Type;
+
+        if ( styletype_Table === this.Type )
+        {
+            if ( undefined === this.TablePr )
+                this.TablePr     = new CTablePr();
+
+            if ( undefined === this.TableRowPr )
+                this.TableRowPr  = new CTableRowPr();
+
+            if ( undefined === this.TableCellPr )
+                this.TableCellPr = new CTableCellPr();
+
+            // Условные типы форматирования стилей таблицы
+            if ( undefined === this.TableBand1Horz )
+                this.TableBand1Horz  = new CTableStylePr();
+            if ( undefined === this.TableBand1Vert )
+                this.TableBand1Vert  = new CTableStylePr();
+            if ( undefined === this.TableBand2Horz )
+                this.TableBand2Horz  = new CTableStylePr();
+            if ( undefined === this.TableBand2Vert )
+                this.TableBand2Vert  = new CTableStylePr();
+            if ( undefined === this.TableFirstCol )
+                this.TableFirstCol   = new CTableStylePr();
+            if ( undefined === this.TableFirstRow )
+                this.TableFirstRow   = new CTableStylePr();
+            if ( undefined === this.TableLastCol )
+                this.TableLastCol    = new CTableStylePr();
+            if ( undefined === this.TableLastRow )
+                this.TableLastRow    = new CTableStylePr();
+            if ( undefined === this.TableTLCell )
+                this.TableTLCell     = new CTableStylePr();
+            if ( undefined === this.TableTRCell )
+                this.TableTRCell     = new CTableStylePr();
+            if ( undefined === this.TableBLCell )
+                this.TableBLCell     = new CTableStylePr();
+            if ( undefined === this.TableBRCell )
+                this.TableBRCell     = new CTableStylePr();
+            if ( undefined === this.TableWholeTable )
+                this.TableWholeTable = new CTableStylePr();
+        }
+    },
+
+    Create_Default_Paragraph : function()
+    {
+        this.qFormat = true;
+
+        var TextPr =
+        {
+            FontFamily: { Name : "Arial", Index : -1 },
+            Color     : { r : 0, g : 0, b : 0 }
+        };
+
+        this.TextPr.Set_FromObject( TextPr );
+    },
+
+    Create_Default_Character : function()
+    {
+        this.uiPriority     = 1;
+        this.semiHidden     = true;
+        this.unhideWhenUsed = true;
+    },
+
+    Create_Default_Numbering : function()
+    {
+        this.uiPriority     = 99;
+        this.semiHidden     = true;
+        this.unhideWhenUsed = true;
+    },
+
+    Create_Heading1 : function()
+    {
+        this.qFormat    = true;
+        this.uiPriority = 9;
+
+        var ParaPr =
+        {
+            KeepNext : true,
+            KeepLines: true,
+
+            Spacing :
+            {
+                Before : 24 * g_dKoef_pt_to_mm,
+                After  : 0
+            },
+
+            OutlineLvl : 0
+        };
+
+        var TextPr =
+        {
+            FontSize   : 24,
+            FontFamily : { Name : Default_Heading_Font, Index : -1 },
+            Bold       : true,
+            Color      :
+            {
+                r : 0,
+                g : 0,
+                b : 0
+            }
+        };
+
+        this.ParaPr.Set_FromObject(ParaPr);
+        this.TextPr.Set_FromObject(TextPr);
+    },
+
+    Create_Heading2 : function()
+    {
+        this.qFormat        = true;
+        this.uiPriority     = 9;
+        this.unhideWhenUsed = true;
+
+        var ParaPr =
+        {
+            KeepNext : true,
+            KeepLines: true,
+
+            Spacing :
+            {
+                Before : 10 * g_dKoef_pt_to_mm,
+                After  : 0
+            },
+
+            OutlineLvl : 1
+        };
+
+        var TextPr =
+        {
+            FontSize   : 20,
+            FontFamily : { Name : Default_Heading_Font, Index : -1 },
+            Bold       : true,
+            Color      :
+            {
+                r : 0,
+                g : 0,
+                b : 0
+            }
+        };
+
+        this.ParaPr.Set_FromObject(ParaPr);
+        this.TextPr.Set_FromObject(TextPr);
+    },
+
+    Create_Heading3 : function()
+    {
+        this.qFormat        = true;
+        this.uiPriority     = 9;
+        this.unhideWhenUsed = true;
+
+        var ParaPr =
+        {
+            KeepNext : true,
+            KeepLines: true,
+
+            Spacing :
+            {
+                Before : 10 * g_dKoef_pt_to_mm,
+                After  : 0
+            },
+
+            OutlineLvl : 2
+        };
+
+        var TextPr =
+        {
+            FontSize   : 18,
+            FontFamily : { Name : Default_Heading_Font, Index : -1 },
+            Bold       : true,
+            Italic     : true,
+            Color      :
+            {
+                r : 0,
+                g : 0,
+                b : 0
+            }
+        };
+
+        this.ParaPr.Set_FromObject(ParaPr);
+        this.TextPr.Set_FromObject(TextPr);
+    },
+
+    Create_Heading4 : function()
+    {
+        this.qFormat        = true;
+        this.uiPriority     = 9;
+        this.unhideWhenUsed = true;
+
+        var ParaPr =
+        {
+            KeepNext : true,
+            KeepLines: true,
+
+            Spacing :
+            {
+                Before : 10 * g_dKoef_pt_to_mm,
+                After  : 0
+            },
+
+            OutlineLvl : 3
+        };
+
+        var TextPr =
+        {
+            FontSize   : 16,
+            FontFamily : { Name : Default_Heading_Font, Index : -1 },
+            Color      :
+            {
+                r : 0x23,
+                g : 0x23,
+                b : 0x23
+            }
+        };
+
+        this.ParaPr.Set_FromObject(ParaPr);
+        this.TextPr.Set_FromObject(TextPr);
+    },
+
+    Create_Heading5 : function()
+    {
+        this.qFormat        = true;
+        this.uiPriority     = 9;
+        this.unhideWhenUsed = true;
+
+        var ParaPr =
+        {
+            KeepNext : true,
+            KeepLines: true,
+
+            Spacing :
+            {
+                Before : 10 * g_dKoef_pt_to_mm,
+                After  : 0
+            },
+
+            OutlineLvl : 4
+        };
+
+        var TextPr =
+        {
+            FontSize   : 14,
+            FontFamily : { Name : Default_Heading_Font, Index : -1 },
+            Bold       : true,
+            Color      :
+            {
+                r : 0x44,
+                g : 0x44,
+                b : 0x44
+            }
+        };
+
+        this.ParaPr.Set_FromObject(ParaPr);
+        this.TextPr.Set_FromObject(TextPr);
+    },
+
+    Create_Heading6 : function()
+    {
+        this.qFormat        = true;
+        this.uiPriority     = 9;
+        this.unhideWhenUsed = true;
+
+        var ParaPr =
+        {
+            KeepNext : true,
+            KeepLines: true,
+
+            Spacing :
+            {
+                Before : 10 * g_dKoef_pt_to_mm,
+                After  : 0
+            },
+
+            OutlineLvl : 5
+        };
+
+        var TextPr =
+        {
+            FontSize   : 14,
+            Italic     : true,
+            FontFamily : { Name : Default_Heading_Font, Index : -1 },
+            Color      :
+            {
+                r : 0x23,
+                g : 0x23,
+                b : 0x23
+            }
+        };
+
+        this.ParaPr.Set_FromObject(ParaPr);
+        this.TextPr.Set_FromObject(TextPr);
+    },
+
+    Create_Heading7 : function()
+    {
+        this.qFormat        = true;
+        this.uiPriority     = 9;
+        this.unhideWhenUsed = true;
+
+        var ParaPr =
+        {
+            KeepNext : true,
+            KeepLines: true,
+
+            Spacing :
+            {
+                Before : 10 * g_dKoef_pt_to_mm,
+                After  : 0
+            },
+
+            OutlineLvl : 6
+        };
+
+        var TextPr =
+        {
+            FontSize   : 12,
+            FontFamily : { Name : Default_Heading_Font, Index : -1 },
+            Bold       : true,
+            Color      :
+            {
+                r : 0x60,
+                g : 0x60,
+                b : 0x60
+            }
+        };
+
+        this.ParaPr.Set_FromObject(ParaPr);
+        this.TextPr.Set_FromObject(TextPr);
+    },
+
+    Create_Heading8 : function()
+    {
+        this.qFormat        = true;
+        this.uiPriority     = 9;
+        this.unhideWhenUsed = true;
+
+        var ParaPr =
+        {
+            KeepNext : true,
+            KeepLines: true,
+
+            Spacing :
+            {
+                Before : 10 * g_dKoef_pt_to_mm,
+                After  : 0
+            },
+
+            OutlineLvl : 7
+        };
+
+        var TextPr =
+        {
+            FontSize   : 12,
+            FontFamily : { Name : Default_Heading_Font, Index : -1 },
+            Color      :
+            {
+                r : 0x44,
+                g : 0x44,
+                b : 0x44
+            }
+        };
+
+        this.ParaPr.Set_FromObject(ParaPr);
+        this.TextPr.Set_FromObject(TextPr);
+    },
+
+    Create_Heading9 : function()
+    {
+        this.qFormat        = true;
+        this.uiPriority     = 9;
+        this.unhideWhenUsed = true;
+
+        var ParaPr =
+        {
+            KeepNext : true,
+            KeepLines: true,
+
+            Spacing :
+            {
+                Before : 10 * g_dKoef_pt_to_mm,
+                After  : 0
+            },
+
+            OutlineLvl : 8
+        };
+
+        var TextPr =
+        {
+            FontSize   : 11.5,
+            FontFamily : { Name : Default_Heading_Font, Index : -1 },
+            Italic     : true,
+            Color      :
+            {
+                r : 0x44,
+                g : 0x44,
+                b : 0x44
+            }
+        };
+
+        this.ParaPr.Set_FromObject(ParaPr);
+        this.TextPr.Set_FromObject(TextPr);
+    },
+
+    Create_ListParagraph : function()
+    {
+        this.uiPriority = 34;
+        this.qFormat    = true;
+
+        var ParaPr =
+        {
+            Ind :
+            {
+                Left : 36 * g_dKoef_pt_to_mm
+            },
+
+            ContextualSpacing : true
+        };
+
+        this.ParaPr.Set_FromObject(ParaPr);
+    },
+
+    Create_NoSpacing : function()
+    {
+        this.uiPriority = 1;
+        this.qFormat    = true;
+
+        var ParaPr =
+        {
+            Spacing :
+            {
+                Line     : 1,
+                LineRule : linerule_Auto,
+                After    : 0
+            },
+
+            Ind :
+            {
+                FirstLine : 10 // 1cm
+            }
+        };
+
+        var TextPr =
+        {
+            FontFamily : { Name : "Arial", Index : -1 },
+            Color      :
+            {
+                r : 0x00,
+                g : 0x00,
+                b : 0x00
+            }
+        };
+
+        this.ParaPr.Set_FromObject(ParaPr);
+        this.TextPr.Set_FromObject(TextPr);
+    },
+
+    Create_Header : function()
+    {
+        // TODO: Как только будут реализованы правый и центральный табы, добавить их тут
+        this.uiPriority     = 99;
+        this.unhideWhenUsed = true;
+
+        var ParaPr =
+        {
+            Spacing:
+            {
+                After    : 0,
+                Line     : 1,
+                LineRule : linerule_Auto
+            }
+        };
+
+        var TextPr =
+        {
+            FontSize  : 10,
+            FontFamily: { Name : "Arial", Index : -1 },
+            Color     : { r : 0x00, g : 0x00, b : 0x00 }
+        };
+
+        this.ParaPr.Set_FromObject(ParaPr);
+        this.TextPr.Set_FromObject(TextPr);
+    },
+
+    Create_Footer : function()
+    {
+        // TODO: Как только будут реализованы правый и центральный табы, добавить их тут
+        this.uiPriority     = 99;
+        this.unhideWhenUsed = true;
+
+        var ParaPr =
+        {
+            Spacing:
+            {
+                After    : 0,
+                Line     : 1,
+                LineRule : linerule_Auto
+            }
+        }
+
+        var TextPr =
+        {
+            FontSize  : 10,
+            FontFamily: { Name : "Arial", Index : -1 },
+            Color     : { r : 0x00, g : 0x00, b : 0x00 }
+        };
+
+        this.ParaPr.Set_FromObject(ParaPr);
+        this.TextPr.Set_FromObject(TextPr);
+    },
+
+    Create_NormalTable : function()
+    {
+        this.uiPriority       = 99;
+        this.semiHidden       = true;
+        this.unhideWhenUsed   = true;
+
+        var TablePr =
+        {
+            TableInd: 0,
+            TableCellMar :
+            {
+                Top :
+                {
+                    W    : 1.27,
+                    Type : tblwidth_Mm
+                },
+
+                Left :
+                {
+                    W    : 2.54, // 5.4pt
+                    Type : tblwidth_Mm
+                },
+
+                Bottom :
+                {
+                    W    : 1.27,
+                    Type : tblwidth_Mm
+                },
+
+                Right :
+                {
+                    W    : 2.54, // 5.4pt
+                    Type : tblwidth_Mm
+                }
+            }
+        };
+
+        this.TablePr.Set_FromObject(TablePr);
+    },
+
+    Create_TableGrid : function()
+    {
+        this.uiPriority       = 59;
+
+        var ParaPr =
+        {
+            Spacing :
+            {
+                After    : 0,
+                Line     : 1,
+                LineRule : linerule_Auto
+            }
+        };
+
+        var TablePr =
+        {
+            TableInd : 0,
+
+            TableBorders :
+            {
+                Top :
+                {
+                    Color : { r : 0, g : 0, b : 0 },
+                    Space : 0,
+                    Size  : 0.5 * g_dKoef_pt_to_mm,
+                    Value : border_Single
+                },
+
+                Left :
+                {
+                    Color : { r : 0, g : 0, b : 0 },
+                    Space : 0,
+                    Size  : 0.5 * g_dKoef_pt_to_mm,
+                    Value : border_Single
+                },
+
+                Bottom :
+                {
+                    Color : { r : 0, g : 0, b : 0 },
+                    Space : 0,
+                    Size  : 0.5 * g_dKoef_pt_to_mm,
+                    Value : border_Single
+                },
+
+                Right :
+                {
+                    Color : { r : 0, g : 0, b : 0 },
+                    Space : 0,
+                    Size  : 0.5 * g_dKoef_pt_to_mm,
+                    Value : border_Single
+                },
+
+                InsideH :
+                {
+                    Color : { r : 0, g : 0, b : 0 },
+                    Space : 0,
+                    Size  : 0.5 * g_dKoef_pt_to_mm,
+                    Value : border_Single
+                },
+
+                InsideV :
+                {
+                    Color : { r : 0, g : 0, b : 0 },
+                    Space : 0,
+                    Size  : 0.5 * g_dKoef_pt_to_mm,
+                    Value : border_Single
+                }
+            },
+
+            TableCellMar :
+            {
+                Top :
+                {
+                    W    : 1.27,
+                    Type : tblwidth_Mm
+                },
+
+                Left :
+                {
+                    W    : 2.54, // 5.4pt
+                    Type : tblwidth_Mm
+                },
+
+                Bottom :
+                {
+                    W    : 1.27,
+                    Type : tblwidth_Mm
+                },
+
+                Right :
+                {
+                    W    : 2.54, // 5.4pt
+                    Type : tblwidth_Mm
+                }
+            }
+        };
+
+        this.TablePr.Set_FromObject(TablePr);
+        this.ParaPr.Set_FromObject(ParaPr);
+    },
+
+    Create_Quote : function()
+    {
+        this.uiPriority = 29;
+        this.qFormat    = true;
+
+        var ParaPr =
+        {
+            Ind :
+            {
+                Left : 60 // 6 см
+            },
+
+            Brd :
+            {
+                Bottom :
+                {
+                    Color : { r : 0xA6, g : 0xA6, b : 0xA6 },
+                    Space : 1,
+                    Size  : 1.5 * g_dKoef_pt_to_mm,
+                    Value : border_Single
+                },
+
+                Left :
+                {
+                    Color : { r : 0xA6, g : 0xA6, b : 0xA6 },
+                    Space : 4,
+                    Size  : 1.5 * g_dKoef_pt_to_mm,
+                    Value : border_Single
+                }
+            }
+        };
+
+        var TextPr =
+        {
+            FontSize   : 9,
+            FontFamily : { Name : "Arial", Index : -1 },
+            Italic     : true,
+            Color      :
+            {
+                r : 0x37,
+                g : 0x37,
+                b : 0x37
+            }
+        };
+
+        this.ParaPr.Set_FromObject(ParaPr);
+        this.TextPr.Set_FromObject(TextPr);
+    },
+
+    Create_Subtitle : function()
+    {
+        this.uiPriority = 11;
+        this.qFormat    = true;
+
+        var ParaPr =
+        {
+            Spacing :
+            {
+                Line     : 1,
+                LineRule : linerule_Auto
+            },
+
+            OutlineLvl : 0
+        };
+
+        var TextPr =
+        {
+            FontSize   : 26,
+            FontFamily : { Name : "Arial", Index : -1 },
+            Italic     : true,
+            Color      :
+            {
+                r : 0x44,
+                g : 0x44,
+                b : 0x44
+            }
+        };
+
+        this.ParaPr.Set_FromObject(ParaPr);
+        this.TextPr.Set_FromObject(TextPr);
+    },
+
+    Create_IntenseQuote : function()
+    {
+        this.uiPriority = 30;
+        this.qFormat    = true;
+
+        var ParaPr =
+        {
+            Ind :
+            {
+                Left  : 10, // 1 cm
+                Right : 10  // 1 cm
+            },
+
+            Shd :
+            {
+                Value : shd_Clear,
+                Color :
+                {
+                    r : 0xD9,
+                    g : 0xD9,
+                    b : 0xD9
+                }
+            },
+
+            Brd :
+            {
+                Bottom :
+                {
+                    Color : { r : 0x80, g : 0x80, b : 0x80 },
+                    Space : 1,
+                    Size  : 0.5 * g_dKoef_pt_to_mm,
+                    Value : border_Single
+                },
+
+                Left :
+                {
+                    Color : { r : 0x80, g : 0x80, b : 0x80 },
+                    Space : 4,
+                    Size  : 0.5 * g_dKoef_pt_to_mm,
+                    Value : border_Single
+                },
+
+                Right :
+                {
+                    Color : { r : 0x80, g : 0x80, b : 0x80 },
+                    Space : 4,
+                    Size  : 0.5 * g_dKoef_pt_to_mm,
+                    Value : border_Single
+                },
+
+                Top :
+                {
+                    Color : { r : 0x80, g : 0x80, b : 0x80 },
+                    Space : 1,
+                    Size  : 0.5 * g_dKoef_pt_to_mm,
+                    Value : border_Single
+                }
+            }
+        };
+
+        var TextPr =
+        {
+            FontSize   : 9.5,
+            FontFamily : { Name : "Arial", Index : -1 },
+            Italic     : true,
+            Color      :
+            {
+                r : 0x60,
+                g : 0x60,
+                b : 0x60
+            }
+        };
+
+        this.ParaPr.Set_FromObject(ParaPr);
+        this.TextPr.Set_FromObject(TextPr);
+    },
+
+    Create_Title : function()
+    {
+        this.uiPriority = 10;
+        this.qFormat    = true;
+
+        var ParaPr =
+        {
+            Spacing :
+            {
+                Line              : 1,
+                LineRule          : linerule_Auto,
+                Before            : 15 * g_dKoef_pt_to_mm,
+                After             :  4 * g_dKoef_pt_to_mm
+            },
+
+            Brd :
+            {
+                Bottom :
+                {
+                    Color : { r : 0x00, g : 0x00, b : 0x00 },
+                    Space : 0,
+                    Size  : 3 * g_dKoef_pt_to_mm,
+                    Value : border_Single
+                }
+            },
+
+            OutlineLvl : 0
+        };
+
+        var TextPr =
+        {
+            FontSize   : 36,
+            FontFamily : { Name : "Arial", Index : -1 },
+            Bold       : true,
+            Color      :
+            {
+                r : 0x00,
+                g : 0x00,
+                b : 0x00
+            }
+        };
+
+        this.ParaPr.Set_FromObject(ParaPr);
+        this.TextPr.Set_FromObject(TextPr);
+    },
+
+    Create_Table_LightShading : function()
+    {
+        this.uiPriority = 60;
+
+        var ParaPr =
+        {
+            Spacing :
+            {
+                After    : 0,
+                Line     : 1,
+                LineRule : linerule_Auto
+            }
+        };
+
+        this.ParaPr.Set_FromObject(ParaPr);
+
+
+        var TablePr =
+        {
+            TableStyleColBandSize : 1,
+            TableStyleRowBandSize : 1,
+            TableInd : 0,
+
+            TableBorders :
+            {
+                Top :
+                {
+                    Color : { r : 0, g : 0, b : 0 },
+                    Space : 0,
+                    Size  : 18 / 8 * g_dKoef_pt_to_mm,
+                    Value : border_Single,
+                    unifill : CreteSolidFillRGB(0, 0, 0)
+                },
+
+                Bottom :
+                {
+                    Color : { r : 0, g : 0, b : 0 },
+                    Space : 0,
+                    Size  : 18 / 8 * g_dKoef_pt_to_mm,
+                    Value : border_Single,
+                    unifill : CreteSolidFillRGB(0, 0, 0)
+                }
+            },
+
+            TableCellMar :
+            {
+                Top :
+                {
+                    W    : 0,
+                    Type : tblwidth_Mm
+                },
+                Left :
+                {
+                    W    : 5.75 * g_dKoef_pt_to_mm, // 0.08 inch
+                    Type : tblwidth_Mm
+                },
+
+                Bottom :
+                {
+                    W    : 0,
+                    Type : tblwidth_Mm
+                },
+
+                Right :
+                {
+                    W    : 5.75 * g_dKoef_pt_to_mm, // 0.08 inch
+                    Type : tblwidth_Mm
+                }
+            }
+        };
+
+        this.TablePr.Set_FromObject(TablePr);
+
+        var TableFirstRow =
+        {
+            TextPr :
+            {
+                Bold : true,
+                unifill : CreteSolidFillRGB(255,255,255),
+                Color: {r: 0, g: 0, b: 0}
+            },
+
+            ParaPr :
+            {
+                Spacing :
+                {
+                    After    : 0,
+                    Before   : 0,
+                    Line     : 1,
+                    LineRule : linerule_Auto
+                }
+            },
+
+            TableCellPr :
+            {
+                TableCellBorders :
+                {
+                    Bottom :
+                    {
+                        unifill : CreteSolidFillRGB(0, 0, 0),
+                        Space : 0,
+                        Size  : 18 / 8 * g_dKoef_pt_to_mm,
+                        Value : border_Single,
+                        Color: {r: 0, g: 0, b: 0}
+                    },
+
+                    Left :
+                    {
+                        Value : border_None
+                    },
+
+                    Right :
+                    {
+                        Value : border_None
+                    },
+
+                    Top :
+                    {
+                        unifill : CreteSolidFillRGB(0, 0, 0),
+                        Space : 0,
+                        Size  : 18 / 8 * g_dKoef_pt_to_mm,
+                        Value : border_Single,
+                        Color: {r: 0, g: 0, b: 0}
+                    }
+                },
+
+                Shd :
+                {
+                    Value : shd_Clear,
+                    unifill : CreteSolidFillRGB(0x4F, 0x81, 0xBD),
+                    Color: {r: 0, g: 0, b: 0}
+                }
+            }
+        };
+
+        this.TableFirstRow.TextPr.Set_FromObject(TableFirstRow.TextPr);
+        this.TableFirstRow.ParaPr.Set_FromObject(TableFirstRow.ParaPr);
+        this.TableFirstRow.TableCellPr.Set_FromObject(TableFirstRow.TableCellPr);
+
+        var TableLastRow =
+        {
+            TextPr :
+            {
+                unifill : CreteSolidFillRGB(0,0,0)
+            },
+
+            TableCellPr :
+            {
+                TableCellBorders :
+                {
+                    Bottom :
+                    {
+                        unifill : CreteSolidFillRGB(0,0,0),
+                        Space : 0,
+                        Size  : 18 / 8 * g_dKoef_pt_to_mm,
+                        Value : border_Single,
+                        Color: {r: 0, g: 0, b: 0}
+                    },
+
+                    Left :
+                    {
+                        Value : border_None
+                    },
+
+                    Right :
+                    {
+                        Value : border_None
+                    },
+
+                    Top :
+                    {
+                        unifill : CreteSolidFillRGB(0,0,0),
+                        Space : 0,
+                        Size  : 12 / 8 * g_dKoef_pt_to_mm,
+                        Value : border_Single,
+                        Color: {r: 0, g: 0, b: 0}
+                    }
+                },
+
+                Shd :
+                {
+                    Value : shd_Clear,
+                    unifill : CreteSolidFillRGB(0xFF,0xFF, 0xFF),
+                    Color: {r: 0, g: 0, b: 0}
+                }
+            }
+        };
+
+        this.TableLastRow.TextPr.Set_FromObject(TableLastRow.TextPr);
+        this.TableLastRow.TableCellPr.Set_FromObject(TableLastRow.TableCellPr);
+
+        var TableFirstCol =
+        {
+            TextPr :
+            {
+                Bold  : true,
+                unifill : CreteSolidFillRGB(0xFF,0xFF, 0xFF)
+            },
+
+            ParaPr :
+            {
+                Spacing :
+                {
+                    After    : 0,
+                    Before   : 0,
+                    Line     : 1,
+                    LineRule : linerule_Auto
+                }
+            },
+
+            TableCellPr :
+            {
+                TableCellBorder :
+                {
+                    Bottom :
+                    {
+                        unifill : CreteSolidFillRGB(0,0,0),
+                        Space : 0,
+                        Size  : 18 / 8 * g_dKoef_pt_to_mm,
+                        Value : border_Single,
+                        Color: {r: 0, g: 0, b: 0}
+                    },
+
+                    Left :
+                    {
+                        Value : border_None
+                    },
+
+                    Right :
+                    {
+                        Value : border_None
+                    },
+
+                    Top :
+                    {
+                        Value : border_None
+                    }
+                },
+
+                Shd :
+                {
+                    Value : shd_Clear,
+                    unifill : CreteSolidFillRGB(0x4F,0x81,0xBD),
+                    Color: {r: 0, g: 0, b: 0}
+                }
+            }
+
+        };
+
+        this.TableFirstCol.TextPr.Set_FromObject(TableFirstCol.TextPr);
+        this.TableFirstCol.ParaPr.Set_FromObject(TableFirstCol.ParaPr);
+        this.TableFirstCol.TableCellPr.Set_FromObject(TableFirstCol.TableCellPr);
+
+        var TableLastCol =
+        {
+            TextPr :
+            {
+                Bold  : true,
+                unifill : CreteSolidFillRGB(0x4F,0x81,0xBD),
+                Color: {r: 0, g: 0, b: 0}
+            },
+
+            TableCellPr :
+            {
+                TableCellBorders :
+                {
+                    Left :
+                    {
+                        Value : border_None
+                    },
+
+                    Right :
+                    {
+                        Value : border_None
+                    }
+                },
+
+                Shd :
+                {
+                    Value : shd_Clear,
+                    unifill : CreteSolidFillRGB(0x4F,0x81,0xBD),
+                    Color: {r: 0, g: 0, b: 0}
+                }
+            }
+        };
+
+        this.TableLastCol.TextPr.Set_FromObject(TableLastCol.TextPr);
+        this.TableLastCol.TableCellPr.Set_FromObject(TableLastCol.TableCellPr);
+
+        var TableBand1Vert =
+        {
+            TableCellPr :
+            {
+                TableCellBorders :
+                {
+                    Left :
+                    {
+                        Value : border_None
+                    },
+
+                    Right :
+                    {
+                        Value : border_None
+                    }
+                },
+
+                Shd :
+                {
+                    Value : shd_Clear,
+                    unifill : CreteSolidFillRGB(0xD8,0xD8,0xD8),
+                    Color: {r: 0, g: 0, b: 0}
+                }
+            }
+        };
+
+        this.TableBand1Vert.TableCellPr.Set_FromObject(TableBand1Vert.TableCellPr);
+
+        var TableBand1Horz =
+        {
+            TableCellPr :
+            {
+                Shd :
+                {
+                    Value : shd_Clear,
+                    unifill : CreteSolidFillRGB(0xD8,0xD8,0xD8),
+                    Color: {r: 0, g: 0, b: 0}
+                }
+            }
+        };
+
+        this.TableBand1Horz.TableCellPr.Set_FromObject(TableBand1Horz.TableCellPr);
+
+        var TableTRCell =
+        {
+            TableCellPr :
+            {
+                TableCellBorders:
+                {
+                    Bottom :
+                    {
+                        unifill : CreteSolidFillRGB(0,0,0),
+                        Space : 0,
+                        Size  : 18 / 8 * g_dKoef_pt_to_mm,
+                        Value : border_Single,
+                        Color: {r: 0, g: 0, b: 0}
+                    },
+
+                    Left :
+                    {
+                        Value : border_None
+                    },
+
+                    Right :
+                    {
+                        Value : border_None
+                    },
+
+                    Top :
+                    {
+                        unifill : CreteSolidFillRGB(0,0,0),
+                        Space : 0,
+                        Size  : 18 / 8 * g_dKoef_pt_to_mm,
+                        Value : border_Single,
+                        Color: {r: 0, g: 0, b: 0}
+                    }
+                },
+
+                Shd :
+                {
+                    Value : shd_Clear,
+                    unifill : CreteSolidFillRGB(0,255,0),
+                    Color :
+                    {
+                        r : 0,
+                        g : 255,
+                        b : 0
+                    }
+                }
+            }
+        };
+
+        this.TableTRCell.TableCellPr.Set_FromObject(TableTRCell.TableCellPr);
+
+        var TableTLCell =
+        {
+            TextPr :
+            {
+                unifill : CreteSolidFillRGB(0xFF,0xFF,0xFF)
+            },
+
+            TableCellPr :
+            {
+                TableCellBorders:
+                {
+                    Bottom :
+                    {
+                        unifill : CreteSolidFillRGB(0x0,0x0,0x0),
+                        Space : 0,
+                        Size  : 18 / 8 * g_dKoef_pt_to_mm,
+                        Value : border_Single,
+                        Color: {r: 0, g: 0, b: 0}
+                    },
+
+                    Left :
+                    {
+                        Value : border_None
+                    },
+
+                    Right :
+                    {
+                        Value : border_None
+                    },
+
+                    Top :
+                    {
+                        unifill : CreteSolidFillRGB(0x0,0x0,0x0),
+                        Space : 0,
+                        Size  : 18 / 8 * g_dKoef_pt_to_mm,
+                        Value : border_Single,
+                        Color: {r: 0, g: 0, b: 0}
+                    }
+                }          ,
+
+                Shd :
+                {
+                    Value : shd_Clear,
+                    unifill : CreteSolidFillRGB(0xFF,0x0,0x0),
+                    Color: {r: 0, g: 0, b: 0}
+                }
+            }
+        };
+
+        this.TableTLCell.TextPr.Set_FromObject(TableTLCell.TextPr);
+        this.TableTLCell.TableCellPr.Set_FromObject(TableTLCell.TableCellPr);
+
+        this.TableWholeTable.TablePr.Set_FromObject(this.TablePr);
+    },
+
+    Create_Table_ColorfulListAccent6 : function()
+    {
+        this.uiPriority = 72;
+
+        var ParaPr =
+        {
+            Spacing :
+            {
+                After    : 0,
+                Line     : 1,
+                LineRule : linerule_Auto
+            }
+        };
+
+        this.ParaPr.Set_FromObject(ParaPr);
+
+        var TextPr =
+        {
+            unifill : CreteSolidFillRGB(0x0,0x0,0x0)
+        };
+
+        this.TextPr.Set_FromObject(TextPr);
+
+        var TablePr =
+        {
+            TableStyleColBandSize : 1,
+            TableStyleRowBandSize : 1,
+            TableInd              : 0,
+
+            TableCellMar :
+            {
+                TableCellMar :
+                {
+                    Top :
+                    {
+                        W    : 0,
+                        Type : tblwidth_Mm
+                    },
+                    Left :
+                    {
+                        W    : 5.75 * g_dKoef_pt_to_mm, // 0.08 inch
+                        Type : tblwidth_Mm
+                    },
+
+                    Bottom :
+                    {
+                        W    : 0,
+                        Type : tblwidth_Mm
+                    },
+
+                    Right :
+                    {
+                        W    : 5.75 * g_dKoef_pt_to_mm, // 0.08 inch
+                        Type : tblwidth_Mm
+                    }
+                }
+            }
+        };
+
+        this.TablePr.Set_FromObject(TablePr);
+        var TableCellPr =
+        {
+            Shd :
+            {
+                Value : shd_Clear,
+                unifill : CreteSolidFillRGB( 0xFE,  0xF4,  0xEC ),
+                Color : { r : 0xFE, g : 0xF4, b : 0xEC }
+            }
+        };
+
+        this.TableCellPr.Set_FromObject(TableCellPr);
+
+        var TableFirstRow =
+        {
+            TextPr :
+            {
+                Bold  : true,
+                unifill : CreteSolidFillRGB( 0xFF,  0xFF,  0xFF ),
+                Color : { r : 0xFF, g : 0xFF, b : 0xFF }
+            },
+
+            TableCellPr :
+            {
+                TableCellBorders :
+                {
+                    Bottom :
+                    {
+                        unifill : CreteSolidFillRGB( 0xFF,  0xFF,  0xFF ),
+                        Color : { r : 0xFF, g : 0xFF, b : 0xFF },
+                        Space : 0,
+                        Size  : 12 / 8 * g_dKoef_pt_to_mm,
+                        Value : border_Single
+                    }
+                },
+
+                Shd :
+                {
+                    unifill : CreteSolidFillRGB( 0x34,  0x8D,  0xA5 ),
+                    Value : shd_Clear,
+                    Color : { r : 0x34, g : 0x8D, b : 0xA5 }
+                }
+            }
+        };
+
+        this.TableFirstRow.TextPr.Set_FromObject(TableFirstRow.TextPr);
+        this.TableFirstRow.TableCellPr.Set_FromObject(TableFirstRow.TableCellPr);
+
+        var TableLastRow =
+        {
+            TextPr :
+            {
+                unifill : CreteSolidFillRGB( 0x34,  0x8D,  0xA5 ),
+                Bold  : true,
+                Color : { r : 0x34, g : 0x8D, b : 0xA5 }
+            },
+
+            TableCellPr :
+            {
+                TableCellBorders :
+                {
+                    Top :
+                    {
+                        unifill : CreteSolidFillRGB( 0,  0,  0 ),
+                        Color : { r : 0, g : 0, b : 0 },
+                        Space : 0,
+                        Size  : 12 / 8 * g_dKoef_pt_to_mm,
+                        Value : border_Single
+                    }
+                },
+
+                Shd :
+                {
+                    unifill : CreteSolidFillRGB( 0xFF,  0xFF,  0xFF ),
+                    Value : shd_Clear,
+                    Color : { r : 0xFF, g : 0xFF, b : 0xFF }
+                }
+            }
+        };
+
+        this.TableLastRow.TextPr.Set_FromObject(TableLastRow.TextPr);
+        this.TableLastRow.TableCellPr.Set_FromObject(TableLastRow.TableCellPr);
+
+        var TableFirstCol =
+        {
+            TextPr :
+            {
+                Bold : true
+            }
+        };
+
+        this.TableFirstCol.TextPr.Set_FromObject(TableFirstCol.TextPr);
+
+        var TableLastCol =
+        {
+            TextPr :
+            {
+                Bold : true
+            }
+        };
+
+        this.TableLastCol.TextPr.Set_FromObject(TableLastCol.TextPr);
+
+        var TableBand1Vert =
+        {
+            TableCellPr :
+            {
+                TableCellBorders :
+                {
+                    Top     : { Value : border_None },
+                    Left    : { Value : border_None },
+                    Bottom  : { Value : border_None },
+                    Right   : { Value : border_None },
+                    InsideH : { Value : border_None },
+                    InsideV : { Value : border_None }
+                },
+
+                Shd :
+                {
+                    unifill : CreteSolidFillRGB( 0xFD,  0xE4,  0xD0 ),
+                    Value : shd_Clear,
+                    Color : { r : 0xFD, g : 0xE4, b : 0xD0 }
+                }
+            }
+        };
+
+        this.TableBand1Vert.TableCellPr.Set_FromObject(TableBand1Vert.TableCellPr);
+
+        var TableBand1Horz =
+        {
+            TableCellPr :
+            {
+                Shd :
+                {
+                    unifill : CreteSolidFillRGB( 0xFD,  0xE9,  0xD9 ),
+                    Value : shd_Clear,
+                    Color : { r : 0xFD, g : 0xE9, b : 0xD9 }
+                }
+            }
+        };
+
+        this.TableBand1Horz.TableCellPr.Set_FromObject(TableBand1Horz.TableCellPr);
+
+        this.TableWholeTable.TablePr.Set_FromObject(this.TablePr);
+    },
+
+    Create_Table_Lined : function(Color1, Color2)
+    {
+        this.uiPriority = 99;
+
+        // ParaPr
+        this.ParaPr.Spacing.After    = 0;
+        this.ParaPr.Spacing.Line     = 1;
+        this.ParaPr.Spacing.LineRule = linerule_Auto;
+
+        // TablePr
+        this.TablePr.TableStyleColBandSize = 1;
+        this.TablePr.TableStyleRowBandSize = 1;
+        this.TablePr.TableInd = 0;
+        this.TablePr.TableCellMar.Top    = new CTableMeasurement( tblwidth_Auto, 0 );
+        this.TablePr.TableCellMar.Left   = new CTableMeasurement( tblwidth_Auto, 5.4 * g_dKoef_pt_to_mm );
+        this.TablePr.TableCellMar.Bottom = new CTableMeasurement( tblwidth_Auto, 0 );
+        this.TablePr.TableCellMar.Right  = new CTableMeasurement( tblwidth_Auto, 5.4 * g_dKoef_pt_to_mm );
+
+        // TableFirstRow
+        this.TableFirstRow.TableCellPr.Shd = new CDocumentShd();
+        this.TableFirstRow.TableCellPr.Shd.Value = shd_Clear;
+        this.TableFirstRow.TableCellPr.Shd.unifill = CreteSolidFillRGB(Color1.r, Color1.g, Color1.b);
+        this.TableFirstRow.TableCellPr.Shd.Color = new CDocumentColor(0, 0,0);
+
+        // TableLastRow
+        this.TableLastRow.TableCellPr.Shd = new CDocumentShd();
+        this.TableLastRow.TableCellPr.Shd.Value = shd_Clear;
+        this.TableLastRow.TableCellPr.Shd.unifill = CreteSolidFillRGB(Color1.r, Color1.g, Color1.b);
+        this.TableLastRow.TableCellPr.Shd.Color = new CDocumentColor(0, 0,0);
+
+        // TableFirstCol
+        this.TableFirstCol.TableCellPr.Shd = new CDocumentShd();
+        this.TableFirstCol.TableCellPr.Shd.Value = shd_Clear;
+        this.TableFirstCol.TableCellPr.Shd.unifill = CreteSolidFillRGB(Color1.r, Color1.g, Color1.b);
+        this.TableFirstCol.TableCellPr.Shd.Color = new CDocumentColor(0, 0,0);
+
+        // TableLastCol
+        this.TableLastCol.TableCellPr.Shd = new CDocumentShd();
+        this.TableLastCol.TableCellPr.Shd.Value = shd_Clear;
+        this.TableLastCol.TableCellPr.Shd.unifill = CreteSolidFillRGB(Color1.r, Color1.g, Color1.b);
+        this.TableLastCol.TableCellPr.Shd.Color = new CDocumentColor(0, 0,0);
+
+        // TableBand2Vert
+        this.TableBand2Vert.TableCellPr.Shd = new CDocumentShd();
+        this.TableBand2Vert.TableCellPr.Shd.Value = shd_Clear;
+        this.TableBand2Vert.TableCellPr.Shd.unifill = CreteSolidFillRGB(Color2.r, Color2.g, Color2.b);
+        this.TableBand2Vert.TableCellPr.Shd.Color = new CDocumentColor(0, 0,0);
+
+        // TableBand2Horz
+        this.TableBand2Horz.TableCellPr.Shd = new CDocumentShd();
+        this.TableBand2Horz.TableCellPr.Shd.Value = shd_Clear;
+        this.TableBand2Horz.TableCellPr.Shd.unifill = CreteSolidFillRGB(Color2.r, Color2.g, Color2.b);
+        this.TableBand2Horz.TableCellPr.Shd.Color = new CDocumentColor(0, 0,0);
+
+        this.TableWholeTable.TablePr.Set_FromObject(this.TablePr);
+    },
+
+    Create_Table_Bordered : function(Color1, Color2)
+    {
+        this.uiPriority = 99;
+
+        // ParaPr
+        this.ParaPr.Spacing.After    = 0;
+        this.ParaPr.Spacing.Line     = 1;
+        this.ParaPr.Spacing.LineRule = linerule_Auto;
+
+        // TablePr
+        this.TablePr.TableInd = 0;
+
+        this.TablePr.TableBorders.Top = new CDocumentBorder();
+        this.TablePr.TableBorders.Top.unifill = CreteSolidFillRGB(Color1.r, Color1.g, Color1.b);
+        this.TablePr.TableBorders.Top.Value = border_Single;
+        this.TablePr.TableBorders.Top.Size  = 0.5 * g_dKoef_pt_to_mm;
+        this.TablePr.TableBorders.Top.Space = 0;
+
+
+        this.TablePr.TableBorders.Left = new CDocumentBorder();
+        this.TablePr.TableBorders.Left.unifill = CreteSolidFillRGB(Color1.r, Color1.g, Color1.b);
+        this.TablePr.TableBorders.Left.Value = border_Single;
+        this.TablePr.TableBorders.Left.Size  = 0.5 * g_dKoef_pt_to_mm;
+        this.TablePr.TableBorders.Left.Space = 0;
+
+        this.TablePr.TableBorders.Bottom = new CDocumentBorder();
+        this.TablePr.TableBorders.Bottom.unifill = CreteSolidFillRGB(Color1.r, Color1.g, Color1.b);
+        this.TablePr.TableBorders.Bottom.Value = border_Single;
+        this.TablePr.TableBorders.Bottom.Size  = 0.5 * g_dKoef_pt_to_mm;
+        this.TablePr.TableBorders.Bottom.Space = 0;
+
+        this.TablePr.TableBorders.Right = new CDocumentBorder();
+        this.TablePr.TableBorders.Right.unifill = CreteSolidFillRGB(Color1.r, Color1.g, Color1.b);
+        this.TablePr.TableBorders.Right.Value = border_Single;
+        this.TablePr.TableBorders.Right.Size  = 0.5 * g_dKoef_pt_to_mm;
+        this.TablePr.TableBorders.Right.Space = 0;
+
+        this.TablePr.TableBorders.InsideH = new CDocumentBorder();
+        this.TablePr.TableBorders.InsideH.unifill = CreteSolidFillRGB(Color1.r, Color1.g, Color1.b);
+        this.TablePr.TableBorders.InsideH.Value = border_Single;
+        this.TablePr.TableBorders.InsideH.Size  = 0.5 * g_dKoef_pt_to_mm;
+        this.TablePr.TableBorders.InsideH.Space = 0;
+
+        this.TablePr.TableBorders.InsideV = new CDocumentBorder();
+        this.TablePr.TableBorders.InsideV.unifill = CreteSolidFillRGB(Color1.r, Color1.g, Color1.b);
+        this.TablePr.TableBorders.InsideV.Value = border_Single;
+        this.TablePr.TableBorders.InsideV.Size  = 0.5 * g_dKoef_pt_to_mm;
+        this.TablePr.TableBorders.InsideV.Space = 0;
+
+        this.TablePr.TableCellMar.Top    = new CTableMeasurement( tblwidth_Auto, 0 );
+        this.TablePr.TableCellMar.Left   = new CTableMeasurement( tblwidth_Auto, 5.4 * g_dKoef_pt_to_mm );
+        this.TablePr.TableCellMar.Bottom = new CTableMeasurement( tblwidth_Auto, 0 );
+        this.TablePr.TableCellMar.Right  = new CTableMeasurement( tblwidth_Auto, 5.4 * g_dKoef_pt_to_mm );
+
+        // TableFirstRow
+        this.TableFirstRow.TableCellPr.TableCellBorders.Bottom = new CDocumentBorder();
+        this.TableFirstRow.TableCellPr.TableCellBorders.Bottom.unifill = CreteSolidFillRGB(Color2.r, Color2.g, Color2.b);
+        this.TableFirstRow.TableCellPr.TableCellBorders.Bottom.Value = border_Single;
+        this.TableFirstRow.TableCellPr.TableCellBorders.Bottom.Size  = 2.25 * g_dKoef_pt_to_mm;
+        this.TableFirstRow.TableCellPr.TableCellBorders.Bottom.Space = 0;
+
+        // TableLastRow
+        this.TableLastRow.TableCellPr.TableCellBorders.Top = new CDocumentBorder();
+        this.TableLastRow.TableCellPr.TableCellBorders.Top.unifill = CreteSolidFillRGB(Color2.r, Color2.g, Color2.b);
+        this.TableLastRow.TableCellPr.TableCellBorders.Top.Value = border_Single;
+        this.TableLastRow.TableCellPr.TableCellBorders.Top.Size  = 2.25 * g_dKoef_pt_to_mm;
+        this.TableLastRow.TableCellPr.TableCellBorders.Top.Space = 0;
+
+        // TableFirstCol
+        this.TableFirstCol.TableCellPr.TableCellBorders.Right = new CDocumentBorder();
+        this.TableFirstCol.TableCellPr.TableCellBorders.Right.unifill = CreteSolidFillRGB(Color2.r, Color2.g, Color2.b);
+        this.TableFirstCol.TableCellPr.TableCellBorders.Right.Value = border_Single;
+        this.TableFirstCol.TableCellPr.TableCellBorders.Right.Size  = 2.25 * g_dKoef_pt_to_mm;
+        this.TableFirstCol.TableCellPr.TableCellBorders.Right.Space = 0;
+
+        // TableLastCol
+        this.TableLastCol.TableCellPr.TableCellBorders.Left = new CDocumentBorder();
+        this.TableLastCol.TableCellPr.TableCellBorders.Left.unifill = CreteSolidFillRGB(Color2.r, Color2.g, Color2.b);
+        this.TableLastCol.TableCellPr.TableCellBorders.Left.Value = border_Single;
+        this.TableLastCol.TableCellPr.TableCellBorders.Left.Size  = 2.25 * g_dKoef_pt_to_mm;
+        this.TableLastCol.TableCellPr.TableCellBorders.Left.Space = 0;
+
+        this.TableWholeTable.TablePr.Set_FromObject(this.TablePr);
+    },
+
+    Create_Table_BorderedAndLined : function(Color1, Color2, Color3)
+    {
+        this.uiPriority = 99;
+
+        // ParaPr
+        this.ParaPr.Spacing.After    = 0;
+        this.ParaPr.Spacing.Line     = 1;
+        this.ParaPr.Spacing.LineRule = linerule_Auto;
+
+        // TablePr
+        this.TablePr.TableStyleColBandSize = 1;
+        this.TablePr.TableStyleRowBandSize = 1;
+        this.TablePr.TableInd = 0;
+        this.TablePr.TableCellMar.Top    = new CTableMeasurement( tblwidth_Auto, 0 );
+        this.TablePr.TableCellMar.Left   = new CTableMeasurement( tblwidth_Auto, 5.4 * g_dKoef_pt_to_mm );
+        this.TablePr.TableCellMar.Bottom = new CTableMeasurement( tblwidth_Auto, 0 );
+        this.TablePr.TableCellMar.Right  = new CTableMeasurement( tblwidth_Auto, 5.4 * g_dKoef_pt_to_mm );
+
+        this.TablePr.TableBorders.Top = new CDocumentBorder();
+        this.TablePr.TableBorders.Top.unifill = CreteSolidFillRGB(Color1.r, Color1.g, Color1.b);
+        this.TablePr.TableBorders.Top.Value = border_Single;
+        this.TablePr.TableBorders.Top.Size  = 0.5 * g_dKoef_pt_to_mm;
+        this.TablePr.TableBorders.Top.Space = 0;
+
+        this.TablePr.TableBorders.Left = new CDocumentBorder();
+        this.TablePr.TableBorders.Left.unifill = CreteSolidFillRGB(Color1.r, Color1.g, Color1.b);
+        this.TablePr.TableBorders.Left.Value = border_Single;
+        this.TablePr.TableBorders.Left.Size  = 0.5 * g_dKoef_pt_to_mm;
+        this.TablePr.TableBorders.Left.Space = 0;
+
+        this.TablePr.TableBorders.Bottom = new CDocumentBorder();
+        this.TablePr.TableBorders.Bottom.unifill = CreteSolidFillRGB(Color1.r, Color1.g, Color1.b);
+        this.TablePr.TableBorders.Bottom.Value = border_Single;
+        this.TablePr.TableBorders.Bottom.Size  = 0.5 * g_dKoef_pt_to_mm;
+        this.TablePr.TableBorders.Bottom.Space = 0;
+
+        this.TablePr.TableBorders.Right = new CDocumentBorder();
+        this.TablePr.TableBorders.Right.unifill = CreteSolidFillRGB(Color1.r, Color1.g, Color1.b);
+        this.TablePr.TableBorders.Right.Value = border_Single;
+        this.TablePr.TableBorders.Right.Size  = 0.5 * g_dKoef_pt_to_mm;
+        this.TablePr.TableBorders.Right.Space = 0;
+
+        this.TablePr.TableBorders.InsideH = new CDocumentBorder();
+        this.TablePr.TableBorders.InsideH.unifill = CreteSolidFillRGB(Color1.r, Color1.g, Color1.b);
+        this.TablePr.TableBorders.InsideH.Value = border_Single;
+        this.TablePr.TableBorders.InsideH.Size  = 0.5 * g_dKoef_pt_to_mm;
+        this.TablePr.TableBorders.InsideH.Space = 0;
+
+        this.TablePr.TableBorders.InsideV = new CDocumentBorder();
+        this.TablePr.TableBorders.InsideV.unifill = CreteSolidFillRGB(Color1.r, Color1.g, Color1.b);
+        this.TablePr.TableBorders.InsideV.Value = border_Single;
+        this.TablePr.TableBorders.InsideV.Size  = 0.5 * g_dKoef_pt_to_mm;
+        this.TablePr.TableBorders.InsideV.Space = 0;
+
+        // TableFirstRow
+        this.TableFirstRow.TableCellPr.Shd = new CDocumentShd();
+        this.TableFirstRow.TableCellPr.Shd.Value = shd_Clear;
+        this.TableFirstRow.TableCellPr.Shd.unifill = CreteSolidFillRGB(Color2.r, Color2.g, Color2.b);
+        this.TableFirstRow.TableCellPr.Shd.Color = new CDocumentColor(0, 0,0);
+
+        // TableLastRow
+        this.TableLastRow.TableCellPr.Shd = new CDocumentShd();
+        this.TableLastRow.TableCellPr.Shd.Value = shd_Clear;
+        this.TableLastRow.TableCellPr.Shd.unifill = CreteSolidFillRGB(Color2.r, Color2.g, Color2.b);
+        this.TableLastRow.TableCellPr.Shd.Color = new CDocumentColor(0, 0,0);
+
+        // TableFirstCol
+        this.TableFirstCol.TableCellPr.Shd = new CDocumentShd();
+        this.TableFirstCol.TableCellPr.Shd.Value = shd_Clear;
+        this.TableFirstCol.TableCellPr.Shd.unifill = CreteSolidFillRGB(Color2.r, Color2.g, Color2.b);
+        this.TableFirstCol.TableCellPr.Shd.Color = new CDocumentColor(0, 0,0);
+
+
+        // TableLastCol
+        this.TableLastCol.TableCellPr.Shd = new CDocumentShd();
+        this.TableLastCol.TableCellPr.Shd.Value = shd_Clear;
+        this.TableLastCol.TableCellPr.Shd.unifill = CreteSolidFillRGB(Color2.r, Color2.g, Color2.b);
+        this.TableLastCol.TableCellPr.Shd.Color = new CDocumentColor(0, 0,0);
+
+        // TableBand2Vert
+        this.TableBand2Vert.TableCellPr.Shd = new CDocumentShd();
+
+        this.TableBand2Vert.TableCellPr.Shd.Value = shd_Clear;
+        this.TableBand2Vert.TableCellPr.Shd.unifill = CreteSolidFillRGB(Color3.r, Color3.g, Color3.b);
+        this.TableBand2Vert.TableCellPr.Shd.Color = new CDocumentColor(0, 0,0);
+
+        // TableBand2Horz
+        this.TableBand2Horz.TableCellPr.Shd = new CDocumentShd();
+        this.TableBand2Horz.TableCellPr.Shd.Value = shd_Clear;
+        this.TableBand2Horz.TableCellPr.Shd.unifill = CreteSolidFillRGB(Color3.r, Color3.g, Color3.b);
+        this.TableBand2Horz.TableCellPr.Shd.Color = new CDocumentColor(0, 0,0);
+        this.TableWholeTable.TablePr.Set_FromObject(this.TablePr);
+    }
+
+};
+
+
+function CreateDefaultStylesForTables()
+{
+    var _table_styles = new CStyles();
+    var _default_table_style = new CStyle("defaultTableStyle", null, null, styletype_Table);
+    var _font_ref = new FontRef();
+    _font_ref.idx = fntStyleInd_minor;
+    _font_ref.Color = new CUniColor();
+    _font_ref.Color.color = new CPrstColor();
+    _font_ref.Color.color.id = "black";
+    var _font_fill = new CUniFill();
+    _font_fill.fill = new CSolidFill();
+    _font_fill.fill.color.color = new CSchemeColor();
+    _font_fill.fill.color.color.id = 8;
+    _default_table_style.TableWholeTable.TextPr.fontRef = _font_ref;
+    _default_table_style.TableWholeTable.TextPr.unifill = _font_fill;
+
+
+
+    _default_table_style.TableWholeTable.TableCellPr.TableCellBorders.Left = new CDocumentBorder();
+    var _border_fill = new CUniFill();
+    _border_fill.fill = new CSolidFill();
+    _border_fill.fill.color.color = new CSchemeColor();
+    _border_fill.fill.color.color.id = 12;
+    _default_table_style.TableWholeTable.TableCellPr.TableCellBorders.Left.unifill = _border_fill;
+    _default_table_style.TableWholeTable.TableCellPr.TableCellBorders.Left.Size = 127/360;
+    _default_table_style.TableWholeTable.TableCellPr.TableCellBorders.Left.Value = border_Single;
+
+    _default_table_style.TableWholeTable.TableCellPr.TableCellBorders.Top = new CDocumentBorder();
+    _border_fill = new CUniFill();
+    _border_fill.fill = new CSolidFill();
+    _border_fill.fill.color.color = new CSchemeColor();
+    _border_fill.fill.color.color.id = 12;
+    _default_table_style.TableWholeTable.TableCellPr.TableCellBorders.Top.unifill = _border_fill;
+    _default_table_style.TableWholeTable.TableCellPr.TableCellBorders.Top.Size = 127/360;
+    _default_table_style.TableWholeTable.TableCellPr.TableCellBorders.Top.Value = border_Single;
+
+    _default_table_style.TableWholeTable.TableCellPr.TableCellBorders.Right = new CDocumentBorder();
+    _border_fill = new CUniFill();
+    _border_fill.fill = new CSolidFill();
+    _border_fill.fill.color.color = new CSchemeColor();
+    _border_fill.fill.color.color.id = 12;
+    _default_table_style.TableWholeTable.TableCellPr.TableCellBorders.Right.unifill = _border_fill;
+    _default_table_style.TableWholeTable.TableCellPr.TableCellBorders.Right.Size = 127/360;
+    _default_table_style.TableWholeTable.TableCellPr.TableCellBorders.Right.Value = border_Single;
+
+    _default_table_style.TableWholeTable.TableCellPr.TableCellBorders.Bottom = new CDocumentBorder();
+    _border_fill = new CUniFill();
+    _border_fill.fill = new CSolidFill();
+    _border_fill.fill.color.color = new CSchemeColor();
+    _border_fill.fill.color.color.id = 12;
+    _default_table_style.TableWholeTable.TableCellPr.TableCellBorders.Bottom.unifill = _border_fill;
+    _default_table_style.TableWholeTable.TableCellPr.TableCellBorders.Bottom.Size = 127/360;
+    _default_table_style.TableWholeTable.TableCellPr.TableCellBorders.Bottom.Value = border_Single;
+
+    _default_table_style.TableWholeTable.TableCellPr.Shd = new CDocumentShd();
+    _default_table_style.TableWholeTable.TableCellPr.Shd.Value = shd_Clear;
+    var _cell_fill = new CUniFill();
+    _cell_fill.fill = new CSolidFill();
+    _cell_fill.fill.color.color = new CSchemeColor();
+    _cell_fill.fill.color.color.id = 0;
+    _cell_fill.fill.color.Mods.Mods.push({name: "tint", val:20000});
+    _default_table_style.TableWholeTable.TableCellPr.Shd.unifill = _cell_fill;
+
+
+    _default_table_style.TableBand1Horz.TableCellPr.Shd = new CDocumentShd();
+    _default_table_style.TableBand1Horz.TableCellPr.Shd.Value = shd_Clear;
+    _cell_fill = new CUniFill();
+    _cell_fill.fill = new CSolidFill();
+    _cell_fill.fill.color.color = new CSchemeColor();
+    _cell_fill.fill.color.color.id = 0;
+    _cell_fill.fill.color.Mods.Mods.push({name: "tint", val:40000});
+    _default_table_style.TableBand1Horz.TableCellPr.Shd.unifill = _cell_fill;
+
+
+    _default_table_style.TableBand1Vert.TableCellPr.Shd = new CDocumentShd();
+    _default_table_style.TableBand1Vert.TableCellPr.Shd.Value = shd_Clear;
+    _cell_fill = new CUniFill();
+    _cell_fill.fill = new CSolidFill();
+    _cell_fill.fill.color.color = new CSchemeColor();
+    _cell_fill.fill.color.color.id = 0;
+    _cell_fill.fill.color.Mods.Mods.push({name: "tint", val:40000});
+    _default_table_style.TableBand1Vert.TableCellPr.Shd.unifill = _cell_fill;
+
+
+    _default_table_style.TableLastCol.TextPr.Bold = true;
+    _font_fill = new CUniFill();
+    _font_fill.fill = new CSolidFill();
+    _font_fill.fill.color.color = new CSchemeColor();
+    _font_fill.fill.color.color.id = 12;
+    _default_table_style.TableLastCol.TextPr.unifill = _font_fill;
+    _font_ref = new FontRef();
+    _font_ref.idx = fntStyleInd_minor;
+    _font_ref.Color = new CUniColor();
+    _font_ref.Color.color = new CPrstColor();
+    _font_ref.Color.color.id = "black";
+    _default_table_style.TableLastCol.TextPr.fontRef = _font_ref;
+
+
+
+    _default_table_style.TableLastCol.TableCellPr.Shd = new CDocumentShd();
+    _default_table_style.TableLastCol.TableCellPr.Shd.Value = shd_Clear;
+    _cell_fill = new CUniFill();
+    _cell_fill.fill = new CSolidFill();
+    _cell_fill.fill.color.color = new CSchemeColor();
+    _cell_fill.fill.color.color.id = 0;
+    _default_table_style.TableLastCol.TableCellPr.Shd.unifill = _cell_fill;
+
+
+    _default_table_style.TableFirstCol.TextPr.Bold = true;
+    _font_fill = new CUniFill();
+    _font_fill.fill = new CSolidFill();
+    _font_fill.fill.color.color = new CSchemeColor();
+    _font_fill.fill.color.color.id = 12;
+    _default_table_style.TableFirstCol.TextPr.unifill = _font_fill;
+    _font_ref = new FontRef();
+    _font_ref.idx = fntStyleInd_minor;
+    _font_ref.Color = new CUniColor();
+    _font_ref.Color.color = new CPrstColor();
+    _font_ref.Color.color.id = "black";
+    _default_table_style.TableFirstCol.TextPr.fontRef = _font_ref;
+
+
+   _default_table_style.TableFirstCol.TableCellPr.Shd = new CDocumentShd();
+    _default_table_style.TableFirstCol.TableCellPr.Shd.Value = shd_Clear;
+    _cell_fill = new CUniFill();
+    _cell_fill.fill = new CSolidFill();
+    _cell_fill.fill.color.color = new CSchemeColor();
+    _cell_fill.fill.color.color.id = 0;
+    _default_table_style.TableFirstCol.TableCellPr.Shd.unifill = _cell_fill;
+
+
+    _default_table_style.TableLastRow.TextPr.Bold = true;
+    _font_fill = new CUniFill();
+    _font_fill.fill = new CSolidFill();
+    _font_fill.fill.color.color = new CSchemeColor();
+    _font_fill.fill.color.color.id = 12;
+    _default_table_style.TableLastRow.TextPr.unifill = _font_fill;
+    _font_ref = new FontRef();
+    _font_ref.idx = fntStyleInd_minor;
+    _font_ref.Color = new CUniColor();
+    _font_ref.Color.color = new CPrstColor();
+    _font_ref.Color.color.id = "black";
+    _default_table_style.TableLastRow.TextPr.fontRef = _font_ref;
+
+    _default_table_style.TableLastRow.TableCellPr.TableCellBorders.Top = new CDocumentBorder();
+    _border_fill = new CUniFill();
+    _border_fill.fill = new CSolidFill();
+    _border_fill.fill.color.color = new CSchemeColor();
+    _border_fill.fill.color.color.id = 12;
+    _default_table_style.TableLastRow.TableCellPr.TableCellBorders.Top.unifill = _border_fill;
+    _default_table_style.TableLastRow.TableCellPr.TableCellBorders.Top.Size = 381/360;
+    _default_table_style.TableLastRow.TableCellPr.TableCellBorders.Top.Value = border_Single;
+
+
+    _default_table_style.TableLastRow.TableCellPr.Shd = new CDocumentShd();
+    _default_table_style.TableLastRow.TableCellPr.Shd.Value = shd_Clear;
+    _cell_fill = new CUniFill();
+    _cell_fill.fill = new CSolidFill();
+    _cell_fill.fill.color.color = new CSchemeColor();
+    _cell_fill.fill.color.color.id = 0;
+    _default_table_style.TableLastRow.TableCellPr.Shd.unifill = _cell_fill;
+
+    _default_table_style.TableFirstRow.TextPr.Bold = true;
+    _font_fill = new CUniFill();
+    _font_fill.fill = new CSolidFill();
+    _font_fill.fill.color.color = new CSchemeColor();
+    _font_fill.fill.color.color.id = 12;
+    _default_table_style.TableFirstRow.TextPr.unifill = _font_fill;
+    _font_ref = new FontRef();
+    _font_ref.idx = fntStyleInd_minor;
+    _font_ref.Color = new CUniColor();
+    _font_ref.Color.color = new CPrstColor();
+    _font_ref.Color.color.id = "black";
+    _default_table_style.TableFirstRow.TextPr.fontRef = _font_ref;
+
+    _default_table_style.TableFirstRow.TableCellPr.TableCellBorders.Bottom = new CDocumentBorder();
+    _border_fill = new CUniFill();
+    _border_fill.fill = new CSolidFill();
+    _border_fill.fill.color.color = new CSchemeColor();
+    _border_fill.fill.color.color.id = 12;
+    _default_table_style.TableFirstRow.TableCellPr.TableCellBorders.Bottom.unifill = _border_fill;
+    _default_table_style.TableFirstRow.TableCellPr.TableCellBorders.Bottom.Size = 381/360;
+    _default_table_style.TableFirstRow.TableCellPr.TableCellBorders.Bottom.Value = border_Single;
+
+    _default_table_style.TableFirstRow.TableCellPr.Shd = new CDocumentShd();
+    _default_table_style.TableFirstRow.TableCellPr.Shd.Value = shd_Clear;
+    _cell_fill = new CUniFill();
+    _cell_fill.fill = new CSolidFill();
+    _cell_fill.fill.color.color = new CSchemeColor();
+    _cell_fill.fill.color.color.id = 0;
+    _default_table_style.TableFirstRow.TableCellPr.Shd.unifill = _cell_fill;
+
+    _table_styles.Style.push(_default_table_style);
+    _table_styles.Id++;
+    return _default_table_style;
+}
+
+function CStyles()
+{
+    this.Default =
+    {
+        ParaPr      : new CParaPr(),
+        TextPr      : new CTextPr(),
+        TablePr     : new CTablePr(),
+        TableRowPr  : new CTableRowPr(),
+        TableCellPr : new CTableCellPr(),
+        Paragraph : null,
+        Character : null,
+        Numbering : null,
+        Table     : null,
+        TableGrid : null,
+        Headings  : [],
+        ParaList  : null,
+        Header    : null,
+        Footer    : null
+    };
+
+    // Заполняем значения по умолчанию
+    this.Default.ParaPr.Init_Default();
+    this.Default.TextPr.Init_Default();
+    this.Default.TablePr.Init_Default();
+    this.Default.TableRowPr.Init_Default();
+    this.Default.TableCellPr.Init_Default();
+
+    this.Id = 0;
+    this.Style = new Array();
+
+    // Создадим стандартные стили
+
+    // Дефолтовый стиль для параграфа
+    var Style_Para_Def = new CStyle( "Normal", null, null, styletype_Paragraph );
+    Style_Para_Def.Create_Default_Paragraph();
+    this.Style[this.Id] = Style_Para_Def;
+    this.Default.Paragraph = this.Id;
+
+    this.Id++;
+    // Дефолтовый стиль для текста
+    var Style_Char_Def = new CStyle( "Default Paragraph Font", null, null, styletype_Character );
+    Style_Char_Def.Create_Default_Character();
+    this.Style[this.Id] = Style_Char_Def;
+    this.Default.Character = this.Id;
+
+    this.Id++;
+    // Дефолтовый стиль для нумерации в списках
+    var Style_Num_Def = new CStyle( "No List", null, null, styletype_Numbering );
+    Style_Num_Def.Create_Default_Numbering();
+    this.Style[this.Id] = Style_Num_Def;
+    this.Default.Numbering = this.Id;
+
+    this.Id++;
+    // Создаем стандартные стили для заголовков
+    var Style_H1 = new CStyle("Heading 1", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
+    Style_H1.Create_Heading1();
+    this.Style[this.Id] = Style_H1;
+    this.Default.Headings[0] = this.Id;
+
+    this.Id++;
+    // Создаем стандартные стили для заголовков
+    var Style_H2 = new CStyle("Heading 2", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
+    Style_H2.Create_Heading2();
+    this.Style[this.Id] = Style_H2;
+    this.Default.Headings[1] = this.Id;
+
+    this.Id++;
+    // Создаем стандартные стили для заголовков
+    var Style_H3 = new CStyle("Heading 3", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
+    Style_H3.Create_Heading3();
+    this.Style[this.Id] = Style_H3;
+    this.Default.Headings[2] = this.Id;
+
+    this.Id++;
+    // Создаем стандартные стили для заголовков
+    var Style_H4 = new CStyle("Heading 4", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
+    Style_H4.Create_Heading4();
+    this.Style[this.Id] = Style_H4;
+    this.Default.Headings[3] = this.Id;
+
+    this.Id++;
+    // Создаем стандартные стили для заголовков
+    var Style_H5 = new CStyle("Heading 5", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
+    Style_H5.Create_Heading5();
+    this.Style[this.Id] = Style_H5;
+    this.Default.Headings[4] = this.Id;
+
+    this.Id++;
+    // Создаем стандартные стили для заголовков
+    var Style_H6 = new CStyle("Heading 6", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
+    Style_H6.Create_Heading6();
+    this.Style[this.Id] = Style_H6;
+    this.Default.Headings[5] = this.Id;
+
+    this.Id++;
+    // Создаем стандартные стили для заголовков
+    var Style_H7 = new CStyle("Heading 7", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
+    Style_H7.Create_Heading7();
+    this.Style[this.Id] = Style_H7;
+    this.Default.Headings[6] = this.Id;
+
+    this.Id++;
+    // Создаем стандартные стили для заголовков
+    var Style_H8 = new CStyle("Heading 8", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
+    Style_H8.Create_Heading8();
+    this.Style[this.Id] = Style_H8;
+    this.Default.Headings[7] = this.Id;
+
+    this.Id++;
+    // Создаем стандартные стили для заголовков
+    var Style_H9 = new CStyle("Heading 9", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
+    Style_H9.Create_Heading9();
+    this.Style[this.Id] = Style_H9;
+    this.Default.Headings[8] = this.Id;
+
+    this.Id++;
+    // Создаем стандартный стиль для нумерованных параграфов
+    var Style_Para_List = new CStyle("List Paragraph", this.Default.Paragraph, null, styletype_Paragraph );
+    Style_Para_List.Create_ListParagraph();
+    this.Style[this.Id] = Style_Para_List;
+    this.Default.ParaList = this.Id;
+
+    this.Id++;
+
+    // Создаем стандартный стиль для таблиц
+    var Style_Table = new CStyle("Normal Table", null, null, styletype_Table );
+    Style_Table.Create_NormalTable();
+    this.Style[this.Id] = Style_Table;
+    this.Default.Table = this.Id;
+
+    this.Id++;
+    // Создаем стиль "Без интервала"
+    var Style_NoSpacing = new CStyle("No Spacing", null, null, styletype_Paragraph );
+    Style_NoSpacing.Create_NoSpacing();
+    this.Style[this.Id] = Style_NoSpacing;
+
+    this.Id++;
+
+    // Создаем стиль "Заголовок"
+    var Style_Title = new CStyle("Title", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
+    Style_Title.Create_Title();
+    this.Style[this.Id] = Style_Title;
+
+    this.Id++;
+    // Создаем стиль "Подзаголовок"
+    var Style_Subtitle = new CStyle("Subtitle", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
+    Style_Subtitle.Create_Subtitle();
+    this.Style[this.Id] = Style_Subtitle;
+
+    this.Id++;
+    // Создаем стиль "Цитата"
+    var Style_Quote = new CStyle("Quote", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
+    Style_Quote.Create_Quote();
+    this.Style[this.Id] = Style_Quote;
+
+    this.Id++;
+    // Создаем стиль "Выделенная цитата"
+    var Style_IntenseQuote = new CStyle("Intense Quote", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
+    Style_IntenseQuote.Create_IntenseQuote();
+    this.Style[this.Id] = Style_IntenseQuote;
+
+    this.Id++;
+
+    // Создаем стандартный стиль верхнего колонтитула
+    var Style_Header = new CStyle("Header", this.Default.Paragraph, null, styletype_Paragraph );
+    Style_Header.Create_Header();
+    this.Style[this.Id] = Style_Header;
+    this.Default.Header = this.Id;
+
+    this.Id++;
+
+    // Создаем стандартный стиль нижнего колонтитула
+    var Style_Footer = new CStyle("Footer", this.Default.Paragraph, null, styletype_Paragraph );
+    Style_Footer.Create_Footer();
+    this.Style[this.Id] = Style_Footer;
+    this.Default.Footer = this.Id;
+
+    this.Id++;
+    // Создаем стиль для таблиц, который будет применяться к новым таблицам
+    var Style_TableGrid = new CStyle("Table Grid", this.Default.Table, null, styletype_Table );
+    Style_TableGrid.Create_TableGrid();
+    this.Style[this.Id] = Style_TableGrid;
+    this.Default.TableGrid = this.Id;
+
+    this.Id++;
+    // Создаем стандартный стиль для таблиц
+    var Style_Table = new CStyle("LightShading", this.Default.Table, null, styletype_Table );
+    Style_Table.Create_Table_LightShading();
+    this.Style[this.Id] = Style_Table;
+
+    this.Id++;
+
+    // Создаем стандартный стиль для таблиц
+    var Style_Table = new CStyle("ColorfulListAccent6", this.Default.Table, null, styletype_Table );
+    Style_Table.Create_Table_ColorfulListAccent6();
+    this.Style[this.Id] = Style_Table;
+
+    this.Id++;
+
+
+}
+
+CStyles.prototype =
+{
+
+    Get_AllTableStyles : function()
+    {
+        var TableStyles = new Array();
+        for ( var Id in this.Style )
+        {
+            var Style = this.Style[Id];
+            if ( styletype_Table === Style.Type )
+                TableStyles.push( Id );
+        }
+
+        return TableStyles;
+    },
+
+    Get_Pr : function(StyleId, Type, TableStyle)
+    {
+        var Pr = {};
+
+        // Сначала копируем параметры заданные в табличном стиле
+        switch ( Type )
+        {
+            case styles_Paragraph:
+            {
+                if ( null != TableStyle )
+                {
+                    Pr.TextPr = TableStyle.TextPr.Copy();
+                    Pr.ParaPr = TableStyle.ParaPr.Copy();
+                }
+                else
+                {
+                    Pr.TextPr = this.Default.TextPr.Copy();
+                    Pr.ParaPr = this.Default.ParaPr.Copy();
+                }
+
+                break;
+            }
+            case styles_Table:
+            {
+                // Сначала копируем параметры по умолчанию
+                Pr.TextPr      = this.Default.TextPr.Copy();
+                Pr.ParaPr      = this.Default.ParaPr.Copy();
+
+                Pr.TablePr     = this.Default.TablePr.Copy();
+                Pr.TableRowPr  = this.Default.TableRowPr.Copy();
+                Pr.TableCellPr = this.Default.TableCellPr.Copy();
+
+                Pr.TableFirstCol   = new CTableStylePr();
+                Pr.TableFirstRow   = new CTableStylePr();
+                Pr.TableLastCol    = new CTableStylePr();
+                Pr.TableLastRow    = new CTableStylePr();
+                Pr.TableBand1Horz  = new CTableStylePr();
+                Pr.TableBand1Vert  = new CTableStylePr();
+                Pr.TableBand2Horz  = new CTableStylePr();
+                Pr.TableBand2Vert  = new CTableStylePr();
+                Pr.TableTLCell     = new CTableStylePr();
+                Pr.TableTRCell     = new CTableStylePr();
+                Pr.TableBLCell     = new CTableStylePr();
+                Pr.TableBRCell     = new CTableStylePr();
+                Pr.TableWholeTable = new CTableStylePr();
+
+                break;
+            }
+            case styles_Character:
+            {
+                if ( null != TableStyle )
+                    Pr.TextPr = TableStyle.TextPr.Copy();
+                else
+                    Pr.TextPr = this.Default.TextPr.Copy();
+
+                break;
+            }
+        }
+
+        // Рассчитываем стиль
+        this.Internal_Get_Pr( Pr, StyleId, Type, ( null === TableStyle ? true : false ) );
+
+        if ( styles_Table === Type )
+        {
+            // Соединим настройки для всей таблицы в одну общую настройку и удалим одну из них за ненадобностью
+            Pr.ParaPr.Merge( Pr.TableWholeTable.ParaPr );
+            Pr.TextPr.Merge( Pr.TableWholeTable.TextPr );
+            Pr.TablePr.Merge( Pr.TableWholeTable.TablePr );
+            Pr.TableRowPr.Merge( Pr.TableWholeTable.TableRowPr );
+            Pr.TableCellPr.Merge( Pr.TableWholeTable.TableCellPr );
+            delete Pr.TableWholeTable;
+        }
+
+        /*if(styles_Paragraph === Type && TableStyle !== null && typeof  TableStyle === "object" )
+        {
+            Pr.ParaPr.Merge( TableStyle.ParaPr );
+            Pr.TextPr.Merge( TableStyle.TextPr );
+        }   */
+
+        return Pr;
+    },
+
+    Get_Next : function(StyleId)
+    {
+        return this.Style[StyleId].Next;
+    },
+
+    Get_Name : function(StyleId)
+    {
+        if ( undefined != this.Style[StyleId] )
+            return this.Style[StyleId].Name;
+
+        return "";
+    },
+
+    Get_Default_Paragraph : function()
+    {
+        return this.Default.Paragraph;
+    },
+
+    Get_Default_Character : function()
+    {
+        return this.Default.Character;
+    },
+
+    Get_Default_Numbering : function()
+    {
+        return this.Default.Numbering;
+    },
+
+    Get_Default_Table : function()
+    {
+        return this.Default.Table;
+    },
+
+    Get_Default_TableGrid : function()
+    {
+        return this.Default.TableGrid;
+    },
+
+    Get_Default_Heading : function(Lvl)
+    {
+        Lvl = Math.max( Math.min( Lvl, 8 ), 0 );
+        return this.Default.Headings[Lvl];
+    },
+
+    Get_Default_ParaList : function()
+    {
+        return this.Default.ParaList;
+    },
+
+    Get_Default_Header : function()
+    {
+        return this.Default.Header;
+    },
+
+    Get_Default_Footer : function()
+    {
+        return this.Default.Footer;
+    },
+
+    Get_StyleIdByName : function (Name)
+    {
+        for ( var Id in this.Style )
+        {
+            var Style = this.Style[Id];
+            if ( Style.Name === Name )
+                return Id;
+        }
+
+        return this.Default.Paragraph;
+    },
+
+    Internal_Get_Pr : function(Pr, StyleId, Type, bUseDefault)
+    {
+        var Style = this.Style[StyleId];
+        if ( undefined == StyleId || undefined === Style )
+        {
+            if ( true === bUseDefault )
+            {
+                // Копируем свойства по умолчанию для данного типа
+                switch ( Type )
+                {
+                    case styles_Paragraph:
+                    {
+                        var DefId = this.Default.Paragraph;
+
+                        Pr.ParaPr.Merge( this.Style[DefId].ParaPr );
+                        Pr.TextPr.Merge( this.Style[DefId].TextPr );
+
+                        break;
+                    }
+                    case styles_Numbering:
+                    {
+                        var DefId = this.Default.Numbering;
+                        break;
+                    }
+                    case styles_Table:
+                    {
+                        var DefId = this.Default.Table;
+
+                        Pr.ParaPr.Merge( this.Style[DefId].ParaPr );
+                        Pr.TextPr.Merge( this.Style[DefId].TextPr );
+                        Pr.TablePr.Merge( this.Style[DefId].TablePr );
+                        Pr.TableRowPr.Merge( this.Style[DefId].TableRowPr );
+                        Pr.TableCellPr.Merge( this.Style[DefId].TableCellPr );
+
+                        break;
+                    }
+                    case styles_Character:
+                    {
+                        var DefId = this.Default.Character;
+
+                        Pr.TextPr.Merge( this.Style[DefId].TextPr );
+
+                        break;
+                    }
+                }
+            }
+
+            return;
+        }
+
+        if ( null === Style.BasedOn )
+        {
+            // Копируем свойства по умолчанию для данного типа
+            if ( true === bUseDefault )
+            {
+                // Копируем свойства по умолчанию для данного типа
+                switch ( Type )
+                {
+                    case styles_Paragraph:
+                    {
+                        var DefId = this.Default.Paragraph;
+
+                        Pr.ParaPr.Merge( this.Style[DefId].ParaPr );
+                        Pr.TextPr.Merge( this.Style[DefId].TextPr );
+
+                        break;
+                    }
+                    case styles_Numbering:
+                    {
+                        var DefId = this.Default.Numbering;
+                        break;
+                    }
+                    case styles_Table:
+                    {
+                        var DefId = this.Default.Table;
+
+                        Pr.ParaPr.Merge( this.Style[DefId].ParaPr );
+                        Pr.TextPr.Merge( this.Style[DefId].TextPr );
+                        Pr.TablePr.Merge( this.Style[DefId].TablePr );
+                        Pr.TableRowPr.Merge( this.Style[DefId].TableRowPr );
+                        Pr.TableCellPr.Merge( this.Style[DefId].TableCellPr );
+
+                        break;
+                    }
+                    case styles_Character:
+                    {
+                        var DefId = this.Default.Character;
+
+                        Pr.TextPr.Merge( this.Style[DefId].TextPr );
+
+                        break;
+                    }
+                }
+            }
+
+            // Копируем свойства текущего стиля
+            switch ( Type )
+            {
+                case styles_Paragraph:
+                {
+                    Pr.ParaPr.Merge( Style.ParaPr );
+                    Pr.TextPr.Merge( Style.TextPr );
+
+                    break;
+                }
+                case styles_Numbering:
+                {
+                    break;
+                }
+                case styles_Table:
+                {
+                    Pr.ParaPr.Merge( Style.ParaPr );
+                    Pr.TextPr.Merge( Style.TextPr );
+
+                    Pr.TablePr.Merge(     Style.TablePr );
+                    Pr.TableRowPr.Merge(  Style.TableRowPr );
+                    Pr.TableCellPr.Merge( Style.TableCellPr );
+
+                    Pr.TableBand1Horz.Merge(  Style.TableBand1Horz  );
+                    Pr.TableBand1Vert.Merge(  Style.TableBand1Vert  );
+                    Pr.TableBand2Horz.Merge(  Style.TableBand2Horz  );
+                    Pr.TableBand2Vert.Merge(  Style.TableBand2Vert  );
+                    Pr.TableFirstCol.Merge(   Style.TableFirstCol   );
+                    Pr.TableFirstRow.Merge(   Style.TableFirstRow   );
+                    Pr.TableLastCol.Merge(    Style.TableLastCol    );
+                    Pr.TableLastRow.Merge(    Style.TableLastRow    );
+                    Pr.TableTLCell.Merge(     Style.TableTLCell     );
+                    Pr.TableTRCell.Merge(     Style.TableTRCell     );
+                    Pr.TableBLCell.Merge(     Style.TableBLCell     );
+                    Pr.TableBRCell.Merge(     Style.TableBRCell     );
+                    Pr.TableWholeTable.Merge( Style.TableWholeTable );
+
+                    break;
+                }
+                case styles_Character:
+                {
+                    Pr.TextPr.Merge( Style.TextPr );
+
+                    break;
+                }
+            }
+        }
+        else
+        {
+            // Копируем свойства родительского стиля
+            this.Internal_Get_Pr( Pr, Style.BasedOn, Type );
+
+            // Копируем свойства текущего стиля
+            switch ( Type )
+            {
+                case styles_Paragraph:
+                {
+                    Pr.ParaPr.Merge( Style.ParaPr );
+                    Pr.TextPr.Merge( Style.TextPr );
+
+                    break;
+                }
+                case styles_Numbering:
+                {
+                    break;
+                }
+                case styles_Table:
+                {
+                    Pr.ParaPr.Merge( Style.ParaPr );
+                    Pr.TextPr.Merge( Style.TextPr );
+
+                    Pr.TablePr.Merge(     Style.TablePr );
+                    Pr.TableRowPr.Merge(  Style.TableRowPr );
+                    Pr.TableCellPr.Merge( Style.TableCellPr );
+
+                    Pr.TableBand1Horz.Merge(  Style.TableBand1Horz  );
+                    Pr.TableBand1Vert.Merge(  Style.TableBand1Vert  );
+                    Pr.TableBand2Horz.Merge(  Style.TableBand2Horz  );
+                    Pr.TableBand2Vert.Merge(  Style.TableBand2Vert  );
+                    Pr.TableFirstCol.Merge(   Style.TableFirstCol   );
+                    Pr.TableFirstRow.Merge(   Style.TableFirstRow   );
+                    Pr.TableLastCol.Merge(    Style.TableLastCol    );
+                    Pr.TableLastRow.Merge(    Style.TableLastRow    );
+                    Pr.TableTLCell.Merge(     Style.TableTLCell     );
+                    Pr.TableTRCell.Merge(     Style.TableTRCell     );
+                    Pr.TableBLCell.Merge(     Style.TableBLCell     );
+                    Pr.TableBRCell.Merge(     Style.TableBRCell     );
+                    Pr.TableWholeTable.Merge( Style.TableWholeTable );
+
+                    break;
+                }
+                case styles_Character:
+                {
+                    Pr.TextPr.Merge( Style.TextPr );
+
+                    break;
+                }
+            }
+        }
+    }
+};
+
+function CDocumentColor(r,g,b)
+{
+    this.r = r;
+    this.g = g;
+    this.b = b;
+}
+
+CDocumentColor.prototype =
+{
+    Copy : function()
+    {
+        return new CDocumentColor(this.r, this.g, this.b);
+    },
+
+    Write_ToBinary : function(Writer)
+    {
+        // Byte : r
+        // Byte : g
+        // Byte : b
+
+        Writer.WriteByte( this.r );
+        Writer.WriteByte( this.g );
+        Writer.WriteByte( this.b );
+    },
+
+    Read_FromBinary : function(Reader)
+    {
+        // Byte : r
+        // Byte : g
+        // Byte : b
+
+        this.r = Reader.GetByte();
+        this.g = Reader.GetByte();
+        this.b = Reader.GetByte();
+    },
+
+    Set : function(r, g, b)
+    {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+    },
+
+    Compare : function(Color)
+    {
+        if ( this.r === Color.r &&  this.g === Color.g && this.b === Color.b )
+            return true;
+
+        return false;
+    }
+};
+
+function CDocumentShd()
+{
+    this.Value = shd_Nil;
+    this.Color = new CDocumentColor(255, 255, 255);
+    this.unifill = null;
+    this.fillRef = null;
+};
+
+CDocumentShd.prototype =
+{
+    Copy : function()
+    {
+        var Shd = new CDocumentShd();
+        Shd.Value = this.Value;
+        Shd.Color.Set( this.Color.r, this.Color.g, this.Color.b );
+        if(this.unifill !== null && typeof this.unifill === "object" && typeof this.unifill.createDuplicate === "function")
+        {
+            Shd.unifill = this.unifill.createDuplicate();
+        }
+        if(this.fillRef !== null && typeof this.fillRef === "object" && typeof this.fillRef.createDuplicate === "function")
+        {
+            Shd.fillRef = this.fillRef.createDuplicate();
+        }
+        return Shd;
+    },
+
+    Compare : function(Shd)
+    {
+        if ( this.Value === Shd.Value )
+        {
+            switch ( this.Value )
+            {
+                case shd_Nil:
+                    return true;
+
+                case shd_Clear:
+                {
+                    if(this.unifill == null && Shd.unifill != null)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        if(this.unifill != null && this.unifill.IsIdentical(Shd.unifill) == false)
+                        {
+                            return false;
+                        }
+                    }
+
+                    if(this.fillRef == null && Shd.fillRef != null)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        if(this.fillRef!= null && this.fillRef.isIdentical(Shd.fillRef) == false)
+                        {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+
+            }
+        }
+
+        return false;
+    },
+
+    Set_FromObject : function(Shd)
+    {
+        this.Value = Shd.Value;
+        this.Color.Set( Shd.Color.r, Shd.Color.g, Shd.Color.b );
+        if(Shd.unifill instanceof CUniFill)
+        {
+            this.unifill = Shd.unifill.createDuplicate();
+        }
+        if(Shd.fillRef instanceof  StyleRef)
+        {
+            this.fillRef = Shd.fillRef.createDuplicate();
+        }
+    },
+
+    Write_ToBinary : function(Writer)
+    {
+        // Byte : Value
+        //
+        // Если shd_Clear
+        // Variable : Color
+
+        Writer.WriteByte( this.Value );
+        if ( shd_Clear === this.Value )
+            this.Color.Write_ToBinary(Writer);
+    },
+
+    Read_FromBinary : function(Reader)
+    {
+        // Byte : Value
+        //
+        // Если shd_Clear
+        // Variable : Color
+
+        this.Value = Reader.GetByte();
+
+        if ( shd_Clear === this.Value )
+            this.Color.Read_FromBinary(Reader);
+        else
+            this.Color.Set(0, 0, 0);
+    }
+};
+
+function CDocumentBorder()
+{
+    this.Color = new CDocumentColor( 0, 0, 0 );
+    this.Space = 0;
+    this.Size  = 0.5 * g_dKoef_pt_to_mm;
+    this.Value = border_None;
+    this.unifill = null;
+    this.lnRef = null;  //new CStyleRef
+}
+
+
+CDocumentBorder.prototype =
+{
+    Copy : function()
+    {
+        var Border = new CDocumentBorder();
+
+        if ( undefined === this.Color )
+            Border.Color = undefined;
+        else
+            Border.Color.Set(this.Color.r, this.Color.g, this.Color.b);
+
+        if ( undefined === this.Space )
+            Border.Space = undefined;
+        else
+            Border.Space = this.Space;
+
+        if ( undefined === this.Size )
+            Border.Size = undefined;
+        else
+            Border.Size  = this.Size;
+
+        if ( undefined === this.Value )
+            Border.Value = undefined;
+        else
+            Border.Value = this.Value;
+
+
+        if(this.unifill !== null && typeof this.unifill === "object" && typeof this.unifill.createDuplicate === "function")
+        {
+            Border.unifill = this.unifill.createDuplicate();
+        }
+        if(this.lnRef !== null && typeof  this.lnRef === "object" && typeof  this.lnRef.createDuplicate === "function")
+        {
+            Border.lnRef = this.lnRef.createDuplicate();
+        }
+
+        return Border;
+    },
+
+    Compare : function(Border)
+    {
+        if ( false === this.Color.Compare(Border.Color) )
+            return false;
+
+        if ( Math.abs( this.Size - Border.Size ) > 0.001 )
+            return false;
+
+        if ( Math.abs( this.Space - Border.Space ) > 0.001 )
+            return false;
+
+        if ( this.Value != Border.Value )
+            return false;
+
+        if(this.unifill == null && Border.unifill != null)
+            return false;
+
+        if(this.unifill != null)
+        {
+            if(CompareUniFill(this.unifill, Border.unifill) === false)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    },
+
+    Set_FromObject : function(Border)
+    {
+        this.Space = Border.Space;
+        this.Size  = Border.Size;
+        this.Value = Border.Value;
+
+        if ( undefined != Border.Color )
+            this.Color = new CDocumentColor( Border.Color.r, Border.Color.g, Border.Color.b );
+        else
+            this.Color = undefined;
+
+        if(Border.unifill instanceof CUniFill)
+        {
+            this.unifill = Border.unifill.createDuplicate();
+        }
+        else
+        {
+            this.unifill = null;
+        }
+        if(Border.lnRef instanceof  StyleRef)
+        {
+            this.lnRef = Border.lnRef.createDuplicate();
+        }
+        else
+        {
+            this.lnRef = null;
+        }
+    },
+
+    Check_Null : function()
+    {
+        if ( undefined === this.Space || undefined === this.Size || undefined === this.Value || undefined === this.Color )
+            return false;
+
+        return true;
+    },
+
+    Write_ToBinary : function(Writer)
+    {
+        // Double   : Size
+        // Long     : Space
+        // Byte     : Value
+        // Variable : Color
+
+        Writer.WriteDouble( this.Size );
+        Writer.WriteLong( this.Space );
+        Writer.WriteByte( this.Value );
+        this.Color.Write_ToBinary( Writer );
+    },
+
+    Read_FromBinary : function(Reader)
+    {
+        // Double   : Size
+        // Long     : Space
+        // Byte     : Value
+        // Variable : Color
+
+        this.Size  = Reader.GetDouble();
+        this.Space = Reader.GetLong();
+        this.Value = Reader.GetByte();
+        this.Color.Read_FromBinary( Reader );
+    }
+}
+
+function CTableMeasurement(Type, W)
+{
+    this.Type = Type;
+    this.W    = W;
+}
+
+CTableMeasurement.prototype =
+{
+    Copy : function()
+    {
+        return new CTableMeasurement(this.Type, this.W);
+    },
+
+    Write_ToBinary : function(Writer)
+    {
+        // Double : W
+        // Long   : Type
+        Writer.WriteDouble( this.W );
+        Writer.WriteLong( this.Type );
+    },
+
+    Read_FromBinary : function(Reader)
+    {
+        // Double : W
+        // Long   : Type
+
+        this.W    = Reader.GetDouble();
+        this.Type = Reader.GetLong();
+    }
+}
+
+function CTablePr()
+{
+    this.TableStyleColBandSize = undefined;
+    this.TableStyleRowBandSize = undefined;
+    this.Jc                    = undefined;
+    this.Shd                   = undefined;
+    this.TableBorders          =
+    {
+        Bottom  : undefined,
+        Left    : undefined,
+        Right   : undefined,
+        Top     : undefined,
+        InsideH : undefined,
+        InsideV : undefined
+    };
+    this.TableCellMar          =
+    {
+        Bottom : undefined,
+        Left   : undefined,
+        Right  : undefined,
+        Top    : undefined
+    };
+    this.TableCellSpacing      = undefined;
+    this.TableInd              = undefined;
+    this.TableW                = undefined;
+}
+
+CTablePr.prototype =
+{
+    Copy : function()
+    {
+        var TablePr = new CTablePr();
+
+        TablePr.TableStyleColBandSize = this.TableStyleColBandSize;
+        TablePr.TableStyleRowBandSize = this.TableStyleRowBandSize;
+        TablePr.Jc                    = this.Jc;
+
+        if ( undefined != this.Shd )
+            TablePr.Shd = this.Shd.Copy();
+
+        // TableBorders
+        if ( undefined != this.TableBorders.Bottom )
+            TablePr.TableBorders.Bottom = this.TableBorders.Bottom.Copy();
+
+        if ( undefined != this.TableBorders.Left )
+            TablePr.TableBorders.Left = this.TableBorders.Left.Copy();
+
+        if ( undefined != this.TableBorders.Right )
+            TablePr.TableBorders.Right = this.TableBorders.Right.Copy();
+
+        if ( undefined != this.TableBorders.Top )
+            TablePr.TableBorders.Top = this.TableBorders.Top.Copy();
+
+        if ( undefined != this.TableBorders.InsideH )
+            TablePr.TableBorders.InsideH = this.TableBorders.InsideH.Copy();
+
+        if ( undefined != this.TableBorders.InsideV )
+            TablePr.TableBorders.InsideV = this.TableBorders.InsideV.Copy();
+
+        // TableCellMar
+        if ( undefined != this.TableCellMar.Bottom )
+            TablePr.TableCellMar.Bottom = this.TableCellMar.Bottom.Copy();
+
+        if ( undefined != this.TableCellMar.Left )
+            TablePr.TableCellMar.Left = this.TableCellMar.Left.Copy();
+
+        if ( undefined != this.TableCellMar.Right )
+            TablePr.TableCellMar.Right = this.TableCellMar.Right.Copy();
+
+        if ( undefined != this.TableCellMar.Top )
+            TablePr.TableCellMar.Top = this.TableCellMar.Top.Copy();
+
+        TablePr.TableCellSpacing = this.TableCellSpacing;
+        TablePr.TableInd         = this.TableInd;
+
+        if ( undefined != this.TableW )
+            TablePr.TableW = this.TableW.Copy();
+
+        return TablePr;
+    },
+
+    Merge : function(TablePr)
+    {
+        if ( undefined != TablePr.TableStyleColBandSize )
+            this.TableStyleColBandSize = TablePr.TableStyleColBandSize;
+
+        if ( undefined != TablePr.TableStyleRowBandSize )
+            this.TableStyleRowBandSize = TablePr.TableStyleRowBandSize;
+
+        if ( undefined != TablePr.Jc )
+            this.Jc = TablePr.Jc;
+
+        if ( undefined != TablePr.Shd )
+            this.Shd = TablePr.Shd.Copy();
+
+        // TableBorders
+        if ( undefined != TablePr.TableBorders.Bottom )
+            this.TableBorders.Bottom = TablePr.TableBorders.Bottom.Copy();
+
+        if ( undefined != TablePr.TableBorders.Left )
+            this.TableBorders.Left = TablePr.TableBorders.Left.Copy();
+
+        if ( undefined != TablePr.TableBorders.Right )
+            this.TableBorders.Right = TablePr.TableBorders.Right.Copy();
+
+        if ( undefined != TablePr.TableBorders.Top )
+            this.TableBorders.Top = TablePr.TableBorders.Top.Copy();
+
+        if ( undefined != TablePr.TableBorders.InsideH )
+            this.TableBorders.InsideH = TablePr.TableBorders.InsideH.Copy();
+
+        if ( undefined != TablePr.TableBorders.InsideV )
+            this.TableBorders.InsideV = TablePr.TableBorders.InsideV.Copy();
+
+        // TableCellMar
+        if ( undefined != TablePr.TableCellMar.Bottom )
+            this.TableCellMar.Bottom = TablePr.TableCellMar.Bottom.Copy();
+
+        if ( undefined != TablePr.TableCellMar.Left )
+            this.TableCellMar.Left = TablePr.TableCellMar.Left.Copy();
+
+        if ( undefined != TablePr.TableCellMar.Right )
+            this.TableCellMar.Right = TablePr.TableCellMar.Right.Copy();
+
+        if ( undefined != TablePr.TableCellMar.Top )
+            this.TableCellMar.Top = TablePr.TableCellMar.Top.Copy();
+
+        if ( undefined != TablePr.TableCellMar )
+            this.TableCellSpacing = TablePr.TableCellSpacing;
+
+        if ( undefined != TablePr.TableInd )
+            this.TableInd         = TablePr.TableInd;
+
+        if ( undefined != TablePr.TableW )
+            this.TableW = TablePr.TableW.Copy();
+    },
+
+    Init_Default : function()
+    {
+        this.TableStyleColBandSize = 1;
+        this.TableStyleRowBandSize = 1;
+        this.Jc                    = align_Left;
+        this.Shd                   = new CDocumentShd();
+        this.TableBorders.Bottom   = new CDocumentBorder();
+        this.TableBorders.Left     = new CDocumentBorder();
+        this.TableBorders.Right    = new CDocumentBorder();
+        this.TableBorders.Top      = new CDocumentBorder();
+        this.TableBorders.InsideH  = new CDocumentBorder();
+        this.TableBorders.InsideV  = new CDocumentBorder();
+        this.TableCellMar.Bottom   = new CTableMeasurement(tblwidth_Mm, 0);
+        this.TableCellMar.Left     = new CTableMeasurement(tblwidth_Mm, 5.75 * g_dKoef_pt_to_mm); // 0.08 inch
+        this.TableCellMar.Right    = new CTableMeasurement(tblwidth_Mm, 5.75 * g_dKoef_pt_to_mm); // 0.08 inch
+        this.TableCellMar.Top      = new CTableMeasurement(tblwidth_Mm, 0);
+        this.TableCellSpacing      = null;
+        this.TableInd              = 0;
+        this.TableW                = new CTableMeasurement(tblwidth_Auto, 0);
+    },
+
+
+    Set_FromObject : function(TablePr)
+    {
+        this.TableStyleColBandSize = TablePr.TableStyleColBandSize;
+        this.TableStyleRowBandSize = TablePr.TableStyleRowBandSize;
+        this.Jc = TablePr.Jc;
+
+        if ( undefined != TablePr.Shd )
+        {
+            this.Shd = new CDocumentShd();
+            this.Shd.Set_FromObject(TablePr.Shd);
+        }
+        else
+            this.Shd = undefined;
+
+        if ( undefined != TablePr.TableBorders )
+        {
+            if ( undefined != TablePr.TableBorders.Bottom )
+            {
+                this.TableBorders.Bottom = new CDocumentBorder();
+                this.TableBorders.Bottom.Set_FromObject( TablePr.TableBorders.Bottom );
+            }
+            else
+                this.TableBorders.Bottom = undefined;
+
+            if ( undefined != TablePr.TableBorders.Left )
+            {
+                this.TableBorders.Left = new CDocumentBorder();
+                this.TableBorders.Left.Set_FromObject( TablePr.TableBorders.Left );
+            }
+            else
+                this.TableBorders.Left = undefined;
+
+            if ( undefined != TablePr.TableBorders.Right )
+            {
+                this.TableBorders.Right = new CDocumentBorder();
+                this.TableBorders.Right.Set_FromObject( TablePr.TableBorders.Right );
+            }
+            else
+                this.TableBorders.Right = undefined;
+
+            if ( undefined != TablePr.TableBorders.Top )
+            {
+                this.TableBorders.Top = new CDocumentBorder();
+                this.TableBorders.Top.Set_FromObject( TablePr.TableBorders.Top );
+            }
+            else
+                this.TableBorders.Top = undefined;
+
+            if ( undefined != TablePr.TableBorders.InsideH )
+            {
+                this.TableBorders.InsideH = new CDocumentBorder();
+                this.TableBorders.InsideH.Set_FromObject( TablePr.TableBorders.InsideH );
+            }
+            else
+                this.TableBorders.InsideH = undefined;
+
+            if ( undefined != TablePr.TableBorders.InsideV )
+            {
+                this.TableBorders.InsideV = new CDocumentBorder();
+                this.TableBorders.InsideV.Set_FromObject( TablePr.TableBorders.InsideV );
+            }
+            else
+                this.TableBorders.InsideV = undefined;
+        }
+        else
+        {
+            this.TableBorders.Bottom  = undefined;
+            this.TableBorders.Left    = undefined;
+            this.TableBorders.Right   = undefined;
+            this.TableBorders.Top     = undefined;
+            this.TableBorders.InsideH = undefined;
+            this.TableBorders.InsideV = undefined;
+        }
+
+        if ( undefined != this.TableCellMar )
+        {
+            if ( undefined != TablePr.TableCellMar.Bottom )
+                this.TableCellMar.Bottom = new CTableMeasurement( TablePr.TableCellMar.Bottom.Type, TablePr.TableCellMar.Bottom.W );
+            else
+                this.TableCellMar.Bottom = undefined;
+
+            if ( undefined != TablePr.TableCellMar.Left )
+                this.TableCellMar.Left = new CTableMeasurement( TablePr.TableCellMar.Left.Type, TablePr.TableCellMar.Left.W );
+            else
+                this.TableCellMar.Left = undefined;
+
+            if ( undefined != TablePr.TableCellMar.Right )
+                this.TableCellMar.Right = new CTableMeasurement( TablePr.TableCellMar.Right.Type, TablePr.TableCellMar.Right.W );
+            else
+                this.TableCellMar.Right = undefined;
+
+            if ( undefined != TablePr.TableCellMar.Top )
+                this.TableCellMar.Top = new CTableMeasurement( TablePr.TableCellMar.Top.Type, TablePr.TableCellMar.Top.W );
+            else
+                this.TableCellMar.Top = undefined;
+        }
+        else
+        {
+            this.TableCellMar.Bottom = undefined;
+            this.TableCellMar.Left   = undefined;
+            this.TableCellMar.Right  = undefined;
+            this.TableCellMar.Top    = undefined;
+        }
+
+        this.TableCellSpacing = TablePr.TableCellSpacing;
+        this.TableInd         = TablePr.TableInd;
+
+        if ( undefined != TablePr.TableW )
+            this.TableW = new CTableMeasurement( TablePr.TableW.Type, TablePr.TableW.W );
+        else
+            this.TableW = undefined;
+    },
+
+    Write_ToBinary : function(Writer)
+    {
+        var StartPos = Writer.GetCurPosition();
+        Writer.Skip(4);
+        var Flags = 0;
+
+        if ( undefined != this.TableStyleColBandSize )
+        {
+            Writer.WriteLong( this.TableStyleColBandSize );
+            Flags |= 1;
+        }
+
+        if ( undefined != this.TableStyleRowBandSize )
+        {
+            Writer.WriteLong( this.TableStyleRowBandSize );
+            Flags |= 2;
+        }
+
+        if ( undefined != this.Jc )
+        {
+            Writer.WriteLong( this.Jc );
+            Flags |= 4;
+        }
+
+        if ( undefined != this.Shd )
+        {
+            this.Shd.Write_ToBinary( Writer );
+            Flags |= 8;
+        }
+
+        if ( undefined != this.TableBorders.Bottom )
+        {
+            this.TableBorders.Bottom.Write_ToBinary( Writer );
+            Flags |= 16;
+        }
+
+        if ( undefined != this.TableBorders.Left )
+        {
+            this.TableBorders.Left.Write_ToBinary( Writer );
+            Flags |= 32;
+        }
+
+        if ( undefined != this.TableBorders.Right )
+        {
+            this.TableBorders.Right.Write_ToBinary( Writer );
+            Flags |= 64;
+        }
+
+        if ( undefined != this.TableBorders.Top )
+        {
+            this.TableBorders.Top.Write_ToBinary( Writer );
+            Flags |= 128;
+        }
+
+        if ( undefined != this.TableBorders.InsideH )
+        {
+            this.TableBorders.InsideH.Write_ToBinary( Writer );
+            Flags |= 256;
+        }
+
+        if ( undefined != this.TableBorders.InsideV )
+        {
+            this.TableBorders.InsideV.Write_ToBinary( Writer );
+            Flags |= 512;
+        }
+
+        if ( undefined != this.TableCellMar.Bottom )
+        {
+            this.TableCellMar.Bottom.Write_ToBinary( Writer );
+            Flags |= 1024;
+        }
+
+        if ( undefined != this.TableCellMar.Left )
+        {
+            this.TableCellMar.Left.Write_ToBinary( Writer );
+            Flags |= 2048;
+        }
+
+        if ( undefined != this.TableCellMar.Right )
+        {
+            this.TableCellMar.Right.Write_ToBinary( Writer );
+            Flags |= 4096;
+        }
+
+        if ( undefined != this.TableCellMar.Top )
+        {
+            this.TableCellMar.Top.Write_ToBinary( Writer );
+            Flags |= 8192;
+        }
+
+        if ( undefined != this.TableCellSpacing )
+        {
+            if ( null === this.TableCellSpacing )
+                Writer.WriteBool(true);
+            else
+            {
+                Writer.WriteBool(false);
+                Writer.WriteDouble(this.TableCellSpacing);
+            }
+
+            Flags |= 16384;
+        }
+
+        if ( undefined != this.TableInd )
+        {
+            Writer.WriteDouble(this.TableInd);
+
+            Flags |= 32768;
+        }
+
+        if ( undefined != this.TableW )
+        {
+            this.TableW.Write_ToBinary( Writer );
+            Flags |= 65536;
+        }
+
+        var EndPos = Writer.GetCurPosition();
+        Writer.Seek( StartPos );
+        Writer.WriteLong( Flags );
+        Writer.Seek( EndPos );
+    },
+
+    Read_FromBinary : function(Reader)
+    {
+        var Flags = Reader.GetLong();
+
+        if ( 1 & Flags )
+            this.TableStyleColBandSize = Reader.GetLong();
+
+        if ( 2 & Flags )
+            this.TableStyleRowBandSize = Reader.GetLong();
+
+        if ( 4 & Flags )
+            this.Jc = Reader.GetLong();
+
+        if ( 8 & Flags )
+        {
+            this.Shd = new CDocumentShd();
+            this.Shd.Read_FromBinary(Reader);
+        }
+
+        if ( 16 & Flags )
+        {
+            this.TableBorders.Bottom = new CDocumentBorder();
+            this.TableBorders.Bottom.Read_FromBinary( Reader );
+        }
+
+        if ( 32 & Flags )
+        {
+            this.TableBorders.Left = new CDocumentBorder();
+            this.TableBorders.Left.Read_FromBinary( Reader );
+        }
+
+        if ( 64 & Flags )
+        {
+            this.TableBorders.Right = new CDocumentBorder();
+            this.TableBorders.Right.Read_FromBinary( Reader );
+        }
+
+        if ( 128 & Flags )
+        {
+            this.TableBorders.Top = new CDocumentBorder();
+            this.TableBorders.Top.Read_FromBinary( Reader );
+        }
+
+        if ( 256 & Flags )
+        {
+            this.TableBorders.InsideH = new CDocumentBorder();
+            this.TableBorders.InsideH.Read_FromBinary( Reader );
+        }
+
+        if ( 512 & Flags )
+        {
+            this.TableBorders.InsideV = new CDocumentBorder();
+            this.TableBorders.InsideV.Read_FromBinary( Reader );
+        }
+
+        if ( 1024 & Flags )
+        {
+            this.TableCellMar.Bottom = new CTableMeasurement(tblwidth_Auto, 0);
+            this.TableCellMar.Bottom.Read_FromBinary(Reader);
+        }
+
+        if ( 2048 & Flags )
+        {
+            this.TableCellMar.Left = new CTableMeasurement(tblwidth_Auto, 0);
+            this.TableCellMar.Left.Read_FromBinary(Reader);
+        }
+
+        if ( 4096 & Flags )
+        {
+            this.TableCellMar.Right = new CTableMeasurement(tblwidth_Auto, 0);
+            this.TableCellMar.Right.Read_FromBinary(Reader);
+        }
+
+        if ( 8192 & Flags )
+        {
+            this.TableCellMar.Top = new CTableMeasurement(tblwidth_Auto, 0);
+            this.TableCellMar.Top.Read_FromBinary(Reader);
+        }
+
+        if ( 16384 & Flags )
+        {
+            if ( true === Reader.GetBool() )
+                this.TableCellSpacing = null;
+            else
+                this.TableCellSpacing = Reader.GetDouble()
+        }
+
+        if ( 32768 & Flags )
+            this.TableInd = Reader.GetDouble();
+
+        if ( 65536 & Flags )
+        {
+            this.TableW = new CTableMeasurement(tblwidth_Auto, 0);
+            this.TableW.Read_FromBinary(Reader);
+        }
+    }
+}
+
+function CTableRowHeight(Value, HRule)
+{
+    this.Value = Value;
+    this.HRule = HRule;
+}
+
+CTableRowHeight.prototype =
+{
+    Copy : function()
+    {
+        return new CTableRowHeight(this.Value, this.HRule);
+    },
+
+    Write_ToBinary : function(Writer)
+    {
+        // Double : Value
+        // Long   : HRule
+        Writer.WriteDouble( this.Value );
+        Writer.WriteLong( this.HRule );
+    },
+
+    Read_FromBinary : function(Reader)
+    {
+        // Double : Value
+        // Long   : HRule
+
+        this.Value = Reader.GetDouble();
+        this.HRule = Reader.GetLong();
+    }
+}
+
+function CTableRowPr()
+{
+    this.CantSplit        = undefined;
+    this.GridAfter        = undefined;
+    this.GridBefore       = undefined;
+    this.Jc               = undefined;
+    this.TableCellSpacing = undefined;
+    this.Height           = undefined;
+    this.WAfter           = undefined;
+    this.WBefore          = undefined;
+}
+
+CTableRowPr.prototype =
+{
+    Copy : function()
+    {
+        var RowPr = new CTableRowPr();
+
+        RowPr.CantSplit        = this.CantSplit;
+        RowPr.GridAfter        = this.GridAfter;
+        RowPr.GridBefore       = this.GridBefore;
+        RowPr.Jc               = this.Jc;
+        RowPr.TableCellSpacing = this.TableCellSpacing;
+
+        if ( undefined != this.Height )
+            RowPr.Height = this.Height.Copy();
+
+        if ( undefined != this.WAfter )
+            RowPr.WAfter = this.WAfter.Copy();
+
+        if ( undefined != this.WBefore )
+            RowPr.WBefore = this.WBefore.Copy();
+
+        return RowPr;
+    },
+
+    Merge : function(RowPr)
+    {
+        if ( undefined != RowPr.CantSplit )
+            this.CantSplit = RowPr.CantSplit;
+
+        if ( undefined != RowPr.GridAfter )
+            this.GridAfter = RowPr.GridAfter;
+
+        if ( undefined != RowPr.GridBefore )
+            this.GridBefore = RowPr.GridBefore;
+
+        if ( undefined != RowPr.Jc )
+            this.Jc = RowPr.Jc;
+
+        if ( undefined != RowPr.TableCellSpacing )
+            this.TableCellSpacing = RowPr.TableCellSpacing;
+
+        if ( undefined != RowPr.Height )
+            this.Height = RowPr.Height.Copy();
+
+        if ( undefined != RowPr.WAfter )
+            this.WAfter = RowPr.WAfter.Copy();
+
+        if ( undefined != RowPr.WBefore )
+            this.WBefore = RowPr.WBefore.Copy();
+    },
+
+    Init_Default : function()
+    {
+        this.CantSplit        = false;
+        this.GridAfter        = 0;
+        this.GridBefore       = 0;
+        this.Jc               = align_Left;
+        this.TableCellSpacing = null;
+        this.Height           = new CTableRowHeight(0, heightrule_Auto);
+        this.WAfter           = new CTableMeasurement(tblwidth_Auto, 0);
+        this.WBefore          = new CTableMeasurement(tblwidth_Auto, 0);
+    },
+
+    Set_FromObject : function(RowPr)
+    {
+        this.CantSplit        = RowPr.CantSplit;
+        this.GridAfter        = RowPr.GridAfter;
+        this.GridBefore       = RowPr.GridBefore;
+        this.Jc               = RowPr.Jc;
+        this.TableCellSpacing = RowPr.TableCellSpacing;
+
+        if ( undefined != RowPr.Height )
+            this.Height = new CTableRowHeight( RowPr.Height.Value, RowPr.Height.HRule );
+        else
+            this.Height = undefined;
+
+        if ( undefined != RowPr.WAfter )
+            this.WAfter = new CTableMeasurement( RowPr.WAfter.Type, RowPr.WAfter.W );
+        else
+            this.WAfter = undefined;
+
+        if ( undefined != RowPr.WBefore )
+            this.WBefore = new CTableMeasurement( RowPr.WBefore.Type, RowPr.WBefore.W );
+        else
+            this.WBefore = undefined;
+    },
+
+    Write_ToBinary : function(Writer)
+    {
+        var StartPos = Writer.GetCurPosition();
+        Writer.Skip(4);
+        var Flags = 0;
+
+        if ( undefined != this.CantSplit )
+        {
+            Writer.WriteBool( this.CantSplit );
+            Flags |= 1;
+        }
+
+        if ( undefined != this.GridAfter )
+        {
+            Writer.WriteLong( this.GridAfter );
+            Flags |= 2;
+        }
+
+        if ( undefined != this.GridBefore )
+        {
+            Writer.WriteLong( this.GridBefore );
+            Flags |= 4;
+        }
+
+        if ( undefined != this.Jc )
+        {
+            Writer.WriteLong( this.Jc );
+            Flags |= 8;
+        }
+
+        if ( undefined != this.TableCellSpacing )
+        {
+            if ( null === this.TableCellSpacing )
+                Writer.WriteBool( true );
+            else
+            {
+                Writer.WriteBool( false );
+                Writer.WriteDouble( this.TableCellSpacing );
+            }
+
+            Flags |= 16;
+        }
+
+        if ( undefined != this.Height )
+        {
+            this.Height.Write_ToBinary( Writer );
+            Flags |= 32;
+        }
+
+        if ( undefined != this.WAfter )
+        {
+            this.WAfter.Write_ToBinary(Writer);
+            Flags |= 64;
+        }
+
+        if ( undefined != this.WBefore )
+        {
+            this.WBefore.Write_ToBinary(Writer);
+            Flags |= 128;
+        }
+
+        var EndPos = Writer.GetCurPosition();
+        Writer.Seek( StartPos );
+        Writer.WriteLong( Flags );
+        Writer.Seek( EndPos );
+    },
+
+    Read_FromBinary : function(Reader)
+    {
+        var Flags = Reader.GetLong();
+
+        if ( 1 & Flags )
+            this.CantSplit = Reader.GetBool();
+
+        if ( 2 & Flags )
+            this.GridAfter = Reader.GetLong();
+
+        if ( 4 & Flags )
+            this.GridBefore = Reader.GetLong();
+
+        if ( 8 & Flags )
+            this.Jc = Reader.GetLong();
+
+        if ( 16 & Flags )
+        {
+            if ( true === Reader.GetBool() )
+                this.TableCellSpacing = Reader.GetLong();
+            else
+                this.TableCellSpacing = Reader.GetDouble();
+        }
+
+        if ( 32 & Flags )
+        {
+            this.Height = new CTableRowHeight(0, heightrule_Auto);
+            this.Height.Read_FromBinary(Reader);
+        }
+
+        if ( 64 & Flags )
+        {
+            this.WAfter = new CTableMeasurement(tblwidth_Auto, 0);
+            this.WAfter.Read_FromBinary(Reader);
+        }
+
+        if ( 128 & Flags )
+        {
+            this.WBefore = new CTableMeasurement(tblwidth_Auto, 0);
+            this.WBefore.Read_FromBinary(Reader);
+        }
+    }
+}
+
+function CTableCellPr()
+{
+    this.GridSpan         = undefined;
+    this.Shd              = undefined;
+    this.TableCellMar     = undefined; // undefined/null/{Top, Left, Right, Bottom}
+    this.TableCellBorders =
+    {
+        Bottom : undefined,
+        Left   : undefined,
+        Right  : undefined,
+        Top    : undefined
+    };
+    this.TableCellW       = undefined;
+    this.VAlign           = undefined;
+    this.VMerge           = undefined;
+}
+
+CTableCellPr.prototype =
+{
+    Copy : function()
+    {
+        var CellPr = new CTableCellPr();
+
+        CellPr.GridSpan = this.GridSpan;
+
+        if ( undefined != this.Shd )
+            CellPr.Shd = this.Shd.Copy();
+
+        if ( undefined === this.TableCellMar )
+            CellPr.TableCellMar = undefined;
+        else if ( null === this.TableCellMar )
+            CellPr.TableCellMar = null;
+        else
+        {
+            CellPr.TableCellMar = new Object();
+            CellPr.TableCellMar.Bottom = this.TableCellMar.Bottom.Copy();
+            CellPr.TableCellMar.Left   = this.TableCellMar.Left.Copy();
+            CellPr.TableCellMar.Right  = this.TableCellMar.Right.Copy();
+            CellPr.TableCellMar.Top    = this.TableCellMar.Top.Copy();
+        }
+
+        if ( undefined != this.TableCellBorders.Bottom )
+            CellPr.TableCellBorders.Bottom = this.TableCellBorders.Bottom.Copy();
+
+        if ( undefined != this.TableCellBorders.Left )
+            CellPr.TableCellBorders.Left = this.TableCellBorders.Left.Copy();
+
+        if ( undefined != this.TableCellBorders.Right )
+            CellPr.TableCellBorders.Right = this.TableCellBorders.Right.Copy();
+
+        if ( undefined != this.TableCellBorders.Top )
+            CellPr.TableCellBorders.Top = this.TableCellBorders.Top.Copy();
+
+        if ( undefined != this.TableCellW )
+            CellPr.TableCellW = this.TableCellW.Copy();
+
+        CellPr.VAlign = this.VAlign;
+        CellPr.VMerge = this.VMerge;
+        return CellPr;
+    },
+
+    Merge : function(CellPr)
+    {
+        if ( undefined != CellPr.GridSpan )
+            this.GridSpan = CellPr.GridSpan;
+
+        if ( undefined != CellPr.Shd )
+            this.Shd = CellPr.Shd.Copy();
+
+        if ( undefined === CellPr.TableCellMar )
+        {}
+        else if ( null === CellPr.TableCellMar )
+            this.TableCellMar = null;
+        else
+        {
+            this.TableCellMar = new Object();
+            if(CellPr.TableCellMar.Bottom )
+                this.TableCellMar.Bottom = CellPr.TableCellMar.Bottom.Copy();
+            if(CellPr.TableCellMar.Left )
+                this.TableCellMar.Left   = CellPr.TableCellMar.Left.Copy();
+            if(CellPr.TableCellMar.Right )
+                this.TableCellMar.Right  = CellPr.TableCellMar.Right.Copy();
+            if(CellPr.TableCellMar.Top )
+                this.TableCellMar.Top    = CellPr.TableCellMar.Top.Copy();
+        }
+
+        if ( undefined != CellPr.TableCellBorders.Bottom )
+            this.TableCellBorders.Bottom = CellPr.TableCellBorders.Bottom.Copy();
+
+        if ( undefined != CellPr.TableCellBorders.Left )
+            this.TableCellBorders.Left = CellPr.TableCellBorders.Left.Copy();
+
+        if ( undefined != CellPr.TableCellBorders.Right )
+            this.TableCellBorders.Right = CellPr.TableCellBorders.Right.Copy();
+
+        if ( undefined != CellPr.TableCellBorders.Top )
+            this.TableCellBorders.Top = CellPr.TableCellBorders.Top.Copy();
+
+        if ( undefined != CellPr.TableCellW )
+            this.TableCellW = CellPr.TableCellW.Copy();
+
+        if ( undefined != CellPr.VAlign )
+            this.VAlign = CellPr.VAlign;
+
+        if ( undefined != CellPr.VMerge )
+            this.VMerge = CellPr.VMerge;
+    },
+
+    Init_Default : function()
+    {
+        this.GridSpan                = 1;
+        this.Shd                     = new CDocumentShd();
+        this.TableCellMar            = null;
+        this.TableCellBorders.Bottom = new CDocumentBorder();
+        this.TableCellBorders.Left   = new CDocumentBorder();
+        this.TableCellBorders.Right  = new CDocumentBorder();
+        this.TableCellBorders.Top    = new CDocumentBorder();
+        this.TableCellW              = new CTableMeasurement(tblwidth_Auto, 0);
+        this.VAlign                  = vertalignjc_Top;
+        this.VMerge                  = vmerge_Restart;
+    },
+
+    Set_FromObject : function(CellPr)
+    {
+        this.GridSpan = CellPr.GridSpan;
+
+        if ( undefined != CellPr.Shd )
+        {
+            this.Shd = new CDocumentShd();
+            this.Shd.Set_FromObject( CellPr.Shd );
+        }
+        else
+            this.Shd = undefined;
+
+        if ( undefined === CellPr.TableCellMar )
+            this.TableCellMar = undefined;
+        else if ( null === CellPr.TableCellMar )
+            this.TableCellMar = null;
+        else
+        {
+            this.TableCellMar = new Object();
+
+            if ( undefined != CellPr.TableCellMar.Bottom )
+                this.TableCellMar.Bottom = new CTableMeasurement( CellPr.TableCellMar.Bottom.Type, CellPr.TableCellMar.Bottom.W );
+            else
+                this.TableCellMar.Bottom = undefined;
+
+            if ( undefined != CellPr.TableCellMar.Left )
+                this.TableCellMar.Left = new CTableMeasurement( CellPr.TableCellMar.Left.Type, CellPr.TableCellMar.Left.W );
+            else
+                this.TableCellMar.Left = undefined;
+
+            if ( undefined != CellPr.TableCellMar.Right )
+                this.TableCellMar.Right = new CTableMeasurement( CellPr.TableCellMar.Right.Type, CellPr.TableCellMar.Right.W );
+            else
+                this.TableCellMar.Right = undefined;
+
+            if ( undefined != CellPr.TableCellMar.Top )
+                this.TableCellMar.Top = new CTableMeasurement( CellPr.TableCellMar.Top.Type, CellPr.TableCellMar.Top.W );
+            else
+                this.TableCellMar.Top = undefined;
+        }
+
+        if ( undefined != CellPr.TableCellBorders )
+        {
+            if ( undefined != CellPr.TableCellBorders.Bottom )
+            {
+                this.TableCellBorders.Bottom = new CDocumentBorder();
+                this.TableCellBorders.Bottom.Set_FromObject( CellPr.TableCellBorders.Bottom );
+            }
+            else
+                this.TableCellBorders.Bottom = undefined;
+
+            if ( undefined != CellPr.TableCellBorders.Left )
+            {
+                this.TableCellBorders.Left = new CDocumentBorder();
+                this.TableCellBorders.Left.Set_FromObject( CellPr.TableCellBorders.Left );
+            }
+            else
+                this.TableCellBorders.Left = undefined;
+
+            if ( undefined != CellPr.TableCellBorders.Right )
+            {
+                this.TableCellBorders.Right = new CDocumentBorder();
+                this.TableCellBorders.Right.Set_FromObject( CellPr.TableCellBorders.Right );
+            }
+            else
+                this.TableCellBorders.Right = undefined;
+
+            if ( undefined != CellPr.TableCellBorders.Top )
+            {
+                this.TableCellBorders.Top = new CDocumentBorder();
+                this.TableCellBorders.Top.Set_FromObject( CellPr.TableCellBorders.Top );
+            }
+            else
+                this.TableCellBorders.Top = undefined;
+        }
+        else
+        {
+            this.TableCellBorders.Bottom = undefined;
+            this.TableCellBorders.Left   = undefined;
+            this.TableCellBorders.Right  = undefined;
+            this.TableCellBorders.Top    = undefined;
+        }
+
+        if ( undefined != this.TableCellW )
+            this.TableCellW = new CTableMeasurement( CellPr.TableCellW.Type, CellPr.TableCellW.W );
+        else
+            this.TableCellW = undefined;
+
+
+        this.VAlign = CellPr.VAlign;
+        this.VMerge = CellPr.VMerge;
+    },
+
+    Write_ToBinary : function(Writer)
+    {
+        var StartPos = Writer.GetCurPosition();
+        Writer.Skip(4);
+        var Flags = 0;
+
+        if ( undefined != this.GridSpan )
+        {
+            Writer.WriteLong( this.GridSpan );
+            Flags |= 1;
+        }
+
+        if ( undefined != this.Shd )
+        {
+            this.Shd.Write_ToBinary( Writer );
+            Flags |= 2;
+        }
+
+        if ( undefined != this.TableCellMar )
+        {
+            if ( null === this.TableCellMar )
+            {
+                Flags |= 4;
+            }
+            else
+            {
+                if ( undefined != this.TableCellMar.Bottom )
+                {
+                    this.TableCellMar.Bottom.Write_ToBinary(Writer);
+                    Flags |= 8;
+                }
+
+                if ( undefined != this.TableCellMar.Left )
+                {
+                    this.TableCellMar.Left.Write_ToBinary(Writer);
+                    Flags |= 16;
+                }
+
+                if ( undefined != this.TableCellMar.Right )
+                {
+                    this.TableCellMar.Right.Write_ToBinary(Writer);
+                    Flags |= 32;
+                }
+
+                if ( undefined != this.TableCellMar.Top )
+                {
+                    this.TableCellMar.Top.Write_ToBinary(Writer);
+                    Flags |= 64;
+                }
+            }
+        }
+
+        if ( undefined != this.TableCellBorders.Bottom )
+        {
+            this.TableCellBorders.Bottom.Write_ToBinary( Writer );
+            Flags |= 128;
+        }
+
+        if ( undefined != this.TableCellBorders.Left )
+        {
+            this.TableCellBorders.Left.Write_ToBinary( Writer );
+            Flags |= 256;
+        }
+
+        if ( undefined != this.TableCellBorders.Right )
+        {
+            this.TableCellBorders.Right.Write_ToBinary( Writer );
+            Flags |= 512;
+        }
+
+        if ( undefined != this.TableCellBorders.Top )
+        {
+            this.TableCellBorders.Top.Write_ToBinary( Writer );
+            Flags |= 1024;
+        }
+
+        if ( undefined != this.TableCellW )
+        {
+            this.TableCellW.Write_ToBinary(Writer);
+            Flags |= 2048;
+        }
+
+        if ( undefined != this.VAlign )
+        {
+            Writer.WriteLong( this.VAlign );
+            Flags |= 4096;
+        }
+
+        if ( undefined != this.VMerge )
+        {
+            Writer.WriteLong( this.VMerge );
+            Flags |= 8192;
+        }
+
+        var EndPos = Writer.GetCurPosition();
+        Writer.Seek( StartPos );
+        Writer.WriteLong( Flags );
+        Writer.Seek( EndPos );
+    },
+
+    Read_FromBinary : function(Reader)
+    {
+        var Flags = Reader.GetLong();
+
+        if ( 1 & Flags )
+            this.GridSpan = Reader.GetLong();
+
+        if ( 2 & Flags )
+        {
+            this.Shd = new CDocumentShd();
+            this.Shd.Read_FromBinary( Reader );
+        }
+
+        if ( 4 & Flags )
+            this.TableCellMar = null;
+        else
+        {
+            this.TableCellMar = new Object();
+            if ( 8 & Flags )
+            {
+                this.TableCellMar.Bottom = new CTableMeasurement(tblwidth_Auto, 0);
+                this.TableCellMar.Bottom.Read_FromBinary( Reader );
+            }
+
+            if ( 16 & Flags )
+            {
+                this.TableCellMar.Left = new CTableMeasurement(tblwidth_Auto, 0);
+                this.TableCellMar.Left.Read_FromBinary( Reader );
+            }
+
+            if ( 32 & Flags )
+            {
+                this.TableCellMar.Right = new CTableMeasurement(tblwidth_Auto, 0);
+                this.TableCellMar.Right.Read_FromBinary( Reader );
+            }
+
+            if ( 64 & Flags )
+            {
+                this.TableCellMar.Top = new CTableMeasurement(tblwidth_Auto, 0);
+                this.TableCellMar.Top.Read_FromBinary( Reader );
+            }
+        }
+
+        if ( 128 & Flags )
+        {
+            this.TableCellBorders.Bottom = new CDocumentBorder();
+            this.TableCellBorders.Bottom.Read_FromBinary( Reader );
+        }
+
+        if ( 256 & Flags )
+        {
+            this.TableCellBorders.Left = new CDocumentBorder();
+            this.TableCellBorders.Left.Read_FromBinary( Reader );
+        }
+
+        if ( 512 & Flags )
+        {
+            this.TableCellBorders.Right = new CDocumentBorder();
+            this.TableCellBorders.Right.Read_FromBinary( Reader );
+        }
+
+        if ( 1024 & Flags )
+        {
+            this.TableCellBorders.Top = new CDocumentBorder();
+            this.TableCellBorders.Top.Read_FromBinary( Reader );
+        }
+
+        if ( 2048 & Flags )
+        {
+            this.TableCellW = new CTableMeasurement(tblwidth_Auto, 0);
+            this.TableCellW.Read_FromBinary( Reader );
+        }
+
+        if ( 4096 & Flags )
+            this.VAlign = Reader.GetLong();
+
+        if ( 8192 & Flags )
+            this.VMerge = Reader.GetLong();
+    }
+}
+
+function CTextPr()
+{
+    this.Bold       = undefined;
+    this.Italic     = undefined;
+    this.Strikeout  = undefined;
+    this.Underline  = undefined;
+    this.FontFamily = undefined;
+    this.FontSize   = undefined;
+    this.FontSize_S = undefined; // Спеациально для Paragraph.Internal_Recalculate_1
+    this.Color      = undefined;
+    this.VertAlign  = undefined;
+    this.HighLight  = undefined; // highlight_None/Color
+    this.RStyle     = undefined;
+    this.unifill    = undefined;
+}
+
+CTextPr.prototype =
+{
+    isEmpty: function()
+    {
+        return this.Bold === undefined &&  this.unifill    === undefined
+        this.Italic     === undefined && this.Strikeout  === undefined &&
+        this.Underline  === undefined && this.FontFamily === undefined &&
+        this.FontSize   === undefined && this.FontSize_S === undefined &&
+        this.Color      === undefined && this.VertAlign  === undefined &&
+        this.HighLight  === undefined && this.RStyle     === undefined;
+
+    },
+    Clear : function()
+    {
+        this.Bold       = undefined;
+        this.Italic     = undefined;
+        this.Strikeout  = undefined;
+        this.Underline  = undefined;
+        this.FontFamily = undefined;
+        this.FontSize   = undefined;
+        this.FontSize_S = undefined;
+        this.Color      = undefined;
+        this.VertAlign  = undefined;
+        this.HighLight  = undefined;
+        this.RStyle     = undefined;
+        this.unifill    = undefined;
+    },
+
+    Copy : function()
+    {
+        var TextPr = new CTextPr();
+        TextPr.Bold      = this.Bold;
+        TextPr.Italic    = this.Italic;
+        TextPr.Strikeout = this.Strikeout;
+        TextPr.Underline = this.Underline;
+
+        if ( undefined != this.FontFamily )
+        {
+            TextPr.FontFamily = new Object();
+            TextPr.FontFamily.Name  = this.FontFamily.Name;
+            TextPr.FontFamily.Index = this.FontFamily.Index;
+            TextPr.FontFamily.themeFont = this.FontFamily.themeFont;
+        }
+
+        TextPr.FontSize   = this.FontSize;
+        TextPr.FontSize_S = this.FontSize_S;
+
+        if ( undefined != this.Color )
+            TextPr.Color = new CDocumentColor(this.Color.r, this.Color.g, this.Color.b);
+
+        if(this.unifill !== null && typeof this.unifill === "object")
+        {
+            TextPr.unifill = this.unifill.createDuplicate();
+        }
+
+        TextPr.VertAlign = this.VertAlign;
+
+        if ( undefined === this.HighLight )
+            TextPr.HighLight = undefined;
+        else if ( highlight_None === this.HighLight )
+            TextPr.HighLight = highlight_None;
+        else
+            TextPr.HighLight = this.HighLight.Copy();
+
+        TextPr.RStyle = this.RStyle;
+
+        return TextPr;
+    },
+
+    Merge : function(TextPr)
+    {
+        if(TextPr === null || typeof TextPr !== "object")
+            return;
+        if ( undefined != TextPr.Bold )
+            this.Bold = TextPr.Bold;
+
+        if ( undefined != TextPr.Italic )
+            this.Italic = TextPr.Italic;
+
+        if ( undefined != TextPr.Strikeout )
+            this.Strikeout = TextPr.Strikeout;
+
+        if ( undefined != TextPr.Underline )
+            this.Underline = TextPr.Underline;
+
+        if ( undefined != TextPr.FontFamily )
+        {
+            this.FontFamily = new Object();
+            this.FontFamily.Name  = TextPr.FontFamily.Name;
+            this.FontFamily.Index = TextPr.FontFamily.Index;
+            this.FontFamily.themeFont = TextPr.FontFamily.themeFont;
+        }
+
+        if ( undefined != TextPr.FontSize )
+            this.FontSize = TextPr.FontSize;
+
+        if ( undefined != TextPr.FontSize_S )
+            this.FontSize_S = TextPr.FontSize_S;
+
+        if ( undefined != TextPr.Color )
+        {
+            this.Color = new CDocumentColor(TextPr.Color.r, TextPr.Color.g, TextPr.Color.b);
+        }
+
+        if ( undefined != TextPr.unifill && undefined != TextPr.unifill.fill )
+        {
+            this.unifill = new CUniFill();
+            this.unifill.merge(TextPr.unifill);
+        }
+
+        if (TextPr.fontRef !== null && typeof TextPr.fontRef === "object" && typeof TextPr.fontRef.createDuplicate === "function")
+        {
+            this.fontRef = TextPr.fontRef.createDuplicate();
+        }
+          //  this.Color = TextPr.Color.Copy();
+
+        if ( undefined != TextPr.VertAlign )
+            this.VertAlign = TextPr.VertAlign;
+
+        if ( undefined === TextPr.HighLight )
+        {}
+        else if ( highlight_None === TextPr.HighLight )
+            this.HighLight = highlight_None;
+        else
+            this.HighLight = TextPr.Copy();
+
+        if ( undefined != TextPr.RStyle )
+            this.RStyle = TextPr.RStyle;
+    },
+
+    Init_Default : function()
+    {
+        this.Bold       = false;
+        this.Italic     = false;
+        this.Underline  = false;
+        this.Strikeout  = false;
+        this.FontFamily =
+        {
+            Name  : "Arial",
+            Index : -1
+        };
+        this.FontSize   = 18;
+        this.Color      = new CDocumentColor(0, 0, 0);
+        this.VertAlign  = vertalign_Baseline;
+        this.HighLight  = highlight_None;
+        this.RStyle     = undefined;
+    },
+
+    Set_FromObject : function(TextPr)
+    {
+        this.Bold      = TextPr.Bold;
+        this.Italic    = TextPr.Italic;
+        this.Strikeout = TextPr.Strikeout;
+        this.Underline = TextPr.Underline;
+
+        if ( undefined != TextPr.FontFamily )
+        {
+            this.FontFamily = {};
+            this.FontFamily.Name  = TextPr.FontFamily.Name;
+            this.FontFamily.Index = TextPr.FontFamily.Index;
+            this.FontFamily.themeFont = TextPr.FontFamily.themeFont;
+        }
+        else
+            this.FontFamily = undefined;
+
+        this.FontSize   = TextPr.FontSize;
+        this.FontSize_S = TextPr.FontSize_S;
+
+        if ( undefined != TextPr.Color )
+            this.Color = new CDocumentColor( TextPr.Color.r, TextPr.Color.g, TextPr.Color.b );
+        else
+            this.Color = undefined;
+
+        if(TextPr.unifill !== null && typeof TextPr.unifill === "object")
+        {
+            this.unifill = TextPr.unifill.createDuplicate();
+        }
+
+        this.VertAlign = TextPr.VertAlign;
+
+        if ( undefined === TextPr.HighLight )
+            this.HighLight = undefined;
+        else if ( highlight_None === TextPr.HighLight )
+            this.HighLight = highlight_None;
+        else
+            this.HighLight = new CDocumentColor( TextPr.HighLight.r, TextPr.HighLight.g, TextPr.HighLight.b );
+
+        if ( undefined != TextPr.RStyle )
+            this.RStyle = TextPr.RStyle;
+    },
+
+    Compare : function(TextPr)
+    {
+        var Result_TextPr = new CTextPr();
+
+        // Bold
+        if ( this.Bold === TextPr.Bold )
+            Result_TextPr.Bold = TextPr.Bold;
+
+        // Italic
+        if ( this.Italic === TextPr.Italic )
+            Result_TextPr.Italic = TextPr.Italic;
+
+        // Strikeout
+        if ( this.Strikeout === TextPr.Strikeout )
+            Result_TextPr.Strikeout = TextPr.Strikeout;
+
+        // Underline
+        if ( this.Underline === TextPr.Underline )
+            Result_TextPr.Underline = TextPr.Underline;
+
+        // FontFamily
+        if ( undefined != this.FontFamily && undefined != TextPr.FontFamily && this.FontFamily.Name === TextPr.FontFamily.Name )
+        {
+            Result_TextPr.FontFamily = {};
+            Result_TextPr.FontFamily.Name  = TextPr.FontFamily.Name;
+            Result_TextPr.FontFamily.Index = -1;
+        }
+
+        // FontSize
+        if ( undefined != this.FontSize && undefined != TextPr.FontSize && Math.abs( this.FontSize - TextPr.FontSize ) < 0.001 )
+            Result_TextPr.FontSize = TextPr.FontSize;
+
+        // Color
+        if ( undefined != this.Color && undefined != TextPr.Color && true === this.Color.Compare(TextPr.Color) )
+            Result_TextPr.Color = new CDocumentColor( TextPr.Color.r, TextPr.Color.g, TextPr.Color.b );
+
+        // VertAlign
+        if ( this.VertAlign === TextPr.VertAlign )
+            Result_TextPr.VertAlign = TextPr.VertAlign;
+
+        // HighLight
+        if ( undefined != this.HighLight && undefined != TextPr.HighLight )
+        {
+            if ( highlight_None === this.HighLight && highlight_None === TextPr.HighLight )
+                Result_TextPr.HighLight = highlight_None;
+            else if ( highlight_None != this.HighLight && highlight_None != TextPr.HighLight && this.HighLight.Compare( TextPr.HighLight ) )
+                Result_TextPr.HighLight = new CDocumentColor( TextPr.HighLight.r, TextPr.HighLight.g, TextPr.HighLight.b );
+        }
+
+        // RStyle
+        if ( undefined != this.RStyle && undefined != TextPr.RStyle && this.RStyle === TextPr.RStyle )
+            Result_TextPr.RStyle = TextPr.RStyle;
+
+        return Result_TextPr;
+    },
+
+    Write_ToBinary : function(Writer)
+    {
+        var StartPos = Writer.GetCurPosition();
+        Writer.Skip(4);
+        var Flags = 0;
+
+        if ( undefined != this.Bold )
+        {
+            Writer.WriteBool( this.Bold );
+            Flags |= 1;
+        }
+
+        if ( undefined != this.Italic )
+        {
+            Writer.WriteBool( this.Italic );
+            Flags |= 2;
+        }
+
+        if ( undefined != this.Underline )
+        {
+            Writer.WriteBool( this.Underline );
+            Flags |= 4;
+        }
+
+        if ( undefined != this.Strikeout )
+        {
+            Writer.WriteBool( this.Strikeout );
+            Flags |= 8;
+        }
+
+        if ( undefined != this.FontFamily )
+        {
+            Writer.WriteString2( this.FontFamily.Name );
+            Flags |= 16;
+        }
+
+        if ( undefined != this.FontSize )
+        {
+            Writer.WriteLong( this.FontSize );
+            Flags |= 32;
+        }
+
+        if ( undefined != this.Color )
+        {
+            this.Color.Write_ToBinary(Writer);
+            Flags |= 64;
+        }
+
+        if ( undefined != this.VertAlign )
+        {
+            Writer.WriteLong( this.VertAlign );
+            Flags |= 128;
+        }
+
+        if ( undefined != this.HighLight )
+        {
+            if ( highlight_None === this.HighLight )
+            {
+                Writer.WriteLong( highlight_None );
+            }
+            else
+            {
+                Writer.WriteLong( 0 );
+                this.HighLight.Write_ToBinary( Writer );
+            }
+
+            Flags |= 256;
+        }
+
+        if ( undefined != this.RStyle )
+        {
+            Writer.WriteString2( this.RStyle );
+            Flags |= 512;
+        }
+
+        var EndPos = Writer.GetCurPosition();
+        Writer.Seek( StartPos );
+        Writer.WriteLong( Flags );
+        Writer.Seek( EndPos );
+    },
+
+    Read_FromBinary : function(Reader)
+    {
+        var Flags = Reader.GetLong();
+
+        // Bold
+        if ( Flags & 1 )
+            this.Bold = Reader.GetBool();
+
+        // Italic
+        if ( Flags & 2 )
+            this.Italic = Reader.GetBool();
+
+        // Underline
+        if ( Flags & 4 )
+            this.Underline = Reader.GetBool();
+
+        // Strikeout
+        if ( Flags & 8 )
+            this.Strikeout = Reader.GetBool();
+
+        // FontFamily
+        if ( Flags & 16 )
+            this.FontFamily = { Name : Reader.GetString2(), Index : -1 };
+
+        // FontSize
+        if ( Flags & 32 )
+            this.FontSize = Reader.GetLong();
+
+        // Color
+        if ( Flags & 64 )
+        {
+            this.Color = new CDocumentColor(0, 0, 0);
+            this.Color.Read_FromBinary(Reader);
+        }
+
+        // VertAlign
+        if ( Flags & 128 )
+            this.VertAlign = Reader.GetLong();
+
+        // HighLight
+        if ( Flags & 256 )
+        {
+            var HL_type = Reader.GetLong();
+            if ( highlight_None == HL_type )
+                this.HighLight = highlight_None;
+            else
+            {
+                this.HighLight = new CDocumentColor(0, 0, 0);
+                this.HighLight.Read_FromBinary(Reader);
+            }
+        }
+
+        // RStyle
+        if ( Flags & 512 )
+            this.RStyle = Reader.GetString2();
+    },
+
+    Check_NeedRecalc : function()
+    {
+        if ( undefined != this.Bold )
+            return true;
+
+        if ( undefined != this.Italic )
+            return true;
+
+        if ( undefined != this.FontFamily )
+            return true;
+
+        if ( undefined != this.FontSize )
+            return true;
+
+        if ( undefined != this.VertAlign )
+            return true;
+
+        return false;
+    },
+
+    Update_FontSize : function()
+    {
+        // Данная функция выполняется, только если заполнены поля FontSize и VertAlign
+        if ( undefined === this.FontSize || undefined === this.VertAlign )
+            return;
+
+        // Для Subscript и superscript добавим дополнительный параметр с размером текста
+        this.FontSize_S = this.FontSize;
+
+        switch ( this.VertAlign )
+        {
+            case vertalign_Baseline:
+            {
+                this.FontSize = this.FontSize_S;
+                break;
+            }
+            case vertalign_SubScript:
+            case vertalign_SuperScript:
+            {
+                this.FontSize = this.FontSize_S * vertalign_Koef_Size;
+                break;
+            }
+        }
+    }
+}
+
+function CParaTab(Value, Pos)
+{
+    this.Value = Value;
+    this.Pos   = Pos;
+}
+
+CParaTab.prototype =
+{
+    Copy : function()
+    {
+        return new CParaTab(this.Value, this.Pos);
+    }
+}
+
+function CParaTabs()
+{
+    this.Tabs = new Array();
+};
+
+CParaTabs.prototype =
+{
+    Add : function(Tab)
+    {
+        this.Tabs.push( Tab );
+    },
+
+    Copy : function()
+    {
+        var Tabs = new CParaTabs();
+        var Count = this.Tabs.length;
+
+        for ( var Index = 0; Index < Count; Index++ )
+            Tabs.Add( this.Tabs[Index].Copy() );
+
+        return Tabs;
+    },
+
+    Set_FromObject : function(Tabs)
+    {
+        if ( Tabs instanceof Array )
+        {
+            var Count = Tabs.length;
+            for ( var Index = 0; Index < Count; Index++ )
+                this.Add( new CParaTab( Tabs[Index].Value, Tabs[Index].Pos ) );
+        }
+    },
+
+    Get_Count : function()
+    {
+        return this.Tabs.length;
+    },
+
+    Get : function(Index)
+    {
+        return this.Tabs[Index];
+    },
+
+    Write_ToBinary : function(Writer)
+    {
+        // Long : количество (если 0, удаляем элемент)
+        // Массив
+        // Byte   : Value
+        // Double : Pos
+
+        var Count = this.Tabs.length;
+        Writer.WriteLong( Count );
+
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            Writer.WriteByte( this.Tabs[Index].Value );
+            Writer.WriteDouble( this.Tabs[Index].Pos );
+        }
+    },
+
+    Read_FromBinary : function(Reader)
+    {
+        // Long : количество (если 0, удаляем элемент)
+        // Массив
+        // Byte   : Value
+        // Double : Pos
+
+        var Count = Reader.GetLong();
+        this.Tabs = new Array( Count );
+
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            var Value = Reader.GetByte();
+            var Pos   = Reader.GetDouble();
+            this.Add( new CParaTab( Value, Pos ) );
+        }
+    }
+}
+
+function CParaInd()
+{
+    this.Left      = undefined; // Левый отступ
+    this.Right     = undefined; // Правый отступ
+    this.FirstLine = undefined; // Первая строка
+}
+
+CParaInd.prototype =
+{
+    isEmpty: function()
+    {
+        return this.Left === undefined && this.Right === undefined && this.FirstLine === undefined;
+    },
+
+    Copy : function()
+    {
+        var Ind = new CParaInd();
+        Ind.Left      = this.Left;
+        Ind.Right     = this.Right;
+        Ind.FirstLine = this.FirstLine;
+        return Ind;
+    },
+
+    Merge : function(Ind)
+    {
+        if ( undefined != Ind.Left )
+            this.Left = Ind.Left;
+
+        if ( undefined != Ind.Right )
+            this.Right = Ind.Right;
+
+        if ( undefined != Ind.FirstLine )
+            this.FirstLine = Ind.FirstLine;
+    },
+
+    Set_FromObject : function(Ind)
+    {
+        if ( undefined != Ind.Left )
+            this.Left = Ind.Left;
+        else
+            this.Left = undefined;
+
+        if ( undefined != Ind.Right )
+            this.Right = Ind.Right;
+        else
+            this.Right = undefined;
+
+        if ( undefined != Ind.FirstLine )
+            this.FirstLine = Ind.FirstLine;
+        else
+            this.FirstLine = undefined;
+    },
+
+    Write_ToBinary : function(Writer)
+    {
+        var StartPos = Writer.GetCurPosition();
+        Writer.Skip(4);
+        var Flags = 0;
+
+        if ( undefined != this.Left )
+        {
+            Writer.WriteDouble( this.Left );
+            Flags |= 1;
+        }
+
+        if ( undefined != this.Right )
+        {
+            Writer.WriteDouble( this.Right );
+            Flags |= 2;
+        }
+
+        if ( undefined != this.FirstLine )
+        {
+            Writer.WriteDouble( this.FirstLine );
+            Flags |= 4;
+        }
+
+        var EndPos = Writer.GetCurPosition();
+        Writer.Seek( StartPos );
+        Writer.WriteLong( Flags );
+        Writer.Seek( EndPos );
+    },
+
+    Read_FromBinary : function(Reader)
+    {
+        var Flags = Reader.GetLong();
+
+        if ( Flags & 1 )
+            this.Left = Reader.GetDouble();
+
+        if ( Flags & 2 )
+            this.Right = Reader.GetDouble();
+
+        if ( Flags & 4 )
+            this.FirstLine = Reader.GetDouble();
+    }
+}
+
+function CParaSpacing()
+{
+    this.Line              = undefined; // Расстояние между строками внутри абзаца
+    this.LineRule          = undefined; // Тип расстрояния между строками
+    this.Before            = undefined; // Дополнительное расстояние до абзаца
+    this.BeforeAutoSpacing = undefined; // Использовать ли автоматический расчет расстояния до параграфа
+    this.After             = undefined; // Дополнительное расстояние после абзаца
+    this.AfterAutoSpacing  = undefined; // Использовать ли автоматический расчет расстояния после параграфа
+}
+
+CParaSpacing.prototype =
+{
+    isEmpty: function()
+    {
+        return this.Line === undefined &&
+        this.LineRule          === undefined && this.Before === undefined &&
+        this.BeforeAutoSpacing === undefined && this.After  === undefined &&
+        this.AfterAutoSpacing  === undefined;
+    },
+    Copy : function()
+    {
+        var Spacing = new CParaSpacing();
+        Spacing.Line              = this.Line;
+        Spacing.LineRule          = this.LineRule;
+        Spacing.Before            = this.Before;
+        Spacing.BeforeAutoSpacing = this.BeforeAutoSpacing;
+        Spacing.After             = this.After;
+        Spacing.AfterAutoSpacing  = this.AfterAutoSpacing;
+        return Spacing;
+    },
+
+    Merge : function(Spacing)
+    {
+        if ( undefined != Spacing.Line )
+            this.Line = Spacing.Line;
+
+        if ( undefined != Spacing.LineRule )
+            this.LineRule = Spacing.LineRule;
+
+        if ( undefined != Spacing.Before )
+            this.Before = Spacing.Before;
+
+        if ( undefined != Spacing.BeforeAutoSpacing )
+            this.BeforeAutoSpacing = Spacing.BeforeAutoSpacing;
+
+        if ( undefined != Spacing.After )
+            this.After = Spacing.After;
+
+        if ( undefined != Spacing.AfterAutoSpacing )
+            this.AfterAutoSpacing = Spacing.AfterAutoSpacing;
+    },
+
+    Set_FromObject : function(Spacing)
+    {
+        this.Line              = Spacing.Line;
+        this.LineRule          = Spacing.LineRule;
+        this.Before            = Spacing.Before;
+        this.BeforeAutoSpacing = Spacing.BeforeAutoSpacing;
+        this.After             = Spacing.After;
+        this.AfterAutoSpacing  = Spacing.AfterAutoSpacing;
+    },
+
+    Write_ToBinary : function(Writer)
+    {
+        var StartPos = Writer.GetCurPosition();
+        Writer.Skip(4);
+        var Flags = 0;
+
+        if ( undefined != this.Line )
+        {
+            Writer.WriteDouble( this.Line );
+            Flags |= 1;
+        }
+
+        if ( undefined != this.LineRule )
+        {
+            Writer.WriteByte( this.LineRule );
+            Flags |= 2;
+        }
+
+        if ( undefined != this.Before )
+        {
+            Writer.WriteDouble( this.Before );
+            Flags |= 4;
+        }
+
+        if ( undefined != this.After )
+        {
+            Writer.WriteDouble( this.After );
+            Flags |= 8;
+        }
+
+        if ( undefined != this.AfterAutoSpacing )
+        {
+            Writer.WriteBool( this.AfterAutoSpacing );
+            Flags |= 16;
+        }
+
+        if ( undefined != this.BeforeAutoSpacing )
+        {
+            Writer.WriteBool( this.BeforeAutoSpacing );
+            Flags |= 32;
+        }
+
+        var EndPos = Writer.GetCurPosition();
+        Writer.Seek( StartPos );
+        Writer.WriteLong( Flags );
+        Writer.Seek( EndPos );
+    },
+
+    Read_FromBinary : function(Reader)
+    {
+        var Flags = Reader.GetLong();
+
+        if ( Flags & 1 )
+            this.Line = Reader.GetDouble();
+
+        if ( Flags & 2 )
+            this.LineRule = Reader.GetByte();
+
+        if ( Flags & 4 )
+            this.Before = Reader.GetDouble();
+
+        if ( Flags & 8 )
+            this.After = Reader.GetDouble();
+
+        if ( Flags & 16 )
+            this.AfterAutoSpacing = Reader.GetBool();
+
+        if ( Flags & 32 )
+            this.BeforeAutoSpacing = Reader.GetBool();
+    }
+}
+
+function CNumPr()
+{
+    this.NumId = "-1";
+    this.Lvl   =    0;
+}
+
+CNumPr.prototype =
+{
+    Copy : function()
+    {
+        var NumPr = new CNumPr();
+        NumPr.NumId = this.NumId;
+        NumPr.Lvl   = this.Lvl;
+        return NumPr;
+    },
+
+    Set : function(NumId, Lvl)
+    {
+        this.NumId = NumId;
+        this.Lvl   = Lvl;
+    },
+
+    Set_FromObject : function(NumPr)
+    {
+        this.NumId = NumPr.NumId;
+        this.Lvl   = NumPr.Lvl;
+    },
+
+    Write_ToBinary : function(Writer)
+    {
+        // Bool   : Is NumId undefined
+        // String : NumId
+        // Byte   : Lvl
+
+        if ( undefined === this.NumId )
+            Writer.WriteBool( true );
+        else
+        {
+            Writer.WriteBool( false );
+            Writer.WriteString2( this.NumId );
+        }
+        Writer.WriteByte( this.Lvl );
+    },
+
+    Read_FromBinary : function(Reader)
+    {
+        // Bool   : Is NumId undefined
+        // String : NumId
+        // Byte   : Lvl
+
+        if ( true === Reader.GetBool() )
+            this.NumId = undefined;
+        else
+            this.NumId = Reader.GetString2();
+
+        this.Lvl = Reader.GetByte();
+    }
+};
+
+function CParaPr()
+{
+    this.ContextualSpacing = undefined;          // Удалять ли интервал между параграфами одинакового стиля
+    this.Ind               = new CParaInd();     // Отступы
+    this.Jc                = undefined;          // Прилегание параграфа
+    this.KeepLines         = undefined;          // Неразрывный параграф
+    this.KeepNext          = undefined;          // Не разъединять со следующим параграфом
+    this.PageBreakBefore   = undefined;          // Разрыв страницы перед параграфом
+    this.Spacing           = new CParaSpacing(); // Расстояния между строками внутри параграфа и между параграфами
+    this.Shd               = undefined;          // Заливка параграфа
+    this.Brd =
+    {
+        First   : undefined,            // Является ли данный параграф первым в группе параграфов с одинаковыми краями и настройками границ
+        Last    : undefined,            // Является ли данный параграф последним в группе параграфов с одинаковыми краями и настройками границ
+        Between : undefined,
+        Bottom  : undefined,
+        Left    : undefined,
+        Right   : undefined,
+        Top     : undefined
+    };
+   /* this.Brd = {};
+    this.Brd.First                 = true;
+    this.Brd.Last                  = true;
+    this.Brd.Between               = new CDocumentBorder();
+    this.Brd.Bottom                = new CDocumentBorder();
+    this.Brd.Left                  = new CDocumentBorder();
+    this.Brd.Right                 = new CDocumentBorder();
+    this.Brd.Top                   = new CDocumentBorder();    */
+    this.WidowControl      = undefined; // Запрет висячих строк
+    this.Tabs              = undefined; // Заданные табы
+    this.NumPr             = undefined; // Нумерация
+    this.PStyle            = undefined; // Стиль параграфа
+}
+
+CParaPr.prototype =
+{
+    isEmpty: function()
+    {
+        return this.ContextualSpacing === undefined && this.Ind.isEmpty() &&
+        this.Jc                === undefined && this.KeepLines         === undefined &&
+        this.KeepNext          === undefined && this.PageBreakBefore   === undefined &&
+        this.Spacing.isEmpty() && this.Shd === undefined &&
+        this.Brd.First === undefined && this.Brd.Last === undefined && this.Brd.Between === undefined && this.Brd.Bottom === undefined &&
+        this.Brd.Left === undefined && this.Brd.Right === undefined && this.Brd.Top === undefined &&
+        this.WidowControl === undefined && this.Tabs === undefined && this.NumPr === undefined && this.PStyle === undefined; // Стиль параграфа
+    },
+    Copy : function()
+    {
+        var ParaPr = new CParaPr();
+
+        ParaPr.ContextualSpacing = this.ContextualSpacing;
+
+        if ( undefined != this.Ind )
+            ParaPr.Ind = this.Ind.Copy();
+
+        ParaPr.Jc              = this.Jc;
+        ParaPr.KeepLines       = this.KeepLines;
+        ParaPr.KeepNext        = this.KeepNext;
+        ParaPr.PageBreakBefore = this.PageBreakBefore;
+
+        if ( undefined != this.Spacing )
+            ParaPr.Spacing = this.Spacing.Copy();
+
+        if ( undefined != this.Shd )
+            ParaPr.Shd = this.Shd.Copy();
+
+        ParaPr.Brd.First = this.Brd.First;
+        ParaPr.Brd.Last  = this.Brd.Last;
+
+        if ( undefined != this.Brd.Between )
+            ParaPr.Brd.Between = this.Brd.Between.Copy();
+
+        if ( undefined != this.Brd.Bottom )
+            ParaPr.Brd.Bottom = this.Brd.Bottom.Copy();
+
+        if ( undefined != this.Brd.Left )
+            ParaPr.Brd.Left = this.Brd.Left.Copy();
+
+        if ( undefined != this.Brd.Right )
+            ParaPr.Brd.Right = this.Brd.Right.Copy();
+
+        if ( undefined != this.Brd.Top )
+            ParaPr.Brd.Top = this.Brd.Top.Copy();
+
+        ParaPr.WidowControl = this.WidowControl;
+
+        if ( undefined != this.Tabs )
+            ParaPr.Tabs = this.Tabs.Copy();
+
+        if ( undefined != this.NumPr )
+            ParaPr.NumPr = this.NumPr.Copy();
+
+        if ( undefined != this.PStyle )
+            ParaPr.PStyle = this.PStyle;
+
+        return ParaPr;
+    },
+
+    Merge : function(ParaPr)
+    {
+        if ( undefined != ParaPr.ContextualSpacing )
+            this.ContextualSpacing = ParaPr.ContextualSpacing;
+
+        if ( undefined != ParaPr.Ind )
+            this.Ind.Merge( ParaPr.Ind );
+
+        if ( undefined != ParaPr.Jc )
+            this.Jc = ParaPr.Jc;
+
+        if ( undefined != ParaPr.KeepLines )
+            this.KeepLines = ParaPr.KeepLines;
+
+        if ( undefined != ParaPr.KeepNext )
+            this.KeepNext = ParaPr.KeepNext;
+
+        if ( undefined != ParaPr.PageBreakBefore )
+            this.PageBreakBefore = ParaPr.PageBreakBefore;
+
+        if ( undefined != ParaPr.Spacing )
+            this.Spacing.Merge( ParaPr.Spacing );
+
+        if ( undefined != ParaPr.Shd )
+            this.Shd = ParaPr.Shd.Copy();
+
+        /*if ( undefined != ParaPr.Brd.First )
+            this.Brd.First = ParaPr.Brd.First;
+
+        if ( undefined != ParaPr.Brd.Last )
+            this.Brd.Last  = ParaPr.Brd.Last;
+
+        if ( undefined != ParaPr.Brd.Between )
+            this.Brd.Between = ParaPr.Brd.Between.Copy();
+
+        if ( undefined != ParaPr.Brd.Bottom )
+            this.Brd.Bottom = ParaPr.Brd.Bottom.Copy();
+
+        if ( undefined != ParaPr.Brd.Left )
+            this.Brd.Left = ParaPr.Brd.Left.Copy();
+
+        if ( undefined != ParaPr.Brd.Right )
+            this.Brd.Right = ParaPr.Brd.Right.Copy();
+
+        if ( undefined != ParaPr.Brd.Top )
+            this.Brd.Top = ParaPr.Brd.Top.Copy();   */
+
+        if ( undefined != ParaPr.WidowControl )
+            this.WidowControl = ParaPr.WidowControl;
+
+        if ( undefined != ParaPr.Tabs )
+            this.Tabs = ParaPr.Tabs.Copy();
+
+        /*if ( undefined != ParaPr.NumPr )
+            this.NumPr = ParaPr.NumPr.Copy();   */
+
+        if ( undefined != ParaPr.PStyle )
+            this.PStyle = ParaPr.PStyle;
+    },
+
+    Init_Default : function()
+    {
+        this.ContextualSpacing         = false;
+        this.Ind                       = new CParaInd();
+        this.Ind.Left                  = 0;
+        this.Ind.Right                 = 0;
+        this.Ind.FirstLine             = 0;
+        this.Jc                        = align_Left;
+        this.KeepLines                 = false;
+        this.KeepNext                  = false;
+        this.PageBreakBefore           = false;
+        this.Spacing                   = new CParaSpacing();
+        this.Spacing.Line              = 1;
+        this.Spacing.LineRule          = linerule_Auto;
+        this.Spacing.Before            = 0;
+        this.Spacing.BeforeAutoSpacing = false;
+        this.Spacing.After             = 0;//10 * g_dKoef_pt_to_mm;
+        this.Spacing.AfterAutoSpacing  = false;
+        this.Shd                       = new CDocumentShd();
+        this.Brd.First                 = true;
+        this.Brd.Last                  = true;
+        this.Brd.Between               = new CDocumentBorder();
+        this.Brd.Bottom                = new CDocumentBorder();
+        this.Brd.Left                  = new CDocumentBorder();
+        this.Brd.Right                 = new CDocumentBorder();
+        this.Brd.Top                   = new CDocumentBorder();
+        this.WidowControl              = true;
+        this.Tabs                      = new CParaTabs();
+        this.NumPr                     = undefined;
+        this.PStyle                    = undefined;
+    },
+
+    Set_FromObject : function(ParaPr)
+    {
+        this.ContextualSpacing = ParaPr.ContextualSpacing;
+
+        if ( undefined != ParaPr.Ind )
+        {
+            this.Ind = new CParaInd();
+            this.Ind.Set_FromObject( ParaPr.Ind );
+        }
+        else
+            this.Ind = undefined;
+
+        this.Jc              = ParaPr.Jc;
+        this.KeepLines       = ParaPr.KeepLines;
+        this.KeepNext        = ParaPr.KeepNext;
+        this.PageBreakBefore = ParaPr.PageBreakBefore;
+
+        if ( undefined != ParaPr.Spacing )
+        {
+            this.Spacing = new CParaSpacing();
+            this.Spacing.Set_FromObject( ParaPr.Spacing );
+        }
+        else
+            this.Spacing = undefined;
+
+        if ( undefined != ParaPr.Shd )
+        {
+            this.Shd = new CDocumentShd();
+            this.Shd.Set_FromObject( ParaPr.Shd );
+        }
+        else
+            this.Shd = undefined;
+
+        if ( undefined != ParaPr.Brd )
+        {
+            if ( undefined != ParaPr.Brd.Between )
+            {
+                this.Brd.Between = new CDocumentBorder();
+                this.Brd.Between.Set_FromObject( ParaPr.Brd.Between );
+            }
+            else
+                this.Brd.Between = undefined;
+
+            if ( undefined != ParaPr.Brd.Bottom )
+            {
+                this.Brd.Bottom = new CDocumentBorder();
+                this.Brd.Bottom.Set_FromObject( ParaPr.Brd.Bottom );
+            }
+            else
+                this.Brd.Bottom = undefined;
+
+            if ( undefined != ParaPr.Brd.Left )
+            {
+                this.Brd.Left = new CDocumentBorder();
+                this.Brd.Left.Set_FromObject( ParaPr.Brd.Left );
+            }
+            else
+                this.Brd.Left = undefined;
+
+            if ( undefined != ParaPr.Brd.Right )
+            {
+                this.Brd.Right = new CDocumentBorder();
+                this.Brd.Right.Set_FromObject( ParaPr.Brd.Right );
+            }
+            else
+                this.Brd.Right = undefined;
+
+            if ( undefined != ParaPr.Brd.Top )
+            {
+                this.Brd.Top = new CDocumentBorder();
+                this.Brd.Top.Set_FromObject( ParaPr.Brd.Top );
+            }
+            else
+                this.Brd.Top = undefined;
+        }
+        else
+        {
+            this.Brd.Between = undefined;
+            this.Brd.Bottom  = undefined;
+            this.Brd.Left    = undefined;
+            this.Brd.Right   = undefined;
+            this.Brd.Top     = undefined;
+        }
+
+        this.WidowControl = ParaPr.WidowControl;
+
+        if ( undefined != ParaPr.Tabs )
+        {
+            this.Tabs = new CParaTabs();
+            this.Tabs.Set_FromObject( ParaPr.Tabs );
+        }
+        else
+            this.Tabs = undefined;
+
+        if ( undefined != ParaPr.NumPr )
+        {
+            this.NumPr = new CNumPr();
+            this.NumPr.Set_FromObject( ParaPr.NumPr );
+        }
+        else
+            this.NumPr = undefined;
+    },
+
+    Compare : function(ParaPr)
+    {
+        // При сравнении добавляем 1 элемент Locked
+        var Result_ParaPr = new CParaPr();
+        Result_ParaPr.Locked  = false;
+
+        if ( ParaPr.ContextualSpacing === this.ContextualSpacing )
+            Result_ParaPr.ContextualSpacing = ParaPr.ContextualSpacing;
+
+        Result_ParaPr.Ind = new CParaInd();
+        if ( undefined != ParaPr.Ind && undefined != this.Ind )
+        {
+            if ( undefined != ParaPr.Ind.Left && undefined != this.Ind.Left && Math.abs( ParaPr.Ind.Left - this.Ind.Left ) < 0.001 )
+                Result_ParaPr.Ind.Left = ParaPr.Ind.Left;
+
+            if ( undefined != ParaPr.Ind.Right && undefined != this.Ind.Right && Math.abs( ParaPr.Ind.Right - this.Ind.Right ) < 0.001 )
+                Result_ParaPr.Ind.Right = ParaPr.Ind.Right;
+
+            if ( undefined != ParaPr.Ind.FirstLine && undefined != this.Ind.FirstLine && Math.abs( ParaPr.Ind.FirstLine - this.Ind.FirstLine ) < 0.001 )
+                Result_ParaPr.Ind.FirstLine = ParaPr.Ind.FirstLine;
+        }
+
+        if ( ParaPr.Jc === this.Jc )
+            Result_ParaPr.Jc = ParaPr.Jc;
+
+        if ( ParaPr.KeepLines === this.KeepLines )
+            Result_ParaPr.KeepLines = ParaPr.KeepLines;
+
+        if ( ParaPr.KeepNext === this.KeepNext )
+            Result_ParaPr.KeepNext = ParaPr.KeepNext;
+
+        if ( ParaPr.PageBreakBefore === this.PageBreakBefore )
+            Result_ParaPr.PageBreakBefore = ParaPr.PageBreakBefore;
+
+        Result_ParaPr.Spacing = new CParaSpacing();
+        if ( undefined != this.Spacing && undefined != ParaPr.Spacing )
+        {
+            if ( undefined != this.Spacing.After && undefined != ParaPr.Spacing.After && Math.abs( this.Spacing.After - ParaPr.Spacing.After ) < 0.001 )
+                Result_ParaPr.Spacing.After = ParaPr.Spacing.After;
+
+            if ( this.Spacing.AfterAutoSpacing === ParaPr.Spacing.AfterAutoSpacing )
+                Result_ParaPr.Spacing.AfterAutoSpacing = ParaPr.Spacing.AfterAutoSpacing;
+
+            if ( undefined != this.Spacing.Before && undefined != ParaPr.Spacing.Before && Math.abs( this.Spacing.Before - ParaPr.Spacing.Before ) < 0.001 )
+                Result_ParaPr.Spacing.Before = ParaPr.Spacing.Before;
+
+            if ( this.Spacing.BeforeAutoSpacing === ParaPr.Spacing.BeforeAutoSpacing )
+                Result_ParaPr.Spacing.BeforeAutoSpacing = ParaPr.Spacing.BeforeAutoSpacing;
+
+            if ( undefined != this.Spacing.Line && undefined != ParaPr.Spacing.Line && Math.abs( this.Spacing.Line - ParaPr.Spacing.Line ) < 0.001 )
+                Result_ParaPr.Spacing.Line = ParaPr.Spacing.Line;
+
+            if ( this.Spacing.LineRule === ParaPr.Spacing.LineRule )
+                Result_ParaPr.Spacing.LineRule = ParaPr.Spacing.LineRule;
+        }
+
+        if ( undefined != this.Shd && undefined != ParaPr.Shd && true === this.Shd.Compare(ParaPr.Shd) )
+            Result_ParaPr.Shd = ParaPr.Shd.Copy();
+
+        if ( undefined != this.Brd.Between && undefined != ParaPr.Brd.Between && true === this.Brd.Between.Compare( ParaPr.Brd.Between ) )
+            Result_ParaPr.Brd.Between = ParaPr.Brd.Between.Copy();
+
+        if ( undefined != this.Brd.Bottom && undefined != ParaPr.Brd.Bottom && true === this.Brd.Bottom.Compare( ParaPr.Brd.Bottom ) )
+            Result_ParaPr.Brd.Bottom = ParaPr.Brd.Bottom.Copy();
+
+        if ( undefined != this.Brd.Left && undefined != ParaPr.Brd.Left && true === this.Brd.Left.Compare( ParaPr.Brd.Left ) )
+            Result_ParaPr.Brd.Left = ParaPr.Brd.Left.Copy();
+
+        if ( undefined != this.Brd.Right && undefined != ParaPr.Brd.Right && true === this.Brd.Right.Compare( ParaPr.Brd.Right ) )
+            Result_ParaPr.Brd.Right = ParaPr.Brd.Right.Copy();
+
+        if ( undefined != this.Brd.Top && undefined != ParaPr.Brd.Top && true === this.Brd.Top.Compare( ParaPr.Brd.Top ) )
+            Result_ParaPr.Brd.Top = ParaPr.Brd.Top.Copy();
+
+        if ( ParaPr.WidowControl === this.WidowControl )
+            Result_ParaPr.WidowControl = ParaPr.WidowControl;
+
+        // PStyle
+        if ( undefined != this.PStyle && undefined != ParaPr.PStyle && this.PStyle === ParaPr.PStyle )
+            Result_ParaPr.PStyle = ParaPr.PStyle;
+
+        // NumPr
+        if ( undefined != this.NumPr && undefined != ParaPr.NumPr && this.NumPr.NumId === ParaPr.NumPr.NumId )
+        {
+            Result_ParaPr.NumPr = new CParaPr();
+            Result_ParaPr.NumPr.NumId = ParaPr.NumPr.NumId;
+            Result_ParaPr.NumPr.Lvl   = Math.max( this.NumPr.Lvl, ParaPr.NumPr.Lvl );
+        }
+
+        // Locked
+        if ( undefined != this.Locked && undefined != ParaPr.Locked )
+        {
+            if ( this.Locked != ParaPr.Locked )
+                Result_ParaPr.Locked = true;
+            else
+                Result_ParaPr.Locked = ParaPr.Locked;
+        }
+
+        return Result_ParaPr;
+    },
+
+    Write_ToBinary : function(Writer)
+    {
+        var StartPos = Writer.GetCurPosition();
+        Writer.Skip(4);
+        var Flags = 0;
+
+        if ( undefined != this.ContextualSpacing )
+        {
+            Writer.WriteBool( this.ContextualSpacing );
+            Flags |= 1;
+        }
+
+        if ( undefined != this.Ind )
+        {
+            this.Ind.Write_ToBinary(Writer);
+            Flags |= 2;
+        }
+
+        if ( undefined != this.Jc )
+        {
+            Writer.WriteByte( this.Jc );
+            Flags |= 4;
+        }
+
+        if ( undefined != this.KeepLines )
+        {
+            Writer.WriteBool( this.KeepLines );
+            Flags |= 8;
+        }
+
+        if ( undefined != this.KeepNext )
+        {
+            Writer.WriteBool( this.KeepNext );
+            Flags |= 16;
+        }
+
+        if ( undefined != this.PageBreakBefore )
+        {
+            Writer.WriteBool( this.PageBreakBefore );
+            Flags |= 32;
+        }
+
+        if ( undefined != this.Spacing )
+        {
+            this.Spacing.Write_ToBinary(Writer);
+            Flags |= 64;
+        }
+
+        if ( undefined != this.Shd )
+        {
+            this.Shd.Write_ToBinary(Writer);
+            Flags |= 128;
+        }
+
+        if ( undefined != this.Brd.Between )
+        {
+            this.Brd.Between.Write_ToBinary( Writer );
+            Flags |= 256;
+        }
+
+        if ( undefined != this.Brd.Bottom )
+        {
+            this.Brd.Bottom.Write_ToBinary( Writer );
+            Flags |= 512;
+        }
+
+        if ( undefined != this.Brd.Left )
+        {
+            this.Brd.Left.Write_ToBinary( Writer );
+            Flags |= 1024;
+        }
+
+        if ( undefined != this.Brd.Right )
+        {
+            this.Brd.Right.Write_ToBinary( Writer );
+            Flags |= 2048;
+        }
+
+        if ( undefined != this.Brd.Top )
+        {
+            this.Brd.Top.Write_ToBinary( Writer );
+            Flags |= 4096;
+        }
+
+        if ( undefined != this.WidowControl )
+        {
+            Writer.WriteBool( this.WidowControl );
+            Flags |= 8192;
+        }
+
+        if ( undefined != this.Tabs )
+        {
+            this.Tabs.Write_ToBinary( Writer );
+            Flags |= 16384;
+        }
+
+        if ( undefined != this.NumPr )
+        {
+            this.NumPr.Write_ToBinary( Writer );
+            Flags |= 32768;
+        }
+
+        if ( undefined != this.PStyle )
+        {
+            Writer.WriteString2( this.PStyle );
+            Flags |= 65536;
+        }
+
+        var EndPos = Writer.GetCurPosition();
+        Writer.Seek( StartPos );
+        Writer.WriteLong( Flags );
+        Writer.Seek( EndPos );
+    },
+
+    Read_FromBinary : function(Reader)
+    {
+        var Flags = Reader.GetLong();
+
+        if ( Flags & 1 )
+            this.ContextualSpacing = Reader.GetBool();
+
+        if ( Flags & 2 )
+        {
+            this.Ind = new CParaInd();
+            this.Ind.Read_FromBinary( Reader );
+        }
+
+        if ( Flags & 4 )
+            this.Jc = Reader.GetByte();
+
+        if ( Flags & 8 )
+            this.KeepLines = Reader.GetBool();
+
+        if ( Flags & 16 )
+            this.KeepNext = Reader.GetBool();
+
+        if ( Flags & 32 )
+            this.PageBreakBefore = Reader.GetBool();
+
+        if ( Flags & 64 )
+        {
+            this.Spacing = new CParaSpacing();
+            this.Spacing.Read_FromBinary( Reader );
+        }
+
+        if ( Flags & 128 )
+        {
+            this.Shd = new CDocumentShd();
+            this.Shd.Read_FromBinary( Reader );
+        }
+
+        if ( Flags & 256 )
+        {
+            this.Brd.Between = new CDocumentBorder();
+            this.Brd.Bottom.Read_FromBinary( Reader );
+        }
+
+        if ( Flags & 512 )
+        {
+            this.Brd.Bottom = new CDocumentBorder();
+            this.Brd.Bottom.Read_FromBinary( Reader );
+        }
+
+        if ( Flags & 1024 )
+        {
+            this.Brd.Left = new CDocumentBorder();
+            this.Brd.Left.Read_FromBinary( Reader );
+        }
+
+        if ( Flags & 2048 )
+        {
+            this.Brd.Right = new CDocumentBorder();
+            this.Brd.Right.Read_FromBinary( Reader );
+        }
+
+        if ( Flags & 4096 )
+        {
+            this.Brd.Top = new CDocumentBorder();
+            this.Brd.Top.Read_FromBinary( Reader );
+        }
+
+        if ( Flags & 8192 )
+            this.WidowControl = Reader.GetBool();
+
+        if ( Flags & 16384 )
+        {
+            this.Tabs = new CParaTabs();
+            this.Tabs.Read_FromBinary( Reader );
+        }
+
+        if ( Flags & 32768 )
+        {
+            this.NumPr = new CNumPr();
+            this.NumPr.Read_FromBinary( Reader );
+        }
+
+        if ( Flags & 65536 )
+            this.PStyle = Reader.GetString2();
+    }
+}
+
+function Copy_Bounds(Bounds)
+{
+    if ( undefined === Bounds )
+        return {};
+    var Bounds_new = {};
+    Bounds_new.Bottom = Bounds.Bottom;
+    Bounds_new.Left   = Bounds.Left;
+    Bounds_new.Right  = Bounds.Right;
+    Bounds_new.Top    = Bounds.Top;
+    return Bounds_new;
+}
+
+
+function GetRGBColorFromUniFillAndRef(unifill, fontRef, theme, master, layout, slide)
+{
+    var _calculated_unifill;
+    var RGBA = {R:0, G:0, B:0, A:255};
+
+    if((fontRef !== null && typeof fontRef === "object")
+        || (unifill !== null && typeof unifill === "object"
+        && unifill.fill !== null && typeof unifill.fill === "object"))
+    {
+        if (theme && fontRef !==null && typeof fontRef === "object"
+            && fontRef.Color !==null && typeof fontRef.Color === "object"
+            && typeof fontRef.Color.Calculate === "function")
+        {
+            _calculated_unifill = new CUniFill();//theme.getFillStyle(fontRef.idx);
+            fontRef.Color.Calculate(theme, slide, layout, master);
+            RGBA = fontRef.Color.RGBA;
+            if (fontRef.Color.color != null)
+            {
+                if (_calculated_unifill.fill != null && _calculated_unifill.fill.type == FILL_TYPE_SOLID)
+                {
+                    _calculated_unifill.fill.color = fontRef.Color.createDuplicate();
+                }
+            }
+        }
+        else
+        {
+            _calculated_unifill = new CUniFill();
+        }
+        _calculated_unifill.merge(unifill);
+        _calculated_unifill.calculate(theme, slide, layout, master, RGBA);
+        if(_calculated_unifill.fill && _calculated_unifill.fill.color && _calculated_unifill.fill.color.RGBA)
+        {
+            return _calculated_unifill.fill.color.RGBA;
+        }
+    }
+    return null;
+}
+
+function Styles_IsNeedRecalc_TextPr(TextPr)
+{
+    if ( "undefined" === typeof(TextPr) || null === TextPr )
+        return false;
+
+    if ( "undefined" != typeof(TextPr.Bold) )
+        return true;
+
+    if ( "undefined" != typeof(TextPr.Italic) )
+        return true;
+
+    if ( "undefined" != typeof(TextPr.FontFamily) )
+        return true;
+
+    if ( "undefined" != typeof(TextPr.FontSize) )
+        return true;
+
+    if ( "undefined" != typeof(TextPr.VertAlign) )
+        return true;
+
+    return false;
+}

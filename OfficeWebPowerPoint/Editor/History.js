@@ -1,0 +1,518 @@
+/**
+ * User: Ilja.Kirillov
+ * Date: 11.04.12
+ * Time: 14:35
+ */
+
+var historyitem_Unknown = 0;
+
+// Типы изменений в классе CDocument
+var historyitem_Document_AddItem     = 1; // Добавляем элемент в документ
+var historyitem_Document_RemoveItem  = 2; // Удаляем элемент из документа
+var historyitem_Document_Margin      = 3; // Меняем маргины(поля) документа
+var historyitem_Document_PageSize    = 4; // Меняем размер страницы у документа
+var historyitem_Document_Orientation = 5; // Меняем ориентацию страниц у документа
+
+// Типы изменений в классе Paragraph
+var historyitem_Paragraph_AddItem                   =  1; // Добавляем элемент в параграф
+var historyitem_Paragraph_RemoveItem                =  2; // Удаляем элемент из параграфа
+var historyitem_Paragraph_Numbering                 =  3; // Добавляем/Убираем/Изменяем нумерацию у параграфа
+var historyitem_Paragraph_Align                     =  4; // Изменяем прилегание параграфа
+var historyitem_Paragraph_Ind_First                 =  5; // Изменяем отспут первой строки
+var historyitem_Paragraph_Ind_Right                 =  6; // Изменяем правый отступ
+var historyitem_Paragraph_Ind_Left                  =  7; // Изменяем левый отступ
+var historyitem_Paragraph_ContextualSpacing         =  8; // Изменяем свойство contextualSpacing
+var historyitem_Paragraph_KeepLines                 =  9; // Изменяем свойство KeepLines
+var historyitem_Paragraph_KeepNext                  = 10; // Изменяем свойство KeepNext
+var historyitem_Paragraph_PageBreakBefore           = 11; // Изменяем свойство PageBreakBefore
+var historyitem_Paragraph_Spacing_Line              = 12; // Изменяем свойство Spacing.Line
+var historyitem_Paragraph_Spacing_LineRule          = 13; // Изменяем свойство Spacing.LineRule
+var historyitem_Paragraph_Spacing_Before            = 14; // Изменяем свойство Spacing.Before
+var historyitem_Paragraph_Spacing_After             = 15; // Изменяем свойство Spacing.After
+var historyitem_Paragraph_Spacing_AfterAutoSpacing  = 16; // Изменяем свойство Spacing.AfterAutoSpacing
+var historyitem_Paragraph_Spacing_BeforeAutoSpacing = 17; // Изменяем свойство Spacing.BeforeAutoSpacing
+var historyitem_Paragraph_Shd_Value                 = 18; // Изменяем свойство Shd.Value
+var historyitem_Paragraph_Shd_Color                 = 19; // Изменяем свойство Shd.Color
+var historyitem_Paragraph_WidowControl              = 20; // Изменяем свойство WidowControl
+var historyitem_Paragraph_Tabs                      = 21; // Изменяем табы у параграфа
+var historyitem_Paragraph_PStyle                    = 22; // Изменяем стиль параграфа
+var historyitem_Paragraph_DocNext                   = 23; // Изменяем указатель на следующий объект
+var historyitem_Paragraph_DocPrev                   = 24; // Изменяем указатель на предыдущий объект
+var historyitem_Paragraph_Parent                    = 25; // Изменяем указатель на родительский объект
+var historyitem_Paragraph_Borders_Between           = 26; // Изменяем промежуточную границу
+var historyitem_Paragraph_Borders_Bottom            = 27; // Изменяем верхнюю границу
+var historyitem_Paragraph_Borders_Left              = 28; // Изменяем левую границу
+var historyitem_Paragraph_Borders_Right             = 29; // Изменяем правую границу
+var historyitem_Paragraph_Borders_Top               = 30; // Изменяем нижнюю границу
+var historyitem_Paragraph_Pr                        = 31; // Изменяем свойства полностью
+var historyitem_Paragraph_PresentationPr_Bullet     = 32; // Изменяем свойства нумерации у параграфа в презентации
+var historyitem_Paragraph_PresentationPr_Level      = 33; // Изменяем уровень параграфа в презентациях
+
+// Типы изменений в классе ParaTextPr
+var historyitem_TextPr_Change     =  1; // Изменяем настройку
+var historyitem_TextPr_Bold       =  2; // Изменяем жирность
+var historyitem_TextPr_Italic     =  3; // Изменяем наклонность
+var historyitem_TextPr_Strikeout  =  4; // Изменяем зачеркивание текста
+var historyitem_TextPr_Underline  =  5; // Изменяем подчеркивание текста
+var historyitem_TextPr_FontFamily =  6; // Изменяем имя шрифта
+var historyitem_TextPr_FontSize   =  7; // Изменяем размер шрифта
+var historyitem_TextPr_Color      =  8; // Изменяем цвет текста
+var historyitem_TextPr_VertAlign  =  9; // Изменяем вертикальное прилегание
+var historyitem_TextPr_HighLight  = 10; // Изменяем выделение текста
+var historyitem_TextPr_RStyle     = 11; // Изменяем стиль текста
+var historyitem_TextPr_Unifill     = 12; // Изменяем стиль текста
+
+// Типы изменений в классе ParaDrawing
+var historyitem_Drawing_Size = 1; // Изменяем размер картинки
+var historyitem_Drawing_Url  = 2; // Изменяем адрес картинку (т.е. меняем само изображение)
+
+// Типы изменений в классе CDrawingObjects
+var historyitem_DrawingObjects_AddItem    = 1;
+var historyitem_DrawingObjects_RemoveItem = 2;
+
+// Типы изменений в классе FlowObjects
+var historyitem_FlowObjects_AddItem    = 1;
+var historyitem_FlowObjects_RemoveItem = 2;
+
+// Типы изменений в классе FlowImage
+var historyitem_FlowImage_Position = 1; // Изменяем позицию картинки
+var historyitem_FlowImage_Size     = 2; // Изменяем размер картинки
+var historyitem_FlowImage_Paddings = 3; // Изменяем отступы от картинки
+var historyitem_FlowImage_PageNum  = 4; // Изменяем номер страницы картинки
+var historyitem_FlowImage_Url      = 5; // Изменяем адрес картинку (т.е. меняем само изображение)
+var historyitem_FlowImage_Parent   = 6; // Изменяем указатель на родительский объект
+
+// Типы изменений в классе CTable
+var historyitem_Table_DocNext               =  1; // Изменяем указатель на следующий объект
+var historyitem_Table_DocPrev               =  2; // Изменяем указатель на предыдущий объект
+var historyitem_Table_Parent                =  3; // Изменяем указатель на родительский объект
+var historyitem_Table_TableW                =  4; // Изменяем ширину таблицы
+var historyitem_Table_TableCellMar          =  5; // Изменяем отступы(по умолчанию) внутри ячеек
+var historyitem_Table_TableAlign            =  6; // Изменяем прилегание(для inline таблиц)
+var historyitem_Table_TableInd              =  7; // Изменяем отступ(для inline таблиц)
+var historyitem_Table_TableBorder_Left      =  8; // Изменяем левую границу таблицы
+var historyitem_Table_TableBorder_Top       =  9; // Изменяем верхнюю границу таблицы
+var historyitem_Table_TableBorder_Right     = 10; // Изменяем правую границу таблицы
+var historyitem_Table_TableBorder_Bottom    = 11; // Изменяем нижнюю границу таблицы
+var historyitem_Table_TableBorder_InsideH   = 12; // Изменяем внутренюю горизонтальную границу
+var historyitem_Table_TableBorder_InsideV   = 13; // Изменяем внутренюю вертикальную границу
+var historyitem_Table_TableShd              = 14; // Изменяем заливку таблицы
+var historyitem_Table_Inline                = 15; // Изменяем свойствой inline
+var historyitem_Table_AddRow                = 16; // Добавляем строку в таблицу
+var historyitem_Table_RemoveRow             = 17; // Удаляем строку из таблицы
+var historyitem_Table_TableGrid             = 18; // Изменяем сетку колонок
+var historyitem_Table_TableLook             = 19; // Изменяем тип условного форматирования таблицы
+var historyitem_Table_TableStyleRowBandSize = 20; // Изменяем количество строк в группе
+var historyitem_Table_TableStyleColBandSize = 21; // Изменяем количество колонок в группе
+var historyitem_Table_TableStyle            = 22; // Изменяем стиль таблицы
+
+// Типы изменений в классе CTableRow
+var historyitem_TableRow_Before      = 1; // Изменяем свойство Before
+var historyitem_TableRow_After       = 2; // Изменяем свойство After
+var historyitem_TableRow_CellSpacing = 3; // Изменяем свойство CellSpacing
+var historyitem_TableRow_Height      = 4; // Изменяем свойство Height
+var historyitem_TableRow_AddCell     = 5; // Добавляем ячейку
+var historyitem_TableRow_RemoveCell  = 6; // Удаляем ячейку
+
+// Типы изменений в классе CTableCell
+var historyitem_TableCell_GridSpan      = 1; // Изменяем горизонтальное объединение
+var historyitem_TableCell_Margins       = 2; // Изменяем отступы
+var historyitem_TableCell_Shd           = 3; // Изменяем заливку
+var historyitem_TableCell_VMerge        = 4; // Изменяем вертикальное объединение
+var historyitem_TableCell_Border_Left   = 5; // Изменяем левую границу ячейки
+var historyitem_TableCell_Border_Right  = 6; // Изменяем правую границу ячейки
+var historyitem_TableCell_Border_Top    = 7; // Изменяем верхнюю границу ячейки
+var historyitem_TableCell_Border_Bottom = 8; // Изменяем нижнюю границу ячейки
+
+// Типы изменений в классе CDocumentContent
+var historyitem_DocumentContent_AddItem     = 1; // Добавляем элемент в документ
+var historyitem_DocumentContent_RemoveItem  = 2; // Удаляем элемент из документа
+
+// Типы изменений в классе CFlowTable
+var historyitem_FlowTable_Position = 1; // Изменяем позиции
+var historyitem_FlowTable_Paddings = 2; // Изменяем отступов
+var historyitem_FlowTable_PageNum  = 3; // Изменяем номер страницы у таблицы
+var historyitem_FlowTable_Parent   = 4; // Изменяем указатель на родительский объект
+
+// Типы изменений в классе CHeaderFooterController
+var historyitem_HdrFtrController_AddItem    = 1; // Добавляем колонтитул
+var historyitem_HdrFtrController_RemoveItem = 2; // Удаляем колонтитул
+
+// Типы изменений в классе CHeaderFooter
+var historyitem_HdrFtr_BoundY2 = 1; // Изменяем отступ колонтитула (для верхнего от верха,  для нижнего от низа)
+
+// Типы изменений в классе CAbstractNum
+var historyitem_AbstractNum_LvlChange    = 1; // Изменили заданный уровень
+var historyitem_AbstractNum_TextPrChange = 2; // Изменили текстовую настройку у заданного уровня
+
+// Типы изменений в классе CTableId
+var historyitem_TableId_Add   = 1; // Добавили новую ссылку в глобальную таблицу
+var historyitem_TableId_Reset = 2; // Изменили Id ссылки
+
+// Типы изменений в классе CComments
+var historyitem_Comments_Add    = 1; // Добавили новый комментарий
+var historyitem_Comments_Remove = 2; // Удалили комментарий
+
+// Типы изменений в классе СComment
+var historyitem_Comment_Change   = 1; // Изменили комментарий
+var historyitem_Comment_TypeInfo = 2; // Изменили информацию о типе комментария
+
+// Тип класса, к которому относится данный элемент истории
+var historyitem_State_Unknown         = 0;
+var historyitem_State_Document        = 1;
+var historyitem_State_DocumentContent = 2;
+var historyitem_State_Paragraph       = 3;
+var historyitem_State_Table           = 4;
+
+// Типы произошедших изменений
+var historyrecalctype_Inline = 0; // Изменения произошли в обычном тексте (с верхним классом CDocument)
+var historyrecalctype_Flow   = 1; // Изменения произошли в "плавающем" объекте
+var historyrecalctype_HdrFtr = 2; // Изменения произошли в колонтитуле
+
+// Типы классов, в которых происходили изменения (типы нужны для совместного редактирования)
+var historyitem_type_Unknown          =  0;
+var historyitem_type_TableId          =  1;
+var historyitem_type_Document         =  2;
+var historyitem_type_Paragraph        =  3;
+var historyitem_type_TextPr           =  4;
+var historyitem_type_Drawing          =  5;
+var historyitem_type_DrawingObjects   =  6;
+var historyitem_type_FlowObjects      =  7;
+var historyitem_type_FlowImage        =  8;
+var historyitem_type_Table            =  9;
+var historyitem_type_TableRow         = 10;
+var historyitem_type_TableCell        = 11;
+var historyitem_type_DocumentContent  = 12;
+var historyitem_type_FlowTable        = 13;
+var historyitem_type_HdrFtrController = 14;
+var historyitem_type_HdrFtr           = 15;
+var historyitem_type_AbstractNum      = 16;
+var historyitem_type_Comment          = 17;
+var historyitem_type_Comments         = 18;
+
+function CHistory(Document)
+{
+    this.Index      = -1;
+    this.SavedIndex = -1;          // Номер точки отката, на которой произошло последнее сохранение
+    this.Points     = new Array(); // Точки истории, в каждой хранится массив с изменениями после текущей точки
+    this.Document   = Document;
+
+    this.RecalculateData =
+    {
+        Inline : -1,
+        Flow   : new Array(),
+        HdrFtr : new Array()
+    };
+
+    this.TurnOffHistory = false;
+
+    this.BinaryWriter = new CMemory();
+}
+
+CHistory.prototype =
+{
+    Is_Clear : function()
+    {
+        if ( this.Points.length <= 0 )
+            return true;
+
+        return false;
+    },
+
+    Clear : function()
+    {
+        this.Index         = -1;
+        this.Points.length = 0;
+        this.Internal_RecalcData_Clear();
+    },
+
+    Can_Undo : function()
+    {
+        if ( this.Index >= 0 )
+            return true;
+
+        return false;
+    },
+
+    Can_Redo : function()
+    {
+        if ( this.Points.length > 0 && this.Index < this.Points.length - 1 )
+            return true;
+
+        return false;
+    },
+
+    Undo : function()
+    {
+        this.Check_UninonLastPoints();
+
+        // Проверяем можно ли сделать Undo
+        if ( true != this.Can_Undo() )
+            return null;
+
+        // Запоминаем самое последнее состояние документа для Redo
+        if ( this.Index === this.Points.length - 1 )
+            this.LastState = this.Document.Get_SelectionState();
+
+        var Point = this.Points[this.Index--];
+
+        this.Internal_RecalcData_Clear();
+
+        // Откатываем все действия в обратном порядке (относительно их выполенения)
+        for ( var Index = Point.Items.length - 1; Index >= 0; Index-- )
+        {
+            var Item = Point.Items[Index];
+            Item.Class.Undo( Item.Data );
+        }
+
+        this.Document.Set_SelectionState( Point.State );
+
+        return this.RecalculateData;
+    },
+
+    Redo : function()
+    {
+        // Проверяем можно ли сделать Redo
+        if ( true != this.Can_Redo() )
+            return null;
+
+        var Point = this.Points[++this.Index];
+
+        this.Internal_RecalcData_Clear();
+
+        // Выполняем все действия в прямом порядке
+        for ( var Index = 0; Index < Point.Items.length; Index++ )
+        {
+            var Item = Point.Items[Index];
+            Item.Class.Redo( Item.Data );
+        }
+
+        // Восстанавливаем состояние на следующую точку
+        var State = null;
+        if ( this.Index === this.Points.length - 1 )
+            State = this.LastState;
+        else
+            State = this.Points[this.Index + 1].State;
+
+        this.Document.Set_SelectionState( State );
+
+        return this.RecalculateData;
+    },
+
+    Create_NewPoint : function()
+    {
+        this.Check_UninonLastPoints();
+
+        var State = this.Document.Get_SelectionState();
+        var Items = new Array();
+        var Time  = new Date().getTime();
+
+        // Создаем новую точку
+        this.Points[++this.Index] =
+        {
+            State : State, // Текущее состояние документа (курсор, селект)
+            Items : Items, // Массив изменений, начиная с текущего момента
+            Time  : Time   // Текущее время
+        };
+
+        // Удаляем ненужные точки
+        this.Points.length = this.Index + 1;
+    },
+
+    Clear_Redo : function()
+    {
+        // Удаляем ненужные точки
+        this.Points.length = this.Index + 1;
+    },
+
+    // Регистрируем новое изменение:
+    // Class - объект, в котором оно произошло
+    // Data  - сами изменения
+    Add : function(Class, Data)
+    {
+        if ( true === this.TurnOffHistory )
+            return;
+
+        if ( this.Index < 0 )
+            return;
+
+        //var Binary_Pos = this.BinaryWriter.GetCurPosition();
+
+        //Class.Save_Changes( Data, this.BinaryWriter );
+
+        //var Binary_Len = this.BinaryWriter.GetCurPosition() - Binary_Pos;
+
+        var Item =
+        {
+            Class : Class,
+            Data  : Data//,
+//            Binary:
+  //          {
+    //            Pos : Binary_Pos,
+      //          Len : Binary_Len
+        //    }
+        };
+
+        this.Points[this.Index].Items.push( Item );
+
+        if ( ( Class instanceof CPresentation        && ( historyitem_Document_AddItem        === Data.Type || historyitem_Document_RemoveItem        === Data.Type ) ) ||
+             ( Class instanceof CDocumentContent && ( historyitem_DocumentContent_AddItem === Data.Type || historyitem_DocumentContent_RemoveItem === Data.Type ) ) ||
+             ( Class instanceof CTable           && ( historyitem_Table_AddRow            === Data.Type || historyitem_Table_RemoveRow            === Data.Type ) ) ||
+             ( Class instanceof CTableRow        && ( historyitem_TableRow_AddCell        === Data.Type || historyitem_TableRow_RemoveCell        === Data.Type ) ) )
+        {
+            var bAdd = ( ( Class instanceof CPresentation        && historyitem_Document_AddItem        === Data.Type ) ||
+                         ( Class instanceof CDocumentContent && historyitem_DocumentContent_AddItem === Data.Type ) ||
+                         ( Class instanceof CTable           && historyitem_Table_AddRow            === Data.Type ) ||
+                         ( Class instanceof CTableRow        && historyitem_TableRow_AddCell        === Data.Type )
+                       ) ? true : false;
+
+            var ContentChanges = new CContentChanges( ( bAdd == true ? contentchanges_Add : contentchanges_Remove ), Data.Pos, Item );
+            Class.Add_ContentChanges( ContentChanges );
+        }
+    },
+
+    Internal_RecalcData_Clear : function()
+    {
+        this.RecalculateData =
+        {
+            Inline : -1,
+            Flow   : new Array(),
+            HdrFtr : new Array()
+        };
+    },
+
+    RecalcData_Add : function(Data)
+    {
+
+        if (  null === Data || !(typeof Data === "object") || !(Data instanceof  CDocumentContent || Data instanceof  CTable))
+            return;
+
+
+        switch ( Data.Type )
+        {
+            case historyrecalctype_Flow:
+            {
+                var bNew = true;
+                for ( var Index = 0; Index < this.RecalculateData.Flow.length; Index++ )
+                {
+                    if ( this.RecalculateData.Flow[Index] === Data.Data )
+                    {
+                        bNew = false;
+                        break;
+                    }
+                }
+
+                if ( true === bNew )
+                    this.RecalculateData.Flow.push( Data.Data );
+
+                break;
+            }
+
+            case historyrecalctype_HdrFtr:
+            {
+                if ( null === Data.Data )
+                    break;
+
+                var bNew = true;
+                for ( var Index = 0; Index < this.RecalculateData.Flow.length; Index++ )
+                {
+                    if ( this.RecalculateData.HdrFtr[Index] === Data.Data )
+                    {
+                        bNew = false;
+                        break;
+                    }
+                }
+
+                if ( true === bNew )
+                    this.RecalculateData.HdrFtr.push( Data.Data );
+
+                break
+            }
+
+            case historyrecalctype_Inline:
+            {
+                if ( Data.Data < this.RecalculateData.Inline || this.RecalculateData.Inline < 0 )
+                    this.RecalculateData.Inline = Data.Data;
+
+                break;
+            }
+        }
+        this.RecalculateData = Data;
+    },
+
+    Check_UninonLastPoints : function()
+    {
+        if ( this.Points.length < 2 )
+            return;
+
+        var Point1 = this.Points[this.Points.length - 2];
+        var Point2 = this.Points[this.Points.length - 1];
+
+        // Не объединяем слова больше 63 элементов
+        if ( Point1.Items.length > 63 )
+            return;
+
+        var PrevItem = null;
+        var Class = null;
+        for ( var Index = 0; Index < Point1.Items.length; Index++ )
+        {
+            var Item = Point1.Items[Index];
+
+            if ( null === Class )
+                Class = Item.Class;
+            else if ( Class != Item.Class || "undefined" === typeof(Class.Check_HistoryUninon) || false === Class.Check_HistoryUninon(PrevItem.Data, Item.Data) )
+                return;
+
+            PrevItem = Item;
+        }
+
+        for ( var Index = 0; Index < Point2.Items.length; Index++ )
+        {
+            var Item = Point2.Items[Index];
+
+            if ( Class != Item.Class || "undefined" === typeof(Class.Check_HistoryUninon) || false === Class.Check_HistoryUninon(PrevItem.Data, Item.Data) )
+                return;
+
+            PrevItem = Item;
+        }
+
+        var NewPoint =
+        {
+            State : Point1.State,
+            Items : Point1.Items.concat(Point2.Items),
+            Time  : Point1.Time
+        };
+
+        this.Points.splice( this.Points.length - 2, 2, NewPoint );
+        if ( this.Index >= this.Points.length )
+            this.Index = this.Points.length - 1;
+    },
+
+    TurnOff : function()
+    {
+        this.TurnOffHistory = true;
+    },
+
+    TurnOn : function()
+    {
+        this.TurnOffHistory = false;
+    },
+
+    Is_On : function()
+    {
+        return ( false === this.TurnOffHistory ? true : false ) ;
+    },
+
+    Reset_SavedIndex : function()
+    {
+        this.SavedIndex = this.Index;
+    },
+
+    Have_Changes : function()
+    {
+        if ( this.Index != this.SavedIndex )
+            return true;
+
+        return false;
+    }
+};
