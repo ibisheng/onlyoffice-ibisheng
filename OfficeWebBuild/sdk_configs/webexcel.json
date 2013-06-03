@@ -1,0 +1,181 @@
+{
+    "info": {
+        "version": "1.1",
+        "build": 145
+    },
+    "update_src": {
+        "revision": "HEAD",
+        "src": "../OfficeWebCommon ../OfficeWebWord ../OfficeWebExcel ../OfficeWebPowerPoint"
+    },
+    "extract_api": {
+        "src": "../OfficeWebWord/WebWord/apiCommon.js",
+        "dst": "../OfficeWebExcel/.build/Log/apiCommonExport.js"
+    },
+    "compile": {
+        "sdk": {
+            "src": [
+                "../OfficeWebCommon/Build/License.js",
+                "../OfficeWebCommon/docscoapisettings.js",
+                "../OfficeWebCommon/docscoapicommon.js",
+                "../OfficeWebCommon/docscoapi.js",
+                "../OfficeWebCommon/downloaderfiles.js",
+				"../OfficeWebCommon/commonDefines.js",
+				"../OfficeWebCommon/editorscommon.js",
+				"../OfficeWebCommon/NumFormat.js",
+                "../OfficeWebCommon/Charts/charts.js",
+                "../OfficeWebCommon/Charts/DrawingObjects.js",
+                "../OfficeWebWord/FontsFreeType/font_engine.js",
+                "../OfficeWebWord/FontsFreeType/FontFile.js",
+                "../OfficeWebWord/FontsFreeType/FontManager.js",
+                "../OfficeWebWord/WebWord/Drawing/Externals.js",
+                "../OfficeWebWord/WebWord/Drawing/Graphics.js",
+                "../OfficeWebWord/WebWord/Drawing/Metafile.js",
+                "../OfficeWebWord/WebWord/Drawing/AllFonts.js",
+                "../OfficeWebWord/WebWord/Drawing/GlobalLoaders.js",
+                "../OfficeWebWord/FontsFreeType/FontExport.js",
+                "../OfficeWebExcel/offlinedocs/test-workbook9/Editor.js",
+                "../OfficeWebExcel/offlinedocs/empty-workbook.js",
+                "../OfficeWebExcel/utils/utils.js",
+                "../OfficeWebExcel/model/clipboard.js",
+                "../OfficeWebExcel/model/autofilters.js",
+                "../OfficeWebExcel/graphics/DrawingContext.js",
+                "../OfficeWebExcel/graphics/pdfprinter.js",
+                "../OfficeWebExcel/model/CollaborativeEditing.js",
+                "../OfficeWebExcel/model/parserFormula.js",
+                "../OfficeWebExcel/model/Serialize.js",
+                "../OfficeWebExcel/model/WorkbookElems.js",
+                "../OfficeWebExcel/model/Workbook.js",
+                "../OfficeWebExcel/model/CellInfo.js",
+                "../OfficeWebExcel/model/AdvancedOptions.js",
+                "../OfficeWebExcel/model/History.js",
+                "../OfficeWebExcel/model/UndoRedo.js",
+                "../OfficeWebExcel/model/CellComment.js",
+                "../OfficeWebExcel/view/StringRender.js",
+                "../OfficeWebExcel/view/CellTextRender.js",
+                "../OfficeWebExcel/view/CellEditorView.js",
+                "../OfficeWebExcel/view/WorksheetView.js",
+                "../OfficeWebExcel/view/HandlerList.js",
+                "../OfficeWebExcel/view/EventsController.js",
+                "../OfficeWebExcel/view/WorkbookView.js",
+                "../OfficeWebExcel/view/scroll.js",
+                "../OfficeWebWord/WebWord/Editor/SerializeCommon.js",
+                "../OfficeWebWord/WebWord/Editor/GraphicObjects/ObjectTypes/Format.js",
+                "../OfficeWebCommon/Shapes/Serialize.js",
+                "../OfficeWebCommon/Shapes/SerializeWriter.js",
+				"../OfficeWebCommon/SerializeCommonWordExcel.js",
+                "../OfficeWebCommon/Charts/libraries/OfficeExcel.common.core.js",
+                "../OfficeWebCommon/Charts/libraries/OfficeExcel.common.annotate.js",
+                "../OfficeWebCommon/Charts/libraries/OfficeExcel.common.context.js",
+                "../OfficeWebCommon/Charts/libraries/OfficeExcel.common.effects.js",
+                "../OfficeWebCommon/Charts/libraries/OfficeExcel.common.key.js",
+                "../OfficeWebCommon/Charts/libraries/OfficeExcel.common.resizing.js",
+                "../OfficeWebCommon/Charts/libraries/OfficeExcel.common.tooltips.js",
+                "../OfficeWebCommon/Charts/libraries/OfficeExcel.common.zoom.js",
+                "../OfficeWebCommon/Charts/libraries/OfficeExcel.bar.js",
+                "../OfficeWebCommon/Charts/libraries/OfficeExcel.bipolar.js",
+                "../OfficeWebCommon/Charts/libraries/OfficeExcel.gantt.js",
+                "../OfficeWebCommon/Charts/libraries/OfficeExcel.hbar.js",
+                "../OfficeWebCommon/Charts/libraries/OfficeExcel.line.js",
+                "../OfficeWebCommon/Charts/libraries/OfficeExcel.pie.js",
+                "../OfficeWebCommon/Charts/libraries/OfficeExcel.radar.js",
+                "../OfficeWebCommon/Charts/libraries/OfficeExcel.rose.js",
+                "../OfficeWebCommon/Charts/libraries/OfficeExcel.rscatter.js",
+                "../OfficeWebCommon/Charts/libraries/OfficeExcel.scatter.js",
+                "../OfficeWebCommon/Charts/libraries/OfficeExcel.waterfall.js",
+                "../OfficeWebCommon/Charts/libraries/OfficeExcel.chartProperties.js",
+                "../OfficeWebCommon/Charts/libraries/hsv.js",
+                "../OfficeWebCommon/Charts/libraries/rgbcolor.js",
+                "../OfficeWebWord/WebWord/apiCommon.js",
+                "../OfficeWebExcel/.build/Log/apiCommonExport.js",
+                "../OfficeWebExcel/api.js",
+                "../OfficeWebExcel/apiDefines.js"
+            ],
+            "dst": "../OfficeWebExcel/sdk-all.js",
+            "externs": [
+                "../OfficeWebCommon/Build/Externs.js",
+                "../OfficeWebExcel/jquery/jquery-1.7.1.js",
+                "../OfficeWebExcel/jquery/jquery.mousewheel-3.0.6.js",
+                "../OfficeWebCommon/3rdparty/XRegExp/xregexp-all-min.js"
+            ],
+            "map": "sdk-all.js.map",
+            "log": "../OfficeWebExcel/.build/Log",
+            "define": [
+                "ASC_DOCS_API_LOAD_COAUTHORING_SETTINGS=false",
+                "ASC_DOCS_API_USE_FONTS_ORIGINAL_FORMAT=true"
+            ]
+        },
+        "defines": {
+            "src": [
+                "../OfficeWebCommon/Shapes/EditorSettings.js",
+				"../OfficeWebCommon/commonDefines.js",
+                "../OfficeWebExcel/apiDefines.js"
+            ],
+            "dst": "apiDefines.min.js"
+        },
+        "source_map": {
+            "url": "http://localhost:8080/sdk/OfficeWebExcel"
+        }
+    },
+    "deploy": {
+        "copy": {
+            "common": {
+                "files": {
+                    "<%= pkg.menu_path %>/OfficeWebExcel/model/": [
+                        "../OfficeWebCommon/Charts/DrawingObjects.js"
+                    ]
+                }
+            },
+            "api": {
+                "files": {
+                    "<%= pkg.menu_path %>/OfficeWebExcel/": [
+                        "../OfficeWebExcel/api.js",
+                        "../OfficeWebExcel/apiDefines.js",
+                        "../OfficeWebExcel/view/EventsController.js",
+                        "../OfficeWebExcel/view/HandlerList.js",
+                        "../OfficeWebExcel/model/AdvancedOptions.js",
+                        "../OfficeWebExcel/model/CellInfo.js",
+                        "../OfficeWebExcel/model/CellComment.js",
+                        "../OfficeWebExcel/utils/utils.js",
+                        "../OfficeWebExcel/css/*.css"
+                    ]
+                }
+            },
+            "sdk": {
+                "files": {
+                    "<%= pkg.menu_path %>/OfficeWebExcel/": "../OfficeWebExcel/sdk-all.js"
+                }
+            },
+            "doc": {
+                "files": {
+                    "<%= pkg.menu_path %>/OfficeWebExcel/offlinedocs/test-workbook9/": "../OfficeWebExcel/offlinedocs/test-workbook9/**"
+                }
+            },
+            "log": {
+                "files": {
+                    "<%= pkg.menu_path %>/OfficeWebExcel/": "../OfficeWebExcel/sdk-all.js.map"
+                }
+            },
+            "samlpe": {
+                "files": {
+                    "<%= pkg.menu_path %>/OfficeWebExcel/Spreadsheet.html": "../OfficeWebExcel/Spreadsheet.html.deploy"
+                }
+            },
+            "samlpe_files": {
+                "files": {
+                    "<%= pkg.menu_path %>/OfficeWebExcel/": [
+                        "../OfficeWebExcel/jquery/jquery-1.7.1.js",
+                        "../OfficeWebExcel/jquery/jquery.mousewheel-3.0.6.js",
+                        "../OfficeWebExcel/css/nav-buttons.png",
+                        "../OfficeWebExcel/css/gradient.png"
+                    ]
+                }
+            }
+        },
+        "store_log": {
+            "dst": "../OfficeWebExcel/.build/Log"
+        }
+    },
+    "tasks": {
+        "build": "increment_build extract_js_api compile_sdk deploy_sdk"
+    }
+}

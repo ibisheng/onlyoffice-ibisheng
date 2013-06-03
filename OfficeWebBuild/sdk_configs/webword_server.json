@@ -1,0 +1,93 @@
+{
+    "info": {
+        "version": "1.1",
+        "build": 35
+    },
+    "update_src": {
+        "revision": "HEAD",
+        "src": "../OfficeWebCommon ../OfficeWebWord"
+    },
+    "extract_api": {
+        "src": "../OfficeWebWord/WebWord/api.js",
+        "dst": "../OfficeWebWord/Build/Log/apiExport.js"
+    },
+    "compile": {
+        "sdk": {
+            "src": [
+                "../OfficeWebCommon/License.js",
+                "../OfficeWebWord/WebWord/merge/utils.js",
+                "../OfficeWebWord/WebWord/Drawing/Externals.js",
+                "../OfficeWebWord/WebWord/Drawing/AllFonts.js",
+                "../OfficeWebWord/WebWord/Drawing/GlobalLoaders.js",
+                "../OfficeWebWord/WebWord/Editor/CollaborativeEditing.js",
+                "../OfficeWebWord/WebWord/Editor/Comments.js",
+                "../OfficeWebWord/WebWord/Editor/History.js",
+                "../OfficeWebWord/WebWord/Editor/Styles.js",
+                "../OfficeWebWord/WebWord/Editor/DrawingObjects.js",
+                "../OfficeWebWord/WebWord/Editor/FlowObjects.js",
+                "../OfficeWebWord/WebWord/Editor/ParagraphContent.js",
+                "../OfficeWebWord/WebWord/Editor/Paragraph.js",
+                "../OfficeWebWord/WebWord/Editor/Sections.js",
+                "../OfficeWebWord/WebWord/Editor/Numbering.js",
+                "../OfficeWebWord/WebWord/Editor/HeaderFooter.js",
+                "../OfficeWebWord/WebWord/Editor/Document.js",
+                "../OfficeWebWord/WebWord/Editor/Common.js",
+                "../OfficeWebWord/WebWord/Editor/DocumentContent.js",
+                "../OfficeWebWord/WebWord/Editor/Table.js",
+                "../OfficeWebWord/WebWord/Editor/Serialize2.js",
+                "../OfficeWebWord/WebWord/apiDefines.js",
+                "../OfficeWebWord/WebWord/merge/api_merge.js"
+            ],
+            "dst": "../OfficeWebWord/WebWord/sdk-all.js",
+            "externs": [
+                "../OfficeWebWord/Build/apiExtern.js"
+            ],
+            "map": "sdk-all.js.map",
+            "log": "../OfficeWebWord/Build/Log"
+        },
+        "defines": {
+            "src": "../OfficeWebWord/WebWord/apiDefines.js",
+            "dst": "apiDefines.min.js"
+        },
+        "source_map": {
+            "url": "http://localhost:8080/sdk/OfficeWebWord"
+        }
+    },
+    "deploy": {
+        "copy": {
+            "api": {
+                "files": {
+                    "<%= pkg.menu_path %>/OfficeWebWord/": [
+                        "../OfficeWebWord/WebWord/api.js",
+                        "../OfficeWebWord/WebWord/apiDefines.js"
+                    ]
+                }
+            },
+            "sdk": {
+                "files": {
+                    "<%= pkg.menu_path %>/OfficeWebWord/WebWord/": "../OfficeWebWord/WebWord/sdk-all.js"
+                }
+            },
+            "doc": {
+                "files": {
+                    "<%= pkg.menu_path %>/OfficeWebWord/WebWord/document/": "../OfficeWebWord/WebWord/document/**"
+                }
+            },
+            "log": {
+                "files": {
+                    "<%= pkg.menu_path %>/OfficeWebWord/WebWord/": [
+                        "../OfficeWebWord/Build/Log/property.map",
+                        "../OfficeWebWord/Build/Log/variable.map",
+                        "../OfficeWebWord/Build/Log/apiExport.js"
+                    ]
+                }
+            }
+        },
+        "store_log": {
+            "dst": "../OfficeWebWord/Build/Log"
+        }
+    },
+    "tasks": {
+        "build": "compile_sdk"
+    }
+}
