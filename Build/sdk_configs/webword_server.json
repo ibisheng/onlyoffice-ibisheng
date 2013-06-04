@@ -8,37 +8,37 @@
         "src": "../Common ../Word"
     },
     "extract_api": {
-        "src": "../Word/WebWord/api.js",
+        "src": "../Word/api.js",
         "dst": "../Word/Build/Log/apiExport.js"
     },
     "compile": {
         "sdk": {
             "src": [
                 "../Common/License.js",
-                "../Word/WebWord/merge/utils.js",
-                "../Word/WebWord/Drawing/Externals.js",
-                "../Word/WebWord/Drawing/AllFonts.js",
-                "../Word/WebWord/Drawing/GlobalLoaders.js",
-                "../Word/WebWord/Editor/CollaborativeEditing.js",
-                "../Word/WebWord/Editor/Comments.js",
-                "../Word/WebWord/Editor/History.js",
-                "../Word/WebWord/Editor/Styles.js",
-                "../Word/WebWord/Editor/DrawingObjects.js",
-                "../Word/WebWord/Editor/FlowObjects.js",
-                "../Word/WebWord/Editor/ParagraphContent.js",
-                "../Word/WebWord/Editor/Paragraph.js",
-                "../Word/WebWord/Editor/Sections.js",
-                "../Word/WebWord/Editor/Numbering.js",
-                "../Word/WebWord/Editor/HeaderFooter.js",
-                "../Word/WebWord/Editor/Document.js",
-                "../Word/WebWord/Editor/Common.js",
-                "../Word/WebWord/Editor/DocumentContent.js",
-                "../Word/WebWord/Editor/Table.js",
-                "../Word/WebWord/Editor/Serialize2.js",
-                "../Word/WebWord/apiDefines.js",
-                "../Word/WebWord/merge/api_merge.js"
+                "../Word/merge/utils.js",
+                "../Word/Drawing/Externals.js",
+                "../Word/Drawing/AllFonts.js",
+                "../Word/Drawing/GlobalLoaders.js",
+                "../Word/Editor/CollaborativeEditing.js",
+                "../Word/Editor/Comments.js",
+                "../Word/Editor/History.js",
+                "../Word/Editor/Styles.js",
+                "../Word/Editor/DrawingObjects.js",
+                "../Word/Editor/FlowObjects.js",
+                "../Word/Editor/ParagraphContent.js",
+                "../Word/Editor/Paragraph.js",
+                "../Word/Editor/Sections.js",
+                "../Word/Editor/Numbering.js",
+                "../Word/Editor/HeaderFooter.js",
+                "../Word/Editor/Document.js",
+                "../Word/Editor/Common.js",
+                "../Word/Editor/DocumentContent.js",
+                "../Word/Editor/Table.js",
+                "../Word/Editor/Serialize2.js",
+                "../Word/apiDefines.js",
+                "../Word/merge/api_merge.js"
             ],
-            "dst": "../Word/WebWord/sdk-all.js",
+            "dst": "../Word/sdk-all.js",
             "externs": [
                 "../Word/Build/apiExtern.js"
             ],
@@ -46,7 +46,7 @@
             "log": "../Word/Build/Log"
         },
         "defines": {
-            "src": "../Word/WebWord/apiDefines.js",
+            "src": "../Word/apiDefines.js",
             "dst": "apiDefines.min.js"
         },
         "source_map": {
@@ -58,24 +58,24 @@
             "api": {
                 "files": {
                     "<%= pkg.menu_path %>/Word/": [
-                        "../Word/WebWord/api.js",
-                        "../Word/WebWord/apiDefines.js"
+                        "../Word/api.js",
+                        "../Word/apiDefines.js"
                     ]
                 }
             },
             "sdk": {
                 "files": {
-                    "<%= pkg.menu_path %>/Word/WebWord/": "../Word/WebWord/sdk-all.js"
+                    "<%= pkg.menu_path %>/Word/": "../Word/sdk-all.js"
                 }
             },
             "doc": {
                 "files": {
-                    "<%= pkg.menu_path %>/Word/WebWord/document/": "../Word/WebWord/document/**"
+                    "<%= pkg.menu_path %>/Word/document/": "../Word/document/**"
                 }
             },
             "log": {
                 "files": {
-                    "<%= pkg.menu_path %>/Word/WebWord/": [
+                    "<%= pkg.menu_path %>/Word/": [
                         "../Word/Build/Log/property.map",
                         "../Word/Build/Log/variable.map",
                         "../Word/Build/Log/apiExport.js"
