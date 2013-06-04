@@ -5935,7 +5935,7 @@ asc_docs_api.prototype.OnHandleMessage = function(event)
 				if(c_oAscServerError.NoError == data.error)
 					this.AddImageUrl(data.url);
 				else
-					t.sync_ErrorCallback(_mapAscServerErrorToAscError(data.error), c_oAscError.Level.NoCritical);
+					this.sync_ErrorCallback(_mapAscServerErrorToAscError(data.error), c_oAscError.Level.NoCritical);
 			}
 		}
 	}
