@@ -364,19 +364,19 @@
 
 			switch(info.asc_getHorAlign()){
 				case "right":
-					$("td[id*='td_ta']").removeClass("iconPressed");
+					$("li[id*='td_ta']").removeClass("iconPressed");
 					$("#td_ta_right").addClass("iconPressed");
 					break;
 				case "left":
-					$("td[id*='td_ta']").removeClass("iconPressed");
+					$("li[id*='td_ta']").removeClass("iconPressed");
 					$("#td_ta_left").addClass("iconPressed");
 					break;
 				case "center":
-					$("td[id*='td_ta']").removeClass("iconPressed");
+					$("li[id*='td_ta']").removeClass("iconPressed");
 					$("#td_ta_center").addClass("iconPressed");
 					break;
 				case "justify":
-					$("td[id*='td_ta']").removeClass("iconPressed");
+					$("li[id*='td_ta']").removeClass("iconPressed");
 					$("#td_ta_justify").addClass("iconPressed");
 					break;
 			}
