@@ -132,19 +132,6 @@ function CTableOutline(Table, PageNum, X, Y, W, H)
     this.H = H;
 }
 
-function CFontSetup()
-{
-    this.Name   = "";
-    this.Index  = -1;
-    this.Size   = 12;
-    this.Bold   = false;
-    this.Italic = false;
-
-    this.SetUpIndex = -1;
-    this.SetUpSize = 12;
-    this.SetUpStyle = -1;
-}
-
 function CTextMeasurer()
 {
     this.m_oManager     = new CFontManager();

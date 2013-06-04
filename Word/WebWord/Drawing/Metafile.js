@@ -4,6 +4,19 @@ var gr_state_pen_brush  = 2;
 var gr_state_state      = 3;
 var gr_state_all        = 4;
 
+function CFontSetup()
+{
+    this.Name   = "";
+    this.Index  = -1;
+    this.Size   = 12;
+    this.Bold   = false;
+    this.Italic = false;
+
+    this.SetUpIndex = -1;
+    this.SetUpSize = 12;
+    this.SetUpStyle = -1;
+}
+
 function CGrState_Pen()
 {
     this.Type   = gr_state_pen;
