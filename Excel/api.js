@@ -1088,7 +1088,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				//TODO: Вынести шрифты в коммоны, SetFontPath заменить на SetCommonPath,
 				//пердаваемый путь использовать для загрузки шрифтов и настороек.
 				if(true == ASC_DOCS_API_LOAD_COAUTHORING_SETTINGS){
-					this.ScriptLoader.LoadScriptAsync( this.FontLoader.fontFilesPath + "../../../Common/docscoapisettings.js", this._onLoadCoAuthoringSetings, this);
+					this.ScriptLoader.LoadScriptAsync( this.FontLoader.fontFilesPath + "../Common/docscoapisettings.js", this._onLoadCoAuthoringSetings, this);
 				}
 				else{
 					this._onLoadCoAuthoringSetings(this);
