@@ -1,1 +1,0 @@
-var arrayImages = new Array();
