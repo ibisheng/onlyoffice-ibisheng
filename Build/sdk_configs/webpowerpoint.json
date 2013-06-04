@@ -5,99 +5,99 @@
     },
     "update_src": {
         "revision": "HEAD",
-        "src": "../OfficeWebCommon ../OfficeWebWord ../OfficeWebPowerPoint"
+        "src": "../Common ../Word ../PowerPoint"
     },
     "concat_api": {
-        "../OfficeWebPowerPoint/api-all.js": [
-            "../OfficeWebPowerPoint/api.js",
-            "../OfficeWebPowerPoint/apiCommon.js"
+        "../PowerPoint/api-all.js": [
+            "../PowerPoint/api.js",
+            "../PowerPoint/apiCommon.js"
         ]
     },
     "extract_api": {
-        "src": "../OfficeWebPowerPoint/api-all.js",
-        "dst": "../OfficeWebPowerPoint/Build/Log/apiExport.js"
+        "src": "../PowerPoint/api-all.js",
+        "dst": "../PowerPoint/Build/Log/apiExport.js"
     },
     "compile": {
         "sdk": {
             "src": [
-                "../OfficeWebCommon/Build/License.js",
-                "../OfficeWebCommon/docscoapisettings.js",
-                "../OfficeWebCommon/docscoapicommon.js",
-                "../OfficeWebCommon/docscoapi.js",
-                "../OfficeWebCommon/wordcopypaste.js",
-                "../OfficeWebCommon/downloaderfiles.js",
-				"../OfficeWebCommon/editorscommon.js",
-                "../OfficeWebCommon/Shapes/Serialize.js",
-                "../OfficeWebCommon/Shapes/SerializeWriter.js",
-                "../OfficeWebWord/FontsFreeType/font_engine.js",
-                "../OfficeWebWord/FontsFreeType/FontFile.js",
-                "../OfficeWebWord/FontsFreeType/FontManager.js",
-                "../OfficeWebWord/WebWord/Drawing/Externals.js",
-                "../OfficeWebWord/WebWord/Drawing/AllFonts.js",
-                "../OfficeWebWord/WebWord/Drawing/GlobalLoaders.js",
-                "../OfficeWebPowerPoint/Drawing/ThemeLoader.js",
-                "../OfficeWebPowerPoint/Editor/CollaborativeEditing.js",
-                "../OfficeWebWord/FontsFreeType/FontExport.js",
-                "../OfficeWebPowerPoint/Editor/Styles.js",
-                "../OfficeWebPowerPoint/Editor/ParagraphContent.js",
-                "../OfficeWebWord/WebWord/Drawing/Metafile.js",
-                "../OfficeWebWord/WebWord/Drawing/GraphicsEvents.js",
-                "../OfficeWebWord/WebWord/Drawing/WorkEvents.js",
-                "../OfficeWebWord/WebWord/Drawing/Controls.js",
-                "../OfficeWebWord/WebWord/Drawing/Rulers.js",
-                "../OfficeWebPowerPoint/Editor/Table.js",
-                "../OfficeWebWord/WebWord/Editor/Common.js",
-                "../OfficeWebWord/WebWord/Editor/Sections.js",
-                "../OfficeWebWord/WebWord/Editor/CollaborativeEditing.js",
-                "../OfficeWebWord/WebWord/Drawing/scrolls/scroll.js",
-                "../OfficeWebPowerPoint/Editor/History.js",
-                "../OfficeWebPowerPoint/Editor/Paragraph.js",
-                "../OfficeWebPowerPoint/Editor/FlowObjects.js",
-                "../OfficeWebPowerPoint/Editor/DocumentContent.js",
-                "../OfficeWebPowerPoint/Editor/Presentation.js",
-                "../OfficeWebPowerPoint/Editor/SlideShowInfo.js",
-                "../OfficeWebPowerPoint/Editor/PresentationProperties.js",
-                "../OfficeWebPowerPoint/Editor/Shape.js",
-                "../OfficeWebPowerPoint/Editor/GraphicFrame.js",
-                "../OfficeWebPowerPoint/Editor/Numbering.js",
-                "../OfficeWebPowerPoint/Editor/TextBody.js",
-                "../OfficeWebPowerPoint/Editor/TableShape.js",
-                "../OfficeWebPowerPoint/Editor/Drawing/Geometry.js",
-                "../OfficeWebPowerPoint/Editor/Drawing/CreateGoemetry.js",
-                "../OfficeWebPowerPoint/Editor/Drawing/ColorArray.js",
-                "../OfficeWebPowerPoint/Editor/Drawing/Math.js",
-                "../OfficeWebPowerPoint/Editor/Drawing/Path.js",
-                "../OfficeWebPowerPoint/Editor/Drawing/ArcTo.js",
-                "../OfficeWebPowerPoint/Editor/Drawing/GraphicFigure.js",
-                "../OfficeWebPowerPoint/Editor/Drawing/Clone.js",
-                "../OfficeWebPowerPoint/Editor/Drawing/CImage.js",
-                "../OfficeWebPowerPoint/Editor/Drawing/StatesAutoShapes.js",
-                "../OfficeWebPowerPoint/Editor/Drawing/AutoShapesContainer.js",
-                "../OfficeWebPowerPoint/Editor/Drawing/Spline.js",
-                "../OfficeWebPowerPoint/Editor/Drawing/PolyLine.js",
-                "../OfficeWebPowerPoint/Editor/Drawing/PolyLine2.js",
-                "../OfficeWebPowerPoint/Editor/Drawing/Hit.js",
-                "../OfficeWebPowerPoint/Editor/Drawing/GroupShape.js",
-                "../OfficeWebPowerPoint/Editor/Drawing/Joined.js",
-                "../OfficeWebWord/WebWord/Drawing/Graphics.js",
-                "../OfficeWebWord/WebWord/Drawing/Overlay.js",
-                "../OfficeWebWord/WebWord/Drawing/ShapeDrawer.js",
-                "../OfficeWebPowerPoint/Drawing/DrawingDocument.js",
-                "../OfficeWebPowerPoint/Drawing/HtmlPage.js",
-                "../OfficeWebPowerPoint/Editor/Format.js",
-                "../OfficeWebPowerPoint/apiDefines.js",
-                "../OfficeWebPowerPoint/api-all.js",
-                "../OfficeWebPowerPoint/Build/Log/apiExport.js"
+                "../Common/Build/License.js",
+                "../Common/docscoapisettings.js",
+                "../Common/docscoapicommon.js",
+                "../Common/docscoapi.js",
+                "../Common/wordcopypaste.js",
+                "../Common/downloaderfiles.js",
+                "../Common/editorscommon.js",
+                "../Common/Shapes/Serialize.js",
+                "../Common/Shapes/SerializeWriter.js",
+                "../Word/FontsFreeType/font_engine.js",
+                "../Word/FontsFreeType/FontFile.js",
+                "../Word/FontsFreeType/FontManager.js",
+                "../Word/WebWord/Drawing/Externals.js",
+                "../Word/WebWord/Drawing/AllFonts.js",
+                "../Word/WebWord/Drawing/GlobalLoaders.js",
+                "../PowerPoint/Drawing/ThemeLoader.js",
+                "../PowerPoint/Editor/CollaborativeEditing.js",
+                "../Word/FontsFreeType/FontExport.js",
+                "../PowerPoint/Editor/Styles.js",
+                "../PowerPoint/Editor/ParagraphContent.js",
+                "../Word/WebWord/Drawing/Metafile.js",
+                "../Word/WebWord/Drawing/GraphicsEvents.js",
+                "../Word/WebWord/Drawing/WorkEvents.js",
+                "../Word/WebWord/Drawing/Controls.js",
+                "../Word/WebWord/Drawing/Rulers.js",
+                "../PowerPoint/Editor/Table.js",
+                "../Word/WebWord/Editor/Common.js",
+                "../Word/WebWord/Editor/Sections.js",
+                "../Word/WebWord/Editor/CollaborativeEditing.js",
+                "../Word/WebWord/Drawing/scrolls/scroll.js",
+                "../PowerPoint/Editor/History.js",
+                "../PowerPoint/Editor/Paragraph.js",
+                "../PowerPoint/Editor/FlowObjects.js",
+                "../PowerPoint/Editor/DocumentContent.js",
+                "../PowerPoint/Editor/Presentation.js",
+                "../PowerPoint/Editor/SlideShowInfo.js",
+                "../PowerPoint/Editor/PresentationProperties.js",
+                "../PowerPoint/Editor/Shape.js",
+                "../PowerPoint/Editor/GraphicFrame.js",
+                "../PowerPoint/Editor/Numbering.js",
+                "../PowerPoint/Editor/TextBody.js",
+                "../PowerPoint/Editor/TableShape.js",
+                "../PowerPoint/Editor/Drawing/Geometry.js",
+                "../PowerPoint/Editor/Drawing/CreateGoemetry.js",
+                "../PowerPoint/Editor/Drawing/ColorArray.js",
+                "../PowerPoint/Editor/Drawing/Math.js",
+                "../PowerPoint/Editor/Drawing/Path.js",
+                "../PowerPoint/Editor/Drawing/ArcTo.js",
+                "../PowerPoint/Editor/Drawing/GraphicFigure.js",
+                "../PowerPoint/Editor/Drawing/Clone.js",
+                "../PowerPoint/Editor/Drawing/CImage.js",
+                "../PowerPoint/Editor/Drawing/StatesAutoShapes.js",
+                "../PowerPoint/Editor/Drawing/AutoShapesContainer.js",
+                "../PowerPoint/Editor/Drawing/Spline.js",
+                "../PowerPoint/Editor/Drawing/PolyLine.js",
+                "../PowerPoint/Editor/Drawing/PolyLine2.js",
+                "../PowerPoint/Editor/Drawing/Hit.js",
+                "../PowerPoint/Editor/Drawing/GroupShape.js",
+                "../PowerPoint/Editor/Drawing/Joined.js",
+                "../Word/WebWord/Drawing/Graphics.js",
+                "../Word/WebWord/Drawing/Overlay.js",
+                "../Word/WebWord/Drawing/ShapeDrawer.js",
+                "../PowerPoint/Drawing/DrawingDocument.js",
+                "../PowerPoint/Drawing/HtmlPage.js",
+                "../PowerPoint/Editor/Format.js",
+                "../PowerPoint/apiDefines.js",
+                "../PowerPoint/api-all.js",
+                "../PowerPoint/Build/Log/apiExport.js"
             ],
-            "dst": "../OfficeWebPowerPoint/sdk-all.js",
+            "dst": "../PowerPoint/sdk-all.js",
             "externs": [
-                "../OfficeWebCommon/Build/Externs.js",
-                "../OfficeWebWord/WebWord/Drawing/scrolls/jquery.min.js",
-                "../OfficeWebCommon/3rdparty/Underscore/underscore-min.js",
-                "../OfficeWebCommon/3rdparty/Sockjs/sockjs-0.3.min.js"
+                "../Common/Build/Externs.js",
+                "../Word/WebWord/Drawing/scrolls/jquery.min.js",
+                "../Common/3rdparty/Underscore/underscore-min.js",
+                "../Common/3rdparty/Sockjs/sockjs-0.3.min.js"
             ],
             "map": "sdk-all.js.map",
-            "log": "../OfficeWebPowerPoint/Build/Log",
+            "log": "../PowerPoint/Build/Log",
             "define": [
                 "ASC_DOCS_API_LOAD_COAUTHORING_SETTINGS=false",
                 "ASC_DOCS_API_USE_FONTS_ORIGINAL_FORMAT=true"
@@ -105,47 +105,47 @@
         },
         "defines": {
             "src": [
-                "../OfficeWebCommon/Shapes/EditorSettings.js",
-                "../OfficeWebPowerPoint/themes/Themes.js",
-                "../OfficeWebPowerPoint/apiDefines.js"
+                "../Common/Shapes/EditorSettings.js",
+                "../PowerPoint/themes/Themes.js",
+                "../PowerPoint/apiDefines.js"
             ],
             "dst": "apiDefines.min.js"
         },
         "source_map": {
-            "url": "http://localhost:8080/sdk/OfficeWebPowerPoint"
+            "url": "http://localhost:8080/sdk/PowerPoint"
         }
     },
     "deploy": {
         "copy": {
             "api": {
                 "files": {
-                    "<%= pkg.menu_path %>/OfficeWebPowerPoint/": [
-                        "../OfficeWebPowerPoint/api.js",
-                        "../OfficeWebPowerPoint/apiCommon.js",
-                        "../OfficeWebPowerPoint/apiDefines.js"
+                    "<%= pkg.menu_path %>/PowerPoint/": [
+                        "../PowerPoint/api.js",
+                        "../PowerPoint/apiCommon.js",
+                        "../PowerPoint/apiDefines.js"
                     ]
                 }
             },
             "sdk": {
                 "files": {
-                    "<%= pkg.menu_path %>/OfficeWebPowerPoint/": [
-                        "../OfficeWebPowerPoint/sdk-all.js",
-                        "../OfficeWebPowerPoint/themes/theme*/**"
+                    "<%= pkg.menu_path %>/PowerPoint/": [
+                        "../PowerPoint/sdk-all.js",
+                        "../PowerPoint/themes/theme*/**"
                     ]
                 }
             },
             "doc": {
                 "files": {
-                    "<%= pkg.menu_path %>/OfficeWebPowerPoint/document/": "../OfficeWebPowerPoint/document/**"
+                    "<%= pkg.menu_path %>/PowerPoint/document/": "../PowerPoint/document/**"
                 }
             },
             "log": {
                 "files": {
-                    "<%= pkg.menu_path %>/OfficeWebPowerPoint/": [
-                        "../OfficeWebPowerPoint/sdk-all.js.map",
-                        "../OfficeWebPowerPoint/Build/Log/property.map",
-                        "../OfficeWebPowerPoint/Build/Log/variable.map",
-                        "../OfficeWebPowerPoint/Build/Log/apiExport.js"
+                    "<%= pkg.menu_path %>/PowerPoint/": [
+                        "../PowerPoint/sdk-all.js.map",
+                        "../PowerPoint/Build/Log/property.map",
+                        "../PowerPoint/Build/Log/variable.map",
+                        "../PowerPoint/Build/Log/apiExport.js"
                     ]
                 },
                 "options": {
@@ -154,17 +154,17 @@
             },
             "sample": {
                 "files": {
-                    "<%= pkg.menu_path %>/OfficeWebPowerPoint/": [
-                        "../OfficeWebPowerPoint/Images/**",
-                        "../OfficeWebPowerPoint/menu/**",
-                        "../OfficeWebPowerPoint/MenuIcons/**"
+                    "<%= pkg.menu_path %>/PowerPoint/": [
+                        "../PowerPoint/Images/**",
+                        "../PowerPoint/menu/**",
+                        "../PowerPoint/MenuIcons/**"
                     ],
-                    "<%= pkg.menu_path %>/OfficeWebPowerPoint/index.html": "../OfficeWebPowerPoint/index.html.deploy"
+                    "<%= pkg.menu_path %>/PowerPoint/index.html": "../PowerPoint/index.html.deploy"
                 }
             }
         },
         "store_log": {
-            "dst": "../OfficeWebPowerPoint/Build/Log"
+            "dst": "../PowerPoint/Build/Log"
         }
     },
     "tasks": {

@@ -5,128 +5,128 @@
     },
     "update_src": {
         "revision": "HEAD",
-        "src": "../OfficeWebCommon ../OfficeWebWord"
+        "src": "../Common ../Word"
     },
     "concat_api": {
-        "../OfficeWebWord/WebWord/api-all.js": [
-            "../OfficeWebWord/WebWord/api.js",
-            "../OfficeWebWord/WebWord/apiCommon.js"
+        "../Word/WebWord/api-all.js": [
+            "../Word/WebWord/api.js",
+            "../Word/WebWord/apiCommon.js"
         ]
     },
     "extract_api": {
-        "src": "../OfficeWebWord/WebWord/api-all.js",
-        "dst": "../OfficeWebWord/Build/Log/apiExport.js"
+        "src": "../Word/WebWord/api-all.js",
+        "dst": "../Word/Build/Log/apiExport.js"
     },
     "compile": {
         "sdk": {
             "src": [
-                "../OfficeWebCommon/Build/License.js",
-                "../OfficeWebCommon/docscoapisettings.js",
-                "../OfficeWebCommon/docscoapicommon.js",
-                "../OfficeWebCommon/docscoapi.js",
-                "../OfficeWebCommon/wordcopypaste.js",
-                "../OfficeWebCommon/downloaderfiles.js",
-				"../OfficeWebCommon/commonDefines.js",
-				"../OfficeWebCommon/editorscommon.js",
-				"../OfficeWebCommon/NumFormat.js",
-                "../OfficeWebCommon/Shapes/Serialize.js",
-                "../OfficeWebCommon/Shapes/SerializeWriter.js",
-				"../OfficeWebCommon/SerializeCommonWordExcel.js",
-                "../OfficeWebCommon/Charts/libraries/OfficeExcel.common.core.js",
-                "../OfficeWebCommon/Charts/libraries/OfficeExcel.common.annotate.js",
-                "../OfficeWebCommon/Charts/libraries/OfficeExcel.common.context.js",
-                "../OfficeWebCommon/Charts/libraries/OfficeExcel.common.effects.js",
-                "../OfficeWebCommon/Charts/libraries/OfficeExcel.common.key.js",
-                "../OfficeWebCommon/Charts/libraries/OfficeExcel.common.resizing.js",
-                "../OfficeWebCommon/Charts/libraries/OfficeExcel.common.tooltips.js",
-                "../OfficeWebCommon/Charts/libraries/OfficeExcel.common.zoom.js",
-                "../OfficeWebCommon/Charts/libraries/OfficeExcel.bar.js",
-                "../OfficeWebCommon/Charts/libraries/OfficeExcel.bipolar.js",
-                "../OfficeWebCommon/Charts/libraries/OfficeExcel.gantt.js",
-                "../OfficeWebCommon/Charts/libraries/OfficeExcel.hbar.js",
-                "../OfficeWebCommon/Charts/libraries/OfficeExcel.line.js",
-                "../OfficeWebCommon/Charts/libraries/OfficeExcel.pie.js",
-                "../OfficeWebCommon/Charts/libraries/OfficeExcel.radar.js",
-                "../OfficeWebCommon/Charts/libraries/OfficeExcel.rose.js",
-                "../OfficeWebCommon/Charts/libraries/OfficeExcel.rscatter.js",
-                "../OfficeWebCommon/Charts/libraries/OfficeExcel.scatter.js",
-                "../OfficeWebCommon/Charts/libraries/OfficeExcel.waterfall.js",
-                "../OfficeWebCommon/Charts/libraries/OfficeExcel.chartProperties.js",
-                "../OfficeWebCommon/Charts/libraries/hsv.js",
-                "../OfficeWebCommon/Charts/libraries/rgbcolor.js",
-                "../OfficeWebCommon/Charts/charts.js",
-                "../OfficeWebCommon/Charts/DrawingObjects.js",
-                "../OfficeWebWord/FontsFreeType/font_engine.js",
-                "../OfficeWebWord/FontsFreeType/FontFile.js",
-                "../OfficeWebWord/FontsFreeType/FontManager.js",
-                "../OfficeWebWord/WebWord/Drawing/Externals.js",
-                "../OfficeWebWord/WebWord/Drawing/AllFonts.js",
-                "../OfficeWebWord/WebWord/Drawing/GlobalLoaders.js",
-                "../OfficeWebWord/FontsFreeType/FontExport.js",
-                "../OfficeWebWord/WebWord/Drawing/translations.js",
-                "../OfficeWebWord/WebWord/Editor/GraphicObjects/GraphicObjects.js",
-                "../OfficeWebWord/WebWord/Editor/GraphicObjects/GraphicPage.js",
-                "../OfficeWebWord/WebWord/Editor/GraphicObjects/States.js",
-                "../OfficeWebWord/WebWord/Editor/GraphicObjects/Math.js",
-                "../OfficeWebWord/WebWord/Editor/GraphicObjects/TrackGraphicObjects.js",
-                "../OfficeWebWord/WebWord/Editor/GraphicObjects/WrapManager.js",
-                "../OfficeWebWord/WebWord/Editor/GraphicObjects/Spline.js",
-                "../OfficeWebWord/WebWord/Editor/GraphicObjects/PolyLine.js",
-                "../OfficeWebWord/WebWord/Editor/GraphicObjects/ObjectTypes/WordShape.js",
-                "../OfficeWebWord/WebWord/Editor/GraphicObjects/ObjectTypes/WordImage.js",
-                "../OfficeWebWord/WebWord/Editor/GraphicObjects/ObjectTypes/WordGroupShapes.js",
-                "../OfficeWebWord/WebWord/Editor/GraphicObjects/ObjectTypes/Format.js",
-                "../OfficeWebWord/WebWord/Editor/GraphicObjects/ObjectTypes/Geometry.js",
-                "../OfficeWebWord/WebWord/Editor/GraphicObjects/ObjectTypes/ShapeTracks.js",
-                "../OfficeWebWord/WebWord/Editor/GraphicObjects/ObjectTypes/GroupTracks.js",
-                "../OfficeWebWord/WebWord/Editor/GraphicObjects/ObjectTypes/CreateGeometry.js",
-                "../OfficeWebWord/WebWord/Editor/GraphicObjects/ObjectTypes/Path.js",
-                "../OfficeWebWord/WebWord/Editor/CollaborativeEditing.js",
-                "../OfficeWebWord/WebWord/Editor/Comments.js",
-                "../OfficeWebWord/WebWord/Editor/History.js",
-                "../OfficeWebWord/WebWord/Editor/Styles.js",
-                "../OfficeWebWord/WebWord/Editor/DrawingObjects.js",
-                "../OfficeWebWord/WebWord/Editor/FlowObjects.js",
-                "../OfficeWebWord/WebWord/Editor/ParagraphContent.js",
-                "../OfficeWebWord/WebWord/Editor/Paragraph.js",
-                "../OfficeWebWord/WebWord/Editor/Sections.js",
-                "../OfficeWebWord/WebWord/Editor/Numbering.js",
-                "../OfficeWebWord/WebWord/Editor/HeaderFooter.js",
-                "../OfficeWebWord/WebWord/Editor/Document.js",
-                "../OfficeWebWord/WebWord/Editor/Common.js",
-                "../OfficeWebWord/WebWord/Editor/DocumentContent.js",
-                "../OfficeWebWord/WebWord/Editor/Table.js",
-                "../OfficeWebWord/WebWord/Editor/Serialize2.js",
-                "../OfficeWebWord/WebWord/Drawing/Graphics.js",
-                "../OfficeWebWord/WebWord/Drawing/ArcTo.js",
-                "../OfficeWebWord/WebWord/Drawing/Hit.js",
-                "../OfficeWebWord/WebWord/Drawing/ColorArray.js",
-                "../OfficeWebWord/WebWord/Drawing/Overlay.js",
-                "../OfficeWebWord/WebWord/Drawing/ShapeDrawer.js",
-                "../OfficeWebWord/WebWord/Drawing/Metafile.js",
-                "../OfficeWebWord/WebWord/Drawing/DrawingDocument.js",
-                "../OfficeWebWord/WebWord/Drawing/GraphicsEvents.js",
-                "../OfficeWebWord/WebWord/Drawing/scrolls/iscroll.js",
-                "../OfficeWebWord/WebWord/Drawing/WorkEvents.js",
-                "../OfficeWebWord/WebWord/Drawing/Controls.js",
-                "../OfficeWebWord/WebWord/Drawing/Rulers.js",
-                "../OfficeWebWord/WebWord/Drawing/HtmlPage.js",
-                "../OfficeWebWord/WebWord/Drawing/documentrenderer.js",
-                "../OfficeWebWord/WebWord/Drawing/scrolls/scroll.js",
-                "../OfficeWebWord/WebWord/Editor/SerializeCommon.js",
-                "../OfficeWebWord/WebWord/apiDefines.js",
-                "../OfficeWebWord/WebWord/api-all.js",
-                "../OfficeWebWord/Build/Log/apiExport.js"
+                "../Common/Build/License.js",
+                "../Common/docscoapisettings.js",
+                "../Common/docscoapicommon.js",
+                "../Common/docscoapi.js",
+                "../Common/wordcopypaste.js",
+                "../Common/downloaderfiles.js",
+                "../Common/commonDefines.js",
+                "../Common/editorscommon.js",
+                "../Common/NumFormat.js",
+                "../Common/Shapes/Serialize.js",
+                "../Common/Shapes/SerializeWriter.js",
+                "../Common/SerializeCommonWordExcel.js",
+                "../Common/Charts/libraries/OfficeExcel.common.core.js",
+                "../Common/Charts/libraries/OfficeExcel.common.annotate.js",
+                "../Common/Charts/libraries/OfficeExcel.common.context.js",
+                "../Common/Charts/libraries/OfficeExcel.common.effects.js",
+                "../Common/Charts/libraries/OfficeExcel.common.key.js",
+                "../Common/Charts/libraries/OfficeExcel.common.resizing.js",
+                "../Common/Charts/libraries/OfficeExcel.common.tooltips.js",
+                "../Common/Charts/libraries/OfficeExcel.common.zoom.js",
+                "../Common/Charts/libraries/OfficeExcel.bar.js",
+                "../Common/Charts/libraries/OfficeExcel.bipolar.js",
+                "../Common/Charts/libraries/OfficeExcel.gantt.js",
+                "../Common/Charts/libraries/OfficeExcel.hbar.js",
+                "../Common/Charts/libraries/OfficeExcel.line.js",
+                "../Common/Charts/libraries/OfficeExcel.pie.js",
+                "../Common/Charts/libraries/OfficeExcel.radar.js",
+                "../Common/Charts/libraries/OfficeExcel.rose.js",
+                "../Common/Charts/libraries/OfficeExcel.rscatter.js",
+                "../Common/Charts/libraries/OfficeExcel.scatter.js",
+                "../Common/Charts/libraries/OfficeExcel.waterfall.js",
+                "../Common/Charts/libraries/OfficeExcel.chartProperties.js",
+                "../Common/Charts/libraries/hsv.js",
+                "../Common/Charts/libraries/rgbcolor.js",
+                "../Common/Charts/charts.js",
+                "../Common/Charts/DrawingObjects.js",
+                "../Word/FontsFreeType/font_engine.js",
+                "../Word/FontsFreeType/FontFile.js",
+                "../Word/FontsFreeType/FontManager.js",
+                "../Word/WebWord/Drawing/Externals.js",
+                "../Word/WebWord/Drawing/AllFonts.js",
+                "../Word/WebWord/Drawing/GlobalLoaders.js",
+                "../Word/FontsFreeType/FontExport.js",
+                "../Word/WebWord/Drawing/translations.js",
+                "../Word/WebWord/Editor/GraphicObjects/GraphicObjects.js",
+                "../Word/WebWord/Editor/GraphicObjects/GraphicPage.js",
+                "../Word/WebWord/Editor/GraphicObjects/States.js",
+                "../Word/WebWord/Editor/GraphicObjects/Math.js",
+                "../Word/WebWord/Editor/GraphicObjects/TrackGraphicObjects.js",
+                "../Word/WebWord/Editor/GraphicObjects/WrapManager.js",
+                "../Word/WebWord/Editor/GraphicObjects/Spline.js",
+                "../Word/WebWord/Editor/GraphicObjects/PolyLine.js",
+                "../Word/WebWord/Editor/GraphicObjects/ObjectTypes/WordShape.js",
+                "../Word/WebWord/Editor/GraphicObjects/ObjectTypes/WordImage.js",
+                "../Word/WebWord/Editor/GraphicObjects/ObjectTypes/WordGroupShapes.js",
+                "../Word/WebWord/Editor/GraphicObjects/ObjectTypes/Format.js",
+                "../Word/WebWord/Editor/GraphicObjects/ObjectTypes/Geometry.js",
+                "../Word/WebWord/Editor/GraphicObjects/ObjectTypes/ShapeTracks.js",
+                "../Word/WebWord/Editor/GraphicObjects/ObjectTypes/GroupTracks.js",
+                "../Word/WebWord/Editor/GraphicObjects/ObjectTypes/CreateGeometry.js",
+                "../Word/WebWord/Editor/GraphicObjects/ObjectTypes/Path.js",
+                "../Word/WebWord/Editor/CollaborativeEditing.js",
+                "../Word/WebWord/Editor/Comments.js",
+                "../Word/WebWord/Editor/History.js",
+                "../Word/WebWord/Editor/Styles.js",
+                "../Word/WebWord/Editor/DrawingObjects.js",
+                "../Word/WebWord/Editor/FlowObjects.js",
+                "../Word/WebWord/Editor/ParagraphContent.js",
+                "../Word/WebWord/Editor/Paragraph.js",
+                "../Word/WebWord/Editor/Sections.js",
+                "../Word/WebWord/Editor/Numbering.js",
+                "../Word/WebWord/Editor/HeaderFooter.js",
+                "../Word/WebWord/Editor/Document.js",
+                "../Word/WebWord/Editor/Common.js",
+                "../Word/WebWord/Editor/DocumentContent.js",
+                "../Word/WebWord/Editor/Table.js",
+                "../Word/WebWord/Editor/Serialize2.js",
+                "../Word/WebWord/Drawing/Graphics.js",
+                "../Word/WebWord/Drawing/ArcTo.js",
+                "../Word/WebWord/Drawing/Hit.js",
+                "../Word/WebWord/Drawing/ColorArray.js",
+                "../Word/WebWord/Drawing/Overlay.js",
+                "../Word/WebWord/Drawing/ShapeDrawer.js",
+                "../Word/WebWord/Drawing/Metafile.js",
+                "../Word/WebWord/Drawing/DrawingDocument.js",
+                "../Word/WebWord/Drawing/GraphicsEvents.js",
+                "../Word/WebWord/Drawing/scrolls/iscroll.js",
+                "../Word/WebWord/Drawing/WorkEvents.js",
+                "../Word/WebWord/Drawing/Controls.js",
+                "../Word/WebWord/Drawing/Rulers.js",
+                "../Word/WebWord/Drawing/HtmlPage.js",
+                "../Word/WebWord/Drawing/documentrenderer.js",
+                "../Word/WebWord/Drawing/scrolls/scroll.js",
+                "../Word/WebWord/Editor/SerializeCommon.js",
+                "../Word/WebWord/apiDefines.js",
+                "../Word/WebWord/api-all.js",
+                "../Word/Build/Log/apiExport.js"
             ],
-            "dst": "../OfficeWebWord/WebWord/sdk-all.js",
+            "dst": "../Word/WebWord/sdk-all.js",
             "externs": [
-                "../OfficeWebCommon/Build/Externs.js",
-                "../OfficeWebWord/WebWord/Drawing/scrolls/jquery.min.js",
-                "../OfficeWebCommon/3rdparty/Underscore/underscore-min.js",
-                "../OfficeWebCommon/3rdparty/Sockjs/sockjs-0.3.min.js"
+                "../Common/Build/Externs.js",
+                "../Word/WebWord/Drawing/scrolls/jquery.min.js",
+                "../Common/3rdparty/Underscore/underscore-min.js",
+                "../Common/3rdparty/Sockjs/sockjs-0.3.min.js"
             ],
             "map": "sdk-all.js.map",
-            "log": "../OfficeWebWord/Build/Log",
+            "log": "../Word/Build/Log",
             "define": [
                 "ASC_DOCS_API_LOAD_COAUTHORING_SETTINGS=false",
                 "ASC_DOCS_API_USE_FONTS_ORIGINAL_FORMAT=true"
@@ -134,79 +134,79 @@
         },
         "defines": {
             "src": [
-                "../OfficeWebCommon/Shapes/EditorSettings.js",
-				"../OfficeWebCommon/commonDefines.js",
-                "../OfficeWebWord/WebWord/apiDefines.js"
+                "../Common/Shapes/EditorSettings.js",
+                "../Common/commonDefines.js",
+                "../Word/WebWord/apiDefines.js"
             ],
             "dst": "apiDefines.min.js"
         },
         "source_map": {
-            "url": "http://localhost:8080/sdk/OfficeWebWord"
+            "url": "http://localhost:8080/sdk/Word"
         }
     },
     "deploy": {
         "copy": {
             "api": {
                 "files": {
-                    "<%= pkg.menu_path %>/OfficeWebWord/": [
-                        "../OfficeWebWord/WebWord/api.js",
-                        "../OfficeWebWord/WebWord/apiCommon.js",
-                        "../OfficeWebWord/WebWord/apiDefines.js"
+                    "<%= pkg.menu_path %>/Word/": [
+                        "../Word/WebWord/api.js",
+                        "../Word/WebWord/apiCommon.js",
+                        "../Word/WebWord/apiDefines.js"
                     ]
                 }
             },
             "sdk": {
                 "files": {
-                    "<%= pkg.menu_path %>/OfficeWebWord/WebWord/": [
-                        "../OfficeWebWord/WebWord/sdk-all.js",
-                        "../OfficeWebWord/WebWord/Images/*.cur"
+                    "<%= pkg.menu_path %>/Word/WebWord/": [
+                        "../Word/WebWord/sdk-all.js",
+                        "../Word/WebWord/Images/*.cur"
                     ]
                 }
             },
             "fonts": {
                 "files": {
-                    "<%= pkg.menu_path %>/OfficeWebWord/FontsFreeType/FontFiles/":
-					[
-                        "../OfficeWebWord/FontsFreeType/FontFiles/*.js",					
-                        "../OfficeWebWord/FontsFreeType/FontFiles/TrueType/*.ttf",
-                        "../OfficeWebWord/FontsFreeType/FontFiles/TrueType/*.ttc",
-                        "../OfficeWebWord/FontsFreeType/FontFiles/TrueType/*.otf",
-                        "../OfficeWebWord/FontsFreeType/FontFiles/TrueType/*.TTF",
-                        "../OfficeWebWord/FontsFreeType/FontFiles/TrueType/*.TTC",
-                        "../OfficeWebWord/FontsFreeType/FontFiles/TrueType/*.OTF"
+                    "<%= pkg.menu_path %>/Word/FontsFreeType/FontFiles/":
+                    [
+                        "../Word/FontsFreeType/FontFiles/*.js",
+                        "../Word/FontsFreeType/FontFiles/TrueType/*.ttf",
+                        "../Word/FontsFreeType/FontFiles/TrueType/*.ttc",
+                        "../Word/FontsFreeType/FontFiles/TrueType/*.otf",
+                        "../Word/FontsFreeType/FontFiles/TrueType/*.TTF",
+                        "../Word/FontsFreeType/FontFiles/TrueType/*.TTC",
+                        "../Word/FontsFreeType/FontFiles/TrueType/*.OTF"
                     ]
                 }
             },
             "doc": {
                 "files": {
-                    "<%= pkg.menu_path %>/OfficeWebWord/WebWord/document/": "../OfficeWebWord/WebWord/document/**"
+                    "<%= pkg.menu_path %>/Word/WebWord/document/": "../Word/WebWord/document/**"
                 }
             },
             "mobile_downloader": {
                 "files": {
-                    "<%= pkg.menu_path %>/OfficeWebCommon/MobileDownloader/": "../OfficeWebCommon/MobileDownloader/**"
+                    "<%= pkg.menu_path %>/Common/MobileDownloader/": "../Common/MobileDownloader/**"
                 }
             },
             "docscoapisettings": {
                 "files": {
-                    "<%= pkg.menu_path %>/OfficeWebCommon/": [
-						"../OfficeWebCommon/docscoapisettings.js",
-						"../OfficeWebCommon/commonDefines.js"
-					]
+                    "<%= pkg.menu_path %>/Common/": [
+                        "../Common/docscoapisettings.js",
+                        "../Common/commonDefines.js"
+                    ]
                 }
             },
             "log": {
                 "files": {
-                    "<%= pkg.menu_path %>/OfficeWebWord/WebWord/": [
-                        "../OfficeWebWord/Build/Log/property.map",
-                        "../OfficeWebWord/Build/Log/variable.map",
-                        "../OfficeWebWord/Build/Log/apiExport.js"
+                    "<%= pkg.menu_path %>/Word/WebWord/": [
+                        "../Word/Build/Log/property.map",
+                        "../Word/Build/Log/variable.map",
+                        "../Word/Build/Log/apiExport.js"
                     ]
                 }
             }
         },
         "store_log": {
-            "dst": "../OfficeWebWord/Build/Log"
+            "dst": "../Word/Build/Log"
         }
     },
     "tasks": {
