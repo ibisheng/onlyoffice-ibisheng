@@ -1329,11 +1329,7 @@ function BinarySharedStringsTableWriter(memory, oSharedStrings)
     {
         var oThis = this;
         if(null != run.format)
-		{
-			var fontMinimized = run.format.getDif(g_oDefaultFontAbs);
-			if(null != fontMinimized)
-				this.bs.WriteItem(c_oSerSharedStringTypes.RPr, function(){oThis.bsw.WriteFont(fontMinimized);});
-		}
+			this.bs.WriteItem(c_oSerSharedStringTypes.RPr, function(){oThis.bsw.WriteFont(run.format);});
 		if(null != run.text)
 		{
 			this.memory.WriteByte(c_oSerSharedStringTypes.Text);
