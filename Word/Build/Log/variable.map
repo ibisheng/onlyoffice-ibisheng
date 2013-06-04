@@ -1537,7 +1537,7 @@ cff_operator_seac:Cy
 CFontFile:dA
 tt_face_free_ps_names:es
 COverlay:JZ
-CDocMeta:z0
+CDocMeta:K0
 c_oSer_ChartSeriesNumCacheType$NumCacheVal:Wk
 _ph_summ__two_obj_and_two_tx:jK
 c_oSer_CommentsType$Replies:CX
@@ -2092,19 +2092,19 @@ L 124:Jr
 L 123:Nz
 L 122:Mz
 L 121:Hl
-L 120:K0
+L 120:J0
 JSCompiler_StaticMethods_AddRoundRect:LZ
 JSCompiler_StaticMethods__BordersToStyle:ob
 c_oAscError$ID$SplitCellMaxCols:YS
 FONT_TYPE_ADDITIONAL_CUT:XA
 CAscSlideProps:N2
-L 118:I0
-L 119:J0
-L 116:G0
+L 118:H0
+L 119:I0
+L 116:F0
 ParaNewLine:Yc
-L 117:H0
-L 114:E0
-L 115:F0
+L 117:G0
+L 114:D0
+L 115:E0
 CopyProcessor:ka
 TT_GaspRange:Co
 EGlyphState$glyphstateNormal:gA
@@ -2166,7 +2166,7 @@ L 111:Lz
 L 110:Kz
 L 113:mn
 tt_get_interface:Zw
-L 112:D0
+L 112:C0
 bIsSupportOriginalFormatFonts:RA
 L 103:Gl
 CAutoshapeTrack:TZ
@@ -2176,9 +2176,9 @@ STATES_ID_PRE_CHANGE_ADJ_GROUPED:RB
 historyitem_AddToSpTree:VH
 L 105:Ku
 CAscFill:C2
-L 106:A0
-L 107:B0
-L 108:C0
+L 106:z0
+L 107:A0
+L 108:B0
 L 109:Jz
 ETblStyleOverrideType$tblstyleoverridetypeBand2Horz:XX
 para_Empty:ZM

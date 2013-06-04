@@ -228,6 +228,7 @@ prop:AddURL
 prop:Help
 prop:ClearCache
 prop:SetFontRenderingMode
+prop:processSavedFile
 prop:startGetDocInfo
 prop:stopGetDocInfo
 prop:sync_DocInfoCallback
@@ -1185,6 +1186,7 @@ asc_docs_api.prototype['AddURL'] = asc_docs_api.prototype.AddURL;
 asc_docs_api.prototype['Help'] = asc_docs_api.prototype.Help;
 asc_docs_api.prototype['ClearCache'] = asc_docs_api.prototype.ClearCache;
 asc_docs_api.prototype['SetFontRenderingMode'] = asc_docs_api.prototype.SetFontRenderingMode;
+asc_docs_api.prototype['processSavedFile'] = asc_docs_api.prototype.processSavedFile;
 asc_docs_api.prototype['startGetDocInfo'] = asc_docs_api.prototype.startGetDocInfo;
 asc_docs_api.prototype['stopGetDocInfo'] = asc_docs_api.prototype.stopGetDocInfo;
 asc_docs_api.prototype['sync_DocInfoCallback'] = asc_docs_api.prototype.sync_DocInfoCallback;
