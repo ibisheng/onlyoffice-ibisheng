@@ -730,7 +730,7 @@ JSCompiler_StaticMethods_Internal_Check_TableRows:rB
 historyitem_type_TableId:Tw
 c_oAscFill$FILL_TYPE_SOLID:VK
 ParaSpace:qc
-Window_OnMouseUp:wz
+Window_OnMouseUp:kz
 CorrectUniColor:vL
 CCollaborativeChanges:Vw
 _ph_summ_chart_and_tx:cK
@@ -1176,7 +1176,7 @@ ft_var_readpackeddeltas:wr
 historyitem_TableRow_RemoveCell:WB
 JSCompiler_StaticMethods_AddCnx:J
 JSCompiler_StaticMethods_Internal_Get_StartMergedCell2:jB
-FT_SqrtFixed:bi
+FT_SqrtFixed:gi
 JSCompiler_StaticMethods__Decide_AddParagraph:nc
 tt_cmap2_char_index:un
 c_oMainTables$NotesMasters:Kg
@@ -1407,13 +1407,13 @@ L 120:xg
 JSCompiler_StaticMethods__BordersToStyle:lb
 FONT_TYPE_ADDITIONAL_CUT:bw
 CAscSlideProps:DL
-L 118:vz
+L 118:wz
 L 119:Us
 L 116:Mm
 ParaNewLine:zc
 L 117:kp
 L 114:Uk
-L 115:uz
+L 115:vz
 TT_GaspRange:ij
 CopyProcessor:qa
 JSCompiler_StaticMethods_slidesPaste:xF
@@ -1449,8 +1449,8 @@ historyitem_TableId_Reset:Cw
 T1_Decoder_ZoneRec:jm
 L 102:TJ
 T1_Size_Request:vu
-L 101:rz
-L 100:qz
+L 101:sz
+L 100:rz
 FT_GlyphLoader_Prepare:Ri
 FT_Smooth_Renderer_Class:pp
 CColorModifiers:jI
@@ -1458,18 +1458,18 @@ tblwidth_Auto:sx
 FT_Size_Metrics:Tj
 bIsIE:CH
 find_sbit_range:jn
-L 111:tz
+L 111:uz
 L 110:Aj
 L 113:kh
 tt_get_interface:Xr
-L 112:gi
+L 112:fi
 bIsSupportOriginalFormatFonts:Wv
 L 103:wb
 CAutoshapeTrack:PH
-L 104:fi
+L 104:ei
 JSCompiler_StaticMethods_Internal_RecalculateGrid:tA
 plusDiv:tG
-L 105:sz
+L 105:tz
 CAscFill:BL
 L 106:Lm
 L 107:Te
@@ -1957,7 +1957,7 @@ L 77:Rk
 L 78:Sk
 t1_args_count:Zl
 dublicate_matrix:Nj
-L 79:ei
+L 79:di
 CHorRulerRepaintChecker:Pz
 AFM_StreamRec:gl
 numbering_presentationnumfrmt_ArabicPeriod:Ua
@@ -1967,12 +1967,12 @@ TT_Forget_Glyph_Frame:Hr
 gray_record_cell:Ro
 JSCompiler_StaticMethods_Stop:qE
 trimString:Yb
-L 70:ci
+L 70:bi
 FT_PEEK_USHORT:Hh
 L 72:Sf
-L 71:di
+L 71:ci
 L 64:Se
-L 65:kz
+L 65:lz
 L 62:vj
 BULLET_TYPE_TYPEFACE_BUFONT:lg
 CUniFill:af
@@ -1991,9 +1991,9 @@ tt_sfnt_id_rec:ls
 tt_face_load_name:Nm
 L 61:Ps
 L 60:Wa
-L 99:pz
+L 99:qz
 L 95:Ss
-L 96:oz
+L 96:pz
 L 97:Ts
 JSCompiler_StaticMethods_Set_TableBorder_Top:dd
 L 98:SJ
@@ -2003,12 +2003,12 @@ FT_Request_Metrics:gs
 ParaPresentationNumbering:Ly
 SPH_ScaleRule:Ip
 L 92:QJ
-L 91:mz
+L 91:nz
 nSldLtTObjTx:gJ
 L 94:RJ
 JSCompiler_StaticMethods_Document_UpdateUndoRedoState:nC
 CreateUIntArray:Kk
-L 93:nz
+L 93:oz
 global_keyboardEvent:gz
 FT_RoundFix:Th
 CFontFileLoader:O
@@ -2018,7 +2018,7 @@ _ph_summ__two_obj_and_tx:pK
 tt_name_entry_ascii_from_utf16:Eo
 Editor_Copy_GetElem:ha
 JSCompiler_StaticMethods_Set_TableBorder_InsideV:Xc
-L 88:lz
+L 88:mz
 L 89:OJ
 L 86:NJ
 JSCompiler_StaticMethods_Set_Inline:JB
