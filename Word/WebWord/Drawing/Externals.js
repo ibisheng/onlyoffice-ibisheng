@@ -97,7 +97,7 @@ function CFontFileLoader(id)
         if (-1 != _srcInd)
             _src = _src.substring(0, _srcInd);
 
-        scriptElem.setAttribute('src', basePath + _src + ".js");
+        scriptElem.setAttribute('src', basePath + "js/" + _src + ".js");
         scriptElem.setAttribute('type','text/javascript');
         document.getElementsByTagName('head')[0].appendChild(scriptElem);
         return false;
@@ -128,7 +128,7 @@ function CFontFileLoader(id)
         }
 
         var xhr = new XMLHttpRequest();
-        xhr.open('GET', basePath + "TrueType/" + this.Id, true); // TODO:
+        xhr.open('GET', basePath + "native/" + this.Id, true); // TODO:
 
         if (typeof ArrayBuffer !== 'undefined' && !window.opera)
             xhr.responseType = 'arraybuffer';

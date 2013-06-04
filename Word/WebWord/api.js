@@ -755,7 +755,7 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 	}
 	else
     {
-        documentUrl = this.FontLoader.fontFilesPath + "../../WebWord/document/";
+        documentUrl = this.FontLoader.fontFilesPath + "../Word/WebWord/document/";
         c_DocInfo.put_OfflineApp(true);
 
         // For test create unique id
