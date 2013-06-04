@@ -10,7 +10,7 @@ var documentId = undefined;
 var documentUrl = 'null';
 var documentTitle = 'null';
 var documentFormat = 'null';
-var documentVKey = 'null';
+var documentVKey = null;
 var documentOrigin = "";
 
 function CDocOpenProgress()
@@ -2049,7 +2049,13 @@ asc_docs_api.prototype.asc_Print = function()
 			sendCommand(editor, function(){editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Print);}, JSON.stringify(rData));
 		}
 		else
-			_downloadAs(this, c_oAscFileType.PDF, function(){editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Print);}, true);
+			_downloadAs(this, c_oAscFileType.PDF, function(incomeObject){
+				if(null != incomeObject && "save" == incomeObject.type)
+				{
+					var outputData = JSON.parse(incomeObject.data);
+					editor.processSavedFile(outputData.url, false);
+				}
+				editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Print);}, true);
 	}
 }
 asc_docs_api.prototype.Undo = function()
@@ -2145,7 +2151,13 @@ function OnSave_Callback(e)
              data = JSON.stringify( CollaborativeEditing.Get_SelfChanges() );
              */
             var sData = "mnuSaveAs" + cCharDelimiter + JSON.stringify(oAdditionalData) + cCharDelimiter + data;
-            sendCommand(editor, function(){}, sData);
+            sendCommand(editor, function(incomeObject){
+				if(null != incomeObject && "save" == incomeObject.type)
+				{
+					var outputData = JSON.parse(incomeObject.data);
+					editor.processSavedFile(outputData.url, true);
+				}
+			}, sData);
         }
     } else {
 		nState = editor.CoAuthoringApi.get_state();
@@ -2161,7 +2173,13 @@ function OnSave_Callback(e)
 asc_docs_api.prototype.asc_DownloadAs = function(typeFile){//передаем число соответствующее своему формату.
 	this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
 	var editor = this;
-	_downloadAs(this, typeFile, function(){editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);}, true);
+	_downloadAs(this, typeFile, function(incomeObject){
+		if(null != incomeObject && "save" == incomeObject.type)
+		{
+			var outputData = JSON.parse(incomeObject.data);
+			editor.processSavedFile(outputData.url, false);
+		}
+		editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);}, true);
 }
 asc_docs_api.prototype.Resize = function(){
 	if (false === this.bInit_word_control)
@@ -2200,7 +2218,32 @@ asc_docs_api.prototype.SetFontRenderingMode = function(mode)
     if (this.bInit_word_control)
         this.WordControl.OnScroll();
 }
-
+asc_docs_api.prototype.processSavedFile = function(url, bInner)
+{
+	if(bInner)
+	{
+		var urlAbs = documentOrigin + g_sResourceServiceLocalUrl + encodeURIComponent(url);
+		this.asc_fireCallback("asc_onSaveUrl", urlAbs, function(hasError){});
+	}
+	else
+	{
+		var urlAbs = g_sResourceServiceLocalUrl + encodeURIComponent(url);
+		var nIndex = documentTitle.lastIndexOf(".");
+		if(-1 != nIndex)
+		{
+			var nIndexFormat = url.lastIndexOf(".");
+			var sDocumentFilename = documentTitle.substring(0, nIndex);
+			urlAbs += "&filename=" + encodeURIComponent(sDocumentFilename);
+			if(-1 != nIndexFormat)
+				urlAbs += url.substring(nIndexFormat);
+		}
+		if( this.isMobileVersion ){
+			window.open("../../../../Common/MobileDownloader/download.html?file="+urlAbs,"_parent","",false);
+		}
+		else
+			getFile(urlAbs);
+	}	
+}
 asc_docs_api.prototype.startGetDocInfo = function(){
 	/*
 	Возвращаем объект следующего вида:
@@ -6086,39 +6129,8 @@ function sendCommand(editor, fCallback, rdata){
                     setTimeout( function(){sendCommand(editor, fCallback,  JSON.stringify(rData))}, 3000);
                 break;
                 case "save":
-					var outputData = JSON.parse(incomeObject.data);
-					if(c_oAscFileType.INNER != outputData.format)
-					{
-						var url = g_sResourceServiceLocalUrl + encodeURIComponent(outputData.url);
-						var nIndex = documentTitle.lastIndexOf(".");
-						if(-1 != nIndex)
-						{
-							var nIndexFormat = outputData.url.lastIndexOf(".");
-							var sDocumentFilename = documentTitle.substring(0, nIndex);
-							url += "&filename=" + encodeURIComponent(sDocumentFilename);
-							if(-1 != nIndexFormat)
-								url += outputData.url.substring(nIndexFormat);
-						}
-						if( editor.isMobileVersion ){
-							window.open("../../../../Common/MobileDownloader/download.html?file="+url,"_parent","",false);
-						}
-						else {
-							getFile(url);
-							if(fCallback)
-								fCallback(incomeObject);
-						}
-					}
-					else
-					{
-						var sUrl = documentOrigin + g_sResourceServiceLocalUrl + encodeURIComponent(outputData.url);
-						editor.asc_fireCallback("asc_onSaveUrl", sUrl, function(hasError){
-							if (hasError){
-								;//sendCommand(editor, function(){}, "cc");
-							}
-						});
-						if(fCallback)
-							fCallback(incomeObject);
-					}
+					if(fCallback)
+						fCallback(incomeObject);
                 break;
                 case "waitsave":
 				{

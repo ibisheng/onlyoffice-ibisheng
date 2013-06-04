@@ -65,7 +65,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.documentUrl = "null";
 			this.documentTitle = "null";
 			this.documentFormat = "null";
-			this.documentVKey = "null";
+			this.documentVKey = null;
 			this.documentOrigin = "";
 			this.cCharDelimiter = String.fromCharCode(5);
 			this.chartEditor = undefined;
@@ -446,7 +446,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				var that = this;
 				// Меняем тип состояния (на сохранение)
 				this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Save;
-				this._asc_downloadAs(typeFile, function(){
+				this._asc_downloadAs(typeFile, function(incomeObject){
+					if(null != incomeObject && "save" == incomeObject.type)
+					{
+						var outputData = JSON.parse(incomeObject.data);
+						that.asc_processSavedFile(outputData.url, false);
+					}
 					// Меняем тип состояния (на никакое)
 					that.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
 					that.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
@@ -611,7 +616,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 							var v = {"id":this.documentId, "format": this.documentFormat, "vkey": this.documentVKey, "editorid": c_oEditorId.Speadsheet, "c":"reopen", "url": this.documentUrl, "title": this.documentTitle, "embeddedfonts": this.isUseEmbeddedCutFonts, "delimiter": option.asc_getDelimiter(), "codepage": option.asc_getCodePage()};
 							this._asc_sendCommand(function (response) {t._startOpenDocument(response);}, JSON.stringify(v));
 						} else if (this.advancedOptionsAction === c_oAscAdvancedOptionsAction.Save)
-							this._asc_downloadAs(c_oAscFileType.CSV, function(){
+							this._asc_downloadAs(c_oAscFileType.CSV, function(incomeObject){
+								if(null != incomeObject && "save" == incomeObject.type)
+								{
+									var outputData = JSON.parse(incomeObject.data);
+									t.asc_processSavedFile(outputData.url, false);
+								}
 								// Меняем тип состояния (на никакое)
 								t.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
 								t.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
@@ -619,7 +629,33 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					break;
 				}
 			},
-
+			asc_processSavedFile: function(url, bInner)
+			{
+				if(bInner)
+				{
+					var urlAbs = this.documentOrigin + g_sResourceServiceLocalUrl + encodeURIComponent(url);
+					this.handlers.trigger("asc_onSaveUrl", urlAbs, function(hasError){});
+				}
+				else
+				{
+					var urlAbs = g_sResourceServiceLocalUrl + encodeURIComponent(url);
+					var nIndex = this.documentTitle.lastIndexOf(".");
+					if(-1 != nIndex)
+					{
+						var nIndexFormat = url.lastIndexOf(".");
+						var sDocumentFilename = this.documentTitle.substring(0, nIndex);
+						urlAbs += "&filename=" + encodeURIComponent(sDocumentFilename);
+						if(-1 != nIndexFormat)
+							urlAbs += url.substring(nIndexFormat);
+					}
+					if( this.isMobileVersion ){
+						window.open("../../../sdk/Common/MobileDownloader/download.html?file="+urlAbs,"_parent","",false);
+					}
+					else {
+						getFile(urlAbs);
+					}
+				}
+			},
 			// Опции страницы (для печати)
 			asc_setPageOptions: function (options, index) {
 				var sheetIndex = (undefined !== index && null !== index) ? index : this.wbModel.getActive();
@@ -740,39 +776,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 									//oThis._asc_sendCommand(callback, "opencsv", oThis.documentTitle, JSON.stringify(value));
 									break;
 								case "save":
-									var outputData = JSON.parse(incomeObject.data);
-									if(c_oAscFileType.INNER != outputData.format)
-									{
-										var url = g_sResourceServiceLocalUrl + encodeURIComponent(outputData.url);
-										var nIndex = oThis.documentTitle.lastIndexOf(".");
-										if(-1 != nIndex)
-										{
-											var nIndexFormat = outputData.url.lastIndexOf(".");
-											var sDocumentFilename = oThis.documentTitle.substring(0, nIndex);
-											url += "&filename=" + encodeURIComponent(sDocumentFilename);
-											if(-1 != nIndexFormat)
-												url += outputData.url.substring(nIndexFormat);
-										}
-										if( oThis.isMobileVersion ){
-											window.open("../../../sdk/Common/MobileDownloader/download.html?file="+url,"_parent","",false);
-										}
-										else {
-											getFile(url);
-										}
-										if(callback)
-											callback({returnCode: 0, val:incomeObject.data});
-									}
-									else
-									{
-										var sUrl = oThis.documentOrigin + g_sResourceServiceLocalUrl + encodeURIComponent(outputData.url);
-										oThis.handlers.trigger("asc_onSaveUrl", sUrl, function(hasError){
-											if (hasError){
-												;//oThis._asc_sendCommand(/*callback*/null, /*command*/"cc");
-											}
-										});
-										if(callback)
-											callback(incomeObject);
-									}
+									if(callback)
+										callback(incomeObject);
 									break;
 								case "waitopen":
 									var rData = {"id":oThis.documentId, "format": oThis.documentFormat, "vkey": oThis.documentVKey, "editorid": c_oEditorId.Spreadsheet, "c":"chopen"};
@@ -823,6 +828,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 
 			_asc_save: function () {
+				var that = this;
 				this.wb._initCommentsToSave();
 				var oBinaryFileWriter = new BinaryFileWriter(this.wbModel);
 				var data = oBinaryFileWriter.Write();
@@ -830,9 +836,15 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				oAdditionalData["c"] = "save";
 				oAdditionalData["id"] = this.documentId;
 				oAdditionalData["vkey"] = this.documentVKey;
-				oAdditionalData["outputformat"] = c_oAscFileType.XLSY;
+				oAdditionalData["outputformat"] = c_oAscFileType.INNER;
 				oAdditionalData["savetype"] = "completeall";
-				this._asc_sendCommand (/*callback*/ null, "mnuSaveAs" + this.cCharDelimiter + JSON.stringify(oAdditionalData) + this.cCharDelimiter + data);
+				this._asc_sendCommand (/*callback*/ function(incomeObject){
+					if(null != incomeObject && "save" == incomeObject.type)
+					{
+						var outputData = JSON.parse(incomeObject.data);
+						that.asc_processSavedFile(outputData.url, true);
+					}
+				}, "mnuSaveAs" + this.cCharDelimiter + JSON.stringify(oAdditionalData) + this.cCharDelimiter + data);
 			},
 
 			_asc_downloadAs: function (sFormat, fCallback, bStart, options, sSaveKey) { //fCallback({returnCode:"", ...})

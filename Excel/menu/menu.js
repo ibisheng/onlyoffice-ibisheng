@@ -485,11 +485,11 @@
 	var sUserNameAndId = "user_" + Math.floor ((Math.random() * 100) + 1);
 
 	api.asc_LoadDocument({
-		"Id"     : key ? decodeURIComponent(getURLParameter("key")) : undefined,
-		"Url"    : key ? decodeURIComponent(getURLParameter("url")) : undefined,
-		"Title"  : key ? decodeURIComponent(getURLParameter("title")).replace(new RegExp("\\+",'g')," ") : undefined,
-		"Format" : key ? decodeURIComponent(getURLParameter("filetype")) : undefined,
-		"VKey"   : key ? decodeURIComponent(getURLParameter("vkey")) : undefined,
+		"Id"     : getURLParameter("key") ? decodeURIComponent(getURLParameter("key")) : undefined,
+		"Url"    : getURLParameter("url") ? decodeURIComponent(getURLParameter("url")) : undefined,
+		"Title"  : getURLParameter("title") ? decodeURIComponent(getURLParameter("title")).replace(new RegExp("\\+",'g')," ") : undefined,
+		"Format" : getURLParameter("filetype") ? decodeURIComponent(getURLParameter("filetype")) : undefined,
+		"VKey"   : getURLParameter("vkey") ? decodeURIComponent(getURLParameter("vkey")) : undefined,
 		"Origin" : (sProtocol.search(/\w+/) >= 0 ? sProtocol + "//" : "") + sHost,
 		"UserId" : sUserNameAndId,
 		"UserName" : sUserNameAndId,

@@ -49,7 +49,7 @@ var c_oAscConfirm = {
 	ConfirmReplaceRange : 0
 };
 var c_oAscFileType = {
-	INNER:		0x1002,
+	INNER:		0x0101,
 	XLSX:		0x0101,
 	XLS:		0x0102,
 	ODS:		0x0103,

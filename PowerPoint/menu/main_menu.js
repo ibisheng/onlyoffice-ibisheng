@@ -2455,16 +2455,16 @@ $(".colorWatch").mouseover(function(){
 	c_DocInfo.put_Id( getURLParameter("key") ?
 							decodeURIComponent(getURLParameter("key")) :
 							undefined );
-	c_DocInfo.put_Url( getURLParameter("key") ?
+	c_DocInfo.put_Url( getURLParameter("url") ?
 							decodeURIComponent(getURLParameter("url")) :
 							undefined );
-	c_DocInfo.put_Title( getURLParameter("key") ?
+	c_DocInfo.put_Title( getURLParameter("title") ?
 							decodeURIComponent(getURLParameter("title")).replace(new RegExp("\\+",'g')," ") :
 							undefined );
-	c_DocInfo.put_Format( getURLParameter("key") ?
+	c_DocInfo.put_Format( getURLParameter("filetype") ?
 							decodeURIComponent(getURLParameter("filetype")) :
 							undefined );
-	c_DocInfo.put_VKey( getURLParameter("key") ?
+	c_DocInfo.put_VKey( getURLParameter("vkey") ?
 							decodeURIComponent(getURLParameter("vkey")) :
 							undefined );
 

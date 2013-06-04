@@ -23,7 +23,7 @@ var c_oAscAsyncAction = {
 }
 //files type for Saving & DownloadAs
 var c_oAscFileType = {
-		INNER: 		0x1001,
+		INNER: 		0x0041,
 		DOCX: 		0x0041,
 		DOC: 		0x0042,
 		ODT: 		0x0043,
