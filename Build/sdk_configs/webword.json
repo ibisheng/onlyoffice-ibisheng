@@ -165,15 +165,14 @@
             },
             "fonts": {
                 "files": {
-                    "<%= pkg.menu_path %>/Word/FontsFreeType/FontFiles/":
-                    [
-                        "../Word/FontsFreeType/FontFiles/*.js",
-                        "../Word/FontsFreeType/FontFiles/TrueType/*.ttf",
-                        "../Word/FontsFreeType/FontFiles/TrueType/*.ttc",
-                        "../Word/FontsFreeType/FontFiles/TrueType/*.otf",
-                        "../Word/FontsFreeType/FontFiles/TrueType/*.TTF",
-                        "../Word/FontsFreeType/FontFiles/TrueType/*.TTC",
-                        "../Word/FontsFreeType/FontFiles/TrueType/*.OTF"
+                    "<%= pkg.menu_path %>/Fonts/": [
+                        "../Fonts/js/*.js",
+                        "../Fonts/native/*.ttf",
+                        "../Fonts/native/*.ttc",
+                        "../Fonts/native/*.otf",
+                        "../Fonts/native/*.TTF",
+                        "../Fonts/native/*.TTC",
+                        "../Fonts/native/*.OTF"
                     ]
                 }
             },
