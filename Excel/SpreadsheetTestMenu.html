@@ -1278,87 +1278,126 @@
 			</td>
 
 			<td class="cp toolbarSep" style="vertical-align: top; width: 15px;min-width:15px;">
-				<div class="sepMenu ToolbarIconOut" style="position: absolute; background: url('menu/img/sep.png') no-repeat scroll 0pt 0pt transparent; margin-top: -7px; height: 40px; margin-left: 6px;"></div>
+				<div class="sepMenu ToolbarIconOut" style="position: absolute; background: url('menu/img/sep.png') repeat-y scroll 0pt 0pt transparent; margin-top: -7px; height: 65px; margin-left: 6px;"></div>
 			</td>
-
-			<td class="printholder ToolbarIconOut selectableIcon" title="Print (Ctrl+P)">
-				<div id="td_print" class="iconToolbar">
-					<img class="ToolbarIcon ToolbarPrint" src="menu/img/spacer.gif"/>
-				</div>
+			<td>
+                <ul class="noListStyle">
+                    <li class="printholder ToolbarIconOut selectableIcon" title="Print (Ctrl+P)">
+                        <div id="td_print" class="iconToolbar">
+                            <img class="ToolbarIcon ToolbarPrint" src="menu/img/spacer.gif"/>
+                        </div>
+                    </li>
+                    <li class="ToolbarIconOut selectableIcon" title="Undo (Ctrl+Z)">
+                        <div id="td_undo" class="iconToolbar">
+                            <img class="ToolbarIcon ToolbarUndo" src="menu/img/spacer.gif"/>
+                        </div>
+                    </li>
+                    <li class="ToolbarIconOut selectableIcon" title="Redo (Ctrl+Y)">
+                        <div id="td_redo" class="iconToolbar">
+                            <img class="ToolbarIcon ToolbarRedo" src="menu/img/spacer.gif"/>
+                        </div>
+                    </li>
+                </ul>
 			</td>
-			<td class="ToolbarIconOut selectableIcon" title="Undo (Ctrl+Z)">
-				<div id="td_undo" class="iconToolbar">
-					<img class="ToolbarIcon ToolbarUndo" src="menu/img/spacer.gif"/>
-				</div>
-			</td>
-			<td class="ToolbarIconOut selectableIcon" title="Redo (Ctrl+Y)">
-				<div id="td_redo" class="iconToolbar">
-					<img class="ToolbarIcon ToolbarRedo" src="menu/img/spacer.gif"/>
-				</div>
-			</td>
-			<td class="toolbarSep">
-				<div class="ToolbarIconOut">
-					<img src="menu/img/Border.png"/>
-				</div>
-			</td>
+            <td class="cp toolbarSep" style="vertical-align: top; width: 15px;min-width:15px;">
+                <div class="sepMenu ToolbarIconOut" style="position: absolute; background: url('menu/img/sep.png') repeat-y scroll 0pt 0pt transparent; margin-top: -7px; height: 65px; margin-left: 6px;"></div>
+            </td>
 			<td style="min-width: 211px;vertical-align:middle;">
-				<div>
-				<ul id="textMenu">
-					<li id="fontSelect" class="item main textSelect textSelectBoard ToolbarIconOut" value="Arial">
-					<span id="fontSelectVal">Arial</span>
-						<ul style="width: 250px; height: 250px;overflow-y: scroll;">
-							<li id="Arial" class="SubItem" style="font-family:Arial;" value="Arial">Arial</li>
-							<li id="ArialBlack" class="SubItem" value="Arial Black" style="font-family:Arial Black;">Arial Black</li>
-							<li id="ArialCyr" class="SubItem" value="Arial Cyr" style="font-family:Arial Cyr;">Arial Cyr</li>
-							<li id="Calibri" 	class="SubItem" style="font-family:Calibri;" value="Calibri">Calibri</li>
-							<li id="CourierNew" 	class="SubItem" style="font-family:Courier New;" value="Courier New">Courier New</li>
-							<li id="LucidaConsole" 	class="SubItem" value="Lucida Console" style="font-family:Lucida Console;">Lucida Console</li>
-							<li id="MsSansSerif" class="SubItem" value="Ms Sans Serif" style="font-family:Ms Sans Serif;">Ms Sans Serif</li>
-							<li id="Tahoma" 	class="SubItem" style="font-family:Tahoma;" value="Tahoma">Tahoma</li>
-							<li id="TimesNewRoman" 		class="SubItem" style="font-family:Times New Roman;" value="Times New Roman">Times New Roman</li>
-							<li id="Verdana" 	class="SubItem" style="font-family:Verdana;" value="Verdana">Verdana</li>
-						</ul>
-						<div class="ToolbarDropDown dropdown" style="margin-top: 5px;margin-right: -3px;"></div>
-					</li>
-					<li id="fontSizeSelect" class="item main textSelect textSelectBoard ToolbarIconOut" value="12">
-					<span id="fontSizeSelectVal">12</span>
-						<ul style="width:45px;text-align:center;">
-							<li id="8" class="SubItem" value="8pt">8</li>
-							<li id="9" class="SubItem" value="9pt">9</li>
-							<li id="10" class="SubItem" value="10pt">10</li>
-							<li id="11" class="SubItem" value="11pt">11</li>
-							<li id="12" class="SubItem" value="12pt">12</li>
-							<li id="14" class="SubItem" value="14pt">14</li>
-							<li id="16" class="SubItem" value="16pt">16</li>
-							<li id="18" class="SubItem" value="18pt">18</li>
-							<li id="20" class="SubItem" value="20pt">20</li>
-							<li id="22" class="SubItem" value="22pt">22</li>
-							<li id="24" class="SubItem" value="24pt">24</li>
-							<li id="26" class="SubItem" value="26pt">26</li>
-							<li id="28" class="SubItem" value="28pt">28</li>
-							<li id="30" class="SubItem" value="30pt">30</li>
-							<li id="36" class="SubItem" value="36pt">36</li>
-							<li id="72" class="SubItem" value="72pt">72</li>
-						</ul>
-						<div class="ToolbarDropDown dropdown" style="margin-top: 5px;margin-right: -3px;"></div>
-					</li>
-				</ul>
+				<div style="padding-bottom: 10px;">
+                    <ul id="textMenu">
+                        <li id="fontSelect" class="item main textSelect textSelectBoard ToolbarIconOut" value="Arial">
+                            <span id="fontSelectVal">Arial</span>
+                            <ul style="width: 250px; height: 250px;overflow-y: scroll;">
+                                <li id="Arial" class="SubItem" style="font-family:Arial;" value="Arial">Arial</li>
+                                <li id="ArialBlack" class="SubItem" value="Arial Black" style="font-family:Arial Black;">Arial Black</li>
+                                <li id="ArialCyr" class="SubItem" value="Arial Cyr" style="font-family:Arial Cyr;">Arial Cyr</li>
+                                <li id="Calibri" 	class="SubItem" style="font-family:Calibri;" value="Calibri">Calibri</li>
+                                <li id="CourierNew" 	class="SubItem" style="font-family:Courier New;" value="Courier New">Courier New</li>
+                                <li id="LucidaConsole" 	class="SubItem" value="Lucida Console" style="font-family:Lucida Console;">Lucida Console</li>
+                                <li id="MsSansSerif" class="SubItem" value="Ms Sans Serif" style="font-family:Ms Sans Serif;">Ms Sans Serif</li>
+                                <li id="Tahoma" 	class="SubItem" style="font-family:Tahoma;" value="Tahoma">Tahoma</li>
+                                <li id="TimesNewRoman" 		class="SubItem" style="font-family:Times New Roman;" value="Times New Roman">Times New Roman</li>
+                                <li id="Verdana" 	class="SubItem" style="font-family:Verdana;" value="Verdana">Verdana</li>
+                            </ul>
+                            <div class="ToolbarDropDown dropdown" style="margin-top: 5px;margin-right: -3px;"></div>
+                        </li>
+                        <li id="fontSizeSelect" class="item main textSelect textSelectBoard ToolbarIconOut" value="12">
+                            <span id="fontSizeSelectVal">12</span>
+                            <ul style="width:45px;text-align:center;">
+                                <li id="8" class="SubItem" value="8pt">8</li>
+                                <li id="9" class="SubItem" value="9pt">9</li>
+                                <li id="10" class="SubItem" value="10pt">10</li>
+                                <li id="11" class="SubItem" value="11pt">11</li>
+                                <li id="12" class="SubItem" value="12pt">12</li>
+                                <li id="14" class="SubItem" value="14pt">14</li>
+                                <li id="16" class="SubItem" value="16pt">16</li>
+                                <li id="18" class="SubItem" value="18pt">18</li>
+                                <li id="20" class="SubItem" value="20pt">20</li>
+                                <li id="22" class="SubItem" value="22pt">22</li>
+                                <li id="24" class="SubItem" value="24pt">24</li>
+                                <li id="26" class="SubItem" value="26pt">26</li>
+                                <li id="28" class="SubItem" value="28pt">28</li>
+                                <li id="30" class="SubItem" value="30pt">30</li>
+                                <li id="36" class="SubItem" value="36pt">36</li>
+                                <li id="72" class="SubItem" value="72pt">72</li>
+                            </ul>
+                            <div class="ToolbarDropDown dropdown" style="margin-top: 5px;margin-right: -3px;"></div>
+                        </li>
+                    </ul>
 				</div>
+                <ul class="noListStyle">
+                    <li id="td_bold" class="ToolbarIconOut selectableIcon iconToolbar" title="Bold (Ctrl+B)">
+                        <img class="toolbarImg bold" src="menu/img/spacer.gif"/>
+                    </li>
+                    <li id="td_italic" class="ToolbarIconOut selectableIcon iconToolbar" title="Italic (Ctrl+I)">
+                        <img class="toolbarImg italic" src="menu/img/spacer.gif"/>
+                    </li>
+                    <li id="td_underline" class="ToolbarIconOut selectableIcon iconToolbar" title="Underline (Ctrl+U)">
+                        <img class="toolbarImg underline" src="menu/img/spacer.gif"/>
+                    </li>
+                    <li class="toolbarSep">
+                        <div class="ToolbarIconOut">
+                            <img src="menu/img/Border.png"/>
+                        </div>
+                    </li>
+                    <li id="td_Border" class="ToolbarIconOut selectableIcon iconToolbar" title="Borders" style="padding-right: 15px;">
+                        <div id="td_cellBorder" class="ToolbarButtonCaption" vid="1365">
+                            <div class="brdImg brd_st0"></div>
+                        </div>
+                        <div id="td_border_choose" class="ToolbarDropDownInner">
+                            <div class="ToolbarDropDown"></div>
+                        </div>
+                    </li>
+                    <li class="toolbarSep">
+                        <div class="ToolbarIconOut">
+                            <img src="menu/img/Border.png"/>
+                        </div>
+                    </li>
+                    <li id="td_BackgroundColor" class="ToolbarIconOut selectableIcon iconToolbar" title="TextBG" style="padding-right: 15px;">
+                        <div class="ToolbarButtonCaption clrSelector1">
+                            <div class="ToolbarColorIndicator">
+                                <div class="toolbarImg bg_fill"></div>
+                            </div>
+                        </div>
+                        <div class="ToolbarDropDownInner clrPicker1">
+                            <div class="ToolbarDropDown"></div>
+                        </div>
+                    </li>
+                    <li id="td_TextColor" class="ToolbarIconOut selectableIcon iconToolbar" title="TextColor">
+                        <div class="ToolbarButtonCaption clrSelector2">
+                            <div class="ToolbarColorIndicator2">
+                                <div class="toolbarImg txt_color"></div>
+                            </div>
+                        </div>
+                        <div class="ToolbarDropDownInner clrPicker2">
+                            <div class="ToolbarDropDown"></div>
+                        </div>
+                    </li>
+                </ul>
 			</td>
-			<td id="td_bold" class="ToolbarIconOut selectableIcon iconToolbar" title="Bold (Ctrl+B)">
-				<img class="toolbarImg bold" src="menu/img/spacer.gif"/>
-			</td>
-			<td id="td_italic" class="ToolbarIconOut selectableIcon iconToolbar" title="Italic (Ctrl+I)">
-				<img class="toolbarImg italic" src="menu/img/spacer.gif"/>
-			</td>
-			<td id="td_underline" class="ToolbarIconOut selectableIcon iconToolbar" title="Underline (Ctrl+U)">
-				<img class="toolbarImg underline" src="menu/img/spacer.gif"/>
-			</td>
-			<td class="toolbarSep">
-				<div class="ToolbarIconOut">
-					<img src="menu/img/Border.png"/>
-				</div>
-			</td>
+            <td class="cp toolbarSep" style="vertical-align: top; width: 15px;min-width:15px;">
+                <div class="sepMenu ToolbarIconOut" style="position: absolute; background: url('menu/img/sep.png') repeat-y scroll 0pt 0pt transparent; margin-top: -7px; height: 65px; margin-left: 6px;"></div>
+            </td>
 			<td id="td_ta_left" class="ToolbarIconOut selectableIcon iconToolbar" title="AlignTextLeft">
 				<img class="toolbarImg align_left" src="menu/img/spacer.gif"/>
 			</td>
@@ -1385,34 +1424,6 @@
 			<td class="toolbarSep">
 				<div class="ToolbarIconOut">
 					<img src="menu/img/Border.png"/>
-				</div>
-			</td>
-			<td id="td_BackgroundColor" class="ToolbarIconOut selectableIcon iconToolbar" title="TextBG" style="padding: 0px;">
-					<div class="ToolbarButtonCaption clrSelector1">
-						<div class="ToolbarColorIndicator">
-							<div class="toolbarImg bg_fill"></div>
-						</div>
-					</div>
-				<div class="ToolbarDropDownInner clrPicker1">
-					<div class="ToolbarDropDown"></div>
-				</div>
-			</td>
-			<td id="td_TextColor" class="ToolbarIconOut selectableIcon iconToolbar" title="TextColor" style="padding: 0px;">
-				<div class="ToolbarButtonCaption clrSelector2">
-					<div class="ToolbarColorIndicator2">
-						<div class="toolbarImg txt_color"></div>
-					</div>
-				</div>
-				<div class="ToolbarDropDownInner clrPicker2">
-					<div class="ToolbarDropDown"></div>
-				</div>
-			</td>
-			<td id="td_Border" class="ToolbarIconOut selectableIcon iconToolbar" title="Borders" style="padding: 0px;">
-				<div id="td_cellBorder" class="ToolbarButtonCaption" vid="1365">
-					<div class="brdImg brd_st0"></div>
-				</div>
-				<div id="td_border_choose" class="ToolbarDropDownInner">
-					<div class="ToolbarDropDown"></div>
 				</div>
 			</td>
 			<td id="td_mergeCells" class="ToolbarIconOut selectableIcon iconToolbar" title="Merge">

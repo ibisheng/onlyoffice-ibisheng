@@ -16,7 +16,7 @@ p{ margin: 2px; padding: 2px; vertical-align:top;}
 #menu{height: 70px;  width: 100%; left:0px; top:0px; position: absolute; z-index: 2; -khtml-user-select: none;min-width:1200px;}
 #topmenu{background-color: #EEF0F2;}
 #topmenuSep{height: 2px; left:0px; top:19px; width: 100%;}
-#toolbar{/*display: block;*/ left:0px; top:21px;background-color:#EEF0F2; padding-left: 2px;padding-right:2px;vertical-align: middle;height: 40px;min-width:1200px;}
+#toolbar{/*display: block;*/ left:0px; top:21px;background-color:#EEF0F2; padding-left: 2px;padding-right:2px;vertical-align: middle;height: 80px;min-width:1200px;}
 #toolbarSep{height: 2px; left:0px; top:45px;  width: 100%;}
 #formulabar{padding: 1px 0; background: none repeat scroll 0 0 #EEF0F2; -khtml-user-select: none;}
 #cc1{width:60px; height: 16px; padding-left:3px; background-color:white;border: 1px solid #7F9DB9;cursor: default;text-align:center;}
@@ -440,3 +440,16 @@ li.SubItem.hover {background-color: #4B963E;color: #FFFFFF;}
 #addValues, #chartXVisible, #chartYVisible, #chartXVisibleLines, #chartYVisibleLines, #addLegend {cursor:pointer;}
 .legend li, .chart_data li {cursor:pointer;}
 */
+
+#styleMenuTab {
+	margin: 3px;
+	padding: 0;
+}
+.noListStyle {
+	margin: 0;
+	padding: 0;
+}
+.noListStyle li {
+	list-style: none;
+	float: left;
+}
