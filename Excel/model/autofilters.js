@@ -721,6 +721,8 @@
 						if(isInsertButton){
 							if (bIsActiveSheet)
 								t._addButtonAF(newRes, ws, bIsOpenFilter);
+							else
+								t._addButtonAF(newRes, ws, true);
 						}
 						else if(!t.allButtonAF)
 							t.allButtonAF = [];
