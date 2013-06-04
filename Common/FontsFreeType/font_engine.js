@@ -1427,7 +1427,7 @@ var temp2 = new Int64();
 function FT_MulDiv(a, b, c)
 {
     if (a > 2147483647 || b > 2147483647 || c > 2147483647)
-        alert("error: muldiv");
+        alert("error");
 
     if (a == 0 || b == c)
         return a;
@@ -1456,7 +1456,7 @@ function FT_MulDiv(a, b, c)
 function FT_MulFix(a, b)
 {
     if (a > 2147483647 || b > 2147483647)
-        alert("error: mulfix");
+        alert("error");
 
     if (a == 0 || b == 0x10000)
         return a;
@@ -1484,7 +1484,6 @@ function FT_DivFix(a, b)
     {
         a = (a & 0xFFFFFFFF);
         b = (b & 0xFFFFFFFF);
-        alert("error: divfix " + editor.WordControl.m_nZoomValue);
     }
     
     var q = 0;
@@ -21723,7 +21722,7 @@ function Ins_SxVTL(exc, aIdx1, aIdx2, aOpc, Vec)
 function TT_VecLen(X, Y)
 {
     if (X > 2147483647 || Y > 2147483647)
-        alert("error: veclen");
+        alert("error");
 
     var v = new FT_Vector();
     v.x = X;
@@ -21734,7 +21733,7 @@ function TT_VecLen(X, Y)
 function Normalize(exc, Vx, Vy, R)
 {
     if (Vx > 2147483647 || Vy > 2147483647)
-        alert("error: normalize");
+        alert("error");
 
     var W = 0;
     var S1, S2;
@@ -21879,28 +21878,28 @@ function Compute_Funcs(exc)
 function Project(exc, dx, dy)
 {
     if (dx > 2147483647 || dy > 2147483647)
-        alert("error: project");
+        alert("error");
 
     return TT_DotFix14(dx, dy, exc.GS.projVector.x, exc.GS.projVector.y);
 }
 function Project_x(exc, dx, dy)
 {
     if (dx > 2147483647 || dy > 2147483647)
-        alert("error: projectx");
+        alert("error");
 
     return dx;
 }
 function Project_y(exc, dx, dy)
 {
     if (dx > 2147483647 || dy > 2147483647)
-        alert("error: projecty");
+        alert("error");
 
     return dy;
 }
 function Dual_Project(exc, dx, dy)
 {
     if (dx > 2147483647 || dy > 2147483647)
-        alert("error: dualproj");
+        alert("error");
     
     return TT_DotFix14(dx, dy, exc.GS.dualVector.x, exc.GS.dualVector.y);
 }
@@ -21908,7 +21907,7 @@ function Dual_Project(exc, dx, dy)
 function Direct_Move(exc, zone, point, distance)
 {
     if (point < 0 || point > 0xFFFF || distance > 2147483647)
-        alert("error: directmove");
+        alert("error");
 
     var v = exc.GS.freeVector.x;
     if (v != 0)
@@ -21948,7 +21947,7 @@ function Direct_Move(exc, zone, point, distance)
 function Direct_Move_Orig(exc, zone, point, distance)
 {
     if (point < 0 || point > 0xFFFF || distance > 2147483647)
-        alert("error: move orig");
+        alert("error");
 
     var v = exc.GS.freeVector.x;
 
@@ -21974,7 +21973,7 @@ function Direct_Move_Orig(exc, zone, point, distance)
 function Direct_Move_X(exc, zone, point, distance)
 {
     if (point < 0 || point > 0xFFFF || distance > 2147483647)
-        alert("error: direct_movex");
+        alert("error");
 
     if (exc.face.driver.library.tt_hint_props.TT_CONFIG_OPTION_SUBPIXEL_HINTING)
     {
@@ -22001,7 +22000,7 @@ function Direct_Move_X(exc, zone, point, distance)
 function Direct_Move_Y(exc, zone, point, distance)
 {
     if (point < 0 || point > 0xFFFF || distance > 2147483647)
-        alert("error: direct_movey");
+        alert("error");
 
     zone.cur[zone._offset_cur + point].y += distance;
 
@@ -22014,7 +22013,7 @@ function Direct_Move_Y(exc, zone, point, distance)
 function Direct_Move_Orig_X(exc, zone, point, distance)
 {
     if (point < 0 || point > 0xFFFF || distance > 2147483647)
-        alert("error: direct_move_origx");
+        alert("error");
 
     zone.org[zone._offset_org + point].x += distance;
 
@@ -22025,7 +22024,7 @@ function Direct_Move_Orig_X(exc, zone, point, distance)
 function Direct_Move_Orig_Y(exc, zone, point, distance)
 {
     if (point < 0 || point > 0xFFFF || distance > 2147483647)
-        alert("error: direct_move_origy");
+        alert("error");
     
     zone.org[zone._offset_org + point].y += distance;
 
@@ -22077,7 +22076,7 @@ function Compute_Round(exc, round_mode)
 function Round_None(exc, distance, compensation)
 {
     if (distance > 2147483647 || compensation > 2147483647)
-        alert("error: round_none");
+        alert("error");
 
     var val;
     if (distance >= 0)
@@ -22098,7 +22097,7 @@ function Round_None(exc, distance, compensation)
 function Round_To_Grid(exc, distance, compensation)
 {
     if (distance > 2147483647 || compensation > 2147483647)
-        alert("error: round_to_grid");
+        alert("error");
 
     var val;
     if (distance >= 0)
@@ -22122,7 +22121,7 @@ function Round_To_Grid(exc, distance, compensation)
 function Round_Up_To_Grid(exc, distance, compensation)
 {
     if (distance > 2147483647 || compensation > 2147483647)
-        alert("error: round_up_to_grid");
+        alert("error");
 
     var val;
     if (distance >= 0)
@@ -22145,7 +22144,7 @@ function Round_Up_To_Grid(exc, distance, compensation)
 function Round_Down_To_Grid(exc, distance, compensation)
 {
     if (distance > 2147483647 || compensation > 2147483647)
-        alert("error: round_down_to_grid");
+        alert("error");
 
     var val;
     if (distance >= 0)
@@ -22168,7 +22167,7 @@ function Round_Down_To_Grid(exc, distance, compensation)
 function Round_To_Half_Grid(exc, distance, compensation)
 {
     if (distance > 2147483647 || compensation > 2147483647)
-        alert("error: round_to_half_grid");
+        alert("error");
     
     var val;
     if (distance >= 0)
@@ -22189,7 +22188,7 @@ function Round_To_Half_Grid(exc, distance, compensation)
 function Round_To_Double_Grid(exc, distance, compensation)
 {
     if (distance > 2147483647 || compensation > 2147483647)
-        alert("error: round_to_double_grid");
+        alert("error");
     
     var val;
     if (distance >= 0)
@@ -22213,7 +22212,7 @@ function Round_To_Double_Grid(exc, distance, compensation)
 function Round_Super(exc, distance, compensation)
 {
     if (distance > 2147483647 || compensation > 2147483647)
-        alert("error: round_super");
+        alert("error");
     
     var val;
     if (distance >= 0)
@@ -22236,7 +22235,7 @@ function Round_Super(exc, distance, compensation)
 function Round_Super_45(exc, distance, compensation)
 {
     if (distance > 2147483647 || compensation > 2147483647)
-        alert("error: round_super45");
+        alert("error");
     
     var val;
     if (distance >= 0)
@@ -25981,7 +25980,7 @@ function TT_RunIns(exc)
         }
 
         Instruct_Dispatch[exc.opcode](exc, exc.stack, exc.args);
-
+ 
         var bSuiteLabel = false;
         if (exc.error != 0)
         {
@@ -28444,7 +28443,7 @@ function TT_Load_Simple_Glyph(load)
 
 				for (var j = 0; j < n_ins; j++)
 					_dd[_dc + j] = p.data[p.cur + j];
-			}				
+			}
         }
     }
 
@@ -29973,7 +29972,7 @@ function tt_face_load_hdmx(face, stream)
 
     table_size = face.goto_table(face, 1751412088, stream);
     if ( (FT_Error != 0) || table_size < 8 )
-	{
+    {
 		FT_Error = 0;
 		return 0;
 	}
@@ -30223,6 +30222,7 @@ function tt_face_load_prep(face, stream)
         var table_len = face.goto_table(face, 1886545264, stream);
         var error = FT_Error;
 		FT_Error = 0;
+		
         if (error != 0)
         {
             face.cvt_program = null;
