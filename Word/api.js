@@ -5089,7 +5089,7 @@ asc_docs_api.prototype.asyncServerIdStartLoaded = function()
 	//TODO: Вынести шрифты в коммоны, SetFontPath заменить на SetCommonPath,
 	//пердаваемый путь использовать для загрузки шрифтов и настороек.
 	if(true == ASC_DOCS_API_LOAD_COAUTHORING_SETTINGS){
-		this.ScriptLoader.LoadScriptAsync( this.FontLoader.fontFilesPath + "../../../Common/docscoapisettings.js",
+		this.ScriptLoader.LoadScriptAsync( this.FontLoader.fontFilesPath + "../Common/docscoapisettings.js",
 											this._coAuthoringInitCallBack, this);
 	}else{
 		this._coAuthoringInitCallBack(this);
