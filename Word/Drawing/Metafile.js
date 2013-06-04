@@ -749,6 +749,10 @@ function CMetafile(width, height)
     this.VectorMemoryForPrint = null;
 
     this.BrushTypeSolid = true;
+
+    // RFonts
+    this.m_oTextPr      = null;
+    this.m_oLastFont    = new CFontSetup();
 }
 
 CMetafile.prototype =
@@ -1025,8 +1029,17 @@ CMetafile.prototype =
 
     SetFont : function(font)
     {
+        if (null == font)
+            return;
+
         if (font.FontFamily.Name == "" && 0 <= font.FontFamily.Index)
             font.FontFamily.Name = g_font_infos[font.FontFamily.Index].Name;
+
+        var style = 0;
+        if (font.Italic == true)
+            style += 2;
+        if (font.Bold == true)
+            style += 1;
 
         if (null == this.m_oFont)
         {
@@ -1035,12 +1048,6 @@ CMetafile.prototype =
 
             this.Memory.WriteByte(CommandType.ctFontSize);
             this.Memory.WriteDouble(font.FontSize);
-
-            var style = 0;
-            if (font.Italic == true)
-                style += 2;
-            if (font.Bold == true)
-                style += 1;
 
             this.Memory.WriteByte(CommandType.ctFontStyle);
             this.Memory.WriteLong(style);
@@ -1059,17 +1066,27 @@ CMetafile.prototype =
             }
             if (this.m_oFont.Italic != font.Italic || this.m_oFont.Bold != font.Bold)
             {
-                var style = 0;
-                if (font.Italic == true)
-                    style += 2;
-                if (font.Bold == true)
-                    style += 1;
-                
                 this.Memory.WriteByte(CommandType.ctFontStyle);
                 this.Memory.WriteLong(style);
             }
         }
-        this.m_oFont = Common_CopyObj(font);
+
+        this.m_oFont =
+        {
+            FontFamily :
+            {
+                Index : font.FontFamily.Index,
+                Name  : font.FontFamily.Name
+            },
+
+            FontSize : font.FontSize,
+            Bold     : font.Bold,
+            Italic   : font.Italic
+        };
+
+        this.m_oLastFont.SetUpIndex = font.FontFamily.Index;
+        this.m_oLastFont.SetUpSize = font.FontSize;
+        this.m_oLastFont.SetUpStyle = style;
     },
     FillText : function(x,y,text)
     {
@@ -1125,6 +1142,133 @@ CMetafile.prototype =
     {
         this.Memory.WriteByte(CommandType.ctBrushRectableEnabled);
         this.Memory.WriteBool(bIsEnabled);
+    },
+
+    SetFontSlot : function(slot, fontSizeKoef)
+    {
+        var _rfonts = this.m_oTextPr.RFonts;
+        var _lastFont = this.m_oLastFont;
+
+        switch (slot)
+        {
+            case fontslot_ASCII:
+            {
+                _lastFont.Name   = _rfonts.Ascii.Name;
+                _lastFont.Index  = _rfonts.Ascii.Index;
+
+                if (_lastFont.Index == -1 || _lastFont.Index === undefined)
+                {
+                    _lastFont.Index = g_map_font_index[_lastFont.Name];
+                }
+
+                _lastFont.Size = this.m_oTextPr.FontSize;
+                _lastFont.Bold = this.m_oTextPr.Bold;
+                _lastFont.Italic = this.m_oTextPr.Italic;
+
+                break;
+            }
+            case fontslot_CS:
+            {
+                _lastFont.Name   = _rfonts.CS.Name;
+                _lastFont.Index  = _rfonts.CS.Index;
+
+                if (_lastFont.Index == -1 || _lastFont.Index === undefined)
+                {
+                    _lastFont.Index = g_map_font_index[_lastFont.Name];
+                }
+
+                _lastFont.Size = this.m_oTextPr.FontSizeCS;
+                _lastFont.Bold = this.m_oTextPr.BoldCS;
+                _lastFont.Italic = this.m_oTextPr.ItalicCS;
+
+                break;
+            }
+            case fontslot_EastAsia:
+            {
+                _lastFont.Name   = _rfonts.EastAsia.Name;
+                _lastFont.Index  = _rfonts.EastAsia.Index;
+
+                if (_lastFont.Index == -1 || _lastFont.Index === undefined)
+                {
+                    _lastFont.Index = g_map_font_index[_lastFont.Name];
+                }
+
+                _lastFont.Size = this.m_oTextPr.FontSize;
+                _lastFont.Bold = this.m_oTextPr.Bold;
+                _lastFont.Italic = this.m_oTextPr.Italic;
+
+                break;
+            }
+            case fontslot_HAnsi:
+            default:
+            {
+                _lastFont.Name   = _rfonts.HAnsi.Name;
+                _lastFont.Index  = _rfonts.HAnsi.Index;
+
+                if (_lastFont.Index == -1 || _lastFont.Index === undefined)
+                {
+                    _lastFont.Index = g_map_font_index[_lastFont.Name];
+                }
+
+                _lastFont.Size = this.m_oTextPr.FontSize;
+                _lastFont.Bold = this.m_oTextPr.Bold;
+                _lastFont.Italic = this.m_oTextPr.Italic;
+
+                break;
+            }
+        }
+
+        if (undefined !== fontSizeKoef)
+            _lastFont.Size *= fontSizeKoef;
+
+        var style = 0;
+        if (_lastFont.Italic == true)
+            style += 2;
+        if (_lastFont.Bold == true)
+            style += 1;
+
+        if (null == this.m_oFont)
+        {
+            this.Memory.WriteByte(CommandType.ctFontName);
+            this.Memory.WriteString(_lastFont.Name);
+
+            this.Memory.WriteByte(CommandType.ctFontSize);
+            this.Memory.WriteDouble(_lastFont.Size);
+
+            this.Memory.WriteByte(CommandType.ctFontStyle);
+            this.Memory.WriteLong(style);
+        }
+        else
+        {
+            if (this.m_oFont.FontFamily.Name != _lastFont.Name)
+            {
+                this.Memory.WriteByte(CommandType.ctFontName);
+                this.Memory.WriteString(_lastFont.Name);
+            }
+            if (this.m_oFont.FontSize != _lastFont.Size)
+            {
+                this.Memory.WriteByte(CommandType.ctFontSize);
+                this.Memory.WriteDouble(_lastFont.Size);
+            }
+            if (this.m_oFont.Italic != _lastFont.Italic || this.m_oFont.Bold != _lastFont.Bold)
+            {
+                this.Memory.WriteByte(CommandType.ctFontStyle);
+                this.Memory.WriteLong(style);
+            }
+        }
+
+        this.m_oFont =
+        {
+            FontFamily :
+            {
+                Index : _lastFont.Index,
+                Name  : _lastFont.Name
+            },
+
+            FontSize : _lastFont.Size,
+            Bold     : _lastFont.Bold,
+            Italic   : _lastFont.Italic
+        };
     }
 };
 
@@ -1729,5 +1873,24 @@ CDocumentRenderer.prototype =
     {
         if (0 != this.m_lPagesCount)
             this.m_arrayPages[this.m_lPagesCount - 1].endCommand(32);
+    },
+
+    SetTextPr : function(textPr)
+    {
+        if (0 != this.m_lPagesCount)
+            this.m_arrayPages[this.m_lPagesCount - 1].m_oTextPr = textPr.Copy();
+    },
+
+    SetFontSlot : function(slot, fontSizeKoef)
+    {
+        if (0 != this.m_lPagesCount)
+            this.m_arrayPages[this.m_lPagesCount - 1].SetFontSlot(slot, fontSizeKoef);
+    },
+
+    GetTextPr : function()
+    {
+        if (0 != this.m_lPagesCount)
+            return this.m_arrayPages[this.m_lPagesCount - 1].m_oTextPr;
+        return null;
     }
 };
