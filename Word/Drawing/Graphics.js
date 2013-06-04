@@ -1090,8 +1090,8 @@ CGraphics.prototype =
 
         g_font_infos[font.FontFamily.Index].LoadFont(g_font_loader, this.m_oFontManager, font.FontSize, oFontStyle, this.m_dDpiX, this.m_dDpiY, this.m_oTransform);
 
-        this.m_oFontManager.SetTextMatrix(this.m_oTransform.sx,this.m_oTransform.shy,this.m_oTransform.shx,
-            this.m_oTransform.sy,this.m_oTransform.tx,this.m_oTransform.ty);
+        //this.m_oFontManager.SetTextMatrix(this.m_oTransform.sx,this.m_oTransform.shy,this.m_oTransform.shx,
+        //    this.m_oTransform.sy,this.m_oTransform.tx,this.m_oTransform.ty);
     },
 
     SetTextPr : function(textPr)
@@ -1191,8 +1191,8 @@ CGraphics.prototype =
             g_font_infos[_lastFont.SetUpIndex].LoadFont(g_font_loader, this.m_oFontManager, _lastFont.SetUpSize, _lastFont.SetUpStyle, this.m_dDpiX, this.m_dDpiY, this.m_oTransform);
         }
 
-        this.m_oFontManager.SetTextMatrix(this.m_oTransform.sx,this.m_oTransform.shy,this.m_oTransform.shx,
-            this.m_oTransform.sy,this.m_oTransform.tx,this.m_oTransform.ty);
+        //this.m_oFontManager.SetTextMatrix(this.m_oTransform.sx,this.m_oTransform.shy,this.m_oTransform.shx,
+        //    this.m_oTransform.sy,this.m_oTransform.tx,this.m_oTransform.ty);
     },
 
     GetTextPr : function()

@@ -744,11 +744,11 @@ function CFontInfo(sName, thumbnail, type, indexR, faceIndexR, indexI, faceIndex
         fontManager.m_oGlyphString.ResetCTM();
 		if (undefined !== transform)
         {
-            fontManager.m_pFont.SetTextMatrix(transform.sx,transform.shy,transform.shx,transform.sy,transform.tx,transform.ty);
+            fontManager.SetTextMatrix(transform.sx,transform.shy,transform.shx,transform.sy,transform.tx,transform.ty);
         }
         else
         {
-            fontManager.m_pFont.SetTextMatrix(1, 0, 0, 1, 0, 0);
+            fontManager.SetTextMatrix(1, 0, 0, 1, 0, 0);
         }
 
         fontManager.AfterLoad();
