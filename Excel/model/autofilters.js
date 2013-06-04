@@ -1220,7 +1220,19 @@
 							
 							//добавляем какие именно строки скрыты этим фильтром
 							//применяем к заданному диапазону фильтр и смотрим какие строки им скрыты
-							buttons[i].hiddenRows = this._getHiddenRows(buttons[i].id,buttons[i].idNext,filters,ws);
+							var hiddenRowsObj = this._getHiddenRows(buttons[i].id,buttons[i].idNext,filters,ws);
+							buttons[i].hiddenRows = hiddenRowsObj;
+							//изменяем result у объекта автофильтра
+							if(curFilForSort.result)
+							{
+								for(var n = 0; n < curFilForSort.result.length; n++)
+								{
+									if(curFilForSort.result[n].id == buttons[i].id)
+									{
+										curFilForSort.result[n].hiddenRows = hiddenRowsObj;
+									}	
+								}
+							}
 							
 							if(isSetFilter)
 								activeButtonFilter[activeButtonFilter.length]  = buttons[i];
@@ -1811,7 +1823,7 @@
 				if(!array)
 				{
 					cellId = autoFiltersObject.cellId;
-					array = autoFiltersObject.result;
+					array = Asc.clone(autoFiltersObject.result);
 					isArray = false;
 				}
 				else
