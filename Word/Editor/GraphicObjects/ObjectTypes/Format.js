@@ -1059,7 +1059,7 @@ CBlipFill.prototype =
         if(flag)
         {
             var imageId = Reader.GetString2();
-            if(typeof imageId === "string" && isRealObject(Reader.oImages) && typeof Reader.oImages[imageId] === "string")
+            if(typeof imageId === "string" && isRealObject(Reader.oImages) && typeof Reader.oImages[imageId] === "string" && Reader.oImages[imageId] !== "error")
 				this.RasterImageId = Reader.oImages[imageId];
 			else
 				this.RasterImageId = imageId;
