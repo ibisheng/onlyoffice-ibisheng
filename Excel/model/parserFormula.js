@@ -541,19 +541,7 @@ _func[cElementType.cellsRange][cElementType.number] = _func[cElementType.cellsRa
 _func[cElementType.cellsRange][cElementType.bool] = _func[cElementType.cellsRange][cElementType.error] =
 _func[cElementType.cellsRange][cElementType.array] = _func[cElementType.cellsRange][cElementType.empty] = function(arg0,arg1,what,cellAddress){
 	var cross = arg0.cross(cellAddress);
-	if( cross ){
-		if( cross.r != undefined ){
-			arg0 = arg0.getValue2(new CellAddress(cross.r,arg0.getBBox().c1))
-		}
-		else if( cross.c != undefined ){
-			arg0 = arg0.getValue2(new CellAddress(arg0.getBBox().r1, cross.c))
-		}
-		else
-			return new cError( cErrorType.wrong_value_type ); 
-	}
-	else
-		return new cError( cErrorType.wrong_value_type ); 
-	return _func[arg0.type][arg1.type](arg0,arg1,what)
+	return _func[cross.type][arg1.type](cross,arg1,what)
 }
 
 
@@ -561,40 +549,14 @@ _func[cElementType.number][cElementType.cellsRange] = _func[cElementType.string]
 _func[cElementType.bool][cElementType.cellsRange] = _func[cElementType.error][cElementType.cellsRange] = 
 _func[cElementType.array][cElementType.cellsRange] = _func[cElementType.empty][cElementType.cellsRange] = function(arg0,arg1,what,cellAddress){
 	var cross = arg1.cross(cellAddress);
-	if( cross ){
-		if( cross.r != undefined ){
-			arg1 = arg1.getValue2(new CellAddress(cross.r,arg1.getBBox().c1))
-		}
-		else if( cross.c != undefined ){
-			arg1 = arg1.getValue2(new CellAddress(arg1.getBBox().r1, cross.c))
-		}
-		else 
-			return new cError( cErrorType.wrong_value_type ); 
-	}
-	else
-		return new cError( cErrorType.wrong_value_type ); 
-	return _func[arg0.type][arg1.type](arg0,arg1,what)
+	return _func[arg0.type][cross.type](arg0,cross,what)
 }
 
 
 _func[cElementType.cellsRange][cElementType.cellsRange] = function(arg0,arg1,what,cellAddress){
 	var cross1 = arg0.cross(cellAddress),
 		cross2 = arg1.cross(cellAddress);
-	if( cross1 && cross2 ){
-		if( cross1.r != undefined && cross2.r != undefined ){
-			arg0 = arg0.getValue2(new CellAddress(cross1.r,arg0.getBBox().c1))
-			arg1 = arg1.getValue2(new CellAddress(cross2.r,arg1.getBBox().c1))
-		}
-		else if( cross1.c != undefined && cross2.c != undefined ){
-			arg0 = arg0.getValue2(new CellAddress(arg0.getBBox().r1, cross1.c))
-			arg1 = arg1.getValue2(new CellAddress(arg1.getBBox().r1, cross2.c))
-		}
-		else 
-			return new cError( cErrorType.wrong_value_type );
-	}
-	else
-		return new cError( cErrorType.wrong_value_type ); 
-	return _func[arg0.type][arg1.type](arg0,arg1,what)
+	return _func[cross1.type][cross2.type](cross1,cross2,what)
 }
 
 
@@ -1220,7 +1182,7 @@ var cFormulaOperators = {
 		r.Calculate = function(arg){	//calculate operator
 			var arg0 = arg[0];
 			if( arg0 instanceof cArea){
-				arg0 = arg0.cross(arguments[1]);
+				arg0 = arg0.cross(arguments[1].first);
 			}
 			arg0 = arg0.tocNumber();
 			return this.value = arg0 instanceof cError ? arg0 : new cNumber( -arg0.getValue() )
@@ -1239,7 +1201,7 @@ var cFormulaOperators = {
 		r.Calculate = function(arg){
 			var arg0 = arg[0];
 			if( arg0 instanceof cArea){
-				arg0 = arg0.cross(arguments[1]);
+				arg0 = arg0.cross(arguments[1].first);
 			}
 			arg0 = arg[0].tryConvert();
 			return this.value = arg0;
@@ -3543,7 +3505,7 @@ var cFormulaFunction = {
 				
 				var c = new CellAddress(bb.r1+numberRow,resC,0);
 				
-				var v = arg1.getWS().getRange(c,c).getCells()[0].getValueWithoutFormat();
+				var v = arg1.getWS()._getCellNoEmpty(c.getRow0(),c.getCol0()).getValueWithoutFormat();
 				
 				return this.value = checkTypeCell(v);
 			}
@@ -3712,7 +3674,7 @@ var cFormulaFunction = {
 					
 					var c = new CellAddress(BBox.r1+resR,BBox.c1+resC)
 					
-					return this.value = checkTypeCell( _arg2.getWS().getRange(c,c).getCells()[0].getValueWithoutFormat() );
+					return this.value = checkTypeCell( _arg2.getWS()._getCellNoEmpty(c.getRow0(),c.getCol0()).getValueWithoutFormat() );
 					
 				}
 				else{
@@ -3957,7 +3919,7 @@ var cFormulaFunction = {
 				
 				var c = new CellAddress(resR,bb.c1+numberCol,0);
 				
-				var v = arg1.getWS().getRange(c,c).getCells()[0].getValueWithoutFormat();
+				var v = arg1.getWS()._getCellNoEmpty(c.getRow0(),c.getCol0()).getValueWithoutFormat();
 				
 				return this.value = checkTypeCell(v);
 			}
@@ -7032,7 +6994,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'FINDB' : function(){
-            var r = new cBaseFunction();
+            var r = cFormulaFunction.TextAndData["FIND"]()
             r.setName("FINDB");
         	return r;
 		},
@@ -7049,20 +7011,84 @@ var cFormulaFunction = {
         'LEFT' : function(){
             var r = new cBaseFunction();
             r.setName("LEFT");
+			r.setArgumentsMin(1);
+            r.setArgumentsMax(2);
+            r.Calculate = function(arg){
+				var arg0 = arg[0], arg1 = this.argumentsCurrent == 1 ? new cNumber(1) : arg[1];
+				if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
+					arg0 = arg0.cross(arguments[1].first);
+				}
+				if( arg1 instanceof cArea || arg1 instanceof cArea3D ){
+					arg1 = arg1.cross(arguments[1].first);
+				}
+				
+                arg0 = arg0.tocString();
+				arg1 = arg1.tocNumber();
+				
+				if( arg0 instanceof cArray && arg1 instanceof cArray ){
+					arg0 = arg0.getElementRowCol(0,0);
+					arg1 = arg1.getElementRowCol(0,0);
+				}
+				else if( arg0 instanceof cArray ){
+					arg0 = arg0.getElementRowCol(0,0);
+				}
+				else if( arg1 instanceof cArray ){
+					arg1 = arg1.getElementRowCol(0,0);
+				}
+				
+                if ( arg0 instanceof cError )	return this.value = arg0;
+                if ( arg1 instanceof cError )	return this.value = arg1;
+				
+				if( arg1.getValue() < 0 ) return this.value = new cError( cErrorType.wrong_value_type );
+				
+				return this.value = new cString( arg0.getValue().substring(0, arg1.getValue()) )
+				
+            }
+            r.getInfo = function(){
+                return {
+                    name:this.name,
+                    args:"( string [ , number-chars ] )"
+                };
+            }
         	return r;
 		},
         'LEFTB' : function(){
-            var r = new cBaseFunction();
+			var r = cFormulaFunction.TextAndData["LEFT"]()
             r.setName("LEFTB");
         	return r;
 		},
         'LEN' : function(){
             var r = new cBaseFunction();
             r.setName("LEN");
+			r.setArgumentsMin(1);
+            r.setArgumentsMax(1);
+            r.Calculate = function(arg){
+				var arg0 = arg[0];
+				if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
+					arg0 = arg0.cross(arguments[1].first);
+				}
+				
+                arg0 = arg0.tocString();
+				
+				if( arg0 instanceof cArray ){
+					arg0 = arg0.getElementRowCol(0,0);
+				}
+				
+                if ( arg0 instanceof cError )	return this.value = arg0;
+
+				return this.value = new cNumber( arg0.getValue().length )
+				
+            }
+            r.getInfo = function(){
+                return {
+                    name:this.name,
+                    args:"( string )"
+                };
+            }
         	return r;
 		},
         'LENB' : function(){
-            var r = new cBaseFunction();
+            var r = cFormulaFunction.TextAndData["LEN"]();
             r.setName("LENB");
         	return r;
 		},
@@ -7096,10 +7122,61 @@ var cFormulaFunction = {
         'MID' : function(){
             var r = new cBaseFunction();
             r.setName("MID");
+			r.setArgumentsMin(3);
+            r.setArgumentsMax(3);
+            r.Calculate = function(arg){
+				var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
+				if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
+					arg0 = arg0.cross(arguments[1].first);
+				}
+				if( arg1 instanceof cArea || arg1 instanceof cArea3D ){
+					arg1 = arg1.cross(arguments[1].first);
+				}
+				if( arg2 instanceof cArea || arg2 instanceof cArea3D ){
+					arg2 = arg2.cross(arguments[1].first);
+				}
+				
+                arg0 = arg0.tocString();
+				arg1 = arg1.tocNumber();
+				arg2 = arg2.tocNumber();
+				
+				if( arg0 instanceof cArray ){
+					arg0 = arg0.getElementRowCol(0,0);
+				}
+				if( arg1 instanceof cArray ){
+					arg1 = arg1.getElementRowCol(0,0);
+				}
+				if( arg2 instanceof cArray ){
+					arg2 = arg2.getElementRowCol(0,0);
+				}
+				
+                if ( arg0 instanceof cError )	return this.value = arg0;
+                if ( arg1 instanceof cError )	return this.value = arg1;
+                if ( arg2 instanceof cError )	return this.value = arg2;
+				if( arg1.getValue() < 0 ) return this.value = new cError( cErrorType.wrong_value_type );
+				if( arg2.getValue() < 0 ) return this.value = new cError( cErrorType.wrong_value_type );
+				
+				var l = arg0.getValue().length;
+				
+				if( arg1.getValue() > l )
+					return this.value = new cString("");
+				
+				/* if( arg1.getValue() < l )
+					return this.value = arg0; */
+				
+				return this.value = new cString( arg0.getValue().substr( arg1.getValue() == 0 ? 0 : arg1.getValue()-1, arg2.getValue() ) )
+				
+            }
+            r.getInfo = function(){
+                return {
+                    name:this.name,
+                    args:"( string , start-pos , number-chars )"
+                };
+            }
         	return r;
 		},
         'MIDB' : function(){
-            var r = new cBaseFunction();
+			var r = cFormulaFunction.TextAndData["MID"]();
             r.setName("MIDB");
         	return r;
 		},
@@ -7243,10 +7320,49 @@ var cFormulaFunction = {
         'RIGHT' : function(){
             var r = new cBaseFunction();
             r.setName("RIGHT");
+			r.setArgumentsMin(1);
+            r.setArgumentsMax(2);
+            r.Calculate = function(arg){
+				var arg0 = arg[0], arg1 = this.argumentsCurrent == 1 ? new cNumber(1) : arg[1];
+				if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
+					arg0 = arg0.cross(arguments[1].first);
+				}
+				if( arg1 instanceof cArea || arg1 instanceof cArea3D ){
+					arg1 = arg1.cross(arguments[1].first);
+				}
+				
+                arg0 = arg0.tocString();
+				arg1 = arg1.tocNumber();
+				
+				if( arg0 instanceof cArray && arg1 instanceof cArray ){
+					arg0 = arg0.getElementRowCol(0,0);
+					arg1 = arg1.getElementRowCol(0,0);
+				}
+				else if( arg0 instanceof cArray ){
+					arg0 = arg0.getElementRowCol(0,0);
+				}
+				else if( arg1 instanceof cArray ){
+					arg1 = arg1.getElementRowCol(0,0);
+				}
+				
+                if ( arg0 instanceof cError )	return this.value = arg0;
+                if ( arg1 instanceof cError )	return this.value = arg1;
+				
+				if( arg1.getValue() < 0 ) return this.value = new cError( cErrorType.wrong_value_type );
+				var l = arg0.getValue().length, _number = l-arg1.getValue();
+				return this.value = new cString( arg0.getValue().substring( _number < 0 ? 0 : _number , l) )
+				
+            }
+            r.getInfo = function(){
+                return {
+                    name:this.name,
+                    args:"( string [ , number-chars ] )"
+                };
+            }
         	return r;
 		},
         'RIGHTB' : function(){
-            var r = new cBaseFunction();
+            var r = cFormulaFunction.TextAndData["RIGHT"]()
             r.setName("RIGHTB");
         	return r;
 		},
@@ -7299,7 +7415,65 @@ var cFormulaFunction = {
 		},
         'TEXT' : function(){
             var r = new cBaseFunction();
+			r.setArgumentsMin(2);
+            r.setArgumentsMax(2);
+            r.Calculate = function(arg){
+				var arg0 = arg[0], arg1 = arg[1];
+                if( arg0 instanceof cRef || arg0 instanceof cRef3D){
+                    arg0 = arg0.getValue();
+                }
+                else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ){
+					arg0 = arg0.cross(arguments[1].first);
+				}
+				else if( arg0 instanceof cArray ){
+					arg0 = arg0.getElementRowCol(0,0);
+				}
+				
+				if( arg1 instanceof cRef || arg1 instanceof cRef3D){
+                    arg1 = arg1.getValue();
+                }
+                else if ( arg1 instanceof cArea || arg1 instanceof cArea3D ){
+					arg1 = arg1.cross(arguments[1].first);
+				}
+				else if( arg1 instanceof cArray ){
+					arg1 = arg1.getElementRowCol(0,0);
+				}
+				
+				if ( arg0 instanceof cError )	return this.value = arg0;
+                if ( arg1 instanceof cError )	return this.value = arg1;
+				
+				arg0 = arg0.tocString();
+				
+				var _tmp = arg0.tocNumber();
+				if( _tmp instanceof cNumber )
+					arg0 = _tmp;
+				
+				var oFormat = oNumFormatCache.get(arg1.toString());
+				var aText = oFormat.format(arg0.getValue(), arg0 instanceof cNumber ? CellValueType.Number : CellValueType.String, gc_nMaxDigCountView, null);
+				var text = "";
+				
+				for(var i = 0, length = aText.length; i < length; ++i)
+				{
+					
+					if(aText[i].format && aText[i].format.skip ){
+						text += " ";
+						continue;
+					}
+					if(aText[i].format && aText[i].format.repeat )
+						continue;
+						
+					text += aText[i].text;
+				}
+				
+				return this.value = new cString(text);
+			}
             r.setName("TEXT");
+			r.getInfo = function(){
+                return {
+                    name:this.name,
+                    args:"( value , format )"
+                };
+            }
         	return r;
 		},
         'TRIM' : function(){
@@ -7623,8 +7797,8 @@ function cRef(val,_ws){/*Ref means A1 for example*/
 	this.wb = _ws.workbook;
     this.isAbsolute = false;
     this.type = cElementType.cell;
-    this.range = _ws != undefined ? this.ws.getCell2(val) :this.wb.getWorksheet(this.wb.getActive()).getCell2(val);
-    this._valid = this.range ? true : false;
+    this.range = _ws.getRange2(val);
+    this._valid = new CellAddress(val).isValid();
 }
 extend(cRef,cBaseType);
 cRef.prototype.getWsId = function(){ return this.ws.Id; }
@@ -7632,8 +7806,7 @@ cRef.prototype.getValue = function(){
 	if( !this._valid ){
 		return new cError(cErrorType.bad_reference)
 	}
-	var c = this.range.getCells()[0];
-	switch (c.getType()){
+	switch (this.range.getType()){
 		case CellValueType.Number:{
 			var v = this.range.getValueWithoutFormat();
 			if( v == "" )
@@ -7895,11 +8068,7 @@ cRef3D.prototype.isValid = function(){
 	else return false;
 }
 cRef3D.prototype.getValue = function(){
-	var _ws =  this.ws ;
-	if( !_ws ){
-		return new cError( cErrorType.bad_reference );
-	}
-	var _r = _ws.getCell2(this._cells);
+	var _r = this.getRange();
 	if( !_r ){
 		return new cError( cErrorType.bad_reference );
 	}
@@ -8554,7 +8723,7 @@ parserFormula.prototype = {
 					}
 					_tmp = currentElement.Calculate(arg,this.ws.getCell(this.cellAddress));
 					if( _tmp.numFormat !== undefined && _tmp.numFormat !== null ){
-						numFormat = _tmp.numFormat //> numFormat ? _tmp.numFormat : numFormat;
+						numFormat = _tmp.numFormat; //> numFormat ? _tmp.numFormat : numFormat;
 					}
 					else if( numFormat < 0 ){
 						numFormat = currentElement.numFormat;

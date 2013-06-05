@@ -948,12 +948,8 @@ function Vertex(sheetId,cellId,wb){
 
 	if( wb && !this.isArea ){
 		this.wb = wb;
-		var cell = this.wb.getWorksheetById(this.sheetId).getCell2(this.cellId);
-		if( cell )
-			this.cell = cell.getCells()[0];
-		else{
-			this.cell = null;
-		}
+		var c = new CellAddress(this.cellId);
+		this.cell = this.wb.getWorksheetById(this.sheetId)._getCellNoEmpty(c.getRow0(),c.getCol0());
 	}
 	
 	//вершина которую мы прошли и поставили в очередь обхода
@@ -1683,7 +1679,7 @@ Workbook.prototype.replaceWorksheet=function(indexFrom, indexTo){
 			var se = a[i].getSlaveEdges();
 			if(se){
 				for(var id in se){
-					var _ws = this.getWorksheetById(se[id].sheetId), f = _ws.getCell2(se[id].cellId).getCells()[0].sFormula, cID = se[id].cellId;
+					var cID = se[id].cellId, _ws = this.getWorksheetById(se[id].sheetId), f = _ws.getCell2(cID).getCells()[0].sFormula;
 					if( f.indexOf(tempW.wFN+":") > 0 || f.indexOf(":"+tempW.wFN) > 0 ){
 						var _c = _ws.getCell2(cID).getCells()[0];
 						_c.setFormula(_c.formulaParsed.moveSheet(tempW).assemble());//Перестраиваем трехмерные ссылки в формуле.
@@ -1891,7 +1887,8 @@ Workbook.prototype.recalc = function(is3D){
 			for(var i=0; i<this.getWorksheetCount();i++){
 				__ws = this.getWorksheet(i);
 				for(var id in this.cwf[__ws.Id].cells){
-					if( __ws.getCell2(id).getCells()[0].formulaParsed.is3D ){
+					var c = new CellAddress(id);
+					if( __ws._getCellNoEmpty(c.getRow0(),c.getCol0()).formulaParsed.is3D ){
 						dep1 = this.dependencyFormulas.t_sort_slave( __ws.Id, id );
 						sr1 = recalcDependency.call(thas,dep1.badF,true);
 						sr2 = recalcDependency.call(thas,dep1.depF,false);
@@ -3299,6 +3296,7 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
 	History.Create_NewPoint();
 	History.SetSelection(new Asc.Range(oBBoxFrom.c1, oBBoxFrom.r1, oBBoxFrom.c2, oBBoxFrom.r2));
 	History.SetSelectionRedo(new Asc.Range(oBBoxTo.c1, oBBoxTo.r1, oBBoxTo.c2, oBBoxTo.r2));
+	// History.StartTransaction();
 	History.TurnOff();
 	
 	var arrUndo={from:[],to:[]};
@@ -3322,7 +3320,7 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
 		var _sn = n.getSlaveEdges2();
 		for( var _id in _sn ){
 			var cell = _sn[_id].returnCell();
-			if( undefined == cell ) { continue; }
+			if( undefined == cell || null == cell ) { continue; }
 			if( cell.formulaParsed ){
 				cell.formulaParsed.shiftCells( offset, oBBoxFrom, n, this.Id, false );
 				cell.setFormula(cell.formulaParsed.assemble());
@@ -3408,17 +3406,18 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
 			if( _cell.hyperlinks.length > 0 ){
 				for( var i = 0; i < _cell.hyperlinks.length; i++ ){
 					if( !( oBBoxFrom.c1 <= _cell.hyperlinks[i].Ref.bbox.c1 && oBBoxFrom.r1 <= _cell.hyperlinks[i].Ref.bbox.r1 && oBBoxFrom.c2 >= _cell.hyperlinks[i].Ref.bbox.c2 && oBBoxFrom.r2 >= _cell.hyperlinks[i].Ref.bbox.r2 ) ){
-						savedHyperlinks.push( _cell.hyperlinks.splice(i,1)[0] );
+						this.getCell3(nRow,nCol).setHyperlink(_cell.hyperlinks.splice(i,1)[0],true)
 						i-=1;
 					}
+					else{
+						_cell.hyperlinks[i].Ref = this.getRange2(_cell.getName());
+					}
 				}
-				if( savedHyperlinks.length > 0 )
-					this.getCell3(nRow,nCol).getCells()[0].hyperlinks = savedHyperlinks;
 			}
-			
+
 			var oTargetRow = this._getRow(nRow + offset.offsetRow);
 			oTargetRow.c[nCol+offset.offsetCol] = _cell;
-		
+
 		}
 	}
 		
@@ -3426,6 +3425,7 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
 	this.workbook.needRecalc = rec;
 
 	recalc(this.workbook);
+	// History.EndTransaction();
 	History.TurnOn();
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_MoveRange,
 				this.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0),
@@ -3610,17 +3610,16 @@ Woorksheet.prototype._BuildDependencies=function(cellRange){
 	/*
 		Построение графа зависимостей.
 	*/
-	var c;
+	var c, ca;
 	for(var i in cellRange){
-		c = this.getRange2(cellRange[i]).getCells()[0];
+		ca = new CellAddress(i);
+		c = this._getCellNoEmpty(ca.getRow0(),ca.getCol0());
 
-		if( !c.sFormula )
-			continue;
-		// if( !c.formulaParsed ){
+		if( c && c.sFormula ){
 			c.formulaParsed = new parserFormula( c.sFormula, c.oId.getID(), this );
-		// }
-		c.formulaParsed.parse();
-		c.formulaParsed.buildDependencies();
+			c.formulaParsed.parse();
+			c.formulaParsed.buildDependencies();
+		}
 	}
 }
 Woorksheet.prototype._RecalculatedFunctions=function(cell,bad){
@@ -3639,17 +3638,13 @@ Woorksheet.prototype._RecalculatedFunctions=function(cell,bad){
 		if( g_oDefaultNum.f == c.getNumFormatStr() )
 			c.setNumFormat(thas.getCell(ca).getNumFormatStr());
 	}
+	
 	if( cell.indexOf(":")>-1 ) return;
 	
-	var __cell = this.getRange2(cell), res;
-	if( __cell )
-		__cell = __cell.getCells()[0];
-	else
-		return;
-	/*
-		Проверяем содержит ли ячейка формулу. Если нет, то выходим из функции.
-	*/
-	if ( !__cell.sFormula )
+	var celladd = this.getRange2(cell).getFirst(),
+		__cell = this._getCellNoEmpty( celladd.getRow0(),celladd.getCol0() ), res;
+	
+	if( !__cell || !__cell.sFormula )
 		return;
 
 	/*
@@ -3708,10 +3703,12 @@ Woorksheet.prototype._ReBuildFormulas=function(cellRange,lastSheetName,newSheetN
 	/*
 		Если существуют трехмерные ссылки на ячейки, то у них необходимо поменять имя листа на новое после переименования листа.
 	*/
-	var c, __ws = this;
+	var c, ca;
 	for(var i in cellRange){
-		c = this.getRange2(cellRange[i]).getCells()[0];
-		if( c.formulaParsed.is3D ){
+		ca = new CellAddress(i);
+		c = this._getCellNoEmpty(ca.getRow0(),ca.getCol0());
+		
+		if( c && c.formulaParsed && c.formulaParsed.is3D ){
 			c.setFormula(c.formulaParsed.assemble());
 		}
 	}
