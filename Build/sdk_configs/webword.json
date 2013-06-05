@@ -97,6 +97,8 @@
                 "../Word/Editor/DocumentContent.js",
                 "../Word/Editor/Table.js",
                 "../Word/Editor/Serialize2.js",
+                "../Word/Search.js",
+                "../Word/FontClassification.js",
                 "../Word/Drawing/Graphics.js",
                 "../Word/Drawing/ArcTo.js",
                 "../Word/Drawing/Hit.js",
