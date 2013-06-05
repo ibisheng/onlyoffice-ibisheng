@@ -1974,11 +1974,11 @@ function BinaryWorkbookTableWriter(memory, wb)
         var oThis = this;
 		//собираем все defined names в массив
 		var allDefined = new Object();
-		if(null != this.wb.DefinedNames)
+		if(null != this.wb.oRealDefinedNames)
 		{
-			for(var i in this.wb.DefinedNames)
+			for(var i in this.wb.oRealDefinedNames)
 			{
-				var oDefinedName = this.wb.DefinedNames[i];
+				var oDefinedName = this.wb.oRealDefinedNames[i];
 				if(null == allDefined[oDefinedName.Name])
 					allDefined[oDefinedName.Name] = {global: oDefinedName, local: {}};
 			}
@@ -3276,9 +3276,10 @@ function BinaryFileWriter(wb)
     }
 };
 /** @constructor */
-function Binary_TableReader(stream, Dxfs)
+function Binary_TableReader(stream, ws, Dxfs)
 {
 	this.stream = stream;
+	this.ws = ws;
 	this.Dxfs = Dxfs;
 	this.bcr = new Binary_CommonReader(this.stream);
 	this.Read = function(length, aTables)
@@ -3300,6 +3301,8 @@ function Binary_TableReader(stream, Dxfs)
 			res = this.bcr.Read1(length, function(t,l){
 					return oThis.ReadTable(t,l, oNewTable);
 				});
+			if(null != oNewTable.Ref && null != oNewTable.DisplayName)
+				this.ws.workbook.oNameGenerator.addTableName(oNewTable.DisplayName, this.ws, oNewTable.Ref);
 			aTables.push(oNewTable);
 		}
 		else
@@ -4559,7 +4562,7 @@ function Binary_WorkbookTableReader(stream, oWorkbook)
         else if ( c_oSerWorkbookTypes.DefinedNames === type )
         {
             res = this.bcr.Read1(length, function(t,l){
-                    return oThis.ReadDefinedNames(t,l,oThis.oWorkbook.DefinedNames);
+                    return oThis.ReadDefinedNames(t,l);
                 });
         }
         else
@@ -4604,13 +4607,13 @@ function Binary_WorkbookTableReader(stream, oWorkbook)
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
-    this.ReadDefinedNames = function(type, length, aDefinedNames)
+    this.ReadDefinedNames = function(type, length)
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
         if ( c_oSerWorkbookTypes.DefinedName == type )
         {
-            var oNewDefinedName = new Object();
+            var oNewDefinedName = new DefinedName();
             res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadDefinedName(t,l,oNewDefinedName);
                 });
@@ -4620,10 +4623,16 @@ function Binary_WorkbookTableReader(stream, oWorkbook)
 				{
 					var ws = this.oWorkbook.aWorksheets[oNewDefinedName.LocalSheetId];
 					if(null != ws)
+					{
 						ws.DefinedNames[oNewDefinedName.Name] = oNewDefinedName;
+						this.oWorkbook.oNameGenerator.addLocalDefinedName(oNewDefinedName);
+					}
 				}
 				else
-					aDefinedNames[oNewDefinedName.Name] = oNewDefinedName;
+				{
+					this.oWorkbook.oNameGenerator.addDefinedName(oNewDefinedName);
+					this.oWorkbook.oRealDefinedNames[oNewDefinedName.Name] = oNewDefinedName;
+				}
 			}
         }
         else
@@ -4831,7 +4840,7 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
         }
 		else if ( c_oSerWorksheetsTypes.Autofilter == type )
 		{
-			var oBinary_TableReader = new Binary_TableReader(this.stream, this.Dxfs);
+			var oBinary_TableReader = new Binary_TableReader(this.stream, oWorksheet, this.Dxfs);
 			oWorksheet.AutoFilter = new Object();
 			res = this.bcr.Read1(length, function(t,l){
 					return oBinary_TableReader.ReadAutoFilter(t,l, oWorksheet.AutoFilter);
@@ -4840,7 +4849,7 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 		else if ( c_oSerWorksheetsTypes.TableParts == type )
         {
 			oWorksheet.TableParts = new Array();
-			var oBinary_TableReader = new Binary_TableReader(this.stream, this.Dxfs);
+			var oBinary_TableReader = new Binary_TableReader(this.stream, oWorksheet, this.Dxfs);
 			oBinary_TableReader.Read(length, oWorksheet.TableParts);
         }
         else if ( c_oSerWorksheetsTypes.Comments == type )

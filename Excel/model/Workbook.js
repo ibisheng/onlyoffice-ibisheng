@@ -1365,6 +1365,8 @@ function Workbook(sUrlPath, eventsHandlers, oApi){
     this.clrSchemeMap   = GenerateDefaultColorMap();
 	
 	this.DefinedNames = new Object();
+	this.oRealDefinedNames = new Object();
+	this.oNameGenerator = new NameGenerator(this);
 	this.TableStyles = new CTableStyles();
 	this.oStyleManager = new StyleManager(this);
 	this.calcChain = new Array();
@@ -8286,3 +8288,53 @@ PromoteHelper.prototype = {
 		return {a0: a0, a1: a1, nX: nX};
 	}
 };
+function DefinedName(){
+	this.Name = null;
+	this.Ref = null;
+	this.LocalSheetId = null;
+	this.bTable = false;
+}
+function NameGenerator(wb){
+	this.wb = wb;
+	this.aExistNames = new Object();
+	this.sTableNamePattern = "Table";
+	this.nTableNameMaxIndex = 0;
+};
+NameGenerator.prototype = {
+	addName : function(sName){
+		this.aExistNames[sName] = 1;
+	},
+	addLocalDefinedName : function(oDefinedName){
+		this.addName(oDefinedName.Name);
+	},
+	addDefinedName : function(oDefinedName){
+		this.wb.DefinedNames[oDefinedName.Name] = oDefinedName;
+		this.addName(oDefinedName.Name);
+	},
+	addTableName : function(sName, ws, Ref){
+		var sDefinedNameRef = ws.getName();
+		if(false == rx_test_ws_name.test(sDefinedNameRef))
+			sDefinedNameRef = "'" + sDefinedNameRef + "'";
+		sDefinedNameRef += "!" + Ref;
+		var oNewDefinedName = new DefinedName();
+		oNewDefinedName.Name = sName;
+		oNewDefinedName.Ref = sDefinedNameRef;
+		oNewDefinedName.bTable = true;
+		this.addDefinedName(oNewDefinedName);
+	},
+	isExist : function(sName)
+	{
+		return null != this.aExistNames[sName];
+	},
+	getNextTableName : function(ws, Ref){
+		this.nTableNameMaxIndex++;
+		var sNewName = this.sTableNamePattern + this.nTableNameMaxIndex;
+		while(null != this.aExistNames[sNewName])
+		{
+			this.nTableNameMaxIndex++;
+			sNewName = this.sTableNamePattern + this.nTableNameMaxIndex;
+		}
+		this.addTableName(sNewName, ws, Ref);
+		return sNewName;
+	}
+}

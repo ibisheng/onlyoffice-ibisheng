@@ -3343,7 +3343,7 @@
 							ShowRowStripes: true 
 						},
 						TableColumns: tableColumns,
-						DisplayName: this._generateNameTable(aWs)
+						DisplayName: aWs.workbook.oNameGenerator.getNextTableName(aWs, ref)
 					};
 					return 	aWs.TableParts[aWs.TableParts.length - 1];
 				}
@@ -4685,32 +4685,6 @@
 					SortState : obj.SortState ? obj.SortState : null
 				};
 				return newObj;
-			},
-			
-			_generateNameTable: function(aWs)
-			{
-				var number = 1;
-				var worksheets = aWs.workbook.aWorksheets;
-				for(var j = 0; j < worksheets.length; j++)
-				{
-					if(worksheets[j])
-					{
-						var table = worksheets[j].TableParts;
-						if(table)
-						{
-							for(var i = 0; i < table.length; i++)
-							{
-								var name = table[i].DisplayName.split('Table');
-								if(name[1] && !isNaN(parseFloat(name[1])))
-								{
-									if(number <= parseFloat(name[1]))
-										number = parseFloat(name[1]) + 1;
-								}
-							}
-						}
-					}
-				}
-				return "Table" + number;
 			},
 
 			_removeTableByName: function (ws, name) {
