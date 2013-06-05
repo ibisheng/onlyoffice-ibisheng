@@ -2309,7 +2309,7 @@ PasteProcessor.prototype =
                                 {
                                     src_string = Drawing.GraphicObj.blipFill.RasterImageId;
                                     if(typeof src_string === "string")
-										this.oImages[src_string] = documentOrigin + src_string;
+										this.oImages[src_string] = src_string;
                                 }
                                 break;
                             }
@@ -2328,7 +2328,7 @@ PasteProcessor.prototype =
                                         {
                                             src_string = Drawing.GraphicObj.spPr.Fill.fill.RasterImageId;
                                             if(typeof src_string === "string")
-												this.oImages[src_string] = documentOrigin + src_string;
+												this.oImages[src_string] = src_string;
                                         }
                                     }
                                     if(typeof Drawing.GraphicObj.isGroup === "function" && Drawing.GraphicObj.isGroup() === true)
@@ -2348,7 +2348,7 @@ PasteProcessor.prototype =
                                                             src_string = sp.blipFill.RasterImageId;
 
                                                             if(typeof src_string === "string")
-																this.oImages[src_string] = documentOrigin + src_string;
+																this.oImages[src_string] = src_string;
                                                         }
                                                     }
                                                     if(typeof sp.isShape === "function" && sp.isShape())
@@ -2360,7 +2360,7 @@ PasteProcessor.prototype =
                                                         {
                                                             src_string = sp.spPr.Fill.fill.RasterImageId;
                                                             if(typeof src_string === "string")
-																this.oImages[src_string] = documentOrigin + src_string;
+																this.oImages[src_string] = src_string;
                                                         }
                                                     }
                                                 }
