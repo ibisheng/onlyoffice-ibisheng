@@ -15,6 +15,8 @@ function CFontSetup()
     this.SetUpIndex = -1;
     this.SetUpSize = 12;
     this.SetUpStyle = -1;
+
+    this.SetUpMatrix = new CMatrix();
 }
 
 function CGrState_Pen()

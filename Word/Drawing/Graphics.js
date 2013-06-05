@@ -1090,6 +1090,16 @@ CGraphics.prototype =
 
         g_font_infos[font.FontFamily.Index].LoadFont(g_font_loader, this.m_oFontManager, font.FontSize, oFontStyle, this.m_dDpiX, this.m_dDpiY, this.m_oTransform);
 
+        var _mD = this.m_oLastFont.SetUpMatrix;
+        var _mS = this.m_oTransform;
+
+        _mD.sx = _mS.sx;
+        _mD.sy = _mS.sy;
+        _mD.shx = _mS.shx;
+        _mD.shy = _mS.shy;
+        _mD.tx = _mS.tx;
+        _mD.ty = _mS.ty;
+
         //this.m_oFontManager.SetTextMatrix(this.m_oTransform.sx,this.m_oTransform.shy,this.m_oTransform.shx,
         //    this.m_oTransform.sy,this.m_oTransform.tx,this.m_oTransform.ty);
     },
@@ -1189,6 +1199,23 @@ CGraphics.prototype =
             _lastFont.SetUpStyle = _style;
 
             g_font_infos[_lastFont.SetUpIndex].LoadFont(g_font_loader, this.m_oFontManager, _lastFont.SetUpSize, _lastFont.SetUpStyle, this.m_dDpiX, this.m_dDpiY, this.m_oTransform);
+        }
+        else
+        {
+            var _mD = this.m_oLastFont.SetUpMatrix;
+            var _mS = this.m_oTransform;
+
+            if (_mD.sx != _mS.sx || _mD.sy != _mS.sy || _mD.shx != _mS.shx || _mD.shy != _mS.shy || _mD.tx != _mS.tx || _mD.ty != _mS.ty)
+            {
+                _mD.sx = _mS.sx;
+                _mD.sy = _mS.sy;
+                _mD.shx = _mS.shx;
+                _mD.shy = _mS.shy;
+                _mD.tx = _mS.tx;
+                _mD.ty = _mS.ty;
+
+                this.m_oFontManager.SetTextMatrix(_mD.sx,_mD.shy,_mD.shx,_mD.sy,_mD.tx,_mD.ty);
+            }
         }
 
         //this.m_oFontManager.SetTextMatrix(this.m_oTransform.sx,this.m_oTransform.shy,this.m_oTransform.shx,
