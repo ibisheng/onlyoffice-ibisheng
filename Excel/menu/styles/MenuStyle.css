@@ -305,6 +305,13 @@
 }
 .ToolbarIconAsc {
 	background: url(../img/toolbar-btns.png) no-repeat scroll 0 0 transparent;
+	width: 20px;
+	margin-left: 1px;
+}
+.ToolbarIconMenuAsc {
+	background: url(../img/main-menu.png) no-repeat scroll 0 0 transparent;
+	width: 24px;
+	margin-left: 0px;
 }
 .ToolbarIcon2
 {
@@ -402,6 +409,12 @@
 .MenubarFilter, .ToolbarFilter {
 	background-position: 0 -800px;
 }
+.MenubarInsertChart, .ToolbarInsertChart {
+	background-position: 0 -720px;
+}
+.MenubarInsertComment, .ToolbarInsertComment {
+	background-position: 0 -99px;
+}
 .MenubarUnwritten, .ToolbarUnwritten
 {
 	background-position: -802px 50%;
@@ -418,6 +431,10 @@
 .MenubarLink, .ToolbarLink
 {
 	background-position: -336px 50%;
+}
+.MenubarLinkAsc, .ToolbarLinkAsc
+{
+	background-position: 0 -700px;
 }
 .MenubarLine, .ToolbarLine
 {

@@ -632,7 +632,7 @@
 	function addClassIconPress(a){
 		a.addClass("iconPressed");
 	}
-	$("#td_sort_desc,#td_sort_asc,#td_text_wrap, #td_redo, #td_undo, #td_bold, #td_italic, #td_underline, #td_print, #td_copy, #td_paste,#td_cut, #td_ta_center, #td_ta_right, #td_ta_left, #td_ta_justify, #td_mergeCells, #td_recalc, #td_insert_chart, #td_insert_image_url, #td_insert_image_file, #td_drawing_object_layer, #td_add_cell_comment, #td_add_document_comment, #td_add_hyperlink, #td_print_pdf, #td_auto_filter, #td_auto_filter_local").click(function(){
+	$("#td_sort_desc,#td_sort_asc,#td_text_wrap, #td_redo, #td_undo, #td_bold, #td_italic, #td_underline, #td_print, #td_copy, #td_paste,#td_cut, #td_ta_center, #td_ta_right, #td_ta_left, #td_ta_justify, #td_mergeCells, #td_recalc, #td_insert_chart, #td_insert_image_url, #td_insert_image_file, #td_drawing_object_layer, #td_add_cell_comment, #td_add_document_comment, #td_add_hyperlink, #td_auto_filter, #td_auto_filter_local").click(function(){
 		switch (this.id){
 			case "td_bold":{
 				if ($(this).hasClass("iconPressed")){
@@ -668,7 +668,7 @@
 				break;
 			}
 			case "td_print":{
-				// editor.Print();
+				api.asc_Print();
 				break;
 			}
 			case "td_copy":{
@@ -826,9 +826,6 @@
 				$("#dialogAddHyperlink").dialog("open");
 				break;
 			}
-			case "td_print_pdf":
-				api.asc_Print();
-				break;
 			case "td_auto_filter":{
 				api.asc_addAutoFilter()
 				break;
