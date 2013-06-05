@@ -1024,7 +1024,16 @@ CBlipFill.prototype =
         Writer.WriteBool(flag);
         if(flag)
         {
-            Writer.WriteString2(_getFullImageSrc(this.RasterImageId));
+            var string_to_write =  _getFullImageSrc(this.RasterImageId);
+            if(string_to_write.indexOf(documentOrigin) !== 0
+                && string_to_write.indexOf("http:") !== 0
+                && string_to_write.indexOf("https:") !== 0
+                && string_to_write.indexOf("ftp:") !== 0
+                && string_to_write.indexOf("data:") !== 0)
+            {
+                string_to_write = documentOrigin + string_to_write;
+            }
+            Writer.WriteString2(string_to_write);
         }
 
         flag = this.stretch !== null;
