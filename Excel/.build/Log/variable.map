@@ -1014,7 +1014,7 @@ FT_Generic:Bg
 EBorderStyle$borderstyleDashDot:eB
 c_oAscCoAuthoringOtherBorderColor:Ud
 c_oAscAsyncAction$SlowOperation:LJ
-g_oDefaultFontAbs:QC
+g_oDefaultFontAbs:RC
 _ph_summ__pic_tx:$M
 gc_dDefaultColWidthCharsAttribute:$C
 c_oAscDrawingLayerType$BringToFront:Na
@@ -1137,7 +1137,7 @@ historyitem_Worksheet_RowProp:$G
 FT_Outline_Get_CBox:of
 c_oSer_ChartSeriesType$OutlineColor:bP
 cff_slot_done:Fp
-g_oDefaultBorderAbs:RC
+g_oDefaultBorderAbs:QC
 c_oSerFormulaTypes$Bx:py
 TransactionState$Start:md
 c_oAscFileType$INNER:UQ
@@ -1371,7 +1371,7 @@ c_oAscError$ID$StockChartError:$c
 historyitem_AutoFilter_ApplyDF:Gt
 fontstyle_mask_bold:ms
 cElementType$error:ju
-FT_Face_Internal:Og
+FT_Face_Internal:Qg
 compare_kern_pairs:oq
 c_oSer_CommentData$Reply:dB
 tt_cmap14_get_nondef_chars:Mk
@@ -1984,7 +1984,7 @@ LAYOUT_KIND:zK
 c_oAscLockTypes$kLockTypeNone:Tt
 L 39:Pe
 c_oAscMergeOptions$Unmerge:CJ
-L 38:Qg
+L 38:Pg
 L 37:Oe
 c_oAscServerError$VKeyEncrypt:rb
 PS_PrivateRec:uh
@@ -2089,7 +2089,7 @@ TT_Post_NamesRec:hg
 L 40:Gb
 ft_bitmap_glyph_init:Ye
 Get_Kerning:ar
-L 43:Pg
+L 43:Og
 L 42:Vc
 c_oSer_TableColumns$Name:sz
 asc_CChartAxis:td
