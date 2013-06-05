@@ -800,25 +800,26 @@
 				var oCellInfo = api.asc_getCellInfo();
 				oTmpHyperlinkObj = oCellInfo.asc_getHyperlink();
 
-				$("#addHyperlink_text").val(oTmpHyperlinkObj.asc_getText());
-
+				var oHyperText = $("#addHyperlink_text");
 				var oSelect = $("#addHyperlink_she");
 				oSelect.empty();
 				for (var i = 0; i < $("#ws-navigation .tabs .tab-name").length; i++)
 					oSelect.append("<option>" + $("#ws-navigation .tabs .tab-name")[i].textContent + "</option>");
 				if (null == oTmpHyperlinkObj) {
+					oHyperText.val(oCellInfo.asc_getText());
 					toggleHyperlinkDialog(true);
 					$("#addHyperlink_url").val("");
 					$("#addHyperlink_ran").val("A1");
 				}
 				else {
+					oHyperText.val(oTmpHyperlinkObj.asc_getText());
 					if (c_oAscHyperlinkType.WebLink === oTmpHyperlinkObj.asc_getType()) {
 						toggleHyperlinkDialog(true);
 						$("#addHyperlink_url").val(oTmpHyperlinkObj.asc_getHyperlinkUrl());
 					}
 					else if (c_oAscHyperlinkType.RangeLink === oTmpHyperlinkObj.asc_getType()) {
 						toggleHyperlinkDialog(false);
-						$("#addHyperlink_she").val(oTmpHyperlinkObj.asc_getSheet());
+						oSelect.val(oTmpHyperlinkObj.asc_getSheet());
 						$("#addHyperlink_ran").val(oTmpHyperlinkObj.asc_getRange());
 					}
 				}
