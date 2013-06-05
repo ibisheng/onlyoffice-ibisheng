@@ -303,6 +303,9 @@
 	height: 16px;
 	width: 16px;
 }
+.ToolbarIconAsc {
+	background: url(../img/toolbar-btns.png) no-repeat scroll 0 0 transparent;
+}
 .ToolbarIcon2
 {
 	margin: 0px;
@@ -395,6 +398,9 @@
 .MenubarCut, .ToolbarCut
 {
 	background-position: -978px 50%;
+}
+.MenubarFilter, .ToolbarFilter {
+	background-position: 0 -800px;
 }
 .MenubarUnwritten, .ToolbarUnwritten
 {
