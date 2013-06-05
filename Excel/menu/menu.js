@@ -629,7 +629,6 @@
 	function remClassIconPress(a){
 		a.removeClass("iconPressed");
 	}
-	$("#td_verticalAlign").addClass("iconPressed");
 	function addClassIconPress(a){
 		a.addClass("iconPressed");
 	}
@@ -853,6 +852,7 @@
 		if ("none" != $("#va_options").css("display")) {
 			IsVisibleMenu = true;
 			$("#td_verticalAlign").removeClass("iconPressed");
+			$("#va_options").hide();
 		}
 	});
 	$("#td_va_choose").click(function() {
@@ -962,6 +962,7 @@
 		if ("none" != $("#formulaList2").css("display")) {
 			IsVisibleMenu = true;
 			$("#td_Formulas").removeClass("iconPressed");
+			$("#formulaList2").hide();
 		}
 	});
 	$("#td_func_choose").click(function() {
