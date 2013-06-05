@@ -164,7 +164,7 @@ tt_cmap14_ensure:Yn
 cff_decoder_parse_charstrings:Pt
 JSCompiler_StaticMethods__Execute:bc
 Write_CVT_Stretched:hr
-TT_Header:uj
+TT_Header:Aj
 ps_table_funcs:lm
 DoNullBitmap:ii
 g_dKoef_in_to_mm:Rd
@@ -597,7 +597,7 @@ T1_Driver_Init:Bu
 Ins_Goto_CodeRange:zq
 TT_Load_Simple_Glyph:Jr
 LineEndType$Stealth:WH
-close:hh
+close:kh
 tt_face_load_strike_metrics:hn
 cff_index_access_element:dt
 cff_slot_load:Qt
@@ -1114,7 +1114,7 @@ ft_var_apply_tuple:yr
 JSCompiler_StaticMethods_Internal_Add_Row:uB
 ParaTab:Ac
 c_oMainTables$Slides:Jg
-FT_DivFix:ai
+FT_DivFix:fi
 CTab:Kz
 Ins_SDPVTL:ar
 documentUrl:$K
@@ -1128,7 +1128,7 @@ cff_cmap_encoding_class_rec:nt
 check_KeyboardEvent:hz
 JSCompiler_StaticMethods__MarginToStyle:rb
 LineJoinType$Miter:aI
-PS_FontExtraRec:Mk
+PS_FontExtraRec:Uk
 CopyPasteCorrectString:Ab
 CParagraphSpacing:sL
 ps_get_macintosh_name:Ak
@@ -1411,7 +1411,7 @@ L 119:Us
 L 116:Mm
 ParaNewLine:zc
 L 117:kp
-L 114:Uk
+L 114:Tk
 L 115:vz
 TT_GaspRange:ij
 CopyProcessor:qa
@@ -1458,22 +1458,22 @@ FT_Size_Metrics:Tj
 bIsIE:CH
 find_sbit_range:jn
 L 111:uz
-L 110:Aj
-L 113:kh
+L 110:zj
+L 113:jh
 tt_get_interface:Xr
-L 112:fi
+L 112:ei
 bIsSupportOriginalFormatFonts:Wv
 L 103:wb
 CAutoshapeTrack:PH
-L 104:ei
+L 104:di
 JSCompiler_StaticMethods_Internal_RecalculateGrid:tA
 plusDiv:tG
 L 105:tz
 CAscFill:AL
 L 106:Lm
 L 107:Te
-L 108:zj
-L 109:Tk
+L 108:yj
+L 109:Sk
 LineJoinType$Bevel:ZH
 para_Empty:Px
 FT_Service_PsFontNameRec:ph
@@ -1701,7 +1701,7 @@ ParaHyperlinkEnd:Dc
 cff_builder_start_point:Lt
 pararecalc_0_None:fD
 LAYOUT_KIND:fA
-L 39:Nk
+L 39:Mk
 L 38:md
 L 37:cd
 locktype_None:Yw
@@ -1759,8 +1759,8 @@ TRACK_CIRCLE_RADIUS:bG
 tt_face_load_bhed:Gm
 T1_Loader:Du
 nSldLtTClipArtAndTx:YI
-L 59:Pk
-L 58:Ok
+L 59:Ok
+L 58:Nk
 L 57:JJ
 L 56:IJ
 L 55:Os
@@ -1948,15 +1948,15 @@ L 73:Tf
 L 74:Uf
 JSCompiler_StaticMethods__draw:NC
 Int64:Uh
-L 75:xj
+L 75:wj
 _ph_summ__sec_head:lK
 tt_face_load_bdf_props:vm
-L 76:yj
-L 77:Rk
-L 78:Sk
+L 76:xj
+L 77:Qk
+L 78:Rk
 t1_args_count:Zl
 dublicate_matrix:Nj
-L 79:di
+L 79:ci
 CHorRulerRepaintChecker:Pz
 AFM_StreamRec:gl
 numbering_presentationnumfrmt_ArabicPeriod:Ua
@@ -1966,19 +1966,19 @@ TT_Forget_Glyph_Frame:Hr
 gray_record_cell:Ro
 JSCompiler_StaticMethods_Stop:qE
 trimString:Yb
-L 70:bi
+L 70:ai
 FT_PEEK_USHORT:Hh
 L 72:Sf
-L 71:ci
+L 71:bi
 L 64:Se
 L 65:lz
-L 62:vj
+L 62:uj
 BULLET_TYPE_TYPEFACE_BUFONT:lg
 CUniFill:af
-L 63:wj
+L 63:vj
 L 68:ip
 L 69:jp
-L 66:Qk
+L 66:Pk
 Ins_MSIRP:Qq
 L 67:Jm
 JSCompiler_StaticMethods_getSrc:xa
@@ -2021,7 +2021,7 @@ L 88:mz
 L 89:NJ
 L 86:MJ
 JSCompiler_StaticMethods_Set_Inline:JB
-L 87:jh
+L 87:ih
 L 84:Rs
 L 85:LJ
 FT_Glyph_Class:ap
@@ -2035,7 +2035,7 @@ c_oAscServerError$ConvertReadFile:ue
 numbering_numfmt_UpperLetter:Ta
 JSCompiler_StaticMethods_Create_Table_BorderedAndLined:zx
 ScrollArrowType$ARROW_LEFT:sC
-L 83:ih
+L 83:hh
 L 82:Km
 L 81:KJ
 L 80:Qs
