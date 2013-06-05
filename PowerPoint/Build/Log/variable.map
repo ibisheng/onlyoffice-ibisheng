@@ -541,7 +541,7 @@ historyitem_TableCell_Shd:ZB
 nSldLtTObjOnly:eJ
 JSCompiler_StaticMethods_Set_Ind:vd
 T1_GlyphSlot_Done:wu
-CHist_Clip:Py
+CHist_Clip:Qy
 historyitem_TextPr_Italic:dy
 JSCompiler_StaticMethods_Internal_ScaleTableWidth:zB
 JSCompiler_StaticMethods_Get_Props:NB
@@ -712,7 +712,7 @@ cff_expertsubset_charset:Xs
 FT_NEXT_BYTE:Eh
 JSCompiler_StaticMethods_Internal_Get_SelectionArray:aB
 g_clr_MAX:MI
-CMatrix:Qy
+CMatrix:Py
 DefaultShapeDefinition:Kf
 check_MouseDownEvent:xz
 TT_SBit_StrikeRec:oj
@@ -1114,7 +1114,7 @@ ft_var_apply_tuple:yr
 JSCompiler_StaticMethods_Internal_Add_Row:uB
 ParaTab:Ac
 c_oMainTables$Slides:Jg
-FT_DivFix:fi
+FT_DivFix:ai
 CTab:Kz
 Ins_SDPVTL:ar
 documentUrl:$K
@@ -1461,11 +1461,11 @@ L 111:uz
 L 110:zj
 L 113:jh
 tt_get_interface:Xr
-L 112:ei
+L 112:fi
 bIsSupportOriginalFormatFonts:Wv
 L 103:wb
 CAutoshapeTrack:PH
-L 104:di
+L 104:ei
 JSCompiler_StaticMethods_Internal_RecalculateGrid:tA
 plusDiv:tG
 L 105:tz
@@ -1956,7 +1956,7 @@ L 77:Qk
 L 78:Rk
 t1_args_count:Zl
 dublicate_matrix:Nj
-L 79:ci
+L 79:di
 CHorRulerRepaintChecker:Pz
 AFM_StreamRec:gl
 numbering_presentationnumfrmt_ArabicPeriod:Ua
@@ -1966,10 +1966,10 @@ TT_Forget_Glyph_Frame:Hr
 gray_record_cell:Ro
 JSCompiler_StaticMethods_Stop:qE
 trimString:Yb
-L 70:ai
+L 70:bi
 FT_PEEK_USHORT:Hh
 L 72:Sf
-L 71:bi
+L 71:ci
 L 64:Se
 L 65:lz
 L 62:uj
