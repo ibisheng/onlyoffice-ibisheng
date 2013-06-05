@@ -5542,7 +5542,7 @@ CGraphicObjects.prototype =
             if(cur_state.id === STATES_ID_NULL)
             {
                 var selected_array = this.selectionInfo.selectionArray;
-                if(selected_array.length === 1 && typeof selected_array[0].GraphicObj.setParagraphNumbering === "function")
+                if(selected_array.length === 1 && typeof selected_array[0].GraphicObj.setParagraphNumbering === "function" && isRealObject(selected_array[0].GraphicObj.textBoxContent))
                 {
                     this.changeCurrentState(new TextAddState(this, selected_array[0]));
                     selected_array[0].setAllParagraphNumbering(NumInfo);
