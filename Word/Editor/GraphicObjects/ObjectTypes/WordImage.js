@@ -1864,7 +1864,7 @@ WordImage.prototype =
 
             this.chart.img = chartBase64;
             this.setRasterImage(this.chart.img);
-            editor.SyncLoadImages([chartBase64]);
+            editor.WordControl.m_oLogicDocument.DrawingObjects.urlMap.push(chartBase64);
         }
     },
 
