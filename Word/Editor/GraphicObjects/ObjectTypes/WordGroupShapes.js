@@ -416,8 +416,10 @@ WordGroupShapes.prototype =
     {
         for(var i = 0; i< this.spTree.length; ++i)
         {
-            if(typeof this.spTree[i].setDiagram === "function")
+            if(typeof this.spTree[i].setDiagram === "function" && isRealObject(this.spTree[i].chart))
+            {
                 this.spTree[i].setDiagram(chart);
+            }
         }
     },
 
