@@ -59,6 +59,8 @@
 			this.isMoveRangeMode = false;
 			this.isMoveResizeRange = false;
 			this.isMoveResizeChartsRange = false;
+			// Режим select-а для диалогов
+			this.isSelectDialogRangeMode = false;
 			// Режим формулы
 			this.isFormulaEditMode = false;
 			this.endWasPressed = false;
@@ -197,6 +199,14 @@
 				this.isFocusDrawingObject = isFocusDrawingObject;
 			},
 
+			/**
+			 *
+			 * @param {Boolean} isSelectDialogRangeMode
+			 */
+			setSelectDialogRangeMode: function (isSelectDialogRangeMode) {
+				this.isSelectDialogRangeMode = isSelectDialogRangeMode;
+			},
+
 			/** @param whichSB {Number}  Scroll bar to reinit (1=vertical, 2=horizontal) */
 			reinitializeScroll: function (whichSB) {
 				var self = this,
@@ -244,7 +254,7 @@
 				var t = this;
 
 				// Для формулы не нужно выходить из редактирования ячейки
-				if (t.settings.isViewerMode || t.isFormulaEditMode) {return true;}
+				if (t.settings.isViewerMode || t.isFormulaEditMode || t.isSelectDialogRangeMode) {return true;}
 				
 				if( this.targetInfo && ( this.targetInfo.target == "moveResizeRange" || this.targetInfo.target == "moveRange" || this.targetInfo.target == "fillhandle" ) ){
 					return true;
@@ -636,7 +646,7 @@
 				switch (event.which) {
 
 					case 113: // F2
-						if (isViewerMode || t.isCellEditMode) {return true;}
+						if (isViewerMode || t.isCellEditMode || t.isSelectDialogRangeMode) {return true;}
 						if ($.browser.opera) {stop();}
 						// Выставляем блокировку на выход из редактора по клавишам-стрелкам
 						t.strictClose = true;
@@ -645,7 +655,7 @@
 						return t.__retval;
 
 					case 8: // backspace
-						if (isViewerMode || t.isCellEditMode) {return true;}
+						if (isViewerMode || t.isCellEditMode || t.isSelectDialogRangeMode) {return true;}
 						if (t.isSelectDrawingObject) {
 							t.handlers.trigger("deleteDrawingObjectDone");
 							t.isSelectDrawingObject = false;
@@ -660,7 +670,7 @@
 						return true;
 
 					case 46: // Del
-						if (isViewerMode || t.isCellEditMode) {return true;}
+						if (isViewerMode || t.isCellEditMode || t.isSelectDialogRangeMode) {return true;}
 						// Удаляем содержимое
 						if (t.isSelectDrawingObject) {
 							t.handlers.trigger("deleteDrawingObjectDone");
@@ -803,7 +813,7 @@
 					case 88: // cut             Ctrl + x
 					case 89: // redo            Ctrl + y
 					case 90: // undo            Ctrl + z
-						if (isViewerMode) {stop(); return false;}
+						if (isViewerMode || t.isSelectDialogRangeMode) {stop(); return false;}
 
 					case 65: // select all      Ctrl + a
 					case 67: // copy            Ctrl + c
@@ -836,7 +846,7 @@
 
 					case 61:  // Firefox, Opera (+/=)
 					case 187: // +/=
-						if (isViewerMode || t.isCellEditMode) {return true;}
+						if (isViewerMode || t.isCellEditMode || t.isSelectDialogRangeMode) {return true;}
 
 						if (event.altKey) {
 							t.handlers.trigger("addFunction", /*functionName*/"SUM", /*autoComplet*/true);
@@ -901,7 +911,7 @@
 				// не вводим текст в режиме просмотра
 				// если в FF возвращать false, то отменяется дальнейшая обработка серии keydown -> keypress -> keyup
 				// и тогда у нас не будут обрабатываться ctrl+c и т.п. события
-				if (t.settings.isViewerMode) {return true;}
+				if (t.settings.isViewerMode || t.isSelectDialogRangeMode) {return true;}
 
 				if ($("#drawingObjectsMenu").length || t.isSelectDrawingObject)
 					return true;

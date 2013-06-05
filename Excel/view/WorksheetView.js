@@ -346,6 +346,8 @@
 		 * @param {Worksheet} model  Worksheet
 		 * @param {Object} canvas    Canvas for drawing
 		 * @param {Object} overlay   Canvas for selection
+		 * @param {asc_CCollaborativeEditing} collaborativeEditing
+		 * @param {c_oAscFontRenderingModeType} fontRenderingMode
 		 * @param {Object} settings  Settings
 		 *
 		 * @constructor
@@ -420,6 +422,10 @@
 			this.isFormulaEditMode = false;
 			this.isChartAreaEditMode = false;
 			this.lockDraw = false;
+
+
+			this.isSelectDialogRangeMode = false;
+			this.copyOfActiveRange = null;
 
 			this.startCellMoveResizeRange = null;
 			this.startCellMoveResizeRange2 = null;
@@ -2678,9 +2684,13 @@
 			 * @param {Asc.Range} range
 			 */
 			_drawSelection: function (range) {
-				this._drawCollaborativeElements(/*bIsDrawObjects*/true);
-				this._drawSelectionRange(range);
-				this.cellCommentator.drawCommentCells(false);
+				if (!this.isSelectDialogRangeMode) {
+					this._drawCollaborativeElements(/*bIsDrawObjects*/true);
+					this._drawSelectionRange(range);
+					this.cellCommentator.drawCommentCells(false);
+				} else {
+					this._drawSelectionRange(range);
+				}
 			},
 
 			_drawSelectionRange: function (range) {
@@ -2693,7 +2703,10 @@
 					this.activeRange.c2 = this.cols.length - 1;
 				}
 
-				range = this.activeRange.intersection(range !== undefined ? range : this.visibleRange);
+				if (!this.isSelectDialogRangeMode)
+					range = this.activeRange.intersection(range !== undefined ? range : this.visibleRange);
+				else
+					range = this.copyOfActiveRange.intersection(range !== undefined ? range : this.visibleRange);
 
 				// Copy fill Handle
 				var aFH = null;
@@ -2714,7 +2727,7 @@
 				var opt = this.settings;
 				var offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
 				var offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
-				var arn = this.activeRange.clone(true);
+				var arn = (!this.isSelectDialogRangeMode) ? this.activeRange.clone(true) : this.copyOfActiveRange.clone(true);
 				var x1 = (range) ? (this.cols[range.c1].left - offsetX) : 0;
 				var x2 = (range) ? (this.cols[range.c2].left + this.cols[range.c2].width - offsetX) : 0;
 				var y1 = (range) ? (this.rows[range.r1].top - offsetY) : 0;
@@ -2834,7 +2847,7 @@
 					ctx.setFillStyle( opt.activeCellBackground )
 							.fillRect(lRect, tRect, rRect - lRect, bRect - tRect);
 
-					var firstCell = this.activeRange;
+					var firstCell = (!this.isSelectDialogRangeMode) ? this.activeRange : this.copyOfActiveRange;
 					cr = this._getMergedCellsRange(firstCell.startCol, firstCell.startRow);
 					// Получаем активную ячейку в выделении
 					cr = range.intersection(cr !== undefined ? cr : asc_Range(firstCell.startCol, firstCell.startRow, firstCell.startCol, firstCell.startRow));
@@ -2900,6 +2913,10 @@
 					this._drawFormulaRange(this.arrActiveChartsRanges)
 				}
 
+				if (this.isSelectDialogRangeMode) {
+					this._drawSelectRange(this.activeRange.clone(true));
+				}
+
 				if (null !== this.activeMoveRange) {
 					ctx.setStrokeStyle("rgba(0,0,0,1)")
 						.setLineWidth(1)
@@ -2938,11 +2955,11 @@
 			
 			_drawFormulaRange: function(arr){
 				var ctx = this.overlayCtx,
-					opt = this.settings
+					opt = this.settings,
 					offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft,
 					offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
 					
-				ctx.setLineWidth(1)
+				ctx.setLineWidth(1);
 					
 				for (var i in arr) {
 					var arFormulaTmp = arr[i].clone(true);
@@ -2951,7 +2968,7 @@
 					if (aFormulaIntersection) {
 						ctx.beginPath()
 							.setStrokeStyle(opt.formulaRangeBorderColor[i%opt.formulaRangeBorderColor.length])
-							.setFillStyle(opt.formulaRangeBorderColor[i%opt.formulaRangeBorderColor.length])
+							.setFillStyle(opt.formulaRangeBorderColor[i%opt.formulaRangeBorderColor.length]);
 						var drawLeftSideFormula   = aFormulaIntersection.c1 === arFormulaTmp.c1;
 						var drawRightSideFormula  = aFormulaIntersection.c2 === arFormulaTmp.c2;
 						var drawTopSideFormula    = aFormulaIntersection.r1 === arFormulaTmp.r1;
@@ -2974,15 +2991,45 @@
 							ctx.rect(xFormula2-3, yFormula1, 1.5, 2, -0.5, -0.5);
 							
 						if( drawRightSideFormula && drawBottomSideFormula)
-							ctx.rect(xFormula2-3, yFormula2-3, 2, 2, -0.5, -0.5)
+							ctx.rect(xFormula2-3, yFormula2-3, 2, 2, -0.5, -0.5);
 							
 						if( drawLeftSideFormula && drawBottomSideFormula)
-							ctx.rect(xFormula1, yFormula2-3, 2, 2, -0.5, -0.5)
+							ctx.rect(xFormula1, yFormula2-3, 2, 2, -0.5, -0.5);
 						
 						ctx.closePath()
 							.stroke()
 							.fill();
 					}
+				}
+			},
+
+			_drawSelectRange: function (oSelectRange) {
+				var ctx = this.overlayCtx,
+					offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft,
+					offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
+
+				ctx.setLineWidth(2);
+
+				var oSelectRangeIntersection = oSelectRange.intersection(this.visibleRange);
+				if (oSelectRangeIntersection) {
+					ctx.beginPath()
+						.setStrokeStyle(c_oAscCoAuthoringOtherBorderColor);
+					var drawLeftSideSelectRange   = oSelectRangeIntersection.c1 === oSelectRange.c1;
+					var drawRightSideSelectRange  = oSelectRangeIntersection.c2 === oSelectRange.c2;
+					var drawTopSideSelectRange    = oSelectRangeIntersection.r1 === oSelectRange.r1;
+					var drawBottomSideSelectRange = oSelectRangeIntersection.r2 === oSelectRange.r2;
+
+					var xSelectRange1 = this.cols[oSelectRangeIntersection.c1].left - offsetX;
+					var xSelectRange2 = this.cols[oSelectRangeIntersection.c2].left + this.cols[oSelectRangeIntersection.c2].width - offsetX;
+					var ySelectRange1 = this.rows[oSelectRangeIntersection.r1].top - offsetY;
+					var ySelectRange2 = this.rows[oSelectRangeIntersection.r2].top + this.rows[oSelectRangeIntersection.r2].height - offsetY;
+
+					if (drawTopSideSelectRange)		{ctx.dashLine(xSelectRange1, ySelectRange1, xSelectRange2, ySelectRange1, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
+					if (drawBottomSideSelectRange)	{ctx.dashLine(xSelectRange1, ySelectRange2, xSelectRange2, ySelectRange2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
+					if (drawLeftSideSelectRange)	{ctx.dashLine(xSelectRange1, ySelectRange1, xSelectRange1, ySelectRange2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
+					if (drawRightSideSelectRange)	{ctx.dashLine(xSelectRange2, ySelectRange1, xSelectRange2, ySelectRange2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
+
+					ctx.closePath().stroke().fill();
 				}
 			},
 			
@@ -3246,6 +3293,20 @@
 					x2 = Math.max(x2, xMR2);
 					y1 = Math.min(y1, yMR1);
 					y2 = Math.max(y2, yMR2);
+				}
+
+				if (null !== this.copyOfActiveRange) {
+					// Координаты для перемещения диапазона
+					var xCopyAr1 = this.cols[this.copyOfActiveRange.c1].left - offsetX - this.width_2px;
+					var xCopyAr2 = this.cols[this.copyOfActiveRange.c2].left + this.cols[this.copyOfActiveRange.c2].width - offsetX + this.width_1px + this.width_2px;
+					var yCopyAr1 = this.rows[this.copyOfActiveRange.r1].top - offsetY - this.height_2px;
+					var yCopyAr2 = this.rows[this.copyOfActiveRange.r2].top + this.rows[this.copyOfActiveRange.r2].height - offsetY + this.height_1px + this.height_2px;
+
+					// Выбираем наибольший range для очистки
+					x1 = Math.min(x1, xCopyAr1);
+					x2 = Math.max(x2, xCopyAr2);
+					y1 = Math.min(y1, yCopyAr1);
+					y2 = Math.max(y2, yCopyAr2);
 				}
 
 				ctx.save()
@@ -5565,12 +5626,17 @@
 						case c_oAscSelectionType.RangeCol: return cc + "C";
 						case c_oAscSelectionType.RangeRow: return rc + "R";
 						case c_oAscSelectionType.RangeMax: return gc_nMaxRow + "R x " + gc_nMaxCol + "C";
-					};
+					}
 					return "";
 				})(activeCell);
 
 				var cellName =  this._getColumnTitle(c1) + this._getRowTitle(r1);
 				return selectionSize || cellName;
+			},
+
+			getSelectionRangeValue: function () {
+				var sListName = this.model.getName();
+				return sListName + "!" + this.getActiveRange(this.activeRange.clone(true));
 			},
 
 			getSelectionInfo: function (bExt) {
@@ -5734,6 +5800,7 @@
 
 				this._trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
 				this._trigger("selectionChanged", this.getSelectionInfo());
+
 				return this._calcActiveRangeOffset();
 			},
 
@@ -5769,9 +5836,14 @@
 				}
 
 				if (!this.isCellEditMode && (sc !== ar.startCol || sr !== ar.startRow)) {
-					this._trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
-					if (!isSelectMode)
-						this._trigger("selectionChanged", this.getSelectionInfo());
+					if (!this.isSelectDialogRangeMode) {
+						this._trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
+						if (!isSelectMode)
+							this._trigger("selectionChanged", this.getSelectionInfo());
+					} else {
+						// ToDo смена диапазона
+						this._trigger("selectionRangeChanged", this.getSelectionRangeValue());
+					}
 				}
 
 				if ( index < 0 )
@@ -5905,9 +5977,14 @@
 				ret = this._calcActiveRangeOffset();
 
 				if (!this.isCellEditMode && !arnOld.isEqual(ar.clone(true))) {
-					this._trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/true));
-					if (!isSelectMode)
-						this._trigger("selectionChanged", this.getSelectionInfo(false));
+					if (!this.isSelectDialogRangeMode) {
+						this._trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/true));
+						if (!isSelectMode)
+							this._trigger("selectionChanged", this.getSelectionInfo(false));
+					} else {
+						// ToDo смена диапазона
+						this._trigger("selectionRangeChanged", this.getSelectionRangeValue());
+					}
 				}
 
 				return ret;
@@ -8523,6 +8600,28 @@
 
 			getFormulaEditMode: function () {
 				return this.isFormulaEditMode;
+			},
+
+			setSelectDialogRangeMode: function (isSelectDialogRangeMode) {
+				if (isSelectDialogRangeMode === this.isSelectDialogRangeMode)
+					return;
+				this.isSelectDialogRangeMode = isSelectDialogRangeMode;
+				this.cleanSelection();
+
+				if (false === this.isSelectDialogRangeMode) {
+					if (null !== this.copyOfActiveRange) {
+						this.activeRange = this.copyOfActiveRange.clone(true);
+						this.activeRange.startCol = this.copyOfActiveRange.startCol;
+						this.activeRange.startRow = this.copyOfActiveRange.startRow;
+					}
+					this.copyOfActiveRange = null;
+				} else {
+					this.copyOfActiveRange = this.activeRange.clone(true);
+					this.copyOfActiveRange.startCol = this.activeRange.startCol;
+					this.copyOfActiveRange.startRow = this.activeRange.startRow;
+				}
+
+				this._drawSelection();
 			},
 
 			// Получаем свойство: редактируем мы сейчас или нет

@@ -805,8 +805,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 			_asc_open: function (fCallback) { //fCallback({returnCode:"", val:obj, ...})
 				if ( this.chartEditor ) {
-				}
-				else if ( !this.documentId ) {
+				} else if (!this.documentId || !this.documentVKey) {
 					var data = getTestWorkbook();
 					var sData = data + "";
 					if( c_oSerFormat.Signature === sData.substring(0, c_oSerFormat.Signature.length))
@@ -947,6 +946,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			 * asc_onMouseMove				(asc_CMouseMoveData)										- эвент на наведение мышкой на гиперлинк или комментарий
 			 * asc_onHyperlinkClick			(sUrl)														- эвент на нажатие гиперлинка
 			 * asc_onСoAuthoringDisconnect	()															- эвент об отключении от сервера без попытки reconnect
+			 * asc_onSelectionRangeChanged	(selectRange)												- эвент о выборе диапазона для диаграммы (после нажатия кнопки выбора)
 			 */
 
 			asc_StartAction: function (type, id) {
@@ -955,10 +955,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 			asc_EndAction: function (type, id) {
 				this.handlers.trigger("asc_onEndAction", type, id);
-			},
-			
-			asc_SetAFDialog: function(val){
-				this.handlers.trigger("asc_onSetAFDialog", val);
 			},
 
 			asc_registerCallback: function (name, callback, replaceOldCallback) {
@@ -2248,16 +2244,24 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				}
 			},
 
-			asc_SendThemeColors : function(colors,standart_colors)
-			{
+			/**
+			 * Режим выбора диапазона
+			 * @param {Boolean} isSelectDialogRangeMode
+			 */
+			asc_setSelectDialogRangeMode: function (isSelectDialogRangeMode) {
+				this.controller.setSelectDialogRangeMode(isSelectDialogRangeMode);
+				if (this.wb)
+					this.wb.setSelectDialogRangeMode(isSelectDialogRangeMode);
+			},
+
+			asc_SendThemeColors : function (colors, standart_colors) {
 				this._gui_control_colors = { Colors : colors, StandartColors : standart_colors };
-				var ret = this.handlers.trigger("asc_onSendThemeColors", colors,standart_colors);
+				var ret = this.handlers.trigger("asc_onSendThemeColors", colors, standart_colors);
 				if (ret)
 					this._gui_control_colors = null;
 			},
 			
-			asc_SendThemeColorSchemes : function(param)
-			{
+			asc_SendThemeColorSchemes : function (param) {
 				this._gui_color_schemes = param;
 				var ret = this.handlers.trigger("asc_onSendThemeColorSchemes", param);
 				if (ret)
@@ -2824,6 +2828,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_insertFormula"] = prot.asc_insertFormula;
 		prot["asc_getFormulasInfo"] = prot.asc_getFormulasInfo;
 		prot["asc_setFontRenderingMode"] = prot.asc_setFontRenderingMode;
+		prot["asc_setSelectDialogRangeMode"] = prot.asc_setSelectDialogRangeMode;
 		prot["asc_ChangeColorScheme"] = prot.asc_ChangeColorScheme;
 		/////////////////////////////////////////////////////////////////////////
 		///////////////////CoAuthoring and Chat api//////////////////////////////

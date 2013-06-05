@@ -30,13 +30,15 @@
 		/**
 		 * Widget for displaying and editing Workbook object
 		 * -----------------------------------------------------------------------------
-		 * @param {Workbook} model               Workbook
-		 * @param {EventsController} controller  Events controller
-		 * @param {HandlersList} handlers        Events handlers for WorkbookView events
-		 * @param {Element} elem                 Container element
-		 * @param {Element} inputElem            Input element for top line editor
+		 * @param {Workbook} model               					Workbook
+		 * @param {EventsController} controller  					Events controller
+		 * @param {HandlersList} handlers        					Events handlers for WorkbookView events
+		 * @param {Element} elem                 					Container element
+		 * @param {Element} inputElem            					Input element for top line editor
 		 * @param {Object} Api
-		 * @param {Object} settings              Settings
+		 * @param {asc_CCollaborativeEditing} collaborativeEditing
+		 * @param {c_oAscFontRenderingModeType} fontRenderingMode
+		 * @param {Object} settings              					Settings
 		 *
 		 * @constructor
 		 * @memberOf Asc
@@ -290,7 +292,8 @@
 								"onErrorEvent"			: function (errorId, level) {self.handlers.trigger("asc_onError", errorId, level);},
 								"slowOperation"			: function (isStart) {self.handlers.trigger((isStart ? "asc_onStartAction" : "asc_onEndAction"), c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.SlowOperation);},
 								"setFocusDrawingObject" : function (isFocusDrawingObject) { self.controller.setFocusDrawingObject(isFocusDrawingObject); },
-								"setAutoFiltersDialog"  : function (arrVal) {self.handlers.trigger(("asc_onSetAFDialog"),arrVal);}
+								"setAutoFiltersDialog"  : function (arrVal) {self.handlers.trigger("asc_onSetAFDialog", arrVal);},
+								"selectionRangeChanged"	: function (val) {self.handlers.trigger("asc_onSelectionRangeChanged", val);}
 							});
 				return new asc_WSV(wsModel, this.canvas[0], this.canvasOverlay[0], this.collaborativeEditing, this.fontRenderingMode, opt);
 			},
@@ -1202,6 +1205,10 @@
 
 					this.cellEditor.setFontRenderingMode(mode);
 				}
+			},
+
+			setSelectDialogRangeMode: function (isSelectDialogRangeMode) {
+				this.getWorksheet().setSelectDialogRangeMode(isSelectDialogRangeMode);
 			},
 
 			// Поиск текста в листе

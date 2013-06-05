@@ -390,6 +390,7 @@
 	var oTmpHyperlinkObj = null;
 	var aDialogNames = [];
 	var bIsUpdateChartProperties = false;
+	var bIsReopenDialog = false;
 
 	// Comment events	
 	api.asc_registerCallback("asc_onMouseMove", eventMouseMoveComment);
@@ -472,6 +473,10 @@
 		console.log("Cell Edit State - " + state);
 	});
 
+	api.asc_registerCallback("asc_onSelectionRangeChanged", function (val) {
+		$("#chartRange").val(val);
+	});
+
 	api.asc_Init("../Fonts/");
 	//api.asc_setViewerMode(true);
 
@@ -486,7 +491,7 @@
 	var sUserNameAndId = "user_" + Math.floor ((Math.random() * 100) + 1);
 
 	api.asc_LoadDocument({
-		"Id"     : getURLParameter("key") ? decodeURIComponent(getURLParameter("key")) : undefined,
+		"Id"     : getURLParameter("key") ? decodeURIComponent(getURLParameter("key")) : "9876543210",
 		"Url"    : getURLParameter("url") ? decodeURIComponent(getURLParameter("url")) : undefined,
 		"Title"  : getURLParameter("title") ? decodeURIComponent(getURLParameter("title")).replace(new RegExp("\\+",'g')," ") : undefined,
 		"Format" : getURLParameter("filetype") ? decodeURIComponent(getURLParameter("filetype")) : undefined,
@@ -1995,8 +2000,10 @@
 		chartForm.find("#legendField").show();
 		chartForm.find("#typeField").show();
 
+		api.asc_setSelectDialogRangeMode(true);
+
 		chartForm.css("visibility", "visible");
-		chartForm.dialog({ autoOpen: false, closeOnEscape: true, height: 'auto', width: 400,
+		chartForm.dialog({ autoOpen: false, closeOnEscape: false, height: 'auto', width: 400,
 					resizable: false, modal: true, title: "Chart properties", draggable: true,
 					open: function() {
 						if (!bIsUpdateChartProperties)
@@ -2116,6 +2123,8 @@
 						}
 					],
 					close: function() {
+						if (!bIsReopenDialog)
+							api.asc_setSelectDialogRangeMode(false);
 					},
 					create: function() {
 					}
@@ -2160,6 +2169,8 @@
 	}
 
 	$("#changeRange").click(function () {
+		bIsReopenDialog = true;
+
 		var selector = $(this);
 		var chartForm = $("#chartSelector");
 		if (selector.hasClass("ToolbarChangeRange")) {
@@ -2185,6 +2196,8 @@
 			chartForm.dialog("option", "modal", true);
 			chartForm.dialog("close").dialog("open");
 		}
+
+		bIsReopenDialog = false;
 	});
 
 	$("#autoFilterCancel").click(function() { $('#MenuAutoFilter').hide(); });
