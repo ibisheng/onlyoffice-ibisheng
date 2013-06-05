@@ -3158,7 +3158,7 @@ ParaDrawing.prototype =
 
         if(isRealObject(Props.ChartProperties))
         {
-            if(this.GraphicObj.isImage())
+            if(this.GraphicObj.isImage() && isRealObject(this.GraphicObj.chart))
             {
                 this.GraphicObj.setDiagram(Props.ChartProperties)
             }
@@ -3166,7 +3166,7 @@ ParaDrawing.prototype =
                 this.GraphicObj.setDiagram(Props.ChartProperties);
         }
 
-        if(typeof Props.ImageUrl === "string" && this.GraphicObj.isImage())
+        if(typeof Props.ImageUrl === "string" && this.GraphicObj.isImage() && !isRealObject(this.GraphicObj.chart))
         {
             this.GraphicObj.setRasterImage2(Props.ImageUrl);
         }
