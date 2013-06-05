@@ -167,6 +167,7 @@ var ASC_DOCS_API_USE_OPEN_SOURCE_FONTS_ONLY = false;
             {
                 this.embeddedFontFiles[index] = new CFontFileLoader(map_files[i]);
                 this.embeddedFontFiles[index].CanUseOriginalFormat = false;
+                this.embeddedFontFiles[index].IsNeedAddJSToFontPath = false;
                 map_files[i] = index++;
             }
 

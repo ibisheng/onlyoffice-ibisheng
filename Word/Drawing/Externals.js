@@ -48,6 +48,7 @@ function CFontFileLoader(id)
     this.Status     = -1;  // -1 - notloaded, 0 - loaded, 1 - error, 2 - loading
     this.stream_index = -1;
     this.callback = null;
+    this.IsNeedAddJSToFontPath = true;
 
     this.CanUseOriginalFormat = true;
 
@@ -97,7 +98,10 @@ function CFontFileLoader(id)
         if (-1 != _srcInd)
             _src = _src.substring(0, _srcInd);
 
-        scriptElem.setAttribute('src', basePath + "js/" + _src + ".js");
+        if (this.IsNeedAddJSToFontPath)
+            scriptElem.setAttribute('src', basePath + "js/" + _src + ".js");
+        else
+            scriptElem.setAttribute('src', basePath + _src + ".js");
         scriptElem.setAttribute('type','text/javascript');
         document.getElementsByTagName('head')[0].appendChild(scriptElem);
         return false;
