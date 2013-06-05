@@ -1984,7 +1984,7 @@
 		if (!chart)		// selected image
 			return;
 		$("#chartSelector").css("visibility", "visible");
-		$("#chartSelector").dialog({ autoOpen: false, closeOnEscape: false, height: 'auto', width: 400,
+		$("#chartSelector").dialog({ autoOpen: false, closeOnEscape: true, height: 'auto', width: 400,
 					resizable: false, modal: true, title: "Chart properties", draggable: true,
 					open: function() {
 
@@ -2112,7 +2112,7 @@
 	// Images
 	function showImageUrlDialog() {
 		$("#imageSelector").css("visibility", "visible");
-		$("#imageSelector").dialog({ autoOpen: false, closeOnEscape: false, height: 160, width: 400,
+		$("#imageSelector").dialog({ autoOpen: false, closeOnEscape: true, height: 160, width: 400,
 					resizable: false, modal: true, title: "Add image", draggable: true,
 					open: function() {
 						$("#imageSelectorUrl").val("");
