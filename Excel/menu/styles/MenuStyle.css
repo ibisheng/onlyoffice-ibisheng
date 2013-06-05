@@ -492,6 +492,20 @@
 {
 	background-position: -1328px 50%;
 }
+.ToolbarChangeRange {
+	background: url(../img/selectRange.png) no-repeat scroll 0 0 transparent;
+	width: 21px;
+	height: 19px;
+	float: none;
+	margin-top: 1px;
+}
+.ToolbarChangeRange2 {
+	background: url(../img/selectRange2.png) no-repeat scroll 0 0 transparent;
+	width: 21px;
+	height: 19px;
+	float: none;
+	margin-top: 1px;
+}
 .MenuSeparator
 {
 	border-top: 1px solid #CCCCCC;

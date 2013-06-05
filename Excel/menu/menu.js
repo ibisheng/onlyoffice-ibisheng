@@ -1524,74 +1524,6 @@
 			case 1: toggleHyperlinkDialog(false); break;
 		}
 	});
-
-	// Image and chart dialogs
-	function BuildDrawingObjectMenu() {
-		var menu = $(
-			"<div id='drawingObjectsMenu'>\
-				<div id='imageSelector' style='font-size: 12px; visibility: hidden;'>\
-					<input type='text' id='imageSelectorUrl' style='width: 340px; margin: 10px;'/>\
-				</div>\
-				<div id='chartSelector' style='font-size: 12px; visibility: hidden;'>\
-					\
-					 <select id='chartType' style='width: 340px; margin: 10px;'>\
-						<option value='Line' selected>Line</option>\
-						<option value='Bar'>Bar</option>\
-						<option value='HBar'>HBar</option>\
-						<option value='Area'>Area</option>\
-						<option value='Pie'>Pie</option>\
-						<option value='Scatter'>Scatter</option>\
-						<option value='Stock'>Stock</option>\
-					</select>\
-					\
-					<select id='chartSubType' style='width: 340px; margin: 10px;'>\
-						<option value='Normal' selected>Normal</option>\
-						<option value='stacked'>Stacked</option>\
-						<option value='stackedPer'>100Stacked</option>\
-					</select>\
-					\
-					<fieldset>\
-						<legend>Data</legend>\
-						<input type='text' style='margin-left: 10px; width: 80%;' id='chartRange' value=''><br>\
-						<input type='radio' name='dataRadio' id='dataRows' style='margin-left: 10px;'>Rows<br>\
-						<input type='radio' name='dataRadio' id='dataColumns' style='margin-left: 10px;'>Columns<br>\
-					</fieldset>\
-					\
-					<fieldset>\
-						<legend>Grid</legend>\
-						<input type='checkbox' id='xGridShow' checked style='margin-left: 10px;'>Vertical<br>\
-						<input type='checkbox' id='yGridShow' checked style='margin-left: 10px;'>Horizontal<br>\
-					</fieldset>\
-					\
-					<fieldset>\
-						<legend>Axis</legend>\
-						<input type='checkbox' id='xAxisShow' checked style='margin-left: 10px;'>Show X<br>\
-						<input type='checkbox' id='yAxisShow' checked style='margin-left: 10px;'>Show Y<br>\
-					</fieldset>\
-					\
-					<fieldset>\
-						<legend>Titles</legend>\
-						<input type='text' style='margin-left: 10px;' id='chartTitle' value='Diagramm'><br>\
-						<span style='margin-left: 10px;'>X axis title</span>\
-						<input type='text' style='margin-left: 10px;' id='xAxisTitle' value='X axis'><br>\
-						<span style='margin-left: 10px;'>Y axis title</span>\
-						<input type='text' style='margin-left: 10px;' id='yAxisTitle' value='Y axis'><br>\
-						<input type='checkbox' id='valueShow' style='margin-left: 10px;'>Show values<br>\
-					</fieldset>\
-					\
-					<fieldset>\
-						<legend>Legend</legend>\
-						<input type='checkbox' id='legendShow' checked style='margin-left: 10px;'>Show<br>\
-						<input type='radio' name='legendRadio' id='legendLeft' checked style='margin-left: 10px;'>Left<br>\
-						<input type='radio' name='legendRadio' id='legendRight' style='margin-left: 10px;'>Right<br>\
-						<input type='radio' name='legendRadio' id='legendTop' style='margin-left: 10px;'>Top<br>\
-						<input type='radio' name='legendRadio' id='legendBottom' style='margin-left: 10px;'>Bottom<br>\
-					</fieldset>\
-				</div>\
-			</div>");
-
-		$("body").append(menu);
-	}
 	
 	function BuildDrawingObjectLayerMenu() {
 		var menu = $(
@@ -2051,7 +1983,6 @@
 		var objectsExist = api.asc_drawingObjectsExist();
 		if (!chart)		// selected image
 			return;
-		BuildDrawingObjectMenu();
 		$("#chartSelector").css("visibility", "visible");
 		$("#chartSelector").dialog({ autoOpen: false, closeOnEscape: false, height: 'auto', width: 400,
 					resizable: false, modal: true, title: "Chart properties", draggable: true,
@@ -2062,6 +1993,7 @@
 						var interval = range.asc_getInterval();
 
 						chartForm.find("#chartRange").val(interval);
+						chartForm.find("#changeRange").addClass("ToolbarChangeRange").removeClass("ToolbarChangeRange2");
 						chartForm.find("#chartRange").bind("keyup", function() {
 							var result = range.asc_checkInterval(chartForm.find("#chartType").val(),chartForm.find("#chartSubType").val(),chartForm.find("#chartRange").val(),chartForm.find("#dataRows").is(":checked"));
 							if (result)
@@ -2170,7 +2102,6 @@
 						}
 					],
 					close: function() {
-						$("#drawingObjectsMenu").remove();
 					},
 					create: function() {
 					}
@@ -2180,7 +2111,6 @@
 		
 	// Images
 	function showImageUrlDialog() {
-		BuildDrawingObjectMenu();
 		$("#imageSelector").css("visibility", "visible");
 		$("#imageSelector").dialog({ autoOpen: false, closeOnEscape: false, height: 160, width: 400,
 					resizable: false, modal: true, title: "Add image", draggable: true,
@@ -2206,7 +2136,6 @@
 						}
 					],
 					close: function() {
-						$("#drawingObjectsMenu").remove();
 					},
 					create: function() {
 						$("#imageSelectorUrl").val("");
@@ -2214,7 +2143,16 @@
 		});
 		$("#imageSelector").dialog("open");
 	}
-	
+
+	$("#changeRange").click(function () {
+		var selector = $(this);
+		if (selector.hasClass("ToolbarChangeRange")) {
+			selector.removeClass("ToolbarChangeRange").addClass("ToolbarChangeRange2")
+		} else {
+			selector.removeClass("ToolbarChangeRange2").addClass("ToolbarChangeRange")
+		}
+	});
+
 	$("#autoFilterCancel").click(function() { $('#MenuAutoFilter').hide(); });
 	$("#autoFilterOk").click(function() {
 		var cellId = $('#MenuAutoFilter').attr('idcolumn') 
