@@ -1190,7 +1190,7 @@ fontslot_ASCII:mN
 JSCompiler_StaticMethods_Check_NeedRecalc:qH
 TT_RunIns:Vu
 STATES_ID_RESIZE_GROUPED:YB
-cff_size_init:hy
+cff_size_init:gy
 nSldLtTTbl:sJ
 phType_obj:LI
 tt_cmap14_char_map_def_binary:ft
@@ -1529,7 +1529,7 @@ FT_GlyphLoader_CheckSubGlyphs:jo
 StartAddNewShape:MC
 tt_face_get_name:Ft
 JSCompiler_StaticMethods_Continue:qP
-JSCompiler_StaticMethods__MergeProp:Bb
+JSCompiler_StaticMethods__MergeProp:Ab
 tt_cmap14_def_char_count:mt
 tab_Center:AN
 c_oAscLineDrawingRule$Center:yS
@@ -2888,7 +2888,7 @@ JSCompiler_StaticMethods_Stop:BQ
 trimString:ec
 c_oSerExtent$Cx:NW
 c_oSerExtent$Cy:OW
-L 70:Ab
+L 70:Bb
 FT_PEEK_USHORT:an
 L 72:Cc
 L 71:Mf
