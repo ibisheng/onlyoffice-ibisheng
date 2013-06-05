@@ -389,6 +389,7 @@
 	//api.asc_setViewerMode(true);
 	var oTmpHyperlinkObj = null;
 	var aDialogNames = [];
+	var bIsUpdateChartProperties = false;
 
 	// Comment events	
 	api.asc_registerCallback("asc_onMouseMove", eventMouseMoveComment);
@@ -1984,6 +1985,7 @@
 		var objectsExist = api.asc_drawingObjectsExist();
 		if (!chart)		// selected image
 			return;
+		bIsUpdateChartProperties = true;
 		var chartForm = $("#chartSelector");
 		chartForm.find("#changeRange").removeClass("ToolbarChangeRange2").addClass("ToolbarChangeRange");
 		chartForm.find("#switchTypeField").show();
@@ -1997,6 +1999,10 @@
 		chartForm.dialog({ autoOpen: false, closeOnEscape: true, height: 'auto', width: 400,
 					resizable: false, modal: true, title: "Chart properties", draggable: true,
 					open: function() {
+						if (!bIsUpdateChartProperties)
+							return;
+						bIsUpdateChartProperties = false;
+
 						var range = chart.asc_getRange();
 						var interval = range.asc_getInterval();
 
@@ -2119,8 +2125,9 @@
 		
 	// Images
 	function showImageUrlDialog() {
-		$("#imageSelector").css("visibility", "visible");
-		$("#imageSelector").dialog({ autoOpen: false, closeOnEscape: true, height: 160, width: 400,
+		var imageForm = $("#imageSelector");
+		imageForm.css("visibility", "visible");
+		imageForm.dialog({ autoOpen: false, closeOnEscape: true, height: 160, width: 400,
 					resizable: false, modal: true, title: "Add image", draggable: true,
 					open: function() {
 						$("#imageSelectorUrl").val("");
@@ -2149,7 +2156,7 @@
 						$("#imageSelectorUrl").val("");
 					}
 		});
-		$("#imageSelector").dialog("open");
+		imageForm.dialog("open");
 	}
 
 	$("#changeRange").click(function () {
@@ -2163,6 +2170,9 @@
 			chartForm.find("#titlesField").hide();
 			chartForm.find("#legendField").hide();
 			chartForm.find("#typeField").hide();
+
+			chartForm.dialog("option", "modal", false);
+			chartForm.dialog("close").dialog("open");
 		} else {
 			selector.removeClass("ToolbarChangeRange2").addClass("ToolbarChangeRange");
 			chartForm.find("#switchTypeField").show();
@@ -2171,6 +2181,9 @@
 			chartForm.find("#titlesField").show();
 			chartForm.find("#legendField").show();
 			chartForm.find("#typeField").show();
+
+			chartForm.dialog("option", "modal", true);
+			chartForm.dialog("close").dialog("open");
 		}
 	});
 
