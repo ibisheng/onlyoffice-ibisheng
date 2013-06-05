@@ -1983,17 +1983,24 @@
 		var objectsExist = api.asc_drawingObjectsExist();
 		if (!chart)		// selected image
 			return;
-		$("#chartSelector").css("visibility", "visible");
-		$("#chartSelector").dialog({ autoOpen: false, closeOnEscape: true, height: 'auto', width: 400,
+		var chartForm = $("#chartSelector");
+		chartForm.find("#changeRange").removeClass("ToolbarChangeRange2").addClass("ToolbarChangeRange");
+		chartForm.find("#switchTypeField").show();
+		chartForm.find("#gridField").show();
+		chartForm.find("#axisField").show();
+		chartForm.find("#titlesField").show();
+		chartForm.find("#legendField").show();
+		chartForm.find("#typeField").show();
+
+		chartForm.css("visibility", "visible");
+		chartForm.dialog({ autoOpen: false, closeOnEscape: true, height: 'auto', width: 400,
 					resizable: false, modal: true, title: "Chart properties", draggable: true,
 					open: function() {
-
-						var chartForm = $("#chartSelector");
 						var range = chart.asc_getRange();
 						var interval = range.asc_getInterval();
 
 						chartForm.find("#chartRange").val(interval);
-						chartForm.find("#changeRange").addClass("ToolbarChangeRange").removeClass("ToolbarChangeRange2");
+
 						chartForm.find("#chartRange").bind("keyup", function() {
 							var result = range.asc_checkInterval(chartForm.find("#chartType").val(),chartForm.find("#chartSubType").val(),chartForm.find("#chartRange").val(),chartForm.find("#dataRows").is(":checked"));
 							if (result)
@@ -2106,7 +2113,7 @@
 					create: function() {
 					}
 		});
-		$("#chartSelector").dialog("open");
+		chartForm.dialog("open");
 	}
 		
 	// Images
@@ -2146,10 +2153,23 @@
 
 	$("#changeRange").click(function () {
 		var selector = $(this);
+		var chartForm = $("#chartSelector");
 		if (selector.hasClass("ToolbarChangeRange")) {
-			selector.removeClass("ToolbarChangeRange").addClass("ToolbarChangeRange2")
+			selector.removeClass("ToolbarChangeRange").addClass("ToolbarChangeRange2");
+			chartForm.find("#switchTypeField").hide();
+			chartForm.find("#gridField").hide();
+			chartForm.find("#axisField").hide();
+			chartForm.find("#titlesField").hide();
+			chartForm.find("#legendField").hide();
+			chartForm.find("#typeField").hide();
 		} else {
-			selector.removeClass("ToolbarChangeRange2").addClass("ToolbarChangeRange")
+			selector.removeClass("ToolbarChangeRange2").addClass("ToolbarChangeRange");
+			chartForm.find("#switchTypeField").show();
+			chartForm.find("#gridField").show();
+			chartForm.find("#axisField").show();
+			chartForm.find("#titlesField").show();
+			chartForm.find("#legendField").show();
+			chartForm.find("#typeField").show();
 		}
 	});
 

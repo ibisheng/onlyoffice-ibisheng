@@ -2035,39 +2035,44 @@
             <input type='text' id='imageSelectorUrl' style='width: 340px; margin: 10px;'/>
         </div>
         <div id='chartSelector' style='font-size: 12px; visibility: hidden;'>
-            <select id='chartType' style='width: 340px; margin: 10px;'>
-                <option value='Line' selected>Line</option>
-                <option value='Bar'>Bar</option>
-                <option value='HBar'>HBar</option>
-                <option value='Area'>Area</option>
-                <option value='Pie'>Pie</option>
-                <option value='Scatter'>Scatter</option>
-                <option value='Stock'>Stock</option>
-            </select>
-            <select id='chartSubType' style='width: 340px; margin: 10px;'>
-                <option value='Normal' selected>Normal</option>
-                <option value='stacked'>Stacked</option>
-                <option value='stackedPer'>100Stacked</option>
-            </select>
             <fieldset>
                 <legend>Data</legend>
                 <input type='text' style='margin-left: 10px; width: 80%;' id='chartRange' value=''>
                 <img class='ToolbarIcon ToolbarChangeRange' id='changeRange'>
-                <br>
-                <input type='radio' name='dataRadio' id='dataRows' style='margin-left: 10px;'>Rows<br>
-                <input type='radio' name='dataRadio' id='dataColumns' style='margin-left: 10px;'>Columns<br>
+                <fieldset id="switchTypeField">
+                    <legend>Switch Row/Column</legend>
+                    <input type='radio' name='dataRadio' id='dataRows' style='margin-left: 10px;'>Rows<br>
+                    <input type='radio' name='dataRadio' id='dataColumns' style='margin-left: 10px;'>Columns<br>
+                </fieldset>
             </fieldset>
-            <fieldset>
+            <fieldset id="typeField">
+                <legend>Type</legend>
+                <select id='chartType' style='width: 320px; margin: 10px;'>
+                    <option value='Line' selected>Line</option>
+                    <option value='Bar'>Bar</option>
+                    <option value='HBar'>HBar</option>
+                    <option value='Area'>Area</option>
+                    <option value='Pie'>Pie</option>
+                    <option value='Scatter'>Scatter</option>
+                    <option value='Stock'>Stock</option>
+                </select>
+                <select id='chartSubType' style='width: 320px; margin: 10px;'>
+                    <option value='Normal' selected>Normal</option>
+                    <option value='stacked'>Stacked</option>
+                    <option value='stackedPer'>100Stacked</option>
+                </select>
+            </fieldset>
+            <fieldset id="gridField">
                 <legend>Grid</legend>
                 <input type='checkbox' id='xGridShow' checked style='margin-left: 10px;'>Vertical<br>
                 <input type='checkbox' id='yGridShow' checked style='margin-left: 10px;'>Horizontal<br>
             </fieldset>
-            <fieldset>
+            <fieldset id="axisField">
                 <legend>Axis</legend>
                 <input type='checkbox' id='xAxisShow' checked style='margin-left: 10px;'>Show X<br>
                 <input type='checkbox' id='yAxisShow' checked style='margin-left: 10px;'>Show Y<br>
             </fieldset>
-            <fieldset>
+            <fieldset id="titlesField">
                 <legend>Titles</legend>
                 <input type='text' style='margin-left: 10px;' id='chartTitle' value='Diagramm'><br>
                 <span style='margin-left: 10px;'>X axis title</span>
@@ -2076,7 +2081,7 @@
                 <input type='text' style='margin-left: 10px;' id='yAxisTitle' value='Y axis'><br>
                 <input type='checkbox' id='valueShow' style='margin-left: 10px;'>Show values<br>
             </fieldset>
-            <fieldset>
+            <fieldset id="legendField">
                 <legend>Legend</legend>
                 <input type='checkbox' id='legendShow' checked style='margin-left: 10px;'>Show<br>
                 <input type='radio' name='legendRadio' id='legendLeft' checked style='margin-left: 10px;'>Left<br>
