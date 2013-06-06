@@ -2560,31 +2560,16 @@ function CEditorPage(api)
         {
             if (drDoc.m_bIsSelection)
             {
-                ctx.fillStyle = "rgba(51,102,204,255)";
-                ctx.beginPath();
-
-                var bIsStroke = (!drDoc.TextMatrix || global_MatrixTransformer.IsIdentity(drDoc.TextMatrix)) ? false : true;
-
-                if (bIsStroke)
-                    ctx.strokeStyle = "#9ADBFE";
+                this.CheckShowOverlay();
+                drDoc.private_StartDrawSelection(overlay);
 
                 for (var i = drDoc.m_lDrawingFirst; i <= drDoc.m_lDrawingEnd; i++)
                 {
-                    var drawPage = drDoc.m_arrPages[i].drawingPage;
-                    drDoc.m_arrPages[i].DrawSelection(overlay, drawPage.left, drawPage.top, drawPage.right - drawPage.left, drawPage.bottom - drawPage.top, drDoc.TextMatrix);
+                    if (!drDoc.IsFreezePage(i))
+                        this.m_oLogicDocument.Selection_Draw_Page(i);
                 }
 
-                ctx.globalAlpha = 0.2;
-                ctx.fill();
-
-                if (bIsStroke)
-                {
-                    ctx.globalAlpha = 1.0;
-                    ctx.stroke();
-                }
-
-                ctx.beginPath();
-                ctx.globalAlpha = 1.0;
+                drDoc.private_EndDrawSelection();
 
                 if (this.MobileTouchManager)
                     this.MobileTouchManager.CheckSelect2(overlay);

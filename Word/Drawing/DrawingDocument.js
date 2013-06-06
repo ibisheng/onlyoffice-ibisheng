@@ -1848,6 +1848,9 @@ function CDrawingDocument()
     this.AutoShapesTrack = null;
     this.AutoShapesTrackLockPageNum = -1;
 
+    this.Overlay = null;
+    this.IsTextMatrixUse = false;
+
     // массивы ректов для поиска
     this._search_HdrFtr_All          = new Array(); // Поиск в колонтитуле, который находится на всех страницах
     this._search_HdrFtr_All_no_First = new Array(); // Поиск в колонтитуле, который находится на всех страницах, кроме первой
@@ -3449,13 +3452,6 @@ function CDrawingDocument()
     }
 	this.SelectClear = function()
     {
-        for (var i = 0; i < this.m_lPagesCount; i++)
-        {
-            this.m_arrPages[i].selectionArray.splice(0, this.m_arrPages[i].selectionArray.length);
-        }
-        //this.m_oWordControl.m_oOverlayApi.Clear();
-        this.IsShowSelectAttack = true;
-
         if (this.m_oWordControl.MobileTouchManager)
         {
             this.m_oWordControl.MobileTouchManager.RectSelect1 = null;
@@ -3668,7 +3664,148 @@ function CDrawingDocument()
         }
     }
 
-    this.AddPageSelection = function(pageIndex, x, y, width, height)
+    this.SelectionStart = function()
+    {
+    }
+    this.SelectionEnd = function()
+    {
+    }
+
+    this.private_StartDrawSelection = function(overlay)
+    {
+        this.Overlay = overlay;
+        this.IsTextMatrixUse = ((null != this.TextMatrix) && !global_MatrixTransformer.IsIdentity(this.TextMatrix));
+
+        this.Overlay.m_oContext.fillStyle = "rgba(51,102,204,255)";
+        this.Overlay.m_oContext.beginPath();
+
+        if (this.IsTextMatrixUse)
+            this.Overlay.m_oContext.strokeStyle = "#9ADBFE";
+    }
+    this.private_EndDrawSelection = function()
+    {
+        var ctx = this.Overlay.m_oContext;
+
+        ctx.globalAlpha = 0.2;
+        ctx.fill();
+
+        if (this.IsTextMatrixUse)
+        {
+            ctx.globalAlpha = 1.0;
+            ctx.stroke();
+        }
+
+        ctx.beginPath();
+        ctx.globalAlpha = 1.0;
+
+        this.IsTextMatrixUse = false;
+        this.Overlay = null;
+    }
+
+    this.AddPageSelection = function(pageIndex, x, y, w, h)
+    {
+        if (pageIndex < this.m_lDrawingFirst || pageIndex > this.m_lDrawingEnd)
+            return;
+
+        var page = this.m_arrPages[pageIndex];
+        var drawPage = page.drawingPage;
+
+        var dKoefX = (drawPage.right - drawPage.left) / page.width_mm;
+        var dKoefY = (drawPage.bottom - drawPage.top) / page.height_mm;
+
+        if (!this.IsTextMatrixUse)
+        {
+            var _x = ((drawPage.left + dKoefX * x) >> 0) - 0.5;
+            var _y = ((drawPage.top + dKoefY * y) >> 0) - 0.5;
+
+            var _w = (dKoefX * w + 1) >> 0;
+            var _h = (dKoefY * h + 1) >> 0;
+
+            this.Overlay.CheckRect(_x, _y, _w, _h);
+            this.Overlay.m_oContext.rect(_x,_y,_w,_h);
+        }
+        else
+        {
+            var _x1 = this.TextMatrix.TransformPointX(x, y);
+            var _y1 = this.TextMatrix.TransformPointY(x, y);
+
+            var _x2 = this.TextMatrix.TransformPointX(x + w, y);
+            var _y2 = this.TextMatrix.TransformPointY(x + w, y);
+
+            var _x3 = this.TextMatrix.TransformPointX(x + w, y + h);
+            var _y3 = this.TextMatrix.TransformPointY(x + w, y + h);
+
+            var _x4 = this.TextMatrix.TransformPointX(x, y + h);
+            var _y4 = this.TextMatrix.TransformPointY(x, y + h);
+
+            var x1 = drawPage.left + dKoefX * _x1;
+            var y1 = drawPage.top + dKoefY * _y1;
+
+            var x2 = drawPage.left + dKoefX * _x2;
+            var y2 = drawPage.top + dKoefY * _y2;
+
+            var x3 = drawPage.left + dKoefX * _x3;
+            var y3 = drawPage.top + dKoefY * _y3;
+
+            var x4 = drawPage.left + dKoefX * _x4;
+            var y4 = drawPage.top + dKoefY * _y4;
+
+            this.Overlay.CheckPoint(x1, y1);
+            this.Overlay.CheckPoint(x2, y2);
+            this.Overlay.CheckPoint(x3, y3);
+            this.Overlay.CheckPoint(x4, y4);
+
+            var ctx = this.Overlay.m_oContext;
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.lineTo(x3, y3);
+            ctx.lineTo(x4, y4);
+            ctx.closePath();
+        }
+    }
+
+    this.AddPageSelection2 = function(pageIndex, x, y, width, height)
+    {
+        //if (pageIndex < 0 || pageIndex >= Math.max(this.m_lPagesCount, this.m_lCountCalculatePages) || Math.abs(width) < 0.001 || Math.abs(height) < 0.001)
+        //    return;
+        if (Math.abs(width) < 0.001 || Math.abs(height) < 0.001)
+            return;
+
+        if (undefined === this.m_arrPages[pageIndex])
+            this.m_arrPages[pageIndex] = new CPage();
+
+        if (this.min_PageAddSelection > pageIndex)
+            this.min_PageAddSelection = pageIndex;
+        if (this.max_PageAddSelection < pageIndex)
+            this.max_PageAddSelection = pageIndex;
+
+        if (this.m_bIsSelection && (this.m_oWordControl.m_oOverlay.HtmlElement.style.display == "none"))
+        {
+            this.m_oWordControl.ShowOverlay();
+            this.m_oWordControl.m_oOverlayApi.m_oContext.globalAlpha = 0.2;
+        }
+
+        var r = new _rect();
+        r.x = x;
+        r.y = y;
+        r.w = width;
+        r.h = height;
+        this.m_arrPages[pageIndex].selectionArray[this.m_arrPages[pageIndex].selectionArray.length] = r;
+
+        if (this.m_oWordControl.MobileTouchManager)
+        {
+            if (null == this.m_oWordControl.MobileTouchManager.RectSelect1)
+            {
+                this.m_oWordControl.MobileTouchManager.RectSelect1 = r;
+                this.m_oWordControl.MobileTouchManager.PageSelect1 = pageIndex;
+            }
+
+            this.m_oWordControl.MobileTouchManager.RectSelect2 = r;
+            this.m_oWordControl.MobileTouchManager.PageSelect2 = pageIndex;
+        }
+    }
+
+    this.AddPageSelection2 = function(pageIndex, x, y, width, height)
     {
         //if (pageIndex < 0 || pageIndex >= Math.max(this.m_lPagesCount, this.m_lCountCalculatePages) || Math.abs(width) < 0.001 || Math.abs(height) < 0.001)
         //    return;
@@ -3710,19 +3847,7 @@ function CDrawingDocument()
     }
     this.SelectShow = function()
     {
-        //this.m_oWordControl.OnUpdateSelection();
-
-        // смотрим, среди добавленных секектов есть ли те, которые видны на экране???
-        if ((this.m_lDrawingFirst != -1 && this.m_lDrawingFirst >= this.min_PageAddSelection && this.m_lDrawingFirst <= this.max_PageAddSelection) ||
-            (this.m_lDrawingEnd != -1 && this.m_lDrawingEnd >= this.min_PageAddSelection && this.m_lDrawingEnd <= this.max_PageAddSelection) ||
-            this.IsShowSelectAttack === true)
-        {
-            this.m_oWordControl.OnUpdateOverlay();
-        }
-
-        this.IsShowSelectAttack = false;
-        this.min_PageAddSelection = 100000;
-        this.max_PageAddSelection = -1;
+        this.m_oWordControl.OnUpdateOverlay();
     }
 
     this.Set_RulerState_Table = function(markup, transform)
