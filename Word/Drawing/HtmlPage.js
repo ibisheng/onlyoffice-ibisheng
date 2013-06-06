@@ -2563,10 +2563,17 @@ function CEditorPage(api)
                 this.CheckShowOverlay();
                 drDoc.private_StartDrawSelection(overlay);
 
-                for (var i = drDoc.m_lDrawingFirst; i <= drDoc.m_lDrawingEnd; i++)
+                if (!this.MobileTouchManager)
                 {
-                    if (!drDoc.IsFreezePage(i))
-                        this.m_oLogicDocument.Selection_Draw_Page(i);
+                    for (var i = drDoc.m_lDrawingFirst; i <= drDoc.m_lDrawingEnd; i++)
+                    {
+                        if (!drDoc.IsFreezePage(i))
+                            this.m_oLogicDocument.Selection_Draw_Page(i);
+                    }
+                }
+                else
+                {
+                    this.m_oLogicDocument.Selection_Draw_Pages(0, drDoc.m_lPagesCount - 1);
                 }
 
                 drDoc.private_EndDrawSelection();

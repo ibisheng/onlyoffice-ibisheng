@@ -3656,14 +3656,6 @@ function CDrawingDocument()
         this.m_oWordControl.m_oApi.sync_SearchEndCallback();
     }
 
-    this.ClearPageSelection = function(pageIndex)
-    {
-        if (this.m_arrPages[pageIndex])
-        {
-            this.m_arrPages[pageIndex].selectionArray.splice(0, this.m_arrPages[pageIndex].selectionArray.length);
-        }
-    }
-
     this.SelectionStart = function()
     {
     }
@@ -3705,7 +3697,26 @@ function CDrawingDocument()
     this.AddPageSelection = function(pageIndex, x, y, w, h)
     {
         if (pageIndex < this.m_lDrawingFirst || pageIndex > this.m_lDrawingEnd)
+        {
+            if (this.m_oWordControl.MobileTouchManager)
+            {
+                var r = new _rect();
+                r.x = x;
+                r.y = y;
+                r.w = w;
+                r.h = h;
+
+                if (null == this.m_oWordControl.MobileTouchManager.RectSelect1)
+                {
+                    this.m_oWordControl.MobileTouchManager.RectSelect1 = r;
+                    this.m_oWordControl.MobileTouchManager.PageSelect1 = pageIndex;
+                }
+
+                this.m_oWordControl.MobileTouchManager.RectSelect2 = r;
+                this.m_oWordControl.MobileTouchManager.PageSelect2 = pageIndex;
+            }
             return;
+        }
 
         var page = this.m_arrPages[pageIndex];
         var drawPage = page.drawingPage;
@@ -3761,6 +3772,24 @@ function CDrawingDocument()
             ctx.lineTo(x3, y3);
             ctx.lineTo(x4, y4);
             ctx.closePath();
+        }
+
+        if (this.m_oWordControl.MobileTouchManager)
+        {
+            var r = new _rect();
+            r.x = x;
+            r.y = y;
+            r.w = w;
+            r.h = h;
+
+            if (null == this.m_oWordControl.MobileTouchManager.RectSelect1)
+            {
+                this.m_oWordControl.MobileTouchManager.RectSelect1 = r;
+                this.m_oWordControl.MobileTouchManager.PageSelect1 = pageIndex;
+            }
+
+            this.m_oWordControl.MobileTouchManager.RectSelect2 = r;
+            this.m_oWordControl.MobileTouchManager.PageSelect2 = pageIndex;
         }
     }
 
