@@ -5424,7 +5424,7 @@ CGraphicObjects.prototype =
                     this.curState.textObject.textBoxContent.Selection_Draw_Page(pageIndex);
             }
         }
-        this.drawSelect(pageIndex);
+        //this.drawSelect(pageIndex);
     },
     getAllRasterImagesOnPage: function(pageIndex)
     {
