@@ -5396,7 +5396,7 @@ CGraphicObjects.prototype =
     },
 
 
-    drawSelection: function(pageIndex)
+    drawSelectionPage: function(pageIndex)
     {
         if(this.document.CurPos.Type !== docpostype_HdrFtr)
         {
