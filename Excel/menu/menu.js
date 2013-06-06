@@ -490,17 +490,34 @@
 	var bChartEditor = !!getURLParameter("charteditor");
 	var sUserNameAndId = "user_" + Math.floor ((Math.random() * 100) + 1);
 
-	api.asc_LoadDocument({
-		"Id"     : getURLParameter("key") ? decodeURIComponent(getURLParameter("key")) : "9876543210",
-		"Url"    : getURLParameter("url") ? decodeURIComponent(getURLParameter("url")) : undefined,
-		"Title"  : getURLParameter("title") ? decodeURIComponent(getURLParameter("title")).replace(new RegExp("\\+",'g')," ") : undefined,
-		"Format" : getURLParameter("filetype") ? decodeURIComponent(getURLParameter("filetype")) : undefined,
-		"VKey"   : getURLParameter("vkey") ? decodeURIComponent(getURLParameter("vkey")) : undefined,
-		"Origin" : (sProtocol.search(/\w+/) >= 0 ? sProtocol + "//" : "") + sHost,
-		"UserId" : sUserNameAndId,
-		"UserName" : sUserNameAndId,
-		"ChartEditor" : bChartEditor
-	});
+    var offLineApp = 0; //  1;  // NOTE: ONLY FOR TEST DESKTOP APPLICATION
+
+    if (!offLineApp) {
+        api.asc_LoadDocument({
+            "Id"     : getURLParameter("key") ? decodeURIComponent(getURLParameter("key")) : "9876543210",
+            "Url"    : getURLParameter("url") ? decodeURIComponent(getURLParameter("url")) : undefined,
+            "Title"  : getURLParameter("title") ? decodeURIComponent(getURLParameter("title")).replace(new RegExp("\\+",'g')," ") : undefined,
+            "Format" : getURLParameter("filetype") ? decodeURIComponent(getURLParameter("filetype")) : undefined,
+            "VKey"   : getURLParameter("vkey") ? decodeURIComponent(getURLParameter("vkey")) : undefined,
+            "Origin" : (sProtocol.search(/\w+/) >= 0 ? sProtocol + "//" : "") + sHost,
+            "UserId" : sUserNameAndId,
+            "UserName" : sUserNameAndId,
+            "ChartEditor" : bChartEditor
+        });
+    } else {
+        api.asc_LoadDocument({
+            "Id"     : getURLParameter("key") ? decodeURIComponent(getURLParameter("key")) : "9876543210",
+            "Url"    : decodeURIComponent("file:///X:/AVS/Sources/TeamlabOffice/trunk/OfficeWeb/Excel/offlinedocs/test-native/"),
+            "Title"  : getURLParameter("title") ? decodeURIComponent(getURLParameter("title")).replace(new RegExp("\\+",'g')," ") : undefined,
+            "Format" : getURLParameter("filetype") ? decodeURIComponent(getURLParameter("filetype")) : undefined,
+            "VKey"   : getURLParameter("vkey") ? decodeURIComponent(getURLParameter("vkey")) : undefined,
+            "Origin" : (sProtocol.search(/\w+/) >= 0 ? sProtocol + "//" : "") + sHost,
+            "UserId" : sUserNameAndId,
+            "UserName" : sUserNameAndId,
+            "ChartEditor" : bChartEditor,
+            "OfflineApp" : true
+        });
+    }
 
 	$("#enableKE").data("state", true).click(function(){
 		var $this = $(this), s = $this.data("state");
