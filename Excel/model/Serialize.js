@@ -5961,8 +5961,8 @@ CTableStyles.prototype =
 function CTableStyle()
 {
 	this.name = null;
-	this.pivot = false;
-	this.table = null;
+	this.pivot = true;
+	this.table = true;
 	
 	this.blankRow = null;
 	this.firstColumn = null;
