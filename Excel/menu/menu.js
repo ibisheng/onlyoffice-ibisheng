@@ -1801,8 +1801,6 @@
 
 					commentBlock = document.createElement("div");
 					commentBlock.id = g_commentsTooltipId;
-					//commentBlock.style["width"] = "auto";
-					//commentBlock.style["height"] = "auto";
 
 					commentBlock.style["width"] = (commentCoords.asc_getWidthPX() + 2 * padding) + "px";
 					commentBlock.style["height"] = (commentCoords.asc_getHeightPX() + 2 * padding) + "px";
@@ -1812,8 +1810,8 @@
 					commentBlock.style["border"] = "1px solid Grey";
 					commentBlock.style["backgroundColor"] = "#FFFF99";
 					commentBlock.style["position"] = "absolute";
-					commentBlock.style["top"] = (/*mouseMoveObject.asc_getY()*/ commentCoords.asc_getTopPX() + cellCommentator.mmToPx(commentCoords.asc_getTopOffset()) + canvasWidget.offset().top) + "px";
-					commentBlock.style["left"] = (/*mouseMoveObject.asc_getX()*/ commentCoords.asc_getLeftPX() + cellCommentator.mmToPx(commentCoords.asc_getLeftOffset()) + canvasWidget.offset().left) + "px";
+					commentBlock.style["top"] = (commentCoords.asc_getTopPX() + cellCommentator.mmToPx(commentCoords.asc_getTopOffset()) + canvasWidget.offset().top) + "px";
+					commentBlock.style["left"] = (commentCoords.asc_getLeftPX() + cellCommentator.mmToPx(commentCoords.asc_getLeftOffset()) + canvasWidget.offset().left) + "px";
 					$("body").append(commentBlock);
 
 					function drawComment(comment) {
@@ -2025,7 +2023,9 @@
 					open: function() {
 						if (!bIsUpdateChartProperties)
 							return;
+						
 						bIsUpdateChartProperties = false;
+						api.asc_enableKeyEvents(false);
 
 						var range = chart.asc_getRange();
 						var interval = range.asc_getInterval();
@@ -2142,6 +2142,7 @@
 					close: function() {
 						if (!bIsReopenDialog)
 							api.asc_setSelectDialogRangeMode(false);
+						api.asc_enableKeyEvents(true);
 					},
 					create: function() {
 					}
@@ -2157,6 +2158,7 @@
 					resizable: false, modal: true, title: "Add image", draggable: true,
 					open: function() {
 						$("#imageSelectorUrl").val("");
+						api.asc_enableKeyEvents(false);
 					},
 					buttons: [
 						{
@@ -2177,6 +2179,7 @@
 						}
 					],
 					close: function() {
+						api.asc_enableKeyEvents(true);
 					},
 					create: function() {
 						$("#imageSelectorUrl").val("");

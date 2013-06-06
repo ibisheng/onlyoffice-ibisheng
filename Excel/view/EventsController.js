@@ -615,9 +615,6 @@
 					t.lastKeyCode = event.which;
 				}
 
-				if ($("#drawingObjectsMenu").length)
-					return true;
-
 				// Двигаемся ли мы в выделенной области
 				var selectionActivePointChanged = false;
 
@@ -912,9 +909,6 @@
 				// если в FF возвращать false, то отменяется дальнейшая обработка серии keydown -> keypress -> keyup
 				// и тогда у нас не будут обрабатываться ctrl+c и т.п. события
 				if (t.settings.isViewerMode || t.isSelectDialogRangeMode) {return true;}
-
-				if ($("#drawingObjectsMenu").length || t.isSelectDrawingObject)
-					return true;
 
 				// Для таких браузеров, которые не присылают отжатие левой кнопки мыши для двойного клика, при выходе из
 				// окна редактора и отпускания кнопки, будем отрабатывать выход из окна (только Chrome присылает эвент MouseUp даже при выходе из браузера)
