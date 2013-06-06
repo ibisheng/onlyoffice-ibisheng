@@ -92,7 +92,7 @@ CMathMatrix.prototype.setPosition = function(pos)
     }
 
 }
-CMathMatrix.prototype.old_findDisposition = function( coord )
+CMathMatrix.prototype.old_old_findDisposition = function( coord )
 {
     var pos_x = this.nRow - 1, pos_y = this.nCol - 1,
         w = 0, h = 0;
@@ -207,7 +207,7 @@ CMathMatrix.prototype.findDisposition = function( coord )
         sumHeight += Heights[t] + this.gaps.row[t + 1];
 
     // флаг для случая, когда выходим за границы элемента и есть выравнивание относительно других элементов
-    var flag = true;
+    var inside_flag = -1;
 
     if( posCurs.x != null && posCurs.y != null)
     {
@@ -216,25 +216,31 @@ CMathMatrix.prototype.findDisposition = function( coord )
         if(coord.x < ( sumWidth + align.x ))
         {
             mouseCoord.x = 0;
-            flag = false;
+            inside_flag = 0;
         }
         else if( coord.x > (sumWidth + align.x + size.width ))
         {
             mouseCoord.x = size.width;
-            flag = false;
+            inside_flag = 1;
         }
         else
             mouseCoord.x = coord.x - ( sumWidth + align.x );
 
         if(coord.y < (sumHeight + align.y))
+        {
             mouseCoord.y = 0;
+            inside_flag = 2;
+        }
         else if( coord.y > ( sumHeight + align.y + size.height ) )
+        {
             mouseCoord.y = size.height;
+            inside_flag = 2;
+        }
         else
             mouseCoord.y = coord.y - ( sumHeight + align.y );
     }
 
-    return {pos: posCurs, mCoord: mouseCoord, flag: flag};
+    return {pos: posCurs, mCoord: mouseCoord, inside_flag: inside_flag};
 }
 CMathMatrix.prototype.getMetrics = function()
 {

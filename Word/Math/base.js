@@ -468,7 +468,7 @@ CMathBase.prototype =
         this.CurPos_X = elem.pos.x;
         this.CurPos_Y = elem.pos.y;
 
-        var res = this.elements[this.CurPos_X][this.CurPos_Y].mouseDown( elem.mCoord );
+        var res = this.elements[this.CurPos_X][this.CurPos_Y].mouseDown( elem.mCoord, elem.inside_flag );
 
         return res;
 
@@ -478,7 +478,7 @@ CMathBase.prototype =
         var state = true, SelectContent = null;
         var elem = this.findDisposition( mCoord);
 
-        if(elem.pos.x == this.CurPos_X && elem.pos.y == this.CurPos_Y && elem.flag === true )
+        if(elem.pos.x == this.CurPos_X && elem.pos.y == this.CurPos_Y && elem.inside_flag === -1 )
         {
             var movement = this.elements[this.CurPos_X][this.CurPos_Y].mouseMove( elem.mCoord );
             SelectContent = movement.SelectContent;
@@ -574,7 +574,7 @@ CMathBase.prototype =
 
         return {x: _x, y: _y};
     },
-    findDisposition: function(mCoord)
+    old_findDisposition: function(mCoord)
     {
         var mouseCoord = {x: null, y: null},
             posCurs =    {x: null, y: null};
@@ -705,6 +705,150 @@ CMathBase.prototype =
         }
 
         return {pos: posCurs, mCoord: mouseCoord, flag: flag};
+    },
+    findDisposition: function(mCoord)
+    {
+         var mouseCoord = {x: null, y: null},
+             posCurs =    {x: null, y: null};
+
+
+         var sumWidth = 0;
+         var sumHeight = 0;
+
+         var maxWH = this.getWidthsHeights();
+
+         var Widths = maxWH.widths;
+         var Heights = maxWH.heights;
+
+         ///////////////////////////////
+
+         if(mCoord.y > this.size.height)
+             posCurs.x = this.nRow - 1;
+         else
+         {
+             var _h = 0;
+             for(var j = 0; j < this.nRow; j++)
+             {
+                 _h += Heights[j];
+                 _h += this.dH/2;
+                 if( mCoord.y <= _h )
+                 {
+                     posCurs.x = j;
+                     break;
+                 }
+                 _h += this.dH/2;
+             }
+         }
+
+         ///////////////////////////////
+
+         //если не правильно посчитали, а элемент был justDraw, то будет ошибка
+
+         if( mCoord.x > this.size.width )
+             posCurs.y = this.nCol - 1;
+         else
+         {
+             var _w = 0;
+             for(var u = 0; u < this.nCol; u++)
+             {
+                 _w +=Widths[u];
+                 _w += this.dW/2;
+                 if( mCoord.x <= _w )
+                 {
+
+                     if( this.elements[posCurs.x][u].IsJustDraw() )
+                     {
+                         if(this.nRow > 1)
+                         {
+                             if(posCurs.x == 0)
+                                 posCurs.x = 1;
+                             else if(posCurs.x == this.nRow - 1)
+                                 posCurs.x = this.nRow - 2;
+                             else
+                             {
+                                 if( mCoord.y < (_h - Heights[posCurs.x]/2) )
+                                     posCurs.x--;
+                                 else
+                                     posCurs.x++;
+                             }
+                             posCurs.y = u;
+                         }
+                         else if(this.nCol > 1)
+                         {
+                             if(u == 0)
+                                 posCurs.y = 1;
+                             else if(u == this.nCol - 1)
+                                 posCurs.y = this.nCol - 2;
+                             else
+                             {
+                                 if( mCoord.x < (_w - Widths[u]/2) )
+                                     posCurs.y = u - 1;
+                                 else
+                                     posCurs.y = u + 1;
+                             }
+
+                         }
+                         else
+                             return; // не самое лучшее решение, в идеале если у нас если такая ситуация получилась
+                         // (что сомнительно, в контенте один элемент с которым ничего нельзя сделать),
+                         // то вставать  после этого элемента  в контенте на уровень выше
+                         // лучше следить за подобными ситуациями, чтобы такого не было
+                     }
+                     else
+                         posCurs.y = u;
+                     break;
+                 }
+                 _w += this.dW/2;
+             }
+         }
+         ////////////////////////////////
+
+         for(var t = 0; t < posCurs.y; t++)
+             sumWidth += Widths[t];
+         for(t = 0; t < posCurs.x; t++)
+             sumHeight += Heights[t];
+
+         // флаг для случая, когда выходим за границы элемента и есть выравнивание относительно других элементов
+         // -1 - в пределах границы
+         // 0 - начало контента
+         // 1 - конец контента
+         // 2 - выщли за границы контента по Y
+
+         var inside_flag = -1;
+
+         if( posCurs.x != null && posCurs.y != null)
+         {
+             var size = this.elements[posCurs.x][posCurs.y].size;
+             var align = this.align(posCurs.x, posCurs.y);
+             if(mCoord.x < ( posCurs.y*this.dW + sumWidth + align.x ))
+             {
+                 mouseCoord.x = 0;
+                 inside_flag = 0;
+             }
+             else if( mCoord.x > ( posCurs.y*this.dW + sumWidth + align.x + size.width ))
+             {
+                 mouseCoord.x = size.width;
+                 inside_flag = 1;
+             }
+             else
+                 mouseCoord.x = mCoord.x - ( posCurs.y*this.dW + sumWidth + align.x );
+
+
+             if(mCoord.y < (posCurs.x*this.dH + sumHeight + align.y))
+             {
+                 mouseCoord.y = 0;
+                 inside_flag = 2;
+             }
+             else if( mCoord.y > ( posCurs.x*this.dH + sumHeight + align.y + size.height ) )
+             {
+                 mouseCoord.y = size.height;
+                 inside_flag = 2;
+             }
+             else
+                 mouseCoord.y = mCoord.y - (posCurs.x*this.dH + sumHeight + align.y );
+         }
+
+         return {pos: posCurs, mCoord: mouseCoord, inside_flag: inside_flag};
     },
     setPosition: function(pos)
     {
@@ -855,6 +999,10 @@ CMathBase.prototype =
     IsIncline: function()
     {
         return false;
+    },
+    gToUp: function()
+    {
+        this.recalculateSize();
+        return this.Parent;
     }
-
 }

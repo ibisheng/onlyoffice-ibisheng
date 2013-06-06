@@ -1,3 +1,5 @@
+
+
 function CBarFraction()
 {
     CMathBase.call(this,2,1);
@@ -187,9 +189,9 @@ CSkewedFraction.prototype.getCenter = function()
 };
 CSkewedFraction.prototype.findDisposition = function( mCoord )
 {
-    var flag = true;
     var mouseCoord = {x: mCoord.x, y: mCoord.y},
-        posCurs =    {x: null, y: null};
+        posCurs =    {x: null, y: null},
+        inside_flag = -1;
 
     posCurs.x = 0;
 
@@ -199,11 +201,12 @@ CSkewedFraction.prototype.findDisposition = function( mCoord )
         if(sizeFirst.width < mCoord.x)
         {
             mouseCoord.x = sizeFirst.width;
-            flag = false;
+            inside_flag = 1;
         }
         if(sizeFirst.height < mCoord.y)
         {
             mouseCoord.y = sizeFirst.height;
+            inside_flag = 2;
         }
 
         posCurs.y = 0;
@@ -214,27 +217,33 @@ CSkewedFraction.prototype.findDisposition = function( mCoord )
         if(mCoord.x < this.size.width - sizeSec.width)
         {
             mouseCoord.x = 0;
-            flag = false;
+            inside_flag = 0;
         }
         else if( mCoord.x > this.size.width)
         {
             mouseCoord.x = sizeSec.width;
-            flag = false;
+            inside_flag = 1;
         }
         else
             mouseCoord.x = mCoord.x - this.elements[0][0].size.width - this.gapSlash;
 
         if( mCoord.y < this.size.height - this.elements[0][1].size.height)
+        {
             mouseCoord.y = 0;
+            inside_flag = 2;
+        }
         else if(mCoord.y > this.size.height)
+        {
             mouseCoord.y = sizeSec.height;
+            inside_flag = 2;
+        }
         else
             mouseCoord.y = mCoord.y - this.elements[0][0].size.height;
 
         posCurs.y = 1;
     }
 
-    return {pos: posCurs, mCoord: mouseCoord, flag: flag};
+    return {pos: posCurs, mCoord: mouseCoord, inside_flag: inside_flag};
 
 };
 CSkewedFraction.prototype.draw = function()

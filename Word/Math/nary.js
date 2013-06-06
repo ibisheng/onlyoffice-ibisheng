@@ -30,9 +30,6 @@ CNary.prototype.setContent = function()
     else
         oBase = new CDegree(this.IterType - 1); // вычитаем 1 т.к. параметры инициализации от 0 до 2
 
-            // выставляем здесь символ, т.к. не прокатит протащить другой размер шрифта для основания в CDegree
-            // SetContent унифицирован !
-
     var sign = null;
 
     if(this.id == 0)

@@ -35,7 +35,7 @@ CSubMathBase.prototype.mouseMove = function( mCoord )
     var res = true;
     var elem = this.findDisposition( mCoord);
 
-    if(elem.pos.x == this.CurPos_X && elem.pos.y == this.CurPos_Y && elem.flag === true )
+    if(elem.pos.x == this.CurPos_X && elem.pos.y == this.CurPos_Y && elem.inside_flag === -1 )
         res = this.elements[this.CurPos_X][this.CurPos_Y].mouseMove(elem.mCoord);
     else
         res = false;

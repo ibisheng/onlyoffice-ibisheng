@@ -15,18 +15,18 @@ CBaseBracket.prototype.findDisposition = function(mCoord)
 {
     var X = null,
         Y = null,
-        flag = true; // остаемя в пределах данного элемента( за границы элемента не вышли )
+        inside_flag = true; // остаемя в пределах данного элемента( за границы элемента не вышли )
 
     if(mCoord.x < this.gapBrack)
     {
         X = 0;
-        flag = false;
+        inside_flag = 0;
     }
     else if(mCoord.x > this.size.width - this.gapBrack)
     {
         //X = this.size.width - 2*this.gapBrack;
         X = this.elements[0][0].size.width; // разницы никакой
-        flag = false;
+        inside_flag = 1;
     }
     else
     {
@@ -36,12 +36,12 @@ CBaseBracket.prototype.findDisposition = function(mCoord)
     if(Y < this.gapTop)
     {
         Y = 0;
-        flag = false;
+        inside_flag = 2;
     }
     else if(Y > this.size.height - this.gapTop)
     {
         Y = this.size.height - 2*this.gapTop;
-        flag = false;
+        inside_flag = 2;
     }
     else
     {
@@ -51,7 +51,7 @@ CBaseBracket.prototype.findDisposition = function(mCoord)
     var coord = {x: X, y: Y},
         posCurs = {x: 0, y: 0};
 
-    return {pos: posCurs, mCoord: coord, flag: flag};
+    return {pos: posCurs, mCoord: coord, inside_flag: inside_flag};
 }
 CBaseBracket.prototype.setPosition = function(pos)
 {

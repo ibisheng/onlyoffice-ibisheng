@@ -1418,7 +1418,6 @@ function Set_Container(dimension, path, index)
         Cont.style.width = column*width + scrollWidth + "px";
     }*/
 
-    var flag = true;
     for(var i = 0; i < row; i++)
     {
         for(var j = 0; j < column; j++)

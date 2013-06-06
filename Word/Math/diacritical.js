@@ -48,12 +48,12 @@ CBaseDiacritic.prototype.findDisposition = function(mCoord)
 {
     var X = null,
         Y = null,
-        flag = true; // остаемя в пределах данного элемента( за границы элемента не вышли )
+        inside_flag = -1; // остаемя в пределах данного элемента( за границы элемента не вышли )
 
     if(mCoord.y < this.accentSize.height)
     {
         Y = 0;
-        flag = false;
+        inside_flag = 2;
     }
     else
         Y = mCoord.y - this.accentSize.height;
@@ -62,7 +62,7 @@ CBaseDiacritic.prototype.findDisposition = function(mCoord)
     if(mCoord.x < this.shiftArg)
     {
         X = 0;
-        flag = false;
+        inside_flag = 0;
     }
     else
         X = mCoord.x - this.shiftArg;
@@ -70,7 +70,7 @@ CBaseDiacritic.prototype.findDisposition = function(mCoord)
     var coord = {x: X, y: Y},
         posCurs = {x: 0, y: 0};
 
-    return {pos: posCurs, mCoord: coord, flag: flag};
+    return {pos: posCurs, mCoord: coord, inside_flag: inside_flag};
 }
 CBaseDiacritic.prototype.IsIncline = function()
 {

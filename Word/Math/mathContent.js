@@ -15,6 +15,9 @@ function mathElem(_val, _gps, _w )
 }
 
 //TODO
+//переделать/продумать DotIndef, т.к. при перетаскивании из одного места в другое флаг DotIndef может измениться для другого контента
+
+//TODO
 //сделать более понятным индефикатор bMText
 
 //TODO
@@ -44,6 +47,19 @@ function mathElem(_val, _gps, _w )
 
 //TODO
 //сделать у радикала степень
+
+
+
+// TODO Refactoring
+// 1. (!!) повтор IsIncline, IsHighElement
+// 2. (!!) переделать add / add_mathComponent / addText / addLetter
+// 3. home/end if( IsTarget() )
+// 4. relate => сделать 2 функции : одну установить базовый контент корнем(Root) и функцию установить родительский класс (setParent)
+// 5. update_widthContent добавить в recalculateSize (убрать recalculate в CMathContent)
+// 6. (скорее всего) убрать coordWOGaps
+// 7. убрать getMetricsLetter
+// 8. setFont и updateTextPrp переделать (сделать, чтобы font менялся для заселекченной части контента)
+
 
 function CMathContent()
 {
@@ -474,7 +490,7 @@ CMathContent.prototype =
         return { state: state, SelectContent: SelectContent, CurrContent: CurrContent };
     },
     // не вызываем из mouseDown эту ф-ию, тк иначе не установим селект для внутреннего объекта (setStart_Selection)
-    afterDisplacement: function(coord)
+    afterDisplacement: function(coord) //аналог mouseDown для goToUpperLevel и goToLowerLever
     {
         var content = null;
         var msCoord = this.coordWOGaps(coord);
@@ -677,12 +693,10 @@ CMathContent.prototype =
         var _center     =   0 ;
         var _height     =   0 ;
 
-        var Size;
-
         for(var i=0; i< this.content.length; i++)
         {
-            Size = this.content[i].value.size;
-            gps = this.content[i].g_mContext;
+            var Size = this.content[i].value.size;
+            var gps = this.content[i].g_mContext;
             _width += Size.width + gps.left + gps.right;
             _descent = ( _descent < ( Size.height - Size.center + gps.low) ) ? ( Size.height - Size.center + gps.low): _descent;
             _center =  ( _center < (Size.center + gps.top) ) ? ( Size.center + gps.top) : _center;
@@ -713,7 +727,6 @@ CMathContent.prototype =
     {
         for(var j = 1; j <this.content.length; j++)
         {
-
             this.content[j].widthToEl = this.content[j-1].widthToEl + this.content[j].value.size.width + this.content[j].g_mContext.left + this.content[j].g_mContext.right;
         }
     },
@@ -727,9 +740,12 @@ CMathContent.prototype =
         editor.WordControl.m_oDrawingDocument.UpdateTargetFromPaint = false;
 
     },
-    mouseDown: function( mouseCoord )
+    mouseDown: function( mouseCoord, inside_flag )
     {
         var result = null;
+
+        if(typeof(inside_flag) === "undefined")
+            inside_flag = -1;
 
         if(this.IsTarget())
         {
@@ -738,7 +754,14 @@ CMathContent.prototype =
         else
         {
             var msCoord = this.coordWOGaps(mouseCoord);
-            this.CurPos = this.findPosition( msCoord );
+
+            if(inside_flag == 0)
+                this.CurPos = 0;
+            else if(inside_flag == 1)
+                this.CurPos = this.content.length - 1;
+            else
+                this.CurPos = this.findPosition( msCoord );
+
 
             if( this.content[this.CurPos].value.SUBCONTENT )
             {
@@ -845,7 +868,7 @@ CMathContent.prototype =
     findPosition: function(mCoord)
     {
         var mouseX = mCoord.x;
-        var mouseY = mCoord.y;
+        //var mouseY = mCoord.y;
         var pos = 0;
         while( pos < (this.content.length - 1) &&  this.content[pos].widthToEl < mouseX )
             pos++;
@@ -872,12 +895,13 @@ CMathContent.prototype =
         return pos;
 
     },
-    getCoordElem: function(index, mCoord )
+    getCoordElem: function(index, mCoord)  // without gaps of Math Component ( напримет, если справа/слева есть относительно мат элемента компонент, то добавляем gaps справа/слева для этого мат элемента )
     {
-        var X;
-        var Y;
         var widthToPrev = this.content[index-1].widthToEl;
         var widthToCur = this.content[index].widthToEl;
+        var X;
+        var Y;
+
         var gps = this.content[index].g_mContext;
         if( widthToPrev <= mCoord.x && mCoord.x <=  (widthToPrev + gps.left) )
             X = 0;
@@ -1012,14 +1036,14 @@ CMathContent.prototype =
 
         return {CurrContent : CurrContent, SelectContent: SelectContent, state: state };
     },
-    setPlaceholderAfterRemove: function()
+    setPlaceholderAfterRemove: function()  // чтобы не выставлялся тагет при вставке, когда заселекчен весь контент и мы добавляем, например, другой мат элемент
     {
         if(this.content.length == 1 && ! this.bRoot )//только CEmpty
         {
             this.add(StartTextElement);
         }
     },
-    ResizeReverse: function()
+    ResizeReverse: function() // пересчитываем начиная с текущего контента (и уровни, к-ые находятся выше)
     {
         this.recalculate();
         if(! this.bRoot )
@@ -1038,14 +1062,13 @@ CMathContent.prototype =
             this.selection.startPos = StartIndSelect;
             this.selection.endPos   = StartIndSelect;
         }
-        else
+        else // один CEmpty
         {
             this.selection.startPos = 0;
             this.selection.endPos = 0;
             this.selection.active = false;
         }
 
-        //this.selection.use = false;
     },
     setEnd_Selection: function( EndIndSelect )
     {
@@ -1053,8 +1076,6 @@ CMathContent.prototype =
         {
             this.selection.endPos = EndIndSelect + 1;
             this.drawSelect();
-
-            //this.selection.use = (this.selection.startPos !==  this.selection.endPos);
         }
     },
     //TODO
@@ -1159,6 +1180,8 @@ CMathContent.prototype =
     {
         return metrics = this.content[pos+1].value.getMetrics();
     },
+    // для диакритических элементов, если в контенте есть заглавные буквы, и для букв ascent > ascent "o"
+    // (!) повторяется функция (IsIncline)
     IsHighElement: function()
     {
         var res = false;
@@ -1206,10 +1229,11 @@ CMathContent.prototype =
     {
         this.bDot = flag;
     },
-    TestFont: function(font)
+    /*TestFont: function(font)
     {
         this.font = GetMathFont(font);
-    },
+    },*/
+    // (!) повторяется функция (IsHighElement)
     IsIncline: function()
     {
         var bIncline = false;
@@ -1223,14 +1247,14 @@ CMathContent.prototype =
     {
         for(var i = 0; i < txt.length; i++)
         {
-            this.addCode( txt.charCodeAt(i) );
+            this.addLetter( txt.charCodeAt(i) );
         }
 
         this.recalculate();
         this.setStart_Selection(this.CurPos);
         this.selection.active = false;
     },
-    addCode: function(code)
+    addLetter: function(code)
     {
         if( this.IsTarget() ) //удаляем тагет
         {
@@ -1291,7 +1315,7 @@ CMathContent.prototype =
     },
     add: function(code)
     {
-        this.addCode(code);
+        this.addLetter(code);
         this.recalculate();
     },
     addElementToContent: function(element, gaps)
@@ -1307,6 +1331,131 @@ CMathContent.prototype =
         this.CurPos++;
         this.setStart_Selection(this.CurPos);
         this.selection.active = false;
+    },
+    fillContent: function(type)
+    {
+        var component,
+            result;
+
+        if(type == 0)
+        {
+            component = new CMathText();
+            component.init(this.params);
+            component.addCode(StartTextElement);
+            result = this;
+        }
+        else if(type == 1)
+        {
+            component = new CMathText();
+            component.init(this.params);
+            result = this;
+        }
+        else
+        {
+            component = this.getMathComponent(type);
+            component.init(this.params);
+            result = component;
+        }
+
+        return result;
+
+        /*var component;
+        switch(type)
+        {
+            case 0:
+                component = new CMathText();
+                component.addCode(StartTextElement);
+                break;
+            case 1:
+                component = new CMathText();
+                break;
+            case 2:
+                component = new CBarFraction();
+                break;
+            case 3:
+                component = new CSkewedFraction();
+                break;
+            case 4:
+                component = new CLinearFraction();
+                break;
+            case 5:
+                component = new CSimpleFraction();
+                break;
+            case 6:
+                component = new CDegree(0);
+                break;
+            case 7:
+                component = new CDegree(1);
+                break;
+            case 8:
+                component = new CDegree(2);
+                break;
+            case 9:
+                component = new CDegree(3);
+        }
+
+        component.setParams(this.params);*/
+    },
+    getMathComponent: function(id)
+    {
+        // 0 - placeholder
+        // 1 - math text
+        var component;
+        switch(id)
+        {
+            case 2:
+                component = new CBarFraction();
+                break;
+            case 3:
+                component = new CSkewedFraction();
+                break;
+            case 4:
+                component = new CLinearFraction();
+                break;
+            case 5:
+                component = new CSimpleFraction();
+                break;
+            case 6:
+                component = new CDegree(0);
+                break;
+            case 7:
+                component = new CDegree(1);
+                break;
+            case 8:
+                component = new CDegree(2);
+                break;
+            case 9:
+                component = new CDegree(3);
+                break;
+            case 10:
+                component = new CRadical();
+                break;
+            case 11:
+                component = new CNary();
+                break;
+            case 12:
+                component = new CDelimiter();
+                break;
+            case 13:
+                component = new CMathFunc(); // CMathMatrix(1, 2)
+                break;
+        }
+
+        return component;
+    },
+    gToUp: function()
+    {
+        this.recalculateSize();
+        this.update_widthContent();
+
+        var upLevel;
+
+        if( ! this.bRoot )
+            upLevel = this.Parent;
+        else
+            upLevel = this.Root;
+
+        return upLevel;
     }
 }
 //todo
@@ -1458,7 +1607,12 @@ CMathComposition.prototype =
     MouseDown: function(mouseX, mouseY)
     {
         this.ClearSelect();
-        this.CurrentContent = this.SelectContent = this.Root.mouseDown({x: mouseX, y: mouseY});
+        this.CurrentContent = this.SelectContent = this.Root.mouseDown({x: mouseX, y: mouseY}, -1);
+
+        if(typeof(this.CurrentContent) == "undefined")
+        {
+            var stop = true;
+        }
 
         this.СheckTarget();
     },
@@ -1472,6 +1626,7 @@ CMathComposition.prototype =
             this.SelectContent = movement.SelectContent;
             this.СheckTarget();
         }
+
     },
     MouseUp: function()
     {
@@ -1491,7 +1646,7 @@ CMathComposition.prototype =
         this.CurrentContent = removal.CurrContent;
         this.SelectContent  = removal.SelectContent;
 
-        this.CurrentContent.setPlaceholderAfterRemove(); // чтобы не выставлялся тагет при вставке, когда заселекчен весь контент
+        this.CurrentContent.setPlaceholderAfterRemove(); // чтобы не выставлялся тагет при вставке, когда заселекчен весь контент и мы добавляем, например, другой мат элемент
 
         if( removal.state.bRecPosition )
         {
@@ -1583,10 +1738,10 @@ CMathComposition.prototype =
             editor.WordControl.m_oLogicDocument.DrawingDocument.SelectEnabled(false);
         }
     },
-    TestFont: function(font)
+    /*TestFont: function(font)
     {
         this.CurrentContent.TestFont(font);
-    },
+    },*/
     TestSetPostion: function()
     {
         this.Root.setPosition(this.posCompos);
@@ -1594,6 +1749,16 @@ CMathComposition.prototype =
     TestSetFontAllSymbols: function(font)
     {
         this.Root.setFont(font);
+    },
+    FillContent: function(type)
+    {
+        this.CurrentContent = this.CurrentContent.fillContent(type);
+        this.SelectContent = this.CurrentContent;
+    },
+    GToUp: function()
+    {
+        this.CurrentContent = this.CurrentContent.gToUp();
+        this.SelectContent = this.CurrentContent;
     }
 }
 
@@ -2144,6 +2309,7 @@ function AddEquation(ind)
         case 169:
             break;
         case 170:
+            mathElem = new CBorderBox();
             break;
         case 171:
             break;
@@ -2300,4 +2466,14 @@ function AddEquation(ind)
     }
 
     return mathElem;
+}
+
+function AddMEtoContent(type)
+{
+
+}
+
+function AddtoParentContent(type)
+{
+
 }
