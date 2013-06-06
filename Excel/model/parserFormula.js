@@ -6785,6 +6785,35 @@ var cFormulaFunction = {
         'CLEAN' : function(){
             var r = new cBaseFunction();
             r.setName("CLEAN");
+			r.setArgumentsMin(1);
+            r.setArgumentsMax(1);
+            r.Calculate = function(arg){
+				var arg0 = arg[0];
+				
+				if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
+					arg0 = arg0.cross(arguments[1].first).tocNumber();
+				}
+				if( arg0 instanceof cArray ){
+					arg0 = arg0.getElementRowCol(0,0);
+				}
+				
+				arg0 = arg0.tocString();
+				
+				var v = arg0.getValue(), l = v.length, res = "";
+
+				for( var i = 0; i < l; i++){
+					if( v.charCodeAt(i) > 0x1f )
+						res+=v[i];
+				}
+				
+				return this.value = new cString( res );
+			}
+			r.getInfo = function(){
+                return {
+                    name:this.name,
+                    args:"( string )"
+                };
+            }
         	return r;
 		},
         'CODE' : function(){
@@ -7001,6 +7030,164 @@ var cFormulaFunction = {
         'FIXED' : function(){
             var r = new cBaseFunction();
             r.setName("FIXED");
+			r.setArgumentsMin(1);
+            r.setArgumentsMax(3);
+			r.Calculate = function(arg){
+
+				function SignZeroPositive(number){
+					return number < 0 ? -1 : 1;
+				}
+				function truncate(n) {
+					return Math[n > 0 ? "floor" : "ceil"](n);
+				}
+				function sign(n){
+					return n == 0 ? 0 :	n < 0 ? -1 : 1
+				}
+				function Floor(number, significance){
+					var quotient = number / significance;
+					if (quotient == 0){
+						return 0;
+					}
+					var nolpiat = 5 * sign(quotient) * Math.pow(10, Math.floor( Math.log ( Math.abs(quotient) ) / Math.log ( 10 ) ) - cExcelSignificantDigits);
+					return truncate(quotient + nolpiat) * significance;
+				}
+				function roundHelper(number,num_digits){
+					if(num_digits > cExcelMaxExponent){
+						if (Math.abs(number) < 1 || num_digits < 1e10) // The values are obtained experimentally
+						{
+							return new cNumber(number);
+						}
+						return new cNumber(0);
+					}
+					else if (num_digits < cExcelMinExponent)
+					{
+						if (Math.abs(number) < 0.01) // The values are obtained experimentally
+						{
+							return new cNumber(number);
+						}
+						return new cNumber(0);
+					}
+					
+					var significance = SignZeroPositive(number) * Math.pow(10, -truncate(num_digits));
+					
+					number += significance / 2;
+					
+					if ( number/significance == Infinity){
+						return new cNumber( number );
+					}
+					
+					return new cNumber( Floor(number, significance) );
+				}
+				function toFix(str,skip){
+					var res, _int, _dec, _tmp = ""
+					
+					if(skip)
+						return str;
+						
+					res = str.split(".")
+					_int = res[0];
+					if( res.length == 2)
+						_dec = res[1];
+						
+					_int = _int.split("").reverse().join("").match(/([^]{1,3})/ig)
+					
+						
+					for( var i = _int.length-1; i >= 0; i--){
+						
+						_tmp += _int[i].split("").reverse().join("");
+						
+						if( i != 0 )
+							_tmp += ",";
+					}
+					
+					if( undefined != _dec)
+						while( _dec.length < arg1.getValue() ) _dec+="0";
+						
+					return "" + _tmp + ( res.length == 2 ? "."+_dec+"" : "");
+				}
+                var arg0 = arg[0], 
+					arg1 = arg[1] ? arg[1] : new cNumber(2), 
+					arg2 = arg[2] ? arg[2] : new cBool(false);
+					
+				if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
+					arg0 = arg0.cross(arguments[1].first);
+				}
+				if( arg1 instanceof cArea || arg1 instanceof cArea3D ){
+					arg1 = arg1.cross(arguments[1].first);
+				}
+				if( arg2 instanceof cArea || arg2 instanceof cArea3D ){
+					arg2 = arg2.cross(arguments[1].first);
+				}
+				
+				if( arg0 instanceof cError ) return this.value = arg0;
+                if( arg1 instanceof cError ) return this.value = arg1;
+                if( arg2 instanceof cError ) return this.value = arg2;
+				
+                if( arg0 instanceof cRef || arg0 instanceof cRef3D ){
+                    arg0 = arg0.getValue();
+                    if(arg0 instanceof cError) return this.value = arg0;
+                    else if(arg0 instanceof cString) return this.value = new cError(cErrorType.wrong_value_type);
+                    else arg0 = arg0.tocNumber();
+                }
+                else arg0 = arg0.tocNumber();
+
+                if( arg1 instanceof cRef || arg1 instanceof cRef3D ){
+                    arg1 = arg1.getValue();
+                    if(arg1 instanceof cError) return this.value = arg1;
+                    else if(arg1 instanceof cString) return this.value = new cError(cErrorType.wrong_value_type);
+                    else arg1 = arg1.tocNumber();
+                }
+                else arg1 = arg1.tocNumber();
+
+				if( arg0 instanceof cArray && arg1 instanceof cArray ){
+					if( arg0.getCountElement() != arg1.getCountElement() || arg0.getRowCount() != arg1.getRowCount() ){
+						return this.value = new cError( cErrorType.not_available );
+					}
+					else{
+						arg0.foreach(function(elem,r,c){
+							var a = elem;
+								b = arg1.getElementRowCol(r,c);
+							if( a instanceof cNumber && b instanceof cNumber ){
+								var res = roundHelper( a.getValue(), b.getValue() );
+								this.array[r][c] = toFix(res.toString(),arg2.toBool());
+							}
+							else
+								this.array[r][c] = new cError( cErrorType.wrong_value_type );
+						})
+						return this.value = arg0;
+					}
+				}
+				else if( arg0 instanceof cArray ){
+					arg0.foreach(function(elem,r,c){
+						var a = elem;
+							b = arg1;
+						if( a instanceof cNumber && b instanceof cNumber ){
+							var res = roundHelper( a.getValue(), b.getValue() );
+							this.array[r][c] = toFix(res.toString(),arg2.toBool());
+						}
+						else
+							this.array[r][c] = new cError( cErrorType.wrong_value_type );
+					})
+					return this.value = arg0;
+				}
+				else if( arg1 instanceof cArray ){
+					arg1.foreach(function(elem,r,c){
+						var a = arg0;
+							b = elem;
+						if( a instanceof cNumber && b instanceof cNumber ){
+							var res = roundHelper( a.getValue(), b.getValue() );
+							this.array[r][c] = toFix(res.toString(),arg2.toBool());
+						}
+						else
+							this.array[r][c] = new cError( cErrorType.wrong_value_type );
+					})
+					return this.value = arg1;
+				}
+			
+                var number = arg0.getValue(), num_digits = arg1.getValue();
+				
+				return this.value = new cString(toFix(roundHelper(number,num_digits).toString(), arg2.toBool()));
+            }
         	return r;
 		},
         'JIS' : function(){
@@ -7597,6 +7784,7 @@ cBool.prototype.getValue = function(){ return this.toString(); }
 cBool.prototype.tocNumber = function(){ return new cNumber( this.value ? 1.0: 0.0 ); }
 cBool.prototype.tocString = function(){ return new cString( this.value ? "TRUE": "FALSE"  ); }
 cBool.prototype.tocBool = function(){ return this; }
+cBool.prototype.toBool = function(){ return this.value; }
 
 /** @constructor */
 function cError(val){
