@@ -194,7 +194,7 @@
 			},
 			
 			//добавляем кнопки или удаляем (вызывается из меню при нажатии на кнопку добавления фильтра)
-			addAutoFilter: function (ws, lTable, ar, openFilter, isTurnOffHistory) {
+			addAutoFilter: function (ws, lTable, ar, openFilter, isTurnOffHistory, addNameColumn) {
 				var bIsActiveSheet = this._isActiveSheet(ws);
 				var bIsOpenFilter = undefined !== openFilter;
 				var activeCells = Asc.clone(ar);
@@ -215,6 +215,7 @@
 				var endCell; 
 				var rangeFilter;
 				var splitRange;
+				addNameColumn = true;
 				//callback
 				var onAddAutoFiltersCallback = function(success)
 				{
@@ -522,29 +523,26 @@
 										else
 											ws.model.getRange3(mainAdjacentCells.r1, mainAdjacentCells.c1, mainAdjacentCells.r2, mainAdjacentCells.c2).unmerge();
 									}
-									for(col = mainAdjacentCells.c1; col <= mainAdjacentCells.c2; col++)
+									if(addNameColumn)
 									{
-										var cell = new CellAddress(mainAdjacentCells.r1, col, 0);
-										var strNum = null;
-										if(addNameColumn) {
+										for(col = mainAdjacentCells.c1; col <= mainAdjacentCells.c2; col++)
+										{
+											var cell = new CellAddress(mainAdjacentCells.r1, col, 0);
+											var strNum = null;
 											var range = ws.model.getCell(cell);
 											var strNum = "Column" + (col - mainAdjacentCells.c1 + 1).toString();
 											if(!isTurnOffHistory)
 												range.setValue(strNum);
+											tableColumns[j] = 
+											{
+												Name: strNum
+											};
+											j++;
 										}
-										else
-										{
-											var range = ws.model.getCell(cell);
-											strNum = range.getValue();
-											if(!isTurnOffHistory)
-												range.setNumFormat("@");
-										}
-										tableColumns[j] = 
-										{
-											Name: strNum
-										};
-										j++;
-										
+									}
+									else
+									{
+										tableColumns = t._generateColumnNameWithoutTitle(ws, mainAdjacentCells, isTurnOffHistory);
 									}
 									if(addNameColumn && !isTurnOffHistory)
 										mainAdjacentCells.r2 = mainAdjacentCells.r2 + 1;
@@ -559,27 +557,26 @@
 										else
 											ws.model.getRange3(activeCells.r1, activeCells.c1, activeCells.r2, activeCells.c2).unmerge();
 									}
-									for(col = activeCells.c1; col <= activeCells.c2; col++)
+									if(addNameColumn)
 									{
-										var cell = new CellAddress(activeCells.r1, col, 0);
-										var strNum = null;
-										if(addNameColumn) {
+										for(col = activeCells.c1; col <= activeCells.c2; col++)
+										{
+											var cell = new CellAddress(activeCells.r1, col, 0);
+											var strNum = null;
 											var range = ws.model.getCell(cell);
 											var strNum = "Column" + (col - activeCells.c1 + 1).toString();
 											if(!isTurnOffHistory)
 												range.setValue(strNum);
-										} else {
-											var range = ws.model.getCell(cell);
-											strNum = range.getValue();
-											if(!isTurnOffHistory)
-												range.setNumFormat("@");
+											tableColumns[j] = 
+											{
+												Name: strNum
+											};
+											j++;
 										}
-										tableColumns[j] = 
-										{
-											Name: strNum
-										};
-										j++;
-										
+									}
+									else
+									{
+										tableColumns = t._generateColumnNameWithoutTitle(ws, mainAdjacentCells, isTurnOffHistory);
 									}
 									if(addNameColumn && !isTurnOffHistory)
 										activeCells.r2 = activeCells.r2 + 1;
@@ -824,7 +821,6 @@
 							var rowAdd = 0;
 							var tableColumns = [];
 							var j = 0;
-							addNameColumn = true;
 							rangeShift = ws.model.getRange(new CellAddress(activeCells.r1, activeCells.c1, 0), new CellAddress(activeCells.r1, activeCells.c2, 0));
 							if(addNameColumn)
 							{
@@ -992,7 +988,6 @@
 						var tableColumns = [];
 						var j = 0;
 						//проверка на добавлять/не добавлять название столбцов
-						var addNameColumn = this._isAddNameColumn(ws,mainAdjacentCells);
 						if(addNameColumn && !isTurnOffHistory)
 						{
 							rowAdd = 1;
@@ -1021,7 +1016,6 @@
 						var tableColumns = [];
 						var j = 0;
 						//проверка на добавлять/не добавлять название столбцов
-						var addNameColumn = this._isAddNameColumn(ws,activeCells);
 						if(addNameColumn && !isTurnOffHistory)
 						{
 							rowAdd = 1;
@@ -4853,6 +4847,37 @@
 					}
 					return "Column" + index;
 				}
+			},
+			
+			_generateColumnNameWithoutTitle: function(ws, range, isTurnOffHistory)
+			{
+				var tableColumns = [];
+				var cell;
+				var val;
+				var index;
+				for(var col1 = range.c1; col1 <= range.c2; col1++)
+				{
+					cell = ws.model.getCell(new CellAddress(range.r1,col1, 0));
+					val = cell.getValue();
+					//проверяем, не повторяется ли значение, которое лежит в данной ячейке
+					var index = 2;
+					var valNew = val;
+					for(var s = 0; s < tableColumns.length; s++)
+					{
+						if(valNew == tableColumns[s].Name)
+						{
+							valNew = val + index;
+							index++;
+							s = -1;
+						};
+					};
+					if(!isTurnOffHistory)
+						cell.setNumFormat("@");
+					tableColumns[col1 - range.c1] = {
+						Name: valNew
+					};
+				}
+				return tableColumns;
 			},
 			
 			_renameTableColumn: function(ws, range)
