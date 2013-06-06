@@ -805,7 +805,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 			_asc_open: function (fCallback) { //fCallback({returnCode:"", val:obj, ...})
 				if ( this.chartEditor ) {
-				} else if (!this.documentId || !this.documentVKey) {
+				} else if (!this.documentId || !this.documentUrl) {
 					var data = getTestWorkbook();
 					var sData = data + "";
 					if( c_oSerFormat.Signature === sData.substring(0, c_oSerFormat.Signature.length))
