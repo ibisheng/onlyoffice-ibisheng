@@ -5392,7 +5392,7 @@ CGraphicObjects.prototype =
             this.drawingDocument.SelectClear();
             this.drawingDocument.TargetEnd();
         }
-        this.selectionDraw();
+        ///this.selectionDraw();
     },
 
 
@@ -5403,17 +5403,12 @@ CGraphicObjects.prototype =
             if(this.curState.id === STATES_ID_TEXT_ADD)
             {
                 if(this.curState.textObject.PageNum === pageIndex)
-                    this.curState.textObject.updateSelectionState();
+                    this.curState.textObject.GraphicObj.textBoxContent.Selection_Draw_Page(pageIndex);
             }
             else if(this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP)
             {
                 if(this.curState.textObject.pageIndex === pageIndex)
-                    this.curState.textObject.updateSelectionState();
-            }
-            else
-            {
-                this.drawingDocument.SelectClear();
-                this.drawingDocument.TargetEnd();
+                    this.curState.textObject.textBoxContent.Selection_Draw_Page(pageIndex);
             }
         }
         else
@@ -5427,11 +5422,6 @@ CGraphicObjects.prototype =
             {
                 if(this.curState.textObject.selectStartPage === pageIndex)
                     this.curState.textObject.updateSelectionState();
-            }
-            else
-            {
-                this.drawingDocument.SelectClear();
-                this.drawingDocument.TargetEnd();
             }
         }
         this.drawSelect(pageIndex);
