@@ -1158,6 +1158,81 @@ function CHorRuler()
         this.m_bIsMouseDown = false;
     }
 
+    this.OnMouseUpExternal = function()
+    {
+        var word_control = this.m_oWordControl;
+
+        this.m_dIndentLeft_old      = -10000;
+        this.m_dIndentLeftFirst_old = -10000;
+        this.m_dIndentRight_old     = -10000;
+
+        if (7 != this.DragType)
+        {
+            word_control.UpdateHorRuler();
+            word_control.m_oOverlayApi.UnShow();
+        }
+
+        var _margin_left = this.m_dMarginLeft;
+        var _margin_right = this.m_dMarginRight;
+        if (this.CurrentObjectType == RULER_OBJECT_TYPE_TABLE)
+        {
+            _margin_left = this.TableMarginLeft;
+            _margin_right = this.TableMarginRight;
+        }
+
+        switch (this.DragType)
+        {
+            case 1:
+            case 2:
+            {
+                this.SetMarginProperties();
+                break;
+            }
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+            {
+                this.SetPrProperties();
+                break;
+            }
+            case 7:
+            {
+                // смотрим, сохраняем ли таб
+                var _y = (global_mouseEvent.Y - word_control.Y) * g_dKoef_pix_to_mm;
+                if (_y <= 3 || _y > 5.6 || this.m_dCurrentTabNewPosition < 0 || (this.m_dCurrentTabNewPosition + _margin_left) > _margin_right)
+                {
+                    this.m_arrTabs.splice(this.m_lCurrentTab, 1);
+                }
+                else
+                {
+                    this.m_arrTabs[this.m_lCurrentTab].pos = this.m_dCurrentTabNewPosition;
+                }
+                this.m_lCurrentTab = -1;
+                this.CorrectTabs();
+                this.m_oWordControl.UpdateHorRuler();
+                this.SetTabsProperties();
+                break;
+            }
+            case 8:
+            {
+                this.SetTableProperties();
+                this.DragTablePos = -1;
+                break;
+            }
+        }
+
+        if (7 == this.DragType)
+        {
+            word_control.UpdateHorRuler();
+            word_control.m_oOverlayApi.UnShow();
+        }
+
+        this.IsDrawingCurTab = true;
+        this.DragType = 0;
+        this.m_bIsMouseDown = false;
+    }
+
     this.SetTabsProperties = function()
     {
         // потом заменить на объекты CTab (когда Илюха реализует не только левые табы)
@@ -2225,6 +2300,36 @@ function CVerRuler()
     {
         var lockedElement = check_MouseUpEvent(e);
 
+        this.m_oWordControl.m_oOverlayApi.UnShow();
+        this.m_oWordControl.m_oOverlayApi.Clear();
+
+        switch (this.DragType)
+        {
+            case 1:
+            case 2:
+            {
+                this.SetMarginProperties();
+                break;
+            }
+            case 3:
+            case 4:
+            {
+                this.SetHeaderProperties();
+                break;
+            }
+            case 5:
+            {
+                this.SetTableProperties();
+                this.DragTablePos = -1;
+                break;
+            }
+        }
+
+        this.DragType = 0;
+    }
+
+    this.OnMouseUpExternal = function()
+    {
         this.m_oWordControl.m_oOverlayApi.UnShow();
         this.m_oWordControl.m_oOverlayApi.Clear();
 

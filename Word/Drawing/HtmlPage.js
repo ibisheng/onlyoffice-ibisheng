@@ -1573,6 +1573,13 @@ function CEditorPage(api)
         global_mouseEvent.Type = g_mouse_event_type_up;
 
         g_bIsMouseUpLockedSend = true;
+
+        if (oWordControl.m_oHorRuler.m_bIsMouseDown)
+            oWordControl.m_oHorRuler.OnMouseUpExternal();
+
+        if (oWordControl.m_oVerRuler.DragType != 0)
+            oWordControl.m_oVerRuler.OnMouseUpExternal();
+
         global_mouseEvent.Sender = null;
 
         global_mouseEvent.UnLockMouse();
