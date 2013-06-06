@@ -3656,13 +3656,6 @@ function CDrawingDocument()
         this.m_oWordControl.m_oApi.sync_SearchEndCallback();
     }
 
-    this.SelectionStart = function()
-    {
-    }
-    this.SelectionEnd = function()
-    {
-    }
-
     this.private_StartDrawSelection = function(overlay)
     {
         this.Overlay = overlay;
