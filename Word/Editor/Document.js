@@ -5940,6 +5940,7 @@ CDocument.prototype =
     // Рисуем селект
     Selection_Draw : function()
     {
+        this.DrawingDocument.SelectShow();
         return;
         // Работаем с колонтитулом
         if ( docpostype_HdrFtr === this.CurPos.Type )
@@ -6078,7 +6079,7 @@ CDocument.prototype =
 
         if ( true === this.Selection.Use )
         {
-            this.DrawingDocument.ClearPageSelection(Page_abs);
+            //this.DrawingDocument.ClearPageSelection(Page_abs);
 
             switch( this.Selection.Flag )
             {
@@ -6133,7 +6134,7 @@ CDocument.prototype =
                 }
             }
 
-            this.DrawingDocument.SelectShow();
+            //this.DrawingDocument.SelectShow();
         }
     },
 
@@ -6179,7 +6180,7 @@ CDocument.prototype =
         }
 
         this.DrawingDocument.SelectClear();
-        this.DrawingDocument.SelectShow();
+        //this.DrawingDocument.SelectShow();
     },
 
     Selection_SetStart : function(X,Y, MouseEvent)
