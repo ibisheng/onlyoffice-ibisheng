@@ -5416,12 +5416,12 @@ CGraphicObjects.prototype =
             if(this.curState.id === STATES_ID_TEXT_ADD)
             {
                 if(this.curState.textObject.GraphicObj.selectStartPage === pageIndex)
-                    this.curState.textObject.updateSelectionState();
+                    this.curState.textObject.GraphicObj.textBoxContent.Selection_Draw_Page(pageIndex);
             }
             else if(this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP)
             {
                 if(this.curState.textObject.selectStartPage === pageIndex)
-                    this.curState.textObject.updateSelectionState();
+                    this.curState.textObject.textBoxContent.Selection_Draw_Page(pageIndex);
             }
         }
         this.drawSelect(pageIndex);
