@@ -1725,6 +1725,8 @@
 			},
 
 			_print: function (drawingCtx, printPagesData) {
+                var isAppBridge = (undefined != window['appBridge']);
+
 				if (null === printPagesData) {
 					// Напечатаем пустую страницу
 					drawingCtx.BeginPage (c_oAscPrintDefaultSettings.PageWidth, c_oAscPrintDefaultSettings.PageHeight);
@@ -1733,33 +1735,47 @@
 					drawingCtx.BeginPage (printPagesData.pageWidth, printPagesData.pageHeight);
 					drawingCtx.AddClipRect (printPagesData.pageClipRectLeft, printPagesData.pageClipRectTop, printPagesData.pageClipRectWidth, printPagesData.pageClipRectHeight);
 
-					var offsetCols = printPagesData.startOffsetPt;
+                    if (isAppBridge) {window['appBridge']['dummyCommandUpdate'] ();}
+
+                    var offsetCols = printPagesData.startOffsetPt;
 
 					var range = printPagesData.pageRange;
 					for (var row = range.r1; row <= range.r2; ++row) {
 						var rangeTmpRow = asc_Range(range.c1, row, range.c2, row);
+
+                        if (isAppBridge) {window['appBridge']['dummyCommandUpdate'] ();}
 
 						// Рисуем сетку
 						if (printPagesData.pageGridLines) {
 							this._drawGrid(drawingCtx, rangeTmpRow, this.cols[range.c1].left - printPagesData.leftFieldInPt + offsetCols, this.rows[range.r1].top - printPagesData.topFieldInPt, printPagesData.pageWidth / vector_koef, printPagesData.pageHeight / vector_koef);
 						}
 
-						// Рисуем строку для печати
+                        if (isAppBridge) {window['appBridge']['dummyCommandUpdate'] ();}
+
+                        // Рисуем строку для печати
 						var mergedCells = {};
 						$.extend (mergedCells,
 							this._drawRowBG(drawingCtx, row, range.c1, range.c2, this.cols[range.c1].left - printPagesData.leftFieldInPt + offsetCols, this.rows[range.r1].top - printPagesData.topFieldInPt, false),
 							this._drawRowText(drawingCtx, row, range.c1, range.c2, this.cols[range.c1].left - printPagesData.leftFieldInPt + offsetCols, this.rows[range.r1].top - printPagesData.topFieldInPt));
 
-						// draw merged cells at last stage to fix cells background issue
+                        if (isAppBridge) {window['appBridge']['dummyCommandUpdate'] ();}
+
+                        // draw merged cells at last stage to fix cells background issue
 						for (var i in mergedCells) if (mergedCells.hasOwnProperty(i)) {
 							var mc = mergedCells[i];
 							this._drawRowBG(drawingCtx, mc.row, mc.col, mc.col, this.cols[range.c1].left - printPagesData.leftFieldInPt + offsetCols, this.rows[range.r1].top - printPagesData.topFieldInPt, true);
 							this._drawCellText(drawingCtx, mc.col, mc.row, range.c1, range.c2, this.cols[range.c1].left - printPagesData.leftFieldInPt + offsetCols, this.rows[range.r1].top - printPagesData.topFieldInPt, true);
-						}
 
-						// Отрисовываем бордеры
+                            if (isAppBridge) {window['appBridge']['dummyCommandUpdate'] ();}
+                        }
+
+                        if (isAppBridge) {window['appBridge']['dummyCommandUpdate'] ();}
+
+                        // Отрисовываем бордеры
 						this._drawCellsBorders (drawingCtx, range, /*mergedCellsStage*/undefined, this.cols[range.c1].left - printPagesData.leftFieldInPt + offsetCols, this.rows[range.r1].top - printPagesData.topFieldInPt);
-					}
+
+                        if (isAppBridge) {window['appBridge']['dummyCommandUpdate'] ();}
+                    }
 
 					if (printPagesData.pageHeadings) {
 						// Нужно отрисовать заголовки
@@ -1767,7 +1783,9 @@
 						this._drawRowHeaders (drawingCtx, range.r1, range.r2, /*style*/ undefined, printPagesData.leftFieldInPt - this.cellsLeft, this.rows[range.r1].top - printPagesData.topFieldInPt);
 					}
 
-					// Отрисовываем картинки и графики (для этого должны выставить видимую область)
+                    if (isAppBridge) {window['appBridge']['dummyCommandUpdate'] ();}
+
+                    // Отрисовываем картинки и графики (для этого должны выставить видимую область)
 					// Сохраняем копию и на время меняем область (стоит рисовать от входных параметров функции, а не от методов класса)
 					var tmpVisibleRange = this.visibleRange.clone(true);
 					this.visibleRange.c1 = range.c1;
@@ -1787,7 +1805,9 @@
 					this.objectRender.showDrawingObjects(false, drawingPrintOptions, false, true);
 					this.visibleRange = tmpVisibleRange.clone(true);
 
-					drawingCtx.RemoveClipRect();
+                    if (isAppBridge) {window['appBridge']['dummyCommandUpdate'] ();}
+
+                    drawingCtx.RemoveClipRect();
 					drawingCtx.EndPage();
 				}
 			},
