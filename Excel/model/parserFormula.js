@@ -4570,6 +4570,82 @@ var cFormulaFunction = {
         'GCD' : function(){
             var r = new cBaseFunction();
             r.setName("GCD");
+			r.setArgumentsMin(1);
+            r.setArgumentsMax(255);
+            r.Calculate = function(arg){
+				
+				var _gcd = 0;
+				
+				function gcd(a,b){
+					var _a = parseInt(a), _b = parseInt(b);
+					while (_b != 0)
+						_b = _a % (_a = _b);
+					return _a;
+				}
+				
+				for( var i = 0; i < this.getArguments(); i++ ){
+					var argI = arg[i];
+					
+					if( argI instanceof cArea || argI instanceof cArea3D ){
+						var argArr = argI.getValue();
+						for( var j = 0; j < argArr.length; j++ ){
+						
+							if( argArr[j] instanceof cError )
+								return this.value = argArr[j];
+							
+							if( argArr[j] instanceof cString )
+								continue;
+							
+							if( argArr[j] instanceof cBool )
+								argArr[j] = argArr[j].tocNumber();
+							
+							_gcd = gcd(_gcd,argArr[j].getValue());
+						}
+					}
+					else if( argI instanceof cArray ){
+						var argArr = argI.tocNumber();
+					
+						if( 
+							argArr.foreach(function(arrElem){ 
+								
+								if( arrElem instanceof cError ){
+									_gcd = arrElem;
+									return true;
+								}
+								
+								if( arrElem instanceof cBool )
+									arrElem = arrElem.tocNumber();
+								
+								if( arrElem instanceof cString )
+									return;
+									
+								_gcd = gcd(_gcd,arrElem.getValue());
+								
+								
+							}) 
+						){
+							return this.value = _gcd;
+						}
+					}
+					else{
+						argI = argI.tocNumber();
+					
+						if( argI instanceof cError )
+							return this.value = argI;
+							
+						_gcd = gcd(_gcd,argI.getValue())
+					}
+				}
+				
+				return this.value = new cNumber( _gcd );
+				
+			}
+			r.getInfo = function(){
+                return {
+                    name:this.name,
+                    args:"( argument-list )"
+                };
+            }
         	return r;
 		},
         'INT' : function(){
@@ -8400,7 +8476,7 @@ cArray.prototype.foreach = function(action){
 	for( var ir = 0; ir < this.rowCount; ir++ ){
 		for( var ic = 0; ic < this.countElementInRow[ir]; ic++){
 			if( action.call(this,this.array[ir][ic],ir,ic) )
-				return;
+				return true;
 		}
 	}
 }
