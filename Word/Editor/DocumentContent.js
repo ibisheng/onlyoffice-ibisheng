@@ -5635,56 +5635,61 @@ CDocumentContent.prototype =
         }
     },
 
-    Selection_Draw_Page : function(Page_abs, bStart, bEnd)
+    Selection_Draw_Page : function(Page_abs)
     {
-        var CurPage = Page_abs - this.Get_StartPage_Absolute();
-        if ( CurPage < 0 || CurPage >= this.Pages.length )
-            return;
-
-        var Pos_start = this.Pages[CurPage].Pos;
-        var Pos_end   = this.Pages[CurPage].EndPos;
-
-        if ( true === this.Selection.Use )
+        if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
-            switch( this.Selection.Flag )
+            this.LogicDocument.DrawingObjects.drawSelectionPage(Page_abs);
+        }
+        else
+        {
+            var CurPage = Page_abs - this.Get_StartPage_Absolute();
+            if ( CurPage < 0 || CurPage >= this.Pages.length )
+                return;
+
+            var Pos_start = this.Pages[CurPage].Pos;
+            var Pos_end   = this.Pages[CurPage].EndPos;
+
+            if ( true === this.Selection.Use )
             {
-                case selectionflag_Common:
+                switch( this.Selection.Flag )
                 {
-                    var Start = this.Selection.StartPos;
-                    var End   = this.Selection.EndPos;
-
-                    if ( Start > End )
+                    case selectionflag_Common:
                     {
-                        Start = this.Selection.EndPos;
-                        End   = this.Selection.StartPos;
-                    }
+                        var Start = this.Selection.StartPos;
+                        var End   = this.Selection.EndPos;
 
-                    var Start = Math.max( Start, Pos_start );
-                    var End   = Math.min( End,   Pos_end   );
+                        if ( Start > End )
+                        {
+                            Start = this.Selection.EndPos;
+                            End   = this.Selection.StartPos;
+                        }
 
-                    for ( var Index = Start; Index <= End; Index++ )
-                    {
-                        var _bStart = ( true === bStart && Index === Start ? true : false )
-                        var _bEnd   = ( true === bEnd   && Index === End   ? true : false )
-                        this.Content[Index].Selection_Draw_Page(Page_abs, _bStart, _bEnd);
-                    }
+                        var Start = Math.max( Start, Pos_start );
+                        var End   = Math.min( End,   Pos_end   );
 
-                    break;
-                }
-                case selectionflag_Numbering:
-                {
-                    if ( null == this.Selection.Data )
+                        for ( var Index = Start; Index <= End; Index++ )
+                        {
+                            this.Content[Index].Selection_Draw_Page(Page_abs);
+                        }
+
                         break;
-
-                    var Count = this.Selection.Data.length;
-
-                    for ( var Index = 0; Index < Count; Index++ )
-                    {
-                        if ( this.Selection.Data[Index] <= Pos_end && this.Selection.Data[Index] >= Pos_start )
-                            this.Content[this.Selection.Data[Index]].Selection_Draw_Page(Page_abs, ( true === bStart && 0 === Index ? true : false ), ( true === bEnd && Count - 1 === Index ? true : false ) );
                     }
+                    case selectionflag_Numbering:
+                    {
+                        if ( null == this.Selection.Data )
+                            break;
 
-                    break;
+                        var Count = this.Selection.Data.length;
+
+                        for ( var Index = 0; Index < Count; Index++ )
+                        {
+                            if ( this.Selection.Data[Index] <= Pos_end && this.Selection.Data[Index] >= Pos_start )
+                                this.Content[this.Selection.Data[Index]].Selection_Draw_Page(Page_abs);
+                        }
+
+                        break;
+                    }
                 }
             }
         }
@@ -6283,7 +6288,7 @@ CDocumentContent.prototype =
 
         this.DrawingDocument.SelectEnabled(true);
 
-        this.Selection_Draw();
+        this.LogicDocument.Document_UpdateSelectionState();
 
         this.Interface_Update_ParaPr();
         this.Interface_Update_TextPr();

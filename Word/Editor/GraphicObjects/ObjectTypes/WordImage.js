@@ -1839,7 +1839,6 @@ WordImage.prototype =
                 this.document.DrawingDocument.TargetEnd();
                 this.document.DrawingDocument.SelectEnabled(true);
                 this.document.DrawingDocument.SelectClear();
-                Doc.Selection_Draw();
                 this.document.DrawingDocument.SelectShow();
             }
             else /*if(this.parent.elementsManipulator.Document.CurPos.Type == docpostype_FlowObjects ) */{

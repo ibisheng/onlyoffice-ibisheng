@@ -8198,7 +8198,6 @@ CShape.prototype =
             this.Container.DrawingDocument.TargetEnd();
             this.Container.DrawingDocument.SelectEnabled(true);
             this.Container.DrawingDocument.SelectClear();
-            Doc.Selection_Draw();
             this.Container.DrawingDocument.SelectShow();
         }
         else if(this.parent.elementsManipulator.Document.CurPos.Type == docpostype_FlowObjects ) {

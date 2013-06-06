@@ -616,7 +616,6 @@ CHeaderFooter.prototype =
                     this.DrawingDocument.TargetEnd();
                     this.DrawingDocument.SelectEnabled(true);
                     this.DrawingDocument.SelectClear();
-                    this.Content.Selection_Draw();
                     this.DrawingDocument.SelectShow();
                 }
                 // Обрабатываем движение границы у таблиц
@@ -632,9 +631,6 @@ CHeaderFooter.prototype =
                         this.DrawingDocument.TargetEnd();
                         this.DrawingDocument.SelectEnabled(true);
                         this.DrawingDocument.SelectClear();
-
-                        this.Content.Selection_Draw();
-
                         this.DrawingDocument.SelectShow();
                     }
                     else
@@ -889,9 +885,9 @@ CHeaderFooter.prototype =
     },
 
     // Рисуем селект
-    Selection_Draw : function()
+    Selection_Draw_Page : function(Page_abs)
     {
-        return this.Content.Selection_Draw();
+        return this.Content.Selection_Draw_Page(Page_abs, true, true);
     },
 
     Selection_Clear : function()
@@ -2373,10 +2369,10 @@ CHeaderFooterController.prototype =
     },
 
     // Рисуем селект
-    Selection_Draw : function()
+    Selection_Draw_Page : function(Page_abs)
     {
         if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Selection_Draw();
+            return this.CurHdrFtr.Selection_Draw_Page(Page_abs);
     },
 
     Selection_Clear : function()

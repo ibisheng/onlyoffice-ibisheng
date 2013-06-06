@@ -4644,6 +4644,9 @@ Paragraph.prototype =
             TextPr.Merge( CurTextPr );
         }
 
+        TextPr.FontFamily.Name  = TextPr.RFonts.Ascii.Name;
+        TextPr.FontFamily.Index = TextPr.RFonts.Ascii.Index;
+
         return TextPr;
     },
 
@@ -7054,151 +7057,6 @@ Paragraph.prototype =
 
     Selection_Clear : function()
     {
-    },
-
-    Selection_Draw : function()
-    {
-        var StartPage = this.Get_StartPage_Absolute();
-
-        if ( true === this.Selection.Use )
-        {
-            switch ( this.Selection.Flag )
-            {
-                case selectionflag_Common:
-                {
-                    // Делаем подсветку
-                    var StartPos = this.Selection.StartPos;
-                    var EndPos   = this.Selection.EndPos;
-
-                    if ( StartPos > EndPos )
-                    {
-                        var Temp = EndPos;
-                        EndPos   = StartPos;
-                        StartPos = Temp;
-                    }
-
-                    // Найдем линию, с которой начинается селект
-                    var StartParaPos = this.Internal_Get_ParaPos_By_Pos( StartPos );
-                    var CurLine  = StartParaPos.Line;
-                    var CurRange = StartParaPos.Range;
-                    var PNum     = StartParaPos.Page;
-
-                    // Найдем начальный сдвиг в данном отрезке
-                    var StartX = this.Lines[CurLine].Ranges[CurRange].XVisible;
-                    var Pos, Item;
-                    for ( Pos = this.Lines[CurLine].Ranges[CurRange].StartPos; Pos <= StartPos - 1; Pos++ )
-                    {
-                        Item = this.Content[Pos];
-                        if ( undefined != Item.WidthVisible && ( para_Drawing != Item.Type || drawing_Inline === Item.DrawingType  ) )
-                            StartX += Item.WidthVisible;
-                    }
-
-                    if ( this.Pages[PNum].StartLine > CurLine )
-                    {
-                        CurLine = this.Pages[PNum].StartLine;
-                        CurRange = 0;
-                        StartX   = this.Lines[CurLine].Ranges[CurRange].XVisible;
-                        StartPos = this.Lines[this.Pages[PNum].StartLine].StartPos;
-                    }
-
-                    var StartY = this.Pages[PNum].Y + this.Lines[CurLine].Top;
-                    var H      = this.Lines[CurLine].Bottom - this.Lines[CurLine].Top;
-
-                    var W = 0;
-
-                    for ( Pos = StartPos; Pos < EndPos; Pos++ )
-                    {
-                        Item = this.Content[Pos];
-
-                        if ( undefined != Item.CurPage )
-                        {
-                            if ( PNum < Item.CurPage )
-                                PNum = Item.CurPage;
-
-                            if ( CurLine < Item.CurLine )
-                            {
-                                this.DrawingDocument.AddPageSelection(StartPage + PNum, StartX, StartY, W, H);
-
-                                CurLine  = Item.CurLine;
-                                CurRange = Item.CurRange;
-
-                                StartX = this.Lines[CurLine].Ranges[CurRange].XVisible;
-                                StartY = this.Pages[PNum].Y + this.Lines[CurLine].Top;
-                                H      = this.Lines[CurLine].Bottom - this.Lines[CurLine].Top;
-
-                                W = 0;
-                            }
-                            else if ( CurRange < Item.CurRange )
-                            {
-                                this.DrawingDocument.AddPageSelection(StartPage + PNum, StartX, StartY, W, H);
-
-                                CurRange = Item.CurRange;
-                                StartX = this.Lines[CurLine].Ranges[CurRange].XVisible;
-                                W = 0;
-                            }
-                        }
-
-                        if ( undefined != Item.WidthVisible )
-                        {
-                            if ( para_Drawing != Item.Type || drawing_Inline === Item.DrawingType  )
-                                W += Item.WidthVisible;
-                            else
-                                Item.Draw_Selection();
-                        }
-
-                        if ( Pos == EndPos - 1 )
-                            this.DrawingDocument.AddPageSelection(StartPage + PNum, StartX, StartY, W, H);
-                    }
-
-                    break;
-                }
-                case  selectionflag_Numbering:
-                {
-                    var ParaNum = null;
-
-                    var PNum     = 0;
-                    var CurRange = 0;
-
-                    for ( var Index = 0; Index < this.Content.length; Index++ )
-                    {
-                        if ( para_Numbering == this.Content[Index].Type )
-                        {
-                            ParaNum = this.Content[Index];
-                            var ParaPos = this.Internal_Get_ParaPos_By_Pos( Index );
-                            CurRange = ParaPos.Range;
-                            PNum     = ParaPos.Page;
-
-                            break;
-                        }
-                    }
-
-                    var NumPr = this.Numbering_Get();
-                    var SelectX = this.Lines[0].Ranges[CurRange].XVisible;
-                    var SelectW = ParaNum.WidthVisible;
-                    var NumJc = this.Parent.Get_Numbering().Get_AbstractNum( NumPr.NumId ).Lvl[NumPr.Lvl].Jc;
-                    switch ( NumJc )
-                    {
-                        case align_Center:
-                            SelectX = this.Lines[0].Ranges[CurRange].XVisible - ParaNum.WidthNum / 2;
-                            SelectW = ParaNum.WidthVisible + ParaNum.WidthNum / 2;
-                            break;
-                        case align_Right:
-                            SelectX = this.Lines[0].Ranges[CurRange].XVisible - ParaNum.WidthNum;
-                            SelectW = ParaNum.WidthVisible + ParaNum.WidthNum;
-                            break;
-                        case align_Left:
-                        default:
-                            SelectX = this.Lines[0].Ranges[CurRange].XVisible;
-                            SelectW = ParaNum.WidthVisible;
-                            break;
-                    }
-
-                    this.DrawingDocument.AddPageSelection(StartPage + PNum, SelectX, this.Lines[0].Top + this.Pages[PNum].Y, SelectW, this.Lines[0].Bottom - this.Lines[0].Top);
-
-                    break;
-                }
-            }
-        }
     },
 
     Selection_Draw_Page : function(Page_abs, bStart, bEnd)

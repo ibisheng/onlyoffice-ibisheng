@@ -544,343 +544,6 @@ CDocument.prototype =
     },
 
     // Пересчет содержимого Документа
-    Recalculate_ : function(bOneParagraph, bRecalcContentLast)
-    {
-        if ( true === this.TurnOffRecalc )
-            return;
-
-        if ( "undefined" == typeof(bRecalcContentLast) )
-            bRecalcContentLast = true;
-
-        if ( null != this.SearchInfo.Id )
-            this.Search_Stop(true);
-
-        this.NeedUpdateTarget = true;
-
-        var CurPage = 0;
-        this.Pages[0].Width   = Page_Width;
-        this.Pages[0].Height  = Page_Height;
-        this.Pages[0].Margins =
-        {
-            Left   : X_Left_Field,
-            Right  : X_Right_Field,
-            Top    : Y_Top_Field,
-            Bottom : Y_Bottom_Field
-        };
-
-        StartTime = new Date().getTime();
-
-        var Count = this.Content.length;
-
-        var StartPos = this.Get_PageContentStartPos( 0 );
-        var X      = StartPos.X;
-        var StartY = StartPos.Y;
-
-        var Y = StartY;
-
-        var YLimit = StartPos.YLimit;
-        var XLimit = StartPos.XLimit;
-
-        /*
-         var bLastPage = false;
-
-         for ( var Index = this.Pages.length - 1; Index >= 0; Index-- )
-         {
-         this.Pages[Index].Pos = 0;
-         if ( false === bLastPage && this.Pages[Index].FlowObjects.Objects.length > 0 )
-         {
-         bLastPage = true;
-         this.Pages.length = Index + 1;
-         }
-         }
-
-
-         if ( false === bLastPage )
-         this.Pages.length = 1;
-
-         */
-
-        var Timer = 0;
-        var bStartRecalc    = false;
-        var bNeedFullRecalc = false;
-
-        if ( null != this.FullRecalc.Id )
-        {
-            bNeedFullRecalc  = true;
-            clearTimeout( this.FullRecalc.Id );
-            this.FullRecalc.Id = null;
-            this.DrawingDocument.OnEndRecalculate( false );
-        }
-
-        var Index;
-        for ( Index = 0; Index < Count; Index++ )
-        {
-            // Пересчитываем элемент документа
-            var Element = this.Content[Index];
-            Element.Set_DocumentIndex( Index );
-
-            if ( Index >= this.ContentLastChangePos || ( true === bNeedFullRecalc && Index >= this.FullRecalc.StartPos ) )
-            {
-                if ( null != this.DrawingDocument && false == bStartRecalc )
-                {
-                    bStartRecalc = true;
-                    this.DrawingDocument.OnStartRecalculate( CurPage );
-                }
-
-                var OldPagesLen = Element.Pages.length;
-                var OldBounds = Copy_Bounds( Element.Pages[OldPagesLen - 1].Bounds );
-                var OldStartPage = Element.PageNum;
-
-                Element.TurnOff_RecalcEvent();
-                if ( true === bRecalcContentLast || Index != this.ContentLastChangePos )
-                {
-                    Element.Reset( X, Y, XLimit, YLimit, CurPage );
-
-                    if ( type_Paragraph === Element.GetType() )
-                    {
-                        var _Page = 0;
-                        while ( recalcresult_NextElement != Element.Recalculate_Page( _Page ) )
-                            _Page++;
-                    }
-                    else
-                        Element.Recalculate();
-                }
-                Element.TurnOn_RecalcEvent();
-
-                // Если нижняя граница не изменилась, следующие элементы не пересчитываем
-                if ( true == bOneParagraph && OldStartPage == Element.PageNum && OldPagesLen == Element.Pages.length && Math.abs( OldBounds.Bottom - Element.Pages[Element.Pages.length - 1].Bounds.Bottom ) < 0.001 )
-                {
-                    var Temp = CurPage;
-                    for ( ; CurPage < Temp + Element.Pages.length; CurPage++ )
-                    {
-                        this.DrawingDocument.OnRecalculatePage( CurPage, this.Pages[CurPage] );
-                    }
-
-                    //sendStatus( "Recalc: " + ((new Date().getTime() - StartTime) / 1000) + " s" + " StylesCompileCount : " + this.StyleCounter + " NumInfoCount : " + this.NumInfoCounter );
-
-                    if ( true === bNeedFullRecalc )
-                    {
-                        this.DrawingDocument.OnStartRecalculate( this.FullRecalc.CurPage );
-                        this.FullRecalc.Id = setTimeout(function() {editor.WordControl.m_oLogicDocument.Recalculate2()}, 10);
-                    }
-                    else
-                    {
-                        this.DrawingDocument.OnEndRecalculate(false, true);
-                    }
-
-                    break;
-                }
-            }
-
-            var bNewPage = false;
-            var Temp = CurPage;
-            for ( ; CurPage < Temp + Element.Pages.length - 1; )
-            {
-                if ( true == bStartRecalc && null != this.DrawingDocument )
-                    this.DrawingDocument.OnRecalculatePage( CurPage, this.Pages[CurPage] );
-
-                if ( "undefined" == typeof(this.Pages[++CurPage]) )
-                {
-                    this.Pages[CurPage] = new Object();
-                    this.Pages[CurPage].FlowObjects = new FlowObjects(this, CurPage);
-                }
-
-                this.Pages[CurPage].Width   = Page_Width;
-                this.Pages[CurPage].Height  = Page_Height;
-                this.Pages[CurPage].Margins =
-                {
-                    Left   : X_Left_Field,
-                    Right  : X_Right_Field,
-                    Top    : Y_Top_Field,
-                    Bottom : Y_Bottom_Field
-                };
-                this.Pages[CurPage].Pos = Index;
-
-
-                bNewPage = true;
-                if ( 0 != Timer )
-                    Timer += Element.Pages.length - 1;
-            }
-
-            Element.NeedReDraw = true;
-
-            Element.ClearRect  = OldBounds;
-
-            // Округляем для селекта
-            if ( false === bNewPage )
-                Y += Element.Bounds.Bottom - Element.Bounds.Top;
-            else
-            {
-                var StartPagePos = this.Get_PageContentStartPos( CurPage );
-
-                YLimit = StartPagePos.YLimit;
-                XLimit = StartPagePos.XLimit;
-
-                Y = StartPagePos.Y;
-                Y += Element.Bounds.Bottom - Y;
-            }
-
-            if ( 0 === Timer  && Index >= this.ContentLastChangePos )
-            {
-                Timer = 1;
-            }
-
-            if ( docpostype_Content == this.CurPos.Type && Index >= this.ContentLastChangePos && Index == this.CurPos.ContentPos )
-            {
-                if ( type_Paragraph === Element.GetType() )
-                    this.CurPage = Element.PageNum + Element.CurPos.PagesPos;
-                else
-                    this.CurPage = Element.PageNum; // TODO: переделать
-            }
-
-            if ( Timer >= 3 )
-            {
-                this.FullRecalc.X = X;
-                this.FullRecalc.Y = Y;
-                this.FullRecalc.XLimit = XLimit;
-                this.FullRecalc.YLimit = YLimit;
-                this.FullRecalc.StartPos = Index + 1;
-                this.FullRecalc.CurPage  = CurPage;
-                this.FullRecalc.Id = setTimeout(function() {editor.WordControl.m_oLogicDocument.Recalculate2()}, 10);
-
-                break;
-            }
-        }
-
-        if ( Index >= Count && null != this.DrawingDocument )
-        {
-            this.DrawingDocument.OnRecalculatePage( CurPage, this.Pages[CurPage] );
-            this.DrawingDocument.OnEndRecalculate( true );
-            this.FullRecalc.Id = null;
-            this.Selection.UpdateOnRecalc = false;
-        }
-
-        // TODO: Пока обновляем состояние линейки после каждого обсчета. Надо будет переделать.
-        if ( this.CurPos.ContentPos <= Index )
-            this.Document_UpdateRulersState();
-
-        //sendStatus( "Recalc: " + ((new Date().getTime() - StartTime) / 1000) + " s"  + " StylesCompileCount : " + this.StyleCounter + " NumInfoCount : " + this.NumInfoCounter );
-    },
-
-    Recalculate2 : function()
-    {
-        if ( null === this.FullRecalc.Id )
-            return;
-
-        //var StartTime = new Date().getTime();
-
-        var Count = this.Content.length;
-
-        var X = this.FullRecalc.X;
-        var Y = this.FullRecalc.Y;
-        var XLimit = this.FullRecalc.XLimit;
-        var YLimit = this.FullRecalc.YLimit;
-
-        var CurPage = this.FullRecalc.CurPage;
-
-        var Pos_start = this.FullRecalc.StartPos;
-        var Pos_end   = Pos_start;
-
-        for ( var Index = this.FullRecalc.StartPos; Index < Count; Index++ )
-        {
-            // Пересчитываем элемент документа
-            var Element = this.Content[Index];
-            var OldBounds = Copy_Bounds( Element.Bounds );
-
-            Element.Set_DocumentIndex( Index );
-            Element.TurnOff_RecalcEvent();
-            Element.Reset( X, Y, XLimit, YLimit, CurPage );
-
-            if ( type_Paragraph === Element.GetType() )
-            {
-                var _Page = 0;
-                while ( recalcresult_NextElement != Element.Recalculate_Page( _Page ) )
-                    _Page++;
-            }
-            else
-                Element.Recalculate();
-
-            Element.TurnOn_RecalcEvent();
-
-            var bNewPage = false;
-            var Temp = CurPage;
-            for ( ; CurPage < Temp + Element.Pages.length - 1; )
-            {
-                if ( null != this.DrawingDocument )
-                    this.DrawingDocument.OnRecalculatePage( CurPage, this.Pages[CurPage] );
-
-                if ( "undefined" == typeof(this.Pages[++CurPage]) )
-                {
-                    this.Pages[CurPage] = new Object();
-                    this.Pages[CurPage].FlowObjects = new FlowObjects(this, CurPage);
-                }
-                this.Pages[CurPage].Width   = Page_Width;
-                this.Pages[CurPage].Height  = Page_Height;
-                this.Pages[CurPage].Margins =
-                {
-                    Left   : X_Left_Field,
-                    Right  : X_Right_Field,
-                    Top    : Y_Top_Field,
-                    Bottom : Y_Bottom_Field
-                };
-                this.Pages[CurPage].Pos = Index;
-
-                bNewPage = true;
-            }
-
-            Element.NeedReDraw = true;
-
-            Element.ClearRect  = OldBounds;
-
-            // Округляем для селекта
-            if ( false === bNewPage )
-                Y += Element.Bounds.Bottom - Element.Bounds.Top;
-            else
-            {
-                var StartPagePos = this.Get_PageContentStartPos( CurPage );
-
-                YLimit = StartPagePos.YLimit;
-                XLimit = StartPagePos.XLimit;
-
-                Y = StartPagePos.Y;
-                Y += Element.Bounds.Bottom - Y;
-            }
-
-            if ( bNewPage )
-            {
-                clearTimeout( this.FullRecalc.Id );
-
-                this.FullRecalc.X = X;
-                this.FullRecalc.Y = Y;
-                this.FullRecalc.XLimit = XLimit;
-                this.FullRecalc.YLimit = YLimit;
-                this.FullRecalc.StartPos = Index + 1;
-                this.FullRecalc.CurPage  = CurPage;
-                this.FullRecalc.Id = setTimeout(function() {editor.WordControl.m_oLogicDocument.Recalculate2()}, 0);
-
-                break;
-            }
-        }
-
-        var Pos_end = Math.min( Index, Count - 1 );
-
-        if ( true === this.Selection.UpdateOnRecalc )
-            this.Selection_Draw2(Pos_start, Pos_end);
-
-        if ( Index >= Count && null != this.DrawingDocument )
-        {
-            this.DrawingDocument.OnRecalculatePage( CurPage, this.Pages[CurPage] );
-            this.DrawingDocument.OnEndRecalculate( true );
-            this.FullRecalc.Id = null;
-            this.Selection.UpdateOnRecalc = false;
-        }
-
-        //clearTimeout( this.FullRecalc.Id );
-        //this.FullRecalc.Id = null;
-
-        sendStatus("LastRecalc: " + ((new Date().getTime() - StartTime) / 1000) + " s Page:" + (CurPage + 1)  + " StylesCompileCount : " + this.StyleCounter   + " NumInfoCount : " + this.NumInfoCounter );
-    },
-
     Recalculate : function(bOneParagraph, bRecalcContentLast, _RecalcData)
     {
         //var StartTime = new Date().getTime();
@@ -1190,9 +853,6 @@ CDocument.prototype =
         if ( true === bReDraw )
         {
             this.DrawingDocument.OnRecalculatePage( PageIndex, this.Pages[PageIndex] );
-
-            if ( true === this.Selection.UpdateOnRecalc )
-                this.Selection_Draw_Page( PageIndex );
         }
 
         if ( Index >= Count )
@@ -5942,34 +5602,6 @@ CDocument.prototype =
     {
         this.DrawingDocument.SelectShow();
         return;
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-        {
-            this.HdrFtr.Selection_Draw();
-            return;
-        }
-        else if ( docpostype_DrawingObjects === this.CurPos.Type )
-        {
-            return this.DrawingObjects.selectionDraw();
-        }
-        else //if ( docpostype_Content === this.CurPos.Type )
-        {
-            if ( true === this.Selection.Use )
-            {
-                this.DrawingDocument.SelectClear();
-
-                if ( null != this.FullRecalc.Id )
-                {
-                    this.Selection.UpdateOnRecalc = true;
-                    this.Selection_Draw_Pages( 0, this.FullRecalc.PageIndex - 1 );
-                }
-                else
-                {
-                    this.Selection_Draw_Pages( 0, this.Pages.length - 1 );
-                    this.DrawingDocument.OnSelectEnd();
-                }
-            }
-        }
     },
 
     Selection_IsEmpty : function(bCheckHidden)
@@ -6004,137 +5636,77 @@ CDocument.prototype =
         }
     },
 
-    Selection_Draw_Pages : function(StartPage, EndPage)
-    {
-        if ( true === this.Selection.Use )
-        {
-            var Start = 0;
-            var End   = 0;
-
-            switch( this.Selection.Flag )
-            {
-                case selectionflag_Common:
-                {
-                    var Start = this.Selection.StartPos;
-                    var End   = this.Selection.EndPos;
-
-                    if ( Start > End )
-                    {
-                        Start = this.Selection.EndPos;
-                        End   = this.Selection.StartPos;
-                    }
-
-                    break;
-                }
-                case selectionflag_Numbering:
-                {
-                    if ( null == this.Selection.Data )
-                        break;
-
-                    var Start = this.Selection.Data[0];
-                    var End   = this.Selection.Data[0];
-
-                    for ( var Index = 0; Index < this.Selection.Data.length; Index++ )
-                    {
-                        if ( this.Selection.Data[Index] < Start )
-                            Start = this.Selection.Data[Index];
-
-                        if ( this.Selection.Data[Index] > End )
-                            End = this.Selection.Data[Index];
-                    }
-
-                    break;
-                }
-            }
-
-            var _StartPage = -1;
-            var _EndPage   = -1;
-
-            for ( var Index = StartPage; Index <= EndPage; Index++ )
-            {
-                var Page = this.Pages[Index];
-
-                if ( -1 === _StartPage && Start >= Page.Pos && Start <= Page.EndPos )
-                    _StartPage = Index;
-
-                if ( End >= Page.Pos && End <= Page.EndPos )
-                    _EndPage = Index;
-            }
-
-            if ( -1 === _StartPage )
-                return;
-
-            if ( -1 === _EndPage )
-                _EndPage = EndPage;
-
-            for ( var Index = _StartPage; Index <= _EndPage; Index++ )
-                this.Selection_Draw_Page( Index );
-        }
-    },
-
     Selection_Draw_Page : function(Page_abs)
     {
-        var Pos_start = this.Pages[Page_abs].Pos;
-        var Pos_end   = this.Pages[Page_abs].EndPos;
-
-        if ( true === this.Selection.Use )
+        // Работаем с колонтитулом
+        if ( docpostype_HdrFtr === this.CurPos.Type )
         {
-            //this.DrawingDocument.ClearPageSelection(Page_abs);
+            this.HdrFtr.Selection_Draw_Page(Page_abs);
+        }
+        else if ( docpostype_DrawingObjects === this.CurPos.Type )
+        {
+            this.DrawingObjects.drawSelectionPage(Page_abs);
+        }
+        else
+        {
+            var Pos_start = this.Pages[Page_abs].Pos;
+            var Pos_end   = this.Pages[Page_abs].EndPos;
 
-            switch( this.Selection.Flag )
+            if ( true === this.Selection.Use )
             {
-                case selectionflag_Common:
+                //this.DrawingDocument.ClearPageSelection(Page_abs);
+
+                switch( this.Selection.Flag )
                 {
-                    var Start = this.Selection.StartPos;
-                    var End   = this.Selection.EndPos;
-
-                    if ( Start > End )
+                    case selectionflag_Common:
                     {
-                        Start = this.Selection.EndPos;
-                        End   = this.Selection.StartPos;
-                    }
+                        var Start = this.Selection.StartPos;
+                        var End   = this.Selection.EndPos;
 
-                    var Start = Math.max( Start, Pos_start );
-                    var End   = Math.min( End,   Pos_end   );
+                        if ( Start > End )
+                        {
+                            Start = this.Selection.EndPos;
+                            End   = this.Selection.StartPos;
+                        }
 
-                    for ( var Index = Start; Index <= End; Index++ )
-                    {
-                        var bStart = ( Start === Index ? true : false );
-                        var bEnd   = ( End   === Index ? true : false );
-                        this.Content[Index].Selection_Draw_Page(Page_abs, bStart, bEnd);
-                    }
+                        var Start = Math.max( Start, Pos_start );
+                        var End   = Math.min( End,   Pos_end   );
 
-                    if ( Page_abs >= 2 && End < this.Pages[Page_abs - 2].EndPos )
-                    {
-                        this.Selection.UpdateOnRecalc = false;
-                        this.DrawingDocument.OnSelectEnd();
-                    }
+                        for ( var Index = Start; Index <= End; Index++ )
+                        {
+                            this.Content[Index].Selection_Draw_Page(Page_abs);
+                        }
 
-                    break;
-                }
-                case selectionflag_Numbering:
-                {
-                    if ( null == this.Selection.Data )
+                        if ( Page_abs >= 2 && End < this.Pages[Page_abs - 2].EndPos )
+                        {
+                            this.Selection.UpdateOnRecalc = false;
+                            this.DrawingDocument.OnSelectEnd();
+                        }
+
                         break;
-
-                    var Count = this.Selection.Data.length;
-                    for ( var Index = 0; Index < Count; Index++ )
-                    {
-                        if ( this.Selection.Data[Index] <= Pos_end && this.Selection.Data[Index] >= Pos_start )
-                            this.Content[this.Selection.Data[Index]].Selection_Draw_Page(Page_abs, ( 0 === Index ? true : false ), ( Count - 1 === Index ? true : false ) );
                     }
-
-                    if ( Page_abs >= 2 && this.Selection.Data[this.Selection.Data.length - 1] < this.Pages[Page_abs - 2].EndPos )
+                    case selectionflag_Numbering:
                     {
-                        this.Selection.UpdateOnRecalc = false;
-                        this.DrawingDocument.OnSelectEnd();
-                    }
+                        if ( null == this.Selection.Data )
+                            break;
 
-                    break;
+                        var Count = this.Selection.Data.length;
+                        for ( var Index = 0; Index < Count; Index++ )
+                        {
+                            if ( this.Selection.Data[Index] <= Pos_end && this.Selection.Data[Index] >= Pos_start )
+                                this.Content[this.Selection.Data[Index]].Selection_Draw_Page(Page_abs);
+                        }
+
+                        if ( Page_abs >= 2 && this.Selection.Data[this.Selection.Data.length - 1] < this.Pages[Page_abs - 2].EndPos )
+                        {
+                            this.Selection.UpdateOnRecalc = false;
+                            this.DrawingDocument.OnSelectEnd();
+                        }
+
+                        break;
+                    }
                 }
             }
-
-            //this.DrawingDocument.SelectShow();
         }
     },
 
@@ -6698,8 +6270,6 @@ CDocument.prototype =
             {
                 this.Content[Index].Select_All();
             }
-
-            this.Selection_Draw();
         }
 
         this.Document_UpdateSelectionState();
@@ -6726,12 +6296,10 @@ CDocument.prototype =
             }
         }
 
-        this.DrawingDocument.SelectEnabled(true);
-
-        this.Selection_Draw();
-
         this.Interface_Update_ParaPr();
         this.Interface_Update_TextPr();
+
+        this.Document_UpdateSelectionState();
     },
 
     // Если сейчас у нас заселекчена нумерация, тогда убираем селект
@@ -8983,7 +8551,7 @@ CDocument.prototype =
                 {
                     this.DrawingDocument.TargetEnd();
                     this.DrawingDocument.SelectEnabled(true);
-                    this.Selection_Draw();
+                    this.DrawingDocument.SelectShow();
                 }
                 // Обрабатываем движение границы у таблиц
                 else if ( null != this.Selection.Data && true === this.Selection.Data.TableBorder && type_Table == this.Content[this.Selection.Data.Pos].GetType() )
@@ -8998,7 +8566,7 @@ CDocument.prototype =
                     {
                         this.DrawingDocument.TargetEnd();
                         this.DrawingDocument.SelectEnabled(true);
-                        this.Selection_Draw();
+                        this.DrawingDocument.SelectShow();
                     }
                     else
                     {

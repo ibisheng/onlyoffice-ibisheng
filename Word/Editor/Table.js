@@ -7344,7 +7344,7 @@ CTable.prototype =
         }
     },
 
-    Selection_Draw_Page : function(Page_abs, bStart, bEnd)
+    Selection_Draw_Page : function(Page_abs)
     {
         if ( this.Selection.Type2 === table_Selection_Border )
         {
@@ -7400,13 +7400,7 @@ CTable.prototype =
                     }
                     else
                     {
-                        if ( true === bStart )
-                            this.DrawingDocument.SelectionStart();
-
                         this.DrawingDocument.AddPageSelection( Page_abs, X_start, this.RowsInfo[Pos.Row].Y[CurPage] + this.RowsInfo[Pos.Row].TopDy[CurPage] + CellMar.Top.W + Y_offset, X_end - X_start, Bounds.Bottom - Bounds.Top );
-
-                        if ( true === bEnd )
-                            this.DrawingDocument.SelectionEnd();
                     }
                 }
                 break;
@@ -7414,7 +7408,7 @@ CTable.prototype =
             case table_Selection_Text:
             {
                 var Cell = this.Content[this.Selection.StartPos.Pos.Row].Get_Cell( this.Selection.StartPos.Pos.Cell );
-                Cell.Content.Selection_Draw_Page(Page_abs, bStart, bEnd);
+                Cell.Content.Selection_Draw_Page(Page_abs);
 
                 break;
             }
@@ -7610,15 +7604,6 @@ CTable.prototype =
             {
                 this.Parent.OnContentReDraw( this.Get_StartPage_Absolute(), this.Get_StartPage_Absolute() + this.Pages.length - 1 );
             }
-
-            if ( false === this.Is_Inline() )
-            {
-                // Обновляем выделение
-                this.DrawingDocument.SelectClear();
-                this.Selection_Draw();
-                this.DrawingDocument.SelectShow();
-            }
-
         }
         else
             this.CurCell.Content.Paragraph_Add( ParaItem, bRecalculate );
@@ -7647,14 +7632,6 @@ CTable.prototype =
             {
                 this.Internal_Recalculate_1();
                 this.Internal_OnContentRecalculate( true, 0, this.Index );
-            }
-
-            if ( false === this.Is_Inline() )
-            {
-                // Обновляем выделение
-                this.DrawingDocument.SelectClear();
-                this.Selection_Draw();
-                this.DrawingDocument.SelectShow();
             }
         }
         else
@@ -7685,14 +7662,6 @@ CTable.prototype =
                 this.Internal_Recalculate_1();
                 this.Internal_OnContentRecalculate( true, 0, this.Index );
             }
-
-            if ( false === this.Is_Inline() )
-            {
-                // Обновляем выделение
-                this.DrawingDocument.SelectClear();
-                this.Selection_Draw();
-                this.DrawingDocument.SelectShow();
-            }
         }
         else
             this.CurCell.Content.Paragraph_Format_Paste(TextPr, ParaPr, false);
@@ -7722,15 +7691,6 @@ CTable.prototype =
                 this.Internal_Recalculate_1();
                 this.Internal_OnContentRecalculate( true, 0, this.Index );
             }
-
-            if ( false === this.Is_Inline() )
-            {
-                // Обновляем выделение
-                this.DrawingDocument.SelectClear();
-                this.Selection_Draw();
-                this.DrawingDocument.SelectShow();
-            }
-
         }
         else
             this.CurCell.Content.Remove(Count, bOnlyText, bRemoveOnlySelection);
@@ -8691,14 +8651,6 @@ CTable.prototype =
                 this.Internal_Recalculate_1();
                 this.Internal_OnContentRecalculate( true, 0, this.Index );
             }
-
-            if ( false === this.Is_Inline() )
-            {
-                // Обновляем выделение
-                this.DrawingDocument.SelectClear();
-                this.Selection_Draw();
-                this.DrawingDocument.SelectShow();
-            }
         }
         else
             return this.CurCell.Content.Set_ParagraphAlign( Align );
@@ -8727,14 +8679,6 @@ CTable.prototype =
             {
                 this.Internal_Recalculate_1();
                 this.Internal_OnContentRecalculate( true, 0, this.Index );
-            }
-
-            if ( false === this.Is_Inline() )
-            {
-                // Обновляем выделение
-                this.DrawingDocument.SelectClear();
-                this.Selection_Draw();
-                this.DrawingDocument.SelectShow();
             }
         }
         else
@@ -8765,14 +8709,6 @@ CTable.prototype =
                 this.Internal_Recalculate_1();
                 this.Internal_OnContentRecalculate( true, 0, this.Index );
             }
-
-            if ( false === this.Is_Inline() )
-            {
-                // Обновляем выделение
-                this.DrawingDocument.SelectClear();
-                this.Selection_Draw();
-                this.DrawingDocument.SelectShow();
-            }
         }
         else
             return this.CurCell.Content.Set_ParagraphIndent( Ind );
@@ -8801,14 +8737,6 @@ CTable.prototype =
             {
                 this.Internal_Recalculate_1();
                 this.Internal_OnContentRecalculate( true, 0, this.Index );
-            }
-
-            if ( false === this.Is_Inline() )
-            {
-                // Обновляем выделение
-                this.DrawingDocument.SelectClear();
-                this.Selection_Draw();
-                this.DrawingDocument.SelectShow();
             }
         }
         else
@@ -8839,14 +8767,6 @@ CTable.prototype =
                 this.Internal_Recalculate_1();
                 this.Internal_OnContentRecalculate( true, 0, this.Index );
             }
-
-            if ( false === this.Is_Inline() )
-            {
-                // Обновляем выделение
-                this.DrawingDocument.SelectClear();
-                this.Selection_Draw();
-                this.DrawingDocument.SelectShow();
-            }
         }
         else
             return this.CurCell.Content.Set_ParagraphShd( Shd );
@@ -8875,14 +8795,6 @@ CTable.prototype =
             {
                 this.Internal_Recalculate_1();
                 this.Internal_OnContentRecalculate( true, 0, this.Index );
-            }
-
-            if ( false === this.Is_Inline() )
-            {
-                // Обновляем выделение
-                this.DrawingDocument.SelectClear();
-                this.Selection_Draw();
-                this.DrawingDocument.SelectShow();
             }
         }
         else
@@ -8913,14 +8825,6 @@ CTable.prototype =
                 this.Internal_Recalculate_1();
                 this.Internal_OnContentRecalculate( true, 0, this.Index );
             }
-
-            if ( false === this.Is_Inline() )
-            {
-                // Обновляем выделение
-                this.DrawingDocument.SelectClear();
-                this.Selection_Draw();
-                this.DrawingDocument.SelectShow();
-            }
         }
         else
             return this.CurCell.Content.Set_ParagraphTabs( Tabs );
@@ -8949,14 +8853,6 @@ CTable.prototype =
             {
                 this.Internal_Recalculate_1();
                 this.Internal_OnContentRecalculate( true, 0, this.Index );
-            }
-
-            if ( false === this.Is_Inline() )
-            {
-                // Обновляем выделение
-                this.DrawingDocument.SelectClear();
-                this.Selection_Draw();
-                this.DrawingDocument.SelectShow();
             }
         }
         else
@@ -8987,14 +8883,6 @@ CTable.prototype =
                 this.Internal_Recalculate_1();
                 this.Internal_OnContentRecalculate( true, 0, this.Index );
             }
-
-            if ( false === this.Is_Inline() )
-            {
-                // Обновляем выделение
-                this.DrawingDocument.SelectClear();
-                this.Selection_Draw();
-                this.DrawingDocument.SelectShow();
-            }
         }
         else
             return this.CurCell.Content.Set_ParagraphPageBreakBefore( Value );
@@ -9023,14 +8911,6 @@ CTable.prototype =
             {
                 this.Internal_Recalculate_1();
                 this.Internal_OnContentRecalculate( true, 0, this.Index );
-            }
-
-            if ( false === this.Is_Inline() )
-            {
-                // Обновляем выделение
-                this.DrawingDocument.SelectClear();
-                this.Selection_Draw();
-                this.DrawingDocument.SelectShow();
             }
         }
         else
@@ -9061,14 +8941,6 @@ CTable.prototype =
                 this.Internal_Recalculate_1();
                 this.Internal_OnContentRecalculate( true, 0, this.Index );
             }
-
-            if ( false === this.Is_Inline() )
-            {
-                // Обновляем выделение
-                this.DrawingDocument.SelectClear();
-                this.Selection_Draw();
-                this.DrawingDocument.SelectShow();
-            }
         }
         else
             return this.CurCell.Content.Set_ParagraphBorders( Borders );
@@ -9098,14 +8970,6 @@ CTable.prototype =
                 this.Internal_Recalculate_1();
                 this.Internal_OnContentRecalculate( true, 0, this.Index );
             }
-
-            if ( false === this.Is_Inline() )
-            {
-                // Обновляем выделение
-                this.DrawingDocument.SelectClear();
-                this.Selection_Draw();
-                this.DrawingDocument.SelectShow();
-            }
         }
         else
             return this.CurCell.Content.Paragraph_IncDecFontSize(bIncrease);
@@ -9134,14 +8998,6 @@ CTable.prototype =
             {
                 this.Internal_Recalculate_1();
                 this.Internal_OnContentRecalculate( true, 0, this.Index );
-            }
-
-            if ( false === this.Is_Inline() )
-            {
-                // Обновляем выделение
-                this.DrawingDocument.SelectClear();
-                this.Selection_Draw();
-                this.DrawingDocument.SelectShow();
             }
         }
         else
@@ -10813,10 +10669,6 @@ CTable.prototype =
         // Выделим новые строки
         this.Selection.Use = true;
 
-        this.DrawingDocument.TargetEnd();
-        this.DrawingDocument.SelectClear();
-        this.DrawingDocument.SelectEnabled(true);
-
         if ( null != this.Selection.Data )
             this.Selection.Data.length = 0;
         else
@@ -10842,8 +10694,6 @@ CTable.prototype =
         }
 
         this.Internal_Recalculate_1();
-        this.Selection_Draw();
-        this.DrawingDocument.SelectShow();
     },
 
     // Удаление строки либо по номеру Ind, либо по выделению Selection,
