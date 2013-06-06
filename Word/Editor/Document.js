@@ -958,7 +958,7 @@ CDocument.prototype =
             // в колонтитуле всегда можно проверять текущую позицию
         }
 
-        if ( true === this.NeedUpdateTarget && true === bFlag )
+        if ( true === this.NeedUpdateTarget && true === bFlag && false === this.Selection_Is_TableBorderMove() )
         {
             this.Document_UpdateRulersState();
             this.RecalculateCurPos();
@@ -5614,7 +5614,7 @@ CDocument.prototype =
                 if ( selectionflag_Numbering == this.Selection.Flag )
                     return false;
                 // Обрабатываем движение границы у таблиц
-                else if ( null != this.Selection.Data && true === this.Selection.Data.TableBorder && type_Table == this.Content[this.Selection.Data.Pos].GetType() )
+                else if ( true === this.Selection_Is_TableBorderMove() )
                     return false;
                 else
                 {
@@ -5932,7 +5932,7 @@ CDocument.prototype =
         }
 
         // Обрабатываем движение границы у таблиц
-        if ( null != this.Selection.Data && true === this.Selection.Data.TableBorder && type_Table == this.Content[this.Selection.Data.Pos].GetType() )
+        if ( true === this.Selection_Is_TableBorderMove() )
         {
             var Item = this.Content[this.Selection.Data.Pos];
             Item.Selection_SetEnd( X, Y, this.CurPage, MouseEvent, true );
@@ -6177,6 +6177,14 @@ CDocument.prototype =
     Selection_Is_OneElement : function()
     {
         if ( true === this.Selection.Use && this.CurPos.Type === docpostype_Content && this.Selection.Flag === selectionflag_Common && this.Selection.StartPos === this.Selection.EndPos )
+            return true;
+
+        return false;
+    },
+
+    Selection_Is_TableBorderMove : function()
+    {
+        if ( null != this.Selection.Data && true === this.Selection.Data.TableBorder && type_Table == this.Content[this.Selection.Data.Pos].GetType() )
             return true;
 
         return false;
@@ -8544,7 +8552,7 @@ CDocument.prototype =
                     this.DrawingDocument.SelectShow();
                 }
                 // Обрабатываем движение границы у таблиц
-                else if ( null != this.Selection.Data && true === this.Selection.Data.TableBorder && type_Table == this.Content[this.Selection.Data.Pos].GetType() )
+                else if ( true === this.Selection_Is_TableBorderMove() )
                 {
                     // Убираем курсор, если он был
                     this.DrawingDocument.TargetEnd();
