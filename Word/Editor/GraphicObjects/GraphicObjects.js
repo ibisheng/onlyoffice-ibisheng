@@ -1122,6 +1122,19 @@ CGraphicObjects.prototype =
     },
 
 
+
+    drawPageSelect: function(pageIndex)
+    {
+        if(this.document.CurPos.Type !== docpostype_HdrFtr)
+        {
+
+        }
+        else
+        {
+
+        }
+    },
+
     getTableByXY: function(x, y, pageIndex, documentContent)
     {
         if(!documentContent.Is_HdrFtr())
@@ -5382,6 +5395,47 @@ CGraphicObjects.prototype =
         this.selectionDraw();
     },
 
+
+    drawSelection: function(pageIndex)
+    {
+        if(this.document.CurPos.Type !== docpostype_HdrFtr)
+        {
+            if(this.curState.id === STATES_ID_TEXT_ADD)
+            {
+                if(this.curState.textObject.PageNum === pageIndex)
+                    this.curState.textObject.updateSelectionState();
+            }
+            else if(this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP)
+            {
+                if(this.curState.textObject.pageIndex === pageIndex)
+                    this.curState.textObject.updateSelectionState();
+            }
+            else
+            {
+                this.drawingDocument.SelectClear();
+                this.drawingDocument.TargetEnd();
+            }
+        }
+        else
+        {
+            if(this.curState.id === STATES_ID_TEXT_ADD)
+            {
+                if(this.curState.textObject.GraphicObj.selectStartPage === pageIndex)
+                    this.curState.textObject.updateSelectionState();
+            }
+            else if(this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP)
+            {
+                if(this.curState.textObject.selectStartPage === pageIndex)
+                    this.curState.textObject.updateSelectionState();
+            }
+            else
+            {
+                this.drawingDocument.SelectClear();
+                this.drawingDocument.TargetEnd();
+            }
+        }
+        this.drawSelect(pageIndex);
+    },
     getAllRasterImagesOnPage: function(pageIndex)
     {
         var ret = [];
