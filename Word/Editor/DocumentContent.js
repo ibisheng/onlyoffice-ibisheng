@@ -5618,23 +5618,6 @@ CDocumentContent.prototype =
     },
 
     // Рисуем селект
-    Selection_Draw : function()
-    {
-        if ( docpostype_DrawingObjects === this.CurPos.Type )
-        {
-            return this.DrawingObjects.selectionDraw();
-        }
-        else //if ( docpostype_Content === this.CurPos.Type )
-        {
-            if ( true === this.Selection.Use )
-            {
-                var StartPage_abs = this.Get_StartPage_Absolute();
-                for ( var Index = 0; Index < this.Pages.length; Index++ )
-                    this.Selection_Draw_Page( Index + StartPage_abs );
-            }
-        }
-    },
-
     Selection_Draw_Page : function(Page_abs)
     {
         if ( docpostype_DrawingObjects === this.CurPos.Type )

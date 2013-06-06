@@ -2197,28 +2197,6 @@ CTable.prototype =
             bRecalc_All = true;
         }
 
-
-//        if ( true === bRecalc_All )
-//        {
-//            this.Internal_RecalculateGrid();
-//            this.Internal_Recalculate_1();
-//
-//            this.Parent.OnContentRecalculate( true, 0, this.Index );
-//
-//            if ( true === this.Selection.Use )
-//            {
-//                this.DrawingDocument.SelectClear();
-//                this.Selection_Draw();
-//                this.DrawingDocument.SelectShow();
-//            }
-//
-//
-//        }
-//        else if ( true === bRedraw )
-//        {
-//            this.Parent.OnContentRecalculate( false, 0, this.Index );
-//        }
-
         return true;
     },
 
@@ -7158,16 +7136,6 @@ CTable.prototype =
 
                 this.Selection.Type2 = table_Selection_Common;
                 this.Selection.Data2 = null;
-
-                // TODO: В данном случае селект может быть только внутри таблицы. В будущем надо будет это переделать
-                //       Надо сделать OnSelectChange, чтобы родительский класс перерисовал Select на данной странице
-                if ( false === this.Is_Inline() )
-                {
-                    this.DrawingDocument.SelectClear();
-                    this.Selection_Draw();
-                    this.DrawingDocument.SelectShow();
-                }
-                //----------------------
             }
             
             return;
@@ -7238,126 +7206,8 @@ CTable.prototype =
         this.Content[this.Selection.StartPos.Pos.Row].Get_Cell( this.Selection.StartPos.Pos.Cell ).Content.Selection_Stop( X, Y, PageIndex - this.PageNum, MouseEvent );
     },
 
-    Selection_Draw : function()
-    {
-        if ( this.Selection.Type2 === table_Selection_Border )
-        {
-            if ( true === this.Selection.Data2.bCol )
-            {
-                this.DrawingDocument.UpdateTableRuler( this.Selection.Data2.bCol, this.Selection.Data2.Index, this.Selection.Data2.X );
-            }
-            else
-            {
-                this.DrawingDocument.UpdateTableRuler( this.Selection.Data2.bCol, this.Selection.Data2.Index, this.Selection.Data2.Y );
-            }
-        }
-
-        if ( false === this.Selection.Use )
-            return;
-
-        switch( this.Selection.Type )
-        {
-            case table_Selection_Cell:
-            {
-                var StartPage_Abs = this.Get_StartPage_Absolute();
-
-                // Найдем стартовую страницу
-                var CurPage = 0;
-                var Row_start = this.Selection.Data[0].Row;
-                for ( var Index = 1; Index < this.Pages.length; Index++ )
-                {
-                    if ( Row_start <= this.Pages[Index].FirstRow )
-                        break;
-
-                    CurPage++;
-                }
-
-                var Row_prev_index = -1;
-                var Row_pages      =  1;
-
-                for ( var Index = 0; Index < this.Selection.Data.length; Index++ )
-                {
-                    var Pos = this.Selection.Data[Index];
-                    var Row = this.Content[Pos.Row];
-                    var Cell = Row.Get_Cell( Pos.Cell );
-                    var CellInfo = Row.Get_CellInfo( Pos.Cell );
-                    var CellMar = Cell.Get_Margins();
-
-                    var VMergeCount = this.Internal_GetVertMergeCount( Row.Index, CellInfo.StartGridCol, Cell.Get_GridSpan() );
-                    var BottomMargin = this.MaxBotMargin[Row.Index + VMergeCount - 1];
-
-                    if ( -1 === Row_prev_index || Row_prev_index != Pos.Row )
-                    {
-                        CurPage += Row_pages - 1;
-
-                        if ( -1 != Row_prev_index )
-                        {
-                            for ( var Index2 = Row_prev_index + 1; Index2 < Pos.Row; Index2++ )
-                                CurPage += this.RowsInfo[Index2].Pages - 1;
-                        }
-
-                        Row_prev_index = Pos.Row;
-                        Row_pages      = this.RowsInfo[Pos.Row].Pages;
-                    }
-
-                    var X_start = ( 0 === Pos.Cell ? CellInfo.X_content_start : CellInfo.X_cell_start );
-                    var X_end   = CellInfo.X_cell_end;
-
-                    var Cell_pages = Cell.Content_Get_PagesCount();
-                    for ( var PageId = 0; PageId < Cell_pages; PageId++ )
-                    {
-                        var Bounds = Cell.Content_Get_PageBounds( PageId );
-                        var Y_offset = Cell.Temp.Y_VAlign_offset[PageId];
-
-                        if ( 0 != PageId )
-                        {
-                            // мы должны определить ряд, на котором случился перенос на новую страницу
-                            var TempRowIndex = this.Pages[CurPage + PageId].FirstRow;
-                            this.DrawingDocument.AddPageSelection( StartPage_Abs + CurPage + PageId, X_start, this.RowsInfo[TempRowIndex].Y[CurPage + PageId] + this.RowsInfo[TempRowIndex].TopDy[CurPage + PageId] + CellMar.Top.W + + Y_offset, X_end - X_start, Bounds.Bottom - Bounds.Top );
-                        }
-                        else
-                        {
-                            var bDrawSelectionBlock = true;
-                            if ( Cell_pages > 1 )
-                            {
-                                // Можно не проверять наличие страницы CurPage + 1, это мы сделали
-                                // проверкой Cell_pages > 1
-                                var TempRowIndex = this.Pages[CurPage + 1].FirstRow;
-                                if ( TempRowIndex === Pos.Row && false === this.RowsInfo[TempRowIndex].FirstPage )
-                                    bDrawSelectionBlock = false;
-                            }
-
-                            if ( true === bDrawSelectionBlock )
-                                this.DrawingDocument.AddPageSelection( StartPage_Abs + CurPage + PageId, X_start, this.RowsInfo[Pos.Row].Y[CurPage + PageId] + this.RowsInfo[Pos.Row].TopDy[CurPage + PageId] + CellMar.Top.W + Y_offset, X_end - X_start, Bounds.Bottom - Bounds.Top );
-                        }
-                    }
-                }
-                break;
-            }
-            case table_Selection_Text:
-            {
-                var Cell = this.Content[this.Selection.StartPos.Pos.Row].Get_Cell( this.Selection.StartPos.Pos.Cell );
-                Cell.Content.Selection_Draw();
-
-                break;
-            }
-        }
-    },
-
     Selection_Draw_Page : function(Page_abs)
     {
-        if ( this.Selection.Type2 === table_Selection_Border )
-        {
-            if ( true === this.Selection.Data2.bCol )
-            {
-                this.DrawingDocument.UpdateTableRuler( this.Selection.Data2.bCol, this.Selection.Data2.Index, this.Selection.Data2.X );
-            }
-            else
-            {
-                this.DrawingDocument.UpdateTableRuler( this.Selection.Data2.bCol, this.Selection.Data2.Index, this.Selection.Data2.Y );
-            }
-        }
-
         if ( false === this.Selection.Use )
             return;
 
@@ -10166,21 +10016,14 @@ CTable.prototype =
 
         this.Internal_Recalculate_1();
 
-        // Убираем старый селект
-        this.Selection_Remove();
-        this.DrawingDocument.SelectClear();
-
         // Выделяем полученную ячейку
         this.Selection.Use   = true;
         this.Selection.StartPos.Pos = Pos_tl;
         this.Selection.EndPos.Pos   = Pos_tl;
         this.Selection.Type         = table_Selection_Cell;
         this.Selection.Data = [ Pos_tl ];
-        this.Selection_Draw();
 
         this.CurCell = Cell_tl;
-
-        this.DrawingDocument.SelectShow();
     },
 
     // Разделяем текущую ячейку
@@ -11231,10 +11074,6 @@ CTable.prototype =
         // Выделим новые строки
         this.Selection.Use = true;
 
-        this.DrawingDocument.TargetEnd();
-        this.DrawingDocument.SelectClear();
-        this.DrawingDocument.SelectEnabled(true);
-
         if ( null != this.Selection.Data )
             this.Selection.Data.length = 0;
         else
@@ -11254,9 +11093,6 @@ CTable.prototype =
 
         this.Internal_RecalculateGrid();
         this.Internal_Recalculate_1();
-
-        this.Selection_Draw();
-        this.DrawingDocument.SelectShow();
     },
 
     // NewMarkup - новая разметка таблицы
@@ -11453,14 +11289,8 @@ CTable.prototype =
 
         this.Internal_Recalculate_1();
         this.Internal_Update_TableMarkup( this.Markup.Internal.RowIndex, this.Markup.Internal.CellIndex, this.Markup.Internal.PageNum );
-
-        // TODO: В данном случае селект может быть только внутри таблицы. В буждущем надо будет это переделать
-        this.DrawingDocument.SelectClear();
-        this.Selection_Draw();
-        this.DrawingDocument.SelectShow();
-        //----------------------
-
         this.Internal_OnContentRecalculate( true, 0, this.Index );
+        editor.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
     },
 
 //-----------------------------------------------------------------------------------

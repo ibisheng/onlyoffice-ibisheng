@@ -5597,13 +5597,6 @@ CDocument.prototype =
         }
     },
 
-    // Рисуем селект
-    Selection_Draw : function()
-    {
-        this.DrawingDocument.SelectShow();
-        return;
-    },
-
     Selection_IsEmpty : function(bCheckHidden)
     {
         // Работаем с колонтитулом
@@ -5654,8 +5647,6 @@ CDocument.prototype =
 
             if ( true === this.Selection.Use )
             {
-                //this.DrawingDocument.ClearPageSelection(Page_abs);
-
                 switch( this.Selection.Flag )
                 {
                     case selectionflag_Common:
@@ -5752,7 +5743,6 @@ CDocument.prototype =
         }
 
         this.DrawingDocument.SelectClear();
-        //this.DrawingDocument.SelectShow();
     },
 
     Selection_SetStart : function(X,Y, MouseEvent)

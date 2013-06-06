@@ -7059,7 +7059,7 @@ Paragraph.prototype =
     {
     },
 
-    Selection_Draw_Page : function(Page_abs, bStart, bEnd)
+    Selection_Draw_Page : function(Page_abs)
     {
         if ( true != this.Selection.Use )
             return;
@@ -7129,9 +7129,6 @@ Paragraph.prototype =
 
                 for ( Pos = StartPos; Pos < EndPos; Pos++ )
                 {
-                    if ( true === bStart && Pos === StartPos )
-                        this.DrawingDocument.SelectionStart();
-
                     Item = this.Content[Pos];
 
                     if ( undefined != Item.CurPage )
@@ -7170,8 +7167,6 @@ Paragraph.prototype =
                     if ( Pos == EndPos - 1 )
                     {
                         this.DrawingDocument.AddPageSelection(Page_abs, StartX, StartY, W, H);
-                        if ( true === bEnd )
-                            this.DrawingDocument.SelectionEnd();
                     }
                 }
 
@@ -7216,13 +7211,7 @@ Paragraph.prototype =
                         break;
                 }
 
-                if ( true === bStart )
-                    this.DrawingDocument.SelectionStart();
-
                 this.DrawingDocument.AddPageSelection(Page_abs, SelectX, this.Lines[0].Top + this.Pages[PNum].Y, SelectW, this.Lines[0].Bottom - this.Lines[0].Top);
-
-                if ( true === bEnd )
-                    this.DrawingDocument.SelectionEnd();
 
                 break;
             }
