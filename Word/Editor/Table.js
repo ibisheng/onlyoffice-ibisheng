@@ -7344,7 +7344,7 @@ CTable.prototype =
         }
     },
 
-    Selection_Draw_Page : function(Page_abs)
+    Selection_Draw_Page : function(Page_abs, bStart, bEnd)
     {
         if ( this.Selection.Type2 === table_Selection_Border )
         {
@@ -7369,30 +7369,6 @@ CTable.prototype =
         {
             case table_Selection_Cell:
             {
-                /*
-                // Найдем ячейки, которые нам надо выделить на данной странице
-                var StartPos = -1;
-                var EndPos   = -1;
-                for ( var Index = 0; Index < this.Selection.Data.length; Index++ )
-                {
-                    var CurRow = this.Selection.Data[Index].Row;
-
-                    if ( CurRow >= this.Pages[CurPage].FirstRow && CurRow <= this.Pages[CurPage].LastRow )
-                    {
-                        if ( -1 === StartPos )
-                            StartPos = Index;
-
-                        EndPos = Index;
-                    }
-                }
-
-                if ( -1 === StartPos )
-                    return;
-
-                if ( -1 === EndPos )
-                    EndPos = this.Selection.Data.length - 1;
-                    */
-
                 var Row_prev_index = -1;
                 for ( var Index = 0; Index < this.Selection.Data.length; Index++ )
                 {
@@ -7424,7 +7400,13 @@ CTable.prototype =
                     }
                     else
                     {
+                        if ( true === bStart )
+                            this.DrawingDocument.SelectionStart();
+
                         this.DrawingDocument.AddPageSelection( Page_abs, X_start, this.RowsInfo[Pos.Row].Y[CurPage] + this.RowsInfo[Pos.Row].TopDy[CurPage] + CellMar.Top.W + Y_offset, X_end - X_start, Bounds.Bottom - Bounds.Top );
+
+                        if ( true === bEnd )
+                            this.DrawingDocument.SelectionEnd();
                     }
                 }
                 break;
@@ -7432,7 +7414,7 @@ CTable.prototype =
             case table_Selection_Text:
             {
                 var Cell = this.Content[this.Selection.StartPos.Pos.Row].Get_Cell( this.Selection.StartPos.Pos.Cell );
-                Cell.Content.Selection_Draw_Page(Page_abs);
+                Cell.Content.Selection_Draw_Page(Page_abs, bStart, bEnd);
 
                 break;
             }

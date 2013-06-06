@@ -4254,7 +4254,6 @@ function CTextPr()
     this.Underline  = undefined;
     this.FontFamily = undefined;
     this.FontSize   = undefined;
-    this.FontSize_S = undefined; // Спеациально для Paragraph.Internal_Recalculate_1
     this.Color      = undefined;
     this.VertAlign  = undefined;
     this.HighLight  = undefined; // highlight_None/Color
@@ -4269,7 +4268,6 @@ function CTextPr()
     this.BoldCS       = undefined;
     this.ItalicCS     = undefined;
     this.FontSizeCS   = undefined;
-    this.FontSizeCS_S = undefined;
     this.CS           = undefined;
     this.RTL          = undefined;
 }
@@ -4284,7 +4282,6 @@ CTextPr.prototype =
         this.Underline  = undefined;
         this.FontFamily = undefined;
         this.FontSize   = undefined;
-        this.FontSize_S = undefined;
         this.Color      = undefined;
         this.VertAlign  = undefined;
         this.HighLight  = undefined;
@@ -4299,7 +4296,6 @@ CTextPr.prototype =
         this.BoldCS       = undefined;
         this.ItalicCS     = undefined;
         this.FontSizeCS   = undefined;
-        this.FontSizeCS_S = undefined;
         this.CS           = undefined;
         this.RTL          = undefined;
     },
@@ -4320,7 +4316,6 @@ CTextPr.prototype =
         }
 
         TextPr.FontSize   = this.FontSize;
-        TextPr.FontSize_S = this.FontSize_S;
 
         if ( undefined != this.Color )
             TextPr.Color = new CDocumentColor(this.Color.r, this.Color.g, this.Color.b);
@@ -4345,7 +4340,6 @@ CTextPr.prototype =
         TextPr.BoldCS       = this.BoldCS;
         TextPr.ItalicCS     = this.ItalicCS;
         TextPr.FontSizeCS   = this.FontSizeCS;
-        TextPr.FontSizeCS_S = this.FontSizeCS_S;
         TextPr.CS           = this.CS;
         TextPr.RTL          = this.RTL;
 
@@ -4375,9 +4369,6 @@ CTextPr.prototype =
 
         if ( undefined != TextPr.FontSize )
             this.FontSize = TextPr.FontSize;
-
-        if ( undefined != TextPr.FontSize_S )
-            this.FontSize_S = TextPr.FontSize_S;
 
         if ( undefined != TextPr.Color )
             this.Color = TextPr.Color.Copy();
@@ -4421,9 +4412,6 @@ CTextPr.prototype =
         if ( undefined != TextPr.FontSizeCS )
             this.FontSizeCS = TextPr.FontSizeCS;
 
-        if ( undefined != TextPr.FontSizeCS_S )
-            this.FontSizeCS_S = TextPr.FontSizeCS_S;
-
         if ( undefined != TextPr.CS )
             this.CS = TextPr.CS;
 
@@ -4457,7 +4445,6 @@ CTextPr.prototype =
         this.BoldCS       = false;
         this.ItalicCS     = false;
         this.FontSizeCS   = 11;
-        this.FontSizeCS_S = 11;
         this.CS           = false;
         this.RTL          = false;
     },
@@ -4479,7 +4466,6 @@ CTextPr.prototype =
             this.FontFamily = undefined;
 
         this.FontSize   = TextPr.FontSize;
-        this.FontSize_S = TextPr.FontSize_S;
 
         if ( undefined != TextPr.Color )
             this.Color = new CDocumentColor( TextPr.Color.r, TextPr.Color.g, TextPr.Color.b );
@@ -4510,7 +4496,6 @@ CTextPr.prototype =
         this.BoldCS       = TextPr.BoldCS;
         this.ItalicCS     = TextPr.ItalicCS;
         this.FontSizeCS   = TextPr.FontSizeCS;
-        this.FontSizeCS_S = TextPr.FontSizeCS_S;
         this.CS           = TextPr.CS;
         this.RTL          = TextPr.RTL;
     },
@@ -4602,10 +4587,6 @@ CTextPr.prototype =
         // FontSizeCS
         if ( undefined != this.FontSizeCS && undefined != TextPr.FontSizeCS && Math.abs( this.FontSizeCS - TextPr.FontSizeCS ) < 0.001 )
             Result_TextPr.FontSizeCS = TextPr.FontSizeCS;
-
-        // FontSizeCS_S
-        if ( undefined != this.FontSizeCS_S && undefined != TextPr.FontSizeCS_S && Math.abs( this.FontSizeCS_S - TextPr.FontSizeCS_S ) < 0.001 )
-            Result_TextPr.FontSizeCS_S = TextPr.FontSizeCS_S;
 
         // CS
         if ( this.CS === TextPr.CS )
@@ -4913,124 +4894,26 @@ CTextPr.prototype =
         return false;
     },
 
-    Update_FontSize : function()
+    Get_FontKoef : function()
     {
-        // Данная функция выполняется, только если заполнены поля FontSize и VertAlign
-        if ( undefined === this.VertAlign )
-            return;
+        var dFontKoef  = 1;
 
-        if ( undefined != this.FontSize )
+        switch ( this.VertAlign )
         {
-            // Для Subscript и superscript добавим дополнительный параметр с размером текста
-            this.FontSize_S = this.FontSize;
-
-            switch ( this.VertAlign )
+            case vertalign_Baseline:
             {
-                case vertalign_Baseline:
-                {
-                    this.FontSize = this.FontSize_S;
-                    break;
-                }
-                case vertalign_SubScript:
-                case vertalign_SuperScript:
-                {
-                    this.FontSize = this.FontSize_S * vertalign_Koef_Size;
-                    break;
-                }
-            }
-        }
-
-        if ( undefined != this.FontSizeCS )
-        {
-            // Для Subscript и superscript добавим дополнительный параметр с размером текста
-            this.FontSizeCS_S = this.FontSizeCS;
-
-            switch ( this.VertAlign )
-            {
-                case vertalign_Baseline:
-                {
-                    this.FontSizeCS = this.FontSizeCS_S;
-                    break;
-                }
-                case vertalign_SubScript:
-                case vertalign_SuperScript:
-                {
-                    this.FontSizeCS = this.FontSizeCS_S * vertalign_Koef_Size;
-                    break;
-                }
-            }
-        }
-    },
-
-    Get_FontByFontSlot : function(fontSlot)
-    {
-        // Данную функцию можно применять только, когда данный TextPr содержит все свойста
-
-        var Font =
-        {
-            FontFamily :
-            {
-                Name  : "Arial",
-                Index : -1
-            },
-
-            FontSize : 11,
-            Bold     : false,
-            Italic   : false
-        };
-
-        switch ( fontSlot )
-        {
-            case fontslot_ASCII :
-            {
-                Font.FontFamily.Name  = this.RFonts.Ascii.Name;
-                Font.FontFamily.Index = this.RFonts.Ascii.Index;
-
-                Font.FontSize = this.FontSize;
-                Font.Bold     = this.Bold;
-                Font.Italic   = this.Italic;
-
+                dFontKoef = 1;
                 break;
             }
-
-            case fontslot_EastAsia :
+            case vertalign_SubScript:
+            case vertalign_SuperScript:
             {
-                Font.FontFamily.Name  = this.RFonts.EastAsia.Name;
-                Font.FontFamily.Index = this.RFonts.EastAsia.Index;
-
-                Font.FontSize = this.FontSize;
-                Font.Bold     = this.Bold;
-                Font.Italic   = this.Italic;
-
-                break;
-            }
-
-            case fontslot_HAnsi :
-            {
-                Font.FontFamily.Name  = this.RFonts.HAnsi.Name;
-                Font.FontFamily.Index = this.RFonts.HAnsi.Index;
-
-                Font.FontSize = this.FontSize;
-                Font.Bold     = this.Bold;
-                Font.Italic   = this.Italic;
-
-                break;
-            }
-
-            case fontslot_CS :
-            {
-                Font.FontFamily.Name  = this.RFonts.CS.Name;
-                Font.FontFamily.Index = this.RFonts.CS.Index;
-
-                Font.FontSize = this.FontSizeCS;
-                Font.Bold     = this.BoldCS;
-                Font.Italic   = this.ItalicCS;
-
+                dFontKoef = vertalign_Koef_Size;
                 break;
             }
         }
 
-        return Font;
+        return dFontKoef;
     }
 }
 

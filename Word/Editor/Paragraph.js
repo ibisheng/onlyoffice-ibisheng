@@ -694,8 +694,6 @@ Paragraph.prototype =
         var ParaPr    = Pr.ParaPr;
         var CurTextPr = Pr.TextPr;
 
-        CurTextPr.Update_FontSize();
-
         // Предполагается, что при вызове данной функции Content не содержит
         // рассчитанных переносов строк.
 
@@ -706,24 +704,9 @@ Paragraph.prototype =
         var TextHeight  = 0;
         var TextDescent = 0;
 
-        if ( Math.abs(CurTextPr.FontSize - CurTextPr.FontSize_S) < 0.01 )
-        {
-            g_oTextMeasurer.SetFontSlot( fontslot_ASCII );
-            TextHeight  = g_oTextMeasurer.GetHeight();
-            TextDescent = Math.abs( g_oTextMeasurer.GetDescender() );
-        }
-        else
-        {
-            var OldSize = CurTextPr.FontSize;
-            CurTextPr.FontSize = CurTextPr.FontSize_S;
-            g_oTextMeasurer.SetTextPr( CurTextPr );
-            g_oTextMeasurer.SetFontSlot( fontslot_ASCII );
-            TextHeight  = g_oTextMeasurer.GetHeight();
-            TextDescent = Math.abs( g_oTextMeasurer.GetDescender() );
-            CurTextPr.FontSize = OldSize;
-
-            g_oTextMeasurer.SetTextPr( CurTextPr );
-        }
+        g_oTextMeasurer.SetFontSlot( fontslot_ASCII );
+        TextHeight  = g_oTextMeasurer.GetHeight();
+        TextDescent = Math.abs( g_oTextMeasurer.GetDescender() );
         TextAscent  = TextHeight - TextDescent;
 
         var ContentLength = this.Content.length;
@@ -802,26 +785,10 @@ Paragraph.prototype =
                 case para_TextPr:
                 {
                     CurTextPr = this.Internal_CalculateTextPr( Pos );
-                    CurTextPr.Update_FontSize();
                     g_oTextMeasurer.SetTextPr( CurTextPr );
-
-                    if ( Math.abs(CurTextPr.FontSize - CurTextPr.FontSize_S) < 0.01 )
-                    {
-                        g_oTextMeasurer.SetFontSlot( fontslot_ASCII );
-                        TextDescent = Math.abs( g_oTextMeasurer.GetDescender() );
-                        TextHeight  = g_oTextMeasurer.GetHeight();
-                    }
-                    else
-                    {
-                        var OldSize = CurTextPr.FontSize;
-                        CurTextPr.FontSize = CurTextPr.FontSize_S;
-                        g_oTextMeasurer.SetTextPr( CurTextPr );
-                        g_oTextMeasurer.SetFontSlot( fontslot_ASCII );
-                        TextDescent = Math.abs( g_oTextMeasurer.GetDescender() );
-                        TextHeight  = g_oTextMeasurer.GetHeight();
-                        CurTextPr.FontSize = OldSize;
-                        g_oTextMeasurer.SetTextPr( CurTextPr );
-                    }
+                    g_oTextMeasurer.SetFontSlot( fontslot_ASCII );
+                    TextDescent = Math.abs( g_oTextMeasurer.GetDescender() );
+                    TextHeight  = g_oTextMeasurer.GetHeight();
                     TextAscent = TextHeight - TextDescent;
 
                     break;
@@ -2969,15 +2936,11 @@ Paragraph.prototype =
                     if ( true === UpdateTarget )
                     {
                         var CurTextPr = this.Internal_CalculateTextPr(ItemNum);
-                        CurTextPr.Update_FontSize();
-
-                        var OldTextPr = g_oTextMeasurer.GetTextPr();
                         g_oTextMeasurer.SetTextPr( CurTextPr );
-                        g_oTextMeasurer.SetFontSlot( fontslot_ASCII );
+                        g_oTextMeasurer.SetFontSlot( fontslot_ASCII, CurTextPr.Get_FontKoef() );
                         var Height    = g_oTextMeasurer.GetHeight();
                         var Descender = Math.abs( g_oTextMeasurer.GetDescender() );
                         var Ascender  = Height - Descender;
-                        g_oTextMeasurer.SetTextPr( OldTextPr );
 
                         this.DrawingDocument.SetTargetSize( Height );
                         this.DrawingDocument.SetTargetColor( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b );
@@ -2987,12 +2950,12 @@ Paragraph.prototype =
                         {
                             case vertalign_SubScript:
                             {
-                                TargetY -= CurTextPr.FontSize_S * g_dKoef_pt_to_mm * vertalign_Koef_Sub;
+                                TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Sub;
                                 break;
                             }
                             case vertalign_SuperScript:
                             {
-                                TargetY -= CurTextPr.FontSize_S * g_dKoef_pt_to_mm * vertalign_Koef_Super;
+                                TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Super;
                                 break;
                             }
                         }
@@ -3005,15 +2968,11 @@ Paragraph.prototype =
                 if ( true === ReturnTarget )
                 {
                     var CurTextPr = this.Internal_CalculateTextPr(ItemNum);
-                    CurTextPr.Update_FontSize();
-
-                    var OldTextPr = g_oTextMeasurer.GetTextPr();
                     g_oTextMeasurer.SetTextPr( CurTextPr );
-                    g_oTextMeasurer.SetFontSlot( fontslot_ASCII );
+                    g_oTextMeasurer.SetFontSlot( fontslot_ASCII, CurTextPr.Get_FontKoef() );
                     var Height    = g_oTextMeasurer.GetHeight();
                     var Descender = Math.abs( g_oTextMeasurer.GetDescender() );
                     var Ascender  = Height - Descender;
-                    g_oTextMeasurer.SetTextPr( OldTextPr );
 
                     var TargetY = Y - Ascender - CurTextPr.Position;
 
@@ -3021,12 +2980,12 @@ Paragraph.prototype =
                     {
                         case vertalign_SubScript:
                         {
-                            TargetY -= CurTextPr.FontSize_S * g_dKoef_pt_to_mm * vertalign_Koef_Sub;
+                            TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Sub;
                             break;
                         }
                         case vertalign_SuperScript:
                         {
-                            TargetY -= CurTextPr.FontSize_S * g_dKoef_pt_to_mm * vertalign_Koef_Super;
+                            TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Super;
                             break;
                         }
                     }
@@ -3263,7 +3222,6 @@ Paragraph.prototype =
 
         var Pr = { TextPr : null, ParaPr : null };
         var CurTextPr = this.Internal_CalculateTextPr( StartPos, Pr );
-        CurTextPr.Update_FontSize();
 
         pGraphics.SetTextPr( CurTextPr );
         pGraphics.b_color1( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
@@ -3538,13 +3496,13 @@ Paragraph.prototype =
             {
                 case vertalign_SubScript:
                 {
-                    Y -= vertalign_Koef_Sub * CurTextPr.FontSize_S * g_dKoef_pt_to_mm;
+                    Y -= vertalign_Koef_Sub * CurTextPr.FontSize * g_dKoef_pt_to_mm;
 
                     break;
                 }
                 case vertalign_SuperScript:
                 {
-                    Y -= vertalign_Koef_Super * CurTextPr.FontSize_S * g_dKoef_pt_to_mm;
+                    Y -= vertalign_Koef_Super * CurTextPr.FontSize * g_dKoef_pt_to_mm;
 
                     break;
                 }
@@ -3741,8 +3699,6 @@ Paragraph.prototype =
                 case para_TextPr:
                 {
                     CurTextPr = this.Internal_CalculateTextPr( ItemNum );
-                    CurTextPr.Update_FontSize();
-
                     pGraphics.SetTextPr( CurTextPr );
                     pGraphics.b_color1( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
                     break;
@@ -3823,7 +3779,6 @@ Paragraph.prototype =
 
         Pr = { TextPr : null, ParaPr : null };
         CurTextPr = this.Internal_CalculateTextPr( StartPos, Pr );
-        CurTextPr.Update_FontSize();
 
         pGraphics.SetTextPr( CurTextPr );
         pGraphics.b_color1( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
@@ -3875,13 +3830,13 @@ Paragraph.prototype =
             {
                 case vertalign_SubScript:
                 {
-                    Y -= vertalign_Koef_Sub * CurTextPr.FontSize_S * g_dKoef_pt_to_mm;
+                    Y -= vertalign_Koef_Sub * CurTextPr.FontSize * g_dKoef_pt_to_mm;
 
                     break;
                 }
                 case vertalign_SuperScript:
                 {
-                    Y -= vertalign_Koef_Super * CurTextPr.FontSize_S * g_dKoef_pt_to_mm;
+                    Y -= vertalign_Koef_Super * CurTextPr.FontSize * g_dKoef_pt_to_mm;
 
                     break;
                 }
@@ -4146,8 +4101,6 @@ Paragraph.prototype =
                 case para_TextPr:
 
                     CurTextPr = this.Internal_CalculateTextPr( ItemNum );
-                    CurTextPr.Update_FontSize();
-
                     pGraphics.SetTextPr( CurTextPr );
                     pGraphics.b_color1( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
                     break;
@@ -6039,6 +5992,18 @@ Paragraph.prototype =
 
     Internal_AddTextPr : function(TextPr)
     {
+        if ( undefined != TextPr.FontFamily )
+        {
+            var FName  = TextPr.FontFamily.Name;
+            var FIndex = TextPr.FontFamily.Index;
+
+            TextPr.RFonts = new CRFonts();
+            TextPr.RFonts.Ascii    = { Name : FName, Index : FIndex };
+            TextPr.RFonts.EastAsia = { Name : FName, Index : FIndex };
+            TextPr.RFonts.HAnsi    = { Name : FName, Index : FIndex };
+            TextPr.RFonts.CS       = { Name : FName, Index : FIndex };
+        }
+
         if ( true === this.ApplyToAll )
         {
             this.Internal_Content_Add( 0, new ParaTextPr( TextPr ) );
@@ -7236,7 +7201,7 @@ Paragraph.prototype =
         }
     },
 
-    Selection_Draw_Page : function(Page_abs)
+    Selection_Draw_Page : function(Page_abs, bStart, bEnd)
     {
         if ( true != this.Selection.Use )
             return;
@@ -7306,6 +7271,9 @@ Paragraph.prototype =
 
                 for ( Pos = StartPos; Pos < EndPos; Pos++ )
                 {
+                    if ( true === bStart && Pos === StartPos )
+                        this.DrawingDocument.SelectionStart();
+
                     Item = this.Content[Pos];
 
                     if ( undefined != Item.CurPage )
@@ -7342,7 +7310,11 @@ Paragraph.prototype =
                     }
 
                     if ( Pos == EndPos - 1 )
+                    {
                         this.DrawingDocument.AddPageSelection(Page_abs, StartX, StartY, W, H);
+                        if ( true === bEnd )
+                            this.DrawingDocument.SelectionEnd();
+                    }
                 }
 
                 break;
@@ -7386,7 +7358,13 @@ Paragraph.prototype =
                         break;
                 }
 
+                if ( true === bStart )
+                    this.DrawingDocument.SelectionStart();
+
                 this.DrawingDocument.AddPageSelection(Page_abs, SelectX, this.Lines[0].Top + this.Pages[PNum].Y, SelectW, this.Lines[0].Bottom - this.Lines[0].Top);
+
+                if ( true === bEnd )
+                    this.DrawingDocument.SelectionEnd();
 
                 break;
             }
@@ -7419,6 +7397,9 @@ Paragraph.prototype =
     {
         if ( true === this.Selection.Use || true === this.ApplyToAll )
         {
+            if ( pararecalc_0_None != this.RecalcInfo.Recalc_0_Type )
+                this.Internal_Recalculate_0();
+
             var StartPos = this.Selection.StartPos;
             var EndPos   = this.Selection.EndPos;
 
@@ -9127,8 +9108,6 @@ Paragraph.prototype =
             }
 
             var CurTextPr = this.CompiledPr.Pr.TextPr.Copy();
-            CurTextPr.Update_FontSize();
-
             var Style = ( true === CurTextPr.Bold ? 1 : 0 ) + ( true === CurTextPr.Italic ? 2 : 0 );
             var Key = "" + CurTextPr.FontFamily.Name + "_" + Style + "_" + CurTextPr.FontSize;
             this.FontMap.Map[Key] =
@@ -9139,8 +9118,6 @@ Paragraph.prototype =
             };
 
             CurTextPr.Merge( this.TextPr.Value );
-            CurTextPr.Update_FontSize();
-
             var Style = ( true === CurTextPr.Bold ? 1 : 0 ) + ( true === CurTextPr.Italic ? 2 : 0 );
             var Key = "" + CurTextPr.FontFamily.Name + "_" + Style + "_" + CurTextPr.FontSize;
             this.FontMap.Map[Key] =
@@ -9171,8 +9148,6 @@ Paragraph.prototype =
 
                     // Копируем прямые настройки
                     CurTextPr.Merge( _CurTextPr );
-                    CurTextPr.Update_FontSize();
-
                     Style = ( true === CurTextPr.Bold ? 1 : 0 ) + ( true === CurTextPr.Italic ? 2 : 0 );
                     Key = "" + CurTextPr.FontFamily.Name + "_" + Style + "_" + CurTextPr.FontSize;
                     this.FontMap.Map[Key] =
@@ -9201,8 +9176,6 @@ Paragraph.prototype =
         }
 
         var CurTextPr = this.CompiledPr.Pr.TextPr.Copy();
-        CurTextPr.Update_FontSize();
-
         FontCharMap.StartFont( CurTextPr.FontFamily.Name, CurTextPr.Bold, CurTextPr.Italic, CurTextPr.FontSize );
 
         for ( var Index = 0; Index < this.Content.length; Index++ )
@@ -9226,8 +9199,6 @@ Paragraph.prototype =
 
                 // Копируем прямые настройки
                 CurTextPr.Merge( _CurTextPr );
-                CurTextPr.Update_FontSize();
-
                 FontCharMap.StartFont( CurTextPr.FontFamily.Name, CurTextPr.Bold, CurTextPr.Italic, CurTextPr.FontSize );
             }
             else if ( para_Text === Item.Type )
@@ -9261,7 +9232,6 @@ Paragraph.prototype =
         }
 
         CurTextPr.Merge( this.TextPr.Value );
-        CurTextPr.Update_FontSize();
     },
 
     Document_Get_AllFontNames : function(AllFonts)

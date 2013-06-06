@@ -70,6 +70,7 @@ function ParaText(value)
 
     this.CalcValue = value;
     this.FontSlot  = fontslot_ASCII;
+    this.FontKoef  = 1;
 
     this.Width        = 0;
     this.Height       = 0;
@@ -81,38 +82,12 @@ ParaText.prototype =
     {
         try
         {
-            Context.SetFontSlot( this.FontSlot );
+            Context.SetFontSlot( this.FontSlot, this.FontKoef );
 
             if ( true === this.Is_NBSP() && editor.ShowParaMarks )
                 Context.FillText( X, Y, String.fromCharCode( 0x00B0 ) );
             else
-            {
-//                var OldFont;
-//                if ( true === this.SmallCaps )
-//                {
-//                    OldFont = Context.GetFont();
-//
-//                    var TempFont =
-//                    {
-//                        FontFamily :
-//                        {
-//                            Index : OldFont.FontFamily.Index,
-//                            Name  : OldFont.FontFamily.Name
-//                        },
-//
-//                        FontSize : OldFont.FontSize * smallcaps_Koef,
-//                        Bold     : OldFont.Bold,
-//                        Italic   : OldFont.Italic
-//                    };
-//
-//                    Context.SetFont( TempFont );
-//                }
-
                 Context.FillText( X, Y, this.CalcValue );
-
-//                if ( true === this.SmallCaps )
-//                    Context.SetFont(OldFont);
-            }
         }
         catch(e)
         {
@@ -124,6 +99,8 @@ ParaText.prototype =
     {
         try
         {
+            this.FontKoef = TextPr.Get_FontKoef();
+
             var bCapitals = false;
             if ( true === TextPr.Caps || true === TextPr.SmallCaps )
             {
@@ -136,36 +113,8 @@ ParaText.prototype =
                 bCapitals  = false;
             }
 
-            this.SmallCaps = false;
-
-
-//            var OldFont;
-//
-//            if ( true != TextPr.Caps && true === TextPr.SmallCaps && false === bCapitals )
-//            {
-//                this.SmallCaps = true;
-//                OldFont = Context.GetFont();
-//
-//                var TempFont =
-//                {
-//                    FontFamily :
-//                    {
-//                        Index : OldFont.FontFamily.Index,
-//                        Name  : OldFont.FontFamily.Name
-//                    },
-//
-//                    FontSize : OldFont.FontSize * smallcaps_Koef,
-//                    Bold     : OldFont.Bold,
-//                    Italic   : OldFont.Italic
-//                };
-//
-//                Context.SetFont( TempFont );
-//            }
-//
-//            var Temp = Context.Measure( this.CalcValue );
-//
-//            if ( true != TextPr.Caps && true === TextPr.SmallCaps && false === bCapitals )
-//                Context.SetFont(OldFont);
+            if ( true != TextPr.Caps && true === TextPr.SmallCaps && false === bCapitals )
+                this.FontKoef *= smallcaps_Koef;
 
             var Hint = TextPr.RFonts.Hint;
             var bCS  = TextPr.CS;
@@ -173,13 +122,7 @@ ParaText.prototype =
 
             this.FontSlot = g_font_detector.Get_FontClass( this.CalcValue.charCodeAt(0), Hint, lcid_unknown, bCS, bRTL );
 
-            if ( true != TextPr.Caps && true === TextPr.SmallCaps && false === bCapitals )
-            {
-                this.SmallCaps = true;
-                //this.Font.FontSize *= smallcaps_Koef;
-            }
-
-            Context.SetFontSlot( this.FontSlot );
+            Context.SetFontSlot( this.FontSlot, this.FontKoef );
             var Temp = Context.Measure( this.CalcValue );
 
             Temp.Width = Math.max( Temp.Width + TextPr.Spacing, 0 );
@@ -248,7 +191,7 @@ function ParaSpace(Count)
         this.Value = Count;
 
     this.Type = para_Space;
-    this.SmallCaps = false;
+    this.FontKoef = 1;
 
     this.Width        = 0;
     this.Height       = 0;
@@ -271,7 +214,8 @@ ParaSpace.prototype =
 
         try
         {
-            var OldFont;
+            Context.SetFontSlot( fontslot_ASCII, this.FontKoef );
+            /*var OldFont;
             if ( true === this.SmallCaps )
             {
                 OldFont = Context.GetFont();
@@ -290,13 +234,13 @@ ParaSpace.prototype =
                 };
 
                 Context.SetFont( TempFont );
-            }
+            }*/
 
             if ( editor.ShowParaMarks )
                 Context.FillText( X, Y, sString );
 
-            if ( true === this.SmallCaps )
-                Context.SetFont(OldFont);
+            //if ( true === this.SmallCaps )
+//                Context.SetFont(OldFont);
         }
         catch(e)
         {
@@ -319,33 +263,14 @@ ParaSpace.prototype =
 
         try
         {
-            this.SmallCaps = ( true != TextPr.Caps && true === TextPr.SmallCaps ? true : false );
+            this.FontKoef = TextPr.Get_FontKoef();
 
-            var OldFont;
-            if ( true === this.SmallCaps )
-            {
-                OldFont = Context.GetFont();
+            if ( true != TextPr.Caps && true === TextPr.SmallCaps )
+                this.FontKoef *= smallcaps_Koef;
 
-                var TempFont =
-                {
-                    FontFamily :
-                    {
-                        Index : OldFont.FontFamily.Index,
-                        Name  : OldFont.FontFamily.Name
-                    },
-
-                    FontSize : OldFont.FontSize * smallcaps_Koef,
-                    Bold     : OldFont.Bold,
-                    Italic   : OldFont.Italic
-                };
-
-                Context.SetFont( TempFont );
-            }
+            Context.SetFontSlot( fontslot_ASCII, this.FontKoef );
 
             var Temp = Context.Measure( sString );
-
-            if ( true === this.SmallCaps )
-                Context.SetFont(OldFont);
 
             Temp.Width = Math.max( Temp.Width + TextPr.Spacing, 0 );
 
@@ -421,8 +346,6 @@ ParaTextPr.prototype =
         this.Width  = 0;
         this.Height = 0;
         this.WidthVisible = 0;
-
-        //return { Width : this.Width, Height : this.Height, WidthVisible : this.WidthVisible };
     },
 
     Copy : function()
@@ -496,6 +419,9 @@ ParaTextPr.prototype =
 
         if ( undefined != TextPr.Position )
             this.Set_Position( TextPr.Position );
+
+        if ( undefined != TextPr.RFonts )
+            this.Set_RFonts( TextPr.RFonts );
     },
 
     Set_Prop : function(Prop, Value)
@@ -571,13 +497,7 @@ ParaTextPr.prototype =
         var OldValue = ( undefined != this.Value.FontFamily ? this.Value.FontFamily : undefined );
 
         if ( undefined != Value )
-        {
-            this.Value.FontFamily      = Value;
-            this.Value.RFonts.Ascii    = Value;
-            this.Value.RFonts.HAnsi    = Value;
-            this.Value.RFonts.EastAsia = Value;
-            this.Value.RFonts.CS       = Value;
-        }
+            this.Value.FontFamily = Value;
         else
             this.Value.FontFamily = undefined;
 
@@ -710,6 +630,17 @@ ParaTextPr.prototype =
         this.Value = Value;
 
         History.Add( this, { Type : historyitem_TextPr_Value, New : Value, Old : OldValue } );
+    },
+
+    Set_RFonts : function(Value)
+    {
+        var OldValue = this.Value;
+        if ( undefined != Value )
+            this.Value.RFonts = Value;
+        else
+            this.Value.RFonts = new CRFonts();
+
+        History.Add( this, { Type : historyitem_TextPr_RFonts, New : Value, Old : OldValue } );
     },
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
@@ -880,6 +811,16 @@ ParaTextPr.prototype =
             case historyitem_TextPr_Value:
             {
                 this.Value = Data.Old;
+
+                break;
+            }
+
+            case historyitem_TextPr_RFonts:
+            {
+                if ( undefined != Data.Old )
+                    this.Value = Data.Old;
+                else
+                    this.Value = new CRFonts();
 
                 break;
             }
@@ -1059,6 +1000,15 @@ ParaTextPr.prototype =
                 break;
             }
 
+            case historyitem_TextPr_RFonts:
+            {
+                if ( undefined != Data.New )
+                    this.Value = Data.New;
+                else
+                    this.Value = new CRFonts();
+
+                break;
+            }
         }
     },
 
@@ -1303,7 +1253,20 @@ ParaTextPr.prototype =
                 break;
             }
 
+            case historyitem_TextPr_RFonts:
+            {
+                // Bool : undefined ?
+                // false -> CRFonts
+                if ( undefined != Data.Old )
+                {
+                    Writer.WriteBool( false );
+                    Data.New.Write_ToBinary( Writer );
+                }
+                else
+                    Writer.WriteBool( true );
 
+                break;
+            }
         }
 
         return Writer;
@@ -1565,6 +1528,21 @@ ParaTextPr.prototype =
 
                 break;
             }
+
+            case historyitem_TextPr_RFonts:
+            {
+                // Bool : undefined ?
+                // false -> CRFonts
+                if ( false === Reader.GetBool() )
+                {
+                    this.Value.RFonts = new CRFonts();
+                    this.Value.RFonts.Read_FromBinary( Reader );
+                }
+                else
+                    this.Value.RFonts = new CRFonts();
+
+                break;
+            }
         }
     }
 };
@@ -1579,6 +1557,8 @@ ParaEnd.prototype =
 {
     Draw : function(X,Y,Context, bEndCell)
     {
+        Context.SetFontSlot( fontslot_ASCII );
+        
         if ( editor.ShowParaMarks )
         {
             if ( true === bEndCell )
@@ -1593,12 +1573,12 @@ ParaEnd.prototype =
         this.Width  = 0;
         this.Height = 0;
 
+        Context.SetFontSlot( fontslot_ASCII );
+
         if ( true === bEndCell )
             this.WidthVisible = Context.Measure( String.fromCharCode( 0x00A4 ) ).Width;
         else
             this.WidthVisible = Context.Measure( String.fromCharCode( 0x00B6 ) ).Width;
-
-        //return { Width : this.Width, Height : this.Height, WidthVisible : this.WidthVisible };
     },
 
     Is_RealContent : function()
@@ -1646,10 +1626,8 @@ ParaNewLine.prototype =
             {
                 case break_Line:
                 {
-                    var oldFont = Context.GetFont();
                     Context.SetFont( {FontFamily: { Name : "Wingdings 3", Index : -1 }, FontSize: 10, Italic: false, Bold : false} );
                     Context.FillText( X, Y, String.fromCharCode( 0x0038/*0x21B5*/ ) );
-                    Context.SetFont( oldFont );
                     break;
                 }
                 case break_Page:
@@ -1663,8 +1641,6 @@ ParaNewLine.prototype =
                             PageBreak_String += "PageBreak";
                     }
 
-                    var oldFont = Context.GetFont();
-
                     var OldColor = Common_CopyObj( Context.m_oBrush.Color1 );
                     Context.b_color1( 0, 0 , 0, 255);
 
@@ -1675,9 +1651,8 @@ ParaNewLine.prototype =
                         Context.FillText( X, Y, PageBreak_String[Index] );
                         X += g_oTextMeasurer.Measure( PageBreak_String[Index] ).Width;
                     }
-                    Context.SetFont( oldFont );
+
                     Context.b_color1( OldColor.R, OldColor.G, OldColor.B, OldColor.A);
-                    g_oTextMeasurer.SetFont( oldFont );
                     break;
                 }
             }
@@ -1693,10 +1668,8 @@ ParaNewLine.prototype =
                 this.Width  = 0;
                 this.Height = 0;
 
-                var oldFont = Context.GetFont();
                 Context.SetFont( {FontFamily: { Name : "Wingdings 3", Index : -1 }, FontSize: 10, Italic: false, Bold : false} );
                 var Temp = Context.Measure( String.fromCharCode( 0x0038 ) );
-                Context.SetFont( oldFont );
 
                 // Почему-то в шрифте Wingding 3 символ 0x0038 имеет неправильную ширину
                 this.WidthVisible = Temp.Width * 1.7;
@@ -1724,13 +1697,11 @@ ParaNewLine.prototype =
                     W += g_oTextMeasurer.Measure( PageBreak_String[Index] ).Width;
                 g_oTextMeasurer.SetFont( oldFont );
 
-
                 this.WidthVisible = W;
+
                 break;
             }
         }
-
-        //return { Width : this.Width, Height : this.Height , WidthVisible : this.WidthVisible };
     },
 
     Is_RealContent : function()
@@ -1794,8 +1765,6 @@ ParaNewLineRendered.prototype =
         this.Width  = 0;
         this.Height = 0;
         this.WidthVisible = 0;
-
-        //return { Width : this.Width, Height : this.Height, WidthVisible : this.WidthVisible };
     },
 
     Is_RealContent : function()
@@ -1832,8 +1801,6 @@ ParaInlineBreak.prototype =
         this.Width  = 0;
         this.Height = 0;
         this.WidthVisible = 0;
-
-        //return { Width : this.Width, Height : this.Height, WidthVisible : this.WidthVisible };
     },
 
     Is_RealContent : function()
@@ -1870,8 +1837,6 @@ ParaPageBreakRenderer.prototype =
         this.Width        = 0;
         this.Height       = 0;
         this.WidthVisible = 0;
-
-        //return { Width : this.Width, Height : this.Height, WidthVisible : this.WidthVisible };
     },
 
     Is_RealContent : function()
@@ -1913,8 +1878,6 @@ ParaEmpty.prototype =
         this.Width        = 0;
         this.Height       = 0;
         this.WidthVisible = 0;
-
-        //return { Width : this.Width, Height : this.Height, WidthVisible : this.WidthVisible };
     },
 
     Is_RealContent : function()
@@ -1984,8 +1947,6 @@ ParaNumbering.prototype =
         this.WidthNum     = Temp.Width;
         this.WidthSuff    = 0;
         this.Height       = Temp.Ascent; // Это не вся высота, а только высота над BaseLine
-
-        //return { Width : this.Width, Height : this.Height, WidthVisible : this.WidthVisible };
     },
 
     Is_RealContent : function()
@@ -2033,30 +1994,23 @@ ParaTab.prototype =
         {
             var X0 = this.Width / 2 - this.RealWidth / 2;
 
-            var oldFont = Context.GetFont();
             Context.SetFont( {FontFamily: { Name : "Wingdings 3", Index : -1 }, FontSize: 10, Italic: false, Bold : false} );
 
             if ( X0 > 0 )
                 Context.FillText2( X + X0, Y, String.fromCharCode( tab_Symbol ), 0, this.Width );
             else
                 Context.FillText2( X, Y, String.fromCharCode( tab_Symbol ), this.RealWidth - this.Width, this.Width );
-
-            Context.SetFont( oldFont );
         }
     },
 
     Measure : function (Context)
     {
-        var oldFont = Context.GetFont();
         Context.SetFont( {FontFamily: { Name : "Wingdings 3", Index : -1 }, FontSize: 10, Italic: false, Bold : false} );
         this.RealWidth = Context.Measure( String.fromCharCode( tab_Symbol ) ).Width;
-        Context.SetFont( oldFont );
 
         this.Width        = 0;
         this.Height       = 0;
         this.WidthVisible = 0;
-
-        //return { Width : this.Width, Height : this.Height, WidthVisible : this.WidthVisible };
     },
 
     Is_RealContent : function()
@@ -2747,9 +2701,6 @@ CAnchorPosition.prototype =
         return Value;
     }
 };
-
-
-
 
 var WRAPPING_TYPE_NONE = 0x00;
 var WRAPPING_TYPE_SQUARE = 0x01;
@@ -5886,8 +5837,9 @@ ParaPageNum.prototype =
 
         var sValue = "" + (Value + 1);
 
-        var oldFont = g_oTextMeasurer.GetFont();
-        g_oTextMeasurer.SetFont( Context.GetFont() );
+        g_oTextMeasurer.SetTextPr( Context.GetTextPr() );
+        g_oTextMeasurer.SetFontSlot( fontslot_ASCII );
+
         var RealWidth = 0;
         for ( var Index = 0; Index < sValue.length; Index++ )
         {
@@ -5923,8 +5875,6 @@ ParaPageNum.prototype =
             Context.FillText( _X, _Y, Char );
             _X += g_oTextMeasurer.Measure( Char ).Width;
         }
-
-        g_oTextMeasurer.SetFont( oldFont );
     },
 
     Measure : function (Context)
@@ -5943,8 +5893,6 @@ ParaPageNum.prototype =
         this.Width        = Width;
         this.Height       = 0;
         this.WidthVisible = Width;
-
-        //return { Width : this.Width, Height : this.Height, WidthVisible : this.WidthVisible };
     },
 
     Document_CreateFontCharMap : function(FontCharMap)
@@ -6061,8 +6009,6 @@ ParaHyperlinkStart.prototype =
         this.Width        = 0;
         this.Height       = 0;
         this.WidthVisible = 0;
-
-        //return { Width : 0, Height : 0, WidthVisible : 0 };
     },
 
     Is_RealContent : function()
@@ -6303,8 +6249,6 @@ ParaHyperlinkEnd.prototype =
         this.Width        = 0;
         this.Height       = 0;
         this.WidthVisible = 0;
-
-        //return { Width : 0, Height : 0, WidthVisible : 0 };
     },
 
     Is_RealContent : function()
@@ -6347,7 +6291,6 @@ ParaCollaborativeChangesStart.prototype =
         this.Height       = 0;
         this.WidthVisible = 0;
 
-        //return { Width : this.Width, Height : this.Height, WidthVisible : this.WidthVisible };
     },
 
     Is_RealContent : function()
@@ -6384,8 +6327,6 @@ ParaCollaborativeChangesEnd.prototype =
         this.Width        = 0;
         this.Height       = 0;
         this.WidthVisible = 0;
-
-        //return { Width : this.Width, Height : this.Height, WidthVisible : this.WidthVisible };
     },
 
     Is_RealContent : function()
@@ -6424,7 +6365,6 @@ ParaCommentStart.prototype =
         this.Height       = 0;
         this.WidthVisible = 0;
 
-        //return { Width : this.Width, Height : this.Height, WidthVisible : this.WidthVisible };
     },
 
     Is_RealContent : function()
@@ -6469,8 +6409,6 @@ ParaCommentEnd.prototype =
         this.Width        = 0;
         this.Height       = 0;
         this.WidthVisible = 0;
-
-        //return { Width : this.Width, Height : this.Height, WidthVisible : this.WidthVisible };
     },
 
     Is_RealContent : function()
@@ -6523,8 +6461,6 @@ ParaPresentationNumbering.prototype =
 
         this.Width        = Temp.Width;
         this.WidthVisible = Temp.Width;
-
-        //return { Width : this.Width, Height : this.Height, WidthVisible : this.WidthVisible };
     },
 
     Is_RealContent : function()

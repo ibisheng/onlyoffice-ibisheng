@@ -66,6 +66,7 @@ var historyitem_TextPr_Caps       = 14; // Изменяем все буквы н
 var historyitem_TextPr_SmallCaps  = 15; // Изменяем все буквы на малые прописные
 var historyitem_TextPr_Position   = 16; // Изменяем вертикальное положение
 var historyitem_TextPr_Value      = 17; // Изменяем целиком все настройки
+var historyitem_TextPr_RFonts     = 18; // Изменяем настройки шрифтов
 
 // Типы изменений в классе ParaDrawing
 var historyitem_Drawing_Size              = 1; // Изменяем размер картинки

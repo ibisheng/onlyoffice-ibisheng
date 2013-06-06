@@ -5635,7 +5635,7 @@ CDocumentContent.prototype =
         }
     },
 
-    Selection_Draw_Page : function(Page_abs)
+    Selection_Draw_Page : function(Page_abs, bStart, bEnd)
     {
         var CurPage = Page_abs - this.Get_StartPage_Absolute();
         if ( CurPage < 0 || CurPage >= this.Pages.length )
@@ -5664,7 +5664,9 @@ CDocumentContent.prototype =
 
                     for ( var Index = Start; Index <= End; Index++ )
                     {
-                        this.Content[Index].Selection_Draw_Page(Page_abs);
+                        var _bStart = ( true === bStart && Index === Start ? true : false )
+                        var _bEnd   = ( true === bEnd   && Index === End   ? true : false )
+                        this.Content[Index].Selection_Draw_Page(Page_abs, _bStart, _bEnd);
                     }
 
                     break;
@@ -5674,10 +5676,12 @@ CDocumentContent.prototype =
                     if ( null == this.Selection.Data )
                         break;
 
-                    for ( var Index = 0; Index < this.Selection.Data.length; Index++ )
+                    var Count = this.Selection.Data.length;
+
+                    for ( var Index = 0; Index < Count; Index++ )
                     {
                         if ( this.Selection.Data[Index] <= Pos_end && this.Selection.Data[Index] >= Pos_start )
-                            this.Content[this.Selection.Data[Index]].Selection_Draw_Page(Page_abs);
+                            this.Content[this.Selection.Data[Index]].Selection_Draw_Page(Page_abs, ( true === bStart && 0 === Index ? true : false ), ( true === bEnd && Count - 1 === Index ? true : false ) );
                     }
 
                     break;

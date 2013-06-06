@@ -5940,6 +5940,7 @@ CDocument.prototype =
     // Рисуем селект
     Selection_Draw : function()
     {
+        return;
         // Работаем с колонтитулом
         if ( docpostype_HdrFtr === this.CurPos.Type )
         {
@@ -6097,7 +6098,9 @@ CDocument.prototype =
 
                     for ( var Index = Start; Index <= End; Index++ )
                     {
-                        this.Content[Index].Selection_Draw_Page(Page_abs);
+                        var bStart = ( Start === Index ? true : false );
+                        var bEnd   = ( End   === Index ? true : false );
+                        this.Content[Index].Selection_Draw_Page(Page_abs, bStart, bEnd);
                     }
 
                     if ( Page_abs >= 2 && End < this.Pages[Page_abs - 2].EndPos )
@@ -6113,10 +6116,11 @@ CDocument.prototype =
                     if ( null == this.Selection.Data )
                         break;
 
-                    for ( var Index = 0; Index < this.Selection.Data.length; Index++ )
+                    var Count = this.Selection.Data.length;
+                    for ( var Index = 0; Index < Count; Index++ )
                     {
                         if ( this.Selection.Data[Index] <= Pos_end && this.Selection.Data[Index] >= Pos_start )
-                            this.Content[this.Selection.Data[Index]].Selection_Draw_Page(Page_abs);
+                            this.Content[this.Selection.Data[Index]].Selection_Draw_Page(Page_abs, ( 0 === Index ? true : false ), ( Count - 1 === Index ? true : false ) );
                     }
 
                     if ( Page_abs >= 2 && this.Selection.Data[this.Selection.Data.length - 1] < this.Pages[Page_abs - 2].EndPos )
