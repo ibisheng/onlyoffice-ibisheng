@@ -3193,6 +3193,7 @@ function StartTrackNewShape(graphicObjects, beginArrow, endArrow)
         var shape = new WordShape(Drawing, this.graphicObjects.document, this.graphicObjects.drawingDocument, null);
         Drawing.Set_GraphicObject(shape);
         Drawing.Set_WrappingType(WRAPPING_TYPE_NONE);
+        Drawing.Set_Distance( 3.2,  0,  3.2, 0 );
         shape.init(this.graphicObjects.currentPresetGeom, _offset_x, _offset_y, _ext_x, _ext_y, false, false, false, false/*track_obj.beginFlag, track_obj.endFlag TODO*/);
         var near_pos = this.graphicObjects.document.Get_NearestPos(this.graphicObjects.startTrackPos.pageIndex, x, y, true, Drawing);
         if(near_pos!= null && false === this.graphicObjects.document.Document_Is_SelectionLocked(changestype_None, {Type : changestype_2_Element_and_Type , Element : near_pos.Paragraph, CheckType : changestype_Paragraph_Content} ) && false === editor.isViewMode)
@@ -3203,6 +3204,7 @@ function StartTrackNewShape(graphicObjects, beginArrow, endArrow)
             var shape = new WordShape(Drawing, this.graphicObjects.document, this.graphicObjects.drawingDocument, null);
             Drawing.Set_GraphicObject(shape);
             Drawing.Set_WrappingType(WRAPPING_TYPE_NONE);
+            Drawing.Set_Distance( 3.2,  0,  3.2, 0 );
             shape.init(this.graphicObjects.currentPresetGeom, _offset_x, _offset_y, _ext_x, _ext_y, false, false, false, false/*track_obj.beginFlag, track_obj.endFlag TODO*/);
 
 
@@ -3269,6 +3271,7 @@ function TrackNewShape(graphicObjects, beginArrow, endArrow)
         var shape = new WordShape(Drawing, this.graphicObjects.document, this.graphicObjects.drawingDocument, null);
         Drawing.Set_GraphicObject(shape);
         Drawing.Set_WrappingType(WRAPPING_TYPE_NONE);
+        Drawing.Set_Distance( 3.2,  0,  3.2, 0 );
         shape.init(track_obj.presetGeom, track_obj.posX, track_obj.posY, track_obj.extX, track_obj.extY, track_obj.flipH, track_obj.flipV, this.beginArrow, this.endArrow);
         var near_pos =  this.graphicObjects.document.Get_NearestPos(this.graphicObjects.startTrackPos.pageIndex, object_bounds.l, object_bounds.t, true, Drawing);
 
@@ -3280,6 +3283,7 @@ function TrackNewShape(graphicObjects, beginArrow, endArrow)
             var shape = new WordShape(Drawing, this.graphicObjects.document, this.graphicObjects.drawingDocument, null);
             Drawing.Set_GraphicObject(shape);
             Drawing.Set_WrappingType(WRAPPING_TYPE_NONE);
+            Drawing.Set_Distance( 3.2,  0,  3.2, 0 );
             shape.init(track_obj.presetGeom, track_obj.posX, track_obj.posY, track_obj.extX, track_obj.extY, track_obj.flipH, track_obj.flipV, this.beginArrow, this.endArrow);
             this.graphicObjects.arrTrackObjects[0].endTrack();
 
@@ -3431,6 +3435,7 @@ function TrackTextRect(graphicObjects)
             var shape = new WordShape(Drawing, this.graphicObjects.document, this.graphicObjects.drawingDocument, null);
             Drawing.Set_GraphicObject(shape);
             Drawing.Set_WrappingType(WRAPPING_TYPE_NONE);
+            Drawing.Set_Distance( 3.2,  0,  3.2, 0 );
             shape.init2(track_obj.presetGeom, track_obj.posX, track_obj.posY, track_obj.extX, track_obj.extY, track_obj.flipH, track_obj.flipV, false, false/*track_obj.beginFlag, track_obj.endFlag TODO*/);
             near_pos.Page = this.graphicObjects.startTrackPos.pageIndex;
             Drawing.Set_XYForAdd(track_obj.posX, track_obj.posY);
