@@ -5841,7 +5841,7 @@
 						if (!isSelectMode)
 							this._trigger("selectionChanged", this.getSelectionInfo());
 					} else {
-						// ToDo смена диапазона
+						// Смена диапазона
 						this._trigger("selectionRangeChanged", this.getSelectionRangeValue());
 					}
 				}
@@ -5982,7 +5982,7 @@
 						if (!isSelectMode)
 							this._trigger("selectionChanged", this.getSelectionInfo(false));
 					} else {
-						// ToDo смена диапазона
+						// Смена диапазона
 						this._trigger("selectionRangeChanged", this.getSelectionRangeValue());
 					}
 				}
