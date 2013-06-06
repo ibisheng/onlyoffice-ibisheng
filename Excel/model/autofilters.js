@@ -1501,13 +1501,16 @@
 				{
 					for(var i in customStyles)
 					{
-						result[n] = 
+						if(customStyles[i].table)
 						{
-							name: i,
-							type: 'custom',
-							image: this._drawSmallIconTable(canvas,customStyles[i])
-						};
-						n++;
+							result[n] = 
+							{
+								name: i,
+								type: 'custom',
+								image: this._drawSmallIconTable(canvas,customStyles[i])
+							};
+							n++;
+						}
 					}
 				}
 				var defaultStyles = wb.TableStyles.DefaultStyles;
@@ -1515,13 +1518,16 @@
 				{
 					for(var i in defaultStyles)
 					{
-						result[n] = 
+						if(defaultStyles[i].table)
 						{
-							name: i,
-							type: 'default',
-							image: this._drawSmallIconTable(canvas,defaultStyles[i])
-						};
-						n++;
+							result[n] = 
+							{
+								name: i,
+								type: 'default',
+								image: this._drawSmallIconTable(canvas,defaultStyles[i])
+							};
+							n++;
+						}
 					}
 				}
 				return result;
