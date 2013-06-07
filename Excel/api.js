@@ -561,10 +561,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				ws.sortColFilter(type,cellId);
 			},
 			
-			asc_getAutoFilterOptions: function(nameOption)
+			asc_getAddFormatTableOptions: function()
 			{
 				var ws = this.wb.getWorksheet();
-				var result = ws.getAutoFilterOptions(nameOption);
+				var result = ws.getAddFormatTableOptions();
 				return result;
 			},
 			

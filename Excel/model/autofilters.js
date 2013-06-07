@@ -167,6 +167,23 @@
 			asc_getSortState : function() { return this.sortVal; }
 		};
 		
+		function AddFormatTableOptions () {
+
+			if ( !(this instanceof AddFormatTableOptions) ) {return new AddFormatTableOptions();};
+
+			this.range = null;
+			this.isTitle = null;
+			return this;
+		};
+
+		AddFormatTableOptions.prototype = {
+			constructor: AddFormatTableOptions,
+			asc_setRange : function(range) { this.range = range;},
+			asc_setIsTitle : function(isTitle) { this.isTitle = isTitle;},
+
+			asc_getRange : function() { return this.range; },
+			asc_getIsTitle : function() { return this.isTitle; }
+		};
 		
 		/** @constructor */
 		function AutoFilters() {
@@ -1753,42 +1770,41 @@
 				return false;
 			},
 			
-			getAutoFilterOptions: function(ws, nameOption, activeCells)
+			getAddFormatTableOptions: function(ws,activeCells)
 			{
 				var aWs = this._getCurrentWS(ws);
-				switch(nameOption)
+				var objOptions = new AddFormatTableOptions();
+				/*var isMAddFilter = this._searchFilters(activeCells,false,ws,aWs);
+				if(isMAddFilter == "error")
+					return isMAddFilter;//нельзя применять к этому диапазону форматированную таблицы
+				if(aWs.TableParts)
 				{
-					case "isApplyFormatTable"://применена ли к выделенному диапазону форматированная таблица. возвращаем либо называние стиля(чтобы подсвечивать в менб миниатюры), либо false
+					for(var i = 0; i < aWs.TableParts.length; i++)
 					{
-						var isMAddFilter = this._searchFilters(activeCells,false,ws,aWs);
-						if(isMAddFilter == "error")
-							return isMAddFilter;//нельзя применять к этому диапазону форматированную таблицы
-						if(aWs.TableParts)
-						{
-							for(var i = 0; i < aWs.TableParts.length; i++)
-							{
-								var ref = aWs.TableParts[i].Ref.split(":");
-								var startRange = this._idToRange(ref[0]);
-								var endRange = this._idToRange(ref[1]);
-								var tableRange = new Asc.Range(startRange.c1, startRange.r1, endRange.c1, endRange.r1);
-								if(activeCells.c1 >= tableRange.c1 && activeCells.c2 <= tableRange.c2 && activeCells.r1 >= tableRange.r1 && activeCells.r2 <= tableRange.r2)
-									return aWs.TableParts[i].TableStyleInfo.Name;//посылаемназвание стиля, чтобы подсветитьь его в меню
-							}
-						}
-						return false;//к данному диапазону не применены форматированные таблицы и конфликтов с другими фильтрами нет
-					}	
-					case "getRangeNewFilter"://получаем предварительный диапазон перед открытием диалогового окна создания форматированной таблицы
-					{
-						var mainAdjacentCells;
-						if(activeCells.r1 == activeCells.r2 && activeCells.c1 == activeCells.c2)//если ячейка выделенная одна
-							mainAdjacentCells = this._getAdjacentCellsAF(activeCells,ws,aWs);
-						else//выделено > 1 ячейки
-							mainAdjacentCells = Asc.clone(activeCells);
-						var firstCellId = this._rangeToId(mainAdjacentCells); 
-						var endCellId = this._rangeToId({r1: mainAdjacentCells.r2, c1: mainAdjacentCells.c2, r2: mainAdjacentCells.r2, c2: mainAdjacentCells.c2}); 
-						return firstCellId + ":" + endCellId
+						var ref = aWs.TableParts[i].Ref.split(":");
+						var startRange = this._idToRange(ref[0]);
+						var endRange = this._idToRange(ref[1]);
+						var tableRange = new Asc.Range(startRange.c1, startRange.r1, endRange.c1, endRange.r1);
+						if(activeCells.c1 >= tableRange.c1 && activeCells.c2 <= tableRange.c2 && activeCells.r1 >= tableRange.r1 && activeCells.r2 <= tableRange.r2)
+							return aWs.TableParts[i].TableStyleInfo.Name;//посылаем название стиля, чтобы подсветитьь его в меню
 					}
 				}
+				return false;//к данному диапазону не применены форматированные таблицы и конфликтов с другими фильтрами нет*/
+				
+				var isTitle = this._isAddNameColumn(ws, activeCells);
+				objOptions.asc_setIsTitle(isTitle);
+				
+				var mainAdjacentCells;
+				if(activeCells.r1 == activeCells.r2 && activeCells.c1 == activeCells.c2)//если ячейка выделенная одна
+					mainAdjacentCells = this._getAdjacentCellsAF(activeCells,ws,aWs);
+				else//выделено > 1 ячейки
+					mainAdjacentCells = Asc.clone(activeCells);
+				var firstCellId = this._rangeToId(mainAdjacentCells); 
+				var endCellId = this._rangeToId({r1: mainAdjacentCells.r2, c1: mainAdjacentCells.c2, r2: mainAdjacentCells.r2, c2: mainAdjacentCells.c2}); 
+				var sListName = ws.model.getName();
+				var ref = sListName + "!" + firstCellId + ":" + endCellId;
+				objOptions.asc_setRange(ref);
+				return objOptions;
 			},
 			
 			//при закрытии диалогового окна числового фильтра
@@ -4778,7 +4794,7 @@
 						}
 					}
 				}
-				return true;
+				return result;
 			},
 			
 			_reDrawCurrentFilter: function(ws,fColumns, result, tableParts)
@@ -5008,6 +5024,12 @@
 		prot["asc_getVisible"]					= prot.asc_getVisible;
 		prot["asc_setVal"]						= prot.asc_setVal;
 		prot["asc_setVisible"]					= prot.asc_setVisible;
-
+		
+		window["Asc"]["AddFormatTableOptions"]	= window["Asc"].AddFormatTableOptions = AddFormatTableOptions;
+		prot									= AddFormatTableOptions.prototype;
+		prot["asc_getRange"]					= prot.asc_getRange;
+		prot["asc_getIsTitle"]					= prot.asc_getIsTitle;
+		prot["asc_setRange"]					= prot.asc_setRange;
+		prot["asc_setIsTitle"]					= prot.asc_setIsTitle;
 	}
 )(jQuery, window);

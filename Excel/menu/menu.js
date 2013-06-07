@@ -1,7 +1,6 @@
 ﻿$(function () {
 	var  IsVisibleMenu = false, elem, contextGrad, gradient, gradSelectPosTop = 1, imgd, pix, colorSelecterClick, newColorSelected={r:255,g:0,b:0},lastColorSelected={r:255,g:0,b:0};
 	var autoFilterObj;
-	var ref;
 	
 	var docTitle = window.location.toString().match(/&title=([^&]+)&/);
 	if (docTitle) {
@@ -478,6 +477,10 @@
 		$("#chartRange").val(val);
 	});
 
+	api.asc_registerCallback("asc_onSelectionRangeChanged", function (val) {
+		$("#formatTableRange").val(val);
+	});
+	
 	api.asc_Init("../Fonts/");
 	//api.asc_setViewerMode(true);
 
@@ -858,19 +861,17 @@
 			case "td_auto_filter_local":{
 				//в случае если применен фильтр с форматированной таблицей или форматированная таблица не показываем диалоговое окно и сразу вызываем функцию
 				var defaultStyle = "TableStyleLight2";
-				var isApplyFormatTable = api.asc_getAutoFilterOptions("isApplyFormatTable");
-				if(isApplyFormatTable)
-					api.asc_addAutoFilter(defaultStyle);
-				else if(isApplyFormatTable == "error")
-				{
-					return;
-				}
+				var addFilterOptions = api.asc_getAddFormatTableOptions();
+				//открываем диалоговое окно
+				var range = addFilterOptions.asc_getRange();
+				var isTitle = addFilterOptions.asc_getIsTitle();
+				var isTitleElem = $("#addFilterDialog").find('#isTitle');
+				if(isTitle)//в таком случае не ставим галочку
+					isTitleElem.attr('checked',false);
 				else
-				{
-					ref = api.asc_getAutoFilterOptions("getRangeNewFilter");
-					//открываем диалоговое окно
-					$("#addFilterDialog").dialog("open");
-				}
+					isTitleElem.attr('checked',true);
+				$("#addFilterDialog").find('#formatTableRange').val(range);
+				$("#addFilterDialog").dialog("open");
 				break;
 			}
 		}
@@ -2234,6 +2235,21 @@
 
 		bIsReopenDialog = false;
 	});
+	/*$("#changeRangeFormatTable").click(function () {
+		bIsReopenDialog = true;
+		var selector = $(this);
+		var chartForm = $("#addFilterDialog");
+		if (selector.hasClass("ToolbarChangeRange")) {
+			selector.removeClass("ToolbarChangeRange").addClass("ToolbarChangeRange2");
+			chartForm.find("#titleArea").hide();
+			chartForm.dialog("close").dialog("open");
+		} else {
+			selector.removeClass("ToolbarChangeRange2").addClass("ToolbarChangeRange");
+			chartForm.find("#titleArea").show();
+			chartForm.dialog("close").dialog("open");
+		}
+		bIsReopenDialog = false;
+	});*/
 
 	$("#autoFilterCancel").click(function() { $('#MenuAutoFilter').hide(); });
 	$("#autoFilterOk").click(function() {
@@ -2314,11 +2330,11 @@
 	});
 	$("#addFilterDialog").dialog({ autoOpen: false, closeOnEscape: false, dialogClass: 'dialogClass',
 		open: function() { 
-			$('#ref').val(ref)
+			api.asc_setSelectDialogRangeMode(true);
 			aDialogNames.push("addFilterDialog"); 
 		},
-		close: function() { aDialogNames.pop(); },
-		resizable: false, modal: true, width: '350px',
+		close: function() { aDialogNames.pop(); api.asc_setSelectDialogRangeMode(false);},
+		resizable: false, modal: false, width: '350px',
 		buttons: [
 			{
 				text: 'Ok',

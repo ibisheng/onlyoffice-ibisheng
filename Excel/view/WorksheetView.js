@@ -9087,11 +9087,11 @@
 				}
 			},
 			
-			getAutoFilterOptions: function(nameOption)
+			getAddFormatTableOptions: function(nameOption)
 			{
 				var ar = this.activeRange.clone(true);
 				var t = this;
-				var result = t.autoFilters.getAutoFilterOptions(t, nameOption, ar);
+				var result = t.autoFilters.getAddFormatTableOptions(t, ar);
 				return result;
 			},
 
