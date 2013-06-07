@@ -7244,9 +7244,6 @@ Paragraph.prototype =
     {
         if ( true === this.Selection.Use || true === this.ApplyToAll )
         {
-            if ( pararecalc_0_None != this.RecalcInfo.Recalc_0_Type )
-                this.Internal_Recalculate_0();
-
             var StartPos = this.Selection.StartPos;
             var EndPos   = this.Selection.EndPos;
 
@@ -9084,8 +9081,7 @@ Paragraph.prototype =
     Document_Get_AllFontNames : function(AllFonts)
     {
         // Смотрим на знак конца параграфа
-        if ( undefined != this.TextPr.Value.FontFamily )
-            AllFonts[this.TextPr.Value.FontFamily.Name] = true;
+        this.TextPr.Value.Document_Get_AllFontNames( AllFonts );
 
         var Count = this.Content.length;
         for ( var Index = 0; Index < Count; Index++ )
@@ -9093,8 +9089,7 @@ Paragraph.prototype =
             var Item = this.Content[Index];
             if ( para_TextPr === Item.Type )
             {
-                if ( undefined != Item.Value.FontFamily )
-                    AllFonts[Item.Value.FontFamily.Name] = true;
+                Item.Value.Document_Get_AllFontNames( AllFonts );
             }
             else if ( para_Drawing === Item.Type )
             {

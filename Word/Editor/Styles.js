@@ -4914,6 +4914,21 @@ CTextPr.prototype =
         }
 
         return dFontKoef;
+    },
+
+    Document_Get_AllFontNames : function(AllFonts)
+    {
+        if ( undefined != this.RFonts.Ascii )
+            AllFonts[this.RFonts.Ascii.Name] = true;
+
+        if ( undefined != this.RFonts.HAnsi )
+            AllFonts[this.RFonts.HAnsi.Name] = true;
+
+        if ( undefined != this.RFonts.EastAsia )
+            AllFonts[this.RFonts.EastAsia.Name] = true;
+
+        if ( undefined != this.RFonts.CS )
+            AllFonts[this.RFonts.CS.Name] = true;
     }
 }
 
