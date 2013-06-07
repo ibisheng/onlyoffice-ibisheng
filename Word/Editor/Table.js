@@ -2790,25 +2790,16 @@ CTable.prototype =
 
         // Определим какие строки попадают на данную страницу
         var Row_start = this.Pages[PNum].FirstRow;
-        var Row_last  = Row_start;
+        var Row_last  = this.Pages[PNum].LastRow;
 
-        if ( PNum + 1 < this.Pages.length )
-        {
-            Row_last = this.Pages[PNum + 1].FirstRow;
-
-            // Возможно, на данной странице строку, с которой началось разбиение на стрнице,
-            // не надо рисовать. (Если начальная и конечная строки совпадают, тогда это 2
-            // или более страница данной строки)
-            if ( (Row_start != Row_last || ( 0 === Row_start && 0 === Row_last ) ) && false === this.RowsInfo[Row_last].FirstPage )
-                Row_last--;
-        }
-        else
-            Row_last = this.Content.length - 1;
+        // Возможно, на данной странице строку, с которой началось разбиение на странице,
+        // не надо рисовать. (Если начальная и конечная строки совпадают, тогда это 2
+        // или более страница данной строки)
+        if ( (Row_start != Row_last || ( 0 === Row_start && 0 === Row_last ) ) && false === this.RowsInfo[Row_last].FirstPage )
+            Row_last--;
 
         if ( Row_last < Row_start )
             return -1;
-
-        var TableBorders = this.Get_Borders();
 
         var bIsSmartGrForcing = false;
         if (pGraphics.StartCheckTableDraw)
@@ -6585,8 +6576,6 @@ CTable.prototype =
         this.DrawingDocument.TargetShow();
         this.CurCell.Content.Cursor_MoveAt( X, Y, false, true, PageIndex + this.Get_StartPage_Absolute() );
         this.RecalculateCurPos();
-
-        //this.Internal_Update_TableMarkup( Pos.Row, Pos.Cell, PageNum );
     },
 
     Selection_SetStart : function( X, Y, PageIndex, MouseEvent )
@@ -7192,9 +7181,6 @@ CTable.prototype =
             this.Selection.Type = table_Selection_Cell;
             this.Internal_Selection_UpdateCells();
         }
-
-        //if ( MouseEvent.Type === g_mouse_event_type_up && true === this.Parent.Selection_Is_OneElement() )
-        //    this.Internal_Update_TableMarkup( this.Selection.EndPos.Pos.Row, this.Selection.EndPos.Pos.Cell, PageNum );
     },
 
     Selection_Stop : function( X, Y, PageIndex, MouseEvent )
@@ -10012,8 +9998,6 @@ CTable.prototype =
                 break;
         }
 
-        //this.Internal_Update_TableMarkup( Pos_tl.Row, Pos_tl.Cell, PageNum );
-
         this.Internal_Recalculate_1();
 
         // Выделяем полученную ячейку
@@ -11288,7 +11272,6 @@ CTable.prototype =
         }
 
         this.Internal_Recalculate_1();
-        this.Internal_Update_TableMarkup( this.Markup.Internal.RowIndex, this.Markup.Internal.CellIndex, this.Markup.Internal.PageNum );
         this.Internal_OnContentRecalculate( true, 0, this.Index );
         editor.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
     },
@@ -12558,8 +12541,6 @@ CTable.prototype =
         this.TurnOffRecalc = false;
 
         this.Bounds = this.Pages[this.Pages.length - 1].Bounds;
-
-        //this.Internal_Update_TableMarkup( this.Markup.Internal.RowIndex, this.Markup.Internal.CellIndex, this.Markup.Internal.PageNum );
     },
 
     Internal_Recalculate_Header : function()
