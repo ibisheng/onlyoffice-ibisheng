@@ -182,24 +182,8 @@ CStyle.prototype =
 
     Document_Get_AllFontNames : function(AllFonts)
     {
-        if ( undefined != this.TextPr && undefined != this.TextPr.FontFamily )
-            AllFonts[this.TextPr.FontFamily.Name] = true;
-
-        if ( undefined != this.TextPr && undefined != this.TextPr.RFonts )
-        {
-            var _rfonts = this.TextPr.RFonts;
-            if (!_rfonts)
-                return;
-
-            if (_rfonts.Ascii)
-                AllFonts[_rfonts.Ascii.Name] = true;
-            if (_rfonts.HAnsi)
-                AllFonts[_rfonts.HAnsi.Name] = true;
-            if (_rfonts.CS)
-                AllFonts[_rfonts.CS.Name] = true;
-            if (_rfonts.EastAsia)
-                AllFonts[_rfonts.EastAsia.Name] = true;
-        }
+        if ( undefined != this.TextPr )
+            this.TextPr.Document_Get_AllFontNames(AllFonts);
     },
 
     Create_Default_Paragraph : function()
@@ -2603,8 +2587,7 @@ CStyles.prototype =
             Style.Document_Get_AllFontNames(AllFonts);
         }
 
-        if ( undefined != this.Default.TextPr.FontFamily )
-            AllFonts[this.Default.TextPr.FontFamily.Name] = true;
+        this.Default.TextPr.Document_Get_AllFontNames(AllFonts);
     },
 
     Get_AllTableStyles : function()
