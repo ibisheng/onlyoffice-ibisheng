@@ -940,7 +940,11 @@
 						result = [];
 						var startCol = sCell.first.col - 1;
 						var endCol = eCell.first.col - 1;
-						
+						//проверяем диапазон
+						if(ws.cols.length < eCell.first.col)
+							ws.expandColsOnScroll(false,true,eCell.first.col);
+						if(ws.rows.length < eCell.first.row)
+							ws.expandColsOnScroll(false,true,eCell.first.row);
 						for(var col = startCol; col <= endCol; col++)
 						{
 							var idCell = new CellAddress(sCell.first.row - 1, col, 0);
