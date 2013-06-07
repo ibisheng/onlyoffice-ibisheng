@@ -4912,6 +4912,59 @@ CTextPr.prototype =
 
         if ( undefined != this.RFonts.CS )
             AllFonts[this.RFonts.CS.Name] = true;
+    },
+
+    Document_CreateFontMap : function(FontMap)
+    {
+        var Style   = ( true === this.Bold   ? 1 : 0 ) + ( true === this.Italic   ? 2 : 0 );
+        var StyleCS = ( true === this.BoldCS ? 1 : 0 ) + ( true === this.ItalicCS ? 2 : 0 );
+        var Size    = this.FontSize;
+        var SizeCS  = this.FontSizeCS;
+
+        var RFonts = this.RFonts;
+        if ( undefined != RFonts.Ascii )
+        {
+            var Key = "" + RFonts.Ascii.Name + "_" + Style + "_" + Size;
+            FontMap[Key] =
+            {
+                Name  : RFonts.Ascii.Name,
+                Style : Style,
+                Size  : Size
+            };
+        }
+
+        if ( undefined != RFonts.EastAsia )
+        {
+            var Key = "" + RFonts.EastAsia.Name + "_" + Style + "_" + Size;
+            FontMap[Key] =
+            {
+                Name  : RFonts.EastAsia.Name,
+                Style : Style,
+                Size  : Size
+            };
+        }
+
+        if ( undefined != RFonts.HAnsi )
+        {
+            var Key = "" + RFonts.HAnsi.Name + "_" + Style + "_" + Size;
+            FontMap[Key] =
+            {
+                Name  : RFonts.HAnsi.Name,
+                Style : Style,
+                Size  : Size
+            };
+        }
+
+        if ( undefined != RFonts.CS )
+        {
+            var Key = "" + RFonts.CS.Name + "_" + StyleCS + "_" + SizeCS;
+            FontMap[Key] =
+            {
+                Name  : RFonts.CS.Name,
+                Style : StyleCS,
+                Size  : SizeCS
+            };
+        }
     }
 }
 

@@ -8952,24 +8952,10 @@ Paragraph.prototype =
             }
 
             var CurTextPr = this.CompiledPr.Pr.TextPr.Copy();
-            var Style = ( true === CurTextPr.Bold ? 1 : 0 ) + ( true === CurTextPr.Italic ? 2 : 0 );
-            var Key = "" + CurTextPr.FontFamily.Name + "_" + Style + "_" + CurTextPr.FontSize;
-            this.FontMap.Map[Key] =
-            {
-                Name  : CurTextPr.FontFamily.Name,
-                Style : Style,
-                Size  : CurTextPr.FontSize
-            };
+            CurTextPr.Document_CreateFontMap( this.FontMap.Map );
 
             CurTextPr.Merge( this.TextPr.Value );
-            var Style = ( true === CurTextPr.Bold ? 1 : 0 ) + ( true === CurTextPr.Italic ? 2 : 0 );
-            var Key = "" + CurTextPr.FontFamily.Name + "_" + Style + "_" + CurTextPr.FontSize;
-            this.FontMap.Map[Key] =
-            {
-                Name  : CurTextPr.FontFamily.Name,
-                Style : Style,
-                Size  : CurTextPr.FontSize
-            };
+            CurTextPr.Document_CreateFontMap( this.FontMap.Map );
 
             for ( var Index = 0; Index < this.Content.length; Index++ )
             {
@@ -8992,14 +8978,7 @@ Paragraph.prototype =
 
                     // Копируем прямые настройки
                     CurTextPr.Merge( _CurTextPr );
-                    Style = ( true === CurTextPr.Bold ? 1 : 0 ) + ( true === CurTextPr.Italic ? 2 : 0 );
-                    Key = "" + CurTextPr.FontFamily.Name + "_" + Style + "_" + CurTextPr.FontSize;
-                    this.FontMap.Map[Key] =
-                    {
-                        Name  : CurTextPr.FontFamily.Name,
-                        Style : Style,
-                        Size  : CurTextPr.FontSize
-                    };
+                    CurTextPr.Document_CreateFontMap( this.FontMap.Map );
                 }
             }
             this.FontMap.NeedRecalc = false;
