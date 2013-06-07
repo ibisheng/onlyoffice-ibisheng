@@ -234,6 +234,16 @@
 				var splitRange;
 				if(addNameColumn == undefined)
 					addNameColumn = true;
+				else
+				{
+					var objOpt = this.AddFormatTableOptions;
+					var ref;
+					if(objOpt)
+						ref = this.AddFormatTableOptions.asc_getRange();
+					var newRange = this._refToRange(ref);
+					if(newRange)
+						activeCells = newRange;
+				}
 				//callback
 				var onAddAutoFiltersCallback = function(success)
 				{
@@ -1808,6 +1818,7 @@
 				var sListName = ws.model.getName();
 				var ref = sListName + "!" + firstCellId + ":" + endCellId;
 				objOptions.asc_setRange(ref);
+				this.AddFormatTableOptions = objOptions;
 				return objOptions;
 			},
 			
@@ -4982,6 +4993,24 @@
 						}
 					}
 				}
+			},
+			
+			_refToRange: function(ref)
+			{
+				if(typeof ref != 'string')
+					return false;
+				var splitRef = ref.split("!");
+				if(splitRef[1])
+					ref = splitRef[1];
+				var parseRef = ref.split(":");
+				if(parseRef[0] && parseRef[1])
+				{
+					var startRange = this._idToRange(parseRef[0]);
+					var endRange = this._idToRange(parseRef[1]);
+					var range = Asc.Range(startRange.c1, startRange.r1, endRange.c1, endRange.r1);
+					return range;
+				}
+				return false;
 			}
 		};
 

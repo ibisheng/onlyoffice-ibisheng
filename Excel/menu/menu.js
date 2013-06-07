@@ -859,19 +859,7 @@
 				break;
 			}
 			case "td_auto_filter_local":{
-				//в случае если применен фильтр с форматированной таблицей или форматированная таблица не показываем диалоговое окно и сразу вызываем функцию
-				var defaultStyle = "TableStyleLight2";
-				var addFilterOptions = api.asc_getAddFormatTableOptions();
-				//открываем диалоговое окно
-				var range = addFilterOptions.asc_getRange();
-				var isTitle = addFilterOptions.asc_getIsTitle();
-				var isTitleElem = $("#addFilterDialog").find('#isTitle');
-				if(isTitle)//в таком случае не ставим галочку
-					isTitleElem.attr('checked',false);
-				else
-					isTitleElem.attr('checked',true);
-				$("#addFilterDialog").find('#formatTableRange').val(range);
-				$("#addFilterDialog").dialog("open");
+				showAddFilterDialog();
 				break;
 			}
 		}
@@ -2014,7 +2002,51 @@
 			}
 		}
 	}
-
+	
+	function showAddFilterDialog(){
+		var defaultStyle = "TableStyleLight2";
+		var addFilterDialog = $("#addFilterDialog");
+		var addFilterOptions = api.asc_getAddFormatTableOptions();
+		//открываем диалоговое окно
+		var range = addFilterOptions.asc_getRange();
+		var isTitle = addFilterOptions.asc_getIsTitle();
+		var isTitleElem = addFilterDialog.find('#isTitle');
+		if(isTitle)//в таком случае не ставим галочку
+			isTitleElem.attr('checked',false);
+		else
+			isTitleElem.attr('checked',true);
+		addFilterDialog.find('#formatTableRange').val(range);
+		//addFilterDialog.dialog("open");
+		
+		addFilterDialog.dialog({ autoOpen: false, closeOnEscape: false, dialogClass: 'dialogClass',
+			open: function() { 
+				api.asc_setSelectDialogRangeMode(true);
+				aDialogNames.push("addFilterDialog"); 
+			},
+			close: function() { aDialogNames.pop(); api.asc_setSelectDialogRangeMode(false);},
+			resizable: false, modal: false, width: '350px',
+			buttons: [
+				{
+					text: 'Ok',
+					click: function() {
+						var isTitle = true;
+						var defaultStyle = "TableStyleLight1";
+						if($('#isTitle')[0].checked)
+							isTitle = false;
+						addFilterOptions.asc_setRange(addFilterDialog.find('#formatTableRange').val());
+						api.asc_addAutoFilter(defaultStyle, isTitle);
+						$(this).dialog("close");
+					}
+				},
+				{
+					text: 'Cancel',
+					btCancel: "classButtonCancel",
+					click: function() { $(this).dialog("close"); }
+				}
+			]
+		});
+		addFilterDialog.dialog("open");
+	}
 	// Charts
 	function showChartDialog() {
 		var chart = api.asc_getChartObject();
@@ -2318,32 +2350,6 @@
 					
 					api.asc_applyAutoFilter(type,autoFilterObject); 
 					
-					$(this).dialog("close");
-				}
-			},
-			{
-				text: 'Cancel',
-				btCancel: "classButtonCancel",
-				click: function() { $(this).dialog("close"); }
-			}
-		]
-	});
-	$("#addFilterDialog").dialog({ autoOpen: false, closeOnEscape: false, dialogClass: 'dialogClass',
-		open: function() { 
-			api.asc_setSelectDialogRangeMode(true);
-			aDialogNames.push("addFilterDialog"); 
-		},
-		close: function() { aDialogNames.pop(); api.asc_setSelectDialogRangeMode(false);},
-		resizable: false, modal: false, width: '350px',
-		buttons: [
-			{
-				text: 'Ok',
-				click: function() {
-					var isTitle = false;
-					var defaultStyle = "TableStyleLight1";
-					if($('#isTitle')[0].checked)
-						isTitle = true;		
-					api.asc_addAutoFilter(defaultStyle, isTitle);
 					$(this).dialog("close");
 				}
 			},
