@@ -4371,6 +4371,21 @@ CGraphicObjects.prototype =
             }
 
 
+            cur_page_array = this.graphicPages[pageIndex].inlineObjects;
+            for(index = 0; index < cur_page_array.length; ++index)
+            {
+                if(!cur_page_array[index].isShapeChild())
+                {
+                    var b_hit_to_text_rect;
+                    if(cur_page_array[index].GraphicObj.isGroup())
+                        b_hit_to_text_rect = cur_page_array[index].hitToTextRect(x, y).hit;
+                    else
+                        b_hit_to_text_rect = cur_page_array[index].hitToTextRect(x, y);
+                    if( (cur_page_array[index].hit(x, y) || b_hit_to_text_rect))
+                        return DRAWING_ARRAY_TYPE_INLINE;
+                }
+            }
+
             cur_page_array = this.graphicPages[pageIndex].wrappingObjects;
             for(index = 0; index < cur_page_array.length; ++index)
             {
@@ -4385,6 +4400,8 @@ CGraphicObjects.prototype =
                         return DRAWING_ARRAY_TYPE_WRAPPING;
                 }
             }
+
+
 
             cur_page_array = this.graphicPages[pageIndex].behindDocObjects;
             for(index = 0; index < cur_page_array.length; ++index)
@@ -4401,20 +4418,7 @@ CGraphicObjects.prototype =
                 }
             }
 
-            cur_page_array = this.graphicPages[pageIndex].inlineObjects;
-            for(index = 0; index < cur_page_array.length; ++index)
-            {
-                if(!cur_page_array[index].isShapeChild())
-                {
-                    var b_hit_to_text_rect;
-                    if(cur_page_array[index].GraphicObj.isGroup())
-                        b_hit_to_text_rect = cur_page_array[index].hitToTextRect(x, y).hit;
-                    else
-                        b_hit_to_text_rect = cur_page_array[index].hitToTextRect(x, y);
-                    if( (cur_page_array[index].hit(x, y) || b_hit_to_text_rect))
-                        return DRAWING_ARRAY_TYPE_INLINE;
-                }
-            }
+
         }
         else
         {
@@ -4474,7 +4478,20 @@ CGraphicObjects.prototype =
                 }
 
 
+                cur_page_array = hdr_footer_objects.inlineArray;
+                for(index = 0; index < cur_page_array.length; ++index)
+                {
+                    if(!cur_page_array[index].isShapeChild())
+                    {
+                        if(cur_page_array[index].GraphicObj.isGroup())
+                            b_hit_to_text_rect = cur_page_array[index].hitToTextRect(x, y).hit;
+                        else
+                            b_hit_to_text_rect = cur_page_array[index].hitToTextRect(x, y);
 
+                        if(/*cur_page_array[index].Parent.Parent === documentContent &&*/ (cur_page_array[index].hit(x, y) || b_hit_to_text_rect))
+                            return DRAWING_ARRAY_TYPE_INLINE;
+                    }
+                }
 
                 cur_page_array = hdr_footer_objects.wrappingArray;
                 for(index = 0; index < cur_page_array.length; ++index)
@@ -4491,24 +4508,9 @@ CGraphicObjects.prototype =
                     }
                 }
 
-                cur_page_array = hdr_footer_objects.inlineArray;
 
-                for(index = 0; index < cur_page_array.length; ++index)
-                {
-                    if(!cur_page_array[index].isShapeChild())
-                    {
-                        if(cur_page_array[index].GraphicObj.isGroup())
-                            b_hit_to_text_rect = cur_page_array[index].hitToTextRect(x, y).hit;
-                        else
-                            b_hit_to_text_rect = cur_page_array[index].hitToTextRect(x, y);
-
-                        if(/*cur_page_array[index].Parent.Parent === documentContent &&*/ (cur_page_array[index].hit(x, y) || b_hit_to_text_rect))
-                            return DRAWING_ARRAY_TYPE_INLINE;
-                    }
-                }
 
                 cur_page_array = hdr_footer_objects.behindDocArray;
-
                 for(index = 0; index < cur_page_array.length; ++index)
                 {
                     if(!cur_page_array[index].isShapeChild())
