@@ -1387,7 +1387,9 @@ CDocument.prototype =
 
 
         var Count = this.Content.length;
-        for ( var Index = this.Pages[nPageIndex].Pos; Index < Count; Index++ )
+        var Page_StartPos = this.Pages[nPageIndex].Pos;
+        var Page_EndPos   = this.Pages[nPageIndex].EndPos;
+        for ( var Index = Page_StartPos; Index <= Page_EndPos; Index++ )
         {
             if ( -1 == this.Content[Index].Draw(nPageIndex, pGraphics) )
                 break;
@@ -3681,7 +3683,7 @@ CDocument.prototype =
                                             break;
                                         }
                                     }
-                                    else if ( type_Paragraph === this.Content[Index].GetType() && undefined === NumPr )
+                                    else if ( (type_Paragraph === this.Content[Index].GetType() && undefined === NumPr) || type_Table === this.Content[Index].GetType() )
                                     {
                                         bDiffLvl = true;
                                         break;
@@ -3879,7 +3881,7 @@ CDocument.prototype =
                                             break;
                                         }
                                     }
-                                    else if ( type_Paragraph === this.Content[Index].GetType() && undefined === NumPr )
+                                    else if ( ( type_Paragraph === this.Content[Index].GetType() && undefined === NumPr ) || type_Table === this.Content[Index].GetType() )
                                     {
                                         bDiffLvl = true;
                                         break;
@@ -5310,21 +5312,10 @@ CDocument.prototype =
         if ( docpostype_HdrFtr === this.CurPos.Type )
         {
             this.HdrFtr.Set_TableProps(Props);
-
-            this.Document_UpdateInterfaceState();
-            this.Document_UpdateRulersState();
-            this.Document_UpdateSelectionState();
-            
-            return;
         }
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
             this.DrawingObjects.setTableProps(Props);
-            this.Document_UpdateInterfaceState();
-            this.Document_UpdateRulersState();
-            this.Document_UpdateSelectionState();
-
-            return;
         }
         else //if ( docpostype_Content === this.CurPos.Type )
         {
@@ -5339,11 +5330,13 @@ CDocument.prototype =
                 var Table = this.Content[Pos];
                 Table.Set_Props(Props);
             }
-
-            this.Document_UpdateInterfaceState();
-            this.Document_UpdateRulersState();
-            this.Document_UpdateSelectionState();
         }
+
+        this.Recalculate();
+
+        this.Document_UpdateInterfaceState();
+        this.Document_UpdateRulersState();
+        this.Document_UpdateSelectionState();
     },
 
     Get_Paragraph_ParaPr : function()
@@ -5761,12 +5754,17 @@ CDocument.prototype =
     // Обновляем данные в интерфейсе о свойствах графики (картинки, автофигуры)
     Interface_Update_DrawingPr : function(Flag)
     {
-        var DrawingPr = this.DrawingObjects.getProps();
+        if(!(this.DrawingObjects.curState.id === STATES_ID_TEXT_ADD || this.DrawingObjects.curState.id === STATES_ID_TEXT_ADD_IN_GROUP))
+        {
+            var DrawingPr = this.DrawingObjects.getProps();
 
-        if ( true === Flag )
-            return DrawingPr;
-        else
-            editor.sync_ImgPropCallback( DrawingPr );
+            if ( true === Flag )
+                return DrawingPr;
+            else
+                editor.sync_ImgPropCallback( DrawingPr );
+        }
+        if(Flag)
+            return null;
     },
 
     // Обновляем данные в интерфейсе о свойствах таблицы
@@ -6747,7 +6745,7 @@ CDocument.prototype =
         {
             return this.HdrFtr.Is_TableBorder( X, Y, PageIndex );
         }
-        else if ( -1 != this.DrawingObjects.isPointInDrawingObjects( X,Y, this.CurPage, this ) )
+        else if ( -1 != this.DrawingObjects.isPointInDrawingObjects( X,Y, PageIndex, this ) )
         {
             return null;
         }
@@ -6895,7 +6893,15 @@ CDocument.prototype =
         }
         else if ( e.KeyCode == 27 ) // Esc
         {
-            if ( docpostype_HdrFtr == this.CurPos.Type )
+            // 1. Если у нас выделена автофигура (в колонтитуле или документе), тогда снимаем выделение с нее
+            // 2. Если мы просто находимся в колонтитуле (автофигура не выделена) выходим из колонтитула
+            if ( docpostype_DrawingObjects === this.CurPos.Type || (docpostype_HdrFtr === this.CurPos.Type && null != this.HdrFtr.CurHdrFtr && docpostype_DrawingObjects === this.HdrFtr.CurHdrFtr.Content.CurPos.Type ) )
+            {
+                this.DrawingObjects.resetSelection2();
+                this.Document_UpdateInterfaceState();
+                this.Document_UpdateSelectionState();
+            }
+            else if ( docpostype_HdrFtr == this.CurPos.Type )
             {
                 this.Document_End_HdrFtrEditing();
             }
@@ -7320,7 +7326,7 @@ CDocument.prototype =
         }
         else if ( e.KeyCode == 75 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + K - добавление гиперссылки
         {
-            if ( true === this.Hyperlink_CanAdd() )
+            if ( true === this.Hyperlink_CanAdd(false) )
                 editor.sync_DialogAddHyperlink();
 
             bRetValue = true;
@@ -7691,7 +7697,8 @@ CDocument.prototype =
                     // TODO : Если в MouseEvent будет использоваться что-то кроме ClickCount, Type и CtrlKey, добавить здесь
                     ClickCount : 1,
                     Type       : g_mouse_event_type_down,
-                    CtrlKey    : false
+                    CtrlKey    : false,
+                    Button     : g_mouse_button_right
                 };
                 this.Selection_SetStart( X, Y, MouseEvent_new );
 
@@ -7955,7 +7962,7 @@ CDocument.prototype =
         if ( true != bAnchor )
         {
             // Проверяем попадание в графические объекты
-            var NearestPos = this.DrawingObjects.getNearestPos( X, Y, PageNum );
+            var NearestPos = this.DrawingObjects.getNearestPos( X, Y, PageNum, Drawing);
             if ( ( nInDrawing === DRAWING_ARRAY_TYPE_BEFORE || nInDrawing === DRAWING_ARRAY_TYPE_INLINE || ( false === bInText && nInDrawing >= 0 ) ) && null != NearestPos )
                 return NearestPos;
         }
@@ -8541,7 +8548,7 @@ CDocument.prototype =
         }
         else if ( docpostype_DrawingObjects == this.CurPos.Type )
         {
-            this.HdrFtr.tableRemoveRow();
+            this.DrawingObjects.tableRemoveRow();
         }
         else if ( docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType() ) ) )
         {
@@ -9009,7 +9016,7 @@ CDocument.prototype =
     Document_UpdateCanAddHyperlinkState : function()
     {
         // Проверяем можно ли добавить гиперссылку
-        editor.sync_CanAddHyperlinkCallback( this.Hyperlink_CanAdd() );
+        editor.sync_CanAddHyperlinkCallback( this.Hyperlink_CanAdd(false) );
     },
 //-----------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
@@ -9554,13 +9561,13 @@ CDocument.prototype =
         this.Document_UpdateInterfaceState();
     },
 
-    Hyperlink_CanAdd : function()
+    Hyperlink_CanAdd : function(bCheckInHyperlink)
     {
         // Проверим можно ли добавлять гиперссылку
         if ( docpostype_HdrFtr === this.CurPos.Type )
-            return this.HdrFtr.Hyperlink_CanAdd();
+            return this.HdrFtr.Hyperlink_CanAdd(bCheckInHyperlink);
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
-            return this.DrawingObjects.hyperlinkCanAdd();
+            return this.DrawingObjects.hyperlinkCanAdd(bCheckInHyperlink);
         else //if ( docpostype_Content === this.CurPos.Type )
         {
             if ( true === this.Selection.Use )
@@ -9573,12 +9580,12 @@ CDocument.prototype =
                         if ( this.Selection.StartPos != this.Selection.EndPos )
                             return false;
 
-                        return this.Content[this.Selection.StartPos].Hyperlink_CanAdd();
+                        return this.Content[this.Selection.StartPos].Hyperlink_CanAdd(bCheckInHyperlink);
                     }
                 }
             }
             else
-                return this.Content[this.CurPos.ContentPos].Hyperlink_CanAdd();
+                return this.Content[this.CurPos.ContentPos].Hyperlink_CanAdd(bCheckInHyperlink);
         }
 
         return false;

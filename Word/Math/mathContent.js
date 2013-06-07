@@ -1341,6 +1341,7 @@ CMathContent.prototype =
         {
             component = new CMathText();
             component.init(this.params);
+            component.relate(this);
             component.addCode(StartTextElement);
             result = this;
         }
@@ -1348,12 +1349,14 @@ CMathContent.prototype =
         {
             component = new CMathText();
             component.init(this.params);
+            component.relate(this);
             result = this;
         }
         else
         {
             component = this.getMathComponent(type);
             component.init(this.params);
+            component.relate(this);
             result = component;
         }
 
@@ -1608,11 +1611,6 @@ CMathComposition.prototype =
     {
         this.ClearSelect();
         this.CurrentContent = this.SelectContent = this.Root.mouseDown({x: mouseX, y: mouseY}, -1);
-
-        if(typeof(this.CurrentContent) == "undefined")
-        {
-            var stop = true;
-        }
 
         this.СheckTarget();
     },
