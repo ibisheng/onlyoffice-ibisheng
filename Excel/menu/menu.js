@@ -1,6 +1,7 @@
 ﻿$(function () {
 	var  IsVisibleMenu = false, elem, contextGrad, gradient, gradSelectPosTop = 1, imgd, pix, colorSelecterClick, newColorSelected={r:255,g:0,b:0},lastColorSelected={r:255,g:0,b:0};
 	var autoFilterObj;
+	var ref;
 	
 	var docTitle = window.location.toString().match(/&title=([^&]+)&/);
 	if (docTitle) {
@@ -853,9 +854,23 @@
 			case "td_auto_filter":{
 				api.asc_addAutoFilter()
 				break;
-		}
+			}
 			case "td_auto_filter_local":{
-				api.asc_addAutoFilter(true);
+				//в случае если применен фильтр с форматированной таблицей или форматированная таблица не показываем диалоговое окно и сразу вызываем функцию
+				var defaultStyle = "TableStyleLight2";
+				var isApplyFormatTable = api.asc_getAutoFilterOptions("isApplyFormatTable");
+				if(isApplyFormatTable)
+					api.asc_addAutoFilter(defaultStyle);
+				else if(isApplyFormatTable == "error")
+				{
+					return;
+				}
+				else
+				{
+					ref = api.asc_getAutoFilterOptions("getRangeNewFilter");
+					//открываем диалоговое окно
+					$("#addFilterDialog").dialog("open");
+				}
 				break;
 			}
 		}
@@ -2297,6 +2312,33 @@
 			}
 		]
 	});
+	$("#addFilterDialog").dialog({ autoOpen: false, closeOnEscape: false, dialogClass: 'dialogClass',
+		open: function() { 
+			$('#ref').val(ref)
+			aDialogNames.push("addFilterDialog"); 
+		},
+		close: function() { aDialogNames.pop(); },
+		resizable: false, modal: true, width: '350px',
+		buttons: [
+			{
+				text: 'Ok',
+				click: function() {
+					var isTitle = false;
+					var defaultStyle = "TableStyleLight1";
+					if($('#isTitle')[0].checked)
+						isTitle = true;		
+					api.asc_addAutoFilter(defaultStyle, isTitle);
+					$(this).dialog("close");
+				}
+			},
+			{
+				text: 'Cancel',
+				btCancel: "classButtonCancel",
+				click: function() { $(this).dialog("close"); }
+			}
+		]
+	});
+	
 	$("#numericalFilter").click(function() {
 		$('#MenuAutoFilter').hide();
 		api.asc_enableKeyEvents(false);

@@ -9048,14 +9048,14 @@
 				this.arrActiveFormulaRanges = [];
 			},
 			
-			addAutoFilter: function (lTable) {
+			addAutoFilter: function (lTable, isTitle) {
 				var t = this;
 				var ar = t.activeRange.clone(true);
 				var onChangeAutoFilterCallback = function (isSuccess) {
 					if (false === isSuccess)
 						return;
 					
-					return t.autoFilters.addAutoFilter(t, lTable, ar);
+					return t.autoFilters.addAutoFilter(t, lTable, ar, undefined, false, isTitle);
 				};
 				this._isLockedAll (onChangeAutoFilterCallback);
 			},
@@ -9085,6 +9085,14 @@
 					if (isDraw)
 						this.draw();
 				}
+			},
+			
+			getAutoFilterOptions: function(nameOption)
+			{
+				var ar = this.activeRange.clone(true);
+				var t = this;
+				var result = t.autoFilters.getAutoFilterOptions(t, nameOption, ar);
+				return result;
 			},
 
 			_loadFonts: function (fontArr, callback) {

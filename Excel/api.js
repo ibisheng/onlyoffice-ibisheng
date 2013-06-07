@@ -545,9 +545,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					this.wb.resize();
 			},
 			
-			asc_addAutoFilter: function(lTable){
+			asc_addAutoFilter: function(lTable, isTitle){
 				var ws = this.wb.getWorksheet();
-				var result = ws.addAutoFilter(lTable);
+				var result = ws.addAutoFilter(lTable, isTitle);
 				return result;
 			},
 			
@@ -559,6 +559,13 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			asc_sortColFilter: function(type,cellId) {
 				var ws = this.wb.getWorksheet();
 				ws.sortColFilter(type,cellId);
+			},
+			
+			asc_getAutoFilterOptions: function(nameOption)
+			{
+				var ws = this.wb.getWorksheet();
+				var result = ws.getAutoFilterOptions(nameOption);
+				return result;
 			},
 			
 			asc_setMobileVersion: function (isMobile){
