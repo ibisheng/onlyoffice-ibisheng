@@ -67,6 +67,7 @@ function CBinaryFileWriter()
         delete _canvas;
     };
 
+    this.IsWordWriter = false;
     this.ImData = null;
     this.data = null;
     this.len = 0;
@@ -2404,6 +2405,9 @@ function CBinaryFileWriter()
 
     this.WriteXfrm = function(xfrm)
     {
+        if (oThis.IsWordWriter === true)
+            return oThis.WriteXfrmRot(xfrm);
+
         oThis.WriteUChar(g_nodeAttributeStart);
         oThis._WriteInt4(0, xfrm.offX, c_dScalePPTXSizes);
         oThis._WriteInt4(1, xfrm.offY, c_dScalePPTXSizes);
@@ -2416,6 +2420,53 @@ function CBinaryFileWriter()
         oThis._WriteBool2(8, xfrm.flipH);
         oThis._WriteBool2(9, xfrm.flipV);
         oThis._WriteInt4(10, xfrm.rot, 180 * 60000 / Math.PI);
+        oThis.WriteUChar(g_nodeAttributeEnd);
+    }
+
+    this.WriteXfrmRot = function(xfrm)
+    {
+        oThis.WriteUChar(g_nodeAttributeStart);
+        oThis._WriteInt4(0, xfrm.offX, c_dScalePPTXSizes);
+        oThis._WriteInt4(1, xfrm.offY, c_dScalePPTXSizes);
+        oThis._WriteInt4(2, xfrm.extX, c_dScalePPTXSizes);
+        oThis._WriteInt4(3, xfrm.extY, c_dScalePPTXSizes);
+        oThis._WriteInt4(4, xfrm.chOffX, c_dScalePPTXSizes);
+        oThis._WriteInt4(5, xfrm.chOffY, c_dScalePPTXSizes);
+        oThis._WriteInt4(6, xfrm.chExtX, c_dScalePPTXSizes);
+        oThis._WriteInt4(7, xfrm.chExtY, c_dScalePPTXSizes);
+        oThis._WriteBool2(8, xfrm.flipH);
+        oThis._WriteBool2(9, xfrm.flipV);
+
+        if (xfrm.rot != null)
+        {
+            var nCheckInvert = 0;
+            if (true == xfrm.flipH)
+                nCheckInvert += 1;
+            if (true == xfrm.flipV)
+                nCheckInvert += 1;
+
+            var _rot = (xfrm.rot * 180 * 60000 / Math.PI) >> 0;
+            var _n360 = 360 * 60000;
+
+            if (_rot > _n360)
+            {
+                var _nDel = (_rot / _n360) >> 0;
+                _rot = _rot - _nDel * _n360;
+            }
+            else
+            {
+                var _nDel = (-_rot / _n360) >> 0;
+                _nDel += 1;
+                _rot = _rot + _nDel * _n360;
+            }
+
+            if (nCheckInvert == 1)
+            {
+                _rot = _n360 - _rot;
+            }
+            oThis._WriteInt1(10, _rot);
+        }
+
         oThis.WriteUChar(g_nodeAttributeEnd);
     }
 

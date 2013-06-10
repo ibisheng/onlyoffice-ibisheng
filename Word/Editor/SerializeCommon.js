@@ -410,6 +410,7 @@ function CPPTXContentLoader()
                 case 0:
                 {
                     spPr.xfrm = this.Reader.ReadXfrm();
+                    this.CorrectXfrm(spPr.xfrm);
                     break;
                 }
                 case 1:
@@ -453,6 +454,41 @@ function CPPTXContentLoader()
         s.Seek2(_end_rec);
     }
 
+    this.CorrectXfrm = function(_xfrm)
+    {
+        if (!_xfrm)
+            return;
+
+        if (null == _xfrm.rot)
+            return;
+
+        var nInvertRotate = 0;
+        if (true === _xfrm.flipH)
+            nInvertRotate += 1;
+        if (true === _xfrm.flipV)
+            nInvertRotate += 1;
+
+        var _rot = _xfrm.rot;
+        var _del = 2 * Math.PI;
+
+        if (nInvertRotate)
+            _rot = -_rot;
+
+        if (_rot >= _del)
+        {
+            var _intD = (_rot / _del) >> 0;
+            _rot = _rot - _intD * _del;
+        }
+        else if (_rot < 0)
+        {
+            var _intD = (-_rot / _del) >> 0;
+            _intD = 1 + _intD;
+            _rot = _rot + _intD * _del;
+        }
+
+        _xfrm.rot = _rot;
+    }
+
     this.ReadTheme = function(reader, stream)
     {
         this.BaseReader = reader;
@@ -489,6 +525,7 @@ function CPPTXContentWriter()
 {
     this.BinaryFileWriter = new CBinaryFileWriter();
     this.BinaryFileWriter.Init();
+    this.BinaryFileWriter.IsWordWriter = true;
 
     this.TreeDrawingIndex = 0;
 
