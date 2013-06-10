@@ -410,7 +410,7 @@ function CPPTXContentLoader()
                 case 0:
                 {
                     spPr.xfrm = this.Reader.ReadXfrm();
-                    this.CorrectXfrm(spPr.xfrm);
+                    //this.CorrectXfrm(spPr.xfrm);
                     break;
                 }
                 case 1:
@@ -525,7 +525,7 @@ function CPPTXContentWriter()
 {
     this.BinaryFileWriter = new CBinaryFileWriter();
     this.BinaryFileWriter.Init();
-    this.BinaryFileWriter.IsWordWriter = true;
+    //this.BinaryFileWriter.IsWordWriter = true;
 
     this.TreeDrawingIndex = 0;
 

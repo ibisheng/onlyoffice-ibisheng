@@ -2453,7 +2453,7 @@ function CBinaryFileWriter()
                 var _nDel = (_rot / _n360) >> 0;
                 _rot = _rot - _nDel * _n360;
             }
-            else
+            else if (_rot < 0)
             {
                 var _nDel = (-_rot / _n360) >> 0;
                 _nDel += 1;
