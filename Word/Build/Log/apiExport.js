@@ -827,6 +827,8 @@ prop:asc_getRepliesCount
 ---
 var:getURLParameter
 ---
+var:spellCheck
+---
 var:sendCommand
 ---
 var:_downloadAs
@@ -1757,6 +1759,7 @@ asc_CCommentData.prototype['asc_getReply'] = asc_CCommentData.prototype.asc_getR
 asc_CCommentData.prototype['asc_addReply'] = asc_CCommentData.prototype.asc_addReply;
 asc_CCommentData.prototype['asc_getRepliesCount'] = asc_CCommentData.prototype.asc_getRepliesCount;
 window['getURLParameter'] = getURLParameter;
+window['spellCheck'] = spellCheck;
 window['sendCommand'] = sendCommand;
 window['_downloadAs'] = _downloadAs;
 window['_addImageUrl2'] = _addImageUrl2;
