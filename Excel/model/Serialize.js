@@ -167,7 +167,8 @@ var c_oSerWorksheetsTypes =
 	Autofilter: 17,
 	TableParts: 18,
 	Comments: 19,
-	Comment: 20
+	Comment: 20,
+	ConditionalFormatting: 21
 };
 /** @enum */
 var c_oSerWorksheetPropTypes =
@@ -495,6 +496,53 @@ var c_oSer_CommentData =
 	Document : 6,
 	Replies : 7,
 	Reply : 8
+};
+var c_oSer_ConditionalFormatting = {
+	Pivot						: 0,
+	SqRef						: 1,
+	ConditionalFormattingRule	: 2
+};
+var c_oSer_ConditionalFormattingRule = {
+	AboveAverage	: 0,
+	Bottom			: 1,
+	DxfId			: 2,
+	EqualAverage	: 3,
+	Operator		: 4,
+	Percent			: 5,
+	Priority		: 6,
+	Rank			: 7,
+	StdDev			: 8,
+	StopIfTrue		: 9,
+	Text			: 10,
+	TimePeriod		: 11,
+	Type			: 12,
+	ColorScale		: 14,
+	DataBar			: 15,
+	FormulaCF		: 16,
+	IconSet			: 17
+};
+var c_oSer_ConditionalFormattingRuleColorScale = {
+	CFVO			: 0,
+	Color			: 1
+};
+var c_oSer_ConditionalFormattingDataBar = {
+	CFVO			: 0,
+	Color			: 1,
+	MaxLength		: 2,
+	MinLength		: 3,
+	ShowValue		: 4
+};
+var c_oSer_ConditionalFormattingIconSet = {
+	CFVO			: 0,
+	IconSet			: 1,
+	Percent			: 2,
+	Reverse			: 3,
+	ShowValue		: 4
+};
+var c_oSer_ConditionalFormattingValueObject = {
+	Gte				: 0,
+	Type			: 1,
+	Val				: 2
 };
 /** @enum */
 var EBorderStyle =
@@ -4718,6 +4766,7 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
         }
         else if ( c_oSerWorksheetsTypes.Cols == type )
         {
+			var oConditionalFormatting = null;
             if(null == oWorksheet.Cols)
                 oWorksheet.aCols = new Array();
 			var aTempCols = new Array();
@@ -4858,6 +4907,13 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 					return oThis.ReadComments(t,l, oWorksheet);
 				});
         }
+		else if (c_oSerWorksheetsTypes.ConditionalFormatting === type) {
+			oConditionalFormatting = new Asc.CConditionalFormatting();
+			res = this.bcr.Read1(length, function (t, l) {
+				return oThis.ReadConditionalFormatting(t, l, oConditionalFormatting);
+			});
+			oWorksheet.aConditionalFormatting.push(oConditionalFormatting);
+		}
         else
             res = c_oSerConstants.ReadUnknown;
         return res;
@@ -5481,7 +5537,162 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 		else
 			res = c_oSerConstants.ReadUnknown;
         return res;
-    }
+    };
+	this.ReadConditionalFormatting = function (type, length, oConditionalFormatting) {
+		var res = c_oSerConstants.ReadOk;
+		var oThis = this;
+		var oConditionalFormattingRule = null;
+		if (c_oSer_ConditionalFormatting.Pivot === type)
+			oConditionalFormatting.Pivot = this.stream.GetBool();
+		else if (c_oSer_ConditionalFormatting.SqRef === type)
+			oConditionalFormatting.SqRef = this.stream.GetString2LE(length);
+		else if (c_oSer_ConditionalFormatting.ConditionalFormattingRule === type) {
+			oConditionalFormattingRule = new Asc.CConditionalFormattingRule();
+			res = this.bcr.Read1(length, function (t, l) {
+				return oThis.ReadConditionalFormattingRule(t, l, oConditionalFormattingRule);
+			});
+			oConditionalFormatting.aRules.push(oConditionalFormattingRule);
+		}
+		else
+			res = c_oSerConstants.ReadUnknown;
+		return res;
+	};
+	this.ReadConditionalFormattingRule = function (type, length, oConditionalFormattingRule) {
+		var res = c_oSerConstants.ReadOk;
+		var oThis = this;
+		var oConditionalFormattingRuleElement = null;
+
+		if (c_oSer_ConditionalFormattingRule.AboveAverage === type)
+			oConditionalFormattingRule.AboveAverage = this.stream.GetBool();
+		else if (c_oSer_ConditionalFormattingRule.Bottom === type)
+			oConditionalFormattingRule.Bottom = this.stream.GetBool();
+		else if (c_oSer_ConditionalFormattingRule.DxfId === type)
+			oConditionalFormattingRule.DxfId = this.stream.GetULongLE();
+		else if (c_oSer_ConditionalFormattingRule.EqualAverage === type)
+			oConditionalFormattingRule.EqualAverage = this.stream.GetBool();
+		else if (c_oSer_ConditionalFormattingRule.Operator === type)
+			oConditionalFormattingRule.Operator = this.stream.GetString2LE(length);
+		else if (c_oSer_ConditionalFormattingRule.Percent === type)
+			oConditionalFormattingRule.Percent = this.stream.GetBool();
+		else if (c_oSer_ConditionalFormattingRule.Priority === type)
+			oConditionalFormattingRule.Priority = this.stream.GetULongLE();
+		else if (c_oSer_ConditionalFormattingRule.Rank === type)
+			oConditionalFormattingRule.Rank = this.stream.GetULongLE();
+		else if (c_oSer_ConditionalFormattingRule.StdDev === type)
+			oConditionalFormattingRule.StdDev = this.stream.GetULongLE();
+		else if (c_oSer_ConditionalFormattingRule.StopIfTrue === type)
+			oConditionalFormattingRule.StopIfTrue = this.stream.GetBool();
+		else if (c_oSer_ConditionalFormattingRule.Text === type)
+			oConditionalFormattingRule.Text = this.stream.GetString2LE(length);
+		else if (c_oSer_ConditionalFormattingRule.TimePeriod === type)
+			oConditionalFormattingRule.TimePeriod = this.stream.GetString2LE(length);
+		else if (c_oSer_ConditionalFormattingRule.Type === type)
+			oConditionalFormattingRule.Type = this.stream.GetString2LE(length);
+		else if (c_oSer_ConditionalFormattingRule.ColorScale === type) {
+			oConditionalFormattingRuleElement = new Asc.CColorScale();
+			res = this.bcr.Read1(length, function (t, l) {
+				return oThis.ReadColorScale(t, l, oConditionalFormattingRuleElement);
+			});
+			oConditionalFormattingRule.aRuleElements.push(oConditionalFormattingRuleElement);
+		} else if (c_oSer_ConditionalFormattingRule.DataBar === type) {
+			oConditionalFormattingRuleElement = new Asc.CDataBar();
+			res = this.bcr.Read1(length, function (t, l) {
+				return oThis.ReadDataBar(t, l, oConditionalFormattingRuleElement);
+			});
+			oConditionalFormattingRule.aRuleElements.push(oConditionalFormattingRuleElement);
+		} else if (c_oSer_ConditionalFormattingRule.FormulaCF === type) {
+			oConditionalFormattingRuleElement = new Asc.CFormulaCF();
+			oConditionalFormattingRuleElement.Text = this.stream.GetString2LE(length);
+			oConditionalFormattingRule.aRuleElements.push(oConditionalFormattingRuleElement);
+		} else if (c_oSer_ConditionalFormattingRule.IconSet === type) {
+			oConditionalFormattingRuleElement = new Asc.CIconSet();
+			res = this.bcr.Read1(length, function (t, l) {
+				return oThis.ReadIconSet(t, l, oConditionalFormattingRuleElement);
+			});
+			oConditionalFormattingRule.aRuleElements.push(oConditionalFormattingRuleElement);
+		} else
+			res = c_oSerConstants.ReadUnknown;
+		return res;
+	};
+	this.ReadColorScale = function (type, length, oColorScale) {
+		var res = c_oSerConstants.ReadOk;
+		var oThis = this;
+		var oObject = null;
+		if (c_oSer_ConditionalFormattingRuleColorScale.CFVO === type) {
+			oObject = new Asc.CConditionalFormatValueObject();
+			res = this.bcr.Read1(length, function (t, l) {
+				return oThis.ReadCFVO(t, l, oObject);
+			});
+			oColorScale.aCFVOs.push(oObject);
+		} else if (c_oSer_ConditionalFormattingRuleColorScale.Color === type) {
+			oObject = new OpenColor();
+			res = this.bcr.Read2Spreadsheet(length, function(t,l){
+				return oThis.bcr.ReadColorSpreadsheet(t,l, oObject);
+			});
+			oColorScale.aColors.push(oObject);
+		} else
+			res = c_oSerConstants.ReadUnknown;
+		return res;
+	};
+	this.ReadDataBar = function (type, length, oDataBar) {
+		var res = c_oSerConstants.ReadOk;
+		var oThis = this;
+		var oObject = null;
+		if (c_oSer_ConditionalFormattingDataBar.MaxLength === type)
+			oDataBar.MaxLength = this.stream.GetULongLE();
+		else if (c_oSer_ConditionalFormattingDataBar.MinLength === type)
+			oDataBar.MinLength = this.stream.GetULongLE();
+		else if (c_oSer_ConditionalFormattingDataBar.ShowValue === type)
+			oDataBar.ShowValue = this.stream.GetBool();
+		else if (c_oSer_ConditionalFormattingDataBar.Color === type) {
+			oDataBar.Color = new OpenColor();
+			res = this.bcr.Read2Spreadsheet(length, function(t,l){
+				return oThis.bcr.ReadColorSpreadsheet(t,l, oDataBar.Color);
+			});
+		} else if (c_oSer_ConditionalFormattingDataBar.CFVO === type) {
+			oObject = new Asc.CConditionalFormatValueObject();
+			res = this.bcr.Read1(length, function (t, l) {
+				return oThis.ReadCFVO(t, l, oObject);
+			});
+			oDataBar.aCFVOs.push(oObject);
+		} else
+			res = c_oSerConstants.ReadUnknown;
+		return res;
+	};
+	this.ReadIconSet = function (type, length, oIconSet) {
+		var res = c_oSerConstants.ReadOk;
+		var oThis = this;
+		var oObject = null;
+		if (c_oSer_ConditionalFormattingIconSet.IconSet === type)
+			oIconSet.IconSet = this.stream.GetString2LE(length);
+		else if (c_oSer_ConditionalFormattingIconSet.Percent === type)
+			oIconSet.Percent = this.stream.GetBool();
+		else if (c_oSer_ConditionalFormattingIconSet.Reverse === type)
+			oIconSet.Reverse = this.stream.GetBool();
+		else if (c_oSer_ConditionalFormattingIconSet.ShowValue === type)
+			oIconSet.ShowValue = this.stream.GetBool();
+		else if (c_oSer_ConditionalFormattingIconSet.CFVO === type) {
+			oObject = new Asc.CConditionalFormatValueObject();
+			res = this.bcr.Read1(length, function (t, l) {
+				return oThis.ReadCFVO(t, l, oObject);
+			});
+			oIconSet.aCFVOs.push(oObject);
+		} else
+			res = c_oSerConstants.ReadUnknown;
+		return res;
+	};
+	this.ReadCFVO = function (type, length, oCFVO) {
+		var res = c_oSerConstants.ReadOk;
+		if (c_oSer_ConditionalFormattingValueObject.Gte === type)
+			oCFVO.Gte = this.stream.GetBool();
+		else if (c_oSer_ConditionalFormattingValueObject.Type === type)
+			oCFVO.Type = this.stream.GetString2LE(length);
+		else if (c_oSer_ConditionalFormattingValueObject.Val === type)
+			oCFVO.Val = this.stream.GetString2LE(length);
+		else
+			res = c_oSerConstants.ReadUnknown;
+		return res;
+	};
 	this.Iso8601ToDate = function(sDate)
 	{
 		var numericKeys = [ 1, 4, 5, 6, 7, 10, 11 ];

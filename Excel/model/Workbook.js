@@ -2098,6 +2098,8 @@ function Woorksheet(wb, _index, bAddUserId, sId){
 	this.objForRebuldFormula = {};
 	this.aComments = new Array();
 	this.aCommentsCoords = new Array();
+
+	this.aConditionalFormatting = [];
 	
 	this.nActionNested = 0;
 	this.bUpdateHyperlinks = false;
