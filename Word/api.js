@@ -6060,6 +6060,41 @@ var cCharDelimiter = String.fromCharCode(5);
 function getURLParameter(name) {
     return (RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1];
 };
+
+function spellCheck (editor, fCallback, rdata){
+	asc_ajax({
+        type: 'POST',
+        url: g_sSpellCheckServiceLocalUrl,
+        data: rdata,
+        error: function(jqXHR, textStatus, errorThrown){
+				editor.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.Critical);
+				if(fCallback)
+					fCallback();
+            },
+        success: function(msg){
+			var incomeObject = JSON.parse(msg);
+			switch(incomeObject.type){
+                case "spell":
+					if(fCallback)
+                        fCallback(incomeObject);
+                break;
+				case "synonym":
+					if(fCallback)
+                        fCallback(incomeObject);
+                break;
+				case "suggest":
+					if(fCallback)
+                        fCallback(incomeObject);
+                break;
+                case "err":
+					editor.asc_fireCallback("asc_onError", _mapAscServerErrorToAscError(parseInt(incomeObject.data)), c_oAscError.Level.Critical);
+					if(fCallback)
+						fCallback(incomeObject);
+                break;
+            }
+		}
+	})
+};
 function sendCommand(editor, fCallback, rdata){
 	asc_ajax({
         type: 'POST',
