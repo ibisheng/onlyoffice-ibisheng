@@ -4599,6 +4599,9 @@ var cFormulaFunction = {
 							if( argArr[j] instanceof cBool )
 								argArr[j] = argArr[j].tocNumber();
 							
+							if( argArr[j].getValue() < 0 )
+								return this.value = new cError( cErrorType.not_numeric );
+							
 							_gcd = gcd(_gcd,argArr[j].getValue());
 						}
 					}
@@ -4606,30 +4609,36 @@ var cFormulaFunction = {
 						var argArr = argI.tocNumber();
 					
 						if( 
-							argArr.foreach(function(arrElem){ 
-								
+							argArr.foreach(function(arrElem){
+
 								if( arrElem instanceof cError ){
 									_gcd = arrElem;
 									return true;
 								}
-								
+
 								if( arrElem instanceof cBool )
 									arrElem = arrElem.tocNumber();
-								
+
 								if( arrElem instanceof cString )
 									return;
-									
+
+								if( arrElem.getValue() < 0 ){
+									_gcd = new cError( cErrorType.not_numeric );
+									return true;
+								}
 								_gcd = gcd(_gcd,arrElem.getValue());
-								
-								
-							}) 
+
+							})
 						){
 							return this.value = _gcd;
 						}
 					}
 					else{
 						argI = argI.tocNumber();
-					
+						
+						if( argI.getValue() < 0 )
+								return this.value = new cError( cErrorType.not_numeric );
+						
 						if( argI instanceof cError )
 							return this.value = argI;
 							
@@ -5589,12 +5598,6 @@ var cFormulaFunction = {
             r.setArgumentsMin(2);
             r.setArgumentsMax(2);
             r.setName("ROUNDUP");
-            r.getInfo = function(){
-                return {
-                    name:this.name,
-                    args:"(number, num_digits)"
-                };
-            }
             r.Calculate = function(arg){
 				function roundupHelper(number, num_digits){
 					if(num_digits > cExcelMaxExponent){
@@ -5693,7 +5696,13 @@ var cFormulaFunction = {
 				return this.value = roundupHelper(number, num_digits);
 				
             }
-        	return r;
+        	r.getInfo = function(){
+                return {
+                    name:this.name,
+                    args:"(number, num_digits)"
+                };
+            }
+			return r;
 		},
         'SERIESSUM' : function(){
             var r = new cBaseFunction();
@@ -6183,6 +6192,25 @@ var cFormulaFunction = {
         'COUNTBLANK' : function(){
             var r = new cBaseFunction();
             r.setName("COUNTBLANK");
+			r.setArgumentsMin(1);
+            r.setArgumentsMax(1);
+            r.Calculate = function(arg){
+				var arg0 = arg[0];
+				if( arg0 instanceof cArea || arg0 instanceof cArea3D )
+					return this.value = arg0.countCells();
+				else if( arg0 instanceof cRef || arg0 instanceof cRef3D ){
+					return this.value = new cNumber( 1 );
+				}
+				else 
+					return this.value = new cError( cErrorType.bad_reference );
+			}
+			r.getInfo = function(){
+                return {
+                    name:this.name,
+                    args:"( argument-list )"
+                };
+            }
+			r.setFormat(r.formatType.noneFormat);
         	return r;
 		},
         'COUNTIF' : function(){
@@ -7160,18 +7188,16 @@ var cFormulaFunction = {
 					if(skip)
 						return str;
 						
-					res = str.split(".")
+					res = str.split(".");
 					_int = res[0];
+					
 					if( res.length == 2)
 						_dec = res[1];
 						
 					_int = _int.split("").reverse().join("").match(/([^]{1,3})/ig)
-					
 						
 					for( var i = _int.length-1; i >= 0; i--){
-						
 						_tmp += _int[i].split("").reverse().join("");
-						
 						if( i != 0 )
 							_tmp += ",";
 					}
@@ -7263,6 +7289,12 @@ var cFormulaFunction = {
                 var number = arg0.getValue(), num_digits = arg1.getValue();
 				
 				return this.value = new cString(toFix(roundHelper(number,num_digits).toString(), arg2.toBool()));
+            }
+			r.getInfo = function(){
+                return {
+                    name:this.name,
+                    args:"( number [ , [ num-decimal ] [ , suppress-commas-flag ] ] )"
+                };
             }
         	return r;
 		},
@@ -7527,12 +7559,6 @@ var cFormulaFunction = {
             r.setArgumentsMin(2);
             r.setArgumentsMax(2);
             r.setName("REPT");
-            r.getInfo = function(){
-                return {
-                    name:this.name,
-                    args:"(text, number_of_times)"
-                };
-            }
             r.Calculate = function(arg){
                 var arg0 = arg[0], arg1 = arg[1], res = "";
                 if( arg0 instanceof cError ) return this.value = arg0;
@@ -7578,7 +7604,13 @@ var cFormulaFunction = {
                 }
                 return this.value = new cString( res );
             }
-        	return r;
+            r.getInfo = function(){
+                return {
+                    name:this.name,
+                    args:"(text, number_of_times)"
+                };
+            }
+			return r;
 		},
         'RIGHT' : function(){
             var r = new cBaseFunction();
@@ -8052,6 +8084,14 @@ cArea.prototype.isValid = function(){
 		return false;
 	return true;
 }
+cArea.prototype.countCells = function(){
+	var r = this.getRange(), bbox = r.bbox,
+		count = (Math.abs(bbox.c1 - bbox.c2) + 1)*(Math.abs(bbox.r1 - bbox.r2) + 1);
+		r._foreachNoEmpty(function (_cell){
+			count--;
+		})
+	return new cNumber( count );
+}
 
 /** @constructor */
 function cRef(val,_ws){/*Ref means A1 for example*/
@@ -8307,6 +8347,35 @@ cArea3D.prototype.isValid = function(){
 			return false;
 	}
 	return true;
+}
+cArea3D.prototype.countCells = function(){
+	var _wsA = this.wsRange();
+	var _val = [];
+	if(_wsA.length<1){
+		_val.push(new cError( cErrorType.bad_reference ));
+		return _val;
+	}
+	for( var i=0;i<_wsA.length;i++ ){
+		if( !_wsA[i] ) {
+			_val.push(new cError( cErrorType.bad_reference ));
+			return _val;
+		}
+
+	}
+	var _r = this.range(_wsA),
+		bbox = _r[0].bbox,
+		count = (Math.abs(bbox.c1 - bbox.c2) + 1)*(Math.abs(bbox.r1 - bbox.r2) + 1);
+	count = _r.length * count;
+	for(var i=0; i < _r.length; i++){
+		_r[i]._foreachNoEmpty(function(_cell){
+			
+			if( _cell.getType() == CellValueType.Number && _cell.getValueWithoutFormat() == "" )
+				return null;
+				
+			count--;
+		})
+	}
+	return new cNumber( count );
 }
 
 /** @constructor */
