@@ -1323,7 +1323,7 @@ tt_face_free_sbit_stub:Tk
 ps_get_macintosh_name:nh
 cName:xv
 JSCompiler_StaticMethods_getStrikeout:YI
-c_oAscServerError$StorageRead:cb
+c_oAscServerError$StorageRead:bb
 EVerticalAlignment$verticalalignmentDistributed:BC
 EBorderStyle$borderstyleThin:eC
 c_oSer_CustomFilters$CustomFilters:eA
@@ -1802,7 +1802,7 @@ tt_cmap10_char_next:jk
 numFormat_Day:Cb
 c_oAscMouseMoveLockedObjectType$Range:AK
 FT_BBox:lg
-c_oAscChartType$area:sa
+c_oAscChartType$area:ra
 load_truetype_glyph:io
 __grays_raster_render:Gl
 tt_face_load_pclt:sj
@@ -2022,10 +2022,10 @@ PS_PrivateRec:th
 L 32:ua
 L 31:Aa
 Project:Bm
-L 30:ra
+L 30:sa
 cff_standard_encoding:fp
 L 36:pc
-L 35:bb
+L 35:cb
 L 34:eb
 FT_Data:Ag
 L 33:Sa
