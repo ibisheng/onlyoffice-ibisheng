@@ -1500,7 +1500,7 @@
 							var oldFilter = aWs.TableParts[i];
 							//отменяем заливку и бордеры
 							var allRange = ws.model.getRange(new CellAddress(ref[0]), new CellAddress(ref[1]));
-							allRange.setFill(Asc.parseColor('white'));
+							allRange.setFill(new RgbColor(Asc.parseColor('white')));
 							//открываем диапазон
 							for(var s = startCell.first.row - 1; s <= endCell.first.row - 1; s++)
 							{
@@ -3023,7 +3023,7 @@
 						{
 							var range = ws.model.getCell(new CellAddress(row,col,0));
 							if(row == firstCell.first.row - 1)
-								range.setFill(5210557)
+								range.setFill(new RgbColor(5210557));
 						}
 					}
 				}
@@ -4314,7 +4314,7 @@
 				//**draw background**
 				var defaultColorBackground;
 				if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill)
-					defaultColorBackground = Asc.parseColor(styleOptions.wholeTable.dxf.fill.bg).color;
+					defaultColorBackground = Asc.parseColor(styleOptions.wholeTable.dxf.fill.getRgbOrNull()).color;
 				else
 					defaultColorBackground = "#FFFFFF";
 
@@ -4367,14 +4367,14 @@
 								if((k)%2 != 0)
 								{
 									if(styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.fill)
-										color =  Asc.parseColor(styleOptions.firstRowStripe.dxf.fill.bg).color;
+										color =  Asc.parseColor(styleOptions.firstRowStripe.dxf.fill.getRgbOrNull()).color;
 								}
 								else
 								{
 									if(styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.fill)
-										color =  Asc.parseColor(styleOptions.secondRowStripe.dxf.fill.bg).color;
+										color =  Asc.parseColor(styleOptions.secondRowStripe.dxf.fill.getRgbOrNull()).color;
 									else if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill)
-										color =  Asc.parseColor(styleOptions.wholeTable.dxf.fill.bg).color;
+										color =  Asc.parseColor(styleOptions.wholeTable.dxf.fill.getRgbOrNull()).color;
 										
 								}
 								if(color != null)
@@ -4397,14 +4397,14 @@
 								if((k+1)%2 != 0)
 								{
 									if(styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.fill)
-										color =  Asc.parseColor(styleOptions.firstRowStripe.dxf.fill.bg).color;
+										color =  Asc.parseColor(styleOptions.firstRowStripe.dxf.fill.getRgbOrNull()).color;
 								}
 								else
 								{
 									if(styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.fill)
-										color =  Asc.parseColor(styleOptions.secondRowStripe.dxf.fill.bg).color;
+										color =  Asc.parseColor(styleOptions.secondRowStripe.dxf.fill.getRgbOrNull()).color;
 									else if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill)
-										color =  Asc.parseColor(styleOptions.wholeTable.dxf.fill.bg).color;
+										color =  Asc.parseColor(styleOptions.wholeTable.dxf.fill.getRgbOrNull()).color;
 								}
 								
 								if(color != null)
@@ -4420,7 +4420,7 @@
 					if(styleInfo.ShowFirstColumn && styleOptions.firstColumn)//first column
 					{
 						if(styleOptions.firstColumn && styleOptions.firstColumn.dxf.fill)
-							ctx.fillStyle = Asc.parseColor(styleOptions.firstColumn.dxf.fill.bg).color;
+							ctx.fillStyle = Asc.parseColor(styleOptions.firstColumn.dxf.fill.getRgbOrNull()).color;
 						else
 							ctx.fillStyle = defaultColorBackground;
 						ctx.fillRect(0,0,stepX,ySize);
@@ -4429,7 +4429,7 @@
 					{
 						var color = null;
 						if(styleOptions.lastColumn && styleOptions.lastColumn.dxf.fill)
-							color = Asc.parseColor(styleOptions.lastColumn.dxf.fill.bg).color;
+							color = Asc.parseColor(styleOptions.lastColumn.dxf.fill.getRgbOrNull()).color;
 						/*else
 							ctx.fillStyle = defaultColorBackground;*/
 						if(color != null)
@@ -4443,7 +4443,7 @@
 					{
 						if(styleOptions.headerRow && styleOptions.headerRow.dxf.fill)
 						{
-							ctx.fillStyle =  Asc.parseColor(styleOptions.headerRow.dxf.fill.bg).color;
+							ctx.fillStyle =  Asc.parseColor(styleOptions.headerRow.dxf.fill.getRgbOrNull()).color;
 						}
 						else
 						{
@@ -4456,7 +4456,7 @@
 					{
 						var color = null;
 						if(styleOptions.totalRow && styleOptions.totalRow.dxf.fill)
-							color = Asc.parseColor(styleOptions.totalRow.dxf.fill.bg).color;
+							color = Asc.parseColor(styleOptions.totalRow.dxf.fill.getRgbOrNull()).color;
 						else
 							color = defaultColorBackground ;
 						ctx.fillStyle = color;
@@ -4468,7 +4468,7 @@
 					if(styleOptions.firstHeaderCell && styleInfo.ShowFirstColumn)
 					{
 						if(styleOptions.firstHeaderCell && styleOptions.firstHeaderCell.dxf.fill)
-							ctx.fillStyle = Asc.parseColor(styleOptions.firstHeaderCell.dxf.fill.bg).color;
+							ctx.fillStyle = Asc.parseColor(styleOptions.firstHeaderCell.dxf.fill.getRgbOrNull()).color;
 						else
 							ctx.fillStyle = defaultColorBackground;
 						ctx.fillRect(0,0,stepX,stepY);
@@ -4477,7 +4477,7 @@
 					if(styleOptions.lastHeaderCell && styleInfo.ShowLastColumn)
 					{
 						if(styleOptions.lastHeaderCell && styleOptions.lastHeaderCell.dxf.fill)
-							ctx.fillStyle = Asc.parseColor(styleOptions.lastHeaderCell.dxf.fill.bg).color;
+							ctx.fillStyle = Asc.parseColor(styleOptions.lastHeaderCell.dxf.fill.getRgbOrNull()).color;
 						else
 							ctx.fillStyle = defaultColorBackground;
 						ctx.fillRect(4*stepX,0,stepX,stepY);
@@ -4486,7 +4486,7 @@
 					if(styleOptions.firstTotalCell  && styleInfo.TotalsRowCount && styleInfo.ShowFirstColumn)
 					{
 						if(styleOptions.firstTotalCell && styleOptions.firstTotalCell.dxf.fill)
-							ctx.fillStyle = Asc.parseColor(styleOptions.firstTotalCell.dxf.fill.bg).color;
+							ctx.fillStyle = Asc.parseColor(styleOptions.firstTotalCell.dxf.fill.getRgbOrNull()).color;
 						else
 							ctx.fillStyle = defaultColorBackground;
 						ctx.fillRect(0,4*stepY,stepX,stepY);
@@ -4495,7 +4495,7 @@
 					if(styleOptions.lastTotalCell  && styleInfo.TotalsRowCount && styleInfo.ShowLastColumn)
 					{
 						if(styleOptions.lastTotalCell && styleOptions.lastTotalCell.dxf.fill)
-							ctx.fillStyle = Asc.parseColor(styleOptions.lastTotalCell.dxf.fill.bg).color;
+							ctx.fillStyle = Asc.parseColor(styleOptions.lastTotalCell.dxf.fill.getRgbOrNull()).color;
 						else
 							ctx.fillStyle = defaultColorBackground;
 						ctx.fillRect(4*stepX,4*stepY,stepX,ySize);
@@ -4520,31 +4520,31 @@
 						var borders = styleOptions.wholeTable.dxf.border;
 						if(borders.t.s != 'none')
 						{
-							ctx.strokeStyle = Asc.parseColor(borders.t.c).color;
+							ctx.strokeStyle = Asc.parseColor(borders.t.getRgbOrNull()).color;
 							ctx.moveTo(0.5,0.5);
 							ctx.lineTo(Math.floor(xSize) + 0.5,0.5);
 						}
 						if(borders.b.s != 'none')
 						{
-							ctx.strokeStyle = Asc.parseColor(borders.b.c).color;
+							ctx.strokeStyle = Asc.parseColor(borders.b.getRgbOrNull()).color;
 							ctx.moveTo(0,Math.floor(ySize) - 0.5);
 							ctx.lineTo(Math.floor(xSize) + 0.5,Math.floor(ySize) - 0.5)
 						}					
 						if(borders.l.s != 'none')
 						{	
-							ctx.strokeStyle = Asc.parseColor(borders.l.c).color;
+							ctx.strokeStyle = Asc.parseColor(borders.l.getRgbOrNull()).color;
 							ctx.moveTo(0.5,0.5);
 							ctx.lineTo(0.5,Math.floor(ySize) + 0.5)
 						}
 						if(borders.r.s != 'none')
 						{
-							ctx.strokeStyle = Asc.parseColor(borders.r.c).color;
+							ctx.strokeStyle = Asc.parseColor(borders.r.getRgbOrNull()).color;
 							ctx.moveTo(Math.floor(xSize) - 0.5,0.5);
 							ctx.lineTo(Math.floor(xSize) - 0.5,Math.floor(ySize) + 0.5);
 						}
 						if(borders.ih.s != 'none')
 						{
-							ctx.strokeStyle = Asc.parseColor(borders.ih.c).color;
+							ctx.strokeStyle = Asc.parseColor(borders.ih.getRgbOrNull()).color;
 							for(var n = 1; n < 5; n++)
 							{
 								ctx.moveTo(0.5,Math.floor(stepY*n) + 0.5);
@@ -4554,7 +4554,7 @@
 						}
 						if(borders.iv.s != 'none')
 						{
-							ctx.strokeStyle = Asc.parseColor(borders.iv.c).color;
+							ctx.strokeStyle = Asc.parseColor(borders.iv.getRgbOrNull()).color;
 							for(var n = 1; n < 5; n++)
 							{
 								ctx.moveTo(Math.floor(stepX*n) + 0.5,0.5);
@@ -4577,9 +4577,9 @@
 						if(border)
 						{
 							if(border.t.s != 'none')
-								color = Asc.parseColor(borders.t.c).color;
+								color = Asc.parseColor(borders.t.getRgbOrNull()).color;
 							else if(border.b.s != 'none')
-								color = Asc.parseColor(borders.b.c).color;
+								color = Asc.parseColor(borders.b.getRgbOrNull()).color;
 							
 							for(n = 1; n < 5; n++)
 							{
@@ -4594,7 +4594,7 @@
 						var border = styleOptions.totalRow.dxf.border;
 						if(border.t.s != 'none')
 						{
-							ctx.strokeStyle = Asc.parseColor(border.t.c).color;
+							ctx.strokeStyle = Asc.parseColor(border.t.getRgbOrNull()).color;
 							ctx.moveTo(xSize,0.5);
 							ctx.lineTo(xSize,Math.floor(ySize) + 0.5);
 						}
@@ -4604,13 +4604,13 @@
 						var border = styleOptions.headerRow.dxf.border;
 						if(border.t.s != 'none')
 						{
-							ctx.strokeStyle = Asc.parseColor(border.t.c).color;
+							ctx.strokeStyle = Asc.parseColor(border.t.getRgbOrNull()).color;
 							ctx.moveTo(0,0.5);
 							ctx.lineTo(xSize,0.5);
 						}
 						if(border.b.s != 'none')
 						{
-							ctx.strokeStyle = Asc.parseColor(border.b.c).color;
+							ctx.strokeStyle = Asc.parseColor(border.b.getRgbOrNull()).color;
 							ctx.moveTo(0,Math.floor(stepY) + 0.5);
 							ctx.lineTo(xSize,Math.floor(stepY) + 0.5);
 						}
@@ -4625,30 +4625,30 @@
 				if(!styleOptions || !styleOptions.wholeTable || !styleOptions.wholeTable.dxf.font)
 					defaultColor = 0;
 				else
-					defaultColor = styleOptions.wholeTable.dxf.font.c;
+					defaultColor = styleOptions.wholeTable.dxf.font.getRgbOrNull();
 				for(n = 1; n < 6; n++)
 				{
 					ctx.beginPath();
 					var color = null;
 					if(n == 1 && styleOptions && styleOptions.headerRow && styleOptions.headerRow.dxf.font)
-						color = styleOptions.headerRow.dxf.font.c;
+						color = styleOptions.headerRow.dxf.font.getRgbOrNull();
 					else if(n == 5 && styleOptions && styleOptions.totalRow && styleOptions.totalRow.dxf.font)
-						color = styleOptions.totalRow.dxf.font.c;
+						color = styleOptions.totalRow.dxf.font.getRgbOrNull();
 					else if(styleOptions && styleOptions.headerRow && styleInfo.ShowRowStripes)
 					{
 						if((n == 2 || (n == 5 && !styleOptions.totalRow)) &&  styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.font)
-							color  = styleOptions.firstRowStripe.dxf.font.c;
+							color  = styleOptions.firstRowStripe.dxf.font.getRgbOrNull();
 						else if(n == 3 && styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.font)
-							color  = styleOptions.secondRowStripe.dxf.font.c;
+							color  = styleOptions.secondRowStripe.dxf.font.getRgbOrNull();
 						else
 							color = defaultColor
 					}
 					else if(styleOptions && !styleOptions.headerRow && styleInfo.ShowRowStripes)
 					{	
 						if((n == 1 || n == 3 || (n == 5 && !styleOptions.totalRow)) && styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.font)
-							color  = styleOptions.firstRowStripe.dxf.font.c;
+							color  = styleOptions.firstRowStripe.dxf.font.getRgbOrNull();
 						else if((n == 2 || n == 4) && styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.font)
-							color  = styleOptions.secondRowStripe.dxf.font.c;
+							color  = styleOptions.secondRowStripe.dxf.font.getRgbOrNull();
 						else
 							color = defaultColor
 					}

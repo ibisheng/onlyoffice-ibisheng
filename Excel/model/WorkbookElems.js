@@ -10,8 +10,245 @@ var g_oDefaultNumAbs = null;
 var g_oDefaultBorderAbs = null;
 var g_oDefaultAlignAbs = null;
 
-var g_nColorHyperlink = 0x0000ff;
-var g_nColorHyperlinkVisited = 0x800080;
+var g_nColorHyperlink = 10;
+var g_nColorHyperlinkVisited = 11;
+
+var g_oThemeColorTint = [0, 0.79998168889431442, 0.59999389629810485, 0.39997558519241921, -0.249977111117893, -0.499984740745262];
+var map_themeExcel_to_themePresentation = {
+	0: 12,
+	1: 8,
+	2: 13,
+	3: 9,
+	4: 0,
+	5: 1,
+	6: 2,
+	7: 3,
+	8: 4,
+	9: 5,
+	10: 11,
+	11: 10
+}
+var map_themePresentation_to_themeExcel = new Object();
+for(var i in map_themeExcel_to_themePresentation)
+	map_themePresentation_to_themeExcel[map_themeExcel_to_themePresentation[i]] = i - 0;
+function RgbColor(rgb)
+{
+	this.rgb = rgb;
+}
+RgbColor.prototype =
+{
+	getType : function()
+	{
+		return UndoRedoDataTypes.RgbColor;
+	},
+	Write_ToBinary2 : function(oBinaryWriter)
+	{
+		oBinaryWriter.WriteLong(this.rgb);
+	},
+	Read_FromBinary2 : function(oBinaryReader)
+	{
+		this.rgb = oBinaryReader.GetULongLE();
+	},
+	getRgb : function()
+	{
+		return this.rgb;
+	},
+	getR : function()
+	{
+		return (this.rgb >> 16) & 0xff;
+	},
+	getG : function()
+	{
+		return (this.rgb >> 8) & 0xff;
+	},
+	getB : function()
+	{
+		return this.rgb & 0xff;
+	}
+}
+function ThemeColor()
+{
+	this.rgb = null;
+	this.theme = null;
+	this.tint = null;
+}
+ThemeColor.prototype =
+{
+	getType : function()
+	{
+		return UndoRedoDataTypes.ThemeColor;
+	},
+	Write_ToBinary2 : function(oBinaryWriter)
+	{
+		oBinaryWriter.WriteByte(this.theme);
+		if(null != this.tint)
+		{
+			oBinaryWriter.WriteByte(true);
+			oBinaryWriter.WriteDouble2(this.tint);
+		}
+		else
+		{
+			oBinaryWriter.WriteBool(false);
+		}
+	},
+	Read_FromBinary2AndReplace : function(oBinaryReader)
+	{
+		this.theme = oBinaryReader.GetUChar();
+		var bTint = oBinaryReader.GetBool();
+		if(bTint)
+			this.tint = oBinaryReader.GetDoubleLE();
+		return g_oColorManager.getThemeColor(this.theme, this.tint);
+	},
+	getRgb : function()
+	{
+		return this.rgb;
+	},
+	getR : function()
+	{
+		return (this.rgb >> 16) & 0xff;
+	},
+	getG : function()
+	{
+		return (this.rgb >> 8) & 0xff;
+
+	},
+	getB : function()
+	{
+		return this.rgb & 0xff;
+	},
+	rebuild : function(theme)
+	{
+		var nRes = 0;
+		var r = 0;
+		var g = 0;
+		var b = 0;
+		if(null != this.theme && null != theme)
+		{
+			var oUniColor = theme.themeElements.clrScheme.colors[map_themeExcel_to_themePresentation[this.theme]];
+			if(null != oUniColor)
+			{
+				var rgba = oUniColor.color.RGBA;
+				if(null != rgba)
+				{
+					r = rgba.R;
+					g = rgba.G;
+					b = rgba.B;
+				}
+			}
+			if(null != this.tint && 0 != this.tint)
+			{
+				var oCColorModifiers = new CColorModifiers();
+				var HSL = {H: 0, S: 0, L: 0};
+				oCColorModifiers.RGB2HSL(r, g, b, HSL);
+				var L = HSL.L / g_nHSLMaxValue;
+				if (this.tint < 0)
+					L = L * (1 + this.tint);
+				else
+					L = L * (1 - this.tint) + (1 - 1 * (1 - this.tint));
+				HSL.L = Asc.floor(L * g_nHSLMaxValue);
+				var RGB = {R: 0, G: 0, B: 0};
+				oCColorModifiers.HSL2RGB(HSL, RGB);
+				r = RGB.R;
+				g = RGB.G;
+				b = RGB.B;
+			}
+			nRes |= b;
+			nRes |= g << 8;
+			nRes |= r << 16;
+		}
+		this.rgb = nRes;
+	}
+}
+function CorrectAscColor(asc_color)
+{
+	if (null == asc_color)
+		return null;
+
+	var ret = null;
+
+	var _type = asc_color.get_type();
+	switch (_type)
+	{
+		case c_oAscColor.COLOR_TYPE_SCHEME:
+		{
+			// тут выставляется ТОЛЬКО из меню. поэтому:
+			var _index = parseInt(asc_color.get_value());
+			var _id = (_index / 6) >> 0;
+			var _pos = _index - _id * 6
+			var tint = g_oThemeColorTint[_pos];
+			ret = g_oColorManager.getThemeColor(_id, tint);
+			break;
+		}
+		default:
+		{
+			ret = new RgbColor((asc_color.get_r() << 16) + (asc_color.get_g() << 8) + asc_color.get_b());
+		}
+	}
+	return ret;
+}
+function ColorManager()
+{
+	this.theme = null;
+	this.aColors = new Array(12);
+}
+ColorManager.prototype =
+{
+	isEqual : function(color1, color2)
+	{
+		var bRes = false;
+		if(null == color1 && null == color2)
+			bRes = true;
+		else if(null != color1 && null != color2)
+		{
+			if((color1 instanceof ThemeColor && color2 instanceof ThemeColor) || (color1 instanceof RgbColor && color2 instanceof RgbColor))
+				bRes =  color1.getRgb() == color2.getRgb();
+		}
+		return bRes;
+	},
+	setTheme : function(theme)
+	{
+		this.theme = theme;
+		this.rebuildColors();
+	},
+	getThemeColor : function(theme, tint)
+	{
+		if(null == tint)
+			tint = null;
+		var oColorObj = this.aColors[theme];
+		if(null == oColorObj)
+		{
+			oColorObj = new Object();
+			this.aColors[theme] = oColorObj;
+		}
+		var oThemeColor = oColorObj[tint];
+		if(null == oThemeColor)
+		{
+			oThemeColor = new ThemeColor();
+			oThemeColor.theme = theme;
+			oThemeColor.tint = tint;
+			if(null != this.theme)
+				oThemeColor.rebuild(this.theme);
+			oColorObj[tint] = oThemeColor;
+		}
+		return oThemeColor;
+	},
+	rebuildColors : function()
+	{
+		if(null != this.theme)
+		{
+			for(var i = 0, length = this.aColors.length; i < length; ++i)
+			{
+				var oColorObj = this.aColors[i];
+				for(var j in oColorObj)
+				{
+					var oThemeColor = oColorObj[j];
+					oThemeColor.rebuild(this.theme);
+				}
+			}
+		}
+	}
+}
+g_oColorManager = new ColorManager();
 
 /** @constructor */
 function Font(val)
@@ -20,12 +257,13 @@ function Font(val)
 	{
 		val = {
 			fn : "Calibri",
+			scheme : EFontScheme.fontschemeMinor,
 			fs : 11,
 			b : false,
 			i : false,
 			u : "none",
 			s : false,
-			c : 0x000000,
+			c : g_oColorManager.getThemeColor(1),
 			va : "baseline",
 			skip : false,
 			repeat : false
@@ -33,23 +271,23 @@ function Font(val)
 	}
 	this.Properties = {
 		fn: 0,
-		fs: 1,
-		b: 2,
-		i: 3,
-		u: 4,
-		s: 5,
-		c: 6,
-		va: 7
+		scheme: 1,
+		fs: 2,
+		b: 3,
+		i: 4,
+		u: 5,
+		s: 6,
+		c: 7,
+		va: 8
 	};
 	this.fn = val.fn;
+	this.scheme = val.scheme;
 	this.fs = val.fs;
 	this.b = val.b;
 	this.i = val.i;
 	this.u = val.u;
 	this.s = val.s;
 	this.c = val.c;
-	this.themeColor = null;
-	this.themeTint = null;
 	this.va = val.va
     //skip и repeat не сохраняются в файл нужны здесь только чтобы класс Font можно было использовать в комплексных строках
     this.skip = val.skip;
@@ -57,12 +295,23 @@ function Font(val)
 };
 Font.prototype =
 {
+	getRgbOrNull : function()
+	{
+		var nRes = null;
+		if(null != this.c)
+			nRes = this.c.getRgb();
+		return nRes;
+	},
 	getDif : function(val)
 	{
 		var oRes = new Font(this);
 		var bEmpty = true;
 		if(this.fn == val.fn)
 			oRes.fn =  null;
+		else
+			bEmpty = false;
+		if(this.scheme == val.scheme)
+			oRes.scheme =  null;
 		else
 			bEmpty = false;
 		if(this.fs == val.fs)
@@ -85,7 +334,7 @@ Font.prototype =
 			oRes.s =  null;
 		else
 			bEmpty = false;
-		if(this.c == val.c)
+		if(g_oColorManager.isEqual(this.c, val.c))
 			oRes.c =  null;
 		else
 			bEmpty = false;
@@ -107,8 +356,18 @@ Font.prototype =
 	},
 	isEqual : function(font)
 	{
-		return this.fn == font.fn && this.fs == font.fs && this.b == font.b && this.i == font.i && this.u == font.u && this.s == font.s &&
-				this.c == font.c && this.va == font.va && this.skip == font.skip && this.repeat == font.repeat;
+		var bRes = this.fs == font.fs && this.b == font.b && this.i == font.i && this.u == font.u && this.s == font.s &&
+				g_oColorManager.isEqual(this.c, font.c) && this.va == font.va && this.skip == font.skip && this.repeat == font.repeat;
+		if(bRes)
+		{
+			if(null == this.scheme && null == font.scheme)
+				bRes = this.fn == font.fn;
+			else if(null != this.scheme && null != font.scheme)
+				bRes = this.scheme == font.scheme;
+			else
+				bRes = false;
+		}
+		return bRes;
 	},
     clone : function()
     {
@@ -118,6 +377,8 @@ Font.prototype =
 	{
         if(null != oVal.fn)
             this.fn = oVal.fn;
+		if(null != oVal.scheme)
+            this.scheme = oVal.scheme;
         if(null != oVal.fs)
             this.fs = oVal.fs;
         if(null != oVal.b)
@@ -141,6 +402,8 @@ Font.prototype =
 	{
 		if(this.fn != oFont.fn)
             this.fn = g_oDefaultFont.fn;
+		if(this.scheme != oFont.scheme)
+            this.scheme = g_oDefaultFont.scheme;
         if(this.fs != oFont.fs)
             this.fs = g_oDefaultFont.fs;
 		if(this.b != oFont.b)
@@ -151,7 +414,7 @@ Font.prototype =
             this.u = g_oDefaultFont.u;
 		if(this.s != oFont.s)
             this.s = g_oDefaultFont.s;
-		if(this.c != oFont.c)
+		if(false == g_oColorManager.isEqual(this.c, oFont.c))
             this.c = g_oDefaultFont.c;
 		if(this.va != oFont.va)
             this.va = g_oDefaultFont.va;
@@ -173,6 +436,7 @@ Font.prototype =
 		switch(nType)
 		{
 			case this.Properties.fn: return this.fn;break;
+			case this.Properties.scheme: return this.scheme;break;
 			case this.Properties.fs: return this.fs;break;
 			case this.Properties.b: return this.b;break;
 			case this.Properties.i: return this.i;break;
@@ -187,6 +451,7 @@ Font.prototype =
 		switch(nType)
 		{
 			case this.Properties.fn: this.fn = value;break;
+			case this.Properties.scheme: this.scheme = value;break;
 			case this.Properties.fs: this.fs = value;break;
 			case this.Properties.b: this.b = value;break;
 			case this.Properties.i: this.i = value;break;
@@ -197,7 +462,6 @@ Font.prototype =
 		}
 	}
 };
-g_oDefaultFont = g_oDefaultFontAbs = new Font();
 /** @constructor */
 function Fill(val)
 {
@@ -211,16 +475,21 @@ function Fill(val)
 		bg: 0
 	};
 	this.bg = val.bg;
-	this.themeColor = null;
-	this.themeTint = null;
 };
 Fill.prototype =
 {
+	getRgbOrNull : function()
+	{
+		var nRes = null;
+		if(null != this.bg)
+			nRes = this.bg.getRgb();
+		return nRes;
+	},
 	getDif : function(val)
 	{
 		var oRes = new Fill(this);
 		var bEmpty = true;
-		if(this.bg == val.bg)
+		if(g_oColorManager.isEqual(this.bg, val.bg))
 			oRes.bg =  null;
 		else
 			bEmpty = false;
@@ -228,9 +497,9 @@ Fill.prototype =
 			oRes = null;
 		return oRes;
 	},
-	isEqual : function(val)
+	isEqual : function(fill)
 	{
-		return this.bg == val.bg;
+		return g_oColorManager.isEqual(this.bg, fill.bg);
 	},
     clone : function()
     {
@@ -259,7 +528,6 @@ Fill.prototype =
 		}
 	}
 };
-g_oDefaultFill = g_oDefaultFillAbs = new Fill();
 function BorderProp()
 {
 	this.Properties = {
@@ -267,18 +535,23 @@ function BorderProp()
 		c: 1
 	};
 	this.s = "none";
-	this.c = 0x000000;
-	this.themeColor = null;
-	this.themeTint = null;
+	this.c = g_oColorManager.getThemeColor(1);
 }
 BorderProp.prototype = {
+	getRgbOrNull : function()
+	{
+		var nRes = null;
+		if(null != this.c)
+			nRes = this.c.getRgb();
+		return nRes;
+	},
 	isEmpty : function()
 	{
-		return "none" == this.s ;
+		return "none" == this.s;
 	},
 	isEqual : function(val)
 	{
-		return this.s == val.s && this.c == val.c;
+		return this.s == val.s && g_oColorManager.isEqual(this.c, val.c);
 	},
 	clone : function()
 	{
@@ -491,7 +764,6 @@ Border.prototype =
 		}
 	}
 };
-g_oDefaultBorder = g_oDefaultBorderAbs = new Border();
 /** @constructor */
 function Num(val)
 {
@@ -551,7 +823,6 @@ Num.prototype =
 		}
 	}
 };
-g_oDefaultNum = g_oDefaultNumAbs = new Num();
 /** @constructor */
 function CellXfs()
 {
@@ -752,7 +1023,6 @@ Align.prototype =
 		}
 	}
 };
-g_oDefaultAlign = g_oDefaultAlignAbs = new Align();
 /** @constructor */
 function StyleManager(){
     //содержат все свойства по умолчанию
@@ -2230,35 +2500,24 @@ CCellValue.prototype =
 			cellfont = this.cell.xfs.font;
 		else
 			cellfont = g_oDefaultFont;
-		if(this.cell.hyperlinks.length > 0)
-		{
-			var bVisited = false;
-			for(var i = 0, length = this.cell.hyperlinks.length; i < length; ++i)
-			{
-				if(true == this.cell.hyperlinks[i].bVisited)
-				{
-					bVisited = true;
-					break;
-				}
-			}
-			//todo отказаться от сравнения с цветом
-			if(bVisited && g_nColorHyperlink == cellfont.c)
-			{
-				cellfont = cellfont.clone();
-				cellfont.c = g_nColorHyperlinkVisited;
-			}
-		}
 		if(null != sText){
-			var oNewItem = {text: null, format: null, sFormula: null, sId: null};
+			var oNewItem = {text: null, format: null, sFormula: null, sId: null, theme: null, tint: null};
 			oNewItem.text = sText;
 			oNewItem.format = cellfont.clone();
+			//todo
+			if(oNewItem.format.c instanceof ThemeColor)
+			{
+				oNewItem.theme = oNewItem.format.c.theme;
+				oNewItem.tint = oNewItem.format.c.tint;
+			}
+			oNewItem.format.c = oNewItem.format.getRgbOrNull();
 			oNewItem.format.skip = false;
 			oNewItem.format.repeat = false;
 			aResult.push(oNewItem);
 		}
 		else if(null != aText){
 			for(var i = 0; i < aText.length; i++){
-				var oNewItem = {text: null, format: null, sFormula: null, sId: null};
+				var oNewItem = {text: null, format: null, sFormula: null, sId: null, theme: null, tint: null};
 				var oCurtext = aText[i];
 				if(null != oCurtext.text)
 				{
@@ -2269,6 +2528,13 @@ CCellValue.prototype =
 					if(null != oCurtext.format)
 						oCurFormat.set(oCurtext.format);
 					oNewItem.format = oCurFormat;
+					//todo
+					if(oNewItem.format.c instanceof ThemeColor)
+					{
+						oNewItem.theme = oNewItem.format.c.theme;
+						oNewItem.tint = oNewItem.format.c.tint;
+					}
+					oNewItem.format.c = oNewItem.format.getRgbOrNull();
 					aResult.push(oNewItem);
 				}
 			}
@@ -2361,43 +2627,34 @@ CCellValue.prototype =
 			//проверяем можно ли перевести массив в простую строку.
 			if(aVal.length > 0)
 			{
-				//для гиперссылок
-				var bVisited = false;
-				if(this.cell.hyperlinks.length > 0)
-				{
-					for(var i = 0, length = this.cell.hyperlinks.length; i < length; ++i)
-					{
-						if(this.cell.hyperlinks[i].bVisited)
-						{
-							bVisited = true;
-							break;
-						}
-					}
-				}
 				this.multiText = new Array();
 				for(var i = 0, length = aVal.length; i < length; i++){
 					var item = aVal[i];
 					var format = item.format;
-					//todo убрать это преобразование
-					if(null != format && null != format.c && "string" == typeof(format.c))
+					if(null != item.theme)
+						format.c = g_oColorManager.getThemeColor(item.theme, item.tint);
+					else
 					{
-						//переводим обратно в число
-						if(0 == format.c.indexOf("#"))
+						//todo убрать это преобразование
+						if(null != format && null != format.c && "string" == typeof(format.c))
 						{
-							var hex = format.c.substring(1);
-							if(hex.length == 3)
-								hex = hex.charAt(0) + hex.charAt(0) + hex.charAt(1) + hex.charAt(1) + hex.charAt(2) + hex.charAt(2);
-							if(hex.length == 6)
+							//переводим обратно в число
+							if(0 == format.c.indexOf("#"))
 							{
-								var r = parseInt("0x" + hex.substring(0,2));
-								var g = parseInt("0x" + hex.substring(2,4));
-								var b = parseInt("0x" + hex.substring(4,6));
-								format.c = r << 16 | g <<  8 | b;
+								var hex = format.c.substring(1);
+								if(hex.length == 3)
+									hex = hex.charAt(0) + hex.charAt(0) + hex.charAt(1) + hex.charAt(1) + hex.charAt(2) + hex.charAt(2);
+								if(hex.length == 6)
+								{
+									var r = parseInt("0x" + hex.substring(0,2));
+									var g = parseInt("0x" + hex.substring(2,4));
+									var b = parseInt("0x" + hex.substring(4,6));
+									format.c = r << 16 | g <<  8 | b;
+								}
 							}
 						}
+						format.c = new RgbColor(format.c);
 					}
-					if(bVisited && g_nColorHyperlinkVisited == format.c)
-						format.c = g_nColorHyperlink;
 					
 					var oNewElem = new CCellValueMultiText();
 					oNewElem.text = item.text;
@@ -2461,7 +2718,9 @@ CCellValue.prototype =
 				oIntersectFont.intersect(aVal[i].format);
 			if(bSetCellFont)
 			{
-				if(null != this.cell.xfs || false == oIntersectFont.isEqual(g_oDefaultFontAbs))
+				if(oIntersectFont.isEqual(g_oDefaultFont))
+					this.cell.setFont(null, false);
+				else
 					this.cell.setFont(oIntersectFont, false);
 			}
 			//если у всех элементов один формат, то сохраняем только текст

@@ -105,6 +105,47 @@ function numberToAscColor(n) {
 	return CreateAscColorCustom(r, g, b);
 }
 
+function colorObjToAscColor(color) {
+	var oRes = null;
+	var n = color.getRgb();
+	var r = (n >> 16) & 0xff;
+	var g = (n >> 8) & 0xff;
+	var b = n & 0xff;
+	var bTheme = false;
+	if(color instanceof ThemeColor && null != color.theme)
+	{
+		var array_colors_types = [6, 15, 7, 16, 0, 1, 2, 3, 4, 5];
+		var themePresentation = array_colors_types[color.theme];
+		var tintExcel = 0;
+		if(null != color.tint)
+			tintExcel = color.tint;
+		var tintPresentation = 0;
+		for(var i = 0 , length = g_oThemeColorTint.length; i < length; ++i)
+		{
+			var cur = g_oThemeColorTint[i];
+			//0.005 установлено экспериментально
+			if(Math.abs(cur - tintExcel) < 0.005)
+			{
+				bTheme = true;
+				tintPresentation = i;
+				break;
+			}
+		}
+		if(bTheme)
+		{
+			oRes = new CAscColor();
+			oRes.r = r;
+			oRes.g = g;
+			oRes.b = b;
+			oRes.a = 255;
+			oRes.type = c_oAscColor.COLOR_TYPE_SCHEME;
+			oRes.value = themePresentation;
+		}
+	}
+	if(false == bTheme)
+		oRes = CreateAscColorCustom(r, g, b);
+	return oRes;
+}
 
 var oldPpi = undefined,
     cvt = undefined;
@@ -1211,6 +1252,7 @@ window["Asc"].getCvtRatio      = getCvtRatio;
 window["Asc"].calcNearestPt    = calcNearestPt;
 window["Asc"].numberToCSSColor = numberToCSSColor;
 window["Asc"].numberToAscColor = numberToAscColor;
+window["Asc"].colorObjToAscColor = colorObjToAscColor;
 window["Asc"].parseColor       = parseColor;
 
 window["Asc"].FontProperties   = FontProperties;

@@ -24,6 +24,7 @@
 		var asc_round   = asc.round;
 		var asc_n2css   = asc.numberToCSSColor;
 		var asc_n2Color   = asc.numberToAscColor;
+		var asc_obj2Color = asc.colorObjToAscColor;
 		var asc_typeof  = asc.typeOf;
 		var asc_debug   = asc.outputDebugStr;
 		var asc_DC      = asc.DrawingContext;
@@ -165,7 +166,7 @@
 			/** @type {String} */
 			this.s = style !== undefined ? style : kcbNone;
 			/** @type {Number} */
-			this.c = color !== undefined ? color : 0;
+			this.c = color !== undefined ? color.getRgb() : 0;
 			/** @type {Number} */
 			this.w = width !== undefined ? width : 0;
 			/** @type {Boolean} */
@@ -2200,6 +2201,8 @@
 
 					var ctx = (undefined === drawingCtx) ? this.drawingCtx : drawingCtx;
 					var bg = c.getFill();
+					if(null != bg)
+						bg = bg.getRgb();
 					var fl = this._getCellFlags(c);
 					var range = fl.isMerged ? this._getMergedCellsRange(col, row) : undefined;
 					var mwidth = 0, mheight = 0;
@@ -2227,7 +2230,7 @@
 								if (c2) {
 									var bg2 = c2.getFill();
 									if (bg2 !== null) {
-										ctx.setFillStyle(asc_n2css(bg2))
+										ctx.setFillStyle(asc_n2css(bg2.getRgb()))
 												.fillRect(
 														this.cols[col + 1].left - offsetX - this.width_1px,
 														this.rows[row].top - offsetY - this.height_1px,
@@ -2239,7 +2242,7 @@
 								if (c3) {
 									var bg3 = c3.getFill();
 									if (bg3 !== null) {
-										ctx.setFillStyle(asc_n2css(bg3))
+										ctx.setFillStyle(asc_n2css(bg3.getRgb()))
 												.fillRect(
 														this.cols[col].left - offsetX - this.width_1px,
 														this.rows[row + 1].top - offsetY - this.height_1px,
@@ -3763,11 +3766,13 @@
 						cto = this._calcCellTextOffset(col, row, ha, tm.width);
 					}
 				}
-
+				var oFontColor = c.getFontcolor();
+				if(null != oFontColor)
+					oFontColor = oFontColor.getRgb();
 				this._fetchCellCache(col, row).text = {
 					state   : this.stringRender.getInternalState(),
 					flags   : fl,
-					color   : (c.getFontcolor() || this.settings.cells.defaultState.color),
+					color   : (oFontColor || this.settings.cells.defaultState.color),
 					metrics : tm,
 					cellW   : cto.maxWidth,
 					cellHA  : ha,
@@ -5703,17 +5708,17 @@
 				cell_info.font.strikeout = c.getStrikeout();
 				cell_info.font.subscript = fa === "subscript";
 				cell_info.font.superscript = fa === "superscript";
-				cell_info.font.color = (fc ? asc_n2Color(fc) : asc_n2Color(c_opt.defaultState.colorNumber));
+				cell_info.font.color = (fc ? asc_obj2Color(fc) : asc_n2Color(c_opt.defaultState.colorNumber));
 
-				cell_info.fill = new asc_CFill((null !==  bg && undefined !== bg) ? asc_n2Color(bg) : bg);
+				cell_info.fill = new asc_CFill((null !==  bg && undefined !== bg) ? asc_obj2Color(bg) : bg);
 
 				cell_info.border = new asc_CBorders();
-				cell_info.border.left = new asc_CBorder(b.l.w, b.l.s, asc_n2Color(b.l.c));
-				cell_info.border.top = new asc_CBorder(b.t.w, b.t.s, asc_n2Color(b.t.c));
-				cell_info.border.right = new asc_CBorder(b.r.w, b.r.s, asc_n2Color(b.r.c));
-				cell_info.border.bottom = new asc_CBorder(b.b.w, b.b.s, asc_n2Color(b.b.c));
-				cell_info.border.diagDown = new asc_CBorder(b.dd.w, b.dd.s, asc_n2Color(b.dd.c));
-				cell_info.border.diagUp = new asc_CBorder(b.du.w, b.du.s, asc_n2Color(b.du.c));
+				cell_info.border.left = new asc_CBorder(b.l.w, b.l.s, b.l.c);
+				cell_info.border.top = new asc_CBorder(b.t.w, b.t.s, b.t.c);
+				cell_info.border.right = new asc_CBorder(b.r.w, b.r.s, b.r.c);
+				cell_info.border.bottom = new asc_CBorder(b.b.w, b.b.s, b.b.c);
+				cell_info.border.diagDown = new asc_CBorder(b.dd.w, b.dd.s, b.dd.c);
+				cell_info.border.diagUp = new asc_CBorder(b.du.w, b.du.s, b.du.c);
 
 				// Получаем гиперссылку
 				var ar = this.activeRange.clone();
@@ -6904,9 +6909,7 @@
 							if (b.style !== null && b.style !== undefined) {border.s = b.style;}
 							if (b.color !== null && b.color !== undefined) {
 								if(b.color instanceof CAscColor)
-									border.c = ((b.color.get_r() << 16) | (b.color.get_g() << 8) | b.color.get_b());
-								else
-									border.c = asc_parsecolor(b.color).binary;
+									border.c = CorrectAscColor(b.color);
 							}
 							flag = flag || (b.width === null || b.style === null || b.color === null);
 						}
@@ -6928,8 +6931,8 @@
 						case "fa": range.setFontAlign(val); break;
 						case "a":  range.setAlignHorizontal(val); break;
 						case "va": range.setAlignVertical(val); break;
-						case "c":  range.setFontcolor(asc_parsecolor(val).binary); break;
-						case "bc": range.setFill((val) ? (asc_parsecolor(val).binary) : null); break;
+						case "c":  range.setFontcolor(val); break;
+						case "bc": range.setFill((val) ? (val) : null); break;
 						case "wrap":   range.setWrap(val); break;
 						case "shrink": range.setShrinkToFit(val); break;
 						case "value":  range.setValue(val); break;
@@ -7361,7 +7364,7 @@
 										range.setItalic(currentObj[0].format.i);
 										range.setStrikeout(currentObj[0].format.s);
 										if(!isOneMerge && currentObj[0].format && currentObj[0].format.c != null && currentObj[0].format.c != undefined && asc_parsecolor(currentObj[0].format.c) != null)
-											range.setFontcolor(asc_parsecolor(currentObj[0].format.c).binary);
+											range.setFontcolor(new RgbColor(asc_parsecolor(currentObj[0].format.c).binary));
 										range.setUnderline(currentObj[0].format.u);
 										range.setAlignVertical(currentObj.va);
 										range.setFontname(currentObj[0].format.fn);
@@ -7403,7 +7406,7 @@
 										range.setBorderSrc(currentObj.borders, false);
 									range.setWrap(currentObj.wrap);
 									if(currentObj.bc && currentObj.bc != 'rgba(0, 0, 0, 0)' && currentObj.bc != 'transparent' && '' != currentObj.bc && !isOneMerge)
-										range.setFill(asc_parsecolor(currentObj.bc).binary);
+										range.setFill(new RgbColor(asc_parsecolor(currentObj.bc).binary));
 										var link = values[r][c][0].hyperLink;
 									if(link)
 									{
@@ -7690,7 +7693,7 @@
 										range.setItalic(newVal.value2[numStyle].format.i);
 										range.setStrikeout(newVal.value2[numStyle].format.s);
 										if(!isOneMerge && newVal.value2[numStyle].format && newVal.value2[numStyle].format.c != null && newVal.value2[numStyle].format.c != undefined)
-											range.setFontcolor(asc_parsecolor(newVal.value2[numStyle].format.c).binary);
+											range.setFontcolor(new RgbColor(asc_parsecolor(newVal.value2[numStyle].format.c).binary));
 										range.setUnderline(newVal.value2[numStyle].format.u);
 										//range.setAlignVertical(currentObj.va);
 										range.setFontname(newVal.value2[numStyle].format.fn);
@@ -7717,7 +7720,6 @@
 										nameFormat = newVal.format.sFormat;
 									if(nameFormat)
 										range.setNumFormat(nameFormat);
-										
 									range.setFill(newVal.fill);
 
 									range.setWrap(newVal.wrap);
@@ -8788,11 +8790,16 @@
 				}
 
 				bg = c.getFill();
+				if(null != bg)
+					bg = bg.getRgb();
 
 				t.isFormulaEditMode = false;
 				// Очищаем массив ячеек для текущей формулы
 				t.arrActiveFormulaRanges = [];
-
+				
+				var oFontColor = c.getFontcolor();
+				if(null != oFontColor)
+					oFontColor = oFontColor.getRgb();
 				editor.open({
 					cellX: t.cellsLeft + tc[!fl.isMerged ? col : mc.c1].left - tc[vr.c1].left,
 					cellY: t.cellsTop + tr[!fl.isMerged ? row : mc.r1].top - tr[vr.r1].top,
@@ -8804,7 +8811,7 @@
 					font: new asc_FP(c.getFontname(), c.getFontsize()),
 					background: bg !== null ? asc_n2css(bg) : t.settings.cells.defaultState.background,
 					hasBackground: bg !== null,
-					textColor: c.getFontcolor() || t.settings.cells.defaultState.color,
+					textColor: oFontColor || t.settings.cells.defaultState.color,
 					cursorPos: cursorPos,
 					zoom: t.getZoom(),
 					focus: isFocus,

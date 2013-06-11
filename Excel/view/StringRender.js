@@ -977,8 +977,12 @@
                                 f_ = f;
                                 this.fontNeedUpdate = false;
                             }
-
-							ctx.setFillStyle(p.c || textColor);
+							var fillStyle;
+							if(null != p.c && null != p.c.getRgb)
+								fillStyle = p.c.getRgb();
+							else
+								fillStyle = p.c || textColor;
+							ctx.setFillStyle(fillStyle);
 							p_ = p;
 						}
 						if (p.skip > 0) {

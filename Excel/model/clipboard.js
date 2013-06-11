@@ -1189,7 +1189,7 @@
 						borderTopColor = $(node).css('border-top-color');*/
 					var borderTopColor = 0;
 					
-					oNewItem.borders.t.c = borderTopColor;
+					oNewItem.borders.t.c = new RgbColor(borderTopColor);
                     var style = borderTopStyle + parseInt(borderTopWidth).toString();
 					if(undefined != kBorderRevVal[$.inArray(style, kBorderRev)])
 						oNewItem.borders.t.s =  kBorderRevVal[$.inArray(style, kBorderRev)];
@@ -1210,7 +1210,7 @@
 						borderBottomColor = $(node).css('border-bottom-color');*/
 					var borderBottomColor = 0;
 					
-					oNewItem.borders.b.c = borderBottomColor;
+					oNewItem.borders.b.c = new RgbColor(borderBottomColor);
                      var style = borderBottomStyle + parseInt(borderBottomWidth).toString();
 					if(undefined != kBorderRevVal[$.inArray(style, kBorderRev)])
 						 oNewItem.borders.b.s =  kBorderRevVal[$.inArray(style, kBorderRev)];
@@ -1233,7 +1233,7 @@
 						borderLeftColor = $(node).css('border-left-color');*/
 					var borderLeftColor = 0;
 					
-					oNewItem.borders.l.c = borderLeftColor;
+					oNewItem.borders.l.c = new RgbColor(borderLeftColor);
                       var style = borderLeftStyle + parseInt(borderLeftWidth).toString();
 					if(undefined != kBorderRevVal[$.inArray(style, kBorderRev)])
 						 oNewItem.borders.l.s =  kBorderRevVal[$.inArray(style, kBorderRev)];
@@ -1254,7 +1254,7 @@
 						borderRightColor = $(node).css('border-right-color'); */
 					var borderRightColor = 0;
 					
-					oNewItem.borders.r.c = borderRightColor;
+					oNewItem.borders.r.c = new RgbColor(borderRightColor);
                       var style = borderRightStyle + parseInt(borderRightWidth).toString();
 					if(undefined != kBorderRevVal[$.inArray(style, kBorderRev)])
 						 oNewItem.borders.r.s =  kBorderRevVal[$.inArray(style, kBorderRev)];
@@ -2014,7 +2014,7 @@
 				function makeBorder(border) {
 					return !border || !border.s || border.s === "none" ?
 							"" :
-							kBorder[border.s][1] + "px " + kBorder[border.s][0] + " " + number2color(border.c);
+							kBorder[border.s][1] + "px " + kBorder[border.s][0] + " " + number2color(border.getRgbOrNull());
 				}
 
 				table = doc.createElement("TABLE");
@@ -2162,7 +2162,7 @@
 							
 							b = cell.getFill();
 							// если b==0 мы не зайдем в if, хотя b==0 это ни что иное, как черный цвет заливки.
-							if (b!=null) {td.style.backgroundColor = number2color(b);}
+							if (b!=null) {td.style.backgroundColor = number2color(b.getRgb());}
 
 							var isQPrefix = cell.getQuotePrefix()
 							this._makeNodesFromCellValue(cell.getValue2(), fn ,fs,isQPrefix,isFormat,cell).forEach(

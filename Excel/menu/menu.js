@@ -934,7 +934,7 @@
 		var otd_color_fon = $("#td_color_fon");
 		otd_color_fon.blur();
 		$("#td_BackgroundColor").removeClass("iconPressed");
-		api.asc_setCellBackgroundColor(a2)
+		api.asc_setCellBackgroundColor(Asc.numberToAscColor(Asc.parseColor(a2).binary));
 		return false;
 	});
 	$(".clrPicker2, .clrPicker3").mousedown(function(event){
@@ -980,7 +980,7 @@
 		otd_color.blur();
 		$("#td_TextColor").removeClass("iconPressed");
 		// changeFontColor(a2,"text");
-		api.asc_setCellTextColor(a2)
+		api.asc_setCellTextColor(Asc.numberToAscColor(Asc.parseColor(a2).binary))
 		return false;
 	});
 	$("#td_func_choose").mousedown(function(event) {
@@ -1035,34 +1035,34 @@
 			}
 			case "1":{
 				val = [];
-				val[c_oAscBorderOptions.Left] = new window.Asc.asc_CBorder(0, "thin", "#000");
+				val[c_oAscBorderOptions.Left] = new window.Asc.asc_CBorder(0, "thin", Asc.numberToAscColor(Asc.parseColor("#000").binary));
 				api.asc_setCellBorders(val);
 				break;
 			}
 			case "4":{
 				val = [];
-				val[c_oAscBorderOptions.Top] = new window.Asc.asc_CBorder(0, "thin", "#000");
+				val[c_oAscBorderOptions.Top] = new window.Asc.asc_CBorder(0, "thin", Asc.numberToAscColor(Asc.parseColor("#000").binary));
 				api.asc_setCellBorders(val);
 				break;
 			}
 			case "16":{
 				val = [];
-				val[c_oAscBorderOptions.Right] = new window.Asc.asc_CBorder(0, "thin", "#000");
+				val[c_oAscBorderOptions.Right] = new window.Asc.asc_CBorder(0, "thin", Asc.numberToAscColor(Asc.parseColor("#000").binary));
 				api.asc_setCellBorders(val);
 				break;
 			}
 			case "64":{
 				val = [];
-				val[c_oAscBorderOptions.Bottom] = new window.Asc.asc_CBorder(0, "thin", "#000");
+				val[c_oAscBorderOptions.Bottom] = new window.Asc.asc_CBorder(0, "thin", Asc.numberToAscColor(Asc.parseColor("#000").binary));
 				api.asc_setCellBorders(val);
 				break;
 			}
 			case "85":{
 				val = [];
-				val[c_oAscBorderOptions.Left] = new window.Asc.asc_CBorder(0, "thin", "#000");
-				val[c_oAscBorderOptions.Top] = new window.Asc.asc_CBorder(0, "thin", "#000");
-				val[c_oAscBorderOptions.Right] = new window.Asc.asc_CBorder(0, "thin", "#000");
-				val[c_oAscBorderOptions.Bottom] = new window.Asc.asc_CBorder(0, "thin", "#000");
+				val[c_oAscBorderOptions.Left] = new window.Asc.asc_CBorder(0, "thin", Asc.numberToAscColor(Asc.parseColor("#000").binary));
+				val[c_oAscBorderOptions.Top] = new window.Asc.asc_CBorder(0, "thin", Asc.numberToAscColor(Asc.parseColor("#000").binary));
+				val[c_oAscBorderOptions.Right] = new window.Asc.asc_CBorder(0, "thin", Asc.numberToAscColor(Asc.parseColor("#000").binary));
+				val[c_oAscBorderOptions.Bottom] = new window.Asc.asc_CBorder(0, "thin", Asc.numberToAscColor(Asc.parseColor("#000").binary));
 				api.asc_setCellBorders(val);
 				break;
 			}

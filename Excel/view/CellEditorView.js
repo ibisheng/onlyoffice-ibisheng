@@ -113,6 +113,7 @@
 			this.hasCursor = false;
 			this.hasFocus = false;
 			this.newTextFormat = undefined;
+			this.newTextFormatAdditional = undefined;
 			this.selectionTimer = undefined;
 			this.enableKeyEvents = true;
 			this.isTopLineActive = false;
@@ -314,7 +315,8 @@
 
 					if (first && last) {
 						for (i = first.index; i <= last.index; ++i) {
-							var valTmp = t._setFormatProperty(opt.fragments[i].format, prop, val);
+							var elem = opt.fragments[i];
+							var valTmp = t._setFormatProperty(elem.format, prop, val, elem);
 							// Только для горячих клавиш
 							if (null === val)
 								val = valTmp;
@@ -337,9 +339,11 @@
 					first = t._findFragmentToInsertInto(t.cursorPos);
 					if (first) {
 						if (!t.newTextFormat) {
-							t.newTextFormat = t._cloneFormat(opt.fragments[first.index].format);
+							var elem = opt.fragments[first.index];
+							t.newTextFormat = t._cloneFormat(elem.format);
+							t.newTextFormatAdditional = {theme: elem.theme, tint: elem.tint};
 						}
-						t._setFormatProperty(t.newTextFormat, prop, val);
+						t._setFormatProperty(t.newTextFormat, prop, val, t.newTextFormatAdditional);
 					}
 
 				}
@@ -631,6 +635,7 @@
 				t._cleanFragments(opt.fragments);
 				t.textRender.setString(opt.fragments, t.textFlags);
 				delete t.newTextFormat;
+				delete t.newTextFormatAdditional;
 
 				if (opt.zoom > 0) {
 					t.overlayCtx.setFont(t.drawingCtx.getFont());
@@ -1254,8 +1259,15 @@
 				}
 
 				if (t.newTextFormat) {
-					t._addFragments([{format: t.newTextFormat, text: str}], pos);
+					var oNewObj = {format: t.newTextFormat, text: str, theme: null, tint: null};
+					if(null != t.newTextFormatAdditional)
+					{
+						oNewObj.theme = t.newTextFormatAdditional.theme;
+						oNewObj.tint = t.newTextFormatAdditional.tint;
+					}
+					t._addFragments([oNewObj], pos);
 					delete t.newTextFormat;
+					delete t.newTextFormatAdditional;
 				} else {
 					f = t._findFragmentToInsertInto(pos);
 					if (f) {
@@ -1412,8 +1424,8 @@
 					Array.prototype.splice.apply(
 							opt.fragments,
 							[f.index, 1].concat([
-									{format: t._cloneFormat(fr.format), text: fr.text.slice(0, pos - f.begin)},
-									{format: t._cloneFormat(fr.format), text: fr.text.slice(pos - f.begin)}]));
+									{format: t._cloneFormat(fr.format), text: fr.text.slice(0, pos - f.begin), theme: fr.theme, tint: fr.tint},
+									{format: t._cloneFormat(fr.format), text: fr.text.slice(pos - f.begin), theme: fr.theme, tint: fr.tint}]));
 				}
 			},
 
@@ -1487,8 +1499,9 @@
 					}
 					if (i < opt.fragments.length - 1 &&
 					    t._isEqualFormats(opt.fragments[i].format, opt.fragments[i + 1].format)) {
+						var fr = opt.fragments[i];
 						opt.fragments.splice(i, 2,
-								{format: opt.fragments[i].format, text: opt.fragments[i].text + opt.fragments[i + 1].text});
+								{format: fr.format, text: fr.text + fr.text, theme: fr.theme, tint: fr.tint});
 						continue;
 					}
 					++i;
@@ -1524,7 +1537,7 @@
 						f1.c === f2.c && f1.va === f2.va;
 			},
 
-			_setFormatProperty: function (format, prop, val) {
+			_setFormatProperty: function (format, prop, val, formatAdditional) {
 				switch (prop) {
 					case "fn": format.fn = val; break;
 					case "fs": format.fs = val; break;
@@ -1542,7 +1555,14 @@
 						break;
 					case "s":  format.s = val; break;
 					case "fa": format.va = val; break;
-					case "c":  format.c = asc_parsecolor(val).binary; break;
+					case "c":
+						format.c = asc.numberToCSSColor(val.getRgb());
+						if(val instanceof ThemeColor)
+						{
+							formatAdditional.theme = val.theme;
+							formatAdditional.tint = val.tint;
+						}
+						break;
 				}
 				return val;
 			},

@@ -221,6 +221,8 @@ UndoRedoItemSerializable.prototype = {
 		{
 			if(null != oDataObject.Read_FromBinary2)
 				oDataObject.Read_FromBinary2(oBinaryReader);
+			else if(null != oDataObject.Read_FromBinary2AndReplace)
+				oDataObject = oDataObject.Read_FromBinary2AndReplace(oBinaryReader);
 			else
 				this.DeserializeDataInner(oBinaryReader, oDataObject, nLength, false);
 		}
@@ -320,6 +322,8 @@ var UndoRedoDataTypes = new function() {
 	this.DrawingObjectLayer = 31;
 	this.AutoFiltersOptionsElements = 32;
 	this.SingleProperty = 33;
+	this.RgbColor = 34;
+	this.ThemeColor = 35;
 	this.Create = function(nType)
 	{
 		switch(nType)
@@ -358,6 +362,8 @@ var UndoRedoDataTypes = new function() {
 			case this.AutoFiltersOptions: return new Asc.AutoFiltersOptions(); break;
 			case this.AutoFiltersOptionsElements: return new Asc.AutoFiltersOptionsElements(); break;
 			case this.SingleProperty: return new UndoRedoData_SingleProperty(); break;
+			case this.RgbColor: return new RgbColor(); break;
+			case this.ThemeColor: return new ThemeColor(); break;
 		}
 		return null;
 	};

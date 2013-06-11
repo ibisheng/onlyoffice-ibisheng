@@ -131,23 +131,13 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			{
 				// потом реализовать проверку на то, что нужно ли посылать
 				var _theme  = this.wbModel.theme;
-				var _clrMap = this.wbModel.clrSchemeMap.color_map;
 
 				var arr_colors = new Array(10);
-				var rgba = {R:0, G:0, B:0, A:255};
-				// bg1,tx1,bg2,tx2,accent1 - accent6
-				var array_colors_types = [6, 15, 7, 16, 0, 1, 2, 3, 4, 5];
-				var _count = array_colors_types.length;
-
-				var color = new CUniColor();
-				color.color = new CSchemeColor();
+				var _count = arr_colors.length;
 				for (var i = 0; i < _count; ++i)
 				{
-					color.color.id = array_colors_types[i];
-					color.Calculate(_theme, _clrMap, rgba);
-
-					var _rgba = color.RGBA;
-					arr_colors[i] = new CColor(_rgba.R, _rgba.G, _rgba.B);
+					var color = g_oColorManager.getThemeColor(i);
+					arr_colors[i] = new CColor(color.getR(), color.getG(), color.getB());
 				}
 
 				// теперь проверим
@@ -205,30 +195,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 				for (var i = 0; i < _count; ++i)
 				{
-					var _color_src = this.GuiControlColorsMap[i];
-
-					_ret_array[_cur_index] = new CColor(_color_src.r, _color_src.g, _color_src.b);
-					_cur_index++;
-
-					// теперь с модификаторами
-					var _count_mods = g_oThemeColorsDefaultMods.length;
-					for (var j = 0; j < _count_mods; ++j)
+					for(var j = 0, length = g_oThemeColorTint.length; j < length; ++j)
 					{
-						var _mods = g_oThemeColorsDefaultMods[j];
-						var dst_mods = new CColorModifiers();
-						var _ind = 0;
-						for (var k in _mods)
-						{
-							dst_mods.Mods[_ind] = new CColorMod();
-							dst_mods.Mods[_ind].name = k;
-							dst_mods.Mods[_ind].val = _mods[k];
-							_ind++;
-						}
-
-						var _rgba = {R:_color_src.r, G: _color_src.g, B:_color_src.b, A: 255};
-						dst_mods.Apply(_rgba);
-
-						_ret_array[_cur_index] = new CColor(_rgba.R, _rgba.G, _rgba.B);
+						var tint = g_oThemeColorTint[j];
+						var color = g_oColorManager.getThemeColor(i, tint);
+						_ret_array[_cur_index] = new CColor(color.getR(), color.getG(), color.getB());
 						_cur_index++;
 					}
 				}
@@ -2150,21 +2121,19 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			asc_setCellTextColor: function (color) {
 				if(color instanceof CAscColor)
 				{
-					//преобразуем в css
-					color = asc.numberToCSSColor((color.get_r() << 16) | (color.get_g() << 8) | color.get_b());
+					color = CorrectAscColor(color);
+					this.wb.setFontAttributes("c", color);
+					this.wb.restoreFocus();
 				}
-				this.wb.setFontAttributes("c", color);
-				this.wb.restoreFocus();
 			},
 
 			asc_setCellBackgroundColor: function (color) {
 				if(color instanceof CAscColor)
 				{
-					//преобразуем в css
-					color = asc.numberToCSSColor((color.get_r() << 16) | (color.get_g() << 8) | color.get_b());
+					color = CorrectAscColor(color);
+					this.wb.getWorksheet().setSelectionInfo("bc", color);
+					this.wb.restoreFocus();
 				}
-				this.wb.getWorksheet().setSelectionInfo("bc", color);
-				this.wb.restoreFocus();
 			},
 
 			asc_setCellBorders: function (borders) {

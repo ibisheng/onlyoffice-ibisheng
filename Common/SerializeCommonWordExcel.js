@@ -150,9 +150,27 @@ function BinaryCommonWriter(memory)
     };
 	this.WriteColorSpreadsheet = function(color)
     {
-        this.memory.WriteByte(c_oSer_ColorObjectType.Rgb);
-        this.memory.WriteByte(c_oSerPropLenType.Long);
-        this.memory.WriteLong(color);
+		if(color instanceof ThemeColor)
+		{
+			if(null != color.theme)
+			{
+				this.memory.WriteByte(c_oSer_ColorObjectType.Theme);
+				this.memory.WriteByte(c_oSerPropLenType.Byte);
+				this.memory.WriteByte(color.theme);
+			}
+			if(null != color.tint)
+			{
+				this.memory.WriteByte(c_oSer_ColorObjectType.Tint);
+				this.memory.WriteByte(c_oSerPropLenType.Double);
+				this.memory.WriteDouble(color.tint);
+			}
+		}
+		else
+		{
+			this.memory.WriteByte(c_oSer_ColorObjectType.Rgb);
+			this.memory.WriteByte(c_oSerPropLenType.Long);
+			this.memory.WriteLong(color.getRgb());
+		}
     };
 };
 function Binary_CommonReader(stream)

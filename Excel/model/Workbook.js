@@ -1361,8 +1361,7 @@ function Workbook(sUrlPath, eventsHandlers, oApi){
 	this.dependencyFormulas = new DependencyGraph(this);
 	this.nActive = 0;
 
-	this.theme          = GenerateDefaultTheme(this);
-    this.clrSchemeMap   = GenerateDefaultColorMap();
+	this.theme = GenerateDefaultTheme(this);
 	
 	this.DefinedNames = new Object();
 	this.oRealDefinedNames = new Object();
@@ -1496,7 +1495,9 @@ Workbook.prototype.init=function(){
 	}
 };
 Workbook.prototype.rebuildColors=function(){
-	this.TableStyles.rebuildColors(this.theme);
+	g_oColorManager.rebuildColors();
+	for(var i = 0 , length = this.aWorksheets.length; i < length; ++i)
+		this.aWorksheets[i].rebuildColors();;
 }
 Workbook.prototype.getDefaultFont=function(){
 	return g_oDefaultFont.fn;
@@ -2107,6 +2108,11 @@ function Woorksheet(wb, _index, bAddUserId, sId){
 	this.nMaxRowId = 1;
 	this.nMaxColId = 1;
 };
+Woorksheet.prototype.rebuildColors=function(){
+	this._forEachCell(function(cell){
+		cell.cleanCache();
+	});
+}
 Woorksheet.prototype.generateFontMap=function(oFontMap){
 	//пробегаемся по колонкам
 	for(var i in this.aCols)
@@ -3888,6 +3894,9 @@ Cell.prototype.Remove=function(){
 Cell.prototype.getName=function(){
 	return this.oId.getID();
 };
+Cell.prototype.cleanCache=function(){
+	this.oValue.cleanCache();
+}
 Cell.prototype.setFormula=function(val){
 	this.sFormula = val;
 	this.oValue.cleanCache();
@@ -5168,7 +5177,7 @@ Range.prototype.setBorder=function(border){
 					oNewBorderProp = oNewBorder.b;
 				break;
 		}
-		if(null != oNewBorderProp && null != oCurBorderProp && null != oCurBorderProp.s && (oNewBorderProp.s != oCurBorderProp.s || oNewBorderProp.c != oCurBorderProp.c)){
+		if(null != oNewBorderProp && null != oCurBorderProp && null != oCurBorderProp.s && (oNewBorderProp.s != oCurBorderProp.s || oNewBorderProp.getRgbOrNull() != oCurBorderProp.getRgbOrNull())){
 			switch(type)
 			{
 				case nEdgeTypeLeft: oCurBorder.r = new BorderProp(); break;
@@ -5212,7 +5221,7 @@ Range.prototype.setBorder=function(border){
 						oNewBorderProp = oNewBorder.b;
 					break;
 			}
-			if(null != oNewBorderProp && null != oCurBorderProp && (oNewBorderProp.s != oCurBorderProp.s || oNewBorderProp.c != oCurBorderProp.c)){
+			if(null != oNewBorderProp && null != oCurBorderProp && (oNewBorderProp.s != oCurBorderProp.s || oNewBorderProp.getRgbOrNull() != oCurBorderProp.getRgbOrNull())){
 				switch(type)
 				{
 					case nEdgeTypeLeft: oCurBorder.r = new BorderProp(); break;
@@ -6917,7 +6926,7 @@ Range.prototype.setHyperlink=function(val, bWithoutStyle){
 	oHyperlinkFont.fn = this.worksheet.workbook.getDefaultFont();
 	oHyperlinkFont.fs = this.worksheet.workbook.getDefaultSize();
 	oHyperlinkFont.u = "single";
-	oHyperlinkFont.c = g_nColorHyperlink;
+	oHyperlinkFont.c = g_oColorManager.getThemeColor(g_nColorHyperlink);
 	var bNeedCheckHyperlink = true;
 	var fCheckHyperlink = function(aHyperlinks)
 	{
