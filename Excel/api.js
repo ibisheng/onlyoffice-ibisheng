@@ -2488,7 +2488,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
                         window['scriptBridge']['save_csv'] = function() {
 
                             var v = {"id":this.documentId, "c":"getcodepage"};
-                            this._asc_sendCommand (function(incomeObject){
+                            t._asc_sendCommand (function(incomeObject){
                                 // if(null != incomeObject && "save" == incomeObject.type)
                                 // {
                                 //     var outputData = JSON.parse(incomeObject.data);
@@ -2498,7 +2498,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
                                 t.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
                                 // t.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
                             }, JSON.stringify(v));
-
 
                             // if (c_oAscFileType.CSV === sFormat) {
                             //    if (options instanceof asc.asc_CCSVAdvancedOptions) {
