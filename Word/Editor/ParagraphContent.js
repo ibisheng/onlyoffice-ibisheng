@@ -58,6 +58,9 @@ var g_aPunctuation =
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0
 ];
 
+g_aPunctuation[0x00AB] = 1; // символ «
+g_aPunctuation[0x00BB] = 1; // символ »
+
 // Класс ParaText
 function ParaText(value)
 {
