@@ -910,6 +910,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						}
 					}
 					data = oBinaryFileWriter.Write();
+
+                    if (undefined != window['appBridge']) {
+                        window['appBridge']['dummyCommandSave_CSV'] (data);
+                        this.asc_OnSaveEnd(true);
+                        return;
+                    }
 				}
 				this._asc_sendCommand (fCallback, "mnuSaveAs" + this.cCharDelimiter + JSON.stringify(oAdditionalData) + this.cCharDelimiter + data);
 			},
@@ -2458,20 +2464,13 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
                     if (!window['scriptBridge']['save']) {
                         window['scriptBridge']['save'] = function(sFormat) {
                             var oAdditionalData = new Object();
-                            oAdditionalData["documentId"] = t.documentId+ "." + t.documentFormat;
+                            oAdditionalData["documentId"] = t.documentId + "." + t.documentFormat;
                             oAdditionalData["vkey"] = t.documentVKey;
                             oAdditionalData["outputformat"] = sFormat;
 
                             t.wb._initCommentsToSave();
                             var oBinaryFileWriter = new BinaryFileWriter(t.wbModel);
                             oAdditionalData["savetype"] = "completeall";
-
-                            // TODO: csv
-                            // if (c_oAscFileType.CSV === sFormat) {
-                            //     if (options instanceof asc.asc_CCSVAdvancedOptions) {
-                            //         oAdditionalData["saveparams"] = options.asc_getCodePage() + "-" + options.asc_getDelimiter();
-                            //     }
-                            // }
 
                             var data = oBinaryFileWriter.Write();
                             t.asc_OnSaveEnd(true);
@@ -2482,6 +2481,37 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
                     if (!window['scriptBridge']['saveEnd']) {
                         window['scriptBridge']['saveEnd'] = function() {
                             t.asc_OnSaveEnd(true);
+                        }
+                    }
+
+                    if (!window['scriptBridge']['save_csv']) {
+                        window['scriptBridge']['save_csv'] = function() {
+
+                            var v = {"id":this.documentId, "c":"getcodepage"};
+                            this._asc_sendCommand (function(incomeObject){
+                                // if(null != incomeObject && "save" == incomeObject.type)
+                                // {
+                                //     var outputData = JSON.parse(incomeObject.data);
+                                //     t.asc_processSavedFile(outputData.url, false);
+                                // }
+                                // Меняем тип состояния (на никакое)
+                                t.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
+                                // t.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
+                            }, JSON.stringify(v));
+
+
+                            // if (c_oAscFileType.CSV === sFormat) {
+                            //    if (options instanceof asc.asc_CCSVAdvancedOptions) {
+                            //        oAdditionalData["codepage"] = options.asc_getCodePage();
+                            //        oAdditionalData["delimiter"] = options.asc_getDelimiter();
+                            //    }
+                            //}
+                        }
+                    }
+
+                    if (!window['scriptBridge']['updateTitle']) {
+                        window['scriptBridge']['updateTitle'] = function(title) {
+                            t.documentTitle = title;
                         }
                     }
 
