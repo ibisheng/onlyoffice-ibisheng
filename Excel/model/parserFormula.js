@@ -6215,7 +6215,115 @@ var cFormulaFunction = {
 		},
         'COUNTIF' : function(){
             var r = new cBaseFunction();
+			r.setArgumentsMin(2);
+            r.setArgumentsMax(2);
+			r.Calculate = function(arg){
+				var arg0 = arg[0], arg1 = arg[1], count = 0, valueForSearching, regexpSearch;
+				if( !(arg0 instanceof cRef || arg0 instanceof cRef3D || arg0 instanceof cArea || arg0 instanceof cArea3D) ){
+					return this.value = new cError( cErrorType.wrong_value_type );
+				}
+				
+				if( !(arg1 instanceof cString) ){
+					return this.value = new cError( cErrorType.wrong_value_type );
+				}
+
+				function matching(x,y,oper){
+					var res = 0;
+					if( typeof x === typeof y ){
+						switch(oper){
+							case "=":
+								res = (x.value == y.value);
+								break;
+							case "<>":
+								res = (x.value != y.value);
+								break;
+							case ">":
+								res = (x.value > y.value);
+								break;
+							case "<":
+								res = (x.value < y.value);
+								break;
+							case ">=":
+								res = (x.value >= y.value);
+								break;
+							case "<=":
+								res = (x.value <= y.value);
+								break;
+							default:
+								res = 0;
+						}
+					}
+					count += res;
+				}
+				
+				arg1 = arg1.toString();
+				var operators = new RegExp("^ *[<=> ]+ *"), searchOperators = new RegExp("^ *[*?]")
+				var match = arg1.match(operators);
+				if( match ){
+					var search = arg1.substr( match[0].length ), oper = match[0].replace(/\s/g,""), val;
+					valueForSearching = parseNum( search ) ? new cNumber( search ) : new cString( search );
+					if( arg0 instanceof cArea ){
+						val = arg0.getValue();
+						for( var i in val ){
+							matching( val[i], valueForSearching, oper);
+						}
+					}
+					else if( arg0 instanceof cArea3D ){
+						val = arg0.getValue();
+						for(var i in val){
+							for(var j in val[i]){
+								matching( val[i][j], valueForSearching, oper);
+							}
+						}
+						
+					}
+					else{
+						val = arg0.getValue();
+						matching( val, valueForSearching, oper);
+					}
+				}
+				else{
+					match = arg1.match(searchOperators)
+					if( match ){
+						valueForSearching = arg1
+												.replace(/(~)?\*/g, function($0, $1){
+													return $1 ? $0 : '[\\w\\W]*';
+												})
+												.replace(/(~)?\?/g, function($0, $1){
+													return $1 ? $0 : '[\\w\\W]{1,1}';
+												})
+												.replace(/\~/g, "\\");
+						regexpSearch = new XRegExp(valueForSearching+"$");
+						if( arg0 instanceof cArea ){
+							val = arg0.getValue();
+							for( var i in val ){
+								count += regexpSearch.test(val[i].value);
+							}
+						}
+						else if( arg0 instanceof cArea3D ){
+							val = arg0.getValue();
+							for(var i in val){
+								for(var j in val[i]){
+									count += regexpSearch.test(val[i][j].value);
+								}
+							}
+						}
+						else{
+							val = arg0.getValue();
+							count += regexpSearch.test(val.value);
+						}
+					}
+				}
+
+				return this.value = new cNumber(count);
+			}
             r.setName("COUNTIF");
+			r.getInfo = function(){
+                return {
+                    name:this.name,
+                    args:"( cell-range, selection-criteria )"
+                };
+            }
         	return r;
 		},
         'COUNTIFS' : function(){
