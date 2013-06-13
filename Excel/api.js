@@ -2453,27 +2453,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
                         }
                     }
 
-                    if (!window['scriptBridge']['save_csv']) {
-                        window['scriptBridge']['save_csv'] = function() {
-
-                            var v = {"id":this.documentId, "c":"getcodepage"};
-                            t._asc_sendCommand (function(incomeObject){
-                                // if(null != incomeObject && "save" == incomeObject.type)
-                                // {
-                                //     var outputData = JSON.parse(incomeObject.data);
-                                //     t.asc_processSavedFile(outputData.url, false);
-                                // }
-                                // Меняем тип состояния (на никакое)
-                                t.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
-                                // t.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
-                            }, JSON.stringify(v));
-
-                            // if (c_oAscFileType.CSV === sFormat) {
-                            //    if (options instanceof asc.asc_CCSVAdvancedOptions) {
-                            //        oAdditionalData["codepage"] = options.asc_getCodePage();
-                            //        oAdditionalData["delimiter"] = options.asc_getDelimiter();
-                            //    }
-                            //}
+                    if (!window['scriptBridge']['showAdvancedOptionsDialog']) {
+                        window['scriptBridge']['showAdvancedOptionsDialog'] = function(codepages) {
+                            var cp = JSON.parse(codepages);
+                            t.advancedOptionsAction = c_oAscAdvancedOptionsAction.Save;
+                            t.handlers.trigger("asc_onAdvancedOptions",  new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV,cp), t.advancedOptionsAction);
                         }
                     }
 
