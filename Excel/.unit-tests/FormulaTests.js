@@ -391,6 +391,107 @@
 		oParser = new parserFormula("PROPER(\"this is a TITLE\")","A1",ws);
 		ok(oParser.parse());
         strictEqual( oParser.calculate().getValue(), "This Is A Title");
+	})
+	
+	test("Test: \"GCD\"",function(){
+		oParser = new parserFormula("GCD(10,100,50)","A1",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 10);
+		oParser = new parserFormula("GCD(24.6,36.2)","A1",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 12);
+		oParser = new parserFormula("GCD(-1,39,52)","A1",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), "#NUM!");
+	})
+
+	test("Test: \"FIXED\"",function(){
+		oParser = new parserFormula("FIXED(1234567,-3)","A1",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), "1,235,000");
+		oParser = new parserFormula("FIXED(.555555,10)","A1",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), "0.5555550000");
+		oParser = new parserFormula("FIXED(1234567.555555,4,TRUE)","A1",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), "1234567.5556");
+		oParser = new parserFormula("FIXED(1234567)","A1",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), "1,234,567");
+	})
+
+	test("Test: \"COUNTIF\"",function(){
+
+		ws.getRange2("A7").setValue("3");
+		ws.getRange2("B7").setValue("10");
+		ws.getRange2("C7").setValue("7");
+		ws.getRange2("D7").setValue("10");
+		
+		ws.getRange2("A8").setValue("apples");
+		ws.getRange2("B8").setValue("oranges");
+		ws.getRange2("C8").setValue("grapes");
+		ws.getRange2("D8").setValue("melons");
+	
+	
+		oParser = new parserFormula("COUNTIF(A7:D7,\"=10\")","A1",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 2);
+
+		oParser = new parserFormula("COUNTIF(A7:D7,\">5\")","B1",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 3);
+		
+		oParser = new parserFormula("COUNTIF(A7:D7,\"<>10\")","C1",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 2);
+
+		oParser = new parserFormula("COUNTIF(A8:D8,\"*es\")","A2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 3);
+		
+		oParser = new parserFormula("COUNTIF(A8:D8,\"??a*\")","B2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 2);
+		
+		oParser = new parserFormula("COUNTIF(A8:D8,\"*l*\")","C2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 2);
+		
+	})
+	
+	test("Test: \"REPLACE\"",function(){
+
+		oParser = new parserFormula("REPLACE(\"abcdefghijk\",3,4,\"XY\")","A2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), "abXYghijk");
+		
+		oParser = new parserFormula("REPLACE(\"abcdefghijk\",3,1,\"12345\")","B2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), "ab12345defghijk");
+		
+		oParser = new parserFormula("REPLACE(\"abcdefghijk\",15,4,\"XY\")","C2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), "abcdefghijkXY");
+		
+	})
+	
+	test("Test: \"SEARCH\"",function(){
+
+		oParser = new parserFormula("SEARCH(\"de\",\"abcdEF\")","A2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 4);
+		
+		oParser = new parserFormula("SEARCH(\"?c*e\",\"abcdEF\")","B2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 2);
+		
+		oParser = new parserFormula("SEARCH(\"de\",\"dEFabcdEF\",3)","C2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 7);
+		
+		oParser = new parserFormula("SEARCH(\"de\",\"dEFabcdEF\",30)","C2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), "#VALUE!");
 		
 	})
 	
