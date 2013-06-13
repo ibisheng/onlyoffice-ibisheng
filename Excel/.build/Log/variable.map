@@ -613,7 +613,7 @@ COLOR_TYPE_SCHEME:CL
 t1_service_kerning:gr
 CFF_FontRecDictRec:Xo
 cFormulaFunction:Nv
-c_oAscServerError$VKeyKeyExpire:Db
+c_oAscServerError$VKeyKeyExpire:Cb
 ScrollObject:PK
 DrawScatterChart:rd
 JSCompiler_StaticMethods_setColWidth:XH
@@ -2128,7 +2128,7 @@ tt_face_free_hdmx_stub:$k
 L 45:qb
 L 44:fv
 historyitem_Cell_Italic:NI
-L 47:Cb
+L 47:Db
 L 46:fS
 L 41:sc
 TT_Post_NamesRec:sg
