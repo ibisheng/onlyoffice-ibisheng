@@ -162,7 +162,7 @@ function BinaryCommonWriter(memory)
 			{
 				this.memory.WriteByte(c_oSer_ColorObjectType.Tint);
 				this.memory.WriteByte(c_oSerPropLenType.Double);
-				this.memory.WriteDouble(color.tint);
+				this.memory.WriteDouble2(color.tint);
 			}
 		}
 		else
