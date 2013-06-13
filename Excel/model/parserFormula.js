@@ -7730,7 +7730,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'REPLACEB' : function(){
-            var r = cFormulaFunction.TextAndData["REPLACE"]()
+            var r = cFormulaFunction.TextAndData["REPLACE"]();
             r.setName("REPLACEB");
         	return r;
 		},
@@ -7844,16 +7844,164 @@ var cFormulaFunction = {
         'SEARCH' : function(){
             var r = new cBaseFunction();
             r.setName("SEARCH");
+			r.setArgumentsMin(2);
+            r.setArgumentsMax(3);
+			r.Calculate = function(arg){
+				
+				var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new cNumber(1);
+				
+				if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
+					arg0 = arg0.cross(arguments[1].first).tocString();
+				}
+				else if( arg0 instanceof cArray){
+					arg0 = arg0.getElement(0).tocString();
+				}
+				
+				arg0 = arg0.tocString();
+				
+				if( arg1 instanceof cArea || arg1 instanceof cArea3D ){
+					arg1 = arg1.cross(arguments[1].first).tocString();
+				}
+				else if( arg1 instanceof cArray){
+					arg1 = arg1.getElement(0).tocString();
+				}
+				
+				arg1 = arg1.tocString();
+				
+				if( arg2 instanceof cArea || arg2 instanceof cArea3D ){
+					arg2 = arg2.cross(arguments[1].first).tocNumber();
+				}
+				else if( arg2 instanceof cArray){
+					arg2 = arg2.getElement(0).tocNumber();
+				}
+				
+				arg2 = arg2.tocNumber();
+				
+				if( arg0 instanceof cError )
+					return this.value = arg0;
+				if( arg1 instanceof cError )
+					return this.value = arg1;
+				if( arg2 instanceof cError )
+					return this.value = arg2;
+				
+				if( arg2.getValue() < 1 || arg2.getValue() > arg1.getValue().length ){
+					return this.value = new cError( cErrorType.wrong_value_type );
+				}
+				
+				var string1 = arg0.getValue(), string2 = arg1.getValue(), res = 0,
+					valueForSearching = string1
+												.replace(/(~)?\*/g, function($0, $1){
+													return $1 ? $0 : '[\\w\\W]*';
+												})
+												.replace(/(~)?\?/g, function($0, $1){
+													return $1 ? $0 : '[\\w\\W]{1,1}';
+												})
+												.replace(/\~/g, "\\");
+				
+					valueForSearching = new RegExp( valueForSearching, "ig")
+				if( string1 == "" )
+					return this.value = arg2;
+				
+				
+				
+				res = string2.substring(arg2.getValue()-1).search( valueForSearching ) + arg2.getValue()-1;
+				
+				if( res < 0 )
+					return this.value = new cError( cErrorType.wrong_value_type );
+					
+				return this.value = new cNumber(res+1);
+				
+			}
+			r.getInfo = function(){
+				return {
+                    name:this.name,
+                    args:"( string-1 , string-2 [ , start-pos ] )"
+                };
+			}
         	return r;
 		},
         'SEARCHB' : function(){
-            var r = new cBaseFunction();
+            var r = cFormulaFunction.TextAndData["SEARCH"]();
             r.setName("SEARCHB");
         	return r;
 		},
         'SUBSTITUTE' : function(){
             var r = new cBaseFunction();
             r.setName("SUBSTITUTE");
+			r.setArgumentsMin(3);
+            r.setArgumentsMax(4);
+			r.Calculate = function(arg){
+				var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3] ? arg[3] : new cNumber(0);
+				
+				if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
+					arg0 = arg0.cross(arguments[1].first).tocString();
+				}
+				else if( arg0 instanceof cArray){
+					arg0 = arg0.getElement(0).tocString();
+				}
+				
+				arg0 = arg0.tocString();
+				
+				if( arg1 instanceof cArea || arg1 instanceof cArea3D ){
+					arg1 = arg1.cross(arguments[1].first).tocString();
+				}
+				else if( arg1 instanceof cArray){
+					arg1 = arg1.getElement(0).tocString();
+				}
+				
+				arg1 = arg1.tocString();
+				
+				if( arg2 instanceof cArea || arg2 instanceof cArea3D ){
+					arg2 = arg2.cross(arguments[1].first).tocString();
+				}
+				else if( arg2 instanceof cArray){
+					arg2 = arg2.getElement(0).tocString();
+				}
+				
+				arg2 = arg2.tocString();
+				
+				if( arg3 instanceof cArea || arg3 instanceof cArea3D ){
+					arg3 = arg3.cross(arguments[1].first).tocNumber();
+				}
+				else if( arg3 instanceof cArray){
+					arg3 = arg3.getElement(0).tocNumber();
+				}
+				
+				arg3 = arg3.tocNumber();
+				
+				if( arg0 instanceof cError )
+					return this.value = arg0;
+				if( arg1 instanceof cError )
+					return this.value = arg1;
+				if( arg2 instanceof cError )
+					return this.value = arg2;
+				if( arg3 instanceof cError )
+					return this.value = arg3;
+					
+				if( arg3.getValue() < 0 ){
+					return this.value = new cError( cErrorType.wrong_value_type );
+				}
+					
+				var string = arg0.getValue(), old_string = arg1.getValue(), new_string = arg2.getValue(), index = 0, res;
+					res = string.replace(new RegExp(old_string,"g"),function(equal, p1, source){
+						index++;
+						if( arg3.getValue() == 0 || arg3.getValue() > source.length )
+							return new_string;
+						else if( arg3.getValue() == index ){
+							return new_string;
+						}
+						return equal;
+					})
+					
+				return this.value = new cString( res );
+					
+			}
+			r.getInfo = function(){
+				return {
+                    name:this.name,
+                    args:"( string , old-string , new-string [ , occurence ] )"
+                };
+			}
         	return r;
 		},
         'T' : function(){
