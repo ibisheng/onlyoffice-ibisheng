@@ -3389,13 +3389,13 @@ var cFormulaFunction = {
 					valueForSearching = arg0.getValue();
 					valueForSearching = valueForSearching
 											.replace(/(~)?\*/g, function($0, $1){
-												return $1 ? $0 : '[\w\W]*';
+												return $1 ? $0 : '[\\w\\W]*';
 											})
 											.replace(/(~)?\?/g, function($0, $1){
-												return $1 ? $0 : '[\w\W]{1,1}';
+												return $1 ? $0 : '[\\w\\W]{1,1}';
 											})
 											.replace(/\~/g, "\\");
-					regexp = new XRegExp(valueForSearching+"$");
+					regexp = new XRegExp(valueForSearching+"$","i");
 				}
 				else if( arg0 instanceof cError )	
 					return this.value = arg0;
@@ -3809,7 +3809,7 @@ var cFormulaFunction = {
 												return $1 ? $0 : '[\\w\\W]{1,1}';
 											})
 											.replace(/\~/g, "\\");
-					regexp = new XRegExp(valueForSearching+"$");
+					regexp = new XRegExp(valueForSearching+"$","i");
 				}
 				else if( arg0 instanceof cError )	
 					return this.value = arg0;
@@ -6218,7 +6218,7 @@ var cFormulaFunction = {
 			r.setArgumentsMin(2);
             r.setArgumentsMax(2);
 			r.Calculate = function(arg){
-				var arg0 = arg[0], arg1 = arg[1], count = 0, valueForSearching, regexpSearch;
+				var arg0 = arg[0], arg1 = arg[1], _count = 0, valueForSearching, regexpSearch, a;
 				if( !(arg0 instanceof cRef || arg0 instanceof cRef3D || arg0 instanceof cArea || arg0 instanceof cArea3D) ){
 					return this.value = new cError( cErrorType.wrong_value_type );
 				}
@@ -6253,7 +6253,7 @@ var cFormulaFunction = {
 								res = 0;
 						}
 					}
-					count += res;
+					_count += res;
 				}
 				
 				arg1 = arg1.toString();
@@ -6275,7 +6275,6 @@ var cFormulaFunction = {
 								matching( val[i][j], valueForSearching, oper);
 							}
 						}
-						
 					}
 					else{
 						val = arg0.getValue();
@@ -6293,29 +6292,31 @@ var cFormulaFunction = {
 													return $1 ? $0 : '[\\w\\W]{1,1}';
 												})
 												.replace(/\~/g, "\\");
-						regexpSearch = new XRegExp(valueForSearching+"$");
+						regexpSearch = new RegExp(valueForSearching+"$","i");
 						if( arg0 instanceof cArea ){
 							val = arg0.getValue();
-							for( var i in val ){
-								count += regexpSearch.test(val[i].value);
+							for( var i = 0; i < val.length; i++ ){
+								a = regexpSearch.test(val[i].value)
+								console.log(""+i+" "+a)
+								_count += a;
 							}
 						}
 						else if( arg0 instanceof cArea3D ){
 							val = arg0.getValue();
 							for(var i in val){
 								for(var j in val[i]){
-									count += regexpSearch.test(val[i][j].value);
+									_count += regexpSearch.test(val[i][j].value);
 								}
 							}
 						}
 						else{
 							val = arg0.getValue();
-							count += regexpSearch.test(val.value);
+							_count += regexpSearch.test(val.value);
 						}
 					}
 				}
 
-				return this.value = new cNumber(count);
+				return this.value = new cNumber(_count);
 			}
             r.setName("COUNTIF");
 			r.getInfo = function(){
@@ -7655,10 +7656,81 @@ var cFormulaFunction = {
         'REPLACE' : function(){
             var r = new cBaseFunction();
             r.setName("REPLACE");
+			r.setArgumentsMin(4);
+            r.setArgumentsMax(4);
+			r.Calculate = function(arg){
+				var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3];
+				
+				if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
+					arg0 = arg0.cross(arguments[1].first).tocString();
+				}
+				else if( arg0 instanceof cArray){
+					arg0 = arg0.getElement(0).tocString();
+				}
+				
+				arg0 = arg0.tocString();
+				
+				if( arg1 instanceof cArea || arg1 instanceof cArea3D ){
+					arg1 = arg1.cross(arguments[1].first).tocNumber();
+				}
+				else if( arg1 instanceof cArray){
+					arg1 = arg1.getElement(0).tocNumber();
+				}
+				
+				arg1 = arg1.tocNumber();
+				
+				if( arg2 instanceof cArea || arg2 instanceof cArea3D ){
+					arg2 = arg2.cross(arguments[1].first).tocNumber();
+				}
+				else if( arg2 instanceof cArray){
+					arg2 = arg2.getElement(0).tocNumber();
+				}
+				
+				arg2 = arg2.tocNumber();
+				
+				if( arg3 instanceof cArea || arg3 instanceof cArea3D ){
+					arg3 = arg3.cross(arguments[1].first).tocString();
+				}
+				else if( arg3 instanceof cArray){
+					arg3 = arg3.getElement(0).tocString();
+				}
+				
+				arg3 = arg3.tocString();
+				
+				if( arg0 instanceof cError )
+					return this.value = arg0;
+				if( arg1 instanceof cError )
+					return this.value = arg1;
+				if( arg2 instanceof cError )
+					return this.value = arg2;
+				if( arg3 instanceof cError )
+					return this.value = arg3;
+				
+				if( arg1.getValue() < 1 || arg2.getValue() < 0 ){
+					return this.value = new cError( cErrorType.wrong_value_type );
+				}
+				
+				var string1 = arg0.getValue(), string2 = arg3.getValue(), res = "";
+				
+				string1 = string1.split("");
+				string1.splice(arg1.getValue()-1,arg2.getValue(),string2);
+				for( var i = 0; i < string1.length; i++){
+					res += string1[i];
+				}
+				
+				return this.value = new cString(res);
+				
+			}
+			r.getInfo = function(){
+				return {
+                    name:this.name,
+                    args:"( string-1, start-pos, number-chars, string-2 )"
+                };
+			}
         	return r;
 		},
         'REPLACEB' : function(){
-            var r = new cBaseFunction();
+            var r = cFormulaFunction.TextAndData["REPLACE"]()
             r.setName("REPLACEB");
         	return r;
 		},
@@ -8596,7 +8668,6 @@ cName.prototype.toRef = function(wsID){
 	}
 	return new cError("#REF!");
 }
-
 
 /** @constructor */
 function cArray(){
