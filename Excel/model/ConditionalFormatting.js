@@ -121,6 +121,48 @@
 		return this;
 	}
 
+	function CGradient () {
+		if ( !(this instanceof CGradient) ) {
+			return new CGradient ();
+		}
+
+		this.MaxColorIndex = 512;
+		this.base_shift = 8;
+
+		this.c1 = null;
+		this.c2 = null;
+
+		return this;
+	}
+
+	CGradient.prototype = {
+		/** @type CGradient */
+		constructor: CGradient,
+
+		generate: function (count) {
+			if (null === this.c1 || null === this.c2)
+				return null;
+
+			var result = [];
+			var i, indexColor;
+			var tmp = this.MaxColorIndex / (2.0 * (count - 1));
+			for (i = 0; i < count; ++i) {
+				indexColor = parseInt(i * tmp);
+				result[i] = this.calculateColor(indexColor);
+			}
+
+			return result;
+		},
+		calculateColor: function (indexColor) {
+			var ret = new CAscColor();
+			ret.r = (this.c1.r + ((FT_Common.IntToUInt(this.c2.r - this.c1.r) * indexColor) >> this.base_shift)) & 0xFFFF;
+			ret.g = (this.c1.g + ((FT_Common.IntToUInt(this.c2.g - this.c1.g) * indexColor) >> this.base_shift)) & 0xFFFF;
+			ret.b = (this.c1.b + ((FT_Common.IntToUInt(this.c2.b - this.c1.b) * indexColor) >> this.base_shift)) & 0xFFFF;
+			ret.a = (this.c1.a + ((FT_Common.IntToUInt(this.c2.a - this.c1.a) * indexColor) >> this.base_shift)) & 0xFFFF;
+			return ret;
+		}
+	};
+
 	/*
 	 * Export
 	 * -----------------------------------------------------------------------------
@@ -132,4 +174,5 @@
 	asc.CFormulaCF = CFormulaCF;
 	asc.CIconSet = CIconSet;
 	asc.CConditionalFormatValueObject = CConditionalFormatValueObject;
+	asc.CGradient = CGradient;
 })(jQuery, window);
