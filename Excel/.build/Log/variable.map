@@ -2069,7 +2069,7 @@ c_oSerWorkbookTypes$DefinedName:Dx
 nSldLtTChartAndTx:gN
 L 21:J
 L 20:I
-L 23:M
+L 23:O
 L 22:Y
 L 25:ga
 L 24:T
@@ -2122,7 +2122,7 @@ rgCols:ev
 CSrcRect:$L
 L 49:gS
 c_oSerHyperlinkTypes$Tooltip:ry
-L 48:ac
+L 48:bc
 JSCompiler_StaticMethods_Reinit:MK
 tt_face_free_hdmx_stub:$k
 L 45:qb
@@ -2162,7 +2162,7 @@ JSCompiler_StaticMethods__BuildDependencies:rG
 historyitem_Worksheet_CreateCol:pI
 tt_cmap14_get_def_chars:Uk
 CGraphics:Ls
-JSCompiler_prototypeAlias:O
+JSCompiler_prototypeAlias:M
 historyitem_Cell_Fill:UI
 FormatObj:hc
 read_pfb_tag:Gq
@@ -2403,6 +2403,6 @@ L 82:GS
 L 81:FS
 tt_cmap2_get_subheader:dk
 L 80:WS
-NumComporationOperators$greater:bc
+NumComporationOperators$greater:ac
 c_oAscAdvancedOptionsID$CSV:PJ
 c_oSer_Comments$Right:dB
