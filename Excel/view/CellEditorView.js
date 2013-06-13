@@ -1497,12 +1497,15 @@
 						opt.fragments.splice(i, 1);
 						continue;
 					}
-					if (i < opt.fragments.length - 1 &&
-					    t._isEqualFormats(opt.fragments[i].format, opt.fragments[i + 1].format)) {
+					if (i < opt.fragments.length - 1)
+					{
 						var fr = opt.fragments[i];
-						opt.fragments.splice(i, 2,
-								{format: fr.format, text: fr.text + fr.text, theme: fr.theme, tint: fr.tint});
-						continue;
+						var nextFr = opt.fragments[i + 1];
+					    if(t._isEqualFormats(fr.format, nextFr.format) && fr.theme == nextFr.theme && fr.tint == nextFr.tint) {
+							opt.fragments.splice(i, 2,
+									{format: fr.format, text: fr.text + fr.text, theme: fr.theme, tint: fr.tint});
+							continue;
+						}
 					}
 					++i;
 				}

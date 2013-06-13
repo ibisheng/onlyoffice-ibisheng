@@ -33,6 +33,9 @@ for(var i in map_themeExcel_to_themePresentation)
 	map_themePresentation_to_themeExcel[map_themeExcel_to_themePresentation[i]] = i - 0;
 function RgbColor(rgb)
 {
+	this.Properties = {
+		rgb : 0
+	}
 	this.rgb = rgb;
 }
 RgbColor.prototype =
@@ -40,6 +43,24 @@ RgbColor.prototype =
 	getType : function()
 	{
 		return UndoRedoDataTypes.RgbColor;
+	},
+	getProperties : function()
+	{
+		return this.Properties;
+	},
+	getProperty : function(nType)
+	{
+		switch(nType)
+		{
+		case this.Properties.rgb:return this.rgb;break;
+		}
+	},
+	setProperty : function(nType, value)
+	{
+		switch(nType)
+		{
+		case this.Properties.rgb: this.rgb = value;break;
+		}
 	},
 	Write_ToBinary2 : function(oBinaryWriter)
 	{
@@ -68,6 +89,11 @@ RgbColor.prototype =
 }
 function ThemeColor()
 {
+	this.Properties = {
+		rgb: 0,
+		theme: 1,
+		tint: 2
+	}
 	this.rgb = null;
 	this.theme = null;
 	this.tint = null;
@@ -77,6 +103,28 @@ ThemeColor.prototype =
 	getType : function()
 	{
 		return UndoRedoDataTypes.ThemeColor;
+	},
+	getProperties : function()
+	{
+		return this.Properties;
+	},
+	getProperty : function(nType)
+	{
+		switch(nType)
+		{
+		case this.Properties.rgb:return this.rgb;break;
+		case this.Properties.theme:return this.theme;break;
+		case this.Properties.tint:return this.tint;break;
+		}
+	},
+	setProperty : function(nType, value)
+	{
+		switch(nType)
+		{
+		case this.Properties.rgb: this.rgb = value;break;
+		case this.Properties.theme: this.theme= value;break;
+		case this.Properties.tint: this.tint = value;break;
+		}
 	},
 	Write_ToBinary2 : function(oBinaryWriter)
 	{
