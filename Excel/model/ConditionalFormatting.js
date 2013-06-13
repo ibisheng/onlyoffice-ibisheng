@@ -155,10 +155,16 @@
 		},
 		calculateColor: function (indexColor) {
 			var ret = new CAscColor();
-			ret.r = (this.c1.r + ((FT_Common.IntToUInt(this.c2.r - this.c1.r) * indexColor) >> this.base_shift)) & 0xFFFF;
-			ret.g = (this.c1.g + ((FT_Common.IntToUInt(this.c2.g - this.c1.g) * indexColor) >> this.base_shift)) & 0xFFFF;
-			ret.b = (this.c1.b + ((FT_Common.IntToUInt(this.c2.b - this.c1.b) * indexColor) >> this.base_shift)) & 0xFFFF;
-			ret.a = (this.c1.a + ((FT_Common.IntToUInt(this.c2.a - this.c1.a) * indexColor) >> this.base_shift)) & 0xFFFF;
+			var r1 = this.c1.getR();
+			var g1 = this.c1.getG();
+			var b1 = this.c1.getB();
+			var r2 = this.c2.getR();
+			var g2 = this.c2.getG();
+			var b2 = this.c2.getB();
+
+			ret.r = (r1 + ((FT_Common.IntToUInt(r2 - r1) * indexColor) >> this.base_shift)) & 0xFFFF;
+			ret.g = (g1 + ((FT_Common.IntToUInt(g2 - g1) * indexColor) >> this.base_shift)) & 0xFFFF;
+			ret.b = (b1 + ((FT_Common.IntToUInt(b2 - b1) * indexColor) >> this.base_shift)) & 0xFFFF;
 			return ret;
 		}
 	};

@@ -5562,7 +5562,10 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 			res = this.bcr.Read2Spreadsheet(length, function(t,l){
 				return oThis.bcr.ReadColorSpreadsheet(t,l, oObject);
 			});
-			oColorScale.aColors.push(oObject);
+			if(null != oObject.theme)
+				oColorScale.aColors.push(g_oColorManager.getThemeColor(oObject.theme, oObject.tint));
+			else if(null != oObject.rgb)
+				oColorScale.aColors.push(new RgbColor(0x00ffffff & oObject.rgb));
 		} else
 			res = c_oSerConstants.ReadUnknown;
 		return res;
@@ -5578,10 +5581,14 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 		else if (c_oSer_ConditionalFormattingDataBar.ShowValue === type)
 			oDataBar.ShowValue = this.stream.GetBool();
 		else if (c_oSer_ConditionalFormattingDataBar.Color === type) {
-			oDataBar.Color = new OpenColor();
+			oObject = new OpenColor();
 			res = this.bcr.Read2Spreadsheet(length, function(t,l){
-				return oThis.bcr.ReadColorSpreadsheet(t,l, oDataBar.Color);
+				return oThis.bcr.ReadColorSpreadsheet(t,l, oObject);
 			});
+			if(null != oObject.theme)
+				oDataBar.Color = g_oColorManager.getThemeColor(oObject.theme, oObject.tint);
+			else if(null != oObject.rgb)
+				oDataBar.Color = new RgbColor(0x00ffffff & oObject.rgb);
 		} else if (c_oSer_ConditionalFormattingDataBar.CFVO === type) {
 			oObject = new Asc.CConditionalFormatValueObject();
 			res = this.bcr.Read1(length, function (t, l) {
