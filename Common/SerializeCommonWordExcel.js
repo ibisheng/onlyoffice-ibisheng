@@ -886,7 +886,7 @@ function BinaryChartWriter(memory)
 	this.WriteChartContent = function(chart)
     {
         var oThis = this;
-		if(null != chart.legend && true == chart.legend.show)
+		if(null != chart.legend && true == chart.legend.bShow)
 			this.bs.WriteItem(c_oSer_ChartType.Legend, function(){oThis.WriteLegend(chart.legend);});
 		if(null != chart.title && ("" != chart.title || true == chart.bDefaultTitle))
 		{
@@ -913,8 +913,8 @@ function BinaryChartWriter(memory)
 			if(null != byteLegendPos)
 				this.bs.WriteItem(c_oSer_ChartLegendType.LegendPos, function(){oThis.memory.WriteByte(byteLegendPos);});
 		}
-		if(null != legend.overlay)
-			this.bs.WriteItem(c_oSer_ChartLegendType.Overlay, function(){oThis.memory.WriteBool(legend.overlay);});
+		if(null != legend.bOverlay)
+			this.bs.WriteItem(c_oSer_ChartLegendType.Overlay, function(){oThis.memory.WriteBool(legend.bOverlay);});
     };
 	this.WritePlotArea = function(chart)
     {
@@ -946,10 +946,10 @@ function BinaryChartWriter(memory)
 			this.memory.WriteByte(c_oSer_ChartCatAxType.Title);
             this.memory.WriteString2(axis.title);
 		}
-		if(null != axis.grid)
-			this.bs.WriteItem(c_oSer_ChartCatAxType.MajorGridlines, function(){oThis.memory.WriteBool(axis2.grid);});
-		if(null != axis.show)
-			this.bs.WriteItem(c_oSer_ChartCatAxType.Delete, function(){oThis.memory.WriteBool(!axis.show);});
+		if(null != axis.bGrid)
+			this.bs.WriteItem(c_oSer_ChartCatAxType.MajorGridlines, function(){oThis.memory.WriteBool(axis2.bGrid);});
+		if(null != axis.bShow)
+			this.bs.WriteItem(c_oSer_ChartCatAxType.Delete, function(){oThis.memory.WriteBool(!axis.bShow);});
 		if(bBottom)
 			this.bs.WriteItem(c_oSer_ChartCatAxType.AxPos, function(){oThis.memory.WriteByte(EChartAxPos.chartaxposBottom);});
 		else
@@ -1025,7 +1025,7 @@ function BinaryChartWriter(memory)
 				this.bs.WriteItemWithLength(function(){oThis.WriteSeries(chartRange, chart.data, chart.type);});
 			}
 		}
-		if(null != chart.showValue)
+		if(null != chart.bShowValue)
 		{
 			this.memory.WriteByte(c_oSer_BasicChartType.DataLabels);
 			this.memory.WriteByte(c_oSerPropLenType.Variable);
@@ -1212,17 +1212,17 @@ function BinaryChartWriter(memory)
 		{
 			this.memory.WriteByte(c_oSer_ChartSeriesMarkerType.Symbol);
 			this.memory.WriteByte(c_oSerPropLenType.Byte);
-			this.memory.WriteByte(marker.showValue);
+			this.memory.WriteByte(marker.bShowValue);
 		}
     };
 	this.WriteDataLabels = function(chart)
     {
         var oThis = this;
-		if(null != chart.showValue)
+		if(null != chart.bShowValue)
 		{
 			this.memory.WriteByte(c_oSer_ChartSeriesDataLabelsType.ShowVal);
 			this.memory.WriteByte(c_oSerPropLenType.Byte);
-			this.memory.WriteBool(chart.showValue);
+			this.memory.WriteBool(chart.bShowValue);
 		}
     };
 }
@@ -1235,7 +1235,7 @@ function Binary_ChartReader(stream, chart)
 	this.chartType = null;
 	this.PreRead = function()
 	{
-		this.chart.legend.show = false;
+		this.chart.legend.bShow = false;
 	}
 	this.Read = function(length)
 	{
@@ -1277,16 +1277,16 @@ function Binary_ChartReader(stream, chart)
         var oThis = this;
         if ( c_oSer_ChartType.Legend === type )
         {
-			this.chart.legend.show = true;
+			this.chart.legend.bShow = true;
 			res = this.bcr.Read1(length, function(t,l){
 					return oThis.ReadLegend(t,l);
 				});
 		}
 		else if ( c_oSer_ChartType.Title === type )
 		{
-			this.chart.title = this.stream.GetString2LE(length);
-			if("" == this.chart.title)
-				this.chart.bDefaultTitle = true;
+			this.chart.header.title = this.stream.GetString2LE(length);
+			if("" == this.chart.header.title)
+				this.chart.header.bDefaultTitle = true;
 		}
 		else if ( c_oSer_ChartType.PlotArea === type )
 		{
@@ -1318,8 +1318,8 @@ function Binary_ChartReader(stream, chart)
 					}
 				}
 			}
-			this.chart.xAxis.show = this.chart.yAxis.show = false;
-			this.chart.xAxis.grid = this.chart.yAxis.grid = false;
+			this.chart.xAxis.bShow = this.chart.yAxis.bShow = false;
+			this.chart.xAxis.bGrid = this.chart.yAxis.bGrid = false;
 			var fExecAxis = function(oFrom, oTo)
 			{
 				for(var i in oFrom)
@@ -1330,9 +1330,9 @@ function Binary_ChartReader(stream, chart)
 			if(null != yAxis)
 				fExecAxis(yAxis, this.chart.yAxis);
 			//меняем местами 
-			var bTemp = this.chart.xAxis.grid;
-			this.chart.xAxis.grid = this.chart.yAxis.grid;
-			this.chart.yAxis.grid = bTemp;
+			var bTemp = this.chart.xAxis.bGrid;
+			this.chart.xAxis.bGrid = this.chart.yAxis.bGrid;
+			this.chart.yAxis.bGrid = bTemp;
 			if(c_oAscChartType.hbar == this.chartType)
 			{
 				var oTemp = this.chart.xAxis;
@@ -1372,7 +1372,7 @@ function Binary_ChartReader(stream, chart)
 			}
 		}
 		else if ( c_oSer_ChartLegendType.Overlay === type )
-			this.chart.legend.overlay = this.stream.GetBool();
+			this.chart.legend.bOverlay = this.stream.GetBool();
 		else
             res = c_oSerConstants.ReadUnknown;
 		return res;
@@ -1452,9 +1452,9 @@ function Binary_ChartReader(stream, chart)
 				oAx.bDefaultTitle = true;
 		}
 		else if ( c_oSer_ChartCatAxType.MajorGridlines === type )
-			oAx.grid = this.stream.GetBool();
+			oAx.bGrid = this.stream.GetBool();
 		else if ( c_oSer_ChartCatAxType.Delete === type )
-			oAx.show = !this.stream.GetBool();
+			oAx.bShow = !this.stream.GetBool();
 		else if ( c_oSer_ChartCatAxType.AxPos === type )
 			oAx.axPos = this.stream.GetUChar();
 		else
@@ -1624,7 +1624,7 @@ function Binary_ChartReader(stream, chart)
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
         if ( c_oSer_ChartSeriesDataLabelsType.ShowVal === type )
-			this.chart.showValue = this.stream.GetBool();
+			this.chart.bShowValue = this.stream.GetBool();
 		else
             res = c_oSerConstants.ReadUnknown;
 		return res;

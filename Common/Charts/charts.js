@@ -26,7 +26,6 @@ function ChartRender() {
 	}
 }
 
-//var arrBaseColors = ["#4572A7", "#AA4643", "#89A54E", "#71588F", "#4198AF", "#DB843D"];
 var arrBaseColors = [];
 
 function ChartStyleManager() {
@@ -287,9 +286,9 @@ function ChartPreviewManager() {
 				
 				// Create and minimize properties
 				var chart = new CChartData(false);
-				chart.xAxis.show = chart.xAxis.grid = false;
-				chart.yAxis.show = chart.yAxis.grid = false;
-				chart.legend.show = false;
+				chart.xAxis.bShow = chart.xAxis.bGrid = false;
+				chart.yAxis.bShow = chart.yAxis.bGrid = false;
+				chart.legend.bShow = false;
 				
 				chart.type = chartType;
 				chart.styleId = parseInt(style);
@@ -635,6 +634,7 @@ function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY) {
 //-----------------------------------------------------------------------------------
 // Draw 
 //-----------------------------------------------------------------------------------
+
 function checkDataRange(type,subType,dataRange,isRows,worksheet) {
 	var columns = false;
 	var rows = false;
@@ -1387,12 +1387,12 @@ function drawChart(chart, arrValues, width, height) {
 			break;
 	}
 	
-	if(!chart.yAxis.show)
+	if(!chart.yAxis.bShow)
 	{
 		bar._otherProps._ylabels  = false;
 		bar._otherProps._noyaxis = true;
 	}
-	if(!chart.xAxis.show)
+	if(!chart.xAxis.bShow)
 	{
 		bar._otherProps._xlabels  = false;
 		bar._otherProps._noxaxis = true;
@@ -1416,8 +1416,8 @@ function drawChart(chart, arrValues, width, height) {
 		chart.yAxis.title = defaultYTitle;
 	if((!chart.xAxis.title || chart.xAxis.title == null || chart.xAxis.title == undefined || chart.xAxis.title == '') && chart.xAxis.bDefaultTitle)
 		chart.xAxis.title = defaultXTitle;
-	if((!chart.title || chart.title == null || chart.title == undefined || chart.title == '') && chart.bDefaultTitle)
-		chart.title = defaultTitle;
+	if((!chart.header.title || chart.header.title == null || chart.header.title == undefined || chart.header.title == '') && chart.header.bDefaultTitle)
+		chart.header.title = defaultTitle;
 	
 	if (chart.yAxis.title)
 		bar._chartGutter._left = 35 + 29;
@@ -1433,7 +1433,7 @@ function drawChart(chart, arrValues, width, height) {
 	//bar.Draw();
 
 	// Легенда
-	if (chart.legend.show && chart.legend.position != '') {
+	if (chart.legend.bShow && chart.legend.position != '') {
 		bar._otherProps._key_position = 'graph';
 		bar._otherProps._key = [];
 		bar._otherProps._key_halign = chart.legend.position;
@@ -1494,9 +1494,9 @@ function drawChart(chart, arrValues, width, height) {
 	// Подписи данных
 	if(chart.type != 'Stock')
 	{
-		if (chart.showValue &&  bar.type == 'pie')
+		if (chart.bShowValue &&  bar.type == 'pie')
 			bar._otherProps._labels = data[0];
-		else if (chart.showValue)
+		else if (chart.bShowValue)
 			bar._otherProps._labels_above = true;
 		else
 			bar._otherProps._labels_above = false;
@@ -1504,8 +1504,8 @@ function drawChart(chart, arrValues, width, height) {
 	}
 	
 	// Название
-	if (chart.title) {
-		bar._chartTitle._text = chart.title;
+	if (chart.header.title) {
+		bar._chartTitle._text = chart.header.title;
 		bar._chartTitle._vpos = 32;
 		bar._chartTitle._hpos = 0.5;
 		bar._chartTitle._size = 18;
@@ -1513,7 +1513,7 @@ function drawChart(chart, arrValues, width, height) {
 
 	if (chart.xAxis.title) {
 		var legendTop = 0;
-		var widthXtitle =  bar.context.measureText(chart.xAxis.title).width
+		var widthXtitle =  bar.context.measureText(chart.xAxis.title).width;
 		if(chart.legend.position == 'bottom')
 			legendTop = 30;
 		bar._xAxisTitle._text = chart.xAxis.title;
@@ -1521,7 +1521,7 @@ function drawChart(chart, arrValues, width, height) {
 	}
 
 	if (chart.yAxis.title) {
-		var widthYtitle =  bar.context.measureText(chart.yAxis.title).width
+		var widthYtitle =  bar.context.measureText(chart.yAxis.title).width;
 		bar._yAxisTitle._text = chart.yAxis.title;
 		bar._yAxisTitle._align = 'rev';
 		var keyLeft = 0;
@@ -1532,8 +1532,8 @@ function drawChart(chart, arrValues, width, height) {
 	}
 
 	// Основная сетка	
-	bar._otherProps._background_grid_hlines = chart.xAxis.grid;
-	bar._otherProps._background_grid_vlines = chart.yAxis.grid;
+	bar._otherProps._background_grid_hlines = chart.xAxis.bGrid;
+	bar._otherProps._background_grid_vlines = chart.yAxis.bGrid;
 
 	var axis;
 	calcGutter(axis,chart.min,chart.max,chart.ymin,chart.ymax,chart.isSkip,chart.isFormatCell);
@@ -1555,7 +1555,10 @@ function drawChart(chart, arrValues, width, height) {
 	bar.Draw(chart.min,chart.max,chart.ymin,chart.ymax,chart.isSkip,chart.isFormatCell,chart.isformatCellScOy);
 }
 
-//
+//-----------------------------------------------------------------------------------
+// Chart types
+//-----------------------------------------------------------------------------------
+
 function DrawScatterChart(chartCanvas, chartSubType, data, chart) {
 	
 	var colors = generateColors(data.length * data[0].length, arrBaseColors);
@@ -1646,6 +1649,7 @@ function DrawScatterChart(chartCanvas, chartSubType, data, chart) {
 	//addOptions('chart.gutter.bottom',50);
 	bar._chartGutter._bottom = 30;
 	//для соединения линий
+	bar._otherProps._area_border = chart.bShowBorder;
 	bar._otherProps._line = true;
 	bar._otherProps._linewidth = 2;
 	bar._otherProps._background_grid_color = 'graytext';
@@ -1703,6 +1707,7 @@ function DrawPieChart(chartCanvas, chartSubType, data, chart) {
 	//для разрезанной кольцевой или разрезанной круговой
 	//bar._otherProps._exploded = 15;
 
+	bar._otherProps._area_border = chart.bShowBorder;
 	bar._otherProps._ylabels_count = 'auto';
 	bar._otherProps._colors = ['steelblue', 'IndianRed', 'Silver'];
 	bar._chartGutter._left = 45;
@@ -1778,6 +1783,7 @@ function DrawLineChart(chartCanvas, chartType, chartSubType, data, chart) {
 		bar._chartGutter._bottom = 35;
 	}
 
+	bar._otherProps._area_border = chart.bShowBorder;
 	bar._otherProps._background_grid_autofit_numvlines = data.length;
 	bar._otherProps._background_grid_color = 'graytext';
 	bar._otherProps._background_barcolor1 = 'white';
@@ -1862,6 +1868,7 @@ function DrawBarChart(chartCanvas, chartSubType, data, chart) {
 		}
 	}
 
+	bar._otherProps._area_border = chart.bShowBorder;
 	bar._otherProps._ylabels_count = 'auto';
 	bar._otherProps._variant = 'bar';
 	bar._chartGutter._left = 35;
@@ -1949,6 +1956,7 @@ function DrawHBarChart(chartCanvas, chartSubType, data, chart) {
 	}
 
 	//bar._otherProps._labels = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+	bar._otherProps._area_border = chart.bShowBorder;
 	bar._otherProps._ylabels_count = 'auto';
 	bar._chartGutter._left = 35;
 	bar._chartGutter._bottom = 35;

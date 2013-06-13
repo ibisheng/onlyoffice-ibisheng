@@ -282,7 +282,7 @@
         this.context.fillRect(0,0,this.canvas.width,this.canvas.height);
 		
 		// border
-		if ( !g_bChartPreview ) {
+		if ( !g_bChartPreview && this._otherProps._area_border ) {
 			this.context.beginPath();
 			this.context.rect(0, 0, this.canvas.width,this.canvas.height);
 			this.context.strokeStyle = "black";

@@ -9,30 +9,36 @@
 	// Chart interface
 	//-----------------------------------------------------------------------------------
 	
-	// Global drawing pointer
+	// Global drawing pointers
 	var DrawingObject = null;
 	var DrawingObjectLayer = null;
-	if ( !window["Asc"] ) 
-		{window["Asc"] = {};}		// Для вставки диаграмм в Word
-		
-	// Defines
-	var	TransactionState = { 
-		No: -1,
-		Start: 0,
-		Stop: 1
-	};
-							
-	var ECellAnchorType = {
-		cellanchorAbsolute:  0,
-		cellanchorOneCell:  1,
-		cellanchorTwoCell:  2
-	};
+	if ( !window["Asc"] ) {		// Для вставки диаграмм в Word
+		window["Asc"] = {};
+	}
+	
+	function isObject(what) {
+		return ( what && (typeof(what) == "object") );
+	}
+	
+	function convertFormula(formula, ws) {
+		var range = null;
 
-	var ChartDefines = {
-		defaultChartWidth: 478,
-		defaultChartHeight: 286
-	};
-
+		if (formula && ws) {
+			var ref3D = parserHelp.is3DRef(formula, 0);
+			if (!ref3D[0])
+				range = ws.model.getRange2(formula.toUpperCase());
+			else {
+				var resultRef = parserHelp.parse3DRef(formula);
+				if (null !== resultRef) {
+					var ws = ws.model.workbook.getWorksheetByName(resultRef.sheet);
+					if (ws)
+						range = ws.getRange2(resultRef.range);
+				}
+			}
+		}
+		return range;
+	}
+	
 	// Интерфейс < Excel - Word >
 	function CChartData(bWordContext, chart) {
 	
@@ -40,30 +46,30 @@
 		
 		_this.Id = bWordContext ? g_oIdCounter.Get_NewId() : "";
 		_this.img = chart ? chart.img : "";
-		_this.width = chart ? chart.width : ChartDefines.defaultChartWidth;
-		_this.height = chart ? chart.height : ChartDefines.defaultChartHeight;
+		_this.width = chart ? chart.width : c_oAscChartDefines.defaultChartWidth;
+		_this.height = chart ? chart.height : c_oAscChartDefines.defaultChartHeight;
 		_this.bChartEditor = chart ? chart.bChartEditor : true;
 		
 		_this.type = chart ? chart.type : "";
 		_this.subType = chart ? chart.subType : c_oAscChartSubType.normal;
-		_this.title = chart ? chart.title : "";
-		_this.bDefaultTitle = chart ? chart.bDefaultTitle : false;
-		_this.subTitle = chart ? chart.subTitle : "";
 
 		if ( chart ) {
+			_this.header = { title: chart.header.title, subTitle: chart.header.subTitle, bDefaultTitle: chart.header.bDefaultTitle };
 			_this.range = { interval: chart.range.interval, rows: chart.range.rows, columns: chart.range.columns };
-			_this.xAxis = { title: chart.xAxis.title, bDefaultTitle: chart.xAxis.bDefaultTitle, show: chart.xAxis.show, grid: chart.xAxis.grid };
-			_this.yAxis = { title: chart.yAxis.title, bDefaultTitle: chart.yAxis.bDefaultTitle, show: chart.yAxis.show, grid: chart.yAxis.grid };
-			_this.legend = { position: chart.legend.position, show: chart.legend.show, overlay: chart.legend.overlay };
+			_this.xAxis = { title: chart.xAxis.title, bDefaultTitle: chart.xAxis.bDefaultTitle, bShow: chart.xAxis.bShow, bGrid: chart.xAxis.bGrid };
+			_this.yAxis = { title: chart.yAxis.title, bDefaultTitle: chart.yAxis.bDefaultTitle, bShow: chart.yAxis.bShow, bGrid: chart.yAxis.bGrid };
+			_this.legend = { position: chart.legend.position, bShow: chart.legend.bShow, bOverlay: chart.legend.bOverlay };
 		}
 		else {
+			_this.header = { title: "", subTitle: "", bDefaultTitle: false };
 			_this.range = { interval: bWordContext ? "" : "Sheet1!A1:C3", rows: false, columns: true };
-			_this.xAxis = { title: "", bDefaultTitle: false, show: true, grid: true };
-			_this.yAxis = { title: "", bDefaultTitle: false, show: true, grid: true };
-			_this.legend = { position: c_oAscChartLegend.right, show: true, overlay: false };
+			_this.xAxis = { title: "", bDefaultTitle: false, bShow: true, bGrid: true };
+			_this.yAxis = { title: "", bDefaultTitle: false, bShow: true, bGrid: true };
+			_this.legend = { position: c_oAscChartLegend.right, bShow: true, bOverlay: false };
 		}			
 		
-		_this.showValue = chart ? chart.showValue : false;
+		_this.bShowValue = chart ? chart.bShowValue : false;
+		_this.bShowBorder = chart ? chart.bShowBorder : true;
 		_this.styleId = chart ? chart.styleId : c_oAscChartStyle.Standart;
 		
 		_this.data = [];
@@ -126,12 +132,15 @@
 			chart["height"] = _this.height;
 			chart["type"] = _this.type;
 			chart["subType"] = _this.subType;
-			chart["title"] = _this.title;
-			chart["bDefaultTitle"] = _this.bDefaultTitle;
-			chart["subTitle"] = _this.subTitle;
-			chart["showValue"] = _this.showValue;
+			chart["bShowValue"] = _this.bShowValue;
+			chart["bShowBorder"] = _this.bShowBorder;
 			chart["styleId"] = _this.styleId;
 			chart["bChartEditor"] = _this.bChartEditor;
+			
+			chart["header"] = {};
+			chart["header"]["title"] = _this.header.title;
+			chart["header"]["subTitle"] = _this.header.subTitle;
+			chart["header"]["bDefaultTitle"] = _this.header.bDefaultTitle;
 
 			chart["range"] = {};
 			chart["range"]["interval"] = _this.range.interval;
@@ -141,19 +150,19 @@
 			chart["xAxis"] = {};
 			chart["xAxis"]["title"] = _this.xAxis.title;
 			chart["xAxis"]["bDefaultTitle"] = _this.xAxis.bDefaultTitle;
-			chart["xAxis"]["show"] = _this.xAxis.show;
-			chart["xAxis"]["grid"] = _this.xAxis.grid;
+			chart["xAxis"]["bShow"] = _this.xAxis.bShow;
+			chart["xAxis"]["bGrid"] = _this.xAxis.bGrid;
 
 			chart["yAxis"] = {};
 			chart["yAxis"]["title"] = _this.yAxis.title;
 			chart["yAxis"]["bDefaultTitle"] = _this.yAxis.bDefaultTitle;
-			chart["yAxis"]["show"] = _this.yAxis.show;
-			chart["yAxis"]["grid"] = _this.yAxis.grid;
+			chart["yAxis"]["bShow"] = _this.yAxis.bShow;
+			chart["yAxis"]["bGrid"] = _this.yAxis.bGrid;
 
 			chart["legend"] = {};
 			chart["legend"]["position"] = _this.legend.position;
-			chart["legend"]["show"] = _this.legend.show;
-			chart["legend"]["overlay"] = _this.legend.overlay;
+			chart["legend"]["bShow"] = _this.legend.bShow;
+			chart["legend"]["bOverlay"] = _this.legend.bOverlay;
 				
 			if ( _this.data ) {
 				chart["data"] = [];
@@ -192,12 +201,14 @@
 			
 			_this.type = chart["type"];
 			_this.subType = chart["subType"];
-			_this.title = chart["title"];
-			_this.bDefaultTitle = chart["bDefaultTitle"];
-			_this.subTitle = chart["subTitle"];
-			_this.showValue = chart["showValue"];
+			_this.bShowValue = chart["bShowValue"];
+			_this.bShowBorder = chart["bShowBorder"];
 			_this.styleId = chart["styleId"];
 			_this.bChartEditor = chart["bChartEditor"];
+			
+			_this.header.title = chart["header"]["title"];
+			_this.header.subTitle = chart["header"]["subTitle"];
+			_this.header.bDefaultTitle = chart["range"]["bDefaultTitle"];
 				
 			_this.range.interval = chart["range"]["interval"];
 			_this.range.rows = chart["range"]["rows"];
@@ -205,17 +216,17 @@
 				
 			_this.xAxis.title = chart["xAxis"]["title"];
 			_this.xAxis.bDefaultTitle = chart["xAxis"]["bDefaultTitle"];
-			_this.xAxis.show = chart["xAxis"]["show"];
-			_this.xAxis.grid = chart["xAxis"]["grid"];
+			_this.xAxis.bShow = chart["xAxis"]["bShow"];
+			_this.xAxis.bGrid = chart["xAxis"]["bGrid"];
 				
 			_this.yAxis.title = chart["yAxis"]["title"];
 			_this.yAxis.bDefaultTitle = chart["yAxis"]["bDefaultTitle"];
-			_this.yAxis.show = chart["yAxis"]["show"];
-			_this.yAxis.grid = chart["yAxis"]["grid"];
+			_this.yAxis.bShow = chart["yAxis"]["bShow"];
+			_this.yAxis.bGrid = chart["yAxis"]["bGrid"];
 				
 			_this.legend.position = chart["legend"]["position"];
-			_this.legend.show = chart["legend"]["show"];
-			_this.legend.overlay = chart["legend"]["overlay"];
+			_this.legend.bShow = chart["legend"]["bShow"];
+			_this.legend.bOverlay = chart["legend"]["bOverlay"];
 			
 			if ( chart["data"] ) {
 				_this.data = [];
@@ -255,12 +266,14 @@
 				
 				_this.type = object.chart.type;
 				_this.subType = object.chart.subType;
-				_this.title = object.chart.title;
-				_this.bDefaultTitle = object.chart.bDefaultTitle;
-				_this.subTitle = object.chart.subTitle;
-				_this.showValue = object.chart.showValue;
+				_this.bShowValue = object.chart.bShowValue;
+				_this.bShowBorder = object.chart.bShowBorder;
 				_this.styleId = object.chart.styleId;
 				_this.bChartEditor = object.chart.bChartEditor;
+				
+				_this.header.title = object.chart.header.title;
+				_this.header.subTitle = object.chart.header.subTitle;
+				_this.header.bDefaultTitle = object.chart.header.bDefaultTitle;
 					
 				_this.range.interval = object.chart.range.interval;
 				_this.range.rows = object.chart.range.rows;
@@ -268,17 +281,17 @@
 					
 				_this.xAxis.title = object.chart.xAxis.title;
 				_this.xAxis.bDefaultTitle = object.chart.xAxis.bDefaultTitle;
-				_this.xAxis.show = object.chart.xAxis.show;
-				_this.xAxis.grid = object.chart.xAxis.grid;
+				_this.xAxis.bShow = object.chart.xAxis.bShow;
+				_this.xAxis.bGrid = object.chart.xAxis.bGrid;
 					
 				_this.yAxis.title = object.chart.yAxis.title;
 				_this.yAxis.bDefaultTitle = object.chart.yAxis.bDefaultTitle;
-				_this.yAxis.show = object.chart.yAxis.show;
-				_this.yAxis.grid = object.chart.yAxis.grid;
+				_this.yAxis.bShow = object.chart.yAxis.bShow;
+				_this.yAxis.bGrid = object.chart.yAxis.bGrid;
 					
 				_this.legend.position = object.chart.legend.position;
-				_this.legend.show = object.chart.legend.show;
-				_this.legend.overlay = object.chart.legend.overlay;
+				_this.legend.bShow = object.chart.legend.bShow;
+				_this.legend.bOverlay = object.chart.legend.bOverlay;
 				
 				_this.data = [];
 				if ( object.chart.range.intervalObject ) {
@@ -316,12 +329,14 @@
 			Writer.WriteLong( _this.height );
 			Writer.WriteString2( _this.type );
 			Writer.WriteString2( _this.subType );
-			Writer.WriteString2( _this.title );
-			Writer.WriteBool( _this.bDefaultTitle );
-			Writer.WriteString2( _this.subTitle );
-			Writer.WriteBool( _this.showValue );
+			Writer.WriteBool( _this.bShowValue );
+			Writer.WriteBool( _this.bShowBorder );
 			Writer.WriteLong( _this.styleId );
 			Writer.WriteBool( _this.bChartEditor );
+			
+			Writer.WriteString2( _this.header.title );
+			Writer.WriteString2( _this.header.subTitle );
+			Writer.WriteBool( _this.header.bDefaultTitle );
 				
 			Writer.WriteString2( _this.range.interval );
 			Writer.WriteBool( _this.range.rows );
@@ -329,17 +344,17 @@
 				
 			Writer.WriteString2( _this.xAxis.title );
 			Writer.WriteBool( _this.xAxis.bDefaultTitle );
-			Writer.WriteBool( _this.xAxis.show );
-			Writer.WriteBool( _this.xAxis.grid );
+			Writer.WriteBool( _this.xAxis.bShow );
+			Writer.WriteBool( _this.xAxis.bGrid );
 				
 			Writer.WriteString2( _this.yAxis.title );
 			Writer.WriteBool( _this.yAxis.bDefaultTitle );
-			Writer.WriteBool( _this.yAxis.show );
-			Writer.WriteBool( _this.yAxis.grid );
+			Writer.WriteBool( _this.yAxis.bShow );
+			Writer.WriteBool( _this.yAxis.bGrid );
 				
 			Writer.WriteString2( _this.legend.position );
-			Writer.WriteBool( _this.legend.show );
-			Writer.WriteBool( _this.legend.overlay );
+			Writer.WriteBool( _this.legend.bShow );
+			Writer.WriteBool( _this.legend.bOverlay );
 			
 			/*
 			* numFormatStr
@@ -373,12 +388,14 @@
 			_this.height = Reader.GetLong();
 			_this.type = Reader.GetString2();
 			_this.subType = Reader.GetString2();
-			_this.title = Reader.GetString2();
-			_this.bDefaultTitle = Reader.GetBool();
-			_this.subTitle = Reader.GetString2();
-			_this.showValue = Reader.GetBool();
+			_this.bShowValue = Reader.GetBool();
+			_this.bShowBorder = Reader.GetBool();
 			_this.styleId = Reader.GetLong();
 			_this.bChartEditor = Reader.GetBool();
+			
+			_this.header.title = Reader.GetString2();
+			_this.header.subTitle = Reader.GetString2();
+			_this.header.bDefaultTitle = Reader.GetBool();
 				
 			_this.range.interval = Reader.GetString2();
 			_this.range.rows = Reader.GetBool();
@@ -386,17 +403,17 @@
 				
 			_this.xAxis.title = Reader.GetString2();
 			_this.xAxis.bDefaultTitle = Reader.GetBool();
-			_this.xAxis.show = Reader.GetBool();
-			_this.xAxis.grid = Reader.GetBool();
+			_this.xAxis.bShow = Reader.GetBool();
+			_this.xAxis.bGrid = Reader.GetBool();
 				
 			_this.yAxis.title = Reader.GetString2();
 			_this.yAxis.bDefaultTitle = Reader.GetBool();
-			_this.yAxis.show = Reader.GetBool();
-			_this.yAxis.grid = Reader.GetBool();
+			_this.yAxis.bShow = Reader.GetBool();
+			_this.yAxis.bGrid = Reader.GetBool();
 				
 			_this.legend.position = Reader.GetString2();
-			_this.legend.show = Reader.GetBool();
-			_this.legend.overlay = Reader.GetBool();
+			_this.legend.bShow = Reader.GetBool();
+			_this.legend.bOverlay = Reader.GetBool();
 			
 			/*
 			* numFormatStr
@@ -475,40 +492,60 @@
 	prot["asc_getImageUrl"] = prot.asc_getImageUrl;
 	prot["asc_setImageUrl"] = prot.asc_setImageUrl;
 	
-	function asc_CChart(o) {
+	function asc_CChart(object) {
+	
+		var bCopy = isObject(object);
 
-		this.bChartEditor = o.bChartEditor;
-		this.type = o.type;
-		this.subType = o.subType;
-		this.title = o.title;
-		this.bDefaultTitle = o.bDefaultTitle;
-		this.subTitle = o.subTitle;
-		this.showValue = o.showValue;
-		this.styleId = o.styleId;
+		this.bChartEditor = bCopy ? object.bChartEditor : false;
+		this.type = bCopy ? object.type : null;
+		this.subType = bCopy ? object.subType : null;
+		
+		this.bShowValue = bCopy ? object.bShowValue : false;
+		this.bShowBorder = bCopy ? object.bShowBorder : true;
+		this.styleId = bCopy ? object.styleId : c_oAscChartStyle.Standart;
 
-		this.range = new asc_CChartRange(o.range);
-		this.xAxis = new asc_CChartAxis(o.xAxis);
-		this.yAxis = new asc_CChartAxis(o.yAxis);
-		this.legend = new asc_CChartLegend(o.legend);
+		this.header = bCopy ? new asc_CChartHeader(object.header) : new asc_CChartHeader();
+		this.range = bCopy ? new asc_CChartRange(object.range) : new asc_CChartRange();
+		
+		this.xAxis = bCopy ? new asc_CChartAxisX(object.xAxis) : new asc_CChartAxisX();
+		this.yAxis = bCopy ? new asc_CChartAxisY(object.yAxis) : new asc_CChartAxisY();
+		
+		this.legend = bCopy ? new asc_CChartLegend(object.legend) : new asc_CChartLegend();
 
 		this.series = [];
-		for (var i = 0; i < o.series.length; i++) {
-			var ser = new asc_CChartSeria();
+		if ( bCopy ) {
+			for (var i = 0; i < object.series.length; i++) {
+				var ser = new asc_CChartSeria();
 
-			ser.asc_setTitle(o.series[i].Tx);
-			if (o.series[i].Val && o.series[i].Val.Formula)
-				ser.asc_setValFormula(o.series[i].Val.Formula);
-			if (o.series[i].xVal && o.series[i].xVal.Formula)
-				ser.asc_setxValFormula(o.series[i].xVal.Formula);
-			if (o.series[i].Marker) {
-				ser.asc_setMarkerSize(o.series[i].Marker.Size);
-				ser.asc_setMarkerSymbol(o.series[i].Marker.Symbol);
+				ser.asc_setTitle(object.series[i].Tx);
+				if (object.series[i].Val && object.series[i].Val.Formula)
+					ser.asc_setValFormula(object.series[i].Val.Formula);
+				if (object.series[i].xVal && object.series[i].xVal.Formula)
+					ser.asc_setxValFormula(object.series[i].xVal.Formula);
+				if (object.series[i].Marker) {
+					ser.asc_setMarkerSize(object.series[i].Marker.Size);
+					ser.asc_setMarkerSymbol(object.series[i].Marker.Symbol);
+				}
+				ser.asc_setOutlineColor(object.series[i].OutlineColor);
+
+				this.series.push(ser);
 			}
-			ser.asc_setOutlineColor(o.series[i].OutlineColor);
-
-			this.series.push(ser);
 		}
-		this.buildSeries = o.buildSeries;
+		
+		this.Properties = {
+			bChartEditor: 0,
+			type: 1,
+			subType: 2,
+			bShowValue: 3,
+			bShowBorder: 4,
+			styleId: 5,
+			header: 6,
+			range: 7,
+			xAxis: 8,
+			yAxis: 9,
+			legend: 10,
+			series: 11
+		};
 	}
 
 	asc_CChart.prototype = {
@@ -518,20 +555,17 @@
 		asc_getSubType: function() { return this.subType; },
 		asc_setSubType: function(subType) { this.subType = subType; },
 
-		asc_getTitle: function() { return this.title; },
-		asc_setTitle: function(title) { this.title = title; },
-
-		asc_getDefaultTitleFlag: function() { return this.bDefaultTitle; },
-		asc_setDefaultTitleFlag: function(defaultTitleFlag) { this.bDefaultTitle = defaultTitleFlag; },
-
-		asc_getSubTitle: function() { return this.subTitle; },
-		asc_setSubTitle: function(subTitle) { this.subTitle = subTitle; },
-
 		asc_getStyleId: function() { return this.styleId; },
 		asc_setStyleId: function(styleId) { this.styleId = styleId; },
 
-		asc_getShowValueFlag: function() { return this.showValue; },
-		asc_setShowValueFlag: function(show) { this.showValue = show; },
+		asc_getShowValueFlag: function() { return this.bShowValue; },
+		asc_setShowValueFlag: function(show) { this.bShowValue = show; },
+		
+		asc_getShowBorderFlag: function() { return this.bShowBorder; },
+		asc_setShowBorderFlag: function(show) { this.bShowBorder = show; },
+		
+		asc_getHeader: function() { return this.header; },
+		asc_setHeader: function(headerObj) { this.header = headerObj; },
 
 		asc_getRange: function() { return this.range; },
 		asc_setRange: function(rangeObj) { this.range = rangeObj; },
@@ -550,7 +584,98 @@
 		asc_removeSeries: function() { this.series = []; },
 		
 		asc_getChartEditorFlag: function() { return this.bChartEditor; },
-		asc_setChartEditorFlag: function(value) { this.bChartEditor = value; }
+		asc_setChartEditorFlag: function(value) { this.bChartEditor = value; },
+		
+		rebuildSeries: function() {
+			var _t = this;
+			var bbox = _t.range.intervalObject.getBBox0();
+			_t.series = [];
+			var nameIndex = 1;
+			
+			if (_t.range.rows) {
+				for (var i = bbox.r1; i <= bbox.r2; i++) {
+					var ser = new window["Asc"]["asc_CChartSeria"];
+
+					var startCell = new CellAddress(i, bbox.c1, 0);
+					var endCell = new CellAddress(i, bbox.c2, 0);
+
+					if (startCell && endCell) {
+						if (startCell.getID() == endCell.getID())
+							ser.Val.Formula = startCell.getID();
+						else {
+							ser.Val.Formula = ( !rx_test_ws_name.test(_t.range.intervalObject.worksheet.sName) ? "'" +_t.range.intervalObject.worksheet.sName+ "'" : _t.range.intervalObject.worksheet.sName )
+												+ "!" + startCell.getID() + ":" + endCell.getID();
+					}
+					}
+					ser.Tx = "Series" + nameIndex;
+					_t.series.push(ser);
+					nameIndex++;
+				}
+			}
+			else {
+				for (var i = bbox.c1; i <= bbox.c2; i++) {
+					var ser = new window["Asc"]["asc_CChartSeria"];
+
+					var startCell = new CellAddress(bbox.r1, i, 0);
+					var endCell = new CellAddress(bbox.r2, i, 0);
+
+					if (startCell && endCell) {
+						if (startCell.getID() == endCell.getID())
+							ser.Val.Formula = startCell.getID();
+						else {
+							ser.Val.Formula = ( !rx_test_ws_name.test(_t.range.intervalObject.worksheet.sName) ? "'" +_t.range.intervalObject.worksheet.sName+ "'" : _t.range.intervalObject.worksheet.sName )
+												+ "!" + startCell.getID() + ":" + endCell.getID();
+					}
+					}
+					ser.Tx = "Series" + nameIndex;
+					_t.series.push(ser);
+					nameIndex++;
+				}
+			}
+		},
+		
+		//	For collaborative editing
+		getType: function() {
+			return UndoRedoDataTypes.ChartData;
+		},
+
+		getProperties: function() {
+			return this.Properties;
+		},
+
+		getProperty: function(nType) {
+			switch (nType) {
+				case this.Properties.bChartEditor: return this.bChartEditor; break;
+				case this.Properties.type: return this.type; break;
+				case this.Properties.subType: return this.subType; break;
+				case this.Properties.bShowValue: return this.bShowValue; break;
+				case this.Properties.bShowBorder: return this.bShowBorder; break;
+				case this.Properties.styleId: return this.styleId; break;
+				case this.Properties.header: return this.header; break;
+				case this.Properties.range: return this.range; break;
+				case this.Properties.xAxis: return this.xAxis; break;
+				case this.Properties.yAxis: return this.yAxis; break;
+				case this.Properties.legend: return this.legend; break;
+				case this.Properties.series: return this.series; break;
+			}
+		},
+
+		setProperty: function(nType, value) {
+			switch (nType) {
+				case this.Properties.bChartEditor: this.bChartEditor = value; break;
+				case this.Properties.type: this.type = value; break;
+				case this.Properties.subType: this.subType = value; break;
+				case this.Properties.bShowValue: this.bShowValue = value; break;
+				case this.Properties.bShowBorder: this.bShowBorder = value; break;
+				case this.Properties.styleId: this.styleId = value; break;
+				case this.Properties.header: this.header = value; break;
+				case this.Properties.range: this.range = value; break;
+				case this.Properties.xAxis: this.xAxis = value; break;
+				case this.Properties.yAxis: this.yAxis = value; break;
+				case this.Properties.legend: this.legend = value; break;
+				case this.Properties.series: this.series = value; break;
+			}
+		}
 	}
 
 	window["Asc"].asc_CChart = asc_CChart;
@@ -563,20 +688,17 @@
 	prot["asc_getSubType"] = prot.asc_getSubType;
 	prot["asc_setSubType"] = prot.asc_setSubType;
 
-	prot["asc_getTitle"] = prot.asc_getTitle;
-	prot["asc_setTitle"] = prot.asc_setTitle;
-
-	prot["asc_getDefaultTitleFlag"] = prot.asc_getDefaultTitleFlag;
-	prot["asc_setDefaultTitleFlag"] = prot.asc_setDefaultTitleFlag;
-
-	prot["asc_getSubTitle"] = prot.asc_getSubTitle;
-	prot["asc_setSubTitle"] = prot.asc_setSubTitle;
-
 	prot["asc_getStyleId"] = prot.asc_getStyleId;
 	prot["asc_setStyleId"] = prot.asc_setStyleId;
 
 	prot["asc_getShowValueFlag"] = prot.asc_getShowValueFlag;
 	prot["asc_setShowValueFlag"] = prot.asc_setShowValueFlag;
+	
+	prot["asc_getShowBorderFlag"] = prot.asc_getShowBorderFlag;
+	prot["asc_setShowBorderFlag"] = prot.asc_setShowBorderFlag;
+	
+	prot["asc_getHeader"] = prot.asc_getHeader;
+	prot["asc_setHeader"] = prot.asc_setHeader;
 
 	prot["asc_getRange"] = prot.asc_getRange;
 	prot["asc_setRange"] = prot.asc_setRange;
@@ -598,42 +720,62 @@
 	prot["asc_setChartEditorFlag"] = prot.asc_setChartEditorFlag;
 
 	// Chart range
-	function asc_CChartRange(o) {
-		this.calcInterval = o.calcInterval;
-		this.checkInterval = o.checkInterval;
-		this.intervalToIntervalObject = o.intervalToIntervalObject;
-		this.interval = o.interval;
-		this.intervalObject = o.intervalObject;
-		this.rows = o.rows;
-		this.columns = o.columns;
+	function asc_CChartRange(object) {
+		
+		var bCopy = isObject(object);
+		
+		this.interval = bCopy ? object.interval : "";
+		this.intervalObject = bCopy ? object.intervalObject : null;
+		this.rows = bCopy ? object.rows : false;
+		this.columns = bCopy ? object.columns : true;
+		
+		this.Properties = {
+			interval: 0,
+			rows: 1,
+			columns: 2
+		};
 	}
 
 	asc_CChartRange.prototype = {
 
 		asc_getInterval: function() { return this.interval; },
 		asc_setInterval: function(interval) { this.interval = interval; },
-		asc_checkInterval: function(type, subtype, interval, isRows) {
-			return this.checkInterval(type, subtype, interval, isRows);
-		},
-		asc_calcInterval: function() {
-			return this.calcInterval();
-		},
-
-		asc_getIntervalObject: function() { return this.intervalObject; },
-		asc_setIntervalObject: function(intervalObject) { this.intervalObject = intervalObject; },
-		intervalToIntervalObject: function() { return this.intervalToIntervalObject(); },
 
 		asc_getRowsFlag: function() { return this.rows; },
-
-		asc_setRowsFlag: function(rowsFlag) {
-			this.rows = rowsFlag;
-			this.columns = !rowsFlag;
+		asc_setRowsFlag: function(value) {
+			this.rows = value;
+			this.columns = !value;
 		},
+		
 		asc_getColumnsFlag: function() { return this.columns; },
+		asc_setColumnsFlag: function(value) {
+			this.rows = !value;
+			this.columns = value;
+		},
+		
+		//	For collaborative editing
+		getType: function() {
+			return UndoRedoDataTypes.ChartRange;
+		},
 
-		asc_setColumnsFlag: function(columnsFlag) {
-			this.rows = !columnsFlag;
-			this.columns = columnsFlag;
+		getProperties: function() {
+			return this.Properties;
+		},
+
+		getProperty: function(nType) {
+			switch (nType) {
+				case this.Properties.interval: return this.interval; break;
+				case this.Properties.rows: return this.rows; break;
+				case this.Properties.columns: return this.columns; break;
+			}
+		},
+
+		setProperty: function(nType, value) {
+			switch (nType) {
+				case this.Properties.interval: this.interval = value; break;
+				case this.Properties.rows: this.rows = value; break;
+				case this.Properties.columns: this.columns = value; break;
+			}
 		}
 	}
 
@@ -643,43 +785,227 @@
 
 	prot["asc_getInterval"] = prot.asc_getInterval;
 	prot["asc_setInterval"] = prot.asc_setInterval;
-	prot["asc_calcInterval"] = prot.asc_calcInterval;
-	prot["asc_checkInterval"] = prot.asc_checkInterval;
-
-	prot["asc_getIntervalObject"] = prot.asc_getIntervalObject;
-	prot["asc_setIntervalObject"] = prot.asc_setIntervalObject;
-
+		
 	prot["asc_getRowsFlag"] = prot.asc_getRowsFlag;
 	prot["asc_setRowsFlag"] = prot.asc_setRowsFlag;
 
 	prot["asc_getColumnsFlag"] = prot.asc_getColumnsFlag;
 	prot["asc_setColumnsFlag"] = prot.asc_setColumnsFlag;
-
-	// Chart axis
-	function asc_CChartAxis(o) {
-		this.title = o.title;
-		this.bDefaultTitle = o.bDefaultTitle;
-		this.show = o.show;
-		this.grid = o.grid;
+	
+	// Chart title
+	function asc_CChartHeader(object) {
+	
+		var bCopy = isObject(object);
+		
+		this.title = bCopy ? object.title : "";
+		this.subTitle = bCopy ? object.subTitle : "";
+		this.bDefaultTitle = bCopy ? object.bDefaultTitle : false;
+		this.font = bCopy ? new asc_CChartFont(object.font) : new asc_CChartFont();
+		
+		this.Properties = {
+			title: 0,
+			subTitle: 1,
+			bDefaultTitle: 2,
+			font: 3
+		};
 	}
 
-	asc_CChartAxis.prototype = {
+	asc_CChartHeader.prototype = {
+		asc_getTitle: function() { return this.title; },
+		asc_setTitle: function(title) { this.title = title; },
+		
+		asc_getSubTitle: function() { return this.subTitle; },
+		asc_setSubTitle: function(subTitle) { this.subTitle = subTitle; },
+
+		asc_getDefaultTitleFlag: function() { return this.bDefaultTitle; },
+		asc_setDefaultTitleFlag: function(defaultTitleFlag) { this.bDefaultTitle = defaultTitleFlag; },
+		
+		//	For collaborative editing
+		getType: function() {
+			return UndoRedoDataTypes.ChartHeader;
+		},
+
+		getProperties: function() {
+			return this.Properties;
+		},
+
+		getProperty: function(nType) {
+			switch (nType) {
+				case this.Properties.title: return this.title; break;
+				case this.Properties.subTitle: return this.subTitle; break;
+				case this.Properties.bDefaultTitle: return this.bDefaultTitle; break;
+				case this.Properties.font: return this.font; break;
+			}
+		},
+
+		setProperty: function(nType, value) {
+			switch (nType) {
+				case this.Properties.title: this.title = value; break;
+				case this.Properties.subTitle: this.subTitle = value; break;
+				case this.Properties.bDefaultTitle: this.bDefaultTitle = value; break;
+				case this.Properties.font: this.font = value; break;
+			}
+		}
+	}
+	
+	window["Asc"].asc_CChartHeader = asc_CChartHeader;
+	window["Asc"]["asc_CChartHeader"] = asc_CChartHeader;
+	prot = asc_CChartHeader.prototype;
+
+	prot["asc_getTitle"] = prot.asc_getTitle;
+	prot["asc_setTitle"] = prot.asc_setTitle;
+	
+	prot["asc_getSubTitle"] = prot.asc_getSubTitle;
+	prot["asc_setSubTitle"] = prot.asc_setSubTitle;
+
+	prot["asc_getDefaultTitleFlag"] = prot.asc_getDefaultTitleFlag;
+	prot["asc_setDefaultTitleFlag"] = prot.asc_setDefaultTitleFlag;
+
+	// Chart axis X
+	function asc_CChartAxisX(object) {
+	
+		var bCopy = isObject(object);
+		
+		this.title = bCopy ? object.title : "";
+		this.bDefaultTitle = bCopy ? object.bDefaultTitle : false;
+		this.bShow = bCopy ? object.bShow : true;
+		this.bGrid = bCopy ? object.bGrid : true;
+		this.font = bCopy ? new asc_CChartFont(object.font) : new asc_CChartFont();
+		
+		this.Properties = {
+			title: 0,
+			bDefaultTitle: 1,
+			bShow: 2,
+			bGrid: 3,
+			font: 4
+		};
+	}
+
+	asc_CChartAxisX.prototype = {
 		asc_getTitle: function() { return this.title; },
 		asc_setTitle: function(title) { this.title = title; },
 
 		asc_getDefaultTitleFlag: function() { return this.bDefaultTitle; },
 		asc_setDefaultTitleFlag: function(defaultTitleFlag) { this.bDefaultTitle = defaultTitleFlag; },
 
-		asc_getShowFlag: function() { return this.show; },
-		asc_setShowFlag: function(showFlag) { this.show = showFlag; },
+		asc_getShowFlag: function() { return this.bShow; },
+		asc_setShowFlag: function(showFlag) { this.bShow = showFlag; },
 
-		asc_getGridFlag: function() { return this.grid; },
-		asc_setGridFlag: function(gridFlag) { this.grid = gridFlag; }
+		asc_getGridFlag: function() { return this.bGrid; },
+		asc_setGridFlag: function(gridFlag) { this.bGrid = gridFlag; },
+		
+		//	For collaborative editing
+		getType: function() {
+			return UndoRedoDataTypes.ChartAxisX;
+		},
+
+		getProperties: function() {
+			return this.Properties;
+		},
+
+		getProperty: function(nType) {
+			switch (nType) {
+				case this.Properties.title: return this.title; break;
+				case this.Properties.bDefaultTitle: return this.bDefaultTitle; break;
+				case this.Properties.bShow: return this.bShow; break;
+				case this.Properties.bGrid: return this.bGrid; break;
+				case this.Properties.font: return this.font; break;
+			}
+		},
+
+		setProperty: function(nType, value) {
+			switch (nType) {
+				case this.Properties.title: this.title = value; break;
+				case this.Properties.bDefaultTitle: this.bDefaultTitle = value; break;
+				case this.Properties.bShow: this.bShow = value; break;
+				case this.Properties.bGrid: this.bGrid = value; break;
+				case this.Properties.font: this.font = value; break;
+			}
+		}
 	}
 
-	window["Asc"].asc_CChartAxis = asc_CChartAxis;
-	window["Asc"]["asc_CChartAxis"] = asc_CChartAxis;
-	prot = asc_CChartAxis.prototype;
+	window["Asc"].asc_CChartAxisX = asc_CChartAxisX;
+	window["Asc"]["asc_CChartAxisX"] = asc_CChartAxisX;
+	prot = asc_CChartAxisX.prototype;
+
+	prot["asc_getTitle"] = prot.asc_getTitle;
+	prot["asc_setTitle"] = prot.asc_setTitle;
+
+	prot["asc_getDefaultTitleFlag"] = prot.asc_getDefaultTitleFlag;
+	prot["asc_setDefaultTitleFlag"] = prot.asc_setDefaultTitleFlag;
+
+	prot["asc_getShowFlag"] = prot.asc_getShowFlag;
+	prot["asc_setShowFlag"] = prot.asc_setShowFlag;
+
+	prot["asc_getGridFlag"] = prot.asc_getGridFlag;
+	prot["asc_setGridFlag"] = prot.asc_setGridFlag;
+	
+	// Chart axis Y
+	function asc_CChartAxisY(object) {
+	
+		var bCopy = isObject(object);
+		
+		this.title = bCopy ? object.title : "";
+		this.bDefaultTitle = bCopy ? object.bDefaultTitle : false;
+		this.bShow = bCopy ? object.bShow : true;
+		this.bGrid = bCopy ? object.bGrid : true;
+		this.font = bCopy ? new asc_CChartFont(object.font) : new asc_CChartFont();
+		
+		this.Properties = {
+			title: 0,
+			bDefaultTitle: 1,
+			bShow: 2,
+			bGrid: 3,
+			font: 4
+		};
+	}
+
+	asc_CChartAxisY.prototype = {
+		asc_getTitle: function() { return this.title; },
+		asc_setTitle: function(title) { this.title = title; },
+
+		asc_getDefaultTitleFlag: function() { return this.bDefaultTitle; },
+		asc_setDefaultTitleFlag: function(defaultTitleFlag) { this.bDefaultTitle = defaultTitleFlag; },
+
+		asc_getShowFlag: function() { return this.bShow; },
+		asc_setShowFlag: function(showFlag) { this.bShow = showFlag; },
+
+		asc_getGridFlag: function() { return this.bGrid; },
+		asc_setGridFlag: function(gridFlag) { this.bGrid = gridFlag; },
+		
+		//	For collaborative editing
+		getType: function() {
+			return UndoRedoDataTypes.ChartAxisY;
+		},
+
+		getProperties: function() {
+			return this.Properties;
+		},
+
+		getProperty: function(nType) {
+			switch (nType) {
+				case this.Properties.title: return this.title; break;
+				case this.Properties.bDefaultTitle: return this.bDefaultTitle; break;
+				case this.Properties.bShow: return this.bShow; break;
+				case this.Properties.bGrid: return this.bGrid; break;
+				case this.Properties.font: return this.font; break;
+			}
+		},
+
+		setProperty: function(nType, value) {
+			switch (nType) {
+				case this.Properties.title: this.title = value; break;
+				case this.Properties.bDefaultTitle: this.bDefaultTitle = value; break;
+				case this.Properties.bShow: this.bShow = value; break;
+				case this.Properties.bGrid: this.bGrid = value; break;
+				case this.Properties.font: this.font = value; break;
+			}
+		}
+	}
+
+	window["Asc"].asc_CChartAxisY = asc_CChartAxisY;
+	window["Asc"]["asc_CChartAxisY"] = asc_CChartAxisY;
+	prot = asc_CChartAxisY.prototype;
 
 	prot["asc_getTitle"] = prot.asc_getTitle;
 	prot["asc_setTitle"] = prot.asc_setTitle;
@@ -694,21 +1020,59 @@
 	prot["asc_setGridFlag"] = prot.asc_setGridFlag;
 
 	// Chart legend
-	function asc_CChartLegend(o) {
-		this.position = o.position;
-		this.show = o.show;
-		this.overlay = o.overlay;
+	function asc_CChartLegend(object) {
+	
+		var bCopy = isObject(object);
+		
+		this.position = bCopy ? object.position : c_oAscChartLegend.right;
+		this.bShow = bCopy ? object.bShow : true;
+		this.bOverlay = bCopy ? object.bOverlay : false;
+		this.font = bCopy ? new asc_CChartFont(object.font) : new asc_CChartFont();
+		
+		this.Properties = {
+			position: 0,
+			bShow: 1,
+			bOverlay: 2,
+			font: 3
+		};
 	}
 
 	asc_CChartLegend.prototype = {
 		asc_getPosition: function() { return this.position; },
 		asc_setPosition: function(pos) { this.position = pos; },
 
-		asc_getShowFlag: function() { return this.show; },
-		asc_setShowFlag: function(showFlag) { this.show = showFlag; },
+		asc_getShowFlag: function() { return this.bShow; },
+		asc_setShowFlag: function(showFlag) { this.bShow = showFlag; },
 
-		asc_getOverlayFlag: function() { return this.overlay; },
-		asc_setOverlayFlag: function(overlayFlag) { this.overlay = overlayFlag; }
+		asc_getOverlayFlag: function() { return this.bOverlay; },
+		asc_setOverlayFlag: function(overlayFlag) { this.bOverlay = overlayFlag; },
+		
+		//	For collaborative editing
+		getType: function() {
+			return UndoRedoDataTypes.ChartLegend;
+		},
+
+		getProperties: function() {
+			return this.Properties;
+		},
+
+		getProperty: function(nType) {
+			switch (nType) {
+				case this.Properties.position: return this.position; break;
+				case this.Properties.bShow: return this.bShow; break;
+				case this.Properties.bOverlay: return this.bOverlay; break;
+				case this.Properties.font: return this.font; break;
+			}
+		},
+
+		setProperty: function(nType, value) {
+			switch (nType) {
+				case this.Properties.position: this.position = value; break;
+				case this.Properties.bShow: this.bShow = value; break;
+				case this.Properties.bOverlay: this.bOverlay = value; break;
+				case this.Properties.font: this.font = value; break;
+			}
+		}
 	}
 
 	window["Asc"].asc_CChartLegend = asc_CChartLegend;
@@ -821,6 +1185,104 @@
 
 	prot["asc_getOutlineColor"] = prot.asc_getOutlineColor;
 	prot["asc_setOutlineColor"] = prot.asc_setOutlineColor;
+	
+	// Chart font
+	function asc_CChartFont(object) {
+	
+		var bCopy = isObject(object);
+	
+		this.name = bCopy ? object.name : "Arial";
+		this.size = bCopy ? object.size : 12;
+		this.color = bCopy ? object.color : "#000000";
+		
+		this.bold = bCopy ? object.bold : 0;
+		this.italic = bCopy ? object.italic : 0;
+		this.underline = bCopy ? object.underline : 0;
+		
+		this.Properties = {
+			name: 0,
+			size: 1,
+			color: 2,
+			bold: 3,
+			italic: 4,
+			underline: 5
+		}
+	}
+	
+	asc_CChartFont.prototype = {
+		asc_getName: function() { return this.name; },
+		asc_setName: function(val) { this.name = val; },
+
+		asc_getSize: function() { return this.size; },
+		asc_setSize: function(val) { this.size = val; },
+
+		asc_getColor: function() { return this.color; },
+		asc_setColor: function(val) { this.color = val; },
+		
+		asc_getBold: function() { return this.bold; },
+		asc_setBold: function(val) { this.bold = val; },
+		
+		asc_getItalic: function() { return this.italic; },
+		asc_setItalic: function(val) { this.italic = val; },
+		
+		asc_getUnderline: function() { return this.underline; },
+		asc_setUnderline: function(val) { this.underline = val; },
+		
+		//	For collaborative editing
+		getType: function() {
+			return UndoRedoDataTypes.ChartFont;
+		},
+
+		getProperties: function() {
+			return this.Properties;
+		},
+
+		getProperty: function(nType) {
+			switch (nType) {
+				case this.Properties.name: return this.name; break;
+				case this.Properties.size: return this.size; break;
+				case this.Properties.color: return this.color; break;
+				
+				case this.Properties.bold: return this.bold; break;
+				case this.Properties.italic: return this.italic; break;
+				case this.Properties.underline: return this.underline; break;
+			}
+		},
+
+		setProperty: function(nType, value) {
+			switch (nType) {
+				case this.Properties.name: this.name = value; break;
+				case this.Properties.size: this.size = value; break;
+				case this.Properties.color: this.color = value; break;
+				
+				case this.Properties.bold: this.bold = value; break;
+				case this.Properties.italic: this.italic = value; break;
+				case this.Properties.underline: this.underline = value; break;
+			}
+		}
+	}
+	
+	window["Asc"].asc_CChartFont = asc_CChartFont;
+	window["Asc"]["asc_CChartFont"] = asc_CChartFont;
+	prot = asc_CChartFont.prototype;
+
+	prot["asc_getName"] = prot.asc_getName;
+	prot["asc_setName"] = prot.asc_setName;
+
+	prot["asc_getSize"] = prot.asc_getSize;
+	prot["asc_setSize"] = prot.asc_setSize;
+
+	prot["asc_getColor"] = prot.asc_getColor;
+	prot["asc_setColor"] = prot.asc_setColor;
+	
+	prot["asc_getBold"] = prot.asc_getBold;
+	prot["asc_setBold"] = prot.asc_setBold;
+	
+	prot["asc_getItalic"] = prot.asc_getItalic;
+	prot["asc_setItalic"] = prot.asc_setItalic;
+	
+	prot["asc_getUnderline"] = prot.asc_getUnderline;
+	prot["asc_setUnderline"] = prot.asc_setUnderline;
 
 // Undo / Redo
 DrawingObjects.prototype = {
@@ -838,7 +1300,7 @@ DrawingObjects.prototype = {
 				break;
 
 			case historyitem_DrawingObject_Edit:
-				if ((data.flags.transactionState == TransactionState.No) || (data.flags.transactionState == TransactionState.Start)) {
+				if ((data.flags.transactionState == c_oAscTransactionState.No) || (data.flags.transactionState == c_oAscTransactionState.Start)) {
 					this.deleteDrawingObject(data);
 					this.addDrawingObject(data);
 				}
@@ -872,7 +1334,7 @@ DrawingObjects.prototype = {
 				break;
 
 			case historyitem_DrawingObject_Edit:
-				if ((data.flags.transactionState == TransactionState.No) || (data.flags.transactionState == TransactionState.Stop)) {
+				if ((data.flags.transactionState == c_oAscTransactionState.No) || (data.flags.transactionState == c_oAscTransactionState.Stop)) {
 					this.deleteDrawingObject(data);
 					this.addDrawingObject(data);
 				}
@@ -912,6 +1374,7 @@ function DrawingObjects() {
 	var minChartWidth = 160;
 	var minChartHeight = 160;
 	var undoRedoObject = null;
+	
 	var shiftKey = false;
 	var userId = null;
 	var documentId = null;
@@ -920,15 +1383,7 @@ function DrawingObjects() {
 	//-----------------------------------------------------------------------------------
 	// Public methods
 	//-----------------------------------------------------------------------------------
-
-	_this.setShiftKey = function(bShiftKey) {
-		shiftKey = bShiftKey;
-	}
-
-	_this.getWorksheet = function() {
-		return worksheet;
-	}
-
+	
 	_this.init = function(currentSheet) {
 
 		var api = window["Asc"]["editor"];
@@ -940,16 +1395,15 @@ function DrawingObjects() {
 		overlayCtx = currentSheet.overlayCtx;
 		isViewerMode =  function() { return worksheet._trigger("getViewerMode"); };
 
-		// в currentSheet.model.Drawings содержатся объекты с worksheet == null. Для каждого вызываем cloneDrawingObject
 		aObjects = [];
 		for (var i = 0; currentSheet.model.Drawings && (i < currentSheet.model.Drawings.length); i++) {
 
+			currentSheet.model.Drawings[i].worksheet = worksheet;
 			aObjects[i] = _this.cloneDrawingObject(currentSheet.model.Drawings[i]);
-			aObjects[i].worksheet = worksheet;
 			aObjects[i].flags.loaded = currentSheet.model.Drawings[i].flags.loaded;
 
 			if (aObjects[i].isChart())
-				aObjects[i].chart.range.calcInterval();
+				_this.calcChartInterval(aObjects[i].chart);
 		}
 		lastObjectIndex = aObjects.length;
 
@@ -963,7 +1417,15 @@ function DrawingObjects() {
 			}
 		}
 	}
-	
+
+	_this.setShiftKey = function(bShiftKey) {
+		shiftKey = bShiftKey;
+	}
+
+	_this.getWorksheet = function() {
+		return worksheet;
+	}
+
 	_this.initGlobalDrawingPointer = function() {
 		DrawingObject = DrawingBase;
 		DrawingObjectLayer = DrawingLayer;
@@ -1042,25 +1504,6 @@ function DrawingObjects() {
 			return true;
 		else
 			return false;
-	}
-
-	_this.formulaToRange = function(formula, ws) {
-		var range = null;
-
-		if (formula && ws) {
-			var ref3D = parserHelp.is3DRef(formula, 0);
-			if (!ref3D[0])
-				range = ws.model.getRange2(formula.toUpperCase());
-			else {
-				var resultRef = parserHelp.parse3DRef(formula);
-				if (null !== resultRef) {
-					var ws = ws.model.workbook.getWorksheetByName(resultRef.sheet);
-					if (ws)
-						range = ws.getRange2(resultRef.range);
-				}
-			}
-		}
-		return range;
 	}
 
 	//-----------------------------------------------------------------------------------
@@ -1148,13 +1591,13 @@ function DrawingObjects() {
 						History.Create_NewPoint();
 						History.StartTransaction();
 
-						undoRedoObject.flags.transactionState = TransactionState.Start;
+						undoRedoObject.flags.transactionState = c_oAscTransactionState.Start;
 						History.Add(g_oUndoRedoDrawingObject, historyitem_DrawingObject_Edit, worksheet.model.getId(), null, undoRedoObject);
 						undoRedoObject = null;
 
 						History.Create_NewPoint();
 						var urObj = _this.cloneDrawingObject(obj);
-						urObj.flags.transactionState = TransactionState.Stop;
+						urObj.flags.transactionState = c_oAscTransactionState.Stop;
 						History.Add(g_oUndoRedoDrawingObject, historyitem_DrawingObject_Edit, worksheet.model.getId(), null, urObj);
 
 						History.EndTransaction();
@@ -1172,8 +1615,8 @@ function DrawingObjects() {
 
 					var bOnload = false;
 					if ( obj.isChart() && bUpdateCharts ) {
-						if (!obj.chart.range.intervalObject)
-							obj.chart.range.intervalToIntervalObject();
+						if ( !obj.chart.range.intervalObject )
+							_this.intervalToIntervalObject(obj.chart);
 						
 						var chartBase64 = chartRender.insertChart(obj.chart, null, obj.getWidthFromTo(), obj.getHeightFromTo());
 						if ( !chartBase64 )
@@ -1363,10 +1806,11 @@ function DrawingObjects() {
 	
 	var DrawingBase = function(ws) {
 		
-		var _th = this;
-		_th.worksheet = ws;		
-		_th.Properties = {
-			id: 1,			
+		var _t = this;
+		_t.worksheet = ws;
+		
+		_t.Properties = {
+			Id: 1,
 			Type: 2,
 			PosX: 3,
 			PosY: 4,
@@ -1375,7 +1819,7 @@ function DrawingObjects() {
 			ImageSrc: 7,
 			FlagCurrentCursor: 8,
 			FlagsTransactionState: 9,
-			imageUrl: 10,
+			ImageUrl: 10,
 			FromCol: 11,
 			FromColOff: 12,
 			FromRow: 13,
@@ -1387,225 +1831,67 @@ function DrawingObjects() {
 			MoveX: 19,
 			MoveY: 20,
 			SizeCoeff: 21,
-			ChartType: 22,
-			ChartSubType: 23,
-			ChartTitle: 24,
-			ChartDefaultTitle: 25,
-			ChartSubTitle: 26,
-			ChartShowValue: 27,
-			ChartRangeInterval: 28,
-			ChartRangeRows: 29,
-			ChartRangeColumns: 30,
-			ChartxAxisTitle: 31,
-			ChartxAxisDefaultTitle: 32,
-			ChartxAxisShow: 33,
-			ChartxAxisGrid: 34,
-			ChartyAxisTitle: 35,
-			ChartyAxisDefaultTitle: 36,
-			ChartyAxisShow: 37,
-			ChartyAxisGrid: 38,
-			ChartLegendPosition: 39,
-			ChartLegendShow: 40,
-			ChartLegendOverlay: 41,
-			ChartSeries: 42,
-			ChartStyleId: 43
+			ChartData: 22
 		};
 
-		_th.id = null;
-		_th.image = new Image();
-		_th.imageUrl = "";
-		_th.Type = ECellAnchorType.cellanchorTwoCell;
-		_th.Pos = { X: 0, Y: 0 };
+		_t.id = null;
+		_t.image = new Image();
+		_t.imageUrl = "";
+		_t.Type = c_oAscCellAnchorType.cellanchorTwoCell;
+		_t.Pos = { X: 0, Y: 0 };
 
-		_th.from = { col: 0, colOff: 0, row: 0, rowOff: 0 };
-		_th.to = { col: 0, colOff: 0, row: 0, rowOff: 0 };
-		_th.ext = { cx: 0, cy: 0 };
-		_th.size = { width: 0, height: 0, coeff: 1 };
-		_th.move = { x: 0, y: 0, inAction: false };
+		_t.from = { col: 0, colOff: 0, row: 0, rowOff: 0 };
+		_t.to = { col: 0, colOff: 0, row: 0, rowOff: 0 };
+		_t.ext = { cx: 0, cy: 0 };
+		_t.size = { width: 0, height: 0, coeff: 1 };
+		_t.move = { x: 0, y: 0, inAction: false };
 
-		this.chart = {
-			bChartEditor: false,
-			range: {
-				interval: function() {
-					var result = "";
-					if (_th.worksheet) {
-						var selectedRange = _th.worksheet.getSelectedRange();
-						if (selectedRange) {
-							var box = selectedRange.getBBox0();
-							var startCell = new CellAddress(box.r1, box.c1, 0);
-							var endCell = new CellAddress(box.r2, box.c2, 0);
+		_t.chart = new asc_CChart();
 
-							if (startCell && endCell) {
-								var wsName = _th.worksheet.model.sName;								
-								if ( !rx_test_ws_name.test(wsName) )
-									wsName = "'" + wsName + "'";
-								
-								if (startCell.getID() == endCell.getID())
-									result = wsName + "!" + startCell.getID();
-								else
-									result = wsName + "!" + startCell.getID() + ":" + endCell.getID();
-							}
-						}
-					}
-					return result;
-				} (),
-
-				intervalObject: function() {
-					return _th.worksheet ? _th.worksheet.getSelectedRange() : null;
-				} (),
-
-				checkInterval: function(type, subtype, interval, isRows) {
-					var result = false;
-					if (interval && _th.worksheet) {
-						var _range = _this.formulaToRange(interval, _th.worksheet);
-						if (_range && checkDataRange(type, subtype, _range, isRows, _th.worksheet))
-							result = true;
-					}
-					return result;
-				},
-
-				calcInterval: function() {
-					if (this.intervalObject) {
-						var box = this.intervalObject.getBBox0();
-						var startCell = new CellAddress(box.r1, box.c1, 0);
-						var endCell = new CellAddress(box.r2, box.c2, 0);
-
-						if (startCell && endCell) {
-							
-							if (startCell.getID() == endCell.getID())
-								this.interval = startCell.getID();
-							else {
-								var wsName = this.intervalObject.worksheet.sName;								
-								if ( !rx_test_ws_name.test(wsName) )
-									wsName = "'" + wsName + "'";
-									
-								this.interval = wsName + "!" + startCell.getID() + ":" + endCell.getID();
-							}
-						}
-					}
-				},
-
-				intervalToIntervalObject: function() {
-					if (this.interval && _th.worksheet) {
-						var _range = _this.formulaToRange(this.interval, _th.worksheet);
-						if (_range)
-							this.intervalObject = _range;
-					}
-				},
-
-				rows: false,
-				columns: true
-			},
-
-			type: null,
-			subType: null,
-			title: "",
-			bDefaultTitle: false,
-			subTitle: "",
-
-			xAxis: { title: "", bDefaultTitle: false, show: true, grid: true },
-
-			yAxis: { title: "", bDefaultTitle: false, show: true, grid: true },
-
-			legend: { position: c_oAscChartLegend.right, show: true, overlay: false },
-
-			showValue: false,
-			styleId: c_oAscChartStyle.Standart,
-
-			series: [], 	// Массив объектов типа asc_CChartSeria,
-
-			buildSeries: function() {
-				var _t = this;
-				var bbox = _t.range.intervalObject.getBBox0();
-				_t.series = [];
-				var nameIndex = 1;
-				if (_t.range.rows) {
-					for (var i = bbox.r1; i <= bbox.r2; i++) {
-						var ser = new window["Asc"]["asc_CChartSeria"];
-
-						var startCell = new CellAddress(i, bbox.c1, 0);
-						var endCell = new CellAddress(i, bbox.c2, 0);
-
-						if (startCell && endCell) {
-							if (startCell.getID() == endCell.getID())
-								ser.Val.Formula = startCell.getID();
-							else {
-								ser.Val.Formula = ( !rx_test_ws_name.test(_t.range.intervalObject.worksheet.sName) ? "'" +_t.range.intervalObject.worksheet.sName+ "'" : _t.range.intervalObject.worksheet.sName )
-													+ "!" + startCell.getID() + ":" + endCell.getID();
-						}
-						}
-						ser.Tx = "Series" + nameIndex;
-						_t.series.push(ser);
-						nameIndex++;
-					}
-				}
-				else {
-					for (var i = bbox.c1; i <= bbox.c2; i++) {
-						var ser = new window["Asc"]["asc_CChartSeria"];
-
-						var startCell = new CellAddress(bbox.r1, i, 0);
-						var endCell = new CellAddress(bbox.r2, i, 0);
-
-						if (startCell && endCell) {
-							if (startCell.getID() == endCell.getID())
-								ser.Val.Formula = startCell.getID();
-							else {
-								ser.Val.Formula = ( !rx_test_ws_name.test(_t.range.intervalObject.worksheet.sName) ? "'" +_t.range.intervalObject.worksheet.sName+ "'" : _t.range.intervalObject.worksheet.sName )
-													+ "!" + startCell.getID() + ":" + endCell.getID();
-						}
-						}
-						ser.Tx = "Series" + nameIndex;
-						_t.series.push(ser);
-						nameIndex++;
-					}
-				}
-			}
-		};
-
-		this.flags = {
+		_t.flags = {
 			loaded: false,
 			selected: false,
 			anchorUpdated: false,
 			lockState: c_oAscObjectLockState.No,
 			currentCursor: null,
-			transactionState: TransactionState.No
+			transactionState: c_oAscTransactionState.No
 		};
 
 		// Свойства
-		this.isImage = function() {
-			return !this.isChart();
+		_t.isImage = function() {
+			return !_t.isChart();
 		}
 		
-		this.isChart = function() {
-			return this.chart.type ? true : false;
+		_t.isChart = function() {
+			return _t.chart.type ? true : false;
 		}
 
 		// Проверяет выход за границы
-		this.canDraw = function() {
+		_t.canDraw = function() {
 			var result = true;
 
-			if (!this.image.src ||
-					 (_th.worksheet.getCellLeft(_th.worksheet.getFirstVisibleCol(), 0) > _th.worksheet.getCellLeft(this.to.col, 0) + mmToPx(this.to.colOff)) ||
-					 (_th.worksheet.getCellTop(_th.worksheet.getFirstVisibleRow(), 0) > _th.worksheet.getCellTop(this.to.row, 0) + mmToPx(this.to.rowOff)))
+			if (!_t.image.src ||
+					 (_t.worksheet.getCellLeft(_t.worksheet.getFirstVisibleCol(), 0) > _t.worksheet.getCellLeft(_t.to.col, 0) + mmToPx(_t.to.colOff)) ||
+					 (_t.worksheet.getCellTop(_t.worksheet.getFirstVisibleRow(), 0) > _t.worksheet.getCellTop(_t.to.row, 0) + mmToPx(_t.to.rowOff)))
 			{ result = false; }
 
 			return result;
 		}
 
-		this.canResize = function(width, height) {
+		_t.canResize = function(width, height) {
 			var result = true;
 
-			if (this.flags.currentCursor != "move") {
-				if (this.isChart()) {
+			if (_t.flags.currentCursor != "move") {
+				if (_t.isChart()) {
 					if (width == minChartWidth) {
-						switch (this.flags.currentCursor) {
+						switch (_t.flags.currentCursor) {
 							case "w-resize": case "e-resize": case "ne-resize":
 							case "nw-resize": case "se-resize": case "sw-resize":
 								result = false;
 						}
 					}
 					else if (height == minChartHeight) {
-						switch (this.flags.currentCursor) {
+						switch (_t.flags.currentCursor) {
 							case "n-resize": case "s-resize": case "ne-resize":
 							case "nw-resize": case "se-resize": case "sw-resize":
 								result = false;
@@ -1614,14 +1900,14 @@ function DrawingObjects() {
 				}
 				else {		// Image
 					if (width == minImageWidth) {
-						switch (this.flags.currentCursor) {
+						switch (_t.flags.currentCursor) {
 							case "w-resize": case "e-resize": case "ne-resize":
 							case "nw-resize": case "se-resize": case "sw-resize":
 								result = false;
 						}
 					}
 					else if (height == minImageHeight) {
-						switch (this.flags.currentCursor) {
+						switch (_t.flags.currentCursor) {
 							case "n-resize": case "s-resize": case "ne-resize":
 							case "nw-resize": case "se-resize": case "sw-resize":
 								result = false;
@@ -1633,183 +1919,164 @@ function DrawingObjects() {
 			return result;
 		}
 
-		this.updateAnchorPosition = function() {
+		_t.updateAnchorPosition = function() {
 
-			switch (this.Type) {
-				case ECellAnchorType.cellanchorOneCell: 
+			switch (_t.Type) {
+				case c_oAscCellAnchorType.cellanchorOneCell: 
 					{
-						var _left = this.getRealLeftOffset();
-						var _top = this.getRealTopOffset();
+						var _left = _t.getRealLeftOffset();
+						var _top = _t.getRealTopOffset();
 
-						var foundCol = _th.worksheet._findColUnderCursor(pxToPt(_left + mmToPx(this.ext.cx)), true);
+						var foundCol = _t.worksheet._findColUnderCursor(pxToPt(_left + mmToPx(_t.ext.cx)), true);
 						while (foundCol == null) {
-							_th.worksheet.expandColsOnScroll(true);
-							_th.worksheet._trigger("reinitializeScrollX");
-							foundCol = _th.worksheet._findColUnderCursor(pxToPt(_left + mmToPx(this.ext.cx)), true);
+							_t.worksheet.expandColsOnScroll(true);
+							_t.worksheet._trigger("reinitializeScrollX");
+							foundCol = _t.worksheet._findColUnderCursor(pxToPt(_left + mmToPx(_t.ext.cx)), true);
 						}
-						this.to.col = foundCol.col;
-						this.to.colOff = pxToMm(_left + mmToPx(this.ext.cx) - _th.worksheet.getCellLeft(this.to.col, 0));
+						_t.to.col = foundCol.col;
+						_t.to.colOff = pxToMm(_left + mmToPx(_t.ext.cx) - _t.worksheet.getCellLeft(_t.to.col, 0));
 
-						var foundRow = _th.worksheet._findRowUnderCursor(pxToPt(_top + mmToPx(this.ext.cy)), true);
+						var foundRow = _t.worksheet._findRowUnderCursor(pxToPt(_top + mmToPx(_t.ext.cy)), true);
 						while (foundRow == null) {
-							_th.worksheet.expandRowsOnScroll(true);
-							_th.worksheet._trigger("reinitializeScrollY");
-							foundRow = _th.worksheet._findRowUnderCursor(pxToPt(_top + mmToPx(this.ext.cy)), true);
+							_t.worksheet.expandRowsOnScroll(true);
+							_t.worksheet._trigger("reinitializeScrollY");
+							foundRow = _t.worksheet._findRowUnderCursor(pxToPt(_top + mmToPx(_t.ext.cy)), true);
 						}
-						this.to.row = foundRow.row;
-						this.to.rowOff = pxToMm(_top + mmToPx(this.ext.cy) - _th.worksheet.getCellTop(this.to.row, 0));
+						_t.to.row = foundRow.row;
+						_t.to.rowOff = pxToMm(_top + mmToPx(_t.ext.cy) - _t.worksheet.getCellTop(_t.to.row, 0));
 					}
 					break;
 
-				case ECellAnchorType.cellanchorAbsolute: 
+				case c_oAscCellAnchorType.cellanchorAbsolute: 
 					{
-						if ( this.Pos.X < 0 )
-							this.Pos.X = 0;
-						if ( this.Pos.Y < 0 )
-							this.Pos.Y = 0;
+						if ( _t.Pos.X < 0 )
+							_t.Pos.X = 0;
+						if ( _t.Pos.Y < 0 )
+							_t.Pos.Y = 0;
 					
-						this.from.col = _th.worksheet._findColUnderCursor(pxToPt(mmToPx(this.Pos.X) + _th.worksheet.getCellLeft(0, 0)), true).col;
-						this.from.colOff = pxToMm(mmToPx(this.Pos.X) + _th.worksheet.getCellLeft(0, 0) - _th.worksheet.getCellLeft(this.from.col, 0));
+						_t.from.col = _t.worksheet._findColUnderCursor(pxToPt(mmToPx(_t.Pos.X) + _t.worksheet.getCellLeft(0, 0)), true).col;
+						_t.from.colOff = pxToMm(mmToPx(_t.Pos.X) + _t.worksheet.getCellLeft(0, 0) - _t.worksheet.getCellLeft(_t.from.col, 0));
 
-						this.from.row = _th.worksheet._findRowUnderCursor(pxToPt(mmToPx(this.Pos.Y) + _th.worksheet.getCellTop(0, 0)), true).row;
-						this.from.rowOff = pxToMm(mmToPx(this.Pos.Y) + _th.worksheet.getCellTop(0, 0) - _th.worksheet.getCellTop(this.from.row, 0));
+						_t.from.row = _t.worksheet._findRowUnderCursor(pxToPt(mmToPx(_t.Pos.Y) + _t.worksheet.getCellTop(0, 0)), true).row;
+						_t.from.rowOff = pxToMm(mmToPx(_t.Pos.Y) + _t.worksheet.getCellTop(0, 0) - _t.worksheet.getCellTop(_t.from.row, 0));
 
-						var _left = this.getRealLeftOffset();
-						var _top = this.getRealTopOffset();
+						var _left = _t.getRealLeftOffset();
+						var _top = _t.getRealTopOffset();
 
-						var foundCol = _th.worksheet._findColUnderCursor(pxToPt(_left + mmToPx(this.ext.cx)), true);
+						var foundCol = _t.worksheet._findColUnderCursor(pxToPt(_left + mmToPx(_t.ext.cx)), true);
 						while (foundCol == null) {
-							_th.worksheet.expandColsOnScroll(true);
-							_th.worksheet._trigger("reinitializeScrollX");
-							foundCol = _th.worksheet._findColUnderCursor(pxToPt(_left + mmToPx(this.ext.cx)), true);
+							_t.worksheet.expandColsOnScroll(true);
+							_t.worksheet._trigger("reinitializeScrollX");
+							foundCol = _t.worksheet._findColUnderCursor(pxToPt(_left + mmToPx(_t.ext.cx)), true);
 						}
-						this.to.col = foundCol.col;
-						this.to.colOff = pxToMm(_left + mmToPx(this.ext.cx) - _th.worksheet.getCellLeft(this.to.col, 0));
+						_t.to.col = foundCol.col;
+						_t.to.colOff = pxToMm(_left + mmToPx(_t.ext.cx) - _t.worksheet.getCellLeft(_t.to.col, 0));
 
-						var foundRow = _th.worksheet._findRowUnderCursor(pxToPt(_top + mmToPx(this.ext.cy)), true);
+						var foundRow = _t.worksheet._findRowUnderCursor(pxToPt(_top + mmToPx(_t.ext.cy)), true);
 						while (foundRow == null) {
-							_th.worksheet.expandRowsOnScroll(true);
-							_th.worksheet._trigger("reinitializeScrollY");
-							foundRow = _th.worksheet._findRowUnderCursor(pxToPt(_top + mmToPx(this.ext.cy)), true);
+							_t.worksheet.expandRowsOnScroll(true);
+							_t.worksheet._trigger("reinitializeScrollY");
+							foundRow = _t.worksheet._findRowUnderCursor(pxToPt(_top + mmToPx(_t.ext.cy)), true);
 						}
-						this.to.row = foundRow.row;
-						this.to.rowOff = pxToMm(_top + mmToPx(this.ext.cy) - _th.worksheet.getCellTop(this.to.row, 0));
+						_t.to.row = foundRow.row;
+						_t.to.rowOff = pxToMm(_top + mmToPx(_t.ext.cy) - _t.worksheet.getCellTop(_t.to.row, 0));
 					}
 					break;
 			}
-			this.flags.anchorUpdated = true;
+			_t.flags.anchorUpdated = true;
 		}
 
-		this.normalizeMetrics = function() {
-			var width = this.getWidthFromTo();
-			var height = this.getHeightFromTo();
+		_t.normalizeMetrics = function() {
+			var width = _t.getWidthFromTo();
+			var height = _t.getHeightFromTo();
 			if ( width < 2 )
-				this.to.colOff = this.from.colOff + 4;
+				_t.to.colOff = _t.from.colOff + 4;
 			if ( height < 2 )
-				this.to.rowOff = this.from.rowOff + 4;
+				_t.to.rowOff = _t.from.rowOff + 4;
 		}
 		
 		// Реальное смещение по высоте
-		this.getRealTopOffset = function() {
-			var val = _th.worksheet.getCellTop(this.from.row, 0) + mmToPx(this.from.rowOff);
+		_t.getRealTopOffset = function() {
+			var val = _t.worksheet.getCellTop(_t.from.row, 0) + mmToPx(_t.from.rowOff);
 			return Asc.round(val);
 		}
 
 		// Реальное смещение по ширине
-		this.getRealLeftOffset = function() {
-			var val = _th.worksheet.getCellLeft(this.from.col, 0) + mmToPx(this.from.colOff);
+		_t.getRealLeftOffset = function() {
+			var val = _t.worksheet.getCellLeft(_t.from.col, 0) + mmToPx(_t.from.colOff);
 			return Asc.round(val);
 		}
 
 		// Ширина по координатам
-		this.getWidthFromTo = function(withoutRound) {
-			var val = _th.worksheet.getCellLeft(this.to.col, 0) + mmToPx(this.to.colOff) - _th.worksheet.getCellLeft(this.from.col, 0) - mmToPx(this.from.colOff);
+		_t.getWidthFromTo = function(withoutRound) {
+			var val = _t.worksheet.getCellLeft(_t.to.col, 0) + mmToPx(_t.to.colOff) - _t.worksheet.getCellLeft(_t.from.col, 0) - mmToPx(_t.from.colOff);
 			return withoutRound ? val : Asc.round(val);
 		}
 
 		// Высота по координатам
-		this.getHeightFromTo = function(withoutRound) {
-			var val = _th.worksheet.getCellTop(this.to.row, 0) + mmToPx(this.to.rowOff) - _th.worksheet.getCellTop(this.from.row, 0) - mmToPx(this.from.rowOff);
+		_t.getHeightFromTo = function(withoutRound) {
+			var val = _t.worksheet.getCellTop(_t.to.row, 0) + mmToPx(_t.to.rowOff) - _t.worksheet.getCellTop(_t.from.row, 0) - mmToPx(_t.from.rowOff);
 			return withoutRound ? val : Asc.round(val);
 		}
 
 		// Видимая ширина при скролах
-		this.getVisibleWidth = function() {
-			var fvc = _th.worksheet.getCellLeft(_th.worksheet.getFirstVisibleCol(), 0);
-			var off = this.getRealLeftOffset() - fvc;
+		_t.getVisibleWidth = function() {
+			var fvc = _t.worksheet.getCellLeft(_t.worksheet.getFirstVisibleCol(), 0);
+			var off = _t.getRealLeftOffset() - fvc;
 			off = (off >= 0) ? 0 : Math.abs(off);
-			return this.getWidthFromTo() - off;
+			return _t.getWidthFromTo() - off;
 		}
 
 		// Видимая высота при скролах
-		this.getVisibleHeight = function() {
-			var fvr = _th.worksheet.getCellTop(_th.worksheet.getFirstVisibleRow(), 0);
-			var off = this.getRealTopOffset() - fvr;
+		_t.getVisibleHeight = function() {
+			var fvr = _t.worksheet.getCellTop(_t.worksheet.getFirstVisibleRow(), 0);
+			var off = _t.getRealTopOffset() - fvr;
 			off = (off >= 0) ? 0 : Math.abs(off);
-			return this.getHeightFromTo() - off;
+			return _t.getHeightFromTo() - off;
 		}
 
 		// Видимое смещение объекта от первой видимой строки
-		this.getVisibleTopOffset = function(withHeader) {
-			var headerRowOff = _th.worksheet.getCellTop(0, 0);
-			var fvr = _th.worksheet.getCellTop(_th.worksheet.getFirstVisibleRow(), 0);
-			var off = this.getRealTopOffset() - fvr;
+		_t.getVisibleTopOffset = function(withHeader) {
+			var headerRowOff = _t.worksheet.getCellTop(0, 0);
+			var fvr = _t.worksheet.getCellTop(_t.worksheet.getFirstVisibleRow(), 0);
+			var off = _t.getRealTopOffset() - fvr;
 			var off = (off > 0) ? off : 0;
 			return withHeader ? headerRowOff + off : off;
 		}
 
 		// Видимое смещение объекта от первой видимой колонки
-		this.getVisibleLeftOffset = function(withHeader) {
-			var headerColOff = _th.worksheet.getCellLeft(0, 0);
-			var fvc = _th.worksheet.getCellLeft(_th.worksheet.getFirstVisibleCol(), 0);
-			var off = this.getRealLeftOffset() - fvc;
+		_t.getVisibleLeftOffset = function(withHeader) {
+			var headerColOff = _t.worksheet.getCellLeft(0, 0);
+			var fvc = _t.worksheet.getCellLeft(_t.worksheet.getFirstVisibleCol(), 0);
+			var off = _t.getRealLeftOffset() - fvc;
 			var off = (off > 0) ? off : 0;
 			return withHeader ? headerColOff + off : off;
 		}
 
 		// смещение по высоте внутри объекта
-		this.getInnerOffsetTop = function() {
-			var fvr = _th.worksheet.getCellTop(_th.worksheet.getFirstVisibleRow(), 0);
-			var off = this.getRealTopOffset() - fvr;
-			return (off > 0) ? 0 : Asc.round(Math.abs(off) * this.getHeightCoeff());
+		_t.getInnerOffsetTop = function() {
+			var fvr = _t.worksheet.getCellTop(_t.worksheet.getFirstVisibleRow(), 0);
+			var off = _t.getRealTopOffset() - fvr;
+			return (off > 0) ? 0 : Asc.round(Math.abs(off) * _t.getHeightCoeff());
 		}
 
 		// смещение по ширине внутри объекта
-		this.getInnerOffsetLeft = function() {
-			var fvc = _th.worksheet.getCellLeft(_th.worksheet.getFirstVisibleCol(), 0);
-			var off = this.getRealLeftOffset() - fvc;
-			return (off > 0) ? 0 : Asc.round(Math.abs(off) * this.getWidthCoeff());
+		_t.getInnerOffsetLeft = function() {
+			var fvc = _t.worksheet.getCellLeft(_t.worksheet.getFirstVisibleCol(), 0);
+			var off = _t.getRealLeftOffset() - fvc;
+			return (off > 0) ? 0 : Asc.round(Math.abs(off) * _t.getWidthCoeff());
 		}
 
 		// коэффициент по ширине если несоответствие с реальным размером
-		this.getWidthCoeff = function() {
-			return this.image.width / this.getWidthFromTo();
+		_t.getWidthCoeff = function() {
+			return _t.image.width / _t.getWidthFromTo();
 		}
 
 		// коэффициент по высоте если несоответствие с реальным размером
-		this.getHeightCoeff = function() {
-			return this.image.height / this.getHeightFromTo();
+		_t.getHeightCoeff = function() {
+			return _t.image.height / _t.getHeightFromTo();
 		}
 	}
-	
-	//-----------------------------------------------------------------------------------
-	// Create drawing layer
-	//-----------------------------------------------------------------------------------
-	
-	var DrawingLayer = function() {
-	
-		this.Properties = {
-			aLayerBefore: 1,
-			aLayerAfter: 2
-		}
-		
-		this.aLayerBefore = [];
-		this.aLayerAfter = [];
-	}
-	
-	//-----------------------------------------------------------------------------------
-	// For collaborative editing
-	//-----------------------------------------------------------------------------------
 	
 	DrawingBase.prototype = {
 
@@ -1823,7 +2090,7 @@ function DrawingObjects() {
 
 		getProperty: function(nType) {
 			switch (nType) {
-				case this.Properties.id: return this.id; break;
+				case this.Properties.Id: return this.id; break;
 				case this.Properties.Type: return this.Type; break;
 				case this.Properties.PosX: return this.Pos.X; break;
 				case this.Properties.PosY: return this.Pos.Y; break;
@@ -1851,40 +2118,13 @@ function DrawingObjects() {
 				case this.Properties.MoveY: return this.move.y; break;
 
 				case this.Properties.SizeCoeff: return this.size.coeff; break;
-
-				case this.Properties.ChartType: return this.chart.type; break;
-				case this.Properties.ChartSubType: return this.chart.subType; break;
-				case this.Properties.ChartTitle: return this.chart.title; break;
-				case this.Properties.ChartDefaultTitle: return this.chart.bDefaultTitle; break;
-				case this.Properties.ChartSubTitle: return this.chart.subTitle; break;
-				case this.Properties.ChartShowValue: return this.chart.showValue; break;
-				case this.Properties.ChartStyleId: return this.chart.styleId; break;
-
-				case this.Properties.ChartRangeInterval: return this.chart.range.interval; break;
-				case this.Properties.ChartRangeRows: return this.chart.range.rows; break;
-				case this.Properties.ChartRangeColumns: return this.chart.range.columns; break;
-
-				case this.Properties.ChartxAxisTitle: return this.chart.xAxis.title; break;
-				case this.Properties.ChartxAxisDefaultTitle: return this.chart.xAxis.bDefaultTitle; break;
-				case this.Properties.ChartxAxisShow: return this.chart.xAxis.show; break;
-				case this.Properties.ChartxAxisGrid: return this.chart.xAxis.grid; break;
-
-				case this.Properties.ChartyAxisTitle: return this.chart.yAxis.title; break;
-				case this.Properties.ChartyAxisDefaultTitle: return this.chart.yAxis.bDefaultTitle; break;
-				case this.Properties.ChartyAxisShow: return this.chart.yAxis.show; break;
-				case this.Properties.ChartyAxisGrid: return this.chart.yAxis.grid; break;
-
-				case this.Properties.ChartLegendPosition: return this.chart.legend.position; break;
-				case this.Properties.ChartLegendShow: return this.chart.legend.show; break;
-				case this.Properties.ChartLegendOverlay: return this.chart.legend.overlay; break;
-
-				case this.Properties.ChartSeries: return this.chart.series; break;
+				case this.Properties.ChartData: return this.chart; break;
 			}
 		},
 
 		setProperty: function(nType, value) {
 			switch (nType) {
-				case this.Properties.id: this.id = value; break;
+				case this.Properties.Id: this.id = value; break;
 				case this.Properties.Type: this.Type = value; break;
 				case this.Properties.PosX: this.Pos.X = value; break;
 				case this.Properties.PosY: this.Pos.Y = value; break;
@@ -1912,39 +2152,28 @@ function DrawingObjects() {
 				case this.Properties.MoveY: this.move.y = value; break;
 
 				case this.Properties.SizeCoeff: this.size.coeff = value; break;
-
-				case this.Properties.ChartType: this.chart.type = value; break;
-				case this.Properties.ChartSubType: this.chart.subType = value; break;
-				case this.Properties.ChartTitle: this.chart.title = value; break;
-				case this.Properties.ChartDefaultTitle: this.chart.bDefaultTitle = value; break;
-				case this.Properties.ChartSubTitle: this.chart.subTitle = value; break;
-				case this.Properties.ChartShowValue: this.chart.showValue = value; break;
-				case this.Properties.ChartStyleId: this.chart.styleId = value; break;
-
-				case this.Properties.ChartRangeInterval: this.chart.range.interval = value; break;
-				case this.Properties.ChartRangeRows: this.chart.range.rows = value; break;
-				case this.Properties.ChartRangeColumns: this.chart.range.columns = value; break;
-
-				case this.Properties.ChartxAxisTitle: this.chart.xAxis.title = value; break;
-				case this.Properties.ChartxAxisDefaultTitle: this.chart.xAxis.bDefaultTitle = value; break;
-				case this.Properties.ChartxAxisShow: this.chart.xAxis.show = value; break;
-				case this.Properties.ChartxAxisGrid: this.chart.xAxis.grid = value; break;
-
-				case this.Properties.ChartyAxisTitle: this.chart.yAxis.title = value; break;
-				case this.Properties.ChartyAxisDefaultTitle: this.chart.yAxis.bDefaultTitle = value; break;
-				case this.Properties.ChartyAxisShow: this.chart.yAxis.show = value; break;
-				case this.Properties.ChartyAxisGrid: this.chart.yAxis.grid = value; break;
-
-				case this.Properties.ChartLegendPosition: this.chart.legend.position = value; break;
-				case this.Properties.ChartLegendShow: this.chart.legend.show = value; break;
-				case this.Properties.ChartLegendOverlay: this.chart.legend.overlay = value; break;
-
-				case this.Properties.ChartSeries: this.chart.series = value; break;
+				case this.Properties.ChartData: this.chart = value; break;
 			}
 		}
 	}
+	
+	//-----------------------------------------------------------------------------------
+	// Create drawing layer
+	//-----------------------------------------------------------------------------------
+	
+	var DrawingLayer = function() {
+	
+		this.Properties = {
+			aLayerBefore: 1,
+			aLayerAfter: 2
+		}
 		
+		this.aLayerBefore = [];
+		this.aLayerAfter = [];
+	}
+
 	DrawingLayer.prototype = {
+	
 		getType: function() {
 			return UndoRedoDataTypes.DrawingObjectLayer;
 		},
@@ -1967,9 +2196,44 @@ function DrawingObjects() {
 			}
 		}
 	}
-
+	
+	//-----------------------------------------------------------------------------------
+	// Constructor
+	//-----------------------------------------------------------------------------------
+	
 	_this.createDrawingObject = function() {
-		return new DrawingBase(worksheet);
+	
+		var drawing = new DrawingBase(worksheet);
+		
+		drawing.chart.range.interval = function() {
+			var result = "";
+			if (worksheet) {
+				var selectedRange = worksheet.getSelectedRange();
+				if (selectedRange) {
+					var box = selectedRange.getBBox0();
+					var startCell = new CellAddress(box.r1, box.c1, 0);
+					var endCell = new CellAddress(box.r2, box.c2, 0);
+
+					if (startCell && endCell) {
+						var wsName = worksheet.model.sName;								
+						if ( !rx_test_ws_name.test(wsName) )
+							wsName = "'" + wsName + "'";
+						
+						if (startCell.getID() == endCell.getID())
+							result = wsName + "!" + startCell.getID();
+						else
+							result = wsName + "!" + startCell.getID() + ":" + endCell.getID();
+					}
+				}
+			}
+			return result;
+		}();
+
+		drawing.chart.range.intervalObject = function() {
+			return worksheet ? worksheet.getSelectedRange() : null;
+		}();
+		
+		return drawing;
 	}
 
 	_this.cloneDrawingObject = function(obj) {
@@ -2006,59 +2270,9 @@ function DrawingObjects() {
 
 		copyObject.move.x = obj.move.x;
 		copyObject.move.y = obj.move.y;
-
 		copyObject.size.coeff = obj.size.coeff;
-
-		copyObject.chart.bChartEditor = obj.chart.bChartEditor;
-		copyObject.chart.worksheet = obj.chart.worksheet;
-		copyObject.chart.type = obj.chart.type;
-		copyObject.chart.subType = obj.chart.subType ? obj.chart.subType : c_oAscChartSubType.normal;
-		copyObject.chart.title = obj.chart.title;
-		copyObject.chart.bDefaultTitle = obj.chart.bDefaultTitle;
-		copyObject.chart.subTitle = obj.chart.subTitle;
-		copyObject.chart.showValue = obj.chart.showValue;
-		copyObject.chart.styleId = obj.chart.styleId;
-
-		copyObject.chart.range.interval = obj.chart.range.interval;
-		copyObject.chart.range.intervalObject = obj.chart.range.intervalObject;
-		copyObject.chart.range.rows = obj.chart.range.rows;
-		copyObject.chart.range.columns = obj.chart.range.columns;
-
-		copyObject.chart.xAxis.title = obj.chart.xAxis.title;
-		copyObject.chart.xAxis.bDefaultTitle = obj.chart.xAxis.bDefaultTitle;
-		copyObject.chart.xAxis.show = obj.chart.xAxis.show;
-		copyObject.chart.xAxis.grid = obj.chart.xAxis.grid;
-
-		copyObject.chart.yAxis.title = obj.chart.yAxis.title;
-		copyObject.chart.yAxis.bDefaultTitle = obj.chart.yAxis.bDefaultTitle;
-		copyObject.chart.yAxis.show = obj.chart.yAxis.show;
-		copyObject.chart.yAxis.grid = obj.chart.yAxis.grid;
-
-		copyObject.chart.legend.position = obj.chart.legend.position;
-		copyObject.chart.legend.show = obj.chart.legend.show;
-		copyObject.chart.legend.overlay = obj.chart.legend.overlay;
-
-		copyObject.chart.series = [];
-		for (var i = 0; i < obj.chart.series.length; i++) {
-
-			var ser = new window["Asc"].asc_CChartSeria;
-			ser.asc_setTitle(obj.chart.series[i].Tx);
-
-			if (obj.chart.series[i].Val && obj.chart.series[i].Val.Formula) {
-				ser.asc_setValFormula(obj.chart.series[i].Val.Formula);
-			}
-
-			if (obj.chart.series[i].xVal && obj.chart.series[i].xVal.Formula) {
-				ser.asc_setxValFormula(obj.chart.series[i].xVal.Formula);
-			}
-
-			if (obj.chart.series[i].Marker) {
-				ser.asc_setMarkerSize(obj.chart.series[i].Marker.Size);
-				ser.asc_setMarkerSymbol(obj.chart.series[i].Marker.Symbol);
-			}
-			ser.asc_setOutlineColor(obj.chart.series[i].OutlineColor);
-			copyObject.chart.series.push(ser);
-		}
+		
+		copyObject.chart = new asc_CChart(obj.chart);
 
 		return copyObject;
 	}
@@ -2253,12 +2467,15 @@ function DrawingObjects() {
 			
 			copyChart.chart.type = wordChart.type;
 			copyChart.chart.subType = wordChart.subType;
-			copyChart.chart.title = wordChart.title;
-			copyChart.chart.bDefaultTitle = wordChart.bDefaultTitle;
-			copyChart.chart.subTitle = wordChart.subTitle;
-			copyChart.chart.showValue = wordChart.showValue;
+			
+			copyChart.chart.bShowValue = wordChart.bShowValue;
+			copyChart.chart.bShowBorder = wordChart.bShowBorder;
 			copyChart.chart.styleId = wordChart.styleId;
 			copyChart.chart.bChartEditor = wordChart.bChartEditor;
+			
+			copyChart.chart.header.title = wordChart.header.title;
+			copyChart.chart.header.subTitle = wordChart.header.subTitle;
+			copyChart.chart.header.bDefaultTitle = wordChart.header.bDefaultTitle;
 			
 			copyChart.chart.range.rows = wordChart.range.rows;
 			copyChart.chart.range.columns = wordChart.range.columns;
@@ -2266,22 +2483,22 @@ function DrawingObjects() {
 			
 			copyChart.chart.xAxis.title = wordChart.xAxis.title;
 			copyChart.chart.xAxis.bDefaultTitle = wordChart.xAxis.bDefaultTitle;
-			copyChart.chart.xAxis.show = wordChart.xAxis.show;
-			copyChart.chart.xAxis.grid = wordChart.xAxis.grid;
+			copyChart.chart.xAxis.bShow = wordChart.xAxis.bShow;
+			copyChart.chart.xAxis.bGrid = wordChart.xAxis.bGrid;
 			
 			copyChart.chart.yAxis.title = wordChart.yAxis.title;
 			copyChart.chart.yAxis.bDefaultTitle = wordChart.yAxis.bDefaultTitle;
-			copyChart.chart.yAxis.show = wordChart.yAxis.show;
-			copyChart.chart.yAxis.grid = wordChart.yAxis.grid;
+			copyChart.chart.yAxis.bShow = wordChart.yAxis.bShow;
+			copyChart.chart.yAxis.bGrid = wordChart.yAxis.bGrid;
 						
 			copyChart.chart.legend.position = wordChart.legend.position;
-			copyChart.chart.legend.show = wordChart.legend.show;
-			copyChart.chart.legend.overlay = wordChart.legend.overlay;
+			copyChart.chart.legend.bShow = wordChart.legend.bShow;
+			copyChart.chart.legend.bOverlay = wordChart.legend.bOverlay;
 			
 			copyChart.chart.data = wordChart.data ? wordChart.data : [];
 			
 			chart = copyChart.chart;
-			chart.range.intervalToIntervalObject();
+			_this.intervalToIntervalObject(chart);
 			
 			// Заполняем таблицу
 			
@@ -2309,15 +2526,15 @@ function DrawingObjects() {
 			_this.showDrawingObjects(false);
 		}
 
-		var _range = _this.formulaToRange(chart.range.interval, worksheet);
+		var _range = convertFormula(chart.range.interval, worksheet);
 		if (_range)
 			chart.range.intervalObject = _range;
 
-		chart.buildSeries();
+		chart.rebuildSeries();
 
 		var isNewChart = true;
 		chart.worksheet = worksheet; 	// Для формул серий
-		var chartBase64 = chartRender.insertChart(chart, null, bWordChart ? wordChart.width : ChartDefines.defaultChartWidth, bWordChart ? wordChart.height : ChartDefines.defaultChartHeight, isNewChart);
+		var chartBase64 = chartRender.insertChart(chart, null, bWordChart ? wordChart.width : c_oAscChartDefines.defaultChartWidth, bWordChart ? wordChart.height : c_oAscChartDefines.defaultChartHeight, isNewChart);
 		if ( !chartBase64 )
 			return false;
 
@@ -2327,8 +2544,8 @@ function DrawingObjects() {
 		obj.chart = chart;
 
 		// center
-		var chartLeft = options && options.left ? ptToPx(options.left) : (parseInt($("#ws-canvas").css('width')) / 2) - ChartDefines.defaultChartWidth / 2;
-		var chartTop = options && options.top ? ptToPx(options.top) : (parseInt($("#ws-canvas").css('height')) / 2) - ChartDefines.defaultChartHeight / 2;
+		var chartLeft = options && options.left ? ptToPx(options.left) : (parseInt($("#ws-canvas").css('width')) / 2) - c_oAscChartDefines.defaultChartWidth / 2;
+		var chartTop = options && options.top ? ptToPx(options.top) : (parseInt($("#ws-canvas").css('height')) / 2) - c_oAscChartDefines.defaultChartHeight / 2;
 
 		obj.from.col = worksheet._findColUnderCursor(pxToPt(chartLeft), true).col;
 		obj.from.row = worksheet._findRowUnderCursor(pxToPt(chartTop), true).row;
@@ -2412,7 +2629,7 @@ function DrawingObjects() {
 						History.StartTransaction();
 
 						var copyObject = _this.cloneDrawingObject(obj);
-						copyObject.flags.transactionState = TransactionState.Start;
+						copyObject.flags.transactionState = c_oAscTransactionState.Start;
 						History.Add(g_oUndoRedoDrawingObject, historyitem_DrawingObject_Edit, worksheet.model.getId(), null, copyObject);
 
 						// asc to self
@@ -2421,25 +2638,25 @@ function DrawingObjects() {
 							bRebuidSeries = true;
 
 						obj.chart.range = chart.range;
-						var _range = _this.formulaToRange(obj.chart.range.interval, worksheet);
+						var _range = convertFormula(obj.chart.range.interval, worksheet);
 						if (_range)
 							obj.chart.range.intervalObject = _range;
 
 						obj.chart.type = chart.type;
 						obj.chart.subType = chart.subType;
-						obj.chart.title = chart.title;
-						obj.chart.subTitle = chart.subTitle;
+						obj.chart.header = chart.header;
 						obj.chart.xAxis = chart.xAxis;
 						obj.chart.yAxis = chart.yAxis;
-						obj.chart.showValue = chart.showValue;
+						obj.chart.bShowValue = chart.bShowValue;
+						obj.chart.bShowBorder = chart.bShowBorder;
 						obj.chart.styleId = chart.styleId;
 						obj.chart.legend = chart.legend;
 
 						if ( bRebuidSeries )
-							obj.chart.buildSeries();
+							obj.chart.rebuildSeries();
 
 						var copyObject = _this.cloneDrawingObject(obj);
-						copyObject.flags.transactionState = TransactionState.Stop;
+						copyObject.flags.transactionState = c_oAscTransactionState.Stop;
 						History.Add(g_oUndoRedoDrawingObject, historyitem_DrawingObject_Edit, worksheet.model.getId(), null, copyObject);
 						History.EndTransaction();
 
@@ -2792,12 +3009,12 @@ function DrawingObjects() {
 				if (changedRange || metrics) {
 
 					var copyObject = _this.cloneDrawingObject(obj);
-					copyObject.flags.transactionState = TransactionState.Start;
+					copyObject.flags.transactionState = c_oAscTransactionState.Start;
 					History.Add(g_oUndoRedoDrawingObject, historyitem_DrawingObject_Edit, worksheet.model.getId(), null, copyObject);
 
 					if (changedRange) {
 						obj.chart.range.intervalObject = changedRange;
-						obj.chart.range.calcInterval();
+						_this.calcChartInterval(obj.chart);
 					}
 					if (metrics) {
 						obj.from.col = metrics.from.col;
@@ -2812,7 +3029,7 @@ function DrawingObjects() {
 					}
 
 					var copyObject = _this.cloneDrawingObject(obj);
-					copyObject.flags.transactionState = TransactionState.Stop;
+					copyObject.flags.transactionState = c_oAscTransactionState.Stop;
 					History.Add(g_oUndoRedoDrawingObject, historyitem_DrawingObject_Edit, worksheet.model.getId(), null, copyObject);
 				}
 
@@ -2829,8 +3046,8 @@ function DrawingObjects() {
 				var copyObject = _this.cloneDrawingObject(chartObject);
 				
 				copyObject.chart.range.intervalObject = worksheet._getRange(oBBoxTo.c1, oBBoxTo.r1, oBBoxTo.c2, oBBoxTo.r2);
-				copyObject.chart.range.calcInterval();
-				copyObject.chart.buildSeries();
+				_this.calcChartInterval(copyObject.chart);
+				copyObject.chart.rebuildSeries();
 				
 				_this.unselectDrawingObjects();
 				chartObject.flags.selected = true;
@@ -2858,6 +3075,49 @@ function DrawingObjects() {
 		}
 	}
 
+	//-----------------------------------------------------------------------------------
+	// Chart
+	//-----------------------------------------------------------------------------------
+	
+	_this.checkChartInterval = function(type, subtype, interval, isRows) {
+		var result = false;
+		if (interval && worksheet) {
+			var _range = convertFormula(interval, worksheet);
+			if (_range && checkDataRange(type, subtype, _range, isRows, worksheet))
+				result = true;
+		}
+		return result;
+	}
+
+	_this.calcChartInterval = function(chart) {
+		if (chart.range.intervalObject) {
+			var box = chart.range.intervalObject.getBBox0();
+			var startCell = new CellAddress(box.r1, box.c1, 0);
+			var endCell = new CellAddress(box.r2, box.c2, 0);
+
+			if (startCell && endCell) {
+				
+				if (startCell.getID() == endCell.getID())
+					chart.range.interval = startCell.getID();
+				else {
+					var wsName = chart.range.intervalObject.worksheet.sName;								
+					if ( !rx_test_ws_name.test(wsName) )
+						wsName = "'" + wsName + "'";
+						
+					chart.range.interval = wsName + "!" + startCell.getID() + ":" + endCell.getID();
+				}
+			}
+		}
+	}
+
+	_this.intervalToIntervalObject = function(chart) {
+		if (chart.range.interval && worksheet) {
+			var _range = convertFormula(chart.range.interval, worksheet);
+			if (_range)
+				chart.range.intervalObject = _range;
+		}
+	}
+	
 	//-----------------------------------------------------------------------------------
 	// Asc
 	//-----------------------------------------------------------------------------------
@@ -3192,8 +3452,8 @@ function DrawingObjects() {
 			var obj = aObjects[index];
 			if (obj.canDraw() && obj.isChart()) {
 
-				if ( !obj.chart.range.intervalObject )					
-					obj.chart.range.intervalToIntervalObject();
+				if ( !obj.chart.range.intervalObject )
+					_this.intervalToIntervalObject(obj.chart);
 				
 				// Проверка для id листа				
 				if (obj.chart.range.intervalObject.worksheet.Id != worksheet.model.Id)

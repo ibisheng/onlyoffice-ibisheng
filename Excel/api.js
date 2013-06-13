@@ -1965,6 +1965,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				}
 			},
 			
+			asc_checkChartInterval: function(type, subtype, interval, isRows) {
+				var ws = this.wb.getWorksheet();
+				return ws.objectRender.checkChartInterval(type, subtype, interval, isRows);
+			},
+			
 			// Для вставки диаграмм в Word
 			asc_getBinaryFileWriter: function() {
 				this.wb._initCommentsToSave();
@@ -2762,6 +2767,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_deleteSelectedDrawingObject"] = prot.asc_deleteSelectedDrawingObject;
 		prot["asc_setSelectedDrawingObjectLayer"] = prot.asc_setSelectedDrawingObjectLayer;
 		prot["asc_getChartPreviews"] = prot.asc_getChartPreviews;
+		prot["asc_checkChartInterval"] = prot.asc_checkChartInterval;
 		prot["asc_getBinaryFileWriter"] = prot.asc_getBinaryFileWriter;
 		prot["asc_getWordChartObject"] = prot.asc_getWordChartObject;
 		prot["asc_cleanWorksheet"] = prot.asc_cleanWorksheet;

@@ -480,7 +480,7 @@
         //this.context.strokeRect(10,10,this.canvas.width-150,this.canvas.height-150)
 		
 		// border
-		if ( !g_bChartPreview ) {
+		if ( !g_bChartPreview && this._otherProps._area_border ) {
 			this.context.beginPath();
 			this.context.rect(0, 0, this.canvas.width,this.canvas.height);
 			this.context.strokeStyle = "black";

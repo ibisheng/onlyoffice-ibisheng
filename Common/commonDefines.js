@@ -56,3 +56,20 @@ var c_oAscChartType = {
 	Accent5: 7,
 	Accent6: 8
 };
+
+var	c_oAscTransactionState = { 
+	No: -1,
+	Start: 0,
+	Stop: 1
+};
+						
+var c_oAscCellAnchorType = {
+	cellanchorAbsolute:  0,
+	cellanchorOneCell:  1,
+	cellanchorTwoCell:  2
+};
+
+var c_oAscChartDefines = {
+	defaultChartWidth: 478,
+	defaultChartHeight: 286
+};

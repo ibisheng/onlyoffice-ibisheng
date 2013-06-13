@@ -2081,7 +2081,7 @@
 						chartForm.find("#chartRange").val(interval);
 
 						chartForm.find("#chartRange").bind("keyup", function() {
-							var result = range.asc_checkInterval(chartForm.find("#chartType").val(),chartForm.find("#chartSubType").val(),chartForm.find("#chartRange").val(),chartForm.find("#dataRows").is(":checked"));
+							var result = api.asc_checkChartInterval(chartForm.find("#chartType").val(), chartForm.find("#chartSubType").val(), chartForm.find("#chartRange").val(), chartForm.find("#dataRows").is(":checked"));
 							if (result)
 								chartForm.find("#chartRange").css("color", "black");
 							else
@@ -2096,15 +2096,16 @@
 							else
 								chartForm.find("#dataColumns").attr("checked", range.asc_getColumnsFlag());
 
-							chartForm.find("#chartTitle").val(chart.asc_getTitle());
+							chartForm.find("#chartTitle").val(chart.asc_getHeader().asc_getTitle());
 							chartForm.find("#valueShow").attr("checked", chart.asc_getShowValueFlag());
+							chartForm.find("#borderShow").attr("checked", chart.asc_getShowBorderFlag());
 
 							var xAxis = chart.asc_getXAxis();
 							chartForm.find("#xAxisShow").attr("checked", xAxis.asc_getShowFlag());
 							chartForm.find("#xGridShow").attr("checked", xAxis.asc_getGridFlag());
 							chartForm.find("#xAxisTitle").val(xAxis.asc_getTitle() ? xAxis.asc_getTitle() : "");
 
-							var yAxis = chart.asc_getXAxis();
+							var yAxis = chart.asc_getYAxis();
 							chartForm.find("#yAxisShow").attr("checked", yAxis.asc_getShowFlag());
 							chartForm.find("#yGridShow").attr("checked", yAxis.asc_getGridFlag());
 							chartForm.find("#yAxisTitle").val(yAxis.asc_getTitle() ? yAxis.asc_getTitle() : "");
@@ -2123,8 +2124,10 @@
 								var isSelected = (chart.type != null) && (chart.type != "");
 
 								var range = chart.asc_getRange();
-								if (!range.asc_checkInterval(chartForm.find("#chartType").val(),chartForm.find("#chartSubType").val(),chartForm.find("#chartRange").val(),chartForm.find("#dataRows").is(":checked")))
+									
+								if ( !api.asc_checkChartInterval(chartForm.find("#chartType").val(),chartForm.find("#chartSubType").val(),chartForm.find("#chartRange").val(),chartForm.find("#dataRows").is(":checked")) )
 									return;
+								
 								range.asc_setRowsFlag(chartForm.find("#dataRows").is(":checked"));
 								range.asc_setColumnsFlag(chartForm.find("#dataColumns").is(":checked"));
 								range.asc_setInterval(chartForm.find("#chartRange").val());
@@ -2132,8 +2135,9 @@
 								chart.asc_setType(chartForm.find("#chartType").find("option:selected").val());
 								chart.asc_setSubType(chartForm.find("#chartSubType").find("option:selected").val());
 
-								chart.asc_setTitle(chartForm.find("#chartTitle").val());
+								chart.asc_getHeader().asc_setTitle(chartForm.find("#chartTitle").val());
 								chart.asc_setShowValueFlag(chartForm.find("#valueShow").is(":checked"));
+								chart.asc_setShowBorderFlag(chartForm.find("#borderShow").is(":checked"));
 
 								if(chart.type != null && chart.type == 'Stock' && !isSelected)
 								{
@@ -2160,7 +2164,6 @@
 
 								var legend = chart.asc_getLegend();
 								legend.asc_setShowFlag(chartForm.find("#legendShow").is(":checked"));
-								//legend.asc_setShowFlag(true);
 								legend.asc_setPosition("");
 
 								if (chartForm.find("#legendLeft").is(":checked"))
