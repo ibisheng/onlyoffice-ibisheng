@@ -184,7 +184,13 @@ var c_oSerProp_rPrType = {
 	DStrikeout: 15,
 	Caps: 16,
 	SmallCaps: 17,
-	Position: 18
+	Position: 18,
+	FontHint: 19,
+	BoldCs: 20,
+	ItalicCs: 21,
+	FontSizeCs: 22,
+	Cs: 23,
+	Rtl: 24
 };
 var c_oSerProp_rowPrType = {
     CantSplit:0,
@@ -465,6 +471,11 @@ var EWmlColorSchemeIndex = {
 	wmlcolorschemeindexHyperlink:  9,
 	wmlcolorschemeindexLight1: 10,
 	wmlcolorschemeindexLight2: 11
+};
+var EHint = {
+	hintCs: 0,
+	hintDefault: 1,
+	hintEastAsia: 2
 };
 var g_nodeAttributeStart = 0xFA;
 var g_nodeAttributeEnd	= 0xFB;
@@ -1012,24 +1023,46 @@ function Binary_rPrWriter(memory)
             this.memory.WriteBool(rPr.Strikeout);
         }
         //FontFamily
-        if(null != rPr.FontFamily)
+        if(null != rPr.RFonts)
         {
-            var fontname = rPr.FontFamily.Name.toString();
-            this.memory.WriteByte(c_oSerProp_rPrType.FontAscii);
-            this.memory.WriteByte(c_oSerPropLenType.Variable);
-            this.memory.WriteString2(fontname);
-            
-            this.memory.WriteByte(c_oSerProp_rPrType.FontHAnsi);
-            this.memory.WriteByte(c_oSerPropLenType.Variable);
-            this.memory.WriteString2(fontname);
-            
-            this.memory.WriteByte(c_oSerProp_rPrType.FontAE);
-            this.memory.WriteByte(c_oSerPropLenType.Variable);
-            this.memory.WriteString2(fontname);
-            
-            this.memory.WriteByte(c_oSerProp_rPrType.FontCS);
-            this.memory.WriteByte(c_oSerPropLenType.Variable);
-            this.memory.WriteString2(fontname);
+            var font = rPr.RFonts;
+			if(null != font.Ascii)
+			{
+				this.memory.WriteByte(c_oSerProp_rPrType.FontAscii);
+				this.memory.WriteByte(c_oSerPropLenType.Variable);
+				this.memory.WriteString2(font.Ascii.Name);
+			}
+            if(null != font.HAnsi)
+			{
+				this.memory.WriteByte(c_oSerProp_rPrType.FontHAnsi);
+				this.memory.WriteByte(c_oSerPropLenType.Variable);
+				this.memory.WriteString2(font.HAnsi.Name);
+			}
+            if(null != font.CS)
+			{
+				this.memory.WriteByte(c_oSerProp_rPrType.FontCS);
+				this.memory.WriteByte(c_oSerPropLenType.Variable);
+				this.memory.WriteString2(font.CS.Name);
+			}
+            if(null != font.EastAsia)
+			{
+				this.memory.WriteByte(c_oSerProp_rPrType.FontAE);
+				this.memory.WriteByte(c_oSerPropLenType.Variable);
+				this.memory.WriteString2(font.EastAsia.Name);
+			}
+			if(null != font.Hint)
+			{
+				var nHint;
+				switch(font.Hint)
+				{
+					case fonthint_CS:nHint = EHint.hintCs;break;
+					case fonthint_EastAsia:nHint = EHint.hintEastAsia;break;
+					default :nHint = EHint.hintDefault;break;
+				}
+				this.memory.WriteByte(c_oSerProp_rPrType.FontHint);
+				this.memory.WriteByte(c_oSerPropLenType.Byte);
+				this.memory.WriteByte(nHint);
+			}
         }
         //FontSize
         if(null != rPr.FontSize)
@@ -1105,6 +1138,41 @@ function Binary_rPrWriter(memory)
 		    this.memory.WriteByte(c_oSerProp_rPrType.Position);
             this.memory.WriteByte(c_oSerPropLenType.Double);
             this.memory.WriteDouble(rPr.Position);
+		}
+		//BoldCs
+		if(null != rPr.BoldCS)
+		{
+			this.memory.WriteByte(c_oSerProp_rPrType.BoldCs);
+            this.memory.WriteByte(c_oSerPropLenType.Byte);
+            this.memory.WriteBool(rPr.BoldCS);
+		}
+		//ItalicCS
+		if(null != rPr.ItalicCS)
+		{
+			this.memory.WriteByte(c_oSerProp_rPrType.ItalicCs);
+            this.memory.WriteByte(c_oSerPropLenType.Byte);
+            this.memory.WriteBool(rPr.ItalicCS);
+		}
+		//FontSizeCS
+		if(null != rPr.FontSizeCS)
+		{
+			this.memory.WriteByte(c_oSerProp_rPrType.FontSizeCs);
+            this.memory.WriteByte(c_oSerPropLenType.Long);
+            this.memory.WriteLong(rPr.FontSizeCS * 2);
+		}
+		//CS
+		if(null != rPr.CS)
+		{
+			this.memory.WriteByte(c_oSerProp_rPrType.Cs);
+            this.memory.WriteByte(c_oSerPropLenType.Byte);
+            this.memory.WriteBool(rPr.CS);
+		}
+		//RTL
+		if(null != rPr.RTL)
+		{
+			this.memory.WriteByte(c_oSerProp_rPrType.Rtl);
+            this.memory.WriteByte(c_oSerPropLenType.Byte);
+            this.memory.WriteBool(rPr.RTL);
 		}
     };
 };
@@ -3667,6 +3735,31 @@ function Binary_rPrReader(doc, stream)
                 break;
 			case c_oSerProp_rPrType.Position:
 				rPr.Position = this.bcr.ReadDouble();
+                break;
+			case c_oSerProp_rPrType.FontHint:
+				var nHint;
+				switch(this.stream.GetUChar())
+				{
+					case EHint.hintCs: nHint = fonthint_CS;break;
+					case EHint.hintEastAsia: nHint = fonthint_EastAsia;break;
+					default : nHint = fonthint_Default;break;
+				}
+				rPr.RFonts.Hint = nHint;
+                break;
+			case c_oSerProp_rPrType.BoldCs:
+				rPr.BoldCS = this.stream.GetBool();
+                break;
+			case c_oSerProp_rPrType.ItalicCs:
+				rPr.ItalicCS = this.stream.GetBool();
+                break;
+			case c_oSerProp_rPrType.FontSizeCs:
+				rPr.FontSizeCS = this.stream.GetULongLE() / 2;
+                break;
+			case c_oSerProp_rPrType.Cs:
+				rPr.CS = this.stream.GetBool();
+                break;
+			case c_oSerProp_rPrType.Rtl:
+				rPr.RTL = this.stream.GetBool();
                 break;
             default:
                 res = c_oSerConstants.ReadUnknown;
