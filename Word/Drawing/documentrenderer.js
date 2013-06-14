@@ -562,6 +562,30 @@ function CDocMeta()
                 {
                     // drawImage
                     var _type = s.GetUChar();
+
+                    if (2 == _type)
+                    {
+                        var _src = this.DocumentUrl + "media/image" + s.GetLong() + ".svg";
+
+                        obj.StreamPos = s.pos;
+
+                        var img = new Image();
+                        img.onload = function(){
+                            if (1 != obj.BreakDrawing)
+                            {
+                                g.drawImage2(img, 0, 0, page.width_mm, page.height_mm);
+                            }
+
+                            oThisDoc.OnImageLoad(obj);
+                        };
+                        img.onerror = function(){
+                            oThisDoc.OnImageLoad(obj);
+                        };
+                        img.src = _src;
+
+                        return;
+                    }
+
                     var _src = (0 == _type) ? (this.DocumentUrl + "media/image" + s.GetLong() + ".jpg") : (this.DocumentUrl + "media/image" + s.GetLong() + ".png");
 
                     var __x = s.GetDouble();
