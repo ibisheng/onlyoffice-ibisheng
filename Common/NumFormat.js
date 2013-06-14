@@ -2425,6 +2425,8 @@ function FormatParser()
 {
     this.rx_percent = new RegExp("^([+-]?)(\\d+\\.?\\d*|\\.\\d+)%$");
     this.rx_date = new RegExp("^ *((\\d{1,2}) *[/-] *(\\d{1,2}) *[/-] *(\\d{2,4}))? *((\\d{1,2}) *: *(\\d{1,2})? *(: *(\\d{1,2})?)? *(AM|PM)?)?$");
+    this.rx_date2 = new RegExp("^ *((\\d{1,2}) *[/-])? *(\\w{3}) *([/-]|[/-](\\w{2,4}))?$");
+	
 	this.rx_currency = new RegExp("^([+-]?)([$€£¥])?(\\d+\\.?\\d*|\\.\\d+)(р.)?$");
 	this.days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 	this.daysLeap = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
@@ -2475,7 +2477,7 @@ FormatParser.prototype =
 	{
 		var res = null;
         match = value.match(this.rx_date);
-        if(null != match)
+        if(null != (match = value.match(this.rx_date)) )
         {
             var d = match[3];
             var m = match[2];
@@ -2560,6 +2562,107 @@ FormatParser.prototype =
 				}
             }
         }
+		else if( null != (match = this.rx_date2.exec(value)) ){
+			
+			var sDD = match[2],
+				sMM = match[3],
+				sYY = match[5],
+				nDay,
+				nMounth,
+				nYear,
+				sFormat,
+				bValidDate = false;
+				
+			if(g_bDate1904)
+			{
+				nDay = 1;
+				nMounth = 0;
+				nYear = 1904;
+			}
+			else
+			{
+				nDay = 31;
+				nMounth = 11;
+				nYear = 1899;
+			}
+				
+			if (undefined != sDD)
+			{
+				if (undefined != sYY){
+					if( sYY.length == 4)
+						sFormat = "d-mmm-yyyy";
+					else
+						sFormat = "d-mmm-yy";
+				}
+				else
+					sFormat = "d-mmm";
+			}
+			else if (undefined != sYY){
+				if( sYY.length == 4)
+					sFormat = "mmm-yyyy";
+				else
+					sFormat = "mmm-yy";
+			}
+			else
+				return res;
+			
+			var nDD = 1;
+			if (undefined != sDD)
+				nDD = parseInt(sDD);
+
+			var nMM = 0;
+			switch( sMM.toLowerCase() ){
+				case "jan": nMM = 1; break;
+				case "feb": nMM = 2; break;
+				case "mar": nMM = 3; break;
+				case "apr": nMM = 4; break;
+				case "may": nMM = 5; break;
+				case "jun": nMM = 6; break;
+				case "jul": nMM = 7; break;
+				case "aug": nMM = 8; break;
+				case "sep": nMM = 9; break;
+				case "oct": nMM = 10; break;
+				case "nov": nMM = 11; break;
+				case "dec": nMM = 12; break;
+				default:
+					return res;
+			}
+			
+			var nYY = -1;
+			if (undefined != sYY)
+				nYY = parseInt(sYY);
+			else 
+				nYY = new Date().getFullYear();
+				
+			if( 0 <= nDD && 0 < nMM && 0 <= nYY )
+            {
+                nDay = nDD - 0;
+                nMounth = nMM - 1;
+                nYear = nYY - 0;
+                if(nYear < 100)
+                    nYear = 2000 + nYear;
+				//проверяем дату на валидность
+				bValidDate = this.isValidDate(nYear, nMounth, nDay);
+            }
+			if(true == bValidDate)
+            {
+				if(g_bDate1904)
+					dValue = ((new Date(nYear,nMounth,nDay)).getTime() - (new Date(1904,0,1,0,0,0)).getTime()) / (86400 * 1000);
+				else
+				{
+					if(1900 < nYear || (1900 == nYear && 2 < nMounth ))
+						dValue = ((new Date(nYear,nMounth,nDay)).getTime() - (new Date(1899,11,30,0,0,0)).getTime()) / (86400 * 1000);
+					else if(1900 == nYear && 2 == nMounth && 29 == nDay)
+						dValue = 60;
+					else
+						dValue = ((new Date(nYear,nMounth,nDay)).getTime() - (new Date(1899,11,31,0,0,0)).getTime()) / (86400 * 1000);
+				}
+                if(dValue > 0)
+				{
+					res = {format: sFormat, value: dValue, bDateTime: true};
+				}
+            }
+		}
 		return res;
 	},
 	isValidDate : function(nYear, nMounth, nDay)
