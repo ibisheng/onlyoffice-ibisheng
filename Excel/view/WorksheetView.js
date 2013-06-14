@@ -1044,11 +1044,11 @@
 			_initConditionalFormatting: function () {
 				var oGradient = null;
 				var aCFs = this.model.aConditionalFormatting;
-				var aRules = null;
-				var oRule = null;
+				var aRules, oRule;
 				var oRuleElement = null;
 				var min = Number.MAX_VALUE;
-				var max = Number.MIN_VALUE, tmp;
+				var max = -Number.MAX_VALUE;
+				var tmp;
 				var arrayCells = [];
 				for (var i in aCFs) {
 					if (!aCFs.hasOwnProperty(i) )
@@ -1097,7 +1097,7 @@
 
 						arrayCells.splice(0, arrayCells.length);
 						min = Number.MAX_VALUE;
-						max = Number.MIN_VALUE;
+						max = -Number.MAX_VALUE;
 					}
 				}
 			},
