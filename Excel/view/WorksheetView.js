@@ -1092,12 +1092,12 @@
 										}
 									}
 								}
+
+								arrayCells.splice(0, arrayCells.length);
+								min = Number.MAX_VALUE;
+								max = -Number.MAX_VALUE;
 								break;
 						}
-
-						arrayCells.splice(0, arrayCells.length);
-						min = Number.MAX_VALUE;
-						max = -Number.MAX_VALUE;
 					}
 				}
 			},
