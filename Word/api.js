@@ -2137,19 +2137,17 @@ function OnSave_Callback(e)
             window['qtDocBridge']['savedDocument'] (data);
             
         } else {
-            var data = oBinaryFileWriter.Write();
-
             var oAdditionalData = new Object();
 			oAdditionalData["c"] = "save";
 			oAdditionalData["id"] = documentId;
             oAdditionalData["vkey"] = documentVKey;
             oAdditionalData["outputformat"] = c_oAscFileType.INNER;
-            oAdditionalData["savetype"] = "completeall";
-
-            /* uncoment to save changes only instead send file complete
-             oAdditionalData["savetype"] = "changes";
-             data = JSON.stringify( CollaborativeEditing.Get_SelfChanges() );
-             */
+			var data = oBinaryFileWriter.Write();
+			oAdditionalData["savetype"] = "completeall";
+			////uncoment to save changes only instead send file complete
+            //var data = JSON.stringify( CollaborativeEditing.Get_SelfChanges() );
+			//oAdditionalData["savetype"] = "changes";
+			
             var sData = "mnuSaveAs" + cCharDelimiter + JSON.stringify(oAdditionalData) + cCharDelimiter + data;
             sendCommand(editor, function(incomeObject){
 				if(null != incomeObject && "save" == incomeObject.type)
@@ -6163,6 +6161,14 @@ function sendCommand(editor, fCallback, rdata){
 					var rData = {"id":documentId, "format": documentFormat, "vkey": documentVKey, "editorid": c_oEditorId.Word, "c":"chopen"};
                     setTimeout( function(){sendCommand(editor, fCallback,  JSON.stringify(rData))}, 3000);
                 break;
+				case "changes":
+					editor.canSave = true;
+					editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
+					//var rData = {"id":documentId, "c":"sfc", "outputformat": c_oAscFileType.DOCX};
+					//sendCommand(editor, fCallback,  JSON.stringify(rData));
+					if(fCallback)
+						fCallback(incomeObject);
+				break;
                 case "save":
 					if(fCallback)
 						fCallback(incomeObject);

@@ -573,13 +573,13 @@ function CCollaborativeEditing()
         for ( var PointIndex = 0; PointIndex < PointsCount; PointIndex++ )
         {
             var Point = History.Points[PointIndex];
-            var LastPoint = History.Index;
+            var LastPoint = Point.Items.length;
 
-            for ( var Index = 0; Index <= LastPoint; Index++ )
+            for ( var Index = 0; Index < LastPoint; Index++ )
             {
                 var Item = Point.Items[Index];
-                var oChanges = new CCollaborativeChanges()
-                oChanges.Set_FromUndoRedo( Item.Class, Item.Data );
+                var oChanges = new CCollaborativeChanges();
+                oChanges.Set_FromUndoRedo( Item.Class, Item.Data, Item.Binary );
                 // Изменения могут обрабатываться другим кодом, поэтому здесь
                 // явно указываются имена свойств, что бы избежать их последующей
                 // минимизации.
