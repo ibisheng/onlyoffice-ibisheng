@@ -6223,6 +6223,15 @@ var cFormulaFunction = {
 					return this.value = new cError( cErrorType.wrong_value_type );
 				}
 				
+                if ( arg1 instanceof cArea || arg1 instanceof cArea3D ){
+					arg1 = arg1.cross(arguments[1].first);
+				}
+				else if( arg1 instanceof cArray ){
+					arg1 = arg1.getElementRowCol(0,0);
+				}
+				
+				arg1 = arg1.tocString();
+				
 				if( !(arg1 instanceof cString) ){
 					return this.value = new cError( cErrorType.wrong_value_type );
 				}
@@ -6231,9 +6240,6 @@ var cFormulaFunction = {
 					var res = 0;
 					if( typeof x === typeof y ){
 						switch(oper){
-							case "=":
-								res = (x.value == y.value);
-								break;
 							case "<>":
 								res = (x.value != y.value);
 								break;
@@ -6249,8 +6255,11 @@ var cFormulaFunction = {
 							case "<=":
 								res = (x.value <= y.value);
 								break;
+							case "=":
 							default:
-								res = 0;
+								res = (x.value == y.value);
+								break;
+								
 						}
 					}
 					_count += res;
@@ -6259,21 +6268,27 @@ var cFormulaFunction = {
 				arg1 = arg1.toString();
 				var operators = new RegExp("^ *[<=> ]+ *"), searchOperators = new RegExp("^ *[*?]")
 				var match = arg1.match(operators);
-				if( match ){
-					var search = arg1.substr( match[0].length ), oper = match[0].replace(/\s/g,""), val;
+				if( match || parseNum(arg1) ){
+					
+					var search, oper, val;
+					if( match ){
+						search = arg1.substr( match[0].length );
+						oper = match[0].replace(/\s/g,"");
+					}
+					else{
+						search = arg1;
+					}
 					valueForSearching = parseNum( search ) ? new cNumber( search ) : new cString( search );
 					if( arg0 instanceof cArea ){
 						val = arg0.getValue();
-						for( var i in val ){
+						for( var i = 0; i < val.length; i++ ){
 							matching( val[i], valueForSearching, oper);
 						}
 					}
 					else if( arg0 instanceof cArea3D ){
 						val = arg0.getValue();
-						for(var i in val){
-							for(var j in val[i]){
-								matching( val[i][j], valueForSearching, oper);
-							}
+						for(var i = 0; i < val.length; i++){
+							matching( val[i], valueForSearching, oper);
 						}
 					}
 					else{
