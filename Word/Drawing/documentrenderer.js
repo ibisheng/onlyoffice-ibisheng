@@ -62,6 +62,23 @@ function CStream(data, size)
         return t;
     }
 
+    this.GetStringA = function(len)
+    {
+        if (this.pos + len > this.size)
+            return "";
+        var t = "";
+        for (var i = 0; i < len; i++)
+        {
+            var _c = this.data[this.pos + i];
+            if (_c == 0)
+                break;
+
+            t += String.fromCharCode(_c);
+        }
+        this.pos += len;
+        return t;
+    }
+
     // 2 byte
     this.GetUShort = function()
     {
@@ -566,6 +583,29 @@ function CDocMeta()
                     if (2 == _type)
                     {
                         var _src = this.DocumentUrl + "media/image" + s.GetLong() + ".svg";
+
+                        obj.StreamPos = s.pos;
+
+                        var img = new Image();
+                        img.onload = function(){
+                            if (1 != obj.BreakDrawing)
+                            {
+                                g.drawImage2(img, 0, 0, page.width_mm, page.height_mm);
+                            }
+
+                            oThisDoc.OnImageLoad(obj);
+                        };
+                        img.onerror = function(){
+                            oThisDoc.OnImageLoad(obj);
+                        };
+                        img.src = _src;
+
+                        return;
+                    }
+                    else if (3 == _type)
+                    {
+                        var _lenA = s.GetULong();
+                        var _src = "data:image/svg+xml;base64," + s.GetStringA(_lenA);
 
                         obj.StreamPos = s.pos;
 
