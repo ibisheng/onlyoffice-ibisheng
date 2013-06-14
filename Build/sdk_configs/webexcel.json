@@ -41,6 +41,7 @@
                 "../Excel/graphics/DrawingContext.js",
                 "../Excel/graphics/pdfprinter.js",
                 "../Excel/model/CollaborativeEditing.js",
+				"../Excel/model/ConditionalFormatting.js",
                 "../Excel/model/parserFormula.js",
                 "../Excel/model/Serialize.js",
                 "../Excel/model/WorkbookElems.js",
