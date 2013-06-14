@@ -1072,10 +1072,8 @@
 								if (!(oRuleElement instanceof asc.CColorScale))
 									break;
 								aCFs[i].SqRefRange._setPropertyNoEmpty(null, null, function (c) {
-									if (CellValueType.Number === c.getType()) {
+									if (CellValueType.Number === c.getType() && false === c.isEmptyTextString()) {
 										tmp = parseInt(c.getValueWithoutFormat());
-										if (isNaN(tmp))
-											return;
 										arrayCells.push({cell: c, val: tmp});
 										min = Math.min(min, tmp);
 										max = Math.max(max, tmp);
