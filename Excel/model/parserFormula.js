@@ -7117,6 +7117,21 @@ var cFormulaFunction = {
         'DOLLAR' : function(){
             var r = new cBaseFunction();
             r.setName("DOLLAR");
+			r.setArgumentsMin(1);
+            r.setArgumentsMax(2);
+			r.Calculate = function(arg){
+				var res = cFormulaFunction.TextAndData["FIXED"]().Calculate(arg);
+				if( res instanceof cError )
+					return this.value =  res;
+				
+				return this.value = new cString("$"+res.getValue());
+			}
+			r.getInfo = function(){
+                return {
+                    name:this.name,
+                    args:"( number [ , num-decimal ] )"
+                };
+            }
         	return r;
 		},
         'EXACT' : function(){
@@ -8102,6 +8117,31 @@ var cFormulaFunction = {
         'TRIM' : function(){
             var r = new cBaseFunction();
             r.setName("TRIM");
+			r.setArgumentsMin(1);
+            r.setArgumentsMax(1);
+            r.Calculate = function(arg){
+				var arg0 = arg[0];
+				
+				if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
+					arg0 = arg0.cross(arguments[1].first).tocString();
+				}
+				else if( arg0 instanceof cArray){
+					arg0 = arg0.getElement(0).tocString();
+				}
+				
+				arg0 = arg0.tocString();
+				
+				if( arg0 instanceof cError )
+					return this.value = arg0;
+					
+				return this.value = new cString( arg0.getValue().replace(/\s/g, function($0, $1, $2){ var r; /\s/.test($2[$1+1]) ? r = "" : r = $2[$1]; return r; }).replace(/^\s|\s$/g,"") )
+			}
+			r.getInfo = function(){
+				return {
+                    name:this.name,
+                    args:"( string )"
+                };
+			}
         	return r;
 		},
         'UPPER' : function(){
@@ -8132,6 +8172,31 @@ var cFormulaFunction = {
         'VALUE' : function(){
             var r = new cBaseFunction();
             r.setName("VALUE");
+			r.setArgumentsMin(1);
+            r.setArgumentsMax(1);
+            r.Calculate = function(arg){
+				var arg0 = arg[0];
+                
+				if ( arg0 instanceof cArea || arg0 instanceof cArea3D ){
+					arg0 = arg0.cross(arguments[1].first);
+				}
+				else if( arg0 instanceof cArray ){
+					arg0 = arg0.getElementRowCol(0,0);
+				}
+				
+				if ( arg0 instanceof cError )
+					return this.value = arg0;
+				
+				arg0 = arg0.tocString();
+				
+				var res = g_oFormatParser.parse(arg0.getValue());
+				
+				if( res )
+					return this.value = new cNumber( res.value );
+				else
+					return this.value = new cError( cErrorType.wrong_value_type );
+				
+			}
         	return r;
 		}
     }

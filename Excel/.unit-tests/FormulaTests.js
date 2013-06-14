@@ -248,13 +248,19 @@
 	test("Test: YEAR",function(){
 		oParser = new parserFormula("YEAR(2013)","A1",ws);
 		ok(oParser.parse());
-        strictEqual( oParser.calculate().getValue(), 1909);
+		if( g_bDate1904 )
+			strictEqual( oParser.calculate().getValue(), 1909);
+		else
+			strictEqual( oParser.calculate().getValue(), 1905);
 	})
 	
 	test("Test: DAY",function(){
 		oParser = new parserFormula("DAY(2013)","A1",ws);
 		ok(oParser.parse());
-        strictEqual( oParser.calculate().getValue(), 6);
+		if( g_bDate1904 )
+			strictEqual( oParser.calculate().getValue(), 6);
+		else
+			strictEqual( oParser.calculate().getValue(), 5);
 	})
 	
 	test("Test: DAY 2",function(){
@@ -494,5 +500,79 @@
         strictEqual( oParser.calculate().getValue(), "#VALUE!");
 		
 	})
+
+	test("Test: \"SUBSTITUTE\"",function(){
+
+		oParser = new parserFormula("SUBSTITUTE(\"abcaAabca\",\"a\",\"xx\")","A2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), "xxbcxxAxxbcxx");
+		
+		oParser = new parserFormula("SUBSTITUTE(\"abcaaabca\",\"a\",\"xx\")","B2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), "xxbcxxxxxxbcxx");
+		
+		oParser = new parserFormula("SUBSTITUTE(\"abcaaabca\",\"a\",\"\",10)","C2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), "bcbc");
+		
+		oParser = new parserFormula("SUBSTITUTE(\"abcaaabca\",\"a\",\"xx\",3)","C2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), "abcaxxabca");
+		
+	})
+
+	test("Test: \"TRIM\"",function(){
+	
+		oParser = new parserFormula("TRIM(\"     abc         def      \")","A2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), "abc def");
+		
+	})
+	
+	test("Test: \"DOLLAR\"",function(){
+	
+		oParser = new parserFormula("DOLLAR(1234.567)","A2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), "$1,234.57");
+		
+		oParser = new parserFormula("DOLLAR(1234.567,-2)","A2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), "$1,200");
+		
+		oParser = new parserFormula("DOLLAR(-1234.567,4)","A2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), "$-1,234.5670");
+		
+	})
+
+	test("Test: \"VALUE\"",function(){
+	
+		oParser = new parserFormula("VALUE(\"123.456\")","A2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 123.456);
+		
+		oParser = new parserFormula("VALUE(\"$1,000\")","A2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), "#VALUE!");
+		
+		oParser = new parserFormula("VALUE(\"23-Mar-2002\")","A2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), "#VALUE!");
+		
+		oParser = new parserFormula("VALUE(\"03-26-2006\")","A2",ws);
+		ok(oParser.parse());
+        
+		if( g_bDate1904 )
+			strictEqual( oParser.calculate().getValue(), 37340);
+		else
+			strictEqual( oParser.calculate().getValue(), 38802);
+		
+		oParser = new parserFormula("VALUE(\"16:48:00\")-VALUE(\"12:17:12\")","A2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 0.188055555555556);
+		
+	})
+	
+	
 	
 });
