@@ -888,10 +888,10 @@ function BinaryChartWriter(memory)
         var oThis = this;
 		if(null != chart.legend && true == chart.legend.bShow)
 			this.bs.WriteItem(c_oSer_ChartType.Legend, function(){oThis.WriteLegend(chart.legend);});
-		if(null != chart.title && ("" != chart.title || true == chart.bDefaultTitle))
+		if (null != chart.header.title && ("" != chart.header.title || true == chart.header.bDefaultTitle))
 		{
 			this.memory.WriteByte(c_oSer_ChartType.Title);
-            this.memory.WriteString2(chart.title);
+            this.memory.WriteString2(chart.header.title);
 		}
 		this.bs.WriteItem(c_oSer_ChartType.PlotArea, function(){oThis.WritePlotArea(chart);});
 		if(null != chart.styleId)
@@ -1212,7 +1212,7 @@ function BinaryChartWriter(memory)
 		{
 			this.memory.WriteByte(c_oSer_ChartSeriesMarkerType.Symbol);
 			this.memory.WriteByte(c_oSerPropLenType.Byte);
-			this.memory.WriteByte(marker.bShowValue);
+			this.memory.WriteByte(marker.Symbol);
 		}
     };
 	this.WriteDataLabels = function(chart)
