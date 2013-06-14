@@ -1073,7 +1073,7 @@
 									break;
 								aCFs[i].SqRefRange._setPropertyNoEmpty(null, null, function (c) {
 									if (CellValueType.Number === c.getType() && false === c.isEmptyTextString()) {
-										tmp = parseInt(c.getValueWithoutFormat());
+										tmp = parseFloat(c.getValueWithoutFormat());
 										if (isNaN(tmp))
 											return;
 										arrayCells.push({cell: c, val: tmp});
@@ -1082,7 +1082,9 @@
 									}
 								});
 
-								if (0 < arrayCells.length) {
+								// ToDo CFVO Type (formula, max, min, num, percent, percentile) (page 2681)
+								// ToDo support 3 colors in rule
+								if (0 < arrayCells.length && 2 === oRuleElement.aColors.length) {
 									oGradient = new asc.CGradient(oRuleElement.aColors[0], oRuleElement.aColors[1]);
 									oGradient.init(min, max);
 
