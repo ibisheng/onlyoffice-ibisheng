@@ -31,6 +31,8 @@
 		this.SqRef = null;
 		this.aRules = [];
 
+		this.SqRefRange = null;
+
 		return this;
 	}
 
@@ -121,16 +123,22 @@
 		return this;
 	}
 
-	function CGradient () {
+	function CGradient (c1, c2) {
 		if ( !(this instanceof CGradient) ) {
-			return new CGradient ();
+			return new CGradient (c1, c2);
 		}
 
 		this.MaxColorIndex = 512;
 		this.base_shift = 8;
 
-		this.c1 = null;
-		this.c2 = null;
+		this.c1 = c1;
+		this.c2 = c2;
+
+		this.min = this.max = 0;
+		this.koef = null;
+		this.r1 = this.r2 = 0;
+		this.g1 = this.g2 = 0;
+		this.b1 = this.b2 = 0;
 
 		return this;
 	}
@@ -139,33 +147,27 @@
 		/** @type CGradient */
 		constructor: CGradient,
 
-		generate: function (count) {
-			if (null === this.c1 || null === this.c2)
-				return null;
+		init: function (min, max) {
+			var distance = max - min;
 
-			var result = [];
-			var i, indexColor;
-			var tmp = this.MaxColorIndex / (2.0 * (count - 1));
-			for (i = 0; i < count; ++i) {
-				indexColor = parseInt(i * tmp);
-				result[i] = this.calculateColor(indexColor);
-			}
-
-			return result;
+			this.min = min;
+			this.max = max;
+			this.koef = this.MaxColorIndex / (2.0 * distance);
+			this.r1 = this.c1.getR();
+			this.g1 = this.c1.getG();
+			this.b1 = this.c1.getB();
+			this.r2 = this.c2.getR();
+			this.g2 = this.c2.getG();
+			this.b2 = this.c2.getB();
 		},
 		calculateColor: function (indexColor) {
-			var ret = new CAscColor();
-			var r1 = this.c1.getR();
-			var g1 = this.c1.getG();
-			var b1 = this.c1.getB();
-			var r2 = this.c2.getR();
-			var g2 = this.c2.getG();
-			var b2 = this.c2.getB();
+			indexColor = parseInt((indexColor - this.min) * this.koef);
 
-			ret.r = (r1 + ((FT_Common.IntToUInt(r2 - r1) * indexColor) >> this.base_shift)) & 0xFFFF;
-			ret.g = (g1 + ((FT_Common.IntToUInt(g2 - g1) * indexColor) >> this.base_shift)) & 0xFFFF;
-			ret.b = (b1 + ((FT_Common.IntToUInt(b2 - b1) * indexColor) >> this.base_shift)) & 0xFFFF;
-			return ret;
+			var r = (this.r1 + ((FT_Common.IntToUInt(this.r2 - this.r1) * indexColor) >> this.base_shift)) & 0xFF;
+			var g = (this.g1 + ((FT_Common.IntToUInt(this.g2 - this.g1) * indexColor) >> this.base_shift)) & 0xFF;
+			var b = (this.b1 + ((FT_Common.IntToUInt(this.b2 - this.b1) * indexColor) >> this.base_shift)) & 0xFF;
+			//console.log("index=" + indexColor + ": r=" + r + " g=" + g + " b=" + b);
+			return new RgbColor((r << 16) + (g << 8) + b);
 		}
 	};
 

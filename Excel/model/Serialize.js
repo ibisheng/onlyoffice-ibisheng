@@ -4843,7 +4843,8 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 		else if (c_oSerWorksheetsTypes.ConditionalFormatting === type) {
 			oConditionalFormatting = new Asc.CConditionalFormatting();
 			res = this.bcr.Read1(length, function (t, l) {
-				return oThis.ReadConditionalFormatting(t, l, oConditionalFormatting);
+				return oThis.ReadConditionalFormatting(t, l, oConditionalFormatting,
+					function (sRange) {return oWorksheet.getRange2(sRange);});
 			});
 			oWorksheet.aConditionalFormatting.push(oConditionalFormatting);
 		}
@@ -5471,14 +5472,16 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 			res = c_oSerConstants.ReadUnknown;
         return res;
     };
-	this.ReadConditionalFormatting = function (type, length, oConditionalFormatting) {
+	this.ReadConditionalFormatting = function (type, length, oConditionalFormatting, functionGetRange2) {
 		var res = c_oSerConstants.ReadOk;
 		var oThis = this;
 		var oConditionalFormattingRule = null;
 		if (c_oSer_ConditionalFormatting.Pivot === type)
 			oConditionalFormatting.Pivot = this.stream.GetBool();
-		else if (c_oSer_ConditionalFormatting.SqRef === type)
+		else if (c_oSer_ConditionalFormatting.SqRef === type) {
 			oConditionalFormatting.SqRef = this.stream.GetString2LE(length);
+			oConditionalFormatting.SqRefRange = functionGetRange2(oConditionalFormatting.SqRef);
+		}
 		else if (c_oSer_ConditionalFormatting.ConditionalFormattingRule === type) {
 			oConditionalFormattingRule = new Asc.CConditionalFormattingRule();
 			res = this.bcr.Read1(length, function (t, l) {

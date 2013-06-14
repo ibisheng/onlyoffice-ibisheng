@@ -1037,8 +1037,69 @@
 				this._cleanCellsTextMetricsCache();
 				this._prepareCellTextMetricsCache(this.visibleRange);
 				this.autoFilters.addFiltersAfterOpen(this);
+				this._initConditionalFormatting();
 				// initializing is completed
 				this._trigger("initialized");
+			},
+			_initConditionalFormatting: function () {
+				var oGradient = null;
+				var aCFs = this.model.aConditionalFormatting;
+				var aRules = null;
+				var oRule = null;
+				var oRuleElement = null;
+				var min = Number.MAX_VALUE;
+				var max = Number.MIN_VALUE, tmp;
+				var arrayCells = [];
+				for (var i in aCFs) {
+					if (!aCFs.hasOwnProperty(i) )
+						continue;
+					aRules = aCFs[i].aRules;
+					if (0 >= aRules.length)
+						continue;
+					for (var j in aRules) {
+						if (!aRules.hasOwnProperty(j))
+							continue;
+
+						oRule = aRules[j];
+						// ToDo aboveAverage, beginsWith, cellIs, containsBlanks, containsErrors,
+						// ToDo containsText, dataBar, duplicateValues, endsWith, expression, iconSet, notContainsBlanks,
+						// ToDo notContainsErrors, notContainsText, timePeriod, top10, uniqueValues (page 2679)
+						switch (oRule.Type) {
+							case "colorScale":
+								if (1 !== oRule.aRuleElements.length)
+									break;
+								oRuleElement = oRule.aRuleElements[0];
+								if (!(oRuleElement instanceof asc.CColorScale))
+									break;
+								aCFs[i].SqRefRange._setPropertyNoEmpty(null, null, function (c) {
+									if (CellValueType.Number === c.getType()) {
+										tmp = parseInt(c.getValueWithoutFormat());
+										if (isNaN(tmp))
+											return;
+										arrayCells.push({cell: c, val: tmp});
+										min = Math.min(min, tmp);
+										max = Math.max(max, tmp);
+									}
+								});
+
+								if (0 < arrayCells.length) {
+									oGradient = new asc.CGradient(oRuleElement.aColors[0], oRuleElement.aColors[1]);
+									oGradient.init(min, max);
+
+									for (var cell in arrayCells) {
+										if (arrayCells.hasOwnProperty(cell)) {
+											arrayCells[cell].cell.setFill(oGradient.calculateColor(arrayCells[cell].val));
+										}
+									}
+								}
+								break;
+						}
+
+						arrayCells.splice(0, arrayCells.length);
+						min = Number.MAX_VALUE;
+						max = Number.MIN_VALUE;
+					}
+				}
 			},
 			_calcEmSize: function () {
 				// set default worksheet header font for calculations
