@@ -241,7 +241,7 @@
 				}
 
 				// Отправляем на сервер изменения
-				this.handlers.trigger("sendChanges", this.m_oRecalcIndexColumns, this.m_oRecalcIndexRows);
+				this.handlers.trigger("sendChanges", this.getRecalcIndexSave(this.m_oRecalcIndexColumns), this.getRecalcIndexSave(this.m_oRecalcIndexRows));
 
 				// Пересчитываем lock-и от чужих пользователей
 				this._recalcLockArrayOthers();
@@ -263,6 +263,24 @@
 					this.handlers.trigger("showDrawingObjects");
 					this.handlers.trigger("showComments");
 				}
+			},
+
+			getRecalcIndexSave: function (oRecalcIndex) {
+				var result = {};
+				var element = null;
+				for (var sheetId in oRecalcIndex) {
+					if (!oRecalcIndex.hasOwnProperty(sheetId))
+						continue;
+					result[sheetId] = {"_arrElements": []};
+					for (var i = 0, length = oRecalcIndex[sheetId]._arrElements.length; i < length; ++i) {
+						element = oRecalcIndex[sheetId]._arrElements[i];
+						result[sheetId]["_arrElements"].push({"_recalcType" : element._recalcType,
+							"_position" : element._position, "_count" : element._count,
+							"m_bIsSaveIndex" : element.m_bIsSaveIndex});
+					}
+				}
+
+				return result;
 			},
 
 			S4: function () {
