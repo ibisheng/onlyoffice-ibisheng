@@ -1128,6 +1128,9 @@ asc_CChartHeader.prototype = {
 	asc_getDefaultTitleFlag: function() { return this.bDefaultTitle; },
 	asc_setDefaultTitleFlag: function(defaultTitleFlag) { this.bDefaultTitle = defaultTitleFlag; },
 	
+	asc_getFont: function() { return this.font; },
+	asc_setFont: function(fontObj) { this.font = fontObj; },
+	
 	//	For collaborative editing
 	getType: function() {
 		return UndoRedoDataTypes.ChartHeader;
@@ -1169,6 +1172,9 @@ prot["asc_setSubTitle"] = prot.asc_setSubTitle;
 
 prot["asc_getDefaultTitleFlag"] = prot.asc_getDefaultTitleFlag;
 prot["asc_setDefaultTitleFlag"] = prot.asc_setDefaultTitleFlag;
+
+prot["asc_getFont"] = prot.asc_getFont;
+prot["asc_setFont"] = prot.asc_setFont;
 //}
 
 //-----------------------------------------------------------------------------------
@@ -1206,6 +1212,9 @@ asc_CChartAxisX.prototype = {
 
 	asc_getGridFlag: function() { return this.bGrid; },
 	asc_setGridFlag: function(gridFlag) { this.bGrid = gridFlag; },
+	
+	asc_getFont: function() { return this.font; },
+	asc_setFont: function(fontObj) { this.font = fontObj; },
 	
 	//	For collaborative editing
 	getType: function() {
@@ -1253,6 +1262,9 @@ prot["asc_setShowFlag"] = prot.asc_setShowFlag;
 
 prot["asc_getGridFlag"] = prot.asc_getGridFlag;
 prot["asc_setGridFlag"] = prot.asc_setGridFlag;
+
+prot["asc_getFont"] = prot.asc_getFont;
+prot["asc_setFont"] = prot.asc_setFont;
 //}
 
 //-----------------------------------------------------------------------------------
@@ -1290,6 +1302,9 @@ asc_CChartAxisY.prototype = {
 
 	asc_getGridFlag: function() { return this.bGrid; },
 	asc_setGridFlag: function(gridFlag) { this.bGrid = gridFlag; },
+	
+	asc_getFont: function() { return this.font; },
+	asc_setFont: function(fontObj) { this.font = fontObj; },
 	
 	//	For collaborative editing
 	getType: function() {
@@ -1337,6 +1352,9 @@ prot["asc_setShowFlag"] = prot.asc_setShowFlag;
 
 prot["asc_getGridFlag"] = prot.asc_getGridFlag;
 prot["asc_setGridFlag"] = prot.asc_setGridFlag;
+
+prot["asc_getFont"] = prot.asc_getFont;
+prot["asc_setFont"] = prot.asc_setFont;
 //}
 
 //-----------------------------------------------------------------------------------
@@ -1369,6 +1387,9 @@ asc_CChartLegend.prototype = {
 
 	asc_getOverlayFlag: function() { return this.bOverlay; },
 	asc_setOverlayFlag: function(overlayFlag) { this.bOverlay = overlayFlag; },
+	
+	asc_getFont: function() { return this.font; },
+	asc_setFont: function(fontObj) { this.font = fontObj; },
 	
 	//	For collaborative editing
 	getType: function() {
@@ -1411,6 +1432,9 @@ prot["asc_setShowFlag"] = prot.asc_setShowFlag;
 
 prot["asc_getOverlayFlag"] = prot.asc_getOverlayFlag;
 prot["asc_setOverlayFlag"] = prot.asc_setOverlayFlag;
+
+prot["asc_getFont"] = prot.asc_getFont;
+prot["asc_setFont"] = prot.asc_setFont;
 //}
 
 //-----------------------------------------------------------------------------------
