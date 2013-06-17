@@ -1022,6 +1022,11 @@ function cBaseOperator(name, priority, argumentCount){
     this.isRightAssociative = false;
     this.argumentsCurrent = argumentCount ? argumentCount : 2;
     this.value = null;
+	this.formatType = {
+		def:-1,//подразумевается формат первой ячейки входящей в формулу.
+		noneFormat:-2
+	};
+	this.numFormat = this.formatType.noneFormat;
 }
 cBaseOperator.prototype = {
 	constructor : cBaseOperator,
@@ -1545,6 +1550,37 @@ var cFormulaFunction = {
         'DATEVALUE' : function(){
             var r = new cBaseFunction();
             r.setName("DATEVALUE");
+			r.setArgumentsMin(1);
+            r.setArgumentsMax(1);
+			r.Calculate = function(arg){
+				var arg0 = arg[0];
+                
+				if ( arg0 instanceof cArea || arg0 instanceof cArea3D ){
+					arg0 = arg0.cross(arguments[1].first);
+				}
+				else if( arg0 instanceof cArray ){
+					arg0 = arg0.getElementRowCol(0,0);
+				}
+				
+				if ( arg0 instanceof cError )
+					return this.value = arg0;
+				
+				arg0 = arg0.tocString();
+				
+				var res = g_oFormatParser.parse(arg0.getValue());
+				
+				if( res && res.bDateTime )
+					return this.value = new cNumber( parseInt(res.value) );
+				else
+					return this.value = new cError( cErrorType.wrong_value_type );
+			}
+			r.getInfo = function(){
+                return {
+                    name:this.name,
+                    args:"( date-time-string )"
+                };
+            }
+			r.setFormat(r.formatType.noneFormat);
 			return r;
         },
         'DAY' : function(){
@@ -8212,6 +8248,7 @@ var cFormulaFunction = {
 					return this.value = new cError( cErrorType.wrong_value_type );
 				
 			}
+			r.setFormat(r.formatType.noneFormat);
         	return r;
 		}
     }
@@ -8510,7 +8547,7 @@ function cRef(val,_ws){/*Ref means A1 for example*/
     this.isAbsolute = false;
     this.type = cElementType.cell;
     this.range = _ws.getRange2(val);
-    this._valid = new CellAddress(val).isValid();
+    this._valid = new CellAddress(val.replace("$","")).isValid();
 }
 extend(cRef,cBaseType);
 cRef.prototype.getWsId = function(){ return this.ws.Id; }
@@ -8546,7 +8583,7 @@ cRef.prototype.getValue = function(){
 	}
 }
 cRef.prototype.tocNumber = function(){ return this.getValue().tocNumber(); }
-cRef.prototype.tocString = function(){ return this.getValue().tocString(); }
+cRef.prototype.tocString = function(){ return new cString(""+this.range.getValueWithFormat()); }
 cRef.prototype.tocBool = function(){ return this.getValue().tocBool(); }
 cRef.prototype.tryConvert = function(){ return this.getValue(); }
 cRef.prototype.toString = function(){ return this._cells; }
@@ -9465,7 +9502,7 @@ parserFormula.prototype = {
 					if( _tmp.numFormat !== undefined && _tmp.numFormat !== null ){
 						numFormat = _tmp.numFormat; //> numFormat ? _tmp.numFormat : numFormat;
 					}
-					else if( numFormat < 0 ){
+					else if( numFormat < 0 || currentElement.numFormat < currentElement.formatType.def){
 						numFormat = currentElement.numFormat;
 					}
 					elemArr.push( _tmp );
