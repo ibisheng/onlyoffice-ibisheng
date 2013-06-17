@@ -357,7 +357,7 @@ function CChartData(bWordContext, chart) {
 		// Header
 		_this.header.title = chart["header"]["title"];
 		_this.header.subTitle = chart["header"]["subTitle"];
-		_this.header.bDefaultTitle = chart["range"]["bDefaultTitle"];
+		_this.header.bDefaultTitle = chart["header"]["bDefaultTitle"];
 		
 		_this.header.font = {};
 		_this.header.font.name = chart["header"]["font"]["name"];
@@ -825,6 +825,7 @@ function asc_CChart(object) {
 				ser.asc_setMarkerSymbol(object.series[i].Marker.Symbol);
 			}
 			ser.asc_setOutlineColor(object.series[i].OutlineColor);
+			ser.asc_setFormatCode(object.series[i].FormatCode);
 
 			this.series.push(ser);
 		}
@@ -1447,6 +1448,7 @@ function asc_CChartSeria() {
 	this.Tx = null;
 	this.Marker = { Size: null, Symbol: null };
 	this.OutlineColor = null;
+	this.FormatCode = "";
 
 	this.Properties = {
 		ValFormula: 0,
@@ -1456,7 +1458,8 @@ function asc_CChartSeria() {
 		Tx: 4,
 		MarkerSize: 5,
 		MarkerSymbol: 6,
-		OutlineColor: 7
+		OutlineColor: 7,
+		FormatCode: 8
 	};
 }
 
@@ -1479,6 +1482,9 @@ asc_CChartSeria.prototype = {
 
 	asc_getOutlineColor: function() { return this.OutlineColor; },
 	asc_setOutlineColor: function(color) { this.OutlineColor = color; },
+	
+	asc_getFormatCode: function() { return this.FormatCode; },
+	asc_setFormatCode: function(format) { this.FormatCode = format; },
 
 	//	For collaborative editing
 	getType: function() {
@@ -1499,6 +1505,7 @@ asc_CChartSeria.prototype = {
 			case this.Properties.MarkerSize: return this.Marker.Size; break;
 			case this.Properties.MarkerSymbol: return this.Marker.Symbol; break;
 			case this.Properties.OutlineColor: return this.OutlineColor; break;
+			case this.Properties.FormatCode: return this.FormatCode; break;
 		}
 	},
 
@@ -1512,6 +1519,7 @@ asc_CChartSeria.prototype = {
 			case this.Properties.MarkerSize: this.Marker.Size = value; break;
 			case this.Properties.MarkerSymbol: this.Marker.Symbol = value; break;
 			case this.Properties.OutlineColor: this.OutlineColor = value; break;
+			case this.Properties.FormatCode: this.FormatCode = value; break;
 		}
 	}
 }
@@ -1538,6 +1546,9 @@ prot["asc_setMarkerSymbol"] = prot.asc_setMarkerSymbol;
 
 prot["asc_getOutlineColor"] = prot.asc_getOutlineColor;
 prot["asc_setOutlineColor"] = prot.asc_setOutlineColor;
+
+prot["asc_getFormatCode"] = prot.asc_getFormatCode;
+prot["asc_setFormatCode"] = prot.asc_setFormatCode;
 //}
 
 //-----------------------------------------------------------------------------------
