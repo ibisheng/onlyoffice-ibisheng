@@ -21,6 +21,29 @@
 
 	module("Formula");
 	
+	test("Test: \"Absolute reference\"",function(){
+	
+		ws.getRange2("A7").setValue("1");
+		ws.getRange2("A8").setValue("2");
+		ws.getRange2("A9").setValue("3");
+		oParser = new parserFormula('A$7+A8',"A1",ws);
+		ok(oParser.parse());
+        strictEqual(oParser.calculate().getValue(),3);
+		
+		oParser = new parserFormula('A$7+A$8',"A1",ws);
+		ok(oParser.parse());
+        strictEqual(oParser.calculate().getValue(),3);
+		
+		oParser = new parserFormula('$A$7+$A$8',"A1",ws);
+		ok(oParser.parse());
+        strictEqual(oParser.calculate().getValue(),3);
+		
+		oParser = new parserFormula('SUM($A$7:$A$9)',"A1",ws);
+		ok(oParser.parse());
+        strictEqual(oParser.calculate().getValue(),6);
+	})
+	
+	
 	test("Test: \"1+3\"",function(){
 		oParser = new parserFormula('1+3',"A1",ws);
 		ok(oParser.parse());
@@ -557,7 +580,7 @@
 		
 		oParser = new parserFormula("VALUE(\"23-Mar-2002\")","A2",ws);
 		ok(oParser.parse());
-        strictEqual( oParser.calculate().getValue(), "#VALUE!");
+        strictEqual( oParser.calculate().getValue(), 37338);
 		
 		oParser = new parserFormula("VALUE(\"03-26-2006\")","A2",ws);
 		ok(oParser.parse());
@@ -572,7 +595,38 @@
         strictEqual( oParser.calculate().getValue(), 0.188055555555556);
 		
 	})
+
+	test("Test: \"DATEVALUE\"",function(){
 	
-	
+		oParser = new parserFormula("DATEVALUE(\"10-10-2010 10:26\")","A2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 40461);
+		
+		oParser = new parserFormula("DATEVALUE(\"10-10-2010 10:26\")","A2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 40461);
+		
+		ws.getRange2("A7").setValue("3-Mar");
+		oParser = new parserFormula("DATEVALUE(A7)","A2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 41336);
+		
+		oParser = new parserFormula("DATEVALUE(\"$1,000\")","A2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), "#VALUE!");
+		
+		oParser = new parserFormula("DATEVALUE(\"23-Mar-2002\")","A2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 37338);
+		
+		oParser = new parserFormula("DATEVALUE(\"03-26-2006\")","A2",ws);
+		ok(oParser.parse());
+        
+		if( g_bDate1904 )
+			strictEqual( oParser.calculate().getValue(), 37340);
+		else
+			strictEqual( oParser.calculate().getValue(), 38802);
+		
+	})
 	
 });
