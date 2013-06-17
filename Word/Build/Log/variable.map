@@ -381,7 +381,7 @@ ps_parser_skip_PS_token:hq
 ETblStyleOverrideType$tblstyleoverridetypeBand1Horz:UX
 align_Justify:ib
 PS_Conv_ToFixed:Dp
-char9:RA
+char9:QA
 JSCompiler_StaticMethods_Set_CellSpacing:dd
 StartTrackTextRect:tE
 DRAWING_ARRAY_TYPE_WRAPPING:CC
@@ -479,10 +479,10 @@ g_anchor_bottom:j0
 _ph_summ__two_col_tx:OJ
 load_format_20:wr
 c_oSer_pgMarType$Header:pX
-charp:SA
+charp:RA
 NumComporationOperators$less:Nf
 c_oMainTables$ImageMap:ki
-c_oAscStyleImage$Document:O_
+c_oAscStyleImage$Document:N_
 c_oAscChartType$hbar:xe
 c_oAscRelativeFromV$TopMargin:ON
 nVertTTvert:wG
@@ -740,7 +740,7 @@ CFF_SizeRec:Ax
 SplineCommandLineTo:gF
 cff_size_select:Ex
 FT_GlyphSlot:Ao
-CParagraphProp:G_
+CParagraphProp:F_
 GetMinSnapDistanceX:zE
 GetMinSnapDistanceY:AE
 c_oSer_ChartSeriesDataLabelsType$ShowVal:hk
@@ -809,9 +809,9 @@ CParaInd:Gd
 linerule_Auto:kb
 FT_Stream2:kj
 CColorMod:Pg
-FT_CFF_SERVICES_GET:ky
+FT_CFF_SERVICES_GET:jy
 tt_size_init:yw
-CAscColorScheme:F_
+CAscColorScheme:E_
 FORMULA_TYPE_MULT_DIV:aK
 TT_NameTableRec:Sn
 GraphicPicture:aO
@@ -880,7 +880,7 @@ phType_ftr:oI
 tt_get_metrics_incr_overrides:dw
 t1_cmap_custom_class_rec:Zp
 g_aPunctuation:XM
-cff_services:jy
+cff_services:iy
 TT_Table:Pn
 JSCompiler_StaticMethods_highlight_segment:gl
 g_bIsDocumentCopyPaste:fa
@@ -1658,7 +1658,7 @@ c_oMainTables$Slides:ei
 CTab:D_
 FT_DivFix:Qm
 Ins_SDPVTL:zv
-documentUrl:gH
+documentUrl:fH
 JSCompiler_StaticMethods_OnEnd_ResizeInline:fC
 c_oSer_ChartSeriesType$Marker:bk
 tt_cmap12_char_index:ms
@@ -1778,7 +1778,7 @@ TT_ExecContextRec:mu
 c_oSer_pgMarType$Footer:qX
 afm_parser_read_vals:Lp
 TT_Load_Glyph_Header:gw
-JSCompiler_StaticMethods_Add_Page:qQ
+JSCompiler_StaticMethods_Add_Page:pQ
 CPen:zZ
 DocumentPageSize:A2
 STATES_ID_RESIZE:OD
@@ -1941,7 +1941,7 @@ c_oAscRelativeFromV$BottomMargin:CN
 t1_expert_encoding:Wo
 clonePrototype:rK
 tt_size_ready_bytecode:pu
-JSCompiler_StaticMethods_Row_Add:OQ
+JSCompiler_StaticMethods_Row_Add:NQ
 c_oSer_StyleType$Character:CX
 MobileTouchMode$TableRuler:b0
 STATES_ID_START_ADD_NEW_SHAPE:KD
@@ -1962,7 +1962,7 @@ c_oSerHdrFtrTypes$HdrFtr_Content:kT
 historyitem_ChangePolygon:YE
 ResizeState:yE
 c_oSerImageType$Width:aW
-c_oSerProp_pPrType$Spacing_LineRule:AU
+c_oSerProp_pPrType$Spacing_LineRule:zU
 Direct_Move_Orig:Iu
 JSCompiler_StaticMethods_DrawEvents:bl
 TT_Round_Off:Qt
@@ -2001,7 +2001,7 @@ CFF_Builder:Px
 c_oSer_CommentsType$Initials:uX
 historyitem_type_HdrFtrGrObjects:tD
 c_oSerBorderType$Space:Ti
-c_oSerProp_pPrType$Spacing_Line:zU
+c_oSerProp_pPrType$Spacing_Line:yU
 c_oAscRelativeFromH$Margin:zN
 LineEndType$Triangle:cI
 BULLET_TYPE_BULLET_NONE:Lh
@@ -2257,7 +2257,7 @@ c_oSerProp_rPrType$FontSizeCs:mV
 c_oAscAlignH$Left:tN
 ClrScheme:kC
 c_oSerEffectExtent$Top:GW
-JSCompiler_StaticMethods_setTextBoxContent:hH
+JSCompiler_StaticMethods_setTextBoxContent:gH
 CreateAscShapePropFromProp:sD
 PS_FontInfoRec:lp
 tab_Right:lN
@@ -2407,7 +2407,7 @@ c_oSer_sts$Style_ParaPr:WT
 c_oAscVAnchor$Margin:uR
 historyitem_type_Image:nH
 tt_cmap14_char_var_isdefault:Es
-c_oAscStyleImage$Default:N_
+c_oAscStyleImage$Default:M_
 c_oAscError$ID$SplitCellMaxRows:OS
 FT_NEXT_USHORT:tm
 CShapeStyle:ph
@@ -2694,7 +2694,7 @@ HSLToRGB:MZ
 L 42:Yd
 changestype_Paragraph_Content:YB
 ft_outline_glyph_done:an
-JSCompiler_StaticMethods_Select_Comment:NQ
+JSCompiler_StaticMethods_Select_Comment:MQ
 JSCompiler_StaticMethods_Set_FontSize:cN
 JSCompiler_StaticMethods_DrawBorders:el
 para_Text:Bb
@@ -2900,7 +2900,7 @@ JSCompiler_StaticMethods_setTableProps:IC
 Y_Top_Margin:zD
 TT_Forget_Glyph_Frame:fw
 gray_record_cell:nt
-JSCompiler_StaticMethods_Stop:rQ
+JSCompiler_StaticMethods_Stop:qQ
 trimString:$b
 c_oSerExtent$Cx:JW
 c_oSerExtent$Cy:KW
