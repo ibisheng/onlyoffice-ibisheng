@@ -2122,7 +2122,7 @@ Woorksheet.prototype.generateFontMap=function(oFontMap){
 			oFontMap[col.xfs.font.fn] = 1;
 	}
 	if(null != this.oAllCol && null != this.oAllCol.xfs && null != this.oAllCol.xfs.font && null != this.oAllCol.xfs.font.fn)
-		oFontMap[col.xfs.font.fn] = 1;
+		oFontMap[this.oAllCol.xfs.font.fn] = 1;
 	//пробегаемся строкам
 	for(var i in this.aGCells)
 	{
