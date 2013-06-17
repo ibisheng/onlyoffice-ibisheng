@@ -1866,7 +1866,7 @@
 							bottom: printPagesData.bottomFieldInPt
 						}
 					};
-					this.objectRender.showDrawingObjects(false, drawingPrintOptions, false, true);
+					this.objectRender.showDrawingObjects(false, drawingPrintOptions, false);
 					this.visibleRange = tmpVisibleRange.clone(true);
 
                     if (isAppBridge) {window['appBridge']['dummyCommandUpdate'] ();}
@@ -1894,7 +1894,7 @@
 				}
 				//draw auto filters
 				this.autoFilters.drawAutoF(this);
-				this.objectRender.showDrawingObjects(true, null/*printOptions*/, false/*bMouseUp*/, true/*bUpdateCharts*/);
+				this.objectRender.showDrawingObjects(true, null/*printOptions*/, true/*bUpdateCharts*/);
 				this.cellCommentator.drawCommentCells(false);
 
 				return this;
@@ -3456,7 +3456,7 @@
 					t.overlayCtx.ctx.globalAlpha = 1;
 					if (res) {
 						// Все хорошо, мы залочили, теперь применяем
-						t.objectRender.showDrawingObjects(true, null, true, true);
+						t.objectRender.showDrawingObjects(true, null, true);
 					}
 					else {
 						// Не удалось, восстанавливаем состояние
@@ -8017,7 +8017,7 @@
 					if (isUpdateCols) { t._updateVisibleColsCount(); }
 					if (isUpdateRows) { t._updateVisibleRowsCount(); }
 
-					t.objectRender.showDrawingObjects(true, null, false, true);
+					t.objectRender.showDrawingObjects(true, null, true);
 				};
 
 				switch (prop) {
@@ -8304,7 +8304,7 @@
 				if (isUpdateRows) { t._updateVisibleRowsCount(); }
 
 				if (false === lockDraw) {
-					t.objectRender.showDrawingObjects(true, null, false, true);
+					t.objectRender.showDrawingObjects(true, null, true);
 					t.autoFilters.drawAutoF(t);
 				}
 			},
@@ -9034,7 +9034,6 @@
 					t._trigger("selectionChanged", t.getSelectionInfo());
 				}
 
-				t.objectRender.reloadChartDrawingObjects();
 				t.cellCommentator.updateCommentPosition();
 				t.draw(lockDraw);
 			},
