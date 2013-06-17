@@ -41,6 +41,23 @@ function extend(Child, Parent) {
 	Child.superclass = Parent.prototype
 }
 
+Date.prototype.isLeapYear = function()
+{
+    var y = this.getFullYear();
+    return y % 4 == 0 && y % 100 != 0 || y % 400 == 0;
+};
+
+Date.prototype.getDaysInMonth = function()
+{
+    return arguments.callee[this.isLeapYear() ? 'L' : 'R'][this.getMonth()];
+};
+
+// durations of months for the regular year
+Date.prototype.getDaysInMonth.R = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+// durations of months for the leap year
+Date.prototype.getDaysInMonth.L = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+
 var _func = new Array();//для велосипеда а-ля перегрузка функций.
 _func[cElementType.number] = new Array();
 _func[cElementType.string] = new Array();
@@ -1655,6 +1672,58 @@ var cFormulaFunction = {
         'EDATE' : function(){
             var r = new cBaseFunction();
             r.setName("EDATE");
+			r.setArgumentsMin(2);
+            r.setArgumentsMax(2);
+			r.Calculate = function(arg){
+				var arg0 = arg[0], arg1 = arg[1];
+				
+				if ( arg0 instanceof cArea || arg0 instanceof cArea3D ){
+					arg0 = arg0.cross(arguments[1].first);
+				}
+				else if( arg0 instanceof cArray ){
+					arg0 = arg0.getElementRowCol(0,0);
+				}
+				
+				if ( arg1 instanceof cArea || arg1 instanceof cArea3D ){
+					arg1 = arg1.cross(arguments[1].first);
+				}
+				else if( arg1 instanceof cArray ){
+					arg1 = arg1.getElementRowCol(0,0);
+				}
+				
+				arg0 = arg0.tocNumber();
+				arg1 = arg1.tocNumber();
+				
+				if( arg0 instanceof cError) return this.value = arg0;
+				if( arg1 instanceof cError) return this.value = arg1;
+				
+				var val = arg0.getValue();
+				
+				if(val < 0)
+					return this.setCA(new cError( cErrorType.not_numeric ),true);
+				else if(!g_bDate1904){
+					if( val < 60 )
+						val = new Date((val-c_DateCorrectConst)*86400*1000);
+					else if( val == 60 )
+						val = new Date((val-c_DateCorrectConst-1)*86400*1000);
+					else
+						val = new Date((val-c_DateCorrectConst-1)*86400*1000);
+				}
+				else
+					val = new Date((val-c_DateCorrectConst)*86400*1000);
+					
+				val = new Date(val.setMonth(val.getMonth()+arg1.getValue()))
+					
+				return this.value = new cNumber( Math.floor( ( val.getTime()/1000 - val.getTimezoneOffset()*60 )/86400+(c_DateCorrectConst+1) ) )
+				
+			}
+			/* r.getInfo = function(){
+                return {
+                    name:this.name,
+                    args:"( start-date , month-offset )"
+                };
+            } */
+			r.setFormat(r.formatType.noneFormat);
 			return r;
         },
         'EOMONTH' : function(){
@@ -8547,7 +8616,7 @@ function cRef(val,_ws){/*Ref means A1 for example*/
     this.isAbsolute = false;
     this.type = cElementType.cell;
     this.range = _ws.getRange2(val);
-    this._valid = new CellAddress(val.replace("$","")).isValid();
+    this._valid = new CellAddress(val.replace(/\$/g,"")).isValid();
 }
 extend(cRef,cBaseType);
 cRef.prototype.getWsId = function(){ return this.ws.Id; }
