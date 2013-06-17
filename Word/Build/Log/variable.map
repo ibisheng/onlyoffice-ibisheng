@@ -551,7 +551,7 @@ ParaInlineBreak:hN
 tt_face_set_sbit_strike:Fr
 Numbering_Number_To_Roman:BP
 phType_dgm:mI
-selected_None:tQ
+selected_None:sQ
 Round_To_Grid:Pu
 sfnt_service_glyph_dict:Us
 JSCompiler_StaticMethods_HSL2RGB:VH
@@ -642,7 +642,7 @@ tt_face_load_cvt:$v
 CNumbering:PP
 phType_pic:sI
 TextListStyle:Ph
-c_oSerProp_pPrType$Spacing_After:CU
+c_oSerProp_pPrType$Spacing_After:BU
 JSCompiler_StaticMethods_Is_CurrentElementTable:nG
 c_oAscYAlign$Inside:yR
 JSCompiler_StaticMethods_RecalcScroller:F1
@@ -730,7 +730,7 @@ _files$$inline_1271:V
 tt_cmap13_next:qs
 JSCompiler_StaticMethods_getexploded:kl
 JSCompiler_StaticMethods_Internal_CalculateTextPr:pb
-check_MouseMoveEvent:Q_
+check_MouseMoveEvent:P_
 PreChangeAdjInGroup:BE
 c_oSerImageType$Type:$V
 g_oCellAddressUtils:lj
@@ -1088,7 +1088,7 @@ cff_face_done:Lx
 FT_ENCODING_MS_SYMBOL:Uz
 WRAPPING_TYPE_NONE:MC
 c_oSer_BasicChartType$BarDerection:Tj
-JSCompiler_StaticMethods_Col_Add:PQ
+JSCompiler_StaticMethods_Col_Add:OQ
 c_oSer_ChartLegendLayoutType$XMode:Gj
 c_oAscServerError$ConvertUnknownFormat:ef
 JSCompiler_StaticMethods_Set_After:sd
@@ -1550,7 +1550,7 @@ c_oAscLineDrawingRule$Center:nS
 FlowObjects:XK
 CDocMetaSelection:A0
 numFormat_Hour:uf
-JSCompiler_StaticMethods_Row_Remove:QQ
+JSCompiler_StaticMethods_Row_Remove:PQ
 cff_operator_seac:Yx
 CFontFile:Jz
 tt_face_free_ps_names:zr
@@ -1668,7 +1668,7 @@ c_oAscError$ID$Database:Q1
 CreateIntArray:Wl
 ParaCollaborativeChangesStart:eO
 cff_cmap_encoding_class_rec:xx
-check_KeyboardEvent:P_
+check_KeyboardEvent:O_
 JSCompiler_StaticMethods__MarginToStyle:ub
 CopyPasteCorrectString:Cb
 PS_FontExtraRec:sp
@@ -1879,7 +1879,7 @@ c_oSer_st$DefpPr:NT
 nSldLtTTwoTxTwoObj:fJ
 RotateInGroup:OE
 Ins_PUSHW:Bv
-CDocumentSearch:sQ
+CDocumentSearch:rQ
 STATES_ID_PRE_MOVE:ED
 JSCompiler_StaticMethods_Add_Cell:MS
 _weight_obj:vJ
@@ -2010,7 +2010,7 @@ VERTICAL_ANCHOR_TYPE_TOP:uG
 tt_face_load_head:jr
 tt_slot_init:Aw
 handleMessage:w0
-TABLE_STYLE_HEIGHT_PIX:I_
+TABLE_STYLE_HEIGHT_PIX:H_
 JSCompiler_StaticMethods_pointInSelectedObject:DC
 gc_nMaxDigCountView:Jf
 c_oSerImageType$Page:eW
@@ -2237,7 +2237,7 @@ JSCompiler_StaticMethods_Set_Tabs:Qd
 fontstyle_mask_bolditalic:FA
 c_oSer_sts$Style:QT
 historyitem_ChangePresetGeom:FG
-c_oSerProp_pPrType$Spacing_Before:BU
+c_oSerProp_pPrType$Spacing_Before:AU
 c_oSerImageType$MediaId:ZV
 c_oAscServerError$Storage:Ve
 JSCompiler_StaticMethods_Create:dA
@@ -2288,7 +2288,7 @@ Binary_OtherTableReader:$Y
 STATES_ID_TEXT_ADD_IN_GROUP:Da
 SplineCommandMoveTo:eF
 CBulletType:Kh
-TABLE_STYLE_WIDTH_PIX:H_
+TABLE_STYLE_WIDTH_PIX:G_
 c_oSerImageType2$EffectExtent:tW
 numbering_suff_Tab:uO
 JSCompiler_StaticMethods_Internal_Get_ParaPos_By_Pos:MO
