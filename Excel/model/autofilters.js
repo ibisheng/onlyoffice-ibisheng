@@ -1954,9 +1954,6 @@
 				
 				if(!isArray)
 				{
-					// ToDo - убрать в новой версии (из меню не нужно присылать "Select All"
-					//if(array[0] && array[0].val == "Select All")
-					array.splice(0,1);
 					var newArray = [];
 					//преобразуем массив в другой вид
 					for(var m = 0; m < array.length; m++)
