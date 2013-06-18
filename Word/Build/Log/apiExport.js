@@ -278,6 +278,7 @@ prop:put_TextPrSpacing
 prop:put_TextPrCaps
 prop:put_TextPrSmallCaps
 prop:put_TextPrPosition
+prop:put_TextPrLang
 prop:put_PrLineSpacing
 prop:put_LineSpacingBeforeAfter
 prop:FontSizeIn
@@ -416,6 +417,8 @@ prop:sync_HyperlinkClickCallback
 prop:sync_CanAddHyperlinkCallback
 prop:sync_DialogAddHyperlink
 prop:sync_DialogAddHyperlink
+prop:sync_SpellCheckCallback
+prop:sync_SpellCheckVariantsFound
 prop:asc_showComments
 prop:asc_hideComments
 prop:asc_addComment
@@ -807,6 +810,11 @@ prop:get_ToolTip
 prop:put_ToolTip
 prop:get_Text
 prop:put_Text
+---
+var:asc_CSpellCheckProperty
+prop:get_Word
+prop:get_Checked
+prop:get_Variants
 ---
 var:asc_CCommentData
 prop:asc_getText
@@ -1238,6 +1246,7 @@ asc_docs_api.prototype['put_TextPrSpacing'] = asc_docs_api.prototype.put_TextPrS
 asc_docs_api.prototype['put_TextPrCaps'] = asc_docs_api.prototype.put_TextPrCaps;
 asc_docs_api.prototype['put_TextPrSmallCaps'] = asc_docs_api.prototype.put_TextPrSmallCaps;
 asc_docs_api.prototype['put_TextPrPosition'] = asc_docs_api.prototype.put_TextPrPosition;
+asc_docs_api.prototype['put_TextPrLang'] = asc_docs_api.prototype.put_TextPrLang;
 asc_docs_api.prototype['put_PrLineSpacing'] = asc_docs_api.prototype.put_PrLineSpacing;
 asc_docs_api.prototype['put_LineSpacingBeforeAfter'] = asc_docs_api.prototype.put_LineSpacingBeforeAfter;
 asc_docs_api.prototype['FontSizeIn'] = asc_docs_api.prototype.FontSizeIn;
@@ -1376,6 +1385,8 @@ asc_docs_api.prototype['sync_HyperlinkClickCallback'] = asc_docs_api.prototype.s
 asc_docs_api.prototype['sync_CanAddHyperlinkCallback'] = asc_docs_api.prototype.sync_CanAddHyperlinkCallback;
 asc_docs_api.prototype['sync_DialogAddHyperlink'] = asc_docs_api.prototype.sync_DialogAddHyperlink;
 asc_docs_api.prototype['sync_DialogAddHyperlink'] = asc_docs_api.prototype.sync_DialogAddHyperlink;
+asc_docs_api.prototype['sync_SpellCheckCallback'] = asc_docs_api.prototype.sync_SpellCheckCallback;
+asc_docs_api.prototype['sync_SpellCheckVariantsFound'] = asc_docs_api.prototype.sync_SpellCheckVariantsFound;
 asc_docs_api.prototype['asc_showComments'] = asc_docs_api.prototype.asc_showComments;
 asc_docs_api.prototype['asc_hideComments'] = asc_docs_api.prototype.asc_hideComments;
 asc_docs_api.prototype['asc_addComment'] = asc_docs_api.prototype.asc_addComment;
@@ -1742,6 +1753,10 @@ CHyperlinkProperty.prototype['get_ToolTip'] = CHyperlinkProperty.prototype.get_T
 CHyperlinkProperty.prototype['put_ToolTip'] = CHyperlinkProperty.prototype.put_ToolTip;
 CHyperlinkProperty.prototype['get_Text'] = CHyperlinkProperty.prototype.get_Text;
 CHyperlinkProperty.prototype['put_Text'] = CHyperlinkProperty.prototype.put_Text;
+window['asc_CSpellCheckProperty'] = asc_CSpellCheckProperty;
+asc_CSpellCheckProperty.prototype['get_Word'] = asc_CSpellCheckProperty.prototype.get_Word;
+asc_CSpellCheckProperty.prototype['get_Checked'] = asc_CSpellCheckProperty.prototype.get_Checked;
+asc_CSpellCheckProperty.prototype['get_Variants'] = asc_CSpellCheckProperty.prototype.get_Variants;
 window['asc_CCommentData'] = asc_CCommentData;
 asc_CCommentData.prototype['asc_getText'] = asc_CCommentData.prototype.asc_getText;
 asc_CCommentData.prototype['asc_putText'] = asc_CCommentData.prototype.asc_putText;
