@@ -67,6 +67,7 @@ var historyitem_TextPr_SmallCaps  = 15; // Изменяем все буквы н
 var historyitem_TextPr_Position   = 16; // Изменяем вертикальное положение
 var historyitem_TextPr_Value      = 17; // Изменяем целиком все настройки
 var historyitem_TextPr_RFonts     = 18; // Изменяем настройки шрифтов
+var historyitem_TextPr_Lang       = 19; // Изменяем настройку языка
 
 // Типы изменений в классе ParaDrawing
 var historyitem_Drawing_Size              = 1; // Изменяем размер картинки
@@ -81,7 +82,7 @@ var historyitem_Drawing_AbsoluteTransform = 9;
 var historyitem_Drawing_BehindDoc         = 10; // Изменяем положение объекта (за/перед текстом)
 var historyitem_Drawing_SetZIndex         = 11;
 var historyitem_Drawing_SetGraphicObject  = 12;
-var historyitem_CalculateAfterPaste = 13;
+var historyitem_CalculateAfterPaste       = 13;
 
 
 // Типы изменений в классе CDrawingObjects

@@ -827,6 +827,10 @@ Paragraph.prototype =
     {
         this.SpellChecker.Clear();
 
+        var Pr        = this.Get_CompiledPr();
+        var CurTextPr = Pr.TextPr;
+        var CurLcid   = CurTextPr.Lang.Val;
+
         var bWord      = false;
         var sWord      = "";
         var nWordStart = 0;
@@ -838,7 +842,19 @@ Paragraph.prototype =
             var Item = this.Content[Pos];
 
             if ( para_TextPr === Item.Type )
+            {
+                CurTextPr = this.Internal_CalculateTextPr( Pos );
+
+                if ( true === bWord && CurLcid != CurTextPr.Lang.Val )
+                {
+                    bWord = false;
+                    this.SpellChecker.Add( nWordStart, nWordEnd, sWord, CurLcid );
+                }
+
+                CurLcid = CurTextPr.Lang.Val;
+
                 continue;
+            }
             else if ( para_Text === Item.Type && false === Item.Is_Punctuation() && false === Item.Is_NBSP() )
             {
                 if ( false === bWord )
@@ -859,7 +875,7 @@ Paragraph.prototype =
                 if ( true === bWord )
                 {
                     bWord = false;
-                    this.SpellChecker.Add( nWordStart, nWordEnd, sWord );
+                    this.SpellChecker.Add( nWordStart, nWordEnd, sWord, CurLcid );
                 }
             }
         }
@@ -6539,8 +6555,24 @@ Paragraph.prototype =
         }
     },
 
+    Internal_Clear_EmptyTextPr : function()
+    {
+        var Count = this.Content.length;
+        for ( var Pos = 0; Pos < Count - 1; Pos++ )
+        {
+            if ( para_TextPr === this.Content[Pos].Type && para_TextPr === this.Content[Pos + 1].Type )
+            {
+                this.Internal_Content_Remove( Pos );
+                Pos--;
+                Count--;
+            }
+        }
+    },
+
     Internal_AddTextPr : function(TextPr)
     {
+        this.Internal_Clear_EmptyTextPr();
+
         if ( undefined != TextPr.FontFamily )
         {
             var FName  = TextPr.FontFamily.Name;
@@ -9628,6 +9660,15 @@ Paragraph.prototype =
     {
         if ( true === this.Selection.Use )
         {
+            var StartPos = this.Selection.StartPos;
+            var EndPos   = this.Selection.EndPos;
+
+            if ( StartPos > EndPos )
+            {
+                StartPos = this.Selection.EndPos;
+                EndPos   = this.Selection.StartPos;
+            }
+
             var Hyper_start = this.Check_Hyperlink2( this.Selection.StartPos );
             var Hyper_end   = this.Check_Hyperlink2( this.Selection.EndPos );
 
@@ -9680,6 +9721,8 @@ Paragraph.prototype =
 
                 editor.sync_HyperlinkPropCallback( HyperProps );
             }
+
+            this.SpellChecker.Document_UpdateInterfaceState( StartPos, EndPos );
         }
         else
         {
@@ -9733,6 +9776,8 @@ Paragraph.prototype =
 
                 editor.sync_HyperlinkPropCallback( HyperProps );
             }
+
+            this.SpellChecker.Document_UpdateInterfaceState( this.CurPos.ContentPos, this.CurPos.ContentPos );
         }
     },
 
@@ -12213,9 +12258,9 @@ CParaSpellChecker.prototype =
         this.RecalcId = RecalcId;
     },
 
-    Add : function(StartPos, EndPos, Word)
+    Add : function(StartPos, EndPos, Word, Lang)
     {
-        this.Elements.push( new CParaSpellCheckerElement( StartPos, EndPos, Word ) );
+        this.Elements.push( new CParaSpellCheckerElement( StartPos, EndPos, Word, Lang ) );
     },
 
     Check : function()
@@ -12231,7 +12276,7 @@ CParaSpellChecker.prototype =
         }
 
         if ( 0 < usrWords.length )
-            spellCheck(editor, SpellCheck_CallBack, JSON.stringify({"type": "spell", "ParagraphId": this.ParaId, "RecalcId" : this.RecalcId, "usrWords" : usrWords, "usrLang" : usrLang }) );
+            spellCheck(editor, SpellCheck_CallBack, JSON.stringify({"type": "spell", "ParagraphId": this.ParaId, "RecalcId" : this.RecalcId, "ElementId" : 0, "usrWords" : usrWords, "usrLang" : usrLang }) );
     },
 
     Check_CallBack : function(RecalcId, UsrCorrect)
@@ -12265,19 +12310,66 @@ CParaSpellChecker.prototype =
         return true;
     },
 
-    Set_RecalcId : function(RecalcId)
+    Document_UpdateInterfaceState : function(StartPos, EndPos)
     {
-        this.RecalcId = RecalcId;
+        // Надо определить, попадает ли какое-либо неверно набранное слово в заданный промежуток, и одно ли оно
+        var Count = this.Elements.length;
+        var FoundElement = null;
+        var FoundIndex   = -1;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            var Element = this.Elements[Index];
+            if ( Element.StartPos <= EndPos && Element.EndPos >= StartPos && false === Element.Checked )
+            {
+                if ( null != FoundElement )
+                {
+                    FoundElement = null;
+                    break;
+                }
+                else
+                {
+                    FoundIndex   = Index;
+                    FoundElement = Element;
+                }
+            }
+        }
+
+        var Word     = "";
+        var Variants = null;
+        var Checked  = true;
+
+        if ( null != FoundElement )
+        {
+            Word     = FoundElement.Word;
+            Variants = FoundElement.Variants;
+            Checked  = FoundElement.Checked;
+
+            if ( null === Variants )
+            {
+                spellCheck(editor, SpellCheck_CallBack, JSON.stringify({"type": "suggest", "ParagraphId": this.ParaId, "RecalcId" : this.RecalcId, "ElementId" : FoundIndex, "usrWords" : [Word], "usrLang" : [FoundElement.Lang] }) );
+            }
+        }
+
+        editor.sync_SpellCheckCallback( Word, Checked, Variants );
+    },
+
+    Check_CallBack2: function(RecalcId, ElementId, usrVariants)
+    {
+        if ( RecalcId == this.RecalcId )
+        {
+            this.Elements[ElementId].Variants = usrVariants[0];
+        }
     }
 };
 
-function CParaSpellCheckerElement(StartPos, EndPos, Word)
+function CParaSpellCheckerElement(StartPos, EndPos, Word, Lang)
 {
     this.StartPos = StartPos;
     this.EndPos   = EndPos;
     this.Word     = Word;
-    this.Lang     = lcid_enUS;
+    this.Lang     = Lang;
     this.Checked  = true;
+    this.Variants = null;
 }
 
 CParaSpellCheckerElement.prototype =
@@ -12291,10 +12383,19 @@ function SpellCheck_CallBack(Obj)
     {
         var ParaId = Obj["ParagraphId"];
         var Paragraph = g_oTableId.Get_ById( ParaId );
+        var Type   = Obj["type"];
         if ( null != Paragraph )
         {
-            Paragraph.SpellChecker.Check_CallBack( Obj["RecalcId"], Obj["usrCorrect"] );
-            Paragraph.ReDraw();
+            if ( "spell" === Type )
+            {
+                Paragraph.SpellChecker.Check_CallBack( Obj["RecalcId"], Obj["usrCorrect"] );
+                Paragraph.ReDraw();
+            }
+            else if ( "suggest" === Type )
+            {
+                Paragraph.SpellChecker.Check_CallBack2( Obj["RecalcId"], Obj["ElementId"], Obj["usrSuggest"] );
+                editor.sync_SpellCheckVariantsFound();
+            }
         }
     }
 }

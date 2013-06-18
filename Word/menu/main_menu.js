@@ -1806,6 +1806,12 @@ $(".colorWatch").mouseover(function(){
          sendStatus( "There're some changed to be updated" );
      });
 
+     editor.asc_registerCallback("asc_onSpellCheckVariantsFound", function()
+     {
+         editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
+     });
+
+
      $("#hafFP").click(function(){
 		editor.HeadersAndFooters_DifferentFirstPage(document.getElementById ("hafFP").checked);
 	})
@@ -1995,6 +2001,19 @@ $(".colorWatch").mouseover(function(){
          var TableStyleId = Styles.Get_StyleIdByName( this.options[this.selectedIndex].text );
 
          editor.tblApply( { TableStyle : TableStyleId } );
+     })
+
+     $("#prLang").change(function(evt)
+     {
+         var lcid = lcid_enUS;
+         switch (this.selectedIndex)
+         {
+             case 0 : lcid = lcid_enUS; break;
+             case 1 : lcid = lcid_ruRU; break;
+             case 2 : lcid = lcid_deDE; break;
+         }
+
+         editor.put_TextPrLang( lcid );
      })
 
      $("#tblLookFirstRow, #tblLookLastRow, #tblLookFirstCol, #tblLookLastCol, #tblLookHorBand, #tblLookVerBand,").change(function(evt)
@@ -2739,6 +2758,41 @@ $(".colorWatch").mouseover(function(){
                         $("#hyperToolTip").val( elemVal.ToolTip );
                     else
                         $("#hyperToolTip").val("");
+                }
+                else if ( ObjectType == c_oAscTypeSelectElement.SpellCheck )
+                {
+                    var elemVal = elemArg.get_ObjectValue();
+
+                    var Word     = elemVal.get_Word();
+                    var Checked  = elemVal.get_Checked();
+                    var Variants = elemVal.get_Variants();
+
+                    var SpellingVariants = document.getElementById("prSpellingVariants");
+                    SpellingVariants.options.length = 0;
+
+                    if ( true === Checked )
+                    {
+
+                    }
+                    else
+                    {
+                        var SpellingVariants = document.getElementById("prSpellingVariants");
+                        SpellingVariants.options.length = 0;
+
+                        if ( null != Variants && 0 < Variants.length )
+                        {
+                            SpellingVariants.disabled = 0;
+                            for ( var Index = 0; Index < Variants.length; Index++ )
+                            {
+                                $('#prSpellingVariants').append($('<option>', { Index : Index } ).text(Variants[Index]));
+                            }
+                        }
+                        else
+                        {
+                            SpellingVariants.disabled = "disabled";
+                            $('#prSpellingVariants').append($('<option>', { Index : 0 } ).text("Нет вариантов"));
+                        }
+                    }
                 }
 			}
 		}

@@ -50,7 +50,7 @@ var g_aPunctuation =
 [
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1,
+    0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1,
     1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1,
@@ -60,6 +60,8 @@ var g_aPunctuation =
 
 g_aPunctuation[0x00AB] = 1; // символ «
 g_aPunctuation[0x00BB] = 1; // символ »
+g_aPunctuation[0x2013] = 1; // символ –
+g_aPunctuation[0x2026] = 1; // символ ...
 
 // Класс ParaText
 function ParaText(value)
@@ -122,8 +124,9 @@ ParaText.prototype =
             var Hint = TextPr.RFonts.Hint;
             var bCS  = TextPr.CS;
             var bRTL = TextPr.RTL;
+            var lcid = TextPr.Lang.EastAsia;
 
-            this.FontSlot = g_font_detector.Get_FontClass( this.CalcValue.charCodeAt(0), Hint, lcid_unknown, bCS, bRTL );
+            this.FontSlot = g_font_detector.Get_FontClass( this.CalcValue.charCodeAt(0), Hint, lcid, bCS, bRTL );
 
             Context.SetFontSlot( this.FontSlot, this.FontKoef );
             var Temp = Context.Measure( this.CalcValue );
@@ -425,6 +428,9 @@ ParaTextPr.prototype =
 
         if ( undefined != TextPr.RFonts )
             this.Set_RFonts( TextPr.RFonts );
+
+        if ( undefined != TextPr.Lang )
+            this.Set_Lang( TextPr.Lang );
     },
 
     Set_Prop : function(Prop, Value)
@@ -645,6 +651,19 @@ ParaTextPr.prototype =
 
         History.Add( this, { Type : historyitem_TextPr_RFonts, New : Value, Old : OldValue } );
     },
+
+    Set_Lang : function(Value)
+    {
+        var OldValue = this.Value;
+
+        var NewValue = new CLang();
+        if ( undefined != Value )
+            NewValue.Set_FromObject( Value );
+
+        this.Value.Lang = NewValue;
+
+        History.Add( this, { Type : historyitem_TextPr_Lang, New : NewValue, Old : OldValue } );
+    },
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------
@@ -824,6 +843,16 @@ ParaTextPr.prototype =
                     this.Value = Data.Old;
                 else
                     this.Value = new CRFonts();
+
+                break;
+            }
+
+            case historyitem_TextPr_Lang:
+            {
+                if ( undefined != Data.Old )
+                    this.Value = Data.Old;
+                else
+                    this.Value = new CLang();
 
                 break;
             }
@@ -1009,6 +1038,16 @@ ParaTextPr.prototype =
                     this.Value = Data.New;
                 else
                     this.Value = new CRFonts();
+
+                break;
+            }
+
+            case historyitem_TextPr_Lang:
+            {
+                if ( undefined != Data.New )
+                    this.Value = Data.New;
+                else
+                    this.Value = new CLang();
 
                 break;
             }
@@ -1260,6 +1299,21 @@ ParaTextPr.prototype =
             {
                 // Bool : undefined ?
                 // false -> CRFonts
+                if ( undefined != Data.Old )
+                {
+                    Writer.WriteBool( false );
+                    Data.New.Write_ToBinary( Writer );
+                }
+                else
+                    Writer.WriteBool( true );
+
+                break;
+            }
+
+            case historyitem_TextPr_Lang:
+            {
+                // Bool : undefined ?
+                // false -> CLang
                 if ( undefined != Data.Old )
                 {
                     Writer.WriteBool( false );
@@ -1543,6 +1597,21 @@ ParaTextPr.prototype =
                 }
                 else
                     this.Value.RFonts = new CRFonts();
+
+                break;
+            }
+
+            case historyitem_TextPr_Lang:
+            {
+                // Bool : undefined ?
+                // false -> Lang
+                if ( false === Reader.GetBool() )
+                {
+                    this.Value.Lang = new CLang();
+                    this.Value.Lang.Read_FromBinary( Reader );
+                }
+                else
+                    this.Value.Lang = new CLang();
 
                 break;
             }

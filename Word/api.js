@@ -2696,6 +2696,19 @@ asc_docs_api.prototype.put_TextPrPosition = function(value)
     }
 }
 
+asc_docs_api.prototype.put_TextPrLang = function(value)
+{
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
+    {
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { Lang : { Val : value } } ) );
+
+        if ( true === this.isMarkerFormat )
+            this.sync_MarkerFormatCallback( false );
+    }
+}
+
+
 asc_docs_api.prototype.put_PrLineSpacing = function(Type, Value)
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
@@ -4816,6 +4829,30 @@ asc_docs_api.prototype.sync_DialogAddHyperlink = function()
 asc_docs_api.prototype.sync_DialogAddHyperlink = function()
 {
     this.asc_fireCallback("asc_onDialogAddHyperlink");
+}
+
+//-----------------------------------------------------------------
+// Функции для работы с орфографией
+//-----------------------------------------------------------------
+function asc_CSpellCheckProperty( Word, Checked, Variants )
+{
+    this.Word     = Word;
+    this.Checked  = Checked;
+    this.Variants = Variants;
+}
+
+asc_CSpellCheckProperty.prototype.get_Word     = function()  { return this.Word; }
+asc_CSpellCheckProperty.prototype.get_Checked  = function()  { return this.Checked; }
+asc_CSpellCheckProperty.prototype.get_Variants = function()  { return this.Variants; }
+
+asc_docs_api.prototype.sync_SpellCheckCallback = function(Word, Checked, Variants)
+{
+    this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new CSelectedObject( c_oAscTypeSelectElement.SpellCheck, new asc_CSpellCheckProperty( Word, Checked, Variants ) );
+}
+
+asc_docs_api.prototype.sync_SpellCheckVariantsFound = function()
+{
+    this.asc_fireCallback("asc_onSpellCheckVariantsFound");
 }
 //-----------------------------------------------------------------
 // Функции для работы с комментариями

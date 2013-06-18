@@ -105,11 +105,12 @@ var c_oAscError = {
 
 var c_oAscTypeSelectElement =
 {
-	Paragraph : 0,
-	Table     : 1,
-	Image     : 2,
-	Header    : 3,
-    Hyperlink : 4
+	Paragraph  : 0,
+	Table      : 1,
+	Image      : 2,
+	Header     : 3,
+    Hyperlink  : 4,
+    SpellCheck : 5
 }	
 
 var c_oAscTableBordersType = {

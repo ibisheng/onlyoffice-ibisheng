@@ -4229,6 +4229,117 @@ CRFonts.prototype =
     }
 };
 
+function CLang()
+{
+    this.Bidi     = undefined;
+    this.EastAsia = undefined;
+    this.Val      = undefined;
+}
+
+CLang.prototype =
+{
+    Copy : function()
+    {
+        var Lang = new CLang();
+        Lang.Bidi     = this.Bidi;
+        Lang.EastAsia = this.EastAsia;
+        Lang.Val      = this.Val;
+        return Lang;
+    },
+
+    Merge : function(Lang)
+    {
+        if ( undefined !== Lang.Bidi )
+            this.Bidi = Lang.Bidi;
+
+        if ( undefined !== Lang.EastAsia )
+            this.EastAsia = Lang.EastAsia;
+
+        if ( undefined !== Lang.Val )
+            this.Val = Lang.Val;
+    },
+
+    Init_Default : function()
+    {
+        this.Bidi     = lcid_ruRU;
+        this.EastAsia = lcid_ruRU;
+        this.Val      = lcid_ruRU;
+    },
+
+    Set_FromObject : function(Lang)
+    {
+        this.Bidi     = Lang.Bidi;
+        this.EastAsia = Lang.EastAsia;
+        this.Val      = Lang.Val;
+    },
+
+    Compare : function(Lang)
+    {
+        var Result_Lang = new CLang();
+
+        // Bidi
+        if ( this.Bidi === Lang.Bidi )
+            Result_Lang.Bidi = Lang.Bidi;
+
+        // EastAsia
+        if ( this.EastAsia === Lang.EastAsia )
+            Result_Lang.EastAsia = Lang.EastAsia;
+
+        // Val
+        if ( this.Val === Lang.Val )
+            Result_Lang.Val = Lang.Val;
+
+        return Result_Lang;
+    },
+
+    Write_ToBinary : function(Writer)
+    {
+        var StartPos = Writer.GetCurPosition();
+        Writer.Skip(4);
+        var Flags = 0;
+
+        if ( undefined != this.Bidi )
+        {
+            Writer.WriteLong( this.Bidi );
+            Flags |= 1;
+        }
+
+        if ( undefined != this.EastAsia )
+        {
+            Writer.WriteLong( this.EastAsia );
+            Flags |= 2;
+        }
+
+        if ( undefined != this.Val )
+        {
+            Writer.WriteLong( this.Val );
+            Flags |= 4;
+        }
+
+        var EndPos = Writer.GetCurPosition();
+        Writer.Seek( StartPos );
+        Writer.WriteLong( Flags );
+        Writer.Seek( EndPos );
+    },
+
+    Read_FromBinary : function(Reader)
+    {
+        var Flags = Reader.GetLong();
+
+        // Bidi
+        if ( Flags & 1 )
+            this.Bidi = Reader.GetLong();
+
+        // EastAsia
+        if ( Flags & 2 )
+            this.EastAsia = Reader.GetLong();
+
+        // Val
+        if ( Flags & 4 )
+            this.Val = Reader.GetLong();
+    }
+};
+
 function CTextPr()
 {
     this.Bold       = undefined; // Жирный текст
@@ -4247,12 +4358,13 @@ function CTextPr()
     this.SmallCaps  = undefined;
     this.Position   = undefined; // Смещение по Y
 
-    this.RFonts       = new CRFonts();
-    this.BoldCS       = undefined;
-    this.ItalicCS     = undefined;
-    this.FontSizeCS   = undefined;
-    this.CS           = undefined;
-    this.RTL          = undefined;
+    this.RFonts     = new CRFonts();
+    this.BoldCS     = undefined;
+    this.ItalicCS   = undefined;
+    this.FontSizeCS = undefined;
+    this.CS         = undefined;
+    this.RTL        = undefined;
+    this.Lang       = new CLang();
 }
 
 CTextPr.prototype =
@@ -4275,12 +4387,13 @@ CTextPr.prototype =
         this.SmallCaps  = undefined;
         this.Position   = undefined;
 
-        this.RFonts       = new CRFonts();
-        this.BoldCS       = undefined;
-        this.ItalicCS     = undefined;
-        this.FontSizeCS   = undefined;
-        this.CS           = undefined;
-        this.RTL          = undefined;
+        this.RFonts     = new CRFonts();
+        this.BoldCS     = undefined;
+        this.ItalicCS   = undefined;
+        this.FontSizeCS = undefined;
+        this.CS         = undefined;
+        this.RTL        = undefined;
+        this.Lang       = undefined;
     },
 
     Copy : function()
@@ -4318,13 +4431,13 @@ CTextPr.prototype =
         TextPr.Caps       = this.Caps;
         TextPr.SmallCaps  = this.SmallCaps;
         TextPr.Position   = this.Position;
-
-        TextPr.RFonts       = this.RFonts.Copy();
-        TextPr.BoldCS       = this.BoldCS;
-        TextPr.ItalicCS     = this.ItalicCS;
-        TextPr.FontSizeCS   = this.FontSizeCS;
-        TextPr.CS           = this.CS;
-        TextPr.RTL          = this.RTL;
+        TextPr.RFonts     = this.RFonts.Copy();
+        TextPr.BoldCS     = this.BoldCS;
+        TextPr.ItalicCS   = this.ItalicCS;
+        TextPr.FontSizeCS = this.FontSizeCS;
+        TextPr.CS         = this.CS;
+        TextPr.RTL        = this.RTL;
+        TextPr.Lang       = this.Lang.Copy();
 
         return TextPr;
     },
@@ -4400,6 +4513,8 @@ CTextPr.prototype =
 
         if ( undefined != TextPr.RTL )
             this.RTL = TextPr.RTL;
+
+        this.Lang.Merge( TextPr.Lang );
     },
 
     Init_Default : function()
@@ -4423,13 +4538,13 @@ CTextPr.prototype =
         this.SmallCaps  = false;
         this.Caps       = false;
         this.Position   = 0;
-
         this.RFonts.Init_Default();
-        this.BoldCS       = false;
-        this.ItalicCS     = false;
-        this.FontSizeCS   = 11;
-        this.CS           = false;
-        this.RTL          = false;
+        this.BoldCS     = false;
+        this.ItalicCS   = false;
+        this.FontSizeCS = 11;
+        this.CS         = false;
+        this.RTL        = false;
+        this.Lang.Init_Default();
     },
 
     Set_FromObject : function(TextPr)
@@ -4481,6 +4596,9 @@ CTextPr.prototype =
         this.FontSizeCS   = TextPr.FontSizeCS;
         this.CS           = TextPr.CS;
         this.RTL          = TextPr.RTL;
+
+        if ( undefined != TextPr.Lang )
+            this.Lang.Set_FromObject( TextPr.Lang );
     },
 
     Compare : function(TextPr)
@@ -4578,6 +4696,9 @@ CTextPr.prototype =
         // RTL
         if ( this.RTL === TextPr.RTL )
             Result_TextPr.RTL = TextPr.RTL;
+
+        // Lang
+        Result_TextPr.Lang = this.Lang.Compare( TextPr.Lang );
 
         return Result_TextPr;
     },
@@ -4723,6 +4844,12 @@ CTextPr.prototype =
             Flags |= 1048576;
         }
 
+        if ( undefined != this.Lang )
+        {
+            this.Lang.Write_ToBinary( Writer );
+            Flags |= 2097152;
+        }
+
         var EndPos = Writer.GetCurPosition();
         Writer.Seek( StartPos );
         Writer.WriteLong( Flags );
@@ -4828,6 +4955,10 @@ CTextPr.prototype =
         // RTL
         if ( Flags & 1048576 )
             this.RTL = Reader.GetBool();
+
+        // Lang
+        if ( Flags & 2097152 )
+            this.Lang.Read_FromBinary( Reader );
     },
 
     Check_NeedRecalc : function()
@@ -4872,6 +5003,9 @@ CTextPr.prototype =
             return true;
 
         if ( undefined != this.RTL || undefined != this.CS || undefined != this.BoldCS || undefined != this.ItalicCS || undefined != this.FontSizeCS )
+            return true;
+
+        if ( undefined != this.Lang.Val )
             return true;
 
         return false;
