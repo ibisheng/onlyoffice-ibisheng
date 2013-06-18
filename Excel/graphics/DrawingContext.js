@@ -527,13 +527,10 @@ function DrawingContext(settings) {
 	this.changeUnits( settings !== undefined && settings.units !== undefined ? settings.units : this.units );
 
 	this.fontRenderingMode = c_oAscFontRenderingModeType.noHinting;
-    // TODO: вместо двух использовать один менеджер для измерения и отображения
-	this.fmgrMeasure = new CFontManager();  // FontManager for measure
-	this.fmgrMeasure.Initialize();
 
-	this.fmgrGraphics = [];                      // FontManager for draw
-    this.fmgrGraphics.push(new CFontManager());
-    this.fmgrGraphics.push(new CFontManager());
+	this.fmgrGraphics = [];						// FontManager for draw (1 для обычного + 1 для поворотного текста)
+    this.fmgrGraphics.push(new CFontManager());	// Для обычного
+    this.fmgrGraphics.push(new CFontManager());	// Для поворотного
 
     this.fmgrGraphics[0].Initialize(true); // IE memory enable
 	this.fmgrGraphics[1].Initialize(true); // IE memory enable
@@ -835,7 +832,7 @@ DrawingContext.prototype = {
 	 * @return {FontMetrics}
 	 */
 	getFontMetrics: function (units) {
-		var fm = this.fmgrMeasure,
+		var fm = this.fmgrGraphics[0],
 		    d  = Math.abs(fm.m_lDescender),
 		    r  = getCvtRatio(0/*px*/, units >= 0 && units <=3 ? units : this.units, this.ppiX),
 		    factor = this.getFontSize() * r / fm.m_lUnits_Per_Em;
@@ -847,7 +844,7 @@ DrawingContext.prototype = {
 	},
 
     setFont: function (font, angle) {
-        var italic, bold, fontStyle, r1, r2;
+        var italic, bold, fontStyle, r;
 
         if (font.FontFamily.Index === undefined ||
             font.FontFamily.Index === null ||
@@ -870,21 +867,18 @@ DrawingContext.prototype = {
 
         if (angle && 0 != angle) {
 
-            r1 = g_font_infos[ font.FontFamily.Index ].LoadFont(
+            r = g_font_infos[ font.FontFamily.Index ].LoadFont(
                 g_font_loader, this.fmgrGraphics[1], font.FontSize, fontStyle, this.ppiX, this.ppiY);
 
             this.fmgrGraphics[1].SetTextMatrix(
                 this._mt.sx, this._mt.shy, this._mt.shx, this._mt.sy, this._mt.tx, this._mt.ty);
         } else {
 
-            r1 = g_font_infos[ font.FontFamily.Index ].LoadFont(
+            r = g_font_infos[ font.FontFamily.Index ].LoadFont(
                 g_font_loader, this.fmgrGraphics[0], font.FontSize, fontStyle, this.ppiX, this.ppiY);
-
-            r2 = g_font_infos[ font.FontFamily.Index ].LoadFont(
-                g_font_loader, this.fmgrMeasure, font.FontSize, fontStyle, this.ppiX, this.ppiY);
         }
 
-        if (r1 === false || r2 === false) {
+        if (r === false) {
             throw "Can not use " + font.FontFamily.Name + " font. (Check whether font file is loaded)";
         }
 
@@ -908,7 +902,7 @@ DrawingContext.prototype = {
 	 * @return {TextMetrics}  Returns the dimension of string {width: w, height: h}
 	 */
 	measureText: function (text, units) {
-		var fm = this.fmgrMeasure,
+		var fm = this.fmgrGraphics[0],
 		    r  = getCvtRatio(0/*px*/, units >= 0 && units <=3 ? units : this.units, this.ppiX);
 		for (var tmp, w = 0, w2 = 0, i = 0; i < text.length; ++i) {
 			tmp = fm.MeasureChar( text.charCodeAt(i) );
