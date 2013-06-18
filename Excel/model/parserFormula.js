@@ -15,16 +15,16 @@ var cElementType = {
 };
 /** @enum */
 var cErrorType = {
-    division_by_zero: 		0,
-    not_available: 			1,
-    wrong_name: 			2,
-    null_value:				3,
-    not_numeric:			4,
-    bad_reference:			5,
-    wrong_value_type:		6,
-    unsupported_function:	7,
-	getting_data:			8
-}
+    division_by_zero: 0,
+    not_available: 1,
+    wrong_name: 2,
+    null_value: 3,
+    not_numeric: 4,
+    bad_reference: 5,
+    wrong_value_type: 6,
+    unsupported_function: 7,
+    getting_data: 8
+};
 var cExcelSignificantDigits = 15;//количество цифр в числе после запятой
 var cExcelMaxExponent = 308, cExcelMinExponent = -308;
 var cExcelDateTimeDigits = 8;//количество цифр после запятой в числах отвечающих за время специализация $18.17.4.2
@@ -34,21 +34,19 @@ var c_Date1900Const = 25568; //разница в днях между 01.01.1970 
 var c_DateCorrectConst = c_Date1900Const;
 	
 function extend(Child, Parent) {
-	var F = function() { }
-	F.prototype = Parent.prototype
-	Child.prototype = new F()
-	Child.prototype.constructor = Child
-	Child.superclass = Parent.prototype
+	var F = function() {};
+	F.prototype = Parent.prototype;
+	Child.prototype = new F();
+	Child.prototype.constructor = Child;
+	Child.superclass = Parent.prototype;
 }
 
-Date.prototype.isLeapYear = function()
-{
+Date.prototype.isLeapYear = function(){
     var y = this.getFullYear();
     return y % 4 == 0 && y % 100 != 0 || y % 400 == 0;
 };
 
-Date.prototype.getDaysInMonth = function()
-{
+Date.prototype.getDaysInMonth = function(){
     return arguments.callee[this.isLeapYear() ? 'L' : 'R'][this.getMonth()];
 };
 
@@ -58,14 +56,14 @@ Date.prototype.getDaysInMonth.R = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 3
 Date.prototype.getDaysInMonth.L = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
 
-var _func = new Array();//для велосипеда а-ля перегрузка функций.
-_func[cElementType.number] = new Array();
-_func[cElementType.string] = new Array();
-_func[cElementType.bool] = new Array();
-_func[cElementType.error] = new Array();
-_func[cElementType.cellsRange] = new Array();
-_func[cElementType.empty] = new Array();
-_func[cElementType.array] = new Array();
+var _func = [];//для велосипеда а-ля перегрузка функций.
+_func[cElementType.number] = [];
+_func[cElementType.string] = [];
+_func[cElementType.bool] = [];
+_func[cElementType.error] = [];
+_func[cElementType.cellsRange] = [];
+_func[cElementType.empty] = [];
+_func[cElementType.array] = [];
 
 
 _func[cElementType.number][cElementType.number] = function(arg0,arg1,what){
@@ -94,6 +92,7 @@ _func[cElementType.number][cElementType.number] = function(arg0,arg1,what){
         case "*":
             return new cNumber( arg0.getValue() * arg1.getValue() );
     }
+    return new cError( cErrorType.wrong_value_type);
 }
 
 _func[cElementType.number][cElementType.string] = function(arg0,arg1,what){
@@ -114,6 +113,7 @@ _func[cElementType.number][cElementType.string] = function(arg0,arg1,what){
         case "*":
 			return new cError( cErrorType.wrong_value_type );
     }
+    return new cError( cErrorType.wrong_value_type);
 }
 
 _func[cElementType.number][cElementType.bool] = function(arg0,arg1,what){
@@ -148,6 +148,7 @@ _func[cElementType.number][cElementType.bool] = function(arg0,arg1,what){
             if( _arg instanceof cError )	return _arg;
             return new cNumber( arg0.getValue() * _arg.getValue() );
     }
+    return new cError( cErrorType.wrong_value_type);
 }
 
 _func[cElementType.number][cElementType.error] = function(arg0,arg1,what){
@@ -177,6 +178,7 @@ _func[cElementType.number][cElementType.empty] = function(arg0,arg1,what){
         case "*":
             return new cNumber( 0 );
     }
+    return new cError( cErrorType.wrong_value_type);
 }
 
 
@@ -197,6 +199,7 @@ _func[cElementType.string][cElementType.number] = function(arg0,arg1,what){
         case "*":
 			return new cError( cErrorType.wrong_value_type );
     }
+    return new cError( cErrorType.wrong_value_type);
 }
 
 _func[cElementType.string][cElementType.string] = function(arg0,arg1,what){
@@ -240,6 +243,7 @@ _func[cElementType.string][cElementType.string] = function(arg0,arg1,what){
             if( _arg1 instanceof cError )	return _arg1;
             return new cNumber( _arg0.getValue() * _arg1.getValue() );
     }
+    return new cError( cErrorType.wrong_value_type);
 }
 
 _func[cElementType.string][cElementType.bool] = function(arg0,arg1,what){
@@ -281,6 +285,7 @@ _func[cElementType.string][cElementType.bool] = function(arg0,arg1,what){
             if( _arg1 instanceof cError )	return _arg1;
             return new cNumber( _arg0.getValue() * _arg1.getValue() );
     }
+    return new cError( cErrorType.wrong_value_type);
 }
 
 _func[cElementType.string][cElementType.error] = function(arg0,arg1,what){
@@ -307,6 +312,7 @@ _func[cElementType.string][cElementType.empty] = function(arg0,arg1,what){
         case "*":
             return new cError( cErrorType.wrong_value_type );
     }
+    return new cError( cErrorType.wrong_value_type);
 }
 
 
@@ -342,6 +348,7 @@ _func[cElementType.bool][cElementType.number] = function(arg0,arg1,what){
             if( _arg instanceof cError )	return _arg;
             return new cNumber( _arg.getValue() * arg1.getValue() );
     }
+    return new cError( cErrorType.wrong_value_type);
 }
 
 _func[cElementType.bool][cElementType.string] = function(arg0,arg1,what){
@@ -379,6 +386,7 @@ _func[cElementType.bool][cElementType.string] = function(arg0,arg1,what){
             if( _arg1 instanceof cError )	return _arg1;
             return new cNumber( _arg0.getValue() * _arg1.getValue() );
     }
+    return new cError( cErrorType.wrong_value_type);
 }
 
 _func[cElementType.bool][cElementType.bool] = function(arg0,arg1,what){
@@ -414,6 +422,7 @@ _func[cElementType.bool][cElementType.bool] = function(arg0,arg1,what){
             _arg1 = arg1.tocNumber();
             return new cNumber( _arg0.getValue() * _arg1.getValue() );
     }
+    return new cError( cErrorType.wrong_value_type);
 }
 
 _func[cElementType.bool][cElementType.error] = function(arg0,arg1,what){
@@ -443,6 +452,7 @@ _func[cElementType.bool][cElementType.empty] = function(arg0,arg1,what){
         case "*":
             return new cNumber( 0 );
     }
+    return new cError( cErrorType.wrong_value_type);
 }
 
 
@@ -478,6 +488,7 @@ _func[cElementType.empty][cElementType.number] = function(arg0,arg1,what){
         case "*":
             return new cNumber( 0 );
     }
+    return new cError( cErrorType.wrong_value_type);
 }
 
 _func[cElementType.empty][cElementType.string] = function(arg0,arg1,what){
@@ -500,6 +511,7 @@ _func[cElementType.empty][cElementType.string] = function(arg0,arg1,what){
         case "*":
             return new cError( cErrorType.wrong_value_type );
     }
+    return new cError( cErrorType.wrong_value_type);
 }
 
 _func[cElementType.empty][cElementType.bool] = function(arg0,arg1,what){
@@ -527,6 +539,7 @@ _func[cElementType.empty][cElementType.bool] = function(arg0,arg1,what){
         case "*":
             return new cNumber( 0 );
     }
+    return new cError( cErrorType.wrong_value_type);
 }
 
 _func[cElementType.empty][cElementType.error] = function(arg0,arg1,what){
@@ -551,6 +564,7 @@ _func[cElementType.empty][cElementType.empty] = function(arg0,arg1,what){
         case "*":
             return new cNumber( 0 );
     }
+    return new cError( cErrorType.wrong_value_type);
 }
 
 
@@ -1697,7 +1711,7 @@ var cFormulaFunction = {
 				if( arg0 instanceof cError) return this.value = arg0;
 				if( arg1 instanceof cError) return this.value = arg1;
 				
-				var val = arg0.getValue();
+				var val = arg0.getValue(), date, _date;
 				
 				if(val < 0)
 					return this.setCA(new cError( cErrorType.not_numeric ),true);
@@ -1712,17 +1726,28 @@ var cFormulaFunction = {
 				else
 					val = new Date((val-c_DateCorrectConst)*86400*1000);
 					
-				val = new Date(val.setMonth(val.getMonth()+arg1.getValue()))
-					
-				return this.value = new cNumber( Math.floor( ( val.getTime()/1000 - val.getTimezoneOffset()*60 )/86400+(c_DateCorrectConst+1) ) )
+				date = new Date(val);
 				
+				if( 0 <= date.getDate() && 28 >= date.getDate() ){
+					val = new Date(val.setMonth(val.getMonth()+arg1.getValue()))
+				}
+				else if( 29 <= date.getDate() && 31 >= date.getDate() ){
+					date.setDate(1);
+					date.setMonth(date.getMonth()+arg1.getValue());
+					if( val.getDate() > (_date = date.getDaysInMonth()) ){
+						val.setDate( _date );
+					}
+					val = new Date(val.setMonth(val.getMonth()+arg1.getValue()));
+				}
+
+				return this.value = new cNumber( Math.floor( ( val.getTime()/1000 - val.getTimezoneOffset()*60 )/86400+(c_DateCorrectConst+1) ) )
 			}
-			/* r.getInfo = function(){
+			r.getInfo = function(){
                 return {
                     name:this.name,
                     args:"( start-date , month-offset )"
                 };
-            } */
+            }
 			r.setFormat(r.formatType.noneFormat);
 			return r;
         },
