@@ -1754,6 +1754,61 @@ var cFormulaFunction = {
         'EOMONTH' : function(){
             var r = new cBaseFunction();
             r.setName("EOMONTH");
+			r.setArgumentsMin(2);
+            r.setArgumentsMax(2);
+			r.Calculate = function(arg){
+				var arg0 = arg[0], arg1 = arg[1];
+				
+				if ( arg0 instanceof cArea || arg0 instanceof cArea3D ){
+					arg0 = arg0.cross(arguments[1].first);
+				}
+				else if( arg0 instanceof cArray ){
+					arg0 = arg0.getElementRowCol(0,0);
+				}
+				
+				if ( arg1 instanceof cArea || arg1 instanceof cArea3D ){
+					arg1 = arg1.cross(arguments[1].first);
+				}
+				else if( arg1 instanceof cArray ){
+					arg1 = arg1.getElementRowCol(0,0);
+				}
+				
+				arg0 = arg0.tocNumber();
+				arg1 = arg1.tocNumber();
+				
+				if( arg0 instanceof cError) return this.value = arg0;
+				if( arg1 instanceof cError) return this.value = arg1;
+				
+				var val = arg0.getValue(), date, _date;
+				
+				if(val < 0)
+					return this.setCA(new cError( cErrorType.not_numeric ),true);
+				else if(!g_bDate1904){
+					if( val < 60 )
+						val = new Date((val-c_DateCorrectConst)*86400*1000);
+					else if( val == 60 )
+						val = new Date((val-c_DateCorrectConst-1)*86400*1000);
+					else
+						val = new Date((val-c_DateCorrectConst-1)*86400*1000);
+				}
+				else
+					val = new Date((val-c_DateCorrectConst)*86400*1000);
+					
+				date = new Date(val);
+				
+				val.setDate(1);
+				val.setMonth(val.getMonth()+arg1.getValue());
+				val.setDate(val.getDaysInMonth());
+
+				return this.value = new cNumber( Math.floor( ( val.getTime()/1000 - val.getTimezoneOffset()*60 )/86400+(c_DateCorrectConst+1) ) )
+			}
+			r.getInfo = function(){
+                return {
+                    name:this.name,
+                    args:"( start-date , month-offset )"
+                };
+            }
+			r.setFormat(r.formatType.noneFormat);
 			return r;
         },
         'HOUR' : function(){
