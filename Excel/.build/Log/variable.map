@@ -1015,7 +1015,7 @@ EBorderStyle$borderstyleDashed:kC
 c_oAscLayoutPageType$ActualSize:ut
 FT_Outline_New_Internal:tf
 CellValueType$String:ka
-JSCompiler_StaticMethods__addToFormat:qc
+JSCompiler_StaticMethods__addToFormat:pc
 FontStyle$FontStyleBold:ds
 JSCompiler_StaticMethods_changeOffset:lw
 FT_Raster_Params:Kg
@@ -1862,7 +1862,7 @@ FormatObjBracket:mc
 BULLET_TYPE_SIZE_TX:HO
 c_oAscCellEditorState$editStart:ZK
 EChartLegendPos$chartlegendposLeft:vQ
-c_oAscServerError$NoError:db
+c_oAscServerError$NoError:cb
 c_oAscError$ID$DownloadError:LR
 FT_Render_Glyph:Ar
 c_oSer_ChartPlotAreaType$ValAx:UP
@@ -2041,8 +2041,8 @@ L 31:ya
 Project:Nm
 L 30:wa
 cff_standard_encoding:rp
-L 36:pc
-L 35:cb
+L 36:qc
+L 35:db
 L 34:eb
 FT_Data:Ng
 L 33:Ia
