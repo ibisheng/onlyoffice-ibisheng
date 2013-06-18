@@ -5,23 +5,74 @@ function CMathMatrix( numRow, numCol)
     this.lineGapRow = 1;
     this.gaps = null;
 
+    this.spaceRow =
+    {
+        rule: 0,
+        gap: 0,
+        minGap: 13/12    //em
+                         // 780 /20 (pt) for font 36 pt
+    };
+    this.spaceColumn =
+    {
+        rule: 0,
+        gap: 0,
+        minGap: 0       // minGap / 20 pt
+    };
+
 }
 extend(CMathMatrix, CMathBase);
+CMathMatrix.prototype.init = function(params)
+{
+    this.params = Common_CopyObj(params);
+}
 CMathMatrix.prototype.setContent = function()
 {
     CMathMatrix.superclass.fillPlaceholders.call(this);
 }
-CMathMatrix.prototype.getLineGap = function(spaceLine)
+CMathMatrix.prototype.old_getLineGap = function(spaceLine)
 {
     var metrs = this.params.font.metrics;
     var textHeight =  metrs.Height;
-    var t = 0;         
+    var t = 0;
     if(spaceLine >= 2)
         t = metrs.Height;
     else
         t = metrs.Height - metrs.Placeholder.Height;
 
     return textHeight*(spaceLine - 1) + t;
+}
+CMathMatrix.prototype.old_recalculateSize = function()
+{
+    this.gaps = {row: new Array(), column: new Array()};
+
+    var interval = this.getLineGap(this.lineGapColumn);
+    this.gaps.column[0] = 0;
+    for(var i = 0; i < this.nCol - 1; i++)
+        this.gaps.column[i + 1] = interval ;
+
+    interval = this.getLineGap( this.lineGapRow );
+    var simpleGap = this.getLineGap(1),
+        divCenter = 0;
+
+    var metrics = this.getMetrics();
+
+    this.gaps.row[0] = 0;
+    for(var j = 0; j < this.nRow - 1; j++)
+    {
+        divCenter = metrics.descents[j] + metrics.ascents[j + 1] + simpleGap;
+        this.gaps.row[j + 1] = divCenter > interval ? simpleGap : interval -  metrics.descents[j] - metrics.ascents[j + 1];
+    }
+
+    var height = 0, width = 0;
+
+    for(var i = 0; i< this.nCol; i++)
+        width +=  this.gaps.column[i] + metrics.widths[i];
+
+    for(var j = 0; j < this.nRow; j++)
+        height += this.gaps.row[j] + metrics.ascents[j] + metrics.descents[j];
+
+    this.size = {width: width, height: height, center: height/2};
+
 }
 CMathMatrix.prototype.setLineGapColumn = function(coeff)
 {
@@ -37,22 +88,23 @@ CMathMatrix.prototype.recalculateSize = function()
 {
     this.gaps = {row: new Array(), column: new Array()};
 
-    var interval = this.getLineGap(this.lineGapColumn);
+    var interval = this.getLineGap(this.spaceColumn);
     this.gaps.column[0] = 0;
     for(var i = 0; i < this.nCol - 1; i++)
         this.gaps.column[i + 1] = interval;
 
-    interval = this.getLineGap( this.lineGapRow );
-    var simpleGap = this.getLineGap(1),
-        divCenter = 0;
+    interval = this.getRowSpace(this.spaceRow);
 
+    var divCenter = 0;
     var metrics = this.getMetrics();
 
+    var minGp = this.spaceRow.minGap*this.params.font.FontSize*g_dKoef_pt_to_mm;
+    minGp -= this.params.font.metrics.Placeholder.Height;
     this.gaps.row[0] = 0;
     for(var j = 0; j < this.nRow - 1; j++)
     {
-        divCenter = metrics.descents[j] + metrics.ascents[j + 1] + simpleGap;
-        this.gaps.row[j + 1] = divCenter > interval ? simpleGap : interval -  metrics.descents[j] - metrics.ascents[j + 1];
+        divCenter = interval - (metrics.descents[j] + metrics.ascents[j + 1]);
+        this.gaps.row[j + 1] = minGp > divCenter ? minGp : divCenter;
     }
 
     var height = 0, width = 0;
@@ -280,3 +332,127 @@ CMathMatrix.prototype.findDistance = function()
     return {w : w, h: h };
 }
 
+////  open  ////
+CMathMatrix.prototype.addRow = function()
+{
+    this.nRow++;
+
+    for(var j = 0; j < this.nCol; j++)
+    {
+        this.elements[this.nRow-1][j] = new CMathContent();
+        this.elements[this.nRow-1][j].init(this.params);
+        this.elements[this.nRow-1][j].relate(this);
+        this.elements[this.nRow-1][j].fillPlaceholders();
+    }
+
+    //this.setDistance();
+    this.recalculateSize();
+}
+CMathMatrix.prototype.getElement = function(x, y)
+{
+    return this.elements[x][y];
+}
+CMathMatrix.prototype.setRowGapRule = function(rule, gap)
+{
+    this.spaceRow.rule = rule;
+    this.spaceRow.gap = gap;
+}
+CMathMatrix.prototype.setColumnGapRule = function(rule, gap, minGap)
+{
+    this.spaceColumn.rule = rule;
+    this.spaceColumn.gap = gap;
+    this.spaceColumn.minGap = minGap;
+}
+CMathMatrix.prototype.getLineGap = function(space)
+{
+    var spLine;
+
+    if(space.rule == 0)
+        spLine = 1;             //em
+    else if(space.rule == 1)
+        spLine = 1.5;           //em
+    else if(space.rule == 2)
+        spLine = 2;             //em
+    else if(space.rule == 3)
+        spLine = space.gap/20;  //pt
+    else if(space.rule == 4)
+        spLine = space.gap/2;   //em
+    else
+        spLine = 1;
+
+    var lineGap;
+
+    if(space.rule == 3)
+        lineGap = spLine*g_dKoef_pt_to_mm;                           //pt
+    else
+        lineGap = spLine*this.params.font.FontSize*g_dKoef_pt_to_mm; //em
+
+    var min = space.minGap / 20 * g_dKoef_pt_to_mm - this.params.font.metrics.Placeholder.Width;
+    lineGap = Math.max(lineGap, min);
+    //lineGap += this.params.font.metrics.Placeholder.Height; // для случая, когда gapRow - (аскент + дескент) > minGap, вычитаем из gap строки, а здесь прибавляем стандартный metrics.Height
+
+    return lineGap;
+}
+////
+CMathMatrix.prototype.old_getRowSpace = function(space)
+{
+    var spLine;
+
+    if(space.rule == 0)
+        spLine = 840 / 20;            //pt
+    else if(space.rule == 1)
+        spLine = 840*1.5 /20;           //em
+    else if(space.rule == 2)
+        spLine = 840*2 /20;             //em
+    else if(space.rule == 3)
+        spLine = space.gap/20;  //pt
+    else if(space.rule == 4)
+        spLine = space.gap/2;   //em
+    else
+        spLine = 1;
+
+    //minGap = 780
+    var lineGap;
+
+    /*if(space.rule == 3)
+        lineGap = spLine*g_dKoef_pt_to_mm;                           //pt
+    else
+        lineGap = spLine*this.params.font.FontSize*g_dKoef_pt_to_mm; //em*/
+
+    lineGap = spLine*g_dKoef_pt_to_mm;                           //pt
+
+    lineGap = Math.max(lineGap, space.minGap*this.params.font.FontSize*g_dKoef_pt_to_mm);
+
+    return lineGap;
+}
+
+CMathMatrix.prototype.getRowSpace = function(space)
+{
+    var spLine;
+
+    if(space.rule == 0)
+        spLine = 7 /6;                 //em
+    else if(space.rule == 1)
+        spLine = 7 /6 *1.5;            //em
+    else if(space.rule == 2)
+        spLine = 7 /6 *2;              //em
+    else if(space.rule == 3)
+        spLine = space.gap/20;         //pt
+    else if(space.rule == 4)
+        spLine = 7/6 * space.gap/2;    //em
+    else
+        spLine = 7 /6;
+
+    var lineGap;
+
+    if(space.rule == 3)
+        lineGap = spLine*g_dKoef_pt_to_mm;                           //pt
+    else
+        lineGap = spLine*this.params.font.FontSize*g_dKoef_pt_to_mm; //em
+
+
+    var min = space.minGap*this.params.font.FontSize*g_dKoef_pt_to_mm;
+    lineGap = Math.max(lineGap, min);
+
+    return lineGap;
+}
