@@ -837,7 +837,7 @@ DrawingContext.prototype = {
 	getFontMetrics: function (units) {
 		var fm = this.fmgrMeasure,
 		    d  = Math.abs(fm.m_lDescender),
-		    r  = getCvtRatio(1/*pt*/, units >= 0 && units <=3 ? units : this.units, 72),
+		    r  = getCvtRatio(0/*px*/, units >= 0 && units <=3 ? units : this.units, this.ppiX),
 		    factor = this.getFontSize() * r / fm.m_lUnits_Per_Em;
 		return new FontMetrics(
 			factor * fm.m_lAscender,
@@ -881,7 +881,7 @@ DrawingContext.prototype = {
                 g_font_loader, this.fmgrGraphics[0], font.FontSize, fontStyle, this.ppiX, this.ppiY);
 
             r2 = g_font_infos[ font.FontFamily.Index ].LoadFont(
-                g_font_loader, this.fmgrMeasure, font.FontSize, fontStyle, 72, 72);
+                g_font_loader, this.fmgrMeasure, font.FontSize, fontStyle, this.ppiX, this.ppiY);
         }
 
         if (r1 === false || r2 === false) {
@@ -909,7 +909,7 @@ DrawingContext.prototype = {
 	 */
 	measureText: function (text, units) {
 		var fm = this.fmgrMeasure,
-		    r  = getCvtRatio(1/*pt*/, units >= 0 && units <=3 ? units : this.units, 72);
+		    r  = getCvtRatio(0/*px*/, units >= 0 && units <=3 ? units : this.units, this.ppiX);
 		for (var tmp, w = 0, w2 = 0, i = 0; i < text.length; ++i) {
 			tmp = fm.MeasureChar( text.charCodeAt(i) );
 			w += tmp.fAdvanceX;

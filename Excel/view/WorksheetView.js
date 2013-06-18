@@ -621,7 +621,6 @@
 				if (factor === this.getZoom())
 					return this;
 				this.cleanSelection();
-				this._calcEmSize();
 				this.buffers.main.changeZoom(factor);
 				this.buffers.overlay.changeZoom(factor);
 				this._initCellsArea(true);
@@ -1104,12 +1103,25 @@
 				}
 			},
 			_calcEmSize: function () {
+				// ToDo Мерить нужно только со 100% и один раз для всего документа
+
 				// set default worksheet header font for calculations
 				var c = this.settings.cells;
 				this._setFont(/*drawingCtx*/ undefined, c.fontName, c.fontSize);
+				// Измеряем в pt
 				this.stringRender.measureString(
 					"0123456789", {wrapText: false, shrinkToFit: false, isMerged: false, textAlign: khaLeft});
-				this.emSize = this.stringRender.getWidestCharWidth();
+
+				var ppiX = this._getPPIX(); // ToDo Мерить только с 96
+				var ptConvToPx = asc_getcvt(1/*pt*/, 0/*px*/, ppiX);
+				var pxConvToPt = asc_getcvt(0/*px*/, 1/*pt*/, ppiX);
+
+				// Максимальная ширина в Pt
+				var maxWidthInPt = this.stringRender.getWidestCharWidth();
+				// Переводим в px и приводим к целому (int), а затем переводим обратно в pt
+				this.emSize = asc_round(maxWidthInPt * ptConvToPx) * pxConvToPt;
+				// Проверка для Calibri 11 должно быть asc_round(maxWidthInPt * ptConvToPx) = 7
+
 				if (!this.emSize) {throw "Error: can't measure text string";}
 			},
 			_prepareComments: function () {
