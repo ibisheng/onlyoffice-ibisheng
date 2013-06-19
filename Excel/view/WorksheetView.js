@@ -373,6 +373,9 @@
 
 			this.stringRender = stringRender;
 
+			// Флаг, сигнализирует о том, что мы сменили zoom, но это не активный лист (поэтому как только будем показывать, нужно перерисовать и пересчитать кеш)
+			this.updateZoom = false;
+
 			var cnv = $('<canvas width="2" height="2"/>')[0];
 			var ctx = cnv.getContext("2d");
 			ctx.clearRect(0, 0, 2, 2);
@@ -610,22 +613,23 @@
 				return this.drawingCtx.getZoom();
 			},
 
-			changeZoom: function (factor) {
-				if (factor === this.getZoom())
-					return this;
-				this.cleanSelection();
-				this.buffers.main.changeZoom(factor);
-				this.buffers.overlay.changeZoom(factor);
-				this._initCellsArea(true);
-				this._normalizeViewRange();
-				this._cleanCellsTextMetricsCache();
-				this._shiftVisibleRange();
-				this._prepareCellTextMetricsCache(this.visibleRange);
-				this._shiftVisibleRange();
-				this.cellCommentator.updateCommentPosition();
+			changeZoom: function (isUpdate) {
+				if (isUpdate) {
+					this.cleanSelection();
+					this._initCellsArea(true);
+					this._normalizeViewRange();
+					this._cleanCellsTextMetricsCache();
+					this._shiftVisibleRange();
+					this._prepareCellTextMetricsCache(this.visibleRange);
+					this._shiftVisibleRange();
+					this.cellCommentator.updateCommentPosition();
+
+					this.updateZoom = false;
+				} else {
+					this.updateZoom = true;
+				}
 				return this;
 			},
-
 
 			getCellTextMetrics: function (col, row) {
 				var ct = this._getCellTextCache(col, row);

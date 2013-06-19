@@ -80,6 +80,8 @@
 			this.fmgrGraphics[1].Initialize(true); // IE memory enable
 
 			this.buffers = {};
+			this.drawingCtx = undefined;
+			this.overlayCtx = undefined;
 			this.stringRender = undefined;
 
 			this.emSize = 0;
@@ -124,6 +126,8 @@
 
 				this.buffers.main		= asc_DC({canvas: this.canvas[0],			units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics});
 				this.buffers.overlay	= asc_DC({canvas: this.canvasOverlay[0],	units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics});
+				this.drawingCtx			= this.buffers.main;
+				this.overlayCtx			= this.buffers.overlay;
 
 				this.stringRender		= asc_SR(this.buffers.main);
 				this.stringRender.setDefaultFont(this.defaultFont);
@@ -882,11 +886,14 @@
 				this.wsActive = index;
 
 				ws = this.getWorksheet(index);
+				// Мы меняли zoom, но не перерисовывали данный лист (он был не активный)
+				if (ws.updateZoom)
+					ws.changeZoom(true);
 				ws.draw();
 				this._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
 				this._onWSSelectionChanged(ws.getSelectionInfo());
 				this.controller.reinitializeScroll();
-				this.handlers.trigger("asc_onZoomChanged",ws.getZoom());
+				// Zoom теперь на каждом листе одинаковый, не отправляем смену
 				return this;
 			},
 
@@ -981,16 +988,32 @@
 			},
 
 			getZoom: function () {
-				return this.getWorksheet().getZoom();
+				return this.drawingCtx.getZoom();
 			},
 
 			changeZoom: function (factor) {
-				var ws = this.getWorksheet();
-				ws.changeZoom(factor);
-				ws.draw();
-				ws.drawDepCells();
+				if (factor === this.getZoom())
+					return;
+
+				this.buffers.main.changeZoom(factor);
+				this.buffers.overlay.changeZoom(factor);
+
+				var item;
+				var activeIndex = this.model.getActive();
+				for(var i in this.wsViews) {
+					if (this.wsViews.hasOwnProperty(i)) {
+						item = this.wsViews[i];
+						// Меняем zoom (для не активных сменим как только сделаем его активным)
+						item.changeZoom(/*isDraw*/i == activeIndex);
+						if (i == activeIndex) {
+							item.draw();
+							item.drawDepCells();
+						}
+					}
+				}
+
 				this.controller.reinitializeScroll();
-				this.handlers.trigger("asc_onZoomChanged",this.getWorksheet().getZoom());
+				this.handlers.trigger("asc_onZoomChanged",this.getZoom());
 			},
 
 			enableKeyEventsHandler: function (f) {
