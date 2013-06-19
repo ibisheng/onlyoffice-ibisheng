@@ -1502,7 +1502,7 @@ Workbook.prototype.rebuildColors=function(){
 Workbook.prototype.getDefaultFont=function(){
 	return g_oDefaultFont.fn;
 };
-Workbook.prototype.getDefaultSize=function(name){
+Workbook.prototype.getDefaultSize=function(){
 	return g_oDefaultFont.fs;
 };
 Workbook.prototype.getActive=function(){
