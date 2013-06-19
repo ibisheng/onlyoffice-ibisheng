@@ -419,6 +419,8 @@ prop:sync_DialogAddHyperlink
 prop:sync_DialogAddHyperlink
 prop:sync_SpellCheckCallback
 prop:sync_SpellCheckVariantsFound
+prop:asc_replaceMisspelledWord
+prop:asc_ignoreMisspelledWord
 prop:asc_showComments
 prop:asc_hideComments
 prop:asc_addComment
@@ -1387,6 +1389,8 @@ asc_docs_api.prototype['sync_DialogAddHyperlink'] = asc_docs_api.prototype.sync_
 asc_docs_api.prototype['sync_DialogAddHyperlink'] = asc_docs_api.prototype.sync_DialogAddHyperlink;
 asc_docs_api.prototype['sync_SpellCheckCallback'] = asc_docs_api.prototype.sync_SpellCheckCallback;
 asc_docs_api.prototype['sync_SpellCheckVariantsFound'] = asc_docs_api.prototype.sync_SpellCheckVariantsFound;
+asc_docs_api.prototype['asc_replaceMisspelledWord'] = asc_docs_api.prototype.asc_replaceMisspelledWord;
+asc_docs_api.prototype['asc_ignoreMisspelledWord'] = asc_docs_api.prototype.asc_ignoreMisspelledWord;
 asc_docs_api.prototype['asc_showComments'] = asc_docs_api.prototype.asc_showComments;
 asc_docs_api.prototype['asc_hideComments'] = asc_docs_api.prototype.asc_hideComments;
 asc_docs_api.prototype['asc_addComment'] = asc_docs_api.prototype.asc_addComment;
