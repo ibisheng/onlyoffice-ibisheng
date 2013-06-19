@@ -27,9 +27,7 @@
 		var asc_obj2Color = asc.colorObjToAscColor;
 		var asc_typeof  = asc.typeOf;
 		var asc_debug   = asc.outputDebugStr;
-		var asc_DC      = asc.DrawingContext;
 		var asc_Range   = asc.Range;
-		var asc_SR      = asc.StringRender;
 		var asc_FP      = asc.FontProperties;
 		var asc_parsecolor = asc.parseColor;
 		var asc_clone   = asc.clone;
@@ -345,18 +343,18 @@
 		 * Widget for displaying and editing Worksheet object
 		 * -----------------------------------------------------------------------------
 		 * @param {Worksheet} model  Worksheet
-		 * @param {Object} canvas    Canvas for drawing
-		 * @param {Object} overlay   Canvas for selection
+		 * @param {Array} buffers    DrawingContext + Overlay
+		 * @param {StringRender} stringRender    StringRender
+		 * @param {Number} emSize    Размер символа
 		 * @param {asc_CCollaborativeEditing} collaborativeEditing
-		 * @param {Array} fmgrGraphics
 		 * @param {Object} settings  Settings
 		 *
 		 * @constructor
 		 * @memberOf Asc
 		 */
-		function WorksheetView(model, canvas, overlay, collaborativeEditing, fmgrGraphics, settings) {
+		function WorksheetView(model, buffers, stringRender, emSize, collaborativeEditing, settings) {
 			if ( !(this instanceof WorksheetView) ) {
-				return new WorksheetView(model, canvas, overlay, collaborativeEditing, fmgrGraphics, settings);
+				return new WorksheetView(model, buffers, stringRender, emSize, collaborativeEditing, settings);
 			}
 
 			this.settings = $.extend(true, {}, this.defaults, settings);
@@ -369,15 +367,11 @@
 
 			this.model = model;
 
-			this.buffers = {};
-			this.buffers.main    = canvas.getPPIX ? canvas : asc_DC({canvas: canvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics});
-			this.buffers.overlay = overlay ? asc_DC({canvas: overlay, units: 1/*pt*/, fmgrGraphics: fmgrGraphics}) : null;
-
+			this.buffers = buffers;
 			this.drawingCtx = this.buffers.main;
 			this.overlayCtx = this.buffers.overlay;
 
-			this.stringRender = asc_SR(this.drawingCtx);
-			this.stringRender.setDefaultFontFromFmt({fn: cells.fontName, fs: cells.fontSize});
+			this.stringRender = stringRender;
 
 			var cnv = $('<canvas width="2" height="2"/>')[0];
 			var ctx = cnv.getContext("2d");
@@ -390,7 +384,7 @@
 			this.cache = new Cache();
 
 			//---member declaration---
-			this.emSize = 0;
+			this.emSize = emSize;
 			this.maxNumWidth = 0;
 			this.defaultColWidth = 0;
 			this.defaultRowHeight = 0;
@@ -1030,12 +1024,11 @@
 			// ----- Initialization -----
 
 			_init: function () {
-				this._calcEmSize();
 				this._initCellsArea(true);
-				this._cleanCellsTextMetricsCache();
-				this._prepareCellTextMetricsCache(this.visibleRange);
 				this.autoFilters.addFiltersAfterOpen(this);
 				this._initConditionalFormatting();
+				this._cleanCellsTextMetricsCache();
+				this._prepareCellTextMetricsCache(this.visibleRange);
 				// initializing is completed
 				this._trigger("initialized");
 			},
@@ -1100,28 +1093,6 @@
 						}
 					}
 				}
-			},
-			_calcEmSize: function () {
-				// ToDo Мерить нужно только со 100% и один раз для всего документа
-
-				// set default worksheet header font for calculations
-				var c = this.settings.cells;
-				this._setFont(/*drawingCtx*/ undefined, c.fontName, c.fontSize);
-				// Измеряем в pt
-				this.stringRender.measureString(
-					"0123456789", {wrapText: false, shrinkToFit: false, isMerged: false, textAlign: khaLeft});
-
-				var ppiX = this._getPPIX(); // ToDo Мерить только с 96
-				var ptConvToPx = asc_getcvt(1/*pt*/, 0/*px*/, ppiX);
-				var pxConvToPt = asc_getcvt(0/*px*/, 1/*pt*/, ppiX);
-
-				// Максимальная ширина в Pt
-				var maxWidthInPt = this.stringRender.getWidestCharWidth();
-				// Переводим в px и приводим к целому (int), а затем переводим обратно в pt
-				this.emSize = asc_round(maxWidthInPt * ptConvToPx) * pxConvToPt;
-				// Проверка для Calibri 11 должно быть asc_round(maxWidthInPt * ptConvToPx) = 7
-
-				if (!this.emSize) {throw "Error: can't measure text string";}
 			},
 			_prepareComments: function () {
 				var commentList = [];	// для отправки за один раз

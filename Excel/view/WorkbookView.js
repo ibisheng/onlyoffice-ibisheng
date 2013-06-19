@@ -15,16 +15,18 @@
 		 * Import
 		 * -----------------------------------------------------------------------------
 		 */
-		var asc        = window["Asc"];
-		var asc_round  = asc.round;
-		var asc_typeof = asc.typeOf;
-		var asc_FP     = asc.FontProperties;
-		var asc_CE     = asc.CellEditor;
-		var asc_WSV    = asc.WorksheetView;
-		var asc_CB     = asc.Clipboard;
-		var asc_CMM    = asc.asc_CMouseMoveData;
-		var asc_Range  = asc.Range;
-		var asc_CPrintPagesData = asc.CPrintPagesData;
+		var asc					= window["Asc"];
+		var asc_round			= asc.round;
+		var asc_typeof			= asc.typeOf;
+		var asc_FP				= asc.FontProperties;
+		var asc_CE				= asc.CellEditor;
+		var asc_WSV				= asc.WorksheetView;
+		var asc_CB				= asc.Clipboard;
+		var asc_CMM				= asc.asc_CMouseMoveData;
+		var asc_CPrintPagesData	= asc.CPrintPagesData;
+		var asc_DC				= asc.DrawingContext;
+		var asc_SR				= asc.StringRender;
+		var asc_getcvt			= asc.getCvtRatio;
 
 
 		/**
@@ -76,6 +78,12 @@
 
 			this.fmgrGraphics[0].Initialize(true); // IE memory enable
 			this.fmgrGraphics[1].Initialize(true); // IE memory enable
+
+			this.buffers = {};
+			this.stringRender = undefined;
+
+			this.emSize = 0;
+			this.defaultFont = new asc_FP(this.model.getDefaultFont(), this.model.getDefaultSize());
 			//-----------------------
 			
 			this.init(fontRenderingMode);
@@ -113,6 +121,15 @@
 				this.canvasOverlay = this.element.find("#ws-canvas-overlay")
 						.attr("width", outer.width())
 						.attr("height", outer.height());
+
+				this.buffers.main		= asc_DC({canvas: this.canvas[0],			units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics});
+				this.buffers.overlay	= asc_DC({canvas: this.canvasOverlay[0],	units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics});
+
+				this.stringRender		= asc_SR(this.buffers.main);
+				this.stringRender.setDefaultFont(this.defaultFont);
+
+				// Мерить нужно только со 100% и один раз для всего документа
+				this._calcEmSize();
 
 				// initialize events controller
 				this.controller.init(this, this.element, this.canvasOverlay, /*handlers*/{
@@ -277,7 +294,7 @@
 							}
 						},
 						/*settings*/{
-							font: new asc_FP(this.model.getDefaultFont(), this.model.getDefaultSize())
+							font: this.defaultFont
 						});
 
 				this.clipboard.Api = this.Api;
@@ -307,7 +324,7 @@
 								"setAutoFiltersDialog"  : function (arrVal) {self.handlers.trigger("asc_onSetAFDialog", arrVal);},
 								"selectionRangeChanged"	: function (val) {self.handlers.trigger("asc_onSelectionRangeChanged", val);}
 							});
-				return new asc_WSV(wsModel, this.canvas[0], this.canvasOverlay[0], this.collaborativeEditing, this.fmgrGraphics, opt);
+				return new asc_WSV(wsModel, this.buffers, this.stringRender, this.emSize, this.collaborativeEditing, opt);
 			},
 
 			_onSelectionNameChanged: function (name) {
@@ -1369,6 +1386,26 @@
 
 					manager.ClearFontsRasterCache();
 				}
+			},
+
+			_calcEmSize: function () {
+				// set default worksheet header font for calculations
+				this.buffers.main.setFont(this.defaultFont);
+				// Измеряем в pt
+				this.stringRender.measureString(
+					"0123456789", {wrapText: false, shrinkToFit: false, isMerged: false, textAlign: /*khaLeft*/"left"});
+
+				var ppiX = 96; // Мерить только с 96
+				var ptConvToPx = asc_getcvt(1/*pt*/, 0/*px*/, ppiX);
+				var pxConvToPt = asc_getcvt(0/*px*/, 1/*pt*/, ppiX);
+
+				// Максимальная ширина в Pt
+				var maxWidthInPt = this.stringRender.getWidestCharWidth();
+				// Переводим в px и приводим к целому (int), а затем переводим обратно в pt
+				this.emSize = asc_round(maxWidthInPt * ptConvToPx) * pxConvToPt;
+				// Проверка для Calibri 11 должно быть asc_round(maxWidthInPt * ptConvToPx) = 7
+
+				if (!this.emSize) {throw "Error: can't measure text string";}
 			}
 		};
 
