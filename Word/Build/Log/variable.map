@@ -767,7 +767,7 @@ search_HdrFtr_Odd_no_First:dQ
 FONT_TYPE_EMBEDDED:AA
 CRasterHeapTotal:eA
 historyitem_MovePoint:SF
-button_eventHandlers:V_
+button_eventHandlers:U_
 JSCompiler_StaticMethods_shapeApply:gD
 para_Drawing:Ib
 c_oSerNumTypes$lvl_Suff:CT
@@ -1886,7 +1886,7 @@ CDocumentSearch:sQ
 STATES_ID_PRE_MOVE:ED
 JSCompiler_StaticMethods_Add_Cell:NS
 _weight_obj:vJ
-JSCompiler_StaticMethods_InitRun:ra
+JSCompiler_StaticMethods_InitRun:sa
 FT_Var_Axis:Fn
 hdrftr_Default:cB
 ParaTextPr:hc
@@ -1901,7 +1901,7 @@ JSCompiler_StaticMethods_Set_CurHdrFtr_ById:vL
 para_End:Hb
 CreateAscColorCustom:I2
 g_sErrorCharCountMessage:AY
-c_oSerProp_pPrType$Tab_Item:GU
+c_oSerProp_pPrType$Tab_Item:FU
 fontstyle_mask_regular:CA
 nSldLtTTwoObjAndTx:dJ
 T1_Get_Multi_Master:Qy
@@ -2409,7 +2409,7 @@ c_oSer_sts$Style_ParaPr:XT
 c_oAscVAnchor$Margin:vR
 historyitem_type_Image:nH
 tt_cmap14_char_var_isdefault:Es
-c_oAscStyleImage$Default:N_
+c_oAscStyleImage$Default:M_
 c_oAscError$ID$SplitCellMaxRows:PS
 FT_NEXT_USHORT:tm
 CShapeStyle:ph
@@ -2608,7 +2608,7 @@ c_oSerProp_rPrType$Cs:oV
 RULER_OBJECT_TYPE_PARAGRAPH:B_
 c_oAscAsyncAction$ApplyChanges:sL
 TT_LongMetricsRec:Qn
-L 27:sa
+L 27:ra
 L 26:ga
 L 29:xa
 ParaPageBreakRenderer:kN
