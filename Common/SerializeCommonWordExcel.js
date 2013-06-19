@@ -152,6 +152,9 @@ function BinaryCommonWriter(memory)
     {
 		if(color instanceof ThemeColor)
 		{
+			//заглушка для посещенных гиперссылок
+			if(g_nColorHyperlinkVisited == color.theme && null == color.tint)
+				color.theme = g_nColorHyperlink;
 			if(null != color.theme)
 			{
 				this.memory.WriteByte(c_oSer_ColorObjectType.Theme);
