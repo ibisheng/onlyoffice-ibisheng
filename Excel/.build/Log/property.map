@@ -552,7 +552,7 @@ reHypNL:OHa
 ReadPatternFill:Nna
 asc_getQuoteText:vba
 showImageFileDialog:QIa
-cellsLeft:xc
+cellsLeft:yc
 ReadSeria:Vna
 asc_Print:iba
 IsAsyncOpenDocumentImages:sla
@@ -736,7 +736,7 @@ getWS:qI
 _gutter_center:Ut
 resetLockedDrawingObject:aIa
 DEEMBOLDEN_Rules:Cka
-opcode:$d
+opcode:ae
 Copy:Og
 asc_showDrawingObjects:lOa
 urlMap:zWa
@@ -941,7 +941,7 @@ renderers:zJ
 FT_Get_Module_Interface:fG
 initialDelay:ZT
 CurPoint:hh
-multiText:Ec
+multiText:Fc
 FlagsTransactionState:f6
 noneFormat:co
 cellFrom:hda
@@ -2203,7 +2203,7 @@ getPPIX:Nw
 getPPIY:tE
 _getRowCache:fua
 _hasNumberValueInActiveRange:jua
-theme:Fc
+theme:xc
 _onWindowKeyDown:hZ
 read_width:vV
 degree:aea
@@ -2302,7 +2302,7 @@ Name:qb
 Filters:un
 charstrings_block:nda
 Pos:nk
-getCellTop:Ac
+getCellTop:Bc
 max_contours:dx
 subType:Md
 RemoveRect:Koa
@@ -2334,7 +2334,7 @@ cur_gindex:Rn
 _onStartCoAuthoring:Sva
 lightblue:ESa
 asc_getWidthMM:g_
-fs:Cc
+fs:Dc
 asc_CHyperlink:rxa
 _check_loaded:i$
 _border_color:Q9
@@ -2589,7 +2589,7 @@ Read2:NLa
 month:YE
 r1:b
 po:OUa
-ph:be
+ph:ce
 comment:i0
 darkcyan:hQa
 Read1:Wb
@@ -2638,7 +2638,7 @@ m_pDefaultFont:cf
 formatString:Hs
 sheetId:Ae
 getInnerOffsetLeft:qE
-_WriteString1:Xd
+_WriteString1:Yd
 asyncImagesEndLoaded:RBa
 _WriteString2:pf
 kern_order_bits:iga
@@ -3350,7 +3350,7 @@ Read_FromBinary2:cd
 _autoFiltersClick:Msa
 asc_setBottomOffset:Jba
 span_y:dP
-h_mm:Dc
+h_mm:Ec
 TotalsRowFormula:x8
 _drawCells:uL
 applyFillHandle:Ywa
@@ -3446,7 +3446,7 @@ canEnterCellRange:ada
 WriteDefinedNames:Dqa
 Tag:YK
 set_char_sizes:Eia
-pedantic_hinting:ae
+pedantic_hinting:be
 getLockOtherRow2:Nj
 _fade_out:$Q
 table_offset:Zia
@@ -3475,7 +3475,7 @@ GetNextChar2:dla
 ColorBackOver:xka
 ReadTableCustomStyleElements:moa
 get_kerning:yE
-Type:Bc
+Type:Cc
 readFromDrawingObject:SHa
 DefaultTableStyle:HW
 variant_list:HJa
@@ -3519,7 +3519,7 @@ adjustPrint:KR
 Expand:KKa
 glyph_transform:zfa
 hotpink:gSa
-drawingCtx:yc
+drawingCtx:zc
 ReadLineEnd:x7
 nCurSequence:gx
 deleteNode:A0
@@ -4251,7 +4251,7 @@ getDif:pE
 isEmptyAutoFilters:Ufa
 OutlineColor:Ux
 coordsKey:hm
-cellCommentator:Zd
+cellCommentator:$d
 removeCols:OO
 _setOptions:nwa
 _isviewermode:EL
@@ -4580,7 +4580,7 @@ ReadSharedString:Zna
 _boxplot_capped:oY
 getRealTopOffset:zr
 MIAP_HACK_Rules:Jla
-tint:ce
+tint:Xd
 _angle:hY
 WorkbookView:gqa
 get_globals_funcs:aFa
@@ -5458,7 +5458,7 @@ gep2:Js
 memcpy:MTa
 SKIP_INLINE_DELTAS_Rules:Uoa
 commentIndexes:KS
-getCellLeft:zc
+getCellLeft:Ac
 xTickGap:R4
 copyText:Sm
 secondSubtotalColumn:a4
@@ -5655,7 +5655,7 @@ asc_getGroupName:Mya
 ghostwhite:RRa
 slideLayouts:LJ
 TT_CONFIG_OPTION_UNPATENTED_HINTING:zMa
-cell:Yd
+cell:Zd
 toRGB:jJa
 WriteRun:sra
 Aligment:Nja
