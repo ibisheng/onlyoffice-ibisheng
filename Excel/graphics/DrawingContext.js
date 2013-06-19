@@ -854,14 +854,12 @@ DrawingContext.prototype = {
             fontStyle = FontStyle.FontStyleBoldItalic;
 
         if (angle && 0 != angle) {
-
             r = g_font_infos[ font.FontFamily.Index ].LoadFont(
                 g_font_loader, this.fmgrGraphics[1], font.FontSize, fontStyle, this.ppiX, this.ppiY);
 
             this.fmgrGraphics[1].SetTextMatrix(
                 this._mt.sx, this._mt.shy, this._mt.shx, this._mt.sy, this._mt.tx, this._mt.ty);
         } else {
-
             r = g_font_infos[ font.FontFamily.Index ].LoadFont(
                 g_font_loader, this.fmgrGraphics[0], font.FontSize, fontStyle, this.ppiX, this.ppiY);
         }
