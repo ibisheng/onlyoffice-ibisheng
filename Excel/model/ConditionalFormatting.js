@@ -43,7 +43,7 @@
 
 		this.AboveAverage = true;
 		this.Bottom = false;
-		this.DxfId = null;
+		this.dxf = null;
 		this.EqualAverage = false;
 		this.Operator = null;
 		this.Percent = false;

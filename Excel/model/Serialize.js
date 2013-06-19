@@ -5503,7 +5503,11 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 		else if (c_oSer_ConditionalFormattingRule.Bottom === type)
 			oConditionalFormattingRule.Bottom = this.stream.GetBool();
 		else if (c_oSer_ConditionalFormattingRule.DxfId === type)
-			oConditionalFormattingRule.DxfId = this.stream.GetULongLE();
+		{
+			var DxfId = this.stream.GetULongLE();
+			var dxf = this.Dxfs[DxfId];
+			oConditionalFormattingRule.dxf = dxf;
+		}
 		else if (c_oSer_ConditionalFormattingRule.EqualAverage === type)
 			oConditionalFormattingRule.EqualAverage = this.stream.GetBool();
 		else if (c_oSer_ConditionalFormattingRule.Operator === type)
@@ -6118,6 +6122,8 @@ function CTableStyle()
 	this.name = null;
 	this.pivot = true;
 	this.table = true;
+
+	this.compiled = null;
 	
 	this.blankRow = null;
 	this.firstColumn = null;
@@ -6147,6 +6153,175 @@ function CTableStyle()
 	this.thirdSubtotalRow = null;
 	this.totalRow = null;
 	this.wholeTable = null;
+}
+CTableStyle.prototype = 
+{
+	getStyle: function(bbox, rowAbs, colAbs, rowIndex, colIndex, options, headerRowCount, totalsRowCount)
+	{
+		if(null == this.compiled)
+			this._compile();
+		var res = null;
+		if(headerRowCount > 0 && rowAbs == bbox.r1)
+			res = this.compiled.header;
+		else if(totalsRowCount > 0 && rowAbs == bbox.r2)
+			res = this.compiled.total;
+		else
+		{
+			var option = this._getOption(options);
+			if(options.ShowFirstColumn && colAbs == bbox.c1)
+			{
+				if(0 == (rowIndex - headerRowCount) % 2)
+					res = option.leftRowFirstColFirst;
+				else
+					res = option.leftRowSecondColFirst;
+			}
+			else if(options.ShowLastColumn && colAbs == bbox.c2)
+			{
+				if(0 == (rowIndex - headerRowCount) % 2)
+				{
+					if(0 == colIndex % 2)
+						res = option.rightRowFirstColFirst;
+					else
+						res = option.rightRowFirstColSecond;
+				}
+				else
+				{
+					if(0 == colIndex % 2)
+						res = option.rightRowSecondColFirst;
+					else
+						res = option.rightRowSecondColSecond;
+				}
+			}
+			else if(options.ShowRowStripes || options.ShowColumnStripes)
+			{
+				if(0 == (rowIndex - headerRowCount) % 2)
+				{
+					if(0 == colIndex % 2)
+						res = option.rowFirstColFirst;
+					else
+						res = option.rowFirstColSecond;
+				}
+				else
+				{
+					if(0 == colIndex % 2)
+						res = option.rowSecondColFirst;
+					else
+						res = option.rowSecondColSecond;
+				}
+			}
+			else
+				res = this.wholeTable;
+		}
+		return res;
+	},
+	_getOption: function(options)
+	{
+		var nBitMask = 0;
+		if(options.ShowFirstColumn)
+			nBitMask += 1;
+		if(options.ShowLastColumn)
+			nBitMask += 1 << 1;
+		if(options.ShowRowStripes)
+			nBitMask += 1 << 2;
+		if(options.ShowColumnStripes)
+			nBitMask += 1 << 3;
+		var styles = this.compiled.options[nBitMask];
+		if(null == styles)
+		{
+			styles = {
+				leftRowFirstColFirst: new CellXfs(),
+				leftRowSecondColFirst: new CellXfs(),
+				rowFirstColFirst: new CellXfs(),
+				rowSecondColFirst: new CellXfs(),
+				rowFirstColSecond: new CellXfs(),
+				rowSecondColSecond: new CellXfs(),
+				rightRowFirstColFirst: new CellXfs(),
+				rightRowSecondColFirst: new CellXfs(),
+				rightRowFirstColSecond: new CellXfs(),
+				rightRowSecondColSecond: new CellXfs()
+			}
+			this._compileOption(options, styles);
+			this.compiled.options[nBitMask] = styles;
+		}
+		return styles;
+	},
+	_compileOption : function(options, styles)
+	{
+		for(var i in styles)
+		{
+			var elem = styles[i];
+			var xfs = elem;
+			if(options.ShowFirstColumn && elem == styles.leftRowFirstColFirst || elem == styles.leftRowSecondColFirst)
+			{
+				if(null != this.firstColumn)
+					xfs = xfs.merge(this.firstColumn.dxf);
+			}
+			else if(options.ShowLastColumn && elem == styles.rightRowFirstColFirst || elem == styles.rightRowSecondColFirst ||
+						elem == styles.rightRowFirstColSecond || elem == styles.rightRowSecondColSecond)
+			{
+				if(null != this.lastColumn)
+					xfs = xfs.merge(this.lastColumn.dxf);
+			}
+			if(options.ShowRowStripes)
+			{
+				if(elem == styles.leftRowFirstColFirst || elem == styles.rowFirstColFirst ||
+					elem == styles.rowFirstColSecond || elem == styles.rightRowFirstColFirst || elem == styles.rightRowFirstColSecond)
+				{
+					if(null != this.firstRowStripe)
+						xfs = xfs.merge(this.firstRowStripe.dxf);
+				}
+				else
+				{
+					if(null != this.secondRowStripe)
+						xfs = xfs.merge(this.secondRowStripe.dxf);
+				}
+			}
+			if(options.ShowColumnStripes)
+			{
+				if(elem == styles.leftRowFirstColFirst || elem == styles.leftRowSecondColFirst ||
+					elem == styles.rowFirstColFirst || elem == styles.rowSecondColFirst || 
+					elem == styles.rightRowFirstColFirst || elem == styles.rightRowSecondColFirst)
+				{
+					if(null != this.firstColumnStripe)
+						xfs = xfs.merge(this.firstColumnStripe.dxf);
+				}
+				else
+				{
+					if(null != this.secondColumnStripe)
+						xfs = xfs.merge(this.secondColumnStripe.dxf);
+				}
+			}
+			if(null != this.wholeTable)
+				xfs = xfs.merge(this.wholeTable.dxf);
+			styles[i] = xfs;
+		}
+	},
+	_compile : function()
+	{
+		this.compiled = {
+			header: null,
+			total: null,
+			options: new Object()
+		};
+		//header
+		if(null != this.headerRow && null != this.wholeTable)
+		{
+			this.compiled.header = new CellXfs();
+			if(null != this.headerRow)
+				this.compiled.header = this.compiled.header.merge(this.headerRow.dxf);
+			if(null != this.wholeTable)
+				this.compiled.header = this.compiled.header.merge(this.wholeTable.dxf);
+		}
+		//total
+		if(null != this.totalRow && null != this.wholeTable)
+		{
+			this.compiled.total = new CellXfs();
+			if(null != this.totalRow)
+				this.compiled.total = this.compiled.total.merge(this.totalRow.dxf);
+			if(null != this.wholeTable)
+				this.compiled.total = this.compiled.total.merge(this.wholeTable.dxf);
+		}
+	}
 }
 function CTableStyleElement()
 {

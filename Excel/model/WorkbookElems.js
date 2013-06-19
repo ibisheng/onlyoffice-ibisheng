@@ -10,6 +10,7 @@ var g_oDefaultNumAbs = null;
 var g_oDefaultBorderAbs = null;
 var g_oDefaultAlignAbs = null;
 
+var g_nColorTextDefault = 1;
 var g_nColorHyperlink = 10;
 var g_nColorHyperlinkVisited = 11;
 
@@ -311,7 +312,7 @@ function Font(val)
 			i : false,
 			u : "none",
 			s : false,
-			c : g_oColorManager.getThemeColor(1),
+			c : g_oColorManager.getThemeColor(g_nColorTextDefault),
 			va : "baseline",
 			skip : false,
 			repeat : false
@@ -343,6 +344,34 @@ function Font(val)
 };
 Font.prototype =
 {
+	_mergeProperty : function(first, second, def)
+	{
+		if(def != first)
+			return first;
+		else
+			return second;
+	},
+	merge : function(font)
+	{
+		var oRes = new Font();
+		oRes.fn = this._mergeProperty(this.fn, font.fn, g_oDefaultFont.fn);
+		oRes.fs = this._mergeProperty(this.fs, font.fs, g_oDefaultFont.fs);
+		oRes.b = this._mergeProperty(this.b, font.b, g_oDefaultFont.b);
+		oRes.i = this._mergeProperty(this.i, font.i, g_oDefaultFont.i);
+		oRes.u = this._mergeProperty(this.u, font.u, g_oDefaultFont.u);
+		oRes.s = this._mergeProperty(this.s, font.s, g_oDefaultFont.s);
+		//заглушка excel при merge стилей игнорирует default цвет
+		if(this.c instanceof ThemeColor && g_nColorTextDefault == this.c.theme && null == this.c.tint)
+			oRes.c = this._mergeProperty(font.c, this.c, g_oDefaultFont.c);
+		else
+			oRes.c = this._mergeProperty(this.c, font.c, g_oDefaultFont.c);
+		oRes.themeColor = this._mergeProperty(this.themeColor, font.themeColor, g_oDefaultFont.themeColor);
+		oRes.themeTint = this._mergeProperty(this.themeTint, font.themeTint, g_oDefaultFont.themeTint);
+		oRes.va = this._mergeProperty(this.va, font.va, g_oDefaultFont.va);
+		oRes.skip = this._mergeProperty(this.skip, font.skip, g_oDefaultFont.skip);
+		oRes.repeat = this._mergeProperty(this.repeat, font.repeat, g_oDefaultFont.repeat);
+		return oRes;
+	},
 	getRgbOrNull : function()
 	{
 		var nRes = null;
@@ -526,6 +555,21 @@ function Fill(val)
 };
 Fill.prototype =
 {
+	_mergeProperty : function(first, second, def)
+	{
+		if(def != first)
+			return first;
+		else
+			return second;
+	},
+	merge : function(fill)
+	{
+		var oRes = new Fill();
+		oRes.bg = this._mergeProperty(this.bg, fill.bg, g_oDefaultFill.bg);
+		oRes.themeColor = this._mergeProperty(this.themeColor, fill.themeColor, g_oDefaultFill.themeColor);
+		oRes.themeTint = this._mergeProperty(this.themeTint, fill.themeTint, g_oDefaultFill.themeTint);
+		return oRes;
+	},
 	getRgbOrNull : function()
 	{
 		var nRes = null;
@@ -681,6 +725,27 @@ function Border(val)
 };
 Border.prototype =
 {
+	_mergeProperty : function(first, second, def)
+	{
+		if((null != def.isEqual && false == def.isEqual(first)) || (null == def.isEqual && def != first))
+			return first;
+		else
+			return second;
+	},
+	merge : function(border)
+	{
+		var oRes = new Border();
+		oRes.l = this._mergeProperty(this.l, border.l, g_oDefaultBorder.l).clone();
+		oRes.t = this._mergeProperty(this.t, border.t, g_oDefaultBorder.t).clone();
+		oRes.r = this._mergeProperty(this.r, border.r, g_oDefaultBorder.r).clone();
+		oRes.b = this._mergeProperty(this.b, border.b, g_oDefaultBorder.b).clone();
+		oRes.d = this._mergeProperty(this.d, border.d, g_oDefaultBorder.d).clone();
+		oRes.ih = this._mergeProperty(this.ih, border.ih, g_oDefaultBorder.ih).clone();
+		oRes.iv = this._mergeProperty(this.iv, border.iv, g_oDefaultBorder.iv).clone();
+		oRes.dd = this._mergeProperty(this.dd, border.dd, g_oDefaultBorder.dd);
+		oRes.du = this._mergeProperty(this.du, border.du, g_oDefaultBorder.du);
+		return oRes;
+	},
 	getDif : function(val)
 	{
 		var oRes = new Border(this);
@@ -748,9 +813,9 @@ Border.prototype =
     {
 		//border может быть не класса Border
 		this.clean();
-		this.merge(border);
+		this.mergeInner(border);
     },
-    merge : function(border){
+    mergeInner : function(border){
 		//border может быть не класса Border
         if(border){
             if(border.l)
@@ -828,6 +893,15 @@ function Num(val)
 };
 Num.prototype =
 {
+	merge : function(num)
+	{
+		var oRes = new Num();
+		if(g_oDefaultNum.f != this.f)
+			oRes.f = this.f;
+		else
+			oRes.f = num.f;
+		return oRes;
+	},
 	getDif : function(val)
 	{
 		var oRes = new Num(this);
@@ -891,6 +965,36 @@ function CellXfs()
 };
 CellXfs.prototype =
 {
+	_mergeProperty : function(first, second)
+	{
+		var res = null;
+		if(null != first || null != second)
+		{
+			if(null == first)
+				res = second;
+			else if(null == second)
+				res = first;
+			else
+			{
+				if(null != first.merge)
+					res = first.merge(second);
+				else
+					res = from;
+			}
+		}
+		return res;
+	},
+	merge : function(xfs)
+	{
+		var oRes = new CellXfs();
+		oRes.border = this._mergeProperty(this.border, xfs.border);
+		oRes.fill = this._mergeProperty(this.fill, xfs.fill);
+		oRes.font = this._mergeProperty(this.font, xfs.font);
+		oRes.num = this._mergeProperty(this.num, xfs.num);
+		oRes.align = this._mergeProperty(this.align, xfs.align);
+		oRes.QuotePrefix = this._mergeProperty(this.QuotePrefix, xfs.QuotePrefix);
+		return oRes;
+	},
     clone : function()
     {
         var res = new CellXfs();
@@ -991,6 +1095,25 @@ function Align(val)
 };
 Align.prototype =
 {
+	_mergeProperty : function(first, second, def)
+	{
+		if(false == def.isEqual(first))
+			return first;
+		else
+			return second;
+	},
+	merge : function(border)
+	{
+		var oRes = new Align();
+		oRes.hor = this._mergeProperty(this.hor, border.hor, g_oDefaultAlign.hor);
+		oRes.indent = this._mergeProperty(this.indent, border.indent, g_oDefaultAlign.indent);
+		oRes.RelativeIndent = this._mergeProperty(this.RelativeIndent, border.RelativeIndent, g_oDefaultAlign.RelativeIndent);
+		oRes.shrink = this._mergeProperty(this.shrink, border.shrink, g_oDefaultAlign.shrink);
+		oRes.angle = this._mergeProperty(this.angle, border.angle, g_oDefaultAlign.angle);
+		oRes.ver = this._mergeProperty(this.ver, border.ver, g_oDefaultAlign.ver);
+		oRes.wrap = this._mergeProperty(this.wrap, border.wrap, g_oDefaultAlign.wrap);
+		return oRes;
+	},
 	getDif : function(val)
 	{
 		var oRes = new Align(this);
@@ -2338,8 +2461,9 @@ CCellValue.prototype =
 				if(CellValueType.String == this.type)
 					bNeedMeasure = false;
 				var oNumFormat;
-				if(null != this.cell.xfs && null != this.cell.xfs.num)
-					oNumFormat = oNumFormatCache.get(this.cell.xfs.num.f);
+				var xfs = this.cell.getStyle();
+				if(null != xfs && null != xfs.num)
+					oNumFormat = oNumFormatCache.get(xfs.num.f);
 				else
 					oNumFormat = oNumFormatCache.get(g_oDefaultNum.f);
 				if(false == oNumFormat.isGeneralFormat())
@@ -2461,6 +2585,7 @@ CCellValue.prototype =
 			//применяем форматирование
 			var oValueText = null;
 			var oValueArray = null;
+			var xfs = this.cell.getStyle();
 			if(this.cell.sFormula)
 				oValueText = "="+this.cell.sFormula;
 			else
@@ -2476,8 +2601,8 @@ CCellValue.prototype =
 						if(CellValueType.Number == this.type || CellValueType.String == this.type)
 						{
 							var oNumFormat;
-							if(null != this.cell.xfs && null != this.cell.xfs.num)
-								oNumFormat = oNumFormatCache.get(this.cell.xfs.num.f);
+							if(null != xfs && null != xfs.num)
+								oNumFormat = oNumFormatCache.get(xfs.num.f);
 							else
 								oNumFormat = oNumFormatCache.get(g_oDefaultNum.f);
 							if(CellValueType.String != this.type && null != oNumFormat && null != this.number)
@@ -2527,7 +2652,7 @@ CCellValue.prototype =
 				else if(this.multiText)
 					oValueArray = this.multiText;
 			}
-			if(null != this.cell.xfs && true == this.cell.xfs.QuotePrefix && CellValueType.String == this.type)
+			if(null != xfs && true == xfs.QuotePrefix && CellValueType.String == this.type)
 			{
 				if(null != oValueText)
 					oValueText = "'" + oValueText;
@@ -2544,8 +2669,9 @@ CCellValue.prototype =
 		if(null == sText && null == aText)
 			sText = "";
 		var cellfont;
-		if(null != this.cell.xfs && null != this.cell.xfs.font)
-			cellfont = this.cell.xfs.font;
+		var xfs = this.cell.getStyle();
+		if(null != xfs && null != xfs.font)
+			cellfont = xfs.font;
 		else
 			cellfont = g_oDefaultFont;
 		if(null != sText){
@@ -2595,8 +2721,9 @@ CCellValue.prototype =
 		if("" == val)
 			return;
 		var oNumFormat;
-		if(null != this.cell.xfs && null != this.cell.xfs.num)
-			oNumFormat = oNumFormatCache.get(this.cell.xfs.num.f);
+		var xfs = this.cell.getStyle();
+		if(null != xfs && null != xfs.num)
+			oNumFormat = oNumFormatCache.get(xfs.num.f);
 		else
 			oNumFormat = oNumFormatCache.get(g_oDefaultNum.f);
 		if(oNumFormat.isTextFormat())

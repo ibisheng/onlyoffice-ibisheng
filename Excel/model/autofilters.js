@@ -2892,136 +2892,56 @@
 			
 			_setColorStyleTable: function(id,idNext,ws,options, isOpenFilter)
 			{
-				var firstCell = ws.model.getCell(new CellAddress(id));
-				var endCell = ws.model.getCell(new CellAddress(idNext));
+				var firstCellAddress = new CellAddress(id);
+				var endCellAddress = new CellAddress(idNext);
+				var bbox = {r1: firstCellAddress.getRow0(), c1: firstCellAddress.getCol0(), r2: endCellAddress.getRow0(), c2: endCellAddress.getCol0()};
 				var style = options.TableStyleInfo;
-				
-				if(style && style.Name && ws.model.workbook.TableStyles && ws.model.workbook.TableStyles.AllStyles && ws.model.workbook.TableStyles.AllStyles[style.Name])
+				var styleForCurTable;
+				//todo из файла
+				var headerRowCount = 1;
+				var totalRowShown = 0;
+				var totalsRowCount = 0;
+				if(options.TotalsRowCount)
+					totalsRowCount = options.TotalsRowCount;
+				if(style && style.Name && ws.model.workbook.TableStyles && ws.model.workbook.TableStyles.AllStyles && (styleForCurTable = ws.model.workbook.TableStyles.AllStyles[style.Name]))
 				{
-					var styleForCurTable = ws.model.workbook.TableStyles.AllStyles[style.Name];
-					var allRange = ws.model.getRange(new CellAddress(id), new CellAddress(idNext));
-					//allRange.setFill((styleForCurTable.wholeTable && styleForCurTable.wholeTable.dxf.fill) ? (styleForCurTable.wholeTable.dxf.fill) : null);
-					for(var row = firstCell.first.row - 1; row < endCell.first.row; row++)
+					//заполняем названия столбцов
+					if(true != isOpenFilter && headerRowCount > 0 && options.TableColumns)
 					{
-						
-						for(var col = firstCell.first.col - 1; col < endCell.first.col; col++)
+						for(var i = bbox.c1; i <= bbox.c2; i++)
 						{
-							var range = ws.model.getCell(new CellAddress(row,col,0));
-							if(row == firstCell.first.row - 1 && options.TableColumns && !isOpenFilter)
-							{
-								var num = col - (firstCell.first.col - 1);
-								var nameColumn = options.TableColumns[num].Name;
-								range.setValue(nameColumn);
-							}
-							//clear prev table
-							//range.cleanFormat();
-							range.setFill(null);
-							range.setBorderSrc(null);
-							
-							if(ws.model._getRow(row).hd)
-								continue;
-							if(row == firstCell.first.row - 1)//header row
-							{
-								this._setAllColorStyleForTable(range,styleForCurTable.headerRow,styleForCurTable.wholeTable);
-							}
-							else if(row == endCell.first.row - 1 && options.TotalsRowCount)//total row
-							{
-								this._setAllColorStyleForTable(range,styleForCurTable.totalRow,styleForCurTable.wholeTable);
-							}
-							else if(col == firstCell.first.col - 1 && options.TableStyleInfo.ShowFirstColumn && styleForCurTable.firstColumn)//first column
-							{
-								this._setAllColorStyleForTable(range,styleForCurTable.firstColumn,styleForCurTable.wholeTable);
-							}
-							else if(col == endCell.first.col - 1 && options.TableStyleInfo.ShowLastColumn && styleForCurTable.lastColumn)//last column
-							{
-								this._setAllColorStyleForTable(range,styleForCurTable.lastColumn,styleForCurTable.wholeTable);
-							}
-							else if(options.TableStyleInfo.ShowColumnStripes || options.TableStyleInfo.ShowRowStripes)//column stripes
-							{
-								//определяем четный/нечетный
-								if(options.TableStyleInfo.ShowColumnStripes)
-								{	
-									var n = 0;
-									for(k = firstCell.first.col - 1; k < endCell.first.col;k++)
-									{
-										if(col == k)
-										{
-											n++;
-											break;
-										}
-										//if(!(options.TableStyleInfo.ShowFirstColumn && k == firstCell.first.col - 1) && !ws.model._getCol(k).hd)
-										n++;
-									}
-									if(n%2 != 0)
-									{
-										this._setAllColorStyleForTable(range,styleForCurTable.firstColumnStripe,styleForCurTable.wholeTable);
-									}
-									else
-									{
-										this._setAllColorStyleForTable(range,styleForCurTable.secondColumnStripe,styleForCurTable.wholeTable);
-									}
-								}
-								
-								if(options.TableStyleInfo.ShowRowStripes)
-								{
-									//определяем четная/нечетная
-									var n = 0;
-									for(var k = firstCell.first.row - 1; k < endCell.first.row;k++)
-									{
-										if(ws.model._getRow(k).hd)
-											continue;
-										if(row == k)
-										{
-											n++;
-											break;
-										}
-										if(!(k == firstCell.first.row - 1) && !ws.model._getRow(k).hd)
-											n++;
-									}
-									var defaultStyles = styleForCurTable.wholeTable;
-									if(options.TableStyleInfo.ShowColumnStripes)
-										defaultStyles = undefined;
-									if(n%2 != 0)
-									{
-										this._setAllColorStyleForTable(range,styleForCurTable.firstRowStripe,defaultStyles);
-									}
-									else
-									{
-										this._setAllColorStyleForTable(range,styleForCurTable.secondRowStripe,defaultStyles);
-									}
-								}
-								
-							}
-							//первая ячейка
-							if(styleForCurTable.firstHeaderCell && row == firstCell.first.row - 1 && col == firstCell.first.col - 1 && options.TableStyleInfo.ShowFirstColumn)
-								this._setAllColorStyleForTable(range,styleForCurTable.firstHeaderCell,styleForCurTable.wholeTable);
-							//последняя в первой строке
-							if(styleForCurTable.lastHeaderCell && row == firstCell.first.row - 1 && col == endCell.first.col - 1 && options.TableStyleInfo.ShowLastColumn)
-								this._setAllColorStyleForTable(range,styleForCurTable.lastHeaderCell,styleForCurTable.wholeTable);
-							//первая в последней строке	
-							if(styleForCurTable.firstTotalCell && row == endCell.first.row - 1 && col == firstCell.first.col - 1  && options.TotalsRowCount && options.TableStyleInfo.ShowFirstColumn)
-								this._setAllColorStyleForTable(range,styleForCurTable.firstTotalCell,styleForCurTable.wholeTable);
-							//последняя ячейка	
-							if(styleForCurTable.lastTotalCell && row == endCell.first.row - 1 && col == endCell.first.col - 1  && options.TotalsRowCount && options.TableStyleInfo.ShowLastColumn)
-								this._setAllColorStyleForTable(range,styleForCurTable.lastTotalCell,styleForCurTable.wholeTable);
-								
-							
-							
+							var range = ws.model.getCell3(bbox.r1, i);
+							var num = i - bbox.c1;
+							var tableColumn = options.TableColumns[num];
+							if(null != tableColumn && null != tableColumn.Name)
+								range.setValue(tableColumn.Name);
 						}
 					}
-					//wholeTable
-					allRange.setBorder((styleForCurTable.wholeTable && styleForCurTable.wholeTable.dxf.border) ? (styleForCurTable.wholeTable.dxf.border) : null);
-				}
-				else//test
-				{
-					for(var row = firstCell.first.row - 1; row < endCell.first.row; row++)
+					//заполняем стили
+					var aNoHiddenCol = new Array();
+					for(var i = bbox.c1; i <= bbox.c2; i++)
 					{
-						for(var col = firstCell.first.col - 1; col < endCell.first.col; col++)
+						var col = ws.model._getColNoEmpty(i);
+						if(null == col || true != col.hd)
+							aNoHiddenCol.push(i);
+					}
+					aNoHiddenCol.sort(fSortAscending);
+					var nRowIndex = 0;//с учетом скрытых
+					for(var i = bbox.r1; i <= bbox.r2; i++)
+					{
+						if(true == ws.model._getRow(i).hd)
+							continue;
+						var nColIndex = 0;//с учетом скрытых
+						for(var j = 0, length = aNoHiddenCol.length; j < length; j++)
 						{
-							var range = ws.model.getCell(new CellAddress(row,col,0));
-							if(row == firstCell.first.row - 1)
-								range.setFill(new RgbColor(5210557));
+							var nColIndexAbs = aNoHiddenCol[j];
+							var cell = ws.model._getCell(i, nColIndexAbs);
+							var dxf = styleForCurTable.getStyle(bbox, i, nColIndexAbs, nRowIndex, nColIndex, style, headerRowCount, totalsRowCount);
+							if(null != dxf)
+								cell.setTableStyle(dxf);
+							nColIndex++;
 						}
+						nRowIndex++;
 					}
 				}
 			},
@@ -4665,28 +4585,6 @@
 				}
 				var result = canvas.toDataURL();
 				return result;
-			},
-			
-			_setAllColorStyleForTable: function(range,styles,wholeTable)
-			{
-				if(!styles)
-				{
-					if(wholeTable && wholeTable.dxf.fill)
-						range.setFill((wholeTable && wholeTable.dxf.fill) ? (wholeTable.dxf.fill.bg) : null);
-				}
-				else
-				{
-					if(!styles.dxf.fill && wholeTable && wholeTable.dxf.fill)
-						range.setFill((wholeTable && wholeTable.dxf.fill) ? (wholeTable.dxf.fill.bg) : null);
-					else
-						range.setFill((styles && styles.dxf.fill) ? (styles.dxf.fill.bg) : null);
-					range.setBorderSrc((styles && styles.dxf.border) ? (styles.dxf.border) : null);
-				}
-				//style for text
-				if(styles && styles.dxf.font)
-					this._setStyleForTextInTable(range,styles.dxf.font);
-				/*else if(wholeTable && wholeTable.dxf.font)
-					this._setStyleForTextInTable(range,wholeTable.dxf.font);*/
 			},
 			
 			_dataFilterParse: function(data,val)
