@@ -2227,7 +2227,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				if (mode !== this.fontRenderingMode) {
 					this.fontRenderingMode = mode;
 					if (this.wb)
-						this.wb.setFontRenderingMode(mode);
+						this.wb.setFontRenderingMode(mode, /*isInit*/false);
 				}
 			},
 

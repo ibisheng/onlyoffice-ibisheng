@@ -65,7 +65,7 @@
 			this.wsActive = -1;
 			this.wsViews = [];
 			this.cellEditor = undefined;
-			this.fontRenderingMode = fontRenderingMode;
+			this.fontRenderingMode = c_oAscFontRenderingModeType.noHinting;
 
 			this._lockDraw = false;
 
@@ -78,7 +78,7 @@
 			this.fmgrGraphics[1].Initialize(true); // IE memory enable
 			//-----------------------
 			
-			this.init();
+			this.init(fontRenderingMode);
 
 			return this;
 		}
@@ -93,8 +93,12 @@
 			},
 
 
-			init: function () {
+			init: function (fontRenderingMode) {
 				var self = this;
+
+				// Init font managers rendering
+				// Изначально мы инициализируем c_oAscFontRenderingModeType.noHinting
+				this.setFontRenderingMode(fontRenderingMode, /*isInit*/true);
 
 				// create canvas
 				var outer = this.element.find("#ws-canvas-outer");
@@ -1314,8 +1318,9 @@
 
 			/*
 			 * @param {c_oAscRenderingModeType} mode Режим отрисовки
+			 * @param {Boolean} isInit инициализация или нет
 			 */
-			setFontRenderingMode: function (mode) {
+			setFontRenderingMode: function (mode, isInit) {
 				var ws;
 				if (mode !== this.fontRenderingMode) {
 					this.fontRenderingMode = mode;
@@ -1326,10 +1331,11 @@
 					else if (c_oAscFontRenderingModeType.hintingAndSubpixeling === mode)
 						this._setHintsProps(true, true);
 
-					ws = this.getWorksheet();
-					ws.draw();
-
-					this.cellEditor.setFontRenderingMode(mode);
+					if (!isInit) {
+						ws = this.getWorksheet();
+						ws.draw();
+						this.cellEditor.setFontRenderingMode(mode);
+					}
 				}
 			},
 
