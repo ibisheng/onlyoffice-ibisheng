@@ -2498,7 +2498,7 @@ CParaPage:qO
 JSCompiler_StaticMethods_normalizeXfrm:pH
 isObject:Il
 BDF_PropertyRec:Tq
-c_oSerPropLenType$Short:Mi
+c_oSerPropLenType$Short:Ki
 nSldLtTVertTitleAndTxOverChart:nJ
 tt_cmap13_char_index:ss
 APPROXIMATE_EPSILON:ZF
@@ -2918,11 +2918,11 @@ _cmap_classes$$inline_689:Rq
 BULLET_TYPE_TYPEFACE_BUFONT:Jh
 CUniFill:Eg
 L 63:mu
-L 68:Li
+L 68:Mi
 L 69:zm
 L 66:Uk
 Ins_MSIRP:ov
-L 67:Ki
+L 67:Li
 JSCompiler_StaticMethods_getSrc:ua
 CMouseMoveData:FM
 CMobileTouchManager:d0
