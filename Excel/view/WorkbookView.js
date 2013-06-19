@@ -66,9 +66,17 @@
 			this.wsViews = [];
 			this.cellEditor = undefined;
 			this.fontRenderingMode = fontRenderingMode;
-			//-----------------------
-			
+
 			this._lockDraw = false;
+
+			// Теперь у нас 2 FontManager-а на весь документ (а не на каждом листе свой)
+			this.fmgrGraphics = [];						// FontManager for draw (1 для обычного + 1 для поворотного текста)
+			this.fmgrGraphics.push(new CFontManager());	// Для обычного
+			this.fmgrGraphics.push(new CFontManager());	// Для поворотного
+
+			this.fmgrGraphics[0].Initialize(true); // IE memory enable
+			this.fmgrGraphics[1].Initialize(true); // IE memory enable
+			//-----------------------
 			
 			this.init();
 
@@ -233,7 +241,7 @@
 							}
 						});
 
-				this.cellEditor = new asc_CE(this.element, this.input, this.fontRenderingMode,
+				this.cellEditor = new asc_CE(this.element, this.input, this.fmgrGraphics,
 						/*handlers*/{
 							"closed"   : function () {self._onCloseCellEditor.apply(self, arguments);},
 							"updated"  : function () {self.handlers.trigger.apply(self.handlers,
@@ -295,7 +303,7 @@
 								"setAutoFiltersDialog"  : function (arrVal) {self.handlers.trigger("asc_onSetAFDialog", arrVal);},
 								"selectionRangeChanged"	: function (val) {self.handlers.trigger("asc_onSelectionRangeChanged", val);}
 							});
-				return new asc_WSV(wsModel, this.canvas[0], this.canvasOverlay[0], this.collaborativeEditing, this.fontRenderingMode, opt);
+				return new asc_WSV(wsModel, this.canvas[0], this.canvasOverlay[0], this.collaborativeEditing, this.fmgrGraphics, opt);
 			},
 
 			_onSelectionNameChanged: function (name) {
@@ -1191,22 +1199,6 @@
 				}
 			},
 
-			setFontRenderingMode: function (mode) {
-				var item, activeIndex;
-				if (mode !== this.fontRenderingMode) {
-					this.fontRenderingMode = mode;
-					activeIndex = this.model.getActive();
-					for(var i in this.wsViews) {
-						if (this.wsViews.hasOwnProperty(i)) {
-							item = this.wsViews[i];
-							item.setFontRenderingMode(mode, /*isDraw*/i == activeIndex);
-						}
-					}
-
-					this.cellEditor.setFontRenderingMode(mode);
-				}
-			},
-
 			setSelectDialogRangeMode: function (isSelectDialogRangeMode) {
 				this.getWorksheet().setSelectDialogRangeMode(isSelectDialogRangeMode);
 			},
@@ -1318,6 +1310,59 @@
 			
 			lockDraw: function(){
 				this._lockDraw = true;
+			},
+
+			/*
+			 * @param {c_oAscRenderingModeType} mode Режим отрисовки
+			 */
+			setFontRenderingMode: function (mode) {
+				var ws;
+				if (mode !== this.fontRenderingMode) {
+					this.fontRenderingMode = mode;
+					if (c_oAscFontRenderingModeType.noHinting === mode)
+						this._setHintsProps(false, false);
+					else if (c_oAscFontRenderingModeType.hinting === mode)
+						this._setHintsProps(true, false);
+					else if (c_oAscFontRenderingModeType.hintingAndSubpixeling === mode)
+						this._setHintsProps(true, true);
+
+					ws = this.getWorksheet();
+					ws.draw();
+
+					this.cellEditor.setFontRenderingMode(mode);
+				}
+			},
+
+			_setHintsProps: function (bIsHinting, bIsSubpixHinting) {
+				var index, manager, hintProps;
+				for (index in this.fmgrGraphics) {
+					if (!this.fmgrGraphics.hasOwnProperty(index))
+						continue;
+
+					manager = this.fmgrGraphics[index];
+					hintProps = manager.m_oLibrary.tt_hint_props;
+					if (!hintProps)
+						continue;
+
+					if (bIsHinting && bIsSubpixHinting) {
+						hintProps.TT_USE_BYTECODE_INTERPRETER = true;
+						hintProps.TT_CONFIG_OPTION_SUBPIXEL_HINTING = true;
+
+						manager.LOAD_MODE = 40968;
+					} else if (bIsHinting) {
+						hintProps.TT_USE_BYTECODE_INTERPRETER = true;
+						hintProps.TT_CONFIG_OPTION_SUBPIXEL_HINTING = false;
+
+						manager.LOAD_MODE = 40968;
+					} else {
+						hintProps.TT_USE_BYTECODE_INTERPRETER = true;
+						hintProps.TT_CONFIG_OPTION_SUBPIXEL_HINTING = false;
+
+						manager.LOAD_MODE = 40970;
+					}
+
+					manager.ClearFontsRasterCache();
+				}
 			}
 		};
 

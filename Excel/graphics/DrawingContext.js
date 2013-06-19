@@ -526,20 +526,13 @@ function DrawingContext(settings) {
 	this.units  = 3/*mm*/;
 	this.changeUnits( settings !== undefined && settings.units !== undefined ? settings.units : this.units );
 
-	this.fontRenderingMode = c_oAscFontRenderingModeType.noHinting;
-
-	this.fmgrGraphics = [];						// FontManager for draw (1 для обычного + 1 для поворотного текста)
-    this.fmgrGraphics.push(new CFontManager());	// Для обычного
-    this.fmgrGraphics.push(new CFontManager());	// Для поворотного
-
-    this.fmgrGraphics[0].Initialize(true); // IE memory enable
-	this.fmgrGraphics[1].Initialize(true); // IE memory enable
+	this.fmgrGraphics = undefined !== settings.fmgrGraphics ? settings.fmgrGraphics : null;
+	if (null === this.fmgrGraphics) {return null;}
 
 	/** @type FontProperties */
 	this.font = settings !== undefined && settings.font !== undefined ? settings.font : new FontProperties("Arial", 11);
 
 	this.fillColor = {r: 255, g: 255, b: 255, a: 255};
-	this._init(settings.fontRenderingMode);
     return this;
 }
 
@@ -547,11 +540,6 @@ DrawingContext.prototype = {
 
 	/** @type DrawingContext */
 	constructor: DrawingContext,
-
-	_init: function (fontRenderingMode) {
-		// Изначально мы инициализируем c_oAscFontRenderingModeType.noHinting
-		this.setFontRenderingMode(fontRenderingMode);
-	},
 
 	/**
 	 * Returns width of drawing context in current units
@@ -1186,54 +1174,7 @@ DrawingContext.prototype = {
 		    b = fm.m_lAscender * factor,
 		    d = Math.abs(fm.m_lDescender * factor);
 		return new TextMetrics(w, b + d, l, b, d, this.font.FontSize, 0, wBB);
-	},
-
-	/*
-	 * @param {c_oAscRenderingModeType} mode Режим отрисовки
-	 */
-	setFontRenderingMode: function (mode) {
-		if (mode !== this.fontRenderingMode) {
-			this.fontRenderingMode = mode;
-			if (c_oAscFontRenderingModeType.noHinting === mode)
-				this._setHintsProps(false, false);
-			else if (c_oAscFontRenderingModeType.hinting === mode)
-				this._setHintsProps(true, false);
-			else if (c_oAscFontRenderingModeType.hintingAndSubpixeling === mode)
-				this._setHintsProps(true, true);
-		}
-     },
-
-    _setHintsProps: function (bIsHinting, bIsSubpixHinting) {
-		var index, manager, hintProps;
-        for (index in this.fmgrGraphics) {
-			if (!this.fmgrGraphics.hasOwnProperty(index))
-				continue;
-
-			manager = this.fmgrGraphics[index];
-			hintProps = manager.m_oLibrary.tt_hint_props;
-			if (!hintProps)
-				continue;
-
-            if (bIsHinting && bIsSubpixHinting) {
-				hintProps.TT_USE_BYTECODE_INTERPRETER = true;
-				hintProps.TT_CONFIG_OPTION_SUBPIXEL_HINTING = true;
-
-                manager.LOAD_MODE = 40968;
-            } else if (bIsHinting) {
-				hintProps.TT_USE_BYTECODE_INTERPRETER = true;
-				hintProps.TT_CONFIG_OPTION_SUBPIXEL_HINTING = false;
-
-                manager.LOAD_MODE = 40968;
-            } else {
-				hintProps.TT_USE_BYTECODE_INTERPRETER = true;
-				hintProps.TT_CONFIG_OPTION_SUBPIXEL_HINTING = false;
-
-                manager.LOAD_MODE = 40970;
-            }
-
-			manager.ClearFontsRasterCache();
-        }
-    }
+	}
 };
 
 

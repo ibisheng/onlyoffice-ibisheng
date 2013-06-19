@@ -348,15 +348,15 @@
 		 * @param {Object} canvas    Canvas for drawing
 		 * @param {Object} overlay   Canvas for selection
 		 * @param {asc_CCollaborativeEditing} collaborativeEditing
-		 * @param {c_oAscFontRenderingModeType} fontRenderingMode
+		 * @param {Array} fmgrGraphics
 		 * @param {Object} settings  Settings
 		 *
 		 * @constructor
 		 * @memberOf Asc
 		 */
-		function WorksheetView(model, canvas, overlay, collaborativeEditing, fontRenderingMode, settings) {
+		function WorksheetView(model, canvas, overlay, collaborativeEditing, fmgrGraphics, settings) {
 			if ( !(this instanceof WorksheetView) ) {
-				return new WorksheetView(model, canvas, overlay, collaborativeEditing, fontRenderingMode, settings);
+				return new WorksheetView(model, canvas, overlay, collaborativeEditing, fmgrGraphics, settings);
 			}
 
 			this.settings = $.extend(true, {}, this.defaults, settings);
@@ -370,12 +370,11 @@
 			this.model = model;
 
 			this.buffers = {};
-			this.buffers.main    = canvas.getPPIX ? canvas : asc_DC({canvas: canvas, units: 1/*pt*/, fontRenderingMode: fontRenderingMode});
-			this.buffers.overlay = overlay ? asc_DC({canvas: overlay, units: 1/*pt*/, fontRenderingMode: fontRenderingMode}) : null;
+			this.buffers.main    = canvas.getPPIX ? canvas : asc_DC({canvas: canvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics});
+			this.buffers.overlay = overlay ? asc_DC({canvas: overlay, units: 1/*pt*/, fmgrGraphics: fmgrGraphics}) : null;
 
 			this.drawingCtx = this.buffers.main;
 			this.overlayCtx = this.buffers.overlay;
-			this.fontRenderingMode = fontRenderingMode;
 
 			this.stringRender = asc_SR(this.drawingCtx);
 			this.stringRender.setDefaultFontFromFmt({fn: cells.fontName, fs: cells.fontSize});
@@ -1147,25 +1146,27 @@
 				this.height_2px = asc_calcnpt(0, this._getPPIY(), 2/*px*/);
 				this.height_3px = asc_calcnpt(0, this._getPPIY(), 3/*px*/);
 
-				if (this.printMode) {
+				// ToDo разобраться со значениями
+//				if (this.printMode) {
 					// Для печати используем алгоритм из спецификации
 					// Ecma-376 Office Open XML Part 1, пункт 18.3.1.13
-					this.maxNumWidth = asc_round( this.emSize * asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIX() ) );
-				} else {
+//					this.maxNumWidth = asc_round( this.emSize * asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIX() ) );
+//				} else {
 					// Для отображения нужно более точное значение, иначе будут прыгать строки в ячейках
 					// http://bugzserver/show_bug.cgi?id=15311
 					this.maxNumWidth = this.emSize * asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIX() );
-				}
+//				}
 				gc_dDefaultColWidthCharsAttribute = this._charCountToModelColWidth(gc_dDefaultColWidthChars, true);
 				this.defaultColWidth = this._modelColWidthToColWidth(gc_dDefaultColWidthCharsAttribute);
 				this.displayColWidth = this._modelColWidthToColWidth(gc_dDefaultColWidthCharsAttribute, true);
 
 				this.maxRowHeight = asc_calcnpt( 409, this._getPPIY() );
-				if (this.printMode) {
-					this.defaultRowHeight = asc_round( this.settings.cells.fontSize * this.vspRatio );
-				} else {
+				// ToDo разобраться со значениями
+//				if (this.printMode) {
+//					this.defaultRowHeight = asc_round( this.settings.cells.fontSize * this.vspRatio );
+//				} else {
 					this.defaultRowHeight = asc_calcnpt( this.settings.cells.fontSize * this.vspRatio, this._getPPIY() ) + this.height_1px;
-				}
+//				}
 				this.defaultRowDescender = this._calcRowDescender(this.settings.cells.fontSize);
 
 				// calculate rows heights and visible rows
@@ -1778,29 +1779,7 @@
 
 				return arrResult;
 			},
-
 			drawForPrint: function (drawingCtx, printPagesData) {
-				var p, sett = {}, w, h, cnv, ws;
-
-				// Копируем все опции, кроме обработчиков
-				for (p in this.settings) if (this.settings.hasOwnProperty(p)) {
-					if (typeof this.settings[p] === "function") {continue;}
-					sett[p] = asc_clone(this.settings[p]);
-				}
-				sett.printMode = true;
-
-				// Создаем канву для печати
-				w = this.drawingCtx.getWidth();
-				h = this.drawingCtx.getHeight();
-				cnv = $('<canvas width="' + w + '" height="' + h + '"/>')[0];
-				
-				sett.objectRender = this.objectRender;
-
-				ws = new WorksheetView(this.model, cnv, null, null, this.fontRenderingMode, sett);
-				ws._print(drawingCtx, printPagesData);
-			},
-
-			_print: function (drawingCtx, printPagesData) {
                 var isAppBridge = (undefined != window['appBridge']);
 
 				if (null === printPagesData) {
@@ -9156,16 +9135,6 @@
 			sortColFilter: function (type,cellId) {
 				var ar = this.activeRange.clone(true);
 				this.autoFilters.sortColFilter(type, cellId, this, ar);
-			},
-
-			setFontRenderingMode: function (mode, isDraw) {
-				if (mode !== this.fontRenderingMode) {
-					this.fontRenderingMode = mode;
-					this.drawingCtx.setFontRenderingMode(mode);
-					this.overlayCtx.setFontRenderingMode(mode);
-					if (isDraw)
-						this.draw();
-				}
 			},
 			
 			getAddFormatTableOptions: function(nameOption)
