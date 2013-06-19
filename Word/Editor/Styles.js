@@ -4393,7 +4393,7 @@ CTextPr.prototype =
         this.FontSizeCS = undefined;
         this.CS         = undefined;
         this.RTL        = undefined;
-        this.Lang       = undefined;
+        this.Lang       = new CLang();
     },
 
     Copy : function()
