@@ -1557,6 +1557,8 @@
 					case "fa": format.va = val; break;
 					case "c":
 						format.c = asc.numberToCSSColor(val.getRgb());
+						formatAdditional.theme = null;
+						formatAdditional.tint = null;
 						if(val instanceof ThemeColor)
 						{
 							formatAdditional.theme = val.theme;
