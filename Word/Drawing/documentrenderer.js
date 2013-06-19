@@ -122,6 +122,37 @@ function CStream(data, size)
     {
         return this.GetShort() / 100;
     }
+
+    this.SkipImage = function()
+    {
+        var _type = this.GetUChar();
+
+        switch (_type)
+        {
+            case 2:
+            {
+                this.Skip(4);
+                break;
+            }
+            case 3:
+            {
+                var _lenA = this.GetULong();
+                this.Skip(_lenA);
+                break;
+            }
+            case 10:
+            case 11:
+            {
+                this.Skip(44);
+                break;
+            }
+            default:
+            {
+                this.Skip(20);
+                break;
+            }
+        }
+    }
 }
 
 function CreateDocumentData(szSrc)
@@ -633,14 +664,33 @@ function CDocMeta()
                     var __w = s.GetDouble();
                     var __h = s.GetDouble();
 
+                    var _tr = null;
+                    if (10 == _type || 11 == _type)
+                    {
+                        _tr = new CMatrix();
+                        _tr.sx = s.GetDouble();
+                        _tr.shy = s.GetDouble();
+                        _tr.shx = s.GetDouble();
+                        _tr.sy = s.GetDouble();
+                        _tr.tx = s.GetDouble();
+                        _tr.ty = s.GetDouble();
+                    }
+
                     obj.StreamPos = s.pos;
 
                     var img = new Image();
                     img.onload = function(){
                         if (1 != obj.BreakDrawing)
                         {
+                            var _old = g.m_oTransform;
+                            if (_tr)
+                                g.transform(_tr.sx, _tr.shy, _tr.shx, _tr.sy, _tr.tx, _tr.ty);
+
                             g.drawImage2(img,__x,__y,__w,__h);
 							//editor.WordControl.OnScroll();
+
+                            if (_tr)
+                                g.transform(_old.sx, _old.shy, _old.shx, _old.sy, _old.tx, _old.ty);
                         }
 						
                         oThisDoc.OnImageLoad(obj);
@@ -835,7 +885,7 @@ function CDocMeta()
                 case 110:
                 {
                     // drawImage
-                    s.Skip(21);
+                    s.SkipImage();
                     break;
                 }
                 case 160:
@@ -1130,7 +1180,7 @@ function CDocMeta()
                 case 110:
                 {
                     // drawImage
-                    s.Skip(21);
+                    s.SkipImage();
                     break;
                 }
                 case 160:
@@ -1378,7 +1428,7 @@ function CDocMeta()
                 case 110:
                 {
                     // drawImage
-                    s.Skip(21);
+                    s.SkipImage();
                     break;
                 }
                 case 160:
@@ -1745,7 +1795,7 @@ function CDocMeta()
                 case 110:
                 {
                     // drawImage
-                    s.Skip(21);
+                    s.SkipImage();
                     break;
                 }
                 case 160:
@@ -1983,7 +2033,7 @@ function CDocMeta()
                 case 110:
                 {
                     // drawImage
-                    s.Skip(21);
+                    s.SkipImage();
                     break;
                 }
                 case 160:
@@ -2259,7 +2309,7 @@ function CDocMeta()
                 case 110:
                 {
                     // drawImage
-                    s.Skip(21);
+                    s.SkipImage();
                     break;
                 }
                 case 160:
