@@ -32,6 +32,8 @@ var cExcelDateTimeDigits = 8;//количество цифр после запя
 var c_Date1904Const = 24107; //разница в днях между 01.01.1970 и 01.01.1904 годами
 var c_Date1900Const = 25568; //разница в днях между 01.01.1970 и 01.01.1900 годами
 var c_DateCorrectConst = c_Date1900Const;
+var c_sPerDay = 86400;
+var c_msPerDay = c_sPerDay*1000;
 	
 function extend(Child, Parent) {
 	var F = function() {};
@@ -1560,7 +1562,7 @@ var cFormulaFunction = {
 				if( month == 0 ){
 					return this.setCA(new cError( cErrorType.not_numeric ),true);
 				}
-                this.value = new cNumber( Math.round( ( ( new Date(year, month - 1,  day) ).getTime()/1000 )/86400+(c_DateCorrectConst+1) ) )
+                this.value = new cNumber( Math.round( ( ( new Date(year, month - 1,  day) ).getTime()/1000 )/c_sPerDay+(c_DateCorrectConst+1) ) )
                 this.value.numFormat = 14;
 				this.value.ca = true;
                 return this.value;
@@ -1649,7 +1651,7 @@ var cFormulaFunction = {
 							return this.setCA(new cError( cErrorType.wrong_value_type ),true);
 						}
 						else 
-							val = Math.floor( ( d.getTime()/1000 - d.getTimezoneOffset()*60 )/86400+( c_DateCorrectConst + (g_bDate1904?0:1) ) );
+							val = Math.floor( ( d.getTime()/1000 - d.getTimezoneOffset()*60 )/c_sPerDay+( c_DateCorrectConst + (g_bDate1904?0:1) ) );
                     }
                     else {
                         val = arg0.tocNumber().getValue();
@@ -1660,14 +1662,14 @@ var cFormulaFunction = {
 				else if(!g_bDate1904)
 				{
 					if( val < 60 )
-						return this.setCA(new cNumber( ( new Date((val-c_DateCorrectConst)*86400*1000) ).getUTCDate() ),true,0);
+						return this.setCA(new cNumber( ( new Date((val-c_DateCorrectConst)*c_msPerDay) ).getUTCDate() ),true,0);
 					else if( val == 60 )
-						return this.setCA(new cNumber( ( new Date((val-c_DateCorrectConst-1)*86400*1000) ).getUTCDate() +1),true,0);
+						return this.setCA(new cNumber( ( new Date((val-c_DateCorrectConst-1)*c_msPerDay) ).getUTCDate() +1),true,0);
 					else
-						return this.setCA(new cNumber( ( new Date((val-c_DateCorrectConst-1)*86400*1000) ).getUTCDate() ),true,0);
+						return this.setCA(new cNumber( ( new Date((val-c_DateCorrectConst-1)*c_msPerDay) ).getUTCDate() ),true,0);
 				}
 				else
-					return this.setCA(new cNumber( ( new Date((val-c_DateCorrectConst)*86400*1000) ).getUTCDate() ),true,0);
+					return this.setCA(new cNumber( ( new Date((val-c_DateCorrectConst)*c_msPerDay) ).getUTCDate() ),true,0);
             }
             r.getInfo = function(){
                 return {
@@ -1717,14 +1719,14 @@ var cFormulaFunction = {
 					return this.setCA(new cError( cErrorType.not_numeric ),true);
 				else if(!g_bDate1904){
 					if( val < 60 )
-						val = new Date((val-c_DateCorrectConst)*86400*1000);
+						val = new Date((val-c_DateCorrectConst)*c_msPerDay);
 					else if( val == 60 )
-						val = new Date((val-c_DateCorrectConst-1)*86400*1000);
+						val = new Date((val-c_DateCorrectConst-1)*c_msPerDay);
 					else
-						val = new Date((val-c_DateCorrectConst-1)*86400*1000);
+						val = new Date((val-c_DateCorrectConst-1)*c_msPerDay);
 				}
 				else
-					val = new Date((val-c_DateCorrectConst)*86400*1000);
+					val = new Date((val-c_DateCorrectConst)*c_msPerDay);
 					
 				date = new Date(val);
 				
@@ -1740,7 +1742,7 @@ var cFormulaFunction = {
 					val = new Date(val.setMonth(val.getMonth()+arg1.getValue()));
 				}
 
-				return this.value = new cNumber( Math.floor( ( val.getTime()/1000 - val.getTimezoneOffset()*60 )/86400+(c_DateCorrectConst+1) ) )
+				return this.value = new cNumber( Math.floor( ( val.getTime()/1000 - val.getTimezoneOffset()*60 )/c_sPerDay+(c_DateCorrectConst+1) ) )
 			}
 			r.getInfo = function(){
                 return {
@@ -1785,14 +1787,14 @@ var cFormulaFunction = {
 					return this.setCA(new cError( cErrorType.not_numeric ),true);
 				else if(!g_bDate1904){
 					if( val < 60 )
-						val = new Date((val-c_DateCorrectConst)*86400*1000);
+						val = new Date((val-c_DateCorrectConst)*c_msPerDay);
 					else if( val == 60 )
-						val = new Date((val-c_DateCorrectConst-1)*86400*1000);
+						val = new Date((val-c_DateCorrectConst-1)*c_msPerDay);
 					else
-						val = new Date((val-c_DateCorrectConst-1)*86400*1000);
+						val = new Date((val-c_DateCorrectConst-1)*c_msPerDay);
 				}
 				else
-					val = new Date((val-c_DateCorrectConst)*86400*1000);
+					val = new Date((val-c_DateCorrectConst)*c_msPerDay);
 					
 				date = new Date(val);
 				
@@ -1800,7 +1802,7 @@ var cFormulaFunction = {
 				val.setMonth(val.getMonth()+arg1.getValue());
 				val.setDate(val.getDaysInMonth());
 
-				return this.value = new cNumber( Math.floor( ( val.getTime()/1000 - val.getTimezoneOffset()*60 )/86400+(c_DateCorrectConst+1) ) )
+				return this.value = new cNumber( Math.floor( ( val.getTime()/1000 - val.getTimezoneOffset()*60 )/c_sPerDay+(c_DateCorrectConst+1) ) );
 			}
 			r.getInfo = function(){
                 return {
@@ -1851,7 +1853,7 @@ var cFormulaFunction = {
 							val = d.value ;
 						}
 						else 
-							val = ( d.getTime()/1000 - d.getTimezoneOffset()*60 )/86400+( c_DateCorrectConst + (g_bDate1904?0:1) );
+							val = ( d.getTime()/1000 - d.getTimezoneOffset()*60 )/c_sPerDay+( c_DateCorrectConst + (g_bDate1904?0:1) );
                     }
                     else {
                         val = arg0.tocNumber().getValue();
@@ -1911,7 +1913,7 @@ var cFormulaFunction = {
 							val = d.value ;
 						}
 						else 
-							val = ( d.getTime()/1000 - d.getTimezoneOffset()*60 )/86400+( c_DateCorrectConst + (g_bDate1904?0:1) );
+							val = ( d.getTime()/1000 - d.getTimezoneOffset()*60 )/c_sPerDay+( c_DateCorrectConst + (g_bDate1904?0:1) );
                     }
                     else {
                         val = arg0.tocNumber().getValue();
@@ -1969,7 +1971,7 @@ var cFormulaFunction = {
 							return this.setCA( new cError( cErrorType.wrong_value_type ) ,true);
 						}
 						else 
-							val = Math.floor( ( d.getTime()/1000 - d.getTimezoneOffset()*60 )/86400+( c_DateCorrectConst + (g_bDate1904?0:1) ) );
+							val = Math.floor( ( d.getTime()/1000 - d.getTimezoneOffset()*60 )/c_sPerDay+( c_DateCorrectConst + (g_bDate1904?0:1) ) );
                     }
                     else {
                         val = arg0.tocNumber().getValue();
@@ -1982,10 +1984,10 @@ var cFormulaFunction = {
 						if( val == 60 )
 							return this.setCA( new cNumber( 2 ) ,true,0);
 						else 
-							return this.setCA( new cNumber( ( new Date( ( (val==0?1:val) - c_DateCorrectConst ) * 86400 * 1000) ).getUTCMonth() + 1 ) ,true,0);
+							return this.setCA( new cNumber( ( new Date( ( (val==0?1:val) - c_DateCorrectConst ) * c_msPerDay) ).getUTCMonth() + 1 ) ,true,0);
 					}
 					else 
-						return this.setCA( new cNumber( ( new Date( ( (val==0?1:val) - c_DateCorrectConst ) * 86400 * 1000) ).getUTCMonth() + 1 ) ,true,0);
+						return this.setCA( new cNumber( ( new Date( ( (val==0?1:val) - c_DateCorrectConst ) * c_msPerDay) ).getUTCMonth() + 1 ) ,true,0);
             }
             r.getInfo = function(){
                 return {
@@ -1999,6 +2001,123 @@ var cFormulaFunction = {
         'NETWORKDAYS' : function(){
             var r = new cBaseFunction();
             r.setName("NETWORKDAYS");
+			r.setArgumentsMin(2);
+            r.setArgumentsMax(3);
+			r.Calculate = function(arg){
+				var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arrDateIncl = [];
+				
+				if ( arg0 instanceof cArea || arg0 instanceof cArea3D ){
+					arg0 = arg0.cross(arguments[1].first);
+				}
+				else if( arg0 instanceof cArray ){
+					arg0 = arg0.getElementRowCol(0,0);
+				}
+				
+				if ( arg1 instanceof cArea || arg1 instanceof cArea3D ){
+					arg1 = arg1.cross(arguments[1].first);
+				}
+				else if( arg1 instanceof cArray ){
+					arg1 = arg1.getElementRowCol(0,0);
+				}
+				
+				arg0 = arg0.tocNumber();
+				arg1 = arg1.tocNumber();
+				
+				if( arg0 instanceof cError) return this.value = arg0;
+				if( arg1 instanceof cError) return this.value = arg1;
+				
+				var val0 = arg0.getValue(), val1 = arg1.getValue(), dif, count = 0;
+				
+				if(val0 < 0)
+					return this.setCA(new cError( cErrorType.not_numeric ),true);
+				else if(!g_bDate1904){
+					if( val0 < 60 )
+						val0 = new Date((val0-c_DateCorrectConst)*c_msPerDay);
+					else if( val0 == 60 )
+						val0 = new Date((val0-c_DateCorrectConst-1)*c_msPerDay);
+					else
+						val0 = new Date((val0-c_DateCorrectConst-1)*c_msPerDay);
+				}
+				else
+					val0 = new Date((val0-c_DateCorrectConst)*c_msPerDay);
+				
+				if(val1 < 0)
+					return this.setCA(new cError( cErrorType.not_numeric ),true);
+				else if(!g_bDate1904){
+					if( val1 < 60 )
+						val1 = new Date((val1-c_DateCorrectConst)*c_msPerDay);
+					else if( val1 == 60 )
+						val1 = new Date((val1-c_DateCorrectConst-1)*c_msPerDay);
+					else
+						val1 = new Date((val1-c_DateCorrectConst-1)*c_msPerDay);
+				}
+				else
+					val1 = new Date((val1-c_DateCorrectConst)*c_msPerDay);
+					
+				var holidays = [];
+				
+				if( arg2 ){
+					if( arg2 instanceof cArea || arg2 instanceof cArea3D ){
+						var arr = arg2.getValue();
+						for(var i = 0; i < arr.length; i++){
+							if( arr[i] instanceof cNumber && arr[i].getValue() >= 0 ){
+								holidays.push(arr[i]);
+							}
+						}
+					}
+					else if( arg2 instanceof cArray ){
+						arg2.foreach(function(elem,r,c){
+							if( elem instanceof cNumber ){
+								holidays.push(elem);
+							}
+							else if( elem instanceof cString ){
+								var res = g_oFormatParser.parse(elem.getValue());
+								if( res && res.bDateTime && res.value >= 0 )
+									holidays.push( new cNumber(parseInt(res.value)) );
+							}
+						})
+					}
+				}
+				
+				for(var i = 0; i < holidays.length; i++ ){
+					if(!g_bDate1904){
+						if( holidays[i].getValue() < 60 )
+							holidays[i] = new Date((holidays[i].getValue()-c_DateCorrectConst)*c_msPerDay);
+						else if( holidays[i] == 60 )
+							holidays[i] = new Date((holidays[i].getValue()-c_DateCorrectConst-1)*c_msPerDay);
+						else
+							holidays[i] = new Date((holidays[i].getValue()-c_DateCorrectConst-1)*c_msPerDay);
+					}
+					else
+						holidays[i] = new Date((holidays[i].getValue()-c_DateCorrectConst)*c_msPerDay);
+				}
+				
+				function includeInHolidays(date){
+					for(var i = 0; i < holidays.length; i++ ){
+						if( date.getTime() == holidays[i].getTime() )
+							return false;
+					}
+					return true;
+				}
+				
+				dif = ( val1 - val0 ) / c_msPerDay;
+				for(var i = 0; i < Math.abs(dif); i++ ){
+					var date = new Date( val0 );
+					date.setDate(val0.getDate()+i) ;
+					if( date.getDay() != 5 && date.getDay() != 6 && includeInHolidays(date) )
+						count++;
+				}
+				
+				
+				return this.value = new cNumber( (dif<0?-1:1)*count );
+			}
+			r.getInfo = function(){
+                return {
+                    name:this.name,
+                    args:"( start-date , end-date [ , holidays ] )"
+                };
+            }
+			r.setFormat(r.formatType.noneFormat);
 			return r;
         },
         'NETWORKDAYS.INTL' : function(){
@@ -2013,7 +2132,7 @@ var cFormulaFunction = {
             r.setName("NOW");
             r.Calculate = function(){
                 var d = new Date();
-                this.value = new cNumber( Math.floor( ( d.getTime()/1000 - d.getTimezoneOffset()*60 )/86400+(c_DateCorrectConst+1) ) + ( (d.getHours()*60*60+d.getMinutes()*60+d.getSeconds())/86400 ) );
+                this.value = new cNumber( Math.floor( ( d.getTime()/1000 - d.getTimezoneOffset()*60 )/c_sPerDay+(c_DateCorrectConst+1) ) + ( (d.getHours()*60*60+d.getMinutes()*60+d.getSeconds())/c_sPerDay ) );
                 this.value.numFormat = 22;
 				return this.setCA( this.value ,true);
             }
@@ -2065,7 +2184,7 @@ var cFormulaFunction = {
 							val = d.value ;
 						}
 						else 
-							val = ( d.getTime()/1000 - d.getTimezoneOffset()*60 )/86400+( c_DateCorrectConst + (g_bDate1904?0:1) );
+							val = ( d.getTime()/1000 - d.getTimezoneOffset()*60 )/c_sPerDay+( c_DateCorrectConst + (g_bDate1904?0:1) );
                     }
                     else {
                         val = arg0.tocNumber().getValue();
@@ -2092,7 +2211,7 @@ var cFormulaFunction = {
             r.setArgumentsMin(3);
             r.setArgumentsMax(3);
             r.setName("TIME");
-            //to excel (hh*60*60+mm*60+ss)/86400 (86400 the number of seconds in a day)
+            //to excel (hh*60*60+mm*60+ss)/c_sPerDay (c_sPerDay the number of seconds in a day)
             r.Calculate = function(arg){
                 var hour,minute,second;
                 for (var i = 0; i<this.argumentsCurrent;i++){
@@ -2132,7 +2251,7 @@ var cFormulaFunction = {
                         }
                     }
                 }
-                var v = (hour*60*60+minute*60+second)/86400;
+                var v = (hour*60*60+minute*60+second)/c_sPerDay;
 				this.setCA( new cNumber( v - Math.floor(v) ) ,true);
 				if( arguments[1].getNumFormatStr().toLowerCase() === "general" )
 					this.value.numFormat = 18;
@@ -2159,7 +2278,7 @@ var cFormulaFunction = {
             r.Calculate = function(){
                 var d = new Date();
 				//						1			2 3												3		4					  5				   5 4 2 1
-				this.setCA(  new cNumber( Math.floor( ( d.getTime()/1000 - d.getTimezoneOffset()*60 )/86400+( c_DateCorrectConst + (g_bDate1904?0:1) ) ) ) ,true);
+				this.setCA(  new cNumber( Math.floor( ( d.getTime()/1000 - d.getTimezoneOffset()*60 )/c_sPerDay+( c_DateCorrectConst + (g_bDate1904?0:1) ) ) ) ,true);
 				if( arguments[1].getNumFormatStr().toLowerCase() === "general" )
 					this.value.numFormat = 14;
                 return this.value;
@@ -2171,7 +2290,7 @@ var cFormulaFunction = {
                 };
             }
 			return r;
-			//Math.floor(((new Date()).getTime()/1000)/86400+(c_DateCorrectConst+1)) from UTC-timestamp to excel 2010
+			//Math.floor(((new Date()).getTime()/1000)/c_sPerDay+(c_DateCorrectConst+1)) from UTC-timestamp to excel 2010
         },
         'WEEKDAY' : function(){
             var r = new cBaseFunction();
@@ -2232,7 +2351,7 @@ var cFormulaFunction = {
 							return this.setCA( new cError( cErrorType.wrong_value_type ) ,true);
 						}
 						else 
-							val = Math.floor( ( d.getTime()/1000 - d.getTimezoneOffset()*60 )/86400+( c_DateCorrectConst + (g_bDate1904?0:1) ) );
+							val = Math.floor( ( d.getTime()/1000 - d.getTimezoneOffset()*60 )/c_sPerDay+( c_DateCorrectConst + (g_bDate1904?0:1) ) );
                     }
                     else {
                         val = arg0.tocNumber().getValue();
@@ -2241,7 +2360,7 @@ var cFormulaFunction = {
                 if(val < 0)
 					return this.setCA( new cError( cErrorType.not_numeric ) ,true,0);
 				else
-					return this.setCA( new cNumber( (new Date((val-(c_DateCorrectConst+1))*86400*1000)).getUTCFullYear() ) ,true,0);
+					return this.setCA( new cNumber( (new Date((val-(c_DateCorrectConst+1))*c_msPerDay)).getUTCFullYear() ) ,true,0);
             }
             r.getInfo = function(){
                 return {
@@ -2656,6 +2775,77 @@ var cFormulaFunction = {
         'PV' : function(){
             var r = new cBaseFunction();
             r.setName("PV");
+			r.setArgumentsMin(1);
+            r.setArgumentsMax(5);
+            r.Calculate = function(arg){
+				var rate = arg[0], nper = arg[1], pmt = arg[2], fv = arg[3] ? arg[3] : new cNumber(0), type = arg[4] ? arg[4] : new cNumber(0);
+				
+				if ( rate instanceof cArea || rate instanceof cArea3D ){
+					rate = rate.cross(arguments[1].first);
+				}
+				else if( rate instanceof cArray ){
+					rate = rate.getElementRowCol(0,0);
+				}
+				
+				if ( nper instanceof cArea || nper instanceof cArea3D ){
+					nper = nper.cross(arguments[1].first);
+				}
+				else if( nper instanceof cArray ){
+					nper = nper.getElementRowCol(0,0);
+				}
+				
+				if ( pmt instanceof cArea || pmt instanceof cArea3D ){
+					pmt = pmt.cross(arguments[1].first);
+				}
+				else if( pmt instanceof cArray ){
+					pmt = pmt.getElementRowCol(0,0);
+				}
+				
+				if ( fv instanceof cArea || fv instanceof cArea3D ){
+					fv = fv.cross(arguments[1].first);
+				}
+				else if( fv instanceof cArray ){
+					fv = fv.getElementRowCol(0,0);
+				}
+				
+				if ( type instanceof cArea || type instanceof cArea3D ){
+					type = type.cross(arguments[1].first);
+				}
+				else if( type instanceof cArray ){
+					type = type.getElementRowCol(0,0);
+				}
+
+				rate = rate.tocNumber();
+				nper = nper.tocNumber();
+				pmt = pmt.tocNumber();
+				fv = fv.tocNumber();
+				type = type.tocNumber();
+				
+				if ( rate instanceof cError ) return this.value = rate;
+				if ( nper instanceof cError ) return this.value = nper;
+				if ( pmt instanceof cError ) return this.value = pmt;
+				if ( fv instanceof cError ) return this.value = fv;
+				if ( type instanceof cError ) return this.value = type;				
+				
+				if ( type.getValue() != 1 && type.getValue() != 0 ) return this.value = new cError( cErrorType.not_numeric );				
+
+				var res;
+				if( rate.getValue() != 0 ){
+					res = -1*( fv.getValue() + pmt.getValue()*(1+rate.getValue()*type.getValue())*( (Math.pow((1+rate.getValue()),nper.getValue())-1)/rate.getValue() ) )/Math.pow(1+rate.getValue(),nper.getValue())
+				}
+				else{
+					res = -1*( fv.getValue()+pmt.getValue()*nper.getValue() );
+				}
+
+				return this.value = new cNumber(res);
+			}
+			r.getInfo = function(){
+                return {
+                    name:this.name,
+                    args:"( rate , nper , pmt [ , [ fv ] [ ,[ type ] ] ] )"
+                };
+            }
+			r.setFormat(r.formatType.noneFormat);
 			return r;
         },
         'RATE' : function(){
@@ -8397,6 +8587,12 @@ var cFormulaFunction = {
 					return this.value = new cError( cErrorType.wrong_value_type );
 				
 			}
+			r.getInfo = function(){
+                return {
+                    name:this.name,
+                    args:"( string )"
+                };
+            }
 			r.setFormat(r.formatType.noneFormat);
         	return r;
 		}
@@ -9388,12 +9584,12 @@ parserFormula.prototype = {
 
 			/*Comma & arguments union*/
 			else if( parserHelp.isComma.call(this,this.Formula,this.pCurrPos) ){
-				if( operand_expected ){
+				/* if( operand_expected ){
 					this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
 					this.outStack = [];
 					this.elemArr = [];
 					return false;
-				}
+				} */
 				var wasLeftParentheses = false;
 				var stackLength = this.elemArr.length;
 				var top_elem = null;
