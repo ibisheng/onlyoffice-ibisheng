@@ -19,6 +19,7 @@ var g_oImagePr   = new Object();//
 var g_nImageWrap = 0;//c_oAscWrapStyle2.Inline;
 var g_bImageCanBeFlow = true;
 var g_oTablePr   = new Object();
+var g_oSpellCheck = new Object();
 //var oChartEditor = new ChartEditor();
 
 var Drag = {
@@ -2016,6 +2017,22 @@ $(".colorWatch").mouseover(function(){
          editor.put_TextPrLang( lcid );
      })
 
+     $("#prSpellingVariants").change(function(evt)
+     {
+         var word = this.options[this.selectedIndex].text;
+         editor.asc_replaceMisspelledWord( word, g_oSpellCheck );
+     })
+
+     $("#prIgnoreMisspelling").click(function()
+     {
+         editor.asc_ignoreMisspelledWord(g_oSpellCheck, false);
+     })
+
+     $("#prIgnoreAllMisspelling").click(function()
+     {
+         editor.asc_ignoreMisspelledWord(g_oSpellCheck, true);
+     })
+
      $("#tblLookFirstRow, #tblLookLastRow, #tblLookFirstCol, #tblLookLastCol, #tblLookHorBand, #tblLookVerBand,").change(function(evt)
      {
          var TableLook =
@@ -2762,6 +2779,7 @@ $(".colorWatch").mouseover(function(){
                 else if ( ObjectType == c_oAscTypeSelectElement.SpellCheck )
                 {
                     var elemVal = elemArg.get_ObjectValue();
+                    g_oSpellCheck = elemVal;
 
                     var Word     = elemVal.get_Word();
                     var Checked  = elemVal.get_Checked();
@@ -2772,10 +2790,11 @@ $(".colorWatch").mouseover(function(){
 
                     if ( true === Checked )
                     {
-
+                        document.getElementById("prIgnoreMisspelling_div").style.display = "none";
                     }
                     else
                     {
+                        document.getElementById("prIgnoreMisspelling_div").style.display = "block";
                         var SpellingVariants = document.getElementById("prSpellingVariants");
                         SpellingVariants.options.length = 0;
 

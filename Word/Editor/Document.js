@@ -221,6 +221,44 @@ CStatistics.prototype =
     }
 };
 
+function CDocumentSpelling()
+{
+    this.Paragraphs = new Object(); // Параграфы, в которых есть ошибки в орфографии (объект с ключом - Id параграфа)
+    this.Words      = new Object(); // Слова, которые пользователь решил пропустить(нажал "пропустить все") при проверке орфографии
+}
+
+CDocumentSpelling.prototype =
+{
+    Add_Paragraph : function(Id, Para)
+    {
+        this.Paragraphs[Id] = Para;
+    },
+
+    Remove_Paragraph : function(Id)
+    {
+        delete this.Paragraphs[Id];
+    },
+
+    Check_Word : function(Word)
+    {
+        if ( undefined != this.Words[Word] )
+            return true;
+
+        return false;
+    },
+
+    Add_Word : function(Word)
+    {
+        this.Words[Word] = true;
+
+        for ( var Id in this.Paragraphs )
+        {
+            var Para = this.Paragraphs[Id];
+            Para.SpellChecker.Ignore( Word );
+        }
+    }
+};
+
 function CDocument(DrawingDocument)
 {
     this.History = new CHistory(this);
@@ -347,6 +385,9 @@ function CDocument(DrawingDocument)
 
     // Класс для работы с поиском и заменой в документе
     this.SearchEngine = new CDocumentSearch();
+
+    // Параграфы, в которых есть ошибки в орфографии (объект с ключом - Id параграфа)
+    this.Spelling = new CDocumentSpelling();
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );

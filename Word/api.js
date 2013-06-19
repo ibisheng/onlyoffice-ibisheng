@@ -4834,25 +4834,64 @@ asc_docs_api.prototype.sync_DialogAddHyperlink = function()
 //-----------------------------------------------------------------
 // Функции для работы с орфографией
 //-----------------------------------------------------------------
-function asc_CSpellCheckProperty( Word, Checked, Variants )
+function asc_CSpellCheckProperty( Word, Checked, Variants, ParaId, ElemId )
 {
     this.Word     = Word;
     this.Checked  = Checked;
     this.Variants = Variants;
+
+    this.ParaId   = ParaId;
+    this.ElemId   = ElemId;
 }
 
 asc_CSpellCheckProperty.prototype.get_Word     = function()  { return this.Word; }
 asc_CSpellCheckProperty.prototype.get_Checked  = function()  { return this.Checked; }
 asc_CSpellCheckProperty.prototype.get_Variants = function()  { return this.Variants; }
 
-asc_docs_api.prototype.sync_SpellCheckCallback = function(Word, Checked, Variants)
+asc_docs_api.prototype.sync_SpellCheckCallback = function(Word, Checked, Variants, ParaId, ElemId)
 {
-    this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new CSelectedObject( c_oAscTypeSelectElement.SpellCheck, new asc_CSpellCheckProperty( Word, Checked, Variants ) );
+    this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new CSelectedObject( c_oAscTypeSelectElement.SpellCheck, new asc_CSpellCheckProperty( Word, Checked, Variants, ParaId, ElemId ) );
 }
 
 asc_docs_api.prototype.sync_SpellCheckVariantsFound = function()
 {
     this.asc_fireCallback("asc_onSpellCheckVariantsFound");
+}
+
+asc_docs_api.prototype.asc_replaceMisspelledWord = function(Word, SpellCheckProperty)
+{
+    var ParaId = SpellCheckProperty.ParaId;
+    var ElemId = SpellCheckProperty.ElemId;
+
+    var Paragraph = g_oTableId.Get_ById(ParaId);
+    if ( null != Paragraph && false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_Element_and_Type, Element : Paragraph, CheckType : changestype_Paragraph_Content } ) )
+    {
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        Paragraph.Replace_MisspelledWord( Word, ElemId );
+        this.WordControl.m_oLogicDocument.Recalculate();
+    }
+}
+
+asc_docs_api.prototype.asc_ignoreMisspelledWord = function(SpellCheckProperty, bAll)
+{
+    if ( false === bAll )
+    {
+        var ParaId = SpellCheckProperty.ParaId;
+        var ElemId = SpellCheckProperty.ElemId;
+
+        var Paragraph = g_oTableId.Get_ById(ParaId);
+        if ( null != Paragraph )
+        {
+            Paragraph.Ignore_MisspelledWord( ElemId );
+        }
+    }
+    else
+    {
+        var LogicDocument = editor.WordControl.m_oLogicDocument;
+        LogicDocument.Spelling.Add_Word( SpellCheckProperty.Word );
+        LogicDocument.DrawingDocument.ClearCachePages();
+        LogicDocument.DrawingDocument.FirePaint();
+    }
 }
 //-----------------------------------------------------------------
 // Функции для работы с комментариями
