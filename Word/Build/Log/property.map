@@ -2827,7 +2827,7 @@ TableSumGrid:xe
 _background:cca
 Index_To_Loc_Format:Z$
 Set_DocumentIndex:UI
-Document_UpdateInterfaceState:Sb
+Document_UpdateInterfaceState:Rb
 CheckFontLoadStyles:kX
 UpdateTextPr:$T
 Document_UpdateRulersState:Pi
@@ -3741,7 +3741,7 @@ WriteExtent:Nma
 Get_NewId:Po
 currentIndex:u_
 checkFileSize:Kpa
-Odd:Rb
+Odd:Sb
 WriteDocTable:EEa
 asc_setSubType:OJa
 m_lTimerTargetId:xR
