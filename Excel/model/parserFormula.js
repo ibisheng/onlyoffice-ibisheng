@@ -68,34 +68,34 @@ _func[cElementType.empty] = [];
 _func[cElementType.array] = [];
 
 
-_func[cElementType.number][cElementType.number] = function(arg0,arg1,what){
-    switch (what){
+_func[cElementType.number][cElementType.number] = function (arg0, arg1, what) {
+    switch (what) {
         case ">":
-            return new cBool( arg0.getValue() > arg1.getValue() );
+            return new cBool(arg0.getValue() > arg1.getValue());
         case ">=":
-            return new cBool( arg0.getValue() >= arg1.getValue() );
+            return new cBool(arg0.getValue() >= arg1.getValue());
         case "<":
-            return new cBool( arg0.getValue() < arg1.getValue() );
+            return new cBool(arg0.getValue() < arg1.getValue());
         case "<=":
-            return new cBool( arg0.getValue() <= arg1.getValue() );
+            return new cBool(arg0.getValue() <= arg1.getValue());
         case "=":
-            return new cBool( arg0.getValue() == arg1.getValue() );
+            return new cBool(arg0.getValue() == arg1.getValue());
         case "<>":
-            return new cBool( arg0.getValue() != arg1.getValue() );
+            return new cBool(arg0.getValue() != arg1.getValue());
         case "-":
-            return new cNumber( arg0.getValue() - arg1.getValue() );
+            return new cNumber(arg0.getValue() - arg1.getValue());
         case "+":
-            return new cNumber( arg0.getValue() + arg1.getValue() );
+            return new cNumber(arg0.getValue() + arg1.getValue());
         case "/":
             if (arg1.getValue() != 0)
-                return new cNumber( arg0.getValue() / arg1.getValue() );
+                return new cNumber(arg0.getValue() / arg1.getValue());
             else
-                return new cError( cErrorType.division_by_zero );
+                return new cError(cErrorType.division_by_zero);
         case "*":
-            return new cNumber( arg0.getValue() * arg1.getValue() );
+            return new cNumber(arg0.getValue() * arg1.getValue());
     }
-    return new cError( cErrorType.wrong_value_type);
-}
+    return new cError(cErrorType.wrong_value_type);
+};
 
 _func[cElementType.number][cElementType.string] = function(arg0,arg1,what){
     switch (what){
@@ -116,7 +116,7 @@ _func[cElementType.number][cElementType.string] = function(arg0,arg1,what){
 			return new cError( cErrorType.wrong_value_type );
     }
     return new cError( cErrorType.wrong_value_type);
-}
+};
 
 _func[cElementType.number][cElementType.bool] = function(arg0,arg1,what){
     switch (what){
@@ -151,11 +151,11 @@ _func[cElementType.number][cElementType.bool] = function(arg0,arg1,what){
             return new cNumber( arg0.getValue() * _arg.getValue() );
     }
     return new cError( cErrorType.wrong_value_type);
-}
+};
 
 _func[cElementType.number][cElementType.error] = function(arg0,arg1,what){
     return arg1;
-}
+};
 
 _func[cElementType.number][cElementType.empty] = function(arg0,arg1,what){
     switch (what){
@@ -181,7 +181,7 @@ _func[cElementType.number][cElementType.empty] = function(arg0,arg1,what){
             return new cNumber( 0 );
     }
     return new cError( cErrorType.wrong_value_type);
-}
+};
 
 
 _func[cElementType.string][cElementType.number] = function(arg0,arg1,what){
@@ -202,7 +202,7 @@ _func[cElementType.string][cElementType.number] = function(arg0,arg1,what){
 			return new cError( cErrorType.wrong_value_type );
     }
     return new cError( cErrorType.wrong_value_type);
-}
+};
 
 _func[cElementType.string][cElementType.string] = function(arg0,arg1,what){
     switch (what){
@@ -246,7 +246,7 @@ _func[cElementType.string][cElementType.string] = function(arg0,arg1,what){
             return new cNumber( _arg0.getValue() * _arg1.getValue() );
     }
     return new cError( cErrorType.wrong_value_type);
-}
+};
 
 _func[cElementType.string][cElementType.bool] = function(arg0,arg1,what){
     switch (what){
@@ -288,11 +288,11 @@ _func[cElementType.string][cElementType.bool] = function(arg0,arg1,what){
             return new cNumber( _arg0.getValue() * _arg1.getValue() );
     }
     return new cError( cErrorType.wrong_value_type);
-}
+};
 
 _func[cElementType.string][cElementType.error] = function(arg0,arg1,what){
     return arg1;
-}
+};
 
 _func[cElementType.string][cElementType.empty] = function(arg0,arg1,what){
     switch (what){
@@ -315,7 +315,7 @@ _func[cElementType.string][cElementType.empty] = function(arg0,arg1,what){
             return new cError( cErrorType.wrong_value_type );
     }
     return new cError( cErrorType.wrong_value_type);
-}
+};
 
 
 _func[cElementType.bool][cElementType.number] = function(arg0,arg1,what){
@@ -351,7 +351,7 @@ _func[cElementType.bool][cElementType.number] = function(arg0,arg1,what){
             return new cNumber( _arg.getValue() * arg1.getValue() );
     }
     return new cError( cErrorType.wrong_value_type);
-}
+};
 
 _func[cElementType.bool][cElementType.string] = function(arg0,arg1,what){
     switch (what){
@@ -389,7 +389,7 @@ _func[cElementType.bool][cElementType.string] = function(arg0,arg1,what){
             return new cNumber( _arg0.getValue() * _arg1.getValue() );
     }
     return new cError( cErrorType.wrong_value_type);
-}
+};
 
 _func[cElementType.bool][cElementType.bool] = function(arg0,arg1,what){
     switch (what){
@@ -425,11 +425,11 @@ _func[cElementType.bool][cElementType.bool] = function(arg0,arg1,what){
             return new cNumber( _arg0.getValue() * _arg1.getValue() );
     }
     return new cError( cErrorType.wrong_value_type);
-}
+};
 
 _func[cElementType.bool][cElementType.error] = function(arg0,arg1,what){
     return arg1;
-}
+};
 
 _func[cElementType.bool][cElementType.empty] = function(arg0,arg1,what){
     switch (what){
@@ -455,14 +455,14 @@ _func[cElementType.bool][cElementType.empty] = function(arg0,arg1,what){
             return new cNumber( 0 );
     }
     return new cError( cErrorType.wrong_value_type);
-}
+};
 
 
 _func[cElementType.error][cElementType.number] = _func[cElementType.error][cElementType.string] =
 _func[cElementType.error][cElementType.bool] = _func[cElementType.error][cElementType.error] =
 _func[cElementType.error][cElementType.empty] = function(arg0,arg1,what){
 	return arg0;
-}
+};
 
 
 _func[cElementType.empty][cElementType.number] = function(arg0,arg1,what){
@@ -491,7 +491,7 @@ _func[cElementType.empty][cElementType.number] = function(arg0,arg1,what){
             return new cNumber( 0 );
     }
     return new cError( cErrorType.wrong_value_type);
-}
+};
 
 _func[cElementType.empty][cElementType.string] = function(arg0,arg1,what){
     switch (what){
@@ -514,7 +514,7 @@ _func[cElementType.empty][cElementType.string] = function(arg0,arg1,what){
             return new cError( cErrorType.wrong_value_type );
     }
     return new cError( cErrorType.wrong_value_type);
-}
+};
 
 _func[cElementType.empty][cElementType.bool] = function(arg0,arg1,what){
     switch (what){
@@ -542,11 +542,11 @@ _func[cElementType.empty][cElementType.bool] = function(arg0,arg1,what){
             return new cNumber( 0 );
     }
     return new cError( cErrorType.wrong_value_type);
-}
+};
 
 _func[cElementType.empty][cElementType.error] = function(arg0,arg1,what){
     return arg1;
-}
+};
 
 _func[cElementType.empty][cElementType.empty] = function(arg0,arg1,what){
     switch (what){
@@ -567,7 +567,7 @@ _func[cElementType.empty][cElementType.empty] = function(arg0,arg1,what){
             return new cNumber( 0 );
     }
     return new cError( cErrorType.wrong_value_type);
-}
+};
 
 
 _func[cElementType.cellsRange][cElementType.number] = _func[cElementType.cellsRange][cElementType.string] =
@@ -575,7 +575,7 @@ _func[cElementType.cellsRange][cElementType.bool] = _func[cElementType.cellsRang
 _func[cElementType.cellsRange][cElementType.array] = _func[cElementType.cellsRange][cElementType.empty] = function(arg0,arg1,what,cellAddress){
 	var cross = arg0.cross(cellAddress);
 	return _func[cross.type][arg1.type](cross,arg1,what)
-}
+};
 
 
 _func[cElementType.number][cElementType.cellsRange] = _func[cElementType.string][cElementType.cellsRange] =
@@ -583,14 +583,14 @@ _func[cElementType.bool][cElementType.cellsRange] = _func[cElementType.error][cE
 _func[cElementType.array][cElementType.cellsRange] = _func[cElementType.empty][cElementType.cellsRange] = function(arg0,arg1,what,cellAddress){
 	var cross = arg1.cross(cellAddress);
 	return _func[arg0.type][cross.type](arg0,cross,what)
-}
+};
 
 
 _func[cElementType.cellsRange][cElementType.cellsRange] = function(arg0,arg1,what,cellAddress){
 	var cross1 = arg0.cross(cellAddress),
 		cross2 = arg1.cross(cellAddress);
 	return _func[cross1.type][cross2.type](cross1,cross2,what)
-}
+};
 
 
 _func[cElementType.array][cElementType.number] = _func[cElementType.array][cElementType.string] =
@@ -602,7 +602,7 @@ _func[cElementType.array][cElementType.empty] = function(arg0,arg1,what,cellAddr
 		res.addElement( _func[elem.type][arg1.type](elem,arg1,what) );
 	})
 	return res;
-}
+};
 
 
 _func[cElementType.number][cElementType.array] = _func[cElementType.string][cElementType.array] =
@@ -612,9 +612,9 @@ _func[cElementType.empty][cElementType.array] = function(arg0,arg1,what,cellAddr
 	arg1.foreach(function(elem,r,c){
 		if( !res.array[r] ) res.addRow();
 		res.addElement( _func[arg0.type][elem.type](arg0,elem,what) );
-	})
+	});
 	return res;
-}
+};
 
 
 _func.binarySearch = function(sElem, arrTagert, regExp){
@@ -666,7 +666,7 @@ _func.binarySearch = function(sElem, arrTagert, regExp){
 		return last-1;/* Искомый элемент не найден. Но если вам вдруг надо его вставить со сдвигом, то его место - last.    */
     }
 
-}
+};
 
 /*Functions that checks of an element in formula*/
 var rx_operators = new RegExp("^ *[-+*/^&%<=>:]"),
@@ -1514,7 +1514,7 @@ var cFormulaFunction = {
             r.setName("DATE");
             r.Calculate = function(arg){
 				var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], year, month, day;
-				
+
                 for (var i = 0; i<this.argumentsCurrent;i++){
                     var arg0 = arg[i];
 					if( arg0 instanceof cArray ){
@@ -1523,7 +1523,7 @@ var cFormulaFunction = {
                     else if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
 						arg0 = arg0.cross(arguments[1].first).tocNumber();
 					}
-					
+
 					if(arg0 instanceof cError){
 						return this.setCA(arg0,true);
 					}
@@ -1556,7 +1556,7 @@ var cFormulaFunction = {
                         }
                     }
                 }
-				
+
                 if( year >= 0 && year <= 1899)
                     year+=1900;
 				if( month == 0 ){
@@ -1587,21 +1587,21 @@ var cFormulaFunction = {
             r.setArgumentsMax(1);
 			r.Calculate = function(arg){
 				var arg0 = arg[0];
-                
+
 				if ( arg0 instanceof cArea || arg0 instanceof cArea3D ){
 					arg0 = arg0.cross(arguments[1].first);
 				}
 				else if( arg0 instanceof cArray ){
 					arg0 = arg0.getElementRowCol(0,0);
 				}
-				
+
 				if ( arg0 instanceof cError )
 					return this.value = arg0;
-				
+
 				arg0 = arg0.tocString();
-				
+
 				var res = g_oFormatParser.parse(arg0.getValue());
-				
+
 				if( res && res.bDateTime )
 					return this.value = new cNumber( parseInt(res.value) );
 				else
@@ -1650,7 +1650,7 @@ var cFormulaFunction = {
                         if( isNaN(d) ){
 							return this.setCA(new cError( cErrorType.wrong_value_type ),true);
 						}
-						else 
+						else
 							val = Math.floor( ( d.getTime()/1000 - d.getTimezoneOffset()*60 )/c_sPerDay+( c_DateCorrectConst + (g_bDate1904?0:1) ) );
                     }
                     else {
@@ -1692,29 +1692,29 @@ var cFormulaFunction = {
             r.setArgumentsMax(2);
 			r.Calculate = function(arg){
 				var arg0 = arg[0], arg1 = arg[1];
-				
+
 				if ( arg0 instanceof cArea || arg0 instanceof cArea3D ){
 					arg0 = arg0.cross(arguments[1].first);
 				}
 				else if( arg0 instanceof cArray ){
 					arg0 = arg0.getElementRowCol(0,0);
 				}
-				
+
 				if ( arg1 instanceof cArea || arg1 instanceof cArea3D ){
 					arg1 = arg1.cross(arguments[1].first);
 				}
 				else if( arg1 instanceof cArray ){
 					arg1 = arg1.getElementRowCol(0,0);
 				}
-				
+
 				arg0 = arg0.tocNumber();
 				arg1 = arg1.tocNumber();
-				
+
 				if( arg0 instanceof cError) return this.value = arg0;
 				if( arg1 instanceof cError) return this.value = arg1;
-				
+
 				var val = arg0.getValue(), date, _date;
-				
+
 				if(val < 0)
 					return this.setCA(new cError( cErrorType.not_numeric ),true);
 				else if(!g_bDate1904){
@@ -1727,9 +1727,9 @@ var cFormulaFunction = {
 				}
 				else
 					val = new Date((val-c_DateCorrectConst)*c_msPerDay);
-					
+
 				date = new Date(val);
-				
+
 				if( 0 <= date.getDate() && 28 >= date.getDate() ){
 					val = new Date(val.setMonth(val.getMonth()+arg1.getValue()))
 				}
@@ -1760,29 +1760,29 @@ var cFormulaFunction = {
             r.setArgumentsMax(2);
 			r.Calculate = function(arg){
 				var arg0 = arg[0], arg1 = arg[1];
-				
+
 				if ( arg0 instanceof cArea || arg0 instanceof cArea3D ){
 					arg0 = arg0.cross(arguments[1].first);
 				}
 				else if( arg0 instanceof cArray ){
 					arg0 = arg0.getElementRowCol(0,0);
 				}
-				
+
 				if ( arg1 instanceof cArea || arg1 instanceof cArea3D ){
 					arg1 = arg1.cross(arguments[1].first);
 				}
 				else if( arg1 instanceof cArray ){
 					arg1 = arg1.getElementRowCol(0,0);
 				}
-				
+
 				arg0 = arg0.tocNumber();
 				arg1 = arg1.tocNumber();
-				
+
 				if( arg0 instanceof cError) return this.value = arg0;
 				if( arg1 instanceof cError) return this.value = arg1;
-				
+
 				var val = arg0.getValue(), date, _date;
-				
+
 				if(val < 0)
 					return this.setCA(new cError( cErrorType.not_numeric ),true);
 				else if(!g_bDate1904){
@@ -1795,9 +1795,9 @@ var cFormulaFunction = {
 				}
 				else
 					val = new Date((val-c_DateCorrectConst)*c_msPerDay);
-					
+
 				date = new Date(val);
-				
+
 				val.setDate(1);
 				val.setMonth(val.getMonth()+arg1.getValue());
 				val.setDate(val.getDaysInMonth());
@@ -1826,7 +1826,7 @@ var cFormulaFunction = {
 				else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ){
 					arg0 = arg0.cross(arguments[1].first).tocNumber();
                 }
-				
+
                 if(arg0 instanceof cError)return this.setCA(arg0,true);
                 else if( arg0 instanceof cNumber || arg0 instanceof cBool){
                     val = arg0.tocNumber().getValue();
@@ -1852,7 +1852,7 @@ var cFormulaFunction = {
 							}
 							val = d.value ;
 						}
-						else 
+						else
 							val = ( d.getTime()/1000 - d.getTimezoneOffset()*60 )/c_sPerDay+( c_DateCorrectConst + (g_bDate1904?0:1) );
                     }
                     else {
@@ -1886,7 +1886,7 @@ var cFormulaFunction = {
 				else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ){
 					arg0 = arg0.cross(arguments[1].first).tocNumber();
                 }
-				
+
                 if(arg0 instanceof cError) return this.setCA(arg0,true);
                 else if( arg0 instanceof cNumber || arg0 instanceof cBool){
                     val = arg0.tocNumber().getValue();
@@ -1912,7 +1912,7 @@ var cFormulaFunction = {
 							}
 							val = d.value ;
 						}
-						else 
+						else
 							val = ( d.getTime()/1000 - d.getTimezoneOffset()*60 )/c_sPerDay+( c_DateCorrectConst + (g_bDate1904?0:1) );
                     }
                     else {
@@ -1948,7 +1948,7 @@ var cFormulaFunction = {
                 else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ){
 					arg0 = arg0.cross(arguments[1].first).tocNumber();
                 }
-				
+
 				if(arg0 instanceof cError) return this.setCA( arg0 ,true);
                 else if( arg0 instanceof cNumber || arg0 instanceof cBool){
                     val = arg0.tocNumber().getValue();
@@ -1970,7 +1970,7 @@ var cFormulaFunction = {
 						if( isNaN(d) ){
 							return this.setCA( new cError( cErrorType.wrong_value_type ) ,true);
 						}
-						else 
+						else
 							val = Math.floor( ( d.getTime()/1000 - d.getTimezoneOffset()*60 )/c_sPerDay+( c_DateCorrectConst + (g_bDate1904?0:1) ) );
                     }
                     else {
@@ -1983,10 +1983,10 @@ var cFormulaFunction = {
 					if(!g_bDate1904){
 						if( val == 60 )
 							return this.setCA( new cNumber( 2 ) ,true,0);
-						else 
+						else
 							return this.setCA( new cNumber( ( new Date( ( (val==0?1:val) - c_DateCorrectConst ) * c_msPerDay) ).getUTCMonth() + 1 ) ,true,0);
 					}
-					else 
+					else
 						return this.setCA( new cNumber( ( new Date( ( (val==0?1:val) - c_DateCorrectConst ) * c_msPerDay) ).getUTCMonth() + 1 ) ,true,0);
             }
             r.getInfo = function(){
@@ -2005,29 +2005,29 @@ var cFormulaFunction = {
             r.setArgumentsMax(3);
 			r.Calculate = function(arg){
 				var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arrDateIncl = [];
-				
+
 				if ( arg0 instanceof cArea || arg0 instanceof cArea3D ){
 					arg0 = arg0.cross(arguments[1].first);
 				}
 				else if( arg0 instanceof cArray ){
 					arg0 = arg0.getElementRowCol(0,0);
 				}
-				
+
 				if ( arg1 instanceof cArea || arg1 instanceof cArea3D ){
 					arg1 = arg1.cross(arguments[1].first);
 				}
 				else if( arg1 instanceof cArray ){
 					arg1 = arg1.getElementRowCol(0,0);
 				}
-				
+
 				arg0 = arg0.tocNumber();
 				arg1 = arg1.tocNumber();
-				
+
 				if( arg0 instanceof cError) return this.value = arg0;
 				if( arg1 instanceof cError) return this.value = arg1;
-				
+
 				var val0 = arg0.getValue(), val1 = arg1.getValue(), dif, count = 0;
-				
+
 				if(val0 < 0)
 					return this.setCA(new cError( cErrorType.not_numeric ),true);
 				else if(!g_bDate1904){
@@ -2040,7 +2040,7 @@ var cFormulaFunction = {
 				}
 				else
 					val0 = new Date((val0-c_DateCorrectConst)*c_msPerDay);
-				
+
 				if(val1 < 0)
 					return this.setCA(new cError( cErrorType.not_numeric ),true);
 				else if(!g_bDate1904){
@@ -2053,9 +2053,9 @@ var cFormulaFunction = {
 				}
 				else
 					val1 = new Date((val1-c_DateCorrectConst)*c_msPerDay);
-					
+
 				var holidays = [];
-				
+
 				if( arg2 ){
 					if( arg2 instanceof cArea || arg2 instanceof cArea3D ){
 						var arr = arg2.getValue();
@@ -2078,7 +2078,7 @@ var cFormulaFunction = {
 						})
 					}
 				}
-				
+
 				for(var i = 0; i < holidays.length; i++ ){
 					if(!g_bDate1904){
 						if( holidays[i].getValue() < 60 )
@@ -2091,7 +2091,7 @@ var cFormulaFunction = {
 					else
 						holidays[i] = new Date((holidays[i].getValue()-c_DateCorrectConst)*c_msPerDay);
 				}
-				
+
 				function includeInHolidays(date){
 					for(var i = 0; i < holidays.length; i++ ){
 						if( date.getTime() == holidays[i].getTime() )
@@ -2099,7 +2099,7 @@ var cFormulaFunction = {
 					}
 					return true;
 				}
-				
+
 				dif = ( val1 - val0 ) / c_msPerDay;
 				for(var i = 0; i < Math.abs(dif); i++ ){
 					var date = new Date( val0 );
@@ -2107,8 +2107,8 @@ var cFormulaFunction = {
 					if( date.getDay() != 5 && date.getDay() != 6 && includeInHolidays(date) )
 						count++;
 				}
-				
-				
+
+
 				return this.value = new cNumber( (dif<0?-1:1)*count );
 			}
 			r.getInfo = function(){
@@ -2157,7 +2157,7 @@ var cFormulaFunction = {
                 else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ){
 					arg0 = arg0.cross(arguments[1].first).tocNumber();
                 }
-				
+
 				if(arg0 instanceof cError) return this.setCA( arg0 ,true);
                 else if( arg0 instanceof cNumber || arg0 instanceof cBool){
                     val = arg0.tocNumber().getValue();
@@ -2183,7 +2183,7 @@ var cFormulaFunction = {
 							}
 							val = d.value ;
 						}
-						else 
+						else
 							val = ( d.getTime()/1000 - d.getTimezoneOffset()*60 )/c_sPerDay+( c_DateCorrectConst + (g_bDate1904?0:1) );
                     }
                     else {
@@ -2222,7 +2222,7 @@ var cFormulaFunction = {
                     else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ){
 						arg0 = arg0.cross(arguments[1].first).tocNumber();
 					}
-					
+
 					if(arg0 instanceof cError) return this.setCA( arg0 ,true);
                     else if( arg0 instanceof cNumber || arg0 instanceof cBool){
                         if(i==0)hour = arg0.tocNumber().getValue();
@@ -2325,7 +2325,7 @@ var cFormulaFunction = {
 				else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ){
 					arg0 = arg0.cross(arguments[1].first).tocNumber();
                 }
-				
+
                 if(arg0 instanceof cError) return this.setCA( arg0 ,true);
                 else if( arg0 instanceof cNumber || arg0 instanceof cBool){
                     val = arg0.tocNumber().getValue();
@@ -2350,7 +2350,7 @@ var cFormulaFunction = {
                         if( isNaN(d) ){
 							return this.setCA( new cError( cErrorType.wrong_value_type ) ,true);
 						}
-						else 
+						else
 							val = Math.floor( ( d.getTime()/1000 - d.getTimezoneOffset()*60 )/c_sPerDay+( c_DateCorrectConst + (g_bDate1904?0:1) ) );
                     }
                     else {
@@ -2725,6 +2725,72 @@ var cFormulaFunction = {
         'NPV' : function(){
             var r = new cBaseFunction();
             r.setName("NPV");
+            r.setArgumentsMin(2);
+            r.setArgumentsMax(255);
+            r.Calculate = function(arg){
+                var arg0 = arg[0], arg1 = arg[1], iStart = 1, res = 0, rate;
+				
+				function elemCalc(rate,value,step){
+					return value / Math.pow(1+rate,step);
+				}
+				
+                if ( arg0 instanceof cArea || arg0 instanceof cArea3D ){
+                    arg0 = arg0.cross(arguments[1].first);
+                }
+                else if( arg0 instanceof cArray ){
+                    arg0 = arg0.getElementRowCol(0,0);
+                }
+
+                arg0 = arg0.tocNumber();
+
+                if ( arg0 instanceof cError )
+                    return this.value = arg0;
+
+				rate = arg0.getValue();
+					
+				if( rate == -1)
+					return this.value = new cError( cErrorType.division_by_zero );
+				
+					
+				for(var i = 1; i < this.getArguments(); i++){
+					var argI = arg[i];
+					if( argI instanceof cArea || argI instanceof cArea3D ){
+						var argIArr = argI.getValue();
+						for (var j = 0; j < argIArr.length; j++){
+							if( argIArr[j] instanceof cNumber ){
+								res += elemCalc( rate, argIArr[j].getValue(), iStart++ );
+							}
+						}
+						continue;
+					}
+					else if( argI instanceof cArray ){
+						argI.foreach(function(elem,r,c){
+							if( elem instanceof cNumber ){
+								res += elemCalc( rate, elem.getValue(), iStart++ );
+							}
+						})
+						continue;
+					}
+
+					argI = argI.tocNumber();
+
+					if( argI instanceof cError )
+						continue;
+					
+					res += elemCalc( rate, argI.getValue(), iStart++ );
+					
+				}
+				
+				return this.value = new cNumber(res);
+
+            };
+            r.getInfo = function(){
+                return {
+                    name:this.name,
+                    args:"( rate , argument-list )"
+                };
+            };
+            r.setFormat(r.formatType.noneFormat);
 			return r;
         },
         'ODDFPRICE' : function(){
@@ -2779,35 +2845,35 @@ var cFormulaFunction = {
             r.setArgumentsMax(5);
             r.Calculate = function(arg){
 				var rate = arg[0], nper = arg[1], pmt = arg[2], fv = arg[3] ? arg[3] : new cNumber(0), type = arg[4] ? arg[4] : new cNumber(0);
-				
+
 				if ( rate instanceof cArea || rate instanceof cArea3D ){
 					rate = rate.cross(arguments[1].first);
 				}
 				else if( rate instanceof cArray ){
 					rate = rate.getElementRowCol(0,0);
 				}
-				
+
 				if ( nper instanceof cArea || nper instanceof cArea3D ){
 					nper = nper.cross(arguments[1].first);
 				}
 				else if( nper instanceof cArray ){
 					nper = nper.getElementRowCol(0,0);
 				}
-				
+
 				if ( pmt instanceof cArea || pmt instanceof cArea3D ){
 					pmt = pmt.cross(arguments[1].first);
 				}
 				else if( pmt instanceof cArray ){
 					pmt = pmt.getElementRowCol(0,0);
 				}
-				
+
 				if ( fv instanceof cArea || fv instanceof cArea3D ){
 					fv = fv.cross(arguments[1].first);
 				}
 				else if( fv instanceof cArray ){
 					fv = fv.getElementRowCol(0,0);
 				}
-				
+
 				if ( type instanceof cArea || type instanceof cArea3D ){
 					type = type.cross(arguments[1].first);
 				}
@@ -2820,14 +2886,14 @@ var cFormulaFunction = {
 				pmt = pmt.tocNumber();
 				fv = fv.tocNumber();
 				type = type.tocNumber();
-				
+
 				if ( rate instanceof cError ) return this.value = rate;
 				if ( nper instanceof cError ) return this.value = nper;
 				if ( pmt instanceof cError ) return this.value = pmt;
 				if ( fv instanceof cError ) return this.value = fv;
-				if ( type instanceof cError ) return this.value = type;				
-				
-				if ( type.getValue() != 1 && type.getValue() != 0 ) return this.value = new cError( cErrorType.not_numeric );				
+				if ( type instanceof cError ) return this.value = type;
+
+				if ( type.getValue() != 1 && type.getValue() != 0 ) return this.value = new cError( cErrorType.not_numeric );
 
 				var res;
 				if( rate.getValue() != 0 ){
@@ -3414,7 +3480,7 @@ var cFormulaFunction = {
 						else if( arg[i] instanceof cArray ){
 							var thas = this;
 							arg[i].foreach(function(elem){
-								if ( elem instanceof cError ) { 
+								if ( elem instanceof cError ) {
 									argResult = elem;
 									return true;
 								}
@@ -3472,14 +3538,14 @@ var cFormulaFunction = {
             r.setArgumentsMax(3);
             r.Calculate = function(arg){
                 var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
-				
+
 				if( arg0 instanceof cArray )
 					arg0 = arg0.getElement(0);
 				if( arg1 instanceof cArray )
 					arg1 = arg1.getElement(0);
 				if( arg2 instanceof cArray )
 					arg2 = arg2.getElement(0);
-					
+
                 if ( arg0 instanceof cError )
                     return this.value = arg0;
                 else{
@@ -3524,7 +3590,7 @@ var cFormulaFunction = {
 				if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
 					arg0 = arg0.cross(arguments[1].first);
 				}
-				
+
                 if (arg0 instanceof cError)
                     return this.value = arg[1] instanceof cArray ? arg[1].getElement(0) : arg[1];
                 else return this.value = arg[0];
@@ -3550,7 +3616,7 @@ var cFormulaFunction = {
 				if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
 					arg0 = arg0.cross(arguments[1].first);
 				}
-					
+
                 if ( arg0 instanceof cString ){
 					var res = arg0.tocBool();
 					if( res instanceof cString )
@@ -3599,7 +3665,7 @@ var cFormulaFunction = {
 						else if( arg[i] instanceof cArray ){
 							var thas = this;
 							arg[i].foreach(function(elem){
-								if ( elem instanceof cError ) { 
+								if ( elem instanceof cError ) {
 									argResult = elem;
 									return true;
 								}
@@ -3667,24 +3733,24 @@ var cFormulaFunction = {
             r.setArgumentsMax(30);
 			r.Calculate = function(arg){
 				var arg0 = arg[0];
-				
+
 				if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
 					arg0 = arg0.cross(arguments[1].first);
 				}
 				arg0 = arg0.tocNumber();
-				
+
 				if( arg0 instanceof cError ){
 					return this.value = arg0;
 				}
-				
+
 				if( arg0 instanceof cNumber ){
 					if( arg0.getValue() < 1 || arg0.getValue() > this.getArguments() ){
 						return this.value = new cError( cErrorType.wrong_value_type );
 					}
-					
+
 					return this.value = arg[arg0.getValue()];
 				}
-				
+
 				return this.value = new cError( cErrorType.wrong_value_type );
 			}
             r.setName("CHOOSE");
@@ -3724,7 +3790,7 @@ var cFormulaFunction = {
 						return this.value = new cError( cErrorType.bad_reference );
 					}
 				}
-				else 
+				else
 					return this.value = new cError( cErrorType.bad_reference );
 			}
 			r.getInfo = function(){
@@ -3753,13 +3819,13 @@ var cFormulaFunction = {
 			r.Calculate = function(arg){
 				var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = this.argumentsCurrent == 4 ? arg[3].tocBool() : new cBool( true );
 				var numberRow = arg2.getValue()-1, valueForSearching = arg0.getValue(), resC = -1, min, regexp;
-				
+
 				if( isNaN( numberRow ) )
 					return this.value = new cError( cErrorType.bad_reference );
-				
+
 				if( numberRow < 0 )
 					return this.value = new cError( cErrorType.wrong_value_type );
-					
+
 				if( arg0 instanceof cString ){
 					valueForSearching = arg0.getValue();
 					valueForSearching = valueForSearching
@@ -3772,12 +3838,12 @@ var cFormulaFunction = {
 											.replace(/\~/g, "\\");
 					regexp = new XRegExp(valueForSearching+"$","i");
 				}
-				else if( arg0 instanceof cError )	
+				else if( arg0 instanceof cError )
 					return this.value = arg0;
 				else{
 					valueForSearching = arg0.getValue();
 				}
-					
+
 				var found = false, bb,
 					f = function(cell, r, c, r1, c1){
 						if( r == r1 ){
@@ -3809,13 +3875,13 @@ var cFormulaFunction = {
 							}
 						}
 					};
-				
+
 				if( arg1 instanceof cRef || arg1 instanceof cRef3D || arg1 instanceof cArea ){
 					var range = arg1.getRange();
 					bb = range.getBBox0();
 					if( numberRow > bb.r2-bb.r1 )
 						return this.value = new cError( cErrorType.bad_reference );
-						
+
 					range._foreachColNoEmpty(/*func for col*/ null, /*func for cell in col*/ f);
 				}
 				else if( arg1 instanceof cArea3D ){
@@ -3823,14 +3889,14 @@ var cFormulaFunction = {
 					bb = range.getBBox0();
 					if( numberRow > bb.r2-bb.r1 )
 						return this.value = new cError( cErrorType.bad_reference );
-					
+
 					range._foreachColNoEmpty(/*func for col*/ null, /*func for cell in col*/ f);
 				}
 				else if( arg1 instanceof cArray ){
 					arg1.foreach(function(elem,r,c){
 						if( c == 0 )
 							min = elem.getValue();
-					
+
 						if( arg3.value == true ){
 							if( valueForSearching == elem.getValue() ){
 								resC = c;
@@ -3849,39 +3915,39 @@ var cFormulaFunction = {
 								resC = c;
 							}
 						}
-						
+
 						min = Math.min( min , elem.getValue() );
 					})
-					
+
 					if ( min > valueForSearching ){
 						return this.value = new cError( cErrorType.not_available );
 					}
-					
+
 					if( resC == -1 ){
 						return this.value = new cError( cErrorType.not_available );
 					}
-					
+
 					if( numberRow > arg1.getRowCount()-1 ){
 						return this.value = new cError( cErrorType.bad_reference );
 					}
-					
+
 					return this.value = arg1.getElementRowCol(numberRow,resC);
-					
+
 				}
-				
-				
+
+
 				if ( min > valueForSearching ){
 					return this.value = new cError( cErrorType.not_available );
 				}
-				
+
 				if( resC == -1 ){
 					return this.value = new cError( cErrorType.not_available );
 				}
-				
+
 				var c = new CellAddress(bb.r1+numberRow,resC,0);
-				
+
 				var v = arg1.getWS()._getCellNoEmpty(c.getRow0(),c.getCol0()).getValueWithoutFormat();
-				
+
 				return this.value = checkTypeCell(v);
 			}
 			r.getInfo = function(){
@@ -3909,7 +3975,7 @@ var cFormulaFunction = {
             r.setArgumentsMax(1);
 			r.Calculate = function(arg){
 				var arg0 = arg[0].tocString(), r = arguments[1], wb = r.worksheet.workbook, o = { Formula:"", pCurrPos : 0 }, ref, found_operand;
-				
+
 				function parseReference() {
 					if( (ref = parserHelp.is3DRef.call(o,o.Formula,o.pCurrPos))[0] ){
 						var _wsFrom = ref[1],
@@ -3947,7 +4013,7 @@ var cFormulaFunction = {
 							found_operand.isAbsolute = true;
 					}
 				}
-				
+
 				if( arg0 instanceof cArray ){
 					var ret = new cArray();
 					arg0.foreach(function(elem,r,c){
@@ -3963,12 +4029,12 @@ var cFormulaFunction = {
 					o.Formula = arg0.toString();
 					parseReference();
 				}
-				
+
 				if( found_operand )
 					return this.value = found_operand;
-				
+
 				return this.value = new cError( cErrorType.bad_reference );
-				
+
 			}
 			r.getInfo = function(){
 				return {
@@ -3986,14 +4052,14 @@ var cFormulaFunction = {
 			r.Calculate = function(arg){
 				var arg0 = arg[0], arg1 = arg[1], arg2 = this.argumentsCurrent == 2 ? arg1 : arg[2],
 					valueForSearching, resC = -1, resR = -1;
-				
+
 				if( arg0 instanceof cError ){
 					return this.value = arg0;
 				}
 				if( arg0 instanceof cRef ){
 					arg0 = arg0.tryConvert();
 				}
-				
+
 				function arrFinder(arr){
 					if( arr.getRowCount() > arr.getCountElementInRow() ){
 						//ищем в первом столбце
@@ -4008,70 +4074,70 @@ var cFormulaFunction = {
 						resC = _func.binarySearch( arg0, arrRow);
 					}
 				}
-				
+
 				if( !( arg1 instanceof cArea || arg1 instanceof cArea3D || arg1 instanceof cArray || arg2 instanceof cArea || arg2 instanceof cArea3D || arg2 instanceof cArray) ){
 					return this.value = new cError( cErrorType.not_available );
 				}
-				
+
 				if( arg1 instanceof cArray && arg2 instanceof cArray ){
 					if( arg1.getRowCount() != arg2.getRowCount() && arg1.getCountElementInRow() != arg2.getCountElementInRow() ){
 						return this.value = new cError( cErrorType.not_available );
 					}
-					
+
 					arrFinder(arg1);
-				
+
 					if( resR <= -1 &&  resC <= -1 || resR <= -2 || resC <= -2 ){
 						return this.value = new cError( cErrorType.not_available );
 					}
-					
+
 					return this.value = arg2.getElementRowCol(resR,resC);
-				
+
 				}
 				else if( arg1 instanceof cArray || arg2 instanceof cArray ){
 
 					var _arg1, _arg2;
-					
+
 					_arg1 = arg1 instanceof cArray ? arg1 : arg2;
-					
+
 					_arg2 = arg2 instanceof cArray ? arg1 : arg2;
-					
+
 					var BBox = _arg2.getBBox();
-					
+
 					if( _arg1.getRowCount() != (BBox.r2-BBox.r1) && _arg1.getCountElementInRow() != (BBox.c2-BBox.c1) ){
 						return this.value = new cError( cErrorType.not_available );
 					}
-				
+
 					arrFinder(_arg1);
-					
+
 					if( resR <= -1 &&  resC <= -1 || resR <= -2 || resC <= -2 ){
 						return this.value = new cError( cErrorType.not_available );
 					}
-					
+
 					var c = new CellAddress(BBox.r1+resR,BBox.c1+resC)
-					
+
 					return this.value = checkTypeCell( _arg2.getWS()._getCellNoEmpty(c.getRow0(),c.getCol0()).getValueWithoutFormat() );
-					
+
 				}
 				else{
 					var arg1Range = arg1.getRange(), arg2Range = arg2.getRange();
-				
+
 					if( arg1 instanceof cArea3D && arg1Range.length > 1 || arg2 instanceof cArea3D && arg2Range.length > 1 )
 						return this.value = new cError( cErrorType.not_available );
-						
+
 					if( arg1 instanceof cArea3D )
 						arg1Range = arg1Range[0];
-						
+
 					if( arg2 instanceof cArea3D )
 						arg2Range = arg2Range[0];
-						
+
 					var oBBox1 = arg1Range.getBBox0(), oBBox2 = arg2Range.getBBox0();
-					
+
 					if( !(oBBox1.r1 == oBBox1.r2 || oBBox1.c1 == oBBox1.c2) && !(oBBox2.r1 == oBBox2.r2 || oBBox2.c1 == oBBox2.c2) ){
 						return this.value = new cError( cErrorType.not_available );
 					}
-					
+
 					var index;
-					
+
 					if( (oBBox1.r1 == oBBox1.r2 && ( (oBBox2.r1 == oBBox2.r2 && oBBox1.r1 - oBBox1.r2 == oBBox2.r1 - oBBox2.r2) || (oBBox2.c1 == oBBox2.c2 && oBBox1.r1 - oBBox1.r2 == oBBox2.c1 - oBBox2.c2)))
 						||
 						(oBBox1.c1 == oBBox1.c2 && ( (oBBox2.r1 == oBBox2.r2 && oBBox1.c1 - oBBox1.c2 == oBBox2.r1 - oBBox2.r2) || (oBBox2.c1 == oBBox2.c2 && oBBox1.c1 - oBBox1.c2 == oBBox2.c1 - oBBox2.c2)))
@@ -4082,10 +4148,10 @@ var cFormulaFunction = {
 					else{
 						return this.value = new cError( cErrorType.not_available );
 					}
-					
+
 					return this.value = arg2.getValue()[index];
 				}
-				
+
 			}
 			r.getInfo = function(){
                 return {
@@ -4133,7 +4199,7 @@ var cFormulaFunction = {
 						return this.value = new cError( cErrorType.bad_reference );
 					}
 				}
-				else 
+				else
 					return this.value = new cError( cErrorType.bad_reference );
 			}
 			r.getInfo = function(){
@@ -4167,13 +4233,13 @@ var cFormulaFunction = {
 			r.Calculate = function(arg){
 				var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = this.argumentsCurrent == 4 ? arg[3].tocBool() : new cBool( true );
 				var numberCol = arg2.getValue()-1, valueForSearching, resR = -1, min, regexp;
-				
+
 				if( isNaN( numberCol ) )
 					return this.value = new cError( cErrorType.bad_reference );
-				
+
 				if( numberCol < 0 )
 					return this.value = new cError( cErrorType.wrong_value_type );
-				
+
 				if( arg0 instanceof cString ){
 					valueForSearching = arg0.getValue();
 					valueForSearching = valueForSearching
@@ -4186,13 +4252,13 @@ var cFormulaFunction = {
 											.replace(/\~/g, "\\");
 					regexp = new XRegExp(valueForSearching+"$","i");
 				}
-				else if( arg0 instanceof cError )	
+				else if( arg0 instanceof cError )
 					return this.value = arg0;
 				else{
 					valueForSearching = arg0.getValue();
 				}
-				
-					
+
+
 				var found = false, bb,
 					f = function(cell, r, c, r1, c1){
 						if( c == c1 ){
@@ -4224,13 +4290,13 @@ var cFormulaFunction = {
 						}
 						}
 					};
-				
+
 				if( arg1 instanceof cRef || arg1 instanceof cRef3D || arg1 instanceof cArea ){
 					var range = arg1.getRange();
 					bb = range.getBBox0();
 					if( numberCol > bb.c2-bb.c1 )
 						return this.value = new cError( cErrorType.bad_reference );
-						
+
 					range._foreachRowNoEmpty(/*func for col*/ null, /*func for cell in col*/ f);
 				}
 				else if( arg1 instanceof cArea3D ){
@@ -4238,14 +4304,14 @@ var cFormulaFunction = {
 					bb = range.getBBox0();
 					if( numberCol > bb.c2-bb.c1 )
 						return this.value = new cError( cErrorType.bad_reference );
-					
+
 					range._foreachRowNoEmpty(/*func for col*/ null, /*func for cell in col*/ f);
 				}
 				else if( arg1 instanceof cArray ){
 					arg1.foreach(function(elem,r,c){
 						if( r == 0 )
 							min = elem.getValue();
-					
+
 						if( arg3.value == true ){
 							if( valueForSearching == elem.getValue() ){
 								resR = r;
@@ -4264,38 +4330,38 @@ var cFormulaFunction = {
 								resR = r;
 							}
 						}
-						
+
 						min = Math.min( min , elem.getValue() );
 					})
-					
+
 					if ( min > valueForSearching ){
 						return this.value = new cError( cErrorType.not_available );
 					}
-					
+
 					if( resR == -1 ){
 						return this.value = new cError( cErrorType.not_available );
 					}
-					
+
 					if( numberCol > arg1.getCountElementInRow()-1 ){
 						return this.value = new cError( cErrorType.bad_reference );
 					}
-					
+
 					return this.value = arg1.getElementRowCol(resR,numberCol);
-					
+
 				}
-				
+
 				if ( min > valueForSearching ){
 					return this.value = new cError( cErrorType.not_available );
 				}
-				
+
 				if( resR == -1 ){
 					return this.value = new cError( cErrorType.not_available );
 				}
-				
+
 				var c = new CellAddress(resR,bb.c1+numberCol,0);
-				
+
 				var v = arg1.getWS()._getCellNoEmpty(c.getRow0(),c.getCol0()).getValueWithoutFormat();
-				
+
 				return this.value = checkTypeCell(v);
 			}
 			r.getInfo = function(){
@@ -4493,8 +4559,8 @@ var cFormulaFunction = {
 							var a = elem,
 								b = arg1.getElementRowCol(r,c);
 							if( a instanceof cNumber && b instanceof cNumber ){
-								this.array[r][c] = 
-												a.getValue() == 0 && b.getValue() == 0  ? 
+								this.array[r][c] =
+												a.getValue() == 0 && b.getValue() == 0  ?
 													new cError( cErrorType.division_by_zero ) :
 													new cNumber( Math.atan2( b.getValue(), a.getValue() ) )
 							}
@@ -4509,8 +4575,8 @@ var cFormulaFunction = {
 						var a = elem,
 							b = arg1;
 						if( a instanceof cNumber && b instanceof cNumber ){
-							this.array[r][c] = 
-											a.getValue() == 0 && b.getValue() == 0  ? 
+							this.array[r][c] =
+											a.getValue() == 0 && b.getValue() == 0  ?
 												new cError( cErrorType.division_by_zero ) :
 												new cNumber( Math.atan2( b.getValue(), a.getValue() ) )
 						}
@@ -4524,8 +4590,8 @@ var cFormulaFunction = {
 						var a = arg0,
 							b = elem;
 						if( a instanceof cNumber && b instanceof cNumber ){
-							this.array[r][c] = 
-											a.getValue() == 0 && b.getValue() == 0  ? 
+							this.array[r][c] =
+											a.getValue() == 0 && b.getValue() == 0  ?
 												new cError( cErrorType.division_by_zero ) :
 												new cNumber( Math.atan2( b.getValue(), a.getValue() ) )
 						}
@@ -4534,7 +4600,7 @@ var cFormulaFunction = {
 					})
 					return this.value = arg1;
 				}
-				
+
                 return this.value = (	arg0 instanceof cError ? arg0 :
                     arg1 instanceof cError ? arg1 :
                     arg1.getValue() == 0 && arg0.getValue() == 0  ? new cError( cErrorType.division_by_zero ) :
@@ -4592,7 +4658,7 @@ var cFormulaFunction = {
 						return new cNumber ( quotientTr * significance );
 					}
 				}
-				
+
 				if( arg0 instanceof cArray && arg1 instanceof cArray ){
 					if( arg0.getCountElement() != arg1.getCountElement() || arg0.getRowCount() != arg1.getRowCount() ){
 						return this.value = new cError( cErrorType.not_available );
@@ -4634,9 +4700,9 @@ var cFormulaFunction = {
 					})
 					return this.value = arg1;
 				}
-				
+
 				return this.value = ceilingHelper( arg0.getValue(), arg1.getValue() );
-				
+
             }
             r.setName("CEILING");
             r.getInfo = function(){
@@ -4723,7 +4789,7 @@ var cFormulaFunction = {
 					return this.value = isNaN( a ) ? new cError( cErrorType.not_numeric ) : new cNumber( a * 180 / Math.PI );
 				}
                 return this.value = arg0;
-				
+
             };
             r.setName("DEGREES");
             r.getInfo = function(){
@@ -4744,7 +4810,7 @@ var cFormulaFunction = {
             r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
-                
+
 				function evenHelper( arg ){
 					var arg0 = arg.getValue();
 					if (arg0 >= 0)
@@ -4763,17 +4829,17 @@ var cFormulaFunction = {
 							return new cNumber ( arg0 - 1 );
 					}
 				}
-				
+
 				var arg0 = arg[0];
 				if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
 					arg0 = arg0.cross(arguments[1].first);
 				}
 
 				arg0 = arg0.tocNumber();
-                
+
 				if ( arg0 instanceof cError )
                     return this.value = arg0;
-					
+
 				if( arg0 instanceof cArray ){
 					arg0.foreach(function(elem,r,c){
 						if( elem instanceof cNumber ){
@@ -4866,7 +4932,7 @@ var cFormulaFunction = {
                 arg0 = arg[0].tocNumber(); arg1 = arg[1].tocNumber();
                 if ( arg0 instanceof cError ) return this.value = arg0;
                 if ( arg1 instanceof cError ) return this.value = arg1;
-			
+
 				function floorHelper( number, significance ){
 					if ( significance == 0 )
 						return new cNumber( 0.0 );
@@ -4885,7 +4951,7 @@ var cFormulaFunction = {
 						return new cNumber ( Math.floor(quotient + nolpiat) * significance );
 					}
 				}
-				
+
 				if( arg0 instanceof cArray && arg1 instanceof cArray ){
 					if( arg0.getCountElement() != arg1.getCountElement() || arg0.getRowCount() != arg1.getRowCount() ){
 						return this.value = new cError( cErrorType.not_available );
@@ -4927,10 +4993,10 @@ var cFormulaFunction = {
 					})
 					return this.value = arg1;
 				}
-				
+
 				if( arg0 instanceof cString || arg1 instanceof cString )
 					return this.value = new cError( cErrorType.wrong_value_type );
-				
+
 				return this.value =  floorHelper( arg0.getValue(), arg1.getValue() );
             }
             r.setName("FLOOR");
@@ -4948,42 +5014,42 @@ var cFormulaFunction = {
 			r.setArgumentsMin(1);
             r.setArgumentsMax(255);
             r.Calculate = function(arg){
-				
+
 				var _gcd = 0;
-				
+
 				function gcd(a,b){
 					var _a = parseInt(a), _b = parseInt(b);
 					while (_b != 0)
 						_b = _a % (_a = _b);
 					return _a;
 				}
-				
+
 				for( var i = 0; i < this.getArguments(); i++ ){
 					var argI = arg[i];
-					
+
 					if( argI instanceof cArea || argI instanceof cArea3D ){
 						var argArr = argI.getValue();
 						for( var j = 0; j < argArr.length; j++ ){
-						
+
 							if( argArr[j] instanceof cError )
 								return this.value = argArr[j];
-							
+
 							if( argArr[j] instanceof cString )
 								continue;
-							
+
 							if( argArr[j] instanceof cBool )
 								argArr[j] = argArr[j].tocNumber();
-							
+
 							if( argArr[j].getValue() < 0 )
 								return this.value = new cError( cErrorType.not_numeric );
-							
+
 							_gcd = gcd(_gcd,argArr[j].getValue());
 						}
 					}
 					else if( argI instanceof cArray ){
 						var argArr = argI.tocNumber();
-					
-						if( 
+
+						if(
 							argArr.foreach(function(arrElem){
 
 								if( arrElem instanceof cError ){
@@ -5010,19 +5076,19 @@ var cFormulaFunction = {
 					}
 					else{
 						argI = argI.tocNumber();
-						
+
 						if( argI.getValue() < 0 )
 								return this.value = new cError( cErrorType.not_numeric );
-						
+
 						if( argI instanceof cError )
 							return this.value = argI;
-							
+
 						_gcd = gcd(_gcd,argI.getValue())
 					}
 				}
-				
+
 				return this.value = new cNumber( _gcd );
-				
+
 			}
 			r.getInfo = function(){
                 return {
@@ -5044,7 +5110,7 @@ var cFormulaFunction = {
                 arg0 = arg0.tocNumber();
                 if( arg0 instanceof cError) return this.value = arg0;
 				if( arg0 instanceof cString ) this.value = new cError ( cErrorType.wrong_value_type );
-				
+
 				if( arg0 instanceof cArray ){
 					arg0.foreach(function(elem,r,c){
 						if( elem instanceof cNumber ){
@@ -5058,7 +5124,7 @@ var cFormulaFunction = {
 				else {
 					return this.value = new cNumber( Math.floor( arg0.getValue() ) )
 				}
-				
+
                 return this.value = new cNumber( Math.floor( arg0.getValue() ) );
             }
             r.setName("INT");
@@ -5099,7 +5165,7 @@ var cFormulaFunction = {
 						if( elem instanceof cNumber ){
 							if( elem.getValue() <= 0 )
 								this.array[r][c] = new cError( cErrorType.not_numeric );
-							else 
+							else
 								this.array[r][c] = new cNumber( Math.log( elem.getValue() ) );
 						}
 						else{
@@ -5110,7 +5176,7 @@ var cFormulaFunction = {
 				else {
 					if( arg0.getValue() <= 0 )
 						return this.value = new cError( cErrorType.not_numeric );
-					else 
+					else
 						return this.value = new cNumber( Math.log( arg0.getValue() ) );
 				}
             }
@@ -5133,7 +5199,7 @@ var cFormulaFunction = {
 					arg0 = arg0.cross(arguments[1].first);
 				}
                 arg0 = arg0.tocNumber();
-				
+
 				if( this.argumentsCurrent == 2 ){
 					arg1 = arg[1];
 					if( arg1 instanceof cArea || arg1 instanceof cArea3D ){
@@ -5141,12 +5207,12 @@ var cFormulaFunction = {
 					}
 					arg1 = arg1.tocNumber();
 					if ( arg1 instanceof cError )
-						return this.value = arg1;	
+						return this.value = arg1;
 				}
-				
+
 				if ( arg0 instanceof cError )
 					return this.value = arg0;
-					
+
 				if( arg0 instanceof cArray && arg1 instanceof cArray ){
 					if( arg0.getCountElement() != arg1.getCountElement() || arg0.getRowCount() != arg1.getRowCount() ){
 						return this.value = new cError( cErrorType.not_available );
@@ -5169,11 +5235,11 @@ var cFormulaFunction = {
 						var a = elem,
 							b = arg1 ? arg1 : new cNumber( 10 );
 						if( a instanceof cNumber && b instanceof cNumber ){
-							
+
 							if ( a.getValue() <= 0 || a.getValue() <= 0 )
 								this.array[r][c] = new cError( cErrorType.not_numeric );
-								
-							this.array[r][c] = new cNumber(  Math.log ( a.getValue() ) / Math.log ( b.getValue() ) );	
+
+							this.array[r][c] = new cNumber(  Math.log ( a.getValue() ) / Math.log ( b.getValue() ) );
 						}
 						else
 							this.array[r][c] = new cError( cErrorType.wrong_value_type );
@@ -5185,25 +5251,25 @@ var cFormulaFunction = {
 						var a = arg0,
 							b = elem;
 						if( a instanceof cNumber && b instanceof cNumber ){
-							
+
 							if ( a.getValue() <= 0 || a.getValue() <= 0 )
 								this.array[r][c] = new cError( cErrorType.not_numeric );
-							
-							this.array[r][c] = new cNumber(  Math.log ( a.getValue() ) / Math.log ( b.getValue() ) );	
+
+							this.array[r][c] = new cNumber(  Math.log ( a.getValue() ) / Math.log ( b.getValue() ) );
 						}
 						else
 							this.array[r][c] = new cError( cErrorType.wrong_value_type );
 					})
 					return this.value = arg1;
 				}
-				
+
 				if( !(arg0 instanceof cNumber) || ( arg1 && !(arg0 instanceof cNumber) ) )
 					return this.value = new cError( cErrorType.wrong_value_type );
-				
+
 				if ( arg0.getValue() <= 0 || ( arg1 && arg1.getValue() <= 0 ) )
 					return this.value = new cError( cErrorType.not_numeric );
-				
-				
+
+
 				if ( this.argumentsCurrent == 1)
 					return this.value = new cNumber( Math.log( arg0.getValue() ) / Math.log( 10 ) );
 				else
@@ -5238,7 +5304,7 @@ var cFormulaFunction = {
 						if( elem instanceof cNumber ){
 							if( elem.getValue() <= 0 )
 								this.array[r][c] = new cError( cErrorType.not_numeric );
-							else 
+							else
 								this.array[r][c] = new cNumber( Math.log( elem.getValue() ) / Math.log( 10 ) );
 						}
 						else{
@@ -5249,7 +5315,7 @@ var cFormulaFunction = {
 				else {
 					if( arg0.getValue() <= 0 )
 						return this.value = new cError( cErrorType.not_numeric );
-					else 
+					else
 						return this.value = new cNumber( Math.log( arg0.getValue() ) / Math.log( 10 ) );
 				}
             }
@@ -5290,10 +5356,10 @@ var cFormulaFunction = {
 					arg1 = arg1.cross(arguments[1].first);
 				}
 				arg0 = arg0.tocNumber(); arg1 = arg1.tocNumber();
-				
+
 				if ( arg0 instanceof cError ) return this.value = arg0;
-				if ( arg1 instanceof cError ) return this.value = arg1;	
-				
+				if ( arg1 instanceof cError ) return this.value = arg1;
+
 				if( arg0 instanceof cArray && arg1 instanceof cArray ){
 					if( arg0.getCountElement() != arg1.getCountElement() || arg0.getRowCount() != arg1.getRowCount() ){
 						return this.value = new cError( cErrorType.not_available );
@@ -5316,7 +5382,7 @@ var cFormulaFunction = {
 						var a = elem,
 							b = arg1;
 						if( a instanceof cNumber && b instanceof cNumber ){
-							
+
 							this.array[r][c] = new cNumber( (b.getValue() < 0 ? -1 : 1) * ( Math.abs(a.getValue()) % Math.abs(b.getValue()) ) );
 						}
 						else
@@ -5336,13 +5402,13 @@ var cFormulaFunction = {
 					})
 					return this.value = arg1;
 				}
-				
+
 				if( !(arg0 instanceof cNumber) || ( arg1 && !(arg0 instanceof cNumber) ) )
 					return this.value = new cError( cErrorType.wrong_value_type );
-				
+
 				if ( arg1.getValue() == 0 )
 					return this.value = new cError( cErrorType.division_by_zero );
-				
+
 				return this.value = new cNumber( (arg1.getValue() < 0 ? -1 : 1) * ( Math.abs(arg0.getValue()) % Math.abs(arg1.getValue()) ) );
 
             }
@@ -5360,7 +5426,7 @@ var cFormulaFunction = {
             r.setArgumentsMin(2);
             r.setArgumentsMax(2);
             r.Calculate = function(arg){
-                
+
 				var multiple;
 				function mroundHelper(num){
                     var multiplier = Math.pow(10, Math.floor(Math.log(Math.abs(num))/Math.log(10)) - cExcelSignificantDigits + 1);
@@ -5373,10 +5439,10 @@ var cFormulaFunction = {
 					var nolpiat = 5 * (x/Math.abs(x)) * Math.pow(10, Math.floor(Math.log(Math.abs(x))/Math.log(10)) - cExcelSignificantDigits);
 					x = x + nolpiat;
 					x = x | x;
-					
+
 					return x*multiple;
 				}
-				
+
 				function f(a,b,r,c){
 					if( a instanceof cNumber && b instanceof cNumber ){
 						if( a.getValue() == 0 )
@@ -5391,7 +5457,7 @@ var cFormulaFunction = {
 					else
 						this.array[r][c] = new cError( cErrorType.wrong_value_type );
 				}
-				
+
 				var arg0 = arg[0], arg1 = arg[1];
 				if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
 					arg0 = arg0.cross(arguments[1].first);
@@ -5406,7 +5472,7 @@ var cFormulaFunction = {
                 if( arg0 instanceof cError ) return this.value = arg0;
                 if( arg1 instanceof cError ) return this.value = arg1;
 				if( arg0 instanceof cString || arg1 instanceof cString ) { return this.value = new cError( cErrorType.wrong_value_type ); }
-				
+
 				if( arg0 instanceof cArray && arg1 instanceof cArray ){
 					if( arg0.getCountElement() != arg1.getCountElement() || arg0.getRowCount() != arg1.getRowCount() ){
 						return this.value = new cError( cErrorType.not_available );
@@ -5430,13 +5496,13 @@ var cFormulaFunction = {
 					})
 					return this.value = arg1;
 				}
-				
+
                 if( arg1.getValue() == 0 )
                     return this.value = new cNumber( 0 );
 
                 if( arg0.getValue() < 0 && arg1.getValue() > 0 || arg0.getValue() > 0 && arg1.getValue() < 0)
                     return this.value = new cError( cErrorType.not_numeric );
-					
+
 				multiple = arg1.getValue();
                 return this.value = new cNumber( mroundHelper( arg0.getValue() + arg1.getValue() / 2 ) );
             }
@@ -5459,7 +5525,7 @@ var cFormulaFunction = {
             r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
-				                
+
 				function oddHelper( arg ){
 					var arg0 = arg.getValue();
 					if (arg0 >= 0){
@@ -5477,16 +5543,16 @@ var cFormulaFunction = {
 							return new cNumber ( arg0 - 1 );
 					}
 				}
-				
+
 				var arg0 = arg[0];
 				if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
 					arg0 = arg0.cross(arguments[1].first);
 				}
                 arg0 = arg0.tocNumber();
-				
+
 				if ( arg0 instanceof cError )
                     return this.value = arg0;
-					
+
 				if( arg0 instanceof cArray ){
 					arg0.foreach(function(elem,r,c){
 						if( elem instanceof cNumber ){
@@ -5502,7 +5568,7 @@ var cFormulaFunction = {
 					return this.value = oddHelper( arg0 );
                 }
 				return this.value = new cError ( cErrorType.wrong_value_type );
-				
+
             }
             r.setName("ODD");
             r.getInfo = function(){
@@ -5534,16 +5600,16 @@ var cFormulaFunction = {
             r.setArgumentsMin(2);
             r.setArgumentsMax(2);
             r.Calculate = function(arg){
-				
+
 				function powerHelper(a,b){
 					if ( a == 0 && b < 0 )
 						return new cError( cErrorType.division_by_zero );
 					if ( a == 0 && b == 0 )
 						return new cError( cErrorType.not_numeric );
-					
+
 					return new cNumber( Math.pow( a, b ) );
 				}
-				
+
 				function f(a,b,r,c){
 					if( a instanceof cNumber && b instanceof cNumber ){
 						this.array[r][c] = powerHelper( a.getValue(), b.getValue() );
@@ -5551,7 +5617,7 @@ var cFormulaFunction = {
 					else
 						this.array[r][c] = new cError( cErrorType.wrong_value_type );
 				}
-				
+
 				var arg0 = arg[0], arg1 = arg[1];
 				if( arg0 instanceof cArea || arg1 instanceof cArea3D ){
 					arg0 = arg0.cross(arguments[1].first);
@@ -5560,10 +5626,10 @@ var cFormulaFunction = {
 					arg1 = arg1.cross(arguments[1].first);
 				}
 				arg0 = arg0.tocNumber(); arg1 = arg1.tocNumber();
-				
+
 				if ( arg0 instanceof cError ) return this.value = arg0;
-				if ( arg1 instanceof cError ) return this.value = arg1;	
-				
+				if ( arg1 instanceof cError ) return this.value = arg1;
+
 				if( arg0 instanceof cArray && arg1 instanceof cArray ){
 					if( arg0.getCountElement() != arg1.getCountElement() || arg0.getRowCount() != arg1.getRowCount() ){
 						return this.value = new cError( cErrorType.not_available );
@@ -5587,12 +5653,12 @@ var cFormulaFunction = {
 					})
 					return this.value = arg1;
 				}
-				
+
 				if( !(arg0 instanceof cNumber) || ( arg1 && !(arg0 instanceof cNumber) ) )
 					return this.value = new cError( cErrorType.wrong_value_type );
-					
+
 				return this.value = powerHelper( arg0.getValue(), arg1.getValue() );
-			
+
             };
             r.setName("POWER");
             r.getInfo = function(){
@@ -5625,10 +5691,10 @@ var cFormulaFunction = {
                     }
 					else if( arg[i] instanceof cArray ){
 						arg[i].foreach(function(elem){
-							
+
 							if( elem instanceof cString || elem instanceof cBool || elem instanceof cEmpty )
 								return;
-							
+
 							arg0 = _func[arg0.type][elem.type](arg0,elem,"*");
 						})
 					}
@@ -5637,7 +5703,7 @@ var cFormulaFunction = {
                     }
                     if( arg0 instanceof cError)
                         return this.value = arg0;
-					
+
                 }
                 return this.value = arg0;
             };
@@ -5659,17 +5725,17 @@ var cFormulaFunction = {
             r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
-			
+
 				function radiansHelper( ang ){
 					return ang * Math.PI / 180
 				}
-			
+
                 var arg0 = arg[0];
 				if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
 					arg0 = arg0.cross(arguments[1].first);
 				}
 				arg0 = arg0.tocNumber();
-				
+
 				if( arg0 instanceof cArray ){
 					arg0.foreach(function(elem,r,c){
 						if( elem instanceof cNumber ){
@@ -5683,9 +5749,9 @@ var cFormulaFunction = {
 				else{
 					return this.value = ( arg0 instanceof cError ? arg0 : new cNumber( radiansHelper( arg0.getValue() ) ) );
 				}
-				
+
 				return this.value = arg0;
-                
+
             };
             r.setName("RADIANS");
             r.getInfo = function(){
@@ -5762,19 +5828,19 @@ var cFormulaFunction = {
 						}
 						return new cNumber(0);
 					}
-					
+
 					var significance = SignZeroPositive(number) * Math.pow(10, -truncate(num_digits));
-					
+
 					number += significance / 2;
-					
+
 					if ( number/significance == Infinity){
 						return new cNumber( number );
 					}
-					
+
 					return new cNumber( Floor(number, significance) );
-				
+
 				}
-				
+
                 var arg0 = arg[0], arg1 = arg[1];
 				if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
 					arg0 = arg0.cross(arguments[1].first);
@@ -5782,10 +5848,10 @@ var cFormulaFunction = {
 				if( arg1 instanceof cArea || arg1 instanceof cArea3D ){
 					arg1 = arg1.cross(arguments[1].first);
 				}
-				
+
 				if( arg0 instanceof cError ) return this.value = arg0;
                 if( arg1 instanceof cError ) return this.value = arg1;
-				
+
                 if( arg0 instanceof cRef || arg0 instanceof cRef3D ){
                     arg0 = arg0.getValue();
                     if(arg0 instanceof cError) return this.value = arg0;
@@ -5843,11 +5909,11 @@ var cFormulaFunction = {
 					})
 					return this.value = arg1;
 				}
-			
+
                 var number = arg0.getValue(), num_digits = arg1.getValue();
-				
+
 				return this.value = roundHelper(number,num_digits);
-				
+
             }
             r.getInfo = function(){
                 return {
@@ -5886,7 +5952,7 @@ var cFormulaFunction = {
 					x = x | x;
 					return new cNumber( x * significance );
 				}
-				
+
 				var arg0 = arg[0], arg1 = arg[1];
 				if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
 					arg0 = arg0.cross(arguments[1].first);
@@ -5894,7 +5960,7 @@ var cFormulaFunction = {
 				if( arg1 instanceof cArea || arg1 instanceof cArea3D ){
 					arg1 = arg1.cross(arguments[1].first);
 				}
-				
+
                 if( arg0 instanceof cError ) return this.value = arg0;
                 if( arg1 instanceof cError ) return this.value = arg1;
 
@@ -5955,10 +6021,10 @@ var cFormulaFunction = {
 					})
 					return this.value = arg1;
 				}
-				
+
                 var number = arg0.getValue(), num_digits = arg1.getValue();
 				return this.value = rounddownHelper(number,num_digits);
-				
+
             }
             r.getInfo = function(){
                 return {
@@ -5997,7 +6063,7 @@ var cFormulaFunction = {
 					x = (x | x) + (x>0?1:x<0?-1:0)*1;
 					return new cNumber( x * significance );
 				}
-				
+
 				var arg0 = arg[0], arg1 = arg[1];
 				if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
 					arg0 = arg0.cross(arguments[1].first);
@@ -6005,7 +6071,7 @@ var cFormulaFunction = {
 				if( arg1 instanceof cArea || arg1 instanceof cArea3D ){
 					arg1 = arg1.cross(arguments[1].first);
 				}
-				
+
                 if( arg0 instanceof cError ) return this.value = arg0;
                 if( arg1 instanceof cError ) return this.value = arg1;
 
@@ -6066,10 +6132,10 @@ var cFormulaFunction = {
 					})
 					return this.value = arg1;
 				}
-				
+
                 var number = arg0.getValue(), num_digits = arg1.getValue();
 				return this.value = roundupHelper(number, num_digits);
-				
+
             }
         	r.getInfo = function(){
                 return {
@@ -6089,7 +6155,7 @@ var cFormulaFunction = {
             r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
-				
+
 				function signHelper(arg){
 					if ( arg < 0)
 						return new cNumber(-1.0);
@@ -6098,12 +6164,12 @@ var cFormulaFunction = {
 					else
 						return new cNumber(1.0);
 				}
-				
+
 				var arg0 = arg[0];
 				if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
 					arg0 = arg0.cross(arguments[1].first);
 				}
-				
+
 				arg0 = arg0.tocNumber();
 				if( arg0 instanceof cError )
 					return this.value = arg0;
@@ -6290,7 +6356,7 @@ var cFormulaFunction = {
                     }
                     if( arg0 instanceof cError)
                         return this.value = arg0;
-					
+
                 }
                 return this.value = arg0;
             };
@@ -6576,7 +6642,7 @@ var cFormulaFunction = {
 				else if( arg0 instanceof cRef || arg0 instanceof cRef3D ){
 					return this.value = new cNumber( 1 );
 				}
-				else 
+				else
 					return this.value = new cError( cErrorType.bad_reference );
 			}
 			r.getInfo = function(){
@@ -6597,16 +6663,16 @@ var cFormulaFunction = {
 				if( !(arg0 instanceof cRef || arg0 instanceof cRef3D || arg0 instanceof cArea || arg0 instanceof cArea3D) ){
 					return this.value = new cError( cErrorType.wrong_value_type );
 				}
-				
+
                 if ( arg1 instanceof cArea || arg1 instanceof cArea3D ){
 					arg1 = arg1.cross(arguments[1].first);
 				}
 				else if( arg1 instanceof cArray ){
 					arg1 = arg1.getElementRowCol(0,0);
 				}
-				
+
 				arg1 = arg1.tocString();
-				
+
 				if( !(arg1 instanceof cString) ){
 					return this.value = new cError( cErrorType.wrong_value_type );
 				}
@@ -6634,17 +6700,17 @@ var cFormulaFunction = {
 							default:
 								res = (x.value == y.value);
 								break;
-								
+
 						}
 					}
 					_count += res;
 				}
-				
+
 				arg1 = arg1.toString();
 				var operators = new RegExp("^ *[<=> ]+ *"), searchOperators = new RegExp("^ *[*?]")
 				var match = arg1.match(operators);
 				if( match || parseNum(arg1) ){
-					
+
 					var search, oper, val;
 					if( match ){
 						search = arg1.substr( match[0].length );
@@ -6931,24 +6997,24 @@ var cFormulaFunction = {
                 for ( var i = 0; i < this.argumentsCurrent; i++ ){
                     argI = arg[i], argIVal = argI.getValue();
                     if ( argI instanceof cRef || argI instanceof cRef3D ){
-						
+
 						if( argIVal instanceof cError )
                             return this.value = argIVal;
 
 						var v = argIVal.tocNumber();
-							
+
 						if ( v instanceof cNumber && v.getValue() > max.getValue() )
 							max = v;
                     }
                     else if ( argI instanceof cArea || argI instanceof cArea3D ){
                         var argArr = argI.getValue();
                         for( var j = 0; j < argArr.length; j++ ){
-							
+
 							if( argArr[j] instanceof cError )
 								return this.value = argArr[j];
-							
+
 							var v = argArr[j].tocNumber();
-							
+
 							if ( v instanceof cNumber && v.getValue() > max.getValue() )
 								max = v;
                         }
@@ -6973,7 +7039,7 @@ var cFormulaFunction = {
 								return true;
 							}
 							elem = elem.tocNumber();
-							
+
 							if( elem instanceof cNumber && elem.getValue() > max.getValue() ){
 								max = elem;
 							}
@@ -7087,25 +7153,25 @@ var cFormulaFunction = {
                 for ( var i = 0; i < this.argumentsCurrent; i++ ){
                     argI = arg[i], argIVal = argI.getValue();
                     if ( argI instanceof cRef || argI instanceof cRef3D ){
-                        
+
 						if( argIVal instanceof cError )
                             return this.value = argIVal;
-						
+
 						var v = argIVal.tocNumber();
-						
+
 						if ( v instanceof cNumber && v.getValue() < min.getValue() )
 							min = v;
                     }
                     else if ( argI instanceof cArea || argI instanceof cArea3D ){
                         var argArr = argI.getValue();
                         for( var j = 0; j < argArr.length; j++ ){
-							
+
 							if ( argArr[j] instanceof cError ){
 								return this.value = argArr[j];
 							}
-						
+
 							var v = argArr[j].tocNumber();
-							
+
 							if ( v instanceof cNumber && v.getValue() < min.getValue() )
 								min = v;
                         }
@@ -7129,9 +7195,9 @@ var cFormulaFunction = {
 								min = elem;
 								return true;
 							}
-							
+
 							elem = elem.tocNumber();
-							
+
 							if( elem instanceof cNumber && elem.getValue() < min.getValue() ){
 								min = elem;
 							}
@@ -7350,7 +7416,7 @@ var cFormulaFunction = {
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
 				var arg0 = arg[0];
-				
+
 				if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
 					arg0 = arg0.cross(arguments[1].first).tocNumber();
 				}
@@ -7360,17 +7426,17 @@ var cFormulaFunction = {
 						var _elem = elem.tocNumber();
 						if(!ret.array[r])
 							ret.addRow();
-							
+
 						if( _elem instanceof cError )
 							ret.addElement(_elem);
-						else 
+						else
 							ret.addElement( new cString( String.fromCharCode(_elem.getValue()) ) );
 					})
 					return this.value = ret;
 				}
-				
+
 				arg0 = arg0.tocNumber();
-				
+
 				if( arg0 instanceof cError ){
 					return this.value = arg0;
 				}
@@ -7392,23 +7458,23 @@ var cFormulaFunction = {
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
 				var arg0 = arg[0];
-				
+
 				if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
 					arg0 = arg0.cross(arguments[1].first).tocNumber();
 				}
 				if( arg0 instanceof cArray ){
 					arg0 = arg0.getElementRowCol(0,0);
 				}
-				
+
 				arg0 = arg0.tocString();
-				
+
 				var v = arg0.getValue(), l = v.length, res = "";
 
 				for( var i = 0; i < l; i++){
 					if( v.charCodeAt(i) > 0x1f )
 						res+=v[i];
 				}
-				
+
 				return this.value = new cString( res );
 			}
 			r.getInfo = function(){
@@ -7425,7 +7491,7 @@ var cFormulaFunction = {
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
 				var arg0 = arg[0];
-				
+
 				if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
 					arg0 = arg0.cross(arguments[1].first).tocString();
 				}
@@ -7435,17 +7501,17 @@ var cFormulaFunction = {
 						var _elem = elem.tocString();
 						if(!ret.array[r])
 							ret.addRow();
-							
+
 						if( _elem instanceof cError )
 							ret.addElement(_elem);
-						else 
+						else
 							ret.addElement(new cNumber( _elem.toString().charCodeAt() ));
 					})
 					return this.value = ret;
 				}
-				
+
 				arg0 = arg0.tocString();
-				
+
 				if( arg0 instanceof cError ){
 					return this.value = arg0;
 				}
@@ -7473,8 +7539,8 @@ var cFormulaFunction = {
 						argI = argI.cross(arguments[1].first);
 					}
                     argI = argI.tocString();
-                    if (argI instanceof cError) { 
-						return this.value = argI; 
+                    if (argI instanceof cError) {
+						return this.value = argI;
 					}
 					else if( argI instanceof cArray ){
 						argI.foreach(function(elem){
@@ -7482,12 +7548,12 @@ var cFormulaFunction = {
 								arg0 = elem;
 								return true;
 							}
-							
+
 							arg0 = new cString( arg0.toString().concat( elem.toString() ) );
-							
+
 						})
 						if( arg0 instanceof cError ){
-							return this.value = arg0; 
+							return this.value = arg0;
 						}
 					}
 					else
@@ -7513,7 +7579,7 @@ var cFormulaFunction = {
 				var res = cFormulaFunction.TextAndData["FIXED"]().Calculate(arg);
 				if( res instanceof cError )
 					return this.value =  res;
-				
+
 				return this.value = new cString("$"+res.getValue());
 			}
 			r.getInfo = function(){
@@ -7536,10 +7602,10 @@ var cFormulaFunction = {
 				if( arg1 instanceof cArea || arg1 instanceof cArea3D ){
 					arg1 = arg1.cross(arguments[1].first);
 				}
-				
+
                 arg0 = arg0.tocString();
 				arg1 = arg1.tocString();
-				
+
 				if( arg0 instanceof cArray && arg1 instanceof cArray ){
 					arg0 = arg0.getElementRowCol(0,0);
 					arg1 = arg1.getElementRowCol(0,0);
@@ -7550,10 +7616,10 @@ var cFormulaFunction = {
 				else if( arg1 instanceof cArray ){
 					arg1 = arg1.getElementRowCol(0,0);
 				}
-				
+
                 if ( arg0 instanceof cError )	return this.value = arg0;
                 if ( arg1 instanceof cError )	return this.value = arg1;
-				
+
                 var arg0val = arg0.getValue(), arg1val = arg1.getValue();
                 return this.value = new cBool( arg0val === arg1val );
             }
@@ -7573,51 +7639,51 @@ var cFormulaFunction = {
             r.setArgumentsMax(3);
             r.Calculate = function(arg){
 				var arg0 = arg[0], arg1 = arg[1], arg2 = this.getArguments() == 3 ? arg[2] : null, res, str, searchStr, pos = -1;
-				
+
 				if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
 					arg0 = arg0.cross(arguments[1].first);
 				}
 				if( arg1 instanceof cArea || arg1 instanceof cArea3D ){
 					arg1 = arg1.cross(arguments[1].first);
 				}
-				
+
 				arg0 = arg0.tocString();
 				arg1 = arg1.tocString();
-				
+
 				if( arg2 !== null ){
-				
+
 					if( arg2 instanceof cArea || arg2 instanceof cArea3D ){
 						arg2 = arg2.cross(arguments[1].first);
 					}
-				
+
 					arg2 = arg2.tocNumber();
 					if( arg2 instanceof cArray ){
 						arg2 = arg1.getElementRowCol(0,0);
 					}
 					if ( arg2 instanceof cError )	return this.value = arg2;
-					
+
 					pos = arg2.getValue();
 					pos = pos > 0 ? pos-1 : pos;
 				}
-				
+
 				if( arg0 instanceof cArray ){
 					arg0 = arg0.getElementRowCol(0,0);
 				}
 				if( arg1 instanceof cArray ){
 					arg1 = arg1.getElementRowCol(0,0);
 				}
-				
+
 				if ( arg0 instanceof cError )	return this.value = arg0;
                 if ( arg1 instanceof cError )	return this.value = arg1;
-                
+
 				str = arg1.getValue();
 				searchStr = arg0.getValue();
 
 				if( arg2 ){
-					
+
 					if( pos > str.length || pos < 0 )
 						return this.value = new cError( cErrorType.wrong_value_type );
-						
+
 					str = str.substring(pos);
 					res = str.search( searchStr );
 					if( res >= 0 )
@@ -7625,12 +7691,12 @@ var cFormulaFunction = {
 				}
 				else
 					res = str.search( searchStr );
-					
+
 				if( res < 0 )
 					return this.value = new cError( cErrorType.wrong_value_type );
-					
+
 				return this.value = new cNumber( res+1 );
-				
+
 			}
 			r.getInfo = function(){
                 return {
@@ -7685,46 +7751,46 @@ var cFormulaFunction = {
 						}
 						return new cNumber(0);
 					}
-					
+
 					var significance = SignZeroPositive(number) * Math.pow(10, -truncate(num_digits));
-					
+
 					number += significance / 2;
-					
+
 					if ( number/significance == Infinity){
 						return new cNumber( number );
 					}
-					
+
 					return new cNumber( Floor(number, significance) );
 				}
 				function toFix(str,skip){
 					var res, _int, _dec, _tmp = ""
-					
+
 					if(skip)
 						return str;
-						
+
 					res = str.split(".");
 					_int = res[0];
-					
+
 					if( res.length == 2)
 						_dec = res[1];
-						
+
 					_int = _int.split("").reverse().join("").match(/([^]{1,3})/ig)
-						
+
 					for( var i = _int.length-1; i >= 0; i--){
 						_tmp += _int[i].split("").reverse().join("");
 						if( i != 0 )
 							_tmp += ",";
 					}
-					
+
 					if( undefined != _dec)
 						while( _dec.length < arg1.getValue() ) _dec+="0";
-						
+
 					return "" + _tmp + ( res.length == 2 ? "."+_dec+"" : "");
 				}
-                var arg0 = arg[0], 
-					arg1 = arg[1] ? arg[1] : new cNumber(2), 
+                var arg0 = arg[0],
+					arg1 = arg[1] ? arg[1] : new cNumber(2),
 					arg2 = arg[2] ? arg[2] : new cBool(false);
-					
+
 				if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
 					arg0 = arg0.cross(arguments[1].first);
 				}
@@ -7734,11 +7800,11 @@ var cFormulaFunction = {
 				if( arg2 instanceof cArea || arg2 instanceof cArea3D ){
 					arg2 = arg2.cross(arguments[1].first);
 				}
-				
+
 				if( arg0 instanceof cError ) return this.value = arg0;
                 if( arg1 instanceof cError ) return this.value = arg1;
                 if( arg2 instanceof cError ) return this.value = arg2;
-				
+
                 if( arg0 instanceof cRef || arg0 instanceof cRef3D ){
                     arg0 = arg0.getValue();
                     if(arg0 instanceof cError) return this.value = arg0;
@@ -7799,9 +7865,9 @@ var cFormulaFunction = {
 					})
 					return this.value = arg1;
 				}
-			
+
                 var number = arg0.getValue(), num_digits = arg1.getValue();
-				
+
 				return this.value = new cString(toFix(roundHelper(number,num_digits).toString(), arg2.toBool()));
             }
 			r.getInfo = function(){
@@ -7830,10 +7896,10 @@ var cFormulaFunction = {
 				if( arg1 instanceof cArea || arg1 instanceof cArea3D ){
 					arg1 = arg1.cross(arguments[1].first);
 				}
-				
+
                 arg0 = arg0.tocString();
 				arg1 = arg1.tocNumber();
-				
+
 				if( arg0 instanceof cArray && arg1 instanceof cArray ){
 					arg0 = arg0.getElementRowCol(0,0);
 					arg1 = arg1.getElementRowCol(0,0);
@@ -7844,14 +7910,14 @@ var cFormulaFunction = {
 				else if( arg1 instanceof cArray ){
 					arg1 = arg1.getElementRowCol(0,0);
 				}
-				
+
                 if ( arg0 instanceof cError )	return this.value = arg0;
                 if ( arg1 instanceof cError )	return this.value = arg1;
-				
+
 				if( arg1.getValue() < 0 ) return this.value = new cError( cErrorType.wrong_value_type );
-				
+
 				return this.value = new cString( arg0.getValue().substring(0, arg1.getValue()) )
-				
+
             }
             r.getInfo = function(){
                 return {
@@ -7876,17 +7942,17 @@ var cFormulaFunction = {
 				if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
 					arg0 = arg0.cross(arguments[1].first);
 				}
-				
+
                 arg0 = arg0.tocString();
-				
+
 				if( arg0 instanceof cArray ){
 					arg0 = arg0.getElementRowCol(0,0);
 				}
-				
+
                 if ( arg0 instanceof cError )	return this.value = arg0;
 
 				return this.value = new cNumber( arg0.getValue().length )
-				
+
             }
             r.getInfo = function(){
                 return {
@@ -7910,13 +7976,13 @@ var cFormulaFunction = {
 
                 if( arg0 instanceof cArea || arg0 instanceof cArea3D )
                     arg0 = arg0.cross(arguments[1].first);
-                
+
 				arg0 = arg0.tocString();
 				if( arg0 instanceof cArray )
 					arg0 = arg0.getElementRowCol(0,0);
-					
+
                 if( arg0 instanceof cError ) return this.value = arg0;
-				
+
                 return this.value = new cString( arg0.getValue().toLowerCase() );
             }
             r.setName("LOWER");
@@ -7944,11 +8010,11 @@ var cFormulaFunction = {
 				if( arg2 instanceof cArea || arg2 instanceof cArea3D ){
 					arg2 = arg2.cross(arguments[1].first);
 				}
-				
+
                 arg0 = arg0.tocString();
 				arg1 = arg1.tocNumber();
 				arg2 = arg2.tocNumber();
-				
+
 				if( arg0 instanceof cArray ){
 					arg0 = arg0.getElementRowCol(0,0);
 				}
@@ -7958,23 +8024,23 @@ var cFormulaFunction = {
 				if( arg2 instanceof cArray ){
 					arg2 = arg2.getElementRowCol(0,0);
 				}
-				
+
                 if ( arg0 instanceof cError )	return this.value = arg0;
                 if ( arg1 instanceof cError )	return this.value = arg1;
                 if ( arg2 instanceof cError )	return this.value = arg2;
 				if( arg1.getValue() < 0 ) return this.value = new cError( cErrorType.wrong_value_type );
 				if( arg2.getValue() < 0 ) return this.value = new cError( cErrorType.wrong_value_type );
-				
+
 				var l = arg0.getValue().length;
-				
+
 				if( arg1.getValue() > l )
 					return this.value = new cString("");
-				
+
 				/* if( arg1.getValue() < l )
 					return this.value = arg0; */
-				
+
 				return this.value = new cString( arg0.getValue().substr( arg1.getValue() == 0 ? 0 : arg1.getValue()-1, arg2.getValue() ) )
-				
+
             }
             r.getInfo = function(){
                 return {
@@ -8001,12 +8067,12 @@ var cFormulaFunction = {
             r.setArgumentsMax(1);
 			r.Calculate = function(arg){
 				var reg_PROPER = new RegExp("[-#$+*/^&%<\\[\\]='?_\\@!~`\">: ;.\\)\\(,]|\\d|\\s"), arg0 = arg[0];
-				
+
 				function proper(str){
 					var canUpper = true, retStr = "", regTest;
 					for( var i=0; i< str.length; i++ ){
 						regTest = reg_PROPER.test(str[i]);
-						
+
 						if( regTest ){
 							canUpper = true;
 						}
@@ -8017,13 +8083,13 @@ var cFormulaFunction = {
 								continue;
 							}
 						}
-						
+
 						retStr += str[i].toLowerCase();
-						
+
 					}
 					return retStr;
 				}
-				
+
 				if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
 					arg0 = arg0.cross(arguments[1].first).tocString();
 				}
@@ -8033,17 +8099,17 @@ var cFormulaFunction = {
 						var _elem = elem.tocString();
 						if(!ret.array[r])
 							ret.addRow();
-							
+
 						if( _elem instanceof cError )
 							ret.addElement(_elem);
-						else 
+						else
 							ret.addElement(new cString( proper(_elem.toString()) ));
 					})
 					return this.value = ret;
 				}
-				
+
 				arg0 = arg0.tocString();
-				
+
 				if( arg0 instanceof cError ){
 					return this.value = arg0;
 				}
@@ -8065,43 +8131,43 @@ var cFormulaFunction = {
             r.setArgumentsMax(4);
 			r.Calculate = function(arg){
 				var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3];
-				
+
 				if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
 					arg0 = arg0.cross(arguments[1].first).tocString();
 				}
 				else if( arg0 instanceof cArray){
 					arg0 = arg0.getElement(0).tocString();
 				}
-				
+
 				arg0 = arg0.tocString();
-				
+
 				if( arg1 instanceof cArea || arg1 instanceof cArea3D ){
 					arg1 = arg1.cross(arguments[1].first).tocNumber();
 				}
 				else if( arg1 instanceof cArray){
 					arg1 = arg1.getElement(0).tocNumber();
 				}
-				
+
 				arg1 = arg1.tocNumber();
-				
+
 				if( arg2 instanceof cArea || arg2 instanceof cArea3D ){
 					arg2 = arg2.cross(arguments[1].first).tocNumber();
 				}
 				else if( arg2 instanceof cArray){
 					arg2 = arg2.getElement(0).tocNumber();
 				}
-				
+
 				arg2 = arg2.tocNumber();
-				
+
 				if( arg3 instanceof cArea || arg3 instanceof cArea3D ){
 					arg3 = arg3.cross(arguments[1].first).tocString();
 				}
 				else if( arg3 instanceof cArray){
 					arg3 = arg3.getElement(0).tocString();
 				}
-				
+
 				arg3 = arg3.tocString();
-				
+
 				if( arg0 instanceof cError )
 					return this.value = arg0;
 				if( arg1 instanceof cError )
@@ -8110,21 +8176,21 @@ var cFormulaFunction = {
 					return this.value = arg2;
 				if( arg3 instanceof cError )
 					return this.value = arg3;
-				
+
 				if( arg1.getValue() < 1 || arg2.getValue() < 0 ){
 					return this.value = new cError( cErrorType.wrong_value_type );
 				}
-				
+
 				var string1 = arg0.getValue(), string2 = arg3.getValue(), res = "";
-				
+
 				string1 = string1.split("");
 				string1.splice(arg1.getValue()-1,arg2.getValue(),string2);
 				for( var i = 0; i < string1.length; i++){
 					res += string1[i];
 				}
-				
+
 				return this.value = new cString(res);
-				
+
 			}
 			r.getInfo = function(){
 				return {
@@ -8148,7 +8214,7 @@ var cFormulaFunction = {
                 var arg0 = arg[0], arg1 = arg[1], res = "";
                 if( arg0 instanceof cError ) return this.value = arg0;
                 if( arg1 instanceof cError ) return this.value = arg1;
-				
+
 				if( arg0 instanceof cArray && arg1 instanceof cArray ){
 					arg0 = arg0.getElementRowCol(0,0);
 					arg1 = arg1.getElementRowCol(0,0);
@@ -8159,29 +8225,29 @@ var cFormulaFunction = {
 				else if( arg1 instanceof cArray ){
 					arg1 = arg1.getElementRowCol(0,0);
 				}
-				
-				
+
+
                 if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
 					arg0 = arg0.cross(arguments[1].first);
 				}
                 arg0 = arg0.tocString();
 				if (arg0 instanceof cError)
 					return this.value = arg0;
-				
+
                 if( arg1 instanceof cArea || arg1 instanceof cArea3D ){
 					arg1 = arg1.cross(arguments[1].first).tocNumber();
 				}
                 else if( arg1 instanceof cRef || arg1 instanceof cRef3D ){
                     arg1 = arg1.getValue();
                 }
-				
-				if(arg1 instanceof cError) 
+
+				if(arg1 instanceof cError)
 					return this.value = arg1;
-				else if(arg1 instanceof cString) 
+				else if(arg1 instanceof cString)
 					return this.value = new cError(cErrorType.wrong_value_type);
-				else 
+				else
 					arg1 = arg1.tocNumber();
-				
+
                 if( arg1.getValue() < 0 ) return this.value = new cError(cErrorType.wrong_value_type);
 
                 for ( var i = 0; i < arg1.getValue(); i++){
@@ -8210,10 +8276,10 @@ var cFormulaFunction = {
 				if( arg1 instanceof cArea || arg1 instanceof cArea3D ){
 					arg1 = arg1.cross(arguments[1].first);
 				}
-				
+
                 arg0 = arg0.tocString();
 				arg1 = arg1.tocNumber();
-				
+
 				if( arg0 instanceof cArray && arg1 instanceof cArray ){
 					arg0 = arg0.getElementRowCol(0,0);
 					arg1 = arg1.getElementRowCol(0,0);
@@ -8224,14 +8290,14 @@ var cFormulaFunction = {
 				else if( arg1 instanceof cArray ){
 					arg1 = arg1.getElementRowCol(0,0);
 				}
-				
+
                 if ( arg0 instanceof cError )	return this.value = arg0;
                 if ( arg1 instanceof cError )	return this.value = arg1;
-				
+
 				if( arg1.getValue() < 0 ) return this.value = new cError( cErrorType.wrong_value_type );
 				var l = arg0.getValue().length, _number = l-arg1.getValue();
 				return this.value = new cString( arg0.getValue().substring( _number < 0 ? 0 : _number , l) )
-				
+
             }
             r.getInfo = function(){
                 return {
@@ -8252,47 +8318,47 @@ var cFormulaFunction = {
 			r.setArgumentsMin(2);
             r.setArgumentsMax(3);
 			r.Calculate = function(arg){
-				
+
 				var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new cNumber(1);
-				
+
 				if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
 					arg0 = arg0.cross(arguments[1].first).tocString();
 				}
 				else if( arg0 instanceof cArray){
 					arg0 = arg0.getElement(0).tocString();
 				}
-				
+
 				arg0 = arg0.tocString();
-				
+
 				if( arg1 instanceof cArea || arg1 instanceof cArea3D ){
 					arg1 = arg1.cross(arguments[1].first).tocString();
 				}
 				else if( arg1 instanceof cArray){
 					arg1 = arg1.getElement(0).tocString();
 				}
-				
+
 				arg1 = arg1.tocString();
-				
+
 				if( arg2 instanceof cArea || arg2 instanceof cArea3D ){
 					arg2 = arg2.cross(arguments[1].first).tocNumber();
 				}
 				else if( arg2 instanceof cArray){
 					arg2 = arg2.getElement(0).tocNumber();
 				}
-				
+
 				arg2 = arg2.tocNumber();
-				
+
 				if( arg0 instanceof cError )
 					return this.value = arg0;
 				if( arg1 instanceof cError )
 					return this.value = arg1;
 				if( arg2 instanceof cError )
 					return this.value = arg2;
-				
+
 				if( arg2.getValue() < 1 || arg2.getValue() > arg1.getValue().length ){
 					return this.value = new cError( cErrorType.wrong_value_type );
 				}
-				
+
 				var string1 = arg0.getValue(), string2 = arg1.getValue(), res = 0,
 					valueForSearching = string1
 												.replace(/(~)?\*/g, function($0, $1){
@@ -8302,20 +8368,20 @@ var cFormulaFunction = {
 													return $1 ? $0 : '[\\w\\W]{1,1}';
 												})
 												.replace(/\~/g, "\\");
-				
+
 					valueForSearching = new RegExp( valueForSearching, "ig")
 				if( string1 == "" )
 					return this.value = arg2;
-				
-				
-				
+
+
+
 				res = string2.substring(arg2.getValue()-1).search( valueForSearching ) + arg2.getValue()-1;
-				
+
 				if( res < 0 )
 					return this.value = new cError( cErrorType.wrong_value_type );
-					
+
 				return this.value = new cNumber(res+1);
-				
+
 			}
 			r.getInfo = function(){
 				return {
@@ -8337,43 +8403,43 @@ var cFormulaFunction = {
             r.setArgumentsMax(4);
 			r.Calculate = function(arg){
 				var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3] ? arg[3] : new cNumber(0);
-				
+
 				if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
 					arg0 = arg0.cross(arguments[1].first).tocString();
 				}
 				else if( arg0 instanceof cArray){
 					arg0 = arg0.getElement(0).tocString();
 				}
-				
+
 				arg0 = arg0.tocString();
-				
+
 				if( arg1 instanceof cArea || arg1 instanceof cArea3D ){
 					arg1 = arg1.cross(arguments[1].first).tocString();
 				}
 				else if( arg1 instanceof cArray){
 					arg1 = arg1.getElement(0).tocString();
 				}
-				
+
 				arg1 = arg1.tocString();
-				
+
 				if( arg2 instanceof cArea || arg2 instanceof cArea3D ){
 					arg2 = arg2.cross(arguments[1].first).tocString();
 				}
 				else if( arg2 instanceof cArray){
 					arg2 = arg2.getElement(0).tocString();
 				}
-				
+
 				arg2 = arg2.tocString();
-				
+
 				if( arg3 instanceof cArea || arg3 instanceof cArea3D ){
 					arg3 = arg3.cross(arguments[1].first).tocNumber();
 				}
 				else if( arg3 instanceof cArray){
 					arg3 = arg3.getElement(0).tocNumber();
 				}
-				
+
 				arg3 = arg3.tocNumber();
-				
+
 				if( arg0 instanceof cError )
 					return this.value = arg0;
 				if( arg1 instanceof cError )
@@ -8382,11 +8448,11 @@ var cFormulaFunction = {
 					return this.value = arg2;
 				if( arg3 instanceof cError )
 					return this.value = arg3;
-					
+
 				if( arg3.getValue() < 0 ){
 					return this.value = new cError( cErrorType.wrong_value_type );
 				}
-					
+
 				var string = arg0.getValue(), old_string = arg1.getValue(), new_string = arg2.getValue(), index = 0, res;
 					res = string.replace(new RegExp(old_string,"g"),function(equal, p1, source){
 						index++;
@@ -8397,9 +8463,9 @@ var cFormulaFunction = {
 						}
 						return equal;
 					})
-					
+
 				return this.value = new cString( res );
-					
+
 			}
 			r.getInfo = function(){
 				return {
@@ -8427,7 +8493,7 @@ var cFormulaFunction = {
 				else if( arg[0] instanceof cArray ){
 					arg0 = arg[0].getElementRowCol(0,0);
 				}
-				
+
                 if( arg0 instanceof cString || arg0 instanceof cError )
                     return this.value = arg[0];
                 else
@@ -8456,7 +8522,7 @@ var cFormulaFunction = {
 				else if( arg0 instanceof cArray ){
 					arg0 = arg0.getElementRowCol(0,0);
 				}
-				
+
 				if( arg1 instanceof cRef || arg1 instanceof cRef3D){
                     arg1 = arg1.getValue();
                 }
@@ -8466,33 +8532,33 @@ var cFormulaFunction = {
 				else if( arg1 instanceof cArray ){
 					arg1 = arg1.getElementRowCol(0,0);
 				}
-				
+
 				if ( arg0 instanceof cError )	return this.value = arg0;
                 if ( arg1 instanceof cError )	return this.value = arg1;
-				
+
 				arg0 = arg0.tocString();
-				
+
 				var _tmp = arg0.tocNumber();
 				if( _tmp instanceof cNumber )
 					arg0 = _tmp;
-				
+
 				var oFormat = oNumFormatCache.get(arg1.toString());
 				var aText = oFormat.format(arg0.getValue(), arg0 instanceof cNumber ? CellValueType.Number : CellValueType.String, gc_nMaxDigCountView, null);
 				var text = "";
-				
+
 				for(var i = 0, length = aText.length; i < length; ++i)
 				{
-					
+
 					if(aText[i].format && aText[i].format.skip ){
 						text += " ";
 						continue;
 					}
 					if(aText[i].format && aText[i].format.repeat )
 						continue;
-						
+
 					text += aText[i].text;
 				}
-				
+
 				return this.value = new cString(text);
 			}
             r.setName("TEXT");
@@ -8511,19 +8577,19 @@ var cFormulaFunction = {
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
 				var arg0 = arg[0];
-				
+
 				if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
 					arg0 = arg0.cross(arguments[1].first).tocString();
 				}
 				else if( arg0 instanceof cArray){
 					arg0 = arg0.getElement(0).tocString();
 				}
-				
+
 				arg0 = arg0.tocString();
-				
+
 				if( arg0 instanceof cError )
 					return this.value = arg0;
-					
+
 				return this.value = new cString( arg0.getValue().replace(/\s/g, function($0, $1, $2){ var r; /\s/.test($2[$1+1]) ? r = "" : r = $2[$1]; return r; }).replace(/^\s|\s$/g,"") )
 			}
 			r.getInfo = function(){
@@ -8546,7 +8612,7 @@ var cFormulaFunction = {
                 arg0 = arg0.tocString();
 				if( arg0 instanceof cArray )
 					arg0 = arg0.getElementRowCol(0,0);
-				
+
                 if( arg0 instanceof cError ) return this.value = arg0;
                 return this.value = new cString( arg0.getValue().toUpperCase() );
             }
@@ -8566,26 +8632,26 @@ var cFormulaFunction = {
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
 				var arg0 = arg[0];
-                
+
 				if ( arg0 instanceof cArea || arg0 instanceof cArea3D ){
 					arg0 = arg0.cross(arguments[1].first);
 				}
 				else if( arg0 instanceof cArray ){
 					arg0 = arg0.getElementRowCol(0,0);
 				}
+
+				arg0 = arg0.tocString();
 				
 				if ( arg0 instanceof cError )
 					return this.value = arg0;
-				
-				arg0 = arg0.tocString();
-				
+
 				var res = g_oFormatParser.parse(arg0.getValue());
-				
+
 				if( res )
 					return this.value = new cNumber( res.value );
 				else
 					return this.value = new cError( cErrorType.wrong_value_type );
-				
+
 			}
 			r.getInfo = function(){
                 return {
@@ -8624,10 +8690,10 @@ function cNumber(val){
     this.value = parseFloat(val);
 }
 extend(cNumber,cBaseType);
-cNumber.prototype.getValue = function(){ return this.value.toFixed(cExcelSignificantDigits)-0; }
-cNumber.prototype.tocString = function(){ return new cString( ""+this.value ); }
-cNumber.prototype.tocNumber = function(){ return this; }
-cNumber.prototype.tocBool = function(){ return new cBool( this.value != 0 ); }
+cNumber.prototype.getValue = function(){ return this.value.toFixed(cExcelSignificantDigits)-0; };
+cNumber.prototype.tocString = function(){ return new cString( ""+this.value ); };
+cNumber.prototype.tocNumber = function(){ return this; };
+cNumber.prototype.tocBool = function(){ return new cBool( this.value != 0 ); };
 
 /** @constructor */
 function cString(val){
@@ -8649,7 +8715,7 @@ cString.prototype.tocNumber = function(){
 		if ( !isNaN(_numberValue) )
 			return new cNumber(_numberValue);
 	}
-}
+};
 cString.prototype.tocBool = function(){
 	if ( parserHelp.isBoolean(this.value, 0) ){
 		if( parserHelp.operand_str == "TRUE" )
@@ -8659,8 +8725,8 @@ cString.prototype.tocBool = function(){
 	}
 	else
 		return this;
-}
-cString.prototype.tocString = function(){ return this; }
+};
+cString.prototype.tocString = function(){ return this; };
 
 /** @constructor */
 function cBool(val){
@@ -8677,12 +8743,12 @@ function cBool(val){
 	}
 }
 extend(cBool,cBaseType);
-cBool.prototype.toString = function(){ return this.value.toString().toUpperCase(); }
-cBool.prototype.getValue = function(){ return this.toString(); }
-cBool.prototype.tocNumber = function(){ return new cNumber( this.value ? 1.0: 0.0 ); }
-cBool.prototype.tocString = function(){ return new cString( this.value ? "TRUE": "FALSE"  ); }
-cBool.prototype.tocBool = function(){ return this; }
-cBool.prototype.toBool = function(){ return this.value; }
+cBool.prototype.toString = function(){ return this.value.toString().toUpperCase(); };
+cBool.prototype.getValue = function(){ return this.toString(); };
+cBool.prototype.tocNumber = function(){ return new cNumber( this.value ? 1.0: 0.0 ); };
+cBool.prototype.tocString = function(){ return new cString( this.value ? "TRUE": "FALSE"  ); };
+cBool.prototype.tocBool = function(){ return this; };
+cBool.prototype.toBool = function(){ return this.value; };
 
 /** @constructor */
 function cError(val){
@@ -8762,7 +8828,7 @@ function cError(val){
 	}
 }
 extend(cError,cBaseType);
-cError.prototype.tocNumber = cError.prototype.tocString = cError.prototype.tocBool = cError.prototype.tocEmpty = function(){ return this; }
+cError.prototype.tocNumber = cError.prototype.tocString = cError.prototype.tocBool = cError.prototype.tocEmpty = function(){ return this; };
 
 /** @constructor */
 function cArea(val,_ws){/*Area means "A1:E5" for example*/
@@ -8776,7 +8842,7 @@ function cArea(val,_ws){/*Area means "A1:E5" for example*/
     // this._valid = this.range ? true : false;
 }
 extend(cArea,cBaseType);
-cArea.prototype.getWsId = function(){ return this.ws.Id; }
+cArea.prototype.getWsId = function(){ return this.ws.Id; };
 cArea.prototype.getValue = function(){
 	var _val = [], r = this.getRange();
 	if(  !r ){
@@ -8806,7 +8872,7 @@ cArea.prototype.getValue = function(){
 			}
 		});
 	return _val;
-}
+};
 cArea.prototype.getValue2 = function(cell){
 	var _val = [], r = this.getRange();
 	if(  !r ){
@@ -8837,19 +8903,19 @@ cArea.prototype.getValue2 = function(cell){
 			}
 		});
 	return _val[0];
-}
-cArea.prototype.getRange = function(){ return this.ws.getRange2(this._cells); }
-cArea.prototype.tocNumber = function(){ return this.getValue()[0].tocNumber(); }
-cArea.prototype.tocString = function(){ return this.getValue()[0].tocString(); }
-cArea.prototype.tocBool = function(){ return this.getValue()[0].tocBool(); }
-cArea.prototype.toString = function(){ return this._cells; }
+};
+cArea.prototype.getRange = function(){ return this.ws.getRange2(this._cells); };
+cArea.prototype.tocNumber = function(){ return this.getValue()[0].tocNumber(); };
+cArea.prototype.tocString = function(){ return this.getValue()[0].tocString(); };
+cArea.prototype.tocBool = function(){ return this.getValue()[0].tocBool(); };
+cArea.prototype.toString = function(){ return this._cells; };
 cArea.prototype.setRange = function(cell){
 	this._cells = this.value = cell;
 	this.range = this.ws.getRange2(cell);
 	this._valid = this.range ? true : false;
-}
-cArea.prototype.getWS = function(){ return this.ws; }
-cArea.prototype.getBBox = function(){ return this.getRange().getBBox(); }
+};
+cArea.prototype.getWS = function(){ return this.ws; };
+cArea.prototype.getBBox = function(){ return this.getRange().getBBox(); };
 cArea.prototype.cross = function(arg){
 	var r = this.getRange();
 	if( !r )
@@ -8867,13 +8933,13 @@ cArea.prototype.cross = function(arg){
 	}
 	else
 		return new cError( cErrorType.wrong_value_type );
-}
+};
 cArea.prototype.isValid = function(){
 	var r = this.getRange();
 	if(!r)
 		return false;
 	return true;
-}
+};
 cArea.prototype.countCells = function(){
 	var r = this.getRange(), bbox = r.bbox,
 		count = (Math.abs(bbox.c1 - bbox.c2) + 1)*(Math.abs(bbox.r1 - bbox.r2) + 1);
@@ -8881,7 +8947,7 @@ cArea.prototype.countCells = function(){
 			count--;
 		})
 	return new cNumber( count );
-}
+};
 
 /** @constructor */
 function cRef(val,_ws){/*Ref means A1 for example*/
@@ -8895,7 +8961,7 @@ function cRef(val,_ws){/*Ref means A1 for example*/
     this._valid = new CellAddress(val.replace(/\$/g,"")).isValid();
 }
 extend(cRef,cBaseType);
-cRef.prototype.getWsId = function(){ return this.ws.Id; }
+cRef.prototype.getWsId = function(){ return this.ws.Id; };
 cRef.prototype.getValue = function(){
 	if( !this._valid ){
 		return new cError(cErrorType.bad_reference)
@@ -8926,17 +8992,17 @@ cRef.prototype.getValue = function(){
 				return new cError(parserHelp.operand_str)
 			else return new cString(_val);
 	}
-}
-cRef.prototype.tocNumber = function(){ return this.getValue().tocNumber(); }
-cRef.prototype.tocString = function(){ return new cString(""+this.range.getValueWithFormat()); }
-cRef.prototype.tocBool = function(){ return this.getValue().tocBool(); }
-cRef.prototype.tryConvert = function(){ return this.getValue(); }
-cRef.prototype.toString = function(){ return this._cells; }
-cRef.prototype.getRange = function(){ return this.range; }
-cRef.prototype.getWS = function(){ return this.ws; }
+};
+cRef.prototype.tocNumber = function(){ return this.getValue().tocNumber(); };
+cRef.prototype.tocString = function(){ return new cString(""+this.range.getValueWithFormat()); };
+cRef.prototype.tocBool = function(){ return this.getValue().tocBool(); };
+cRef.prototype.tryConvert = function(){ return this.getValue(); };
+cRef.prototype.toString = function(){ return this._cells; };
+cRef.prototype.getRange = function(){ return this.range; };
+cRef.prototype.getWS = function(){ return this.ws; };
 cRef.prototype.isValid = function(){
 	return this._valid;
-}
+};
 
 /** @constructor */
 function cArea3D(val,_wsFrom, _wsTo,wb){/*Area3D means "Sheat1!A1:E5" for example*/
@@ -8969,7 +9035,7 @@ cArea3D.prototype.range = function(wsRange){
 	}
 	return r;
 };
-cArea3D.prototype.getRange = function(){ return this.range(this.wsRange()); }
+cArea3D.prototype.getRange = function(){ return this.range(this.wsRange()); };
 cArea3D.prototype.getValue = function(){
 	var _wsA = this.wsRange();
 	var _val = [];
@@ -9014,7 +9080,7 @@ cArea3D.prototype.getValue = function(){
 		})
 	}
 	return _val;
-}
+};
 cArea3D.prototype.getValue2 = function(cell){
 	var _wsA = this.wsRange();
 	var _val = [];
@@ -9058,7 +9124,7 @@ cArea3D.prototype.getValue2 = function(cell){
 		}
 	})
 	return _val[0];
-}
+};
 cArea3D.prototype.changeSheet = function(lastName,newName){
 	if( this.wsFrom == this._wb.getWorksheetByName(lastName).getId() && this.wsTo == this._wb.getWorksheetByName(lastName).getId() ){
 		this.wsFrom = this.wsTo = this._wb.getWorksheetByName(newName).getId();
@@ -9069,7 +9135,7 @@ cArea3D.prototype.changeSheet = function(lastName,newName){
 	else if( this.wsTo == this._wb.getWorksheetByName(lastName).getId() ){
 		this.wsTo = this._wb.getWorksheetByName(newName).getId();
 	}
-}
+};
 cArea3D.prototype.moveSheet = function(tempW){
 	if( this.wsFrom == this.wsTo ){
 		return;
@@ -9088,7 +9154,7 @@ cArea3D.prototype.moveSheet = function(tempW){
 			this.wsTo = this._wb.getWorksheet(tempW.wFI).getId();
 		}
 	}
-}
+};
 cArea3D.prototype.toString = function(){
 	var wsFrom = this._wb.getWorksheetById( this.wsFrom ).getName();
 	var wsTo = this._wb.getWorksheetById( this.wsTo ).getName();
@@ -9104,11 +9170,11 @@ cArea3D.prototype.toString = function(){
 				wsFrom+":"+wsTo :
 				wsFrom)
 			+"!"+this._cells;
-}
-cArea3D.prototype.tocNumber = function(){ return this.getValue()[0].tocNumber(); }
-cArea3D.prototype.tocString = function(){ return this.getValue()[0].tocString(); }
-cArea3D.prototype.tocBool = function(){ return this.getValue()[0].tocBool(); }
-cArea3D.prototype.getWS = function(){ return this.wsRange()[0]; }
+};
+cArea3D.prototype.tocNumber = function(){ return this.getValue()[0].tocNumber(); };
+cArea3D.prototype.tocString = function(){ return this.getValue()[0].tocString(); };
+cArea3D.prototype.tocBool = function(){ return this.getValue()[0].tocBool(); };
+cArea3D.prototype.getWS = function(){ return this.wsRange()[0]; };
 cArea3D.prototype.cross = function(arg){
 	if( this.wsFrom != this.wsTo )
 		return new cError( cErrorType.wrong_value_type );
@@ -9128,8 +9194,8 @@ cArea3D.prototype.cross = function(arg){
 	}
 	else
 		return new cError( cErrorType.wrong_value_type );
-}
-cArea3D.prototype.getBBox = function(){ return this.getRange()[0].getBBox(); }
+};
+cArea3D.prototype.getBBox = function(){ return this.getRange()[0].getBBox(); };
 cArea3D.prototype.isValid = function(){
 	var r = this.getRange();
 	for( var i=0;i<r.length;i++){
@@ -9137,7 +9203,7 @@ cArea3D.prototype.isValid = function(){
 			return false;
 	}
 	return true;
-}
+};
 cArea3D.prototype.countCells = function(){
 	var _wsA = this.wsRange();
 	var _val = [];
@@ -9166,7 +9232,7 @@ cArea3D.prototype.countCells = function(){
 		})
 	}
 	return new cNumber( count );
-}
+};
 
 /** @constructor */
 function cRef3D(val,_wsFrom,wb){/*Ref means Sheat1!A1 for example*/
@@ -9178,18 +9244,18 @@ function cRef3D(val,_wsFrom,wb){/*Ref means Sheat1!A1 for example*/
 	this.ws = this._wb.getWorksheetByName( _wsFrom );
 }
 extend(cRef3D,cBaseType);
-cRef3D.prototype.getWsId = function(){ return this.ws.Id; }
+cRef3D.prototype.getWsId = function(){ return this.ws.Id; };
 cRef3D.prototype.getRange = function(){
 	if(this.ws)
 		return this.ws.getRange2(this._cells);
 	else 
 		return null;
-}
+};
 cRef3D.prototype.isValid = function(){
 	if( this.getRange() )
 		return true;
 	else return false;
-}
+};
 cRef3D.prototype.getValue = function(){
 	var _r = this.getRange();
 	if( !_r ){
@@ -9221,16 +9287,16 @@ cRef3D.prototype.getValue = function(){
 				return new cError(parserHelp.operand_str)
 			else return new cString(_val);
 	}
-}
-cRef3D.prototype.tocBool = function(){ return this.getValue().tocBool(); }
-cRef3D.prototype.tocNumber = function(){ return this.getValue().tocNumber(); }
-cRef3D.prototype.tocString = function(){ return this.getValue().tocString(); }
-cRef3D.prototype.tryConvert = function(){ return this.getValue(); }
+};
+cRef3D.prototype.tocBool = function(){ return this.getValue().tocBool(); };
+cRef3D.prototype.tocNumber = function(){ return this.getValue().tocNumber(); };
+cRef3D.prototype.tocString = function(){ return this.getValue().tocString(); };
+cRef3D.prototype.tryConvert = function(){ return this.getValue(); };
 cRef3D.prototype.changeSheet = function(lastName,newName){
 	if( this.ws.getName() == lastName ){
 		this.ws = this._wb.getWorksheetByName( newName );
 	}
-}
+};
 cRef3D.prototype.toString = function(){
 	var wsName = this.ws.getName();
 	if( !rx_test_ws_name.test(wsName) ){
@@ -9239,8 +9305,8 @@ cRef3D.prototype.toString = function(){
 	else{
 		return wsName+"!"+this._cells;
 	}
-}
-cRef3D.prototype.getWS = function(){ return this.ws; }
+};
+cRef3D.prototype.getWS = function(){ return this.ws; };
 
 /** @constructor */
 function cEmpty(){
@@ -9248,10 +9314,10 @@ function cEmpty(){
     this.type = cElementType.empty;
 }
 extend(cEmpty,cBaseType);
-cEmpty.prototype.tocNumber = function(){ return new cNumber(0); }
-cEmpty.prototype.tocBool = function(){ return new cBool(false); }
-cEmpty.prototype.tocString = function(){ return new cString(""); }
-cEmpty.prototype.toString = function(){ return ""; }
+cEmpty.prototype.tocNumber = function(){ return new cNumber(0); };
+cEmpty.prototype.tocBool = function(){ return new cBool(false); };
+cEmpty.prototype.tocString = function(){ return new cString(""); };
+cEmpty.prototype.toString = function(){ return ""; };
 
 /** @constructor */
 function cName(val,wb){
@@ -9268,16 +9334,14 @@ cName.prototype.toRef = function(wsID){
 		_wsFrom = _3DRefTmp[1];
 		_wsTo = ( (_3DRefTmp[2] !== null) && (_3DRefTmp[2] !== undefined) )? _3DRefTmp[2] : _wsFrom;
 		if ( parserHelp.isArea(ref,ref.indexOf("!")+1) ){
-			var r = new cArea3D(parserHelp.operand_str,_wsFrom, _wsTo, this.wb);
-			return r;
+			return new cArea3D(parserHelp.operand_str,_wsFrom, _wsTo, this.wb);
 		}
 		else if ( parserHelp.isRef(ref,ref.indexOf("!")+1) ){
-			var r = new cRef3D(parserHelp.operand_str,_wsFrom,this.wb);
-			return r;
+			return new cRef3D(parserHelp.operand_str,_wsFrom,this.wb);
 		}
 	}
 	return new cError("#REF!");
-}
+};
 
 /** @constructor */
 function cArray(){
@@ -9292,7 +9356,7 @@ extend(cArray,cBaseType);
 cArray.prototype.addRow = function(){
 	this.array[this.array.length] = [];
 	this.countElementInRow[this.rowCount++] = 0;
-}
+};
 cArray.prototype.addElement = function(element){
 	if( this.array.length == 0){
 		this.addRow();
@@ -9302,24 +9366,24 @@ cArray.prototype.addElement = function(element){
 	subArr[subArr.length] = element;
 	this.countElementInRow[this.rowCount-1]++;
 	this.countElement++;
-}
+};
 cArray.prototype.getRow = function(rowIndex){
 	if( rowIndex < 0 || rowIndex > this.array.length-1 )
 		return null;
 	return this.array[rowIndex];
-}
+};
 cArray.prototype.getCol = function(colIndex){
 	var col = [];
 	for( var i = 0; i < this.rowCount; i++){
 		col.push(this.array[i][colIndex])
 	}
 	return col;
-}
+};
 cArray.prototype.getElementRowCol = function(row,col){
 	if( row > this.rowCount || col > this.getCountElementInRow() )
 		return new cError( cErrorType.not_available );
 	return this.array[row][col];
-}
+};
 cArray.prototype.getElement = function(index){
 	for( var i = 0; i < this.rowCount; i++){
 		if( index > this.countElementInRow[i].length )
@@ -9328,7 +9392,7 @@ cArray.prototype.getElement = function(index){
 			return this.array[i][index];
 	}
 	return null;
-}
+};
 cArray.prototype.foreach = function(action){
 	if( typeof (action) != 'function' ){ return; }
 	for( var ir = 0; ir < this.rowCount; ir++ ){
@@ -9337,10 +9401,12 @@ cArray.prototype.foreach = function(action){
 				return true;
 		}
 	}
-}
-cArray.prototype.getCountElement = function(){ return this.countElement; }
-cArray.prototype.getCountElementInRow = function(){ return this.countElementInRow[0]; }
-cArray.prototype.getRowCount = function(){ return this.rowCount; }
+};
+cArray.prototype.getCountElement = function(){ return this.countElement; };
+cArray.prototype.getCountElementInRow = function(){ return this.countElementInRow[0]; };
+cArray.prototype.getRowCount = function () {
+    return this.rowCount;
+};
 cArray.prototype.tocNumber = function(){
 	var retArr = new cArray();
 	for( var ir = 0; ir < this.rowCount; ir++,retArr.addRow()){
@@ -9351,7 +9417,7 @@ cArray.prototype.tocNumber = function(){
 			break;
 	}
 	return retArr;
-}
+};
 cArray.prototype.tocString = function(){
 	var retArr = new cArray();
 	for( var ir = 0; ir < this.rowCount; ir++,retArr.addRow()){
@@ -9362,7 +9428,7 @@ cArray.prototype.tocString = function(){
 			break;
 	}
 	return retArr;
-}
+};
 cArray.prototype.tocBool = function(){
 	var retArr = new cArray();
 	for( var ir = 0; ir < this.rowCount; ir++,retArr.addRow()){
@@ -9373,7 +9439,7 @@ cArray.prototype.tocBool = function(){
 			break;
 	}
 	return retArr;
-}
+};
 cArray.prototype.toString = function(){
 	var ret="";
 	for( var ir = 0; ir < this.rowCount; ir++,ret+=";" ){
@@ -9388,9 +9454,9 @@ cArray.prototype.toString = function(){
 			ret = ret.substring(0,ret.length-1)
 	}
 	if ( ret[ret.length-1]==";")
-		ret = ret.substring(0,ret.length-1)
+		ret = ret.substring(0, ret.length - 1);
 	return "{"+ret+"}";
-}
+};
 cArray.prototype.isValidArray = function(){
 	for( var i = 0; i < this.rowCount-1; i++){
 		if( this.countElementInRow[i] - this.countElementInRow[i+1] == 0)
@@ -9399,7 +9465,7 @@ cArray.prototype.isValidArray = function(){
 			return false;
 	}
 	return true;
-}
+};
 
 /** класс отвечающий за парсинг строки с формулой, подсчета формулы, перестройки формулы при манипуляции с ячейкой*/
 /** @constructor */
@@ -10109,8 +10175,7 @@ parserFormula.prototype = {
 					r = ref.getRange();
 					r.setOffset({offsetCol:0, offsetRow:offset.offsetRow});
 					ref.value = ref._cells = "$"+r.first.getID();
-				}
-				else{
+				} else{
 					r = ref.getRange();
 					r.setOffset({offsetCol:offset.offsetCol, offsetRow:0});
 					ref.value = ref._cells = r.first.getColLetter()+"$"+r.first.getRow();
