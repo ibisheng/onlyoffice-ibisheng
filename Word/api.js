@@ -506,6 +506,7 @@ function asc_docs_api(name)
     this.FontLoader = window.g_font_loader;
     this.ImageLoader = window.g_image_loader;
 	this.ScriptLoader = window.g_script_loader;
+	this.ScriptSpellCheckLoader = window.g_script_loader2;
     this.FontLoader.put_Api(this);
     this.ImageLoader.put_Api(this);
 
@@ -534,6 +535,10 @@ function asc_docs_api(name)
     this.User = undefined;
     this.CoAuthoringApi = new CDocsCoApi();
 	this.isCoAuthoringEnable = true;
+
+	// Spell Checking
+	this.SpellCheckApi = new CSpellCheckApi();
+	this.isSpellCheckEnable = true;
     /**************************************/
 
     this.bInit_word_control = false;
@@ -1349,6 +1354,44 @@ asc_docs_api.prototype.asc_coAuthoringDisconnect = function () {
 		return; // Error
 	this.CoAuthoringApi.disconnect();
 }
+
+/////////////////////////////////////////////////////////////////////////
+//////////////////////////SpellChecking api//////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+// Init SpellCheck
+asc_docs_api.prototype._coSpellCheckInit = function(docId) {
+	if (!this.SpellCheckApi) {
+		return; // Error
+	}
+
+	this.SpellCheckApi.onSpellCheck	= function (e) {
+		var incomeObject = JSON.parse(e);
+		SpellCheck_CallBack(incomeObject);
+	};
+
+	this.SpellCheckApi.init (docId);
+};
+// Set SpellCheck server url
+asc_docs_api.prototype._coSpellCheckSetServerUrl = function(url) {
+	if (!this.SpellCheckApi)
+		return; // Error
+
+	this.SpellCheckApi.set_url(url);
+};
+asc_docs_api.prototype._spellCheckInitCallback = function(_this) {
+	if(undefined !== window['g_cAscSpellCheckUrl'])
+		window.g_cAscSpellCheckUrl = window['g_cAscSpellCheckUrl'];
+
+	if(undefined !== window.g_cAscSpellCheckUrl) {
+		//Turn off SpellCheck feature if it disabled
+		if(!_this.isSpellCheckEnable)
+			window.g_cAscSpellCheckUrl = "";
+
+		_this._coSpellCheckSetServerUrl(window.g_cAscSpellCheckUrl);
+	}
+
+	_this._coSpellCheckInit(documentId);
+};
 
 // get functions
 // Возвращает
@@ -5208,10 +5251,14 @@ asc_docs_api.prototype.asyncServerIdStartLoaded = function()
 	//Загружаем скрипт с настройками, по окончанию инициализируем контрол для совместного редактирования
 	//TODO: Вынести шрифты в коммоны, SetFontPath заменить на SetCommonPath,
 	//пердаваемый путь использовать для загрузки шрифтов и настороек.
-	if(true == ASC_DOCS_API_LOAD_COAUTHORING_SETTINGS){
-		this.ScriptLoader.LoadScriptAsync( this.FontLoader.fontFilesPath + "../Common/docscoapisettings.js",
+	if(true == ASC_DOCS_API_LOAD_COAUTHORING_SETTINGS) {
+		// Загружаем для SpellCheck
+		this.ScriptSpellCheckLoader.LoadScriptAsync(this.FontLoader.fontFilesPath + "../Common/spellcheckapisettings.js",
+			this._spellCheckInitCallback, this);
+
+		this.ScriptLoader.LoadScriptAsync(this.FontLoader.fontFilesPath + "../Common/docscoapisettings.js",
 											this._coAuthoringInitCallBack, this);
-	}else{
+	} else {
 		this._coAuthoringInitCallBack(this);
 	}
 }
@@ -6136,9 +6183,19 @@ var cCharDelimiter = String.fromCharCode(5);
 
 function getURLParameter(name) {
     return (RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1];
-};
+}
 
-function spellCheck (editor, fCallback, rdata){
+function spellCheck (editor, rdata) {
+	//console.log("start - " + rdata);
+	// ToDo проверка на подключение
+	switch (rdata.type) {
+		case "spell":
+			editor.SpellCheckApi.spellCheck(JSON.stringify(rdata));
+			break;
+	}
+}
+
+/*function spellCheck (editor, fCallback, rdata){
 	asc_ajax({
         type: 'POST',
         url: g_sSpellCheckServiceLocalUrl,
@@ -6171,7 +6228,7 @@ function spellCheck (editor, fCallback, rdata){
             }
 		}
 	})
-};
+};*/
 function sendCommand(editor, fCallback, rdata){
 	asc_ajax({
         type: 'POST',

@@ -709,6 +709,7 @@ var ASC_DOCS_API_USE_OPEN_SOURCE_FONTS_ONLY = false;
     window.g_font_loader    = new CGlobalFontLoader();
     window.g_image_loader   = new CGlobalImageLoader();
     window.g_script_loader   = new CGlobalScriptLoader();
+	window.g_script_loader2   = new CGlobalScriptLoader();
 
     window.g_flow_anchor = new Image();
     window.g_flow_anchor.asc_complete = false;

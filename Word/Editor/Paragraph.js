@@ -12315,7 +12315,7 @@ CParaSpellChecker.prototype =
         }
 
         if ( 0 < usrWords.length )
-            spellCheck(editor, SpellCheck_CallBack, JSON.stringify({"type": "spell", "ParagraphId": this.ParaId, "RecalcId" : this.RecalcId, "ElementId" : 0, "usrWords" : usrWords, "usrLang" : usrLang }) );
+            spellCheck(editor, {"type": "spell", "ParagraphId": this.ParaId, "RecalcId" : this.RecalcId, "ElementId" : 0, "usrWords" : usrWords, "usrLang" : usrLang });
     },
 
     Check_CallBack : function(RecalcId, UsrCorrect)
@@ -12413,7 +12413,7 @@ CParaSpellChecker.prototype =
 
             if ( null === Variants )
             {
-                spellCheck(editor, SpellCheck_CallBack, JSON.stringify({"type": "suggest", "ParagraphId": this.ParaId, "RecalcId" : this.RecalcId, "ElementId" : FoundIndex, "usrWords" : [Word], "usrLang" : [FoundElement.Lang] }) );
+                spellCheck(editor, {"type": "suggest", "ParagraphId": this.ParaId, "RecalcId" : this.RecalcId, "ElementId" : FoundIndex, "usrWords" : [Word], "usrLang" : [FoundElement.Lang] });
             }
         }
 
