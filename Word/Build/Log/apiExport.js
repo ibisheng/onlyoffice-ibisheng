@@ -205,6 +205,9 @@ prop:asc_coAuthoringChatSendMessage
 prop:asc_coAuthoringChatGetMessages
 prop:asc_coAuthoringGetUsers
 prop:asc_coAuthoringDisconnect
+prop:_coSpellCheckInit
+prop:_coSpellCheckSetServerUrl
+prop:_spellCheckInitCallback
 prop:get_TextProps
 prop:GetJSONLogicDocument
 prop:get_ContentCount
@@ -1175,6 +1178,9 @@ asc_docs_api.prototype['asc_coAuthoringChatSendMessage'] = asc_docs_api.prototyp
 asc_docs_api.prototype['asc_coAuthoringChatGetMessages'] = asc_docs_api.prototype.asc_coAuthoringChatGetMessages;
 asc_docs_api.prototype['asc_coAuthoringGetUsers'] = asc_docs_api.prototype.asc_coAuthoringGetUsers;
 asc_docs_api.prototype['asc_coAuthoringDisconnect'] = asc_docs_api.prototype.asc_coAuthoringDisconnect;
+asc_docs_api.prototype['_coSpellCheckInit'] = asc_docs_api.prototype._coSpellCheckInit;
+asc_docs_api.prototype['_coSpellCheckSetServerUrl'] = asc_docs_api.prototype._coSpellCheckSetServerUrl;
+asc_docs_api.prototype['_spellCheckInitCallback'] = asc_docs_api.prototype._spellCheckInitCallback;
 asc_docs_api.prototype['get_TextProps'] = asc_docs_api.prototype.get_TextProps;
 asc_docs_api.prototype['GetJSONLogicDocument'] = asc_docs_api.prototype.GetJSONLogicDocument;
 asc_docs_api.prototype['get_ContentCount'] = asc_docs_api.prototype.get_ContentCount;
