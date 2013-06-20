@@ -1085,7 +1085,9 @@
 
 									for (var cell in arrayCells) {
 										if (arrayCells.hasOwnProperty(cell)) {
-											arrayCells[cell].cell.setFill(oGradient.calculateColor(arrayCells[cell].val));
+											var dxf = new CellXfs();
+											dxf.fill = new Fill({bg:oGradient.calculateColor(arrayCells[cell].val)});
+											arrayCells[cell].cell.setConditionalFormattingStyle(dxf);
 										}
 									}
 								}

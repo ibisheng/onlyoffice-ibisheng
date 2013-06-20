@@ -3840,7 +3840,7 @@ function Cell(worksheet){
 	this.xfs = null;
 	this.tableXfs = null;
 	this.conditionalFormattingXfs = null;
-	this.bNeedCompileXfs = false;
+	this.bNeedCompileXfs = true;
 	this.compiledXfs = null;
 	this.oId = null;
 	this.oFormulaExt = null;

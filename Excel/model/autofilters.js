@@ -2899,8 +2899,9 @@
 				var styleForCurTable;
 				//todo из файла
 				var headerRowCount = 1;
-				var totalRowShown = 0;
 				var totalsRowCount = 0;
+				if(options.HeaderRowCount)
+					headerRowCount = options.HeaderRowCount;
 				if(options.TotalsRowCount)
 					totalsRowCount = options.TotalsRowCount;
 				if(style && style.Name && ws.model.workbook.TableStyles && ws.model.workbook.TableStyles.AllStyles && (styleForCurTable = ws.model.workbook.TableStyles.AllStyles[style.Name]))

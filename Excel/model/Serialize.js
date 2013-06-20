@@ -336,7 +336,8 @@ var c_oSer_TablePart =
 	AutoFilter:4,
 	SortState:5,
 	TableColumns:6,
-	TableStyleInfo:7
+	TableStyleInfo:7,
+	HeaderRowCount:8
 };
 /** @enum */
 var c_oSer_TableStyleInfo =
@@ -913,6 +914,9 @@ function BinaryTableWriter(memory, aDxfs)
 			this.memory.WriteByte(c_oSer_TablePart.Ref);
 			this.memory.WriteString2(table.Ref);
 		}
+		//HeaderRowCount
+		if(null != table.HeaderRowCount)
+			this.bs.WriteItem(c_oSer_TablePart.HeaderRowCount, function(){oThis.memory.WriteLong(table.HeaderRowCount);});
 		//TotalsRowCount
 		if(null != table.TotalsRowCount)
 			this.bs.WriteItem(c_oSer_TablePart.TotalsRowCount, function(){oThis.memory.WriteLong(table.TotalsRowCount);});
@@ -3310,6 +3314,8 @@ function Binary_TableReader(stream, ws, Dxfs)
         var oThis = this;
         if ( c_oSer_TablePart.Ref == type )
 			oTable.Ref = this.stream.GetString2LE(length);
+		else if ( c_oSer_TablePart.HeaderRowCount == type )
+			oTable.HeaderRowCount = this.stream.GetULongLE();
 		else if ( c_oSer_TablePart.TotalsRowCount == type )
 			oTable.TotalsRowCount = this.stream.GetULongLE();
 		else if ( c_oSer_TablePart.DisplayName == type )
@@ -6210,7 +6216,7 @@ CTableStyle.prototype =
 				}
 			}
 			else
-				res = this.wholeTable;
+				res = this.wholeTable.dxf;
 		}
 		return res;
 	},
