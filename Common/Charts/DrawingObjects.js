@@ -139,10 +139,10 @@ function CChartData(bWordContext, chart) {
 			subTitle: "",
 			bDefaultTitle: false,
 			font: {
-				name: "Arial",
-				size: 12,
+				name: "Calibri",
+				size: 18,
 				color: "#000000",
-				bold: 0,
+				bold: 1,
 				italic: 0,
 				underline: 0
 			}
@@ -158,16 +158,16 @@ function CChartData(bWordContext, chart) {
 			bShow: true,
 			bGrid: true,
 			titleFont: {
-				name: "Arial",
-				size: 12,
+				name: "Calibri",
+				size: 10,
 				color: "#000000",
-				bold: 0,
+				bold: 1,
 				italic: 0,
 				underline: 0
 			},
 			labelFont: {
-				name: "Arial",
-				size: 12,
+				name: "Calibri",
+				size: 10,
 				color: "#000000",
 				bold: 0,
 				italic: 0,
@@ -180,16 +180,16 @@ function CChartData(bWordContext, chart) {
 			bShow: true,
 			bGrid: true,
 			titleFont: {
-				name: "Arial",
-				size: 12,
+				name: "Calibri",
+				size: 10,
 				color: "#000000",
-				bold: 0,
+				bold: 1,
 				italic: 0,
 				underline: 0
 			},
 			labelFont: {
-				name: "Arial",
-				size: 12,
+				name: "Calibri",
+				size: 10,
 				color: "#000000",
 				bold: 0,
 				italic: 0,
@@ -201,8 +201,8 @@ function CChartData(bWordContext, chart) {
 			bShow: true,
 			bOverlay: false,
 			font: {
-				name: "Arial",
-				size: 12,
+				name: "Calibri",
+				size: 10,
 				color: "#000000",
 				bold: 0,
 				italic: 0,
@@ -1305,8 +1305,9 @@ function asc_CChartHeader(object) {
 	this.font = bCopy ? new asc_CChartFont(object.font) : new asc_CChartFont();
 	
 	if ( !bCopy ) {
-		this.font.asc_setSize(14);
-	}	
+		this.font.asc_setSize(18);
+		this.font.asc_setBold(1);
+	}
 	
 	this.Properties = {
 		title: 0,
@@ -1390,6 +1391,10 @@ function asc_CChartAxisX(object) {
 	
 	this.titleFont = bCopy ? new asc_CChartFont(object.titleFont) : new asc_CChartFont();
 	this.labelFont = bCopy ? new asc_CChartFont(object.labelFont) : new asc_CChartFont();
+	
+	if ( !bCopy ) {
+		this.titleFont.asc_setBold(1);
+	}
 	
 	this.Properties = {
 		title: 0,
@@ -1491,6 +1496,10 @@ function asc_CChartAxisY(object) {
 	
 	this.titleFont = bCopy ? new asc_CChartFont(object.titleFont) : new asc_CChartFont();
 	this.labelFont = bCopy ? new asc_CChartFont(object.labelFont) : new asc_CChartFont();
+	
+	if ( !bCopy ) {
+		this.titleFont.asc_setBold(1);
+	}
 	
 	this.Properties = {
 		title: 0,
@@ -1778,8 +1787,8 @@ function asc_CChartFont(object) {
 
 	var bCopy = isObject(object);
 
-	this.name = bCopy ? object.name : "Arial";
-	this.size = bCopy ? object.size : 12;
+	this.name = bCopy ? object.name : "Calibri";
+	this.size = bCopy ? object.size : 10;
 	this.color = bCopy ? object.color : "#000000";
 	
 	this.bold = bCopy ? object.bold : 0;
