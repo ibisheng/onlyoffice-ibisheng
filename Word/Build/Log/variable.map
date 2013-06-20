@@ -277,7 +277,7 @@ vmerge_Restart:vh
 _iup_worker_interpolate:jv
 historyitem_type_AbstractNum:iL
 c_oAscChartStyle$Standart:Je
-CGraphicObjects:YA
+CGraphicObjects:XA
 c_oAscWrapStyle2$TopAndBottom:XN
 JSCompiler_StaticMethods_DeleteThis:CM
 highlight_None:Qb
@@ -578,7 +578,7 @@ Ins_ROUND:vv
 FT_SFNT_SERVICES_GET:jt
 ParaCommentEnd:iO
 historyitem_GroupRecalculate:aC
-t1_get_index:py
+t1_get_index:oy
 align_Center:gb
 JSCompiler_StaticMethods_calculateFullTransformMatrix:pH
 JSCompiler_StaticMethods_DrawVBars:ml
@@ -1771,7 +1771,7 @@ cff_lookup_glyph_by_stdcharcode:Xx
 JSCompiler_StaticMethods_Internal_GetVertMergeCount2:kS
 fontstyle_mask_bold:EA
 FT_Face_Internal:Jo
-compare_kern_pairs:qy
+compare_kern_pairs:py
 MIN_ANGLE:IH
 __FT_CMapRec:Do
 tt_cmap14_get_nondef_chars:Js
@@ -2474,7 +2474,7 @@ FT_CFF_SERVICE_GLYPH_DICT_GET:ey
 c_oSerWrapThroughTight$DistL:YW
 c_oSerRunType$pagenum:RV
 Binary_ChartReader:Mk
-CompareUniFill:nH
+CompareUniFill:mH
 EChartAxPos$chartaxposBottom:nk
 JSCompiler_StaticMethods_endCommand:j_
 CParaTabs:Nd
@@ -2496,7 +2496,7 @@ JSCompiler_StaticMethods__MouseHoverOnArrowDown:v1
 t1_cmap_std_init:Tp
 linerule_AtLeast:jb
 CParaPage:pO
-JSCompiler_StaticMethods_normalizeXfrm:oH
+JSCompiler_StaticMethods_normalizeXfrm:nH
 isObject:Il
 BDF_PropertyRec:Tq
 c_oSerPropLenType$Short:Mi
@@ -2786,7 +2786,7 @@ HitInLine:SG
 CDefaultFont:iA
 Round_Down_To_Grid:Ru
 _ph_summ__tx:QJ
-CGraphicPage:ZA
+CGraphicPage:YA
 JSCompiler_StaticMethods_Internal_GetVertMergeCount:dS
 EHint$hintDefault:vY
 _ph_summ__obj_and_tx:HJ
