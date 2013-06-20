@@ -1045,9 +1045,9 @@ CGraphics.prototype =
     {
         return this.m_oCurFont;
     },
-    font : function(font_id,font_size)
+    font : function(font_id,font_size,matrix)
     {
-        g_font_infos[g_map_font_index[font_id]].LoadFont(editor.FontLoader, this.m_oFontManager, font_size, 0, this.m_dDpiX, this.m_dDpiY);
+        g_font_infos[g_map_font_index[font_id]].LoadFont(editor.FontLoader, this.m_oFontManager, font_size, 0, this.m_dDpiX, this.m_dDpiY, /*matrix*/undefined);
     },
     SetFont : function(font)
     {

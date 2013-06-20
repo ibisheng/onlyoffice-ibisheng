@@ -551,7 +551,7 @@ function CFontInfo(sName, thumbnail, type, indexR, faceIndexR, indexI, faceIndex
         return isNeed;
     }
 
-    this.LoadFont = function(font_loader, fontManager, fEmSize, lStyle, dHorDpi, dVerDpi,transform)
+    this.LoadFont = function(font_loader, fontManager, fEmSize, lStyle, dHorDpi, dVerDpi, transform)
     {
         // сначала нужно проверить на обрезанный шрифт
         var _embedded_cur = g_font_loader.embedded_cut_manager;
