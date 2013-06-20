@@ -2486,8 +2486,14 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, oDrawings, aDxf
 		}
 		else
 		{
-			if ( (null != oDrawing.imageUrl) && ("" != oDrawing.imageUrl))
-				this.bs.WriteItem(c_oSer_DrawingType.Pic, function(){oThis.WritePic(oDrawing.imageUrl);});
+            if ( (null != oDrawing.imageUrl) && ("" != oDrawing.imageUrl)) {
+
+                if (window['scriptBridge']) {
+                    this.bs.WriteItem(c_oSer_DrawingType.Pic, function(){oThis.WritePic(oDrawing.imageUrl.replace(/^.*(\\|\/|\:)/, ''));});
+                } else {
+                    this.bs.WriteItem(c_oSer_DrawingType.Pic, function(){oThis.WritePic(oDrawing.imageUrl);});
+                }
+            }
 		}
     };
     this.WriteFromTo = function(oFromTo)

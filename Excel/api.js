@@ -2416,12 +2416,20 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
                     }
 
                     if (!window['scriptBridge']['addFileImage']) {
-                        window['scriptBridge']['addFileImage'] = function(imageUrl) {
+                        window['scriptBridge']['addFileImage'] = function(imageUrl, x, y) {
                             t.wb.controller.isSelectDrawingObject = true;
 
                             var ws = t.wb.getWorksheet();
                             ws.model.workbook.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
-                            ws.objectRender.addImageDrawingObject(imageUrl, false, null);
+
+                            var options = null;
+                            if (x && y) {
+                                var picker = ws.objectRender.getPositionInfo(x,y);
+                                options = {cell: {col: picker.col, row: picker.row}};
+                                console.log(picker);
+                            }
+
+                            ws.objectRender.addImageDrawingObject(imageUrl, false, options);
                             ws.model.workbook.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
                         };
                     }
