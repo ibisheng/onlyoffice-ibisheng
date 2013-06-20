@@ -1029,7 +1029,7 @@ asc_CChart.prototype = {
 			var cntLeft = 0, cntTop = 0;
 			var headers = { bLeft: false, bTop: false };
 			
-			/*for (var i = bbox.r1; i <= bbox.r2; i++) {
+			for (var i = bbox.r1; i <= bbox.r2; i++) {
 				
 				var cell = _t.range.intervalObject.worksheet.getCell( new CellAddress(i, bbox.c1, 0) );
 				var value = cell.getValue();
@@ -1047,7 +1047,7 @@ asc_CChart.prototype = {
 					cntTop++;
 			}
 			if ( cntTop >= (bbox.c2 - bbox.c1) )
-				headers.bTop = true;*/
+				headers.bTop = true;
 			
 			return headers;
 		}
@@ -1303,6 +1303,7 @@ function asc_CChartHeader(object) {
 	this.subTitle = bCopy ? object.subTitle : "";
 	this.bDefaultTitle = bCopy ? object.bDefaultTitle : false;
 	this.font = bCopy ? new asc_CChartFont(object.font) : new asc_CChartFont();
+	
 	if ( !bCopy ) {
 		this.font.asc_setSize(14);
 	}	
