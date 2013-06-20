@@ -661,8 +661,11 @@ asc_docs_api.prototype.sync_EndCatchSelectedElements = function()
 {
     this.asc_fireCallback("asc_onFocusObject", this.SelectedObjectsStack);
 }
-asc_docs_api.prototype.getSelectedElements = function()
+asc_docs_api.prototype.getSelectedElements = function(bUpdate)
 {
+    if ( true === bUpdate )
+        editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
+
     return this.SelectedObjectsStack;
 }
 asc_docs_api.prototype.sync_ChangeLastSelectedElement = function(type, obj)
