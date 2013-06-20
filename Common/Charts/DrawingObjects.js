@@ -80,13 +80,21 @@ function CChartData(bWordContext, chart) {
 			bDefaultTitle: chart.xAxis.bDefaultTitle,
 			bShow: chart.xAxis.bShow,
 			bGrid: chart.xAxis.bGrid,
-			font: {
-				name: chart.xAxis.font.name,
-				size: chart.xAxis.font.size,
-				color: chart.xAxis.font.color,
-				bold: chart.xAxis.font.bold,
-				italic: chart.xAxis.font.italic,
-				underline: chart.xAxis.font.underline
+			titleFont: {
+				name: chart.xAxis.titleFont.name,
+				size: chart.xAxis.titleFont.size,
+				color: chart.xAxis.titleFont.color,
+				bold: chart.xAxis.titleFont.bold,
+				italic: chart.xAxis.titleFont.italic,
+				underline: chart.xAxis.titleFont.underline
+			},
+			labelFont: {
+				name: chart.xAxis.labelFont.name,
+				size: chart.xAxis.labelFont.size,
+				color: chart.xAxis.labelFont.color,
+				bold: chart.xAxis.labelFont.bold,
+				italic: chart.xAxis.labelFont.italic,
+				underline: chart.xAxis.labelFont.underline
 			}
 		};
 		_this.yAxis = {
@@ -94,13 +102,21 @@ function CChartData(bWordContext, chart) {
 			bDefaultTitle: chart.yAxis.bDefaultTitle,
 			bShow: chart.yAxis.bShow,
 			bGrid: chart.yAxis.bGrid,
-			font: {
-				name: chart.yAxis.font.name,
-				size: chart.yAxis.font.size,
-				color: chart.yAxis.font.color,
-				bold: chart.yAxis.font.bold,
-				italic: chart.yAxis.font.italic,
-				underline: chart.yAxis.font.underline
+			titleFont: {
+				name: chart.yAxis.titleFont.name,
+				size: chart.yAxis.titleFont.size,
+				color: chart.yAxis.titleFont.color,
+				bold: chart.yAxis.titleFont.bold,
+				italic: chart.yAxis.titleFont.italic,
+				underline: chart.yAxis.titleFont.underline
+			},
+			labelFont: {
+				name: chart.xAxis.labelFont.name,
+				size: chart.xAxis.labelFont.size,
+				color: chart.xAxis.labelFont.color,
+				bold: chart.xAxis.labelFont.bold,
+				italic: chart.xAxis.labelFont.italic,
+				underline: chart.xAxis.labelFont.underline
 			}
 		};
 		_this.legend = {
@@ -141,7 +157,15 @@ function CChartData(bWordContext, chart) {
 			bDefaultTitle: false,
 			bShow: true,
 			bGrid: true,
-			font: {
+			titleFont: {
+				name: "Arial",
+				size: 12,
+				color: "#000000",
+				bold: 0,
+				italic: 0,
+				underline: 0
+			},
+			labelFont: {
 				name: "Arial",
 				size: 12,
 				color: "#000000",
@@ -155,7 +179,15 @@ function CChartData(bWordContext, chart) {
 			bDefaultTitle: false,
 			bShow: true,
 			bGrid: true,
-			font: {
+			titleFont: {
+				name: "Arial",
+				size: 12,
+				color: "#000000",
+				bold: 0,
+				italic: 0,
+				underline: 0
+			},
+			labelFont: {
 				name: "Arial",
 				size: 12,
 				color: "#000000",
@@ -275,13 +307,21 @@ function CChartData(bWordContext, chart) {
 		chart["xAxis"]["bShow"] = _this.xAxis.bShow;
 		chart["xAxis"]["bGrid"] = _this.xAxis.bGrid;
 		
-		chart["xAxis"]["font"] = {};
-		chart["xAxis"]["font"]["name"] = _this.xAxis.font.name;
-		chart["xAxis"]["font"]["size"] = _this.xAxis.font.size;
-		chart["xAxis"]["font"]["color"] = _this.xAxis.font.color;
-		chart["xAxis"]["font"]["bold"] = _this.xAxis.font.bold;
-		chart["xAxis"]["font"]["italic"] = _this.xAxis.font.italic;
-		chart["xAxis"]["font"]["underline"] = _this.xAxis.font.underline;
+		chart["xAxis"]["titleFont"] = {};
+		chart["xAxis"]["titleFont"]["name"] = _this.xAxis.titleFont.name;
+		chart["xAxis"]["titleFont"]["size"] = _this.xAxis.titleFont.size;
+		chart["xAxis"]["titleFont"]["color"] = _this.xAxis.titleFont.color;
+		chart["xAxis"]["titleFont"]["bold"] = _this.xAxis.titleFont.bold;
+		chart["xAxis"]["titleFont"]["italic"] = _this.xAxis.titleFont.italic;
+		chart["xAxis"]["titleFont"]["underline"] = _this.xAxis.titleFont.underline;
+		
+		chart["xAxis"]["labelFont"] = {};
+		chart["xAxis"]["labelFont"]["name"] = _this.xAxis.labelFont.name;
+		chart["xAxis"]["labelFont"]["size"] = _this.xAxis.labelFont.size;
+		chart["xAxis"]["labelFont"]["color"] = _this.xAxis.labelFont.color;
+		chart["xAxis"]["labelFont"]["bold"] = _this.xAxis.labelFont.bold;
+		chart["xAxis"]["labelFont"]["italic"] = _this.xAxis.labelFont.italic;
+		chart["xAxis"]["labelFont"]["underline"] = _this.xAxis.labelFont.underline;
 
 		// Axis Y
 		chart["yAxis"] = {};
@@ -290,13 +330,21 @@ function CChartData(bWordContext, chart) {
 		chart["yAxis"]["bShow"] = _this.yAxis.bShow;
 		chart["yAxis"]["bGrid"] = _this.yAxis.bGrid;
 		
-		chart["yAxis"]["font"] = {};
-		chart["yAxis"]["font"]["name"] = _this.yAxis.font.name;
-		chart["yAxis"]["font"]["size"] = _this.yAxis.font.size;
-		chart["yAxis"]["font"]["color"] = _this.yAxis.font.color;
-		chart["yAxis"]["font"]["bold"] = _this.yAxis.font.bold;
-		chart["yAxis"]["font"]["italic"] = _this.yAxis.font.italic;
-		chart["yAxis"]["font"]["underline"] = _this.yAxis.font.underline;
+		chart["yAxis"]["titleFont"] = {};
+		chart["yAxis"]["titleFont"]["name"] = _this.yAxis.titleFont.name;
+		chart["yAxis"]["titleFont"]["size"] = _this.yAxis.titleFont.size;
+		chart["yAxis"]["titleFont"]["color"] = _this.yAxis.titleFont.color;
+		chart["yAxis"]["titleFont"]["bold"] = _this.yAxis.titleFont.bold;
+		chart["yAxis"]["titleFont"]["italic"] = _this.yAxis.titleFont.italic;
+		chart["yAxis"]["titleFont"]["underline"] = _this.yAxis.titleFont.underline;
+		
+		chart["yAxis"]["labelFont"] = {};
+		chart["yAxis"]["labelFont"]["name"] = _this.yAxis.labelFont.name;
+		chart["yAxis"]["labelFont"]["size"] = _this.yAxis.labelFont.size;
+		chart["yAxis"]["labelFont"]["color"] = _this.yAxis.labelFont.color;
+		chart["yAxis"]["labelFont"]["bold"] = _this.yAxis.labelFont.bold;
+		chart["yAxis"]["labelFont"]["italic"] = _this.yAxis.labelFont.italic;
+		chart["yAxis"]["labelFont"]["underline"] = _this.yAxis.labelFont.underline;
 
 		// Legeng
 		chart["legend"] = {};
@@ -378,13 +426,21 @@ function CChartData(bWordContext, chart) {
 		_this.xAxis.bShow = chart["xAxis"]["bShow"];
 		_this.xAxis.bGrid = chart["xAxis"]["bGrid"];
 		
-		_this.xAxis.font = {};
-		_this.xAxis.font.name = chart["xAxis"]["font"]["name"];
-		_this.xAxis.font.size = chart["xAxis"]["font"]["size"];
-		_this.xAxis.font.color = chart["xAxis"]["font"]["color"];
-		_this.xAxis.font.bold = chart["xAxis"]["font"]["bold"];
-		_this.xAxis.font.italic = chart["xAxis"]["font"]["italic"];
-		_this.xAxis.font.underline = chart["xAxis"]["font"]["underline"];
+		_this.xAxis.titleFont = {};
+		_this.xAxis.titleFont.name = chart["xAxis"]["titleFont"]["name"];
+		_this.xAxis.titleFont.size = chart["xAxis"]["titleFont"]["size"];
+		_this.xAxis.titleFont.color = chart["xAxis"]["titleFont"]["color"];
+		_this.xAxis.titleFont.bold = chart["xAxis"]["titleFont"]["bold"];
+		_this.xAxis.titleFont.italic = chart["xAxis"]["titleFont"]["italic"];
+		_this.xAxis.titleFont.underline = chart["xAxis"]["titleFont"]["underline"];
+		
+		_this.xAxis.labelFont = {};
+		_this.xAxis.labelFont.name = chart["xAxis"]["labelFont"]["name"];
+		_this.xAxis.labelFont.size = chart["xAxis"]["labelFont"]["size"];
+		_this.xAxis.labelFont.color = chart["xAxis"]["labelFont"]["color"];
+		_this.xAxis.labelFont.bold = chart["xAxis"]["labelFont"]["bold"];
+		_this.xAxis.labelFont.italic = chart["xAxis"]["labelFont"]["italic"];
+		_this.xAxis.labelFont.underline = chart["xAxis"]["labelFont"]["underline"];
 			
 		// Axis Y
 		_this.yAxis.title = chart["yAxis"]["title"];
@@ -392,13 +448,21 @@ function CChartData(bWordContext, chart) {
 		_this.yAxis.bShow = chart["yAxis"]["bShow"];
 		_this.yAxis.bGrid = chart["yAxis"]["bGrid"];
 		
-		_this.yAxis.font = {};
-		_this.yAxis.font.name = chart["yAxis"]["font"]["name"];
-		_this.yAxis.font.size = chart["yAxis"]["font"]["size"];
-		_this.yAxis.font.color = chart["yAxis"]["font"]["color"];
-		_this.yAxis.font.bold = chart["yAxis"]["font"]["bold"];
-		_this.yAxis.font.italic = chart["yAxis"]["font"]["italic"];
-		_this.yAxis.font.underline = chart["yAxis"]["font"]["underline"];
+		_this.yAxis.titleFont = {};
+		_this.yAxis.titleFont.name = chart["yAxis"]["titleFont"]["name"];
+		_this.yAxis.titleFont.size = chart["yAxis"]["titleFont"]["size"];
+		_this.yAxis.titleFont.color = chart["yAxis"]["titleFont"]["color"];
+		_this.yAxis.titleFont.bold = chart["yAxis"]["titleFont"]["bold"];
+		_this.yAxis.titleFont.italic = chart["yAxis"]["titleFont"]["italic"];
+		_this.yAxis.titleFont.underline = chart["yAxis"]["titleFont"]["underline"];
+		
+		_this.yAxis.labelFont = {};
+		_this.yAxis.labelFont.name = chart["yAxis"]["labelFont"]["name"];
+		_this.yAxis.labelFont.size = chart["yAxis"]["labelFont"]["size"];
+		_this.yAxis.labelFont.color = chart["yAxis"]["labelFont"]["color"];
+		_this.yAxis.labelFont.bold = chart["yAxis"]["labelFont"]["bold"];
+		_this.yAxis.labelFont.italic = chart["yAxis"]["labelFont"]["italic"];
+		_this.yAxis.labelFont.underline = chart["yAxis"]["labelFont"]["underline"];
 			
 		// Legend
 		_this.legend.position = chart["legend"]["position"];
@@ -480,13 +544,21 @@ function CChartData(bWordContext, chart) {
 			_this.xAxis.bShow = object.chart.xAxis.bShow;
 			_this.xAxis.bGrid = object.chart.xAxis.bGrid;
 			
-			_this.xAxis.font = {};
-			_this.xAxis.font.name = object.chart.xAxis.font.name;
-			_this.xAxis.font.size = object.chart.xAxis.font.size;
-			_this.xAxis.font.color = object.chart.xAxis.font.color;
-			_this.xAxis.font.bold = object.chart.xAxis.font.bold;
-			_this.xAxis.font.italic = object.chart.xAxis.font.italic;
-			_this.xAxis.font.underline = object.chart.xAxis.font.underline;
+			_this.xAxis.titleFont = {};
+			_this.xAxis.titleFont.name = object.chart.xAxis.titleFont.name;
+			_this.xAxis.titleFont.size = object.chart.xAxis.titleFont.size;
+			_this.xAxis.titleFont.color = object.chart.xAxis.titleFont.color;
+			_this.xAxis.titleFont.bold = object.chart.xAxis.titleFont.bold;
+			_this.xAxis.titleFont.italic = object.chart.xAxis.titleFont.italic;
+			_this.xAxis.titleFont.underline = object.chart.xAxis.titleFont.underline;
+			
+			_this.xAxis.labelFont = {};
+			_this.xAxis.labelFont.name = object.chart.xAxis.labelFont.name;
+			_this.xAxis.labelFont.size = object.chart.xAxis.labelFont.size;
+			_this.xAxis.labelFont.color = object.chart.xAxis.labelFont.color;
+			_this.xAxis.labelFont.bold = object.chart.xAxis.labelFont.bold;
+			_this.xAxis.labelFont.italic = object.chart.xAxis.labelFont.italic;
+			_this.xAxis.labelFont.underline = object.chart.xAxis.labelFont.underline;
 				
 			// Axis Y
 			_this.yAxis.title = object.chart.yAxis.title;
@@ -494,13 +566,21 @@ function CChartData(bWordContext, chart) {
 			_this.yAxis.bShow = object.chart.yAxis.bShow;
 			_this.yAxis.bGrid = object.chart.yAxis.bGrid;
 			
-			_this.yAxis.font = {};
-			_this.yAxis.font.name = object.chart.yAxis.font.name;
-			_this.yAxis.font.size = object.chart.yAxis.font.size;
-			_this.yAxis.font.color = object.chart.yAxis.font.color;
-			_this.yAxis.font.bold = object.chart.yAxis.font.bold;
-			_this.yAxis.font.italic = object.chart.yAxis.font.italic;
-			_this.yAxis.font.underline = object.chart.yAxis.font.underline;
+			_this.yAxis.titleFont = {};
+			_this.yAxis.titleFont.name = object.chart.yAxis.titleFont.name;
+			_this.yAxis.titleFont.size = object.chart.yAxis.titleFont.size;
+			_this.yAxis.titleFont.color = object.chart.yAxis.titleFont.color;
+			_this.yAxis.titleFont.bold = object.chart.yAxis.titleFont.bold;
+			_this.yAxis.titleFont.italic = object.chart.yAxis.titleFont.italic;
+			_this.yAxis.titleFont.underline = object.chart.yAxis.titleFont.underline;
+			
+			_this.yAxis.labelFont = {};
+			_this.yAxis.labelFont.name = object.chart.yAxis.labelFont.name;
+			_this.yAxis.labelFont.size = object.chart.yAxis.labelFont.size;
+			_this.yAxis.labelFont.color = object.chart.yAxis.labelFont.color;
+			_this.yAxis.labelFont.bold = object.chart.yAxis.labelFont.bold;
+			_this.yAxis.labelFont.italic = object.chart.yAxis.labelFont.italic;
+			_this.yAxis.labelFont.underline = object.chart.yAxis.labelFont.underline;
 				
 			// Legend
 			_this.legend.position = object.chart.legend.position;
@@ -579,12 +659,19 @@ function CChartData(bWordContext, chart) {
 		Writer.WriteBool( _this.xAxis.bShow );
 		Writer.WriteBool( _this.xAxis.bGrid );
 		
-		Writer.WriteString2( _this.xAxis.font.name );
-		Writer.WriteLong( _this.xAxis.font.size );
-		Writer.WriteString2( _this.xAxis.font.color );
-		Writer.WriteLong( _this.xAxis.font.bold );
-		Writer.WriteLong( _this.xAxis.font.italic );
-		Writer.WriteLong( _this.xAxis.font.underline );
+		Writer.WriteString2( _this.xAxis.titleFont.name );
+		Writer.WriteLong( _this.xAxis.titleFont.size );
+		Writer.WriteString2( _this.xAxis.titleFont.color );
+		Writer.WriteLong( _this.xAxis.titleFont.bold );
+		Writer.WriteLong( _this.xAxis.titleFont.italic );
+		Writer.WriteLong( _this.xAxis.titleFont.underline );
+		
+		Writer.WriteString2( _this.xAxis.labelFont.name );
+		Writer.WriteLong( _this.xAxis.labelFont.size );
+		Writer.WriteString2( _this.xAxis.labelFont.color );
+		Writer.WriteLong( _this.xAxis.labelFont.bold );
+		Writer.WriteLong( _this.xAxis.labelFont.italic );
+		Writer.WriteLong( _this.xAxis.labelFont.underline );
 			
 		// Axis Y
 		Writer.WriteString2( _this.yAxis.title );
@@ -592,12 +679,19 @@ function CChartData(bWordContext, chart) {
 		Writer.WriteBool( _this.yAxis.bShow );
 		Writer.WriteBool( _this.yAxis.bGrid );
 		
-		Writer.WriteString2( _this.yAxis.font.name );
-		Writer.WriteLong( _this.yAxis.font.size );
-		Writer.WriteString2( _this.yAxis.font.color );
-		Writer.WriteLong( _this.yAxis.font.bold );
-		Writer.WriteLong( _this.yAxis.font.italic );
-		Writer.WriteLong( _this.yAxis.font.underline );
+		Writer.WriteString2( _this.yAxis.titleFont.name );
+		Writer.WriteLong( _this.yAxis.titleFont.size );
+		Writer.WriteString2( _this.yAxis.titleFont.color );
+		Writer.WriteLong( _this.yAxis.titleFont.bold );
+		Writer.WriteLong( _this.yAxis.titleFont.italic );
+		Writer.WriteLong( _this.yAxis.titleFont.underline );
+		
+		Writer.WriteString2( _this.yAxis.labelFont.name );
+		Writer.WriteLong( _this.yAxis.labelFont.size );
+		Writer.WriteString2( _this.yAxis.labelFont.color );
+		Writer.WriteLong( _this.yAxis.labelFont.bold );
+		Writer.WriteLong( _this.yAxis.labelFont.italic );
+		Writer.WriteLong( _this.yAxis.labelFont.underline );
 			
 		// Legend
 		Writer.WriteString2( _this.legend.position );
@@ -671,12 +765,19 @@ function CChartData(bWordContext, chart) {
 		_this.xAxis.bShow = Reader.GetBool();
 		_this.xAxis.bGrid = Reader.GetBool();
 		
-		_this.xAxis.font.name = Reader.GetString2();
-		_this.xAxis.font.size = Reader.GetLong();
-		_this.xAxis.font.color = Reader.GetString2();
-		_this.xAxis.font.bold = Reader.GetLong();
-		_this.xAxis.font.italic = Reader.GetLong();
-		_this.xAxis.font.underline = Reader.GetLong();
+		_this.xAxis.titleFont.name = Reader.GetString2();
+		_this.xAxis.titleFont.size = Reader.GetLong();
+		_this.xAxis.titleFont.color = Reader.GetString2();
+		_this.xAxis.titleFont.bold = Reader.GetLong();
+		_this.xAxis.titleFont.italic = Reader.GetLong();
+		_this.xAxis.titleFont.underline = Reader.GetLong();
+		
+		_this.xAxis.labelFont.name = Reader.GetString2();
+		_this.xAxis.labelFont.size = Reader.GetLong();
+		_this.xAxis.labelFont.color = Reader.GetString2();
+		_this.xAxis.labelFont.bold = Reader.GetLong();
+		_this.xAxis.labelFont.italic = Reader.GetLong();
+		_this.xAxis.labelFont.underline = Reader.GetLong();
 			
 		// Axis Y
 		_this.yAxis.title = Reader.GetString2();
@@ -684,12 +785,19 @@ function CChartData(bWordContext, chart) {
 		_this.yAxis.bShow = Reader.GetBool();
 		_this.yAxis.bGrid = Reader.GetBool();
 		
-		_this.yAxis.font.name = Reader.GetString2();
-		_this.yAxis.font.size = Reader.GetLong();
-		_this.yAxis.font.color = Reader.GetString2();
-		_this.yAxis.font.bold = Reader.GetLong();
-		_this.yAxis.font.italic = Reader.GetLong();
-		_this.yAxis.font.underline = Reader.GetLong();
+		_this.yAxis.titleFont.name = Reader.GetString2();
+		_this.yAxis.titleFont.size = Reader.GetLong();
+		_this.yAxis.titleFont.color = Reader.GetString2();
+		_this.yAxis.titleFont.bold = Reader.GetLong();
+		_this.yAxis.titleFont.italic = Reader.GetLong();
+		_this.yAxis.titleFont.underline = Reader.GetLong();
+		
+		_this.yAxis.labelFont.name = Reader.GetString2();
+		_this.yAxis.labelFont.size = Reader.GetLong();
+		_this.yAxis.labelFont.color = Reader.GetString2();
+		_this.yAxis.labelFont.bold = Reader.GetLong();
+		_this.yAxis.labelFont.italic = Reader.GetLong();
+		_this.yAxis.labelFont.underline = Reader.GetLong();
 			
 		// Legend
 		_this.legend.position = Reader.GetString2();
@@ -891,42 +999,127 @@ asc_CChart.prototype = {
 		_t.series = [];
 		var nameIndex = 1;
 		
+		function isNumber(n) {
+			return !isNaN(parseFloat(n)) && isFinite(n);
+		}
+		
+		function getNumCache(c1, c2, r1, r2) {
+			
+			// (c1 == c2) || (r1 == r2)
+			var cache = [];
+			
+			if ( c1 == c2 ) {		// vertical cache
+				for (var row = r1; row <= r2; row++) {
+					var cell = _t.range.intervalObject.worksheet.getCell( new CellAddress(row, c1, 0) );
+					cache.push(cell.getValue());
+				}
+			}
+			else /*r1 == r2*/ {		// horizontal cache
+				for (var col = c1; col <= c2; col++) {
+					var cell = _t.range.intervalObject.worksheet.getCell( new CellAddress(r1, col, 0) );
+					cache.push(cell.getValue());
+				}
+			}
+			
+			return cache;
+		}
+		
+		function parseSeriesHeaders() {
+			
+			var cntLeft = 0, cntTop = 0;
+			var headers = { bLeft: false, bTop: false };
+			
+			/*for (var i = bbox.r1; i <= bbox.r2; i++) {
+				
+				var cell = _t.range.intervalObject.worksheet.getCell( new CellAddress(i, bbox.c1, 0) );
+				var value = cell.getValue();
+				if ( !isNumber(value) )
+					cntLeft++;
+			}
+			if ( cntLeft >= (bbox.r2 - bbox.r1) )
+				headers.bLeft = true;
+			
+			for (var i = bbox.c1; i <= bbox.c2; i++) {
+				
+				var cell = _t.range.intervalObject.worksheet.getCell( new CellAddress(bbox.r1, i, 0) );
+				var value = cell.getValue();
+				if ( !isNumber(value) )
+					cntTop++;
+			}
+			if ( cntTop >= (bbox.c2 - bbox.c1) )
+				headers.bTop = true;*/
+			
+			return headers;
+		}
+		
+		var parsedHeaders = parseSeriesHeaders();
+		
 		if (_t.range.rows) {
-			for (var i = bbox.r1; i <= bbox.r2; i++) {
-				var ser = new window["Asc"]["asc_CChartSeria"];
-
-				var startCell = new CellAddress(i, bbox.c1, 0);
+			for (var i = bbox.r1 + (parsedHeaders.bTop ? 1 : 0); i <= bbox.r2; i++) {
+				
+				var ser = new asc_CChartSeria();
+				var startCell = new CellAddress(i, bbox.c1 + (parsedHeaders.bLeft ? 1 : 0), 0);
 				var endCell = new CellAddress(i, bbox.c2, 0);
 
+				// Val
 				if (startCell && endCell) {
 					if (startCell.getID() == endCell.getID())
 						ser.Val.Formula = startCell.getID();
 					else {
 						ser.Val.Formula = ( !rx_test_ws_name.test(_t.range.intervalObject.worksheet.sName) ? "'" +_t.range.intervalObject.worksheet.sName+ "'" : _t.range.intervalObject.worksheet.sName )
 											+ "!" + startCell.getID() + ":" + endCell.getID();
+					}
 				}
+				ser.Val.NumCache = getNumCache(bbox.c1 + (parsedHeaders.bLeft ? 1 : 0), bbox.c2, i, i);
+				
+				// xVal
+				if ( parsedHeaders.bTop ) {
+					
+					var start = new CellAddress(bbox.r1, bbox.c1 + (parsedHeaders.bLeft ? 1 : 0), 0);
+					var end = new CellAddress(bbox.r1, bbox.c2, 0);
+					
+					ser.xVal.Formula = ( !rx_test_ws_name.test(_t.range.intervalObject.worksheet.sName) ? "'" +_t.range.intervalObject.worksheet.sName+ "'" : _t.range.intervalObject.worksheet.sName )
+										+ "!" + start.getID() + ":" + end.getID();
+					ser.xVal.NumCache = getNumCache( bbox.c1 + (parsedHeaders.bLeft ? 1 : 0), bbox.c2, bbox.r1, bbox.r1 );
 				}
-				ser.Tx = "Series" + nameIndex;
+				
+				var seriaName = parsedHeaders.bLeft ? ( _t.range.intervalObject.worksheet.getCell(new CellAddress(i, bbox.c1, 0)).getValue() ) : ("Series" + nameIndex);
+				ser.Tx = seriaName;
 				_t.series.push(ser);
 				nameIndex++;
 			}
 		}
 		else {
-			for (var i = bbox.c1; i <= bbox.c2; i++) {
-				var ser = new window["Asc"]["asc_CChartSeria"];
-
-				var startCell = new CellAddress(bbox.r1, i, 0);
+			for (var i = bbox.c1 + (parsedHeaders.bLeft ? 1 : 0); i <= bbox.c2; i++) {
+				
+				var ser = new asc_CChartSeria();
+				var startCell = new CellAddress(bbox.r1 + (parsedHeaders.bTop ? 1 : 0), i, 0);
 				var endCell = new CellAddress(bbox.r2, i, 0);
 
+				// Val
 				if (startCell && endCell) {
 					if (startCell.getID() == endCell.getID())
 						ser.Val.Formula = startCell.getID();
 					else {
 						ser.Val.Formula = ( !rx_test_ws_name.test(_t.range.intervalObject.worksheet.sName) ? "'" +_t.range.intervalObject.worksheet.sName+ "'" : _t.range.intervalObject.worksheet.sName )
 											+ "!" + startCell.getID() + ":" + endCell.getID();
+					}
 				}
+				ser.Val.NumCache = getNumCache(i, i, bbox.r1 + (parsedHeaders.bTop ? 1 : 0), bbox.r2);
+				
+				// xVal
+				if ( parsedHeaders.bLeft ) {
+					
+					var start = new CellAddress(bbox.r1 + (parsedHeaders.bTop ? 1 : 0), bbox.c1, 0);
+					var end = new CellAddress(bbox.r2, bbox.c1, 0);
+					
+					ser.xVal.Formula = ( !rx_test_ws_name.test(_t.range.intervalObject.worksheet.sName) ? "'" +_t.range.intervalObject.worksheet.sName+ "'" : _t.range.intervalObject.worksheet.sName )
+										+ "!" + start.getID() + ":" + end.getID();
+					ser.xVal.NumCache = getNumCache( bbox.c1, bbox.c1, bbox.r1 + (parsedHeaders.bTop ? 1 : 0), bbox.r2 );
 				}
-				ser.Tx = "Series" + nameIndex;
+				
+				var seriaName = parsedHeaders.bTop ? ( _t.range.intervalObject.worksheet.getCell(new CellAddress(bbox.r1, i, 0)).getValue() ) : ("Series" + nameIndex);
+				ser.Tx = seriaName;
 				_t.series.push(ser);
 				nameIndex++;
 			}
@@ -1110,6 +1303,9 @@ function asc_CChartHeader(object) {
 	this.subTitle = bCopy ? object.subTitle : "";
 	this.bDefaultTitle = bCopy ? object.bDefaultTitle : false;
 	this.font = bCopy ? new asc_CChartFont(object.font) : new asc_CChartFont();
+	if ( !bCopy ) {
+		this.font.asc_setSize(14);
+	}	
 	
 	this.Properties = {
 		title: 0,
@@ -1190,14 +1386,17 @@ function asc_CChartAxisX(object) {
 	this.bDefaultTitle = bCopy ? object.bDefaultTitle : false;
 	this.bShow = bCopy ? object.bShow : true;
 	this.bGrid = bCopy ? object.bGrid : true;
-	this.font = bCopy ? new asc_CChartFont(object.font) : new asc_CChartFont();
+	
+	this.titleFont = bCopy ? new asc_CChartFont(object.titleFont) : new asc_CChartFont();
+	this.labelFont = bCopy ? new asc_CChartFont(object.labelFont) : new asc_CChartFont();
 	
 	this.Properties = {
 		title: 0,
 		bDefaultTitle: 1,
 		bShow: 2,
 		bGrid: 3,
-		font: 4
+		titleFont: 4,
+		labelFont: 5
 	};
 }
 
@@ -1214,8 +1413,11 @@ asc_CChartAxisX.prototype = {
 	asc_getGridFlag: function() { return this.bGrid; },
 	asc_setGridFlag: function(gridFlag) { this.bGrid = gridFlag; },
 	
-	asc_getFont: function() { return this.font; },
-	asc_setFont: function(fontObj) { this.font = fontObj; },
+	asc_getTitleFont: function() { return this.titleFont; },
+	asc_setTitleFont: function(fontObj) { this.titleFont = fontObj; },
+	
+	asc_getLabelFont: function() { return this.labelFont; },
+	asc_setLabelFont: function(fontObj) { this.labelFont = fontObj; },
 	
 	//	For collaborative editing
 	getType: function() {
@@ -1232,7 +1434,8 @@ asc_CChartAxisX.prototype = {
 			case this.Properties.bDefaultTitle: return this.bDefaultTitle; break;
 			case this.Properties.bShow: return this.bShow; break;
 			case this.Properties.bGrid: return this.bGrid; break;
-			case this.Properties.font: return this.font; break;
+			case this.Properties.titleFont: return this.titleFont; break;
+			case this.Properties.labelFont: return this.labelFont; break;
 		}
 	},
 
@@ -1242,7 +1445,8 @@ asc_CChartAxisX.prototype = {
 			case this.Properties.bDefaultTitle: this.bDefaultTitle = value; break;
 			case this.Properties.bShow: this.bShow = value; break;
 			case this.Properties.bGrid: this.bGrid = value; break;
-			case this.Properties.font: this.font = value; break;
+			case this.Properties.titleFont: this.titleFont = value; break;
+			case this.Properties.labelFont: this.labelFont = value; break;
 		}
 	}
 }
@@ -1264,8 +1468,11 @@ prot["asc_setShowFlag"] = prot.asc_setShowFlag;
 prot["asc_getGridFlag"] = prot.asc_getGridFlag;
 prot["asc_setGridFlag"] = prot.asc_setGridFlag;
 
-prot["asc_getFont"] = prot.asc_getFont;
-prot["asc_setFont"] = prot.asc_setFont;
+prot["asc_getTitleFont"] = prot.asc_getTitleFont;
+prot["asc_setTitleFont"] = prot.asc_setTitleFont;
+
+prot["asc_getLabelFont"] = prot.asc_getLabelFont;
+prot["asc_setLabelFont"] = prot.asc_setLabelFont;
 //}
 
 //-----------------------------------------------------------------------------------
@@ -1280,14 +1487,17 @@ function asc_CChartAxisY(object) {
 	this.bDefaultTitle = bCopy ? object.bDefaultTitle : false;
 	this.bShow = bCopy ? object.bShow : true;
 	this.bGrid = bCopy ? object.bGrid : true;
-	this.font = bCopy ? new asc_CChartFont(object.font) : new asc_CChartFont();
+	
+	this.titleFont = bCopy ? new asc_CChartFont(object.titleFont) : new asc_CChartFont();
+	this.labelFont = bCopy ? new asc_CChartFont(object.labelFont) : new asc_CChartFont();
 	
 	this.Properties = {
 		title: 0,
 		bDefaultTitle: 1,
 		bShow: 2,
 		bGrid: 3,
-		font: 4
+		titleFont: 4,
+		labelFont: 5
 	};
 }
 
@@ -1304,8 +1514,11 @@ asc_CChartAxisY.prototype = {
 	asc_getGridFlag: function() { return this.bGrid; },
 	asc_setGridFlag: function(gridFlag) { this.bGrid = gridFlag; },
 	
-	asc_getFont: function() { return this.font; },
-	asc_setFont: function(fontObj) { this.font = fontObj; },
+	asc_getTitleFont: function() { return this.titleFont; },
+	asc_setTitleFont: function(fontObj) { this.titleFont = fontObj; },
+	
+	asc_getLabelFont: function() { return this.labelFont; },
+	asc_setLabelFont: function(fontObj) { this.labelFont = fontObj; },
 	
 	//	For collaborative editing
 	getType: function() {
@@ -1322,7 +1535,8 @@ asc_CChartAxisY.prototype = {
 			case this.Properties.bDefaultTitle: return this.bDefaultTitle; break;
 			case this.Properties.bShow: return this.bShow; break;
 			case this.Properties.bGrid: return this.bGrid; break;
-			case this.Properties.font: return this.font; break;
+			case this.Properties.titleFont: return this.titleFont; break;
+			case this.Properties.labelFont: return this.labelFont; break;
 		}
 	},
 
@@ -1332,7 +1546,8 @@ asc_CChartAxisY.prototype = {
 			case this.Properties.bDefaultTitle: this.bDefaultTitle = value; break;
 			case this.Properties.bShow: this.bShow = value; break;
 			case this.Properties.bGrid: this.bGrid = value; break;
-			case this.Properties.font: this.font = value; break;
+			case this.Properties.titleFont: this.titleFont = value; break;
+			case this.Properties.labelFont: this.labelFont = value; break;
 		}
 	}
 }
@@ -1354,8 +1569,11 @@ prot["asc_setShowFlag"] = prot.asc_setShowFlag;
 prot["asc_getGridFlag"] = prot.asc_getGridFlag;
 prot["asc_setGridFlag"] = prot.asc_setGridFlag;
 
-prot["asc_getFont"] = prot.asc_getFont;
-prot["asc_setFont"] = prot.asc_setFont;
+prot["asc_getTitleFont"] = prot.asc_getTitleFont;
+prot["asc_setTitleFont"] = prot.asc_setTitleFont;
+
+prot["asc_getLabelFont"] = prot.asc_getLabelFont;
+prot["asc_setLabelFont"] = prot.asc_setLabelFont;
 //}
 
 //-----------------------------------------------------------------------------------
@@ -2001,10 +2219,11 @@ function DrawingObjects() {
 						worksheet.expandRowsOnScroll(true);
 					}
 
-					if ( obj.isChart() && bUpdateCharts ) {
+					if ( obj.isChart() && (obj.flags.redrawChart || bUpdateCharts) ) {
 						if ( !obj.chart.range.intervalObject )
 							_this.intervalToIntervalObject(obj.chart);
-						
+							
+						obj.chart.rebuildSeries();
 						var chartBase64 = chartRender.insertChart(obj.chart, null, obj.getWidthFromTo(), obj.getHeightFromTo());
 						if ( !chartBase64 )
 							continue;
@@ -2015,8 +2234,9 @@ function DrawingObjects() {
 						obj.image.onload = function() {
 							obj.flags.currentCursor = null;
 						}
-
+						
 						obj.image.src = chartBase64;
+						obj.flags.redrawChart = false;
 						continue;
 					}
 
@@ -2208,7 +2428,8 @@ function DrawingObjects() {
 			anchorUpdated: false,
 			lockState: c_oAscObjectLockState.No,
 			currentCursor: null,
-			transactionState: c_oAscTransactionState.No
+			transactionState: c_oAscTransactionState.No,
+			redrawChart: false
 		};
 
 		// Свойства
@@ -2609,6 +2830,7 @@ function DrawingObjects() {
 
 		copyObject.flags.currentCursor = obj.flags.currentCursor;
 		copyObject.flags.transactionState = obj.flags.transactionState;
+		copyObject.flags.redrawChart = obj.flags.redrawChart;
 
 		copyObject.imageUrl = obj.imageUrl;
 
@@ -2870,6 +3092,7 @@ function DrawingObjects() {
 		var obj = _this.createDrawingObject();
 		obj.id = generateId();
 		obj.chart = chart;
+		obj.flags.redrawChart = true;
 
 		// center
 		var chartLeft = options && options.left ? ptToPx(options.left) : (parseInt($("#ws-canvas").css('width')) / 2) - c_oAscChartDefines.defaultChartWidth / 2;
@@ -2915,10 +3138,7 @@ function DrawingObjects() {
 				History.Add(g_oUndoRedoDrawingObject, historyitem_DrawingObject_Add, worksheet.model.getId(), null, copyObject);
 			}
 
-			if(options)
-				_this.showDrawingObjects(true, null/*printOptions*/, true/*bUpdateCharts*/);
-			else
-				_this.showDrawingObjects(true);
+			_this.showDrawingObjects(false);
 			
 			worksheet._trigger("reinitializeScroll");
 			worksheet.autoFilters.drawAutoF(worksheet);
@@ -2978,7 +3198,8 @@ function DrawingObjects() {
 
 						_this.selectDrawingObject(index);
 						_this.selectDrawingObjectRange(index);
-						_this.showDrawingObjects(false, null/*printOptions*/, true/*bUpdateCharts*/);
+						obj.flags.redrawChart = true;
+						_this.showDrawingObjects(false);
 					}
 				}
 				
@@ -4151,7 +4372,6 @@ function DrawingObjects() {
 			obj.to.row = foundRow.row;
 			obj.to.rowOff = pxToMm(top + obj.size.height - worksheet.getCellTop(obj.to.row, 0));
 		}
-		//_this.showDrawingObjects(true, null, false, true);
 	}
 
 	_this.checkCursorDrawingObject = function(x, y) {
@@ -4426,7 +4646,6 @@ function DrawingObjects() {
 				worksheet._trigger("reinitializeScrollX");
 				foundCol = worksheet._findColUnderCursor(pxToPt(realLeftOffset + widthFromTo), true);
 			}
-			
 			obj.move.x = x;
 
 			// выход за границу сверху
@@ -4457,6 +4676,9 @@ function DrawingObjects() {
 
 			obj.to.row = foundRow.row;
 			obj.to.rowOff = pxToMm(realTopOffset + heightFromTo - worksheet.getCellTop(obj.to.row, 0));
+			
+			if ( obj.flags.currentCursor && (obj.flags.currentCursor != "move") )
+				obj.flags.redrawChart = true;
 		}
 	}
 
@@ -4580,10 +4802,9 @@ function ImageLoader() {
 			if ( !container[i].bReady )
 				return false;
 		}
-		container = [];		// remove cache
 		return true;
 	}
-	
+		
 	_this.addImage = function(imageSrc) {
 		if ( imageSrc ) {
 			var imageObject = new ImageObject();
@@ -4599,5 +4820,6 @@ function ImageLoader() {
 	
 	_this.removeReadyCallback = function(callback) {
 		readyCallback = null;
+		container = [];
 	}
 }

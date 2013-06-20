@@ -3424,7 +3424,7 @@
 					t.overlayCtx.ctx.globalAlpha = 1;
 					if (res) {
 						// Все хорошо, мы залочили, теперь применяем
-						t.objectRender.showDrawingObjects(true, null, true);
+						t.objectRender.showDrawingObjects(true, null, false);
 					}
 					else {
 						// Не удалось, восстанавливаем состояние
@@ -3468,6 +3468,8 @@
 				}
 				else
 					t.objectRender.clearUndoRedoDrawingObject();
+					
+				t.overlayCtx.ctx.globalAlpha = 1;
 			},
 
 
