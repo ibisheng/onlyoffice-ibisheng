@@ -2900,9 +2900,9 @@
 				//todo из файла
 				var headerRowCount = 1;
 				var totalsRowCount = 0;
-				if(options.HeaderRowCount)
+				if(null != options.HeaderRowCount)
 					headerRowCount = options.HeaderRowCount;
-				if(options.TotalsRowCount)
+				if(null != options.TotalsRowCount)
 					totalsRowCount = options.TotalsRowCount;
 				if(style && style.Name && ws.model.workbook.TableStyles && ws.model.workbook.TableStyles.AllStyles && (styleForCurTable = ws.model.workbook.TableStyles.AllStyles[style.Name]))
 				{
