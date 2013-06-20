@@ -24,6 +24,8 @@
                 "../Common/docscoapisettings.js",
                 "../Common/docscoapicommon.js",
                 "../Common/docscoapi.js",
+				"../Common/spellcheckapisettings.js",
+				"../Common/spellcheckapi.js",
                 "../Common/wordcopypaste.js",
                 "../Common/downloaderfiles.js",
                 "../Common/commonDefines.js",
