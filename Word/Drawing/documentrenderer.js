@@ -441,6 +441,8 @@ function CDocMeta()
         s.Seek(obj.StreamPos);
         var g = obj.Graphics;
 
+        g.SetIntegerGrid(false);
+
         // textline parameters
         var _lineX = 0;
         var _lineY = 0;
@@ -657,7 +659,7 @@ function CDocMeta()
                         return;
                     }
 
-                    var _src = (0 == _type) ? (this.DocumentUrl + "media/image" + s.GetLong() + ".jpg") : (this.DocumentUrl + "media/image" + s.GetLong() + ".png");
+                    var _src = (0 == _type || 10 == _type) ? (this.DocumentUrl + "media/image" + s.GetLong() + ".jpg") : (this.DocumentUrl + "media/image" + s.GetLong() + ".png");
 
                     var __x = s.GetDouble();
                     var __y = s.GetDouble();
@@ -682,15 +684,22 @@ function CDocMeta()
                     img.onload = function(){
                         if (1 != obj.BreakDrawing)
                         {
-                            var _old = g.m_oTransform;
+                            var _ctx = g.m_oContext;
+
                             if (_tr)
-                                g.transform(_tr.sx, _tr.shy, _tr.shx, _tr.sy, _tr.tx, _tr.ty);
+                            {
+                                var _dX = g.m_oCoordTransform.sx;
+                                var _dY = g.m_oCoordTransform.sy;
+
+                                _ctx.save();
+                                _ctx.setTransform(_tr.sx * _dX, _tr.shy * _dY, _tr.shx * _dX, _tr.sy * _dY, _tr.tx * _dX, _tr.ty * _dY);
+                            }
 
                             g.drawImage2(img,__x,__y,__w,__h);
 							//editor.WordControl.OnScroll();
 
                             if (_tr)
-                                g.transform(_old.sx, _old.shy, _old.shx, _old.sy, _old.tx, _old.ty);
+                                _ctx.restore();
                         }
 						
                         oThisDoc.OnImageLoad(obj);
