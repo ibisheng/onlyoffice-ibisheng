@@ -120,15 +120,19 @@ function colorObjToAscColor(color) {
 		if(null != color.tint)
 			tintExcel = color.tint;
 		var tintPresentation = 0;
-		for(var i = 0 , length = g_oThemeColorTint.length; i < length; ++i)
+		var oThemeColorTint = g_oThemeColorTint[color.theme];
+		if(null != oThemeColorTint)
 		{
-			var cur = g_oThemeColorTint[i];
-			//0.005 установлено экспериментально
-			if(Math.abs(cur - tintExcel) < 0.005)
+			for(var i = 0 , length = oThemeColorTint.length; i < length; ++i)
 			{
-				bTheme = true;
-				tintPresentation = i;
-				break;
+				var cur = oThemeColorTint[i];
+				//0.005 установлено экспериментально
+				if(Math.abs(cur - tintExcel) < 0.005)
+				{
+					bTheme = true;
+					tintPresentation = i;
+					break;
+				}
 			}
 		}
 		if(bTheme)

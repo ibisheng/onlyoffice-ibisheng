@@ -373,9 +373,15 @@ CColorModifiers.prototype =
     {
         if (HSL.S == 0)
         {
-            RGB.R = HSL.L;
-            RGB.G = HSL.L;
-            RGB.B = HSL.L;
+			var R = (255 * (HSL.L / 240.0)) >> 0;
+            if (R < 0)
+                R = 0;
+            if (R > 255)
+                R = 255;
+
+            RGB.R = R;
+            RGB.G = R;
+            RGB.B = R;
         }
         else
         {
