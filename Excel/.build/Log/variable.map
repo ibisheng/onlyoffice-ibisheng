@@ -454,7 +454,7 @@ historyitem_RowCol_FontAlign:JF
 tt_face_get_ps_name:Lj
 FT_Add64:bf
 c_oAscServerError$StorageWrite:nb
-rgRows:gv
+rgRows:fv
 JSCompiler_StaticMethods__removeRows:JH
 TT_NameEntryRec:ig
 c_oSer_TableStyles$DefaultTableStyle:KA
@@ -719,8 +719,8 @@ JSCompiler_StaticMethods_getBold:rJ
 c_oSerBorderTypes$DiagonalUp:Nw
 nOTOwerflow:zO
 c_oSer_PageSetup$Orientation:rz
-asc_CChartAxisX:Cd
-asc_CChartAxisY:Dd
+asc_CChartAxisX:Bd
+asc_CChartAxisY:Cd
 cElementType$array:Eu
 c_oSerHyperlinkTypes$Location:py
 CorrectUniFill:CR
@@ -1072,7 +1072,7 @@ BULLET_TYPE_TYPEFACE_NONE:PO
 afm_stream_read_one:Zh
 gray_set_cell:Al
 CLn:sM
-c_oAscChartLegend$right:Ea
+c_oAscChartLegend$right:Da
 ReadObjectLong:XL
 FT_ENCODING_APPLE_ROMAN:Nr
 ScrollOverType$ACTIVE:mL
@@ -1403,7 +1403,7 @@ c_oAscError$ID$StockChartError:kd
 historyitem_AutoFilter_ApplyDF:Pt
 fontstyle_mask_bold:vs
 cElementType$error:xu
-FT_Face_Internal:Zg
+FT_Face_Internal:Yg
 compare_kern_pairs:xq
 c_oSer_CommentData$Reply:vB
 tt_cmap14_get_nondef_chars:Vk
@@ -1635,7 +1635,7 @@ g_memory:He
 cff_isoadobe_charset:mp
 JSCompiler_StaticMethods__scrollH:wL
 FT_Lookup_Renderer:wr
-historyitem_DrawingObject_Add:Nd
+historyitem_DrawingObject_Add:Md
 JSCompiler_StaticMethods_GetSerializeArray:jH
 JSCompiler_StaticMethods__scrollV:vL
 create_t1_field:Ui
@@ -2036,10 +2036,10 @@ UndoRedoData_CellSimpleData:bG
 cErrorType$not_numeric:Ju
 LAYOUT_KIND:ML
 c_oAscLockTypes$kLockTypeNone:gu
-L 39:nd
+L 39:od
 c_oAscMergeOptions$Unmerge:LK
-L 38:Yg
-L 37:Md
+L 38:Zg
+L 37:Nd
 c_oAscServerError$VKeyEncrypt:Cb
 PS_PrivateRec:Dh
 L 32:xa
@@ -2065,7 +2065,7 @@ tt_services:xo
 Align:AE
 c_oAscCleanOptions$Formula:NK
 TT_LongMetricsRec:hg
-L 27:Da
+L 27:Ea
 c_oSer_ColorObjectType$Rgb:gz
 L 26:aa
 L 29:Ja
@@ -2084,7 +2084,7 @@ L 25:ha
 L 24:S
 c_oSerFillTypes$PatternFill:ix
 tt_find_sbit_image:Uj
-L 50:Bd
+L 50:Dd
 tt_size_reset:Oo
 UndoRedoData_RowProp:iI
 _strcmp_data:Ve
@@ -2135,7 +2135,7 @@ L 48:oS
 JSCompiler_StaticMethods_Reinit:QK
 tt_face_free_hdmx_stub:$k
 L 45:rb
-L 44:fv
+L 44:gv
 historyitem_Cell_Italic:QI
 L 47:nS
 L 46:mS
@@ -2192,7 +2192,7 @@ c_oMainTables$Main:gP
 CNoFill:mM
 JSCompiler_alias_VOID:q
 JSCompiler_StaticMethods_CreatePlaces:Ur
-JSCompiler_StaticMethods_getWorksheetByName:od
+JSCompiler_StaticMethods_getWorksheetByName:nd
 c_oSer_Dxf$Font:IA
 c_oSer_Comments$CommentData:ZA
 c_oSer_ConditionalFormattingRule$StopIfTrue:JB
