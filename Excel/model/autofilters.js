@@ -4495,9 +4495,9 @@
 						if(border)
 						{
 							if(border.t.s != 'none')
-								color = Asc.parseColor(borders.t.getRgbOrNull()).color;
+								color = Asc.parseColor(border.t.getRgbOrNull()).color;
 							else if(border.b.s != 'none')
-								color = Asc.parseColor(borders.b.getRgbOrNull()).color;
+								color = Asc.parseColor(border.b.getRgbOrNull()).color;
 							
 							for(n = 1; n < 5; n++)
 							{
