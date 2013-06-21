@@ -1036,7 +1036,7 @@ asc_CChart.prototype = {
 				if ( !isNumber(value) )
 					cntLeft++;
 			}
-			if ( cntLeft >= (bbox.r2 - bbox.r1) )
+			if ( (cntLeft > 0) && (cntLeft >= bbox.r2 - bbox.r1) )
 				headers.bLeft = true;
 			
 			for (var i = bbox.c1; i <= bbox.c2; i++) {
@@ -1046,7 +1046,7 @@ asc_CChart.prototype = {
 				if ( !isNumber(value) )
 					cntTop++;
 			}
-			if ( cntTop >= (bbox.c2 - bbox.c1) )
+			if ( (cntTop > 0) && (cntTop >= bbox.c2 - bbox.c1) )
 				headers.bTop = true;
 			
 			return headers;
@@ -2918,7 +2918,7 @@ function DrawingObjects() {
 			obj.worksheet = worksheet;
 			
 			obj.from.col = (options && options.cell) ? options.cell.col : worksheet.getSelectedColumnIndex();
-			obj.from.row = (options && options.cell) ? options.cell.row : worksheet.getSelectedRowIndex();;
+			obj.from.row = (options && options.cell) ? options.cell.row : worksheet.getSelectedRowIndex();
 			
 			// Проверяем начальные координаты при вставке
 			while ( !worksheet.cols[obj.from.col] ) {
