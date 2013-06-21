@@ -1595,11 +1595,14 @@ var cFormulaFunction = {
 					arg0 = arg0.getElementRowCol(0,0);
 				}
 
+				arg0 = arg0.tocString();
+
 				if ( arg0 instanceof cError )
 					return this.value = arg0;
 
-				arg0 = arg0.tocString();
-
+				if( arg0.tocNumber() instanceof cNumber && arg0.tocNumber().getValue() > 0 )
+					return this.value = new cNumber( parseInt(arg0.tocNumber().getValue()) );
+					
 				var res = g_oFormatParser.parse(arg0.getValue());
 
 				if( res && res.bDateTime )
@@ -9238,7 +9241,7 @@ cRef.prototype.getValue = function(){
 	}
 };
 cRef.prototype.tocNumber = function(){ return this.getValue().tocNumber(); };
-cRef.prototype.tocString = function(){ return new cString(""+this.range.getValueWithFormat()); };
+cRef.prototype.tocString = function(){ return this.getValue().tocString();/* new cString(""+this.range.getValueWithFormat()); */ };
 cRef.prototype.tocBool = function(){ return this.getValue().tocBool(); };
 cRef.prototype.tryConvert = function(){ return this.getValue(); };
 cRef.prototype.toString = function(){ return this._cells; };
