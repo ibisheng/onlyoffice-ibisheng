@@ -1767,7 +1767,7 @@ function DrawLineChart(chartCanvas, chartType, chartSubType, data, chart) {
 		}
 	}
 	//подписи по оси OX
-	if(chart && chart.series && chart.series[0] && chart.series[0].xVal && chart.series[0].xVal.NumCache)
+	if(chart && chart.series && chart.series[0] && chart.series[0].xVal && chart.series[0].xVal.NumCache && chart.series[0].xVal.Formula != null && chart.series[0].xVal.NumCache.length != 0)
 		bar._otherProps._labels = chart.series[0].xVal.NumCache;
 	else
 		bar._otherProps._labels = tempMas;
@@ -1821,7 +1821,7 @@ function DrawBarChart(chartCanvas, chartSubType, data, chart) {
 		tempMas[i] = i + 1;
 	}
 	//подписи по оси OX
-	if(chart && chart.series && chart.series[0] && chart.series[0].xVal && chart.series[0].xVal.NumCache)
+	if(chart && chart.series && chart.series[0] && chart.series[0].xVal && chart.series[0].xVal.NumCache && chart.series[0].xVal.Formula != null && chart.series[0].xVal.NumCache.length != 0)
 		bar._otherProps._labels = chart.series[0].xVal.NumCache;
 	else
 		bar._otherProps._labels = tempMas;
@@ -1908,7 +1908,7 @@ function DrawHBarChart(chartCanvas, chartSubType, data, chart) {
 		tempMas[data.length - i - 1] = i + 1;
 	}
 	//подписи по оси OY
-	if(chart && chart.series && chart.series[0] && chart.series[0].xVal && chart.series[0].xVal.NumCache)
+	if(chart && chart.series && chart.series[0] && chart.series[0].xVal && chart.series[0].xVal.NumCache && chart.series[0].xVal.Formula != null && chart.series[0].xVal.NumCache.length != 0)
 		bar._otherProps._labels = chart.series[0].xVal.NumCache;
 	else
 		bar._otherProps._labels = tempMas;
