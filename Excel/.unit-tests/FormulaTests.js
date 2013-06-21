@@ -626,7 +626,228 @@
 			strictEqual( oParser.calculate().getValue(), 37340);
 		else
 			strictEqual( oParser.calculate().getValue(), 38802);
+	})
+
+	test("Test: \"EDATE\"",function(){
+	
+		if( !g_bDate1904 ){
+			oParser = new parserFormula("EDATE(DATE(2006,1,31),5)","A2",ws);
+			ok(oParser.parse());
+			strictEqual( oParser.calculate().getValue(), 38898);
+			
+			oParser = new parserFormula("EDATE(DATE(2004,2,29),12)","A2",ws);
+			ok(oParser.parse());
+			strictEqual( oParser.calculate().getValue(), 38411);
+			
+			ws.getRange2("A7").setValue("02-28-2004");
+			oParser = new parserFormula("EDATE(A7,12)","A2",ws);
+			ok(oParser.parse());
+			strictEqual( oParser.calculate().getValue(), 38411);
+			
+			oParser = new parserFormula("EDATE(DATE(2004,1,15),-23)","A2",ws);
+			ok(oParser.parse());
+			strictEqual( oParser.calculate().getValue(), 37302);
+        }
+		else{
+			oParser = new parserFormula("EDATE(DATE(2006,1,31),5)","A2",ws);
+			ok(oParser.parse());
+			strictEqual( oParser.calculate().getValue(), 37436);
+			
+			oParser = new parserFormula("EDATE(DATE(2004,2,29),12)","A2",ws);
+			ok(oParser.parse());
+			strictEqual( oParser.calculate().getValue(), 36949);
+			
+			ws.getRange2("A7").setValue("02-28-2004");
+			oParser = new parserFormula("EDATE(A7,12)","A2",ws);
+			ok(oParser.parse());
+			strictEqual( oParser.calculate().getValue(), 36949);
+			
+			oParser = new parserFormula("EDATE(DATE(2004,1,15),-23)","A2",ws);
+			ok(oParser.parse());
+			strictEqual( oParser.calculate().getValue(), 35840);
+		}
+	})
+
+	test("Test: \"EOMONTH\"",function(){
+	
+		if( !g_bDate1904 ){
+			oParser = new parserFormula("EOMONTH(DATE(2006,1,31),5)","A2",ws);
+			ok(oParser.parse());
+			strictEqual( oParser.calculate().getValue(), 38898);
+			
+			oParser = new parserFormula("EOMONTH(DATE(2004,2,29),12)","A2",ws);
+			ok(oParser.parse());
+			strictEqual( oParser.calculate().getValue(), 38411);
+			
+			ws.getRange2("A7").setValue("02-28-2004");
+			oParser = new parserFormula("EOMONTH(A7,12)","A2",ws);
+			ok(oParser.parse());
+			strictEqual( oParser.calculate().getValue(), 38411);
+			
+			oParser = new parserFormula("EOMONTH(DATE(2004,1,15),-23)","A2",ws);
+			ok(oParser.parse());
+			strictEqual( oParser.calculate().getValue(), 37315);
+        }
+		else{
+			oParser = new parserFormula("EOMONTH(DATE(2006,1,31),5)","A2",ws);
+			ok(oParser.parse());
+			strictEqual( oParser.calculate().getValue(), 37436);
+			
+			oParser = new parserFormula("EOMONTH(DATE(2004,2,29),12)","A2",ws);
+			ok(oParser.parse());
+			strictEqual( oParser.calculate().getValue(), 36949);
+			
+			ws.getRange2("A7").setValue("02-28-2004");
+			oParser = new parserFormula("EOMONTH(A7,12)","A2",ws);
+			ok(oParser.parse());
+			strictEqual( oParser.calculate().getValue(), 36949);
+			
+			oParser = new parserFormula("EOMONTH(DATE(2004,1,15),-23)","A2",ws);
+			ok(oParser.parse());
+			strictEqual( oParser.calculate().getValue(), 35853);
+		}
+	})
+
+	test("Test: \"DATEVALUE\"",function(){
+	
+		oParser = new parserFormula("NETWORKDAYS(DATE(2006,1,1),DATE(2006,1,31))","A2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 22);
+		
+		oParser = new parserFormula("NETWORKDAYS(DATE(2006,1,31),DATE(2006,1,1))","A2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), -22);
+		
+		oParser = new parserFormula("NETWORKDAYS(DATE(2006,1,1),DATE(2006,2,1),{\"01-02-2006\",\"01-16-2006\"})","A2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 21);
+
+	})
+
+	test("Test: \"PV\"",function(){
+	
+		oParser = new parserFormula("PV(0.08/12,12*20,500,,0)","A2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), -59777.14585118638 );
+		
+		oParser = new parserFormula("PV(0,12*20,500,,0)","A2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), -120000 );
 		
 	})
+
+	test("Test: \"NPV\"",function(){
 	
+		oParser = new parserFormula("NPV(0.1,-10000,3000,4200,6800)","A2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 1188.4434123352216 );
+		
+	})
+
+	test("Test: \"SUMIF\"",function(){
+	
+		ws.getRange2("A2").setValue("100000");
+		ws.getRange2("A3").setValue("200000");
+		ws.getRange2("A4").setValue("300000");
+		ws.getRange2("A5").setValue("400000");
+		
+		ws.getRange2("B2").setValue("7000");
+		ws.getRange2("B3").setValue("14000");
+		ws.getRange2("B4").setValue("21000");
+		ws.getRange2("B5").setValue("28000");
+		
+		ws.getRange2("C2").setValue("250000");
+		
+		oParser = new parserFormula("SUMIF(A2:A5,\">160000\",B2:B5)","A7",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 63000 );
+		
+		oParser = new parserFormula("SUMIF(A2:A5,\">160000\")","A8",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 900000 );
+		
+		oParser = new parserFormula("SUMIF(A2:A5,300000,B2:B5)","A9",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 21000 );
+		
+		oParser = new parserFormula("SUMIF(A2:A5,\">\" & C2,B2:B5)","A10",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 49000 );
+		
+		
+		ws.getRange2("A12").setValue("Vegetables");
+		ws.getRange2("A13").setValue("Vegetables");
+		ws.getRange2("A14").setValue("Fruits");
+		ws.getRange2("A15").setValue("");
+		ws.getRange2("A16").setValue("Vegetables");
+		ws.getRange2("A17").setValue("Fruits");
+		
+		ws.getRange2("B12").setValue("Tomatoes");
+		ws.getRange2("B13").setValue("Celery");
+		ws.getRange2("B14").setValue("Oranges");
+		ws.getRange2("B15").setValue("Butter");
+		ws.getRange2("B16").setValue("Carrots");
+		ws.getRange2("B17").setValue("Apples");
+		
+		ws.getRange2("C12").setValue("2300");
+		ws.getRange2("C13").setValue("5500");
+		ws.getRange2("C14").setValue("800");
+		ws.getRange2("C15").setValue("400");
+		ws.getRange2("C16").setValue("4200");
+		ws.getRange2("C17").setValue("1200");
+		
+		oParser = new parserFormula("SUMIF(A12:A17,\"Fruits\",C12:C17)","A19",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 2000 );
+		
+		oParser = new parserFormula("SUMIF(A12:A17,\"Vegetables\",C12:C17)","A20",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 12000 );
+		
+		oParser = new parserFormula("SUMIF(B12:B17,\"*es\",C12:C17)","A21",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 4300 );
+		
+		oParser = new parserFormula("SUMIF(A12:A17,\"\",C12:C17)","A22",ws);
+		ok(oParser.parse());
+        notEqual( oParser.calculate().getValue(), 400 );
+		
+	})
+
+	test("Test: \"TEXT\"",function(){
+		
+		wb.dependencyFormulas = new DependencyGraph(wb);
+		
+		oParser = new parserFormula("TEXT(1234.567,\"$0.00\")","A2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), "$1234.57" );	
+		
+		oParser = new parserFormula("TEXT(0.125,\"0.0%\")","A2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), "12.5%" );	
+		
+	})
+
+	test("Test: \"TEXT\"",function(){
+		
+		wb.dependencyFormulas = new DependencyGraph(wb);
+		
+		oParser = new parserFormula("WORKDAY(DATE(2006,1,1),0)","A2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 38718 );
+		
+		oParser = new parserFormula("WORKDAY(DATE(2006,1,1),10)","A2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 38730 );
+		
+		oParser = new parserFormula("WORKDAY(DATE(2006,1,1),-10)","A2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 38705 );
+		
+		oParser = new parserFormula("WORKDAY(DATE(2006,1,1),20,{\"1-2-2006\",\"1-16-2006\"})","A2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 38748 );
+		
+	})
+
 });
