@@ -1515,110 +1515,260 @@
 	
 	OfficeExcel.getDrwContext = function(canvas)
 	{
-		if(!this.fmgrGraphics)
+		if(!this.fmgrGraphics && Asc.DrawingContext)
 		{
 			this.getFmgrGraphics();
 			this.drwContext =  Asc.DrawingContext({canvas: canvas, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics});
 		}
-		else if(!this.drwContext)
+		else if(!this.drwContext && Asc.DrawingContext)
 			this.drwContext =  Asc.DrawingContext({canvas: canvas, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics});
-		else//здесь должна быть передача canvas(setCanvas) 
+		else if(Asc.DrawingContext)//здесь должна быть передача canvas(setCanvas) 
 			this.drwContext =  Asc.DrawingContext({canvas: canvas, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics});
+		else
+			return false;
 		return this.drwContext;
 	}
 	
 	OfficeExcel.Text = function (context, font, size, x, y, text)
     {		
-		var context = OfficeExcel.getDrwContext(bar.canvas);
+		var drwContext = OfficeExcel.getDrwContext(bar.canvas);
+		if(drwContext)
+		{
+			context = drwContext;
+			 // Need these now the angle can be specified, ie defaults for the former two args
+			if (typeof(arguments[6]) == null) arguments[6]  = 'bottom'; // Vertical alignment. Default to bottom/baseline
+			if (typeof(arguments[7]) == null) arguments[7]  = 'left';   // Horizontal alignment. Default to left
+			if (typeof(arguments[8]) == null) arguments[8]  = null;     // Show a bounding box. Useful for positioning during development. Defaults to false
+			if (typeof(arguments[9]) == null) arguments[9]  = 0;        // Angle (IN DEGREES) that the text should be drawn at. 0 is middle right, and it goes clockwise
+			if (typeof(arguments[12]) == null) arguments[12] = true;    // Whether the bounding box has the placement indicator
 
-        // Need these now the angle can be specified, ie defaults for the former two args
-        if (typeof(arguments[6]) == null) arguments[6]  = 'bottom'; // Vertical alignment. Default to bottom/baseline
-        if (typeof(arguments[7]) == null) arguments[7]  = 'left';   // Horizontal alignment. Default to left
-        if (typeof(arguments[8]) == null) arguments[8]  = null;     // Show a bounding box. Useful for positioning during development. Defaults to false
-        if (typeof(arguments[9]) == null) arguments[9]  = 0;        // Angle (IN DEGREES) that the text should be drawn at. 0 is middle right, and it goes clockwise
-        if (typeof(arguments[12]) == null) arguments[12] = true;    // Whether the bounding box has the placement indicator
-
-        // The alignment is recorded here for purposes of Opera compatibility
-        if (navigator.userAgent.indexOf('Opera') != -1) {
-            context.canvas.__OfficeExcel_valign__ = arguments[6];
-            context.canvas.__OfficeExcel_halign__ = arguments[7];
-        }
-
-        // First, translate to x/y coords
-        context.save();
-
-		context.canvas.__OfficeExcel_originalx__ = x;
-		context.canvas.__OfficeExcel_originaly__ = y;
-		context.translate(x, y);
-		var italic = arguments[13] && arguments[13].italic ? arguments[13].italic : false;
-		var underline = arguments[13] && arguments[13].underline ? arguments[13].underline : false;
-		
-		var ascFont = new Asc.FontProperties(font, size, arguments[11], italic, underline);
-		context.setFont(ascFont);
-	 
-		var width;
-		var textSize;
-		if(typeof text != 'string')
-			text = text.toString();
-		if(text != "")
-			textSize  = context.measureText(text,1);
-		
-
-		// Vertical alignment - defaults to bottom
-		if (arguments[6]) {
-			var vAlign = arguments[6];
-			if(textSize)
-				size1 = textSize.height/0.75;
-			else
-				size1 = size;
-			if (vAlign == 'center') {
-				y = y + size1 / 2;
-				//context.translate(0, size / 2);
-			} else if (vAlign == 'top') {
-				y = y + size1;
-				//context.translate(0, size);
+			// The alignment is recorded here for purposes of Opera compatibility
+			if (navigator.userAgent.indexOf('Opera') != -1) {
+				context.canvas.__OfficeExcel_valign__ = arguments[6];
+				context.canvas.__OfficeExcel_halign__ = arguments[7];
 			}
-		}
 
+			// First, translate to x/y coords
+			context.save();
 
-		// Hoeizontal alignment - defaults to left
-		if (arguments[7] && textSize) {
-			var hAlign = arguments[7];
-			width = textSize.width/0.75;
-			if (hAlign) {
-				if (hAlign == 'center') {
-					//context.translate(-1 * (width / 2), 0)
-					x = x - width/2;
-				} else if (hAlign == 'right') {
-					x = x - width;
-					//context.translate(-1 * width, 0)
+			context.canvas.__OfficeExcel_originalx__ = x;
+			context.canvas.__OfficeExcel_originaly__ = y;
+			context.translate(x, y);
+			var italic = arguments[13] && arguments[13].italic ? arguments[13].italic : false;
+			var underline = arguments[13] && arguments[13].underline ? arguments[13].underline : false;
+			
+			var ascFont = new Asc.FontProperties(font, size, arguments[11], italic, underline);
+			context.setFont(ascFont);
+		 
+			var width;
+			var textSize;
+			if(typeof text != 'string')
+				text = text.toString();
+			if(text != "")
+				textSize  = context.measureText(text,1);
+			
+
+			// Vertical alignment - defaults to bottom
+			if (arguments[6]) {
+				var vAlign = arguments[6];
+				if(textSize)
+					size1 = textSize.height/0.75;
+				else
+					size1 = size;
+				if (vAlign == 'center') {
+					y = y + size1 / 2;
+					//context.translate(0, size / 2);
+				} else if (vAlign == 'top') {
+					y = y + size1;
+					//context.translate(0, size);
 				}
 			}
-		}
-		if(arguments[13] && arguments[13].color)
-			context.setFillStyle(arguments[13].color);
-		else
-			context.setFillStyle("#000000");
 
-		// Rotate the canvas if need be
-		if (arguments[9] && textSize) {
-			var textOptions = 
+
+			// Hoeizontal alignment - defaults to left
+			if (arguments[7] && textSize) {
+				var hAlign = arguments[7];
+				width = textSize.width/0.75;
+				if (hAlign) {
+					if (hAlign == 'center') {
+						//context.translate(-1 * (width / 2), 0)
+						x = x - width/2;
+					} else if (hAlign == 'right') {
+						x = x - width;
+						//context.translate(-1 * width, 0)
+					}
+				}
+			}
+			if(arguments[13] && arguments[13].color)
+				context.setFillStyle(arguments[13].color);
+			else
+				context.setFillStyle("#000000");
+
+			// Rotate the canvas if need be
+			if (arguments[9] && textSize) {
+				var textOptions = 
+				{
+					font: ascFont,
+					width: textSize.width,
+					height: textSize.height,
+					x: x*0.75,
+					y: y*0.75,
+				};
+				OfficeExcel.drawTurnedText(context,textOptions, text, 90);
+			}
+			
+			if(!arguments[9])
 			{
-				font: ascFont,
-				width: textSize.width,
-				height: textSize.height,
-				x: x*0.75,
-				y: y*0.75,
-			};
-			OfficeExcel.drawTurnedText(context,textOptions, text, 90);
+				 context.fillText(text, x*0.75, y*0.75, undefined, [6.36474609375]);
+				 context.lineWidth = 1;
+			}	
+			 context.restore();
 		}
-		
-		if(!arguments[9])
+		else
 		{
-			 context.fillText(text, x*0.75, y*0.75, undefined, [6.36474609375]);
-			 context.lineWidth = 1;
-		}	
-         context.restore();
+				 /**
+			* This calls the text function recursively to accommodate multi-line text
+			*/
+			
+			if (typeof(text) == 'string' && text.match(/\r\n/)) {
+				
+				var arr = text.split('\r\n');
+
+				text = arr[0];
+				arr = OfficeExcel.array_shift(arr);
+
+				var nextline = arr.join('\r\n')
+
+				OfficeExcel.Text(context, font, size, arguments[9] == -90 ? (x + (size * 1.5)) : x, y + (size * 1.5), nextline, arguments[6] ? arguments[6] : null, 'center', arguments[8], arguments[9], arguments[10], arguments[11], arguments[12]);
+			}
+		
+			// Accommodate MSIE
+			if (OfficeExcel.isOld()) {
+				y += 2;
+			}
+
+
+			context.font = (arguments[11] ? 'Bold ': '') + size + 'pt ' + font;
+
+			var i;
+			var origX = x;
+			var origY = y;
+			var originalFillStyle = context.fillStyle;
+			var originalLineWidth = context.lineWidth;
+
+			// Need these now the angle can be specified, ie defaults for the former two args
+			if (typeof(arguments[6]) == null) arguments[6]  = 'bottom'; // Vertical alignment. Default to bottom/baseline
+			if (typeof(arguments[7]) == null) arguments[7]  = 'left';   // Horizontal alignment. Default to left
+			if (typeof(arguments[8]) == null) arguments[8]  = null;     // Show a bounding box. Useful for positioning during development. Defaults to false
+			if (typeof(arguments[9]) == null) arguments[9]  = 0;        // Angle (IN DEGREES) that the text should be drawn at. 0 is middle right, and it goes clockwise
+			if (typeof(arguments[12]) == null) arguments[12] = true;    // Whether the bounding box has the placement indicator
+
+			// The alignment is recorded here for purposes of Opera compatibility
+			if (navigator.userAgent.indexOf('Opera') != -1) {
+				context.canvas.__OfficeExcel_valign__ = arguments[6];
+				context.canvas.__OfficeExcel_halign__ = arguments[7];
+			}
+
+			// First, translate to x/y coords
+			context.save();
+
+				context.canvas.__OfficeExcel_originalx__ = x;
+				context.canvas.__OfficeExcel_originaly__ = y;
+
+				context.translate(x, y);
+				x = 0;
+				y = 0;
+				
+				// Rotate the canvas if need be
+				if (arguments[9]) {
+					context.rotate(arguments[9] / 57.3);
+				}
+
+				// Vertical alignment - defaults to bottom
+				if (arguments[6]) {
+					var vAlign = arguments[6];
+
+					if (vAlign == 'center') {
+						context.translate(0, size / 2);
+					} else if (vAlign == 'top') {
+						context.translate(0, size);
+					}
+				}
+
+
+				// Hoeizontal alignment - defaults to left
+				if (arguments[7]) {
+					var hAlign = arguments[7];
+					var width  = context.measureText(text).width;
+		
+					if (hAlign) {
+						if (hAlign == 'center') {
+							context.translate(-1 * (width / 2), 0)
+						} else if (hAlign == 'right') {
+							context.translate(-1 * width, 0)
+						}
+					}
+				}
+				
+				
+				context.fillStyle = originalFillStyle;
+
+				/**
+				* Draw a bounding box if requested
+				*/
+				context.save();
+					 context.fillText(text,0,0);
+					 context.lineWidth = 1;
+					
+					if (arguments[8]) {
+
+						var width = context.measureText(text).width;
+						var ieOffset = OfficeExcel.isIE8() ? 2 : 0;
+
+						context.translate(x, y);
+						context.strokeRect(AA(context.canvas.__object__, - 3), AA(context.canvas.__object__, 0 - 3 - size - ieOffset), width + 6, 0 + size + 6);
+
+
+						/**
+						* If requested, draw a background for the text
+						*/
+						if (arguments[10]) {
+			
+							var offset = 3;
+							var ieOffset = OfficeExcel.isIE8() ? 2 : 0;
+							var width = context.measureText(text).width
+
+							//context.strokeStyle = 'gray';
+							context.fillStyle = arguments[10];
+							context.fillRect(AA(context.canvas.__object__, x - offset),
+											 AA(context.canvas.__object__, y - size - offset - ieOffset),
+											 width + (2 * offset),
+											 size + (2 * offset));
+							//context.strokeRect(x - offset, y - size - offset - ieOffset, width + (2 * offset), size + (2 * offset));
+						}
+						
+						/**
+						* Do the actual drawing of the text
+						*/
+						context.fillStyle = originalFillStyle;
+						context.fillText(text,0,0);
+
+						if (arguments[12]) {
+							context.fillRect(
+								arguments[7] == 'left' ? 0 : (arguments[7] == 'center' ? width / 2 : width ) - 2,
+								arguments[6] == 'bottom' ? 0 : (arguments[6] == 'center' ? (0 - size) / 2 : 0 - size) - 2,
+								4,
+								4
+							);
+						}
+					}
+				context.restore();
+				
+				// Reset the lineWidth
+				context.lineWidth = originalLineWidth;
+
+			context.restore();
+		}
     }
 	
 	OfficeExcel.drawTurnedText = function(drawingCtx,textOptions, text, angle)
