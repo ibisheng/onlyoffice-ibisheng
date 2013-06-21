@@ -1112,7 +1112,7 @@
                                     this._otherProps._labels_above_angle,
 									null,
 									bold,
-									options);
+									textOptions);
                       
                         // Turn any shadow back on
                         if (shadow) {
@@ -1360,7 +1360,7 @@
 										null,
 										bold,
 										null,
-										options);
+										textOptions);
 						  
 							// Turn any shadow back on
 							if (shadow) {
