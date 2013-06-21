@@ -1581,7 +1581,7 @@
 					width: textSize.width,
 					height: textSize.height,
 					x: x*0.75,
-					y: y*0.75,
+					y: y*0.75
 				};
 				OfficeExcel.drawTurnedText(context,textOptions, text, 90);
 			}
