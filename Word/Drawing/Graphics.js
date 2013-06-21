@@ -492,6 +492,8 @@ function CGraphics()
     this.GrState.Parent = this;
 
     this.globalAlpha = 1;
+
+    this.TextClipRect = null;
 }
 
 CGraphics.prototype =

@@ -771,6 +771,23 @@ function CDocMeta()
                     g.transform(s.GetDouble(), s.GetDouble(), s.GetDouble(), s.GetDouble(), 0, 0);
                     break;
                 }
+                case 163:
+                {
+                    // text clip rect reset
+                    g.TextClipRect = null;
+                    break;
+                }
+                case 164:
+                {
+                    // text clip rect
+                    g.TextClipRect = {
+                        l : s.GetDouble(),
+                        t : s.GetDouble(),
+                        r : s.GetDouble(),
+                        b : s.GetDouble()
+                    };
+                    break;
+                }
                 default:
                 {
                     s.pos = page.end;
@@ -1099,6 +1116,15 @@ function CDocMeta()
                     s.Skip(16);
                     break;
                 }
+                case 163:
+                {
+                    break;
+                }
+                case 164:
+                {
+                    s.Skip(16);
+                    break;
+                }
                 default:
                 {
                     s.pos = page.end;
@@ -1238,6 +1264,15 @@ function CDocMeta()
                 case 161:
                 {
                     // text transform
+                    s.Skip(16);
+                    break;
+                }
+                case 163:
+                {
+                    break;
+                }
+                case 164:
+                {
                     s.Skip(16);
                     break;
                 }
@@ -1615,6 +1650,15 @@ function CDocMeta()
                     s.Skip(16);
                     break;
                 }
+                case 163:
+                {
+                    break;
+                }
+                case 164:
+                {
+                    s.Skip(16);
+                    break;
+                }
                 default:
                 {
                     s.pos = page.end;
@@ -1927,6 +1971,15 @@ function CDocMeta()
                     s.Skip(16);
                     break;
                 }
+                case 163:
+                {
+                    break;
+                }
+                case 164:
+                {
+                    s.Skip(16);
+                    break;
+                }
                 default:
                 {
                     s.pos = page.end;
@@ -2111,6 +2164,15 @@ function CDocMeta()
                 case 161:
                 {
                     // text transform
+                    s.Skip(16);
+                    break;
+                }
+                case 163:
+                {
+                    break;
+                }
+                case 164:
+                {
                     s.Skip(16);
                     break;
                 }
@@ -2368,6 +2430,15 @@ function CDocMeta()
                 case 161:
                 {
                     // text transform
+                    s.Skip(16);
+                    break;
+                }
+                case 163:
+                {
+                    break;
+                }
+                case 164:
+                {
                     s.Skip(16);
                     break;
                 }
