@@ -1244,7 +1244,7 @@ CGraphics.prototype =
         }
         catch(err)
         {
-    }
+        }
 
         if (false === this.m_bIntegerGrid)
         {
@@ -1459,7 +1459,11 @@ CGraphics.prototype =
         var nY = (this.m_oFontManager.m_oGlyphString.m_fY + pGlyph.fY - pGlyph.oBitmap.nY) >> 0;
 
         pGlyph.oBitmap.oGlyphData.checkColor(this.m_oBrush.Color1.R,this.m_oBrush.Color1.G,this.m_oBrush.Color1.B,nW,nH);
-        pGlyph.oBitmap.draw(this.m_oContext, nX, nY);
+
+        if (null == this.TextClipRect)
+            pGlyph.oBitmap.draw(this.m_oContext, nX, nY, this.TextClipRect);
+        else
+            pGlyph.oBitmap.drawCropInRect(this.m_oContext, nX, nY, this.TextClipRect);
     },
     private_FillGlyphC : function(pGlyph,cropX,cropW)
     {
@@ -2518,5 +2522,15 @@ CGraphics.prototype =
     {
         if (bIsRestore)
             this.RestoreGrState();
+    },
+
+    SetTextClipRect : function(_l, _t, _r, _b)
+    {
+        this.TextClipRect = {
+            l : _l,
+            t : _t,
+            r : _r,
+            b : _b
+        };
     }
 };

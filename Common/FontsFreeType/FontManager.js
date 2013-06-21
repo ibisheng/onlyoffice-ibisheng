@@ -224,6 +224,61 @@ TGlyphBitmap.prototype =
         }
     },
 
+    drawCropInRect : function(context2D, x, y, clipRect)
+    {
+        var _x = x;
+        var _y = y;
+        var _r = x + this.nWidth;
+        var _b = y + this.nHeight;
+
+        var _dstX = 0;
+        var _dstY = 0;
+        var _dstW = this.nWidth;
+        var _dstH = this.nHeight;
+
+        if (_x < clipRect.l)
+        {
+            _dstX = clipRect.l - _x;
+            _x += _dstX;
+            _dstW -= _dstX;
+        }
+        if (_y < clipRect.t)
+        {
+            _dstY = clipRect.t - _y;
+            _y += _dstY;
+            _dstH -= _dstY;
+        }
+        if (_r > clipRect.r)
+        {
+            _dstW -= (_r - clipRect.r);
+        }
+        if (_b > clipRect.b)
+        {
+            _dstH -= (_b - clipRect.b);
+        }
+
+        if (_dstW <= 0 || _dstH <= 0)
+            return;
+
+        if (null != this.oGlyphData.TempImage)
+        {
+            context2D.drawImage(this.oGlyphData.TempImage, _dstX, _dstY, _dstW, _dstH, _x, _y, _dstW, _dstH);
+            this.oGlyphData.TempImage = null;
+        }
+        else if (null != this.oGlyphData.m_oCanvas)
+        {
+            // своя память
+            context2D.drawImage(this.oGlyphData.m_oCanvas, _dstX, _dstY, _dstW, _dstH, _x, _y, _dstW, _dstH);
+        }
+        else
+        {
+            var _raster = this.oGlyphData.RasterData;
+            var __x = _raster.Line.Height * _raster.Index;
+            var __y = _raster.Line.Y;
+            context2D.drawImage(_raster.Chunk.CanvasImage, __x + _dstX, __y + _dstY, _dstW, _dstH, _x, _y, _dstW, _dstH);
+        }
+    },
+
     Free : function()
     {
         if (null != this.oGlyphData.RasterData)

@@ -780,12 +780,7 @@ function CDocMeta()
                 case 164:
                 {
                     // text clip rect
-                    g.TextClipRect = {
-                        l : s.GetDouble(),
-                        t : s.GetDouble(),
-                        r : s.GetDouble(),
-                        b : s.GetDouble()
-                    };
+                    g.SetTextClipRect(s.GetDouble(), s.GetDouble(), s.GetDouble(), s.GetDouble());
                     break;
                 }
                 default:
