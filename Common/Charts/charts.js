@@ -2030,5 +2030,8 @@ function setFontChart(chart)
 		bar._otherProps._text_underline = false;
 		bar._otherProps._text_font = defaultFont;
 		bar._otherProps._text_size = defaultSize;
-	}	
+	}
+	
+	if (chart.worksheet)//выставление контекста для отрисовки
+		bar.drawingCtxCharts = chart.worksheet.getDrawingContextCharts();
 }

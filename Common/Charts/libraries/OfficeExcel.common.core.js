@@ -1,4 +1,4 @@
-    if (typeof(OfficeExcel) == 'undefined') OfficeExcel = {isOfficeExcel:true,type:'common'};
+п»ї    if (typeof(OfficeExcel) == 'undefined') OfficeExcel = {isOfficeExcel:true,type:'common'};
 
     OfficeExcel.Registry       = {};
     OfficeExcel.Registry.store = [];
@@ -84,7 +84,7 @@
                     var newMin = min;
                     var newMax  = max;
                     
-                    //находим максимум после преобразования
+                    //РЅР°С…РѕРґРёРј РјР°РєСЃРёРјСѓРј РїРѕСЃР»Рµ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ
                     if('bar' != mainObj.type)
                     {
                          if(typeof(arrNew[0]) == 'object')
@@ -117,21 +117,21 @@
                     }
                     var massRes = [];
                     
-                    //шаг нужно высчитывать
+                    //С€Р°Рі РЅСѓР¶РЅРѕ РІС‹СЃС‡РёС‚С‹РІР°С‚СЊ
                     var step = 10;
                     if(((newMax - newMin)/10) > 11 )
                         step = 20;
                     if('bar' == mainObj.type  && max > 0 && min < 0)
                         step = 20;
                     var maxValue = 100;
-                    //находим максимум
+                    //РЅР°С…РѕРґРёРј РјР°РєСЃРёРјСѓРј
                     for (var i=0; i < 11; i++) {
                         if(newMax < 100 - step*i && newMax > 100 - step*(i+1))
                             maxValue = 100 - step*i;
                     }
                     if(maxValue > 100)
                         maxValue = 100;
-                    //получаем массив
+                    //РїРѕР»СѓС‡Р°РµРј РјР°СЃСЃРёРІ
                     if(max <= 0 && min < 0)
                     {
                         if('bar' == mainObj.type)
@@ -207,7 +207,7 @@
                 var max1;
                 var arr = [];
 
-                //находим минимальное значение
+                //РЅР°С…РѕРґРёРј РјРёРЅРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ
                 var min;
                 var trueOX = false;
                 if('hbar' == mainObj.type)
@@ -236,7 +236,7 @@
                 }
                 if('scatter' == mainObj.type)
                 {
-                    //в этом случае определяем значения для оси OX(max == true)
+                    //РІ СЌС‚РѕРј СЃР»СѓС‡Р°Рµ РѕРїСЂРµРґРµР»СЏРµРј Р·РЅР°С‡РµРЅРёСЏ РґР»СЏ РѕСЃРё OX(max == true)
                     if(mainObj._otherProps._type == 'burse2')
                     {
                         var arrTemp = []
@@ -333,7 +333,7 @@
 						return [0.2,0.4,0.6,0.8,1,1.2];
 				}
 						
-                //подготовительная работы для дальнейшего вычисления шага
+                //РїРѕРґРіРѕС‚РѕРІРёС‚РµР»СЊРЅР°СЏ СЂР°Р±РѕС‚С‹ РґР»СЏ РґР°Р»СЊРЅРµР№С€РµРіРѕ РІС‹С‡РёСЃР»РµРЅРёСЏ С€Р°РіР°
                 if(max >= 0 && min >= 0)
                 {
                      if(max == min)
@@ -436,7 +436,7 @@
                 
                 
                 
-                //приводим к первому порядку для дальнейших вычислений
+                //РїСЂРёРІРѕРґРёРј Рє РїРµСЂРІРѕРјСѓ РїРѕСЂСЏРґРєСѓ РґР»СЏ РґР°Р»СЊРЅРµР№С€РёС… РІС‹С‡РёСЃР»РµРЅРёР№
                 var secPart = max.toString().split('.');
                 var numPow = 1;
                 if(0 != secPart[0])
@@ -479,7 +479,7 @@
                 }
                 
                 
-                //поиск шага
+                //РїРѕРёСЃРє С€Р°РіР°
                 if(undefined != greaterNull)
                 {
                      var greaterNullTemp = greaterNull.toString().split('.');
@@ -517,11 +517,11 @@
                 }
                 
                 arr[0] = 0;arr[1] = 1;arr[2] = 2;arr[3] = 5;arr[4] = 10;
-                //если максимальное значение больше числа из данного массива, меняем диапазон по оси OY
+                //РµСЃР»Рё РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ Р±РѕР»СЊС€Рµ С‡РёСЃР»Р° РёР· РґР°РЅРЅРѕРіРѕ РјР°СЃСЃРёРІР°, РјРµРЅСЏРµРј РґРёР°РїР°Р·РѕРЅ РїРѕ РѕСЃРё OY
                 var arrMaxVal = [0,0.952380952,1.904761904,4.76190476,9.523809523]
-                //массив диапазонов
+                //РјР°СЃСЃРёРІ РґРёР°РїР°Р·РѕРЅРѕРІ
                 var arrDiffVal1 = [0,0.2,0.5,1,2]
-                if(axisXMin == 0 && undefined == greaterNull)//если разница между min и max такая, что не нужно масштабировать
+                if(axisXMin == 0 && undefined == greaterNull)//РµСЃР»Рё СЂР°Р·РЅРёС†Р° РјРµР¶РґСѓ min Рё max С‚Р°РєР°СЏ, С‡С‚Рѕ РЅРµ РЅСѓР¶РЅРѕ РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°С‚СЊ
                 {
                     for (var i=0; i<arr.length; i++) {
                         if( max >= arr[i] && max <= arr[i+1])
@@ -531,7 +531,7 @@
                             var diff = max1/10;
                             var trueDiff = diff;
                             var maxVal;
-                            //проверяем есть ли переход в следующий диапазон
+                            //РїСЂРѕРІРµСЂСЏРµРј РµСЃС‚СЊ Р»Рё РїРµСЂРµС…РѕРґ РІ СЃР»РµРґСѓСЋС‰РёР№ РґРёР°РїР°Р·РѕРЅ
                             if(max > arrMaxVal[i+1])
                             {
                                 trueDiff = arrDiffVal1[i+1]
@@ -559,7 +559,7 @@
                     }
                 }
                 
-                //находим истинные min и max
+                //РЅР°С…РѕРґРёРј РёСЃС‚РёРЅРЅС‹Рµ min Рё max
                 var testDiff;
                 var axisXMinTest;
                 if(axisXMin == 0)
@@ -599,7 +599,7 @@
                 
                 
                 
-                //возвращаем массив
+                //РІРѕР·РІСЂР°С‰Р°РµРј РјР°СЃСЃРёРІ
                 var varMin = axisXMinTest*numPowOY;
                 var massRes = [];
                 var tempKoff = 100000000000;
@@ -765,14 +765,14 @@
             {
                 var max1;
                 var arr = [];
-                //находим минимальное значение
+                //РЅР°С…РѕРґРёРј РјРёРЅРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ
                 var min;
                 var max;
                 if('bar' == mainObj.type || 'hbar' == mainObj.type || 'radar' == mainObj.type)
                 {
                     if(mainObj._otherProps._type == 'accumulative')
                     {
-                        //суммируем отрицательные и положительные значения
+                        //СЃСѓРјРјРёСЂСѓРµРј РѕС‚СЂРёС†Р°С‚РµР»СЊРЅС‹Рµ Рё РїРѕР»РѕР¶РёС‚РµР»СЊРЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ
                         if(typeof(mainObj.data[0]) == 'object')
                         {
                             var arrMin = [];
@@ -932,7 +932,7 @@
                 
                 
                 
-                //приведение к первому порядку для дальнейших вычислений
+                //РїСЂРёРІРµРґРµРЅРёРµ Рє РїРµСЂРІРѕРјСѓ РїРѕСЂСЏРґРєСѓ РґР»СЏ РґР°Р»СЊРЅРµР№С€РёС… РІС‹С‡РёСЃР»РµРЅРёР№
                 var secPart = max.toString().split('.');
                 var numPow = 1;
                 if(0 != secPart[0])
@@ -977,7 +977,7 @@
                 }
                 
                 
-                //поиск шага
+                //РїРѕРёСЃРє С€Р°РіР°
                 if(undefined != greaterNull)
                 {
                      var greaterNullTemp = greaterNull.toString().split('.');
@@ -1010,11 +1010,11 @@
                 }
                 
                 arr[0] = 0;arr[1] = 1;arr[2] = 2;arr[3] = 5;arr[4] = 10;
-                //если максимальное значение больше числа из данного массива, меняем диапазон по оси OY
+                //РµСЃР»Рё РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ Р±РѕР»СЊС€Рµ С‡РёСЃР»Р° РёР· РґР°РЅРЅРѕРіРѕ РјР°СЃСЃРёРІР°, РјРµРЅСЏРµРј РґРёР°РїР°Р·РѕРЅ РїРѕ РѕСЃРё OY
                 var arrMaxVal = [0,0.952380952,1.904761904,4.76190476,9.523809523]
-                //массив диапазонов
+                //РјР°СЃСЃРёРІ РґРёР°РїР°Р·РѕРЅРѕРІ
                 var arrDiffVal1 = [0,0.2,0.5,1,2]
-                if(axisXMin == 0)//если разница между min и max такая, что не нужно масштабировать
+                if(axisXMin == 0)//РµСЃР»Рё СЂР°Р·РЅРёС†Р° РјРµР¶РґСѓ min Рё max С‚Р°РєР°СЏ, С‡С‚Рѕ РЅРµ РЅСѓР¶РЅРѕ РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°С‚СЊ
                 {
                     for (var i=0; i<arr.length; i++) {
                         if( max >= arr[i] && max <= arr[i+1])
@@ -1024,7 +1024,7 @@
                             var diff = max1/10;
                             var trueDiff = diff;
                             var maxVal;
-                            //проверяем есть ли переход в следующий диапазон
+                            //РїСЂРѕРІРµСЂСЏРµРј РµСЃС‚СЊ Р»Рё РїРµСЂРµС…РѕРґ РІ СЃР»РµРґСѓСЋС‰РёР№ РґРёР°РїР°Р·РѕРЅ
                             if(max > arrMaxVal[i+1])
                             {
                                 trueDiff = arrDiffVal1[i+1]
@@ -1038,7 +1038,7 @@
                 
                 
                 
-                //находим истинные min и max
+                //РЅР°С…РѕРґРёРј РёСЃС‚РёРЅРЅС‹Рµ min Рё max
                 var testDiff;
                 var axisXMinTest;
                 if(axisXMin == 0)
@@ -1106,7 +1106,7 @@
                 
                 
                 
-                //возвращаем массив
+                //РІРѕР·РІСЂР°С‰Р°РµРј РјР°СЃСЃРёРІ
                 var varMin = axisXMinTest*numPowOY;
                 var massRes = [];
                 
@@ -1496,44 +1496,13 @@
     * @param bool           Whether the text is bold or not
     * @param bool           Whether the bounding box has a placement indicator
     */
-	
-	OfficeExcel.getFmgrGraphics = function()
-	{
-		if(!this.fmgrGraphics)
-		{
-			if(!OfficeExcel.fontManager)
-				OfficeExcel.fontManager = new CFontManager();
-			
-			this.fmgrGraphics = [];	
-			this.fmgrGraphics.push(OfficeExcel.fontManager);	
-			this.fmgrGraphics.push(OfficeExcel.fontManager);
-			
-			this.fmgrGraphics[0].Initialize(true); 
-			this.fmgrGraphics[1].Initialize(true);
-		}
-	}
-	
-	OfficeExcel.getDrwContext = function(canvas)
-	{
-		if(!this.fmgrGraphics && Asc.DrawingContext)
-		{
-			this.getFmgrGraphics();
-			this.drwContext =  Asc.DrawingContext({canvas: canvas, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics});
-		}
-		else if(!this.drwContext && Asc.DrawingContext)
-			this.drwContext =  Asc.DrawingContext({canvas: canvas, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics});
-		else if(Asc.DrawingContext)//здесь должна быть передача canvas(setCanvas) 
-			this.drwContext =  Asc.DrawingContext({canvas: canvas, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics});
-		else
-			return false;
-		return this.drwContext;
-	}
-	
 	OfficeExcel.Text = function (context, font, size, x, y, text)
-    {		
-		var drwContext = OfficeExcel.getDrwContext(bar.canvas);
+    {
+		var drwContext = bar.drawingCtxCharts;
 		if(drwContext)
 		{
+			drwContext.setCanvas(bar.canvas);
+
 			context = drwContext;
 			 // Need these now the angle can be specified, ie defaults for the former two args
 			if (typeof(arguments[6]) == null) arguments[6]  = 'bottom'; // Vertical alignment. Default to bottom/baseline

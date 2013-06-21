@@ -83,6 +83,7 @@
 			this.drawingCtx = undefined;
 			this.overlayCtx = undefined;
 			this.stringRender = undefined;
+			this.drawingCtxCharts = undefined;
 
 			this.emSize = 0;
 			this.defaultFont = new asc_FP(this.model.getDefaultFont(), this.model.getDefaultSize());
@@ -128,6 +129,8 @@
 				this.buffers.overlay	= asc_DC({canvas: this.canvasOverlay[0],	units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics});
 				this.drawingCtx			= this.buffers.main;
 				this.overlayCtx			= this.buffers.overlay;
+
+				this.drawingCtxCharts	= asc_DC({units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics});
 
 				this.stringRender		= asc_SR(this.buffers.main);
 				this.stringRender.setDefaultFont(this.defaultFont);
@@ -326,7 +329,8 @@
 								"slowOperation"			: function (isStart) {self.handlers.trigger((isStart ? "asc_onStartAction" : "asc_onEndAction"), c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.SlowOperation);},
 								"setFocusDrawingObject" : function (isFocusDrawingObject) { self.controller.setFocusDrawingObject(isFocusDrawingObject); },
 								"setAutoFiltersDialog"  : function (arrVal) {self.handlers.trigger("asc_onSetAFDialog", arrVal);},
-								"selectionRangeChanged"	: function (val) {self.handlers.trigger("asc_onSelectionRangeChanged", val);}
+								"selectionRangeChanged"	: function (val) {self.handlers.trigger("asc_onSelectionRangeChanged", val);},
+								"getDCForCharts"		: function () { return self.drawingCtxCharts; }
 							});
 				return new asc_WSV(wsModel, this.buffers, this.stringRender, this.emSize, this.collaborativeEditing, opt);
 			},
@@ -997,6 +1001,8 @@
 
 				this.buffers.main.changeZoom(factor);
 				this.buffers.overlay.changeZoom(factor);
+
+				this.drawingCtxCharts.changeZoom(factor);
 
 				var item;
 				var activeIndex = this.model.getActive();

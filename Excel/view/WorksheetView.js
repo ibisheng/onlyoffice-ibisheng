@@ -1024,6 +1024,11 @@
 				}
 			},
 
+			// ToDo переделать на полную отрисовку на нашем контексте
+			getDrawingContextCharts: function () {
+				return this._trigger("getDCForCharts");
+			},
+
 
 			// ----- Initialization -----
 

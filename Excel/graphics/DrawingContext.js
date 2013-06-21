@@ -501,13 +501,8 @@ function DrawingContext(settings) {
 		return new DrawingContext(settings);
 	}
 
-	var c = settings !== undefined && settings.canvas !== undefined ? settings.canvas : null;
-	if (c === null) {return null;}
-	this.canvas = $(c);
-	this.ctx = c.getContext("2d");
-	if (this.ctx.mozImageSmoothingEnabled) {
-		this.ctx.mozImageSmoothingEnabled = false;
-	}
+	if (undefined !== settings)
+		this.setCanvas(settings.canvas);
 
 	var ppiTest =
 			$('<div style="position: absolute; width: 10in; height:10in; visibility:hidden; padding:0;"/>')
@@ -571,6 +566,20 @@ DrawingContext.prototype = {
 	 */
 	getCanvas: function () {
 		return this.canvas[0];
+	},
+
+	/**
+	 *
+	 * @param canvas
+	 */
+	setCanvas: function (canvas) {
+		var c = canvas !== undefined ? canvas : null;
+		if (c === null) {return;}
+		this.canvas = $(c);
+		this.ctx = c.getContext("2d");
+		if (this.ctx.mozImageSmoothingEnabled) {
+			this.ctx.mozImageSmoothingEnabled = false;
+		}
 	},
 
 	/**
