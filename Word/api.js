@@ -6190,6 +6190,7 @@ function spellCheck (editor, rdata) {
 	// ToDo проверка на подключение
 	switch (rdata.type) {
 		case "spell":
+		case "suggest":
 			editor.SpellCheckApi.spellCheck(JSON.stringify(rdata));
 			break;
 	}
