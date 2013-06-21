@@ -78,6 +78,9 @@
         // Мы сами отключились от совместного редактирования
 		this.isCloseCoAuthoring = false;
 
+		// Массив данных, который стоит отправить как только подключимся
+		this.dataNeedSend = [];
+
 		this._url = "";
     };
 
@@ -107,9 +110,17 @@
         if (data !== null && typeof data === "object") {
             if (this._state > 0) {
                 this.sockjs.send(JSON.stringify(data));
-            }
+            } else {
+				this.dataNeedSend.push(data);
+			}
         }
     };
+
+	SpellCheckApi.prototype._sendAfterConnect = function () {
+		var data;
+		while (this._state > 0 && undefined !== (data = this.dataNeedSend.shift()))
+			this._send(data);
+	};
 
 	SpellCheckApi.prototype._onSpellCheck = function (data) {
 		if (undefined !== data["spellCheckData"] && this.onSpellCheck)
@@ -130,6 +141,9 @@
             if (docsCoApi.onConnect) {
                 docsCoApi.onConnect();
             }
+
+			// Отправляем все данные, которые пришли до соединения с сервером
+			docsCoApi._sendAfterConnect();
         };
 
         sockjs.onmessage = function (e) {
