@@ -70,8 +70,8 @@ JSCompiler_StaticMethods_RecalculateNumbering:XB
 CHyperlinkProperty:AD
 CStatistics:pE
 EndArrow:Cf
-ret$$inline_418:tm
 TT_HoriHeader:Bj
+ret$$inline_419:tm
 CFont:Xd
 JSCompiler_StaticMethods_HorLine:$z
 g_mouse_event_type_move:ez
@@ -150,7 +150,7 @@ X_Left_Margin:Ib
 L 3:d
 ParaEmpty:zy
 L 9:u
-L 8:p
+L 8:m
 L 7:k
 L 6:h
 historyitem_TextPr_Unifill:my
@@ -194,7 +194,7 @@ _iup_worker_interpolate:Lq
 historyitem_type_AbstractNum:Sw
 highlight_None:Ob
 tt_cmap4_char_next:Dn
-JSCompiler_alias_TRUE:m
+JSCompiler_alias_TRUE:p
 JSCompiler_StaticMethods_Set_TableW:dB
 fntStyleInd_none:II
 tt_face_load_font_dir:Cm
@@ -402,7 +402,7 @@ CThemeLoadInfo:We
 align_Center:eb
 t1operator_seac:am
 historyitem_TableCell_Border_Top:bC
-_parser_funcs$$inline_412:pm
+_parser_funcs$$inline_413:pm
 ft_char_table:bl
 FT_Load_Glyph:fv
 CDocumentShd:Gc
@@ -675,6 +675,7 @@ c_oAscServerError$TaskQueue:he
 CSolidFill:bf
 changestype_2_InlineObjectMove:sA
 FT_CharMapRec:Sj
+_files$$inline_1000:Q
 JSCompiler_StaticMethods_Set_DocumentOrientation:cF
 CBodyPr:eg
 ParaNewLineRendered:wy
@@ -951,7 +952,7 @@ CTextProp:WL
 _weight_tbl:ZJ
 TYPE_TRACK_GROUP_PASSIVE:wH
 Load_SBit_Range_Codes:cn
-_cmap_classes$$inline_416:sm
+_cmap_classes$$inline_417:sm
 CCacheImage:eI
 JSCompiler_StaticMethods_Style_Add:sd
 cff_parse_fixed_scaled:Ds
@@ -1091,8 +1092,8 @@ t1_cmap_std_char_index:wl
 FT_GlyphLoader_Rewind:Oi
 JSCompiler_StaticMethods_Read_Lvl_FromBinary:jG
 JSCompiler_StaticMethods_Add_PresentationNumbering:xD
-_decoder_funcs$$inline_414:rm
 PARRUN_TYPE_BR:yg
+_decoder_funcs$$inline_415:rm
 _weight_subTitle:YJ
 ShapeAddState:OE
 tt_service_truetype_glyf:Pr
@@ -1289,7 +1290,7 @@ c_oAscServerError$UploadContentLength:we
 c_oAscServerError$VKeyUserCountExceed:Ce
 ft_extra_glyph_unicodes:vk
 FT_Matrix:Ji
-_builder_funcs$$inline_413:qm
+_builder_funcs$$inline_414:qm
 cos:yG
 FT_CMap_New:Ko
 TRACK_DISTANCE_ROTATE:aG
@@ -1318,7 +1319,6 @@ c_oMainTables$App:Bg
 c_oAscError$ID$UplImageSize:GK
 Direct_Move_Orig:jq
 TT_Round_Off:xp
-_files$$inline_999:Q
 LineEndSize$Large:FI
 JSCompiler_StaticMethods_parse_para_TextPr:nb
 check_type1_format:pu
@@ -1485,6 +1485,7 @@ historyitem_type_HdrFtr:Rw
 FT_FACE_FIND_SERVICE:xh
 Path:OG
 TT_CMap12Rec:Kn
+_infos$$inline_1001:R
 AFM_GETC:hl
 JSCompiler_StaticMethods_Get_CellSpacing:jA
 UniNvPr:Wf
@@ -1690,7 +1691,6 @@ LineEndType$Oval:VH
 historyitem_TextPr_Change:ny
 CParagraphPropEx:VL
 tt_cmap14_done:Xn
-_infos$$inline_1000:R
 CVerRulerRepaintChecker:Qz
 CFF_Decoder:Ht
 tt_face_load_generic_header:Em
@@ -1931,8 +1931,8 @@ FT_Module:ek
 numbering_numfmt_UpperRoman:Ra
 CTablePositionH:PL
 min:HG
+xhrSupported$$inline_991:Xv
 ps_parser_load_field:Pl
-xhrSupported$$inline_990:Xv
 ArcToOnCanvas:XF
 PARRUN_TYPE_RUN:vg
 CFF_EncodingRec:os
