@@ -669,7 +669,7 @@ _func.binarySearch = function(sElem, arrTagert, regExp){
 };
 
 /*Functions that checks of an element in formula*/
-var rx_operators = new RegExp("^ *[-+*/^&%<=>:]"),
+var rx_operators = new RegExp("^ *[-+*/^&%<=>:] *"),
 	rx_LG = new RegExp("^ *[<=>]+ *"),
 	rx_Lt = new RegExp("^ *< *"),
 	rx_Le = new RegExp("^ *<= *"),
@@ -2305,6 +2305,115 @@ var cFormulaFunction = {
         'WORKDAY' : function(){
             var r = new cBaseFunction();
             r.setName("WORKDAY");
+			r.setArgumentsMin(2);
+            r.setArgumentsMax(3);
+			r.Calculate = function(arg){
+				var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arrDateIncl = [];
+
+				if ( arg0 instanceof cArea || arg0 instanceof cArea3D ){
+					arg0 = arg0.cross(arguments[1].first);
+				}
+				else if( arg0 instanceof cArray ){
+					arg0 = arg0.getElementRowCol(0,0);
+				}
+
+				if ( arg1 instanceof cArea || arg1 instanceof cArea3D ){
+					arg1 = arg1.cross(arguments[1].first);
+				}
+				else if( arg1 instanceof cArray ){
+					arg1 = arg1.getElementRowCol(0,0);
+				}
+
+				arg0 = arg0.tocNumber();
+				arg1 = arg1.tocNumber();
+
+				if( arg0 instanceof cError) return this.value = arg0;
+				if( arg1 instanceof cError) return this.value = arg1;
+
+				var val0 = arg0.getValue(), val1 = arg1.getValue(),  holidays = []
+
+				if(val0 < 0)
+					return this.setCA(new cError( cErrorType.not_numeric ),true);
+				else if(!g_bDate1904){
+					if( val0 < 60 )
+						val0 = new Date((val0-c_DateCorrectConst)*c_msPerDay);
+					else if( val0 == 60 )
+						val0 = new Date((val0-c_DateCorrectConst-1)*c_msPerDay);
+					else
+						val0 = new Date((val0-c_DateCorrectConst-1)*c_msPerDay);
+				}
+				else
+					val0 = new Date((val0-c_DateCorrectConst)*c_msPerDay);
+
+				if( arg2 ){
+					if( arg2 instanceof cArea || arg2 instanceof cArea3D ){
+						var arr = arg2.getValue();
+						for(var i = 0; i < arr.length; i++){
+							if( arr[i] instanceof cNumber && arr[i].getValue() >= 0 ){
+								holidays.push(arr[i]);
+							}
+						}
+					}
+					else if( arg2 instanceof cArray ){
+						arg2.foreach(function(elem,r,c){
+							if( elem instanceof cNumber ){
+								holidays.push(elem);
+							}
+							else if( elem instanceof cString ){
+								var res = g_oFormatParser.parse(elem.getValue());
+								if( res && res.bDateTime && res.value >= 0 )
+									holidays.push( new cNumber(parseInt(res.value)) );
+							}
+						})
+					}
+				}
+
+				for(var i = 0; i < holidays.length; i++ ){
+					if(!g_bDate1904){
+						if( holidays[i].getValue() < 60 )
+							holidays[i] = new Date((holidays[i].getValue()-c_DateCorrectConst)*c_msPerDay);
+						else if( holidays[i] == 60 )
+							holidays[i] = new Date((holidays[i].getValue()-c_DateCorrectConst-1)*c_msPerDay);
+						else
+							holidays[i] = new Date((holidays[i].getValue()-c_DateCorrectConst-1)*c_msPerDay);
+					}
+					else
+						holidays[i] = new Date((holidays[i].getValue()-c_DateCorrectConst)*c_msPerDay);
+				}
+
+				function notAHolidays(date){
+					for(var i = 0; i < holidays.length; i++ ){
+						if( date.getTime() == holidays[i].getTime() )
+							return false;
+					}
+					return true;
+				}
+
+				var dif = arg1.getValue(), count = 1, dif1 = dif>0?1:dif<0?-1:0, val, date = val0;
+				while( Math.abs(dif) > count ){
+					date = new Date( val0.getTime() + dif1*c_msPerDay );
+					if( date.getDay() != 6 && date.getDay() != 0 && notAHolidays(date) )
+						count++;
+					dif>=0?dif1++:dif1--;
+				}
+				date = new Date( val0.getTime() + dif1*c_msPerDay );
+				val = parseInt(( date.getTime()/1000 - date.getTimezoneOffset()*60 )/c_sPerDay+( c_DateCorrectConst + (g_bDate1904?0:1) ));
+				
+				if( val < 0 )
+					return this.setCA(new cError( cErrorType.not_numeric ),true);
+					
+				if( arguments[1].getNumFormatStr().toLowerCase() === "general" )
+					return this.setCA( new cNumber( val ) ,true,14);
+				else
+					return this.setCA( new cNumber( val ) ,true);
+			}
+			r.getInfo = function(){
+                return {
+                    name:this.name,
+                    args:"( start-date , day-offset [ , holidays ] )"
+                };
+            }
+			// r.setFormat(r.formatType.noneFormat);
 			return r;
         },
         'WORKDAY.INTL' : function(){
@@ -4287,7 +4396,7 @@ var cFormulaFunction = {
 								min = Math.min( min , cv );
 								if( arg3.value == false )
 									return true;
-						}
+							}
 						}
 					};
 
@@ -6372,6 +6481,142 @@ var cFormulaFunction = {
         'SUMIF' : function(){
             var r = new cBaseFunction();
             r.setName("SUMIF");
+			r.setArgumentsMin(2);
+            r.setArgumentsMax(3);
+			r.Calculate = function(arg){
+				var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : arg[0], _count = 0, valueForSearching, regexpSearch;
+				if( !(arg0 instanceof cRef || arg0 instanceof cRef3D || arg0 instanceof cArea) ){
+					return this.value = new cError( cErrorType.wrong_value_type );
+				}
+				
+				if( !(arg2 instanceof cRef || arg2 instanceof cRef3D || arg2 instanceof cArea) ){
+					return this.value = new cError( cErrorType.wrong_value_type );
+				}
+
+                if ( arg1 instanceof cArea || arg1 instanceof cArea3D ){
+					arg1 = arg1.cross(arguments[1].first);
+				}
+				else if( arg1 instanceof cArray ){
+					arg1 = arg1.getElementRowCol(0,0);
+				}
+
+				arg1 = arg1.tocString();
+
+				if( !(arg1 instanceof cString) ){
+					return this.value = new cError( cErrorType.wrong_value_type );
+				}
+
+				function matching(x, y, oper, startCell, pos){
+					var res = false;
+					if( typeof x === typeof y ){
+						switch(oper){
+							case "<>":
+								res = (x.value != y.value);
+								break;
+							case ">":
+								res = (x.value > y.value);
+								break;
+							case "<":
+								res = (x.value < y.value);
+								break;
+							case ">=":
+								res = (x.value >= y.value);
+								break;
+							case "<=":
+								res = (x.value <= y.value);
+								break;
+							case "=":
+							default:
+								res = (x.value == y.value);
+								break;
+						}
+					}
+					return res;
+				}
+
+				arg1 = arg1.toString();
+				var operators = new RegExp("^ *[<=> ]+ *"), searchOperators = new RegExp("^ *[*?]")
+				var match = arg1.match(operators);
+				if( match || parseNum(arg1) ){
+
+					var search, oper, val, calcVal;
+					if( match ){
+						search = arg1.substr( match[0].length );
+						oper = match[0].replace(/\s/g,"");
+					}
+					else{
+						search = arg1;
+					}
+					valueForSearching = parseNum( search ) ? new cNumber( search ) : new cString( search );
+					if( arg0 instanceof cArea ){
+						val = arg0.getValue();
+						for( var i = 0; i < val.length; i++ ){
+							if( matching( val[i], valueForSearching, oper) ){
+								var r = arg0.getRange(), ws = arg0.getWS(),
+									r1 = r.first.getRow0() + i, c1 =  arg2.getRange().first.getCol0();
+								r = new cRef(ws.getRange3( r1, c1, r1, c1).getName(),ws);
+								if( r.getValue() instanceof cNumber ){
+									_count += r.getValue().getValue();
+								}
+							}
+						}
+					}
+					else{
+						val = arg0.getValue();
+						if( matching( val, valueForSearching, oper) ){
+							var r = arg0.getRange(), ws = arg0.getWS(),
+								r1 = r.first.getRow0() + 0, c1 =  arg2.getRange().first.getCol0();
+							r = new cRef(ws.getRange3( r1, c1, r1, c1).getName(),ws);
+							if( r.getValue() instanceof cNumber ){
+								_count += r.getValue().getValue();
+							}
+						}
+					}
+				}
+				else{
+					valueForSearching = arg1
+											.replace(/(~)?\*/g, function($0, $1){
+												return $1 ? $0 : '[\\w\\W]*';
+											})
+											.replace(/(~)?\?/g, function($0, $1){
+												return $1 ? $0 : '[\\w\\W]{1,1}';
+											})
+											.replace(/\~/g, "\\");
+					regexpSearch = new RegExp(valueForSearching+"$","i");
+					if( arg0 instanceof cArea ){
+						val = arg0.getValue();
+						for( var i = 0; i < val.length; i++ ){
+							if( regexpSearch.test(val[i].value) ){
+								var r = arg0.getRange(), ws = arg0.getWS(),
+									r1 = r.first.getRow0() + i, c1 =  arg2.getRange().first.getCol0();
+								r = new cRef(ws.getRange3( r1, c1, r1, c1).getName(),ws);
+								if( r.getValue() instanceof cNumber ){
+									_count += r.getValue().getValue();
+								}
+							}
+						}
+					}
+					else{
+						val = arg0.getValue();
+						if( regexpSearch.test(val.value) ){
+							var r = arg0.getRange(), ws = arg0.getWS(),
+								r1 = r.first.getRow0() + 0, c1 =  arg2.getRange().first.getCol0();
+							r = new cRef(ws.getRange3( r1, c1, r1, c1).getName(),ws);
+							if( r.getValue() instanceof cNumber ){
+								_count += r.getValue().getValue();
+							}
+						}
+					}
+				}
+
+				return this.value = new cNumber(_count);
+			}
+			r.getInfo = function(){
+                return {
+                    name:this.name,
+                    args:"( cell-range, selection-criteria )"
+                };
+            }
         	return r;
 		},
         'SUMIFS' : function(){
@@ -6656,10 +6901,11 @@ var cFormulaFunction = {
 		},
         'COUNTIF' : function(){
             var r = new cBaseFunction();
+			r.setName("COUNTIF");
 			r.setArgumentsMin(2);
             r.setArgumentsMax(2);
 			r.Calculate = function(arg){
-				var arg0 = arg[0], arg1 = arg[1], _count = 0, valueForSearching, regexpSearch, a;
+				var arg0 = arg[0], arg1 = arg[1], _count = 0, valueForSearching, regexpSearch;
 				if( !(arg0 instanceof cRef || arg0 instanceof cRef3D || arg0 instanceof cArea || arg0 instanceof cArea3D) ){
 					return this.value = new cError( cErrorType.wrong_value_type );
 				}
@@ -6752,9 +6998,7 @@ var cFormulaFunction = {
 						if( arg0 instanceof cArea ){
 							val = arg0.getValue();
 							for( var i = 0; i < val.length; i++ ){
-								a = regexpSearch.test(val[i].value)
-								console.log(""+i+" "+a)
-								_count += a;
+								_count += regexpSearch.test(val[i].value);
 							}
 						}
 						else if( arg0 instanceof cArea3D ){
@@ -6774,7 +7018,6 @@ var cFormulaFunction = {
 
 				return this.value = new cNumber(_count);
 			}
-            r.setName("COUNTIF");
 			r.getInfo = function(){
                 return {
                     name:this.name,
@@ -8533,10 +8776,10 @@ var cFormulaFunction = {
 					arg1 = arg1.getElementRowCol(0,0);
 				}
 
+				arg1 = arg1.tocString();
+
 				if ( arg0 instanceof cError )	return this.value = arg0;
                 if ( arg1 instanceof cError )	return this.value = arg1;
-
-				arg0 = arg0.tocString();
 
 				var _tmp = arg0.tocNumber();
 				if( _tmp instanceof cNumber )
@@ -8609,9 +8852,10 @@ var cFormulaFunction = {
                 if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
 					arg0 = arg0.cross(arguments[1].first);
 				}
-                arg0 = arg0.tocString();
 				if( arg0 instanceof cArray )
 					arg0 = arg0.getElementRowCol(0,0);
+                
+				arg0 = arg0.tocString();
 
                 if( arg0 instanceof cError ) return this.value = arg0;
                 return this.value = new cString( arg0.getValue().toUpperCase() );
