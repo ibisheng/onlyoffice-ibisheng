@@ -1,4 +1,4 @@
-    if (typeof(OfficeExcel) == 'undefined') OfficeExcel = {};
+п»ї    if (typeof(OfficeExcel) == 'undefined') OfficeExcel = {};
 
     /**
     * The bar chart constructor
@@ -312,7 +312,7 @@
         // Draw the X axis
 		if('auto' == this._otherProps._ylabels_count)
 		{
-			//определяем куда ставить ось
+			//РѕРїСЂРµРґРµР»СЏРµРј РєСѓРґР° СЃС‚Р°РІРёС‚СЊ РѕСЃСЊ
 			var numNull = this._otherProps._background_grid_autofit_numhlines;
 			var arrTemp = []
 			
@@ -1225,7 +1225,7 @@
                         {
                             individualBarWidth = ((width) - (2 * hmargin));
                             startX = hmargin + i*2*hmargin + (i * individualBarWidth) + this._chartGutter._left;
-                            //считаем общую высоту
+                            //СЃС‡РёС‚Р°РµРј РѕР±С‰СѓСЋ РІС‹СЃРѕС‚Сѓ
                             var allHeight = 0;
                             var allHeightAbNull = 0;
                             var allHeightLessNull = 0;
@@ -1547,7 +1547,7 @@
 			{
 				color: this._otherProps._ylabels_color,
 				italic: this._otherProps._ylabels_italic,
-				underline: this._otherProps._ylabels_underline,
+				underline: this._otherProps._ylabels_underline
 			}
 
             if (this._otherProps._ylabels_inside == true) {
