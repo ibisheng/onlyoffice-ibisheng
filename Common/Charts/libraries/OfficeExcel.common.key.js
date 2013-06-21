@@ -62,7 +62,7 @@
         var canvas      = obj.canvas;
         var context     = obj.context;
         var text_size   = typeof(obj._otherProps._key_text_size) == 'number' ? obj._otherProps._key_text_size : obj._otherProps._text_size;
-        var text_font   = obj._otherProps._text_font;
+        var text_font   = obj._otherProps._key_text_font;
         
         var gutterLeft   = obj._chartGutter._left;
         var gutterRight  = obj._chartGutter._right;

@@ -1,5 +1,4 @@
-﻿
-var bar;
+﻿var bar;
 var chartCanvas = null;
 var g_bChartPreview = false;
 
@@ -373,26 +372,6 @@ function OnFormatText(command) {
 //-----------------------------------------------------------------------------------
 
 function calcGutter(axis,min,max,ymin,ymax,isSkip,isFormatCell) {
-	/*if (typeof (bar.data[0]) == 'object') {
-		var arrMin = [];
-		var arrMax = [];
-		for (var j = 0; j < bar.data.length; j++) {
-			min = Math.min.apply(null, bar.data[j]);
-			max = Math.max.apply(null, bar.data[j]);
-			arrMin[j] = min;
-			arrMax[j] = max;
-		}
-		var min = Math.min.apply(null, arrMin);
-		var max = Math.max.apply(null, arrMax);
-	}
-	else {
-		var min = Math.min.apply(null, bar.data);
-		var max = Math.max.apply(null, bar.data);
-	}
-	if(isNaN(min) && isNaN(min))
-	{
-		min = 0;max = 0;
-	}*/
 	var scale = bar.scale
 	if(undefined == scale)
 		scale = [max, min]
@@ -516,7 +495,7 @@ function calcWidthGraph() {
 
 }
 
-function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY) {
+function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY, chart) {
 	if (typeof (bar.data[0]) == 'object') {
 		var arrMin = [];
 		var arrMax = [];
@@ -541,19 +520,51 @@ function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY) {
 	
 	var left = 0;
 	var standartMargin = 14;
-	bar.context.font = '13px Arial'
+	bar.context.font = '13px Arial';
 	
-	if(bar.scale != undefined && bar.scale[bar.scale.length -1] != undefined && bar._otherProps._ylabels != false)
+	//для определении ширины текста(подписи оси OY), необходимо получить scale
+	var tempScale;
+	if(!bar.scale && bar.type != "pie")
+	{
+		if(bar.type == 'hbar' && bar._otherProps._autoGrouping == 'stackedPer')
+		{
+			for (i=0; i<bar.data.length; ++i) {
+				if (typeof(bar.data[i]) == 'object') {
+					var value = Number(OfficeExcel.array_max(bar.data[i], true));
+				} else {
+					var value = Number(Math.abs(bar.data[i]));
+				}
+
+				bar.max = Math.max(Math.abs(bar.max), Math.abs(value));
+			}
+
+			tempScale = OfficeExcel.getScale(bar.max);
+		}
+		else
+			tempScale = OfficeExcel.getScale(Math.abs(parseFloat(chart.max)),bar,chart.min,chart.max);
+		
+		if(bar.type == 'bar')
+			bar.min = bar._otherProps._ymin;
+		else if(bar.type == 'hbar')
+		{
+			bar._otherProps._background_grid_autofit_numvlines = tempScale.length;
+			bar._otherProps._background_grid_autofit_numhlines = bar.data.length;
+		}
+	}
+	else
+		tempScale = bar.scale;
+
+	if(tempScale != undefined && tempScale[tempScale.length -1] != undefined && bar._otherProps._ylabels != false)
 	{
 		//left = bar.context.measureText(bar.scale[bar.scale.length -1]).width;
 		var tempArr = [];
-		for (var j = 0; j < bar.scale.length; j++) {
+		for (var j = 0; j < tempScale.length; j++) {
 			if(bar.type == 'hbar')
-				tempArr[j] = bar.context.measureText(bar.scale[j]).width
+				tempArr[j] = bar.context.measureText(tempScale[j]).width
 			else if(bar.type == 'scatter')
-				tempArr[j] = bar.context.measureText(OfficeExcel.numToFormatText(bar.scale[j],isformatCellScOy)).width
+				tempArr[j] = bar.context.measureText(OfficeExcel.numToFormatText(tempScale[j],isformatCellScOy)).width
 			else
-				tempArr[j] = bar.context.measureText(OfficeExcel.numToFormatText(bar.scale[j],isFormatCell)).width
+				tempArr[j] = bar.context.measureText(OfficeExcel.numToFormatText(tempScale[j],isFormatCell)).width
 		}
 		if((bar.type == 'hbar' && min < 0 )|| ( bar.type == 'scatter' && bar._otherProps._type != 'burse2' && minX < 0))
 			left = 0
@@ -592,8 +603,6 @@ function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY) {
 			left += 95;
 		else if (bar._yAxisTitle._align == 'ver')
 			left += 0;
-		//if(bar._otherProps._ylabels == false && left > 0)
-			//left += -30;
 
 		var right = 0;
 		if (bar._otherProps._key_halign == 'right')
@@ -624,10 +633,6 @@ function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY) {
 	bar._chartGutter._left = standartMargin + left;
 	bar._chartGutter._right = standartMargin + right;
 	bar._chartGutter._top = standartMargin + top;
-	/*if(bar._otherProps._xlabels != false && bar.type != 'pie')
-		standartMargin = 0;
-	if(bottom < 0)
-		bottom = 0;*/
 	bar._chartGutter._bottom = bottom + standartMargin;
 }
 
@@ -683,7 +688,6 @@ function checkDataRange(type,subType,dataRange,isRows,worksheet) {
 
 function formulaToRange(formula, worksheet) {
 	var range = null;
-	
 	if ( formula && worksheet ) {
 		var ref3D = parserHelp.is3DRef(formula, 0);
 		if ( !ref3D[0] )
@@ -692,7 +696,6 @@ function formulaToRange(formula, worksheet) {
 			var resultRef = parserHelp.parse3DRef(formula);
 			if ( null !== resultRef ) {
 				var ws = worksheet.workbook.getWorksheetByName(resultRef.sheet);
-				//var ws = worksheet.workbook.getWorksheetByName(resultRef.sheet);
 				if ( ws )
 					range = ws.getRange2(resultRef.range);
 			}
@@ -1166,15 +1169,6 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 		}
 	}
 	
-	
-	/*if(chart.type == 'Stock' && isNewChart)
-	{
-		if((chart.range.columns && arrValues[0].length != 4) || (chart.range.rows && arrValues.length != 4))
-		{
-			chart.range.intervalObject.worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.StockChartError, c_oAscError.Level.NoCritical)
-			return false;
-		}
-	}*/
 	if(isSeries)
 		var arrValuesRev = arrValues;
 	isEn = false;
@@ -1400,10 +1394,6 @@ function drawChart(chart, arrValues, width, height) {
 	// Цвета и шрифты
 	bar._otherProps._axis_color = 'grey';
 	bar._otherProps._background_grid_color = 'graytext';
-	bar._otherProps._key_text_size = 10;
-	bar._otherProps._key_text_font = 'Arial';
-	bar._otherProps._text_font = 'Arial';
-	bar._otherProps._text_font_size = 8;
 	if('Line' == chart.type || 'Area' == chart.type)
 		bar._otherProps._colors = generateColors(data.length, arrBaseColors, true);
 	else if(chart.type == 'HBar')
@@ -1418,26 +1408,12 @@ function drawChart(chart, arrValues, width, height) {
 		chart.xAxis.title = defaultXTitle;
 	if((!chart.header.title || chart.header.title == null || chart.header.title == undefined || chart.header.title == '') && chart.header.bDefaultTitle)
 		chart.header.title = defaultTitle;
-	
-	if (chart.yAxis.title)
-		bar._chartGutter._left = 35 + 29;
-	else
-		bar._chartGutter._left = 35;
-
-	if (chart.xAxis.title)
-		bar._chartGutter._bottom = 35 + 29;
-	else
-		bar._chartGutter._bottom = 35;
 		
-	calcWidthGraph();
-	//bar.Draw();
-
 	// Легенда
 	if (chart.legend.bShow && chart.legend.position != '') {
 		bar._otherProps._key_position = 'graph';
 		bar._otherProps._key = [];
 		bar._otherProps._key_halign = chart.legend.position;
-		//setKeyPosition(chart);
 				
 		var legendCnt = (chart.type == "Scatter") ? data.length : data.length;
 		if(chart.type == 'Pie' || chart.type == 'Bar' || chart.type == 'HBar')
@@ -1457,14 +1433,12 @@ function drawChart(chart, arrValues, width, height) {
 			}	
 		}
 			
-		
 		// без рамки
 		bar._otherProps._key_rounded = null;
 
 		if (bar._otherProps._filled != true && bar.type != 'bar' && bar.type != 'hbar' && bar.type != 'pie')
 			bar._otherProps._key_color_shape = 'line';
 		
-		bar._otherProps._key_text_size = 9;
 		
 		if(chart.type == 'HBar' && chart.subType != 'stacked' && chart.subType != 'stackedPer')
 		{
@@ -1490,7 +1464,6 @@ function drawChart(chart, arrValues, width, height) {
 		bar._otherProps._key = [];
 	}
 	
-
 	// Подписи данных
 	if(chart.type != 'Stock')
 	{
@@ -1500,7 +1473,6 @@ function drawChart(chart, arrValues, width, height) {
 			bar._otherProps._labels_above = true;
 		else
 			bar._otherProps._labels_above = false;
-		bar._otherProps._labels_above_size = 10;
 	}
 	
 	// Название
@@ -1508,7 +1480,6 @@ function drawChart(chart, arrValues, width, height) {
 		bar._chartTitle._text = chart.header.title;
 		bar._chartTitle._vpos = 32;
 		bar._chartTitle._hpos = 0.5;
-		bar._chartTitle._size = 18;
 	}
 
 	if (chart.xAxis.title) {
@@ -1517,7 +1488,6 @@ function drawChart(chart, arrValues, width, height) {
 		if(chart.legend.position == 'bottom')
 			legendTop = 30;
 		bar._xAxisTitle._text = chart.xAxis.title;
-		bar._xAxisTitle._size = 10;
 	}
 
 	if (chart.yAxis.title) {
@@ -1528,7 +1498,6 @@ function drawChart(chart, arrValues, width, height) {
 		if (bar._otherProps._key_halign == 'left')
 			keyLeft = 70;
 		bar._yAxisTitle._angle = 'null';
-		bar._yAxisTitle._size = 10;
 	}
 
 	// Основная сетка	
@@ -1537,7 +1506,7 @@ function drawChart(chart, arrValues, width, height) {
 
 	var axis;
 	calcGutter(axis,chart.min,chart.max,chart.ymin,chart.ymax,chart.isSkip,chart.isFormatCell);
-	calcAllMargin(chart.isFormatCell,chart.isformatCellScOy,chart.min,chart.max,chart.ymin,chart.ymax);
+	calcAllMargin(chart.isFormatCell,chart.isformatCellScOy,chart.min,chart.max,chart.ymin,chart.ymax, chart);
 	calcWidthGraph();
 	
 	if (chart.xAxis.title)
@@ -1551,7 +1520,8 @@ function drawChart(chart, arrValues, width, height) {
 		bar._yAxisTitle._vpos = bar._chartGutter._top + (bar.canvas.height - bar._chartGutter._top - bar._chartGutter._bottom) / 2 ;
 		bar._yAxisTitle._hpos = 23 + keyLeft;
 	}
-
+	//выставляем параметры текса
+	setFontChart(chart);	
 	bar.Draw(chart.min,chart.max,chart.ymin,chart.ymax,chart.isSkip,chart.isFormatCell,chart.isformatCellScOy);
 }
 
@@ -1622,7 +1592,7 @@ function DrawScatterChart(chartCanvas, chartSubType, data, chart) {
 		data = newData;
 	}
 	
-	bar = new OfficeExcel.Scatter(chartCanvas, data);
+	bar = new OfficeExcel.Scatter(chartCanvas, data);	
 	if(chartSubType == 'Stock')
 	{
 		bar._otherProps._type = 'burse2';
@@ -1641,12 +1611,8 @@ function DrawScatterChart(chartCanvas, chartSubType, data, chart) {
 	}
 	
 	bar._chartGutter._left = 45;
-	//bar._otherProps._background_grid_autofit_numvlines = data.length;
-	//addOptions('chart.gutter.right',70);
 	bar._chartGutter._right = 90;
-	//addOptions('chart.gutter.top',50);
 	bar._chartGutter._top = 13;
-	//addOptions('chart.gutter.bottom',50);
 	bar._chartGutter._bottom = 30;
 	//для соединения линий
 	bar._otherProps._area_border = chart.bShowBorder;
@@ -1660,8 +1626,6 @@ function DrawScatterChart(chartCanvas, chartSubType, data, chart) {
 	bar._otherProps._line_colors = colors;
 	bar._otherProps._linewidth = 3;
 	bar._otherProps._ylabels_count = 'auto';
-	//bar._otherProps._xmax = 360;
-	//bar._otherProps._ymax = 1;
 	bar._otherProps._scale_decimals = 1;
 	bar._otherProps._xscale_decimals = 0;
 	bar._otherProps._tickmarks = 'diamond';
@@ -1669,8 +1633,6 @@ function DrawScatterChart(chartCanvas, chartSubType, data, chart) {
 	bar._otherProps._tickmarks_dot_color = 'steelblue';
 	bar._otherProps._xscale = 'true';
 	bar._otherProps._gutter_left = 50;
-	bar._otherProps._key_text_size = 10;
-	bar._otherProps._text_font = 'Arial';
 	bar._otherProps._axis_color = 'grey';
 	//для биржевой диаграммы
 	if (original_data != undefined) {
@@ -1699,14 +1661,11 @@ function DrawScatterChart(chartCanvas, chartSubType, data, chart) {
 
 function DrawPieChart(chartCanvas, chartSubType, data, chart) {
 
-	bar = new OfficeExcel.Pie(chartCanvas, data);
-
+	bar = new OfficeExcel.Pie(chartCanvas, data);	
 	//для кольцевой диаграммы
 	//bar._otherProps._variant = 'donut';
-
 	//для разрезанной кольцевой или разрезанной круговой
 	//bar._otherProps._exploded = 15;
-
 	bar._otherProps._area_border = chart.bShowBorder;
 	bar._otherProps._ylabels_count = 'auto';
 	bar._otherProps._colors = ['steelblue', 'IndianRed', 'Silver'];
@@ -1715,23 +1674,20 @@ function DrawPieChart(chartCanvas, chartSubType, data, chart) {
 	bar._chartGutter._top = 13;
 	bar._chartGutter._bottom = 30;
 	bar._otherProps._key_rounded = null;
-
-	bar.Draw(chart.min,chart.max,chart.ymin,chart.ymax,chart.isSkip,chart.isFormatCell);
 }
 
 function DrawLineChart(chartCanvas, chartType, chartSubType, data, chart) {
 
 	var copyData = $.extend(true, [], data);
-
 	bar = new OfficeExcel.Line(chartCanvas, data);
 	bar.firstData = copyData;
 	bar._otherProps._autoGrouping = chartType;
 	
+	//в случае поверхностной диаграммы
 	if (chartSubType == c_oAscChartType.area)
 		bar._otherProps._filled = true;
 
-	//для нормированных графиков с накоплением и без него.
-	//bar._otherProps._autoGrouping = 'stackedPer';
+	//для нормированных графиков с накоплением и без него
 	if (bar._otherProps._autoGrouping == 'stacked') {
 		for (var j = 0; j < (data.length - 1); j++) {
 			for (var i = 0; i < data[j].length; i++) {
@@ -1773,10 +1729,8 @@ function DrawLineChart(chartCanvas, chartType, chartSubType, data, chart) {
 	bar.firstData = copyData;
 	bar._otherProps._ylabels_count = 'auto';
 
-	//для поверхностной диаграммы выставляем свойство
-	//bar._otherProps._filled = true;
+	//обводка графика для поверхностной диаграммы
 	bar._otherProps._filled_accumulative = false;
-
 
 	if (bar._otherProps._filled != true) {
 		bar._chartGutter._left = 35;
@@ -1788,24 +1742,10 @@ function DrawLineChart(chartCanvas, chartType, chartSubType, data, chart) {
 	bar._otherProps._background_grid_color = 'graytext';
 	bar._otherProps._background_barcolor1 = 'white';
 	bar._otherProps._background_barcolor2 = 'white';
-	//bar._otherProps._fillstyle = [['steelblue'],['red'],['black'],['grey']];
-	bar._otherProps._colors = ['steelblue', 'IndianRed', 'green', 'grey'];
 	bar._otherProps._linewidth = 3;
-
-	//bar._otherProps._noxaxis = true;
-	//bar._otherProps._noyaxis = true;
-	//для подписей данных
-	// bar._otherProps._labels_above = true;
-
 	//для графика с маркерами
 	//bar._otherProps._tickmarks = ['filledendsquare','filledsquare','filledarrow'];
-
-	//bar._otherProps._fillstyle = '#fcc';
-	//bar._otherProps._numxticks = data.length;
-	//bar._otherProps._background_grid_autofit_numhlines = 10;
-	//bar._otherProps._numyticks = 10;
-	//bar._otherProps._ylabels_count = 10
-	//bar._otherProps._background_grid_autofit_numhlines = 
+	
 	var tempMas = [];
 	if ('object' == typeof data[0]) {
 		var testMas = [];
@@ -1826,17 +1766,15 @@ function DrawLineChart(chartCanvas, chartType, chartSubType, data, chart) {
 			tempMas[i] = i;
 		}
 	}
-
-	bar._otherProps._labels = tempMas;
-
-	//отключаем вертикальную сетку
-	//bar._otherProps._background_grid_vlines = false;
-	//bar._otherProps._background_grid_border = false;
-	//bar._otherProps._ymax = 60;
-	//bar._otherProps._ymin = 50;
+	//подписи по оси OX
+	if(chart && chart.series && chart.series[0] && chart.series[0].xVal && chart.series[0].xVal.NumCache)
+		bar._otherProps._labels = chart.series[0].xVal.NumCache;
+	else
+		bar._otherProps._labels = tempMas;
+		
 	if (bar._otherProps._autoGrouping == 'stackedPer')
 		bar._otherProps._units_post = '%';
-	bar.Draw(chart.min,chart.max,chart.ymin,chart.ymax,chart.isSkip,chart.isFormatCell);
+	
 	if (bar._otherProps._filled != true)
 		bar._otherProps._hmargin = bar._otherProps._background_grid_vsize / 2;
 	else
@@ -1845,7 +1783,7 @@ function DrawLineChart(chartCanvas, chartType, chartSubType, data, chart) {
 
 function DrawBarChart(chartCanvas, chartSubType, data, chart) {
 	
-	bar = new OfficeExcel.Bar(chartCanvas, data);	
+	bar = new OfficeExcel.Bar(chartCanvas, data);
 	//меняем входные данные для нормированной диаграммы
 	bar._otherProps._autoGrouping = chartSubType;
 	//с накоплениями
@@ -1877,16 +1815,16 @@ function DrawBarChart(chartCanvas, chartSubType, data, chart) {
 	bar._otherProps._background_grid_color = 'graytext';
 	bar._otherProps._background_barcolor1 = 'white';
 	bar._otherProps._background_barcolor2 = 'white';
-	
-	//bar._otherProps._background_grid_autofit_numhlines = 6;
-	//bar._otherProps._linewidth = 10;
-	//bar._otherProps._key = ['ряд1'];
+
 	var tempMas = [];
 	for (var i = 0; i < data.length; i++) {
 		tempMas[i] = i + 1;
 	}
-	bar._otherProps._labels = tempMas;
-	bar.Draw(chart.min,chart.max,chart.ymin,chart.ymax,chart.isSkip,chart.isFormatCell);
+	//подписи по оси OX
+	if(chart && chart.series && chart.series[0] && chart.series[0].xVal && chart.series[0].xVal.NumCache)
+		bar._otherProps._labels = chart.series[0].xVal.NumCache;
+	else
+		bar._otherProps._labels = tempMas;
 
 	//отступы меняют ширину
 	if (bar._otherProps._autoGrouping == 'stacked' || bar._otherProps._autoGrouping == 'stackedPer') {
@@ -1909,7 +1847,7 @@ function DrawHBarChart(chartCanvas, chartSubType, data, chart) {
 	}
 	data = OfficeExcel.array_reverse(data);
 	
-	bar = new OfficeExcel.HBar(chartCanvas, data);
+	bar = new OfficeExcel.HBar(chartCanvas, data);	
 	bar._otherProps._autoGrouping = chartSubType;
 	var originalData = $.extend(true, [], data);
 
@@ -1969,15 +1907,16 @@ function DrawHBarChart(chartCanvas, chartSubType, data, chart) {
 	for (var i = 0; i < data.length; i++) {
 		tempMas[data.length - i - 1] = i + 1;
 	}
-	bar._otherProps._labels = tempMas;
+	//подписи по оси OY
+	if(chart && chart.series && chart.series[0] && chart.series[0].xVal && chart.series[0].xVal.NumCache)
+		bar._otherProps._labels = chart.series[0].xVal.NumCache;
+	else
+		bar._otherProps._labels = tempMas;
 	bar._otherProps._background_grid_autofit_numhlines = data.length;
 	bar._otherProps._numyticks = data.length;
 	bar._chartGutter._left = 45;
-	//addOptions('chart.gutter.right',70);
 	bar._chartGutter._right = 90;
-	//addOptions('chart.gutter.top',50);
 	bar._chartGutter._top = 13;
-	//addOptions('chart.gutter.bottom',50);
 	bar._chartGutter._bottom = 30;
 	//аналогично для измения высоты(ширины)
 	if (bar._otherProps._autoGrouping == 'stacked' || bar._otherProps._autoGrouping == 'stackedPer') {
@@ -1988,18 +1927,8 @@ function DrawHBarChart(chartCanvas, chartSubType, data, chart) {
 	else
 		bar._otherProps._vmargin = (((bar.canvas.height - (bar._chartGutter._top + bar._chartGutter._bottom)) * 0.3) / bar.data.length) / bar.data[0].length;
 
-	bar._otherProps._key_text_size = 10;
-	bar._otherProps._text_font = 'Arial';
 	//для того, чтобы не строить рамку вокруг легенды
 	bar._otherProps._key_rounded = null;
-	bar.Draw(chart.min,chart.max,chart.ymin,chart.ymax,chart.isSkip,chart.isFormatCell);
-
-	bar._otherProps._background_grid_autofit_numvlines = bar.scale.length;
-	bar._otherProps._background_grid_autofit_numhlines = data.length;
-
-	//отключаем горизонтальную сетку
-	//bar._otherProps._background_grid_hlines = false;
-	//bar._otherProps._background_grid_border = false;
 }
 
 function findPrevValue(originalData, num, max) {
@@ -2016,4 +1945,90 @@ function findPrevValue(originalData, num, max) {
 		}
 	}
 	return summ;
+}
+function setFontChart(chart)
+{
+	var defaultColor = "#000000"
+	var defaultFont = "Arial";
+	var defaultSize = "10";
+	
+	if(chart.header.font)//заголовок
+	{
+		bar._chartTitle._bold = chart.header.font.bold ? chart.header.font.bold : true;
+		bar._chartTitle._color = chart.header.font.color ? chart.header.font.color : defaultColor;
+		bar._chartTitle._font = chart.header.font.name ? chart.header.font.name : defaultFont;
+		bar._chartTitle._size = chart.header.font.size ? chart.header.font.size : defaultSize;
+		bar._chartTitle._italic = chart.header.font.italic ? chart.header.font.italic : false;
+		bar._chartTitle._underline = chart.header.font.underline ? chart.header.font.underline : false;
+	}
+	
+	if(chart.xAxis.titleFont)//название оси OX
+	{
+		bar._xAxisTitle._bold = chart.xAxis.titleFont.bold ? chart.xAxis.titleFont.bold : true;
+		bar._xAxisTitle._color = chart.xAxis.titleFont.color ? chart.xAxis.titleFont.color : defaultColor;
+		bar._xAxisTitle._font = chart.xAxis.titleFont.name ? chart.xAxis.titleFont.name : defaultFont;
+		bar._xAxisTitle._size = chart.xAxis.titleFont.size ? chart.xAxis.titleFont.size : defaultSize;
+		bar._xAxisTitle._italic = chart.xAxis.titleFont.italic ? chart.xAxis.titleFont.italic : false;
+		bar._xAxisTitle._underline = chart.xAxis.titleFont.underline ? chart.xAxis.titleFont.underline : false;
+	}
+	
+	if(chart.yAxis.titleFont)//название оси OY
+	{
+		bar._yAxisTitle._bold = chart.yAxis.titleFont.bold ? chart.yAxis.titleFont.bold : true;
+		bar._yAxisTitle._color = chart.yAxis.titleFont.color ? chart.yAxis.titleFont.color : defaultColor;
+		bar._yAxisTitle._font = chart.yAxis.titleFont.name ? chart.yAxis.titleFont.name : defaultFont;
+		bar._yAxisTitle._size = chart.yAxis.titleFont.size ? chart.yAxis.titleFont.size : defaultSize;
+		bar._yAxisTitle._italic = chart.yAxis.titleFont.italic ? chart.yAxis.titleFont.italic : false;
+		bar._yAxisTitle._underline = chart.yAxis.titleFont.underline ? chart.yAxis.titleFont.underline : false;
+	}
+	
+	if(chart.legend.font)//подписи легенды
+	{
+		bar._otherProps._key_text_bold = chart.legend.font.bold ? chart.legend.font.bold : false;
+		bar._otherProps._key_text_color = chart.legend.font.color ? chart.legend.font.color : defaultColor;
+		bar._otherProps._key_text_font = chart.legend.font.name ? chart.legend.font.name : defaultFont;
+		bar._otherProps._key_text_size = chart.legend.font.size ? chart.legend.font.size : 10;
+		bar._otherProps._key_text_italic = chart.legend.font.italic ? chart.legend.font.italic : false;
+		bar._otherProps._key_text_underline = chart.legend.font.underline ? chart.legend.font.underline : false;
+	}
+	
+	if(chart.xAxis.labelFont)//значения по оси OX
+	{
+		bar._otherProps._xlabels_bold = chart.xAxis.labelFont.bold ? chart.xAxis.labelFont.bold : false;
+		bar._otherProps._xlabels_color = chart.xAxis.labelFont.color ? chart.xAxis.labelFont.color : defaultColor;
+		bar._otherProps._xlabels_font = chart.xAxis.labelFont.name ? chart.xAxis.labelFont.name : defaultFont;
+		bar._otherProps._xlabels_size = chart.xAxis.labelFont.size ? chart.xAxis.labelFont.size : defaultSize;
+		bar._otherProps._xlabels_italic = chart.xAxis.labelFont.italic ? chart.xAxis.labelFont.italic : false;
+		bar._otherProps._xlabels_underline = chart.xAxis.labelFont.underline ? chart.xAxis.labelFont.underline : false;
+	}	
+	
+	if(chart.yAxis.labelFont)//значения по оси OY
+	{
+		bar._otherProps._ylabels_bold = chart.yAxis.labelFont.bold ? chart.yAxis.labelFont.bold : false;
+		bar._otherProps._ylabels_color = chart.yAxis.labelFont.color ? chart.yAxis.labelFont.color : defaultColor;
+		bar._otherProps._ylabels_font = chart.yAxis.labelFont.name ? chart.yAxis.labelFont.name : defaultFont;
+		bar._otherProps._ylabels_size = chart.yAxis.labelFont.size ? chart.yAxis.labelFont.size : defaultSize;
+		bar._otherProps._ylabels_italic = chart.yAxis.labelFont.italic ? chart.yAxis.labelFont.italic : false;
+		bar._otherProps._ylabels_underline = chart.yAxis.labelFont.underline ? chart.yAxis.labelFont.underline : false;
+	}	
+	
+	if(chart.legend.font)//подписи значений графика
+	{
+		bar._otherProps._labels_above_bold = chart.legend.font.bold ? chart.legend.font.bold : false;
+		bar._otherProps._labels_above_color = chart.legend.font.color ? chart.legend.font.color : defaultColor;
+		bar._otherProps._labels_above_font = chart.legend.font.name ? chart.legend.font.name : defaultFont;
+		bar._otherProps._labels_above_size = chart.legend.font.size ? chart.legend.font.size : defaultSize;
+		bar._otherProps._labels_above_italic = chart.legend.font.italic ? chart.legend.font.italic : false;
+		bar._otherProps._labels_above_underline = chart.legend.font.underline ? chart.legend.font.underline : false;
+	}	
+	
+	if(chart.xAxis.font)//остальные подписи
+	{
+		bar._otherProps._text_color = defaultColor;
+		bar._otherProps._text_bold = false;
+		bar._otherProps._text_italic = false;
+		bar._otherProps._text_underline = false;
+		bar._otherProps._text_font = defaultFont;
+		bar._otherProps._text_size = defaultSize;
+	}	
 }

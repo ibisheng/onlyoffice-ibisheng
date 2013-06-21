@@ -72,7 +72,11 @@
     */
     OfficeExcel.Bar.prototype.Draw = function (min,max,ymin,ymax,isSkip,isFormatCell)
     {
-        // MUST be the first thing done!
+        this.max = max;
+        this.scale = OfficeExcel.getScale(this.max, this,min,max);
+		this._otherProps._background_grid_autofit_numhlines = this.scale.length;
+        this._otherProps._numyticks = this.scale.length;
+		// MUST be the first thing done!
         if (typeof(this._otherProps._background_image) == 'string' && !this.__background_image__) {
             OfficeExcel.DrawBackgroundImage(this);
             return;
@@ -120,7 +124,6 @@
         * Work out a few things. They need to be here because they depend on things you can change before you
         * call Draw() but after you instantiate the object
         */
-        this.max            = 0;
         this.grapharea      = OfficeExcel.GetHeight(this) - this._chartGutter._top - this._chartGutter._bottom;
         this.halfgrapharea  = this.grapharea / 2;
         this.halfTextHeight = this._otherProps._text_size / 2;
@@ -139,19 +142,6 @@
         */
         OfficeExcel.InstallUserClickListener(this, this._otherProps._events_click);
         OfficeExcel.InstallUserMousemoveListener(this, this._otherProps._events_mousemove);
-
-         /*for (i=0; i<this.data.length; ++i) {
-            if (typeof(this.data[i]) == 'object') {
-                var value = this._otherProps._grouping == 'grouped' ? Number(OfficeExcel.array_max(this.data[i], true)) : Number(OfficeExcel.array_sum(this.data[i])) ;
-
-            } else {
-                var value = Number(this.data[i]);
-            }*/
-
-            this.max = max;
-        //}
-
-        this.scale = OfficeExcel.getScale(this.max, this,min,max);
 
 
         //If it's a sketch chart variant, draw the axes first
@@ -624,6 +614,14 @@
         var strokeStyle   = this._otherProps._strokecolor;
         var colors        = this._otherProps._colors;
         var sequentialColorIndex = 0;
+		
+		var bold = this._otherProps._labels_above_bold;
+		var textOptions = 
+		{
+			color: this._otherProps._labels_above_color,
+			italic: this._otherProps._labels_above_italic,
+			underline: this._otherProps._labels_above_underline
+		};
 
         for (i=0; i<this.data.length; ++i) {
 
@@ -852,7 +850,7 @@
                             this.context.fillStyle = this._otherProps._text_color;
 
                             OfficeExcel.Text(this.context,
-                                        this._otherProps._text_font,
+                                        this._otherProps._labels_above_font,
                                         typeof(this._otherProps._labels_above_size) == 'number' ? this._otherProps._labels_above_size : this._otherProps._text_size - 3,
                                         x + hmargin + (barWidth / 2),
                                         yPos,
@@ -860,7 +858,11 @@
                                         this._otherProps._labels_above_angle ? 'bottom' : null,
                                         this._otherProps._labels_above_angle ? (this._otherProps._labels_above_angle > 0 && (this._otherProps._xaxispos != 'top') ? 'right' : 'left') : 'center',
                                         null,
-                                        this._otherProps._labels_above_angle
+                                        this._otherProps._labels_above_angle,
+										null,
+										bold,
+										null,
+										textOptions
                                        );
                         }
 
@@ -1099,7 +1101,7 @@
 
                         this.context.fillStyle = this._otherProps._text_color;
                         OfficeExcel.Text(this.context,
-                                    this._otherProps._text_font,
+                                    this._otherProps._labels_above_font,
                                     typeof(this._otherProps._labels_above_size) == 'number' ? this._otherProps._labels_above_size : this._otherProps._text_size - 3,
                                     startX + (barWidth / 2) + this._otherProps._hmargin,
                                     startY - (this._shadow._visible && this._shadow._offset_y < 0 ? 7 : 4) - (this._otherProps._variant == '3d' ? 5 : 0),
@@ -1107,7 +1109,10 @@
                                     this._otherProps._labels_above_angle ? 'bottom' : null,
                                     this._otherProps._labels_above_angle ? (this._otherProps._labels_above_angle > 0 ? 'right' : 'left') : 'center',
                                     null,
-                                    this._otherProps._labels_above_angle);
+                                    this._otherProps._labels_above_angle,
+									null,
+									bold,
+									options);
                       
                         // Turn any shadow back on
                         if (shadow) {
@@ -1343,7 +1348,7 @@
 
 							this.context.fillStyle = this._otherProps._text_color;
 							OfficeExcel.Text(this.context,
-										this._otherProps._text_font,
+										this._otherProps._labels_above_font,
 										typeof(this._otherProps._labels_above_size) == 'number' ? this._otherProps._labels_above_size : this._otherProps._text_size - 3,startX + (individualBarWidth / 2),
 										startY - 2 - (this._otherProps._variant == '3d' ? 5 : 0),
 										//OfficeExcel.number_format(this, OfficeExcel.num_round(this.data[i][j]),this._otherProps._units_pre,this._otherProps._units_post),
@@ -1351,7 +1356,11 @@
 										null,
 										this._otherProps._labels_above_angle ? (this._otherProps._labels_above_angle > 0 ? 'right' : 'left') : 'center',
 										null,
-										this._otherProps._labels_above_angle);
+										this._otherProps._labels_above_angle,
+										null,
+										bold,
+										null,
+										options);
 						  
 							// Turn any shadow back on
 							if (shadow) {
@@ -1419,7 +1428,6 @@
     {
         var context    = this.context;
         var text_angle = this._otherProps._text_angle;
-        var text_size  = this._otherProps._text_size;
         var labels     = this._otherProps._labels;
 
 
@@ -1465,8 +1473,16 @@
 
             // Draw the X tickmarks
             var i=0;
-            var font = this._otherProps._text_font;
-
+            var font = this._otherProps._xlabels_font;
+			var bold = this._otherProps._xlabels_bold;
+			var textOptions = 
+			{
+				color: this._otherProps._xlabels_color,
+				italic: this._otherProps._xlabels_italic,
+				underline: this._otherProps._xlabels_underline
+			}
+			var text_size  = this._otherProps._xlabels_size;
+			
             if('auto' == this._otherProps._ylabels_count)
                 yOffset =+ 23;
             for (x=this._chartGutter._left + (xTickGap / 2); x<=OfficeExcel.GetWidth(this) - this._chartGutter._right; x+=xTickGap) {
@@ -1480,7 +1496,11 @@
                                       (this._otherProps._text_angle == 90 ? 'center' : null),
                                       halign,
                                       null,
-                                      angle);
+                                      angle,
+									  null,
+									  bold,
+									  null,
+									  textOptions);
                     }
                     else
                     {
@@ -1492,7 +1512,11 @@
                                       (this._otherProps._text_angle == 90 ? 'center' : null),
                                       halign,
                                       null,
-                                      angle);
+                                       angle,
+									  null,
+									  bold,
+									  null,
+									  textOptions);
                     }
                
             }
@@ -1512,12 +1536,19 @@
 
             var context    = this.context;
             var interval   = (this.grapharea * (1/5) );
-            var text_size  = this._otherProps._text_size;
+            var text_size  = this._otherProps._ylabels_size;
             var units_pre  = this._otherProps._units_pre;
             var units_post = this._otherProps._units_post;
             var align      = this._otherProps._yaxispos == 'left' ? 'right' : 'left';
-            var font       = this._otherProps._text_font;
+            var font       = this._otherProps._ylabels_font;
             var numYLabels = this._otherProps._ylabels_count;
+			var bold 	   = this._otherProps._ylabels_bold;
+			var textOptions = 
+			{
+				color: this._otherProps._ylabels_color,
+				italic: this._otherProps._ylabels_italic,
+				underline: this._otherProps._ylabels_underline,
+			}
 
             if (this._otherProps._ylabels_inside == true) {
                 var xpos  = this._otherProps._yaxispos == 'left' ? this._chartGutter._left + 5 : OfficeExcel.GetWidth(this) - this._chartGutter._right - 5;
@@ -1547,9 +1578,9 @@
 						elemArr = Math.round(OfficeExcel.array_exp(scale[scale.length - 1] - (scale[scale.length - 2] - scale[scale.length - 1]))*floatKoff)/floatKoff ;
 					}
 					if(elemArr == 0)
-						OfficeExcel.Text(context,font,text_size,xpos - 5,this._chartGutter._top + this.halfTextHeight + ((i/this.scale.length) * (this.grapharea) ),OfficeExcel.numToFormatText(elemArr.toString(),isFormatCell),null, align, boxed);
+						OfficeExcel.Text(context,font,text_size,xpos - 5,this._chartGutter._top + this.halfTextHeight + ((i/this.scale.length) * (this.grapharea) ),OfficeExcel.numToFormatText(elemArr.toString(),isFormatCell),null, align, boxed, null, null, bold, null, textOptions);
 					else
-						OfficeExcel.Text(context,font,text_size,xpos - 5,this._chartGutter._top + this.halfTextHeight + ((i/this.scale.length) * (this.grapharea) ),OfficeExcel.numToFormatText("-" + elemArr.toString(),isFormatCell),null, align, boxed);	
+						OfficeExcel.Text(context,font,text_size,xpos - 5,this._chartGutter._top + this.halfTextHeight + ((i/this.scale.length) * (this.grapharea) ),OfficeExcel.numToFormatText("-" + elemArr.toString(),isFormatCell),null, align, boxed, null, null, bold, null, textOptions);	
                 }
             }
             else
@@ -1566,7 +1597,7 @@
                         
                         var y = this._chartGutter._top + (grapharea * (i / labels.length)) + (grapharea / labels.length);
                         
-                        OfficeExcel.Text(context, font, text_size, xpos, y, labels[i], 'center', align, boxed);
+                        OfficeExcel.Text(context, font, text_size, xpos, y, labels[i], 'center', align, boxed, null, null, bold, null, textOptions);
                     }
 
                     return;
@@ -1577,18 +1608,18 @@
                     
                 // 1(ish) label
                 if (numYLabels == 3 || numYLabels == 5) {
-                    OfficeExcel.Text(context, font, text_size, xpos, this._chartGutter._top + this.halfTextHeight + interval, '-' + OfficeExcel.number_format(this, this.scale[0], units_pre, units_post), null, align, boxed);
+                    OfficeExcel.Text(context, font, text_size, xpos, this._chartGutter._top + this.halfTextHeight + interval, '-' + OfficeExcel.number_format(this, this.scale[0], units_pre, units_post), null, align, boxed, null, null, bold, null, textOptions);
         
                     // 5 labels
                     if (numYLabels == 5) {
-                        OfficeExcel.Text(context, font, text_size, xpos, (1*interval) + this._chartGutter._top + this.halfTextHeight + interval, '-' + OfficeExcel.number_format(this, this.scale[1], units_pre, units_post), null, align, boxed);
-                        OfficeExcel.Text(context, font, text_size, xpos, (3*interval) + this._chartGutter._top + this.halfTextHeight + interval, '-' + OfficeExcel.number_format(this, this.scale[3], units_pre, units_post), null, align, boxed);
+                        OfficeExcel.Text(context, font, text_size, xpos, (1*interval) + this._chartGutter._top + this.halfTextHeight + interval, '-' + OfficeExcel.number_format(this, this.scale[1], units_pre, units_post), null, align, boxed, null, null, bold, null, textOptions);
+                        OfficeExcel.Text(context, font, text_size, xpos, (3*interval) + this._chartGutter._top + this.halfTextHeight + interval, '-' + OfficeExcel.number_format(this, this.scale[3], units_pre, units_post), null, align, boxed, null, null, bold, null, textOptions);
                     }
                     
                     // 3 labels
                     if (numYLabels == 3 || numYLabels == 5) {
-                        OfficeExcel.Text(context, font, text_size, xpos, (2*interval) + this._chartGutter._top + this.halfTextHeight + interval, '-' + OfficeExcel.number_format(this, this.scale[2], units_pre, units_post), null, align, boxed);
-                        OfficeExcel.Text(context, font, text_size, xpos, (4*interval) + this._chartGutter._top + this.halfTextHeight + interval, '-' + OfficeExcel.number_format(this, this.scale[4], units_pre, units_post), null, align, boxed);
+                        OfficeExcel.Text(context, font, text_size, xpos, (2*interval) + this._chartGutter._top + this.halfTextHeight + interval, '-' + OfficeExcel.number_format(this, this.scale[2], units_pre, units_post), null, align, boxed, null, null, bold, null, textOptions);
+                        OfficeExcel.Text(context, font, text_size, xpos, (4*interval) + this._chartGutter._top + this.halfTextHeight + interval, '-' + OfficeExcel.number_format(this, this.scale[4], units_pre, units_post), null, align, boxed, null, null, bold, null, textOptions);
                     }
                 }
                 
@@ -1598,7 +1629,7 @@
                     interval = (this.grapharea / numYLabels );
 
                     for (var i=10; i>0; --i) {
-                        OfficeExcel.Text(context, font, text_size, xpos,this._chartGutter._top + ((this.grapharea / numYLabels) * i),'-' + OfficeExcel.number_format(this,((this.scale[4] / numYLabels) * i).toFixed((this._otherProps._scale_decimals)), units_pre, units_post), 'center', align, boxed);
+                        OfficeExcel.Text(context, font, text_size, xpos,this._chartGutter._top + ((this.grapharea / numYLabels) * i),'-' + OfficeExcel.number_format(this,((this.scale[4] / numYLabels) * i).toFixed((this._otherProps._scale_decimals)), units_pre, units_post), 'center', align, boxed, null, null, bold, null, textOptions);
                     }
                 }
 
@@ -1614,7 +1645,7 @@
                                 '-' + OfficeExcel.number_format(this,(this.min.toFixed((this._otherProps._scale_decimals))), units_pre, units_post),
                                 'center',
                                 align,
-                                boxed);
+                                boxed, null, null, bold, null, textOptions);
                 }
 
             }
@@ -1630,8 +1661,15 @@
     */
     OfficeExcel.Bar.prototype.Drawlabels_center = function (isFormatCell)
     {
-        var font       = this._otherProps._text_font;
+        var font       = this._otherProps._xlabels_font;
         var numYLabels = this._otherProps._ylabels_count;
+		var bold = this._otherProps._xlabels_bold;
+		var textOptions = 
+		{
+			color: this._otherProps._xlabels_color,
+			italic: this._otherProps._xlabels_italic,
+			underline: this._otherProps._xlabels_underline
+		}
 
         this.context.fillStyle = this._otherProps._text_color;
 
@@ -1641,7 +1679,7 @@
             * Draw the top labels
             */
             var interval   = (this.grapharea * (1/10) );
-            var text_size  = this._otherProps._text_size;
+            var text_size  = this._otherProps._xlabels_size;
             var units_pre  = this._otherProps._units_pre;
             var units_post = this._otherProps._units_post;
             var context = this.context;
@@ -1663,16 +1701,6 @@
             }
 
 
-
-
-
-
-
-
-
-
-
-
             /**
             * Draw specific Y labels here so that the local variables can be reused
             */
@@ -1686,14 +1714,14 @@
 
                     var y = this._chartGutter._top + ((grapharea / 2) / labels.length) * i;
                     
-                    OfficeExcel.Text(context, font, text_size, xpos, y, String(labels[i]), 'center', align, boxed);
+                    OfficeExcel.Text(context, font, text_size, xpos, y, String(labels[i]), 'center', align, boxed, null, null, bold, null, textOptions);
                 }
 
                 // Draw the bottom halves labels
                 for (var i=labels.length-1; i>=0; --i) {
                     var y = this._chartGutter._top  + (grapharea * ( (i+1) / (labels.length * 2) )) + (grapharea / 2);
 
-                    OfficeExcel.Text(context, font, text_size, xpos, y, labels[labels.length - i - 1], 'center', align, boxed);
+                    OfficeExcel.Text(context, font, text_size, xpos, y, labels[labels.length - i - 1], 'center', align, boxed, null, null, bold, null, textOptions);
                 }
 
                 return;
@@ -1714,20 +1742,20 @@
                 OfficeExcel.Text(context, font, text_size, xpos, this._chartGutter._top + this.halfTextHeight, OfficeExcel.number_format(this, this.scale[4], units_pre, units_post), null, align, boxed);
     
                 if (numYLabels == 5) {
-                    OfficeExcel.Text(context, font, text_size, xpos, (1*interval) + this._chartGutter._top + this.halfTextHeight, OfficeExcel.number_format(this, this.scale[3], units_pre, units_post), null, align, boxed);
+                    OfficeExcel.Text(context, font, text_size, xpos, (1*interval) + this._chartGutter._top + this.halfTextHeight, OfficeExcel.number_format(this, this.scale[3], units_pre, units_post), null, align, boxed, null, null, bold, null, textOptions);
                     OfficeExcel.Text(context, font, text_size, xpos, (3*interval) + this._chartGutter._top + this.halfTextHeight, OfficeExcel.number_format(this, this.scale[1], units_pre, units_post), null, align, boxed);
                 }
                 
                 if (numYLabels == 3 || numYLabels == 5) {
-                    OfficeExcel.Text(context, font, text_size, xpos, (4*interval) + this._chartGutter._top + this.halfTextHeight, OfficeExcel.number_format(this, this.scale[0], units_pre, units_post), null, align, boxed);
-                    OfficeExcel.Text(context, font, text_size, xpos, (2*interval) + this._chartGutter._top + this.halfTextHeight, OfficeExcel.number_format(this, this.scale[2], units_pre, units_post), null, align, boxed);
+                    OfficeExcel.Text(context, font, text_size, xpos, (4*interval) + this._chartGutter._top + this.halfTextHeight, OfficeExcel.number_format(this, this.scale[0], units_pre, units_post), null, align, boxed, null, null, bold, null, textOptions);
+                    OfficeExcel.Text(context, font, text_size, xpos, (2*interval) + this._chartGutter._top + this.halfTextHeight, OfficeExcel.number_format(this, this.scale[2], units_pre, units_post), null, align, boxed, null, null, bold, null, textOptions);
                 }
             } else if (numYLabels == 10) {
                 // 10Y labels
                 interval = (this.grapharea / numYLabels) / 2;
             
                 for (var i=0; i<numYLabels; ++i) {
-                    OfficeExcel.Text(context, font, text_size, xpos,this._chartGutter._top + ((this.grapharea / (numYLabels * 2)) * i),OfficeExcel.number_format(this, ((this.scale[4] / numYLabels) * (numYLabels - i)).toFixed((this._otherProps._scale_decimals)), units_pre, units_post), 'center', align, boxed);
+                    OfficeExcel.Text(context, font, text_size, xpos,this._chartGutter._top + ((this.grapharea / (numYLabels * 2)) * i),OfficeExcel.number_format(this, ((this.scale[4] / numYLabels) * (numYLabels - i)).toFixed((this._otherProps._scale_decimals)), units_pre, units_post), 'center', align, boxed, null, null, bold, null, textOptions);
                 }
             }
             ///////////////////////////////////////////////////////////////////////////////////
@@ -1739,16 +1767,16 @@
 
             if (numYLabels == 3 || numYLabels == 5) {
                 if (numYLabels == 3 || numYLabels == 5) {
-                    OfficeExcel.Text(context, font, text_size, xpos, (this.grapharea + this._chartGutter._top + this.halfTextHeight) - (4 * interval), '-' + OfficeExcel.number_format(this, this.scale[0], units_pre, units_post), null, align, boxed);
+                    OfficeExcel.Text(context, font, text_size, xpos, (this.grapharea + this._chartGutter._top + this.halfTextHeight) - (4 * interval), '-' + OfficeExcel.number_format(this, this.scale[0], units_pre, units_post), null, align, boxed, null, null, bold, null, textOptions);
                     OfficeExcel.Text(context, font, text_size, xpos, (this.grapharea + this._chartGutter._top + this.halfTextHeight) - (2 * interval), '-' + OfficeExcel.number_format(this, this.scale[2], units_pre, units_post), null, align, boxed);
                 }
     
                 if (numYLabels == 5) {
-                    OfficeExcel.Text(context, font, text_size, xpos, (this.grapharea + this._chartGutter._top + this.halfTextHeight) - (3 * interval), '-' + OfficeExcel.number_format(this, this.scale[1], units_pre, units_post), null, align, boxed);
-                    OfficeExcel.Text(context, font, text_size, xpos, (this.grapharea + this._chartGutter._top + this.halfTextHeight) - interval, '-' + OfficeExcel.number_format(this, this.scale[3], units_pre, units_post), null, align, boxed);
+                    OfficeExcel.Text(context, font, text_size, xpos, (this.grapharea + this._chartGutter._top + this.halfTextHeight) - (3 * interval), '-' + OfficeExcel.number_format(this, this.scale[1], units_pre, units_post), null, align, boxed, null, null, bold, null, textOptions);
+                    OfficeExcel.Text(context, font, text_size, xpos, (this.grapharea + this._chartGutter._top + this.halfTextHeight) - interval, '-' + OfficeExcel.number_format(this, this.scale[3], units_pre, units_post), null, align, boxed, null, null, bold, null, textOptions);
                 }
     
-                OfficeExcel.Text(context, font, text_size, xpos,  this.grapharea + this._chartGutter._top + this.halfTextHeight, '-' + OfficeExcel.number_format(this, this.scale[4], units_pre, units_post), null, align, boxed);
+                OfficeExcel.Text(context, font, text_size, xpos,  this.grapharea + this._chartGutter._top + this.halfTextHeight, '-' + OfficeExcel.number_format(this, this.scale[4], units_pre, units_post), null, align, boxed, null, null, bold, null, textOptions);
 
             } else if (numYLabels == 10) {
 
@@ -1756,7 +1784,7 @@
                 interval = (this.grapharea / numYLabels) / 2;
             
                 for (var i=0; i<numYLabels; ++i) {
-                    OfficeExcel.Text(context, font, text_size, xpos,this._chartGutter._top + (this.grapharea / 2) + ((this.grapharea / (numYLabels * 2)) * i) + (this.grapharea / (numYLabels * 2)),OfficeExcel.number_format(this, ((this.scale[4] / numYLabels) * (i+1)).toFixed((this._otherProps._scale_decimals)), '-' + units_pre, units_post),'center', align, boxed);
+                    OfficeExcel.Text(context, font, text_size, xpos,this._chartGutter._top + (this.grapharea / 2) + ((this.grapharea / (numYLabels * 2)) * i) + (this.grapharea / (numYLabels * 2)),OfficeExcel.number_format(this, ((this.scale[4] / numYLabels) * (i+1)).toFixed((this._otherProps._scale_decimals)), '-' + units_pre, units_post),'center', align, boxed, null, null, bold, null, textOptions);
                 }
             }
 
@@ -1774,7 +1802,7 @@
                             OfficeExcel.number_format(this,(this.min.toFixed((this._otherProps._scale_decimals))), units_pre, units_post),
                             'center',
                             align,
-                            boxed);
+                            boxed, null, null, bold, null, textOptions);
             }
         }
     }
@@ -1792,13 +1820,20 @@
         if (this._otherProps._xaxispos != 'center' && this._otherProps._xaxispos != 'top') {
             
             var interval   = (this.grapharea * (1/5) );
-            var text_size  = this._otherProps._text_size;
+            var text_size  = this._otherProps._xlabels_size;
             var units_pre  = this._otherProps._units_pre;
             var units_post = this._otherProps._units_post;
             var context    = this.context;
             var align      = this._otherProps._yaxispos == 'left' ? 'right' : 'left';
-            var font       = this._otherProps._text_font;
+            var font       = this._otherProps._xlabels_font;
             var numYLabels = this._otherProps._ylabels_count;
+			var bold 	   = this._otherProps._xlabels_bold;
+			var textOptions = 
+			{	
+				color: this._otherProps._xlabels_color,
+				italic: this._otherProps._xlabels_italic,
+				underline: this._otherProps._xlabels_underline
+			}
 
             if (this._otherProps._ylabels_inside == true) {
                 var xpos  = this._otherProps._yaxispos == 'left' ? this._chartGutter._left + 5 : OfficeExcel.GetWidth(this) - this._chartGutter._right - 5;
@@ -1820,7 +1855,7 @@
                 for (var i=0; i<labels.length; ++i) {
                     var y = this._chartGutter._top + (grapharea * (i / labels.length));
                     
-                    OfficeExcel.Text(context, font, text_size, xpos, y, labels[i], 'center', align, boxed);
+                    OfficeExcel.Text(context, font, text_size, xpos, y, labels[i], 'center', align, boxed, null, null, bold, null, textOptions);
                 }
 
                 return;
@@ -1835,24 +1870,24 @@
                         stepY = this._otherProps._ymin;
                     else*/
                         stepY = this.scale[this.scale.length -1 - i]
-						OfficeExcel.Text(context,font,text_size,xpos - 5,this._chartGutter._top + this.halfTextHeight + ((i/this.scale.length) * (this.grapharea) ),OfficeExcel.numToFormatText(stepY.toString(),isFormatCell) + units_post,null,align,boxed);
+						OfficeExcel.Text(context,font,text_size,xpos - 5,this._chartGutter._top + this.halfTextHeight + ((i/this.scale.length) * (this.grapharea) ),OfficeExcel.numToFormatText(stepY.toString(),isFormatCell) + units_post,null,align,boxed, null, null, bold, null, textOptions);
                     //OfficeExcel.Text(context,font,text_size,xpos - 5,this._chartGutter._top + this.halfTextHeight + ((i/this.scale.length) * (this.grapharea) ),OfficeExcel.number_format(this, stepY, units_pre, units_post),null,align,boxed);
                 }
             }
             else if (numYLabels == 3 || numYLabels == 5) {
 
-                OfficeExcel.Text(context, font, text_size, xpos, this._chartGutter._top + this.halfTextHeight, OfficeExcel.number_format(this, this.scale[4], units_pre, units_post), null, align, boxed);
+                OfficeExcel.Text(context, font, text_size, xpos, this._chartGutter._top + this.halfTextHeight, OfficeExcel.number_format(this, this.scale[4], units_pre, units_post), null, align, boxed, null, null, bold, null, textOptions);
 
                 // 5 labels
                 if (numYLabels == 5) {
-                    OfficeExcel.Text(context, font, text_size, xpos, (1*interval) + this._chartGutter._top + this.halfTextHeight, OfficeExcel.number_format(this, this.scale[3], units_pre, units_post), null, align, boxed);
-                    OfficeExcel.Text(context, font, text_size, xpos, (3*interval) + this._chartGutter._top + this.halfTextHeight, OfficeExcel.number_format(this, this.scale[1], units_pre, units_post), null, align, boxed);
+                    OfficeExcel.Text(context, font, text_size, xpos, (1*interval) + this._chartGutter._top + this.halfTextHeight, OfficeExcel.number_format(this, this.scale[3], units_pre, units_post), null, align, boxed, null, null, bold, null, textOptions);
+                    OfficeExcel.Text(context, font, text_size, xpos, (3*interval) + this._chartGutter._top + this.halfTextHeight, OfficeExcel.number_format(this, this.scale[1], units_pre, units_post), null, align, boxed, null, null, bold, null, textOptions);
                 }
                 
                 // 3 labels
                 if (numYLabels == 3 || numYLabels == 5) {
-                    OfficeExcel.Text(context, font, text_size, xpos, (2*interval) + this._chartGutter._top + this.halfTextHeight, OfficeExcel.number_format(this, this.scale[2], units_pre, units_post), null, align, boxed);
-                    OfficeExcel.Text(context, font, text_size, xpos, (4*interval) + this._chartGutter._top + this.halfTextHeight, OfficeExcel.number_format(this, this.scale[0], units_pre, units_post), null, align, boxed);
+                    OfficeExcel.Text(context, font, text_size, xpos, (2*interval) + this._chartGutter._top + this.halfTextHeight, OfficeExcel.number_format(this, this.scale[2], units_pre, units_post), null, align, boxed, null, null, bold, null, textOptions);
+                    OfficeExcel.Text(context, font, text_size, xpos, (4*interval) + this._chartGutter._top + this.halfTextHeight, OfficeExcel.number_format(this, this.scale[0], units_pre, units_post), null, align, boxed, null, null, bold, null, textOptions);
                 }
             }
             
@@ -1862,7 +1897,7 @@
                 interval   = (this.grapharea / numYLabels );
 
                 for (var i=0; i<numYLabels; ++i) {
-                    OfficeExcel.Text(context, font, text_size, xpos, this._chartGutter._top + ((this.grapharea / numYLabels) * i), OfficeExcel.number_format(this,((this.scale[4] / numYLabels) * (numYLabels - i)).toFixed((this._otherProps._scale_decimals)), units_pre, units_post), 'center', align, boxed);
+                    OfficeExcel.Text(context, font, text_size, xpos, this._chartGutter._top + ((this.grapharea / numYLabels) * i), OfficeExcel.number_format(this,((this.scale[4] / numYLabels) * (numYLabels - i)).toFixed((this._otherProps._scale_decimals)), units_pre, units_post), 'center', align, boxed, null, null, bold, null, textOptions);
                 }
             }
             
@@ -1880,7 +1915,7 @@
                             this.min + units_post,
                             'center',
                             align,
-                            boxed);
+                            boxed, null, null, bold, null, textOptions);
 			}
 			else{
 				OfficeExcel.Text(context,
@@ -1892,7 +1927,7 @@
                             //OfficeExcel.number_format(this,(this.min.toFixed((this._otherProps._scale_decimals))), units_pre, units_post),
                             'center',
                             align,
-                            boxed);
+                            boxed, null, null, bold, null, textOptions);
 				}   
             }
         }

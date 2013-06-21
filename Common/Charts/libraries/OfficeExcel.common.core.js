@@ -1496,11 +1496,169 @@
     * @param bool           Whether the text is bold or not
     * @param bool           Whether the bounding box has a placement indicator
     */
-    OfficeExcel.Text = function (context, font, size, x, y, text)
+	
+	OfficeExcel.getFmgrGraphics = function()
+	{
+		if(!this.fmgrGraphics)
+		{
+			if(!OfficeExcel.fontManager)
+				OfficeExcel.fontManager = new CFontManager();
+			
+			this.fmgrGraphics = [];	
+			this.fmgrGraphics.push(OfficeExcel.fontManager);	
+			this.fmgrGraphics.push(OfficeExcel.fontManager);
+			
+			this.fmgrGraphics[0].Initialize(true); 
+			this.fmgrGraphics[1].Initialize(true);
+		}
+	}
+	
+	OfficeExcel.getDrwContext = function(canvas)
+	{
+		if(!this.fmgrGraphics)
+		{
+			this.getFmgrGraphics();
+			this.drwContext =  Asc.DrawingContext({canvas: canvas, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics});
+		}
+		else if(!this.drwContext)
+			this.drwContext =  Asc.DrawingContext({canvas: canvas, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics});
+		else//здесь должна быть передача canvas(setCanvas) 
+			this.drwContext =  Asc.DrawingContext({canvas: canvas, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics});
+		return this.drwContext;
+	}
+	
+	OfficeExcel.Text = function (context, font, size, x, y, text)
+    {		
+		var context = OfficeExcel.getDrwContext(bar.canvas);
+
+        // Need these now the angle can be specified, ie defaults for the former two args
+        if (typeof(arguments[6]) == null) arguments[6]  = 'bottom'; // Vertical alignment. Default to bottom/baseline
+        if (typeof(arguments[7]) == null) arguments[7]  = 'left';   // Horizontal alignment. Default to left
+        if (typeof(arguments[8]) == null) arguments[8]  = null;     // Show a bounding box. Useful for positioning during development. Defaults to false
+        if (typeof(arguments[9]) == null) arguments[9]  = 0;        // Angle (IN DEGREES) that the text should be drawn at. 0 is middle right, and it goes clockwise
+        if (typeof(arguments[12]) == null) arguments[12] = true;    // Whether the bounding box has the placement indicator
+
+        // The alignment is recorded here for purposes of Opera compatibility
+        if (navigator.userAgent.indexOf('Opera') != -1) {
+            context.canvas.__OfficeExcel_valign__ = arguments[6];
+            context.canvas.__OfficeExcel_halign__ = arguments[7];
+        }
+
+        // First, translate to x/y coords
+        context.save();
+
+		context.canvas.__OfficeExcel_originalx__ = x;
+		context.canvas.__OfficeExcel_originaly__ = y;
+		context.translate(x, y);
+		var italic = arguments[13] && arguments[13].italic ? arguments[13].italic : false;
+		var underline = arguments[13] && arguments[13].underline ? arguments[13].underline : false;
+		
+		var ascFont = new Asc.FontProperties(font, size, arguments[11], italic, underline);
+		context.setFont(ascFont);
+	 
+		var width;
+		var textSize;
+		if(typeof text != 'string')
+			text = text.toString();
+		if(text != "")
+			textSize  = context.measureText(text,1);
+		
+
+		// Vertical alignment - defaults to bottom
+		if (arguments[6]) {
+			var vAlign = arguments[6];
+			if(textSize)
+				size1 = textSize.height/0.75;
+			else
+				size1 = size;
+			if (vAlign == 'center') {
+				y = y + size1 / 2;
+				//context.translate(0, size / 2);
+			} else if (vAlign == 'top') {
+				y = y + size1;
+				//context.translate(0, size);
+			}
+		}
+
+
+		// Hoeizontal alignment - defaults to left
+		if (arguments[7] && textSize) {
+			var hAlign = arguments[7];
+			width = textSize.width/0.75;
+			if (hAlign) {
+				if (hAlign == 'center') {
+					//context.translate(-1 * (width / 2), 0)
+					x = x - width/2;
+				} else if (hAlign == 'right') {
+					x = x - width;
+					//context.translate(-1 * width, 0)
+				}
+			}
+		}
+		if(arguments[13] && arguments[13].color)
+			context.setFillStyle(arguments[13].color);
+		else
+			context.setFillStyle("#000000");
+
+		// Rotate the canvas if need be
+		if (arguments[9] && textSize) {
+			var textOptions = 
+			{
+				font: ascFont,
+				width: textSize.width,
+				height: textSize.height,
+				x: x*0.75,
+				y: y*0.75,
+			};
+			OfficeExcel.drawTurnedText(context,textOptions, text, 90);
+		}
+		
+		if(!arguments[9])
+		{
+			 context.fillText(text, x*0.75, y*0.75, undefined, [6.36474609375]);
+			 context.lineWidth = 1;
+		}	
+         context.restore();
+    }
+	
+	OfficeExcel.drawTurnedText = function(drawingCtx,textOptions, text, angle)
+	{
+		var cx = textOptions.x; // center offset x
+		var cy = textOptions.y; // center offset y
+		var textWidth = textOptions.width;  // NOTE: measure text (width * 0.5)
+		var textHeight = textOptions.height; // NOTE: measure text (height * 0.5)
+		var font = textOptions.font;
+		var size = textOptions.size;
+		var asc = Asc; 
+		
+		if(!angle)
+			angle = 90;
+
+		var m = new asc.Matrix();
+		m.rotate(angle, 0);
+
+		var mbt = new asc.Matrix();
+		mbt.translate(cx + textWidth, cy + textHeight);
+
+		drawingCtx.setFont(font, angle);
+
+
+		drawingCtx.setTextTransform(m.sx, m.shy, m.shx, m.sy, m.tx, m.ty);
+		drawingCtx.setTransform(mbt.sx, mbt.shy, mbt.shx, mbt.sy, mbt.tx, mbt.ty);
+		drawingCtx.updateTransforms();
+
+		drawingCtx.fillText(text, 0, 0, 0, 0, angle);
+
+		drawingCtx.resetTransforms();
+	}	 
+	   
+					
+    OfficeExcel.TextWithoutFonts = function (context, font, size, x, y, text)
     {
         /**
         * This calls the text function recursively to accommodate multi-line text
         */
+		
         if (typeof(text) == 'string' && text.match(/\r\n/)) {
             
             var arr = text.split('\r\n');
@@ -1512,8 +1670,7 @@
 
             OfficeExcel.Text(context, font, size, arguments[9] == -90 ? (x + (size * 1.5)) : x, y + (size * 1.5), nextline, arguments[6] ? arguments[6] : null, 'center', arguments[8], arguments[9], arguments[10], arguments[11], arguments[12]);
         }
-
-
+	
         // Accommodate MSIE
         if (OfficeExcel.isOld()) {
             y += 2;
@@ -1701,6 +1858,13 @@
         var vpos         = obj._chartTitle._vpos;
         var hpos         = obj._chartTitle._hpos;
         var bgcolor      = obj._chartTitle._background;
+		var textOptions =
+		{
+			color: obj._chartTitle._color,
+			underline: obj._chartTitle._underline,
+			italic: obj._chartTitle._italic
+		}		
+		
 
         // Account for 3D effect by faking the key position
         if (obj.type == 'bar' && obj._otherProps._variant == '3d') {
@@ -1766,7 +1930,7 @@
             vpos = obj._chartTitle._vpos;
             vCenter = 'bottom';
         }
-        OfficeExcel.Text(context, font, size, centerx, vpos, text, vCenter, 'center', bgcolor != null, null, bgcolor, bold);
+        OfficeExcel.Text(context, font, size, centerx, vpos, text, vCenter, 'center', bgcolor != null, null, bgcolor, bold, null, textOptions);
         
         // Reset the fill colour
         context.fillStyle = oldColor;
@@ -1995,7 +2159,13 @@
             var size = obj._otherProps._text_size + 2;
             var font = obj._otherProps._text_font;
             var bold = obj._xAxisTitle._bold;
-
+			var textOptions =
+			{
+				color: obj._xAxisTitle._color,
+				underline: obj._xAxisTitle._underline,
+				italic: obj._xAxisTitle._italic
+			}			
+			
             if (typeof(obj._xAxisTitle._size) == 'number')
                 size = obj._xAxisTitle._size;
 
@@ -2024,7 +2194,9 @@
                         false,
                         false,
                         false,
-                        bold);
+                        bold,
+						null,
+						textOptions);
             context.fill();
         }
 
@@ -2035,7 +2207,13 @@
             var font            = obj._otherProps._text_font;
             var angle           = 270;
             var bold = obj._yAxisTitle._bold;
-
+			var textOptions =
+			{
+				color: obj._yAxisTitle._color,
+				underline: obj._yAxisTitle._underline,
+				italic: obj._yAxisTitle._italic
+			}			
+			
             var hpos;
             var vpos = ((obj.canvas.height - obj._chartGutter._top - obj._chartGutter._bottom) / 2) + obj._chartGutter._top;
 
@@ -2072,11 +2250,13 @@
                 vpos,
                 obj._yAxisTitle._text,
                 'center',
-                'center',
+                'right',//change with center
                 false,
                 angle,
                 false,
-                bold);
+                bold,
+				null,
+				textOptions);
             context.fill();
         }
 
@@ -2550,6 +2730,13 @@ if (typeof(obj._otherProps._scale_formatter) == 'function') {
         var fgcolor   = 'black';
         var bgcolor   = 'white';
         var direction = 1;
+		var bold = bar._otherProps._labels_above_bold;
+		var textOptions = 
+		{
+			color: bar._otherProps._labels_above_color,
+			italic: bar._otherProps._labels_above_italic,
+			underline: bar._otherProps._labels_above_underline
+		}
 
         if (!labels) {
             return;
@@ -2692,7 +2879,10 @@ if (typeof(obj._otherProps._scale_formatter) == 'function') {
                                         'center',
                                         true,
                                         null,
-                                        (typeof(labels_processed[i]) == 'object' && typeof(labels_processed[i][2]) == 'string') ? labels_processed[i][2] : 'white');
+                                        (typeof(labels_processed[i]) == 'object' && typeof(labels_processed[i][2]) == 'string') ? labels_processed[i][2] : 'white',
+										bold,
+										null,
+										textOptions);
                         context.fill();
                     }
                 }

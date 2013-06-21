@@ -641,7 +641,14 @@
         var vAlignment = 'center';
         var labels     = this._otherProps._labels;
         var context    = this.context;
-
+		var bold 	   = this._otherProps._labels_above_bold;
+		var textOptions =
+		{
+			color: this._otherProps._labels_above_color,
+			underline: this._otherProps._labels_above_underline,
+			italic: this._otherProps._labels_above_italic
+		}	
+		
         /**
         * Turn the shadow off
         */
@@ -724,7 +731,7 @@
                             this.centery + explosion_offsety + (((this.radius + 10) * Math.sin(a))),
                             labels[i],
                             vAlignment,
-                            hAlignment);
+                            hAlignment, false, null,null, bolf, null, textOptions);
             }
             
             context.fill();
