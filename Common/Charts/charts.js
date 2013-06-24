@@ -12,6 +12,8 @@ function ChartRender() {
 		else
 			g_bChartPreview = false;
 		
+		if (chart.worksheet && !OfficeExcel.drawingCtxCharts)//выставление контекста для отрисовки
+			OfficeExcel.drawingCtxCharts = chart.worksheet.getDrawingContextCharts();
 		chartCanvas = document.createElement('canvas');
 		$(chartCanvas).css('width', width);
 		$(chartCanvas).css('height', height);
@@ -437,7 +439,7 @@ function calcGutter(axis,min,max,ymin,ymax,isSkip,isFormatCell) {
 		}
 	}
 }
-
+//ширины самих линий графика
 function calcWidthGraph() {
 	
 	if ( !chartCanvas )
@@ -630,10 +632,13 @@ function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY, chart)
 		if(bar._xAxisTitle._text != '' && (min >= 0 || bar.type == 'hbar') &&  bar._otherProps._xlabels)
 			bottom += 7;
 	}
-	bar._chartGutter._left = standartMargin + left;
-	bar._chartGutter._right = standartMargin + right;
-	bar._chartGutter._top = standartMargin + top;
-	bar._chartGutter._bottom = bottom + standartMargin;
+	var scale = 1;
+	if(OfficeExcel && OfficeExcel.drawingCtxCharts)
+		scale = OfficeExcel.drawingCtxCharts.scaleFactor;
+	bar._chartGutter._left = (standartMargin + left)*scale;
+	bar._chartGutter._right = (standartMargin + right)*scale;
+	bar._chartGutter._top = (standartMargin + top)*scale;
+	bar._chartGutter._bottom = (bottom + standartMargin)*scale;
 }
 
 //-----------------------------------------------------------------------------------
@@ -2031,7 +2036,4 @@ function setFontChart(chart)
 		bar._otherProps._text_font = defaultFont;
 		bar._otherProps._text_size = defaultSize;
 	}
-	
-	if (chart.worksheet)//выставление контекста для отрисовки
-		bar.drawingCtxCharts = chart.worksheet.getDrawingContextCharts();
 }

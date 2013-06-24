@@ -1498,7 +1498,7 @@
     */
 	OfficeExcel.Text = function (context, font, size, x, y, text)
     {
-		var drwContext = bar.drawingCtxCharts;
+		var drwContext = OfficeExcel.drawingCtxCharts;
 		if(drwContext)
 		{
 			drwContext.setCanvas(bar.canvas);
@@ -1572,7 +1572,8 @@
 				context.setFillStyle(arguments[13].color);
 			else
 				context.setFillStyle("#000000");
-
+			x = x/(drwContext.scaleFactor);
+			y = y/(drwContext.scaleFactor);
 			// Rotate the canvas if need be
 			if (arguments[9] && textSize) {
 				var textOptions = 
@@ -1588,7 +1589,7 @@
 			
 			if(!arguments[9])
 			{
-				 context.fillText(text, x*0.75, y*0.75, undefined, [6.36474609375]);
+				 context.fillText(text, x*0.75, y*0.75);
 				 context.lineWidth = 1;
 			}	
 			 context.restore();
