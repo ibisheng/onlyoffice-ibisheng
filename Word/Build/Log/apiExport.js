@@ -208,6 +208,7 @@ prop:asc_coAuthoringDisconnect
 prop:_coSpellCheckInit
 prop:_coSpellCheckSetServerUrl
 prop:_spellCheckInitCallback
+prop:asc_getSpellCheckLanguages
 prop:get_TextProps
 prop:GetJSONLogicDocument
 prop:get_ContentCount
@@ -330,6 +331,7 @@ prop:sync_TextDStrikeout
 prop:sync_TextCaps
 prop:sync_TextSmallCaps
 prop:sync_TextPosition
+prop:sync_TextLangCallBack
 prop:sync_ParaStyleName
 prop:sync_ParaSpacingLine
 prop:sync_PageBreakCallback
@@ -424,6 +426,8 @@ prop:sync_SpellCheckCallback
 prop:sync_SpellCheckVariantsFound
 prop:asc_replaceMisspelledWord
 prop:asc_ignoreMisspelledWord
+prop:asc_setDefaultLanguage
+prop:asc_getDefaultLanguage
 prop:asc_showComments
 prop:asc_hideComments
 prop:asc_addComment
@@ -1181,6 +1185,7 @@ asc_docs_api.prototype['asc_coAuthoringDisconnect'] = asc_docs_api.prototype.asc
 asc_docs_api.prototype['_coSpellCheckInit'] = asc_docs_api.prototype._coSpellCheckInit;
 asc_docs_api.prototype['_coSpellCheckSetServerUrl'] = asc_docs_api.prototype._coSpellCheckSetServerUrl;
 asc_docs_api.prototype['_spellCheckInitCallback'] = asc_docs_api.prototype._spellCheckInitCallback;
+asc_docs_api.prototype['asc_getSpellCheckLanguages'] = asc_docs_api.prototype.asc_getSpellCheckLanguages;
 asc_docs_api.prototype['get_TextProps'] = asc_docs_api.prototype.get_TextProps;
 asc_docs_api.prototype['GetJSONLogicDocument'] = asc_docs_api.prototype.GetJSONLogicDocument;
 asc_docs_api.prototype['get_ContentCount'] = asc_docs_api.prototype.get_ContentCount;
@@ -1303,6 +1308,7 @@ asc_docs_api.prototype['sync_TextDStrikeout'] = asc_docs_api.prototype.sync_Text
 asc_docs_api.prototype['sync_TextCaps'] = asc_docs_api.prototype.sync_TextCaps;
 asc_docs_api.prototype['sync_TextSmallCaps'] = asc_docs_api.prototype.sync_TextSmallCaps;
 asc_docs_api.prototype['sync_TextPosition'] = asc_docs_api.prototype.sync_TextPosition;
+asc_docs_api.prototype['sync_TextLangCallBack'] = asc_docs_api.prototype.sync_TextLangCallBack;
 asc_docs_api.prototype['sync_ParaStyleName'] = asc_docs_api.prototype.sync_ParaStyleName;
 asc_docs_api.prototype['sync_ParaSpacingLine'] = asc_docs_api.prototype.sync_ParaSpacingLine;
 asc_docs_api.prototype['sync_PageBreakCallback'] = asc_docs_api.prototype.sync_PageBreakCallback;
@@ -1397,6 +1403,8 @@ asc_docs_api.prototype['sync_SpellCheckCallback'] = asc_docs_api.prototype.sync_
 asc_docs_api.prototype['sync_SpellCheckVariantsFound'] = asc_docs_api.prototype.sync_SpellCheckVariantsFound;
 asc_docs_api.prototype['asc_replaceMisspelledWord'] = asc_docs_api.prototype.asc_replaceMisspelledWord;
 asc_docs_api.prototype['asc_ignoreMisspelledWord'] = asc_docs_api.prototype.asc_ignoreMisspelledWord;
+asc_docs_api.prototype['asc_setDefaultLanguage'] = asc_docs_api.prototype.asc_setDefaultLanguage;
+asc_docs_api.prototype['asc_getDefaultLanguage'] = asc_docs_api.prototype.asc_getDefaultLanguage;
 asc_docs_api.prototype['asc_showComments'] = asc_docs_api.prototype.asc_showComments;
 asc_docs_api.prototype['asc_hideComments'] = asc_docs_api.prototype.asc_hideComments;
 asc_docs_api.prototype['asc_addComment'] = asc_docs_api.prototype.asc_addComment;
