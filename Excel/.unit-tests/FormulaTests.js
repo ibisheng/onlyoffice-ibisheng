@@ -2,7 +2,7 @@
 	
 	var ver = 2;
 
-	var oParser, wb, ws, date1, date2,
+	var oParser, wb, ws, date1, date2, dif = 1e-9,
 		data = getTestWorkbook(),
 		sData = data + "";
 	if( c_oSerFormat.Signature === sData.substring(0, c_oSerFormat.Signature.length))
@@ -708,7 +708,7 @@
 		}
 	})
 
-	test("Test: \"DATEVALUE\"",function(){
+	test("Test: \"NETWORKDAYS\"",function(){
 	
 		oParser = new parserFormula("NETWORKDAYS(DATE(2006,1,1),DATE(2006,1,31))","A2",ws);
 		ok(oParser.parse());
@@ -828,7 +828,7 @@
 		
 	})
 
-	test("Test: \"TEXT\"",function(){
+	test("Test: \"WORKDAY\"",function(){
 		
 		wb.dependencyFormulas = new DependencyGraph(wb);
 		
@@ -850,4 +850,60 @@
 		
 	})
 
+	test("Test: \"FV\"",function(){
+	
+		function fv( rate, nper, pmt, pv, type ){
+			var res;
+			if( type === undefined || type === null )
+				type = 0;
+			
+			if( pv === undefined || pv === null )
+				pv = 0;
+			
+			if( rate != 0 ){
+				res = -1 * ( pv * Math.pow( 1 + rate, nper ) + pmt * ( 1 + rate * type ) * ( Math.pow( 1 + rate ,nper ) - 1) / rate );
+			}
+			else{
+				res = -1 * ( pv + pmt * nper );
+			}
+			return res;
+		}
+	
+		oParser = new parserFormula("FV(0.06/12,10,-200,-500,1)","A2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), fv(0.06/12,10,-200,-500,1) );
+		
+		oParser = new parserFormula("FV(0.12/12,12,-1000)","A2",ws);
+		ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), fv(0.12/12,12,-1000) );
+		
+		oParser = new parserFormula("FV(0.11/12,35,-2000,,1)","A2",ws);
+		ok(oParser.parse());
+        ok( Math.abs(oParser.calculate().getValue() - fv(0.11/12,35,-2000,null,1)) < dif );
+		
+		oParser = new parserFormula("FV(0.06/12,12,-100,-1000,1)","A2",ws);
+		ok(oParser.parse());
+        ok( Math.abs(oParser.calculate().getValue() - fv(0.06/12,12,-100,-1000,1)) < dif );
+		
+	})
+	
+	test("Test: \"STDEV\"",function(){
+	
+		function stdev(){
+			var average = 0, sum = 0, res = 0; 
+			for( var i = 0; i < arguments.length; i++){
+				average += arguments[i] / arguments.length;
+			}
+			for( var i = 0; i < arguments.length; i++){
+				res += (arguments[i] - average)*(arguments[i] - average);
+			}
+			return Math.sqrt(res / (arguments.length - 1));
+		}
+	
+		oParser = new parserFormula("STDEV(123,134,143,173,112,109)","A2",ws);
+		ok(oParser.parse());
+        ok( Math.abs(oParser.calculate().getValue() - stdev(123,134,143,173,112,109)) < dif );
+		
+	})
+	
 });

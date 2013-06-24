@@ -2787,6 +2787,77 @@ var cFormulaFunction = {
         'FV' : function(){
             var r = new cBaseFunction();
             r.setName("FV");
+			r.setArgumentsMin(3);
+            r.setArgumentsMax(5);
+            r.Calculate = function(arg){
+				var rate = arg[0], nper = arg[1], pmt = arg[2], pv = arg[3] ? arg[3] : new cNumber(0), type = arg[4] ? arg[4] : new cNumber(0);
+
+				if ( rate instanceof cArea || rate instanceof cArea3D ){
+					rate = rate.cross(arguments[1].first);
+				}
+				else if( rate instanceof cArray ){
+					rate = rate.getElementRowCol(0,0);
+				}
+
+				if ( nper instanceof cArea || nper instanceof cArea3D ){
+					nper = nper.cross(arguments[1].first);
+				}
+				else if( nper instanceof cArray ){
+					nper = nper.getElementRowCol(0,0);
+				}
+
+				if ( pmt instanceof cArea || pmt instanceof cArea3D ){
+					pmt = pmt.cross(arguments[1].first);
+				}
+				else if( pmt instanceof cArray ){
+					pmt = pmt.getElementRowCol(0,0);
+				}
+
+				if ( pv instanceof cArea || pv instanceof cArea3D ){
+					pv = pv.cross(arguments[1].first);
+				}
+				else if( pv instanceof cArray ){
+					pv = pv.getElementRowCol(0,0);
+				}
+
+				if ( type instanceof cArea || type instanceof cArea3D ){
+					type = type.cross(arguments[1].first);
+				}
+				else if( type instanceof cArray ){
+					type = type.getElementRowCol(0,0);
+				}
+
+				rate = rate.tocNumber();
+				nper = nper.tocNumber();
+				pmt = pmt.tocNumber();
+				pv = pv.tocNumber();
+				type = type.tocNumber();
+
+				if ( rate instanceof cError ) return this.value = rate;
+				if ( nper instanceof cError ) return this.value = nper;
+				if ( pmt instanceof cError ) return this.value = pmt;
+				if ( pv instanceof cError ) return this.value = pv;
+				if ( type instanceof cError ) return this.value = type;
+
+				if ( type.getValue() != 1 && type.getValue() != 0 ) return this.value = new cError( cErrorType.not_numeric );
+
+				var res;
+				if( rate.getValue() != 0 ){
+					res = -1*( pv.getValue()*Math.pow(1+rate.getValue(),nper.getValue())+pmt.getValue()*( 1 + rate.getValue()*type.getValue() )*(Math.pow((1+rate.getValue()),nper.getValue())-1)/rate.getValue() );
+				}
+				else{
+					res = -1*( pv.getValue()+pmt.getValue()*nper.getValue() );
+				}
+
+				return this.value = new cNumber(res);
+			}
+			r.getInfo = function(){
+                return {
+                    name:this.name,
+                    args:"( rate , nper , pmt [ , [ pv ] [ ,[ type ] ] ] )"
+                };
+            }
+			r.setFormat(r.formatType.noneFormat);
 			return r;
         },
         'FVSCHEDULE' : function(){
@@ -2953,7 +3024,7 @@ var cFormulaFunction = {
         'PV' : function(){
             var r = new cBaseFunction();
             r.setName("PV");
-			r.setArgumentsMin(1);
+			r.setArgumentsMin(3);
             r.setArgumentsMax(5);
             r.Calculate = function(arg){
 				var rate = arg[0], nper = arg[1], pmt = arg[2], fv = arg[3] ? arg[3] : new cNumber(0), type = arg[4] ? arg[4] : new cNumber(0);
@@ -3101,7 +3172,8 @@ var cFormulaFunction = {
         },
         "ERROR.TYPE" :function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+			r.setName("ERROR.TYPE");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
 				function typeError(elem){
@@ -3148,7 +3220,6 @@ var cFormulaFunction = {
 				}
                 return this.value = typeError(arg0);
                }
-            r.setName("ERROR.TYPE");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -3164,7 +3235,8 @@ var cFormulaFunction = {
         },
         "ISBLANK" :function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("ISBLANK");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
 				var arg0 = arg[0];
@@ -3179,7 +3251,6 @@ var cFormulaFunction = {
                 else
                     return this.value = new cBool( false );
             }
-            r.setName("ISBLANK");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -3190,7 +3261,8 @@ var cFormulaFunction = {
 		},
         "ISERR" :function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("ISERR");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
 				var arg0 = arg[0];
@@ -3208,7 +3280,6 @@ var cFormulaFunction = {
                 else
                     return this.value = new cBool( false );
             }
-            r.setName("ISERR");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -3219,7 +3290,8 @@ var cFormulaFunction = {
 		},
         "ISERROR" :function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("ISERROR");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
 				var arg0 = arg[0];
@@ -3237,7 +3309,6 @@ var cFormulaFunction = {
                 else
                     return this.value = new cBool( false );
             }
-            r.setName("ISERROR");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -3248,6 +3319,7 @@ var cFormulaFunction = {
 		},
         "ISEVEN" :function(){
             var r = new cBaseFunction();
+			r.setName("ISEVEN");
             r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -3269,7 +3341,6 @@ var cFormulaFunction = {
 				else
 					return this.value = new cBool( (arg0.getValue() & 1) == 0 );
             }
-            r.setName("ISEVEN");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -3280,7 +3351,8 @@ var cFormulaFunction = {
 		},
         "ISLOGICAL" :function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("ISLOGICAL");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
 				var arg0 = arg[0];
@@ -3297,7 +3369,6 @@ var cFormulaFunction = {
                     return this.value = new cBool( true );
                 else return this.value = new cBool( false );
             }
-            r.setName("ISLOGICAL");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -3308,7 +3379,8 @@ var cFormulaFunction = {
 		},
         "ISNA" :function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("ISNA");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
 				var arg0 = arg[0];
@@ -3326,7 +3398,6 @@ var cFormulaFunction = {
                 else
                     return this.value = new cBool( false );
             }
-            r.setName("ISNA");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -3337,7 +3408,8 @@ var cFormulaFunction = {
 		},
         "ISNONTEXT" :function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("ISNONTEXT");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
 				var arg0 = arg[0];
@@ -3355,7 +3427,6 @@ var cFormulaFunction = {
                 else
                     return this.value = new cBool( false );
             }
-            r.setName("ISNONTEXT");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -3366,7 +3437,8 @@ var cFormulaFunction = {
 		},
         "ISNUMBER" :function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("ISNUMBER");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
 				var arg0 = arg[0];
@@ -3384,7 +3456,6 @@ var cFormulaFunction = {
                 else
                     return this.value = new cBool( false );
             }
-            r.setName("ISNUMBER");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -3395,7 +3466,8 @@ var cFormulaFunction = {
 		},
         "ISODD" :function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("ISODD");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
 				var arg0 = arg[0];
@@ -3416,7 +3488,6 @@ var cFormulaFunction = {
 				else
                     return this.value = new cBool( (arg0.getValue() & 1) == 1 );
             }
-            r.setName("ISODD");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -3427,14 +3498,14 @@ var cFormulaFunction = {
 		},
         "ISREF" :function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("ISREF");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
                 if ( (arg[0] instanceof cRef || arg[0] instanceof cArea || arg[0] instanceof cArea3D|| arg[0] instanceof cRef3D) && arg[0].isValid && arg[0].isValid() )
                     return this.value = new cBool( true );
                 else return this.value = new cBool( false );
             }
-            r.setName("ISREF");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -3445,7 +3516,8 @@ var cFormulaFunction = {
 		},
         "ISTEXT" :function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("ISTEXT");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
 				var arg0 = arg[0];
@@ -3463,7 +3535,6 @@ var cFormulaFunction = {
                 else
                     return this.value = new cBool( false );
             }
-            r.setName("ISTEXT");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -3474,7 +3545,8 @@ var cFormulaFunction = {
 		},
         "N" :function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("N");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
 				var arg0 = arg[0];
@@ -3504,24 +3576,23 @@ var cFormulaFunction = {
                     return this.value = new cNumber( 0 );
 
             }
-            r.setName("N");
-			r.setFormat(r.formatType.noneFormat);
             r.getInfo = function(){
                 return {
                     name:this.name,
                     args:"(value)"
                 };
             }
+			r.setFormat(r.formatType.noneFormat);
 			return r;
 		},
         "NA" :function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(0);
+            r.setName("NA");
+			r.setArgumentsMin(0);
             r.setArgumentsMax(0);
             r.Calculate = function(){
                 return this.value = new cError(cErrorType.not_available);
             }
-            r.setName("NA");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -3532,7 +3603,8 @@ var cFormulaFunction = {
 		},
         "TYPE" :function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("TYPE");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
 				var arg0 = arg[0];
@@ -3553,7 +3625,6 @@ var cFormulaFunction = {
                 else
                     return this.value = new cNumber( 64 );
 			}
-            r.setName("TYPE");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -3567,7 +3638,8 @@ var cFormulaFunction = {
         'groupName' : "Logical",
         'AND' : function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("AND");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(255);
             r.Calculate = function(arg){
                 var argResult = null;
@@ -3621,7 +3693,6 @@ var cFormulaFunction = {
                     return this.value = new cError( cErrorType.wrong_value_type );
                 return this.value = argResult;
             }
-            r.setName("AND");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -3632,10 +3703,12 @@ var cFormulaFunction = {
 		},
         'FALSE' : function(){
             var r = new cBaseFunction();
-            r.Calculate = function(){
+            r.setName("FALSE");
+			r.setArgumentsMin(0);
+            r.setArgumentsMax(0);
+			r.Calculate = function(){
                 return this.value = new cBool(false);
             }
-            r.setName("FALSE");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -3646,7 +3719,8 @@ var cFormulaFunction = {
 		},
         'IF' : function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("IF");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(3);
             r.Calculate = function(arg){
                 var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
@@ -3678,7 +3752,6 @@ var cFormulaFunction = {
                         new cBool(false) ;
                 }
             }
-            r.setName("IF");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -3689,7 +3762,8 @@ var cFormulaFunction = {
 		},
         'IFERROR' : function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(2);
+            r.setName("IFERROR");
+			r.setArgumentsMin(2);
             r.setArgumentsMax(2);
             r.Calculate = function(arg){
 				var arg0 = arg[0];
@@ -3707,7 +3781,6 @@ var cFormulaFunction = {
                     return this.value = arg[1] instanceof cArray ? arg[1].getElement(0) : arg[1];
                 else return this.value = arg[0];
             }
-            r.setName("IFERROR");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -3718,7 +3791,8 @@ var cFormulaFunction = {
 		},
         'NOT' : function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("NOT");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
 				var arg0 = arg[0];
@@ -3741,7 +3815,6 @@ var cFormulaFunction = {
                 else
                     return this.value = new cBool( ! arg0.tocBool().value );
             }
-            r.setName("NOT");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -3752,7 +3825,8 @@ var cFormulaFunction = {
 		},
         'OR' : function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("OR");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(255);
             r.Calculate = function(arg){
                 var argResult = null;
@@ -3803,7 +3877,6 @@ var cFormulaFunction = {
                     return this.value = new cError( cErrorType.wrong_value_type );
                 return this.value = argResult;
             }
-            r.setName("OR");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -3814,10 +3887,12 @@ var cFormulaFunction = {
 		},
         'TRUE' : function(){
             var r = new cBaseFunction();
+			r.setName("TRUE");
+			r.setArgumentsMin(0);
+            r.setArgumentsMax(0);
             r.Calculate = function(){
                 return this.value = new cBool(true);
             }
-            r.setName("TRUE");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -3841,6 +3916,7 @@ var cFormulaFunction = {
 		},
         'CHOOSE' : function(){
             var r = new cBaseFunction();
+			r.setName("CHOOSE");
 			r.setArgumentsMin(2);
             r.setArgumentsMax(30);
 			r.Calculate = function(arg){
@@ -3865,7 +3941,6 @@ var cFormulaFunction = {
 
 				return this.value = new cError( cErrorType.wrong_value_type );
 			}
-            r.setName("CHOOSE");
 			r.getInfo = function(){
                 return {
                     name:this.name,
@@ -4489,7 +4564,8 @@ var cFormulaFunction = {
         'groupName' : "Mathematic",
         'ABS' : function(){
 			var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("ABS");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
 				var arg0 = arg[0];
@@ -4514,7 +4590,6 @@ var cFormulaFunction = {
 				}
                 return this.value = arg0;
             };
-            r.setName("ABS");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -4525,7 +4600,8 @@ var cFormulaFunction = {
 		},
         'ACOS' :  function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("ACOS");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
 				var arg0 = arg[0];
@@ -4552,7 +4628,6 @@ var cFormulaFunction = {
 				}
                 return this.value = arg0;
             };
-            r.setName("ACOS");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -4568,7 +4643,8 @@ var cFormulaFunction = {
 		},
         'ASIN' :  function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("ASIN");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
 				var arg0 = arg[0];
@@ -4595,7 +4671,6 @@ var cFormulaFunction = {
 				}
                 return this.value = arg0;
             };
-            r.setName("ASIN");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -4611,7 +4686,8 @@ var cFormulaFunction = {
 		},
         'ATAN' : function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("ATAN");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
 				var arg0 = arg[0];
@@ -4639,7 +4715,6 @@ var cFormulaFunction = {
 				}
                 return this.value = arg0;
             };
-            r.setName("ATAN");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -4734,7 +4809,8 @@ var cFormulaFunction = {
 		},
         'CEILING' : function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(2);
+            r.setName("CEILING");
+			r.setArgumentsMin(2);
             r.setArgumentsMax(2);
             r.Calculate = function(arg){
 				var arg0 = arg[0],arg1 = arg[1];
@@ -4816,7 +4892,6 @@ var cFormulaFunction = {
 				return this.value = ceilingHelper( arg0.getValue(), arg1.getValue() );
 
             }
-            r.setName("CEILING");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -4832,7 +4907,8 @@ var cFormulaFunction = {
 		},
         'COS' : function (){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("COS");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
 				var arg0 = arg[0];
@@ -4859,7 +4935,6 @@ var cFormulaFunction = {
 				}
                 return this.value = arg0;
             }
-            r.setName("COS");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -4875,7 +4950,8 @@ var cFormulaFunction = {
 		},
         'DEGREES' : function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("DEGREES");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
 				var arg0 = arg[0];
@@ -4903,7 +4979,6 @@ var cFormulaFunction = {
                 return this.value = arg0;
 
             };
-            r.setName("DEGREES");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -4919,7 +4994,8 @@ var cFormulaFunction = {
 		},
         'EVEN' : function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("EVEN");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
 
@@ -4968,7 +5044,6 @@ var cFormulaFunction = {
                 }
 				return this.value = new cError ( cErrorType.wrong_value_type );
             }
-            r.setName("EVEN");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -4979,7 +5054,8 @@ var cFormulaFunction = {
 		},
         'EXP' : function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("EXP");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
 			r.Calculate = function(arg){
 				var arg0 = arg[0];
@@ -5009,7 +5085,6 @@ var cFormulaFunction = {
 				}
                 return this.value = arg0;
             }
-            r.setName("EXP");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -5030,7 +5105,8 @@ var cFormulaFunction = {
 		},
         'FLOOR' : function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(2);
+            r.setName("FLOOR");
+			r.setArgumentsMin(2);
             r.setArgumentsMax(2);
             r.Calculate = function(arg){
                 var arg0 = arg[0],arg1 = arg[1];
@@ -5111,7 +5187,6 @@ var cFormulaFunction = {
 
 				return this.value =  floorHelper( arg0.getValue(), arg1.getValue() );
             }
-            r.setName("FLOOR");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -5212,7 +5287,8 @@ var cFormulaFunction = {
 		},
         'INT' : function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("INT");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
                 var arg0 = arg[0];
@@ -5239,7 +5315,6 @@ var cFormulaFunction = {
 
                 return this.value = new cNumber( Math.floor( arg0.getValue() ) );
             }
-            r.setName("INT");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -5260,7 +5335,8 @@ var cFormulaFunction = {
 		},
         'LN' : function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("LN");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
 				var arg0 = arg[0];
@@ -5292,7 +5368,6 @@ var cFormulaFunction = {
 						return this.value = new cNumber( Math.log( arg0.getValue() ) );
 				}
             }
-            r.setName("LN");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -5303,7 +5378,8 @@ var cFormulaFunction = {
 		},
         'LOG' : function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("LOG");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(2);
             r.Calculate = function(arg){
 				var arg0 = arg[0],arg1 = undefined;
@@ -5388,7 +5464,6 @@ var cFormulaFunction = {
 					return this.value = new cNumber( Math.log( arg0.getValue() ) / Math.log( arg1.getValue() ) );
 
             };
-            r.setName("LOG");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -5399,7 +5474,8 @@ var cFormulaFunction = {
 		},
         'LOG10' : function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("LOG10");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
 				var arg0 = arg[0];
@@ -5431,7 +5507,6 @@ var cFormulaFunction = {
 						return this.value = new cNumber( Math.log( arg0.getValue() ) / Math.log( 10 ) );
 				}
             }
-            r.setName("LOG10");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -5459,6 +5534,7 @@ var cFormulaFunction = {
             var r = new cBaseFunction();
             r.setArgumentsMin(2);
             r.setArgumentsMax(2);
+			r.setName("MOD");
             r.Calculate = function(arg){
 				var arg0 = arg[0],arg1 = arg[1];
 				if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
@@ -5524,7 +5600,6 @@ var cFormulaFunction = {
 				return this.value = new cNumber( (arg1.getValue() < 0 ? -1 : 1) * ( Math.abs(arg0.getValue()) % Math.abs(arg1.getValue()) ) );
 
             }
-            r.setName("MOD");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -5535,7 +5610,8 @@ var cFormulaFunction = {
 		},
         'MROUND' : function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(2);
+            r.setName("MROUND");
+			r.setArgumentsMin(2);
             r.setArgumentsMax(2);
             r.Calculate = function(arg){
 
@@ -5618,7 +5694,6 @@ var cFormulaFunction = {
 				multiple = arg1.getValue();
                 return this.value = new cNumber( mroundHelper( arg0.getValue() + arg1.getValue() / 2 ) );
             }
-            r.setName("MROUND");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -5634,7 +5709,8 @@ var cFormulaFunction = {
 		},
         'ODD' : function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("ODD");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
 
@@ -5682,7 +5758,6 @@ var cFormulaFunction = {
 				return this.value = new cError ( cErrorType.wrong_value_type );
 
             }
-            r.setName("ODD");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -5693,12 +5768,12 @@ var cFormulaFunction = {
 		},
         'PI' : function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(0);
+            r.setName("PI");
+			r.setArgumentsMin(0);
             r.setArgumentsMax(0);
             r.Calculate = function(){
                 return new cNumber(Math.PI);
             };
-            r.setName("PI");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -5709,7 +5784,8 @@ var cFormulaFunction = {
 		},
         'POWER' : function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(2);
+            r.setName("POWER");
+			r.setArgumentsMin(2);
             r.setArgumentsMax(2);
             r.Calculate = function(arg){
 
@@ -5772,7 +5848,6 @@ var cFormulaFunction = {
 				return this.value = powerHelper( arg0.getValue(), arg1.getValue() );
 
             };
-            r.setName("POWER");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -5834,7 +5909,8 @@ var cFormulaFunction = {
 		},
         'RADIANS' : function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("RADIANS");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
 
@@ -5865,7 +5941,6 @@ var cFormulaFunction = {
 				return this.value = arg0;
 
             };
-            r.setName("RADIANS");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -5902,9 +5977,9 @@ var cFormulaFunction = {
 		},
         'ROUND' : function(){
             var r = new cBaseFunction();
+            r.setName("ROUND");
             r.setArgumentsMin(2);
             r.setArgumentsMax(2);
-            r.setName("ROUND");
             r.Calculate = function(arg){
 
 				function SignZeroPositive(number){
@@ -6037,9 +6112,9 @@ var cFormulaFunction = {
 		},
         'ROUNDDOWN' : function(){
             var r = new cBaseFunction();
+            r.setName("ROUNDDOWN");
             r.setArgumentsMin(2);
             r.setArgumentsMax(2);
-            r.setName("ROUNDDOWN");
             r.Calculate = function(arg){
 				function rounddownHelper(number,num_digits){
 					if(num_digits > cExcelMaxExponent){
@@ -6148,9 +6223,9 @@ var cFormulaFunction = {
 		},
         'ROUNDUP' : function(){
             var r = new cBaseFunction();
+            r.setName("ROUNDUP");
             r.setArgumentsMin(2);
             r.setArgumentsMax(2);
-            r.setName("ROUNDUP");
             r.Calculate = function(arg){
 				function roundupHelper(number, num_digits){
 					if(num_digits > cExcelMaxExponent){
@@ -6264,7 +6339,8 @@ var cFormulaFunction = {
 		},
         'SIGN' : function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("SIGN");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
 
@@ -6303,7 +6379,6 @@ var cFormulaFunction = {
                 return this.value = arg0;
 
             };
-            r.setName("SIGN");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -6314,7 +6389,8 @@ var cFormulaFunction = {
 		},
         'SIN' : function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("SIN");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
 				var arg0 = arg[0];
@@ -6341,7 +6417,6 @@ var cFormulaFunction = {
 				}
                 return this.value = arg0;
             }
-            r.setName("SIN");
             r.getInfo = function(){
                 return { name:this.name, args:"(number)" }
             }
@@ -6354,7 +6429,8 @@ var cFormulaFunction = {
 		},
         'SQRT' :  function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("SQRT");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
 			r.Calculate = function(arg){
 				var arg0 = arg[0];
@@ -6381,7 +6457,6 @@ var cFormulaFunction = {
 				}
                 return this.value = arg0;
             }
-			r.setName("SQRT");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -6392,7 +6467,8 @@ var cFormulaFunction = {
 		},
         'SQRTPI' : function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("SQRTPI");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
 			r.Calculate = function(arg){
 				var arg0 = arg[0];
@@ -6419,7 +6495,6 @@ var cFormulaFunction = {
 				}
                 return this.value = arg0;
             }
-            r.setName("SQRTPI");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -6435,7 +6510,8 @@ var cFormulaFunction = {
 		},
         'SUM' : function(){
 			var r = new cBaseFunction(this);
-		    r.setArgumentsMin(1);
+		    r.setName("SUM");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(255);
             r.Calculate = function(arg){
                 var arg0 = new cNumber(0), _aVal = null;
@@ -6472,7 +6548,6 @@ var cFormulaFunction = {
                 }
                 return this.value = arg0;
             };
-            r.setName("SUM");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -6654,7 +6729,8 @@ var cFormulaFunction = {
 		},
         'TAN' : function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("TAN");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
 				var arg0 = arg[0];
@@ -6681,7 +6757,6 @@ var cFormulaFunction = {
 				}
                 return this.value = arg0;
             };
-            r.setName("TAN");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -6710,33 +6785,25 @@ var cFormulaFunction = {
 		},
         'AVERAGE' : function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+			r.setName("AVERAGE");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(255);
             r.Calculate = function(arg){
                 var count = 0, sum = new cNumber(0);
                 for ( var i = 0; i < arg.length; i++){
                     var _arg = arg[i];
-                    if( _arg instanceof cError){
-                        return this.value = _arg;
-                    }
-                    else if( _arg instanceof cRef || _arg instanceof cRef3D){
+                    if( _arg instanceof cRef || _arg instanceof cRef3D){
                         var _argV = _arg.getValue();
                         if ( _argV instanceof cNumber ){
                             sum = _func[sum.type][_argV.type](sum,_argV,"+");
                             count++;
-                        }
-                        else if ( _argV instanceof cError ){
-                            return this.value = _argV;
                         }
                     }
                     else if ( _arg instanceof cArea || _arg instanceof cArea3D){
                         var _argAreaValue = _arg.getValue();
                         for ( var j = 0; j < _argAreaValue.length; j++){
                             var __arg = _argAreaValue[j];
-                            if( __arg instanceof cError){
-                                return this.value = __arg;
-                            }
-                            else if ( __arg instanceof cNumber ){
+                            if ( __arg instanceof cNumber ){
                                 sum = _func[sum.type][__arg.type](sum,__arg,"+");
                                 count++;
                             }
@@ -6752,14 +6819,14 @@ var cFormulaFunction = {
 						})
 					}
                     else{
+						if( _arg instanceof cError )
+							continue;
                         sum = _func[sum.type][_arg.type](sum,_arg,"+");
                         count++;
-                        if(sum instanceof cError) return this.value = sum;
                     }
                 }
                 return this.value = new cNumber (sum.getValue() / count);
             };
-            r.setName("AVERAGE");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -6825,7 +6892,8 @@ var cFormulaFunction = {
 		},
         'COUNT' : function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("COUNT");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(255);
             r.Calculate = function(arg){
                 var count = 0;
@@ -6863,7 +6931,6 @@ var cFormulaFunction = {
                 }
                 return this.value = new cNumber( count );
             };
-            r.setName("COUNT");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -7161,7 +7228,8 @@ var cFormulaFunction = {
 		},
         'MAX' : function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("MAX");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(255);
             r.Calculate = function(arg){
                 var argI, argIVal, max = new cNumber ( Number.NEGATIVE_INFINITY );
@@ -7224,7 +7292,6 @@ var cFormulaFunction = {
                 }
                 return this.value = ( max.value === Number.NEGATIVE_INFINITY ? new cNumber(0) : max );
             };
-            r.setName("MAX");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -7316,7 +7383,8 @@ var cFormulaFunction = {
 		},
         'MIN' : function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("MIN");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(255);
             r.Calculate = function(arg){
                 var argI, argIVal, min = new cNumber ( Number.POSITIVE_INFINITY );
@@ -7380,7 +7448,6 @@ var cFormulaFunction = {
                 }
                 return this.value = ( min.value === Number.POSITIVE_INFINITY ? new cNumber(0) : min );
             };
-            r.setName("MIN");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -7565,6 +7632,64 @@ var cFormulaFunction = {
         'STDEV' : function(){
             var r = new cBaseFunction();
             r.setName("STDEV");
+			r.setArgumentsMin(1);
+            r.setArgumentsMax(255);
+            r.Calculate = function(arg){
+                var count = 0, sum = new cNumber(0), member = [];
+                for ( var i = 0; i < arg.length; i++){
+                    var _arg = arg[i];
+                    if( _arg instanceof cRef || _arg instanceof cRef3D){
+                        var _argV = _arg.getValue();
+                        if ( _argV instanceof cNumber ){
+							member.push(_argV);
+                            sum = _func[sum.type][_argV.type](sum,_argV,"+");
+                            count++;
+                        }
+                    }
+                    else if ( _arg instanceof cArea || _arg instanceof cArea3D){
+                        var _argAreaValue = _arg.getValue();
+                        for ( var j = 0; j < _argAreaValue.length; j++){
+                            var __arg = _argAreaValue[j];
+                            if ( __arg instanceof cNumber ){
+								member.push(__arg);
+                                sum = _func[sum.type][__arg.type](sum,__arg,"+");
+                                count++;
+                            }
+                        }
+                    }
+					else if( _arg instanceof cArray ){
+						_arg.foreach(function(elem){
+							var e = elem.tocNumber();
+							if( e instanceof cNumber ){
+								member.push(e);
+								sum = _func[sum.type][e.type](sum,e,"+");
+								count++;
+							}
+						})
+					}
+                    else{
+						_arg = _arg.tocNumber();
+						if( _arg instanceof cNumber ){
+							member.push(_arg);
+							sum = _func[sum.type][_arg.type](sum,_arg,"+");
+							count++;
+						}
+                    }
+                }
+				var average = sum.getValue() / count, res = 0, av;
+				for( var i = 0; i < member.length; i++ ){
+					av =  member[i] - average;
+					res += av * av;
+				}
+                return this.value = new cNumber ( Math.sqrt(res / (count-1)) );STDEV(123,134,143,173,112,109)
+            };
+			r.getInfo = function(){
+                return {
+                    name:this.name,
+                    args:"( argument-list )"
+                };
+            }
+			r.setFormat(r.formatType.noneFormat);
         	return r;
 		},
         'STDEVA' : function(){
@@ -7733,6 +7858,7 @@ var cFormulaFunction = {
 		},
         'CODE' : function(){
             var r = new cBaseFunction();
+			r.setName("CODE");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -7764,7 +7890,6 @@ var cFormulaFunction = {
 
 				return this.value = new cNumber( arg0.toString().charCodeAt() );
 			}
-            r.setName("CODE");
 			r.getInfo = function(){
                 return {
                     name:this.name,
@@ -7775,7 +7900,8 @@ var cFormulaFunction = {
 		},
         'CONCATENATE' : function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("CONCATENATE");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(255);
             r.Calculate = function(arg){
                 var arg0 = new cString(""), argI;
@@ -7807,7 +7933,6 @@ var cFormulaFunction = {
                 }
                 return this.value = arg0;
             };
-            r.setName("CONCATENATE");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -7838,7 +7963,8 @@ var cFormulaFunction = {
 		},
         'EXACT' : function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(2);
+            r.setName("EXACT");
+			r.setArgumentsMin(2);
             r.setArgumentsMax(2);
             r.Calculate = function(arg){
 				var arg0 = arg[0], arg1 = arg[1];
@@ -7869,7 +7995,6 @@ var cFormulaFunction = {
                 var arg0val = arg0.getValue(), arg1val = arg1.getValue();
                 return this.value = new cBool( arg0val === arg1val );
             }
-            r.setName("EXACT");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -8215,7 +8340,8 @@ var cFormulaFunction = {
 		},
         'LOWER' : function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("LOWER");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
 				var arg0 = arg[0];
@@ -8231,7 +8357,6 @@ var cFormulaFunction = {
 
                 return this.value = new cString( arg0.getValue().toLowerCase() );
             }
-            r.setName("LOWER");
             r.getInfo = function(){
                 return {
                     name:this.name,
@@ -8453,9 +8578,9 @@ var cFormulaFunction = {
 		},
         'REPT' : function(){
             var r = new cBaseFunction();
+            r.setName("REPT");
             r.setArgumentsMin(2);
             r.setArgumentsMax(2);
-            r.setName("REPT");
             r.Calculate = function(arg){
                 var arg0 = arg[0], arg1 = arg[1], res = "";
                 if( arg0 instanceof cError ) return this.value = arg0;
@@ -8723,9 +8848,9 @@ var cFormulaFunction = {
 		},
         'T' : function(){
             var r = new cBaseFunction();
+            r.setName("T");
             r.setArgumentsMin(1);
             r.setArgumentsMax(1);
-            r.setName("T");
             r.Calculate = function(arg){
 				var arg0 = arg[0];
                 if( arg0 instanceof cRef || arg0 instanceof cRef3D){
@@ -8755,6 +8880,7 @@ var cFormulaFunction = {
 		},
         'TEXT' : function(){
             var r = new cBaseFunction();
+			r.setName("TEXT");
 			r.setArgumentsMin(2);
             r.setArgumentsMax(2);
             r.Calculate = function(arg){
@@ -8807,7 +8933,6 @@ var cFormulaFunction = {
 
 				return this.value = new cString(text);
 			}
-            r.setName("TEXT");
 			r.getInfo = function(){
                 return {
                     name:this.name,
@@ -8848,7 +8973,8 @@ var cFormulaFunction = {
 		},
         'UPPER' : function(){
             var r = new cBaseFunction();
-            r.setArgumentsMin(1);
+            r.setName("UPPER");
+			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
 				var arg0 = arg[0];
@@ -8863,7 +8989,6 @@ var cFormulaFunction = {
                 if( arg0 instanceof cError ) return this.value = arg0;
                 return this.value = new cString( arg0.getValue().toUpperCase() );
             }
-            r.setName("UPPER");
             r.getInfo = function(){
                 return {
                     name:this.name,
