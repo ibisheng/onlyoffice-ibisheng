@@ -2895,7 +2895,8 @@
 				var firstCellAddress = new CellAddress(id);
 				var endCellAddress = new CellAddress(idNext);
 				var bbox = {r1: firstCellAddress.getRow0(), c1: firstCellAddress.getCol0(), r2: endCellAddress.getRow0(), c2: endCellAddress.getCol0()};
-				var style = options.TableStyleInfo;
+				//todo убрать Asc.clone
+				var style = Asc.clone(options.TableStyleInfo);
 				var styleForCurTable;
 				//todo из файла
 				var headerRowCount = 1;
@@ -2927,22 +2928,43 @@
 							aNoHiddenCol.push(i);
 					}
 					aNoHiddenCol.sort(fSortAscending);
-					var nRowIndex = 0;//с учетом скрытых
+					//если скрыт первый или последний столбец, то их не надо сдвигать и показывать
+					if(aNoHiddenCol.length > 0)
+					{
+						if(aNoHiddenCol[0] != bbox.c1)
+							style.ShowFirstColumn = false;
+						if(aNoHiddenCol[aNoHiddenCol.length - 1] != bbox.c2)
+							style.ShowLastColumn = false;
+					}
+					var aNoHiddenRow = new Array();
 					for(var i = bbox.r1; i <= bbox.r2; i++)
 					{
-						if(true == ws.model._getRow(i).hd)
-							continue;
-						var nColIndex = 0;//с учетом скрытых
-						for(var j = 0, length = aNoHiddenCol.length; j < length; j++)
+						var row = ws.model._getRowNoEmpty(i);
+						if(null == row || true != row.hd)
+							aNoHiddenRow.push(i);
+					}
+					aNoHiddenRow.sort(fSortAscending);
+					//если скрыты заголовок или итоги, то их не надо сдвигать и показывать
+					if(aNoHiddenRow.length > 0)
+					{
+						if(aNoHiddenRow[0] != bbox.r1)
+							headerRowCount = 0;
+						if(aNoHiddenRow[aNoHiddenRow.length - 1] != bbox.r2)
+							totalsRowCount = 0;
+					}
+					//изменяем bbox с учетом скрытых
+					bbox = {r1: 0, c1: 0, r2: aNoHiddenRow.length - 1, c2: aNoHiddenCol.length - 1};
+					for(var i = 0, length = aNoHiddenRow.length; i < length; i++)
+					{
+						var nRowIndexAbs = aNoHiddenRow[i];
+						for(var j = 0, length2 = aNoHiddenCol.length; j < length2; j++)
 						{
 							var nColIndexAbs = aNoHiddenCol[j];
-							var cell = ws.model._getCell(i, nColIndexAbs);
-							var dxf = styleForCurTable.getStyle(bbox, i, nColIndexAbs, nRowIndex, nColIndex, style, headerRowCount, totalsRowCount);
+							var cell = ws.model._getCell(nRowIndexAbs, nColIndexAbs);
+							var dxf = styleForCurTable.getStyle(bbox, i, j, style, headerRowCount, totalsRowCount);
 							if(null != dxf)
 								cell.setTableStyle(dxf);
-							nColIndex++;
 						}
-						nRowIndex++;
 					}
 				}
 			},

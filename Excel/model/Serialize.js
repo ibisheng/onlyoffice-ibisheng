@@ -6168,36 +6168,36 @@ function CTableStyle()
 }
 CTableStyle.prototype = 
 {
-	getStyle: function(bbox, rowAbs, colAbs, rowIndex, colIndex, options, headerRowCount, totalsRowCount)
+	getStyle: function(bbox, rowIndex, colIndex, options, headerRowCount, totalsRowCount)
 	{
 		//todo есть проблемы при малых размерах таблиц
 		var res = null;
 		if(null == this.compiled)
 			this._compile();
 		var styles = this._getOption(options, headerRowCount, totalsRowCount);
-		if(headerRowCount > 0 && rowAbs == bbox.r1)
+		if(headerRowCount > 0 && rowIndex == bbox.r1)
 		{
-			if(colAbs == bbox.c1)
+			if(colIndex == bbox.c1)
 				res = styles.headerLeftTop;
-			else if(colAbs == bbox.c2)
+			else if(colIndex == bbox.c2)
 				res = styles.headerRightTop;
 			else
 				res = styles.header;
 		}
-		else if(totalsRowCount > 0 && rowAbs == bbox.r2)
+		else if(totalsRowCount > 0 && rowIndex == bbox.r2)
 		{
-			if(colAbs == bbox.c1)
+			if(colIndex == bbox.c1)
 				res = styles.totalLeftBottom;
-			else if(colAbs == bbox.c2)
+			else if(colIndex == bbox.c2)
 				res = styles.totalRightBottom;
 			else
 				res = styles.total;
 		}
-		else if(options.ShowFirstColumn && colAbs == bbox.c1)
+		else if(options.ShowFirstColumn && colIndex == bbox.c1)
 		{
-			if(rowAbs == bbox.r1 + headerRowCount)
+			if(rowIndex == bbox.r1 + headerRowCount)
 				res = styles.leftTopFC;
-			else if(rowAbs == bbox.r2 - totalsRowCount)
+			else if(rowIndex == bbox.r2 - totalsRowCount)
 			{
 				if(0 == (rowIndex - headerRowCount) % 2)
 					res = styles.leftBottomRowBand1FC;
@@ -6212,16 +6212,16 @@ CTableStyle.prototype =
 					res = styles.leftRowBand2FC;
 			}
 		}
-		else if(options.ShowLastColumn && colAbs == bbox.c2)
+		else if(options.ShowLastColumn && colIndex == bbox.c2)
 		{
-			if(rowAbs == bbox.r1 + headerRowCount)
+			if(rowIndex == bbox.r1 + headerRowCount)
 			{
 				if(0 == colIndex % 2)
 					res = styles.rightTopColBand1LC;
 				else
 					res = styles.rightTopColBand2LC;
 			}
-			else if(rowAbs == bbox.r2 - totalsRowCount)
+			else if(rowIndex == bbox.r2 - totalsRowCount)
 			{
 				if(0 == (rowIndex - headerRowCount) % 2)
 				{
@@ -6258,11 +6258,11 @@ CTableStyle.prototype =
 		}
 		else if(options.ShowRowStripes || options.ShowColumnStripes)
 		{
-			if(rowAbs == bbox.r1)
+			if(rowIndex == bbox.r1 + headerRowCount)
 			{
-				if(colAbs == bbox.c1)
+				if(colIndex == bbox.c1)
 					res = styles.leftTop;
-				else if(colAbs == bbox.c2)
+				else if(colIndex == bbox.c2)
 				{
 					if(0 == colIndex % 2)
 						res = styles.rightTopColBand1;
@@ -6277,16 +6277,16 @@ CTableStyle.prototype =
 						res = styles.topColBand2;
 				}
 			}
-			else if(rowAbs == bbox.r2)
+			else if(rowIndex == bbox.r2 - totalsRowCount)
 			{
-				if(colAbs == bbox.c1)
+				if(colIndex == bbox.c1)
 				{
 					if(0 == (rowIndex - headerRowCount) % 2)
 						res = styles.leftBottomRowBand1;
 					else
 						res = styles.leftBottomRowBand2;
 				}
-				else if(colAbs == bbox.c2)
+				else if(colIndex == bbox.c2)
 				{
 					if(0 == (rowIndex - headerRowCount) % 2)
 					{
@@ -6321,14 +6321,14 @@ CTableStyle.prototype =
 					}
 				}
 			}
-			else if(colAbs == bbox.c1)
+			else if(colIndex == bbox.c1)
 			{
 				if(0 == (rowIndex - headerRowCount) % 2)
 					res = styles.leftRowBand1;
 				else
 					res = styles.leftRowBand2;
 			}
-			else if(colAbs == bbox.c2)
+			else if(colIndex == bbox.c2)
 			{
 				if(0 == (rowIndex - headerRowCount) % 2)
 				{
@@ -6365,31 +6365,30 @@ CTableStyle.prototype =
 		}
 		else
 		{
-			styles = this.compiled.empty; 
-			if(rowAbs == bbox.r1)
+			if(rowIndex == bbox.r1 + headerRowCount)
 			{
-				if(colAbs == bbox.c1)
-					res = styles.emptyLeftTop;
-				else if(colAbs == bbox.c2)
-					res = styles.emptyRightTop;
+				if(colIndex == bbox.c1)
+					res = styles.leftTop;
+				else if(colIndex == bbox.c2)
+					res = styles.rightTopColBand1;
 				else
-					res = styles.emptyTop;
+					res = styles.topColBand1;
 			}
-			else if(rowAbs == bbox.r2)
+			else if(rowIndex == bbox.r2 - totalsRowCount)
 			{
-				if(colAbs == bbox.c1)
-					res = styles.emptyLeftBottom;
-				else if(colAbs == bbox.c2)
-					res = styles.emptyRightBottom;
+				if(colIndex == bbox.c1)
+					res = styles.leftBottomRowBand1;
+				else if(colIndex == bbox.c2)
+					res = styles.rightBottomRowBand1ColBand1;
 				else
-					res = styles.emptyBottom;
+					res = styles.bottomRowBand1ColBand1;
 			}
-			else if(colAbs == bbox.c1)
-				res = styles.emptyLeft;
-			else if(colAbs == bbox.c2)
-				res = styles.emptyRight;
+			else if(colIndex == bbox.c1)
+				res = styles.leftRowBand1;
+			else if(colIndex == bbox.c2)
+				res = styles.rightRowBand1ColBand1;
 			else
-				res = styles.emptyInner;
+				res = styles.innerRowBand1ColBand1;
 		}
 		return res;
 	},
@@ -6467,22 +6466,6 @@ CTableStyle.prototype =
 			this._compileOption(options, headerRowCount, totalsRowCount, styles, configs);
 			this.compiled.options[nBitMask] = styles;
 		}
-		if(null == this.compiled.empty)
-		{
-			var empty = {
-					emptyLeftTop: new CellXfs(),
-					emptyTop: new CellXfs(),
-					emptyRightTop: new CellXfs(),
-					emptyRight: new CellXfs(),
-					emptyRightBottom: new CellXfs(),
-					emptyBottom: new CellXfs(),
-					emptyLeftBottom: new CellXfs(),
-					emptyLeft: new CellXfs(),
-					emptyInner: new CellXfs()
-				};
-			this._compileEmpty(empty);
-			this.compiled.empty = empty;
-		}
 		return styles;
 	},
 	_compileSetBorder : function(inputDxf, outputDxf, bLeft, bTop, bRight, bBottom, bInnerHor, bInnerVer)
@@ -6514,37 +6497,20 @@ CTableStyle.prototype =
 				outputDxf.border = outputDxf.border.merge(oNewBorder);
 		}
 	},
-	_compileEmpty : function(styles)
+	_compileSetHeaderBorder : function(inputDxf, outputDxf, bHeader)
 	{
-		for(var i in styles)
+		if(null != inputDxf && null != inputDxf.border)
 		{
-			if(null != this.wholeTable)
-			{
-				var elem = styles[i];
-				var xfs = elem;
-			
-				xfs = xfs.merge(this.compiled.wholeTable.dxf);
-				//применяем бордер
-				if(elem == styles.emptyLeftTop)
-					this._compileSetBorder(this.wholeTable.dxf, xfs, true, true, false, false, true, true);
-				else if(elem == styles.emptyTop)
-					this._compileSetBorder(this.wholeTable.dxf, xfs, false, true, false, false, true, true);
-				else if(elem == styles.emptyRightTop)
-					this._compileSetBorder(this.wholeTable.dxf, xfs, false, true, true, false, true, true);
-				else if(elem == styles.emptyRight)
-					this._compileSetBorder(this.wholeTable.dxf, xfs, false, false, true, false, true, true);
-				else if(elem == styles.emptyRightBottom)
-					this._compileSetBorder(this.wholeTable.dxf, xfs, false, false, true, true, true, true);
-				else if(elem == styles.emptyBottom)
-					this._compileSetBorder(this.wholeTable.dxf, xfs, false, false, false, true, true, true);
-				else if(elem == styles.emptyLeftBottom)
-					this._compileSetBorder(this.wholeTable.dxf, xfs, true, false, false, true, true, true);
-				else if(elem == styles.emptyLeft)
-					this._compileSetBorder(this.wholeTable.dxf, xfs, true, false, false, false, true, true);
-				else if(elem == styles.emptyInner)
-					this._compileSetBorder(this.wholeTable.dxf, xfs, false, false, false, false, true, true);
-				styles[i] = xfs;
-			}
+			var oCurBorder = inputDxf.border;
+			var oNewBorder = new Border();
+			if(bHeader)
+				oNewBorder.t = oCurBorder.b;
+			else
+				oNewBorder.b = oCurBorder.t;
+			if(null == outputDxf.border)
+				outputDxf.border = oNewBorder;
+			else
+				outputDxf.border = outputDxf.border.merge(oNewBorder);
 		}
 	},
 	_compileOption : function(options, headerRowCount, totalsRowCount, styles, configs)
@@ -6553,6 +6519,25 @@ CTableStyle.prototype =
 		{
 			var xfs = styles[i];
 			var config = configs[i];
+			//заглушка для бордеров, чтобы при конфликте нижние бордеры не перекрывали бордеры заголовка
+			if(headerRowCount > 0 && config.top && true != config.header)
+			{
+				if(options.ShowFirstColumn && null != this.firstHeaderCell && config.left)
+					this._compileSetHeaderBorder(this.firstHeaderCell.dxf, xfs, true);
+				else if(options.ShowLastColumn && null != this.lastHeaderCell && config.right)
+					this._compileSetHeaderBorder(this.lastHeaderCell.dxf, xfs, true);
+				if(null != this.headerRow)
+					this._compileSetHeaderBorder(this.headerRow.dxf, xfs, true);
+			}
+			if(totalsRowCount > 0 && config.bottom && true != config.total)
+			{
+				if(options.ShowFirstColumn && null != this.firstTotalCell && config.left)
+					this._compileSetHeaderBorder(this.firstTotalCell.dxf, xfs, false);
+				else if(options.ShowLastColumn && null != this.lastTotalCell && config.right)
+					this._compileSetHeaderBorder(this.lastTotalCell.dxf, xfs, false);
+				if(null != this.totalRow)
+					this._compileSetHeaderBorder(this.totalRow.dxf, xfs, false);
+			}
 			if(headerRowCount > 0 && config.header)
 			{
 				if(options.ShowFirstColumn && null != this.firstHeaderCell && config.left)
@@ -6714,7 +6699,7 @@ CTableStyle.prototype =
 				//применяем бордер
 				if(config.top)
 				{
-					if(headerRowCount > 0 && false == config.header)
+					if(headerRowCount > 0 && true != config.header)
 					{
 						if(config.left)
 							this._compileSetBorder(this.wholeTable.dxf, xfs, true, false, false, false, true, true);
@@ -6735,7 +6720,7 @@ CTableStyle.prototype =
 				}
 				else if(config.bottom)
 				{
-					if(totalsRowCount > 0 && false == config.total)
+					if(totalsRowCount > 0 && true != config.total)
 					{
 						if(config.left)
 							this._compileSetBorder(this.wholeTable.dxf, xfs, true, false, false, false, true, true);
@@ -6768,7 +6753,6 @@ CTableStyle.prototype =
 	{
 		this.compiled = {
 			options: new Object(),
-			empty: null,
 			blankRow: null,
 			firstColumn: null,
 			firstColumnStripe: null,
