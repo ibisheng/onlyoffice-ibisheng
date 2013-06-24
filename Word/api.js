@@ -1958,7 +1958,8 @@ asc_docs_api.prototype.UpdateTextPr = function(TextPr)
             DStrikeout : function(oThis, v){ oThis.sync_TextDStrikeout(v); },
             Caps       : function(oThis, v){ oThis.sync_TextCaps(v); },
             SmallCaps  : function(oThis, v){ oThis.sync_TextSmallCaps(v); },
-            Position   : function(oThis, v){ oThis.sync_TextPosition(v); }
+            Position   : function(oThis, v){ oThis.sync_TextPosition(v); },
+            Lang       : function(oThis, v){ oThis.sync_TextLangCallBack(v);}
 		}
 
         for ( var Item in oTextPrMap )
@@ -3336,6 +3337,10 @@ asc_docs_api.prototype.sync_TextSmallCaps = function(Value)
 asc_docs_api.prototype.sync_TextPosition = function(Value)
 {
     this.asc_fireCallback("asc_onTextPosition", Value );
+}
+asc_docs_api.prototype.sync_TextLangCallBack = function(Lang)
+{
+    this.asc_fireCallback("asc_onTextLanguage", Lang.Val );
 }
 asc_docs_api.prototype.sync_ParaStyleName = function(Name){
 	this.asc_fireCallback("asc_onParaStyleName",Name);
@@ -4938,6 +4943,16 @@ asc_docs_api.prototype.asc_ignoreMisspelledWord = function(SpellCheckProperty, b
         LogicDocument.DrawingDocument.ClearCachePages();
         LogicDocument.DrawingDocument.FirePaint();
     }
+}
+
+asc_docs_api.prototype.asc_setDefaultLanguage = function(Lang)
+{
+    editor.WordControl.m_oLogicDocument.Set_DefaultLanguage(Lang);
+}
+
+asc_docs_api.prototype.asc_getDefaultLanguage = function()
+{
+    return editor.WordControl.m_oLogicDocument.Get_DefaultLanguage();
 }
 //-----------------------------------------------------------------
 // Функции для работы с комментариями

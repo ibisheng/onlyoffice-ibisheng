@@ -278,6 +278,11 @@ CDocumentContent.prototype =
         this.Parent.Set_CurrentElement();
     },
 
+    Is_ThisElementCurrent : function()
+    {
+        return this.Parent.Is_ThisElementCurrent();
+    },
+
     Content_GetPrev : function(Id)
     {
         var Index = this.Internal_Content_Find( Id );

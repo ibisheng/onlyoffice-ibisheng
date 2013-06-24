@@ -259,6 +259,14 @@ CHeaderFooter.prototype =
         this.LogicDocument.Document_UpdateSelectionState();
     },
 
+    Is_ThisElementCurrent : function()
+    {
+        if ( this === this.Parent.CurHdrFtr && docpostype_HdrFtr === this.LogicDocument.CurPos.Type )
+            return true;
+
+        return false;
+    },
+
     Reset : function(X,Y, XLimit, YLimit)
     {
         this.Content.Reset( X, Y, XLimit, YLimit );

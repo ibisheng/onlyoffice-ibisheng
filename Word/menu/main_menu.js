@@ -1476,6 +1476,20 @@ $(".colorWatch").mouseover(function(){
          }
      });
 
+     editor.asc_registerCallback("asc_onTextLanguage", function()
+     {
+         var Value = arguments[0];
+
+         var PrLang = document.getElementById("prLang");
+
+         if ( Value === lcid_ruRU )
+             PrLang.selectedIndex = 1;
+         else if ( Value === lcid_deDE )
+             PrLang.selectedIndex = 2;
+         else
+             PrLang.selectedIndex = 0;
+     });
+
 	editor.asc_registerCallback("asc_onPrAlign", function(){
 		$(document.getElementById("td_justifyleft")).removeClass("iconPressed");
 		$(document.getElementById("td_justifycenter")).removeClass("iconPressed");
@@ -2015,6 +2029,19 @@ $(".colorWatch").mouseover(function(){
          }
 
          editor.put_TextPrLang( lcid );
+     })
+
+     $("#prDefaultLang").change(function(evt)
+     {
+         var lcid = lcid_enUS;
+         switch (this.selectedIndex)
+         {
+             case 0 : lcid = lcid_enUS; break;
+             case 1 : lcid = lcid_ruRU; break;
+             case 2 : lcid = lcid_deDE; break;
+         }
+
+         editor.asc_setDefaultLanguage( lcid );
      })
 
      $("#prSpellingVariants").change(function(evt)
@@ -2849,6 +2876,21 @@ $(".colorWatch").mouseover(function(){
          for (var message in messages)
              messagesElement.append("<div>" + messages[message].user + ": " + messages[message].message + "</div>");
     });
+
+     editor.asc_registerCallback("asc_onDocumentContentReady", function(participants)
+     {
+         // Запрашиваем словарь по умолчанию
+         var Lcid = editor.asc_getDefaultLanguage();
+
+         var Element = document.getElementById("prDefaultLang");
+         switch (Lcid)
+         {
+             case lcid_enUS : Element.selectedIndex = 0; break;
+             case lcid_ruRU : Element.selectedIndex = 1; break;
+             case lcid_deDE : Element.selectedIndex = 2; break;
+         }
+     });
+
 	$("#imgApply").click(function()
     {
 		var oImgProp = new CImgProperty();

@@ -18502,6 +18502,19 @@ CTableCell.prototype =
         Table.Document_SetThisElementCurrent();
     },
 
+    Is_ThisElementCurrent : function()
+    {
+        var Table = this.Row.Table;
+        if ( false === Table.Selection.Use && this === Table.CurCell )
+        {
+            var Parent = Table.Parent;
+            if ( docpostype_Content === Parent.CurPos.Type && false === Parent.Selection.Use && this.Index === Parent.CurPos.ContentPos )
+                return this.Parent.Is_ThisElementCurrent();
+        }
+
+        return false;
+    },
+
     Check_TableCoincidence : function(Table)
     {
         var CurTable = this.Row.Table;

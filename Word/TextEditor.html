@@ -124,6 +124,7 @@
 		<script type="text/javascript" src="Editor/Serialize2.js"></script>
         <script type="text/javascript" src="Editor/Search.js"></script>
         <script type="text/javascript" src="Editor/FontClassification.js"></script>
+        <script type="text/javascript" src="Editor/Spelling.js"></script>
 
         <script type="text/javascript" src="Drawing/Graphics.js"></script>
         <script type="text/javascript" src="Drawing/ArcTo.js"></script>
@@ -1981,12 +1982,12 @@
 		</div>
 			<input id="imgApply" type="button"  value="imgApply"/>
 	</div>
-    <div id="prPropDrag"    style="display:none;width:300px;background-color:#fff;top:415px;left:25px;z-index:100;position:absolute;padding-top: 5px;border: 4px ridge silver;cursor:move;">
+    <div id="prPropDrag"    style="display:none;width:300px;background-color:#fff;top:106px;left:66px;z-index:100;position:absolute;padding-top: 5px;border: 4px ridge silver;cursor:move;">
         <div id="prPropDragCaption" style="float:left;width:300px;text-align: center;cursor:move;">
             <b>Paragraph</b>
         </div>
     </div>
-    <div id="prProp"        style="display:none;width:300px;background-color:#fff;top:445px;left:25px;z-index:100;position:absolute;padding-top: 5px;border: 4px ridge silver;">
+    <div id="prProp"        style="display:none;width:300px;background-color:#fff;top:136px;left:66px;z-index:100;position:absolute;padding-top: 5px;border: 4px ridge silver;">
         <div style="float:left;width:300px">
             <div style="float:left;width:300px;height:25px;text-align: center;">Indent</div>
             <div style="float:left;width:140px;padding-left: 10px">
@@ -2147,6 +2148,17 @@
             </div>
         </div>
         <div style="float:left;border-top: 2px ridge silver;width:300px">
+            <div style="float:left;width:300px;height:25px;padding-left: 10px">Default language</div>
+            <div style="float:left;width:300px">
+                <select id="prDefaultLang" style="float:left">
+                    <option value="0">Английский (США)</option>
+                    <option value="1">Русский</option>
+                    <option value="2">Немецкий</option>
+                </select>
+            </div>
+        </div>
+        <div style="float:left;border-top: 2px ridge silver;width:300px">
+            <div style="float:left;width:300px;height:25px;padding-left: 10px">Spelling</div>
             <select id="prLang" style="float:left">
                 <option value="0">Английский (США)</option>
                 <option value="1">Русский</option>

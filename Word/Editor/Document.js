@@ -221,44 +221,6 @@ CStatistics.prototype =
     }
 };
 
-function CDocumentSpelling()
-{
-    this.Paragraphs = new Object(); // Параграфы, в которых есть ошибки в орфографии (объект с ключом - Id параграфа)
-    this.Words      = new Object(); // Слова, которые пользователь решил пропустить(нажал "пропустить все") при проверке орфографии
-}
-
-CDocumentSpelling.prototype =
-{
-    Add_Paragraph : function(Id, Para)
-    {
-        this.Paragraphs[Id] = Para;
-    },
-
-    Remove_Paragraph : function(Id)
-    {
-        delete this.Paragraphs[Id];
-    },
-
-    Check_Word : function(Word)
-    {
-        if ( undefined != this.Words[Word] )
-            return true;
-
-        return false;
-    },
-
-    Add_Word : function(Word)
-    {
-        this.Words[Word] = true;
-
-        for ( var Id in this.Paragraphs )
-        {
-            var Para = this.Paragraphs[Id];
-            Para.SpellChecker.Ignore( Word );
-        }
-    }
-};
-
 function CDocument(DrawingDocument)
 {
     this.History = new CHistory(this);
@@ -557,6 +519,11 @@ CDocument.prototype =
         this.Document_UpdateInterfaceState();
         this.Document_UpdateRulersState();
         this.Document_UpdateSelectionState();
+    },
+
+    Is_ThisElementCurrent : function()
+    {
+        return true;
     },
 
     Get_PageContentStartPos : function (PageIndex)
@@ -10039,7 +10006,6 @@ CDocument.prototype =
             var Comment_PageNum = Comment.m_oStartInfo.PageNum;
             var Comment_Y       = Comment.m_oStartInfo.Y;
             var Comment_X       = Page_Width;
-
             var Coords = this.DrawingDocument.ConvertCoordsToCursorWR( Comment_X, Comment_Y, Comment_PageNum );
             editor.sync_UpdateCommentPosition( Comment.Get_Id(), Coords.X, Coords.Y );
         }
