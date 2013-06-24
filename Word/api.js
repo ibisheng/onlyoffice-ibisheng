@@ -1392,6 +1392,9 @@ asc_docs_api.prototype._spellCheckInitCallback = function(_this) {
 
 	_this._coSpellCheckInit(documentId);
 };
+asc_docs_api.prototype.asc_getSpellCheckLanguages = function() {
+	return g_spellCheckLanguages;
+};
 
 // get functions
 // Возвращает
