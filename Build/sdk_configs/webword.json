@@ -27,6 +27,8 @@
 				"../Common/spellcheckapisettings.js",
 				"../Common/spellcheckapi.js",
                 "../Common/wordcopypaste.js",
+				"../Common/spellCheckLanguage.js",
+				"../Common/spellCheckLanguagesAll.js",
                 "../Common/downloaderfiles.js",
                 "../Common/commonDefines.js",
                 "../Common/editorscommon.js",
