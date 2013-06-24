@@ -18509,7 +18509,7 @@ CTableCell.prototype =
         {
             var Parent = Table.Parent;
             if ( docpostype_Content === Parent.CurPos.Type && false === Parent.Selection.Use && this.Index === Parent.CurPos.ContentPos )
-                return this.Parent.Is_ThisElementCurrent();
+                return Table.Parent.Is_ThisElementCurrent();
         }
 
         return false;
