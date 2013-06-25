@@ -103,6 +103,7 @@
                 "../Word/Editor/Serialize2.js",
                 "../Word/Editor/Search.js",
                 "../Word/Editor/FontClassification.js",
+				"../Word/Editor/Spelling.js",
                 "../Word/Drawing/Graphics.js",
                 "../Word/Drawing/ArcTo.js",
                 "../Word/Drawing/Hit.js",
