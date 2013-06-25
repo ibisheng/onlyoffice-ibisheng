@@ -795,8 +795,7 @@ CDocumentContent.prototype =
 
         for ( var Index = this.Pages[PageNum].Pos; Index < Count; Index++ )
         {
-            if ( -1 == this.Content[Index].Draw(PageNum, pGraphics) )
-                break;
+            this.Content[Index].Draw(PageNum, pGraphics);
         }
 
         if ( true === bClip )

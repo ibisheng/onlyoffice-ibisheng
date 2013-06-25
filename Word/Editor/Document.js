@@ -1080,8 +1080,7 @@ CDocument.prototype =
         var Page_EndPos   = this.Pages[nPageIndex].EndPos;
         for ( var Index = Page_StartPos; Index <= Page_EndPos; Index++ )
         {
-            if ( -1 == this.Content[Index].Draw(nPageIndex, pGraphics) )
-                break;
+            this.Content[Index].Draw(nPageIndex, pGraphics);
         }
 
         this.DrawingObjects.drawBeforeObjects( nPageIndex, pGraphics );
