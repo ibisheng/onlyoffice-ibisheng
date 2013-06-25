@@ -7482,7 +7482,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'NORMINV' : function(){
-            var r = new cBaseFunctionNORMINV
+            var r = new cBaseFunction("NORMINV");
         	return r;
 		},
         'NORMSDIST' : function(){
