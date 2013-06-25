@@ -2311,17 +2311,12 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, oDrawings, aDxf
     };
     this.WriteSheetFormatPr = function(ws)
     {
-		var dDefaultwidth = ws.dDefaultwidth;
-		if(null == ws.dDefaultwidth)
-			dDefaultwidth = gc_dDefaultColWidthCharsAttribute;
-        if(null != dDefaultwidth)
-        {
+        if(null !== ws.dDefaultwidth) {
             this.memory.WriteByte(c_oSerSheetFormatPrTypes.DefaultColWidth);
             this.memory.WriteByte(c_oSerPropLenType.Double);
-            this.memory.WriteDouble2(dDefaultwidth);
+            this.memory.WriteDouble2(ws.dDefaultwidth);
         }
-        if(null != ws.dDefaultheight)
-        {
+        if(null !== ws.dDefaultheight) {
             this.memory.WriteByte(c_oSerSheetFormatPrTypes.DefaultRowHeight);
             this.memory.WriteByte(c_oSerPropLenType.Double);
             this.memory.WriteDouble2(ws.dDefaultheight);
