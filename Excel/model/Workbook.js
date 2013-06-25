@@ -2079,6 +2079,7 @@ function Woorksheet(wb, _index, bAddUserId, sId){
 	this.bHidden = false;
 	this.dDefaultwidth = null;
 	this.dDefaultheight = null;
+	this.nBaseColWidth = null;
 	this.index = _index;
 	this.Id = null;
 	if(null != sId)

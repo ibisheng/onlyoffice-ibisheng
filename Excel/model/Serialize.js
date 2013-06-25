@@ -199,8 +199,9 @@ var c_oSerHyperlinkTypes =
 /** @enum */
 var c_oSerSheetFormatPrTypes =
 {
-    DefaultColWidth: 0,
-    DefaultRowHeight: 1
+    DefaultColWidth		: 0,
+    DefaultRowHeight	: 1,
+	BaseColWidth		: 2
 };
 /** @enum */
 var c_oSerRowTypes =
@@ -2325,6 +2326,11 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, oDrawings, aDxf
             this.memory.WriteByte(c_oSerPropLenType.Double);
             this.memory.WriteDouble2(ws.dDefaultheight);
         }
+		if (null !== ws.nBaseColWidth) {
+			this.memory.WriteByte(c_oSerSheetFormatPrTypes.BaseColWidth);
+			this.memory.WriteByte(c_oSerPropLenType.Long);
+			this.memory.WriteLong(ws.nBaseColWidth);
+		}
     };
 	this.WritePageMargins = function(oMargins)
     {
@@ -4932,6 +4938,8 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
             oWorksheet.dDefaultwidth = this.stream.GetDoubleLE();
         else if ( c_oSerSheetFormatPrTypes.DefaultRowHeight == type )
             oWorksheet.dDefaultheight = this.stream.GetDoubleLE();
+		else if (c_oSerSheetFormatPrTypes.BaseColWidth === type)
+			oWorksheet.nBaseColWidth = this.stream.GetULongLE();
         else
             res = c_oSerConstants.ReadUnknown;
         return res;
