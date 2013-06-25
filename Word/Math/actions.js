@@ -306,7 +306,7 @@ CControlComposition.prototype =
         {
             editor.WordControl.m_oLogicDocument.DrawingDocument.OnRecalculatePage(0, editor.WordControl.m_oLogicDocument.Pages[0]);
 
-            this.Content[this.CurPos].Add(code);
+            this.Content[this.CurPos].AddLetter(code);
 
             return true;
         }

@@ -8,6 +8,8 @@
 //api 2212: asc_docs_api.prototype.sync_TextPrFontFamilyCallBack
 // возвращает название шрифта
 
+var DIV_CENTER = 0.375;
+
 function CMathText(params)
 {
     this.pos = null;
@@ -58,7 +60,7 @@ CMathText.prototype =
         var _descent = (metricsTxt.Height - metricsTxt.Ascent);
         var _height = _ascent + _descent;
         var placeholder = this.metrics.Placeholder;
-        var  _center = _ascent - placeholder.Height*0.375;
+        var  _center = _ascent - placeholder.Height*DIV_CENTER;
 
         this.sizeSymbol = {width: _width, height: _height, center: _center, ascent: _ascent, descent: _descent};
         this.size = {width: _width, height: _height, center: _center, ascent: _ascent, descent: _descent, gap: 0 };

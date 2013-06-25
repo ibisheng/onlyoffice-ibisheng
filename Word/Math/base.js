@@ -1004,5 +1004,11 @@ CMathBase.prototype =
     {
         this.recalculateSize();
         return this.Parent;
+    },
+    hidePlaceholder: function(flag)
+    {
+        for(var i=0; i < this.nRow; i++)
+            for(var j = 0; j < this.nCol; j++)
+                this.elements[i][j].hidePlaceholder(flag);
     }
 }

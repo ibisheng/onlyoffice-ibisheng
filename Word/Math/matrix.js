@@ -19,6 +19,8 @@ function CMathMatrix( numRow, numCol)
         minGap: 0       // minGap / 20 pt
     };
 
+    this.baseJc = 0;
+
 }
 extend(CMathMatrix, CMathBase);
 CMathMatrix.prototype.init = function(params)
@@ -29,6 +31,7 @@ CMathMatrix.prototype.setContent = function()
 {
     CMathMatrix.superclass.fillPlaceholders.call(this);
 }
+
 CMathMatrix.prototype.old_getLineGap = function(spaceLine)
 {
     var metrs = this.params.font.metrics;
@@ -74,16 +77,17 @@ CMathMatrix.prototype.old_recalculateSize = function()
     this.size = {width: width, height: height, center: height/2};
 
 }
-CMathMatrix.prototype.setLineGapColumn = function(coeff)
+CMathMatrix.prototype.old_setLineGapColumn = function(coeff)
 {
     this.lineGapColumn = coeff;
     this.recalculateSize();
 }
-CMathMatrix.prototype.setLineGapRow = function(coeff)
+CMathMatrix.prototype.old_setLineGapRow = function(coeff)
 {
     this.lineGapRow = coeff;
     this.recalculateSize();
 }
+
 CMathMatrix.prototype.recalculateSize = function()
 {
     this.gaps = {row: new Array(), column: new Array()};
@@ -115,7 +119,29 @@ CMathMatrix.prototype.recalculateSize = function()
     for(var j = 0; j < this.nRow; j++)
         height += this.gaps.row[j] + metrics.ascents[j] + metrics.descents[j];
 
-    this.size = {width: width, height: height, center: height/2};
+    var center = 0;
+
+    if(this.baseJc == 1)
+    {
+        for(var j = 0; j < this.nCol; j++)
+            center = this.elements[0][j].size.center > center ? this.elements[0][j].size.center : center;
+    }
+    else if(this.baseJc == 2)
+    {
+        var descent = 0,
+            currDsc;
+        for(var j = 0; j < this.nCol; j++)
+        {
+            currDsc = this.elements[this.nRow -1][j].size.height - this.elements[this.nRow -1][j].size.center;
+            descent = currDsc > descent ? currDsc : descent;
+
+            center = height - descent;
+        }
+    }
+    else /*this.baseJc == 0*/
+        center = height/2;
+
+    this.size = {width: width, height: height, center: center};
 
 }
 CMathMatrix.prototype.setPosition = function(pos)
@@ -144,6 +170,7 @@ CMathMatrix.prototype.setPosition = function(pos)
     }
 
 }
+
 CMathMatrix.prototype.old_old_findDisposition = function( coord )
 {
     var pos_x = this.nRow - 1, pos_y = this.nCol - 1,
@@ -217,6 +244,7 @@ CMathMatrix.prototype.old_old_findDisposition = function( coord )
     return {pos: {x: pos_x, y: pos_y }, mCoord: {x: mX, y: mY}, flag: flag};
 
 }
+
 CMathMatrix.prototype.findDisposition = function( coord )
 {
     var mouseCoord = {x: null, y: null},
@@ -319,7 +347,7 @@ CMathMatrix.prototype.getMetrics = function()
 
     return {ascents: Ascents, descents: Descents, widths: Widths}
 }
-CMathMatrix.prototype.findDistance = function()
+CMathMatrix.prototype.findDistance = function() // для получения позиции тагета
 {
     var w = 0, h = 0;
     //кол-во элементов gap равно кол-ву элементов в строке/столбце для удобства подсчета
@@ -393,7 +421,7 @@ CMathMatrix.prototype.getLineGap = function(space)
 
     return lineGap;
 }
-////
+
 CMathMatrix.prototype.old_getRowSpace = function(space)
 {
     var spLine;
@@ -415,9 +443,9 @@ CMathMatrix.prototype.old_getRowSpace = function(space)
     var lineGap;
 
     /*if(space.rule == 3)
-        lineGap = spLine*g_dKoef_pt_to_mm;                           //pt
-    else
-        lineGap = spLine*this.params.font.FontSize*g_dKoef_pt_to_mm; //em*/
+     lineGap = spLine*g_dKoef_pt_to_mm;                           //pt
+     else
+     lineGap = spLine*this.params.font.FontSize*g_dKoef_pt_to_mm; //em*/
 
     lineGap = spLine*g_dKoef_pt_to_mm;                           //pt
 
@@ -425,7 +453,6 @@ CMathMatrix.prototype.old_getRowSpace = function(space)
 
     return lineGap;
 }
-
 CMathMatrix.prototype.getRowSpace = function(space)
 {
     var spLine;
@@ -456,3 +483,15 @@ CMathMatrix.prototype.getRowSpace = function(space)
 
     return lineGap;
 }
+CMathMatrix.prototype.baseJustification = function(type)
+{
+
+    // 0 - center
+    // 1 - top
+    // 2 - bottom
+
+    this.baseJc = type;
+
+}
+////
+

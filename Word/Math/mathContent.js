@@ -82,7 +82,8 @@ function CMathContent()
     this.font       =   null;
     this.indefSize  =   null;
     this.bMText     =   true;   // default
-    this.bDot       = false;
+    this.bDot       =   false;
+    this.plhHide    =   false;
 
     this.reduct     =   0;      // индефикатор для степени (уменьшение размера шрифта)
 
@@ -720,8 +721,9 @@ CMathContent.prototype =
     },
     draw: function()
     {
-        for(var i=1; i < this.content.length;i++)
-            this.content[i].value.draw();
+        if( !(this.plhHide && this.IsTarget()) )
+            for(var i=1; i < this.content.length;i++)
+                this.content[i].value.draw();
     },
     update_widthContent: function()
     {
@@ -1146,7 +1148,16 @@ CMathContent.prototype =
     },
     IsTarget: function()
     {
-        return ( (this.content.length == 2) && (this.content[1].value.value === StartTextElement ));
+        var bTarget = this.content.length == 2 && this.content[1].value.value === StartTextElement ;
+        return bTarget;
+    },
+    hidePlaceholder: function(flag)
+    {
+        this.plhHide = flag;
+    },
+    setPositionHideTgt: function()
+    {
+        this.CurPos = 0;
     },
     tgtSelect: function()
     {
@@ -1243,6 +1254,164 @@ CMathContent.prototype =
 
         return bIncline;
     },
+
+    ////  open  ////
+    fillMComponent: function(id)
+    {
+        var component,
+            result = component;
+
+        switch(id)
+        {
+            case 0:
+                component = new CMathText();
+                result = this; // передаем указатель на данный контент, т.к. добавляем текст
+                break;
+            case 1:
+                component = new CBarFraction();
+                break;
+            case 2:
+                component = new CSkewedFraction();
+                break;
+            case 3:
+                component = new CLinearFraction();
+                break;
+            case 4:
+                component = new CSimpleFraction();
+                break;
+            case 5:
+                component = new CDegree(0);
+                break;
+            case 6:
+                component = new CDegree(1);
+                break;
+            case 7:
+                component = new CDegree(2);
+                break;
+            case 8:
+                component = new CDegree(3);
+                break;
+            case 9:
+                component = new CRadical();
+                break;
+            case 10:
+                component = new CNary();
+                break;
+            case 11:
+                component = new CDelimiter();
+                break;
+            case 12:
+                component = new CMathFunc(); // CMathMatrix(1, 2)
+                break;
+        }
+
+        component.init(this.params);
+
+        return result;
+
+    },
+    fillPlaceholder: function()
+    {
+        this.fillMComponent(0);
+        this.addCode(StartTextElement);
+    },
+    fillText: function(txt)
+    {
+        for(var i = 0; i < txt.length; i++)
+        {
+            this.addCode( txt.charCodeAt(i) );
+        }
+
+        //  ??  this.recalculate();
+        this.setStart_Selection(this.CurPos);
+        this.selection.active = false;
+
+    },
+    gToUp: function()
+    {
+        this.recalculateSize(); // пересчитываем здесь размер
+        this.update_widthContent();
+
+        var upLevel = null;
+
+        if( ! this.bRoot )          // на всякий случай
+            upLevel = this.Parent;
+        else
+            upLevel = this.Root;
+
+        return upLevel;
+    },
+    ////
+
+    //// edit ////
+    new_add: function(code)
+    {
+        if( this.IsTarget() ) //удаляем тагет
+        {
+            var empty = this.content[0]; //CEmpty
+            this.content.length = 0;
+            this.content.push( empty );
+            this.CurPos = 0;
+        }
+        else if( this.selection.startPos != this.selection.endPos ) //т.к. после того как удалили тагет у нас эти 2 значения не равны, равенство их выставляется позднее, после добавления символа
+            this.remove();
+
+        /*
+         var gps = null;
+         if(code == 0x002B || code == 0x002F || code == 0x002A || code == 0x002D)
+         {
+             //l_gap = r_gap = Math.floor( this.font.FontSize / 5 ) *g_dKoef_pix_to_mm;
+             l_gap = r_gap = 0;
+             gps = new dist(l_gap, r_gap, 0, 0);
+         }
+         else
+            gps = new dist(0,0,0,0);
+         */
+
+        this.addCode(code);
+
+        this.setStart_Selection(this.CurPos);
+        this.selection.active = false;
+    },
+    new_addCode: function(code)
+    {
+        if(code == 42)      // "*"
+            code = 8727;
+        else if(code == 45) // "-"
+            code = 8722;
+
+        if(this.bDot)
+        {
+            if(code === 0x69)
+                code = 0x1D6A4;
+            if(code === 0x6A)
+                code =  0x1D6A5;
+        }
+
+        var TParms =
+        {
+            font:       this.font,
+            indefSize:  this.indefSize,
+            bMText:     this.bMText     // для текста передаем тот параметр, который у контента (привемеры: тригонометрические ф-ии, логарифм и т.п.)
+        };
+
+        var symbol = new CMathText(TParms);
+        symbol.init(code, true);
+        var gps = new dist(0,0,0,0);
+
+        var tmp = this.content.splice(0, this.CurPos+1);
+        tmp.push(  new mathElem(symbol, gps) );
+        tmp = tmp.concat( this.content.splice(0, this.content.length) );
+
+        this.content.length = 0;
+        this.content = tmp;
+
+        this.CurPos++;
+        //this.setStart_Selection(this.CurPos);
+        //this.selection.active = false;
+    },
+    ////
+
     addText: function(txt)
     {
         for(var i = 0; i < txt.length; i++)
@@ -1332,7 +1501,8 @@ CMathContent.prototype =
         this.setStart_Selection(this.CurPos);
         this.selection.active = false;
     },
-    fillContent: function(type)
+
+    old_fillContent: function(type)
     {
         var component,
             result;
@@ -1341,7 +1511,6 @@ CMathContent.prototype =
         {
             component = new CMathText();
             component.init(this.params);
-            component.relate(this);
             component.addCode(StartTextElement);
             result = this;
         }
@@ -1349,57 +1518,55 @@ CMathContent.prototype =
         {
             component = new CMathText();
             component.init(this.params);
-            component.relate(this);
             result = this;
         }
         else
         {
             component = this.getMathComponent(type);
             component.init(this.params);
-            component.relate(this);
             result = component;
         }
 
         return result;
 
         /*var component;
-        switch(type)
-        {
-            case 0:
-                component = new CMathText();
-                component.addCode(StartTextElement);
-                break;
-            case 1:
-                component = new CMathText();
-                break;
-            case 2:
-                component = new CBarFraction();
-                break;
-            case 3:
-                component = new CSkewedFraction();
-                break;
-            case 4:
-                component = new CLinearFraction();
-                break;
-            case 5:
-                component = new CSimpleFraction();
-                break;
-            case 6:
-                component = new CDegree(0);
-                break;
-            case 7:
-                component = new CDegree(1);
-                break;
-            case 8:
-                component = new CDegree(2);
-                break;
-            case 9:
-                component = new CDegree(3);
-        }
+         switch(type)
+         {
+         case 0:
+         component = new CMathText();
+         component.addCode(StartTextElement);
+         break;
+         case 1:
+         component = new CMathText();
+         break;
+         case 2:
+         component = new CBarFraction();
+         break;
+         case 3:
+         component = new CSkewedFraction();
+         break;
+         case 4:
+         component = new CLinearFraction();
+         break;
+         case 5:
+         component = new CSimpleFraction();
+         break;
+         case 6:
+         component = new CDegree(0);
+         break;
+         case 7:
+         component = new CDegree(1);
+         break;
+         case 8:
+         component = new CDegree(2);
+         break;
+         case 9:
+         component = new CDegree(3);
+         }
 
-        component.setParams(this.params);*/
+         component.setParams(this.params);*/
     },
-    getMathComponent: function(id)
+    old_getMathComponent: function(id)
     {
         // 0 - placeholder
         // 1 - math text
@@ -1446,9 +1613,9 @@ CMathContent.prototype =
 
         return component;
     },
-    gToUp: function()
+    old_gToUp: function()
     {
-        this.recalculateSize();
+        this.recalculateSize(); // пересчитываем здесь размер
         this.update_widthContent();
 
         var upLevel;
@@ -1460,6 +1627,7 @@ CMathContent.prototype =
 
         return upLevel;
     }
+
 }
 //todo
 //разобраться с gaps
@@ -1560,7 +1728,7 @@ CMathComposition.prototype =
             this.SelectContent = move.SelectContent;
             this.CurrentContent = move.CurrContent;
 
-            this.СheckTarget();
+            this.CheckTarget();
         }
 
         return move.state;
@@ -1575,7 +1743,7 @@ CMathComposition.prototype =
             this.SelectContent = move.SelectContent;
             this.CurrentContent = move.CurrContent;
 
-            this.СheckTarget();
+            this.CheckTarget();
         }
 
         return move.state;
@@ -1591,7 +1759,7 @@ CMathComposition.prototype =
         this.CurrentContent = move.CurrContent;
         this.SelectContent = move.SelectContent;
 
-        this.СheckTarget();
+        this.CheckTarget();
 
         return move.state;
     },
@@ -1603,7 +1771,7 @@ CMathComposition.prototype =
         this.CurrentContent = move.CurrContent;
         this.SelectContent = move.SelectContent;
 
-        this.СheckTarget();
+        this.CheckTarget();
 
         return move.state;
     },
@@ -1612,7 +1780,12 @@ CMathComposition.prototype =
         this.ClearSelect();
         this.CurrentContent = this.SelectContent = this.Root.mouseDown({x: mouseX, y: mouseY}, -1);
 
-        this.СheckTarget();
+        /*if(typeof(this.CurrentContent) == "undefined")
+        {
+            var stop = true;
+        }*/
+
+        this.CheckTarget();
     },
     MouseMove: function(mouseX, mouseY)
     {
@@ -1622,7 +1795,7 @@ CMathComposition.prototype =
             var movement = this.Root.mouseMove({x: mouseX, y: mouseY});
 
             this.SelectContent = movement.SelectContent;
-            this.СheckTarget();
+            this.CheckTarget();
         }
 
     },
@@ -1654,7 +1827,7 @@ CMathComposition.prototype =
             result = true;
         }
 
-        this.СheckTarget();
+        this.CheckTarget();
 
         return result;
     },
@@ -1669,7 +1842,9 @@ CMathComposition.prototype =
         this.SelectContent.drawSelect();
 
     },
-    Add: function(code)
+
+    //// edit ////
+    AddLetter: function(code)
     {
         this.ClearSelect();
 
@@ -1695,6 +1870,8 @@ CMathComposition.prototype =
 
         this.ShowCursor();
     },
+    ////
+
     HideCursor: function()
     {
         editor.WordControl.m_oLogicDocument.DrawingDocument.TargetEnd();
@@ -1709,15 +1886,24 @@ CMathComposition.prototype =
     {
         editor.WordControl.m_oLogicDocument.DrawingDocument.TargetStart();
     },
-    СheckTarget: function()
+    CheckTarget: function()
     {
         var bSelect = this.SelectContent.selectUse(),
-            bTarget = this.SelectContent.IsTarget();
+            bTarget = this.SelectContent.IsTarget(),
+            bHideTgt = this.SelectContent.plhHide;
 
         if(bTarget)
         {
-            this.SelectContent.tgtSelect();
-            this.HideCursor();
+            if(!bHideTgt)
+            {
+                this.SelectContent.tgtSelect();
+                this.HideCursor();
+            }
+            else
+            {
+                this.SelectContent.setPositionHideTgt();
+                this.ShowCursor();
+            }
         }
         else if(bSelect)
             this.HideCursor();
@@ -1736,10 +1922,8 @@ CMathComposition.prototype =
             editor.WordControl.m_oLogicDocument.DrawingDocument.SelectEnabled(false);
         }
     },
-    /*TestFont: function(font)
-    {
-        this.CurrentContent.TestFont(font);
-    },*/
+
+    ////  test function  ////
     TestSetPostion: function()
     {
         this.Root.setPosition(this.posCompos);
@@ -1748,16 +1932,42 @@ CMathComposition.prototype =
     {
         this.Root.setFont(font);
     },
-    FillContent: function(type)
+    /*TestFont: function(font)
+     {
+     this.CurrentContent.TestFont(font);
+     },*/
+    ////
+
+
+    ////  open  ////
+    FillPlaceholder: function()
     {
-        this.CurrentContent = this.CurrentContent.fillContent(type);
+        this.CurrentContent.fillPlaceholder();
+        this.GToUp(); //переходим на уровен выше, пересчитываем размер
+
+        //позицию рассчитаем позже
+    },
+    FillText: function()
+    {
+        this.CurrentContent.fillText(); // CurrentContent не меняем, остается текущий
+    },
+    FillMComponent: function()
+    {
+        this.CurrentContent = this.CurrentContent.fillMComponent(type); // переходим в мат. компонент
         this.SelectContent = this.CurrentContent;
     },
     GToUp: function()
     {
-        this.CurrentContent = this.CurrentContent.gToUp();
+        this.CurrentContent = this.CurrentContent.gToUp(); // пересчитываем размер текущего контента в gToUp, в контенте уровнем выше пересчитаем в аналогичной ф-ии, когда достигнем конца контента
         this.SelectContent = this.CurrentContent;
+    },
+    SetEnd: function()
+    {
+        this.SelectContent = this.Root;
+        this.CurrentContent = this.Root;
+        this.Root.recalculateSize();
     }
+    ////
 }
 
 function CEmpty()
@@ -1837,6 +2047,7 @@ function AddEquation(ind)
             mathElem = new CRadical();
             break;
         case 18:
+            mathElem = new CDegreeRadical();
             break;
         case 19:
             break;

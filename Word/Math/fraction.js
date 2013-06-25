@@ -1,5 +1,3 @@
-
-
 function CBarFraction()
 {
     CMathBase.call(this,2,1);
@@ -68,6 +66,54 @@ CNumerator.prototype.recalculateSize = function()
 
     this.size = {width : width, height: height, center: center};
 }
+CNumerator.prototype.new_recalculateSize = function()
+{
+    var arg = this.elements[0][0].size;
+    var metrics = this.params.font.metrics;
+    var penW = this.params.font.FontSize* 25.4/96 * 0.08;
+
+    var Descent = arg.height - arg.center - metrics.Placeholder.Height*DIV_CENTER; // baseLine
+    //var gap = metrics.Height - metrics.Placeholder.Height + metrics.Descender,
+    var gap = metrics.Descender + 2*penW *1.8,
+        minGap = 2*penW;
+
+    var delta = gap - Descent;
+
+    var GapNum = delta > minGap ? delta : minGap;
+
+    var width = arg.width;
+    var height = arg.height + GapNum;
+    var center = arg.center;
+
+    this.size = {width : width, height: height, center: center};
+}
+CNumerator.prototype.n_recalculateSize = function()
+{
+    var arg = this.elements[0][0].size;
+    var metrics = this.params.font.metrics;
+    //var penW = this.params.font.FontSize* 25.4/96 * 0.08;
+
+
+    var DescentFirst = arg.height - arg.center - metrics.Placeholder.Height*DIV_CENTER; // baseLine
+
+    //var gap = metrics.Height -  2.8*metrics.Descender;  // 8 pt
+    //var gap = metrics.Height -  1.5*metrics.Descender;
+
+    var gap = metrics.Height - (2.96 - 0.02*this.params.font.FontSize)*metrics.Descender;
+
+    var penW = this.params.font.FontSize/47;
+
+    // 20    7
+    // 60   21
+
+    var gapNum = DescentFirst - 2*penW < 0.55*gap ? 0.55*gap - DescentFirst : 2*penW;
+
+    var width = arg.width;
+    var height = arg.height + gapNum;
+    var center = arg.center;
+
+    this.size = {width : width, height: height, center: center};
+}
 CNumerator.prototype.findDisposition = function(mCoord)
 {
     var arg = this.elements[0][0].size;
@@ -102,13 +148,58 @@ CDenominator.prototype.recalculateSize = function()
         Ascent = arg.center - metrics.Placeholder.Height/2,
         minGap = this.params.font.FontSize* 25.4/96 * 0.24;
 
-
     var delta = 0.47*gap - Ascent;
     var GapDen = delta > minGap ? delta : minGap;
 
     var width = arg.width;
     var height = arg.height + GapDen;
     var center = arg.center + GapDen;
+
+    this.size = {width : width, height: height, center: center};
+}
+CDenominator.prototype.new_recalculateSize = function()
+{
+    var arg = this.elements[0][0].size;
+    var metrics = this.params.font.metrics;
+
+    var gap = metrics.Height - metrics.Placeholder.Height - metrics.Descender,
+        Ascent = arg.center + metrics.Placeholder.Height*DIV_CENTER - metrics.Placeholder.Height,
+        minGap = this.params.font.FontSize* 25.4/96 * 0.24 * 1.23;
+
+    var delta = gap - Ascent;
+    var GapDen = delta > minGap ? delta : minGap;
+
+    var width  = arg.width;
+    var height = arg.height + GapDen;
+    var center = arg.center + GapDen;
+
+    this.size = {width : width, height: height, center: center};
+}
+CDenominator.prototype.n_recalculateSize = function()
+{
+    var arg = this.elements[0][0].size;
+    var metrics = this.params.font.metrics;
+
+    var AscentSecond = arg.center + metrics.Placeholder.Height*DIV_CENTER;
+
+    //var gap = metrics.Height - 2.8*metrics.Descender; // 8 pt
+    //var gap = metrics.Height - 1.5*metrics.Descender; // 72 pt
+
+    var gap = metrics.Height - (2.96 - 0.02*this.params.font.FontSize)*metrics.Descender;
+
+    // a*x + b = c
+    // a*8 + b = 2.8
+    // a*72 + b = 1.5
+    // a = - 1.3/64
+    // b = 2.96
+
+    var penW = this.params.font.FontSize/47;
+
+    var gapDen = AscentSecond - 3*penW < 0.45*gap ? 0.45*gap - AscentSecond : 3*penW;
+
+    var width  = arg.width;
+    var height = arg.height + gapDen;
+    var center = arg.center + gapDen;
 
     this.size = {width : width, height: height, center: center};
 }

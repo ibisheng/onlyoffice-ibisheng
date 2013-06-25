@@ -97,7 +97,6 @@ CBaseBracket.prototype.goToLowerLevel = function(coord){
         content = null;
 
     return {bLow: bLow, content: content};
-
 }
 
 function CParenthesis()

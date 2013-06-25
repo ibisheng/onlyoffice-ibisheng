@@ -120,13 +120,17 @@ function getStateHeight_2(height, GFont)
     return state;
 }
 
-function getTypeDegree(IFont)
+function getTypeDegree(IFont, flag)
 {
-    var old_CONST_DEG = 0.728;
-    var CONST_DEG = 0.728;
     var fontSize = null;
 
-    var sD = IFont.FontSize*CONST_DEG;
+    if(flag)
+        CONST_INDEX = 0.62;
+    else
+        CONST_INDEX = 0.728;
+
+
+    var sD = IFont.FontSize*CONST_INDEX;
     if( sD - Math.floor(sD) > 0.65 )
         fontSize = Math.ceil(sD) - 0.5;
     else
@@ -164,13 +168,16 @@ function getStateHeight_3( height, GFont) //for radical
                  GenHeight;
     var gap = metric.Height - metric.Placeholder.Height;
 
-    var H1 = metric.Height,
+    var H0 = metric.Placeholder.Height,
+        H1 = metric.Height,
         H2 = 2*metric.Placeholder.Height + 1.5*gap,
         H3 = 3*metric.Placeholder.Height + 2.4*gap,
         H4 = 4*metric.Placeholder.Height + 3*gap,
         H5 = 5*metric.Placeholder.Height + 4*gap;
 
-    if( height < H1 )
+    if(height < H0)
+        GenHeight = H1*0.75;
+    else if( height < H1 )
         GenHeight = H1;
     else if( height < H2 )
         GenHeight = H2;
