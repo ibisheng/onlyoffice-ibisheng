@@ -6209,7 +6209,16 @@ function spellCheck (editor, rdata) {
 	switch (rdata.type) {
 		case "spell":
 		case "suggest":
-			editor.SpellCheckApi.spellCheck(JSON.stringify(rdata));
+			if (undefined != window['qtDocBridge'])
+			{
+				// push data to native QT code
+				window['qtDocBridge']['spellCheck'] (JSON.stringify(rdata));
+			}
+			else
+			{
+				editor.SpellCheckApi.spellCheck(JSON.stringify(rdata));
+			}
+			
 			break;
 	}
 }
