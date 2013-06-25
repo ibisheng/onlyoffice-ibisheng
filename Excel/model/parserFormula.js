@@ -1082,8 +1082,8 @@ cBaseOperator.prototype = {
 }
 
 /** @constructor */
-function cBaseFunction(){
-    this.name = null;
+function cBaseFunction(name){
+    this.name = name;
     this.type = cElementType.func;
     this.value = null;
     this.argumentsMin = 0;
@@ -1407,111 +1407,91 @@ var cFormulaFunction = {
     Cube : {
         'groupName' : "Cube",
         'CUBEKPIMEMBER' : function(){
-            var r = new cBaseFunction();
-            r.setName("CUBEKPIMEMBER");
+            var r = new cBaseFunction("CUBEKPIMEMBER");
 			return r;
         },
         'CUBEMEMBER' : function(){
-            var r = new cBaseFunction();
-            r.setName("CUBEMEMBER");
+            var r = new cBaseFunction("CUBEMEMBER");
 			return r;
         },
         'CUBEMEMBERPROPERTY' : function(){
-            var r = new cBaseFunction();
-            r.setName("CUBEMEMBERPROPERTY");
+            var r = new cBaseFunction("CUBEMEMBERPROPERTY");
 			return r;
         },
         'CUBERANKEDMEMBER' : function(){
-            var r = new cBaseFunction();
-            r.setName("CUBERANKEDMEMBER");
+            var r = new cBaseFunction("CUBERANKEDMEMBER");
 			return r;
         },
         'CUBESET' : function(){
-            var r = new cBaseFunction();
-            r.setName("CUBESET");
+            var r = new cBaseFunction("CUBESET");
 			return r;
         },
         'CUBESETCOUNT' : function(){
-            var r = new cBaseFunction();
-            r.setName("CUBESETCOUNT");
+            var r = new cBaseFunction("CUBESETCOUNT");
 			return r;
         },
         'CUBEVALUE' : function(){
-            var r = new cBaseFunction();
-            r.setName("CUBEVALUE");
+            var r = new cBaseFunction("CUBEVALUE");
 			return r;
         }
     },
     Database : {
         'groupName' : "Database",
         'DAVERAGE' : function(){
-            var r = new cBaseFunction();
-            r.setName("DAVERAGE");
+            var r = new cBaseFunction("DAVERAGE");
 			return r;
         },
         'DCOUNT' : function(){
-            var r = new cBaseFunction();
-            r.setName("DCOUNT");
+            var r = new cBaseFunction("DCOUNT");
 			return r;
         },
         'DCOUNTA' : function(){
-            var r = new cBaseFunction();
-            r.setName("DCOUNTA");
+            var r = new cBaseFunction("DCOUNTA");
 			return r;
         },
         'DGET' : function(){
-            var r = new cBaseFunction();
-            r.setName("DGET");
+            var r = new cBaseFunction("DGET");
 			return r;
         },
         'DMAX' : function(){
-            var r = new cBaseFunction();
-            r.setName("DMAX");
+            var r = new cBaseFunction("DMAX");
 			return r;
         },
         'DMIN' : function(){
-            var r = new cBaseFunction();
-            r.setName("DMIN");
+            var r = new cBaseFunction("DMIN");
 			return r;
         },
         'DPRODUCT' : function(){
-            var r = new cBaseFunction();
-            r.setName("DPRODUCT");
+            var r = new cBaseFunction("DPRODUCT");
 			return r;
         },
         'DSTDEV' : function(){
-            var r = new cBaseFunction();
-            r.setName("DSTDEV");
+            var r = new cBaseFunction("DSTDEV");
 			return r;
         },
         'DSTDEVP' : function(){
-            var r = new cBaseFunction();
-            r.setName("DSTDEVP");
+            var r = new cBaseFunction("DSTDEVP");
 			return r;
         },
         'DSUM' : function(){
-            var r = new cBaseFunction();
-            r.setName("DSUM");
+            var r = new cBaseFunction("DSUM");
 			return r;
         },
         'DVAR' : function(){
-            var r = new cBaseFunction();
-            r.setName("DVAR");
+            var r = new cBaseFunction("DVAR");
 			return r;
         },
         'DVARP' : function(){
-            var r = new cBaseFunction();
-            r.setName("DVARP");
+            var r = new cBaseFunction("DVARP");
 			return r;
         }
     },
     DateAndTime : {
         'groupName' : "DateAndTime",
         'DATE' : function(){
-            var r = new cBaseFunction();
+            var r = new cBaseFunction("DATE");
             r.setArgumentsMin(3);
             r.setArgumentsMax(3);
-            r.setName("DATE");
             r.Calculate = function(arg){
 				var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], year, month, day;
 
@@ -1576,13 +1556,11 @@ var cFormulaFunction = {
 			return r;
 		},
         'DATEDIF' : function(){
-            var r = new cBaseFunction();
-            r.setName("DATEDIF");
+            var r = new cBaseFunction("DATEDIF");
 			return r;
         },
         'DATEVALUE' : function(){
-            var r = new cBaseFunction();
-            r.setName("DATEVALUE");
+            var r = new cBaseFunction("DATEVALUE");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
 			r.Calculate = function(arg){
@@ -1620,10 +1598,9 @@ var cFormulaFunction = {
 			return r;
         },
         'DAY' : function(){
-            var r = new cBaseFunction();
+            var r = new cBaseFunction("DAY");
             r.setArgumentsMin(1);
             r.setArgumentsMax(1);
-            r.setName("DAY");
             r.Calculate = function(arg){
                 var arg0 = arg[0],val;
 				if( arg0 instanceof cArray ){
@@ -1684,13 +1661,11 @@ var cFormulaFunction = {
 			return r;
 		},
         'DAYS360' : function(){
-            var r = new cBaseFunction();
-            r.setName("DAYS360");
+            var r = new cBaseFunction("DAYS360");
 			return r;
         },
         'EDATE' : function(){
-            var r = new cBaseFunction();
-            r.setName("EDATE");
+            var r = new cBaseFunction("EDATE");
 			r.setArgumentsMin(2);
             r.setArgumentsMax(2);
 			r.Calculate = function(arg){
@@ -1757,8 +1732,7 @@ var cFormulaFunction = {
 			return r;
         },
         'EOMONTH' : function(){
-            var r = new cBaseFunction();
-            r.setName("EOMONTH");
+            var r = new cBaseFunction("EOMONTH");
 			r.setArgumentsMin(2);
             r.setArgumentsMax(2);
 			r.Calculate = function(arg){
@@ -1817,10 +1791,9 @@ var cFormulaFunction = {
 			return r;
         },
         'HOUR' : function(){
-            var r = new cBaseFunction();
+            var r = new cBaseFunction("HOUR");
             r.setArgumentsMin(1);
             r.setArgumentsMax(1);
-            r.setName("HOUR");
             r.Calculate = function(arg){
                 var arg0 = arg[0],val;
 				if( arg0 instanceof cArray ){
@@ -1877,10 +1850,9 @@ var cFormulaFunction = {
 			return r;
 		},
         'MINUTE' : function(){
-            var r = new cBaseFunction();
+            var r = new cBaseFunction("MINUTE");
             r.setArgumentsMin(1);
             r.setArgumentsMax(1);
-            r.setName("MINUTE");
             r.Calculate = function(arg){
                 var arg0 = arg[0],val;
 				if( arg0 instanceof cArray ){
@@ -1939,10 +1911,9 @@ var cFormulaFunction = {
 			return r;
 		},
         'MONTH' : function(){
-            var r = new cBaseFunction();
+            var r = new cBaseFunction("MONTH");
             r.setArgumentsMin(1);
             r.setArgumentsMax(1);
-            r.setName("MONTH");
             r.Calculate = function(arg){
                 var arg0 = arg[0],val;
 				if( arg0 instanceof cArray ){
@@ -2002,8 +1973,7 @@ var cFormulaFunction = {
 			return r;
 		},
         'NETWORKDAYS' : function(){
-            var r = new cBaseFunction();
-            r.setName("NETWORKDAYS");
+            var r = new cBaseFunction("NETWORKDAYS");
 			r.setArgumentsMin(2);
             r.setArgumentsMax(3);
 			r.Calculate = function(arg){
@@ -2124,15 +2094,13 @@ var cFormulaFunction = {
 			return r;
         },
         'NETWORKDAYS.INTL' : function(){
-            var r = new cBaseFunction();
-            r.setName("NETWORKDAYS.INTL");
+            var r = new cBaseFunction("NETWORKDAYS.INTL");
 			return r;
         },
         'NOW' : function(){
-            var r = new cBaseFunction();
+            var r = new cBaseFunction("NOW");
             r.setArgumentsMin(0);
             r.setArgumentsMax(0);
-            r.setName("NOW");
             r.Calculate = function(){
                 var d = new Date();
                 this.value = new cNumber( Math.floor( ( d.getTime()/1000 - d.getTimezoneOffset()*60 )/c_sPerDay+(c_DateCorrectConst+1) ) + ( (d.getHours()*60*60+d.getMinutes()*60+d.getSeconds())/c_sPerDay ) );
@@ -2148,10 +2116,9 @@ var cFormulaFunction = {
 			return r;
 		},
         'SECOND' : function(){
-            var r = new cBaseFunction();
+            var r = new cBaseFunction("SECOND");
             r.setArgumentsMin(1);
             r.setArgumentsMax(1);
-            r.setName("SECOND");
             r.Calculate = function(arg){
                 var arg0 = arg[0],val;
 				if( arg0 instanceof cArray ){
@@ -2210,10 +2177,9 @@ var cFormulaFunction = {
 			return r;
 		},
         'TIME' : function(){
-            var r = new cBaseFunction();
+            var r = new cBaseFunction("TIME");
             r.setArgumentsMin(3);
             r.setArgumentsMax(3);
-            r.setName("TIME");
             //to excel (hh*60*60+mm*60+ss)/c_sPerDay (c_sPerDay the number of seconds in a day)
             r.Calculate = function(arg){
                 var hour,minute,second;
@@ -2269,15 +2235,13 @@ var cFormulaFunction = {
 			return r;
 		},
         'TIMEVALUE' : function(){
-            var r = new cBaseFunction();
-            r.setName("TIMEVALUE");
+            var r = new cBaseFunction("TIMEVALUE");
 			return r;
         },
         'TODAY' : function(){
-            var r = new cBaseFunction();
+            var r = new cBaseFunction("TODAY");
 			r.setArgumentsMin(0);
 			r.setArgumentsMax(0);
-            r.setName("TODAY");
             r.Calculate = function(){
                 var d = new Date();
 				//						1			2 3												3		4					  5				   5 4 2 1
@@ -2296,18 +2260,15 @@ var cFormulaFunction = {
 			//Math.floor(((new Date()).getTime()/1000)/c_sPerDay+(c_DateCorrectConst+1)) from UTC-timestamp to excel 2010
         },
         'WEEKDAY' : function(){
-            var r = new cBaseFunction();
-            r.setName("WEEKDAY");
+            var r = new cBaseFunction("WEEKDAY");
 			return r;
         },
         'WEEKNUM' : function(){
-            var r = new cBaseFunction();
-            r.setName("WEEKNUM");
+            var r = new cBaseFunction("WEEKNUM");
 			return r;
         },
         'WORKDAY' : function(){
-            var r = new cBaseFunction();
-            r.setName("WORKDAY");
+            var r = new cBaseFunction("WORKDAY");
 			r.setArgumentsMin(2);
             r.setArgumentsMax(3);
 			r.Calculate = function(arg){
@@ -2420,15 +2381,13 @@ var cFormulaFunction = {
 			return r;
         },
         'WORKDAY.INTL' : function(){
-            var r = new cBaseFunction();
-            r.setName("WORKDAY.INTL");
+            var r = new cBaseFunction("WORKDAY.INTL");
 			return r;
         },
         'YEAR' : function(){
-            var r = new cBaseFunction();
+            var r = new cBaseFunction("YEAR");
             r.setArgumentsMin(1);
             r.setArgumentsMax(1);
-            r.setName("YEAR");
             r.Calculate = function(arg){
                 var arg0 = arg[0],val;
 				if( arg0 instanceof cArray ){
@@ -2484,309 +2443,249 @@ var cFormulaFunction = {
 			return r;
 		},
         'YEARFRAC' : function(){
-            var r = new cBaseFunction();
-            r.setName("YEARFRAC");
+            var r = new cBaseFunction("YEARFRAC");
 			return r;
         }
     },
     Engineering : {
         'groupName' : "Engineering",
         'BESSELI' : function(){
-            var r = new cBaseFunction();
-            r.setName("BESSELI");
+            var r = new cBaseFunction("BESSELI");
 			return r;
         },
         'BESSELJ' : function(){
-            var r = new cBaseFunction();
-            r.setName("BESSELJ");
+            var r = new cBaseFunction("BESSELJ");
 			return r;
         },
         'BESSELK' : function(){
-            var r = new cBaseFunction();
-            r.setName("BESSELK");
+            var r = new cBaseFunction("BESSELK");
 			return r;
         },
         'BESSELY' : function(){
-            var r = new cBaseFunction();
-            r.setName("BESSELY");
+            var r = new cBaseFunction("BESSELY");
 			return r;
         },
         'BIN2DEC' : function(){
-            var r = new cBaseFunction();
-            r.setName("BIN2DEC");
+            var r = new cBaseFunction("BIN2DEC");
 			return r;
         },
         'BIN2HEX' : function(){
-            var r = new cBaseFunction();
-            r.setName("BIN2HEX");
+            var r = new cBaseFunction("BIN2HEX");
 			return r;
         },
         'BIN2OCT' : function(){
-            var r = new cBaseFunction();
-            r.setName("BIN2OCT");
+            var r = new cBaseFunction("BIN2OCT");
 			return r;
         },
         'COMPLEX' : function(){
-            var r = new cBaseFunction();
-            r.setName("COMPLEX");
+            var r = new cBaseFunction("COMPLEX");
 			return r;
         },
         'CONVERT' : function(){
-            var r = new cBaseFunction();
-            r.setName("CONVERT");
+            var r = new cBaseFunction("CONVERT");
 			return r;
         },
         'DEC2BIN' : function(){
-            var r = new cBaseFunction();
-            r.setName("DEC2BIN");
+            var r = new cBaseFunction("DEC2BIN");
 			return r;
         },
         'DEC2HEX' : function(){
-            var r = new cBaseFunction();
-            r.setName("DEC2HEX");
+            var r = new cBaseFunction("DEC2HEX");
 			return r;
         },
         'DEC2OCT' : function(){
-            var r = new cBaseFunction();
-            r.setName("DEC2OCT");
+            var r = new cBaseFunction("DEC2OCT");
 			return r;
         },
         'DELTA' : function(){
-            var r = new cBaseFunction();
-            r.setName("DELTA");
+            var r = new cBaseFunction("DELTA");
 			return r;
         },
         'ERF' : function(){
-            var r = new cBaseFunction();
-            r.setName("ERF");
+            var r = new cBaseFunction("ERF");
 			return r;
         },
         'ERFC' : function(){
-            var r = new cBaseFunction();
-            r.setName("ERFC");
+            var r = new cBaseFunction("ERFC");
 			return r;
         },
         'GESTEP' : function(){
-            var r = new cBaseFunction();
-            r.setName("GESTEP");
+            var r = new cBaseFunction("GESTEP");
 			return r;
         },
         'HEX2BIN' : function(){
-            var r = new cBaseFunction();
-            r.setName("HEX2BIN");
+            var r = new cBaseFunction("HEX2BIN");
 			return r;
         },
         'HEX2DEC' : function(){
-            var r = new cBaseFunction();
-            r.setName("HEX2DEC");
+            var r = new cBaseFunction("HEX2DEC");
 			return r;
         },
         'HEX2OCT' : function(){
-            var r = new cBaseFunction();
-            r.setName("HEX2OCT");
+            var r = new cBaseFunction("HEX2OCT");
 			return r;
         },
         'IMABS' : function(){
-            var r = new cBaseFunction();
-            r.setName("IMABS");
+            var r = new cBaseFunction("IMABS");
 			return r;
         },
         'IMAGINARY' : function(){
-            var r = new cBaseFunction();
-            r.setName("IMAGINARY");
+            var r = new cBaseFunction("IMAGINARY");
 			return r;
         },
         'IMARGUMENT' : function(){
-            var r = new cBaseFunction();
-            r.setName("IMARGUMENT");
+            var r = new cBaseFunction("IMARGUMENT");
 			return r;
         },
         'IMCONJUGATE' : function(){
-            var r = new cBaseFunction();
-            r.setName("IMCONJUGATE");
+            var r = new cBaseFunction("IMCONJUGATE");
 			return r;
         },
         'IMCOS' : function(){
-            var r = new cBaseFunction();
-            r.setName("IMCOS");
+            var r = new cBaseFunction("IMCOS");
 			return r;
         },
         'IMDIV' : function(){
-            var r = new cBaseFunction();
-            r.setName("IMDIV");
+            var r = new cBaseFunction("IMDIV");
 			return r;
         },
         'IMEXP' : function(){
-            var r = new cBaseFunction();
-            r.setName("IMEXP");
+            var r = new cBaseFunction("IMEXP");
 			return r;
         },
         'IMLN' : function(){
-            var r = new cBaseFunction();
-            r.setName("IMLN");
+            var r = new cBaseFunction("IMLN");
 			return r;
         },
         'IMLOG10' : function(){
-            var r = new cBaseFunction();
-            r.setName("IMLOG10");
+            var r = new cBaseFunction("IMLOG10");
 			return r;
         },
         'IMLOG2' : function(){
-            var r = new cBaseFunction();
-            r.setName("IMLOG2");
+            var r = new cBaseFunction("IMLOG2");
 			return r;
         },
         'IMPOWER' : function(){
-            var r = new cBaseFunction();
-            r.setName("IMPOWER");
+            var r = new cBaseFunction("IMPOWER");
 			return r;
         },
         'IMPRODUCT' : function(){
-            var r = new cBaseFunction();
-            r.setName("IMPRODUCT");
+            var r = new cBaseFunction("IMPRODUCT");
 			return r;
         },
         'IMREAL' : function(){
-            var r = new cBaseFunction();
-            r.setName("IMREAL");
+            var r = new cBaseFunction("IMREAL");
 			return r;
         },
         'IMSIN' : function(){
-            var r = new cBaseFunction();
-            r.setName("IMSIN");
+            var r = new cBaseFunction("IMSIN");
 			return r;
         },
         'IMSQRT' : function(){
-            var r = new cBaseFunction();
-            r.setName("IMSQRT");
+            var r = new cBaseFunction("IMSQRT");
 			return r;
         },
         'IMSUB' : function(){
-            var r = new cBaseFunction();
-            r.setName("IMSUB");
+            var r = new cBaseFunction("IMSUB");
 			return r;
         },
         'IMSUM' : function(){
-            var r = new cBaseFunction();
-            r.setName("IMSUM");
+            var r = new cBaseFunction("IMSUM");
 			return r;
         },
         'OCT2BIN' : function(){
-            var r = new cBaseFunction();
-            r.setName("OCT2BIN");
+            var r = new cBaseFunction("OCT2BIN");
 			return r;
         },
         'OCT2DEC' : function(){
-            var r = new cBaseFunction();
-            r.setName("OCT2DEC");
+            var r = new cBaseFunction("OCT2DEC");
 			return r;
         },
         'OCT2HEX' : function(){
-            var r = new cBaseFunction();
-            r.setName("OCT2HEX");
+            var r = new cBaseFunction("OCT2HEX");
 			return r;
         }
     },
     Financial : {
         'groupName' : "Financial",
         'ACCRINT' : function(){
-            var r = new cBaseFunction();
-            r.setName("ACCRINT");
+            var r = new cBaseFunction("ACCRINT");
 			return r;
         },
         'ACCRINTM' : function(){
-            var r = new cBaseFunction();
-            r.setName("ACCRINTM");
+            var r = new cBaseFunction("ACCRINTM");
 			return r;
         },
         'AMORDEGRC' : function(){
-            var r = new cBaseFunction();
-            r.setName("AMORDEGRC");
+            var r = new cBaseFunction("AMORDEGRC");
 			return r;
         },
         'AMORLINC' : function(){
-            var r = new cBaseFunction();
-            r.setName("AMORLINC");
+            var r = new cBaseFunction("AMORLINC");
 			return r;
         },
         'COUPDAYBS' : function(){
-            var r = new cBaseFunction();
-            r.setName("COUPDAYBS");
+            var r = new cBaseFunction("COUPDAYBS");
 			return r;
         },
         'COUPDAYS' : function(){
-            var r = new cBaseFunction();
-            r.setName("COUPDAYS");
+            var r = new cBaseFunction("COUPDAYS");
 			return r;
         },
         'COUPDAYSNC' : function(){
-            var r = new cBaseFunction();
-            r.setName("COUPDAYSNC");
+            var r = new cBaseFunction("COUPDAYSNC");
 			return r;
         },
         'COUPNCD' : function(){
-            var r = new cBaseFunction();
-            r.setName("COUPNCD");
+            var r = new cBaseFunction("COUPNCD");
 			return r;
         },
         'COUPNUM' : function(){
-            var r = new cBaseFunction();
-            r.setName("COUPNUM");
+            var r = new cBaseFunction("COUPNUM");
 			return r;
         },
         'COUPPCD' : function(){
-            var r = new cBaseFunction();
-            r.setName("COUPPCD");
+            var r = new cBaseFunction("COUPPCD");
 			return r;
         },
         'CUMIPMT' : function(){
-            var r = new cBaseFunction();
-            r.setName("CUMIPMT");
+            var r = new cBaseFunction("CUMIPMT");
 			return r;
         },
         'CUMPRINC' : function(){
-            var r = new cBaseFunction();
-            r.setName("CUMPRINC");
+            var r = new cBaseFunction("CUMPRINC");
 			return r;
         },
         'DB' : function(){
-            var r = new cBaseFunction();
-            r.setName("DB");
+            var r = new cBaseFunction("DB");
 			return r;
         },
         'DDB' : function(){
-            var r = new cBaseFunction();
-            r.setName("DDB");
+            var r = new cBaseFunction("DDB");
 			return r;
         },
         'DISC' : function(){
-            var r = new cBaseFunction();
-            r.setName("DISC");
+            var r = new cBaseFunction("DISC");
 			return r;
         },
         'DOLLARDE' : function(){
-            var r = new cBaseFunction();
-            r.setName("DOLLARDE");
+            var r = new cBaseFunction("DOLLARDE");
 			return r;
         },
         'DOLLARFR' : function(){
-            var r = new cBaseFunction();
-            r.setName("DOLLARFR");
+            var r = new cBaseFunction("DOLLARFR");
 			return r;
         },
         'DURATION' : function(){
-            var r = new cBaseFunction();
-            r.setName("DURATION");
+            var r = new cBaseFunction("DURATION");
 			return r;
         },
         'EFFECT' : function(){
-            var r = new cBaseFunction();
-            r.setName("EFFECT");
+            var r = new cBaseFunction("EFFECT");
 			return r;
         },
         'FV' : function(){
-            var r = new cBaseFunction();
-            r.setName("FV");
+            var r = new cBaseFunction("FV");
 			r.setArgumentsMin(3);
             r.setArgumentsMax(5);
             r.Calculate = function(arg){
@@ -2861,53 +2760,43 @@ var cFormulaFunction = {
 			return r;
         },
         'FVSCHEDULE' : function(){
-            var r = new cBaseFunction();
-            r.setName("FVSCHEDULE");
+            var r = new cBaseFunction("FVSCHEDULE");
 			return r;
         },
         'INTRATE' : function(){
-            var r = new cBaseFunction();
-            r.setName("INTRATE");
+            var r = new cBaseFunction("INTRATE");
 			return r;
         },
         'IPMT' : function(){
-            var r = new cBaseFunction();
-            r.setName("IPMT");
+            var r = new cBaseFunction("IPMT");
 			return r;
         },
         'IRR' : function(){
-            var r = new cBaseFunction();
-            r.setName("IRR");
+            var r = new cBaseFunction("IRR");
 			return r;
         },
         'ISPMT' : function(){
-            var r = new cBaseFunction();
-            r.setName("ISPMT");
+            var r = new cBaseFunction("ISPMT");
 			return r;
         },
         'MDURATION' : function(){
-            var r = new cBaseFunction();
-            r.setName("MDURATION");
+            var r = new cBaseFunction("MDURATION");
 			return r;
         },
         'MIRR' : function(){
-            var r = new cBaseFunction();
-            r.setName("MIRR");
+            var r = new cBaseFunction("MIRR");
 			return r;
         },
         'NOMINAL' : function(){
-            var r = new cBaseFunction();
-            r.setName("NOMINAL");
+            var r = new cBaseFunction("NOMINAL");
 			return r;
         },
         'NPER' : function(){
-            var r = new cBaseFunction();
-            r.setName("NPER");
+            var r = new cBaseFunction("NPER");
 			return r;
         },
         'NPV' : function(){
-            var r = new cBaseFunction();
-            r.setName("NPV");
+            var r = new cBaseFunction("NPV");
             r.setArgumentsMin(2);
             r.setArgumentsMax(255);
             r.Calculate = function(arg){
@@ -2977,53 +2866,118 @@ var cFormulaFunction = {
 			return r;
         },
         'ODDFPRICE' : function(){
-            var r = new cBaseFunction();
-            r.setName("ODDFPRICE");
+            var r = new cBaseFunction("ODDFPRICE");
 			return r;
         },
         'ODDFYIELD' : function(){
-            var r = new cBaseFunction();
-            r.setName("ODDFYIELD");
+            var r = new cBaseFunction("ODDFYIELD");
 			return r;
         },
         'ODDLPRICE' : function(){
-            var r = new cBaseFunction();
-            r.setName("ODDLPRICE");
+            var r = new cBaseFunction("ODDLPRICE");
 			return r;
         },
         'ODDLYIELD' : function(){
-            var r = new cBaseFunction();
-            r.setName("ODDLYIELD");
+            var r = new cBaseFunction("ODDLYIELD");
 			return r;
         },
         'PMT' : function(){
-            var r = new cBaseFunction();
-            r.setName("PMT");
+            var r = new cBaseFunction("PMT");
+			r.setArgumentsMin(3);
+            r.setArgumentsMax(5);
+            r.Calculate = function(arg){
+				var rate = arg[0], nper = arg[1], pv = arg[2], fv = arg[3] ? arg[3] : new cNumber(0), type = arg[4] ? arg[4] : new cNumber(0);
+
+				if ( rate instanceof cArea || rate instanceof cArea3D ){
+					rate = rate.cross(arguments[1].first);
+				}
+				else if( rate instanceof cArray ){
+					rate = rate.getElementRowCol(0,0);
+				}
+
+				if ( nper instanceof cArea || nper instanceof cArea3D ){
+					nper = nper.cross(arguments[1].first);
+				}
+				else if( nper instanceof cArray ){
+					nper = nper.getElementRowCol(0,0);
+				}
+
+				if ( pv instanceof cArea || pv instanceof cArea3D ){
+					pv = pv.cross(arguments[1].first);
+				}
+				else if( pv instanceof cArray ){
+					pv = pv.getElementRowCol(0,0);
+				}
+
+				if ( fv instanceof cArea || fv instanceof cArea3D ){
+					fv = fv.cross(arguments[1].first);
+				}
+				else if( fv instanceof cArray ){
+					fv = fv.getElementRowCol(0,0);
+				}
+
+				if ( type instanceof cArea || type instanceof cArea3D ){
+					type = type.cross(arguments[1].first);
+				}
+				else if( type instanceof cArray ){
+					type = type.getElementRowCol(0,0);
+				}
+
+				rate = rate.tocNumber();
+				nper = nper.tocNumber();
+				pv = pv.tocNumber();
+				fv = fv.tocNumber();
+				type = type.tocNumber();
+
+				if ( rate instanceof cError ) return this.value = rate;
+				
+				if ( nper instanceof cError ) return this.value = nper;
+				if ( nper.getValue() == 0 ) return this.value = new cError( cErrorType.division_by_zero );
+				
+				if ( pv instanceof cError ) return this.value = pv;
+				if ( fv instanceof cError ) return this.value = fv;
+				if ( type instanceof cError ) return this.value = type;
+
+				if ( type.getValue() != 1 && type.getValue() != 0 ) return this.value = new cError( cErrorType.not_numeric );
+
+				var res;
+				if( rate.getValue() != 0 ){
+					res = -1*( pv.getValue() * Math.pow( 1 + rate.getValue(), nper.getValue() ) + fv.getValue() ) / 
+						( ( 1 + rate.getValue() * type.getValue() ) * ( Math.pow((1 + rate.getValue()), nper.getValue() ) - 1 ) / rate.getValue() );
+				}
+				else{
+					res = -1*( pv.getValue()+fv.getValue() )/ nper.getValue();
+				}
+
+				return this.value = new cNumber(res);
+			}
+			r.getInfo = function(){
+                return {
+                    name:this.name,
+                    args:"( rate , nper , pv [ , [ fv ] [ ,[ type ] ] ] )"
+                };
+            }
+			r.setFormat(r.formatType.noneFormat);
 			return r;
         },
         'PPMT' : function(){
-            var r = new cBaseFunction();
-            r.setName("PPMT");
+            var r = new cBaseFunction("PPMT");
 			return r;
         },
         'PRICE' : function(){
-            var r = new cBaseFunction();
-            r.setName("PRICE");
+            var r = new cBaseFunction("PRICE");
 			return r;
         },
         'PRICEDISC' : function(){
-            var r = new cBaseFunction();
-            r.setName("PRICEDISC");
+            var r = new cBaseFunction("PRICEDISC");
 			return r;
         },
         'PRICEMAT' : function(){
-            var r = new cBaseFunction();
-            r.setName("PRICEMAT");
+            var r = new cBaseFunction("PRICEMAT");
 			return r;
         },
         'PV' : function(){
-            var r = new cBaseFunction();
-            r.setName("PV");
+            var r = new cBaseFunction("PV");
 			r.setArgumentsMin(3);
             r.setArgumentsMax(5);
             r.Calculate = function(arg){
@@ -3098,81 +3052,66 @@ var cFormulaFunction = {
 			return r;
         },
         'RATE' : function(){
-            var r = new cBaseFunction();
-            r.setName("RATE");
+            var r = new cBaseFunction("RATE");
 			return r;
         },
         'RECEIVED' : function(){
-            var r = new cBaseFunction();
-            r.setName("RECEIVED");
+            var r = new cBaseFunction("RECEIVED");
 			return r;
         },
         'SLN' : function(){
-            var r = new cBaseFunction();
-            r.setName("SLN");
+            var r = new cBaseFunction("SLN");
 			return r;
         },
         'SYD' : function(){
-            var r = new cBaseFunction();
-            r.setName("SYD");
+            var r = new cBaseFunction("SYD");
 			return r;
         },
         'TBILLEQ' : function(){
-            var r = new cBaseFunction();
-            r.setName("TBILLEQ");
+            var r = new cBaseFunction("TBILLEQ");
 			return r;
         },
         'TBILLPRICE' : function(){
-            var r = new cBaseFunction();
-            r.setName("TBILLPRICE");
+            var r = new cBaseFunction("TBILLPRICE");
 			return r;
         },
         'TBILLYIELD' : function(){
-            var r = new cBaseFunction();
-            r.setName("TBILLYIELD");
+            var r = new cBaseFunction("TBILLYIELD");
 			return r;
         },
         'VDB' : function(){
-            var r = new cBaseFunction();
-            r.setName("VDB");
+            var r = new cBaseFunction("VDB");
 			return r;
         },
         'XIRR' : function(){
-            var r = new cBaseFunction();
-            r.setName("XIRR");
+            var r = new cBaseFunction("XIRR");
 			return r;
         },
         'XNPV' : function(){
-            var r = new cBaseFunction();
-            r.setName("XNPV");
+            var r = new cBaseFunction("XNPV");
 			return r;
         },
         'YIELD' : function(){
-            var r = new cBaseFunction();
-            r.setName("YIELD");
+            var r = new cBaseFunction("YIELD");
 			return r;
         },
         'YIELDDISC' : function(){
-            var r = new cBaseFunction();
-            r.setName("YIELDDISC");
+            var r = new cBaseFunction("YIELDDISC");
 			return r;
         },
         'YIELDMAT' : function(){
-            var r = new cBaseFunction();
-            r.setName("YIELDMAT");
+            var r = new cBaseFunction("YIELDMAT");
 			return r;
         }
     },
     Information	: {
         'groupName' : "Information",
         "CELL" :function(){
-            var r = new cBaseFunction();
-            r.setName("CELL");
+            var r = new cBaseFunction("CELL");
 			return r;
         },
         "ERROR.TYPE" :function(){
-            var r = new cBaseFunction();
-			r.setName("ERROR.TYPE");
+            var r = new cBaseFunction("ERROR.TYPE");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -3229,13 +3168,11 @@ var cFormulaFunction = {
 			return r;
 		},
         "INFO" :function(){
-            var r = new cBaseFunction();
-            r.setName("INFO");
+            var r = new cBaseFunction("INFO");
 			return r;
         },
         "ISBLANK" :function(){
-            var r = new cBaseFunction();
-            r.setName("ISBLANK");
+            var r = new cBaseFunction("ISBLANK");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -3260,8 +3197,7 @@ var cFormulaFunction = {
 			return r;
 		},
         "ISERR" :function(){
-            var r = new cBaseFunction();
-            r.setName("ISERR");
+            var r = new cBaseFunction("ISERR");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -3289,8 +3225,7 @@ var cFormulaFunction = {
 			return r;
 		},
         "ISERROR" :function(){
-            var r = new cBaseFunction();
-            r.setName("ISERROR");
+            var r = new cBaseFunction("ISERROR");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -3318,8 +3253,7 @@ var cFormulaFunction = {
 			return r;
 		},
         "ISEVEN" :function(){
-            var r = new cBaseFunction();
-			r.setName("ISEVEN");
+            var r = new cBaseFunction("ISEVEN");
             r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -3350,8 +3284,7 @@ var cFormulaFunction = {
 			return r;
 		},
         "ISLOGICAL" :function(){
-            var r = new cBaseFunction();
-            r.setName("ISLOGICAL");
+            var r = new cBaseFunction("ISLOGICAL");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -3378,8 +3311,7 @@ var cFormulaFunction = {
 			return r;
 		},
         "ISNA" :function(){
-            var r = new cBaseFunction();
-            r.setName("ISNA");
+            var r = new cBaseFunction("ISNA");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -3407,8 +3339,7 @@ var cFormulaFunction = {
 			return r;
 		},
         "ISNONTEXT" :function(){
-            var r = new cBaseFunction();
-            r.setName("ISNONTEXT");
+            var r = new cBaseFunction("ISNONTEXT");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -3436,8 +3367,7 @@ var cFormulaFunction = {
 			return r;
 		},
         "ISNUMBER" :function(){
-            var r = new cBaseFunction();
-            r.setName("ISNUMBER");
+            var r = new cBaseFunction("ISNUMBER");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -3465,8 +3395,7 @@ var cFormulaFunction = {
 			return r;
 		},
         "ISODD" :function(){
-            var r = new cBaseFunction();
-            r.setName("ISODD");
+            var r = new cBaseFunction("ISODD");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -3497,8 +3426,7 @@ var cFormulaFunction = {
 			return r;
 		},
         "ISREF" :function(){
-            var r = new cBaseFunction();
-            r.setName("ISREF");
+            var r = new cBaseFunction("ISREF");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -3515,8 +3443,7 @@ var cFormulaFunction = {
 			return r;
 		},
         "ISTEXT" :function(){
-            var r = new cBaseFunction();
-            r.setName("ISTEXT");
+            var r = new cBaseFunction("ISTEXT");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -3544,8 +3471,7 @@ var cFormulaFunction = {
 			return r;
 		},
         "N" :function(){
-            var r = new cBaseFunction();
-            r.setName("N");
+            var r = new cBaseFunction("N");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -3586,8 +3512,7 @@ var cFormulaFunction = {
 			return r;
 		},
         "NA" :function(){
-            var r = new cBaseFunction();
-            r.setName("NA");
+            var r = new cBaseFunction("NA");
 			r.setArgumentsMin(0);
             r.setArgumentsMax(0);
             r.Calculate = function(){
@@ -3602,8 +3527,7 @@ var cFormulaFunction = {
 			return r;
 		},
         "TYPE" :function(){
-            var r = new cBaseFunction();
-            r.setName("TYPE");
+            var r = new cBaseFunction("TYPE");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -3637,8 +3561,7 @@ var cFormulaFunction = {
     Logical : {
         'groupName' : "Logical",
         'AND' : function(){
-            var r = new cBaseFunction();
-            r.setName("AND");
+            var r = new cBaseFunction("AND");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(255);
             r.Calculate = function(arg){
@@ -3702,8 +3625,7 @@ var cFormulaFunction = {
 			return r;
 		},
         'FALSE' : function(){
-            var r = new cBaseFunction();
-            r.setName("FALSE");
+            var r = new cBaseFunction("FALSE");
 			r.setArgumentsMin(0);
             r.setArgumentsMax(0);
 			r.Calculate = function(){
@@ -3718,8 +3640,7 @@ var cFormulaFunction = {
 			return r;
 		},
         'IF' : function(){
-            var r = new cBaseFunction();
-            r.setName("IF");
+            var r = new cBaseFunction("IF");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(3);
             r.Calculate = function(arg){
@@ -3761,8 +3682,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'IFERROR' : function(){
-            var r = new cBaseFunction();
-            r.setName("IFERROR");
+            var r = new cBaseFunction("IFERROR");
 			r.setArgumentsMin(2);
             r.setArgumentsMax(2);
             r.Calculate = function(arg){
@@ -3790,8 +3710,7 @@ var cFormulaFunction = {
 			return r;
 		},
         'NOT' : function(){
-            var r = new cBaseFunction();
-            r.setName("NOT");
+            var r = new cBaseFunction("NOT");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -3824,8 +3743,7 @@ var cFormulaFunction = {
 			return r;
 		},
         'OR' : function(){
-            var r = new cBaseFunction();
-            r.setName("OR");
+            var r = new cBaseFunction("OR");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(255);
             r.Calculate = function(arg){
@@ -3886,8 +3804,7 @@ var cFormulaFunction = {
 			return r;
 		},
         'TRUE' : function(){
-            var r = new cBaseFunction();
-			r.setName("TRUE");
+            var r = new cBaseFunction("TRUE");
 			r.setArgumentsMin(0);
             r.setArgumentsMax(0);
             r.Calculate = function(){
@@ -3905,18 +3822,15 @@ var cFormulaFunction = {
     LookupAndReference : {
         'groupName' : "LookupAndReference",
         'ADDRESS' : function(){
-            var r = new cBaseFunction();
-            r.setName("ADDRESS");
+            var r = new cBaseFunction("ADDRESS");
 			return r;
 		},
         'AREAS' : function(){
-            var r = new cBaseFunction();
-            r.setName("AREAS");
+            var r = new cBaseFunction("AREAS");
 			return r;
 		},
         'CHOOSE' : function(){
-            var r = new cBaseFunction();
-			r.setName("CHOOSE");
+            var r = new cBaseFunction("CHOOSE");
 			r.setArgumentsMin(2);
             r.setArgumentsMax(30);
 			r.Calculate = function(arg){
@@ -3950,8 +3864,7 @@ var cFormulaFunction = {
 			return r;
 		},
         'COLUMN' : function(){
-            var r = new cBaseFunction();
-            r.setName("COLUMN");
+            var r = new cBaseFunction("COLUMN");
 			r.setArgumentsMin(0);
             r.setArgumentsMax(1);
 			r.Calculate = function(arg){
@@ -3989,18 +3902,42 @@ var cFormulaFunction = {
         	return r;
 		},
         'COLUMNS' : function(){
-            var r = new cBaseFunction();
-            r.setName("COLUMNS");
+            var r = new cBaseFunction("COLUMNS");
+			r.setArgumentsMin(1);
+            r.setArgumentsMax(1);
+			r.Calculate = function(arg){
+				var arg0 = arg[0];
+				if( arg0 instanceof cArray ){
+					return this.value = new cNumber(arg0.getCountElementInRow());
+				}
+				else if( arg0 instanceof cArea || arg0 instanceof cRef || arg0 instanceof cRef3D ){
+					var range = arg0.getRange();
+					return this.value = new cNumber( Math.abs( range.getBBox().c1 - range.getBBox().c2 ) + 1 );
+				}
+				else if( arg0 instanceof cArea3D ){
+					var range = arg0.getRange();
+					if( range.length > 1 )
+						return this.value = new cError( cErrorType.wrong_value_type );
+					
+					return this.value = new cNumber( Math.abs(range[0].getBBox().c1 - range[0].getBBox().c2) + 1 );
+				}
+				else 
+					return this.value = new cError( cErrorType.wrong_value_type );
+			}
+			r.getInfo = function(){
+				return {
+                    name:this.name,
+                    args:"( array )"
+                };
+			}
         	return r;
 		},
         'GETPIVOTDATA' : function(){
-            var r = new cBaseFunction();
-            r.setName("GETPIVOTDATA");
+            var r = new cBaseFunction("GETPIVOTDATA");
         	return r;
 		},
         'HLOOKUP' : function(){
-            var r = new cBaseFunction();
-            r.setName("HLOOKUP");
+            var r = new cBaseFunction("HLOOKUP");
 			r.setArgumentsMin(3);
             r.setArgumentsMax(4);
 			r.Calculate = function(arg){
@@ -4146,18 +4083,15 @@ var cFormulaFunction = {
         	return r;
 		},
         'HYPERLINK' : function(){
-            var r = new cBaseFunction();
-            r.setName("HYPERLINK");
+            var r = new cBaseFunction("HYPERLINK");
         	return r;
 		},
         'INDEX' : function(){
-            var r = new cBaseFunction();
-            r.setName("INDEX");
+            var r = new cBaseFunction("INDEX");
         	return r;
 		},
         'INDIRECT' : function(){
-            var r = new cBaseFunction();
-            r.setName("INDIRECT");
+            var r = new cBaseFunction("INDIRECT");
 			r.setArgumentsMin(0);
             r.setArgumentsMax(1);
 			r.Calculate = function(arg){
@@ -4232,8 +4166,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'LOOKUP' : function(){
-            var r = new cBaseFunction();
-            r.setName("LOOKUP");
+            var r = new cBaseFunction("LOOKUP");
 			r.setArgumentsMin(2);
             r.setArgumentsMax(3);
 			r.Calculate = function(arg){
@@ -4349,18 +4282,15 @@ var cFormulaFunction = {
         	return r;
 		},
         'MATCH' : function(){
-            var r = new cBaseFunction();
-            r.setName("MATCH");
+            var r = new cBaseFunction("MATCH");
         	return r;
 		},
         'OFFSET' : function(){
-            var r = new cBaseFunction();
-            r.setName("OFFSET");
+            var r = new cBaseFunction("OFFSET");
         	return r;
 		},
         'ROW' : function(){
-            var r = new cBaseFunction();
-            r.setName("ROW");
+            var r = new cBaseFunction("ROW");
 			r.setArgumentsMin(0);
             r.setArgumentsMax(1);
 			r.Calculate = function(arg){
@@ -4398,23 +4328,46 @@ var cFormulaFunction = {
         	return r;
 		},
         'ROWS' : function(){
-            var r = new cBaseFunction();
-            r.setName("ROWS");
+            var r = new cBaseFunction("ROWS");
+			r.setArgumentsMin(1);
+            r.setArgumentsMax(1);
+			r.Calculate = function(arg){
+				var arg0 = arg[0];
+				if( arg0 instanceof cArray ){
+					return this.value = new cNumber(arg0.getRowCount());
+				}
+				else if( arg0 instanceof cArea || arg0 instanceof cRef || arg0 instanceof cRef3D ){
+					var range = arg0.getRange();
+					return this.value = new cNumber( Math.abs( range.getBBox().r1 - range.getBBox().r2 ) + 1 );
+				}
+				else if( arg0 instanceof cArea3D ){
+					var range = arg0.getRange();
+					if( range.length > 1 )
+						return this.value = new cError( cErrorType.wrong_value_type );
+					
+					return this.value = new cNumber( Math.abs(range[0].getBBox().r1 - range[0].getBBox().r2) + 1 );
+				}
+				else 
+					return this.value = new cError( cErrorType.wrong_value_type );
+			}
+			r.getInfo = function(){
+				return {
+                    name:this.name,
+                    args:"( array )"
+                };
+			}
         	return r;
 		},
         'RTD' : function(){
-            var r = new cBaseFunction();
-            r.setName("RTD");
+            var r = new cBaseFunction("RTD");
         	return r;
 		},
         'TRANSPOSE' : function(){
-            var r = new cBaseFunction();
-            r.setName("TRANSPOSE");
+            var r = new cBaseFunction("TRANSPOSE");
         	return r;
 		},
         'VLOOKUP' : function(){
-            var r = new cBaseFunction();
-			r.setName("VLOOKUP");
+            var r = new cBaseFunction("VLOOKUP");
 			r.setArgumentsMin(3);
             r.setArgumentsMax(4);
 			r.Calculate = function(arg){
@@ -4563,8 +4516,7 @@ var cFormulaFunction = {
     Mathematic : {
         'groupName' : "Mathematic",
         'ABS' : function(){
-			var r = new cBaseFunction();
-            r.setName("ABS");
+			var r = new cBaseFunction("ABS");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -4599,8 +4551,7 @@ var cFormulaFunction = {
 			return r;
 		},
         'ACOS' :  function(){
-            var r = new cBaseFunction();
-            r.setName("ACOS");
+            var r = new cBaseFunction("ACOS");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -4637,13 +4588,11 @@ var cFormulaFunction = {
 			return r;
 		},
         'ACOSH' :	function(){
-            var r = new cBaseFunction();
-            r.setName("ACOSH");
+            var r = new cBaseFunction("ACOSH");
         	return r;
 		},
         'ASIN' :  function(){
-            var r = new cBaseFunction();
-            r.setName("ASIN");
+            var r = new cBaseFunction("ASIN");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -4680,13 +4629,11 @@ var cFormulaFunction = {
         	return r;
 		},
         'ASINH' : function(){
-            var r = new cBaseFunction();
-            r.setName("ASINH");
+            var r = new cBaseFunction("ASINH");
         	return r;
 		},
         'ATAN' : function(){
-            var r = new cBaseFunction();
-            r.setName("ATAN");
+            var r = new cBaseFunction("ATAN");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -4724,10 +4671,9 @@ var cFormulaFunction = {
         	return r;
 		},
         'ATAN2' : function(){
-            var r = new cBaseFunction();
+            var r = new cBaseFunction("ATAN2");
             r.setArgumentsMin(2);
             r.setArgumentsMax(2);
-            r.setName("ATAN2");
             r.Calculate = function(arg){
 				var arg0 = arg[0],arg1 = arg[1];
 				if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
@@ -4803,13 +4749,11 @@ var cFormulaFunction = {
         	return r;
 		},
         'ATANH' : function(){
-            var r = new cBaseFunction();
-            r.setName("ATANH");
+            var r = new cBaseFunction("ATANH");
         	return r;
 		},
         'CEILING' : function(){
-            var r = new cBaseFunction();
-            r.setName("CEILING");
+            var r = new cBaseFunction("CEILING");
 			r.setArgumentsMin(2);
             r.setArgumentsMax(2);
             r.Calculate = function(arg){
@@ -4901,13 +4845,11 @@ var cFormulaFunction = {
         	return r;
 		},
         'COMBIN' : function(){
-            var r = new cBaseFunction();
-            r.setName("COMBIN");
+            var r = new cBaseFunction("COMBIN");
         	return r;
 		},
         'COS' : function (){
-            var r = new cBaseFunction();
-            r.setName("COS");
+            var r = new cBaseFunction("COS");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -4944,13 +4886,11 @@ var cFormulaFunction = {
         	return r;
 		},
         'COSH' : function(){
-            var r = new cBaseFunction();
-            r.setName("COSH");
+            var r = new cBaseFunction("COSH");
         	return r;
 		},
         'DEGREES' : function(){
-            var r = new cBaseFunction();
-            r.setName("DEGREES");
+            var r = new cBaseFunction("DEGREES");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -4988,13 +4928,11 @@ var cFormulaFunction = {
         	return r;
 		},
         'ECMA.CEILING' : function(){
-            var r = new cBaseFunction();
-            r.setName("ECMA_CEILING");
+            var r = new cBaseFunction("ECMA_CEILING");
         	return r;
 		},
         'EVEN' : function(){
-            var r = new cBaseFunction();
-            r.setName("EVEN");
+            var r = new cBaseFunction("EVEN");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -5053,8 +4991,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'EXP' : function(){
-            var r = new cBaseFunction();
-            r.setName("EXP");
+            var r = new cBaseFunction("EXP");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
 			r.Calculate = function(arg){
@@ -5094,18 +5031,15 @@ var cFormulaFunction = {
         	return r;
 		},
         'FACT' : function(){
-            var r = new cBaseFunction();
-            r.setName("FACT");
+            var r = new cBaseFunction("FACT");
         	return r;
 		},
         'FACTDOUBLE' : function(){
-            var r = new cBaseFunction();
-            r.setName("FACTDOUBLE");
+            var r = new cBaseFunction("FACTDOUBLE");
         	return r;
 		},
         'FLOOR' : function(){
-            var r = new cBaseFunction();
-            r.setName("FLOOR");
+            var r = new cBaseFunction("FLOOR");
 			r.setArgumentsMin(2);
             r.setArgumentsMax(2);
             r.Calculate = function(arg){
@@ -5196,8 +5130,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'GCD' : function(){
-            var r = new cBaseFunction();
-            r.setName("GCD");
+            var r = new cBaseFunction("GCD");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(255);
             r.Calculate = function(arg){
@@ -5286,8 +5219,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'INT' : function(){
-            var r = new cBaseFunction();
-            r.setName("INT");
+            var r = new cBaseFunction("INT");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -5324,18 +5256,15 @@ var cFormulaFunction = {
         	return r;
 		},
         'ISO.CEILING' : function(){
-            var r = new cBaseFunction();
-            r.setName("ISO_CEILING");
+            var r = new cBaseFunction("ISO_CEILING");
         	return r;
 		},
         'LCM' : function(){
-            var r = new cBaseFunction();
-            r.setName("LCM");
+            var r = new cBaseFunction("LCM");
         	return r;
 		},
         'LN' : function(){
-            var r = new cBaseFunction();
-            r.setName("LN");
+            var r = new cBaseFunction("LN");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -5377,8 +5306,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'LOG' : function(){
-            var r = new cBaseFunction();
-            r.setName("LOG");
+            var r = new cBaseFunction("LOG");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(2);
             r.Calculate = function(arg){
@@ -5473,8 +5401,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'LOG10' : function(){
-            var r = new cBaseFunction();
-            r.setName("LOG10");
+            var r = new cBaseFunction("LOG10");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -5516,25 +5443,21 @@ var cFormulaFunction = {
         	return r;
 		},
         'MDETERM' : function(){
-            var r = new cBaseFunction();
-            r.setName("MDETERM");
+            var r = new cBaseFunction("MDETERM");
         	return r;
 		},
         'MINVERSE' : function(){
-            var r = new cBaseFunction();
-            r.setName("MINVERSE");
+            var r = new cBaseFunction("MINVERSE");
         	return r;
 		},
         'MMULT' : function(){
-            var r = new cBaseFunction();
-            r.setName("MMULT");
+            var r = new cBaseFunction("MMULT");
         	return r;
 		},
         'MOD' : function(){
-            var r = new cBaseFunction();
+            var r = new cBaseFunction("MOD");
             r.setArgumentsMin(2);
             r.setArgumentsMax(2);
-			r.setName("MOD");
             r.Calculate = function(arg){
 				var arg0 = arg[0],arg1 = arg[1];
 				if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
@@ -5609,8 +5532,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'MROUND' : function(){
-            var r = new cBaseFunction();
-            r.setName("MROUND");
+            var r = new cBaseFunction("MROUND");
 			r.setArgumentsMin(2);
             r.setArgumentsMax(2);
             r.Calculate = function(arg){
@@ -5703,13 +5625,11 @@ var cFormulaFunction = {
         	return r;
 		},
         'MULTINOMIAL' : function(){
-            var r = new cBaseFunction();
-            r.setName("MULTINOMIAL");
+            var r = new cBaseFunction("MULTINOMIAL");
         	return r;
 		},
         'ODD' : function(){
-            var r = new cBaseFunction();
-            r.setName("ODD");
+            var r = new cBaseFunction("ODD");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -5767,8 +5687,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'PI' : function(){
-            var r = new cBaseFunction();
-            r.setName("PI");
+            var r = new cBaseFunction("PI");
 			r.setArgumentsMin(0);
             r.setArgumentsMax(0);
             r.Calculate = function(){
@@ -5783,8 +5702,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'POWER' : function(){
-            var r = new cBaseFunction();
-            r.setName("POWER");
+            var r = new cBaseFunction("POWER");
 			r.setArgumentsMin(2);
             r.setArgumentsMax(2);
             r.Calculate = function(arg){
@@ -5857,10 +5775,9 @@ var cFormulaFunction = {
         	return r;
 		},
         'PRODUCT' : function(){
-            var r = new cBaseFunction();
+            var r = new cBaseFunction("PRODUCT");
             r.setArgumentsMin(1);
             r.setArgumentsMax(255);
-            r.setName("PRODUCT");
             r.Calculate = function(arg){
                 var arg0 = new cNumber(1), _aVal = null;
                 for(var i = 0; i < arg.length; i++){
@@ -5903,13 +5820,11 @@ var cFormulaFunction = {
         	return r;
 		},
         'QUOTIENT' : function(){
-            var r = new cBaseFunction();
-            r.setName("QUOTIENT");
+            var r = new cBaseFunction("QUOTIENT");
         	return r;
 		},
         'RADIANS' : function(){
-            var r = new cBaseFunction();
-            r.setName("RADIANS");
+            var r = new cBaseFunction("RADIANS");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -5950,8 +5865,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'RAND' : function(){
-            var r = new cBaseFunction();
-            r.setName("RAND");
+            var r = new cBaseFunction("RAND");
             r.setArgumentsMin(0);
             r.setArgumentsMax(0);
             r.Calculate = function(){
@@ -5966,18 +5880,15 @@ var cFormulaFunction = {
         	return r;
 		},
         'RANDBETWEEN' : function(){
-            var r = new cBaseFunction();
-            r.setName("RANDBETWEEN");
+            var r = new cBaseFunction("RANDBETWEEN");
         	return r;
 		},
         'ROMAN' : function(){
-            var r = new cBaseFunction();
-            r.setName("ROMAN");
+            var r = new cBaseFunction("ROMAN");
         	return r;
 		},
         'ROUND' : function(){
-            var r = new cBaseFunction();
-            r.setName("ROUND");
+            var r = new cBaseFunction("ROUND");
             r.setArgumentsMin(2);
             r.setArgumentsMax(2);
             r.Calculate = function(arg){
@@ -6111,8 +6022,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'ROUNDDOWN' : function(){
-            var r = new cBaseFunction();
-            r.setName("ROUNDDOWN");
+            var r = new cBaseFunction("ROUNDDOWN");
             r.setArgumentsMin(2);
             r.setArgumentsMax(2);
             r.Calculate = function(arg){
@@ -6222,8 +6132,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'ROUNDUP' : function(){
-            var r = new cBaseFunction();
-            r.setName("ROUNDUP");
+            var r = new cBaseFunction("ROUNDUP");
             r.setArgumentsMin(2);
             r.setArgumentsMax(2);
             r.Calculate = function(arg){
@@ -6333,13 +6242,11 @@ var cFormulaFunction = {
 			return r;
 		},
         'SERIESSUM' : function(){
-            var r = new cBaseFunction();
-            r.setName("SERIESSUM");
+            var r = new cBaseFunction("SERIESSUM");
         	return r;
 		},
         'SIGN' : function(){
-            var r = new cBaseFunction();
-            r.setName("SIGN");
+            var r = new cBaseFunction("SIGN");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -6388,8 +6295,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'SIN' : function(){
-            var r = new cBaseFunction();
-            r.setName("SIN");
+            var r = new cBaseFunction("SIN");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -6423,13 +6329,11 @@ var cFormulaFunction = {
         	return r;
 		},
         'SINH' : function(){
-            var r = new cBaseFunction();
-            r.setName("SINH");
+            var r = new cBaseFunction("SINH");
         	return r;
 		},
         'SQRT' :  function(){
-            var r = new cBaseFunction();
-            r.setName("SQRT");
+            var r = new cBaseFunction("SQRT");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
 			r.Calculate = function(arg){
@@ -6466,8 +6370,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'SQRTPI' : function(){
-            var r = new cBaseFunction();
-            r.setName("SQRTPI");
+            var r = new cBaseFunction("SQRTPI");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
 			r.Calculate = function(arg){
@@ -6504,13 +6407,11 @@ var cFormulaFunction = {
         	return r;
 		},
         'SUBTOTAL' : function(){
-            var r = new cBaseFunction();
-            r.setName("SUBTOTAL");
+            var r = new cBaseFunction("SUBTOTAL");
         	return r;
 		},
         'SUM' : function(){
-			var r = new cBaseFunction(this);
-		    r.setName("SUM");
+			var r = new cBaseFunction("SUM");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(255);
             r.Calculate = function(arg){
@@ -6557,8 +6458,7 @@ var cFormulaFunction = {
 			return r;
 		},
         'SUMIF' : function(){
-            var r = new cBaseFunction();
-            r.setName("SUMIF");
+            var r = new cBaseFunction("SUMIF");
 			r.setArgumentsMin(2);
             r.setArgumentsMax(3);
 			r.Calculate = function(arg){
@@ -6698,38 +6598,123 @@ var cFormulaFunction = {
         	return r;
 		},
         'SUMIFS' : function(){
-            var r = new cBaseFunction();
-            r.setName("SUMIFS");
+            var r = new cBaseFunction("SUMIFS");
         	return r;
 		},
         'SUMPRODUCT' : function(){
-            var r = new cBaseFunction();
-            r.setName("SUMPRODUCT");
+            var r = new cBaseFunction("SUMPRODUCT");
+			/*r.setArgumentsMin(1);
+            r.setArgumentsMax(255);
+            r.Calculate = function(arg){
+				var arg0 = new cNumber(0), resArr = [];
+                for(var i = 0; i < arg.length; i++){
+					
+					if( arg[i] instanceof cArea3D )
+						return this.value = new cError( bad_reference );
+					
+                    if( arg[i] instanceof cArea ){
+					
+						function retCell(_cell){
+							if(!_cell)
+								return new cNumber(0);
+							switch( _cell.getType() ){
+								case CellValueType.Number:
+									_cell.getValueWithoutFormat() == ""? return new cNumber(0) : return new cNumber( _cell.getValueWithoutFormat() );
+								case CellValueType.Bool:
+									return new cBool( _cell.getValueWithoutFormat() ).tocNumber();
+								case CellValueType.Error:
+									return new cError( _cell.getValueWithoutFormat() );
+								case CellValueType.String:
+								default:
+									return new cNumber(0);
+							}
+						}
+							
+						var argIBBox = arg[i].getBBox0(),
+							colCount = Math.abs(argIBBox.c2-argIBBox.c1)+1,
+							rowCount = Math.abs(argIBBox.r2-argIBBox.r1)+1,
+							range = arg[i].getRange();
+						
+							range._foreachIndex(function(i,j){
+								
+							})
+							
+                        if( resArr.length == 0 ){
+							for( var i = 0; i < rowCount; i++ ){
+								resArr.push(new Array(colCount));
+							}
+						}
+						else{
+							if( resArr.length == rowCount ){
+								if( resArr[0] == colCount ){
+								
+								}
+								else
+									return this.value = new cError( not_numeric );
+							}
+							else
+								return this.value = new cError( not_numeric );
+						}
+						
+						arg[i].foreach(function(oCurCell, i, j, r, c){
+							
+							if( resArr[i] !== undefined && resArr[i] !== null ){
+								if( resArr[i][j] !== undefined && resArr[i][j] !== null ){
+									
+								}
+								else{
+									
+									resArr[i][j] = retCell(oCurCell);
+								}
+							}
+							else{
+								resArr[i] = [];
+								resArr[i][j] = !oCurCell ? new cNumber(0) : 
+							}
+							
+						})
+                    }
+                    else if( arg[i] instanceof cRef || arg[i] instanceof cRef3D ){
+						
+                    }
+					else if( arg[i] instanceof cArray ){
+						
+					}
+                    else{
+						
+                    }
+					
+                    if( arg[i] instanceof cError )
+                        return this.value = arg0;
+                }
+                return this.value = arg0;
+			}
+			r.getInfo = function(){
+                return {
+                    name:this.name,
+                    args:"( argument-lists )"
+                };
+            }*/
         	return r;
 		},
         'SUMSQ' : function(){
-            var r = new cBaseFunction();
-            r.setName("SUMSQ");
+            var r = new cBaseFunction("SUMSQ");
         	return r;
 		},
         'SUMX2MY2' : function(){
-            var r = new cBaseFunction();
-            r.setName("SUMX2MY2");
+            var r = new cBaseFunction("SUMX2MY2");
         	return r;
 		},
         'SUMX2PY2' : function(){
-            var r = new cBaseFunction();
-            r.setName("SUMX2PY2");
+            var r = new cBaseFunction("SUMX2PY2");
         	return r;
 		},
         'SUMXMY2' : function(){
-            var r = new cBaseFunction();
-            r.setName("SUMXMY2");
+            var r = new cBaseFunction("SUMXMY2");
         	return r;
 		},
         'TAN' : function(){
-            var r = new cBaseFunction();
-            r.setName("TAN");
+            var r = new cBaseFunction("TAN");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -6766,26 +6751,22 @@ var cFormulaFunction = {
         	return r;
 		},
         'TANH' : function(){
-            var r = new cBaseFunction();
-            r.setName("TANH");
+            var r = new cBaseFunction("TANH");
         	return r;
 		},
         'TRUNC' : function(){
-            var r = new cBaseFunction();
-            r.setName("TRUNC");
+            var r = new cBaseFunction("TRUNC");
         	return r;
 		}
     },
     Statistical:{
         'groupName' : "Statistical",
         'AVEDEV' : function(){
-            var r = new cBaseFunction();
-            r.setName("AVEDEV");
+            var r = new cBaseFunction("AVEDEV");
         	return r;
 		},
         'AVERAGE' : function(){
-            var r = new cBaseFunction();
-			r.setName("AVERAGE");
+            var r = new cBaseFunction("AVERAGE");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(255);
             r.Calculate = function(arg){
@@ -6836,63 +6817,51 @@ var cFormulaFunction = {
         	return r;
 		},
         'AVERAGEA' : function(){
-            var r = new cBaseFunction();
-            r.setName("AVERAGEA");
+            var r = new cBaseFunction("AVERAGEA");
         	return r;
 		},
         'AVERAGEIF' : function(){
-            var r = new cBaseFunction();
-            r.setName("AVERAGEIF");
+            var r = new cBaseFunction("AVERAGEIF");
         	return r;
 		},
         'AVERAGEIFS' : function(){
-            var r = new cBaseFunction();
-            r.setName("AVERAGEIFS");
+            var r = new cBaseFunction("AVERAGEIFS");
         	return r;
 		},
         'BETADIST' : function(){
-            var r = new cBaseFunction();
-            r.setName("BETADIST");
+            var r = new cBaseFunction("BETADIST");
         	return r;
 		},
         'BETAINV' : function(){
-            var r = new cBaseFunction();
-            r.setName("BETAINV");
+            var r = new cBaseFunction("BETAINV");
         	return r;
 		},
         'BINOMDIST' : function(){
-            var r = new cBaseFunction();
-            r.setName("BINOMDIST");
+            var r = new cBaseFunction("BINOMDIST");
         	return r;
 		},
         'CHIDIST' : function(){
-            var r = new cBaseFunction();
-            r.setName("CHIDIST");
+            var r = new cBaseFunction("CHIDIST");
         	return r;
 		},
         'CHIINV' : function(){
-            var r = new cBaseFunction();
-            r.setName("CHIINV");
+            var r = new cBaseFunction("CHIINV");
         	return r;
 		},
         'CHITEST' : function(){
-            var r = new cBaseFunction();
-            r.setName("CHITEST");
+            var r = new cBaseFunction("CHITEST");
         	return r;
 		},
         'CONFIDENCE' : function(){
-            var r = new cBaseFunction();
-            r.setName("CONFIDENCE");
+            var r = new cBaseFunction("CONFIDENCE");
         	return r;
 		},
         'CORREL' : function(){
-            var r = new cBaseFunction();
-            r.setName("CORREL");
+            var r = new cBaseFunction("CORREL");
         	return r;
 		},
         'COUNT' : function(){
-            var r = new cBaseFunction();
-            r.setName("COUNT");
+            var r = new cBaseFunction("COUNT");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(255);
             r.Calculate = function(arg){
@@ -6941,13 +6910,11 @@ var cFormulaFunction = {
 			return r;
 		},
         'COUNTA' : function(){
-            var r = new cBaseFunction();
-            r.setName("COUNTA");
+            var r = new cBaseFunction("COUNTA");
         	return r;
 		},
         'COUNTBLANK' : function(){
-            var r = new cBaseFunction();
-            r.setName("COUNTBLANK");
+            var r = new cBaseFunction("COUNTBLANK");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -6970,8 +6937,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'COUNTIF' : function(){
-            var r = new cBaseFunction();
-			r.setName("COUNTIF");
+            var r = new cBaseFunction("COUNTIF");
 			r.setArgumentsMin(2);
             r.setArgumentsMax(2);
 			r.Calculate = function(arg){
@@ -7097,138 +7063,111 @@ var cFormulaFunction = {
         	return r;
 		},
         'COUNTIFS' : function(){
-            var r = new cBaseFunction();
-            r.setName("COUNTIFS");
+            var r = new cBaseFunction("COUNTIFS");
         	return r;
 		},
         'COVAR' : function(){
-            var r = new cBaseFunction();
-            r.setName("COVAR");
+            var r = new cBaseFunction("COVAR");
         	return r;
 		},
         'CRITBINOM' : function(){
-            var r = new cBaseFunction();
-            r.setName("CRITBINOM");
+            var r = new cBaseFunction("CRITBINOM");
         	return r;
 		},
         'DEVSQ' : function(){
-            var r = new cBaseFunction();
-            r.setName("DEVSQ");
+            var r = new cBaseFunction("DEVSQ");
         	return r;
 		},
         'EXPONDIST' : function(){
-            var r = new cBaseFunction();
-            r.setName("EXPONDIST");
+            var r = new cBaseFunction("EXPONDIST");
         	return r;
 		},
         'FDIST' : function(){
-            var r = new cBaseFunction();
-            r.setName("FDIST");
+            var r = new cBaseFunction("FDIST");
         	return r;
 		},
         'FINV' : function(){
-            var r = new cBaseFunction();
-            r.setName("FINV");
+            var r = new cBaseFunction("FINV");
         	return r;
 		},
         'FISHER' : function(){
-            var r = new cBaseFunction();
-            r.setName("FISHER");
+            var r = new cBaseFunction("FISHER");
         	return r;
 		},
         'FISHERINV' : function(){
-            var r = new cBaseFunction();
-            r.setName("FISHERINV");
+            var r = new cBaseFunction("FISHERINV");
         	return r;
 		},
         'FORECAST' : function(){
-            var r = new cBaseFunction();
-            r.setName("FORECAST");
+            var r = new cBaseFunction("FORECAST");
         	return r;
 		},
         'FREQUENCY' : function(){
-            var r = new cBaseFunction();
-            r.setName("FREQUENCY");
+            var r = new cBaseFunction("FREQUENCY");
         	return r;
 		},
         'FTEST' : function(){
-            var r = new cBaseFunction();
-            r.setName("FTEST");
+            var r = new cBaseFunction("FTEST");
         	return r;
 		},
         'GAMMADIST' : function(){
-            var r = new cBaseFunction();
-            r.setName("GAMMADIST");
+            var r = new cBaseFunction("GAMMADIST");
         	return r;
 		},
         'GAMMAINV' : function(){
-            var r = new cBaseFunction();
-            r.setName("GAMMAINV");
+            var r = new cBaseFunction("GAMMAINV");
         	return r;
 		},
         'GAMMALN' : function(){
-            var r = new cBaseFunction();
-            r.setName("GAMMALN");
+            var r = new cBaseFunction("GAMMALN");
         	return r;
 		},
         'GEOMEAN' : function(){
-            var r = new cBaseFunction();
-            r.setName("GEOMEAN");
+            var r = new cBaseFunction("GEOMEAN");
         	return r;
 		},
         'GROWTH' : function(){
-            var r = new cBaseFunction();
-            r.setName("GROWTH");
+            var r = new cBaseFunction("GROWTH");
         	return r;
 		},
         'HARMEAN' : function(){
-            var r = new cBaseFunction();
-            r.setName("HARMEAN");
+            var r = new cBaseFunction("HARMEAN");
         	return r;
 		},
         'HYPGEOMDIST' : function(){
-            var r = new cBaseFunction();
-            r.setName("HYPGEOMDIST");
+            var r = new cBaseFunction("HYPGEOMDIST");
         	return r;
 		},
         'INTERCEPT' : function(){
-            var r = new cBaseFunction();
-            r.setName("INTERCEPT");
+            var r = new cBaseFunction("INTERCEPT");
         	return r;
 		},
         'KURT' : function(){
-            var r = new cBaseFunction();
-            r.setName("KURT");
+            var r = new cBaseFunction("KURT");
         	return r;
 		},
         'LARGE' : function(){
-            var r = new cBaseFunction();
-            r.setName("LARGE");
+            var r = new cBaseFunction("LARGE");
         	return r;
 		},
         'LINEST' : function(){
-            var r = new cBaseFunction();
-            r.setName("LINEST");
+            var r = new cBaseFunction("LINEST");
         	return r;
 		},
         'LOGEST' : function(){
-            var r = new cBaseFunction();
-            r.setName("LOGEST");
+            var r = new cBaseFunction("LOGEST");
         	return r;
 		},
         'LOGINV' : function(){
-            var r = new cBaseFunction();
-            r.setName("LOGINV");
+            var r = new cBaseFunction("LOGINV");
         	return r;
 		},
         'LOGNORMDIST' : function(){
-            var r = new cBaseFunction();
-            r.setName("LOGNORMDIST");
+            var r = new cBaseFunction("LOGNORMDIST");
         	return r;
 		},
         'MAX' : function(){
-            var r = new cBaseFunction();
-            r.setName("MAX");
+            var r = new cBaseFunction("MAX");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(255);
             r.Calculate = function(arg){
@@ -7301,8 +7240,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'MAXA' : function(){
-            var r = new cBaseFunction();
-            r.setName("MAXA");
+            var r = new cBaseFunction("MAXA");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(255);
 			r.Calculate = function(arg){
@@ -7377,13 +7315,11 @@ var cFormulaFunction = {
         	return r;
 		},
         'MEDIAN' : function(){
-            var r = new cBaseFunction();
-            r.setName("MEDIAN");
+            var r = new cBaseFunction("MEDIAN");
         	return r;
 		},
         'MIN' : function(){
-            var r = new cBaseFunction();
-            r.setName("MIN");
+            var r = new cBaseFunction("MIN");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(255);
             r.Calculate = function(arg){
@@ -7457,8 +7393,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'MINA' : function(){
-            var r = new cBaseFunction();
-            r.setName("MINA");
+            var r = new cBaseFunction("MINA");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(255);
 			r.Calculate = function(arg){
@@ -7535,103 +7470,83 @@ var cFormulaFunction = {
         	return r;
 		},
         'MODE' : function(){
-            var r = new cBaseFunction();
-            r.setName("MODE");
+            var r = new cBaseFunction("MODE");
         	return r;
 		},
         'NEGBINOMDIST' : function(){
-            var r = new cBaseFunction();
-            r.setName("NEGBINOMDIST");
+            var r = new cBaseFunction("NEGBINOMDIST");
         	return r;
 		},
         'NORMDIST' : function(){
-            var r = new cBaseFunction();
-            r.setName("NORMDIST");
+            var r = new cBaseFunction("NORMDIST");
         	return r;
 		},
         'NORMINV' : function(){
-            var r = new cBaseFunction();
-            r.setName("NORMINV");
+            var r = new cBaseFunctionNORMINV
         	return r;
 		},
         'NORMSDIST' : function(){
-            var r = new cBaseFunction();
-            r.setName("NORMSDIST");
+            var r = new cBaseFunction("NORMSDIST");
         	return r;
 		},
         'NORMSINV' : function(){
-            var r = new cBaseFunction();
-            r.setName("NORMSINV");
+            var r = new cBaseFunction("NORMSINV");
         	return r;
 		},
         'PEARSON' : function(){
-            var r = new cBaseFunction();
-            r.setName("PEARSON");
+            var r = new cBaseFunction("PEARSON");
         	return r;
 		},
         'PERCENTILE' : function(){
-            var r = new cBaseFunction();
-            r.setName("PERCENTILE");
+            var r = new cBaseFunction("PERCENTILE");
         	return r;
 		},
         'PERCENTRANK' : function(){
-            var r = new cBaseFunction();
-            r.setName("PERCENTRANK");
+            var r = new cBaseFunction("PERCENTRANK");
         	return r;
 		},
         'PERMUT' : function(){
-            var r = new cBaseFunction();
-            r.setName("PERMUT");
+            var r = new cBaseFunction("PERMUT");
         	return r;
 		},
         'POISSON' : function(){
-            var r = new cBaseFunction();
-            r.setName("POISSON");
+            var r = new cBaseFunction("POISSON");
         	return r;
 		},
         'PROB' : function(){
-            var r = new cBaseFunction();
-            r.setName("PROB");
+            var r = new cBaseFunction("PROB");
         	return r;
 		},
         'QUARTILE' : function(){
-            var r = new cBaseFunction();
-            r.setName("QUARTILE");
+            var r = new cBaseFunction("QUARTILE");
         	return r;
 		},
         'RANK' : function(){
-            var r = new cBaseFunction();
-            r.setName("RANK");
+            var r = new cBaseFunction("RANK");
         	return r;
 		},
         'RSQ' : function(){
-            var r = new cBaseFunction();
-            r.setName("RSQ");
+            var r = new cBaseFunction("RSQ");
         	return r;
 		},
         'SKEW' : function(){
-            var r = new cBaseFunction();
-            r.setName("SKEW");
+            var r = new cBaseFunction("SKEW");
         	return r;
 		},
         'SLOPE' : function(){
-            var r = new cBaseFunction();
-            r.setName("SLOPE");
+            var r = new cBaseFunction("SLOPE");
         	return r;
 		},
         'SMALL' : function(){
-            var r = new cBaseFunction();
-            r.setName("SMALL");
+            var r = new cBaseFunction("SMALL");
         	return r;
 		},
         'STANDARDIZE' : function(){
-            var r = new cBaseFunction();
-            r.setName("STANDARDIZE");
+            var r = new cBaseFunction("STANDARDIZE");
         	return r;
 		},
         'STDEV' : function(){
-            var r = new cBaseFunction();
-            r.setName("STDEV");
+            var r = new cBaseFunction("STDEV");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(255);
             r.Calculate = function(arg){
@@ -7693,96 +7608,78 @@ var cFormulaFunction = {
         	return r;
 		},
         'STDEVA' : function(){
-            var r = new cBaseFunction();
-            r.setName("STDEVA");
+            var r = new cBaseFunction("STDEVA");
         	return r;
 		},
         'STDEVP' : function(){
-            var r = new cBaseFunction();
-            r.setName("STDEVP");
+            var r = new cBaseFunction("STDEVP");
         	return r;
 		},
         'STDEVPA' : function(){
-            var r = new cBaseFunction();
-            r.setName("STDEVPA");
+            var r = new cBaseFunction("STDEVPA");
         	return r;
 		},
         'STEYX' : function(){
-            var r = new cBaseFunction();
-            r.setName("STEYX");
+            var r = new cBaseFunction("STEYX");
         	return r;
 		},
         'TDIST' : function(){
-            var r = new cBaseFunction();
-            r.setName("TDIST");
+            var r = new cBaseFunction("TDIST");
         	return r;
 		},
         'TINV' : function(){
-            var r = new cBaseFunction();
-            r.setName("TINV");
+            var r = new cBaseFunction("TINV");
         	return r;
 		},
         'TREND' : function(){
-            var r = new cBaseFunction();
-            r.setName("TREND");
+            var r = new cBaseFunction("TREND");
         	return r;
 		},
         'TRIMMEAN' : function(){
-            var r = new cBaseFunction();
-            r.setName("TRIMMEAN");
+            var r = new cBaseFunction("TRIMMEAN");
         	return r;
 		},
         'TTEST' : function(){
-            var r = new cBaseFunction();
-            r.setName("TTEST");
+            var r = new cBaseFunction("TTEST");
         	return r;
 		},
         'VAR' : function(){
-            var r = new cBaseFunction();
-            r.setName("VAR");
+            var r = new cBaseFunction("VAR");
         	return r;
 		},
         'VARA' : function(){
-            var r = new cBaseFunction();
-            r.setName("VARA");
+            var r = new cBaseFunction("VARA");
         	return r;
 		},
         'VARP' : function(){
-            var r = new cBaseFunction();
-            r.setName("VARP");
+            var r = new cBaseFunction("VARP");
         	return r;
 		},
         'VARPA' : function(){
-            var r = new cBaseFunction();
-            r.setName("VARPA");
+            var r = new cBaseFunction("VARPA");
         	return r;
 		},
         'WEIBULL' : function(){
-            var r = new cBaseFunction();
-            r.setName("WEIBULL");
+            var r = new cBaseFunction("WEIBULL");
         	return r;
 		},
         'ZTEST' : function(){
-            var r = new cBaseFunction();
-            r.setName("ZTEST");
+            var r = new cBaseFunction("ZTEST");
         	return r;
 		}
     },
     TextAndData:{
         'groupName' : "TextAndData",
         'ASC' : function(){
-            var r = new cBaseFunction();
-            r.setName("ASC");
+            var r = new cBaseFunction("ASC");
         	return r;
 		},
         'BAHTTEXT' : function(){
-            var r = new cBaseFunction();
-            r.setName("BAHTTEXT");
+            var r = new cBaseFunction("BAHTTEXT");
         	return r;
 		},
         'CHAR' : function(){
-            var r = new cBaseFunction();
-            r.setName("CHAR");
+            var r = new cBaseFunction("CHAR");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -7823,8 +7720,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'CLEAN' : function(){
-            var r = new cBaseFunction();
-            r.setName("CLEAN");
+            var r = new cBaseFunction("CLEAN");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -7857,8 +7753,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'CODE' : function(){
-            var r = new cBaseFunction();
-			r.setName("CODE");
+            var r = new cBaseFunction("CODE");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -7899,8 +7794,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'CONCATENATE' : function(){
-            var r = new cBaseFunction();
-            r.setName("CONCATENATE");
+            var r = new cBaseFunction("CONCATENATE");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(255);
             r.Calculate = function(arg){
@@ -7942,8 +7836,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'DOLLAR' : function(){
-            var r = new cBaseFunction();
-            r.setName("DOLLAR");
+            var r = new cBaseFunction("DOLLAR");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(2);
 			r.Calculate = function(arg){
@@ -7962,8 +7855,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'EXACT' : function(){
-            var r = new cBaseFunction();
-            r.setName("EXACT");
+            var r = new cBaseFunction("EXACT");
 			r.setArgumentsMin(2);
             r.setArgumentsMax(2);
             r.Calculate = function(arg){
@@ -8004,8 +7896,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'FIND' : function(){
-            var r = new cBaseFunction();
-            r.setName("FIND");
+            var r = new cBaseFunction("FIND");
 			r.setArgumentsMin(2);
             r.setArgumentsMax(3);
             r.Calculate = function(arg){
@@ -8083,8 +7974,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'FIXED' : function(){
-            var r = new cBaseFunction();
-            r.setName("FIXED");
+            var r = new cBaseFunction("FIXED");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(3);
 			r.Calculate = function(arg){
@@ -8250,13 +8140,11 @@ var cFormulaFunction = {
         	return r;
 		},
         'JIS' : function(){
-            var r = new cBaseFunction();
-            r.setName("JIS");
+            var r = new cBaseFunction("JIS");
         	return r;
 		},
         'LEFT' : function(){
-            var r = new cBaseFunction();
-            r.setName("LEFT");
+            var r = new cBaseFunction("LEFT");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(2);
             r.Calculate = function(arg){
@@ -8304,8 +8192,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'LEN' : function(){
-            var r = new cBaseFunction();
-            r.setName("LEN");
+            var r = new cBaseFunction("LEN");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -8339,8 +8226,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'LOWER' : function(){
-            var r = new cBaseFunction();
-            r.setName("LOWER");
+            var r = new cBaseFunction("LOWER");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -8366,8 +8252,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'MID' : function(){
-            var r = new cBaseFunction();
-            r.setName("MID");
+            var r = new cBaseFunction("MID");
 			r.setArgumentsMin(3);
             r.setArgumentsMax(3);
             r.Calculate = function(arg){
@@ -8427,13 +8312,11 @@ var cFormulaFunction = {
         	return r;
 		},
         'PHONETIC' : function(){
-            var r = new cBaseFunction();
-            r.setName("PHONETIC");
+            var r = new cBaseFunction("PHONETIC");
         	return r;
 		},
         'PROPER' : function(){
-            var r = new cBaseFunction();
-            r.setName("PROPER");
+            var r = new cBaseFunction("PROPER");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
 			r.Calculate = function(arg){
@@ -8496,8 +8379,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'REPLACE' : function(){
-            var r = new cBaseFunction();
-            r.setName("REPLACE");
+            var r = new cBaseFunction("REPLACE");
 			r.setArgumentsMin(4);
             r.setArgumentsMax(4);
 			r.Calculate = function(arg){
@@ -8577,8 +8459,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'REPT' : function(){
-            var r = new cBaseFunction();
-            r.setName("REPT");
+            var r = new cBaseFunction("REPT");
             r.setArgumentsMin(2);
             r.setArgumentsMax(2);
             r.Calculate = function(arg){
@@ -8635,8 +8516,7 @@ var cFormulaFunction = {
 			return r;
 		},
         'RIGHT' : function(){
-            var r = new cBaseFunction();
-            r.setName("RIGHT");
+            var r = new cBaseFunction("RIGHT");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(2);
             r.Calculate = function(arg){
@@ -8684,8 +8564,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'SEARCH' : function(){
-            var r = new cBaseFunction();
-            r.setName("SEARCH");
+            var r = new cBaseFunction("SEARCH");
 			r.setArgumentsMin(2);
             r.setArgumentsMax(3);
 			r.Calculate = function(arg){
@@ -8768,8 +8647,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'SUBSTITUTE' : function(){
-            var r = new cBaseFunction();
-            r.setName("SUBSTITUTE");
+            var r = new cBaseFunction("SUBSTITUTE");
 			r.setArgumentsMin(3);
             r.setArgumentsMax(4);
 			r.Calculate = function(arg){
@@ -8847,8 +8725,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'T' : function(){
-            var r = new cBaseFunction();
-            r.setName("T");
+            var r = new cBaseFunction("T");
             r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -8879,8 +8756,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'TEXT' : function(){
-            var r = new cBaseFunction();
-			r.setName("TEXT");
+            var r = new cBaseFunction("TEXT");
 			r.setArgumentsMin(2);
             r.setArgumentsMax(2);
             r.Calculate = function(arg){
@@ -8942,8 +8818,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'TRIM' : function(){
-            var r = new cBaseFunction();
-            r.setName("TRIM");
+            var r = new cBaseFunction("TRIM");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -8972,8 +8847,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'UPPER' : function(){
-            var r = new cBaseFunction();
-            r.setName("UPPER");
+            var r = new cBaseFunction("UPPER");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -8998,8 +8872,7 @@ var cFormulaFunction = {
         	return r;
 		},
         'VALUE' : function(){
-            var r = new cBaseFunction();
-            r.setName("VALUE");
+            var r = new cBaseFunction("VALUE");
 			r.setArgumentsMin(1);
             r.setArgumentsMax(1);
             r.Calculate = function(arg){
@@ -9320,6 +9193,14 @@ cArea.prototype.countCells = function(){
 		})
 	return new cNumber( count );
 };
+cArea.prototype.foreach = function(action){
+	var _val = [], r = this.getRange();
+	if(  !r ){
+		_val.push(new cError(cErrorType.bad_reference))
+	}
+	else
+		r._foreach2(action)
+}
 
 /** @constructor */
 function cRef(val,_ws){/*Ref means A1 for example*/
@@ -9766,7 +9647,7 @@ cArray.prototype.getElement = function(index){
 	return null;
 };
 cArray.prototype.foreach = function(action){
-	if( typeof (action) != 'function' ){ return; }
+	if( typeof (action) != 'function' ){ return true; }
 	for( var ir = 0; ir < this.rowCount; ir++ ){
 		for( var ic = 0; ic < this.countElementInRow[ir]; ic++){
 			if( action.call(this,this.array[ir][ic],ir,ic) )

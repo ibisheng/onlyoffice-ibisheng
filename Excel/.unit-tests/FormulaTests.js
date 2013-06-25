@@ -906,4 +906,34 @@
 		
 	})
 	
+	test("Test: \"PMT\"",function(){
+	
+		function pmt( rate, nper, pv, fv, type ){
+			var res;
+			if( type === undefined || type === null )
+				type = 0;
+			
+			if( fv === undefined || fv === null )
+				fv = 0;
+			
+			if( rate != 0 ){
+				res = -1*( pv * Math.pow( 1 + rate, nper ) + fv ) / 
+					( ( 1 + rate * type ) * ( Math.pow( 1 + rate, nper ) - 1 ) / rate );
+			}
+			else{
+				res = -1*( pv + fv )/ nper;
+			}
+			return res;
+		}
+		
+		oParser = new parserFormula("PMT(0.08/12,10,10000)","A2",ws);
+		ok(oParser.parse());
+        ok( Math.abs(oParser.calculate().getValue() - pmt(0.08/12,10,10000)) < dif );
+		
+		oParser = new parserFormula("PMT(0.08/12,10,10000,0,1)","A2",ws);
+		ok(oParser.parse());
+        ok( Math.abs(oParser.calculate().getValue() - pmt(0.08/12,10,10000,0,1)) < dif );
+		
+	})
+	
 });
