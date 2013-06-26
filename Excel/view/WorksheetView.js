@@ -1132,7 +1132,8 @@
 				this.height_3px = asc_calcnpt(0, this._getPPIY(), 3/*px*/);
 
 				// ToDo неправильно, что maxDigitWidth постоянно пересчитывается в зависимости от PPIX (переделать)
-				this.maxDigitWidth = this.emSize * asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIX() );
+				//this.maxDigitWidth = this.emSize * asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIX() );
+				this.maxDigitWidth = this.maxDigitWidthBase * this.drawingCtx.scaleFactor;
 
 				gc_dDefaultColWidthCharsAttribute = this._charCountToModelColWidth(gc_dDefaultColWidthChars, true);
 				this.defaultColWidth = this._modelColWidthToColWidth(gc_dDefaultColWidthCharsAttribute);
@@ -1197,6 +1198,7 @@
 			 * @returns {Number}  Количество символов
 			 */
 			_colWidthToCharCount: function (w) {
+				// ToDo у нас CharCount меняется от zoom (он не должен меняться!)
 				var px = w * asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIX() );
 				return px <= 5 ? 0 : asc_floor( (px - 5) / asc_round(this.maxDigitWidth) * 100 + 0.5 ) / 100;
 			},
