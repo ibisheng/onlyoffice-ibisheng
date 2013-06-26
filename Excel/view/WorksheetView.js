@@ -345,16 +345,16 @@
 		 * @param {Worksheet} model  Worksheet
 		 * @param {Array} buffers    DrawingContext + Overlay
 		 * @param {StringRender} stringRender    StringRender
-		 * @param {Number} emSize    Размер символа
+		 * @param {Number} maxDigitWidth    Максимальный размер цифры
 		 * @param {asc_CCollaborativeEditing} collaborativeEditing
 		 * @param {Object} settings  Settings
 		 *
 		 * @constructor
 		 * @memberOf Asc
 		 */
-		function WorksheetView(model, buffers, stringRender, emSize, collaborativeEditing, settings) {
+		function WorksheetView(model, buffers, stringRender, maxDigitWidth, collaborativeEditing, settings) {
 			if ( !(this instanceof WorksheetView) ) {
-				return new WorksheetView(model, buffers, stringRender, emSize, collaborativeEditing, settings);
+				return new WorksheetView(model, buffers, stringRender, maxDigitWidth, collaborativeEditing, settings);
 			}
 
 			this.settings = $.extend(true, {}, this.defaults, settings);
@@ -387,8 +387,11 @@
 			this.cache = new Cache();
 
 			//---member declaration---
-			this.emSize = emSize;
-			this.maxNumWidth = 0;
+			// Максимальная ширина числа из 0,1,2...,9, померенная в нормальном шрифте(дефалтовый для книги) в px(целое)
+			// Ecma-376 Office Open XML Part 1, пункт 18.3.1.13
+			this.maxDigitWidthBase = maxDigitWidth;
+			this.emSize = this.maxDigitWidthBase * asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
+			this.maxDigitWidth = 0;
 			this.defaultColWidth = 0;
 			this.defaultRowHeight = 0;
 			this.defaultRowDescender = 0;
@@ -1128,16 +1131,9 @@
 				this.height_2px = asc_calcnpt(0, this._getPPIY(), 2/*px*/);
 				this.height_3px = asc_calcnpt(0, this._getPPIY(), 3/*px*/);
 
-				// ToDo разобраться со значениями
-//				if (this.printMode) {
-					// Для печати используем алгоритм из спецификации
-					// Ecma-376 Office Open XML Part 1, пункт 18.3.1.13
-//					this.maxNumWidth = asc_round( this.emSize * asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIX() ) );
-//				} else {
-					// Для отображения нужно более точное значение, иначе будут прыгать строки в ячейках
-					// http://bugzserver/show_bug.cgi?id=15311
-					this.maxNumWidth = this.emSize * asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIX() );
-//				}
+				// ToDo неправильно, что maxDigitWidth постоянно пересчитывается в зависимости от PPIX (переделать)
+				this.maxDigitWidth = this.emSize * asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIX() );
+
 				gc_dDefaultColWidthCharsAttribute = this._charCountToModelColWidth(gc_dDefaultColWidthChars, true);
 				this.defaultColWidth = this._modelColWidthToColWidth(gc_dDefaultColWidthCharsAttribute);
 				this.displayColWidth = this._modelColWidthToColWidth(gc_dDefaultColWidthCharsAttribute, true);
@@ -1179,7 +1175,7 @@
 			 */
 			_charCountToModelColWidth: function (count, displayWidth, noPad) {
 				if (count <= 0) { return 0; }
-				var maxw = displayWidth ? asc_round(this.maxNumWidth) : this.maxNumWidth;
+				var maxw = displayWidth ? asc_round(this.maxDigitWidth) : this.maxDigitWidth;
 				return asc_floor( ( count * maxw + (!noPad ? 5 : 0) ) / maxw * 256 ) / 256;
 			},
 
@@ -1190,7 +1186,7 @@
 			 * @returns {Number}    Ширина столбца в пунктах (pt)
 			 */
 			_modelColWidthToColWidth: function (mcw, displayWidth) {
-				var maxw = displayWidth ? asc_round(this.maxNumWidth) : this.maxNumWidth;
+				var maxw = displayWidth ? asc_round(this.maxDigitWidth) : this.maxDigitWidth;
 				var px = asc_floor( (( 256 * mcw + asc_floor(128 / maxw) ) / 256) * maxw );
 				return px * asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIX() );
 			},
@@ -1202,7 +1198,7 @@
 			 */
 			_colWidthToCharCount: function (w) {
 				var px = w * asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIX() );
-				return px <= 5 ? 0 : asc_floor( (px - 5) / asc_round(this.maxNumWidth) * 100 + 0.5 ) / 100;
+				return px <= 5 ? 0 : asc_floor( (px - 5) / asc_round(this.maxDigitWidth) * 100 + 0.5 ) / 100;
 			},
 
 			/**
@@ -8397,11 +8393,11 @@
 							fl = t._getCellFlags(c);
 							if (fl.isMerged) {continue;}
 							str = c.getValue2();
-							maxW = ct.metrics.width + t.maxNumWidth;
+							maxW = ct.metrics.width + t.maxDigitWidth;
 							while (1) {
 								tm = t._roundTextMetrics( t.stringRender.measureString(str, fl, maxW) );
 								if (tm.height <= t.maxRowHeight) {break;}
-								maxW += t.maxNumWidth;
+								maxW += t.maxDigitWidth;
 							}
 							width = Math.max(width, tm.width);
 						} else {

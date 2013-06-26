@@ -85,7 +85,9 @@
 			this.stringRender = undefined;
 			this.drawingCtxCharts = undefined;
 
-			this.emSize = 0;
+			// Максимальная ширина числа из 0,1,2...,9, померенная в нормальном шрифте(дефалтовый для книги) в px(целое)
+			// Ecma-376 Office Open XML Part 1, пункт 18.3.1.13
+			this.maxDigitWidth = 0;
 			this.defaultFont = new asc_FP(this.model.getDefaultFont(), this.model.getDefaultSize());
 			//-----------------------
 			
@@ -136,7 +138,7 @@
 				this.stringRender.setDefaultFont(this.defaultFont);
 
 				// Мерить нужно только со 100% и один раз для всего документа
-				this._calcEmSize();
+				this._calcMaxDigitWidth();
 
 				// initialize events controller
 				this.controller.init(this, this.element, this.canvasOverlay, /*handlers*/{
@@ -332,7 +334,7 @@
 								"selectionRangeChanged"	: function (val) {self.handlers.trigger("asc_onSelectionRangeChanged", val);},
 								"getDCForCharts"		: function () { return self.drawingCtxCharts; }
 							});
-				return new asc_WSV(wsModel, this.buffers, this.stringRender, this.emSize, this.collaborativeEditing, opt);
+				return new asc_WSV(wsModel, this.buffers, this.stringRender, this.maxDigitWidth, this.collaborativeEditing, opt);
 			},
 
 			_onSelectionNameChanged: function (name) {
@@ -1417,7 +1419,7 @@
 				}
 			},
 
-			_calcEmSize: function () {
+			_calcMaxDigitWidth: function () {
 				// set default worksheet header font for calculations
 				this.buffers.main.setFont(this.defaultFont);
 				// Измеряем в pt
@@ -1430,11 +1432,11 @@
 
 				// Максимальная ширина в Pt
 				var maxWidthInPt = this.stringRender.getWidestCharWidth();
-				// Переводим в px и приводим к целому (int), а затем переводим обратно в pt
-				this.emSize = asc_round(maxWidthInPt * ptConvToPx) * pxConvToPt;
-				// Проверка для Calibri 11 должно быть asc_round(maxWidthInPt * ptConvToPx) = 7
+				// Переводим в px и приводим к целому (int)
+				this.maxDigitWidth = asc_round(maxWidthInPt * ptConvToPx);
+				// Проверка для Calibri 11 должно быть this.maxDigitWidth = 7
 
-				if (!this.emSize) {throw "Error: can't measure text string";}
+				if (!this.maxDigitWidth) {throw "Error: can't measure text string";}
 			}
 		};
 
