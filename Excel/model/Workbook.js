@@ -2077,7 +2077,7 @@ function Woorksheet(wb, _index, bAddUserId, sId){
 	this.DefinedNames = new Object();
 	this.sName = this.workbook.getUniqueSheetNameFrom(g_sNewSheetNamePattern, false);
 	this.bHidden = false;
-	this.dDefaultwidth = null;
+	this.dDefaultColWidth = null;
 	this.dDefaultheight = null;
 	this.nBaseColWidth = null;
 	this.index = _index;
@@ -2160,7 +2160,8 @@ Woorksheet.prototype.clone=function(sNewId){
 		oNewWs = new Woorksheet(this.workbook, this.workbook.aWorksheets.length, true);
 	oNewWs.sName = this.workbook.getUniqueSheetNameFrom(this.sName, true);
 	oNewWs.bHidden = this.bHidden;
-	oNewWs.dDefaultwidth = this.dDefaultwidth;
+	oNewWs.nBaseColWidth = this.nBaseColWidth;
+	oNewWs.dDefaultColWidth = this.dDefaultColWidth;
 	oNewWs.dDefaultheight = this.dDefaultheight;
 	oNewWs.index = this.index;
 	oNewWs.nRowsCount = this.nRowsCount;
@@ -2785,7 +2786,7 @@ Woorksheet.prototype.insertColsAfter=function(index, count){
 	return this.insertColsBefore(index + 1, count);
 };
 Woorksheet.prototype.getDefaultWidth=function(){
-	return this.dDefaultwidth;
+	return this.dDefaultColWidth;
 };
 Woorksheet.prototype.getColWidth=function(index){
 	//index 0 based
@@ -2793,7 +2794,7 @@ Woorksheet.prototype.getColWidth=function(index){
 	var col = this._getColNoEmptyWithAll(index);
 	if(null != col && null != col.width)
 		return col.width;
-	var dResult = this.dDefaultwidth;
+	var dResult = this.dDefaultColWidth;
 	if(dResult === undefined || dResult === null || dResult == 0)
 		//dResult = (8) + 5;//(EMCA-376.page 1857.)defaultColWidth = baseColumnWidth + {margin padding (2 pixels on each side, totalling 4 pixels)} + {gridline (1pixel)}
 		dResult = -1; // calc default width at presentation level

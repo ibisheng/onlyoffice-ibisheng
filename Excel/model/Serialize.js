@@ -2195,8 +2195,8 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, oDrawings, aDxf
 			var oRes = {BestFit: col.BestFit, hd: col.hd, Max: nMax, Min: nMin, xfsid: null, width: col.width, CustomWidth: col.CustomWidth};
 			if(null == oRes.width)
 			{
-				if(null != ws.dDefaultwidth)
-					oRes.width = ws.dDefaultwidth;
+				if(null != ws.dDefaultColWidth)
+					oRes.width = ws.dDefaultColWidth;
 				else
 					oRes.width = gc_dDefaultColWidthCharsAttribute;
 			}
@@ -2311,10 +2311,10 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, oDrawings, aDxf
     };
     this.WriteSheetFormatPr = function(ws)
     {
-        if(null !== ws.dDefaultwidth) {
+        if(null !== ws.dDefaultColWidth) {
             this.memory.WriteByte(c_oSerSheetFormatPrTypes.DefaultColWidth);
             this.memory.WriteByte(c_oSerPropLenType.Double);
-            this.memory.WriteDouble2(ws.dDefaultwidth);
+            this.memory.WriteDouble2(ws.dDefaultColWidth);
         }
         if(null !== ws.dDefaultheight) {
             this.memory.WriteByte(c_oSerSheetFormatPrTypes.DefaultRowHeight);
@@ -4930,7 +4930,7 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
     {
         var res = c_oSerConstants.ReadOk;
         if ( c_oSerSheetFormatPrTypes.DefaultColWidth == type )
-            oWorksheet.dDefaultwidth = this.stream.GetDoubleLE();
+            oWorksheet.dDefaultColWidth = this.stream.GetDoubleLE();
         else if ( c_oSerSheetFormatPrTypes.DefaultRowHeight == type )
             oWorksheet.dDefaultheight = this.stream.GetDoubleLE();
 		else if (c_oSerSheetFormatPrTypes.BaseColWidth === type)
