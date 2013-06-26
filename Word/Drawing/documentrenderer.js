@@ -426,6 +426,13 @@ function CDocMeta()
             if (pageIndex == this.Drawings[i].Page)
             {
                 oThisDoc.Drawings[i].BreakDrawing = 1;
+
+                if (oThisDoc.Drawings[i].Graphics.IsClipContext)
+                {
+                    oThisDoc.Drawings[i].Graphics.m_oContext.restore();
+                    oThisDoc.Drawings[i].Graphics.IsClipContext = false;
+                }
+
                 oThisDoc.Drawings.splice(i, 1);
                 i--;
             }
@@ -435,7 +442,9 @@ function CDocMeta()
     this.OnImageLoad = function(obj)
     {
         if (obj.BreakDrawing == 1)
+        {
             return;
+        }
 
         var page = oThisDoc.Pages[obj.Page];
         var s = oThisDoc.stream;
@@ -580,6 +589,7 @@ function CDocMeta()
 
                     break;
                 }
+                case 98:
                 case 100:
                 {
                     // beginpath
@@ -714,7 +724,9 @@ function CDocMeta()
 							//editor.WordControl.OnScroll();
 
                             if (_tr)
+                            {
                                 _ctx.restore();
+                            }
                         }
 						
                         oThisDoc.OnImageLoad(obj);
@@ -781,6 +793,35 @@ function CDocMeta()
                 {
                     // text clip rect
                     g.SetTextClipRect(s.GetDouble(), s.GetDouble(), s.GetDouble(), s.GetDouble());
+                    break;
+                }
+                case 121:
+                {
+                    var _command_type = s.GetLong();
+                    if (32 == _command_type)
+                    {
+                        if (!g.IsClipContext)
+                        {
+                            g.m_oContext.save();
+                        }
+
+                        g.IsClipContext = true;
+                    }
+                    else if (64 == _command_type && g.IsClipContext)
+                    {
+                        g.m_oContext.restore();
+                        g.IsClipContext = false;
+                    }
+                    break;
+                }
+                case 122:
+                {
+                    var _command_type = s.GetLong();
+                    if (32 == _command_type)
+                    {
+                        // clip
+                        g.m_oContext.clip();
+                    }
                     break;
                 }
                 default:
@@ -884,6 +925,7 @@ function CDocMeta()
 
                     break;
                 }
+                case 98:
                 case 100:
                 {
                     break;
@@ -1117,6 +1159,13 @@ function CDocMeta()
                     s.Skip(16);
                     break;
                 }
+                case 121:
+                case 122:
+                {
+                    // begin/end command
+                    s.Skip(4);
+                    break;
+                }
                 default:
                 {
                     s.pos = page.end;
@@ -1188,6 +1237,7 @@ function CDocMeta()
 
                     break;
                 }
+                case 98:
                 case 100:
                 {
                     break;
@@ -1266,6 +1316,13 @@ function CDocMeta()
                 case 164:
                 {
                     s.Skip(16);
+                    break;
+                }
+                case 121:
+                case 122:
+                {
+                    // begin/end command
+                    s.Skip(4);
                     break;
                 }
                 default:
@@ -1445,6 +1502,7 @@ function CDocMeta()
 
                     break;
                 }
+                case 98:
                 case 100:
                 {
                     break;
@@ -1651,6 +1709,13 @@ function CDocMeta()
                     s.Skip(16);
                     break;
                 }
+                case 121:
+                case 122:
+                {
+                    // begin/end command
+                    s.Skip(4);
+                    break;
+                }
                 default:
                 {
                     s.pos = page.end;
@@ -1821,6 +1886,7 @@ function CDocMeta()
                     isChangeSpan = false;
                     break;
                 }
+                case 98:
                 case 100:
                 {
                     break;
@@ -1972,6 +2038,13 @@ function CDocMeta()
                     s.Skip(16);
                     break;
                 }
+                case 121:
+                case 122:
+                {
+                    // begin/end command
+                    s.Skip(4);
+                    break;
+                }
                 default:
                 {
                     s.pos = page.end;
@@ -2068,6 +2141,7 @@ function CDocMeta()
 
                     break;
                 }
+                case 98:
                 case 100:
                 {
                     break;
@@ -2166,6 +2240,13 @@ function CDocMeta()
                 case 164:
                 {
                     s.Skip(16);
+                    break;
+                }
+                case 121:
+                case 122:
+                {
+                    // begin/end command
+                    s.Skip(4);
                     break;
                 }
                 default:
@@ -2353,6 +2434,7 @@ function CDocMeta()
 
                     break;
                 }
+                case 98:
                 case 100:
                 {
                     break;
@@ -2432,6 +2514,13 @@ function CDocMeta()
                 case 164:
                 {
                     s.Skip(16);
+                    break;
+                }
+                case 121:
+                case 122:
+                {
+                    // begin/end command
+                    s.Skip(4);
                     break;
                 }
                 default:

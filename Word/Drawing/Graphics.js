@@ -494,6 +494,7 @@ function CGraphics()
     this.globalAlpha = 1;
 
     this.TextClipRect = null;
+    this.IsClipContext = false;
 }
 
 CGraphics.prototype =
@@ -2527,10 +2528,10 @@ CGraphics.prototype =
     SetTextClipRect : function(_l, _t, _r, _b)
     {
         this.TextClipRect = {
-            l : _l,
-            t : _t,
-            r : _r,
-            b : _b
+            l : (_l * this.m_oCoordTransform.sx) >> 0,
+            t : (_t * this.m_oCoordTransform.sy) >> 0,
+            r : (_r * this.m_oCoordTransform.sx) >> 0,
+            b : (_b * this.m_oCoordTransform.sy) >> 0
         };
     }
 };
