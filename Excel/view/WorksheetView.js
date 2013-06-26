@@ -392,6 +392,9 @@
 			this.maxDigitWidthBase = maxDigitWidth;
 			this.emSize = this.maxDigitWidthBase * asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
 			this.maxDigitWidth = 0;
+
+			this.nBaseColWidth = 8; // Число символов для дефалтовой ширины (по умолчинию 8)
+			this.defaultColWidthChars = 0;
 			this.defaultColWidth = 0;
 			this.defaultRowHeight = 0;
 			this.defaultRowDescender = 0;
@@ -1036,6 +1039,7 @@
 			// ----- Initialization -----
 
 			_init: function () {
+				this._initWorksheetDefaultWidth();
 				this._initCellsArea(true);
 				this.autoFilters.addFiltersAfterOpen(this);
 				this._initConditionalFormatting();
@@ -1122,6 +1126,15 @@
 				//this.model.aComments = new Array();
 				//this.model.aCommentsCoords = new Array();
 			},
+			_initWorksheetDefaultWidth: function () {
+				this.nBaseColWidth = this.model.nBaseColWidth || this.nBaseColWidth;
+				// Теперь рассчитываем число px для (ToDo переделать на функции, а не писать одинаковые формулы)
+				var defaultColWidthChars = asc_floor((this.nBaseColWidth * this.maxDigitWidthBase + 5.0) / this.maxDigitWidthBase * 256) / 256;
+				var defaultColWidthPx = asc_floor(((256 * defaultColWidthChars + asc_floor(128 / this.maxDigitWidthBase)) / 256) * this.maxDigitWidthBase);
+				// Делаем кратным 8 (http://support.microsoft.com/kb/214123)
+				defaultColWidthPx = asc_ceil(defaultColWidthPx / 8) * 8;
+				this.defaultColWidthChars = asc_floor((defaultColWidthPx - 5) / asc_round(this.maxDigitWidthBase) * 100 + 0.5) / 100;
+			},
 			_initCellsArea: function (fullRecalc) {
 				this.width_1px = asc_calcnpt(0, this._getPPIX(), 1/*px*/);
 				this.width_2px = asc_calcnpt(0, this._getPPIX(), 2/*px*/);
@@ -1135,7 +1148,7 @@
 				//this.maxDigitWidth = this.emSize * asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIX() );
 				this.maxDigitWidth = this.maxDigitWidthBase * this.drawingCtx.scaleFactor;
 
-				gc_dDefaultColWidthCharsAttribute = this._charCountToModelColWidth(gc_dDefaultColWidthChars, true);
+				gc_dDefaultColWidthCharsAttribute = this._charCountToModelColWidth(this.defaultColWidthChars, true);
 				this.defaultColWidth = this._modelColWidthToColWidth(gc_dDefaultColWidthCharsAttribute);
 				this.displayColWidth = this._modelColWidthToColWidth(gc_dDefaultColWidthCharsAttribute, true);
 

@@ -1,7 +1,6 @@
 var d1,d2,d3;
 var g_nHSLMaxValue = 240;
 var g_nVerticalTextAngle = 255;
-var gc_dDefaultColWidthChars = 8.43; // ToDo разобраться, не должно быть константой!
 var gc_dDefaultColWidthCharsAttribute;//определяется в WorksheetView.js
 var g_nNextWorksheetId = 1;
 var g_sNewSheetNamePattern = "Sheet";
