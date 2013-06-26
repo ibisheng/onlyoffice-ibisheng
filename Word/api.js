@@ -1550,6 +1550,7 @@ function CParagraphProp (obj)
 		this.ContextualSpacing = (undefined != obj.ContextualSpacing)              ? obj.ContextualSpacing : null;
 		this.Ind               = (undefined != obj.Ind     && null != obj.Ind)     ? new CParagraphInd (obj.Ind) : null;
 		this.KeepLines         = (undefined != obj.KeepLines)                      ? obj.KeepLines : null;
+        this.WidowControl      = (undefined != obj.WidowControl                    ? obj.WidowControl : undefined );
 		this.PageBreakBefore   = (undefined != obj.PageBreakBefore)                ? obj.PageBreakBefore : null;
 		this.Spacing           = (undefined != obj.Spacing && null != obj.Spacing) ? new CParagraphSpacing (obj.Spacing) : null;
 		this.Brd               = (undefined != obj.Brd     && null != obj.Brd)     ? new CParagraphBorders (obj.Brd) : null;
@@ -1588,6 +1589,7 @@ function CParagraphProp (obj)
 		this.ContextualSpacing = undefined;
 		this.Ind               = new CParagraphInd ();
 		this.KeepLines         = undefined;
+        this.WidowControl      = undefined;
 		this.PageBreakBefore   = undefined;
 		this.Spacing           = new CParagraphSpacing ();
 		this.Brd               = undefined;
@@ -1614,6 +1616,8 @@ CParagraphProp.prototype.get_KeepLines = function () { return this.KeepLines; }
 CParagraphProp.prototype.put_KeepLines = function (v) { this.KeepLines = v; }
 CParagraphProp.prototype.get_PageBreakBefore = function (){ return this.PageBreakBefore; }
 CParagraphProp.prototype.put_PageBreakBefore = function (v){ this.PageBreakBefore = v; }
+CParagraphProp.prototype.get_WidowControl = function (){ return this.WidowControl; }
+CParagraphProp.prototype.put_WidowControl = function (v){ this.WidowControl = v; }
 CParagraphProp.prototype.get_Spacing = function () { return this.Spacing; }
 CParagraphProp.prototype.put_Spacing = function (v) { this.Spacing = v; }
 CParagraphProp.prototype.get_Borders = function () { return this.Brd; }
@@ -2967,6 +2971,9 @@ asc_docs_api.prototype.paraApply = function(Props)
         if ( "undefined" != typeof(Props.KeepLines) && null != Props.KeepLines )
             this.WordControl.m_oLogicDocument.Set_ParagraphKeepLines( Props.KeepLines );
 
+        if ( undefined != Props.WidowControl && null != Props.WidowControl )
+            this.WordControl.m_oLogicDocument.Set_ParagraphWidowControl( Props.WidowControl );
+
         //if ( "undefined" != typeof(Props.KeepNext) && null != Props.KeepNext )
         //    this.WordControl.m_oLogicDocument.Set_ParagraphKeepNext( Props.KeepNext );
 
@@ -3194,6 +3201,17 @@ asc_docs_api.prototype.put_PageBreak = function(isBreak)
         this.sync_PageBreakCallback(isBreak);
     }
 }
+
+asc_docs_api.prototype.put_WidowControl = function(bValue)
+{
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
+    {
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        this.WordControl.m_oLogicDocument.Set_ParagraphWidowControl(bValue);
+        this.sync_WidowControlCallback(bValue);
+    }
+}
+
 asc_docs_api.prototype.put_KeepLines = function(isKeepLines)
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
@@ -3364,6 +3382,11 @@ asc_docs_api.prototype.sync_ParaSpacingLine = function(SpacingLine)
 }
 asc_docs_api.prototype.sync_PageBreakCallback = function(isBreak){
 	this.asc_fireCallback("asc_onPageBreak",isBreak);
+}
+
+asc_docs_api.prototype.sync_WidowControlCallback = function(bValue)
+{
+    this.asc_fireCallback("asc_onWidowControl",bValue);
 }
 asc_docs_api.prototype.sync_KeepLinesCallback = function(isKeepLines){
 	this.asc_fireCallback("asc_onKeepLines",isKeepLines);

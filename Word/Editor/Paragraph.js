@@ -951,6 +951,20 @@ Paragraph.prototype =
                 return recalcresult_NextPage;
             }
         }
+        else if  ( this === this.Parent.RecalcInfo.WidowControlParagraph && CurLine === this.Parent.RecalcInfo.WidowControlLine )
+        {
+            this.Parent.RecalcInfo.WidowControlParagraph = null;
+            this.Parent.RecalcInfo.WidowControlLine      = -1;
+
+            this.Pages[CurPage].Set_EndLine( CurLine - 1 );
+            if ( 0 === CurLine )
+            {
+                this.Lines[-1] = new CParaLine( 0 );
+                this.Lines[-1].Set_EndPos( LineStart_Pos - 1 );
+            }
+
+            return recalcresult_NextPage;
+        }
 
         var RecalcResult = recalcresult_NextElement;
 
@@ -2038,34 +2052,45 @@ Paragraph.prototype =
                     }
                 }
 
-                bBreakPageLine = false;
-
                 // Сначала проверяем не нужно ли сделать перенос страницы в данном месте
                 // Перенос не делаем, если это первая строка на новой странице
                 if ( (Top > this.YLimit || Bottom2 > this.YLimit ) && ( CurLine != this.Pages[CurPage].FirstLine || ( 0 === CurPage && ( null != this.Get_DocumentPrev() || true === this.Parent.Is_TableCellContent() ) ) ) && false === bBreakPageLineEmpty )
                 {
-                    // Неразрывные абзацы не учитываются в таблицах
-                    if ( true === ParaPr.KeepLines && null != this.Get_DocumentPrev() && true != this.Parent.Is_TableCellContent() && 0 === CurPage )
+                    // Проверим висячую строку
+                    if ( true === ParaPr.WidowControl && CurLine - this.Pages[CurPage].StartLine <= 1 && CurLine >= 1 && true != bBreakPageLine )
                     {
-                        CurLine       = 0;
-                        LineStart_Pos = 0;
+                        this.Parent.RecalcInfo.WidowControlParagraph = this;
+                        this.Parent.RecalcInfo.WidowControlLine      = CurLine - 1;
+                        RecalcResult = recalcresult_CurPage;
+                        break;
                     }
-
-                    // Восстанавливаем позицию нижней границы предыдущей страницы
-                    this.Pages[CurPage].Bounds.Bottom = LastPage_Bottom;
-                    this.Pages[CurPage].Set_EndLine( CurLine - 1 );
-
-                    if ( 0 === CurLine )
+                    else
                     {
-                        this.Lines[-1] = new CParaLine(0);
-                        this.Lines[-1].Set_EndPos( LineStart_Pos - 1 );
+                        // Неразрывные абзацы не учитываются в таблицах
+                        if ( true === ParaPr.KeepLines && null != this.Get_DocumentPrev() && true != this.Parent.Is_TableCellContent() && 0 === CurPage )
+                        {
+                            CurLine       = 0;
+                            LineStart_Pos = 0;
+                        }
+
+                        // Восстанавливаем позицию нижней границы предыдущей страницы
+                        this.Pages[CurPage].Bounds.Bottom = LastPage_Bottom;
+                        this.Pages[CurPage].Set_EndLine( CurLine - 1 );
+
+                        if ( 0 === CurLine )
+                        {
+                            this.Lines[-1] = new CParaLine(0);
+                            this.Lines[-1].Set_EndPos( LineStart_Pos - 1 );
+                        }
+
+                        // Добавляем разрыв страницы
+                        RecalcResult = recalcresult_NextPage;
+
+                        break;
                     }
-
-                    // Добавляем разрыв страницы
-                    RecalcResult = recalcresult_NextPage;
-
-                    break;
                 }
+
+                bBreakPageLine = false;
 
                 var Left   = ( 0 != CurLine ? this.X + ParaPr.Ind.Left : this.X + ParaPr.Ind.Left + ParaPr.Ind.FirstLine );
                 var Right  = this.XLimit - ParaPr.Ind.Right;
@@ -2251,6 +2276,22 @@ Paragraph.prototype =
                         {
                             this.Lines[CurLine].Set_EndPos( Pos );
                             CurLine++;
+
+                            if ( this === this.Parent.RecalcInfo.WidowControlParagraph && CurLine === this.Parent.RecalcInfo.WidowControlLine )
+                            {
+                                this.Parent.RecalcInfo.WidowControlParagraph = null;
+                                this.Parent.RecalcInfo.WidowControlLine      = -1;
+
+                                this.Pages[CurPage].Set_EndLine( CurLine - 1 );
+                                if ( 0 === CurLine )
+                                {
+                                    this.Lines[-1] = new CParaLine( 0 );
+                                    this.Lines[-1].Set_EndPos( LineStart_Pos - 1 );
+                                }
+
+                                RecalcResult = recalcresult_NextPage;
+                                break;
+                            }
                         }
                         this.Lines[CurLine] = new CParaLine(Pos + 1);
                         //this.Lines[CurLine].Metrics.Update( TextAscent, TextDescent, TextAscent, TextDescent, ParaPr );
@@ -2320,27 +2361,56 @@ Paragraph.prototype =
                             break;
                         }
                     }
-                    else if ( true === bEnd && true === bExtendBoundToBottom )
-                    {
-                        // Специальный случай с PageBreak, когда после самого PageBreak ничего нет
-                        // в параграфе
-
-                        this.Pages[CurPage].Bounds.Bottom = this.Pages[CurPage].YLimit;
-                        this.Bounds.Bottom = this.Pages[CurPage].YLimit;
-
-                        this.Lines[CurLine].Set_EndPos( Pos );
-                        this.Pages[CurPage].Set_EndLine( CurLine );
-
-                        for ( var TempRange = CurRange + 1; TempRange <= RangesCount; TempRange++ )
-                            this.Lines[CurLine].Set_RangeStartPos( TempRange, Pos );
-                    }
                     else
                     {
-                        this.Lines[CurLine].Set_EndPos( Pos );
-                        this.Pages[CurPage].Set_EndLine( CurLine );
+                        // Проверим висячую строку
+                        if ( true === ParaPr.WidowControl && CurLine === this.Pages[CurPage].StartLine && CurLine >= 1 )
+                        {
+                            // Проверим не встречается ли в предыдущей строке BreakPage, если да, тогда не учитываем WidowControl
+                            var bBreakPagePrevLine = false;
+                            var StartPos = (CurLine == 2 ? this.Lines[CurLine - 2].StartPos : this.Lines[CurLine - 1].StartPos );
+                            var EndPos   = this.Lines[CurLine - 1].EndPos;
+                            for ( var TempPos = StartPos; TempPos <= EndPos; TempPos++ )
+                            {
+                                var TempItem = this.Content[TempPos];
+                                if ( para_NewLine === TempItem.Type && break_Page === TempItem.BreakType )
+                                {
+                                    bBreakPagePrevLine = true;
+                                    break;
+                                }
+                            }
 
-                        for ( var TempRange = CurRange + 1; TempRange <= RangesCount; TempRange++ )
-                            this.Lines[CurLine].Set_RangeStartPos( TempRange, Pos );
+                            if ( false === bBreakPagePrevLine )
+                            {
+                                this.Parent.RecalcInfo.WidowControlParagraph = this;
+                                this.Parent.RecalcInfo.WidowControlLine      = ( CurLine > 2 ? CurLine - 1 : 0 ); // Если у нас в параграфе 3 строки, тогда сразу начинаем параграф с новой строки
+                                RecalcResult = recalcresult_PrevPage;
+                                break;
+                            }
+                        }
+
+                        if ( true === bEnd && true === bExtendBoundToBottom )
+                        {
+                            // Специальный случай с PageBreak, когда после самого PageBreak ничего нет
+                            // в параграфе
+
+                            this.Pages[CurPage].Bounds.Bottom = this.Pages[CurPage].YLimit;
+                            this.Bounds.Bottom = this.Pages[CurPage].YLimit;
+
+                            this.Lines[CurLine].Set_EndPos( Pos );
+                            this.Pages[CurPage].Set_EndLine( CurLine );
+
+                            for ( var TempRange = CurRange + 1; TempRange <= RangesCount; TempRange++ )
+                                this.Lines[CurLine].Set_RangeStartPos( TempRange, Pos );
+                        }
+                        else
+                        {
+                            this.Lines[CurLine].Set_EndPos( Pos );
+                            this.Pages[CurPage].Set_EndLine( CurLine );
+
+                            for ( var TempRange = CurRange + 1; TempRange <= RangesCount; TempRange++ )
+                                this.Lines[CurLine].Set_RangeStartPos( TempRange, Pos );
+                        }
                     }
                 }
 

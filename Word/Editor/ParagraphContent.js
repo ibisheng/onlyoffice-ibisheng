@@ -61,7 +61,24 @@ var g_aPunctuation =
 g_aPunctuation[0x00AB] = 1; // символ «
 g_aPunctuation[0x00BB] = 1; // символ »
 g_aPunctuation[0x2013] = 1; // символ –
+g_aPunctuation[0x201C] = 1; // символ “
+g_aPunctuation[0x201D] = 1; // символ ”
 g_aPunctuation[0x2026] = 1; // символ ...
+
+var g_aNumber = [];
+g_aNumber[0x0030] = 1;
+g_aNumber[0x0031] = 1;
+g_aNumber[0x0032] = 1;
+g_aNumber[0x0033] = 1;
+g_aNumber[0x0034] = 1;
+g_aNumber[0x0035] = 1;
+g_aNumber[0x0036] = 1;
+g_aNumber[0x0037] = 1;
+g_aNumber[0x0038] = 1;
+g_aNumber[0x0039] = 1;
+
+var g_aSpecialSymbols = [];
+g_aSpecialSymbols[0x00AE] = 1;
 
 // Класс ParaText
 function ParaText(value)
@@ -163,8 +180,23 @@ ParaText.prototype =
 
     Is_Punctuation : function()
     {
-        var CharCode = this.Value.charCodeAt(0);
         if ( 1 === this.Value.length && 1 === g_aPunctuation[this.Value.charCodeAt(0)] )
+            return true;
+
+        return false;
+    },
+
+    Is_Number : function()
+    {
+        if ( 1 === this.Value.length && 1 === g_aNumber[this.Value.charCodeAt(0)] )
+            return true;
+
+        return false;
+    },
+
+    Is_SpecialSymbol : function()
+    {
+        if ( 1 === g_aSpecialSymbols[this.Value.charCodeAt(0)] )
             return true;
 
         return false;

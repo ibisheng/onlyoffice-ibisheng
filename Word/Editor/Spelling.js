@@ -610,7 +610,8 @@ Paragraph.prototype.Internal_CheckSpelling = function()
 {
     if ( pararecalc_0_Spell_None !== this.RecalcInfo.Recalc_0_Spell.Type )
     {
-        this.LogicDocument.Spelling.Add_ParagraphToCheck(this.Get_Id(), this);
+        if ( null != g_oTableId.Get_ById( this.Get_Id() ) )
+            this.LogicDocument.Spelling.Add_ParagraphToCheck(this.Get_Id(), this);
     }
 };
 
@@ -651,7 +652,7 @@ Paragraph.prototype.Continue_CheckSpelling = function()
 
                 continue;
             }
-            else if ( para_Text === Item.Type && false === Item.Is_Punctuation() && false === Item.Is_NBSP() )
+            else if ( para_Text === Item.Type && false === Item.Is_Punctuation() && false === Item.Is_NBSP() && false === Item.Is_Number() && false === Item.Is_SpecialSymbol() )
             {
                 if ( false === bWord )
                 {

@@ -285,7 +285,10 @@ function CDocument(DrawingDocument)
     {
         FlowObject                : null,   // Текущий float-объект, который мы пересчитываем
         FlowObjectPageBreakBefore : false,  // Нужно ли перед float-объектом поставить pagebreak
-        FlowObjectPage            : 0       // Количество обработанных страниц
+        FlowObjectPage            : 0,      // Количество обработанных страниц
+
+        WidowControlParagraph     : null,   // Параграф, который мы пересчитываем из-за висячих строк
+        WidowControlLine          : -1      // Номер строки, перед которой надо поставить разрыв страницы
     };
     this.RecalcId   = 0; // Номер пересчета
     this.FullRecalc = new Object();
@@ -1074,8 +1077,6 @@ CDocument.prototype =
         this.DrawingObjects.drawBehindDoc( nPageIndex, pGraphics );
         this.DrawingObjects.drawWrappingObjects( nPageIndex, pGraphics );
 
-
-        var Count = this.Content.length;
         var Page_StartPos = this.Pages[nPageIndex].Pos;
         var Page_EndPos   = this.Pages[nPageIndex].EndPos;
         for ( var Index = Page_StartPos; Index <= Page_EndPos; Index++ )
@@ -4600,6 +4601,96 @@ CDocument.prototype =
             }
             else if ( type_Table == Item.GetType() )
                 Item.Set_ParagraphKeepLines( Value );
+
+            this.Document_UpdateSelectionState();
+            this.Document_UpdateInterfaceState();
+        }
+    },
+
+    Set_ParagraphWidowControl : function(Value)
+    {
+        // Работаем с колонтитулом
+        if ( docpostype_HdrFtr === this.CurPos.Type )
+        {
+            var bRetValue = this.HdrFtr.Set_ParagraphWidowControl(Value);
+            this.Document_UpdateSelectionState();
+            this.Document_UpdateInterfaceState();
+            return bRetValue;
+        }
+        else if ( docpostype_DrawingObjects === this.CurPos.Type )
+        {
+            var bRetValue = this.DrawingObjects.setParagraphWidowControl(Value);
+            this.Document_UpdateSelectionState();
+            this.Document_UpdateInterfaceState();
+            return bRetValue;
+        }
+        else //if ( docpostype_Content === this.CurPos.Type )
+        {
+            if ( this.CurPos.ContentPos < 0 )
+                return false;
+
+            if ( true === this.Selection.Use )
+            {
+                switch ( this.Selection.Flag )
+                {
+                    case selectionflag_Common:
+                    {
+                        var StartPos = this.Selection.StartPos;
+                        var EndPos   = this.Selection.EndPos;
+                        if ( EndPos < StartPos )
+                        {
+                            var Temp = StartPos;
+                            StartPos = EndPos;
+                            EndPos   = Temp;
+                        }
+
+                        for ( var Index = StartPos; Index <= EndPos; Index++ )
+                        {
+                            // При изменении цвета фона параграфа, не надо ничего пересчитывать
+                            var Item = this.Content[Index];
+
+                            if ( type_Paragraph == Item.GetType() )
+                                Item.Set_WidowControl( Value );
+                            else if ( type_Table == Item.GetType() )
+                            {
+                                Item.TurnOff_RecalcEvent();
+                                Item.Set_ParagraphWidowControl( Value );
+                                Item.TurnOn_RecalcEvent();
+                            }
+                        }
+
+                        // Нам нужно пересчитать все изменения, начиная с первого элемента,
+                        // попавшего в селект.
+                        this.ContentLastChangePos = StartPos;
+
+                        this.Recalculate();
+
+                        this.Document_UpdateSelectionState();
+                        this.Document_UpdateInterfaceState();
+
+                        return;
+                    }
+                    case  selectionflag_Numbering:
+                    {
+                        break;
+                    }
+                }
+
+                return;
+            }
+
+            var Item = this.Content[this.CurPos.ContentPos];
+            if ( type_Paragraph == Item.GetType() )
+            {
+                Item.Set_WidowControl( Value );
+
+                // Нам нужно пересчитать все изменения, начиная с текущего элемента
+                this.ContentLastChangePos = this.CurPos.ContentPos;
+
+                this.Recalculate( true );
+            }
+            else if ( type_Table == Item.GetType() )
+                Item.Set_ParagraphWidowControl( Value );
 
             this.Document_UpdateSelectionState();
             this.Document_UpdateInterfaceState();

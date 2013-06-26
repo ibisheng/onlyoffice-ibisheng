@@ -163,6 +163,12 @@ WordShape.prototype =
             this.textBoxContent.Set_ParagraphKeepLines(Value);
     },
 
+    setParagraphWidowControl: function(Value)
+    {
+        if(isRealObject(this.textBoxContent))
+            this.textBoxContent.Set_ParagraphWidowControl(Value);
+    },
+
     setParagraphPageBreakBefore: function(Value)
     {
         if(isRealObject(this.textBoxContent))
@@ -334,6 +340,10 @@ WordShape.prototype =
         }
     },
 
+    Is_ThisElementCurrent : function()
+    {
+        return false;
+    },
 
     getBase64Object: function()
     {

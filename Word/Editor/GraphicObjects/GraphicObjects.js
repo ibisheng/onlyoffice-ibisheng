@@ -5761,6 +5761,21 @@ CGraphicObjects.prototype =
         }
         this.document.Recalculate();
     },
+
+    setParagraphWidowControl: function(Value)
+    {
+        if(this.curState.id === STATES_ID_TEXT_ADD)
+        {
+            this.curState.textObject.setParagraphWidowControl(Value);
+        }
+        if(this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP)
+        {
+            if(typeof this.curState.textObject.setParagraphWidowControl === "function")
+                this.curState.textObject.setParagraphWidowControl(Value);
+        }
+        this.document.Recalculate();
+    },
+
     setParagraphBorders: function(Value)
     {
         if(this.curState.id === STATES_ID_TEXT_ADD)

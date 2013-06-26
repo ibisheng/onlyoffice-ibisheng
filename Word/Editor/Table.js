@@ -8753,6 +8753,35 @@ CTable.prototype =
             return this.CurCell.Content.Set_ParagraphKeepLines( Value );
     },
 
+    Set_ParagraphWidowControl : function(Value)
+    {
+        if ( true === this.ApplyToAll || ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0 ) )
+        {
+            var Cells_array = this.Internal_Get_SelectionArray();
+            for ( var Index = 0; Index < Cells_array.length; Index++ )
+            {
+                var Pos = Cells_array[Index];
+                var Row = this.Content[Pos.Row];
+                var Cell = Row.Get_Cell( Pos.Cell );
+
+                var Cell_Content = Cell.Content;
+                Cell_Content.Set_ApplyToAll( true );
+                Cell.Content.Set_ParagraphWidowControl( Value );
+                Cell_Content.Set_ApplyToAll( false );
+            }
+
+            if ( Cells_array[0].Row - 1 >= 0 )
+                this.Internal_RecalculateFrom( Cells_array[0].Row - 1, 0, true, true );
+            else
+            {
+                this.Internal_Recalculate_1();
+                this.Internal_OnContentRecalculate( true, 0, this.Index );
+            }
+        }
+        else
+            return this.CurCell.Content.Set_ParagraphWidowControl( Value );
+    },
+
     Set_ParagraphBorders : function(Borders)
     {
         if ( true === this.ApplyToAll || ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0 ) )

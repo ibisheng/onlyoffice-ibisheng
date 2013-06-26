@@ -4261,9 +4261,9 @@ CLang.prototype =
 
     Init_Default : function()
     {
-        this.Bidi     = lcid_ruRU;
-        this.EastAsia = lcid_ruRU;
-        this.Val      = lcid_ruRU;
+        this.Bidi     = lcid_enUS;
+        this.EastAsia = lcid_enUS;
+        this.Val      = lcid_enUS;
     },
 
     Set_FromObject : function(Lang)

@@ -836,6 +836,11 @@ CHeaderFooter.prototype =
         return this.Content.Set_ParagraphKeepLines( Value );
     },
 
+    Set_ParagraphWidowControl : function(Value)
+    {
+        return this.Content.Set_ParagraphWidowControl( Value );
+    },
+
     Set_ParagraphBorders : function(Value)
     {
         return this.Content.Set_ParagraphBorders( Value );
@@ -2284,6 +2289,12 @@ CHeaderFooterController.prototype =
     {
         if ( null != this.CurHdrFtr )
             return this.CurHdrFtr.Set_ParagraphKeepLines( Value );
+    },
+
+    Set_ParagraphWidowControl : function(Value)
+    {
+        if ( null != this.CurHdrFtr )
+            return this.CurHdrFtr.Set_ParagraphWidowControl( Value );
     },
 
     Set_ParagraphBorders : function(Value)

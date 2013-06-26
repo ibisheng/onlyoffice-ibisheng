@@ -1839,6 +1839,11 @@ $(".colorWatch").mouseover(function(){
 	$("#prPageBreak").click(function(){
 		editor.put_PageBreak(document.getElementById("prPageBreak").checked);
 	})
+
+     $("#prWidowControl").click(function()
+     {
+         editor.put_WidowControl(document.getElementById("prWidowControl").checked);
+     })
 	
 	$("#hafOE").click(function(){
 		editor.HeadersAndFooters_DifferentOddandEvenPage(document.getElementById ("hafOE").checked);
@@ -2766,6 +2771,7 @@ $(".colorWatch").mouseover(function(){
 					document.getElementById("prIntervBetween").checked = elemVal.ContextualSpacing;
 					document.getElementById("prKeepLines").checked = elemVal.KeepLines;
 					document.getElementById("prPageBreak").checked = elemVal.PageBreakBefore;
+                    document.getElementById("prWidowControl").checked = elemVal.WidowControl;
 				}
                 else if ( ObjectType == c_oAscTypeSelectElement.Hyperlink )
                 {
