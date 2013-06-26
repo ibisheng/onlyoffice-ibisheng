@@ -3896,14 +3896,11 @@ function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
                 oNewXfs.QuotePrefix = xfs.QuotePrefix;
             if(null != xfs.align)
                 oNewXfs.align = xfs.align.clone();
-
-            this.aCellXfs.push(oNewXfs);
+			if(0 == this.aCellXfs.length)
+				this.oStyleManager.init(oNewXfs);
+			this.minimizeXfs(oNewXfs);
+			this.aCellXfs.push(oNewXfs);
         }
-		if(this.aCellXfs.length > 0)
-		{
-			var oFirstXfs = this.aCellXfs[0];
-			this.oStyleManager.oDefaultXfs = oFirstXfs;
-		}
 		for(var i in oCustomTableStyles)
 		{
 			var item = oCustomTableStyles[i];
@@ -3915,7 +3912,6 @@ function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
 				this.wb.TableStyles.CustomStyles[i] = style;
 			}
 		}
-		this.oStyleManager.init();
     }
 	this.initTableStyle = function(style, elems, Dxfs)
 	{
@@ -3927,6 +3923,7 @@ function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
 				var Dxf = Dxfs[elem.DxfId];
 				if(null != Dxf)
 				{
+					this.minimizeXfs(Dxf);
 					var oTableStyleElement = new CTableStyleElement();
 					oTableStyleElement.dxf = Dxf;
 					if(null != elem.Size)
@@ -3965,6 +3962,19 @@ function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
 				}
 			}					
 		}
+	}
+	this.minimizeXfs = function(xfs)
+	{
+		if(null != xfs.border && g_oDefaultBorder.isEqual(xfs.border))
+			xfs.border = null;
+		if(null != xfs.fill && g_oDefaultFill.isEqual(xfs.fill))
+			xfs.fill = null;
+		if(null != xfs.font && g_oDefaultFont.isEqual(xfs.font))
+			xfs.font = null;
+		if(null != xfs.num && g_oDefaultNum.isEqual(xfs.num))
+			xfs.num = null;
+		if(null != xfs.align && g_oDefaultAlign.isEqual(xfs.align))
+			xfs.align = null;
 	}
 	this.ParseNum = function(oNum, oNumFmts)
 	{
@@ -4058,8 +4068,6 @@ function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
             res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadBorder(t,l,oNewBorder);
                 });
-			if(oNewBorder.isEqual(g_oDefaultBorderAbs))
-				oNewBorder = null;
             aBorders.push(oNewBorder);
         }
         else
@@ -4216,8 +4224,6 @@ function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
             res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.ReadAligment(t,l,oXfs.align);
                 });
-			if(oXfs.align.isEqual(g_oDefaultAlignAbs))
-				oXfs.align = null;
         }
         else
             res = c_oSerConstants.ReadUnknown;
@@ -4276,8 +4282,6 @@ function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
             res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadFill(t,l,oNewFill);
                 });
-			if(oNewFill.isEqual(g_oDefaultFillAbs))
-				oNewFill = null;
             aFills.push(oNewFill);
         }
         else
@@ -4327,8 +4331,6 @@ function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
             res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.bssr.ReadRPr(t,l,oNewFont);
                 });
-			if(oNewFont.isEqual(g_oDefaultFont))
-				oNewFont = null;
             aFonts.push(oNewFont);
         }
         else
@@ -4401,8 +4403,6 @@ function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
             res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadBorder(t,l,oNewBorder);
                 });
-			if(oNewBorder.isEqual(g_oDefaultBorderAbs))
-				oNewBorder = null;
             oDxf.border = oNewBorder;
         }
 		else if ( c_oSer_Dxf.Fill == type )

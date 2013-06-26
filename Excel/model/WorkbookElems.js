@@ -1210,25 +1210,22 @@ function StyleManager(){
 	this.oDefaultAlign = null;
 	this.oDefaultQuotePrefix = null;
     //стиль ячейки по умолчанию, может содержать не все свойства
-	this.oDefaultXfs = null;
+	this.oDefaultXfs = new CellXfs();
 };
 StyleManager.prototype =
 {
-    init : function()
+    init : function(oDefaultXfs)
     {
-		if(null == this.oDefaultXfs)
-			this.oDefaultXfs = new CellXfs();
-		if(null == this.oDefaultXfs.font)
-			this.oDefaultXfs.font = new Font();
-		g_oDefaultFont = this.oDefaultXfs.font.clone();
-		if(null != this.oDefaultXfs.fill)
-			g_oDefaultFill = this.oDefaultXfs.fill.clone();
-		if(null != this.oDefaultXfs.border)
-			g_oDefaultBorder = this.oDefaultXfs.border.clone();
-		if(null != this.oDefaultXfs.num)
-			g_oDefaultNum = this.oDefaultXfs.num.clone();
-		if(null != this.oDefaultXfs.align)
-			g_oDefaultAlign = this.oDefaultXfs.align.clone();
+		if(null != oDefaultXfs.font)
+			g_oDefaultFont = oDefaultXfs.font.clone();
+		if(null != oDefaultXfs.fill)
+			g_oDefaultFill = oDefaultXfs.fill.clone();
+		if(null != oDefaultXfs.border)
+			g_oDefaultBorder = oDefaultXfs.border.clone();
+		if(null != oDefaultXfs.num)
+			g_oDefaultNum = oDefaultXfs.num.clone();
+		if(null != oDefaultXfs.align)
+			g_oDefaultAlign = oDefaultXfs.align.clone();
 	},
     _prepareSet : function(oItemWithXfs)
 	{
