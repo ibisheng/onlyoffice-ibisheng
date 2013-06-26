@@ -309,6 +309,7 @@ prop:get_ShowParaMarks
 prop:put_ShowTableEmptyLine
 prop:get_ShowTableEmptyLine
 prop:put_PageBreak
+prop:put_WidowControl
 prop:put_KeepLines
 prop:put_AddSpaceBetweenPrg
 prop:put_LineHighLight
@@ -335,6 +336,7 @@ prop:sync_TextLangCallBack
 prop:sync_ParaStyleName
 prop:sync_ParaSpacingLine
 prop:sync_PageBreakCallback
+prop:sync_WidowControlCallback
 prop:sync_KeepLinesCallback
 prop:sync_ShowParaMarksCallback
 prop:sync_SpaceBetweenPrgCallback
@@ -568,6 +570,8 @@ prop:get_KeepLines
 prop:put_KeepLines
 prop:get_PageBreakBefore
 prop:put_PageBreakBefore
+prop:get_WidowControl
+prop:put_WidowControl
 prop:get_Spacing
 prop:put_Spacing
 prop:get_Borders
@@ -1286,6 +1290,7 @@ asc_docs_api.prototype['get_ShowParaMarks'] = asc_docs_api.prototype.get_ShowPar
 asc_docs_api.prototype['put_ShowTableEmptyLine'] = asc_docs_api.prototype.put_ShowTableEmptyLine;
 asc_docs_api.prototype['get_ShowTableEmptyLine'] = asc_docs_api.prototype.get_ShowTableEmptyLine;
 asc_docs_api.prototype['put_PageBreak'] = asc_docs_api.prototype.put_PageBreak;
+asc_docs_api.prototype['put_WidowControl'] = asc_docs_api.prototype.put_WidowControl;
 asc_docs_api.prototype['put_KeepLines'] = asc_docs_api.prototype.put_KeepLines;
 asc_docs_api.prototype['put_AddSpaceBetweenPrg'] = asc_docs_api.prototype.put_AddSpaceBetweenPrg;
 asc_docs_api.prototype['put_LineHighLight'] = asc_docs_api.prototype.put_LineHighLight;
@@ -1312,6 +1317,7 @@ asc_docs_api.prototype['sync_TextLangCallBack'] = asc_docs_api.prototype.sync_Te
 asc_docs_api.prototype['sync_ParaStyleName'] = asc_docs_api.prototype.sync_ParaStyleName;
 asc_docs_api.prototype['sync_ParaSpacingLine'] = asc_docs_api.prototype.sync_ParaSpacingLine;
 asc_docs_api.prototype['sync_PageBreakCallback'] = asc_docs_api.prototype.sync_PageBreakCallback;
+asc_docs_api.prototype['sync_WidowControlCallback'] = asc_docs_api.prototype.sync_WidowControlCallback;
 asc_docs_api.prototype['sync_KeepLinesCallback'] = asc_docs_api.prototype.sync_KeepLinesCallback;
 asc_docs_api.prototype['sync_ShowParaMarksCallback'] = asc_docs_api.prototype.sync_ShowParaMarksCallback;
 asc_docs_api.prototype['sync_SpaceBetweenPrgCallback'] = asc_docs_api.prototype.sync_SpaceBetweenPrgCallback;
@@ -1540,6 +1546,8 @@ CParagraphProp.prototype['get_KeepLines'] = CParagraphProp.prototype.get_KeepLin
 CParagraphProp.prototype['put_KeepLines'] = CParagraphProp.prototype.put_KeepLines;
 CParagraphProp.prototype['get_PageBreakBefore'] = CParagraphProp.prototype.get_PageBreakBefore;
 CParagraphProp.prototype['put_PageBreakBefore'] = CParagraphProp.prototype.put_PageBreakBefore;
+CParagraphProp.prototype['get_WidowControl'] = CParagraphProp.prototype.get_WidowControl;
+CParagraphProp.prototype['put_WidowControl'] = CParagraphProp.prototype.put_WidowControl;
 CParagraphProp.prototype['get_Spacing'] = CParagraphProp.prototype.get_Spacing;
 CParagraphProp.prototype['put_Spacing'] = CParagraphProp.prototype.put_Spacing;
 CParagraphProp.prototype['get_Borders'] = CParagraphProp.prototype.get_Borders;
