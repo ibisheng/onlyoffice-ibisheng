@@ -1062,22 +1062,22 @@ function cBaseOperator(name, priority, argumentCount){
 	this.numFormat = this.formatType.noneFormat;
 }
 cBaseOperator.prototype = {
-	constructor : cBaseOperator,
-	getArguments : function(){
+    constructor:cBaseOperator,
+    getArguments:function () {
         return this.argumentsCurrent;
     },
-	toString : function(){
+    toString:function () {
         return this.name;
     },
-	Calculate : function(){
+    Calculate:function () {
         return null;
     },
-	Assemble : function(arg){
+    Assemble:function ( arg ) {
         var str = "";
-        if( this.argumentsCurrent == 2 )
-            str = arg[0]+""+this.name+""+arg[1];
-        else str = this.name+""+arg[0];
-        return new cString(str);
+        if ( this.argumentsCurrent == 2 )
+            str = arg[0] + "" + this.name + "" + arg[1];
+        else str = this.name + "" + arg[0];
+        return new cString( str );
     }
 }
 
@@ -2236,6 +2236,40 @@ var cFormulaFunction = {
 		},
         'TIMEVALUE' : function(){
             var r = new cBaseFunction("TIMEVALUE");
+            r.setArgumentsMin(1);
+            r.setArgumentsMax(1);
+            r.Calculate = function(arg){
+                var arg0 = arg[0];
+
+                if ( arg0 instanceof cArea || arg0 instanceof cArea3D ){
+                    arg0 = arg0.cross(arguments[1].first);
+                }
+                else if( arg0 instanceof cArray ){
+                    arg0 = arg0.getElementRowCol(0,0);
+                }
+
+                arg0 = arg0.tocString();
+
+                if ( arg0 instanceof cError )
+                    return this.value = arg0;
+
+                if( arg0.tocNumber() instanceof cNumber && arg0.tocNumber().getValue() > 0 )
+                    return this.value = new cNumber( parseInt(arg0.tocNumber().getValue()) );
+
+                var res = g_oFormatParser.parse(arg0.getValue());
+
+                if( res && res.bDateTime )
+                    return this.value = new cNumber( res.value - parseInt(res.value) );
+                else
+                    return this.value = new cError( cErrorType.wrong_value_type );
+            }
+            r.getInfo = function(){
+                return {
+                    name:this.name,
+                    args:"( date-time-string )"
+                };
+            }
+            r.setFormat(r.formatType.noneFormat);
 			return r;
         },
         'TODAY' : function(){
@@ -2261,6 +2295,79 @@ var cFormulaFunction = {
         },
         'WEEKDAY' : function(){
             var r = new cBaseFunction("WEEKDAY");
+            r.setArgumentsMin(1);
+            r.setArgumentsMax(2);
+            r.Calculate = function(arg){
+                var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cNumber(1);
+
+                if ( arg0 instanceof cArea || arg0 instanceof cArea3D ){
+                    arg0 = arg0.cross(arguments[1].first);
+                }
+                else if( arg0 instanceof cArray ){
+                    arg0 = arg0.getElementRowCol(0,0);
+                }
+
+                if ( arg1 instanceof cArea || arg1 instanceof cArea3D ){
+                    arg1 = arg1.cross(arguments[1].first);
+                }
+                else if( arg1 instanceof cArray ){
+                    arg1 = arg1.getElementRowCol(0,0);
+                }
+
+                arg0 = arg0.tocNumber();
+                arg1 = arg1.tocNumber();
+
+                if ( arg0 instanceof cError )
+                    return this.value = arg0;
+
+                if ( arg1 instanceof cError )
+                    return this.value = arg1;
+
+                var weekday;
+
+                switch (arg1.getValue()){
+                    case 1: /* 1 (Sunday) through 7 (Saturday)  */
+                    case 17:/* 1 (Sunday) through 7 (Saturday) */
+                        weekday = { 0:1,1:2,2:3,3:4,4:5,5:6,6:7 };
+                        break;
+                    case 2: /* 1 (Monday) through 7 (Sunday)    */
+                    case 11:/* 1 (Monday) through 7 (Sunday)    */
+                        weekday = { 0:7,1:1,2:2,3:3,4:4,5:5,6:6 };
+                        break;
+                    case 3: /* 0 (Monday) through 6 (Sunday)    */
+                        weekday = { 0:6,1:0,2:1,3:2,4:3,5:4,6:5 };
+//                        correctDate = 0;
+                        break;
+                    case 12:/* 1 (Tuesday) through 7 (Monday)   */
+                        weekday = { 0:6,1:7,2:1,3:2,4:3,5:4,6:5 };
+                        break;
+                    case 13:/* 1 (Wednesday) through 7 (Tuesday) */
+                        weekday = { 0:5,1:6,2:7,3:1,4:2,5:3,6:4 };
+                        break;
+                    case 14:/* 1 (Thursday) through 7 (Wednesday) */
+                        weekday = { 0:4,1:5,2:6,3:7,4:1,5:2,6:3 };
+                        break;
+                    case 15:/* 1 (Friday) through 7 (Thursday) */
+                        weekday = { 0:3,1:4,2:5,3:6,4:7,5:1,6:2 };
+                        break;
+                    case 16:/* 1 (Saturday) through 7 (Friday) */
+                        weekday = { 0:2,1:3,2:4,3:5,4:6,5:7,6:1 };
+                        break;
+                    default:
+                        return this.value = new cError( cErrorType.not_numeric );
+                }
+                if( arg0.getValue() < 0 )
+                    return this.value = new cError( cErrorType.wrong_value_type );
+
+                return this.value = new cNumber( weekday[new Date((arg0.getValue()-(c_DateCorrectConst+1))*c_msPerDay).getDay()] );
+            }
+            r.getInfo = function(){
+                return {
+                    name:this.name,
+                    args:"( serial-value [ , weekday-start-flag ] )"
+                };
+            }
+            r.setFormat(r.formatType.noneFormat);
 			return r;
         },
         'WEEKNUM' : function(){
@@ -3823,6 +3930,102 @@ var cFormulaFunction = {
         'groupName' : "LookupAndReference",
         'ADDRESS' : function(){
             var r = new cBaseFunction("ADDRESS");
+			r.setArgumentsMin(2);
+            r.setArgumentsMax(5);
+			r.Calculate = function(arg){
+				
+				function _getColumnTitle(col) {
+					var q = col < 26 ? undefined : Asc.floor(col / 26) - 1;
+					var r = col % 26;
+					var text = String.fromCharCode( ("A").charCodeAt(0) + r );
+					return col < 26 ? text : _getColumnTitle(q) + text;
+				}
+
+				function _getRowTitle(row) {
+					return "" + (row + 1);
+				}
+				
+				var rowNumber = arg[0], colNumber = arg[1],
+					refType = arg[2] ? arg[2] : new cNumber(1),
+					A1RefType = arg[3] ? arg[3] : new cBool(true),
+					sheetName = arg[4] ? arg[4] : new cEmpty();
+
+				if ( rowNumber instanceof cArea || rowNumber instanceof cArea3D ){
+					rowNumber = rowNumber.cross(arguments[1].first);
+				}
+				else if( rowNumber instanceof cArray ){
+					rowNumber = rowNumber.getElementRowCol(0,0);
+				}
+
+				if ( colNumber instanceof cArea || colNumber instanceof cArea3D ){
+					colNumber = colNumber.cross(arguments[1].first);
+				}
+				else if( colNumber instanceof cArray ){
+					colNumber = colNumber.getElementRowCol(0,0);
+				}
+
+				if ( refType instanceof cArea || refType instanceof cArea3D ){
+					refType = refType.cross(arguments[1].first);
+				}
+				else if( refType instanceof cArray ){
+					refType = refType.getElementRowCol(0,0);
+				}
+
+				if ( A1RefType instanceof cArea || A1RefType instanceof cArea3D ){
+					A1RefType = A1RefType.cross(arguments[1].first);
+				}
+				else if( A1RefType instanceof cArray ){
+					A1RefType = A1RefType.getElementRowCol(0,0);
+				}
+
+				if ( sheetName instanceof cArea || sheetName instanceof cArea3D ){
+					sheetName = sheetName.cross(arguments[1].first);
+				}
+				else if( sheetName instanceof cArray ){
+					sheetName = sheetName.getElementRowCol(0,0);
+				}
+
+				rowNumber = rowNumber.tocNumber();
+				colNumber = colNumber.tocNumber();
+				refType = refType.tocNumber();
+				A1RefType = A1RefType.tocBool();
+				
+				if ( rowNumber instanceof cError ) return this.value = rowNumber;
+				if ( colNumber instanceof cError ) return this.value = colNumber;
+				if ( refType instanceof cError ) return this.value = refType;
+				if ( A1RefType instanceof cError ) return this.value = A1RefType;
+				if ( sheetName instanceof cError ) return this.value = sheetName;
+				
+				if( refType.getValue() > 4 && refType.getValue() < 1 || rowNumber.getValue() < 1 || colNumber.getValue() < 1 ){
+					return this.value = new cError( cErrorType.not_numeric );
+				}
+				var strRef;
+				switch( refType.getValue() ){
+					case 1: strRef = "$" + _getColumnTitle( colNumber.getValue()-1 ) + "$" + _getRowTitle( rowNumber.getValue()-1 ); break;
+					case 2: strRef = _getColumnTitle( colNumber.getValue()-1 ) + "$" + _getRowTitle( rowNumber.getValue()-1 ); break;
+					case 3: strRef = "$" + _getColumnTitle( colNumber.getValue()-1 ) + _getRowTitle( rowNumber.getValue()-1 ); break;
+					case 4: strRef = _getColumnTitle( colNumber.getValue()-1 ) + _getRowTitle( rowNumber.getValue()-1 ); break;
+				}
+				
+				if( sheetName instanceof cEmpty ){
+					return this.value = new cString( strRef );
+				}
+				else{
+					if( !rx_test_ws_name.test(sheetName.toString()) ){
+						return this.value = "'"+sheetName.toString().replace(/'/g,"''")+"'"+"!"+strRef;
+					}
+					else{
+						return this.value = sheetName.toString()+"!"+strRef;
+					}
+				}
+				
+			}
+			r.getInfo = function(){
+				return {
+                    name:this.name,
+                    args:"( row-number , col-number [ , [ ref-type ] [ , [ A1-ref-style-flag ] [ , sheet-name ] ] ] )"
+                };
+			}
 			return r;
 		},
         'AREAS' : function(){
