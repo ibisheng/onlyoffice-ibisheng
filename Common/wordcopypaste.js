@@ -1758,7 +1758,16 @@ function Body_Paste(api, e)
                 return false;
             }
         }
-        if (/text\/html/.test(e.clipboardData.types))
+		var fTest = function(types, sPattern)
+		{
+			for(var i = 0, length = types.length; i < length; ++i)
+			{
+				if(sPattern == types[i])
+					return true;
+			}
+			return false;
+		}
+        if (fTest(e.clipboardData.types, "text/html"))
         {
             var sHtml = e.clipboardData.getData('text/html');
             //������ ��� ��������� ����� ������ �� Word � chrome ��������� ���������� ������� ����� </html>, �������� ��.
@@ -1766,7 +1775,7 @@ function Body_Paste(api, e)
             if(-1 != nIndex)
                 sHtml = sHtml.substring(0, nIndex + "</html>".length);
         }
-        else if (is_chrome && /text\/plain/.test(e.clipboardData.types))
+        else if (is_chrome && fTest(e.clipboardData.types, "text/plain"))
         {
             bExist = true;
             var sText = e.clipboardData.getData('text/plain');
