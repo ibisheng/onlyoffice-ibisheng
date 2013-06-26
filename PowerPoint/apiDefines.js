@@ -245,5 +245,47 @@ var c_oAscMouseMoveDataTypes =
     LockedObject : 2
 };
 
+var c_oAscSlideTransitionTypes =
+{
+    None    : 0,
+    Fade    : 1,
+    Push    : 2,
+    Wipe    : 3,
+    Split   : 4,
+    UnCover : 5,
+    Cover   : 6,
+    Clock   : 7,
+    Pan     : 8,
+    Zoom    : 9
+};
+
+var c_oAscSlideTransitionParams =
+{
+    Fade_Smoothly       : 0,
+    Fade_Through_Black  : 1,
+
+    Param_Left          : 0,
+    Param_Top           : 1,
+    Param_Right         : 2,
+    Param_Bottom        : 3,
+    Param_TopLeft       : 4,
+    Param_TopRight      : 5,
+    Param_BottomLeft    : 6,
+    Param_BottomRight   : 7,
+
+    Split_VerticalIn    : 8,
+    Split_VerticalOut   : 9,
+    Split_HorizontalIn  : 10,
+    Split_HorizontalOut : 11,
+
+    Clock_Clockwise         : 0,
+    Clock_Counterclockwise  : 1,
+    Clock_Wedge             : 2,
+
+    Zoom_In             : 0,
+    Zoom_Out            : 1,
+    Zoom_AndRotate      : 2
+};
+
 var TABLE_STYLE_WIDTH_PIX   = 70;
 var TABLE_STYLE_HEIGHT_PIX  = 50;
