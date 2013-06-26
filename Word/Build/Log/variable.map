@@ -586,13 +586,13 @@ c_oSerConstants$ErrorUnknown:Ci
 STATES_ID_MOVE_INLINE_OBJECT:mB
 CARD_DIRECTION_W:iG
 t1operator_seac:wq
-c_oSerProp_rPrType$HighLight:eV
+c_oSerProp_rPrType$HighLight:dV
 NumComporationOperators$equal:Jf
 ft_char_table:xp
 FT_Load_Glyph:nz
 RotateInGroupState:TE
 CDocumentShd:Rc
-c_oSerProp_rPrType$HighLightTyped:fV
+c_oSerProp_rPrType$HighLightTyped:eV
 c_oSer_ChartCatAxType$Delete:Oj
 CARD_DIRECTION_S:gG
 t1_cmap_standard_class_rec:Up
@@ -735,7 +735,7 @@ PreChangeAdjInGroup:zE
 c_oSerImageType$Type:cW
 g_oCellAddressUtils:jj
 c_oSerProp_pPrType$Spacing:AU
-TT_Set_CodeRange:pu
+TT_Set_CodeRange:ku
 CFF_SizeRec:xx
 SplineCommandLineTo:eF
 cff_size_select:Bx
@@ -779,7 +779,7 @@ CFF_FontRecDictRec:Mw
 X_Right_Field:ic
 c_oSerBorderType$Size:Si
 c_oAscServerError$VKeyKeyExpire:mf
-ScrollObject:B0
+ScrollObject:A0
 styletype_Numbering:gM
 SplineBezierState33:dF
 numbering_presentationnumfrmt_AlphaUcPeriod:bb
@@ -959,7 +959,7 @@ TYPE_TRACK_GROUP:IH
 FmtScheme:BI
 c_oSer_CommentsType$Comment:vX
 c_oAscServerError$Upload:ff
-JSCompiler_StaticMethods_getHdrFtrObjectsByPageIndex:qB
+JSCompiler_StaticMethods_getHdrFtrObjectsByPageIndex:pB
 ResizeGroupedShapes:NE
 c_oSer_ChartSeriesMarkerType$Symbol:ek
 ParaText:sc
@@ -1203,7 +1203,7 @@ JSCompiler_StaticMethods_getMax:Pk
 c_oAscError$ID$ConvertationTimeout:U1
 fontslot_ASCII:YM
 JSCompiler_StaticMethods_Check_NeedRecalc:UG
-TT_RunIns:ju
+TT_RunIns:iu
 STATES_ID_RESIZE_GROUPED:zB
 cff_size_init:Ax
 nSldLtTTbl:XI
@@ -2117,8 +2117,8 @@ cff_index_init:hx
 c_oSer_CommentsType$UserId:zX
 c_oSerBordersType$right:Wi
 L 124:kr
-L 123:Bz
-L 122:Az
+L 123:Cz
+L 122:Bz
 L 121:Wk
 L 120:n1
 JSCompiler_StaticMethods_AddRoundRect:WZ
@@ -2151,7 +2151,7 @@ recalcresult2_NextPage:xG
 _fakeHeaders:$2
 MobileTouchMode$TableMove:f0
 JSCompiler_StaticMethods_chartModify:hD
-L 125:Cz
+L 125:Dz
 cToRad:oF
 c_oSer_ClrSchemeMappingType$FollowedHyperlink:TX
 tt_get_advances:Aw
@@ -2173,8 +2173,8 @@ historyitem_TableId_Reset:IK
 L 102:Fm
 T1_Decoder_ZoneRec:Fq
 T1_Size_Request:Cy
-L 101:ou
-L 100:nu
+L 101:pu
+L 100:ou
 FT_GlyphLoader_Prepare:yn
 FT_Smooth_Renderer_Class:Ft
 CColorModifiers:QH
@@ -2188,8 +2188,8 @@ historyitem_ChangeDiagram2:gH
 bIsIE:HZ
 ShapeForResizeInGroup:DH
 find_sbit_range:Fr
-L 111:zz
-L 110:yz
+L 111:Az
+L 110:zz
 L 113:Gm
 tt_get_interface:sw
 L 112:g1
@@ -2199,13 +2199,13 @@ CAutoshapeTrack:d_
 JSCompiler_StaticMethods_Internal_RecalculateGrid:iS
 L 104:b1
 STATES_ID_PRE_CHANGE_ADJ_GROUPED:sB
-historyitem_AddToSpTree:zH
+historyitem_AddToSpTree:yH
 L 105:c1
 CAscFill:i3
 L 106:d1
 L 107:e1
 L 108:f1
-L 109:xz
+L 109:yz
 ETblStyleOverrideType$tblstyleoverridetypeBand2Horz:ZX
 para_Empty:LM
 JSCompiler_StaticMethods_ReadPaddings2:pZ
@@ -2383,7 +2383,7 @@ c_oAscServerError$NoError:Ne
 c_oAscError$ID$DownloadError:W1
 c_oSerDocTableType$tblGrid_Item:HV
 CTableRecalcInfo:IR
-FT_Render_Glyph:Dz
+FT_Render_Glyph:oz
 JSCompiler_StaticMethods_Interface_Update_HdrFtrPr:CQ
 c_oSer_ChartPlotAreaType$ValAx:Ij
 c_oSerHdrFtrTypes$HdrFtr_Even:lT
@@ -2633,7 +2633,7 @@ L 22:W
 c_oSerSimplePos$X:RW
 L 25:da
 L 24:Z
-L 50:ku
+L 50:lu
 tt_find_sbit_image:Gr
 tt_size_reset:Dw
 recalcresult_PrevPage:CO
@@ -2651,17 +2651,17 @@ TRACK_CIRCLE_RADIUS:HG
 tt_face_load_bhed:br
 T1_Loader:Ly
 nSldLtTClipArtAndTx:KI
-L 59:tz
+L 59:uz
 L 58:M0
-L 57:sz
-L 56:rz
-L 55:qz
+L 57:tz
+L 56:sz
+L 55:rz
 TT_Round_Super_45:Ut
-L 54:pz
+L 54:qz
 tt_cmap10_char_index:ds
 L 53:L0
 ps_parser_skip_spaces:fq
-L 52:oz
+L 52:pz
 L 51:K0
 FT_TT_SERVICES_GET:nw
 g_fonts_streams:dA
@@ -2685,7 +2685,7 @@ L 49:gr
 CControl:p0
 c_oSer_pgMarType$Bottom:rX
 L 48:J0
-L 45:iu
+L 45:ju
 tt_face_free_hdmx_stub:Ls
 L 44:je
 CTrackXYAdjObject:ZD
@@ -2882,7 +2882,7 @@ TT_Face:Mv
 CTrackNewObject2:nE
 BinarySettingsTableWriter:HY
 L 73:Vk
-L 74:uz
+L 74:vz
 JSCompiler_StaticMethods__draw:L1
 JSCompiler_StaticMethods_setAdjustmentValue:uF
 L 75:N0
@@ -2892,11 +2892,11 @@ L 76:jr
 tt_face_load_bdf_props:Rq
 L 77:Lj
 Get_TableOffsetCorrection:xZ
-L 78:vz
+L 78:wz
 L 79:O0
 dublicate_matrix:po
 t1_args_count:uq
-CHorRulerRepaintChecker:u0
+CHorRulerRepaintChecker:t0
 g_spellCheckLanguages:oe
 c_oSerRunType$linebreak:UV
 c_oSerNumTypes$lvl_LvlTextItem:zT
@@ -2920,10 +2920,10 @@ L 71:Go
 L 64:Sk
 L 65:Tk
 c_oSer_SettingsType$ClrSchemeMapping:JX
-L 62:lu
+L 62:mu
 BULLET_TYPE_TYPEFACE_BUFONT:Hh
 CUniFill:Cg
-L 63:mu
+L 63:nu
 L 68:Ni
 L 69:Cm
 L 66:Uk
@@ -2979,7 +2979,7 @@ tt_name_entry_ascii_from_utf16:Ys
 Editor_Copy_GetElem:ga
 JSCompiler_StaticMethods_Set_TableBorder_InsideV:jd
 L 88:T0
-L 89:wz
+L 89:xz
 JSCompiler_StaticMethods_Set_Inline:ZR
 L 86:S0
 L 87:ZK
