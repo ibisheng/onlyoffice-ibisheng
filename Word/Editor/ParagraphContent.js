@@ -2942,6 +2942,12 @@ function ParaDrawing(W, H, GraphicObj, DrawingDocument, DocumentContent, Parent)
 
 ParaDrawing.prototype =
 {
+
+    canRotate: function()
+    {
+        return isRealObject(this.GraphicObj) && typeof this.GraphicObj.canRotate == "function" && this.GraphicObj.canRotate();
+    },
+
     Get_Props : function(OtherProps)
     {
         // Сначала заполняем свойства

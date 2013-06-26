@@ -2881,6 +2881,16 @@ WordGroupShapes.prototype =
             this.selectStartPage = pageIndex;
     },
 
+    canRotate: function()
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(!this.spTree[i].canRotate())
+                return false;
+        }
+        return true;
+    },
+
     deselect: function()
     {
         this.selected = false;

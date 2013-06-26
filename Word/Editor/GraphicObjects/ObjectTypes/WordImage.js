@@ -1590,6 +1590,12 @@ WordImage.prototype =
         };
     },
 
+
+    canRotate: function()
+    {
+        return !isRealObject(this.chart);
+    },
+
     hit: function(x, y)
     {
         if(isRealObject(this.parent) && isRealObject(this.parent.Parent) && isRealObject(this.parent.Parent.Parent)

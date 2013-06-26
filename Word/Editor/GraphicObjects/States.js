@@ -130,9 +130,19 @@ function NullState(graphicObjects)
                     }
                     else
                     {
+                        if(!_cur_selected_gr_object.canRotate())
+                            return;
                         for(_selected_index = 0; _selected_index < _common_selection_array.length; ++_selected_index)
                         {
-                            this.graphicObjects.arrPreTrackObjects.push(new CTrackRotateObject(_common_selection_array[_selected_index], _common_selection_array[_selected_index].pageIndex));
+                            if(_common_selection_array[_selected_index].canRotate())
+                                break;
+                        }
+                        if(_selected_index === _common_selection_array.length)
+                            return;
+                        for(_selected_index = 0; _selected_index < _common_selection_array.length; ++_selected_index)
+                        {
+                            if(_common_selection_array[_selected_index].canRotate())
+                                this.graphicObjects.arrPreTrackObjects.push(new CTrackRotateObject(_common_selection_array[_selected_index], _common_selection_array[_selected_index].pageIndex));
                         }
                         this.graphicObjects.changeCurrentState(new PreRotateState(this.graphicObjects));
                         return;
@@ -1591,6 +1601,15 @@ function NullStateHeaderFooter(graphicObjects)
                     }
                     else
                     {
+                        if(!_cur_selected_gr_object.canRotate())
+                            return;
+                        for(_selected_index = 0; _selected_index < _common_selection_array.length; ++_selected_index)
+                        {
+                            if(_common_selection_array[_selected_index].canRotate())
+                                break;
+                        }
+                        if(_selected_index === _common_selection_array.length)
+                            return;
                         for(_selected_index = 0; _selected_index < _common_selection_array.length; ++_selected_index)
                         {
                             this.graphicObjects.arrPreTrackObjects.push(new CTrackRotateObject(_common_selection_array[_selected_index], _common_selection_array[_selected_index].GraphicObj.selectStartPage));
@@ -4854,6 +4873,16 @@ function GroupState(graphicObjects, group)
                         }
                         else
                         {
+
+                            if(!s_arr[i].canRotate())
+                                return;
+                            for(var _selected_index = 0; _selected_index < s_arr.length; ++_selected_index)
+                            {
+                                if(s_arr[_selected_index].canRotate())
+                                    break;
+                            }
+                            if(_selected_index === s_arr.length)
+                                return;
                             for(j = 0; j < s_arr.length; ++j)
                             {
 
@@ -4890,6 +4919,8 @@ function GroupState(graphicObjects, group)
             }
             else
             {
+                if(!this.group.canRotate())
+                    return;
                 this.graphicObjects.arrPreTrackObjects.push(new CTrackRotateObject(this.group.parent, this.group.pageIndex));
                 this.graphicObjects.changeCurrentState(new PreRotateState(this.graphicObjects));
             }

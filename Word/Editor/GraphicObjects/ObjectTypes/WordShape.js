@@ -5414,6 +5414,11 @@ WordShape.prototype =
         return c;
     },
 
+    canRotate: function()
+    {
+        return true;
+    },
+
     Read_FromBinary2 : function(reader, noReadId)
     {
         if(noReadId === true)

@@ -925,7 +925,6 @@ function MoveTrackInGroup(original)
             copy.setXfrm(this.x, this.y, null, null, null, null, null);
             copy.setAbsoluteTransform(this.x, this.y, null, null, null, null, null);
             para_drawing.Set_GraphicObject(copy);
-
         }
         else
         {
