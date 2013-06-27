@@ -2395,7 +2395,7 @@
 				var x1 = x1/zoom;
 				var y1 = y1/zoom;
 				ws.drawingCtx
-					.setFillPattern(ws.settings.cells.defaultState.background)
+					.setFillStyle(ws.settings.cells.defaultState.background)
 					.setLineWidth(1)
 					.setStrokeStyle(ws.settings.cells.defaultState.border)
 					.fillRect(x1 + diffX, y1 + diffY, width, height)
@@ -2419,7 +2419,7 @@
 				.lineTo(x + 3*index,y - size, 0, 0)
 				.lineTo(x + shift,y - size/2, 0, 0)
 				.lineTo(x + shift,y, 0, 0)
-				.setFillPattern('#787878')
+				.setFillStyle('#787878')
 				.fill();
 			},
 			
@@ -2433,7 +2433,7 @@
 					.lineTo(x + size,y, -shift,0.5)
 					.lineTo(x + size/2,y + size/2 + shift,-shift,0)
 					.lineTo(x , y , -shift, 0)
-					.setFillPattern('#787878')
+					.setFillStyle('#787878')
 					.fill();
 			},
 
