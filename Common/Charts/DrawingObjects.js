@@ -2009,8 +2009,10 @@ function DrawingObjects() {
 			currentSheet.model.Drawings[i].worksheet = worksheet;
 			aObjects[i] = _this.cloneDrawingObject(currentSheet.model.Drawings[i]);
 			
-			if (aObjects[i].isChart())
+			if (aObjects[i].isChart()) {
 				_this.calcChartInterval(aObjects[i].chart);
+				aObjects[i].chart.worksheet = worksheet;
+			}
 				
 			if (aObjects[i].isImage())
 				imageLoader.addImage(aObjects[i].image.src);
@@ -2863,6 +2865,7 @@ function DrawingObjects() {
 		copyObject.size.coeff = obj.size.coeff;
 		
 		copyObject.chart = new asc_CChart(obj.chart);
+		copyObject.chart.worksheet = obj.chart.worksheet;
 
 		return copyObject;
 	}
