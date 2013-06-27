@@ -380,63 +380,6 @@ function calcGutter(axis,min,max,ymin,ymax,isSkip,isFormatCell) {
 	if ('scatter' == bar.type) {
 		bar.scale = OfficeExcel.getScale(false, bar,min,max,ymin,ymax);
 		bar.xScale = OfficeExcel.getScale(true, bar,min,max,ymin,ymax);
-		if (bar._otherProps._ymax > 0 && bar._otherProps._ymin < 0) {
-			bar._chartGutter._bottom = 14;
-			bar._chartGutter._top = 14;
-		}
-		else if (bar._otherProps._ymax <= 0 && bar._otherProps._ymin < 0) {
-			bar._chartGutter._bottom = 14;
-			bar._chartGutter._top = 14;
-		}
-		else {
-			bar._chartGutter._bottom = 14 + 20;
-			bar._chartGutter._top = 14;
-		}
-
-		if (bar._otherProps._xmax > 0 && bar._otherProps._xmin < 0) {
-			bar._chartGutter._left = 22;
-			bar._chartGutter._right = 93;
-		}
-		else if (bar._otherProps._xmax <= 0 && bar._otherProps._xmin < 0) {
-			bar._chartGutter._left = 22;
-			bar._chartGutter._right = 93;
-		}
-		else {
-			bar._chartGutter._left = bar.context.measureText(Math.max.apply(null, bar.scale)).width + 22;
-			bar._chartGutter._right = 93;
-		}
-	}
-	else if ('hbar' == bar.type || 'bar' == bar.type) {
-		if ('hbar' == bar.type)
-			bar._chartGutter._left = bar.context.measureText(Math.max.apply(null, [bar.data.length])).width + 20;
-		else
-			bar._chartGutter._left = bar.context.measureText(Math.max.apply(null, scale)).width + 20;
-		bar._chartGutter._right = 72;
-		bar._chartGutter._bottom = 35;
-		bar._chartGutter._top = 14;
-	}
-	else {
-		if (axis == undefined) {
-			bar._chartGutter._left = bar.context.measureText(Math.max.apply(null, scale)).width + 18;
-			if (bar._otherProps._filled == true)
-				bar._chartGutter._right = 76;
-			else
-				bar._chartGutter._right = 90;
-			if (min < 0 && max < 0 || min < 0 && max > 0)
-				bar._chartGutter._bottom = 13;
-			else
-				bar._chartGutter._bottom = 34;
-			bar._chartGutter._top = 13;
-		}
-		else if (axis == 'OX') {
-			if (min < 0 && max < 0 || min < 0 && max > 0)
-				bar._chartGutter._bottom = 13;
-			else
-				bar._chartGutter._bottom = 34;
-		}
-		else if (axis == 'OY') {
-			bar._chartGutter._left = bar.context.measureText(Math.max.apply(null, scale)).width + 18;
-		}
 	}
 }
 //ширины самих линий графика
@@ -498,6 +441,11 @@ function calcWidthGraph() {
 }
 
 function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY, chart) {
+	var scale = 1;
+	if(OfficeExcel && OfficeExcel.drawingCtxCharts)
+		scale = OfficeExcel.drawingCtxCharts.scaleFactor;
+	var context = OfficeExcel.drawingCtxCharts;
+	
 	if (typeof (bar.data[0]) == 'object') {
 		var arrMin = [];
 		var arrMax = [];
@@ -584,61 +532,82 @@ function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY, chart)
 		var bottom = 0;
 		var right = 0;
 		var top = 0;
-		if (bar._otherProps._key_halign == 'left')
-			left += 76;
-		else if (bar._otherProps._key_halign == 'right')
-			right += 76;
-		else if (bar._otherProps._key_halign == 'top')
-			top +=32;
-		else if (bar._otherProps._key_halign == 'bottom')
-			bottom +=32;
-		if (bar._chartTitle._text != null && bar._chartTitle._text != '')
-			top += 42;
 	}
 	else
 	{
-		if (bar._otherProps._key_halign == 'left')
-			left += 76;
 		if (bar._yAxisTitle._align == 'rev')
-			left += 28;
+		{
+			var font = getFontProperties("yTitle");
+			var axisTitleProp = getMaxPropertiesText(context,font, bar._yAxisTitle._text);
+			var heigthText = (context.getHeightText()/0.75);
+			//прибавляем высоту текста названия + стандартный маргин 
+			left += heigthText + 12;
+		}
 		else if (bar._yAxisTitle._align == 'hor')
 			left += 95;
 		else if (bar._yAxisTitle._align == 'ver')
 			left += 0;
 
 		var right = 0;
-		if (bar._otherProps._key_halign == 'right')
-			right += 76;
-		
-
 		var top = 0;
-		if (bar._otherProps._key_halign == 'top')
-			top += 32;
-		if (bar._chartTitle._text != null && bar._chartTitle._text != '')
-			top += 42;
-		
-
 		var bottom = 0;
-		if (bar._otherProps._key_halign == 'bottom')
-			bottom += 32;
 		if (bar._xAxisTitle._text != '')
 		{
-			bottom += 20;
+			var font = getFontProperties("xTitle");
+			var axisTitleProp = getMaxPropertiesText(context,font, bar._xAxisTitle._text);
+			var heigthText = (context.getHeightText()/0.75);
+			//прибавляем высоту текста названия + стандартный маргин 
+			bottom += heigthText + 14;
 		}
 		if ((min >= 0 || bar.type == 'hbar') &&  bar._otherProps._xlabels)
 		{
 			bottom +=20;
 		}
-		if(bar._xAxisTitle._text != '' && (min >= 0 || bar.type == 'hbar') &&  bar._otherProps._xlabels)
+		if(bar._xAxisTitle._text == '' && (min >= 0 || bar.type == 'hbar') &&  bar._otherProps._xlabels)
 			bottom += 7;
 	}
-	var scale = 1;
-	if(OfficeExcel && OfficeExcel.drawingCtxCharts)
-		scale = OfficeExcel.drawingCtxCharts.scaleFactor;
-	bar._chartGutter._left = (standartMargin + left)*scale;
+	
+	//+высота названия диаграммы
+	if (bar._chartTitle._text != null && bar._chartTitle._text != '')
+	{
+		var font = getFontProperties("title");
+		var axisTitleProp = getMaxPropertiesText(context,font, bar._chartTitle._text);
+		var heigthText = (context.getHeightText()/0.75);
+		//прибавляем высоту текста названия + стандартный маргин 
+		top += heigthText + 7;
+	}
+	//+ высота легенды
+	if(bar._otherProps._key_halign == 'top' || bar._otherProps._key_halign == 'bottom')
+	{
+		var font = getFontProperties("key");
+		var props = getMaxPropertiesText(context,font,bar._otherProps._key);
+		var heigthTextKey = (context.getHeightText()/0.75);
+		if(bar._otherProps._key_halign == 'top')
+			top += heigthTextKey + 7;
+		else
+			bottom += heigthTextKey + 7;
+	}
+	//+ ширина легенды
+	if (bar._otherProps._key_halign == 'left' || bar._otherProps._key_halign == 'right')
+	{
+		var widthLine = 28;
+		//находим ширину текста легенды(то есть её максимального элемента), в дальнейшем будем возвращать ширину автофигуры
+		var font = getFontProperties("key");
+		var widthText = getMaxPropertiesText(context,font,bar._otherProps._key);
+		var widthKey = widthText.width/scale + 2 + widthLine;
+		//в MSExcel справа от легенды всегда остаётся такой маргин 
+		if(bar._otherProps._key_halign == 'left')
+			left += widthKey + 7;
+		else
+			right += widthKey + 7;
+	}
+	
+	if(bottom == 0)
+		bottom = standartMargin;
+	bar._chartGutter._left = (left)*scale + standartMargin;
 	bar._chartGutter._right = (standartMargin + right)*scale;
 	bar._chartGutter._top = (standartMargin + top)*scale;
-	bar._chartGutter._bottom = (bottom + standartMargin)*scale;
+	bar._chartGutter._bottom = (bottom)*scale;
 }
 
 //-----------------------------------------------------------------------------------
@@ -1511,8 +1480,6 @@ function drawChart(chart, arrValues, width, height) {
 
 	var axis;
 	calcGutter(axis,chart.min,chart.max,chart.ymin,chart.ymax,chart.isSkip,chart.isFormatCell);
-	calcAllMargin(chart.isFormatCell,chart.isformatCellScOy,chart.min,chart.max,chart.ymin,chart.ymax, chart);
-	calcWidthGraph();
 	
 	if (chart.xAxis.title)
 	{
@@ -1526,7 +1493,9 @@ function drawChart(chart, arrValues, width, height) {
 		bar._yAxisTitle._hpos = 23 + keyLeft;
 	}
 	//выставляем параметры текса
-	setFontChart(chart);	
+	setFontChart(chart);
+	calcAllMargin(chart.isFormatCell,chart.isformatCellScOy,chart.min,chart.max,chart.ymin,chart.ymax, chart);
+	calcWidthGraph();	
 	bar.Draw(chart.min,chart.max,chart.ymin,chart.ymax,chart.isSkip,chart.isFormatCell,chart.isformatCellScOy);
 }
 
@@ -1656,8 +1625,6 @@ function DrawScatterChart(chartCanvas, chartSubType, data, chart) {
 		bar._otherProps._xmax = countGraph.length;
 		bar._otherProps._key_colors = keyColors;
 	}
-
-	calcGutter(undefined,chart.min,chart.max,chart.ymin,chart.ymax,chart.isSkip,chart.isFormatCell);
 	//для того, чтобы не строить рамку вокруг легенды
 	bar._otherProps._key_rounded = null;
 	if (bar._otherProps._filled != true)
@@ -1972,7 +1939,7 @@ function setFontChart(chart)
 		bar._xAxisTitle._bold = chart.xAxis.titleFont.bold ? chart.xAxis.titleFont.bold : true;
 		bar._xAxisTitle._color = chart.xAxis.titleFont.color ? chart.xAxis.titleFont.color : defaultColor;
 		bar._xAxisTitle._font = chart.xAxis.titleFont.name ? chart.xAxis.titleFont.name : defaultFont;
-		bar._xAxisTitle._size = chart.xAxis.titleFont.size ? chart.xAxis.titleFont.size : defaultSize;
+		bar._xAxisTitle._size = chart.xAxis.titleFont.size ? chart.xAxis.titleFont.size : defaultFont;
 		bar._xAxisTitle._italic = chart.xAxis.titleFont.italic ? chart.xAxis.titleFont.italic : false;
 		bar._xAxisTitle._underline = chart.xAxis.titleFont.underline ? chart.xAxis.titleFont.underline : false;
 	}
@@ -1982,7 +1949,7 @@ function setFontChart(chart)
 		bar._yAxisTitle._bold = chart.yAxis.titleFont.bold ? chart.yAxis.titleFont.bold : true;
 		bar._yAxisTitle._color = chart.yAxis.titleFont.color ? chart.yAxis.titleFont.color : defaultColor;
 		bar._yAxisTitle._font = chart.yAxis.titleFont.name ? chart.yAxis.titleFont.name : defaultFont;
-		bar._yAxisTitle._size = chart.yAxis.titleFont.size ? chart.yAxis.titleFont.size : defaultSize;
+		bar._yAxisTitle._size = chart.yAxis.titleFont.size ? chart.yAxis.titleFont.size : defaultFont;
 		bar._yAxisTitle._italic = chart.yAxis.titleFont.italic ? chart.yAxis.titleFont.italic : false;
 		bar._yAxisTitle._underline = chart.yAxis.titleFont.underline ? chart.yAxis.titleFont.underline : false;
 	}
@@ -1992,7 +1959,7 @@ function setFontChart(chart)
 		bar._otherProps._key_text_bold = chart.legend.font.bold ? chart.legend.font.bold : false;
 		bar._otherProps._key_text_color = chart.legend.font.color ? chart.legend.font.color : defaultColor;
 		bar._otherProps._key_text_font = chart.legend.font.name ? chart.legend.font.name : defaultFont;
-		bar._otherProps._key_text_size = chart.legend.font.size ? chart.legend.font.size : 10;
+		bar._otherProps._key_text_size = chart.legend.font.size ? chart.legend.font.size : defaultFont;
 		bar._otherProps._key_text_italic = chart.legend.font.italic ? chart.legend.font.italic : false;
 		bar._otherProps._key_text_underline = chart.legend.font.underline ? chart.legend.font.underline : false;
 	}
@@ -2036,4 +2003,231 @@ function setFontChart(chart)
 		bar._otherProps._text_font = defaultFont;
 		bar._otherProps._text_size = defaultSize;
 	}
+}
+function getFontProperties(type)
+{
+	var props = bar._otherProps;
+	var xAxisTitle = bar._xAxisTitle;
+	var yAxisTitle = bar._yAxisTitle;
+	var chartTitle = bar._chartTitle;
+	switch (type) {
+		case "xLabels":
+		{
+			return new Asc.FontProperties(props._xlabels_font,props._xlabels_size,props._xlabels_bold, props._xlabels_italic, props._xlabels_underline);
+		}
+		case "yLabels":
+		{
+			return new Asc.FontProperties(props._ylabels_font, props._ylabels_size, props._ylabels_bold, props._ylabels_italic, props._ylabels_underline);
+		}
+		case "xTitle":
+		{
+			return new Asc.FontProperties(xAxisTitle._font, xAxisTitle._size, xAxisTitle._bold, xAxisTitle._italic, xAxisTitle._underline);
+		}
+		case "yTitle":
+		{
+			return new Asc.FontProperties(yAxisTitle._font, yAxisTitle._size, yAxisTitle._bold, yAxisTitle._italic, yAxisTitle._underline);
+		}
+		case "key":
+		{
+			return new Asc.FontProperties(props._key_text_font,props._key_text_size,props._key_text_bold, props._key_text_italic, props._key_text_underline);
+		}
+		case "title":
+		{
+			return new Asc.FontProperties(chartTitle._font, chartTitle._size, chartTitle._bold, chartTitle._italic, chartTitle._underline);
+		}
+		case "labelsAbove":
+		{
+			return new Asc.FontProperties(props._ylabels_labels_above_labels_above_font, props._labels_above_size, props._labels_above_bold, props._labels_above_italic, props._labels_above_underline);
+		}
+	}
+}
+function calculatePosiitionObjects(type)
+{
+	var context = OfficeExcel.drawingCtxCharts;
+	if(!context || !context.scaleFactor)
+		return false;
+	var scale = context.scaleFactor;
+	switch (type) {
+		case "xLabels":
+		{
+			//возвращаем только координату y, поскольку она зависит от величины маргина
+			var marginBottom = bar._chartGutter._bottom;
+			var ascFontXLabels = getFontProperties("xLabels");
+			context.setFont(ascFontXLabels);
+			var heigthTextLabelsOx = context.measureText((bar._otherProps._labels[0]).toString(),1);
+			//если имеется название оси
+			var heigthTextNameAxisOx = 0;
+			if(bar._xAxisTitle._vpos)
+			{
+				var ascFontXTitle = getFontProperties("xTitle");
+				context.setFont(ascFontXTitle);
+				//в дальнейшем коэффициэнт нужно убрать и вместо него должна быть высота автофигуры с текстом
+				var koff = 12*scale;
+				heigthTextNameAxisOx = 10 + context.measureText((bar._xAxisTitle._text).toString(),1).height + koff;
+			}
+			//отступ от оси до подписи значений			
+			marginOx = (marginBottom - (heigthTextLabelsOx.height + heigthTextNameAxisOx))/2;
+			return marginOx;
+		}
+		case "yLabels":
+		{
+			//возвращаем только координату x
+			var marginLeft = bar._chartGutter._left;
+			var ascFontXLabels = getFontProperties("xLabels");
+			context.setFont(ascFontXLabels);
+			var propsTextLabelsOy = getMaxPropertiesText(context,ascFontXLabels,bar._otherProps._labels);
+			var marginOy = bar._chartGutter._left - (12*scale);
+			return marginOy;
+		}
+		case "key_hpos":
+		{
+			if(bar._otherProps._key_halign == 'right')
+			{
+				if(bar._otherProps._key_color_shape == 'line')
+				{
+					var widthLine = 28;
+					//находим ширину текста легенды(то есть её максимального элемента), в дальнейшем будем возвращать ширину автофигуры
+					var font = getFontProperties("key");
+					var widthText = getMaxPropertiesText(context,font,bar._otherProps._key);
+					var widthKey = widthText.width + 2*scale + widthLine*scale;
+					//в MSExcel справа от легенды всегда остаётся такой маргин 
+					var marginRightFromKey = 12*scale;
+					var hpos = bar.canvas.width - widthKey - marginRightFromKey;
+					return hpos;
+				}
+				else
+				{
+					var widthLine = 8;
+					//находим ширину текста легенды(то есть её максимального элемента), в дальнейшем будем возвращать ширину автофигуры
+					var font = getFontProperties("key");
+					var widthText = getMaxPropertiesText(context,font,bar._otherProps._key);
+					var widthKey = widthText.width + 5 + widthLine;
+					//в MSExcel справа от легенды всегда остаётся такой маргин 
+					var marginRightFromKey = 12*scale;
+					var hpos = bar.canvas.width - widthKey - marginRightFromKey;
+					return hpos;
+				}
+			}
+			else if(bar._otherProps._key_halign == 'left')
+			{
+				//слева от легенды всегда расстояние 12px
+				return 12*scale;
+			}
+			else if(bar._otherProps._key_halign == 'bottom')
+			{
+				return bar.canvas.height - 7*scale;
+			}
+			else if(bar._otherProps._key_halign == 'top')
+			{
+				var font = getFontProperties("key");
+				var props = getMaxPropertiesText(context,font,bar._otherProps._key);
+				var heigthTextKey = (context.getHeightText()/0.75)*scale;
+				if(typeof(bar._chartTitle._text) == 'string' && bar._chartTitle._text != '')
+				{
+					var font = getFontProperties("title");
+					var axisTitleProp = getMaxPropertiesText(context,font, bar._chartTitle._text);
+					var hpos = (bar.canvas.width)/2 - axisTitleProp.width/2;
+					var heigthText = (context.getHeightText()/0.75)*scale;
+					return 7*scale + heigthTextKey + 7*scale + heigthText;
+				}
+				else
+				{
+					return 7*scale + heigthTextKey;
+				}
+			}
+		}
+		case "yAxisTitle":
+		{
+			// ***по дефолту в ms office отступ от левого края(или от легенды) 12px
+			var hpos;
+			var font = getFontProperties("yTitle");
+			var axisTitleProp = getMaxPropertiesText(context,font, bar._yAxisTitle._text);
+			var vpos = (bar.canvas.height - bar._chartGutter._bottom - bar._chartGutter._top)/2 + axisTitleProp.width/2 + bar._chartGutter._top;
+			var heigthText = (context.getHeightText()/0.75)*scale;
+			if(bar._otherProps._key_halign == 'left')
+			{
+				var widthLine = 8;
+				var diff = 5;
+				if(bar._otherProps._key_color_shape == 'line')
+				{
+					widthLine = 28;
+					diff = 2;
+				}
+				//находим ширину текста легенды(то есть её максимального элемента), в дальнейшем будем возвращать ширину автофигуры
+				var font = getFontProperties("key");
+				var widthText = getMaxPropertiesText(context,font,bar._otherProps._key);
+				var widthKey = widthText.width + diff*scale + widthLine*scale;
+				//складываем стандартный маргин от легенды + маргин от названия + ширину легенды + высоту текста названия
+				hpos = heigthText + widthKey + 6*scale + 12*scale;
+				return {x: hpos,y: vpos}
+			}
+			else
+			{
+				hpos = heigthText + 12*scale;
+				return {x: hpos,y: vpos}
+			}
+		}
+		case "xAxisTitle":
+		{
+			// ***по дефолту в ms office отступ от нижнего края(или от легенды) 14px
+			
+			var hpos;
+			var font = getFontProperties("xTitle");
+			var axisTitleProp = getMaxPropertiesText(context,font, bar._xAxisTitle._text);
+			var hpos = (bar.canvas.width - bar._chartGutter._left - bar._chartGutter._right)/2 - axisTitleProp.width/2 + bar._chartGutter._left;
+			var heigthText = (context.getHeightText()/0.75)*scale;
+			var ascenderText = (context.getAscenderText()/0.75)*scale;
+			if(bar._otherProps._key_halign == 'bottom')
+			{
+				var font = getFontProperties("key");
+				var heightText = getMaxPropertiesText(context,font,bar._otherProps._key);
+				var heightKey = (context.getHeightText()/0.75)*scale;
+				//складываем стандартный маргин от легенды + маргин от названия + ширину легенды + высоту текста названия
+				vpos = bar.canvas.height - 14*scale - 7*scale - heightKey;
+				return {x: hpos,y: vpos}
+			}
+			else
+			{
+				vpos = bar.canvas.height - 14*scale;
+				return {x: hpos,y: vpos}
+			}
+		}
+		case "title":
+		{
+			// ***по дефолту в ms office отступ от верхнего края(или от легенды) 7px
+			var hpos;
+			var font = getFontProperties("title");
+			var axisTitleProp = getMaxPropertiesText(context,font, bar._chartTitle._text);
+			var hpos = (bar.canvas.width)/2 - axisTitleProp.width/2;
+			var heigthText = (context.getHeightText()/0.75)*scale;
+			vpos = 7*scale + heigthText;
+			return {x: hpos,y: vpos}
+		}
+	}
+}
+function getMaxPropertiesText(context, font, text)
+{
+	context.setFont(font);
+	var result;
+	if(typeof text == "object")
+	{	
+		// в данном случае ищем максимальную ширину текста
+		var maxLength = 0;
+		var maxWord;
+		for(var i = 0; i < text.length; i++)
+		{
+			var lengthText = text[i].toString().length;
+			if(lengthText > maxLength)
+			{
+				maxLength = lengthText;
+				maxWord = text[i].toString();
+			}
+		}
+		result = context.measureText(maxWord,0);
+	}
+	else
+	{
+		result = context.measureText((text).toString(),0);
+	}
+	return result;
 }

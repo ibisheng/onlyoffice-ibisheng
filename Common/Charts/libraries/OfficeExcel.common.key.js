@@ -79,8 +79,13 @@
         var strokestyle  = '#333';
         var height       = 0;
         var width        = 0;
-
-
+		var scale = 1;
+		if(OfficeExcel.drawingCtxCharts && OfficeExcel.drawingCtxCharts.scaleFactor)
+			scale = OfficeExcel.drawingCtxCharts.scaleFactor;
+		
+		var sizeLine = 26*scale;
+		if(bar._otherProps._key_color_shape != 'line')
+			sizeLine = 8*scale;
         obj.coordsKey = [];
 
 
@@ -120,19 +125,12 @@
         /**
         * Horizontal alignment
         */
-        /*if (typeof(obj._otherProps._key_halign) == 'string') {
-            if (obj._otherProps._key_halign == 'left') {
-                hpos = gutterLeft + 10;
-            } else if (obj._otherProps._key_halign == 'right') {
-                hpos = OfficeExcel.GetWidth(obj) - gutterRight  - width;
-            }
-        }*/
         
-        
-        
-        
+		var scale = 1;
+		if(OfficeExcel.drawingCtxCharts && OfficeExcel.drawingCtxCharts.scaleFactor)
+			scale = OfficeExcel.drawingCtxCharts.scaleFactor;
         var widthAllKey = 70*(key.length);
-        if((obj._otherProps._key_halign == 'top' || obj._otherProps._key_halign == 'bottom' ))
+        /*if((obj._otherProps._key_halign == 'top' || obj._otherProps._key_halign == 'bottom' ))
 		{
             if(widthAllKey > obj.canvas.width - 50)
 			{
@@ -143,33 +141,52 @@
                 key = obj._otherProps._key;
 			}
             widthAllKey = 70*(key.length);
+		}*/
+		
+		var drwContext = OfficeExcel.drawingCtxCharts;
+		var font = getFontProperties("key");
+		if(obj._otherProps._key_halign == 'top' || obj._otherProps._key_halign == 'bottom' && key.length != 0)
+		{
+			widthAllKey = 0;
+			var widthEveryElemKey = [];
+			for(var l = 0; l < key.length; l++)
+			{
+				var props1 = getMaxPropertiesText(drwContext,font,key[l]);
+				widthAllKey += props1.width + (3)*scale + sizeLine;
+				widthEveryElemKey[l] = props1.width + (3)*scale + sizeLine;
+			}
 		}
-        
-        var heightKeyVer = key.length*24;
+		
+		heigthTextKey = 24;
+		if(key && key.length != 0)
+		{
+			var props = getMaxPropertiesText(drwContext,font,bar._otherProps._key);
+			heigthTextKey = (drwContext.getHeightText()/0.75)*scale;
+		}
+		
+        var heightKeyVer = key.length*heigthTextKey;
+		
         var heightKey = 24;
         var widthKey = textWidth*key.length + key.length*30 + 11*(key.length-1);
         //var widthKeyVer = textWidth + 30;
-        var widthKeyVer = 31 + 30;
+        var widthKeyVer = 61;
         //var margin = obj._chartGutter._top - 14;
         
         if (typeof(obj._otherProps._key_halign) == 'string') {
             if (obj._otherProps._key_halign == 'left') {
-                hpos = 20;
+                hpos = calculatePosiitionObjects("key_hpos");
                 vpos = canvas.height/2 - heightKeyVer/2;
             } else if (obj._otherProps._key_halign == 'right') {
-                hpos = canvas.width -  widthKeyVer - 10;
+                hpos = calculatePosiitionObjects("key_hpos");
                 vpos = canvas.height/2 - heightKeyVer/2;
             }
             else if (obj._otherProps._key_halign == 'top') {
                 hpos = canvas.width/2 - widthAllKey/2;
-                if(obj._chartTitle._text != null && obj._chartTitle._text != '')
-                    vpos = text_size + 20 + obj._chartTitle._size + 20;
-                else
-                    vpos = text_size + 20;
+                vpos = calculatePosiitionObjects("key_hpos");
             }
             else if (obj._otherProps._key_halign == 'bottom') {
                 hpos = canvas.width/2 - widthAllKey/2;
-                vpos = canvas.height - 10;
+                vpos = calculatePosiitionObjects("key_hpos");
             }
         }
 
@@ -245,19 +262,17 @@
                 if('hbar' != obj.type)
                     key = OfficeExcel.array_reverse(key)
             }
-            var horPos = false;
-            if(obj._otherProps._key_halign == 'bottom' || obj._otherProps._key_halign == 'top')
-            {
-                horPos = true;
-                //colors = OfficeExcel.array_reverse(colors)
-                //key = OfficeExcel.array_reverse(key)
-            }
            
-            if(horPos)
+            if(obj._otherProps._key_halign == 'bottom' || obj._otherProps._key_halign == 'top')
             {
                  for (var i=0; i<key.length; i++) {
                 // Draw the blob of color
-                    
+                    var leftDiff = 0;
+					for(var n = 0 ; n < i; n++)
+					{
+						leftDiff += widthEveryElemKey[n];
+					}
+					
                 
                     if (obj._otherProps._key_color_shape == 'circle') {
                         context.beginPath();
@@ -271,14 +286,14 @@
                             context.strokeStyle = colors[i];
                             context.lineWidth = '2.7'
 
-                                context.moveTo(hpos + (65 * i) + (text_size * i) ,vpos - text_size);
-                                context.lineTo(hpos + blob_size + (65 * i) + (text_size * i) + 16, vpos - text_size);
+                                context.moveTo(hpos + leftDiff + 2*scale,vpos - props.height/2);
+                                context.lineTo(hpos + leftDiff + sizeLine + 2*scale, vpos - props.height/2);
 
                         context.stroke();
 
                     } else {
                         context.fillStyle =  colors[i];
-                        context.fillRect(hpos + blob_size + (65 * i) + (text_size * i), vpos  - text_size - 10, text_size - 2, text_size + 1 - 2);
+                        context.fillRect(hpos + leftDiff + 2*scale, vpos - 7*scale, 7*scale, 7*scale);
                         //context.fillRect(hpos, vpos + (10 * j) + (text_size * j) - text_size, 22, obj._otherProps._linewidth);
                     }
 
@@ -288,8 +303,8 @@
                      OfficeExcel.Text(context,
                             text_font,
                             text_size,
-                            hpos + blob_size + (65 * i) + (text_size * i) + 19,
-                            vpos-text_size,
+                            hpos + leftDiff + sizeLine + 3*scale,
+                            vpos,
                             key[i]);
                 }
             }
@@ -301,7 +316,7 @@
                     
                     // Draw the blob of color
                         
-                    
+                    var diffKeyAndLine = 3*scale;
                     if (obj._otherProps._key_color_shape == 'circle') {
                         context.beginPath();
                             context.strokeStyle = 'rgba(0,0,0,0)';
@@ -314,16 +329,16 @@
                             context.strokeStyle = colors[i];
                             context.lineWidth = '2.7'
 
-                            context.moveTo(hpos - 8, vpos + (15 * j) + (text_size * j) - text_size + (blob_size / 2));
-                            context.lineTo(hpos + blob_size + 8, vpos + (15 * j) + (text_size * j) - text_size + (blob_size / 2));
+                            context.moveTo(hpos, vpos + heigthTextKey*j - heigthTextKey + (heigthTextKey / 2));
+                            context.lineTo(hpos + sizeLine, vpos + heigthTextKey*j - heigthTextKey + (heigthTextKey / 2));
                             //context.moveTo(hpos + 5, vpos + (5 * j) + (text_size * j) - text_size + (blob_size / 2));
                             //context.lineTo(hpos + blob_size + 5, vpos + (5 * j) + (text_size * j) - text_size + (blob_size / 2));
                         context.stroke();
 
                     } else {
                         context.fillStyle =  colors[i];
-                        context.fillRect(hpos + 5 + 2, vpos + (15 * j) + (text_size * j) - text_size, text_size - 2, text_size + 1 - 2);
-                        //context.fillRect(hpos, vpos + (10 * j) + (text_size * j) - text_size, 22, obj._otherProps._linewidth);
+                        context.fillRect(hpos, vpos + heigthTextKey*j - props.height/2 - 7*scale, 7*scale, 7*scale);
+                        diffKeyAndLine = 5;
                     }
 
                     context.beginPath();
@@ -333,8 +348,8 @@
                     OfficeExcel.Text(context,
                             text_font,
                             text_size,
-                            hpos + blob_size + 5 + 5,
-                            vpos + (15 * j) + (text_size * j),
+                            hpos + sizeLine + diffKeyAndLine,
+                            vpos + heigthTextKey*j - props.height/2,
                             key[i]);
                 }
             }

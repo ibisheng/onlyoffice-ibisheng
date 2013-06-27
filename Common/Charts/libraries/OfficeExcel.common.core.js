@@ -1743,10 +1743,10 @@
 	
 	OfficeExcel.drawTurnedText = function(drawingCtx,textOptions, text, angle)
 	{
-		var cx = textOptions.x; // center offset x
-		var cy = textOptions.y; // center offset y
-		var textWidth = textOptions.width;  // NOTE: measure text (width * 0.5)
-		var textHeight = textOptions.height; // NOTE: measure text (height * 0.5)
+		var cx = textOptions.x;
+		var cy = textOptions.y;
+		var textWidth = 0;
+		var textHeight = 0;
 		var font = textOptions.font;
 		var size = textOptions.size;
 		var asc = Asc; 
@@ -1966,7 +1966,10 @@
     */
     OfficeExcel.DrawTitle = function (canvas, text, gutterTop)
     {
-        var obj          = canvas.__object__;
+
+		var obj          = canvas.__object__;
+		if(obj._chartTitle._text == '')
+			return;
         var context      = canvas.getContext('2d');
         var gutterLeft   = obj._chartGutter._left;
         var gutterRight  = obj._chartGutter._right;
@@ -2050,7 +2053,13 @@
             vpos = obj._chartTitle._vpos;
             vCenter = 'bottom';
         }
-        OfficeExcel.Text(context, font, size, centerx, vpos, text, vCenter, 'center', bgcolor != null, null, bgcolor, bold, null, textOptions);
+		var props = calculatePosiitionObjects("title");
+		if(props)
+		{
+			centerx = props.x;
+			vpos = props.y;
+		}
+        OfficeExcel.Text(context, font, size, centerx, vpos, text, null, null, bgcolor != null, null, bgcolor, bold, null, textOptions);
         
         // Reset the fill colour
         context.fillStyle = oldColor;
@@ -2302,6 +2311,9 @@
                 vpos = obj._xAxisTitle._vpos
             if (obj._xAxisTitle._hpos != 'null')
                 hpos = obj._xAxisTitle._hpos
+			var props = calculatePosiitionObjects("xAxisTitle");
+			hpos = props.x;
+			vpos = props.y;
             context.beginPath();
             OfficeExcel.Text(context,
                         font,
@@ -2309,8 +2321,8 @@
                         hpos,
                         vpos,
                         obj._xAxisTitle._text,
-                        'center',
-                        'center',
+                        null,
+                        null,
                         false,
                         false,
                         false,
@@ -2355,13 +2367,18 @@
                                                                      obj.canvas.width - obj._chartGutter._right + obj._otherProps._text_size + 5;
             } else
                 hpos = hpos;
+			
             if(obj._yAxisTitle._angle != 'null' && obj._yAxisTitle._angle != undefined)
                 angle = obj._yAxisTitle._angle;
             if (obj._yAxisTitle._vpos != 'null')
                 vpos = obj._yAxisTitle._vpos;
             if (obj._yAxisTitle._hpos != 'null')
                 hpos = obj._yAxisTitle._hpos;
-
+			
+			var props = calculatePosiitionObjects("yAxisTitle");
+			hpos = props.x;
+			vpos = props.y;
+			
             context.beginPath();
             OfficeExcel.Text(context,
                 font,
@@ -2370,7 +2387,7 @@
                 vpos,
                 obj._yAxisTitle._text,
                 'center',
-                'right',//change with center
+                null,//change with center
                 false,
                 angle,
                 false,
@@ -2509,7 +2526,7 @@
         }
 
         // Draw the title if one is set
-        if ( typeof(obj._chartTitle._text) == 'string') {
+        if ( typeof(obj._chartTitle._text) == 'string' && obj._chartTitle._text != '') {
 
             if (obj.type == 'gantt') {
                 gutterTop -= 10;
