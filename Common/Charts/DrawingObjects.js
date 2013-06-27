@@ -1677,6 +1677,7 @@ function asc_CChartSeria() {
 	this.Marker = { Size: null, Symbol: null };
 	this.OutlineColor = null;
 	this.FormatCode = "";
+	this.LabelFont = new asc_CChartFont();
 
 	this.Properties = {
 		ValFormula: 0,
@@ -1687,7 +1688,8 @@ function asc_CChartSeria() {
 		MarkerSize: 5,
 		MarkerSymbol: 6,
 		OutlineColor: 7,
-		FormatCode: 8
+		FormatCode: 8,
+		LabelFont: 9
 	};
 }
 
@@ -1734,6 +1736,7 @@ asc_CChartSeria.prototype = {
 			case this.Properties.MarkerSymbol: return this.Marker.Symbol; break;
 			case this.Properties.OutlineColor: return this.OutlineColor; break;
 			case this.Properties.FormatCode: return this.FormatCode; break;
+			case this.Properties.LabelFont: return this.LabelFont; break;
 		}
 	},
 
@@ -1748,6 +1751,7 @@ asc_CChartSeria.prototype = {
 			case this.Properties.MarkerSymbol: this.Marker.Symbol = value; break;
 			case this.Properties.OutlineColor: this.OutlineColor = value; break;
 			case this.Properties.FormatCode: this.FormatCode = value; break;
+			case this.Properties.LabelFont: this.LabelFont = value; break;
 		}
 	}
 }

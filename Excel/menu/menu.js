@@ -659,7 +659,11 @@
 	function addClassIconPress(a){
 		a.addClass("iconPressed");
 	}
-	$("#td_sort_desc,#td_sort_asc,#td_text_wrap, #td_redo, #td_undo, #td_bold, #td_italic, #td_underline, #td_print, #td_copy, #td_paste,#td_cut, #td_ta_center, #td_ta_right, #td_ta_left, #td_ta_justify, #td_mergeCells, #td_recalc, #td_insert_chart, #td_insert_image_url, #td_insert_image_file, #td_drawing_object_layer, #td_add_cell_comment, #td_add_document_comment, #td_add_hyperlink, #td_auto_filter, #td_auto_filter_local").click(function(){
+	$("#td_sort_desc,#td_sort_asc,#td_text_wrap, #td_redo, #td_undo, #td_bold, #td_italic, #td_underline, \
+		#td_print, #td_copy, #td_paste,#td_cut, #td_ta_center, #td_ta_right, #td_ta_left, #td_ta_justify, \
+		#td_mergeCells, #td_recalc, #td_insert_chart, #td_insert_image_url, #td_insert_image_file, #td_drawing_object_layer, \
+		#td_add_cell_comment, #td_add_document_comment, #td_add_hyperlink, #td_auto_filter, #td_auto_filter_local, \
+		#td_set_fixed_area, #td_clean_fixed_area").click(function(){
 		switch (this.id){
 			case "td_bold":{
 				if ($(this).hasClass("iconPressed")){
@@ -860,6 +864,12 @@
 			}
 			case "td_auto_filter_local":{
 				showAddFilterDialog();
+				break;
+			}
+			case "td_set_fixed_area":{
+				break;
+			}
+			case "td_clean_fixed_area":{
 				break;
 			}
 		}
@@ -1568,7 +1578,7 @@
 	function showDrawingLayerDialog() {
 		BuildDrawingObjectLayerMenu();
 
-		$("#drawingObjectsLayerMenu").dialog({ autoOpen: false, closeOnEscape: false, height: 'auto', width: 400,
+		$("#drawingObjectsLayerMenu").dialog({ autoOpen: false, closeOnEscape: true, height: 'auto', width: 400,
 					resizable: false, modal: true, title: "Drawing layer", draggable: true,
 					open: function() {
 					},
@@ -2047,6 +2057,7 @@
 		});
 		addFilterDialog.dialog("open");
 	}
+	
 	// Charts
 	function showChartDialog() {
 		var chart = api.asc_getChartObject();
@@ -2062,15 +2073,24 @@
 		chartForm.find("#titlesField").show();
 		chartForm.find("#legendField").show();
 		chartForm.find("#typeField").show();
+		
+		function setTitleFont() { showChartFontDialog(chart.asc_getHeader().asc_getFont()) }
+		function setAxisXFont() { showChartFontDialog(chart.asc_getXAxis().asc_getTitleFont()) }
+		function setAxisYFont() { showChartFontDialog(chart.asc_getYAxis().asc_getTitleFont()) }
 
 		api.asc_setSelectDialogRangeMode(true);
 
 		chartForm.css("visibility", "visible");
-		chartForm.dialog({ autoOpen: false, closeOnEscape: false, height: 'auto', width: 400,
+		chartForm.dialog({ autoOpen: false, closeOnEscape: true, height: 'auto', width: 400,
 					resizable: false, modal: true, title: "Chart properties", draggable: true,
 					open: function() {
 						if (!bIsUpdateChartProperties)
 							return;
+							
+						// chart font binding
+						chartForm.find("#chartTitleFont").bind("click", setTitleFont);
+						chartForm.find("#chartAxisXFont").bind("click", setAxisXFont);
+						chartForm.find("#chartAxisYFont").bind("click", setAxisYFont);
 						
 						bIsUpdateChartProperties = false;
 						api.asc_enableKeyEvents(false);
@@ -2120,9 +2140,7 @@
 							click: function() {
 
 								var chartForm = $("#chartSelector");
-								var chart = api.asc_getChartObject();
 								var isSelected = (chart.type != null) && (chart.type != "");
-
 								var range = chart.asc_getRange();
 									
 								if ( !api.asc_checkChartInterval(chartForm.find("#chartType").val(),chartForm.find("#chartSubType").val(),chartForm.find("#chartRange").val(),chartForm.find("#dataRows").is(":checked")) )
@@ -2194,11 +2212,66 @@
 						if (!bIsReopenDialog)
 							api.asc_setSelectDialogRangeMode(false);
 						api.asc_enableKeyEvents(true);
+						
+						// chart font unbinding
+						chartForm.find("#chartTitleFont").unbind("click", setTitleFont);
+						chartForm.find("#chartAxisXFont").unbind("click", setAxisXFont);
+						chartForm.find("#chartAxisYFont").unbind("click", setAxisYFont);
 					},
 					create: function() {
 					}
 		});
 		chartForm.dialog("open");
+	}
+	
+	function showChartFontDialog(fontObject) {
+		
+		var chartFontForm = $("#chartFontSelector");	
+
+		chartFontForm.css("visibility", "visible");
+		chartFontForm.dialog({ autoOpen: false, closeOnEscape: true, height: 'auto', width: 190,
+					resizable: false, modal: true, title: "Chart font", draggable: true,
+					open: function() {
+						chartFontForm.find("#fontName").val(fontObject.asc_getName());
+						chartFontForm.find("#fontSize").val(fontObject.asc_getSize());
+						chartFontForm.find("#fontColor").val(fontObject.asc_getColor());
+						
+						chartFontForm.find("#fontBold").attr("checked", fontObject.asc_getBold() == 1);
+						chartFontForm.find("#fontItalic").attr("checked", fontObject.asc_getItalic() == 1);
+						chartFontForm.find("#fontUnderline").attr("checked", fontObject.asc_getUnderline() == 1);
+					},
+					buttons: [
+						{
+							text: "Ok",
+							click: function() {
+								
+								fontObject.asc_setName( chartFontForm.find("#fontName").val() );
+								fontObject.asc_setSize( parseInt(chartFontForm.find("#fontSize").val()) );
+								fontObject.asc_setColor( chartFontForm.find("#fontColor").val() );
+								
+								fontObject.asc_setBold(chartFontForm.find("#fontBold").is(":checked") ? 1 : 0);
+								fontObject.asc_setItalic(chartFontForm.find("#fontItalic").is(":checked") ? 1 : 0);
+								fontObject.asc_setUnderline(chartFontForm.find("#fontUnderline").is(":checked") ? 1: 0);
+								
+								$(this).dialog("close");
+							}
+						},
+						{
+							text: "Cancel",
+							click: function() {
+								$(this).dialog("close");
+							}
+						}
+					],
+					close: function() {
+						if (!bIsReopenDialog)
+							api.asc_setSelectDialogRangeMode(false);
+						api.asc_enableKeyEvents(true);
+					},
+					create: function() {
+					}
+		});
+		chartFontForm.dialog("open");
 	}
 		
 	// Images

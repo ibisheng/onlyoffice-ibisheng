@@ -1878,7 +1878,7 @@
 				}
 				//draw auto filters
 				this.autoFilters.drawAutoF(this);
-				this.objectRender.showDrawingObjects(true, null/*printOptions*/, true/*bUpdateCharts*/);
+				this.objectRender.showDrawingObjects(false, null/*printOptions*/, true/*bUpdateCharts*/);
 				this.cellCommentator.drawCommentCells(false);
 
 				return this;
@@ -3486,6 +3486,8 @@
 					t.objectRender.clearUndoRedoDrawingObject();
 					
 				t.overlayCtx.ctx.globalAlpha = 1;
+				if ( objectId )
+					t.objectRender.selectDrawingObject(t.objectRender.getSelectedDrawingObjectIndex());
 			},
 
 

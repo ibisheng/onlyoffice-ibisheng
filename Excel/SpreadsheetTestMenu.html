@@ -75,7 +75,7 @@
 		<script type="text/javascript" src="model/AdvancedOptions.js"></script>
 		<script type="text/javascript" src="model/History.js"></script>
 		<script type="text/javascript" src="model/UndoRedo.js"></script>
-
+		
 		<script type="text/javascript" src="view/scroll.js"></script>
 		<script type="text/javascript" src="view/StringRender.js"></script>
 		<script type="text/javascript" src="view/CellTextRender.js"></script>
@@ -1591,6 +1591,23 @@
                     </li>
                 </ul>
             </td>
+			<td class="cp toolbarSep" style="vertical-align: top; width: 15px;min-width:15px;">
+                <div class="sepMenu ToolbarIconOut" style="position: absolute; background: url('menu/img/sep.png') repeat-y scroll 0pt 0pt transparent; margin-top: -7px; height: 65px; margin-left: 6px;"></div>
+            </td>
+			<td>
+                <ul class="noListStyle">
+                    <li class="ToolbarIconOut selectableIcon" title="Set fixed area">
+                        <div id="td_set_fixed_area" class="iconToolbar">
+                            <img class="ToolbarIcon FixedArea" src="menu/img/spacer.gif"/>
+                        </div>
+                    </li>
+                    <li class="ToolbarIconOut selectableIcon" title="Clean fixed area">
+                        <div id="td_clean_fixed_area" class="iconToolbar">
+                            <img class="ToolbarIcon FixedAreaClean" src="menu/img/spacer.gif"/>
+                        </div>
+                    </li>
+                </ul>
+			</td>
             <td class="cp toolbarSep" style="vertical-align: top; width: 15px;min-width:15px;">
                 <div class="sepMenu ToolbarIconOut" style="position: absolute; background: url('menu/img/sep.png') repeat-y scroll 0pt 0pt transparent; margin-top: -7px; height: 65px; margin-left: 6px;"></div>
             </td>
@@ -2041,6 +2058,14 @@
 			</td></tr>
 		</table>
 	</div>
+	<div id='chartFontSelector' style='font-size: 12px;'>
+		<input type='text' style='margin-left: 10px;' id='fontName' value='Calibri'>
+		<input type='text' style='margin-left: 10px;' id='fontSize' value='10'>
+		<input type='text' style='margin-left: 10px;' id='fontColor' value='Black'>
+		<input type='checkbox' id='fontBold' checked style='margin-left: 10px;'>Bold<br>
+		<input type='checkbox' id='fontItalic' checked style='margin-left: 10px;'>Italic<br>
+		<input type='checkbox' id='fontUnderline' checked style='margin-left: 10px;'>Underline<br>
+	</div>
     <div id='drawingObjectsMenu'>
         <div id='imageSelector' style='font-size: 12px; visibility: hidden;'>
             <input type='text' id='imageSelectorUrl' style='width: 340px; margin: 10px;'/>
@@ -2085,11 +2110,11 @@
             </fieldset>
             <fieldset id="titlesField">
                 <legend>Titles</legend>
-                <input type='text' style='margin-left: 10px;' id='chartTitle' value='Diagramm'><br>
+                <input type='text' style='margin-left: 10px;' id='chartTitle' value='Diagramm'><img class="menuChartFont" id="chartTitleFont" src="menu/img/chartFont.png"/><br>
                 <span style='margin-left: 10px;'>X axis title</span>
-                <input type='text' style='margin-left: 10px;' id='xAxisTitle' value='X axis'><br>
+                <input type='text' style='margin-left: 10px;' id='xAxisTitle' value='X axis'><img class="menuChartFont" id="chartAxisXFont" src="menu/img/chartFont.png"/><br>
                 <span style='margin-left: 10px;'>Y axis title</span>
-                <input type='text' style='margin-left: 10px;' id='yAxisTitle' value='Y axis'><br>
+                <input type='text' style='margin-left: 10px;' id='yAxisTitle' value='Y axis'><img class="menuChartFont" id="chartAxisYFont" src="menu/img/chartFont.png"/><br>
                 <input type='checkbox' id='valueShow' style='margin-left: 10px;'>Show values
 				<input type='checkbox' id='borderShow' style='margin-left: 10px;'>Show border<br>
             </fieldset>
