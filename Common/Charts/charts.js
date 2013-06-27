@@ -2176,7 +2176,6 @@ function calculatePosiitionObjects(type)
 			var axisTitleProp = getMaxPropertiesText(context,font, bar._xAxisTitle._text);
 			var hpos = (bar.canvas.width - bar._chartGutter._left - bar._chartGutter._right)/2 - axisTitleProp.width/2 + bar._chartGutter._left;
 			var heigthText = (context.getHeightText()/0.75)*scale;
-			var ascenderText = (context.getAscenderText()/0.75)*scale;
 			if(bar._otherProps._key_halign == 'bottom')
 			{
 				var font = getFontProperties("key");
