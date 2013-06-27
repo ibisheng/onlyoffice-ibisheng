@@ -1758,7 +1758,7 @@ Slide:xg
 c_oSerWrapTopBottom$DistT:eX
 afm_parser_next_key:Jp
 c_oSer_CommentsType$UserName:AX
-JSCompiler_StaticMethods_calculateAfterOpen3:CH
+JSCompiler_StaticMethods_calculateAfterOpen3:BH
 c_oSerProp_pPrType$WidowControl:QU
 historyitem_SetSizesInGroup:XG
 Round_Up_To_Grid:Nu
@@ -1799,7 +1799,7 @@ FileStream:kg
 JSCompiler_StaticMethods_CheckRectT:$Z
 JSCompiler_StaticMethods_Internal_CheckMerge:XS
 c_oSer_pgMarType$Right:sX
-c_oAscServerError$UploadExtension:hf
+c_oAscServerError$UploadExtension:gf
 JSCompiler_StaticMethods_Create_AbstractNum:Sd
 MATRIX_ORDER_APPEND:jD
 historyitem_RemoveFromSpTree:rH
@@ -2369,7 +2369,7 @@ JSCompiler_StaticMethods_WriteCellPr:VY
 findPrevValue:Dl
 CSld:DI
 cff_index_get_pointers:jx
-T1_GlyphSlot_Init:Fy
+T1_GlyphSlot_Init:Ey
 JSCompiler_StaticMethods_Statistics_OnPage:rQ
 c_oSer_ClrSchemeMappingType$T1:XX
 raster_memory:jt
@@ -2699,7 +2699,7 @@ JSCompiler_StaticMethods__read_rPr:zd
 ft_bitmap_glyph_init:Pm
 TT_Post_NamesRec:Xn
 Get_Kerning:$y
-L 43:gf
+L 43:hf
 HSLToRGB:VZ
 L 42:Od
 changestype_Paragraph_Content:VB

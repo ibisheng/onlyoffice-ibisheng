@@ -850,6 +850,8 @@ var:getURLParameter
 ---
 var:spellCheck
 ---
+var:_onSpellCheck_Callback2
+---
 var:sendCommand
 ---
 var:_downloadAs
@@ -1801,6 +1803,7 @@ asc_CCommentData.prototype['asc_addReply'] = asc_CCommentData.prototype.asc_addR
 asc_CCommentData.prototype['asc_getRepliesCount'] = asc_CCommentData.prototype.asc_getRepliesCount;
 window['getURLParameter'] = getURLParameter;
 window['spellCheck'] = spellCheck;
+window['_onSpellCheck_Callback2'] = _onSpellCheck_Callback2;
 window['sendCommand'] = sendCommand;
 window['_downloadAs'] = _downloadAs;
 window['_addImageUrl2'] = _addImageUrl2;
