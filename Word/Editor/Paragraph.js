@@ -1841,9 +1841,9 @@ Paragraph.prototype =
                 if ( 0 === this.Pages[CurPage].FirstLine )
                 {
                     if ( ( true === ParaPr.Brd.First || 1 === CurPage ) && border_Single === ParaPr.Brd.Top.Value )
-                        TempDy += ParaPr.Brd.Top.Size;
+                        TempDy += ParaPr.Brd.Top.Size + ParaPr.Brd.Top.Space;
                     else if ( false === ParaPr.Brd.First && border_Single === ParaPr.Brd.Between.Value )
-                        TempDy += ParaPr.Brd.Between.Size;
+                        TempDy += ParaPr.Brd.Between.Size + ParaPr.Brd.Between.Space;
                 }
 
                 var Top, Bottom;
@@ -1866,15 +1866,15 @@ Paragraph.prototype =
                             Bottom  = Top + ParaPr.Spacing.Before + this.Lines[0].Metrics.Ascent + this.Lines[0].Metrics.Descent + this.Lines[0].Metrics.LineGap;
                             if ( true === ParaPr.Brd.First && border_Single === ParaPr.Brd.Top.Value )
                             {
-                                Top2    += ParaPr.Brd.Top.Size;
-                                Bottom2 += ParaPr.Brd.Top.Size;
-                                Bottom  += ParaPr.Brd.Top.Size;
+                                Top2    += ParaPr.Brd.Top.Size + ParaPr.Brd.Top.Space;
+                                Bottom2 += ParaPr.Brd.Top.Size + ParaPr.Brd.Top.Space;
+                                Bottom  += ParaPr.Brd.Top.Size + ParaPr.Brd.Top.Space;
                             }
                             else if ( false === ParaPr.Brd.First && border_Single === ParaPr.Brd.Between.Value )
                             {
-                                Top2    += ParaPr.Brd.Between.Size;
-                                Bottom2 += ParaPr.Brd.Between.Size;
-                                Bottom  += ParaPr.Brd.Between.Size;
+                                Top2    += ParaPr.Brd.Between.Size + ParaPr.Brd.Between.Space;
+                                Bottom2 += ParaPr.Brd.Between.Size + ParaPr.Brd.Between.Space;
+                                Bottom  += ParaPr.Brd.Between.Size + ParaPr.Brd.Between.Space;
                             }
                         }
                         else
@@ -1885,9 +1885,9 @@ Paragraph.prototype =
 
                             if ( border_Single === ParaPr.Brd.Top.Value )
                             {
-                                Top2    += ParaPr.Brd.Top.Size;
-                                Bottom2 += ParaPr.Brd.Top.Size;
-                                Bottom  += ParaPr.Brd.Top.Size;
+                                Top2    += ParaPr.Brd.Top.Size + ParaPr.Brd.Top.Space;
+                                Bottom2 += ParaPr.Brd.Top.Size + ParaPr.Brd.Top.Space;
+                                Bottom  += ParaPr.Brd.Top.Size + ParaPr.Brd.Top.Space;
                             }
                         }
                     }
@@ -1902,8 +1902,16 @@ Paragraph.prototype =
                         Bottom += ParaPr.Spacing.After;
 
                         // Если нижняя граница Between, тогда она учитывается в следующем параграфе
-                        if ( true === ParaPr.Brd.Last && border_Single === ParaPr.Brd.Bottom.Value )
-                            Bottom += ParaPr.Brd.Bottom.Size;
+                        if ( true === ParaPr.Brd.Last )
+                        {
+                            if ( border_Single === ParaPr.Brd.Bottom.Value )
+                                  Bottom += ParaPr.Brd.Bottom.Size + ParaPr.Brd.Bottom.Space;
+                        }
+                        else
+                        {
+                            if ( border_Single === ParaPr.Brd.Between.Value )
+                                Bottom += ParaPr.Brd.Between.Space;
+                        }
 
                         if ( false === this.Parent.Is_TableCellContent() && Bottom > this.YLimit && Bottom - this.YLimit <= ParaPr.Spacing.After )
                             Bottom = this.YLimit;
@@ -1932,8 +1940,16 @@ Paragraph.prototype =
                                 Bottom += ParaPr.Spacing.After;
 
                                 // Если нижняя граница Between, тогда она учитывается в следующем параграфе
-                                if ( true === ParaPr.Brd.Last && border_Single === ParaPr.Brd.Bottom.Value )
-                                    Bottom += ParaPr.Brd.Bottom.Size;
+                                if ( true === ParaPr.Brd.Last )
+                                {
+                                    if ( border_Single === ParaPr.Brd.Bottom.Value )
+                                        Bottom += ParaPr.Brd.Bottom.Size + ParaPr.Brd.Bottom.Space;
+                                }
+                                else
+                                {
+                                    if ( border_Single === ParaPr.Brd.Between.Value )
+                                        Bottom += ParaPr.Brd.Between.Space;
+                                }
 
                                 if ( false === this.Parent.Is_TableCellContent() && Bottom > this.YLimit && Bottom - this.YLimit <= ParaPr.Spacing.After )
                                     Bottom = this.YLimit;
@@ -1958,8 +1974,16 @@ Paragraph.prototype =
                                 Bottom += ParaPr.Spacing.After;
 
                                 // Если нижняя граница Between, тогда она учитывается в следующем параграфе
-                                if ( true === ParaPr.Brd.Last && border_Single === ParaPr.Brd.Bottom.Value )
-                                    Bottom += ParaPr.Brd.Bottom.Size;
+                                if ( true === ParaPr.Brd.Last )
+                                {
+                                    if ( border_Single === ParaPr.Brd.Bottom.Value )
+                                        Bottom += ParaPr.Brd.Bottom.Size + ParaPr.Brd.Bottom.Space;
+                                }
+                                else
+                                {
+                                    if ( border_Single === ParaPr.Brd.Between.Value )
+                                        Bottom += ParaPr.Brd.Between.Space;
+                                }
 
                                 if ( false === this.Parent.Is_TableCellContent() && Bottom > this.YLimit && Bottom - this.YLimit <= ParaPr.Spacing.After )
                                     Bottom = this.YLimit;
@@ -1986,15 +2010,15 @@ Paragraph.prototype =
 
                             if ( true === ParaPr.Brd.First && border_Single === ParaPr.Brd.Top.Value )
                             {
-                                Top2    += ParaPr.Brd.Top.Size;
-                                Bottom2 += ParaPr.Brd.Top.Size;
-                                Bottom  += ParaPr.Brd.Top.Size;
+                                Top2    += ParaPr.Brd.Top.Size + ParaPr.Brd.Top.Space;
+                                Bottom2 += ParaPr.Brd.Top.Size + ParaPr.Brd.Top.Space;
+                                Bottom  += ParaPr.Brd.Top.Size + ParaPr.Brd.Top.Space;
                             }
                             else if ( false === ParaPr.Brd.First && border_Single === ParaPr.Brd.Between.Value )
                             {
-                                Top2    += ParaPr.Brd.Between.Size;
-                                Bottom2 += ParaPr.Brd.Between.Size;
-                                Bottom  += ParaPr.Brd.Between.Size;
+                                Top2    += ParaPr.Brd.Between.Size + ParaPr.Brd.Between.Space;
+                                Bottom2 += ParaPr.Brd.Between.Size + ParaPr.Brd.Between.Space;
+                                Bottom  += ParaPr.Brd.Between.Size + ParaPr.Brd.Between.Space;
                             }
                         }
                         else
@@ -2005,9 +2029,9 @@ Paragraph.prototype =
 
                             if ( border_Single === ParaPr.Brd.Top.Value )
                             {
-                                Top2    += ParaPr.Brd.Top.Size;
-                                Bottom2 += ParaPr.Brd.Top.Size;
-                                Bottom  += ParaPr.Brd.Top.Size;
+                                Top2    += ParaPr.Brd.Top.Size + ParaPr.Brd.Top.Space;
+                                Bottom2 += ParaPr.Brd.Top.Size + ParaPr.Brd.Top.Space;
+                                Bottom  += ParaPr.Brd.Top.Size + ParaPr.Brd.Top.Space;
                             }
                         }
 
@@ -2016,8 +2040,16 @@ Paragraph.prototype =
                             Bottom += ParaPr.Spacing.After;
 
                             // Если нижняя граница Between, тогда она учитывается в следующем параграфе
-                            if ( true === ParaPr.Brd.Last && border_Single === ParaPr.Brd.Bottom.Value )
-                                Bottom += ParaPr.Brd.Bottom.Size;
+                            if ( true === ParaPr.Brd.Last )
+                            {
+                                if ( border_Single === ParaPr.Brd.Bottom.Value )
+                                    Bottom += ParaPr.Brd.Bottom.Size + ParaPr.Brd.Bottom.Space;
+                            }
+                            else
+                            {
+                                if ( border_Single === ParaPr.Brd.Between.Value )
+                                    Bottom += ParaPr.Brd.Between.Space;
+                            }
 
                             if ( false === this.Parent.Is_TableCellContent() && Bottom > this.YLimit && Bottom - this.YLimit <= ParaPr.Spacing.After )
                                 Bottom = this.YLimit;
@@ -2484,9 +2516,9 @@ Paragraph.prototype =
         if ( 0 === StartLine )
         {
             if ( ( true === ParaPr.Brd.First || 1 === CurPage ) && border_Single === ParaPr.Brd.Top.Value )
-                TempDy += ParaPr.Brd.Top.Size;
+                TempDy += ParaPr.Brd.Top.Size + ParaPr.Brd.Top.Space;
             else if ( false === ParaPr.Brd.First && border_Single === ParaPr.Brd.Between.Value )
-                TempDy += ParaPr.Brd.Between.Size;
+                TempDy += ParaPr.Brd.Between.Size + ParaPr.Brd.Between.Space;
         }
 
         for ( var Index = StartLine; Index <= EndLine; Index++ )
@@ -3284,7 +3316,7 @@ Paragraph.prototype =
 
         // 2 часть отрисовки :
         //    Добавляем специальный символ слева от параграфа, для параграфов, у которых стоит хотя бы
-        //    одна из настроек: не рарзывать абзац(KeepLines), не отрывать от следующего(KeepNext),
+        //    одна из настроек: не разрывать абзац(KeepLines), не отрывать от следующего(KeepNext),
         //    начать с новой страницы(PageBreakBefore)
         this.Internal_Draw_2( CurPage, pGraphics, Pr );
 
@@ -3571,7 +3603,7 @@ Paragraph.prototype =
                 //----------------------------------------------------------------------------------------------------------
                 // Заливка параграфа
                 //----------------------------------------------------------------------------------------------------------
-                if ( this.Lines[CurLine].Ranges[CurRange].W > 0.001 && ( ( this.Pages.length - 1 === CurPage ) || ( CurLine < this.Pages[CurPage + 1].FirstLine ) ) && shd_Clear === Pr.ParaPr.Shd.Value )
+                if ( (this.Lines[CurLine].Ranges[CurRange].W > 0.001 || true === this.IsEmpty() ) && ( ( this.Pages.length - 1 === CurPage ) || ( CurLine < this.Pages[CurPage + 1].FirstLine ) ) && shd_Clear === Pr.ParaPr.Shd.Value )
                 {
                     var TempX0 = this.Lines[CurLine].Ranges[CurRange].X;
                     if ( 0 === CurRange )
@@ -3652,7 +3684,7 @@ Paragraph.prototype =
                     if ( 0 === CurRange )
                     {
                         if ( Pr.ParaPr.Brd.Left.Value === border_Single )
-                            TempX0 -= 1.9;
+                            TempX0 -= 1 + Pr.ParaPr.Brd.Left.Size + Pr.ParaPr.Brd.Left.Space;
                         else
                             TempX0 -= 1;
                     }
@@ -3660,7 +3692,7 @@ Paragraph.prototype =
                     if ( this.Lines[CurLine].Ranges.length - 1 === CurRange )
                     {
                         if ( Pr.ParaPr.Brd.Right.Value === border_Single )
-                            TempX1 += 1.9;
+                            TempX1 += 1 + Pr.ParaPr.Brd.Right.Size + Pr.ParaPr.Brd.Right.Space;
                         else
                             TempX1 += 1;
                     }
@@ -3752,13 +3784,13 @@ Paragraph.prototype =
                 if ( Pr.ParaPr.Brd.Right.Value === border_Single )
                 {
                     pGraphics.p_color( Pr.ParaPr.Brd.Right.Color.r, Pr.ParaPr.Brd.Right.Color.g, Pr.ParaPr.Brd.Right.Color.b, 255 );
-                    pGraphics.drawVerLine( c_oAscLineDrawingRule.Right, TempX1 + 1.9 + Pr.ParaPr.Brd.Right.Size, this.Pages[CurPage].Y + TempTop, this.Pages[CurPage].Y + TempBottom, Pr.ParaPr.Brd.Right.Size );
+                    pGraphics.drawVerLine( c_oAscLineDrawingRule.Right, TempX1 + 1 + Pr.ParaPr.Brd.Right.Size + Pr.ParaPr.Brd.Right.Space, this.Pages[CurPage].Y + TempTop, this.Pages[CurPage].Y + TempBottom, Pr.ParaPr.Brd.Right.Size );
                 }
 
                 if ( Pr.ParaPr.Brd.Left.Value === border_Single )
                 {
                     pGraphics.p_color( Pr.ParaPr.Brd.Left.Color.r, Pr.ParaPr.Brd.Left.Color.g, Pr.ParaPr.Brd.Left.Color.b, 255 );
-                    pGraphics.drawVerLine( c_oAscLineDrawingRule.Left, TempX0 - 1.9 - Pr.ParaPr.Brd.Left.Size, this.Pages[CurPage].Y + TempTop, this.Pages[CurPage].Y + TempBottom, Pr.ParaPr.Brd.Left.Size );
+                    pGraphics.drawVerLine( c_oAscLineDrawingRule.Left, TempX0 - 1 - Pr.ParaPr.Brd.Left.Size - Pr.ParaPr.Brd.Left.Space, this.Pages[CurPage].Y + TempTop, this.Pages[CurPage].Y + TempBottom, Pr.ParaPr.Brd.Left.Size );
                 }
             }
 
@@ -4253,12 +4285,12 @@ Paragraph.prototype =
         var X_right = this.Pages[CurPage].XLimit - Pr.ParaPr.Ind.Right;
 
         if ( Pr.ParaPr.Brd.Left.Value === border_Single )
-            X_left -= 1.9;
+            X_left -= 1 + Pr.ParaPr.Brd.Left.Space;
         else
             X_left -= 1;
 
         if ( Pr.ParaPr.Brd.Right.Value === border_Single )
-            X_right += 1.9;
+            X_right += 1 + Pr.ParaPr.Brd.Right.Space;
         else
             X_right += 1;
 
@@ -4273,19 +4305,46 @@ Paragraph.prototype =
                 Y_top += Pr.ParaPr.Spacing.Before;
 
             pGraphics.p_color( Pr.ParaPr.Brd.Top.Color.r, Pr.ParaPr.Brd.Top.Color.g, Pr.ParaPr.Brd.Top.Color.b, 255 );
-            pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Top, Y_top, X_left, X_right, Pr.ParaPr.Brd.Top.Size, LeftMW, RightMW );
+
+            // Учтем разрывы из-за обтекания
+            var StartLine = this.Pages[CurPage].StartLine;
+            var RangesCount = this.Lines[StartLine].Ranges.length;
+            for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
+            {
+                var X0 = ( 0 === CurRange ? X_left : this.Lines[StartLine].Ranges[CurRange].X );
+                var X1 = ( RangesCount - 1 === CurRange ? X_right : this.Lines[StartLine].Ranges[CurRange].XEnd );
+
+                if ( this.Lines[StartLine].Ranges[CurRange].W > 0.001 )
+                    pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Top, Y_top, X0, X1, Pr.ParaPr.Brd.Top.Size, LeftMW, RightMW );
+            }
         }
         else if ( false === Pr.ParaPr.Brd.First )
         {
+            var Size = 0;
+            var Y    = 0;
             if ( 1 === CurPage && true === this.Is_StartFromNewPage() && border_Single === Pr.ParaPr.Brd.Top.Value )
             {
                 pGraphics.p_color( Pr.ParaPr.Brd.Top.Color.r, Pr.ParaPr.Brd.Top.Color.g, Pr.ParaPr.Brd.Top.Color.b, 255 );
-                pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Top, this.Pages[CurPage].Y + this.Lines[this.Pages[CurPage].FirstLine].Top, X_left, X_right, Pr.ParaPr.Brd.Top.Size, LeftMW, RightMW );
+                Size = Pr.ParaPr.Brd.Top.Size;
+                Y    = this.Pages[CurPage].Y + this.Lines[this.Pages[CurPage].FirstLine].Top;
             }
             else if ( 0 === CurPage && false === this.Is_StartFromNewPage() && border_Single === Pr.ParaPr.Brd.Between.Value )
             {
                 pGraphics.p_color( Pr.ParaPr.Brd.Between.Color.r, Pr.ParaPr.Brd.Between.Color.g, Pr.ParaPr.Brd.Between.Color.b, 255 );
-                pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Top, this.Pages[CurPage].Y, X_left, X_right, Pr.ParaPr.Brd.Between.Size, LeftMW, RightMW );
+                Size = Pr.ParaPr.Brd.Between.Size;
+                Y    = this.Pages[CurPage].Y;
+            }
+
+            // Учтем разрывы из-за обтекания
+            var StartLine = this.Pages[CurPage].StartLine;
+            var RangesCount = this.Lines[StartLine].Ranges.length;
+            for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
+            {
+                var X0 = ( 0 === CurRange ? X_left : this.Lines[StartLine].Ranges[CurRange].X );
+                var X1 = ( RangesCount - 1 === CurRange ? X_right : this.Lines[StartLine].Ranges[CurRange].XEnd );
+
+                if ( this.Lines[StartLine].Ranges[CurRange].W > 0.001 )
+                    pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Top, Y, X0, X1, Size, LeftMW, RightMW );
             }
         }
 
@@ -4310,7 +4369,18 @@ Paragraph.prototype =
             }
 
             pGraphics.p_color( Pr.ParaPr.Brd.Bottom.Color.r, Pr.ParaPr.Brd.Bottom.Color.g, Pr.ParaPr.Brd.Bottom.Color.b, 255 );
-            pGraphics.drawHorLineExt( DrawLineRule, TempY, X_left, X_right, Pr.ParaPr.Brd.Bottom.Size, LeftMW, RightMW );
+
+            // Учтем разрывы из-за обтекания
+            var EndLine = this.Pages[CurPage].EndLine;
+            var RangesCount = this.Lines[EndLine].Ranges.length;
+            for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
+            {
+                var X0 = ( 0 === CurRange ? X_left : this.Lines[EndLine].Ranges[CurRange].X );
+                var X1 = ( RangesCount - 1 === CurRange ? X_right : this.Lines[EndLine].Ranges[CurRange].XEnd );
+
+                if ( this.Lines[EndLine].Ranges[CurRange].W > 0.001 )
+                    pGraphics.drawHorLineExt( DrawLineRule, TempY, X0, X1, Pr.ParaPr.Brd.Bottom.Size, LeftMW, RightMW );
+            }
         }
         else if ( true === bEnd && false === Pr.ParaPr.Brd.Last && border_Single === Pr.ParaPr.Brd.Bottom.Value )
         {
@@ -4318,7 +4388,18 @@ Paragraph.prototype =
             if ( null != NextEl && type_Paragraph === NextEl.GetType() && true === NextEl.Is_StartFromNewPage() )
             {
                 pGraphics.p_color( Pr.ParaPr.Brd.Bottom.Color.r, Pr.ParaPr.Brd.Bottom.Color.g, Pr.ParaPr.Brd.Bottom.Color.b, 255 );
-                pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Top, this.Pages[CurPage].Y + this.Lines[CurLine].Y + this.Lines[CurLine].Metrics.Descent + this.Lines[CurLine].Metrics.LineGap, X_left, X_right, Pr.ParaPr.Brd.Bottom.Size, LeftMW, RightMW );
+
+                // Учтем разрывы из-за обтекания
+                var EndLine = this.Pages[CurPage].EndLine;
+                var RangesCount = this.Lines[EndLine].Ranges.length;
+                for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
+                {
+                    var X0 = ( 0 === CurRange ? X_left : this.Lines[EndLine].Ranges[CurRange].X );
+                    var X1 = ( RangesCount - 1 === CurRange ? X_right : this.Lines[EndLine].Ranges[CurRange].XEnd );
+
+                    if ( this.Lines[EndLine].Ranges[CurRange].W > 0.001 )
+                        pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Top, this.Pages[CurPage].Y + this.Lines[CurLine].Y + this.Lines[CurLine].Metrics.Descent + this.Lines[CurLine].Metrics.LineGap, X0, X1, Pr.ParaPr.Brd.Bottom.Size, LeftMW, RightMW );
+                }
             }
         }
 

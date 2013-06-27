@@ -375,7 +375,7 @@ $(document).ready(function(){
         }
     );
 
-$("#imgW, #imgH, #imgLeft, #imgTop, #imgRight, #imgBottom, #imgX, #imgY, #hafHF, #tblW, #tblCS, #tblMarLeft, #tblMarTop, #tblMarRight, #tblMarBottom, #tblIndentLeft, #tblLeft, #tblTop, #tblRight, #tblBottom, #tblBrdBGColor, #imgURL, #tblDefMarLeft, #tblDefMarTop, #tblDefMarRight, #tblDefMarBottom, #tblX, #tblY, #prFirst, #prLeft, #prRight, #prLineHeight, #prAfter, #prBefore, #hyperToolTip, #hyperUrl, #hyperText, #prTextSpacing, #prTextPosition, #prTextPosition, #imgPositionVPosValueCombo, #imgPositionHPosValueCombo, #tblHeaderRowsCount, #tblPositionVPosValueCombo, #tblPositionHPosValueCombo, #searchString, #replaceString")
+$("#imgW, #imgH, #imgLeft, #imgTop, #imgRight, #imgBottom, #imgX, #imgY, #hafHF, #tblW, #tblCS, #tblMarLeft, #tblMarTop, #tblMarRight, #tblMarBottom, #tblIndentLeft, #tblLeft, #tblTop, #tblRight, #tblBottom, #tblBrdBGColor, #imgURL, #tblDefMarLeft, #tblDefMarTop, #tblDefMarRight, #tblDefMarBottom, #tblX, #tblY, #prFirst, #prLeft, #prRight, #prLineHeight, #prAfter, #prBefore, #hyperToolTip, #hyperUrl, #hyperText, #prTextSpacing, #prTextPosition, #prTextPosition, #imgPositionVPosValueCombo, #imgPositionHPosValueCombo, #tblHeaderRowsCount, #tblPositionVPosValueCombo, #tblPositionHPosValueCombo, #searchString, #replaceString, #prBrdSpaceVals")
 .focus(function(){editor.asc_enableKeyEvents(false);})
 .blur(function(){editor.asc_enableKeyEvents(true);})
 
@@ -3060,81 +3060,69 @@ $(".colorWatch").mouseover(function(){
                  Bits[1] = Bits[2] = Bits[3] = 0;
              }
 
+             var nSpace = parseFloat(document.getElementById("prBrdSpaceVals").value);
+             var Space = (isNaN(nSpace) ? 0 : nSpace) * g_dKoef_pt_to_mm;
+
              var BrdType = document.getElementById("prBrdType").checked ? border_Single : border_None;
 
              var BrdObj =
              {
                  Bottom :
                      (!document.getElementById("prBrdBottom").checked?
-                     {
-                         Color : null,
-                         Value : null,
-                         Size  : null
-                     }
+                         undefined
                          :
                      {
                          Color : { r : Bits[1], g : Bits[2], b : Bits[3] },
                          Value : BrdType,
+                         Space : Space,
                          Size  : BrdSize
                      }
                          ),
 
                  Left :
                      (!document.getElementById("prBrdLeft").checked?
-                     {
-                         Color : null,
-                         Value : null,
-                         Size  : null
-                     }
+                         undefined
                          :
                      {
                          Color : { r : Bits[1], g : Bits[2], b : Bits[3] },
                          Value : BrdType,
+                         Space : Space,
                          Size  : BrdSize
                      }
                          ),
 
                  Right :
                      (!document.getElementById("prBrdRight").checked?
-                     {
-                         Color : null,
-                         Value : null,
-                         Size  : null
-                     }
+                         undefined
                          :
                      {
                          Color : { r : Bits[1], g : Bits[2], b : Bits[3] },
                          Value : BrdType,
+                         Space : Space,
                          Size  : BrdSize
                      }
                          ),
 
                  Top :
                      (!document.getElementById("prBrdTop").checked?
-                     {
-                         Color : null,
-                         Value : null,
-                         Size  : null
-                     }
+                         undefined
                          :
                      {
                          Color : { r : Bits[1], g : Bits[2], b : Bits[3] },
                          Value : BrdType,
+                         Space : Space,
                          Size  : BrdSize
                      }
                          ),
 
                  Between :
                      (!document.getElementById("prBrdBetween").checked?
-                     {
-                         Color : null,
-                         Value : null,
-                         Size  : null
-                     }
+                        undefined
                          :
                      {
                          Color : { r : Bits[1], g : Bits[2], b : Bits[3] },
                          Value : BrdType,
+                         Space : Space,
                          Size  : BrdSize
                      }
                          )
