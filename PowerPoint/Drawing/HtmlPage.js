@@ -140,6 +140,7 @@ function CEditorPage(api)
     this.m_oLogicDocument   = null;
 
     this.m_oDrawingDocument.m_oWordControl = this;
+    this.m_oDrawingDocument.TransitionSlide.HtmlPage = this;
     this.m_oDrawingDocument.m_oLogicDocument = this.m_oLogicDocument;
 
     this.m_bIsUpdateHorRuler    = false;
@@ -266,6 +267,10 @@ function CEditorPage(api)
 
     this.Init = function()
     {
+        //-
+        InitPanelAnimation();
+        //-
+
         this.m_oBody = CreateControlContainer(this.Name);
         this.m_oBody.HtmlElement.style.backgroundColor = "#D3D3D3";
 

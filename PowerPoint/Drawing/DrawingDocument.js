@@ -658,6 +658,7 @@ function CDrawingDocument()
     this.LastDrawingUrlSlide = "";
 
     this.AutoShapesTrack = null;
+    this.TransitionSlide = new CTransitionAnimation(null);
 
     this.GetTargetStyle = function()
     {
@@ -4195,12 +4196,11 @@ function InitPanelAnimation()
             <option value=\"5\">UnCover</option>\
             <option value=\"6\">Cover</option>\
             <option value=\"7\">Clock</option>\
-            <option value=\"8\">Pan</option>\
             <option value=\"9\">Zoom</option>\
         </select>\
         <select id=\"animationParam\" style=\"width:170px;\" onchange=\"AnimationParam_Changed()\">\
         </select>\
-    Time <input id=\"animationSpeed\" style=\"width:70px;\" value=\"1.5\"/>\
+    Time <input id=\"animationSpeed\" style=\"width:70px;\" value=\"5.0\"/>\
     <input id=\"animationPlay\" style=\"width:60px;\" type=\"button\" value=\"Play\"/>\
 <div>";
 
@@ -4216,6 +4216,12 @@ function InitPanelAnimation()
     _body_elem.appendChild(_div_animation_prop);
 
     document.getElementById("animationPlay").onclick = AnimationPlay;
+
+    $("#animationSpeed")
+        .focus(function(){editor.asc_enableKeyEvents(false);})
+        .blur(function(){editor.asc_enableKeyEvents(true);})
+
+    $("#id_viewer").mousedown(function(){ this.focus(); editor.asc_enableKeyEvents(true);});
 }
 
 function AnimationType_Changed()
@@ -4334,12 +4340,11 @@ function AnimationPlay()
         [],
         [c_oAscSlideTransitionParams.Fade_Smoothly, c_oAscSlideTransitionParams.Fade_Through_Black],
         [c_oAscSlideTransitionParams.Param_Bottom, c_oAscSlideTransitionParams.Param_Left, c_oAscSlideTransitionParams.Param_Right, c_oAscSlideTransitionParams.Param_Top],
-        [c_oAscSlideTransitionParams.Param_Right, c_oAscSlideTransitionParams.Param_Top, c_oAscSlideTransitionParams.Param_Left, c_oAscSlideTransitionParams.Param_Bottom, c_oAscSlideTransitionParams.Param_TopRight, c_oAscSlideTransitionParams.Param_BottomRight, c_oAscSlideTransitionParams.Param_TopLeft, c_oAscSlideTransitionParams.Param_TopRight],
+        [c_oAscSlideTransitionParams.Param_Right, c_oAscSlideTransitionParams.Param_Top, c_oAscSlideTransitionParams.Param_Left, c_oAscSlideTransitionParams.Param_Bottom, c_oAscSlideTransitionParams.Param_TopRight, c_oAscSlideTransitionParams.Param_BottomRight, c_oAscSlideTransitionParams.Param_TopLeft, c_oAscSlideTransitionParams.Param_BottomLeft],
         [c_oAscSlideTransitionParams.Split_VerticalOut, c_oAscSlideTransitionParams.Split_HorizontalIn, c_oAscSlideTransitionParams.Split_HorizontalOut, c_oAscSlideTransitionParams.Split_VerticalIn],
-        [c_oAscSlideTransitionParams.Param_Right, c_oAscSlideTransitionParams.Param_Top, c_oAscSlideTransitionParams.Param_Left, c_oAscSlideTransitionParams.Param_Bottom, c_oAscSlideTransitionParams.Param_TopRight, c_oAscSlideTransitionParams.Param_BottomRight, c_oAscSlideTransitionParams.Param_TopLeft, c_oAscSlideTransitionParams.Param_TopRight],
-        [c_oAscSlideTransitionParams.Param_Right, c_oAscSlideTransitionParams.Param_Top, c_oAscSlideTransitionParams.Param_Left, c_oAscSlideTransitionParams.Param_Bottom, c_oAscSlideTransitionParams.Param_TopRight, c_oAscSlideTransitionParams.Param_BottomRight, c_oAscSlideTransitionParams.Param_TopLeft, c_oAscSlideTransitionParams.Param_TopRight],
+        [c_oAscSlideTransitionParams.Param_Right, c_oAscSlideTransitionParams.Param_Top, c_oAscSlideTransitionParams.Param_Left, c_oAscSlideTransitionParams.Param_Bottom, c_oAscSlideTransitionParams.Param_TopRight, c_oAscSlideTransitionParams.Param_BottomRight, c_oAscSlideTransitionParams.Param_TopLeft, c_oAscSlideTransitionParams.Param_BottomLeft],
+        [c_oAscSlideTransitionParams.Param_Right, c_oAscSlideTransitionParams.Param_Top, c_oAscSlideTransitionParams.Param_Left, c_oAscSlideTransitionParams.Param_Bottom, c_oAscSlideTransitionParams.Param_TopRight, c_oAscSlideTransitionParams.Param_BottomRight, c_oAscSlideTransitionParams.Param_TopLeft, c_oAscSlideTransitionParams.Param_BottomLeft],
         [c_oAscSlideTransitionParams.Clock_Clockwise, c_oAscSlideTransitionParams.Clock_Counterclockwise, c_oAscSlideTransitionParams.Clock_Wedge],
-        [c_oAscSlideTransitionParams.Param_Bottom, c_oAscSlideTransitionParams.Param_Left, c_oAscSlideTransitionParams.Param_Right, c_oAscSlideTransitionParams.Param_Top],
         [c_oAscSlideTransitionParams.Zoom_In, c_oAscSlideTransitionParams.Zoom_Out, c_oAscSlideTransitionParams.Zoom_AndRotate]
     ];
 
@@ -4350,7 +4355,13 @@ function AnimationPlay()
 
 function PlayAnimation(type, param, duration)
 {
-    alert("type: " + type + ", param: " + param + ", duration: " + duration);
+    //alert("type: " + type + ", param: " + param + ", duration: " + duration);
+    var _tr = editor.WordControl.m_oDrawingDocument.TransitionSlide;
+    _tr.Type = type;
+    _tr.Param = param;
+    _tr.Duration = 1000 * duration;
+
+    _tr.Start();
 }
 
 function UnInitPanelAnimation()
