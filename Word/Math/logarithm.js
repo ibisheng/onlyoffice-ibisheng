@@ -1,6 +1,6 @@
 //var NameFunctions = ["min", "max", "lim", "log", "ln", "sin", "cos", "tg", "ctg", "ch", "sh", "th", "cth", "sec", "csc", "cot", "csch", "sech", "coth"];
 //var NameFunctions = ["min", "max", "lim", "log", "ln", "sin", "cos", "tan", "ctg", "cosh", "sinh", "tanh", "cth", "sec", "csc", "cot", "csch", "sech", "coth"];
-var Diff = ["dx","dy","dθ"];
+//var Diff = ["dx","dy","dθ"];
 
 function CLogarithm()
 {
@@ -173,13 +173,13 @@ old_CMathFunc.prototype.addText = function(txt)
     this.elements[0][1].addText(txt);
 }
 
-function CDifferential(num)
+function old_CDifferential(num)
 {
     this.num = num;
     CSubMathBase.call(this, 1,1);
 }
-extend(CDifferential, CSubMathBase);
-CDifferential.prototype.setContent = function()
+extend(old_CDifferential, CSubMathBase);
+old_CDifferential.prototype.setContent = function()
 {
     var oDiff = new CMathContent();
     oDiff.init(this.params);

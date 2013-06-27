@@ -2175,6 +2175,24 @@ CMathComposition.prototype =
 
                 radical.ResizeReverse_2();
                 break;
+            case 41:
+                mathBase = this.SelectContent.addMathComponent_2(230);
+                elem1 = mathBase.getElement(0,0);
+                elem1.addText("dx");
+                mathBase.ResizeReverse_2();
+                break;
+            case 42:
+                mathBase = this.SelectContent.addMathComponent_2(230);
+                elem1 = mathBase.getElement(0,0);
+                elem1.addText("dy");
+                mathBase.ResizeReverse_2();
+                break;
+            case 43:
+                mathBase = this.SelectContent.addMathComponent_2(230);
+                elem1 = mathBase.getElement(0,0);
+                elem1.addText("dθ");
+                mathBase.ResizeReverse_2();
+                break;
             case 79:
                 nary = this.SelectContent.addMathComponent_2(47);
 
@@ -2881,13 +2899,13 @@ function AddEquation(ind)
             mathElem = new CNary(5, 0, 3);
             break;
         case 41:
-            mathElem = new CDifferential(0);
+            //mathElem = new CDifferential(0);
             break;
         case 42:
-            mathElem = new CDifferential(1);
+            //mathElem = new CDifferential(1);
             break;
         case 43:
-            mathElem = new CDifferential(2);
+            //mathElem = new CDifferential(2);
             break;
 
         case 44:
@@ -3450,6 +3468,9 @@ function AddEquation(ind)
             break;
         case 229:
             mathElem = new CMathMatrix(1, 1);
+            break;
+        case 230:
+            mathElem = new CMathBase(1,1);
             break;
 
     }
