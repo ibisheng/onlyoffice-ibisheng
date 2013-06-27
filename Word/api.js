@@ -6246,6 +6246,12 @@ function spellCheck (editor, rdata) {
 	}
 }
 
+function _onSpellCheck_Callback2 (response)
+{
+	var incomeObject = JSON.parse(response);
+	editor.SpellCheck_CallBack(incomeObject);
+}
+
 /*function spellCheck (editor, fCallback, rdata){
 	asc_ajax({
         type: 'POST',
