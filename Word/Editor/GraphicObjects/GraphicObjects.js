@@ -2990,12 +2990,12 @@ CGraphicObjects.prototype =
                 var group = this.curState.group;
                 if((b_no_hdr_ftr_state && group.pageIndex === pageIndex) || (!b_no_hdr_ftr_state && group.selectStartPage === pageIndex))
                 {
-                    this.drawingDocument.DrawTrack(TYPE_TRACK_GROUP_PASSIVE, group.getTransformMatrix(), 0, 0, group.absExtX, group.absExtY, false);
+                    this.drawingDocument.DrawTrack(TYPE_TRACK_GROUP_PASSIVE, group.getTransformMatrix(), 0, 0, group.absExtX, group.absExtY, false, group.canRotate());
                     var selected_arr = group.selectionInfo.selectionArray;
                     for(var i = 0; i < selected_arr.length; ++i)
                     {
                         var cur_drawing = selected_arr[i];
-                        this.drawingDocument.DrawTrack(this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP ? TYPE_TRACK_TEXT : TYPE_TRACK_SHAPE, cur_drawing.getTransformMatrix(), 0, 0, cur_drawing.absExtX, cur_drawing.absExtY, CheckLinePreset(cur_drawing.getPresetGeom()));
+                        this.drawingDocument.DrawTrack(this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP ? TYPE_TRACK_TEXT : TYPE_TRACK_SHAPE, cur_drawing.getTransformMatrix(), 0, 0, cur_drawing.absExtX, cur_drawing.absExtY, CheckLinePreset(cur_drawing.getPresetGeom()), cur_drawing.canRotate());
                     }
                     if(selected_arr.length === 1 && typeof selected_arr[0].drawAdjustments === "function")
                         selected_arr[0].drawAdjustments();
@@ -3015,7 +3015,7 @@ CGraphicObjects.prototype =
             {
                 cur_drawing = this.curState.textObject;
                 if(isRealObject(cur_drawing) && isRealObject(cur_drawing.GraphicObj) && ((b_no_hdr_ftr_state && cur_drawing.pageIndex === pageIndex) || (!b_no_hdr_ftr_state && cur_drawing.GraphicObj.selectStartPage === pageIndex)))
-                    this.drawingDocument.DrawTrack(TYPE_TRACK_TEXT, cur_drawing.GraphicObj.getTransformMatrix(), 0, 0, cur_drawing.absExtX, cur_drawing.absExtY, CheckLinePreset(cur_drawing.GraphicObj.getPresetGeom()));
+                    this.drawingDocument.DrawTrack(TYPE_TRACK_TEXT, cur_drawing.GraphicObj.getTransformMatrix(), 0, 0, cur_drawing.absExtX, cur_drawing.absExtY, CheckLinePreset(cur_drawing.GraphicObj.getPresetGeom()), cur_drawing.canRotate());
 
                 selected_arr = this.selectionInfo.selectionArray;
                 if(selected_arr.length === 1 && typeof selected_arr[0].drawAdjustments === "function" &&( (b_no_hdr_ftr_state && selected_arr[0].pageIndex === pageIndex) || (!b_no_hdr_ftr_state && isRealObject(selected_arr[0].GraphicObj) && selected_arr[0].GraphicObj.selectStartPage === pageIndex)))
@@ -3029,7 +3029,7 @@ CGraphicObjects.prototype =
                 {
                     cur_drawing = selected_arr[i].GraphicObj;
                     if(isRealObject(cur_drawing) &&( (b_no_hdr_ftr_state && cur_drawing.pageIndex === pageIndex) || (!b_no_hdr_ftr_state && cur_drawing.selectStartPage === pageIndex) ) )
-                        this.drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, cur_drawing.getTransformMatrix(), 0, 0, cur_drawing.absExtX, cur_drawing.absExtY, CheckLinePreset(cur_drawing.getPresetGeom()));
+                        this.drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, cur_drawing.getTransformMatrix(), 0, 0, cur_drawing.absExtX, cur_drawing.absExtY, CheckLinePreset(cur_drawing.getPresetGeom()), cur_drawing.canRotate());
                 }
                 if(selected_arr.length === 1 && typeof selected_arr[0].drawAdjustments === "function" &&( (b_no_hdr_ftr_state && selected_arr[0].pageIndex === pageIndex) || (!b_no_hdr_ftr_state && isRealObject(selected_arr[0].GraphicObj) && selected_arr[0].GraphicObj.selectStartPage === pageIndex)))
                     selected_arr[0].drawAdjustments();
