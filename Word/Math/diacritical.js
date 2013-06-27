@@ -78,6 +78,10 @@ CBaseDiacritic.prototype.IsIncline = function()
 
     return this.elements[0][0].IsIncline();
 }
+CBaseDiacritic.prototype.getBase = function()
+{
+    return this.elements[0][0];
+}
 
 function CCircumflex(id)
 {

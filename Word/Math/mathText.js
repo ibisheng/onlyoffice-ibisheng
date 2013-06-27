@@ -422,7 +422,11 @@ CMathText.prototype =
             flag = true;
 
         return flag;
-     }
+     },
+    ResizeDirect: function()
+    {
+        this.recalculateSize();
+    }
 
 }
 function CSymbol(IFont)

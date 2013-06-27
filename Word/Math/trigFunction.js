@@ -32,4 +32,11 @@ CTrigFunc.prototype.setDistance = function()
     this.dW = slashWidth(this.params.font);
     this.dH = 0;
 }
-
+CTrigFunc.prototype.getFunction = function()
+{
+    return this.elemens[0][0];
+}
+CTrigFunc.prototype.getArgument = function()
+{
+    return this.elemens[0][1];
+}

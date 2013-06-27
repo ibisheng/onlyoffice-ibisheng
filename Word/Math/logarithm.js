@@ -1,4 +1,5 @@
-var NameFunctions = ["min", "max", "lim", "log", "ln", "sin", "cos", "tg", "ctg", "ch", "sh", "th", "cth", "sec", "csc", "cot", "csch", "sech", "coth"];
+//var NameFunctions = ["min", "max", "lim", "log", "ln", "sin", "cos", "tg", "ctg", "ch", "sh", "th", "cth", "sec", "csc", "cot", "csch", "sech", "coth"];
+//var NameFunctions = ["min", "max", "lim", "log", "ln", "sin", "cos", "tan", "ctg", "cosh", "sinh", "tanh", "cth", "sec", "csc", "cot", "csch", "sech", "coth"];
 var Diff = ["dx","dy","dθ"];
 
 function CLogarithm()
@@ -13,7 +14,7 @@ CLogarithm.prototype.setContent = function()
     GParams.bMText = false;
     oBase.init(GParams);
     oBase.relate(this);
-    oBase.addText(NameFunctions[3]);
+    oBase.addText("log");
     //oBase.setContent.apply(oBase, NameFunctions.minimax[3] );
 
 
@@ -32,6 +33,61 @@ CLogarithm.prototype.setContent = function()
 
     CLogarithm.superclass.setContent.call(this, oFunc, oArg);
 }
+CLogarithm.prototype.getFunction = function()
+{
+    return this.elements[0][0].getBase();
+}
+CLogarithm.prototype.getBase = function()
+{
+    return this.elements[0][0].getIterator();
+}
+CLogarithm.prototype.getArgument = function()
+{
+    return this.elements[0][1];
+}
+
+function CMinimaxFunc(num)
+{
+    this.num = num;
+    CMathBase.call(this, 2, 1);
+}
+extend(CMinimaxFunc, CMathBase);
+CMinimaxFunc.prototype.setContent = function()
+{
+    var oBase = new CMathContent();
+    var GParams = Common_CopyObj(this.params);
+    GParams.bMText = false;
+    oBase.init(GParams);
+    oBase.relate(this);
+
+    if(this.num == 0)
+        oBase.addText("min");
+    else if(this.num == 1)
+        oBase.addText("max");
+    else
+        oBase.addText("lim");
+
+    var oIter = new CMathContent();
+    GParams = Common_CopyObj(this.params);
+    GParams.font = getTypeDegree(this.params.font);
+    oIter.init(GParams);
+    oIter.relate(this);
+    oIter.fillPlaceholders();
+
+    CMinimaxFunc.superclass.setContent.call(this, oBase, oIter);
+}
+CMinimaxFunc.prototype.getCenter = function()
+{
+    return this.elements[0][0].size.center;
+}
+CMinimaxFunc.prototype.getBase = function()
+{
+    return this.elements[0][0];
+}
+CMinimaxFunc.prototype.getIterator = function()
+{
+    return this.elements[1][0];
+}
 
 function CMinimax(num)
 {
@@ -45,27 +101,13 @@ function CMinimax(num)
 extend(CMinimax, CSubMathBase);
 CMinimax.prototype.setContent = function()
 {
-    var oBase = new CMathContent();
-    var GParams = Common_CopyObj(this.params);
-    GParams.bMText = false;
-    oBase.init(GParams);
-    oBase.relate(this);
-    oBase.addText(NameFunctions[this.num]);
-
-    var oIter = new CMathBase(1,1);
-    GParams = Common_CopyObj(this.params);
-    GParams.font = getTypeDegree(this.params.font);
-    oIter.init(GParams);
-    oIter.relate(this);
-    oIter.fillPlaceholders();
-
-    var oFunc = new CMathBase(2, 1);
-    oFunc.getCenter = function() { return this.elements[0][0].size.center; };
+    var oFunc = new CMinimaxFunc(this.num);
     oFunc.init(this.params);
     oFunc.relate(this);
-    oFunc.setContent(oBase, oIter);
+    oFunc.setContent();
 
-    var oArg = new CMathBase(1, 1);
+
+    var oArg = new CMathContent();
     oArg.init(this.params);
     oArg.relate(this);
     oArg.fillPlaceholders();
@@ -80,8 +122,20 @@ CMinimax.prototype.setDistance = function()
     this.dW = slashWidth(this.params.font);
     this.dH = 0;
 }
+CMinimax.prototype.getFunction = function()
+{
+    return this.elements[0][0].getBase();
+}
+CMinimax.prototype.getIterator = function()
+{
+    return this.elements[0][0].getIterator();
+}
+CMinimax.prototype.getArgument = function()
+{
+    return this.elements[0][1];
+}
 
-function CMathFunc(num)
+function old_CMathFunc(num)
 {
     if(num > 19)
         return;
@@ -90,9 +144,9 @@ function CMathFunc(num)
     CMathBase.call(this, 1,2);
 
 }
-//extend(CMathFunc,CSubMathBase);
-extend(CMathFunc, CMathBase);
-CMathFunc.prototype.setContent = function()
+//extend(old_CMathFunc,CSubMathBase);
+extend(old_CMathFunc, CMathBase);
+old_CMathFunc.prototype.setContent = function()
 {
     var oFunc = new CMathContent();
     var GParms = Common_CopyObj(this.params);
@@ -105,16 +159,16 @@ CMathFunc.prototype.setContent = function()
     oArg.init(this.params);
     oArg.fillPlaceholders();
 
-    CMathFunc.superclass.setContent.call(this, oFunc, oArg);
+    old_CMathFunc.superclass.setContent.call(this, oFunc, oArg);
 }
-CMathFunc.prototype.setDistance = function()
+old_CMathFunc.prototype.setDistance = function()
 {
     //todo
     //переделать!
     this.dW = slashWidth(this.params.font);
     this.dH = 0;
 }
-CMathFunc.prototype.addText = function(txt)
+old_CMathFunc.prototype.addText = function(txt)
 {
     this.elements[0][1].addText(txt);
 }
@@ -131,5 +185,38 @@ CDifferential.prototype.setContent = function()
     oDiff.init(this.params);
     oDiff.addText(Diff[this.num]);
 
-    CMathFunc.superclass.setContent.call(this, oDiff);
+    old_CMathFunc.superclass.setContent.call(this, oDiff);
+}
+
+function CMathFunc()
+{
+    CMathBase.call(this, 1,2);
+}
+extend(CMathFunc, CMathBase);
+CMathFunc.prototype.setContent = function()
+{
+    var oFunc = new CMathContent();
+    var GParms = Common_CopyObj(this.params);
+    GParms.bMText = false; //!!
+
+    oFunc.init(GParms);
+
+    var oArg  = new CMathContent();
+    oArg.init(this.params);
+    oArg.fillPlaceholders();
+
+    CMathFunc.superclass.setContent.call(this, oFunc, oArg);
+}
+CMathFunc.prototype.setDistance = function()
+{
+    this.dW = this.params.font.FontSize/6*g_dKoef_pt_to_mm;
+    this.dH = 0;
+}
+CMathFunc.prototype.getFunction = function()
+{
+    return this.elements[0][0];
+}
+CMathFunc.prototype.getArgument = function()
+{
+    return this.elements[0][1];
 }

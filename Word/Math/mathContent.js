@@ -10,8 +10,8 @@ function dist(_left, _right, _top, _low)
 function mathElem(_val, _gps, _w )
 {
     this.value = _val;
-    this.widthToEl = _w; // with this element
     this.g_mContext = _gps; //mm
+    this.widthToEl = _w; // with this element
 }
 
 //TODO
@@ -719,6 +719,7 @@ CMathContent.prototype =
         this.recalculateSize();
         this.update_widthContent();
     },
+
     draw: function()
     {
         if( !(this.plhHide && this.IsTarget()) )
@@ -1051,6 +1052,13 @@ CMathContent.prototype =
         if(! this.bRoot )
             this.Parent.ResizeReverse();
     },
+    ResizeDirect: function()    //for finished equation
+    {
+        for(var i = 0; i < this.content.length; i++)
+            this.content[i].value.ResizeDirect();
+
+        this.recalculate();
+    },
     selectUse: function()
     {
         return (this.selection.startPos !== this.selection.endPos);
@@ -1107,7 +1115,7 @@ CMathContent.prototype =
             editor.WordControl.m_oLogicDocument.DrawingDocument.SelectEnabled(true); // select
             /// ...Selectenabled(false)         deselect, убираем слой
             //editor.WordControl.m_oLogicDocument.DrawingDocument.TargetEnd();
-            editor.WordControl.m_oLogicDocument.DrawingDocument.AddPageSelection(0,this.pos.x + this.content[start-1].widthToEl, this.pos.y, widthSelect, heightSelect );
+            //editor.WordControl.m_oLogicDocument.DrawingDocument.AddPageSelection(0,this.pos.x + this.content[start-1].widthToEl, this.pos.y, widthSelect, heightSelect );
             editor.WordControl.m_oLogicDocument.DrawingDocument.SelectShow();
             //editor.WordControl.m_oLogicDocument.DrawingDocument.TargetStart();
         }
@@ -1301,7 +1309,7 @@ CMathContent.prototype =
                 component = new CDelimiter();
                 break;
             case 12:
-                component = new CMathFunc(); // CMathMatrix(1, 2)
+                component = new old_CMathFunc();
                 break;
         }
 
@@ -1607,7 +1615,7 @@ CMathContent.prototype =
                 component = new CDelimiter();
                 break;
             case 13:
-                component = new CMathFunc(); // CMathMatrix(1, 2)
+                component = new old_CMathFunc();
                 break;
         }
 
@@ -1626,6 +1634,38 @@ CMathContent.prototype =
             upLevel = this.Root;
 
         return upLevel;
+    },
+
+    //// finished equation ////
+    addMathComponent_2: function(ind)
+    {
+        this.add_mathComponent(ind);
+
+        return this.content[this.CurPos - 1].value;
+    },
+    ////
+
+    drawSelect2: function()
+    {
+        var start   = this.selection.startPos;
+        var end     = this.selection.endPos ;
+
+        if( start > end)
+        {
+            var tmp = start;
+            start = end;
+            end = tmp;
+        }
+
+        //var heightSelect = this.size.ascent + this.size.descent;
+        var heightSelect = this.size.height;
+        var widthSelect = 0;
+
+        for(var j= start; j < end ; j++)
+            widthSelect += this.content[j].widthToEl - this.content[j-1].widthToEl;
+
+        if( widthSelect != 0)
+            editor.WordControl.m_oLogicDocument.DrawingDocument.AddPageSelection(0,this.pos.x + this.content[start-1].widthToEl, this.pos.y, widthSelect, heightSelect );
     }
 
 }
@@ -1871,7 +1911,6 @@ CMathComposition.prototype =
         this.ShowCursor();
     },
     ////
-
     HideCursor: function()
     {
         editor.WordControl.m_oLogicDocument.DrawingDocument.TargetEnd();
@@ -1934,7 +1973,7 @@ CMathComposition.prototype =
     },
     /*TestFont: function(font)
      {
-     this.CurrentContent.TestFont(font);
+        this.CurrentContent.TestFont(font);
      },*/
     ////
 
@@ -1966,7 +2005,735 @@ CMathComposition.prototype =
         this.SelectContent = this.Root;
         this.CurrentContent = this.Root;
         this.Root.recalculateSize();
+    },
+    ////
+
+    DrawSelect2: function()
+    {
+        this.SelectContent.drawSelect2();
+    },
+
+    //// finished equation ////
+
+    AddMathEquation: function (ind)
+    {
+        this.ClearSelect();
+
+        switch(ind)
+        {
+            case 4:
+                fraction = this.SelectContent.addMathComponent_2(0);
+                numerator = fraction.getNumerator();
+                numerator.addText("dy");
+
+                denominator = fraction.getDenominator();
+                denominator.addText("dx");
+
+                fraction.ResizeReverse_2();
+                break;
+            case 5:
+                fraction = this.SelectContent.addMathComponent_2(0);
+                numerator = fraction.getNumerator();
+                numerator.addText("Δy");
+
+                denominator = fraction.getDenominator();
+                denominator.addText("Δx");
+
+                fraction.ResizeReverse_2();
+                break;
+            case 6:
+                fraction = this.SelectContent.addMathComponent_2(0);
+                numerator = fraction.getNumerator();
+                numerator.addText("∂y");
+
+                denominator = fraction.getDenominator();
+                denominator.addText("∂x");
+
+                fraction.ResizeReverse_2();
+
+                break;
+            case 7:
+                fraction = this.SelectContent.addMathComponent_2(0);
+                numerator = fraction.getNumerator();
+                numerator.addText("δy");
+
+                denominator = fraction.getDenominator();
+                denominator.addText("δx");
+
+                fraction.ResizeReverse_2();
+
+                break;
+            case 8:
+                fraction = this.SelectContent.addMathComponent_2(0);
+                numerator = fraction.getNumerator();
+                numerator.addText("π");
+
+                denominator = fraction.getDenominator();
+                denominator.addText("2");
+
+                fraction.ResizeReverse_2();
+
+                break;
+            case 13:
+                degree = this.SelectContent.addMathComponent_2(10);
+                base = degree.getBase();
+                base.addText("x");
+                iterator = degree.getIterator();
+
+                degr_2 = iterator.addMathComponent_2(9);
+                base_2 = degr_2.getBase();
+                base_2.addText("y");
+
+                iter_2 = degr_2.getIterator();
+                iter_2.addText("2");
+
+                degr_2.ResizeReverse_2();
+                degree.ResizeReverse_2();
+
+                break;
+            case 14:
+                degree = this.SelectContent.addMathComponent_2(9);
+                base = degree.getBase();
+                base.addText("e");
+                iterator = degree.getIterator();
+                iterator.addText("-iωt");
+
+                degree.ResizeReverse_2();
+                break;
+            case 15:
+                degree = this.SelectContent.addMathComponent_2(9);
+                base = degree.getBase();
+                base.addText("x");
+                iterator = degree.getIterator();
+                iterator.addText("2");
+
+                degree.ResizeReverse_2();
+                break;
+            case 16:
+                degree = this.SelectContent.addMathComponent_2(12);
+                base = degree.getBase();
+                base.addText("Y");
+                iterator = degree.getUpperIterator();
+                iterator.addText("n");
+
+                iterator = degree.getLowerIterator();
+                iterator.addText("1");
+
+                degree.ResizeReverse_2();
+                break;
+            case 19:
+                radical = this.SelectContent.addMathComponent_2(18);
+                degr = radical.getDegree();
+                degr.addText("2");
+                radical.ResizeReverse_2();
+                break;
+            case 20:
+                radical = this.SelectContent.addMathComponent_2(18);
+                degr = radical.getDegree();
+                degr.addText("3");
+                radical.ResizeReverse_2();
+                break;
+            case 21:
+                fraction = this.SelectContent.addMathComponent_2(0);
+                numerator = fraction.getNumerator();
+
+                numerator.addText("-b±");
+                radical = numerator.addMathComponent_2(17);
+                baseRad = radical.getBase();
+
+                degree = baseRad.addMathComponent_2(9);
+                base = degree.getBase();
+                base.addText("b");
+                iter = degree.getIterator();
+                iter.addText("2");
+
+                baseRad.addText("-4ac");
+
+                denominator = fraction.getDenominator();
+                denominator.addText("2a");
+
+                fraction.ResizeReverse_2();
+
+                break;
+            case 22:
+                radical = this.SelectContent.addMathComponent_2(17);
+                baseRad = radical.getBase();
+
+                degree = baseRad.addMathComponent_2(9);
+                base = degree.getBase();
+                base.addText("a");
+                iter = degree.getIterator();
+                iter.addText("2");
+
+                baseRad.addText("+");
+
+                degree2 = baseRad.addMathComponent_2(9);
+                base2 = degree2.getBase();
+                base2.addText("b");
+                iter2 = degree2.getIterator();
+                iter2.addText("2");
+
+                radical.ResizeReverse_2();
+                break;
+            case 79:
+                nary = this.SelectContent.addMathComponent_2(47);
+
+                iter = nary.getLowerIterator();
+                iter.addText("k");
+
+                base = nary.getBase();
+                delimiter = base.addMathComponent_2(83);
+                delimBase = delimiter.getBase();
+                matrix = delimBase.addMathComponent_2(207);
+
+                matrElem = matrix.getElement(0, 0);
+                matrElem.addText("n");
+
+                matrElem2 = matrix.getElement(1, 0);
+                matrElem2.addText("k");
+
+                nary.ResizeReverse_2();
+                break;
+            case 80:
+                nary = this.SelectContent.addMathComponent_2(45);
+
+                iter = nary.getUpperIterator();
+                iter.addText("n");
+
+                iter = nary.getLowerIterator();
+                iter.addText("i=0");
+
+                nary.ResizeReverse_2();
+                break;
+            case 82:
+                nary = this.SelectContent.addMathComponent_2(60);
+                iterUp = nary.getUpperIterator();
+                iterUp.addText("m");
+
+                iterLow = nary.getLowerIterator();
+                iterLow.addText("n=1");
+
+                base = nary.getBase();
+                delimiter = base.addMathComponent_2(83);
+                delimBase = delimiter.getBase();
+                degr = delimBase.addMathComponent_2(10);
+                degrBase = degr.getBase();
+                degrBase.addText("X");
+
+                degrIter = degr.getIterator();
+                degrIter.addText("n");
+
+                delimBase.addText("∩");
+
+                degr2 = delimBase.addMathComponent_2(10);
+                degrBase2 = degr2.getBase();
+                degrBase2.addText("Y");
+
+                degrIter2 = degr2.getIterator();
+                degrIter2.addText("n");
+
+                nary.ResizeReverse_2();
+                break;
+            case 117:
+                delimiter = this.SelectContent.addMathComponent_2(103);
+                delimBase = delimiter.getBase();
+                delimBase.addMathComponent_2(207);
+                delimiter.ResizeReverse_2();
+                break;
+            case 118:
+                delimiter = this.SelectContent.addMathComponent_2(103);
+                delimBase = delimiter.getBase();
+                delimBase.addMathComponent_2(209);
+                delimiter.ResizeReverse_2();
+                break;
+            case 122:
+                delimiter = this.SelectContent.addMathComponent_2(83);
+                delimBase = delimiter.getBase();
+                matrix = delimBase.addMathComponent_2(207);
+
+                matrElem = matrix.getElement(0, 0);
+                matrElem.addText("n");
+
+                matrElem2 = matrix.getElement(1, 0);
+                matrElem2.addText("k");
+
+                delimiter.ResizeReverse_2();
+                break;
+            case 123:
+                delimiter = this.SelectContent.addMathComponent_2(86);
+                delimBase = delimiter.getBase();
+                matrix = delimBase.addMathComponent_2(207);
+
+                matrElem = matrix.getElement(0, 0);
+                matrElem.addText("n");
+
+                matrElem2 = matrix.getElement(1, 0);
+                matrElem2.addText("k");
+
+                delimiter.ResizeReverse_2();
+                break;
+            case 124:
+                this.SetTrigonometricFunc("sin");
+                break;
+            case 125:
+                this.SetTrigonometricFunc("cos");
+                break;
+            case 126:
+                this.SetTrigonometricFunc("tan");
+                break;
+            case 127:
+                this.SetTrigonometricFunc("csc");
+                break;
+            case 128:
+                this.SetTrigonometricFunc("sec");
+                break;
+            case 129:
+                this.SetTrigonometricFunc("cot");
+                break;
+
+            case 130:
+                this.SetDegrTrigFunc("sin");
+                break;
+            case 131:
+                this.SetDegrTrigFunc("cos");
+                break;
+            case 132:
+                this.SetDegrTrigFunc("tan");
+                break;
+            case 133:
+                this.SetDegrTrigFunc("csc");
+                break;
+            case 134:
+                this.SetDegrTrigFunc("sec");
+                break;
+            case 135:
+                this.SetDegrTrigFunc("cot");
+                break;
+
+            case 136:
+                this.SetTrigonometricFunc("sinh");
+                break;
+            case 137:
+                this.SetTrigonometricFunc("cosh");
+                break;
+            case 138:
+                this.SetTrigonometricFunc("tanh");
+                break;
+            case 139:
+                this.SetTrigonometricFunc("csch");
+                break;
+            case 140:
+                this.SetTrigonometricFunc("sech");
+                break;
+            case 141:
+                this.SetTrigonometricFunc("coth");
+                break;
+
+            case 142:
+                this.SetDegrTrigFunc("sinh");
+                break;
+            case 143:
+                this.SetDegrTrigFunc("cosh");
+                break;
+            case 144:
+                this.SetDegrTrigFunc("tanh");
+                break;
+            case 145:
+                this.SetDegrTrigFunc("csch");
+                break;
+            case 146:
+                this.SetDegrTrigFunc("sech");
+                break;
+            case 147:
+                this.SetDegrTrigFunc("coth");
+                break;
+            case 148:
+                mathFunc = this.SelectContent.addMathComponent_2(228);
+                func = mathFunc.getFunction();
+                func.addText("sin");
+
+                arg = mathFunc.getArgument();
+                arg.addText("θ");
+
+                mathFunc.ResizeReverse_2();
+                break;
+            case 149:
+                mathFunc = this.SelectContent.addMathComponent_2(228);
+                func = mathFunc.getFunction();
+                func.addText("cos");
+
+                arg = mathFunc.getArgument();
+                arg.addText("2x");
+
+                mathFunc.ResizeReverse_2();
+                break;
+            case 150:
+                mathFunc = this.SelectContent.addMathComponent_2(228);
+                func = mathFunc.getFunction();
+                func.addText("tan");
+
+                arg = mathFunc.getArgument();
+                arg.addText("θ");
+
+                this.SelectContent.addText("=");
+
+                fract = this.SelectContent.addMathComponent_2(0);
+                numer = fract.getNumerator();
+
+                mathFunc2 =  numer.addMathComponent_2(228);
+                func2 = mathFunc2.getFunction();
+                func2.addText("sin");
+
+                arg2 = mathFunc2.getArgument();
+                arg2.addText("θ");
+
+                den = fract.getDenominator();
+
+                mathFunc3 =  den.addMathComponent_2(228);
+                func3 = mathFunc3.getFunction();
+                func3.addText("cos");
+
+                arg3 = mathFunc3.getArgument();
+                arg3.addText("θ");
+
+                mathFunc.ResizeReverse_2();
+                fract.ResizeReverse_2();
+
+                break;
+            case 174:
+                box = this.SelectContent.addMathComponent_2(173);
+                borderBox = box.getElement();
+
+                aDegr = borderBox.addMathComponent_2(9);
+
+                aBase = aDegr.getBase();
+                aBase.addText("a");
+                aIter = aDegr.getIterator();
+                aIter.addText("2");
+
+                borderBox.addText("=");
+                bDegr = borderBox.addMathComponent_2(9);
+
+                bBase = bDegr.getBase();
+                bBase.addText("b");
+                bIter = bDegr.getIterator();
+                bIter.addText("2");
+
+                borderBox.addText("+");
+                cDegr = borderBox.addMathComponent_2(9);
+
+                cBase = cDegr.getBase();
+                cBase.addText("c");
+                cIter = cDegr.getIterator();
+                cIter.addText("2");
+
+                box.ResizeReverse_2();
+                break;
+            case 178:
+                this.SetTrigonometricFunc("log");
+                break;
+            case 182:
+                this.SetTrigonometricFunc("ln");
+                break;
+            case 183:
+                lim = this.SelectContent.addMathComponent_2(179);
+                iter = lim.getIterator();
+                iter.addText("n→∞");
+
+                base = lim.getArgument();
+                degree = base.addMathComponent_2(9);
+                iter2 = degree.getIterator();
+                iter2.addText("n");
+                base2 = degree.getBase();
+
+                delim = base2.addMathComponent_2(83);
+                delimBase = delim.getBase();
+                delimBase.addText("1+");
+
+                fract = delimBase.addMathComponent_2(0);
+                num = fract.getNumerator();
+                num.addText("1");
+                den = fract.getDenominator();
+                den.addText("n");
+
+                lim.ResizeReverse_2();
+                break;
+            case 184:
+                maximum = this.SelectContent.addMathComponent_2(181);
+                iter = maximum.getIterator();
+                iter.addText("0≤x≤1");
+
+                base = maximum.getArgument();
+                base.addText("x");
+
+                degree = base.addMathComponent_2(9);
+                base2 = degree.getBase();
+                base2.addText("e");
+
+                iter2 = degree.getIterator();
+                iter2.addText("-");
+                degree3 = iter2.addMathComponent_2(9);
+                base3 = degree3.getBase();
+                base3.addText("x");
+
+                iter3 = degree3.getIterator();
+                iter3.addText("2");
+
+
+                maximum.ResizeReverse_2();
+                break;
+            case 185:
+                matr = this.SelectContent.addMathComponent_2(229);
+                elemMatr = matr.getElement(0,0);
+                elemMatr.addText("∶=");
+                matr.ResizeReverse_2();
+                break;
+            case 186:
+                matr = this.SelectContent.addMathComponent_2(229);
+                elemMatr = matr.getElement(0,0);
+                elemMatr.addText("==");
+                matr.ResizeReverse_2();
+                break;
+            case 187:
+                matr = this.SelectContent.addMathComponent_2(229);
+                elemMatr = matr.getElement(0,0);
+                elemMatr.addText("+=");
+                matr.ResizeReverse_2();
+                break;
+            case 188:
+                matr = this.SelectContent.addMathComponent_2(229);
+                elemMatr = matr.getElement(0,0);
+                elemMatr.addText("-=");
+                matr.ResizeReverse_2();
+                break;
+            case 189:
+                matr = this.SelectContent.addMathComponent_2(229);
+                elemMatr = matr.getElement(0,0);
+                elemMatr.addText("≝");
+                matr.ResizeReverse_2();
+                break;
+            case 190:
+                matr = this.SelectContent.addMathComponent_2(229);
+                elemMatr = matr.getElement(0,0);
+                elemMatr.addText("≞");
+                matr.ResizeReverse_2();
+                break;
+            case 191:
+                matr = this.SelectContent.addMathComponent_2(229);
+                elemMatr = matr.getElement(0,0);
+                elemMatr.addText("≜");
+                matr.ResizeReverse_2();
+                break;
+            case 204:
+                arrow =  this.SelectContent.addMathComponent_2(195);
+                base = arrow.getBase();
+                base.addText("yields");
+                arrow.ResizeReverse_2();
+                break;
+            case 205:
+                arrow =  this.SelectContent.addMathComponent_2(195);
+                base = arrow.getBase();
+                base.addText("∆");
+                arrow.ResizeReverse_2();
+                break;
+            case 214:
+                this.SelectContent.addText("⋯");
+                break;
+            case 215:
+                this.SelectContent.addText("…");
+                break;
+            case 216:
+                this.SelectContent.addText("⋮");
+                break;
+            case 217:
+                this.SelectContent.addText("⋱");
+                break;
+                break;
+            case 218:
+                matr = this.SelectContent.addMathComponent_2(210);
+                elem1 = matr.getElement(0,0);
+                elem1.addText("1");
+
+                elem2 = matr.getElement(0,1);
+                elem2.addText("0");
+
+                elem3 = matr.getElement(1,0);
+                elem3.addText("0");
+
+                elem4 = matr.getElement(1,1);
+                elem4.addText("1");
+
+                matr.ResizeReverse_2();
+                break;
+            case 219:
+                matr = this.SelectContent.addMathComponent_2(210);
+                matr.hidePlaceholder(true);
+                elem1 = matr.getElement(0,0);
+                elem1.addText("1");
+
+                elem4 = matr.getElement(1,1);
+                elem4.addText("1");
+                matr.ResizeReverse_2();
+                break;
+            case 220:
+                matr = this.SelectContent.addMathComponent_2(213);
+                elem1 = matr.getElement(0,0);
+                elem1.addText("1");
+
+                elem2 = matr.getElement(0,1);
+                elem2.addText("0");
+
+                elem3 = matr.getElement(0,2);
+                elem3.addText("0");
+
+                elem4 = matr.getElement(1,0);
+                elem4.addText("0");
+
+                elem5 = matr.getElement(1,1);
+                elem5.addText("1");
+
+                elem6 = matr.getElement(1,2);
+                elem6.addText("0");
+
+                elem7 = matr.getElement(2,0);
+                elem7.addText("0");
+
+                elem8 = matr.getElement(2,1);
+                elem8.addText("0");
+
+                elem9 = matr.getElement(2,2);
+                elem9.addText("1");
+
+                matr.ResizeReverse_2();
+                break;
+            case 221:
+                matr = this.SelectContent.addMathComponent_2(213);
+                matr.hidePlaceholder(true);
+                elem1 = matr.getElement(0,0);
+                elem1.addText("1");
+
+                elem5 = matr.getElement(1,1);
+                elem5.addText("1");
+
+                elem9 = matr.getElement(2,2);
+                elem9.addText("1");
+
+                matr.ResizeReverse_2();
+                break;
+            case 222:
+                delimiter = this.SelectContent.addMathComponent_2(83);
+                base = delimiter.getBase();
+                base.addMathComponent_2(210);
+
+                delimiter.ResizeReverse_2();
+                break;
+            case 223:
+                delimiter = this.SelectContent.addMathComponent_2(84);
+                base = delimiter.getBase();
+                base.addMathComponent_2(210);
+
+                delimiter.ResizeReverse_2();
+                break;
+            case 224:
+                delimiter = this.SelectContent.addMathComponent_2(89);
+                base = delimiter.getBase();
+                base.addMathComponent_2(210);
+
+                delimiter.ResizeReverse_2();
+                break;
+            case 225:
+                delimiter = this.SelectContent.addMathComponent_2(90);
+                base = delimiter.getBase();
+                base.addMathComponent_2(210);
+
+                delimiter.ResizeReverse_2();
+                break;
+            case 226:
+                delimiter = this.SelectContent.addMathComponent_2(83);
+
+                base = delimiter.getBase();
+                matr = base.addMathComponent_2(213);
+
+                elem2 = matr.getElement(0,1);
+                elem2.addText("⋯");
+
+                elem4 = matr.getElement(1,0);
+                elem4.addText("⋮");
+
+                elem5 = matr.getElement(1,1);
+                elem5.addText("⋱");
+
+                elem6 = matr.getElement(1,2);
+                elem6.addText("⋮");
+
+                elem8 = matr.getElement(2,1);
+                elem8.addText("⋯");
+
+
+                delimiter.ResizeReverse_2();
+                break;
+            case 227:
+                delimiter = this.SelectContent.addMathComponent_2(84);
+
+                base = delimiter.getBase();
+                matr = base.addMathComponent_2(213);
+
+                elem2 = matr.getElement(0,1);
+                elem2.addText("⋯");
+
+                elem4 = matr.getElement(1,0);
+                elem4.addText("⋮");
+
+                elem5 = matr.getElement(1,1);
+                elem5.addText("⋱");
+
+                elem6 = matr.getElement(1,2);
+                elem6.addText("⋮");
+
+                elem8 = matr.getElement(2,1);
+                elem8.addText("⋯");
+
+
+                delimiter.ResizeReverse_2();
+                break;
+            default:
+                this.SelectContent.add_mathComponent(ind);
+                break;
+
+        }
+
+        this.SelectContent.ResizeReverse();
+        this.Root.setPosition(this.posCompos);
+
+        this.CurrentContent = this.SelectContent;
+        this.CurrentContent.update_Cursor();
+
+        this.ShowCursor();
+    },
+    SetDegrTrigFunc: function(txt)
+    {
+        mathFunc = this.SelectContent.addMathComponent_2(228);
+        //setColumnGapRule(3, 120);
+        func = mathFunc.getFunction();
+        degr = func.addMathComponent_2(9);
+
+        base = degr.getBase();
+        base.bMText = false;
+        base.addText(txt);
+        iter = degr.getIterator();
+        iter.addText("-1");
+
+        mathFunc.ResizeReverse_2();
+    },
+    SetTrigonometricFunc: function(txt)
+    {
+        mathFunc = this.SelectContent.addMathComponent_2(228);
+        func = mathFunc.getFunction();
+        func.addText(txt);
+
+        mathFunc.ResizeReverse_2();
     }
+
     ////
 }
 
@@ -1989,6 +2756,7 @@ function CEmpty()
     this.setFont = function() {}
 
     this.setPosition = function (_pos) { this.pos = _pos; }
+    this.ResizeDirect = function(){}
 
     this.IsHighElement =  function() { return false; }
 }
@@ -2376,30 +3144,30 @@ function AddEquation(ind)
             break;
         case 120:
             break;
-
         case 121:
-            mathElem = new CMathFunc(5);
             break;
         case 122:
-            mathElem = new CMathFunc(6);
             break;
         case 123:
-            mathElem = new CMathFunc(7);
             break;
+
         case 124:
-            mathElem = new CMathFunc(14);
+            
             break;
         case 125:
-            mathElem = new CMathFunc(13);
+            
             break;
         case 126:
-            mathElem = new CMathFunc(15);
+            
             break;
         case 127:
+            
             break;
         case 128:
+            
             break;
         case 129:
+            
             break;
         case 130:
             break;
@@ -2408,28 +3176,28 @@ function AddEquation(ind)
         case 132:
             break;
         case 133:
-            mathElem = new CMathFunc(10);
             break;
         case 134:
-            mathElem = new CMathFunc(9);
             break;
         case 135:
-            mathElem = new CMathFunc(11);
             break;
         case 136:
-            mathElem = new CMathFunc(16);
+            
             break;
         case 137:
-            mathElem = new CMathFunc(17);
+            
             break;
         case 138:
-            mathElem = new CMathFunc(18);
+            
             break;
         case 139:
+            
             break;
         case 140:
+            
             break;
         case 141:
+            
             break;
         case 142:
             break;
@@ -2438,124 +3206,124 @@ function AddEquation(ind)
         case 144:
             break;
         case 145:
-            /*mathElem = new CMathFunc(5);
-            mathElem.addText("θ");*/
             break;
         case 146:
             break;
         case 147:
             break;
-
         case 148:
-            mathElem = new CAccent(3);
+            /*
+            mathElem.addText("θ");*/
             break;
         case 149:
-            mathElem = new CAccent(4);
             break;
         case 150:
-            mathElem = new CAccent(5);
             break;
+
         case 151:
-            mathElem = new CCircumflex(-1);
+            mathElem = new CAccent(3);
             break;
         case 152:
-            mathElem = new CCircumflex(1);
+            mathElem = new CAccent(4);
             break;
         case 153:
-            mathElem = new CAccent(2);
+            mathElem = new CAccent(5);
             break;
         case 154:
-            mathElem = new CAccent(1);
+            mathElem = new CCircumflex(-1);
             break;
         case 155:
-            mathElem = new CSign(1);
+            mathElem = new CCircumflex(1);
             break;
         case 156:
-            mathElem = new CSign(2);
+            mathElem = new CAccent(2);
             break;
         case 157:
-            mathElem = new CLine(0);
+            mathElem = new CAccent(1);
             break;
         case 158:
-            mathElem = new CLine(1);
+            mathElem = new CSign(1);
             break;
         case 159:
+            mathElem = new CSign(2);
+            break;
+        case 160:
+            mathElem = new CLine(0);
+            break;
+        case 161:
+            mathElem = new CLine(1);
+            break;
+        case 162:
             //mathElem = new COperatorBracket(0);
             mathElem = new CDelimiter(1, 0, 0);  // bracket
             break;
-        case 160:
+        case 163:
             mathElem = new CDelimiter(1, 1, 2);  // bracket
             //mathElem = new COperatorBracket(1);
             break;
-        case 161:
+        case 164:
             mathElem = new GroupCharacter(1);
             break;
-        case 162:
+        case 165:
             mathElem = new GroupCharacter(-1);
             break;
-        case 163:
+        case 166:
             mathElem = new CStructCombiningArrow(1,0,0);
             //mathElem = new COperatorArrow(1,0,0);
             break;
-        case 164:
+        case 167:
             mathElem = new CStructCombiningArrow(1,0,1);
             //mathElem = new COperatorArrow(1,0,1);
             break;
-        case 165:
+        case 168:
             mathElem = new CStructCombiningArrow(2,0,0);
             //mathElem = new COperatorArrow(2,0,0);
             break;
-        case 166:
+        case 169:
             mathElem = new CStructCombiningArrow(0,0,0);
             //mathElem = new COperatorArrow(0,0,2);
             break;
-        case 167:
+        case 170:
             mathElem = new CStructCombiningArrow(0,0,1);
             //mathElem = new COperatorArrow(0,0,3);
-            break;
-        case 168:
-            break;
-        case 169:
-            break;
-        case 170:
-            mathElem = new CBorderBox();
             break;
         case 171:
             break;
         case 172:
             break;
         case 173:
+            mathElem = new CBorderBox();
             break;
-
         case 174:
-            mathElem = new CLogarithm();
             break;
         case 175:
-            mathElem = new CMathFunc(3);
             break;
         case 176:
-            mathElem = new CMinimax(2);
-            break;
-        case 177:
-            mathElem = new CMinimax(0);
-            break;
-        case 178:
-            mathElem = new CMinimax(1);
-            break;
-        case 179:
-            mathElem = new CMathFunc(4);
-            break;
-        case 180:
-            break;
-        case 181:
             break;
 
+        case 177:
+            mathElem = new CLogarithm();
+            break;
+        case 178:
+            
+            break;
+        case 179:
+            mathElem = new CMinimax(2);
+            break;
+        case 180:
+            mathElem = new CMinimax(0);
+            break;
+        case 181:
+            mathElem = new CMinimax(1);
+            break;
         case 182:
+            
             break;
         case 183:
             break;
         case 184:
             break;
+
         case 185:
             break;
         case 186:
@@ -2565,89 +3333,89 @@ function AddEquation(ind)
         case 188:
             break;
         case 189:
+            break;
+        case 190:
+            break;
+        case 191:
+            break;
+        case 192:
             //mathElem = new CSingleArrow(0,0);
             mathElem = new CStructArrow(1, 0, 0); // left arrow  top
             break;
-        case 190:
+        case 193:
             //mathElem = new CSingleArrow(0,1);
             mathElem = new CStructArrow(1, 0, 1); // right arrow top
             break;
-        case 191:
+        case 194:
             //mathElem = new CSingleArrow(1,2);
             mathElem = new CStructArrow(1, 1, 2); // "переворачиваем", чтобы стрелка была выравнена
                                                   // left arrow  bottom
             break;
-        case 192:
+        case 195:
             //mathElem = new CSingleArrow(1,3);
             mathElem = new CStructArrow(1, 1, 3); // "переворачиваем", чтобы стрелка была выравнена
                                                   // right arrow  bottom
             break;
-        case 193:
+        case 196:
             mathElem = new CStructArrow(3, 0, 0); // double mathematical left arrow top
             //mathElem = new CDoubleArrow(0,0);
             break;
-        case 194:
+        case 197:
             //mathElem = new CDoubleArrow(0,1);
             mathElem = new CStructArrow(3, 0, 1); // double mathematical right  arrow top
             break;
-        case 195:
+        case 198:
             //mathElem = new CDoubleArrow(1,2);
             mathElem = new CStructArrow(3, 1, 2); // double mathematical left arrow bottom
             break;
-        case 196:
+        case 199:
             //mathElem = new CDoubleArrow(1,3);
             mathElem = new CStructArrow(3, 1, 3); // double mathematical right arrow bottom
             break;
-        case 197:
+        case 200:
             //mathElem = new CLeftRightArrow(0, 0);
             mathElem = new CStructArrow(2, 0, 0); // left/right arrow top
             break;
-        case 198:
+        case 201:
             //mathElem = new CLeftRightArrow(1, 2);
             mathElem = new CStructArrow(2, 1, 2); // left/right arrow bottom
             break;
-        case 199:
+        case 202:
             //mathElem = new CLR_DoubleArrow(0, 0);
             mathElem = new CStructArrow(4, 0, 0);  // left/right double mathematica arrow top
             break;
-        case 200:
+        case 203:
             //mathElem = new CLR_DoubleArrow(1, 2);
             mathElem = new CStructArrow(4, 1, 2); // left/right double mathematica arrow bottom
             break;
-        case 201:
-            break;
-        case 202:
-            break;
-
-        case 203:
-            mathElem = new CMathMatrix(1, 2);
-            break;
         case 204:
-            mathElem = new CMathMatrix(2, 1);
             break;
         case 205:
-            mathElem = new CMathMatrix(1, 3);
             break;
+
         case 206:
-            mathElem = new CMathMatrix(3, 1);
+            mathElem = new CMathMatrix(1, 2);
             break;
         case 207:
-            mathElem = new CMathMatrix(2, 2);
+            mathElem = new CMathMatrix(2, 1);
             break;
         case 208:
-            mathElem = new CMathMatrix(2, 3);
+            mathElem = new CMathMatrix(1, 3);
             break;
         case 209:
-            mathElem = new CMathMatrix(3, 2);
+            mathElem = new CMathMatrix(3, 1);
             break;
         case 210:
-            mathElem = new CMathMatrix(3, 3);
+            mathElem = new CMathMatrix(2, 2);
             break;
         case 211:
+            mathElem = new CMathMatrix(2, 3);
             break;
         case 212:
+            mathElem = new CMathMatrix(3, 2);
             break;
         case 213:
+            mathElem = new CMathMatrix(3, 3);
             break;
         case 214:
             break;
@@ -2671,11 +3439,26 @@ function AddEquation(ind)
             break;
         case 224:
             break;
+        case 225:
+            break;
+        case 226:
+            break;
+        case 227:
+            break;
+        case 228:
+            mathElem = new CMathFunc();
+            break;
+        case 229:
+            mathElem = new CMathMatrix(1, 1);
+            break;
 
     }
 
     return mathElem;
 }
+
+
+
 
 function AddMEtoContent(type)
 {

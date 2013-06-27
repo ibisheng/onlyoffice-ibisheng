@@ -359,7 +359,8 @@ CControlComposition.prototype =
     },
     AddMathComponent: function(indef)
     {
-        this.Content[this.CurPos].AddMathComponent(indef);
+        this.Content[this.CurPos].AddMathEquation(indef);
+        //this.Content[this.CurPos].AddMathComponent(indef);
     },
     Paragraph_Add: function(TextPr)
     {
@@ -369,6 +370,10 @@ CControlComposition.prototype =
             font[i] = TextPr[i];
 
         this.Content[this.CurPos].updateTextPrp(font);
+    },
+    DrawSelect2: function()
+    {
+        this.Content[0].DrawSelect2();
     }
 }
 var MathControl = new CControlComposition();
@@ -1004,7 +1009,7 @@ function Create_Structures()
 
             };
             path    = "url('Math/img/bracket_2.png')";
-            Set_Container(dim, path, 118);
+            Set_Container(dim, path, 121);
 
             dim =
             {
@@ -1015,7 +1020,7 @@ function Create_Structures()
 
             };
             path    = "url('Math/img/bracket_3.png')";
-            Set_Container(dim, path, 119);
+            Set_Container(dim, path, 122);
 
         }
 
@@ -1053,7 +1058,7 @@ function Create_Structures()
 
             };
             var path    = "url('Math/img/trig_function.png')";
-            Set_Container(dim, path, 121);
+            Set_Container(dim, path, 124);
 
             dim =
             {
@@ -1064,7 +1069,7 @@ function Create_Structures()
 
             };
             path    = "url('Math/img/trig_function_1.png')";
-            Set_Container(dim, path, 147);
+            Set_Container(dim, path, 150);
         }
 
         var Accent = document.createElement("div");
@@ -1100,7 +1105,7 @@ function Create_Structures()
 
             };
             var path    = "url('Math/img/accent.png')";
-            Set_Container(dim, path, 148);
+            Set_Container(dim, path, 151);
 
             dim =
             {
@@ -1110,7 +1115,7 @@ function Create_Structures()
                 heightEqt:    80
             }
             path    = "url('Math/img/accent_1.png')";
-            Set_Container(dim, path, 168);
+            Set_Container(dim, path, 171);
 
             dim =
             {
@@ -1120,7 +1125,7 @@ function Create_Structures()
                 heightEqt:    80
             }
             path    = "url('Math/img/accent_2.png')";
-            Set_Container(dim, path, 170);
+            Set_Container(dim, path, 173);
 
             dim =
             {
@@ -1130,7 +1135,7 @@ function Create_Structures()
                 heightEqt:    80
             }
             path    = "url('Math/img/accent_3.png')";
-            Set_Container(dim, path, 171);
+            Set_Container(dim, path, 174);
 
             dim =
             {
@@ -1150,7 +1155,7 @@ function Create_Structures()
                 heightEqt:    80
             }
             path    = "url('Math/img/accent_4.png')";
-            Set_Container(dim, path, 172);
+            Set_Container(dim, path, 175);
 
             dim =
             {
@@ -1160,7 +1165,7 @@ function Create_Structures()
                 heightEqt:    80
             }
             path    = "url('Math/img/accent_5.png')";
-            Set_Container(dim, path, 173);
+            Set_Container(dim, path, 176);
 
 
         }
@@ -1198,7 +1203,7 @@ function Create_Structures()
 
             };
             var path    = "url('Math/img/logarithm.png')";
-            Set_Container(dim, path, 174);
+            Set_Container(dim, path, 177);
 
             dim =
             {
@@ -1209,7 +1214,7 @@ function Create_Structures()
 
             };
             path    = "url('Math/img/logarithm_1.png')";
-            Set_Container(dim, path, 180);
+            Set_Container(dim, path, 183);
 
             dim =
             {
@@ -1220,7 +1225,7 @@ function Create_Structures()
 
             };
             path    = "url('Math/img/logarithm_2.png')";
-            Set_Container(dim, path, 181);
+            Set_Container(dim, path, 184);
         }
 
         var Operator = document.createElement("div");
@@ -1256,7 +1261,7 @@ function Create_Structures()
 
             };
             var path    = "url('Math/img/operators.png')";
-            Set_Container(dim, path, 182);
+            Set_Container(dim, path, 185);
 
             dim =
             {
@@ -1267,7 +1272,7 @@ function Create_Structures()
 
             };
             path    = "url('Math/img/operators_1.png')";
-            Set_Container(dim, path, 189);
+            Set_Container(dim, path, 192);
 
             dim =
             {
@@ -1278,7 +1283,7 @@ function Create_Structures()
 
             };
             path    = "url('Math/img/operators_2.png')";
-            Set_Container(dim, path, 201);
+            Set_Container(dim, path, 204);
 
             dim =
             {
@@ -1289,7 +1294,7 @@ function Create_Structures()
 
             };
             path    = "url('Math/img/operators_3.png')";
-            Set_Container(dim, path, 202);
+            Set_Container(dim, path, 205);
         }
 
 
@@ -1326,7 +1331,7 @@ function Create_Structures()
 
             };
             var path    = "url('Math/img/matrix.png')";
-            Set_Container(dim, path, 203);
+            Set_Container(dim, path, 206);
 
             dim =
             {
@@ -1337,7 +1342,7 @@ function Create_Structures()
 
             };
             path    = "url('Math/img/matrix_1.png')";
-            Set_Container(dim, path, 223);
+            Set_Container(dim, path, 226);
         }
 
         MathDesign.bStruct = false;

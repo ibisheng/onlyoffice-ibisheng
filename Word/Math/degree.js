@@ -12,6 +12,7 @@ function CDegree(type)
 
     return degr;
 }
+
 function CDegreeOrdinary(index)
 {
     this.index = index;
@@ -20,7 +21,7 @@ function CDegreeOrdinary(index)
 }
 extend(CDegreeOrdinary, CMathBase);
 CDegreeOrdinary.prototype.SH_DEGR = 2/3;
-CDegreeOrdinary.prototype.setContent = function()
+CDegreeOrdinary.prototype.old_setContent = function()
 {
     var oBase = null;
     if(arguments.length > 0)
@@ -34,6 +35,28 @@ CDegreeOrdinary.prototype.setContent = function()
     }
 
     var oDegree = new CMathBase(1, 1);
+    oDegree.init( this.params );
+    oDegree.relate(this);
+    oDegree.fillPlaceholders();
+    oDegree.setFont(getTypeDegree(this.params.font), -1);
+
+    CDegreeOrdinary.superclass.setContent.call(this, oBase, oDegree);
+
+}
+CDegreeOrdinary.prototype.setContent = function()
+{
+    var oBase = null;
+    if(arguments.length > 0)
+        oBase = arguments[0];
+    else
+    {
+        oBase = new CMathContent();
+        oBase.init( this.params );
+        oBase.relate(this);
+        oBase.fillPlaceholders();
+    }
+
+    var oDegree = new CMathContent();
     oDegree.init( this.params );
     oDegree.relate(this);
     oDegree.fillPlaceholders();
@@ -176,6 +199,65 @@ CDegreeOrdinary.prototype.findDisposition = function( mCoord )
 
     return {pos: {x: X, y: Y}, mCoord: mCoord, inside_flag: inside_flag};
 }
+CDegreeOrdinary.prototype.getIterator = function()
+{
+    return this.elements[0][1];
+}
+CDegreeOrdinary.prototype.getUpperIterator = function()
+{
+    return this.elements[0][1];
+}
+CDegreeOrdinary.prototype.getLowerIterator = function()
+{
+    return this.elements[0][1];
+}
+CDegreeOrdinary.prototype.getBase = function()
+{
+    return this.elements[0][0];
+}
+
+
+function CIterators()
+{
+    CMathBase.call(this, 2, 1);
+}
+extend(CIterators, CMathBase);
+CIterators.prototype.setDistance = function()
+{
+    var descF = this.elements[0][0].size.height - this.elements[0][0].size.center ,
+        ascS = this.elements[1][0].size.center ;
+
+    var up = 0;
+    var down = 0;
+    if(this.lUp  > descF)
+        up = this.lUp - descF;
+    if( this.lD > ascS )
+        down = this.lD - ascS;
+
+    this.dH = up + down;
+    this.dW = 0;
+
+}
+CIterators.prototype.getCenter = function()
+{
+    var center = 0;
+    var descF = this.elements[0][0].size.height - this.elements[0][0].size.center;
+
+    if( this.lUp > descF )
+        center = this.elements[0][0].size.center + this.lUp;
+    else
+        center = this.elements[0][0].size.height;
+
+    return center;
+}
+CIterators.prototype.getUpperIterator = function()
+{
+    return this.elements[0][0];
+}
+CIterators.prototype.getLowerIterator = function()
+{
+    return this.elements[1][0];
+}
 
 function CDegreeSubSup(type)
 {
@@ -183,7 +265,7 @@ function CDegreeSubSup(type)
     this.type = type;
 }
 extend(CDegreeSubSup, CSubMathBase);
-CDegreeSubSup.prototype.setContent = function()
+CDegreeSubSup.prototype.old_setContent = function()
 {
 
     var oBase = null;
@@ -197,54 +279,58 @@ CDegreeSubSup.prototype.setContent = function()
         oBase.fillPlaceholders();
     }
 
-    var oDegree = new CMathBase(2, 1);
-    oDegree.init( this.params );
-    oDegree.relate(this);
-    oDegree.fillPlaceholders();
-    oDegree.setFont(getTypeDegree(this.params.font), -1);
+    var oIters = new CIterators();
+    oIters.init( this.params );
+    oIters.relate(this);
+    oIters.fillPlaceholders();
+    oIters.setFont(getTypeDegree(this.params.font), -1);
 
-    oDegree.setDistance = function() {
-
-        var metrics = this.params.font.metrics;
-        var descF = this.elements[0][0].size.height - this.elements[0][0].size.center ,
-            ascS = this.elements[1][0].size.center ;
-
-        var up = 0;
-        var down = 0;
-        if(this.lUp  > descF)
-            up = this.lUp - descF;
-        if( this.lD > ascS )
-            down = this.lD - ascS;
-
-        this.dH = up + down;
-        this.dW = 0;
-
-    };
-    oDegree.getCenter = function()
-    {
-        var center = 0;
-        var descF = this.elements[0][0].size.height - this.elements[0][0].size.center;
-
-        if( this.lUp > descF )
-            center = this.elements[0][0].size.center + this.lUp;
-        else
-            center = this.elements[0][0].size.height;
-
-        return center;
-    };
-
-    oDegree.lUp = 0;
-    oDegree.lD = 0;
+    oIters.lUp = 0;
+    oIters.lD = 0;
 
     if(this.type == 0)
     {
-        oDegree.alignHor(-1, 0);
-        CDegreeSubSup.superclass.setContent.call(this, oBase, oDegree);
+        oIters.alignHor(-1, 0);
+        CDegreeSubSup.superclass.setContent.call(this, oBase, oIters);
     }
     else
     {
-        oDegree.alignHor(-1, 1);
-        CDegreeSubSup.superclass.setContent.call(this, oDegree, oBase);
+        oIters.alignHor(-1, 1);
+        CDegreeSubSup.superclass.setContent.call(this, oIters, oBase);
+    }
+}
+CDegreeSubSup.prototype.setContent = function()
+{
+
+    var oBase = null;
+    if(arguments.length > 0)
+        oBase = arguments[0];
+    else
+    {
+        oBase = new CMathContent(1, 1);
+        oBase.init( this.params );
+        oBase.relate(this);
+        oBase.fillPlaceholders();
+    }
+
+    var oIters = new CIterators();
+    oIters.init( this.params );
+    oIters.relate(this);
+    oIters.fillPlaceholders();
+    oIters.setFont(getTypeDegree(this.params.font), -1);
+
+    oIters.lUp = 0;
+    oIters.lD = 0;
+
+    if(this.type == 0)
+    {
+        oIters.alignHor(-1, 0);
+        CDegreeSubSup.superclass.setContent.call(this, oBase, oIters);
+    }
+    else
+    {
+        oIters.alignHor(-1, 1);
+        CDegreeSubSup.superclass.setContent.call(this, oIters, oBase);
     }
 }
 CDegreeSubSup.prototype.recalculateSize = function()
@@ -266,6 +352,40 @@ CDegreeSubSup.prototype.recalculateSize = function()
 
     CSubMathBase.superclass.recalculateSize.call(this);
 }
+CDegreeSubSup.prototype.getBase = function()
+{
+    var base;
+
+    if(this.type == 0)
+        base = this.elements[0][0];
+    else
+        base = this.elements[0][1];
+
+    return base;
+}
+CDegreeSubSup.prototype.getUpperIterator = function()
+{
+    var iter;
+
+    if(this.type == 0)
+        iter = this.elements[0][1].getUpperIterator();
+    else
+        iter = this.elements[0][0].getUpperIterator();
+
+    return iter;
+}
+CDegreeSubSup.prototype.getLowerIterator = function()
+{
+    var iter;
+
+    if(this.type == 0)
+        iter = this.elements[0][1].getLowerIterator();
+    else
+        iter = this.elements[0][0].getLowerIterator();
+
+    return iter;
+}
+
 //выяcнить: почему и с этой ф-ией и без нее работает всё ok...
 //всё ok, т.к. в контенте 2 элемента, и их center сравниваем
 /*CDegreeSubSup.prototype.getCenter = function()

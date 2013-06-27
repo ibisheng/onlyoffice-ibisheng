@@ -10381,5 +10381,11 @@ CDocument.prototype =
             var Coords = this.DrawingDocument.ConvertCoordsToCursorWR( Comment_X, Comment_Y, Comment_PageNum );
             editor.sync_UpdateCommentPosition( Comment.Get_Id(), Coords.X, Coords.Y );
         }
+    },
+
+    Selection_Draw_Page: function()
+    {
+        //var i = 100;
+        MathControl.DrawSelect2();
     }
 };

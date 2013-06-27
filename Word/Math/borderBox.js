@@ -214,3 +214,7 @@ CBorderBox.prototype.findDisposition = function(mCoord)
     return {pos: posCurs, mCoord: coord, inside_flag: inside_flag};
 
 }
+CBorderBox.prototype.getElement = function()
+{
+    return this.elements[0][0];
+}

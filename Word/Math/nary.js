@@ -74,6 +74,18 @@ CNary.prototype.setContent = function()
 
     CNary.superclass.setContent.call(this, oBase, oArg);
 }
+CNary.prototype.getBase = function()
+{
+    return this.elements[0][1];
+}
+CNary.prototype.getUpperIterator = function()
+{
+    return this.elements[0][0].getUpperIterator();
+}
+CNary.prototype.getLowerIterator = function()
+{
+    return this.elements[0][0].getLowerIterator();
+}
 
 function CBaseNaryOrder(id, IterType )
 {
@@ -147,6 +159,21 @@ CBaseNaryOrder.prototype.recalculateSize = function()
 CBaseNaryOrder.prototype.IsJustDraw = function()
 {
     return this.IterType == 0; // если только один значок n-арного оператора
+}
+CBaseNaryOrder.prototype.getUpperIterator = function()
+{
+    return this.elements[0][0];
+}
+CBaseNaryOrder.prototype.getLowerIterator = function()
+{
+    var iter = null;
+
+    if(this.IterType == 2)
+        iter = this.elements[1][0];
+    else if(this.IterType == 3)
+        iter = this.elements[2][0];
+
+    return iter;
 }
 
 function CNaryOperator(flip)

@@ -377,7 +377,7 @@ function CDelimiter(type, loc, turn1, turn2)
 
     this.type = type;
     this.loc = loc;
-
+    this.base = null;
 
     var countRow, countCol;
 
@@ -505,6 +505,8 @@ CDelimiter.prototype.setContent = function()
     argument.relate(this);
     argument.fillPlaceholders();
 
+    this.base = argument;
+
     if(this.loc == 0 || this.loc == 2)
     {
         CDelimiter.superclass.setContent.call(this, operator1, argument);
@@ -612,32 +614,9 @@ CDelimiter.prototype.recalculateSize = function()
 
     this.size = {width: width, height: height, center: center};
 }
-
-function CStructOperator(type, loc, turn)
+CDelimiter.prototype.getBase = function()
 {
-    this.type = type;
-    this.loc = loc;
-    this.turn = turn;
-
-
-    var countRow, countCol;
-    if(loc == 0 || loc == 1)
-    {
-        countRow = 2;
-        countCol = 1;
-    }
-    else
-    {
-        countRow = 1;
-        countCol = 2;
-    }
-
-    CMathBase.call(this, countRow, countCol);
-}
-extend(CStructOperator, CMathBase);
-CStructOperator.prototype.setContent = function()
-{
-
+    return this.base;
 }
 
 function COperatorBracket()
@@ -2125,6 +2104,16 @@ CStructArrow.prototype.recalculateSize = function()
     }
 
     CStructArrow.superclass.recalculateSize.call(this);
+}
+CStructArrow.prototype.getBase = function()
+{
+    var res;
+    if(this.loc == 0)
+        res = this.elements[1][0];
+    else
+        res = this.elements[0][0];
+
+    return res;
 }
 
 function CSingleArrow()

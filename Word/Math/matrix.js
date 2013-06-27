@@ -376,10 +376,7 @@ CMathMatrix.prototype.addRow = function()
     //this.setDistance();
     this.recalculateSize();
 }
-CMathMatrix.prototype.getElement = function(x, y)
-{
-    return this.elements[x][y];
-}
+
 CMathMatrix.prototype.setRowGapRule = function(rule, gap)
 {
     this.spaceRow.rule = rule;
@@ -389,7 +386,8 @@ CMathMatrix.prototype.setColumnGapRule = function(rule, gap, minGap)
 {
     this.spaceColumn.rule = rule;
     this.spaceColumn.gap = gap;
-    this.spaceColumn.minGap = minGap;
+    if(minGap != null && typeof(minGap) !== "undefined")
+        this.spaceColumn.minGap = minGap;
 }
 CMathMatrix.prototype.getLineGap = function(space)
 {

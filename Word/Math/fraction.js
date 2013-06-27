@@ -39,7 +39,14 @@ CBarFraction.prototype.draw = function()
 
     CBarFraction.superclass.draw.call(this);
 }
-
+CBarFraction.prototype.getNumerator = function()
+{
+    return this.elements[0][0].getElement();
+}
+CBarFraction.prototype.getDenominator = function()
+{
+    return this.elements[1][0].getElement();
+}
 //////////
 
 function CNumerator()
@@ -131,6 +138,10 @@ CNumerator.prototype.setPosition = function(pos)
     var y = pos.y ;
 
     this.elements[0][0].setPosition({x: x, y: y});
+}
+CNumerator.prototype.getElement = function(txt)
+{
+    return this.elements[0][0];
 }
 
 function CDenominator()
@@ -231,6 +242,10 @@ CDenominator.prototype.setGapCoeff = function(coeff)
         this.coeffGap = coeff;
         this.recalculateSize();
     }
+}
+CDenominator.prototype.getElement = function(txt)
+{
+    return this.elements[0][0];
 }
 
 
@@ -425,6 +440,14 @@ CSkewedFraction.prototype.draw = function()
     MathControl.pGraph._l(xx2, yy2);
     MathControl.pGraph.ds();
 }
+CSkewedFraction.prototype.getNumerator = function()
+{
+    return this.elements[0][0];
+}
+CSkewedFraction.prototype.getDenominator = function()
+{
+    return this.elements[0][1];
+}
 
 //////////
 
@@ -502,6 +525,14 @@ CLinearFraction.prototype.draw = function()
 
     CLinearFraction.superclass.draw.call(this);
 
+}
+CLinearFraction.prototype.getNumerator = function()
+{
+    return this.elements[0][0];
+}
+CLinearFraction.prototype.getDenominator = function()
+{
+    return this.elements[0][1];
 }
 
 /////////

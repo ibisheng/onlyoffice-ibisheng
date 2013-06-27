@@ -913,6 +913,23 @@ CMathBase.prototype =
         this.recalculateSize();
         this.Parent.ResizeReverse();
     },
+    ResizeReverse_2: function() //for finished equation
+    {
+        this.ResizeDirect();
+
+        this.Parent.ResizeReverse();
+    },
+    ResizeDirect: function()
+    {
+        for(var i=0; i < this.nRow; i++)
+            for(var j = 0; j < this.nCol; j++)
+            {
+                if(! this.elements[i][j].IsJustDraw() )
+                    this.elements[i][j].ResizeDirect();
+            }
+
+        this.recalculateSize();
+    },
     getCenter: function(_height)
     {
         var res = 0;
@@ -1010,5 +1027,9 @@ CMathBase.prototype =
         for(var i=0; i < this.nRow; i++)
             for(var j = 0; j < this.nCol; j++)
                 this.elements[i][j].hidePlaceholder(flag);
+    },
+    getElement: function(x, y)
+    {
+     return this.elements[x][y];
     }
 }
