@@ -1272,7 +1272,7 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 		chart.isSkip = isSkip;
 		if(isSeries)
 		{
-			if(chart.type == 'HBar' || chart.type == 'Bar' || chart.type == 'Stock')
+			if(chart.type == 'HBar' || chart.type == 'Bar' || chart.type == 'Stock' || chart.type == 'Pie')
 			{
 				//надо перевернуть массив
 				arrValuesRev = arrReverse(arrValues);
