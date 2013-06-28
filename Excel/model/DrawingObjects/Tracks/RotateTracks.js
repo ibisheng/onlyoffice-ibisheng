@@ -41,7 +41,7 @@ function OverlayObject(geometry, extX, extY, brush, pen, transform)
     {
         overlay.SaveGrState();
         overlay.SetIntegerGrid(false);
-        overlay.transform3(this.transform, false);
+        overlay.transform3(this.TransformMatrix, false);
         this.shapeDrawer.fromShape(this, overlay);
         this.shapeDrawer.draw(this.geometry);
         overlay.RestoreGrState();

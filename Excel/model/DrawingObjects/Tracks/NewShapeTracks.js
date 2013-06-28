@@ -20,17 +20,30 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
     this.transform = new CMatrix();
     var geometry = CreateGeometry(presetGeom);
     geometry.Init(5, 5);
-    var brush = new CUniFill();
-    brush.fill = new CSolidFill();
-    brush.fill.color.color = new CRGBColor();
-    brush.fill.color.color.RGBA = {R:155, G:255, B:255, A:255};
 
-    var pen = new CLn();
-    pen.w = 38100;
-    pen.Fill = new CUniFill();
-    pen.Fill.fill = new CSolidFill();
-    pen.Fill.fill.color.color = new CRGBColor();
-    pen.Fill.fill.color.color.RGBA = {R:155, G:255, B:0, A:255};
+    var theme = drawingObjects.getWorkbook().theme;
+    var color_map = GenerateDefaultColorMap().color_map;
+    var style = CreateDefaultShapeStyle();
+    var brush = theme.getFillStyle(style.fillRef.idx);
+    style.fillRef.Color.Calculate(theme, color_map, {R:0, G:0, B:0, A:255});
+    var RGBA = style.fillRef.Color.RGBA;
+
+    if (style.fillRef.Color.color != null)
+    {
+        if (brush.fill != null && (brush.fill.type == FILL_TYPE_SOLID || brush.fill.type == FILL_TYPE_GRAD))
+        {
+            brush.fill.color = style.fillRef.Color.createDuplicate();
+        }
+    }
+    brush.calculate(theme, color_map, RGBA) ;
+
+    var pen = theme.getLnStyle(style.lnRef.idx);
+    style.lnRef.Color.Calculate(theme, color_map, {R: 0 , G: 0, B: 0, A: 255});
+    RGBA = style.lnRef.Color.RGBA;
+
+    pen.Fill.calculate(theme, color_map, RGBA) ;
+
+
     this.overlayObject = new OverlayObject(geometry, 5, 5, brush, pen, this.transform);
 
     this.track = function(e, x, y)

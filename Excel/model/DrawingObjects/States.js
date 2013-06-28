@@ -287,6 +287,7 @@ function TrackNewShapeState(drawingObjectsController, drawingObjects)
     this.onMouseMove = function(e, x, y)
     {
         this.drawingObjectsController.trackNewShape(e, x, y);
+        this.drawingObjects.showOverlayGraphicObjects();
     };
 
     this.onMouseUp = function(e, x, y)
