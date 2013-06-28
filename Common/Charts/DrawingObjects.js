@@ -2201,7 +2201,6 @@ function DrawingObjects() {
 			// всё чистим
 			if (clearCanvas) {
 				_this.clearDrawingObjects();
-				shapeOverlayCtx.m_oContext.clearRect(0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix);
 			}
 				
 			if ( !imageLoader.isReady() ) {
@@ -2346,6 +2345,7 @@ function DrawingObjects() {
 	}
 
 	_this.showOverlayGraphicObjects = function() {
+		shapeOverlayCtx.m_oContext.clearRect(0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix);
 		_this.controller.drawTracks(shapeOverlayCtx);
 	}
 	
