@@ -11,7 +11,8 @@ function ChartRender() {
 			g_bChartPreview = true;
 		else
 			g_bChartPreview = false;
-		
+		if(window["editor"])
+			return;
 		if (chart.worksheet && !OfficeExcel.drawingCtxCharts)//выставление контекста для отрисовки
 			OfficeExcel.drawingCtxCharts = chart.worksheet.getDrawingContextCharts();
 		chartCanvas = document.createElement('canvas');
