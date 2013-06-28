@@ -582,10 +582,13 @@ function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY, chart)
 		var font = getFontProperties("key");
 		var props = getMaxPropertiesText(context,font,bar._otherProps._key);
 		var heigthTextKey = (context.getHeightText()/0.75);
+		var kF = 1;
+		if(bar.type == 'pie')
+			kF = 2;
 		if(bar._otherProps._key_halign == 'top')
-			top += heigthTextKey + 7;
+			top += (heigthTextKey + 7)*kF;
 		else
-			bottom += heigthTextKey + 7;
+			bottom += (heigthTextKey + 7)*kF;
 	}
 	//+ ширина легенды
 	if (bar._otherProps._key_halign == 'left' || bar._otherProps._key_halign == 'right')
@@ -604,9 +607,12 @@ function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY, chart)
 	
 	if(bottom == 0)
 		bottom = standartMargin;
+	var standartMarginTop = standartMargin;
+	if(bar.type == 'pie' && bar._otherProps._key_halign == 'top')
+		standartMarginTop = 0;
 	bar._chartGutter._left = (left)*scale + standartMargin;
 	bar._chartGutter._right = (standartMargin + right)*scale;
-	bar._chartGutter._top = (standartMargin + top)*scale;
+	bar._chartGutter._top = (standartMarginTop + top)*scale;
 	bar._chartGutter._bottom = (bottom)*scale;
 }
 
