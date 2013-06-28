@@ -2058,6 +2058,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				
 				this.isStartAddShape = true;
 				this.addShapePreset = sPreset;
+				var ws = this.wb.getWorksheet();
+				ws.objectRender.controller.startTrackNewShape(sPreset);
 								
 				if (is_apply) {					
 				}

@@ -3701,6 +3701,22 @@ function DrawingObjects() {
 	}
 	
 	//-----------------------------------------------------------------------------------
+	// Graphic object mouse events
+	//-----------------------------------------------------------------------------------
+	
+	_this.shapeMouseDown = function(e, x, y) {
+		_this.controller.onMouseDown( e, pxToMm(x), pxToMm(y) );
+	}
+	
+	_this.shapeMouseMove = function(e, x, y) {
+		_this.controller.onMouseMove( e, pxToMm(x), pxToMm(y) );
+	}
+	
+	_this.shapeMouseUp = function(e, x, y) {
+		_this.controller.onMouseUp( e, pxToMm(x), pxToMm(y) );
+	}
+	
+	//-----------------------------------------------------------------------------------
 	// Asc
 	//-----------------------------------------------------------------------------------
 	

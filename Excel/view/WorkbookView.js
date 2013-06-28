@@ -655,20 +655,17 @@
 			
 			_onShapeMouseDown: function (e, x, y) {
 				var ws = this.getWorksheet();
-				//console.log("_onShapeMouseDown");
-				ws.objectRender.controller.onMouseDown(e, x, y);
+				ws.objectRender.shapeMouseDown(e, x, y);
 			},
 			
 			_onShapeMouseMove: function (e, x, y) {
 				var ws = this.getWorksheet();
-				//console.log("_onShapeMouseMove");
-				ws.objectRender.controller.onMouseMove(e, x, y);
+				ws.objectRender.shapeMouseMove(e, x, y);
 			},
 			
 			_onShapeMouseUp: function (e, x, y) {
 				var ws = this.getWorksheet();
-				//console.log("_onShapeMouseUp");
-				ws.objectRender.controller.onMouseUp(e, x, y);
+				ws.objectRender.shapeMouseUp(e, x, y);
 			},
 			
 			_onMouseDblClick: function (x, y, isHideCursor, isCoord, callback) {
