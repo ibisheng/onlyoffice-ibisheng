@@ -2339,6 +2339,10 @@ function DrawingObjects() {
 		}
 	}
 
+	_this.showOverlayGraphicObjects = function() {
+		_this.controller.drawTracks(shapeOverlayCtx);
+	}
+	
 	_this.showOverlayDrawingObjects = function() {
 
 		if (overlayCtx) {
