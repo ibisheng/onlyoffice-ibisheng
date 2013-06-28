@@ -107,6 +107,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.isChartEditor = false;
 			this.chartStyleManager = new ChartStyleManager();
 			this.chartPreviewManager = new ChartPreviewManager();
+			
+			// Shapes
+			this.isStartAddShape = false;
+			this.addShapePreset = "";
 			/**************************************/
 
 			this.OpenDocumentProgress = {
@@ -2037,7 +2041,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				return ws.cellCommentator.asc_hideComments();
 			},
 			
-			asc_getWorkbookComments: function() {				
+			asc_getWorkbookComments: function() {
 				var _this = this, comments = [];
 				if ( _this.wb ) {
 					for (var i = 0; i < _this.wb.model.aWorksheets.length; i++) {
@@ -2049,8 +2053,24 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				return comments;
 			},
 
+			// Shapes
+			asc_startAddShape: function(sPreset, is_apply) {
+				
+				this.isStartAddShape = true;
+				this.addShapePreset = sPreset;
+				
+				if (is_apply)
+				{
+					//this.WordControl.m_oDrawingDocument.LockCursorType("crosshair");
+				}
+				else
+				{
+					//editor.sync_EndAddShape();
+					//editor.sync_StartAddShapeCallback(false);
+				}
+			},
+			
 			// Cell interface
-
 			asc_getCellInfo: function (bExt) {
 				return this.wb.getWorksheet().getSelectionInfo(!!bExt);
 			},
@@ -2794,10 +2814,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		
 		prot["asc_getComments"] = prot.asc_getComments;
 		prot["asc_getDocumentComments"] = prot.asc_getDocumentComments;
-		prot["asc_getWorkbookComments"] = prot.asc_getWorkbookComments;		
+		prot["asc_getWorkbookComments"] = prot.asc_getWorkbookComments;
+		
+		// Shapes
+		prot["asc_startAddShape"] = prot.asc_startAddShape;
 
 		// Cell interface
-
 		prot["asc_getCellInfo"] = prot.asc_getCellInfo;
 		prot["asc_getActiveCellCoord"] = prot.asc_getActiveCellCoord;
 		prot["asc_setCellFontName"] = prot.asc_setCellFontName;

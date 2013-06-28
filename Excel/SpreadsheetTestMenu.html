@@ -130,7 +130,18 @@
 		<!--for colors-->
 		<script src="../Common/Charts/libraries/hsv.js"></script>
 		<script src="../Common/Charts/libraries/rgbcolor.js"></script>
-
+		
+		<!--for shapes-->
+		<script src="../Word/Drawing/Graphics.js"></script>
+		<script src="model/DrawingObjects/DrawingObjectsController.js"></script>
+		<script src="model/DrawingObjects/States.js"></script>
+		
+		<script src="model/DrawingObjects/Format/GroupShape.js"></script>
+		<script src="model/DrawingObjects/Format/Image.js"></script>
+		<script src="model/DrawingObjects/Format/Shape.js"></script>
+		
+		<script src="model/DrawingObjects/Tracks/ResizeTracks.js"></script>
+		<script src="model/DrawingObjects/Tracks/RotateTracks.js"></script>
 
 
 		<style type="text/css">
@@ -1607,6 +1618,13 @@
                         </div>
                     </li>
                 </ul>
+				<ul class="noListStyle">
+                    <li class="ToolbarIconOut selectableIcon" title="Add shape">
+                        <div id="td_shape" class="ToolbarIconOut selectableIcon iconToolbar">
+                            <img class="ToolbarIcon ToolbarIconMenuAsc ToolbarAddShape" src="menu/img/spacer.gif"/>
+                        </div>
+                    </li>
+                </ul>
 			</td>
             <td class="cp toolbarSep" style="vertical-align: top; width: 15px;min-width:15px;">
                 <div class="sepMenu ToolbarIconOut" style="position: absolute; background: url('menu/img/sep.png') repeat-y scroll 0pt 0pt transparent; margin-top: -7px; height: 65px; margin-left: 6px;"></div>
@@ -2128,5 +2146,250 @@
             </fieldset>
         </div>
     </div>
+	<div id="shapeBox" class="options hidden">
+		<table>
+			<tr>
+				<td class="cell" title="line"><img src="menu/img/line.bmp"></td>
+				<td class="cell" title="textRect"><img src="menu/img/Irregular2.bmp"></td>
+				<td class="cell" title="spline"><img src="menu/img/ellipse.bmp"></td>
+				<td class="cell" title="curvedConnector2"><img src="menu/img/star5.bmp"></td>
+				<td class="cell" title="mathDivide"><img src="menu/img/star6.bmp"></td>
+				<td class="cell" title="leftRightArrow"><img src="menu/img/star7.bmp"></td>
+				<td class="cell" title="star8"><img src="menu/img/star8.bmp"></td>
+				<td class="cell" title="star10"><img src="menu/img/star10.bmp"></td>
+				<td class="cell" title="star12"><img src="menu/img/star12.bmp"></td>
+				<td class="cell" title="star16"><img src="menu/img/star16.bmp"></td>
+				<td class="cell" title="polyline1"><img src="menu/img/star24.bmp"></td>
+				<td class="cell" title="polyline2"><img src="menu/img/star32.bmp"></td>
+			</tr>
+			<tr>
+				<td class="cell" title="ribbon"><img src="menu/img/ribbon.bmp">
+				<td class="cell" title="ribbon2"><img src="menu/img/ribbon2.bmp">
+				<td class="cell" title="ellipseRibbon"><img src="menu/img/ellipseRibbon.bmp">
+
+				<td class="cell" title="ellipseRibbon2"><img src="menu/img/ellipseRibbon2.bmp">
+
+				<td class="cell" title="verticalScroll"><img src="menu/img/verticalScroll.bmp">
+
+				<td class="cell" title="horizontalScroll"><img src="menu/img/horizontalScroll.bmp">
+				<td class="cell" title="wave"><img src="menu/img/wave.bmp">
+				<td class="cell" title="doubleWave"><img src="menu/img/dowbleWave.bmp">
+				<td class="cell" title="triangle"><img src="menu/img/triangle.bmp">
+				<td class="cell" title="rtTriangle"><img src="menu/img/rtTriangle.bmp">
+				<td class="cell" title="smileyFace"><img src="menu/img/smileyFace.bmp">
+				<td class="cell" title="heart"><img src="menu/img/heart.bmp"></td>
+			</tr>
+			<tr>
+				<td class="cell" title="wedgeRectCallout"><img src="menu/img/wedgeRectCallout.bmp"></td>
+				<td class="cell" title="wedgeRoundRectCallout"><img src="menu/img/wedgeRoundRectCallout.bmp"></td>
+				<td class="cell" title="wedgeEllipseCallout"><img src="menu/img/wedgeEllipseCallout.bmp"></td>
+				<td class="cell" title="cloudCallout"><img src="menu/img/cloudCallout.bmp"></td>
+				<td class="cell" title="borderCallout1"><img src="menu/img/borderCallout1.bmp"></td>
+				<td class="cell" title="borderCallout2"><img src="menu/img/borderCallout2.bmp"></td>
+				<td class="cell" title="borderCallout3"><img src="menu/img/borderCallout3.bmp"></td>
+				<td class="cell" title="accentCallout1"><img src="menu/img/accentCallout1.bmp"></td>
+				<td class="cell" title="accentCallout2"><img src="menu/img/accentCallout2.bmp"></td>
+				<td class="cell" title="accentCallout3"><img src="menu/img/accentCallout3.bmp"></td>
+				<td class="cell" title="callout1"><img src="menu/img/callout1.bmp"></td>
+				<td class="cell" title="callout2"><img src="menu/img/callout2.bmp"></td>
+			</tr>
+			<tr>
+				<td class="cell" title="callout3"><img src="menu/img/callout3.bmp"></td>
+				<td class="cell" title="accentBorderCallout1"><img src="menu/img/accentBorderCallout1.bmp"></td>
+				<td class="cell" title="accentBorderCallout2"><img src="menu/img/accentBorderCallout2.bmp"></td>
+				<td class="cell" title="accentBorderCallout3"><img src="menu/img/accentBorderCallout3.bmp"></td>
+				<td class="cell" title="lightningBolt"><img src="menu/img/lightningBolt.bmp"></td>
+				<td class="cell" title="sun"><img src="menu/img/sun.bmp"></td>
+				<td class="cell" title="moon"><img src="menu/img/moon.bmp"></td>
+				<td class="cell" title="cloud"><img src="menu/img/cloud.bmp"></td>
+				<td class="cell" title="nonIsoscelesTrapezoid"><img src="menu/img/nonIsoscelesTrapezoid.bmp"></td>
+				<td class="cell" title="noSmoking"><img src="menu/img/noSmoking.bmp"></td>
+				<td class="cell" title="notchedRightArrow"><img src="menu/img/notchedRightArrow.bmp"></td>
+				<td class="cell" title="octagon"><img src="menu/img/octagon.bmp"></td>
+			</tr>
+			<tr>
+				<td class="cell" title="lineWithArrow"><img src="menu/img/parallelogram.bmp"></td>
+				<td class="cell" title="lineWithTwoArrow"><img src="menu/img/pentagon.bmp"></td>
+				<td class="cell" title="pie"><img src="menu/img/pie.bmp"></td>
+				<td class="cell" title="plaque"><img src="menu/img/plaque.bmp"></td>
+				<td class="cell" title="quadArrow"><img src="menu/img/quadArrow.bmp"></td>
+				<td class="cell" title="quadArrowCallout"><img src="menu/img/quadArrowCallout.bmp"></td>
+				<td class="cell" title="curvedDownArrow"><img src="menu/img/curvedDownArrow.bmp"></td>
+				<td class="cell" title="curvedLeftArrow"><img src="menu/img/curvedLeftArrow.bmp"></td>
+				<td class="cell" title="curvedRightArrow"><img src="menu/img/curvedRightArrow.bmp"></td>
+				<td class="cell" title="curvedUpArrow"><img src="menu/img/curvedUpArrow.bmp"></td>
+				<td class="cell" title="polyline1"><img src="menu/img/octagon.bmp"></td>
+				<td class="cell" title="polyline2"><img src="menu/img/octagon.bmp"></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+		</table>
+	</div>
 	</body>
 </html>

@@ -1967,12 +1967,13 @@ function DrawingObjects() {
 	// Private
 	//-----------------------------------------------------------------------------------
 	
-	var _this = this;
+	var _this = this;	
 	var chartRender = new ChartRender();
 	var worksheet = null;
 	var isViewerMode = null;	
 	var drawingCtx = null;
 	var overlayCtx = null;
+	var shapeCtx = null;
 	var aObjects = null;
 	var minImageWidth = 20;
 	var minImageHeight = 20;
@@ -2001,6 +2002,7 @@ function DrawingObjects() {
 		
 		drawingCtx = currentSheet.drawingCtx;
 		overlayCtx = currentSheet.overlayCtx;
+		shapeCtx = currentSheet.shapeCtx;
 		isViewerMode =  function() { return worksheet._trigger("getViewerMode"); };
 
 		aObjects = [];
@@ -2030,6 +2032,14 @@ function DrawingObjects() {
 		}
 	}
 
+	_this.getWorkbook = function() {
+		return (worksheet ? worksheet.model.workbook : null);
+	}
+	
+	_this.getDrawingObjects = function() {
+		return aObjects;
+	}
+	
 	_this.setShiftKey = function(bShiftKey) {
 		shiftKey = bShiftKey;
 	}
@@ -2438,6 +2448,7 @@ function DrawingObjects() {
 		_t.move = { x: 0, y: 0, inAction: false };
 
 		_t.chart = new asc_CChart();
+		_t.shape = null; //new CShape(_t);
 
 		_t.flags = {
 			selected: false,
@@ -2455,6 +2466,10 @@ function DrawingObjects() {
 		
 		_t.isChart = function() {
 			return _t.chart.type ? true : false;
+		}
+		
+		_t.isShape = function() {
+			return _t.shape != null;
 		}
 
 		// Проверяет выход за границы
@@ -4736,6 +4751,12 @@ function DrawingObjects() {
 			fileName.click();
 	}
 
+	//-----------------------------------------------------------------------------------
+	// Shapes controller
+	//-----------------------------------------------------------------------------------
+	
+	_this.controller = new DrawingObjectsController(_this);
+	
 	//-----------------------------------------------------------------------------------
 	// Private Misc Methods
 	//-----------------------------------------------------------------------------------

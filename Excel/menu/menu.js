@@ -2510,4 +2510,61 @@
 			$("#selectAllElements").addClass('SelectedAutoFilterItem')
 			
 	});
+	
+	// Shapes
+	$("#td_shape").mousedown(function(event) {
+		if ( "none" != ($("#shapeBox").css("display")) ) {
+			IsVisibleMenu = true;
+		}
+	});
+	
+	$("#td_shape").click(
+        function()
+        {
+            if ( !IsVisibleMenu )
+            {
+                var offset = $("#td_shape").offset();
+                offset.top += $("#td_shape").outerHeight() - 1;
+                $("#shapeBox").css("top", offset.top);
+                $("#shapeBox").css("left", offset.left);
+                $("#shapeBox").attr("init", "shapePrst").show();
+            }
+            else
+            {
+                $("#shapeBox").attr("init", "shapePrst").hide();
+            }
+            IsVisibleMenu = false;
+        }
+    );
+	
+	$(".cell").css("width", "20px");
+	$(".cell").css("height", "20px");
+	$(".cell").css("padding", "2px");
+	
+	$(".cell").mousedown(
+        function()
+        {
+            $(this).css("border", "3px solid #000");
+			$("#shapeBox").attr("init", "shapePrst").hide();
+            api.asc_startAddShape($(this).attr("title"), true);
+        }
+    );
+    $(".cell").mouseover(
+        function()
+        {
+            $(this).css("border", "1px solid #000");
+        }
+    );
+    $(".cell").mouseup(
+        function()
+        {
+            $(this).css("border", "1px solid #000");
+        }
+    );
+    $(".cell").mouseout(
+        function()
+        {
+            $(this).css("border", "0px solid #000");
+        }
+    );
 });

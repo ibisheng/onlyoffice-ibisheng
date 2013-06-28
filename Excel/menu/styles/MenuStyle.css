@@ -985,3 +985,7 @@ input, textarea {outline:none;}
 .menuChartFont {
 	cursor: pointer;
 }
+
+.ToolbarAddShape{
+	background: url("../img/drawing-16.png") no-repeat scroll 0 0 transparent;
+}
