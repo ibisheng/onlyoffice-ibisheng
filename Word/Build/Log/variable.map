@@ -306,7 +306,7 @@ JSCompiler_StaticMethods__isEmptyProperty:Gd
 tt_face_free_charmap_stub:Ss
 Current_Ppem:sv
 JSCompiler_StaticMethods_Get_AllTableStyles:rM
-JSCompiler_set:ca
+JSCompiler_set:ba
 CBulletSize:Eh
 FT_CMap_ClassRec:Eo
 NvPr:hI
@@ -2619,7 +2619,7 @@ RULER_OBJECT_TYPE_PARAGRAPH:M_
 c_oAscAsyncAction$ApplyChanges:sL
 TT_LongMetricsRec:Pn
 L 27:ma
-L 26:ba
+L 26:ca
 L 29:Da
 ParaPageBreakRenderer:mN
 L 28:pa
