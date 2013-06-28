@@ -15,6 +15,13 @@ function CShape(drawingBase)
 
     this.group = null;
 
+    this.recalcInfo =
+    {
+        recalculateTransform: true,
+        recalculateBrush: true,
+        recalculatePen: true
+    };
+
     this.x = null;
     this.y = null;
     this.x = null;
@@ -34,13 +41,22 @@ function CShape(drawingBase)
     this.pen = null;
 
     this.selected = false;
+
+
 }
 
 
 CShape.prototype =
 {
-    initDefault: function()
-    {},
+    initDefault: function(x, y, extX, extY, flipH, flipV, presetGeom)
+    {
+        this.setPosition(x, y);
+        this.setExtents(extX, extY);
+        this.setFlips(flipH, flipV);
+        this.setPresetGeometry(presetGeom);
+        this.setStyle(CreateDefaultShapeStyle());
+        this.recalculate();
+    },
 
     initDefaultTextRect: function()
     {},
@@ -48,6 +64,16 @@ CShape.prototype =
     setGroup: function(group)
     {
         this.group = group;
+    },
+
+    recalculate: function()
+    {
+        if(this.recalcInfo.recalculateTransform)
+            this.recalculateTransform();
+        if(this.recalcInfo.recalculateBrush)
+            this.recalculateBrush();
+        if(this.recalcInfo.recalculatePen)
+            this.recalculatePen()
     },
 
     setPosition: function(x, y)
@@ -71,6 +97,26 @@ CShape.prototype =
     setRotate: function(rot)
     {
         this.spPr.xfrm.rot = rot;
+    },
+
+    setPresetGeometry: function(presetGeom)
+    {
+        this.spPr.geometry = CreateGeometry(presetGeom);
+    },
+
+    setStyle: function(style)
+    {
+        this.style = style;
+    },
+
+    setFill: function(fill)
+    {
+        this.spPr.Fill = fill;
+    },
+
+    setLine: function(line)
+    {
+        this.spPr.ln = line;
     },
 
     select: function(drawingObjectsController)
@@ -108,9 +154,111 @@ CShape.prototype =
         }
     },
 
+
+    recalculateTransform: function()
+    {
+        var xfrm = this.spPr.xfrm;
+        if(!isRealObject(this.group))
+        {
+            this.x = xfrm.offX;
+            this.y = xfrm.offY;
+            this.extX = xfrm.extX;
+            this.extY = xfrm.extY;
+            this.rot = isRealNumber(xfrm.rot) ? xfrm.rot : 0;
+            this.flipH = xfrm.flipH === true;
+            this.flipV = xfrm.flipV === true;
+        }
+        else
+        {
+            var scale_scale_coefficients = this.group.getResultScaleCoefficients();
+            this.x = scale_scale_coefficients.cx*(xfrm.offX - this.group.xfrm.chOffX);
+            this.y = scale_scale_coefficients.cy*(xfrm.offY - this.group.xfrm.chOffY);
+            this.extX = scale_scale_coefficients.cx*xfrm.extX;
+            this.extY = scale_scale_coefficients.cy*xfrm.extY;
+            this.rot = isRealNumber(xfrm.rot) ? xfrm.rot : 0;
+            this.flipH = xfrm.flipH === true;
+            this.flipV = xfrm.flipV === true;
+        }
+        this.transform.Reset();
+        var hc, vc;
+        hc = this.extX*0.5;
+        vc = this.extY*0.5;
+        global_MatrixTransformer.TranslateAppend(this.transform, -hc, -vc);
+        if(this.flipH)
+            global_MatrixTransformer.ScaleAppend(this.transform, -1, 1);
+        if(this.flipV)
+            global_MatrixTransformer.ScaleAppend(this.transform, 1, -1);
+
+        global_MatrixTransformer.RotateAppend(this.transform, -this.rot);
+        global_MatrixTransformer.TranslateAppend(this.transform, this.x + hc, this.y + vc);
+        if(isRealObject(this.group))
+        {
+            global_MatrixTransformer.MultiplyAppend(t, this.group.getTransform());
+        }
+    },
+
     recalculateBrush: function()
     {
+        var theme = this.document.theme;
+        var brush;
+        var colorMap = this.document.clrSchemeMap.color_map;
+        var RGBA = {R: 0, G: 0, B: 0, A: 255};
+        if(colorMap==null)
+            colorMap = GenerateDefaultColorMap().color_map;
+        if (theme && this.style != null && this.style.fillRef!=null)
+        {
+            brush = theme.getFillStyle(this.style.fillRef.idx);
+            this.style.fillRef.Color.Calculate(theme, colorMap, {R:0, G:0, B:0, A:255});
+            RGBA = this.style.fillRef.Color.RGBA;
 
+            if (this.style.fillRef.Color.color != null)
+            {
+                if (brush.fill != null && (brush.fill.type == FILL_TYPE_SOLID || brush.fill.type == FILL_TYPE_GRAD))
+                {
+                    brush.fill.color = this.style.fillRef.Color.createDuplicate();
+                }
+            }
+        }
+        else
+        {
+            brush = new CUniFill();
+        }
+
+        brush.merge(this.spPr.Fill);
+        this.brush = brush;
+        this.brush.calculate(theme, colorMap, RGBA);
+    },
+
+    recalculatePen: function()
+    {
+        var _calculated_line;
+        var _theme = this.document.theme;
+        var colorMap = this.document.clrSchemeMap.color_map;
+        if(colorMap==null)
+            colorMap = GenerateDefaultColorMap().color_map;
+        var RGBA = {R: 0, G: 0, B: 0, A: 255};
+        if(_theme !== null && typeof _theme === "object" && typeof _theme.getLnStyle === "function"
+            && this.style !== null && typeof  this.style === "object"
+            && this.style.lnRef !== null && typeof this.style.lnRef === "object" && typeof  this.style.lnRef.idx === "number"
+            && this.style.lnRef.Color !== null && typeof  this.style.lnRef.Color.Calculate === "function")
+        {
+            _calculated_line = _theme.getLnStyle(this.style.lnRef.idx);
+            this.style.lnRef.Color.Calculate(_theme, colorMap, {R: 0 , G: 0, B: 0, A: 255});
+            RGBA = this.style.lnRef.Color.RGBA;
+        }
+        else
+        {
+            _calculated_line = new CLn();
+        }
+
+        _calculated_line.merge(this.spPr.ln);
+
+        if(_calculated_line.Fill!=null)
+        {
+            _calculated_line.Fill.calculate(_theme, colorMap, RGBA) ;
+        }
+
+        this.pen = _calculated_line;
     },
 
     draw: function(graphics)
