@@ -2484,6 +2484,10 @@ function DrawingObjects() {
 			return (_t.worksheet ? _t.worksheet.model.workbook : null);
 		}
 
+        _t.getCanvasContext = function() {
+            return shapeCtx.m_oContext;
+        }
+
 		// Проверяет выход за границы
 		_t.canDraw = function() {
 			var result = true;
@@ -3256,7 +3260,7 @@ function DrawingObjects() {
 	_this.addGraphicObject = function(x, y, extX, extY, flipH, flipV, presetGeom) {
 		
 		var obj = _this.createDrawingObject();
-		obj.graphicObject = new CShape(_this);
+		obj.graphicObject = new CShape(obj);
 		obj.graphicObject.initDefault(x, y, extX, extY, flipH, flipV, presetGeom);
 		aObjects.push(obj);
 		_this.showDrawingObjects(false);
