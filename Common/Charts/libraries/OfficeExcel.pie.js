@@ -731,7 +731,7 @@
                             this.centery + explosion_offsety + (((this.radius + 10) * Math.sin(a))),
                             labels[i],
                             vAlignment,
-                            hAlignment, false, null,null, bolf, null, textOptions);
+                            hAlignment, false, null,null, bold, null, textOptions);
             }
             
             context.fill();
