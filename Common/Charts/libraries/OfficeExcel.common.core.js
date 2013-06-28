@@ -1499,8 +1499,10 @@
 	OfficeExcel.Text = function (context, font, size, x, y, text)
     {
 		var drwContext = OfficeExcel.drawingCtxCharts;
+		var scale = 1;
 		if(drwContext)
 		{
+			scale = drwContext.scaleFactor;
 			drwContext.setCanvas(bar.canvas);
 
 			context = drwContext;
@@ -1541,7 +1543,7 @@
 			if (arguments[6]) {
 				var vAlign = arguments[6];
 				if(textSize)
-					size1 = textSize.height/0.75;
+					size1 = (textSize.height/0.75)*scale;
 				else
 					size1 = size;
 				if (vAlign == 'center') {
@@ -1557,7 +1559,7 @@
 			// Hoeizontal alignment - defaults to left
 			if (arguments[7] && textSize) {
 				var hAlign = arguments[7];
-				width = textSize.width/0.75;
+				width = (textSize.width/0.75)*scale;
 				if (hAlign) {
 					if (hAlign == 'center') {
 						//context.translate(-1 * (width / 2), 0)
@@ -1572,8 +1574,8 @@
 				context.setFillStyle(arguments[13].color);
 			else
 				context.setFillStyle("#000000");
-			x = x/(drwContext.scaleFactor);
-			y = y/(drwContext.scaleFactor);
+			x = x/(scale);
+			y = y/(scale);
 			// Rotate the canvas if need be
 			if (arguments[9] && textSize) {
 				var textOptions = 
