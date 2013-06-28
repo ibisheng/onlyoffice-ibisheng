@@ -123,7 +123,7 @@ SignType$Positive:yf
 __gray_convert_glyph:Et
 GenerateDefaultTheme:ug
 c_oSerPosHV$Align:TW
-c_oAscXAlign$Left:yR
+c_oAscXAlign$Left:xR
 WRAP_TEXT_SIDE_BOTH_SIDES:AF
 Ins_SPVTL:dv
 reallocate_t1_table:aq
@@ -2946,7 +2946,7 @@ c_oSerSigTypes$Version:lT
 EChartAxPos$chartaxposRight:kk
 JSCompiler_StaticMethods_isPointInDrawingObjects:GC
 L 61:nr
-JSCompiler_StaticMethods_Viewer_OnChangePosition:bR
+JSCompiler_StaticMethods_Viewer_OnChangePosition:aR
 c_oSer_ColorType$Auto:hj
 L 60:mr
 L 99:eL
