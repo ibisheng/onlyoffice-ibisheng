@@ -220,3 +220,48 @@ CMathFunc.prototype.getArgument = function()
 {
     return this.elements[0][1];
 }
+
+
+
+function old_CTrigFunc(num)
+{
+    if(num != num + 0 || num < 0 || num > 14)
+        return;
+
+    this.num = num;
+    //CSubMathBase.call(this, 1, 2);
+    CMathBase.call(this, 1,2);
+
+}
+//extend(old_CTrigFunc,CSubMathBase);
+extend(old_CTrigFunc, CMathBase);
+old_CTrigFunc.prototype.setContent = function()
+{
+    var oFunc = new CMathContent();
+    var GParms = Common_CopyObj(this.params);
+    GParms.bMText = false;
+
+    oFunc.init(GParms);
+    oFunc.setContent.apply(oFunc, NameFunctions.trig[this.num] );
+
+    var oArg  = new CMathContent();
+    oArg.init(this.params);
+    oArg.fillPlaceholders();
+
+    old_CTrigFunc.superclass.setContent.call(this, oFunc, oArg);
+}
+old_CTrigFunc.prototype.setDistance = function()
+{
+    //todo
+    //переделать!
+    this.dW = slashWidth(this.params.font);
+    this.dH = 0;
+}
+old_CTrigFunc.prototype.getFunction = function()
+{
+    return this.elemens[0][0];
+}
+old_CTrigFunc.prototype.getArgument = function()
+{
+    return this.elemens[0][1];
+}
