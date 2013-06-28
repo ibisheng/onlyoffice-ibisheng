@@ -71,9 +71,19 @@ DrawingObjectsController.prototype =
             this.arrTrackObjects[i].track(angle, e);
     },
 
+    trackNewShape: function(e, x, y)
+    {
+        this.arrTrackObjects[0].track(e, x, y);
+    },
+
     trackEnd: function()
     {
         for(var i = 0; i < this.arrTrackObjects.length; ++i)
             this.arrTrackObjects[i].trackEnd();
+    },
+
+    startTrackNewShape: function(presetGeom)
+    {
+        this.changeCurrentState(new StartTrackNewShapeState(this, this.drawingObjects, presetGeom));
     }
 };

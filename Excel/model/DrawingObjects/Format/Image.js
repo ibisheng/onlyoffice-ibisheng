@@ -72,7 +72,6 @@ CImage.prototype =
         this.recalculate();
     },
 
-
     setPresetGeometry: function(preset)
     {
         this.spPr.geometry = CreateGeometry(preset);
@@ -127,11 +126,11 @@ CImage.prototype =
         }
         else
         {
-            //TODO
-            this.x = xfrm.offX;
-            this.y = xfrm.offY;
-            this.extX = xfrm.extX;
-            this.extY = xfrm.extY;
+            var scale_scale_coefficients = this.group.getResultScaleCoefficients();
+            this.x = scale_scale_coefficients.cx*(xfrm.offX - this.group.xfrm.chOffX);
+            this.y = scale_scale_coefficients.cy*(xfrm.offY - this.group.xfrm.chOffY);
+            this.extX = scale_scale_coefficients.cx*xfrm.extX;
+            this.extY = scale_scale_coefficients.cy*xfrm.extY;
             this.rot = isRealNumber(xfrm.rot) ? xfrm.rot : 0;
             this.flipH = xfrm.flipH === true;
             this.flipV = xfrm.flipV === true;
@@ -170,14 +169,75 @@ CImage.prototype =
 
     getCardDirectionByNum: function(num)
     {
-        //TODO
-        return CARD_DIRECTION_N;
+        var num_north = this.getNumByCardDirection(CARD_DIRECTION_N);
+        var full_flip_h = this.getFullFlipH();
+        var full_flip_v = this.getFullFlipV();
+        var same_flip = !full_flip_h && !full_flip_v || full_flip_h && full_flip_v;
+        if(same_flip)
+            return ((num - num_north) + CARD_DIRECTION_N + 8)%8;
+
+        return (CARD_DIRECTION_N - (num - num_north)+ 8)%8;
     },
 
     getNumByCardDirection: function(cardDirection)
     {
-        //TODO
-        return 1;
+        var hc = this.extX*0.5;
+        var vc = this.extY*0.5;
+        var transform = this.getTransform();
+        var y1, y3, y5, y7;
+        y1 = transform.TransformPointY(hc, 0);
+        y3 = transform.TransformPointY(this.extX, vc);
+        y5 = transform.TransformPointY(hc, this.extY);
+        y7 = transform.TransformPointY(0, vc);
+
+        var north_number;
+        var full_flip_h = this.getFullFlipH();
+        var full_flip_v = this.getFullFlipV();
+        switch(Math.min(y1, y3, y5, y7))
+        {
+            case y1:
+            {
+                north_number = !full_flip_v ? 1 : 5;
+                break;
+            }
+            case y3:
+            {
+                north_number = !full_flip_h ? 3 : 7;
+                break;
+            }
+            case y5:
+            {
+                north_number = !full_flip_v ? 5 : 1;
+                break;
+            }
+            default:
+            {
+                north_number = !full_flip_h ? 7 : 3;
+                break;
+            }
+        }
+        var same_flip = !full_flip_h && !full_flip_v || full_flip_h && full_flip_v;
+
+        if(same_flip)
+            return (north_number + cardDirection)%8;
+        return (north_number - cardDirection + 8)%8;
+    },
+
+    getFullFlipH: function()
+    {
+        if(!isRealObject(this.group))
+            return this.flipH;
+        else
+            return this.group.getFullFlipH() ? !this.flipH : this.flipH;
+    },
+
+
+    getFullFlipV: function()
+    {
+        if(!isRealObject(this.group))
+            return this.flipH;
+        else
+            return this.group.getFullFlipH() ? !this.flipH : this.flipH;
     },
 
     setGroup: function(group)

@@ -52,5 +52,43 @@ CGroupShape.prototypr =
         if(!isRealObject(this.group))
             return this;
         return this.group.getMainGroup();
+    },
+
+    getResultScaleCoefficients: function()
+    {
+        var cx, cy;
+        if(this.spPr.xfrm.chExtX > 0)
+            cx = this.spPr.xfrm.extX/this.spPr.xfrm.chExtX;
+        else
+            cx = 1;
+
+        if(this.spPr.xfrm.chExtY > 0)
+            cy = this.spPr.xfrm.extY/this.spPr.xfrm.chExtY;
+        else
+            cy = 1;
+        if(isRealObject(this.group))
+        {
+            var group_scale_coefficients = this.group.getResultScaleCoefficients();
+            cx *= group_scale_coefficients.cx;
+            cy *= group_scale_coefficients.cy;
+        }
+        return {cx: cx, cy: cy};
+    },
+
+    getFullFlipH: function()
+    {
+        if(!isRealObject(this.group))
+            return this.flipH;
+        else
+            return this.group.getFullFlipH() ? !this.flipH : this.flipH;
+    },
+
+
+    getFullFlipV: function()
+    {
+        if(!isRealObject(this.group))
+            return this.flipH;
+        else
+            return this.group.getFullFlipH() ? !this.flipH : this.flipH;
     }
 };

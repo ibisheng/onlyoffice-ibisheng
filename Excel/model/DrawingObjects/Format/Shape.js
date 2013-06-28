@@ -110,8 +110,19 @@ CShape.prototype =
 
     recalculateBrush: function()
     {
+
     },
 
+    draw: function(graphics)
+    {
+        graphics.SetIntegerGrid(false);
+        graphics.transform3(this.transform, false);
+        var shape_drawer = new CShapeDrawer();
+        shape_drawer.fromShape(this, graphics);
+        shape_drawer.draw(this.spPr.geometry);
+        graphics.reset();
+        graphics.SetIntegerGrid(true);
+    },
 
     getTransform: function()
     {
@@ -129,8 +140,25 @@ CShape.prototype =
 
     getCardDirectionByNum: function(num)
     {
-        //TODO
+
         return CARD_DIRECTION_N;
+    },
+
+    getFullFlipH: function()
+    {
+        if(!isRealObject(this.group))
+            return this.flipH;
+        else
+            return this.group.getFullFlipH() ? !this.flipH : this.flipH;
+    },
+
+
+    getFullFlipV: function()
+    {
+        if(!isRealObject(this.group))
+            return this.flipH;
+        else
+            return this.group.getFullFlipH() ? !this.flipH : this.flipH;
     },
 
     getNumByCardDirection: function(cardDirection)

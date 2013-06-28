@@ -11,7 +11,9 @@ var STATES_ID_PRE_ROTATE = 0x01;
 var STATES_ID_ROTATE = 0x02;
 var STATES_ID_PRE_RESIZE = 0x03;
 var STATES_ID_RESIZE = 0x04;
-
+var STATES_ID_START_TRACK_NEW_SHAPE = 0x05;
+var STATES_ID_BEGIN_TRACK_NEW_SHAPE = 0x06;
+var STATES_ID_TRACK_NEW_SHAPE = 0x07;
 
 function NullState(drawingObjectsController, drawingObjects)
 {
@@ -172,6 +174,78 @@ function ResizeState(drawingObjectsController, drawingObjects, majorObject, card
     this.onMouseUp = function(e, x, y)
     {
         this.drawingObjectsController.trackEnd();
+        this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
+    }
+}
+
+function StartTrackNewShapeState(drawingObjectsController, drawingObjects, presetGeom)
+{
+    this.id = STATES_ID_START_TRACK_NEW_SHAPE;
+    this.drawingObjectsController = drawingObjectsController;
+    this.drawingObjects = drawingObjects;
+    this.presetGeom = presetGeom;
+
+    this.onMouseDown = function(e, x, y)
+    {
+        this.drawingObjectsController.changeCurrentState(new BeginTrackNewShapeState(this.drawingObjectsController, this.drawingObjects, this.presetGeom, x, y));
+    };
+
+    this.onMouseMove = function(e, x, y)
+    {
+    };
+
+    this.onMouseUp = function(e, x, y)
+    {
+        //TODO
+    }
+}
+
+function BeginTrackNewShapeState(drawingObjectsController, drawingObjects, presetGeom, startX, startY)
+{
+    this.id = STATES_ID_BEGIN_TRACK_NEW_SHAPE;
+    this.drawingObjectsController = drawingObjectsController;
+    this.drawingObjects = drawingObjects;
+    this.presetGeom = presetGeom;
+    this.startX = startX;
+    this.startY = startY;
+
+    this.onMouseDown = function(e, x, y)
+    {
+
+    };
+
+    this.onMouseMove = function(e, x, y)
+    {
+        this.drawingObjectsController.addTrackObject(new NewShapeTrack(this.drawingObjects, this.presetGeom, this.startX, this.startY));
+        this.drawingObjectsController.trackNewShape(e, x, y);
+        this.drawingObjectsController.changeCurrentState(new TrackNewShapeState(this.drawingObjectsController, this.drawingObjects));
+
+    };
+
+    this.onMouseUp = function(e, x, y)
+    {
+        this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
+    }
+}
+
+function TrackNewShapeState(drawingObjectsController, drawingObjects)
+{
+    this.id = STATES_ID_TRACK_NEW_SHAPE;
+    this.drawingObjectsController = drawingObjectsController;
+    this.drawingObjects = drawingObjects;
+
+    this.onMouseDown = function(e, x, y)
+    {
+
+    };
+
+    this.onMouseMove = function(e, x, y)
+    {
+        this.drawingObjectsController.trackNewShape(e, x, y);
+    };
+
+    this.onMouseUp = function(e, x, y)
+    {
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
     }
 }
