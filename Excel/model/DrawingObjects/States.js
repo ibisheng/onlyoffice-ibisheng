@@ -157,7 +157,7 @@ function PreResizeState(drawingObjectsController, drawingObjects, majorObject, c
 
 function ResizeState(drawingObjectsController, drawingObjects, majorObject, cardDirection)
 {
-    this.id = STATES_ID_PRE_RESIZE;
+    this.id = STATES_ID_RESIZE;
     this.drawingObjectsController = drawingObjectsController;
     this.drawingObjects = drawingObjects;
     this.majorObject = majorObject;
@@ -246,6 +246,8 @@ function TrackNewShapeState(drawingObjectsController, drawingObjects)
 
     this.onMouseUp = function(e, x, y)
     {
+        this.drawingObjectsController.trackEnd();
+        this.drawingObjectsController.clearTrackObjects();
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
     }
 }

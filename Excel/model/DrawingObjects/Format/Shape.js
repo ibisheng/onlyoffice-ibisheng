@@ -46,6 +46,27 @@ function CShape(drawingBase)
 
 CShape.prototype =
 {
+    isShape: function()
+    {
+        return true;
+    },
+
+    isGroup: function()
+    {
+        return false;
+    },
+
+    isImage: function()
+    {
+        return false;
+    },
+
+    isChart: function()
+    {
+        return false;
+    },
+
+
     initDefault: function(x, y, extX, extY, flipH, flipV, presetGeom)
     {
         this.setPosition(x, y);
@@ -284,12 +305,6 @@ CShape.prototype =
         return this.invertTransform;
     },
 
-    getCardDirectionByNum: function(num)
-    {
-
-        return CARD_DIRECTION_N;
-    },
-
     getFullFlipH: function()
     {
         if(!isRealObject(this.group))
@@ -307,12 +322,61 @@ CShape.prototype =
             return this.group.getFullFlipH() ? !this.flipH : this.flipH;
     },
 
-    getNumByCardDirection: function(cardDirection)
+    getCardDirectionByNum: function(num)
     {
-        //TODO
-        return 1;
+        var num_north = this.getNumByCardDirection(CARD_DIRECTION_N);
+        var full_flip_h = this.getFullFlipH();
+        var full_flip_v = this.getFullFlipV();
+        var same_flip = !full_flip_h && !full_flip_v || full_flip_h && full_flip_v;
+        if(same_flip)
+            return ((num - num_north) + CARD_DIRECTION_N + 8)%8;
+
+        return (CARD_DIRECTION_N - (num - num_north)+ 8)%8;
     },
 
+    getNumByCardDirection: function(cardDirection)
+    {
+        var hc = this.extX*0.5;
+        var vc = this.extY*0.5;
+        var transform = this.getTransform();
+        var y1, y3, y5, y7;
+        y1 = transform.TransformPointY(hc, 0);
+        y3 = transform.TransformPointY(this.extX, vc);
+        y5 = transform.TransformPointY(hc, this.extY);
+        y7 = transform.TransformPointY(0, vc);
+
+        var north_number;
+        var full_flip_h = this.getFullFlipH();
+        var full_flip_v = this.getFullFlipV();
+        switch(Math.min(y1, y3, y5, y7))
+        {
+            case y1:
+            {
+                north_number = !full_flip_v ? 1 : 5;
+                break;
+            }
+            case y3:
+            {
+                north_number = !full_flip_h ? 3 : 7;
+                break;
+            }
+            case y5:
+            {
+                north_number = !full_flip_v ? 5 : 1;
+                break;
+            }
+            default:
+            {
+                north_number = !full_flip_h ? 7 : 3;
+                break;
+            }
+        }
+        var same_flip = !full_flip_h && !full_flip_v || full_flip_h && full_flip_v;
+
+        if(same_flip)
+            return (north_number + cardDirection)%8;
+        return (north_number - cardDirection + 8)%8;
+    },
 
     hitToAdjustment: function(x, y)
     {
@@ -385,6 +449,36 @@ CShape.prototype =
 
     },
 
+    hit: function(x, y)
+    {
+        return this.hitInInnerArea(x, y) || this.hitInPath(x, y) || this.hitInTextRect(x, y);
+    },
+
+    hitInPath: function(x, y)
+    {
+        var invert_transform = this.getInvertTransform();
+        var x_t = invert_transform.TransformPointX(x, y);
+        var y_t = invert_transform.TransformPointY(x, y);
+        if(isRealObject(this.spPr.geometry))
+            return this.spPr.geometry.hitInPath({}, x_t, y_t);
+        return false;
+    },
+
+    hitInInnerArea: function(x, y)
+    {
+        var invert_transform = this.getInvertTransform();
+        var x_t = invert_transform.TransformPointX(x, y);
+        var y_t = invert_transform.TransformPointY(x, y);
+        if(isRealObject(this.spPr.geometry))
+            return this.spPr.geometry.hitInInnerArea({}, x_t, y_t);
+        return x_t > 0 && x_t < this.extX && y_t > 0 && y_t < this.extY;
+    },
+
+    hitInTextRect: function(x, y)
+    {
+        return false;
+    },
+
     canRotate: function()
     {
         return true;
@@ -404,4 +498,5 @@ CShape.prototype =
     {
         return new ResizeTrackShapeImage(this, cardDirection);
     }
+
 };

@@ -91,5 +91,28 @@ DrawingObjectsController.prototype =
     {
         for(var i = 0; i < this.arrTrackObjects.length; ++i)
             this.arrTrackObjects[i].draw(overlay);
+    },
+
+    isPointInDrawingObjects: function(x, y)
+    {
+        var selected_objects = this.selectedObjects;
+        if(selected_objects.length === 1)
+        {
+            if(selected_objects[0].hitToAdjustment(x, y).hit)
+                return true;
+        }
+        for(var i = selected_objects.length - 1; i > -1; --i)
+        {
+            if(selected_objects[i].hitToHandles(x, y) > -1)
+                return true;
+        }
+        var arr_objects = [];//TODO
+        for(i = arr_objects.length - 1; i > -1; --i)
+        {
+            if(arr_objects[i].hit(x, y))
+                return true;
+        }
+        return false;
+
     }
 };

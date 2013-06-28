@@ -18,6 +18,13 @@ function CGroupShape(drawingBase)
 
     this.group = null;
 
+
+    this.recalcInfo =
+    {
+        recalculateTransform: true,
+        recalculateArrGraphicObjects: true
+    };
+
     this.x = null;
     this.y = null;
     this.x = null;
@@ -42,6 +49,26 @@ function CGroupShape(drawingBase)
 
 CGroupShape.prototypr =
 {
+    isShape: function()
+    {
+        return false;
+    },
+
+    isGroup: function()
+    {
+        return true;
+    },
+
+    isImage: function()
+    {
+        return false;
+    },
+
+    isChart: function()
+    {
+        return false;
+    },
+
     setGroup: function(group)
     {
         this.group = group;
@@ -83,12 +110,34 @@ CGroupShape.prototypr =
             return this.group.getFullFlipH() ? !this.flipH : this.flipH;
     },
 
-
     getFullFlipV: function()
     {
         if(!isRealObject(this.group))
             return this.flipH;
         else
             return this.group.getFullFlipH() ? !this.flipH : this.flipH;
+    },
+
+    getArrGraphicObjects: function()
+    {
+        if(this.recalcInfo.recalculateArrGraphicObjects)
+            this.recalculateArrGraphicObjects();
+        return this.arrGraphicObjects;
+    },
+
+    recalculateArrGraphicObjects: function()
+    {
+        this.arrGraphicObjects.length = 0;
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(!this.spTree[i].isGroup())
+                this.arrGraphicObjects.push(this.spTree[i]);
+            else
+            {
+                var arr_graphic_objects = this.spTree.getArrGraphicObjects();
+                for(var j = 0; j < arr_graphic_objects.length; ++j)
+                    this.arrGraphicObjects.push(arr_graphic_objects[i]);
+            }
+        }
     }
 };

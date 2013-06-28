@@ -63,6 +63,27 @@ function CImage(drawingBase)
 
 CImage.prototype =
 {
+
+    isShape: function()
+    {
+        return false;
+    },
+
+    isGroup: function()
+    {
+        return false;
+    },
+
+    isImage: function()
+    {
+        return true;//TODO
+    },
+
+    isChart: function()
+    {
+        return false;/*TODO*/
+    },
+
     init: function(x, y, extX, extY, imageId)
     {
         this.setPosition(x, y);
@@ -384,11 +405,8 @@ CImage.prototype =
         v2_x = rot_x_t - xc_t;
         v2_y = rot_y_t - yc_t;
         return  Math.atan2( Math.abs(v1_x*v2_y - v1_y*v2_x), v1_x*v2_x + v1_y*v2_y);
-    },
-
-    isChart: function()
-    {
-        return false;/*TODO*/
     }
+
+
 
 };
