@@ -84,6 +84,11 @@ CImage.prototype =
         return false;/*TODO*/
     },
 
+    isSimpleObject: function()
+    {
+        return true;
+    },
+
     init: function(x, y, extX, extY, imageId)
     {
         this.setPosition(x, y);
@@ -367,12 +372,32 @@ CImage.prototype =
 
     },
 
+    hitInBoundingRect: function(x, y)
+    {
+        var invert_transform = this.getInvertTransform();
+        var x_t = invert_transform.TransformPointX(x, y);
+        var y_t = invert_transform.TransformPointY(x, y);
+
+        var _hit_context = this.drawingDocument.CanvasHitContext;
+
+        return (HitInLine(_hit_context, x_t, y_t, 0, 0, this.extX, 0) ||
+            HitInLine(_hit_context, x_t, y_t, this.extX, 0, this.extX, this.extY)||
+            HitInLine(_hit_context, x_t, y_t, this.extX, this.extY, 0, this.extY)||
+            HitInLine(_hit_context, x_t, y_t, 0, this.extY, 0, 0) ||
+            HitInLine(_hit_context, x_t, y_t, this.extX*0.5, 0, this.extX*0.5, -this.drawingDocument.GetMMPerDot(TRACK_DISTANCE_ROTATE)));
+    },
+
     canRotate: function()
     {
         return !this.isChart(); //TODO
     },
 
     canResize: function()
+    {
+        return true;//TODO
+    },
+
+    canMove: function()
     {
         return true;//TODO
     },
@@ -385,6 +410,12 @@ CImage.prototype =
     createResizeTrack: function(cardDirection)
     {
         return new ResizeTrackShapeImage(this, cardDirection);
+    },
+
+
+    createMoveTrack: function()
+    {
+        return new MoveShapeImageTrack(this);
     },
 
     getRotateAngle: function(x, y)

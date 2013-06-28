@@ -14,6 +14,8 @@ var STATES_ID_RESIZE = 0x04;
 var STATES_ID_START_TRACK_NEW_SHAPE = 0x05;
 var STATES_ID_BEGIN_TRACK_NEW_SHAPE = 0x06;
 var STATES_ID_TRACK_NEW_SHAPE = 0x07;
+var STATES_ID_PRE_MOVE = 0x08;
+var STATES_ID_MOVE = 0x09;
 
 var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
 
@@ -34,6 +36,7 @@ function NullState(drawingObjectsController, drawingObjects)
                 //TODO
             }
         }
+
         for(var i = selected_objects.length - 1; i > -1; --i)
         {
             var hit_to_handles = selected_objects[i].hitToHandles(x, y);
@@ -71,10 +74,48 @@ function NullState(drawingObjectsController, drawingObjects)
             }
         }
 
-        var arr_drawing_objects = [];
-        for(i = arr_drawing_objects.length-1; i > -1; ++i)
+        for(i = selected_objects.length - 1; i > -1; --i)
         {
-            var cur_drawing_object = arr_drawing_objects[i];
+            if(selected_objects[i].hitInBoundingRect(x, y))
+            {
+                if(!selected_objects[i].canMove())
+                    return;
+                for(var j = 0; j < selected_objects.length; ++j)
+                {
+                    this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
+                }
+                this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects, x, y));
+                return;
+            }
+        }
+
+        var arr_drawing_objects = this.drawingObjects.getDrawingObjects();
+        for(i = arr_drawing_objects.length-1; i > -1; --i)
+        {
+            var cur_drawing_base = arr_drawing_objects[i];
+            //TODO: пока работаем только с шейпами
+            if(cur_drawing_base.isGraphicObject())
+            {
+                var cur_drawing = cur_drawing_base.graphicObject;
+                if(cur_drawing.isSimpleObject())
+                {
+                    var hit_in_inner_area = cur_drawing.hitInInnerArea(x, y);
+                    var hit_in_path = cur_drawing.hitInPath(x, y);
+                    var hit_in_text_rect = cur_drawing.hitInTextRect(x, y);
+                    if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
+                    {
+
+                    }
+                    else if(hit_in_text_rect)
+                    {
+
+                    }
+                }
+                else
+                {
+
+                }
+            }
         }
     };
 
@@ -246,6 +287,60 @@ function TrackNewShapeState(drawingObjectsController, drawingObjects)
     this.onMouseMove = function(e, x, y)
     {
         this.drawingObjectsController.trackNewShape(e, x, y);
+    };
+
+    this.onMouseUp = function(e, x, y)
+    {
+        this.drawingObjectsController.trackEnd();
+        this.drawingObjectsController.clearTrackObjects();
+        this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
+    }
+}
+
+function PreMoveState(drawingObjectsController, drawingObjects, startX, startY, shift, ctrl, group)
+{
+    this.id = STATES_ID_PRE_MOVE;
+    this.drawingObjectsController = drawingObjectsController;
+    this.drawingObjects = drawingObjects;
+    this.startX = startX;
+    this.startY = startY;
+    this.shift = shift;
+    this.ctrl = ctrl;
+    this.group = group;
+
+    this.onMouseDown = function(e, x, y)
+    {
+
+    };
+
+    this.onMouseMove = function(e, x, y)
+    {
+        this.drawingObjectsController.swapTrackObjects();
+        this.drawingObjectsController.changeCurrentState(new MoveState(this.drawingObjectsController, this.drawingObjects, this.startX, this.startY))
+    };
+
+    this.onMouseUp = function(e, x, y)
+    {
+        this.drawingObjectsController.clearPreTrackObjects();
+        this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
+    }
+}
+
+function MoveState(drawingObjectsController, drawingObjects, startX, startY)
+{
+    this.id = STATES_ID_MOVE;
+    this.drawingObjectsController = drawingObjectsController;
+    this.drawingObjects = drawingObjects;
+    this.startX = startX;
+    this.startY = startY;
+    this.onMouseDown = function(e, x, y)
+    {
+
+    };
+
+    this.onMouseMove = function(e, x, y)
+    {
+        this.drawingObjectsController.trackMoveObjects(x - this.startX, y - this.startY);
     };
 
     this.onMouseUp = function(e, x, y)

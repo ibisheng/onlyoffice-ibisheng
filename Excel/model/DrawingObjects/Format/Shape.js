@@ -66,6 +66,11 @@ CShape.prototype =
         return false;
     },
 
+    isSimpleObject: function()
+    {
+        return true;
+    },
+
 
     initDefault: function(x, y, extX, extY, flipH, flipV, presetGeom)
     {
@@ -218,12 +223,12 @@ CShape.prototype =
 
     recalculateBrush: function()
     {
-        var theme = this.document.theme;
         var brush;
-        var colorMap = this.document.clrSchemeMap.color_map;
+        var wb = this.drawingBase.getWorkbook();
+
+        var theme = wb.theme;
+        var colorMap = GenerateDefaultColorMap().color_map;
         var RGBA = {R: 0, G: 0, B: 0, A: 255};
-        if(colorMap==null)
-            colorMap = GenerateDefaultColorMap().color_map;
         if (theme && this.style != null && this.style.fillRef!=null)
         {
             brush = theme.getFillStyle(this.style.fillRef.idx);
@@ -251,10 +256,8 @@ CShape.prototype =
     recalculatePen: function()
     {
         var _calculated_line;
-        var _theme = this.document.theme;
-        var colorMap = this.document.clrSchemeMap.color_map;
-        if(colorMap==null)
-            colorMap = GenerateDefaultColorMap().color_map;
+        var _theme = this.drawingBase.getWorkbook().theme;
+        var colorMap = GenerateDefaultColorMap().color_map;
         var RGBA = {R: 0, G: 0, B: 0, A: 255};
         if(_theme !== null && typeof _theme === "object" && typeof _theme.getLnStyle === "function"
             && this.style !== null && typeof  this.style === "object"
@@ -479,12 +482,32 @@ CShape.prototype =
         return false;
     },
 
+    hitInBoundingRect: function(x, y)
+    {
+        var invert_transform = this.getInvertTransform();
+        var x_t = invert_transform.TransformPointX(x, y);
+        var y_t = invert_transform.TransformPointY(x, y);
+
+        var _hit_context = this.drawingDocument.CanvasHitContext;
+
+        return (HitInLine(_hit_context, x_t, y_t, 0, 0, this.extX, 0) ||
+            HitInLine(_hit_context, x_t, y_t, this.extX, 0, this.extX, this.extY)||
+            HitInLine(_hit_context, x_t, y_t, this.extX, this.extY, 0, this.extY)||
+            HitInLine(_hit_context, x_t, y_t, 0, this.extY, 0, 0) ||
+            HitInLine(_hit_context, x_t, y_t, this.extX*0.5, 0, this.extX*0.5, -this.drawingDocument.GetMMPerDot(TRACK_DISTANCE_ROTATE)));
+    },
+
     canRotate: function()
     {
         return true;
     },
 
     canResize: function()
+    {
+        return true;//TODO
+    },
+
+    canMove: function()
     {
         return true;//TODO
     },
@@ -497,6 +520,11 @@ CShape.prototype =
     createResizeTrack: function(cardDirection)
     {
         return new ResizeTrackShapeImage(this, cardDirection);
+    },
+
+    createMoveTrack: function()
+    {
+        return new MoveShapeImageTrack(this);
     }
 
 };

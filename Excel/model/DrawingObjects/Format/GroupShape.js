@@ -69,6 +69,13 @@ CGroupShape.prototypr =
         return false;
     },
 
+
+    isSimpleObject: function()
+    {
+        return false;
+    },
+
+
     setGroup: function(group)
     {
         this.group = group;
@@ -139,5 +146,36 @@ CGroupShape.prototypr =
                     this.arrGraphicObjects.push(arr_graphic_objects[i]);
             }
         }
+    },
+
+
+    canRotate: function()
+    {
+        return true;
+    },
+
+    canResize: function()
+    {
+        return true;//TODO
+    },
+
+    canMove: function()
+    {
+        return true;//TODO
+    },
+
+    hitInBoundingRect: function(x, y)
+    {
+        var invert_transform = this.getInvertTransform();
+        var x_t = invert_transform.TransformPointX(x, y);
+        var y_t = invert_transform.TransformPointY(x, y);
+
+        var _hit_context = this.drawingDocument.CanvasHitContext;
+
+        return (HitInLine(_hit_context, x_t, y_t, 0, 0, this.extX, 0) ||
+            HitInLine(_hit_context, x_t, y_t, this.extX, 0, this.extX, this.extY)||
+            HitInLine(_hit_context, x_t, y_t, this.extX, this.extY, 0, this.extY)||
+            HitInLine(_hit_context, x_t, y_t, 0, this.extY, 0, 0) ||
+            HitInLine(_hit_context, x_t, y_t, this.extX*0.5, 0, this.extX*0.5, -this.drawingDocument.GetMMPerDot(TRACK_DISTANCE_ROTATE)));
     }
 };

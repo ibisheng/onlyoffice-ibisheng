@@ -76,6 +76,12 @@ DrawingObjectsController.prototype =
         this.arrTrackObjects[0].track(e, x, y);
     },
 
+    trackMoveObjects: function(dx, dy)
+    {
+        for(var i = 0; i < this.arrTrackObjects.length; ++i)
+            this.arrTrackObjects[i].track(dx, dy);
+    },
+
     trackEnd: function()
     {
         for(var i = 0; i < this.arrTrackObjects.length; ++i)
