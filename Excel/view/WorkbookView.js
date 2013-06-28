@@ -196,7 +196,12 @@
 					"canvasClick": function () {self.enableKeyEventsHandler(true);},
 					"autoFiltersClick":			function () {self._onAutoFiltersClick.apply(self, arguments);},
 					"commentCellClick":			function () {self._onCommentCellClick.apply(self, arguments);},
-					"isGlobalLockEditCell":		function () {return self.collaborativeEditing.getGlobalLockEditCell();}
+					"isGlobalLockEditCell":		function () {return self.collaborativeEditing.getGlobalLockEditCell();},
+					
+					// shapes
+					"shapeMouseDown":			function () {self._onShapeMouseDown.apply(self, arguments);},
+					"shapeMouseMove":			function () {self._onShapeMouseMove.apply(self, arguments);},
+					"shapeMouseUp":				function () {self._onShapeMouseUp.apply(self, arguments);}
 				});
 
 				this.model.handlers.add("cleanCellCache", function (wsId, range, canChangeColWidth) {
@@ -646,6 +651,24 @@
 				var comments = ws.cellCommentator.getCommentsXY(x, y);
 				if (comments.length)
 					ws.cellCommentator.asc_showComment(comments[0].asc_getId());
+			},
+			
+			_onShapeMouseDown: function (e, x, y) {
+				var ws = this.getWorksheet();
+				//console.log("_onShapeMouseDown");
+				ws.objectRender.controller.onMouseDown(e, x, y);
+			},
+			
+			_onShapeMouseMove: function (e, x, y) {
+				var ws = this.getWorksheet();
+				//console.log("_onShapeMouseMove");
+				ws.objectRender.controller.onMouseMove(e, x, y);
+			},
+			
+			_onShapeMouseUp: function (e, x, y) {
+				var ws = this.getWorksheet();
+				//console.log("_onShapeMouseUp");
+				ws.objectRender.controller.onMouseUp(e, x, y);
 			},
 			
 			_onMouseDblClick: function (x, y, isHideCursor, isCoord, callback) {

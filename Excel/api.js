@@ -2058,16 +2058,15 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				
 				this.isStartAddShape = true;
 				this.addShapePreset = sPreset;
-				
-				if (is_apply)
-				{
-					//this.WordControl.m_oDrawingDocument.LockCursorType("crosshair");
+								
+				if (is_apply) {					
 				}
-				else
-				{
-					//editor.sync_EndAddShape();
-					//editor.sync_StartAddShapeCallback(false);
+				else {
 				}
+			},
+			
+			asc_endAddShape: function() {
+				this.isStartAddShape = false;
 			},
 			
 			// Cell interface
@@ -2818,6 +2817,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		
 		// Shapes
 		prot["asc_startAddShape"] = prot.asc_startAddShape;
+		prot["asc_endAddShape"] = prot.asc_endAddShape;
 
 		// Cell interface
 		prot["asc_getCellInfo"] = prot.asc_getCellInfo;

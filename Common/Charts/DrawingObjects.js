@@ -1971,9 +1971,12 @@ function DrawingObjects() {
 	var chartRender = new ChartRender();
 	var worksheet = null;
 	var isViewerMode = null;	
+	
 	var drawingCtx = null;
 	var overlayCtx = null;
 	var shapeCtx = null;
+	var shapeOverlayCtx = null;
+	
 	var aObjects = null;
 	var minImageWidth = 20;
 	var minImageHeight = 20;
@@ -2003,6 +2006,8 @@ function DrawingObjects() {
 		drawingCtx = currentSheet.drawingCtx;
 		overlayCtx = currentSheet.overlayCtx;
 		shapeCtx = currentSheet.shapeCtx;
+		shapeOverlayCtx = currentSheet.shapeOverlayCtx;
+		
 		isViewerMode =  function() { return worksheet._trigger("getViewerMode"); };
 
 		aObjects = [];
@@ -2030,10 +2035,6 @@ function DrawingObjects() {
 				window.attachEvent("onmessage", this._uploadMessage);
 			}
 		}
-	}
-
-	_this.getWorkbook = function() {
-		return (worksheet ? worksheet.model.workbook : null);
 	}
 	
 	_this.getDrawingObjects = function() {
@@ -2210,6 +2211,13 @@ function DrawingObjects() {
 
 					var index = i;
 					var obj = aObjects[i];
+					
+					// Shape render
+					if ( obj.isGraphicObject() ) {
+						obj.graphicObject.draw(shapeCtx);
+						continue;
+					}
+					
 					obj.normalizeMetrics();
 					
 					obj.size.coeff = obj.getHeightFromTo(true) / obj.getWidthFromTo(true);
@@ -2448,7 +2456,7 @@ function DrawingObjects() {
 		_t.move = { x: 0, y: 0, inAction: false };
 
 		_t.chart = new asc_CChart();
-		_t.shape = null; //new CShape(_t);
+		_t.graphicObject = null; // CShape or GroupShape
 
 		_t.flags = {
 			selected: false,
@@ -2468,8 +2476,12 @@ function DrawingObjects() {
 			return _t.chart.type ? true : false;
 		}
 		
-		_t.isShape = function() {
-			return _t.shape != null;
+		_t.isGraphicObject = function() {
+			return _t.graphicObject != null;
+		}
+		
+		_t.getWorkbook = function() {
+			return (_t.worksheet ? _t.worksheet.model.workbook : null);
 		}
 
 		// Проверяет выход за границы
@@ -3241,6 +3253,15 @@ function DrawingObjects() {
 		}
 	}
 
+	_this.addGraphicObject = function(x, y, extX, extY, flipH, flipV, presetGeom) {
+		
+		var obj = _this.createDrawingObject();
+		obj.graphicObject = new CShape(_this);
+		obj.graphicObject.initDefault(x, y, extX, extY, flipH, flipV, presetGeom);
+		aObjects.push(obj);
+		_this.showDrawingObjects(false);
+	}
+	
 	_this.deleteSelectedDrawingObject = function() {
 
 		var bResult = false;

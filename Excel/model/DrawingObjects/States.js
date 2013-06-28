@@ -15,6 +15,8 @@ var STATES_ID_START_TRACK_NEW_SHAPE = 0x05;
 var STATES_ID_BEGIN_TRACK_NEW_SHAPE = 0x06;
 var STATES_ID_TRACK_NEW_SHAPE = 0x07;
 
+var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
+
 function NullState(drawingObjectsController, drawingObjects)
 {
     this.id = STATES_ID_NULL;
@@ -80,7 +82,9 @@ function NullState(drawingObjectsController, drawingObjects)
     {};
 
     this.onMouseUp = function(e, x, y)
-    {}
+    {
+		asc.editor.asc_endAddShape();
+	}
 }
 
 function PreRotateState(drawingObjectsController, drawingObjects, majorObject)

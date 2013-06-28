@@ -372,6 +372,8 @@
 			this.overlayCtx = this.buffers.overlay;
 			this.shapeCtx = new CGraphics();
 			this.shapeCtx.init(this.drawingCtx.ctx, this.drawingCtx.getWidth(0), this.drawingCtx.getHeight(0), this.drawingCtx.getWidth(3), this.drawingCtx.getHeight(3));
+			this.shapeOverlayCtx = new CGraphics();
+			this.shapeOverlayCtx.init(this.overlayCtx.ctx, this.overlayCtx.getWidth(0), this.overlayCtx.getHeight(0), this.overlayCtx.getWidth(3), this.overlayCtx.getHeight(3));
 
 			this.stringRender = stringRender;
 
@@ -632,6 +634,7 @@
 					this._shiftVisibleRange();
 					this.cellCommentator.updateCommentPosition();
 					this.shapeCtx.init(this.drawingCtx.ctx, this.drawingCtx.getWidth(0), this.drawingCtx.getHeight(0), this.drawingCtx.getWidth(3), this.drawingCtx.getHeight(3));
+					this.shapeOverlayCtx.init(this.overlayCtx.ctx, this.overlayCtx.getWidth(0), this.overlayCtx.getHeight(0), this.overlayCtx.getWidth(3), this.overlayCtx.getHeight(3));
 
 					this.updateZoom = false;
 				} else {
@@ -5025,6 +5028,9 @@
 				var lockRangePosTop = undefined;
 				var lockInfo = undefined;
 				var isLocked = false;
+				
+				if ( asc.editor.isStartAddShape )
+					return {cursor: kCurFillHandle, target: "shape", col: -1, row: -1};
 				
 				var drawingInfo = this.objectRender.checkCursorDrawingObject(x, y);
 				if (drawingInfo && drawingInfo.cursor) {
