@@ -255,7 +255,7 @@ var c_oAscSlideTransitionTypes =
     UnCover : 5,
     Cover   : 6,
     Clock   : 7,
-    Zoom    : 8,
+    Zoom    : 8
 };
 
 var c_oAscSlideTransitionParams =
