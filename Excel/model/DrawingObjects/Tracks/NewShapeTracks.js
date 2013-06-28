@@ -19,7 +19,7 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
 
     this.transform = new CMatrix();
     var geometry = CreateGeometry(presetGeom);
-    geometry.init(5, 5);
+    geometry.Init(5, 5);
     var brush = new CUniFill();
     brush.fill = new CSolidFill();
     brush.fill.color.color = new CRGBColor();
@@ -77,6 +77,6 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
 
     this.trackEnd = function()
     {
-
+        this.drawingOjects.addGraphicObject(this.x, this.y, this.extX, this.extY, false, false, this.presetGeom)
     };
 }

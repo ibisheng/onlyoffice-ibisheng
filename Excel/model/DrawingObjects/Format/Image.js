@@ -171,7 +171,7 @@ CImage.prototype =
         if(this.flipV)
             global_MatrixTransformer.ScaleAppend(this.transform, 1, -1);
 
-        global_MatrixTransformer.RotateAppend(this.transform, -this.rot);
+        global_MatrixTransformer.RotateRadAppend(this.transform, -this.rot);
         global_MatrixTransformer.TranslateAppend(this.transform, this.x + hc, this.y + vc);
         if(isRealObject(this.group))
         {

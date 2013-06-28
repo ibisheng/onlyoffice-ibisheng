@@ -31,7 +31,7 @@ function CShape(drawingBase)
     this.rot = null;
     this.flipH = null;
     this.flipV = null;
-    this.transform = null;
+    this.transform = new CMatrix();
     this.invertTransform = null;
     this.transformText = null;
     this.invertTransformText = null;
@@ -126,6 +126,7 @@ CShape.prototype =
     setPresetGeometry: function(presetGeom)
     {
         this.spPr.geometry = CreateGeometry(presetGeom);
+        this.spPr.geometry.Init(5, 5);
     },
 
     setStyle: function(style)
@@ -203,6 +204,8 @@ CShape.prototype =
             this.flipH = xfrm.flipH === true;
             this.flipV = xfrm.flipV === true;
         }
+        if(isRealObject(this.spPr.geometry))
+            this.spPr.geometry.Recalculate(this.extX, this.extY);
         this.transform.Reset();
         var hc, vc;
         hc = this.extX*0.5;
@@ -213,12 +216,13 @@ CShape.prototype =
         if(this.flipV)
             global_MatrixTransformer.ScaleAppend(this.transform, 1, -1);
 
-        global_MatrixTransformer.RotateAppend(this.transform, -this.rot);
+        global_MatrixTransformer.RotateRadAppend(this.transform, -this.rot);
         global_MatrixTransformer.TranslateAppend(this.transform, this.x + hc, this.y + vc);
         if(isRealObject(this.group))
         {
-            global_MatrixTransformer.MultiplyAppend(t, this.group.getTransform());
+            global_MatrixTransformer.MultiplyAppend(this.transform, this.group.getTransform());
         }
+        this.invertTransform = global_MatrixTransformer.Invert(this.transform);
     },
 
     recalculateBrush: function()
@@ -463,7 +467,7 @@ CShape.prototype =
         var x_t = invert_transform.TransformPointX(x, y);
         var y_t = invert_transform.TransformPointY(x, y);
         if(isRealObject(this.spPr.geometry))
-            return this.spPr.geometry.hitInPath({}, x_t, y_t);
+            return this.spPr.geometry.hitInPath(this.drawingBase.getCanvasContext(), x_t, y_t);
         return false;
     },
 
@@ -473,7 +477,7 @@ CShape.prototype =
         var x_t = invert_transform.TransformPointX(x, y);
         var y_t = invert_transform.TransformPointY(x, y);
         if(isRealObject(this.spPr.geometry))
-            return this.spPr.geometry.hitInInnerArea({}, x_t, y_t);
+            return this.spPr.geometry.hitInInnerArea(this.drawingBase.getCanvasContext(), x_t, y_t);
         return x_t > 0 && x_t < this.extX && y_t > 0 && y_t < this.extY;
     },
 
@@ -488,13 +492,13 @@ CShape.prototype =
         var x_t = invert_transform.TransformPointX(x, y);
         var y_t = invert_transform.TransformPointY(x, y);
 
-        var _hit_context = this.drawingDocument.CanvasHitContext;
+        var _hit_context = his.drawingBase.getCanvasContext();
 
         return (HitInLine(_hit_context, x_t, y_t, 0, 0, this.extX, 0) ||
             HitInLine(_hit_context, x_t, y_t, this.extX, 0, this.extX, this.extY)||
             HitInLine(_hit_context, x_t, y_t, this.extX, this.extY, 0, this.extY)||
-            HitInLine(_hit_context, x_t, y_t, 0, this.extY, 0, 0) ||
-            HitInLine(_hit_context, x_t, y_t, this.extX*0.5, 0, this.extX*0.5, -this.drawingDocument.GetMMPerDot(TRACK_DISTANCE_ROTATE)));
+            HitInLine(_hit_context, x_t, y_t, 0, this.extY, 0, 0) /*||
+            HitInLine(_hit_context, x_t, y_t, this.extX*0.5, 0, this.extX*0.5, -this.drawingDocument.GetMMPerDot(TRACK_DISTANCE_ROTATE))*/);
     },
 
     canRotate: function()
