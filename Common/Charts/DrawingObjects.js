@@ -2037,6 +2037,10 @@ function DrawingObjects() {
 		}
 	}
 	
+	_this.getWorkbook = function() {
+		return (worksheet ? worksheet.model.workbook : null);
+	}
+	
 	_this.getDrawingObjects = function() {
 		return aObjects;
 	}
@@ -2195,8 +2199,10 @@ function DrawingObjects() {
 		if (drawingCtx && _this.needDrawingObjects()) {
 
 			// всё чистим
-			if (clearCanvas)
+			if (clearCanvas) {
 				_this.clearDrawingObjects();
+				shapeOverlayCtx.m_oContext.clearRect(0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix);
+			}
 				
 			if ( !imageLoader.isReady() ) {
 				//console.log("imageLoader - False");
