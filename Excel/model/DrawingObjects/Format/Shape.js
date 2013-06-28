@@ -41,8 +41,6 @@ function CShape(drawingBase)
     this.pen = null;
 
     this.selected = false;
-
-
 }
 
 

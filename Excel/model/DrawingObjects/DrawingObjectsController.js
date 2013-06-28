@@ -85,5 +85,11 @@ DrawingObjectsController.prototype =
     startTrackNewShape: function(presetGeom)
     {
         this.changeCurrentState(new StartTrackNewShapeState(this, this.drawingObjects, presetGeom));
+    },
+
+    drawTracks: function(overlay)
+    {
+        for(var i = 0; i < this.arrTrackObjects.length; ++i)
+            this.arrTrackObjects[i].draw(overlay);
     }
 };

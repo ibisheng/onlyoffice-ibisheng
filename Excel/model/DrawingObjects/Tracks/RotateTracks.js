@@ -43,7 +43,7 @@ function OverlayObject(geometry, extX, extY, brush, pen, transform)
         overlay.SetIntegerGrid(false);
         overlay.transform3(this.transform, false);
         this.shapeDrawer.fromShape(this, overlay);
-        this.shapeDrawer.draw(this.spPr.geometry);
+        this.shapeDrawer.draw(this.geometry);
         overlay.RestoreGrState();
     };
 
