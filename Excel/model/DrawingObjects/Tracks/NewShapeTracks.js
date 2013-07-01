@@ -48,40 +48,188 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
 
     this.track = function(e, x, y)
     {
-        var _finished_x = x, _finished_y = y;
+        var real_dist_x = x - this.startX;
+        var abs_dist_x = Math.abs(real_dist_x);
+        var real_dist_y = y - this.startY;
+        var abs_dist_y = Math.abs(real_dist_y);
 
-        var _real_dist_x = _finished_x - this.startX;
-        var _abs_dist_x = Math.abs(_real_dist_x);
-        var _real_dist_y = _finished_y - this.startY;
-        var _abs_dist_y = Math.abs(_real_dist_y);
-        //if( (!ctrlKey && !shiftKey) )
+        if(!(e.ctrlKey || e.shiftKey))
         {
-            if(_real_dist_x >= 0)
+            if(real_dist_x >= 0)
             {
                 this.x = this.startX;
             }
             else
             {
-                this.x = _abs_dist_x >= MIN_SHAPE_SIZE  ? x : this.startX - MIN_SHAPE_SIZE;
+                this.x = abs_dist_x >= MIN_SHAPE_SIZE  ? x : this.startX - MIN_SHAPE_SIZE;
             }
 
-            if(_real_dist_y >= 0)
+            if(real_dist_y >= 0)
             {
                 this.y = this.startY;
             }
             else
             {
-                this.y = _abs_dist_y >= MIN_SHAPE_SIZE  ? y : this.startY - MIN_SHAPE_SIZE;
+                this.y = abs_dist_y >= MIN_SHAPE_SIZE  ? y : this.startY - MIN_SHAPE_SIZE;
             }
 
-            this.extX = _abs_dist_x >= MIN_SHAPE_SIZE ? _abs_dist_x : MIN_SHAPE_SIZE;
-            this.extY = _abs_dist_y >= MIN_SHAPE_SIZE ? _abs_dist_y : MIN_SHAPE_SIZE;
+            this.extX = abs_dist_x >= MIN_SHAPE_SIZE ? abs_dist_x : MIN_SHAPE_SIZE;
+            this.extY = abs_dist_y >= MIN_SHAPE_SIZE ? abs_dist_y : MIN_SHAPE_SIZE;
 
-            this.overlayObject.updateExtents(this.extX, this.extY);
-            this.transform.Reset();
-            global_MatrixTransformer.TranslateAppend(this.transform, this.x, this.y);
         }
+        else if(e.ctrlKey && !e.shiftKey)
+        {
+            if(abs_dist_x >= MIN_SHAPE_SIZE_DIV2)
+            {
+                this.x = this.startX - abs_dist_x;
+                this.extX = 2*abs_dist_x;
+            }
+            else
+            {
+                this.x = this.startX - MIN_SHAPE_SIZE_DIV2;
+                this.extX = MIN_SHAPE_SIZE;
+            }
+
+            if(abs_dist_y >= MIN_SHAPE_SIZE_DIV2)
+            {
+                this.y = this.startY - abs_dist_y;
+                this.extY = 2*abs_dist_y;
+            }
+            else
+            {
+                this.y = this.startY - MIN_SHAPE_SIZE_DIV2;
+                this.extY = MIN_SHAPE_SIZE;
+            }
+        }
+        else if(!e.ctrlKey && e.shiftKey)
+        {
+            var new_width, new_height;
+            var prop_coefficient = (typeof SHAPE_ASPECTS[this.presetGeom] === "number" ? SHAPE_ASPECTS[this.presetGeom] : 1);
+            if(abs_dist_y === 0)
+            {
+                new_width = abs_dist_x > MIN_SHAPE_SIZE ? abs_dist_x : MIN_SHAPE_SIZE;
+                new_height = abs_dist_x/prop_coefficient;
+            }
+            else
+            {
+                var new_aspect = abs_dist_x/abs_dist_y;
+                if (new_aspect >= prop_coefficient)
+                {
+                    new_width = abs_dist_x;
+                    new_height = abs_dist_x/prop_coefficient;
+                }
+                else
+                {
+                    new_height = abs_dist_y;
+                    new_width = abs_dist_y*prop_coefficient;
+                }
+            }
+
+            if(new_width < MIN_SHAPE_SIZE || new_height < MIN_SHAPE_SIZE)
+            {
+                var k_wh = new_width/new_height;
+                if(new_height < MIN_SHAPE_SIZE && new_width < MIN_SHAPE_SIZE)
+                {
+                    if(new_height < new_width)
+                    {
+                        new_height = MIN_SHAPE_SIZE;
+                        new_width = new_height*k_wh;
+                    }
+                    else
+                    {
+                        new_width = MIN_SHAPE_SIZE;
+                        new_height = new_width/k_wh;
+                    }
+                }
+                else if(new_height < MIN_SHAPE_SIZE)
+                {
+                    new_height = MIN_SHAPE_SIZE;
+                    new_width = new_height*k_wh;
+                }
+                else
+                {
+                    new_width = MIN_SHAPE_SIZE;
+                    new_height = new_width/k_wh;
+                }
+            }
+            this.extX = new_width;
+            this.extY = new_height;
+            if(real_dist_x >= 0)
+                this.x = this.startX;
+            else
+                this.x = this.startX - this.extX;
+
+            if(real_dist_y >= 0)
+                this.y = this.startY;
+            else
+                this.y = this.startY - this.extY;
+        }
+        else
+        {
+            var new_width, new_height;
+            var prop_coefficient = (typeof SHAPE_ASPECTS[this.presetGeom] === "number" ? SHAPE_ASPECTS[this.presetGeom] : 1);
+            if(abs_dist_y === 0)
+            {
+                new_width = abs_dist_x > MIN_SHAPE_SIZE_DIV2 ? abs_dist_x*2 : MIN_SHAPE_SIZE;
+                new_height = new_width/prop_coefficient;
+            }
+            else
+            {
+                var new_aspect = abs_dist_x/abs_dist_y;
+                if (new_aspect >= prop_coefficient)
+                {
+                    new_width = abs_dist_x*2;
+                    new_height = new_width/prop_coefficient;
+                }
+                else
+                {
+                    new_height = abs_dist_y*2;
+                    new_width = new_height*prop_coefficient;
+                }
+            }
+
+            if(new_width < MIN_SHAPE_SIZE || new_height < MIN_SHAPE_SIZE)
+            {
+                var k_wh = new_width/new_height;
+                if(new_height < MIN_SHAPE_SIZE && new_width < MIN_SHAPE_SIZE)
+                {
+                    if(new_height < new_width)
+                    {
+                        new_height = MIN_SHAPE_SIZE;
+                        new_width = new_height*k_wh;
+                    }
+                    else
+                    {
+                        new_width = MIN_SHAPE_SIZE;
+                        new_height = new_width/k_wh;
+                    }
+                }
+                else if(new_height < MIN_SHAPE_SIZE)
+                {
+                    new_height = MIN_SHAPE_SIZE;
+                    new_width = new_height*k_wh;
+                }
+                else
+                {
+                    new_width = MIN_SHAPE_SIZE;
+                    new_height = new_width/k_wh;
+                }
+            }
+            this.extX = new_width;
+            this.extY = new_height;
+            this.x = this.startX - this.extX*0.5;
+            this.y = this.startY - this.extY*0.5;
+        }
+        this.overlayObject.updateExtents(this.extX, this.extY);
+        this.transform.Reset();
+        global_MatrixTransformer.TranslateAppend(this.transform, this.x, this.y);
     };
+
+    this.ctrlDown = function()
+    {};
+
+    this.shiftDown = function()
+    {};
 
     this.draw = function(overlay)
     {

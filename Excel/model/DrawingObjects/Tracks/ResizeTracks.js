@@ -138,7 +138,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
     this.centerPointX = originalObject.x + _half_width;
     this.centerPointY = originalObject.y + _half_height;
 
-    this.lineFlag = originalObject.checkLine();
+    //this.lineFlag = originalObject.checkLine();
 
     this.originalExtX = originalObject.absExtX;
     this.originalExtY = originalObject.absExtY;

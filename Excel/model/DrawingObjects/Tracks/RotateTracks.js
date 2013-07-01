@@ -7,9 +7,6 @@
  */
 
 
-var MIN_SHAPE_SIZE = 1.27;//размер меньше которого нельзя уменшить автофигуру или картинку по горизонтали или вертикали
-var MIN_SHAPE_SIZE_DIV2 = MIN_SHAPE_SIZE/2.0;
-var MIN_ANGLE = 0.07;
 
 function OverlayObject(geometry, extX, extY, brush, pen, transform)
     //({check_bounds: function(){},brush: this.originalShape.brush, pen: this.originalShape.pen, ext:{cx:this.originalShape.absExtX, cy:this.originalShape.absExtY}, geometry: this.geometry, TransformMatrix: this.originalShape.transform})
