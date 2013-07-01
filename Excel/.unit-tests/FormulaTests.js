@@ -935,5 +935,104 @@
         ok( Math.abs(oParser.calculate().getValue() - pmt(0.08/12,10,10000,0,1)) < dif );
 		
 	})
-	
+
+    test("Test: \"TIMEVALUE\"",function(){
+        oParser = new parserFormula("timevalue(\"10:02:34\")","A2",ws);
+        ok(oParser.parse());
+        ok( Math.abs(oParser.calculate().getValue() - 0.4184490740740740) < dif );
+
+        oParser = new parserFormula("timevalue(\"02-01-2006 10:15:29 AM\")","A2",ws);
+        ok(oParser.parse());
+        ok( Math.abs(oParser.calculate().getValue() - 0.4274189814823330) < dif );
+
+        oParser = new parserFormula("timevalue(\"22:02\")","A2",ws);
+        ok(oParser.parse());
+        ok( Math.abs(oParser.calculate().getValue() - 0.9180555555555560) < dif );
+    })
+
+    test("Test: \"WEEKNUM\"",function(){
+       /* oParser = new parserFormula("WEEKNUM(DATE(2006,1,1))","A2",ws);
+        ok(oParser.parse());
+        ok( Math.abs(oParser.calculate().getValue() - 1) < dif );
+
+        oParser = new parserFormula("WEEKNUM(DATE(2006,1,1),17)","A2",ws);
+        ok(oParser.parse());
+        ok( Math.abs(oParser.calculate().getValue() - 1) < dif );
+
+        oParser = new parserFormula("WEEKNUM(DATE(2006,1,1),1)","A2",ws);
+        ok(oParser.parse());
+        ok( Math.abs(oParser.calculate().getValue() - 1) < dif );
+
+        oParser = new parserFormula("WEEKNUM(DATE(2006,1,1),21)","A2",ws);
+        ok(oParser.parse());
+        ok( Math.abs(oParser.calculate().getValue() - 52) < dif );
+
+        oParser = new parserFormula("WEEKNUM(DATE(2006,2,1),1)","A2",ws);
+        ok(oParser.parse());
+        ok( Math.abs(oParser.calculate().getValue() - 5) < dif );//10
+
+        oParser = new parserFormula("WEEKNUM(DATE(2006,2,1),2)","A2",ws);
+        ok(oParser.parse());
+        ok( Math.abs(oParser.calculate().getValue() - 6) < dif );//12
+
+        oParser = new parserFormula("WEEKNUM(DATE(2006,2,1),11)","A2",ws);
+        ok(oParser.parse());
+        ok( Math.abs(oParser.calculate().getValue() - 6) < dif );//14*/
+
+        oParser = new parserFormula("WEEKNUM(DATE(2007,1,1),15)","A2",ws);//понед
+        ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 1);
+
+        oParser = new parserFormula("WEEKNUM(DATE(2008,1,1),15)","A2",ws);//втор
+        ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 1);
+
+        oParser = new parserFormula("WEEKNUM(DATE(2003,1,1),15)","A2",ws);//сред
+        ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 1);
+
+        oParser = new parserFormula("WEEKNUM(DATE(2009,1,1),15)","A2",ws);//чет
+        ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 1);
+
+        oParser = new parserFormula("WEEKNUM(DATE(2010,1,1),15)","A2",ws);//пят
+        ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 1);
+
+        oParser = new parserFormula("WEEKNUM(DATE(2011,1,1),15)","A2",ws);//суб
+        ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 1);
+
+        oParser = new parserFormula("WEEKNUM(DATE(2012,1,1),15)","A2",ws);//вск
+        ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 1);
+
+        oParser = new parserFormula("WEEKNUM(DATE(2008,1,4),15)","A2",ws);//вск
+        ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 2);
+
+        oParser = new parserFormula("WEEKNUM(DATE(2008,1,10),15)","A2",ws);//вск
+        ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 2);
+
+        oParser = new parserFormula("WEEKNUM(DATE(2008,1,11),15)","A2",ws);//вск
+        ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 3);
+
+        oParser = new parserFormula("WEEKNUM(DATE(2008,1,17),15)","A2",ws);//вск
+        ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 3);
+
+        oParser = new parserFormula("WEEKNUM(DATE(2008,1,18),15)","A2",ws);//вск
+        ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 4);
+
+        oParser = new parserFormula("WEEKNUM(DATE(2008,1,24),15)","A2",ws);//вск
+        ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 4);
+
+    })
+
+
+
 });

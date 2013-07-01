@@ -53,6 +53,17 @@ SET SRC_TABLE_EGINE=^
  "%TABLE_ENGINE%\graphics\pdfprinter.js" ^
  "%TABLE_ENGINE%\model\CollaborativeEditing.js" ^
  "%TABLE_ENGINE%\model\parserFormula.js" ^
+ "%TABLE_ENGINE%\model\dateandtimeFunctions.js" ^
+ "%TABLE_ENGINE%\model\engineeringFunctions.js" ^
+ "%TABLE_ENGINE%\model\cubeFunctions.js" ^
+ "%TABLE_ENGINE%\model\databaseFunctions.js" ^
+ "%TABLE_ENGINE%\model\textanddataFunctions.js" ^
+ "%TABLE_ENGINE%\model\statisticalFunctions.js" ^
+ "%TABLE_ENGINE%\model\financialFunctions.js" ^
+ "%TABLE_ENGINE%\model\mathematicFunctions.js" ^
+ "%TABLE_ENGINE%\model\lookupandreferenceFunctions.js" ^
+ "%TABLE_ENGINE%\model\informationFunctions.js" ^
+ "%TABLE_ENGINE%\model\logicalFunctions.js" ^
  "%TABLE_ENGINE%\model\DrawingObjects.js" ^
  "%TABLE_ENGINE%\model\NumFormat.js" ^
  "%TABLE_ENGINE%\model\Serialize.js" ^
