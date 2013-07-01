@@ -891,6 +891,13 @@ Paragraph.prototype =
         var nWordLen          = 0;
         var nSpaceLen         = 0;
         var nSpacesCount      = 0;
+        var pLastTab =
+        {
+            TabPos : 0,
+            X      : 0,
+            Value  : -1,
+            Item   : null
+        };
 
         var bNewLine             = false;
         var bNewRange            = false;
@@ -945,7 +952,7 @@ Paragraph.prototype =
                 if (  0 === CurLine )
                 {
                     this.Lines[-1] = new CParaLine(0);
-                    this.Lines[-1].Set_EndPos( StartPos - 1 );
+                    this.Lines[-1].Set_EndPos( StartPos - 1, this );
                 }
 
                 return recalcresult_NextPage;
@@ -960,7 +967,7 @@ Paragraph.prototype =
             if ( 0 === CurLine )
             {
                 this.Lines[-1] = new CParaLine( 0 );
-                this.Lines[-1].Set_EndPos( LineStart_Pos - 1 );
+                this.Lines[-1].Set_EndPos( LineStart_Pos - 1, this );
             }
 
             return recalcresult_NextPage;
@@ -1463,7 +1470,7 @@ Paragraph.prototype =
                                     if ( 0 === CurLine )
                                     {
                                         this.Lines[-1] = new CParaLine(0);
-                                        this.Lines[-1].Set_EndPos( LineStart_Pos - 1 );
+                                        this.Lines[-1].Set_EndPos( LineStart_Pos - 1, this );
                                     }
 
                                     RecalcResult = recalcresult_NextPage;
@@ -1479,7 +1486,7 @@ Paragraph.prototype =
                                         if ( 0 === CurLine )
                                         {
                                             this.Lines[-1] = new CParaLine(0);
-                                            this.Lines[-1].Set_EndPos( LineStart_Pos - 1 );
+                                            this.Lines[-1].Set_EndPos( LineStart_Pos - 1, this );
                                         }
 
                                         RecalcResult = recalcresult_NextPage;
@@ -1601,9 +1608,34 @@ Paragraph.prototype =
                     }
                     case para_Tab:
                     {
-                        if ( true === bWord )
+                        if ( -1 != pLastTab.Value )
                         {
-                            bEmptyLine  = false;
+                            var TempTabX = X;
+
+                            if ( bWord || nWordLen > 0 )
+                                TempTabX += nSpaceLen + nWordLen;
+
+                            var TabItem   = pLastTab.Item;
+                            var TabStartX = pLastTab.X;
+                            var TabRangeW = TempTabX - TabStartX;
+                            var TabValue  = pLastTab.Value;
+                            var TabPos    = pLastTab.TabPos;
+
+                            var TabCalcW = 0;
+                            if ( tab_Right === TabValue )
+                                TabCalcW = Math.max( TabPos - (TabStartX + TabRangeW), 0 );
+                            else if ( tab_Center === TabValue )
+                                TabCalcW = Math.max( TabPos - (TabStartX + TabRangeW / 2), 0 );
+
+                            if ( X + TabCalcW > XEnd )
+                                TabCalcW = XEnd - X;
+
+                            TabItem.Width        = TabCalcW;
+                            TabItem.WidthVisible = TabCalcW;
+
+                            pLastTab.Value = -1;
+
+                            X += TabCalcW;
                         }
 
                         // Добавляем длину пробелов до слова
@@ -1616,7 +1648,11 @@ Paragraph.prototype =
                         nSpaceLen = 0;
                         nWordLen  = 0;
 
-                        var NewX = null;
+
+                        nSpacesCount = 0;
+                        this.Lines[CurLine].Ranges[CurRange].Spaces = 0;
+                        this.Lines[CurLine].Ranges[CurRange].TabPos = Pos;
+
                         var PageStart = this.Parent.Get_PageContentStartPos( this.PageNum + CurPage );
 
                         // Если у данного параграфа есть табы, тогда ищем среди них
@@ -1637,28 +1673,30 @@ Paragraph.prototype =
                             }
 
                             if ( tab_Clear != Tab.Value )
-                                TabsPos.push( TabPos );
+                                TabsPos.push( Tab );
                         }
 
                         if ( true === bCheckLeft )
                             TabsPos.push( PageStart.X + ParaPr.Ind.Left );
 
-                        TabsCount++;
+                        TabsCount = TabsPos.length;
 
+                        var Tab = null;
                         for ( var Index = 0; Index < TabsCount; Index++ )
                         {
-                            var TabPos = TabsPos[Index];
+                            var TempTab = TabsPos[Index];
 
-                            if ( X < TabPos )
+                            if ( X < TempTab.Pos + PageStart.X )
                             {
-                                NewX = TabPos;
-                                Item.TabType = tab_Left;
+                                Tab = TempTab;
                                 break;
                             }
                         }
 
+                        var NewX = null;
+
                         // Если табов нет, либо их позиции левее текущей позиции ставим таб по умолчанию
-                        if ( null === NewX )
+                        if ( null === Tab )
                         {
                             if ( X < PageStart.X + ParaPr.Ind.Left )
                                 NewX = PageStart.X + ParaPr.Ind.Left;
@@ -1668,43 +1706,67 @@ Paragraph.prototype =
                                 while ( X >= NewX )
                                     NewX += Default_Tab_Stop;
                             }
-
-                            Item.TabType = tab_Left;
-                        }
-
-                        if ( NewX > XEnd && ( false === bFirstItemOnLine || RangesCount > 0 ) )
-                        {
-                            if ( RangesCount == CurRange )
-                            {
-                                bNewLine = true;
-                                Pos--;
-                            }
-                            else
-                            {
-                                bNewRange = true;
-                                Pos--;
-                            }
                         }
                         else
                         {
-                            Item.Width        = NewX - X;
-                            Item.WidthVisible = NewX - X;
+                            // Если таб левый, тогда мы сразу смещаемся к нему
+                            if ( tab_Left === Tab.Value )
+                            {
+                                NewX = Tab.Pos + PageStart.X;
+                            }
+                            else
+                            {
+                                pLastTab.TabPos = Tab.Pos + PageStart.X;
+                                pLastTab.Value  = Tab.Value;
+                                pLastTab.X      = X;
+                                pLastTab.Item   = Item;
 
-                            X = NewX;
-
-                            this.Lines[CurLine].Words++;
-                            this.Lines[CurLine].Ranges[CurRange].Words++;
-
-                            // Пробелы перед первым словом в строке не считаем
-                            if ( this.Lines[CurLine].Words > 1 )
-                                this.Lines[CurLine].Spaces += nSpacesCount;
-
-                            if ( this.Lines[CurLine].Ranges[CurRange].Words > 1 )
-                                this.Lines[CurLine].Ranges[CurRange].Spaces += nSpacesCount;
+                                Item.Width        = 0;
+                                Item.WidthVisible = 0;
+                            }
                         }
 
-                        bFirstItemOnLine = false;
+                        if ( null != NewX )
+                        {
+                            if ( NewX > XEnd && ( false === bFirstItemOnLine || RangesCount > 0 ) )
+                            {
+                                nWordLen = NewX - X;
+                            }
+                            else
+                            {
+                                Item.Width        = NewX - X;
+                                Item.WidthVisible = NewX - X;
+
+                                X = NewX;
+
+                                this.Lines[CurLine].Words++;
+                                this.Lines[CurLine].Ranges[CurRange].Words++;
+
+                                // Пробелы перед первым словом в строке не считаем
+                                if ( this.Lines[CurLine].Words > 1 )
+                                    this.Lines[CurLine].Spaces += nSpacesCount;
+
+                                if ( this.Lines[CurLine].Ranges[CurRange].Words > 1 )
+                                    this.Lines[CurLine].Ranges[CurRange].Spaces += nSpacesCount;
+                            }
+                        }
+
+                        // Если перенос идет по строке, а не из-за обтекания, тогда разрываем перед табом, а если
+                        // из-за обтекания, тогда разрываем перед последним словом, идущим перед табом
+                        if ( RangesCount === CurRange )
+                        {
+                            if ( true === bStartWord )
+                            {
+                                bFirstItemOnLine = false;
+                                bEmptyLine       = false;
+                            }
+
+                            nWordStartPos = Pos;
+                        }
+
                         nSpacesCount = 0;
+                        bStartWord = true;
+                        bWord = true;
 
                         break;
                     }
@@ -1785,6 +1847,31 @@ Paragraph.prototype =
                                 X += nSpaceLen;
                                 nSpaceLen = 0;
                             }
+
+                            if ( -1 != pLastTab.Value )
+                            {
+                                var TabItem   = pLastTab.Item;
+                                var TabStartX = pLastTab.X;
+                                var TabRangeW = X - TabStartX;
+                                var TabValue  = pLastTab.Value;
+                                var TabPos    = pLastTab.TabPos;
+
+                                var TabCalcW = 0;
+                                if ( tab_Right === TabValue )
+                                    TabCalcW = Math.max( TabPos - (TabStartX + TabRangeW), 0 );
+                                else if ( tab_Center === TabValue )
+                                    TabCalcW = Math.max( TabPos - (TabStartX + TabRangeW / 2), 0 );
+
+                                if ( X + TabCalcW > XEnd )
+                                    TabCalcW = XEnd - X;
+
+                                TabItem.Width        = TabCalcW;
+                                TabItem.WidthVisible = TabCalcW;
+
+                                pLastTab.Value = -1;
+
+                                X += TabCalcW;
+                            }
                         }
 
                         bNewLine    = true;
@@ -1803,6 +1890,7 @@ Paragraph.prototype =
             // Переносим строку
             if ( bNewLine )
             {
+                pLastTab.Value = -1;
                 nSpaceLen = 0;
 
                 // Строка пустая, у нее надо выставить ненулевую высоту. Делаем как Word, выставляем высоту по размеру
@@ -2112,7 +2200,7 @@ Paragraph.prototype =
                         if ( 0 === CurLine )
                         {
                             this.Lines[-1] = new CParaLine(0);
-                            this.Lines[-1].Set_EndPos( LineStart_Pos - 1 );
+                            this.Lines[-1].Set_EndPos( LineStart_Pos - 1, this );
                         }
 
                         // Добавляем разрыв страницы
@@ -2178,6 +2266,7 @@ Paragraph.prototype =
                     else
                         XEnd = Ranges[0].X0;
 
+                    bStartWord = false;
                     bWord = false;
                     bNewPage = false;
                     bForceNewPage = false;
@@ -2250,7 +2339,7 @@ Paragraph.prototype =
                         }
 
                         this.Pages[CurPage].Set_EndLine( CurLine );
-                        this.Lines[CurLine].Set_EndPos( Pos );
+                        this.Lines[CurLine].Set_EndPos( Pos, this );
 
                         RecalcResult = recalcresult_NextPage;
                         break;
@@ -2306,7 +2395,7 @@ Paragraph.prototype =
                         }
                         else
                         {
-                            this.Lines[CurLine].Set_EndPos( Pos );
+                            this.Lines[CurLine].Set_EndPos( Pos, this );
                             CurLine++;
 
                             if ( this === this.Parent.RecalcInfo.WidowControlParagraph && CurLine === this.Parent.RecalcInfo.WidowControlLine )
@@ -2318,7 +2407,7 @@ Paragraph.prototype =
                                 if ( 0 === CurLine )
                                 {
                                     this.Lines[-1] = new CParaLine( 0 );
-                                    this.Lines[-1].Set_EndPos( LineStart_Pos - 1 );
+                                    this.Lines[-1].Set_EndPos( LineStart_Pos - 1, this );
                                 }
 
                                 RecalcResult = recalcresult_NextPage;
@@ -2386,7 +2475,7 @@ Paragraph.prototype =
                             if ( 0 === CurLine )
                             {
                                 this.Lines[-1] = new CParaLine( 0 );
-                                this.Lines[-1].Set_EndPos( LineStart_Pos - 1 );
+                                this.Lines[-1].Set_EndPos( LineStart_Pos - 1, this );
                             }
 
                             RecalcResult = recalcresult_NextPage;
@@ -2429,7 +2518,7 @@ Paragraph.prototype =
                             this.Pages[CurPage].Bounds.Bottom = this.Pages[CurPage].YLimit;
                             this.Bounds.Bottom = this.Pages[CurPage].YLimit;
 
-                            this.Lines[CurLine].Set_EndPos( Pos );
+                            this.Lines[CurLine].Set_EndPos( Pos, this );
                             this.Pages[CurPage].Set_EndLine( CurLine );
 
                             for ( var TempRange = CurRange + 1; TempRange <= RangesCount; TempRange++ )
@@ -2437,7 +2526,7 @@ Paragraph.prototype =
                         }
                         else
                         {
-                            this.Lines[CurLine].Set_EndPos( Pos );
+                            this.Lines[CurLine].Set_EndPos( Pos, this );
                             this.Pages[CurPage].Set_EndLine( CurLine );
 
                             for ( var TempRange = CurRange + 1; TempRange <= RangesCount; TempRange++ )
@@ -2450,6 +2539,8 @@ Paragraph.prototype =
             }
             else if ( bNewRange )
             {
+                pLastTab.Value = -1;
+
                 this.Lines[CurLine].Set_RangeStartPos( CurRange + 1, Pos + 1 );
 
                 nSpaceLen = 0;
@@ -2871,7 +2962,7 @@ Paragraph.prototype =
                 }
                 case para_Space:
                 {
-                    if ( !bFirstLineItem && CurLine != this.Lines.length - 1 && SpacesCounter > 0 )
+                    if ( !bFirstLineItem && CurLine != this.Lines.length - 1 && SpacesCounter > 0 && (ItemNum > this.Lines[CurLine].Ranges[CurRange].SpacePos) )
                     {
                         Item.WidthVisible = Item.Width + JustifySpace;
                         SpacesCounter--;
@@ -3411,8 +3502,6 @@ Paragraph.prototype =
         {
             var EndLinePos = this.Lines[CurLine].EndPos;
 
-            var bFirstLineItem = true;
-
             var Y0 = (this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent);
             var Y1 = (this.Pages[CurPage].Y + this.Lines[CurLine].Y + this.Lines[CurLine].Metrics.Descent);
             if ( this.Lines[CurLine].Metrics.LineGap < 0 )
@@ -3430,8 +3519,7 @@ Paragraph.prototype =
                 // сохраним позиции начала и конца продолжительных одинаковых настроек
                 // выделения, совместного редатирования и поиска соответственно.
 
-                var SpacesCounter = this.Lines[CurLine].Ranges[CurRange].Spaces;
-                var X             = this.Lines[CurLine].Ranges[CurRange].XVisible;
+                var X = this.Lines[CurLine].Ranges[CurRange].XVisible;
 
                 var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
                 var EndPos   = ( CurRange === RangesCount - 1 ? EndLinePos : this.Lines[CurLine].Ranges[CurRange + 1].StartPos - 1 );
@@ -3498,8 +3586,6 @@ Paragraph.prototype =
                             if ( para_Drawing === Item.Type && drawing_Anchor === Item.DrawingType )
                                 break;
 
-                            bFirstLineItem = false;
-
                             if ( CommentsFlag != comments_NoComment && true === bDrawComments )
                                 aComm.Add( Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0, { Active : CommentsFlag === comments_ActiveComment ? true : false } );
                             else if ( highlight_None != CurTextPr.HighLight )
@@ -3518,15 +3604,12 @@ Paragraph.prototype =
                         case para_Space:
                         {
                             // Пробелы в конце строки (и строку состоящую из пробелов) не подчеркиваем, не зачеркиваем и не выделяем
-                            if ( SpacesCounter > 0 || ( bFirstLineItem && this.Lines[CurLine].Words > 0 ) )
+                            if ( Pos >= this.Lines[CurLine].Ranges[CurRange].StartPos2 && Pos <= this.Lines[CurLine].Ranges[CurRange].EndPos2 )
                             {
                                 if ( CommentsFlag != comments_NoComment && bDrawComments )
                                     aComm.Add( Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0, { Active : CommentsFlag === comments_ActiveComment ? true : false } );
                                 else if ( highlight_None != CurTextPr.HighLight )
                                     aHigh.Add( Y0, Y1, X, X + Item.WidthVisible, 0, CurTextPr.HighLight.r, CurTextPr.HighLight.g, CurTextPr.HighLight.b );
-
-                                if ( !bFirstLineItem && this.Lines[CurLine].Words > 0 )
-                                    SpacesCounter--;
                             }
 
                             if ( true === bSearchResult )
@@ -4099,8 +4182,6 @@ Paragraph.prototype =
 
         for ( var CurLine = StartLine; CurLine <= EndLine; CurLine++ )
         {
-            var bFirstLineItem = true;
-
             var EndLinePos = this.Lines[CurLine].EndPos;
             var LineY      = this.Pages[CurPage].Y + this.Lines[CurLine].Y;
             var Y          = LineY;
@@ -4117,8 +4198,7 @@ Paragraph.prototype =
                 // aSpelling сохраним позиции начала и конца продолжительных одинаковых настроек зачеркивания,
                 // двойного зачеркивания, подчеркивания и подчеркивания орфографии.
 
-                var SpacesCounter = this.Lines[CurLine].Ranges[CurRange].Spaces;
-                var X             = this.Lines[CurLine].Ranges[CurRange].XVisible;
+                var X = this.Lines[CurLine].Ranges[CurRange].XVisible;
 
                 var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
                 var EndPos   = ( CurRange === RangesCount - 1 ? EndLinePos : this.Lines[CurLine].Ranges[CurRange + 1].StartPos - 1 );
@@ -4147,8 +4227,6 @@ Paragraph.prototype =
                         {
                             if ( para_Drawing != Item.Type || drawing_Anchor != Item.DrawingType )
                             {
-                                bFirstLineItem = false;
-
                                 if ( true === CurTextPr.DStrikeout )
                                     aDStrikeout.Add( Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b );
                                 else if ( true === CurTextPr.Strikeout )
@@ -4168,11 +4246,8 @@ Paragraph.prototype =
                         case para_Space:
                         {
                             // Пробелы в конце строки (и строку состоящую из пробелов) не подчеркиваем, не зачеркиваем и не выделяем
-                            if ( SpacesCounter > 0 || ( bFirstLineItem && this.Lines[CurLine].Words > 0 ) )
+                            if ( Pos >= this.Lines[CurLine].Ranges[CurRange].StartPos2 && Pos <= this.Lines[CurLine].Ranges[CurRange].EndPos2 )
                             {
-                                if ( !bFirstLineItem && this.Lines[CurLine].Words > 0 )
-                                    SpacesCounter--;
-
                                 if ( true === CurTextPr.DStrikeout )
                                     aDStrikeout.Add( Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b );
                                 else if ( true === CurTextPr.Strikeout )
@@ -11800,13 +11875,16 @@ CParaRecalcInfo.prototype =
 
 function CParaLineRange(X, XEnd)
 {
-    this.X        = X;
-    this.XVisible = 0;
-    this.W        = 0;
-    this.Words    = 0;
-    this.Spaces   = 0;
-    this.XEnd     = XEnd;
-    this.StartPos = 0; // Позиция в контенте параграфа, с которой начинается данный отрезок
+    this.X         = X;
+    this.XVisible  = 0;
+    this.W         = 0;
+    this.Words     = 0;
+    this.Spaces    = 0;
+    this.XEnd      = XEnd;
+    this.StartPos  = 0;  // Позиция в контенте параграфа, с которой начинается данный отрезок
+    this.SpacePos  = -1; // Позиция, с которой начинаем считать пробелы
+    this.StartPos2 = -1; // Позиции начала и конца отрисовки выделения
+    this.EndPos2   = -1; // текста(а также подчеркивания и зачеркивания)
 }
 
 CParaLineRange.prototype =
@@ -11878,17 +11956,17 @@ CParaLineMetrics.prototype =
 
 function CParaLine(StartPos)
 {
-    this.Y        = 0; //
-    this.W        = 0;
-    this.Top      = 0;
-    this.Bottom   = 0;
-    this.Words    = 0;
-    this.Spaces   = 0; // Количество пробелов между словами в строке (пробелы, идущие в конце строки, не учитываются)
-    this.Metrics  = new CParaLineMetrics();
-    this.Ranges   = new Array(); // Массив CParaLineRanges
-    this.RangeY   = false;
-    this.StartPos = StartPos; // Позиция в контенте параграфа, с которой начинается данная строка
-    this.EndPos   = StartPos; // Позиция последнего элемента в данной строке
+    this.Y         = 0; //
+    this.W         = 0;
+    this.Top       = 0;
+    this.Bottom    = 0;
+    this.Words     = 0;
+    this.Spaces    = 0; // Количество пробелов между словами в строке (пробелы, идущие в конце строки, не учитываются)
+    this.Metrics   = new CParaLineMetrics();
+    this.Ranges    = new Array(); // Массив CParaLineRanges
+    this.RangeY    = false;
+    this.StartPos  = StartPos; // Позиция в контенте параграфа, с которой начинается данная строка
+    this.EndPos    = StartPos; // Позиция последнего элемента в данной строке
 }
 
 CParaLine.prototype =
@@ -11929,9 +12007,181 @@ CParaLine.prototype =
     },
 
 
-    Set_EndPos : function(EndPos)
+    Set_EndPos : function(EndPos, Paragraph)
     {
         this.EndPos = EndPos;
+
+        var Content = Paragraph.Content;
+        var RangesCount = this.Ranges.length;
+
+        for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
+        {
+            var StartRangePos = this.Ranges[CurRange].StartPos;
+            var EndRangePos   = ( CurRange === RangesCount - 1 ? EndPos : this.Ranges[CurRange + 1].StartPos - 1 );
+
+            var nSpacesCount = 0;
+            var bWord        = false;
+            var nSpaceLen    = 0;
+
+            var nSpacePos  = -1;
+            var nStartPos2 = -1;
+            var nEndPos2   = -1;
+
+            this.Ranges[CurRange].W      = 0;
+            this.Ranges[CurRange].Words  = 0;
+            this.Ranges[CurRange].Spaces = 0;
+
+            for ( var Pos = StartRangePos; Pos <= EndRangePos; Pos++ )
+            {
+                var Item = Content[Pos];
+                switch( Item.Type )
+                {
+                    case para_Text:
+                    {
+                        if ( true != bWord )
+                        {
+                            bWord = true;
+                            this.Ranges[CurRange].Words++;
+                        }
+
+                        this.Ranges[CurRange].W += Item.Width;
+
+                        // Если текущий символ, например, дефис, тогда на нем заканчивается слово
+                        if ( true === Item.SpaceAfter )
+                        {
+                            this.Ranges[CurRange].W += nSpaceLen;
+
+                            // Пробелы перед первым словом в строке не считаем
+                            if ( this.Ranges[CurRange].Words > 1 )
+                                this.Ranges[CurRange].Spaces += nSpacesCount;
+
+                            bWord        = false;
+                            nSpaceLen    = 0;
+                            nSpacesCount = 0;
+                        }
+
+                        if ( EndRangePos === Pos )
+                            this.Ranges[CurRange].W += nSpaceLen;
+
+                        if ( -1 === nSpacePos )
+                            nSpacePos = Pos;
+
+                        if ( -1 === nStartPos2 )
+                            nStartPos2 = Pos;
+
+                        nEndPos2 = Pos;
+
+                        break;
+                    }
+                    case para_Space:
+                    {
+                        if ( true === bWord )
+                        {
+                            this.Ranges[CurRange].W += nSpaceLen;
+
+                            // Пробелы перед первым словом в строке не считаем
+                            if ( this.Ranges[CurRange].Words > 1 )
+                                this.Ranges[CurRange].Spaces += nSpacesCount;
+
+                            bWord        = false;
+                            nSpacesCount = 1;
+                            nSpaceLen    = 0;
+                        }
+                        else
+                            nSpacesCount++;
+
+                        nSpaceLen += Item.Width;
+
+                        break;
+                    }
+                    case para_Drawing:
+                    {
+                        this.Ranges[CurRange].Words++;
+                        this.Ranges[CurRange].W      += nSpaceLen;
+                        this.Ranges[CurRange].Spaces += nSpacesCount;
+
+                        bWord        = false;
+                        nSpacesCount = 0;
+                        nSpaceLen    = 0;
+
+                        if ( true === Item.Is_Inline() || true === Paragraph.Parent.Is_DrawingShape() )
+                        {
+                            this.Ranges[CurRange].W += Item.Width;
+
+                            if ( -1 === nSpacePos )
+                                nSpacePos = Pos;
+
+                            if ( -1 === nStartPos2 )
+                                nStartPos2 = Pos;
+
+                            nEndPos2 = Pos;
+                        }
+
+                        break;
+                    }
+                    case para_PageNum:
+                    {
+                        this.Ranges[CurRange].Words++;
+                        this.Ranges[CurRange].W      += nSpaceLen;
+                        this.Ranges[CurRange].Spaces += nSpacesCount;
+
+                        bWord        = false;
+                        nSpacesCount = 0;
+                        nSpaceLen    = 0;
+
+                        this.Ranges[CurRange].W += Item.Width;
+
+                        if ( -1 === nSpacePos )
+                            nSpacePos = Pos;
+
+                        if ( -1 === nStartPos2 )
+                            nStartPos2 = Pos;
+
+                        nEndPos2 = Pos;
+
+                        break;
+                    }
+                    case para_Tab:
+                    {
+                        this.Ranges[CurRange].W += Item.Width;
+                        this.Ranges[CurRange].W += nSpaceLen;
+
+                        this.Ranges[CurRange].Words  = 0;
+                        this.Ranges[CurRange].Spaces = 0;
+
+                        nSpaceLen    = 0;
+                        nSpacesCount = 0;
+                        bWord        = false;
+
+                        nSpacePos = -1;
+
+                        break;
+                    }
+
+                    case para_NewLine:
+                    {
+                        if ( bWord && this.Ranges[CurRange].Words > 1 )
+                            this.Ranges[CurRange].Spaces += nSpacesCount;
+
+                        nSpacesCount = 0;
+                        bWord        = false;
+
+                        break;
+                    }
+                    case para_End:
+                    {
+                        if ( true === bWord )
+                            this.Ranges[CurRange].Spaces += nSpacesCount;
+
+                        break;
+                    }
+                }
+            }
+
+            this.Ranges[CurRange].SpacePos  = nSpacePos;
+            this.Ranges[CurRange].StartPos2 = ( nStartPos2 === -1 ? StartRangePos : nStartPos2 );
+            this.Ranges[CurRange].EndPos2   = ( nEndPos2   === -1 ? EndRangePos   : nEndPos2   );
+        }
     }
 };
 

@@ -249,7 +249,7 @@ CHeaderFooter.prototype =
 
     Get_PageContentStartPos : function ()
     {
-        return {X : 0, Y : 0, XLimit : 0, YLimit : 0};
+        return { X : X_Left_Field, Y : 0, XLimit : X_Right_Field, YLimit : 0 };
     },
 
     Set_CurrentElement : function()
