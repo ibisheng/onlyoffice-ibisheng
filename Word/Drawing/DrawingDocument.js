@@ -4040,7 +4040,14 @@ function CDrawingDocument()
         var _ar = hor_ruler.m_arrTabs;
 
         for (var i = 0; i < _len; i++)
-            _ar[i] = new CTab(__tabs[i].Pos, g_tabtype_left);
+        {
+            if (__tabs[i].Value == tab_Left)
+                _ar[i] = new CTab(__tabs[i].Pos, g_tabtype_left);
+            else if (__tabs[i].Value == tab_Center)
+                _ar[i] = new CTab(__tabs[i].Pos, g_tabtype_center);
+            else if (__tabs[i].Value == tab_Right)
+                _ar[i] = new CTab(__tabs[i].Pos, g_tabtype_right);
+        }
 
         hor_ruler.CorrectTabs();
         this.m_oWordControl.UpdateHorRuler();
