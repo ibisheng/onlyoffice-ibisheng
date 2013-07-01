@@ -2214,7 +2214,7 @@ function calculatePosiitionObjects(type)
 function getMaxPropertiesText(context, font, text)
 {
 	context.setFont(font);
-	var result;
+	var result = 0;
 	if(typeof text == "object")
 	{	
 		// в данном случае ищем максимальную ширину текста
@@ -2233,7 +2233,8 @@ function getMaxPropertiesText(context, font, text)
 	}
 	else
 	{
-		result = context.measureText((text).toString(),0);
+		if(text.toString() != '')
+			result = context.measureText((text).toString(),0);
 	}
 	return result;
 }
