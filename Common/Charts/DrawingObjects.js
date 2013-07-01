@@ -2007,7 +2007,6 @@ function DrawingObjects() {
 		overlayCtx = currentSheet.overlayCtx;
 		shapeCtx = currentSheet.shapeCtx;
 		shapeOverlayCtx = currentSheet.shapeOverlayCtx;
-        shapeOverlayCtx.put_GlobalAlpha(true, 0.5)
 		
 		isViewerMode =  function() { return worksheet._trigger("getViewerMode"); };
 
@@ -2346,8 +2345,10 @@ function DrawingObjects() {
 	}
 
 	_this.showOverlayGraphicObjects = function() {
+		shapeOverlayCtx.put_GlobalAlpha(true, 0.5);
 		shapeOverlayCtx.m_oContext.clearRect(0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix);
 		_this.controller.drawTracks(shapeOverlayCtx);
+		shapeOverlayCtx.put_GlobalAlpha(true, 1)
 	}
 	
 	_this.showOverlayDrawingObjects = function() {
