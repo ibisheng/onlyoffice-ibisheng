@@ -82,6 +82,12 @@ DrawingObjectsController.prototype =
             this.arrTrackObjects[i].track(dx, dy);
     },
 
+    trackAdjObject: function(x, y)
+    {
+        if(this.arrTrackObjects.length > 0)
+            this.arrPreTrackObjects[0].track(x, y);
+    },
+
     trackEnd: function()
     {
         for(var i = 0; i < this.arrTrackObjects.length; ++i)
@@ -99,26 +105,166 @@ DrawingObjectsController.prototype =
             this.arrTrackObjects[i].draw(overlay);
     },
 
+    drawSelection: function(drawingDocument)
+    {
+        switch (this.curState.id)
+        {
+            default :
+            {
+                var selected_objects = this.selectedObjects;
+                for(var i = 0; i < selected_objects.length; ++i)
+                {
+                    drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, selected_objects[i].getTransform(), 0, 0, selected_objects[i].extX, selected_objects[i].extY, false, selected_objects[i].canRotate());
+                }
+                break;
+            }
+        }
+    },
+
     isPointInDrawingObjects: function(x, y)
     {
-        var selected_objects = this.selectedObjects;
+        var selected_objects = this.drawingObjectsController.selectedObjects;
         if(selected_objects.length === 1)
         {
-            if(selected_objects[0].hitToAdjustment(x, y).hit)
+            var hit_to_adj = selected_objects[0].hitToAdjustment(x, y);
+            if(hit_to_adj.hit)
+            {
                 return true;
+            }
         }
+
         for(var i = selected_objects.length - 1; i > -1; --i)
         {
-            if(selected_objects[i].hitToHandles(x, y) > -1)
+            var hit_to_handles = selected_objects[i].hitToHandles(x, y);
+            if(hit_to_handles > -1)
+            {
+                if(hit_to_handles === 8)
+                {
+                    if(!selected_objects[i].canRotate())
+                        return false;
+                }
+                else
+                {
+                    if(!selected_objects[i].canResize())
+                        return false;
+                }
                 return true;
+            }
         }
-        var arr_objects = [];//TODO
-        for(i = arr_objects.length - 1; i > -1; --i)
+
+        for(i = selected_objects.length - 1; i > -1; --i)
         {
-            if(arr_objects[i].hit(x, y))
-                return true;
+            if(selected_objects[i].hitInBoundingRect(x, y))
+            {
+                return selected_objects[i].canMove();
+            }
+        }
+
+        var arr_drawing_objects = this.drawingObjects.getDrawingObjects();
+        for(i = arr_drawing_objects.length-1; i > -1; --i)
+        {
+            var cur_drawing_base = arr_drawing_objects[i];
+            if(cur_drawing_base.isGraphicObject())
+            {
+                var cur_drawing = cur_drawing_base.graphicObject;
+                if(cur_drawing.isSimpleObject())
+                {
+                    var hit_in_inner_area = cur_drawing.hitInInnerArea(x, y);
+                    var hit_in_path = cur_drawing.hitInPath(x, y);
+                    var hit_in_text_rect = cur_drawing.hitInTextRect(x, y);
+                    if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
+                    {
+                        if(!cur_drawing.canMove())
+                            return false;
+                        return true;
+                    }
+                    else if(hit_in_text_rect)
+                    {
+                        return false
+                    }
+                }
+                else
+                {
+
+                }
+            }
         }
         return false;
 
+    },
+
+    isPointInDrawingObjects2: function(x, y)
+    {
+        var selected_objects = this.drawingObjectsController.selectedObjects;
+        if(selected_objects.length === 1)
+        {
+            var hit_to_adj = selected_objects[0].hitToAdjustment(x, y);
+            if(hit_to_adj.hit)
+            {
+                return true;
+            }
+        }
+
+        for(var i = selected_objects.length - 1; i > -1; --i)
+        {
+            var hit_to_handles = selected_objects[i].hitToHandles(x, y);
+            if(hit_to_handles > -1)
+            {
+                if(hit_to_handles === 8)
+                {
+                    if(!selected_objects[i].canRotate())
+                        return false;
+                }
+                else
+                {
+                    if(!selected_objects[i].canResize())
+                        return false;
+                }
+                return true;
+            }
+        }
+
+        for(i = selected_objects.length - 1; i > -1; --i)
+        {
+            if(selected_objects[i].hitInBoundingRect(x, y))
+            {
+                if(!selected_objects[i].canMove())
+                    return;
+                for(var j = 0; j < selected_objects.length; ++j)
+                {
+                    this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
+                }
+                this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects, x, y));
+                return true;
+            }
+        }
+
+        var arr_drawing_objects = this.drawingObjects.getDrawingObjects();
+        for(i = arr_drawing_objects.length-1; i > -1; --i)
+        {
+            var cur_drawing_base = arr_drawing_objects[i];
+            if(cur_drawing_base.isGraphicObject())
+            {
+                var cur_drawing = cur_drawing_base.graphicObject;
+                if(cur_drawing.isSimpleObject())
+                {
+                    var hit_in_inner_area = cur_drawing.hitInInnerArea(x, y);
+                    var hit_in_path = cur_drawing.hitInPath(x, y);
+                    var hit_in_text_rect = cur_drawing.hitInTextRect(x, y);
+                    if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
+                    {
+
+                    }
+                    else if(hit_in_text_rect)
+                    {
+
+                    }
+                }
+                else
+                {
+
+                }
+            }
+        }
     }
 };

@@ -144,6 +144,37 @@ CShape.prototype =
         this.spPr.ln = line;
     },
 
+    setAdjustmentValue: function(ref1, value1, ref2, value2)
+    {
+
+        if(this.spPr.geometry)
+        {
+            /*var data = {};
+            data.Type = historyitem_SetAdjValue;
+            data.ref1 = ref1;
+            data.newValue1 = value1;
+            data.ref2 = ref2;
+            data.newValue2 = value2;
+            data.oldValue1 = this.spPr.geometry.gdLst[ref1];
+            data.oldValue2 = this.spPr.geometry.gdLst[ref2];
+            History.Add(this, data);*/
+
+            var geometry = this.spPr.geometry;
+            if(typeof geometry.gdLst[ref1] === "number")
+            {
+                geometry.gdLst[ref1] = value1;
+            }
+
+            if(typeof geometry.gdLst[ref2] === "number")
+            {
+                geometry.gdLst[ref2] = value2;
+            }
+            geometry.Recalculate(this.extX, this.extY);
+            /*this.calculateContent();
+            this.calculateTransformTextMatrix(); */
+        }
+    },
+
     select: function(drawingObjectsController)
     {
         this.selected = true;
