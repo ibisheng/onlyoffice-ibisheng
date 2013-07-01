@@ -37,6 +37,13 @@ DrawingObjectsController.prototype =
         this.curState.onMouseUp(e, x, y);
     },
 
+    resetSelectionState: function()
+    {
+        while(this.selectedObjects.length > 0)
+            this.selectedObjects[0].deselect(this);
+        this.changeCurrentState(new NullState(this, this.drawingObjects));
+    },
+
     clearPreTrackObjects: function()
     {
         this.arrPreTrackObjects.length = 0;
