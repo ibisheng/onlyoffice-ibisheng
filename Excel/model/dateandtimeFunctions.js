@@ -917,8 +917,10 @@ cFormulaFunction.DateAndTime = {
                         default:
                             return new cNumber(wk);
                     }
-                else
+                else{
+                    wk = parseInt(((dt-startOfYear)/c_msPerDay+iso[startOfYear.getDay()]+7)/7);
                     return new cNumber(wk);
+                }
             }
 
             if ( arg0 instanceof cArea || arg0 instanceof cArea3D ){
@@ -952,41 +954,29 @@ cFormulaFunction.DateAndTime = {
             switch (arg1.getValue()){
                 case 1: /* 1 (Sunday) through 7 (Saturday)  */
                 case 17:/* 1 (Sunday) through 7 (Saturday) */
-//                    weekdayStartDay = [10,4,5,6,7,8,9];
-//                    type = 0;
-                    //weekdayStartDay = [13,7,8,9,10,11,12];
-//                    break;
+                    weekdayStartDay = [0,1,2,3,4,5,6];
+                    break;
                 case 2: /* 1 (Monday) through 7 (Sunday)    */
                 case 11:/* 1 (Monday) through 7 (Sunday)    */
-//                    weekdayStartDay = [6,0,1,2,3,4,5];
-//                    type = 0;
-//                    break;
+                      weekdayStartDay = [6,0,1,2,3,4,5];
+                    break;
                 case 12:/* 1 (Tuesday) through 7 (Monday)   */
-//                    weekdayStartDay = [6,7,8,2,3,4,5];
-//                    type = 0;
-//                    break;
+                    weekdayStartDay = [5,6,0,1,2,3,4];
+                    break;
                 case 13:/* 1 (Wednesday) through 7 (Tuesday) */
-//                    weekdayStartDay = [6,7,8,9,3,4,5];
-//                    type = 0;
-//                    break;
+                    weekdayStartDay = [4,5,6,0,1,2,3];
+                    break;
                 case 14:/* 1 (Thursday) through 7 (Wednesday) */
-//                    weekdayStartDay = [6,7,8,9,10,4,5];
-//                    type = 0;
-//                    break;
+                    weekdayStartDay = [3,4,5,6,0,1,2];
+                    break;
                 case 15:/* 1 (Friday) through 7 (Thursday) */
-//                    weekdayStartDay = [6,7,8,9,10,11,5];
-//                    weekdayStartDay = [5,6,7,8,9,10,4];
-//                    weekdayStartDay = [6,7,1,2,3,4,5];
-                    weekdayStartDay = [5,6,7,8,9,10,4];
-                    type = 0;
+                    weekdayStartDay = [2,3,4,5,6,0,1];
                     break;
                 case 16:/* 1 (Saturday) through 7 (Friday) */
-//                    weekdayStartDay = [6,7,8,9,10,11,12];
-                    weekdayStartDay = [6,0,1,2,3,4,5];
-                    type = 0;
+                    weekdayStartDay = [1,2,3,4,5,6,0];
                     break;
                 case 21:
-                    weekdayStartDay = [6,7,1,2,3,4,5];
+                    weekdayStartDay = [6,7,8,9,10,4,5];
 //                { 6, 7, 8, 9, 10, 4, 5 }
                     type = 1;
                     break;
