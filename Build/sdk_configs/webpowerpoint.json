@@ -82,6 +82,7 @@
                 "../Word/Drawing/Graphics.js",
                 "../Word/Drawing/Overlay.js",
                 "../Word/Drawing/ShapeDrawer.js",
+				"../PowerPoint/Drawing/Transitions.js",
                 "../PowerPoint/Drawing/DrawingDocument.js",
                 "../PowerPoint/Drawing/HtmlPage.js",
                 "../PowerPoint/Editor/Format.js",
