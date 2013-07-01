@@ -1,5 +1,6 @@
 function CBarFraction()
 {
+    this.bHide = false;
     CMathBase.call(this,2,1);
     //!!!
     //this.gapLine = 0; // толщину линии не учитываем, рисуем в области числителя
@@ -33,9 +34,13 @@ CBarFraction.prototype.draw = function()
         x2 = this.pos.x + this.size.width,
         y1 = y2 = this.pos.y + this.size.center - penW/2;
 
-    MathControl.pGraph.p_color(0,0,0, 255);
-    MathControl.pGraph.b_color1(0,0,0, 255);
-    MathControl.pGraph.drawHorLine(0, y1, x1, x2, penW);
+    if( ! this.bHide)
+    {
+        MathControl.pGraph.p_color(0,0,0, 255);
+        MathControl.pGraph.b_color1(0,0,0, 255);
+        MathControl.pGraph.drawHorLine(0, y1, x1, x2, penW);
+    }
+
 
     CBarFraction.superclass.draw.call(this);
 }
@@ -46,6 +51,10 @@ CBarFraction.prototype.getNumerator = function()
 CBarFraction.prototype.getDenominator = function()
 {
     return this.elements[1][0].getElement();
+}
+CBarFraction.prototype.hideBar = function(flag)
+{
+    this.bHide = flag;
 }
 //////////
 

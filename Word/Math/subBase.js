@@ -30,7 +30,7 @@ extend(CSubMathBase, CMathBase);
         h += maxWH.heights[i];
     }
 }*/
-CSubMathBase.prototype.mouseMove = function( mCoord )
+CSubMathBase.prototype.old_mouseMove = function( mCoord )
 {
     var res = true;
     var elem = this.findDisposition( mCoord);
@@ -43,35 +43,22 @@ CSubMathBase.prototype.mouseMove = function( mCoord )
     return res;
 }
 
+CSubMathBase.prototype.mouseMove = function( mCoord )
+{
+    var elem = this.findDisposition( mCoord);
+    var state = true,
+        SelectContent = null;
 
-function Fraction()
-{
-    this.type = 0;
-}
-Fraction.prototype =
-{
-    GetProperty: function()
+    if(elem.pos.x == this.CurPos_X && elem.pos.y == this.CurPos_Y && elem.inside_flag === -1 )
     {
-
+        movement = this.elements[this.CurPos_X][this.CurPos_Y].mouseMove(elem.mCoord);
+        SelectContent = movement.SelectContent;
+        state = movement.state;
+    }
+    else
+    {
+        state = false;
     }
 
+    return {state: state, SelectContent: SelectContent};
 }
-
-function Degree()
-{
-    this.type = 1;
-}
-function Nary()
-{
-    this.type = 2;
-}
-function Trigonometric()
-{
-    this.type = 3;
-}
-function Minimax()
-{
-    this.type = 3;
-}
-
-

@@ -88,6 +88,15 @@ CMinimaxFunc.prototype.getIterator = function()
 {
     return this.elements[1][0];
 }
+CMinimaxFunc.prototype.old_setDistance = function()
+{
+    var iter = this.elements[1][0].size,
+        ascent = iter.center + this.params.font.metrics.Placeholder.Height*DIV_CENTER;
+
+    this.dH = this.params.font.metrics.Placeholder.Height - ascent;
+    this.dW = 0;
+    //this.dH = this.params.font.FontSize/16*g_dKoef_pt_to_mm;
+}
 
 function CMinimax(num)
 {
@@ -96,7 +105,6 @@ function CMinimax(num)
         this.num = 0;
     else
         this.num = num;
-
 }
 extend(CMinimax, CSubMathBase);
 CMinimax.prototype.setContent = function()
@@ -131,6 +139,44 @@ CMinimax.prototype.getIterator = function()
     return this.elements[0][0].getIterator();
 }
 CMinimax.prototype.getArgument = function()
+{
+    return this.elements[0][1];
+}
+CMinimax.prototype.setDistance = function()
+{
+    this.dW = this.params.font.FontSize/6*g_dKoef_pt_to_mm;
+    this.dH = 0;
+}
+
+function CMathFunc()
+{
+    CMathBase.call(this, 1,2);
+}
+extend(CMathFunc, CMathBase);
+CMathFunc.prototype.setContent = function()
+{
+    var oFunc = new CMathContent();
+    var GParms = Common_CopyObj(this.params);
+    GParms.bMText = false; //!!
+
+    oFunc.init(GParms);
+
+    var oArg  = new CMathContent();
+    oArg.init(this.params);
+    oArg.fillPlaceholders();
+
+    CMathFunc.superclass.setContent.call(this, oFunc, oArg);
+}
+CMathFunc.prototype.setDistance = function()
+{
+    this.dW = this.params.font.FontSize/6*g_dKoef_pt_to_mm;
+    this.dH = 0;
+}
+CMathFunc.prototype.getFunction = function()
+{
+    return this.elements[0][0];
+}
+CMathFunc.prototype.getArgument = function()
 {
     return this.elements[0][1];
 }
@@ -187,41 +233,6 @@ old_CDifferential.prototype.setContent = function()
 
     old_CMathFunc.superclass.setContent.call(this, oDiff);
 }
-
-function CMathFunc()
-{
-    CMathBase.call(this, 1,2);
-}
-extend(CMathFunc, CMathBase);
-CMathFunc.prototype.setContent = function()
-{
-    var oFunc = new CMathContent();
-    var GParms = Common_CopyObj(this.params);
-    GParms.bMText = false; //!!
-
-    oFunc.init(GParms);
-
-    var oArg  = new CMathContent();
-    oArg.init(this.params);
-    oArg.fillPlaceholders();
-
-    CMathFunc.superclass.setContent.call(this, oFunc, oArg);
-}
-CMathFunc.prototype.setDistance = function()
-{
-    this.dW = this.params.font.FontSize/6*g_dKoef_pt_to_mm;
-    this.dH = 0;
-}
-CMathFunc.prototype.getFunction = function()
-{
-    return this.elements[0][0];
-}
-CMathFunc.prototype.getArgument = function()
-{
-    return this.elements[0][1];
-}
-
-
 
 function old_CTrigFunc(num)
 {

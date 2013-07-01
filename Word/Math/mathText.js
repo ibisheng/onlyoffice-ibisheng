@@ -27,7 +27,8 @@ function CMathText(params)
     this.SUBCONTENT = false;
     this.empty = false;
 
-    this.transform = {
+    this.transform =
+    {
         sx:  1,
         shy: 0,
         shx: 0,

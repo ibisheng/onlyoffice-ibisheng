@@ -426,7 +426,7 @@ function CDelimiter(type, loc, turn1, turn2)
     CMathBase.call(this, countRow, countCol);
 }
 extend(CDelimiter, CMathBase);
-CDelimiter.prototype.setContent = function()
+CDelimiter.prototype.setContent = function(arg)
 {
     var operator1, operator2,
         loc1, loc2;
@@ -500,10 +500,16 @@ CDelimiter.prototype.setContent = function()
     operator2.init(params2);
     operator2.setLocation(loc2, this.turn2);
 
-    var argument = new CMathContent();
-    argument.init(this.params);
-    argument.relate(this);
-    argument.fillPlaceholders();
+    var argument;
+    if(arg !== null && typeof(arg)!== "undefined")
+        argument = arg;
+    else
+    {
+        argument = new CMathContent();
+        argument.init(this.params);
+        argument.relate(this);
+        argument.fillPlaceholders();
+    }
 
     this.base = argument;
 
@@ -2809,3 +2815,90 @@ CCombiningDoubleArrow.prototype.calcCoord = function(measure)
     return {XX: XX, YY: YY, W: W, H: H};
 
 }
+
+
+function CSeparatorDelimiter(type, column)
+{
+    this.column = column;
+
+    CDelimiter.call(this, type, 4, 0, 1);
+}
+extend(CSeparatorDelimiter, CDelimiter);
+CSeparatorDelimiter.prototype.setContent = function()
+{
+    var arg = new CSeparator(this.column);
+    arg.init(this.params);
+    arg.relate(this);
+    arg.fillPlaceholders();
+
+    CSeparatorDelimiter.superclass.setContent.call(this, arg);
+}
+CSeparatorDelimiter.prototype.mouseMove = function(mCoord)
+{
+    var elem = this.findDisposition( mCoord);
+    var state = true,
+        SelectContent = null;
+
+    if(elem.pos.x == this.CurPos_X && elem.pos.y == this.CurPos_Y && elem.inside_flag === -1 )
+    {
+        movement = this.elements[this.CurPos_X][this.CurPos_Y].mouseMove(elem.mCoord);
+        SelectContent = movement.SelectContent;
+        state = movement.state;
+    }
+    else
+    {
+        state = false;
+    }
+
+    return {state: state, SelectContent: SelectContent};
+}
+
+function CSeparator(column)
+{
+    CMathBase.call(this, 1, column);
+}
+extend(CSeparator, CMathBase);
+CSeparator.prototype.setDistance = function()
+{
+    this.dH = 0;
+    this.dW = this.params.font.FontSize/3*g_dKoef_pt_to_mm;
+}
+CSeparator.prototype.draw = function()
+{
+    var x = this.pos.x,
+        y = this.pos.y;
+
+    var w = this.elements[0][0].size.width + this.dW/2;
+
+    var intGrid = MathControl.pGraph.GetIntegerGrid();
+    MathControl.pGraph.SetIntegerGrid(false);
+    MathControl.pGraph.p_width(1000);
+    MathControl.pGraph.b_color1(0,0,0, 255);
+
+    pW = this.params.font.FontSize/18*g_dKoef_pt_to_mm;
+
+    for(var i = 0; i < this.nCol - 1; i++)
+    {
+        var x1 = x + w - pW/2, y1 = y,
+            x2 = x + pW/2 + w, y2 = y,
+            x3 = x2, y3 = y + this.size.height,
+            x4 = x1, y4 = y3;
+
+        MathControl.pGraph._s();
+
+        MathControl.pGraph._m(x1, y1);
+        MathControl.pGraph._l(x2, y2);
+        MathControl.pGraph._l(x3, y3);
+        MathControl.pGraph._l(x4, y4);
+        MathControl.pGraph._l(x1, y1);
+
+        MathControl.pGraph.df();
+
+        w += this.elements[0][i+1].size.width + this.dW;
+    }
+
+    MathControl.pGraph.SetIntegerGrid(intGrid);
+
+    CSeparator.superclass.draw.call(this);
+}
+

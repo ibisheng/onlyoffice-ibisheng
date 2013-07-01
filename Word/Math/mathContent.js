@@ -51,6 +51,8 @@ function mathElem(_val, _gps, _w )
 
 
 // TODO Refactoring
+
+// 1. переделать mouseMove (вызов из this.SelectContent, а не из this.Root, далее если state == false, подниматься наверх)
 // 1. (!!) повтор IsIncline, IsHighElement
 // 2. (!!) переделать add / add_mathComponent / addText / addLetter
 // 3. home/end if( IsTarget() )
@@ -140,6 +142,7 @@ CMathContent.prototype =
         }
         this.recalculate();
     },
+
     fillPlaceholders: function()
     {
         var gps = new dist(0,0,0,0);
@@ -1820,10 +1823,6 @@ CMathComposition.prototype =
         this.ClearSelect();
         this.CurrentContent = this.SelectContent = this.Root.mouseDown({x: mouseX, y: mouseY}, -1);
 
-        /*if(typeof(this.CurrentContent) == "undefined")
-        {
-            var stop = true;
-        }*/
 
         this.CheckTarget();
     },
@@ -1832,9 +1831,16 @@ CMathComposition.prototype =
         if(this.Root.selection.active)
         {
             this.ClearSelect();
+
+            /*mouseX = 18.479166666666664;
+            mouseY = 9.76875;*/
+
             var movement = this.Root.mouseMove({x: mouseX, y: mouseY});
 
             this.SelectContent = movement.SelectContent;
+
+
+
             this.CheckTarget();
         }
 
@@ -2264,29 +2270,45 @@ CMathComposition.prototype =
                 delimBase.addMathComponent_2(209);
                 delimiter.ResizeReverse_2();
                 break;
+            case 119:
+                fract = this.SelectContent.addMathComponent_2(0);
+                fract.hideBar(true);
+                fract.ResizeReverse_2();
+                break;
+            case 120:
+                delimiter = this.SelectContent.addMathComponent_2(83);
+                delimBase = delimiter.getBase();
+                fract = delimBase.addMathComponent_2(0);
+                fract.hideBar(true);
+                delimiter.ResizeReverse_2();
+                break;
+            case 121:
+                break;
             case 122:
                 delimiter = this.SelectContent.addMathComponent_2(83);
                 delimBase = delimiter.getBase();
-                matrix = delimBase.addMathComponent_2(207);
+                fract = delimBase.addMathComponent_2(0);
+                fract.hideBar(true);
 
-                matrElem = matrix.getElement(0, 0);
-                matrElem.addText("n");
+                num = fract.getNumerator();
+                num.addText("n");
 
-                matrElem2 = matrix.getElement(1, 0);
-                matrElem2.addText("k");
+                den = fract.getDenominator();
+                den.addText("k");
 
                 delimiter.ResizeReverse_2();
                 break;
             case 123:
                 delimiter = this.SelectContent.addMathComponent_2(86);
                 delimBase = delimiter.getBase();
-                matrix = delimBase.addMathComponent_2(207);
+                fract = delimBase.addMathComponent_2(0);
+                fract.hideBar(true);
 
-                matrElem = matrix.getElement(0, 0);
-                matrElem.addText("n");
+                num = fract.getNumerator();
+                num.addText("n");
 
-                matrElem2 = matrix.getElement(1, 0);
-                matrElem2.addText("k");
+                den = fract.getDenominator();
+                den.addText("k");
 
                 delimiter.ResizeReverse_2();
                 break;
@@ -3075,12 +3097,16 @@ function AddEquation(ind)
             //mathElem = new CWhiteSquareBracket(5);
             break;
         case 95:
+            mathElem = new CSeparatorDelimiter(0, 2);
             break;
         case 96:
+            mathElem = new CSeparatorDelimiter(1, 2);
             break;
         case 97:
+            mathElem = new CSeparatorDelimiter(3, 2);
             break;
         case 98:
+            mathElem = new CSeparatorDelimiter(3, 3);
             break;
         case 99:
             mathElem = new CDelimiter(0, 2, 0);  // parentheses
