@@ -267,10 +267,6 @@ function CEditorPage(api)
 
     this.Init = function()
     {
-        //-
-        InitPanelAnimation();
-        //-
-
         this.m_oBody = CreateControlContainer(this.Name);
         this.m_oBody.HtmlElement.style.backgroundColor = "#D3D3D3";
 
