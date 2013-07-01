@@ -58,7 +58,7 @@
     /**
     * This draws the pie chart
     */
-    OfficeExcel.Pie.prototype.Draw = function ()
+    OfficeExcel.Pie.prototype.Draw = function (min,max,ymin,ymax,isSkip,isFormatCell)
     {
         /**
         * Fire the onbeforedraw event
@@ -215,7 +215,7 @@
         /**
         * Draw the labels
         */
-        this.DrawLabels();
+        this.DrawLabels(isFormatCell);
         
         
         /**
@@ -635,7 +635,7 @@
     /**
     * Draws the graphs labels
     */
-    OfficeExcel.Pie.prototype.DrawLabels = function ()
+    OfficeExcel.Pie.prototype.DrawLabels = function (isFormatCell)
     {
         var hAlignment = 'left';
         var vAlignment = 'center';
@@ -729,7 +729,7 @@
                             text_size,
                             this.centerx + explosion_offsetx + ((this.radius + 10)* Math.cos(a)) + (this._otherProps._labels_sticks ? (a < 1.57 || a > 4.71 ? 2 : -2) : 0),
                             this.centery + explosion_offsety + (((this.radius + 10) * Math.sin(a))),
-                            labels[i],
+                            OfficeExcel.numToFormatText(labels[i],isFormatCell),
                             vAlignment,
                             hAlignment, false, null,null, bold, null, textOptions);
             }
