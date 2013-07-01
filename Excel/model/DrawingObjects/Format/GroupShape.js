@@ -141,7 +141,7 @@ CGroupShape.prototypr =
                 this.arrGraphicObjects.push(this.spTree[i]);
             else
             {
-                var arr_graphic_objects = this.spTree.getArrGraphicObjects();
+                var arr_graphic_objects = this.spTree[i].getArrGraphicObjects();
                 for(var j = 0; j < arr_graphic_objects.length; ++j)
                     this.arrGraphicObjects.push(arr_graphic_objects[i]);
             }
