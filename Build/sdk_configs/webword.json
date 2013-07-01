@@ -63,6 +63,7 @@
                 "../Common/FontsFreeType/font_engine.js",
                 "../Common/FontsFreeType/FontFile.js",
                 "../Common/FontsFreeType/FontManager.js",
+				"../Common/PresentationSerializeAdapter.js",
                 "../Word/Drawing/Externals.js",
                 "../Word/Drawing/AllFonts.js",
                 "../Word/Drawing/GlobalLoaders.js",

@@ -736,14 +736,25 @@ var c_oSer_ChartType =
 	Legend: 0,
 	Title: 1,
 	PlotArea: 2,
-	Style: 3
+	Style: 3,
+	TitlePptx: 4,
+	TitleTxPrPptx: 5,
+	ShowBorder: 6
 };
 /** @enum */
 var c_oSer_ChartLegendType =
 {
 	LegendPos: 0,
 	Overlay: 1,
-	Layout: 2
+	Layout: 2,
+	LegendEntry: 3
+};
+/** @enum */
+var c_oSer_ChartLegendEntryType =
+{
+	Delete: 0,
+	Index: 1,
+	TxPrPptx: 2
 };
 /** @enum */
 var c_oSer_ChartLegendLayoutType =
@@ -773,7 +784,10 @@ var c_oSer_ChartCatAxType =
 	Title: 0,
 	MajorGridlines: 1,
 	Delete: 2,
-	AxPos: 3
+	AxPos: 3,
+	TitlePptx: 4,
+	TitleTxPrPptx: 5,
+	TxPrPptx: 6
 };
 /** @enum */
 var c_oSer_BasicChartType =
@@ -794,7 +808,9 @@ var c_oSer_ChartSeriesType =
 	Marker: 2,
 	OutlineColor: 3,
 	xVal: 4,
-	TxRef: 5
+	TxRef: 5,
+	Index: 6,
+	Order: 7
 };
 /** @enum */
 var c_oSer_ChartSeriesMarkerType =
@@ -805,7 +821,8 @@ var c_oSer_ChartSeriesMarkerType =
 /** @enum */
 var c_oSer_ChartSeriesDataLabelsType =
 {
-	ShowVal: 0
+	ShowVal: 0,
+	TxPrPptx: 1
 };
 /** @enum */
 var c_oSer_ChartSeriesNumCacheType =
@@ -1236,8 +1253,12 @@ function Binary_ChartReader(stream, chart)
 	this.bcr = new Binary_CommonReader(this.stream);
 	this.chart = chart;
 	this.chartType = null;
+	this.oLegendEntries = new Object();
+	this.oSeriesByIndex = new Object();
 	this.PreRead = function()
 	{
+		this.oLegendEntries = new Object();
+		this.oSeriesByIndex = new Object();
 		this.chart.legend.bShow = false;
 	}
 	this.Read = function(length)
@@ -1253,11 +1274,21 @@ function Binary_ChartReader(stream, chart)
 	};
 	this.PostRead = function()
 	{
-		if("" != this.chartType && null != this.chart.seriesOpen && this.chart.seriesOpen.length > 0)
+		if("" != this.chartType && null != this.chart.series && this.chart.series.length > 0)
 		{
 			//инициализируем interval в Woorksheet.init
-			//присваивается 1, чтобы isChart() вернула true
 			this.chart.type = this.chartType;
+			for(var i in this.oLegendEntries)
+			{
+				var index = i - 0;
+				var legendEntries = this.oLegendEntries[i];
+				if(null != legendEntries.oTxPr)
+				{
+					var seria = this.oSeriesByIndex[i];
+					if(null != seria && null != legendEntries.oTxPr.font)
+						seria.titleFont = legendEntries.oTxPr.font;
+				}
+			}
 		}
 	}
 	this.GraphicFrame = function(type, length)
@@ -1282,7 +1313,7 @@ function Binary_ChartReader(stream, chart)
         {
 			this.chart.legend.bShow = true;
 			res = this.bcr.Read1(length, function(t,l){
-					return oThis.ReadLegend(t,l);
+					return oThis.ReadLegend(t,l, this.oLegendEntries);
 				});
 		}
 		else if ( c_oSer_ChartType.Title === type )
@@ -1321,18 +1352,29 @@ function Binary_ChartReader(stream, chart)
 					}
 				}
 			}
+			//выставляем начальные значения как у Excel
 			this.chart.xAxis.bShow = this.chart.yAxis.bShow = false;
 			this.chart.xAxis.bGrid = this.chart.yAxis.bGrid = false;
 			var fExecAxis = function(oFrom, oTo)
 			{
-				for(var i in oFrom)
-					oTo[i] = oFrom[i];
+				if(null != oFrom.title)
+					oTo.title = oFrom.title;
+				if(null != oFrom.bDefaultTitle)
+					oTo.bDefaultTitle = oFrom.bDefaultTitle;
+				if(null != oFrom.bShow)
+					oTo.bShow = oFrom.bShow;
+				if(null != oFrom.bGrid)
+					oTo.bGrid = oFrom.bGrid;
+				if(null != oFrom.titlefont)
+					oTo.titleFont = oFrom.titlefont;
+				if(null != oFrom.lablefont)
+					oTo.labelFont = oFrom.lablefont;
 			}
 			if(null != xAxis)
 				fExecAxis(xAxis, this.chart.xAxis);
 			if(null != yAxis)
 				fExecAxis(yAxis, this.chart.yAxis);
-			//меняем местами 
+			//меняем местами из-за разного понимания флагов нами и Excel
 			var bTemp = this.chart.xAxis.bGrid;
 			this.chart.xAxis.bGrid = this.chart.yAxis.bGrid;
 			this.chart.yAxis.bGrid = bTemp;
@@ -1347,11 +1389,25 @@ function Binary_ChartReader(stream, chart)
 		{
 			this.chart.styleId = this.stream.GetULongLE();
 		}
+		else if ( c_oSer_ChartType.TitlePptx === type || c_oSer_ChartType.TitleTxPrPptx === type)
+		{
+			var oPresentationSimpleSerializer = new PresentationSimpleSerializer();
+			var textBody = oPresentationSimpleSerializer.ReadTextBody(this.stream);
+			var params = this.ParsePptxParagraph(textBody);
+			if(c_oSer_ChartType.TitlePptx === type)
+				this.chart.header.title = params.text;
+			else
+				this.chart.header.bDefaultTitle = true;
+			if(null != params.font)
+				this.chart.header.font = params.font;
+		}
+		else if ( c_oSer_ChartType.ShowBorder === type )
+			this.chart.bShowBorder = this.stream.GetBool();
 		else
             res = c_oSerConstants.ReadUnknown;
 		return res;
 	};
-	this.ReadLegend = function(type, length)
+	this.ReadLegend = function(type, length, oLegendEntries)
 	{
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
@@ -1367,15 +1423,42 @@ function Binary_ChartReader(stream, chart)
 			var byteLegendPos = this.stream.GetUChar();
 			switch(byteLegendPos)
 			{
-			case EChartLegendPos.chartlegendposLeft: this.chart.legend.position = "left";break;
-			case EChartLegendPos.chartlegendposTop: this.chart.legend.position = "top";break;
+			case EChartLegendPos.chartlegendposLeft: this.chart.legend.position = c_oAscChartLegend.left;break;
+			case EChartLegendPos.chartlegendposTop: this.chart.legend.position = c_oAscChartLegend.top;break;
 			case EChartLegendPos.chartlegendposRight:
-			case EChartLegendPos.chartlegendposRightTop: this.chart.legend.position = "right";break;
-			case EChartLegendPos.chartlegendposBottom: this.chart.legend.position = "bottom";break;
+			case EChartLegendPos.chartlegendposRightTop: this.chart.legend.position = c_oAscChartLegend.right;break;
+			case EChartLegendPos.chartlegendposBottom: this.chart.legend.position = c_oAscChartLegend.bottom;break;
 			}
 		}
 		else if ( c_oSer_ChartLegendType.Overlay === type )
 			this.chart.legend.bOverlay = this.stream.GetBool();
+		else if ( c_oSer_ChartLegendType.LegendEntry === type )
+		{
+			var oNewLegendEntry = {nIndex: null, bDelete: null, oTxPr: null};
+			res = this.bcr.Read1(length, function(t,l){
+					return oThis.ReadLegendEntry(t,l, oNewLegendEntry);
+				});
+			if(null != oNewLegendEntry.nIndex)
+				this.oLegendEntries[oNewLegendEntry.nIndex] = oNewLegendEntry;
+		}
+		else
+            res = c_oSerConstants.ReadUnknown;
+		return res;
+	};
+	this.ReadLegendEntry = function(type, length, oLegendEntry)
+	{
+        var res = c_oSerConstants.ReadOk;
+        var oThis = this;
+        if(c_oSer_ChartLegendEntryType.Index === type)
+			oLegendEntry.nIndex = this.stream.GetULongLE();
+		else if(c_oSer_ChartLegendEntryType.Delete === type)
+			oLegendEntry.bDelete = this.stream.GetBool();
+		else if(c_oSer_ChartLegendEntryType.TxPrPptx === type)
+		{
+			var oPresentationSimpleSerializer = new PresentationSimpleSerializer();
+			var textBody = oPresentationSimpleSerializer.ReadTextBody(this.stream);
+			oLegendEntry.oTxPr = this.ParsePptxParagraph(textBody);
+		}
 		else
             res = c_oSerConstants.ReadUnknown;
 		return res;
@@ -1412,14 +1495,14 @@ function Binary_ChartReader(stream, chart)
         var oThis = this;
         if ( c_oSer_ChartPlotAreaType.CatAx === type )
         {
-			oAxis.CatAx = new Object();
+			oAxis.CatAx = {title: null, bDefaultTitle: null, bGrid: null, bShow: null, axPos: null, titlefont: null, lablefont: null};
 			res = this.bcr.Read1(length, function(t,l){
 					return oThis.ReadAx(t,l, oAxis.CatAx);
 				});
 		}
 		else if ( c_oSer_ChartPlotAreaType.ValAx === type )
         {
-			var oNewValAx = new Object();
+			var oNewValAx = {title: null, bDefaultTitle: null, bGrid: null, bShow: null, axPos: null, titlefont: null, lablefont: null};
 			res = this.bcr.Read1(length, function(t,l){
 					return oThis.ReadAx(t,l, oNewValAx);
 				});
@@ -1427,16 +1510,16 @@ function Binary_ChartReader(stream, chart)
 		}
 		else if ( c_oSer_ChartPlotAreaType.BasicChart === type )
         {
-			var oData = new Object();
+			var oData = {BarDerection: null};
 			res = this.bcr.Read2Spreadsheet(length, function(t,l){
 					return oThis.ReadBasicChart(t,l, oData);
 				});
-			if(null != oData.BarDerection && "HBar" == this.chartType)
+			if(null != oData.BarDerection && c_oAscChartType.hbar == this.chartType)
 			{
 				switch(oData.BarDerection)
 				{
 					case EChartBarDerection.chartbardirectionBar:break;
-					case EChartBarDerection.chartbardirectionCol: this.chartType = "Bar";break;
+					case EChartBarDerection.chartbardirectionCol: this.chartType = c_oAscChartType.bar;break;
 				}
 			}
 		}
@@ -1444,7 +1527,7 @@ function Binary_ChartReader(stream, chart)
             res = c_oSerConstants.ReadUnknown;
 		return res;
 	}
-	this.ReadAx = function(type, length, oAx, oAx2)
+	this.ReadAx = function(type, length, oAx)
 	{
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
@@ -1460,6 +1543,30 @@ function Binary_ChartReader(stream, chart)
 			oAx.bShow = !this.stream.GetBool();
 		else if ( c_oSer_ChartCatAxType.AxPos === type )
 			oAx.axPos = this.stream.GetUChar();
+		else if ( c_oSer_ChartCatAxType.TitlePptx === type || c_oSer_ChartCatAxType.TitleTxPrPptx === type)
+		{
+			var oPresentationSimpleSerializer = new PresentationSimpleSerializer();
+			var textBody = oPresentationSimpleSerializer.ReadTextBody(this.stream);
+			var params = this.ParsePptxParagraph(textBody);
+			if(c_oSer_ChartCatAxType.TitlePptx === type)
+				oAx.title = params.text;
+			else
+				oAx.bDefaultTitle = true;
+			if(null != params.font)
+				oAx.titlefont = params.font;
+		}
+		else if ( c_oSer_ChartCatAxType.TxPrPptx === type )
+		{
+			var oPresentationSimpleSerializer = new PresentationSimpleSerializer();
+			var textBody = oPresentationSimpleSerializer.ReadTextBody(this.stream);
+			var params = this.ParsePptxParagraph(textBody);
+			if("" != params.text)
+				oAx.title = params.text;
+			else
+				oAx.bDefaultTitle  = true;
+			if(null != params.font)
+				oAx.lablefont = params.font;
+		}
 		else
             res = c_oSerConstants.ReadUnknown;
 		return res;
@@ -1474,16 +1581,16 @@ function Binary_ChartReader(stream, chart)
 			switch(byteType)
 			{
 				case EChartBasicTypes.chartbasicBarChart:
-				case EChartBasicTypes.chartbasicBar3DChart: this.chartType = "HBar";break;
+				case EChartBasicTypes.chartbasicBar3DChart: this.chartType = c_oAscChartType.hbar;break;
 				case EChartBasicTypes.chartbasicAreaChart:
-				case EChartBasicTypes.chartbasicRadarChart: this.chartType = "Area";break;
+				case EChartBasicTypes.chartbasicRadarChart: this.chartType = c_oAscChartType.area;break;
 				case EChartBasicTypes.chartbasicLineChart:
-				case EChartBasicTypes.chartbasicLine3DChart: this.chartType = "Line";break;
+				case EChartBasicTypes.chartbasicLine3DChart: this.chartType = c_oAscChartType.line;break;
 				case EChartBasicTypes.chartbasicPieChart:
-				case EChartBasicTypes.chartbasicDoughnutChart: this.chartType = "Pie";break;
+				case EChartBasicTypes.chartbasicDoughnutChart: this.chartType = c_oAscChartType.pie;break;
 				case EChartBasicTypes.chartbasicBubbleChart:
-				case EChartBasicTypes.chartbasicScatterChart: this.chartType = "Scatter";break;
-				case EChartBasicTypes.chartbasicStockChart: this.chartType = "Stock";break;
+				case EChartBasicTypes.chartbasicScatterChart: this.chartType = c_oAscChartType.scatter;break;
+				case EChartBasicTypes.chartbasicStockChart: this.chartType = c_oAscChartType.stock;break;
 			}
 		}
 		else if ( c_oSer_BasicChartType.BarDerection === type )
@@ -1491,13 +1598,16 @@ function Binary_ChartReader(stream, chart)
 		else if ( c_oSer_BasicChartType.Grouping === type )
 		{
 			var byteGrouping = this.stream.GetUChar();
+			var subtype = null;
 			switch(byteGrouping)
 			{
 				case EChartBarGrouping.chartbargroupingClustered:
-				case EChartBarGrouping.chartbargroupingStandard: this.chart.subType = "normal";break;
-				case EChartBarGrouping.chartbargroupingPercentStacked: this.chart.subType = "stackedPer";break;
-				case EChartBarGrouping.chartbargroupingStacked: this.chart.subType = "stacked";break;
+				case EChartBarGrouping.chartbargroupingStandard: subtype = c_oAscChartSubType.normal;break;
+				case EChartBarGrouping.chartbargroupingPercentStacked: subtype = c_oAscChartSubType.stackedPer;break;
+				case EChartBarGrouping.chartbargroupingStacked: subtype = c_oAscChartSubType.stacked;break;
 			}
+			if(null != subtype)
+				this.chart.subType = subtype;
 		}
 		else if ( c_oSer_BasicChartType.Overlap === type )
 		{
@@ -1505,7 +1615,6 @@ function Binary_ChartReader(stream, chart)
 		}
 		else if ( c_oSer_BasicChartType.Series === type )
 		{
-			this.chart.seriesOpen = new Array();
 			res = this.bcr.Read1(length, function(t,l){
 					return oThis.ReadSeries(t,l);
 				});
@@ -1526,11 +1635,11 @@ function Binary_ChartReader(stream, chart)
         var oThis = this;
         if ( c_oSer_BasicChartType.Seria === type )
 		{
-			var seria = new Object();
+			var seria = new asc_CChartSeria();
 			res = this.bcr.Read1(length, function(t,l){
 					return oThis.ReadSeria(t,l, seria);
 				});
-			this.chart.seriesOpen.push(seria);
+			this.chart.series.push(seria);
 		}
 		else
             res = c_oSerConstants.ReadUnknown;
@@ -1542,30 +1651,27 @@ function Binary_ChartReader(stream, chart)
         var oThis = this;
         if ( c_oSer_ChartSeriesType.xVal === type )
 		{
-			seria.xVal = new Object();
 			res = this.bcr.Read1(length, function(t,l){
 					return oThis.ReadSeriesNumCache(t,l, seria.xVal);
 				});
 		}
 		else if ( c_oSer_ChartSeriesType.Val === type )
 		{
-			seria.Val = new Object();
 			res = this.bcr.Read1(length, function(t,l){
 					return oThis.ReadSeriesNumCache(t,l, seria.Val);
 				});
 		}
 		else if ( c_oSer_ChartSeriesType.Tx === type )
-			seria.Tx = this.stream.GetString2LE(length);
-		else if ( c_oSer_ChartSeriesType.TxRef === type )
-		{
-			seria.TxRef = new Object();
-			res = this.bcr.Read1(length, function(t,l){
-					return oThis.ReadSeriesNumCache(t,l, seria.TxRef);
-				});
-		}
+			seria.title = this.stream.GetString2LE(length);
+		// else if ( c_oSer_ChartSeriesType.TxRef === type )
+		// {
+			// seria.TxRef = new Object();
+			// res = this.bcr.Read1(length, function(t,l){
+					// return oThis.ReadSeriesNumCache(t,l, seria.TxRef);
+				// });
+		// }
 		else if ( c_oSer_ChartSeriesType.Marker === type )
 		{
-			seria.Marker = new Object();
 			res = this.bcr.Read2Spreadsheet(length, function(t,l){
 					return oThis.ReadSeriesMarkers(t,l, seria.Marker);
 				});
@@ -1576,8 +1682,18 @@ function Binary_ChartReader(stream, chart)
             res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.bcr.ReadColorSpreadsheet(t,l, color);
                 });
-            if(null != color.rgb)
-                seria.OutlineColor = color.rgb;
+			if(null != color.theme)
+				seria.OutlineColor = g_oColorManager.getThemeColor(color.theme, color.tint);
+			else if(null != color.rgb)
+                seria.OutlineColor = new RgbColor(0x00ffffff & color.rgb);
+		}
+		else if ( c_oSer_ChartSeriesType.Index === type )
+		{
+            this.oSeriesByIndex[this.stream.GetULongLE()] = seria;
+		}
+		else if ( c_oSer_ChartSeriesType.Order === type )
+		{
+            this.stream.GetULongLE();
 		}
 		else
             res = c_oSerConstants.ReadUnknown;
@@ -1591,9 +1707,8 @@ function Binary_ChartReader(stream, chart)
 			Val.Formula = this.stream.GetString2LE(length);
 		else if ( c_oSer_ChartSeriesNumCacheType.NumCache === type )
 		{
-			Val.values = new Array();
 			res = this.bcr.Read1(length, function(t,l){
-					return oThis.ReadSeriesNumCacheValues(t,l, Val.values);
+					return oThis.ReadSeriesNumCacheValues(t,l, Val.NumCache);
 				});
 		}
 		else
@@ -1628,10 +1743,88 @@ function Binary_ChartReader(stream, chart)
         var oThis = this;
         if ( c_oSer_ChartSeriesDataLabelsType.ShowVal === type )
 			this.chart.bShowValue = this.stream.GetBool();
+		else if ( c_oSer_ChartSeriesDataLabelsType.TxPrPptx === type )
+		{
+			var oPresentationSimpleSerializer = new PresentationSimpleSerializer();
+			var textBody = oPresentationSimpleSerializer.ReadTextBody(this.stream);
+			//this.ParsePptxParagraph(textBody);
+		}
 		else
             res = c_oSerConstants.ReadUnknown;
 		return res;
 	};
+	this.ParsePptxParagraph = function(textbody)
+	{
+		var res = {text: "", font: null};
+		for(var i = 0, length = textbody.content.length; i < length; ++i)
+		{
+			var par = textbody.content[i];
+			if(0 != i)
+				res.text += "\r\n";
+			else
+			{
+				if(null != par.rPr)
+				{
+					res.font = new asc_CChartFont();
+					if(null != par.rPr.Bold)
+						res.font.bold = par.rPr.Bold ? 1 : 0;
+					if(null != par.rPr.Italic)
+						res.font.italic = par.rPr.Italic ? 1 : 0;
+					if(null != par.rPr.Underline)
+						res.font.underline = par.rPr.Underline ? 1 : 0;
+					if(null != par.rPr.FontSize)
+						res.font.size = par.rPr.FontSize;
+					if(null != par.rPr.FontFamily && null != par.rPr.FontFamily.Name && "" != par.rPr.FontFamily.Name)
+						res.font.name = par.rPr.FontFamily.Name;
+					// if(null != par.rPr.unifill)
+					// {
+						// var fill = par.rPr.unifill.fill;
+						// if(null != fill && FILL_TYPE_SOLID == fill.type)
+						// {
+							// var color = fill.color;
+							// if(null != color.color)
+							// {
+								// color = color.color;
+								// if(null != color)
+								// {
+									// var rgba = {R:0, G:0, B:0, A:255};
+									// if(COLOR_TYPE_SRGB == color.type)
+									// {
+										// rgba.R = color.RGBA.R;
+										// rgba.G = color.RGBA.G;
+										// rgba.B = color.RGBA.B;
+									// }
+									// else if(COLOR_TYPE_SCHEME == color.type)
+									// {
+										// var _theme = null;
+										// var _clrMap = null;
+										// if(null != Asc && null != Asc.editor && null != Asc.editor.wbModel)
+										// {
+											// _theme = Asc.editor.wbModel.theme;
+											// _clrMap = Asc.editor.wbModel.clrSchemeMap;
+										// }
+										// else if(null != editor && null != editor.WordControl && null != editor.WordControl.m_oLogicDocument)
+										// {
+											// _theme = editor.WordControl.m_oLogicDocument.theme;
+											// _clrMap = editor.WordControl.m_oLogicDocument.clrSchemeMap;
+										// }
+										// if(null != _theme && null != _clrMap)
+											// color.Calculate(_theme, _clrMap, rgba);
+									// }
+									// var num = rgba.R << 16 | rgba.G << 8 | rgba.B;
+									// var c = num.toString(16);
+									// while (c.length < 6) {c = "0" + c;}
+									// res.font.color = num;	
+								// }
+							// }
+						// }
+					// }
+				}
+			}
+			res.text += par.text;
+		}
+		return res;
+	}
 }
 
 function isRealObject(obj)

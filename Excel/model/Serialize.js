@@ -4827,8 +4827,6 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
         }
         else if ( c_oSerWorksheetsTypes.Drawings == type )
         {
-            if(null == oWorksheet.Drawings)
-                oWorksheet.Drawings = new Array();
             res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadDrawings(t,l, oWorksheet.Drawings, oWorksheet.Id);
                 });

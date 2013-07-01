@@ -1361,6 +1361,7 @@ function Workbook(sUrlPath, eventsHandlers, oApi){
 	this.nActive = 0;
 
 	this.theme = GenerateDefaultTheme(this);
+	this.clrSchemeMap = GenerateDefaultColorMap();
 	
 	this.DefinedNames = new Object();
 	this.oRealDefinedNames = new Object();
@@ -2095,6 +2096,7 @@ function Woorksheet(wb, _index, bAddUserId, sId){
 	this.nColsCount = 0;
 	this.aGCells = new Object();// 0 based
 	this.aCols = new Array();// 0 based
+	this.Drawings = new Array();
 	this.oAllCol = null;
 	this.objForRebuldFormula = {};
 	this.aComments = new Array();
@@ -2148,6 +2150,16 @@ Woorksheet.prototype.generateFontMap=function(oFontMap){
 					}
 				}
 			}
+		}
+	}
+	//пробегаемся по chart
+	for(var i = 0, length = this.Drawings.length; i < length; ++i)
+	{
+		var drawing = this.Drawings[i];
+		if(drawing.isChart())
+		{
+			var chart = drawing.chart;
+			chart.generateFontMap(oFontMap);
 		}
 	}
 }
@@ -2309,9 +2321,9 @@ Woorksheet.prototype.initPostOpen = function(){
 				//анализируем series
 				var oBounds = null;
 				var ws = null;
-				for(var j = 0; j < chart.seriesOpen.length; ++j)
+				for(var j = 0; j < chart.series.length; ++j)
 				{
-					var seria = chart.seriesOpen[j];
+					var seria = chart.series[j];
 					if(0 == j && null != seria && null != seria.xVal && null != seria.xVal.Formula)
 					{
 						var sRef = seria.xVal.Formula.replace(/\$/g,"");

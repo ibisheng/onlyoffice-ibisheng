@@ -217,6 +217,7 @@ function CChartData(bWordContext, chart) {
 	
 	_this.data = [];
 	_this.themeColors = [];
+	_this.series = [];
 	
 	if ( chart ) {
 		for (var row = 0; row < chart.data.length; row++) {
@@ -993,6 +994,42 @@ asc_CChart.prototype = {
 	asc_getChartEditorFlag: function() { return this.bChartEditor; },
 	asc_setChartEditorFlag: function(value) { this.bChartEditor = value; },
 	
+	generateFontMap: function(oFontMap)
+	{
+		var font;
+		font = this.header.asc_getFont();
+		if(null != font)
+			oFontMap[font.asc_getName()] = 1;
+		font = this.xAxis.asc_getTitleFont();
+		if(null != font)
+			oFontMap[font.asc_getName()] = 1;
+		font = this.xAxis.asc_getLabelFont();
+		if(null != font)
+			oFontMap[font.asc_getName()] = 1;
+		font = this.yAxis.asc_getTitleFont();
+		if(null != font)
+			oFontMap[font.asc_getName()] = 1;
+		font = this.yAxis.asc_getLabelFont();
+		if(null != font)
+			oFontMap[font.asc_getName()] = 1;
+		font = this.legend.asc_getFont();
+		if(null != font)
+			oFontMap[font.asc_getName()] = 1;
+		for(var i = 0, length = this.series.length; i < length; ++i)
+		{
+			var seria = this.series[i];
+			if(null != seria)
+			{
+				font = seria.asc_getTitleFont();
+				if(null != font)
+					oFontMap[font.asc_getName()] = 1;
+				font = seria.asc_getLabelFont();
+				if(null != font)
+					oFontMap[font.asc_getName()] = 1;
+			}
+		}
+	},
+	
 	rebuildSeries: function() {
 		var _t = this;
 		var bbox = _t.range.intervalObject.getBBox0();
@@ -1674,6 +1711,7 @@ function asc_CChartSeria() {
 	this.Val = { Formula: null, NumCache: [] };
 	this.xVal = { Formula: null, NumCache: [] };
 	this.Tx = null;
+	this.TxFont = new asc_CChartFont();
 	this.Marker = { Size: null, Symbol: null };
 	this.OutlineColor = null;
 	this.FormatCode = "";
@@ -1689,7 +1727,8 @@ function asc_CChartSeria() {
 		MarkerSymbol: 6,
 		OutlineColor: 7,
 		FormatCode: 8,
-		LabelFont: 9
+		LabelFont: 9,
+		TxFont: 10
 	};
 }
 
@@ -1703,6 +1742,9 @@ asc_CChartSeria.prototype = {
 
 	asc_getTitle: function() { return this.Tx; },
 	asc_setTitle: function(title) { this.Tx = title; },
+	
+	asc_getTitleFont: function() { return this.TxFont; },
+	asc_setTitleFont: function(title) { this.TxFont = title; },
 
 	asc_getMarkerSize: function() { return this.Marker.Size; },
 	asc_setMarkerSize: function(size) { this.Marker.Size = size; },
@@ -1716,6 +1758,9 @@ asc_CChartSeria.prototype = {
 	asc_getFormatCode: function() { return this.FormatCode; },
 	asc_setFormatCode: function(format) { this.FormatCode = format; },
 
+	asc_getLabelFont: function() { return this.LabelFont; },
+	asc_setLabelFont: function(format) { this.LabelFont = format; },
+	
 	//	For collaborative editing
 	getType: function() {
 		return UndoRedoDataTypes.ChartSeriesData;
@@ -1732,6 +1777,7 @@ asc_CChartSeria.prototype = {
 			case this.Properties.XValFormula: return this.xVal.Formula; break;
 			case this.Properties.XValNumCache: return this.xVal.NumCache; break;
 			case this.Properties.Tx: return this.Tx; break;
+			case this.Properties.TxFont: return this.TxFont; break;
 			case this.Properties.MarkerSize: return this.Marker.Size; break;
 			case this.Properties.MarkerSymbol: return this.Marker.Symbol; break;
 			case this.Properties.OutlineColor: return this.OutlineColor; break;
@@ -1747,6 +1793,7 @@ asc_CChartSeria.prototype = {
 			case this.Properties.XValFormula: this.xVal.Formula = value; break;
 			case this.Properties.XValNumCache: this.xVal.NumCache = value; break;
 			case this.Properties.Tx: this.Tx = value; break;
+			case this.Properties.TxFont: this.TxFont = value; break;
 			case this.Properties.MarkerSize: this.Marker.Size = value; break;
 			case this.Properties.MarkerSymbol: this.Marker.Symbol = value; break;
 			case this.Properties.OutlineColor: this.OutlineColor = value; break;

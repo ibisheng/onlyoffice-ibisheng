@@ -5183,9 +5183,9 @@ function Binary_DocumentTableReader(doc, openParams, ImageMap, stream, bAllowFlo
 				});
 			oBinary_ChartReader.PostRead();
 			//анализируем серии заполняем data
-			for(var i = 0, length = chart.seriesOpen.length; i < length; ++i)
+			for(var i = 0, length = chart.series.length; i < length; ++i)
 			{
-				var seria = chart.seriesOpen[i];
+				var seria = chart.series[i];
 				if(null != seria)
 				{
 					if(0 == i)
