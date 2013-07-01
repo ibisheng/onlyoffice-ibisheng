@@ -201,7 +201,8 @@
 					// shapes
 					"shapeMouseDown":			function () {self._onShapeMouseDown.apply(self, arguments);},
 					"shapeMouseMove":			function () {self._onShapeMouseMove.apply(self, arguments);},
-					"shapeMouseUp":				function () {self._onShapeMouseUp.apply(self, arguments);}
+					"shapeMouseUp":				function () {self._onShapeMouseUp.apply(self, arguments);},
+					"getGraphicsInfo":			function () {return self._onGetGraphicsInfo.apply(self, arguments);}
 				});
 
 				this.model.handlers.add("cleanCellCache", function (wsId, range, canChangeColWidth) {
@@ -666,6 +667,11 @@
 			_onShapeMouseUp: function (e, x, y) {
 				var ws = this.getWorksheet();
 				ws.objectRender.shapeMouseUp(e, x, y);
+			},
+			
+			_onGetGraphicsInfo: function (x, y) {
+				var ws = this.getWorksheet();
+				return ws.objectRender.checkCursorDrawingObject(x, y);
 			},
 			
 			_onMouseDblClick: function (x, y, isHideCursor, isCoord, callback) {

@@ -186,6 +186,7 @@ function RotateState(drawingObjectsController, drawingObjects, majorObject)
     {
         this.drawingObjectsController.trackEnd();
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
+		asc.editor.asc_endAddShape();
     }
 }
 
@@ -368,6 +369,7 @@ function MoveState(drawingObjectsController, drawingObjects, startX, startY)
         this.drawingObjectsController.trackEnd();
         this.drawingObjectsController.clearTrackObjects();
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
+		asc.editor.asc_endAddShape();
     }
 }
 

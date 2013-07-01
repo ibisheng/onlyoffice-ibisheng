@@ -1059,7 +1059,11 @@
 				this.handlers.trigger("setShiftKey", event.shiftKey);
 				
 				// shapes
-				if ( asc.editor.isStartAddShape ) {
+				var graphicsInfo = t.handlers.trigger("getGraphicsInfo", coord.x, coord.y);
+				if ( graphicsInfo && graphicsInfo.isShape )
+					asc.editor.isStartAddShape = true;
+				
+				if ( asc.editor.isStartAddShape || graphicsInfo ) {
 					t.handlers.trigger("shapeMouseDown", event, coord.x, coord.y);
 					return;
 				}
