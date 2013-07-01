@@ -1447,6 +1447,18 @@ function CFontManager()
 
         return true;
     }
+
+    this.SetTextMatrix2 = function(fA, fB, fC, fD, fE, fF)
+    {
+        if (!this.m_pFont)
+            return false;
+
+        this.m_pFont.SetTextMatrix (fA, fB, fC, fD, 0, 0);
+        this.m_oGlyphString.SetCTM(fA, fB, fC, fD, 0, 0);
+        this.m_oGlyphString.SetTrans(fE, fF);
+
+        return true;
+    }
 	
 	this.SetStringGID = function(bStringGID)
 	{

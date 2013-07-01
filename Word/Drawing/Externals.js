@@ -746,9 +746,9 @@ function CFontInfo(sName, thumbnail, type, indexR, faceIndexR, indexI, faceIndex
         pFontFile.SetCharSpacing(fontManager.m_fCharSpacing);
 
         fontManager.m_oGlyphString.ResetCTM();
-		if (undefined !== transform)
+        if (undefined !== transform)
         {
-            fontManager.SetTextMatrix(transform.sx,transform.shy,transform.shx,transform.sy,transform.tx,transform.ty);
+            fontManager.SetTextMatrix2(transform.sx,transform.shy,transform.shx,transform.sy,transform.tx,transform.ty);
         }
         else
         {

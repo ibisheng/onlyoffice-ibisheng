@@ -1091,7 +1091,7 @@ CGraphics.prototype =
         this.m_oLastFont.SetUpSize = font.FontSize;
         this.m_oLastFont.SetUpStyle = oFontStyle;
 
-        g_font_infos[font.FontFamily.Index].LoadFont(g_font_loader, this.m_oFontManager, font.FontSize, oFontStyle, this.m_dDpiX, this.m_dDpiY, undefined/*this.m_oTransform*/);
+        g_font_infos[font.FontFamily.Index].LoadFont(g_font_loader, this.m_oFontManager, font.FontSize, oFontStyle, this.m_dDpiX, this.m_dDpiY, this.m_oTransform);
 
         var _mD = this.m_oLastFont.SetUpMatrix;
         var _mS = this.m_oTransform;
@@ -1103,8 +1103,8 @@ CGraphics.prototype =
         _mD.tx = _mS.tx;
         _mD.ty = _mS.ty;
 
-        this.m_oFontManager.SetTextMatrix(this.m_oTransform.sx,this.m_oTransform.shy,this.m_oTransform.shx,
-            this.m_oTransform.sy,this.m_oTransform.tx,this.m_oTransform.ty);
+        //this.m_oFontManager.SetTextMatrix(this.m_oTransform.sx,this.m_oTransform.shy,this.m_oTransform.shx,
+        //    this.m_oTransform.sy,this.m_oTransform.tx,this.m_oTransform.ty);
     },
 
     SetTextPr : function(textPr)
