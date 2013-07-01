@@ -1429,7 +1429,9 @@
         var context    = this.context;
         var text_angle = this._otherProps._text_angle;
         var labels     = this._otherProps._labels;
-
+		var scaleFactor = 1;
+		if(OfficeExcel.drawingCtxCharts && OfficeExcel.drawingCtxCharts.scaleFactor)
+			scaleFactor = OfficeExcel.drawingCtxCharts.scaleFactor;
 
         // Draw the Y axis labels:
         if (this._otherProps._ylabels) {
@@ -1491,7 +1493,7 @@
                         OfficeExcel.Text(context, font,
                                       text_size,
                                       x + (this._otherProps._text_angle == 90 ? 0 : 0),
-                                      this.nullPositionOX + yOffset,
+                                      this.nullPositionOX + yOffset*scaleFactor,
                                       String(labels[i++]),
                                       (this._otherProps._text_angle == 90 ? 'center' : null),
                                       halign,

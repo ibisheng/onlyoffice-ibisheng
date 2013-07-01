@@ -739,6 +739,9 @@
         this.context.strokeStyle = 'black';
         this.context.fillStyle   = this._otherProps._text_color;
         this.context.lineWidth   = 1;
+		var scaleFactor = 1;
+		if(OfficeExcel.drawingCtxCharts && OfficeExcel.drawingCtxCharts.scaleFactor)
+			scaleFactor = OfficeExcel.drawingCtxCharts.scaleFactor;
 
         // Turn off any shadow
         OfficeExcel.NoShadow(this);
@@ -1185,7 +1188,7 @@
                                 text_size,
                                 labelX,
                                 //(this._otherProps._xaxispos == 'top') ? this._chartGutter._top - yOffset - (this._otherProps._xlabels_inside ? -22 : 0) : (this.canvas.height - this._chartGutter._bottom) + yOffset,
-                                this.nullPositionOX + yOffset,
+                                this.nullPositionOX + yOffset*scaleFactor,
                                 String(this._otherProps._labels[i]),
                                 valign,
                                 halign,

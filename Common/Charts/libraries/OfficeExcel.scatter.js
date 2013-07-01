@@ -1004,6 +1004,10 @@
 			underline: this._otherProps._xlabels_underline,
 			italic: this._otherProps._xlabels_italic
 		}	
+		var scaleFactor = 1;
+		if(OfficeExcel.drawingCtxCharts && OfficeExcel.drawingCtxCharts.scaleFactor)
+			scaleFactor = OfficeExcel.drawingCtxCharts.scaleFactor;
+		var offsetY = 15*scaleFactor;
 		font = this._otherProps._xlabels_font;
 		text_size = this._otherProps._xlabels_size;
         if('auto' == this._otherProps._ylabels_count && this._otherProps._xlabels)
@@ -1043,9 +1047,9 @@
                         var text = scale[i];
                     }
 					if(text == 0)
-						OfficeExcel.Text(context, font, text_size, x, this.nullPositionOY + 15,OfficeExcel.numToFormatText(text.toString(),isFormatCell), 'center', 'center', false, null, null, bold, null, textOptions);
+						OfficeExcel.Text(context, font, text_size, x, this.nullPositionOY + offsetY,OfficeExcel.numToFormatText(text.toString(),isFormatCell), 'center', 'center', false, null, null, bold, null, textOptions);
 					else
-						OfficeExcel.Text(context, font, text_size, x, this.nullPositionOY + 15, "-" + OfficeExcel.numToFormatText(text.toString(),isFormatCell), 'center', 'center', false, null, null, bold, null, textOptions);
+						OfficeExcel.Text(context, font, text_size, x, this.nullPositionOY + offsetY, "-" + OfficeExcel.numToFormatText(text.toString(),isFormatCell), 'center', 'center', false, null, null, bold, null, textOptions);
                 }
                 
                 
@@ -1091,7 +1095,7 @@
                         var text = xScale[i];
                     }
 
-                    OfficeExcel.Text(context, font, text_size, x, this.nullPositionOY + 15, OfficeExcel.numToFormatText(text.toString(),isFormatCell), 'center', 'center', false, null, null, bold, null, textOptions);
+                    OfficeExcel.Text(context, font, text_size, x, this.nullPositionOY + offsetY, OfficeExcel.numToFormatText(text.toString(),isFormatCell), 'center', 'center', false, null, null, bold, null, textOptions);
                 }
             }
            

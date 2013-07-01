@@ -525,7 +525,9 @@
         var units_post = this._otherProps._units_post;
         var text_size  = this._otherProps._xlabels_size;
         var font       = this._otherProps._xlabels_font;
-
+		var scaleFactor = 1;
+		if(OfficeExcel.drawingCtxCharts && OfficeExcel.drawingCtxCharts.scaleFactor)
+			scaleFactor = OfficeExcel.drawingCtxCharts.scaleFactor;
 
         /**
         * Set the units to blank if they're to be used for ingraph labels only
@@ -541,7 +543,7 @@
         */
         if (this._otherProps._xlabels) {
 
-            var gap = 13;
+            var gap = 13*scaleFactor;
 
             this.context.beginPath();
             this.context.fillStyle = this._otherProps._text_color;
@@ -600,9 +602,9 @@
                             
 							//OfficeExcel.Text(context, font, text_size, this._chartGutter._left + (this.graphwidth * (i/xRevScale.length)), this._chartGutter._top + this.halfTextHeight + this.graphheight + gap, - OfficeExcel.number_format(this, elemArr, units_pre, units_post), 'center', 'center'); 
 						if(elemArr == 0)
-							OfficeExcel.Text(context, font, text_size, this._chartGutter._left + (this.graphwidth * (i/xRevScale.length)), this._chartGutter._top + this.halfTextHeight + this.graphheight + gap, OfficeExcel.numToFormatText(elemArr.toString(),isFormatCell) + units_post, 'center', 'center', false, null, null, bold, null,textOptions); 
+							OfficeExcel.Text(context, font, text_size, this._chartGutter._left + (this.graphwidth * (i/xRevScale.length)), this._chartGutter._top + this.halfTextHeight*scaleFactor + this.graphheight + gap, OfficeExcel.numToFormatText(elemArr.toString(),isFormatCell) + units_post, 'center', 'center', false, null, null, bold, null,textOptions); 
 						else
-							OfficeExcel.Text(context, font, text_size, this._chartGutter._left + (this.graphwidth * (i/xRevScale.length)), this._chartGutter._top + this.halfTextHeight + this.graphheight + gap,OfficeExcel.numToFormatText("-" +  elemArr.toString(),isFormatCell) + units_post, 'center', 'center', false, null, null, bold, null,textOptions); 
+							OfficeExcel.Text(context, font, text_size, this._chartGutter._left + (this.graphwidth * (i/xRevScale.length)), this._chartGutter._top + this.halfTextHeight*scaleFactor + this.graphheight + gap,OfficeExcel.numToFormatText("-" +  elemArr.toString(),isFormatCell) + units_post, 'center', 'center', false, null, null, bold, null,textOptions); 
                     }
                   this._otherProps._background_grid_autofit_numvlines = xRevScale.length;
                   this._otherProps._numxticks = xRevScale.length;
@@ -617,7 +619,7 @@
 							elemArr = Math.round(OfficeExcel.array_exp(this.scale[0] - (this.scale[1] - this.scale[0]))*floatKoff)/floatKoff ;
 						}
 							 //OfficeExcel.Text(context, font, text_size, this._chartGutter._left + (this.graphwidth * (i/this.scale.length)), this._chartGutter._top + this.halfTextHeight + this.graphheight + gap, OfficeExcel.number_format(this, elemArr, units_pre, units_post), 'center', 'center'); 
-                        OfficeExcel.Text(context, font, text_size, this._chartGutter._left + (this.graphwidth * (i/this.scale.length)), this._chartGutter._top + this.halfTextHeight + this.graphheight + gap, (OfficeExcel.numToFormatText(elemArr.toString(),isFormatCell) + units_post), 'center', 'center', false, null, null, bold, null,textOptions); 
+                        OfficeExcel.Text(context, font, text_size, this._chartGutter._left + (this.graphwidth * (i/this.scale.length)), this._chartGutter._top + this.halfTextHeight*scaleFactor + this.graphheight + gap, (OfficeExcel.numToFormatText(elemArr.toString(),isFormatCell) + units_post), 'center', 'center', false, null, null, bold, null,textOptions); 
                     }
                   this._otherProps._background_grid_autofit_numvlines = this.scale.length;
                   this._otherProps._numxticks = this.scale.length;
