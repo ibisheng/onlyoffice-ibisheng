@@ -179,6 +179,7 @@ function RotateState(drawingObjectsController, drawingObjects, majorObject)
     {
         var angle = this.majorObject.getRotateAngle(x, y);
         this.drawingObjectsController.rotateTrackObjects(angle, e);
+        this.drawingObjects.showOverlayGraphicObjects();
     };
 
     this.onMouseUp = function(e, x, y)
@@ -218,20 +219,24 @@ function ResizeState(drawingObjectsController, drawingObjects, majorObject, card
     this.drawingObjectsController = drawingObjectsController;
     this.drawingObjects = drawingObjects;
     this.majorObject = majorObject;
-    this.cardDirection = cardDirection;
+    this.handleNum = this.majorObject.getNumByCardDirection(cardDirection);
 
     this.onMouseDown = function(e, x, y)
     {};
 
     this.onMouseMove = function(e, x, y)
     {
-        //TODO
+        var resize_coefficients = this.majorObject.getResizeCoefficients(this.handleNum, x, y);
+        this.drawingObjectsController.trackResizeObjects(resize_coefficients.kd1, resize_coefficients.kd2, e);
+        this.drawingObjects.showOverlayGraphicObjects();
+
     };
 
     this.onMouseUp = function(e, x, y)
     {
         this.drawingObjectsController.trackEnd();
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
+        asc.editor.asc_endAddShape();
     }
 }
 

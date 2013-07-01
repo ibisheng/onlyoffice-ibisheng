@@ -140,8 +140,8 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
 
     //this.lineFlag = originalObject.checkLine();
 
-    this.originalExtX = originalObject.absExtX;
-    this.originalExtY = originalObject.absExtY;
+    this.originalExtX = originalObject.extX;
+    this.originalExtY = originalObject.extY;
     this.originalFlipH = _flip_h;
     this.originalFlipV = _flip_v;
 

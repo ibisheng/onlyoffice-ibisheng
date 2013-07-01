@@ -132,6 +132,36 @@ CGroupShape.prototypr =
         return this.arrGraphicObjects;
     },
 
+    getResizeCoefficients: function(numHandle, x, y)
+    {
+        var t_x, t_y;
+        var cx, cy;
+        cx= this.extX > 0 ? this.extX : 0.01;
+        cy= this.extY > 0 ? this.extY : 0.01;
+        var p = this.transformPointRelativeShape(x, y);
+
+        switch(numHandle)
+        {
+            case 0:
+                return {kd1: (cx-p.x)/cx, kd2: (cy-p.y)/cy};
+            case 1:
+                return {kd1: (cy-p.y)/cy, kd2: 0};
+            case 2:
+                return {kd1: (cy-p.y)/cy, kd2: p.x/cx};
+            case 3:
+                return {kd1: p.x/cx, kd2: 0};
+            case 4:
+                return {kd1: p.x/cx, kd2: p.y/cy};
+            case 5:
+                return {kd1: p.y/cy, kd2: 0};
+            case 6:
+                return {kd1: p.y/cy, kd2:(cx-p.x)/cx};
+            case 7:
+                return {kd1:(cx-p.x)/cx, kd2: 0};
+        }
+        return {kd1: 1, kd2: 1};
+    },
+
     recalculateArrGraphicObjects: function()
     {
         this.arrGraphicObjects.length = 0;

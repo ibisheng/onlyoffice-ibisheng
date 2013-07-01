@@ -431,6 +431,64 @@ CShape.prototype =
         return (north_number - cardDirection + 8)%8;
     },
 
+    getResizeCoefficients: function(numHandle, x, y)
+    {
+        var cx, cy;
+        cx= this.extX > 0 ? this.extX : 0.01;
+        cy= this.extY > 0 ? this.extY : 0.01;
+        var p = this.transformPointRelativeShape(x, y);
+
+        switch(numHandle)
+        {
+            case 0:
+                return {kd1: (cx-p.x)/cx, kd2: (cy-p.y)/cy};
+            case 1:
+                return {kd1: (cy-p.y)/cy, kd2: 0};
+            case 2:
+                return {kd1: (cy-p.y)/cy, kd2: p.x/cx};
+            case 3:
+                return {kd1: p.x/cx, kd2: 0};
+            case 4:
+                return {kd1: p.x/cx, kd2: p.y/cy};
+            case 5:
+                return {kd1: p.y/cy, kd2: 0};
+            case 6:
+                return {kd1: p.y/cy, kd2:(cx-p.x)/cx};
+            case 7:
+                return {kd1:(cx-p.x)/cx, kd2: 0};
+        }
+        return {kd1: 1, kd2: 1};
+    },
+
+
+    getRotateAngle: function(x, y)
+    {
+
+
+
+
+        var transform = this.getTransform();
+        var rotate_distance = 5;/*TODO*/
+        var hc = this.extX*0.5;
+        var vc = this.extY*0.5;
+        var xc_t = transform.TransformPointX(hc, vc);
+        var yc_t = transform.TransformPointY(hc, vc);
+        var rot_x_t = transform.TransformPointX(hc, - rotate_distance);
+        var rot_y_t = transform.TransformPointY(hc, - rotate_distance);
+
+        var invert_transform = this.getInvertTransform();
+        var rel_x = invert_transform.TransformPointX(x, y);
+
+        var v1_x, v1_y, v2_x, v2_y;
+        v1_x = x - xc_t;
+        v1_y = y - yc_t;
+
+        v2_x = rot_x_t - xc_t;
+        v2_y = rot_y_t - yc_t;
+        return  rel_x > this.extX*0.5 ? Math.atan2( Math.abs(v1_x*v2_y - v1_y*v2_x), v1_x*v2_x + v1_y*v2_y) : -Math.atan2( Math.abs(v1_x*v2_y - v1_y*v2_x), v1_x*v2_x + v1_y*v2_y);
+    },
+
+
     transformPointRelativeShape: function(x, y)
     {
 
@@ -515,10 +573,11 @@ CShape.prototype =
         if(Math.sqrt(sqr_x + sqr_y) < radius)
             return 7;
 
-        var rotate_distance = 5;/*TODO*/
-        dist_y = t_y - rotate_distance;
+        var rotate_distance = 10;/*TODO*/
+        dist_y = t_y + rotate_distance;
         sqr_y = dist_y*dist_y;
         dist_x = t_x - hc;
+        sqr_x = dist_x*dist_x;
         if(Math.sqrt(sqr_x + sqr_y) < radius)
             return 8;
 

@@ -92,7 +92,7 @@ DrawingObjectsController.prototype =
     trackAdjObject: function(x, y)
     {
         if(this.arrTrackObjects.length > 0)
-            this.arrPreTrackObjects[0].track(x, y);
+            this.arrTrackObjects[0].track(x, y);
     },
 
     trackResizeObjects: function(kd1, kd2, e)
