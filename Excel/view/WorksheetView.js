@@ -5912,8 +5912,18 @@
 						this.objectRender.saveUndoRedoDrawingObject();
 						//return ret;
 					}
+					
+					var drawingInfo = this.objectRender.checkCursorDrawingObject(x, y);
+					if ( drawingInfo ) {
+						if ( drawingInfo.isShape )
+								asc.editor.isStartAddShape = true;
+							else
+								asc.editor.isStartAddShape = false;
+					}
+					
 					// move active range to coordinates x,y
 					this._moveActiveCellToXY(x, y);
+					
 				} else {
 					// move active range to offset x,y
 					this._moveActiveCellToOffset(x, y);

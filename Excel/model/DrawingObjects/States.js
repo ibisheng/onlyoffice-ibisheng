@@ -91,7 +91,7 @@ function NullState(drawingObjectsController, drawingObjects)
                 {
                     this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
                 }
-                this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects, x, y, e.shiftKey, e.ctrl, selected_objects[j].isGroup() ? selected_objects[j] : null));
+                this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects, x, y, e.shiftKey, e.ctrl, selected_objects[i].isGroup() ? selected_objects[i] : null));
                 return;
             }
         }
@@ -116,7 +116,7 @@ function NullState(drawingObjectsController, drawingObjects)
                         {
                             this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
                         }
-                        this.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects,x, y, e.shiftKey, e.ctrl, cur_drawing.isGroup() ? cur_drawing : null));
+                        this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects,x, y, e.shiftKey, e.ctrl, cur_drawing.isGroup() ? cur_drawing : null));
                         return;
                     }
                     else if(hit_in_text_rect)

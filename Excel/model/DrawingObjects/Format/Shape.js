@@ -562,7 +562,7 @@ CShape.prototype =
         var x_t = invert_transform.TransformPointX(x, y);
         var y_t = invert_transform.TransformPointY(x, y);
 
-        var _hit_context = his.drawingBase.getCanvasContext();
+        var _hit_context = this.drawingBase.getCanvasContext();
 
         return (HitInLine(_hit_context, x_t, y_t, 0, 0, this.extX, 0) ||
             HitInLine(_hit_context, x_t, y_t, this.extX, 0, this.extX, this.extY)||

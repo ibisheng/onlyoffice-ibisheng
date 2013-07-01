@@ -28,7 +28,7 @@ function MoveShapeImageTrack(originalObject)
             global_MatrixTransformer.ScaleAppend(this.transform, -1, 1);
         if(original.flipV)
             global_MatrixTransformer.ScaleAppend(this.transform, 1, -1);
-        global_MatrixTransformer.RotateAppend(this.transform, original.rot);
+        global_MatrixTransformer.RotateRadAppend(this.transform, original.rot);
         global_MatrixTransformer.TranslateAppend(this.transform, this.x + hc, this.y + vc);
     };
 

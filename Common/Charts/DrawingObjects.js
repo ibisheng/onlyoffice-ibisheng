@@ -3272,8 +3272,10 @@ function DrawingObjects() {
 	_this.addGraphicObject = function(x, y, extX, extY, flipH, flipV, presetGeom) {
 		
 		var obj = _this.createDrawingObject();
+		obj.id = generateId();
 		obj.graphicObject = new CShape(obj);
 		obj.graphicObject.initDefault(x, y, extX, extY, flipH, flipV, presetGeom);
+		obj.graphicObject.select(_this.controller);
 		aObjects.push(obj);
 		_this.showDrawingObjects(false);
 	}
@@ -4460,9 +4462,22 @@ function DrawingObjects() {
 	}
 
 	_this.checkCursorDrawingObject = function(x, y) {
+	
+		if ( !aObjects.length )
+			return null;
 
 		var index = _this.inSelectionDrawingObjectIndex(x, y, true);
-		var objectInfo = { cursor: null, data: null };
+		var objectInfo = { cursor: null, data: null, isShape: false };
+		
+		var asc = window["Asc"];
+		var graphicObjectInfo = _this.controller.isPointInDrawingObjects( pxToMm(x), pxToMm(y) );
+		
+		if ( graphicObjectInfo ) {
+			objectInfo.data = graphicObjectInfo.objectId;
+			objectInfo.cursor = graphicObjectInfo.cursorType;
+			objectInfo.isShape = true;
+			return objectInfo;
+		}
 
 		if (index >= 0) {
 			var eps = 6;
