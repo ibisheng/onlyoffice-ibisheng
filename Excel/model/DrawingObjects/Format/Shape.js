@@ -329,6 +329,14 @@ CShape.prototype =
         graphics.SetIntegerGrid(true);
     },
 
+    drawAdjustments: function(drawingDocument)
+    {
+        if(isRealObject(this.spPr.geometry))
+        {
+            this.spPr.geometry.drawAdjustments(drawingDocument, this.transform);
+        }
+    },
+
     getTransform: function()
     {
         if(this.recalcInfo.recalculateTransform)
@@ -358,6 +366,13 @@ CShape.prototype =
             return this.flipH;
         else
             return this.group.getFullFlipH() ? !this.flipH : this.flipH;
+    },
+
+    getAspect: function(num)
+    {
+        var _tmp_x = this.extX != 0 ? this.extX : 0.1;
+        var _tmp_y = this.extY != 0 ? this.extY : 0.1;
+        return num === 0 || num === 4 ? _tmp_x/_tmp_y : _tmp_y/_tmp_x;
     },
 
     getCardDirectionByNum: function(num)
@@ -416,6 +431,30 @@ CShape.prototype =
         return (north_number - cardDirection + 8)%8;
     },
 
+    transformPointRelativeShape: function(x, y)
+    {
+
+        var _horizontal_center = this.extX*0.5;
+        var _vertical_enter = this.extY*0.5;
+        var _sin = Math.sin(this.rot);
+        var _cos = Math.cos(this.rot);
+
+
+        var _temp_x = x - (-_horizontal_center*_cos + _vertical_enter*_sin +this.x + _horizontal_center);
+        var _temp_y = y - (-_horizontal_center*_sin - _vertical_enter*_cos +this.y + _vertical_enter);
+
+        var _relative_x = _temp_x*_cos + _temp_y*_sin;
+        var _relative_y = -_temp_x*_sin + _temp_y*_cos;
+
+        if(this.absFlipH)
+            _relative_x = this.absExtX - _relative_x;
+
+        if(this.absFlipV)
+            _relative_y = this.absExtY - _relative_y;
+
+        return {x: _relative_x, y: _relative_y};
+    },
+
     hitToAdjustment: function(x, y)
     {
         var invert_transform = this.getInvertTransform();
@@ -423,7 +462,7 @@ CShape.prototype =
         t_x = invert_transform.TransformPointX(x, y);
         t_y = invert_transform.TransformPointY(x, y);
         if(isRealObject(this.spPr.geometry))
-            return this.spPr.recalculateGeometry.hitToAdj(t_x, t_y, /*TODO*/ 5);
+            return this.spPr.geometry.hitToAdj(t_x, t_y, /*TODO*/ 5);
         return {hit: false, adjPolarFlag: null, adjNum: null};
     },
 

@@ -88,6 +88,12 @@ DrawingObjectsController.prototype =
             this.arrPreTrackObjects[0].track(x, y);
     },
 
+    trackResizeObjects: function(kd1, kd2, e)
+    {
+        for(var i = 0; i < this.arrTrackObjects.length; ++i)
+            this.arrTrackObjects[i].track(kd1, kd2, e);
+    },
+
     trackEnd: function()
     {
         for(var i = 0; i < this.arrTrackObjects.length; ++i)
@@ -116,6 +122,10 @@ DrawingObjectsController.prototype =
                 {
                     drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, selected_objects[i].getTransform(), 0, 0, selected_objects[i].extX, selected_objects[i].extY, false, selected_objects[i].canRotate());
                 }
+                if(selected_objects.length === 1)
+                {
+                    selected_objects[0].drawAdjustments(drawingDocument);
+                }
                 break;
             }
         }
@@ -123,7 +133,7 @@ DrawingObjectsController.prototype =
 
     isPointInDrawingObjects: function(x, y)
     {
-        var selected_objects = this.drawingObjectsController.selectedObjects;
+        var selected_objects = this.selectedObjects;
         if(selected_objects.length === 1)
         {
             var hit_to_adj = selected_objects[0].hitToAdjustment(x, y);

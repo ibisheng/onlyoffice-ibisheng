@@ -177,5 +177,9 @@ CGroupShape.prototypr =
             HitInLine(_hit_context, x_t, y_t, this.extX, this.extY, 0, this.extY)||
             HitInLine(_hit_context, x_t, y_t, 0, this.extY, 0, 0) ||
             HitInLine(_hit_context, x_t, y_t, this.extX*0.5, 0, this.extX*0.5, -this.drawingDocument.GetMMPerDot(TRACK_DISTANCE_ROTATE)));
+    },
+
+    drawAdjustments: function(drawingDocument)
+    {
     }
 };

@@ -436,8 +436,9 @@ CImage.prototype =
         v2_x = rot_x_t - xc_t;
         v2_y = rot_y_t - yc_t;
         return  Math.atan2( Math.abs(v1_x*v2_y - v1_y*v2_x), v1_x*v2_x + v1_y*v2_y);
+    },
+
+    drawAdjustments: function(drawingDocument)
+    {
     }
-
-
-
 };

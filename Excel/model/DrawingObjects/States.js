@@ -416,3 +416,5 @@ function ChangeAdjState(drawingObjectsController, drawingObjects)
     }
 }
 
+
+
