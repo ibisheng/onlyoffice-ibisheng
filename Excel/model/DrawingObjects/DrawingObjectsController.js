@@ -146,26 +146,30 @@ DrawingObjectsController.prototype =
             var hit_to_adj = selected_objects[0].hitToAdjustment(x, y);
             if(hit_to_adj.hit)
             {
-                return selected_objects[0].drawingBase.id;
+                return {objectId: selected_objects[0].drawingBase.id, cursorType: "crosshair"};
             }
         }
 
         for(var i = selected_objects.length - 1; i > -1; --i)
         {
             var hit_to_handles = selected_objects[i].hitToHandles(x, y);
+            var cursor_type;
             if(hit_to_handles > -1)
             {
                 if(hit_to_handles === 8)
                 {
                     if(!selected_objects[i].canRotate())
                         return null;
+                    cursor_type = "crosshair";
                 }
                 else
                 {
                     if(!selected_objects[i].canResize())
                         return null;
+                    cursor_type = CURSOR_TYPES_BY_CARD_DIRECTION[selected_objects[i].getCardDirectionByNum(hit_to_handles)];
+
                 }
-                return selected_objects[i].drawingBase.id;
+                return {objectId: selected_objects[i].drawingBase.id, cursorType: cursor_type};
             }
         }
 
@@ -173,7 +177,7 @@ DrawingObjectsController.prototype =
         {
             if(selected_objects[i].hitInBoundingRect(x, y))
             {
-                return selected_objects[i].canMove() ? selected_objects[i].drawingBase.id : null;
+                return {objectId: selected_objects[i].drawingBase.id,  cursorType: "move"};
             }
         }
 
@@ -191,7 +195,7 @@ DrawingObjectsController.prototype =
                     var hit_in_text_rect = cur_drawing.hitInTextRect(x, y);
                     if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
                     {
-                        return cur_drawing.canMove() ? cur_drawing_base.id : null;
+                        return {objectId: cur_drawing_base.id ,  cursorType: "move"};
                     }
                     else if(hit_in_text_rect)
                     {
@@ -205,6 +209,5 @@ DrawingObjectsController.prototype =
             }
         }
         return null;
-
     }
 };
