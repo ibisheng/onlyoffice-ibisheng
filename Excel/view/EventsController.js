@@ -1063,7 +1063,7 @@
 				if ( graphicsInfo && graphicsInfo.isShape )
 					asc.editor.isStartAddShape = true;
 				
-				if ( asc.editor.isStartAddShape || graphicsInfo ) {
+				if ( asc.editor.isStartAddShape ) {
 					t.handlers.trigger("shapeMouseDown", event, coord.x, coord.y);
 					return;
 				}

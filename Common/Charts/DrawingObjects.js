@@ -2547,6 +2547,39 @@ function DrawingObjects() {
             return shapeCtx.m_oContext;
         }
 
+		// Считаем From/To исходя из graphicObject
+		_t.setGraphicObjectCoords = function() {
+			if ( _t.isGraphicObject() ) {
+				
+				_t.from.col = _t.worksheet._findColUnderCursor( mmToPt(_t.graphicObject.x) /*+ _t.worksheet.getCellLeft(0, 1)*/, true).col;
+				_t.from.colOff = _t.graphicObject.x /*+ _t.worksheet.getCellLeft(0, 3)*/ - _t.worksheet.getCellLeft(_t.from.col, 3);
+
+				_t.from.row = _t.worksheet._findRowUnderCursor( mmToPt(_t.graphicObject.y) /*+ _t.worksheet.getCellTop(0, 1)*/, true).row;
+				_t.from.rowOff = _t.graphicObject.y /*+ _t.worksheet.getCellTop(0, 3)*/ - _t.worksheet.getCellTop(_t.from.row, 3);
+
+				var _left = _t.getRealLeftOffset();
+				var _top = _t.getRealTopOffset();
+
+				var foundCol = _t.worksheet._findColUnderCursor(pxToPt(_left + mmToPx(_t.graphicObject.extX)), true);
+				while (foundCol == null) {
+					_t.worksheet.expandColsOnScroll(true);
+					_t.worksheet._trigger("reinitializeScrollX");
+					foundCol = _t.worksheet._findColUnderCursor(pxToPt(_left + mmToPx(_t.graphicObject.extX)), true);
+				}
+				_t.to.col = foundCol.col;
+				_t.to.colOff = pxToMm(_left + mmToPx(_t.graphicObject.extX) - _t.worksheet.getCellLeft(_t.to.col, 0));
+
+				var foundRow = _t.worksheet._findRowUnderCursor(pxToPt(_top + mmToPx(_t.graphicObject.extY)), true);
+				while (foundRow == null) {
+					_t.worksheet.expandRowsOnScroll(true);
+					_t.worksheet._trigger("reinitializeScrollY");
+					foundRow = _t.worksheet._findRowUnderCursor(pxToPt(_top + mmToPx(_t.graphicObject.extY)), true);
+				}
+				_t.to.row = foundRow.row;
+				_t.to.rowOff = pxToMm(_top + mmToPx(_t.graphicObject.extY) - _t.worksheet.getCellTop(_t.to.row, 0));
+			}
+		}
+		
 		// Проверяет выход за границы
 		_t.canDraw = function() {
 			var result = true;
@@ -4919,6 +4952,11 @@ function DrawingObjects() {
 
 	function mmToPx(val) {
 		var tmp = val * ascCvtRatio(3, 0);
+		return tmp;
+	}
+	
+	function mmToPt(val) {
+		var tmp = val * ascCvtRatio(3, 1);
 		return tmp;
 	}
 
