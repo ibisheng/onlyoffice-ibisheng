@@ -747,7 +747,8 @@ var c_oSer_ChartLegendType =
 	LegendPos: 0,
 	Overlay: 1,
 	Layout: 2,
-	LegendEntry: 3
+	LegendEntry: 3,
+	TxPrPptx: 4
 };
 /** @enum */
 var c_oSer_ChartLegendEntryType =
@@ -1394,7 +1395,10 @@ function Binary_ChartReader(stream, chart)
 		{
 			var oPresentationSimpleSerializer = new PresentationSimpleSerializer();
 			var textBody = oPresentationSimpleSerializer.ReadTextBody(this.stream);
-			var params = this.ParsePptxParagraph(textBody);
+			var oDefHeaderFont = new asc_CChartFont();
+			oDefHeaderFont.size = 18;
+			oDefHeaderFont.bold = 1;
+			var params = this.ParsePptxParagraph(textBody, oDefHeaderFont);
 			if(c_oSer_ChartType.TitlePptx === type)
 				this.chart.header.title = params.text;
 			else
@@ -1433,6 +1437,14 @@ function Binary_ChartReader(stream, chart)
 		}
 		else if ( c_oSer_ChartLegendType.Overlay === type )
 			this.chart.legend.bOverlay = this.stream.GetBool();
+		else if ( c_oSer_ChartLegendType.TxPrPptx === type )
+		{
+			var oPresentationSimpleSerializer = new PresentationSimpleSerializer();
+			var textBody = oPresentationSimpleSerializer.ReadTextBody(this.stream);
+			var params = this.ParsePptxParagraph(textBody);
+			if(null != params.font)
+				this.chart.legend.font = params.font;
+		}
 		else if ( c_oSer_ChartLegendType.LegendEntry === type )
 		{
 			var oNewLegendEntry = {nIndex: null, bDelete: null, oTxPr: null};
@@ -1766,7 +1778,7 @@ function Binary_ChartReader(stream, chart)
             res = c_oSerConstants.ReadUnknown;
 		return res;
 	};
-	this.ParsePptxParagraph = function(textbody)
+	this.ParsePptxParagraph = function(textbody, oDefFont)
 	{
 		var res = {text: "", font: null};
 		for(var i = 0, length = textbody.content.length; i < length; ++i)
@@ -1778,7 +1790,10 @@ function Binary_ChartReader(stream, chart)
 			{
 				if(null != par.rPr)
 				{
-					res.font = new asc_CChartFont();
+					if(oDefFont)
+						res.font = oDefFont;
+					else
+						res.font = new asc_CChartFont();
 					if(null != par.rPr.Bold)
 						res.font.bold = par.rPr.Bold ? 1 : 0;
 					if(null != par.rPr.Italic)
