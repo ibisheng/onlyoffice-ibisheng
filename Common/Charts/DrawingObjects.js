@@ -2023,6 +2023,8 @@ function DrawingObjects() {
 	var overlayCtx = null;
 	var shapeCtx = null;
 	var shapeOverlayCtx = null;
+	
+	var trackOverlay = null;
 	var autoShapeTrack = null;
 	
 	var aObjects = null;
@@ -2055,8 +2057,12 @@ function DrawingObjects() {
 		overlayCtx = currentSheet.overlayCtx;
 		shapeCtx = currentSheet.shapeCtx;
 		shapeOverlayCtx = currentSheet.shapeOverlayCtx;
+		
+		trackOverlay = new COverlay();
+		trackOverlay.init( shapeOverlayCtx.m_oContext, "ws-canvas-overlay", 0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix, shapeOverlayCtx.m_dWidthMM, shapeOverlayCtx.m_dHeightMM );
+		
 		autoShapeTrack = new CAutoshapeTrack();
-		autoShapeTrack.init( shapeOverlayCtx, 0, 0, shapeOverlayCtx.m_dWidthMM, shapeOverlayCtx.m_dHeightMM, shapeOverlayCtx.m_lWidthPix , shapeOverlayCtx.m_lHeightPix );
+		autoShapeTrack.init( trackOverlay, 0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix, shapeOverlayCtx.m_dWidthMM, shapeOverlayCtx.m_dHeightMM );
 				
 		isViewerMode =  function() { return worksheet._trigger("getViewerMode"); };
 
@@ -3807,6 +3813,9 @@ function DrawingObjects() {
 		obj.graphicObject.select(_this.controller);
 		aObjects.push(obj);
 		_this.showDrawingObjects(false);
+	}
+	
+	_this.addGraphicGroup = function() {
 	}
 	
 	_this.insertUngroupedObjects = function(idGroup, aGraphics) {
