@@ -119,3 +119,61 @@ function RotateTrackShapeImage(originalObject)
         this.originalObject.recalculateTransform();
     }
 }
+
+function RotateTrackShapeImageInGroup(originalObject)
+{
+    this.originalObject = originalObject;
+    this.transform = new CMatrix();
+    this.overlayObject = new OverlayObject(originalObject.spPr.geometry, originalObject.extX, originalObject.extY, originalObject.brush, originalObject.pen, this.transform);
+
+    this.angle = originalObject.rot;
+
+    this.draw = function(overlay)
+    {
+        this.overlayObject.draw(overlay);
+    };
+
+    this.track = function(angle, e)
+    {
+        var new_rot = angle + this.originalObject.rot;
+        while(new_rot < 0)
+            new_rot += 2*Math.PI;
+        while(new_rot >= 2*Math.PI)
+            new_rot -= 2*Math.PI;
+
+        if(new_rot < MIN_ANGLE || new_rot > 2*Math.PI - MIN_ANGLE)
+            new_rot = 0;
+
+        if(Math.abs(new_rot-Math.PI*0.5) < MIN_ANGLE)
+            new_rot = Math.PI*0.5;
+
+        if(Math.abs(new_rot-Math.PI) < MIN_ANGLE)
+            new_rot = Math.PI;
+
+        if(Math.abs(new_rot-1.5*Math.PI) < MIN_ANGLE)
+            new_rot = 1.5*Math.PI;
+
+        if(e.shiftKey)
+            new_rot = (Math.PI/12)*Math.floor(12*new_rot/(Math.PI));
+        this.angle = new_rot;
+
+        var hc, vc;
+        hc = this.originalObject.extX*0.5;
+        vc = this.originalObject.extY*0.5;
+        this.transform.Reset();
+        global_MatrixTransformer.TranslateAppend(this.transform, -hc, -vc);
+        if(this.originalObject.flipH)
+            global_MatrixTransformer.ScaleAppend(this.transform, -1, 1);
+        if(this.originalObject.flipV)
+            global_MatrixTransformer.ScaleAppend(this.transform, 1, -1);
+        global_MatrixTransformer.RotateRadAppend(this.transform, -this.angle);
+        global_MatrixTransformer.TranslateAppend(this.transform, this.originalObject.x + hc, this.originalObject.y + vc);
+        global_MatrixTransformer.MultiplyAppend(this.transform, this.originalObject.group.getTransform());
+    };
+
+    this.trackEnd = function()
+    {
+        this.originalObject.setRotate(this.angle);
+        this.originalObject.recalculateTransform();
+    }
+}

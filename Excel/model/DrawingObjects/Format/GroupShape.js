@@ -331,5 +331,19 @@ CGroupShape.prototypr =
 
     drawAdjustments: function(drawingDocument)
     {
+    },
+
+    getTransform: function()
+    {
+        if(this.recalcInfo.recalculateTransform)
+            this.recalculateTransform();
+        return this.transform;
+    },
+
+    getInvertTransform: function()
+    {
+        if(this.recalcInfo.recalculateTransform)
+            this.recalculateTransform();
+        return this.invertTransform;
     }
 };

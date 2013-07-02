@@ -722,6 +722,12 @@ CShape.prototype =
         return true;//TODO
     },
 
+
+    canChangeAdjustments: function()
+    {
+        return true;//TODO
+    },
+
     createRotateTrack: function()
     {
         return new RotateTrackShapeImage(this);
@@ -735,6 +741,16 @@ CShape.prototype =
     createMoveTrack: function()
     {
         return new MoveShapeImageTrack(this);
+    },
+
+    createRotateInGroupTrack: function()
+    {
+        return new RotateTrackShapeImageInGroup(this);
+    },
+
+    createResizeInGroupTrack: function(cardDirection)
+    {
+        return new ResizeTrackShapeImageInGroup(this, cardDirection);
     }
 
 };

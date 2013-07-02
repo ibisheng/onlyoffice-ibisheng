@@ -448,6 +448,11 @@ CImage.prototype =
         return new MoveShapeImageTrack(this);
     },
 
+    createRotateInGroupTrack: function()
+    {
+        return new RotateTrackShapeImageInGroup(this);
+    },
+
     getRotateAngle: function(x, y)
     {
         var transform = this.getTransform();
