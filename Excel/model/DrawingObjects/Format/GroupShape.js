@@ -99,6 +99,12 @@ CGroupShape.prototypr =
         this.spPr.xfrm.rot = rot;
     },
 
+    setChildExtents: function(chExtX, chExtY)
+    {
+        this.spPr.xfrm.chExtX = chExtX;
+        this.spPr.xfrm.chExtY = chExtY;
+    },
+
 
     updateDrawingBaseCoordinates: function()
     {
@@ -203,16 +209,18 @@ CGroupShape.prototypr =
         return {kd1: 1, kd2: 1};
     },
 
+    draw: function(graphics)
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+            this.spTree[i].draw(graphics);
+    },
 
     recalculate: function()
     {
         if(this.recalcInfo.recalculateTransform)
-            this.re
-        this.recalcInfo =
-        {
-            recalculateTransform: true,
-            recalculateArrGraphicObjects: true
-        };
+            this.recalculateTransform();
+        if(this.recalcInfo.recalculateArrGraphicObjects)
+            this.recalculateArrGraphicObjects();
     },
 
     recalculateArrGraphicObjects: function()
@@ -274,6 +282,10 @@ CGroupShape.prototypr =
             global_MatrixTransformer.MultiplyAppend(this.transform, this.group.getTransform());
         }
         this.invertTransform = global_MatrixTransformer.Invert(this.transform);
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            this.spTree.recalculateTransform();
+        }
     },
 
 

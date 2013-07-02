@@ -91,7 +91,7 @@ function NullState(drawingObjectsController, drawingObjects)
                 {
                     this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
                 }
-                this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects, x, y, e.shiftKey, e.ctrl, selected_objects[i].isGroup() ? selected_objects[i] : null));
+                this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects, x, y, e.shiftKey, e.ctrl, selected_objects[i].isGroup() ? selected_objects[i] : null, true));
                 return;
             }
         }
@@ -392,14 +392,8 @@ function MoveState(drawingObjectsController, drawingObjects, startX, startY, rec
     {
         var dx = x - this.startX;
         var dy = y - this.startY;
-        var dx2 = 0, dy2 = 0;
         var check_position = this.drawingObjects.checkGraphicObjectPosition(this.rectX + dx, this.rectY + dy, this.rectW, this.rectH);
-        if(check_position.result === false)
-        {
-            dx2 = check_position.x;
-            dy2 = check_position.y;
-        }
-        this.drawingObjectsController.trackMoveObjects(dx + dx2, dy + dy2);
+        this.drawingObjectsController.trackMoveObjects(dx + check_position.x, dy + check_position.y);
         this.drawingObjects.showOverlayGraphicObjects();
     };
 
