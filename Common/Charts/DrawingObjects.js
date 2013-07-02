@@ -2088,6 +2088,10 @@ function DrawingObjects() {
 		return (worksheet ? worksheet.model.workbook : null);
 	}
 	
+	_this.getCanvasContext = function() {
+        return shapeCtx.m_oContext;
+    }
+	
 	_this.getDrawingObjects = function() {
 		return aObjects;
 	}
@@ -3353,11 +3357,50 @@ function DrawingObjects() {
 		
 		var obj = _this.createDrawingObject();
 		obj.id = generateId();
-		obj.graphicObject = new CShape(obj);
+		obj.graphicObject = new CShape(obj, _this);
 		obj.graphicObject.initDefault(x, y, extX, extY, flipH, flipV, presetGeom);
 		obj.graphicObject.select(_this.controller);
 		aObjects.push(obj);
 		_this.showDrawingObjects(false);
+	}
+	
+	_this.checkGraphicObjectPosition = function(x, y, w, h) {
+	
+		/*	Принцип:
+			true - если перемещение в области или требуется увеличить лист вправо/вниз
+			false - наезд на хидеры
+		*/
+		
+		var top = worksheet.getCellTop(0, 3);
+		var left = worksheet.getCellLeft(0, 3);
+		
+		// выход за границу слева или сверху
+		if ( (y < top) || (x < left) )
+			return false;
+		
+		// выход за границу справа
+		var foundCol = worksheet._findColUnderCursor(mmToPt(x + w), true);
+		while ( foundCol == null ) {
+			worksheet.expandColsOnScroll(true);
+			worksheet._trigger("reinitializeScrollX");
+			foundCol = worksheet._findColUnderCursor(mmToPt(x + w), true);
+		}
+
+		// выход за границу снизу
+		var foundRow = worksheet._findRowUnderCursor(mmToPt(y + h), true);
+		while ( foundRow == null ) {
+			worksheet.expandRowsOnScroll(true);
+			worksheet._trigger("reinitializeScrollY");
+			foundRow = worksheet._findRowUnderCursor(mmToPt(y + h), true);
+		}
+		
+		return true;
+	}
+	
+	_this.addGraphicGroup = function() {
+		var obj = _this.createDrawingObject();
+		obj.id = generateId();
+		//obj.graphicObject = new CGroupShape(obj, _this);
 	}
 	
 	_this.deleteSelectedDrawingObject = function() {
