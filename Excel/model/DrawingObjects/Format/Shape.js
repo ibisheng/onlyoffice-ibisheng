@@ -107,7 +107,7 @@ CShape.prototype =
     updateDrawingBaseCoordinates: function()
     {
         if(isRealObject(this.drawingBase))
-            this.drawingBase.setGraphicObjectCoords();
+            this.drawingBase.setGraphicObjectCoords()
     },
 
     setExtents: function(extX, extY)
@@ -367,8 +367,7 @@ CShape.prototype =
     {
         if(!isRealObject(this.group))
             return this.flipH;
-        else
-            return this.group.getFullFlipH() ? !this.flipH : this.flipH;
+        return this.group.getFullFlipH() ? !this.flipH : this.flipH;
     },
 
 
@@ -376,8 +375,7 @@ CShape.prototype =
     {
         if(!isRealObject(this.group))
             return this.flipH;
-        else
-            return this.group.getFullFlipH() ? !this.flipH : this.flipH;
+        return this.group.getFullFlipH() ? !this.flipH : this.flipH;
     },
 
     getAspect: function(num)
@@ -385,6 +383,30 @@ CShape.prototype =
         var _tmp_x = this.extX != 0 ? this.extX : 0.1;
         var _tmp_y = this.extY != 0 ? this.extY : 0.1;
         return num === 0 || num === 4 ? _tmp_x/_tmp_y : _tmp_y/_tmp_x;
+    },
+
+    getFullRotate: function()
+    {
+        return !isRealObject(this.group) ? this.rot : this.rot + this.group.getFullRotate();
+    },
+
+    getBoundsInGroup: function()
+    {
+        var r = this.rot;
+        if((r >= 0 && r < Math.PI*0.25)
+            || (r > 3*Math.PI*0.25 && r < 5*Math.PI*0.25)
+            || (r > 7*Math.PI*0.25 && r < 2*Math.PI))
+        {
+            return {minX: this.x, minY: this.y, maxX: this.x + this.extX, maxY: this.y + this.extY};
+        }
+        else
+        {
+            var hc = this.extX*0.5;
+            var vc = this.extY*0.5;
+            var xc = this.x + hc;
+            var yc = this.y + vc;
+            return {minX: xc - vc, minY: yc - hc, maxX: xc + vc, maxY: yc + hc};
+        }
     },
 
     getCardDirectionByNum: function(num)
@@ -495,6 +517,42 @@ CShape.prototype =
         v2_y = rot_y_t - yc_t;
         return  rel_x > this.extX*0.5 ? Math.atan2( Math.abs(v1_x*v2_y - v1_y*v2_x), v1_x*v2_x + v1_y*v2_y) : -Math.atan2( Math.abs(v1_x*v2_y - v1_y*v2_x), v1_x*v2_x + v1_y*v2_y);
     },
+
+
+    getRectBounds: function()
+    {
+        var transform = this.getTransform();
+        var w = this.extX;
+        var h = this.extY;
+        var rect_points = [{x:0, y:0}, {x: w, y: 0}, {x: w, y: h}, {x: 0, y: h}];
+        var min_x, max_x, min_y, max_y;
+        min_x = transform.TransformPointX(rect_points[0].x, rect_points[0].y);
+        min_y = transform.TransformPointY(rect_points[0].x, rect_points[0].y);
+        max_x = min_x;
+        max_y = min_y;
+        var cur_x, cur_y;
+        for(var i = 1; i < 4; ++i)
+        {
+            cur_x = transform.TransformPointX(rect_points[i].x, rect_points[i].y);
+            cur_y = transform.TransformPointY(rect_points[i].x, rect_points[i].y);
+            if(cur_x < min_x)
+                min_x = cur_x;
+            if(cur_x > max_x)
+                max_x = cur_x;
+
+            if(cur_y < min_y)
+                min_y = cur_y;
+            if(cur_y > max_y)
+                max_y = cur_y;
+        }
+        return {minX: min_x, maxX: max_x, minY: min_y, maxY: max_y};
+    },
+
+    getRectForGrouping: function()
+    {
+
+    },
+
 
 
     transformPointRelativeShape: function(x, y)
@@ -649,6 +707,11 @@ CShape.prototype =
     },
 
     canMove: function()
+    {
+        return true;//TODO
+    },
+
+    canGroup: function()
     {
         return true;//TODO
     },

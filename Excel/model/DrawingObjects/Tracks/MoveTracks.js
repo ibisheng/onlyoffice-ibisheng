@@ -14,6 +14,12 @@ function MoveShapeImageTrack(originalObject)
     this.y = null;
     this.overlayObject = new OverlayObject(this.originalObject.spPr.geometry, this.originalObject.extX, this.originalObject.extY, this.originalObject.brush, this.originalObject.pen, this.transform);
 
+
+    this.getOriginalBoundsRect = function()
+    {
+        return this.originalObject.getRectBounds();
+    };
+
     this.track = function(dx, dy)
     {
         var original = this.originalObject;

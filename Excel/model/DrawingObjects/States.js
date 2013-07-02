@@ -343,7 +343,26 @@ function PreMoveState(drawingObjectsController, drawingObjects, startX, startY, 
     this.onMouseMove = function(e, x, y)
     {
         this.drawingObjectsController.swapTrackObjects();
-        this.drawingObjectsController.changeCurrentState(new MoveState(this.drawingObjectsController, this.drawingObjects, this.startX, this.startY))
+        var track_objects = this.drawingObjectsController.getTrackObjects();
+        var max_x, min_x, max_y, min_y;
+        var cur_rect_bounds = track_objects[0].getOriginalBoundsRect();
+        max_x = cur_rect_bounds.maxX;
+        min_x = cur_rect_bounds.minX;
+        max_y = cur_rect_bounds.maxY;
+        min_y = cur_rect_bounds.minY;
+        for(var i = 0; i < track_objects.length; ++i)
+        {
+            cur_rect_bounds = track_objects[i].getOriginalBoundsRect();
+            if(max_x < cur_rect_bounds.maxX)
+                max_x = cur_rect_bounds.maxX;
+            if(min_x > cur_rect_bounds.minX)
+                min_x = cur_rect_bounds.minX;
+            if(max_y < cur_rect_bounds.maxY)
+                max_y = cur_rect_bounds.maxY;
+            if(min_y > cur_rect_bounds.minY)
+                min_y = cur_rect_bounds.minY;
+        }
+        this.drawingObjectsController.changeCurrentState(new MoveState(this.drawingObjectsController, this.drawingObjects, this.startX, this.startY, min_x, min_y, max_x - min_x, max_y - min_y));
     };
 
     this.onMouseUp = function(e, x, y)
@@ -353,13 +372,17 @@ function PreMoveState(drawingObjectsController, drawingObjects, startX, startY, 
     }
 }
 
-function MoveState(drawingObjectsController, drawingObjects, startX, startY)
+function MoveState(drawingObjectsController, drawingObjects, startX, startY, rectX, rectY, rectW, rectH)
 {
     this.id = STATES_ID_MOVE;
     this.drawingObjectsController = drawingObjectsController;
     this.drawingObjects = drawingObjects;
     this.startX = startX;
     this.startY = startY;
+    this.rectX = rectX;
+    this.rectY = rectY;
+    this.rectW = rectW;
+    this.rectH = rectH;
     this.onMouseDown = function(e, x, y)
     {
 
@@ -367,8 +390,13 @@ function MoveState(drawingObjectsController, drawingObjects, startX, startY)
 
     this.onMouseMove = function(e, x, y)
     {
-        this.drawingObjectsController.trackMoveObjects(x - this.startX, y - this.startY);
-        this.drawingObjects.showOverlayGraphicObjects();
+        var dx = x - this.startX;
+        var dy = y - this.startY;
+        if(this.drawingObjects.checkGraphicObjectPosition(this.rectX + dx, this.rectY + dy, this.rectW, this.rectH))
+        {
+            this.drawingObjectsController.trackMoveObjects(dx, dy);
+            this.drawingObjects.showOverlayGraphicObjects();
+        }
     };
 
     this.onMouseUp = function(e, x, y)

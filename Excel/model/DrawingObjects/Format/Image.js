@@ -421,6 +421,11 @@ CImage.prototype =
         return true;//TODO
     },
 
+    canGroup: function()
+    {
+        return true;//TODO
+    },
+
     createRotateTrack: function()
     {
         return new RotateTrackShapeImage(this);
@@ -485,6 +490,11 @@ CImage.prototype =
                 return {kd1:(cx-p.x)/cx, kd2: 0};
         }
         return {kd1: 1, kd2: 1};
+    },
+
+    getFullRotate: function()
+    {
+        return !isRealObject(this.group) ? this.rot : this.rot + this.group.getFullRotate();
     },
 
 

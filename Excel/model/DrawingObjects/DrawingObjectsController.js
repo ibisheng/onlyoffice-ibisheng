@@ -78,6 +78,11 @@ DrawingObjectsController.prototype =
         this.clearPreTrackObjects();
     },
 
+    getTrackObjects: function()
+    {
+        return this.arrTrackObjects;
+    },
+
     rotateTrackObjects: function(angle, e)
     {
         for(var i = 0; i < this.arrTrackObjects.length; ++i)
@@ -112,6 +117,57 @@ DrawingObjectsController.prototype =
         for(var i = 0; i < this.arrTrackObjects.length; ++i)
             this.arrTrackObjects[i].trackEnd();
         this.drawingObjects.showDrawingObjects(true);
+    },
+
+    createGroup: function(drawingBase)
+    {
+        var selected_objects = this.selectedObjects;
+        var grouped_objects = [];
+        for(var i = 0; i < selected_objects.length; ++i)
+        {
+            if(selected_objects[i].canGroup())
+            {
+                grouped_objects.push(selected_objects[i]);
+            }
+        }
+
+        if(grouped_objects.length < 2)
+            return null;
+
+        var max_x, min_x, max_y, min_y;
+        var bounds = grouped_objects[0].getBoundsInGroup();
+        max_x = bounds.maxX;
+        max_y = bounds.maxY;
+        min_x = bounds.minX;
+        min_y = bounds.minY;
+        for(i = 0; i < grouped_objects.length; ++i)
+        {
+            bounds = grouped_objects[i].getBoundsInGroup();
+            if(max_x < bounds.maxX)
+                max_x = bounds.maxX;
+            if(max_y < bounds.maxY)
+                max_y = bounds.maxY;
+            if(min_x > bounds.minX)
+                min_x = bounds.minX;
+            if(min_y > bounds.minY)
+                min_y = bounds.minY;
+        }
+        var group = new CGroupShape(drawingBase, this.drawingObjects);
+        for(i = 0; i < grouped_objects.length; ++i)
+        {
+            group.addToSpTree(grouped_objects[i]);
+        }
+
+    },
+
+    canGroup: function()
+    {
+        return this.selectedObjects.length > 1;//TODO: сделать нормальную проверку
+    },
+
+    canUnGroup: function()
+    {
+        return false;
     },
 
     startTrackNewShape: function(presetGeom)

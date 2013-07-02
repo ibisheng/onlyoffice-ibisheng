@@ -5,9 +5,10 @@
  * Time: 12:06 PM
  * To change this template use File | Settings | File Templates.
  */
-function CGroupShape(drawingBase)
+function CGroupShape(drawingBase, drawingObjects)
 {
     this.drawingBase = drawingBase;
+    this.drawingObjects = drawingObjects;
 
     this.nvSpPr = null;
     this.spPr = new CSpPr();
@@ -87,6 +88,12 @@ CGroupShape.prototypr =
         this.group = group;
     },
 
+    addToSpTree: function(grObject)
+    {
+        this.spTree.push(grObject);
+        this.recalcInfo.recalculateArrGraphicObjects = true;
+    },
+
     getMainGroup: function()
     {
         if(!isRealObject(this.group))
@@ -129,6 +136,11 @@ CGroupShape.prototypr =
             return this.flipH;
         else
             return this.group.getFullFlipH() ? !this.flipH : this.flipH;
+    },
+
+    getFullRotate: function()
+    {
+        return !isRealObject(this.group) ? this.rot : this.rot + this.group.getFullRotate();
     },
 
     getArrGraphicObjects: function()
@@ -196,6 +208,11 @@ CGroupShape.prototypr =
     },
 
     canMove: function()
+    {
+        return true;//TODO
+    },
+
+    canGroup: function()
     {
         return true;//TODO
     },
