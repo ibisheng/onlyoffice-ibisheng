@@ -153,11 +153,14 @@ DrawingObjectsController.prototype =
                 min_y = bounds.minY;
         }
         var group = new CGroupShape(drawingBase, this.drawingObjects);
+        group.setPosition(min_x, min_y);
+        group.setExtents(max_x - min_x, max_y - min_y);
         for(i = 0; i < grouped_objects.length; ++i)
         {
+            grouped_objects[i].setPosition(grouped_objects[i].x - min_x, grouped_objects.y - min_y);
             group.addToSpTree(grouped_objects[i]);
         }
-
+        group.recalculate();
     },
 
     canGroup: function()

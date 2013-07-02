@@ -392,11 +392,15 @@ function MoveState(drawingObjectsController, drawingObjects, startX, startY, rec
     {
         var dx = x - this.startX;
         var dy = y - this.startY;
-        if(this.drawingObjects.checkGraphicObjectPosition(this.rectX + dx, this.rectY + dy, this.rectW, this.rectH))
+        var dx2 = 0, dy2 = 0;
+        var check_position = this.drawingObjects.checkGraphicObjectPosition(this.rectX + dx, this.rectY + dy, this.rectW, this.rectH);
+        if(check_position.result === false)
         {
-            this.drawingObjectsController.trackMoveObjects(dx, dy);
-            this.drawingObjects.showOverlayGraphicObjects();
+            dx2 = check_position.x;
+            dy2 = check_position.y;
         }
+        this.drawingObjectsController.trackMoveObjects(dx + dx2, dy + dy2);
+        this.drawingObjects.showOverlayGraphicObjects();
     };
 
     this.onMouseUp = function(e, x, y)

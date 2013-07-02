@@ -76,6 +76,29 @@ CGroupShape.prototypr =
         return false;
     },
 
+    setPosition: function(x, y)
+    {
+        this.spPr.xfrm.offX = x;
+        this.spPr.xfrm.offY = y;
+    },
+
+    setExtents: function(extX, extY)
+    {
+        this.spPr.xfrm.extX = extX;
+        this.spPr.xfrm.extY = extY;
+    },
+
+    setFlips: function(flipH, flipV)
+    {
+        this.spPr.xfrm.flipH = flipH;
+        this.spPr.xfrm.flipV = flipV;
+    },
+
+    setRotate: function(rot)
+    {
+        this.spPr.xfrm.rot = rot;
+    },
+
 
     updateDrawingBaseCoordinates: function()
     {
@@ -180,6 +203,18 @@ CGroupShape.prototypr =
         return {kd1: 1, kd2: 1};
     },
 
+
+    recalculate: function()
+    {
+        if(this.recalcInfo.recalculateTransform)
+            this.re
+        this.recalcInfo =
+        {
+            recalculateTransform: true,
+            recalculateArrGraphicObjects: true
+        };
+    },
+
     recalculateArrGraphicObjects: function()
     {
         this.arrGraphicObjects.length = 0;
@@ -194,6 +229,51 @@ CGroupShape.prototypr =
                     this.arrGraphicObjects.push(arr_graphic_objects[i]);
             }
         }
+    },
+
+    recalculateTransform: function()
+    {
+        var xfrm = this.spPr.xfrm;
+        if(!isRealObject(this.group))
+        {
+            this.x = xfrm.offX;
+            this.y = xfrm.offY;
+            this.extX = xfrm.extX;
+            this.extY = xfrm.extY;
+            this.rot = isRealNumber(xfrm.rot) ? xfrm.rot : 0;
+            this.flipH = xfrm.flipH === true;
+            this.flipV = xfrm.flipV === true;
+        }
+        else
+        {
+            var scale_scale_coefficients = this.group.getResultScaleCoefficients();
+            this.x = scale_scale_coefficients.cx*(xfrm.offX - this.group.xfrm.chOffX);
+            this.y = scale_scale_coefficients.cy*(xfrm.offY - this.group.xfrm.chOffY);
+            this.extX = scale_scale_coefficients.cx*xfrm.extX;
+            this.extY = scale_scale_coefficients.cy*xfrm.extY;
+            this.rot = isRealNumber(xfrm.rot) ? xfrm.rot : 0;
+            this.flipH = xfrm.flipH === true;
+            this.flipV = xfrm.flipV === true;
+        }
+        if(isRealObject(this.spPr.geometry))
+            this.spPr.geometry.Recalculate(this.extX, this.extY);
+        this.transform.Reset();
+        var hc, vc;
+        hc = this.extX*0.5;
+        vc = this.extY*0.5;
+        global_MatrixTransformer.TranslateAppend(this.transform, -hc, -vc);
+        if(this.flipH)
+            global_MatrixTransformer.ScaleAppend(this.transform, -1, 1);
+        if(this.flipV)
+            global_MatrixTransformer.ScaleAppend(this.transform, 1, -1);
+
+        global_MatrixTransformer.RotateRadAppend(this.transform, -this.rot);
+        global_MatrixTransformer.TranslateAppend(this.transform, this.x + hc, this.y + vc);
+        if(isRealObject(this.group))
+        {
+            global_MatrixTransformer.MultiplyAppend(this.transform, this.group.getTransform());
+        }
+        this.invertTransform = global_MatrixTransformer.Invert(this.transform);
     },
 
 
