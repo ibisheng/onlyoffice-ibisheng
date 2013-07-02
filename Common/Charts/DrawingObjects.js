@@ -3353,64 +3353,6 @@ function DrawingObjects() {
 		}
 	}
 
-	_this.addGraphicObject = function(x, y, extX, extY, flipH, flipV, presetGeom) {
-		
-		var obj = _this.createDrawingObject();
-		obj.id = generateId();
-		obj.graphicObject = new CShape(obj, _this);
-		obj.graphicObject.initDefault(x, y, extX, extY, flipH, flipV, presetGeom);
-		obj.graphicObject.select(_this.controller);
-		aObjects.push(obj);
-		_this.showDrawingObjects(false);
-	}
-	
-	_this.checkGraphicObjectPosition = function(x, y, w, h) {
-	
-		/*	Принцип:
-			true - если перемещение в области или требуется увеличить лист вправо/вниз
-			false - наезд на хидеры
-		*/
-		
-		var response = { result: true, x: 0, y: 0 };
-		
-		var top = worksheet.getCellTop(0, 3) + pxToMm(1);
-		var left = worksheet.getCellLeft(0, 3) + pxToMm(1);
-		
-		// выход за границу слева или сверху
-		if ( y < top ) {
-			response.result = false;
-			response.y = top - y;
-		}
-		if ( x < left ) {
-			response.result = false;
-			response.x = left - x;
-		}
-		
-		// выход за границу справа
-		var foundCol = worksheet._findColUnderCursor(mmToPt(x + w), true);
-		while ( foundCol == null ) {
-			worksheet.expandColsOnScroll(true);
-			worksheet._trigger("reinitializeScrollX");
-			foundCol = worksheet._findColUnderCursor(mmToPt(x + w), true);
-		}
-
-		// выход за границу снизу
-		var foundRow = worksheet._findRowUnderCursor(mmToPt(y + h), true);
-		while ( foundRow == null ) {
-			worksheet.expandRowsOnScroll(true);
-			worksheet._trigger("reinitializeScrollY");
-			foundRow = worksheet._findRowUnderCursor(mmToPt(y + h), true);
-		}
-		
-		return response;
-	}
-	
-	_this.addGraphicGroup = function() {
-		var obj = _this.createDrawingObject();
-		obj.id = generateId();
-		//obj.graphicObject = new CGroupShape(obj, _this);
-	}
-	
 	_this.deleteSelectedDrawingObject = function() {
 
 		var bResult = false;
@@ -3847,6 +3789,96 @@ function DrawingObjects() {
 			if (_range)
 				chart.range.intervalObject = _range;
 		}
+	}
+
+	//-----------------------------------------------------------------------------------
+	// Graphic object
+	//-----------------------------------------------------------------------------------
+	
+	_this.addGraphicObject = function(graphic) {
+		
+		var obj = _this.createDrawingObject();
+		obj.id = generateId();
+		obj.graphicObject = graphic;
+		obj.graphicObject.select(_this.controller);
+		aObjects.push(obj);
+		_this.showDrawingObjects(false);
+	}
+	
+	_this.insertUngroupedObjects = function(idGroup, aGraphics) {
+		
+		if ( idGroup && aGraphics.length ) {
+			
+			var aSingleObjects = [];
+			for (var i = 0; i < aGraphics.length; i++) {
+			
+				var obj = _this.createDrawingObject();
+				obj.id = generateId();
+				obj.graphicObject = aGraphics[i];
+				obj.graphicObject.select(_this.controller);
+				aSingleObjects.push(obj);
+			}
+			
+			for (var i = 0; i < aObjects.length; i++) {
+			
+				if ( idGroup == aObjects[i].id ) {
+					aObjects.splice(i, 1, aSingleObjects);
+					_this.showDrawingObjects(false);
+					break;
+				}
+			}
+		}
+	}
+	
+	_this.deleteDrawingObjectById = function(id) {
+		
+		for (var i = 0; i < _this.countDrawingObjects(); i++) {
+			if ( aObjects[i].id == id ) {
+				aObjects.splice(i, 1);
+				break;
+			}
+		}
+	}
+	
+	_this.checkGraphicObjectPosition = function(x, y, w, h) {
+	
+		/*	Принцип:
+			true - если перемещение в области или требуется увеличить лист вправо/вниз
+			false - наезд на хидеры
+		*/
+		
+		var response = { result: true, x: 0, y: 0 };
+		
+		var top = worksheet.getCellTop(0, 3) + pxToMm(1);
+		var left = worksheet.getCellLeft(0, 3) + pxToMm(1);
+		
+		// выход за границу слева или сверху
+		if ( y < top ) {
+			response.result = false;
+			response.y = top - y;
+		}
+		if ( x < left ) {
+			response.result = false;
+			response.x = left - x;
+		}
+		
+		// выход за границу справа
+		var foundCol = worksheet._findColUnderCursor(mmToPt(x + w), true);
+		while ( foundCol == null ) {
+			worksheet.expandColsOnScroll(true);
+			worksheet._trigger("reinitializeScrollX");
+			foundCol = worksheet._findColUnderCursor(mmToPt(x + w), true);
+		}
+
+		// выход за границу снизу
+		var foundRow = worksheet._findRowUnderCursor(mmToPt(y + h), true);
+		while ( foundRow == null ) {
+			worksheet.expandRowsOnScroll(true);
+			worksheet._trigger("reinitializeScrollY");
+			foundRow = worksheet._findRowUnderCursor(mmToPt(y + h), true);
+		}
+		
+		return response;
 	}
 	
 	//-----------------------------------------------------------------------------------
