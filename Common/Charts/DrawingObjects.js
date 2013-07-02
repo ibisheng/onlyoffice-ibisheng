@@ -3803,6 +3803,7 @@ function DrawingObjects() {
 		var obj = _this.createDrawingObject();
 		obj.id = generateId();
 		obj.graphicObject = graphic;
+        graphic.setDrawingBase(obj);
 		obj.graphicObject.select(_this.controller);
 		aObjects.push(obj);
 		_this.showDrawingObjects(false);
@@ -3818,6 +3819,7 @@ function DrawingObjects() {
 				var obj = _this.createDrawingObject();
 				obj.id = generateId();
 				obj.graphicObject = aGraphics[i];
+                aGraphics[i].setDrawingBase(obj);
 				obj.graphicObject.select(_this.controller);
 				aSingleObjects.push(obj);
 			}
