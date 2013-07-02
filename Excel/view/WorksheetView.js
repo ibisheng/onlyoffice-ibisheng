@@ -4861,7 +4861,7 @@
 				this.cellCommentator.updateCommentPosition();
 				this.autoFilters.drawAutoF(this);
 				this.drawDepCells();
-				this.objectRender.showDrawingObjects(false);
+				this.objectRender.showDrawingObjects(true);
 				return this;
 			},
 
@@ -4915,7 +4915,7 @@
 				this._updateHyperlinksCache();
 				this.autoFilters.drawAutoF(this);
 				this.drawDepCells();
-				this.objectRender.showDrawingObjects(false);
+				this.objectRender.showDrawingObjects(true);
 				return this;
 			},
 			

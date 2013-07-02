@@ -3371,12 +3371,20 @@ function DrawingObjects() {
 			false - наезд на хидеры
 		*/
 		
-		var top = worksheet.getCellTop(0, 3);
-		var left = worksheet.getCellLeft(0, 3);
+		var response = { result: true, x: 0, y: 0 };
+		
+		var top = worksheet.getCellTop(0, 3) + pxToMm(1);
+		var left = worksheet.getCellLeft(0, 3) + pxToMm(1);
 		
 		// выход за границу слева или сверху
-		if ( (y < top) || (x < left) )
-			return false;
+		if ( y < top ) {
+			response.result = false;
+			response.y = top - y;
+		}
+		if ( x < left ) {
+			response.result = false;
+			response.x = left - x;
+		}
 		
 		// выход за границу справа
 		var foundCol = worksheet._findColUnderCursor(mmToPt(x + w), true);
@@ -3394,7 +3402,7 @@ function DrawingObjects() {
 			foundRow = worksheet._findRowUnderCursor(mmToPt(y + h), true);
 		}
 		
-		return true;
+		return response;
 	}
 	
 	_this.addGraphicGroup = function() {
