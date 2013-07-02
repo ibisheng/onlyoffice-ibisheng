@@ -2567,4 +2567,16 @@
             $(this).css("border", "0px solid #000");
         }
     );
+	
+	$("#td_group").click(
+        function() {
+			api.asc_groupGraphicsObjects();
+        }
+    );
+	
+	$("#td_ungroup").click(
+        function() {
+			api.asc_unGroupGraphicsObjects();
+        }
+    );
 });

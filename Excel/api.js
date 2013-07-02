@@ -2071,6 +2071,15 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.isStartAddShape = false;
 			},
 			
+			asc_groupGraphicsObjects: function() {
+				var ws = this.wb.getWorksheet();
+				ws.objectRender.addGraphicGroup();
+			},
+			
+			asc_unGroupGraphicsObjects: function() {
+				var ws = this.wb.getWorksheet();
+			},
+			
 			// Cell interface
 			asc_getCellInfo: function (bExt) {
 				return this.wb.getWorksheet().getSelectionInfo(!!bExt);
@@ -2820,6 +2829,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		// Shapes
 		prot["asc_startAddShape"] = prot.asc_startAddShape;
 		prot["asc_endAddShape"] = prot.asc_endAddShape;
+		prot["asc_groupGraphicsObjects"] = prot.asc_groupGraphicsObjects;
+		prot["asc_unGroupGraphicsObjects"] = prot.asc_unGroupGraphicsObjects;
 
 		// Cell interface
 		prot["asc_getCellInfo"] = prot.asc_getCellInfo;

@@ -304,16 +304,6 @@
 	width: 16px;
 }
 
-.FixedArea
-{
-	background: url(../img/Table_Merge.png) no-repeat scroll 0 0 transparent;	
-}
-
-.FixedAreaClean
-{
-	background: url(../img/Table_MergeDisable.png) no-repeat scroll 0 0 transparent;	
-}
-
 .ToolbarIconAsc {
 	background: url(../img/toolbar-btns.png) no-repeat scroll 0 0 transparent;
 	width: 20px;
@@ -982,10 +972,14 @@ input, textarea {outline:none;}
 	background-position: 0px 0px;
 }
 
-.menuChartFont {
-	cursor: pointer;
-}
+.FixedArea { background: url(../img/Table_Merge.png) no-repeat scroll 0 0 transparent); }
 
-.ToolbarAddShape{
-	background: url("../img/drawing-16.png") no-repeat scroll 0 0 transparent;
-}
+.FixedAreaClean { background: url(../img/Table_MergeDisable.png) no-repeat scroll 0 0 transparent; }
+
+.menuChartFont { cursor: pointer; }
+
+.ToolbarAddShape { background: url("../img/drawing-16.png") no-repeat scroll 0 0 transparent; }
+
+.ToolbarShapeGroup { background: url("../img/group.png") no-repeat scroll 0 0 transparent; }
+
+.ToolbarShapeUnGroup { background: url("../img/ungroup.png") no-repeat scroll 0 0 transparent; }
