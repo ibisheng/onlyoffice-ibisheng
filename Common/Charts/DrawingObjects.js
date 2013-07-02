@@ -2023,6 +2023,7 @@ function DrawingObjects() {
 	var overlayCtx = null;
 	var shapeCtx = null;
 	var shapeOverlayCtx = null;
+	var autoShapeTrack = null;
 	
 	var aObjects = null;
 	var minImageWidth = 20;
@@ -2054,7 +2055,9 @@ function DrawingObjects() {
 		overlayCtx = currentSheet.overlayCtx;
 		shapeCtx = currentSheet.shapeCtx;
 		shapeOverlayCtx = currentSheet.shapeOverlayCtx;
-		
+		autoShapeTrack = new CAutoshapeTrack();
+		autoShapeTrack.init( shapeOverlayCtx, 0, 0, shapeOverlayCtx.m_dWidthMM, shapeOverlayCtx.m_dHeightMM, shapeOverlayCtx.m_lWidthPix , shapeOverlayCtx.m_lHeightPix );
+				
 		isViewerMode =  function() { return worksheet._trigger("getViewerMode"); };
 
 		aObjects = [];
@@ -3879,6 +3882,11 @@ function DrawingObjects() {
 		}
 		
 		return response;
+	}
+	
+	_this.selectGraphicObject = function() {
+		if ( autoShapeTrack )
+			_this.controller.drawSelection(autoShapeTrack);
 	}
 	
 	//-----------------------------------------------------------------------------------
