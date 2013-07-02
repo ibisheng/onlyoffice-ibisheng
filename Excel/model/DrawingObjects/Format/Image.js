@@ -284,9 +284,9 @@ CImage.prototype =
     getFullFlipV: function()
     {
         if(!isRealObject(this.group))
-            return this.flipH;
+            return this.flipV;
         else
-            return this.group.getFullFlipH() ? !this.flipH : this.flipH;
+            return this.group.getFullFlipV() ? !this.flipV : this.flipV;
     },
 
     setGroup: function(group)
@@ -452,6 +452,17 @@ CImage.prototype =
     {
         return new RotateTrackShapeImageInGroup(this);
     },
+
+    createResizeInGroupTrack: function(cardDirection)
+    {
+        return new ResizeTrackShapeImageInGroup(this, cardDirection);
+    },
+
+    createMoveInGroupTrack: function()
+    {
+        return new MoveShapeImageInGroupTrack(this);
+    },
+
 
     getRotateAngle: function(x, y)
     {

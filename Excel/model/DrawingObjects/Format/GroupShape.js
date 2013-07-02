@@ -167,9 +167,9 @@ CGroupShape.prototypr =
     getFullFlipV: function()
     {
         if(!isRealObject(this.group))
-            return this.flipH;
+            return this.flipV;
         else
-            return this.group.getFullFlipH() ? !this.flipH : this.flipH;
+            return this.group.getFullFlipV() ? !this.flipV : this.flipV;
     },
 
     getFullRotate: function()

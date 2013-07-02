@@ -380,8 +380,8 @@ CShape.prototype =
     getFullFlipV: function()
     {
         if(!isRealObject(this.group))
-            return this.flipH;
-        return this.group.getFullFlipH() ? !this.flipH : this.flipH;
+            return this.flipV;
+        return this.group.getFullFlipV() ? !this.flipV : this.flipV;
     },
 
     getAspect: function(num)
@@ -521,7 +521,12 @@ CShape.prototype =
 
         v2_x = rot_x_t - xc_t;
         v2_y = rot_y_t - yc_t;
-        return  rel_x > this.extX*0.5 ? Math.atan2( Math.abs(v1_x*v2_y - v1_y*v2_x), v1_x*v2_x + v1_y*v2_y) : -Math.atan2( Math.abs(v1_x*v2_y - v1_y*v2_x), v1_x*v2_x + v1_y*v2_y);
+
+        var flip_h = this.getFullFlipH();
+        var flip_v = this.getFullFlipV();
+        var same_flip = flip_h && flip_v || !flip_h && !flip_v;
+        var angle =  rel_x > this.extX*0.5 ? Math.atan2( Math.abs(v1_x*v2_y - v1_y*v2_x), v1_x*v2_x + v1_y*v2_y) : -Math.atan2( Math.abs(v1_x*v2_y - v1_y*v2_x), v1_x*v2_x + v1_y*v2_y);
+        return same_flip ? angle : -angle;
     },
 
 
@@ -558,8 +563,6 @@ CShape.prototype =
     {
 
     },
-
-
 
     transformPointRelativeShape: function(x, y)
     {
@@ -751,6 +754,11 @@ CShape.prototype =
     createResizeInGroupTrack: function(cardDirection)
     {
         return new ResizeTrackShapeImageInGroup(this, cardDirection);
+    },
+
+    createMoveInGroupTrack: function()
+    {
+        return new MoveShapeImageInGroupTrack(this);
     }
 
 };
