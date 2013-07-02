@@ -237,8 +237,8 @@ CShape.prototype =
         else
         {
             var scale_scale_coefficients = this.group.getResultScaleCoefficients();
-            this.x = scale_scale_coefficients.cx*(xfrm.offX - this.group.xfrm.chOffX);
-            this.y = scale_scale_coefficients.cy*(xfrm.offY - this.group.xfrm.chOffY);
+            this.x = scale_scale_coefficients.cx*(xfrm.offX - this.group.spPr.xfrm.chOffX);
+            this.y = scale_scale_coefficients.cy*(xfrm.offY - this.group.spPr.xfrm.chOffY);
             this.extX = scale_scale_coefficients.cx*xfrm.extX;
             this.extY = scale_scale_coefficients.cy*xfrm.extY;
             this.rot = isRealNumber(xfrm.rot) ? xfrm.rot : 0;
@@ -358,14 +358,20 @@ CShape.prototype =
     getTransform: function()
     {
         if(this.recalcInfo.recalculateTransform)
+        {
             this.recalculateTransform();
+            this.recalcInfo.recalculateTransform = false;
+        }
         return this.transform;
     },
 
     getInvertTransform: function()
     {
         if(this.recalcInfo.recalculateTransform)
+        {
             this.recalculateTransform();
+            this.recalcInfo.recalculateTransform = false;
+        }
         return this.invertTransform;
     },
 
@@ -476,26 +482,29 @@ CShape.prototype =
         var cx, cy;
         cx= this.extX > 0 ? this.extX : 0.01;
         cy= this.extY > 0 ? this.extY : 0.01;
-        var p = this.transformPointRelativeShape(x, y);
+
+        var invert_transform = this.getInvertTransform();
+        var t_x = invert_transform.TransformPointX(x, y);
+        var t_y = invert_transform.TransformPointY(x, y);
 
         switch(numHandle)
         {
             case 0:
-                return {kd1: (cx-p.x)/cx, kd2: (cy-p.y)/cy};
+                return {kd1: (cx-t_x)/cx, kd2: (cy-t_y)/cy};
             case 1:
-                return {kd1: (cy-p.y)/cy, kd2: 0};
+                return {kd1: (cy-t_y)/cy, kd2: 0};
             case 2:
-                return {kd1: (cy-p.y)/cy, kd2: p.x/cx};
+                return {kd1: (cy-t_y)/cy, kd2: t_x/cx};
             case 3:
-                return {kd1: p.x/cx, kd2: 0};
+                return {kd1: t_x/cx, kd2: 0};
             case 4:
-                return {kd1: p.x/cx, kd2: p.y/cy};
+                return {kd1: t_x/cx, kd2: t_y/cy};
             case 5:
-                return {kd1: p.y/cy, kd2: 0};
+                return {kd1: t_y/cy, kd2: 0};
             case 6:
-                return {kd1: p.y/cy, kd2:(cx-p.x)/cx};
+                return {kd1: t_y/cy, kd2:(cx-t_x)/cx};
             case 7:
-                return {kd1:(cx-p.x)/cx, kd2: 0};
+                return {kd1:(cx-t_x)/cx, kd2: 0};
         }
         return {kd1: 1, kd2: 1};
     },
@@ -580,10 +589,10 @@ CShape.prototype =
         var _relative_y = -_temp_x*_sin + _temp_y*_cos;
 
         if(this.absFlipH)
-            _relative_x = this.absExtX - _relative_x;
+            _relative_x = this.extX - _relative_x;
 
         if(this.absFlipV)
-            _relative_y = this.absExtY - _relative_y;
+            _relative_y = this.extY - _relative_y;
 
         return {x: _relative_x, y: _relative_y};
     },

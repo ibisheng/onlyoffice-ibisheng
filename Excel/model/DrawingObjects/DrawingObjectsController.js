@@ -133,6 +133,7 @@ DrawingObjectsController.prototype =
         if(grouped_objects.length < 2)
             return null;
 
+        this.resetSelection();
         var max_x, min_x, max_y, min_y;
         var bounds = grouped_objects[0].getBoundsInGroup();
         max_x = bounds.maxX;
@@ -157,10 +158,12 @@ DrawingObjectsController.prototype =
         group.setChildExtents(max_x - min_x, max_y - min_y);
         for(i = 0; i < grouped_objects.length; ++i)
         {
-            grouped_objects[i].setPosition(grouped_objects[i].x - min_x, grouped_objects.y - min_y);
+            grouped_objects[i].setPosition(grouped_objects[i].x - min_x, grouped_objects[i].y - min_y);
+            grouped_objects[i].setGroup(group);
             group.addToSpTree(grouped_objects[i]);
         }
         group.recalculate();
+        group.select(this);
         return group;
     },
 

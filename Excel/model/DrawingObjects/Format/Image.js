@@ -176,8 +176,8 @@ CImage.prototype =
         else
         {
             var scale_scale_coefficients = this.group.getResultScaleCoefficients();
-            this.x = scale_scale_coefficients.cx*(xfrm.offX - this.group.xfrm.chOffX);
-            this.y = scale_scale_coefficients.cy*(xfrm.offY - this.group.xfrm.chOffY);
+            this.x = scale_scale_coefficients.cx*(xfrm.offX - this.group.spPr.xfrm.chOffX);
+            this.y = scale_scale_coefficients.cy*(xfrm.offY - this.group.spPr.xfrm.chOffY);
             this.extX = scale_scale_coefficients.cx*xfrm.extX;
             this.extY = scale_scale_coefficients.cy*xfrm.extY;
             this.rot = isRealNumber(xfrm.rot) ? xfrm.rot : 0;
@@ -205,14 +205,20 @@ CImage.prototype =
     getTransform: function()
     {
         if(this.recalcInfo.recalculateTransform)
+        {
             this.recalculateTransform();
+            this.recalcInfo.recalculateTransform = false;
+        }
         return this.transform;
     },
 
     getInvertTransform: function()
     {
         if(this.recalcInfo.recalculateTransform)
+        {
             this.recalculateTransform();
+            this.recalcInfo.recalculateTransform = false;
+        }
         return this.invertTransform;
     },
 

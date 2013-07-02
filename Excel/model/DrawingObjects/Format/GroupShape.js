@@ -35,7 +35,7 @@ function CGroupShape(drawingBase, drawingObjects)
     this.rot = null;
     this.flipH = null;
     this.flipV = null;
-    this.transform = null;
+    this.transform = new CMatrix();
     this.invertTransform = null;
     this.transformText = null;
     this.invertTransformText = null;
@@ -48,7 +48,7 @@ function CGroupShape(drawingBase, drawingObjects)
 
 }
 
-CGroupShape.prototypr =
+CGroupShape.prototype =
 {
     isShape: function()
     {
@@ -260,8 +260,8 @@ CGroupShape.prototypr =
         else
         {
             var scale_scale_coefficients = this.group.getResultScaleCoefficients();
-            this.x = scale_scale_coefficients.cx*(xfrm.offX - this.group.xfrm.chOffX);
-            this.y = scale_scale_coefficients.cy*(xfrm.offY - this.group.xfrm.chOffY);
+            this.x = scale_scale_coefficients.cx*(xfrm.offX - this.group.spPr.xfrm.chOffX);
+            this.y = scale_scale_coefficients.cy*(xfrm.offY - this.group.spPr.xfrm.chOffY);
             this.extX = scale_scale_coefficients.cx*xfrm.extX;
             this.extY = scale_scale_coefficients.cy*xfrm.extY;
             this.rot = isRealNumber(xfrm.rot) ? xfrm.rot : 0;
@@ -289,7 +289,7 @@ CGroupShape.prototypr =
         this.invertTransform = global_MatrixTransformer.Invert(this.transform);
         for(var i = 0; i < this.spTree.length; ++i)
         {
-            this.spTree.recalculateTransform();
+            this.spTree[i].recalculateTransform();
         }
     },
 
@@ -320,14 +320,81 @@ CGroupShape.prototypr =
         var x_t = invert_transform.TransformPointX(x, y);
         var y_t = invert_transform.TransformPointY(x, y);
 
-        var _hit_context = this.drawingDocument.CanvasHitContext;
+        var _hit_context = this.drawingObjects.getCanvasContext();
 
         return (HitInLine(_hit_context, x_t, y_t, 0, 0, this.extX, 0) ||
             HitInLine(_hit_context, x_t, y_t, this.extX, 0, this.extX, this.extY)||
             HitInLine(_hit_context, x_t, y_t, this.extX, this.extY, 0, this.extY)||
-            HitInLine(_hit_context, x_t, y_t, 0, this.extY, 0, 0) ||
-            HitInLine(_hit_context, x_t, y_t, this.extX*0.5, 0, this.extX*0.5, -this.drawingDocument.GetMMPerDot(TRACK_DISTANCE_ROTATE)));
+            HitInLine(_hit_context, x_t, y_t, 0, this.extY, 0, 0) /*||
+         HitInLine(_hit_context, x_t, y_t, this.extX*0.5, 0, this.extX*0.5, -this.drawingDocument.GetMMPerDot(TRACK_DISTANCE_ROTATE))*/);
     },
+
+    hitToAdjustment: function()
+    {
+        return {hit: false};
+    },
+
+    hitToHandles: function(x, y)
+    {
+        var invert_transform = this.getInvertTransform();
+        var t_x, t_y;
+        t_x = invert_transform.TransformPointX(x, y);
+        t_y = invert_transform.TransformPointY(x, y);
+        var radius = 5;/*TODO*/
+
+        var sqr_x = t_x*t_y, sqr_y = t_y*t_y;
+        if(Math.sqrt(sqr_x + sqr_y) < radius)
+            return 0;
+
+        var hc = this.extX*0.5;
+        var dist_x = t_x - hc;
+        sqr_x = dist_x*dist_x;
+        if(Math.sqrt(sqr_x + sqr_y) < radius)
+            return 1;
+
+        dist_x = t_x - this.extX;
+        sqr_x = dist_x*dist_x;
+        if(Math.sqrt(sqr_x + sqr_y) < radius)
+            return 2;
+
+        var vc = this.extY*0.5;
+        var dist_y = t_y - vc;
+        sqr_y = dist_y*dist_y;
+        if(Math.sqrt(sqr_x + sqr_y) < radius)
+            return 3;
+
+        dist_y = t_y - this.extY;
+        sqr_y = dist_y*dist_y;
+        if(Math.sqrt(sqr_x + sqr_y) < radius)
+            return 4;
+
+        dist_x = t_x - hc;
+        sqr_x = dist_x*dist_x;
+        if(Math.sqrt(sqr_x + sqr_y) < radius)
+            return 5;
+
+        dist_x = t_x;
+        sqr_x = dist_x*dist_x;
+        if(Math.sqrt(sqr_x + sqr_y) < radius)
+            return 6;
+
+        dist_y = t_y - vc;
+        sqr_y = dist_y*dist_y;
+        if(Math.sqrt(sqr_x + sqr_y) < radius)
+            return 7;
+
+        var rotate_distance = 10;/*TODO*/
+        dist_y = t_y + rotate_distance;
+        sqr_y = dist_y*dist_y;
+        dist_x = t_x - hc;
+        sqr_x = dist_x*dist_x;
+        if(Math.sqrt(sqr_x + sqr_y) < radius)
+            return 8;
+
+        return -1;
+
+    },
+
 
     drawAdjustments: function(drawingDocument)
     {
@@ -335,8 +402,8 @@ CGroupShape.prototypr =
 
     getTransform: function()
     {
-        if(this.recalcInfo.recalculateTransform)
-            this.recalculateTransform();
+        //if(this.recalcInfo.recalculateTransform)
+         //   this.recalculateTransform();
         return this.transform;
     },
 
@@ -345,5 +412,40 @@ CGroupShape.prototypr =
         if(this.recalcInfo.recalculateTransform)
             this.recalculateTransform();
         return this.invertTransform;
+    } ,
+
+    select: function(drawingObjectsController)
+    {
+        this.selected = true;
+        var selected_objects;
+        if(!isRealObject(this.group))
+            selected_objects = drawingObjectsController.selectedObjects;
+        else
+            selected_objects = this.group.getMainGroup().selectedObjects;
+        for(var i = 0; i < selected_objects.length; ++i)
+        {
+            if(selected_objects[i] === this)
+                break;
+        }
+        if(i === selected_objects.length)
+            selected_objects.push(this);
+    },
+
+    deselect: function(drawingObjectsController)
+    {
+        this.selected = false;
+        var selected_objects;
+        if(!isRealObject(this.group))
+            selected_objects = drawingObjectsController.selectedObjects;
+        else
+            selected_objects = this.group.getMainGroup().selectedObjects;
+        for(var i = 0; i < selected_objects.length; ++i)
+        {
+            if(selected_objects[i] === this)
+            {
+                selected_objects.splice(i, 1);
+                break;
+            }
+        }
     }
 };
