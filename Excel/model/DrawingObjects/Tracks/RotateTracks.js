@@ -96,7 +96,7 @@ function RotateTrackShapeImage(originalObject)
         if(Math.abs(new_rot-1.5*Math.PI) < MIN_ANGLE)
             new_rot = 1.5*Math.PI;
 
-        if(e.ShiftKey)
+        if(e.shiftKey)
             new_rot = (Math.PI/12)*Math.floor(12*new_rot/(Math.PI));
         this.angle = new_rot;
 
@@ -115,6 +115,7 @@ function RotateTrackShapeImage(originalObject)
 
     this.trackEnd = function()
     {
-        this.originalObject.setRotate(this.angle)
+        this.originalObject.setRotate(this.angle);
+        this.originalObject.recalculateTransform();
     }
 }

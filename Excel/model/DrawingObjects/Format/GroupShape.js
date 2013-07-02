@@ -76,6 +76,12 @@ CGroupShape.prototypr =
     },
 
 
+    updateDrawingBaseCoordinates: function()
+    {
+        if(isRealObject(this.drawingBase))
+            this.drawingBase.setGraphicObjectCoords();
+    },
+
     setGroup: function(group)
     {
         this.group = group;

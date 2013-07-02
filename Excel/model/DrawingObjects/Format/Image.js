@@ -137,6 +137,12 @@ CImage.prototype =
         this.spPr.xfrm.rot = rot;
     },
 
+    updateDrawingBaseCoordinates: function()
+    {
+        if(isRealObject(this.drawingBase))
+            this.drawingBase.setGraphicObjectCoords();
+    },
+
     setImageId: function(imageId)
     {
         this.blipFill.RasterImageId = imageId;

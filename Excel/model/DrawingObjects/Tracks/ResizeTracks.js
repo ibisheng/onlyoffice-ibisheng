@@ -586,6 +586,10 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
 
     this.trackEnd = function()
     {
-        //TODO
+        this.originalObject.setPosition(this.resizedPosX, this.resizedPosY);
+        this.originalObject.setExtents(this.resizedExtX, this.resizedExtY);
+        this.originalObject.setFlips(this.resizedflipH, this.resizedflipV);
+        this.originalObject.recalculateTransform();
+        this.originalObject.updateDrawingBaseCoordinates();
     };
 }

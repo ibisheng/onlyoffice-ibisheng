@@ -24,8 +24,6 @@ function CShape(drawingBase)
 
     this.x = null;
     this.y = null;
-    this.x = null;
-    this.y = null;
     this.extX = null;
     this.extY = null;
     this.rot = null;
@@ -104,6 +102,12 @@ CShape.prototype =
     {
         this.spPr.xfrm.offX = x;
         this.spPr.xfrm.offY = y;
+    },
+
+    updateDrawingBaseCoordinates: function()
+    {
+        if(isRealObject(this.drawingBase))
+            this.drawingBase.setGraphicObjectCoords();
     },
 
     setExtents: function(extX, extY)
@@ -318,6 +322,14 @@ CShape.prototype =
         this.pen = _calculated_line;
     },
 
+    recalculateGeometry: function()
+    {
+        if(isRealObject(this.spPr.geometry))
+        {
+            this.spPr.geometry.Recalculate(this.extX, this.extY);
+        }
+    },
+
     draw: function(graphics)
     {
         graphics.SetIntegerGrid(false);
@@ -463,10 +475,6 @@ CShape.prototype =
 
     getRotateAngle: function(x, y)
     {
-
-
-
-
         var transform = this.getTransform();
         var rotate_distance = 5;/*TODO*/
         var hc = this.extX*0.5;

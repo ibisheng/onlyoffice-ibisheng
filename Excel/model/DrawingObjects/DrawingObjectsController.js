@@ -44,6 +44,12 @@ DrawingObjectsController.prototype =
         this.changeCurrentState(new NullState(this, this.drawingObjects));
     },
 
+    resetSelection: function()
+    {
+        while(this.selectedObjects.length > 0)
+            this.selectedObjects[0].deselect(this);
+    },
+
     clearPreTrackObjects: function()
     {
         this.arrPreTrackObjects.length = 0;
@@ -105,6 +111,7 @@ DrawingObjectsController.prototype =
     {
         for(var i = 0; i < this.arrTrackObjects.length; ++i)
             this.arrTrackObjects[i].trackEnd();
+        this.drawingObjects.showDrawingObjects(true);
     },
 
     startTrackNewShape: function(presetGeom)

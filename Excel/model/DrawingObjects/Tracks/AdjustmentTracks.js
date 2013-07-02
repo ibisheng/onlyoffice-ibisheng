@@ -166,6 +166,7 @@ function XYAdjustmentTrack(originalShape, adjIndex)
     this.trackEnd = function()
     {
         this.originalShape.setAdjustmentValue(this.refX, this.geometry.gdLst[this.adjastment.gdRefX], this.refY, this.geometry.gdLst[this.adjastment.gdRefY]);
+        this.originalShape.recalculateGeometry();
     };
 
 }
