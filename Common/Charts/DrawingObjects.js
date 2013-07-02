@@ -3826,6 +3826,7 @@ function DrawingObjects() {
 				obj.graphicObject = group;
 				aObjects.push(obj);
 				_this.showDrawingObjects(false);
+                _this.selectGraphicObject();
 			}
 		}
 	}
