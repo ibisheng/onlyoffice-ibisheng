@@ -810,7 +810,8 @@ var c_oSer_ChartSeriesType =
 	xVal: 4,
 	TxRef: 5,
 	Index: 6,
-	Order: 7
+	Order: 7,
+	DataLabels: 8
 };
 /** @enum */
 var c_oSer_ChartSeriesMarkerType =
@@ -1621,9 +1622,12 @@ function Binary_ChartReader(stream, chart)
 		}
 		else if ( c_oSer_BasicChartType.DataLabels === type )
 		{
+			var oOutput = {ShowVal: null, TxPrPptx: null};
 			res = this.bcr.Read2Spreadsheet(length, function(t,l){
-					return oThis.ReadDataLabels(t,l);
+					return oThis.ReadDataLabels(t,l, oOutput);
 				});
+			if(null != oOutput.ShowVal)
+				this.chart.bShowValue = oOutput.ShowVal;
 		}
 		else
             res = c_oSerConstants.ReadUnknown;
@@ -1695,6 +1699,15 @@ function Binary_ChartReader(stream, chart)
 		{
             this.stream.GetULongLE();
 		}
+		else if ( c_oSer_ChartSeriesType.DataLabels === type )
+		{
+			var oOutput = {ShowVal: null, TxPrPptx: null};
+            res = this.bcr.Read2Spreadsheet(length, function(t,l){
+					return oThis.ReadDataLabels(t,l, oOutput);
+				});
+			if(null != oOutput.TxPrPptx && null != oOutput.TxPrPptx.font)
+				seria.LabelFont = oOutput.TxPrPptx.font;
+		}
 		else
             res = c_oSerConstants.ReadUnknown;
 		return res;
@@ -1737,17 +1750,17 @@ function Binary_ChartReader(stream, chart)
             res = c_oSerConstants.ReadUnknown;
 		return res;
 	};
-	this.ReadDataLabels = function(type, length)
+	this.ReadDataLabels = function(type, length, oOutput)
 	{
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
         if ( c_oSer_ChartSeriesDataLabelsType.ShowVal === type )
-			this.chart.bShowValue = this.stream.GetBool();
+			oOutput.ShowVal = this.stream.GetBool();
 		else if ( c_oSer_ChartSeriesDataLabelsType.TxPrPptx === type )
 		{
 			var oPresentationSimpleSerializer = new PresentationSimpleSerializer();
 			var textBody = oPresentationSimpleSerializer.ReadTextBody(this.stream);
-			//this.ParsePptxParagraph(textBody);
+			oOutput.TxPrPptx = this.ParsePptxParagraph(textBody);
 		}
 		else
             res = c_oSerConstants.ReadUnknown;
