@@ -238,6 +238,8 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
 
     this.trackEnd = function()
     {
-        this.drawingOjects.addGraphicObject(this.x, this.y, this.extX, this.extY, false, false, this.presetGeom)
+        var shape = new CShape(null, this.drawingOjects);
+        shape.initDefault(this.x, this.y, this.extX, this.extY, false, false, this.presetGeom);
+        this.drawingOjects.addGraphicObject(shape);
     };
 }

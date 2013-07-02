@@ -76,6 +76,11 @@ CGroupShape.prototypr =
         return false;
     },
 
+    setDrawingBase: function(drawingBase)
+    {
+        this.drawingBase = drawingBase;
+    },
+
     setPosition: function(x, y)
     {
         this.spPr.xfrm.offX = x;

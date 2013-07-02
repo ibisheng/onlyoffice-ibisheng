@@ -5,9 +5,10 @@
  * Time: 6:09 PM
  * To change this template use File | Settings | File Templates.
  */
-function CShape(drawingBase)
+function CShape(drawingBase, drawingObjects)
 {
     this.drawingBase = drawingBase;
+    this.drawingObjects = drawingObjects;
     this.nvSpPr = null;
     this.spPr = new CSpPr();
     this.style = null;
@@ -86,6 +87,11 @@ CShape.prototype =
     setGroup: function(group)
     {
         this.group = group;
+    },
+
+    setDrawingBase: function(drawingBase)
+    {
+        this.drawingBase = drawingBase;
     },
 
     recalculate: function()
@@ -263,7 +269,7 @@ CShape.prototype =
     recalculateBrush: function()
     {
         var brush;
-        var wb = this.drawingBase.getWorkbook();
+        var wb = this.drawingObjects.getWorkbook();
 
         var theme = wb.theme;
         var colorMap = GenerateDefaultColorMap().color_map;
@@ -295,7 +301,7 @@ CShape.prototype =
     recalculatePen: function()
     {
         var _calculated_line;
-        var _theme = this.drawingBase.getWorkbook().theme;
+        var _theme = this.drawingObjects.getWorkbook().theme;
         var colorMap = GenerateDefaultColorMap().color_map;
         var RGBA = {R: 0, G: 0, B: 0, A: 255};
         if(_theme !== null && typeof _theme === "object" && typeof _theme.getLnStyle === "function"
@@ -662,7 +668,7 @@ CShape.prototype =
         var x_t = invert_transform.TransformPointX(x, y);
         var y_t = invert_transform.TransformPointY(x, y);
         if(isRealObject(this.spPr.geometry))
-            return this.spPr.geometry.hitInPath(this.drawingBase.getCanvasContext(), x_t, y_t);
+            return this.spPr.geometry.hitInPath(this.drawingObjects.getCanvasContext(), x_t, y_t);
         return false;
     },
 
@@ -672,7 +678,7 @@ CShape.prototype =
         var x_t = invert_transform.TransformPointX(x, y);
         var y_t = invert_transform.TransformPointY(x, y);
         if(isRealObject(this.spPr.geometry))
-            return this.spPr.geometry.hitInInnerArea(this.drawingBase.getCanvasContext(), x_t, y_t);
+            return this.spPr.geometry.hitInInnerArea(this.drawingObjects.getCanvasContext(), x_t, y_t);
         return x_t > 0 && x_t < this.extX && y_t > 0 && y_t < this.extY;
     },
 
@@ -687,7 +693,7 @@ CShape.prototype =
         var x_t = invert_transform.TransformPointX(x, y);
         var y_t = invert_transform.TransformPointY(x, y);
 
-        var _hit_context = this.drawingBase.getCanvasContext();
+        var _hit_context = this.drawingObjects.getCanvasContext();
 
         return (HitInLine(_hit_context, x_t, y_t, 0, 0, this.extX, 0) ||
             HitInLine(_hit_context, x_t, y_t, this.extX, 0, this.extX, this.extY)||

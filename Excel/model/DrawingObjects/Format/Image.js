@@ -34,9 +34,10 @@ function isRealNumber(number)
     return number === number && typeof number === "number";
 }
 
-function CImage(drawingBase)
+function CImage(drawingBase, drawingObjects)
 {
     this.drawingBase = drawingBase;
+    this.drawingObjects = drawingObjects;
 
     this.blipFill = new CBlipFill();
     this.spPr = new CSpPr();
@@ -107,6 +108,11 @@ CImage.prototype =
         this.setImageId(imageId);
         this.setPresetGeometry("rect");
         this.recalculate();
+    },
+
+    setDrawingBase: function(drawingBase)
+    {
+        this.drawingBase = drawingBase;
     },
 
     setPresetGeometry: function(preset)
