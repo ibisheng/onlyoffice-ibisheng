@@ -3816,6 +3816,18 @@ function DrawingObjects() {
 	}
 	
 	_this.addGraphicGroup = function() {
+	
+		if ( _this.controller.canGroup() ) {
+			
+			var obj = _this.createDrawingObject();
+			obj.id = generateId();
+			var group = _this.controller.createGroup(obj);
+			if ( group ) {
+				obj.graphicObject = group;
+				aObjects.push(obj);
+				_this.showDrawingObjects(false);
+			}
+		}
 	}
 	
 	_this.insertUngroupedObjects = function(idGroup, aGraphics) {
