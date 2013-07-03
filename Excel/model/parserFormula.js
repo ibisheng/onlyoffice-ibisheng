@@ -57,6 +57,34 @@ Date.prototype.getDaysInMonth.R = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 3
 // durations of months for the leap year
 Date.prototype.getDaysInMonth.L = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
+Date.prototype.getExcelDate = function(){
+    return Math.floor( ( this.getTime()/1000 - this.getTimezoneOffset()*60 )/c_sPerDay+( c_DateCorrectConst + (g_bDate1904?0:1) ) )
+}
+
+Date.prototype.getDateFromExcel = function(val){
+    if(!g_bDate1904){
+        if( val < 60 )
+           return new Date((val-c_DateCorrectConst)*c_msPerDay);
+        else if( val == 60 )
+            return new Date((val-c_DateCorrectConst-1)*c_msPerDay);
+        else
+            return new Date((val-c_DateCorrectConst-1)*c_msPerDay);
+    }
+    else
+        return new Date((val-c_DateCorrectConst)*c_msPerDay);
+}
+
+Date.prototype.addYears = function(counts){
+    this.setYear(this.getFullYear()+counts);
+}
+
+Date.prototype.addMonths = function(counts){
+    this.setMonth(this.getMonth()+counts);
+}
+
+Date.prototype.addDays = function(counts){
+    this.setDate(this.getDate()+counts);
+}
 
 var _func = [];//для велосипеда а-ля перегрузка функций.
 _func[cElementType.number] = [];

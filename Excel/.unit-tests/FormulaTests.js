@@ -950,6 +950,26 @@
         ok( Math.abs(oParser.calculate().getValue() - 0.9180555555555560) < dif );
     })
 
+    test("Test: \"DAYS360\"",function(){
+
+        oParser = new parserFormula("DAYS360(DATE(2002,2,3),DATE(2005,5,31))","A2",ws);
+        ok(oParser.parse());
+        strictEqual(oParser.calculate().getValue(), 1198);
+
+        oParser = new parserFormula("DAYS360(DATE(2005,5,31),DATE(2002,2,3))","A2",ws);
+        ok(oParser.parse());
+        strictEqual(oParser.calculate().getValue(), -1197);
+
+        oParser = new parserFormula("DAYS360(DATE(2002,2,3),DATE(2005,5,31),FALSE)","A2",ws);
+        ok(oParser.parse());
+        strictEqual(oParser.calculate().getValue(), 1198);
+
+        oParser = new parserFormula("DAYS360(DATE(2002,2,3),DATE(2005,5,31),TRUE)","A2",ws);
+        ok(oParser.parse());
+        strictEqual(oParser.calculate().getValue(), 1197);
+
+    })
+
     test("Test: \"WEEKNUM\"",function(){
         oParser = new parserFormula("WEEKNUM(DATE(2006,1,1))","A2",ws);
         ok(oParser.parse());
@@ -1007,36 +1027,101 @@
         ok(oParser.parse());
         strictEqual( oParser.calculate().getValue(), 1);
 
-        oParser = new parserFormula("WEEKNUM(DATE(2008,1,4),11)","A2",ws);//вск
+        oParser = new parserFormula("WEEKNUM(DATE(2008,1,4),11)","A2",ws);
         ok(oParser.parse());
         strictEqual( oParser.calculate().getValue(), 1);
 
-        oParser = new parserFormula("WEEKNUM(DATE(2008,1,10),11)","A2",ws);//вск
+        oParser = new parserFormula("WEEKNUM(DATE(2008,1,10),11)","A2",ws);
         ok(oParser.parse());
         strictEqual( oParser.calculate().getValue(), 2);
 
-        oParser = new parserFormula("WEEKNUM(DATE(2008,1,11),11)","A2",ws);//вск
+        oParser = new parserFormula("WEEKNUM(DATE(2008,1,11),11)","A2",ws);
         ok(oParser.parse());
         strictEqual( oParser.calculate().getValue(), 2);
 
-        oParser = new parserFormula("WEEKNUM(DATE(2008,1,17),11)","A2",ws);//вск
+        oParser = new parserFormula("WEEKNUM(DATE(2008,1,17),11)","A2",ws);
         ok(oParser.parse());
         strictEqual( oParser.calculate().getValue(), 3);
 
-        oParser = new parserFormula("WEEKNUM(DATE(2008,1,18),11)","A2",ws);//вск
+        oParser = new parserFormula("WEEKNUM(DATE(2008,1,18),11)","A2",ws);
         ok(oParser.parse());
         strictEqual( oParser.calculate().getValue(), 3);
 
-        oParser = new parserFormula("WEEKNUM(DATE(2008,1,24),11)","A2",ws);//вск
+        oParser = new parserFormula("WEEKNUM(DATE(2008,1,24),11)","A2",ws);
         ok(oParser.parse());
         strictEqual( oParser.calculate().getValue(), 4);
 
-        oParser = new parserFormula("WEEKNUM(DATE(2013,1,1),21)","A2",ws);//вск
+        oParser = new parserFormula("WEEKNUM(DATE(2013,1,1),21)","A2",ws);
         ok(oParser.parse());
         strictEqual( oParser.calculate().getValue(), 1);
 
+        oParser = new parserFormula("WEEKNUM(DATE(2013,1,7))","A2",ws);
+        ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 2);
+
     })
 
+    test("Test: \"YEARFRAC\"",function(){
+        function okWrapper(a,b){
+            ok( Math.abs(a - b) < dif );
+        }
+        oParser = new parserFormula("YEARFRAC(DATE(2006,1,1),DATE(2006,3,26))","A2",ws);
+        ok(oParser.parse());
+        okWrapper( oParser.calculate().getValue(), 0.236111111);
 
+        oParser = new parserFormula("YEARFRAC(DATE(2006,3,26),DATE(2006,1,1))","A2",ws);
+        ok(oParser.parse());
+        okWrapper( oParser.calculate().getValue(), 0.236111111);
 
+        oParser = new parserFormula("YEARFRAC(DATE(2006,1,1),DATE(2006,7,1))","A2",ws);
+        ok(oParser.parse());
+        okWrapper( oParser.calculate().getValue(), 0.5);
+
+        oParser = new parserFormula("YEARFRAC(DATE(2006,1,1),DATE(2007,9,1))","A2",ws);
+        ok(oParser.parse());
+        okWrapper( oParser.calculate().getValue(), 1.666666667);
+
+        oParser = new parserFormula("YEARFRAC(DATE(2006,1,1),DATE(2006,7,1),0)","A2",ws);
+        ok(oParser.parse());
+        okWrapper( oParser.calculate().getValue(), 0.5);
+
+        oParser = new parserFormula("YEARFRAC(DATE(2006,1,1),DATE(2006,7,1),1)","A2",ws);
+        ok(oParser.parse());
+        okWrapper( oParser.calculate().getValue(), 0.495890411);
+
+        oParser = new parserFormula("YEARFRAC(DATE(2006,1,1),DATE(2006,7,1),2)","A2",ws);
+        ok(oParser.parse());
+        okWrapper( oParser.calculate().getValue(), 0.502777778);
+
+        oParser = new parserFormula("YEARFRAC(DATE(2006,1,1),DATE(2006,7,1),3)","A2",ws);
+        ok(oParser.parse());
+        okWrapper( oParser.calculate().getValue(), 0.495890411);
+
+        oParser = new parserFormula("YEARFRAC(DATE(2006,1,1),DATE(2006,7,1),4)","A2",ws);
+        ok(oParser.parse());
+        okWrapper( oParser.calculate().getValue(), 0.5);
+
+        oParser = new parserFormula("YEARFRAC(DATE(2004,3,1),DATE(2006,3,1),1)","A2",ws);
+        ok(oParser.parse());
+        okWrapper( oParser.calculate().getValue(), 1.998175182481752);
+    })
+
+    test("Test: \"DATEDIF\"",function(){
+
+        oParser = new parserFormula("DATEDIF(DATE(2001,1,1),DATE(2003,1,1),\"Y\")","A2",ws);
+        ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 2);
+
+        oParser = new parserFormula("DATEDIF(DATE(2001,6,1),DATE(2002,8,15),\"D\")","A2",ws);
+        ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 440);
+
+        oParser = new parserFormula("DATEDIF(DATE(2001,6,1),DATE(2002,8,15),\"YD\")","A2",ws);
+        ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 75);
+
+        oParser = new parserFormula("DATEDIF(DATE(2001,6,1),DATE(2002,8,15),\"MD\")","A2",ws);
+        ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 14);
+    })
 });

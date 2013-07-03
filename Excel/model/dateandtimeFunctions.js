@@ -5,9 +5,31 @@
  * Time: 13:24
  * To change this template use File | Settings | File Templates.
  */
+function GetDiffDate360( nDay1,  nMonth1,  nYear1,  bLeapYear1, nDay2,  nMonth2,  nYear2, bUSAMethod ){
+    if( nDay1 == 31 )
+        nDay1--;
+    else if( bUSAMethod && ( nMonth1 == 2 && ( nDay1 == 29 || ( nDay1 == 28 && !bLeapYear1 ) ) ) )
+        nDay1 = 30;
+
+    if( nDay2 == 31 ){
+        if( bUSAMethod && nDay1 != 30 ){
+            nDay2 = 1;
+            if( nMonth2 == 12 ){
+                nYear2++;
+                nMonth2 = 1;
+            }
+            else
+                nMonth2++;
+        }
+        else
+            nDay2 = 30;
+    }
+
+    return nDay2 + nMonth2 * 30 + nYear2 * 360 - nDay1 - nMonth1 * 30 - nYear1 * 360;
+}
 cFormulaFunction.DateAndTime = {
     'groupName' : "DateAndTime",
-        'DATE' : function(){
+    'DATE' : function(){
         var r = new cBaseFunction("DATE");
         r.setArgumentsMin(3);
         r.setArgumentsMax(3);
@@ -61,7 +83,7 @@ cFormulaFunction.DateAndTime = {
             if( month == 0 ){
                 return this.setCA(new cError( cErrorType.not_numeric ),true);
             }
-            this.value = new cNumber( Math.round( ( ( new Date(year, month - 1,  day) ).getTime()/1000 )/c_sPerDay+(c_DateCorrectConst+1) ) )
+            this.value = new cNumber( Math.round( new Date(year, month - 1,  day ).getExcelDate() ) )
             this.value.numFormat = 14;
             this.value.ca = true;
             return this.value;
@@ -76,6 +98,103 @@ cFormulaFunction.DateAndTime = {
     },
     'DATEDIF' : function(){
         var r = new cBaseFunction("DATEDIF");
+        r.setArgumentsMin(3);
+        r.setArgumentsMax(3);
+        r.Calculate = function(arg){
+            var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
+            if ( arg0 instanceof cArea || arg0 instanceof cArea3D ){
+                arg0 = arg0.cross(arguments[1].first);
+            }
+            else if( arg0 instanceof cArray ){
+                arg0 = arg0.getElementRowCol(0,0);
+            }
+
+            if ( arg1 instanceof cArea || arg1 instanceof cArea3D ){
+                arg1 = arg1.cross(arguments[1].first);
+            }
+            else if( arg1 instanceof cArray ){
+                arg1 = arg1.getElementRowCol(0,0);
+            }
+
+            if ( arg2 instanceof cArea || arg2 instanceof cArea3D ){
+                arg2 = arg2.cross(arguments[1].first);
+            }
+            else if( arg2 instanceof cArray ){
+                arg2 = arg2.getElementRowCol(0,0);
+            }
+
+            arg0 = arg0.tocNumber();
+            arg1 = arg1.tocNumber();
+            arg2 = arg2.tocString();
+
+            if( arg0 instanceof cError) return this.value = arg0;
+            if( arg1 instanceof cError) return this.value = arg1;
+            if( arg2 instanceof cError) return this.value = arg2;
+
+            var val0 = arg0.getValue(), val1 = arg1.getValue();
+
+            if(val0 < 0 || val1 < 0 || val0>=val1)
+                return this.setCA(new cError( cErrorType.not_numeric ),true);
+
+            val0 = Date.prototype.getDateFromExcel(val0);
+            val1 = Date.prototype.getDateFromExcel(val1);
+
+            function dateDiff( date1, date2 ) {
+                var years = date2.getFullYear() - date1.getFullYear();
+                var months = years * 12 + date2.getMonth() - date1.getMonth();
+                var days = date2.getDate() - date1.getDate();
+
+                years -= date2.getMonth() < date1.getMonth();
+                months -= date2.getDate() < date1.getDate();
+                days += days < 0 ? new Date( date2.getFullYear(), date2.getMonth() - 1, 0 ).getDate() + 1 : 0;
+
+                return [ years, months, days ];
+            }
+
+            switch(arg2.getValue().toUpperCase()){
+                case "Y":
+                    return this.value = new cNumber(dateDiff( val0, val1 )[0]);
+                    break;
+                case "M":
+                    return this.value = new cNumber(dateDiff( val0, val1 )[1]);
+                    break;
+                case "D":
+                    return this.value = new cNumber(parseInt((val1 - val0)/c_msPerDay));
+                    break;
+                case "MD":
+                    if( val0.getDate() > val1.getDate() ){
+                        this.value = new cNumber(Math.abs(new Date( val0.getFullYear(), val0.getMonth(), val0.getDate() ) - new Date(val0.getFullYear(), val0.getMonth()+1, val1.getDate()))/c_msPerDay);
+                    }
+                    else{
+                        this.value = new cNumber( val1.getDate() - val0.getDate() );
+                    }
+                    return this.value;
+                    break;
+                case "YM":
+                    var d = dateDiff( val0, val1 );
+                    return this.value = new cNumber( d[1] - d[0]*12  );
+                    break;
+                case "YD":
+                    if( val0.getMonth() > val1.getMonth() ){
+                        this.value = new cNumber(Math.abs(new Date( val0.getFullYear(), val0.getMonth(), val0.getDate() ) - new Date(val0.getFullYear()+1, val1.getMonth(), val1.getDate()))/c_msPerDay);
+                    }
+                    else{
+                        this.value = new cNumber( Math.abs(new Date( val0.getFullYear(), val0.getMonth(), val0.getDate() ) - new Date(val0.getFullYear(), val1.getMonth(), val1.getDate()))/c_msPerDay);
+                    }
+                    return this.value;
+                    break;
+                default:
+                    return this.value = new cError(cErrorType.not_numeric)
+            }
+
+        }
+        r.getInfo = function(){
+            return {
+                name:this.name,
+                args:"( start-date , end-date , unit )"
+            };
+        }
+        r.setFormat(r.formatType.noneFormat);
         return r;
     },
     'DATEVALUE' : function(){
@@ -158,8 +277,7 @@ cFormulaFunction.DateAndTime = {
             }
             if(val < 0)
                 return this.setCA(new cError( cErrorType.not_numeric ),true);
-            else if(!g_bDate1904)
-            {
+            else if(!g_bDate1904){
                 if( val < 60 )
                     return this.setCA(new cNumber( ( new Date((val-c_DateCorrectConst)*c_msPerDay) ).getUTCDate() ),true,0);
                 else if( val == 60 )
@@ -181,6 +299,56 @@ cFormulaFunction.DateAndTime = {
     },
     'DAYS360' : function(){
         var r = new cBaseFunction("DAYS360");
+        r.setArgumentsMin(2);
+        r.setArgumentsMax(3);
+        r.Calculate = function(arg){
+            var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new cBool(false);
+
+            if ( arg0 instanceof cArea || arg0 instanceof cArea3D ){
+                arg0 = arg0.cross(arguments[1].first);
+            }
+            else if( arg0 instanceof cArray ){
+                arg0 = arg0.getElementRowCol(0,0);
+            }
+
+            if ( arg1 instanceof cArea || arg1 instanceof cArea3D ){
+                arg1 = arg1.cross(arguments[1].first);
+            }
+            else if( arg1 instanceof cArray ){
+                arg1 = arg1.getElementRowCol(0,0);
+            }
+
+            if ( arg2 instanceof cArea || arg2 instanceof cArea3D ){
+                arg2 = arg2.cross(arguments[1].first);
+            }
+            else if( arg2 instanceof cArray ){
+                arg2 = arg2.getElementRowCol(0,0);
+            }
+
+            arg0 = arg0.tocNumber();
+            arg1 = arg1.tocNumber();
+            arg2 = arg2.tocBool();
+
+            if ( arg0 instanceof cError )return this.value = arg0;
+            if ( arg1 instanceof cError )return this.value = arg1;
+            if ( arg2 instanceof cError )return this.value = arg2;
+
+            if( arg0.getValue() < 0 )return this.value = new cError( cErrorType.not_numeric );
+            if( arg1.getValue() < 0 )return this.value = new cError( cErrorType.not_numeric );
+
+            var date1 = Date.prototype.getDateFromExcel(arg0.getValue()), date2 = Date.prototype.getDateFromExcel(arg1.getValue() );
+
+            return this.value = new cNumber( GetDiffDate360( date1.getDate(), date1.getMonth()+1, date1.getFullYear(), date1.isLeapYear(),
+                                                             date2.getDate(), date2.getMonth()+1, date2.getFullYear(), !arg2.toBool() ) )
+
+        }
+        r.getInfo = function(){
+            return {
+                name:this.name,
+                args:"(  start-date , end-date [ , method-flag ] )"
+            };
+        }
+        r.setFormat(r.formatType.noneFormat);
         return r;
     },
     'EDATE' : function(){
@@ -472,7 +640,6 @@ cFormulaFunction.DateAndTime = {
             }
             if(val < 0)
                 return this.setCA( new cError( cErrorType.not_numeric ) ,true);
-            else
             if(!g_bDate1904){
                 if( val == 60 )
                     return this.setCA( new cNumber( 2 ) ,true,0);
@@ -572,16 +739,7 @@ cFormulaFunction.DateAndTime = {
             }
 
             for(var i = 0; i < holidays.length; i++ ){
-                if(!g_bDate1904){
-                    if( holidays[i].getValue() < 60 )
-                        holidays[i] = new Date((holidays[i].getValue()-c_DateCorrectConst)*c_msPerDay);
-                    else if( holidays[i] == 60 )
-                        holidays[i] = new Date((holidays[i].getValue()-c_DateCorrectConst-1)*c_msPerDay);
-                    else
-                        holidays[i] = new Date((holidays[i].getValue()-c_DateCorrectConst-1)*c_msPerDay);
-                }
-                else
-                    holidays[i] = new Date((holidays[i].getValue()-c_DateCorrectConst)*c_msPerDay);
+                holidays[i] = Date.prototype.getDateFromExcel( holidays[i].getValue() );
             }
 
             function includeInHolidays(date){
@@ -599,8 +757,6 @@ cFormulaFunction.DateAndTime = {
                 if( date.getDay() != 5 && date.getDay() != 6 && includeInHolidays(date) )
                     count++;
             }
-
-
             return this.value = new cNumber( (dif<0?-1:1)*count );
         }
         r.getInfo = function(){
@@ -699,7 +855,6 @@ cFormulaFunction.DateAndTime = {
         var r = new cBaseFunction("TIME");
         r.setArgumentsMin(3);
         r.setArgumentsMax(3);
-        //to excel (hh*60*60+mm*60+ss)/c_sPerDay (c_sPerDay the number of seconds in a day)
         r.Calculate = function(arg){
             var hour,minute,second;
             for (var i = 0; i<this.argumentsCurrent;i++){
@@ -796,9 +951,7 @@ cFormulaFunction.DateAndTime = {
         r.setArgumentsMin(0);
         r.setArgumentsMax(0);
         r.Calculate = function(){
-            var d = new Date();
-            //						1			2 3												3		4					  5				   5 4 2 1
-            this.setCA(  new cNumber( Math.floor( ( d.getTime()/1000 - d.getTimezoneOffset()*60 )/c_sPerDay+( c_DateCorrectConst + (g_bDate1904?0:1) ) ) ) ,true);
+            this.setCA( new cNumber( new Date().getExcelDate() ), true);
             if( arguments[1].getNumFormatStr().toLowerCase() === "general" )
                 this.value.numFormat = 14;
             return this.value;
@@ -810,7 +963,6 @@ cFormulaFunction.DateAndTime = {
             };
         }
         return r;
-        //Math.floor(((new Date()).getTime()/1000)/c_sPerDay+(c_DateCorrectConst+1)) from UTC-timestamp to excel 2010
     },
     'WEEKDAY' : function(){
         var r = new cBaseFunction("WEEKDAY");
@@ -890,7 +1042,6 @@ cFormulaFunction.DateAndTime = {
     },
     'WEEKNUM' : function(){
         var r = new cBaseFunction("WEEKNUM");
-        //var d = new Date(), iso = [6,7,8,9,10,4,5]; console.log(d); var b = new Date(d.getFullYear(), 0, 1); var c = ((d-b)/(86400000)+iso[b.getDay()])/7; console.log(c)
         r.setArgumentsMin(1);
         r.setArgumentsMax(2);
         r.Calculate = function(arg){
@@ -1106,7 +1257,7 @@ cFormulaFunction.DateAndTime = {
                 args:"( start-date , day-offset [ , holidays ] )"
             };
         }
-        // r.setFormat(r.formatType.noneFormat);
+        r.setFormat(r.formatType.noneFormat);
         return r;
     },
     'WORKDAY.INTL' : function(){
@@ -1173,6 +1324,88 @@ cFormulaFunction.DateAndTime = {
     },
     'YEARFRAC' : function(){
         var r = new cBaseFunction("YEARFRAC");
+        r.setArgumentsMin(2);
+        r.setArgumentsMax(3);
+        r.Calculate = function(arg){
+            var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new cNumber(0);
+            if ( arg0 instanceof cArea || arg0 instanceof cArea3D ){
+                arg0 = arg0.cross(arguments[1].first);
+            }
+            else if( arg0 instanceof cArray ){
+                arg0 = arg0.getElementRowCol(0,0);
+            }
+
+            if ( arg1 instanceof cArea || arg1 instanceof cArea3D ){
+                arg1 = arg1.cross(arguments[1].first);
+            }
+            else if( arg1 instanceof cArray ){
+                arg1 = arg1.getElementRowCol(0,0);
+            }
+
+            if ( arg2 instanceof cArea || arg2 instanceof cArea3D ){
+                arg2 = arg2.cross(arguments[1].first);
+            }
+            else if( arg2 instanceof cArray ){
+                arg2 = arg2.getElementRowCol(0,0);
+            }
+
+            arg0 = arg0.tocNumber();
+            arg1 = arg1.tocNumber();
+            arg2 = arg2.tocNumber();
+
+            if( arg0 instanceof cError) return this.value = arg0;
+            if( arg1 instanceof cError) return this.value = arg1;
+            if( arg2 instanceof cError) return this.value = arg2;
+
+            var val0 = arg0.getValue(), val1 = arg1.getValue();
+
+            if(val0 < 0 || val1 < 0)
+                return this.setCA(new cError( cErrorType.not_numeric ),true);
+
+            val0 = Date.prototype.getDateFromExcel(val0);
+            val1 = Date.prototype.getDateFromExcel(val1);
+            var date1 = val0.getDate(), date2 = val1.getDate(), month1 = val0.getMonth(), month2 = val1.getMonth(), year1 = val0.getFullYear(), year2 = val1.getFullYear();
+            switch(arg2.getValue()){
+                case 0:
+                    return this.value = new cNumber( Math.abs(GetDiffDate360( date1,  month1,  year1,  val1.isLeapYear(), date2,  month2,  year2, false ))/360 );
+                    break;
+                case 1:
+                    var yc = Math.abs(year2 - year1 ),
+                        sd = year1 > year2 ? val1 : val0,
+                        yearAverage = sd.isLeapYear() ? 366 : 365, dayDiff = Math.abs(val1 - val0);
+                    for( var i = 0; i < yc; i++){
+                        sd.addYears(1);
+                        yearAverage += sd.isLeapYear() ? 366 : 365;
+                    }
+                    yearAverage /= (yc+1);
+                    dayDiff /= (yearAverage*c_msPerDay);
+                    return this.value = new cNumber(dayDiff);
+                    break;
+                case 2:
+                    var dayDiff = Math.abs(val1 - val0);
+                    dayDiff /= (360*c_msPerDay);
+                    return this.value = new cNumber(dayDiff);
+                    break;
+                case 3:
+                    var dayDiff = Math.abs(val1 - val0);
+                    dayDiff /= (365*c_msPerDay);
+                    return this.value = new cNumber(dayDiff);
+                    break;
+                case 4:
+                    return this.value = new cNumber( Math.abs(GetDiffDate360( date1,  month1,  year1,  val1.isLeapYear(), date2,  month2,  year2, true ))/360 );
+                    break;
+                default:
+                    return this.value = new cError( cErrorType.not_numeric )
+            }
+
+        }
+        r.getInfo = function(){
+            return {
+                name:this.name,
+                args:"(  start-date , end-date [ , basis ] )"
+            };
+        }
+        r.setFormat(r.formatType.noneFormat);
         return r;
     }
 }
