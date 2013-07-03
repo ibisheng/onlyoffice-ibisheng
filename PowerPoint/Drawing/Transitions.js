@@ -984,7 +984,7 @@ function CTransitionAnimation(htmlpage)
 
         switch (oThis.Param)
         {
-            case c_oAscSlideTransitionParams.Split_VerticalIn:
+            case c_oAscSlideTransitionParams.Split_VerticalOut:
             {
                 if (oThis.TimerId === null)
                 {
@@ -1064,16 +1064,252 @@ function CTransitionAnimation(htmlpage)
                 }
                 break;
             }
-            case c_oAscSlideTransitionParams.Split_VerticalOut:
+            case c_oAscSlideTransitionParams.Split_VerticalIn:
             {
-                break;
-            }
-            case c_oAscSlideTransitionParams.Split_HorizontalIn:
-            {
+                if (oThis.TimerId === null)
+                {
+                    // отрисовываем на основной канве картинку первого слайда
+                    var _ctx1 = oThis.HtmlPage.m_oEditor.HtmlElement.getContext('2d');
+                    _ctx1.fillStyle = "#B0B0B0";
+                    _ctx1.fillRect(0, 0, oThis.HtmlPage.m_oEditor.HtmlElement.width, oThis.HtmlPage.m_oEditor.HtmlElement.height);
+                    if (null != oThis.CacheImage1.Image)
+                    {
+                        _ctx1.drawImage(oThis.CacheImage1.Image, oThis.Rect.x, oThis.Rect.y, oThis.Rect.w, oThis.Rect.h);
+                    }
+                    else
+                    {
+                        var _c = oThis.CacheImage1.Color;
+                        _ctx1.fillStyle = "rgb(" + _c.r + "," + _c.g + "," + _c.b + ")";
+                        _ctx1.fillRect(oThis.Rect.x, oThis.Rect.y, oThis.Rect.w, oThis.Rect.h);
+                        _ctx1.beginPath();
+                    }
+
+                    var _canvasTmp = document.createElement('canvas');
+                    var __w = 256 + 255;
+                    _canvasTmp.width = __w;
+                    _canvasTmp.height = 1;
+                    var _canvasTmpCtx = _canvasTmp.getContext('2d');
+                    var _data = _canvasTmpCtx.createImageData(_canvasTmp.width, 1);
+                    for (var i = 0; i < 256; i++)
+                        _data.data[4 * i + 3] = i;
+                    for (var i = 256; i < __w; i++)
+                        _data.data[4 * i + 3] = __w - i - 1;
+                    _canvasTmpCtx.putImageData(_data, 0, 0);
+
+                    oThis.Params = { GradImage : _canvasTmp };
+                }
+
+                var _cX = _xDst + _wDst / 2;
+
+                if (_part <= 0.5)
+                {
+                    var _w = (_part * 2 * _wDst) >> 0;
+                    var _w2 = _w >> 1;
+                    var _w4 = _w2 >> 1;
+
+                    if (_w4 > 0)
+                    {
+                        _ctx2.beginPath();
+                        _ctx2.fillStyle = "#000000";
+
+                        _ctx2.fillRect(_xDst, _yDst, _w4 + 1, _hDst);
+                        _ctx2.beginPath();
+                        _ctx2.fillRect(_xDst + _wDst - _w4 - 1, _yDst, _w4 + 1, _hDst);
+                        _ctx2.beginPath();
+
+                        var _x = _xDst + _w4;
+                        var _r = _xDst + _wDst - _w2;
+                        _ctx2.drawImage(oThis.Params.GradImage, 255, 0, 255, 1, _x, _yDst, _w4, _hDst);
+                        _ctx2.drawImage(oThis.Params.GradImage, 0, 0, 255, 1, _r, _yDst, _w4, _hDst);
+                    }
+                }
+                else
+                {
+                    var _w = (_part * _wDst) >> 0;
+                    var _w2 = _w >> 1;
+
+                    _ctx2.beginPath();
+                    _ctx2.fillStyle = "#000000";
+
+                    _ctx2.fillRect(_xDst, _yDst, _w2 + 1, _hDst);
+                    _ctx2.beginPath();
+                    _ctx2.fillRect(_xDst + _wDst - _w2 - 1, _yDst, _w2 + 1, _hDst);
+                    _ctx2.beginPath();
+
+                    var _gradWW = (_wDst - _w) >> 1;
+                    var _gradW = (_wDst / 4) >> 0;
+
+                    var _srcOff = 256 * _gradWW / _gradW;
+
+                    if (_gradWW > 0)
+                    {
+                        _ctx2.drawImage(oThis.Params.GradImage, 255, 0, 255, 1, _xDst + _w2, _yDst, _gradWW, _hDst);
+                        _ctx2.drawImage(oThis.Params.GradImage, 0, 0, 255, 1, _cX, _yDst, _gradWW, _hDst);
+                    }
+                }
                 break;
             }
             case c_oAscSlideTransitionParams.Split_HorizontalOut:
             {
+                if (oThis.TimerId === null)
+                {
+                    // отрисовываем на основной канве картинку первого слайда
+                    var _ctx1 = oThis.HtmlPage.m_oEditor.HtmlElement.getContext('2d');
+                    _ctx1.fillStyle = "#B0B0B0";
+                    _ctx1.fillRect(0, 0, oThis.HtmlPage.m_oEditor.HtmlElement.width, oThis.HtmlPage.m_oEditor.HtmlElement.height);
+                    if (null != oThis.CacheImage1.Image)
+                    {
+                        _ctx1.drawImage(oThis.CacheImage1.Image, oThis.Rect.x, oThis.Rect.y, oThis.Rect.w, oThis.Rect.h);
+                    }
+                    else
+                    {
+                        var _c = oThis.CacheImage1.Color;
+                        _ctx1.fillStyle = "rgb(" + _c.r + "," + _c.g + "," + _c.b + ")";
+                        _ctx1.fillRect(oThis.Rect.x, oThis.Rect.y, oThis.Rect.w, oThis.Rect.h);
+                        _ctx1.beginPath();
+                    }
+
+                    var _canvasTmp = document.createElement('canvas');
+                    var __w = 256 + 255;
+                    _canvasTmp.width = 1;
+                    _canvasTmp.height = __w;
+                    var _canvasTmpCtx = _canvasTmp.getContext('2d');
+                    var _data = _canvasTmpCtx.createImageData(1, __w);
+                    for (var i = 0; i < 256; i++)
+                        _data.data[4 * i + 3] = i;
+                    for (var i = 256; i < __w; i++)
+                        _data.data[4 * i + 3] = __w - i - 1;
+                    _canvasTmpCtx.putImageData(_data, 0, 0);
+
+                    oThis.Params = { GradImage : _canvasTmp };
+                }
+
+                var _cY = _yDst + _hDst / 2;
+
+                if (_part <= 0.5)
+                {
+                    var _h = (_part * 2 * _hDst) >> 0;
+                    var _h2 = _h >> 1;
+
+                    if (_h > 0 && _h2 > 0)
+                    {
+                        _ctx2.beginPath();
+                        _ctx2.fillStyle = "#000000";
+                        _ctx2.fillRect(_xDst, Math.max(_cY - _h2 / 2 - 1), _wDst, Math.min(_h2 + 2, _hDst));
+                        _ctx2.beginPath();
+
+                        var _h4 = _h2 >> 1;
+                        var _y = _cY - _h2;
+                        var _b = _cY + _h4;
+
+                        _ctx2.drawImage(oThis.Params.GradImage, 0, 0, 1, 255, _xDst, _y, _wDst, _h4);
+                        _ctx2.drawImage(oThis.Params.GradImage, 0, 255, 1, 255, _xDst, _b, _wDst, _h4);
+                    }
+                }
+                else
+                {
+                    var _h = (_part * _hDst) >> 0;
+                    var _h2 = _h >> 1;
+
+                    _ctx2.beginPath();
+                    _ctx2.fillStyle = "#000000";
+                    _ctx2.fillRect(_xDst, Math.max(_yDst, _cY - _h2 - 1), _wDst, Math.min(_h + 2, _hDst));
+                    _ctx2.beginPath();
+
+                    var _gradHH = (_hDst - _h) >> 1;
+                    var _gradH = (_hDst / 4) >> 0;
+
+                    //var _srcOff = 256 * _gradHH / _gradH;
+                    if (_gradHH > 0)
+                    {
+                        _ctx2.drawImage(oThis.Params.GradImage, 0, 0, 1, 255, _xDst, _yDst, _wDst, _gradHH);
+                        _ctx2.drawImage(oThis.Params.GradImage, 0, 255, 1, 255, _xDst, _cY + _h2, _wDst, _gradHH);
+                    }
+                }
+                break;
+            }
+            case c_oAscSlideTransitionParams.Split_HorizontalIn:
+            {
+                if (oThis.TimerId === null)
+                {
+                    // отрисовываем на основной канве картинку первого слайда
+                    var _ctx1 = oThis.HtmlPage.m_oEditor.HtmlElement.getContext('2d');
+                    _ctx1.fillStyle = "#B0B0B0";
+                    _ctx1.fillRect(0, 0, oThis.HtmlPage.m_oEditor.HtmlElement.width, oThis.HtmlPage.m_oEditor.HtmlElement.height);
+                    if (null != oThis.CacheImage1.Image)
+                    {
+                        _ctx1.drawImage(oThis.CacheImage1.Image, oThis.Rect.x, oThis.Rect.y, oThis.Rect.w, oThis.Rect.h);
+                    }
+                    else
+                    {
+                        var _c = oThis.CacheImage1.Color;
+                        _ctx1.fillStyle = "rgb(" + _c.r + "," + _c.g + "," + _c.b + ")";
+                        _ctx1.fillRect(oThis.Rect.x, oThis.Rect.y, oThis.Rect.w, oThis.Rect.h);
+                        _ctx1.beginPath();
+                    }
+
+                    var _canvasTmp = document.createElement('canvas');
+                    var __w = 256 + 255;
+                    _canvasTmp.width = 1;
+                    _canvasTmp.height = __w;
+                    var _canvasTmpCtx = _canvasTmp.getContext('2d');
+                    var _data = _canvasTmpCtx.createImageData(1, __w);
+                    for (var i = 0; i < 256; i++)
+                        _data.data[4 * i + 3] = i;
+                    for (var i = 256; i < __w; i++)
+                        _data.data[4 * i + 3] = __w - i - 1;
+                    _canvasTmpCtx.putImageData(_data, 0, 0);
+
+                    oThis.Params = { GradImage : _canvasTmp };
+                }
+
+                var _cY = _yDst + _hDst / 2;
+
+                if (_part <= 0.5)
+                {
+                    var _h = (_part * 2 * _hDst) >> 0;
+                    var _h2 = _h >> 1;
+                    var _h4 = _h2 >> 1;
+
+                    if (_h4 > 0)
+                    {
+                        _ctx2.beginPath();
+                        _ctx2.fillStyle = "#000000";
+
+                        _ctx2.fillRect(_xDst, _yDst, _wDst, _h4 + 1);
+                        _ctx2.beginPath();
+                        _ctx2.fillRect(_xDst, _yDst + _hDst - _h4 - 1, _wDst, _h4 + 1);
+                        _ctx2.beginPath();
+
+                        var _y = _yDst + _h4;
+                        var _b = _yDst + _hDst - _h2;
+                        _ctx2.drawImage(oThis.Params.GradImage, 0, 255, 1, 255, _xDst, _y, _wDst, _h4);
+                        _ctx2.drawImage(oThis.Params.GradImage, 0, 0, 1, 255, _xDst, _b, _wDst, _h4);
+                    }
+                }
+                else
+                {
+                    var _h = (_part * _hDst) >> 0;
+                    var _h2 = _h >> 1;
+
+                    _ctx2.beginPath();
+                    _ctx2.fillStyle = "#000000";
+
+                    _ctx2.fillRect(_xDst, _yDst, _wDst, _h2 + 1);
+                    _ctx2.beginPath();
+                    _ctx2.fillRect(_xDst, _yDst + _hDst - _h2 - 1, _wDst, _h2 + 1);
+                    _ctx2.beginPath();
+
+                    var _gradHH = (_hDst - _h) >> 1;
+                    var _gradH = (_hDst / 4) >> 0;
+
+                    //var _srcOff = 256 * _gradHH / _gradH;
+                    if (_gradHH > 0)
+                    {
+                        _ctx2.drawImage(oThis.Params.GradImage, 0, 255, 1, 255, _xDst, _yDst + _h2, _wDst, _gradHH);
+                        _ctx2.drawImage(oThis.Params.GradImage, 0, 0, 1, 255, _xDst, _cY, _wDst, _gradHH);
+                    }
+                }
                 break;
             }
             default:

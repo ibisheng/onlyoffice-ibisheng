@@ -519,9 +519,11 @@ CGraphics.prototype =
             this.TextureFillTransformScaleX *= (width_px / (width_mm * g_dKoef_mm_to_pix));
             this.TextureFillTransformScaleY *= (height_px / (height_mm * g_dKoef_mm_to_pix))
         }
-		
+
+        /*
 		if (true == this.m_oContext.mozImageSmoothingEnabled)
 			this.m_oContext.mozImageSmoothingEnabled = false;
+        */
 
         this.m_oContext.save();
     },
