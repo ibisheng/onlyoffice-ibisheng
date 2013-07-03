@@ -45,7 +45,6 @@ function CGroupShape(drawingBase, drawingObjects)
     this.pen = null;
 
     this.selected = false;
-
 }
 
 CGroupShape.prototype =
@@ -110,6 +109,11 @@ CGroupShape.prototype =
         this.spPr.xfrm.chExtY = chExtY;
     },
 
+    setChildOffsets: function(chOffX, chOffY)
+    {
+        this.spPr.xfrm.chOffX = chOffX;
+        this.spPr.xfrm.chOffY = chOffY;
+    },
 
     updateDrawingBaseCoordinates: function()
     {
@@ -401,6 +405,146 @@ CGroupShape.prototype =
         }
     },
 
+    normalize: function()
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            this.spTree[i].normalize();
+        }
+        var new_off_x, new_off_y, new_ext_x, new_ext_y;
+        var xfrm = this.spPr.xfrm;
+        if(!isRealObject(this.group))
+        {
+            new_off_x = xfrm.offX;
+            new_off_y = xfrm.offY;
+            new_ext_x = xfrm.extX;
+            new_ext_y = xfrm.extY;
+        }
+        else
+        {
+            var scale_scale_coefficients = this.group.getResultScaleCoefficients();
+            new_off_x = scale_scale_coefficients.cx*(xfrm.offX - this.group.spPr.xfrm.chOffX);
+            new_off_y = scale_scale_coefficients.cy*(xfrm.offY - this.group.spPr.xfrm.chOffY);
+            new_ext_x = scale_scale_coefficients.cx*xfrm.extX;
+            new_ext_y = scale_scale_coefficients.cy*xfrm.extY;
+        }
+        this.setPosition(new_off_x, new_off_y);
+        this.setExtents(new_ext_x, new_ext_y);
+        this.setChildExtents(new_ext_x, new_ext_y);
+        this.setChildOffsets(0, 0);
+    },
+
+    updateCoordinatesAfterInternalResize: function()
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(this.spTree[i].isGroup())
+                this.spTree[i].updateCoordinatesAfterInternalResize();
+        }
+
+        var sp_tree = this.spTree;
+
+        var min_x, max_x, min_y, max_y;
+        var sp = sp_tree[0];
+        var xfrm  = sp.spPr.xfrm;
+        var rot = xfrm.rot == null ? 0 : xfrm.rot;
+        var xc, yc;
+        if(rot < Math.PI*0.25 || rot>Math.PI*1.75 || (rot>Math.PI*0.75 && rot<Math.PI*1.25))
+        {
+            min_x = xfrm.offX;
+            min_y = xfrm.offY;
+            max_x = xfrm.offX + xfrm.extX;
+            max_y = xfrm.offY + xfrm.extY;
+        }
+        else
+        {
+            xc = xfrm.offX + xfrm.extX*0.5;
+            yc = xfrm.offY + xfrm.extY*0.5;
+            min_x = xc - xfrm.extY*0.5;
+            min_y = yc - xfrm.extX*0.5;
+            max_x = xc + xfrm.extY*0.5;
+            max_y = yc + xfrm.extX*0.5;
+        }
+        var cur_max_x, cur_min_x, cur_max_y, cur_min_y;
+        for(i = 1; i < sp_tree.length; ++i)
+        {
+            sp = sp_tree[i];
+            xfrm  = sp.spPr.xfrm;
+            rot = xfrm.rot == null ? 0 : xfrm.rot;
+
+            if(rot < Math.PI*0.25 || rot>Math.PI*1.75 || (rot>Math.PI*0.75 && rot<Math.PI*1.25))
+            {
+                cur_min_x = xfrm.offX;
+                cur_min_y = xfrm.offY;
+                cur_max_x = xfrm.offX + xfrm.extX;
+                cur_max_y = xfrm.offY + xfrm.extY;
+            }
+            else
+            {
+                xc = xfrm.offX + xfrm.extX*0.5;
+                yc = xfrm.offY + xfrm.extY*0.5;
+                cur_min_x = xc - xfrm.extY*0.5;
+                cur_min_y = yc - xfrm.extX*0.5;
+                cur_max_x = xc + xfrm.extY*0.5;
+                cur_max_y = yc + xfrm.extX*0.5;
+            }
+            if(cur_max_x > max_x)
+                max_x = cur_max_x;
+            if(cur_min_x < min_x)
+                min_x = cur_min_x;
+
+            if(cur_max_y > max_y)
+                max_y = cur_max_y;
+            if(cur_min_y < min_y)
+                min_y = cur_min_y;
+        }
+
+        var temp;
+        var x_min_clear = min_x;
+        var y_min_clear = min_y;
+        if(this.spPr.xfrm.flipH === true)
+        {
+            temp = max_x;
+            max_x = this.spPr.xfrm.extX - min_x;
+            min_x = this.spPr.xfrm.extX - temp;
+        }
+
+        if(this.spPr.xfrm.flipV === true)
+        {
+            temp = max_y;
+            max_y = this.spPr.xfrm.extY - min_y;
+            min_y = this.spPr.xfrm.extY - temp;
+        }
+
+        var old_x0, old_y0;
+        var xfrm = this.spPr.xfrm;
+        var rot = xfrm.rot == null ? 0 : xfrm.rot;
+        var hc = xfrm.extX*0.5;
+        var vc = xfrm.extY*0.5;
+        old_x0 = this.spPr.xfrm.offX + hc - (hc*Math.cos(rot) - vc*Math.sin(rot));
+        old_y0 = this.spPr.xfrm.offY  + vc - (hc*Math.sin(rot) + vc*Math.cos(rot));
+        var t_dx = min_x*Math.cos(rot) - min_y*Math.sin(rot);
+        var t_dy = min_x*Math.sin(rot) + min_y*Math.cos(rot);
+        var new_x0, new_y0;
+        new_x0 = old_x0 + t_dx;
+        new_y0 = old_y0 + t_dy;
+        var new_hc = Math.abs(max_x - min_x)*0.5;
+        var new_vc = Math.abs(max_y - min_y)*0.5;
+        var new_xc = new_x0 + (new_hc*Math.cos(rot) - new_vc*Math.sin(rot));
+        var new_yc = new_y0 + (new_hc*Math.sin(rot) + new_vc*Math.cos(rot));
+
+        var pos_x, pos_y;
+        pos_x = new_xc - new_hc;
+        pos_y = new_yc - new_vc;
+
+        this.setPosition(pos_x, pos_y);
+        this.setExtents(Math.abs(max_x - min_x), Math.abs(max_y - min_y));
+        this.setChildExtents(Math.abs(max_x - min_x), Math.abs(max_y - min_y));
+        for(i = 0; i < sp_tree.length; ++i)
+        {
+            sp_tree[i].setPosition(sp_tree[i].spPr.xfrm.offX - x_min_clear, sp_tree[i].spPr.xfrm.offY - y_min_clear);
+        }
+    },
 
     canRotate: function()
     {
@@ -517,8 +661,8 @@ CGroupShape.prototype =
 
     getInvertTransform: function()
     {
-        if(this.recalcInfo.recalculateTransform)
-            this.recalculateTransform();
+        //if(this.recalcInfo.recalculateTransform)
+        //this.recalculateTransform();
         return this.invertTransform;
     } ,
 
@@ -619,6 +763,12 @@ CGroupShape.prototype =
                 break;
             }
         }
+    },
+
+    resetSelection: function(drawingObjectsController)
+    {
+        while(this.selectedObjects.length > 0)
+            this.selectedObjects[0].deselect(drawingObjectsController);
     },
 
     createRotateTrack: function()

@@ -121,13 +121,14 @@ DrawingObjectsController.prototype =
 
     createGroup: function(drawingBase)
     {
-        var selected_objects = this.selectedObjects;
+        var drawing_bases = this.drawingObjects.getDrawingObjects();
         var grouped_objects = [];
-        for(var i = 0; i < selected_objects.length; ++i)
+        for(var i = 0; i < drawing_bases.length; ++i)
         {
-            if(selected_objects[i].canGroup())
+            var cur_drawing_base = drawing_bases[i];
+            if(cur_drawing_base.isGraphicObject() && cur_drawing_base.graphicObject.selected && cur_drawing_base.graphicObject.canGroup())
             {
-                grouped_objects.push(selected_objects[i]);
+                grouped_objects.push(cur_drawing_base.graphicObject);
             }
         }
         if(grouped_objects.length < 2)
@@ -156,6 +157,7 @@ DrawingObjectsController.prototype =
         group.setPosition(min_x, min_y);
         group.setExtents(max_x - min_x, max_y - min_y);
         group.setChildExtents(max_x - min_x, max_y - min_y);
+        group.setChildOffsets(0, 0);
         for(i = 0; i < grouped_objects.length; ++i)
         {
             grouped_objects[i].setPosition(grouped_objects[i].x - min_x, grouped_objects[i].y - min_y);

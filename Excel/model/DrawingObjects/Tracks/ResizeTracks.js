@@ -1880,7 +1880,7 @@ function ShapeForResizeInGroup(originalObject, parentTrack)
         {
             global_MatrixTransformer.ScaleAppend(t, 1, -1);
         }
-        global_MatrixTransformer.RotateRadAppend(t, this.rot);
+        global_MatrixTransformer.RotateRadAppend(t, -this.rot);
         global_MatrixTransformer.TranslateAppend(t, this.x + this.extX*0.5, this.y+this.extY*0.5);
         if(this.parentTrack)
             global_MatrixTransformer.MultiplyAppend(t, this.parentTrack.transform);

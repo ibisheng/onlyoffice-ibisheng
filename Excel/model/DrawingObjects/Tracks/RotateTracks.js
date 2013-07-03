@@ -133,7 +133,9 @@ function RotateTrackShapeImageInGroup(originalObject)
     this.overlayObject = new OverlayObject(originalObject.spPr.geometry, originalObject.extX, originalObject.extY, originalObject.brush, originalObject.pen, this.transform);
 
     this.angle = originalObject.rot;
-
+    var full_flip_h = this.originalObject.getFullFlipH();
+    var full_flip_v = this.originalObject.getFullFlipV();
+    this.signum = !full_flip_h && !full_flip_v || full_flip_h && full_flip_v ? 1 : -1;
     this.draw = function(overlay)
     {
         this.overlayObject.draw(overlay);
@@ -141,7 +143,7 @@ function RotateTrackShapeImageInGroup(originalObject)
 
     this.track = function(angle, e)
     {
-        var new_rot = angle + this.originalObject.rot;
+        var new_rot = this.signum*angle + this.originalObject.rot;
         while(new_rot < 0)
             new_rot += 2*Math.PI;
         while(new_rot >= 2*Math.PI)

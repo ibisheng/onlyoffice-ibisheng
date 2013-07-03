@@ -101,7 +101,7 @@ CShape.prototype =
         if(this.recalcInfo.recalculateBrush)
             this.recalculateBrush();
         if(this.recalcInfo.recalculatePen)
-            this.recalculatePen()
+            this.recalculatePen();
     },
 
     setPosition: function(x, y)
@@ -264,6 +264,29 @@ CShape.prototype =
             global_MatrixTransformer.MultiplyAppend(this.transform, this.group.getTransform());
         }
         this.invertTransform = global_MatrixTransformer.Invert(this.transform);
+    },
+
+    normalize: function()
+    {
+        var new_off_x, new_off_y, new_ext_x, new_ext_y;
+        var xfrm = this.spPr.xfrm;
+        if(!isRealObject(this.group))
+        {
+            new_off_x = xfrm.offX;
+            new_off_y = xfrm.offY;
+            new_ext_x = xfrm.extX;
+            new_ext_y = xfrm.extY;
+        }
+        else
+        {
+            var scale_scale_coefficients = this.group.getResultScaleCoefficients();
+            new_off_x = scale_scale_coefficients.cx*(xfrm.offX - this.group.spPr.xfrm.chOffX);
+            new_off_y = scale_scale_coefficients.cy*(xfrm.offY - this.group.spPr.xfrm.chOffY);
+            new_ext_x = scale_scale_coefficients.cx*xfrm.extX;
+            new_ext_y = scale_scale_coefficients.cy*xfrm.extY;
+        }
+        this.setPosition(new_off_x, new_off_y);
+        this.setExtents(new_ext_x, new_ext_y);
     },
 
     recalculateBrush: function()
@@ -763,6 +786,7 @@ CShape.prototype =
         return new MoveShapeImageTrack(this);
     },
 
+
     createRotateInGroupTrack: function()
     {
         return new RotateTrackShapeImageInGroup(this);
@@ -775,7 +799,7 @@ CShape.prototype =
 
     createMoveInGroupTrack: function()
     {
-        return new MoveShapeImageInGroupTrack(this);
+        return new MoveShapeImageTrackInGroup(this);
     }
 
 };
