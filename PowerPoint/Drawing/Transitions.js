@@ -714,18 +714,226 @@ function CTransitionAnimation(htmlpage)
             }
             case c_oAscSlideTransitionParams.Param_TopLeft:
             {
+                if (null == oThis.TimerId)
+                {
+                    var _canvasTmp = document.createElement('canvas');
+                    _canvasTmp.width = 256;
+                    _canvasTmp.height = 1;
+                    var _canvasTmpCtx = _canvasTmp.getContext('2d');
+                    var _data = _canvasTmpCtx.createImageData(256, 1);
+                    for (var i = 0; i < 256; i++)
+                        _data.data[4 * i + 3] = 255 - i;
+                    _canvasTmpCtx.putImageData(_data, 0, 0);
+
+                    oThis.Params = { GradImage : _canvasTmp };
+                }
+
+                var _ang = Math.atan(_hDst / _wDst);
+                var _sin = Math.sin(_ang);
+                var _cos = Math.cos(_ang);
+
+                var _hDstN2 = _wDst * _sin;
+                var _hDstN = 2 * _hDstN2;
+                var _wDstN = _wDst * _cos + _hDst * _sin;
+
+                var _e_off_x = -_sin;
+                var _e_off_y = -_cos;
+
+                var _gradW = (_koefWipeLen * _hDstN) >> 0;
+
+                var _cX = _xDst + _wDst / 2;
+                var _cY = _yDst + _hDst / 2;
+                var _cStartX = _cX + (_hDstN2 + _gradW / 2) * _e_off_x;
+                var _cStartY = _cY + (_hDstN2 + _gradW / 2) * _e_off_y;
+
+                var _cPosX = _cStartX - _e_off_x * _part * (_gradW + _hDstN);
+                var _cPosY = _cStartY - _e_off_y * _part * (_gradW + _hDstN);
+
+                _ctx2.save();
+                _ctx2.beginPath();
+                _ctx2.rect(_xDst, _yDst, _wDst, _hDst);
+                _ctx2.clip();
+                _ctx2.beginPath();
+
+                _ctx2.translate(_cPosX, _cPosY);
+                _ctx2.rotate(Math.PI/2 - _ang);
+
+                // потом расчитать точнее!!!
+                _ctx2.fillStyle = "#000000";
+                _ctx2.fillRect(-_hDstN2 - _gradW, -_wDstN / 2, _gradW, _wDstN);
+                _ctx2.beginPath();
+
+                _ctx2.drawImage(oThis.Params.GradImage, -_hDstN2, -_wDstN / 2, _hDstN, _wDstN);
+
+                _ctx2.restore();
                 break;
             }
             case c_oAscSlideTransitionParams.Param_TopRight:
             {
+                if (null == oThis.TimerId)
+                {
+                    var _canvasTmp = document.createElement('canvas');
+                    _canvasTmp.width = 256;
+                    _canvasTmp.height = 1;
+                    var _canvasTmpCtx = _canvasTmp.getContext('2d');
+                    var _data = _canvasTmpCtx.createImageData(256, 1);
+                    for (var i = 0; i < 256; i++)
+                        _data.data[4 * i + 3] = i;
+                    _canvasTmpCtx.putImageData(_data, 0, 0);
+
+                    oThis.Params = { GradImage : _canvasTmp };
+                }
+
+                var _ang = Math.atan(_hDst / _wDst);
+                var _sin = Math.sin(_ang);
+                var _cos = Math.cos(_ang);
+
+                var _wDstN2 = _wDst * _sin;
+                var _wDstN = 2 * _wDstN2;
+                var _hDstN = _wDst * _cos + _hDst * _sin;
+
+                var _e_off_x = _sin;
+                var _e_off_y = -_cos;
+
+                var _gradW = (_koefWipeLen * _wDstN) >> 0;
+
+                var _cX = _xDst + _wDst / 2;
+                var _cY = _yDst + _hDst / 2;
+                var _cStartX = _cX + (_wDstN2 + _gradW / 2) * _e_off_x;
+                var _cStartY = _cY + (_wDstN2 + _gradW / 2) * _e_off_y;
+
+                var _cPosX = _cStartX - _e_off_x * _part * (_gradW + _wDstN);
+                var _cPosY = _cStartY - _e_off_y * _part * (_gradW + _wDstN);
+
+                _ctx2.save();
+                _ctx2.beginPath();
+                _ctx2.rect(_xDst, _yDst, _wDst, _hDst);
+                _ctx2.clip();
+                _ctx2.beginPath();
+
+                _ctx2.translate(_cPosX, _cPosY);
+                _ctx2.rotate(_ang - Math.PI / 2);
+
+                // потом расчитать точнее!!!
+                _ctx2.fillStyle = "#000000";
+                _ctx2.fillRect(_wDstN2, -_hDstN / 2, _gradW, _hDstN);
+                _ctx2.beginPath();
+
+                _ctx2.drawImage(oThis.Params.GradImage, -_wDstN2, -_hDstN / 2, _wDstN, _hDstN);
+
+                _ctx2.restore();
                 break;
             }
             case c_oAscSlideTransitionParams.Param_BottomLeft:
             {
+                if (null == oThis.TimerId)
+                {
+                    var _canvasTmp = document.createElement('canvas');
+                    _canvasTmp.width = 256;
+                    _canvasTmp.height = 1;
+                    var _canvasTmpCtx = _canvasTmp.getContext('2d');
+                    var _data = _canvasTmpCtx.createImageData(256, 1);
+                    for (var i = 0; i < 256; i++)
+                        _data.data[4 * i + 3] = 255 - i;
+                    _canvasTmpCtx.putImageData(_data, 0, 0);
+
+                    oThis.Params = { GradImage : _canvasTmp };
+                }
+
+                var _ang = Math.atan(_hDst / _wDst);
+                var _sin = Math.sin(_ang);
+                var _cos = Math.cos(_ang);
+
+                var _wDstN2 = _wDst * _sin;
+                var _wDstN = 2 * _wDstN2;
+                var _hDstN = _wDst * _cos + _hDst * _sin;
+
+                var _e_off_x = _sin;
+                var _e_off_y = -_cos;
+
+                var _gradW = (_koefWipeLen * _wDstN) >> 0;
+
+                var _cX = _xDst + _wDst / 2;
+                var _cY = _yDst + _hDst / 2;
+                var _cStartX = _cX - (_wDstN2 + _gradW / 2) * _e_off_x;
+                var _cStartY = _cY - (_wDstN2 + _gradW / 2) * _e_off_y;
+
+                var _cPosX = _cStartX + _e_off_x * _part * (_gradW + _wDstN);
+                var _cPosY = _cStartY + _e_off_y * _part * (_gradW + _wDstN);
+
+                _ctx2.save();
+                _ctx2.beginPath();
+                _ctx2.rect(_xDst, _yDst, _wDst, _hDst);
+                _ctx2.clip();
+                _ctx2.beginPath();
+
+                _ctx2.translate(_cPosX, _cPosY);
+                _ctx2.rotate(_ang - Math.PI / 2);
+
+                // потом расчитать точнее!!!
+                _ctx2.fillStyle = "#000000";
+                _ctx2.fillRect(-_wDstN2 - _gradW, -_hDstN / 2, _gradW, _hDstN);
+                _ctx2.beginPath();
+
+                _ctx2.drawImage(oThis.Params.GradImage, -_wDstN2, -_hDstN / 2, _wDstN, _hDstN);
+
+                _ctx2.restore();
                 break;
             }
             case c_oAscSlideTransitionParams.Param_BottomRight:
             {
+                if (null == oThis.TimerId)
+                {
+                    var _canvasTmp = document.createElement('canvas');
+                    _canvasTmp.width = 256;
+                    _canvasTmp.height = 1;
+                    var _canvasTmpCtx = _canvasTmp.getContext('2d');
+                    var _data = _canvasTmpCtx.createImageData(256, 1);
+                    for (var i = 0; i < 256; i++)
+                        _data.data[4 * i + 3] = i;
+                    _canvasTmpCtx.putImageData(_data, 0, 0);
+
+                    oThis.Params = { GradImage : _canvasTmp };
+                }
+
+                var _ang = Math.atan(_hDst / _wDst);
+                var _sin = Math.sin(_ang);
+                var _cos = Math.cos(_ang);
+
+                var _hDstN2 = _wDst * _sin;
+                var _hDstN = 2 * _hDstN2;
+                var _wDstN = _wDst * _cos + _hDst * _sin;
+
+                var _e_off_x = _sin;
+                var _e_off_y = _cos;
+
+                var _gradW = (_koefWipeLen * _hDstN) >> 0;
+
+                var _cX = _xDst + _wDst / 2;
+                var _cY = _yDst + _hDst / 2;
+                var _cStartX = _cX + (_hDstN2 + _gradW / 2) * _e_off_x;
+                var _cStartY = _cY + (_hDstN2 + _gradW / 2) * _e_off_y;
+
+                var _cPosX = _cStartX - _e_off_x * _part * (_gradW + _hDstN);
+                var _cPosY = _cStartY - _e_off_y * _part * (_gradW + _hDstN);
+
+                _ctx2.save();
+                _ctx2.beginPath();
+                _ctx2.rect(_xDst, _yDst, _wDst, _hDst);
+                _ctx2.clip();
+                _ctx2.beginPath();
+
+                _ctx2.translate(_cPosX, _cPosY);
+                _ctx2.rotate(Math.PI/2 - _ang);
+
+                // потом расчитать точнее!!!
+                _ctx2.fillStyle = "#000000";
+                _ctx2.fillRect(_hDstN2, -_wDstN / 2, _gradW, _wDstN);
+                _ctx2.beginPath();
+
+                _ctx2.drawImage(oThis.Params.GradImage, -_hDstN2, -_wDstN / 2, _hDstN, _wDstN);
+
+                _ctx2.restore();
                 break;
             }
             default:
