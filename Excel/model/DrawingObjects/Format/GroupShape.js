@@ -214,6 +214,114 @@ CGroupShape.prototype =
         return {kd1: 1, kd2: 1};
     },
 
+    getFullOffset: function()
+    {
+        if(!isRealObject(this.group))
+            return {offX: this.x, offY: this.y};
+        var group_offset = this.group.getFullOffset();
+        return {offX: this.x + group_offset.offX, offY: this.y + group_offset.offY};
+    },
+
+
+    transformPointRelativeShape: function(x, y)
+    {
+        var _horizontal_center = this.extX*0.5;
+        var _vertical_enter = this.extY*0.5;
+        var _sin = Math.sin(this.rot);
+        var _cos = Math.cos(this.rot);
+
+
+        var _temp_x = x - (-_horizontal_center*_cos + _vertical_enter*_sin +this.x + _horizontal_center);
+        var _temp_y = y - (-_horizontal_center*_sin - _vertical_enter*_cos +this.y + _vertical_enter);
+
+        var _relative_x = _temp_x*_cos + _temp_y*_sin;
+        var _relative_y = -_temp_x*_sin + _temp_y*_cos;
+
+        if(this.absFlipH)
+            _relative_x = this.extX - _relative_x;
+
+        if(this.absFlipV)
+            _relative_y = this.extY - _relative_y;
+
+        return {x: _relative_x, y: _relative_y};
+    },
+
+    getRectBounds: function()
+    {
+        var transform = this.getTransform();
+        var w = this.extX;
+        var h = this.extY;
+        var rect_points = [{x:0, y:0}, {x: w, y: 0}, {x: w, y: h}, {x: 0, y: h}];
+        var min_x, max_x, min_y, max_y;
+        min_x = transform.TransformPointX(rect_points[0].x, rect_points[0].y);
+        min_y = transform.TransformPointY(rect_points[0].x, rect_points[0].y);
+        max_x = min_x;
+        max_y = min_y;
+        var cur_x, cur_y;
+        for(var i = 1; i < 4; ++i)
+        {
+            cur_x = transform.TransformPointX(rect_points[i].x, rect_points[i].y);
+            cur_y = transform.TransformPointY(rect_points[i].x, rect_points[i].y);
+            if(cur_x < min_x)
+                min_x = cur_x;
+            if(cur_x > max_x)
+                max_x = cur_x;
+
+            if(cur_y < min_y)
+                min_y = cur_y;
+            if(cur_y > max_y)
+                max_y = cur_y;
+        }
+        return {minX: min_x, maxX: max_x, minY: min_y, maxY: max_y};
+    },
+
+    getBoundsInGroup: function()
+    {
+        var r = this.rot;
+        if((r >= 0 && r < Math.PI*0.25)
+            || (r > 3*Math.PI*0.25 && r < 5*Math.PI*0.25)
+            || (r > 7*Math.PI*0.25 && r < 2*Math.PI))
+        {
+            return {minX: this.x, minY: this.y, maxX: this.x + this.extX, maxY: this.y + this.extY};
+        }
+        else
+        {
+            var hc = this.extX*0.5;
+            var vc = this.extY*0.5;
+            var xc = this.x + hc;
+            var yc = this.y + vc;
+            return {minX: xc - vc, minY: yc - hc, maxX: xc + vc, maxY: yc + hc};
+        }
+    },
+
+    getRotateAngle: function(x, y)
+    {
+        var transform = this.getTransform();
+        var rotate_distance = 5;/*TODO*/
+        var hc = this.extX*0.5;
+        var vc = this.extY*0.5;
+        var xc_t = transform.TransformPointX(hc, vc);
+        var yc_t = transform.TransformPointY(hc, vc);
+        var rot_x_t = transform.TransformPointX(hc, - rotate_distance);
+        var rot_y_t = transform.TransformPointY(hc, - rotate_distance);
+
+        var invert_transform = this.getInvertTransform();
+        var rel_x = invert_transform.TransformPointX(x, y);
+
+        var v1_x, v1_y, v2_x, v2_y;
+        v1_x = x - xc_t;
+        v1_y = y - yc_t;
+
+        v2_x = rot_x_t - xc_t;
+        v2_y = rot_y_t - yc_t;
+
+        var flip_h = this.getFullFlipH();
+        var flip_v = this.getFullFlipV();
+        var same_flip = flip_h && flip_v || !flip_h && !flip_v;
+        var angle =  rel_x > this.extX*0.5 ? Math.atan2( Math.abs(v1_x*v2_y - v1_y*v2_x), v1_x*v2_x + v1_y*v2_y) : -Math.atan2( Math.abs(v1_x*v2_y - v1_y*v2_x), v1_x*v2_x + v1_y*v2_y);
+        return same_flip ? angle : -angle;
+    },
+
     draw: function(graphics)
     {
         for(var i = 0; i < this.spTree.length; ++i)
@@ -239,7 +347,7 @@ CGroupShape.prototype =
             {
                 var arr_graphic_objects = this.spTree[i].getArrGraphicObjects();
                 for(var j = 0; j < arr_graphic_objects.length; ++j)
-                    this.arrGraphicObjects.push(arr_graphic_objects[i]);
+                    this.arrGraphicObjects.push(arr_graphic_objects[j]);
             }
         }
     },
@@ -431,6 +539,70 @@ CGroupShape.prototype =
             selected_objects.push(this);
     },
 
+    getCardDirectionByNum: function(num)
+    {
+        var num_north = this.getNumByCardDirection(CARD_DIRECTION_N);
+        var full_flip_h = this.getFullFlipH();
+        var full_flip_v = this.getFullFlipV();
+        var same_flip = !full_flip_h && !full_flip_v || full_flip_h && full_flip_v;
+        if(same_flip)
+            return ((num - num_north) + CARD_DIRECTION_N + 8)%8;
+
+        return (CARD_DIRECTION_N - (num - num_north)+ 8)%8;
+    },
+
+    getNumByCardDirection: function(cardDirection)
+    {
+        var hc = this.extX*0.5;
+        var vc = this.extY*0.5;
+        var transform = this.getTransform();
+        var y1, y3, y5, y7;
+        y1 = transform.TransformPointY(hc, 0);
+        y3 = transform.TransformPointY(this.extX, vc);
+        y5 = transform.TransformPointY(hc, this.extY);
+        y7 = transform.TransformPointY(0, vc);
+
+        var north_number;
+        var full_flip_h = this.getFullFlipH();
+        var full_flip_v = this.getFullFlipV();
+        switch(Math.min(y1, y3, y5, y7))
+        {
+            case y1:
+            {
+                north_number = !full_flip_v ? 1 : 5;
+                break;
+            }
+            case y3:
+            {
+                north_number = !full_flip_h ? 3 : 7;
+                break;
+            }
+            case y5:
+            {
+                north_number = !full_flip_v ? 5 : 1;
+                break;
+            }
+            default:
+            {
+                north_number = !full_flip_h ? 7 : 3;
+                break;
+            }
+        }
+        var same_flip = !full_flip_h && !full_flip_v || full_flip_h && full_flip_v;
+
+        if(same_flip)
+            return (north_number + cardDirection)%8;
+        return (north_number - cardDirection + 8)%8;
+    },
+
+    getAspect: function(num)
+    {
+        var _tmp_x = this.extX != 0 ? this.extX : 0.1;
+        var _tmp_y = this.extY != 0 ? this.extY : 0.1;
+        return num === 0 || num === 4 ? _tmp_x/_tmp_y : _tmp_y/_tmp_x;
+    },
+
+
     deselect: function(drawingObjectsController)
     {
         this.selected = false;
@@ -447,5 +619,19 @@ CGroupShape.prototype =
                 break;
             }
         }
+    },
+
+    createRotateTrack: function()
+    {
+        return new RotateTrackGroup(this);
+    },
+
+    createMoveTrack: function()
+    {
+        return new MoveGroupTrack(this);
+    },
+    createResizeTrack: function(cardDirection)
+    {
+        return new ResizeTrackGroup(this, cardDirection);
     }
 };

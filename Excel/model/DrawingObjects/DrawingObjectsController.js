@@ -190,22 +190,7 @@ DrawingObjectsController.prototype =
 
     drawSelection: function(drawingDocument)
     {
-        switch (this.curState.id)
-        {
-            default :
-            {
-                var selected_objects = this.selectedObjects;
-                for(var i = 0; i < selected_objects.length; ++i)
-                {
-                    drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, selected_objects[i].getTransform(), 0, 0, selected_objects[i].extX, selected_objects[i].extY, false, selected_objects[i].canRotate());
-                }
-                if(selected_objects.length === 1)
-                {
-                    selected_objects[0].drawAdjustments(drawingDocument);
-                }
-                break;
-            }
-        }
+        this.curState.drawSelection(drawingDocument);
     },
 
     isPointInDrawingObjects: function(x, y)

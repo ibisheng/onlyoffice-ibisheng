@@ -300,6 +300,43 @@ CImage.prototype =
         this.group = group;
     },
 
+    getFullOffset: function()
+    {
+        if(!isRealObject(this.group))
+            return {offX: this.x, offY: this.y};
+        var group_offset = this.group.getFullOffset();
+        return {offX: this.x + group_offset.offX, offY: this.y + group_offset.offY};
+    },
+
+    getRectBounds: function()
+    {
+        var transform = this.getTransform();
+        var w = this.extX;
+        var h = this.extY;
+        var rect_points = [{x:0, y:0}, {x: w, y: 0}, {x: w, y: h}, {x: 0, y: h}];
+        var min_x, max_x, min_y, max_y;
+        min_x = transform.TransformPointX(rect_points[0].x, rect_points[0].y);
+        min_y = transform.TransformPointY(rect_points[0].x, rect_points[0].y);
+        max_x = min_x;
+        max_y = min_y;
+        var cur_x, cur_y;
+        for(var i = 1; i < 4; ++i)
+        {
+            cur_x = transform.TransformPointX(rect_points[i].x, rect_points[i].y);
+            cur_y = transform.TransformPointY(rect_points[i].x, rect_points[i].y);
+            if(cur_x < min_x)
+                min_x = cur_x;
+            if(cur_x > max_x)
+                max_x = cur_x;
+
+            if(cur_y < min_y)
+                min_y = cur_y;
+            if(cur_y > max_y)
+                max_y = cur_y;
+        }
+        return {minX: min_x, maxX: max_x, minY: min_y, maxY: max_y};
+    },
+
     select: function(drawingObjectsController)
     {
         this.selected = true;

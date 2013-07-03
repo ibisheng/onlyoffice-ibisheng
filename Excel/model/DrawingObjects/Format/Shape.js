@@ -573,6 +573,14 @@ CShape.prototype =
 
     },
 
+    getFullOffset: function()
+    {
+        if(!isRealObject(this.group))
+            return {offX: this.x, offY: this.y};
+        var group_offset = this.group.getFullOffset();
+        return {offX: this.x + group_offset.offX, offY: this.y + group_offset.offY};
+    },
+
     transformPointRelativeShape: function(x, y)
     {
 

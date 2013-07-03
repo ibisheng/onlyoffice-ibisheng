@@ -34,6 +34,12 @@ function OverlayObject(geometry, extX, extY, brush, pen, transform)
         this.geometry.Recalculate(extX, extY);
     };
 
+    this.updateTransformMatrix = function(transform)
+    {
+        this.TransformMatrix = transform;
+    };
+
+
     this.draw = function(overlay)
     {
         overlay.SaveGrState();
@@ -169,6 +175,89 @@ function RotateTrackShapeImageInGroup(originalObject)
         global_MatrixTransformer.RotateRadAppend(this.transform, -this.angle);
         global_MatrixTransformer.TranslateAppend(this.transform, this.originalObject.x + hc, this.originalObject.y + vc);
         global_MatrixTransformer.MultiplyAppend(this.transform, this.originalObject.group.getTransform());
+    };
+
+    this.trackEnd = function()
+    {
+        this.originalObject.setRotate(this.angle);
+        this.originalObject.recalculateTransform();
+    }
+}
+
+
+function RotateTrackGroup(originalObject)
+{
+    this.originalObject = originalObject;
+    this.transform = new CMatrix();
+
+    this.overlayObjects = [];
+
+
+    this.arrTransforms = [];
+    this.arrTransforms2 = [];
+    var arr_graphic_objects = originalObject.getArrGraphicObjects();
+    var group_invert_transform = originalObject.getInvertTransform();
+    for(var i = 0; i < arr_graphic_objects.length; ++i)
+    {
+        var gr_obj_transform_copy = arr_graphic_objects[i].getTransform().CreateDublicate();
+        global_MatrixTransformer.MultiplyAppend(gr_obj_transform_copy, group_invert_transform);
+        this.arrTransforms2[i] = gr_obj_transform_copy;
+        this.overlayObjects[i] = new OverlayObject(arr_graphic_objects[i].spPr.geometry, arr_graphic_objects[i].extX, arr_graphic_objects[i].extY,
+            arr_graphic_objects[i].brush,  arr_graphic_objects[i].pen, new CMatrix());
+    }
+
+
+    this.angle = originalObject.rot;
+
+    this.draw = function(overlay)
+    {
+        for(var i = 0; i < this.overlayObjects.length; ++i)
+        {
+            this.overlayObjects[i].draw(overlay);
+        }
+    };
+
+    this.track = function(angle, e)
+    {
+        var new_rot = angle + this.originalObject.rot;
+        while(new_rot < 0)
+            new_rot += 2*Math.PI;
+        while(new_rot >= 2*Math.PI)
+            new_rot -= 2*Math.PI;
+
+        if(new_rot < MIN_ANGLE || new_rot > 2*Math.PI - MIN_ANGLE)
+            new_rot = 0;
+
+        if(Math.abs(new_rot-Math.PI*0.5) < MIN_ANGLE)
+            new_rot = Math.PI*0.5;
+
+        if(Math.abs(new_rot-Math.PI) < MIN_ANGLE)
+            new_rot = Math.PI;
+
+        if(Math.abs(new_rot-1.5*Math.PI) < MIN_ANGLE)
+            new_rot = 1.5*Math.PI;
+
+        if(e.shiftKey)
+            new_rot = (Math.PI/12)*Math.floor(12*new_rot/(Math.PI));
+        this.angle = new_rot;
+
+        var hc, vc;
+        hc = this.originalObject.extX*0.5;
+        vc = this.originalObject.extY*0.5;
+        this.transform.Reset();
+        global_MatrixTransformer.TranslateAppend(this.transform, -hc, -vc);
+        if(this.originalObject.flipH)
+            global_MatrixTransformer.ScaleAppend(this.transform, -1, 1);
+        if(this.originalObject.flipV)
+            global_MatrixTransformer.ScaleAppend(this.transform, 1, -1);
+        global_MatrixTransformer.RotateRadAppend(this.transform, -this.angle);
+        global_MatrixTransformer.TranslateAppend(this.transform, this.originalObject.x + hc, this.originalObject.y + vc);
+        for(var i = 0; i < this.overlayObjects.length; ++i)
+        {
+            var new_transform = this.arrTransforms2[i].CreateDublicate();
+            global_MatrixTransformer.MultiplyAppend(new_transform, this.transform);
+            this.overlayObjects[i].updateTransformMatrix(new_transform);
+        }
     };
 
     this.trackEnd = function()

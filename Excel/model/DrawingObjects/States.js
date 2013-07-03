@@ -128,6 +128,7 @@ function NullState(drawingObjectsController, drawingObjects)
                         if(!(e.ctrlKey || e.shiftKey) && !is_selected)
                             this.drawingObjectsController.resetSelection();
                         cur_drawing.select(this.drawingObjectsController);
+                        this.drawingObjects.selectGraphicObject();
                         for(var j = 0; j < selected_objects.length; ++j)
                         {
                             this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
@@ -155,6 +156,7 @@ function NullState(drawingObjectsController, drawingObjects)
                             if(!(e.ctrlKey || e.shiftKey))
                                 this.drawingObjectsController.resetSelection();
                             cur_drawing.select(this.drawingObjectsController);
+                            this.drawingObjects.selectGraphicObject();
                             for(var j = 0; j < selected_objects.length; ++j)
                             {
                                 this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
@@ -178,7 +180,12 @@ function NullState(drawingObjectsController, drawingObjects)
 
     this.onMouseUp = function(e, x, y)
     {
-	}
+	};
+
+    this.drawSelection = function(drawingDocument)
+    {
+        DrawDefaultSelection(this.drawingObjectsController, drawingDocument);
+    };
 }
 
 function PreRotateState(drawingObjectsController, drawingObjects, majorObject)
@@ -202,7 +209,12 @@ function PreRotateState(drawingObjectsController, drawingObjects, majorObject)
     {
         this.drawingObjectsController.clearPreTrackObjects();
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
-    }
+    };
+
+    this.drawSelection = function(drawingDocument)
+    {
+        DrawDefaultSelection(this.drawingObjectsController, drawingDocument);
+    };
 }
 
 
@@ -231,7 +243,12 @@ function RotateState(drawingObjectsController, drawingObjects, majorObject)
         this.drawingObjects.selectGraphicObject();
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
 		asc.editor.asc_endAddShape();
-    }
+    };
+
+    this.drawSelection = function(drawingDocument)
+    {
+        DrawDefaultSelection(this.drawingObjectsController, drawingDocument);
+    };
 }
 
 function PreResizeState(drawingObjectsController, drawingObjects, majorObject, cardDirection)
@@ -255,7 +272,11 @@ function PreResizeState(drawingObjectsController, drawingObjects, majorObject, c
     {
         this.drawingObjectsController.clearPreTrackObjects();
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
-    }
+    };
+    this.drawSelection = function(drawingDocument)
+    {
+        DrawDefaultSelection(this.drawingObjectsController, drawingDocument);
+    };
 }
 
 function ResizeState(drawingObjectsController, drawingObjects, majorObject, cardDirection)
@@ -285,7 +306,12 @@ function ResizeState(drawingObjectsController, drawingObjects, majorObject, card
         this.drawingObjects.selectGraphicObject();
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
         asc.editor.asc_endAddShape();
-    }
+    };
+
+    this.drawSelection = function(drawingDocument)
+    {
+        DrawDefaultSelection(this.drawingObjectsController, drawingDocument);
+    };
 }
 
 function StartTrackNewShapeState(drawingObjectsController, drawingObjects, presetGeom)
@@ -307,7 +333,12 @@ function StartTrackNewShapeState(drawingObjectsController, drawingObjects, prese
     this.onMouseUp = function(e, x, y)
     {
         //TODO
-    }
+    };
+
+    this.drawSelection = function(drawingDocument)
+    {
+        DrawDefaultSelection(this.drawingObjectsController, drawingDocument);
+    };
 }
 
 function BeginTrackNewShapeState(drawingObjectsController, drawingObjects, presetGeom, startX, startY)
@@ -335,7 +366,12 @@ function BeginTrackNewShapeState(drawingObjectsController, drawingObjects, prese
     this.onMouseUp = function(e, x, y)
     {
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
-    }
+    };
+
+    this.drawSelection = function(drawingDocument)
+    {
+        DrawDefaultSelection(this.drawingObjectsController, drawingDocument);
+    };
 }
 
 function TrackNewShapeState(drawingObjectsController, drawingObjects)
@@ -363,7 +399,12 @@ function TrackNewShapeState(drawingObjectsController, drawingObjects)
         this.drawingObjects.selectGraphicObject();
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
         asc.editor.asc_endAddShape();
-    }
+    };
+
+    this.drawSelection = function(drawingDocument)
+    {
+        DrawDefaultSelection(this.drawingObjectsController, drawingDocument);
+    };
 }
 
 function PreMoveState(drawingObjectsController, drawingObjects, startX, startY, shift, ctrl, majorObject, majorObjectIsSelected, bInside)
@@ -433,6 +474,11 @@ function PreMoveState(drawingObjectsController, drawingObjects, startX, startY, 
         }
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
     };
+
+    this.drawSelection = function(drawingDocument)
+    {
+        DrawDefaultSelection(this.drawingObjectsController, drawingDocument);
+    };
 }
 
 function MoveState(drawingObjectsController, drawingObjects, startX, startY, rectX, rectY, rectW, rectH)
@@ -468,7 +514,12 @@ function MoveState(drawingObjectsController, drawingObjects, startX, startY, rec
         this.drawingObjects.selectGraphicObject();
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
 		asc.editor.asc_endAddShape();
-    }
+    };
+
+    this.drawSelection = function(drawingDocument)
+    {
+        DrawDefaultSelection(this.drawingObjectsController, drawingDocument);
+    };
 }
 
 
@@ -494,7 +545,12 @@ function PreChangeAdjState(drawingObjectsController, drawingObjects)
     {
         this.drawingObjectsController.clearPreTrackObjects();
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
-    }
+    };
+
+    this.drawSelection = function(drawingDocument)
+    {
+        DrawDefaultSelection(this.drawingObjectsController, drawingDocument);
+    };
 }
 
 function ChangeAdjState(drawingObjectsController, drawingObjects)
@@ -521,6 +577,11 @@ function ChangeAdjState(drawingObjectsController, drawingObjects)
         this.drawingObjectsController.clearTrackObjects();
         this.drawingObjects.selectGraphicObject();
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
+    };
+
+    this.drawSelection = function(drawingDocument)
+    {
+        DrawDefaultSelection(this.drawingObjectsController, drawingDocument);
     };
 }
 
@@ -605,6 +666,11 @@ function GroupState(drawingObjectsController, drawingObjects, group)
 
     this.onMouseUp = function(e, x, y)
     {};
+
+    this.drawSelection = function(drawingDocument)
+    {
+        DrawGroupSelection(this.group, drawingDocument);
+    };
 }
 
 
@@ -628,6 +694,11 @@ function PreMoveInGroupState(drawingObjectsController, drawingObjects, group, st
 
     this.onMouseUp = function(e, x, y)
     {};
+
+    this.drawSelection = function(drawingDocument)
+    {
+        DrawGroupSelection(this.group, drawingDocument);
+    };
 }
 
 function MoveInGroupState(drawingObjectsController, drawingObjects, group)
@@ -651,6 +722,11 @@ function MoveInGroupState(drawingObjectsController, drawingObjects, group)
         this.drawingObjectsController.clearTrackObjects();
         this.drawingObjectsController.changeCurrentState(new GroupState(this.drawingObjectsController, this.drawingObjects, this.group));
     };
+
+    this.drawSelection = function(drawingDocument)
+    {
+        DrawGroupSelection(this.group, drawingDocument);
+    };
 }
 
 function PreChangeAdjInGroupState(drawingObjectsController, drawingObjects, group)
@@ -673,6 +749,11 @@ function PreChangeAdjInGroupState(drawingObjectsController, drawingObjects, grou
 
     this.onMouseUp = function(e, x, y)
     {};
+
+    this.drawSelection = function(drawingDocument)
+    {
+        DrawGroupSelection(this.group, drawingDocument);
+    };
 }
 
 function ChangeAdjInGroupState(drawingObjectsController, drawingObjects, group)
@@ -698,6 +779,11 @@ function ChangeAdjInGroupState(drawingObjectsController, drawingObjects, group)
         this.drawingObjectsController.clearTrackObjects();
         this.drawingObjectsController.changeCurrentState(new GroupState(this.drawingObjectsController, this.drawingObjects, this.group));
     };
+
+    this.drawSelection = function(drawingDocument)
+    {
+        DrawGroupSelection(this.group, drawingDocument);
+    };
 }
 
 function PreRotateInGroupState(drawingObjectsController, drawingObjects, group, majorObject)
@@ -720,6 +806,11 @@ function PreRotateInGroupState(drawingObjectsController, drawingObjects, group, 
 
     this.onMouseUp = function(e, x, y)
     {};
+
+    this.drawSelection = function(drawingDocument)
+    {
+        DrawGroupSelection(this.group, drawingDocument);
+    };
 }
 
 function RotateInGroupState(drawingObjectsController, drawingObjects, group, majorObject)
@@ -741,6 +832,11 @@ function RotateInGroupState(drawingObjectsController, drawingObjects, group, maj
        // this.drawingObjectsController.trackEnd();
         this.drawingObjectsController.clearTrackObjects();
         this.drawingObjectsController.changeCurrentState(new GroupState(this.drawingObjectsController, this.drawingObjects, this.group));
+    };
+
+    this.drawSelection = function(drawingDocument)
+    {
+        DrawGroupSelection(this.group, drawingDocument);
     };
 }
 
@@ -765,6 +861,11 @@ function PreResizeInGroupState(drawingObjectsController, drawingObjects, group, 
 
     this.onMouseUp = function(e, x, y)
     {};
+
+    this.drawSelection = function(drawingDocument)
+    {
+        DrawGroupSelection(this.group, drawingDocument);
+    };
 }
 
 function ResizeInGroupState(drawingObjectsController, drawingObjects, group, majorObject)
@@ -787,6 +888,35 @@ function ResizeInGroupState(drawingObjectsController, drawingObjects, group, maj
         this.drawingObjectsController.clearTrackObjects();
         this.drawingObjectsController.changeCurrentState(new GroupState(this.drawingObjectsController, this.drawingObjects, this.group));
     };
+
+    this.drawSelection = function(drawingDocument)
+    {
+        DrawGroupSelection(this.group, drawingDocument);
+    };
+}
+
+
+function DrawDefaultSelection(drawingObjectsController, drawingDocument)
+{
+    var selected_objects = drawingObjectsController.selectedObjects;
+    for(var i = 0; i < selected_objects.length; ++i)
+    {
+        drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, selected_objects[i].getTransform(), 0, 0, selected_objects[i].extX, selected_objects[i].extY, false/*, selected_objects[i].canRotate()TODO*/);
+    }
+    if(selected_objects.length === 1)
+    {
+        selected_objects[0].drawAdjustments(drawingDocument);
+    }
+}
+
+function DrawGroupSelection(group, drawingDocument)
+{
+    drawingDocument.DrawTrack(TYPE_TRACK_GROUP_PASSIVE, group.getTransform(), 0, 0, group.extX, group.extY, false/*, selected_objects[i].canRotate()TODO*/);
+    var group_selected_objects = group.selectedObjects;
+    for(var i = 0; i < group_selected_objects.length; ++i)
+    {
+        drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, group_selected_objects[i].getTransform(), 0, 0, group_selected_objects[i].extX, group_selected_objects[i].extY, false/*, selected_objects[i].canRotate()TODO*/)
+    }
 }
 
 
