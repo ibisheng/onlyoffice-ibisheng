@@ -862,6 +862,29 @@ function CChartData(bWordContext, chart) {
 		History.Add( _this, { chart: cloneChart } );
 	}
 	
+	_this.documentGetAllFontNames = function(AllFonts) {
+		this.documentGetAllFontNames_ExecuteFont(AllFonts, this.header.font);
+		this.documentGetAllFontNames_ExecuteFont(AllFonts, this.xAxis.titleFont);
+		this.documentGetAllFontNames_ExecuteFont(AllFonts, this.xAxis.labelFont);
+		this.documentGetAllFontNames_ExecuteFont(AllFonts, this.yAxis.titleFont);
+		this.documentGetAllFontNames_ExecuteFont(AllFonts, this.yAxis.labelFont);
+		this.documentGetAllFontNames_ExecuteFont(AllFonts, this.legend.font);
+		this.documentGetAllFontNames_ExecuteFont(AllFonts, this.legend.font);
+		for(var i = 0, length = this.series.length; i < length; ++i)
+		{
+			var seria = this.series[i];
+			if(null != seria)
+			{
+				this.documentGetAllFontNames_ExecuteFont(AllFonts, seria.titleFont);
+				this.documentGetAllFontNames_ExecuteFont(AllFonts, seria.labelFont);
+			}
+		}
+	}
+	_this.documentGetAllFontNames_ExecuteFont = function(AllFonts, font) {
+		if(null != font && null != font.name)
+			AllFonts[font.name] = true;
+	}
+	
 	if ( bWordContext )
 		g_oTableId.Add( _this, _this.Id );
 }

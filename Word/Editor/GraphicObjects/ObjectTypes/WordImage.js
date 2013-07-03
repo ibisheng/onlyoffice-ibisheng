@@ -449,7 +449,12 @@ WordImage.prototype =
 
     },
 
-
+	documentGetAllFontNames: function(AllFonts)
+    {
+        if(isRealObject(this.chart) && typeof this.chart.documentGetAllFontNames === "function")
+            this.chart.documentGetAllFontNames(AllFonts);
+    },
+	
     setRotate: function(rot)
     {
         var history_obj = {};

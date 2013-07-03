@@ -2724,6 +2724,8 @@ function BinaryFileReader(doc, openParams)
 		{
 			if(e.message == g_sErrorCharCountMessage)
 				return false;
+			else
+				throw "open error";
 		}
 		return true;
     };
@@ -5212,11 +5214,11 @@ function Binary_DocumentTableReader(doc, openParams, ImageMap, stream, bAllowFlo
 									chart.range.columns = true;
 							}
 						}
-						if(null != seria.xVal && null != seria.xVal.values)
-							this.PrepareSeria(seria.xVal.values, chart);
+						if(null != seria.xVal && null != seria.xVal.NumCache)
+							this.PrepareSeria(seria.xVal.NumCache, chart);
 					}
-					if(null != seria.Val.values)
-						this.PrepareSeria(seria.Val.values, chart);
+					if(null != seria.Val && null != seria.Val.NumCache)
+						this.PrepareSeria(seria.Val.NumCache, chart);
 				}
 			}
 			var nRowCount = chart.data.length;
