@@ -5029,7 +5029,7 @@
 				var lockInfo = undefined;
 				var isLocked = false;
 				
-				if ( asc.editor.isStartAddShape )
+				if ( asc["editor"].isStartAddShape )
 					return {cursor: kCurFillHandle, target: "shape", col: -1, row: -1};
 				
 				var drawingInfo = this.objectRender.checkCursorDrawingObject(x, y);
@@ -5916,9 +5916,9 @@
 					var drawingInfo = this.objectRender.checkCursorDrawingObject(x, y);
 					if ( drawingInfo ) {
 						if ( drawingInfo.isShape )
-								asc.editor.isStartAddShape = true;
+								asc["editor"].isStartAddShape = true;
 							else
-								asc.editor.isStartAddShape = false;
+								asc["editor"].isStartAddShape = false;
 					}
 					
 					// move active range to coordinates x,y

@@ -242,7 +242,7 @@ function RotateState(drawingObjectsController, drawingObjects, majorObject)
         this.drawingObjectsController.clearTrackObjects();
         this.drawingObjects.selectGraphicObject();
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
-		asc.editor.asc_endAddShape();
+		asc["editor"].asc_endAddShape();
     };
 
     this.drawSelection = function(drawingDocument)
@@ -305,7 +305,7 @@ function ResizeState(drawingObjectsController, drawingObjects, majorObject, card
         this.drawingObjectsController.clearTrackObjects();
         this.drawingObjects.selectGraphicObject();
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
-        asc.editor.asc_endAddShape();
+        asc["editor"].asc_endAddShape();
     };
 
     this.drawSelection = function(drawingDocument)
@@ -398,7 +398,7 @@ function TrackNewShapeState(drawingObjectsController, drawingObjects)
         this.drawingObjectsController.clearTrackObjects();
         this.drawingObjects.selectGraphicObject();
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
-        asc.editor.asc_endAddShape();
+        asc["editor"].asc_endAddShape();
     };
 
     this.drawSelection = function(drawingDocument)
@@ -513,7 +513,7 @@ function MoveState(drawingObjectsController, drawingObjects, startX, startY, rec
         this.drawingObjectsController.clearTrackObjects();
         this.drawingObjects.selectGraphicObject();
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
-		asc.editor.asc_endAddShape();
+		asc["editor"].asc_endAddShape();
     };
 
     this.drawSelection = function(drawingDocument)

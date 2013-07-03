@@ -48,8 +48,6 @@ function CImage(drawingBase, drawingObjects)
 
     this.x = null;
     this.y = null;
-    this.x = null;
-    this.y = null;
     this.extX = null;
     this.extY = null;
     this.rot = null;

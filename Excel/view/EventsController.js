@@ -1061,9 +1061,9 @@
 				// shapes
 				var graphicsInfo = t.handlers.trigger("getGraphicsInfo", coord.x, coord.y);
 				if ( graphicsInfo && graphicsInfo.isShape )
-					asc.editor.isStartAddShape = true;
+					asc["editor"].isStartAddShape = true;
 				
-				if ( asc.editor.isStartAddShape ) {
+				if ( asc["editor"].isStartAddShape ) {
 					t.handlers.trigger("shapeMouseDown", event, coord.x, coord.y);
 					return;
 				}
@@ -1203,7 +1203,7 @@
 			
 				// shapes
 				var coord = this._getCoordinates(event);
-				if ( asc.editor.isStartAddShape ) {
+				if ( asc["editor"].isStartAddShape ) {
 					this.handlers.trigger("shapeMouseUp", event, coord.x, coord.y);
 					return;
 				}
@@ -1252,7 +1252,7 @@
 				t.hasCursor = true;
 				
 				// shapes
-				if ( asc.editor.isStartAddShape ) {
+				if ( asc["editor"].isStartAddShape ) {
 					t.handlers.trigger("shapeMouseMove", event, coord.x, coord.y);
 					t.handlers.trigger("updateWorksheet", t.element[0], coord.x, coord.y, event.ctrlKey, function(info){t.targetInfo = info;});
 					return;

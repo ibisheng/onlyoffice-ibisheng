@@ -2119,15 +2119,13 @@ function DrawingObjects() {
 	}
 
 	_this._uploadMessage = function(event) {
-		if (null != event && null != event.data) {
+		if ( null != event && null != event.data ) {
 
 			var data = JSON.parse(event.data);
-			if(null != data && null != data.type)
+			if ( null != data && null != data.type )
 			{
-				if(PostMessageType.UploadImage == data.type)
-				{
-					if(c_oAscServerError.NoError == data.error)
-					{
+				if ( PostMessageType.UploadImage == data.type ) {
+					if(c_oAscServerError.NoError == data.error) {
 						var sheetId = null;
 						if(null != data.input)
 							sheetId = data.input.sheetId;
@@ -2138,8 +2136,7 @@ function DrawingObjects() {
 						else
 							worksheet.model.workbook.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 					}
-					else
-					{
+					else {
 						worksheet.model.workbook.handlers.trigger("asc_onError", _mapAscServerErrorToAscError(data.error), c_oAscError.Level.NoCritical);
 						worksheet.model.workbook.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 					}
