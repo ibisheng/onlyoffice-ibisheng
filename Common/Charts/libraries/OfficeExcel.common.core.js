@@ -1504,7 +1504,10 @@
 		{
 			scale = drwContext.scaleFactor;
 			drwContext.setCanvas(bar.canvas);
-
+			var fontProp = Asc.FontProperties;
+			if(!fontProp)
+				fontProp = FontProperties;
+			
 			context = drwContext;
 			 // Need these now the angle can be specified, ie defaults for the former two args
 			if (typeof(arguments[6]) == null) arguments[6]  = 'bottom'; // Vertical alignment. Default to bottom/baseline
@@ -1520,15 +1523,15 @@
 			}
 
 			// First, translate to x/y coords
-			context.save();
+			/*context.save();
 
 			context.canvas.__OfficeExcel_originalx__ = x;
 			context.canvas.__OfficeExcel_originaly__ = y;
-			context.translate(x, y);
+			context.translate(x, y);*/
 			var italic = arguments[13] && arguments[13].italic ? arguments[13].italic : false;
 			var underline = arguments[13] && arguments[13].underline ? arguments[13].underline : false;
 			
-			var ascFont = new Asc.FontProperties(font, size, arguments[11], italic, underline);
+			var ascFont = new fontProp(font, size, arguments[11], italic, underline);
 			context.setFont(ascFont);
 		 
 			var width;
@@ -1594,7 +1597,7 @@
 				 context.fillText(text, x*0.75, y*0.75);
 				 context.lineWidth = 1;
 			}	
-			 context.restore();
+			 //context.restore();
 		}
 		else
 		{
@@ -1755,23 +1758,33 @@
 		
 		if(!angle)
 			angle = 90;
+		
+		if(window["editor"])
+		{
+			//****TeST****
+			var m = new CMatrix();
+			drawingCtx.setFont(font, angle);
+			m.Rotate(90);
+			drawingCtx.transform(m.sx, m.shy, m.shx, m.sy, m.tx, m.ty);
+			drawingCtx.fillText(text, cx - 90, cy - 90, 0, 0, angle);
+		}
+		else
+		{
+			var m = new asc.Matrix();
+			m.rotate(angle, 0);
 
-		var m = new asc.Matrix();
-		m.rotate(angle, 0);
+			var mbt = new asc.Matrix();
+			mbt.translate(cx + textWidth, cy + textHeight);
 
-		var mbt = new asc.Matrix();
-		mbt.translate(cx + textWidth, cy + textHeight);
+			drawingCtx.setFont(font, angle);
+			drawingCtx.setTextTransform(m.sx, m.shy, m.shx, m.sy, m.tx, m.ty);
+			drawingCtx.setTransform(mbt.sx, mbt.shy, mbt.shx, mbt.sy, mbt.tx, mbt.ty);
+			drawingCtx.updateTransforms();
 
-		drawingCtx.setFont(font, angle);
+			drawingCtx.fillText(text, 0, 0, 0, 0, angle);
 
-
-		drawingCtx.setTextTransform(m.sx, m.shy, m.shx, m.sy, m.tx, m.ty);
-		drawingCtx.setTransform(mbt.sx, mbt.shy, mbt.shx, mbt.sy, mbt.tx, mbt.ty);
-		drawingCtx.updateTransforms();
-
-		drawingCtx.fillText(text, 0, 0, 0, 0, angle);
-
-		drawingCtx.resetTransforms();
+			drawingCtx.resetTransforms();
+		}
 	}	 
 	   
 					

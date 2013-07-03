@@ -11,10 +11,10 @@ function ChartRender() {
 			g_bChartPreview = true;
 		else
 			g_bChartPreview = false;
-		if(window["editor"])
-			return;
 		if (chart.worksheet && !OfficeExcel.drawingCtxCharts)//выставление контекста для отрисовки
 			OfficeExcel.drawingCtxCharts = chart.worksheet.getDrawingContextCharts();
+		else if(window["editor"] && !OfficeExcel.drawingCtxCharts)
+			OfficeExcel.drawingCtxCharts = new CDrawingContextWord();
 		chartCanvas = document.createElement('canvas');
 		$(chartCanvas).css('width', width);
 		$(chartCanvas).css('height', height);
@@ -1336,7 +1336,8 @@ function drawChart(chart, arrValues, width, height) {
 	var defaultXTitle = 'X Axis';
 	var defaultYTitle = 'Y Axis';
 	var defaultTitle = 'Diagram Title';
-
+	if(OfficeExcel.drawingCtxCharts)
+		OfficeExcel.drawingCtxCharts.setCanvas(chartCanvas);
 	// По типу
 	switch (chart.type) {
 		case c_oAscChartType.line:
@@ -2017,34 +2018,37 @@ function getFontProperties(type)
 	var xAxisTitle = bar._xAxisTitle;
 	var yAxisTitle = bar._yAxisTitle;
 	var chartTitle = bar._chartTitle;
+	var fontProp = Asc.FontProperties;
+	if(!fontProp)
+		fontProp = FontProperties;
 	switch (type) {
 		case "xLabels":
 		{
-			return new Asc.FontProperties(props._xlabels_font,props._xlabels_size,props._xlabels_bold, props._xlabels_italic, props._xlabels_underline);
+			return new fontProp(props._xlabels_font,props._xlabels_size,props._xlabels_bold, props._xlabels_italic, props._xlabels_underline);
 		}
 		case "yLabels":
 		{
-			return new Asc.FontProperties(props._ylabels_font, props._ylabels_size, props._ylabels_bold, props._ylabels_italic, props._ylabels_underline);
+			return new fontProp(props._ylabels_font, props._ylabels_size, props._ylabels_bold, props._ylabels_italic, props._ylabels_underline);
 		}
 		case "xTitle":
 		{
-			return new Asc.FontProperties(xAxisTitle._font, xAxisTitle._size, xAxisTitle._bold, xAxisTitle._italic, xAxisTitle._underline);
+			return new fontProp(xAxisTitle._font, xAxisTitle._size, xAxisTitle._bold, xAxisTitle._italic, xAxisTitle._underline);
 		}
 		case "yTitle":
 		{
-			return new Asc.FontProperties(yAxisTitle._font, yAxisTitle._size, yAxisTitle._bold, yAxisTitle._italic, yAxisTitle._underline);
+			return new fontProp(yAxisTitle._font, yAxisTitle._size, yAxisTitle._bold, yAxisTitle._italic, yAxisTitle._underline);
 		}
 		case "key":
 		{
-			return new Asc.FontProperties(props._key_text_font,props._key_text_size,props._key_text_bold, props._key_text_italic, props._key_text_underline);
+			return new fontProp(props._key_text_font,props._key_text_size,props._key_text_bold, props._key_text_italic, props._key_text_underline);
 		}
 		case "title":
 		{
-			return new Asc.FontProperties(chartTitle._font, chartTitle._size, chartTitle._bold, chartTitle._italic, chartTitle._underline);
+			return new fontProp(chartTitle._font, chartTitle._size, chartTitle._bold, chartTitle._italic, chartTitle._underline);
 		}
 		case "labelsAbove":
 		{
-			return new Asc.FontProperties(props._ylabels_labels_above_labels_above_font, props._labels_above_size, props._labels_above_bold, props._labels_above_italic, props._labels_above_underline);
+			return new fontProp(props._ylabels_labels_above_labels_above_font, props._labels_above_size, props._labels_above_bold, props._labels_above_italic, props._labels_above_underline);
 		}
 	}
 }
