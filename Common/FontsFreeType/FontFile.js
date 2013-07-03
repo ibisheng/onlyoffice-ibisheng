@@ -662,6 +662,13 @@ function CFontFile(fileName, faceIndex)
                 oSizes.ushGID     = unGID;
                 oSizes.nCMapIndex = nCMapIndex.index;
 
+                if (this.m_bIsNeedUpdateMatrix12)
+                {
+                    if (this.m_pDefaultFont)
+                        this.m_pDefaultFont.UpdateMatrix2();
+                    this.UpdateMatrix2();
+                }
+
                 if (0 != FT_Load_Glyph(this.m_pFace, unGID, this.m_oFontManager.LOAD_MODE))
                     return;
 
