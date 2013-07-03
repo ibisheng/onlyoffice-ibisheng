@@ -124,7 +124,8 @@
                 "../Word/Editor/SerializeCommon.js",
                 "../Word/apiDefines.js",
                 "../Word/api-all.js",
-                "../Word/Build/Log/apiExport.js"
+                "../Word/Build/Log/apiExport.js",
+				"../Excel/graphics/DrawingContextWord.js"
             ],
             "dst": "../Word/sdk-all.js",
             "externs": [
