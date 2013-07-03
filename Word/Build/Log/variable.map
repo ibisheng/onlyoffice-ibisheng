@@ -225,7 +225,7 @@ L 5:f
 historyitem_InitShape:gH
 L 4:e
 MobileTouchMode$Cursor:X0
-historyitem_SetXfrmShape:JH
+historyitem_SetXfrmShape:IH
 c_oSerDocTableType$Cell_Pr:EW
 CDocumentBorder:md
 JSCompiler_StaticMethods__setScrollerHW:h2
@@ -552,7 +552,7 @@ ParaInlineBreak:YN
 tt_face_set_sbit_strike:Hs
 Numbering_Number_To_Roman:uQ
 phType_dgm:eJ
-selected_None:nR
+selected_None:mR
 Round_To_Grid:Pv
 sfnt_service_glyph_dict:Wt
 JSCompiler_StaticMethods_HSL2RGB:MI
@@ -1093,7 +1093,7 @@ Editor_Paste_GetElem:Wb
 FileHandler:te
 _ph_summ__title_only:EK
 CTextFontFamily:p3
-cff_face_done:My
+cff_face_done:Ly
 FT_ENCODING_MS_SYMBOL:OA
 WRAPPING_TYPE_NONE:GD
 c_oSer_BasicChartType$BarDerection:Gk
@@ -1151,7 +1151,7 @@ c_oSerProp_tblStylePrType$ParPr:eV
 c_oSer_ChartType$TitleTxPrPptx:Xj
 CAscShapeProp:G3
 numFormat_Scientific:zf
-c_oSerProp_pPrType$pPr_rPr:HV
+c_oSerProp_pPrType$pPr_rPr:GV
 TrackNewShape:lF
 TT_DefRecord:kv
 c_oSerParType$Par:oW
@@ -1351,7 +1351,7 @@ create_cmap_class_rec:Jp
 tt_cmap4_init:Ys
 g_sMainServiceLocalUrl:Re
 c_oSer_pgSzType$Orientation:eY
-MobileTouchMode$Select:V0
+MobileTouchMode$Select:U0
 CARD_DIRECTION_SW:bH
 g_nodeAttributeEnd:Ag
 cff_get_interface:lz
@@ -1472,7 +1472,7 @@ FT_Outline_Get_CBox:fo
 BinaryHeaderFooterTableWriter:CZ
 c_oSer_ChartSeriesType$OutlineColor:Pk
 cff_slot_done:Gy
-LoadMobileImages:b1
+LoadMobileImages:a1
 c_oSerParType$pPr:pW
 c_oAscAlignV$Inside:yO
 selectionflag_Common:iM
@@ -1568,7 +1568,7 @@ c_oAscLineDrawingRule$Center:iT
 FlowObjects:JL
 CDocMetaSelection:y1
 numFormat_Hour:Bf
-JSCompiler_StaticMethods_Row_Remove:KR
+JSCompiler_StaticMethods_Row_Remove:JR
 cff_operator_seac:Zy
 CFontFile:DA
 tt_face_free_ps_names:Bs
@@ -2110,7 +2110,7 @@ CTableCellPr:YM
 historyitem_AddFtr:nE
 JSCompiler_StaticMethods_Internal_UpdatePages:uN
 JSCompiler_StaticMethods_ReadBefore:k_
-ImageLoadStatus$Loading:CB
+ImageLoadStatus$Loading:BB
 CPaddings:b3
 c_oSer_CommentsType$Text:sY
 JSCompiler_StaticMethods_Internal_GetContentByXY:QQ
