@@ -976,7 +976,7 @@ function ResizeTrackShapeImageInGroup(originalObject, cardDirection)
 
         global_MatrixTransformer.TranslateAppend(_transform, this.resizedPosX, this.resizedPosY);
         global_MatrixTransformer.TranslateAppend(_transform, _horizontal_center, _vertical_center);
-        global_MatrixTransformer.MultiplyAppend(_transform, this.group.getTransform());
+        global_MatrixTransformer.MultiplyAppend(_transform, this.originalObject.group.getTransform());
     };
 
     this.resizeRelativeCenter = function(kd1, kd2, shiftKey)
@@ -1075,7 +1075,7 @@ function ResizeTrackShapeImageInGroup(originalObject, cardDirection)
 
         global_MatrixTransformer.TranslateAppend(_transform, this.resizedPosX, this.resizedPosY);
         global_MatrixTransformer.TranslateAppend(_transform, _horizontal_center, _vertical_center);
-        global_MatrixTransformer.MultiplyAppend(_transform, this.group.getTransform());
+        global_MatrixTransformer.MultiplyAppend(_transform, this.originalObject.group.getTransform());
 
     };
 
