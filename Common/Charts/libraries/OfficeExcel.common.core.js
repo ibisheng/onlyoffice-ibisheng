@@ -1761,12 +1761,13 @@
 		
 		if(window["editor"])
 		{
-			//****TeST****
 			var m = new CMatrix();
-			drawingCtx.setFont(font, angle);
-			m.Rotate(90);
+			drawingCtx.setFont(font);
+			m.Rotate(angle);
 			drawingCtx.transform(m.sx, m.shy, m.shx, m.sy, m.tx, m.ty);
-			drawingCtx.fillText(text, cx - 90, cy - 90, 0, 0, angle);
+			var newX = (m.TransformPointX(cx,cy))*(-1);
+			var newY = (m.TransformPointY(cx,cy))*(-1);
+			drawingCtx.fillText(text, newX, newY, 0, 0, angle);
 		}
 		else
 		{
