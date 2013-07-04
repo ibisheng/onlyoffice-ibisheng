@@ -3354,7 +3354,6 @@ Paragraph.prototype =
             {
                 this.Internal_Content_Add( 0, new ParaNumbering() );
             }
-
             for ( var Pos = 1; Pos <  this.Content.length; Pos++ )
             {
                 var Item = this.Content[Pos];
@@ -3389,6 +3388,129 @@ Paragraph.prototype =
     RecalculateCurPos : function()
     {
         this.Internal_Recalculate_CurPos( this.CurPos.ContentPos, true, true, false );
+    },
+
+    Recalculate_MinContentWidth : function()
+    {
+        // Пересчитаем ширины всех элементов
+        this.Internal_Recalculate_0();
+
+        var bWord     = false;
+        var nWordLen  = 0;
+        var nMinWidth = 0;
+
+        var Count = this.Content.length;
+        for ( var Pos = 0; Pos < Count; Pos++ )
+        {
+            var Item = this.Content[Pos];
+
+            switch( Item.Type )
+            {
+                case para_Text :
+                {
+                    if ( false === bWord )
+                    {
+                        bWord    = true;
+                        nWordLen = Item.Width;
+                    }
+                    else
+                    {
+                        nWordLen += Item.Width;
+
+                        if ( true === Item.SpaceAfter )
+                        {
+                            if ( nMinWidth < nWordLen )
+                                nMinWidth = nWordLen;
+
+                            bWord    = false;
+                            nWordLen = 0;
+                        }
+                    }
+
+                    break;
+                }
+
+                case para_Space:
+                {
+                    if ( true === bWord )
+                    {
+                        if ( nMinWidth < nWordLen )
+                            nMinWidth = nWordLen;
+
+                        bWord    = false;
+                        nWordLen = 0;
+                    }
+
+                    break;
+                }
+
+                case para_Drawing:
+                {
+                    if ( true === bWord )
+                    {
+                        if ( nMinWidth < nWordLen )
+                            nMinWidth = nWordLen;
+
+                        bWord    = false;
+                        nWordLen = 0;
+                    }
+
+                    if ( ( true === Item.Is_Inline() || true === this.Parent.Is_DrawingShape() ) && Item.Width > nMinWidth )
+                        nMinWidth = Item.Width;
+
+                    break;
+                }
+
+                case para_PageNum:
+                {
+                    if ( true === bWord )
+                    {
+                        if ( nMinWidth < nWordLen )
+                            nMinWidth = nWordLen;
+
+                        bWord    = false;
+                        nWordLen = 0;
+                    }
+
+                    if ( Item.Width > nMinWidth )
+                        nMinWidth = Item.Width;
+
+                    break;
+                }
+
+                case para_Tab:
+                {
+                    nWordLen += Item.Width;
+
+                    if ( nMinWidth < nWordLen )
+                        nMinWidth = nWordLen;
+
+                    bWord    = false;
+                    nWordLen = 0;
+
+                    break;
+                }
+
+                case para_NewLine:
+                {
+                    if ( nMinWidth < nWordLen )
+                        nMinWidth = nWordLen;
+
+                    break;
+                }
+
+                case para_End:
+                {
+                    if ( nMinWidth < nWordLen )
+                        nMinWidth = nWordLen;
+
+                    break;
+                }
+            }
+        }
+
+        // добавляем 0.001, чтобы избавиться от погрешностей
+        return ( nMinWidth > 0 ?  nMinWidth + 0.001 : 0 );
     },
 
     Draw : function(PageNum, pGraphics)

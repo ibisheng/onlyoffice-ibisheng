@@ -129,6 +129,7 @@ var historyitem_Table_PositionH             = 24; // Изменяем привя
 var historyitem_Table_PositionV             = 25; // Изменяем привязку по вертикали
 var historyitem_Table_Distance              = 26; // Изменяем расстояние до окружающего текста
 var historyitem_Table_Pr                    = 27; // Изменяем настройки таблицы целиком
+var historyitem_Table_TableLayout           = 28; // Изменяем настройки рассчета ширины колонок
 
 // Типы изменений в классе CTableRow
 var historyitem_TableRow_Before      = 1; // Изменяем свойство Before

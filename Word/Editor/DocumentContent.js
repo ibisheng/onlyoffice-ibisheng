@@ -340,6 +340,12 @@ CDocumentContent.prototype =
         return this.Parent.Is_Cell();
     },
 
+    // Проверяем, лежит ли данный класс в таблице
+    Is_InTable : function(bReturnTopTable)
+    {
+        return this.Parent.Is_InTable(bReturnTopTable);
+    },
+
     // Проверяем, является ли данный класс верхним, по отношению к другим классам DocumentContent, Document
     Is_TopDocument : function(bReturnTopDocument)
     {
@@ -749,6 +755,21 @@ CDocumentContent.prototype =
                 this.Parent.OnEndRecalculate_Page(false);
         }
         return Result;
+    },
+
+    Recalculate_MinContentWidth : function()
+    {
+        var Min = 0;
+        var Count = this.Content.length;
+        for ( var Pos = 0; Pos < Count; Pos++ )
+        {
+            var Element = this.Content[Pos];
+            var CurMin = Element.Recalculate_MinContentWidth();
+            if ( Min < CurMin )
+                Min = CurMin;
+        }
+
+        return Min;
     },
 
     ReDraw : function(StartPage, EndPage)

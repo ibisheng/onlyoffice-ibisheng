@@ -7891,6 +7891,14 @@ CDocument.prototype =
         return true;
     },
 
+    Is_InTable : function(bReturnTopTable)
+    {
+        if ( true === bReturnTopTable )
+            return null;
+
+        return false;
+    },
+
     Is_DrawingShape : function()
     {
         return false;

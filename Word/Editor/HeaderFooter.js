@@ -488,6 +488,14 @@ CHeaderFooter.prototype =
         return true;
     },
 
+    Is_InTable : function(bReturnTopTable)
+    {
+        if ( true === bReturnTopTable )
+            return null;
+
+        return false;
+    },
+
     Is_SelectionUse : function()
     {
         return this.Content.Is_SelectionUse();
