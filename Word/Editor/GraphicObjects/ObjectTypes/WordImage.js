@@ -203,7 +203,7 @@ WordImage.prototype =
         this.spPr.geometry.Init( W, H );
         this.calculateTransformTextMatrix();
         this.setXfrm(0, 0, W, H,0, false, false);
-        this.setAbsoluteTransform(0, 0, W, H,0, false, false);
+        this.setAbsoluteTransform(0, 0, W, H,0, false, false, true);
         return this;
     },
 
