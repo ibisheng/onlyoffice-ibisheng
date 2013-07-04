@@ -199,15 +199,11 @@ prop:asc_unregisterCallback
 prop:asc_fireCallback
 prop:asc_checkNeedCallback
 prop:_coAuthoringInit
-prop:_coAuthoringInitCallBack
-prop:_coAuthoringSetServerUrl
 prop:asc_coAuthoringChatSendMessage
 prop:asc_coAuthoringChatGetMessages
 prop:asc_coAuthoringGetUsers
 prop:asc_coAuthoringDisconnect
 prop:_coSpellCheckInit
-prop:_coSpellCheckSetServerUrl
-prop:_spellCheckInitCallback
 prop:asc_getSpellCheckLanguages
 prop:get_TextProps
 prop:GetJSONLogicDocument
@@ -1182,15 +1178,11 @@ asc_docs_api.prototype['asc_unregisterCallback'] = asc_docs_api.prototype.asc_un
 asc_docs_api.prototype['asc_fireCallback'] = asc_docs_api.prototype.asc_fireCallback;
 asc_docs_api.prototype['asc_checkNeedCallback'] = asc_docs_api.prototype.asc_checkNeedCallback;
 asc_docs_api.prototype['_coAuthoringInit'] = asc_docs_api.prototype._coAuthoringInit;
-asc_docs_api.prototype['_coAuthoringInitCallBack'] = asc_docs_api.prototype._coAuthoringInitCallBack;
-asc_docs_api.prototype['_coAuthoringSetServerUrl'] = asc_docs_api.prototype._coAuthoringSetServerUrl;
 asc_docs_api.prototype['asc_coAuthoringChatSendMessage'] = asc_docs_api.prototype.asc_coAuthoringChatSendMessage;
 asc_docs_api.prototype['asc_coAuthoringChatGetMessages'] = asc_docs_api.prototype.asc_coAuthoringChatGetMessages;
 asc_docs_api.prototype['asc_coAuthoringGetUsers'] = asc_docs_api.prototype.asc_coAuthoringGetUsers;
 asc_docs_api.prototype['asc_coAuthoringDisconnect'] = asc_docs_api.prototype.asc_coAuthoringDisconnect;
 asc_docs_api.prototype['_coSpellCheckInit'] = asc_docs_api.prototype._coSpellCheckInit;
-asc_docs_api.prototype['_coSpellCheckSetServerUrl'] = asc_docs_api.prototype._coSpellCheckSetServerUrl;
-asc_docs_api.prototype['_spellCheckInitCallback'] = asc_docs_api.prototype._spellCheckInitCallback;
 asc_docs_api.prototype['asc_getSpellCheckLanguages'] = asc_docs_api.prototype.asc_getSpellCheckLanguages;
 asc_docs_api.prototype['get_TextProps'] = asc_docs_api.prototype.get_TextProps;
 asc_docs_api.prototype['GetJSONLogicDocument'] = asc_docs_api.prototype.GetJSONLogicDocument;

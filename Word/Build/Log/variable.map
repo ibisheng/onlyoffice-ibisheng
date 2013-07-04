@@ -157,7 +157,7 @@ ScrollOverType$NONE:T1
 CFontCharMap:p_
 c_oAscStrokeType$STROKE_COLOR:Q2
 TYPE_TRACK_SHAPE:GC
-JSCompiler_StaticMethods_Cell_Split:MR
+JSCompiler_StaticMethods_Cell_Split:LR
 FT_GLYPHLOADER_CHECK_POINTS:Bo
 ft_bitmap_glyph_copy:Tn
 CTrackRotateObject:$E
@@ -556,7 +556,7 @@ selected_None:mR
 Round_To_Grid:Pv
 sfnt_service_glyph_dict:Wt
 JSCompiler_StaticMethods_HSL2RGB:MI
-JSCompiler_StaticMethods_Col_Remove:LR
+JSCompiler_StaticMethods_Col_Remove:KR
 tt_face_get_ps_name:Cs
 FT_Add64:Kn
 c_oAscServerError$StorageWrite:df
@@ -664,7 +664,7 @@ CSchemeColor:Zg
 c_oSer_sts$Style_unhideWhenUsed:YU
 ETblStyleOverrideType$tblstyleoverridetypeLastRow:VY
 COLOR_TYPE_PRST:Wg
-MATRIX_ORDER_PREPEND:KH
+MATRIX_ORDER_PREPEND:JH
 T1_BuilderRec:Ir
 TT_CMapInfo:an
 documentFormat:T2
@@ -829,7 +829,7 @@ CGlyphData:RA
 CCacheManager:o0
 c_oAscChartSubType$stackedPer:Je
 Binary_HdrFtrTableReader:$Z
-MobileTouchMode$FlowObj:W0
+MobileTouchMode$FlowObj:V0
 c_oSer_CommentsType$Date:rY
 TT_MaxProfile:ip
 Round_To_Double_Grid:Tv
@@ -1233,7 +1233,7 @@ TT_Goto_CodeRange:uv
 Base64Encode:Li
 CBackground:B3
 JSCompiler_StaticMethods_Concat:pc
-CSelectedElementsInfo:oR
+CSelectedElementsInfo:nR
 FORMULA_TYPE_MIN:hL
 g_clr_MIN:rJ
 power_tens:Yx
@@ -1248,7 +1248,7 @@ c_oSerImageType2$DistB:eX
 c_oSerProp_pPrType$Ind:jV
 SetErrorAndReturn:Lw
 c_oSerImageType2$DistL:fX
-JSCompiler_StaticMethods_Search_Stop:pR
+JSCompiler_StaticMethods_Search_Stop:oR
 c_oSer_BasicChartType$Type:Fk
 T1_Read_PFM:rz
 c_oSerImageType2$DistT:hX
@@ -1626,7 +1626,7 @@ Ins_SVTCA:bw
 CFF_Decoder_Zone:Ry
 c_oSer_SettingsType$DefaultTabStop:BY
 t1_cmap_std_char_index:Wq
-CReaderTouchManager:c1
+CReaderTouchManager:b1
 c_oSerProp_tblStylePrType$TrPr:gV
 FT_GlyphLoader_Rewind:wo
 historyitem_ChangeDiagram:bI
