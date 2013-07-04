@@ -4616,8 +4616,8 @@ function GroupForResize(originalGroup, parentTrack, numberHandle, majorOffsetX, 
         this.y = xfrm.offY;
     }
     this.originalRot = xfrm.rot == null ? 0 : xfrm.rot;
-    this.extX =xfrm.extX;
-    this.extY =xfrm.extY;
+    this.extX = xfrm.extX;
+    this.extY = xfrm.extY;
     this.rot = xfrm.rot == null ? 0 : xfrm.rot;
     this.flipH = xfrm.flipH == null ? false : xfrm.flipH;
     this.flipV = xfrm.flipV == null ? false : xfrm.flipV;
