@@ -590,6 +590,13 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
         this.originalObject.setExtents(this.resizedExtX, this.resizedExtY);
         this.originalObject.setFlips(this.resizedflipH, this.resizedflipV);
         this.originalObject.recalculateTransform();
+        var bounds_rect = this.originalObject.getRectBounds();
+        var check_position = this.originalObject.drawingObjects.checkGraphicObjectPosition(bounds_rect.minX, bounds_rect.minY, bounds_rect.maxX - bounds_rect.minX, bounds_rect.maxY - bounds_rect.minY);
+        if(!check_position.result)
+        {
+            this.originalObject.setPosition(this.resizedPosX + check_position.x, this.resizedPosY + check_position.y);
+            this.originalObject.recalculateTransform();
+        }
         this.originalObject.updateDrawingBaseCoordinates();
     };
 }
