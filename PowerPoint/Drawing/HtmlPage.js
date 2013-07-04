@@ -219,6 +219,7 @@ function CEditorPage(api)
     this.DemonstrationDivEndPresentation = null;
     this.PresentationPlayTimerId = -1;
     this.DemonstrationEndShowMessage = "";
+    this.DemonstrationTransition = null;
     this.DefaultSlideDuration = 30000;
 
     // ввод текста через дивку (привет китайцам)

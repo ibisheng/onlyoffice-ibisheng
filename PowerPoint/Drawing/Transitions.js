@@ -92,9 +92,50 @@ function CTransitionAnimation(htmlpage)
         this.Rect.h = _slideH;
     }
 
-    this.Start = function()
+    this.CalculateRectDemonstration = function()
     {
-        this.CalculateRect();
+        var _width = this.HtmlPage.DemonstrationCanvas.width;
+        var _height = this.HtmlPage.DemonstrationCanvas.height;
+
+        var _w_mm = this.HtmlPage.m_oLogicDocument.Width;
+        var _h_mm = this.HtmlPage.m_oLogicDocument.Height;
+
+        // проверим аспект
+        var aspectDisplay = _width / _height;
+        var aspectPres = _w_mm / _h_mm;
+
+        var _l = 0;
+        var _t = 0;
+        var _w = 0;
+        var _h = 0;
+
+        if (aspectPres > aspectDisplay)
+        {
+            _w = _width;
+            _h = _w / aspectPres;
+            _l = 0;
+            _t = (_height - _h) >> 1;
+        }
+        else
+        {
+            _h = _height;
+            _w = _h * aspectPres;
+            _t = 0;
+            _l = (_width - _w) >> 1;
+        }
+
+        this.Rect.x = _l;
+        this.Rect.y = _t;
+        this.Rect.w = _w
+        this.Rect.h = _h;
+    }
+
+    this.Start = function(is_demonstration)
+    {
+        if (true === is_demonstration)
+            this.CalculateRectDemonstration();
+        else
+            this.CalculateRect();
 
         var _currentSlide = this.HtmlPage.m_oDrawingDocument.SlideCurrent;
         if (_currentSlide >= this.HtmlPage.m_oDrawingDocument.SlidesCount)
