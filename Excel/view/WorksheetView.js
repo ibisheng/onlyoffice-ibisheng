@@ -607,7 +607,6 @@
 				return this._getRange(this.activeRange.c1, this.activeRange.r1, this.activeRange.c2, this.activeRange.r2);
 			},
 
-
 			resize: function () {
 				this._initCellsArea(true);
 				this._normalizeViewRange();
@@ -616,7 +615,6 @@
 				return this;
 			},
 
-
 			getZoom: function () {
 				return this.drawingCtx.getZoom();
 			},
@@ -624,7 +622,7 @@
 			changeZoom: function (isUpdate) {
 				if (isUpdate) {
 					this.cleanSelection();
-					this._initCellsArea(true);
+					this._initCellsArea(false);
 					this._normalizeViewRange();
 					this._cleanCellsTextMetricsCache();
 					this._shiftVisibleRange();
@@ -1146,6 +1144,8 @@
 				this.maxRowHeight = asc_calcnpt( 409, this._getPPIY() );
 				this.defaultRowDescender = this._calcRowDescender(this.settings.cells.fontSize);
 				this.defaultRowHeight = asc_calcnpt( this.settings.cells.fontSize * this.vspRatio, this._getPPIY() ) + this.height_1px;
+
+				this._calcHeaderRowHeight();
 			},
 			_initCellsArea: function (fullRecalc) {
 				this.width_1px = asc_calcnpt(0, this._getPPIX(), 1/*px*/);
@@ -1157,15 +1157,12 @@
 				this.height_3px = asc_calcnpt(0, this._getPPIY(), 3/*px*/);
 
 				// calculate rows heights and visible rows
-				this.headersTop = 0;
-				this._calcHeaderRowHeight();
 				this._calcRowHeights(fullRecalc ? 1 : 0);
 				this.visibleRange.r2 = 0;
 				this._calcVisibleRows();
 				this._updateVisibleRowsCount(/*skipScrolReinit*/true);
 
 				// calculate columns widths and visible columns
-				this.headersLeft = 0;
 				this._calcHeaderColumnWidth();
 				this._calcColumnWidths(fullRecalc ? 1 : 0);
 				this.visibleRange.c2 = 0;
