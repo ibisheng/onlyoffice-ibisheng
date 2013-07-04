@@ -27,7 +27,7 @@ var STATES_ID_PRE_RESIZE_IN_GROUP = 0x17;
 var STATES_ID_RESIZE_IN_GROUP = 0x18;
 var STATES_ID_PRE_MOVE_IN_GROUP = 0x19;
 var STATES_ID_MOVE_IN_GROUP = 0x20;
-
+var STATES_ID_START_ADD_POLY_LINE = 0x21;
 
 
 var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
@@ -124,6 +124,7 @@ function NullState(drawingObjectsController, drawingObjects)
                     var hit_in_text_rect = cur_drawing.hitInTextRect(x, y);
                     if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
                     {
+                        this.drawingObjectsController.clearPreTrackObjects();
                         var is_selected = cur_drawing.selected;
                         if(!(e.ctrlKey || e.shiftKey) && !is_selected)
                             this.drawingObjectsController.resetSelection();
@@ -152,6 +153,7 @@ function NullState(drawingObjectsController, drawingObjects)
                         var hit_in_text_rect = cur_grouped_object.hitInTextRect(x, y);
                         if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
                         {
+                            this.drawingObjectsController.clearPreTrackObjects();
                             var is_selected = cur_drawing.selected;
                             if(!(e.ctrlKey || e.shiftKey))
                                 this.drawingObjectsController.resetSelection();
@@ -1153,7 +1155,7 @@ function GroupState(drawingObjectsController, drawingObjects, group)
                             var hit_in_text_rect = cur_drawing.hitInTextRect(x, y);
                             if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
                             {
-                                return {objectId: cur_drawing.drawingBase.id, cursorType: "move"};
+                                return {objectId: this.group.drawingBase.id, cursorType: "move"};
                             }
                             else if(hit_in_text_rect)
                             {
@@ -1514,6 +1516,35 @@ function ResizeInGroupState(drawingObjectsController, drawingObjects, group, maj
     {
         return {objectId: this.group.drawingBase.id, cursorType: CURSOR_TYPES_BY_CARD_DIRECTION[this.cardDirection]};
     };
+}
+
+function StartAddPolyLineState(drawingObjectsController, drawingObjects)
+{
+    this.id = STATES_ID_START_ADD_POLY_LINE;
+    this.drawingObjectsController = drawingObjectsController;
+    this.drawingObjects = drawingObjects;
+
+    this.onMouseDown = function(e, x, y)
+    {};
+
+    this.onMouseMove = function(e, x, y)
+    {
+        var resize_coefficients = this.majorObject.getResizeCoefficients(this.handleNum, x, y);
+        this.drawingObjectsController.trackResizeObjects(resize_coefficients.kd1, resize_coefficients.kd2, e);
+        this.drawingObjects.selectGraphicObject();
+        this.drawingObjects.showOverlayGraphicObjects();
+    };
+
+    this.onMouseUp = function(e, x, y)
+    {
+        this.drawingObjectsController.trackEnd();
+        this.group.normalize();
+        this.group.updateCoordinatesAfterInternalResize();
+        this.group.recalculateTransform();
+        this.drawingObjectsController.clearTrackObjects();
+        this.drawingObjectsController.changeCurrentState(new GroupState(this.drawingObjectsController, this.drawingObjects, this.group));
+    };
+
 }
 
 

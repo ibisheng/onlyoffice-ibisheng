@@ -414,6 +414,24 @@ CImage.prototype =
         graphics.SetIntegerGrid(true);
     },
 
+    check_bounds: function(checker)
+    {
+        if (this.spPr.geometry)
+        {
+            this.spPr.geometry.check_bounds(checker);
+        }
+        else
+        {
+            checker._s();
+            checker._m(0, 0);
+            checker._l(this.absExtX, 0);
+            checker._l(this.absExtX, this.absExtY);
+            checker._l(0, this.absExtY);
+            checker._z();
+            checker._e();
+        }
+    },
+
     hitToAdjustment: function(x, y)
     {
         return {hit: false, adjPolarFlag: null, adjNum: null};

@@ -1076,7 +1076,6 @@ function ResizeTrackShapeImageInGroup(originalObject, cardDirection)
         global_MatrixTransformer.TranslateAppend(_transform, this.resizedPosX, this.resizedPosY);
         global_MatrixTransformer.TranslateAppend(_transform, _horizontal_center, _vertical_center);
         global_MatrixTransformer.MultiplyAppend(_transform, this.originalObject.group.getTransform());
-
     };
 
     this.draw = function(overlay)
