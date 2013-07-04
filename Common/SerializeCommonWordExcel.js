@@ -1803,7 +1803,13 @@ function Binary_ChartReader(stream, chart)
 					if(null != par.rPr.FontSize)
 						res.font.size = par.rPr.FontSize;
 					if(null != par.rPr.FontFamily && null != par.rPr.FontFamily.Name && "" != par.rPr.FontFamily.Name)
-						res.font.name = par.rPr.FontFamily.Name;
+					{
+						var sName = par.rPr.FontFamily.Name;
+						//todo использовать темы
+						if("+mj-lt" == sName || "+mn-lt" == sName || "+mj-ea" == sName || "+mn-ea" == sName || "+mj-cs" == sName || "+mn-cs" == sName)
+							sName = "Arial";
+						res.font.name = sName;
+					}
 					// if(null != par.rPr.unifill)
 					// {
 						// var fill = par.rPr.unifill.fill;
