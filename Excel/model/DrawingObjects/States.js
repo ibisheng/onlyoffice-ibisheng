@@ -28,6 +28,7 @@ var STATES_ID_RESIZE_IN_GROUP = 0x18;
 var STATES_ID_PRE_MOVE_IN_GROUP = 0x19;
 var STATES_ID_MOVE_IN_GROUP = 0x20;
 var STATES_ID_START_ADD_POLY_LINE = 0x21;
+var STATES_ID_SPLINE_BEZIER = 0x22;
 
 
 var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
@@ -612,6 +613,7 @@ function TrackNewShapeState(drawingObjectsController, drawingObjects)
     {
         this.drawingObjectsController.trackNewShape(e, x, y);
         this.drawingObjects.showOverlayGraphicObjects();
+        this.drawingObjects.selectGraphicObject();
     };
 
     this.onMouseUp = function(e, x, y)
@@ -1293,7 +1295,10 @@ function MoveInGroupState(drawingObjectsController, drawingObjects, group, start
         this.group.recalculateTransform();
         this.drawingObjectsController.clearTrackObjects();
         this.drawingObjects.showDrawingObjects(true);
+        this.drawingObjects.selectGraphicObject();
         this.drawingObjectsController.changeCurrentState(new GroupState(this.drawingObjectsController, this.drawingObjects, this.group));
+
+
     };
 
     this.drawSelection = function(drawingDocument)
@@ -1360,6 +1365,7 @@ function ChangeAdjInGroupState(drawingObjectsController, drawingObjects, group)
     {
         this.drawingObjectsController.trackEnd();
         this.drawingObjectsController.clearTrackObjects();
+        this.drawingObjects.selectGraphicObject();
         this.drawingObjectsController.changeCurrentState(new GroupState(this.drawingObjectsController, this.drawingObjects, this.group));
     };
 
@@ -1431,6 +1437,7 @@ function RotateInGroupState(drawingObjectsController, drawingObjects, group, maj
         this.group.updateCoordinatesAfterInternalResize();
         this.group.recalculateTransform();
         this.drawingObjectsController.clearTrackObjects();
+        this.drawingObjects.selectGraphicObject();
         this.drawingObjectsController.changeCurrentState(new GroupState(this.drawingObjectsController, this.drawingObjects, this.group));
     };
 
@@ -1506,6 +1513,7 @@ function ResizeInGroupState(drawingObjectsController, drawingObjects, group, maj
         this.group.updateCoordinatesAfterInternalResize();
         this.group.recalculateTransform();
         this.drawingObjectsController.clearTrackObjects();
+        this.drawingObjects.selectGraphicObject();
         this.drawingObjectsController.changeCurrentState(new GroupState(this.drawingObjectsController, this.drawingObjects, this.group));
     };
 
@@ -1520,33 +1528,877 @@ function ResizeInGroupState(drawingObjectsController, drawingObjects, group, maj
     };
 }
 
-function StartAddPolyLineState(drawingObjectsController, drawingObjects)
+function SplineBezierState(drawingObjectsController, drawingObjects)
 {
-    this.id = STATES_ID_START_ADD_POLY_LINE;
-    this.drawingObjectsController = drawingObjectsController;
-    this.drawingObjects = drawingObjects;
+    this.id = STATES_ID_SPLINE_BEZIER;
+    this.graphicObjects = graphicObjects;
+    this.polylineFlag = true;
+    this.OnMouseDown = function(e, x, y, pageIndex)
+    {
+        this.graphicObjects.startTrackPos = {x: x, y: y, pageIndex: pageIndex};
+        this.graphicObjects.spline = new Spline(pageIndex, this.graphicObjects.document);
+        this.graphicObjects.spline.path.push(new SplineCommandMoveTo(x, y));
+        this.graphicObjects.changeCurrentState(new SplineBezierState33(this.graphicObjects, x, y));
+        var sel_arr = this.graphicObjects.selectionInfo.selectionArray;
+        for(var i = 0; i < sel_arr.length; ++i)
+        {
+            sel_arr[i].deselect();
+        }
+        sel_arr.length = 0;
+        this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
+    };
 
-    this.onMouseDown = function(e, x, y)
+    this.OnMouseMove = function(e, X, Y, pageIndex)
+    {
+    };
+
+    this.OnMouseUp = function(e, X, Y, pageIndex)
+    {
+        this.graphicObjects.changeCurrentState(new NullState(this.graphicObjects));
+        this.graphicObjects.curState.updateAnchorPos();
+    };
+    this.updateCursorType = function(pageIndex, x, y)
+    {
+        return false;
+    }
+}
+
+
+function SplineBezierState33(graphicObjects, startX, startY)
+{
+
+    this.id = STATES_ID_SPLINE_BEZIER33;
+    this.graphicObjects = graphicObjects;
+    this.polylineFlag = true;
+    this.OnMouseDown = function(e, x, y, pageIndex)
+    {
+    };
+
+    this.OnMouseMove = function(e, x, y, pageIndex)
+    {
+        var startPos = this.graphicObjects.startTrackPos;
+        if(startPos.x === x && startPos.y === y && startPos.pageIndex === pageIndex)
+            return;
+
+        var tr_x, tr_y;
+        if(pageIndex === startPos.pageIndex)
+        {
+            tr_x = x;
+            tr_y = y;
+        }
+        else
+        {
+            var tr_point = this.graphicObjects.drawingDocument.ConvertCoordsToAnotherPage(x, y, pageIndex, startPos.pageIndex);
+            tr_x = tr_point.X;
+            tr_y = tr_point.Y;
+        }
+
+        this.graphicObjects.spline.path.push(new SplineCommandLineTo(tr_x, tr_y));
+        this.graphicObjects.changeCurrentState(new SplineBezierState2(this.graphicObjects));
+        this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
+    };
+
+    this.OnMouseUp = function(e, x, y, pageIndex)
+    {
+    };
+    this.updateCursorType = function(pageIndex, x, y)
+    {
+        return false;
+    }
+}
+
+function SplineBezierState2(graphicObjects)
+{
+    this.id = STATES_ID_SPLINE_BEZIER2;
+    this.graphicObjects = graphicObjects;
+    this.polylineFlag = true;
+    this.OnMouseDown = function(e, x, y, pageIndex)
+    {
+        if(e.ClickCount >= 2)
+        {
+            var lt = this.graphicObjects.spline.getLeftTopPoint();
+            var near_pos =  this.graphicObjects.document.Get_NearestPos(this.graphicObjects.startTrackPos.pageIndex, lt.x, lt.y, true, null);
+            near_pos.Page = this.graphicObjects.startTrackPos.pageIndex;
+            if(false === editor.isViewMode && near_pos != null &&
+                false === this.graphicObjects.document.Document_Is_SelectionLocked(changestype_None, {Type : changestype_2_Element_and_Type , Element : near_pos.Paragraph, CheckType : changestype_Paragraph_Content} ))
+            {
+                History.Create_NewPoint();
+                var _new_word_graphic_object = this.graphicObjects.spline.createShape(this.graphicObjects.document);
+                _new_word_graphic_object.select(this.graphicObjects.startTrackPos.pageIndex);
+                this.graphicObjects.selectionInfo.selectionArray.push(_new_word_graphic_object);
+                _new_word_graphic_object.recalculateWrapPolygon();
+                _new_word_graphic_object.Set_DrawingType(drawing_Anchor);
+                _new_word_graphic_object.Set_WrappingType(WRAPPING_TYPE_NONE);
+                _new_word_graphic_object.Set_XYForAdd(_new_word_graphic_object.absOffsetX, _new_word_graphic_object.absOffsetY);
+                _new_word_graphic_object.Add_ToDocument(near_pos);
+            }
+            this.graphicObjects.arrTrackObjects.length = 0;
+            this.graphicObjects.spline = null;
+            editor.sync_StartAddShapeCallback(false);
+            editor.sync_EndAddShape();
+            this.graphicObjects.changeCurrentState(new NullState(this.graphicObjects));
+            this.graphicObjects.curState.updateAnchorPos();
+        }
+    };
+
+    this.OnMouseMove = function(e, x, y, pageIndex)
+    {
+        var startPos = this.graphicObjects.startTrackPos;
+        var tr_x, tr_y;
+        if(pageIndex === startPos.pageIndex)
+        {
+            tr_x = x;
+            tr_y = y;
+        }
+        else
+        {
+            var tr_point = this.graphicObjects.drawingDocument.ConvertCoordsToAnotherPage(x, y, pageIndex, startPos.pageIndex);
+            tr_x = tr_point.X;
+            tr_y = tr_point.Y;
+        }
+
+        this.graphicObjects.spline.path[1].changePoint(tr_x, tr_y);
+        this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
+    };
+
+    this.OnMouseUp = function(e, x, y, pageIndex)
+    {
+        if( e.ClickCount < 2)
+        {
+            var tr_x, tr_y;
+            if(pageIndex === this.graphicObjects.startTrackPos.pageIndex)
+            {
+                tr_x = x;
+                tr_y = y;
+            }
+            else
+            {
+                var tr_point = this.graphicObjects.drawingDocument.ConvertCoordsToAnotherPage(x, y, pageIndex, this.graphicObjects.startTrackPos.pageIndex);
+                tr_x = tr_point.x;
+                tr_y = tr_point.y;
+            }
+            this.graphicObjects.changeCurrentState(new SplineBezierState3(this.graphicObjects,tr_x, tr_y));
+        }
+    };
+    this.updateCursorType = function(pageIndex, x, y)
+    {
+        return false;
+    }
+}
+
+function SplineBezierState3(graphicObjects, startX, startY)
+{
+    this.id = STATES_ID_SPLINE_BEZIER3;
+
+    this.graphicObjects = graphicObjects;
+    this.startX = startX;
+    this.startY = startY;
+    this.polylineFlag = true;
+    this.OnMouseDown = function(e, x, y, pageIndex)
+    {
+        if(e.ClickCount >= 2)
+        {
+            var lt = this.graphicObjects.spline.getLeftTopPoint();
+            var near_pos =  this.graphicObjects.document.Get_NearestPos(this.graphicObjects.startTrackPos.pageIndex, lt.x, lt.y, true, null);
+            near_pos.Page = this.graphicObjects.startTrackPos.pageIndex;
+            if(false === editor.isViewMode && near_pos != null &&
+                false === this.graphicObjects.document.Document_Is_SelectionLocked(changestype_None, {Type : changestype_2_Element_and_Type , Element : near_pos.Paragraph, CheckType : changestype_Paragraph_Content} ))
+            {
+                History.Create_NewPoint();
+                var _new_word_graphic_object = this.graphicObjects.spline.createShape(this.graphicObjects.document);
+                _new_word_graphic_object.select(this.graphicObjects.startTrackPos.pageIndex);
+                this.graphicObjects.selectionInfo.selectionArray.push(_new_word_graphic_object);
+                _new_word_graphic_object.recalculateWrapPolygon();
+                _new_word_graphic_object.Set_DrawingType(drawing_Anchor);
+                _new_word_graphic_object.Set_WrappingType(WRAPPING_TYPE_NONE);
+                _new_word_graphic_object.Set_XYForAdd(_new_word_graphic_object.absOffsetX, _new_word_graphic_object.absOffsetY);
+                _new_word_graphic_object.Add_ToDocument(near_pos);
+            }
+            this.graphicObjects.arrTrackObjects.length = 0;
+            this.graphicObjects.spline = null;
+            editor.sync_StartAddShapeCallback(false);
+            editor.sync_EndAddShape();
+            this.graphicObjects.changeCurrentState(new NullState(this.graphicObjects));
+            this.graphicObjects.curState.updateAnchorPos();
+        }
+    };
+
+    this.OnMouseMove = function(e, x, y, pageIndex)
+    {
+        if(x === this.startX && y === this.startY && pageIndex === this.graphicObjects.startTrackPos.pageIndex)
+        {
+            return;
+        }
+
+        var tr_x, tr_y;
+        if(pageIndex === this.graphicObjects.startTrackPos.pageIndex)
+        {
+            tr_x = x;
+            tr_y = y;
+        }
+        else
+        {
+            var tr_point = this.graphicObjects.drawingDocument.ConvertCoordsToAnotherPage(x, y, pageIndex, this.graphicObjects.startTrackPos.pageIndex);
+            tr_x = tr_point.X;
+            tr_y = tr_point.Y;
+        }
+
+        var x0, y0, x1, y1, x2, y2, x3, y3, x4, y4, x5, y5, x6, y6;
+        var spline = this.graphicObjects.spline;
+        x0 = spline.path[0].x;
+        y0 = spline.path[0].y;
+        x3 = spline.path[1].x;
+        y3 = spline.path[1].y;
+        x6 = tr_x;
+        y6 = tr_y;
+
+        var vx = (x6 - x0)/6;
+        var vy = (y6 - y0)/6;
+
+        x2 = x3 - vx;
+        y2 = y3 - vy;
+
+        x4 = x3 + vx;
+        y4 = y3 + vy;
+
+        x1 = (x0 + x2)*0.5;
+        y1 = (y0 + y2)*0.5;
+
+        x5 = (x4 + x6)*0.5;
+        y5 = (y4 + y6)*0.5;
+
+
+        spline.path.length = 1;
+        spline.path.push(new SplineCommandBezier(x1, y1, x2, y2, x3, y3));
+
+
+        spline.path.push(new SplineCommandBezier(x4, y4, x5, y5, x6, y6));
+        this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
+        this.graphicObjects.changeCurrentState(new SplineBezierState4(this.graphicObjects));
+    };
+
+    this.OnMouseUp = function(e, x, y, pageIndex)
+    {
+        if(e.ClickCount >= 2)
+        {
+            var lt = this.graphicObjects.spline.getLeftTopPoint();
+            var near_pos =  this.graphicObjects.document.Get_NearestPos(this.graphicObjects.startTrackPos.pageIndex, lt.x, lt.y, true, null);
+            near_pos.Page = this.graphicObjects.startTrackPos.pageIndex;
+            if(false === editor.isViewMode && near_pos != null &&
+                false === this.graphicObjects.document.Document_Is_SelectionLocked(changestype_None, {Type : changestype_2_Element_and_Type , Element : near_pos.Paragraph, CheckType : changestype_Paragraph_Content} ))
+            {
+                History.Create_NewPoint();
+
+                var _new_word_graphic_object = this.graphicObjects.spline.createShape(this.graphicObjects.document);
+                _new_word_graphic_object.select(this.graphicObjects.startTrackPos.pageIndex);
+                this.graphicObjects.selectionInfo.selectionArray.push(_new_word_graphic_object);
+                _new_word_graphic_object.recalculateWrapPolygon();
+                _new_word_graphic_object.Set_DrawingType(drawing_Anchor);
+                _new_word_graphic_object.Set_WrappingType(WRAPPING_TYPE_NONE);
+                _new_word_graphic_object.Set_XYForAdd(_new_word_graphic_object.absOffsetX, _new_word_graphic_object.absOffsetY);
+                _new_word_graphic_object.Add_ToDocument(near_pos);
+            }
+            this.graphicObjects.arrTrackObjects.length = 0;
+            this.graphicObjects.spline = null;
+            editor.sync_StartAddShapeCallback(false);
+            editor.sync_EndAddShape();
+            this.graphicObjects.changeCurrentState(new NullState(this.graphicObjects));
+            this.graphicObjects.curState.updateAnchorPos();
+        }
+    };
+    this.updateCursorType = function(pageIndex, x, y)
+    {
+        return false;
+    }
+}
+
+function SplineBezierState4(graphicObjects)
+{
+    this.id = STATES_ID_SPLINE_BEZIER4;
+    this.graphicObjects = graphicObjects;
+    this.polylineFlag = true;
+    this.OnMouseDown = function(e, x, y, pageIndex)
+    {
+        if(e.ClickCount >= 2)
+        {
+            var lt = this.graphicObjects.spline.getLeftTopPoint();
+            var near_pos =  this.graphicObjects.document.Get_NearestPos(this.graphicObjects.startTrackPos.pageIndex, lt.x, lt.y, true, null);
+            near_pos.Page = this.graphicObjects.startTrackPos.pageIndex;
+            if(near_pos != null &&
+                false === this.graphicObjects.document.Document_Is_SelectionLocked(changestype_None, {Type : changestype_2_Element_and_Type , Element : near_pos.Paragraph, CheckType : changestype_Paragraph_Content} ))
+            {
+                var _new_word_graphic_object = this.graphicObjects.spline.createShape(this.graphicObjects.document);
+                _new_word_graphic_object.select(this.graphicObjects.startTrackPos.pageIndex);
+                this.graphicObjects.selectionInfo.selectionArray.push(_new_word_graphic_object);
+                _new_word_graphic_object.recalculateWrapPolygon();
+                _new_word_graphic_object.Set_DrawingType(drawing_Anchor);
+                _new_word_graphic_object.Set_WrappingType(WRAPPING_TYPE_NONE);
+                _new_word_graphic_object.Set_XYForAdd(_new_word_graphic_object.absOffsetX, _new_word_graphic_object.absOffsetY);
+                _new_word_graphic_object.Add_ToDocument(near_pos);
+            }
+            this.graphicObjects.arrTrackObjects.length = 0;
+            this.graphicObjects.spline = null;
+            editor.sync_StartAddShapeCallback(false);
+            editor.sync_EndAddShape();
+            this.graphicObjects.changeCurrentState(new NullState(this.graphicObjects));
+            this.graphicObjects.curState.updateAnchorPos();
+        }
+    };
+
+    this.OnMouseMove = function(e, x, y, pageIndex)
+    {
+        var spline = this.graphicObjects.spline;
+        var lastCommand = spline.path[spline.path.length-1];
+        var preLastCommand = spline.path[spline.path.length-2];
+        var x0, y0, x1, y1, x2, y2, x3, y3, x4, y4, x5, y5, x6, y6;
+        if(spline.path[spline.path.length-3].id == 0)
+        {
+            x0 = spline.path[spline.path.length-3].x;
+            y0 = spline.path[spline.path.length-3].y;
+        }
+        else
+        {
+            x0 = spline.path[spline.path.length-3].x3;
+            y0 = spline.path[spline.path.length-3].y3;
+        }
+
+        x3 = preLastCommand.x3;
+        y3 = preLastCommand.y3;
+
+        var tr_x, tr_y;
+        if(pageIndex === this.graphicObjects.startTrackPos.pageIndex)
+        {
+            tr_x = x;
+            tr_y = y;
+        }
+        else
+        {
+            var tr_point = this.graphicObjects.drawingDocument.ConvertCoordsToAnotherPage(x, y, pageIndex, this.graphicObjects.startTrackPos.pageIndex);
+            tr_x = tr_point.X;
+            tr_y = tr_point.Y;
+        }
+        x6 = tr_x;
+        y6 = tr_y;
+
+        var vx = (x6 - x0)/6;
+        var vy = (y6 - y0)/6;
+
+        x2 = x3 - vx;
+        y2 = y3 - vy;
+
+        x4 = x3 + vx;
+        y4 = y3 + vy;
+
+        x5 = (x4 + x6)*0.5;
+        y5 = (y4 + y6)*0.5;
+
+        if(spline.path[spline.path.length-3].id == 0)
+        {
+            preLastCommand.x1 = (x0 + x2)*0.5;
+            preLastCommand.y1 = (y0 + y2)*0.5;
+        }
+
+        preLastCommand.x2 = x2;
+        preLastCommand.y2 = y2;
+        preLastCommand.x3 = x3;
+        preLastCommand.y3 = y3;
+
+        lastCommand.x1 = x4;
+        lastCommand.y1 = y4;
+        lastCommand.x2 = x5;
+        lastCommand.y2 = y5;
+        lastCommand.x3 = x6;
+        lastCommand.y3 = y6;
+
+        this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
+    };
+
+    this.OnMouseUp = function(e, x, y, pageIndex)
+    {
+        if(e.ClickCount < 2 )
+        {
+            var tr_x, tr_y;
+            if(pageIndex === this.graphicObjects.startTrackPos.pageIndex)
+            {
+                tr_x = x;
+                tr_y = y;
+            }
+            else
+            {
+                var tr_point = this.graphicObjects.drawingDocument.ConvertCoordsToAnotherPage(x, y, pageIndex, this.graphicObjects.startTrackPos.pageIndex);
+                tr_x = tr_point.X;
+                tr_y = tr_point.Y;
+            }
+            this.graphicObjects.changeCurrentState(new SplineBezierState5(graphicObjects, tr_x, tr_y));
+        }
+    };
+    this.updateCursorType = function(pageIndex, x, y)
+    {
+        return false;
+    }
+}
+
+function SplineBezierState5(graphicObjects, startX, startY)
+{
+    this.id = STATES_ID_SPLINE_BEZIER5;
+
+    this.graphicObjects = graphicObjects;
+    this.startX = startX;
+    this.startY = startY;
+    this.polylineFlag = true;
+    this.OnMouseDown = function(e, x, y, pageIndex)
+    {
+        if(e.ClickCount >= 2)
+        {
+            var lt = this.graphicObjects.spline.getLeftTopPoint();
+            var near_pos =  this.graphicObjects.document.Get_NearestPos(this.graphicObjects.startTrackPos.pageIndex, lt.x, lt.y, true, null);
+            near_pos.Page = this.graphicObjects.startTrackPos.pageIndex;
+            if(false === editor.isViewMode && near_pos != null &&
+                false === this.graphicObjects.document.Document_Is_SelectionLocked(changestype_None, {Type : changestype_2_Element_and_Type , Element : near_pos.Paragraph, CheckType : changestype_Paragraph_Content} ))
+            {
+                History.Create_NewPoint();
+                var _new_word_graphic_object = this.graphicObjects.spline.createShape(this.graphicObjects.document);
+
+                _new_word_graphic_object.select(this.graphicObjects.startTrackPos.pageIndex);
+                this.graphicObjects.selectionInfo.selectionArray.push(_new_word_graphic_object);
+                _new_word_graphic_object.recalculateWrapPolygon();
+                _new_word_graphic_object.Set_DrawingType(drawing_Anchor);
+                _new_word_graphic_object.Set_WrappingType(WRAPPING_TYPE_NONE);
+                _new_word_graphic_object.Set_XYForAdd(_new_word_graphic_object.absOffsetX, _new_word_graphic_object.absOffsetY);
+                _new_word_graphic_object.Add_ToDocument(near_pos);
+            }
+            this.graphicObjects.arrTrackObjects.length = 0;
+            this.graphicObjects.spline = null;
+            editor.sync_StartAddShapeCallback(false);
+            editor.sync_EndAddShape();
+            this.graphicObjects.changeCurrentState(new NullState(this.graphicObjects));
+            this.graphicObjects.curState.updateAnchorPos();
+        }
+    };
+
+    this.OnMouseMove = function(e, x, y, pageIndex)
+    {
+        if(x === this.startX && y === this.startY && pageIndex === this.graphicObjects.startTrackPos.pageIndex)
+        {
+            return;
+        }
+        var spline = this.graphicObjects.spline;
+        var lastCommand = spline.path[spline.path.length-1];
+        var x0, y0, x1, y1, x2, y2, x3, y3, x4, y4, x5, y5, x6, y6;
+
+        if(spline.path[spline.path.length-2].id == 0)
+        {
+            x0 = spline.path[spline.path.length-2].x;
+            y0 = spline.path[spline.path.length-2].y;
+        }
+        else
+        {
+            x0 = spline.path[spline.path.length-2].x3;
+            y0 = spline.path[spline.path.length-2].y3;
+        }
+
+        x3 = lastCommand.x3;
+        y3 = lastCommand.y3;
+
+
+        var tr_x, tr_y;
+        if(pageIndex === this.graphicObjects.startTrackPos.pageIndex)
+        {
+            tr_x = x;
+            tr_y = y;
+        }
+        else
+        {
+            var tr_point = this.graphicObjects.drawingDocument.ConvertCoordsToAnotherPage(x, y, pageIndex, this.graphicObjects.startTrackPos.pageIndex);
+            tr_x = tr_point.X;
+            tr_y = tr_point.Y;
+        }
+        x6 = tr_x;
+        y6 = tr_y;
+
+        var vx = (x6 - x0)/6;
+        var vy = (y6 - y0)/6;
+
+
+        x2 = x3 - vx;
+        y2 = y3 - vy;
+
+        x1 = (x2+x1)*0.5;
+        y1 = (y2+y1)*0.5;
+
+        x4 = x3 + vx;
+        y4 = y3 + vy;
+
+        x5 = (x4 + x6)*0.5;
+        y5 = (y4 + y6)*0.5;
+
+        if(spline.path[spline.path.length-2].id == 0)
+        {
+            lastCommand.x1 = x1;
+            lastCommand.y1 = y1;
+        }
+        lastCommand.x2 = x2;
+        lastCommand.y2 = y2;
+
+
+        spline.path.push(new SplineCommandBezier(x4, y4, x5, y5, x6, y6));
+        this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
+        this.graphicObjects.changeCurrentState(new SplineBezierState4(this.graphicObjects));
+    };
+
+    this.OnMouseUp = function(e, x, y, pageIndex)
+    {
+        if(e.ClickCount >= 2)
+        {
+            var lt = this.graphicObjects.spline.getLeftTopPoint();
+            var near_pos =  this.graphicObjects.document.Get_NearestPos(this.graphicObjects.startTrackPos.pageIndex, lt.x, lt.y, true, null);
+            near_pos.Page = this.graphicObjects.startTrackPos.pageIndex;
+            if(false === editor.isViewMode && near_pos != null &&
+                false === this.graphicObjects.document.Document_Is_SelectionLocked(changestype_None, {Type : changestype_2_Element_and_Type , Element : near_pos.Paragraph, CheckType : changestype_Paragraph_Content} ))
+            {
+                History.Create_NewPoint();
+                var _new_word_graphic_object = this.graphicObjects.spline.createShape(this.graphicObjects.document);
+
+                _new_word_graphic_object.select(this.graphicObjects.startTrackPos.pageIndex);
+                this.graphicObjects.selectionInfo.selectionArray.push(_new_word_graphic_object);
+                _new_word_graphic_object.recalculateWrapPolygon();
+                _new_word_graphic_object.Set_DrawingType(drawing_Anchor);
+                _new_word_graphic_object.Set_WrappingType(WRAPPING_TYPE_NONE);
+                _new_word_graphic_object.Set_XYForAdd(_new_word_graphic_object.absOffsetX, _new_word_graphic_object.absOffsetY);
+                _new_word_graphic_object.Add_ToDocument(near_pos);
+            }
+            this.graphicObjects.arrTrackObjects.length = 0;
+            this.graphicObjects.spline = null;
+            editor.sync_StartAddShapeCallback(false);
+            editor.sync_EndAddShape();
+            this.graphicObjects.changeCurrentState(new NullState(this.graphicObjects));
+            this.graphicObjects.curState.updateAnchorPos();
+        }
+    };
+    this.updateCursorType = function(pageIndex, x, y)
+    {
+        return false;
+    }
+}
+
+//Состояния прия работе с полилиниями
+function PolyLineAddState(graphicObjects)
+{
+    this.graphicObjects = graphicObjects;
+    this.polylineFlag = true;
+    this.OnMouseDown = function(e, x, y, pageIndex)
+    {
+        this.graphicObjects.startTrackPos = {x: x, y: y, pageIndex:pageIndex};
+        this.graphicObjects.polyline = new PolyLine(this.graphicObjects.document, pageIndex);
+        this.graphicObjects.polyline.arrPoint.push({x : x, y: y});
+        var sel_arr = this.graphicObjects.selectionInfo.selectionArray;
+        for(var i = 0; i < sel_arr.length; ++i)
+        {
+            sel_arr[i].deselect();
+        }
+        sel_arr.length = 0;
+        this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
+
+        var _min_distance = this.graphicObjects.drawingDocument.GetMMPerDot(1);
+        this.graphicObjects.changeCurrentState(new PolyLineAddState2(this.graphicObjects, _min_distance));
+    };
+    this.OnMouseMove = function(e, x, y, pageIndex)
+    {
+
+    };
+    this.OnMouseUp = function(e, x, y, pageIndex)
+    {
+        this.graphicObjects.changeCurrentState(new NullState(this.graphicObjects));
+        this.graphicObjects.curState.updateAnchorPos();
+        this.graphicObjects.polyline = null;
+    };
+    this.updateCursorType = function(pageIndex, x, y)
+    {
+        return false;
+    }
+}
+
+
+function PolyLineAddState2(graphicObjects, minDistance)
+{
+    this.graphicObjects = graphicObjects;
+    this.minDistance = minDistance;
+    this.polylineFlag = true;
+    this.OnMouseDown = function(e, x, y, pageIndex)
+    {
+    };
+    this.OnMouseMove = function(e, x, y, pageIndex)
+    {
+        var _last_point = this.graphicObjects.polyline.arrPoint[this.graphicObjects.polyline.arrPoint.length - 1];
+
+        var tr_x, tr_y;
+        if(pageIndex === this.graphicObjects.startTrackPos.pageIndex)
+        {
+            tr_x = x;
+            tr_y = y;
+        }
+        else
+        {
+            var tr_point = this.graphicObjects.drawingDocument.ConvertCoordsToAnotherPage(x, y, pageIndex, this.graphicObjects.startTrackPos.pageIndex);
+            tr_x = tr_point.X;
+            tr_y = tr_point.Y;
+        }
+        var dx = tr_x - _last_point.x;
+        var dy = tr_y - _last_point.y;
+
+        if(Math.sqrt(dx*dx + dy*dy) >= this.minDistance)
+        {
+            this.graphicObjects.polyline.arrPoint.push({x : tr_x, y : tr_y});
+            this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
+        }
+    };
+    this.OnMouseUp = function(e, x, y, pageIndex)
+    {
+        if(this.graphicObjects.polyline.arrPoint.length > 1)
+        {
+
+
+            var lt = this.graphicObjects.polyline.getLeftTopPoint();
+            var near_pos =  this.graphicObjects.document.Get_NearestPos(this.graphicObjects.startTrackPos.pageIndex,lt.x, lt.y);
+            near_pos.Page = this.graphicObjects.startTrackPos.pageIndex;
+            if(false === editor.isViewMode && near_pos != null &&
+                false === this.graphicObjects.document.Document_Is_SelectionLocked(changestype_None, {Type : changestype_2_Element_and_Type , Element : near_pos.Paragraph, CheckType : changestype_Paragraph_Content} ))
+            {
+                History.Create_NewPoint();
+                var _new_word_graphic_object = this.graphicObjects.polyline.createShape(this.graphicObjects.document);
+                this.graphicObjects.arrTrackObjects.length = 0;
+                //   this.graphicObjects.resetSelection();
+                _new_word_graphic_object.select(this.graphicObjects.startTrackPos.pageIndex);
+                _new_word_graphic_object.recalculateWrapPolygon();
+                this.graphicObjects.selectionInfo.selectionArray.push(_new_word_graphic_object);
+                _new_word_graphic_object.Set_DrawingType(drawing_Anchor);
+                _new_word_graphic_object.Set_WrappingType(WRAPPING_TYPE_NONE);
+                _new_word_graphic_object.Set_XYForAdd(_new_word_graphic_object.absOffsetX, _new_word_graphic_object.absOffsetY);
+                _new_word_graphic_object.Add_ToDocument(near_pos);
+            }
+            editor.sync_StartAddShapeCallback(false);
+            editor.sync_EndAddShape();
+            this.graphicObjects.changeCurrentState(new NullState(this.graphicObjects));
+            this.graphicObjects.curState.updateAnchorPos();
+            this.graphicObjects.polyline = null;
+
+
+        }
+        else
+        {
+            this.graphicObjects.changeCurrentState(new NullState(this.graphicObjects));
+            this.graphicObjects.curState.updateAnchorPos();
+            this.graphicObjects.drawingDocument.OnRecalculatePage(this.graphicObjects.startTrackPos.pageIndex, this.graphicObjects.document.Pages[this.graphicObjects.startTrackPos.pageIndex]);
+            this.graphicObjects.polyline = null;
+        }
+
+    };
+    this.updateCursorType = function(pageIndex, x, y)
+    {
+        return false;
+    }
+}
+
+
+
+function AddPolyLine2State(graphicObjects)
+{
+    this.graphicObjects = graphicObjects;
+    this.polylineFlag = true;
+    this.OnMouseDown = function(e, x, y, pageIndex)
+    {
+        this.graphicObjects.startTrackPos = {x: x, y: y, pageIndex : pageIndex};
+        var sel_arr = this.graphicObjects.selectionInfo.selectionArray;
+        for(var sel_index = 0; sel_index < sel_arr.length; ++sel_index)
+        {
+            sel_arr[sel_index].deselect();
+        }
+        sel_arr.length = 0;
+
+
+        this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
+        this.graphicObjects.polyline = new PolyLine(this.graphicObjects.document, pageIndex);
+        this.graphicObjects.polyline.arrPoint.push({x : x, y: y});
+        this.graphicObjects.changeCurrentState(new AddPolyLine2State2(this.graphicObjects, x, y));
+    };
+
+    this.OnMouseMove = function(AutoShapes, e, X, Y)
     {};
 
-    this.onMouseMove = function(e, x, y)
+    this.OnMouseUp = function(AutoShapes, e, X, Y)
     {
-        var resize_coefficients = this.majorObject.getResizeCoefficients(this.handleNum, x, y);
-        this.drawingObjectsController.trackResizeObjects(resize_coefficients.kd1, resize_coefficients.kd2, e);
-        this.drawingObjects.selectGraphicObject();
-        this.drawingObjects.showOverlayGraphicObjects();
+    };
+    this.updateCursorType = function(pageIndex, x, y)
+    {
+        return false;
+    }
+}
+
+
+function AddPolyLine2State2(graphicObjects, x, y)
+{
+    this.graphicObjects = graphicObjects;
+    this.X = x;
+    this.Y = y;
+    this.polylineFlag = true;
+    this.OnMouseDown = function(e, x, y, pageIndex)
+    {
+        if(e.ClickCount > 1)
+        {
+            this.graphicObjects.changeCurrentState(new NullState(this.graphicObjects));
+            this.graphicObjects.curState.updateAnchorPos();
+            this.graphicObjects.polyline = null;
+        }
     };
 
-    this.onMouseUp = function(e, x, y)
+    this.OnMouseMove = function(e, x, y, pageIndex)
     {
-        this.drawingObjectsController.trackEnd();
-        this.group.normalize();
-        this.group.updateCoordinatesAfterInternalResize();
-        this.group.recalculateTransform();
-        this.drawingObjectsController.clearTrackObjects();
-        this.drawingObjectsController.changeCurrentState(new GroupState(this.drawingObjectsController, this.drawingObjects, this.group));
+        if(this.X !== x || this.Y !== y || this.graphicObjects.startTrackPos.pageIndex !== pageIndex)
+        {
+            var tr_x, tr_y;
+            if(pageIndex === this.graphicObjects.startTrackPos.pageIndex)
+            {
+                tr_x = x;
+                tr_y = y;
+            }
+            else
+            {
+                var tr_point = this.graphicObjects.drawingDocument.ConvertCoordsToAnotherPage(x, y, pageIndex, this.graphicObjects.startTrackPos.pageIndex);
+                tr_x = tr_point.X;
+                tr_y = tr_point.Y;
+            }
+
+            this.graphicObjects.polyline.arrPoint.push({x : tr_x, y: tr_y});
+            this.graphicObjects.changeCurrentState(new AddPolyLine2State3(this.graphicObjects));
+        }
     };
 
+    this.OnMouseUp = function(e, x, y, pageIndex)
+    {
+    };
+    this.updateCursorType = function(pageIndex, x, y)
+    {
+        return false;
+    }
+}
+
+function AddPolyLine2State3(graphicObjects)
+{
+    this.graphicObjects = graphicObjects;
+    this.minSize = graphicObjects.drawingDocument.GetMMPerDot(1);
+    this.polylineFlag = true;
+    this.OnMouseDown = function(e, x, y, pageIndex)
+    {
+        var tr_x, tr_y;
+        if(pageIndex === this.graphicObjects.startTrackPos.pageIndex)
+        {
+            tr_x = x;
+            tr_y = y;
+        }
+        else
+        {
+            var tr_point = this.graphicObjects.drawingDocument.ConvertCoordsToAnotherPage(x, y, pageIndex, this.graphicObjects.startTrackPos.pageIndex);
+            tr_x = tr_point.X;
+            tr_y = tr_point.Y;
+        }
+        this.graphicObjects.polyline.arrPoint.push({x: tr_x, y: tr_y});
+        if(e.ClickCount > 1)
+        {
+
+            var lt = this.graphicObjects.polyline.getLeftTopPoint();
+            var near_pos =  this.graphicObjects.document.Get_NearestPos(this.graphicObjects.startTrackPos.pageIndex, lt.x, lt.y);
+            near_pos.Page = this.graphicObjects.startTrackPos.pageIndex;
+            if(false === editor.isViewMode && near_pos != null &&
+                false === this.graphicObjects.document.Document_Is_SelectionLocked(changestype_None, {Type : changestype_2_Element_and_Type , Element : near_pos.Paragraph, CheckType : changestype_Paragraph_Content} ))
+            {
+                History.Create_NewPoint();
+                var _new_word_graphic_object = this.graphicObjects.polyline.createShape(this.graphicObjects.document);
+                this.graphicObjects.arrTrackObjects.length = 0;
+                //   this.graphicObjects.resetSelection();
+                _new_word_graphic_object.select(this.graphicObjects.startTrackPos.pageIndex);
+                _new_word_graphic_object.recalculateWrapPolygon();
+                this.graphicObjects.selectionInfo.selectionArray.push(_new_word_graphic_object);
+                _new_word_graphic_object.Set_DrawingType(drawing_Anchor);
+                _new_word_graphic_object.Set_WrappingType(WRAPPING_TYPE_NONE);
+                _new_word_graphic_object.Set_XYForAdd(_new_word_graphic_object.absOffsetX, _new_word_graphic_object.absOffsetY);
+                _new_word_graphic_object.Add_ToDocument(near_pos);
+            }
+            editor.sync_StartAddShapeCallback(false);
+            editor.sync_EndAddShape();
+            this.graphicObjects.changeCurrentState(new NullState(this.graphicObjects));
+            this.graphicObjects.curState.updateAnchorPos();
+            this.graphicObjects.polyline = null;
+        }
+    };
+
+    this.OnMouseMove = function(e, x, y, pageIndex)
+    {
+        var tr_x, tr_y;
+        if(pageIndex === this.graphicObjects.startTrackPos.pageIndex)
+        {
+            tr_x = x;
+            tr_y = y;
+        }
+        else
+        {
+            var tr_point = this.graphicObjects.drawingDocument.ConvertCoordsToAnotherPage(x, y, pageIndex, this.graphicObjects.startTrackPos.pageIndex);
+            tr_x = tr_point.X;
+            tr_y = tr_point.Y;
+        }
+
+        if(!e.IsLocked)
+        {
+            this.graphicObjects.polyline.arrPoint[this.graphicObjects.polyline.arrPoint.length - 1] = {x: tr_x, y: tr_y};
+        }
+        else
+        {
+            var _last_point = this.graphicObjects.polyline.arrPoint[this.graphicObjects.polyline.arrPoint.length - 1];
+            var dx = tr_x - _last_point.x;
+            var dy = tr_y - _last_point.y;
+
+            if(Math.sqrt(dx*dx + dy*dy) >= this.minSize)
+            {
+                this.graphicObjects.polyline.arrPoint.push({x: tr_x, y: tr_y});
+            }
+        }
+        this.graphicObjects.drawingDocument.m_oWordControl.OnUpdateOverlay();
+    };
+
+    this.OnMouseUp = function(e, x, y, pageIndex)
+    {
+        if(e.ClickCount > 1)
+        {
+
+            var lt = this.graphicObjects.polyline.getLeftTopPoint();
+            var near_pos =  this.graphicObjects.document.Get_NearestPos(this.graphicObjects.startTrackPos.pageIndex, lt.x, lt.y);
+            near_pos.Page = this.graphicObjects.startTrackPos.pageIndex;
+            if(false === editor.isViewMode && near_pos != null &&
+                false === this.graphicObjects.document.Document_Is_SelectionLocked(changestype_None, {Type : changestype_2_Element_and_Type , Element : near_pos.Paragraph, CheckType : changestype_Paragraph_Content} ))
+            {
+                History.Create_NewPoint();
+                var _new_word_graphic_object = this.graphicObjects.polyline.createShape(this.graphicObjects.document);
+                this.graphicObjects.arrTrackObjects.length = 0;
+                //   this.graphicObjects.resetSelection();
+                _new_word_graphic_object.select(this.graphicObjects.startTrackPos.pageIndex);
+                _new_word_graphic_object.recalculateWrapPolygon();
+                this.graphicObjects.selectionInfo.selectionArray.push(_new_word_graphic_object);
+                _new_word_graphic_object.Set_DrawingType(drawing_Anchor);
+                _new_word_graphic_object.Set_WrappingType(WRAPPING_TYPE_NONE);
+                _new_word_graphic_object.Set_XYForAdd(_new_word_graphic_object.absOffsetX, _new_word_graphic_object.absOffsetY);
+                _new_word_graphic_object.Add_ToDocument(near_pos);
+            }
+            editor.sync_StartAddShapeCallback(false);
+            editor.sync_EndAddShape();
+            this.graphicObjects.changeCurrentState(new NullState(this.graphicObjects));
+            this.graphicObjects.curState.updateAnchorPos();
+            this.graphicObjects.polyline = null;
+        }
+    };
+
+    this.updateCursorType = function(pageIndex, x, y)
+    {
+        return false;
+    }
 }
 
 
@@ -1570,6 +2422,10 @@ function DrawGroupSelection(group, drawingDocument)
     for(var i = 0; i < group_selected_objects.length; ++i)
     {
         drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, group_selected_objects[i].getTransform(), 0, 0, group_selected_objects[i].extX, group_selected_objects[i].extY, false/*, selected_objects[i].canRotate()TODO*/)
+    }
+    if(group_selected_objects.length === 1)
+    {
+        group_selected_objects[0].drawAdjustments(drawingDocument);
     }
 }
 

@@ -1764,30 +1764,6 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
     };
 
 
-    this.updateTransform = function()
-    {
-        this.transform.Reset();
-        var t = this.transform;
-
-        global_MatrixTransformer.TranslateAppend(t, -this.extX*0.5, -this.extY*0.5);
-        if(xfrm.flipH == null ? false : xfrm.flipH)
-        {
-            global_MatrixTransformer.ScaleAppend(t, -1, 1);
-        }
-        if(xfrm.flipV == null ? false : xfrm.flipV)
-        {
-            global_MatrixTransformer.ScaleAppend(t, 1, -1);
-        }
-        global_MatrixTransformer.RotateRadAppend(t, -this.rot);
-        global_MatrixTransformer.TranslateAppend(t, this.x + this.extX*0.5, this.y+this.extY*0.5);
-        if(this.parentTrack)
-            global_MatrixTransformer.MultiplyAppend(t, this.parentTrack.transform);
-        for(var i = 0; i < this.childs.length; ++i)
-        {
-            this.childs[i].updateTransform();
-        }
-    };
-
 }
 
 function ShapeForResizeInGroup(originalObject, parentTrack)
@@ -1847,7 +1823,7 @@ function ShapeForResizeInGroup(originalObject, parentTrack)
         {
             global_MatrixTransformer.ScaleAppend(t, 1, -1);
         }
-        global_MatrixTransformer.RotateRadAppend(t, this.rot);
+        global_MatrixTransformer.RotateRadAppend(t, -this.rot);
         global_MatrixTransformer.TranslateAppend(t, this.x + this.extX*0.5, this.y+this.extY*0.5);
         global_MatrixTransformer.MultiplyAppend(t, this.parentTrack.transform);
     };

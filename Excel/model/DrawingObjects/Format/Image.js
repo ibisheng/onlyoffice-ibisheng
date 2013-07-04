@@ -201,6 +201,8 @@ CImage.prototype =
             this.flipH = xfrm.flipH === true;
             this.flipV = xfrm.flipV === true;
         }
+        if(isRealObject(this.spPr.geometry))
+            this.spPr.geometry.Recalculate(this.extX, this.extY);
         this.transform.Reset();
         var hc, vc;
         hc = this.extX*0.5;
@@ -215,8 +217,9 @@ CImage.prototype =
         global_MatrixTransformer.TranslateAppend(this.transform, this.x + hc, this.y + vc);
         if(isRealObject(this.group))
         {
-            global_MatrixTransformer.MultiplyAppend(t, this.group.getTransform());
+            global_MatrixTransformer.MultiplyAppend(this.transform, this.group.getTransform());
         }
+        this.invertTransform = global_MatrixTransformer.Invert(this.transform);
     },
 
     normalize: function()
@@ -333,6 +336,13 @@ CImage.prototype =
             return this.flipV;
         else
             return this.group.getFullFlipV() ? !this.flipV : this.flipV;
+    },
+
+    getAspect: function(num)
+    {
+        var _tmp_x = this.extX != 0 ? this.extX : 0.1;
+        var _tmp_y = this.extY != 0 ? this.extY : 0.1;
+        return num === 0 || num === 4 ? _tmp_x/_tmp_y : _tmp_y/_tmp_x;
     },
 
     setGroup: function(group)
@@ -515,13 +525,39 @@ CImage.prototype =
         var x_t = invert_transform.TransformPointX(x, y);
         var y_t = invert_transform.TransformPointY(x, y);
 
-        var _hit_context = this.drawingDocument.CanvasHitContext;
+        var _hit_context = this.drawingObjects.getCanvasContext();
 
         return (HitInLine(_hit_context, x_t, y_t, 0, 0, this.extX, 0) ||
             HitInLine(_hit_context, x_t, y_t, this.extX, 0, this.extX, this.extY)||
             HitInLine(_hit_context, x_t, y_t, this.extX, this.extY, 0, this.extY)||
-            HitInLine(_hit_context, x_t, y_t, 0, this.extY, 0, 0) ||
-            HitInLine(_hit_context, x_t, y_t, this.extX*0.5, 0, this.extX*0.5, -this.drawingDocument.GetMMPerDot(TRACK_DISTANCE_ROTATE)));
+            HitInLine(_hit_context, x_t, y_t, 0, this.extY, 0, 0) /*||
+         HitInLine(_hit_context, x_t, y_t, this.extX*0.5, 0, this.extX*0.5, -this.drawingDocument.GetMMPerDot(TRACK_DISTANCE_ROTATE))*/);
+    },
+
+    hitInInnerArea: function(x, y)
+    {
+        var invert_transform = this.getInvertTransform();
+        var x_t = invert_transform.TransformPointX(x, y);
+        var y_t = invert_transform.TransformPointY(x, y);
+        if(isRealObject(this.spPr.geometry))
+            return this.spPr.geometry.hitInInnerArea(this.drawingObjects.getCanvasContext(), x_t, y_t);
+        return x_t > 0 && x_t < this.extX && y_t > 0 && y_t < this.extY;
+    },
+
+    hitInPath: function(x, y)
+    {
+        var invert_transform = this.getInvertTransform();
+        var x_t = invert_transform.TransformPointX(x, y);
+        var y_t = invert_transform.TransformPointY(x, y);
+        if(isRealObject(this.spPr.geometry))
+            return this.spPr.geometry.hitInPath(this.drawingObjects.getCanvasContext(), x_t, y_t);
+        return false;
+    },
+
+
+    hitInTextRect: function(x, y)
+    {
+        return false;
     },
 
     canRotate: function()
@@ -586,50 +622,79 @@ CImage.prototype =
         var rot_x_t = transform.TransformPointX(hc, - rotate_distance);
         var rot_y_t = transform.TransformPointY(hc, - rotate_distance);
 
+        var invert_transform = this.getInvertTransform();
+        var rel_x = invert_transform.TransformPointX(x, y);
+
         var v1_x, v1_y, v2_x, v2_y;
         v1_x = x - xc_t;
         v1_y = y - yc_t;
 
         v2_x = rot_x_t - xc_t;
         v2_y = rot_y_t - yc_t;
-        return  Math.atan2( Math.abs(v1_x*v2_y - v1_y*v2_x), v1_x*v2_x + v1_y*v2_y);
+
+        var flip_h = this.getFullFlipH();
+        var flip_v = this.getFullFlipV();
+        var same_flip = flip_h && flip_v || !flip_h && !flip_v;
+        var angle =  rel_x > this.extX*0.5 ? Math.atan2( Math.abs(v1_x*v2_y - v1_y*v2_x), v1_x*v2_x + v1_y*v2_y) : -Math.atan2( Math.abs(v1_x*v2_y - v1_y*v2_x), v1_x*v2_x + v1_y*v2_y);
+        return same_flip ? angle : -angle;
     },
 
     getResizeCoefficients: function(numHandle, x, y)
     {
-        var t_x, t_y;
         var cx, cy;
         cx= this.extX > 0 ? this.extX : 0.01;
         cy= this.extY > 0 ? this.extY : 0.01;
-        var p = this.transformPointRelativeShape(x, y);
+
+        var invert_transform = this.getInvertTransform();
+        var t_x = invert_transform.TransformPointX(x, y);
+        var t_y = invert_transform.TransformPointY(x, y);
 
         switch(numHandle)
         {
             case 0:
-                return {kd1: (cx-p.x)/cx, kd2: (cy-p.y)/cy};
+                return {kd1: (cx-t_x)/cx, kd2: (cy-t_y)/cy};
             case 1:
-                return {kd1: (cy-p.y)/cy, kd2: 0};
+                return {kd1: (cy-t_y)/cy, kd2: 0};
             case 2:
-                return {kd1: (cy-p.y)/cy, kd2: p.x/cx};
+                return {kd1: (cy-t_y)/cy, kd2: t_x/cx};
             case 3:
-                return {kd1: p.x/cx, kd2: 0};
+                return {kd1: t_x/cx, kd2: 0};
             case 4:
-                return {kd1: p.x/cx, kd2: p.y/cy};
+                return {kd1: t_x/cx, kd2: t_y/cy};
             case 5:
-                return {kd1: p.y/cy, kd2: 0};
+                return {kd1: t_y/cy, kd2: 0};
             case 6:
-                return {kd1: p.y/cy, kd2:(cx-p.x)/cx};
+                return {kd1: t_y/cy, kd2:(cx-t_x)/cx};
             case 7:
-                return {kd1:(cx-p.x)/cx, kd2: 0};
+                return {kd1:(cx-t_x)/cx, kd2: 0};
         }
         return {kd1: 1, kd2: 1};
     },
+
 
     getFullRotate: function()
     {
         return !isRealObject(this.group) ? this.rot : this.rot + this.group.getFullRotate();
     },
 
+    getBoundsInGroup: function()
+    {
+        var r = this.rot;
+        if((r >= 0 && r < Math.PI*0.25)
+            || (r > 3*Math.PI*0.25 && r < 5*Math.PI*0.25)
+            || (r > 7*Math.PI*0.25 && r < 2*Math.PI))
+        {
+            return {minX: this.x, minY: this.y, maxX: this.x + this.extX, maxY: this.y + this.extY};
+        }
+        else
+        {
+            var hc = this.extX*0.5;
+            var vc = this.extY*0.5;
+            var xc = this.x + hc;
+            var yc = this.y + vc;
+            return {minX: xc - vc, minY: yc - hc, maxX: xc + vc, maxY: yc + hc};
+        }
+    },
 
     drawAdjustments: function(drawingDocument)
     {
