@@ -975,6 +975,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						this._gui_color_schemes = null;
 					}
 				}
+				else if ("asc_onInitEditorShapes" == name)
+				{
+					this.handlers.trigger("asc_onInitEditorShapes", g_oAutoShapesGroups, g_oAutoShapesTypes);
+				}
 			},
 
 			asc_unregisterCallback: function (name, callback) {
