@@ -39,16 +39,16 @@ function convertFormula(formula, ws) {
 	return range;
 }
 
-function getFullImageSrc(src) {
-	/*var start = src.substring(0, 6);
+function _getFullImageSrc(src) {
+	var start = src.substring(0, 6);
     if ( 0 != src.indexOf("http:") && 0 != src.indexOf("data:") && 0 != src.indexOf("https:") && 0 != src.indexOf("ftp:") && 0 != src.indexOf("file:") ) {
 		var editor = window["Asc"]["editor"];
-        if ( 0 == src.indexOf(editor.DocumentUrl) )
+        if ( 0 == src.indexOf(g_sResourceServiceLocalUrl + editor.documentId) )
             return src;
-        return editor.DocumentUrl + "media/" + src;
+        return g_sResourceServiceLocalUrl + editor.documentId + "/media/" + src;
     }
 	else
-		return src;*/
+		return src;
 };
 
 //-----------------------------------------------------------------------------------
