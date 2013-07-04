@@ -2428,7 +2428,7 @@ function DrawingObjects() {
 		shapeOverlayCtx.put_GlobalAlpha(true, 0.5);
 		shapeOverlayCtx.m_oContext.clearRect(0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix);
 		_this.controller.drawTracks(shapeOverlayCtx);
-		shapeOverlayCtx.put_GlobalAlpha(true, 1)
+		shapeOverlayCtx.put_GlobalAlpha(true, 1);
 	}
 	
 	_this.showOverlayDrawingObjects = function() {
@@ -3160,8 +3160,15 @@ function DrawingObjects() {
 				obj.image.onload = function() {
 					
 					calculateObjectMetrics(obj, obj.image.width, obj.image.height);
-
+					
+					// CImage
+					obj.graphicObject = new CImage(obj, _this);
+					obj.graphicObject.initDefault( pxToMm(obj.getVisibleLeftOffset()), pxToMm(obj.getVisibleTopOffset()), pxToMm(obj.getWidthFromTo()), pxToMm(obj.getHeightFromTo()), imageUrl );
+					obj.graphicObject.select(_this.controller);
 					aObjects.push(obj);
+					_this.showDrawingObjects(false);
+
+					/*aObjects.push(obj);
 					_this.selectDrawingObject(aObjects.length - 1);
 
 					History.Create_NewPoint();
@@ -3171,7 +3178,7 @@ function DrawingObjects() {
 					_this.showDrawingObjects(true);
 					worksheet.model.workbook.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 					worksheet.autoFilters.drawAutoF(worksheet);
-					worksheet.cellCommentator.drawCommentCells(false);
+					worksheet.cellCommentator.drawCommentCells(false);*/
 				}
 				
 				obj.image.onerror = function() {
@@ -3931,6 +3938,15 @@ function DrawingObjects() {
 	_this.selectGraphicObject = function() {
 		if ( autoShapeTrack )
 			_this.controller.drawSelection(autoShapeTrack);
+	}
+	
+	_this.setScrollOffset = function(x_px, y_px) {
+		
+		if ( shapeCtx || shapeOverlayCtx ) {
+			
+			//shapeCtx.transform(1, 0, 0, 1, x_px, y_px);
+			//shapeOverlayCtx.transform(1, 0, 0, 1, x_px, y_px);
+		}
 	}
 	
 	//-----------------------------------------------------------------------------------
