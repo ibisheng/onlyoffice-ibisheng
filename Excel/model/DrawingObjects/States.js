@@ -185,6 +185,103 @@ function NullState(drawingObjectsController, drawingObjects)
     {
         DrawDefaultSelection(this.drawingObjectsController, drawingDocument);
     };
+
+    this.isPointInDrawingObjects = function(x, y)
+    {
+        var selected_objects = this.drawingObjectsController.selectedObjects;
+        if(selected_objects.length === 1)
+        {
+            var hit_to_adj = selected_objects[0].hitToAdjustment(x, y);
+            if(hit_to_adj.hit)
+            {
+                if(selected_objects[0].canChangeAdjustments())
+                {
+                    return {objectId: selected_objects[0].drawingBase.id, cursorType: "crosshair"};
+                }
+            }
+        }
+
+        for(var i = selected_objects.length - 1; i > -1; --i)
+        {
+            var hit_to_handles = selected_objects[i].hitToHandles(x, y);
+            if(hit_to_handles > -1)
+            {
+                if(hit_to_handles === 8)
+                {
+                    if(!selected_objects[i].canRotate())
+                        return null;
+                    return {objectId: selected_objects[i].drawingBase.id, cursorType: "crosshair"};
+                }
+                else
+                {
+                    if(!selected_objects[i].canResize())
+                        return null;
+                    this.drawingObjectsController.clearPreTrackObjects();
+                    var card_direction = selected_objects[i].getCardDirectionByNum(hit_to_handles);
+                    for(var j = 0; j < selected_objects.length; ++j)
+                    {
+                        if(selected_objects[j].canResize())
+                            this.drawingObjectsController.addPreTrackObject(selected_objects[j].createResizeTrack(card_direction));
+                    }
+                    return {objectId: selected_objects[i].drawingBase.id, cursorType: CURSOR_TYPES_BY_CARD_DIRECTION[card_direction]};
+                }
+            }
+        }
+
+        for(i = selected_objects.length - 1; i > -1; --i)
+        {
+            if(selected_objects[i].hitInBoundingRect(x, y))
+            {
+                if(!selected_objects[i].canMove())
+                    return null;
+                return {objectId: selected_objects[i].drawingBase.id, cursorType: "move"};
+            }
+        }
+
+        var arr_drawing_objects = this.drawingObjects.getDrawingObjects();
+        for(i = arr_drawing_objects.length-1; i > -1; --i)
+        {
+            var cur_drawing_base = arr_drawing_objects[i];
+            if(cur_drawing_base.isGraphicObject())
+            {
+                var cur_drawing = cur_drawing_base.graphicObject;
+                if(cur_drawing.isSimpleObject())
+                {
+                    var hit_in_inner_area = cur_drawing.hitInInnerArea(x, y);
+                    var hit_in_path = cur_drawing.hitInPath(x, y);
+                    var hit_in_text_rect = cur_drawing.hitInTextRect(x, y);
+                    if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
+                    {
+                        return {objectId: cur_drawing_base.id, cursorType: "move"};
+                    }
+                    else if(hit_in_text_rect)
+                    {
+                        //TODO
+                    }
+                }
+                else
+                {
+                    var grouped_objects = cur_drawing.getArrGraphicObjects();
+                    for(var j = grouped_objects.length - 1; j > -1; --j)
+                    {
+                        var cur_grouped_object = grouped_objects[j];
+                        var hit_in_inner_area = cur_grouped_object.hitInInnerArea(x, y);
+                        var hit_in_path = cur_grouped_object.hitInPath(x, y);
+                        var hit_in_text_rect = cur_grouped_object.hitInTextRect(x, y);
+                        if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
+                        {
+                            return {objectId: cur_drawing_base.id, cursorType: "move"};
+                        }
+                        else if(hit_in_text_rect)
+                        {
+                            //TODO
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    };
 }
 
 function PreRotateState(drawingObjectsController, drawingObjects, majorObject)
@@ -213,6 +310,11 @@ function PreRotateState(drawingObjectsController, drawingObjects, majorObject)
     this.drawSelection = function(drawingDocument)
     {
         DrawDefaultSelection(this.drawingObjectsController, drawingDocument);
+    };
+
+    this.isPointInDrawingObjects = function(x, y)
+    {
+        return {objectId: this.majorObject.drawingBase.id, cursorType: "crosshair"};
     };
 }
 
@@ -247,6 +349,11 @@ function RotateState(drawingObjectsController, drawingObjects, majorObject)
     {
         DrawDefaultSelection(this.drawingObjectsController, drawingDocument);
     };
+
+    this.isPointInDrawingObjects = function(x, y)
+    {
+        return {objectId: this.majorObject.drawingBase.id, cursorType: "crosshair"};
+    };
 }
 
 function PreResizeState(drawingObjectsController, drawingObjects, majorObject, cardDirection)
@@ -275,6 +382,12 @@ function PreResizeState(drawingObjectsController, drawingObjects, majorObject, c
     {
         DrawDefaultSelection(this.drawingObjectsController, drawingDocument);
     };
+
+    this.isPointInDrawingObjects = function(x, y)
+    {
+
+        return {objectId: this.majorObject.drawingBase.id, cursorType: CURSOR_TYPES_BY_CARD_DIRECTION[this.cardDirection]};
+    };
 }
 
 function ResizeState(drawingObjectsController, drawingObjects, majorObject, cardDirection)
@@ -284,6 +397,7 @@ function ResizeState(drawingObjectsController, drawingObjects, majorObject, card
     this.drawingObjects = drawingObjects;
     this.majorObject = majorObject;
     this.handleNum = this.majorObject.getNumByCardDirection(cardDirection);
+    this.cardDirection = cardDirection;
 
     this.onMouseDown = function(e, x, y)
     {};
@@ -309,6 +423,11 @@ function ResizeState(drawingObjectsController, drawingObjects, majorObject, card
     this.drawSelection = function(drawingDocument)
     {
         DrawDefaultSelection(this.drawingObjectsController, drawingDocument);
+    };
+
+    this.isPointInDrawingObjects = function(x, y)
+    {
+        return {objectId: this.majorObject.drawingBase.id, cursorType: CURSOR_TYPES_BY_CARD_DIRECTION[this.cardDirection]};
     };
 }
 
@@ -336,6 +455,11 @@ function StartTrackNewShapeState(drawingObjectsController, drawingObjects, prese
     this.drawSelection = function(drawingDocument)
     {
         DrawDefaultSelection(this.drawingObjectsController, drawingDocument);
+    };
+
+    this.isPointInDrawingObjects = function(x, y)
+    {
+        return null/*TODO*/;
     };
 }
 
@@ -370,6 +494,103 @@ function BeginTrackNewShapeState(drawingObjectsController, drawingObjects, prese
     {
         DrawDefaultSelection(this.drawingObjectsController, drawingDocument);
     };
+
+    this.isPointInDrawingObjects = function(x, y)
+    {
+        var selected_objects = this.drawingObjectsController.selectedObjects;
+        if(selected_objects.length === 1)
+        {
+            var hit_to_adj = selected_objects[0].hitToAdjustment(x, y);
+            if(hit_to_adj.hit)
+            {
+                if(selected_objects[0].canChangeAdjustments())
+                {
+                    return {objectId: selected_objects[0].drawingBase.id, cursorType: "crosshair"};
+                }
+            }
+        }
+
+        for(var i = selected_objects.length - 1; i > -1; --i)
+        {
+            var hit_to_handles = selected_objects[i].hitToHandles(x, y);
+            if(hit_to_handles > -1)
+            {
+                if(hit_to_handles === 8)
+                {
+                    if(!selected_objects[i].canRotate())
+                        return null;
+                    return {objectId: selected_objects[i].drawingBase.id, cursorType: "crosshair"};
+                }
+                else
+                {
+                    if(!selected_objects[i].canResize())
+                        return null;
+                    this.drawingObjectsController.clearPreTrackObjects();
+                    var card_direction = selected_objects[i].getCardDirectionByNum(hit_to_handles);
+                    for(var j = 0; j < selected_objects.length; ++j)
+                    {
+                        if(selected_objects[j].canResize())
+                            this.drawingObjectsController.addPreTrackObject(selected_objects[j].createResizeTrack(card_direction));
+                    }
+                    return {objectId: selected_objects[i].drawingBase.id, cursorType: CURSOR_TYPES_BY_CARD_DIRECTION[card_direction]};
+                }
+            }
+        }
+
+        for(i = selected_objects.length - 1; i > -1; --i)
+        {
+            if(selected_objects[i].hitInBoundingRect(x, y))
+            {
+                if(!selected_objects[i].canMove())
+                    return null;
+                return {objectId: selected_objects[i].drawingBase.id, cursorType: "move"};
+            }
+        }
+
+        var arr_drawing_objects = this.drawingObjects.getDrawingObjects();
+        for(i = arr_drawing_objects.length-1; i > -1; --i)
+        {
+            var cur_drawing_base = arr_drawing_objects[i];
+            if(cur_drawing_base.isGraphicObject())
+            {
+                var cur_drawing = cur_drawing_base.graphicObject;
+                if(cur_drawing.isSimpleObject())
+                {
+                    var hit_in_inner_area = cur_drawing.hitInInnerArea(x, y);
+                    var hit_in_path = cur_drawing.hitInPath(x, y);
+                    var hit_in_text_rect = cur_drawing.hitInTextRect(x, y);
+                    if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
+                    {
+                        return {objectId: cur_drawing_base.id, cursorType: "move"};
+                    }
+                    else if(hit_in_text_rect)
+                    {
+                        //TODO
+                    }
+                }
+                else
+                {
+                    var grouped_objects = cur_drawing.getArrGraphicObjects();
+                    for(var j = grouped_objects.length - 1; j > -1; --j)
+                    {
+                        var cur_grouped_object = grouped_objects[j];
+                        var hit_in_inner_area = cur_grouped_object.hitInInnerArea(x, y);
+                        var hit_in_path = cur_grouped_object.hitInPath(x, y);
+                        var hit_in_text_rect = cur_grouped_object.hitInTextRect(x, y);
+                        if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
+                        {
+                            return {objectId: cur_drawing_base.id, cursorType: "move"};
+                        }
+                        else if(hit_in_text_rect)
+                        {
+                            //TODO
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    };
 }
 
 function TrackNewShapeState(drawingObjectsController, drawingObjects)
@@ -402,6 +623,11 @@ function TrackNewShapeState(drawingObjectsController, drawingObjects)
     this.drawSelection = function(drawingDocument)
     {
         DrawDefaultSelection(this.drawingObjectsController, drawingDocument);
+    };
+
+    this.isPointInDrawingObjects = function(x, y)
+    {
+        return null/*TODO*/;
     };
 }
 
@@ -477,6 +703,11 @@ function PreMoveState(drawingObjectsController, drawingObjects, startX, startY, 
     {
         DrawDefaultSelection(this.drawingObjectsController, drawingDocument);
     };
+
+    this.isPointInDrawingObjects = function(x, y)
+    {
+        return {objectId:this.majorObject.drawingBase.id, cursorType: "move"}
+    };
 }
 
 function MoveState(drawingObjectsController, drawingObjects, startX, startY, rectX, rectY, rectW, rectH)
@@ -518,6 +749,11 @@ function MoveState(drawingObjectsController, drawingObjects, startX, startY, rec
     {
         DrawDefaultSelection(this.drawingObjectsController, drawingDocument);
     };
+
+    this.isPointInDrawingObjects = function(x, y)
+    {
+        return {objectId:this.majorObject.drawingBase.id, cursorType: "move"}
+    };
 }
 
 
@@ -548,6 +784,11 @@ function PreChangeAdjState(drawingObjectsController, drawingObjects)
     this.drawSelection = function(drawingDocument)
     {
         DrawDefaultSelection(this.drawingObjectsController, drawingDocument);
+    };
+
+    this.isPointInDrawingObjects = function(x, y)
+    {
+        return {objectId:this.majorObject.drawingBase.id, cursorType: "crosshair"}
     };
 }
 
@@ -580,6 +821,11 @@ function ChangeAdjState(drawingObjectsController, drawingObjects)
     this.drawSelection = function(drawingDocument)
     {
         DrawDefaultSelection(this.drawingObjectsController, drawingDocument);
+    };
+
+    this.isPointInDrawingObjects = function(x, y)
+    {
+        return {objectId:this.majorObject.drawingBase.id, cursorType: "crosshair"}
     };
 }
 
@@ -802,6 +1048,144 @@ function GroupState(drawingObjectsController, drawingObjects, group)
     {
         DrawGroupSelection(this.group, drawingDocument);
     };
+
+    this.isPointInDrawingObjects = function(x, y)
+    {
+        var group_selected_objects = this.group.selectedObjects;
+        if(group_selected_objects.length === 1)
+        {
+            var hit_to_adj = group_selected_objects[0].hitToAdjustment(x, y);
+            if(hit_to_adj.hit)
+            {
+                return {objectId: this.group.drawingBase.id, cursorType: "crosshair"};
+            }
+        }
+        for(var i = group_selected_objects.length - 1; i  > -1; --i)
+        {
+            var hit_to_handles = group_selected_objects[i].hitToHandles(x, y);
+            if(hit_to_handles > -1)
+            {
+                if(hit_to_handles === 8)
+                {
+                    if(!group_selected_objects[i].canRotate())
+                        return null;
+                    return {objectId: this.group.drawingBase.id, cursorType: "crosshair"};
+                }
+                else
+                {
+                    if(!group_selected_objects[i].canResize())
+                        return null;
+                    var card_direction = group_selected_objects[i].getCardDirectionByNum(hit_to_handles);
+                    return {objectId: this.group.drawingBase.id, cursorType: CURSOR_TYPES_BY_CARD_DIRECTION[card_direction]};
+
+                }
+            }
+        }
+
+        var hit_to_handles = this.group.hitToHandles(x, y);
+        if(hit_to_handles > -1)
+        {
+            if(hit_to_handles === 8)
+            {
+                if(!this.group.canRotate())
+                    return null;
+                return {objectId: this.group.drawingBase.id, cursorType: "crosshair"};
+            }
+            else
+            {
+                var card_direction = this.group.getCardDirectionByNum(hit_to_handles);
+                return {objectId: this.group.drawingBase.id, cursorType: CURSOR_TYPES_BY_CARD_DIRECTION[card_direction]};
+            }
+        }
+
+
+        for(i = group_selected_objects.length - 1; i  > -1; --i)
+        {
+            if(group_selected_objects[i].hitInBoundingRect(x, y))
+            {
+                this.drawingObjectsController.clearPreTrackObjects();
+                for(var j = 0; j < group_selected_objects.length; ++j)
+                {
+                    this.drawingObjectsController.addPreTrackObject(group_selected_objects[j].createMoveInGroupTrack());
+                }
+                this.drawingObjectsController.changeCurrentState(new PreMoveInGroupState(this.drawingObjectsController, this.drawingObjects, this.group,
+                    x, y, e.shiftKey, e.ctrlKey, group_selected_objects[i], true));
+            }
+        }
+
+        if(this.group.hitInBoundingRect(x, y))
+        {
+            return {objectId: this.group.drawingBase.id, cursorType: "move"};
+        }
+
+        var drawing_bases = this.drawingObjects.getDrawingObjects();
+        var selected_objects = this.drawingObjectsController.selectedObjects;
+        for(i = drawing_bases.length - 1; i > -1; --i)
+        {
+            var cur_drawing_base = drawing_bases[i];
+            if(cur_drawing_base.isGraphicObject())
+            {
+                var cur_drawing = cur_drawing_base.graphicObject;
+                if(cur_drawing.isSimpleObject())
+                {
+                    var hit_in_inner_area = cur_drawing.hitInInnerArea(x, y);
+                    var hit_in_path = cur_drawing.hitInPath(x, y);
+                    var hit_in_text_rect = cur_drawing.hitInTextRect(x, y);
+                    if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
+                    {
+                        return {objectId: cur_drawing.drawingBase.id, cursorType: "move"};
+                    }
+                    else if(hit_in_text_rect)
+                    {
+                        //TODO
+                    }
+                }
+                else
+                {
+                    if(this.group === cur_drawing)
+                    {
+                        var arr_graphic_objects = this.group.getArrGraphicObjects();
+                        for(i = arr_graphic_objects.length - 1; i > -1; --i)
+                        {
+                            var cur_drawing = arr_graphic_objects[i];
+                            var hit_in_inner_area = cur_drawing.hitInInnerArea(x, y);
+                            var hit_in_path = cur_drawing.hitInPath(x, y);
+                            var hit_in_text_rect = cur_drawing.hitInTextRect(x, y);
+                            if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
+                            {
+                                return {objectId: cur_drawing.drawingBase.id, cursorType: "move"};
+                            }
+                            else if(hit_in_text_rect)
+                            {
+                                //TODO
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var grouped_objects = cur_drawing.getArrGraphicObjects();
+                        for(var j = grouped_objects.length - 1; j > -1; --j)
+                        {
+                            var cur_grouped_object = grouped_objects[j];
+                            var hit_in_inner_area = cur_grouped_object.hitInInnerArea(x, y);
+                            var hit_in_path = cur_grouped_object.hitInPath(x, y);
+                            var hit_in_text_rect = cur_grouped_object.hitInTextRect(x, y);
+                            if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
+                            {
+                                return {objectId: cur_drawing.drawingBase.id, cursorType: "move"};
+                            }
+                            else if(hit_in_text_rect)
+                            {
+                                //TODO
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
+    };
 }
 
 
@@ -863,6 +1247,11 @@ function PreMoveInGroupState(drawingObjectsController, drawingObjects, group, st
     {
         DrawGroupSelection(this.group, drawingDocument);
     };
+
+    this.isPointInDrawingObjects = function(x, y)
+    {
+        return {objectId: this.group.drawingBase.id, cursorType: "move"};
+    };
 }
 
 function MoveInGroupState(drawingObjectsController, drawingObjects, group, startX, startY, rectX, rectY, rectW, rectH)
@@ -907,6 +1296,11 @@ function MoveInGroupState(drawingObjectsController, drawingObjects, group, start
     {
         DrawGroupSelection(this.group, drawingDocument);
     };
+
+    this.isPointInDrawingObjects = function(x, y)
+    {
+        return {objectId: this.group.drawingBase.id, cursorType: "move"};
+    };
 }
 
 function PreChangeAdjInGroupState(drawingObjectsController, drawingObjects, group)
@@ -933,6 +1327,11 @@ function PreChangeAdjInGroupState(drawingObjectsController, drawingObjects, grou
     this.drawSelection = function(drawingDocument)
     {
         DrawGroupSelection(this.group, drawingDocument);
+    };
+
+    this.isPointInDrawingObjects = function(x, y)
+    {
+        return {objectId: this.group.drawingBase.id, cursorType: "crosshair"};
     };
 }
 
@@ -964,6 +1363,11 @@ function ChangeAdjInGroupState(drawingObjectsController, drawingObjects, group)
     {
         DrawGroupSelection(this.group, drawingDocument);
     };
+
+    this.isPointInDrawingObjects = function(x, y)
+    {
+        return {objectId: this.group.drawingBase.id, cursorType: "crosshair"};
+    };
 }
 
 function PreRotateInGroupState(drawingObjectsController, drawingObjects, group, majorObject)
@@ -990,6 +1394,11 @@ function PreRotateInGroupState(drawingObjectsController, drawingObjects, group, 
     this.drawSelection = function(drawingDocument)
     {
         DrawGroupSelection(this.group, drawingDocument);
+    };
+
+    this.isPointInDrawingObjects = function(x, y)
+    {
+        return {objectId: this.group.drawingBase.id, cursorType: "crosshair"};
     };
 }
 
@@ -1025,6 +1434,11 @@ function RotateInGroupState(drawingObjectsController, drawingObjects, group, maj
     {
         DrawGroupSelection(this.group, drawingDocument);
     };
+
+    this.isPointInDrawingObjects = function(x, y)
+    {
+        return {objectId: this.group.drawingBase.id, cursorType: "crosshair"};
+    };
 }
 
 
@@ -1044,7 +1458,7 @@ function PreResizeInGroupState(drawingObjectsController, drawingObjects, group, 
     this.onMouseMove = function(e, x, y)
     {
         this.drawingObjectsController.swapTrackObjects();
-        this.drawingObjectsController.changeCurrentState(new ResizeInGroupState(this.drawingObjectsController, this.drawingObjects, this.group, this.majorObject, this.majorObject.getNumByCardDirection(this.cardDirection)))
+        this.drawingObjectsController.changeCurrentState(new ResizeInGroupState(this.drawingObjectsController, this.drawingObjects, this.group, this.majorObject, this.majorObject.getNumByCardDirection(this.cardDirection), this.cardDirection))
     };
 
     this.onMouseUp = function(e, x, y)
@@ -1054,9 +1468,14 @@ function PreResizeInGroupState(drawingObjectsController, drawingObjects, group, 
     {
         DrawGroupSelection(this.group, drawingDocument);
     };
+
+    this.isPointInDrawingObjects = function(x, y)
+    {
+        return {objectId: this.group.drawingBase.id, cursorType: CURSOR_TYPES_BY_CARD_DIRECTION[this.cardDirection]};
+    };
 }
 
-function ResizeInGroupState(drawingObjectsController, drawingObjects, group, majorObject, handleNum)
+function ResizeInGroupState(drawingObjectsController, drawingObjects, group, majorObject, handleNum, cardDirection)
 {
     this.id = STATES_ID_RESIZE_IN_GROUP;
     this.drawingObjectsController = drawingObjectsController;
@@ -1064,6 +1483,7 @@ function ResizeInGroupState(drawingObjectsController, drawingObjects, group, maj
     this.group = group;
     this.majorObject = majorObject;
     this.handleNum = handleNum;
+    this.cardDirection = cardDirection;
     this.onMouseDown = function(e, x, y)
     {};
 
@@ -1088,6 +1508,11 @@ function ResizeInGroupState(drawingObjectsController, drawingObjects, group, maj
     this.drawSelection = function(drawingDocument)
     {
         DrawGroupSelection(this.group, drawingDocument);
+    };
+
+    this.isPointInDrawingObjects = function(x, y)
+    {
+        return {objectId: this.group.drawingBase.id, cursorType: CURSOR_TYPES_BY_CARD_DIRECTION[this.cardDirection]};
     };
 }
 
