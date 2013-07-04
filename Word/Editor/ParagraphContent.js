@@ -5516,7 +5516,7 @@ ParaDrawing.prototype =
         if(isRealObject(this.GraphicObj) && typeof  this.GraphicObj.calculateAfterOpen === "function")
         {
             this.GraphicObj.calculateAfterOpen();
-            this.GraphicObj.recalculate(false);
+            this.GraphicObj.recalculate(false, true);
             var bounds = this.getBounds();
             this.W = bounds.r - bounds.l;
             this.H = bounds.b - bounds.t;
