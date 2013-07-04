@@ -114,6 +114,14 @@ WordShape.prototype =
         return true;
     },
 
+    Is_InTable : function(bReturnTopTable)
+    {
+        if ( true === bReturnTopTable )
+            return null;
+
+        return false;
+    },
+
     init: function(presetGeom, posX, posY, extX, extY, flipH, flipV, beginFlag, endFlag)
     {
         var data = {

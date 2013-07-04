@@ -3931,6 +3931,7 @@ function CTableProp (tblProp)
         this.RowsInHeader = (undefined != tblProp.RowsInHeader) ? tblProp.RowsInHeader : 0;
         this.CellsVAlign = (undefined != tblProp.CellsVAlign) ? tblProp.CellsVAlign :c_oAscVertAlignJc.Top;
         this.AllowOverlap = (undefined != tblProp.AllowOverlap) ? tblProp.AllowOverlap : undefined;
+        this.TableLayout  = tblProp.TableLayout;
         this.Locked = (undefined != tblProp.Locked) ? tblProp.Locked : false;
 	}
 	else
@@ -4009,6 +4010,8 @@ CTableProp.prototype.get_TableStyle = function() {return this.TableStyle;}
 CTableProp.prototype.put_TableStyle = function(v){this.TableStyle = v;}
 CTableProp.prototype.get_AllowOverlap = function() {return this.AllowOverlap;}
 CTableProp.prototype.put_AllowOverlap = function(v){this.AllowOverlap = v;}
+CTableProp.prototype.get_TableLayout = function() {return this.TableLayout;}
+CTableProp.prototype.put_TableLayout = function(v){this.TableLayout = v;}
 
 function CBorders (obj)
 {

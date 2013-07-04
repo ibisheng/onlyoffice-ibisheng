@@ -2646,6 +2646,17 @@ $(".colorWatch").mouseover(function(){
                         document.getElementById("tblY").value = "";
                     }
 
+                    var TableLayout = elemVal.get_TableLayout();
+                    if ( undefined === TableLayout )
+                    {
+                        document.getElementById("tblLayout").disabled = "disabled";
+                    }
+                    else
+                    {
+                        document.getElementById("tblLayout").disabled = 0;
+                        document.getElementById("tblLayout").checked = ( TableLayout === c_oAscTableLayout.AutoFit ? true : false );
+                    }
+
                     var bMerge = editor.CheckBeforeMergeCells();
                     var bSplit = editor.CheckBeforeSplitCells();
 
@@ -3156,6 +3167,11 @@ $(".colorWatch").mouseover(function(){
         }
 		else
             tblOBJ.TableWidth = null;
+
+        if ( document.getElementById("tblLayout").checked )
+            tblOBJ.TableLayout = c_oAscTableLayout.AutoFit;
+        else
+            tblOBJ.TableLayout = c_oAscTableLayout.Fixed;
 		
 		if ( document.getElementById("tblAllowSpacing").checked )
         {

@@ -257,6 +257,12 @@ var c_oAscVertAlignJc =
     Bottom : 0x02  // var vertalignjc_Bottom = 0x02
 };
 
+var c_oAscTableLayout =
+{
+    AutoFit : 0x00,
+    Fixed   : 0x01
+};
+
 var c_oAscHAnchor =
 {
     Margin : 0x00,
