@@ -267,6 +267,10 @@ function CEditorPage(api)
 
     this.Init = function()
     {
+        //-
+        InitPanelAnimation();
+        //-
+
         this.m_oBody = CreateControlContainer(this.Name);
         this.m_oBody.HtmlElement.style.backgroundColor = "#D3D3D3";
 
@@ -2973,6 +2977,8 @@ function CEditorPage(api)
 
         drDoc.SlideCurrent = lPageNum;
         this.m_oLogicDocument.Set_CurPage(lPageNum);
+
+        this.m_oApi.asc_fireCallback("asc_onSlideTiming", this.m_oLogicDocument.Slides[lPageNum].timing);
 
         // теперь пошлем все шаблоны первой темы
         this.CheckLayouts();

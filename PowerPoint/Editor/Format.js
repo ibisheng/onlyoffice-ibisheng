@@ -3693,6 +3693,8 @@ function Slide(presentation, slideLayout, slideNum)
     this.show = true;
     this.showMasterPhAnim = false;
 
+    this.timing = new CAscSlideTiming();
+
     this.presentation = presentation;
     // pointers
     this.Layout = slideLayout;

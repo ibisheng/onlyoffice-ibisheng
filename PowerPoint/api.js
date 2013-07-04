@@ -3705,6 +3705,51 @@ asc_docs_api.prototype.DemonstrationGoToSlide = function(slideNum)
     this.WordControl.DemonstrationGoToSlide(slideNum);
 }
 
+asc_docs_api.prototype.ApplySlideTiming = function(oTiming)
+{
+    var _count = this.WordControl.m_oDrawingDocument.SlidesCount;
+    var _cur = this.WordControl.m_oDrawingDocument.SlideCurrent;
+    if (_cur < 0 || _cur >= _count)
+        return;
+    var _curSlide = this.WordControl.m_oLogicDocument.Slides[_cur];
+    _curSlide.timing.applyProps(oTiming);
+}
+asc_docs_api.prototype.SlideTimingApplyToAll = function()
+{
+    var _count = this.WordControl.m_oDrawingDocument.SlidesCount;
+    var _cur = this.WordControl.m_oDrawingDocument.SlideCurrent;
+    var _slides = this.WordControl.m_oLogicDocument.Slides;
+    if (_cur < 0 || _cur >= _count)
+        return;
+    var _curSlide = _slides[_cur];
+
+    _curSlide.timing.makeDuplicate(this.WordControl.m_oLogicDocument.DefaultSlideTiming);
+    var _default = this.WordControl.m_oLogicDocument.DefaultSlideTiming;
+
+    for (var i = 0; i < _count; i++)
+    {
+        if (i == _cur)
+            continue;
+
+        _default.makeDuplicate(_slides[i].timing);
+    }
+}
+asc_docs_api.prototype.SlideTransitionPlay = function()
+{
+    var _count = this.WordControl.m_oDrawingDocument.SlidesCount;
+    var _cur = this.WordControl.m_oDrawingDocument.SlideCurrent;
+    if (_cur < 0 || _cur >= _count)
+        return;
+    var _timing = this.WordControl.m_oLogicDocument.Slides[_cur].timing;
+
+    var _tr     = this.WordControl.m_oDrawingDocument.TransitionSlide;
+    _tr.Type    = _timing.TransitionType;
+    _tr.Param   = _timing.TransitionOption;
+    _tr.Duration = _timing.TransitionDuration;
+
+    _tr.Start();
+}
+
 asc_docs_api.prototype.SetTextBoxInputMode = function(bIsEA)
 {
     this.WordControl.SetTextBoxMode(bIsEA);

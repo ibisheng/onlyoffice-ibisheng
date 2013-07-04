@@ -41,6 +41,8 @@ function CTransitionAnimation(htmlpage)
     this.Rect = new _rect();
     this.Params = null;
 
+    this.IsBackward = false;
+
     this.TimerId = null;
     var oThis = this;
 
@@ -240,6 +242,9 @@ function CTransitionAnimation(htmlpage)
         oThis.HtmlPage.m_oOverlayApi.CheckRect(oThis.Rect.x, oThis.Rect.y, oThis.Rect.w, oThis.Rect.h);
 
         var _part = (oThis.CurrentTime - oThis.StartTime) / oThis.Duration;
+        if (oThis.IsBackward)
+            _part = 1 - _part;
+
         if (oThis.Param == c_oAscSlideTransitionParams.Fade_Smoothly)
         {
             var _ctx2 = oThis.HtmlPage.m_oOverlayApi.m_oContext;
@@ -342,6 +347,8 @@ function CTransitionAnimation(htmlpage)
         var _ySrcO = 0;
 
         var _part = (oThis.CurrentTime - oThis.StartTime) / oThis.Duration;
+        if (oThis.IsBackward)
+            _part = 1 - _part;
 
         var _offX = (_wDst * (1 - _part)) >> 0;
         var _offY = (_hDst * (1 - _part)) >> 0;
@@ -463,6 +470,8 @@ function CTransitionAnimation(htmlpage)
         var _hDst = oThis.Rect.h;
 
         var _part = (oThis.CurrentTime - oThis.StartTime) / oThis.Duration;
+        if (oThis.IsBackward)
+            _part = 1 - _part;
 
         oThis.HtmlPage.m_oOverlayApi.Clear();
         oThis.HtmlPage.m_oOverlayApi.CheckRect(_xDst, _yDst, _wDst, _hDst);
@@ -973,6 +982,8 @@ function CTransitionAnimation(htmlpage)
         var _hDst = oThis.Rect.h;
 
         var _part = (oThis.CurrentTime - oThis.StartTime) / oThis.Duration;
+        if (oThis.IsBackward)
+            _part = 1 - _part;
 
         oThis.HtmlPage.m_oOverlayApi.Clear();
         oThis.HtmlPage.m_oOverlayApi.CheckRect(_xDst, _yDst, _wDst, _hDst);
@@ -1373,6 +1384,8 @@ function CTransitionAnimation(htmlpage)
         var _ySrc = 0;
 
         var _part = (oThis.CurrentTime - oThis.StartTime) / oThis.Duration;
+        if (oThis.IsBackward)
+            _part = 1 - _part;
 
         var _offX = (_wDst * _part) >> 0;
         var _offY = (_hDst * _part) >> 0;
@@ -1502,6 +1515,8 @@ function CTransitionAnimation(htmlpage)
         var _ySrc = 0;
 
         var _part = (oThis.CurrentTime - oThis.StartTime) / oThis.Duration;
+        if (oThis.IsBackward)
+            _part = 1 - _part;
 
         var _offX = (_wDst * (1 - _part)) >> 0;
         var _offY = (_hDst * (1 - _part)) >> 0;
@@ -1628,6 +1643,8 @@ function CTransitionAnimation(htmlpage)
         var _hDst = oThis.Rect.h;
 
         var _part = (oThis.CurrentTime - oThis.StartTime) / oThis.Duration;
+        if (oThis.IsBackward)
+            _part = 1 - _part;
 
         oThis.HtmlPage.m_oOverlayApi.Clear();
         oThis.HtmlPage.m_oOverlayApi.CheckRect(_xDst, _yDst, _wDst, _hDst);
@@ -2050,6 +2067,8 @@ function CTransitionAnimation(htmlpage)
         var _hDst = oThis.Rect.h;
 
         var _part = (oThis.CurrentTime - oThis.StartTime) / oThis.Duration;
+        if (oThis.IsBackward)
+            _part = 1 - _part;
 
         switch (oThis.Param)
         {
@@ -2223,3 +2242,635 @@ function CTransitionAnimation(htmlpage)
         oThis.TimerId = __nextFrame(oThis._startZoom);
     }
 }
+
+////////////////////////////////////////////////////////////////////
+
+var _global_lock_params_timing = false;
+function InitPanelAnimation()
+{
+    var _body_elem  = document.body;
+
+    var _div_caption = document.createElement('div');
+    _div_caption.id = "animationPropDrag";
+    _div_caption.setAttribute("style", "display:block;width:200px;background-color:#fff;top:57px;right:25px;z-index:100;position:absolute;padding-top: 5px;border: 4px ridge silver;cursor:move;");
+
+    _div_caption.innerHTML = "<div id=\"animationPropDragCaption\" style=\"float:left;width:200px;text-align: center;\">\
+                                <b>Timing</b>\
+                                </div>";
+
+    var _div_animation_prop = document.createElement('div');
+    _div_animation_prop.id = "animationProp";
+    _div_animation_prop.setAttribute("style", "display:display;width:200px;background-color:#fff;top:87px;right:25px;z-index:100;position:absolute;padding-top: 5px;border: 4px ridge silver;");
+
+    _div_animation_prop.innerHTML = "<div style=\"float:left;padding-left:5px;width:200px\">\
+        <div style=\"float:left;width:190px;text-align: center;\">Transition</div>\
+        <select id=\"animationType\" style=\"width:180px;\" onchange=\"AnimationType_Changed()\">\
+            <option value=\"0\">None</option>\
+            <option value=\"1\">Fade</option>\
+            <option value=\"2\">Push</option>\
+            <option value=\"3\">Wipe</option>\
+            <option value=\"4\">Split</option>\
+            <option value=\"5\">UnCover</option>\
+            <option value=\"6\">Cover</option>\
+            <option value=\"7\">Clock</option>\
+            <option value=\"9\">Zoom</option>\
+        </select>\
+        <select id=\"animationParam\" style=\"width:180px;\" onchange=\"AnimationParam_Changed()\">\
+        </select>\
+    Time <input id=\"animationSpeed\" style=\"width:70px;\" value=\"2.0\" onchange=\"AnimationSpeed_Changed()\"/>\
+    <input id=\"animationPlay\" style=\"width:60px;\" type=\"button\" value=\"Play\"/>\
+    <div style=\"float:left;width:190px;text-align: center;\">__________________</div>\
+    <div style=\"margin-top:10px;margin-bottom:10px;float:left;width:190px;text-align: center;\">Advance Slide</div>\
+    <br/>\
+    <input id=\"box_tr1\" type=\"checkbox\" onchange=\"SA_Check_Box_OnMouseClick()\"/> On Mouse Click\
+    <br/>\
+    <input id=\"box_tr2\" style=\"margin-top:10px;\" type=\"checkbox\" onchange=\"SA_Check_Box_After()\"/> After: \
+    <input id=\"slideDuration\" style=\"width:60px;margin-top:10px;\" value=\"10.0\" onchange=\"SlideDuration_Changed()\">\
+    <input id=\"slideApplyToAll\" style=\"width:170px;margin-top:10px;margin-bottom:10px;\" type=\"button\" value=\"Apply To All\"/>\
+<div>";
+
+    Drag.init( _div_caption, null, null, null, null, null, true );
+    _div_caption.onDrag = function(X, Y)
+    {
+        var sTop = Y + 30 + "px", sRight = X + "px";
+        _div_animation_prop.style.top   = sTop;
+        _div_animation_prop.style.right = sRight;
+    };
+
+    _body_elem.appendChild(_div_caption);
+    _body_elem.appendChild(_div_animation_prop);
+
+    document.getElementById("animationPlay").onclick = AnimationPlay;
+    document.getElementById("slideApplyToAll").onclick = TimingApplyToAll;
+
+    $("#animationSpeed")
+        .focus(function(){editor.asc_enableKeyEvents(false);})
+        .blur(function(){editor.asc_enableKeyEvents(true);});
+
+    $("#slideDuration")
+        .focus(function(){editor.asc_enableKeyEvents(false);})
+        .blur(function(){editor.asc_enableKeyEvents(true);});
+
+    $("#id_viewer").mousedown(function(){ this.focus(); editor.asc_enableKeyEvents(true);});
+}
+
+function AnimationType_Changed()
+{
+    var _type = document.getElementById("animationType").selectedIndex;
+    var _elem = document.getElementById("animationParam");
+
+    if (!_global_lock_params_timing)
+    {
+        var _timing = new CAscSlideTiming();
+        _timing.setUndefinedOptions();
+        _timing.TransitionType = _type;
+        editor.ApplySlideTiming(_timing);
+    }
+
+    switch (_type)
+    {
+        case c_oAscSlideTransitionTypes.None:
+        {
+            _elem.innerHTML = "";
+            break;
+        }
+        case c_oAscSlideTransitionTypes.Fade:
+        {
+            _elem.innerHTML = "<option value=\"0\">Smoothly</option>\
+                <option value=\"1\">Through Black</option>";
+            _elem.selectedIndex = 0;
+            break;
+        }
+        case c_oAscSlideTransitionTypes.Push:
+        {
+            _elem.innerHTML = "<option value=\"0\">Bottom</option>\
+            <option value=\"1\">Left</option>\
+            <option value=\"2\">Right</option>\
+            <option value=\"3\">Top</option>";
+            _elem.selectedIndex = 0;
+            break;
+        }
+        case c_oAscSlideTransitionTypes.Wipe:
+        {
+            _elem.innerHTML = "<option value=\"0\">Right</option>\
+            <option value=\"2\">Top</option>\
+            <option value=\"3\">Left</option>\
+            <option value=\"4\">Bottom</option>\
+            <option value=\"5\">Top-Right</option>\
+            <option value=\"6\">Bottom-Right</option>\
+            <option value=\"7\">Top-Left</option>\
+            <option value=\"8\">Bottom-Left</option>";
+            _elem.selectedIndex = 0;
+            break;
+        }
+        case c_oAscSlideTransitionTypes.Split:
+        {
+            _elem.innerHTML = "<option value=\"0\">Vertical Out</option>\
+            <option value=\"1\">Horizontal In</option>\
+            <option value=\"2\">Horizontal Out</option>\
+            <option value=\"3\">Vertical In</option>";
+            _elem.selectedIndex = 0;
+            break;
+        }
+        case c_oAscSlideTransitionTypes.UnCover:
+        {
+            _elem.innerHTML = "<option value=\"0\">Right</option>\
+            <option value=\"1\">Top</option>\
+            <option value=\"2\">Left</option>\
+            <option value=\"3\">Bottom</option>\
+            <option value=\"4\">Top-Right</option>\
+            <option value=\"5\">Bottom-Right</option>\
+            <option value=\"6\">Top-Left</option>\
+            <option value=\"7\">Bottom-Left</option>";
+            _elem.selectedIndex = 0;
+            break;
+        }
+        case c_oAscSlideTransitionTypes.Cover:
+        {
+            _elem.innerHTML = "<option value=\"0\">Right</option>\
+            <option value=\"1\">Top</option>\
+            <option value=\"2\">Left</option>\
+            <option value=\"3\">Bottom</option>\
+            <option value=\"4\">Top-Right</option>\
+            <option value=\"5\">Bottom-Right</option>\
+            <option value=\"6\">Top-Left</option>\
+            <option value=\"7\">Bottom-Left</option>";
+            _elem.selectedIndex = 0;
+            break;
+        }
+        case c_oAscSlideTransitionTypes.Clock:
+        {
+            _elem.innerHTML = "<option value=\"0\">Clockwise</option>\
+            <option value=\"1\">Counterclockwise</option>\
+            <option value=\"2\">Wedge</option>";
+            _elem.selectedIndex = 0;
+            break;
+        }
+        case c_oAscSlideTransitionTypes.Pan:
+        {
+            _elem.innerHTML = "<option value=\"0\">Bottom</option>\
+            <option value=\"1\">Left</option>\
+            <option value=\"2\">Right</option>\
+            <option value=\"3\">Top</option>";
+            _elem.selectedIndex = 0;
+            break;
+        }
+        case c_oAscSlideTransitionTypes.Zoom:
+        {
+            _elem.innerHTML = "<option value=\"0\">In</option>\
+            <option value=\"1\">Out</option>\
+            <option value=\"2\">Zoom and Rotate</option>";
+            _elem.selectedIndex = 0;
+            break;
+        }
+        default:
+            break;
+    }
+
+    AnimationParam_Changed();
+}
+
+function AnimationParam_Changed()
+{
+    var _type = document.getElementById("animationType").selectedIndex;
+    var _elem = document.getElementById("animationParam").selectedIndex;
+
+    var _array_Params = [
+        [],
+        [c_oAscSlideTransitionParams.Fade_Smoothly, c_oAscSlideTransitionParams.Fade_Through_Black],
+        [c_oAscSlideTransitionParams.Param_Bottom, c_oAscSlideTransitionParams.Param_Left, c_oAscSlideTransitionParams.Param_Right, c_oAscSlideTransitionParams.Param_Top],
+        [c_oAscSlideTransitionParams.Param_Right, c_oAscSlideTransitionParams.Param_Top, c_oAscSlideTransitionParams.Param_Left, c_oAscSlideTransitionParams.Param_Bottom, c_oAscSlideTransitionParams.Param_TopRight, c_oAscSlideTransitionParams.Param_BottomRight, c_oAscSlideTransitionParams.Param_TopLeft, c_oAscSlideTransitionParams.Param_BottomLeft],
+        [c_oAscSlideTransitionParams.Split_VerticalOut, c_oAscSlideTransitionParams.Split_HorizontalIn, c_oAscSlideTransitionParams.Split_HorizontalOut, c_oAscSlideTransitionParams.Split_VerticalIn],
+        [c_oAscSlideTransitionParams.Param_Right, c_oAscSlideTransitionParams.Param_Top, c_oAscSlideTransitionParams.Param_Left, c_oAscSlideTransitionParams.Param_Bottom, c_oAscSlideTransitionParams.Param_TopRight, c_oAscSlideTransitionParams.Param_BottomRight, c_oAscSlideTransitionParams.Param_TopLeft, c_oAscSlideTransitionParams.Param_BottomLeft],
+        [c_oAscSlideTransitionParams.Param_Right, c_oAscSlideTransitionParams.Param_Top, c_oAscSlideTransitionParams.Param_Left, c_oAscSlideTransitionParams.Param_Bottom, c_oAscSlideTransitionParams.Param_TopRight, c_oAscSlideTransitionParams.Param_BottomRight, c_oAscSlideTransitionParams.Param_TopLeft, c_oAscSlideTransitionParams.Param_BottomLeft],
+        [c_oAscSlideTransitionParams.Clock_Clockwise, c_oAscSlideTransitionParams.Clock_Counterclockwise, c_oAscSlideTransitionParams.Clock_Wedge],
+        [c_oAscSlideTransitionParams.Zoom_In, c_oAscSlideTransitionParams.Zoom_Out, c_oAscSlideTransitionParams.Zoom_AndRotate]
+    ];
+
+    var _param = _array_Params[_type][_elem];
+
+    if (!_global_lock_params_timing)
+    {
+        var _timing = new CAscSlideTiming();
+        _timing.setUndefinedOptions();
+        _timing.TransitionOption = _param;
+        editor.ApplySlideTiming(_timing);
+    }
+}
+
+function SA_Check_Box_After()
+{
+    var _is_ = document.getElementById("box_tr2").checked;
+
+    if (!_global_lock_params_timing)
+    {
+        var _timing = new CAscSlideTiming();
+        _timing.setUndefinedOptions();
+        _timing.SlideAdvanceAfter = _is_;
+        editor.ApplySlideTiming(_timing);
+    }
+}
+
+function SA_Check_Box_OnMouseClick()
+{
+    var _is_ = document.getElementById("box_tr1").checked;
+
+    if (!_global_lock_params_timing)
+    {
+        var _timing = new CAscSlideTiming();
+        _timing.setUndefinedOptions();
+        _timing.SlideAdvanceOnMouseClick = _is_;
+        editor.ApplySlideTiming(_timing);
+    }
+}
+
+function SlideDuration_Changed()
+{
+    var duration = (parseFloat(document.getElementById("slideDuration").value) * 1000) >> 0;
+
+    if (!_global_lock_params_timing)
+    {
+        var _timing = new CAscSlideTiming();
+        _timing.setUndefinedOptions();
+        _timing.SlideAdvanceDuration = duration;
+        editor.ApplySlideTiming(_timing);
+    }
+}
+
+function AnimationSpeed_Changed()
+{
+    var duration = (parseFloat(document.getElementById("animationSpeed").value) * 1000) >> 0;
+
+    if (!_global_lock_params_timing)
+    {
+        var _timing = new CAscSlideTiming();
+        _timing.setUndefinedOptions();
+        _timing.TransitionDuration = duration;
+        editor.ApplySlideTiming(_timing);
+    }
+}
+
+function AnimationPlay()
+{
+    editor.SlideTransitionPlay();
+}
+
+function TimingApplyToAll()
+{
+    editor.SlideTimingApplyToAll();
+}
+
+function UnInitPanelAnimation()
+{
+    var _1 = document.getElementById('animationPropDrag');
+    var _2 = document.getElementById('animationProp');
+
+    if (_1 && _2)
+    {
+        var _body_elem  = document.body;
+        _body_elem.removeChild(_1);
+        _body_elem.removeChild(_2);
+    }
+}
+
+var Drag = {
+
+    obj : null,
+
+    init : function(o, oRoot, minX, maxX, minY, maxY, bSwapHorzRef, bSwapVertRef, fXMapper, fYMapper)
+    {
+        o.onmousedown   = Drag.start;
+
+        o.hmode         = bSwapHorzRef ? false : true ;
+        o.vmode         = bSwapVertRef ? false : true ;
+
+        o.root = oRoot && oRoot != null ? oRoot : o ;
+
+        if (o.hmode  && isNaN(parseInt(o.root.style.left  ))) o.root.style.left   = "0px";
+        if (o.vmode  && isNaN(parseInt(o.root.style.top   ))) o.root.style.top    = "350px";
+        if (!o.hmode && isNaN(parseInt(o.root.style.right ))) o.root.style.right  = "0px";
+        if (!o.vmode && isNaN(parseInt(o.root.style.bottom))) o.root.style.bottom = "0px";
+
+        o.minX  = typeof minX != 'undefined' ? minX : null;
+        o.minY  = typeof minY != 'undefined' ? minY : null;
+        o.maxX  = typeof maxX != 'undefined' ? maxX : null;
+        o.maxY  = typeof maxY != 'undefined' ? maxY : null;
+
+        o.xMapper = fXMapper ? fXMapper : null;
+        o.yMapper = fYMapper ? fYMapper : null;
+
+        o.root.onDragStart  = new Function();
+        o.root.onDragEnd    = new Function();
+        o.root.onDrag       = new Function();
+    },
+
+    start : function(e)
+    {
+        var o = Drag.obj = this;
+        e = Drag.fixE(e);
+        var y = parseInt(o.vmode ? o.root.style.top  : o.root.style.bottom);
+        var x = parseInt(o.hmode ? o.root.style.left : o.root.style.right );
+        o.root.onDragStart(x, y);
+
+        o.lastMouseX    = e.clientX;
+        o.lastMouseY    = e.clientY;
+
+        if (o.hmode) {
+            if (o.minX != null) o.minMouseX = e.clientX - x + o.minX;
+            if (o.maxX != null) o.maxMouseX = o.minMouseX + o.maxX - o.minX;
+        } else {
+            if (o.minX != null) o.maxMouseX = -o.minX + e.clientX + x;
+            if (o.maxX != null) o.minMouseX = -o.maxX + e.clientX + x;
+        }
+
+        if (o.vmode) {
+            if (o.minY != null) o.minMouseY = e.clientY - y + o.minY;
+            if (o.maxY != null) o.maxMouseY = o.minMouseY + o.maxY - o.minY;
+        } else {
+            if (o.minY != null) o.maxMouseY = -o.minY + e.clientY + y;
+            if (o.maxY != null) o.minMouseY = -o.maxY + e.clientY + y;
+        }
+
+        document.onmousemove    = Drag.drag;
+        document.onmouseup      = Drag.end;
+
+        return false;
+    },
+
+    drag : function(e)
+    {
+        e = Drag.fixE(e);
+        var o = Drag.obj;
+
+        var ey  = e.clientY;
+        var ex  = e.clientX;
+        var y = parseInt(o.vmode ? o.root.style.top  : o.root.style.bottom);
+        var x = parseInt(o.hmode ? o.root.style.left : o.root.style.right );
+        var nx, ny;
+
+        if (o.minX != null) ex = o.hmode ? Math.max(ex, o.minMouseX) : Math.min(ex, o.maxMouseX);
+        if (o.maxX != null) ex = o.hmode ? Math.min(ex, o.maxMouseX) : Math.max(ex, o.minMouseX);
+        if (o.minY != null) ey = o.vmode ? Math.max(ey, o.minMouseY) : Math.min(ey, o.maxMouseY);
+        if (o.maxY != null) ey = o.vmode ? Math.min(ey, o.maxMouseY) : Math.max(ey, o.minMouseY);
+
+        nx = x + ((ex - o.lastMouseX) * (o.hmode ? 1 : -1));
+        ny = y + ((ey - o.lastMouseY) * (o.vmode ? 1 : -1));
+
+        if (o.xMapper)      nx = o.xMapper(y)
+        else if (o.yMapper) ny = o.yMapper(x)
+
+        if(o.hmode)
+        {
+            Drag.obj.root.style.left = nx + "px";
+        }
+        else
+        {
+            Drag.obj.root.style.right = nx + "px";
+        }
+
+        if(o.vmode)
+        {
+            Drag.obj.root.style.top = ny + "px";
+        }
+        else
+        {
+            Drag.obj.root.style.bottom = ny + "px";
+        }
+
+        Drag.obj.lastMouseX = ex;
+        Drag.obj.lastMouseY = ey;
+        Drag.obj.root.onDrag(nx, ny);
+
+        return false;
+    },
+
+    end : function()
+    {
+        document.onmousemove = null;
+        document.onmouseup   = null;
+        var x_pos = parseInt( Drag.obj.hmode ? Drag.obj.root.style.left : Drag.obj.root.style.right );
+        var y_pos = parseInt( Drag.obj.vmode ? Drag.obj.root.style.top : Drag.obj.root.style.bottom );
+        Drag.obj.root.onDragEnd( x_pos, y_pos );
+        Drag.obj = null;
+    },
+
+    fixE : function(e)
+    {
+        if (typeof e == 'undefined') e = window.event;
+        if (typeof e.layerX == 'undefined') e.layerX = e.offsetX;
+        if (typeof e.layerY == 'undefined') e.layerY = e.offsetY;
+        return e;
+    }
+};
+
+function SlideTimingCallback(_timing)
+{
+    var _elem = document.getElementById("animationType");
+    if (!_elem)
+        return;
+
+    _global_lock_params_timing = true;
+
+    document.getElementById("animationType").selectedIndex = _timing.TransitionType;
+    AnimationType_Changed();
+
+    switch (_timing.TransitionType)
+    {
+        case c_oAscSlideTransitionTypes.Fade:
+        {
+            switch (_timing.TransitionOption)
+            {
+                case c_oAscSlideTransitionParams.Fade_Smoothly:
+                {
+                    document.getElementById("animationParam").selectedIndex = 0;
+                    break;
+                }
+                case c_oAscSlideTransitionParams.Fade_Through_Black:
+                {
+                    document.getElementById("animationParam").selectedIndex = 1;
+                    break;
+                }
+                default:
+                    break;
+            }
+            break;
+        }
+        case c_oAscSlideTransitionTypes.Push:
+        {
+            switch (_timing.TransitionOption)
+            {
+                case c_oAscSlideTransitionParams.Param_Bottom:
+                {
+                    document.getElementById("animationParam").selectedIndex = 0;
+                    break;
+                }
+                case c_oAscSlideTransitionParams.Param_Left:
+                {
+                    document.getElementById("animationParam").selectedIndex = 1;
+                    break;
+                }
+                case c_oAscSlideTransitionParams.Param_Right:
+                {
+                    document.getElementById("animationParam").selectedIndex = 2;
+                    break;
+                }
+                case c_oAscSlideTransitionParams.Param_Top:
+                {
+                    document.getElementById("animationParam").selectedIndex = 3;
+                    break;
+                }
+                default:
+                    break;
+            }
+            break;
+        }
+        case c_oAscSlideTransitionTypes.Wipe:
+        case c_oAscSlideTransitionTypes.UnCover:
+        case c_oAscSlideTransitionTypes.Cover:
+        {
+            switch (_timing.TransitionOption)
+            {
+                case c_oAscSlideTransitionParams.Param_Right:
+                {
+                    document.getElementById("animationParam").selectedIndex = 0;
+                    break;
+                }
+                case c_oAscSlideTransitionParams.Param_Top:
+                {
+                    document.getElementById("animationParam").selectedIndex = 1;
+                    break;
+                }
+                case c_oAscSlideTransitionParams.Param_Left:
+                {
+                    document.getElementById("animationParam").selectedIndex = 2;
+                    break;
+                }
+                case c_oAscSlideTransitionParams.Param_Bottom:
+                {
+                    document.getElementById("animationParam").selectedIndex = 3;
+                    break;
+                }
+                case c_oAscSlideTransitionParams.Param_TopRight:
+                {
+                    document.getElementById("animationParam").selectedIndex = 4;
+                    break;
+                }
+                case c_oAscSlideTransitionParams.Param_BottomRight:
+                {
+                    document.getElementById("animationParam").selectedIndex = 5;
+                    break;
+                }
+                case c_oAscSlideTransitionParams.Param_TopLeft:
+                {
+                    document.getElementById("animationParam").selectedIndex = 6;
+                    break;
+                }
+                case c_oAscSlideTransitionParams.Param_BottomLeft:
+                {
+                    document.getElementById("animationParam").selectedIndex = 7;
+                    break;
+                }
+                default:
+                    break;
+            }
+            break;
+        }
+        case c_oAscSlideTransitionTypes.Split:
+        {
+            switch (_timing.TransitionOption)
+            {
+                case c_oAscSlideTransitionParams.Split_VerticalOut:
+                {
+                    document.getElementById("animationParam").selectedIndex = 0;
+                    break;
+                }
+                case c_oAscSlideTransitionParams.Split_HorizontalIn:
+                {
+                    document.getElementById("animationParam").selectedIndex = 1;
+                    break;
+                }
+                case c_oAscSlideTransitionParams.Split_HorizontalOut:
+                {
+                    document.getElementById("animationParam").selectedIndex = 2;
+                    break;
+                }
+                case c_oAscSlideTransitionParams.Split_VerticalIn:
+                {
+                    document.getElementById("animationParam").selectedIndex = 3;
+                    break;
+                }
+                default:
+                    break;
+            }
+            break;
+        }
+        case c_oAscSlideTransitionTypes.Clock:
+        {
+            switch (_timing.TransitionOption)
+            {
+                case c_oAscSlideTransitionParams.Clock_Clockwise:
+                {
+                    document.getElementById("animationParam").selectedIndex = 0;
+                    break;
+                }
+                case c_oAscSlideTransitionParams.Clock_Counterclockwise:
+                {
+                    document.getElementById("animationParam").selectedIndex = 1;
+                    break;
+                }
+                case c_oAscSlideTransitionParams.Clock_Wedge:
+                {
+                    document.getElementById("animationParam").selectedIndex = 2;
+                    break;
+                }
+                default:
+                    break;
+            }
+            break;
+        }
+        case c_oAscSlideTransitionTypes.Zoom:
+        {
+            switch (_timing.TransitionOption)
+            {
+                case c_oAscSlideTransitionParams.Zoom_In:
+                {
+                    document.getElementById("animationParam").selectedIndex = 0;
+                    break;
+                }
+                case c_oAscSlideTransitionParams.Zoom_Out:
+                {
+                    document.getElementById("animationParam").selectedIndex = 1;
+                    break;
+                }
+                case c_oAscSlideTransitionParams.Zoom_AndRotate:
+                {
+                    document.getElementById("animationParam").selectedIndex = 2;
+                    break;
+                }
+                default:
+                    break;
+            }
+            break;
+        }
+        default:
+            break;
+    }
+
+    AnimationParam_Changed();
+
+    document.getElementById("animationSpeed").value = "" + (_timing.TransitionDuration / 1000);
+
+    document.getElementById("box_tr1").checked = (true === _timing.SlideAdvanceOnMouseClick);
+    document.getElementById("box_tr2").checked = (true === _timing.SlideAdvanceAfter);
+    document.getElementById("slideDuration").value = "" + (_timing.SlideAdvanceDuration / 1000);
+
+    _global_lock_params_timing = false;
+}
+
+setTimeout(function() {
+    editor.asc_registerCallback("asc_onSlideTiming", function(){
+        SlideTimingCallback(arguments[0]);
+    });
+}, 5000);
+
+////////////////////////////////////////////////////////////////////
