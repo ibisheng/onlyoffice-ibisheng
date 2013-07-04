@@ -3667,42 +3667,42 @@ asc_docs_api.prototype.sync_DemonstrationSlideChanged = function(slideNum)
 
 asc_docs_api.prototype.StartDemonstration = function(div_id, slidestart_num)
 {
-    this.WordControl.StartDemonstration(div_id, slidestart_num);
+    this.WordControl.DemonstrationManager.Start(div_id, slidestart_num, true);
 }
 
 asc_docs_api.prototype.EndDemonstration = function()
 {
-    this.WordControl.EndDemonstration();
+    this.WordControl.DemonstrationManager.End();
 }
 
 asc_docs_api.prototype.DemonstrationPlay = function()
 {
-    this.WordControl.DemonstrationPlay();
+    this.WordControl.DemonstrationManager.Play();
 }
 
 asc_docs_api.prototype.DemonstrationPause = function()
 {
-    this.WordControl.DemonstrationPause();
+    this.WordControl.DemonstrationManager.Pause();
 }
 
 asc_docs_api.prototype.DemonstrationEndShowMessage = function(message)
 {
-    this.WordControl.DemonstrationEndShowMessage = message;
+    this.WordControl.DemonstrationManager.EndShowMessage = message;
 }
 
 asc_docs_api.prototype.DemonstrationNextSlide = function()
 {
-    this.WordControl.DemonstrationNextSlide();
+    this.WordControl.DemonstrationManager.NextSlide();
 }
 
 asc_docs_api.prototype.DemonstrationPrevSlide = function()
 {
-    this.WordControl.DemonstrationPrevSlide();
+    this.WordControl.DemonstrationManager.PrevSlide();
 }
 
-asc_docs_api.prototype.DemonstrationGoToSlide = function(slideNum)
+asc_docs_api.prototype.GoToSlide = function(slideNum)
 {
-    this.WordControl.DemonstrationGoToSlide(slideNum);
+    this.WordControl.GoToSlide(slideNum);
 }
 
 asc_docs_api.prototype.ApplySlideTiming = function(oTiming)

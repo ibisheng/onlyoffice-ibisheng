@@ -212,15 +212,7 @@ function CEditorPage(api)
     this.MasterLayouts = null; // мастер, от которого посылались в меню последние шаблоны
 
     // demonstrationMode
-    this.DemonstrationMode = false;
-    this.DemonstrationDiv = null;
-    this.DemonstrationCanvas = null;
-    this.DemonstrationSlideNum = -1;
-    this.DemonstrationDivEndPresentation = null;
-    this.PresentationPlayTimerId = -1;
-    this.DemonstrationEndShowMessage = "";
-    this.DemonstrationTransition = null;
-    this.DefaultSlideDuration = 30000;
+    this.DemonstrationManager = new CDemonstrationManager(this);
 
     // ввод текста через дивку (привет китайцам)
     this.TextBoxInputMode = false;
@@ -1281,7 +1273,7 @@ function CEditorPage(api)
             e.returnValue = false;
 
         oWordControl.Thumbnails.SetFocusElement(FOCUS_OBJECT_MAIN);
-        if (oWordControl.DemonstrationMode)
+        if (oWordControl.DemonstrationManager.Mode)
             return false;
 
         var _xOffset = oWordControl.X;
@@ -1343,7 +1335,7 @@ function CEditorPage(api)
         else
             e.returnValue = false;
 
-        if (oWordControl.DemonstrationMode)
+        if (oWordControl.DemonstrationManager.Mode)
             return false;
 
         check_MouseMoveEvent(e);
@@ -1377,7 +1369,7 @@ function CEditorPage(api)
 
         var oWordControl = oThis;
 
-        if (oWordControl.DemonstrationMode)
+        if (oWordControl.DemonstrationManager.Mode)
         {
             if (e.preventDefault)
                 e.preventDefault();
@@ -1429,8 +1421,8 @@ function CEditorPage(api)
 
         var oWordControl = oThis;
 
-        if (oWordControl.DemonstrationMode)
-            return oWordControl.onMouseUpDemonstration(e);
+        if (oWordControl.DemonstrationManager.Mode)
+            return oWordControl.DemonstrationManager.onMouseUp(e);
 
         //---
         global_mouseEvent.X = x;
@@ -1473,7 +1465,7 @@ function CEditorPage(api)
         if (false === oThis.m_oApi.bInit_word_control)
             return;
 
-        if (oThis.DemonstrationMode)
+        if (oThis.DemonstrationManager.Mode)
         {
             if (e.preventDefault)
                 e.preventDefault();
@@ -1512,9 +1504,9 @@ function CEditorPage(api)
         if (false === oWordControl.m_oApi.bInit_word_control || oWordControl.IsFocus === false || oWordControl.m_bIsMouseLock === true)
             return;
 
-        if (oWordControl.DemonstrationMode)
+        if (oThis.DemonstrationManager.Mode)
         {
-            oWordControl.onKeyDownDemonstration(e);
+            oWordControl.DemonstrationManager.onKeyDown(e);
             return;
         }
 
@@ -1534,12 +1526,6 @@ function CEditorPage(api)
         var oWordControl = oThis;
         if (false === oWordControl.m_oApi.bInit_word_control || oWordControl.IsFocus === false || oWordControl.m_bIsMouseLock === true)
             return;
-
-        if (oWordControl.DemonstrationMode)
-        {
-            oWordControl.onKeyDownDemonstration(e);
-            return;
-        }
 
         check_KeyboardEvent(e);
 
@@ -1648,7 +1634,7 @@ function CEditorPage(api)
 
         oWordControl.IsKeyDownButNoPress = false;
 
-        if (oWordControl.DemonstrationMode)
+        if (oThis.DemonstrationManager.Mode)
             return;
 
         if (false === oWordControl.bIsUseKeyPress)
@@ -1663,368 +1649,6 @@ function CEditorPage(api)
         if ( true === retValue )
         {
             e.preventDefault();
-        }
-    }
-
-    // -------------------------------------------------------- //
-    // ---------------------demonstration---------------------- //
-    // -------------------------------------------------------- //
-    this.onKeyDownDemonstration = function(e)
-    {
-        check_KeyboardEvent(e);
-
-        switch (global_keyboardEvent.KeyCode)
-        {
-            case 13:    // enter
-            case 32:    // space
-            case 34:    // PgDn
-            case 39:    // right arrow
-            case 40:    // bottom arrow
-            {
-                // next slide
-                this.DemonstrationSlideNum++;
-                if (this.DemonstrationSlideNum > this.m_oDrawingDocument.SlidesCount)
-                    this.EndDemonstration();
-                else
-                {
-                    this.OnPaintDemonstration();
-                    this.m_oApi.sync_DemonstrationSlideChanged(this.DemonstrationSlideNum);
-                }
-                break;
-            }
-            case 33:
-            case 37:
-            case 38:
-            {
-                // prev slide
-                if (0 != this.DemonstrationSlideNum)
-                {
-                    this.DemonstrationSlideNum--;
-                    this.OnPaintDemonstration();
-                    this.m_oApi.sync_DemonstrationSlideChanged(this.DemonstrationSlideNum);
-                }
-                break;
-            }
-            case 36:    // home
-            {
-                if (0 != this.DemonstrationSlideNum)
-                {
-                    this.DemonstrationSlideNum = 0;
-                    this.OnPaintDemonstration();
-                    this.m_oApi.sync_DemonstrationSlideChanged(this.DemonstrationSlideNum);
-                }
-                break;
-            }
-            case 35:    // end
-            {
-                if (this.DemonstrationSlideNum != (this.m_oDrawingDocument.SlidesCount - 1))
-                {
-                    this.DemonstrationSlideNum = this.m_oDrawingDocument.SlidesCount - 1;
-                    this.OnPaintDemonstration();
-                    this.m_oApi.sync_DemonstrationSlideChanged(this.DemonstrationSlideNum);
-                }
-                break;
-            }
-            case 27:    // escape
-            {
-                this.EndDemonstration();
-                break;
-            }
-            default:
-                break;
-        }
-
-        this.IsKeyDownButNoPress = true;
-        return false;
-    }
-
-    this.onMouseDownDemonstration = function(e)
-    {
-        e.preventDefault();
-        return false;
-    }
-
-    this.onMouseMoveDemonstration = function(e)
-    {
-        e.preventDefault();
-        return false;
-    }
-
-    this.onMouseUpDemonstration = function(e)
-    {
-        // next slide
-        oThis.DemonstrationSlideNum++;
-        if (oThis.DemonstrationSlideNum > oThis.m_oDrawingDocument.SlidesCount)
-            oThis.EndDemonstration();
-        else
-        {
-            oThis.OnPaintDemonstration();
-            oThis.m_oApi.sync_DemonstrationSlideChanged(oThis.DemonstrationSlideNum);
-        }
-
-        e.preventDefault();
-        return false;
-    }
-
-    this.onMouseWhellDemonstration = function(e)
-    {
-        var delta = 0;
-        if (undefined != e.wheelDelta)
-            delta = (e.wheelDelta > 0) ? -1 : 1;
-        else
-            delta = (e.detail > 0) ? 1 : -1;
-
-        if (delta > 0)
-        {
-            oThis.DemonstrationSlideNum++;
-            if (oThis.DemonstrationSlideNum > oThis.m_oDrawingDocument.SlidesCount)
-                oThis.EndDemonstration();
-            else
-            {
-                oThis.OnPaintDemonstration();
-                oThis.m_oApi.sync_DemonstrationSlideChanged(oThis.DemonstrationSlideNum);
-            }
-        }
-        else
-        {
-            if (0 != oThis.DemonstrationSlideNum)
-            {
-                oThis.DemonstrationSlideNum--;
-                oThis.OnPaintDemonstration();
-                oThis.m_oApi.sync_DemonstrationSlideChanged(oThis.DemonstrationSlideNum);
-            }
-        }
-
-        e.preventDefault();
-        return false;
-    }
-
-    this.DemonstrationNextSlide = function()
-    {
-        if (!this.DemonstrationMode)
-            return;
-
-        this.DemonstrationSlideNum++;
-        if (this.DemonstrationSlideNum > this.m_oDrawingDocument.SlidesCount)
-            this.EndDemonstration();
-        else
-        {
-            this.m_oApi.sync_DemonstrationSlideChanged(this.DemonstrationSlideNum);
-            this.OnPaintDemonstration();
-        }
-    }
-
-    this.DemonstrationPrevSlide = function()
-    {
-        if (!this.DemonstrationMode)
-            return;
-
-        if (0 != this.DemonstrationSlideNum)
-        {
-            this.DemonstrationSlideNum--;
-            this.OnPaintDemonstration();
-            this.m_oApi.sync_DemonstrationSlideChanged(this.DemonstrationSlideNum);
-        }
-    }
-
-    this.DemonstrationGoToSlide = function(slideNum)
-    {
-        if (!this.DemonstrationMode)
-            return;
-
-        if ((slideNum == this.DemonstrationSlideNum) || (slideNum < 0) || (slideNum >= this.m_oDrawingDocument.SlidesCount))
-            return;
-
-        this.DemonstrationSlideNum = slideNum;
-        this.OnPaintDemonstration();
-        this.m_oApi.sync_DemonstrationSlideChanged(this.DemonstrationSlideNum);
-    }
-
-    this.StartDemonstration = function(div_id, slidestart_num)
-    {
-        this.DemonstrationDiv = document.getElementById(div_id);
-        if (this.DemonstrationDiv == null || slidestart_num < 0 || slidestart_num >= this.m_oDrawingDocument.SlidesCount)
-            return;
-
-        var _width = this.DemonstrationDiv.clientWidth;
-        var _height = this.DemonstrationDiv.clientHeight;
-
-        this.DemonstrationMode = true;
-        this.DemonstrationCanvas = document.createElement('canvas');
-        this.DemonstrationCanvas.style = "position:absolute;margin:0;padding:0;left:0px;top:0px;width:100%;height:100%;zIndex:2;";
-        this.DemonstrationCanvas.width = _width;
-        this.DemonstrationCanvas.height = _height;
-
-        this.DemonstrationSlideNum = slidestart_num;
-
-        this.m_oApi.sync_DemonstrationSlideChanged(this.DemonstrationSlideNum);
-
-        //this.DemonstrationCanvas.onmousedown  = this.onMouseDownDemonstration;
-        //this.DemonstrationCanvas.onmousemove  = this.onMouseMoveDemonstration;
-        this.DemonstrationCanvas.onmouseup    = this.onMouseUpDemonstration;
-
-        this.DemonstrationCanvas.onmousewheel = this.onMouseWhellDemonstration;
-        if (this.DemonstrationCanvas.addEventListener)
-            this.DemonstrationCanvas.addEventListener("DOMMouseScroll", this.onMouseWhellDemonstration, false);
-
-        this.DemonstrationDiv.appendChild(this.DemonstrationCanvas);
-        this.OnPaintDemonstration();
-    }
-
-    this.DemonstrationPlay = function()
-    {
-        if (-1 != this.PresentationPlayTimerId)
-            clearTimeout(this.PresentationPlayTimerId);
-
-        if (this.DemonstrationMode === false)
-            return;
-
-        // интервал - должен зависеть от слайда. Пока так.
-        this.PresentationPlayTimerId = setTimeout(this.OnPlayDemonstration, this.DefaultSlideDuration);
-    }
-
-    this.DemonstrationPause = function()
-    {
-        if (-1 != this.PresentationPlayTimerId)
-            clearTimeout(this.PresentationPlayTimerId);
-    }
-
-    this.OnPlayDemonstration = function()
-    {
-        if (oThis.DemonstrationMode === false)
-            return;
-
-        oThis.DemonstrationSlideNum++;
-        if (oThis.DemonstrationSlideNum > oThis.m_oDrawingDocument.SlidesCount)
-            oThis.DemonstrationSlideNum = oThis.m_oDrawingDocument.SlidesCount;
-
-        oThis.m_oApi.sync_DemonstrationSlideChanged(oThis.DemonstrationSlideNum);
-
-        oThis.OnPaintDemonstration();
-
-        // интервал - должен зависеть от слайда. Пока так.
-        oThis.PresentationPlayTimerId = setTimeout(oThis.OnPlayDemonstration,  oThis.DefaultSlideDuration);
-    }
-
-    this.DemonstrationResize = function()
-    {
-        if (!this.DemonstrationMode)
-            return;
-
-        var _width = this.DemonstrationDiv.clientWidth;
-        var _height = this.DemonstrationDiv.clientHeight;
-
-        if (this.DemonstrationCanvas.width != _width || this.DemonstrationCanvas.height != _height)
-        {
-            this.DemonstrationCanvas.width = _width;
-            this.DemonstrationCanvas.height = _height;
-            this.OnPaintDemonstration();
-        }
-    }
-
-    this.EndDemonstration = function()
-    {
-        if (!this.DemonstrationMode)
-            return;
-
-        if (null != this.DemonstrationDivEndPresentation)
-        {
-            this.DemonstrationDiv.removeChild(this.DemonstrationDivEndPresentation);
-            this.DemonstrationDivEndPresentation = null;
-        }
-
-        this.DemonstrationDiv.removeChild(this.DemonstrationCanvas);
-        this.DemonstrationCanvas = null;
-        this.DemonstrationSlideNum = -1;
-        this.DemonstrationDiv = null;
-        this.DemonstrationMode = false;
-
-        this.m_oApi.sync_endDemonstration();
-
-        if (-1 != this.PresentationPlayTimerId)
-            clearTimeout(this.PresentationPlayTimerId);
-    }
-
-    this.OnPaintDemonstration = function()
-    {
-        if (!this.DemonstrationMode)
-            return;
-
-        var _width = this.DemonstrationCanvas.width;
-        var _height = this.DemonstrationCanvas.height;
-
-        var _w_mm = this.m_oLogicDocument.Width;
-        var _h_mm = this.m_oLogicDocument.Height;
-
-        // проверим аспект
-        var aspectDisplay = _width / _height;
-        var aspectPres = _w_mm / _h_mm;
-
-        var _l = 0;
-        var _t = 0;
-        var _w = 0;
-        var _h = 0;
-
-        if (aspectPres > aspectDisplay)
-        {
-            _w = _width;
-            _h = _w / aspectPres;
-            _l = 0;
-            _t = (_height - _h) >> 1;
-        }
-        else
-        {
-            _h = _height;
-            _w = _h * aspectPres;
-            _t = 0;
-            _l = (_width - _w) >> 1;
-        }
-
-        var ctx = this.DemonstrationCanvas.getContext('2d');
-        ctx.globalAlpha = 1;
-        ctx.fillStyle = "#000000";
-        ctx.fillRect(0, 0, _width, _height);
-        ctx.beginPath();
-
-        if (this.DemonstrationSlideNum < this.m_oDrawingDocument.SlidesCount)
-        {
-            if (null != this.DemonstrationDivEndPresentation)
-            {
-                this.DemonstrationDiv.removeChild(this.DemonstrationDivEndPresentation);
-                this.DemonstrationDivEndPresentation = null;
-            }
-
-            var g = new CGraphics();
-            g.init(ctx, _w, _h, _w_mm, _h_mm);
-            g.m_oFontManager = g_fontManager;
-
-            g.m_oCoordTransform.tx = _l;
-            g.m_oCoordTransform.ty = _t;
-            g.transform(1,0,0,1,0,0);
-
-            g.IsNoDrawingEmptyPlaceholder = true;
-
-            this.m_oLogicDocument.DrawPage(this.DemonstrationSlideNum, g);
-        }
-        else
-        {
-            if (null == this.DemonstrationDivEndPresentation)
-            {
-                this.DemonstrationDivEndPresentation = document.createElement('div');
-                this.DemonstrationDivEndPresentation.setAttribute("style", "position:absolute;margin:0px;padding:0px;left:0px;top:0px;width:100%;height:100%;z-index:3;text-align:center;font-family:monospace;font-size:12pt;color:#FFFFFF;");
-                //this.DemonstrationDivEndPresentation.innerHTML = "Конец показа слайдов. Щелкните для выхода.";
-                this.DemonstrationDivEndPresentation.innerHTML = this.DemonstrationEndShowMessage;
-
-                //this.DemonstrationDivEndPresentation.onmousedown  = this.onMouseDownDemonstration;
-                //this.DemonstrationDivEndPresentation.onmousemove  = this.onMouseMoveDemonstration;
-                this.DemonstrationDivEndPresentation.onmouseup    = this.onMouseUpDemonstration;
-
-                this.DemonstrationDivEndPresentation.onmousewheel = this.onMouseWhellDemonstration;
-                if (this.DemonstrationDivEndPresentation.addEventListener)
-                    this.DemonstrationDivEndPresentation.addEventListener("DOMMouseScroll", this.onMouseWhellDemonstration, false);
-
-                this.DemonstrationDiv.appendChild(this.DemonstrationDivEndPresentation);
-            }
         }
     }
 
@@ -2251,13 +1875,13 @@ function CEditorPage(api)
         var isNewSize = this.checkBodySize();
         if (!isNewSize && false === isAttack)
         {
-            this.DemonstrationResize();
+            this.DemonstrationManager.Resize();
             return;
         }
 
         //console.log("resize");
         this.m_oBody.Resize(this.Width * g_dKoef_pix_to_mm, this.Height * g_dKoef_pix_to_mm);
-        this.DemonstrationResize();
+        this.DemonstrationManager.Resize();
 
         if (this.checkNeedHorScroll())
             return;
@@ -2298,14 +1922,13 @@ function CEditorPage(api)
         this.OnScroll();
         this.onTimerScroll_sync(true);
 
-        if (this.DemonstrationMode)
-            this.OnPaintDemonstration();
+        this.DemonstrationManager.Resize();
     }
 
     this.OnResize2 = function(isAttack)
     {
         this.m_oBody.Resize(this.Width * g_dKoef_pix_to_mm, this.Height * g_dKoef_pix_to_mm);
-        this.DemonstrationResize();
+        this.DemonstrationManager.Resize();
 
         if (this.checkNeedHorScroll())
             return;
@@ -2346,8 +1969,7 @@ function CEditorPage(api)
         this.OnScroll();
         this.onTimerScroll_sync(true);
 
-        if (this.DemonstrationMode)
-            this.OnPaintDemonstration();
+        this.DemonstrationManager.Resize();
     }
 
     this.checkNeedRules = function()
