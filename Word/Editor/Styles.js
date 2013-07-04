@@ -38,6 +38,9 @@ var tblwidth_Mm   = 0x01;
 var tblwidth_Nil  = 0x02;
 var tblwidth_Pct  = 0x03;
 
+var tbllayout_Fixed   = 0x00;
+var tbllayout_AutoFit = 0x01;
+
 var border_None   = 0x0000;
 var border_Single = 0x0001;
 
@@ -2881,6 +2884,7 @@ function CTablePr()
     this.TableCellSpacing      = undefined;
     this.TableInd              = undefined;
     this.TableW                = undefined;
+    this.TableLayout           = undefined;
 }
 
 CTablePr.prototype =
@@ -2933,6 +2937,8 @@ CTablePr.prototype =
 
         if ( undefined != this.TableW )
             TablePr.TableW = this.TableW.Copy();
+
+        TablePr.TableLayout = this.TableLayout;
 
         return TablePr;
     },
@@ -2991,6 +2997,9 @@ CTablePr.prototype =
 
         if ( undefined != TablePr.TableW )
             this.TableW = TablePr.TableW.Copy();
+
+        if ( undefined != TablePr.TableLayout )
+            this.TableLayout = TablePr.TableLayout;
     },
 
     Init_Default : function()
@@ -3012,6 +3021,7 @@ CTablePr.prototype =
         this.TableCellSpacing      = null;
         this.TableInd              = 0;
         this.TableW                = new CTableMeasurement(tblwidth_Auto, 0);
+        this.TableLayout           = tbllayout_AutoFit;
     },
 
     Set_FromObject : function(TablePr)
@@ -3125,6 +3135,8 @@ CTablePr.prototype =
             this.TableW = new CTableMeasurement( TablePr.TableW.Type, TablePr.TableW.W );
         else
             this.TableW = undefined;
+
+        this.TableLayout = TablePr.TableLayout;
     },
 
     Write_ToBinary : function(Writer)
@@ -3243,6 +3255,12 @@ CTablePr.prototype =
             Flags |= 65536;
         }
 
+        if ( undefined != this.TableLayout )
+        {
+            Writer.WriteLong( this.TableLayout );
+            Flags |= 131072;
+        }
+
         var EndPos = Writer.GetCurPosition();
         Writer.Seek( StartPos );
         Writer.WriteLong( Flags );
@@ -3344,6 +3362,9 @@ CTablePr.prototype =
             this.TableW = new CTableMeasurement(tblwidth_Auto, 0);
             this.TableW.Read_FromBinary(Reader);
         }
+
+        if ( 131072 & Flags )
+            this.TableLayout = Reader.GetLong();
     }
 }
 
