@@ -1,9 +1,6 @@
 /** @define {boolean} */
 var ASC_DOCS_API_DEBUG = true;
 
-/** @define {boolean} */
-var ASC_DOCS_API_LOAD_COAUTHORING_SETTINGS = true;
-
 var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 var documentId = undefined;
@@ -1144,13 +1141,37 @@ CChatMessage.prototype.get_Message = function() { return this.Message; }
     ToDo Register Callback OnCoAuthoringDisconnectUser возвращается userId
  */
 // Init CoAuthoring
-asc_docs_api.prototype._coAuthoringInit = function(docId, user)
+asc_docs_api.prototype._coAuthoringInit = function()
 {
     if (!this.CoAuthoringApi) {
 		g_oIdCounter.Set_Load(false);
 		this.asyncServerIdEndLoaded ();
         return; // Error
 	}
+
+	if(undefined !== window['g_cAscCoAuthoringUrl'])
+		window.g_cAscCoAuthoringUrl = window['g_cAscCoAuthoringUrl'];
+		
+	if(undefined !== window.g_cAscCoAuthoringUrl)
+	{
+		//Turn off CoAuthoring feature if it disabled
+		if(!this.isCoAuthoringEnable)
+			window.g_cAscCoAuthoringUrl = "";
+			
+		this.CoAuthoringApi.set_url(window.g_cAscCoAuthoringUrl);
+	}
+	//���� ������ ����������� ������������, ����� ������� ��� ����������� ������������� ���.
+	if(undefined === editor.User || null === editor.User ||
+		undefined === editor.User.asc_getId() || null === editor.User.asc_getId())
+	{
+		var asc_user = window["Asc"].asc_CUser;
+		editor.User = new asc_user();
+		editor.User.asc_setId("Unknown");
+		editor.User.asc_setUserName("Unknown");
+
+		this.CoAuthoringApi.set_url("");
+	}
+
     var t = this;
     this.CoAuthoringApi.onParticipantsChanged   	= function (e) { t.asc_fireCallback( "asc_onParticipantsChanged", e ); };
 	this.CoAuthoringApi.onAuthParticipantsChanged  	= function (e) { t.asc_fireCallback( "asc_onAuthParticipantsChanged", e ); };
@@ -1288,45 +1309,12 @@ asc_docs_api.prototype._coAuthoringInit = function(docId, user)
 		}
 	};
 
-    this.CoAuthoringApi.init (user, docId, this.isViewMode, 'fghhfgsjdgfjs', window.location.host, g_sMainServiceLocalUrl, function(){
+    this.CoAuthoringApi.init (editor.User, documentId, this.isViewMode, 'fghhfgsjdgfjs', window.location.host, g_sMainServiceLocalUrl, function(){
     });
 
     // ToDo init other callbacks
 }
-asc_docs_api.prototype._coAuthoringInitCallBack = function(_this)
-{
-	if(undefined !== window['g_cAscCoAuthoringUrl'])
-		window.g_cAscCoAuthoringUrl = window['g_cAscCoAuthoringUrl'];
-		
-	if(undefined !== window.g_cAscCoAuthoringUrl)
-	{
-		//Turn off CoAuthoring feature if it disabled
-		if(!_this.isCoAuthoringEnable)
-			window.g_cAscCoAuthoringUrl = "";
-			
-		_this._coAuthoringSetServerUrl(window.g_cAscCoAuthoringUrl);
-	}
-	//���� ������ ����������� ������������, ����� ������� ��� ����������� ������������� ���.
-	if(undefined === editor.User || null === editor.User ||
-		undefined === editor.User.asc_getId() || null === editor.User.asc_getId())
-	{
-		var asc_user = window["Asc"].asc_CUser;
-		editor.User = new asc_user();
-		editor.User.asc_setId("Unknown");
-		editor.User.asc_setUserName("Unknown");
 
-		_this._coAuthoringSetServerUrl("");
-	}
-	_this._coAuthoringInit(documentId, editor.User);
-}
-// Set CoAuthoring server url
-asc_docs_api.prototype._coAuthoringSetServerUrl = function(url)
-{
-    if (!this.CoAuthoringApi)
-        return; // Error
-
-    this.CoAuthoringApi.set_url(url);
-}
 // send chart message
 asc_docs_api.prototype.asc_coAuthoringChatSendMessage = function(message)
 {
@@ -1359,9 +1347,20 @@ asc_docs_api.prototype.asc_coAuthoringDisconnect = function () {
 //////////////////////////SpellChecking api//////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 // Init SpellCheck
-asc_docs_api.prototype._coSpellCheckInit = function(docId) {
+asc_docs_api.prototype._coSpellCheckInit = function() {
 	if (!this.SpellCheckApi) {
 		return; // Error
+	}
+	
+	if(undefined !== window['g_cAscSpellCheckUrl'])
+		window.g_cAscSpellCheckUrl = window['g_cAscSpellCheckUrl'];
+
+	if(undefined !== window.g_cAscSpellCheckUrl) {
+		//Turn off SpellCheck feature if it disabled
+		if(!this.isSpellCheckEnable)
+			window.g_cAscSpellCheckUrl = "";
+
+		this.SpellCheckApi.set_url(window.g_cAscSpellCheckUrl);
 	}
 
 	this.SpellCheckApi.onSpellCheck	= function (e) {
@@ -1369,29 +1368,9 @@ asc_docs_api.prototype._coSpellCheckInit = function(docId) {
 		SpellCheck_CallBack(incomeObject);
 	};
 
-	this.SpellCheckApi.init (docId);
+	this.SpellCheckApi.init (documentId);
 };
-// Set SpellCheck server url
-asc_docs_api.prototype._coSpellCheckSetServerUrl = function(url) {
-	if (!this.SpellCheckApi)
-		return; // Error
 
-	this.SpellCheckApi.set_url(url);
-};
-asc_docs_api.prototype._spellCheckInitCallback = function(_this) {
-	if(undefined !== window['g_cAscSpellCheckUrl'])
-		window.g_cAscSpellCheckUrl = window['g_cAscSpellCheckUrl'];
-
-	if(undefined !== window.g_cAscSpellCheckUrl) {
-		//Turn off SpellCheck feature if it disabled
-		if(!_this.isSpellCheckEnable)
-			window.g_cAscSpellCheckUrl = "";
-
-		_this._coSpellCheckSetServerUrl(window.g_cAscSpellCheckUrl);
-	}
-
-	_this._coSpellCheckInit(documentId);
-};
 asc_docs_api.prototype.asc_getSpellCheckLanguages = function() {
 	return g_spellCheckLanguages;
 };
@@ -5289,19 +5268,8 @@ asc_docs_api.prototype.asc_enableKeyEvents = function(value){
 
 asc_docs_api.prototype.asyncServerIdStartLoaded = function()
 {
-	//Загружаем скрипт с настройками, по окончанию инициализируем контрол для совместного редактирования
-	//TODO: Вынести шрифты в коммоны, SetFontPath заменить на SetCommonPath,
-	//пердаваемый путь использовать для загрузки шрифтов и настороек.
-	if(true == ASC_DOCS_API_LOAD_COAUTHORING_SETTINGS) {
-		// Загружаем для SpellCheck
-		this.ScriptSpellCheckLoader.LoadScriptAsync(this.FontLoader.fontFilesPath + "../Common/spellcheckapisettings.js",
-			this._spellCheckInitCallback, this);
-
-		this.ScriptLoader.LoadScriptAsync(this.FontLoader.fontFilesPath + "../Common/docscoapisettings.js",
-											this._coAuthoringInitCallBack, this);
-	} else {
-		this._coAuthoringInitCallBack(this);
-	}
+	this._coSpellCheckInit();
+	this._coAuthoringInit();
 }
 
 asc_docs_api.prototype.asyncServerIdEndLoaded = function()
