@@ -168,7 +168,9 @@ var c_oSerWorksheetsTypes =
 	TableParts: 18,
 	Comments: 19,
 	Comment: 20,
-	ConditionalFormatting: 21
+	ConditionalFormatting: 21,
+	SheetViews: 22,
+	SheetView: 23
 };
 /** @enum */
 var c_oSerWorksheetPropTypes =
@@ -545,6 +547,27 @@ var c_oSer_ConditionalFormattingValueObject = {
 	Gte				: 0,
 	Type			: 1,
 	Val				: 2
+};
+var c_oSer_SheetView = {
+	ColorId						: 0,
+	DefaultGridColor			: 1,
+	RightToLeft					: 2,
+	ShowFormulas				: 3,
+	ShowGridLines				: 4,
+	ShowOutlineSymbols			: 5,
+	ShowRowColHeaders			: 6,
+	ShowRuler					: 7,
+	ShowWhiteSpace				: 8,
+	ShowZeros					: 9,
+	TabSelected					: 10,
+	TopLeftCell					: 11,
+	View						: 12,
+	WindowProtection			: 13,
+	WorkbookViewId				: 14,
+	ZoomScale					: 15,
+	ZoomScaleNormal				: 16,
+	ZoomScalePageLayoutView		: 17,
+	ZoomScaleSheetLayoutView	: 18
 };
 /** @enum */
 var EBorderStyle =
@@ -4850,16 +4873,19 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 			res = this.bcr.Read1(length, function(t,l){
 					return oThis.ReadComments(t,l, oWorksheet);
 				});
-        }
-		else if (c_oSerWorksheetsTypes.ConditionalFormatting === type) {
+        } else if (c_oSerWorksheetsTypes.ConditionalFormatting === type) {
 			oConditionalFormatting = new Asc.CConditionalFormatting();
 			res = this.bcr.Read1(length, function (t, l) {
 				return oThis.ReadConditionalFormatting(t, l, oConditionalFormatting,
 					function (sRange) {return oWorksheet.getRange2(sRange);});
 			});
 			oWorksheet.aConditionalFormatting.push(oConditionalFormatting);
-		}
-        else
+		} else if (c_oSerWorksheetsTypes.SheetViews === type) {
+			oWorksheet.SheetViews = [];
+			res = this.bcr.Read1(length, function (t, l) {
+				return oThis.ReadSheetViews(t, l, oWorksheet.SheetViews);
+			});
+		} else
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
@@ -5650,6 +5676,30 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 		else if (c_oSer_ConditionalFormattingValueObject.Val === type)
 			oCFVO.Val = this.stream.GetString2LE(length);
 		else
+			res = c_oSerConstants.ReadUnknown;
+		return res;
+	};
+	this.ReadSheetViews = function (type, length, aSheetViews) {
+		var res = c_oSerConstants.ReadOk;
+		var oThis = this;
+		var oSheetView = null;
+
+		if (c_oSerWorksheetsTypes.SheetView === type) {
+			oSheetView = {};
+			res = this.bcr.Read1(length, function (t, l) {
+				return oThis.ReadSheetView(t, l, oSheetView);
+			});
+			aSheetViews.push(oSheetView);
+		}
+		return res;
+	};
+	this.ReadSheetView = function (type, length, oSheetView) {
+		var res = c_oSerConstants.ReadOk;
+		if (c_oSer_SheetView.ShowGridLines === type) {
+			oSheetView.ShowGridLines = this.stream.GetBool();
+		} else if (c_oSer_SheetView.ShowRowColHeaders === type) {
+			oSheetView.ShowRowColHeaders = this.stream.GetBool();
+		} else
 			res = c_oSerConstants.ReadUnknown;
 		return res;
 	};
