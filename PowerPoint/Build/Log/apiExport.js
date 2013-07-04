@@ -340,6 +340,9 @@ prop:DemonstrationEndShowMessage
 prop:DemonstrationNextSlide
 prop:DemonstrationPrevSlide
 prop:DemonstrationGoToSlide
+prop:ApplySlideTiming
+prop:SlideTimingApplyToAll
+prop:SlideTransitionPlay
 prop:SetTextBoxInputMode
 prop:GetTextBoxInputMode
 prop:asc_setCoAuthoringEnable
@@ -409,6 +412,24 @@ prop:put_UserName
 var:CAscColorScheme
 prop:get_colors
 prop:get_name
+---
+var:CAscSlideTiming
+prop:put_TransitionType
+prop:get_TransitionType
+prop:put_TransitionOption
+prop:get_TransitionOption
+prop:put_TransitionDuration
+prop:get_TransitionDuration
+prop:put_SlideAdvanceOnMouseClick
+prop:get_SlideAdvanceOnMouseClick
+prop:put_SlideAdvanceAfter
+prop:get_SlideAdvanceAfter
+prop:put_SlideAdvanceDuration
+prop:get_SlideAdvanceDuration
+prop:applyProps
+prop:createDuplicate
+prop:makeDuplicate
+prop:setUndefinedOptions
 ---
 var:CAscTexture
 prop:get_id
@@ -1171,6 +1192,9 @@ asc_docs_api.prototype['DemonstrationEndShowMessage'] = asc_docs_api.prototype.D
 asc_docs_api.prototype['DemonstrationNextSlide'] = asc_docs_api.prototype.DemonstrationNextSlide;
 asc_docs_api.prototype['DemonstrationPrevSlide'] = asc_docs_api.prototype.DemonstrationPrevSlide;
 asc_docs_api.prototype['DemonstrationGoToSlide'] = asc_docs_api.prototype.DemonstrationGoToSlide;
+asc_docs_api.prototype['ApplySlideTiming'] = asc_docs_api.prototype.ApplySlideTiming;
+asc_docs_api.prototype['SlideTimingApplyToAll'] = asc_docs_api.prototype.SlideTimingApplyToAll;
+asc_docs_api.prototype['SlideTransitionPlay'] = asc_docs_api.prototype.SlideTransitionPlay;
 asc_docs_api.prototype['SetTextBoxInputMode'] = asc_docs_api.prototype.SetTextBoxInputMode;
 asc_docs_api.prototype['GetTextBoxInputMode'] = asc_docs_api.prototype.GetTextBoxInputMode;
 asc_docs_api.prototype['asc_setCoAuthoringEnable'] = asc_docs_api.prototype.asc_setCoAuthoringEnable;
@@ -1228,6 +1252,23 @@ CDocInfo.prototype['put_UserName'] = CDocInfo.prototype.put_UserName;
 window['CAscColorScheme'] = CAscColorScheme;
 CAscColorScheme.prototype['get_colors'] = CAscColorScheme.prototype.get_colors;
 CAscColorScheme.prototype['get_name'] = CAscColorScheme.prototype.get_name;
+window['CAscSlideTiming'] = CAscSlideTiming;
+CAscSlideTiming.prototype['put_TransitionType'] = CAscSlideTiming.prototype.put_TransitionType;
+CAscSlideTiming.prototype['get_TransitionType'] = CAscSlideTiming.prototype.get_TransitionType;
+CAscSlideTiming.prototype['put_TransitionOption'] = CAscSlideTiming.prototype.put_TransitionOption;
+CAscSlideTiming.prototype['get_TransitionOption'] = CAscSlideTiming.prototype.get_TransitionOption;
+CAscSlideTiming.prototype['put_TransitionDuration'] = CAscSlideTiming.prototype.put_TransitionDuration;
+CAscSlideTiming.prototype['get_TransitionDuration'] = CAscSlideTiming.prototype.get_TransitionDuration;
+CAscSlideTiming.prototype['put_SlideAdvanceOnMouseClick'] = CAscSlideTiming.prototype.put_SlideAdvanceOnMouseClick;
+CAscSlideTiming.prototype['get_SlideAdvanceOnMouseClick'] = CAscSlideTiming.prototype.get_SlideAdvanceOnMouseClick;
+CAscSlideTiming.prototype['put_SlideAdvanceAfter'] = CAscSlideTiming.prototype.put_SlideAdvanceAfter;
+CAscSlideTiming.prototype['get_SlideAdvanceAfter'] = CAscSlideTiming.prototype.get_SlideAdvanceAfter;
+CAscSlideTiming.prototype['put_SlideAdvanceDuration'] = CAscSlideTiming.prototype.put_SlideAdvanceDuration;
+CAscSlideTiming.prototype['get_SlideAdvanceDuration'] = CAscSlideTiming.prototype.get_SlideAdvanceDuration;
+CAscSlideTiming.prototype['applyProps'] = CAscSlideTiming.prototype.applyProps;
+CAscSlideTiming.prototype['createDuplicate'] = CAscSlideTiming.prototype.createDuplicate;
+CAscSlideTiming.prototype['makeDuplicate'] = CAscSlideTiming.prototype.makeDuplicate;
+CAscSlideTiming.prototype['setUndefinedOptions'] = CAscSlideTiming.prototype.setUndefinedOptions;
 window['CAscTexture'] = CAscTexture;
 CAscTexture.prototype['get_id'] = CAscTexture.prototype.get_id;
 CAscTexture.prototype['get_image'] = CAscTexture.prototype.get_image;
