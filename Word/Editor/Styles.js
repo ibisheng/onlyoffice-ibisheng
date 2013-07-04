@@ -31,7 +31,9 @@ var smallcaps_Koef = 0.8; // Коэффициент изменения разм�
 var g_dKoef_pt_to_mm = 25.4 / 72;
 var g_dKoef_pc_to_mm = g_dKoef_pt_to_mm / 12;
 var g_dKoef_in_to_mm = 25.4;
+var g_dKoef_twips_to_mm = g_dKoef_pt_to_mm / 20;
 var g_dKoef_mm_to_pt = 1 / g_dKoef_pt_to_mm;
+var g_dKoef_mm_to_twips = 1 / g_dKoef_twips_to_mm;
 
 var tblwidth_Auto = 0x00;
 var tblwidth_Mm   = 0x01;

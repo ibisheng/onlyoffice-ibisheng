@@ -1,11 +1,12 @@
 var c_oSerFormat = {
-    Version:3, //1.0.0.2
+    Version:4, //1.0.0.2
     Signature: "DOCY"
 };
 var g_nCurFileVersion = c_oSerFormat.Version;
 //dif:
 //Version:2 добавлены свойства стилей qFormat, uiPriority, hidden, semiHidden, unhideWhenUsed, для более ранних бинарников считаем qFormat = true
 //Version:3 все рисованные обьекты открываются через презентации
+//Version:4 добавилось свойство CTablePr.TableLayout(проблема в том что если оно отсутствует, то это tbllayout_AutoFit, а у нас в любом случае считалось tbllayout_Fixed)
 var c_oSerTableTypes = {
     Signature:0,
     Info:1,
@@ -118,7 +119,8 @@ var c_oSerProp_tblPrType = {
     tblpPr:8,
 	Look: 9,
 	Style: 10,
-	tblpPr2: 11
+	tblpPr2: 11,
+	Layout: 12
 };
 var c_oSer_tblpPrType = {
     Page:0,
@@ -190,7 +192,10 @@ var c_oSerProp_rPrType = {
 	ItalicCs: 21,
 	FontSizeCs: 22,
 	Cs: 23,
-	Rtl: 24
+	Rtl: 24,
+	Lang: 25,
+	LangBidi: 26,
+	LangEA: 27
 };
 var c_oSerProp_rowPrType = {
     CantSplit:0,
@@ -387,7 +392,8 @@ var c_oSerBordersType = {
 };
 var c_oSerWidthType = {
     Type:0,
-    W:1
+    W:1,
+	WDocx: 2
 };
 var c_oSer_pgSzType = {
     W:0,
@@ -476,6 +482,10 @@ var EHint = {
 	hintCs: 0,
 	hintDefault: 1,
 	hintEastAsia: 2
+};
+var ETblLayoutType = {
+	tbllayouttypeAutofit: 1,
+	tbllayouttypeFixed: 2
 };
 var g_nodeAttributeStart = 0xFA;
 var g_nodeAttributeEnd	= 0xFB;
@@ -1174,6 +1184,28 @@ function Binary_rPrWriter(memory)
             this.memory.WriteByte(c_oSerPropLenType.Byte);
             this.memory.WriteBool(rPr.RTL);
 		}
+		//Lang
+		if(null != rPr.Lang)
+		{
+			if(null != rPr.Lang.Val)
+			{
+				this.memory.WriteByte(c_oSerProp_rPrType.Lang);
+				this.memory.WriteByte(c_oSerPropLenType.Variable);
+				this.memory.WriteString2(g_oLcidIdToNameMap[rPr.Lang.Val]);
+			}
+			if(null != rPr.Lang.Bidi)
+			{
+				this.memory.WriteByte(c_oSerProp_rPrType.LangBidi);
+				this.memory.WriteByte(c_oSerPropLenType.Variable);
+				this.memory.WriteString2(g_oLcidIdToNameMap[rPr.Lang.Bidi]);
+			}
+			if(null != rPr.Lang.EastAsia)
+			{
+				this.memory.WriteByte(c_oSerProp_rPrType.LangEA);
+				this.memory.WriteByte(c_oSerPropLenType.Variable);
+				this.memory.WriteString2(g_oLcidIdToNameMap[rPr.Lang.EastAsia]);
+			}
+		}
     };
 };
 function Binary_tblPrWriter(memory, oNumIdMap)
@@ -1239,7 +1271,7 @@ Binary_tblPrWriter.prototype =
             this.bs.WriteItem(c_oSerProp_tblPrType.TableInd, function(){oThis.memory.WriteDouble(tblPr.TableInd);});
         }
         //TableW
-        if(null != tblPr.TableW && tblwidth_Auto != tblPr.TableW.Type)
+        if(null != tblPr.TableW)
         {
             this.bs.WriteItem(c_oSerProp_tblPrType.TableW, function(){oThis.WriteW(tblPr.TableW);});
         }
@@ -1258,6 +1290,16 @@ Binary_tblPrWriter.prototype =
         {
             this.bs.WriteItem(c_oSerProp_tblPrType.Shd, function(){oThis.bs.WriteShd(tblPr.Shd);});
         }
+        if(null != tblPr.TableLayout)
+        {
+			var nLayout = ETblLayoutType.tbllayouttypeAutofit;
+			switch(tblPr.TableLayout)
+			{
+				case tbllayout_AutoFit: nLayout = ETblLayoutType.tbllayouttypeAutofit;break;
+				case tbllayout_Fixed: nLayout = ETblLayoutType.tbllayouttypeFixed;break;
+			}
+            this.bs.WriteItem(c_oSerProp_tblPrType.Layout, function(){oThis.memory.WriteByte(nLayout);});
+        }
         //tblpPr
         if(null != table && false == table.Inline)
         {
@@ -1268,22 +1310,22 @@ Binary_tblPrWriter.prototype =
     {
         var oThis = this;
         //Left
-        if(null != cellMar.Left && tblwidth_Auto != cellMar.Left.Type)
+        if(null != cellMar.Left)
         {
             this.bs.WriteItem(c_oSerMarginsType.left, function(){oThis.WriteW(cellMar.Left);});
         }
         //Top
-        if(null != cellMar.Top && tblwidth_Auto != cellMar.Top.Type)
+        if(null != cellMar.Top)
         {
             this.bs.WriteItem(c_oSerMarginsType.top, function(){oThis.WriteW(cellMar.Top);});
         }
         //Right
-        if(null != cellMar.Right && tblwidth_Auto != cellMar.Right.Type)
+        if(null != cellMar.Right)
         {
             this.bs.WriteItem(c_oSerMarginsType.right, function(){oThis.WriteW(cellMar.Right);});
         }
         //Bottom
-        if(null != cellMar.Bottom && tblwidth_Auto != cellMar.Bottom.Type)
+        if(null != cellMar.Bottom)
         {
             this.bs.WriteItem(c_oSerMarginsType.bottom, function(){oThis.WriteW(cellMar.Bottom);});
         }
@@ -1353,14 +1395,14 @@ Binary_tblPrWriter.prototype =
             this.memory.WriteBool(rowPr.CantSplit);
         }
         //After
-        if(null != rowPr.GridAfter || (null != rowPr.WAfter && tblwidth_Auto != rowPr.WAfter.Type))
+        if(null != rowPr.GridAfter || null != rowPr.WAfter)
         {
             this.memory.WriteByte(c_oSerProp_rowPrType.After);
             this.memory.WriteByte(c_oSerPropLenType.Variable);
             this.bs.WriteItemWithLength(function(){oThis.WriteAfter(rowPr);});
         }
         //Before
-        if(null != rowPr.GridBefore || (null != rowPr.WBefore && tblwidth_Auto != rowPr.WBefore.Type))
+        if(null != rowPr.GridBefore || null != rowPr.WBefore)
         {
             this.memory.WriteByte(c_oSerProp_rowPrType.Before);
             this.memory.WriteByte(c_oSerPropLenType.Variable);
@@ -1406,7 +1448,7 @@ Binary_tblPrWriter.prototype =
             this.memory.WriteLong(After.GridAfter);
         }
         //WAfter
-        if(null != After.WAfter && tblwidth_Auto != After.WAfter.Type)
+        if(null != After.WAfter)
         {
             this.memory.WriteByte(c_oSerProp_rowPrType.WAfter);
             this.memory.WriteByte(c_oSerPropLenType.Variable);
@@ -1424,7 +1466,7 @@ Binary_tblPrWriter.prototype =
             this.memory.WriteLong(Before.GridBefore);
         }
         //WBefore
-        if(null != Before.WBefore && tblwidth_Auto != Before.WBefore.Type)
+        if(null != Before.WBefore)
         {
             this.memory.WriteByte(c_oSerProp_rowPrType.WBefore);
             this.memory.WriteByte(c_oSerPropLenType.Variable);
@@ -1460,9 +1502,12 @@ Binary_tblPrWriter.prototype =
         //W
         if(null != WAfter.W)
         {
-            this.memory.WriteByte(c_oSerWidthType.W);
-            this.memory.WriteByte(c_oSerPropLenType.Double);
-            this.memory.WriteDouble(WAfter.W);
+			var nVal = WAfter.W;
+			if(tblwidth_Mm == WAfter.Type)
+				nVal = Math.round(g_dKoef_mm_to_twips * WAfter.W);
+            this.memory.WriteByte(c_oSerWidthType.WDocx);
+            this.memory.WriteByte(c_oSerPropLenType.Long);
+            this.memory.WriteLong(nVal);
         }
     },
     WriteCellPr: function(cellPr, vMerge)
@@ -1497,7 +1542,7 @@ Binary_tblPrWriter.prototype =
             this.bs.WriteItemWithLength(function(){oThis.WriteCellMar(cellPr.TableCellMar);});
         }
         //TableCellW
-        if(null != cellPr.TableCellW && tblwidth_Auto != cellPr.TableCellW.Type)
+        if(null != cellPr.TableCellW)
         {
             this.memory.WriteByte(c_oSerProp_cellPrType.TableCellW);
             this.memory.WriteByte(c_oSerPropLenType.Variable);
@@ -3763,6 +3808,30 @@ function Binary_rPrReader(doc, stream)
 			case c_oSerProp_rPrType.Rtl:
 				rPr.RTL = this.stream.GetBool();
                 break;
+			case c_oSerProp_rPrType.Lang:
+				if(null == rPr.Lang)
+					rPr.Lang = new CLang();
+				var sLang = this.stream.GetString2LE(length);
+				var nLcid = g_oLcidNameToIdMap[sLang];
+				if(null != nLcid)
+					rPr.Lang.Val = nLcid;
+                break;
+			case c_oSerProp_rPrType.LangBidi:
+				if(null == rPr.Lang)
+					rPr.Lang = new CLang();
+				var sLang = this.stream.GetString2LE(length);
+				var nLcid = g_oLcidNameToIdMap[sLang];
+				if(null != nLcid)
+					rPr.Lang.Bidi = nLcid;
+                break;
+			case c_oSerProp_rPrType.LangEA:
+				if(null == rPr.Lang)
+					rPr.Lang = new CLang();
+				var sLang = this.stream.GetString2LE(length);
+				var nLcid = g_oLcidNameToIdMap[sLang];
+				if(null != nLcid)
+					rPr.Lang.EastAsia = nLcid;
+                break;
             default:
                 res = c_oSerConstants.ReadUnknown;
                 break;
@@ -3793,11 +3862,13 @@ Binary_tblPrReader.prototype =
         }
         else if( c_oSerProp_tblPrType.TableW === type )
         {
-            if(null == Pr.TableW)
-                Pr.TableW = new CTableMeasurement(tblwidth_Auto, 0);
+            var oW = {Type: null, W: null, WDocx: null};
             res = this.bcr.Read2(length, function(t, l){
-                return oThis.ReadW(t, l, Pr.TableW);
+                return oThis.ReadW(t, l, oW);
             });
+			if(null == Pr.TableW)
+                Pr.TableW = new CTableMeasurement(tblwidth_Auto, 0);
+			this.ParseW(oW, Pr.TableW);
         }
         else if( c_oSerProp_tblPrType.TableCellMar === type )
         {
@@ -3831,6 +3902,15 @@ Binary_tblPrReader.prototype =
                 return oThis.bcr.ReadShd(t, l, Pr.Shd);
             });
         }
+		else if( c_oSerProp_tblPrType.Layout === type )
+		{
+			var nLayout = this.stream.GetUChar();
+			switch(nLayout)
+			{
+				case ETblLayoutType.tbllayouttypeAutofit: Pr.TableLayout = tbllayout_AutoFit;break;
+				case ETblLayoutType.tbllayouttypeFixed: Pr.TableLayout = tbllayout_Fixed;break;
+			}
+		}
 		else if(null != table)
 		{
 			if( c_oSerProp_tblPrType.Rows === type )
@@ -3910,45 +3990,71 @@ Binary_tblPrReader.prototype =
         {
             Width.W = this.bcr.ReadDouble();
         }
+		else if( c_oSerWidthType.WDocx === type )
+        {
+            Width.WDocx = this.stream.GetULongLE();
+        }
         else
             res = c_oSerConstants.ReadUnknown;
         return res;
     },
+	ParseW: function(input, output)
+    {
+		if(input.Type)
+			output.Type = input.Type;
+		if(input.W)
+			output.W = input.W;
+		if(input.WDocx)
+		{
+			if(tblwidth_Mm == input.Type)
+				output.W = g_dKoef_twips_to_mm * input.WDocx;
+			else
+				output.W = input.WDocx;
+		}
+	},
     ReadCellMargins: function(type, length, Margins)
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
         if( c_oSerMarginsType.left === type )
         {
-			if(null == Margins.Left)
-				Margins.Left = new CTableMeasurement(tblwidth_Auto, 0);
+            var oW = {Type: null, W: null, WDocx: null};
             res = this.bcr.Read2(length, function(t, l){
-                return oThis.ReadW(t, l, Margins.Left);
+                return oThis.ReadW(t, l, oW);
             });
+			if(null == Margins.Left)
+                Margins.Left = new CTableMeasurement(tblwidth_Auto, 0);
+			this.ParseW(oW, Margins.Left);
         }
         else if( c_oSerMarginsType.top === type )
         {
-			if(null == Margins.Top)
-				Margins.Top = new CTableMeasurement(tblwidth_Auto, 0);
+			var oW = {Type: null, W: null, WDocx: null};
             res = this.bcr.Read2(length, function(t, l){
-                return oThis.ReadW(t, l, Margins.Top);
+                return oThis.ReadW(t, l, oW);
             });
+			if(null == Margins.Top)
+                Margins.Top = new CTableMeasurement(tblwidth_Auto, 0);
+			this.ParseW(oW, Margins.Top);
         }
         else if( c_oSerMarginsType.right === type )
         {
-			if(null == Margins.Right)
-				Margins.Right = new CTableMeasurement(tblwidth_Auto, 0);
+			var oW = {Type: null, W: null, WDocx: null};
             res = this.bcr.Read2(length, function(t, l){
-                return oThis.ReadW(t, l, Margins.Right);
+                return oThis.ReadW(t, l, oW);
             });
+			if(null == Margins.Right)
+                Margins.Right = new CTableMeasurement(tblwidth_Auto, 0);
+			this.ParseW(oW, Margins.Right);
         }
         else if( c_oSerMarginsType.bottom === type )
         {
-			if(null == Margins.Bottom)
-				Margins.Bottom = new CTableMeasurement(tblwidth_Auto, 0);
+			var oW = {Type: null, W: null, WDocx: null};
             res = this.bcr.Read2(length, function(t, l){
-                return oThis.ReadW(t, l, Margins.Bottom);
+                return oThis.ReadW(t, l, oW);
             });
+			if(null == Margins.Bottom)
+                Margins.Bottom = new CTableMeasurement(tblwidth_Auto, 0);
+			this.ParseW(oW, Margins.Bottom);
         }
         else
             res = c_oSerConstants.ReadUnknown;
@@ -4068,11 +4174,13 @@ Binary_tblPrReader.prototype =
         }
         else if( c_oSerProp_rowPrType.WAfter === type )
         {
-            if(null == After.WAfter)
-                After.WAfter = new CTableMeasurement(tblwidth_Auto, 0);
+			var oW = {Type: null, W: null, WDocx: null};
             res = this.bcr.Read2(length, function(t, l){
-                return oThis.ReadW(t, l, After.WAfter);
+                return oThis.ReadW(t, l, oW);
             });
+			if(null == After.WAfter)
+                After.WAfter = new CTableMeasurement(tblwidth_Auto, 0);
+			this.ParseW(oW, After.WAfter);
         }
         else
             res = c_oSerConstants.ReadUnknown;
@@ -4088,11 +4196,13 @@ Binary_tblPrReader.prototype =
         }
         else if( c_oSerProp_rowPrType.WBefore === type )
         {
-            if(null == Before.WBefore)
-                Before.WBefore = new CTableMeasurement(tblwidth_Auto, 0);
+			var oW = {Type: null, W: null, WDocx: null};
             res = this.bcr.Read2(length, function(t, l){
-                return oThis.ReadW(t, l, Before.WBefore);
+                return oThis.ReadW(t, l, oW);
             });
+			if(null == Before.WBefore)
+                Before.WBefore = new CTableMeasurement(tblwidth_Auto, 0);
+			this.ParseW(oW, Before.WBefore);
         }
         else
             res = c_oSerConstants.ReadUnknown;
@@ -4145,19 +4255,23 @@ Binary_tblPrReader.prototype =
         }
         else if( c_oSerProp_cellPrType.CellMar === type )
         {
-            if(null == Pr.TableCellMar)
-                Pr.TableCellMar = this.GetNewMargin();
-            res = this.bcr.Read1(length, function(t, l){
-                return oThis.ReadCellMargins(t, l, Pr.TableCellMar);
+			var oW = {Type: null, W: null, WDocx: null};
+            res = this.bcr.Read2(length, function(t, l){
+                return oThis.ReadW(t, l, oW);
             });
+			if(null == Pr.TableCellMar)
+                Pr.TableCellMar = new CTableMeasurement(tblwidth_Auto, 0);
+			this.ParseW(oW, Pr.TableCellMar);
         }
         else if( c_oSerProp_cellPrType.TableCellW === type )
         {
-            if(null == Pr.TableCellW)
-                Pr.TableCellW = new CTableMeasurement(tblwidth_Auto, 0);
+			var oW = {Type: null, W: null, WDocx: null};
             res = this.bcr.Read2(length, function(t, l){
-                return oThis.ReadW(t, l, Pr.TableCellW);
+                return oThis.ReadW(t, l, oW);
             });
+			if(null == Pr.TableCellW)
+                Pr.TableCellW = new CTableMeasurement(tblwidth_Auto, 0);
+			this.ParseW(oW, Pr.TableCellW);
         }
         else if( c_oSerProp_cellPrType.VAlign === type )
         {
