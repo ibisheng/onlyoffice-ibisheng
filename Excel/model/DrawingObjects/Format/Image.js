@@ -99,7 +99,7 @@ CImage.prototype =
         return true;
     },
 
-    init: function(x, y, extX, extY, imageId)
+    initDefault: function(x, y, extX, extY, imageId)
     {
         this.setPosition(x, y);
         this.setExtents(extX, extY);
@@ -156,6 +156,15 @@ CImage.prototype =
     {
         if(this.recalcInfo.recalculateTransform)
             this.recalculateTransform();
+        if(this.recalcInfo.recalculateBrush)
+            this.recalculateBrush();
+    },
+
+    recalculateBrush: function()
+    {
+        this.brush = new CUniFill();
+        this.brush.fill = new CBlipFill();
+        this.brush.fill.RasterImageId = this.blipFill.RasterImageId;
     },
 
     recalculateTransform: function()
@@ -393,6 +402,17 @@ CImage.prototype =
         }
     },
 
+
+    draw: function(graphics)
+    {
+        graphics.SetIntegerGrid(false);
+        graphics.transform3(this.transform, false);
+        var shape_drawer = new CShapeDrawer();
+        shape_drawer.fromShape(this, graphics);
+        shape_drawer.draw(this.spPr.geometry);
+        graphics.reset();
+        graphics.SetIntegerGrid(true);
+    },
 
     hitToAdjustment: function(x, y)
     {
