@@ -757,6 +757,8 @@ prop:get_TableStyle
 prop:put_TableStyle
 prop:get_AllowOverlap
 prop:put_AllowOverlap
+prop:get_TableLayout
+prop:put_TableLayout
 ---
 var:CBorders
 prop:get_Left
@@ -1717,6 +1719,8 @@ CTableProp.prototype['get_TableStyle'] = CTableProp.prototype.get_TableStyle;
 CTableProp.prototype['put_TableStyle'] = CTableProp.prototype.put_TableStyle;
 CTableProp.prototype['get_AllowOverlap'] = CTableProp.prototype.get_AllowOverlap;
 CTableProp.prototype['put_AllowOverlap'] = CTableProp.prototype.put_AllowOverlap;
+CTableProp.prototype['get_TableLayout'] = CTableProp.prototype.get_TableLayout;
+CTableProp.prototype['put_TableLayout'] = CTableProp.prototype.put_TableLayout;
 window['CBorders'] = CBorders;
 CBorders.prototype['get_Left'] = CBorders.prototype.get_Left;
 CBorders.prototype['put_Left'] = CBorders.prototype.put_Left;
