@@ -39,6 +39,18 @@ function convertFormula(formula, ws) {
 	return range;
 }
 
+function getFullImageSrc(src) {
+	/*var start = src.substring(0, 6);
+    if ( 0 != src.indexOf("http:") && 0 != src.indexOf("data:") && 0 != src.indexOf("https:") && 0 != src.indexOf("ftp:") && 0 != src.indexOf("file:") ) {
+		var editor = window["Asc"]["editor"];
+        if ( 0 == src.indexOf(editor.DocumentUrl) )
+            return src;
+        return editor.DocumentUrl + "media/" + src;
+    }
+	else
+		return src;*/
+};
+
 //-----------------------------------------------------------------------------------
 // Интерфейс < Excel - Word >
 //-----------------------------------------------------------------------------------
@@ -3842,7 +3854,7 @@ function DrawingObjects() {
 		_this.showDrawingObjects(false);
 	}
 	
-	_this.addGraphicGroup = function() {
+	_this.groupGraphicObjects = function() {
 	
 		if ( _this.controller.canGroup() ) {
 			
@@ -3855,6 +3867,13 @@ function DrawingObjects() {
 				_this.showDrawingObjects(false);
                 _this.selectGraphicObject();
 			}
+		}
+	}
+	
+	_this.unGroupGraphicObjects = function() {
+	
+		if ( _this.controller.canUnGroup() ) {
+			_this.controller.unGroup();	
 		}
 	}
 	

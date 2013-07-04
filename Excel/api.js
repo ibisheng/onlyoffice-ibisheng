@@ -2077,11 +2077,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			
 			asc_groupGraphicsObjects: function() {
 				var ws = this.wb.getWorksheet();
-				ws.objectRender.addGraphicGroup();
+				ws.objectRender.groupGraphicObjects();
 			},
 			
 			asc_unGroupGraphicsObjects: function() {
 				var ws = this.wb.getWorksheet();
+				ws.objectRender.unGroupGraphicObjects();
 			},
 			
 			// Cell interface
