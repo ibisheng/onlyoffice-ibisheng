@@ -2145,7 +2145,10 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, oDrawings, aDxf
         
         if(ws.aCols.length > 0 || null != ws.oAllCol)
             this.bs.WriteItem(c_oSerWorksheetsTypes.Cols, function(){oThis.WriteWorksheetCols(ws);});
-        
+
+		if (null != ws.sheetViews)
+			this.bs.WriteItem(c_oSerWorksheetsTypes.SheetViews, function(){oThis.WriteSheetViews(ws);});
+
         this.bs.WriteItem(c_oSerWorksheetsTypes.SheetFormatPr, function(){oThis.WriteSheetFormatPr(ws);});
 		
 		if(null != ws.PagePrintOptions)
@@ -2332,6 +2335,24 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, oDrawings, aDxf
             this.memory.WriteBool(oCol.CustomWidth);
         }
     };
+	this.WriteSheetViews = function (ws) {
+		var oThis = this;
+		for (var i = 0, length = ws.sheetViews.length; i < length; ++i) {
+			this.bs.WriteItem(c_oSerWorksheetsTypes.SheetView, function(){oThis.WriteSheetView(ws.sheetViews[i]);});
+		}
+	};
+	this.WriteSheetView = function (oSheetView) {
+		if (undefined !== oSheetView.ShowGridLines) {
+			this.memory.WriteByte(c_oSer_SheetView.ShowGridLines);
+			this.memory.WriteByte(c_oSerPropLenType.Byte);
+			this.memory.WriteBool(oSheetView.ShowGridLines);
+		}
+		if (undefined !== oSheetView.ShowRowColHeaders) {
+			this.memory.WriteByte(c_oSer_SheetView.ShowRowColHeaders);
+			this.memory.WriteByte(c_oSerPropLenType.Byte);
+			this.memory.WriteBool(oSheetView.ShowRowColHeaders);
+		}
+	};
     this.WriteSheetFormatPr = function(ws)
     {
         if(null !== ws.dDefaultColWidth) {
@@ -4881,9 +4902,9 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 			});
 			oWorksheet.aConditionalFormatting.push(oConditionalFormatting);
 		} else if (c_oSerWorksheetsTypes.SheetViews === type) {
-			oWorksheet.SheetViews = [];
+			oWorksheet.sheetViews = [];
 			res = this.bcr.Read1(length, function (t, l) {
-				return oThis.ReadSheetViews(t, l, oWorksheet.SheetViews);
+				return oThis.ReadSheetViews(t, l, oWorksheet.sheetViews);
 			});
 		} else
             res = c_oSerConstants.ReadUnknown;

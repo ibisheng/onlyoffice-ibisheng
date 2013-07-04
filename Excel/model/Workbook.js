@@ -2102,6 +2102,7 @@ function Woorksheet(wb, _index, bAddUserId, sId){
 	this.aComments = new Array();
 	this.aCommentsCoords = new Array();
 
+	this.sheetViews = null;
 	this.aConditionalFormatting = [];
 	
 	this.nActionNested = 0;
