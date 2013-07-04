@@ -1,3 +1,4 @@
+
 function CClipManager()
 {
     this.clipRects = [];
@@ -991,6 +992,7 @@ CGraphics.prototype =
             return;
         }
 
+		var editor = window["Asc"]["editor"];
         var _img = editor.ImageLoader.map_image_index[img];
         if (_img != undefined && _img.Status == ImageLoadStatus.Loading)
         {
