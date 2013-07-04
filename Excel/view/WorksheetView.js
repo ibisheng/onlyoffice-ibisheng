@@ -393,9 +393,7 @@
 			//---member declaration---
 			// Максимальная ширина числа из 0,1,2...,9, померенная в нормальном шрифте(дефалтовый для книги) в px(целое)
 			// Ecma-376 Office Open XML Part 1, пункт 18.3.1.13
-			this.maxDigitWidthBase = maxDigitWidth;
-			this.emSize = this.maxDigitWidthBase * asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
-			this.maxDigitWidth = 0;
+			this.maxDigitWidth = maxDigitWidth;
 
 			this.nBaseColWidth = 8; // Число символов для дефалтовой ширины (по умолчинию 8)
 			this.defaultColWidthChars = 0;
@@ -1134,12 +1132,20 @@
 			},
 			_initWorksheetDefaultWidth: function () {
 				this.nBaseColWidth = this.model.nBaseColWidth || this.nBaseColWidth;
-				// Теперь рассчитываем число px для (ToDo переделать на функции, а не писать одинаковые формулы)
-				var defaultColWidthChars = asc_floor((this.nBaseColWidth * this.maxDigitWidthBase + 5.0) / this.maxDigitWidthBase * 256) / 256;
-				var defaultColWidthPx = asc_floor(((256 * defaultColWidthChars + asc_floor(128 / this.maxDigitWidthBase)) / 256) * this.maxDigitWidthBase);
+				// Теперь рассчитываем число px
+				var defaultColWidthChars = this._charCountToModelColWidth(this.nBaseColWidth);
+				this.defaultColWidthPx = this._modelColWidthToColWidth(defaultColWidthChars) * asc_getcvt(1/*pt*/, 0/*px*/, 96);
 				// Делаем кратным 8 (http://support.microsoft.com/kb/214123)
-				defaultColWidthPx = asc_ceil(defaultColWidthPx / 8) * 8;
-				this.defaultColWidthChars = asc_floor((defaultColWidthPx - 5) / asc_round(this.maxDigitWidthBase) * 100 + 0.5) / 100;
+				this.defaultColWidthPx = asc_ceil(this.defaultColWidthPx / 8) * 8;
+				this.defaultColWidthChars = this._colWidthToCharCount(this.defaultColWidthPx * asc_getcvt(0/*px*/, 1/*pt*/, 96));
+
+				gc_dDefaultColWidthCharsAttribute = this._charCountToModelColWidth(this.defaultColWidthChars, true);
+				this.defaultColWidth = this._modelColWidthToColWidth(gc_dDefaultColWidthCharsAttribute);
+
+				// ToDo разобраться со значениями
+				this.maxRowHeight = asc_calcnpt( 409, this._getPPIY() );
+				this.defaultRowDescender = this._calcRowDescender(this.settings.cells.fontSize);
+				this.defaultRowHeight = asc_calcnpt( this.settings.cells.fontSize * this.vspRatio, this._getPPIY() ) + this.height_1px;
 			},
 			_initCellsArea: function (fullRecalc) {
 				this.width_1px = asc_calcnpt(0, this._getPPIX(), 1/*px*/);
@@ -1149,23 +1155,6 @@
 				this.height_1px = asc_calcnpt(0, this._getPPIY(), 1/*px*/);
 				this.height_2px = asc_calcnpt(0, this._getPPIY(), 2/*px*/);
 				this.height_3px = asc_calcnpt(0, this._getPPIY(), 3/*px*/);
-
-				// ToDo неправильно, что maxDigitWidth постоянно пересчитывается в зависимости от PPIX (переделать)
-				//this.maxDigitWidth = this.emSize * asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIX() );
-				this.maxDigitWidth = this.maxDigitWidthBase * this.drawingCtx.scaleFactor;
-
-				gc_dDefaultColWidthCharsAttribute = this._charCountToModelColWidth(this.defaultColWidthChars, true);
-				this.defaultColWidth = this._modelColWidthToColWidth(gc_dDefaultColWidthCharsAttribute);
-				this.displayColWidth = this._modelColWidthToColWidth(gc_dDefaultColWidthCharsAttribute, true);
-
-				this.maxRowHeight = asc_calcnpt( 409, this._getPPIY() );
-				// ToDo разобраться со значениями
-//				if (this.printMode) {
-//					this.defaultRowHeight = asc_round( this.settings.cells.fontSize * this.vspRatio );
-//				} else {
-					this.defaultRowHeight = asc_calcnpt( this.settings.cells.fontSize * this.vspRatio, this._getPPIY() ) + this.height_1px;
-//				}
-				this.defaultRowDescender = this._calcRowDescender(this.settings.cells.fontSize);
 
 				// calculate rows heights and visible rows
 				this.headersTop = 0;
@@ -1208,7 +1197,7 @@
 			_modelColWidthToColWidth: function (mcw, displayWidth) {
 				var maxw = displayWidth ? asc_round(this.maxDigitWidth) : this.maxDigitWidth;
 				var px = asc_floor( (( 256 * mcw + asc_floor(128 / maxw) ) / 256) * maxw );
-				return px * asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIX() );
+				return px * asc_getcvt( 0/*px*/, 1/*pt*/, 96 );
 			},
 
 			/**
@@ -1217,8 +1206,7 @@
 			 * @returns {Number}  Количество символов
 			 */
 			_colWidthToCharCount: function (w) {
-				// ToDo у нас CharCount меняется от zoom (он не должен меняться!)
-				var px = w * asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIX() );
+				var px = w * asc_getcvt( 1/*pt*/, 0/*px*/, 96 );
 				return px <= 5 ? 0 : asc_floor( (px - 5) / asc_round(this.maxDigitWidth) * 100 + 0.5 ) / 100;
 			},
 
@@ -1234,8 +1222,7 @@
 				var width;
 				res.width = useDefault ? t.defaultColWidth : (width = t._modelColWidthToColWidth(w), (width < t.width_1px ? 0 : width));
 				res.innerWidth = Math.max(res.width - this.width_padding * 2 - this.width_1px, 0);
-				var displayWidth = useDefault ? t.displayColWidth : (width = t._modelColWidthToColWidth(w, true), (width < t.width_1px ? 0 : width));
-				res.charCount = t._colWidthToCharCount(displayWidth);
+				res.charCount = t._colWidthToCharCount(res.width);
 				return res;
 			},
 
@@ -1250,14 +1237,22 @@
 
 			/** Вычисляет ширину колонки заголовков (в pt) */
 			_calcHeaderColumnWidth: function () {
-				var w = this.emSize * Math.max( calcDecades(this.visibleRange.r2 + 1), 3) * 1.25;
-				this.headersWidth = asc_calcnpt(w, this._getPPIX());
+				// Ширина колонки заголовков считается  - max число знаков в строке - перевести в символы - перевести в пикселы
+				var numDigit = Math.max( calcDecades(this.visibleRange.r2 + 1), 3);
+				var nCharCount = this._charCountToModelColWidth(numDigit);
+				this.headersWidth = this._modelColWidthToColWidth(nCharCount);
+
+				//var w = this.emSize * Math.max( calcDecades(this.visibleRange.r2 + 1), 3) * 1.25;
+				//this.headersWidth = asc_calcnpt(w, this._getPPIX());
+
 				this.cellsLeft = this.headersLeft + this.headersWidth;
 			},
 
 			/** Вычисляет высоту строки заголовков (в pt) */
 			_calcHeaderRowHeight: function () {
-				this.headersHeight = asc_calcnpt( this.settings.header.fontSize * this.vspRatio, this._getPPIY() );
+				this.headersHeight = this.model.getDefaultHeight() || this.defaultRowHeight;
+
+				//this.headersHeight = asc_calcnpt( this.settings.header.fontSize * this.vspRatio, this._getPPIY() );
 				this.cellsTop = this.headersTop + this.headersHeight;
 			},
 
@@ -1338,7 +1333,7 @@
 					h = h < 0 ? defaultH : h;
 					this.rows[i] = {
 						top: y,
-						height: asc_calcnpt(h, this._getPPIY()),
+						height: h,
 						descender: this.defaultRowDescender,
 						isCustomHeight: isCustomHeight,
 						isDefaultHeight: !(row && row.h > 0 && isCustomHeight)  // Высота строки, вычисленная на основе текста
