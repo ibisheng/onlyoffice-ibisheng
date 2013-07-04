@@ -48,6 +48,7 @@ function NullState(drawingObjectsController, drawingObjects)
             {
                 if(selected_objects[0].canChangeAdjustments())
                 {
+                    this.drawingObjectsController.clearPreTrackObjects();
                     if(hit_to_adj.adjPolarFlag === false)
                         this.drawingObjectsController.addPreTrackObject(new XYAdjustmentTrack(selected_objects[0], hit_to_adj.adjNum));
                     else
@@ -101,6 +102,7 @@ function NullState(drawingObjectsController, drawingObjects)
             {
                 if(!selected_objects[i].canMove())
                     return;
+                this.drawingObjectsController.clearPreTrackObjects();
                 for(var j = 0; j < selected_objects.length; ++j)
                 {
                     this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
