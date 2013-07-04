@@ -4252,7 +4252,7 @@ function CDrawingDocument()
     // фукнции для старта работы
     this.OpenDocument = function()
     {
-        SetHintsProps(false, false);
+        //SetHintsProps(false, false);
         this.m_oDocumentRenderer.InitDocument(this);
 
         this.m_oWordControl.CalculateDocumentSize();
