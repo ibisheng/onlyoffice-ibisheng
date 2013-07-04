@@ -139,6 +139,16 @@ CShape.prototype =
         this.spPr.geometry.Init(5, 5);
     },
 
+    setRecalculateAll: function()
+    {
+        this.recalcInfo =
+        {
+            recalculateTransform: true,
+            recalculateBrush: true,
+            recalculatePen: true
+        };
+    },
+
     setStyle: function(style)
     {
         this.style = style;

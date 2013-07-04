@@ -172,7 +172,27 @@ DrawingObjectsController.prototype =
     },
 
     unGroup: function()
-    {},
+    {
+        var selected_objects = this.selectedObjects;
+        var ungrouped_objects = [];
+        for(var i = 0; i < selected_objects.length; ++i)
+        {
+            if(selected_objects[i].isGroup() && selected_objects[i].canUnGroup())
+            {
+                ungrouped_objects.push(selected_objects[i]);
+
+            }
+        }
+        for(i = 0; i < ungrouped_objects.length; ++i)
+        {
+            var ungrouped_sp_tree = ungrouped_objects[i].getUnGroupedSpTree();
+            for(var j = 0; j < ungrouped_sp_tree.length; ++j)
+            {
+                ungrouped_sp_tree[j].recalculateTransform();
+            }
+            this.drawingObjects.insertUngroupedObjects(ungrouped_objects[i].drawingBase.id, ungrouped_sp_tree);
+        }
+    },
 
     canGroup: function()
     {
@@ -181,7 +201,7 @@ DrawingObjectsController.prototype =
 
     canUnGroup: function()
     {
-        return false;
+        return true;
     },
 
     startTrackNewShape: function(presetGeom)

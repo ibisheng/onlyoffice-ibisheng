@@ -566,6 +566,11 @@ CGroupShape.prototype =
         return true;//TODO
     },
 
+    canUnGroup: function()
+    {
+        return true;
+    },
+
     hitInBoundingRect: function(x, y)
     {
         var invert_transform = this.getInvertTransform();
@@ -665,6 +670,31 @@ CGroupShape.prototype =
         //this.recalculateTransform();
         return this.invertTransform;
     } ,
+
+    getUnGroupedSpTree: function()
+    {
+        this.normalize();
+        this.recalculateTransform();
+        var sp_tree = this.spTree;
+        var ret = [];
+        for(var i = 0; i < sp_tree.length; ++i)
+        {
+            var sp = sp_tree[i];
+            var full_flip_h = sp.getFullFlipH();
+            var full_flip_v = sp.getFullFlipV();
+            var full_rotate = sp.getFullRotate();
+            var hc = sp.spPr.xfrm.extX*0.5;
+            var vc = sp.spPr.xfrm.extY*0.5;
+            var xc = sp.transform.TransformPointX(hc, vc);
+            var yc = sp.transform.TransformPointY(hc, vc);
+            sp.setGroup(null);
+            sp.setPosition(xc - hc, yc - vc);
+            sp.setFlips(full_flip_h, full_flip_v);
+            sp.setRotate(normalizeRotate(sp.getFullRotate()));
+            ret.push(sp);
+        }
+        return ret;
+    },
 
     select: function(drawingObjectsController)
     {
@@ -785,3 +815,17 @@ CGroupShape.prototype =
         return new ResizeTrackGroup(this, cardDirection);
     }
 };
+
+function normalizeRotate(rot)
+{
+    var new_rot = rot;
+    if(isRealNumber(new_rot))
+    {
+        while(new_rot >= 2*Math.PI)
+            new_rot -= Math.PI;
+        while(new_rot < 0)
+            new_rot += Math.PI;
+        return new_rot;
+    }
+    return new_rot;
+}

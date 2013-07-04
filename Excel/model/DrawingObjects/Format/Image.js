@@ -116,6 +116,7 @@ CImage.prototype =
     setPresetGeometry: function(preset)
     {
         this.spPr.geometry = CreateGeometry(preset);
+        this.spPr.geometry.Init(5, 5);
     },
 
     setPosition: function(x, y)
@@ -141,6 +142,15 @@ CImage.prototype =
         this.spPr.xfrm.rot = rot;
     },
 
+    setRecalculateAll: function()
+    {
+        this.recalcInfo =
+        {
+            recalculateTransform: true,
+            recalculateGeometry: true,
+            recalculateBrush: true
+        };
+    },
     updateDrawingBaseCoordinates: function()
     {
         if(isRealObject(this.drawingBase))
