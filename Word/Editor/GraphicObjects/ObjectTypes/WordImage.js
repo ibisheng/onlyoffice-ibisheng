@@ -60,6 +60,7 @@ function WordImage(parent/*(WordGraphicObject)*/, document, drawingDocument, gro
 
     this.chart = null;
 
+    this.needRedrawChart = true;
 
     g_oTableId.Add( this, g_oIdCounter.Get_NewId());
 }
@@ -109,7 +110,7 @@ WordImage.prototype =
     calculateAfterOpen: function()
     {
         var xfrm = this.spPr.xfrm;
-        this.setAbsoluteTransform(xfrm.offX, xfrm.offY, xfrm.extX, xfrm.extY, xfrm.rot == null ? 0 : xfrm.rot, xfrm.flipH == null ? false : xfrm.flipH, xfrm.flipV == null ? false : xfrm.flipV);
+        this.setAbsoluteTransform(xfrm.offX, xfrm.offY, xfrm.extX, xfrm.extY, xfrm.rot == null ? 0 : xfrm.rot, xfrm.flipH == null ? false : xfrm.flipH, xfrm.flipV == null ? false : xfrm.flipV, true);
         if(this.chart != null)
             this.chartModify(this.chart);
 
@@ -131,7 +132,7 @@ WordImage.prototype =
         var flip_v = xfrm.flipV == null ? false : xfrm.flipV;
         this.parent = new ParaDrawing(null, null, this, editor.WordControl.m_oLogicDocument.DrawingDocument, null, null);
         this.parent.Set_GraphicObject(this);
-        this.setAbsoluteTransform(xfrm.offX, xfrm.offY, xfrm.extX, xfrm.extY, rot, flip_h, flip_v);
+        this.setAbsoluteTransform(xfrm.offX, xfrm.offY, xfrm.extX, xfrm.extY, rot, flip_h, flip_v, true);
         if(this.spPr.geometry)
             this.spPr.geometry.Init(xfrm.extX, xfrm.extY);
         this.calculateLine();
@@ -144,7 +145,7 @@ WordImage.prototype =
         var rot = xfrm.rot == null ? 0 : xfrm.rot;
         var flip_h = xfrm.flipH == null ? false : xfrm.flipH;
         var flip_v = xfrm.flipV == null ? false : xfrm.flipV;
-        this.setAbsoluteTransform(xfrm.offX, xfrm.offY, xfrm.extX, xfrm.extY, rot, flip_h, flip_v);
+        this.setAbsoluteTransform(xfrm.offX, xfrm.offY, xfrm.extX, xfrm.extY, rot, flip_h, flip_v, true);
         if(this.spPr.geometry)
             this.spPr.geometry.Init(xfrm.extX, xfrm.extY);
         this.calculateLine();
@@ -558,10 +559,10 @@ WordImage.prototype =
         return null;
     },
 
-    recalculate: function(changeSize)
+    recalculate: function(changeSize, bAfterOpen)
     {
 
-        this.calculateAfterResize(null, changeSize);
+        this.calculateAfterResize(null, changeSize, bAfterOpen);
       //  this.updateAbsPosInGroup();
         this.recalculateTransformMatrix();
         this.updateCursorTypes();
@@ -879,7 +880,7 @@ WordImage.prototype =
         } */
     },
 
-    calculateAfterResize: function(transform, bChangeSize)
+    calculateAfterResize: function(transform, bChangeSize, bAfterOpen)
     {
         if(this.spPr.geometry !== null)
             this.spPr.geometry.Recalculate(this.absExtX, this.absExtY);
@@ -888,7 +889,7 @@ WordImage.prototype =
         this.calculateTransformTextMatrix();
         this.calculateLeftTopPoint();
 
-        if(isRealObject(this.chart) && bChangeSize === true)
+        if(isRealObject(this.chart) && (bChangeSize === true || this.chart.img == "")&& bAfterOpen !== true)
         {
             this.chart.width = this.drawingDocument.GetDotsPerMM(this.absExtX);
             this.chart.height = this.drawingDocument.GetDotsPerMM(this.absExtY);
@@ -1410,7 +1411,7 @@ WordImage.prototype =
         return false;
     },
 
-    setAbsoluteTransform: function(offsetX, offsetY, extX, extY, rot, flipH, flipV)
+    setAbsoluteTransform: function(offsetX, offsetY, extX, extY, rot, flipH, flipV, bAfterOpen)
     {
 
         if(offsetX != null)
@@ -1452,7 +1453,7 @@ WordImage.prototype =
             this.parent.setAbsoluteTransform(offsetX, offsetY, extX, extY, rot, flipH, flipV, true);
 
         var b_change_size = extX != null || extY != null;
-        this.recalculate(b_change_size);
+        this.recalculate(b_change_size, bAfterOpen);
     },
 
     setXfrm: function(offsetX, offsetY, extX, extY, rot, flipH, flipV)
