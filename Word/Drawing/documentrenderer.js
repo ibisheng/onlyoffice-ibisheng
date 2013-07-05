@@ -468,15 +468,7 @@ function CDocMeta()
         if (obj.fontId != -1)
         {
             // все для того, чтобы не лочить отрисовку страниц. с этим ифом - отрисовка полностью параллельна
-            var _matr = this.TextMatrix;
-            _matr.sx = obj.tm_sx;
-            _matr.shy = obj.tm_shy;
-            _matr.shx = obj.tm_shx;
-            _matr.sy = obj.tm_sy;
-            _matr.tx = 0;
-            _matr.ty = 0;
-            g.font("font" + obj.fontId, obj.fontSize, _matr);
-            g.m_oFontManager.SetTextMatrix(obj.tm_sx, obj.tm_shy, obj.tm_shx, obj.tm_sy, 0, 0);
+            g.font("font" + obj.fontId, obj.fontSize);
         }
 
         var bIsFromPaint = (oThisDoc.Pages[obj.Page].start == obj.StreamPos) ? 1 : 0;
@@ -494,17 +486,8 @@ function CDocMeta()
                     var style = s.GetLong();
                     var size = s.GetDouble();
 
-                    var _matr = this.TextMatrix;
                     var m = g.m_oTransform;
-                    _matr.sx = m.sx;
-                    _matr.shy = m.shy;
-                    _matr.shx = m.shx;
-                    _matr.sy = m.sy;
-                    _matr.tx = 0;
-                    _matr.ty = 0;
-
-                    g.font(font, size, _matr);
-                    g.m_oFontManager.SetTextMatrix(m.sx, m.shy, m.shx, m.sy, 0, 0);
+                    g.font(font, size);
 
                     obj.fontId = fontId;
                     obj.fontSize = size;

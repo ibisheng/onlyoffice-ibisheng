@@ -95,8 +95,8 @@ function CTransitionAnimation(htmlpage)
 
     this.CalculateRectDemonstration = function()
     {
-        var _width = this.HtmlPage.DemonstrationCanvas.width;
-        var _height = this.HtmlPage.DemonstrationCanvas.height;
+        var _width = this.HtmlPage.DemonstrationManager.Canvas.width;
+        var _height = this.HtmlPage.DemonstrationManager.Canvas.height;
 
         var _w_mm = this.HtmlPage.m_oLogicDocument.Width;
         var _h_mm = this.HtmlPage.m_oLogicDocument.Height;
@@ -125,10 +125,86 @@ function CTransitionAnimation(htmlpage)
             _l = (_width - _w) >> 1;
         }
 
-        this.Rect.x = _l;
-        this.Rect.y = _t;
-        this.Rect.w = _w
-        this.Rect.h = _h;
+        this.Rect.x = _l >> 0;
+        this.Rect.y = _t >> 0;
+        this.Rect.w = _w >> 0;
+        this.Rect.h = _h >> 0;
+    }
+
+    this.DrawImage1 = function(slide_num, _not_use_prev)
+    {
+        if (undefined === slide_num)
+        {
+            if (null == this.DemonstrationObject)
+            {
+                slide_num = this.HtmlPage.m_oDrawingDocument.SlideCurrent;
+                if (slide_num >= this.HtmlPage.m_oDrawingDocument.SlidesCount)
+                    slide_num = this.HtmlPage.m_oDrawingDocument.SlidesCount - 1;
+            }
+            else
+            {
+                slide_num = this.DemonstrationObject.SlideNum;
+                if (slide_num >= this.HtmlPage.m_oDrawingDocument.SlidesCount)
+                    slide_num = this.HtmlPage.m_oDrawingDocument.SlidesCount - 1;
+            }
+        }
+
+        if (slide_num > 0 && (_not_use_prev !== true))
+        {
+            var _w = this.Rect.w;
+            var _h = this.Rect.h;
+            var _w_mm = this.HtmlPage.m_oLogicDocument.Width;
+            var _h_mm = this.HtmlPage.m_oLogicDocument.Height;
+
+            this.CacheImage1.Image = this.CreateImage(_w, _h);
+
+            var g = new CGraphics();
+            g.init(this.CacheImage1.Image.getContext('2d'), _w, _h, _w_mm, _h_mm);
+            g.m_oFontManager = g_fontManager;
+
+            g.transform(1,0,0,1,0,0);
+            g.IsNoDrawingEmptyPlaceholder = true;
+
+            this.HtmlPage.m_oLogicDocument.DrawPage(slide_num - 1, g);
+        }
+    }
+
+    this.DrawImage2 = function(slide_num)
+    {
+        if (undefined === slide_num)
+        {
+            if (null == this.DemonstrationObject)
+            {
+                slide_num = this.HtmlPage.m_oDrawingDocument.SlideCurrent;
+                if (slide_num >= this.HtmlPage.m_oDrawingDocument.SlidesCount)
+                    slide_num = this.HtmlPage.m_oDrawingDocument.SlidesCount - 1;
+            }
+            else
+            {
+                slide_num = this.DemonstrationObject.SlideNum;
+                if (slide_num >= this.HtmlPage.m_oDrawingDocument.SlidesCount)
+                    slide_num = this.HtmlPage.m_oDrawingDocument.SlidesCount - 1;
+            }
+        }
+
+        if (slide_num >= 0)
+        {
+            var _w = this.Rect.w;
+            var _h = this.Rect.h;
+            var _w_mm = this.HtmlPage.m_oLogicDocument.Width;
+            var _h_mm = this.HtmlPage.m_oLogicDocument.Height;
+
+            this.CacheImage2.Image = this.CreateImage(_w, _h);
+
+            var g = new CGraphics();
+            g.init(this.CacheImage2.Image.getContext('2d'), _w, _h, _w_mm, _h_mm);
+            g.m_oFontManager = g_fontManager;
+
+            g.transform(1,0,0,1,0,0);
+            g.IsNoDrawingEmptyPlaceholder = true;
+
+            this.HtmlPage.m_oLogicDocument.DrawPage(slide_num, g);
+        }
     }
 
     this.Start = function(_not_use_prev)
@@ -152,38 +228,8 @@ function CTransitionAnimation(htmlpage)
                 _currentSlide = this.HtmlPage.m_oDrawingDocument.SlidesCount - 1;
         }
 
-        var _w = this.Rect.w;
-        var _h = this.Rect.h;
-        var _w_mm = this.HtmlPage.m_oLogicDocument.Width;
-        var _h_mm = this.HtmlPage.m_oLogicDocument.Height;
-
-        var g = null;
-        if (_currentSlide >= 0)
-        {
-            this.CacheImage2.Image = this.CreateImage(_w, _h);
-
-            g = new CGraphics();
-            g.init(this.CacheImage2.Image.getContext('2d'), _w, _h, _w_mm, _h_mm);
-            g.m_oFontManager = g_fontManager;
-
-            g.transform(1,0,0,1,0,0);
-            g.IsNoDrawingEmptyPlaceholder = true;
-
-            this.HtmlPage.m_oLogicDocument.DrawPage(_currentSlide, g);
-        }
-        if (_currentSlide > 0 && (_not_use_prev !== true))
-        {
-            this.CacheImage1.Image = this.CreateImage(_w, _h);
-
-            g = new CGraphics();
-            g.init(this.CacheImage1.Image.getContext('2d'), _w, _h, _w_mm, _h_mm);
-            g.m_oFontManager = g_fontManager;
-
-            g.transform(1,0,0,1,0,0);
-            g.IsNoDrawingEmptyPlaceholder = true;
-
-            this.HtmlPage.m_oLogicDocument.DrawPage(_currentSlide - 1, g);
-        }
+        this.DrawImage1(_currentSlide, _not_use_prev);
+        this.DrawImage2(_currentSlide);
 
         this.StartTime = new Date().getTime();
         this.EndTime = this.StartTime + this.Duration;

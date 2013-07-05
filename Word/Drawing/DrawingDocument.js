@@ -884,6 +884,7 @@ function CCacheManager()
                 this.arrayImages[i].image_unusedCount = 0;
 
                 this.arrayImages[i].image.ctx.globalAlpha = 1.0;
+                this.arrayImages[i].image.ctx.setTransform(1, 0, 0, 1, 0, 0);
                 this.arrayImages[i].image.ctx.fillStyle = "#ffffff";
                 this.arrayImages[i].image.ctx.fillRect(0, 0, _w, _h);
                 return this.arrayImages[i];
@@ -900,6 +901,7 @@ function CCacheManager()
         this.arrayImages[index].image.height = _h;
         this.arrayImages[index].image.ctx = this.arrayImages[index].image.getContext('2d');
         this.arrayImages[index].image.ctx.globalAlpha = 1.0;
+        this.arrayImages[index].image.ctx.setTransform(1, 0, 0, 1, 0, 0);
         this.arrayImages[index].image.ctx.fillStyle = "#ffffff";
         this.arrayImages[index].image.ctx.fillRect(0, 0, _w, _h);
         this.arrayImages[index].image_locked = 1;
