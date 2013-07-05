@@ -1259,6 +1259,7 @@ function PreMoveInGroupState(drawingObjectsController, drawingObjects, group, st
                 min_y = cur_rect_bounds.minY;
         }
         this.drawingObjectsController.changeCurrentState(new MoveInGroupState(this.drawingObjectsController, this.drawingObjects, this.group, this.startX, this.startY, min_x, min_y, max_x - min_x, max_y - min_y))
+        this.drawingObjectsController.onMouseMove(e, x, y);
     };
 
     this.onMouseUp = function(e, x, y)
