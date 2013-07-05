@@ -392,7 +392,10 @@ var c_oSer_FilterColumn =
 	CustomFilters:4,
 	ColorFilter:5,
 	Top10:6,
-	DynamicFilter: 7
+	DynamicFilter: 7,
+	HiddenButton: 8,
+	ShowButton: 9,
+	FiltersBlank: 10
 };
 /** @enum */
 var c_oSer_Filter =
@@ -1006,6 +1009,9 @@ function BinaryTableWriter(memory, aDxfs)
 		//Top10
 		if(null != filterColumn.Top10)
 			this.bs.WriteItem(c_oSer_FilterColumn.Top10, function(){oThis.WriteTop10(filterColumn.Top10);});
+		//ShowButton
+		if(null != filterColumn.ShowButton)
+			this.bs.WriteItem(c_oSer_FilterColumn.ShowButton, function(){oThis.memory.WriteBool(filterColumn.ShowButton);});
 	}
 	this.WriteFilters = function(filters)
 	{
@@ -1020,6 +1026,8 @@ function BinaryTableWriter(memory, aDxfs)
 			for(var i = 0, length = filters.Dates.length; i < length; ++i)
 				this.bs.WriteItem(c_oSer_FilterColumn.DateGroupItem, function(){oThis.WriteDateGroupItem(filters.Dates[i]);});
 		}
+		if(null != filters.Blank)
+			this.bs.WriteItem(c_oSer_FilterColumn.FiltersBlank, function(){oThis.memory.WriteBool(filters.Blank);});
 	}
 	this.WriteFilter = function(val)
 	{
@@ -3432,7 +3440,7 @@ function Binary_TableReader(stream, ws, Dxfs)
         var oThis = this;
         if ( c_oSer_AutoFilter.FilterColumn == type )
 		{
-			var oFilterColumn = new Object();
+			var oFilterColumn = {ColId: null, Filters: null, CustomFiltersObj: null, DynamicFilter: null, ColorFilter: null, Top10: null, ShowButton: true};
 			res = this.bcr.Read1(length, function(t,l){
 					return oThis.ReadFilterColumn(t,l, oFilterColumn);
 				});
@@ -3450,7 +3458,7 @@ function Binary_TableReader(stream, ws, Dxfs)
 			oFilterColumn.ColId = this.stream.GetULongLE();
 		else if ( c_oSer_FilterColumn.Filters == type )
 		{
-			oFilterColumn.Filters = {Values: new Array(), Dates: new Array()};
+			oFilterColumn.Filters = {Values: new Array(), Dates: new Array(), Blank: null};
 			res = this.bcr.Read1(length, function(t,l){
 					return oThis.ReadFilters(t,l, oFilterColumn.Filters);
 				});
@@ -3482,6 +3490,10 @@ function Binary_TableReader(stream, ws, Dxfs)
 					return oThis.ReadTop10(t,l, oFilterColumn.Top10);
 				});
 		}
+		else if ( c_oSer_FilterColumn.HiddenButton == type )
+			oFilterColumn.ShowButton = !this.stream.GetBool();
+		else if ( c_oSer_FilterColumn.ShowButton == type )
+			oFilterColumn.ShowButton = this.stream.GetBool();
 		else
             res = c_oSerConstants.ReadUnknown;
         return res;
@@ -3507,6 +3519,8 @@ function Binary_TableReader(stream, ws, Dxfs)
 				});
 			oFilters.Dates.push(oDateGroupItem);
 		}
+		else if ( c_oSer_FilterColumn.FiltersBlank == type )
+			oFilters.Blank = this.stream.GetBool();
 		else
             res = c_oSerConstants.ReadUnknown;
         return res;

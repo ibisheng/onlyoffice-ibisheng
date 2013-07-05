@@ -831,7 +831,10 @@ var c_oSer_ChartSeriesNumCacheType =
 {
 	Formula: 0,
 	NumCache: 1,
-	NumCacheVal: 2
+	NumCacheVal: 2,
+	NumCacheIndex: 3,
+	NumCache2: 4,
+	NumCacheItem: 5
 };
 /** @enum */
 var EChartAxPos =
@@ -1183,7 +1186,7 @@ function BinaryChartWriter(memory)
         this.memory.WriteString2(sRef);
 		
 		if(null != data)
-			this.bs.WriteItem(c_oSer_ChartSeriesNumCacheType.NumCache, function(){oThis.WriteSeriesNumCacheValues(bRow, v1, v2, v3, data);});
+			this.bs.WriteItem(c_oSer_ChartSeriesNumCacheType.NumCache2, function(){oThis.WriteSeriesNumCacheValues(bRow, v1, v2, v3, data);});
     };
 	this.WriteSeriesNumCacheValues = function(bRow, v1, v2, v3, data)
     {
@@ -1197,10 +1200,7 @@ function BinaryChartWriter(memory)
 				{
 					var val = subData[i].value;
 					if(null != val)
-					{
-						this.memory.WriteByte(c_oSer_ChartSeriesNumCacheType.NumCacheVal);
-						this.memory.WriteString2(val);
-					}
+						this.bs.WriteItem(c_oSer_ChartSeriesNumCacheType.NumCacheItem, function(){oThis.WriteSeriesNumCacheValue(val, i);});
 				}
 			}
 		}
@@ -1213,13 +1213,18 @@ function BinaryChartWriter(memory)
 				{
 					var val = subData[v1].value;
 					if(null != val)
-					{
-						this.memory.WriteByte(c_oSer_ChartSeriesNumCacheType.NumCacheVal);
-						this.memory.WriteString2(val);
-					}
+						this.bs.WriteItem(c_oSer_ChartSeriesNumCacheType.NumCacheItem, function(){oThis.WriteSeriesNumCacheValue(val, i);});
 				}
 			}
 		}
+	}
+	this.WriteSeriesNumCacheValue = function(val, index)
+    {
+		//val
+		this.memory.WriteByte(c_oSer_ChartSeriesNumCacheType.NumCacheVal);
+		this.memory.WriteString2(val);
+		//index
+		this.bs.WriteItem(c_oSer_ChartSeriesNumCacheType.NumCacheIndex, function(){oThis.memory.WriteLong(index);});
 	}
 	this.WriteSeriesMarkers = function(marker)
     {
@@ -1732,6 +1737,12 @@ function Binary_ChartReader(stream, chart)
 					return oThis.ReadSeriesNumCacheValues(t,l, Val.NumCache);
 				});
 		}
+		else if ( c_oSer_ChartSeriesNumCacheType.NumCache2 === type )
+		{
+			res = this.bcr.Read1(length, function(t,l){
+					return oThis.ReadSeriesNumCacheValues2(t,l, Val.NumCache);
+				});
+		}
 		else
             res = c_oSerConstants.ReadUnknown;
 		return res;
@@ -1741,7 +1752,39 @@ function Binary_ChartReader(stream, chart)
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
         if ( c_oSer_ChartSeriesNumCacheType.NumCacheVal === type )
-			aValues.push(this.stream.GetString2LE(length));
+		{
+			var oNewVal = {val: this.stream.GetString2LE(length), index: aValues.length};
+			aValues.push(oNewVal);
+		}
+		else
+            res = c_oSerConstants.ReadUnknown;
+		return res;
+	};
+	this.ReadSeriesNumCacheValues2 = function(type, length, aValues)
+	{
+        var res = c_oSerConstants.ReadOk;
+        var oThis = this;
+        if ( c_oSer_ChartSeriesNumCacheType.NumCacheItem === type )
+		{
+			var oNewVal = {val: null, index: null};
+			res = this.bcr.Read1(length, function(t,l){
+					return oThis.ReadSeriesNumCacheValuesItem(t,l, oNewVal);
+				});
+			if(null != oNewVal.index)
+				aValues[oNewVal.index] = oNewVal;
+		}
+		else
+            res = c_oSerConstants.ReadUnknown;
+		return res;
+	};
+	this.ReadSeriesNumCacheValuesItem = function(type, length, value)
+	{
+        var res = c_oSerConstants.ReadOk;
+        var oThis = this;
+        if ( c_oSer_ChartSeriesNumCacheType.NumCacheVal === type )
+			value.val = this.stream.GetString2LE(length);
+		else if ( c_oSer_ChartSeriesNumCacheType.NumCacheIndex === type )
+			value.index = this.stream.GetULongLE();
 		else
             res = c_oSerConstants.ReadUnknown;
 		return res;

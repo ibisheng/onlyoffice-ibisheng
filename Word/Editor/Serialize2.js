@@ -5245,30 +5245,59 @@ function Binary_DocumentTableReader(doc, openParams, ImageMap, stream, bAllowFlo
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
-	this.PrepareSeria = function(val, chart)
+	this.ParseFormula = function(formula)
 	{
-		var rowByRow = null;
-		for(var i = 0, length = val.length; i < length; ++i)
+		var bbox = null;
+		//todo надо бы подключить parserHelp.parse3DRef. сейчас здесь упрошенный парсер.
+		var index = formula.indexOf("!");
+		if(-1 != index)
+			formula = formula.substring(index + 1);
+		formula = formula.replace(/\$/g,"");
+		var parts = formula.split(":");
+		if(2 == parts.length)
 		{
-			var item = {numFormatStr: "General", isDateTimeFormat: false, value: val[i]};
-			if(chart.range.rows)
-			{
-				if(null == rowByRow)
-				{
-					rowByRow = new Array();
-					chart.data.push(rowByRow);
-				}
-				rowByRow.push(item);
-			}
+			var first = new CellAddress(parts[0]);
+			var last = new CellAddress(parts[1]);
+			bbox = {r1: first.getRow0(), c1: first.getCol0(), r2: last.getRow0(), c2: last.getCol0()};
+		}
+		return bbox;
+	},
+	this.PrepareSeria = function(val, chart, formula)
+	{
+		var bbox = this.ParseFormula(formula);
+		if(null != bbox)
+		{
+			var length = 0;
+			if(bbox.c2 - bbox.c1 > bbox.r2 - bbox.r1)
+				length = bbox.c2 - bbox.c1 + 1;
 			else
+				length = bbox.r2 - bbox.r1 + 1;
+			for(var i = 0; i < length; ++i)
 			{
-				var row = chart.data[i];
-				if(null == row)
+				var elem = val[i];
+				var sVal = "0";
+				if(null != elem && null != elem.val)
+					sVal = elem.val;
+				var item = {numFormatStr: "General", isDateTimeFormat: false, value: sVal};
+				if(chart.range.rows)
 				{
-					row = new Array();
-					chart.data[i] = row;
+					if(null == rowByRow)
+					{
+						rowByRow = new Array();
+						chart.data.push(rowByRow);
+					}
+					rowByRow.push(item);
 				}
-				row.push(item);
+				else
+				{
+					var row = chart.data[i];
+					if(null == row)
+					{
+						row = new Array();
+						chart.data[i] = row;
+					}
+					row.push(item);
+				}
 			}
 		}
 	}
@@ -5308,31 +5337,22 @@ function Binary_DocumentTableReader(doc, openParams, ImageMap, stream, bAllowFlo
 					{
 						if(null != seria.Val && null != seria.Val.Formula)
 						{
-							//todo надо бы подключить parserHelp.parse3DRef. сейчас здесь упрошенный парсер.
-							var formula = seria.Val.Formula;
-							var index = formula.indexOf("!");
-							if(-1 != index)
-								formula = formula.substring(index + 1);
-							formula = formula.replace(/\$/g,"");
-							var parts = formula.split(":");
-							if(2 == parts.length)
+							var bbox = this.ParseFormula(seria.Val.Formula);
+							if(null != bbox)
 							{
-								var first = new CellAddress(parts[0]);
-								var last = new CellAddress(parts[1]);
 								chart.range.rows = false;
 								chart.range.columns = false;
-								//основываемся на том что parseInt отбрасываем числа в конце
-								if(last.getCol0() - first.getCol0() > last.getRow0() - first.getRow0())
+								if(bbox.c2 - bbox.c1 > bbox.r2 - bbox.r1)
 									chart.range.rows = true;
 								else
 									chart.range.columns = true;
 							}
 						}
-						if(null != seria.xVal && null != seria.xVal.NumCache)
-							this.PrepareSeria(seria.xVal.NumCache, chart);
+						if(null != seria.xVal && null != seria.xVal.NumCache && null != seria.xVal.Formula)
+							this.PrepareSeria(seria.xVal.NumCache, chart, seria.xVal.Formula);
 					}
-					if(null != seria.Val && null != seria.Val.NumCache)
-						this.PrepareSeria(seria.Val.NumCache, chart);
+					if(null != seria.Val && null != seria.Val.NumCache && null != seria.Val.Formula)
+						this.PrepareSeria(seria.Val.NumCache, chart, seria.Val.Formula);
 				}
 			}
 			var nRowCount = chart.data.length;
