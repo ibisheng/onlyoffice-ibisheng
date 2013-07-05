@@ -312,6 +312,7 @@ function SplineForDrawer(spline)
 
     this.draw = function(g)
     {
+        g._e();
         for(var i = 0; i < this.spline.path.length; ++i)
         {
             var lastX, lastY;

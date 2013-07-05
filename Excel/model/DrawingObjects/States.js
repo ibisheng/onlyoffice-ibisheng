@@ -1708,12 +1708,12 @@ function SplineBezierState3(drawingObjectsController, drawingObjects, startX, st
 
     this.onMouseUp = function(e, x, y)
     {
-        if(e.ClickCount >= 2)
+       /* if(e.ClickCount >= 2)
         {
             this.spline.createShape(this.drawingObjects);
             asc["editor"].asc_endAddShape();
             this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
-        }
+        }  */
     };
 
     this.isPointInDrawingObjects = function(x, y)
@@ -1800,9 +1800,9 @@ function SplineBezierState4(drawingObjectsController, drawingObjects, spline)
 
     this.onMouseUp = function(e, x, y)
     {
-        if(e.ClickCount < 2 )
+        //if(e.ClickCount < 2 )
         {
-            this.graphicObjects.changeCurrentState(new SplineBezierState5(this.drawingObjectsController, this.drawingObjects, x, y));
+            this.drawingObjectsController.changeCurrentState(new SplineBezierState5(this.drawingObjectsController, this.drawingObjects, x, y, this.spline));
         }
     };
 
@@ -1816,7 +1816,7 @@ function SplineBezierState4(drawingObjectsController, drawingObjects, spline)
     };
 }
 
-function SplineBezierState5(drawingObjectsController, drawingObjects, startX, startY)
+function SplineBezierState5(drawingObjectsController, drawingObjects, startX, startY, spline)
 {
     this.id = STATES_ID_SPLINE_BEZIER5;
 
@@ -1824,6 +1824,7 @@ function SplineBezierState5(drawingObjectsController, drawingObjects, startX, st
     this.drawingObjects = drawingObjects;
     this.startX = startX;
     this.startY = startY;
+    this.spline = spline;
 
     this.onMouseDown = function(e, x, y)
     {
@@ -1896,12 +1897,12 @@ function SplineBezierState5(drawingObjectsController, drawingObjects, startX, st
 
     this.onMouseUp = function(e, x, y)
     {
-        if(e.ClickCount >= 2)
+      /*  if(e.ClickCount >= 2)
         {
             this.spline.createShape(this.drawingObjects);
             asc["editor"].asc_endAddShape();
             this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
-        }
+        }  */
     };
 
     this.isPointInDrawingObjects = function(x, y)
