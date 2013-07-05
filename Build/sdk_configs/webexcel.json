@@ -114,6 +114,8 @@
                 "../Excel/model/DrawingObjects/Tracks/ResizeTracks.js",
                 "../Excel/model/DrawingObjects/Tracks/RotateTracks.js",
                 "../Excel/model/DrawingObjects/Tracks/NewShapeTracks.js",
+                "../Excel/model/DrawingObjects/Tracks/PolyLine.js",
+                "../Excel/model/DrawingObjects/Tracks/Spline.js",
                 "../Excel/model/DrawingObjects/Tracks/MoveTracks.js",
                 "../Excel/model/DrawingObjects/Hit.js",
 				"../Excel/model/DrawingObjects/Controls.js",
