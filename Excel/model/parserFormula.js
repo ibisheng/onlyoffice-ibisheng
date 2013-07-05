@@ -1724,6 +1724,39 @@ cArea.prototype.foreach = function(action){
 	else
 		r._foreach2(action)
 }
+cArea.prototype.getMatrix = function(){
+    var arr = [],
+        r = this.getRange();
+    r._foreach2(function(cell,i,j,r1,c1){
+        if( !arr[i-r1] )
+            arr[i-r1] = [];
+        if( cell ){
+            switch( cell.getType() ){
+                case CellValueType.Number:
+                    arr[i-r1][j-c1] = cell.getValueWithoutFormat() == ""? new cEmpty() : new cNumber( cell.getValueWithoutFormat() )
+                    break;
+                case CellValueType.Bool:
+                    arr[i-r1][j-c1] = new cBool( cell.getValueWithoutFormat() );
+                    break;
+                case CellValueType.Error:
+                    arr[i-r1][j-c1] = new cError( cell.getValueWithoutFormat() );
+                    break;
+                case CellValueType.String:
+                    arr[i-r1][j-c1] = new cString( cell.getValueWithoutFormat() );
+                    break;
+                default:
+                    if( cell.getValueWithoutFormat() && cell.getValueWithoutFormat() != "" ){
+                        arr[i-r1][j-c1] = new cNumber( cell.getValueWithoutFormat() )
+                    }
+                    else
+                        arr[i-r1][j-c1] = checkTypeCell(""+cell.getValueWithoutFormat());
+            }
+        }
+        else
+            arr[i-r1][j-c1] = new cEmpty();
+    })
+    return arr;
+}
 
 /** @constructor */
 function cRef(val,_ws){/*Ref means A1 for example*/
@@ -2242,6 +2275,9 @@ cArray.prototype.isValidArray = function(){
 	}
 	return true;
 };
+cArray.prototype.getMatrix = function(){
+    return this.array;
+}
 
 /** класс отвечающий за парсинг строки с формулой, подсчета формулы, перестройки формулы при манипуляции с ячейкой*/
 /** @constructor */

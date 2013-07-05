@@ -1124,4 +1124,42 @@
         ok(oParser.parse());
         strictEqual( oParser.calculate().getValue(), 14);
     })
+
+    test("Test: \"SUMPRODUCT\"",function(){
+
+        oParser = new parserFormula("SUMPRODUCT({2,3})","A2",ws);
+        ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 5);
+
+        oParser = new parserFormula("SUMPRODUCT({2,3},{4,5})","A2",ws);
+        ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 23);
+
+        oParser = new parserFormula("SUMPRODUCT({2,3},{4,5},{2,2})","A2",ws);
+        ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 46);
+
+        oParser = new parserFormula("SUMPRODUCT({2,3;4,5},{2,2;3,4})","A2",ws);
+        ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 42);
+
+        ws.getRange2("N44").setValue("1");
+        ws.getRange2("N45").setValue("2");
+        ws.getRange2("N46").setValue("3");
+        ws.getRange2("N47").setValue("4");
+
+        ws.getRange2("O44").setValue("5");
+        ws.getRange2("O45").setValue("6");
+        ws.getRange2("O46").setValue("7");
+        ws.getRange2("O47").setValue("8");
+
+        ws.getRange2("P44").setValue("9");
+        ws.getRange2("P45").setValue("10");
+        ws.getRange2("P46").setValue("11");
+        ws.getRange2("P47").setValue("12");
+        oParser = new parserFormula("SUMPRODUCT(N44:N47,O44:O47,P44:P47)","A2",ws);
+        ok(oParser.parse());
+        strictEqual( oParser.calculate().getValue(), 780);
+    })
+
 });

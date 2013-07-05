@@ -7,10 +7,6 @@
  */
 cFormulaFunction.Information = {
     'groupName' : "Information",
-        "CELL" :function(){
-        var r = new cBaseFunction("CELL");
-        return r;
-    },
     "ERROR.TYPE" :function(){
         var r = new cBaseFunction("ERROR.TYPE");
         r.setArgumentsMin(1);
@@ -45,11 +41,9 @@ cFormulaFunction.Information = {
             var arg0 = arg[0];
             if( arg0 instanceof cRef || arg0 instanceof cRef3D ){
                 arg0 = arg0.getValue();
-            }
-            if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
+            }else if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
                 arg0 = arg0.cross(arguments[1].first);
-            }
-            if( arg0 instanceof cArray ){
+            }else if( arg0 instanceof cArray ){
                 var ret = new cArray();
                 arg0.foreach(function(elem,r,c){
                     if(!ret.array[r])
@@ -68,10 +62,6 @@ cFormulaFunction.Information = {
         }
         return r;
     },
-    "INFO" :function(){
-        var r = new cBaseFunction("INFO");
-        return r;
-    },
     "ISBLANK" :function(){
         var r = new cBaseFunction("ISBLANK");
         r.setArgumentsMin(1);
@@ -80,8 +70,7 @@ cFormulaFunction.Information = {
             var arg0 = arg[0];
             if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
                 arg0 = arg0.cross(arguments[1].first);
-            }
-            if( arg0 instanceof cRef ){
+            }else if( arg0 instanceof cRef || arg0 instanceof cRef3D ){
                 arg0 = arg0.getValue();
             }
             if ( arg0 instanceof cEmpty)
@@ -105,13 +94,12 @@ cFormulaFunction.Information = {
             var arg0 = arg[0];
             if( arg0 instanceof cArray ){
                 arg0 = arg0.getElement(0);
-            }
-            if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
+            }else if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
                 arg0 = arg0.cross(arguments[1].first);
-            }
-            if( arg0 instanceof cRef ){
+            }else if( arg0 instanceof cRef || arg0 instanceof cRef3D ){
                 arg0 = arg0.getValue();
             }
+
             if ( arg0 instanceof cError && arg0.errorType != cErrorType.not_available )
                 return this.value = new cBool( true );
             else
@@ -133,13 +121,12 @@ cFormulaFunction.Information = {
             var arg0 = arg[0];
             if( arg0 instanceof cArray ){
                 arg0 = arg0.getElement(0);
-            }
-            if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
+            }else if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
                 arg0 = arg0.cross(arguments[1].first);
-            }
-            if( arg0 instanceof cRef ){
+            }else if( arg0 instanceof cRef || arg0 instanceof cRef3D ){
                 arg0 = arg0.getValue();
             }
+
             if ( arg0 instanceof cError )
                 return this.value = new cBool( true );
             else
@@ -161,15 +148,15 @@ cFormulaFunction.Information = {
             var arg0 = arg[0];
             if( arg0 instanceof cArray ){
                 arg0 = arg0.getElement(0);
-            }
-            if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
+            }else if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
                 arg0 = arg0.cross(arguments[1].first);
-            }
-            if ( arg0 instanceof cError )
-                return this.value = arg0;
-            else if( arg0 instanceof cRef || arg0 instanceof cRef3D ){
+            }else if( arg0 instanceof cRef || arg0 instanceof cRef3D ){
                 arg0 = arg0.getValue();
             }
+
+            if ( arg0 instanceof cError )
+                return this.value = arg0;
+
             var arg0 = arg0.tocNumber();
             if ( arg0 instanceof cError )
                 return this.value = arg0;
@@ -192,13 +179,12 @@ cFormulaFunction.Information = {
             var arg0 = arg[0];
             if( arg0 instanceof cArray ){
                 arg0 = arg0.getElement(0);
-            }
-            if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
+            }else if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
                 arg0 = arg0.cross(arguments[1].first);
-            }
-            if( arg0 instanceof cRef ){
+            }else if( arg0 instanceof cRef || arg0 instanceof cRef3D ){
                 arg0 = arg0.getValue();
             }
+
             if ( arg0 instanceof cBool )
                 return this.value = new cBool( true );
             else return this.value = new cBool( false );
@@ -219,13 +205,12 @@ cFormulaFunction.Information = {
             var arg0 = arg[0];
             if( arg0 instanceof cArray ){
                 arg0 = arg0.getElement(0);
-            }
-            if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
+            }else if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
                 arg0 = arg0.cross(arguments[1].first);
-            }
-            if( arg0 instanceof cRef ){
+            }else if( arg0 instanceof cRef || arg0 instanceof cRef3D ){
                 arg0 = arg0.getValue();
             }
+
             if ( arg0 instanceof cError && arg0.errorType == cErrorType.not_available )
                 return this.value = new cBool( true );
             else
@@ -247,11 +232,9 @@ cFormulaFunction.Information = {
             var arg0 = arg[0];
             if( arg0 instanceof cArray ){
                 arg0 = arg0.getElement(0);
-            }
-            if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
+            }else if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
                 arg0 = arg0.cross(arguments[1].first);
-            }
-            if( arg0 instanceof cRef ){
+            }else if( arg0 instanceof cRef || arg0 instanceof cRef3D ){
                 arg0 = arg0.getValue();
             }
             if( !(arg0 instanceof cString) )
@@ -275,13 +258,12 @@ cFormulaFunction.Information = {
             var arg0 = arg[0];
             if( arg0 instanceof cArray ){
                 arg0 = arg0.getElement(0);
-            }
-            if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
+            }else if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
                 arg0 = arg0.cross(arguments[1].first);
-            }
-            if( arg0 instanceof cRef ){
+            }else if( arg0 instanceof cRef || arg0 instanceof cRef3D ){
                 arg0 = arg0.getValue();
             }
+
             if( arg0 instanceof cNumber )
                 return this.value = new cBool( true );
             else
@@ -303,15 +285,15 @@ cFormulaFunction.Information = {
             var arg0 = arg[0];
             if( arg0 instanceof cArray ){
                 arg0 = arg0.getElement(0);
-            }
-            if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
+            }else if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
                 arg0 = arg0.cross(arguments[1].first);
-            }
-            if ( arg0 instanceof cError )
-                return this.value = arg0;
-            else if( arg0 instanceof cRef || arg0 instanceof cRef3D ){
+            }else if( arg0 instanceof cRef || arg0 instanceof cRef3D ){
                 arg0 = arg0.getValue();
             }
+
+            if ( arg0 instanceof cError )
+                return this.value = arg0;
+
             var arg0 = arg0.tocNumber();
             if ( arg0 instanceof cError )
                 return this.value = arg0;
@@ -351,13 +333,12 @@ cFormulaFunction.Information = {
             var arg0 = arg[0];
             if( arg0 instanceof cArray ){
                 arg0 = arg0.getElement(0);
-            }
-            if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
+            }else if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
                 arg0 = arg0.cross(arguments[1].first);
-            }
-            if( arg0 instanceof cRef ){
+            }else if( arg0 instanceof cRef || arg0 instanceof cRef3D ){
                 arg0 = arg0.getValue();
             }
+
             if( arg0 instanceof cString )
                 return this.value = new cBool( true );
             else
@@ -388,13 +369,12 @@ cFormulaFunction.Information = {
                         arr.array[r][c] = new cNumber( 0 );
                 })
                 return this.value = arr;
-            }
-            if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
+            }else if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
                 arg0 = arg0.cross(arguments[1].first);
-            }
-            if( arg0 instanceof cRef || arg0 instanceof cRef3D ){
+            }else if( arg0 instanceof cRef || arg0 instanceof cRef3D ){
                 arg0 = arg0.getValue();
             }
+
             if( arg0 instanceof cNumber || arg0 instanceof cError )
                 return this.value = arg0;
             else if ( arg0 instanceof cBool )
@@ -435,10 +415,10 @@ cFormulaFunction.Information = {
             var arg0 = arg[0];
             if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
                 arg0 = arg0.cross(arguments[1].first);
-            }
-            if( arg0 instanceof cRef ){
+            }else if( arg0 instanceof cRef || arg0 instanceof cRef3D ){
                 arg0 = arg0.getValue();
             }
+
             if( arg0 instanceof cNumber )
                 return this.value = new cNumber ( 1 );
             else if( arg0 instanceof cString )
@@ -459,3 +439,15 @@ cFormulaFunction.Information = {
         return r;
     }
 }
+/*
+    здесь вынесены функции, которы по назначению не могут быть использованы в веб редакторах документах.
+    либо они будут реализованы с усеченным функционалом позже.
+    "INFO" :function(){
+        var r = new cBaseFunction("INFO");
+        return r;
+    },
+    "CELL" :function(){
+        var r = new cBaseFunction("CELL");
+        return r;
+    },
+ */

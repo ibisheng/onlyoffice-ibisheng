@@ -7,7 +7,7 @@
  */
 cFormulaFunction.LookupAndReference = {
     'groupName' : "LookupAndReference",
-        'ADDRESS' : function(){
+    'ADDRESS' : function(){
         var r = new cBaseFunction("ADDRESS");
         r.setArgumentsMin(2);
         r.setArgumentsMax(5);

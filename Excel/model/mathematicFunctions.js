@@ -7,7 +7,7 @@
  */
 cFormulaFunction.Mathematic = {
     'groupName' : "Mathematic",
-        'ABS' : function(){
+    'ABS' : function(){
         var r = new cBaseFunction("ABS");
         r.setArgumentsMin(1);
         r.setArgumentsMax(1);
@@ -2096,98 +2096,64 @@ cFormulaFunction.Mathematic = {
     },
     'SUMPRODUCT' : function(){
         var r = new cBaseFunction("SUMPRODUCT");
-        /*r.setArgumentsMin(1);
-         r.setArgumentsMax(255);
-         r.Calculate = function(arg){
-         var arg0 = new cNumber(0), resArr = [];
-         for(var i = 0; i < arg.length; i++){
+        r.setArgumentsMin( 1 );
+        r.setArgumentsMax( 255 );
+        r.Calculate = function ( arg ) {
+            var arg0 = new cNumber( 0 ), resArr = [], col = 0, row = 0, res = 1, _res = [];
 
-         if( arg[i] instanceof cArea3D )
-         return this.value = new cError( bad_reference );
+            for ( var i = 0; i < arg.length; i++ ) {
 
-         if( arg[i] instanceof cArea ){
+                if ( arg[i] instanceof cArea3D )
+                    return this.value = new cError( bad_reference );
 
-         function retCell(_cell){
-         if(!_cell)
-         return new cNumber(0);
-         switch( _cell.getType() ){
-         case CellValueType.Number:
-         _cell.getValueWithoutFormat() == ""? return new cNumber(0) : return new cNumber( _cell.getValueWithoutFormat() );
-         case CellValueType.Bool:
-         return new cBool( _cell.getValueWithoutFormat() ).tocNumber();
-         case CellValueType.Error:
-         return new cError( _cell.getValueWithoutFormat() );
-         case CellValueType.String:
-         default:
-         return new cNumber(0);
-         }
-         }
+                if ( arg[i] instanceof cArea || arg[i] instanceof cArray ){
+                    resArr[i] = arg[i].getMatrix();
+                    if( row == 0 ) row = resArr[0].length;
+                    if( col == 0 ) col = resArr[0][0].length;
+                }
+                else if ( arg[i] instanceof cRef || arg[i] instanceof cRef3D ) {
+                    resArr[i] = [[arg[i].getValue()]];
+                }
+                else {
+                    resArr[i] = [[arg[i]]];
+                }
 
-         var argIBBox = arg[i].getBBox0(),
-         colCount = Math.abs(argIBBox.c2-argIBBox.c1)+1,
-         rowCount = Math.abs(argIBBox.r2-argIBBox.r1)+1,
-         range = arg[i].getRange();
+                if( row != resArr[i].length || col != resArr[i][0].length){
+                    return this.value = new cError( cErrorType.wrong_value_type );
+                }
 
-         range._foreachIndex(function(i,j){
+                if ( arg[i] instanceof cError )
+                    return this.value = arg[i];
+            }
 
-         })
+            for( var iRow = 0; iRow < row; iRow++ ){
+                for( var iCol = 0; iCol < col; iCol++ ){
+                    res=1;
+                    for( var iRes = 0; iRes < resArr.length; iRes++){
+                        arg0 = resArr[iRes][iRow][iCol];
+                        if ( arg0 instanceof cError )
+                            return this.value = arg0;
+                        else if(arg0 instanceof cString ){
+                            res *= 0;
+                        }
+                        else
+                            res *= arg0.tocNumber().getValue();
+                    }
+                    _res.push(res);
+                }
+            }
+            res = 0;
+            for(var i = 0; i < _res.length; i++)
+                res += _res[i]
 
-         if( resArr.length == 0 ){
-         for( var i = 0; i < rowCount; i++ ){
-         resArr.push(new Array(colCount));
-         }
-         }
-         else{
-         if( resArr.length == rowCount ){
-         if( resArr[0] == colCount ){
-
-         }
-         else
-         return this.value = new cError( not_numeric );
-         }
-         else
-         return this.value = new cError( not_numeric );
-         }
-
-         arg[i].foreach(function(oCurCell, i, j, r, c){
-
-         if( resArr[i] !== undefined && resArr[i] !== null ){
-         if( resArr[i][j] !== undefined && resArr[i][j] !== null ){
-
-         }
-         else{
-
-         resArr[i][j] = retCell(oCurCell);
-         }
-         }
-         else{
-         resArr[i] = [];
-         resArr[i][j] = !oCurCell ? new cNumber(0) :
-         }
-
-         })
-         }
-         else if( arg[i] instanceof cRef || arg[i] instanceof cRef3D ){
-
-         }
-         else if( arg[i] instanceof cArray ){
-
-         }
-         else{
-
-         }
-
-         if( arg[i] instanceof cError )
-         return this.value = arg0;
-         }
-         return this.value = arg0;
-         }
-         r.getInfo = function(){
-         return {
-         name:this.name,
-         args:"( argument-lists )"
-         };
-         }*/
+            return this.value = new cNumber(res);
+        }
+        r.getInfo = function () {
+            return {
+                name:this.name,
+                args:"( argument-lists )"
+            };
+        }
         return r;
     },
     'SUMSQ' : function(){
