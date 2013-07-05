@@ -1,5 +1,24 @@
-var window = {chrome:1};
-
+var jsdom = require("jsdom").jsdom;
+var document = jsdom(null, null/*, {
+   features: {
+     FetchExternalResources : ["script", "img", "css", "frame", "iframe", "link"]
+   }
+   }*/);
+var window = document.createWindow();
+var Image = window.Image;
+var navigator = require('navigator');
+var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+/*var window = {chrome:1};
+window.postMessage = function(){};
+window.addEventListener = function(){};
+function XMLHttpRequest()
+{
+	return undefined;
+}
+function Image()
+{
+	this.onload = null;
+}
 function FT_Memory()
 {
     this.Alloc = function(size)
@@ -204,4 +223,4 @@ var FontStyle =
     FontStyleBoldItalic: 3,
     FontStyleUnderline:  4,
     FontStyleStrikeout:  8
-};
+};*/

@@ -9,20 +9,25 @@ var base_file = process.argv[2];
 var changes_file = process.argv[3];
 var output_file = process.argv[4];
 
-try{
-	var sdk_all = require('../sdk-all.js');
-	var editor = new sdk_all.asc_docs_api();
+setTimeout( main, 15000, base_file, changes_file, output_file);
 
-	var fs = require('fs');
-	var base_doc = fs.readFileSync(base_file, 'utf-8');
-	editor.LoadDocument( base_doc );
+function main(base_file, changes_file, output_file)
+{
+	try{
+		var sdk_all = require('./sdk-all.js');
+		var editor = new sdk_all.asc_docs_api();
 
-	var doc_changes = require(changes_file);
-	editor.ApplyChanges( doc_changes );
+		var fs = require('fs');
+		var base_doc = fs.readFileSync(base_file, 'utf-8');
+		editor.LoadDocument( base_doc );
 
-	var changed_doc = editor.Save();
-	fs.writeFileSync(output_file, changed_doc, 'utf-8');
-}
-catch(err){
-	console.log("Error:", err);
+		var doc_changes = require(changes_file);
+		editor.ApplyChanges( doc_changes );
+
+		var changed_doc = editor.Save();
+		fs.writeFileSync(output_file, changed_doc, 'utf-8');
+	}
+	catch(err){
+		console.log("Error:", err);
+	}
 }
