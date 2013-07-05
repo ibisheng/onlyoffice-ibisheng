@@ -1060,10 +1060,14 @@
 				
 				// shapes
 				var graphicsInfo = t.handlers.trigger("getGraphicsInfo", coord.x, coord.y);
-				if ( graphicsInfo && graphicsInfo.isShape )
+				if ( graphicsInfo && graphicsInfo.isShape ) {
 					asc["editor"].isStartAddShape = true;
+					t.isFocusDrawingObject = true;
+					t.isSelectDrawingObject = true;
+				}
 				
 				if ( asc["editor"].isStartAddShape ) {
+					event.ClickCount = 1;
 					t.handlers.trigger("shapeMouseDown", event, coord.x, coord.y);
 					return;
 				}
@@ -1334,6 +1338,20 @@
 
 			/** @param event {jQuery.Event} */
 			_onMouseDblClick: function (event) {
+				var t = this;
+				var coord = t._getCoordinates(event);
+			
+				// shapes
+				var graphicsInfo = t.handlers.trigger("getGraphicsInfo", coord.x, coord.y);
+				if ( graphicsInfo && graphicsInfo.isShape )
+					asc["editor"].isStartAddShape = true;
+				
+				if ( asc["editor"].isStartAddShape ) {
+					event.ClickCount = 2;
+					t.handlers.trigger("shapeMouseDown", event, coord.x, coord.y);
+					return;
+				}
+			
 				if (this.handlers.trigger("isGlobalLockEditCell"))
 					return false;
 

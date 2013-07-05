@@ -2101,7 +2101,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			
 			asyncImageEndLoaded: function(_image) {
 				var ws = this.wb.getWorksheet();
-				ws.objectRender.asyncImageLoadedEvent(_image);
+				if ( ws.objectRender.asyncImageLoadedEvent )
+					ws.objectRender.asyncImageLoadedEvent(_image);
 			},
 			
 			// Cell interface

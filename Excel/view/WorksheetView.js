@@ -4802,6 +4802,8 @@
 				var oldH = ctxH - this.cellsTop - Math.abs(dy);
 				var y    = this.cellsTop + (dy > 0 && oldH > 0 ? dy : 0);
 				var oldW, x, dx;
+				
+				this.objectRender.setScrollOffset(0, dy * asc_getcvt(1, 0, this._getPPIX()) );
 
 				var widthChanged = Math.max(calcDecades(vr.r2 + 1), 3) !== oldDec;
 				if (widthChanged) {
@@ -4888,6 +4890,8 @@
 
 				vr.c1 = start;
 				this._updateVisibleColsCount();
+				
+				this.objectRender.setScrollOffset( dx * asc_getcvt(1, 0, this._getPPIX()), 0 );
 
 				var oldW = ctxW - this.cellsLeft - Math.abs(dx);
 				var x = this.cellsLeft + (dx > 0 && oldW > 0 ? dx : 0);
