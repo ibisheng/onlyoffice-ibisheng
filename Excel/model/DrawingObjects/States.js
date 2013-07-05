@@ -694,7 +694,7 @@ function PreMoveState(drawingObjectsController, drawingObjects, startX, startY, 
             if(min_y > cur_rect_bounds.minY)
                 min_y = cur_rect_bounds.minY;
         }
-        this.drawingObjectsController.changeCurrentState(new MoveState(this.drawingObjectsController, this.drawingObjects, this.startX, this.startY, min_x, min_y, max_x - min_x, max_y - min_y));
+        this.drawingObjectsController.changeCurrentState(new MoveState(this.drawingObjectsController, this.drawingObjects, this.startX, this.startY, min_x, min_y, max_x - min_x, max_y - min_y, this.majorObject));
     };
 
     this.onMouseUp = function(e, x, y)
@@ -735,7 +735,7 @@ function PreMoveState(drawingObjectsController, drawingObjects, startX, startY, 
     };
 }
 
-function MoveState(drawingObjectsController, drawingObjects, startX, startY, rectX, rectY, rectW, rectH)
+function MoveState(drawingObjectsController, drawingObjects, startX, startY, rectX, rectY, rectW, rectH, majorObject)
 {
     this.id = STATES_ID_MOVE;
     this.drawingObjectsController = drawingObjectsController;
@@ -746,6 +746,7 @@ function MoveState(drawingObjectsController, drawingObjects, startX, startY, rec
     this.rectY = rectY;
     this.rectW = rectW;
     this.rectH = rectH;
+    this.majorObject = majorObject;
     this.onMouseDown = function(e, x, y)
     {
 
