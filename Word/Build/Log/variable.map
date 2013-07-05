@@ -1070,7 +1070,7 @@ CAscTexture:F3
 bIsAndroid:N_
 c_oAscVertAlignJc$Center:KS
 FT_NEXT_ULONG:An
-MobileTouchMode$Zoom:h1
+MobileTouchMode$Zoom:g1
 JSCompiler_StaticMethods_Internal_Check_TableRows:nT
 historyitem_type_TableId:$L
 c_oAscRelativeFromH$OutsideMargin:qO
@@ -1206,7 +1206,7 @@ JSCompiler_StaticMethods_Get_SummaryHeight:nH
 Binary_SettingsTableReader:g_
 SlideLayout:Ng
 c_oAscChartLegend$left:Ke
-FT_PEEK_String1:Bn
+FT_PEEK_String1:Cn
 FORMULA_TYPE_ABS:WK
 sfnt_get_interface:nu
 Paragraph:lc
@@ -1283,7 +1283,7 @@ JSCompiler_StaticMethods_Get_Index_ById:sN
 JSCompiler_StaticMethods_Set_TableInd:qd
 JSCompiler_StaticMethods_Remove_Comment:HM
 FT_CreateVectorArray:po
-check_MouseUpEvent:a1
+check_MouseUpEvent:$0
 JSCompiler_StaticMethods_handleEvents:r2
 c_oAscHAnchor$Text:jS
 CTableAnchorPosition:iS
@@ -1413,7 +1413,7 @@ cd23:II
 JSCompiler_StaticMethods_DrawTicks:$l
 sfnt_find_encoding:ku
 c_oSer_ChartSeriesDataLabelsType$TxPrPptx:Xk
-JSCompiler_StaticMethods_Check_Merge:RR
+JSCompiler_StaticMethods_Check_Merge:QR
 TT_Access_Glyph_Frame:fx
 c_oSerWrapSquare$EffectExtent:ZX
 TT_CodeRange:mv
@@ -2220,7 +2220,7 @@ ShapeForResizeInGroup:wI
 find_sbit_range:Ls
 L 111:qA
 L 110:pA
-L 113:Cn
+L 113:Bn
 tt_get_interface:wx
 L 112:V1
 bIsSupportOriginalFormatFonts:qB
@@ -2305,7 +2305,7 @@ _parser_funcs$$inline_729:Wr
 nSldLtTBlank:BJ
 c_oSer_ChartCatAxType$AxPos:Bk
 JSCompiler_StaticMethods__recalculate:Mj
-c_oSerProp_pPrType$numPr_lvl:LV
+c_oSerProp_pPrType$numPr_lvl:KV
 JSCompiler_StaticMethods__init:j2
 JSCompiler_StaticMethods_SetTextClipRect:T_
 lcid_enUS:mN
@@ -2856,7 +2856,7 @@ search_Common:fR
 vertalign_SuperScript:Tb
 tt_face_get_kerning:fs
 c_oSerDocTableType$Content:JW
-JSCompiler_StaticMethods_Get_CellsCount:uR
+JSCompiler_StaticMethods_Get_CellsCount:tR
 c_oAscServerError$StorageFileNoFound:$e
 dublicate_vector:kp
 StartChangeWrapContourState:WD
@@ -2956,7 +2956,7 @@ c_oSerExtent$Cx:NX
 c_oSerExtent$Cy:OX
 L 70:ch
 L 72:be
-FT_PEEK_USHORT:rn
+FT_PEEK_USHORT:un
 L 71:Oh
 L 64:vj
 L 65:Mf
@@ -2988,7 +2988,7 @@ L 61:tj
 JSCompiler_StaticMethods_Viewer_OnChangePosition:TR
 c_oSer_ColorType$Auto:Ij
 L 60:De
-L 99:un
+L 99:tn
 L 95:Ru
 L 96:sl
 c_oSer_pgMarType$Left:pY
@@ -3022,10 +3022,10 @@ tt_name_entry_ascii_from_utf16:du
 Editor_Copy_GetElem:ia
 JSCompiler_StaticMethods_Set_TableBorder_InsideV:nd
 L 88:rl
-L 89:tn
+L 89:sn
 JSCompiler_StaticMethods_Set_Inline:XS
 L 86:Tr
-L 87:sn
+L 87:rn
 L 84:Pu
 L 85:wj
 FT_Glyph_Class:Au
