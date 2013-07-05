@@ -1,4 +1,4 @@
-//зависимости
+//Р·Р°РІРёСЃРёРјРѕСЃС‚Рё
 //stream
 //memory
 //c_oAscChartType
@@ -32,7 +32,7 @@ function BinaryCommonWriter(memory)
     };
     this.WriteItemWithLength = function(fWrite)
     {
-        //Запоминаем позицию чтобы в конце записать туда длину
+        //Р—Р°РїРѕРјРёРЅР°РµРј РїРѕР·РёС†РёСЋ С‡С‚РѕР±С‹ РІ РєРѕРЅС†Рµ Р·Р°РїРёСЃР°С‚СЊ С‚СѓРґР° РґР»РёРЅСѓ
         var nStart = this.memory.GetCurPosition();
         this.memory.Skip(4);
         //pPr
@@ -152,7 +152,7 @@ function BinaryCommonWriter(memory)
     {
 		if(color instanceof ThemeColor)
 		{
-			//заглушка для посещенных гиперссылок
+			//Р·Р°РіР»СѓС€РєР° РґР»СЏ РїРѕСЃРµС‰РµРЅРЅС‹С… РіРёРїРµСЂСЃСЃС‹Р»РѕРє
 			if(g_nColorHyperlinkVisited == color.theme && null == color.tint)
 				color.theme = g_nColorHyperlink;
 			if(null != color.theme)
@@ -188,7 +188,7 @@ function Binary_CommonReader(stream)
         if(c_oSerConstants.ReadOk != res)
             return res;
         var stLen = this.stream.GetULongLE();
-        //Смотрим есть ли данные под всю таблицу в дальнейшем спокойно пользуемся get функциями
+        //РЎРјРѕС‚СЂРёРј РµСЃС‚СЊ Р»Рё РґР°РЅРЅС‹Рµ РїРѕРґ РІСЃСЋ С‚Р°Р±Р»РёС†Сѓ РІ РґР°Р»СЊРЅРµР№С€РµРј СЃРїРѕРєРѕР№РЅРѕ РїРѕР»СЊР·СѓРµРјСЃСЏ get С„СѓРЅРєС†РёСЏРјРё
         res = this.stream.EnterFrame(stLen);
         if(c_oSerConstants.ReadOk != res)
             return res;
@@ -580,20 +580,20 @@ function CellAddress(){
 	this.col = null;
 	this.colLetter = null;
 	if(1 == argc){
-		//Сразу пришло ID вида "A1"
+		//РЎСЂР°Р·Сѓ РїСЂРёС€Р»Рѕ ID РІРёРґР° "A1"
 		this.id = arguments[0].toUpperCase();
 		this._invalidCoord = true;
 		this._checkId();
 	}
 	else if(2 == argc){
-		//адрес вида (1,1) = "A1". Внутренний формат начинается с 1
+		//Р°РґСЂРµСЃ РІРёРґР° (1,1) = "A1". Р’РЅСѓС‚СЂРµРЅРЅРёР№ С„РѕСЂРјР°С‚ РЅР°С‡РёРЅР°РµС‚СЃСЏ СЃ 1
 		this.row = arguments[0];
 		this.col = arguments[1];
 		this._checkCoord();
 		this._invalidId = true;
 	}
 	else if(3 == argc){
-		//тоже самое что и 2 аргумента, только 0-based
+		//С‚РѕР¶Рµ СЃР°РјРѕРµ С‡С‚Рѕ Рё 2 Р°СЂРіСѓРјРµРЅС‚Р°, С‚РѕР»СЊРєРѕ 0-based
 		this.row = arguments[0] + 1;
 		this.col = arguments[1] + 1;
 		this._checkCoord();
@@ -1278,7 +1278,7 @@ function Binary_ChartReader(stream, chart)
 	{
 		if("" != this.chartType && null != this.chart.series && this.chart.series.length > 0)
 		{
-			//инициализируем interval в Woorksheet.init
+			//РёРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј interval РІ Woorksheet.init
 			this.chart.type = this.chartType;
 			for(var i in this.oLegendEntries)
 			{
@@ -1354,7 +1354,7 @@ function Binary_ChartReader(stream, chart)
 					}
 				}
 			}
-			//выставляем начальные значения как у Excel
+			//РІС‹СЃС‚Р°РІР»СЏРµРј РЅР°С‡Р°Р»СЊРЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ РєР°Рє Сѓ Excel
 			this.chart.xAxis.bShow = this.chart.yAxis.bShow = false;
 			this.chart.xAxis.bGrid = this.chart.yAxis.bGrid = false;
 			var fExecAxis = function(oFrom, oTo)
@@ -1376,7 +1376,7 @@ function Binary_ChartReader(stream, chart)
 				fExecAxis(xAxis, this.chart.xAxis);
 			if(null != yAxis)
 				fExecAxis(yAxis, this.chart.yAxis);
-			//меняем местами из-за разного понимания флагов нами и Excel
+			//РјРµРЅСЏРµРј РјРµСЃС‚Р°РјРё РёР·-Р·Р° СЂР°Р·РЅРѕРіРѕ РїРѕРЅРёРјР°РЅРёСЏ С„Р»Р°РіРѕРІ РЅР°РјРё Рё Excel
 			var bTemp = this.chart.xAxis.bGrid;
 			this.chart.xAxis.bGrid = this.chart.yAxis.bGrid;
 			this.chart.yAxis.bGrid = bTemp;
@@ -1573,10 +1573,6 @@ function Binary_ChartReader(stream, chart)
 			var oPresentationSimpleSerializer = new PresentationSimpleSerializer();
 			var textBody = oPresentationSimpleSerializer.ReadTextBody(this.stream);
 			var params = this.ParsePptxParagraph(textBody);
-			if("" != params.text)
-				oAx.title = params.text;
-			else
-				oAx.bDefaultTitle  = true;
 			if(null != params.font)
 				oAx.lablefont = params.font;
 		}
@@ -1790,6 +1786,27 @@ function Binary_ChartReader(stream, chart)
 			{
 				if(null != par.rPr)
 				{
+					var api_doc = window["editor"];
+					var api_sheet = window["Asc"];
+					var theme = null;
+					var clrSchemeMap = null;
+					if(api_doc)
+					{
+						if(null != api_doc.WordControl && null != api_doc.WordControl.m_oLogicDocument && null != api_doc.WordControl.m_oLogicDocument)
+						{
+							theme = api_doc.WordControl.m_oLogicDocument.theme;
+							clrSchemeMap = api_doc.WordControl.m_oLogicDocument.clrSchemeMap;
+						}
+					}
+					else if(api_sheet)
+					{
+						var editor = api_sheet["editor"];
+						if(null != editor.wbModel)
+						{
+							theme = editor.wbModel.theme;
+							clrSchemeMap = editor.wbModel.clrSchemeMap;
+						}
+					}
 					if(oDefFont)
 						res.font = oDefFont;
 					else
@@ -1805,54 +1822,67 @@ function Binary_ChartReader(stream, chart)
 					if(null != par.rPr.FontFamily && null != par.rPr.FontFamily.Name && "" != par.rPr.FontFamily.Name)
 					{
 						var sName = par.rPr.FontFamily.Name;
-						//todo использовать темы
 						if("+mj-lt" == sName || "+mn-lt" == sName || "+mj-ea" == sName || "+mn-ea" == sName || "+mj-cs" == sName || "+mn-cs" == sName)
-							sName = "Arial";
-						res.font.name = sName;
+						{
+							if(null != theme)
+							{
+								var fontScheme = theme.themeElements.fontScheme;
+								switch(sName)
+								{
+									case "+mj-lt": sName = fontScheme.majorFont.latin;break;
+									case "+mj-ea": sName = fontScheme.majorFont.ea;break;
+									case "+mj-cs": sName = fontScheme.majorFont.cs;break;
+									case "+mn-lt": sName = fontScheme.minorFont.latin;break;
+									case "+mn-ea": sName = fontScheme.minorFont.ea;break;
+									case "+mn-cs": sName = fontScheme.minorFont.cs;break;
+									default:sName = null;break;
+								}
+							}
+							else
+								sName = null;
+						}
+						//РїСЂРѕРІРµСЂРєР° РЅР° РїСѓСЃС‚СѓСЋ СЃС‚СЂРѕРєСѓ РЅСѓР¶РЅР°, РїРѕС‚РѕРјСѓ С‡С‚Рѕ РґРѕ AVSOfficeDocxFile2 2,0,0,134 РІ С‚РµРјС‹ РЅРµ РїРѕРґР±РёСЂР°Р»РёСЃСЊ С€СЂРёС„С‚С‹, Р° РІРѕР·РІСЂР°С‰Р°Р»Р°СЃСЊ РїСѓСЃС‚Р°СЏ СЃС‚СЂРѕРєР°.
+						if(null != sName && "" != sName)
+							res.font.name = sName;
 					}
-					// if(null != par.rPr.unifill)
-					// {
-						// var fill = par.rPr.unifill.fill;
-						// if(null != fill && FILL_TYPE_SOLID == fill.type)
-						// {
-							// var color = fill.color;
-							// if(null != color.color)
-							// {
-								// color = color.color;
-								// if(null != color)
-								// {
-									// var rgba = {R:0, G:0, B:0, A:255};
-									// if(COLOR_TYPE_SRGB == color.type)
-									// {
-										// rgba.R = color.RGBA.R;
-										// rgba.G = color.RGBA.G;
-										// rgba.B = color.RGBA.B;
-									// }
-									// else if(COLOR_TYPE_SCHEME == color.type)
-									// {
-										// var _theme = null;
-										// var _clrMap = null;
-										// if(null != Asc && null != Asc.editor && null != Asc.editor.wbModel)
-										// {
-											// _theme = Asc.editor.wbModel.theme;
-											// _clrMap = Asc.editor.wbModel.clrSchemeMap;
-										// }
-										// else if(null != editor && null != editor.WordControl && null != editor.WordControl.m_oLogicDocument)
-										// {
-											// _theme = editor.WordControl.m_oLogicDocument.theme;
-											// _clrMap = editor.WordControl.m_oLogicDocument.clrSchemeMap;
-										// }
-										// if(null != _theme && null != _clrMap)
-											// color.Calculate(_theme, _clrMap, rgba);
-									// }
-									// var num = rgba.R << 16 | rgba.G << 8 | rgba.B;
-									// var c = num.toString(16);
-									// while (c.length < 6) {c = "0" + c;}
-									// res.font.color = num;	
-								// }
-							// }
-						// }
-					// }
+					if(null != par.rPr.unifill)
+					{
+						var fill = par.rPr.unifill.fill;
+						if(null != fill && FILL_TYPE_SOLID == fill.type)
+						{
+							var color = fill.color;
+							if(null != color)
+							{
+								color = color.color;
+								if(null != color)
+								{
+									var rgba = {R:0, G:0, B:0, A:255};
+									if(COLOR_TYPE_SRGB == color.type)
+									{
+										rgba.R = color.RGBA.R;
+										rgba.G = color.RGBA.G;
+										rgba.B = color.RGBA.B;
+									}
+									else if(COLOR_TYPE_SCHEME == color.type && null != theme && null != clrSchemeMap)
+									{
+										color.Calculate(theme, clrSchemeMap.color_map, rgba);
+										if(null != fill.color.Mods)
+										{
+											var _rgba = {R: color.RGBA.R, G: color.RGBA.G, B: color.RGBA.B, A: color.RGBA.A};
+											fill.color.Mods.Apply(_rgba);
+											rgba = _rgba;
+										}
+										else
+											rgba = color.RGBA;
+									}
+									var num = rgba.R << 16 | rgba.G << 8 | rgba.B;
+									var c = num.toString(16);
+									while (c.length < 6) {c = "0" + c;}
+									res.font.color = "#" + c;	
+								}
+							}
+						}
+					}
 				}
 			}
 			res.text += par.text;

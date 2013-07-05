@@ -692,6 +692,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 											{
 												var wb = new Workbook(url, oThis.handlers, oThis);
 												wb.initGlobalObjects();
+												oThis.wbModel = wb;
 												var oBinaryFileReader = new BinaryFileReader(url);
 												oBinaryFileReader.Read(result, wb);
 												if (callback)
