@@ -53,6 +53,7 @@ function CFontFile(fileName, faceIndex)
 
     this.m_bIsNeedUpdateMatrix12 = true;
     this.m_oFontManager = null;
+    this.HintsSupport = true;
 
     this.SetDefaultFont = function(pDefFont)
     {
@@ -464,7 +465,8 @@ function CFontFile(fileName, faceIndex)
                 oSizes.ushGID     = unGID;
                 oSizes.nCMapIndex = nCMapIndex.index;
 
-                if (0 != FT_Load_Glyph(pFace, unGID, this.m_oFontManager.LOAD_MODE))
+                var _LOAD_MODE = this.HintsSupport ? this.m_oFontManager.LOAD_MODE : 40970;
+                if (0 != FT_Load_Glyph(pFace, unGID, _LOAD_MODE))
                     return;
 
                 var pGlyph = FT_Get_Glyph(pCurentGliph);
@@ -669,7 +671,8 @@ function CFontFile(fileName, faceIndex)
                     this.UpdateMatrix2();
                 }
 
-                if (0 != FT_Load_Glyph(this.m_pFace, unGID, this.m_oFontManager.LOAD_MODE))
+                var _LOAD_MODE = this.HintsSupport ? this.m_oFontManager.LOAD_MODE : 40970;
+                if (0 != FT_Load_Glyph(pFace, unGID, _LOAD_MODE))
                     return;
 
                 var pGlyph = FT_Get_Glyph(this.m_pFace.glyph);
@@ -957,11 +960,7 @@ function CFontFile(fileName, faceIndex)
                 pCurGlyph.fY = (_m[5] + fX * _m[1] + fY * _m[3] - pString.m_fY);
             }
 
-            var _LOAD_MODE = this.m_oFontManager.LOAD_MODE;
-            // для некоторых шрифтов отключаем насильно хинты
-            if (this.m_pFace && (this.m_pFace.family_name == "MS Mincho" || this.m_pFace.family_name == "Castellar"))
-                _LOAD_MODE = 40970;
-
+            var _LOAD_MODE = this.HintsSupport ? this.m_oFontManager.LOAD_MODE : 40970;
             if (0 != FT_Load_Glyph(this.m_pFace, unGID, _LOAD_MODE))
                 return;
 
@@ -1293,7 +1292,8 @@ function CFontFile(fileName, faceIndex)
             oSizes.ushGID     = unGID;
             oSizes.nCMapIndex = nCMapIndex.index;
 
-            if (0 != FT_Load_Glyph(pFace, unGID, this.m_oFontManager.LOAD_MODE))
+            var _LOAD_MODE = this.HintsSupport ? this.m_oFontManager.LOAD_MODE : 40970;
+            if (0 != FT_Load_Glyph(pFace, unGID, _LOAD_MODE))
                 return;
 
             var pGlyph = FT_Get_Glyph(pCurentGliph);
@@ -1515,5 +1515,22 @@ function CFontFile(fileName, faceIndex)
     this.Units_Per_Em = function()
     {
         return this.m_lUnits_Per_Em;
+    }
+
+    this.CheckHintsSupport = function()
+    {
+        this.HintsSupport = true;
+
+        if (!this.m_pFace || !this.m_pFace.driver || !this.m_pFace.driver.clazz)
+            return;
+
+        if (this.m_pFace.driver.clazz.name != "truetype")
+        {
+            this.HintsSupport = false;
+            return;
+        }
+
+        if (this.m_pFace.family_name == "MS Mincho" || this.m_pFace.family_name == "Castellar")
+            this.HintsSupport = false;
     }
 };

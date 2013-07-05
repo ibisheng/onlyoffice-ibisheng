@@ -1161,6 +1161,8 @@ function CFontManager()
             this.m_lAscender = f.m_lAscender;
             this.m_lDescender = f.m_lDescender;
             this.m_lLineHeight = f.m_lLineHeight;
+
+            f.CheckHintsSupport();
         }
     }
 
