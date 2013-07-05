@@ -14,7 +14,7 @@ function SplineCommandLineTo(x, y)
     this.id = 1;
     this.x = x;
     this.y = y;
-    this.changePoint = function(x, y)
+    this.changeLastPoint = function(x, y)
     {
         this.x = x;
         this.y = y;
@@ -75,10 +75,9 @@ function Spline(drawingObjects)
     }
 
     this.pen = _calculated_line;
-
+    this.splineForDraw = new SplineForDrawer(this);
     this.Draw = function(graphics)
     {
-        graphics.SetCurrentPage(this.pageIndex);
         graphics.SetIntegerGrid(false);
         graphics.transform3(this.Matrix);
 
@@ -88,6 +87,8 @@ function Spline(drawingObjects)
     };
     this.draw = function(g)
     {
+        this.splineForDraw.Draw(g);
+        return;
         for(var i = 0; i < this.path.length; ++i)
         {
             var lastX, lastY;
@@ -164,7 +165,7 @@ function Spline(drawingObjects)
         return {x: min_x, y: min_y};
     };
 
-    this.createShape =  function(document)
+    this.createShape =  function(drawingObjects)
     {
         var xMax = this.path[0].x, yMax = this.path[0].y, xMin = xMax, yMin = yMax;
         var i;
@@ -245,15 +246,11 @@ function Spline(drawingObjects)
         xMax = max_x;
         yMin = min_y;
         yMax = max_y;
-        var wordGraphicObject = new ParaDrawing(null, null, null, document.DrawingDocument, null, document);
-        var wordShape = new WordShape(wordGraphicObject, document, document.DrawingDocument, null);
+        var shape = new CShape(null, this.drawingObjects);
 
-        wordGraphicObject.Set_GraphicObject(wordShape);
-        wordShape.pageIndex = this.pageIndex;
-
-        wordShape.setAbsoluteTransform(xMin, yMin, xMax-xMin, yMax-yMin, 0, false, false);
-        wordShape.setXfrm(0, 0, xMax-xMin, yMax-yMin, 0, false, false);
-        wordShape.style = CreateDefaultShapeStyle();
+        shape.setPosition(xMin, yMin);
+        shape.setExtents(xMax-xMin, yMax-yMin);
+        shape.setStyle(CreateDefaultShapeStyle());
 
         var geometry = new CGeometry();
         geometry.AddPathCommand(0, undefined, bClosed ? "norm": "none", undefined, xMax - xMin, yMax-yMin);
@@ -284,33 +281,65 @@ function Spline(drawingObjects)
             geometry.AddPathCommand(6);
         }
         geometry.Init( xMax-xMin, yMax-yMin);
-        wordShape.spPr.geometry = geometry;
-        wordShape.calculate();
-        wordShape.calculateTransformMatrix();
-        wordGraphicObject.setZIndex();
-        wordGraphicObject.setPageIndex(this.pageIndex);
+        shape.spPr.geometry = geometry;
+        shape.recalculate();
+        this.drawingObjects.addGraphicObject(shape);
+    };
 
-        for(i = 0;  i< this.path.length; ++i)
+    this.addPathCommand = function(pathCommand)
+    {
+        this.path.push(pathCommand);
+    }
+}
+
+function SplineForDrawer(spline)
+{
+    this.spline = spline;
+    this.pen = spline.pen;
+    this.brush = spline.brush;
+    this.TransformMatrix = spline.TransformMatrix;
+    this.Matrix = spline.Matrix;
+
+    this.Draw = function(graphics)
+    {
+        graphics.SetIntegerGrid(false);
+        graphics.transform3(this.Matrix);
+
+        var shape_drawer = new CShapeDrawer();
+        shape_drawer.fromShape(this, graphics);
+        shape_drawer.draw(this);
+    };
+
+    this.draw = function(g)
+    {
+        for(var i = 0; i < this.spline.path.length; ++i)
         {
-            switch (this.path[i].id)
+            var lastX, lastY;
+            switch (this.spline.path[i].id )
             {
                 case 0 :
                 {
-                    data.commands.push({id: 1, x: (this.path[i].x - xMin) + "", y:(this.path[i].y - yMin) + ""});
+                    g._m(this.spline.path[i].x, this.spline.path[i].y);
+                    lastX = this.spline.path[i].x;
+                    lastY = this.spline.path[i].y;
                     break;
                 }
                 case 1 :
                 {
-                    data.commands.push({id: 2, x: (this.path[i].x - xMin) + "", y:(this.path[i].y - yMin) + ""});
+                    g._l(this.spline.path[i].x, this.spline.path[i].y);
+                    lastX = this.spline.path[i].x;
+                    lastY = this.spline.path[i].y;
                     break;
                 }
-                case 2:
+                case 2 :
                 {
-                    data.commands.push({id: 5, x0: (this.path[i].x1 - xMin) + "", y0: (this.path[i].y1 - yMin) + "", x1:(this.path[i].x2 - xMin) + "", y1:(this.path[i].y2 - yMin) + "", x2:(this.path[i].x3 - xMin) + "", y2:(this.path[i].y3 - yMin) + ""});
+                    g._c(this.spline.path[i].x1, this.spline.path[i].y1, this.spline.path[i].x2, this.spline.path[i].y2, this.spline.path[i].x3, this.spline.path[i].y3);
+                    lastX = this.spline.path[i].x3;
+                    lastY = this.spline.path[i].y3;
                     break;
                 }
             }
         }
-        return wordGraphicObject;
+        g.ds();
     }
 }

@@ -206,7 +206,19 @@ DrawingObjectsController.prototype =
 
     startTrackNewShape: function(presetGeom)
     {
-        this.changeCurrentState(new StartTrackNewShapeState(this, this.drawingObjects, presetGeom));
+        switch (presetGeom)
+        {
+            case "spline":
+            {
+                this.changeCurrentState(new SplineBezierState(this, this.drawingObjects));
+                break;
+            }
+            default :
+            {
+                this.changeCurrentState(new StartTrackNewShapeState(this, this.drawingObjects, presetGeom));
+                break;
+            }
+        }
     },
 
     drawTracks: function(overlay)
