@@ -232,6 +232,9 @@
 				this.model.handlers.add("setSelection", function () {
 					self._onSetSelection.apply(self, arguments);
 				});
+				this.model.handlers.add("reInit", function () {
+					self.reInit.apply(self, arguments);
+				});
 				this.model.handlers.add("drawWS", function () {
 					self.drawWS.apply(self, arguments);
 				});
@@ -1380,7 +1383,13 @@
 					wsModel.aCommentsCoords = wsView.cellCommentator.aCommentCoords;
 				}
 			},
-			
+
+			reInit: function () {
+				var ws = this.getWorksheet();
+				ws._initCellsArea(/*fullRecalc*/true);
+				ws._updateVisibleColsCount();
+				ws._updateVisibleRowsCount();
+			},
 			drawWS: function(){
 				this._lockDraw = false;
 				this.getWorksheet().draw(this._lockDraw);

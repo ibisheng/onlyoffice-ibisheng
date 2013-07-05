@@ -2037,8 +2037,8 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 		
 		window["Asc"]["editor"]._loadFonts(aFontMap, function(){
 				var oHistoryPositions = null;//нужен самый последний historyitem_Workbook_SheetPositions
-				var bIsOn = History.RedoPrepare();
-				var aStartTriggerAction = new Object();
+				var oRedoObjectParam = new Asc.RedoObjectParam();
+				History.RedoPrepare(oRedoObjectParam);
 				for(var i = 0, length = aChanges.length; i < length; ++i)
 				{
 					var sChange = aChanges[i];
@@ -2053,14 +2053,14 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 							if(g_oUndoRedoWorkbook == item.oClass && historyitem_Workbook_SheetPositions == item.nActionType)
 								oHistoryPositions = item;
 							else
-								History.RedoAdd(aStartTriggerAction, item.oClass, item.nActionType, item.nSheetId, item.oRange, item.oData);
+								History.RedoAdd(oRedoObjectParam, item.oClass, item.nActionType, item.nSheetId, item.oRange, item.oData);
 						}
 					}
 				}
 				if(null != oHistoryPositions)
-					History.RedoAdd(aStartTriggerAction, oHistoryPositions.oClass, oHistoryPositions.nActionType, oHistoryPositions.nSheetId, oHistoryPositions.oRange, oHistoryPositions.oData);
+					History.RedoAdd(oRedoObjectParam, oHistoryPositions.oClass, oHistoryPositions.nActionType, oHistoryPositions.nSheetId, oHistoryPositions.oRange, oHistoryPositions.oData);
 			
-				History.RedoEnd(null, bIsOn, aStartTriggerAction);
+				History.RedoEnd(null, oRedoObjectParam);
 				this.bCollaborativeChanges = false;
 				History.Clear();
 				if(null != fCallback)
@@ -2578,7 +2578,7 @@ Woorksheet.prototype.setSheetViewSettings = function (options) {
 	History.Create_NewPoint();
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_SetViewSettings, this.getId(), null, new UndoRedoData_FromTo(current, options.clone()));
 
-	this.sheetViews[0].set(options);
+	this.sheetViews[0].setSettings(options);
 };
 Woorksheet.prototype.getRowsCount=function(){
 	return this.nRowsCount;

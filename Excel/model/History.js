@@ -148,6 +148,7 @@ CHistory.prototype =
 		
 		this.workbook.handlers.trigger("lockDraw");
 
+		var isReInit = false;
 		var oCurWorksheet = this.workbook.getWorksheet(this.workbook.getActive());
 		if(null != Point.nLastSheetId && Point.nLastSheetId != oCurWorksheet.getId())
 			this.workbook.handlers.trigger("showWorksheet", Point.nLastSheetId);
@@ -163,6 +164,8 @@ CHistory.prototype =
 				aStartTriggerAction[Item.SheetId] = ws;
 			}
             Item.Class.Undo( Item.Type, Item.Data, Item.SheetId );
+			if (g_oUndoRedoWorksheet === Item.Class && historyitem_Worksheet_SetViewSettings === Item.Type)
+				isReInit = true;
         }
 		for(var i in aStartTriggerAction)
 			aStartTriggerAction[i].onEndTriggerAction();
@@ -181,7 +184,9 @@ CHistory.prototype =
 			this.workbook.handlers.trigger("setSelection", oSelectRange.clone(), /*validRange*/false);
 		
 		this._sendCanUndoRedo();
-		
+
+		if (isReInit)
+			this.workbook.handlers.trigger("reInit");
 		this.workbook.handlers.trigger("drawWS");
 		
 		/* возвращаем отрисовку. и перерисовываем ячейки с предварительным пересчетом */
@@ -190,22 +195,17 @@ CHistory.prototype =
 		if(bIsOn)
 			this.TurnOn();
     },
-	RedoPrepare : function()
-	{
-		var bIsOn = false;
-		if(this.Is_On())
-		{
-			bIsOn = true;
+	RedoPrepare : function (oRedoObjectParam) {
+		if (this.Is_On()) {
+			oRedoObjectParam.bIsOn = true;
 			this.TurnOff();
 		}
 		/* отключаем отрисовку на случай необходимости пересчета ячеек, заносим ячейку, при необходимости в список перерисовываемых */
         lockDraw(this.workbook);
 		
 		this.workbook.handlers.trigger("lockDraw");
-		
-		return bIsOn;
 	},
-	RedoAdd : function(aStartTriggerAction, Class, Type, sheetid, range, Data, LocalChange)
+	RedoAdd : function(oRedoObjectParam, Class, Type, sheetid, range, Data, LocalChange)
 	{
 		//todo сделать что-нибудь с Is_On
 		var bNeedOff = false;
@@ -217,30 +217,34 @@ CHistory.prototype =
 		this.Add(Class, Type, sheetid, range, Data, LocalChange);
 		if(bNeedOff)
 			this.TurnOff();
-		if(null != sheetid && null == aStartTriggerAction[sheetid])
+		if(null != sheetid && null == oRedoObjectParam.aStartTriggerAction[sheetid])
 		{
 			var ws = this.workbook.getWorksheetById(sheetid);
 			ws.onStartTriggerAction();
-			aStartTriggerAction[sheetid] = ws;
+			oRedoObjectParam.aStartTriggerAction[sheetid] = ws;
 		}
 		Class.Redo( Type, Data, sheetid );
+		if (g_oUndoRedoWorksheet === Class && historyitem_Worksheet_SetViewSettings === Type)
+			oRedoObjectParam.bIsReInit = true;
 	},
-	RedoExecute : function(Point, aStartTriggerAction)
+	RedoExecute : function(Point, oRedoObjectParam)
 	{
 		// Выполняем все действия в прямом порядке
         for ( var Index = 0; Index < Point.Items.length; Index++ )
         {
             var Item = Point.Items[Index];
-			if(null != Item.SheetId && null == aStartTriggerAction[Item.SheetId])
+			if(null != Item.SheetId && null == oRedoObjectParam.aStartTriggerAction[Item.SheetId])
 			{
 				var ws = this.workbook.getWorksheetById(Item.SheetId);
 				ws.onStartTriggerAction();
-				aStartTriggerAction[Item.SheetId] = ws;
+				oRedoObjectParam.aStartTriggerAction[Item.SheetId] = ws;
 			}
             Item.Class.Redo( Item.Type, Item.Data, Item.SheetId );
+			if (g_oUndoRedoWorksheet === Item.Class && historyitem_Worksheet_SetViewSettings === Item.Type)
+				oRedoObjectParam.bIsReInit = true;
         }
 	},
-	RedoEnd : function(Point, bIsOn, aStartTriggerAction)
+	RedoEnd : function(Point, oRedoObjectParam)
 	{
 		if(null == Point)
 		{
@@ -249,8 +253,8 @@ CHistory.prototype =
 		}
 		if(null == Point)
 			return;
-		for(var i in aStartTriggerAction)
-			aStartTriggerAction[i].onEndTriggerAction();
+		for(var i in oRedoObjectParam.aStartTriggerAction)
+			oRedoObjectParam.aStartTriggerAction[i].onEndTriggerAction();
 		for(var i in Point.Triggers)
 			this.workbook.handlers.trigger.apply(this.workbook.handlers, Point.Triggers[i]);
 		var oSelectRange = null;
@@ -268,13 +272,15 @@ CHistory.prototype =
 			this.workbook.handlers.trigger("setSelection", oSelectRange.clone());
 		
 		this._sendCanUndoRedo();
-		
+
+		if (oRedoObjectParam.bIsReInit)
+			this.workbook.handlers.trigger("reInit");
 		this.workbook.handlers.trigger("drawWS");
 		
 		/* возвращаем отрисовку. и перерисовываем ячейки с предварительным пересчетом */
 		helpFunction(this.workbook);
 		unLockDraw(this.workbook);
-		if(bIsOn)
+		if(oRedoObjectParam.bIsOn)
 			this.TurnOn();
 	},
     Redo : function()
@@ -282,8 +288,9 @@ CHistory.prototype =
 		// Проверяем можно ли сделать Redo
         if ( true != this.Can_Redo() )
             return null;
-		
-		var bIsOn = this.RedoPrepare();
+
+		var oRedoObjectParam = new Asc.RedoObjectParam();
+		this.RedoPrepare(oRedoObjectParam);
 		
 		this.CurPoint = null;
         var Point = this.Points[++this.Index];
@@ -291,10 +298,9 @@ CHistory.prototype =
 		var oCurWorksheet = this.workbook.getWorksheet(this.workbook.getActive());
 		if(null != Point.nLastSheetId && Point.nLastSheetId != oCurWorksheet.getId())
 			this.workbook.handlers.trigger("showWorksheet", Point.nLastSheetId);
-		var aStartTriggerAction = new Object();
-		this.RedoExecute(Point, aStartTriggerAction);
+		this.RedoExecute(Point, oRedoObjectParam);
 		
-		this.RedoEnd(Point, bIsOn, aStartTriggerAction);
+		this.RedoEnd(Point, oRedoObjectParam);
 	},
     Create_NewPoint : function()
     {

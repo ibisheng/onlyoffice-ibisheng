@@ -658,7 +658,7 @@
 				return this.asc_getShowGridLines() === settings.asc_getShowGridLines() &&
 					this.asc_getShowRowColHeaders() === settings.asc_getShowRowColHeaders();
 			},
-			set: function (settings) {
+			setSettings: function (settings) {
 				this.showGridLines = settings.showGridLines;
 				this.showRowColHeaders = settings.showRowColHeaders;
 			},
@@ -685,6 +685,16 @@
 				}
 			}
 		};
+
+		function RedoObjectParam () {
+			if (!(this instanceof RedoObjectParam)) {
+				return new RedoObjectParam();
+			}
+
+			this.bIsOn = false;
+			this.aStartTriggerAction = {};
+			this.bIsReInit = false;
+		}
 
 
 		/*
@@ -721,6 +731,8 @@
 		prot.trigger = prot.trigger;
 		prot.add = prot.add;
 		prot.remove = prot.remove;
+
+		window["Asc"].RedoObjectParam = RedoObjectParam;
 
 		window["Asc"]["asc_CMouseMoveData"] = window["Asc"].asc_CMouseMoveData = asc_CMouseMoveData;
 		prot = asc_CMouseMoveData.prototype;

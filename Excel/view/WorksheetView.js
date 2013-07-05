@@ -1148,8 +1148,6 @@
 				this.maxRowHeight = asc_calcnpt( 409, this._getPPIY() );
 				this.defaultRowDescender = this._calcRowDescender(this.settings.cells.fontSize);
 				this.defaultRowHeight = asc_calcnpt( this.settings.cells.fontSize * this.vspRatio, this._getPPIY() ) + this.height_1px;
-
-				this._calcHeaderRowHeight();
 			},
 			_initCellsArea: function (fullRecalc) {
 				this.width_1px = asc_calcnpt(0, this._getPPIX(), 1/*px*/);
@@ -1161,6 +1159,7 @@
 				this.height_3px = asc_calcnpt(0, this._getPPIY(), 3/*px*/);
 
 				// calculate rows heights and visible rows
+				this._calcHeaderRowHeight();
 				this._calcRowHeights(fullRecalc ? 1 : 0);
 				this.visibleRange.r2 = 0;
 				this._calcVisibleRows();
@@ -1238,10 +1237,14 @@
 
 			/** Вычисляет ширину колонки заголовков (в pt) */
 			_calcHeaderColumnWidth: function () {
-				// Ширина колонки заголовков считается  - max число знаков в строке - перевести в символы - перевести в пикселы
-				var numDigit = Math.max( calcDecades(this.visibleRange.r2 + 1), 3);
-				var nCharCount = this._charCountToModelColWidth(numDigit);
-				this.headersWidth = this._modelColWidthToColWidth(nCharCount);
+				if (false === this.model.sheetViews[0].asc_getShowRowColHeaders())
+					this.headersWidth = 0;
+				else {
+					// Ширина колонки заголовков считается  - max число знаков в строке - перевести в символы - перевести в пикселы
+					var numDigit = Math.max( calcDecades(this.visibleRange.r2 + 1), 3);
+					var nCharCount = this._charCountToModelColWidth(numDigit);
+					this.headersWidth = this._modelColWidthToColWidth(nCharCount);
+				}
 
 				//var w = this.emSize * Math.max( calcDecades(this.visibleRange.r2 + 1), 3) * 1.25;
 				//this.headersWidth = asc_calcnpt(w, this._getPPIX());
@@ -1251,7 +1254,10 @@
 
 			/** Вычисляет высоту строки заголовков (в pt) */
 			_calcHeaderRowHeight: function () {
-				this.headersHeight = this.model.getDefaultHeight() || this.defaultRowHeight;
+				if (false === this.model.sheetViews[0].asc_getShowRowColHeaders())
+					this.headersHeight = 0;
+				else
+					this.headersHeight = this.model.getDefaultHeight() || this.defaultRowHeight;
 
 				//this.headersHeight = asc_calcnpt( this.settings.header.fontSize * this.vspRatio, this._getPPIY() );
 				this.cellsTop = this.headersTop + this.headersHeight;
@@ -1971,6 +1977,8 @@
 			},
 
 			_drawCorner: function () {
+				if (false === this.model.sheetViews[0].asc_getShowRowColHeaders())
+					return;
 				var x1 = this.headersLeft + this.headersWidth - this.headersHeight;
 				var x2 = this.headersLeft + this.headersWidth;
 				var y1 = this.headersTop;
@@ -1996,6 +2004,8 @@
 
 			/** Рисует заголовки видимых колонок */
 			_drawColumnHeaders: function (drawingCtx, start, end, style, offsetXForDraw, offsetYForDraw) {
+				if (undefined === drawingCtx && false === this.model.sheetViews[0].asc_getShowRowColHeaders())
+					return;
 				var hdr = this.settings.header;
 				var cells = this.settings.cells;
 				var vr  = this.visibleRange;
@@ -2021,6 +2031,8 @@
 
 			/** Рисует заголовки видимых строк */
 			_drawRowHeaders: function (drawingCtx, start, end, style, offsetXForDraw, offsetYForDraw) {
+				if (undefined === drawingCtx && false === this.model.sheetViews[0].asc_getShowRowColHeaders())
+					return;
 				var hdr = this.settings.header;
 				var cells = this.settings.cells;
 				var vr  = this.visibleRange;
@@ -8288,7 +8300,7 @@
 
 							isUpdateCols = true;
 							isUpdateRows = true;
-							fullRecalc = false;
+							fullRecalc = true;
 						};
 
 						return this._isLockedAll (onChangeWorksheetCallback);
