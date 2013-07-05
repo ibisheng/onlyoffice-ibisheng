@@ -1765,8 +1765,9 @@
 			drawingCtx.setFont(font);
 			m.Rotate(angle);
 			drawingCtx.transform(m.sx, m.shy, m.shx, m.sy, m.tx, m.ty);
-			var newX = (m.TransformPointX(cx,cy))*(-1);
-			var newY = (m.TransformPointY(cx,cy))*(-1);
+			var invertM = m.CreateDublicate().Invert(); 
+			var newX = invertM.TransformPointX(cx,cy);
+			var newY = invertM.TransformPointY(cx,cy);
 			drawingCtx.fillText(text, newX, newY, 0, 0, angle);
 		}
 		else
