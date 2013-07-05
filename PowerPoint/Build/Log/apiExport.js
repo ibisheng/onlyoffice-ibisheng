@@ -339,7 +339,7 @@ prop:DemonstrationPause
 prop:DemonstrationEndShowMessage
 prop:DemonstrationNextSlide
 prop:DemonstrationPrevSlide
-prop:DemonstrationGoToSlide
+prop:GoToSlide
 prop:ApplySlideTiming
 prop:SlideTimingApplyToAll
 prop:SlideTransitionPlay
@@ -1191,7 +1191,7 @@ asc_docs_api.prototype['DemonstrationPause'] = asc_docs_api.prototype.Demonstrat
 asc_docs_api.prototype['DemonstrationEndShowMessage'] = asc_docs_api.prototype.DemonstrationEndShowMessage;
 asc_docs_api.prototype['DemonstrationNextSlide'] = asc_docs_api.prototype.DemonstrationNextSlide;
 asc_docs_api.prototype['DemonstrationPrevSlide'] = asc_docs_api.prototype.DemonstrationPrevSlide;
-asc_docs_api.prototype['DemonstrationGoToSlide'] = asc_docs_api.prototype.DemonstrationGoToSlide;
+asc_docs_api.prototype['GoToSlide'] = asc_docs_api.prototype.GoToSlide;
 asc_docs_api.prototype['ApplySlideTiming'] = asc_docs_api.prototype.ApplySlideTiming;
 asc_docs_api.prototype['SlideTimingApplyToAll'] = asc_docs_api.prototype.SlideTimingApplyToAll;
 asc_docs_api.prototype['SlideTransitionPlay'] = asc_docs_api.prototype.SlideTransitionPlay;
