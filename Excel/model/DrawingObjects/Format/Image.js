@@ -463,7 +463,7 @@ CImage.prototype =
         var t_x, t_y;
         t_x = invert_transform.TransformPointX(x, y);
         t_y = invert_transform.TransformPointY(x, y);
-        var radius = 5;/*TODO*/
+        var radius = this.drawingObjects.convertMetric(TRACK_CIRCLE_RADIUS, 0, 3);
 
         var sqr_x = t_x*t_y, sqr_y = t_y*t_y;
         if(Math.sqrt(sqr_x + sqr_y) < radius)
@@ -506,7 +506,7 @@ CImage.prototype =
         if(Math.sqrt(sqr_x + sqr_y) < radius)
             return 7;
 
-        var rotate_distance = 10;/*TODO*/
+        var rotate_distance = this.drawingObjects.convertMetric(TRACK_DISTANCE_ROTATE, 0, 3);
         dist_y = t_y + rotate_distance;
         sqr_y = dist_y*dist_y;
         dist_x = t_x - hc;
@@ -614,7 +614,7 @@ CImage.prototype =
     getRotateAngle: function(x, y)
     {
         var transform = this.getTransform();
-        var rotate_distance = 5;/*TODO*/
+        var rotate_distance = this.drawingObjects.convertMetric(TRACK_DISTANCE_ROTATE, 0, 3);
         var hc = this.extX*0.5;
         var vc = this.extY*0.5;
         var xc_t = transform.TransformPointX(hc, vc);
