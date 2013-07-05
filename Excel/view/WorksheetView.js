@@ -644,6 +644,13 @@
 				return ct ? $.extend({}, ct.metrics) : undefined;
 			},
 
+			getSheetViewSettings: function () {
+				if (null === this.model.sheetViews || 0 === this.model.sheetViews.length)
+					return new asc.asc_CSheetViewSettings();
+
+				return this.model.sheetViews[0];
+			},
+
 
 			// mouseX - это разница стартовых координат от мыши при нажатии и границы
 			changeColumnWidth: function (col, x2, mouseX) {
@@ -2176,6 +2183,11 @@
 
 			/** Рисует сетку таблицы */
 			_drawGrid: function (drawingCtx, range, leftFieldInPt, topFieldInPt, width, height) {
+				// Возможно сетку не нужно рисовать (при печати свои проверки)
+				if (undefined === drawingCtx && null !== this.model.sheetViews &&
+					0 < this.model.sheetViews.length && false === this.model.sheetViews[0].asc_getShowGridLines())
+					return;
+
 				if (range === undefined) {
 					range = this.visibleRange;
 				}
@@ -8269,6 +8281,19 @@
 							default: return;
 						}
 						break;
+
+					case "sheetViewSettings":
+						functionModelAction = function () {
+							if (null === t.model.sheetViews)
+								t.model.sheetViews = [];
+							t.model.sheetViews[0] = val;
+
+							isUpdateCols = true;
+							isUpdateRows = true;
+							fullRecalc = false;
+						};
+
+						return this._isLockedAll (onChangeWorksheetCallback);
 
 					case "update":
 						if (val !== undefined) {

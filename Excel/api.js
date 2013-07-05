@@ -1915,6 +1915,14 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				return this.wb.getWorksheet().getSelectionMergeInfo(options);
 			},
 
+			asc_getSheetViewSettings: function () {
+				return this.wb.getWorksheet().getSheetViewSettings();
+			},
+
+			asc_setSheetViewSettings: function (options) {
+				this.wb.getWorksheet().changeWorksheet("sheetViewSettings", options);
+			},
+
 			// Images & Charts
 
 			asc_drawingObjectsExist: function(chart) {
@@ -2804,6 +2812,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_sortCells"] = prot.asc_sortCells;
 		prot["asc_emptyCells"] = prot.asc_emptyCells;
 		prot["asc_mergeCellsDataLost"] = prot.asc_mergeCellsDataLost;
+		prot["asc_getSheetViewSettings"] = prot.asc_getSheetViewSettings;
+		prot["asc_setSheetViewSettings"] = prot.asc_setSheetViewSettings;
 		
 		// Auto filters interface
 		prot["asc_addAutoFilter"] = prot.asc_addAutoFilter;

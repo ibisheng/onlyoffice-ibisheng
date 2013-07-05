@@ -1,6 +1,7 @@
 ﻿$(function () {
 	var  IsVisibleMenu = false, elem, contextGrad, gradient, gradSelectPosTop = 1, imgd, pix, colorSelecterClick, newColorSelected={r:255,g:0,b:0},lastColorSelected={r:255,g:0,b:0};
 	var autoFilterObj;
+	var g_sheetViewSettings = null;
 	
 	var docTitle = window.location.toString().match(/&title=([^&]+)&/);
 	if (docTitle) {
@@ -51,6 +52,10 @@
 			.empty()
 			.append(renderTabs());
 		onTabClicked( api.asc_getActiveWorksheetIndex() );
+	}
+
+	function onActiveSheetChanged () {
+		updateSheetViewSettings();
 	}
 
 	function showZoomValue() {
@@ -176,6 +181,12 @@
 		consolelog("onEndAction " + arguments[0] + " " + arguments[1]);
 	}
 
+	function updateSheetViewSettings () {
+		g_sheetViewSettings = api.asc_getSheetViewSettings();
+		$("#showGridLines").attr("checked", g_sheetViewSettings.asc_getShowGridLines());
+		$("#showHeaders").attr("checked", g_sheetViewSettings.asc_getShowRowColHeaders());
+	}
+
 	function onTabNavigationBtnClicked(event) {
 		var btn = $(event.currentTarget),
 				tablist = $("#ws-navigation .tabs"),
@@ -229,6 +240,7 @@
 				.removeClass("active")
 				.eq(index).addClass("active");
 		api.asc_showWorksheet(index);
+		updateSheetViewSettings();
 		return true;
 	}
 
@@ -445,6 +457,8 @@
 
 	});
 	api.asc_registerCallback("asc_onSetAFDialog", onSetAFDialog);
+
+	api.asc_registerCallback("asc_onActiveSheetChanged", onActiveSheetChanged);
 	
 	api.asc_registerCallback("asc_onConfirmAction", function(){
 		var arg = arguments;
@@ -1616,6 +1630,14 @@
 		});
 		$("#drawingObjectsLayerMenu").dialog("open");
 	}
+
+	function onChangeView () {
+		var showGridLines = document.getElementById("showGridLines");
+		var showHeaders = document.getElementById("showHeaders");
+		g_sheetViewSettings.asc_setShowGridLines(showGridLines.checked);
+		g_sheetViewSettings.asc_setShowRowColHeaders(showHeaders.checked);
+		api.asc_setSheetViewSettings(g_sheetViewSettings);
+	}
 	
 	// Comments
 	
@@ -2579,4 +2601,11 @@
 			api.asc_unGroupGraphicsObjects();
         }
     );
+
+	$("#showGridLines").change(function () {
+		onChangeView();
+	});
+	$("#showHeaders").change(function () {
+		onChangeView();
+	});
 });

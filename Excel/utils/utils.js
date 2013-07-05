@@ -628,6 +628,27 @@
 			this["r2"] = r2;
 		}
 
+		function asc_CSheetViewSettings () {
+			if (!(this instanceof asc_CSheetViewSettings)) {
+				return new asc_CSheetViewSettings();
+			}
+
+			// Показывать ли сетку
+			this.showGridLines = null;
+			// Показывать обозначения строк и столбцов
+			this.showRowColHeaders = null;
+
+			return this;
+		}
+
+		asc_CSheetViewSettings.prototype = {
+			constructor: asc_CSheetViewSettings,
+			asc_getShowGridLines: function () { return false !== this.showGridLines; },
+			asc_getShowRowColHeaders: function () { return false !== this.showRowColHeaders; },
+			asc_setShowGridLines: function (val) { this.showGridLines = val; },
+			asc_setShowRowColHeaders: function (val) { this.showRowColHeaders = val; }
+		}
+
 
 		/*
 		 * Export
@@ -741,6 +762,13 @@
 		window["Asc"].asc_CLockInfo = asc_CLockInfo;
 
 		window["Asc"].asc_CCollaborativeRange = asc_CCollaborativeRange;
+
+		window["Asc"]["asc_CSheetViewSettings"] = window["Asc"].asc_CSheetViewSettings = asc_CSheetViewSettings;
+		prot = asc_CSheetViewSettings.prototype;
+		prot["asc_getShowGridLines"] = prot.asc_getShowGridLines;
+		prot["asc_getShowRowColHeaders"] = prot.asc_getShowRowColHeaders;
+		prot["asc_setShowGridLines"] = prot.asc_setShowGridLines;
+		prot["asc_setShowRowColHeaders"] = prot.asc_setShowRowColHeaders;
 
 	}
 )(jQuery, window);

@@ -2146,7 +2146,7 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, oDrawings, aDxf
         if(ws.aCols.length > 0 || null != ws.oAllCol)
             this.bs.WriteItem(c_oSerWorksheetsTypes.Cols, function(){oThis.WriteWorksheetCols(ws);});
 
-		if (null != ws.sheetViews)
+		if (null !== ws.sheetViews)
 			this.bs.WriteItem(c_oSerWorksheetsTypes.SheetViews, function(){oThis.WriteSheetViews(ws);});
 
         this.bs.WriteItem(c_oSerWorksheetsTypes.SheetFormatPr, function(){oThis.WriteSheetFormatPr(ws);});
@@ -2342,15 +2342,15 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, oDrawings, aDxf
 		}
 	};
 	this.WriteSheetView = function (oSheetView) {
-		if (undefined !== oSheetView.ShowGridLines) {
+		if (null !== oSheetView.showGridLines) {
 			this.memory.WriteByte(c_oSer_SheetView.ShowGridLines);
 			this.memory.WriteByte(c_oSerPropLenType.Byte);
-			this.memory.WriteBool(oSheetView.ShowGridLines);
+			this.memory.WriteBool(oSheetView.showGridLines);
 		}
-		if (undefined !== oSheetView.ShowRowColHeaders) {
+		if (null !== oSheetView.showRowColHeaders) {
 			this.memory.WriteByte(c_oSer_SheetView.ShowRowColHeaders);
 			this.memory.WriteByte(c_oSerPropLenType.Byte);
-			this.memory.WriteBool(oSheetView.ShowRowColHeaders);
+			this.memory.WriteBool(oSheetView.showRowColHeaders);
 		}
 	};
     this.WriteSheetFormatPr = function(ws)
@@ -5706,7 +5706,7 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 		var oSheetView = null;
 
 		if (c_oSerWorksheetsTypes.SheetView === type) {
-			oSheetView = {};
+			oSheetView = new Asc.asc_CSheetViewSettings();
 			res = this.bcr.Read1(length, function (t, l) {
 				return oThis.ReadSheetView(t, l, oSheetView);
 			});
@@ -5717,9 +5717,9 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 	this.ReadSheetView = function (type, length, oSheetView) {
 		var res = c_oSerConstants.ReadOk;
 		if (c_oSer_SheetView.ShowGridLines === type) {
-			oSheetView.ShowGridLines = this.stream.GetBool();
+			oSheetView.showGridLines = this.stream.GetBool();
 		} else if (c_oSer_SheetView.ShowRowColHeaders === type) {
-			oSheetView.ShowRowColHeaders = this.stream.GetBool();
+			oSheetView.showRowColHeaders = this.stream.GetBool();
 		} else
 			res = c_oSerConstants.ReadUnknown;
 		return res;
