@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TeamLab Document Editor</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=9,chrome=IE8"/>
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <link rel="icon" href="resources/img/favicon.ico" type="image/x-icon" />
+
+    <link rel="stylesheet" type="text/css" href="../../../3rdparty/extjs/resources/css/ext-all.css">
+    <link rel="stylesheet" type="text/css" href="../../common/main/resources/css/asc.css">
+    <link rel="stylesheet" type="text/css" href="../../common/main/resources/css/header.css">
+    <link rel="stylesheet" type="text/css" href="../../common/main/resources/css/participantspanel.css">
+    <link rel="stylesheet" type="text/css" href="resources/css/ss-main-colors.css">
+    <link rel="stylesheet" type="text/css" href="resources/css/header.css">
+    <link rel="stylesheet" type="text/css" href="resources/css/document-holder.css">
+    <link rel="stylesheet" type="text/css" href="resources/css/document-statusinfo.css">
+    <link rel="stylesheet" type="text/css" href="resources/css/main-menu.css">
+    <link rel="stylesheet" type="text/css" href="resources/css/file.css">
+    <link rel="stylesheet" type="text/css" href="resources/css/file-create-new.css">
+    <link rel="stylesheet" type="text/css" href="resources/css/file-open-recent.css">
+    <link rel="stylesheet" type="text/css" href="resources/css/tab-bar.css">
+
+    <link rel="stylesheet" type="text/css" href="../../common/main/resources/css/jquery.jscrollpane.css">
+    <link rel="stylesheet" type="text/css" href="../../common/main/resources/css/load-mask.css">
+    <link rel="stylesheet" type="text/css" href="../../common/main/resources/css/chat-panel.css">
+
+    <link rel="stylesheet" type="text/css" href="../../../sdk/Excel/css/main.css"/>
+
+
+    <!-- splash -->        
+
+    <style type="text/css">
+        .loadmask {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            border: none;
+            background-color: #f4f4f4;
+            z-index: 20002;
+        }
+
+        .loadmask-body {
+            position:relative;
+            top:44%;
+        }
+
+        .loadmask-logo {
+            display:inline-block;
+            min-width:240px;
+            vertical-align:top;
+            background-image:url('./resources/img/loading-logo.gif');
+            background-image: -webkit-image-set(url('./resources/img/loading-logo.gif') 1x, url('./resources/img/loading-logo@2x.gif') 2x);
+            background-repeat:no-repeat;
+        }
+
+        #loadmask-text {
+            color: #b2b2b2;
+            font-size: 10px;
+            font-weight: bold;
+            font-family: Arial;
+            height:14px;
+            margin-top:32px;
+            padding-left:40px;
+            text-align:left;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loading-mask" class="loadmask">
+        <div class="loadmask-body" align="center">
+            <div class="loadmask-logo">
+                <div id="loadmask-text">LOADING APPLICATION</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3rdparty -->
+
+    <script type="text/javascript" src="../../../3rdparty/extjs/ext-debug.js"></script>
+    <script type="text/javascript" src="../../../3rdparty/jquery/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="../../../3rdparty/jquery/mousewheel/jquery.mousewheel.js"></script>
+    <script type="text/javascript" src="../../../3rdparty/jquery/jscrollpane/jquery.jscrollpane.js"></script>
+    <script type="text/javascript" src="../../../3rdparty/xregexp/xregexp-all-min.js"></script>
+    <script type="text/javascript" src="../../../3rdparty/sockjs/sockjs-0.3.min.js"></script>
+    <script type="text/javascript" src="../../../3rdparty/underscore/underscore-min.js"></script>
+
+    <!-- Application -->
+
+    <script type="text/javascript" src="../../common/Analytics.js"></script>
+    <script type="text/javascript" src="../../common/Gateway.js"></script>
+    <script type="text/javascript" src="../../common/main/loader.js"></script>
+    <script type="text/javascript" src="app.js"></script>
+    <script type="text/javascript" src="../../common/locale.js"></script>
+
+    <!-- SDK -->
+
+    <script type="text/javascript">
+        window.g_debug_mode = true;
+    </script>
+	
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/editorscommon.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/downloaderfiles.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/docscoapicommon.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/docscoapi.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/Charts/DrawingObjects.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/Charts/charts.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/commonDefines.js"></script>
+
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/FontsFreeType/font_engine.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/FontsFreeType/FontFile.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/FontsFreeType/FontManager.js"></script>
+
+	<script type="text/javascript" src="../../../../OfficeWeb/Word/Drawing/Externals.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Word/Drawing/Metafile.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Word/Drawing/AllFonts.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Word/Drawing/GlobalLoaders.js"></script>
+
+	<script type="text/javascript" src="../../../../OfficeWeb/Excel/utils/utils.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Excel/model/ConditionalFormatting.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Excel/model/clipboard.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Excel/model/autofilters.js"></script>
+
+	<script type="text/javascript" src="../../../../OfficeWeb/Excel/graphics/DrawingContext.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Excel/graphics/pdfprinter.js"></script>
+
+    <script type="text/javascript" src="../../../../OfficeWeb/Excel/offlinedocs/empty-workbook.js"></script>
+
+	<script type="text/javascript" src="../../../../OfficeWeb/Excel/model/CollaborativeEditing.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Excel/model/parserFormula.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Excel/model/dateandtimeFunctions.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Excel/model/engineeringFunctions.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Excel/model/cubeFunctions.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Excel/model/databaseFunctions.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Excel/model/textanddataFunctions.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Excel/model/statisticalFunctions.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Excel/model/financialFunctions.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Excel/model/mathematicFunctions.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Excel/model/lookupandreferenceFunctions.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Excel/model/informationFunctions.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Excel/model/logicalFunctions.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Excel/model/CellComment.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/NumFormat.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Excel/model/Serialize.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Excel/model/WorkbookElems.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Excel/model/Workbook.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Excel/model/CellInfo.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Excel/model/AdvancedOptions.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Excel/model/History.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Excel/model/UndoRedo.js"></script>
+
+	<script type="text/javascript" src="../../../../OfficeWeb/Excel/view/scroll.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Excel/view/StringRender.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Excel/view/CellTextRender.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Excel/view/CellEditorView.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Excel/view/WorksheetView.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Excel/view/HandlerList.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Excel/view/EventsController.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Excel/view/WorkbookView.js"></script>
+
+	<script type="text/javascript" src="../../../../OfficeWeb/Excel/apiDefines.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Excel/api.js"></script>
+	
+	<!--for presentation-->
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/PresentationSerializeAdapter.js"></script>
+
+	<!--for theme-->
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/Shapes/EditorSettings.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/Shapes/Serialize.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/Shapes/SerializeWriter.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Word/Editor/SerializeCommon.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Word/Editor/GraphicObjects/ObjectTypes/Format.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Word/Editor/GraphicObjects/ObjectTypes/CreateGeometry.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Word/Editor/GraphicObjects/ObjectTypes/Geometry.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Word/Editor/GraphicObjects/ObjectTypes/Path.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Word/Editor/GraphicObjects/Math.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Word/Drawing/ShapeDrawer.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Word/Drawing/ArcTo.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Word/Drawing/ColorArray.js"></script>
+	
+	<script type="text/javascript" src="../../../../OfficeWeb/Word/apiCommon.js"></script>
+
+	<!--for chart-->
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/SerializeCommonWordExcel.js"></script>
+	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.core.js"></script>
+
+	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.annotate.js"></script>
+	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.context.js"></script>
+	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.effects.js"></script>
+	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.key.js"></script>
+	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.resizing.js"></script>
+	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.tooltips.js"></script>
+	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.zoom.js"></script>
+
+	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.bar.js"></script>
+	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.bipolar.js"></script>
+
+	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.gantt.js"></script>
+
+	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.hbar.js"></script>
+
+	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.line.js"></script>
+
+	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.pie.js"></script>
+	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.radar.js"></script>
+	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.rose.js"></script>
+	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.rscatter.js"></script>
+	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.scatter.js"></script>
+
+	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.waterfall.js"></script>
+	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.chartProperties.js"></script>
+
+	<!--for colors-->
+	<script src="../../../../OfficeWeb/Common/Charts/libraries/hsv.js"></script>
+	<script src="../../../../OfficeWeb/Common/Charts/libraries/rgbcolor.js"></script>
+	
+	<!--for shapes-->
+	<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Graphics.js"></script>
+	<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Overlay.js"></script>
+	<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Controls.js"></script>
+	<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/DrawingObjectsController.js"></script>
+	<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/States.js"></script>
+		
+	<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Format/GroupShape.js"></script>
+	<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Format/Image.js"></script>
+	<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Format/Shape.js"></script>
+	
+	<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Tracks/AdjustmentTracks.js"></script>
+	<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Tracks/ResizeTracks.js"></script>
+	<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Tracks/RotateTracks.js"></script>
+	<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Tracks/NewShapeTracks.js"></script>
+	<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Tracks/PolyLine.js"></script>
+	<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Tracks/Spline.js"></script>
+	<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Tracks/MoveTracks.js"></script>
+	<script src="../../../../OfficeWeb/Excel/model/DrawingObjects/Hit.js"></script>
+	
+    <script type="text/javascript" src="../../../sdk/Common/docscoapisettings.js"></script>
+    <!--<script type="text/javascript" src="../../../sdk/Excel/sdk-all.js"></script>-->
+
+    <script type="text/javascript">
+        var isBrowserSupported = function() {
+            return !((Ext.isIE6 || Ext.isIE7 || Ext.isIE8) ||
+                    (Ext.isSafari2 || Ext.isSafari3 || Ext.isSafari4) ||
+                    (Ext.isGecko && Ext.firefoxVersion < 4.0) ||
+                    (Ext.isChrome && Ext.chromeVersion < 7.0) ||
+                    (Ext.isOpera && Ext.operaVersion < 10.5));
+        };
+
+        if (!isBrowserSupported()){
+            document.write(
+                '<div class="application-error-panel">' +
+                    '<div class="application-error-message-block">' +
+                        '<div class="application-error-message-inner">' +
+                            '<div class="application-error-message-title">' + 'Your browser is not supported.' + '</div>' +
+                            '<div class="application-error-message-text">' + 'Sorry, Spreadsheet Editor is currently only supported in the latest versions of the Chrome, Firefox, Safari or Internet Explorer web browsers.' + '</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="application-error-message-auxiliary"></div>' +
+                '</div>'
+            );
+        }
+
+        var getEditorStylesheets = function() {
+            return ['../../common/main/resources/css/hsb-colorpicker.css','../../common/main/resources/css/themecolorpalette.css',
+                        '../../common/main/resources/css/comments-panel.css', '../../common/main/resources/css/comments-popover.css',
+                    '../../common/main/resources/css/grouped-data-view.css', 'resources/css/toolbar.css','resources/css/advanced-settings-dialog.css',
+                    '../../common/main/resources/css/dataview-picker.css', '../../common/main/resources/css/synchronize-tip.css',
+                    '../../common/main/resources/css/searchfield.css'];
+        };
+
+    </script>
+</body>
+</html>
