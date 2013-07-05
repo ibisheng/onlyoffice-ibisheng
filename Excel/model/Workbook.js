@@ -2102,7 +2102,7 @@ function Woorksheet(wb, _index, bAddUserId, sId){
 	this.aComments = new Array();
 	this.aCommentsCoords = new Array();
 
-	this.sheetViews = null;
+	this.sheetViews = [];
 	this.aConditionalFormatting = [];
 	
 	this.nActionNested = 0;
@@ -2398,6 +2398,12 @@ Woorksheet.prototype.initPostOpen = function(){
 		if(null == this.PagePrintOptions.asc_getHeadings())
 			this.PagePrintOptions.asc_setHeadings(c_oAscPrintDefaultSettings.PageHeadings);
 	}
+
+	// Sheet Views
+	if (0 === this.sheetViews.length) {
+		// Даже если не было, создадим
+		this.sheetViews[0] = new asc.asc_CSheetViewSettings();
+	}
 };
 Woorksheet.prototype.onStartTriggerAction=function(){
 	//начало действия, в конце которого могуть быть вызваны trigger(пока только hyperlink)
@@ -2560,6 +2566,19 @@ Woorksheet.prototype.setHidden=function(hidden){
 			}
 		}
 	}
+};
+Woorksheet.prototype.getSheetViewSettings = function () {
+	return this.sheetViews[0].clone();
+};
+Woorksheet.prototype.setSheetViewSettings = function (options) {
+	var current = this.getSheetViewSettings();
+	if (current.isEqual(options))
+		return;
+
+	History.Create_NewPoint();
+	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_SetViewSettings, this.getId(), null, new UndoRedoData_FromTo(current, options.clone()));
+
+	this.sheetViews[0].set(options);
 };
 Woorksheet.prototype.getRowsCount=function(){
 	return this.nRowsCount;

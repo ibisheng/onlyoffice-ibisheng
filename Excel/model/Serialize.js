@@ -2146,8 +2146,7 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, oDrawings, aDxf
         if(ws.aCols.length > 0 || null != ws.oAllCol)
             this.bs.WriteItem(c_oSerWorksheetsTypes.Cols, function(){oThis.WriteWorksheetCols(ws);});
 
-		if (null !== ws.sheetViews)
-			this.bs.WriteItem(c_oSerWorksheetsTypes.SheetViews, function(){oThis.WriteSheetViews(ws);});
+		this.bs.WriteItem(c_oSerWorksheetsTypes.SheetViews, function(){oThis.WriteSheetViews(ws);});
 
         this.bs.WriteItem(c_oSerWorksheetsTypes.SheetFormatPr, function(){oThis.WriteSheetFormatPr(ws);});
 		
@@ -4902,7 +4901,6 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 			});
 			oWorksheet.aConditionalFormatting.push(oConditionalFormatting);
 		} else if (c_oSerWorksheetsTypes.SheetViews === type) {
-			oWorksheet.sheetViews = [];
 			res = this.bcr.Read1(length, function (t, l) {
 				return oThis.ReadSheetViews(t, l, oWorksheet.sheetViews);
 			});

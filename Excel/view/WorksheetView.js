@@ -645,10 +645,7 @@
 			},
 
 			getSheetViewSettings: function () {
-				if (null === this.model.sheetViews || 0 === this.model.sheetViews.length)
-					return new asc.asc_CSheetViewSettings();
-
-				return this.model.sheetViews[0];
+				return this.model.getSheetViewSettings();
 			},
 
 
@@ -2184,8 +2181,7 @@
 			/** Рисует сетку таблицы */
 			_drawGrid: function (drawingCtx, range, leftFieldInPt, topFieldInPt, width, height) {
 				// Возможно сетку не нужно рисовать (при печати свои проверки)
-				if (undefined === drawingCtx && null !== this.model.sheetViews &&
-					0 < this.model.sheetViews.length && false === this.model.sheetViews[0].asc_getShowGridLines())
+				if (undefined === drawingCtx && false === this.model.sheetViews[0].asc_getShowGridLines())
 					return;
 
 				if (range === undefined) {
@@ -8288,9 +8284,7 @@
 
 					case "sheetViewSettings":
 						functionModelAction = function () {
-							if (null === t.model.sheetViews)
-								t.model.sheetViews = [];
-							t.model.sheetViews[0] = val;
+							t.model.setSheetViewSettings(val);
 
 							isUpdateCols = true;
 							isUpdateRows = true;

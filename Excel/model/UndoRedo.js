@@ -331,6 +331,7 @@ var UndoRedoDataTypes = new function() {
 	this.ChartAxisY = 40;
 	this.ChartLegend = 41;
 	this.ChartFont = 42;
+	this.SheetViewSettings = 43;
 	
 	this.Create = function(nType)
 	{
@@ -379,6 +380,7 @@ var UndoRedoDataTypes = new function() {
 			case this.ChartAxisY: return new asc_CChartAxisY(); break;
 			case this.ChartLegend: return new asc_CChartLegend(); break;
 			case this.ChartFont: return new asc_CChartFont(); break;
+			case this.SheetViewSettings: return new Asc.asc_CSheetViewSettings(); break;
 		}
 		return null;
 	};
@@ -1840,6 +1842,8 @@ UndoRedoWoorksheet.prototype = {
 				ws._removeCell(Data.nRow, Data.nCol);
 			else
 				ws._getCell(Data.nRow, Data.nCol);
+		} else if (historyitem_Worksheet_SetViewSettings === Type) {
+			ws.setSheetViewSettings(bUndo ? Data.from : Data.to);
 		}
 	}
 };

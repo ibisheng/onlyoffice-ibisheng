@@ -28,6 +28,7 @@ var historyitem_Worksheet_Hide = 19;
 var historyitem_Worksheet_CreateRow = 20;
 var historyitem_Worksheet_CreateCol = 21;
 var historyitem_Worksheet_CreateCell = 22;
+var historyitem_Worksheet_SetViewSettings = 23;
 
 var historyitem_RowCol_Fontname = 1;
 var historyitem_RowCol_Fontsize = 2;

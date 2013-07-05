@@ -633,6 +633,11 @@
 				return new asc_CSheetViewSettings();
 			}
 
+			this.Properties = {
+				showGridLines		: 0,
+				showRowColHeaders	: 1
+			};
+
 			// Показывать ли сетку
 			this.showGridLines = null;
 			// Показывать обозначения строк и столбцов
@@ -643,11 +648,43 @@
 
 		asc_CSheetViewSettings.prototype = {
 			constructor: asc_CSheetViewSettings,
+			clone: function () {
+				var result = new asc_CSheetViewSettings();
+				result.showGridLines = this.showGridLines;
+				result.showRowColHeaders = this.showRowColHeaders;
+				return result;
+			},
+			isEqual: function (settings) {
+				return this.asc_getShowGridLines() === settings.asc_getShowGridLines() &&
+					this.asc_getShowRowColHeaders() === settings.asc_getShowRowColHeaders();
+			},
+			set: function (settings) {
+				this.showGridLines = settings.showGridLines;
+				this.showRowColHeaders = settings.showRowColHeaders;
+			},
 			asc_getShowGridLines: function () { return false !== this.showGridLines; },
 			asc_getShowRowColHeaders: function () { return false !== this.showRowColHeaders; },
 			asc_setShowGridLines: function (val) { this.showGridLines = val; },
-			asc_setShowRowColHeaders: function (val) { this.showRowColHeaders = val; }
-		}
+			asc_setShowRowColHeaders: function (val) { this.showRowColHeaders = val; },
+			getType : function () {
+				return UndoRedoDataTypes.SheetViewSettings;
+			},
+			getProperties : function () {
+				return this.Properties;
+			},
+			getProperty : function (nType) {
+				switch (nType) {
+					case this.Properties.showGridLines: return this.showGridLines;break;
+					case this.Properties.showRowColHeaders: return this.showRowColHeaders;break;
+				}
+			},
+			setProperty : function (nType, value) {
+				switch (nType) {
+					case this.Properties.showGridLines: this.showGridLines = value;break;
+					case this.Properties.showRowColHeaders: this.sheet = showRowColHeaders;break;
+				}
+			}
+		};
 
 
 		/*
