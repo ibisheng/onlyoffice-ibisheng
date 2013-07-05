@@ -2878,7 +2878,7 @@ function InitPanelAnimation()
     $("#id_viewer")["mousedown"](function(){ this.focus(); editor.asc_enableKeyEvents(true);});
 }
 
-function AnimationType_Changed()
+window["AnimationType_Changed"] = function()
 {
     var _type = document.getElementById("animationType").selectedIndex;
     var _elem = document.getElementById("animationParam");
@@ -3088,7 +3088,7 @@ function AnimationType_Changed()
     AnimationParam_Changed();
 }
 
-function AnimationParam_Changed()
+window["AnimationParam_Changed"] = function()
 {
     var _type = document.getElementById("animationType").selectedIndex;
     var _elem = document.getElementById("animationParam").selectedIndex;
@@ -3116,7 +3116,7 @@ function AnimationParam_Changed()
     }
 }
 
-function SA_Check_Box_After()
+window["SA_Check_Box_After"] = function()
 {
     var _is_ = document.getElementById("box_tr2").checked;
 
@@ -3129,7 +3129,7 @@ function SA_Check_Box_After()
     }
 }
 
-function SA_Check_Box_OnMouseClick()
+window["SA_Check_Box_OnMouseClick"] = function()
 {
     var _is_ = document.getElementById("box_tr1").checked;
 
@@ -3142,7 +3142,7 @@ function SA_Check_Box_OnMouseClick()
     }
 }
 
-function SlideDuration_Changed()
+window["SlideDuration_Changed"] = function()
 {
     var duration = (parseFloat(document.getElementById("slideDuration").value) * 1000) >> 0;
 
@@ -3155,7 +3155,7 @@ function SlideDuration_Changed()
     }
 }
 
-function AnimationSpeed_Changed()
+window["AnimationSpeed_Changed"] = function()
 {
     var duration = (parseFloat(document.getElementById("animationSpeed").value) * 1000) >> 0;
 
