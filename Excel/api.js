@@ -344,6 +344,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				if	( chartBinTemplate.length && (c_oSerFormat.Signature === chartBinTemplate.substring(0, c_oSerFormat.Signature.length)) ) {
 					var wb = new Workbook("", this.handlers);
 					wb.initGlobalObjects();
+					this.wbModel = wb;
 					var oBinaryFileReader = new BinaryFileReader("");
 					oBinaryFileReader.Read(chartBinTemplate, wb);
 					
@@ -406,6 +407,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					this.isChartEditor = true;
 					var wb = new Workbook("", this.handlers);
 					wb.initGlobalObjects();
+					this.wbModel = wb;
 					var oBinaryFileReader = new BinaryFileReader("");
 					oBinaryFileReader.Read(emptyWorkbook, wb);
 					
@@ -798,6 +800,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						var sUrlPath = "offlinedocs/test-workbook9/";
 						var wb = new Workbook(sUrlPath, this.handlers, this);
 						wb.initGlobalObjects();
+						this.wbModel = wb;
 						var oBinaryFileReader = new BinaryFileReader(sUrlPath);
 						oBinaryFileReader.Read(sData, wb);
 						fCallback({returnCode: 0, val:wb});
@@ -2540,7 +2543,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
                         window['scriptBridge']['loadDocumentFromString'] = function(workbook) {
                             var wb = new Workbook("", t.handlers, t);
                             wb.initGlobalObjects();
-
+							t.wbModel = wb;
                             var oBinaryFileReader = new BinaryFileReader("");
                             oBinaryFileReader.Read(workbook, wb);
 
@@ -2563,7 +2566,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
                     var wb = new Workbook("", t.handlers, t);
                     wb.initGlobalObjects();
-
+					t.wbModel = wb;
                     var oBinaryFileReader = new BinaryFileReader("");
                     oBinaryFileReader.Read(workbook, wb);
 
