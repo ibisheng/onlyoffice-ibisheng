@@ -2875,7 +2875,7 @@ function InitPanelAnimation()
         .focus(function(){editor.asc_enableKeyEvents(false);})
         .blur(function(){editor.asc_enableKeyEvents(true);});
 
-    $("#id_viewer").mousedown(function(){ this.focus(); editor.asc_enableKeyEvents(true);});
+    $("#id_viewer")["mousedown"](function(){ this.focus(); editor.asc_enableKeyEvents(true);});
 }
 
 function AnimationType_Changed()
