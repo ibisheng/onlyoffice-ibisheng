@@ -162,7 +162,7 @@ CDocumentContent.prototype =
 
     Get_PageFields : function(PageIndex)
     {
-        if ( true === this.Parent.Is_Cell() )
+        if ( true === this.Parent.Is_Cell() || this.Parent instanceof WordShape )
         {
             var Y      = this.Pages[PageIndex].Y ;
             var YLimit = this.Pages[PageIndex].YLimit;
@@ -757,19 +757,24 @@ CDocumentContent.prototype =
         return Result;
     },
 
-    Recalculate_MinContentWidth : function()
+    Recalculate_MinMaxContentWidth : function()
     {
         var Min = 0;
+        var Max = 0;
         var Count = this.Content.length;
         for ( var Pos = 0; Pos < Count; Pos++ )
         {
             var Element = this.Content[Pos];
-            var CurMin = Element.Recalculate_MinContentWidth();
-            if ( Min < CurMin )
-                Min = CurMin;
+            var CurMinMax = Element.Recalculate_MinMaxContentWidth();
+
+            if ( Min < CurMinMax.Min )
+                Min = CurMinMax.Min;
+
+            if ( Max < CurMinMax.Max )
+                Max = CurMinMax.Max;
         }
 
-        return Min;
+        return { Min : Min, Max : Max };
     },
 
     ReDraw : function(StartPage, EndPage)

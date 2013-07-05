@@ -537,7 +537,7 @@ function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, 
     this.Content = new Array();
     for ( var Index = 0; Index < Rows; Index++ )
     {
-        this.Content[Index] = new CTableRow( this, Cols );
+        this.Content[Index] = new CTableRow( this, Cols, TableGrid );
     }
 
     this.Internal_ReIndexing(0);
@@ -2796,15 +2796,17 @@ CTable.prototype =
             this.CurCell.Content.RecalculateCurPos();
     },
 
-    Recalculate_MinContentWidth : function()
+    Recalculate_MinMaxContentWidth : function()
     {
-        var MinMargin = new Array(), MinContent = new Array();
+        var MinMargin = new Array(), MinContent = new Array(), MaxContent = new Array(), MaxFlags = new Array();
 
         var GridCount = this.TableGrid.length;
         for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
         {
             MinMargin[CurCol]  = 0;
             MinContent[CurCol] = 0;
+            MaxContent[CurCol] = 0;
+            MaxFlags[CurCol]   = false; // false - ориентируемся на содержимое ячеек, true - ориентируемся только на ширину ячеек записанную в свойствах
         }
 
         var RowsCount = this.Content.length;
@@ -2820,10 +2822,13 @@ CTable.prototype =
             for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
             {
                 var Cell         = Row.Get_Cell( CurCell );
-                var CellMin      = Cell.Content.Recalculate_MinContentWidth();
+                var CellMinMax   = Cell.Content.Recalculate_MinMaxContentWidth();
+                var CellMin      = CellMinMax.Min;
+                var CellMax      = CellMinMax.Max;
                 var GridSpan     = Cell.Get_GridSpan();
                 var CellMargins  = Cell.Get_Margins();
                 var CellMarginsW = CellMargins.Left.W + CellMargins.Right.W;
+                var CellW        = Cell.Get_W();
 
                 // Если GridSpan > 1, тогда все равно маргины учитываются в первую колоноку спана
                 if ( MinMargin[CurGridCol] < CellMarginsW )
@@ -2835,18 +2840,52 @@ CTable.prototype =
                 {
                     if ( MinContent[CurGridCol] < CellMin )
                         MinContent[CurGridCol] = CellMin;
+
+                    if ( false === MaxFlags[CurGridCol] && MaxContent[CurGridCol] < CellMax )
+                        MaxContent[CurGridCol] = CellMax;
+
+                    if ( CellW.Type === tblwidth_Mm )
+                    {
+                        if ( false === MaxFlags[CurGridCol] )
+                        {
+                            MaxFlags[CurGridCol] = true;
+                            MaxContent[CurGridCol] = CellW.W;
+                        }
+                        else if ( MaxContent[CurGridCol] < CellW.W )
+                            MaxContent[CurGridCol] = CellW.W;
+                    }
+
                 }
                 else
                 {
                     var SumSpanMinContent = 0;
+                    var SumSpanMaxContent = 0;
                     for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridSpan; CurSpan++ )
+                    {
                         SumSpanMinContent += MinContent[CurSpan];
+                        SumSpanMaxContent += MaxContent[CurSpan];
+                    }
 
                     if ( SumSpanMinContent < CellMin )
                     {
                         var TempAdd = (CellMin - SumSpanMinContent) / GridSpan;
                         for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridSpan; CurSpan++ )
                             MinContent[CurSpan] += TempAdd;
+                    }
+
+                    // Если у нас в объединении несколько колонок, тогда явно записанная ширина ячейки не
+                    // перекрывает ширину ни одной из колонок, она всего лишь учавствует в определении
+                    // максимальной ширины.
+                    if ( CellW.Type === tblwidth_Mm && CellW.W > CellMax )
+                        CellMax = CellW.W;
+
+                    if ( SumSpanMaxContent < CellMax )
+                    {
+                        // TODO: На самом деле, распределение здесь идет в каком-то отношении.
+                        //       Неплохо было бы выяснить как именно.
+                        var TempAdd = (CellMax - SumSpanMaxContent) / GridSpan;
+                        for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridSpan; CurSpan++ )
+                            MaxContent[CurSpan] += TempAdd;
                     }
                 }
 
@@ -2855,12 +2894,18 @@ CTable.prototype =
         }
 
         var Min = 0;
+        var Max = 0;
         for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
         {
             Min += MinMargin[CurCol] + MinContent[CurCol];
+
+            if ( false === MaxFlags[CurCol] )
+                Max += MinMargin[CurCol] + MaxContent[CurCol];
+            else
+                Max += MaxContent[CurCol];
         }
 
-        return Min;
+        return { Min : Min, Max : Max };
     },
 
     Draw : function(nPageIndex, pGraphics)
@@ -11303,7 +11348,7 @@ CTable.prototype =
             if ( 0 === Dx )
                 return;
 
-            // Пока сделаем так, в будующем надо будет менять ширину таблицы
+            // Пока сделаем так, в будущем надо будет менять ширину таблицы
             if ( 0 != Index && TablePr.TableW.Type != tblwidth_Auto )
             {
                 var TableW = TablePr.TableW.W;
@@ -11595,13 +11640,15 @@ CTable.prototype =
             //---------------------------------------------------------------------------
             // 2 часть пересчета ширины таблицы : Рассчитываем ширину по содержимому
             //---------------------------------------------------------------------------
-            var MinMargin = new Array(), MinContent = new Array();
+            var MinMargin = new Array(), MinContent = new Array(), MaxContent = new Array(), MaxFlags = new Array();
 
             var GridCount = this.TableGridCalc.length;
             for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
             {
                 MinMargin[CurCol]  = 0;
                 MinContent[CurCol] = 0;
+                MaxContent[CurCol] = 0;
+                MaxFlags[CurCol]   = false; // false - ориентируемся на содержимое ячеек, true - ориентируемся только на ширину ячеек записанную в свойствах
             }
 
             // 1. Рассчитаем MinContent и MinMargin для всех колонок таблицы, причем, если
@@ -11622,10 +11669,13 @@ CTable.prototype =
                 for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
                 {
                     var Cell         = Row.Get_Cell( CurCell );
-                    var CellMin      = Cell.Content.Recalculate_MinContentWidth();
+                    var CellMinMax   = Cell.Content.Recalculate_MinMaxContentWidth();
+                    var CellMin      = CellMinMax.Min;
+                    var CellMax      = CellMinMax.Max;
                     var GridSpan     = Cell.Get_GridSpan();
                     var CellMargins  = Cell.Get_Margins();
                     var CellMarginsW = CellMargins.Left.W + CellMargins.Right.W;
+                    var CellW        = Cell.Get_W();
 
                     // Если GridSpan > 1, тогда все равно маргины учитываются в первую колоноку спана
                     if ( MinMargin[CurGridCol] < CellMarginsW )
@@ -11637,18 +11687,51 @@ CTable.prototype =
                     {
                         if ( MinContent[CurGridCol] < CellMin )
                             MinContent[CurGridCol] = CellMin;
+
+                        if ( false === MaxFlags[CurGridCol] && MaxContent[CurGridCol] < CellMax )
+                            MaxContent[CurGridCol] = CellMax;
+
+                        if ( CellW.Type === tblwidth_Mm )
+                        {
+                            if ( false === MaxFlags[CurGridCol] )
+                            {
+                                MaxFlags[CurGridCol] = true;
+                                MaxContent[CurGridCol] = CellW.W;
+                            }
+                            else if ( MaxContent[CurGridCol] < CellW.W )
+                                MaxContent[CurGridCol] = CellW.W;
+                        }
                     }
                     else
                     {
                         var SumSpanMinContent = 0;
+                        var SumSpanMaxContent = 0;
                         for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridSpan; CurSpan++ )
+                        {
                             SumSpanMinContent += MinContent[CurSpan];
+                            SumSpanMaxContent += MaxContent[CurSpan];
+                        }
 
                         if ( SumSpanMinContent < CellMin )
                         {
                             var TempAdd = (CellMin - SumSpanMinContent) / GridSpan;
                             for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridSpan; CurSpan++ )
                                 MinContent[CurSpan] += TempAdd;
+                        }
+
+                        // Если у нас в объединении несколько колонок, тогда явно записанная ширина ячейки не
+                        // перекрывает ширину ни одной из колонок, она всего лишь учавствует в определении
+                        // максимальной ширины.
+                        if ( CellW.Type === tblwidth_Mm && CellW.W > CellMax )
+                            CellMax = CellW.W;
+
+                        if ( SumSpanMaxContent < CellMax )
+                        {
+                            // TODO: На самом деле, распределение здесь идет в каком-то отношении.
+                            //       Неплохо было бы выяснить как именно.
+                            var TempAdd = (CellMax - SumSpanMaxContent) / GridSpan;
+                            for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridSpan; CurSpan++ )
+                                MaxContent[CurSpan] += TempAdd;
                         }
                     }
 
@@ -11662,48 +11745,78 @@ CTable.prototype =
                 }
             }
 
-            // 2. Проследим, чтобы MinContent + MinMargin не превосходило значение 55,87см(так работает Word)
+            for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
+            {
+                if ( true === MaxFlags[CurCol] )
+                    MaxContent[CurCol] = Math.max( 0, MaxContent[CurCol] - MinMargin[CurCol] );
+            }
+
+            // 2. Проследим, чтобы значения MinContent + MinMargin и MaxContent + MinMargin не превосходили
+            //    значение 55,87см(так работает Word)
             for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
             {
                 if ( MinMargin[CurCol] + MinContent[CurCol] > 558.7 )
                     MinContent[CurCol] = Math.max(558.7 - MinMargin[CurCol] , 0);
+
+                if ( MinMargin[CurCol] + MaxContent[CurCol] > 558.7 )
+                    MaxContent[CurCol] = Math.max(558.7 - MinMargin[CurCol] , 0);
             }
 
             // 3. Рассчитаем максимально допустимую ширину под всю таблицу
-            var PageFields = this.Parent.Get_PageFields( this.PageNum + this.Get_StartPage_Absolute() );
-            var MaxTableW = PageFields.XLimit - PageFields.X;
+            var PageFields = this.Parent.Get_PageFields( this.PageNum );
+            var MaxTableW = PageFields.XLimit - PageFields.X - TablePr.TableInd;
             if ( null === TopTable )
                 MaxTableW += LeftMargin + RightMargin; // Добавляем левый маргин первой ячейки + правый маргин правой ячейки для верхних таблиц
 
+            var TableSpacing = this.Content[0].Get_CellSpacing();
+            if ( null != TableSpacing )
+                MaxTableW += 2 * TableSpacing;
+
             // 4. Рассчитаем желаемую ширину таблицы таблицы
-            var SumMin = 0, SumMinMargin = 0, SumMinContent = 0;
+            var MaxContent2 = new Array();
+            var SumMin = 0, SumMinMargin = 0, SumMinContent = 0, SumMax = 0, SumMaxContent2 = 0;
             var TableGrid2 = new Array();
             for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
             {
                 var Temp = MinMargin[CurCol] + MinContent[CurCol];
                 if ( Temp < this.TableGridCalc[CurCol] )
                 {
-                    SumMin += this.TableGridCalc[CurCol];
                     TableGrid2[CurCol] = this.TableGridCalc[CurCol];
                 }
                 else
                 {
-                    SumMin += Temp;
                     TableGrid2[CurCol] = Temp;
                 }
 
-                SumMinMargin  += MinMargin[CurCol];
-                SumMinContent += MinContent[CurCol];
+                MaxContent2[CurCol] = Math.max( 0, MaxContent[CurCol] - MinContent[CurCol] );
+
+                SumMin         += Temp;
+                SumMaxContent2 += MaxContent2[CurCol];
+                SumMinMargin   += MinMargin[CurCol];
+                SumMinContent  += MinContent[CurCol];
+                SumMax         += MinMargin[CurCol] + MinContent[CurCol] + MaxContent2[CurCol];
             }
 
             if ( SumMin < MaxTableW )
             {
-                // Найдем колонки, в которых MinMargin[CurCol] + MinContent[CurCol] > this.TableGridCalc[CurCol], сделаем их
-                // ширину равной MinMargin[CurCol] + MinContent[CurCol], а остальные равномерно уменьшим
-                for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
+                // SumMin < MaxTableW, значит у нас есть свободное пространство для распределения
+                // Если SumMax < MaxTableW, тогда все колонки делаем по ширине MaxContent[CurCol] + MinMargin[CurCol],
+                // в противном случаем значение (MaxTableW - SumMin) распределяем между колонками в отношении
+                // MaxContent[CurCol] / SumMaxContent
+
+                if ( SumMax <= MaxTableW || SumMaxContent2 < 0.001 )
                 {
-                    if ( MinMargin[CurCol] + MinContent[CurCol] > this.TableGridCalc[CurCol] )
-                        this.TableGridCalc[CurCol] = MinMargin[CurCol] + MinContent[CurCol];
+                    for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
+                    {
+                        this.TableGridCalc[CurCol] = MinMargin[CurCol] + Math.max(MinContent[CurCol], MaxContent[CurCol]);
+                    }
+                }
+                else
+                {
+                    for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
+                    {
+                        this.TableGridCalc[CurCol] = MinMargin[CurCol] + MinContent[CurCol] + (MaxTableW - SumMin) * MaxContent2[CurCol] / SumMaxContent2;
+                    }
                 }
             }
             else
@@ -16492,7 +16605,7 @@ CTable.prototype =
                     {
                         var W = 0;
                         for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridSpan; CurSpan++ )
-                            W += this.TableGridCalc[CurSpan];
+                            W += this.TableGrid[CurSpan];
 
                         Cell.Set_W( new CTableMeasurement( tblwidth_Mm, W ) );
                     }
@@ -17275,7 +17388,7 @@ CTable.prototype =
 };
 
 // Класс CTableRow
-function CTableRow(Table, Cols)
+function CTableRow(Table, Cols, TableGrid)
 {
     this.Id = g_oIdCounter.Get_NewId();
 
@@ -17287,7 +17400,8 @@ function CTableRow(Table, Cols)
     this.Content = new Array();
     for ( var Index = 0; Index < Cols; Index++ )
     {
-        this.Content[Index] = new CTableCell( this );
+        var ColW = ( undefined != TableGrid && undefined != TableGrid[Index] ? TableGrid[Index] : undefined );
+        this.Content[Index] = new CTableCell( this, ColW );
     }
 
     this.Internal_ReIndexing();
@@ -18570,7 +18684,7 @@ CTableRow.prototype =
 };
 
 // Класс CTableCell
-function CTableCell(Row)
+function CTableCell(Row, ColW)
 {
     this.Id = g_oIdCounter.Get_NewId();
 
@@ -18590,6 +18704,9 @@ function CTableCell(Row)
         NeedRecalc : true
     };
     this.Pr = new CTableCellPr();
+
+    if ( undefined != ColW )
+        this.Pr.TableCellW = new CTableMeasurement(tblwidth_Mm, ColW);
 
     // Массивы с рассчитанными стилями для границ данной ячейки.
     // В каждом элементе лежит массив стилей.
