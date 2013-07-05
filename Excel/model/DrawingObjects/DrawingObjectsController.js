@@ -213,6 +213,16 @@ DrawingObjectsController.prototype =
                 this.changeCurrentState(new SplineBezierState(this, this.drawingObjects));
                 break;
             }
+            case "polyline1":
+            {
+                this.changeCurrentState(new PolyLineAddState(this, this.drawingObjects));
+                break;
+            }
+            case "polyline2":
+            {
+                this.changeCurrentState(new AddPolyLine2State(this, this.drawingObjects));
+                break;
+            }
             default :
             {
                 this.changeCurrentState(new StartTrackNewShapeState(this, this.drawingObjects, presetGeom));

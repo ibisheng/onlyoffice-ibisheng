@@ -32,6 +32,9 @@ function PolyLine (drawingObjects)
     }
 
     this.pen = _calculated_line;
+
+    this.polylineForDrawer = new PolylineForDrawer(this);
+
     this.Draw = function(graphics)
     {
         graphics.SetIntegerGrid(false);
@@ -43,6 +46,8 @@ function PolyLine (drawingObjects)
     };
     this.draw = function(g)
     {
+        this.polylineForDrawer.Draw(g);
+        return;
         if(this.arrPoint.length < 2)
         {
             return;
@@ -96,7 +101,7 @@ function PolyLine (drawingObjects)
         {
             var dx = this.arrPoint[0].x - this.arrPoint[this.arrPoint.length-1].x;
             var dy = this.arrPoint[0].y - this.arrPoint[this.arrPoint.length-1].y;
-            if(Math.sqrt(dx*dx +dy*dy) < this.document.DrawingDocument.GetMMPerDot(3))
+            if(Math.sqrt(dx*dx +dy*dy) < this.drawingObjects.convertMetric(3, 0, 3))
             {
                 bClosed = true;
             }
@@ -126,16 +131,12 @@ function PolyLine (drawingObjects)
 
 
 
-        var wordGraphicObject = new ParaDrawing(null, null, null, document.DrawingDocument, null, document);
-        var wordShape = new WordShape(wordGraphicObject, document, document.DrawingDocument, null);
-        /*W, H, GraphicObj, Drawing*/
 
-        wordGraphicObject.Set_GraphicObject(wordShape);
-        wordShape.pageIndex = this.pageIndex;
+        var shape = new CShape(null, this.drawingObjects);
 
-        wordShape.setAbsoluteTransform(xMin, yMin, xMax-xMin, yMax-yMin, 0, false, false);
-        wordShape.setXfrm(0, 0, xMax-xMin, yMax-yMin, 0, false, false);
-        wordShape.style = CreateDefaultShapeStyle();
+        shape.setPosition(xMin, yMin);
+        shape.setExtents(xMax-xMin, yMax-yMin);
+        shape.setStyle(CreateDefaultShapeStyle());
         var geometry = new CGeometry();
 
         geometry.AddPathCommand(0, undefined, bClosed ? "norm": "none", undefined, xMax - xMin, yMax-yMin);
@@ -150,36 +151,42 @@ function PolyLine (drawingObjects)
             geometry.AddPathCommand(6);
         }
         geometry.Init( xMax-xMin, yMax-yMin);
-        wordShape.spPr.geometry = geometry;
-        wordShape.calculate();
-        wordShape.calculateTransformMatrix();
-        wordGraphicObject.setZIndex();
-        wordGraphicObject.setPageIndex(this.pageIndex);
+        shape.spPr.geometry = geometry;
+        shape.recalculate();
 
-
-        var data = {Type:historyitem_CreatePolyine};
-        data.xMax = xMax;
-        data.xMin = xMin;
-        data.yMax = yMax;
-        data.yMin = yMin;
-        data.bClosed = bClosed;
-        data.commands = [];
-        data.commands.push({id: 1, x: (this.arrPoint[0].x - xMin) + "", y:(this.arrPoint[0].y - yMin) + ""});
-        for(i = 1;  i< _n; ++i)
-        {
-            data.commands.push({id: 2, x: (this.arrPoint[i].x - xMin) + "", y:(this.arrPoint[i].y - yMin) + ""});
-        }
-        History.Add(wordShape, data);
-        History.Add(wordGraphicObject, {Type: historyitem_CalculateAfterPaste});
-        return wordGraphicObject;
+        this.drawingObjects.addGraphicObject(shape);
     }
 }
 
-function PolyLineAdapter(drawingObjects)
+function PolylineForDrawer(polyline)
 {
-    this.polyLine = new PolyLine (drawingObjects);
-    this.draw = function(graphics)
+    this.polyline = polyline;
+    this.pen = polyline.pen;
+    this.brush = polyline.brush;
+    this.TransformMatrix = polyline.TransformMatrix;
+    this.Matrix = polyline.Matrix;
+
+    this.Draw = function(graphics)
     {
-        this.polyLine.Draw(graphics);
-    }
+        graphics.SetIntegerGrid(false);
+        graphics.transform3(this.Matrix);
+
+        var shape_drawer = new CShapeDrawer();
+        shape_drawer.fromShape(this, graphics);
+        shape_drawer.draw(this);
+    };
+    this.draw = function(g)
+    {
+        g._e();
+        if(this.polyline.arrPoint.length < 2)
+        {
+            return;
+        }
+        g._m(this.polyline.arrPoint[0].x, this.polyline.arrPoint[0].y);
+        for(var i = 1; i < this.polyline.arrPoint.length; ++i)
+        {
+            g._l(this.polyline.arrPoint[i].x, this.polyline.arrPoint[i].y);
+        }
+        g.ds();
+    };
 }
