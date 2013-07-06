@@ -1835,8 +1835,14 @@ $(".colorWatch").mouseover(function(){
 	})	
 	$("#prKeepLines").click(function(){
 		editor.put_KeepLines(document.getElementById("prKeepLines").checked);
-	})	
-	$("#prPageBreak").click(function(){
+	})
+
+     $("#prKeepNext").click(function()
+     {
+         editor.put_KeepNext(document.getElementById("prKeepNext").checked);
+     })
+
+     $("#prPageBreak").click(function(){
 		editor.put_PageBreak(document.getElementById("prPageBreak").checked);
 	})
 
@@ -2780,9 +2786,10 @@ $(".colorWatch").mouseover(function(){
 					}
 
 					document.getElementById("prIntervBetween").checked = elemVal.ContextualSpacing;
-					document.getElementById("prKeepLines").checked = elemVal.KeepLines;
-					document.getElementById("prPageBreak").checked = elemVal.PageBreakBefore;
-                    document.getElementById("prWidowControl").checked = elemVal.WidowControl;
+					document.getElementById("prKeepLines").checked     = elemVal.KeepLines;
+                    document.getElementById("prKeepNext").checked      = elemVal.KeepNext;
+					document.getElementById("prPageBreak").checked     = elemVal.PageBreakBefore;
+                    document.getElementById("prWidowControl").checked  = elemVal.WidowControl;
 				}
                 else if ( ObjectType == c_oAscTypeSelectElement.Hyperlink )
                 {

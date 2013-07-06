@@ -171,6 +171,13 @@ WordShape.prototype =
             this.textBoxContent.Set_ParagraphKeepLines(Value);
     },
 
+    setParagraphKeepNext: function(Value)
+    {
+        if(isRealObject(this.textBoxContent))
+            this.textBoxContent.Set_ParagraphKeepNext(Value);
+    },
+
+
     setParagraphWidowControl: function(Value)
     {
         if(isRealObject(this.textBoxContent))

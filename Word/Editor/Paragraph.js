@@ -1,11 +1,3 @@
-// TODO: Что надо сделать в параграфе:
-//       0. !!!!! Сделать статистику следующих элементов: Число слов, Абзацев, Знаков, Знаков и пробелов.
-//       1. При пересчете параграфа, если он начинается с новой страницы, тогда не надо вверху добавлять
-//          расстояние. Аналогично, не надо добавлять расстояние после параграфа при проверке, убирается
-//          ли он на странице.
-//       2. Реализовать неразрывный параграф.
-//       3. Сделать обработку висячих строк.
-
 // При добавлении нового элемента ParagraphContent, добавить его обработку в
 // следующие функции:
 // Internal_Recalculate1, Internal_Recalculate2, Draw, Internal_RemoveBackward,
@@ -939,38 +931,54 @@ Paragraph.prototype =
         else
             XEnd = Ranges[0].X0;
 
-        // Начинаем параграф с новой страницы
-        if ( 0 === CurPage && true === ParaPr.PageBreakBefore && this.Parent === editor.WordControl.m_oLogicDocument )
+        if ( this.Parent instanceof CDocument )
         {
-            // Если это первый элемент документа, тогда не надо начинать его с новой страницы
-            var Prev = this.Get_DocumentPrev();
-            if ( null != Prev )
+            // Начинаем параграф с новой страницы
+            if ( 0 === CurPage && true === ParaPr.PageBreakBefore )
             {
-                // Добавляем разрыв страницы
-                this.Pages[CurPage].Set_EndLine( CurLine - 1 );
-
-                if (  0 === CurLine )
+                // Если это первый элемент документа, тогда не надо начинать его с новой страницы
+                var Prev = this.Get_DocumentPrev();
+                if ( null != Prev )
                 {
-                    this.Lines[-1] = new CParaLine(0);
-                    this.Lines[-1].Set_EndPos( StartPos - 1, this );
+                    // Добавляем разрыв страницы
+                    this.Pages[CurPage].Set_EndLine( CurLine - 1 );
+
+                    if (  0 === CurLine )
+                    {
+                        this.Lines[-1] = new CParaLine(0);
+                        this.Lines[-1].Set_EndPos( StartPos - 1, this );
+                    }
+
+                    return recalcresult_NextPage;
+                }
+            }
+            else if  ( this === this.Parent.RecalcInfo.WidowControlParagraph && CurLine === this.Parent.RecalcInfo.WidowControlLine )
+            {
+                this.Parent.RecalcInfo.WidowControlParagraph = null;
+                this.Parent.RecalcInfo.WidowControlLine      = -1;
+
+                this.Pages[CurPage].Set_EndLine( CurLine - 1 );
+                if ( 0 === CurLine )
+                {
+                    this.Lines[-1] = new CParaLine( 0 );
+                    this.Lines[-1].Set_EndPos( LineStart_Pos - 1, this );
                 }
 
                 return recalcresult_NextPage;
             }
-        }
-        else if  ( this === this.Parent.RecalcInfo.WidowControlParagraph && CurLine === this.Parent.RecalcInfo.WidowControlLine )
-        {
-            this.Parent.RecalcInfo.WidowControlParagraph = null;
-            this.Parent.RecalcInfo.WidowControlLine      = -1;
-
-            this.Pages[CurPage].Set_EndLine( CurLine - 1 );
-            if ( 0 === CurLine )
+            else if ( this === this.Parent.RecalcInfo.KeepNextParagraph && 0 === CurPage && null != this.Get_DocumentPrev() )
             {
-                this.Lines[-1] = new CParaLine( 0 );
-                this.Lines[-1].Set_EndPos( LineStart_Pos - 1, this );
-            }
+                this.Parent.RecalcInfo.KeepNextParagraph = null;
 
-            return recalcresult_NextPage;
+                this.Pages[CurPage].Set_EndLine( CurLine - 1 );
+                if ( 0 === CurLine )
+                {
+                    this.Lines[-1] = new CParaLine( 0 );
+                    this.Lines[-1].Set_EndPos( LineStart_Pos - 1, this );
+                }
+
+                return recalcresult_NextPage;
+            }
         }
 
         var RecalcResult = recalcresult_NextElement;
@@ -2177,7 +2185,7 @@ Paragraph.prototype =
                 if ( (Top > this.YLimit || Bottom2 > this.YLimit ) && ( CurLine != this.Pages[CurPage].FirstLine || ( 0 === CurPage && ( null != this.Get_DocumentPrev() || true === this.Parent.Is_TableCellContent() ) ) ) && false === bBreakPageLineEmpty )
                 {
                     // Проверим висячую строку
-                    if ( true === ParaPr.WidowControl && CurLine - this.Pages[CurPage].StartLine <= 1 && CurLine >= 1 && true != bBreakPageLine )
+                    if ( this.Parent instanceof CDocument && true === ParaPr.WidowControl && CurLine - this.Pages[CurPage].StartLine <= 1 && CurLine >= 1 && true != bBreakPageLine )
                     {
                         this.Parent.RecalcInfo.WidowControlParagraph = this;
                         this.Parent.RecalcInfo.WidowControlLine      = CurLine - 1;
@@ -2398,7 +2406,7 @@ Paragraph.prototype =
                             this.Lines[CurLine].Set_EndPos( Pos, this );
                             CurLine++;
 
-                            if ( this === this.Parent.RecalcInfo.WidowControlParagraph && CurLine === this.Parent.RecalcInfo.WidowControlLine )
+                            if ( this.Parent instanceof CDocument && this === this.Parent.RecalcInfo.WidowControlParagraph && CurLine === this.Parent.RecalcInfo.WidowControlLine )
                             {
                                 this.Parent.RecalcInfo.WidowControlParagraph = null;
                                 this.Parent.RecalcInfo.WidowControlLine      = -1;
@@ -2501,7 +2509,7 @@ Paragraph.prototype =
                                 }
                             }
 
-                            if ( false === bBreakPagePrevLine )
+                            if ( this.Parent instanceof CDocument && false === bBreakPagePrevLine )
                             {
                                 this.Parent.RecalcInfo.WidowControlParagraph = this;
                                 this.Parent.RecalcInfo.WidowControlLine      = ( CurLine > 2 ? CurLine - 1 : 0 ); // Если у нас в параграфе 3 строки, тогда сразу начинаем параграф с новой строки
@@ -3342,6 +3350,39 @@ Paragraph.prototype =
                 StartPos = 0;
         }
 
+        // Если параграф начинается с новой страницы
+        if ( 1 === CurPage && this.Pages[0].EndLine < 0 && this.Parent instanceof CDocument )
+        {
+            // Если у предыдущего параграфа стоит настройка "не отрывать от следующего".
+            // И сам параграф не разбит на несколько страниц и не начинается с новой страницы,
+            // тогда мы должны пересчитать предыдущую страницу, с учетом того, что предыдущий параграф
+            // надо начать с новой страницы.
+            var Curr = this.Get_DocumentPrev();
+            while ( null != Curr && type_Paragraph === Curr.GetType() )
+            {
+                var CurrKeepNext = Curr.Get_CompiledPr2(false).ParaPr.KeepNext;
+                if ( (true === CurrKeepNext && Curr.Pages.length > 1) || false === CurrKeepNext )
+                {
+                    break;
+                }
+                else
+                {
+                    var Prev = Curr.Get_DocumentPrev();
+                    if ( null === Prev || type_Paragraph != Prev.GetType() )
+                        break;
+
+                    var PrevKeepNext = Prev.Get_CompiledPr2(false).ParaPr.KeepNext;
+                    if ( false === PrevKeepNext )
+                    {
+                        this.Parent.RecalcInfo.KeepNextParagraph = Curr;
+                        return recalcresult_PrevPage;
+                    }
+                    else
+                        Curr = Prev;
+                }
+            }
+        }
+
         // Подготавливаем контент параграфа к новому пересчету:
         //  1. Если у нас есть нумерация в параграфе, то переносим ее в начало. (это делаем на пересчете первой страницы)
         //  2. Удаляем все рассчитанные переносы строк, внутренние переносы, переносы страниц
@@ -3623,8 +3664,7 @@ Paragraph.prototype =
 
     Internal_Draw_2 : function(CurPage, pGraphics, Pr)
     {
-        // TODO: Как только будет поддержка параметра KeepNext раскоментировать тут.
-        if ( true === editor.ShowParaMarks && ( ( 0 === CurPage && ( this.Pages.length <= 1 || this.Pages[1].FirstLine > 0 ) ) || ( 1 === CurPage && this.Pages.length > 1 && this.Pages[1].FirstLine === 0 ) ) && ( /*true === Pr.ParaPr.KeepNext ||*/ true === Pr.ParaPr.KeepLines || true === Pr.ParaPr.PageBreakBefore ) )
+        if ( true === editor.ShowParaMarks && ( ( 0 === CurPage && ( this.Pages.length <= 1 || this.Pages[1].FirstLine > 0 ) ) || ( 1 === CurPage && this.Pages.length > 1 && this.Pages[1].FirstLine === 0 ) ) && ( true === Pr.ParaPr.KeepNext || true === Pr.ParaPr.KeepLines || true === Pr.ParaPr.PageBreakBefore ) )
         {
             var SpecFont = { FontFamily: { Name : "Arial", Index : -1 }, FontSize : 12, Italic : false, Bold : false };
             var SpecSym = String.fromCharCode( 0x25AA );

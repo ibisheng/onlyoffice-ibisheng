@@ -4301,6 +4301,17 @@ ParaDrawing.prototype =
             return this.GraphicObj.setParagraphKeepLines(Value);
     },
 
+    setParagraphKeepNext: function(Value)
+    {
+        if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.setParagraphKeepNext === "function")
+            return this.GraphicObj.setParagraphKeepNext(Value);
+    },
+
+    setParagraphWidowControl: function(Value)
+    {
+        if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.setParagraphWidowControl === "function")
+            return this.GraphicObj.setParagraphWidowControl(Value);
+    },
 
     setParagraphPageBreakBefore: function(Value)
     {

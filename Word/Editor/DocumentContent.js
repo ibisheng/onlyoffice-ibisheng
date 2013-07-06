@@ -34,11 +34,7 @@ function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, 
     {
         FlowObject                : null,   // Текущий float-объект, который мы пересчитываем
         FlowObjectPageBreakBefore : false,  // Нужно ли перед float-объектом поставить pagebreak
-        FlowObjectPage            : 0,
-
-        WidowControlParagraph     : null,   // Параграф, который мы пересчитываем из-за висячих строк
-        WidowControlLine          : -1      // Номер строки, перед которой надо поставить разрыв страницы
-
+        FlowObjectPage            : 0
     };
 
     this.Split = Split; // Разделяем ли на страницы
@@ -4740,6 +4736,82 @@ CDocumentContent.prototype =
             }
             else if ( type_Table == Item.GetType() )
                 Item.Set_ParagraphKeepLines( Value );
+        }
+    },
+
+    Set_ParagraphKeepNext : function(Value)
+    {
+        if ( true === this.ApplyToAll )
+        {
+            for ( var Index = 0; Index < this.Content.length; Index++ )
+            {
+                var Item = this.Content[Index];
+                Item.Set_ApplyToAll(true);
+                if ( type_Paragraph == Item.GetType() )
+                    Item.Set_KeepNext( Value );
+                else if ( type_Table == Item.GetType() )
+                {
+                    Item.TurnOff_RecalcEvent();
+                    Item.Set_ParagraphKeepNext( Value );
+                    Item.TurnOn_RecalcEvent();
+                }
+                Item.Set_ApplyToAll(false);
+            }
+
+            return;
+        }
+
+        if ( docpostype_DrawingObjects === this.CurPos.Type )
+            return this.LogicDocument.DrawingObjects.setParagraphKeepNext( Value );
+        else //if ( docpostype_Content === this.CurPos.Type )
+        {
+            if ( this.CurPos.ContentPos < 0 )
+                return false;
+
+            if ( true === this.Selection.Use )
+            {
+                var StartPos = this.Selection.StartPos;
+                var EndPos   = this.Selection.EndPos;
+                if ( EndPos < StartPos )
+                {
+                    var Temp = StartPos;
+                    StartPos = EndPos;
+                    EndPos   = Temp;
+                }
+
+                for ( var Index = StartPos; Index <= EndPos; Index++ )
+                {
+                    var Item = this.Content[Index];
+                    if ( type_Paragraph == Item.GetType() )
+                        Item.Set_KeepNext( Value );
+                    else if ( type_Table == Item.GetType() )
+                    {
+                        Item.TurnOff_RecalcEvent();
+                        Item.Set_ParagraphKeepNext( Value );
+                        Item.TurnOn_RecalcEvent();
+                    }
+                }
+                // Нам нужно пересчитать все изменения, начиная с первого элемента,
+                // попавшего в селект.
+                this.ContentLastChangePos = StartPos;
+
+                this.Recalculate();
+
+                return;
+            }
+
+            var Item = this.Content[this.CurPos.ContentPos];
+            if ( type_Paragraph == Item.GetType() )
+            {
+                Item.Set_KeepNext( Value );
+
+                // Нам нужно пересчитать все изменения, начиная с текущего элемента
+                this.ContentLastChangePos = this.CurPos.ContentPos;
+
+                this.Recalculate();
+            }
+            else if ( type_Table == Item.GetType() )
+                Item.Set_ParagraphKeepNext( Value );
         }
     },
 
