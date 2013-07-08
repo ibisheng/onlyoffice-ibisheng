@@ -31,6 +31,8 @@ CTxBody.prototype =
         return this.shape.Get_Styles(level);
     },
 
-    paragraphAdd: function()
-    {}
+    paragraphAdd: function(paraItem)
+    {
+        this.content.Paragraph_Add(paraItem);
+    }
 };

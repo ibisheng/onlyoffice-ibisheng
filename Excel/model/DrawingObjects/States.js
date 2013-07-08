@@ -204,8 +204,12 @@ function NullState(drawingObjectsController, drawingObjects)
         var selected_objects = this.drawingObjectsController.selectedObjects;
         if(selected_objects.length === 1 && selected_objects[0].isShape())
         {
-           // selected_objects[0].
+
         }
+    };
+
+    this.onKeyPress = function(e)
+    {
     };
 
     this.drawSelection = function(drawingDocument)
@@ -379,6 +383,10 @@ function RotateState(drawingObjectsController, drawingObjects, majorObject)
 		asc["editor"].asc_endAddShape();
     };
 
+    this.onKeyPress = function(e)
+    {
+    };
+
     this.onKeyDown = function(e)
     {
 
@@ -417,6 +425,8 @@ function PreResizeState(drawingObjectsController, drawingObjects, majorObject, c
         this.drawingObjectsController.clearPreTrackObjects();
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
     };
+
+
     this.drawSelection = function(drawingDocument)
     {
         DrawDefaultSelection(this.drawingObjectsController, drawingDocument);
@@ -425,6 +435,10 @@ function PreResizeState(drawingObjectsController, drawingObjects, majorObject, c
     this.onKeyDown = function(e)
     {
 
+    };
+
+    this.onKeyPress = function(e)
+    {
     };
 
     this.isPointInDrawingObjects = function(x, y)
@@ -474,6 +488,10 @@ function ResizeState(drawingObjectsController, drawingObjects, majorObject, card
 
     };
 
+    this.onKeyPress = function(e)
+    {
+    };
+
     this.isPointInDrawingObjects = function(x, y)
     {
         return {objectId: this.majorObject.drawingBase.id, cursorType: CURSOR_TYPES_BY_CARD_DIRECTION[this.cardDirection]};
@@ -504,6 +522,10 @@ function StartTrackNewShapeState(drawingObjectsController, drawingObjects, prese
     this.onKeyDown = function(e)
     {
 
+    };
+
+    this.onKeyPress = function(e)
+    {
     };
 
     this.drawSelection = function(drawingDocument)
@@ -687,6 +709,10 @@ function TrackNewShapeState(drawingObjectsController, drawingObjects)
 
     };
 
+    this.onKeyPress = function(e)
+    {
+    };
+
     this.drawSelection = function(drawingDocument)
     {
         DrawDefaultSelection(this.drawingObjectsController, drawingDocument);
@@ -774,6 +800,10 @@ function PreMoveState(drawingObjectsController, drawingObjects, startX, startY, 
 
     };
 
+    this.onKeyPress = function(e)
+    {
+    };
+
     this.drawSelection = function(drawingDocument)
     {
         DrawDefaultSelection(this.drawingObjectsController, drawingDocument);
@@ -826,6 +856,10 @@ function MoveState(drawingObjectsController, drawingObjects, startX, startY, rec
 
     };
 
+    this.onKeyPress = function(e)
+    {
+    };
+
     this.drawSelection = function(drawingDocument)
     {
         DrawDefaultSelection(this.drawingObjectsController, drawingDocument);
@@ -867,6 +901,10 @@ function PreChangeAdjState(drawingObjectsController, drawingObjects)
     this.onKeyDown = function(e)
     {
 
+    };
+
+    this.onKeyPress = function(e)
+    {
     };
 
     this.drawSelection = function(drawingDocument)
@@ -911,6 +949,10 @@ function ChangeAdjState(drawingObjectsController, drawingObjects)
     this.onKeyDown = function(e)
     {
 
+    };
+
+    this.onKeyPress = function(e)
+    {
     };
 
     this.drawSelection = function(drawingDocument)
@@ -1144,6 +1186,10 @@ function GroupState(drawingObjectsController, drawingObjects, group)
 
     };
 
+    this.onKeyPress = function(e)
+    {
+    };
+
     this.drawSelection = function(drawingDocument)
     {
         DrawGroupSelection(this.group, drawingDocument);
@@ -1349,6 +1395,10 @@ function PreMoveInGroupState(drawingObjectsController, drawingObjects, group, st
 
     };
 
+    this.onKeyPress = function(e)
+    {
+    };
+
     this.drawSelection = function(drawingDocument)
     {
         DrawGroupSelection(this.group, drawingDocument);
@@ -1406,6 +1456,10 @@ function MoveInGroupState(drawingObjectsController, drawingObjects, group, start
 
     };
 
+    this.onKeyPress = function(e)
+    {
+    };
+
     this.drawSelection = function(drawingDocument)
     {
         DrawGroupSelection(this.group, drawingDocument);
@@ -1441,6 +1495,10 @@ function PreChangeAdjInGroupState(drawingObjectsController, drawingObjects, grou
     this.onKeyDown = function(e)
     {
 
+    };
+
+    this.onKeyPress = function(e)
+    {
     };
 
     this.drawSelection = function(drawingDocument)
@@ -1484,6 +1542,10 @@ function ChangeAdjInGroupState(drawingObjectsController, drawingObjects, group)
 
     };
 
+    this.onKeyPress = function(e)
+    {
+    };
+
     this.drawSelection = function(drawingDocument)
     {
         DrawGroupSelection(this.group, drawingDocument);
@@ -1519,6 +1581,10 @@ function PreRotateInGroupState(drawingObjectsController, drawingObjects, group, 
     this.onKeyDown = function(e)
     {
 
+    };
+
+    this.onKeyPress = function(e)
+    {
     };
 
     this.drawSelection = function(drawingDocument)
@@ -1566,6 +1632,10 @@ function RotateInGroupState(drawingObjectsController, drawingObjects, group, maj
 
     };
 
+    this.onKeyPress = function(e)
+    {
+    };
+
     this.drawSelection = function(drawingDocument)
     {
         DrawGroupSelection(this.group, drawingDocument);
@@ -1603,6 +1673,10 @@ function PreResizeInGroupState(drawingObjectsController, drawingObjects, group, 
     this.onKeyDown = function(e)
     {
 
+    };
+
+    this.onKeyPress = function(e)
+    {
     };
 
     this.drawSelection = function(drawingDocument)
@@ -1648,8 +1722,10 @@ function ResizeInGroupState(drawingObjectsController, drawingObjects, group, maj
     };
 
     this.onKeyDown = function(e)
-    {
+    {};
 
+    this.onKeyPress = function(e)
+    {
     };
 
     this.drawSelection = function(drawingDocument)
@@ -1696,6 +1772,11 @@ function SplineBezierState(drawingObjectsController, drawingObjects)
 
     };
 
+
+    this.onKeyPress = function(e)
+    {
+    };
+
     this.isPointInDrawingObjects = function(x, y)
     {
         return null/*TODO*/;
@@ -1738,6 +1819,10 @@ function SplineBezierState33(drawingObjectsController, drawingObjects, startX, s
     this.onKeyDown = function(e)
     {
 
+    };
+
+    this.onKeyPress = function(e)
+    {
     };
 
     this.isPointInDrawingObjects = function(x, y)
@@ -1787,6 +1872,10 @@ function SplineBezierState2(drawingObjectsController, drawingObjects, startX, st
     this.onKeyDown = function(e)
     {
 
+    };
+
+    this.onKeyPress = function(e)
+    {
     };
 
     this.isPointInDrawingObjects = function(x, y)
@@ -1876,6 +1965,10 @@ function SplineBezierState3(drawingObjectsController, drawingObjects, startX, st
     this.onKeyDown = function(e)
     {
 
+    };
+
+    this.onKeyPress = function(e)
+    {
     };
 
     this.isPointInDrawingObjects = function(x, y)
@@ -1976,6 +2069,10 @@ function SplineBezierState4(drawingObjectsController, drawingObjects, spline)
     this.onKeyDown = function(e)
     {
 
+    };
+
+    this.onKeyPress = function(e)
+    {
     };
 
     this.isPointInDrawingObjects = function(x, y)
@@ -2086,6 +2183,10 @@ function SplineBezierState5(drawingObjectsController, drawingObjects, startX, st
 
     };
 
+    this.onKeyPress = function(e)
+    {
+    };
+
     this.isPointInDrawingObjects = function(x, y)
     {
         return null/*TODO*/;
@@ -2130,6 +2231,10 @@ function PolyLineAddState(drawingObjectsController, drawingObjects)
     this.onKeyDown = function(e)
     {
 
+    };
+
+    this.onKeyPress = function(e)
+    {
     };
 
     this.isPointInDrawingObjects = function(x, y)
@@ -2188,6 +2293,10 @@ function PolyLineAddState2(drawingObjectsController, drawingObjects, minDistance
 
     };
 
+    this.onKeyPress = function(e)
+    {
+    };
+
     this.isPointInDrawingObjects = function(x, y)
     {
         return null;
@@ -2228,6 +2337,10 @@ function AddPolyLine2State(drawingObjectsController, drawingObjects)
     this.onKeyDown = function(e)
     {
 
+    };
+
+    this.onKeyPress = function(e)
+    {
     };
 
     this.isPointInDrawingObjects = function(x, y)
@@ -2277,6 +2390,10 @@ function AddPolyLine2State2(drawingObjectsController, drawingObjects, x, y, poly
     this.onKeyDown = function(e)
     {
 
+    };
+
+    this.onKeyPress = function(e)
+    {
     };
 
     this.isPointInDrawingObjects = function(x, y)
@@ -2364,6 +2481,10 @@ function AddPolyLine2State3(drawingObjectsController, drawingObjects, polyline)
     this.onKeyDown = function(e)
     {
 
+    };
+
+    this.onKeyPress = function(e)
+    {
     };
 
     this.isPointInDrawingObjects = function(x, y)

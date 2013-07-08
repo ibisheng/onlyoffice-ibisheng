@@ -42,6 +42,11 @@ DrawingObjectsController.prototype =
         this.curState.onKeyDown(e);
     },
 
+    onKeyPress: function(e)
+    {
+        this.curState.onKeyPress(e);
+    },
+
     resetSelectionState: function()
     {
         while(this.selectedObjects.length > 0)
