@@ -199,10 +199,12 @@
 					"isGlobalLockEditCell":		function () {return self.collaborativeEditing.getGlobalLockEditCell();},
 					
 					// shapes
-					"shapeMouseDown":			function () {self._onShapeMouseDown.apply(self, arguments);},
-					"shapeMouseMove":			function () {self._onShapeMouseMove.apply(self, arguments);},
-					"shapeMouseUp":				function () {self._onShapeMouseUp.apply(self, arguments);},
-					"getGraphicsInfo":			function () {return self._onGetGraphicsInfo.apply(self, arguments);}
+					"shapeMouseDown":				function () {self._onShapeMouseDown.apply(self, arguments);},
+					"shapeMouseMove":				function () {self._onShapeMouseMove.apply(self, arguments);},
+					"shapeMouseUp":					function () {self._onShapeMouseUp.apply(self, arguments);},
+					"shapeWindowKeyDown":			function () {self._onShapeWindowKeyDown.apply(self, arguments);},
+					"getGraphicsInfo":				function () {return self._onGetGraphicsInfo.apply(self, arguments);},
+					"getSelectedGraphicObjects":	function () {return self._onGetSelectedGraphicObjects.apply(self, arguments);},
 				});
 
 				this.model.handlers.add("cleanCellCache", function (wsId, range, canChangeColWidth) {
@@ -672,9 +674,19 @@
 				ws.objectRender.shapeMouseUp(e, x, y);
 			},
 			
+			_onShapeWindowKeyDown: function (e) {
+				var ws = this.getWorksheet();
+				ws.objectRender.controller.onKeyDown(e);
+			},
+			
 			_onGetGraphicsInfo: function (x, y) {
 				var ws = this.getWorksheet();
 				return ws.objectRender.checkCursorDrawingObject(x, y);
+			},
+			
+			_onGetSelectedGraphicObjects: function () {
+				var ws = this.getWorksheet();
+				return ws.objectRender.getSelectedGraphicObjects();
 			},
 			
 			_onMouseDblClick: function (x, y, isHideCursor, isCoord, callback) {

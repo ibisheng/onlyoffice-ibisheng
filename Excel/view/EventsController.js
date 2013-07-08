@@ -614,6 +614,12 @@
 				if (event.which === 18) {
 					t.lastKeyCode = event.which;
 				}
+				
+				var graphicObjects = t.handlers.trigger("getSelectedGraphicObjects");
+				if ( graphicObjects.length ) {
+					t.handlers.trigger("shapeWindowKeyDown", event);
+					return true;
+				}
 
 				// Двигаемся ли мы в выделенной области
 				var selectionActivePointChanged = false;

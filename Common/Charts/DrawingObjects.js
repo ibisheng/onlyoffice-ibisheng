@@ -2062,6 +2062,7 @@ function DrawingObjects() {
 	
 	var trackOverlay = null;
 	var autoShapeTrack = null;
+	var hitCanvasContext = null;
 	var scrollOffset = { x: 0, y: 0 };
 	
 	var aObjects = null;
@@ -2129,6 +2130,26 @@ function DrawingObjects() {
 				window.attachEvent("onmessage", this._uploadMessage);
 			}
 		}
+		
+		/*var hitCanvasId = "ws-hit-canvas";
+		var hitCanvas = document.getElementById(hitCanvasId);
+		
+		if ( !hitCanvas ) {
+			var wbWidget = $("#wb-widget");
+			var hitCanvas = document.createElement('canvas');
+			
+			$(hitCanvas).attr("id", hitCanvasId);			
+			$(hitCanvas).css( "top", wbWidget.css("top") );
+			$(hitCanvas).css( "left", wbWidget.css("left") );
+			$(hitCanvas).css( "width", wbWidget.css("width") );
+			$(hitCanvas).css( "height", wbWidget.css("height") );
+			$(hitCanvas).css( "position", wbWidget.css("position") );
+			
+			$("#wb-widget").append($(hitCanvas));
+			hitCanvasContext = hitCanvas.getContext("2d");
+		}
+		else
+			hitCanvasContext = hitCanvas.getContext("2d");*/
 	}
 	
 	_this.getWorkbook = function() {
@@ -2137,6 +2158,7 @@ function DrawingObjects() {
 	
 	_this.getCanvasContext = function() {
         return shapeCtx.m_oContext;
+		//return hitCanvasContext;
     }
 	
 	_this.getDrawingObjects = function() {
@@ -2593,6 +2615,7 @@ function DrawingObjects() {
 
         _t.getCanvasContext = function() {
             return shapeCtx.m_oContext;
+			//return hitCanvasContext;
         }
 
 		// Считаем From/To исходя из graphicObject
@@ -3978,16 +4001,16 @@ function DrawingObjects() {
 		
 		if ( shapeCtx || shapeOverlayCtx ) {
 		
-			scrollOffset.x = x_px;
-			scrollOffset.y = y_px;
+			scrollOffset.x -= x_px;
+			scrollOffset.y -= y_px;
 			
 			shapeCtx.m_oCoordTransform.tx -= x_px;
 			shapeCtx.m_oCoordTransform.ty -= y_px;
 			shapeCtx.CalculateFullTransform();
 			
-			//shapeOverlayCtx.m_oCoordTransform.tx -= x_px;
-			//shapeOverlayCtx.m_oCoordTransform.ty -= y_px;
-			//shapeOverlayCtx.CalculateFullTransform();
+			shapeOverlayCtx.m_oCoordTransform.tx -= x_px;
+			shapeOverlayCtx.m_oCoordTransform.ty -= y_px;
+			shapeOverlayCtx.CalculateFullTransform();
 			
 			autoShapeTrack.Graphics.m_oCoordTransform.tx -= x_px;
 			autoShapeTrack.Graphics.m_oCoordTransform.ty -= y_px;
@@ -4000,6 +4023,15 @@ function DrawingObjects() {
 			0 - px, 1 - pt, 2 - in, 3 - mm
 		*/
 		return val * ascCvtRatio(from, to);
+	}
+	
+	_this.getSelectedGraphicObjects = function() {
+		var selArray = [];
+		for (var i = 0; i < aObjects.length; i++) {
+			if ( aObjects[i].isGraphicObject() && aObjects[i].graphicObject.selected )
+				selArray.push(aObjects[i]);
+		}
+		return selArray;
 	}
 	
 	//-----------------------------------------------------------------------------------

@@ -972,7 +972,7 @@ input, textarea {outline:none;}
 	background-position: 0px 0px;
 }
 
-.FixedArea { background: url(../img/Table_Merge.png) no-repeat scroll 0 0 transparent); }
+.FixedArea { background: url(../img/Table_Merge.png) no-repeat scroll 0 0 transparent; }
 
 .FixedAreaClean { background: url(../img/Table_MergeDisable.png) no-repeat scroll 0 0 transparent; }
 
