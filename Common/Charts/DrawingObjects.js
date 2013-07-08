@@ -2089,6 +2089,10 @@ function DrawingObjects() {
 	_this.init = function(currentSheet) {
 
 		userId = api.User.asc_getId();
+		g_oIdCounter = new CIdCounter();
+		g_oTableId = new CTableId();
+		g_oIdCounter.Set_UserId(userId);
+		
 		documentId = api.documentId;
 		worksheet = currentSheet;
 		

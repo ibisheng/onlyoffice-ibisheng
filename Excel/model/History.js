@@ -94,6 +94,10 @@ var historyitem_AutoFilter_Empty	= 3;
 var historyitem_AutoFilter_ApplyDF	= 4;
 var historyitem_AutoFilter_ApplyMF	= 5;
 
+// Типы изменений в классе CTableId
+var historyitem_TableId_Add   = 1; // Добавили новую ссылку в глобальную таблицу
+var historyitem_TableId_Reset = 2; // Изменили Id ссылки
+
 
 function CHistory(workbook)
 {

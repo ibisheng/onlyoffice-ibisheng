@@ -121,6 +121,7 @@
 				"../Excel/model/DrawingObjects/Controls.js",
 				"../Excel/model/DrawingObjects/Graphics.js",
 				"../Excel/model/DrawingObjects/Overlay.js",
+				"../Excel/model/DrawingObjects/GlobalCounters.js",
                 "../Word/apiCommon.js",
                 "../Excel/.build/Log/apiCommonExport.js",
                 "../Excel/api.js",

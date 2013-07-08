@@ -203,6 +203,7 @@
 					"shapeMouseMove":				function () {self._onShapeMouseMove.apply(self, arguments);},
 					"shapeMouseUp":					function () {self._onShapeMouseUp.apply(self, arguments);},
 					"shapeWindowKeyDown":			function () {self._onShapeWindowKeyDown.apply(self, arguments);},
+					"shapeWindowKeyPress":			function () {self._onShapeWindowKeyPress.apply(self, arguments);},
 					"getGraphicsInfo":				function () {return self._onGetGraphicsInfo.apply(self, arguments);},
 					"getSelectedGraphicObjects":	function () {return self._onGetSelectedGraphicObjects.apply(self, arguments);},
 				});
@@ -677,6 +678,11 @@
 			_onShapeWindowKeyDown: function (e) {
 				var ws = this.getWorksheet();
 				ws.objectRender.controller.onKeyDown(e);
+			},
+			
+			_onShapeWindowKeyPress: function (e) {
+				var ws = this.getWorksheet();
+				ws.objectRender.controller.onKeyPress(e);
 			},
 			
 			_onGetGraphicsInfo: function (x, y) {
