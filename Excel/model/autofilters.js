@@ -211,7 +211,7 @@
 			},
 			
 			//добавляем кнопки или удаляем (вызывается из меню при нажатии на кнопку добавления фильтра)
-			addAutoFilter: function (ws, lTable, ar, openFilter, isTurnOffHistory, addNameColumn) {
+			addAutoFilter: function (ws, lTable, ar, openFilter, isTurnOffHistory, addFormatTableOptionsObj) {
 				var bIsActiveSheet = this._isActiveSheet(ws);
 				var bIsOpenFilter = undefined !== openFilter;
 				var activeCells = Asc.clone(ar);
@@ -232,14 +232,12 @@
 				var endCell; 
 				var rangeFilter;
 				var splitRange;
-				if(addNameColumn == undefined)
+				if(!addFormatTableOptionsObj)
 					addNameColumn = true;
 				else
 				{
-					var objOpt = this.AddFormatTableOptions;
-					var ref;
-					if(objOpt)
-						ref = this.AddFormatTableOptions.asc_getRange();
+					ref = addFormatTableOptionsObj.asc_getRange();
+                    addNameColumn = addFormatTableOptionsObj.asc_getIsTitle();
 					var newRange = this._refToRange(ref);
 					if(newRange)
 						activeCells = newRange;

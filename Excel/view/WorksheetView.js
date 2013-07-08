@@ -9151,14 +9151,14 @@
 				this.arrActiveFormulaRanges = [];
 			},
 			
-			addAutoFilter: function (lTable, isTitle) {
+			addAutoFilter: function (lTable, addFormatTableOptionsObj) {
 				var t = this;
 				var ar = t.activeRange.clone(true);
 				var onChangeAutoFilterCallback = function (isSuccess) {
 					if (false === isSuccess)
 						return;
 					
-					return t.autoFilters.addAutoFilter(t, lTable, ar, undefined, false, isTitle);
+					return t.autoFilters.addAutoFilter(t, lTable, ar, undefined, false, addFormatTableOptionsObj);
 				};
 				this._isLockedAll (onChangeAutoFilterCallback);
 			},

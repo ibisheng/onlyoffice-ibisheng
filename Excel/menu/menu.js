@@ -2066,7 +2066,8 @@
 						if($('#isTitle')[0].checked)
 							isTitle = false;
 						addFilterOptions.asc_setRange(addFilterDialog.find('#formatTableRange').val());
-						api.asc_addAutoFilter(defaultStyle, isTitle);
+                        addFilterOptions.asc_setIsTitle(isTitle);
+						api.asc_addAutoFilter(defaultStyle, addFilterOptions);
 						$(this).dialog("close");
 					}
 				},

@@ -524,9 +524,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					this.wb.resize();
 			},
 			
-			asc_addAutoFilter: function(lTable, isTitle){
+			asc_addAutoFilter: function(lTable, addFormatTableOptionsObj){
 				var ws = this.wb.getWorksheet();
-				var result = ws.addAutoFilter(lTable, isTitle);
+				var result = ws.addAutoFilter(lTable, addFormatTableOptionsObj);
 				return result;
 			},
 			
