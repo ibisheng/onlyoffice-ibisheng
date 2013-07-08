@@ -260,7 +260,27 @@ function CDrawingObject()
     this.tm_sy = 0;
     this.tm_shx = 0;
     this.tm_shy = 0;
+
+    this.LastTimeDrawing = -1;
 }
+
+CDrawingObject.prototype =
+{
+    CheckOnScroll : function()
+    {
+        if (-1 == this.LastTimeDrawing)
+        {
+            this.LastTimeDrawing = new Date().getTime();
+            return false;
+        }
+        var newTime = new Date().getTime();
+        if (newTime - this.LastTimeDrawing > 3000) // 3 сек
+        {
+            this.LastTimeDrawing = newTime;
+            return true;
+        }
+    }
+};
 
 function CDocMetaSelection()
 {
@@ -472,6 +492,9 @@ function CDocMeta()
         }
 
         var bIsFromPaint = (oThisDoc.Pages[obj.Page].start == obj.StreamPos) ? 1 : 0;
+
+        if (obj.CheckOnScroll() && 0 == bIsFromPaint)
+            editor.WordControl.OnScroll();
 
         while (s.pos < page.end)
         {
