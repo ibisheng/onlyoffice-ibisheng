@@ -1282,6 +1282,15 @@ CGeometry.prototype=
 
     },
 
+    setGuideValue: function(gdRef, gdValue, model_id)
+    {
+        if(isRealNumber(this.gdLst[gdRef]))
+        {
+            History.Add(g_oUndoRedoDrawingObject, historyitem_AutoShapes_SetGuideValue, model_id, null, {object: this, data:{ gdRef: gdRef, oldValue: this.gdLst[gdRef], newValue: gdValue}});
+            this.gdLst[gdRef] = gdValue;
+        }
+    },
+
 
     Save_Changes: function(data, writer)
     {

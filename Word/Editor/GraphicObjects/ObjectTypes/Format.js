@@ -2495,8 +2495,6 @@ function CreateDefaultShapeStyle()
 }
 
 
-
-
 function CXfrm()
 {
     this.offX = null;
@@ -2511,6 +2509,7 @@ function CXfrm()
     this.flipH = null;
     this.flipV = null;
     this.rot = null;
+
 
     this.Write_ToBinary2 =  function(Writer)
     {
@@ -2694,7 +2693,7 @@ function CXfrm()
         {
             this.rot = xfrm.rot;
         }
-    }
+    };
 
     this.createDuplicate = function()
     {
@@ -2712,8 +2711,58 @@ function CXfrm()
         duplicate.flipV = this.flipV;
         duplicate.rot = this.rot;
         return duplicate;
-    }
+    };
 
+    this.setPosition = function(posX, posY, model_id)
+    {
+        History.Add(g_oUndoRedoDrawingObject, historyitem_AutoShapes_Offset, model_id, null, {object: this, data:{oldX: this.offX, oldY: this.offY, newX: posX, newY: posY}});
+        this.offX = posX;
+        this.offY = posY;
+    };
+
+    this.setExtents = function(extX, extY, model_id)
+    {
+        History.Add(g_oUndoRedoDrawingObject, historyitem_AutoShapes_Extents, model_id, null, {object: this, data:{oldExtX: this.extX, oldExtY: this.extY, newExtX: extX, newExtY: extY}});
+        this.extX = extX;
+        this.extY = extY;
+    };
+
+    this.setChildOffsets = function(chOffX, chOffY, model_id)
+    {
+        History.Add(g_oUndoRedoDrawingObject, historyitem_AutoShapes_Child_Offset, model_id, null, {object: this, data:{oldChOffX: this.chOffX, oldChOffY: this.chOffY, newChOffX: chOffX, newChOffY: chOffY}});
+        this.chOffX = chOffX;
+        this.chOffY = chOffY;
+    };
+
+    this.setChildExtents = function(chExtX, chExtY, model_id)
+    {
+        History.Add(g_oUndoRedoDrawingObject, historyitem_AutoShapes_Child_Extents, model_id, null, {object: this, data:{oldChExtX: this.chExtX, oldChExtY: this.chExtY, newChOffX: chExtX, newChOffY: chExtY}});
+        this.chExtX = chExtX;
+        this.chExtY = chExtY;
+    };
+
+    this.setFlips = function(flipH, flipV, model_id)
+    {
+        History.Add(g_oUndoRedoDrawingObject, historyitem_AutoShapes_Flips, model_id, null, {object: this, data:{oldFlipH: this.flipH, oldFlipV: this.flipV, newFlipH: flipH, newFlipV: flipV}});
+        this.flipH = flipH;
+        this.flipV = flipV;
+    };
+
+    this.setRotate = function(rot, model_id)
+    {
+        History.Add(g_oUndoRedoDrawingObject, historyitem_AutoShapes_Flips, model_id, null, {object: this, data:{oldRot: this.rot, newRot: rot}});
+        this.rot = rot;
+    };
+
+    this.copyFromOther = function(xfrm)
+    {
+        this.setPosition(xfrm.offX, xfrm.offY);
+        this.setExtents(xfrm.extX, xfrm.extY);
+        this.setChildOffsets(xfrm.chOffX, xfrm.chOffY);
+        this.setChildExtents(xfrm.chExtX, xfrm.chExtY);
+        this.setFlips(xfrm.flipH, xfrm.flipV);
+        this.setRotate(xfrm.rot);
+    }
 }
 
 function CSpPr()
@@ -2818,6 +2867,52 @@ function CSpPr()
             this.ln.Read_FromBinary2(Reader);
         }
     };
+
+    this.copyFromOther = function(spPr)
+    {
+        this.setBwMode(spPr.bwMode);
+        this.xfrm.copyFromOther(spPr.xfrm);
+        if(isRealObject(spPr.geometry))
+        {
+            if(!isRealObject(this.geometry))
+            {
+                this.setGeometry(new Geometry());
+            }
+            this.geometry.copyFromOther(spPr.geometry);
+        }
+        if(isRealObject(spPr.Fill))
+        {
+            if(!isRealObject(this.Fill))
+            {
+                this.setFill(new CUniFill());
+            }
+            this.Fill.copyFromOther(spPr.Fill);
+        }
+
+        if(isRealObject(spPr.ln))
+        {
+            if(!isRealObject(this.ln))
+            {
+                this.setFill(new CLn());
+            }
+            this.ln.copyFromOther(spPr.ln);
+        }
+    };
+
+    this.setBwMode = function(bwMode)
+    {
+        this.bwMode = bwMode;
+    };
+
+    this.setGeometry = function(geometry)
+    {
+        this.geometry = geometry;
+    };
+
+    this.setFill = function(fill)
+    {
+        this.Fill = fill;
+    }
 }
 
 function CGrSpPr()
