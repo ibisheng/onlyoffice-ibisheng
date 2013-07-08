@@ -695,6 +695,7 @@ function PreMoveState(drawingObjectsController, drawingObjects, startX, startY, 
                 min_y = cur_rect_bounds.minY;
         }
         this.drawingObjectsController.changeCurrentState(new MoveState(this.drawingObjectsController, this.drawingObjects, this.startX, this.startY, min_x, min_y, max_x - min_x, max_y - min_y, this.majorObject));
+        this.drawingObjectsController.onMouseMove(e, x, y);
     };
 
     this.onMouseUp = function(e, x, y)

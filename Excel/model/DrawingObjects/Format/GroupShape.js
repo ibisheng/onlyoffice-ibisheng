@@ -82,37 +82,38 @@ CGroupShape.prototype =
 
     setPosition: function(x, y)
     {
-        this.spPr.xfrm.offX = x;
-        this.spPr.xfrm.offY = y;
+        var model_id = this.drawingObjects.getWorksheet().model.getId();
+        this.spPr.xfrm.setPosition(x, y, model_id);
     },
 
     setExtents: function(extX, extY)
     {
-        this.spPr.xfrm.extX = extX;
-        this.spPr.xfrm.extY = extY;
+        var model_id = this.drawingObjects.getWorksheet().model.getId();
+        this.spPr.xfrm.setExtents(extX, extY, model_id);
     },
 
     setFlips: function(flipH, flipV)
     {
-        this.spPr.xfrm.flipH = flipH;
-        this.spPr.xfrm.flipV = flipV;
+        var model_id = this.drawingObjects.getWorksheet().model.getId();
+        this.spPr.xfrm.setFlips(flipH, flipV, model_id);
     },
 
     setRotate: function(rot)
     {
-        this.spPr.xfrm.rot = rot;
+        var model_id = this.drawingObjects.getWorksheet().model.getId();
+        this.spPr.xfrm.setRotate(rot, model_id);
     },
 
     setChildExtents: function(chExtX, chExtY)
     {
-        this.spPr.xfrm.chExtX = chExtX;
-        this.spPr.xfrm.chExtY = chExtY;
+        var model_id = this.drawingObjects.getWorksheet().model.getId();
+        this.spPr.xfrm.setChildExtents(chExtX, chExtY, model_id);
     },
 
     setChildOffsets: function(chOffX, chOffY)
     {
-        this.spPr.xfrm.chOffX = chOffX;
-        this.spPr.xfrm.chOffY = chOffY;
+        var model_id = this.drawingObjects.getWorksheet().model.getId();
+        this.spPr.xfrm.setChildOffsets(chOffX, chOffY, model_id);
     },
 
     updateDrawingBaseCoordinates: function()

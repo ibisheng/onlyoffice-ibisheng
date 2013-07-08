@@ -121,25 +121,27 @@ CImage.prototype =
 
     setPosition: function(x, y)
     {
-        this.spPr.xfrm.offX = x;
-        this.spPr.xfrm.offY = y;
+        var model_id = this.drawingObjects.getWorksheet().model.getId();
+        this.spPr.xfrm.setPosition(x, y, model_id);
     },
+
 
     setExtents: function(extX, extY)
     {
-        this.spPr.xfrm.extX = extX;
-        this.spPr.xfrm.extY = extY;
+        var model_id = this.drawingObjects.getWorksheet().model.getId();
+        this.spPr.xfrm.setExtents(extX, extY, model_id);
     },
 
     setFlips: function(flipH, flipV)
     {
-        this.spPr.xfrm.flipH = flipH;
-        this.spPr.xfrm.flipV = flipV;
+        var model_id = this.drawingObjects.getWorksheet().model.getId();
+        this.spPr.xfrm.setFlips(flipH, flipV, model_id);
     },
 
     setRotate: function(rot)
     {
-        this.spPr.xfrm.rot = rot;
+        var model_id = this.drawingObjects.getWorksheet().model.getId();
+        this.spPr.xfrm.setRotate(rot, model_id);
     },
 
     setRecalculateAll: function()
@@ -151,6 +153,7 @@ CImage.prototype =
             recalculateBrush: true
         };
     },
+
     updateDrawingBaseCoordinates: function()
     {
         if(isRealObject(this.drawingBase))
@@ -444,9 +447,9 @@ CImage.prototype =
         {
             checker._s();
             checker._m(0, 0);
-            checker._l(this.absExtX, 0);
-            checker._l(this.absExtX, this.absExtY);
-            checker._l(0, this.absExtY);
+            checker._l(this.extX, 0);
+            checker._l(this.extX, this.extY);
+            checker._l(0, this.extY);
             checker._z();
             checker._e();
         }

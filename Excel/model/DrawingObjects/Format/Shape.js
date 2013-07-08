@@ -106,8 +106,8 @@ CShape.prototype =
 
     setPosition: function(x, y)
     {
-        this.spPr.xfrm.offX = x;
-        this.spPr.xfrm.offY = y;
+        var model_id = this.drawingObjects.getWorksheet().model.getId();
+        this.spPr.xfrm.setPosition(x, y, model_id);
     },
 
     updateDrawingBaseCoordinates: function()
@@ -118,19 +118,20 @@ CShape.prototype =
 
     setExtents: function(extX, extY)
     {
-        this.spPr.xfrm.extX = extX;
-        this.spPr.xfrm.extY = extY;
+        var model_id = this.drawingObjects.getWorksheet().model.getId();
+        this.spPr.xfrm.setExtents(extX, extY, model_id);
     },
 
     setFlips: function(flipH, flipV)
     {
-        this.spPr.xfrm.flipH = flipH;
-        this.spPr.xfrm.flipV = flipV;
+        var model_id = this.drawingObjects.getWorksheet().model.getId();
+        this.spPr.xfrm.setFlips(flipH, flipV, model_id);
     },
 
     setRotate: function(rot)
     {
-        this.spPr.xfrm.rot = rot;
+        var model_id = this.drawingObjects.getWorksheet().model.getId();
+        this.spPr.xfrm.setRotate(rot, model_id);
     },
 
     setPresetGeometry: function(presetGeom)
@@ -166,32 +167,13 @@ CShape.prototype =
 
     setAdjustmentValue: function(ref1, value1, ref2, value2)
     {
-
         if(this.spPr.geometry)
         {
-            /*var data = {};
-            data.Type = historyitem_SetAdjValue;
-            data.ref1 = ref1;
-            data.newValue1 = value1;
-            data.ref2 = ref2;
-            data.newValue2 = value2;
-            data.oldValue1 = this.spPr.geometry.gdLst[ref1];
-            data.oldValue2 = this.spPr.geometry.gdLst[ref2];
-            History.Add(this, data);*/
-
             var geometry = this.spPr.geometry;
-            if(typeof geometry.gdLst[ref1] === "number")
-            {
-                geometry.gdLst[ref1] = value1;
-            }
-
-            if(typeof geometry.gdLst[ref2] === "number")
-            {
-                geometry.gdLst[ref2] = value2;
-            }
+            var model_id = this.drawingObjects.getWorksheet().model.getId();
+            geometry.setGuideValue(ref1, value1, model_id);
+            geometry.setGuideValue(ref2, value2, model_id);
             geometry.Recalculate(this.extX, this.extY);
-            /*this.calculateContent();
-            this.calculateTransformTextMatrix(); */
         }
     },
 
@@ -229,7 +211,6 @@ CShape.prototype =
             }
         }
     },
-
 
     recalculateTransform: function()
     {
@@ -390,9 +371,9 @@ CShape.prototype =
         {
             checker._s();
             checker._m(0, 0);
-            checker._l(this.absExtX, 0);
-            checker._l(this.absExtX, this.absExtY);
-            checker._l(0, this.absExtY);
+            checker._l(this.extX, 0);
+            checker._l(this.extX, this.extY);
+            checker._l(0, this.extY);
             checker._z();
             checker._e();
         }
@@ -828,6 +809,17 @@ CShape.prototype =
     createMoveInGroupTrack: function()
     {
         return new MoveShapeImageTrackInGroup(this);
+    },
+
+    copyFromOther: function(sp)
+    {
+        this.spPr.copyFromOther(sp.spPr);
+        if(isRealObject(sp.style))
+        {
+            if(!isRealObject(this.style))
+                this.setSyle(new CShapeStyle());
+            this.style.copyFromOther(sp.style);
+        }
     }
 
 };

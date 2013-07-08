@@ -76,6 +76,14 @@ var historyitem_DrawingObject_Remove = 2;
 var historyitem_DrawingObject_Edit = 3;
 var historyitem_DrawingLayer = 4;
 
+var historyitem_AutoShapes_Offset = 1;
+var historyitem_AutoShapes_Extents = 2;
+var historyitem_AutoShapes_Child_Offset = 3;
+var historyitem_AutoShapes_Child_Extents = 4;
+var historyitem_AutoShapes_Rotate = 5;
+var historyitem_AutoShapes_Flips = 6;
+var historyitem_AutoShapes_SetGuideValue = 7;
+
 var historyitem_Comment_Add = 1;
 var historyitem_Comment_Remove = 2;
 var historyitem_Comment_Change = 3;
