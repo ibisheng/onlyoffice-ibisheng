@@ -2081,6 +2081,7 @@ function DrawingObjects() {
 	var imageLoader = new ImageLoader();	
 	
 	_this.asyncImageLoadedEvent = null;
+	_this.drawingDocument = null;
 
 	//-----------------------------------------------------------------------------------
 	// Public methods
@@ -5145,6 +5146,7 @@ function DrawingObjects() {
 	//-----------------------------------------------------------------------------------
 	
 	_this.controller = new DrawingObjectsController(_this);
+	_this.drawingDocument = new CDrawingDocument();
 	
 	//-----------------------------------------------------------------------------------
 	// Private Misc Methods
