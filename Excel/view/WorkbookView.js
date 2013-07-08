@@ -205,7 +205,7 @@
 					"shapeWindowKeyDown":			function () {self._onShapeWindowKeyDown.apply(self, arguments);},
 					"shapeWindowKeyPress":			function () {self._onShapeWindowKeyPress.apply(self, arguments);},
 					"getGraphicsInfo":				function () {return self._onGetGraphicsInfo.apply(self, arguments);},
-					"getSelectedGraphicObjects":	function () {return self._onGetSelectedGraphicObjects.apply(self, arguments);},
+					"getSelectedGraphicObjects":	function () {return self._onGetSelectedGraphicObjects.apply(self, arguments);}
 				});
 
 				this.model.handlers.add("cleanCellCache", function (wsId, range, canChangeColWidth) {
