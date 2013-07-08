@@ -707,6 +707,7 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 		var minY = 0;
 		var maxY = 0;
 		var isSkip = [];
+		var skipSeries = [];
 		
 		var isEn = false;
 		var isEnY = false;
@@ -872,19 +873,29 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 		}
 		else//для всех остальных диаграмм при условии что данные приходят в виде серий
 		{
+			var numSeries = 0;
 			for(l = 0; l < series.length; ++l)
 			{
-				arrValues[l] = [];
 				var formula = formulaToRange(series[l].Val.Formula,ws);
 				var firstCol = formula.first.col;
 				var firstRow = formula.first.row;
 				var lastCol = formula.last.col;
 				var lastRow = formula.last.row;
-				
+				skipSeries[l] = true;
 				var isRow = false;
 				if(firstCol == lastCol)
 					isRow  = true;
-				isSkip[l] = true;
+				if(chart.worksheet && chart.worksheet.model._getRow && chart.worksheet.model._getRow(firstRow - 1).hd == true && !isRow)
+				{
+					continue;
+				}
+				else if(chart.worksheet && chart.worksheet.model._getCol && chart.worksheet.model._getCol(firstCol - 1).hd == true && isRow)
+				{
+					continue;
+				}
+				skipSeries[l] = false;
+				arrValues[numSeries] = [];
+				isSkip[numSeries] = true;
 				
 				if(!isRow)//по строкам или по столбцам
 				{
@@ -892,14 +903,18 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 					var n = 0;
 					for(col = firstCol; col <= lastCol; ++col)
 					{
+						if(chart.worksheet && chart.worksheet.model._getCol && chart.worksheet.model._getCol(col - 1).hd == true)
+						{
+							continue;
+						}
 						var cell = ws.getCell(new CellAddress(row - 1, col - 1, 0));
 						
-						if(l == 0 && col == firstCol && chart.subType != 'stackedPer' && chart.type != 'Stock')
+						if(numSeries == 0 && col == firstCol && chart.subType != 'stackedPer' && chart.type != 'Stock')
 						{
 							formatCell = cell.getNumFormatStr();
 							isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
 						}
-						else if(chart.type == 'Stock' && l == 0 && col == firstCol)
+						else if(chart.type == 'Stock' && numSeries == 0 && col == firstCol)
 						{
 							formatCellScOy = cell.getNumFormatStr();
 							isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
@@ -907,14 +922,14 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 						
 						if(chart.type == 'Scatter')
 						{
-							if(l == 1 && col == firstCol && chart.subType != 'stackedPer' && chart.type != 'Stock')
+							if(numSeries == 1 && col == firstCol && chart.subType != 'stackedPer' && chart.type != 'Stock')
 								formatCellScOy = cell.getNumFormatStr();
 						}
 						
 						
 						var orValue = cell.getValue();
 						if('' != orValue)
-							isSkip[l] = false;
+							isSkip[numSeries] = false;
 						var value =  parseFloat(orValue)
 						if(!isEn && !isNaN(value))
 						{
@@ -933,9 +948,9 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 						else if (isNaN(value))
 							value = 0;
 						if(chart.type == 'Pie')
-							arrValues[l][n] = Math.abs(value);
+							arrValues[numSeries][n] = Math.abs(value);
 						else
-							arrValues[l][n] = value;
+							arrValues[numSeries][n] = value;
 						n++;
 					}
 				}
@@ -945,9 +960,13 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 					var n = 0;
 					for(row = firstRow; row <= lastRow; ++row)
 					{
+						if(chart.worksheet && chart.worksheet.model._getRow && chart.worksheet.model._getRow(row - 1).hd == true)
+						{
+							continue;
+						}
 						var cell = ws.getCell(new CellAddress(row - 1, col - 1, 0));
 						
-						if(l == 0 && row == firstRow && chart.subType != 'stackedPer' && chart.type != 'Stock')
+						if(numSeries == 0 && row == firstRow && chart.subType != 'stackedPer' && chart.type != 'Stock')
 						{
 							formatCell = cell.getNumFormatStr();
 							isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
@@ -960,13 +979,13 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 						
 						if(chart.type == 'Scatter')
 						{
-							if(l == 1 && row == firstRow && chart.subType != 'stackedPer' && chart.type != 'Stock')
+							if(numSeries == 1 && row == firstRow && chart.subType != 'stackedPer' && chart.type != 'Stock')
 								formatCellScOy = cell.getNumFormatStr();
 						}
 						
 						var orValue = cell.getValue();
 						if('' != orValue)
-							isSkip[l] = false;
+							isSkip[numSeries] = false;
 						var value =  parseFloat(orValue)
 						if(!isEn && !isNaN(value))
 						{
@@ -986,13 +1005,14 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 							value = 0;
 						
 						if(chart.type == 'Pie')
-							arrValues[l][n] = Math.abs(value);
+							arrValues[numSeries][n] = Math.abs(value);
 						else
-							arrValues[l][n] = value;
+							arrValues[numSeries][n] = value;
 						
 						n++;
 					}
 				}
+				numSeries++;
 			}
 		}
 		
@@ -1265,6 +1285,8 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 	chart.isformatCellScOy = formatCellScOy;
 	chart.min = min;
 	chart.max = max;
+	if(skipSeries)
+		chart.skipSeries = skipSeries;
 	if(newArr != undefined)
 		drawChart(chart, newArr, width, height);
 	else
@@ -1376,12 +1398,23 @@ function drawChart(chart, arrValues, width, height) {
 	// Цвета и шрифты
 	bar._otherProps._axis_color = 'grey';
 	bar._otherProps._background_grid_color = 'graytext';
-	if('Line' == chart.type || 'Area' == chart.type)
-		bar._otherProps._colors = generateColors(data.length, arrBaseColors, true);
-	else if(chart.type == 'HBar')
-			bar._otherProps._colors = OfficeExcel.array_reverse(generateColors(data[0].length, arrBaseColors, true));
+
+	
+	var lengthOfSeries;
+	if(chart.series && chart.series.length != 0)
+	{
+			lengthOfSeries = chart.series.length;
+	}
 	else
-		bar._otherProps._colors = generateColors(data[0].length, arrBaseColors, true);
+	{
+		if('Line' == chart.type || 'Area' == chart.type)
+			lengthOfSeries = data.length;
+		else if(chart.type == 'HBar')
+			lengthOfSeries = data[0].length;
+		else
+			lengthOfSeries = data[0].length;
+	}
+	bar._otherProps._colors = generateColors(lengthOfSeries, arrBaseColors, true);
 
 	//check default title
 	if((!chart.yAxis.title || chart.yAxis.title == null || chart.yAxis.title == undefined || chart.yAxis.title == '') && chart.yAxis.bDefaultTitle)
@@ -1444,6 +1477,27 @@ function drawChart(chart, arrValues, width, height) {
 	else{
 		bar._otherProps._key_halign = 'none';
 		bar._otherProps._key = [];
+	}
+	//в случае наличия скрытых строчек или столбов(в итоге скрытых серий)
+	if(chart.skipSeries)
+	{
+		var skipSeries = chart.skipSeries;
+		if(chart.type == 'Scatter' && chart.series && chart.series[0].xVal.Formula == null)
+		{
+			bar._otherProps._key.splice(bar._otherProps._key.length - 1, 1);
+			bar._otherProps._colors.splice(bar._otherProps._colors.length - 1, 1);
+			skipSeries.splice(0, 1);
+		}
+		for(var i = 0; i < skipSeries.length; i++)
+		{
+			if(skipSeries[i])
+			{
+				bar._otherProps._key.splice(i, 1);
+				bar._otherProps._colors.splice(i, 1);
+				skipSeries.splice(i, 1);
+				i--;
+			}
+		}
 	}
 	
 	// Подписи данных

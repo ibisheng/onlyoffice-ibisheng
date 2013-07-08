@@ -383,7 +383,7 @@
         * Draw the key if necessary
         */
         if (this._otherProps._key && this._otherProps._key.length) {
-            OfficeExcel.DrawKey(this, this._otherProps._key, this._otherProps._line_colors);
+            OfficeExcel.DrawKey(this, this._otherProps._key, this._otherProps._colors);
         }
 
 
@@ -1265,7 +1265,11 @@
 
             var xCoord = data_point[j][0];
             var yCoord = data_point[j][1];
-            var color  = data_point[j][2] ? data_point[j][2] : default_color;
+			var color;
+			if(this._otherProps._colors[i])
+				color = this._otherProps._colors[i];
+			else
+				color = data_point[j][2] ? data_point[j][2] : default_color
             var tooltip = (data_point[j] && data_point[j][3]) ? data_point[j][3] : null;
 			if(yCoord.toString() == "" || xCoord.toString() == "")
 			{
@@ -1574,7 +1578,7 @@
             this.context.lineJoin    = 'round';
             //this.context.lineWidth   = this.GetLineWidth(i);// i is the index of the set of coordinates
             this.context.lineWidth = 3;
-            this.context.strokeStyle = this._otherProps._line_colors[i];
+            this.context.strokeStyle = this._otherProps._colors[i];
             this.context.beginPath();
             
             var len = this.coords[i].length;

@@ -2380,6 +2380,7 @@ function DrawingObjects() {
 							_this.intervalToIntervalObject(obj.chart);
 							
 						obj.chart.rebuildSeries();
+						obj.chart.worksheet = worksheet;
 						var chartBase64 = chartRender.insertChart(obj.chart, null, obj.getWidthFromTo(), obj.getHeightFromTo());
 						if ( !chartBase64 )
 							continue;
