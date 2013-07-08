@@ -204,7 +204,7 @@ function NullState(drawingObjectsController, drawingObjects)
         var selected_objects = this.drawingObjectsController.selectedObjects;
         if(selected_objects.length === 1 && selected_objects[0].isShape())
         {
-            selected_objects[0].
+           // selected_objects[0].
         }
     };
 
