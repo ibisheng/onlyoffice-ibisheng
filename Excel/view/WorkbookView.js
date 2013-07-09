@@ -71,13 +71,15 @@
 
 			this._lockDraw = false;
 
-			// Теперь у нас 2 FontManager-а на весь документ (а не на каждом листе свой)
+			// Теперь у нас 2 FontManager-а на весь документ + 1 для автофигур (а не на каждом листе свой)
 			this.fmgrGraphics = [];						// FontManager for draw (1 для обычного + 1 для поворотного текста)
 			this.fmgrGraphics.push(new CFontManager());	// Для обычного
 			this.fmgrGraphics.push(new CFontManager());	// Для поворотного
+			this.fmgrGraphics.push(new CFontManager());	// Для автофигур
 
 			this.fmgrGraphics[0].Initialize(true); // IE memory enable
 			this.fmgrGraphics[1].Initialize(true); // IE memory enable
+			this.fmgrGraphics[2].Initialize(true); // IE memory enable
 
 			this.buffers = {};
 			this.drawingCtx = undefined;
@@ -198,14 +200,15 @@
 					"commentCellClick":			function () {self._onCommentCellClick.apply(self, arguments);},
 					"isGlobalLockEditCell":		function () {return self.collaborativeEditing.getGlobalLockEditCell();},
 					
-					// shapes
-					"shapeMouseDown":				function () {self._onShapeMouseDown.apply(self, arguments);},
-					"shapeMouseMove":				function () {self._onShapeMouseMove.apply(self, arguments);},
-					"shapeMouseUp":					function () {self._onShapeMouseUp.apply(self, arguments);},
-					"shapeWindowKeyDown":			function () {self._onShapeWindowKeyDown.apply(self, arguments);},
-					"shapeWindowKeyPress":			function () {self._onShapeWindowKeyPress.apply(self, arguments);},
-					"getGraphicsInfo":				function () {return self._onGetGraphicsInfo.apply(self, arguments);},
-					"getSelectedGraphicObjects":	function () {return self._onGetSelectedGraphicObjects.apply(self, arguments);}
+					// Shapes
+					"graphicObjectMouseDown":				function () {self._onGraphicObjectMouseDown.apply(self, arguments);},
+					"graphicObjectMouseMove":				function () {self._onGraphicObjectMouseMove.apply(self, arguments);},
+					"graphicObjectMouseUp":					function () {self._onGraphicObjectMouseUp.apply(self, arguments);},
+					"graphicObjectWindowKeyDown":			function () {self._onGraphicObjectWindowKeyDown.apply(self, arguments);},
+					"graphicObjectWindowKeyPress":			function () {self._onGraphicObjectWindowKeyPress.apply(self, arguments);},
+					"getGraphicsInfo":						function () {return self._onGetGraphicsInfo.apply(self, arguments);},
+					"getSelectedGraphicObjects":			function () {return self._onGetSelectedGraphicObjects.apply(self, arguments);},
+					"resetSelectedGraphicObjects":			function () {return self._onResetSelectedGraphicObjects.apply(self, arguments);}
 				});
 
 				this.model.handlers.add("cleanCellCache", function (wsId, range, canChangeColWidth) {
@@ -660,27 +663,28 @@
 					ws.cellCommentator.asc_showComment(comments[0].asc_getId());
 			},
 			
-			_onShapeMouseDown: function (e, x, y) {
+			// Shapes
+			_onGraphicObjectMouseDown: function (e, x, y) {
 				var ws = this.getWorksheet();
-				ws.objectRender.shapeMouseDown(e, x, y);
+				ws.objectRender.graphicObjectMouseDown(e, x, y);
 			},
 			
-			_onShapeMouseMove: function (e, x, y) {
+			_onGraphicObjectMouseMove: function (e, x, y) {
 				var ws = this.getWorksheet();
-				ws.objectRender.shapeMouseMove(e, x, y);
+				ws.objectRender.graphicObjectMouseMove(e, x, y);
 			},
 			
-			_onShapeMouseUp: function (e, x, y) {
+			_onGraphicObjectMouseUp: function (e, x, y) {
 				var ws = this.getWorksheet();
-				ws.objectRender.shapeMouseUp(e, x, y);
+				ws.objectRender.graphicObjectMouseUp(e, x, y);
 			},
 			
-			_onShapeWindowKeyDown: function (e) {
+			_onGraphicObjectWindowKeyDown: function (e) {
 				var ws = this.getWorksheet();
 				ws.objectRender.controller.onKeyDown(e);
 			},
 			
-			_onShapeWindowKeyPress: function (e) {
+			_onGraphicObjectWindowKeyPress: function (e) {
 				var ws = this.getWorksheet();
 				ws.objectRender.controller.onKeyPress(e);
 			},
@@ -695,6 +699,12 @@
 				return ws.objectRender.getSelectedGraphicObjects();
 			},
 			
+			_onResetSelectedGraphicObjects: function () {
+				var ws = this.getWorksheet();
+				return ws.objectRender.controller.resetSelection();
+			},
+			
+			// Double click
 			_onMouseDblClick: function (x, y, isHideCursor, isCoord, callback) {
 				var res = false;
 				var ws = this.getWorksheet();

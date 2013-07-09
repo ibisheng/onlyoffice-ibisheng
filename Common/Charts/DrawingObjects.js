@@ -2100,7 +2100,9 @@ function DrawingObjects() {
 		drawingCtx = currentSheet.drawingCtx;
 		overlayCtx = currentSheet.overlayCtx;
 		shapeCtx = currentSheet.shapeCtx;
+		shapeCtx.m_oFontManager = api.wb.fmgrGraphics[2];
 		shapeOverlayCtx = currentSheet.shapeOverlayCtx;
+		shapeOverlayCtx.m_oFontManager = api.wb.fmgrGraphics[2];
 		
 		trackOverlay = new COverlay();
 		trackOverlay.init( shapeOverlayCtx.m_oContext, "ws-canvas-overlay", 0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix, shapeOverlayCtx.m_dWidthMM, shapeOverlayCtx.m_dHeightMM );
@@ -4044,15 +4046,15 @@ function DrawingObjects() {
 	// Graphic object mouse events
 	//-----------------------------------------------------------------------------------
 	
-	_this.shapeMouseDown = function(e, x, y) {
+	_this.graphicObjectMouseDown = function(e, x, y) {
 		_this.controller.onMouseDown( e, pxToMm(x - scrollOffset.x), pxToMm(y - scrollOffset.y) );
 	}
 	
-	_this.shapeMouseMove = function(e, x, y) {
+	_this.graphicObjectMouseMove = function(e, x, y) {
 		_this.controller.onMouseMove( e, pxToMm(x - scrollOffset.x), pxToMm(y - scrollOffset.y) );
 	}
 	
-	_this.shapeMouseUp = function(e, x, y) {
+	_this.graphicObjectMouseUp = function(e, x, y) {
 		_this.controller.onMouseUp( e, pxToMm(x - scrollOffset.x), pxToMm(y - scrollOffset.y) );
 	}
 	

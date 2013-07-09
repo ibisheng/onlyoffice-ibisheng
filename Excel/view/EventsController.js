@@ -617,7 +617,7 @@
 				
 				var graphicObjects = t.handlers.trigger("getSelectedGraphicObjects");
 				if ( graphicObjects.length ) {
-					t.handlers.trigger("shapeWindowKeyDown", event);
+					t.handlers.trigger("graphicObjectWindowKeyDown", event);
 					return true;
 				}
 
@@ -918,7 +918,7 @@
 				
 				var graphicObjects = t.handlers.trigger("getSelectedGraphicObjects");
 				if ( graphicObjects.length ) {
-					t.handlers.trigger("shapeWindowKeyPress", event);
+					t.handlers.trigger("graphicObjectWindowKeyPress", event);
 					return true;
 				}
 
@@ -1080,9 +1080,11 @@
 				
 				if ( asc["editor"].isStartAddShape ) {
 					event.ClickCount = 1;
-					t.handlers.trigger("shapeMouseDown", event, coord.x, coord.y);
+					t.handlers.trigger("graphicObjectMouseDown", event, coord.x, coord.y);
 					return;
 				}
+				else
+					t.handlers.trigger("resetSelectedGraphicObjects");
 
 				if (t.handlers.trigger("isGlobalLockEditCell"))
 					return;
@@ -1220,7 +1222,7 @@
 				// shapes
 				var coord = this._getCoordinates(event);
 				if ( asc["editor"].isStartAddShape ) {
-					this.handlers.trigger("shapeMouseUp", event, coord.x, coord.y);
+					this.handlers.trigger("graphicObjectMouseUp", event, coord.x, coord.y);
 					return;
 				}
 			
@@ -1269,7 +1271,7 @@
 				
 				// shapes
 				if ( asc["editor"].isStartAddShape ) {
-					t.handlers.trigger("shapeMouseMove", event, coord.x, coord.y);
+					t.handlers.trigger("graphicObjectMouseMove", event, coord.x, coord.y);
 					t.handlers.trigger("updateWorksheet", t.element[0], coord.x, coord.y, event.ctrlKey, function(info){t.targetInfo = info;});
 					return;
 				}
