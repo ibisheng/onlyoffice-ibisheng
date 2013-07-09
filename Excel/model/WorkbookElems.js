@@ -1,4 +1,5 @@
 ﻿var g_nNumsMaxId = 160;
+var g_oDefaultXfId = null;
 var g_oDefaultFont = null;
 var g_oDefaultFill = null;
 var g_oDefaultNum = null;
@@ -955,15 +956,15 @@ Num.prototype =
 	}
 };
 /** @constructor */
-function CellXfs()
-{
+function CellXfs() {
 	this.Properties = {
 		border: 0,
 		fill: 1,
 		font: 2,
 		num: 3,
 		align: 4,
-		QuotePrefix: 5
+		QuotePrefix: 5,
+		XfId: 6
 	};
     this.border = null;
     this.fill = null;
@@ -971,7 +972,8 @@ function CellXfs()
     this.num = null;
     this.align = null;
 	this.QuotePrefix = null;
-};
+	this.XfId = null;
+}
 CellXfs.prototype =
 {
 	_mergeProperty : function(first, second)
@@ -1019,6 +1021,8 @@ CellXfs.prototype =
             res.align = this.align.clone();
         if(null != this.QuotePrefix)
             res.QuotePrefix = this.QuotePrefix;
+		if (null !== this.XfId)
+			res.XfId = this.XfId;
         return res;
     },
 	isEqual : function(xfs)
@@ -1034,6 +1038,8 @@ CellXfs.prototype =
 		if(false == ((null == this.align && null == xfs.align) || (null != this.align && null != xfs.align && this.align.isEqual(xfs.align))))
 			return false;
 		if(this.QuotePrefix != xfs.QuotePrefix)
+			return false;
+		if (this.XfId != xfs.XfId)
 			return false;
 		return true;
 	},
@@ -1055,6 +1061,7 @@ CellXfs.prototype =
 			case this.Properties.num: return this.num;break;
 			case this.Properties.align: return this.align;break;
 			case this.Properties.QuotePrefix: return this.QuotePrefix;break;
+			case this.Properties.XfId: return this.XfId; break;
 		}
 	},
 	setProperty : function(nType, value)
@@ -1067,6 +1074,7 @@ CellXfs.prototype =
 			case this.Properties.num: this.num = value;break;
 			case this.Properties.align: this.align = value;break;
 			case this.Properties.QuotePrefix: this.QuotePrefix = value;break;
+			case this.Properties.XfId: this.XfId = value; break;
 		}
 	}
 };
@@ -1204,6 +1212,23 @@ Align.prototype =
 	}
 };
 /** @constructor */
+function CCellStyles() {
+	this.CustomStyles = [];
+	this.DefaultStyles = [];
+	this.AllStyles = {};
+}
+/** @constructor */
+function CCellStyle() {
+	this.BuiltinId = null;
+	this.CustomBuiltin = null;
+	this.Hidden = null;
+	this.ILevel = null;
+	this.Name = null;
+	this.XfId = null;
+
+	this.xfs = null;
+}
+/** @constructor */
 function StyleManager(){
     //содержат все свойства по умолчанию
 	this.oDefaultFont = null;
@@ -1226,6 +1251,10 @@ StyleManager.prototype =
 			g_oDefaultNum = oDefaultXfs.num.clone();
 		if(null != oDefaultXfs.align)
 			g_oDefaultAlign = oDefaultXfs.align.clone();
+		if (null !== oDefaultXfs.XfId) {
+			this.oDefaultXfs.XfId = oDefaultXfs.XfId;
+			g_oDefaultXfId = oDefaultXfs.XfId;
+		}
 	},
     _prepareSet : function(oItemWithXfs)
 	{

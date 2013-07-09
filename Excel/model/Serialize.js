@@ -31,7 +31,10 @@ var c_oSerStylesTypes =
     NumFmt: 9,
 	Dxfs: 10,
 	Dxf: 11,
-	TableStyles: 12
+	TableStyles: 12,
+	CellStyleXfs: 14,
+	CellStyles: 15,
+	CellStyle: 16
 };
 /** @enum */
 var c_oSerBorderTypes =
@@ -571,6 +574,14 @@ var c_oSer_SheetView = {
 	ZoomScaleNormal				: 16,
 	ZoomScalePageLayoutView		: 17,
 	ZoomScaleSheetLayoutView	: 18
+};
+var c_oSer_CellStyle = {
+	BuiltinId		: 0,
+	CustomBuiltin	: 1,
+	Hidden			: 2,
+	ILevel			: 3,
+	Name			: 4,
+	XfId			: 5
 };
 /** @enum */
 var EBorderStyle =
@@ -3904,63 +3915,107 @@ function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
     this.Read = function()
     {
         var oThis = this;
-        var aBorders = new Array();
-        var aFills = new Array();
-        var aFonts = new Array();
-        var oNumFmts = new Object();
-        var aCellXfs = new Array();
-		var oCustomTableStyles = new Object();
-        var res = this.bcr.ReadTable(function(t, l){
-                return oThis.ReadStylesContent(t,l, aBorders, aFills, aFonts, oNumFmts, aCellXfs, oCustomTableStyles);
-            });
-        this.InitStyleManager(aBorders, aFills, aFonts, oNumFmts, aCellXfs, oCustomTableStyles);
+		var oStyleObject = {aBorders: [], aFills: [], aFonts: [], oNumFmts: {}, aCellStyleXfs: [],
+			aCellXfs: [], aCellStyles: [], oCustomTableStyles: {}};
+        var res = this.bcr.ReadTable(function (t, l) {
+			return oThis.ReadStylesContent(t, l, oStyleObject);
+		});
+        this.InitStyleManager(oStyleObject);
         return res;
     };
-    this.InitStyleManager = function(aBorders, aFills, aFonts, oNumFmts, aCellXfs, oCustomTableStyles)
+    this.InitStyleManager = function (oStyleObject)
     {
-        for(var i = 0, length = aCellXfs.length; i < length; ++i)
-        {
-            var xfs = aCellXfs[i];
+        for(var i = 0, length = oStyleObject.aCellXfs.length; i < length; ++i) {
+            var xfs = oStyleObject.aCellXfs[i];
             var oNewXfs = new CellXfs();
 
             if(null != xfs.borderid)
 			{
-				var border = aBorders[xfs.borderid];
+				var border = oStyleObject.aBorders[xfs.borderid];
 				if(null != border)
 					oNewXfs.border = border.clone();
 			}
             if(null != xfs.fillid)
 			{
-				var fill = aFills[xfs.fillid];
+				var fill = oStyleObject.aFills[xfs.fillid];
 				if(null != fill)
 					oNewXfs.fill = fill.clone();
 			}
             if(null != xfs.fontid)
 			{
-				var font = aFonts[xfs.fontid];
+				var font = oStyleObject.aFonts[xfs.fontid];
 				if(null != font)
 					oNewXfs.font = font.clone();
 			}
             if(null != xfs.numid)
             {
-                var oCurNum = oNumFmts[xfs.numid];
+                var oCurNum = oStyleObject.oNumFmts[xfs.numid];
 				if(null != oCurNum)
-					oNewXfs.num = this.ParseNum(oCurNum, oNumFmts);
+					oNewXfs.num = this.ParseNum(oCurNum, oStyleObject.oNumFmts);
 				else
-					oNewXfs.num = this.ParseNum({id: xfs.numid, f: null}, oNumFmts);
+					oNewXfs.num = this.ParseNum({id: xfs.numid, f: null}, oStyleObject.oNumFmts);
             }
             if(null != xfs.QuotePrefix)
                 oNewXfs.QuotePrefix = xfs.QuotePrefix;
             if(null != xfs.align)
                 oNewXfs.align = xfs.align.clone();
+			if (null !== xfs.XfId)
+				oNewXfs.XfId = xfs.XfId;
+
 			if(0 == this.aCellXfs.length)
 				this.oStyleManager.init(oNewXfs);
 			this.minimizeXfs(oNewXfs);
 			this.aCellXfs.push(oNewXfs);
         }
-		for(var i in oCustomTableStyles)
+		for (var nIndex in oStyleObject.aCellStyles) {
+			if (!oStyleObject.aCellStyles.hasOwnProperty(nIndex))
+				continue;
+
+			var oCellStyle = oStyleObject.aCellStyles[nIndex];
+			var oCellStyleXfs = oStyleObject.aCellStyleXfs[oCellStyle.XfId];
+
+			oCellStyle.xfs = new CellXfs();
+			// Border
+			if (null != oCellStyleXfs.borderid) {
+				var borderCellStyle = oStyleObject.aBorders[oCellStyleXfs.borderid];
+				if(null != borderCellStyle)
+					oCellStyle.xfs.border = borderCellStyle.clone();
+			}
+			// Fill
+			if (null != oCellStyleXfs.fillid) {
+				var fillCellStyle = oStyleObject.aFills[oCellStyleXfs.fillid];
+				if(null != fillCellStyle)
+					oCellStyle.xfs.fill = fillCellStyle.clone();
+			}
+			// Font
+			if(null != oCellStyleXfs.fontid) {
+				var fontCellStyle = oStyleObject.aFonts[oCellStyleXfs.fontid];
+				if(null != fontCellStyle)
+					oCellStyle.xfs.font = fontCellStyle.clone();
+			}
+			// NumFmt
+			if(null != oCellStyleXfs.numid) {
+				var oCurNumCellStyle = oStyleObject.oNumFmts[oCellStyleXfs.numid];
+				if(null != oCurNumCellStyle)
+					oCellStyle.xfs.num = this.ParseNum(oCurNumCellStyle, oStyleObject.oNumFmts);
+				else
+					oCellStyle.xfs.num = this.ParseNum({id: oCellStyleXfs.numid, f: null}, oStyleObject.oNumFmts);
+			}
+			// QuotePrefix
+			if(null != oCellStyleXfs.QuotePrefix)
+				oCellStyle.xfs.QuotePrefix = oCellStyleXfs.QuotePrefix;
+			// align
+			if(null != oCellStyleXfs.align)
+				oCellStyle.xfs.align = oCellStyleXfs.clone();
+			// XfId
+			if (null !== oCellStyleXfs.XfId)
+				oCellStyle.xfs.XfId = oCellStyleXfs.XfId;
+
+			this.wb.CellStyles.CustomStyles[oCellStyle.XfId] = oCellStyle;
+		}
+		for(var i in oStyleObject.oCustomTableStyles)
 		{
-			var item = oCustomTableStyles[i];
+			var item = oStyleObject.oCustomTableStyles[i];
 			if(null != item)
 			{
 				var style = item.style;
@@ -3969,7 +4024,7 @@ function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
 				this.wb.TableStyles.CustomStyles[i] = style;
 			}
 		}
-    }
+    };
 	this.initTableStyle = function(style, elems, Dxfs)
 	{
 		for(var j = 0, length2 = elems.length; j < length2; ++j)
@@ -4019,7 +4074,7 @@ function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
 				}
 			}					
 		}
-	}
+	};
 	this.minimizeXfs = function(xfs)
 	{
 		if(null != xfs.border && g_oDefaultBorder.isEqual(xfs.border))
@@ -4032,7 +4087,7 @@ function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
 			xfs.num = null;
 		if(null != xfs.align && g_oDefaultAlign.isEqual(xfs.align))
 			xfs.align = null;
-	}
+	};
 	this.ParseNum = function(oNum, oNumFmts)
 	{
 		var oRes = null;
@@ -4064,54 +4119,47 @@ function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
 			oRes.f = sFormat;
 		}
 		return oRes;
-	}
-    this.ReadStylesContent = function(type, length, aBorders, aFills, aFonts, oNumFmts, aCellXfs, oCustomTableStyles)
-    {
+	};
+    this.ReadStylesContent = function (type, length, oStyleObject) {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
-        if ( c_oSerStylesTypes.Borders === type )
-        {
-            res = this.bcr.Read1(length, function(t,l){
-                    return oThis.ReadBorders(t,l,aBorders);
-                });
-        }
-        else if ( c_oSerStylesTypes.Fills === type )
-        {
-            res = this.bcr.Read1(length, function(t,l){
-                    return oThis.ReadFills(t,l,aFills);
-                });
-        }
-        else if ( c_oSerStylesTypes.Fonts === type )
-        {
-            res = this.bcr.Read1(length, function(t,l){
-                    return oThis.ReadFonts(t,l,aFonts);
-                });
-        }
-        else if ( c_oSerStylesTypes.NumFmts === type )
-        {
-            res = this.bcr.Read1(length, function(t,l){
-                    return oThis.ReadNumFmts(t,l,oNumFmts);
-                });
-        }
-        else if ( c_oSerStylesTypes.CellXfs === type )
-        {
-            res = this.bcr.Read1(length, function(t,l){
-                    return oThis.ReadCellXfs(t,l,aCellXfs);
-                });
-        }
-		else if ( c_oSerStylesTypes.Dxfs === type )
-        {
-            res = this.bcr.Read1(length, function(t,l){
-                    return oThis.ReadDxfs(t,l,oThis.Dxfs);
-                });
-        }
-		else if ( c_oSerStylesTypes.TableStyles === type )
-        {
-            res = this.bcr.Read1(length, function(t,l){
-                    return oThis.ReadTableStyles(t, l, oThis.wb.TableStyles, oCustomTableStyles);
-                });
-        }
-        else
+        if (c_oSerStylesTypes.Borders === type) {
+            res = this.bcr.Read1(length, function (t, l) {
+				return oThis.ReadBorders(t, l, oStyleObject.aBorders);
+			});
+        } else if (c_oSerStylesTypes.Fills === type) {
+            res = this.bcr.Read1(length, function (t, l) {
+				return oThis.ReadFills(t, l, oStyleObject.aFills);
+			});
+        } else if (c_oSerStylesTypes.Fonts === type) {
+            res = this.bcr.Read1(length, function (t, l) {
+				return oThis.ReadFonts(t, l, oStyleObject.aFonts);
+			});
+        } else if (c_oSerStylesTypes.NumFmts === type) {
+			res = this.bcr.Read1(length, function (t, l) {
+				return oThis.ReadNumFmts(t, l, oStyleObject.oNumFmts);
+			});
+        } else if (c_oSerStylesTypes.CellStyleXfs === type) {
+			res = this.bcr.Read1(length, function (t, l) {
+				return oThis.ReadCellStyleXfs(t, l, oStyleObject.aCellStyleXfs);
+			});
+		} else if (c_oSerStylesTypes.CellXfs === type) {
+            res = this.bcr.Read1(length, function (t, l) {
+				return oThis.ReadCellXfs(t,l, oStyleObject.aCellXfs);
+			});
+        } else if (c_oSerStylesTypes.CellStyles === type) {
+			res = this.bcr.Read1(length, function (t, l) {
+				return oThis.ReadCellStyles(t, l, oStyleObject.aCellStyles);
+			});
+		} else if (c_oSerStylesTypes.Dxfs === type) {
+            res = this.bcr.Read1(length, function (t, l) {
+				return oThis.ReadDxfs(t, l, oThis.Dxfs);
+			});
+        } else if (c_oSerStylesTypes.TableStyles === type) {
+			res = this.bcr.Read1(length, function (t, l){
+				return oThis.ReadTableStyles(t, l, oThis.wb.TableStyles, oStyleObject.oCustomTableStyles);
+			});
+        } else
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
@@ -4233,6 +4281,20 @@ function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
+	this.ReadCellStyleXfs = function (type, length, aCellStyleXfs) {
+		var res = c_oSerConstants.ReadOk;
+		var oThis = this;
+		if (c_oSerStylesTypes.Xfs === type) {
+			var oNewXfs = {ApplyAlignment: null, ApplyBorder: null, ApplyFill: null, ApplyFont: null, ApplyNumberFormat: null,
+				BorderId: null, FillId: null, FontId: null, NumFmtId: null, QuotePrefix: null, Aligment: null};
+			res = this.bcr.Read2Spreadsheet(length, function (t, l) {
+				return oThis.ReadXfs(t, l, oNewXfs);
+			});
+			aCellStyleXfs.push(oNewXfs);
+		} else
+			res = c_oSerConstants.ReadUnknown;
+		return res;
+	};
     this.ReadCellXfs = function(type, length, aCellXfs)
     {
         var res = c_oSerConstants.ReadOk;
@@ -4240,7 +4302,7 @@ function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
         if ( c_oSerStylesTypes.Xfs == type )
         {
             var oNewXfs = {ApplyAlignment: null, ApplyBorder: null, ApplyFill: null, ApplyFont: null, ApplyNumberFormat: null,
-							BorderId: null, FillId: null, FontId: null, NumFmtId: null, QuotePrefix: null, Aligment: null};
+							BorderId: null, FillId: null, FontId: null, NumFmtId: null, QuotePrefix: null, Aligment: null, XfId: null};
             res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.ReadXfs(t,l,oNewXfs);
                 });
@@ -4274,6 +4336,8 @@ function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
             oXfs.numid = this.stream.GetULongLE();
         else if ( c_oSerXfsTypes.QuotePrefix == type )
             oXfs.QuotePrefix = this.stream.GetBool();
+		else if (c_oSerXfsTypes.XfId === type)
+			oXfs.XfId = this.stream.GetULongLE();
         else if ( c_oSerXfsTypes.Aligment == type )
         {
             if(null == oXfs.Aligment)
@@ -4427,6 +4491,38 @@ function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
+	this.ReadCellStyles = function (type, length, aCellStyles) {
+		var res = c_oSerConstants.ReadOk;
+		var oThis = this;
+		var oCellStyle = null;
+		if (c_oSerStylesTypes.CellStyle === type) {
+			oCellStyle = new CCellStyle();
+			res = this.bcr.Read1(length, function (t, l) {
+				return oThis.ReadCellStyle(t, l, oCellStyle);
+			});
+			aCellStyles.push(oCellStyle);
+		} else
+			res = c_oSerConstants.ReadUnknown;
+		return res;
+	};
+	this.ReadCellStyle = function (type, length, oCellStyle) {
+		var res = c_oSerConstants.ReadOk;
+		if (c_oSer_CellStyle.BuiltinId === type)
+			oCellStyle.BuiltinId = this.stream.GetULongLE();
+		else if (c_oSer_CellStyle.CustomBuiltin === type)
+			oCellStyle.CustomBuiltin = this.stream.GetBool();
+		else if (c_oSer_CellStyle.Hidden === type)
+			oCellStyle.Hidden = this.stream.GetBool();
+		else if (c_oSer_CellStyle.ILevel === type)
+			oCellStyle.ILevel = this.stream.GetULongLE();
+		else if (c_oSer_CellStyle.Name === type)
+			oCellStyle.Name = this.stream.GetString2LE(length);
+		else if (c_oSer_CellStyle.XfId === type)
+			oCellStyle.XfId = this.stream.GetULongLE();
+		else
+			res = c_oSerConstants.ReadUnknown;
+		return res;
+	};
 	this.ReadDxfs = function(type, length, aDxfs)
     {
         var res = c_oSerConstants.ReadOk;
@@ -6086,7 +6182,8 @@ function BinaryFileReader(sUrlPath)
         this.stream = this.getbase64DecodedData(data);
 		History.TurnOff();
         this.ReadFile(wb);
-		
+
+		ReadDefCellStyles(wb, wb.CellStyles.DefaultStyles);
 		ReadDefTableStyles(wb, wb.TableStyles.DefaultStyles);
 		wb.TableStyles.concatStyles();
 		History.TurnOn();
@@ -6925,7 +7022,7 @@ function ReadDefTableStyles(wb, oOutput)
 		else
             res = c_oSerConstants.ReadUnknown;
         return res;
-	}
+	};
 	var fReadStyles = function(type, length, oOutput)
 	{
 		var res = c_oSerConstants.ReadOk;
@@ -6952,6 +7049,118 @@ function ReadDefTableStyles(wb, oOutput)
 	var length = stream.GetULongLE();
 	
 	res = bcr.Read1(length, function(t,l){
+		return fReadStyles(t, l, oOutput);
+	});
+}
+function ReadDefCellStyles(wb, oOutput)
+{
+	var Types = {
+		Style		: 0,
+		BuiltinId	: 1,
+		Hidden		: 2,
+		CellStyle	: 3,
+		Xfs			: 4,
+		Font		: 5,
+		Fill		: 6,
+		Border		: 7,
+		NumFmts		: 8
+	};
+	var sStyles = "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AAEAAAAAAgAAAAAEAAAAAAUAAAAAAKkAAAABBAAAACEAAAADHAAAAAQOAAAAQQBjAGMAZQBuAHQAMgAFBAAAAAEAAAAEHgAAAAABAAEBAAYEAAAAAAcEAgAAAAgEAQAAAAkEAAAAAAUnAAAAAQYDAAAAAgEABAYOAAAAQwBhAGwAaQBiAHIAaQAGBQAAAAAAACZABg0AAAAACAAAAAEDAAAAAgEFBxkAAAAAAAAAAAEAAAAAAgAAAAAEAAAAAAUAAAAAAKAAAAADHAAAAAQOAAAAQQBjAGMAZQBuAHQAMwAFBAAAAAEAAAAEHgAAAAABAAEBAAYEAAAAAAcEAgAAAAgEAQAAAAkEAAAAAAUnAAAAAQYDAAAAAgEABAYOAAAAQwBhAGwAaQBiAHIAaQAGBQAAAAAAACZABg0AAAAACAAAAAEDAAAAAgEGBxkAAAAAAAAAAAEAAAAAAgAAAAAEAAAAAAUAAAAAAK0AAAABBAAAACkAAAADIAAAAAQSAAAAQQBjAGMAZQBuAHQANAAgADIABQQAAAABAAAABB4AAAAAAQABAQAGBAAAAAAHBAIAAAAIBAEAAAAJBAAAAAAFJwAAAAEGAwAAAAIBAAQGDgAAAEMAYQBsAGkAYgByAGkABgUAAAAAAAAmQAYNAAAAAAgAAAABAwAAAAIBBwcZAAAAAAAAAAABAAAAAAIAAAAABAAAAAAFAAAAAACpAAAAAQQAAAAtAAAAAxwAAAAEDgAAAEEAYwBjAGUAbgB0ADUABQQAAAABAAAABB4AAAAAAQABAQAGBAAAAAAHBAIAAAAIBAEAAAAJBAAAAAAFJwAAAAEGAwAAAAIBAAQGDgAAAEMAYQBsAGkAYgByAGkABgUAAAAAAAAmQAYNAAAAAAgAAAABAwAAAAIBCAcZAAAAAAAAAAABAAAAAAIAAAAABAAAAAAFAAAAAACpAAAAAQQAAAAxAAAAAxwAAAAEDgAAAEEAYwBjAGUAbgB0ADYABQQAAAABAAAABB4AAAAAAQABAQAGBAAAAAAHBAIAAAAIBAEAAAAJBAAAAAAFJwAAAAEGAwAAAAIBAAQGDgAAAEMAYQBsAGkAYgByAGkABgUAAAAAAAAmQAYNAAAAAAgAAAABAwAAAAIBCQcZAAAAAAAAAAABAAAAAAIAAAAABAAAAAAFAAAAAAA3AQAAAQQAAAAEAAAA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";
+	var dstLen = sStyles.length;
+	var pointer = g_memory.Alloc(dstLen);
+	stream = new FT_Stream2(pointer.data, dstLen);
+	stream.obj = pointer.obj;
+
+	var bcr = new Binary_CommonReader(stream);
+	var oBinaryFileReader = new BinaryFileReader("");
+	oBinaryFileReader.getbase64DecodedData2(sStyles, 0, stream, 0);
+	var oBinary_StylesTableReader = new Binary_StylesTableReader(stream, wb, [], []);
+
+	var length = stream.GetULongLE();
+
+	var fReadStyle = function(type, length, oCellStyle, oStyleObject) {
+		var res = c_oSerConstants.ReadOk;
+		if (Types.BuiltinId === type) {
+			oCellStyle.BuiltinId = this.stream.GetULongLE();
+		} else if (Types.Hidden === type) {
+			oCellStyle.Hidden = this.stream.GetBool();
+		} else if (Types.CellStyle === type) {
+			res = bcr.Read1(length, function(t, l) {
+				return oBinary_StylesTableReader.ReadCellStyle(t, l, oCellStyle);
+			});
+		} else if (Types.Xfs === type) {
+			oStyleObject.xfs = {ApplyAlignment: null, ApplyBorder: null, ApplyFill: null, ApplyFont: null, ApplyNumberFormat: null,
+				BorderId: null, FillId: null, FontId: null, NumFmtId: null, QuotePrefix: null, Aligment: null, XfId: null};
+			res = bcr.Read2Spreadsheet(length, function (t, l) {
+				return oBinary_StylesTableReader.ReadXfs(t, l, oStyleObject.xfs);
+			});
+		} else if (Types.Font === type) {
+			oStyleObject.font = new Font();
+			res = bcr.Read2Spreadsheet(length, function (t, l) {
+				return oBinary_StylesTableReader.bssr.ReadRPr(t, l, oStyleObject.font);
+			});
+		} else if (Types.Fill === type) {
+			oStyleObject.fill = new Fill();
+			res = bcr.Read1(length, function (t, l) {
+				return oBinary_StylesTableReader.ReadFill(t, l, oStyleObject.fill);
+			});
+		} else if (Types.Border === type) {
+			oStyleObject.border = new Border();
+			res = bcr.Read1(length, function (t, l) {
+				return oBinary_StylesTableReader.ReadBorder(t, l, oStyleObject.border);
+			});
+		} else if (Types.NumFmts === type) {
+			res = bcr.Read1(length, function (t, l) {
+				return oBinary_StylesTableReader.ReadNumFmts(t, l, oStyleObject.oNumFmts);
+			});
+		} else
+			res = c_oSerConstants.ReadUnknown;
+		return res;
+	};
+	var fReadStyles = function (type, length, oOutput) {
+		var res = c_oSerConstants.ReadOk;
+		var oStyleObject = {font: null, fill: null, border: null, oNumFmts: [], xfs: null};
+		if (Types.Style === type) {
+			var oCellStyle = new CCellStyle();
+			res = bcr.Read1(length, function (t, l) {
+				return fReadStyle(t,l, oCellStyle, oStyleObject);
+			});
+
+			oCellStyle.xfs = new CellXfs();
+			// Border
+			if (null !== oStyleObject.border)
+				oCellStyle.xfs.border = oStyleObject.border.clone();
+			// Fill
+			if (null !== oStyleObject.fill)
+				oCellStyle.xfs.fill = oStyleObject.fill.clone();
+			// Font
+			if (null !== oStyleObject.font)
+				oCellStyle.xfs.font = oStyleObject.font.clone();
+			// NumFmt
+			if (null !== oStyleObject.xfs.numid) {
+				var oCurNum = oStyleObject.oNumFmts[oStyleObject.xfs.numid];
+				if(null != oCurNum)
+					oCellStyle.xfs.num = oBinary_StylesTableReader.ParseNum(oCurNum, oStyleObject.oNumFmts);
+				else
+					oCellStyle.xfs.num = oBinary_StylesTableReader.ParseNum({id: oStyleObject.xfs.numid, f: null}, oStyleObject.oNumFmts);
+			}
+			// QuotePrefix
+			if(null != oStyleObject.xfs.QuotePrefix)
+				oCellStyle.xfs.QuotePrefix = oStyleObject.xfs.QuotePrefix;
+			// align
+			if(null != oStyleObject.xfs.align)
+				oCellStyle.xfs.align = oStyleObject.xfs.align.clone();
+			// XfId
+			if (null !== oStyleObject.xfs.XfId)
+				oCellStyle.xfs.XfId = oStyleObject.xfs.XfId;
+
+			oOutput.push(oCellStyle);
+		} else
+			res = c_oSerConstants.ReadUnknown;
+		return res;
+	};
+
+	res = bcr.Read1(length, function (t, l) {
 		return fReadStyles(t, l, oOutput);
 	});
 }

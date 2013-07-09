@@ -1366,6 +1366,7 @@ function Workbook(sUrlPath, eventsHandlers, oApi){
 	this.DefinedNames = new Object();
 	this.oRealDefinedNames = new Object();
 	this.oNameGenerator = new NameGenerator(this);
+	this.CellStyles = new CCellStyles();
 	this.TableStyles = new CTableStyles();
 	this.oStyleManager = new StyleManager(this);
 	this.calcChain = new Array();
@@ -5970,6 +5971,25 @@ Range.prototype.getValue2=function(dDigitsCount, fIsFitMeasurer){
 		oTempCell.create(xfs, this.getFirst());
 		return oTempCell.getValue2(dDigitsCount, fIsFitMeasurer);
 	}
+};
+Range.prototype.getXfId=function(){
+	var nRow = this.bbox.r1;
+	var nCol = this.bbox.c1;
+	var cell = this.worksheet._getCellNoEmpty(nRow, nCol);
+	if(null != cell) {
+		var xfs = cell.getStyle();
+		if(null != xfs && null != xfs.XfId)
+			return xfs.XfId;
+	} else {
+		//стили столбов и колонок
+		var row = this.worksheet._getRowNoEmpty(nRow);
+		if(null != row && null != row.xfs && null != row.xfs.XfId)
+			return row.xfs.XfId;
+		var col = this.worksheet._getColNoEmptyWithAll(nCol);
+		if(null != col && null != col.xfs && null != col.xfs.XfId)
+			return col.xfs.XfId;
+	}
+	return g_oDefaultXfId;
 };
 Range.prototype.getNumFormat=function(){
 	return oNumFormatCache.get(this.getNumFormatStr());
