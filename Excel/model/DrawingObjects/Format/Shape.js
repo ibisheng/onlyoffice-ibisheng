@@ -895,6 +895,14 @@ CShape.prototype =
         }
     },
 
+    drawTextSelection: function()
+    {
+        if(isRealObject(this.txBody))
+        {
+            this.txBody.drawTextSelection();
+        }
+    },
+
     check_bounds: function(checker)
     {
         if (this.spPr.geometry)
@@ -1178,7 +1186,7 @@ CShape.prototype =
         t_x = invert_transform.TransformPointX(x, y);
         t_y = invert_transform.TransformPointY(x, y);
         if(isRealObject(this.spPr.geometry))
-            return this.spPr.geometry.hitToAdj(t_x, t_y, /*TODO*/ 5);
+            return this.spPr.geometry.hitToAdj(t_x, t_y, this.drawingObjects.convertMetric(TRACK_CIRCLE_RADIUS, 0, 3));
         return {hit: false, adjPolarFlag: null, adjNum: null};
     },
 

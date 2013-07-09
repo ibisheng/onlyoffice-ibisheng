@@ -13,7 +13,7 @@ function CTxBody(shape)
     this.bodyPr.setDefault();
     this.lstStyle = null;
 
-    this.content = new CDocumentContent(this, /*editor.WordControl.m_oLogicDocument.DrawingDocument*/undefined, 0, 0, 200, 20000, false, false);
+    this.content = new CDocumentContent(this, shape.drawingObjects.drawingDocument, 0, 0, 200, 20000, false, false);
     this.contentWidth = 0;
     this.contentHeight = 0;
 
@@ -160,7 +160,6 @@ CTxBody.prototype =
 
     selectionSetStart: function(e, x, y)
     {
-        MouseEvent = new CMouseEventHandler();
         this.content.Selection_SetStart(x, y, 0, e);
     },
 
@@ -184,6 +183,12 @@ CTxBody.prototype =
             drawingDocument.UpdateTargetTransform(this.shape.transformText);
             drawingDocument.TargetShow();
             drawingDocument.SelectEnabled(false);
+            drawingDocument.CheckTargetShow();
         }
+    },
+
+    drawTextSelection: function()
+    {
+        this.content.Selection_Draw_Page(0);
     }
 };

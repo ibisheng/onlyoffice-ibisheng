@@ -247,9 +247,22 @@ DrawingObjectsController.prototype =
             this.arrTrackObjects[i].draw(overlay);
     },
 
+    needUpdateOverlay: function()
+    {
+        return this.arrTrackObjects.length > 0;
+    },
+
     drawSelection: function(drawingDocument)
     {
         this.curState.drawSelection(drawingDocument);
+    },
+
+    drawTextSelection: function()
+    {
+        if(isRealObject(this.curState.textObject) )
+        {
+            this.curState.textObject.drawTextSelection();
+        }
     },
 
     isPointInDrawingObjects: function(x, y)

@@ -160,7 +160,7 @@ function NullState(drawingObjectsController, drawingObjects)
                         cur_drawing.selectionSetStart(e, x, y);
                         this.drawingObjectsController.changeCurrentState(new TextAddState(this.drawingObjectsController, this.drawingObjects, cur_drawing));
                         if(e.ClickCount < 2)
-                            this.drawingObjects.selectGraphicObject();
+                            cur_drawing.updateSelectionState(this.drawingObjects.drawingDocument);
                         return;
                     }
                 }
@@ -352,15 +352,17 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
 
     this.onMouseMove = function(e, x, y)
     {
-        this.textObject.selectionSetEnd(e, x, y);
-        this.drawingObjects.selectGraphicObject();
-
+        if(e.which > 0)
+        {
+            this.textObject.selectionSetEnd(e, x, y);
+            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+        }
     };
 
     this.onMouseUp = function(e, x, y)
     {
         this.textObject.selectionSetEnd(e, x, y);
-        this.drawingObjects.selectGraphicObject();
+        this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
     };
 
     this.onKeyDown = function(e)
@@ -386,7 +388,7 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
     this.drawSelection = function(drawingDocument)
     {
         DrawDefaultSelection(this.drawingObjectsController, drawingDocument);
-        this.textObject.updateSelectionState(drawingDocument);
+        //this.textObject.updateSelectionState(drawingDocument);
     };
 
     this.isPointInDrawingObjects = function(x, y)

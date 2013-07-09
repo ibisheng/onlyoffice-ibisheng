@@ -1637,8 +1637,9 @@ function CPage()
     }
 }
 
-function CDrawingDocument()
+function CDrawingDocument(drawingObjects)
 {
+    this.drawingObjects = drawingObjects;
     this.IsLockObjectsEnable = false;
 
     this.cursorMarkerFormat = "";
@@ -2994,7 +2995,7 @@ function CDrawingDocument()
         if (this.m_bIsSearching && null != this.CurrentSearchNavi)
         {
             this.CurrentSearchNavi = null;
-            this.m_oWordControl.OnUpdateOverlay();
+            this.drawingObjects.OnUpdateOverlay();
         }
     }
     this.UpdateTarget2 = function(x, y, pageIndex)
@@ -3186,7 +3187,7 @@ function CDrawingDocument()
         if (this.m_bIsSearching && null != this.CurrentSearchNavi)
         {
             this.CurrentSearchNavi = null;
-            oWordControl.OnUpdateOverlay();
+            this.drawingObjects.OnUpdateOverlay();
         }
     }
 
@@ -3448,8 +3449,8 @@ function CDrawingDocument()
         {
             this.SelectClear();
             //this.m_oWordControl.CheckUnShowOverlay();
-            this.m_oWordControl.OnUpdateOverlay();
-            this.m_oWordControl.m_oOverlayApi.m_oContext.globalAlpha = 1.0;
+            this.drawingObjects.OnUpdateOverlay();
+            this.drawingObjects.getOverlay().m_oContext.globalAlpha = 1.0;
         }
     }
 	this.SelectClear = function()
@@ -3616,7 +3617,7 @@ function CDrawingDocument()
         }
 
         if (is_update)
-            this.m_oWordControl.OnUpdateOverlay();
+            this.drawingObjects.OnUpdateOverlay();
 
     }
 
@@ -3687,38 +3688,21 @@ function CDrawingDocument()
 
     this.AddPageSelection = function(pageIndex, x, y, w, h)
     {
-        if (pageIndex < this.m_lDrawingFirst || pageIndex > this.m_lDrawingEnd)
+       /*    if (pageIndex < this.m_lDrawingFirst || pageIndex > this.m_lDrawingEnd)
         {
-            if (this.m_oWordControl.MobileTouchManager)
-            {
-                var r = new _rect();
-                r.x = x;
-                r.y = y;
-                r.w = w;
-                r.h = h;
-
-                if (null == this.m_oWordControl.MobileTouchManager.RectSelect1)
-                {
-                    this.m_oWordControl.MobileTouchManager.RectSelect1 = r;
-                    this.m_oWordControl.MobileTouchManager.PageSelect1 = pageIndex;
-                }
-
-                this.m_oWordControl.MobileTouchManager.RectSelect2 = r;
-                this.m_oWordControl.MobileTouchManager.PageSelect2 = pageIndex;
-            }
             return;
-        }
+        }     */
 
-        var page = this.m_arrPages[pageIndex];
-        var drawPage = page.drawingPage;
+       // var page = this.m_arrPages[pageIndex];
+      //  var drawPage = page.drawingPage;
 
-        var dKoefX = (drawPage.right - drawPage.left) / page.width_mm;
-        var dKoefY = (drawPage.bottom - drawPage.top) / page.height_mm;
+        var dKoefX = this.drawingObjects.convertMetric(1, 3, 0);//(drawPage.right - drawPage.left) / page.width_mm;
+        var dKoefY = dKoefX;//(drawPage.bottom - drawPage.top) / page.height_mm;
 
         if (!this.IsTextMatrixUse)
         {
-            var _x = ((drawPage.left + dKoefX * x) >> 0) - 0.5;
-            var _y = ((drawPage.top + dKoefY * y) >> 0) - 0.5;
+            var _x = ((/*drawPage.left +*/ dKoefX * x) >> 0) - 0.5;
+            var _y = ((/*drawPage.top + */dKoefY * y) >> 0) - 0.5;
 
             var _w = (dKoefX * w + 1) >> 0;
             var _h = (dKoefY * h + 1) >> 0;
@@ -3740,17 +3724,17 @@ function CDrawingDocument()
             var _x4 = this.TextMatrix.TransformPointX(x, y + h);
             var _y4 = this.TextMatrix.TransformPointY(x, y + h);
 
-            var x1 = drawPage.left + dKoefX * _x1;
-            var y1 = drawPage.top + dKoefY * _y1;
+            var x1 = /*drawPage.left +*/ dKoefX * _x1;
+            var y1 = /*drawPage.top + */dKoefY * _y1;
 
-            var x2 = drawPage.left + dKoefX * _x2;
-            var y2 = drawPage.top + dKoefY * _y2;
+            var x2 =/*drawPage.left +*/ dKoefX * _x2;
+            var y2 =/*drawPage.top + */dKoefY * _y2;
 
-            var x3 = drawPage.left + dKoefX * _x3;
-            var y3 = drawPage.top + dKoefY * _y3;
+            var x3 =/* drawPage.left +*/ dKoefX * _x3;
+            var y3 =/* drawPage.top + */dKoefY * _y3;
 
-            var x4 = drawPage.left + dKoefX * _x4;
-            var y4 = drawPage.top + dKoefY * _y4;
+            var x4 = /*drawPage.left +*/ dKoefX * _x4;
+            var y4 = /*drawPage.top + */dKoefY * _y4;
 
             this.Overlay.CheckPoint(x1, y1);
             this.Overlay.CheckPoint(x2, y2);
@@ -3763,24 +3747,6 @@ function CDrawingDocument()
             ctx.lineTo(x3, y3);
             ctx.lineTo(x4, y4);
             ctx.closePath();
-        }
-
-        if (this.m_oWordControl.MobileTouchManager)
-        {
-            var r = new _rect();
-            r.x = x;
-            r.y = y;
-            r.w = w;
-            r.h = h;
-
-            if (null == this.m_oWordControl.MobileTouchManager.RectSelect1)
-            {
-                this.m_oWordControl.MobileTouchManager.RectSelect1 = r;
-                this.m_oWordControl.MobileTouchManager.PageSelect1 = pageIndex;
-            }
-
-            this.m_oWordControl.MobileTouchManager.RectSelect2 = r;
-            this.m_oWordControl.MobileTouchManager.PageSelect2 = pageIndex;
         }
     }
 
@@ -3867,7 +3833,7 @@ function CDrawingDocument()
     }
     this.SelectShow = function()
     {
-        this.m_oWordControl.OnUpdateOverlay();
+        this.drawingObjects.OnUpdateOverlay();
     }
 
     this.Set_RulerState_Table = function(markup, transform)
