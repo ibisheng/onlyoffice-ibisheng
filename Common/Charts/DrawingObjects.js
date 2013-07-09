@@ -2062,7 +2062,6 @@ function DrawingObjects() {
 	
 	var trackOverlay = null;
 	var autoShapeTrack = null;
-	var hitCanvasContext = null;
 	var scrollOffset = { x: 0, y: 0 };
 	
 	var aObjects = null;
@@ -2080,8 +2079,8 @@ function DrawingObjects() {
 	// Все изменения, связанные с image.src прогоняем через этот класс
 	var imageLoader = new ImageLoader();	
 	
-	_this.asyncImageLoadedEvent = null;
 	_this.drawingDocument = null;
+	_this.asyncImageLoadedEvent = null;
 
 	//-----------------------------------------------------------------------------------
 	// Public methods
@@ -2140,26 +2139,6 @@ function DrawingObjects() {
 				window.attachEvent("onmessage", this._uploadMessage);
 			}
 		}
-		
-		/*var hitCanvasId = "ws-hit-canvas";
-		var hitCanvas = document.getElementById(hitCanvasId);
-		
-		if ( !hitCanvas ) {
-			var wbWidget = $("#wb-widget");
-			var hitCanvas = document.createElement('canvas');
-			
-			$(hitCanvas).attr("id", hitCanvasId);			
-			$(hitCanvas).css( "top", wbWidget.css("top") );
-			$(hitCanvas).css( "left", wbWidget.css("left") );
-			$(hitCanvas).css( "width", wbWidget.css("width") );
-			$(hitCanvas).css( "height", wbWidget.css("height") );
-			$(hitCanvas).css( "position", wbWidget.css("position") );
-			
-			$("#wb-widget").append($(hitCanvas));
-			hitCanvasContext = hitCanvas.getContext("2d");
-		}
-		else
-			hitCanvasContext = hitCanvas.getContext("2d");*/
 	}
 	
 	_this.getWorkbook = function() {
@@ -2167,8 +2146,7 @@ function DrawingObjects() {
 	}
 	
 	_this.getCanvasContext = function() {
-        return shapeCtx.m_oContext;
-		//return hitCanvasContext;
+        return _this.drawingDocument.CanvasHitContext;
     }
 	
 	_this.getDrawingObjects = function() {
@@ -2625,8 +2603,7 @@ function DrawingObjects() {
 		}
 
         _t.getCanvasContext = function() {
-            return shapeCtx.m_oContext;
-			//return hitCanvasContext;
+            return _this.drawingDocument.CanvasHitContext;
         }
 
 		// Считаем From/To исходя из graphicObject
