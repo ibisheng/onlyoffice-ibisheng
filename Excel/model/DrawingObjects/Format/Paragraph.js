@@ -480,7 +480,7 @@ Paragraph.prototype =
     // Удаляем несколько элементов
     Internal_Content_Remove2 : function(Pos, Count)
     {
-        var DocumentComments = editor.WordControl.m_oLogicDocument.Comments;
+        /*var DocumentComments = editor.WordControl.m_oLogicDocument.Comments;
         var CommentsToDelete = new Object();
         for ( var Index = Pos; Index < Pos + Count; Index++ )
         {
@@ -494,7 +494,7 @@ Paragraph.prototype =
 
                 CommentsToDelete[this.Content[Index].Id] = 1;
             }
-        }
+        }     */
 
         var LastArray = this.Content.slice( Pos, Pos + Count );
 
@@ -592,10 +592,10 @@ Paragraph.prototype =
         this.Content.splice( Pos, Count );
 
         // Комментарии удаляем после, чтобы не нарушить позиции
-        for ( var Id in CommentsToDelete )
+       /* for ( var Id in CommentsToDelete )
         {
             editor.WordControl.m_oLogicDocument.Remove_Comment( Id, true );
-        }
+        }    */
 
         // Передвинем все метки слов для проверки орфографии
        // this.SpellChecker.Update_OnRemove( this, Pos, Count );

@@ -3454,11 +3454,7 @@ function CDrawingDocument()
     }
 	this.SelectClear = function()
     {
-        if (this.m_oWordControl.MobileTouchManager)
-        {
-            this.m_oWordControl.MobileTouchManager.RectSelect1 = null;
-            this.m_oWordControl.MobileTouchManager.RectSelect2 = null;
-        }
+
     }
     this.SearchClear = function()
     {
