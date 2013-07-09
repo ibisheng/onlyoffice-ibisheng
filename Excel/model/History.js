@@ -94,6 +94,46 @@ var historyitem_AutoFilter_Empty	= 3;
 var historyitem_AutoFilter_ApplyDF	= 4;
 var historyitem_AutoFilter_ApplyMF	= 5;
 
+
+// Типы изменений в классе CDocumentContent
+var historyitem_DocumentContent_AddItem     = 1; // Добавляем элемент в документ
+var historyitem_DocumentContent_RemoveItem  = 2; // Удаляем элемент из документа
+
+// Типы изменений в классе Paragraph
+var historyitem_Paragraph_AddItem                   =  1; // Добавляем элемент в параграф
+var historyitem_Paragraph_RemoveItem                =  2; // Удаляем элемент из параграфа
+var historyitem_Paragraph_Numbering                 =  3; // Добавляем/Убираем/Изменяем нумерацию у параграфа
+var historyitem_Paragraph_Align                     =  4; // Изменяем прилегание параграфа
+var historyitem_Paragraph_Ind_First                 =  5; // Изменяем отспут первой строки
+var historyitem_Paragraph_Ind_Right                 =  6; // Изменяем правый отступ
+var historyitem_Paragraph_Ind_Left                  =  7; // Изменяем левый отступ
+var historyitem_Paragraph_ContextualSpacing         =  8; // Изменяем свойство contextualSpacing
+var historyitem_Paragraph_KeepLines                 =  9; // Изменяем свойство KeepLines
+var historyitem_Paragraph_KeepNext                  = 10; // Изменяем свойство KeepNext
+var historyitem_Paragraph_PageBreakBefore           = 11; // Изменяем свойство PageBreakBefore
+var historyitem_Paragraph_Spacing_Line              = 12; // Изменяем свойство Spacing.Line
+var historyitem_Paragraph_Spacing_LineRule          = 13; // Изменяем свойство Spacing.LineRule
+var historyitem_Paragraph_Spacing_Before            = 14; // Изменяем свойство Spacing.Before
+var historyitem_Paragraph_Spacing_After             = 15; // Изменяем свойство Spacing.After
+var historyitem_Paragraph_Spacing_AfterAutoSpacing  = 16; // Изменяем свойство Spacing.AfterAutoSpacing
+var historyitem_Paragraph_Spacing_BeforeAutoSpacing = 17; // Изменяем свойство Spacing.BeforeAutoSpacing
+var historyitem_Paragraph_Shd_Value                 = 18; // Изменяем свойство Shd.Value
+var historyitem_Paragraph_Shd_Color                 = 19; // Изменяем свойство Shd.Color
+var historyitem_Paragraph_WidowControl              = 20; // Изменяем свойство WidowControl
+var historyitem_Paragraph_Tabs                      = 21; // Изменяем табы у параграфа
+var historyitem_Paragraph_PStyle                    = 22; // Изменяем стиль параграфа
+var historyitem_Paragraph_DocNext                   = 23; // Изменяем указатель на следующий объект
+var historyitem_Paragraph_DocPrev                   = 24; // Изменяем указатель на предыдущий объект
+var historyitem_Paragraph_Parent                    = 25; // Изменяем указатель на родительский объект
+var historyitem_Paragraph_Borders_Between           = 26; // Изменяем промежуточную границу
+var historyitem_Paragraph_Borders_Bottom            = 27; // Изменяем верхнюю границу
+var historyitem_Paragraph_Borders_Left              = 28; // Изменяем левую границу
+var historyitem_Paragraph_Borders_Right             = 29; // Изменяем правую границу
+var historyitem_Paragraph_Borders_Top               = 30; // Изменяем нижнюю границу
+var historyitem_Paragraph_Pr                        = 31; // Изменяем свойства полностью
+var historyitem_Paragraph_PresentationPr_Bullet     = 32; // Изменяем свойства нумерации у параграфа в презентации
+var historyitem_Paragraph_PresentationPr_Level      = 33; // Изменяем уровень параграфа в презентациях
+
 // Типы изменений в классе CTableId
 var historyitem_TableId_Add   = 1; // Добавили новую ссылку в глобальную таблицу
 var historyitem_TableId_Reset = 2; // Изменили Id ссылки

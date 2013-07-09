@@ -123,6 +123,8 @@ function RotateTrackShapeImage(originalObject)
     {
         this.originalObject.setRotate(this.angle);
         this.originalObject.recalculateTransform();
+        this.originalObject.calculateContent();
+        this.originalObject.calculateTransformTextMatrix();
     }
 }
 
@@ -183,6 +185,8 @@ function RotateTrackShapeImageInGroup(originalObject)
     {
         this.originalObject.setRotate(this.angle);
         this.originalObject.recalculateTransform();
+        this.originalObject.calculateContent();
+        this.originalObject.calculateTransformTextMatrix();
     }
 }
 

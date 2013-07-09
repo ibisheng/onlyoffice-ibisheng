@@ -1661,7 +1661,7 @@ ParaEnd.prototype =
 {
     Draw : function(X,Y,Context, bEndCell)
     {
-        Context.SetFontSlot( fontslot_ASCII );
+       /* Context.SetFontSlot( fontslot_ASCII );
         
         if ( editor.ShowParaMarks )
         {
@@ -1669,7 +1669,7 @@ ParaEnd.prototype =
                 Context.FillText( X, Y, String.fromCharCode( 0x00A4 ) );
             else
                 Context.FillText( X, Y, String.fromCharCode( 0x00B6 ) );
-        }
+        } */
     },
 
     Measure : function(Context, bEndCell)

@@ -5,6 +5,126 @@
  */
 
 
+var docpostype_Content        = 0x00;
+var docpostype_FlowObjects    = 0x01;
+var docpostype_HdrFtr         = 0x02;
+var docpostype_DrawingObjects = 0x03;
+
+// Типы которые возвращают классы CParagraph и CTable после пересчета страницы
+var recalcresult_NextElement = 0x00; // Пересчитываем следующий элемент
+var recalcresult_PrevPage    = 0x01; // Пересчитываем заново предыдущую страницу
+var recalcresult_CurPage     = 0x02; // Пересчитываем заново текущую страницу
+var recalcresult_NextPage    = 0x03; // Пересчитываем следующую страницу
+
+
+// Типы которые возвращают классы CDocument и CDocumentContent после пересчета страницы
+var recalcresult2_End      = 0x00; // Документ рассчитан до конца
+var recalcresult2_NextPage = 0x01; // Рассчет нужно продолжить
+
+
+
+var Page_Width     = 210;
+var Page_Height    = 297;
+
+var X_Left_Margin   = 30;  // 3   cm
+var X_Right_Margin  = 15;  // 1.5 cm
+var Y_Bottom_Margin = 20;  // 2   cm
+var Y_Top_Margin    = 20;  // 2   cm
+
+var Y_Default_Header = 12.5; // 1.25 cm расстояние от верха страницы до верха верхнего колонтитула
+var Y_Default_Footer = 12.5; // 1.25 cm расстояние от низа страницы до низа нижнего колонтитула
+
+var X_Left_Field   = X_Left_Margin;
+var X_Right_Field  = Page_Width  - X_Right_Margin;
+var Y_Bottom_Field = Page_Height - Y_Bottom_Margin;
+var Y_Top_Field    = Y_Top_Margin;
+
+var align_Right   = 0;
+var align_Left    = 1;
+var align_Center  = 2;
+var align_Justify = 3;
+
+var vertalign_Baseline    = 0;
+var vertalign_SuperScript = 1;
+var vertalign_SubScript   = 2;
+var hdrftr_Header = 0x01;
+var hdrftr_Footer = 0x02;
+
+var hdrftr_Default = 0x01;
+var hdrftr_Even    = 0x02;
+var hdrftr_First   = 0x03;
+
+var c_oAscTableSelectionType =
+{
+    Cell   : 0,
+    Row    : 1,
+    Column : 2,
+    Table  : 3
+}
+
+var linerule_AtLeast = 0;
+var linerule_Auto    = 1;
+var linerule_Exact   = 2;
+
+var shd_Clear = 0;
+var shd_Nil   = 1;
+
+var comments_NoComment        = 0;
+var comments_NonActiveComment = 1;
+var comments_ActiveComment    = 2;
+
+
+function Document_Recalculate_Page()
+{
+    var LogicDocument = editor.WordControl.m_oLogicDocument;
+    var FullRecalc    = LogicDocument.FullRecalc;
+    LogicDocument.Recalculate_Page( FullRecalc.PageIndex, FullRecalc.Start, FullRecalc.StartIndex );
+}
+
+function CDocumentPage()
+{
+    this.Width   = Page_Width;
+    this.Height  = Page_Height;
+    this.Margins =
+    {
+        Left   : X_Left_Field,
+        Right  : X_Right_Field,
+        Top    : Y_Top_Field,
+        Bottom : Y_Bottom_Field
+    };
+
+    this.Bounds = new CDocumentBounds(0,0,0,0);
+   // this.FlowObjects = new FlowObjects(editor.WordControl.m_oLogicDocument, 0); // Используем данный объект только для хранения ссылок на Flow-таблицы
+    this.Pos    = 0;
+    this.EndPos = 0;
+
+    this.X      = 0;
+    this.Y      = 0;
+    this.XLimit = 0;
+    this.YLimit = 0;
+}
+
+CDocumentPage.prototype =
+{
+    Update_Limits : function(Limits)
+    {
+        this.X      = Limits.X;
+        this.XLimit = Limits.XLimit;
+        this.Y      = Limits.Y;
+        this.YLimit = Limits.YLimit;
+    },
+
+    Shift : function(Dx, Dy)
+    {
+        this.X      += Dx;
+        this.XLimit += Dx;
+        this.Y      += Dy;
+        this.YLimit += Dy;
+
+        this.Bounds.Shift( Dx, Dy );
+    }
+};
+
 // Класс CDocumentContent. Данный класс используется для работы с контентом ячеек таблицы,
 // колонтитулов, сносок, надписей.
 function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, TurnOffInnerWrap)
@@ -21,7 +141,7 @@ function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, 
 
     this.Parent = Parent;
     this.DrawingDocument = DrawingDocument;
-    this.LogicDocument   = editor.WordControl.m_oLogicDocument;
+   // this.LogicDocument   = editor.WordControl.m_oLogicDocument;
 
     if ( "undefined" === typeof(TurnOffInnerWrap) )
         TurnOffInnerWrap = false;
@@ -70,10 +190,10 @@ function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, 
     };
 
     // Массив укзателей на все инлайновые графические объекты
-    this.DrawingObjects = this.LogicDocument.DrawingObjects;
+   // this.DrawingObjects = this.LogicDocument.DrawingObjects;
 
-    this.Styles    = editor.WordControl.m_oLogicDocument.Get_Styles();
-    this.Numbering = editor.WordControl.m_oLogicDocument.Get_Numbering();
+    this.Styles    = this.Parent.Get_Styles();
+    //this.Numbering = editor.WordControl.m_oLogicDocument.Get_Numbering();
 
     this.ClipInfo =
     {
@@ -181,11 +301,11 @@ CDocumentContent.prototype =
     // что у них врапится текст не колонтитула, а документа.
     CheckRange : function(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, PageNum_rel, Inner)
     {
-        if ( undefined === Inner )
+       /* if ( undefined === Inner )
             Inner = true;
 
         if ( (false === this.TurnOffInnerWrap && true === Inner) || (false === Inner) )
-            return this.LogicDocument.DrawingObjects.CheckRange(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, PageNum_rel + this.Get_StartPage_Absolute(), [], this );
+            return this.LogicDocument.DrawingObjects.CheckRange(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, PageNum_rel + this.Get_StartPage_Absolute(), [], this );     */
 
         return [];
     },
@@ -420,10 +540,9 @@ CDocumentContent.prototype =
 
     Recalculate : function()
     {
-        editor.WordControl.m_oLogicDocument.bRecalcDocContent = true;
-        editor.WordControl.m_oLogicDocument.recalcDocumentConten = this;
-        editor.WordControl.m_oLogicDocument.Recalculate();
-
+       // editor.WordControl.m_oLogicDocument.bRecalcDocContent = true;
+       // editor.WordControl.m_oLogicDocument.recalcDocumentConten = this;
+       // editor.WordControl.m_oLogicDocument.Recalculate();
     },
 
     Recalculate_ : function(bForceRecalc, LastChangeIndex)
@@ -578,7 +697,7 @@ CDocumentContent.prototype =
             this.Pages.length = PageIndex;
             this.Pages[PageIndex] = new CDocumentPage();
             this.Pages[PageIndex].Pos = StartIndex;
-            this.LogicDocument.DrawingObjects.resetDrawingArrays( this.Get_StartPage_Absolute() + PageIndex, this);
+            //this.LogicDocument.DrawingObjects.resetDrawingArrays( this.Get_StartPage_Absolute() + PageIndex, this);
         }
 
         var Count = this.Content.length;
@@ -617,96 +736,14 @@ CDocumentContent.prototype =
 
             var RecalcResult = recalcresult_NextElement;
             var bFlowTable = false;
-            if ( type_Table === Element.GetType() && true != Element.Is_Inline() )
+
+            if ( ( 0 === Index && 0 === PageIndex ) || Index != StartIndex )
             {
-                bFlowTable = true;
-                if ( null === this.RecalcInfo.FlowObject )
-                {
-                    if ( ( 0 === Index && 0 === PageIndex ) || Index != StartIndex )
-                    {
-                        Element.Set_DocumentIndex( Index );
-                        Element.Reset( X, Y, XLimit, YLimit, PageIndex );
-                    }
-
-                    this.RecalcInfo.FlowObjectPage = 0;
-                    this.RecalcInfo.FlowObject   = Element;
-                    this.RecalcInfo.RecalcResult = Element.Recalculate_Page( PageIndex );
-                    this.DrawingObjects.addFloatTable( new CFlowTable2( Element, PageIndex ) );
-                    RecalcResult = recalcresult_CurPage;
-                }
-                else if ( Element === this.RecalcInfo.FlowObject )
-                {
-                    // Если у нас текущая страница совпадает с той, которая указана в таблице, тогда пересчитываем дальше
-                    if ( Element.PageNum > PageIndex || ( this.RecalcInfo.FlowObjectPage <= 0 && Element.PageNum < PageIndex ) || Element.PageNum === PageIndex )
-                    {
-                        if ( true === this.RecalcInfo.FlowObjectPageBreakBefore )
-                        {
-                            // Добавляем начало таблицы в конец страницы так, чтобы не убралось ничего
-                            Element.Set_DocumentIndex( Index );
-                            Element.Reset( X, Page_Height, XLimit, Page_Height, PageIndex );
-                            Element.Recalculate_Page( PageIndex );
-
-                            this.RecalcInfo.FlowObjectPage++;
-                            RecalcResult = recalcresult_NextPage;
-                        }
-                        else
-                        {
-                            if ( ( 0 === Index && 0 === PageIndex ) || Index != StartIndex )
-                            {
-                                Element.Set_DocumentIndex( Index );
-                                Element.Reset( X, Y, XLimit, YLimit, PageIndex );
-                            }
-
-                            RecalcResult = Element.Recalculate_Page( PageIndex );
-                            if ( (( 0 === Index && 0 === PageIndex ) || Index != StartIndex) && true != Element.Is_ContentOnFirstPage()  )
-                            {
-                                this.DrawingObjects.removeFloatTableById(PageIndex, Element.Get_Id());
-                                this.RecalcInfo.FlowObjectPageBreakBefore = true;
-                                RecalcResult = recalcresult_CurPage;
-                            }
-                            else
-                            {
-                                this.RecalcInfo.FlowObjectPage++;
-
-                                if ( recalcresult_NextElement === RecalcResult )
-                                {
-                                    this.RecalcInfo.FlowObject                = null;
-                                    this.RecalcInfo.FlowObjectPageBreakBefore = false;
-                                    this.RecalcInfo.FlowObjectPage            = 0;
-                                    this.RecalcInfo.RecalcResult              = recalcresult_NextElement;
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        RecalcResult = Element.Recalculate_Page( PageIndex );
-                        this.DrawingObjects.addFloatTable( new CFlowTable2( Element, PageIndex ) );
-
-                        if ( recalcresult_NextElement === RecalcResult )
-                        {
-                            this.RecalcInfo.FlowObject                = null;
-                            this.RecalcInfo.FlowObjectPageBreakBefore = false;
-                            this.RecalcInfo.RecalcResult              = recalcresult_NextElement;
-                        }
-                    }
-                }
-                else
-                {
-                    // Пропускаем
-                    RecalcResult = recalcresult_NextElement;
-                }
+                Element.Set_DocumentIndex( Index );
+                Element.Reset( X, Y, XLimit, YLimit, PageIndex );
             }
-            else
-            {
-                if ( ( 0 === Index && 0 === PageIndex ) || Index != StartIndex )
-                {
-                    Element.Set_DocumentIndex( Index );
-                    Element.Reset( X, Y, XLimit, YLimit, PageIndex );
-                }
 
-                RecalcResult = Element.Recalculate_Page( PageIndex );
-            }
+            RecalcResult = Element.Recalculate_Page( PageIndex );
 
             Element.TurnOn_RecalcEvent();
 
@@ -880,33 +917,6 @@ CDocumentContent.prototype =
             return this.Pages[0].Bounds;
 
         var Bounds = this.Pages[PageNum].Bounds;
-
-        if ( true != this.Is_HdrFtr(false) )
-        {
-            // Учитываем только Drawing-объекты с врапом (объекты над и под текстом не учитываются при пересчете размера)
-            // В колонтитуле не учитывается.
-            var AllDrawingObjects = this.Get_AllDrawingObjects();
-            var Count = AllDrawingObjects.length;
-            for ( var Index = 0; Index < Count; Index++ )
-            {
-                var Obj = AllDrawingObjects[Index];
-                if ( true === Obj.Use_TextWrap() && Obj.Y + Obj.H > Bounds.Bottom )
-                    Bounds.Bottom = Obj.Y + Obj.H;
-            }
-
-            // Кроме этого пробежимся по всем Flow-таблицам и учтем их границы
-            var Count = this.Content.length;
-            for ( var Index = 0; Index < Count; Index++ )
-            {
-                var Element = this.Content[Index];
-                if ( type_Table === Element.GetType() && true != Element.Is_Inline() )
-                {
-                    var TableBounds = Element.Get_PageBounds( PageNum - Element.PageNum );
-                    if ( TableBounds.Bottom > Bounds.Bottom )
-                        Bounds.Bottom = TableBounds.Bottom;
-                }
-            }
-        }
 
         return Bounds;
     },
@@ -7548,3 +7558,147 @@ CDocumentContent.prototype =
     }
 
 };
+
+var contentchanges_Add    = 1;
+var contentchanges_Remove = 2;
+
+function CContentChangesElement(Type, Pos, Count, Data)
+{
+    this.m_nType  = Type;  // Тип изменений (удаление или добавление)
+    this.m_nPos   = Pos;   // Позиция, в которой произошли изменения
+    this.m_nCount = Count; // Количество добавленных/удаленных элементов
+    this.m_pData  = Data;  // Связанные с данным изменением данные из истории
+
+    this.Refresh_BinaryData = function()
+    {
+        var Binary_Writer = History.BinaryWriter;
+        var Binary_Pos = Binary_Writer.GetCurPosition();
+
+        this.m_pData.Data.UseArray = true;
+        this.m_pData.Data.PosArray = this.m_aPositions;
+
+        this.m_pData.Class.Save_Changes( this.m_pData.Data, Binary_Writer );
+
+        var Binary_Len = Binary_Writer.GetCurPosition() - Binary_Pos;
+
+        this.m_pData.Binary.Pos = Binary_Pos;
+        this.m_pData.Binary.Len = Binary_Len;
+    };
+
+    this.Check_Changes = function(Type, Pos)
+    {
+        var CurPos = Pos;
+        if ( contentchanges_Add === Type )
+        {
+            for ( var Index = 0; Index < this.m_nCount; Index++ )
+            {
+                if ( false !== this.m_aPositions[Index] )
+                {
+                    if ( CurPos <= this.m_aPositions[Index] )
+                        this.m_aPositions[Index]++;
+                    else
+                    {
+                        if ( contentchanges_Add === this.m_nType )
+                            CurPos++;
+                        else //if ( contentchanges_Remove === this.m_nType )
+                            CurPos--;
+                    }
+                }
+            }
+        }
+        else //if ( contentchanges_Remove === Type )
+        {
+            for ( var Index = 0; Index < this.m_nCount; Index++ )
+            {
+                if ( false !== this.m_aPositions[Index] )
+                {
+                    if ( CurPos < this.m_aPositions[Index] )
+                        this.m_aPositions[Index]--;
+                    else if ( CurPos > this.m_aPositions[Index] )
+                    {
+                        if ( contentchanges_Add === this.m_nType )
+                            CurPos++;
+                        else //if ( contentchanges_Remove === this.m_nType )
+                            CurPos--;
+                    }
+                    else //if ( CurPos === this.m_aPositions[Index] )
+                    {
+                        if ( contentchanges_Remove === this.m_nType )
+                        {
+                            // Отмечаем, что действия совпали
+                            this.m_aPositions[Index] = false;
+                            return false;
+                        }
+                        else
+                        {
+                            CurPos++;
+                        }
+                    }
+                }
+            }
+        }
+
+        return CurPos;
+    };
+
+    this.Make_ArrayOfSimpleActions = function(Type, Pos, Count)
+    {
+        // Разбиваем действие на простейшие
+        var Positions = new Array();
+        if ( contentchanges_Add === Type )
+        {
+            for ( var Index = 0; Index < Count; Index++ )
+                Positions[Index] = Pos + Index;
+        }
+        else //if ( contentchanges_Remove === Type )
+        {
+            for ( var Index = 0; Index < Count; Index++ )
+                Positions[Index] = Pos;
+        }
+
+        return Positions;
+    };
+
+    // Разбиваем сложное действие на простейшие
+    this.m_aPositions = this.Make_ArrayOfSimpleActions( Type, Pos, Count );
+}
+
+function CContentChanges()
+{
+    this.m_aChanges = new Array();
+
+    this.Add = function(Changes)
+    {
+        this.m_aChanges.push( Changes );
+    };
+
+    this.Clear = function()
+    {
+        this.m_aChanges.length = 0;
+    };
+
+    this.Check = function(Type, Pos)
+    {
+        var CurPos = Pos;
+        var Count = this.m_aChanges.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            var NewPos = this.m_aChanges[Index].Check_Changes(Type, CurPos);
+            if ( false === NewPos )
+                return false;
+
+            CurPos = NewPos;
+        }
+
+        return CurPos;
+    };
+
+    this.Refresh = function()
+    {
+        var Count = this.m_aChanges.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            this.m_aChanges[Index].Refresh_BinaryData();
+        }
+    };
+}

@@ -47,6 +47,7 @@ function MoveShapeImageTrack(originalObject)
     {
         this.originalObject.setPosition(this.x, this.y);
         this.originalObject.recalculateTransform();
+        this.originalObject.calculateTransformTextMatrix();
         this.originalObject.updateDrawingBaseCoordinates();
     };
 }
@@ -104,6 +105,7 @@ function MoveShapeImageTrackInGroup(originalObject)
         var xfrm = this.originalObject.group.spPr.xfrm;
         this.originalObject.setPosition(this.x/scale_scale_coefficients.cx + xfrm.chOffX, this.y/scale_scale_coefficients.cy + xfrm.chOffY);
         this.originalObject.recalculateTransform();
+        this.originalObject.calculateTransformTextMatrix();
     }
 }
 

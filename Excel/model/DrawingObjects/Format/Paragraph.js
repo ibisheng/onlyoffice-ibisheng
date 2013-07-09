@@ -17,6 +17,15 @@ var type_Paragraph = 0x0001;
 
 var UnknownValue  = null;
 
+var docpostype_Content     = 0x00;
+var docpostype_FlowObjects = 0x01;
+var docpostype_HdrFtr      = 0x02;
+var docpostype_FlowShape   = 0x03;
+
+var selectionflag_Common        = 0x00;
+var selectionflag_Numbering     = 0x01;
+var selectionflag_DrawingObject = 0x002;
+
 // Класс Paragraph
 function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit)
 {
@@ -46,7 +55,7 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit)
     this.TextPr = new ParaTextPr();
     this.TextPr.Parent = this;
 
-    this.Bounds = new CDocumentBounds( X, Y, X_Right_Field, Y );
+    this.Bounds = new CDocumentBounds( X, Y, 4000, Y );
 
     this.RecalcInfo = new CParaRecalcInfo();
 
@@ -82,14 +91,14 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit)
 
     this.NeedReDraw = true;
     this.DrawingDocument = DrawingDocument;
-    this.LogicDocument   = editor.WordControl.m_oLogicDocument;
+    //this.LogicDocument   = editor.WordControl.m_oLogicDocument;
 
     this.TurnOffRecalcEvent = false;
 
     this.ApplyToAll = false; // Специальный параметр, используемый в ячейках таблицы.
                              // True, если ячейка попадает в выделение по ячейкам.
 
-    this.Lock = new CLock(); // Зажат ли данный параграф другим пользователем
+   // this.Lock = new CLock(); // Зажат ли данный параграф другим пользователем
     if ( false === g_oIdCounter.m_bLoad )
     {
         this.Lock.Set_Type( locktype_Mine, false );
@@ -116,7 +125,7 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit)
 
     this.SearchResults = new Object();
 
-    this.SpellChecker = new CParaSpellChecker();
+    //this.SpellChecker = new CParaSpellChecker();
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
@@ -362,7 +371,7 @@ Paragraph.prototype =
         }
 
         // Передвинем все метки слов для проверки орфографии
-        this.SpellChecker.Update_OnAdd( this, Pos, Item.Type );
+      //  this.SpellChecker.Update_OnAdd( this, Pos, Item.Type );
     },
 
     // Добавляем несколько элементов в конец параграфа.
@@ -465,7 +474,7 @@ Paragraph.prototype =
         }
 
         // Передвинем все метки слов для проверки орфографии
-        this.SpellChecker.Update_OnRemove( this, Pos, 1 );
+       // this.SpellChecker.Update_OnRemove( this, Pos, 1 );
     },
 
     // Удаляем несколько элементов
@@ -589,7 +598,7 @@ Paragraph.prototype =
         }
 
         // Передвинем все метки слов для проверки орфографии
-        this.SpellChecker.Update_OnRemove( this, Pos, Count );
+       // this.SpellChecker.Update_OnRemove( this, Pos, Count );
     },
 
     Clear_ContentChanges : function()
@@ -2226,7 +2235,7 @@ Paragraph.prototype =
                 // при повторном обсчете строки, т.к. она стала меньше, то у нее и рассчитанная высота могла
                 // уменьшиться, а значит Ranges2 могло оказаться меньше чем Ranges). В таком случае не надо
                 // делать повторный пересчет, иначе будет зависание.
-                if ( -1 == FlowObjects_CompareRanges( Ranges, Ranges2 ) && true === FlowObjects_CheckInjection( Ranges, Ranges2 ) && false === bBreakPageLineEmpty )
+               /*if ( -1 == FlowObjects_CompareRanges( Ranges, Ranges2 ) && true === FlowObjects_CheckInjection( Ranges, Ranges2 ) && false === bBreakPageLineEmpty )
                 {
                     bEnd = false;
 
@@ -2274,7 +2283,7 @@ Paragraph.prototype =
                     nWordLen = 0;
                     nSpacesCount = 0;
                 }
-                else
+                else  */
                 {
                     if ( 0 != CurLine )
                         this.Lines[CurLine].W = X - this.X - ParaPr.Ind.Left;
@@ -3376,7 +3385,7 @@ Paragraph.prototype =
         this.FontMap.NeedRecalc = true;
 
         this.Internal_Recalculate_0();
-        this.Internal_CheckSpelling();
+       // this.Internal_CheckSpelling();
 
         var RecalcResult_1 = this.Internal_Recalculate_1_(StartPos, CurPage, CurLine);
         var RecalcResult_2 = this.Internal_Recalculate_2_(StartPos, CurPage, CurLine);
@@ -3432,7 +3441,7 @@ Paragraph.prototype =
     Internal_Draw_1 : function(CurPage, pGraphics, Pr)
     {
         // Если данный параграф зажат другим пользователем, рисуем соответствующий знак
-        if ( locktype_None != this.Lock.Get_Type() )
+        /*if ( locktype_None != this.Lock.Get_Type() )
         {
             if ( ( CurPage > 0 || false === this.Is_StartFromNewPage() || null === this.Get_DocumentPrev() ) )
             {
@@ -3442,14 +3451,14 @@ Paragraph.prototype =
 
                 pGraphics.DrawLockParagraph(this.Lock.Get_Type(), X_min, Y_top, Y_bottom);
             }
-        }
+        }      */
     },
 
     Internal_Draw_2 : function(CurPage, pGraphics, Pr)
     {
         // TODO: Как только будет поддержка параметра KeepNext раскоментировать тут.
-        if ( true === editor.ShowParaMarks && ( ( 0 === CurPage && ( this.Pages.length <= 1 || this.Pages[1].FirstLine > 0 ) ) || ( 1 === CurPage && this.Pages.length > 1 && this.Pages[1].FirstLine === 0 ) ) && ( /*true === Pr.ParaPr.KeepNext ||*/ true === Pr.ParaPr.KeepLines || true === Pr.ParaPr.PageBreakBefore ) )
-        {
+     //   if ( true === editor.ShowParaMarks && ( ( 0 === CurPage && ( this.Pages.length <= 1 || this.Pages[1].FirstLine > 0 ) ) || ( 1 === CurPage && this.Pages.length > 1 && this.Pages[1].FirstLine === 0 ) ) && ( /*true === Pr.ParaPr.KeepNext ||*/ true === Pr.ParaPr.KeepLines || true === Pr.ParaPr.PageBreakBefore ) )
+      /*  {
             var SpecFont = { FontFamily: { Name : "Arial", Index : -1 }, FontSize : 12, Italic : false, Bold : false };
             var SpecSym = String.fromCharCode( 0x25AA );
             pGraphics.SetFont( SpecFont );
@@ -3464,14 +3473,14 @@ Paragraph.prototype =
             var SpecX = Math.min( X, this.X ) - SpecW;
 
             pGraphics.FillText( SpecX, Y, SpecSym );
-        }
+        }                */
     },
 
     Internal_Draw_3 : function(CurPage, pGraphics)
     {
-        var DocumentComments = editor.WordControl.m_oLogicDocument.Comments;
-        var bDrawComments    = DocumentComments.Is_Use();
-        var CommentsFlag     = DocumentComments.Check_CurrentDraw();
+       // var DocumentComments = editor.WordControl.m_oLogicDocument.Comments;
+        var bDrawComments    = false;//DocumentComments.Is_Use();
+        var CommentsFlag     = comments_NoComment;//DocumentComments.Check_CurrentDraw();
 
         var CollaborativeChanges = 0;
         var StartPagePos = this.Lines[this.Pages[CurPage].StartLine].StartPos;
@@ -4235,8 +4244,8 @@ Paragraph.prototype =
                                 if ( true === CurTextPr.Underline )
                                     aUnderline.Add( Y + this.Lines[CurLine].Metrics.TextDescent * 0.4, Y + this.Lines[CurLine].Metrics.TextDescent * 0.4, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b );
 
-                                if ( true != this.SpellChecker.Check_Spelling(Pos) )
-                                    aSpelling.Add( Y + this.Lines[CurLine].Metrics.TextDescent * 0.4, Y + this.Lines[CurLine].Metrics.TextDescent * 0.4, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, 0, 0, 0 );
+                               // if ( true != this.SpellChecker.Check_Spelling(Pos) )
+                               //     aSpelling.Add( Y + this.Lines[CurLine].Metrics.TextDescent * 0.4, Y + this.Lines[CurLine].Metrics.TextDescent * 0.4, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, 0, 0, 0 );
 
                                 X += Item.WidthVisible;
                             }
@@ -9437,7 +9446,7 @@ Paragraph.prototype =
                 editor.sync_HyperlinkPropCallback( HyperProps );
             }
 
-            this.SpellChecker.Document_UpdateInterfaceState( StartPos, EndPos );
+           // this.SpellChecker.Document_UpdateInterfaceState( StartPos, EndPos );
         }
         else
         {
@@ -9492,7 +9501,7 @@ Paragraph.prototype =
                 editor.sync_HyperlinkPropCallback( HyperProps );
             }
 
-            this.SpellChecker.Document_UpdateInterfaceState( this.CurPos.ContentPos, this.CurPos.ContentPos );
+           // this.SpellChecker.Document_UpdateInterfaceState( this.CurPos.ContentPos, this.CurPos.ContentPos );
         }
     },
 

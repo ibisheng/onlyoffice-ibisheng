@@ -167,6 +167,8 @@ function XYAdjustmentTrack(originalShape, adjIndex)
     {
         this.originalShape.setAdjustmentValue(this.refX, this.geometry.gdLst[this.adjastment.gdRefX], this.refY, this.geometry.gdLst[this.adjastment.gdRefY]);
         this.originalShape.recalculateGeometry();
+        this.originalShape.calculateContent();
+        this.originalShape.calculateTransformTextMatrix();
     };
 
 }
@@ -316,5 +318,8 @@ function PolarAdjustmentTrack(originalShape, adjIndex)
     this.trackEnd = function()
     {
         this.originalShape.setAdjustmentValue(this.refR, this.geometry.gdLst[this.adjastment.gdRefR], this.refAng, this.geometry.gdLst[this.adjastment.gdRefAng]);
+        this.originalShape.recalculateGeometry();
+        this.originalShape.calculateContent();
+        this.originalShape.calculateTransformTextMatrix();
     };
 }

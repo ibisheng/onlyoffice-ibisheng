@@ -1133,6 +1133,8 @@ function ResizeTrackShapeImageInGroup(originalObject, cardDirection)
         this.originalObject.setExtents(this.resizedExtX/scale_scale_coefficients.cx, this.resizedExtY/scale_scale_coefficients.cy);
         this.originalObject.setFlips(this.resizedflipH, this.resizedflipV);
         this.originalObject.recalculateTransform();
+        this.originalObject.calculateContent();
+        this.originalObject.calculateTransformTextMatrix();
     };
 }
 
