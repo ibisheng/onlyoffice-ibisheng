@@ -2109,6 +2109,9 @@ function DrawingObjects() {
 		
 		autoShapeTrack = new CAutoshapeTrack();
 		autoShapeTrack.init( trackOverlay, 0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix, shapeOverlayCtx.m_dWidthMM, shapeOverlayCtx.m_dHeightMM );
+		
+		_this.drawingDocument = new CDrawingDocument();
+		_this.drawingDocument.AutoShapesTrack = autoShapeTrack;
 				
 		isViewerMode =  function() { return worksheet._trigger("getViewerMode"); };
 
@@ -4001,8 +4004,8 @@ function DrawingObjects() {
 	}
 	
 	_this.selectGraphicObject = function() {
-		if ( autoShapeTrack )
-			_this.controller.drawSelection(autoShapeTrack);
+		if ( _this.drawingDocument )
+			_this.controller.drawSelection(_this.drawingDocument);
 	}
 	
 	_this.setScrollOffset = function(x_px, y_px) {
@@ -4047,15 +4050,15 @@ function DrawingObjects() {
 	//-----------------------------------------------------------------------------------
 	
 	_this.graphicObjectMouseDown = function(e, x, y) {
-		_this.controller.onMouseDown( e, pxToMm(x - scrollOffset.x), pxToMm(y - scrollOffset.y) );
+		_this.controller.onMouseDown( e, pxToMm(x + scrollOffset.x), pxToMm(y + scrollOffset.y) );
 	}
 	
 	_this.graphicObjectMouseMove = function(e, x, y) {
-		_this.controller.onMouseMove( e, pxToMm(x - scrollOffset.x), pxToMm(y - scrollOffset.y) );
+		_this.controller.onMouseMove( e, pxToMm(x + scrollOffset.x), pxToMm(y + scrollOffset.y) );
 	}
 	
 	_this.graphicObjectMouseUp = function(e, x, y) {
-		_this.controller.onMouseUp( e, pxToMm(x - scrollOffset.x), pxToMm(y - scrollOffset.y) );
+		_this.controller.onMouseUp( e, pxToMm(x + scrollOffset.x), pxToMm(y + scrollOffset.y) );
 	}
 	
 	//-----------------------------------------------------------------------------------
@@ -5148,7 +5151,6 @@ function DrawingObjects() {
 	//-----------------------------------------------------------------------------------
 	
 	_this.controller = new DrawingObjectsController(_this);
-	_this.drawingDocument = new CDrawingDocument();
 	
 	//-----------------------------------------------------------------------------------
 	// Private Misc Methods

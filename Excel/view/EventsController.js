@@ -1068,9 +1068,16 @@
 				var t = this;
 				var coord = t._getCoordinates(event);
 				
-				this.handlers.trigger("setShiftKey", event.shiftKey);
+				this.handlers.trigger("setShiftKey", event.shiftKey);				
+
+				if (t.handlers.trigger("isGlobalLockEditCell"))
+					return;
+
+				if (!this.enableKeyEvents) {
+					t.handlers.trigger("canvasClick");
+				}
 				
-				// shapes
+				// Shapes
 				var graphicsInfo = t.handlers.trigger("getGraphicsInfo", coord.x, coord.y);
 				if ( graphicsInfo && graphicsInfo.isShape ) {
 					asc["editor"].isStartAddShape = true;
@@ -1081,17 +1088,12 @@
 				if ( asc["editor"].isStartAddShape ) {
 					event.ClickCount = 1;
 					t.handlers.trigger("graphicObjectMouseDown", event, coord.x, coord.y);
+					if ( t.isCellEditMode )
+						t.handlers.trigger("stopCellEditing");
 					return;
 				}
 				else
 					t.handlers.trigger("resetSelectedGraphicObjects");
-
-				if (t.handlers.trigger("isGlobalLockEditCell"))
-					return;
-
-				if (!this.enableKeyEvents) {
-					t.handlers.trigger("canvasClick");
-				}
 
 				if (event.originalEvent && 2 === event.originalEvent.detail) {
 					// Это означает, что это MouseDown для dblClick эвента (его обрабатывать не нужно)
@@ -1219,7 +1221,7 @@
 			/** @param event {jQuery.Event} */
 			_onMouseUp: function (event) {
 			
-				// shapes
+				// Shapes
 				var coord = this._getCoordinates(event);
 				if ( asc["editor"].isStartAddShape ) {
 					this.handlers.trigger("graphicObjectMouseUp", event, coord.x, coord.y);
@@ -1269,7 +1271,7 @@
 				var coord = t._getCoordinates(event);
 				t.hasCursor = true;
 				
-				// shapes
+				// Shapes
 				if ( asc["editor"].isStartAddShape ) {
 					t.handlers.trigger("graphicObjectMouseMove", event, coord.x, coord.y);
 					t.handlers.trigger("updateWorksheet", t.element[0], coord.x, coord.y, event.ctrlKey, function(info){t.targetInfo = info;});
