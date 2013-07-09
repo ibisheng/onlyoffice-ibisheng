@@ -6,5 +6,6 @@ call npm install jsdom
 call npm install canvas
 call npm install navigator
 call npm install xmlhttprequest
+call npm install jQuery
 
 pause

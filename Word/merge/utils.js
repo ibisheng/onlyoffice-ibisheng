@@ -1,13 +1,12 @@
 var jsdom = require("jsdom").jsdom;
-var document = jsdom(null, null/*, {
-   features: {
-     FetchExternalResources : ["script", "img", "css", "frame", "iframe", "link"]
-   }
-   }*/);
+var document = jsdom(null, null);
 var window = document.createWindow();
 var Image = window.Image;
 var navigator = require('navigator');
 var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+var $ = require('jQuery');
+var jq = require('jQuery').create();
+var jQuery = require('jQuery').create(window);
 /*var window = {chrome:1};
 window.postMessage = function(){};
 window.addEventListener = function(){};
