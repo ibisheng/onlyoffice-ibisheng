@@ -1114,15 +1114,6 @@ CDocumentContent.prototype =
 
     Is_TableBorder : function(X,Y, PageNum_Abs)
     {
-        var TempPNum = PageNum_Abs - this.Get_StartPage_Absolute();
-        if ( TempPNum < 0 || TempPNum >= this.Pages.length )
-            TempPNum = 0;
-
-        var ContentPos = this.Internal_GetContentPosByXY( X, Y, TempPNum );
-        var Item = this.Content[ContentPos];
-        if ( type_Table == Item.GetType() )
-            return Item.Is_TableBorder( X, Y, PageNum_Abs );
-
         return null;
     },
 
@@ -5828,49 +5819,9 @@ CDocumentContent.prototype =
             return;
 
         this.CurPage = PageIndex - this.StartPage;
-
-        // Сначала проверим, не попали ли мы в один из "плавающих" объектов
-        var bInText      = (null === this.Is_InText(X, Y, this.CurPage)      ? false : true);
-        var bTableBorder = (null === this.Is_TableBorder(X, Y, this.CurPage) ? false : true);
-        var nInDrawing   = this.LogicDocument.DrawingObjects.isPointInDrawingObjects( X, Y, this.CurPage + this.Get_StartPage_Absolute(), this );
-
-        if ( this.Parent instanceof CHeaderFooter && ( nInDrawing === DRAWING_ARRAY_TYPE_BEFORE || nInDrawing === DRAWING_ARRAY_TYPE_INLINE || ( false === bTableBorder && false === bInText && nInDrawing >= 0 ) ) )
-        {
-            if ( docpostype_DrawingObjects != this.CurPos.Type )
-                this.Selection_Remove();
-
-            // Прячем курсор
-            this.DrawingDocument.TargetEnd();
-            this.DrawingDocument.SetCurrentPage( this.CurPage + this.Get_StartPage_Absolute() );
-
-            var HdrFtr = this.Is_HdrFtr( true );
-            if ( null === HdrFtr )
-            {
-                this.LogicDocument.Selection.Use   = true;
-                this.LogicDocument.Selection.Start = true;
-                this.LogicDocument.Selection.Flag  = selectionflag_Common;
-                this.LogicDocument.CurPos.Type     = docpostype_DrawingObjects;
-            }
-            else
-            {
-                HdrFtr.Content.Selection.Use   = true;
-                HdrFtr.Content.Selection.Start = true;
-                HdrFtr.Content.Selection.Flag  = selectionflag_Common;
-                HdrFtr.Content.CurPos.Type     = docpostype_DrawingObjects;
-            }
-
-            this.LogicDocument.DrawingObjects.OnMouseDown(MouseEvent, X, Y, this.CurPage + this.Get_StartPage_Absolute());
-
-        }
-        else
         {
             var bOldSelectionIsCommon = true;
 
-            if ( docpostype_DrawingObjects === this.CurPos.Type && true != this.Is_InDrawing( X, Y, this.CurPage + this.Get_StartPage_Absolute() ) )
-            {
-                this.LogicDocument.DrawingObjects.resetSelection();
-                bOldSelectionIsCommon = false;
-            }
 
             var ContentPos = this.Internal_GetContentPosByXY(X,Y);
 
@@ -5885,8 +5836,6 @@ CDocumentContent.prototype =
             var Item = this.Content[ContentPos];
 
             var bTableBorder = false;
-            if ( type_Table == Item.GetType() )
-                bTableBorder = ( null != Item.Is_TableBorder( X, Y, this.CurPage ) ? true : false );
 
             // Убираем селект, кроме случаев либо текущего параграфа, либо при движении границ внутри таблицы
             if ( !(true === SelectionUse_old && true === MouseEvent.ShiftKey && true === bOldSelectionIsCommon) )
@@ -5912,7 +5861,7 @@ CDocumentContent.prototype =
                 Item.Selection_SetStart( X, Y, this.CurPage, MouseEvent );
                 Item.Selection_SetEnd( X, Y, this.CurPage, {Type : g_mouse_event_type_move, ClickCount : 1} );
 
-                if ( !(type_Table == Item.GetType() && true == bTableBorder) )
+
                 {
                     this.Selection.Use      = true;
                     this.Selection.StartPos = ContentPos;
@@ -5934,15 +5883,7 @@ CDocumentContent.prototype =
                         }
                     }
                 }
-                else
-                {
-                    this.Selection.Data =
-                    {
-                        TableBorder : true,
-                        Pos         : ContentPos,
-                        Selection   : SelectionUse_old
-                    };
-                }
+
             }
         }
     },
@@ -6642,53 +6583,10 @@ CDocumentContent.prototype =
         // TODO: изенить здесь
         PageNum = Math.min( PageNum, this.Pages.length - 1 );
 
-        // Сначала проверим Flow-таблицы
-        var FlowTable = this.LogicDocument.DrawingObjects.getTableByXY( X, Y, PageNum + this.Get_StartPage_Absolute(), this );
-        if ( null != FlowTable )
-            return FlowTable.Table.Index;
+
 
         var StartPos = this.Pages[PageNum].Pos;
-        var EndPos   = this.Content.length - 1;
-
-        if ( PageNum < this.Pages.length - 1 )
-            EndPos = Math.min( this.Pages[PageNum + 1].Pos, EndPos );
-
-        // Сохраним позиции всех Inline элементов на данной странице
-        var InlineElements = new Array();
-        for ( var Index = StartPos; Index <= EndPos; Index++ )
-        {
-            var Item = this.Content[Index];
-            if ( type_Table != Item.GetType() || false != Item.Is_Inline() )
-                InlineElements.push( Index );
-        }
-
-        var Count = InlineElements.length;
-        if ( Count <= 0 )
-            return StartPos;
-
-        for ( var Pos = 0; Pos < Count - 1; Pos++ )
-        {
-            var Item = this.Content[InlineElements[Pos + 1]];
-
-            if ( Y < Item.Pages[0].Bounds.Top )
-                return InlineElements[Pos];
-
-            if ( Item.Pages.length > 1 )
-            {
-                if ( ( type_Paragraph === Item.GetType() && Item.Pages[0].FirstLine != Item.Pages[1].FirstLine ) || ( type_Table === Item.GetType() && true === Item.RowsInfo[0].FirstPage ) )
-                    return InlineElements[Pos + 1];
-
-                return InlineElements[Pos];
-            }
-
-            if ( Pos === Count - 2 )
-            {
-                // Такое возможно, если страница заканчивается Flow-таблицей
-                return InlineElements[Count - 1];
-            }
-        }
-
-        return InlineElements[0];
+        return StartPos;
     },
 
     Internal_Content_Find : function(Id)

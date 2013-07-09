@@ -157,7 +157,11 @@ function NullState(drawingObjectsController, drawingObjects)
                     }
                     else if(hit_in_text_rect)
                     {
-                        //TODO
+                        cur_drawing.selectionSetStart(e, x, y);
+                        this.drawingObjectsController.changeCurrentState(new TextAddState(this.drawingObjectsController, this.drawingObjects, cur_drawing));
+                        if(e.ClickCount < 2)
+                            this.drawingObjects.selectGraphicObject();
+                        return;
                     }
                 }
                 else
@@ -304,7 +308,7 @@ function NullState(drawingObjectsController, drawingObjects)
                     }
                     else if(hit_in_text_rect)
                     {
-                        //TODO
+                        return {objectId: cur_drawing_base.id, cursorType: "move"};
                     }
                 }
                 else
@@ -339,16 +343,25 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
     this.drawingObjectsController = drawingObjectsController;
     this.drawingObjects = drawingObjects;
     this.textObject = textObject;
+    this.nullState = new NullState(drawingObjectsController, drawingObjects);
 
     this.onMouseDown = function(e, x, y)
     {
+        this.nullState.onMouseDown(e, x, y);
     };
 
     this.onMouseMove = function(e, x, y)
-    {};
+    {
+        this.textObject.selectionSetEnd(e, x, y);
+        this.drawingObjects.selectGraphicObject();
+
+    };
 
     this.onMouseUp = function(e, x, y)
-    {};
+    {
+        this.textObject.selectionSetEnd(e, x, y);
+        this.drawingObjects.selectGraphicObject();
+    };
 
     this.onKeyDown = function(e)
     {
@@ -367,109 +380,18 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
     this.onKeyPress = function(e)
     {
         this.textObject.paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
-        //this.drawingObjects.showDrawingObjects(true);
+        this.drawingObjects.showDrawingObjects(true);
     };
 
     this.drawSelection = function(drawingDocument)
     {
         DrawDefaultSelection(this.drawingObjectsController, drawingDocument);
+        this.textObject.updateSelectionState(drawingDocument);
     };
 
     this.isPointInDrawingObjects = function(x, y)
     {
-        var selected_objects = this.drawingObjectsController.selectedObjects;
-        if(selected_objects.length === 1)
-        {
-            var hit_to_adj = selected_objects[0].hitToAdjustment(x, y);
-            if(hit_to_adj.hit)
-            {
-                if(selected_objects[0].canChangeAdjustments())
-                {
-                    return {objectId: selected_objects[0].drawingBase.id, cursorType: "crosshair"};
-                }
-            }
-        }
-
-        for(var i = selected_objects.length - 1; i > -1; --i)
-        {
-            var hit_to_handles = selected_objects[i].hitToHandles(x, y);
-            if(hit_to_handles > -1)
-            {
-                if(hit_to_handles === 8)
-                {
-                    if(!selected_objects[i].canRotate())
-                        return null;
-                    return {objectId: selected_objects[i].drawingBase.id, cursorType: "crosshair"};
-                }
-                else
-                {
-                    if(!selected_objects[i].canResize())
-                        return null;
-                    this.drawingObjectsController.clearPreTrackObjects();
-                    var card_direction = selected_objects[i].getCardDirectionByNum(hit_to_handles);
-                    for(var j = 0; j < selected_objects.length; ++j)
-                    {
-                        if(selected_objects[j].canResize())
-                            this.drawingObjectsController.addPreTrackObject(selected_objects[j].createResizeTrack(card_direction));
-                    }
-                    return {objectId: selected_objects[i].drawingBase.id, cursorType: CURSOR_TYPES_BY_CARD_DIRECTION[card_direction]};
-                }
-            }
-        }
-
-        for(i = selected_objects.length - 1; i > -1; --i)
-        {
-            if(selected_objects[i].hitInBoundingRect(x, y))
-            {
-                if(!selected_objects[i].canMove())
-                    return null;
-                return {objectId: selected_objects[i].drawingBase.id, cursorType: "move"};
-            }
-        }
-
-        var arr_drawing_objects = this.drawingObjects.getDrawingObjects();
-        for(i = arr_drawing_objects.length-1; i > -1; --i)
-        {
-            var cur_drawing_base = arr_drawing_objects[i];
-            if(cur_drawing_base.isGraphicObject())
-            {
-                var cur_drawing = cur_drawing_base.graphicObject;
-                if(cur_drawing.isSimpleObject())
-                {
-                    var hit_in_inner_area = cur_drawing.hitInInnerArea(x, y);
-                    var hit_in_path = cur_drawing.hitInPath(x, y);
-                    var hit_in_text_rect = cur_drawing.hitInTextRect(x, y);
-                    if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
-                    {
-                        return {objectId: cur_drawing_base.id, cursorType: "move"};
-                    }
-                    else if(hit_in_text_rect)
-                    {
-                        //TODO
-                    }
-                }
-                else
-                {
-                    var grouped_objects = cur_drawing.getArrGraphicObjects();
-                    for(var j = grouped_objects.length - 1; j > -1; --j)
-                    {
-                        var cur_grouped_object = grouped_objects[j];
-                        var hit_in_inner_area = cur_grouped_object.hitInInnerArea(x, y);
-                        var hit_in_path = cur_grouped_object.hitInPath(x, y);
-                        var hit_in_text_rect = cur_grouped_object.hitInTextRect(x, y);
-                        if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
-                        {
-                            return {objectId: cur_drawing_base.id, cursorType: "move"};
-                        }
-                        else if(hit_in_text_rect)
-                        {
-                            //TODO
-                        }
-                    }
-                }
-            }
-        }
-        return null;
+        return this.nullState.isPointInDrawingObjects(x, y);
     };
 }
 

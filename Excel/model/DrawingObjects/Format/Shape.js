@@ -5,6 +5,124 @@
  * Time: 6:09 PM
  * To change this template use File | Settings | File Templates.
  */
+
+var g_mouse_event_type_down  = 0;
+var g_mouse_event_type_move  = 1;
+var g_mouse_event_type_up    = 2;
+var g_mouse_event_type_wheel = 3;
+
+var g_mouse_button_left     = 0;
+var g_mouse_button_center   = 1;
+var g_mouse_button_right    = 2;
+
+var g_o_event_map =
+{
+    "mousedown": g_mouse_event_type_down,
+    "mousemove": g_mouse_event_type_move,
+    "mouseup": g_mouse_event_type_up
+
+};
+function CMouseEventHandler()
+{
+    this.X          = 0;                            // ������� ������� X
+    this.Y          = 0;                            // ������� ������� Y
+
+    this.Button     = g_mouse_button_left;          // ������ ����
+    this.Type       = g_mouse_event_type_move;      // ��� ������
+
+    this.AltKey     = false;                        // ������ �� ������ alt
+    this.CtrlKey    = false;                        // ������ �� ������ ctrl
+    this.ShiftKey   = false;                        // ������ �� ������ shift
+
+    this.Sender     = null;                         // �� ������ html �������� ������ �����
+
+    this.LastClickTime  = -1;                       // ����� ���������� mousedown
+    this.ClickCount     = 0;                        // ���������� ������
+
+    this.WheelDelta = 0;
+
+    // ���������� ����� ��� ���������� mousedown (��� mousemove)
+    this.IsPressed  = false;                        // ���� �� ������ ������
+    this.LastX      = 0;
+    this.LastY      = 0;
+
+    this.KoefPixToMM = 1;
+
+    this.IsLocked       = false;
+    this.IsLockedEvent  = false;
+
+    this.buttonObject   = null;
+
+    this.LockMouse = function()
+    {
+        if (!this.IsLocked)
+        {
+            this.IsLocked = true;
+
+            if (window.captureEvents)
+                window.captureEvents(Event.MOUSEDOWN | Event.MOUSEUP);
+
+            /*
+             var parent = window;
+             while (true)
+             {
+             if (!parent)
+             break;
+
+             if (parent.captureEvents)
+             parent.captureEvents(Event.MOUSEDOWN | Event.MOUSEUP);
+
+             if (parent == parent.parent)
+             break;
+
+             parent = parent.parent;
+             }
+             */
+
+            return true;
+        }
+        return false;
+    };
+    this.UnLockMouse = function()
+    {
+        if (this.IsLocked)
+        {
+            this.IsLocked = false;
+
+            if (window.releaseEvents)
+                window.releaseEvents(Event.MOUSEMOVE);
+
+            /*
+             var parent = window;
+             while (true)
+             {
+             if (!parent)
+             break;
+
+             if (parent.releaseEvents)
+             parent.releaseEvents(Event.MOUSEMOVE);
+
+             if (parent == parent.parent)
+             break;
+
+             parent = parent.parent;
+             }
+             */
+
+            return true;
+        }
+        return false;
+    };
+
+    this.fromJQueryEvent = function(e)
+    {
+        this.ClickCount = e.ClickCount;
+        this.Type =  g_o_event_map[e.type];
+        this.ShiftKey = e.shiftKey;
+    };
+}
+
+
 function CShape(drawingBase, drawingObjects)
 {
     this.drawingBase = drawingBase;
@@ -114,6 +232,11 @@ CShape.prototype =
     {
         if(isRealObject(this.drawingBase))
             this.drawingBase.setGraphicObjectCoords()
+    },
+
+    updateSelectionState: function(drawingDocument)
+    {
+        this.txBody.updateSelectionState(drawingDocument);
     },
 
     setExtents: function(extX, extY)
@@ -547,7 +670,7 @@ CShape.prototype =
                 h: this.contentHeight + (b_ins + t_ins)
             };
         }
-        this.invertTextMatrix = global_MatrixTransformer.Invert(this.transformText);
+        this.invertTransformText = global_MatrixTransformer.Invert(this.transformText);
     },
 
 
@@ -589,6 +712,26 @@ CShape.prototype =
                 break;
             }
         }
+    },
+
+    selectionSetStart: function(e, x, y)
+    {
+        var t_x, t_y;
+        t_x = this.invertTransformText.TransformPointX(x, y);
+        t_y = this.invertTransformText.TransformPointY(x, y);
+        var event =  new CMouseEventHandler();
+        event.fromJQueryEvent(e);
+        this.txBody.selectionSetStart(e, t_x, t_y);
+    },
+
+    selectionSetEnd: function(e, x, y)
+    {
+        var t_x, t_y;
+        t_x = this.invertTransformText.TransformPointX(x, y);
+        t_y = this.invertTransformText.TransformPointY(x, y);
+        var event =  new CMouseEventHandler();
+        event.fromJQueryEvent(e);
+        this.txBody.selectionSetEnd(e, t_x, t_y);
     },
 
     recalculateTransform: function()
@@ -1127,6 +1270,13 @@ CShape.prototype =
 
     hitInTextRect: function(x, y)
     {
+        if(isRealObject(this.txBody))
+        {
+            var t_x, t_y;
+            t_x = this.invertTransformText.TransformPointX(x, y);
+            t_y = this.invertTransformText.TransformPointY(x, y);
+            return  t_x > 0 &&  t_x < this.txBody.contentWidth && t_y > 0 && t_y < this.txBody.contentHeight;
+        }
         return false;
     },
 

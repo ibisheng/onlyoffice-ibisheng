@@ -151,5 +151,39 @@ CTxBody.prototype =
     Is_Cell: function()
     {
         return false;
+    },
+
+    Get_StartPage_Absolute: function()
+    {
+        return 0;
+    },
+
+    selectionSetStart: function(e, x, y)
+    {
+        MouseEvent = new CMouseEventHandler();
+        this.content.Selection_SetStart(x, y, 0, e);
+    },
+
+    selectionSetEnd: function(e, x, y)
+    {
+        this.content.Selection_SetEnd(x, y, 0, e);
+    },
+
+    updateSelectionState: function(drawingDocument)
+    {
+        var Doc = this.content;
+        if ( true === Doc.Is_SelectionUse() && !Doc.Selection_IsEmpty()) {
+            drawingDocument.UpdateTargetTransform(this.shape.transformText);
+            drawingDocument.TargetEnd();
+            drawingDocument.SelectEnabled(true);
+            drawingDocument.SelectClear();
+            drawingDocument.SelectShow();
+        }
+        else
+        {
+            drawingDocument.UpdateTargetTransform(this.shape.transformText);
+            drawingDocument.TargetShow();
+            drawingDocument.SelectEnabled(false);
+        }
     }
 };
