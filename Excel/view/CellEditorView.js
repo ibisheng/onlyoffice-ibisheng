@@ -93,6 +93,7 @@
 			this.canvas = undefined;
 			this.canvasOverlay = undefined;
 			this.cursor = undefined;
+			this.graphicObjectCursor = undefined;
 			this.cursorTID = undefined;
 			this.cursorPos = 0;
 			this.topLineIndex = 0;
@@ -182,6 +183,15 @@
 							.css("display", "none")
 							.css("z-index", z+3)
 							.appendTo(t.canvasOuter);
+							
+					var _head = document.getElementsByTagName('head')[0];
+					var style0 = document.createElement('style');
+					style0.type = 'text/css';
+					style0.innerHTML = ".block_elem { position:absolute;padding:0;margin:0; }";
+					_head.appendChild(style0);
+							
+					t.graphicObjectCursor = $('<canvas id=\"id_target_cursor\" class=\"block_elem\" width=\"1\" height=\"1\" style=\"width:2px;height:13px;display:none;z-index:3;\"></canvas>')
+											.appendTo(t.canvasOuter);
 				}
 
 				// create text render

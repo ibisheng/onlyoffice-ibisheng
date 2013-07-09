@@ -2111,6 +2111,7 @@ function DrawingObjects() {
 		
 		_this.drawingDocument = new CDrawingDocument();
 		_this.drawingDocument.AutoShapesTrack = autoShapeTrack;
+		_this.drawingDocument.TargetHtmlElement = document.getElementById('id_target_cursor');
 				
 		isViewerMode =  function() { return worksheet._trigger("getViewerMode"); };
 
