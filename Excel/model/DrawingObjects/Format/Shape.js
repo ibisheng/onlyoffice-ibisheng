@@ -743,11 +743,10 @@ CShape.prototype =
             graphics.SetIntegerGrid(false);
             graphics.transform3(this.transformText);
             this.txBody.draw(graphics);
-            if (graphics.FreeFont !== undefined)
-                graphics.FreeFont();
+          /*  if (graphics.FreeFont !== undefined)
+                graphics.FreeFont(); */
 
 
-            graphics.SetIntegerGrid(true);
             graphics.reset();
             graphics.SetIntegerGrid(true);
         }
