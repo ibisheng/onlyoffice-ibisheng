@@ -1792,13 +1792,18 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					this.wb.enableKeyEventsHandler(isEnabled);
 			},
 
-			asc_findText: function (text, scanByRows, scanForward) {
+			asc_findText: function (text, scanByRows, scanForward, isMatchCase, isWholeWord) {
+				// ToDo process isMatchCase, isWholeWord arguments
 				var d = this.wb.findCellText(text, scanByRows, scanForward);
 				if (d) {
 					if (d.deltaX) {this.controller.scrollHorizontal(d.deltaX);}
 					if (d.deltaY) {this.controller.scrollVertical(d.deltaY);}
 				}
 				return !!d;
+			},
+
+			asc_replaceText: function (findWhat, replaceWith, isReplaceAll, isMatchCase, isWholeWord) {
+				// ToDo add code here
 			},
 
 			/**
@@ -2244,6 +2249,14 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			asc_decreaseCellDigitNumbers: function () {
 				this.wb.getWorksheet().setSelectionInfo("changeDigNum", -1);
 				this.wb.restoreFocus();
+			},
+
+			asc_increaseFontSize: function () {
+				// ToDo add code here
+			},
+
+			asc_decreaseFontSize: function () {
+				// ToDo add code here
 			},
 
 			asc_onMouseUp: function (x, y) {
@@ -2788,6 +2801,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_setZoom"] = prot.asc_setZoom;
 		prot["asc_enableKeyEvents"] = prot.asc_enableKeyEvents;
 		prot["asc_findText"] = prot.asc_findText;
+		prot["asc_replaceText"] = prot.asc_replaceText;
 		prot["asc_findCell"] = prot.asc_findCell;
 		//prot["asc_openCellEditor"] = prot.asc_openCellEditor; - не используется (и не стоит так делать)
 		prot["asc_closeCellEditor"] = prot.asc_closeCellEditor;
@@ -2886,6 +2900,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_setCellDelimitedFormat"] = prot.asc_setCellDelimitedFormat;
 		prot["asc_increaseCellDigitNumbers"] = prot.asc_increaseCellDigitNumbers;
 		prot["asc_decreaseCellDigitNumbers"] = prot.asc_decreaseCellDigitNumbers;
+		prot["asc_increaseFontSize"] = prot.asc_increaseFontSize;
+		prot["asc_decreaseFontSize"] = prot.asc_decreaseFontSize;
 
 		prot["asc_onMouseUp"] = prot.asc_onMouseUp;
 
