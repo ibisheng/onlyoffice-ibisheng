@@ -2099,9 +2099,7 @@ function DrawingObjects() {
 		drawingCtx = currentSheet.drawingCtx;
 		overlayCtx = currentSheet.overlayCtx;
 		shapeCtx = currentSheet.shapeCtx;
-		shapeCtx.m_oFontManager = api.wb.fmgrGraphics[2];
 		shapeOverlayCtx = currentSheet.shapeOverlayCtx;
-		shapeOverlayCtx.m_oFontManager = api.wb.fmgrGraphics[2];
 		
 		trackOverlay = new COverlay();
 		trackOverlay.init( shapeOverlayCtx.m_oContext, "ws-canvas-overlay", 0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix, shapeOverlayCtx.m_dWidthMM, shapeOverlayCtx.m_dHeightMM );
@@ -2142,13 +2140,11 @@ function DrawingObjects() {
 		}
 	}
 
-    _this.getOverlay = function()
-    {
+    _this.getOverlay = function() {
         return trackOverlay;
     };
 
-    _this.OnUpdateOverlay = function()
-    {
+    _this.OnUpdateOverlay = function() {
         /*if (this.IsUpdateOverlayOnlyEnd)
         {
             this.IsUpdateOverlayOnEndCheck = true;
@@ -2282,6 +2278,9 @@ function DrawingObjects() {
         return true;
     };
 
+	_this.changeZoom = function(factor) {
+	}
+	
 	_this.getWorkbook = function() {
 		return (worksheet ? worksheet.model.workbook : null);
 	}

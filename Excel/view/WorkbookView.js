@@ -133,6 +133,15 @@
 				this.buffers.overlay	= asc_DC({canvas: this.canvasOverlay[0],	units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics});
 				this.drawingCtx			= this.buffers.main;
 				this.overlayCtx			= this.buffers.overlay;
+				
+				// Shapes
+				this.buffers.shapeCtx = new CGraphics();
+				this.buffers.shapeCtx.init(this.drawingCtx.ctx, this.drawingCtx.getWidth(0), this.drawingCtx.getHeight(0), this.drawingCtx.getWidth(3), this.drawingCtx.getHeight(3));
+				this.buffers.shapeCtx.m_oFontManager = this.fmgrGraphics[2];
+				
+				this.buffers.shapeOverlayCtx = new CGraphics();
+				this.buffers.shapeOverlayCtx.init(this.overlayCtx.ctx, this.overlayCtx.getWidth(0), this.overlayCtx.getHeight(0), this.overlayCtx.getWidth(3), this.overlayCtx.getHeight(3));
+				this.buffers.shapeOverlayCtx.m_oFontManager = this.fmgrGraphics[2];
 
 				this.drawingCtxCharts	= asc_DC({units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics});
 
@@ -1070,6 +1079,7 @@
 						item = this.wsViews[i];
 						// Меняем zoom (для не активных сменим как только сделаем его активным)
 						item.changeZoom(/*isDraw*/i == activeIndex);
+						item.graphicsChangeZoom(/*isDraw*/i == activeIndex, factor);
 						if (i == activeIndex) {
 							item.draw();
 							item.drawDepCells();
