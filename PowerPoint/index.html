@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TeamLab Presentation Editor</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=9,chrome=IE8"/>
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <link rel="icon" href="resources/img/favicon.ico" type="image/x-icon" />
+
+    <link rel="stylesheet" type="text/css" href="../../../3rdparty/extjs/resources/css/ext-all.css">
+
+    <link rel="stylesheet" type="text/css" href="../../common/main/resources/css/header.css">
+    <link rel="stylesheet" type="text/css" href="../../common/main/resources/css/load-mask.css">
+    <link rel="stylesheet" type="text/css" href="../../common/main/resources/css/chat-panel.css">
+    <link rel="stylesheet" type="text/css" href="../../common/main/resources/css/jquery.jscrollpane.css">
+    <link rel="stylesheet" type="text/css" href="../../common/main/resources/css/asc.css">
+
+    <link rel="stylesheet" type="text/css" href="resources/css/pres-main-colors.css">
+    <link rel="stylesheet" type="text/css" href="resources/css/header.css">
+    <link rel="stylesheet" type="text/css" href="resources/css/document-holder.css">
+    <link rel="stylesheet" type="text/css" href="resources/css/document-statusinfo.css">
+    <link rel="stylesheet" type="text/css" href="resources/css/document-preview.css">
+    <link rel="stylesheet" type="text/css" href="resources/css/main-menu.css">
+    <link rel="stylesheet" type="text/css" href="resources/css/file.css">
+    <link rel="stylesheet" type="text/css" href="resources/css/file-create-new.css">
+    <link rel="stylesheet" type="text/css" href="resources/css/file-open-recent.css">
+
+    <!-- splash -->
+
+    <style type="text/css">
+        .loadmask {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            border: none;
+            background-color: #f4f4f4;
+            z-index: 20002;
+        }
+
+        .loadmask-body {
+            position:relative;
+            top:44%;
+        }
+
+        .loadmask-logo {
+            display:inline-block;
+            min-width:240px;
+            vertical-align:top;
+            background-image:url('./resources/img/loading-logo.gif');
+            background-repeat:no-repeat;
+        }
+
+        #loadmask-text {
+            color: #b2b2b2;
+            font-size: 10px;
+            font-weight: bold;
+            font-family: Arial;
+            height:14px;
+            margin-top:32px;
+            padding-left:40px;
+            text-align:left;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loading-mask" class="loadmask">
+        <div class="loadmask-body" align="center">
+            <div class="loadmask-logo">
+                <div id="loadmask-text">LOADING APPLICATION</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3rdparty -->
+
+    <script type="text/javascript" src="../../../3rdparty/extjs/ext-debug.js"></script>
+    <script type="text/javascript" src="../../../3rdparty/jquery/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="../../../3rdparty/jquery/mousewheel/jquery.mousewheel.js"></script>
+    <script type="text/javascript" src="../../../3rdparty/jquery/jscrollpane/jquery.jscrollpane.js"></script>
+    <script type="text/javascript" src="../../../3rdparty/sockjs/sockjs-0.3.min.js"></script>
+    <script type="text/javascript" src="../../../3rdparty/underscore/underscore-min.js"></script>
+
+    <!-- Application -->
+    <script type="text/javascript" src="../../api/documents/api.js"></script>
+
+    <script type="text/javascript" src="../../common/Analytics.js"></script>
+    <script type="text/javascript" src="../../common/Gateway.js"></script>
+    <script type="text/javascript" src="../../common/main/loader.js"></script>
+    <script type="text/javascript" src="app.js"></script>
+    <script type="text/javascript" src="../../common/locale.js"></script>
+    
+    <!-- SDK -->
+
+    <script type="text/javascript" src="../../../sdk/PowerPoint/sdk-all.js"></script>
+
+    <script type="text/javascript">
+        var isBrowserSupported = function() {
+            return !((Ext.isIE6 || Ext.isIE7 || Ext.isIE8) ||
+                    (Ext.isSafari2 || Ext.isSafari3 || Ext.isSafari4) ||
+                    (Ext.isGecko && Ext.firefoxVersion < 4.0) ||
+                    (Ext.isChrome && Ext.chromeVersion < 7.0) ||
+                    (Ext.isOpera && Ext.operaVersion < 10.5));
+        };
+
+        if (!isBrowserSupported()){
+            document.write(
+                '<div class="application-error-panel">' +
+                    '<div class="application-error-message-block">' +
+                        '<div class="application-error-message-inner">' +
+                            '<div class="application-error-message-title">' + 'Your browser is not supported.' + '</div>' +
+                            '<div class="application-error-message-text">' + 'Sorry, Presentation Editor is currently only supported in the latest versions of the Chrome, Firefox, Safari or Internet Explorer web browsers.' + '</div>' +
+                        '</div>' +
+                     '</div>' +
+                    '<div class="application-error-message-auxiliary"></div>' +
+                '</div>'
+            );
+        }
+
+        var getEditorStylesheets = function() {
+            return ['../../common/main/resources/css/dataview-picker.css', '../../common/main/resources/css/hsb-colorpicker.css',
+                '../../common/main/resources/css/comments-panel.css', '../../common/main/resources/css/comments-popover.css',
+                '../../common/main/resources/css/themecolorpalette.css',
+                '../../common/main/resources/css/grouped-data-view.css',
+                'resources/css/dimension-picker.css', 'resources/css/toolbar.css', 'resources/css/dataview-combo.css',
+                'resources/css/right-panels.css', 'resources/css/advanced-settings-dialog.css'];
+        };
+    </script>
+
+</body>
+</html>
