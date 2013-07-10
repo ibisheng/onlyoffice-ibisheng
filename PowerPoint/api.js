@@ -3724,6 +3724,10 @@ asc_docs_api.prototype.ApplySlideTiming = function(oTiming)
         return;
     var _curSlide = this.WordControl.m_oLogicDocument.Slides[_cur];
     _curSlide.timing.applyProps(oTiming);
+
+    this.sync_BeginCatchSelectedElements();
+    this.sync_slidePropCallback(_curSlide);
+    this.sync_EndCatchSelectedElements();
 }
 asc_docs_api.prototype.SlideTimingApplyToAll = function()
 {
