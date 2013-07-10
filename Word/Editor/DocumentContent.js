@@ -1514,6 +1514,9 @@ CDocumentContent.prototype =
         }
         else //if ( docpostype_Content === this.CurPos.Type )
         {
+            if ( true == this.Selection.Use )
+                this.Remove( 1, true );
+            
             var Item = this.Content[this.CurPos.ContentPos];
             if ( type_Paragraph == Item.GetType() )
             {
@@ -1557,6 +1560,9 @@ CDocumentContent.prototype =
         {
             if ( this.CurPos.ContentPos < 0 )
                 return false;
+
+            if ( true == this.Selection.Use )
+                this.Remove( 1, true );
 
             // Добавляем таблицу
             var Item = this.Content[this.CurPos.ContentPos];
