@@ -1862,30 +1862,18 @@
 					n++;
 				}
 				var oldFilter = Asc.clone(currentFilter);
+				//**добавляем данные в aWs.AutoFilter или aWs.TableParts**
 				this._addCustomFilters(indexFilter,ws,aWs,conFilter);
 				
 				this._addHistoryObj(ws, oldFilter, historyitem_AutoFilter_ApplyDF,
 					{activeCells: ar, autoFiltersObject: autoFiltersObject});
-				//если общий фильтр, то смотрим на наличие ещё непустых строк ниже
-				/*if(this.allAutoFilter[numFil[0]].area)
-				{
-					var val = ws.model.getCell(new CellAddress(endRange.first.row,startRange.first.col - 1,0)).getValue();
-					var k = 0;
-					while(val != '')
-					{
-						n++;
-						k++;
-						arrayFil[n] = this._getLogical(conFilter,ws,val);;
-						val = ws.model.getCell(new CellAddress(endRange.first.row + k,startRange.first.col - 1,0)).getValue()
-					}
-				}*/
+
 				arrayFil.cellId = conFilter.cellId;
 				this._applyMainFilter(ar, ws, autoFiltersObject, true, arrayFil);
 			},
 			
 			//закрываем меню фильтра и применяем сам фильтр
 			_applyMainFilter: function(ar, ws, autoFiltersObject, customFilter, array) {
-				//var ws = this.getWorksheet();
 				var activeCells;
 				var aWs = this._getCurrentWS(ws);
 				var cellId;
@@ -1921,6 +1909,7 @@
 					c2: activeCells.c1
 				};
 				
+				//**получаем нужный фильтр**
 				var indexFilter = this._findArrayFromAllFilter3(newAcCells,ws,cellId);
 				var filtersOp = indexFilter.split(':');
 				var currentFilter;
@@ -1950,10 +1939,10 @@
 						isCurFilter = l;
 				}
 				
+				//**преобразуем массив в другой вид**
 				if(!isArray)
 				{
 					var newArray = [];
-					//преобразуем массив в другой вид
 					for(var m = 0; m < array.length; m++)
 					{
 						var val = ws.model.getCell( new CellAddress(activeCells.r1 + m + 1, activeCells.c1,0)).getCells()[0].getValue();
@@ -1981,12 +1970,11 @@
 					array = newArray;
 				}
 				
-				
+				//**открываем/закрываем строки, скрытые фильтром**
 				var row;
 				var newArray = [];
 				var cellAdd = 1;
 				var rowNew = 0;
-				
 				for(var i = 0; i < array.length; i++)
 				{
 					row = i + activeCells.r1 + cellAdd;
@@ -2025,20 +2013,22 @@
 							ws.model._getRow(row).hd = false;
 					}
 				}
+				
+				
+				//**добавляем данные в aWs.AutoFilter или aWs.TableParts**(для пользовательского фильтра они уже туда добавлены выше)
 				var isPress;
 				if(customFilter)
-				{
 					isPress = true
-				}
 				else
 				{
+					//массив преобразован в нужный вид true/false/hidden, здесь получаем Dates или Values
 					var allVis = true;
 					for(var i = 0; i < array.length ; i++)
 					{
 						var cell = ws.model.getCell( new CellAddress(activeCells.r1 + i + 1, activeCells.c1,0));
 						var valActive = cell.getValue();
 						var arrVal;
-						if(isCurFilter == undefined || !currentFilter[isCurFilter].Filters)
+						if(isCurFilter == undefined || !currentFilter[isCurFilter].Filters)//создаём, если его ещё нет
 						{
 							if(isCurFilter == undefined)
 								isCurFilter = currentFilter.length;
@@ -2078,7 +2068,7 @@
 							if(array[i] == false)
 								allVis = false;
 						}
-						else//values
+						else//получаем массив values исходя из данных array
 						{
 							arrVal = currentFilter[isCurFilter].Filters.Values;
 							var isConsist = undefined;
@@ -2097,8 +2087,9 @@
 								allVis = false;
 						}
 					}
-					//удаляем этот фильтр
+					
 					isPress = true;
+					//в случае всех открытых строк - убираем фильтр из aWs
 					if(allVis)
 					{
 						currentFilter.splice(isCurFilter,1);
