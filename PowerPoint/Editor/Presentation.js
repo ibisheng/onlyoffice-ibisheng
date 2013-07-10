@@ -325,6 +325,7 @@ function CPresentation( DrawingDocument ) {
     this.globalTableStyles = [];
     ///this.globalTableStyles[0] = CreateDefaultStylesForTables();
     this.DefaultSlideTiming = new CAscSlideTiming();
+    this.DefaultSlideTiming.setDefaultParams();
 
     this.IsExternalFonts = false;
     this.createDefaultTableStyles();

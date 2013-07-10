@@ -81,13 +81,13 @@ CAscColorScheme.prototype.get_name = function() { return this.Name; }
 
 function CAscSlideTiming()
 {
-    this.TransitionType     = c_oAscSlideTransitionTypes.None;
-    this.TransitionOption   = -1;
-    this.TransitionDuration = 2000;
+    this.TransitionType     = undefined;
+    this.TransitionOption   = undefined;
+    this.TransitionDuration = undefined;
 
-    this.SlideAdvanceOnMouseClick   = true;
-    this.SlideAdvanceAfter          = false;
-    this.SlideAdvanceDuration       = 10000;
+    this.SlideAdvanceOnMouseClick   = undefined;
+    this.SlideAdvanceAfter          = undefined;
+    this.SlideAdvanceDuration       = undefined;
 }
 
 CAscSlideTiming.prototype.put_TransitionType = function(v) { this.TransitionType = v; }
@@ -159,6 +159,17 @@ CAscSlideTiming.prototype.setUndefinedOptions = function()
     this.SlideAdvanceOnMouseClick   = undefined;
     this.SlideAdvanceAfter          = undefined;
     this.SlideAdvanceDuration       = undefined;
+}
+
+CAscSlideTiming.prototype.setDefaultParams = function()
+{
+    this.TransitionType     = c_oAscSlideTransitionTypes.None;
+    this.TransitionOption   = -1;
+    this.TransitionDuration = 2000;
+
+    this.SlideAdvanceOnMouseClick   = true;
+    this.SlideAdvanceAfter          = false;
+    this.SlideAdvanceDuration       = 10000;
 }
 
 // ---------------------------------------------------------------

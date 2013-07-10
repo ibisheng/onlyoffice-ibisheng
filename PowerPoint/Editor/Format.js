@@ -3694,6 +3694,7 @@ function Slide(presentation, slideLayout, slideNum)
     this.showMasterPhAnim = false;
 
     this.timing = new CAscSlideTiming();
+    this.timing.setDefaultParams();
 
     this.presentation = presentation;
     // pointers

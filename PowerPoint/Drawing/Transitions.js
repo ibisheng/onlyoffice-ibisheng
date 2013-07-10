@@ -2617,6 +2617,11 @@ function CDemonstrationManager(htmlpage)
             _ctx2.clearRect(oThis.Transition.Rect.x, oThis.Transition.Rect.y, oThis.Transition.Rect.w, oThis.Transition.Rect.r);
         }
 
+        if (null == this.SlideImage)
+        {
+
+        }
+
         var _ctx1 = oThis.Canvas.getContext('2d');
         oThis.Transition.CalculateRectDemonstration();
         _ctx1.drawImage(oThis.SlideImage, oThis.Transition.Rect.x, oThis.Transition.Rect.y, oThis.Transition.Rect.w, oThis.Transition.Rect.r);
@@ -2625,9 +2630,12 @@ function CDemonstrationManager(htmlpage)
 
         var _slides = oThis.HtmlPage.m_oLogicDocument.Slides;
         var _timing = _slides[oThis.SlideNum].timing;
-        this.CheckSlideDuration = setTimeout(function(){
-            oThis.StartSlide(true, false);
-        }, _timing.SlideAdvanceDuration);
+        this.CheckSlideDuration = setTimeout(function()
+        {
+            if (oThis.IsPlayMode)
+                oThis.StartSlide(true, false);
+        },
+        _timing.SlideAdvanceDuration);
     }
 
     this.End = function()
