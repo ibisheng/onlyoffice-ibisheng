@@ -5344,8 +5344,14 @@ CDocument.prototype =
                         if ( null == this.Selection.Data || this.Selection.Data.length <= 0 )
                             break;
 
-                        var NumPr = this.Content[this.Selection.Data[0]].Numbering_Get();
-                        VisTextPr = this.Numbering.Get_AbstractNum( NumPr.NumId ).Lvl[NumPr.Lvl].TextPr;
+                        var CurPara = this.Content[this.Selection.Data[0]];
+                        for ( var Index = 0; Index < this.Selection.Data.length; Index++ )
+                        {
+                            if ( this.CurPos.ContentPos === this.Selection.Data[Index] )
+                                CurPara = this.Content[this.Selection.Data[Index]];
+                        }
+
+                        VisTextPr = CurPara.Internal_Get_NumberingTextPr();
 
                         break;
                     }

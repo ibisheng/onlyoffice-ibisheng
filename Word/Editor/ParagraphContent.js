@@ -168,6 +168,11 @@ ParaText.prototype =
         return true;
     },
 
+    Can_AddNumbering : function()
+    {
+        return true;
+    },
+
     Copy : function()
     {
         return new ParaText( this.Value );
@@ -331,6 +336,11 @@ ParaSpace.prototype =
         return true;
     },
 
+    Can_AddNumbering : function()
+    {
+        return true;
+    },
+
     Copy : function()
     {
         return new ParaSpace(this.Value);
@@ -396,6 +406,11 @@ ParaTextPr.prototype =
     Is_RealContent : function()
     {
         return true;
+    },
+
+    Can_AddNumbering : function()
+    {
+        return false;
     },
 
     Set_Id : function(newId)
@@ -1690,6 +1705,11 @@ ParaEnd.prototype =
         return true;
     },
 
+    Can_AddNumbering : function()
+    {
+        return true;
+    },
+
     Copy : function()
     {
         return new ParaEnd();
@@ -1813,6 +1833,14 @@ ParaNewLine.prototype =
         return true;
     },
 
+    Can_AddNumbering : function()
+    {
+        if ( break_Line === this.BreakType )
+            return true;
+
+        return false;
+    },
+
     Copy : function()
     {
         return new ParaNewLine(this.BreakType);
@@ -1876,6 +1904,12 @@ ParaNewLineRendered.prototype =
         return false;
     },
 
+    Can_AddNumbering : function()
+    {
+        return false;
+    },
+
+
     Write_ToBinary : function(Writer)
     {
         // Long   : Type
@@ -1912,6 +1946,12 @@ ParaInlineBreak.prototype =
         return false;
     },
 
+    Can_AddNumbering : function()
+    {
+        return false;
+    },
+
+
     Write_ToBinary : function(Writer)
     {
         // Long   : Type
@@ -1944,6 +1984,11 @@ ParaPageBreakRenderer.prototype =
     },
 
     Is_RealContent : function()
+    {
+        return false;
+    },
+
+    Can_AddNumbering : function()
     {
         return false;
     },
@@ -1989,6 +2034,12 @@ ParaEmpty.prototype =
         return true;
     },
 
+    Can_AddNumbering : function()
+    {
+        return false;
+    },
+
+
     Copy : function()
     {
         return new ParaEmpty(this.NeedToDelete);
@@ -2018,6 +2069,7 @@ ParaEmpty.prototype =
 function ParaNumbering()
 {
     this.Type = para_Numbering;
+    this.Pos  = -1;
 
     this.Internal =
     {
@@ -2056,6 +2108,11 @@ ParaNumbering.prototype =
     Is_RealContent : function()
     {
         return true;
+    },
+
+    Can_AddNumbering : function()
+    {
+        return false;
     },
 
     Copy : function()
@@ -2118,6 +2175,11 @@ ParaTab.prototype =
     },
 
     Is_RealContent : function()
+    {
+        return true;
+    },
+
+    Can_AddNumbering : function()
     {
         return true;
     },
@@ -3299,6 +3361,14 @@ ParaDrawing.prototype =
     Is_RealContent : function()
     {
         return true;
+    },
+
+    Can_AddNumbering : function()
+    {
+        if ( drawing_Inline === this.DrawingType )
+            return true;
+
+        return false;
     },
 
     Copy : function()
@@ -6031,6 +6101,11 @@ ParaPageNum.prototype =
         return true;
     },
 
+    Can_AddNumbering : function()
+    {
+        return true;
+    },
+
     Copy : function()
     {
         return new ParaPageNum();
@@ -6075,6 +6150,12 @@ ParaFlowObjectAnchor.prototype =
     {
         return false;
     },
+
+    Can_AddNumbering : function()
+    {
+        return false;
+    },
+
 
     Set_FlowObject : function(Object)
     {
@@ -6135,6 +6216,11 @@ ParaHyperlinkStart.prototype =
     Is_RealContent : function()
     {
         return true;
+    },
+
+    Can_AddNumbering : function()
+    {
+        return false;
     },
 
     Copy : function()
@@ -6377,6 +6463,12 @@ ParaHyperlinkEnd.prototype =
         return true;
     },
 
+    Can_AddNumbering : function()
+    {
+        return false;
+    },
+
+
     Copy : function()
     {
         return new ParaHyperlinkEnd();
@@ -6419,6 +6511,12 @@ ParaCollaborativeChangesStart.prototype =
         return false;
     },
 
+    Can_AddNumbering : function()
+    {
+        return false;
+    },
+
+
     Write_ToBinary : function(Writer)
     {
         // Long   : Type
@@ -6454,6 +6552,12 @@ ParaCollaborativeChangesEnd.prototype =
     {
         return false;
     },
+
+    Can_AddNumbering : function()
+    {
+        return false;
+    },
+
 
     Write_ToBinary : function(Writer)
     {
@@ -6492,6 +6596,12 @@ ParaCommentStart.prototype =
     {
         return true;
     },
+
+    Can_AddNumbering : function()
+    {
+        return false;
+    },
+
 
     Copy : function()
     {
@@ -6536,6 +6646,12 @@ ParaCommentEnd.prototype =
     {
         return true;
     },
+
+    Can_AddNumbering : function()
+    {
+        return false;
+    },
+
 
     Copy : function()
     {
@@ -6588,6 +6704,12 @@ ParaPresentationNumbering.prototype =
     {
         return true;
     },
+
+    Can_AddNumbering : function()
+    {
+        return false;
+    },
+
 
     Copy : function()
     {
