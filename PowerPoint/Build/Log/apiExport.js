@@ -490,6 +490,8 @@ var:CorrectUniFill
 var:CAscSlideProps
 prop:get_background
 prop:put_background
+prop:get_timing
+prop:put_timing
 ---
 var:CAscStroke
 prop:get_type
@@ -1318,6 +1320,8 @@ window['CorrectUniFill'] = CorrectUniFill;
 window['CAscSlideProps'] = CAscSlideProps;
 CAscSlideProps.prototype['get_background'] = CAscSlideProps.prototype.get_background;
 CAscSlideProps.prototype['put_background'] = CAscSlideProps.prototype.put_background;
+CAscSlideProps.prototype['get_timing'] = CAscSlideProps.prototype.get_timing;
+CAscSlideProps.prototype['put_timing'] = CAscSlideProps.prototype.put_timing;
 window['CAscStroke'] = CAscStroke;
 CAscStroke.prototype['get_type'] = CAscStroke.prototype.get_type;
 CAscStroke.prototype['put_type'] = CAscStroke.prototype.put_type;
