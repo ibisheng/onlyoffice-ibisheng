@@ -696,6 +696,101 @@
 			this.bIsReInit = false;
 		}
 
+		/** @constructor */
+		function asc_CStyleImage(name, thumbnailOffset, type) {
+			this.name = name;
+			this.thumbnailOffset = thumbnailOffset;
+			this.type = type;
+		}
+
+		asc_CStyleImage.prototype = {
+			constructor: asc_CStyleImage,
+			asc_getName: function () { return this.name; },
+			asc_getThumbnailOffset: function () { return this.thumbnailOffset; },
+			asc_getType: function () { return this.type; }
+		};
+
+		/** @constructor */
+		function asc_CStylesPainter() {
+			// base64 defaultStyles image
+			this.defaultStylesImage = "";
+			this.defaultStyles = null;
+
+			// base64 docStyles image
+			this.docStylesImage = "";
+			this.docStyles = null;
+
+			this.styleThumbnailWidth	= 100;
+			this.styleThumbnailHeight	= 22;
+			this.styleThumbnailWidthPt	= this.styleThumbnailWidth * 72 / 96;
+			this.styleThumbnailHeightPt	= this.styleThumbnailHeight * 72 / 96;
+		}
+
+		asc_CStylesPainter.prototype = {
+			constructor: asc_CStylesPainter,
+			asc_getStyleThumbnailWidth: function () { return this.styleThumbnailWidth; },
+			asc_getStyleThumbnailHeight: function () { return this.styleThumbnailHeight; },
+			asc_getDefaultStylesImage: function () { return this.defaultStylesImage; },
+			asc_getDocStylesImage: function () { return this.docStylesImage; },
+			generateStylesAll: function (cellStylesAll, fmgrGraphics) {
+				this.generateStyles(cellStylesAll.DefaultStyles, fmgrGraphics);
+			},
+			generateStyles: function (cellStyles, fmgrGraphics) {
+				var nStylesCount = cellStyles.length;
+				var oCanvas = document.createElement('canvas');
+				oCanvas.width = this.styleThumbnailWidth;
+				oCanvas.height = nStylesCount * this.styleThumbnailHeight;
+				var ctx = oCanvas.getContext('2d');
+				ctx.fillStyle = "#FFFFFF";
+				ctx.fillRect(0, 0, oCanvas.width, oCanvas.height);
+
+				var oGraphics = asc.DrawingContext({canvas: oCanvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics});
+
+				var oStyle = null;
+				this.defaultStyles = [];
+				for (var i = 0; i < nStylesCount; ++i) {
+					oStyle = cellStyles[i];
+					this.defaultStyles[i] = new asc_CStyleImage(oStyle.Name, i, c_oAscStyleImage.Default);
+					this.drawStyle(oGraphics, oStyle, i);
+				}
+
+				this.defaultStylesImage = oCanvas.toDataURL("image/png");
+
+				var test = document.createElement('img');
+				test.src = this.defaultStylesImage;
+				document.body.appendChild(test);
+			},
+			generateDocumentStyles: function () {
+
+			},
+			drawStyle: function (oGraphics, oStyle, nIndex) {
+				var nOffsetY = nIndex * this.styleThumbnailHeightPt;
+
+				var bg = oStyle.getFill();
+				if(null != bg)
+					bg = bg.getRgb();
+				var oColor = bg !== null ? asc.numberToCSSColor(bg) : "#FFFFFF";
+				oGraphics.save().setFillStyle(oColor);
+				oGraphics.rect(0, nOffsetY, this.styleThumbnailWidthPt, nOffsetY + this.styleThumbnailHeightPt);
+				oGraphics.fill().clip();
+
+				var fc = oStyle.getFontColor();
+				if(null != fc)
+					fc = fc.getRgb();
+				var oFontColor = fc !== null ? asc.numberToCSSColor(fc) : "#000000";
+				var format = oStyle.getFont();
+				var oFont = new asc.FontProperties(format.fn, format.fs, format.b, format.i, format.u, format.s);
+
+				oGraphics.setFont(oFont);
+				oGraphics.setFillStyle(oFontColor);
+
+				oGraphics.fillText(oStyle.Name, 0, nOffsetY + this.styleThumbnailHeightPt / 2);
+
+				oGraphics.beginPath().setLineWidth(1).setStrokeStyle(oFontColor).moveTo(0, nOffsetY + this.styleThumbnailHeightPt);
+				oGraphics.lineTo(this.styleThumbnailWidthPt, nOffsetY + this.styleThumbnailHeightPt).stroke();
+				oGraphics.restore();
+			}
+		};
 
 		/*
 		 * Export
@@ -819,5 +914,18 @@
 		prot["asc_setShowGridLines"] = prot.asc_setShowGridLines;
 		prot["asc_setShowRowColHeaders"] = prot.asc_setShowRowColHeaders;
 
-	}
+		window["Asc"]["asc_CStyleImage"] = window["Asc"].asc_CStyleImage = asc_CStyleImage;
+		prot = asc_CStyleImage.prototype;
+		prot["asc_getName"] = prot.asc_getName;
+		prot["asc_getThumbnailOffset"] = prot.asc_getThumbnailOffset;
+		prot["asc_getType"] = prot.asc_getType;
+
+		window["Asc"]["asc_CStylesPainter"] = window["Asc"].asc_CStylesPainter = asc_CStylesPainter;
+		prot = asc_CStylesPainter.prototype;
+		prot["asc_getStyleThumbnailWidth"] = prot.asc_getStyleThumbnailWidth;
+		prot["asc_getStyleThumbnailHeight"] = prot.asc_getStyleThumbnailHeight;
+		prot["asc_getDefaultStylesImage"] = prot.asc_getDefaultStylesImage;
+		prot["asc_getDocStylesImage"] = prot.asc_getDocStylesImage;
+
+}
 )(jQuery, window);

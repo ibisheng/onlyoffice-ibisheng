@@ -1217,6 +1217,20 @@ function CCellStyles() {
 	this.DefaultStyles = [];
 	this.AllStyles = {};
 }
+CCellStyles.prototype = {
+	generateFontMap: function (oFontMap) {
+		this._generateFontMap(oFontMap, this.DefaultStyles);
+		this._generateFontMap(oFontMap, this.CustomStyles);
+	},
+	_generateFontMap: function (oFontMap, aStyles) {
+		var i, length, oStyle;
+		for (i = 0, length = aStyles.length; i < length; ++i) {
+			oStyle = aStyles[i];
+			if (null != oStyle.xfs && null != oStyle.xfs.font && null != oStyle.xfs.font.fn)
+				oFontMap[oStyle.xfs.font.fn] = 1;
+		}
+	}
+};
 /** @constructor */
 function CCellStyle() {
 	this.BuiltinId = null;
@@ -1228,6 +1242,25 @@ function CCellStyle() {
 
 	this.xfs = null;
 }
+CCellStyle.prototype = {
+	getFill: function () {
+		if (null != this.xfs && null != this.xfs.fill)
+			return this.xfs.fill.bg;
+
+		return g_oDefaultFill.bg;
+	},
+	getFontColor: function () {
+		if (null != this.xfs && null != this.xfs.font)
+			return this.xfs.font.c;
+
+		return g_oDefaultFont.c;
+	},
+	getFont: function () {
+		if (null != this.xfs && null != this.xfs.font)
+			return this.xfs.font;
+		return null;
+	}
+};
 /** @constructor */
 function StyleManager(){
     //содержат все свойства по умолчанию

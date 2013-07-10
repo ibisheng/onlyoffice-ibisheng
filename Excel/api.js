@@ -1023,9 +1023,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					this.asyncMethodCallback();
 					this.asyncMethodCallback = undefined;
 				} else {
-					this.asc_CheckGuiControlColors();
-					this.asc_SendThemeColorScheme();
-					this.asc_ApplyColorScheme(false);
 					// Шрифты загрузились, возможно стоит подождать совместное редактирование
 					this.FontLoadWaitComplete = true;
 					if (this.ServerIdWaitComplete)
@@ -1427,6 +1424,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this._applyFirstLoadChanges();
 				// Меняем тип состояния (на никакое)
 				this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
+
+				this.asc_CheckGuiControlColors();
+				this.asc_SendThemeColorScheme();
+				this.asc_ApplyColorScheme(false);
+
 				//this.asc_Resize(); // Убрал, т.к. сверху приходит resize (http://bugzserver/show_bug.cgi?id=14680)
 				if( this.wbModel.startActionOn == false ){
 					this.wbModel.startActionOn = true;
@@ -2385,15 +2387,16 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			asc_ApplyColorScheme : function(bRedraw) {
 				this.chartStyleManager.init();
 				this.chartPreviewManager.init();
-				
-				var asc_AF = asc.AutoFilters;
-				var autoFilters = new asc_AF();
+
+				var autoFilters = new asc.AutoFilters();
 				var tablePictures = autoFilters.getTablePictures(this.wbModel);
 				var bResult = this.handlers.trigger("asc_onInitTablePictures", tablePictures);
-				if (false === bResult)
-					this.tablePictures = tablePictures;
-				else
-					this.tablePictures = null;
+				this.tablePictures = (false === bResult) ? tablePictures : null;
+
+				// Отправка стилей ячеек
+				var guiStyles = this.wb.getCellStyles();
+				bResult = this.handlers.trigger("asc_onInitEditorStyles", guiStyles);
+				this.guiStyles = (false === bResult) ? guiStyles : null;
 					
 				if (bRedraw) {
 					var ws = this.wb.getWorksheet();

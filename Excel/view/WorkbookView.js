@@ -27,6 +27,7 @@
 		var asc_DC				= asc.DrawingContext;
 		var asc_SR				= asc.StringRender;
 		var asc_getcvt			= asc.getCvtRatio;
+		var asc_CSP				= asc.asc_CStylesPainter;
 
 
 		/**
@@ -904,6 +905,11 @@
 					if (ws.getCellEditMode())
 						this.cellEditor.showCursor();
 				}
+			},
+
+			getCellStyles: function () {
+				var oStylesPainter = new asc_CSP();
+				oStylesPainter.generateStylesAll(this.model.CellStyles, this.fmgrGraphics);
 			},
 
 			getWorksheetById: function (id) {

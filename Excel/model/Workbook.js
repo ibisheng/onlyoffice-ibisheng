@@ -1878,6 +1878,7 @@ Workbook.prototype.generateFontMap=function(){
 	
 	for(var i = 0, length = this.aWorksheets.length; i < length; ++i)
 		this.aWorksheets[i].generateFontMap(oFontMap);
+	this.CellStyles.generateFontMap(oFontMap);
 	
 	var aRes = new Array();
 	for(var i in oFontMap)
