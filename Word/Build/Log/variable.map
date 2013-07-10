@@ -217,7 +217,7 @@ ParaEmpty:hO
 recalcresult2_End:zH
 JSCompiler_StaticMethods_recalculateAfterInternalResize:RF
 SpellCheck_CallBack:Q_
-L 9:q
+L 9:s
 monthShort:Mf
 L 8:p
 L 7:h
@@ -287,7 +287,7 @@ JSCompiler_StaticMethods_DeleteThis:xN
 highlight_None:Qb
 tt_cmap4_char_next:kt
 MIN_SHAPE_SIZE_DIV2:xG
-JSCompiler_alias_TRUE:s
+JSCompiler_alias_TRUE:q
 c_oSerRunType$pptxDrawing:kX
 JSCompiler_StaticMethods_Set_TableW:cT
 fntStyleInd_none:vJ
