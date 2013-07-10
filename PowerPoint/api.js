@@ -1483,52 +1483,40 @@ asc_docs_api.prototype.SetSlideProps = function(prop)
     var arr_ind = this.WordControl.Thumbnails.GetSelectedArray();
     var _back_fill = prop.get_background();
 
-    if (_back_fill.get_type() == c_oAscFill.FILL_TYPE_NOFILL)
+    if (_back_fill)
     {
-        this.WordControl.m_oLogicDocument.changeBackground(null, arr_ind);
-        return;
-    }
-
-    var _old_fill = null;
-    var _oldBg = this.WordControl.m_oLogicDocument.Slides[this.WordControl.m_oLogicDocument.CurPage].cSld.Bg;
-    if (_oldBg != null && _oldBg.bgPr != null && _oldBg.bgPr.Fill != null)
-        _old_fill = _oldBg.bgPr.Fill.createDuplicate();
-
-    var bg = new CBg();
-    bg.bgPr = new CBgPr();
-    bg.bgPr.Fill = CorrectUniFill(_back_fill, _old_fill);
-
-    var image_url = "";
-    if (bg.bgPr.Fill != null && bg.bgPr.Fill.fill != null && bg.bgPr.Fill.fill.type == FILL_TYPE_BLIP)
-    {
-        image_url = bg.bgPr.Fill.fill.RasterImageId;
-    }
-    if (image_url != "")
-    {
-        var _image = this.ImageLoader.LoadImage(image_url, 1);
-
-        var sFindString = editor.DocumentUrl + "media/";
-        if(0 == image_url.indexOf(sFindString))
+        if (_back_fill.get_type() == c_oAscFill.FILL_TYPE_NOFILL)
         {
-            image_url = image_url.substring(sFindString.length);
-            bg.bgPr.Fill.fill.RasterImageId = image_url; // erase documentUrl
+            this.WordControl.m_oLogicDocument.changeBackground(null, arr_ind);
+            return;
         }
 
-        if (null != _image)
+        var _old_fill = null;
+        var _oldBg = this.WordControl.m_oLogicDocument.Slides[this.WordControl.m_oLogicDocument.CurPage].cSld.Bg;
+        if (_oldBg != null && _oldBg.bgPr != null && _oldBg.bgPr.Fill != null)
+            _old_fill = _oldBg.bgPr.Fill.createDuplicate();
+
+        var bg = new CBg();
+        bg.bgPr = new CBgPr();
+        bg.bgPr.Fill = CorrectUniFill(_back_fill, _old_fill);
+
+        var image_url = "";
+        if (bg.bgPr.Fill != null && bg.bgPr.Fill.fill != null && bg.bgPr.Fill.fill.type == FILL_TYPE_BLIP)
         {
-            if (bg.bgPr.Fill != null && bg.bgPr.Fill.fill != null && bg.bgPr.Fill.fill.type == c_oAscFill.FILL_TYPE_BLIP)
+            image_url = bg.bgPr.Fill.fill.RasterImageId;
+        }
+        if (image_url != "")
+        {
+            var _image = this.ImageLoader.LoadImage(image_url, 1);
+
+            var sFindString = editor.DocumentUrl + "media/";
+            if(0 == image_url.indexOf(sFindString))
             {
-                this.WordControl.m_oDrawingDocument.DrawImageTextureFillSlide(bg.bgPr.Fill.fill.RasterImageId);
+                image_url = image_url.substring(sFindString.length);
+                bg.bgPr.Fill.fill.RasterImageId = image_url; // erase documentUrl
             }
 
-            this.WordControl.m_oLogicDocument.changeBackground(bg, arr_ind);
-        }
-        else
-        {
-            this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
-
-            var oProp = prop;
-            this.asyncImageEndLoaded2 = function(_image)
+            if (null != _image)
             {
                 if (bg.bgPr.Fill != null && bg.bgPr.Fill.fill != null && bg.bgPr.Fill.fill.type == c_oAscFill.FILL_TYPE_BLIP)
                 {
@@ -1536,17 +1524,38 @@ asc_docs_api.prototype.SetSlideProps = function(prop)
                 }
 
                 this.WordControl.m_oLogicDocument.changeBackground(bg, arr_ind);
-                this.asyncImageEndLoaded2 = null;
+            }
+            else
+            {
+                this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
+
+                var oProp = prop;
+                this.asyncImageEndLoaded2 = function(_image)
+                {
+                    if (bg.bgPr.Fill != null && bg.bgPr.Fill.fill != null && bg.bgPr.Fill.fill.type == c_oAscFill.FILL_TYPE_BLIP)
+                    {
+                        this.WordControl.m_oDrawingDocument.DrawImageTextureFillSlide(bg.bgPr.Fill.fill.RasterImageId);
+                    }
+
+                    this.WordControl.m_oLogicDocument.changeBackground(bg, arr_ind);
+                    this.asyncImageEndLoaded2 = null;
+                }
             }
         }
-    }
-    else
-    {
-        if (bg.bgPr.Fill != null && bg.bgPr.Fill.fill != null && bg.bgPr.Fill.fill.type == c_oAscFill.FILL_TYPE_BLIP)
+        else
         {
-            this.WordControl.m_oDrawingDocument.DrawImageTextureFillSlide(bg.bgPr.Fill.fill.RasterImageId);
+            if (bg.bgPr.Fill != null && bg.bgPr.Fill.fill != null && bg.bgPr.Fill.fill.type == c_oAscFill.FILL_TYPE_BLIP)
+            {
+                this.WordControl.m_oDrawingDocument.DrawImageTextureFillSlide(bg.bgPr.Fill.fill.RasterImageId);
+            }
+            this.WordControl.m_oLogicDocument.changeBackground(bg, arr_ind);
         }
-        this.WordControl.m_oLogicDocument.changeBackground(bg, arr_ind);
+    }
+
+    var _timing = prop.get_timing();
+    if (_timing)
+    {
+        this.ApplySlideTiming(_timing);
     }
 }
 
@@ -3313,6 +3322,8 @@ asc_docs_api.prototype.sync_slidePropCallback = function(slide)
             this.WordControl.m_oDrawingDocument.DrawImageTextureFillSlide(_back_fill.fill.RasterImageId);
         }
     }
+
+    obj.Timing = slide.timing;
 
     var _len = this.SelectedObjectsStack.length;
     if (_len > 0)

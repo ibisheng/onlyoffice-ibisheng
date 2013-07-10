@@ -505,10 +505,13 @@ function CorrectUniFill(asc_fill, unifill)
 function CAscSlideProps()
 {
     this.Background = null;
+    this.Timing = null;
 }
 
 CAscSlideProps.prototype.get_background = function(){return this.Background;}
 CAscSlideProps.prototype.put_background = function(v){this.Background = v;}
+CAscSlideProps.prototype.get_timing = function(){return this.Timing;}
+CAscSlideProps.prototype.put_timing = function(v){this.Timing = v;}
 
 // ---------------------------------------------------------------
 
