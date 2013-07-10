@@ -430,6 +430,7 @@ prop:applyProps
 prop:createDuplicate
 prop:makeDuplicate
 prop:setUndefinedOptions
+prop:setDefaultParams
 ---
 var:CAscTexture
 prop:get_id
@@ -1271,6 +1272,7 @@ CAscSlideTiming.prototype['applyProps'] = CAscSlideTiming.prototype.applyProps;
 CAscSlideTiming.prototype['createDuplicate'] = CAscSlideTiming.prototype.createDuplicate;
 CAscSlideTiming.prototype['makeDuplicate'] = CAscSlideTiming.prototype.makeDuplicate;
 CAscSlideTiming.prototype['setUndefinedOptions'] = CAscSlideTiming.prototype.setUndefinedOptions;
+CAscSlideTiming.prototype['setDefaultParams'] = CAscSlideTiming.prototype.setDefaultParams;
 window['CAscTexture'] = CAscTexture;
 CAscTexture.prototype['get_id'] = CAscTexture.prototype.get_id;
 CAscTexture.prototype['get_image'] = CAscTexture.prototype.get_image;
