@@ -2072,13 +2072,22 @@
 						{
 							arrVal = currentFilter[isCurFilter].Filters.Values;
 							var isConsist = undefined;
+							var isBlank;
 							for(var h = 0; h < arrVal.length; h++)
 							{
 								if(arrVal[h] == valActive)
 									isConsist = h;
 							}
-							
-							
+							//в массиве Values не должно находиться пустых значений, должен быть выставлен аттрибут Blank
+							if('' == valActive && array[i] == true && isConsist == undefined)
+							{
+								currentFilter[isCurFilter].Filters.Blank = true;
+								currentFilter[isCurFilter].Filters.Values.splice(h,1);
+								continue;
+							}
+							else if('' == valActive)
+								currentFilter[isCurFilter].Filters.Blank = null;
+								
 							if(array[i] == true && isConsist == undefined)//добавляем значение в конец
 								arrVal[arrVal.length] = valActive;
 							else if(array[i] == false && isConsist != undefined)//убираем данное значение из массива
@@ -3035,6 +3044,7 @@
 								//пересматриваем все значения
 								var filValue = curFilter.Filters.Values;
 								var dataValues = curFilter.Filters.Dates;
+								var isBlank = curFilter.Filters.Blank;
 								var nC = 0;
 								var acCell = currentFilter.result[curFilter.ColId];
 								var startRow = ws.model.getCell(new CellAddress(acCell.id)).first.row - 1;
@@ -3055,7 +3065,23 @@
 										{
 											for(var nVal = 0; nVal < filValue.length; nVal++)
 											{
-												if(filValue[nVal] == val2)
+												if(val2 == '' && isBlank == null)
+												{
+													result[nC].val = val;
+													result[nC].val2 = val2;
+													if(result[nC].visible != 'hidden')
+														result[nC].visible = false;
+												}
+												if(val2 == '' && isBlank == true)
+												{
+													result[nC].val = val;
+													result[nC].val2 = val2;
+													isInput = true;
+													if(result[nC].visible != 'hidden')
+														result[nC].visible = true;
+													break;
+												}
+												else if(filValue[nVal] == val2)
 												{
 													result[nC].val = val;
 													result[nC].val2 = val2;
@@ -3100,7 +3126,7 @@
 										var check = false;
 										for(var nVal = 0; nVal < filValue.length; nVal++)
 										{
-											if(filValue[nVal] == val)
+											if((filValue[nVal] == val) || (val == '' && isBlank == true))
 											{
 												check = true;
 												break;
@@ -3499,6 +3525,7 @@
 				else if(filter && filter.Filters)
 				{
 					var customFilter = filter.Filters.Values;
+					var isBlank  = filter.Filters.Blank;
 					for(var m = startCell.r1 + 1; m <= endCell.r1; m++)
 					{
 						var val = ws.model.getCell( new CellAddress(m, startCell.c1, 0)).getCells()[0].getValue();
@@ -3508,6 +3535,8 @@
 							if(val == customFilter[k])
 								isVis = true;
 						}
+						if(val == '' && isBlank == true)
+							isVis = true;
 						if(!isVis)
 							result[m] = true;
 					}
@@ -4918,6 +4947,36 @@
 					return range;
 				}
 				return false;
+			},
+			
+			_addBlankValues: function(aWs)
+			{
+				if(aWs.AutoFilter)
+				{
+					var filterColumns = aWs.AutoFilter.FilterColumns
+					for(var i = 0; i < filterColumns.length; i++)
+					{
+						var filters = filterColumns[i].Filters;
+						if(filters && filters.Blank == true)
+							filters.Values[filters.Values.length] = ""; 
+					}
+				}
+				if(aWs.TableParts)
+				{
+					for(var i = 0; i < aWs.TableParts.length; i++)
+					{
+						if(aWs.TableParts[i].AutoFilter)
+						{
+							var filterColumns = aWs.TableParts[i].AutoFilter.FilterColumns;
+							for(var j = 0; j < filterColumns.length; j++)
+							{
+								var filters = filterColumns[j].Filters;
+								if(filters && filters.Blank == true)
+									filters.Values[filters.Values.length] = ""; 
+							}
+						}
+					}
+				}
 			}
 		};
 
