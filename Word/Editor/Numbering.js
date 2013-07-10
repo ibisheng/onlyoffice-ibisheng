@@ -820,11 +820,10 @@ CAbstractNum.prototype =
     {
         var Text = this.Lvl[Lvl].LvlText;
 
-        var OldFont = Context.GetFont();
-        var OldFont2 = g_oTextMeasurer.GetFont();
-
-        Context.SetFont( NumTextPr );
-        g_oTextMeasurer.SetFont( NumTextPr );
+        Context.SetTextPr( NumTextPr );
+        Context.SetFontSlot( fontslot_ASCII );
+        g_oTextMeasurer.SetTextPr( NumTextPr );
+        g_oTextMeasurer.SetFontSlot( fontslot_ASCII );
 
         for ( var Index = 0; Index < Text.length; Index++ )
         {
@@ -832,6 +831,16 @@ CAbstractNum.prototype =
             {
                 case numbering_lvltext_Text:
                 {
+                    var Hint = NumTextPr.RFonts.Hint;
+                    var bCS  = NumTextPr.CS;
+                    var bRTL = NumTextPr.RTL;
+                    var lcid = NumTextPr.Lang.EastAsia;
+
+                    var FontSlot = g_font_detector.Get_FontClass( Text[Index].Value.charCodeAt(0), Hint, lcid, bCS, bRTL );
+
+                    Context.SetFontSlot( FontSlot );
+                    g_oTextMeasurer.SetFontSlot( FontSlot );
+
                     Context.FillText( X, Y, Text[Index].Value );
                     X += g_oTextMeasurer.Measure( Text[Index].Value ).Width;
 
@@ -839,6 +848,9 @@ CAbstractNum.prototype =
                 }
                 case numbering_lvltext_Num:
                 {
+                    Context.SetFontSlot( fontslot_ASCII );
+                    g_oTextMeasurer.SetFontSlot( fontslot_ASCII );
+
                     var CurLvl = Text[Index].Value;
                     switch( this.Lvl[CurLvl].Format )
                     {
@@ -970,9 +982,6 @@ CAbstractNum.prototype =
                 }
             }
         }
-
-        Context.SetFont( OldFont );
-        g_oTextMeasurer.SetFont( OldFont2 );
     },
 
     Measure : function(Context, Lvl, NumInfo, NumTextPr)
@@ -980,9 +989,8 @@ CAbstractNum.prototype =
         var X = 0;
         var Text = this.Lvl[Lvl].LvlText;
 
-        var OldFont = Context.GetFont();
-
-        Context.SetFont( NumTextPr );
+        Context.SetTextPr( NumTextPr );
+        Context.SetFontSlot( fontslot_ASCII );
         var Ascent = Context.GetAscender();
 
         for ( var Index = 0; Index < Text.length; Index++ )
@@ -991,12 +999,21 @@ CAbstractNum.prototype =
             {
                 case numbering_lvltext_Text:
                 {
+                    var Hint = NumTextPr.RFonts.Hint;
+                    var bCS  = NumTextPr.CS;
+                    var bRTL = NumTextPr.RTL;
+                    var lcid = NumTextPr.Lang.EastAsia;
+
+                    var FontSlot = g_font_detector.Get_FontClass( Text[Index].Value.charCodeAt(0), Hint, lcid, bCS, bRTL );
+
+                    Context.SetFontSlot( FontSlot );
                     X += Context.Measure( Text[Index].Value ).Width;
 
                     break;
                 }
                 case numbering_lvltext_Num:
                 {
+                    Context.SetFontSlot( fontslot_ASCII );
                     var CurLvl = Text[Index].Value;
                     switch( this.Lvl[CurLvl].Format )
                     {
@@ -1123,7 +1140,6 @@ CAbstractNum.prototype =
             }
         }
 
-        Context.SetFont( OldFont );
         return { Width : X, Ascent : Ascent };
     },
 

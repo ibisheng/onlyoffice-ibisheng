@@ -3353,12 +3353,12 @@ Paragraph.prototype =
 
         var Numbering = this.Parent.Get_Numbering();
         var NumLvl    = Numbering.Get_AbstractNum( NumPr.NumId ).Lvl[NumPr.Lvl];
-        var NumSuff   = NumLvl.Suff;
-        var NumJc     = NumLvl.Jc;
-        var NumInfo   = this.Parent.Internal_GetNumInfo( this.Id, NumPr );
         var NumTextPr = this.Get_CompiledPr2(false).TextPr.Copy();
         NumTextPr.Merge( this.TextPr.Value );
         NumTextPr.Merge( NumLvl.TextPr );
+
+        NumTextPr.FontFamily.Name = NumTextPr.RFonts.Ascii.Name;
+
         return NumTextPr;
     },
 
@@ -4323,6 +4323,13 @@ Paragraph.prototype =
 
 
                         X += NumberingItem.WidthVisible;
+
+                        // Восстановим настройки
+                        pGraphics.SetTextPr( CurTextPr );
+                        if ( true === bVisitedHyperlink )
+                            pGraphics.b_color1( 128, 0, 151, 255 );
+                        else
+                            pGraphics.b_color1( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
                     }
                     else if ( para_PresentationNumbering === this.Numbering.Type )
                     {
