@@ -355,7 +355,7 @@ Paragraph.prototype =
         }
 
         // Передвинем все метки слов для проверки орфографии
-        this.SpellChecker.Update_OnAdd( this, Pos, Item.Type );
+        this.SpellChecker.Update_OnAdd( this, Pos, Item );
     },
 
     // Добавляем несколько элементов в конец параграфа.
@@ -4882,6 +4882,9 @@ Paragraph.prototype =
                 var Hyper_start = this.Check_Hyperlink2( StartPos );
                 var Hyper_end   = this.Check_Hyperlink2( EndPos );
 
+                // Если встречалось какое-либо изменение настроек, сохраним его последние изменение
+                var LastTextPr = null;
+
                 for ( var Index = StartPos; Index < EndPos; Index++ )
                 {
                     var Item = this.Content[Index];
@@ -4890,10 +4893,9 @@ Paragraph.prototype =
                         var ObjId = Item.Get_Id();
                         this.Parent.DrawingObjects.Remove_ById( ObjId );
                     }
+                    else if ( para_TextPr === Item.Type )
+                        LastTextPr = Item;
                 }
-
-                // Рассчитаем стиль на конце селекта
-                var TextPr = this.Internal_CalculateTextPr( EndPos + 1 );
 
                 this.Internal_Content_Remove2( StartPos, EndPos - StartPos );
 
@@ -4908,7 +4910,8 @@ Paragraph.prototype =
                     StartPos = Temp;
                 }
 
-                this.Internal_Content_Add( StartPos, new ParaTextPr( TextPr ) );
+                if ( null != LastTextPr )
+                    this.Internal_Content_Add( StartPos, new ParaTextPr( LastTextPr.Value ) );
 
                 this.CurPos.ContentPos = StartPos;
                 this.CurPos.Line = -1;

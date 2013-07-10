@@ -281,8 +281,9 @@ CParaSpellChecker.prototype =
         this.Internal_UpdateParagraphState();
     },
 
-    Update_OnAdd : function(Paragraph, Pos, ItemType)
+    Update_OnAdd : function(Paragraph, Pos, Item)
     {
+        var ItemType = Item.Type;
         var Left  = null;
         var Right = null;
 
@@ -308,12 +309,16 @@ CParaSpellChecker.prototype =
         var RecalcInfo = Paragraph.RecalcInfo;
         RecalcInfo.Update_Spell_OnChange( Pos, 1, true );
 
-        if ( para_TextPr != ItemType && para_Numbering != ItemType )
+        if ( para_TextPr != ItemType )
         {
             var StartPos = ( null === Left  ? 0                            : Left.StartPos );
             var EndPos   = ( null === Right ? Paragraph.Content.length - 1 : Right.EndPos  );
 
             RecalcInfo.Set_Type_0_Spell(pararecalc_0_Spell_Pos, StartPos, EndPos);
+        }
+        else if ( undefined != Item.Value.Caps )
+        {
+            RecalcInfo.Set_Type_0_Spell(pararecalc_0_Spell_All);
         }
         else if ( para_TextPr === ItemType )
         {
@@ -657,13 +662,21 @@ Paragraph.prototype.Continue_CheckSpelling = function()
                 if ( false === bWord )
                 {
                     bWord      = true;
-                    sWord      = Item.Value;
                     nWordStart = Pos;
                     nWordEnd   = Pos;
+
+                    if ( true != CurTextPr.Caps )
+                        sWord = Item.Value;
+                    else
+                        sWord = Item.Value.toUpperCase();
                 }
                 else
                 {
-                    sWord += Item.Value;
+                    if ( true != CurTextPr.Caps )
+                        sWord += Item.Value;
+                    else
+                        sWord += Item.Value.toUpperCase();
+
                     nWordEnd = Pos;
                 }
             }
@@ -724,13 +737,21 @@ Paragraph.prototype.Continue_CheckSpelling = function()
                 if ( false === bWord )
                 {
                     bWord      = true;
-                    sWord      = Item.Value;
                     nWordStart = Pos;
                     nWordEnd   = Pos;
+
+                    if ( true != CurTextPr.Caps )
+                        sWord = Item.Value;
+                    else
+                        sWord = Item.Value.toUpperCase();
                 }
                 else
                 {
-                    sWord += Item.Value;
+                    if ( true != CurTextPr.Caps )
+                        sWord += Item.Value;
+                    else
+                        sWord += Item.Value.toUpperCase();
+
                     nWordEnd = Pos;
                 }
             }
