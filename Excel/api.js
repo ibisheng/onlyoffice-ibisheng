@@ -73,6 +73,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 			// объекты, нужные для отправки в тулбар (шрифты, стили)
 			this.guiFonts = null;		// Переменная для сохранения фонтов для облегченной версии (переход в edit mod)
+			this.guiStyles = null;		// Переменная для сохранения стилей ячеек
 			this._gui_control_colors = null;
 			this._gui_color_schemes = null;
 			this.GuiControlColorsMap = null;
@@ -923,6 +924,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			 * asc_onStartAction			(type, id)
 			 * asc_onEndAction				(type, id)
 			 * asc_onInitEditorFonts		(gui_fonts)
+			 * asc_onInitEditorStyles		(gui_styles)
 			 * asc_onOpenDocumentProgress	(_OpenDocumentProgress)
 			 * asc_onAdvancedOptions		(asc_CAdvancedOptions, ascAdvancedOptionsAction)			- эвент на получение дополнительных опций (открытие/сохранение CSV)
 			 * asc_onError					(c_oAscError.ID, c_oAscError.Level)
@@ -961,28 +963,20 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				 */
 				if (null !== this.guiFonts && "asc_onInitEditorFonts" === name) {
 					this.handlers.trigger("asc_onInitEditorFonts", this.guiFonts);
-				}
-				else if (null !== this.tablePictures && "asc_onInitTablePictures" === name) {
+					this.guiFonts = null;
+				} else if (null !== this.guiStyles && "asc_onInitEditorStyles" === name) {
+					this.handlers.trigger("asc_onInitEditorStyles", this.guiStyles);
+					this.guiStyles = null;
+				} else if (null !== this.tablePictures && "asc_onInitTablePictures" === name) {
 					this.handlers.trigger("asc_onInitTablePictures", this.tablePictures);
-				}
-				else if ("asc_onSendThemeColors" == name)
-				{
-					if (this._gui_control_colors != null)
-					{
-						this.handlers.trigger("asc_onSendThemeColors", this._gui_control_colors.Colors, this._gui_control_colors.StandartColors);
-						this._gui_control_colors = null;
-					}
-				}
-				else if ("asc_onSendThemeColorSchemes" == name)
-				{
-					if (this._gui_color_schemes != null)
-					{
-						this.handlers.trigger("asc_onSendThemeColorSchemes", this._gui_color_schemes);
-						this._gui_color_schemes = null;
-					}
-				}
-				else if ("asc_onInitEditorShapes" == name)
-				{
+					this.tablePictures = null;
+				} else if (null !== this._gui_control_colors && "asc_onSendThemeColors" === name) {
+					this.handlers.trigger("asc_onSendThemeColors", this._gui_control_colors.Colors, this._gui_control_colors.StandartColors);
+					this._gui_control_colors = null;
+				} else if (null !== this._gui_color_schemes && "asc_onSendThemeColorSchemes" === name) {
+					this.handlers.trigger("asc_onSendThemeColorSchemes", this._gui_color_schemes);
+					this._gui_color_schemes = null;
+				} else if ("asc_onInitEditorShapes" === name) {
 					this.handlers.trigger("asc_onInitEditorShapes", g_oAutoShapesGroups, g_oAutoShapesTypes);
 				}
 			},
