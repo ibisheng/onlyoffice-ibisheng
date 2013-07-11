@@ -799,10 +799,10 @@
 			asc_getStyleThumbnailHeight: function () { return this.styleThumbnailHeight; },
 			asc_getDefaultStylesImage: function () { return this.defaultStylesImage; },
 			asc_getDocStylesImage: function () { return this.docStylesImage; },
-			generateStylesAll: function (cellStylesAll, fmgrGraphics) {
-				this.generateStyles(cellStylesAll.DefaultStyles, fmgrGraphics);
+			generateStylesAll: function (cellStylesAll, fmgrGraphics, stringRenderer) {
+				this.generateStyles(cellStylesAll.DefaultStyles, fmgrGraphics, stringRenderer);
 			},
-			generateStyles: function (cellStyles, fmgrGraphics) {
+			generateStyles: function (cellStyles, fmgrGraphics, stringRenderer) {
 				var nStylesCount = cellStyles.length;
 				var oCanvas = document.createElement('canvas');
 				//var oCanvas = document.getElementById('TestCanvas');
@@ -819,7 +819,7 @@
 				for (var i = 0; i < nStylesCount; ++i) {
 					oStyle = cellStyles[i];
 					this.defaultStyles[i] = new asc_CStyleImage(oStyle.Name, i, c_oAscStyleImage.Default);
-					this.drawStyle(oGraphics, oStyle, i);
+					this.drawStyle(oGraphics, stringRenderer, oStyle, i);
 				}
 
 				this.defaultStylesImage = oCanvas.toDataURL("image/png");
@@ -827,7 +827,7 @@
 			generateDocumentStyles: function () {
 
 			},
-			drawStyle: function (oGraphics, oStyle, nIndex) {
+			drawStyle: function (oGraphics, stringRenderer, oStyle, nIndex) {
 				var nOffsetY = nIndex * this.styleThumbnailHeightPt;
 
 				// Fill cell
@@ -872,10 +872,10 @@
 				var format = oStyle.getFont();
 				var oFont = new asc.FontProperties(format.fn, format.fs, format.b, format.i, format.u, format.s);
 
+				var tm = stringRenderer.measureString(oStyle.Name);
 				oGraphics.setFont(oFont);
 				oGraphics.setFillStyle(oFontColor);
-
-				oGraphics.fillText(oStyle.Name, 0, nOffsetY + this.styleThumbnailHeightPt / 2);
+				oGraphics.fillText(oStyle.Name, 0, nOffsetY + tm.baseline);
 				oGraphics.restore();
 			}
 		};

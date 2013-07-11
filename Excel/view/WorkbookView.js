@@ -909,7 +909,7 @@
 
 			getCellStyles: function () {
 				var oStylesPainter = new asc_CSP();
-				oStylesPainter.generateStylesAll(this.model.CellStyles, this.fmgrGraphics);
+				oStylesPainter.generateStylesAll(this.model.CellStyles, this.fmgrGraphics, this.stringRender);
 				return oStylesPainter;
 			},
 
