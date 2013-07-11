@@ -2073,17 +2073,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 
 			// Shapes
-			asc_startAddShape: function(sPreset, is_apply) {
-				
+			asc_startAddShape: function(sPreset) {
 				this.isStartAddShape = true;
 				this.addShapePreset = sPreset;
 				var ws = this.wb.getWorksheet();
 				ws.objectRender.controller.startTrackNewShape(sPreset);
-								
-				if (is_apply) {					
-				}
-				else {
-				}
 			},
 			
 			asc_endAddShape: function() {

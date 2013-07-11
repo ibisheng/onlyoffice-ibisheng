@@ -335,7 +335,7 @@ function ChartPreviewManager() {
 		}
 		bReady = true;
 		
-		var endTime = new Date();
+		//var endTime = new Date();
 		//console.log( "ChartPreviewManager init: " + (endTime.getTime() - startTime.getTime()) );
 	}
 	

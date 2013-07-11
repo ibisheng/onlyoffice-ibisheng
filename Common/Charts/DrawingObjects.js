@@ -4010,9 +4010,22 @@ function DrawingObjects() {
 		obj.id = generateId();
 		obj.graphicObject = graphic;
         graphic.setDrawingBase(obj);
-		obj.graphicObject.select(_this.controller);
-		aObjects.push(obj);
-		_this.showDrawingObjects(false);
+		
+		function callbackFunc(result) {
+			if ( result ) {
+			
+				//History.Create_NewPoint();
+				//History.Add(g_oUndoRedoDrawingObject, historyitem_DrawingObject_Add, worksheet.model.getId(), null, obj);
+				
+				obj.graphicObject.select(_this.controller);
+				aObjects.push(obj);
+				_this.showDrawingObjects(false);
+				
+				worksheet.model.workbook.handlers.trigger("asc_onEndAddShape");
+			}
+		}
+		
+		_this.lockDrawingObject(obj.id, true, true, callbackFunc);
 	}
 	
 	_this.groupGraphicObjects = function() {
