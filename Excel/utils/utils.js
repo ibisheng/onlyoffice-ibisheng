@@ -781,10 +781,6 @@
 				}
 
 				this.defaultStylesImage = oCanvas.toDataURL("image/png");
-
-				var test = document.createElement('img');
-				test.src = this.defaultStylesImage;
-				document.body.appendChild(test);
 			},
 			generateDocumentStyles: function () {
 
@@ -792,14 +788,79 @@
 			drawStyle: function (oGraphics, oStyle, nIndex) {
 				var nOffsetY = nIndex * this.styleThumbnailHeightPt;
 
+				// Fill cell
 				var bg = oStyle.getFill();
 				if(null != bg)
 					bg = bg.getRgb();
 				var oColor = bg !== null ? asc.numberToCSSColor(bg) : "#FFFFFF";
-				oGraphics.save().setFillStyle(oColor);
-				oGraphics.rect(0, nOffsetY, this.styleThumbnailWidthPt, nOffsetY + this.styleThumbnailHeightPt);
-				oGraphics.fill().clip();
+				oGraphics.save().beginPath().setFillStyle(oColor);
+				oGraphics.rect(0, nOffsetY, this.styleThumbnailWidthPt, this.styleThumbnailHeightPt).clip();
+				oGraphics.fill();
 
+				var bc, bw;
+				/**
+				 * cell border styles
+				 * @const
+				 */
+				var kcbNone             = "none";
+				var kcbThick            = "thick";
+				var kcbThin             = "thin";
+				var kcbMedium           = "medium";
+				var kcbDashDot          = "dashDot";
+				var kcbDashDotDot       = "dashDotDot";
+				var kcbDashed           = "dashed";
+				var kcbDotted           = "dotted";
+				var kcbDouble           = "double";
+				var kcbHair             = "hair";
+				var kcbMediumDashDot    = "mediumDashDot";
+				var kcbMediumDashDotDot = "mediumDashDotDot";
+				var kcbMediumDashed     = "mediumDashed";
+				var kcbSlantDashDot     = "slantDashDot";
+
+				var kcbThinBorders      = [kcbThin, kcbDashDot, kcbDashDotDot, kcbDashed, kcbDotted, kcbHair];
+				var kcbMediumBorders    = [kcbMedium, kcbMediumDashDot, kcbMediumDashDotDot, kcbMediumDashed, kcbSlantDashDot];
+				var kcbThickBorders     = [kcbThick, kcbDouble];
+
+				var isThinBorder = function (bs) {
+					return $.inArray(bs, kcbThinBorders) >= 0;
+				};
+				var isMediumBorder = function (bs) {
+					return $.inArray(bs, kcbMediumBorders) >= 0;
+				};
+				var isThickBorder = function (bs) {
+					return $.inArray(bs, kcbThickBorders) >= 0;
+				};
+				var calcBorderWidth = function (b) {
+					var s = b.s;
+					return b == null ? 0 : (
+						isThinBorder(s) ? 1 : (
+							isMediumBorder(s) ? 2 : (
+								isThickBorder(s) ? 3 : 0)));
+				};
+				var drawBorder = function (b, x1, y1, x2, y2) {
+					if (null != b && "none" != b.s) {
+						bc = asc.numberToCSSColor(b.c.getRgb());
+						oGraphics.setStrokeStyle(bc);
+
+						bw = calcBorderWidth(b);
+						if (0 < bw) {
+							oGraphics.setLineWidth(bw).beginPath().moveTo(x1, y1).lineTo(x2, y2).stroke();
+						}
+					}
+				};
+
+				// borders
+				var oBorders = oStyle.getBorder();
+				drawBorder(oBorders.l, 0, nOffsetY,
+					0, nOffsetY + this.styleThumbnailHeightPt);
+				drawBorder(oBorders.r, this.styleThumbnailWidthPt, nOffsetY,
+					this.styleThumbnailWidthPt, nOffsetY + this.styleThumbnailHeightPt);
+				drawBorder(oBorders.t, 0, nOffsetY,
+					this.styleThumbnailWidthPt, nOffsetY);
+				drawBorder(oBorders.t, 0, nOffsetY + this.styleThumbnailHeightPt,
+					this.styleThumbnailWidthPt, nOffsetY + this.styleThumbnailHeightPt);
+
+				// Draw text
 				var fc = oStyle.getFontColor();
 				if(null != fc)
 					fc = fc.getRgb();
@@ -811,9 +872,6 @@
 				oGraphics.setFillStyle(oFontColor);
 
 				oGraphics.fillText(oStyle.Name, 0, nOffsetY + this.styleThumbnailHeightPt / 2);
-
-				oGraphics.beginPath().setLineWidth(1).setStrokeStyle(oFontColor).moveTo(0, nOffsetY + this.styleThumbnailHeightPt);
-				oGraphics.lineTo(this.styleThumbnailWidthPt, nOffsetY + this.styleThumbnailHeightPt).stroke();
 				oGraphics.restore();
 			}
 		};

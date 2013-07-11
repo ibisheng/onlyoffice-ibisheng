@@ -1259,6 +1259,11 @@ CCellStyle.prototype = {
 		if (null != this.xfs && null != this.xfs.font)
 			return this.xfs.font;
 		return null;
+	},
+	getBorder: function () {
+		if (null != this.xfs && null != this.xfs.border)
+			return this.xfs.border;
+		return g_oDefaultBorder;
 	}
 };
 /** @constructor */
