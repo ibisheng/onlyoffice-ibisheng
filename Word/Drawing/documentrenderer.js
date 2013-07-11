@@ -398,6 +398,20 @@ function CDocMeta()
             this.Pages[i] = pageInfo;
         }
 
+        if (0 == this.PagesCount)
+        {
+            this.PagesCount = 1;
+            this.Pages = new Array(this.PagesCount);
+
+            var pageInfo = new CPageMeta();
+            pageInfo.width_mm = 210;
+            pageInfo.height_mm = 297;
+            pageInfo.start = 0;
+            pageInfo.end = 0;
+
+            this.Pages[0] = pageInfo;
+        }
+
         this.stream = stream;
 
         if (0 != this.Drawings.length)
