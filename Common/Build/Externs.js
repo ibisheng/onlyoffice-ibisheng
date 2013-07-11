@@ -2,6 +2,8 @@
 //It need to prevent minimize the name of object's method.
 
 function $(){};
+function jq(){};
+function jQuery(){};
 function DE(){};
 function SE(){};
 function SSE(){};
