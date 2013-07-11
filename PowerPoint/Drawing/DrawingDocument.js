@@ -541,6 +541,17 @@ function CCacheManager()
         this.arrayImages[index].image_unusedCount = 0;
         return this.arrayImages[index];
     }
+
+    this.Clear = function()
+    {
+        for (var i = 0; i < this.arrayCount; ++i)
+        {
+            delete this.arrayImages[i].image;
+            this.arrayImages.splice(i, 1);
+            --i;
+            --this.arrayCount;
+        }
+    }
 }
 
 function _rect()

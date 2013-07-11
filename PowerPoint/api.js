@@ -3762,7 +3762,7 @@ asc_docs_api.prototype.SlideTransitionPlay = function()
     _tr.Param   = _timing.TransitionOption;
     _tr.Duration = _timing.TransitionDuration;
 
-    _tr.Start();
+    _tr.Start(true);
 }
 
 asc_docs_api.prototype.SetTextBoxInputMode = function(bIsEA)

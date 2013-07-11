@@ -207,29 +207,29 @@ function CTransitionAnimation(htmlpage)
         }
     }
 
-    this.Start = function(_not_use_prev)
+    this.Start = function(isButtonPreview)
     {
-        if (null != this.DemonstrationObject)
-            this.CalculateRectDemonstration();
-        else
+        if (true == isButtonPreview)
+        {
             this.CalculateRect();
 
-        var _currentSlide = 0;
-        if (null == this.DemonstrationObject)
-        {
-            _currentSlide = this.HtmlPage.m_oDrawingDocument.SlideCurrent;
-            if (_currentSlide >= this.HtmlPage.m_oDrawingDocument.SlidesCount)
-                _currentSlide = this.HtmlPage.m_oDrawingDocument.SlidesCount - 1;
-        }
-        else
-        {
-            _currentSlide = this.DemonstrationObject.SlideNum;
-            if (_currentSlide >= this.HtmlPage.m_oDrawingDocument.SlidesCount)
-                _currentSlide = this.HtmlPage.m_oDrawingDocument.SlidesCount - 1;
-        }
+            var _currentSlide = 0;
+            if (null == this.DemonstrationObject)
+            {
+                _currentSlide = this.HtmlPage.m_oDrawingDocument.SlideCurrent;
+                if (_currentSlide >= this.HtmlPage.m_oDrawingDocument.SlidesCount)
+                    _currentSlide = this.HtmlPage.m_oDrawingDocument.SlidesCount - 1;
+            }
+            else
+            {
+                _currentSlide = this.DemonstrationObject.SlideNum;
+                if (_currentSlide >= this.HtmlPage.m_oDrawingDocument.SlidesCount)
+                    _currentSlide = this.HtmlPage.m_oDrawingDocument.SlidesCount - 1;
+            }
 
-        this.DrawImage1(_currentSlide, _not_use_prev);
-        this.DrawImage2(_currentSlide);
+            this.DrawImage1(_currentSlide, false);
+            this.DrawImage2(_currentSlide);
+        }
 
         this.StartTime = new Date().getTime();
         this.EndTime = this.StartTime + this.Duration;
@@ -327,7 +327,7 @@ function CTransitionAnimation(htmlpage)
             oThis.Params = { IsFirstAfterHalf : true };
 
             var _ctx1 = null;
-            if (null == this.DemonstrationObject)
+            if (null == oThis.DemonstrationObject)
             {
                 // отрисовываем на основной канве картинку первого слайда
                 _ctx1 = oThis.HtmlPage.m_oEditor.HtmlElement.getContext('2d');
@@ -337,6 +337,8 @@ function CTransitionAnimation(htmlpage)
             else
             {
                 _ctx1 = oThis.DemonstrationObject.Canvas.getContext('2d');
+                _ctx1.fillStyle = "#000000";
+                _ctx1.fillRect(0, 0, oThis.DemonstrationObject.Canvas.width, oThis.DemonstrationObject.Canvas.height);
             }
 
             if (null != oThis.CacheImage1.Image)
@@ -395,7 +397,7 @@ function CTransitionAnimation(htmlpage)
                 if (_part > 0.5)
                 {
                     var _ctx1 = null;
-                    if (null == this.DemonstrationObject)
+                    if (null == oThis.DemonstrationObject)
                     {
                         // отрисовываем на основной канве картинку первого слайда
                         _ctx1 = oThis.HtmlPage.m_oEditor.HtmlElement.getContext('2d');
@@ -468,6 +470,12 @@ function CTransitionAnimation(htmlpage)
                 var _ctx1 = oThis.HtmlPage.m_oEditor.HtmlElement.getContext('2d');
                 _ctx1.fillStyle = "#B0B0B0";
                 _ctx1.fillRect(0, 0, oThis.HtmlPage.m_oEditor.HtmlElement.width, oThis.HtmlPage.m_oEditor.HtmlElement.height);
+            }
+            else
+            {
+                var _ctx1 = oThis.DemonstrationObject.Canvas.getContext('2d');
+                _ctx1.fillStyle = "#000000";
+                _ctx1.fillRect(0, 0, oThis.DemonstrationObject.Canvas.width, oThis.DemonstrationObject.Canvas.height);
             }
         }
 
@@ -590,7 +598,7 @@ function CTransitionAnimation(htmlpage)
         if (oThis.TimerId === null)
         {
             var _ctx1 = null;
-            if (null == this.DemonstrationObject)
+            if (null == oThis.DemonstrationObject)
             {
                 // отрисовываем на основной канве картинку первого слайда
                 _ctx1 = oThis.HtmlPage.m_oEditor.HtmlElement.getContext('2d');
@@ -600,6 +608,8 @@ function CTransitionAnimation(htmlpage)
             else
             {
                 _ctx1 = oThis.DemonstrationObject.Canvas.getContext('2d');
+                _ctx1.fillStyle = "#000000";
+                _ctx1.fillRect(0, 0, oThis.DemonstrationObject.Canvas.width, oThis.DemonstrationObject.Canvas.height);
             }
 
             if (null != oThis.CacheImage1.Image)
@@ -1173,6 +1183,8 @@ function CTransitionAnimation(htmlpage)
             else
             {
                 _ctx1 = oThis.DemonstrationObject.Canvas.getContext('2d');
+                _ctx1.fillStyle = "#000000";
+                _ctx1.fillRect(0, 0, oThis.DemonstrationObject.Canvas.width, oThis.DemonstrationObject.Canvas.height);
             }
             if (null != oThis.CacheImage1.Image)
             {
@@ -1489,7 +1501,7 @@ function CTransitionAnimation(htmlpage)
         if (oThis.TimerId === null)
         {
             var _ctx1 = null;
-            if (null == this.DemonstrationObject)
+            if (null == oThis.DemonstrationObject)
             {
                 // отрисовываем на основной канве картинку первого слайда
                 _ctx1 = oThis.HtmlPage.m_oEditor.HtmlElement.getContext('2d');
@@ -1499,6 +1511,8 @@ function CTransitionAnimation(htmlpage)
             else
             {
                 _ctx1 = oThis.DemonstrationObject.Canvas.getContext('2d');
+                _ctx1.fillStyle = "#000000";
+                _ctx1.fillRect(0, 0, oThis.DemonstrationObject.Canvas.width, oThis.DemonstrationObject.Canvas.height);
             }
 
             if (null != oThis.CacheImage2.Image)
@@ -1636,7 +1650,7 @@ function CTransitionAnimation(htmlpage)
         if (oThis.TimerId === null)
         {
             var _ctx1 = null;
-            if (null == this.DemonstrationObject)
+            if (null == oThis.DemonstrationObject)
             {
                 // отрисовываем на основной канве картинку первого слайда
                 _ctx1 = oThis.HtmlPage.m_oEditor.HtmlElement.getContext('2d');
@@ -1646,6 +1660,8 @@ function CTransitionAnimation(htmlpage)
             else
             {
                 _ctx1 = oThis.DemonstrationObject.Canvas.getContext('2d');
+                _ctx1.fillStyle = "#000000";
+                _ctx1.fillRect(0, 0, oThis.DemonstrationObject.Canvas.width, oThis.DemonstrationObject.Canvas.height);
             }
 
             if (null != oThis.CacheImage1.Image)
@@ -1783,7 +1799,7 @@ function CTransitionAnimation(htmlpage)
         if (oThis.TimerId === null)
         {
             var _ctx1 = null;
-            if (null == this.DemonstrationObject)
+            if (null == oThis.DemonstrationObject)
             {
                 // отрисовываем на основной канве картинку первого слайда
                 _ctx1 = oThis.HtmlPage.m_oEditor.HtmlElement.getContext('2d');
@@ -1793,6 +1809,8 @@ function CTransitionAnimation(htmlpage)
             else
             {
                 _ctx1 = oThis.DemonstrationObject.Canvas.getContext('2d');
+                _ctx1.fillStyle = "#000000";
+                _ctx1.fillRect(0, 0, oThis.DemonstrationObject.Canvas.width, oThis.DemonstrationObject.Canvas.height);
             }
 
             if (null != oThis.CacheImage1.Image)
@@ -2252,17 +2270,19 @@ function CTransitionAnimation(htmlpage)
             case c_oAscSlideTransitionParams.Zoom_In:
             {
                 var _ctx1 = null;
-                if (null == this.DemonstrationObject)
+                if (null == oThis.DemonstrationObject)
                 {
                     // отрисовываем на основной канве картинку первого слайда
                     _ctx1 = oThis.HtmlPage.m_oEditor.HtmlElement.getContext('2d');
+                    _ctx1.fillStyle = "#B0B0B0";
+                    _ctx1.fillRect(0, 0, oThis.HtmlPage.m_oEditor.HtmlElement.width, oThis.HtmlPage.m_oEditor.HtmlElement.height);
                 }
                 else
                 {
                     _ctx1 = oThis.DemonstrationObject.Canvas.getContext('2d');
+                    _ctx1.fillStyle = "#000000";
+                    _ctx1.fillRect(0, 0, oThis.DemonstrationObject.Canvas.width, oThis.DemonstrationObject.Canvas.height);
                 }
-                _ctx1.fillStyle = "#B0B0B0";
-                _ctx1.fillRect(0, 0, oThis.HtmlPage.m_oEditor.HtmlElement.width, oThis.HtmlPage.m_oEditor.HtmlElement.height);
 
 
                 var _w = ((0.5 * _wDst) * (1 + _part)) >> 0;
@@ -2309,17 +2329,19 @@ function CTransitionAnimation(htmlpage)
             case c_oAscSlideTransitionParams.Zoom_Out:
             {
                 var _ctx1 = null;
-                if (null == this.DemonstrationObject)
+                if (null == oThis.DemonstrationObject)
                 {
                     // отрисовываем на основной канве картинку первого слайда
                     _ctx1 = oThis.HtmlPage.m_oEditor.HtmlElement.getContext('2d');
+                    _ctx1.fillStyle = "#B0B0B0";
+                    _ctx1.fillRect(0, 0, oThis.HtmlPage.m_oEditor.HtmlElement.width, oThis.HtmlPage.m_oEditor.HtmlElement.height);
                 }
                 else
                 {
                     _ctx1 = oThis.DemonstrationObject.Canvas.getContext('2d');
+                    _ctx1.fillStyle = "#000000";
+                    _ctx1.fillRect(0, 0, oThis.DemonstrationObject.Canvas.width, oThis.DemonstrationObject.Canvas.height);
                 }
-                _ctx1.fillStyle = "#B0B0B0";
-                _ctx1.fillRect(0, 0, oThis.HtmlPage.m_oEditor.HtmlElement.width, oThis.HtmlPage.m_oEditor.HtmlElement.height);
 
                 _part = 1 - _part;
                 var _w = ((0.5 * _wDst) * (1 + _part)) >> 0;
@@ -2368,7 +2390,7 @@ function CTransitionAnimation(htmlpage)
                 if (oThis.TimerId === null)
                 {
                     var _ctx1 = null;
-                    if (null == this.DemonstrationObject)
+                    if (null == oThis.DemonstrationObject)
                     {
                         // отрисовываем на основной канве картинку первого слайда
                         _ctx1 = oThis.HtmlPage.m_oEditor.HtmlElement.getContext('2d');
@@ -2378,6 +2400,8 @@ function CTransitionAnimation(htmlpage)
                     else
                     {
                         _ctx1 = oThis.DemonstrationObject.Canvas.getContext('2d');
+                        _ctx1.fillStyle = "#000000";
+                        _ctx1.fillRect(0, 0, oThis.DemonstrationObject.Canvas.width, oThis.DemonstrationObject.Canvas.height);
                     }
 
                     if (null != oThis.CacheImage1.Image)
@@ -2478,7 +2502,177 @@ function CDemonstrationManager(htmlpage)
     this.CheckSlideDuration = -1;
     this.Transition.DemonstrationObject = this;
 
+    this.CacheImagesManager = new CCacheManager();
+    this.SlideImages = new Array(2);
+    this.SlideImages[0] = null;
+    this.SlideImages[1] = null;
+
+    this.SlideIndexes = new Array(2);
+    this.SlideIndexes[0] = -1;
+    this.SlideIndexes[1] = -1;
+
     var oThis = this;
+
+    this.CacheSlide = function(slide_num, slide_index)
+    {
+        var _w = this.Transition.Rect.w;
+        var _h = this.Transition.Rect.h;
+        var _w_mm = this.HtmlPage.m_oLogicDocument.Width;
+        var _h_mm = this.HtmlPage.m_oLogicDocument.Height;
+
+        var _image = this.CacheImagesManager.Lock(_w, _h);
+
+        var g = new CGraphics();
+        g.init(_image.image.getContext('2d'), _w, _h, _w_mm, _h_mm);
+        g.m_oFontManager = g_fontManager;
+
+        g.transform(1,0,0,1,0,0);
+        g.IsNoDrawingEmptyPlaceholder = true;
+
+        this.HtmlPage.m_oLogicDocument.DrawPage(slide_num, g);
+
+        this.SlideImages[slide_index] = new CCacheSlideImage();
+        this.SlideImages[slide_index].Image = _image;
+        this.SlideIndexes[slide_index] = slide_num;
+    }
+
+    this.PrepareTransition = function(is_first, is_backward)
+    {
+        var _slide1 = -1;
+        var _slide2 = -1;
+
+        this.Transition.IsBackward = false;
+        if (is_first)
+        {
+            _slide1 = -1;
+            _slide2 = this.SlideNum;
+        }
+        else if (!is_backward)
+        {
+            if (this.SlideNum > 0)
+            {
+                _slide1 = this.SlideNum - 1;
+            }
+            _slide2 = this.SlideNum;
+        }
+        else
+        {
+            this.Transition.IsBackward = true;
+            _slide1 = this.SlideNum - 1;
+            _slide2 = this.SlideNum;
+        }
+
+        this.Transition.CalculateRectDemonstration();
+
+        if (this.SlideIndexes[0] != -1 && this.SlideIndexes[0] != _slide1 && this.SlideIndexes[0] != _slide2)
+        {
+            this.CacheImagesManager.UnLock(this.SlideImages[0]);
+            this.SlideImages[0] = null;
+            this.SlideIndexes[0] = -1;
+        }
+        if (this.SlideIndexes[1] != -1 && this.SlideIndexes[1] != _slide1 && this.SlideIndexes[1] != _slide2)
+        {
+            this.CacheImagesManager.UnLock(this.SlideImages[1]);
+            this.SlideImages[1] = null;
+            this.SlideIndexes[1] = -1;
+        }
+
+        if (_slide1 == -1)
+        {
+            this.Transition.CacheImage1.Image = null;
+        }
+        else
+        {
+            if (_slide1 == this.SlideIndexes[0])
+            {
+                this.Transition.CacheImage1.Image = this.SlideImages[0].Image.image;
+            }
+            else if (_slide1 == this.SlideIndexes[1])
+            {
+                this.Transition.CacheImage1.Image = this.SlideImages[1].Image.image;
+            }
+            else
+            {
+                if (-1 == this.SlideIndexes[0])
+                {
+                    this.CacheSlide(_slide1, 0);
+                    this.Transition.CacheImage1.Image = this.SlideImages[0].Image.image;
+                }
+                else
+                {
+                    this.CacheSlide(_slide1, 1);
+                    this.Transition.CacheImage1.Image = this.SlideImages[1].Image.image;
+                }
+            }
+        }
+
+        if (_slide2 == -1)
+        {
+            this.Transition.CacheImage2.Image = null;
+        }
+        else
+        {
+            if (_slide2 == this.SlideIndexes[0])
+            {
+                this.Transition.CacheImage2.Image = this.SlideImages[0].Image.image;
+            }
+            else if (_slide2 == this.SlideIndexes[1])
+            {
+                this.Transition.CacheImage2.Image = this.SlideImages[1].Image.image;
+            }
+            else
+            {
+                if (-1 == this.SlideIndexes[0])
+                {
+                    this.CacheSlide(_slide2, 0);
+                    this.Transition.CacheImage2.Image = this.SlideImages[0].Image.image;
+                }
+                else
+                {
+                    this.CacheSlide(_slide2, 1);
+                    this.Transition.CacheImage2.Image = this.SlideImages[1].Image.image;
+                }
+            }
+        }
+    }
+
+    this.PrepareSlide = function()
+    {
+        if (this.SlideNum < 0 || this.SlideNum >= this.SlidesCount)
+        {
+            this.SlideImage = -1;
+            return;
+        }
+        else
+        {
+            if (this.SlideNum != this.SlideIndexes[0])
+            {
+                this.CacheImagesManager.UnLock(this.SlideImages[0]);
+                this.SlideImages[0] = null;
+                this.SlideIndexes[0] = -1;
+            }
+            if (this.SlideNum != this.SlideIndexes[1])
+            {
+                this.CacheImagesManager.UnLock(this.SlideImages[1]);
+                this.SlideImages[1] = null;
+                this.SlideIndexes[1] = -1;
+            }
+
+            if (this.SlideNum == this.SlideIndexes[0])
+            {
+                this.SlideImage = 0;
+            }
+            else if (this.SlideNum == this.SlideIndexes[1])
+            {
+                this.SlideImage = 1;
+            }
+            else
+            {
+                this.CacheSlide(this.SlideNum, 0);
+                this.SlideImage = 0;
+            }
+        }
+    }
 
     this.Start = function(main_div_id, start_slide_num, is_play_mode)
     {
@@ -2493,7 +2687,7 @@ function CDemonstrationManager(htmlpage)
 
         this.Mode = true;
         this.Canvas = document.createElement('canvas');
-        this.Canvas.style = "position:absolute;margin:0;padding:0;left:0px;top:0px;width:100%;height:100%;zIndex:2;";
+        this.Canvas.setAttribute("style", "position:absolute;margin:0;padding:0;left:0px;top:0px;width:100%;height:100%;zIndex:2;background-color:#000000;");
         this.Canvas.width = _width;
         this.Canvas.height = _height;
 
@@ -2563,6 +2757,11 @@ function CDemonstrationManager(htmlpage)
     {
         if (oThis.Transition.TimerId)
             oThis.Transition.End(true);
+
+        if (-1 != this.CheckSlideDuration)
+            clearTimeout(this.CheckSlideDuration);
+
+        this.CheckSlideDuration = -1;
     }
 
     this.StartTransition = function(_timing, is_first)
@@ -2572,7 +2771,7 @@ function CDemonstrationManager(htmlpage)
         if (null == oThis.Overlay)
         {
             oThis.Overlay = document.createElement('canvas');
-            oThis.Overlay.style = "position:absolute;margin:0;padding:0;left:0px;top:0px;width:100%;height:100%;zIndex:3;";
+            oThis.Overlay.setAttribute("style", "position:absolute;margin:0;padding:0;left:0px;top:0px;width:100%;height:100%;zIndex:3;");
             oThis.Overlay.width = oThis.Canvas.width;
             oThis.Overlay.height = oThis.Canvas.height;
 
@@ -2591,7 +2790,8 @@ function CDemonstrationManager(htmlpage)
         oThis.Transition.Param = _timing.TransitionOption;
         oThis.Transition.Duration = _timing.TransitionDuration;
 
-        oThis.Transition.Start(is_first);
+        oThis.PrepareTransition(is_first, false);
+        oThis.Transition.Start(false);
     }
 
     this.OnEndTransition = function(bIsAttack)
@@ -2617,23 +2817,33 @@ function CDemonstrationManager(htmlpage)
             _ctx2.clearRect(oThis.Transition.Rect.x, oThis.Transition.Rect.y, oThis.Transition.Rect.w, oThis.Transition.Rect.r);
         }
 
-        if (null == this.SlideImage)
-        {
-
-        }
+        oThis.Transition.CalculateRectDemonstration();
+        oThis.PrepareSlide();
 
         var _ctx1 = oThis.Canvas.getContext('2d');
-        oThis.Transition.CalculateRectDemonstration();
-        _ctx1.drawImage(oThis.SlideImage, oThis.Transition.Rect.x, oThis.Transition.Rect.y, oThis.Transition.Rect.w, oThis.Transition.Rect.r);
+
+        var _image = null;
+        if (0 == oThis.SlideImage)
+            _image = oThis.SlideImages[0].Image.image;
+        else if (1 == oThis.SlideImage)
+            _image = oThis.SlideImages[1].Image.image;
+
+        if (null != _image)
+        {
+            _ctx1.drawImage(_image, oThis.Transition.Rect.x, oThis.Transition.Rect.y, oThis.Transition.Rect.w, oThis.Transition.Rect.h);
+        }
 
         // теперь запустим функцию
 
         var _slides = oThis.HtmlPage.m_oLogicDocument.Slides;
         var _timing = _slides[oThis.SlideNum].timing;
-        this.CheckSlideDuration = setTimeout(function()
+        oThis.CheckSlideDuration = setTimeout(function()
         {
             if (oThis.IsPlayMode)
+            {
+                oThis.SlideNum++;
                 oThis.StartSlide(true, false);
+            }
         },
         _timing.SlideAdvanceDuration);
     }
@@ -2642,6 +2852,8 @@ function CDemonstrationManager(htmlpage)
     {
         if (!this.Mode)
             return;
+
+        this.StopTransition();
 
         if (null != this.DivEndPresentation)
         {
@@ -2663,9 +2875,6 @@ function CDemonstrationManager(htmlpage)
         this.Mode = false;
 
         this.HtmlPage.m_oApi.sync_endDemonstration();
-
-        if (-1 != this.CheckSlideDuration)
-            clearTimeout(this.CheckSlideDuration);
     }
 
     this.NextSlide = function()
