@@ -427,7 +427,6 @@
 			this.isChartAreaEditMode = false;
 			this.lockDraw = false;
 
-
 			this.isSelectDialogRangeMode = false;
 			this.copyOfActiveRange = null;
 
@@ -5868,7 +5867,7 @@
 				xL *= asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIX() );
 				yL *= asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIY() );
 				var width = this.getColumnWidth (this.activeRange.startCol, /*px*/0);
-				var height = this.getRowHeight(this.activeRange.startCol, /*px*/0);
+				var height = this.getRowHeight(this.activeRange.startRow, /*px*/0);
 				return new asc_CCellRect (xL, yL, width, height);
 			},
 
