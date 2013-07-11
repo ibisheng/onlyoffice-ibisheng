@@ -168,7 +168,7 @@ JSCompiler_StaticMethods__Execute:bc
 Write_CVT_Stretched:hr
 TT_Header:uj
 ps_table_funcs:lm
-DoNullBitmap:ii
+DoNullBitmap:di
 g_dKoef_in_to_mm:Rd
 CGradFill:sf
 _rect:Ty
@@ -328,7 +328,7 @@ PS_Table_FuncsRec:bm
 CColor:QI
 load_format_25:Ym
 historyitem_type_TableRow:Kw
-c_oAscSlideTransitionTypes$None:JI
+c_oAscSlideTransitionTypes$None:KI
 dublicate_bbox:Ij
 chara:lw
 X_Right_Margin:Kb
@@ -339,7 +339,7 @@ Load_SBit_Image:mn
 chars:qw
 _ph_summ__two_col_tx:WK
 load_format_20:Xm
-g_anchor_bottom:Fz
+g_anchor_bottom:tz
 charp:pw
 c_oMainTables$ImageMap:Og
 historyitem_Table_TableW:IA
@@ -580,7 +580,7 @@ Ins_MDAP:Jq
 JSCompiler_StaticMethods_Internal_Content_Concat:ED
 TGlyphBitmap:qv
 CGlyphData:xv
-CCacheManager:NI
+CCacheManager:JI
 TT_MaxProfile:Gj
 Round_To_Double_Grid:uq
 t1_decoder_funcs:nm
@@ -840,7 +840,7 @@ tt_cmap14_char_map_def_binary:bo
 c_oMainTables$Core:Cg
 para_FlowObjectAnchor:Hb
 GetRGBColorFromUniFillAndRef:Nx
-CTableOutlineDr:LI
+CTableOutlineDr:MI
 TT_Round_To_Double_Grid:Ap
 TT_Goto_CodeRange:Wp
 Base64Encode:Tg
@@ -967,7 +967,7 @@ _weight_tbl:GK
 TYPE_TRACK_GROUP_PASSIVE:wH
 Load_SBit_Range_Codes:cn
 _cmap_classes$$inline_417:sm
-CCacheImage:MI
+CCacheImage:NI
 c_oAscSlideTransitionTypes$UnCover:kI
 JSCompiler_StaticMethods_Style_Add:sd
 cff_parse_fixed_scaled:Ds
@@ -1338,14 +1338,14 @@ Ph:bg
 Read_CVT_Stretched:gr
 JSCompiler_StaticMethods_Remove_Cell:hd
 FT_MM_Var:Xi
-c_oMainTables$App:Bg
+c_oMainTables$App:Ag
 c_oAscError$ID$UplImageSize:nL
 Direct_Move_Orig:jq
 TT_Round_Off:xp
 LineEndSize$Large:mJ
 JSCompiler_StaticMethods_parse_para_TextPr:nb
 check_type1_format:pu
-CTextMeasurer:KI
+CTextMeasurer:LI
 JSCompiler_StaticMethods_scrollByX:zC
 JSCompiler_StaticMethods_scrollByY:AC
 FT_BitmapGlyphRec:Bi
@@ -1428,17 +1428,17 @@ CBounds:pz
 CParagraphInd:AM
 TRaster:bp
 cff_index_init:at
-L 120:Ag
+L 120:Bg
 JSCompiler_StaticMethods__BordersToStyle:lb
 FONT_TYPE_ADDITIONAL_CUT:bw
 CAscSlideProps:jM
-L 118:Ez
+L 118:Gz
 L 119:Zs
 L 116:Pm
 ParaNewLine:zc
 L 117:mp
 L 114:Wk
-L 115:Dz
+L 115:Fz
 TT_GaspRange:ij
 CopyProcessor:qa
 JSCompiler_StaticMethods_slidesPaste:xF
@@ -1473,8 +1473,8 @@ historyitem_TableId_Reset:Cw
 T1_Decoder_ZoneRec:jm
 L 102:eK
 T1_Size_Request:vu
-L 101:Az
-L 100:zz
+L 101:Cz
+L 100:Bz
 FT_GlyphLoader_Prepare:Ri
 FT_Smooth_Renderer_Class:pp
 CColorModifiers:RI
@@ -1482,19 +1482,19 @@ tblwidth_Auto:sx
 FT_Size_Metrics:Tj
 bIsIE:CH
 find_sbit_range:jn
-L 111:Cz
+L 111:Ez
 L 110:Dj
 L 113:mh
 tt_get_interface:Xr
-L 112:hi
+L 112:ii
 bIsSupportOriginalFormatFonts:Wv
 L 103:xb
 c_oAscSlideTransitionParams$Split_HorizontalIn:BI
 CAutoshapeTrack:PH
-L 104:gi
+L 104:hi
 JSCompiler_StaticMethods_Internal_RecalculateGrid:tA
 plusDiv:tG
-L 105:Bz
+L 105:Dz
 CAscFill:hM
 L 106:Om
 L 107:Ve
@@ -1821,7 +1821,7 @@ c_oAscAsyncAction$LoadTheme:xw
 CSrcRect:of
 L 49:Os
 L 48:TJ
-CControl:Gz
+CControl:uz
 JSCompiler_StaticMethods_getVerticalAlign:JE
 L 45:jp
 tt_face_free_hdmx_stub:ro
@@ -1990,7 +1990,7 @@ L 77:Tk
 L 78:Uk
 t1_args_count:Zl
 dublicate_matrix:Nj
-L 79:fi
+L 79:gi
 CHorRulerRepaintChecker:Pz
 AFM_StreamRec:gl
 numbering_presentationnumfrmt_ArabicPeriod:Ua
@@ -2000,12 +2000,12 @@ TT_Forget_Glyph_Frame:Hr
 gray_record_cell:Ro
 JSCompiler_StaticMethods_Stop:qE
 trimString:Yb
-L 70:di
+L 70:ei
 FT_PEEK_USHORT:Hh
 L 72:Uf
-L 71:ei
+L 71:fi
 L 64:Ue
-L 65:tz
+L 65:vz
 L 62:yj
 BULLET_TYPE_TYPEFACE_BUFONT:lg
 CUniFill:af
@@ -2024,9 +2024,9 @@ tt_sfnt_id_rec:ls
 tt_face_load_name:Im
 L 61:Us
 L 60:Xa
-L 99:yz
+L 99:Az
 L 95:Xs
-L 96:xz
+L 96:zz
 L 97:Ys
 JSCompiler_StaticMethods_Set_TableBorder_Top:cd
 L 98:dK
@@ -2036,12 +2036,12 @@ FT_Request_Metrics:gs
 ParaPresentationNumbering:Ny
 SPH_ScaleRule:Ip
 L 92:bK
-L 91:vz
+L 91:xz
 nSldLtTObjTx:OJ
 L 94:cK
 JSCompiler_StaticMethods_Document_UpdateUndoRedoState:nC
 CreateUIntArray:Kk
-L 93:wz
+L 93:yz
 global_keyboardEvent:iz
 FT_RoundFix:Th
 CFontFileLoader:O
@@ -2051,7 +2051,7 @@ _ph_summ__two_obj_and_tx:XK
 tt_name_entry_ascii_from_utf16:Eo
 Editor_Copy_GetElem:ha
 JSCompiler_StaticMethods_Set_TableBorder_InsideV:Xc
-L 88:uz
+L 88:wz
 L 89:$J
 L 86:ZJ
 JSCompiler_StaticMethods_Set_Inline:JB
