@@ -695,7 +695,7 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 	var styleManager = api_doc ? api_doc.chartStyleManager : api_sheet.chartStyleManager;
 	
 	arrBaseColors = styleManager.getBaseColors( parseInt(chart.styleId) );
-	if(chart.series && chart.series.length !=0 && window["Asc"]["editor"])
+	if(chart.series && chart.series.length !=0 && api_sheet)
 	{
 		isSeries = true;
 		var series = chart.series;
