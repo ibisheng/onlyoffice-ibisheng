@@ -225,6 +225,11 @@ CImage.prototype =
         this.invertTransform = global_MatrixTransformer.Invert(this.transform);
     },
 
+    calculateTransformTextMatrix: function()
+    {
+
+    },
+
     normalize: function()
     {
         var new_off_x, new_off_y, new_ext_x, new_ext_y;
