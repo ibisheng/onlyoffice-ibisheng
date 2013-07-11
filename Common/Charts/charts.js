@@ -2072,7 +2072,7 @@ function getFontProperties(type)
 	var xAxisTitle = bar._xAxisTitle;
 	var yAxisTitle = bar._yAxisTitle;
 	var chartTitle = bar._chartTitle;
-	var fontProp = Asc.FontProperties;
+	var fontProp = window["Asc"].FontProperties;
 	if(!fontProp)
 		fontProp = FontProperties;
 	switch (type) {

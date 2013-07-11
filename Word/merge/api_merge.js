@@ -5,6 +5,9 @@ function asc_docs_api()
 	{
 		editor = this;
 	}	
+	if (editor)
+		window.editor = editor;
+		
 	this.WordControl = new CEditorPage(this);
     this.WordControl.m_oLogicDocument   = new CDocument(this.WordControl.m_oDrawingDocument);
     this.WordControl.m_oDrawingDocument.m_oLogicDocument = this.WordControl.m_oLogicDocument;

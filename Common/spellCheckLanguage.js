@@ -4,11 +4,10 @@
  * Date: 24.06.13
  */
 (	/**
- * @param {jQuery} $
  * @param {Window} window
  * @param {undefined} undefined
  */
-	function ($, window, undefined) {
+	function (window, undefined) {
 		/*
 		 * Import
 		 * -----------------------------------------------------------------------------
@@ -55,4 +54,4 @@
 		prot["asc_setId"]			= prot.asc_setId;
 		prot["asc_setName"]			= prot.asc_setName;
 	}
-)(jQuery, window);
+)(window);

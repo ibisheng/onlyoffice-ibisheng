@@ -2911,25 +2911,25 @@ function DrawingObjects() {
 		// Реальное смещение по высоте
 		_t.getRealTopOffset = function() {
 			var val = _t.worksheet.getCellTop(_t.from.row, 0) + mmToPx(_t.from.rowOff);
-			return Asc.round(val);
+			return window["Asc"].round(val);
 		}
 
 		// Реальное смещение по ширине
 		_t.getRealLeftOffset = function() {
 			var val = _t.worksheet.getCellLeft(_t.from.col, 0) + mmToPx(_t.from.colOff);
-			return Asc.round(val);
+			return window["Asc"].round(val);
 		}
 
 		// Ширина по координатам
 		_t.getWidthFromTo = function(withoutRound) {
 			var val = _t.worksheet.getCellLeft(_t.to.col, 0) + mmToPx(_t.to.colOff) - _t.worksheet.getCellLeft(_t.from.col, 0) - mmToPx(_t.from.colOff);
-			return withoutRound ? val : Asc.round(val);
+			return withoutRound ? val : window["Asc"].round(val);
 		}
 
 		// Высота по координатам
 		_t.getHeightFromTo = function(withoutRound) {
 			var val = _t.worksheet.getCellTop(_t.to.row, 0) + mmToPx(_t.to.rowOff) - _t.worksheet.getCellTop(_t.from.row, 0) - mmToPx(_t.from.rowOff);
-			return withoutRound ? val : Asc.round(val);
+			return withoutRound ? val : window["Asc"].round(val);
 		}
 
 		// Видимая ширина при скролах
@@ -2970,14 +2970,14 @@ function DrawingObjects() {
 		_t.getInnerOffsetTop = function() {
 			var fvr = _t.worksheet.getCellTop(_t.worksheet.getFirstVisibleRow(), 0);
 			var off = _t.getRealTopOffset() - fvr;
-			return (off > 0) ? 0 : Asc.round(Math.abs(off) * _t.getHeightCoeff());
+			return (off > 0) ? 0 : window["Asc"].round(Math.abs(off) * _t.getHeightCoeff());
 		}
 
 		// смещение по ширине внутри объекта
 		_t.getInnerOffsetLeft = function() {
 			var fvc = _t.worksheet.getCellLeft(_t.worksheet.getFirstVisibleCol(), 0);
 			var off = _t.getRealLeftOffset() - fvc;
-			return (off > 0) ? 0 : Asc.round(Math.abs(off) * _t.getWidthCoeff());
+			return (off > 0) ? 0 : window["Asc"].round(Math.abs(off) * _t.getWidthCoeff());
 		}
 
 		// коэффициент по ширине если несоответствие с реальным размером
@@ -4222,18 +4222,18 @@ function DrawingObjects() {
 		var index = _this.getSelectedDrawingObjectIndex();
 		if (index >= 0) {
 			if (aObjects[index].isChart())
-				return new Asc.asc_CChart(aObjects[index].chart);
+				return new window["Asc"].asc_CChart(aObjects[index].chart);
 			else null;
 		}
 		else {
 			// Check iframe chart editor
 			for (var i = 0; i < _this.countDrawingObjects(); i++) {
 				if ( aObjects[i].isChart() && aObjects[i].chart.bChartEditor )
-					return new Asc.asc_CChart(aObjects[i].chart);
+					return new window["Asc"].asc_CChart(aObjects[i].chart);
 			}
 		
 			// New chart object
-			var chart = new Asc.asc_CChart(_this.createDrawingObject().chart);
+			var chart = new window["Asc"].asc_CChart(_this.createDrawingObject().chart);
 			return chart;
 		}
 	}
@@ -4533,7 +4533,7 @@ function DrawingObjects() {
 					return;
 					
 				var BB = obj.chart.range.intervalObject.getBBox0(),
-					range = Asc.Range(BB.c1,BB.r1,BB.c2,BB.r2,true);
+					range = window["Asc"].Range(BB.c1,BB.r1,BB.c2,BB.r2,true);
 					
 				worksheet.arrActiveChartsRanges.push(range);
 				worksheet.isChartAreaEditMode = true;
@@ -5299,7 +5299,7 @@ function DrawingObjects() {
 	}
 
 	function ascCvtRatio(fromUnits, toUnits) {
-		return Asc.getCvtRatio( fromUnits, toUnits, drawingCtx.getPPIX() );
+		return window["Asc"].getCvtRatio( fromUnits, toUnits, drawingCtx.getPPIX() );
 	}
 
 	function setCanvasZIndex(canvas, value) {
@@ -5318,7 +5318,7 @@ function DrawingObjects() {
 	}
 
 	function pxToPt(val) {
-		var tmp = Asc.round(val) * ascCvtRatio(0, 1);
+		var tmp = window["Asc"].round(val) * ascCvtRatio(0, 1);
 		return tmp > 0 ? tmp : 0;
 	}
 

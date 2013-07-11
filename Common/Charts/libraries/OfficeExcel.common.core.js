@@ -1504,7 +1504,7 @@
 		{
 			scale = drwContext.scaleFactor;
 			drwContext.setCanvas(bar.canvas);
-			var fontProp = Asc.FontProperties;
+			var fontProp = window["Asc"].FontProperties;
 			if(!fontProp)
 				fontProp = FontProperties;
 			
@@ -1754,7 +1754,7 @@
 		var textHeight = 0;
 		var font = textOptions.font;
 		var size = textOptions.size;
-		var asc = Asc; 
+		var asc = window["Asc"]; 
 		
 		if(!angle)
 			angle = 90;
