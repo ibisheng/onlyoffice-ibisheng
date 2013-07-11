@@ -723,6 +723,45 @@
 		}
 
 		/** @constructor */
+		function CBorderUtils () {
+			/**
+			 * cell border styles
+			 * @const
+			 */
+			this.kcbNone             = "none";
+			this.kcbThick            = "thick";
+			this.kcbThin             = "thin";
+			this.kcbMedium           = "medium";
+			this.kcbDashDot          = "dashDot";
+			this.kcbDashDotDot       = "dashDotDot";
+			this.kcbDashed           = "dashed";
+			this.kcbDotted           = "dotted";
+			this.kcbDouble           = "double";
+			this.kcbHair             = "hair";
+			this.kcbMediumDashDot    = "mediumDashDot";
+			this.kcbMediumDashDotDot = "mediumDashDotDot";
+			this.kcbMediumDashed     = "mediumDashed";
+			this.kcbSlantDashDot     = "slantDashDot";
+
+			this.kcbThinBorders      = [this.kcbThin, this.kcbDashDot, this.kcbDashDotDot, this.kcbDashed, this.kcbDotted, this.kcbHair];
+			this.kcbMediumBorders    = [this.kcbMedium, this.kcbMediumDashDot, this.kcbMediumDashDotDot, this.kcbMediumDashed, this.kcbSlantDashDot];
+			this.kcbThickBorders     = [this.kcbThick, this.kcbDouble];
+		}
+
+		CBorderUtils.prototype = {
+			_isThinBorder	: function (bs) { return $.inArray(bs, this.kcbThinBorders) >= 0; },
+			_isMediumBorder	: function (bs) { return $.inArray(bs, this.kcbMediumBorders) >= 0; },
+			_isThickBorder	: function (bs) { return $.inArray(bs, this.kcbThickBorders) >= 0; },
+			calcBorderWidth	: function (b) {
+				var s = b.s;
+				return b === undefined ? 0 : (
+					this._isThinBorder(s) ? 1 : (
+						this._isMediumBorder(s) ? 2 : (
+							this._isThickBorder(s) ? 3 : 0)));
+			}
+		};
+
+		/** @constructor */
 		function asc_CStyleImage(name, thumbnailOffset, type) {
 			this.name = name;
 			this.thumbnailOffset = thumbnailOffset;
@@ -750,6 +789,8 @@
 			this.styleThumbnailHeight	= 22;
 			this.styleThumbnailWidthPt	= this.styleThumbnailWidth * 72 / 96;
 			this.styleThumbnailHeightPt	= this.styleThumbnailHeight * 72 / 96;
+
+			this.oBorderUtils = new CBorderUtils();
 		}
 
 		asc_CStylesPainter.prototype = {
@@ -798,51 +839,13 @@
 				oGraphics.fill();
 
 				var bc, bw;
-				/**
-				 * cell border styles
-				 * @const
-				 */
-				var kcbNone             = "none";
-				var kcbThick            = "thick";
-				var kcbThin             = "thin";
-				var kcbMedium           = "medium";
-				var kcbDashDot          = "dashDot";
-				var kcbDashDotDot       = "dashDotDot";
-				var kcbDashed           = "dashed";
-				var kcbDotted           = "dotted";
-				var kcbDouble           = "double";
-				var kcbHair             = "hair";
-				var kcbMediumDashDot    = "mediumDashDot";
-				var kcbMediumDashDotDot = "mediumDashDotDot";
-				var kcbMediumDashed     = "mediumDashed";
-				var kcbSlantDashDot     = "slantDashDot";
-
-				var kcbThinBorders      = [kcbThin, kcbDashDot, kcbDashDotDot, kcbDashed, kcbDotted, kcbHair];
-				var kcbMediumBorders    = [kcbMedium, kcbMediumDashDot, kcbMediumDashDotDot, kcbMediumDashed, kcbSlantDashDot];
-				var kcbThickBorders     = [kcbThick, kcbDouble];
-
-				var isThinBorder = function (bs) {
-					return $.inArray(bs, kcbThinBorders) >= 0;
-				};
-				var isMediumBorder = function (bs) {
-					return $.inArray(bs, kcbMediumBorders) >= 0;
-				};
-				var isThickBorder = function (bs) {
-					return $.inArray(bs, kcbThickBorders) >= 0;
-				};
-				var calcBorderWidth = function (b) {
-					var s = b.s;
-					return b == null ? 0 : (
-						isThinBorder(s) ? 1 : (
-							isMediumBorder(s) ? 2 : (
-								isThickBorder(s) ? 3 : 0)));
-				};
+				var t = this;
 				var drawBorder = function (b, x1, y1, x2, y2) {
 					if (null != b && "none" != b.s) {
 						bc = asc.numberToCSSColor(b.c.getRgb());
 						oGraphics.setStrokeStyle(bc);
 
-						bw = calcBorderWidth(b);
+						bw = t.oBorderUtils.calcBorderWidth(b);
 						if (0 < bw) {
 							oGraphics.setLineWidth(bw).beginPath().moveTo(x1, y1).lineTo(x2, y2).stroke();
 						}
@@ -998,6 +1001,10 @@
 		prot["asc_getShowRowColHeaders"] = prot.asc_getShowRowColHeaders;
 		prot["asc_setShowGridLines"] = prot.asc_setShowGridLines;
 		prot["asc_setShowRowColHeaders"] = prot.asc_setShowRowColHeaders;
+
+		window["Asc"].CBorderUtils = CBorderUtils;
+		prot = CBorderUtils.prototype;
+		prot["calcBorderWidth"] = prot.calcBorderWidth;
 
 		window["Asc"]["asc_CStyleImage"] = window["Asc"].asc_CStyleImage = asc_CStyleImage;
 		prot = asc_CStyleImage.prototype;
