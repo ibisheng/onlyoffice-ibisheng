@@ -2721,7 +2721,7 @@ function CDemonstrationManager(htmlpage)
             if (null == oThis.DivEndPresentation)
             {
                 oThis.DivEndPresentation = document.createElement('div');
-                oThis.DivEndPresentation.setAttribute("style", "position:absolute;margin:0px;padding:0px;left:0px;top:0px;width:100%;height:100%;z-index:4;text-align:center;font-family:monospace;font-size:12pt;color:#FFFFFF;");
+                oThis.DivEndPresentation.setAttribute("style", "position:absolute;margin:0px;padding:0px;left:0px;top:0px;width:100%;height:100%;z-index:4;background-color:#000000;text-align:center;font-family:monospace;font-size:12pt;color:#FFFFFF;");
                 oThis.DivEndPresentation.innerHTML = oThis.EndShowMessage;
 
                 //oThis.DemonstrationDivEndPresentation.onmousedown  = oThis.onMouseDownDemonstration;
@@ -2736,6 +2736,11 @@ function CDemonstrationManager(htmlpage)
             }
             return;
         }
+        else if (null != oThis.DivEndPresentation)
+        {
+            this.DemonstrationDiv.removeChild(this.DivEndPresentation);
+            this.DivEndPresentation = null;
+        }
 
         var _slides = oThis.HtmlPage.m_oLogicDocument.Slides;
         var _timing = null;
@@ -2746,10 +2751,47 @@ function CDemonstrationManager(htmlpage)
 
         if (_timing.TransitionType != c_oAscSlideTransitionTypes.None && _timing.TransitionDuration > 0)
         {
-            oThis.StartTransition(_timing, is_first_play);
+            oThis.StartTransition(_timing, is_first_play, false);
             return;
         }
 
+        oThis.OnPaintSlide(false);
+    }
+
+    this.StartSlideBackward = function()
+    {
+        oThis.StopTransition();
+
+        if (oThis.SlideNum == oThis.SlidesCount)
+        {
+            oThis.SlideNum--;
+            oThis.OnPaintSlide(false);
+
+            if (null != oThis.DivEndPresentation)
+            {
+                oThis.DemonstrationDiv.removeChild(oThis.DivEndPresentation);
+                oThis.DivEndPresentation = null;
+            }
+
+            return;
+        }
+
+        if (0 >= this.SlideNum)
+        {
+            this.SlideNum = 0;
+            return;
+        }
+
+        var _slides = oThis.HtmlPage.m_oLogicDocument.Slides;
+        var _timing = _slides[oThis.SlideNum].timing;
+
+        if (_timing.TransitionType != c_oAscSlideTransitionTypes.None && _timing.TransitionDuration > 0)
+        {
+            oThis.StartTransition(_timing, false, true);
+            return;
+        }
+
+        oThis.SlideNum--;
         oThis.OnPaintSlide(false);
     }
 
@@ -2764,7 +2806,7 @@ function CDemonstrationManager(htmlpage)
         this.CheckSlideDuration = -1;
     }
 
-    this.StartTransition = function(_timing, is_first)
+    this.StartTransition = function(_timing, is_first, is_backward)
     {
         // сначала проверим, создан ли уже оверлей (в идеале спрашивать еще у транзишна, нужен ли ему оверлей)
         // пока так.
@@ -2790,7 +2832,7 @@ function CDemonstrationManager(htmlpage)
         oThis.Transition.Param = _timing.TransitionOption;
         oThis.Transition.Duration = _timing.TransitionDuration;
 
-        oThis.PrepareTransition(is_first, false);
+        oThis.PrepareTransition(is_first, is_backward);
         oThis.Transition.Start(false);
     }
 
@@ -2798,12 +2840,8 @@ function CDemonstrationManager(htmlpage)
     {
         if (oThis.Transition.IsBackward)
         {
-            oThis.SlideImage = oThis.Transition.CacheImage1.Image;
             oThis.SlideNum--;
-        }
-        else
-        {
-            oThis.SlideImage = oThis.Transition.CacheImage2.Image;
+            oThis.HtmlPage.m_oApi.sync_DemonstrationSlideChanged(oThis.SlideNum);
         }
 
         this.OnPaintSlide(true);
@@ -2842,6 +2880,7 @@ function CDemonstrationManager(htmlpage)
             if (oThis.IsPlayMode)
             {
                 oThis.SlideNum++;
+                oThis.HtmlPage.m_oApi.sync_DemonstrationSlideChanged(oThis.SlideNum);
                 oThis.StartSlide(true, false);
             }
         },
@@ -2899,11 +2938,9 @@ function CDemonstrationManager(htmlpage)
 
         if (0 != this.SlideNum)
         {
-            this.SlideNum--;
-            this.m_oApi.sync_DemonstrationSlideChanged(this.DemonstrationSlideNum);
-
             // TODO: backward transition
-            this.StartSlide(true, false);
+            this.StartSlideBackward();
+            this.HtmlPage.m_oApi.sync_DemonstrationSlideChanged(this.SlideNum);
         }
     }
 
@@ -2912,11 +2949,11 @@ function CDemonstrationManager(htmlpage)
         if (!this.DemonstrationManager.Mode)
             return;
 
-        if ((slideNum == this.DemonstrationSlideNum) || (slideNum < 0) || (slideNum >= this.m_oDrawingDocument.SlidesCount))
+        if ((slideNum == this.SlideNum) || (slideNum < 0) || (slideNum >= this.m_oDrawingDocument.SlidesCount))
             return;
 
         this.SlideNum = slideNum;
-        this.m_oApi.sync_DemonstrationSlideChanged(this.DemonstrationSlideNum);
+        this.HtmlPage.m_oApi.sync_DemonstrationSlideChanged(this.SlideNum);
 
         this.StartSlide(true, false);
     }
