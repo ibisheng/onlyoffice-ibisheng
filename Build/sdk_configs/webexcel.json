@@ -74,7 +74,7 @@
                 "../Word/Editor/SerializeCommon.js",
                 "../Excel/model/DrawingObjects/Format/Format.js",
                 "../Word/Editor/GraphicObjects/ObjectTypes/CreateGeometry.js",
-                "../Word/Editor/GraphicObjects/ObjectTypes/Geometry.js",
+                "../Excel/model/DrawingObjects/Format/Geometry.js",
                 "../Word/Editor/GraphicObjects/ObjectTypes/Path.js",
                 "../Word/Editor/GraphicObjects/Math.js",
                 "../Word/Drawing/ShapeDrawer.js",
