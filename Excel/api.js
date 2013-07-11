@@ -1420,14 +1420,15 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					this.options);
 
 				this.DocumentLoadComplete = true;
+				
+				this.asc_CheckGuiControlColors();
+				this.asc_SendThemeColorScheme();
+				this.asc_ApplyColorScheme(false);
+				
 				// Применяем пришедшие при открытии изменения
 				this._applyFirstLoadChanges();
 				// Меняем тип состояния (на никакое)
 				this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
-
-				this.asc_CheckGuiControlColors();
-				this.asc_SendThemeColorScheme();
-				this.asc_ApplyColorScheme(false);
 
 				//this.asc_Resize(); // Убрал, т.к. сверху приходит resize (http://bugzserver/show_bug.cgi?id=14680)
 				if( this.wbModel.startActionOn == false ){
