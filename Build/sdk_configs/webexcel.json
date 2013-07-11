@@ -71,7 +71,7 @@
                 "../Excel/view/WorkbookView.js",
                 "../Excel/view/scroll.js",
                 "../Word/Editor/SerializeCommon.js",
-                "../Word/Editor/GraphicObjects/ObjectTypes/Format.js",
+                "../Excel/model/DrawingObjects/Format/Format.js",
                 "../Word/Editor/GraphicObjects/ObjectTypes/CreateGeometry.js",
                 "../Word/Editor/GraphicObjects/ObjectTypes/Geometry.js",
                 "../Word/Editor/GraphicObjects/ObjectTypes/Path.js",
