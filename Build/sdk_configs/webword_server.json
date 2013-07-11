@@ -20,9 +20,11 @@
         "sdk": {
             "src": [
                 "../Common/Build/License.js",
-                "../Word/merge/utils.js",
+                "../Common/Merge/NodejsEnv.js",
+                "../Common/docscoapisettings.js",
                 "../Common/docscoapicommon.js",
                 "../Common/docscoapi.js",
+                "../Common/spellcheckapisettings.js",
                 "../Common/spellcheckapi.js",
                 "../Common/wordcopypaste.js",
                 "../Common/spellCheckLanguage.js",

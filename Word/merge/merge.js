@@ -9,13 +9,15 @@ var base_file = process.argv[2];
 var changes_file = process.argv[3];
 var output_file = process.argv[4];
 
-setTimeout( main, 15000, base_file, changes_file, output_file);
+setTimeout( main, 0, base_file, changes_file, output_file);
 
 function main(base_file, changes_file, output_file)
 {
-	try{
+	var error_code = 1;
+	try {
+		//var TimeStart = new Date();
 		var sdk_all = require('./sdk-all.js');
-		var editor = new sdk_all.asc_docs_api();
+		var editor = new sdk_all.asc_docs_merge_api();
 
 		var fs = require('fs');
 		var base_doc = fs.readFileSync(base_file, 'utf-8');
@@ -25,9 +27,19 @@ function main(base_file, changes_file, output_file)
 		editor.ApplyChanges( doc_changes );
 
 		var changed_doc = editor.Save();
-		fs.writeFileSync(output_file, changed_doc, 'utf-8');
+		fs.writeFileSync(output_file, changed_doc, 'utf-8');/**/
+
+		//var TimeEnd = new Date();
+		//console.log("Execution duration:", TimeEnd - TimeStart, " ms.");
+		
+		error_code = 0;
 	}
-	catch(err){
+
+	catch(err) {
 		console.log("Error:", err);
+	}
+
+	finally	{
+		process.exit(error_code);
 	}
 }
