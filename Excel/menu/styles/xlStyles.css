@@ -65,6 +65,8 @@ p{ margin: 2px; padding: 2px; vertical-align:top;}
 .drop_down{background-position: -66px 0px;width: 5px;height: 3px; margin-left: 1px; margin-right: 1px;margin-top: 10px;}
 .bg_fill{background-position: -544px 50%; width: 16px; height: 14px;}
 .txt_color{background-position: -161px 50%; width: 16px; height: 14px;}
+.incFS {background-position: -1397px 50%;width: 15px;height: 15px; margin-left: 5px; margin-top: 3px;}
+.decFS {background-position: -1382px 50%;width: 15px;height: 15px; margin-left: 5px; margin-top: 3px;}
 .MenubarBGColor{background-position: -544px 50%;}
 .MenubarFontColor{background-position: -161px 50%;}
 .cell_border{background-position: 0px -27px; width: 13px; height: 13px; margin-left: 5px; margin-top: 5px;}

@@ -888,6 +888,12 @@
 			}
 		}
 	});
+	$("#tdIncreaseFontSize").click(function () {
+		api.asc_increaseFontSize();
+	});
+	$("#tdDecreaseFontSize").click(function () {
+		api.asc_decreaseFontSize();
+	});
 	$(".selectable").bind("mouseover", function() {if ($(this).hasClass("noselectable")) return; $(this).addClass("iconHover"); });
 	$(".selectable").bind("mouseout", function() { $(this).removeClass("iconHover"); });
 	$(".clrPicker1").mousedown(function(){

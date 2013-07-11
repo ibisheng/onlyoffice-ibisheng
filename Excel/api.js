@@ -2245,12 +2245,16 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.wb.restoreFocus();
 			},
 
+			// Увеличение размера шрифта
 			asc_increaseFontSize: function () {
-				// ToDo add code here
+				this.wb.changeFontSize("changeFontSize", true);
+				this.wb.restoreFocus();
 			},
 
+			// Уменьшение размера шрифта
 			asc_decreaseFontSize: function () {
-				// ToDo add code here
+				this.wb.changeFontSize("changeFontSize", false);
+				this.wb.restoreFocus();
 			},
 
 			asc_onMouseUp: function (x, y) {

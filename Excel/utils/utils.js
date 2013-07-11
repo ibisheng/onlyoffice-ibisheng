@@ -95,6 +95,32 @@
 			//return Math.ceil(x);
 		}
 
+		function incDecFonSize (bIncrease, oValue) {
+			// Закон изменения размеров :
+			// Результатом должно быть ближайшее из отрезка [8,72] по следующим числам 8,9,10,11,12,14,16,18,20,22,24,26,28,36,48,72
+			// Если значение меньше или равно 8 и мы уменьшаем, то ничего не меняется
+			// Если значение больше или равно 72 и мы увеличиваем, то ничего не меняется
+
+			var aSizes = [8,9,10,11,12,14,16,18,20,22,24,26,28,36,48,72];
+			var nLength = aSizes.length;
+			var i;
+			if (true === bIncrease) {
+				if (oValue >= aSizes[nLength - 1])
+					return null;
+				for (i = 0; i < nLength; ++i)
+					if (aSizes[i] > oValue)
+						break;
+			} else {
+				if (oValue <= aSizes[0])
+					return null;
+				for (i = nLength - 1; i >= 0; --i)
+					if (aSizes[i] < oValue)
+						break;
+			}
+
+			return aSizes[i];
+		}
+
 
 		function inherit(child, parent, childProto) {
 			parent.prototype.constructor = parent;
@@ -803,6 +829,7 @@
 		window["Asc"].round = round;
 		window["Asc"].floor = floor;
 		window["Asc"].ceil = ceil;
+		window["Asc"].incDecFonSize = incDecFonSize;
 		window["Asc"].inherit = inherit;
 		window["Asc"].outputDebugStr = outputDebugStr;
 		window["Asc"].isEqual = isEqual;

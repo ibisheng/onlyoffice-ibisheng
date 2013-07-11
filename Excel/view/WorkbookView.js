@@ -1315,6 +1315,14 @@
 				}
 			},
 
+			changeFontSize: function (prop, val) {
+				if (!this.controller.isCellEditMode) {
+					this.getWorksheet().setSelectionInfo(prop, val);
+				} else {
+					//ToDo this.cellEditor.setTextStyle(prop, val);
+				}
+			},
+
 			emptyCells: function(options) {
 				if (!this.controller.isCellEditMode) {
 					this.getWorksheet().setSelectionInfo("empty", options);

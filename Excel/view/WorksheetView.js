@@ -26,6 +26,7 @@
 		var asc_n2Color   = asc.numberToAscColor;
 		var asc_obj2Color = asc.colorObjToAscColor;
 		var asc_typeof  = asc.typeOf;
+		var asc_incDecFonSize  = asc.incDecFonSize;
 		var asc_debug   = asc.outputDebugStr;
 		var asc_Range   = asc.Range;
 		var asc_FP      = asc.FontProperties;
@@ -6990,6 +6991,7 @@
 
 					var isLargeRange = t._isLargeRange(range), callTrigger = false;
 					var res, flag;
+					var mc, r, c, cell;
 
 					function makeBorder(b) {
 						var border = {};
@@ -7106,6 +7108,20 @@
 							res = t.cols.slice(arn.c1, arn.c2+1).reduce(function(r,c){r.push(c.charCount);return r;}, []);
 							range.shiftNumFormat(val, res);
 							canChangeColWidth = c_oAscCanChangeColWidth.numbers;
+							break;
+						case "changeFontSize":
+							mc = t._getMergedCellsRange(arn.startCol, arn.startRow);
+							c = mc ? mc.c1 : arn.startCol;
+							r = mc ? mc.r1 : arn.startRow;
+							cell = t._getVisibleCell(c, r);
+							if (undefined !== cell) {
+								var oldFontSize = cell.getFontsize();
+								var newFontSize = asc_incDecFonSize(val, oldFontSize);
+								if (null !== newFontSize) {
+									range.setFontsize(newFontSize);
+									canChangeColWidth = c_oAscCanChangeColWidth.numbers;
+								}
+							}
 							break;
 						case "paste":
 							var pasteExec = function()
@@ -7230,9 +7246,9 @@
 								newHyperlink.Tooltip = val.asc_getTooltip();
 								range.setHyperlink(newHyperlink);
 								// Вставим текст в активную ячейку (а не так, как MSExcel в первую ячейку диапазона)
-								var mc = t._getMergedCellsRange(arn.startCol, arn.startRow);
-								var c = mc ? mc.c1 : arn.startCol;
-								var r = mc ? mc.r1 : arn.startRow;
+								mc = t._getMergedCellsRange(arn.startCol, arn.startRow);
+								c = mc ? mc.c1 : arn.startCol;
+								r = mc ? mc.r1 : arn.startRow;
 								if (null !== val.asc_getText()) {
 									t.model.getRange3(r, c, r, c)
 										.setValue(val.asc_getText());
