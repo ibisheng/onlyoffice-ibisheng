@@ -245,7 +245,8 @@
             this.context.shadowOffsetY = this._otherProps._line_shadow_offsety;
             this.context.shadowBlur    = this._otherProps._line_shadow_blur;
             
-            this.DrawLine(i);
+            if(this._otherProps._type != 'burse2')
+				this.DrawLine(i);
 
             // Turn the shadow off
             OfficeExcel.NoShadow(this);
@@ -1587,7 +1588,28 @@
 
 					var xPos = this.coords[i][j][0];
 					var yPos = this.coords[i][j][1];
-
+					//для вычисления среднего
+					/*var summ = 0;
+					if(typeof this.coords[i][j][0] == "object")
+					{
+						for(var k = 0; k < this.coords[i][j][0].length; k++)
+						{
+							summ += this.coords[i][j][0][k];
+						}
+						if(summ != 0)
+							xPos = summ/this.coords[i][j][0].length;
+					}
+					var summ = 0;
+					if(typeof this.coords[i][j][1] == "object")
+					{
+						for(var k = 0; k < this.coords[i][j][1].length; k++)
+						{
+							summ += this.coords[i][j][1][k];
+						}
+						if(summ != 0)
+							yPos = summ/this.coords[i][j][1].length;
+					}*/
+						
 					if (j == 0) {
 						this.context.moveTo(xPos, yPos);
 					} else {
