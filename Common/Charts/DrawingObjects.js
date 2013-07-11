@@ -3256,52 +3256,52 @@ function DrawingObjects() {
 			
 				if ( !_image.Image ) {
 					worksheet.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.UplImageUrl, c_oAscError.Level.NoCritical);
-					return;
 				}
-
-				var obj = _this.createDrawingObject();
-				obj.id = generateId();
-				obj.worksheet = worksheet;
-				
-				obj.from.col = isOption ? options.cell.col : worksheet.getSelectedColumnIndex();
-				obj.from.row = isOption ? options.cell.row : worksheet.getSelectedRowIndex();
-				
-				var headerTop = worksheet.getCellTop(0, 0);
-				var headerLeft = worksheet.getCellLeft(0, 0);
-				
-				// Проверяем начальные координаты при вставке
-				while ( !worksheet.cols[obj.from.col] ) {
-					worksheet.expandColsOnScroll(true);
+				else {
+					var obj = _this.createDrawingObject();
+					obj.id = generateId();
+					obj.worksheet = worksheet;
+					
+					obj.from.col = isOption ? options.cell.col : worksheet.getSelectedColumnIndex();
+					obj.from.row = isOption ? options.cell.row : worksheet.getSelectedRowIndex();
+					
+					var headerTop = worksheet.getCellTop(0, 0);
+					var headerLeft = worksheet.getCellLeft(0, 0);
+					
+					// Проверяем начальные координаты при вставке
+					while ( !worksheet.cols[obj.from.col] ) {
+						worksheet.expandColsOnScroll(true);
+					}
+					worksheet.expandColsOnScroll(true); 	// для colOff
+					
+					while ( !worksheet.rows[obj.from.row] ) {
+						worksheet.expandRowsOnScroll(true);
+					}
+					worksheet.expandRowsOnScroll(true); 	// для rowOff
+					
+					calculateObjectMetrics(obj, isOption ? options.width : _image.Image.width, isOption ? options.height : _image.Image.height);
+					
+					var x = pxToMm(obj.getVisibleLeftOffset() + headerLeft);
+					var y = pxToMm(obj.getVisibleTopOffset() + headerTop);
+					var w = pxToMm(obj.getWidthFromTo());
+					var h = pxToMm(obj.getHeightFromTo());
+					
+					// CImage
+					obj.graphicObject = new CImage(obj, _this);
+					obj.graphicObject.initDefault( x, y, w, h, _image.Image.src );
+					obj.graphicObject.select(_this.controller);
+					aObjects.push(obj);
+					
+					worksheet.autoFilters.drawAutoF(worksheet);
+					worksheet.cellCommentator.drawCommentCells(false);
+					_this.showDrawingObjects(false);
+					
+					// History.Create_NewPoint();
+					// History.Add(g_oUndoRedoDrawingObject, historyitem_DrawingObject_Add, worksheet.model.getId(), null, obj);
+					
+					_this.lockDrawingObject(obj.id, bPackage ? false : true, bPackage ? false : true);
 				}
-				worksheet.expandColsOnScroll(true); 	// для colOff
 				
-				while ( !worksheet.rows[obj.from.row] ) {
-					worksheet.expandRowsOnScroll(true);
-				}
-				worksheet.expandRowsOnScroll(true); 	// для rowOff
-				
-				calculateObjectMetrics(obj, isOption ? options.width : _image.Image.width, isOption ? options.height : _image.Image.height);
-				
-				var x = pxToMm(obj.getVisibleLeftOffset() + headerLeft);
-				var y = pxToMm(obj.getVisibleTopOffset() + headerTop);
-				var w = pxToMm(obj.getWidthFromTo());
-				var h = pxToMm(obj.getHeightFromTo());
-				
-				// CImage
-				obj.graphicObject = new CImage(obj, _this);
-				obj.graphicObject.initDefault( x, y, w, h, _image.Image.src );
-				obj.graphicObject.select(_this.controller);
-				aObjects.push(obj);
-				
-				worksheet.autoFilters.drawAutoF(worksheet);
-				worksheet.cellCommentator.drawCommentCells(false);
-				_this.showDrawingObjects(false);
-				
-				// History.Create_NewPoint();
-				// var copyObject = _this.cloneDrawingObject(obj);
-				// History.Add(g_oUndoRedoDrawingObject, historyitem_DrawingObject_Add, worksheet.model.getId(), null, copyObject);
-				
-				_this.lockDrawingObject(obj.id, bPackage ? false : true, bPackage ? false : true);
 				worksheet.model.workbook.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 			}
 			
