@@ -21,14 +21,15 @@
         "sdk": {
             "src": [
                 "../Common/Build/License.js",
+                "../Common/Merge/NodejsEnv.js",
                 "../Common/docscoapisettings.js",
                 "../Common/docscoapicommon.js",
                 "../Common/docscoapi.js",
-				"../Common/spellcheckapisettings.js",
-				"../Common/spellcheckapi.js",
+                "../Common/spellcheckapisettings.js",
+                "../Common/spellcheckapi.js",
                 "../Common/wordcopypaste.js",
-				"../Common/spellCheckLanguage.js",
-				"../Common/spellCheckLanguagesAll.js",
+                "../Common/spellCheckLanguage.js",
+                "../Common/spellCheckLanguagesAll.js",
                 "../Common/downloaderfiles.js",
                 "../Common/commonDefines.js",
                 "../Common/editorscommon.js",
@@ -63,7 +64,7 @@
                 "../Common/FontsFreeType/font_engine.js",
                 "../Common/FontsFreeType/FontFile.js",
                 "../Common/FontsFreeType/FontManager.js",
-				"../Common/PresentationSerializeAdapter.js",
+                "../Common/PresentationSerializeAdapter.js",
                 "../Word/Drawing/Externals.js",
                 "../Word/Drawing/AllFonts.js",
                 "../Word/Drawing/GlobalLoaders.js",
@@ -104,7 +105,7 @@
                 "../Word/Editor/Serialize2.js",
                 "../Word/Editor/Search.js",
                 "../Word/Editor/FontClassification.js",
-				"../Word/Editor/Spelling.js",
+                "../Word/Editor/Spelling.js",
                 "../Word/Drawing/Graphics.js",
                 "../Word/Drawing/ArcTo.js",
                 "../Word/Drawing/Hit.js",
@@ -124,8 +125,9 @@
                 "../Word/Editor/SerializeCommon.js",
                 "../Word/apiDefines.js",
                 "../Word/api-all.js",
+                "../Word/merge/api_merge.js",
                 "../Word/Build/Log/apiExport.js",
-				"../Excel/graphics/DrawingContextWord.js"
+                "../Excel/graphics/DrawingContextWord.js"
             ],
             "dst": "../Word/sdk-all.js",
             "externs": [

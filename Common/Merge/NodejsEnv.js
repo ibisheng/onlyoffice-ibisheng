@@ -13,6 +13,6 @@ if (typeof window === 'undefined') {
 }
 else {
 	//Run under browser
-	window.exports = {};
+	window.exports = window;
 }
 

@@ -8,13 +8,16 @@
 		<!-- <script type="text/javascript" src="utils.js"></script> -->		
 
 		<script type="text/javascript" src="menu/js/jquery-1.6.1.min.js"></script>
+		<script src="../Common/Merge/NodejsEnv.js"></script>
 		<script src="../Common/downloaderfiles.js"></script>
+		<script src="../Common/docscoapisettings.js"></script>
 		<script src="../Common/docscoapicommon.js"></script>
         <script type="text/javascript" src="../Common/spellCheckLanguage.js"></script>
         <script type="text/javascript" src="../Common/spellCheckLanguagesAll.js"></script>
 		<script type="text/javascript" src="../Common/3rdparty/Underscore/underscore-min.js"></script>
         <script type="text/javascript" src="../Common/3rdparty/Sockjs/sockjs-0.3.min.js"></script>
 		<script type="text/javascript" src="../Common/docscoapi.js"></script>
+		<script type="text/javascript" src="../Common/spellcheckapisettings.js"></script>
         <script type="text/javascript" src="../Common/spellcheckapi.js"></script>
         <script type="text/javascript" src="../Common/wordcopypaste.js"></script>
 		<script type="text/javascript" src="../Common/CommonDefines.js"></script>
@@ -117,6 +120,8 @@
         <script type="text/javascript" src="Drawing/documentrenderer.js"></script>
 		<script type="text/javascript" src="apiDefines.js"></script>
         <script type="text/javascript" src="apiCommon.js"></script>
+		<script type="text/javascript" src="api.js"></script>
+        <script type="text/javascript" src="merge/api_merge.js"></script>
         <script type="text/javascript" src="Drawing/scrolls/scroll.js"></script>
 
         <script type="text/javascript" src="../Common/Shapes/EditorSettings.js"></script>
@@ -138,20 +143,26 @@
 
     </head>
     <body>
-		<p>Test page</p>
+		<p>See the console log.</p>
 		<script>
 			//var sdk_all = require('../sdk-all.js');
-			var editor = new asc_docs_api();
-
+			var editor = new asc_docs_merge_api();
+			
+			console.log("Base document:", base_doc);
+			
 			//var fs = require('fs');
 			//var base_doc = fs.readFileSync(base_file, 'utf-8');
 			editor.LoadDocument( base_doc );
 
+			console.log("Changes:", doc_changes);
+			
 			//var doc_changes = require(changes_file);
 			editor.ApplyChanges( doc_changes );
 
 			var changed_doc = editor.Save();
 			//fs.writeFileSync(output_file, changed_doc, 'utf-8');
+			
+			console.log("Merged document:", changed_doc);
 		</script>
 	</body>
 </html>
