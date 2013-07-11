@@ -785,8 +785,8 @@
 			this.docStylesImage = "";
 			this.docStyles = null;
 
-			this.styleThumbnailWidth	= 100;
-			this.styleThumbnailHeight	= 22;
+			this.styleThumbnailWidth	= 80;
+			this.styleThumbnailHeight	= 18;
 			this.styleThumbnailWidthPt	= this.styleThumbnailWidth * 72 / 96;
 			this.styleThumbnailHeightPt	= this.styleThumbnailHeight * 72 / 96;
 
@@ -805,6 +805,7 @@
 			generateStyles: function (cellStyles, fmgrGraphics) {
 				var nStylesCount = cellStyles.length;
 				var oCanvas = document.createElement('canvas');
+				//var oCanvas = document.getElementById('TestCanvas');
 				oCanvas.width = this.styleThumbnailWidth;
 				oCanvas.height = nStylesCount * this.styleThumbnailHeight;
 				var ctx = oCanvas.getContext('2d');
