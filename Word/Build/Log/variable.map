@@ -492,7 +492,7 @@ c_oAscRelativeFromV$TopMargin:MO
 nVertTTvert:vH
 CFF_Driver_Class:uz
 CParaSpellChecker:kP
-ScrollArrowType$ARROW_RIGHT:j2
+ScrollArrowType$ARROW_RIGHT:Z1
 c_oSerNumTypes$lvl_ParaPr:MU
 FT_GlyphLoader_New:Bo
 JSCompiler_StaticMethods_AddRoundRectCtx:h0
@@ -2153,19 +2153,19 @@ L 124:ms
 L 123:AA
 L 122:zA
 L 121:Jl
-L 120:i2
+L 120:j2
 JSCompiler_StaticMethods_AddRoundRect:i0
 JSCompiler_StaticMethods__BordersToStyle:mb
 c_oAscError$ID$SplitCellMaxCols:aU
 FONT_TYPE_ADDITIONAL_CUT:CB
 CAscSlideProps:m4
-L 118:g2
-L 119:h2
-L 116:e2
+L 118:h2
+L 119:i2
+L 116:f2
 ParaNewLine:Jc
-L 117:f2
-L 114:c2
-L 115:d2
+L 117:g2
+L 114:d2
+L 115:e2
 CopyProcessor:ja
 TT_GaspRange:Xo
 EGlyphState$glyphstateNormal:NA
@@ -2227,7 +2227,7 @@ L 111:yA
 L 110:xA
 L 113:Dn
 tt_get_interface:Dx
-L 112:b2
+L 112:c2
 bIsSupportOriginalFormatFonts:wB
 L 103:vn
 CAutoshapeTrack:q0
@@ -2237,9 +2237,9 @@ L 104:Zr
 historyitem_AddToSpTree:zI
 L 105:Yz
 CAscFill:a4
-L 106:Z1
-L 107:$1
-L 108:a2
+L 106:$1
+L 107:a2
+L 108:b2
 L 109:wA
 ETblStyleOverrideType$tblstyleoverridetypeBand2Horz:iZ
 para_Empty:HN
