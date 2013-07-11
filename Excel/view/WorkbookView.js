@@ -910,6 +910,7 @@
 			getCellStyles: function () {
 				var oStylesPainter = new asc_CSP();
 				oStylesPainter.generateStylesAll(this.model.CellStyles, this.fmgrGraphics);
+				return oStylesPainter;
 			},
 
 			getWorksheetById: function (id) {
