@@ -888,7 +888,7 @@ history_undo_redo_const:IA
 AddPolyLine2State:ME
 tt_cmap12_next:Mn
 g_anchor_right:tz
-CControlContainer:Iz
+CControlContainer:wz
 c_oAscSlideTransitionParams$Clock_Clockwise:DI
 Write_CVT:lr
 historyitem_type_Drawing:Gw
@@ -1432,13 +1432,13 @@ L 120:Bg
 JSCompiler_StaticMethods__BordersToStyle:lb
 FONT_TYPE_ADDITIONAL_CUT:cw
 CAscSlideProps:kM
-L 118:Hz
+L 118:Iz
 L 119:$s
 L 116:Pm
 ParaNewLine:zc
 L 117:mp
 L 114:Wk
-L 115:Gz
+L 115:Hz
 TT_GaspRange:ij
 CopyProcessor:qa
 JSCompiler_StaticMethods_slidesPaste:yF
@@ -1473,8 +1473,8 @@ historyitem_TableId_Reset:Dw
 T1_Decoder_ZoneRec:jm
 L 102:fK
 T1_Size_Request:wu
-L 101:Dz
-L 100:Cz
+L 101:Ez
+L 100:Dz
 FT_GlyphLoader_Prepare:Ri
 FT_Smooth_Renderer_Class:pp
 CColorModifiers:SI
@@ -1482,7 +1482,7 @@ tblwidth_Auto:tx
 FT_Size_Metrics:Tj
 bIsIE:DH
 find_sbit_range:jn
-L 111:Fz
+L 111:Gz
 L 110:Dj
 L 113:mh
 tt_get_interface:Yr
@@ -1494,7 +1494,7 @@ CAutoshapeTrack:QH
 L 104:hi
 JSCompiler_StaticMethods_Internal_RecalculateGrid:uA
 plusDiv:uG
-L 105:Ez
+L 105:Fz
 CAscFill:iM
 L 106:Om
 L 107:Ve
@@ -2005,7 +2005,7 @@ FT_PEEK_USHORT:Hh
 L 72:Uf
 L 71:fi
 L 64:Ue
-L 65:wz
+L 65:xz
 L 62:yj
 BULLET_TYPE_TYPEFACE_BUFONT:lg
 CUniFill:af
@@ -2024,9 +2024,9 @@ tt_sfnt_id_rec:ms
 tt_face_load_name:Im
 L 61:Vs
 L 60:Xa
-L 99:Bz
+L 99:Cz
 L 95:Ys
-L 96:Az
+L 96:Bz
 L 97:Zs
 JSCompiler_StaticMethods_Set_TableBorder_Top:cd
 L 98:eK
@@ -2036,12 +2036,12 @@ FT_Request_Metrics:hs
 ParaPresentationNumbering:Oy
 SPH_ScaleRule:Ip
 L 92:cK
-L 91:yz
+L 91:zz
 nSldLtTObjTx:PJ
 L 94:dK
 JSCompiler_StaticMethods_Document_UpdateUndoRedoState:oC
 CreateUIntArray:Kk
-L 93:zz
+L 93:Az
 global_keyboardEvent:jz
 FT_RoundFix:Th
 CFontFileLoader:O
@@ -2051,7 +2051,7 @@ _ph_summ__two_obj_and_tx:YK
 tt_name_entry_ascii_from_utf16:Eo
 Editor_Copy_GetElem:ha
 JSCompiler_StaticMethods_Set_TableBorder_InsideV:Xc
-L 88:xz
+L 88:yz
 L 89:aK
 L 86:$J
 JSCompiler_StaticMethods_Set_Inline:KB
