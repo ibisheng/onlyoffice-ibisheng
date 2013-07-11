@@ -229,6 +229,11 @@ CImage.prototype =
     {
 
     },
+	
+	calculateContent: function()
+	{
+	
+	},
 
     normalize: function()
     {

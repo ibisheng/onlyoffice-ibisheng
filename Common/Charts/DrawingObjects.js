@@ -3288,7 +3288,7 @@ function DrawingObjects() {
 					
 					// CImage
 					obj.graphicObject = new CImage(obj, _this);
-					obj.graphicObject.initDefault( x, y, w, h, _image.Image.src );
+					obj.graphicObject.initDefault( x, y, w, h, _image.src );
 					obj.graphicObject.select(_this.controller);
 					aObjects.push(obj);
 					
