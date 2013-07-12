@@ -114,6 +114,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.addShapePreset = "";
 			this.ImageLoader = window.g_image_loader;
 			this.ImageLoader.put_Api(this);
+			
 			/**************************************/
 
 			this.OpenDocumentProgress = {
@@ -2096,13 +2097,24 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 			
 			asyncImageStartLoaded: function() {
-				// здесь прокинуть евент о заморозке меню
+			},
+			
+			asyncImagesDocumentStartLoaded: function() {				
+			},
+			
+			asyncImagesDocumentEndLoaded: function() {				
 			},
 			
 			asyncImageEndLoaded: function(_image) {
 				var ws = this.wb.getWorksheet();
 				if ( ws.objectRender.asyncImageLoadedEvent )
 					ws.objectRender.asyncImageLoadedEvent(_image);
+			},
+			
+			asyncImageEndLoadedBackground: function(_image) {
+				var ws = this.wb.getWorksheet();
+				if ( ws.objectRender.asyncImageLoadedBackgroundEvent )
+					ws.objectRender.asyncImageLoadedBackgroundEvent(_image);
 			},
 			
 			// Cell interface

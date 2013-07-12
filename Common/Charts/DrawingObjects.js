@@ -39,7 +39,7 @@ function convertFormula(formula, ws) {
 	return range;
 }
 
-function _getFullImageSrc(src) {
+function getFullImageSrc(src) {
 	var start = src.substring(0, 6);
     if ( 0 != src.indexOf("http:") && 0 != src.indexOf("data:") && 0 != src.indexOf("https:") && 0 != src.indexOf("ftp:") && 0 != src.indexOf("file:") ) {
 		var api = window["Asc"]["editor"];
@@ -2071,16 +2071,15 @@ function DrawingObjects() {
 	var minChartHeight = 160;
 	var undoRedoObject = null;
 	
-	var shiftKey = false;
 	var userId = null;
 	var documentId = null;
 	var lastObjectIndex = null;
 	
-	// Все изменения, связанные с image.src прогоняем через этот класс
-	var imageLoader = new ImageLoader();	
+	//var imageLoader = new ImageLoader();	
 	
 	_this.drawingDocument = null;
 	_this.asyncImageLoadedEvent = null;
+	_this.asyncImageLoadedBackgroundEvent = null;
 
 	//-----------------------------------------------------------------------------------
 	// Public methods
@@ -2089,10 +2088,6 @@ function DrawingObjects() {
 	_this.init = function(currentSheet) {
 
 		userId = api.User.asc_getId();
-		g_oIdCounter = new CIdCounter();
-		g_oTableId = new CTableId();
-		g_oIdCounter.Set_UserId(userId);
-		
 		documentId = api.documentId;
 		worksheet = currentSheet;
 		
@@ -2114,19 +2109,55 @@ function DrawingObjects() {
 		isViewerMode =  function() { return worksheet._trigger("getViewerMode"); };
 
 		aObjects = [];
+		aImagesSync = [];
+		aObjectsSync = [];
+		
 		for (var i = 0; currentSheet.model.Drawings && (i < currentSheet.model.Drawings.length); i++) {
 
 			currentSheet.model.Drawings[i].worksheet = worksheet;
-			aObjects[i] = _this.cloneDrawingObject(currentSheet.model.Drawings[i]);
-			
-			if (aObjects[i].isChart()) {
-				_this.calcChartInterval(aObjects[i].chart);
-				aObjects[i].chart.worksheet = worksheet;
+			var clone = _this.cloneDrawingObject(currentSheet.model.Drawings[i]);
+		
+			if ( currentSheet.model.Drawings[i].isChart() ) {
+				
+				_this.calcChartInterval(clone.chart);
+				clone.chart.worksheet = worksheet;
+				aObjects.push( clone );
 			}
 				
-			if (aObjects[i].isImage())
-				imageLoader.addImage(aObjects[i].image.src);
+			if ( currentSheet.model.Drawings[i].isImage() ) {
+								
+				aImagesSync[aImagesSync.length] = currentSheet.model.Drawings[i].imageUrl;
+				aObjectsSync[aObjectsSync.length] = currentSheet.model.Drawings[i];
+			}
 		}
+		
+		// Загружаем все картинки листа
+		api.ImageLoader.bIsAsyncLoadDocumentImages = true;
+		api.ImageLoader.LoadDocumentImages(aImagesSync);
+		api.ImageLoader.bIsAsyncLoadDocumentImages = false;
+		
+		for (var i = 0; i < aObjectsSync.length; i++) {
+			
+			var clone = aObjectsSync[i];
+			var image = api.ImageLoader.LoadImage(aImagesSync[i], 1);	// Должна быть в мапе
+			
+			if ( image != null ) {
+			
+				var headerTop = worksheet.getCellTop(0, 0);
+				var headerLeft = worksheet.getCellLeft(0, 0);
+								
+				var x = pxToMm(clone.getVisibleLeftOffset() + headerLeft);
+				var y = pxToMm(clone.getVisibleTopOffset() + headerTop);
+				var w = pxToMm(clone.getWidthFromTo());
+				var h = pxToMm(clone.getHeightFromTo());
+				
+				// CImage
+				clone.graphicObject = new CImage(clone, _this);
+				clone.graphicObject.initDefault( x, y, w, h, image.src );
+				aObjects.push(clone);
+			}
+		}
+		
 		lastObjectIndex = aObjects.length;
 
 		// Upload event
@@ -2293,10 +2324,6 @@ function DrawingObjects() {
 		return aObjects;
 	}
 	
-	_this.setShiftKey = function(bShiftKey) {
-		shiftKey = bShiftKey;
-	}
-
 	_this.getWorksheet = function() {
 		return worksheet;
 	}
@@ -2448,14 +2475,14 @@ function DrawingObjects() {
 				_this.clearDrawingObjects();
 			}
 				
-			if ( !imageLoader.isReady() ) {
+			/*if ( !imageLoader.isReady() ) {
 				//console.log("imageLoader - False");
 				imageLoader.setReadyCallback(_this.showDrawingObjects);
 			}
 			else {
 				//console.log("imageLoader - Ok");
 				imageLoader.removeReadyCallback();
-			}
+			}*/
 
 			for (var i = 0; i < _this.countDrawingObjects(); i++) {
 
@@ -2513,8 +2540,8 @@ function DrawingObjects() {
 						if ( !chartBase64 )
 							continue;
 							
-						imageLoader.addImage(chartBase64);
-						imageLoader.setReadyCallback(_this.showDrawingObjects);
+						//imageLoader.addImage(chartBase64);
+						//imageLoader.setReadyCallback(_this.showDrawingObjects);
 
 						obj.image.onload = function() {
 							obj.flags.currentCursor = null;
@@ -2646,11 +2673,8 @@ function DrawingObjects() {
 	_this.getDrawingAreaMetrics = function() {
 
 		/*
-		*	Объект, определяющий max колонку и строчку для отрисовки объектов листа. Если объектов нет, то null
+		*	Объект, определяющий max колонку и строчку для отрисовки объектов листа
 		*/
-
-		if (!_this.countDrawingObjects())
-			return null;
 
 		var metrics = {
 			maxCol: 0,
@@ -2701,7 +2725,7 @@ function DrawingObjects() {
 			ChartData: 22
 		};
 
-		_t.id = null;
+		_t.id = g_oIdCounter ? g_oIdCounter.Get_NewId() : null;
 		_t.image = new Image();
 		_t.imageUrl = "";
 		_t.Type = c_oAscCellAnchorType.cellanchorTwoCell;
@@ -2749,6 +2773,9 @@ function DrawingObjects() {
 		// Считаем From/To исходя из graphicObject
 		_t.setGraphicObjectCoords = function() {
 			if ( _t.isGraphicObject() ) {
+			
+				if ( (_t.graphicObject.x < 0) || (_t.graphicObject.y < 0) || (_t.graphicObject.extX <= 0) || (_t.graphicObject.extY <= 0) )
+					return;
 				
 				_t.from.col = _t.worksheet._findColUnderCursor( mmToPt(_t.graphicObject.x) /*+ _t.worksheet.getCellLeft(0, 1)*/, true).col;
 				_t.from.colOff = _t.graphicObject.x /*+ _t.worksheet.getCellLeft(0, 3)*/ - _t.worksheet.getCellLeft(_t.from.col, 3);
@@ -2989,6 +3016,9 @@ function DrawingObjects() {
 		_t.getHeightCoeff = function() {
 			return _t.image.height / _t.getHeightFromTo();
 		}
+		
+		if ( g_oTableId )
+			g_oTableId.Add( _t, _t.Id );
 	}
 	
 	DrawingBase.prototype = {
@@ -3145,7 +3175,7 @@ function DrawingObjects() {
 		drawing.chart.range.intervalObject = function() {
 			return worksheet ? worksheet.getSelectedRange() : null;
 		}();
-		
+				
 		return drawing;
 	}
 
@@ -3259,7 +3289,6 @@ function DrawingObjects() {
 				}
 				else {
 					var obj = _this.createDrawingObject();
-					obj.id = generateId();
 					obj.worksheet = worksheet;
 					
 					obj.from.col = isOption ? options.cell.col : worksheet.getSelectedColumnIndex();
@@ -3294,6 +3323,7 @@ function DrawingObjects() {
 					
 					worksheet.autoFilters.drawAutoF(worksheet);
 					worksheet.cellCommentator.drawCommentCells(false);
+					
 					_this.showDrawingObjects(false);
 					
 					// History.Create_NewPoint();
@@ -3425,11 +3455,10 @@ function DrawingObjects() {
 		if ( !chartBase64 )
 			return false;
 			
-		imageLoader.addImage(chartBase64);
+		//imageLoader.addImage(chartBase64);
 
 		// draw
 		var obj = _this.createDrawingObject();
-		obj.id = generateId();
 		obj.chart = chart;
 		obj.flags.redrawChart = true;
 
@@ -4007,25 +4036,17 @@ function DrawingObjects() {
 	_this.addGraphicObject = function(graphic) {
 		
 		var obj = _this.createDrawingObject();
-		obj.id = generateId();
 		obj.graphicObject = graphic;
         graphic.setDrawingBase(obj);
 		
-		function callbackFunc(result) {
-			if ( result ) {
-			
-				//History.Create_NewPoint();
-				//History.Add(g_oUndoRedoDrawingObject, historyitem_DrawingObject_Add, worksheet.model.getId(), null, obj);
+		//History.Create_NewPoint();
+		//History.Add(g_oUndoRedoDrawingObject, historyitem_DrawingObject_Add, worksheet.model.getId(), null, obj);
 				
-				obj.graphicObject.select(_this.controller);
-				aObjects.push(obj);
-				_this.showDrawingObjects(false);
-				
-				worksheet.model.workbook.handlers.trigger("asc_onEndAddShape");
-			}
-		}
-		
-		_this.lockDrawingObject(obj.id, true, true, callbackFunc);
+		obj.graphicObject.select(_this.controller);
+		aObjects.push(obj);
+		_this.showDrawingObjects(false);				
+		worksheet.model.workbook.handlers.trigger("asc_onEndAddShape");		
+		_this.lockDrawingObject(obj.id, true, true);
 	}
 	
 	_this.groupGraphicObjects = function() {
@@ -4033,7 +4054,6 @@ function DrawingObjects() {
 		if ( _this.controller.canGroup() ) {
 			
 			var obj = _this.createDrawingObject();
-			obj.id = generateId();
 			var group = _this.controller.createGroup(obj);
 			if ( group ) {
 				obj.graphicObject = group;
@@ -4059,7 +4079,6 @@ function DrawingObjects() {
 			for (var i = 0; i < aGraphics.length; i++) {
 			
 				var obj = _this.createDrawingObject();
-				obj.id = generateId();
 				obj.graphicObject = aGraphics[i];
                 aGraphics[i].setDrawingBase(obj);
 				obj.graphicObject.select(_this.controller);
@@ -4640,7 +4659,7 @@ function DrawingObjects() {
 
 	_this.getSelectedDrawingObjectIndex = function() {
 
-		for (var i = 0; (i < _this.countDrawingObjects()) && !shiftKey; i++) {
+		for (var i = 0; i < _this.countDrawingObjects(); i++) {
 			if (aObjects[i].flags.selected == true)
 				return i;
 		}
@@ -5299,7 +5318,7 @@ function DrawingObjects() {
 	}
 
 	function ascCvtRatio(fromUnits, toUnits) {
-		return window["Asc"].getCvtRatio( fromUnits, toUnits, drawingCtx.getPPIX() );
+		return window["Asc"].getCvtRatio( fromUnits, toUnits, drawingCtx ? drawingCtx.getPPIX() : 96 );
 	}
 
 	function setCanvasZIndex(canvas, value) {

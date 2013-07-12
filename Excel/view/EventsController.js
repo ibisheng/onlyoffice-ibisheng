@@ -1067,8 +1067,6 @@
 			_onMouseDown: function (event) {
 				var t = this;
 				var coord = t._getCoordinates(event);
-				
-				this.handlers.trigger("setShiftKey", event.shiftKey);				
 
 				if (t.handlers.trigger("isGlobalLockEditCell"))
 					return;

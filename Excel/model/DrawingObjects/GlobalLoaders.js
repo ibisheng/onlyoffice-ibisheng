@@ -56,9 +56,9 @@ var ASC_DOCS_API_USE_OPEN_SOURCE_FONTS_ONLY = false;
                 if (isUrl === false)
                     this.images_loading[this.images_loading.length] = _images[id];
                 else
-                    this.images_loading[this.images_loading.length] = _getFullImageSrc(_images[id]);
+                    this.images_loading[this.images_loading.length] = getFullImageSrc(_images[id]);
                 */
-                this.images_loading[this.images_loading.length] = _getFullImageSrc(_images[id]);
+                this.images_loading[this.images_loading.length] = getFullImageSrc(_images[id]);
             }
 
             if (!this.bIsAsyncLoadDocumentImages)

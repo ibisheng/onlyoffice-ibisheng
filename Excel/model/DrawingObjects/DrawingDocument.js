@@ -2293,7 +2293,7 @@ function CDrawingDocument(drawingObjects)
             var _len = _imgs.length;
             for (var j = 0; j < _len; j++)
             {
-                if (_getFullImageSrc(_imgs[j]) == src)
+                if (getFullImageSrc(_imgs[j]) == src)
                 {
                     this.StopRenderingPage(i);
                     bIsRaster = true;
@@ -4497,7 +4497,7 @@ function CDrawingDocument(drawingObjects)
         if (null == this.LastDrawingUrl)
             return;
 
-        var _img = this.m_oWordControl.m_oApi.ImageLoader.map_image_index[_getFullImageSrc(this.LastDrawingUrl)];
+        var _img = this.m_oWordControl.m_oApi.ImageLoader.map_image_index[getFullImageSrc(this.LastDrawingUrl)];
         if (_img != undefined && _img.Image != null || _img.Status == ImageLoadStatus.Loading)
         {
             var _x = 0;

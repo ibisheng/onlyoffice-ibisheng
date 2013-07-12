@@ -87,6 +87,11 @@
 			this.overlayCtx = undefined;
 			this.stringRender = undefined;
 			this.drawingCtxCharts = undefined;
+			
+			// Global counters
+			g_oIdCounter = new CIdCounter();
+			g_oTableId = new CTableId();
+			g_oIdCounter.Set_UserId(this.Api.User.asc_getId());
 
 			// Максимальная ширина числа из 0,1,2...,9, померенная в нормальном шрифте(дефалтовый для книги) в px(целое)
 			// Ecma-376 Office Open XML Part 1, пункт 18.3.1.13
@@ -158,7 +163,6 @@
 					"reinitializeScroll":		function () {self._onScrollReinitialize.apply(self, arguments);},
 					"scrollY":					function () {self._onScrollY.apply(self, arguments);},
 					"scrollX":					function () {self._onScrollX.apply(self, arguments);},
-					"setShiftKey":				function () {self._onSetShiftKey.apply(self, arguments);},
 					"changeSelection":			function () {self._onChangeSelection.apply(self, arguments);},
 					"changeSelectionDone":		function () {self._onChangeSelectionDone.apply(self, arguments);},
 					"changeSelectionRightClick":function () {self._onChangeSelectionRightClick.apply(self, arguments);},
@@ -425,11 +429,6 @@
 					if (d.deltaX) {this.controller.scrollHorizontal(d.deltaX);}
 					if (d.deltaY) {this.controller.scrollVertical(d.deltaY);}
 				}
-			},
-
-			_onSetShiftKey: function (bShiftKey) {
-				var ws = this.getWorksheet();
-				ws.objectRender.setShiftKey(bShiftKey);
 			},
 
 			_onChangeSelection: function (isStartPoint, dc, dr, isCoord, isSelectMode, callback) {

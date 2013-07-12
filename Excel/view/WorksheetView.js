@@ -458,7 +458,12 @@
 			//------------------------
 			
 			this.collaborativeEditing = collaborativeEditing;
+			
+			//auto filters
+			this.autoFilters = new asc_AF();
 
+			this._init();
+			
 			/**
 			 * pictures, charts render
 			 * @type DrawingObjects
@@ -472,11 +477,6 @@
 				this.objectRender = this.settings.objectRender;
 			
 			this.cellCommentator = new asc_CCellCommentator(this);
-			
-			//auto filters
-			this.autoFilters = new asc_AF();
-
-			this._init();
 
 			return this;
 		}
@@ -1274,7 +1274,7 @@
 			_calcColumnWidths: function (fullRecalc) {
 				var x = this.cellsLeft;
 				var visibleW = this.drawingCtx.getWidth();
-				var obr = this.objectRender.getDrawingAreaMetrics() || {maxCol: 0, maxRow: 0};
+				var obr = this.objectRender ? this.objectRender.getDrawingAreaMetrics() : {maxCol: 0, maxRow: 0};
 				var l = Math.max(this.model.getColsCount(), this.nColsCount, obr.maxCol);
 				var i = 0, w, column, isBestFit, hiddenW = 0;
 
@@ -1317,7 +1317,7 @@
 			_calcRowHeights: function (fullRecalc) {
 				var y = this.cellsTop;
 				var visibleH = this.drawingCtx.getHeight();
-				var obr = this.objectRender.getDrawingAreaMetrics() || {maxCol: 0, maxRow: 0};
+				var obr = this.objectRender ? this.objectRender.getDrawingAreaMetrics() : {maxCol: 0, maxRow: 0};
 				var l = Math.max(this.model.getRowsCount() , this.nRowsCount, obr.maxRow);
 				var defaultH = this.model.getDefaultHeight() || this.defaultRowHeight;
 				var i = 0, h, isCustomHeight, row, hiddenH = 0;
@@ -4682,7 +4682,7 @@
 				}
 
 				function findEOT() {
-					var obr = t.objectRender.getDrawingAreaMetrics() || {maxCol: 0, maxRow: 0};
+					var obr = t.objectRender ? t.objectRender.getDrawingAreaMetrics() : {maxCol: 0, maxRow: 0};
 					var maxCols = t.model.getColsCount();
 					var maxRows = t.model.getRowsCount();
 					var lastC = -1, lastR = -1;
@@ -8366,7 +8366,7 @@
 				var t = this;
 				var arn;
 				var bIsMaxCols = false;
-				var obr = this.objectRender.getDrawingAreaMetrics() || {maxCol: 0, maxRow: 0};
+				var obr = this.objectRender ? this.objectRender.getDrawingAreaMetrics() : {maxCol: 0, maxRow: 0};
 				var maxc = Math.max(this.model.getColsCount(), this.cols.length, obr.maxCol);
 				if (newColsCount) {
 					maxc = Math.max(maxc, newColsCount);
@@ -8405,7 +8405,7 @@
 				var t = this;
 				var arn;
 				var bIsMaxRows = false;
-				var obr = this.objectRender.getDrawingAreaMetrics() || {maxCol: 0, maxRow: 0};
+				var obr = this.objectRender ? this.objectRender.getDrawingAreaMetrics() : {maxCol: 0, maxRow: 0};
 				var maxr = Math.max(this.model.getRowsCount() , this.rows.length, obr.maxRow);
 				if (newRowsCount) {
 					maxr = Math.max(maxr, newRowsCount);

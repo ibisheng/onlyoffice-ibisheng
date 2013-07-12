@@ -1129,7 +1129,7 @@ CBlipFill.prototype =
         Writer.WriteBool(flag);
         if(flag)
         {
-            var string_to_write =  _getFullImageSrc(this.RasterImageId);
+            var string_to_write =  getFullImageSrc(this.RasterImageId);
             if(string_to_write.indexOf(documentOrigin) !== 0
                 && string_to_write.indexOf("http:") !== 0
                 && string_to_write.indexOf("https:") !== 0
