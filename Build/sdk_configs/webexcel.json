@@ -75,7 +75,7 @@
                 "../Excel/model/DrawingObjects/Format/Format.js",
                 "../Word/Editor/GraphicObjects/ObjectTypes/CreateGeometry.js",
                 "../Excel/model/DrawingObjects/Format/Geometry.js",
-                "../Word/Editor/GraphicObjects/ObjectTypes/Path.js",
+                "../Excel/model/DrawingObjects/Format/Path.js",
                 "../Word/Editor/GraphicObjects/Math.js",
                 "../Word/Drawing/ShapeDrawer.js",
                 "../Word/Drawing/ArcTo.js",
