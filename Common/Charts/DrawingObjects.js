@@ -2075,7 +2075,7 @@ function DrawingObjects() {
 	var documentId = null;
 	var lastObjectIndex = null;
 	
-	//var imageLoader = new ImageLoader();	
+	var imageLoader = new ImageLoader();	
 	
 	_this.drawingDocument = null;
 	_this.asyncImageLoadedEvent = null;
@@ -2475,14 +2475,14 @@ function DrawingObjects() {
 				_this.clearDrawingObjects();
 			}
 				
-			/*if ( !imageLoader.isReady() ) {
+			if ( !imageLoader.isReady() ) {
 				//console.log("imageLoader - False");
 				imageLoader.setReadyCallback(_this.showDrawingObjects);
 			}
 			else {
 				//console.log("imageLoader - Ok");
 				imageLoader.removeReadyCallback();
-			}*/
+			}
 
 			for (var i = 0; i < _this.countDrawingObjects(); i++) {
 
@@ -2540,8 +2540,8 @@ function DrawingObjects() {
 						if ( !chartBase64 )
 							continue;
 							
-						//imageLoader.addImage(chartBase64);
-						//imageLoader.setReadyCallback(_this.showDrawingObjects);
+						imageLoader.addImage(chartBase64);
+						imageLoader.setReadyCallback(_this.showDrawingObjects);
 
 						obj.image.onload = function() {
 							obj.flags.currentCursor = null;
@@ -3459,7 +3459,7 @@ function DrawingObjects() {
 		if ( !chartBase64 )
 			return false;
 			
-		//imageLoader.addImage(chartBase64);
+		imageLoader.addImage(chartBase64);
 
 		// draw
 		var obj = _this.createDrawingObject();
