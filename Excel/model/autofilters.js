@@ -1536,6 +1536,7 @@
 							result[n] = 
 							{
 								name: i,
+								displayName: i,
 								type: 'custom',
 								image: this._drawSmallIconTable(canvas,customStyles[i])
 							};
@@ -1553,6 +1554,7 @@
 							result[n] = 
 							{
 								name: i,
+								displayName: i,
 								type: 'default',
 								image: this._drawSmallIconTable(canvas,defaultStyles[i])
 							};
@@ -3528,6 +3530,9 @@
 					var isBlank  = filter.Filters.Blank;
 					for(var m = startCell.r1 + 1; m <= endCell.r1; m++)
 					{
+						if(!filter.ShowButton)
+						{
+						}
 						var val = ws.model.getCell( new CellAddress(m, startCell.c1, 0)).getCells()[0].getValue();
 						var isVis = false;
 						for(var k = 0; k < customFilter.length;k++)
