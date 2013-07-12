@@ -464,7 +464,7 @@ CAutoshapeTrack.prototype =
 
         this.Graphics.SetIntegerGrid(false);
 
-        this.m_oContext.globalAlpha = 0.5;
+        //this.m_oContext.globalAlpha = 0.5;
     },
     SetIntegerGrid : function(b)
     {
