@@ -1022,7 +1022,7 @@ ReadBorders:Eca
 Ol:r5
 zp0:Od
 zp1:fe
-zp2:Pd
+zp2:Qd
 get_Shd:NPa
 WriteBg:MGa
 asc_getName:Eea
@@ -3559,7 +3559,7 @@ OnStart_CheckLock:rCa
 put_PageNum:LTa
 xMax_Extent:qXa
 Measure:rg
-Get_StartPage_Absolute:Qd
+Get_StartPage_Absolute:Pd
 ReadGeomPathLst:lDa
 sid_to_string:Cwa
 Can_AddNumbering:dr
@@ -4262,7 +4262,7 @@ handleRotate:Mi
 get_texture_id:Nga
 maxMemType1:BRa
 CheckTableRules2:qza
-selectionArray:Ya
+selectionArray:Xa
 t1_cmap_classes:Vxa
 Get_CompiledPr:lg
 _create_SPH_TweakRule:gc
@@ -6420,7 +6420,7 @@ WriteImageBySrc:apa
 numNameRecords:sO
 bitmap_top:aK
 ps_get_font_extra:g7a
-PageNum:Xa
+PageNum:Ya
 ctPenMiterLimit:x2a
 asc_setLabelFont:q7
 font_matrix:np
