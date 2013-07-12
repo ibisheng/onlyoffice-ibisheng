@@ -1280,7 +1280,7 @@ var g_oLcidIdToNameMap = new Object();
         }
     }
 
-    window["CDetectFontUse"] = CDetectFontUse;
+    window.CDetectFontUse = CDetectFontUse;
 })(window.document);
 
 var g_font_detector = new window.CDetectFontUse();
