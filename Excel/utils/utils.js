@@ -797,6 +797,8 @@
 			constructor: asc_CStylesPainter,
 			asc_getStyleThumbnailWidth: function () { return this.styleThumbnailWidth; },
 			asc_getStyleThumbnailHeight: function () { return this.styleThumbnailHeight; },
+			asc_getDefaultStyles: function () { return this.defaultStyles; },
+			asc_getDocStyles: function () { return this.docStyles; },
 			asc_getDefaultStylesImage: function () { return this.defaultStylesImage; },
 			asc_getDocStylesImage: function () { return this.docStylesImage; },
 			generateStylesAll: function (cellStylesAll, fmgrGraphics, stringRenderer) {
@@ -1017,6 +1019,8 @@
 		prot = asc_CStylesPainter.prototype;
 		prot["asc_getStyleThumbnailWidth"] = prot.asc_getStyleThumbnailWidth;
 		prot["asc_getStyleThumbnailHeight"] = prot.asc_getStyleThumbnailHeight;
+		prot["asc_getDefaultStyles"] = prot.asc_getDefaultStyles;
+		prot["asc_getDocStyles"] = prot.asc_getDocStyles;
 		prot["asc_getDefaultStylesImage"] = prot.asc_getDefaultStylesImage;
 		prot["asc_getDocStylesImage"] = prot.asc_getDocStylesImage;
 
