@@ -67,7 +67,7 @@ b:U
 a:Bi
 l:Rc
 maxCompositeContours:Q8
-h:xc
+h:uc
 i:cya
 w:ob
 TurnOff_RecalcEvent:o4
@@ -179,7 +179,7 @@ load_sfnt_header:wya
 ID_KEYBOARD_AREA:OP
 get_cmap_info:Ps
 extra_points:bu
-CurRow:bm
+CurRow:cm
 m_bIsNeedUpdateMatrix12:ru
 TableStyleRowBandSize:cl
 WriteTableCellBorderLineStyle:Xp
@@ -575,7 +575,7 @@ DrawEmptyTableLine:Ym
 Internal_ReIndexing:uo
 glyph_width:hu
 oldTransform:$v
-WidthVisible:wc
+WidthVisible:xc
 Splitter1PosMax:T3
 TurnOffHistory:ZQ
 attrRtl:H5
@@ -717,7 +717,7 @@ put_ShowTableEmptyLine:Epa
 evt_mousewheel:S6
 shadeToTitle:tU
 extrusionOk:T6
-Set_ParagraphSpacing:Pl
+Set_ParagraphSpacing:Ql
 checkBodySize:pja
 font_files:IM
 onBodyMouseDown:hoa
@@ -1092,7 +1092,7 @@ PrepareTransition:rea
 qFormat:xq
 kd1:Ac
 kd2:zc
-tag:Zl
+tag:$l
 Height_new:Wta
 base_root:U5
 calculateXfrm:yv
@@ -1233,7 +1233,7 @@ linearHoriAdvance:ou
 InitEditor:e2
 curRect:Lr
 showMasterPhAnim:RJ
-GetUShort:uc
+GetUShort:wc
 SetUpMatrix:jga
 User:rv
 Bullet:Zg
@@ -1314,7 +1314,7 @@ OnMouseUpExternal:cea
 get_CellBorders:Hka
 DocumentReaderMode:AK
 get_background:s7
-SlideIndexes:Rl
+SlideIndexes:Sl
 WritePathLst:wha
 to_bytes:lsa
 afm_data:nE
@@ -1357,7 +1357,7 @@ ySuperscriptXSize:Osa
 OVERLAP_COMPOUND:Bua
 prepareToChangeTheme2:ay
 symmetrical_smoothing:y$
-m_aPairs:Wl
+m_aPairs:Xl
 TableMarginRight:QA
 kern_avail_bits:uZ
 Read_Class_FromBinary:rW
@@ -1594,7 +1594,7 @@ Y2:Wt
 Compare:ti
 BandHor:qy
 m_sString:J8
-Y0:Ul
+Y0:Vl
 lvl4pPr:z8
 Recalc_Margins:v3
 TypeFamily:Pga
@@ -1902,7 +1902,7 @@ Index:V
 WriteViewProps:Pha
 RasterMemory:Hy
 Reserved4:xW
-RecalculateSize:Ol
+RecalculateSize:Pl
 TypeFace:Oga
 free_charmap_stub:vxa
 hR:Qs
@@ -2192,7 +2192,7 @@ HeadersAndFooters_DifferentFirstPage:dda
 initEvents2MobileAdvances:II
 compatibility_mode:yB
 Selection:e
-AddControl:$l
+AddControl:am
 sync_DownloadAsCallBack:Rra
 put_Position:xO
 rPr:kd
@@ -2244,7 +2244,7 @@ cachedImage:bq
 onSaveChanges:YF
 done_face:OR
 BorderInfo:Hf
-slide:Yl
+slide:Zl
 asc_CUser:rX
 OutlineLvl:Iw
 Thumbnails:Dh
@@ -2260,7 +2260,7 @@ hints_globals:lz
 Internal_Load_Data2:yD
 num_family_other_blues:cO
 xMax:Nf
-UserId:Tl
+UserId:Ul
 Set_Data:mga
 RecalculateContent2:AQ
 RealX:He
@@ -2344,7 +2344,7 @@ remRow:Hqa
 Check_MergeData:ota
 func_freeProj:Cxa
 TableGridCalculated:vva
-Overlay:em
+Overlay:Ol
 ReadGeometry:Oea
 put_Ind:Yoa
 get_HighLight:bla
@@ -2394,7 +2394,7 @@ FirstCol:rt
 put_TableBackground:Ppa
 EndCheckTableDraw:I1
 last_ey:iF
-SlideDrawer:Ql
+SlideDrawer:Rl
 _user:gX
 advance_v:jX
 GetBool:xb
@@ -2586,7 +2586,7 @@ LoadScriptAsync:mua
 sync_MouseMoveCallback:Ura
 SymbolsWSCount:JL
 FontMap:st
-TT_CONFIG_OPTION_SUBPIXEL_HINTING:Sl
+TT_CONFIG_OPTION_SUBPIXEL_HINTING:Tl
 TableWholeTable:xg
 put_Id:Xoa
 Load_Changes:Fw
@@ -2648,7 +2648,7 @@ ImageSrc:Yta
 LineCap:RV
 calculateText3:WH
 notesStyle:cza
-GuiCanvasFillTextureCtx:cm
+GuiCanvasFillTextureCtx:dm
 avar_segment:gM
 CheckUnShowOverlay:lta
 String:pva
@@ -3216,7 +3216,7 @@ ClearCacheNoAttack:Fba
 isBullet:fya
 min_y:hf
 is_composite:sZ
-m_dScrollY:Xl
+m_dScrollY:Yl
 Check_HistoryUninon:nP
 m_dScrollX:WI
 _offset_contours:fB
@@ -4052,7 +4052,7 @@ glyf_offset:AI
 onTimerScroll:D9
 cnxLstInfo:BE
 SetStreamIndexEmb:dga
-BreakType:am
+BreakType:bm
 oldFontSize:o_
 Margin:uua
 CreateBackgroundVerRuler:uy
@@ -4693,7 +4693,7 @@ Table_AddRow:RQ
 EndTrackAutoShape:pl
 OnUpdateOverlay:If
 TransitionSlide:n4
-GuiCanvasFillTextureCtxSlide:dm
+GuiCanvasFillTextureCtxSlide:em
 WriteStyleRef:cB
 isKeepLinesTogether:Kma
 ReadSlideMaster:Zea
@@ -4724,7 +4724,7 @@ DocumentName:E1
 eventListeners:Ms
 sync_PageBreakCallback:Vra
 Set_ImageProps:rH
-compensations:Vl
+compensations:Wl
 divPH:$ja
 GetNext:Rca
 getStroke:pS
