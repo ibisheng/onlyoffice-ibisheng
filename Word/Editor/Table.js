@@ -7466,7 +7466,7 @@ CTable.prototype =
 
     Selection_Check : function(X, Y, Page_Abs)
     {
-        var PageIndex = Page_Abs - this.PageNum;
+        var PageIndex = Page_Abs - this.Get_StartPage_Absolute();
 
         if ( PageIndex < 0 || PageIndex >= this.Pages.length )
             return false;
