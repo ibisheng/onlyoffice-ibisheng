@@ -3023,6 +3023,10 @@ function DrawingObjects() {
 	
 	DrawingBase.prototype = {
 
+		getObjectType: function() {
+			return CLASS_TYPE_DRAWING_BASE;
+		},
+	
 		getType: function() {
 			return UndoRedoDataTypes.DrawingObjectData;
 		},
