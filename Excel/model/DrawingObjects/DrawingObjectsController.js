@@ -180,7 +180,7 @@ DrawingObjectsController.prototype =
         group.setChildOffsets(0, 0);
         for(i = 0; i < grouped_objects.length; ++i)
         {
-            this.drawingObjects.deleteDrawingObjectById(grouped_objects[i].drawingBase.id);
+            this.drawingObjects.deleteDrawingBase(grouped_objects[i].Id);
             grouped_objects[i].setDrawingBase(null);
             grouped_objects[i].setPosition(grouped_objects[i].x - min_x, grouped_objects[i].y - min_y);
             grouped_objects[i].setGroup(group);
