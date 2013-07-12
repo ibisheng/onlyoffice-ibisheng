@@ -2849,10 +2849,10 @@ function CDemonstrationManager(htmlpage)
 
     this.OnPaintSlide = function(is_clear_overlay)
     {
-        if (is_clear_overlay)
+        if (is_clear_overlay && oThis.Overlay)
         {
             var _ctx2 = oThis.Overlay.getContext('2d');
-            _ctx2.clearRect(oThis.Transition.Rect.x, oThis.Transition.Rect.y, oThis.Transition.Rect.w, oThis.Transition.Rect.r);
+            _ctx2.clearRect(oThis.Transition.Rect.x, oThis.Transition.Rect.y, oThis.Transition.Rect.w, oThis.Transition.Rect.h);
         }
 
         oThis.Transition.CalculateRectDemonstration();
