@@ -332,8 +332,22 @@ var UndoRedoDataTypes = new function() {
 	this.ChartLegend = 41;
 	this.ChartFont = 42;
 	this.SheetViewSettings = 43;
-	
-	this.Create = function(nType)
+    this.GlobalTableIdAdd = 44;
+    this.GraphicObjects = 45;
+    this.GOPairProps = 46;
+    this.GOSingleProp = 47;
+    this.GOShapeRecalcTransform = 48;
+    this.GOAddAdjustment = 49;
+    this.GOAddGuide = 50;
+    this.GOAddCnx = 51;
+    this.GOHandleXY = 52;
+    this.GOHandlePolar = 53;
+    this.GOAddPathCommand = 54;
+    this.GOAddObject = 55;
+    this.GOAddGeometryRect = 56;
+
+
+    this.Create = function(nType)
 	{
 		switch(nType)
 		{
@@ -381,7 +395,20 @@ var UndoRedoDataTypes = new function() {
 			case this.ChartLegend: return new asc_CChartLegend(); break;
 			case this.ChartFont: return new asc_CChartFont(); break;
 			case this.SheetViewSettings: return new Asc.asc_CSheetViewSettings(); break;
-		}
+            case this.GraphicObjects: return new UndoRedoDataGraphicObjects();break;
+            case this.GOPairProps: return new UndoRedoDataGOPairProps(); break;
+            case this.GOSingleProp: return new UndoRedoDataGOSingleProp(); break;
+            case this.GOShapeRecalcTransform: return new UndoRedoDataShapeRecalc(); break;
+            case this.GOAddAdjustment: return new UndoRedoDataAddAdjustment(); break;
+            case this.GOAddGuide: return new UndoRedoDataAddGuide(); break;
+            case this.GOAddCnx: return new UndoRedoDataAddGuide(); break;
+            case this.GOHandleXY: return new UndoRedoDataAddHandleXY(); break;
+            case this.GOHandlePolar: return new UndoRedoDataAddHandlePolar(); break;
+            case this.GOAddPathCommand: return new UndoRedoDataAddPathCommand(); break;
+            case this.GOAddObject: return new UndoRedoDataAddObject(); break;
+            case this.GOAddGeometryRect: return new UndoRedoDataAddGeometryRect(); break;
+
+        }
 		return null;
 	};
 };
@@ -909,7 +936,65 @@ UndoRedoData_SortData.prototype = {
 	}
 };
 
-function UndoRedoData_SheetAdd(insertBefore, name, sheetidfrom, sheetid){
+
+function UndoRedoData_GTableIdAdd(object, id)
+{
+    this.Properties =
+    {
+        objectType: 0,
+        id: 1
+    };
+
+    this.objectType = object.getObjectType();
+    this.id = id;
+}
+UndoRedoData_GTableIdAdd.prototype =
+{
+    getType: function()
+    {
+        return UndoRedoDataTypes.GlobalTableIdAdd;
+    },
+
+    getProperties: function()
+    {
+        return this.Properties;
+    },
+
+    getProperty: function(nType)
+    {
+        switch(nType)
+        {
+            case this.Properties.objectType:
+            {
+                return this.objectType;
+            }
+            case this.Properties.id:
+            {
+                return this.id;
+            }
+        }
+    },
+
+    setProperty: function(nType, value)
+    {
+        switch (nType)
+        {
+            case this.Properties.objectType:
+            {
+                this.objectType = value;
+                break;
+            }
+            case this.Properties.id:
+            {
+                this.id = value;
+                break;
+            }
+        }
+    }
+};
+
+
+    function UndoRedoData_SheetAdd(insertBefore, name, sheetidfrom, sheetid){
 	this.Properties = {
 		name: 0,
 		sheetidfrom: 1,
@@ -1147,12 +1232,656 @@ var UndoRedoClassTypes = new function(){
 	};
 };
 
+
+
+function UndoRedoDataGraphicObjects(objectId, drawingData)
+{
+    this.Properties =
+    {
+        objectId: 0,
+        drawingData: 1
+    };
+
+    this.objectId = objectId;
+    this.drawingData = drawingData;
+}
+
+UndoRedoDataGraphicObjects.prototype = {
+    getType : function ()
+    {
+        return UndoRedoDataTypes.GraphicObjects;
+    },
+    getProperties : function ()
+    {
+        return this.Properties;
+    },
+    getProperty : function (nType)
+    {
+        switch (nType)
+        {
+            case this.Properties.objectId:
+                return this.objectId;
+            case this.Properties.drawingData:
+                return this.drawingData;
+        }
+        return null;
+    },
+    setProperty : function (nType, value)
+    {
+        switch (nType)
+        {
+            case this.Properties.objectId: this.objectId = value;break;
+            case this.Properties.drawingData: this.drawingData = value;break;
+        }
+    }
+};
+
+function UndoRedoDataGOPairProps(oldValue1, oldValue2, newValue1, newValue2)
+{
+    this.Properties =
+    {
+        oldValue1: 0,
+        oldValue2: 1,
+
+        newValue1: 2,
+        newValue2: 3
+    };
+
+    this.oldValue1 = oldValue1;
+    this.oldValue2 = oldValue2;
+
+    this.newValue1 = newValue1;
+    this.newValue2 = newValue2;
+}
+
+UndoRedoDataGOPairProps.prototype = {
+    getType : function ()
+    {
+        return UndoRedoDataTypes.GOPairProps;
+    },
+    getProperties : function ()
+    {
+        return this.Properties;
+    },
+    getProperty : function (nType)
+    {
+        switch (nType)
+        {
+            case this.Properties.oldValue1:
+                return this.oldValue1;
+            case this.Properties.oldValue2:
+                return this.oldValue2;
+            case this.Properties.newValue1:
+                return this.newValue1;
+            case this.Properties.newValue2:
+                return this.newValue2;
+        }
+        return null;
+    },
+    setProperty : function (nType, value)
+    {
+        switch (nType)
+        {
+            case this.Properties.oldValue1: this.oldValue1 = value; break;
+            case this.Properties.oldValue2: this.oldValue2 = value; break;
+            case this.Properties.newValue1: this.newValue1 = value; break;
+            case this.Properties.newValue2: this.newValue2 = value; break;
+        }
+    }
+};
+
+
+function UndoRedoDataGOSingleProp(oldValue, newValue)
+{
+    this.Properties =
+    {
+        oldValue: 0,
+        newValue: 1
+    };
+
+    this.oldValue = oldValue;
+    this.newValue = newValue;
+
+}
+
+UndoRedoDataGOPairProps.prototype = {
+    getType : function ()
+    {
+        return UndoRedoDataTypes.GOSingleProp;
+    },
+    getProperties : function ()
+    {
+        return this.Properties;
+    },
+    getProperty : function (nType)
+    {
+        switch (nType)
+        {
+            case this.Properties.oldValue:
+                return this.oldValue;
+            case this.Properties.newValue:
+                return this.newValue;
+        }
+        return null;
+    },
+    setProperty : function (nType, value)
+    {
+        switch (nType)
+        {
+            case this.Properties.oldValue: this.oldValue = value; break;
+            case this.Properties.newValue: this.newValue = value; break;
+        }
+    }
+};
+
+
+function UndoRedoDataShapeRecalc()
+{
+    this.Properties =
+    {
+    };
+
+
+}
+
+UndoRedoDataShapeRecalc.prototype = {
+    getType : function ()
+    {
+        return UndoRedoDataTypes.GOShapeRecalcTransform;
+    },
+    getProperties : function ()
+    {
+        return this.Properties;
+    },
+    getProperty : function (nType)
+    {
+        return null;
+    },
+    setProperty : function (nType, value)
+    {
+    }
+};
+
+function UndoRedoDataAddAdjustment(name, val)
+{
+    this.Properties =
+    {
+        name: 0,
+        val : 1
+    };
+
+    this.name = name;
+    this.val = val;
+}
+
+UndoRedoDataAddAdjustment.prototype =
+{
+    getType : function ()
+    {
+        return UndoRedoDataTypes.GOAddAdjustment;
+    },
+    getProperties : function ()
+    {
+        return this.Properties;
+    },
+    getProperty : function (nType)
+    {
+        switch (nType)
+        {
+            case this.Properties.name: return this.name;
+            case this.Properties.val: return this.val;
+        }
+        return null;
+    },
+    setProperty : function (nType, value)
+    {
+        switch (nType)
+        {
+            case this.Properties.name: this.name = value; break;
+            case this.Properties.val:  this.val = value; break;
+        }
+    }
+};
+
+
+
+function UndoRedoDataAddGuide(name, formula, x, y, z)
+{
+    this.Properties =
+    {
+        name: 0,
+        formula : 1,
+        x: 2,
+        y: 3,
+        z: 4
+    };
+
+    this.name = name;
+    this.formula = formula;
+    this.x = x;
+    this.y = y;
+    this.z = z;
+}
+
+UndoRedoDataAddGuide.prototype =
+{
+    getType : function ()
+    {
+        return UndoRedoDataTypes.GOAddGuide;
+    },
+    getProperties : function ()
+    {
+        return this.Properties;
+    },
+    getProperty : function (nType)
+    {
+        switch (nType)
+        {
+            case this.Properties.name: return this.name;
+            case this.Properties.formula: return this.formula;
+            case this.Properties.x: return this.x;
+            case this.Properties.y: return this.y;
+            case this.Properties.z: return this.z;
+        }
+        return null;
+    },
+    setProperty : function (nType, value)
+    {
+        switch (nType)
+        {
+            case this.Properties.name: this.name = value; break;
+            case this.Properties.formula: this.formula = value; break;
+            case this.Properties.x: this.x = value; break;
+            case this.Properties.y: this.y = value; break;
+            case this.Properties.z: this.z = value; break;
+        }
+    }
+};
+
+
+function UndoRedoDataAddCnx(ang, x, y)
+{
+    this.Properties =
+    {
+        ang: 0,
+        x : 1,
+        y: 2
+    };
+
+    this.ang = ang;
+    this.x = x;
+    this.y = y;
+}
+
+UndoRedoDataAddCnx.prototype =
+{
+    getType : function ()
+    {
+        return UndoRedoDataTypes.GOAddCnx;
+    },
+    getProperties : function ()
+    {
+        return this.Properties;
+    },
+    getProperty : function (nType)
+    {
+        switch (nType)
+        {
+            case this.Properties.ang: return this.ang;
+            case this.Properties.x: return this.x;
+            case this.Properties.y: return this.y;
+        }
+        return null;
+    },
+    setProperty : function (nType, value)
+    {
+        switch (nType)
+        {
+            case this.Properties.ang: this.ang = value; break;
+            case this.Properties.x: this.x = value; break;
+            case this.Properties.y: this.y = value; break;
+        }
+    }
+};
+
+function UndoRedoDataAddHandleXY(gdRefX, minX, maxX, gdRefY, minY, maxY, posX, posY)
+{
+    this.Properties =
+    {
+        gdRefX: 0,
+        minX : 1,
+        maxX: 2,
+
+        gdRefY: 3,
+        minY: 4,
+        maxY: 5,
+        posX: 6,
+        posY: 7
+    };
+
+    this.gdRefX = gdRefX;
+    this.maxX = maxX;
+    this.minX = minX;
+
+
+    this.gdRefY = gdRefY;
+    this.maxY = maxY;
+    this.minY = minY;
+    this.posX = posX;
+    this.posY = posY;
+}
+
+UndoRedoDataAddHandleXY.prototype =
+{
+    getType : function ()
+    {
+        return UndoRedoDataTypes.GOHandleXY;
+    },
+    getProperties : function ()
+    {
+        return this.Properties;
+    },
+    getProperty : function (nType)
+    {
+        switch (nType)
+        {
+            case this.Properties.gdRefX: return this.gdRefX;
+            case this.Properties.minX: return this.minX;
+            case this.Properties.maxX: return this.maxX;
+            case this.Properties.gdRefY: return this.gdRefY;
+            case this.Properties.minY: return this.minY;
+            case this.Properties.maxY: return this.maxY;
+            case this.Properties.posX: return this.posX;
+            case this.Properties.posY: return this.posY;
+        }
+        return null;
+    },
+    setProperty : function (nType, value)
+    {
+        switch (nType)
+        {
+            case this.Properties.gdRefX: this.gdRefX = value; break;
+            case this.Properties.minX: this.minX = value; break;
+            case this.Properties.maxX: this.maxX = value; break;
+            case this.Properties.gdRefY: this.gdRefY = value; break;
+            case this.Properties.minY: this.minY = value; break;
+            case this.Properties.maxY: this.maxY = value; break;
+            case this.Properties.posX: this.posX = value; break;
+            case this.Properties.posY: this.posY = value; break;
+        }
+    }
+};
+
+
+function UndoRedoDataAddHandlePolar(gdRefR, minR, maxR, gdRefAng, minAng, maxAng, posX, posY)
+{
+    this.Properties =
+    {
+        gdRefR: 0,
+        minR : 1,
+        maxR: 2,
+
+        gdRefAng: 3,
+        minAng: 4,
+        maxAng: 5,
+        posX: 6,
+        posY: 7
+    };
+
+    this.gdRefR = gdRefR;
+    this.maxR = maxR;
+    this.minR = minR;
+
+
+    this.gdRefAng = gdRefAng;
+    this.maxAng = maxAng;
+    this.minAng = minAng;
+    this.posX = posX;
+    this.posY = posY;
+}
+
+UndoRedoDataAddHandlePolar.prototype =
+{
+    getType : function ()
+    {
+        return UndoRedoDataTypes.GOHandlePolar;
+    },
+    getProperties : function ()
+    {
+        return this.Properties;
+    },
+    getProperty : function (nType)
+    {
+        switch (nType)
+        {
+            case this.Properties.gdRefR: return this.gdRefR;
+            case this.Properties.minR: return this.minR;
+            case this.Properties.maxR: return this.maxR;
+            case this.Properties.gdRefAng: return this.gdRefAng;
+            case this.Properties.minAng: return this.minAng;
+            case this.Properties.maxAng: return this.maxAng;
+            case this.Properties.posX: return this.posX;
+            case this.Properties.posY: return this.posY;
+        }
+        return null;
+    },
+    setProperty : function (nType, value)
+    {
+        switch (nType)
+        {
+            case this.Properties.gdRefR: this.gdRefR = value; break;
+            case this.Properties.minR: this.minR = value; break;
+            case this.Properties.maxR: this.maxR = value; break;
+            case this.Properties.gdRefAng: this.gdRefAng = value; break;
+            case this.Properties.minAng: this.minAng = value; break;
+            case this.Properties.maxAng: this.maxAng = value; break;
+            case this.Properties.posX: this.posX = value; break;
+            case this.Properties.posY: this.posY = value; break;
+        }
+    }
+};
+
+
+function UndoRedoDataAddPathCommand(command, x1, y1, x2, y2, x3, y3)
+{
+    this.Properties =
+    {
+        command: 0,
+        x1: 1,
+        y1: 2,
+        x2: 3,
+        y2: 4,
+        x3: 5,
+        y3: 6
+    };
+    this.command = command;
+    this.x1 = x1;
+    this.y1 = y1;
+    this.x2 = x2;
+    this.y2 = y2;
+    this.x3 = x3;
+    this.y3 = y3;
+}
+
+UndoRedoDataAddPathCommand.prototype =
+{
+    getType : function ()
+    {
+        return UndoRedoDataTypes.GOAddPathCommand;
+    },
+    getProperties : function ()
+    {
+        return this.Properties;
+    },
+    getProperty : function (nType)
+    {
+        switch (nType)
+        {
+            case this.Properties.command: return this.command;
+            case this.Properties.x1: return this.x1;
+            case this.Properties.y1: return this.y1;
+            case this.Properties.x2: return this.x2;
+            case this.Properties.y2: return this.y2;
+            case this.Properties.x3: return this.x3;
+            case this.Properties.y3: return this.y3;
+        }
+        return null;
+    },
+    setProperty : function (nType, value)
+    {
+        switch (nType)
+        {
+            case this.Properties.command: this.command = value; break;
+            case this.Properties.x1: this.x1 = value; break;
+            case this.Properties.y1: this.y1 = value; break;
+            case this.Properties.x2: this.x2 = value; break;
+            case this.Properties.y2: this.y2 = value; break;
+            case this.Properties.x3: this.x3 = value; break;
+            case this.Properties.y3: this.y3 = value; break;
+        }
+    }
+};
+
+
+function UndoRedoDataAddObject(objectId)
+{
+    this.Properties =
+    {
+        objectId: 0
+    };
+    this.objectId = objectId;
+}
+
+UndoRedoDataAddObject.prototype =
+{
+    getType : function ()
+    {
+        return UndoRedoDataTypes.GOAddObject;
+    },
+    getProperties : function ()
+    {
+        return this.Properties;
+    },
+    getProperty : function (nType)
+    {
+        switch (nType)
+        {
+            case this.Properties.objectId: return this.objectId;
+        }
+        return null;
+    },
+    setProperty : function (nType, value)
+    {
+        switch (nType)
+        {
+            case this.Properties.objectId: this.objectId = value; break;
+        }
+    }
+};
+
+function UndoRedoDataAddGeometryRect(l, t, r, b)
+{
+    this.Properties =
+    {
+        l: 0,
+        t: 1,
+        r: 2,
+        b: 3
+    };
+    this.l = l;
+    this.t = t;
+    this.r = r;
+    this.b = b;
+}
+
+UndoRedoDataAddObject.prototype =
+{
+    getType : function ()
+    {
+        return UndoRedoDataTypes.GOAddGeometryRect;
+    },
+    getProperties : function ()
+    {
+        return this.Properties;
+    },
+    getProperty : function (nType)
+    {
+        switch (nType)
+        {
+            case this.Properties.l: return this.l;
+            case this.Properties.t: return this.t;
+            case this.Properties.r: return this.r;
+            case this.Properties.b: return this.b;
+        }
+        return null;
+    },
+    setProperty : function (nType, value)
+    {
+        switch (nType)
+        {
+            case this.Properties.l: this.l = value; break;
+            case this.Properties.t: this.t = value; break;
+            case this.Properties.r: this.r = value; break;
+            case this.Properties.b: this.b = value; break;
+
+        }
+    }
+};
+
+
+
+var g_oUndoRedoGraphicObjects = null;
+function UndoRedoGraphicObjects(wb)
+{
+    this.wb = wb;
+    this.nType = UndoRedoClassTypes.Add(function(){return g_oUndoRedoGraphicObjects;});
+}
+
+
+UndoRedoGraphicObjects.prototype =
+{
+    getClassType : function()
+    {
+        return this.nType;
+    },
+    Undo : function(Type, Data, nSheetId)
+    {
+        this.UndoRedo(Type, Data, nSheetId, true);
+    },
+    Redo : function(Type, Data, nSheetId)
+    {
+        this.UndoRedo(Type, Data, nSheetId, false);
+    },
+    UndoRedo : function(Type, Data, nSheetId, bUndo)
+    {
+        var target_object = g_oTableId.Get_ById(Data.objectId);
+        if(isRealObject(target_object))
+        {
+            if(bUndo)
+            {
+                if(typeof target_object.Undo === "function")
+                {
+                    target_object.Undo(Type, Data.drawingData);
+                }
+            }
+            else
+            {
+                if(typeof target_object.Redo === "function")
+                {
+                    target_object.Redo(Type, Data.drawingData);
+                }
+            }
+        }
+    }
+};
+
 var g_oUndoRedoWorkbook = null;
 function UndoRedoWorkbook(wb)
 {
 	this.wb = wb;
 	this.nType = UndoRedoClassTypes.Add(function(){return g_oUndoRedoWorkbook;});
 }
+
 UndoRedoWorkbook.prototype = {
 	getClassType : function()
 	{
