@@ -1,6 +1,5 @@
-function CMathMatrix( numRow, numCol)
+function CMathMatrix(numRow, numCol)
 {
-    CMathBase.call(this, numRow, numCol);
     this.lineGapColumn = 1.5;
     this.lineGapRow = 1;
     this.gaps = null;
@@ -21,17 +20,19 @@ function CMathMatrix( numRow, numCol)
 
     this.baseJc = 0;
 
+    CMathBase.call(this, numRow, numCol);
 }
 extend(CMathMatrix, CMathBase);
-CMathMatrix.prototype.init = function(params)
-{
-    this.params = Common_CopyObj(params);
-}
 CMathMatrix.prototype.setContent = function()
 {
-    CMathMatrix.superclass.fillPlaceholders.call(this);
+    this.init(this.nRow, this.nCol);
+    this.fillPlaceholders();
 }
-
+CMathMatrix.prototype.setProperties = function(nRow, nCol)
+{
+    this.nRow = nRow;
+    this.nCol = nCol;
+}
 CMathMatrix.prototype.old_getLineGap = function(spaceLine)
 {
     var metrs = this.params.font.metrics;

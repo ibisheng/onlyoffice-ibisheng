@@ -1,34 +1,28 @@
 function CBarFraction()
 {
     this.bHide = false;
-    CMathBase.call(this,2,1);
-    //!!!
-    //this.gapLine = 0; // толщину линии не учитываем, рисуем в области числителя
+    CMathBase.call(this);
 }
 extend(CBarFraction, CMathBase);
-CBarFraction.prototype.setContent = function()
+CBarFraction.prototype.init = function()
 {
-    this.elements[0][0] = new CNumerator();
-    this.elements[0][0].init(this.params);
-    this.elements[0][0].relate(this);
-    this.elements[0][0].fillPlaceholders();
+    var num = new CNumerator();
+    num.init();
 
-    this.elements[1][0] = new CDenominator();
-    this.elements[1][0].init(this.params);
-    this.elements[1][0].relate(this);
-    this.elements[1][0].fillPlaceholders();
+    var den = new CDenominator();
+    den.init();
 
-
-    this.recalculateSize();
+    this.setDimension(2, 1);
+    this.addMCToContent(num, den);
 }
 CBarFraction.prototype.getCenter =  function()
 {
-    var penW = this.params.font.FontSize* 25.4/96 * 0.08 /2;
+    var penW = this.getTxtPrp_2().FontSize* 25.4/96 * 0.08 /2;
     return this.elements[0][0].size.height + penW;
 }
 CBarFraction.prototype.draw = function()
 {
-    var penW = this.params.font.FontSize* 25.4/96 * 0.08;
+    var penW = this.getTxtPrp_2().FontSize* this.reduct* 25.4/96 * 0.08;
 
     var x1 = this.pos.x,
         x2 = this.pos.x + this.size.width,
@@ -56,21 +50,33 @@ CBarFraction.prototype.hideBar = function(flag)
 {
     this.bHide = flag;
 }
+CBarFraction.prototype.setSimple = function(flag)
+{
+    if(flag)
+        this.setReduct(DEGR_REDUCT);
+    else
+        this.setReduct(1);
+}
 //////////
 
 function CNumerator()
 {
-    CMathBase.call(this, 1, 1);
+    CMathBase.call(this);
 }
 extend(CNumerator, CMathBase);
+CNumerator.prototype.init = function()
+{
+    this.setDimension(1, 1);
+    this.setContent();
+}
 CNumerator.prototype.recalculateSize = function()
 {
     var arg = this.elements[0][0].size;
-    var metrics = this.params.font.metrics;
+    var txtPrp = this.getTxtPrp_2();
 
-    var Descent = arg.height - arg.center - metrics.Placeholder.Height/ 2; // baseLine
-    var gap = metrics.Height - metrics.Placeholder.Height + metrics.Descender,
-        minGap = this.params.font.FontSize* 25.4/96 * 0.16;
+    var Descent = arg.height - arg.ascent; // baseLine
+    var gap = 7.832769097222222 * txtPrp.FontSize/36,
+        minGap = txtPrp.FontSize* 25.4/96 * 0.16;
 
     var delta = 0.65*gap - Descent;
 
@@ -152,21 +158,29 @@ CNumerator.prototype.getElement = function(txt)
 {
     return this.elements[0][0];
 }
+CNumerator.prototype.getTxtPrp = function()
+{
+    return this.Parent.getTxtPrp();
+}
 
 function CDenominator()
 {
-    this.coeffGap = 1;
-    CMathBase.call(this, 1, 1);
+    CMathBase.call(this);
 }
 extend(CDenominator, CMathBase);
+CDenominator.prototype.init = function()
+{
+    this.setDimension(1, 1);
+    this.setContent();
+}
 CDenominator.prototype.recalculateSize = function()
 {
     var arg = this.elements[0][0].size;
-    var metrics = this.params.font.metrics;
+    var txtPrp = this.getTxtPrp_2();
 
-    var gap = metrics.Height - metrics.Placeholder.Height + metrics.Descender,
-        Ascent = arg.center - metrics.Placeholder.Height/2,
-        minGap = this.params.font.FontSize* 25.4/96 * 0.24;
+    var gap = 7.832769097222222 * txtPrp.FontSize/36,
+        Ascent = arg.ascent,
+        minGap = txtPrp.FontSize* 25.4/96 * 0.24;
 
     var delta = 0.47*gap - Ascent;
     var GapDen = delta > minGap ? delta : minGap;
@@ -244,17 +258,13 @@ CDenominator.prototype.setPosition = function(pos)
 
     this.elements[0][0].setPosition({x: x, y: y});
 }
-CDenominator.prototype.setGapCoeff = function(coeff)
-{
-    if(coeff >= 0 && coeff <= 1)
-    {
-        this.coeffGap = coeff;
-        this.recalculateSize();
-    }
-}
 CDenominator.prototype.getElement = function(txt)
 {
     return this.elements[0][0];
+}
+CDenominator.prototype.getTxtPrp = function()
+{
+    return this.Parent.getTxtPrp();
 }
 
 
@@ -263,12 +273,13 @@ CDenominator.prototype.getElement = function(txt)
 function CSkewedFraction()
 {
     this.gapSlash = 0;
-    CMathBase.call(this,1,2);
+    CMathBase.call(this);
 }
 extend(CSkewedFraction, CMathBase);
-CSkewedFraction.prototype.setContent = function()
+CSkewedFraction.prototype.init = function()
 {
-    CSkewedFraction.superclass.fillPlaceholders.call(this);
+    this.setDimension(1, 2);
+    this.setContent();
 }
 CSkewedFraction.prototype.setPosition = function(pos)
 {
@@ -291,7 +302,7 @@ CSkewedFraction.prototype.setPosition = function(pos)
 };
 CSkewedFraction.prototype.recalculateSize = function()
 {
-    this.gapSlash = this.params.font.metrics.Height - this.params.font.metrics.Placeholder.Height;
+    this.gapSlash = 5.011235894097222 * this.getTxtPrp().FontSize/36;
     var _width = this.elements[0][0].size.width + this.gapSlash + this.elements[0][1].size.width;
     var _height = this.elements[0][0].size.height + this.elements[0][1].size.height;
     var _center = this.getCenter();
@@ -364,15 +375,17 @@ CSkewedFraction.prototype.findDisposition = function( mCoord )
 CSkewedFraction.prototype.draw = function()
 {
     CSkewedFraction.superclass.draw.call(this);
-    var penW = this.params.font.FontSize/12.5*g_dKoef_pix_to_mm;
+    var fontSize = this.getTxtPrp().FontSize;
+    var penW = fontSize/12.5*g_dKoef_pix_to_mm;
 
     //to do
     //переделать
     var gap = this.gapSlash/2 - penW/7.5;
+    var plh = 9.877777777777776 * fontSize / 36;
 
     var minHeight = 2*this.gapSlash,
-        middleHeight = this.params.font.metrics.Placeholder.Height*4/3,
-        maxHeight = (3*this.gapSlash + 5*this.params.font.metrics.Placeholder.Height)*2/3;
+        middleHeight = plh*4/3,
+        maxHeight = (3*this.gapSlash + 5*plh)*2/3;
 
 
     var tg1 = -2.22,
@@ -415,7 +428,7 @@ CSkewedFraction.prototype.draw = function()
         coeff = this.elements[0][0].size.height/this.size.height;
         shift = heightSlash*coeff;
 
-        var minVal = this.params.font.metrics.Placeholder.Height/2,
+        var minVal = plh/2,
             maxVal = heightSlash - minVal;
 
         if(shift < minVal)
@@ -462,24 +475,30 @@ CSkewedFraction.prototype.getDenominator = function()
 
 function CLinearFraction()
 {
-    CMathBase.call(this,1,2);
+    CMathBase.call(this);
 }
 extend(CLinearFraction, CMathBase);
-CLinearFraction.prototype.setContent = function()
+CLinearFraction.prototype.init = function()
 {
-    CLinearFraction.superclass.fillPlaceholders.call(this);
+    this.setDimension(1, 2);
+    this.setContent();
 }
 CLinearFraction.prototype.recalculateSize = function()
 {
     var H = this.elements[0][0].size.center + this.elements[0][1].size.height - this.elements[0][1].size.center;
-    var state = getStateHeight_2(H, this.params.font),
-        gap = this.params.font.metrics.Height - this.params.font.metrics.Placeholder.Height;
+    var txtPrp = this.getTxtPrp();
 
-    if(state == 0 || state == 1)
+    var gap = 5.011235894097222*txtPrp.FontSize/36;
+
+    var H3 = gap*4.942252165543792,
+        H4 = gap*7.913378248315688,
+        H5 = gap*9.884504331087584;
+
+    if( H < H3 )
         this.dW = gap;
-    else if(state == 2)
+    else if( H < H4 )
         this.dW = 2*gap;
-    else if(state == 3)
+    else if( H < H5 )
         this.dW = 2.8*gap;
     else
         this.dW = 3.4*gap;
@@ -502,10 +521,6 @@ CLinearFraction.prototype.recalculateSize = function()
 }
 CLinearFraction.prototype.draw = function()
 {
-    var gap = this.params.font.metrics.Height - this.params.font.metrics.Placeholder.Height;
-    var minHeight = 2*gap,
-        maxHeight = (3*gap + 5*this.params.font.metrics.Placeholder.Height)*2/3;
-
     var first = this.elements[0][0].size,
         sec = this.elements[0][1].size;
 
@@ -520,7 +535,7 @@ CLinearFraction.prototype.draw = function()
         x2 = this.pos.x + this.elements[0][0].size.width + shift,
         y2 = this.pos.y + this.size.center + desc;
 
-    var penW = this.params.font.FontSize/12.5*g_dKoef_pix_to_mm;
+    var penW = this.getTxtPrp().FontSize/12.5*g_dKoef_pix_to_mm;
 
     MathControl.pGraph.p_width(penW*1000);
 
@@ -542,21 +557,4 @@ CLinearFraction.prototype.getNumerator = function()
 CLinearFraction.prototype.getDenominator = function()
 {
     return this.elements[0][1];
-}
-
-/////////
-
-function CSimpleFraction()
-{
-    CBarFraction.call(this);
-}
-extend(CSimpleFraction, CBarFraction);
-CSimpleFraction.prototype.init = function(params)
-{
-    this.params = Common_CopyObj(params);
-    this.params.font = getTypeDegree(params.font);
-}
-CSimpleFraction.prototype.setContent = function()
-{
-    CSimpleFraction.superclass.setContent.call(this);
 }

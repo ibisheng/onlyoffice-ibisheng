@@ -225,10 +225,9 @@ function CControlComposition()
 }
 CControlComposition.prototype =
 {
-    AddComposition: function(coord)
+    AddComposition: function()
     {
-        this.coord = coord;
-        this.Content.push(new CMathComposition(default_font, coord));
+        this.Content.push(new CMathComposition());
         this.CurPos = this.Content.length - 1; //пока так, нужно переделать, чтобы добавлять в зависимости от расположения в документе формулы
     },
     OnKeyDown: function(e)
@@ -267,7 +266,11 @@ CControlComposition.prototype =
             try{
 
                 if(this.Content[this.CurPos].Remove())
+                {
+                    //this.UpdatePosition();
                     editor.WordControl.m_oLogicDocument.DrawingDocument.OnRecalculatePage(0, editor.WordControl.m_oLogicDocument.Pages[0]);
+
+                }
             }
             catch(e)
             {
@@ -359,7 +362,9 @@ CControlComposition.prototype =
     },
     AddMathComponent: function(indef)
     {
-        this.Content[this.CurPos].AddMathEquation(indef);
+        this.Content[this.CurPos].AddMathComponent(indef);
+        this.Content[this.CurPos].RecalculateReverse();
+        this.Content[this.CurPos].UpdatePosition();
         //this.Content[this.CurPos].AddMathComponent(indef);
     },
     Paragraph_Add: function(TextPr)
@@ -374,10 +379,17 @@ CControlComposition.prototype =
     DrawSelect2: function()
     {
         this.Content[0].DrawSelect2();
+    },
+    SetPosition: function(pos)
+    {
+        this.coord = pos;
+        this.Content[this.CurPos].SetPosition(pos);
     }
 }
 var MathControl = new CControlComposition();
-MathControl.AddComposition({x: 27.5 - 6, y: 25.3 });
+MathControl.AddComposition();
+MathControl.SetPosition({x: 27.5 - 6, y: 25.3 });
+
 var inherit = function(obj, extObj)
 {
     if(arguments.length > 2)

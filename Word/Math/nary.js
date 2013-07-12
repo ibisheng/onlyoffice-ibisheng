@@ -109,7 +109,8 @@ CBaseNaryOrder.prototype.setContent =  function()
 
     if(this.IterType == 1) //устанавливаем верхний индекс
     {
-        this.setPlaceholder({x: 0, y : 0}, params);
+        this.elements[0][0].fillPlaceholders();
+        this.elements[0][0].relate(this);
 
         this.elements[1][0] = arguments[0]; // n-арный оператор
         this.elements[1][0].setTopBottonGaps(true, false);
@@ -117,18 +118,23 @@ CBaseNaryOrder.prototype.setContent =  function()
     }
     else if(this.IterType == 2)  //устанавливаем нижний индекс
     {
-        this.setPlaceholder({x : 1, y: 0 }, params);
+
+        this.elements[1][0].fillPlaceholders();
+        this.elements[1][0].relate(this);
 
         this.elements[0][0] = arguments[0]; // n-арный оператор
         this.elements[0][0].setTopBottonGaps(false, true);
     }
     else if(this.IterType == 3)
     {
-        this.setPlaceholder({x: 0, y : 0}, params);
-        this.setPlaceholder({x : 2, y: 0 }, params);
+        this.elements[0][0].fillPlaceholders();
+        this.elements[0][0].relate(this);
 
         this.elements[1][0] = arguments[0]; // n-арный оператор
         this.elements[1][0].setTopBottonGaps(true, true);
+
+        this.elements[2][0].fillPlaceholders();
+        this.elements[2][0].relate(this);
     }
     else
     {

@@ -1,7 +1,4 @@
-var SizeOrdinary = 1;
-var SizeDenominator = 2;
-var SizeDefault = 3;
-var SizeDiacritic = 4;
+var DEGR_REDUCT = 0.728;
 
 
 var default_font = {FontFamily : {Name  : "Cambria Math", Index : -1 }, FontSize   : 36};

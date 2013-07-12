@@ -1,49 +1,24 @@
-function CDegree(type)
+function CDegreeOrdinary()
 {
-    var degr = null;
-    if(type == 0)
-        degr = new CDegreeOrdinary(1);
-    else if(type == 1)
-        degr = new CDegreeOrdinary(-1);
-    else if(type == 2)
-        degr = new CDegreeSubSup(0);
-    else if(type == 3)
-        degr = new CDegreeSubSup(1);
-
-    return degr;
-}
-
-function CDegreeOrdinary(index)
-{
-    this.index = index;
+    this.index = null;
     this.shiftDegree = null;
-    CMathBase.call(this, 1, 2);
+    CMathBase.call(this);
 }
 extend(CDegreeOrdinary, CMathBase);
-CDegreeOrdinary.prototype.SH_DEGR = 2/3;
-CDegreeOrdinary.prototype.old_setContent = function()
-{
-    var oBase = null;
-    if(arguments.length > 0)
-        oBase = arguments[0];
-    else
-    {
-        oBase = new CMathBase(1, 1);
-        oBase.init( this.params );
-        oBase.relate(this);
-        oBase.fillPlaceholders();
-    }
-
-    var oDegree = new CMathBase(1, 1);
-    oDegree.init( this.params );
-    oDegree.relate(this);
-    oDegree.fillPlaceholders();
-    oDegree.setFont(getTypeDegree(this.params.font), -1);
-
-    CDegreeOrdinary.superclass.setContent.call(this, oBase, oDegree);
-
-}
 CDegreeOrdinary.prototype.setContent = function()
+{
+    this.init(1, 2);
+
+    var oBase = new CMathContent();
+    oBase.fillPlaceholders();
+
+    var oDegree = new CMathContent();
+    oDegree.fillPlaceholders();
+    oDegree.setReduct(DEGR_REDUCT);
+
+    this.addMCToContent(1, 2, [oBase, oDegree]);
+}
+CDegreeOrdinary.prototype.old_setContent = function()
 {
     var oBase = null;
     if(arguments.length > 0)
@@ -63,7 +38,10 @@ CDegreeOrdinary.prototype.setContent = function()
     oDegree.setFont(getTypeDegree(this.params.font), -1);
 
     CDegreeOrdinary.superclass.setContent.call(this, oBase, oDegree);
-
+}
+CDegreeOrdinary.prototype.setIndex = function()
+{
+    this.index = index;
 }
 CDegreeOrdinary.prototype.recalculateSize = function()
 {
@@ -71,7 +49,7 @@ CDegreeOrdinary.prototype.recalculateSize = function()
     var Heights = [this.elements[0][0].size.height, this.elements[0][1].size.height];
     var _center;
 
-    var middle = ((Heights[0] > Heights[1]) ? Heights[1] : Heights[0])*this.SH_DEGR;
+    var middle = ((Heights[0] > Heights[1]) ? Heights[1] : Heights[0])* 2/3; /// 2/3 от высоты
     
     var _height = Heights[0] + Heights[1] - middle;
 
