@@ -17,7 +17,7 @@ if ( !window["Asc"] ) {		// Для вставки диаграмм в Word
 }
 
 function isObject(what) {
-	return ( what && (typeof(what) == "object") );
+	return ( (what != null) && (typeof(what) == "object") );
 }
 
 function convertFormula(formula, ws) {
@@ -2722,7 +2722,8 @@ function DrawingObjects() {
 			MoveX: 19,
 			MoveY: 20,
 			SizeCoeff: 21,
-			ChartData: 22
+			ChartData: 22,
+			GraphicObject: 23
 		};
 
 		_t.id = g_oIdCounter ? g_oIdCounter.Get_NewId() : null;
@@ -3018,7 +3019,7 @@ function DrawingObjects() {
 		}
 		
 		if ( g_oTableId )
-			g_oTableId.Add( _t, _t.Id );
+			g_oTableId.Add( _t, _t.id );
 	}
 	
 	DrawingBase.prototype = {
@@ -3066,6 +3067,7 @@ function DrawingObjects() {
 
 				case this.Properties.SizeCoeff: return this.size.coeff; break;
 				case this.Properties.ChartData: return this.chart; break;
+				case this.Properties.GraphicObject: return this.graphicObject; break;
 			}
 		},
 
@@ -3100,6 +3102,7 @@ function DrawingObjects() {
 
 				case this.Properties.SizeCoeff: this.size.coeff = value; break;
 				case this.Properties.ChartData: this.chart = value; break;
+				case this.Properties.GraphicObject: this.graphicObject = value; break;
 			}
 		}
 	}
@@ -3221,6 +3224,7 @@ function DrawingObjects() {
 		copyObject.size.coeff = obj.size.coeff;
 		
 		copyObject.chart = new asc_CChart(obj.chart);
+		copyObject.graphicObject = obj.graphicObject;
 		copyObject.chart.worksheet = obj.chart.worksheet;
 
 		return copyObject;
@@ -4043,8 +4047,8 @@ function DrawingObjects() {
 		obj.graphicObject = graphic;
         graphic.setDrawingBase(obj);
 		
-		//History.Create_NewPoint();
-		//History.Add(g_oUndoRedoDrawingObject, historyitem_DrawingObject_Add, worksheet.model.getId(), null, obj);
+		History.Create_NewPoint();
+		History.Add(g_oUndoRedoDrawingObject, historyitem_DrawingObject_Add, worksheet.model.getId(), null, obj);
 				
 		obj.graphicObject.select(_this.controller);
 		aObjects.push(obj);
