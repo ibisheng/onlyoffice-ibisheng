@@ -5771,6 +5771,7 @@
 				cell_info.halign = c.getAlignHorizontalByValue().toLowerCase();
 				cell_info.valign = c.getAlignVertical().toLowerCase();
 				cell_info.isFormatTable = this.autoFilters.searchRangeInTableParts(activeCell, this);
+				cell_info.styleName = c.getStyleName();
 
 				cell_info.flags = new asc_CCellFlag();
 				cell_info.flags.merge = !!this._getMergedCellsRange(c1, r1);

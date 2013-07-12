@@ -151,6 +151,7 @@
 			this.hyperlink = null;
 			this.isLocked = false;
 			this.isFormatTable = false;
+			this.styleName = null;
 		}
 
 		asc_CCellInfo.prototype = {
@@ -167,7 +168,8 @@
 			asc_getNumFormat: function(){ return this.numFormat; },
 			asc_getHyperlink: function(){ return this.hyperlink; },
 			asc_getLocked: function(){ return this.isLocked; },
-			asc_getIsFormatTable: function () { return this.isFormatTable; }
+			asc_getIsFormatTable: function () { return this.isFormatTable; },
+			asc_getStyleName: function () { return this.styleName; }
 		};
 
 		window["Asc"].asc_CCellInfo = asc_CCellInfo;
@@ -188,6 +190,7 @@
 		prot["asc_getHyperlink"]		= prot.asc_getHyperlink;
 		prot["asc_getLocked"]			= prot.asc_getLocked;
 		prot["asc_getIsFormatTable"]	= prot.asc_getIsFormatTable;
+		prot["asc_getStyleName"]		= prot.asc_getStyleName;
 
 		// Класс точки
 		function asc_CCellRect (x, y, width, height) {

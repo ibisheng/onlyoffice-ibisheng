@@ -5992,6 +5992,9 @@ Range.prototype.getXfId=function(){
 	}
 	return g_oDefaultXfId;
 };
+Range.prototype.getStyleName=function(){
+	return this.worksheet.workbook.CellStyles.getStyleNameByXfId(this.getXfId());
+};
 Range.prototype.getNumFormat=function(){
 	return oNumFormatCache.get(this.getNumFormatStr());
 };

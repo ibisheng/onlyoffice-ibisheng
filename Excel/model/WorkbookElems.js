@@ -1229,6 +1229,38 @@ CCellStyles.prototype = {
 			if (null != oStyle.xfs && null != oStyle.xfs.font && null != oStyle.xfs.font.fn)
 				oFontMap[oStyle.xfs.font.fn] = 1;
 		}
+	},
+	getStyleNameByXfId: function (oXfId) {
+		var styleName = null;
+		if (null === oXfId)
+			return styleName;
+
+		var style = null;
+		for (var i = 0, length = this.CustomStyles.length; i < length; ++i) {
+			style = this.CustomStyles[i];
+			if (oXfId === style.XfId) {
+				if (null !== style.BuiltinId) {
+					styleName = this.getDefaultStyleNameByBuiltinId(style.BuiltinId);
+					if (null === styleName)
+						styleName = style.Name;
+					break;
+				} else {
+					styleName = style.Name;
+					break;
+				}
+			}
+		}
+
+		return styleName;
+	},
+	getDefaultStyleNameByBuiltinId: function (oBuiltinId) {
+		var style = null;
+		for (var i = 0, length = this.DefaultStyles.length; i < length; ++i) {
+			style = this.DefaultStyles[i];
+			if (style.BuiltinId === oBuiltinId)
+				return style.Name;
+		}
+		return null;
 	}
 };
 /** @constructor */
