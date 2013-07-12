@@ -469,11 +469,17 @@ function CGeometry()
         return _duplicate;
     };
 
-
+    this.Id = g_oIdCounter.Get_NewId();
+    g_oTableId.Add(this, this.Id);
 }
 
 CGeometry.prototype=
 {
+    getObjectType: function()
+    {
+        return CLASS_TYPE_GEOMETRY;
+    },
+
     Write_ToBinary: function(Writer)
     {
 
@@ -913,12 +919,15 @@ CGeometry.prototype=
 
     AddAdj: function(name, formula, x, y, z)
     {
+        History.Add(g_oUndoRedoGraphicObjects, this, historyitem_AutoShapes_Add_Adjustment, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataAddAdjustment(name, x)), null);
         this.gdLst[name] = parseInt(x);
-        this.avLst[name]=true;
+        this.avLst[name] = true;
+
     },
 
     AddGuide: function(name, formula, x, y, z)
     {
+        History.Add(g_oUndoRedoGraphicObjects, this, historyitem_AutoShapes_Add_Guide, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataAddGuide(name, formula, x, y, z)), null);
         this.gdLstInfo.push(
             {
                 name: name,
@@ -932,6 +941,7 @@ CGeometry.prototype=
 
     AddCnx: function(ang, x, y)
     {
+        History.Add(g_oUndoRedoGraphicObjects, this, historyitem_AutoShapes_Add_Cnx, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataAddCnx(ang, x, y)), null);
         this.cnxLstInfo.push(
             {
                 ang:ang,
@@ -942,6 +952,7 @@ CGeometry.prototype=
 
     AddHandleXY: function(gdRefX, minX, maxX, gdRefY, minY, maxY, posX, posY)
     {
+        History.Add(g_oUndoRedoGraphicObjects, this, historyitem_AutoShapes_Add_Handle_XY, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataAddHandleXY(gdRefX, minX, maxX, gdRefY, minY, maxY, posX, posY)), null);
         this.ahXYLstInfo.push(
             {
                 gdRefX:gdRefX,
@@ -959,6 +970,7 @@ CGeometry.prototype=
 
     AddHandlePolar: function(gdRefAng, minAng, maxAng, gdRefR, minR, maxR, posX, posY)
     {
+        History.Add(g_oUndoRedoGraphicObjects, this, historyitem_AutoShapes_Add_Handle_Polar, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataAddHandlePolar(gdRefAng, minAng, maxAng, gdRefR, minR, maxR, posX, posY)), null);
         this.ahPolarLstInfo.push(
             {
                 gdRefAng:gdRefAng,
@@ -976,11 +988,12 @@ CGeometry.prototype=
 
     AddPathCommand: function(command, x1, y1, x2, y2, x3, y3)
     {
+     //   History.Add(g_oUndoRedoGraphicObjects, this, historyitem_AutoShapes_Add_Path_Command, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataAddPathCommand(command, x1, y1, x2, y2, x3, y3)), null);
         switch(command)
         {
             case 0:
             {                              /* extrusionOk, fill, stroke, w, h*/
-                this.pathLst[this.pathLst.length] = new Path(x1, y1, x2, y2, x3);
+                this.AddPath(new Path(x1, y1, x2, y2, x3));
                 break;
             }
             case 1:
@@ -1015,8 +1028,15 @@ CGeometry.prototype=
         }
     },
 
+    AddPath: function(path)
+    {
+        History.Add(g_oUndoRedoGraphicObjects, this, historyitem_AutoShapes_Add_Path, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataAddObject(path.Id)), null);
+        this.pathLst.push(path);
+    },
+
     AddRect: function(l, t, r, b)
     {
+        History.Add(g_oUndoRedoGraphicObjects, this, historyitem_AutoShapes_Add_GeometryRect, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataAddGeometryRect(l, t, r, b)), null);
         this.rectS = {};
         this.rectS.l = l;
         this.rectS.t = t;
@@ -1321,34 +1341,152 @@ CGeometry.prototype=
         }
     },
 
-    Undo: function(data)
+    Undo: function(type, data)
     {
-        switch(data.Type)
+        switch(type)
         {
-            case historyitem_SetGuideValue:
+            case historyitem_AutoShapes_Add_Adjustment:
             {
-                this.gdLst[data.guideName] = data.oldValue;
+                delete  this.gdLst[data.name];
+                break;
+            }
+
+            case historyitem_AutoShapes_Add_Guide:
+            {
+                var gd_lst = this.gdLstInfo;
+                for(var i = gd_lst.length - 1; i > -1; --i)
+                {
+                    if(isRealObject(gd_lst[i]) && gd_lst[i].name === data.name)
+                    {
+                        gd_lst.splice(i, 1);
+                        break;
+                    }
+                }
+                break;
+            }
+
+            case historyitem_AutoShapes_Add_Cnx:
+            {
+                var cnx_lst = this.cnxLstInfo;
+                for(var i = cnx_lst.length - 1; i > -1; --i)
+                {
+                    if(isRealObject(cnx_lst[i]) && cnx_lst[i].ang === data.ang && cnx_lst.x === data.x && cnx_lst.y === data.y)
+                    {
+                        cnx_lst.splice(i, 1);
+                    }
+                }
+                break;
+            }
+
+            case historyitem_AutoShapes_Add_Path:
+            {
+                this.pathLst.splice(this.pathLst.length - 1, 1);
+                break;
+            }
+            case historyitem_AutoShapes_Add_GeometryRect:
+            {
+                delete this.rectS.l;
+                delete this.rectS.t;
+                delete this.rectS.r;
+                delete this.rectS.b;
                 break;
             }
         }
     },
 
-    Redo: function(data)
+    Redo: function(type, data)
     {
         switch(data.Type)
         {
-            case historyitem_SetGuideValue:
+            case historyitem_AutoShapes_Add_Adjustment:
             {
-                this.gdLst[data.guideName] = data.newValue;
+                this.gdLst[data.name] = data.val;
+                break;
+            }
+
+            case historyitem_AutoShapes_Add_Guide:
+            {
+                this.gdLstInfo.push(
+                    {
+                        name: data.name,
+                        formula: data.formula,
+                        x: data.x,
+                        y: data.y,
+                        z: data.z,
+                        isAdj: false
+                    });
+                break;
+            }
+
+            case historyitem_AutoShapes_Add_Cnx:
+            {
+                this.cnxLstInfo.push(
+                    {
+                        ang: data.ang,
+                        x: data.x,
+                        y: data.y
+                    }
+                );
+                break;
+            }
+            case historyitem_AutoShapes_Add_Path_Command:
+            {
+                switch(data.command)
+                {
+                    case 0:
+                    {                              /* extrusionOk, fill, stroke, w, h*/
+                        this.pathLst[this.pathLst.length] = new Path(data.x1, data.y1, data.x2, data.y2, data.x3);
+                        break;
+                    }
+                    case 1:
+                    {
+                        this.pathLst[this.pathLst.length-1].moveTo(data.x1, data.y1);
+                        break;
+                    }
+                    case 2:
+                    {
+                        this.pathLst[this.pathLst.length-1].lnTo(data.x1, data.y1);
+                        break;
+                    }
+                    case 3:
+                    {
+                        this.pathLst[this.pathLst.length-1].arcTo(data.x1/*wR*/, data.y1/*hR*/, data.x2/*stAng*/, data.y2/*swAng*/);
+                        break;
+                    }
+                    case 4:
+                    {
+                        this.pathLst[this.pathLst.length-1].quadBezTo(data.x1, data.y1, data.x2, data.y2);
+                        break;
+                    }
+                    case 5:
+                    {
+                        this.pathLst[this.pathLst.length-1].cubicBezTo(data.x1, data.y1, data.x2, data.y2, data.x3, data.y3);
+                        break;
+                    }
+                    case 6:
+                    {
+                        this.pathLst[this.pathLst.length-1].close();
+                    }
+                }
+                break;
+            }
+            case historyitem_AutoShapes_Add_Path:
+            {
+                var path = g_oTableId.Get_ById(data.objectId);
+                if(isRealObject(path))
+                    this.pathLst.push(path);
+                break;
+            }
+            case historyitem_AutoShapes_Add_GeometryRect:
+            {
+                this.rectS.l = data.l;
+                this.rectS.t = data.t;
+                this.rectS.r = data.r;
+                this.rectS.b = data.b;
                 break;
             }
         }
     },
-
-    Save_Changes: function(data, writer)
-    {},
-
-
 
     hit: function(x, y)
     {

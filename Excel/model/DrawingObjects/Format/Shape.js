@@ -158,11 +158,19 @@ function CShape(drawingBase, drawingObjects)
     this.pen = null;
 
     this.selected = false;
+
+    this.Id = g_oIdCounter.Get_NewId();
+    g_oTableId.Add(this, this.Id);
 }
 
 
 CShape.prototype =
 {
+    getObjectType: function()
+    {
+        return CLASS_TYPE_SHAPE;
+    },
+
     isShape: function()
     {
         return true;
@@ -237,6 +245,12 @@ CShape.prototype =
     updateSelectionState: function(drawingDocument)
     {
         this.txBody.updateSelectionState(drawingDocument);
+    },
+
+    recalculateCurPos: function()
+    {
+        if(this.txBody)
+            this.txBody.recalculateCurPos();
     },
 
     setExtents: function(extX, extY)
@@ -1368,6 +1382,35 @@ CShape.prototype =
             if(!isRealObject(this.style))
                 this.setSyle(new CShapeStyle());
             this.style.copyFromOther(sp.style);
+        }
+    },
+
+
+    Undo: function(type, data)
+    {
+        switch (type)
+        {
+            case historyitem_AutoShapes_RecalculateTransformUndo:
+            {
+                this.recalculateTransform();
+                this.calculateContent();
+                this.calculateTransformTextMatrix();
+                break;
+            }
+        }
+    },
+
+    Redo: function(type, data)
+    {
+        switch (type)
+        {
+            case historyitem_AutoShapes_RecalculateTransformRedo:
+            {
+                this.recalculateTransform();
+                this.calculateContent();
+                this.calculateTransformTextMatrix();
+                break;
+            }
         }
     }
 

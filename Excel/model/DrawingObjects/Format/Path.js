@@ -46,10 +46,18 @@ function Path(extrusionOk, fill, stroke, w, h)
          duplicate.ArrPathCommand[i] = clonePrototype(this.ArrPathCommand[i]);
          }  */
         return duplicate;
-    }
+    };
+
+    this.Id = g_oIdCounter.Get_NewId();
+    g_oTableId.Add(this, this.Id);
 }
 
 Path.prototype = {
+
+    getObjectType: function()
+    {
+        return CLASS_TYPE_PATH;
+    },
 
     Write_ToBinary2: function(writer)
     {
@@ -233,6 +241,8 @@ Path.prototype = {
             x=parseInt(x,10);
         if(!isNaN(parseInt(y,10)))
             y=parseInt(y,10);
+
+        History.Add(g_oUndoRedoGraphicObjects, this, historyitem_AutoShapes_Add_PathMoveTo, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataMoveToLineTo(x, y, true)), null);
         this.ArrPathCommandInfo.push({id:moveTo, X:x, Y:y});
     },
 
@@ -242,6 +252,8 @@ Path.prototype = {
             x=parseInt(x,10);
         if(!isNaN(parseInt(y,10)))
             y=parseInt(y,10);
+
+        History.Add(g_oUndoRedoGraphicObjects, this, historyitem_AutoShapes_Add_PathLineTo, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataMoveToLineTo(x, y, false)), null);
         this.ArrPathCommandInfo.push({id:lineTo, X:x, Y:y});
     },
 
@@ -256,6 +268,9 @@ Path.prototype = {
             stAng=parseInt(stAng,10);
         if(!isNaN(parseInt(swAng,10)))
             swAng=parseInt(swAng,10);
+
+
+        History.Add(g_oUndoRedoGraphicObjects, this, historyitem_AutoShapes_Add_PathArcTo, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataArcTo(wR, hR, stAng, swAng)), null);
         this.ArrPathCommandInfo.push({id: arcTo, wR: wR, hR: hR, stAng: stAng, swAng: swAng});
     },
 
@@ -270,6 +285,7 @@ Path.prototype = {
             x1=parseInt(x1,10);
         if(!isNaN(parseInt(y1,10)))
             y1=parseInt(y1,10);
+        History.Add(g_oUndoRedoGraphicObjects, this, historyitem_AutoShapes_Add_PathQuadBezTo, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataQuadBezTo(x0, y0, x1, y1)), null);
         this.ArrPathCommandInfo.push({id:bezier3, X0:x0, Y0:y0, X1:x1, Y1:y1});
     },
 
@@ -289,11 +305,13 @@ Path.prototype = {
             x2=parseInt(x2,10);
         if(!isNaN(parseInt(y2,10)))
             y2=parseInt(y2,10);
+        History.Add(g_oUndoRedoGraphicObjects, this, historyitem_AutoShapes_Add_PathCubicBezTo, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataCubicBezTo(x0, y0, x1, y1, x2, y2)), null);
         this.ArrPathCommandInfo.push({id:bezier4, X0:x0, Y0:y0, X1:x1, Y1:y1, X2:x2, Y2:y2});
     },
 
     close: function()
     {
+        History.Add(g_oUndoRedoGraphicObjects, this, historyitem_AutoShapes_Add_PathClose, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataClosePath()), null);
         this.ArrPathCommandInfo.push({id:close});
     },
 
@@ -1029,6 +1047,52 @@ Path.prototype = {
             }
             graphics._z();
             graphics.ds();
+        }
+    },
+
+
+    Undo: function(type, data)
+    {
+        switch(type)
+        {
+            case historyitem_AutoShapes_Add_PathMoveTo:
+            case historyitem_AutoShapes_Add_PathLineTo:
+            case historyitem_AutoShapes_Add_PathArcTo:
+            case historyitem_AutoShapes_Add_PathQuadBezTo:
+            case historyitem_AutoShapes_Add_PathCubicBezTo:
+            {
+                this.ArrPathCommandInfo.splice(this.ArrPathCommandInfo.length - 1, 1);
+            }
+        }
+    },
+
+    Redo: function(type, data)
+    {
+        switch (type)
+        {
+            case historyitem_AutoShapes_Add_PathMoveTo:
+            {
+                this.ArrPathCommandInfo.push({id:moveTo, x: data.x, y: data.y});
+                break;
+            }
+
+            case historyitem_AutoShapes_Add_PathLineTo:
+            {
+                this.ArrPathCommandInfo.push({id:lineTo, x: data.x, y: data.y});
+                break;
+            }
+
+
+            case historyitem_AutoShapes_Add_PathArcTo:
+            {
+                this.ArrPathCommandInfo.push({id:arcTo, wR: data.wR, hR: data.hR, stAng: data.stAng, swAng: data.swAng});
+                break;
+            }
+            case historyitem_AutoShapes_Add_PathClose:
+            {
+                this.ArrPathCommandInfo.push({id: close});
+                break;
+            }
         }
     }
 };

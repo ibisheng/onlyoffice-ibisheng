@@ -187,6 +187,12 @@ CTxBody.prototype =
         }
     },
 
+
+    recalculateCurPos: function()
+    {
+        this.content.RecalculateCurPos();
+    },
+
     drawTextSelection: function()
     {
         this.content.Selection_Draw_Page(0);

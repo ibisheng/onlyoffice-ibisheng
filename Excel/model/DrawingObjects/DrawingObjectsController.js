@@ -22,9 +22,19 @@ DrawingObjectsController.prototype =
         this.curState = newState;
     },
 
+    recalculateCurPos: function()
+    {
+        if(this.curState.id === STATES_ID_TEXT_ADD)
+            this.curState.textObject.recalculateCurPos();
+    },
+
     onMouseDown: function(e, x, y)
     {
         this.curState.onMouseDown(e, x, y);
+        if(e.ClickCount < 2)
+        {
+            this.recalculateCurPos()
+        }
     },
 
     onMouseMove: function(e, x, y)

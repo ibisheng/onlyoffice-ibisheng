@@ -458,6 +458,7 @@ function RotateState(drawingObjectsController, drawingObjects, majorObject)
 
     this.onMouseUp = function(e, x, y)
     {
+        History.Create_NewPoint();
         this.drawingObjectsController.trackEnd();
         this.drawingObjectsController.clearTrackObjects();
         this.drawingObjects.selectGraphicObject();
@@ -553,6 +554,7 @@ function ResizeState(drawingObjectsController, drawingObjects, majorObject, card
 
     this.onMouseUp = function(e, x, y)
     {
+        History.Create_NewPoint();
         this.drawingObjectsController.trackEnd();
         this.drawingObjectsController.clearTrackObjects();
         this.drawingObjects.selectGraphicObject();
@@ -926,6 +928,7 @@ function MoveState(drawingObjectsController, drawingObjects, startX, startY, rec
 
     this.onMouseUp = function(e, x, y)
     {
+        History.Create_NewPoint();
         this.drawingObjectsController.trackEnd();
         this.drawingObjectsController.clearTrackObjects();
         this.drawingObjects.selectGraphicObject();

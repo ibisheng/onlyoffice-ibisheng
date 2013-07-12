@@ -83,6 +83,25 @@ var historyitem_AutoShapes_Child_Extents = 4;
 var historyitem_AutoShapes_Rotate = 5;
 var historyitem_AutoShapes_Flips = 6;
 var historyitem_AutoShapes_SetGuideValue = 7;
+var historyitem_AutoShapes_RecalculateTransformUndo = 8;
+var historyitem_AutoShapes_RecalculateTransformRedo = 9;
+var historyitem_AutoShapes_Add_Adjustment = 10;
+var historyitem_AutoShapes_Add_Guide = 11;
+var historyitem_AutoShapes_Add_Cnx = 12;
+var historyitem_AutoShapes_Add_Handle_XY = 13;
+var historyitem_AutoShapes_Add_Handle_Polar = 14;
+var historyitem_AutoShapes_Add_Path_Command = 15;
+var historyitem_AutoShapes_Add_Path = 16;
+var historyitem_AutoShapes_Add_GeometryRect = 17;
+var historyitem_AutoShapes_Add_PathMoveTo = 18;
+var historyitem_AutoShapes_Add_PathLineTo = 19;
+var historyitem_AutoShapes_Add_PathArcTo = 20;
+var historyitem_AutoShapes_Add_PathQuadBezTo = 21;
+var historyitem_AutoShapes_Add_PathCubicBezTo = 22;
+var historyitem_AutoShapes_Add_PathClose = 23;
+
+
+
 
 var historyitem_Comment_Add = 1;
 var historyitem_Comment_Remove = 2;

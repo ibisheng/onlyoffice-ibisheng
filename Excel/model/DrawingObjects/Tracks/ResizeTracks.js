@@ -586,9 +586,12 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
 
     this.trackEnd = function()
     {
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(this.originalObject.Id, new UndoRedoDataShapeRecalc()), null);
         this.originalObject.setPosition(this.resizedPosX, this.resizedPosY);
         this.originalObject.setExtents(this.resizedExtX, this.resizedExtY);
         this.originalObject.setFlips(this.resizedflipH, this.resizedflipV);
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(this.originalObject.Id, new UndoRedoDataShapeRecalc()), null);
+
         this.originalObject.recalculateTransform();
         this.originalObject.calculateContent();
         this.originalObject.calculateTransformTextMatrix();

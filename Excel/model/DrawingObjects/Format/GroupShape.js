@@ -49,6 +49,11 @@ function CGroupShape(drawingBase, drawingObjects)
 
 CGroupShape.prototype =
 {
+    getObjectType: function()
+    {
+        return CLASS_TYPE_GROUP;
+    },
+
     isShape: function()
     {
         return false;

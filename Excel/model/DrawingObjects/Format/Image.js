@@ -74,6 +74,12 @@ function CImage(drawingBase, drawingObjects)
 CImage.prototype =
 {
 
+
+    getObjectType: function()
+    {
+        return CLASS_TYPE_IMAGE;
+    },
+
     isShape: function()
     {
         return false;
@@ -711,5 +717,34 @@ CImage.prototype =
 
     drawAdjustments: function(drawingDocument)
     {
+    },
+
+    Undo: function(type, data)
+    {
+        switch (type)
+        {
+            case historyitem_AutoShapes_RecalculateTransformUndo:
+            {
+                this.recalculateTransform();
+                this.calculateContent();
+                this.calculateTransformTextMatrix();
+                break;
+            }
+        }
+    },
+
+    Redo: function(type, data)
+    {
+        switch (type)
+        {
+            case historyitem_AutoShapes_RecalculateTransformRedo:
+            {
+                this.recalculateTransform();
+                this.calculateContent();
+                this.calculateTransformTextMatrix();
+                break;
+            }
+        }
     }
+
 };

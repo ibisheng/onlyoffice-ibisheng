@@ -214,6 +214,11 @@ function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, 
 
 CDocumentContent.prototype =
 {
+    getType: function()
+    {
+        return CLASS_TYPE_DOCUMENT_CONTENT;
+    },
+
     Set_Id : function(newId)
     {
         g_oTableId.Reset_Id( this, newId, this.Id );

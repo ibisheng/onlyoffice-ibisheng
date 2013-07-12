@@ -2908,42 +2908,43 @@ function CXfrm()
 
     this.setPosition = function(posX, posY, model_id)
     {
-        History.Add(g_oUndoRedoDrawingObject, historyitem_AutoShapes_Offset, model_id, null, {object: this, data:{oldX: this.offX, oldY: this.offY, newX: posX, newY: posY}});
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Offset, model_id, null, new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOPairProps(this.offX, this.offY, posX, posY)));
         this.offX = posX;
         this.offY = posY;
     };
 
     this.setExtents = function(extX, extY, model_id)
     {
-        History.Add(g_oUndoRedoDrawingObject, historyitem_AutoShapes_Extents, model_id, null, {object: this, data:{oldExtX: this.extX, oldExtY: this.extY, newExtX: extX, newExtY: extY}});
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Extents, model_id, null, new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOPairProps(this.extX, this.extY, extX, extY)));
+
         this.extX = extX;
         this.extY = extY;
     };
 
     this.setChildOffsets = function(chOffX, chOffY, model_id)
     {
-        History.Add(g_oUndoRedoDrawingObject, historyitem_AutoShapes_Child_Offset, model_id, null, {object: this, data:{oldChOffX: this.chOffX, oldChOffY: this.chOffY, newChOffX: chOffX, newChOffY: chOffY}});
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Child_Offset, model_id, null, new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOPairProps(this.chOffX, this.chOffY, chOffX, chOffY)));
         this.chOffX = chOffX;
         this.chOffY = chOffY;
     };
 
     this.setChildExtents = function(chExtX, chExtY, model_id)
     {
-        History.Add(g_oUndoRedoDrawingObject, historyitem_AutoShapes_Child_Extents, model_id, null, {object: this, data:{oldChExtX: this.chExtX, oldChExtY: this.chExtY, newChOffX: chExtX, newChOffY: chExtY}});
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Child_Extents, model_id, null, new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOPairProps(this.chExtX, this.chExtY, chExtX, chExtY)));
         this.chExtX = chExtX;
         this.chExtY = chExtY;
     };
 
     this.setFlips = function(flipH, flipV, model_id)
     {
-        History.Add(g_oUndoRedoDrawingObject, historyitem_AutoShapes_Flips, model_id, null, {object: this, data:{oldFlipH: this.flipH, oldFlipV: this.flipV, newFlipH: flipH, newFlipV: flipV}});
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Flips, model_id, null, new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOPairProps(this.flipH, this.flipV, flipH, flipV)));
         this.flipH = flipH;
         this.flipV = flipV;
     };
 
     this.setRotate = function(rot, model_id)
     {
-        History.Add(g_oUndoRedoDrawingObject, historyitem_AutoShapes_Flips, model_id, null, {object: this, data:{oldRot: this.rot, newRot: rot}});
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Rotate, model_id, null, new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(this.rot, rot)));
         this.rot = rot;
     };
 
@@ -2955,7 +2956,110 @@ function CXfrm()
         this.setChildExtents(xfrm.chExtX, xfrm.chExtY);
         this.setFlips(xfrm.flipH, xfrm.flipV);
         this.setRotate(xfrm.rot);
-    }
+    };
+
+    this.Get_Id = function()
+    {
+        return this.Id;
+    };
+
+    this.Undo = function(type, data)
+    {
+        switch (type)
+        {
+            case historyitem_AutoShapes_Offset:
+            {
+                this.offX = data.oldValue1;
+                this.offY = data.oldValue2;
+                break;
+            }
+
+            case historyitem_AutoShapes_Extents:
+            {
+                this.extX = data.oldValue1;
+                this.extY = data.oldValue2;
+                break;
+            }
+
+            case historyitem_AutoShapes_Child_Offset:
+            {
+                this.chOffX = data.oldValue1;
+                this.chOffY = data.oldValue2;
+                break;
+            }
+
+            case historyitem_AutoShapes_Child_Extents:
+            {
+                this.chExtX = data.oldValue1;
+                this.chExtY = data.oldValue2;
+                break;
+            }
+            case historyitem_AutoShapes_Flips:
+            {
+                this.flipH = data.oldValue1;
+                this.flipV = data.oldValue2;
+                break;
+            }
+            case historyitem_AutoShapes_Rotate:
+            {
+                this.rot = data.oldValue;
+                break;
+            }
+        }
+    };
+
+    this.Redo = function(type, data)
+    {
+        switch (type)
+        {
+            case historyitem_AutoShapes_Offset:
+            {
+                this.offX = data.newValue1;
+                this.offY = data.newValue2;
+                break;
+            }
+
+            case historyitem_AutoShapes_Extents:
+            {
+                this.extX = data.newValue1;
+                this.extY = data.newValue2;
+                break;
+            }
+
+            case historyitem_AutoShapes_Child_Offset:
+            {
+                this.chOffX = data.newValue1;
+                this.chOffY = data.newValue2;
+                break;
+            }
+
+            case historyitem_AutoShapes_Child_Extents:
+            {
+                this.chExtX = data.newValue1;
+                this.chExtY = data.newValue2;
+                break;
+            }
+            case historyitem_AutoShapes_Flips:
+            {
+                this.flipH = data.newValue1;
+                this.flipV = data.newValue2;
+                break;
+            }
+            case historyitem_AutoShapes_Rotate:
+            {
+                this.rot = data.newValue;
+                break;
+            }
+        }
+    };
+
+    this.getObjectType = function()
+    {
+        return CLASS_TYPE_XFRM;
+    };
+
+    this.Id = g_oIdCounter.Get_NewId();
+    g_oTableId.Add(this, this.Id);
 }
 
 function CSpPr()

@@ -121,7 +121,9 @@ function RotateTrackShapeImage(originalObject)
 
     this.trackEnd = function()
     {
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(this.originalObject.Id, new UndoRedoDataShapeRecalc()), null);
         this.originalObject.setRotate(this.angle);
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(this.originalObject.Id, new UndoRedoDataShapeRecalc()), null);
         this.originalObject.recalculateTransform();
         this.originalObject.calculateContent();
         this.originalObject.calculateTransformTextMatrix();
