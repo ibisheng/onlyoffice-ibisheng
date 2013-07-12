@@ -665,7 +665,9 @@
             var text_size = this._otherProps._text_size;
 
             for (i=0; i<labels.length; ++i) {
-            
+				isFormatCellTrue = isFormatCell;
+				if(this.arrFormatAdobeLabels && this.arrFormatAdobeLabels[i])
+					isFormatCellTrue = this.arrFormatAdobeLabels[0][i];
                 /**
                 * T|his ensures that if we're given too many labels, that we don't get an error
                 */
@@ -729,7 +731,7 @@
                             text_size,
                             this.centerx + explosion_offsetx + ((this.radius + 10)* Math.cos(a)) + (this._otherProps._labels_sticks ? (a < 1.57 || a > 4.71 ? 2 : -2) : 0),
                             this.centery + explosion_offsety + (((this.radius + 10) * Math.sin(a))),
-                            OfficeExcel.numToFormatText(labels[i],isFormatCell),
+                            OfficeExcel.numToFormatText(labels[i],isFormatCellTrue),
                             vAlignment,
                             hAlignment, false, null,null, bold, null, textOptions);
             }

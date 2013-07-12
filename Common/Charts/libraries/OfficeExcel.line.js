@@ -2014,16 +2014,22 @@
 			italic: this._otherProps._labels_above_italic
 		}		
         context.beginPath();
+		var formatLabels = []; 
         var tempData = [];
         n = 0;
-        for (var i = 0; i < this.data.length; ++i) {
-             for (var j = 0; j < this.data[i].length; ++j) {
-                tempData[n++] = this.data[i][j]
+        for (var i = 0; i < this.firstData.length; ++i) {
+             for (var j = 0; j < this.firstData[i].length; ++j) {
+                tempData[n] = this.firstData[i][j];
+				if(this.arrFormatAdobeLabels && this.arrFormatAdobeLabels[i] && this.arrFormatAdobeLabels[i][j])
+					formatLabels[n] = this.arrFormatAdobeLabels[i][j];
+				else
+					formatLabels[n] = format;
+				n++;
             }
         }
         for (var i = 0; i < this.coords.length; ++i) {
             var coords = this.coords[i];
-			 OfficeExcel.Text(context, font, size, coords[0], coords[1] - 5 - size,OfficeExcel.numToFormatText( OfficeExcel.num_round(tempData[i]),format), 'center', 'center', false, null, 'rgba(255, 255, 255, 0.7)', bold, null, textOptions);
+			 OfficeExcel.Text(context, font, size, coords[0], coords[1] - 5 - size,OfficeExcel.numToFormatText( OfficeExcel.num_round(tempData[i]),formatLabels[i]), 'center', 'center', false, null, 'rgba(255, 255, 255, 0.7)', bold, null, textOptions);
            // OfficeExcel.Text(context, font, size, coords[0], coords[1] - 5 - size, OfficeExcel.number_format(this, OfficeExcel.num_round(tempData[i]), units_pre, units_post), 'center', 'center', false, null, 'rgba(255, 255, 255, 0.7)');
         }
 

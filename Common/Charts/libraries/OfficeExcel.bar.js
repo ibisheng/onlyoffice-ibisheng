@@ -1345,14 +1345,16 @@
 							if (this.data[i][j] < 0) {
 								yPos += height + 6 + (this._otherProps._text_size - 4);
 							}
-
+							var formatCellTrue = formatCell;
+							if(this.arrFormatAdobeLabels && this.arrFormatAdobeLabels[i] && this.arrFormatAdobeLabels[i][j])
+								formatCellTrue = this.arrFormatAdobeLabels[i][j];
 							this.context.fillStyle = this._otherProps._text_color;
 							OfficeExcel.Text(this.context,
 										this._otherProps._labels_above_font,
 										typeof(this._otherProps._labels_above_size) == 'number' ? this._otherProps._labels_above_size : this._otherProps._text_size - 3,startX + (individualBarWidth / 2),
 										startY - 2 - (this._otherProps._variant == '3d' ? 5 : 0),
 										//OfficeExcel.number_format(this, OfficeExcel.num_round(this.data[i][j]),this._otherProps._units_pre,this._otherProps._units_post),
-										OfficeExcel.numToFormatText(OfficeExcel.num_round(this.data[i][j]),formatCell),
+										OfficeExcel.numToFormatText(OfficeExcel.num_round(this.firstData[i][j]),formatCellTrue),
 										null,
 										this._otherProps._labels_above_angle ? (this._otherProps._labels_above_angle > 0 ? 'right' : 'left') : 'center',
 										null,

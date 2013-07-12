@@ -1880,7 +1880,9 @@
                 
                 var x_val = this.data[_set][point][0];
                 var y_val = this.data[_set][point][1];
-                
+                var formatTrue = format;
+				if(this.arrFormatAdobeLabels && this.arrFormatAdobeLabels[_set] && this.arrFormatAdobeLabels[_set][point] && this.arrFormatAdobeLabels[_set][point][1])
+					formatTrue = this.arrFormatAdobeLabels[_set][point][1];
                 
                 var x_pos = this.coords[_set][point][0];
                 var y_pos = this.coords[_set][point][1];
@@ -1891,7 +1893,7 @@
                             x_pos,
                             y_pos - 5 - size,
                             //x_val.toFixed(this._otherProps._labels_above_decimals) + ', ' + y_val.toFixed(this._otherProps._labels_above_decimals),
-							OfficeExcel.numToFormatText(OfficeExcel.num_round(y_val),format),
+							OfficeExcel.numToFormatText(OfficeExcel.num_round(y_val),formatTrue),
                             'center',
                             'center',
                             false,//рамка

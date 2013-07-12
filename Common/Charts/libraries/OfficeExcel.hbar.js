@@ -1027,7 +1027,10 @@
                                           individualBarHeight,
                                           this.context.fillStyle,
                                           this.data[i][j],
-                                          true]);
+                                          true,
+										  this.arrFormatAdobeLabels[i][j],
+										  this.firstData[i][j]
+										  ]);
                     }
                 }
 
@@ -1096,14 +1099,20 @@
                 OfficeExcel.NoShadow(this);
 
                 var border = (coords[i][0] + coords[i][2] + 7 + this.context.measureText(this._otherProps._units_pre + this.coords[i][5] + this._otherProps._units_post).width) > OfficeExcel.GetWidth(this) ? true : false;
-
+				var textLabel = this.coords[i][5];
+				var formatLabel = format;
+				if(this.coords[i][7])
+					formatLabel = this.coords[i][7];
+				if(this.coords[i][8])
+					textLabel = this.coords[i][8];
+					
                 OfficeExcel.Text(this.context,
                             font,
                             size,
                             coords[i][0] + coords[i][2] + (border ? -5 : 5),
                             coords[i][1] + (coords[i][3] / 2),
 							//OfficeExcel.number_format(this, OfficeExcel.num_round(this.coords[i][5]), this._otherProps._units_pre, this._otherProps._units_post),
-							OfficeExcel.numToFormatText(OfficeExcel.num_round(this.coords[i][5]),format),
+							OfficeExcel.numToFormatText(OfficeExcel.num_round(textLabel),formatLabel),
                             'center',
                             border ? 'right' : 'left',
                             null,

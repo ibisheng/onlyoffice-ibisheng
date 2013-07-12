@@ -695,6 +695,7 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 	var styleManager = api_doc ? api_doc.chartStyleManager : api_sheet.chartStyleManager;
 	
 	arrBaseColors = styleManager.getBaseColors( parseInt(chart.styleId) );
+	var arrFormatAdobeLabels = [];
 	if(chart.series && chart.series.length !=0 && api_sheet)
 	{
 		isSeries = true;
@@ -720,6 +721,7 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 				var n = 0;
 				
 				arrValues[l] = [];
+				arrFormatAdobeLabels[l] = [];
 				var formula = formulaToRange(series[l].Val.Formula,ws);
 				var xFormula = formulaToRange(series[l].xVal.Formula,ws);
 				
@@ -743,6 +745,7 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 					for(col = xfirstCol; col <= xlastCol; ++col)
 					{
 						arrValues[l][n] = [];
+						arrFormatAdobeLabels[l][n] = [];
 						var cell = ws.getCell(new CellAddress(row - 1, col - 1, 0));
 						var cellY = ws.getCell(new CellAddress(firstRow - 1, firstCol + n - 1, 0));
 						
@@ -777,6 +780,9 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 						else
 							arrValues[l][n][1] = valueY;
 						
+						arrFormatAdobeLabels[l][n][0] = cell.getNumFormatStr();
+						arrFormatAdobeLabels[l][n][1] = cellY.getNumFormatStr();
+						
 						if(value.toString() != '' && !isEn)
 						{
 							min = value;
@@ -808,6 +814,7 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 					for(row = xfirstRow; row <= xlastRow; ++row)
 					{
 						arrValues[l][n] = [];
+						arrFormatAdobeLabels[l][n] = [];
 						var cell = ws.getCell(new CellAddress(row - 1, col - 1, 0));
 						var cellY = ws.getCell(new CellAddress(firstRow + n - 1, firstCol - 1, 0));
 						
@@ -836,6 +843,9 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 							arrValues[l][n][1] = 0;
 						else
 							arrValues[l][n][1] = valueY;
+						
+						arrFormatAdobeLabels[l][n][0] = cell.getNumFormatStr();
+						arrFormatAdobeLabels[l][n][1] = cellY.getNumFormatStr();
 						
 						if(value.toString() != '' && !isEn)
 						{
@@ -895,6 +905,7 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 				}
 				skipSeries[l] = false;
 				arrValues[numSeries] = [];
+				arrFormatAdobeLabels[numSeries] = [];
 				isSkip[numSeries] = true;
 				
 				if(!isRow)//по строкам или по столбцам
@@ -926,6 +937,7 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 								formatCellScOy = cell.getNumFormatStr();
 						}
 						
+						formatAdobeLabel = cell.getNumFormatStr();
 						
 						var orValue = cell.getValue();
 						if('' != orValue)
@@ -951,6 +963,7 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 							arrValues[numSeries][n] = Math.abs(value);
 						else
 							arrValues[numSeries][n] = value;
+						arrFormatAdobeLabels[numSeries][n] = formatAdobeLabel;
 						n++;
 					}
 				}
@@ -986,6 +999,8 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 						var orValue = cell.getValue();
 						if('' != orValue)
 							isSkip[numSeries] = false;
+
+						formatAdobeLabel = cell.getNumFormatStr();
 						var value =  parseFloat(orValue)
 						if(!isEn && !isNaN(value))
 						{
@@ -1008,7 +1023,7 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 							arrValues[numSeries][n] = Math.abs(value);
 						else
 							arrValues[numSeries][n] = value;
-						
+						arrFormatAdobeLabels[numSeries][n] = formatAdobeLabel;
 						n++;
 					}
 				}
@@ -1029,6 +1044,7 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 		var isSkipRev = [];
 		for (row = 0; row < data.length; ++row) {
 			arrValues[n] = [];
+			arrFormatAdobeLabels[n] = [];
 			var k = 0;
 			isSkip[row] = true;
 			for (col = 0; col < data[row].length; ++col) {
@@ -1050,6 +1066,9 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 					formatCellScOy = data[row][col].numFormatStr;
 				
 				var orValue = data[row][col].value;
+				var formatAdobeLabel = 'General';
+				if(data[row][col].numFormatStr)
+					formatAdobeLabel = data[row][col].numFormatStr;
 				var value = parseFloat(orValue);
 				//если все значения пустые, то в дальнейшем при отрисовке пропускаем
 				if(!isNaN(parseFloat(orValue)))
@@ -1074,6 +1093,7 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 					arrValues[n][k] = Math.abs(value);
 				else
 					arrValues[n][k] = value;
+				arrFormatAdobeLabels[n][k] = formatAdobeLabel;
 				k++;
 			}
 			n++;
@@ -1171,7 +1191,11 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 	}
 	
 	if(isSeries)
+	{
+		var arrFormatAdobeLabelsRev = arrFormatAdobeLabels;
 		var arrValuesRev = arrValues;
+	}
+		
 	isEn = false;
 	if(chart.type == 'Scatter' && !newArr)
 	{
@@ -1279,7 +1303,11 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 		chart.ymax = maxY;
 	}
 	if(!arrValuesRev)
-		arrValuesRev = arrReverse(arrValues)
+		arrValuesRev = arrReverse(arrValues);
+	
+	if(!arrFormatAdobeLabelsRev)
+		arrFormatAdobeLabelsRev = arrReverse(arrFormatAdobeLabels);
+		
 	//if ((bbox.c2 - bbox.c1) < bbox.r2 - bbox.r1)
 	chart.isFormatCell = formatCell;
 	chart.isformatCellScOy = formatCellScOy;
@@ -1298,10 +1326,14 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 			{
 				//надо перевернуть массив
 				arrValuesRev = arrReverse(arrValues);
+				chart.arrFormatAdobeLabels = arrReverse(arrFormatAdobeLabels);
 				drawChart(chart, arrValuesRev, width, height);
 			}
 			else
+			{
+				chart.arrFormatAdobeLabels = arrFormatAdobeLabels;
 				drawChart(chart, arrValues, width, height);
+			}
 		}
 		else
 		{
@@ -1309,13 +1341,14 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 			{
 				if(chart.type == 'HBar' || chart.type == 'Bar' || chart.type == 'Stock')
 				{
-					//chart.isSkip = isSkipRev;
 					chart.isSkip = isSkip;
+					chart.arrFormatAdobeLabels = arrFormatAdobeLabelsRev;
 					drawChart(chart, arrValuesRev, width, height);
 				}
 				else
 				{
 					chart.isSkip = isSkip;
+					chart.arrFormatAdobeLabels = arrFormatAdobeLabels;
 					drawChart(chart, arrValues, width, height);
 				}
 			}
@@ -1324,12 +1357,14 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 				if(chart.type == 'HBar' || chart.type == 'Bar' || chart.type == 'Stock')
 				{
 					chart.isSkip = isSkip;
+					chart.arrFormatAdobeLabels = arrFormatAdobeLabels;
 					drawChart(chart, arrValues, width, height);
 				}
 				else
 				{
 					//chart.isSkip = isSkipRev;
 					chart.isSkip = isSkip;
+					chart.arrFormatAdobeLabels = arrFormatAdobeLabelsRev;
 					drawChart(chart, arrValuesRev, width, height);
 				}
 			}
@@ -1401,7 +1436,7 @@ function drawChart(chart, arrValues, width, height) {
 
 	
 	var lengthOfSeries;
-	if(chart.series && chart.series.length != 0)
+	if(chart.series && chart.series.length != 0 && window["Asc"]["editor"])
 	{
 			lengthOfSeries = chart.series.length;
 	}
@@ -1554,6 +1589,7 @@ function drawChart(chart, arrValues, width, height) {
 		bar._yAxisTitle._vpos = bar._chartGutter._top + (bar.canvas.height - bar._chartGutter._top - bar._chartGutter._bottom) / 2 ;
 		bar._yAxisTitle._hpos = 23 + keyLeft;
 	}
+	bar.arrFormatAdobeLabels = chart.arrFormatAdobeLabels;
 	//выставляем параметры текса
 	setFontChart(chart);
 	calcAllMargin(chart.isFormatCell,chart.isformatCellScOy,chart.min,chart.max,chart.ymin,chart.ymax, chart);
@@ -1714,7 +1750,6 @@ function DrawLineChart(chartCanvas, chartType, chartSubType, data, chart) {
 
 	var copyData = $.extend(true, [], data);
 	bar = new OfficeExcel.Line(chartCanvas, data);
-	bar.firstData = copyData;
 	bar._otherProps._autoGrouping = chartType;
 	
 	//в случае поверхностной диаграммы
@@ -1756,6 +1791,12 @@ function DrawLineChart(chartCanvas, chartType, chartSubType, data, chart) {
 		}
 		bar.data = tempData;
 		bar.original_data = tempData;
+	}
+	
+	if((bar._otherProps._autoGrouping == 'stacked' || bar._otherProps._autoGrouping == 'stackedPer') && bar._otherProps._filled)
+	{
+		copyData = OfficeExcel.array_reverse(copyData);
+		chart.arrFormatAdobeLabels = OfficeExcel.array_reverse(chart.arrFormatAdobeLabels);
 	}
 
 
@@ -1818,6 +1859,8 @@ function DrawLineChart(chartCanvas, chartType, chartSubType, data, chart) {
 function DrawBarChart(chartCanvas, chartSubType, data, chart) {
 	
 	bar = new OfficeExcel.Bar(chartCanvas, data);
+	var copyData = $.extend(true, [], data);
+	bar.firstData = copyData;
 	//меняем входные данные для нормированной диаграммы
 	bar._otherProps._autoGrouping = chartSubType;
 	//с накоплениями
@@ -1881,10 +1924,13 @@ function DrawHBarChart(chartCanvas, chartSubType, data, chart) {
 	}
 	data = OfficeExcel.array_reverse(data);
 	
+	var copyData = $.extend(true, [], data);
+	
 	bar = new OfficeExcel.HBar(chartCanvas, data);	
 	bar._otherProps._autoGrouping = chartSubType;
 	var originalData = $.extend(true, [], data);
 
+	chart.arrFormatAdobeLabels =  OfficeExcel.array_reverse(chart.arrFormatAdobeLabels);
 
 	if (bar._otherProps._autoGrouping == 'stacked') {
 		for (var j = 0; j < (data.length); j++) {
@@ -1892,6 +1938,8 @@ function DrawHBarChart(chartCanvas, chartSubType, data, chart) {
 				data[j][i] = findPrevValue(originalData, j, i)
 			}
 			data[j] = OfficeExcel.array_reverse(data[j]);
+			copyData[j] = OfficeExcel.array_reverse(copyData[j]);
+			chart.arrFormatAdobeLabels[j] =  OfficeExcel.array_reverse(chart.arrFormatAdobeLabels[j]);
 		}
 		bar.original_data = data;
 	}
@@ -1922,11 +1970,21 @@ function DrawHBarChart(chartCanvas, chartSubType, data, chart) {
 					tempData[j][i] = 0;
 			}
 			tempData[j] = OfficeExcel.array_reverse(tempData[j]);
+			copyData[j] = OfficeExcel.array_reverse(copyData[j]);
+			chart.arrFormatAdobeLabels[j] =  OfficeExcel.array_reverse(chart.arrFormatAdobeLabels[j]);
 		}
 		bar.data = tempData;
 		bar.original_data = tempData;
 	}
+	else
+	{
+		for (var j = 0; j < (copyData.length); j++) {
+			chart.arrFormatAdobeLabels[j] =  OfficeExcel.array_reverse(chart.arrFormatAdobeLabels[j]);
+		}
+	}
 
+	bar.firstData = copyData;
+	
 	//bar._otherProps._labels = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 	bar._otherProps._area_border = chart.bShowBorder;
 	bar._otherProps._ylabels_count = 'auto';
