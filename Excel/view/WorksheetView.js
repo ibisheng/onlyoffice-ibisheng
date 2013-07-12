@@ -7123,6 +7123,9 @@
 								}
 							}
 							break;
+						case "style":
+							// ToDo add code here
+							break;
 						case "paste":
 							var pasteExec = function()
 							{

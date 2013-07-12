@@ -2248,6 +2248,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.wb.restoreFocus();
 			},
 
+			asc_setCellStyle: function (name) {
+				this.wb.getWorksheet().setSelectionInfo("style", name);
+				this.wb.restoreFocus();
+			},
+
 			asc_increaseCellDigitNumbers: function () {
 				this.wb.getWorksheet().setSelectionInfo("changeDigNum", +1);
 				this.wb.restoreFocus();
@@ -2909,6 +2914,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_setCellFinancialFormat"] = prot.asc_setCellFinancialFormat;
 		prot["asc_setCellPercentFormat"] = prot.asc_setCellPercentFormat;
 		prot["asc_setCellDelimitedFormat"] = prot.asc_setCellDelimitedFormat;
+		prot["asc_setCellStyle"] = prot.asc_setCellStyle;
 		prot["asc_increaseCellDigitNumbers"] = prot.asc_increaseCellDigitNumbers;
 		prot["asc_decreaseCellDigitNumbers"] = prot.asc_decreaseCellDigitNumbers;
 		prot["asc_increaseFontSize"] = prot.asc_increaseFontSize;
