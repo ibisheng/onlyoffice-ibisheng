@@ -303,6 +303,11 @@ function CTransitionAnimation(htmlpage)
         this.HtmlPage.OnScroll();
     }
 
+    this.IsPlaying = function()
+    {
+        return (null != this.TimerId) ? true : false;
+    }
+
     this.CreateImage = function(w, h)
     {
         var _im = document.createElement('canvas');
@@ -2875,16 +2880,20 @@ function CDemonstrationManager(htmlpage)
 
         var _slides = oThis.HtmlPage.m_oLogicDocument.Slides;
         var _timing = _slides[oThis.SlideNum].timing;
-        oThis.CheckSlideDuration = setTimeout(function()
+
+        if (_timing.SlideAdvanceAfter === true)
         {
-            if (oThis.IsPlayMode)
+            oThis.CheckSlideDuration = setTimeout(function()
             {
-                oThis.SlideNum++;
-                oThis.HtmlPage.m_oApi.sync_DemonstrationSlideChanged(oThis.SlideNum);
-                oThis.StartSlide(true, false);
-            }
-        },
-        _timing.SlideAdvanceDuration);
+                if (oThis.IsPlayMode)
+                {
+                    oThis.SlideNum++;
+                    oThis.HtmlPage.m_oApi.sync_DemonstrationSlideChanged(oThis.SlideNum);
+                    oThis.StartSlide(true, false);
+                }
+            },
+            _timing.SlideAdvanceDuration);
+        }
     }
 
     this.End = function()
@@ -2921,13 +2930,16 @@ function CDemonstrationManager(htmlpage)
         if (!this.Mode)
             return;
 
-        this.SlideNum++;
+        var _is_transition = this.Transition.IsPlaying();
+        if (!_is_transition)
+            this.SlideNum++;
+
         if (this.SlideNum > this.SlidesCount)
             this.End();
         else
         {
             this.HtmlPage.m_oApi.sync_DemonstrationSlideChanged(this.SlideNum);
-            this.StartSlide(true, false);
+            this.StartSlide(!_is_transition, false);
         }
     }
 
@@ -3029,7 +3041,28 @@ function CDemonstrationManager(htmlpage)
     this.onMouseUp = function(e)
     {
         // next slide
-        oThis.NextSlide();
+        var _is_transition = oThis.Transition.IsPlaying();
+        if (_is_transition)
+        {
+            oThis.NextSlide();
+        }
+        else
+        {
+            if (oThis.SlideNum < 0 || oThis.SlideNum >= oThis.SlidesCount)
+            {
+                oThis.NextSlide();
+            }
+            else
+            {
+                var _slides = oThis.HtmlPage.m_oLogicDocument.Slides;
+                var _timing = _slides[oThis.SlideNum].timing;
+
+                if (_timing.SlideAdvanceOnMouseClick === true)
+                {
+                    oThis.NextSlide();
+                }
+            }
+        }
 
         e.preventDefault();
         return false;
