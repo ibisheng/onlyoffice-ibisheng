@@ -1088,6 +1088,11 @@
 					t.handlers.trigger("graphicObjectMouseDown", event, coord.x, coord.y);
 					if ( t.isCellEditMode )
 						t.handlers.trigger("stopCellEditing");
+					
+					if (2 === event.button)
+						t.handlers.trigger("changeSelectionRightClick", coord.x, coord.y);
+					else
+						t.handlers.trigger("changeSelection", /*isStartPoint*/true, coord.x, coord.y, /*isCoord*/true, /*isSelectMode*/true);
 					return;
 				}
 				else
