@@ -810,7 +810,6 @@
 				var cellStyles = cellStylesAll.DefaultStyles;
 				var nLength = cellStyles.length;
 				var oCanvas = document.createElement('canvas');
-				//var oCanvas = document.getElementById('TestCanvas');
 				oCanvas.width = this.styleThumbnailWidth;
 				oCanvas.height = nDefaultStylesCount * this.styleThumbnailHeight;
 				var ctx = oCanvas.getContext('2d');
@@ -837,7 +836,6 @@
 				var cellStyles = cellStylesAll.CustomStyles;
 				var nLength = cellStyles.length;
 				var oCanvas = document.createElement('canvas');
-				//var oCanvas = document.getElementById('TestCanvas');
 				oCanvas.width = this.styleThumbnailWidth;
 				oCanvas.height = nDocumentStylesCount * this.styleThumbnailHeight;
 				var ctx = oCanvas.getContext('2d');
