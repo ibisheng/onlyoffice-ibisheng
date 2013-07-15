@@ -278,7 +278,7 @@ table {
 	height:7px;
 	margin:4px 0;
 }
-#fontFormat, #fontSelect, #fontSizeSelect{	-moz-border-radius: 0px;-webkit-border-radius: 0px;-pie-border-radius: 0px;	behavior: url(../js/PIE.htc);height:21px;background-color:#fff;}
+#fontFormat, #fontSelect, #fontSizeSelect, #cellStyleSelect{	-moz-border-radius: 0px;-webkit-border-radius: 0px;-pie-border-radius: 0px;	behavior: url(../js/PIE.htc);height:21px;background-color:#fff;}
 
 #fontSizeSelect .SubItem{text-align:center;}
 #fontFormat .innerBox{width:120px;}

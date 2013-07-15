@@ -198,7 +198,7 @@ p{ margin: 2px; padding: 2px; vertical-align:top;}
 #newSheet .shspFirst.sheetSPassive{background-image: url(../img/dtab_green_left.png);}
 #newSheet .shspLast.sheetSPassive{background-image: url(../img/dtab_green_right.png);}
 #newSheet .sheetIPassive{background-image: url(../img/dtab_green_mid.png);background-repeat: repeat-x;}
-#fontSelect, #fontSizeSelect{-moz-border-radius: 0px;-webkit-border-radius: 0px;-pie-border-radius: 0px;behavior: url(../js/PIE.htc);height:21px;background-color:#fff;}
+#fontSelect, #fontSizeSelect, #cellStyleSelect{-moz-border-radius: 0px;-webkit-border-radius: 0px;-pie-border-radius: 0px;behavior: url(../js/PIE.htc);height:21px;background-color:#fff;}
 #addHyperlink_url {width:427px;}
 #dialogAddHyperlink select{width:137px;}
 #addHyperlink_text{width: 280px;}

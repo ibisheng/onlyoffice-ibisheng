@@ -373,6 +373,7 @@
 
 			$("#fontSelectVal").text(info.asc_getFont().asc_getName());
 			$("#fontSizeSelectVal").text(info.asc_getFont().asc_getSize()+"pt");
+			$("#cellStyleSelectVal").text(info.asc_getStyleName());
 
 			switch(info.asc_getHorAlign()){
 				case "right":
@@ -493,6 +494,16 @@
 
 	api.asc_registerCallback("asc_onSelectionRangeChanged", function (val) {
 		$("#formatTableRange").val(val);
+	});
+
+	api.asc_registerCallback("asc_onInitEditorStyles", function (styles) {
+		var cellStyleContent = "";
+		var styleName;
+		for (var i = 0; i < styles.defaultStyles.length; i++) {
+			styleName = styles.defaultStyles[i].asc_getName();
+			cellStyleContent += '<li id="'+styleName.replace(/\s/g,"")+'"index="'+i+'" class="SubItem fontListElement" style="font-family:Arial;" nameFont="'+styleName+'">'+styleName+'</li>';
+		}
+		$("#cellStyleSelect ul").empty().append(cellStyleContent);
 	});
 	
 	api.asc_Init("../Fonts/");
@@ -644,6 +655,9 @@
 			}
 		}
 		return false;
+	}});
+	$("#textMenu2").clickMenu({onClick:function(){
+
 	}});
 	$("#dialogRenameWS").dialog({ autoOpen: false,
 			resizable: false, modal: true, closeOnEscape: false, dialogClass: 'dialogClass',
