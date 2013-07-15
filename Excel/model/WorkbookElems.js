@@ -1230,6 +1230,28 @@ CCellStyles.prototype = {
 				oFontMap[oStyle.xfs.font.fn] = 1;
 		}
 	},
+	/**
+	 * Возвращает колличество стилей без учета скрытых
+	 */
+	getDefaultStylesCount: function () {
+		var nCount = this.DefaultStyles.length;
+		for (var i = 0, length = nCount; i < length; ++i) {
+			if (this.DefaultStyles[i].Hidden)
+				--nCount;
+		}
+		return nCount;
+	},
+	/**
+	 * Возвращает колличество стилей без учета скрытых и стандартных
+	 */
+	getCustomStylesCount: function () {
+		var nCount = this.CustomStyles.length;
+		for (var i = 0, length = nCount; i < length; ++i) {
+			if (this.CustomStyles[i].Hidden || null != this.CustomStyles[i].BuiltinId)
+				--nCount;
+		}
+		return nCount;
+	},
 	getStyleNameByXfId: function (oXfId) {
 		var styleName = null;
 		if (null === oXfId)

@@ -802,14 +802,17 @@
 			asc_getDefaultStylesImage: function () { return this.defaultStylesImage; },
 			asc_getDocStylesImage: function () { return this.docStylesImage; },
 			generateStylesAll: function (cellStylesAll, fmgrGraphics, stringRenderer) {
-				this.generateStyles(cellStylesAll.DefaultStyles, fmgrGraphics, stringRenderer);
+				this.generateDefaultStyles(cellStylesAll, fmgrGraphics, stringRenderer);
+				this.generateDocumentStyles(cellStylesAll, fmgrGraphics, stringRenderer);
 			},
-			generateStyles: function (cellStyles, fmgrGraphics, stringRenderer) {
-				var nStylesCount = cellStyles.length;
+			generateDefaultStyles: function (cellStylesAll, fmgrGraphics, stringRenderer) {
+				var nDefaultStylesCount = cellStylesAll.getDefaultStylesCount();
+				var cellStyles = cellStylesAll.DefaultStyles;
+				var nLength = cellStyles.length;
 				var oCanvas = document.createElement('canvas');
 				//var oCanvas = document.getElementById('TestCanvas');
 				oCanvas.width = this.styleThumbnailWidth;
-				oCanvas.height = nStylesCount * this.styleThumbnailHeight;
+				oCanvas.height = nDefaultStylesCount * this.styleThumbnailHeight;
 				var ctx = oCanvas.getContext('2d');
 				ctx.fillStyle = "#FFFFFF";
 				ctx.fillRect(0, 0, oCanvas.width, oCanvas.height);
@@ -818,16 +821,43 @@
 
 				var oStyle = null;
 				this.defaultStyles = [];
-				for (var i = 0; i < nStylesCount; ++i) {
+				for (var i = 0, styleIndex = 0; i < nLength; ++i) {
 					oStyle = cellStyles[i];
-					this.defaultStyles[i] = new asc_CStyleImage(oStyle.Name, i, c_oAscStyleImage.Default);
-					this.drawStyle(oGraphics, stringRenderer, oStyle, i);
+					if (oStyle.Hidden)
+						continue;
+					this.defaultStyles[i] = new asc_CStyleImage(oStyle.Name, styleIndex, c_oAscStyleImage.Default);
+					this.drawStyle(oGraphics, stringRenderer, oStyle, styleIndex);
+					++styleIndex;
 				}
 
 				this.defaultStylesImage = oCanvas.toDataURL("image/png");
 			},
-			generateDocumentStyles: function () {
+			generateDocumentStyles: function (cellStylesAll, fmgrGraphics, stringRenderer) {
+				var nDocumentStylesCount = cellStylesAll.getCustomStylesCount();
+				var cellStyles = cellStylesAll.CustomStyles;
+				var nLength = cellStyles.length;
+				var oCanvas = document.createElement('canvas');
+				//var oCanvas = document.getElementById('TestCanvas');
+				oCanvas.width = this.styleThumbnailWidth;
+				oCanvas.height = nDocumentStylesCount * this.styleThumbnailHeight;
+				var ctx = oCanvas.getContext('2d');
+				ctx.fillStyle = "#FFFFFF";
+				ctx.fillRect(0, 0, oCanvas.width, oCanvas.height);
 
+				var oGraphics = asc.DrawingContext({canvas: oCanvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics});
+
+				var oStyle = null;
+				this.docStyles = [];
+				for (var i = 0, styleIndex = 0; i < nLength; ++i) {
+					oStyle = cellStyles[i];
+					if (oStyle.Hidden || null != oStyle.BuiltinId)
+						continue;
+					this.docStyles[styleIndex] = new asc_CStyleImage(oStyle.Name, styleIndex, c_oAscStyleImage.Document);
+					this.drawStyle(oGraphics, stringRenderer, oStyle, styleIndex);
+					++styleIndex;
+				}
+
+				this.docStylesImage = oCanvas.toDataURL("image/png");
 			},
 			drawStyle: function (oGraphics, stringRenderer, oStyle, nIndex) {
 				var nOffsetY = nIndex * this.styleThumbnailHeightPt;
