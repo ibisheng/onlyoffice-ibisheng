@@ -1205,22 +1205,34 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 		maxY = 0;
 		var isEnY = false
 		var scatterArr = arrValuesRev;
+		var scatterArrLabels = arrFormatAdobeLabelsRev;
 		if(!scatterArr)
+		{
 			scatterArr = arrReverse(arrValues);
+			scatterArrLabels = arrReverse(arrFormatAdobeLabels);
+		}
 		if (chart.range.rows)
+		{
 			scatterArr = arrValues;
+			scatterArrLabels = arrFormatAdobeLabels;
+		}
+			
 		var newArr = [];
+		var newAdobeLabels = [];
 		if(isDateTimeFormat)
 		{
 			formatCellScOy = formatCell;
 			formatCell = 'General';
 			
 			for (i = 0; i < scatterArr.length; ++i) {
-				newArr[i]=[];
+				newArr[i] = [];
+				newAdobeLabels[i] = [];
 				for (j = 0; j < scatterArr[i].length; ++j) {
 					newArr[i][j] = [];
+					newAdobeLabels[i][j] = [];
 					newArr[i][j][0] = j+1;
 					newArr[i][j][1] = scatterArr[i][j];
+					newAdobeLabels[i][j][1] = scatterArrLabels[i][j];
 					if(!isEn)
 					{
 						min = newArr[i][j][0];
@@ -1243,10 +1255,13 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 		else if(scatterArr.length == 1)
 		{
 			newArr[0]=[];
+			newAdobeLabels[0] = [];
 			for (j = 0; j < scatterArr[0].length; ++j) {
 				newArr[0][j] = [];
+				newAdobeLabels[0][j] = [];
 				newArr[0][j][0] = j+1;
 				newArr[0][j][1] = scatterArr[0][j];
+				newAdobeLabels[0][j][1] = scatterArrLabels[0][j];
 				if(!isEn)
 				{
 					min = newArr[0][j][0];
@@ -1269,11 +1284,15 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 		{
 			//принимаем первую срочку за X, остальные за y
 			for (i = 1; i < scatterArr.length; ++i) {
-				newArr[i-1]=[];
+				newArr[i-1] = [];
+				newAdobeLabels[i-1] = [];
 				for (j = 0; j < scatterArr[i].length; ++j) {
 					newArr[i-1][j] = [];
+					newAdobeLabels[i-1][j] = [];
 					newArr[i-1][j][0] = scatterArr[0][j];
 					newArr[i-1][j][1] = scatterArr[i][j];
+					newAdobeLabels[i-1][j][0] = scatterArrLabels[0][j];
+					newAdobeLabels[i-1][j][1] = scatterArrLabels[i][j];
 					
 					if(newArr[i-1][j][0].toString() != '' && !isEn)
 					{
@@ -1315,8 +1334,12 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 	chart.max = max;
 	if(skipSeries)
 		chart.skipSeries = skipSeries;
+		
 	if(newArr != undefined)
+	{
+		chart.arrFormatAdobeLabels = newAdobeLabels;
 		drawChart(chart, newArr, width, height);
+	}	
 	else
 	{
 		chart.isSkip = isSkip;
