@@ -2501,7 +2501,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
                     }
 
                     if (!window['scriptBridge']['addFileImage']) {
-                        window['scriptBridge']['addFileImage'] = function(imageUrl, x, y) {
+                        window['scriptBridge']['addFileImage'] = function(imageUrl, x, y, width, height) {
                             t.wb.controller.isSelectDrawingObject = true;
 
                             var ws = t.wb.getWorksheet();
@@ -2510,8 +2510,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
                             var options = null;
                             if (x && y) {
                                 var picker = ws.objectRender.getPositionInfo(x,y);
-                                options = {cell: {col: picker.col, row: picker.row}};
-                                console.log(picker);
+                                options = {cell: {col: picker.col, row: picker.row}, width: width, height: height};
+                                // console.log(picker);
                             }
 
                             ws.objectRender.addImageDrawingObject(imageUrl, false, options);
