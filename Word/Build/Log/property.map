@@ -286,7 +286,7 @@ sync_UnLockComment:Nxa
 ApplyColorSchemeMappingItem:Pya
 get_pageNumber:zQa
 skipSeries:Hwa
-Internal:Bl
+Internal:Cl
 getOwnTransform:yW
 goToPage:Jta
 MIRP_CVT_ZERO_RULES_SIZE:RBa
@@ -614,8 +614,8 @@ m_nCurrentTimeClearCache:Gha
 setParagraphContextualSpacing:CL
 HdrFtr:Kb
 get_ContextualSpacing:vga
-calculateTransformTextMatrix:sl
-canGroup:tl
+calculateTransformTextMatrix:tl
+canGroup:ul
 bytecode_ready:H0
 transformPointRelativeShape:jG
 globalTableStyles:$R
@@ -882,7 +882,7 @@ Edit_Chart:$L
 Ey:Eo
 bUploadFonts:yMa
 short_metrics:L3
-Ex:zl
+Ex:Al
 f_type:u8
 put_Color:q3
 local_subrs_index:YW
@@ -1452,7 +1452,7 @@ aw:wMa
 newFlipV:Oi
 c1:dt
 c2:iD
-Calculate:yl
+Calculate:zl
 ReadClrMap:Jca
 ah:EKa
 ulCodePageRange1:oka
@@ -1612,7 +1612,7 @@ nHeight:BA
 WidthG:GGa
 ConvertCoordsFromCursorPage:Cla
 raster_new:bwa
-NoShadow:Dl
+NoShadow:El
 Numbering:sc
 sync_BoldCallBack:Swa
 PreLoadTooltipImages:BE
@@ -1789,7 +1789,7 @@ numIDefs:OS
 swap_table:dY
 size_object_size:Gwa
 m_nDrawing:Hha
-yy:xl
+yy:yl
 ReadInd:xDa
 max_instruction_defs:D2
 UpdateVerRuler:BM
@@ -3426,7 +3426,7 @@ _labels_above_underline:KQ
 TimeDown:Doa
 reg:iVa
 library:Hf
-m_arrTabs:wl
+m_arrTabs:xl
 startAt:gaa
 m_bIsSearching:eI
 get_ForSelectedCells:xga
@@ -3483,7 +3483,7 @@ TableRect:l_
 origColor:K6a
 gaspRanges:bta
 oddPage:Aj
-Margins:Cl
+Margins:Dl
 createTrackObjectForMove:$V
 mintcream:c6a
 MeasureString2:vZa
@@ -4246,7 +4246,7 @@ coeffR:ZMa
 mediumslateblue:T5a
 coeffX:$Ma
 Set_ApplyToAll:lc
-hitToHandle:vl
+hitToHandle:wl
 Skip2:cb
 m_oPanelRight:ND
 get_TableLayout:aQa
@@ -4296,7 +4296,7 @@ StartMousePosition:ZG
 Set_EndInfo:UG
 getValue:rD
 put_PageBreakBefore:KTa
-SearchInfo:Fl
+SearchInfo:Gl
 offsetToCoord:xva
 coeffY:aNa
 symmetrical_smoothing:Qwa
@@ -4678,7 +4678,7 @@ Line:Qb
 Width_new:Soa
 put_TextPrItalic:BUa
 get_glyph_metrics:YR
-getTransformMatrix:ul
+getTransformMatrix:vl
 setBodyPr:Hja
 lockDirection:uRa
 _type:Zs
@@ -4881,7 +4881,7 @@ ignore_unpatented_hinter:v4a
 callback_OnUserStateChanged:LMa
 newXfrmOffX:ria
 newXfrmOffY:sia
-Read:El
+Read:Fl
 Refresh_DCChanges:MEa
 onZoomEnd:B$
 Start:rd
@@ -4953,7 +4953,7 @@ get_Between:sOa
 api:Pm
 COMPATIBILITY_MODE_RULES_SIZE:Wya
 AutoShapesTrack:Mw
-arrFormatAdobeLabels:Hl
+arrFormatAdobeLabels:sl
 Read_pgSz:HEa
 oCur_rPr:vO
 graphicPage:V8
@@ -6491,7 +6491,7 @@ IsCurrentPathCanArrows:nZ
 IsNeedDefaultFonts:Hma
 Is_MixedSelection:cZa
 ArrowDrawer:Dm
-Get_Type:Al
+Get_Type:Bl
 Get_AllParagraphs_ByNumbering:Fo
 ZoomValue:BQ
 subrs_len:aE
@@ -6502,7 +6502,7 @@ wrappingObjects:Dk
 TableCurrentMoveValueMin:Rz
 _background_grid_hsize:H6
 polylineFlag:rz
-Selection_SetEnd:Gl
+Selection_SetEnd:Hl
 oldChExtX:x6a
 DocumentContent:Zo
 Note:yZa
