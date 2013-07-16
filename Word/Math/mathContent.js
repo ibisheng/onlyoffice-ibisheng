@@ -190,6 +190,18 @@ CMathContent.prototype =
             case 3:
                 mathElem = new CDegreeOrdinary();
                 break;
+            case 4:
+                mathElem = new CDegreeSubSup(0);
+                break;
+            case 5:
+                mathElem = new CDegreeSubSup(1);
+                break;
+            case 6:
+                mathElem = new CRadical();
+                break;
+            case 7:
+                mathElem = new CDegreeRadical();
+                break;
         }
 
         if( mathElem !== null )
@@ -280,16 +292,84 @@ CMathContent.prototype =
                 var den = fract.getDenominator();
                 den.addTxt("2");
                 break;
-           /*case 9:
+            case 9:
                 var degr = this.createMComponent(3);
                 degr.init();
                 degr.setIndex(1);
+                degr.fillPlaceholders();
                 break;
             case 10:
                 var degr = this.createMComponent(3);
                 degr.init();
                 degr.setIndex(-1);
-                break;*/
+                degr.fillPlaceholders();
+                break;
+            case 11:
+                var degrSupSup = this.createMComponent(4);
+                degrSupSup.init();
+                degrSupSup.fillPlaceholders();
+                break;
+            case 12:
+                var degrSupSup = this.createMComponent(5);
+                degrSupSup.init();
+                degrSupSup.fillPlaceholders();
+                break;
+            case 13:
+                var degr = this.createMComponent(3);
+                degr.init();
+                degr.setIndex(-1);
+                var base = degr.getBase();
+                base.addTxt("x");
+                var iter = degr.getIterator();
+
+                var degr2 = iter.createMComponent(3);
+                degr2.init();
+                degr2.setIndex(1);
+                var base2 = degr2.getBase();
+                base2.addTxt("y");
+                var iter2 = degr2.getIterator();
+                iter2.addTxt("2");
+
+                break;
+            case 14:
+                var degr = this.createMComponent(3);
+                degr.init();
+                degr.setIndex(1);
+                var base = degr.getBase();
+                base.addTxt("e");
+                var iter = degr.getIterator();
+                iter.addTxt("-iωt");
+                break;
+            case 15:
+                var degr = this.createMComponent(3);
+                degr.init();
+                degr.setIndex(1);
+                var base = degr.getBase();
+                base.addTxt("x");
+                var iter = degr.getIterator();
+                iter.addTxt("2");
+                break;
+            case 16:
+                var degr = this.createMComponent(5);
+                degr.init();
+                var base = degr.getBase();
+                base.addTxt("Y");
+                var iter1 = degr.getUpperIterator();
+                iter1.addTxt("n");
+                var iter2 = degr.getLowerIterator();
+                iter2.addTxt("1");
+                break;
+            case 17:
+                var rad = this.createMComponent(6);
+                rad.init();
+                rad.fillPlaceholders();
+                break;
+            case 18:
+                var rad = this.createMComponent(7);
+                rad.init();
+                rad.fillPlaceholders();
+                break;
+
         }
     },
     removeAreaSelect: function()
