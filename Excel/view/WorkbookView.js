@@ -87,11 +87,6 @@
 			this.overlayCtx = undefined;
 			this.stringRender = undefined;
 			this.drawingCtxCharts = undefined;
-			
-			// Global counters
-			g_oIdCounter = new CIdCounter();
-			g_oTableId = new CTableId();
-			g_oIdCounter.Set_UserId(this.Api.User.asc_getId());
 
 			// Максимальная ширина числа из 0,1,2...,9, померенная в нормальном шрифте(дефалтовый для книги) в px(целое)
 			// Ecma-376 Office Open XML Part 1, пункт 18.3.1.13

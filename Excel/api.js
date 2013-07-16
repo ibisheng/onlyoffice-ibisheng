@@ -1304,6 +1304,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 				this.CoAuthoringApi.init (user, docId, this.asc_getViewerMode(), 'fghhfgsjdgfjs', window.location.host, g_sMainServiceLocalUrl, function(){
 				}, /*isExcel*/true);
+				
+				// Global counters
+				g_oIdCounter.Set_UserId(user.asc_getId());
 			},
 
 			// Set CoAuthoring server url

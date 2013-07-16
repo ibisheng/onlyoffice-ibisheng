@@ -1394,6 +1394,10 @@ Workbook.prototype.initGlobalObjects=function(){
 	g_oUndoRedoDrawingLayer = new UndoRedoDrawingLayer(this);
 	g_oUndoRedoAutoFilters = new UndoRedoAutoFilters(this);
     g_oUndoRedoGraphicObjects = new UndoRedoGraphicObjects(this);
+	
+	// Global counters
+	g_oIdCounter = new CIdCounter();
+	g_oTableId = new CTableId();
 }
 Workbook.prototype.init=function(){
 	if(this.nActive < 0)
