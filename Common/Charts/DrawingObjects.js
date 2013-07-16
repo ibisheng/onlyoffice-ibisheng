@@ -4212,15 +4212,15 @@ function DrawingObjects() {
 	//-----------------------------------------------------------------------------------
 	
 	_this.graphicObjectMouseDown = function(e, x, y) {
-		_this.controller.onMouseDown( e, pxToMm(x + scrollOffset.x), pxToMm(y + scrollOffset.y) );
+		_this.controller.onMouseDown( e, pxToMm(x - scrollOffset.x), pxToMm(y - scrollOffset.y) );
 	}
 	
 	_this.graphicObjectMouseMove = function(e, x, y) {
-		_this.controller.onMouseMove( e, pxToMm(x + scrollOffset.x), pxToMm(y + scrollOffset.y) );
+		_this.controller.onMouseMove( e, pxToMm(x - scrollOffset.x), pxToMm(y - scrollOffset.y) );
 	}
 	
 	_this.graphicObjectMouseUp = function(e, x, y) {
-		_this.controller.onMouseUp( e, pxToMm(x + scrollOffset.x), pxToMm(y + scrollOffset.y) );
+		_this.controller.onMouseUp( e, pxToMm(x - scrollOffset.x), pxToMm(y - scrollOffset.y) );
 	}
 	
 	//-----------------------------------------------------------------------------------
@@ -4964,7 +4964,7 @@ function DrawingObjects() {
 		var objectInfo = { cursor: null, data: null, isShape: false };
 		
 		var asc = window["Asc"];
-		var graphicObjectInfo = _this.controller.isPointInDrawingObjects( pxToMm(x), pxToMm(y) );
+		var graphicObjectInfo = _this.controller.isPointInDrawingObjects( pxToMm(x - scrollOffset.x), pxToMm(y - scrollOffset.y) );
 		
 		if ( graphicObjectInfo ) {
 			objectInfo.data = graphicObjectInfo.objectId;
