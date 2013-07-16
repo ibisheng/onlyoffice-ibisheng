@@ -69,7 +69,7 @@ function NullState(drawingObjectsController, drawingObjects)
                         this.drawingObjectsController.addPreTrackObject(new XYAdjustmentTrack(selected_objects[0], hit_to_adj.adjNum));
                     else
                         this.drawingObjectsController.addPreTrackObject(new PolarAdjustmentTrack(selected_objects[0], hit_to_adj.adjNum));
-                    this.drawingObjectsController.changeCurrentState(new PreChangeAdjState(this.drawingObjectsController, this.drawingObjects));
+                    this.drawingObjectsController.changeCurrentState(new PreChangeAdjState(this.drawingObjectsController, this.drawingObjects, selected_objects[0]));
                 }
                 return;
             }
@@ -957,11 +957,12 @@ function MoveState(drawingObjectsController, drawingObjects, startX, startY, rec
 }
 
 
-function PreChangeAdjState(drawingObjectsController, drawingObjects)
+function PreChangeAdjState(drawingObjectsController, drawingObjects, majorObject)
 {
     this.id = STATES_ID_PRE_CHANGE_ADJ;
     this.drawingObjectsController = drawingObjectsController;
     this.drawingObjects = drawingObjects;
+    this.majorObject = majorObject;
 
     this.onMouseDown = function(e, x, y)
     {

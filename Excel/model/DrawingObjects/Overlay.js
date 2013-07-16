@@ -724,8 +724,8 @@ CAutoshapeTrack.prototype =
 
         var drPage = this.CurrentPageInfo.drawingPage;
 
-        var xDst = drPage.left;
-        var yDst = drPage.top;
+        var xDst = drPage.left + (this.Graphics ? this.Graphics.m_oCoordTransform.tx : 0);
+        var yDst = drPage.top + (this.Graphics ? this.Graphics.m_oCoordTransform.ty : 0);
         var wDst = drPage.right - drPage.left;
         var hDst = drPage.bottom - drPage.top;
 
@@ -1169,8 +1169,8 @@ CAutoshapeTrack.prototype =
 
         var drPage = this.CurrentPageInfo.drawingPage;
 
-        var xDst = drPage.left;
-        var yDst = drPage.top;
+        var xDst = drPage.left + (this.Graphics ? this.Graphics.m_oCoordTransform.tx : 0);
+        var yDst = drPage.top + (this.Graphics ? this.Graphics.m_oCoordTransform.ty : 0);
         var wDst = drPage.right - drPage.left;
         var hDst = drPage.bottom - drPage.top;
 
@@ -1368,8 +1368,8 @@ CAutoshapeTrack.prototype =
 
         var drPage = this.CurrentPageInfo.drawingPage;
 
-        var xDst = drPage.left;
-        var yDst = drPage.top;
+        var xDst = drPage.left + (this.Graphics ? this.Graphics.m_oCoordTransform.tx : 0);
+        var yDst = drPage.top + (this.Graphics ? this.Graphics.m_oCoordTransform.ty : 0);
         var wDst = drPage.right - drPage.left;
         var hDst = drPage.bottom - drPage.top;
 
