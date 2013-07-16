@@ -5936,7 +5936,7 @@
 					
 					var drawingInfo = this.objectRender.checkCursorDrawingObject(x, y);
 					if ( drawingInfo ) {
-						if ( drawingInfo.isShape )
+						if ( drawingInfo.isGraphicObject )
 								asc["editor"].isStartAddShape = true;
 							else
 								asc["editor"].isStartAddShape = false;

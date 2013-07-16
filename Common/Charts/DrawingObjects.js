@@ -2161,6 +2161,15 @@ function DrawingObjects() {
             return _this.drawingDocument.CanvasHitContext;
         }
 
+		// GraphicObject: x, y, extX, extY
+		_t.getGraphicObjectMetrics = function() {
+			
+			return { x: pxToMm(_t.getRealLeftOffset()),
+					 y: pxToMm(_t.getRealTopOffset()),
+					 extX: pxToMm(_t.getWidthFromTo()),
+					 extY: pxToMm(_t.getHeightFromTo()) };
+		}
+		
 		// Считаем From/To исходя из graphicObject
 		_t.setGraphicObjectCoords = function() {
 			if ( _t.isGraphicObject() ) {
@@ -4207,6 +4216,9 @@ function DrawingObjects() {
 		return selArray;
 	}
 	
+	_this.getSelectedObjectsStack = function() {
+	}
+	
 	//-----------------------------------------------------------------------------------
 	// Graphic object mouse events
 	//-----------------------------------------------------------------------------------
@@ -4961,7 +4973,7 @@ function DrawingObjects() {
 			return null;
 
 		var index = _this.inSelectionDrawingObjectIndex(x, y, true);
-		var objectInfo = { cursor: null, data: null, isShape: false };
+		var objectInfo = { cursor: null, data: null, isGraphicObject: false };
 		
 		var asc = window["Asc"];
 		var graphicObjectInfo = _this.controller.isPointInDrawingObjects( pxToMm(x - scrollOffset.x), pxToMm(y - scrollOffset.y) );
@@ -4969,7 +4981,7 @@ function DrawingObjects() {
 		if ( graphicObjectInfo ) {
 			objectInfo.data = graphicObjectInfo.objectId;
 			objectInfo.cursor = graphicObjectInfo.cursorType;
-			objectInfo.isShape = true;
+			objectInfo.isGraphicObject = true;
 			return objectInfo;
 		}
 

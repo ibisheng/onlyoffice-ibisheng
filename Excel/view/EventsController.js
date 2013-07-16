@@ -1077,7 +1077,7 @@
 				
 				// Shapes
 				var graphicsInfo = t.handlers.trigger("getGraphicsInfo", coord.x, coord.y);
-				if ( graphicsInfo && graphicsInfo.isShape ) {
+				if ( graphicsInfo && graphicsInfo.isGraphicObject ) {
 					asc["editor"].isStartAddShape = true;
 					t.isFocusDrawingObject = true;
 					t.isSelectDrawingObject = true;
@@ -1362,7 +1362,7 @@
 			
 				// shapes
 				var graphicsInfo = t.handlers.trigger("getGraphicsInfo", coord.x, coord.y);
-				if ( graphicsInfo && graphicsInfo.isShape )
+				if ( graphicsInfo && graphicsInfo.isGraphicObject )
 					asc["editor"].isStartAddShape = true;
 				
 				if ( asc["editor"].isStartAddShape ) {
