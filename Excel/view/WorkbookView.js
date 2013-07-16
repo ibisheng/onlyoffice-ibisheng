@@ -1080,10 +1080,10 @@
 						item = this.wsViews[i];
 						// Меняем zoom (для не активных сменим как только сделаем его активным)
 						item.changeZoom(/*isDraw*/i == activeIndex);
-						item.graphicsChangeZoom(/*isDraw*/i == activeIndex, factor);
 						if (i == activeIndex) {
 							item.draw();
 							item.drawDepCells();
+							item.objectRender.changeZoom(this.drawingCtx.scaleFactor);
 						}
 					}
 				}

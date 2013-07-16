@@ -2858,6 +2858,16 @@ function DrawingObjects() {
     };
 
 	_this.changeZoom = function(factor) {
+		
+		shapeCtx.init( drawingCtx.ctx, drawingCtx.getWidth(0), drawingCtx.getHeight(0), drawingCtx.getWidth(3), drawingCtx.getHeight(3) );
+		shapeCtx.CalculateFullTransform();
+		
+		shapeOverlayCtx.init( overlayCtx.ctx, overlayCtx.getWidth(0), overlayCtx.getHeight(0), overlayCtx.getWidth(3), overlayCtx.getHeight(3) );
+		shapeOverlayCtx.CalculateFullTransform();
+		
+		trackOverlay.init( shapeOverlayCtx.m_oContext, "ws-canvas-overlay", 0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix, shapeOverlayCtx.m_dWidthMM, shapeOverlayCtx.m_dHeightMM );
+		autoShapeTrack.init( trackOverlay, 0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix, shapeOverlayCtx.m_dWidthMM, shapeOverlayCtx.m_dHeightMM );		
+		autoShapeTrack.Graphics.CalculateFullTransform();
 	}
 	
 	_this.getWorkbook = function() {
@@ -3171,6 +3181,7 @@ function DrawingObjects() {
 				_this.raiseLayerDrawingObjects(true);
 			}
 		}
+		_this.drawWorksheetHeaders();
 	}
 
 	_this.showOverlayGraphicObjects = function() {
@@ -3247,6 +3258,11 @@ function DrawingObjects() {
 		return metrics;
 	}
 
+	_this.drawWorksheetHeaders = function() {
+		worksheet._drawColumnHeaders();
+		worksheet._drawRowHeaders();
+	}
+	
 	//-----------------------------------------------------------------------------------
 	// Common operation for Undo/Redo
 	//-----------------------------------------------------------------------------------
@@ -3335,8 +3351,8 @@ function DrawingObjects() {
 					
 					calculateObjectMetrics(obj, isOption ? options.width : _image.Image.width, isOption ? options.height : _image.Image.height);
 					
-					var x = pxToMm(obj.getVisibleLeftOffset() + headerLeft);
-					var y = pxToMm(obj.getVisibleTopOffset() + headerTop);
+					var x = pxToMm(obj.getRealLeftOffset());
+					var y = pxToMm(obj.getRealTopOffset());
 					var w = pxToMm(obj.getWidthFromTo());
 					var h = pxToMm(obj.getHeightFromTo());
 					
@@ -3350,10 +3366,6 @@ function DrawingObjects() {
 					worksheet.cellCommentator.drawCommentCells(false);
 					
 					_this.showDrawingObjects(false);
-					
-					// History.Create_NewPoint();
-					// History.Add(g_oUndoRedoDrawingObject, historyitem_DrawingObject_Add, worksheet.model.getId(), null, obj);
-					
 					_this.lockDrawingObject(obj.id, bPackage ? false : true, bPackage ? false : true);
 				}
 				
@@ -4065,6 +4077,7 @@ function DrawingObjects() {
         graphic.setDrawingBase(obj);
 				
 		obj.graphicObject.select(_this.controller);
+		obj.setGraphicObjectCoords();
 		aObjects.push(obj);
 		_this.showDrawingObjects(false);
 		worksheet.model.workbook.handlers.trigger("asc_onEndAddShape");
@@ -4175,8 +4188,10 @@ function DrawingObjects() {
 	}
 	
 	_this.selectGraphicObject = function() {
-		if ( _this.drawingDocument )
+		if ( _this.drawingDocument ) {
 			_this.controller.drawSelection(_this.drawingDocument);
+			_this.drawWorksheetHeaders();
+		}
 	}
 	
 	_this.setScrollOffset = function(x_px, y_px) {

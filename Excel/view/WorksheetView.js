@@ -627,10 +627,6 @@
 					this._prepareCellTextMetricsCache(this.visibleRange);
 					this._shiftVisibleRange();
 					this.cellCommentator.updateCommentPosition();
-					
-					this.shapeCtx.init(this.drawingCtx.ctx, this.drawingCtx.getWidth(0), this.drawingCtx.getHeight(0), this.drawingCtx.getWidth(3), this.drawingCtx.getHeight(3));
-					this.shapeOverlayCtx.init(this.overlayCtx.ctx, this.overlayCtx.getWidth(0), this.overlayCtx.getHeight(0), this.overlayCtx.getWidth(3), this.overlayCtx.getHeight(3));
-
 					this.updateZoom = false;
 				} else {
 					this.updateZoom = true;
@@ -638,11 +634,6 @@
 				return this;
 			},
 			
-			graphicsChangeZoom: function (isUpdate, factor) {
-				if ( isUpdate )
-					this.objectRender.changeZoom(factor);
-			},
-
 			getCellTextMetrics: function (col, row) {
 				var ct = this._getCellTextCache(col, row);
 				return ct ? $.extend({}, ct.metrics) : undefined;
