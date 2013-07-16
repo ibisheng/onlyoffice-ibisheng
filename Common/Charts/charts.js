@@ -1520,6 +1520,9 @@ function drawChart(chart, arrValues, width, height) {
 		}
 		else if(chart.type == 'HBar')
 			bar._otherProps._colors = bar._otherProps._colors;
+			
+		if(chart.type == 'HBar')
+			bar._otherProps._colors = OfficeExcel.array_reverse(bar._otherProps._colors);
 		
 		if((chart.legend.position == 'left' || chart.legend.position == 'right' ))
 		{
