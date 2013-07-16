@@ -2851,6 +2851,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_addAutoFilter"] = prot.asc_addAutoFilter;
 		prot["asc_applyAutoFilter"] = prot.asc_applyAutoFilter;
 		prot["asc_sortColFilter"] = prot.asc_sortColFilter;
+		prot["asc_getAddFormatTableOptions"] = prot.asc_getAddFormatTableOptions;
 		
 		// Drawing objects interface
 
