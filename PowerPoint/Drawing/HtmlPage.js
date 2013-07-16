@@ -227,6 +227,8 @@ function CEditorPage(api)
     this.IsUpdateOverlayOnlyEnd = false;
     this.IsUpdateOverlayOnEndCheck = false;
 
+    this.IsUseNullThumbnailsSplitter = false;
+
     this.m_oApi = api;
     var oThis = this;
 
@@ -1104,7 +1106,7 @@ function CEditorPage(api)
         var _x = global_mouseEvent.X - oWordControl.X;
         var _y = global_mouseEvent.Y - oWordControl.Y;
 
-        if (_x >= x1 && _x <= x2 && _y >= 0 && _y <= oWordControl.Height && oThis.Splitter1Pos != 0)
+        if (_x >= x1 && _x <= x2 && _y >= 0 && _y <= oWordControl.Height && (oThis.IsUseNullThumbnailsSplitter || (oThis.Splitter1Pos != 0)))
         {
             oWordControl.m_oBody.HtmlElement.style.cursor = "w-resize";
             oWordControl.createSplitterDiv(true);
@@ -1201,20 +1203,20 @@ function CEditorPage(api)
         if (!this.IsSupportNotes)
             this.Splitter2Pos = 0;
 
-        if (0 == this.Splitter1Pos)
-        {
-            this.m_oMainContent.Bounds.L = 0;
-            this.m_oMainContent.Bounds.B = this.Splitter2Pos + 1.5;
-
-            this.m_oNotesContainer.Bounds.L = 0;
-            this.m_oNotesContainer.Bounds.AbsH = this.Splitter2Pos;
-        }
-        else
+        if (this.IsUseNullThumbnailsSplitter || (0 != this.Splitter1Pos))
         {
             this.m_oMainContent.Bounds.L = this.Splitter1Pos + 1.5;
             this.m_oMainContent.Bounds.B = this.Splitter2Pos + 1.5;
 
             this.m_oNotesContainer.Bounds.L = this.Splitter1Pos + 1.5;
+            this.m_oNotesContainer.Bounds.AbsH = this.Splitter2Pos;
+        }
+        else
+        {
+            this.m_oMainContent.Bounds.L = 0;
+            this.m_oMainContent.Bounds.B = this.Splitter2Pos + 1.5;
+
+            this.m_oNotesContainer.Bounds.L = 0;
             this.m_oNotesContainer.Bounds.AbsH = this.Splitter2Pos;
         }
 
