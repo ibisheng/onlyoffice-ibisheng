@@ -1786,6 +1786,8 @@ function DrawLineChart(chartCanvas, chartType, chartSubType, data, chart) {
 				data[j + 1][i] = data[j + 1][i] + data[j][i]
 			}
 		}
+		chart.max = getMaxValueArray(data);
+		chart.min = getMinValueArray(data);
 		bar.original_data = data;
 	}
 	else if (bar._otherProps._autoGrouping == 'stackedPer') {
@@ -1812,6 +1814,8 @@ function DrawLineChart(chartCanvas, chartType, chartSubType, data, chart) {
 					tempData[i][j] = (100 * tempData[i][j]) / (summValue[j]);
 			}
 		}
+		chart.max = getMaxValueArray(tempData);
+		chart.min = getMinValueArray(tempData);
 		bar.data = tempData;
 		bar.original_data = tempData;
 	}
@@ -2376,4 +2380,35 @@ function getMaxPropertiesText(context, font, text)
 			result = context.measureText((text).toString(),0);
 	}
 	return result;
+}
+function getMaxValueArray(array)
+{
+	var max = 0;
+	for(var i = 0; i < array.length; i++)
+	{
+		for(var j = 0; j < array[i].length; j++)
+		{
+			if(i == 0 && j == 0)
+				max =  array[i][j];
+			if(array[i][j] > max)
+				max = array[i][j];
+		}
+	}
+	return max;
+}
+
+function getMinValueArray(array)
+{
+	var min = 0;
+	for(var i = 0; i < array.length; i++)
+	{
+		for(var j = 0; j < array[i].length; j++)
+		{
+			if(i == 0 && j == 0)
+				min =  array[i][j];
+			if(array[i][j] < min)
+				min = array[i][j];
+		}
+	}
+	return min;
 }
