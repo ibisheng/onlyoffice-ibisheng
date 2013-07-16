@@ -2407,8 +2407,9 @@ function DrawingObjects() {
 			return _t.image.height / _t.getHeightFromTo();
 		}
 		
-		//if ( g_oTableId )
-		//	g_oTableId.Add( _t, _t.id );
+		_t.getDrawingObjects = function() {	
+			return _this;
+		}
 	}
 	
 	DrawingBase.prototype = {
