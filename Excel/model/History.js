@@ -70,6 +70,7 @@ var historyitem_Cell_SetStyle = 18;
 var historyitem_Cell_SetFont = 19;
 var historyitem_Cell_SetQuotePrefix = 20;
 var historyitem_Cell_Angle = 21;
+var historyitem_Cell_Style = 22;
 
 var historyitem_DrawingObject_Add = 1;
 var historyitem_DrawingObject_Remove = 2;

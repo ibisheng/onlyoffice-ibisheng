@@ -2407,6 +2407,10 @@ UndoRedoCell.prototype = {
 		{
 			cell.setQuotePrefix(Val);
 		}
+		else if (historyitem_Cell_Style == Type)
+		{
+			cell.setCellStyle(Val);
+		}
 	}
 };
 

@@ -1252,6 +1252,15 @@ CCellStyles.prototype = {
 		}
 		return nCount;
 	},
+	getStyleByXfId: function (oXfId) {
+		for (var i = 0, length = this.CustomStyles.length; i < length; ++i) {
+			if (oXfId === this.CustomStyles[i].XfId) {
+				return this.CustomStyles[i];
+			}
+		}
+
+		return null;
+	},
 	getStyleNameByXfId: function (oXfId) {
 		var styleName = null;
 		if (null === oXfId)
@@ -1283,6 +1292,48 @@ CCellStyles.prototype = {
 				return style.Name;
 		}
 		return null;
+	},
+	_prepareCellStyle: function (name) {
+		var defaultStyle = null;
+		var style = null;
+		var i, length;
+		var maxXfId = -1;
+		// Проверим, есть ли в default
+		for (i = 0, length = this.DefaultStyles.length; i < length; ++i) {
+			if (name === this.DefaultStyles[i].Name) {
+				defaultStyle = this.DefaultStyles[i];
+				break;
+			}
+		}
+		// Если есть в default, ищем в custom по builtinId. Если нет, то по имени
+		if (defaultStyle) {
+			for (i = 0, length = this.CustomStyles.length; i < length; ++i) {
+				if (defaultStyle.BuiltinId === this.CustomStyles[i].BuiltinId) {
+					style = this.CustomStyles[i];
+					break;
+				}
+				maxXfId = Math.max(maxXfId, this.CustomStyles[i].XfId);
+			}
+		} else {
+			for (i = 0, length = this.CustomStyles.length; i < length; ++i) {
+				if (name === this.CustomStyles[i].Name) {
+					style = this.CustomStyles[i];
+					break;
+				}
+				maxXfId = Math.max(maxXfId, this.CustomStyles[i].XfId);
+			}
+		}
+
+		// Если нашли, то возвращаем XfId
+		if (style)
+			return style.XfId;
+
+		if (defaultStyle) {
+			this.CustomStyles[i] = defaultStyle.clone();
+			this.CustomStyles[i].XfId = ++maxXfId;
+			return this.CustomStyles[i].XfId;
+		}
+		return null;
 	}
 };
 /** @constructor */
@@ -1297,6 +1348,17 @@ function CCellStyle() {
 	this.xfs = null;
 }
 CCellStyle.prototype = {
+	clone: function () {
+		var oNewStyle = new CCellStyle();
+		oNewStyle.BuiltinId = this.BuiltinId;
+		oNewStyle.CustomBuiltin = this.CustomBuiltin;
+		oNewStyle.Hidden = this.Hidden;
+		oNewStyle.ILevel = this.ILevel;
+		oNewStyle.Name = this.Name;
+
+		oNewStyle.xfs = this.xfs.clone();
+		return oNewStyle;
+	},
 	getFill: function () {
 		if (null != this.xfs && null != this.xfs.fill)
 			return this.xfs.fill.bg;
@@ -1367,6 +1429,27 @@ StyleManager.prototype =
 		if(null == xfs.align)
 			xfs.align = new Align();
         return xfs;
+	},
+	_prepareSetCellStyle : function (oItemWithXfs) {
+		return this._prepareSet(oItemWithXfs);
+	},
+	setCellStyle : function(oItemWithXfs, val)
+	{
+		// ToDo add code
+		var xfs = oItemWithXfs.xfs;
+		var oRes = {newVal: val, oldVal: null};
+		if(null != xfs && null != xfs.XfId)
+			oRes.oldVal = xfs.XfId;
+		else
+			oRes.oldVal = g_oDefaultXfId;
+		if(null == val) {
+			if(null != xfs)
+				xfs.XfId = g_oDefaultXfId;
+		} else {
+			xfs = this._prepareSetCellStyle(oItemWithXfs);
+			xfs.XfId = val;
+		}
+		return oRes;
 	},
 	setNumFormat : function(oItemWithXfs, val)
 	{
@@ -1852,6 +1935,7 @@ function Col(worksheet, index)
 {
 	this.ws = worksheet;
 	this.sm = this.ws.workbook.oStyleManager;
+	this.cs = this.ws.workbook.CellStyles;
 	this.index = index;
 	this.id = this.ws.getNextColId();
     this.BestFit = null;
@@ -1980,6 +2064,10 @@ Col.prototype =
 				newVal = newVal.clone();
 			History.Add(g_oUndoRedoCol, historyitem_RowCol_SetStyle, this.ws.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oldVal, newVal));
 		}
+	},
+	setCellStyle : function(val)
+	{
+		// ToDo add code here
 	},
 	setNumFormat : function(val)
 	{
@@ -2113,6 +2201,7 @@ function Row(worksheet)
 {
 	this.ws = worksheet;
 	this.sm = this.ws.workbook.oStyleManager;
+	this.cs = this.ws.workbook.CellStyles;
 	this.c = new Object();
 	this.id = this.ws.getNextRowId();
     this.r = null;
@@ -2238,6 +2327,10 @@ Row.prototype =
 				newVal = newVal.clone();
 			History.Add(g_oUndoRedoRow, historyitem_RowCol_SetStyle, this.ws.getId(), new Asc.Range(0, this.index, gc_nMaxCol0, this.index), new UndoRedoData_IndexSimpleProp(this.index, true, oldVal, newVal));
 		}
+	},
+	setCellStyle : function(val)
+	{
+		// ToDo add code here
 	},
 	setNumFormat : function(val)
 	{

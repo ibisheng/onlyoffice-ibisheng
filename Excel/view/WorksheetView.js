@@ -7115,7 +7115,7 @@
 							}
 							break;
 						case "style":
-							// ToDo add code here
+							range.setCellStyle(val); canChangeColWidth = c_oAscCanChangeColWidth.numbers; break;
 							break;
 						case "paste":
 							var pasteExec = function()

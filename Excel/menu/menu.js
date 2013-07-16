@@ -501,7 +501,7 @@
 		var styleName;
 		for (var i = 0; i < styles.defaultStyles.length; i++) {
 			styleName = styles.defaultStyles[i].asc_getName();
-			cellStyleContent += '<li id="'+styleName.replace(/\s/g,"")+'"index="'+i+'" class="SubItem fontListElement" style="font-family:Arial;" nameFont="'+styleName+'">'+styleName+'</li>';
+			cellStyleContent += '<li id="'+styleName.replace(/\s/g,"")+'"index="'+i+'" class="SubItem cellStyleListElement" nameStyle="'+styleName+'">'+styleName+'</li>';
 		}
 		$("#cellStyleSelect ul").empty().append(cellStyleContent);
 	});
@@ -657,7 +657,15 @@
 		return false;
 	}});
 	$("#textMenu2").clickMenu({onClick:function(){
+		$('#textMenu2').trigger('closemenu');
+		if ($(this).hasClass("cellStyleListElement")){
+			$('#cellStyleSelectVal').text(this.innerHTML);
+			$('#cellStyleSelectVal').val(this.getAttribute("value"));
+			$('#cellStyleSelectVal').change();
+			api.asc_setCellStyle($(this).attr("nameStyle"));
+		}
 
+		return false;
 	}});
 	$("#dialogRenameWS").dialog({ autoOpen: false,
 			resizable: false, modal: true, closeOnEscape: false, dialogClass: 'dialogClass',

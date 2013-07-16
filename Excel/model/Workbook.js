@@ -3876,6 +3876,7 @@ Woorksheet.prototype.getAllCol = function(){
 function Cell(worksheet){
 	this.ws = worksheet;
 	this.sm = worksheet.workbook.oStyleManager;
+	this.cs = worksheet.workbook.CellStyles;
 	this.oValue = new CCellValue(this);
 	this.xfs = null;
 	this.tableXfs = null;
@@ -4138,6 +4139,22 @@ Cell.prototype.getDefaultFormat=function(oDefault){
 	if(null != col && null != col.xfs)
 		return col.xfs;
 	return oDefault;
+};
+Cell.prototype.setCellStyle=function(val){
+	var newVal = this.cs._prepareCellStyle(val);
+	var oRes = this.sm.setCellStyle(this, newVal);
+	if(History.Is_On() && oRes.oldVal != oRes.newVal) {
+		var oldStyleName = this.cs.getStyleNameByXfId(oRes.oldVal);
+		History.Add(g_oUndoRedoCell, historyitem_Cell_Style, this.ws.getId(), new Asc.Range(0, this.oId.getRow0(), gc_nMaxCol0, this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oldStyleName, val));
+
+		// Выставляем стиль
+		var oStyle = this.cs.getStyleByXfId(oRes.newVal);
+		this.setFont(oStyle.getFont());
+		this.setFill(oStyle.getFill());
+		this.setBorder(oStyle.getBorder());
+	}
+	this.bNeedCompileXfs = true;
+	this.oValue.cleanCache();
 };
 Cell.prototype.setNumFormat=function(val){
 	var oRes = this.sm.setNumFormat(this, val);
@@ -4881,6 +4898,30 @@ Range.prototype.setValue2=function(array){
 			// cell.Remove();
 	});
 	History.EndTransaction();
+};
+Range.prototype.setCellStyle=function(val){
+	History.Create_NewPoint();
+	var oBBox = this.bbox;
+	History.SetSelection(new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2));
+	this.createCellOnRowColCross();
+	var fSetProperty = this._setProperty;
+	var nRangeType = this._getRangeType();
+	if(c_oRangeType.All == nRangeType)
+	{
+		this.worksheet.getAllCol().setCellStyle(val);
+		fSetProperty = this._setPropertyNoEmpty;
+	}
+	fSetProperty.call(this, function(row){
+			if(c_oRangeType.All == nRangeType && null == row.xfs)
+				return;
+			row.setCellStyle(val);
+		},
+		function(col){
+			col.setCellStyle(val);
+		},
+		function(cell){
+			cell.setCellStyle(val);
+		});
 };
 Range.prototype.setNumFormat=function(val){
 	History.Create_NewPoint();
