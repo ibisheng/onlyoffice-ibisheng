@@ -3711,9 +3711,9 @@ asc_docs_api.prototype.DemonstrationPrevSlide = function()
     this.WordControl.DemonstrationManager.PrevSlide();
 }
 
-asc_docs_api.prototype.GoToSlide = function(slideNum)
+asc_docs_api.prototype.DemonstrationGoToSlide = function(slideNum)
 {
-    this.WordControl.GoToSlide(slideNum);
+    this.WordControl.DemonstrationManager.GoToSlide(slideNum);
 }
 
 asc_docs_api.prototype.ApplySlideTiming = function(oTiming)
