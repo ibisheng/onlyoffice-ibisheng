@@ -902,7 +902,7 @@
 				var format = oStyle.getFont();
 				var oFont = new asc.FontProperties(format.fn, format.fs, format.b, format.i, format.u, format.s);
 
-				var width_padding = 2.25; // 3 * 96 / 72
+				var width_padding = 2.25; // 3 * 72 / 96
 				var tm = stringRenderer.measureString(oStyle.Name);
 				oGraphics.setFont(oFont);
 				oGraphics.setFillStyle(oFontColor);
