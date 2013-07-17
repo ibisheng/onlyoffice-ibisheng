@@ -1386,6 +1386,7 @@ function BinaryStylesTableWriter(memory, wb, oBinaryWorksheetsTableWriter)
     this.bs = new BinaryCommonWriter(this.memory);
 	this.wb = wb;
 	this.aDxfs = null;
+	this.oXfsStylesMap = null;
 	this.oXfsMap = null;
 	this.oFontMap = null;
 	this.oFillMap = null;
@@ -1394,6 +1395,7 @@ function BinaryStylesTableWriter(memory, wb, oBinaryWorksheetsTableWriter)
 	if(null != oBinaryWorksheetsTableWriter)
 	{
 		this.aDxfs = oBinaryWorksheetsTableWriter.aDxfs;
+		this.oXfsStylesMap = oBinaryWorksheetsTableWriter.oXfsStylesMap;
 		this.oXfsMap = oBinaryWorksheetsTableWriter.oXfsMap;
 		this.oFontMap = oBinaryWorksheetsTableWriter.oFontMap;
 		this.oFillMap = oBinaryWorksheetsTableWriter.oFillMap;
@@ -1408,6 +1410,7 @@ function BinaryStylesTableWriter(memory, wb, oBinaryWorksheetsTableWriter)
     this.WriteStylesContent = function()
     {
         var oThis = this;
+		var wb = this.wb;
         //borders
         this.bs.WriteItem(c_oSerStylesTypes.Borders, function(){oThis.WriteBorders();});
         //fills
@@ -1416,10 +1419,14 @@ function BinaryStylesTableWriter(memory, wb, oBinaryWorksheetsTableWriter)
         this.bs.WriteItem(c_oSerStylesTypes.Fonts, function(){oThis.WriteFonts();});
         //numfmts
         this.bs.WriteItem(c_oSerStylesTypes.NumFmts, function(){oThis.WriteNumFmts();});
+		//CellStyleXfs
+		this.bs.WriteItem(c_oSerStylesTypes.CellStyleXfs, function(){oThis.WriteCellStyleXfs();});
         //cellxfs
         this.bs.WriteItem(c_oSerStylesTypes.CellXfs, function(){oThis.WriteCellXfs();});
-		
-		var wb = this.wb;
+
+		//CellStyles
+		this.bs.WriteItem(c_oSerStylesTypes.CellStyles, function(){oThis.WriteCellStyles(wb.CellStyles.CustomStyles);});
+
 		if(null != wb.TableStyles)
 			this.bs.WriteItem(c_oSerStylesTypes.TableStyles, function(){oThis.WriteTableStyles(wb.TableStyles);});		
 		
@@ -1655,6 +1662,15 @@ function BinaryStylesTableWriter(memory, wb, oBinaryWorksheetsTableWriter)
             this.memory.WriteLong(num.id);
         }
     };
+	this.WriteCellStyleXfs = function(cellStyles)
+	{
+		var oThis = this;
+		for(var i = 0, length = this.oXfsStylesMap.length; i < length; ++i)
+		{
+			var cellStyleXfs = this.oXfsStylesMap[i];
+			this.bs.WriteItem(c_oSerStylesTypes.Xfs, function(){oThis.WriteXfs(cellStyleXfs);});
+		}
+	};
     this.WriteCellXfs = function()
     {
         var oThis = this;
@@ -1741,6 +1757,12 @@ function BinaryStylesTableWriter(memory, wb, oBinaryWorksheetsTableWriter)
             this.memory.WriteByte(c_oSerPropLenType.Byte);
             this.memory.WriteBool(xfs.QuotePrefix);
         }
+		if(null != xfs.XfId)
+		{
+			this.memory.WriteByte(c_oSerXfsTypes.XfId);
+			this.memory.WriteByte(c_oSerPropLenType.Long);
+			this.memory.WriteLong(xfs.XfId);
+		}
     };
     this.WriteAlign = function(align)
     {
@@ -1824,7 +1846,32 @@ function BinaryStylesTableWriter(memory, wb, oBinaryWorksheetsTableWriter)
 			this.bs.WriteItem(c_oSer_Dxf.Font, function(){oThis.WriteFont(Dxf.font);});
 		if(null != Dxf.numFmt)
 			this.bs.WriteItem(c_oSer_Dxf.NumFmt, function(){oThis.WriteNum(Dxf.numFmt);});
-	}
+	};
+	this.WriteCellStyles = function (cellStyles) {
+		var oThis = this;
+		for(var i = 0, length = cellStyles.length; i < length; ++i)
+		{
+			var style = cellStyles[i];
+			this.bs.WriteItem(c_oSerStylesTypes.CellStyle, function(){oThis.WriteCellStyle(style);});
+		}
+	};
+	this.WriteCellStyle = function (oCellStyle) {
+		var oThis = this;
+		if (null != oCellStyle.BuiltinId)
+			this.bs.WriteItem(c_oSer_CellStyle.BuiltinId, function(){oThis.memory.WriteLong(oCellStyle.BuiltinId);});
+		if (null != oCellStyle.CustomBuiltin)
+			this.bs.WriteItem(c_oSer_CellStyle.CustomBuiltin, function(){oThis.memory.WriteBool(oCellStyle.CustomBuiltin);});
+		if (null != oCellStyle.Hidden)
+			this.bs.WriteItem(c_oSer_CellStyle.Hidden, function(){oThis.memory.WriteBool(oCellStyle.Hidden);});
+		if (null != oCellStyle.ILevel)
+			this.bs.WriteItem(c_oSer_CellStyle.ILevel, function(){oThis.memory.WriteLong(oCellStyle.ILevel);});
+		if (null != oCellStyle.Name) {
+			this.memory.WriteByte(c_oSer_CellStyle.Name);
+			this.memory.WriteString2(oCellStyle.Name);
+		}
+		if (null != oCellStyle.XfId)
+			this.bs.WriteItem(c_oSer_CellStyle.XfId, function(){oThis.memory.WriteLong(oCellStyle.XfId);});
+	};
 	this.WriteTableStyles = function(tableStyles)
     {
 		var oThis = this;
@@ -2087,6 +2134,7 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, oDrawings, aDxf
 	this.aFills = aFills;
 	this.aBorders = aBorders;
 	this.aNums = aNums;
+	this.oXfsStylesMap = [];
 	this.oXfsMap = new Object();
 	this.nXfsMapIndex = 0;
 	this.oFontMap = new Object();
@@ -2136,9 +2184,10 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, oDrawings, aDxf
 			oAlign = g_oDefaultAlign;
 			sAlign = this._getStringFromObjWithProperty(g_oDefaultAlign);
 		}
-		var xfs = {borderid: 0, fontid: 0, fillid: 0, numid: 0, align: oAlign, QuotePrefix: null}
+		this.prepareXfsStyles();
+		var xfs = {borderid: 0, fontid: 0, fillid: 0, numid: 0, align: oAlign, QuotePrefix: null};
 		this.oXfsMap["0|0|0|0|"+sAlign] = {index: this.nXfsMapIndex++, val: xfs};
-	}
+	};
     this.Write = function()
     {
         var oThis = this;
@@ -2695,55 +2744,70 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, oDrawings, aDxf
 				this.bs.WriteItem(c_oSerRowTypes.Cell, function(){oThis.WriteCell(cell, nXfsId);});
         }
     };
-	this.prepareXfs = function(xfs)
-	{
-		var nXfsId = 0;
+	this.prepareXfsStyles = function () {
+		var styles = this.wb.CellStyles.CustomStyles;
+		var xfs = null;
+		for(var i = 0, length = styles.length; i < length; ++i) {
+			xfs = styles[i].xfs;
+			if (xfs) {
+				var sStyle = this.prepareXfsStyle(xfs);
+				var oXfs = {borderid: sStyle.borderid, fontid: sStyle.fontid, fillid: sStyle.fillid,
+					numid: sStyle.numid, align: null, QuotePrefix: null, XfId: xfs.XfId};
+				if("0" != sStyle.align)
+					oXfs.align = xfs.align;
+				if(null != xfs.QuotePrefix)
+					oXfs.QuotePrefix = xfs.QuotePrefix;
+
+				this.oXfsStylesMap.push(oXfs);
+			}
+		}
+	};
+	this.prepareXfsStyle = function(xfs) {
+		var sStyle = {val: "", borderid: 0, fontid: 0, fillid: 0, numid: 0, align: "0"};
 		if(null != xfs)
 		{
-			var sStyle = "";
-			var font = 0;
 			if(null != xfs.font)
 			{
 				var sHash = this._getStringFromObjWithProperty(xfs.font);
 				var elem = this.oFontMap[sHash];
 				if(null == elem)
 				{
-					font = this.nFontMapIndex++;
-					this.oFontMap[sHash] = {index: font, val: xfs.font};
+					sStyle.fontid = this.nFontMapIndex++;
+					this.oFontMap[sHash] = {index: sStyle.fontid, val: xfs.font};
 				}
 				else
-					font = elem.index;
+					sStyle.fontid = elem.index;
 			}
-			sStyle += font.toString();
-			var fill = 0;
+			sStyle.val += sStyle.fontid.toString();
+
 			if(null != xfs.fill)
 			{
 				var sHash = this._getStringFromObjWithProperty(xfs.fill);
 				var elem = this.oFillMap[sHash];
 				if(null == elem)
 				{
-					fill = this.nFillMapIndex++;
-					this.oFillMap[sHash] = {index: fill, val: xfs.fill};
+					sStyle.fillid = this.nFillMapIndex++;
+					this.oFillMap[sHash] = {index: sStyle.fillid, val: xfs.fill};
 				}
 				else
-					fill = elem.index;
+					sStyle.fillid = elem.index;
 			}
-			sStyle += "|" + fill.toString();
-			var border = 0;
+			sStyle.val += "|" + sStyle.fillid.toString();
+
 			if(null != xfs.border)
 			{
 				var sHash = this._getStringFromObjWithProperty(xfs.border);
 				var elem = this.oBorderMap[sHash];
 				if(null == elem)
 				{
-					border = this.nBorderMapIndex++;
-					this.oBorderMap[sHash] = {index: border, val: xfs.border};
+					sStyle.borderid = this.nBorderMapIndex++;
+					this.oBorderMap[sHash] = {index: sStyle.borderid, val: xfs.border};
 				}
 				else
-					border = elem.index;
+					sStyle.borderid = elem.index;
 			}
-			sStyle += "|" + border.toString();
-			var num = 0;
+			sStyle.val += "|" + sStyle.borderid.toString();
+
 			if(null != xfs.num)
 			{
 				//стандартные форматы не записываем в map, на них можно ссылаться по id
@@ -2754,36 +2818,47 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, oDrawings, aDxf
 					var elem = this.oNumMap[sHash];
 					if(null == elem)
 					{
-						num = this.nNumMapIndex++;
-						this.oNumMap[sHash] = {index: num, val: xfs.num};
+						sStyle.numid = this.nNumMapIndex++;
+						this.oNumMap[sHash] = {index: sStyle.numid, val: xfs.num};
 					}
 					else
-						num = elem.index;
+						sStyle.numid = elem.index;
 				}
 				else
-					num = nStandartId;
+					sStyle.numid = nStandartId;
 			}
-			sStyle += "|" + num.toString();
-			var align = "0";
+			sStyle.val += "|" + sStyle.numid.toString();
+
 			if(null != xfs.align && false == xfs.align.isEqual(g_oDefaultAlignAbs))
-				align = this._getStringFromObjWithProperty(xfs.align);
-			sStyle += "|" + align;
-			var oXfsMapObj = this.oXfsMap[sStyle];
+				sStyle.align = this._getStringFromObjWithProperty(xfs.align);
+			sStyle.val += "|" + sStyle.align;
+		}
+
+		return sStyle;
+	};
+	this.prepareXfs = function(xfs)
+	{
+		var nXfsId = 0;
+		if(null != xfs)
+		{
+			var sStyle = this.prepareXfsStyle(xfs);
+			var oXfsMapObj = this.oXfsMap[sStyle.val];
 			if(null == oXfsMapObj)
 			{
 				nXfsId = this.nXfsMapIndex;
-				var oXfs = {borderid: border, fontid: font, fillid: fill, numid: num, align: null, QuotePrefix: null};
-				if("0" != align)
+				var oXfs = {borderid: sStyle.borderid, fontid: sStyle.fontid, fillid: sStyle.fillid,
+					numid: sStyle.numid, align: null, QuotePrefix: null, XfId: xfs.XfId};
+				if("0" != sStyle.align)
 					oXfs.align = xfs.align;
 				if(null != xfs.QuotePrefix)
 					oXfs.QuotePrefix = xfs.QuotePrefix;
-				this.oXfsMap[sStyle] = {index: this.nXfsMapIndex++, val: oXfs};
+				this.oXfsMap[sStyle.val] = {index: this.nXfsMapIndex++, val: oXfs};
 			}
 			else
 				nXfsId = oXfsMapObj.index;
 		}
 		return nXfsId;
-	}
+	};
 	this.AddToMergedAndHyperlink = function(container)
 	{
 		if(null != container.merged)
