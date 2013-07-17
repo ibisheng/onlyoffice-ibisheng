@@ -459,24 +459,11 @@
 			
 			this.collaborativeEditing = collaborativeEditing;
 			
-			//auto filters
+			// Auto filters
 			this.autoFilters = new asc_AF();
+			this.cellCommentator = new asc_CCellCommentator(this);
 
 			this._init();
-			
-			/**
-			 * pictures, charts render
-			 * @type DrawingObjects
-			 */
-			 
-			if ( !this.settings.objectRender ) {
-				this.objectRender = new DrawingObjects();
-				this.objectRender.init(this);
-			}
-			else
-				this.objectRender = this.settings.objectRender;
-			
-			this.cellCommentator = new asc_CCellCommentator(this);
 
 			return this;
 		}
@@ -1123,9 +1110,14 @@
 				}
 				if ( commentList.length )
 					this.model.workbook.handlers.trigger("asc_onAddComments", commentList);
-				
-				//this.model.aComments = new Array();
-				//this.model.aCommentsCoords = new Array();
+			},
+			_prepareDrawingObjects: function () {
+				if ( !this.settings.objectRender ) {
+					this.objectRender = new DrawingObjects();
+					this.objectRender.init(this);
+				}
+				else
+					this.objectRender = this.settings.objectRender;
 			},
 			_initWorksheetDefaultWidth: function () {
 				this.nBaseColWidth = this.model.nBaseColWidth || this.nBaseColWidth;

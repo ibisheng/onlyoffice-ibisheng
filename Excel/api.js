@@ -2102,22 +2102,19 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			asyncImageStartLoaded: function() {
 			},
 			
+			asyncImageEndLoaded: function(_image) {
+				var ws = this.wb.getWorksheet();
+				if ( ws.objectRender.asyncImageEndLoaded )
+					ws.objectRender.asyncImageEndLoaded(_image);
+			},
+			
 			asyncImagesDocumentStartLoaded: function() {				
 			},
 			
-			asyncImagesDocumentEndLoaded: function() {				
-			},
-			
-			asyncImageEndLoaded: function(_image) {
+			asyncImagesDocumentEndLoaded: function() {
 				var ws = this.wb.getWorksheet();
-				if ( ws.objectRender.asyncImageLoadedEvent )
-					ws.objectRender.asyncImageLoadedEvent(_image);
-			},
-			
-			asyncImageEndLoadedBackground: function(_image) {
-				var ws = this.wb.getWorksheet();
-				if ( ws.objectRender.asyncImageLoadedBackgroundEvent )
-					ws.objectRender.asyncImageLoadedBackgroundEvent(_image);
+				if ( ws.objectRender.asyncImagesDocumentEndLoaded )
+					ws.objectRender.asyncImagesDocumentEndLoaded();
 			},
 			
 			// Cell interface

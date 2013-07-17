@@ -940,7 +940,7 @@ function asc_CChart(object) {
 
 	this.bChartEditor = bCopy ? object.bChartEditor : false;
 	this.type = bCopy ? object.type : null;
-	this.subType = bCopy ? object.subType : null;
+	this.subType = bCopy ? object.subType : c_oAscChartSubType.normal;
 	
 	this.bShowValue = bCopy ? object.bShowValue : false;
 	this.bShowBorder = bCopy ? object.bShowBorder : true;
@@ -2050,7 +2050,8 @@ function DrawingObjects() {
 	//-----------------------------------------------------------------------------------
 	
 	var _this = this;
-	var api = window["Asc"]["editor"];
+	var asc = window["Asc"];
+	var api = asc["editor"];
 	var chartRender = new ChartRender();
 	var worksheet = null;
 	var isViewerMode = null;	
@@ -2078,8 +2079,8 @@ function DrawingObjects() {
 	var imageLoader = new ImageLoader();	
 	
 	_this.drawingDocument = null;
-	_this.asyncImageLoadedEvent = null;
-	_this.asyncImageLoadedBackgroundEvent = null;
+	_this.asyncImageEndLoaded = null;
+	_this.asyncImagesDocumentEndLoaded = null;
 	
 	//-----------------------------------------------------------------------------------
 	// Create drawing
@@ -2337,25 +2338,25 @@ function DrawingObjects() {
 		// Реальное смещение по высоте
 		_t.getRealTopOffset = function() {
 			var val = _t.worksheet.getCellTop(_t.from.row, 0) + mmToPx(_t.from.rowOff);
-			return window["Asc"].round(val);
+			return asc.round(val);
 		}
 
 		// Реальное смещение по ширине
 		_t.getRealLeftOffset = function() {
 			var val = _t.worksheet.getCellLeft(_t.from.col, 0) + mmToPx(_t.from.colOff);
-			return window["Asc"].round(val);
+			return asc.round(val);
 		}
 
 		// Ширина по координатам
 		_t.getWidthFromTo = function(withoutRound) {
 			var val = _t.worksheet.getCellLeft(_t.to.col, 0) + mmToPx(_t.to.colOff) - _t.worksheet.getCellLeft(_t.from.col, 0) - mmToPx(_t.from.colOff);
-			return withoutRound ? val : window["Asc"].round(val);
+			return withoutRound ? val : asc.round(val);
 		}
 
 		// Высота по координатам
 		_t.getHeightFromTo = function(withoutRound) {
 			var val = _t.worksheet.getCellTop(_t.to.row, 0) + mmToPx(_t.to.rowOff) - _t.worksheet.getCellTop(_t.from.row, 0) - mmToPx(_t.from.rowOff);
-			return withoutRound ? val : window["Asc"].round(val);
+			return withoutRound ? val : asc.round(val);
 		}
 
 		// Видимая ширина при скролах
@@ -2396,14 +2397,14 @@ function DrawingObjects() {
 		_t.getInnerOffsetTop = function() {
 			var fvr = _t.worksheet.getCellTop(_t.worksheet.getFirstVisibleRow(), 0);
 			var off = _t.getRealTopOffset() - fvr;
-			return (off > 0) ? 0 : window["Asc"].round(Math.abs(off) * _t.getHeightCoeff());
+			return (off > 0) ? 0 : asc.round(Math.abs(off) * _t.getHeightCoeff());
 		}
 
 		// смещение по ширине внутри объекта
 		_t.getInnerOffsetLeft = function() {
 			var fvc = _t.worksheet.getCellLeft(_t.worksheet.getFirstVisibleCol(), 0);
 			var off = _t.getRealLeftOffset() - fvc;
-			return (off > 0) ? 0 : window["Asc"].round(Math.abs(off) * _t.getWidthCoeff());
+			return (off > 0) ? 0 : asc.round(Math.abs(off) * _t.getWidthCoeff());
 		}
 
 		// коэффициент по ширине если несоответствие с реальным размером
@@ -2673,39 +2674,41 @@ function DrawingObjects() {
 			}
 				
 			if ( currentSheet.model.Drawings[i].isImage() ) {
-								
-				aImagesSync[aImagesSync.length] = currentSheet.model.Drawings[i].imageUrl;
-				aObjectsSync[aObjectsSync.length] = currentSheet.model.Drawings[i];
+				
+				aObjectsSync[aObjectsSync.length] = clone;
+				aImagesSync[aImagesSync.length] = clone.imageUrl;
 			}
 		}
 		
 		// Загружаем все картинки листа
-		api.ImageLoader.bIsAsyncLoadDocumentImages = true;
-		api.ImageLoader.LoadDocumentImages(aImagesSync);
-		api.ImageLoader.bIsAsyncLoadDocumentImages = false;
-		
-		for (var i = 0; i < aObjectsSync.length; i++) {
+		_this.asyncImagesDocumentEndLoaded = function() {
 			
-			var clone = aObjectsSync[i];
-			var image = api.ImageLoader.LoadImage(aImagesSync[i], 1);	// Должна быть в мапе
+			for (var i = 0; i < aObjectsSync.length; i++) {
 			
-			if ( image != null ) {
-			
-				var headerTop = worksheet.getCellTop(0, 0);
-				var headerLeft = worksheet.getCellLeft(0, 0);
-								
-				var x = pxToMm(clone.getVisibleLeftOffset() + headerLeft);
-				var y = pxToMm(clone.getVisibleTopOffset() + headerTop);
-				var w = pxToMm(clone.getWidthFromTo());
-				var h = pxToMm(clone.getHeightFromTo());
+				var clone = aObjectsSync[i];
+				var image = api.ImageLoader.LoadImage(aImagesSync[i], 1);	// Должна быть в мапе
 				
-				// CImage
-				clone.graphicObject = new CImage(clone, _this);
-				clone.graphicObject.initDefault( x, y, w, h, image.src );
-				aObjects.push(clone);
+				if ( image != null ) {
+				
+					var headerTop = worksheet.getCellTop(0, 0);
+					var headerLeft = worksheet.getCellLeft(0, 0);
+									
+					var x = pxToMm(clone.getVisibleLeftOffset() + headerLeft);
+					var y = pxToMm(clone.getVisibleTopOffset() + headerTop);
+					var w = pxToMm(clone.getWidthFromTo());
+					var h = pxToMm(clone.getHeightFromTo());
+					
+					// CImage
+					clone.graphicObject = new CImage(clone, _this);
+					clone.graphicObject.initDefault( x, y, w, h, image.src );
+					clone.setGraphicObjectCoords();
+					clone.graphicObject.draw(shapeCtx);
+					aObjects.push(clone);
+				}
 			}
-		}
+		}	
 		
+		api.ImageLoader.LoadDocumentImages(aImagesSync);
 		lastObjectIndex = aObjects.length;
 
 		// Upload event
@@ -3320,7 +3323,7 @@ function DrawingObjects() {
 				addImageObject(_image);
 			}
 			else {
-				_this.asyncImageLoadedEvent = function(_image) {
+				_this.asyncImageEndLoaded = function(_image) {
 					addImageObject(_image);
 				}
 			}
@@ -3362,6 +3365,7 @@ function DrawingObjects() {
 					obj.graphicObject = new CImage(obj, _this);
 					obj.graphicObject.initDefault( x, y, w, h, _image.src );
 					obj.graphicObject.select(_this.controller);
+					obj.setGraphicObjectCoords();
 					aObjects.push(obj);
 					
 					worksheet.autoFilters.drawAutoF(worksheet);
@@ -4283,18 +4287,18 @@ function DrawingObjects() {
 		var index = _this.getSelectedDrawingObjectIndex();
 		if (index >= 0) {
 			if (aObjects[index].isChart())
-				return new window["Asc"].asc_CChart(aObjects[index].chart);
+				return new asc.asc_CChart(aObjects[index].chart);
 			else null;
 		}
 		else {
 			// Check iframe chart editor
 			for (var i = 0; i < _this.countDrawingObjects(); i++) {
 				if ( aObjects[i].isChart() && aObjects[i].chart.bChartEditor )
-					return new window["Asc"].asc_CChart(aObjects[i].chart);
+					return new asc.asc_CChart(aObjects[i].chart);
 			}
 		
 			// New chart object
-			var chart = new window["Asc"].asc_CChart(_this.createDrawingObject().chart);
+			var chart = new asc.asc_CChart(_this.createDrawingObject().chart);
 			return chart;
 		}
 	}
@@ -4599,7 +4603,7 @@ function DrawingObjects() {
 					return;
 					
 				var BB = obj.chart.range.intervalObject.getBBox0(),
-					range = window["Asc"].Range(BB.c1,BB.r1,BB.c2,BB.r2,true);
+					range = asc.Range(BB.c1,BB.r1,BB.c2,BB.r2,true);
 					
 				worksheet.arrActiveChartsRanges.push(range);
 				worksheet.isChartAreaEditMode = true;
@@ -4991,8 +4995,6 @@ function DrawingObjects() {
 
 		var index = _this.inSelectionDrawingObjectIndex(x, y, true);
 		var objectInfo = { cursor: null, data: null, isGraphicObject: false };
-		
-		var asc = window["Asc"];
 		var graphicObjectInfo = _this.controller.isPointInDrawingObjects( pxToMm(x - scrollOffset.x), pxToMm(y - scrollOffset.y) );
 		
 		if ( graphicObjectInfo ) {
@@ -5365,7 +5367,7 @@ function DrawingObjects() {
 	}
 
 	function ascCvtRatio(fromUnits, toUnits) {
-		return window["Asc"].getCvtRatio( fromUnits, toUnits, drawingCtx ? drawingCtx.getPPIX() : 96 );
+		return asc.getCvtRatio( fromUnits, toUnits, drawingCtx.getPPIX() );
 	}
 
 	function setCanvasZIndex(canvas, value) {
@@ -5384,7 +5386,7 @@ function DrawingObjects() {
 	}
 
 	function pxToPt(val) {
-		var tmp = window["Asc"].round(val) * ascCvtRatio(0, 1);
+		var tmp = asc.round(val) * ascCvtRatio(0, 1);
 		return tmp > 0 ? tmp : 0;
 	}
 
