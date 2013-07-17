@@ -8624,7 +8624,7 @@
 					if (true !== options.isMatchCase)
 						cellText = cellText.toLowerCase();
 					if (cellText.indexOf(options.text) >= 0) {
-						if (true !== options.isWholeWord || options.text.length === cellText.length)
+						if (true !== options.isWholeCell || options.text.length === cellText.length)
 							return this._setActiveCell(c, r);
 					}
 				}
@@ -8677,7 +8677,7 @@
 					if (true !== options.isMatchCase)
 						cellText = cellText.toLowerCase();
 					if (cellText.indexOf(options.text) >= 0) {
-						if (true !== options.isWholeWord || options.text.length === cellText.length)
+						if (true !== options.isWholeCell || options.text.length === cellText.length)
 							return this._setActiveCell(c, r);
 					}
 				}

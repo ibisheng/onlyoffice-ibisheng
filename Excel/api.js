@@ -1797,9 +1797,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					this.wb.enableKeyEventsHandler(isEnabled);
 			},
 
-			asc_findText: function (text, scanByRows, scanForward, isMatchCase, isWholeWord) {
+			asc_findText: function (text, scanByRows, scanForward, isMatchCase, isWholeCell) {
 				var d = this.wb.findCellText({text: text, scanByRows: scanByRows, scanForward: scanForward,
-					isMatchCase: isMatchCase, isWholeWord: isWholeWord});
+					isMatchCase: isMatchCase, isWholeCell: isWholeCell});
 				if (d) {
 					if (d.deltaX) {this.controller.scrollHorizontal(d.deltaX);}
 					if (d.deltaY) {this.controller.scrollVertical(d.deltaY);}
@@ -1807,7 +1807,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				return !!d;
 			},
 
-			asc_replaceText: function (findWhat, replaceWith, isReplaceAll, isMatchCase, isWholeWord) {
+			asc_replaceText: function (findWhat, replaceWith, isReplaceAll, isMatchCase, isWholeCell) {
 				// ToDo add code here
 			},
 
