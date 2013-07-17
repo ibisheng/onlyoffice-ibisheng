@@ -8615,8 +8615,6 @@
 
 				for (ct = findNextCell(); ct; ct = findNextCell()) {
 					// Не пользуемся RegExp, чтобы не возиться со спец.символами
-					// ToDo не учитываем регистр
-
 					mc = this._getMergedCellsRange(c, r);
 					if (mc)
 						_tmpCell = this.model.getCell (new CellAddress(mc.r1, mc.c1, 0));
@@ -8626,7 +8624,8 @@
 					if (true !== options.isMatchCase)
 						cellText = cellText.toLowerCase();
 					if (cellText.indexOf(options.text) >= 0) {
-						return this._setActiveCell(c, r);
+						if (true !== options.isWholeWord || options.text.length === cellText.length)
+							return this._setActiveCell(c, r);
 					}
 				}
 
@@ -8669,7 +8668,6 @@
 				}
 				for (ct = findNextCell(); ct; ct = findNextCell()) {
 					// Не пользуемся RegExp, чтобы не возиться со спец.символами
-					// ToDo не учитываем регистр
 					mc = this._getMergedCellsRange(c, r);
 					if (mc)
 						_tmpCell = this.model.getCell (new CellAddress(mc.r1, mc.c1, 0));
@@ -8679,7 +8677,8 @@
 					if (true !== options.isMatchCase)
 						cellText = cellText.toLowerCase();
 					if (cellText.indexOf(options.text) >= 0) {
-						return this._setActiveCell(c, r);
+						if (true !== options.isWholeWord || options.text.length === cellText.length)
+							return this._setActiveCell(c, r);
 					}
 				}
 				return undefined;

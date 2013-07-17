@@ -1798,7 +1798,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 
 			asc_findText: function (text, scanByRows, scanForward, isMatchCase, isWholeWord) {
-				// ToDo process isWholeWord arguments
 				var d = this.wb.findCellText({text: text, scanByRows: scanByRows, scanForward: scanForward,
 					isMatchCase: isMatchCase, isWholeWord: isWholeWord});
 				if (d) {
