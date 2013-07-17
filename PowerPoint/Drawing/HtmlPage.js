@@ -1210,6 +1210,8 @@ function CEditorPage(api)
 
             this.m_oNotesContainer.Bounds.L = this.Splitter1Pos + 1.5;
             this.m_oNotesContainer.Bounds.AbsH = this.Splitter2Pos;
+
+            this.m_oThumbnailsContainer.HtmlElement.style.display = "block";
         }
         else
         {
@@ -1218,6 +1220,8 @@ function CEditorPage(api)
 
             this.m_oNotesContainer.Bounds.L = 0;
             this.m_oNotesContainer.Bounds.AbsH = this.Splitter2Pos;
+
+            this.m_oThumbnailsContainer.HtmlElement.style.display = "none";
         }
 
         this.OnResize2(true);
