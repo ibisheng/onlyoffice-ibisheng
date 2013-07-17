@@ -1546,7 +1546,7 @@ function CParagraphTabs (obj)
     }
 }
 CParagraphTabs.prototype.get_Count = function (){ return this.Tabs.length; }
-CParagraphTabs.prototype.get_Tab = function (Index){ this.Tabs[Index]; }
+CParagraphTabs.prototype.get_Tab = function (Index){ return this.Tabs[Index]; }
 CParagraphTabs.prototype.add_Tab = function (Tab){ this.Tabs.push(Tab) }
 CParagraphTabs.prototype.clear = function (){ this.Tabs.length = 0; }
 
