@@ -2958,10 +2958,10 @@ function CDemonstrationManager(htmlpage)
 
     this.GoToSlide = function(slideNum)
     {
-        if (!this.DemonstrationManager.Mode)
+        if (!this.Mode)
             return;
 
-        if ((slideNum == this.SlideNum) || (slideNum < 0) || (slideNum >= this.m_oDrawingDocument.SlidesCount))
+        if ((slideNum == this.SlideNum) || (slideNum < 0) || (slideNum >= this.SlidesCount))
             return;
 
         this.SlideNum = slideNum;
