@@ -5012,6 +5012,14 @@ Paragraph.prototype =
                 {
                     this.Remove_PresentationNumbering();
                 }
+                else if ( align_Right === Pr.Jc )
+                {
+                    this.Set_Align( align_Center );
+                }
+                else if ( align_Center === Pr.Jc )
+                {
+                    this.Set_Align( align_Left );
+                }
                 else if ( Math.abs(Pr.Ind.FirstLine) > 0.001 )
                 {
                     if ( Pr.Ind.FirstLine > 0 )
