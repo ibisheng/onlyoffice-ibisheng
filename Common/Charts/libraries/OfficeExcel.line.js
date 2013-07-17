@@ -277,32 +277,12 @@
 			//var isSkip = false;
             if(this._otherProps._filled == true && (this._otherProps._autoGrouping == 'stacked' || this._otherProps._autoGrouping == 'stackedPer'))
 			{
-				//isSkip = $.grep(this.data[this.data.length - 1 - i],)
 				var k = 0;
-				/*while(k != this.data[this.data.length - 1 - i].length - 1)
-				{
-					if(this.data[this.data.length - 1 - i][k] != '')
-					{
-						isSkip = true;
-						break;
-					}
-					k++;
-				}*/
 				if(!isSkip[i])
 					this.DrawLine(this.data[this.data.length - 1 - i], 'inherit', this._otherProps._colors[this._otherProps._colors.length - 1- j], this.GetLineWidth(j), tickmarks, i);
 			}  
             else
 			{
-				/*var k = 0;
-				while(k != this.data[i].length - 1)
-				{
-					if(this.data[i][k] != '')
-					{
-						isSkip = true;
-						break;
-					}
-					k++;
-				}*/
 				if(!isSkip[i])
 					this.DrawLine(this.data[i], this._otherProps._colors[j], fill, this.GetLineWidth(j), tickmarks, i);
 			}
@@ -1394,7 +1374,7 @@
                 penUp = true;
             }
 
-            if (i == 0 || penUp || !yPos || !prevY || prevY < this._chartGutter._top) {
+            if (i == 0 || penUp || !yPos || !prevY /*|| prevY < this._chartGutter._top*/) {
 
                 if (this._otherProps._filled && !this._otherProps._filled_range) {
 
@@ -1832,8 +1812,8 @@
 
             if ((
                    (i == 0 && coords[i])
-                || (yPos < this._chartGutter._top)
-                || (prevY < this._chartGutter._top)
+                /*|| (yPos < this._chartGutter._top)
+                || (prevY < this._chartGutter._top)*/
                 || (yPos > (height - this._chartGutter._bottom))
                 || (i > 0 && prevX > (width - this._chartGutter._right))
                 || (i > 0 && prevY > (height - this._chartGutter._bottom))
