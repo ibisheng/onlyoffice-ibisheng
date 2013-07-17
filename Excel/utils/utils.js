@@ -829,7 +829,7 @@
 					++styleIndex;
 				}
 
-				this.defaultStylesImage = (0 === styleIndex) ? null : oCanvas.toDataURL("image/png");
+				this.defaultStylesImage = (0 === styleIndex) ? "" : oCanvas.toDataURL("image/png");
 			},
 			generateDocumentStyles: function (cellStylesAll, fmgrGraphics, stringRenderer) {
 				var nDocumentStylesCount = cellStylesAll.getCustomStylesCount();
@@ -855,7 +855,7 @@
 					++styleIndex;
 				}
 
-				this.docStylesImage = (0 === styleIndex) ? null : oCanvas.toDataURL("image/png");
+				this.docStylesImage = (0 === styleIndex) ? "" : oCanvas.toDataURL("image/png");
 			},
 			drawStyle: function (oGraphics, stringRenderer, oStyle, nIndex) {
 				var nOffsetY = nIndex * this.styleThumbnailHeightPt;
