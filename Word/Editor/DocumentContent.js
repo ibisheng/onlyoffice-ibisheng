@@ -1516,7 +1516,7 @@ CDocumentContent.prototype =
         {
             if ( true == this.Selection.Use )
                 this.Remove( 1, true );
-            
+
             var Item = this.Content[this.CurPos.ContentPos];
             if ( type_Paragraph == Item.GetType() )
             {
@@ -3582,50 +3582,51 @@ CDocumentContent.prototype =
 
                                 var LvlText   = "";
                                 var LvlTextPr = new CTextPr();
-                                LvlTextPr.FontFamily = { Name : "Times New Roman", Index : -1 };
+                                LvlTextPr.RFonts.Set_All( "Times New Roman", -1 );
 
                                 switch ( NumInfo.SubType )
                                 {
                                     case 1:
                                     {
                                         LvlText = String.fromCharCode( 0x00B7 );
-                                        LvlTextPr.FontFamily = { Name : "Symbol", Index : -1 };
+                                        LvlTextPr.RFonts.Set_All( "Symbol", -1 );
                                         break;
                                     }
                                     case 2:
                                     {
                                         LvlText = "o";
-                                        LvlTextPr.FontFamily = { Name : "Courier New", Index : -1 };
+                                        LvlTextPr.RFonts.Set_All( "Courier New", -1 );
                                         break;
                                     }
                                     case 3:
                                     {
                                         LvlText = String.fromCharCode( 0x00A7 );
-                                        LvlTextPr.FontFamily = { Name : "Wingdings", Index : -1 };
+                                        LvlTextPr.RFonts.Set_All( "Wingdings", -1 );
                                         break;
                                     }
                                     case 4:
                                     {
                                         LvlText = String.fromCharCode( 0x0076 );
-                                        LvlTextPr.FontFamily = { Name : "Wingdings", Index : -1 };
+                                        LvlTextPr.RFonts.Set_All( "Wingdings", -1 );
                                         break;
                                     }
                                     case 5:
                                     {
                                         LvlText = String.fromCharCode( 0x00D8 );
-                                        LvlTextPr.FontFamily = { Name : "Wingdings", Index : -1 };
+                                        LvlTextPr.RFonts.Set_All( "Wingdings", -1 );
                                         break;
                                     }
                                     case 6:
                                     {
                                         LvlText = String.fromCharCode( 0x00FC );
-                                        LvlTextPr.FontFamily = { Name : "Wingdings", Index : -1 };
+                                        LvlTextPr.RFonts.Set_All( "Wingdings", -1 );
                                         break;
                                     }
                                     case 7:
                                     {
                                         LvlText = String.fromCharCode( 0x00A8 );
-                                        LvlTextPr.FontFamily = { Name : "Symbol", Index : -1 };
+                                        LvlTextPr.RFonts.Set_All( "Symbol", -1 );
+
                                         break;
                                     }
                                 }
@@ -4004,50 +4005,50 @@ CDocumentContent.prototype =
 
                                 var LvlText   = "";
                                 var LvlTextPr = new CTextPr();
-                                LvlTextPr.FontFamily = { Name : "Times New Roman", Index : -1 };
+                                LvlTextPr.RFonts.Set_All( "Times New Roman", -1 );
 
                                 switch ( NumInfo.SubType )
                                 {
                                     case 1:
                                     {
                                         LvlText = String.fromCharCode( 0x00B7 );
-                                        LvlTextPr.FontFamily = { Name : "Symbol", Index : -1 };
+                                        LvlTextPr.RFonts.Set_All( "Symbol", -1 );
                                         break;
                                     }
                                     case 2:
                                     {
                                         LvlText = "o";
-                                        LvlTextPr.FontFamily = { Name : "Courier New", Index : -1 };
+                                        LvlTextPr.RFonts.Set_All( "Courier New", -1 );
                                         break;
                                     }
                                     case 3:
                                     {
                                         LvlText = String.fromCharCode( 0x00A7 );
-                                        LvlTextPr.FontFamily = { Name : "Wingdings", Index : -1 };
+                                        LvlTextPr.RFonts.Set_All( "Wingdings", -1 );
                                         break;
                                     }
                                     case 4:
                                     {
                                         LvlText = String.fromCharCode( 0x0076 );
-                                        LvlTextPr.FontFamily = { Name : "Wingdings", Index : -1 };
+                                        LvlTextPr.RFonts.Set_All( "Wingdings", -1 );
                                         break;
                                     }
                                     case 5:
                                     {
                                         LvlText = String.fromCharCode( 0x00D8 );
-                                        LvlTextPr.FontFamily = { Name : "Wingdings", Index : -1 };
+                                        LvlTextPr.RFonts.Set_All( "Wingdings", -1 );
                                         break;
                                     }
                                     case 6:
                                     {
                                         LvlText = String.fromCharCode( 0x00FC );
-                                        LvlTextPr.FontFamily = { Name : "Wingdings", Index : -1 };
+                                        LvlTextPr.RFonts.Set_All( "Wingdings", -1 );
                                         break;
                                     }
                                     case 7:
                                     {
                                         LvlText = String.fromCharCode( 0x00A8 );
-                                        LvlTextPr.FontFamily = { Name : "Symbol", Index : -1 };
+                                        LvlTextPr.RFonts.Set_All( "Symbol", -1 );
                                         break;
                                     }
                                 }

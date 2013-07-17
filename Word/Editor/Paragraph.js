@@ -8013,23 +8013,166 @@ Paragraph.prototype =
     // Добавляем нумерацию к данному параграфу
     Numbering_Add : function(NumId, Lvl)
     {
+        var ParaPr = this.Get_CompiledPr2(false).ParaPr;
         var NumPr_old = this.Numbering_Get();
 
         this.Numbering_Remove();
 
-        this.Pr.NumPr = new CNumPr();
-        this.Pr.NumPr.Set( NumId, Lvl );
+        var SelectionUse       = this.Is_SelectionUse();
+        var SelectedOneElement = this.Parent.Selection_Is_OneElement();
 
-        History.Add( this, { Type : historyitem_Paragraph_Numbering, Old : NumPr_old, New : this.Pr.NumPr } );
-
-        if ( undefined != this.Pr.Ind )
+        // Рассчитаем количество табов, идущих в начале параграфа
+        var Count = this.Content.length;
+        var TabsCount = 0;
+        var TabsPos = new Array();
+        for ( var Pos = 0; Pos < Count; Pos++ )
         {
-            History.Add( this, { Type : historyitem_Paragraph_Ind_First, Old : ( undefined != this.Pr.Ind.FirstLine ? this.Pr.Ind.FirstLine : undefined ), New : undefined } );
-            History.Add( this, { Type : historyitem_Paragraph_Ind_Left,  Old : ( undefined != this.Pr.Ind.Left      ? this.Pr.Ind.Left      : undefined ), New : undefined } );
+            var Item = this.Content[Pos];
+            var ItemType = Item.Type;
 
-            // При добавлении списка в параграф, удаляем все собственные сдвиги
-            this.Pr.Ind.FirstLine = undefined;
-            this.Pr.Ind.Left      = undefined;
+            if ( para_Tab === ItemType )
+            {
+                TabsCount++;
+                TabsPos.push( Pos );
+            }
+            else if ( para_Text === ItemType || para_Space === ItemType || (para_Drawing === ItemType && true === Item.Is_Inline() ) || para_PageNum === ItemType )
+                break;
+        }
+
+        // Рассчитаем левую границу и сдвиг первой строки с учетом начальных табов
+        var X = ParaPr.Ind.Left + ParaPr.Ind.FirstLine;
+        var LeftX = X;
+
+        if ( TabsCount > 0 && ParaPr.Ind.FirstLine < 0 )
+        {
+            X     = ParaPr.Ind.Left;
+            LeftX = X;
+            TabsCount--;
+        }
+
+        var ParaTabsCount = ParaPr.Tabs.Get_Count();
+        while ( TabsCount )
+        {
+            // Ищем ближайший таб
+
+            var TabFound = false;
+            for ( var TabIndex = 0; TabIndex < ParaTabsCount; TabIndex++ )
+            {
+                var Tab = ParaPr.Tabs.Get(TabIndex);
+
+                if ( Tab.Pos > X )
+                {
+                    X = Tab.Pos;
+                    TabFound = true;
+                    break;
+                }
+            }
+
+            // Ищем по дефолтовому сдвигу
+            if ( false === TabFound )
+            {
+                var NewX = 0;
+                while ( X >= NewX )
+                    NewX += Default_Tab_Stop;
+
+                X = NewX;
+            }
+
+            TabsCount--;
+        }
+
+        var Numbering   = this.Parent.Get_Numbering();
+        var AbstractNum = Numbering.Get_AbstractNum(NumId);
+
+        // Если у параграфа не было никакой нумерации изначально
+        if ( undefined === NumPr_old )
+        {
+            if ( true === SelectedOneElement || false === SelectionUse )
+            {
+                // Выставляем заданную нумерацию и сдвиги Ind.Left = X + NumPr.ParaPr.Ind.Left
+                var NumLvl = AbstractNum.Lvl[Lvl];
+                var NumParaPr = NumLvl.ParaPr;
+
+                if ( undefined != NumParaPr.Ind && undefined != NumParaPr.Ind.Left )
+                {
+                    var Left = LeftX + NumParaPr.Ind.Left;
+
+                    History.Add( this, { Type : historyitem_Paragraph_Ind_First, Old : ( undefined != this.Pr.Ind.FirstLine ? this.Pr.Ind.FirstLine : undefined ), New : undefined } );
+                    History.Add( this, { Type : historyitem_Paragraph_Ind_Left,  Old : ( undefined != this.Pr.Ind.Left      ? this.Pr.Ind.Left      : undefined ), New : Left      } );
+
+                    if ( undefined === this.Pr.Ind )
+                        this.Pr.Ind = new CParaInd();
+
+                    // При добавлении списка в параграф, удаляем все собственные сдвиги
+                    this.Pr.Ind.FirstLine = undefined;
+                    this.Pr.Ind.Left      = Left;
+                }
+
+                this.Pr.NumPr = new CNumPr();
+                this.Pr.NumPr.Set( NumId, Lvl );
+                History.Add( this, { Type : historyitem_Paragraph_Numbering, Old : NumPr_old, New : this.Pr.NumPr } );
+            }
+            else
+            {
+                // Если выделено несколько параграфов, тогда уже по сдвигу X определяем уровень данной нумерации
+
+                var LvlFound = -1;
+                var LvlsCount = AbstractNum.Lvl.length;
+                for ( var LvlIndex = 0; LvlIndex < LvlsCount; LvlIndex++ )
+                {
+                    var NumLvl = AbstractNum.Lvl[LvlIndex];
+                    var NumParaPr = NumLvl.ParaPr;
+
+                    if ( undefined != NumParaPr.Ind && undefined != NumParaPr.Ind.Left && X <= NumParaPr.Ind.Left )
+                    {
+                        LvlFound = LvlIndex;
+                        break;
+                    }
+                }
+
+                if ( -1 === LvlFound )
+                    LvlFound = LvlsCount - 1;
+
+                if ( undefined != this.Pr.Ind && undefined != NumParaPr.Ind && undefined != NumParaPr.Ind.Left )
+                {
+                    History.Add( this, { Type : historyitem_Paragraph_Ind_First, Old : ( undefined != this.Pr.Ind.FirstLine ? this.Pr.Ind.FirstLine : undefined ), New : undefined } );
+                    History.Add( this, { Type : historyitem_Paragraph_Ind_Left,  Old : ( undefined != this.Pr.Ind.Left      ? this.Pr.Ind.Left      : undefined ), New : undefined } );
+
+                    // При добавлении списка в параграф, удаляем все собственные сдвиги
+                    this.Pr.Ind.FirstLine = undefined;
+                    this.Pr.Ind.Left      = undefined;
+                }
+
+                this.Pr.NumPr = new CNumPr();
+                this.Pr.NumPr.Set( NumId, LvlFound );
+                History.Add( this, { Type : historyitem_Paragraph_Numbering, Old : NumPr_old, New : this.Pr.NumPr } );
+            }
+
+            // Удалим все табы идущие в начале параграфа
+            TabsCount = TabsPos.length;
+            while ( TabsCount )
+            {
+                var Pos = TabsPos[TabsCount - 1];
+                this.Internal_Content_Remove( Pos );
+                TabsCount--;
+            }
+        }
+        else
+        {
+            // просто меняем список, так чтобы он не двигался
+            this.Pr.NumPr = new CNumPr();
+            this.Pr.NumPr.Set( NumId, Lvl );
+
+            History.Add( this, { Type : historyitem_Paragraph_Numbering, Old : NumPr_old, New : this.Pr.NumPr } );
+
+            var Left      = ParaPr.Ind.Left;
+            var FirstLine = ParaPr.Ind.FirstLine;
+
+            History.Add( this, { Type : historyitem_Paragraph_Ind_First, Old : ( undefined != this.Pr.Ind.FirstLine ? this.Pr.Ind.FirstLine : undefined ), New : Left      } );
+            History.Add( this, { Type : historyitem_Paragraph_Ind_Left,  Old : ( undefined != this.Pr.Ind.Left      ? this.Pr.Ind.Left      : undefined ), New : FirstLine } );
+
+            this.Pr.Ind.FirstLine = FirstLine;
+            this.Pr.Ind.Left      = Left;
         }
 
         // Если у параграфа выставлен стиль, тогда не меняем его, если нет, тогда выставляем стандартный
@@ -8067,6 +8210,7 @@ Paragraph.prototype =
     {
         // Если у нас была задана нумерации в стиле, тогда чтобы ее отменить(не удаляя нумерацию в стиле)
         // мы проставляем NumPr с NumId undefined
+        var OldNumPr = this.Numbering_Get();
         var NewNumPr = undefined;
         if ( undefined != this.CompiledPr.Pr.ParaPr.StyleNumPr )
         {
@@ -8077,19 +8221,35 @@ Paragraph.prototype =
         History.Add( this, { Type : historyitem_Paragraph_Numbering, Old : undefined != this.Pr.NumPr ? this.Pr.NumPr : undefined, New : NewNumPr } );
         this.Pr.NumPr = NewNumPr;
 
-        if ( undefined != this.Pr.Ind )
+        if ( undefined != this.Pr.Ind && undefined != OldNumPr )
         {
             // При удалении нумерации из параграфа, если отступ первой строки > 0, тогда
             // увеличиваем левый отступ параграфа, а первую сторку  делаем 0, а если отступ
             // первой строки < 0, тогда просто делаем оступ первой строки 0.
 
-            if ( undefined != this.Pr.Ind.FirstLine && this.Pr.Ind.FirstLine < 0 )
+            if ( undefined === this.Pr.Ind.FirstLine || Math.abs( this.Pr.Ind.FirstLine ) < 0.001 )
+            {
+                if ( undefined != OldNumPr )
+                {
+                    var Lvl = this.Parent.Get_Numbering().Get_AbstractNum(OldNumPr.NumId).Lvl[OldNumPr.Lvl];
+                    if ( undefined != Lvl && undefined != Lvl.ParaPr.Ind && undefined != Lvl.ParaPr.Ind.Left )
+                    {
+                        var CurParaPr = this.Get_CompiledPr2(false).ParaPr;
+                        var Left = CurParaPr.Ind.Left  + CurParaPr.Ind.FirstLine;
+
+                        History.Add( this, { Type : historyitem_Paragraph_Ind_Left,  New : Left, Old : this.Pr.Ind.Left } );
+                        History.Add( this, { Type : historyitem_Paragraph_Ind_First, New : 0,    Old : this.Pr.Ind.FirstLine } );
+                        this.Pr.Ind.Left      = Left;
+                        this.Pr.Ind.FirstLine = 0;
+                    }
+                }
+            }
+            else if ( this.Pr.Ind.FirstLine < 0 )
             {
                 History.Add( this, { Type : historyitem_Paragraph_Ind_First, New : 0, Old : this.Pr.Ind.FirstLine } );
                 this.Pr.Ind.FirstLine = 0;
             }
-
-            if ( undefined != this.Pr.Ind.FirstLine && undefined != this.Pr.Ind.Left && this.Pr.Ind.FirstLine > 0 )
+            else if ( undefined != this.Pr.Ind.Left && this.Pr.Ind.FirstLine > 0 )
             {
                 History.Add( this, { Type : historyitem_Paragraph_Ind_Left,  New : this.Pr.Ind.Left + this.Pr.Ind.FirstLine, Old : this.Pr.Ind.Left } );
                 History.Add( this, { Type : historyitem_Paragraph_Ind_First, New : 0, Old : this.Pr.Ind.FirstLine } );

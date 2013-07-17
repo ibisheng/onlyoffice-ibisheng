@@ -4034,6 +4034,35 @@ function CRFonts()
 
 CRFonts.prototype =
 {
+    Set_All : function(FontName, FontIndex)
+    {
+        this.Ascii =
+        {
+            Name  : FontName,
+            Index : FontIndex
+        };
+
+        this.EastAsia =
+        {
+            Name  : FontName,
+            Index : FontIndex
+        };
+
+        this.HAnsi =
+        {
+            Name  : FontName,
+            Index : FontIndex
+        };
+
+        this.CS =
+        {
+            Name  : FontName,
+            Index : FontIndex
+        };
+
+        this.Hint = fonthint_Default;
+    },
+
     Copy : function()
     {
         var RFonts = new CRFonts();
@@ -5580,6 +5609,46 @@ CNumPr.prototype =
     }
 };
 
+function CFramePr()
+{
+    this.DropCap = undefined; // Является ли данный элемент буквицей
+    this.H       = undefined;
+    this.HAnchor = undefined;
+    this.HRule   = undefined;
+    this.HSpace  = undefined;
+    this.Lines   = undefined;
+    this.VAnchor = undefined;
+    this.VSpace  = undefined;
+    this.W       = undefined;
+    this.Wrap    = undefined;
+    this.X       = undefined;
+    this.XAlign  = undefined;
+    this.Y       = undefined;
+    this.YAlign  = undefined;
+}
+
+CFramePr.prototype =
+{
+    Copy : function()
+    {
+        var FramePr = new CFramePr();
+
+        FramePr.DropCap = this.DropCap;
+        FramePr.H       = this.H;
+        FramePr.HAnchor = this.HAnchor;
+        FramePr.HRule = this.HRule;
+        FramePr.HSpace = this.HSpace;
+        FramePr.Lines = this.Lines;
+        FramePr.VAnchor = this.VAnchor;
+        FramePr.VSpace = this.VSpace;
+        FramePr.W = this.W;
+        FramePr.Wrap = this.Wrap;
+        FramePr.X = this.X;
+        FramePr.DropCap = this.DropCap;
+        FramePr.DropCap = this.DropCap;
+    }
+};
+
 function CParaPr()
 {
     this.ContextualSpacing = undefined;          // Удалять ли интервал между параграфами одинакового стиля
@@ -5604,6 +5673,7 @@ function CParaPr()
     this.Tabs              = undefined; // Заданные табы
     this.NumPr             = undefined; // Нумерация
     this.PStyle            = undefined; // Стиль параграфа
+    this.FramePr           = undefined;
 }
 
 CParaPr.prototype =

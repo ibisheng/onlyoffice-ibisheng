@@ -224,17 +224,17 @@ function CAbstractNum(Type)
         var TextPr = new CTextPr();
         if ( 0 == Index % 3 )
         {
-            TextPr.FontFamily = { Name : "Symbol", Index : -1 };
+            TextPr.RFonts.Set_All( "Symbol", -1 );
             Lvl.LvlText.push( new CLvlText_Text( String.fromCharCode( 0x00B7 ) ) );
         }
         else if ( 1 == Index % 3 )
         {
-            TextPr.FontFamily = { Name : "Courier New", Index : -1 };
+            TextPr.RFonts.Set_All( "Courier New", -1 );
             Lvl.LvlText.push( new CLvlText_Text( "o" ) );
         }
         else
         {
-            TextPr.FontFamily = { Name : "Wingdings", Index : -1 };
+            TextPr.RFonts.Set_All( "Wingdings", -1 );
             Lvl.LvlText.push( new CLvlText_Text( String.fromCharCode( 0x00A7 ) ) );
         }
 
@@ -335,7 +335,7 @@ CAbstractNum.prototype =
             Lvl.ParaPr.Ind.FirstLine = FirstLine;
 
             var TextPr = new CTextPr();
-            TextPr.FontFamily = { Name : "Times New Roman", Index : -1 };
+            TextPr.RFonts.Set_All( "Times New Roman", -1 );
 
             Lvl.TextPr = TextPr;
 
@@ -384,7 +384,7 @@ CAbstractNum.prototype =
             Lvl.ParaPr.Ind.FirstLine = FirstLine;
 
             var TextPr = new CTextPr();
-            TextPr.FontFamily = { Name : "Times New Roman", Index : -1 };
+            TextPr.RFonts.Set_All( "Times New Roman", -1 );
 
             Lvl.TextPr = TextPr;
 
@@ -464,7 +464,7 @@ CAbstractNum.prototype =
             Lvl.ParaPr.Ind.FirstLine = FirstLine;
 
             var TextPr = new CTextPr();
-            TextPr.FontFamily = { Name : "Times New Roman", Index : -1 };
+            TextPr.RFonts.Set_All( "Times New Roman", -1 );
 
             Lvl.TextPr = TextPr;
 
@@ -545,9 +545,9 @@ CAbstractNum.prototype =
 
             var TextPr = new CTextPr();
             if ( 3 === Index || 4 === Index || 7 === Index || 8 === Index )
-                TextPr.FontFamily = { Name : "Times New Roman", Index : -1 };
+                TextPr.RFonts.Set_All( "Times New Roman", -1 );
             else
-                TextPr.FontFamily = { Name : "Wingdings", Index : -1 };
+                TextPr.RFonts.Set_All( "Wingdings", -1 );
 
             Lvl.TextPr = TextPr;
 
@@ -584,17 +584,17 @@ CAbstractNum.prototype =
             var TextPr = new CTextPr();
             if ( 0 == Index % 3 )
             {
-                TextPr.FontFamily = { Name : "Symbol", Index : -1 };
+                TextPr.RFonts.Set_All( "Symbol", -1 );
                 Lvl.LvlText.push( new CLvlText_Text( String.fromCharCode( 0x00B7 ) ) );
             }
             else if ( 1 == Index % 3 )
             {
-                TextPr.FontFamily = { Name : "Courier New", Index : -1 };
+                TextPr.RFonts.Set_All( "Courier New", -1 );
                 Lvl.LvlText.push( new CLvlText_Text( "o" ) );
             }
             else
             {
-                TextPr.FontFamily = { Name : "Wingdings", Index : -1 };
+                TextPr.RFonts.Set_All( "Wingdings", -1 );
                 Lvl.LvlText.push( new CLvlText_Text( String.fromCharCode( 0x00A7 ) ) );
             }
 
@@ -638,7 +638,7 @@ CAbstractNum.prototype =
         Lvl.LvlText = new Array();
         Lvl.LvlText.push( new CLvlText_Num( iLvl ) );
         Lvl.LvlText.push( new CLvlText_Text( ")" ) );
-        Lvl.TextPr.FontFamily = { Name : "Times New Roman", Index : -1 };
+        Lvl.TextPr.RFonts.Set_All( "Times New Roman", -1 );
 
         var Lvl_new = this.Internal_CopyLvl( Lvl );
         History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new } );
@@ -659,7 +659,7 @@ CAbstractNum.prototype =
         Lvl.LvlText = new Array();
         Lvl.LvlText.push( new CLvlText_Num( iLvl ) );
         Lvl.LvlText.push( new CLvlText_Text( "." ) );
-        Lvl.TextPr.FontFamily = { Name : "Times New Roman", Index : -1 };
+        Lvl.TextPr.RFonts.Set_All( "Times New Roman", -1 );
 
         var Lvl_new = this.Internal_CopyLvl( Lvl );
         History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new } );
@@ -680,7 +680,7 @@ CAbstractNum.prototype =
         Lvl.LvlText = new Array();
         Lvl.LvlText.push( new CLvlText_Num( iLvl ) );
         Lvl.LvlText.push( new CLvlText_Text( "." ) );
-        Lvl.TextPr.FontFamily = { Name : "Times New Roman", Index : -1 };
+        Lvl.TextPr.RFonts.Set_All( "Times New Roman", -1 );
 
         var Lvl_new = this.Internal_CopyLvl( Lvl );
         History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new } );
@@ -701,7 +701,7 @@ CAbstractNum.prototype =
         Lvl.LvlText = new Array();
         Lvl.LvlText.push( new CLvlText_Num( iLvl ) );
         Lvl.LvlText.push( new CLvlText_Text( ")" ) );
-        Lvl.TextPr.FontFamily = { Name : "Times New Roman", Index : -1 };
+        Lvl.TextPr.RFonts.Set_All( "Times New Roman", -1 );
 
         var Lvl_new = this.Internal_CopyLvl( Lvl );
         History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new } );
@@ -722,7 +722,7 @@ CAbstractNum.prototype =
         Lvl.LvlText = new Array();
         Lvl.LvlText.push( new CLvlText_Num( iLvl ) );
         Lvl.LvlText.push( new CLvlText_Text( "." ) );
-        Lvl.TextPr.FontFamily = { Name : "Times New Roman", Index : -1 };
+        Lvl.TextPr.RFonts.Set_All( "Times New Roman", -1 );
 
         var Lvl_new = this.Internal_CopyLvl( Lvl );
         History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new } );
@@ -743,7 +743,7 @@ CAbstractNum.prototype =
         Lvl.LvlText = new Array();
         Lvl.LvlText.push( new CLvlText_Num( iLvl ) );
         Lvl.LvlText.push( new CLvlText_Text( "." ) );
-        Lvl.TextPr.FontFamily = { Name : "Times New Roman", Index : -1 };
+        Lvl.TextPr.RFonts.Set_All( "Times New Roman", -1 );
 
         var Lvl_new = this.Internal_CopyLvl( Lvl );
         History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new } );
@@ -764,7 +764,7 @@ CAbstractNum.prototype =
         Lvl.LvlText = new Array();
         Lvl.LvlText.push( new CLvlText_Num( iLvl ) );
         Lvl.LvlText.push( new CLvlText_Text( ")" ) );
-        Lvl.TextPr.FontFamily = { Name : "Times New Roman", Index : -1 };
+        Lvl.TextPr.RFonts.Set_All( "Times New Roman", -1 );
 
         var Lvl_new = this.Internal_CopyLvl( Lvl );
         History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new } );
@@ -785,7 +785,7 @@ CAbstractNum.prototype =
         Lvl.LvlText = new Array();
         Lvl.LvlText.push( new CLvlText_Num( iLvl ) );
         Lvl.LvlText.push( new CLvlText_Text( "." ) );
-        Lvl.TextPr.FontFamily = { Name : "Times New Roman", Index : -1 };
+        Lvl.TextPr.RFonts.Set_All( "Times New Roman", -1 );
 
         var Lvl_new = this.Internal_CopyLvl( Lvl );
         History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new } );
@@ -806,7 +806,7 @@ CAbstractNum.prototype =
         Lvl.LvlText = new Array();
         Lvl.LvlText.push( new CLvlText_Num( iLvl ) );
         Lvl.LvlText.push( new CLvlText_Text( "." ) );
-        Lvl.TextPr.FontFamily = { Name : "Times New Roman", Index : -1 };
+        Lvl.TextPr.RFonts.Set_All( "Times New Roman", -1 );
 
         var Lvl_new = this.Internal_CopyLvl( Lvl );
         History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new } );
