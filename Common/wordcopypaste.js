@@ -2715,7 +2715,8 @@ PasteProcessor.prototype =
                             var font_size = computedStyle.getPropertyValue( "font-size" );
                             if(font_size && null != (font_size = this._ValueToMm(font_size)))
                             {
-                                Spacing.Line = parseInt(100 * obj.val / font_size) / 100;
+                                if(font_size != 0)
+									Spacing.Line = parseInt(100 * obj.val / font_size) / 100;
                                 Spacing.LineRule = linerule_Auto;
                             }
                         }
