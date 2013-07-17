@@ -8571,10 +8571,10 @@
 				return offs;
 			},
 
-			findCellText: function (text, scanByRows, scanForward) {
+			findCellText: function (options) {
 				var self = this;
-				// ToDo не учитываем регистр
-				text = text.toLowerCase();
+				if (true !== options.isMatchCase)
+					options.text = options.text.toLowerCase();
 				var ar = this.activeRange;
 				var c = ar.startCol;
 				var r = ar.startRow;
@@ -8582,9 +8582,9 @@
 				var minR = 0;
 				var maxC = this.cols.length - 1;
 				var maxR = this.rows.length - 1;
-				var inc = scanForward ? +1 : -1;
+				var inc = options.scanForward ? +1 : -1;
 				var ct, mc, excluded = [];
-				var _tmpCell, lowerChars;
+				var _tmpCell, cellText;
 
 				function isExcluded(col, row) {
 					for (var i = 0; i < excluded.length; ++i) {
@@ -8599,12 +8599,12 @@
 						do {
 							mc = self._getMergedCellsRange(c, r);
 							if (mc) {excluded.push(mc);}
-							if (scanByRows) {
-								c += mc ? (scanForward ? mc.c2 + 1 - c : mc.c1 - 1 - c) : inc;
-								if (c < minC || c > maxC) {c = scanForward ? minC : maxC; r += inc;}
+							if (options.scanByRows) {
+								c += mc ? (options.scanForward ? mc.c2 + 1 - c : mc.c1 - 1 - c) : inc;
+								if (c < minC || c > maxC) {c = options.scanForward ? minC : maxC; r += inc;}
 							} else {
-								r += mc ? (scanForward ? mc.r2 + 1 - r : mc.r1 - 1 - r) : inc;
-								if (r < minR || r > maxR) {r = scanForward ? minR : maxR; c += inc;}
+								r += mc ? (options.scanForward ? mc.r2 + 1 - r : mc.r1 - 1 - r) : inc;
+								if (r < minR || r > maxR) {r = options.scanForward ? minR : maxR; c += inc;}
 							}
 							if (c < minC || c > maxC || r < minR || r > maxR) {return undefined;}
 						} while ( isExcluded(c, r) );
@@ -8622,8 +8622,10 @@
 						_tmpCell = this.model.getCell (new CellAddress(mc.r1, mc.c1, 0));
 					else
 						_tmpCell = this.model.getCell (new CellAddress(r, c, 0));
-					lowerChars = _tmpCell.getValueForEdit().toLowerCase();
-					if (lowerChars.indexOf(text) >= 0) {
+					cellText = _tmpCell.getValueForEdit();
+					if (true !== options.isMatchCase)
+						cellText = cellText.toLowerCase();
+					if (cellText.indexOf(options.text) >= 0) {
 						return this._setActiveCell(c, r);
 					}
 				}
@@ -8631,11 +8633,11 @@
 				// Сбрасываем замерженные
 				excluded = [];
 				// Продолжаем циклический поиск
-				if (scanForward){
+				if (options.scanForward){
 					// Идем вперед с первой ячейки
 					minC = 0;
 					minR = 0;
-					if (scanByRows) {
+					if (options.scanByRows) {
 						c = -1;
 						r = 0;
 
@@ -8654,7 +8656,7 @@
 					// Идем назад с последней
 					c = this.cols.length - 1;
 					r = this.rows.length - 1;
-					if (scanByRows) {
+					if (options.scanByRows) {
 						minC = 0;
 						minR = ar.startRow;
 					}
@@ -8673,8 +8675,10 @@
 						_tmpCell = this.model.getCell (new CellAddress(mc.r1, mc.c1, 0));
 					else
 						_tmpCell = this.model.getCell (new CellAddress(r, c, 0));
-					lowerChars = _tmpCell.getValueForEdit().toLowerCase();
-					if (lowerChars.indexOf(text) >= 0) {
+					cellText = _tmpCell.getValueForEdit();
+					if (true !== options.isMatchCase)
+						cellText = cellText.toLowerCase();
+					if (cellText.indexOf(options.text) >= 0) {
 						return this._setActiveCell(c, r);
 					}
 				}

@@ -1333,12 +1333,12 @@
 			},
 
 			// Поиск текста в листе
-			findCellText: function (text, scanByRows, scanForward) {
+			findCellText: function (options) {
 				var ws = this.getWorksheet();
 				// Останавливаем ввод данных в редакторе ввода
 				if (ws.getCellEditMode())
 					this._onStopCellEditing();
-				return ws.findCellText(text, scanByRows, scanForward);
+				return ws.findCellText(options);
 			},
 
 			// Поиск ячейки по ссылке
