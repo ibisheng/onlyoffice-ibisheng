@@ -185,7 +185,8 @@ var c_oAscSelectionType = {
 	RangeRow:	3,
 	RangeMax:	4,
 	RangeImage: 5,
-	RangeChart: 6
+	RangeChart: 6,
+	RangeShape: 7
 };
 
 var c_oAscHyperlinkType = {

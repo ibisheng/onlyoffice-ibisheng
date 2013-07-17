@@ -3039,7 +3039,7 @@ function DrawingObjects() {
 
 		worksheet.model.Drawings = aObjects;
 
-		if (drawingCtx && _this.needDrawingObjects()) {
+		if ( drawingCtx ) {
 
 			// всё чистим
 			if (clearCanvas) {
@@ -3059,6 +3059,8 @@ function DrawingObjects() {
 
 					var index = i;
 					var obj = aObjects[i];
+					if ( !obj.canDraw() )
+						continue;
 					
 					// Shape render
 					if ( obj.isGraphicObject() ) {
@@ -3122,9 +3124,6 @@ function DrawingObjects() {
 						obj.flags.redrawChart = false;
 						continue;
 					}
-
-					if ( !obj.canDraw() )
-						continue;
 
 					var sWidth = obj.image.width - obj.getInnerOffsetLeft();
 					var sHeight = obj.image.height - obj.getInnerOffsetTop();
@@ -4112,6 +4111,13 @@ function DrawingObjects() {
 		}
 	}
 	
+	_this.getGraphicObjectProps = function() {
+		
+		var props = [];
+		var selectedObjects = _this.controller.selectedObjects;
+		return props;
+	}
+	
 	_this.insertUngroupedObjects = function(idGroup, aGraphics) {
 		
 		if ( idGroup && aGraphics.length ) {
@@ -4716,17 +4722,22 @@ function DrawingObjects() {
 		}
 		return -1;
 	}
-
-	_this.isChartDrawingObject = function(index) {
-
-		var result = false;
+	
+	_this.getGraphicSelectionType = function(index) {
+				
 		if (_this.checkDrawingObjectIndex(index)) {
-
 			var obj = aObjects[index];
+			
 			if (obj.isChart())
-				result = true;
+				return c_oAscSelectionType.RangeChart;
+				
+			if (obj.graphicObject.isImage())
+				return c_oAscSelectionType.RangeImage;
+				
+			if (obj.graphicObject.isShape())
+				return c_oAscSelectionType.RangeShape;
 		}
-		return result;
+		return undefined;
 	}
 	
 	_this.getDrawingObjectByCoords = function(x, y) {

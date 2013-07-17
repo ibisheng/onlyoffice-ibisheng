@@ -5439,13 +5439,9 @@
 					ar.startRow = r;
 
 					var index = this.objectRender.inSelectionDrawingObjectIndex(xpos, ypos, true);
-					if (index >= 0)
-					{
-						if (this.objectRender.isChartDrawingObject(index))
-							ar.type = c_oAscSelectionType.RangeChart;
-						else
-							ar.type = c_oAscSelectionType.RangeImage;
-					}
+					var graphicSelectionType = this.objectRender.getGraphicSelectionType(index);
+					if ( (index >= 0) && graphicSelectionType )
+						ar.type = graphicSelectionType;
 					else
 					{
 						ar.type = c_oAscSelectionType.RangeCells;
