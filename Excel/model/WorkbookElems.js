@@ -2067,7 +2067,18 @@ Col.prototype =
 	},
 	setCellStyle : function(val)
 	{
-		// ToDo add code here
+		var newVal = this.cs._prepareCellStyle(val);
+		var oRes = this.sm.setCellStyle(this, newVal);
+		if(History.Is_On() && oRes.oldVal != oRes.newVal) {
+			var oldStyleName = this.cs.getStyleNameByXfId(oRes.oldVal);
+			History.Add(g_oUndoRedoCol, historyitem_RowCol_SetCellStyle, this.ws.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oldStyleName, val));
+
+			// Выставляем стиль
+			var oStyle = this.cs.getStyleByXfId(oRes.newVal);
+			this.setFont(oStyle.getFont());
+			this.setFill(oStyle.getFill());
+			this.setBorder(oStyle.getBorder());
+		}
 	},
 	setNumFormat : function(val)
 	{
@@ -2330,7 +2341,18 @@ Row.prototype =
 	},
 	setCellStyle : function(val)
 	{
-		// ToDo add code here
+		var newVal = this.cs._prepareCellStyle(val);
+		var oRes = this.sm.setCellStyle(this, newVal);
+		if(History.Is_On() && oRes.oldVal != oRes.newVal) {
+			var oldStyleName = this.cs.getStyleNameByXfId(oRes.oldVal);
+			History.Add(g_oUndoRedoRow, historyitem_RowCol_SetCellStyle, this.ws.getId(), new Asc.Range(0, this.index, gc_nMaxCol0, this.index), new UndoRedoData_IndexSimpleProp(this.index, true, oldStyleName, val));
+
+			// Выставляем стиль
+			var oStyle = this.cs.getStyleByXfId(oRes.newVal);
+			this.setFont(oStyle.getFont());
+			this.setFill(oStyle.getFill());
+			this.setBorder(oStyle.getBorder());
+		}
 	},
 	setNumFormat : function(val)
 	{

@@ -48,6 +48,7 @@ var historyitem_RowCol_NumFormat = 15;
 var historyitem_RowCol_SetFont = 16;
 var historyitem_RowCol_Angle = 17;
 var historyitem_RowCol_SetStyle = 18;
+var historyitem_RowCol_SetCellStyle = 19;
 
 var historyitem_Cell_Fontname = 1;
 var historyitem_Cell_Fontsize = 2;

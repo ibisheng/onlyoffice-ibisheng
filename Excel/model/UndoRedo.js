@@ -2923,6 +2923,8 @@ UndoRedoRowCol.prototype = {
             row.setAngle(Val);
 		else if(historyitem_RowCol_SetStyle == Type)
             row.setStyle(Val);
+		else if (historyitem_RowCol_SetCellStyle == Type)
+			row.setCellStyle(Val);
 	}
 }
 
