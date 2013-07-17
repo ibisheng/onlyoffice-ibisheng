@@ -1310,7 +1310,7 @@ function CBinaryFileWriter()
             if (0 == indSlide)
             {
                 var slideNum = parseInt(url.substring(mask.length));
-                url = "slide" + slideNum;
+                url = "slide" + (slideNum + 1) + ".xml";
                 action = "ppaction://hlinksldjump";
             }
         }

@@ -5041,7 +5041,18 @@ function BinaryPPTYLoader()
             {
                 if (hyper.url != null && hyper.url.indexOf("slide") == 0)
                 {
-                    hyper.url = hyper.action + hyper.url;
+                    var _url = hyper.url.substring(5);
+                    var _indexXml = _url.indexOf(".");
+                    if (-1 != _indexXml)
+                        _url = _url.substring(0, _indexXml);
+
+                    var _slideNum = parseInt(_url);
+                    if (isNaN(_slideNum))
+                        _slideNum = 1;
+
+                    --_slideNum;
+
+                    hyper.url = hyper.action + "slide" + _slideNum;
                 }
                 else
                 {
