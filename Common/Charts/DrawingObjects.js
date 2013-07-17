@@ -2868,6 +2868,8 @@ function DrawingObjects() {
 		trackOverlay.init( shapeOverlayCtx.m_oContext, "ws-canvas-overlay", 0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix, shapeOverlayCtx.m_dWidthMM, shapeOverlayCtx.m_dHeightMM );
 		autoShapeTrack.init( trackOverlay, 0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix, shapeOverlayCtx.m_dWidthMM, shapeOverlayCtx.m_dHeightMM );		
 		autoShapeTrack.Graphics.CalculateFullTransform();
+		
+		_this.showDrawingObjects(true);
 	}
 	
 	_this.getWorkbook = function() {
