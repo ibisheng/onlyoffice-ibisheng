@@ -891,7 +891,7 @@
 					this.styleThumbnailWidthPt, nOffsetY + this.styleThumbnailHeightPt);
 				drawBorder(oBorders.t, 0, nOffsetY,
 					this.styleThumbnailWidthPt, nOffsetY);
-				drawBorder(oBorders.t, 0, nOffsetY + this.styleThumbnailHeightPt,
+				drawBorder(oBorders.b, 0, nOffsetY + this.styleThumbnailHeightPt,
 					this.styleThumbnailWidthPt, nOffsetY + this.styleThumbnailHeightPt);
 
 				// Draw text
@@ -902,10 +902,11 @@
 				var format = oStyle.getFont();
 				var oFont = new asc.FontProperties(format.fn, format.fs, format.b, format.i, format.u, format.s);
 
+				var width_padding = 2.25; // 3 * 96 / 72
 				var tm = stringRenderer.measureString(oStyle.Name);
 				oGraphics.setFont(oFont);
 				oGraphics.setFillStyle(oFontColor);
-				oGraphics.fillText(oStyle.Name, 0, nOffsetY + tm.baseline);
+				oGraphics.fillText(oStyle.Name, width_padding, nOffsetY + tm.baseline);
 				oGraphics.restore();
 			}
 		};
