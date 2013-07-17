@@ -559,6 +559,18 @@ prop:put_Value
 prop:get_Color
 prop:put_Color
 ---
+var:CParagraphTab
+prop:get_Value
+prop:put_Value
+prop:get_Pos
+prop:put_Pos
+---
+var:CParagraphTabs
+prop:get_Count
+prop:get_Tab
+prop:add_Tab
+prop:clear
+---
 var:CParagraphProp
 prop:get_ContextualSpacing
 prop:put_ContextualSpacing
@@ -596,6 +608,10 @@ prop:get_TextSpacing
 prop:put_TextSpacing
 prop:get_Position
 prop:put_Position
+prop:get_Tabs
+prop:put_Tabs
+prop:get_DefaultTab
+prop:put_DefaultTab
 ---
 var:CParagraphPropEx
 prop:get_ContextualSpacing
@@ -1539,6 +1555,16 @@ CParagraphShd.prototype['get_Value'] = CParagraphShd.prototype.get_Value;
 CParagraphShd.prototype['put_Value'] = CParagraphShd.prototype.put_Value;
 CParagraphShd.prototype['get_Color'] = CParagraphShd.prototype.get_Color;
 CParagraphShd.prototype['put_Color'] = CParagraphShd.prototype.put_Color;
+window['CParagraphTab'] = CParagraphTab;
+CParagraphTab.prototype['get_Value'] = CParagraphTab.prototype.get_Value;
+CParagraphTab.prototype['put_Value'] = CParagraphTab.prototype.put_Value;
+CParagraphTab.prototype['get_Pos'] = CParagraphTab.prototype.get_Pos;
+CParagraphTab.prototype['put_Pos'] = CParagraphTab.prototype.put_Pos;
+window['CParagraphTabs'] = CParagraphTabs;
+CParagraphTabs.prototype['get_Count'] = CParagraphTabs.prototype.get_Count;
+CParagraphTabs.prototype['get_Tab'] = CParagraphTabs.prototype.get_Tab;
+CParagraphTabs.prototype['add_Tab'] = CParagraphTabs.prototype.add_Tab;
+CParagraphTabs.prototype['clear'] = CParagraphTabs.prototype.clear;
 window['CParagraphProp'] = CParagraphProp;
 CParagraphProp.prototype['get_ContextualSpacing'] = CParagraphProp.prototype.get_ContextualSpacing;
 CParagraphProp.prototype['put_ContextualSpacing'] = CParagraphProp.prototype.put_ContextualSpacing;
@@ -1576,6 +1602,10 @@ CParagraphProp.prototype['get_TextSpacing'] = CParagraphProp.prototype.get_TextS
 CParagraphProp.prototype['put_TextSpacing'] = CParagraphProp.prototype.put_TextSpacing;
 CParagraphProp.prototype['get_Position'] = CParagraphProp.prototype.get_Position;
 CParagraphProp.prototype['put_Position'] = CParagraphProp.prototype.put_Position;
+CParagraphProp.prototype['get_Tabs'] = CParagraphProp.prototype.get_Tabs;
+CParagraphProp.prototype['put_Tabs'] = CParagraphProp.prototype.put_Tabs;
+CParagraphProp.prototype['get_DefaultTab'] = CParagraphProp.prototype.get_DefaultTab;
+CParagraphProp.prototype['put_DefaultTab'] = CParagraphProp.prototype.put_DefaultTab;
 window['CParagraphPropEx'] = CParagraphPropEx;
 CParagraphPropEx.prototype['get_ContextualSpacing'] = CParagraphPropEx.prototype.get_ContextualSpacing;
 CParagraphPropEx.prototype['get_Ind'] = CParagraphPropEx.prototype.get_Ind;
