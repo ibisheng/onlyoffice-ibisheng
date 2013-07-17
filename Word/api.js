@@ -1522,10 +1522,10 @@ CParagraphShd.prototype.put_Value = function (v){ this.Value = v; }
 CParagraphShd.prototype.get_Color = function (){ return this.Color; }
 CParagraphShd.prototype.put_Color = function (v){ this.Color = (v) ? v : null; }
 
-function CParagraphTab(obj)
+function CParagraphTab(Pos, Value)
 {
-    this.Pos   = obj.Pos;
-    this.Value = obj.Value;
+    this.Pos   = Pos;
+    this.Value = Value;
 }
 CParagraphTab.prototype.get_Value = function (){ return this.Value; }
 CParagraphTab.prototype.put_Value = function (v){ this.Value = v; }
@@ -1541,7 +1541,7 @@ function CParagraphTabs (obj)
         var Count = obj.Tabs.length;
         for (var Index = 0; Index < Count; Index++)
         {
-            this.Tabs.push( new CParagraphTab(obj.Tabs[Index]) );
+            this.Tabs.push( new CParagraphTab(obj.Tabs[Index].Pos, obj.Tabs[Index].Value) );
         }
     }
 }
