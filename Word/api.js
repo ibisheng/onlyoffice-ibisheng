@@ -1522,6 +1522,34 @@ CParagraphShd.prototype.put_Value = function (v){ this.Value = v; }
 CParagraphShd.prototype.get_Color = function (){ return this.Color; }
 CParagraphShd.prototype.put_Color = function (v){ this.Color = (v) ? v : null; }
 
+function CParagraphTab(obj)
+{
+    this.Pos   = obj.Pos;
+    this.Value = obj.Value;
+}
+CParagraphTab.prototype.get_Value = function (){ return this.Value; }
+CParagraphTab.prototype.put_Value = function (v){ this.Value = v; }
+CParagraphTab.prototype.get_Pos = function (){ return this.Pos; }
+CParagraphTab.prototype.put_Pos = function (v){ this.Pos = v; }
+
+function CParagraphTabs (obj)
+{
+    this.Tabs = new Array();
+
+    if ( undefined != obj )
+    {
+        var Count = obj.Tabs.length;
+        for (var Index = 0; Index < Count; Index++)
+        {
+            this.Tabs.push( new CParagraphTab(obj.Tabs[Index]) );
+        }
+    }
+}
+CParagraphTabs.prototype.get_Count = function (){ return this.Tabs.length; }
+CParagraphTabs.prototype.get_Tab = function (Index){ this.Tabs[Index]; }
+CParagraphTabs.prototype.add_Tab = function (Tab){ this.Tabs.push(Tab) }
+CParagraphTabs.prototype.clear = function (){ this.Tabs.length = 0; }
+
 function CParagraphProp (obj)
 {
 	if (obj)
@@ -1535,6 +1563,8 @@ function CParagraphProp (obj)
 		this.Spacing           = (undefined != obj.Spacing && null != obj.Spacing) ? new CParagraphSpacing (obj.Spacing) : null;
 		this.Brd               = (undefined != obj.Brd     && null != obj.Brd)     ? new CParagraphBorders (obj.Brd) : null;
 		this.Shd               = (undefined != obj.Shd     && null != obj.Shd)     ? new CParagraphShd (obj.Shd) : null;
+        this.Tabs              = (undefined != obj.Tabs)                           ? new CParagraphTabs(obj.Tabs) : undefined;
+        this.DefaultTab        = Default_Tab_Stop;
         this.Locked            = (undefined != obj.Locked  && null != obj.Locked ) ? obj.Locked : false;
         this.CanAddTable       = (undefined != obj.CanAddTable )                   ? obj.CanAddTable : true;
 
@@ -1577,6 +1607,7 @@ function CParagraphProp (obj)
         this.Shd               = undefined;
         this.Locked            = false;
         this.CanAddTable       = true;
+        this.Tabs              = undefined;
 
         this.Subscript         = undefined;
         this.Superscript       = undefined;
@@ -1625,6 +1656,10 @@ CParagraphProp.prototype.get_TextSpacing = function () { return this.TextSpacing
 CParagraphProp.prototype.put_TextSpacing = function (v) { this.TextSpacing = v; }
 CParagraphProp.prototype.get_Position = function () { return this.Position; }
 CParagraphProp.prototype.put_Position = function (v) { this.Position = v; }
+CParagraphProp.prototype.get_Tabs = function () { return this.Tabs; }
+CParagraphProp.prototype.put_Tabs = function (v) { this.Tabs = v; }
+CParagraphProp.prototype.get_DefaultTab = function () { return this.DefaultTab; }
+CParagraphProp.prototype.put_DefaultTab = function (v) { this.DefaultTab = v; }
 
 // Paragraph properties
 function CParagraphPropEx (obj)
@@ -2971,6 +3006,18 @@ asc_docs_api.prototype.paraApply = function(Props)
 
         if ( "undefined" != typeof(Props.Brd) && null != Props.Brd )
             this.WordControl.m_oLogicDocument.Set_ParagraphBorders( Props.Brd );
+
+        if ( undefined != Props.Tabs )
+        {
+            var Tabs = new CParaTabs();
+            Tabs.Set_FromObject( Props.Tabs.Tabs );
+            this.WordControl.m_oLogicDocument.Set_ParagraphTabs( Tabs );
+        }
+
+        if ( undefined != Props.DefaultTab )
+        {
+            // TODO: реализовать изменения таба по умолчанию
+        }
 
 
         // TODO: как только разъединят настройки параграфа и текста переделать тут
