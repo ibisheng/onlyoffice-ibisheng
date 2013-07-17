@@ -4935,7 +4935,7 @@ function CDrawingDocument()
                 continue;
 
             var table = new CTable(this, logicDoc, true, 0, _x_mar, _y_mar, 1000, 1000, Rows, Cols, Grid);
-            table.Set_Props({TableStyle : i, TableLook : tableLook});
+            table.Set_Props({TableStyle : i, TableLook : tableLook, TableLayout : c_oAscTableLayout.Fixed});
 
             for (var j = 0; j < Rows; j++)
                 table.Content[j].Set_Height(H / Rows, heightrule_AtLeast);
