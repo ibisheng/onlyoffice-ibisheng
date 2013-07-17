@@ -369,6 +369,67 @@ CMathContent.prototype =
                 rad.init();
                 rad.fillPlaceholders();
                 break;
+            case 19:
+                var rad = this.createMComponent(7);
+                rad.init();
+                degr = rad.getDegree();
+                degr.addTxt("2");
+                base = rad.getBase();
+                base.fillPlaceholders();
+                break;
+            case 20:
+                var rad = this.createMComponent(7);
+                rad.init();
+                degr = rad.getDegree();
+                degr.addTxt("3");
+                base = rad.getBase();
+                base.fillPlaceholders();
+                break;
+            case 21:
+                var fract = this.createMComponent(0);
+                fract.init();
+                var num = fract.getNumerator();
+                num.addTxt("-b±");
+
+                var rad = num.createMComponent(6);
+                rad.init();
+                var base = rad.getBase();
+                var degree = base.createMComponent(3);
+                degree.init();
+                degree.setIndex(1);
+                var baseDg = degree.getBase();
+                baseDg.addTxt("b");
+                var iter = degree.getIterator();
+                iter.addTxt("2");
+                base.addTxt("-4ac");
+
+                var den = fract.getDenominator();
+                den.addTxt("2a");
+                break;
+            case 22:
+                var rad = this.createMComponent(6);
+                rad.init();
+                var base = rad.getBase();
+
+                degr1 = base.createMComponent(3);
+                degr1.init();
+                degr1.setIndex(1);
+                var base1 = degr1.getBase();
+                base1.addTxt("a");
+                var iter1 = degr1.getIterator();
+                iter1.addTxt("2");
+
+                base.addTxt("+");
+
+                degr2 = base.createMComponent(3);
+                degr2.init();
+                degr2.setIndex(1);
+                var base2 = degr2.getBase();
+                base2.addTxt("b");
+                var iter2 = degr2.getIterator();
+                iter2.addTxt("2");
+
+                break;
 
         }
     },

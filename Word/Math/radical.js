@@ -161,143 +161,6 @@ CSignRadical.prototype.relate = function(parent)
 }
 
 
-function getHeightTick(height, txtPrp)
-{
-    var plH = 9.877777777777776 * txtPrp.FontSize /36;
-    var minHgtRad = plH * 1.1304931640625,
-        maxHgtRad = plH * 7.029296875;
-
-    var minHgtTick = plH*0.6,
-        maxHgtTick = plH * 1.50732421875;
-
-    var heightTick;
-
-    if ( height > maxHgtRad )
-        heightTick = maxHgtTick;
-    else
-    {
-        var alpha = (height - minHgtRad)/maxHgtRad;
-        heightTick = minHgtTick*(1 + alpha);
-    }
-
-    return heightTick;
-}
-function getHeightRadical(height, txtPrp)
-{
-    //var GFont = GetMathFont(txtPrp);
-
-    /*var metric = GFont.metrics,
-        GenHeight;
-    var gap = metric.Height - metric.Placeholder.Height;*/
-
-    /*var H0 = metric.Placeholder.Height,
-        H1 = metric.Height,
-        H2 = 2*metric.Placeholder.Height + 1.5*gap,
-        H3 = 3*metric.Placeholder.Height + 2.4*gap,
-        H4 = 4*metric.Placeholder.Height + 3*gap,
-        H5 = 5*metric.Placeholder.Height + 4*gap;*/
-
-    var plh = 9.877777777777776*txtPrp.FontSize/36;
-
-    var H0 = plh,
-        H1 = plh*1.50732421875,
-        H2 = plh*2.760986328125,
-        H3 = plh*4.217578125,
-        H4 = plh*5.52197265625,
-        H5 = plh*7.029296875;
-
-    if(height < H0)
-        GenHeight = H1*0.75;
-    else if( height < H1 )
-        GenHeight = H1;
-    else if( height < H2 )
-        GenHeight = H2;
-    else if( height < H3 )
-        GenHeight = H3;
-    else if( height < H4 )
-        GenHeight = H4;
-    else if(height < H5)
-        GenHeight = H5;
-    else
-        GenHeight = height;
-
-    return GenHeight;
-}
-
-function DrawingRadical()
-{
-    var x = this.pos.x,
-        y = this.pos.y;
-
-    var Height = this.size.height - this.shRadical.y,
-        Width = this.size.width - this.shRadical.x;
-
-    var txtPrp = this.getTxtPrp();
-
-    var penW = txtPrp.FontSize*g_dKoef_pt_to_mm*0.042;
-    var plH = 9.877777777777776 * txtPrp.FontSize /36;
-
-    var minHeight = plH * 1.1304931640625,
-        maxHeight = plH * 7.029296875;
-
-    var maxWidth = plH * 0.81171875;
-
-    var coeff = 0.2*maxWidth/(maxHeight - minHeight),
-        b = maxWidth*0.3 - coeff*minHeight;
-
-    var heightTick = getHeightTick(Height, txtPrp);
-
-    var tX = 1.7*penW * 0.5 * 25.4/96,
-        tY = (-1)*tX * 11/25 *0.5; // 11/25 - тангенс угла наклона
-
-    var x1 = x + this.shRadical.x,
-        x2 = x1 + 0.25*maxWidth;
-
-    var y2 = y + this.size.height - heightTick,
-        y1 = y2 + 0.11*maxWidth;
-
-    var x3 = x2 - tX,
-        y3 = y2 - tY;
-
-    if(Height < maxHeight)
-        x4 = x3 + coeff*Height + b;
-    else
-        x4 = x3 + coeff*maxHeight + b;
-
-    var y4 = y + this.size.height - penW;
-
-    var x5 = x1 + maxWidth,
-        x6 = x + this.size.width;
-
-    var y5 = y + this.shRadical.y,
-        y6 = y + this.shRadical.y;
-
-    MathControl.pGraph.p_width(penW*0.8*1000);
-
-    MathControl.pGraph.p_color(0,0,0, 255);
-    MathControl.pGraph.b_color1(0,0,0, 255);
-
-    MathControl.pGraph._s();
-    MathControl.pGraph._m(x1, y1);
-    MathControl.pGraph._l(x2, y2);
-    MathControl.pGraph.ds();
-
-
-    MathControl.pGraph.p_width(1.7*penW*1000);
-    MathControl.pGraph._s();
-    MathControl.pGraph._m(x3, y3);
-    MathControl.pGraph._l(x4, y4);
-    MathControl.pGraph.ds();
-
-    MathControl.pGraph.p_width(penW*1000);
-    MathControl.pGraph._s();
-    MathControl.pGraph._m(x4, y4);
-    MathControl.pGraph._l(x5, y5);
-    MathControl.pGraph._l(x6,y6);
-    MathControl.pGraph.ds();
-}
-
-
 function CRadical()
 {
     this.signRadical = null;
@@ -611,6 +474,140 @@ CDegreeRadical.prototype.getDegree = function()
     return this.elements[0][0];
 }
 
+function old_getHeightTick(height, txtPrp)
+{
+    var plH = 9.877777777777776 * txtPrp.FontSize /36;
+    var minHgtRad = plH * 1.1304931640625,
+        maxHgtRad = plH * 7.029296875;
+
+    var minHgtTick = plH*0.6,
+        maxHgtTick = plH * 1.50732421875;
+
+    var heightTick;
+
+    if ( height > maxHgtRad )
+        heightTick = maxHgtTick;
+    else
+    {
+        var alpha = (height - minHgtRad)/maxHgtRad;
+        heightTick = minHgtTick*(1 + alpha);
+    }
+
+    return heightTick;
+}
+function old_getHeightRadical(height, txtPrp)
+{
+    //var GFont = GetMathFont(txtPrp);
+
+    /*var metric = GFont.metrics,
+     GenHeight;
+     var gap = metric.Height - metric.Placeholder.Height;*/
+
+    /*var H0 = metric.Placeholder.Height,
+     H1 = metric.Height,
+     H2 = 2*metric.Placeholder.Height + 1.5*gap,
+     H3 = 3*metric.Placeholder.Height + 2.4*gap,
+     H4 = 4*metric.Placeholder.Height + 3*gap,
+     H5 = 5*metric.Placeholder.Height + 4*gap;*/
+
+    var plh = 9.877777777777776*txtPrp.FontSize/36;
+
+    var H0 = plh,
+        H1 = plh*1.50732421875,
+        H2 = plh*2.760986328125,
+        H3 = plh*4.217578125,
+        H4 = plh*5.52197265625,
+        H5 = plh*7.029296875;
+
+    if(height < H0)
+        GenHeight = H1*0.75;
+    else if( height < H1 )
+        GenHeight = H1;
+    else if( height < H2 )
+        GenHeight = H2;
+    else if( height < H3 )
+        GenHeight = H3;
+    else if( height < H4 )
+        GenHeight = H4;
+    else if(height < H5)
+        GenHeight = H5;
+    else
+        GenHeight = height;
+
+    return GenHeight;
+}
+function old_DrawingRadical()
+{
+    var x = this.pos.x,
+        y = this.pos.y;
+
+    var Height = this.size.height - this.shRadical.y,
+        Width = this.size.width - this.shRadical.x;
+
+    var txtPrp = this.getTxtPrp();
+
+    var penW = txtPrp.FontSize*g_dKoef_pt_to_mm*0.042;
+    var plH = 9.877777777777776 * txtPrp.FontSize /36;
+
+    var minHeight = plH * 1.1304931640625,
+        maxHeight = plH * 7.029296875;
+
+    var maxWidth = plH * 0.81171875;
+
+    var coeff = 0.2*maxWidth/(maxHeight - minHeight),
+        b = maxWidth*0.3 - coeff*minHeight;
+
+    var heightTick = getHeightTick(Height, txtPrp);
+
+    var tX = 1.7*penW * 0.5 * 25.4/96,
+        tY = (-1)*tX * 11/25 *0.5; // 11/25 - тангенс угла наклона
+
+    var x1 = x + this.shRadical.x,
+        x2 = x1 + 0.25*maxWidth;
+
+    var y2 = y + this.size.height - heightTick,
+        y1 = y2 + 0.11*maxWidth;
+
+    var x3 = x2 - tX,
+        y3 = y2 - tY;
+
+    if(Height < maxHeight)
+        x4 = x3 + coeff*Height + b;
+    else
+        x4 = x3 + coeff*maxHeight + b;
+
+    var y4 = y + this.size.height - penW;
+
+    var x5 = x1 + maxWidth,
+        x6 = x + this.size.width;
+
+    var y5 = y + this.shRadical.y,
+        y6 = y + this.shRadical.y;
+
+    MathControl.pGraph.p_width(penW*0.8*1000);
+
+    MathControl.pGraph.p_color(0,0,0, 255);
+    MathControl.pGraph.b_color1(0,0,0, 255);
+
+    MathControl.pGraph._s();
+    MathControl.pGraph._m(x1, y1);
+    MathControl.pGraph._l(x2, y2);
+    MathControl.pGraph.ds();
+
+
+    MathControl.pGraph.p_width(1.7*penW*1000);
+    MathControl.pGraph._s();
+    MathControl.pGraph._m(x3, y3);
+    MathControl.pGraph._l(x4, y4);
+    MathControl.pGraph.ds();
+
+    MathControl.pGraph.p_width(penW*1000);
+    MathControl.pGraph._s();
+    MathControl.pGraph._m(x4, y4);
+    MathControl.pGraph._l(x5, y5);
+    MathControl.pGraph._l(x6,y6);
+    MathControl.pGraph.ds();
+}
 
 function old_CRadical()
 {
