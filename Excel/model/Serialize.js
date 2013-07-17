@@ -7122,8 +7122,8 @@ function ReadDefTableStyles(wb, oOutput)
 	};
 	
 	var length = stream.GetULongLE();
-	
-	res = bcr.Read1(length, function(t,l){
+
+	var res = bcr.Read1(length, function(t,l){
 		return fReadStyles(t, l, oOutput);
 	});
 }
@@ -7235,7 +7235,17 @@ function ReadDefCellStyles(wb, oOutput)
 		return res;
 	};
 
-	res = bcr.Read1(length, function (t, l) {
+	var res = bcr.Read1(length, function (t, l) {
 		return fReadStyles(t, l, oOutput);
 	});
+
+	// Если нет стилей в документе, то добавим
+	if (0 === wb.CellStyles.CustomStyles.length && 0 < oOutput.length) {
+		wb.CellStyles.CustomStyles.push(oOutput[0].clone());
+		wb.CellStyles.CustomStyles[0].XfId = 0;
+	}
+	// Если XfId не задан, то определим его
+	if (null == g_oDefaultXfId) {
+		g_oDefaultXfId = 0;
+	}
 }
