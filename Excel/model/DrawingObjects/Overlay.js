@@ -1212,6 +1212,61 @@ CAutoshapeTrack.prototype =
         ctx.globalAlpha = globalAlphaOld;
     },
 
+    DrawTrackDashRect : function(left, top, width, height, matrix)
+    {
+        var overlay = this.m_oOverlay;
+        overlay.Show();
+
+        this.CurrentPageInfo = overlay.m_oHtmlPage.GetDrawingPageInfo(this.PageIndex);
+
+        var drPage = this.CurrentPageInfo.drawingPage;
+
+        var xDst = drPage.left + (this.Graphics ? this.Graphics.m_oCoordTransform.tx : 0);
+        var yDst = drPage.top + (this.Graphics ? this.Graphics.m_oCoordTransform.ty : 0);
+        var wDst = drPage.right - drPage.left;
+        var hDst = drPage.bottom - drPage.top;
+
+        var dKoefX = wDst / this.CurrentPageInfo.width_mm;
+        var dKoefY = hDst / this.CurrentPageInfo.height_mm;
+
+        var r = x + width;
+        var b = y + height;
+
+        var x1 = (xDst + dKoefX * (matrix.TransformPointX(left, top))) >> 0;
+        var y1 = (yDst + dKoefY * (matrix.TransformPointY(left, top))) >> 0;
+
+        var x2 = (xDst + dKoefX * (matrix.TransformPointX(r, top))) >> 0;
+        var y2 = (yDst + dKoefY * (matrix.TransformPointY(r, top))) >> 0;
+
+        var x3 = (xDst + dKoefX * (matrix.TransformPointX(left, b))) >> 0;
+        var y3 = (yDst + dKoefY * (matrix.TransformPointY(left, b))) >> 0;
+
+        var x4 = (xDst + dKoefX * (matrix.TransformPointX(r, b))) >> 0;
+        var y4 = (yDst + dKoefY * (matrix.TransformPointY(r, b))) >> 0;
+
+        var bIsClever = false;
+        if (x1 == x3 && x2 == x4 && y1 == y2 && y3 == y4 && x1 < x2 && y1 < y3)
+            bIsClever = true;
+
+        var ctx = overlay.m_oContext;
+        ctx.beginPath();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = "#0000FF";
+
+        overlay.CheckPoint(x1, y1);
+        overlay.CheckPoint(x2, y2);
+        overlay.CheckPoint(x3, y3);
+        overlay.CheckPoint(x4, y4);
+
+        if (bIsClever)
+            this.AddRectDashClever(ctx, x1, y1, x4, y4, 3, 2);
+        else
+            this.AddRectDash(ctx, x1, y1, x2, y2, x3, y3, x4, y4, 3, 2);
+
+        ctx.stroke();
+        ctx.beginPath();
+    },
+
     AddRect : function(ctx, x, y, r, b, bIsClever)
     {
         if (bIsClever)
