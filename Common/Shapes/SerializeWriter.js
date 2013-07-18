@@ -1265,6 +1265,11 @@ function CBinaryFileWriter()
             oThis._WriteInt1(17, rPr.FontSize * 100);
         }
 
+        if (vertalign_SubScript == rPr.VertAlign)
+            oThis._WriteInt1(2, -25000);
+        else if (vertalign_SuperScript == rPr.VertAlign)
+            oThis._WriteInt1(2, 30000);
+
         oThis.WriteUChar(g_nodeAttributeEnd);
 
         oThis.WriteRecord1(1, rPr.unifill, oThis.WriteUniFill);

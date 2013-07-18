@@ -3707,7 +3707,14 @@ function CThumbnailsManager()
             {
                 if(global_keyboardEvent.CtrlKey)
                 {
-                    return  this.m_oWordControl.m_oLogicDocument.slidesCut(this.GetSelectedArray());
+                    var _delete_array = this.GetSelectedArray();
+                    if (_delete_array.length == this.m_oWordControl.m_oDrawingDocument.SlidesCount)
+                        _delete_array.splice(0, 1);
+
+                    if (_delete_array.length != 0)
+                    {
+                        this.m_oWordControl.m_oLogicDocument.slidesCut(_delete_array);
+                    }
                 }
                 break;
             }
