@@ -4246,6 +4246,28 @@ function DrawingObjects() {
 	_this.getSelectedObjectsStack = function() {
 	}
 	
+	_this.loadImageRedraw = function(imageUrl) {
+		
+		var _image = api.ImageLoader.LoadImage(imageUrl, 1);
+				
+		if (null != _image) {
+			imageLoaded(_image);
+		}
+		else {
+			_this.asyncImageEndLoaded = function(_image) {
+				imageLoaded(_image);
+			}
+		}
+		
+		function imageLoaded(_image) {
+			if ( !_image.Image ) {
+				worksheet.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.UplImageUrl, c_oAscError.Level.NoCritical);
+			}
+			else 
+				_this.showDrawingObjects(true);
+		}
+	}
+	
 	//-----------------------------------------------------------------------------------
 	// Graphic object mouse events
 	//-----------------------------------------------------------------------------------
