@@ -7292,11 +7292,13 @@ CDocument.prototype =
         else if ( e.KeyCode == 144 ) // Num Lock
         {
             // Ничего не делаем
+            bUpdateSelection = false;
             bRetValue = true;
         }
         else if ( e.KeyCode == 145 ) // Scroll Lock
         {
             // Ничего не делаем
+            bUpdateSelection = false;
             bRetValue = true;
         }
         else if ( e.KeyCode == 187 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + Shift + +, Ctrl + = - superscript/subscript
