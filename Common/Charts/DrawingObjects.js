@@ -1945,28 +1945,225 @@ asc_CChartFont.prototype = {
 }
 
 //{ asc_CChartFont export
-	window["Asc"].asc_CChartFont = asc_CChartFont;
-	window["Asc"]["asc_CChartFont"] = asc_CChartFont;
-	prot = asc_CChartFont.prototype;
+window["Asc"].asc_CChartFont = asc_CChartFont;
+window["Asc"]["asc_CChartFont"] = asc_CChartFont;
+prot = asc_CChartFont.prototype;
 
-	prot["asc_getName"] = prot.asc_getName;
-	prot["asc_setName"] = prot.asc_setName;
+prot["asc_getName"] = prot.asc_getName;
+prot["asc_setName"] = prot.asc_setName;
 
-	prot["asc_getSize"] = prot.asc_getSize;
-	prot["asc_setSize"] = prot.asc_setSize;
+prot["asc_getSize"] = prot.asc_getSize;
+prot["asc_setSize"] = prot.asc_setSize;
 
-	prot["asc_getColor"] = prot.asc_getColor;
-	prot["asc_setColor"] = prot.asc_setColor;
+prot["asc_getColor"] = prot.asc_getColor;
+prot["asc_setColor"] = prot.asc_setColor;
+
+prot["asc_getBold"] = prot.asc_getBold;
+prot["asc_setBold"] = prot.asc_setBold;
+
+prot["asc_getItalic"] = prot.asc_getItalic;
+prot["asc_setItalic"] = prot.asc_setItalic;
+
+prot["asc_getUnderline"] = prot.asc_getUnderline;
+prot["asc_setUnderline"] = prot.asc_setUnderline;
+//}
+
+//-----------------------------------------------------------------------------------
+// Selected graphic object(properties)
+//-----------------------------------------------------------------------------------	
+
+function asc_CSelectedObject( type, val ) {
+	this.Type = (undefined != type) ? type : null;
+	this.Value = (undefined != val) ? val : null;
+}
+
+asc_CSelectedObject.prototype = {
+	asc_getObjectType: function() { return this.Type; },
+	asc_getObjectValue: function() { return this.Value; }
+}
+
+//{ asc_CSelectedObject export
+window["Asc"].asc_CSelectedObject = asc_CSelectedObject;
+window["Asc"]["asc_CSelectedObject"] = asc_CSelectedObject;
+prot = asc_CSelectedObject.prototype;
+
+prot["asc_getObjectType"] = prot.asc_getObjectType;
+prot["asc_getObjectValue"] = prot.asc_getObjectValue;
+//}
+
+//-----------------------------------------------------------------------------------
+// CImgProperty
+//-----------------------------------------------------------------------------------
 	
-	prot["asc_getBold"] = prot.asc_getBold;
-	prot["asc_setBold"] = prot.asc_setBold;
+function asc_CImgProperty( obj ) {
 	
-	prot["asc_getItalic"] = prot.asc_getItalic;
-	prot["asc_setItalic"] = prot.asc_setItalic;
+	if( obj ) {
+        this.CanBeFlow = (undefined != obj.CanBeFlow) ? obj.CanBeFlow : true;
+
+		this.Width         = (undefined != obj.Width        ) ? obj.Width                          : undefined;
+		this.Height        = (undefined != obj.Height       ) ? obj.Height                         : undefined;
+		this.WrappingStyle = (undefined != obj.WrappingStyle) ? obj.WrappingStyle                  : undefined;
+		this.Paddings      = (undefined != obj.Paddings     ) ? new CPaddings (obj.Paddings)       : undefined;
+		this.Position      = (undefined != obj.Position     ) ? new CPosition (obj.Position)       : undefined;
+        this.AllowOverlap  = (undefined != obj.AllowOverlap ) ? obj.AllowOverlap                   : undefined;
+        this.PositionH     = (undefined != obj.PositionH    ) ? new CImagePositionH(obj.PositionH) : undefined;
+        this.PositionV     = (undefined != obj.PositionV    ) ? new CImagePositionV(obj.PositionV) : undefined;
+
+        this.Internal_Position = (undefined != obj.Internal_Position) ? obj.Internal_Position : null;
+
+		this.ImageUrl = (undefined != obj.ImageUrl) ? obj.ImageUrl : null;
+        this.Locked   = (undefined != obj.Locked) ? obj.Locked : false;
+
+
+        this.ChartProperties = (undefined != obj.ChartProperties) ? obj.ChartProperties : null;
+        this.ShapeProperties = (undefined != obj.ShapeProperties) ? /*CreateAscShapePropFromProp*/(obj.ShapeProperties) : null;
+
+        this.ChangeLevel = (undefined != obj.ChangeLevel) ? obj.ChangeLevel : null;
+        this.Group = (obj.Group != undefined) ? obj.Group : null;
+
+        this.fromGroup = obj.fromGroup != undefined ? obj.fromGroup : null;
+        this.severalCharts = obj.severalCharts != undefined ? obj.severalCharts : false;
+        this.severalChartTypes = obj.severalChartTypes != undefined ? obj.severalChartTypes : undefined;
+        this.severalChartStyles = obj.severalChartStyles != undefined ? obj.severalChartStyles : undefined;
+        this.verticalTextAlign = obj.verticalTextAlign != undefined ? obj.verticalTextAlign : undefined;
+	}
+	else {
+        this.CanBeFlow = true;
+		this.Width         = undefined;
+		this.Height        = undefined;
+		this.WrappingStyle = undefined;
+		this.Paddings      = undefined;
+		this.Position      = undefined;
+        this.PositionH     = undefined;
+        this.PositionV     = undefined;
+        this.Internal_Position = null;
+        this.ImageUrl = null;
+        this.Locked   = false;
+
+        this.ChartProperties = null;
+        this.ShapeProperties = null;
+        this.ImageProperties = null;
+
+        this.ChangeLevel = null;
+        this.Group = null;
+        this.fromGroup = null;
+        this.severalCharts = false;
+        this.severalChartTypes = undefined;
+        this.severalChartStyles = undefined;
+        this.verticalTextAlign = undefined;
+	}
+}
 	
-	prot["asc_getUnderline"] = prot.asc_getUnderline;
-	prot["asc_setUnderline"] = prot.asc_setUnderline;
-	//}
+asc_CImgProperty.prototype = {
+	
+	asc_getChangeLevel: function() { return this.ChangeLevel; },
+	asc_putChangeLevel: function(v) { this.ChangeLevel = v; },
+
+	asc_getCanBeFlow: function() { return this.CanBeFlow; },
+	asc_getWidth: function() { return this.Width; },
+	asc_putWidth: function(v) { this.Width = v; },
+	asc_getHeight: function() { return this.Height; },
+	asc_putHeight: function(v) { this.Height = v; },
+	asc_getWrappingStyle: function() { return this.WrappingStyle; },
+	asc_putWrappingStyle: function(v) { this.WrappingStyle = v; },
+	
+	// Возвращается объект класса CPaddings
+	asc_getPaddings: function() { return this.Paddings; },
+	// Аргумент объект класса CPaddings
+	asc_putPaddings: function(v) { this.Paddings = v; },
+	asc_getAllowOverlap: function() {return this.AllowOverlap;},
+	asc_putAllowOverlap: function(v) {this.AllowOverlap = v;},
+	// Возвращается объект класса CPosition
+	asc_getPosition: function() { return this.Position; },
+	// Аргумент объект класса CPosition
+	asc_putPosition: function(v) { this.Position = v; },
+	asc_getPositionH: function()  { return this.PositionH; },
+	asc_putPositionH: function(v) { this.PositionH = v; },
+	asc_getPositionV: function()  { return this.PositionV; },
+	asc_putPositionV: function(v) { this.PositionV = v; },
+	asc_getValue_X: function(RelativeFrom) { if ( null != this.Internal_Position ) return this.Internal_Position.Calculate_X_Value(RelativeFrom);  return 0; },
+	asc_getValue_Y: function(RelativeFrom) { if ( null != this.Internal_Position ) return this.Internal_Position.Calculate_Y_Value(RelativeFrom);  return 0; },
+
+	asc_getImageUrl: function() { return this.ImageUrl; },
+	asc_putImageUrl: function(v) { this.ImageUrl = v; },
+	asc_getGroup: function() { return this.Group; },
+	asc_putGroup: function(v) { this.Group = v; },
+	asc_getFromGroup: function() { return this.fromGroup; },
+	asc_putFromGroup: function(v) { this.fromGroup = v; },
+	
+	asc_getisChartProps: function() { return this.isChartProps; },
+	asc_putisChartPross: function(v) { this.isChartProps = v; },
+
+	asc_getSeveralCharts: function() { return this.severalCharts; },
+	asc_putSeveralCharts: function(v) { this.severalCharts = v; },
+	asc_getSeveralChartTypes: function() { return this.severalChartTypes; },
+	asc_putSeveralChartTypes: function(v) { this.severalChartTypes = v; },
+
+	asc_getSeveralChartStyles: function() { return this.severalChartStyles; },
+	asc_putSeveralChartStyles: function(v) { this.severalChartStyles = v; },
+
+	asc_getVerticalTextAlign: function() { return this.verticalTextAlign; },
+	asc_putVerticalTextAlign: function(v) { this.verticalTextAlign = v; },
+	
+	asc_getLocked: function() { return this.Locked; },
+	asc_getChartProperties: function() { return this.ChartProperties; },
+	asc_putChartProperties: function(v) { this.ChartProperties = v; },
+	asc_getShapeProperties: function() { return this.ShapeProperties; },
+	asc_putShapeProperties: function(v) { this.ShapeProperties = v; }
+}
+
+//{ asc_CImgProperty export
+window["Asc"].asc_CImgProperty = asc_CImgProperty;
+window["Asc"]["asc_CImgProperty"] = asc_CImgProperty;
+prot = asc_CImgProperty.prototype;
+
+prot["asc_getChangeLevel"] = prot.asc_getChangeLevel;
+prot["asc_putChangeLevel"] = prot.asc_putChangeLevel;
+
+prot["asc_getCanBeFlow"] = prot.asc_getCanBeFlow;
+prot["asc_getWidth"] = prot.asc_getWidth;
+prot["asc_putWidth"] = prot.asc_putWidth;
+prot["asc_getHeight"] = prot.asc_getHeight;
+prot["asc_putHeight"] = prot.asc_putHeight;
+prot["asc_getWrappingStyle"] = prot.asc_getWrappingStyle;
+prot["asc_putWrappingStyle"] = prot.asc_putWrappingStyle;
+
+prot["asc_getPaddings"] = prot.asc_getPaddings;
+prot["asc_putPaddings"] = prot.asc_putPaddings;
+prot["asc_getAllowOverlap"] = prot.asc_getAllowOverlap;
+prot["asc_putAllowOverlap"] = prot.asc_putAllowOverlap;
+prot["asc_getPosition"] = prot.asc_getPosition;
+prot["asc_putPosition"] = prot.asc_putPosition;
+prot["asc_getPositionH"] = prot.asc_getPositionH;
+prot["asc_putPositionH"] = prot.asc_putPositionH;
+prot["asc_getPositionV"] = prot.asc_getPositionV;
+prot["asc_putPositionV"] = prot.asc_putPositionV;
+prot["asc_getValue_X"] = prot.asc_getValue_X;
+prot["asc_getValue_Y"] = prot.asc_getValue_Y;
+
+prot["asc_getImageUrl"] = prot.asc_getImageUrl;
+prot["asc_putImageUrl"] = prot.asc_putImageUrl;
+prot["asc_getGroup"] = prot.asc_getGroup;
+prot["asc_putGroup"] = prot.asc_putGroup;
+prot["asc_getFromGroup"] = prot.asc_getFromGroup;
+prot["asc_putFromGroup"] = prot.asc_putFromGroup;
+prot["asc_getisChartProps"] = prot.asc_getisChartProps;
+prot["asc_putisChartPross"] = prot.asc_putisChartPross;
+	
+prot["asc_getSeveralCharts"] = prot.asc_getSeveralCharts;
+prot["asc_putSeveralCharts"] = prot.asc_putSeveralCharts;
+prot["asc_getSeveralChartTypes"] = prot.asc_getSeveralChartTypes;
+prot["asc_putSeveralChartTypes"] = prot.asc_putSeveralChartTypes;
+prot["asc_getSeveralChartStyles"] = prot.asc_getSeveralChartStyles;
+prot["asc_putSeveralChartStyles"] = prot.asc_putSeveralChartStyles;
+prot["asc_getVerticalTextAlign"] = prot.asc_getVerticalTextAlign;
+prot["asc_putVerticalTextAlign"] = prot.asc_putVerticalTextAlign;
+prot["asc_getLocked"] = prot.asc_getLocked;
+prot["asc_getChartProperties"] = prot.asc_getChartProperties;
+prot["asc_putChartProperties"] = prot.asc_putChartProperties;
+prot["asc_getShapeProperties"] = prot.asc_getShapeProperties;
+prot["asc_putShapeProperties"] = prot.asc_putShapeProperties;
+//}
 
 //-----------------------------------------------------------------------------------
 // Undo/Redo

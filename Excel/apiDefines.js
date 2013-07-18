@@ -333,6 +333,16 @@ var c_oAscStrokeType = {
     STROKE_NONE: 0,
     STROKE_COLOR: 1
 };
+
+var c_oAscTypeSelectElement =
+{
+	Paragraph  : 0,
+	Table      : 1,
+	Image      : 2,
+	Header     : 3,
+    Hyperlink  : 4,
+    SpellCheck : 5
+}
  
 var c_oAscCoAuthoringMeBorderColor					= "rgba(22,156,0,1)";
 var c_oAscCoAuthoringOtherBorderColor				= "rgba(238,53,37,1)";

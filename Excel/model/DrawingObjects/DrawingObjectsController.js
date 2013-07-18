@@ -280,8 +280,8 @@ DrawingObjectsController.prototype =
         return this.curState.isPointInDrawingObjects(x, y);
     },
 	
-	getGraphicObjectProps: function() {
-		
+	getGraphicObjectProps: function()
+	{
 		var shape_props, image_props;
         
         switch(this.curState.id)
@@ -508,7 +508,12 @@ DrawingObjectsController.prototype =
             
             ret.push(image_props);
         }
-        
-        return ret;
+			
+		var ascSelectedObjects = [];
+		for (var i = 0; i < ret.length; i++) {
+			ascSelectedObjects.push(new asc_CSelectedObject( c_oAscTypeSelectElement.Image, new asc_CImgProperty(ret[i]) ));
+		}
+		
+        return ascSelectedObjects;
 	}
 };
