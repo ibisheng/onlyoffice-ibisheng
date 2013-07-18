@@ -11,68 +11,70 @@
 //  0 - итраторы по прямой линии
 //  1 - итераторы расположены также, как у степени
 
-function CNary(id, OrderType, IterType )
+
+
+function CNary()
 {
-    CSubMathBase.call( this,1,2 );
-    this.OrderType = OrderType;
-    this.IterType = IterType;
-    this.id = id;
-    //this.NarySymbols =  [0x222B, 0x222C, 0x222D, 0x222E, 0x222F, 0x2230, 0x2211, 0x220F, 0x2210, 0x22C3, 0x22C2, 0x22C1, 0x22C0];
+    CSubMathBase.call(this);
 }
-extend(CNary,CSubMathBase);
-CNary.prototype.setContent = function()
+extend(CNary, CSubMathBase);
+CNary.prototype.init = function(index, orderType, iterType)
 {
-    var oBase = null, oArg = null;
+    this.setDimension(1, 2);
 
-    //переделать здесь, т.к криво для случая когда нет опреаторов : не обрабатывается событие нажатия мыши
-    if(this.OrderType == 0 || this.IterType == 0)
-        oBase = new CBaseNaryOrder(this.id, this.IterType); // undOvr
-    else
-        oBase = new CDegree(this.IterType - 1); // вычитаем 1 т.к. параметры инициализации от 0 до 2
-
+    var arg = new CMathContent(),
+        base;
     var sign = null;
 
-    if(this.id == 0)
+    if(index == 0)
         sign = new CIntegral();
-    else if(this.id == 1)
+    else if(index == 1)
         sign = new CDoubleIntegral();
-    else if(this.id == 2)
+    else if(index == 2)
         sign = new CTripleIntegral();
-    else if(this.id == 3)
+    else if(index == 3)
         sign = new CContourIntegral();
-    else if(this.id == 4)
+    else if(index == 4)
         sign = new CSurfaceIntegral();
-    else if(this.id == 5)
+    else if(index == 5)
         sign = new CVolumeIntegral();
-    else if(this.id == 6)
+    else if(index == 6)
         sign = new CSigma();
-    else if(this.id == 7)
+    else if(index == 7)
         sign = new CProduct();
-    else if(this.id == 8)
+    else if(index == 8)
         sign = new CProduct(-1);
-    else if(this.id == 9)
+    else if(index == 9)
         sign = new CUnion();
-    else if(this.id == 10)
+    else if(index == 10)
         sign = new CUnion(-1);
-    else if(this.id == 11)
+    else if(index == 11)
         sign = new CLogicalOr(1);
-    else if(this.id == 12)
+    else if(index == 12)
         sign = new CLogicalOr(-1);
-    else
-        return null;
 
-    sign.init(this.params);
+    if(orderType == 0)
+    {
+        if(iterType == 0)
+            base = sign;
+        else if(iterType == 1)
+        {
+            base = new CNaryUnd();
+            base.init(sign);
+        }
+        else if(iterType == 2)
+        {
+            base = new CNaryOvr();
+            base.init(sign);
+        }
+        else if(iterType == 3)
+        {
+            base = new CNaryUndOvr();
+            base.init(sign);
+        }
+    }
 
-    oBase.init(this.params);
-    oBase.relate(this);
-    oBase.setContent(sign);
-
-    oArg = new CMathContent();
-    oArg.init(this.params);
-    oArg.relate(this);
-    oArg.fillPlaceholders();
-
-    CNary.superclass.setContent.call(this, oBase, oArg);
+    this.addMCToContent(base, arg);
 }
 CNary.prototype.getBase = function()
 {
@@ -87,114 +89,163 @@ CNary.prototype.getLowerIterator = function()
     return this.elements[0][0].getLowerIterator();
 }
 
-function CBaseNaryOrder(id, IterType )
+function CNaryUnd()
 {
-    if(IterType == 3)
-        CMathBase.call(this, 3, 1);
-    else if(IterType == 2 || IterType == 1)
-        CMathBase.call(this, 2, 1);
-    else if(IterType == 0)
-        CMathBase.call(this, 1, 1);
-
-    this.id = id;
-    //this.PlaceSign = (IterType == 2 || IterType == 0) ? 0  : 1;
-    this.IterType = IterType;
+    CMathBase.call(this);
 }
-extend(CBaseNaryOrder, CMathBase);
-CBaseNaryOrder.prototype.setContent =  function()
+extend(CNaryUnd, CMathBase);
+CNaryUnd.prototype.init = function(sign)
 {
-    var fontIter = getTypeDegree(this.params.font);
-    var params = Common_CopyObj(this.params);
-    params.font = fontIter;
+    this.setDimension(2,1);
 
-    if(this.IterType == 1) //устанавливаем верхний индекс
+    var iter = new CMathContent();
+    iter.setReduct(DEGR_REDUCT);
+
+    this.addMCToContent(iter, sign);
+}
+CNaryUnd.prototype.setDistance = function()
+{
+    var zetta = this.Parent.getTxtPrp().FontSize* 25.4/96;
+    this.dH = zetta*0.25;
+}
+CNaryUnd.prototype.getCenter = function()
+{
+    return this.elements[0][0].size.height + this.dW + this.elements[1][0].size.center ;
+}
+
+
+function CNaryOvr()
+{
+    CMathBase.call(this);
+}
+extend(CNaryOvr, CMathBase);
+CNaryOvr.prototype.init = function(sign)
+{
+    this.setDimension(2,1);
+
+    var iter = new CMathContent();
+    iter.setReduct(DEGR_REDUCT);
+
+    this.addMCToContent(sign, iter);
+}
+CNaryOvr.prototype.setDistance = function()
+{
+    var zetta = this.Parent.getTxtPrp().FontSize* 25.4/96;
+    this.dH = zetta*0.1;
+}
+CNaryOvr.prototype.getCenter = function()
+{
+    return this.elements[0][0].size.center;
+}
+
+function CNaryUndOvr()
+{
+    this.gapTop = 0;
+    this.gapBottom = 0;
+    CMathBase.call(this);
+}
+extend(CNaryUndOvr, CMathBase);
+CNaryUndOvr.prototype.init = function(sign)
+{
+    this.setDimension(3,1);
+
+    var iter1 = new CMathContent();
+    iter1.setReduct(DEGR_REDUCT);
+
+    var iter2 = new CMathContent();
+    iter2.setReduct(DEGR_REDUCT);
+
+    this.addMCToContent(iter1, sign, iter2);
+}
+CNaryUndOvr.prototype.recalculateSize = function()
+{
+    var zetta = this.Parent.getTxtPrp().FontSize* 25.4/96;
+    this.gapTop = zetta*0.25;
+    this.gapBottom = zetta*0.1;
+
+    var center = this.elements[0][0].size.height + this.gapTop + this.elements[1][0].size.center;
+
+    var width = 0, height = 0;
+    for(var i = 0; i < 3; i++)
     {
-        this.elements[0][0].fillPlaceholders();
-        this.elements[0][0].relate(this);
-
-        this.elements[1][0] = arguments[0]; // n-арный оператор
-        this.elements[1][0].setTopBottonGaps(true, false);
-
+        width = width > this.elements[i][0].size.width ? width : this.elements[i][0].size.width;
+        height += this.elements[i][0].size.height;
     }
-    else if(this.IterType == 2)  //устанавливаем нижний индекс
+
+    height += this.gapTop + this.gapBottom;
+
+    this.size = {width: width, height: height, center: center};
+}
+CNaryUndOvr.prototype.setPosition = function(pos)
+{
+    this.pos = {x: pos.x, y : pos.y - this.size.center};
+    var x1 = pos.x + this.align(0, 0).x,
+        y1 = pos.y,
+        x2 = pos.x + this.align(1,0).x,
+        y2 = y1 + this.elements[0][0].size.height + this.gapTop,
+        x3 = pos.x + this.align(2,0).x,
+        y3 = y2 + this.elements[1][0].size.height + this.gapBottom;
+
+    this.elements[0][0].setPosition({x: x1, y :y1 });
+    this.elements[1][0].setPosition({x: x2, y :y2 });
+    this.elements[2][0].setPosition({x: x3, y :y3 });
+}
+CNaryUndOvr.prototype.findDisposition = function(mCoord)
+{
+    var X = null, Y = null;
+    var iter, pos_x, pos_y = 0;
+    var inside_flag = -1;
+
+    if(mCoord.y < this.size.height/2)
     {
+        iter = this.elements[0][0].size;
+        if( mCoord.y > iter.height )
+        {
+            Y = iter.height;
+            inside_flag = 2;
+        }
+        else
+            Y = mCoord.y;
 
-        this.elements[1][0].fillPlaceholders();
-        this.elements[1][0].relate(this);
-
-        this.elements[0][0] = arguments[0]; // n-арный оператор
-        this.elements[0][0].setTopBottonGaps(false, true);
-    }
-    else if(this.IterType == 3)
-    {
-        this.elements[0][0].fillPlaceholders();
-        this.elements[0][0].relate(this);
-
-        this.elements[1][0] = arguments[0]; // n-арный оператор
-        this.elements[1][0].setTopBottonGaps(true, true);
-
-        this.elements[2][0].fillPlaceholders();
-        this.elements[2][0].relate(this);
+        pos_x = 0;
     }
     else
     {
-        this.elements[0][0] = arguments[0]; // n-арный оператор
-        this.elements[0][0].setTopBottonGaps(false, false);
+        iter = this.elements[2][0].size;
+        if( mCoord.y < iter.height )
+        {
+            Y = 0;
+            inside_flag = 2;
+        }
+        else
+            Y = mCoord.y - (this.size.height - iter.height);
+
+        pos_x = 2;
     }
 
-    this.recalculateSize();
-}
-CBaseNaryOrder.prototype.getCenter = function()
-{
-    var center;
-
-    if(this.IterType == 1 || this.IterType == 3)
-        center = this.elements[0][0].size.height + this.elements[1][0].size.center;
+    var align = this.align(pos_x, 0);
+    if(mCoord.x < align.x )
+    {
+        X = 0;
+        inside_flag = 0;
+    }
+    else if(mCoord.x > align.x + iter.width)
+    {
+        X = iter.width;
+        inside_flag = 1;
+    }
     else
-        center = this.elements[0][0].size.center;
+        X = mCoord.x - align.x;
 
-    return center;
+    return {pos: {x: pos_x, y: pos_y}, mCoord: {x: X, y: Y}, inside_flag: inside_flag};
 }
-CBaseNaryOrder.prototype.recalculateSize = function()
-{
-    CBaseNaryOrder.superclass.recalculateSize.call(this);
 
-    var gap = this.params.font.FontSize/36*2.45;
-    this.size.width += gap;
-}
-CBaseNaryOrder.prototype.IsJustDraw = function()
-{
-    return this.IterType == 0; // если только один значок n-арного оператора
-}
-CBaseNaryOrder.prototype.getUpperIterator = function()
-{
-    return this.elements[0][0];
-}
-CBaseNaryOrder.prototype.getLowerIterator = function()
-{
-    var iter = null;
-
-    if(this.IterType == 2)
-        iter = this.elements[1][0];
-    else if(this.IterType == 3)
-        iter = this.elements[2][0];
-
-    return iter;
-}
 
 function CNaryOperator(flip)
 {
-    this.gap = 0;
     this.bFlip = (flip == -1);
 
     this.sizeGlyph = null;
-    this.gapTop = 0;
-    this.gapBotton = 0;
-}
-CNaryOperator.prototype.init = function(params)
-{
-    this.params = Common_CopyObj(params);
-    this.recalculateSize();
 }
 CNaryOperator.prototype.draw = function()
 {
@@ -206,7 +257,7 @@ CNaryOperator.prototype.draw = function()
     var XX = new Array(),
         YY = new Array();
 
-    var textScale = this.params.font.FontSize/850; // 1000 pt
+    var textScale = this.Parent.getTxtPrp().FontSize/850; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент; используется для того чтобы перевести координаты в миллиметры
     // g_dKoef_px_to_mm = 25.4/96
 
@@ -247,34 +298,36 @@ CNaryOperator.prototype.IsJustDraw = function()
 {
     return true;
 }
-CNaryOperator.prototype.relate = function()
+CNaryOperator.prototype.relate = function(parent)
 {
-
+    this.Parent = parent;
 }
 CNaryOperator.prototype.setPosition = function(pos)
 {
-    this.pos = {x: pos.x , y: pos.y + this.gapTop};
+    this.pos = {x: pos.x , y: pos.y};
 }
 CNaryOperator.prototype.recalculateSize = function()
 {
     this.sizeGlyph = this.calculateSizeGlyph();
 
-    var height = this.sizeGlyph.height + this.gapTop + this.gapBotton,
+    var height = this.sizeGlyph.height,
         width =  this.sizeGlyph.width,
-        center = this.sizeGlyph.height/2 + this.gapTop;
+        center = this.sizeGlyph.height/2;
 
     this.size = {height: height, width: width, center: center};
 }
-CNaryOperator.prototype.setTopBottonGaps = function(bUp, bDown)
+CNaryOperator.prototype.setComposition = function()
 {
-    var zetta = this.params.font.FontSize* 25.4/96;
 
-    this.gapTop =    bUp ?  zetta*0.25 : 0;
-    this.gapBotton = bDown ? zetta*0.1 : 0;
+}
+CNaryOperator.prototype.setReduct = function()
+{
 
+}
+CNaryOperator.prototype.Resize = function()
+{
     this.recalculateSize();
 }
-
 
 function CSigma()
 {
@@ -1080,7 +1133,7 @@ CIntegral.prototype.old_drawPath = function(XX, YY)
 }
 CIntegral.prototype.calculateSizeGlyph = function()
 {
-    var betta = this.params.font.FontSize/36;
+    var betta = this.Parent.getTxtPrp().FontSize/36;
 
     var _width =  8.624*betta,
         _height = 13.7*betta;
@@ -3746,4 +3799,273 @@ CVolumeIntegral.prototype.calculateSizeGlyph = function()
         height = 2*_height;
 
     return {width : width, height : height};
+}
+
+
+
+
+function old_CNary(id, OrderType, IterType )
+{
+    CSubMathBase.call( this,1,2 );
+    this.OrderType = OrderType;
+    this.IterType = IterType;
+    this.id = id;
+    //this.NarySymbols =  [0x222B, 0x222C, 0x222D, 0x222E, 0x222F, 0x2230, 0x2211, 0x220F, 0x2210, 0x22C3, 0x22C2, 0x22C1, 0x22C0];
+}
+extend(old_CNary,CSubMathBase);
+old_CNary.prototype.setContent = function()
+{
+    var oBase = null, oArg = null;
+
+    //переделать здесь, т.к криво для случая когда нет опреаторов : не обрабатывается событие нажатия мыши
+    if(this.OrderType == 0 || this.IterType == 0)
+        oBase = new CBaseNaryOrder(this.id, this.IterType); // undOvr
+    else
+        oBase = new CDegree(this.IterType - 1); // вычитаем 1 т.к. параметры инициализации от 0 до 2
+
+    var sign = null;
+
+    if(this.id == 0)
+        sign = new CIntegral();
+    else if(this.id == 1)
+        sign = new CDoubleIntegral();
+    else if(this.id == 2)
+        sign = new CTripleIntegral();
+    else if(this.id == 3)
+        sign = new CContourIntegral();
+    else if(this.id == 4)
+        sign = new CSurfaceIntegral();
+    else if(this.id == 5)
+        sign = new CVolumeIntegral();
+    else if(this.id == 6)
+        sign = new CSigma();
+    else if(this.id == 7)
+        sign = new CProduct();
+    else if(this.id == 8)
+        sign = new CProduct(-1);
+    else if(this.id == 9)
+        sign = new CUnion();
+    else if(this.id == 10)
+        sign = new CUnion(-1);
+    else if(this.id == 11)
+        sign = new CLogicalOr(1);
+    else if(this.id == 12)
+        sign = new CLogicalOr(-1);
+    else
+        return null;
+
+    sign.init(this.params);
+
+    oBase.init(this.params);
+    oBase.relate(this);
+    oBase.setContent(sign);
+
+    oArg = new CMathContent();
+    oArg.init(this.params);
+    oArg.relate(this);
+    oArg.fillPlaceholders();
+
+    old_CNary.superclass.setContent.call(this, oBase, oArg);
+}
+old_CNary.prototype.getBase = function()
+{
+    return this.elements[0][1];
+}
+old_CNary.prototype.getUpperIterator = function()
+{
+    return this.elements[0][0].getUpperIterator();
+}
+old_CNary.prototype.getLowerIterator = function()
+{
+    return this.elements[0][0].getLowerIterator();
+}
+
+
+function old_CBaseNaryOrder(id, IterType )
+{
+    if(IterType == 3)
+        CMathBase.call(this, 3, 1);
+    else if(IterType == 2 || IterType == 1)
+        CMathBase.call(this, 2, 1);
+    else if(IterType == 0)
+        CMathBase.call(this, 1, 1);
+
+    this.id = id;
+    //this.PlaceSign = (IterType == 2 || IterType == 0) ? 0  : 1;
+    this.IterType = IterType;
+}
+extend(old_CBaseNaryOrder, CMathBase);
+old_CBaseNaryOrder.prototype.setContent =  function()
+{
+    var fontIter = getTypeDegree(this.params.font);
+    var params = Common_CopyObj(this.params);
+    params.font = fontIter;
+
+    if(this.IterType == 1) //устанавливаем верхний индекс
+    {
+        this.elements[0][0].fillPlaceholders();
+        this.elements[0][0].relate(this);
+
+        this.elements[1][0] = arguments[0]; // n-арный оператор
+        this.elements[1][0].setTopBottonGaps(true, false);
+
+    }
+    else if(this.IterType == 2)  //устанавливаем нижний индекс
+    {
+
+        this.elements[1][0].fillPlaceholders();
+        this.elements[1][0].relate(this);
+
+        this.elements[0][0] = arguments[0]; // n-арный оператор
+        this.elements[0][0].setTopBottonGaps(false, true);
+    }
+    else if(this.IterType == 3)
+    {
+        this.elements[0][0].fillPlaceholders();
+        this.elements[0][0].relate(this);
+
+        this.elements[1][0] = arguments[0]; // n-арный оператор
+        this.elements[1][0].setTopBottonGaps(true, true);
+
+        this.elements[2][0].fillPlaceholders();
+        this.elements[2][0].relate(this);
+    }
+    else
+    {
+        this.elements[0][0] = arguments[0]; // n-арный оператор
+        this.elements[0][0].setTopBottonGaps(false, false);
+    }
+
+    this.recalculateSize();
+}
+old_CBaseNaryOrder.prototype.getCenter = function()
+{
+    var center;
+
+    if(this.IterType == 1 || this.IterType == 3)
+        center = this.elements[0][0].size.height + this.elements[1][0].size.center;
+    else
+        center = this.elements[0][0].size.center;
+
+    return center;
+}
+old_CBaseNaryOrder.prototype.recalculateSize = function()
+{
+    old_CBaseNaryOrder.superclass.recalculateSize.call(this);
+
+    var gap = this.params.font.FontSize/36*2.45;
+    this.size.width += gap;
+}
+old_CBaseNaryOrder.prototype.IsJustDraw = function()
+{
+    return this.IterType == 0; // если только один значок n-арного оператора
+}
+old_CBaseNaryOrder.prototype.getUpperIterator = function()
+{
+    return this.elements[0][0];
+}
+old_CBaseNaryOrder.prototype.getLowerIterator = function()
+{
+    var iter = null;
+
+    if(this.IterType == 2)
+        iter = this.elements[1][0];
+    else if(this.IterType == 3)
+        iter = this.elements[2][0];
+
+    return iter;
+}
+
+
+function old_CNaryOperator(flip)
+{
+    this.gap = 0;
+    this.bFlip = (flip == -1);
+
+    this.sizeGlyph = null;
+    this.gapTop = 0;
+    this.gapBotton = 0;
+}
+old_CNaryOperator.prototype.init = function(params)
+{
+    this.params = Common_CopyObj(params);
+    this.recalculateSize();
+}
+old_CNaryOperator.prototype.draw = function()
+{
+    var coord = this.getCoord();
+
+    var X = coord.X,
+        Y = coord.Y;
+
+    var XX = new Array(),
+        YY = new Array();
+
+    var textScale = this.params.font.FontSize/850; // 1000 pt
+    var alpha = textScale*25.4/96 /64; // коэффициент; используется для того чтобы перевести координаты в миллиметры
+    // g_dKoef_px_to_mm = 25.4/96
+
+    var a, b;
+    if(this.bFlip)
+    {
+        a = -1;
+        b = this.sizeGlyph.height;
+    }
+    else
+    {
+        a = 1;
+        b = 0;
+    }
+
+    for(var i = 0 ; i < X.length; i++)
+    {
+        XX[i] = this.pos.x + X[i]*alpha;
+        YY[i] = this.pos.y + (a*Y[i]*alpha + b);
+    }
+
+    var intGrid = MathControl.pGraph.GetIntegerGrid();
+    MathControl.pGraph.SetIntegerGrid(false);
+
+    MathControl.pGraph.p_width(1000);
+
+    MathControl.pGraph.b_color1(0,0,0, 255);
+    MathControl.pGraph.p_color(0,0,0, 255);
+    MathControl.pGraph._s();
+
+    this.drawPath(XX,YY);
+
+    MathControl.pGraph.df();
+    MathControl.pGraph.SetIntegerGrid(intGrid);
+
+}
+old_CNaryOperator.prototype.IsJustDraw = function()
+{
+    return true;
+}
+old_CNaryOperator.prototype.relate = function()
+{
+
+}
+old_CNaryOperator.prototype.setPosition = function(pos)
+{
+    this.pos = {x: pos.x , y: pos.y + this.gapTop};
+}
+old_CNaryOperator.prototype.recalculateSize = function()
+{
+    this.sizeGlyph = this.calculateSizeGlyph();
+
+    var height = this.sizeGlyph.height + this.gapTop + this.gapBotton,
+        width =  this.sizeGlyph.width,
+        center = this.sizeGlyph.height/2 + this.gapTop;
+
+    this.size = {height: height, width: width, center: center};
+}
+old_CNaryOperator.prototype.setTopBottonGaps = function(bUp, bDown)
+{
+    var zetta = this.params.font.FontSize* 25.4/96;
+
+    this.gapTop =    bUp ?  zetta*0.25 : 0;
+    this.gapBotton = bDown ? zetta*0.1 : 0;
+
+    this.recalculateSize();
 }

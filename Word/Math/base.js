@@ -91,6 +91,13 @@ CMathBase.prototype =
     setComposition: function(Compos)
     {
         this.Composition = Compos;
+
+        for(var i=0; i < this.nRow; i++)
+            for(var j = 0; j < this.nCol; j++)
+            {
+                if(!this.elements[i][j].IsJustDraw())
+                    this.elements[i][j].setComposition(Compos);
+            }
     },
     setTxtPr: function(prp)
     {
@@ -100,6 +107,7 @@ CMathBase.prototype =
     {
          for(var i=0; i < this.nRow; i++)
              for(var j = 0; j < this.nCol; j++)
+                if(!this.elements[i][j].IsJustDraw())
                  this.elements[i][j].fillPlaceholders();
     },
     setReduct: function(coeff)
@@ -702,7 +710,7 @@ CMathBase.prototype =
     setPosition: function(pos)
     {
         if(this.bMObjs === true)
-            this.pos = pos;
+            this.pos = {x: pos.x, y : pos.y};
         else
             this.pos = {x: pos.x, y: pos.y - this.size.center}; ///!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -739,6 +747,8 @@ CMathBase.prototype =
         var _height = 0;
 
         var maxWH = this.getWidthsHeights();
+
+        this.setDistance();
 
         var Widths = maxWH.widths;
         var Heights = maxWH.heights;

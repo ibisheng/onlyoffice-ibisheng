@@ -7,12 +7,9 @@ extend(CBarFraction, CMathBase);
 CBarFraction.prototype.init = function()
 {
     var num = new CNumerator();
-
-    num.setComposition(this.Composition);
     num.init();
 
     var den = new CDenominator();
-    den.setComposition(this.Composition);
     den.init();
 
     this.setDimension(2, 1);

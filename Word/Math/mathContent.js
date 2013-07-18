@@ -202,6 +202,9 @@ CMathContent.prototype =
             case 7:
                 mathElem = new CDegreeRadical();
                 break;
+            case 8:
+                mathElem = new CNary();
+                break;
         }
 
         if( mathElem !== null )
@@ -430,7 +433,26 @@ CMathContent.prototype =
                 iter2.addTxt("2");
 
                 break;
-
+            case 23:
+                var integr = this.createMComponent(8);
+                integr.init(0,0,0);
+                integr.fillPlaceholders();
+                break;
+            case 25:
+                var integr = this.createMComponent(8);
+                integr.init(0,0,3);
+                integr.fillPlaceholders();
+                break;
+            /*case 24:
+                var integr = this.createMComponent(8);
+                integr.init(0,0,1);
+                integr.fillPlaceholders();
+                break;
+            case 26:
+                var integr = this.createMComponent(8);
+                integr.init(0,0,2);
+                integr.fillPlaceholders();
+                break;*/
         }
     },
     removeAreaSelect: function()
