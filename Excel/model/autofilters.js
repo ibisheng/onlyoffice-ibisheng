@@ -4876,6 +4876,9 @@
 				{
 					cell = ws.model.getCell(new CellAddress(range.r1,col1, 0));
 					val = cell.getValue();
+					//если ячейка пустая, то генерируем название
+					if(val == '')
+						val = this._generateColumnName(tableColumns);
 					//проверяем, не повторяется ли значение, которое лежит в данной ячейке
 					var index = 2;
 					var valNew = val;
