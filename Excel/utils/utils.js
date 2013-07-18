@@ -900,13 +900,18 @@
 					fc = fc.getRgb();
 				var oFontColor = fc !== null ? asc.numberToCSSColor(fc) : "#000000";
 				var format = oStyle.getFont();
-				var oFont = new asc.FontProperties(format.fn, format.fs, format.b, format.i, format.u, format.s);
+				// Для размера шрифта делаем ограничение для превью в 16pt (у Excel 18pt, но и высота превью больше 22px)
+				var oFont = new asc.FontProperties(format.fn, (16 < format.fs) ? 16 : format.fs,
+					format.b, format.i, format.u, format.s);
 
-				var width_padding = 2.25; // 3 * 72 / 96
+				var width_padding = 3; // 4 * 72 / 96
+
 				var tm = stringRenderer.measureString(oStyle.Name);
+				// Текст будем рисовать по центру (в Excel чуть по другому реализовано, у них постоянный отступ снизу)
+				var textY = 0.5 * (nOffsetY + (nOffsetY + this.styleThumbnailHeightPt) - tm.height);
 				oGraphics.setFont(oFont);
 				oGraphics.setFillStyle(oFontColor);
-				oGraphics.fillText(oStyle.Name, width_padding, nOffsetY + tm.baseline);
+				oGraphics.fillText(oStyle.Name, width_padding, textY + tm.baseline);
 				oGraphics.restore();
 			}
 		};
