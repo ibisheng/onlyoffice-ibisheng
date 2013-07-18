@@ -22,6 +22,7 @@
 }
 
 var g_bIsDocumentCopyPaste = true;
+var isOnlyLocalBufferSafariWord = false;
 function Editor_Copy_GetElem(api)
 {
     var ElemToSelect = document.getElementById( "SelectId" );
@@ -1646,6 +1647,13 @@ function Editor_Paste(api, bClean)
     var oWordControl = api.WordControl;
     oWordControl.bIsEventPaste = false;
     var oDocument = oWordControl.m_oLogicDocument;
+	if(isOnlyLocalBufferSafariWord && navigator.userAgent.toLowerCase().indexOf('safari') > -1 && navigator.userAgent.toLowerCase().indexOf('mac'))
+	{
+		 var ElemToSelect = document.getElementById( "SelectId" );
+		 if(ElemToSelect)
+            Editor_Paste_Exec(api, ElemToSelect);
+		return;
+	}
     if(false == CanPaste(oDocument))
         return;
 
