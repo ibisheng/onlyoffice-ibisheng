@@ -5147,7 +5147,23 @@ CDocumentContent.prototype =
         }
 
         if ( docpostype_DrawingObjects === this.CurPos.Type )
-            return this.LogicDocument.DrawingObjects.paragraphIncDecIndent( bIncrease );
+        {
+            if ( true != this.LogicDocument.DrawingObjects.isSelectedText() )
+            {
+                var ParaDrawing = this.LogicDocument.DrawingObjects.getMajorParaDrawing();
+                if ( null != ParaDrawing )
+                {
+                    var Paragraph = ParaDrawing.Parent;
+                    Paragraph.IncDec_Indent(bIncrease);
+                    this.Recalculate();
+                }
+            }
+            else
+            {
+                this.DrawingObjects.paragraphIncDecIndent(bIncrease);
+            }
+            return;
+        }
         else //if ( docpostype_Content === this.CurPos.Type )
         {
             if ( this.CurPos.ContentPos < 0 )

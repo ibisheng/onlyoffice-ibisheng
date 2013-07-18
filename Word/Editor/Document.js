@@ -5043,10 +5043,24 @@ CDocument.prototype =
         }
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
-            var bRetValue = this.DrawingObjects.paragraphIncDecIndent(bIncrease);
+            if ( true != this.DrawingObjects.isSelectedText() )
+            {
+                var ParaDrawing = this.DrawingObjects.getMajorParaDrawing();
+                if ( null != ParaDrawing )
+                {
+                    var Paragraph = ParaDrawing.Parent;
+                    Paragraph.IncDec_Indent(bIncrease);
+                    this.Recalculate();
+                }
+            }
+            else
+            {
+                this.DrawingObjects.paragraphIncDecIndent(bIncrease);
+            }
+
             this.Document_UpdateSelectionState();
             this.Document_UpdateInterfaceState();
-            return bRetValue;
+            return;
         }
         else //if ( docpostype_Content === this.CurPos.Type )
         {
