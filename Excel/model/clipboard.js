@@ -35,6 +35,7 @@
 		var isTruePaste = false;
 		//activate local buffer
 		var activateLocalStorage = true;
+		var isOnlyLocalBufferSafari = false;
 		
 		var Base64 = {
 		 
@@ -524,8 +525,12 @@
 							doc.body.style["user-select"] = "none";
 							doc.body.style["-webkit-user-select"] = "none";
 							t.elementText.style.display = "none";
+							var textInsert = t.elementText.value;
+							if(isOnlyLocalBufferSafari && navigator.userAgent.toLowerCase().indexOf('safari') > -1 && navigator.userAgent.toLowerCase().indexOf('mac') && t.lStorageText)
+								textInsert = t.lStorageText;
+							
 							// for paste event
-							callback(t.elementText.value, []);
+							callback(textInsert, []);
 							if($.browser["mozilla"])
 								t._getStylesSelect();
 						},
@@ -1425,6 +1430,9 @@
             {
                 var pasteFragment = node;
                 var t = this;
+				
+				if(isOnlyLocalBufferSafari && navigator.userAgent.toLowerCase().indexOf('safari') > -1 && navigator.userAgent.toLowerCase().indexOf('mac'))
+					onlyFromLocalStorage = true;
 				
 				if(activateLocalStorage)
 				{
