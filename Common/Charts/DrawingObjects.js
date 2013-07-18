@@ -4111,13 +4111,6 @@ function DrawingObjects() {
 		}
 	}
 	
-	_this.getGraphicObjectProps = function() {
-		
-		var props = [];
-		var selectedObjects = _this.controller.selectedObjects;
-		return props;
-	}
-	
 	_this.insertUngroupedObjects = function(idGroup, aGraphics) {
 		
 		if ( idGroup && aGraphics.length ) {

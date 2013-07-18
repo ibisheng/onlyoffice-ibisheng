@@ -1097,6 +1097,57 @@ CShape.prototype =
         return {kd1: 1, kd2: 1};
     },
 
+	getPresetGeom: function()
+    {
+        if(this.spPr.geometry != null)
+        {
+            return this.spPr.geometry.preset;
+        }
+        else
+        {
+            return null;
+        }
+    },
+	
+	getFill: function()
+    {
+        return this.brush;
+    },
+	
+	 getStroke: function()
+    {
+        if(!isRealObject(this.pen))
+            return null;
+        return this.pen;
+    },
+	
+	canChangeArrows : function()
+    {
+        if(this.spPr.geometry == null)
+        {
+            return false;
+        }
+        var _path_list = this.spPr.geometry.pathLst;
+        var _path_index;
+        var _path_command_index;
+        var _path_command_arr;
+        for(_path_index = 0; _path_index < _path_list.length; ++_path_index)
+        {
+            _path_command_arr = _path_list[_path_index].ArrPathCommandInfo;
+            for(_path_command_index = 0; _path_command_index < _path_command_arr.length; ++ _path_command_index)
+            {
+                if(_path_command_arr[_path_command_index].id == 5)
+                {
+                    break;
+                }
+            }
+            if(_path_command_index == _path_command_arr.length)
+            {
+                return true;
+            }
+        }
+        return false;
+    },
 
     getRotateAngle: function(x, y)
     {

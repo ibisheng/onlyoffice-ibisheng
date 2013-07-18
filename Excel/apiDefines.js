@@ -322,6 +322,17 @@ var c_oAscStyleImage = {
 	Default		: 0,
 	Document	: 1
 };
+
+var c_oAscFill = {
+    FILL_TYPE_BLIP   : 1,
+    FILL_TYPE_NOFILL : 2,
+    FILL_TYPE_SOLID	 : 3
+};
+
+var c_oAscStrokeType = {
+    STROKE_NONE: 0,
+    STROKE_COLOR: 1
+};
  
 var c_oAscCoAuthoringMeBorderColor					= "rgba(22,156,0,1)";
 var c_oAscCoAuthoringOtherBorderColor				= "rgba(238,53,37,1)";

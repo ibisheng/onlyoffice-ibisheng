@@ -278,5 +278,237 @@ DrawingObjectsController.prototype =
     isPointInDrawingObjects: function(x, y)
     {
         return this.curState.isPointInDrawingObjects(x, y);
-    }
+    },
+	
+	getGraphicObjectProps: function() {
+		
+		var shape_props, image_props;
+        
+        switch(this.curState.id)
+        {
+            /*case STATES_ID_GROUP:
+            case STATES_ID_TEXT_ADD_IN_GROUP:
+            {
+                var s_array = this.curState.group.selectionInfo.selectionArray;
+                for(var i = 0; i< s_array.length; ++i)
+                {
+                    var c_obj = s_array[i];
+                    if(c_obj.isImage() && c_obj.chart == null)
+                    {
+                        if(!isRealObject(image_props))
+                        {
+                            image_props = {fromGroup: true};
+                            image_props.ImageUrl = c_obj.getImageUrl();
+                        }
+                        else
+                        {
+                            if(image_props.ImageUrl != null && c_obj.getImageUrl() !== image_props.ImageUrl)
+                                image_props.ImageUrl = null;
+                        }
+                    }
+                    if(c_obj.isImage() && isRealObject(c_obj.chart))
+                    {
+                        if(!isRealObject(chart_props))
+                        {
+                            chart_props = {fromGroup: true};
+                            chart_props.ChartProperties = c_obj.chart;
+                        }
+                        else
+                        {
+                            chart_props.chart = null;
+                            chart_props.severalCharts = true;
+                            if(chart_props.severalChartTypes !== true)
+                            {
+                                if(!(chart_props.ChartProperties.type === c_obj.chart.type && chart_props.ChartProperties.subType === c_obj.chart.subType) )
+                                    chart_props.severalChartTypes = true;
+                            }
+                            if(chart_props.severalChartStyles !== true)
+                            {
+                                if(chart_props.ChartProperties.styleId !== c_obj.chart.styleId )
+                                    chart_props.severalChartStyles = true;
+                            }
+                        }
+                    }
+                    if(c_obj.isShape())
+                    {
+                        if(!isRealObject(shape_props))
+                        {
+                            shape_props = {fromGroup: true};
+                            shape_props.ShapeProperties =
+                            {
+                                type: c_obj.getPresetGeom(),
+                                fill: c_obj.getFill(),
+                                stroke: c_obj.getStroke(),
+                                canChangeArrows: c_obj.canChangeArrows()
+                            };
+                            shape_props.verticalTextAlign = c_obj.bodyPr.anchor;
+                        }
+                        else
+                        {
+                            var ShapeProperties =
+                            {
+                                type: c_obj.getPresetGeom(),
+                                fill: c_obj.getFill(),
+                                stroke: c_obj.getStroke(),
+                                canChangeArrows: c_obj.canChangeArrows()
+                            };
+                            shape_props.ShapeProperties = CompareShapeProperties(ShapeProperties, shape_props.ShapeProperties);
+                            shape_props.verticalTextAlign = undefined;
+                        }
+                    }
+                }
+                break;
+            }*/
+            default :
+            {
+                var s_arr = this.selectedObjects;
+                for(i = 0; i < s_arr.length; ++i)
+                {
+                    c_obj = s_arr[i];
+                    if (isRealObject(c_obj))
+                    {
+                        if (c_obj.isShape())
+                        {
+                            if (!isRealObject(shape_props))
+                            {
+                                shape_props = {};
+                                //shape_props =  s_arr[i].Get_Props(null);
+                                shape_props.ShapeProperties =
+                                {
+                                    type: c_obj.getPresetGeom(),
+                                    fill: c_obj.getFill(),
+                                    stroke: c_obj.getStroke(),
+                                    canChangeArrows: c_obj.canChangeArrows()
+                                };
+                                //shape_props.verticalTextAlign = c_obj.bodyPr.anchor;
+                            }
+                            else
+                            {
+                                ShapeProperties =
+                                {
+                                    type: c_obj.getPresetGeom(),
+                                    fill: c_obj.getFill(),
+                                    stroke: c_obj.getStroke(),
+                                    canChangeArrows: c_obj.canChangeArrows()
+                                };
+                                shape_props =  s_arr[i].Get_Props(shape_props);
+                                shape_props.ShapeProperties = CompareShapeProperties(ShapeProperties, shape_props.ShapeProperties);
+                                shape_props.verticalTextAlign = undefined;
+                            }
+                        }
+                        if (c_obj.isImage())
+                        {
+                            if (!isRealObject(image_props))
+                            {
+                                image_props = {};
+                                //image_props = s_arr[i].Get_Props(null);
+                                image_props.ImageUrl = c_obj.getImageUrl();
+                            }
+                            /*else
+                            {
+                                image_props = s_arr[i].Get_Props(image_props);
+                                if (image_props.ImageUrl != null && c_obj.getImageUrl() !== image_props.ImageUrl)
+                                    image_props.ImageUrl = null;
+                            }*/
+                        }
+                        
+                        if (c_obj.isGroup())
+                        {
+                            var shape_props2 = c_obj.getShapeProps();
+                            var image_props2 = c_obj.getImageProps2();
+                            var chart_props2 = c_obj.getChartProps();
+                            if(isRealObject(shape_props2))
+                            {
+                                if (!isRealObject(shape_props))
+                                {
+                                    shape_props = {};
+                                    shape_props =  s_arr[i].Get_Props(null);
+                                    shape_props.ShapeProperties = shape_props2.ShapeProperties;
+                                }
+                                else
+                                {
+                                    shape_props =  s_arr[i].Get_Props(shape_props);
+                                    shape_props.ShapeProperties = CompareShapeProperties(shape_props2.ShapeProperties, shape_props.ShapeProperties);
+                                }
+                            }
+
+                            if (isRealObject(image_props2))
+                            {
+                                if(!isRealObject(image_props))
+                                {
+                                    image_props = {};
+                                    image_props = s_arr[i].Get_Props(null);
+                                    image_props.ImageUrl = image_props2.ImageUrl;
+                                }
+                                else
+                                {
+                                    image_props = s_arr[i].Get_Props(image_props);
+                                    if(image_props.ImageUrl != null && image_props2.ImageUrl !== image_props.ImageUrl)
+                                        image_props.ImageUrl = null;
+                                }
+                            }
+                            if (isRealObject(chart_props2))
+                            {
+                                if (!isRealObject(chart_props))
+                                {
+                                    chart_props = {};
+                                    chart_props = s_arr[i].Get_Props(null);
+                                    chart_props.ChartProperties = chart_props2.ChartProperties;
+                                    chart_props.severalCharts = chart_props2.severalCharts;
+                                    chart_props.severalChartTypes = chart_props2.severalChartTypes;
+                                    chart_props.severalChartStyles = chart_props2.severalChartStyles;
+                                }
+                                else
+                                {
+                                    chart_props = s_arr[i].Get_Props(chart_props);
+                                    chart_props.severalCharts = true;
+                                    if(chart_props.severalChartTypes !== true)
+                                    {
+                                        if(chart_props2.severalChartTypes === true)
+                                            chart_props.severalChartTypes = true;
+                                        else
+                                        {
+                                            if(!(chart_props.ChartProperties.type === chart_props2.ChartProperties.type && chart_props.ChartProperties.subType === chart_props2.ChartProperties.subType) )
+                                                chart_props.severalChartTypes = true;
+                                            if(chart_props.ChartProperties.subType !== chart_props2.ChartProperties.subType  )
+                                                chart_props.severalChartStyles = true;
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
+                break;
+            }
+        }
+		
+        var ret = [];
+        if (isRealObject(shape_props))
+        {
+            if (shape_props.ShapeProperties)
+            {
+                var pr = shape_props.ShapeProperties;
+                if (pr.fill != null && pr.fill.fill != null && pr.fill.fill.type == FILL_TYPE_BLIP)
+                {
+                    this.drawingDocument.DrawImageTextureFillShape(pr.fill.fill.RasterImageId);
+                }
+
+                shape_props.ShapeProperties = CreateAscShapePropFromProp(shape_props.ShapeProperties);
+            }
+            
+            ret.push(shape_props);
+        }
+
+        if (isRealObject(image_props))
+        {
+            if (image_props.ShapeProperties)
+                image_props.ShapeProperties = CreateAscShapePropFromProp(image_props.ShapeProperties);
+            
+            ret.push(image_props);
+        }
+        
+        return ret;
+	}
 };

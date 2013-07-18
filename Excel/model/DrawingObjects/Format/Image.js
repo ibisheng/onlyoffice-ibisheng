@@ -348,6 +348,12 @@ CImage.prototype =
             return this.group.getFullFlipH() ? !this.flipH : this.flipH;
     },
 
+	getImageUrl: function()
+    {
+        if(isRealObject(this.blipFill))
+            return this.blipFill.RasterImageId;
+        return null;
+    },
 
     getFullFlipV: function()
     {
