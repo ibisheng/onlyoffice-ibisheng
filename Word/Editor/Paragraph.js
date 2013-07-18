@@ -5566,10 +5566,7 @@ Paragraph.prototype =
         var NumPr = this.Numbering_Get();
         if ( undefined != NumPr )
         {
-            if ( true === bIncrease )
-                this.Numbering_Add( NumPr.NumId, Math.min( 8, NumPr.Lvl + 1 ) );
-            else
-                this.Numbering_Add( NumPr.NumId, Math.max( 0, NumPr.Lvl - 1 ) );
+            this.Numbering_IndDec_Level( bIncrease );
         }
         else
         {
@@ -6184,7 +6181,7 @@ Paragraph.prototype =
             var Item = this.Content[CurPos];
             var ItemType = Item.Type;
 
-            if ( para_Text === ItemType || para_Space === ItemType || para_End === ItemType || (para_Drawing === ItemType && true === Item.Is_Inline() ) || para_PageNum === ItemType || para_NewLine === ItemType || para_HyperlinkStart === ItemType )
+            if ( para_Text === ItemType || para_Space === ItemType || para_End === ItemType || para_Tab === ItemType || (para_Drawing === ItemType && true === Item.Is_Inline() ) || para_PageNum === ItemType || para_NewLine === ItemType || para_HyperlinkStart === ItemType )
                 break;
 
             CurPos++;
@@ -6199,7 +6196,7 @@ Paragraph.prototype =
             var Item = this.Content[CurPos];
             var ItemType = Item.Type;
 
-            if ( para_Text === ItemType || para_Space === ItemType || para_End === ItemType || (para_Drawing === ItemType && true === Item.Is_Inline() ) || para_PageNum === ItemType || para_NewLine === ItemType || para_HyperlinkEnd === ItemType )
+            if ( para_Text === ItemType || para_Space === ItemType || para_End === ItemType || para_Tab === ItemType || (para_Drawing === ItemType && true === Item.Is_Inline() ) || para_PageNum === ItemType || para_NewLine === ItemType || para_HyperlinkEnd === ItemType )
             {
                 this.CurPos.ContentPos = CurPos + 1;
                 return;
@@ -8248,6 +8245,28 @@ Paragraph.prototype =
 
         // Надо пересчитать конечный стиль
         this.CompiledPr.NeedRecalc = true;
+    },
+
+    // Изменяем уровень нумерации
+    Numbering_IndDec_Level : function(bIncrease)
+    {
+        var NumPr = this.Numbering_Get();
+        if ( undefined != NumPr )
+        {
+            var NewLvl;
+            if ( true === bIncrease )
+                NewLvl = Math.min( 8, NumPr.Lvl + 1 );
+            else
+                NewLvl = Math.max( 0, NumPr.Lvl - 1 );
+
+            this.Pr.NumPr = new CNumPr();
+            this.Pr.NumPr.Set( NumPr.NumId, NewLvl );
+
+            History.Add( this, { Type : historyitem_Paragraph_Numbering, Old : NumPr, New : this.Pr.NumPr } );
+
+            // Надо пересчитать конечный стиль
+            this.CompiledPr.NeedRecalc = true;
+        }
     },
 
     // Добавление нумерации в параграф при открытии и копировании
