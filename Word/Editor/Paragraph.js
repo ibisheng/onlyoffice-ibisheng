@@ -316,7 +316,7 @@ Paragraph.prototype =
         this.Content.splice( Pos, 0, Item );
 
         if ( this.CurPos.ContentPos >= Pos )
-            this.CurPos.ContentPos++;
+            this.Set_ContentPos( this.CurPos.ContentPos + 1 );
 
         if ( this.Selection.StartPos >= Pos )
             this.Selection.StartPos++;
@@ -393,7 +393,7 @@ Paragraph.prototype =
         }
 
         if ( this.CurPos.ContentPos > Pos )
-            this.CurPos.ContentPos--;
+            this.Set_ContentPos( this.CurPos.ContentPos - 1 );
 
         if ( this.Selection.StartPos <= this.Selection.EndPos )
         {
@@ -496,9 +496,9 @@ Paragraph.prototype =
         if ( this.CurPos.ContentPos > Pos )
         {
             if ( this.CurPos.ContentPos > Pos + Count )
-                this.CurPos.ContentPos -= Count;
+                this.Set_ContentPos( this.CurPos.ContentPos - Count );
             else
-                this.CurPos.ContentPos = Pos;
+                this.Set_ContentPos( Pos );
 
             this.CurPos.Line = -1;
         }
@@ -4865,7 +4865,7 @@ Paragraph.prototype =
                     StartPos = Temp;
                 }
 
-                this.CurPos.ContentPos = StartPos;
+                this.Set_ContentPos( StartPos );
                 this.CurPos.Line = -1;
 
                 if ( null != Hyper_start )
@@ -4913,19 +4913,19 @@ Paragraph.prototype =
                 if ( null != LastTextPr )
                     this.Internal_Content_Add( StartPos, new ParaTextPr( LastTextPr.Value ) );
 
-                this.CurPos.ContentPos = StartPos;
+                this.Set_ContentPos( StartPos );
                 this.CurPos.Line = -1;
 
                 if ( null != Hyper_end && Hyper_start != Hyper_end )
                 {
                     this.Internal_Content_Add( StartPos, Hyper_end );
-                    this.CurPos.ContentPos++;
+                    this.Set_ContentPos( this.CurPos.ContentPos + 1 );
                 }
 
                 if ( null != Hyper_start && Hyper_start != Hyper_end )
                 {
                     this.Internal_Content_Add( StartPos, new ParaHyperlinkEnd() );
-                    this.CurPos.ContentPos++;
+                    this.Set_ContentPos( this.CurPos.ContentPos + 1 );
                 }
             }
 
@@ -4985,7 +4985,7 @@ Paragraph.prototype =
                 {
                     // Удаляем элемент в найденной позиции и уменьшаем текущую позицию
                     this.Internal_Content_Remove( oPos.LetterPos );
-                    this.CurPos.ContentPos = oPos.LetterPos;
+                    this.Set_ContentPos( oPos.LetterPos );
                     this.CurPos.Line = -1;
                 }
             }
@@ -5072,7 +5072,7 @@ Paragraph.prototype =
                 {
                     // Удаляем элемент в найденной позиции и меняем текущую позицию
                     this.Internal_Content_Remove( oPos.LetterPos );
-                    this.CurPos.ContentPos = oPos.LetterPos;
+                    this.Set_ContentPos( oPos.LetterPos );
                     this.CurPos.Line = -1;
                 }
             }
@@ -5482,7 +5482,7 @@ Paragraph.prototype =
                 TextPr_start.FontSize = this.Internal_IncDecFontSize( bIncrease, StartTextPr.FontSize );
 
             this.Internal_Content_Add( Pos, new ParaTextPr( TextPr_start ) );
-            this.CurPos.ContentPos = Pos + 1;
+            this.Set_ContentPos( Pos + 1 );
             this.CurPos.Line = -1;
 
             // Выставляем настройки для символа параграфа
@@ -5507,7 +5507,7 @@ Paragraph.prototype =
             this.Internal_Content_Add( CurPos, new ParaEmpty(true) );
             this.Internal_Content_Add( CurPos, new ParaTextPr( TextPr_new ) );
 
-            this.CurPos.ContentPos = CurPos + 1;
+            this.Set_ContentPos( CurPos + 1 );
             this.CurPos.Line = -1;
             this.RecalculateCurPos();
             return false;
@@ -5541,7 +5541,7 @@ Paragraph.prototype =
             this.Internal_Content_Add( oWordStart.LetterPos, new ParaTextPr( TextPr_start ) );
             this.Internal_Content_Add( oWordEnd.LetterPos + 1 /* из-за предыдущего Internal_Content_Add */, new ParaTextPr( TextPr_end ) );
 
-            this.CurPos.ContentPos = CurPos + 1;
+            this.Set_ContentPos( CurPos + 1 );
             this.CurPos.Line = -1;
 
             // Если внутри слова были изменения размера шрифта, тогда заменяем их.
@@ -5680,7 +5680,7 @@ Paragraph.prototype =
         {
             if ( true === AddToSelect )
             {
-                this.CurPos.ContentPos = this.Selection.EndPos;
+                this.Set_ContentPos( this.Selection.EndPos );
                 this.CurPos.Line = -1;
 
                 // Пока сделаем для Count = 1
@@ -5707,7 +5707,7 @@ Paragraph.prototype =
                     this.Selection_Remove();
                     this.Selection.Use = false;
 
-                    this.CurPos.ContentPos = Math.max( CursorPos_min, Math.min( this.Selection.EndPos, CursorPos_max ) );
+                    this.Set_ContentPos( Math.max( CursorPos_min, Math.min( this.Selection.EndPos, CursorPos_max ) ) );
                     this.CurPos.Line = -1;
                     this.RecalculateCurPos();
 
@@ -5726,7 +5726,7 @@ Paragraph.prototype =
                     StartPos = Temp;
                 }
 
-                this.CurPos.ContentPos = StartPos;
+                this.Set_ContentPos( StartPos );
                 this.CurPos.Line = -1;
                 this.Selection_Remove();
 
@@ -5780,7 +5780,7 @@ Paragraph.prototype =
                 this.Selection_Remove();
                 this.Selection.Use = false;
 
-                this.CurPos.ContentPos = Math.max( CursorPos_min, Math.min( this.Selection.EndPos, CursorPos_max ) );
+                this.Set_ContentPos( Math.max( CursorPos_min, Math.min( this.Selection.EndPos, CursorPos_max ) ) );
                 this.CurPos.Line = -1;
                 this.RecalculateCurPos();
 
@@ -5826,7 +5826,7 @@ Paragraph.prototype =
         {
             if ( true === AddToSelect )
             {
-                this.CurPos.ContentPos = this.Selection.EndPos;
+                this.Set_ContentPos( this.Selection.EndPos );
                 this.CurPos.Line = -1;
 
                 // Пока сделаем для Count = 1
@@ -5853,7 +5853,7 @@ Paragraph.prototype =
                     this.Selection_Remove();
                     this.Selection.Use = false;
 
-                    this.CurPos.ContentPos = Math.max( CursorPos_min, Math.min( this.Selection.EndPos, CursorPos_max ) );
+                    this.Set_ContentPos( Math.max( CursorPos_min, Math.min( this.Selection.EndPos, CursorPos_max ) ) );
                     this.CurPos.Line = -1;
                     this.RecalculateCurPos();
 
@@ -5872,7 +5872,7 @@ Paragraph.prototype =
                     StartPos = Temp;
                 }
 
-                this.CurPos.ContentPos = Math.max( CursorPos_min, Math.min( EndPos, CursorPos_max ) );
+                this.Set_ContentPos( Math.max( CursorPos_min, Math.min( EndPos, CursorPos_max ) ) );
                 this.CurPos.Line = -1;
                 this.Selection_Remove();
 
@@ -5926,7 +5926,7 @@ Paragraph.prototype =
                 this.Selection_Remove();
                 this.Selection.Use = false;
 
-                this.CurPos.ContentPos = Math.max( CursorPos_min, Math.min( this.Selection.EndPos, CursorPos_max ) );
+                this.Set_ContentPos( Math.max( CursorPos_min, Math.min( this.Selection.EndPos, CursorPos_max ) ) );
                 this.CurPos.Line = -1;
                 this.RecalculateCurPos();
 
@@ -5962,10 +5962,10 @@ Paragraph.prototype =
         if ( true === this.Selection.Use )
         {
             if ( true === AddToSelect )
-                this.CurPos.ContentPos = this.Selection.EndPos;
+                this.Set_ContentPos( this.Selection.EndPos );
             else
             {
-                this.CurPos.ContentPos = Math.max( CursorPos_min, Math.min( CursorPos_max, ( this.Selection.EndPos >= this.Selection.StartPos ? this.Selection.EndPos : this.Selection.StartPos ) ) );
+                this.Set_ContentPos( Math.max( CursorPos_min, Math.min( CursorPos_max, ( this.Selection.EndPos >= this.Selection.StartPos ? this.Selection.EndPos : this.Selection.StartPos ) ) ) );
                 this.Selection_Remove();
             }
 
@@ -5984,7 +5984,7 @@ Paragraph.prototype =
                 this.Selection_Remove();
                 this.Selection.Use = false;
 
-                this.CurPos.ContentPos = Math.max( CursorPos_min, Math.min( this.Selection.EndPos, CursorPos_max ) );
+                this.Set_ContentPos( Math.max( CursorPos_min, Math.min( this.Selection.EndPos, CursorPos_max ) ) );
                 this.CurPos.Line = -1;
                 this.RecalculateCurPos();
 
@@ -6003,7 +6003,7 @@ Paragraph.prototype =
                 this.Selection_Remove();
                 this.Selection.Use = false;
 
-                this.CurPos.ContentPos = Math.max( CursorPos_min, Math.min( this.Selection.EndPos, CursorPos_max ) );
+                this.Set_ContentPos( Math.max( CursorPos_min, Math.min( this.Selection.EndPos, CursorPos_max ) ) );
                 this.CurPos.Line = -1;
                 this.RecalculateCurPos();
 
@@ -6012,7 +6012,7 @@ Paragraph.prototype =
         }
         else
         {
-            this.CurPos.ContentPos = LineEndPos;
+            this.Set_ContentPos( LineEndPos );
             this.CurPos.Line = -1;
 
             this.RecalculateCurPos();
@@ -6032,10 +6032,10 @@ Paragraph.prototype =
         if ( true === this.Selection.Use )
         {
             if ( true === AddToSelect )
-                this.CurPos.ContentPos = this.Selection.EndPos;
+                this.Set_ContentPos( this.Selection.EndPos );
             else
             {
-                this.CurPos.ContentPos = ( this.Selection.StartPos <= this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos );
+                this.Set_ContentPos( ( this.Selection.StartPos <= this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos ) );
                 this.Selection_Remove();
             }
             this.CurPos.Line = -1;
@@ -6053,7 +6053,7 @@ Paragraph.prototype =
                 this.Selection_Remove();
                 this.Selection.Use = false;
 
-                this.CurPos.ContentPos = Math.max( CursorPos_min, Math.min( this.Selection.EndPos, CursorPos_max ) );
+                this.Set_ContentPos( Math.max( CursorPos_min, Math.min( this.Selection.EndPos, CursorPos_max ) ) );
                 this.CurPos.Line = -1;
                 this.RecalculateCurPos();
 
@@ -6072,7 +6072,7 @@ Paragraph.prototype =
                 this.Selection_Remove();
                 this.Selection.Use = false;
 
-                this.CurPos.ContentPos = Math.max( CursorPos_min, Math.min( this.Selection.EndPos, CursorPos_max ) );
+                this.Set_ContentPos( Math.max( CursorPos_min, Math.min( this.Selection.EndPos, CursorPos_max ) ) );
                 this.CurPos.Line = -1;
                 this.RecalculateCurPos();
 
@@ -6081,7 +6081,7 @@ Paragraph.prototype =
         }
         else
         {
-            this.CurPos.ContentPos = LineStartPos;
+            this.Set_ContentPos( LineStartPos );
             this.CurPos.Line = -1;
 
             this.RecalculateCurPos();
@@ -6094,14 +6094,14 @@ Paragraph.prototype =
     Cursor_MoveToStartPos : function()
     {
         this.Selection.Use = false;
-        this.CurPos.ContentPos = this.Internal_GetStartPos();
+        this.Set_ContentPos( this.Internal_GetStartPos() );
         this.CurPos.Line = -1;
     },
 
     Cursor_MoveToEndPos : function()
     {
         this.Selection.Use = false;
-        this.CurPos.ContentPos = this.Internal_GetEndPos();
+        this.Set_ContentPos( this.Internal_GetEndPos() );
         this.CurPos.Line = -1;
     },
 
@@ -6158,11 +6158,63 @@ Paragraph.prototype =
         if ( -1 === Pos )
             return;
 
-        this.CurPos.ContentPos = Pos;
+        this.Set_ContentPos( Pos );
         this.CurPos.Line = -1;
         this.RecalculateCurPos();
         this.CurPos.RealX = this.CurPos.X;
         this.CurPos.RealY = this.CurPos.Y;
+    },
+
+    Set_ContentPos : function(Pos, bCorrectPos)
+    {
+        this.CurPos.ContentPos = Pos;
+
+        if ( false != bCorrectPos )
+            this.Internal_Correct_ContentPos();
+    },
+
+    Internal_Correct_ContentPos : function()
+    {
+        // 1. Ищем ближайший справа элемент
+        //    Это делается для того, чтобы если мы находимся в конце гиперссылки выйти из нее.
+        var Count = this.Content.length;
+        var CurPos = this.CurPos.ContentPos;
+        while ( CurPos < Count - 1 )
+        {
+            var Item = this.Content[CurPos];
+            var ItemType = Item.Type;
+
+            if ( para_Text === ItemType || para_Space === ItemType || para_End === ItemType || (para_Drawing === ItemType && true === Item.Is_Inline() ) || para_PageNum === ItemType || para_NewLine === ItemType || para_HyperlinkStart === ItemType )
+                break;
+
+            CurPos++;
+        }
+
+        // 2. Ищем ближайший слева (текcт, пробел, картинку, нумерацию и т.д.)
+        //    Смещаемся к концу ближайшего левого элемента, чтобы продолжался набор с
+        //    настройками левого ближайшего элемента.
+        while ( CurPos > 0 )
+        {
+            CurPos--;
+            var Item = this.Content[CurPos];
+            var ItemType = Item.Type;
+
+            if ( para_Text === ItemType || para_Space === ItemType || para_End === ItemType || (para_Drawing === ItemType && true === Item.Is_Inline() ) || para_PageNum === ItemType || para_NewLine === ItemType || para_HyperlinkEnd === ItemType )
+            {
+                this.CurPos.ContentPos = CurPos + 1;
+                return;
+            }
+        }
+
+        // 3. Если мы попали в начало параграфа, тогда пропускаем все TextPr
+        if ( CurPos <= 0 )
+        {
+            CurPos = 0;
+            while ( para_TextPr === this.Content[CurPos].Type )
+                CurPos++;
+
+            this.CurPos.ContentPos = CurPos;
+        }
     },
 
     Get_CurPosXY : function()
@@ -6204,7 +6256,7 @@ Paragraph.prototype =
         {
             if ( true === AddToSelect )
             {
-                this.CurPos.ContentPos = this.Selection.EndPos;
+                this.Set_ContentPos( this.Selection.EndPos );
                 this.CurPos.Line = -1;
             }
             else
@@ -6221,7 +6273,7 @@ Paragraph.prototype =
                 }
 
                 this.Selection_Remove();
-                this.CurPos.ContentPos = StartPos;
+                this.Set_ContentPos( StartPos );
                 this.CurPos.Line = -1;
                 return;
             }
@@ -6245,7 +6297,7 @@ Paragraph.prototype =
                     this.Selection_Remove();
                     this.Selection.Use = false;
 
-                    this.CurPos.ContentPos = Math.max( CursorPos_min, Math.min( this.Selection.EndPos, CursorPos_max ) );
+                    this.Set_ContentPos( Math.max( CursorPos_min, Math.min( this.Selection.EndPos, CursorPos_max ) ) );
                     this.CurPos.Line = -1;
                     this.RecalculateCurPos();
 
@@ -6297,7 +6349,7 @@ Paragraph.prototype =
 
             if ( oPos.Found )
             {
-                this.CurPos.ContentPos = oPos.LetterPos;
+                this.Set_ContentPos( oPos.LetterPos );
                 this.CurPos.Line = -1;
                 return true;
             }
@@ -6465,7 +6517,7 @@ Paragraph.prototype =
         {
             if ( true === AddToSelect )
             {
-                this.CurPos.ContentPos = this.Selection.EndPos;
+                this.Set_ContentPos( this.Selection.EndPos, false );
                 this.CurPos.Line = -1;
             }
             else
@@ -6482,7 +6534,7 @@ Paragraph.prototype =
                 }
 
                 this.Selection_Remove();
-                this.CurPos.ContentPos = Math.max( CursorPos_min, Math.min( EndPos, CursorPos_max ) );
+                this.Set_ContentPos( Math.max( CursorPos_min, Math.min( EndPos, CursorPos_max ) ) );
                 this.CurPos.Line = -1;
                 return true;
             }
@@ -6506,7 +6558,7 @@ Paragraph.prototype =
                     this.Selection_Remove();
                     this.Selection.Use = false;
 
-                    this.CurPos.ContentPos = Math.max( CursorPos_min, Math.min( this.Selection.EndPos, CursorPos_max ) );
+                    this.Set_ContentPos( Math.max( CursorPos_min, Math.min( this.Selection.EndPos, CursorPos_max ) ) );
                     this.CurPos.Line = -1;
                     this.RecalculateCurPos();
 
@@ -6551,13 +6603,17 @@ Paragraph.prototype =
             var oPos;
 
             if ( true != Word )
-                oPos = this.Internal_FindForward( this.CurPos.ContentPos + 1, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine, para_End] );
+            {
+                oPos = this.Internal_FindForward( this.CurPos.ContentPos, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine] );
+                if ( oPos.Found )
+                    oPos.LetterPos++;
+            }
             else
                 oPos = this.Internal_FindWordEnd( this.CurPos.ContentPos, CursorPos_max );
 
             if ( oPos.Found )
             {
-                this.CurPos.ContentPos = oPos.LetterPos;
+                this.Set_ContentPos( oPos.LetterPos );
                 this.CurPos.Line = -1;
                 return true;
             }
@@ -6690,7 +6746,7 @@ Paragraph.prototype =
             TextPr_start.Merge( TextPr );
 
             this.Internal_Content_Add( Pos, new ParaTextPr( TextPr_start ) );
-            this.CurPos.ContentPos = Pos + 1;
+            this.Set_ContentPos( Pos + 1, false );
             this.CurPos.Line = -1;
 
             // Выставляем настройки для символа параграфа
@@ -6705,7 +6761,7 @@ Paragraph.prototype =
             this.Internal_Content_Add( CurPos, new ParaTextPr( TextPr_old ) );
             this.Internal_Content_Add( CurPos, new ParaTextPr( TextPr_new ) );
 
-            this.CurPos.ContentPos = CurPos + 1;
+            this.Set_ContentPos( CurPos + 1, false );
             this.CurPos.Line = -1;
             this.RecalculateCurPos();
         }
@@ -6734,7 +6790,7 @@ Paragraph.prototype =
             this.Internal_Content_Add( oWordStart.LetterPos, new ParaTextPr( TextPr_start ) );
             this.Internal_Content_Add( oWordEnd.LetterPos + 1 /* из-за предыдущего Internal_Content_Add */, new ParaTextPr( TextPr_end ) );
 
-            this.CurPos.ContentPos = CurPos + 1;
+            this.Set_ContentPos( CurPos + 1, false );
             this.CurPos.Line = -1;
 
             // Если внутри слова были изменения текстовых настроек, тогда удаляем только те записи, которые
@@ -6826,7 +6882,7 @@ Paragraph.prototype =
             TextPr_start.Merge( TextPr );
 
             this.Internal_Content_Add( Pos, new ParaTextPr( TextPr_start ) );
-            this.CurPos.ContentPos = Pos + 1;
+            this.Set_ContentPos( Pos + 1, false );
             this.CurPos.Line = -1;
         }
         else if ( para_PageNum === CurType || para_Drawing === CurType || para_Tab == CurType || para_Space == CurType || para_NewLine == CurType || !oStart.Found || para_NewLine == oEnd.Type || para_Space == oEnd.Type || para_NewLine == oStart.Type || para_Space == oStart.Type || para_Tab == oEnd.Type || para_Tab == oStart.Type || para_Drawing == oEnd.Type || para_Drawing == oStart.Type || para_PageNum == oEnd.Type || para_PageNum == oStart.Type )
@@ -6838,7 +6894,7 @@ Paragraph.prototype =
             this.Internal_Content_Add( CurPos, new ParaTextPr( TextPr_old ) );
             this.Internal_Content_Add( CurPos, new ParaTextPr( TextPr_new ) );
 
-            this.CurPos.ContentPos = CurPos + 1;
+            this.Set_ContentPos( CurPos + 1, false );
             this.CurPos.Line = -1;
             this.RecalculateCurPos();
         }
@@ -6867,7 +6923,7 @@ Paragraph.prototype =
             this.Internal_Content_Add( oWordStart.LetterPos, new ParaTextPr( TextPr_start ) );
             this.Internal_Content_Add( oWordEnd.LetterPos + 1 /* из-за предыдущего Internal_Content_Add */, new ParaTextPr( TextPr_end ) );
 
-            this.CurPos.ContentPos = CurPos + 1;
+            this.Set_ContentPos( CurPos + 1, false );
             this.CurPos.Line = -1;
 
             // Если внутри слова были изменения текстовых настроек, тогда удаляем только те записи, которые
@@ -7214,7 +7270,7 @@ Paragraph.prototype =
                     this.Internal_Content_Add( Pos + 2 + NewPos, new ParaText(Char) );
             }
 
-            this.CurPos.ContentPos = Pos + 2; // чтобы курсор встал после TextPr
+            this.Set_ContentPos( Pos + 2, false ); // чтобы курсор встал после TextPr
             this.CurPos.Line = -1;
         }
     },
@@ -7283,10 +7339,10 @@ Paragraph.prototype =
                 {
                     this.Selection.StartPos = Start + 1;
                     this.Selection.EndPos   = Start + 2 + HyperProps.Text.length;
-                    this.CurPos.ContentPos  = this.Selection.EndPos;
+                    this.Set_ContentPos( this.Selection.EndPos );
                 }
                 else
-                    this.CurPos.ContentPos  = Start + 2; // чтобы курсор встал после TextPr
+                    this.Set_ContentPos( Start + 2, false ); // чтобы курсор встал после TextPr
 
                 return true;
             }
@@ -7471,7 +7527,7 @@ Paragraph.prototype =
 
         if ( -1 != Pos )
         {
-            this.CurPos.ContentPos = Pos;
+            this.Set_ContentPos( Pos );
             this.CurPos.Line = -1;
         }
 
@@ -7500,7 +7556,7 @@ Paragraph.prototype =
             else
                 this.Selection.StartPos = Pos.Pos;
 
-            this.CurPos.ContentPos = Pos.Pos;
+            this.Set_ContentPos( Pos.Pos );
             this.CurPos.Line       = Pos.Line;
 
             this.Selection.Use      = true;
@@ -7520,7 +7576,7 @@ Paragraph.prototype =
         var Pos  = Temp.Pos;
         if ( -1 != Pos )
         {
-            this.CurPos.ContentPos = Pos;
+            this.Set_ContentPos( Pos );
             this.CurPos.Line       = Temp.Line;
 
             if ( true === Temp.End )
@@ -7535,7 +7591,7 @@ Paragraph.prototype =
                 {
                     // Ставим именно 0, а не this.Internal_GetStartPos(), чтобы при нажатии на клавишу "направо"
                     // мы оказывались в начале параграфа.
-                    this.CurPos.ContentPos = 0;
+                    this.Set_ContentPos( 0 );
                     this.CurPos.Line = -1;
                     this.Parent.Document_SelectNumbering( NumPr );
                 }
@@ -7548,7 +7604,7 @@ Paragraph.prototype =
                         this.Selection_Remove();
                         this.Selection.Use = false;
 
-                        this.CurPos.ContentPos = Pos;
+                        this.Set_ContentPos( Pos );
                         this.CurPos.Line       = Temp.Line;
                         this.RecalculateCurPos();
 
@@ -9992,6 +10048,7 @@ Paragraph.prototype =
         NewParagraph.Internal_Content_Remove2(0, NewParagraph.Content.length);
         NewParagraph.Internal_Content_Concat( this.Content.slice( Pos ) );
         NewParagraph.Internal_Content_Add( 0, new ParaTextPr( TextPr ) );
+        NewParagraph.Set_ContentPos( 0 );
         NewParagraph.DeleteCommentOnRemove = true;
 
         NewParagraph.TextPr.Value = this.TextPr.Value.Copy();
@@ -10798,7 +10855,7 @@ Paragraph.prototype =
         var CursorPos_max = this.Internal_GetEndPos();
         var CursorPos_min = this.Internal_GetStartPos();
 
-        this.CurPos.ContentPos  = Math.max( CursorPos_min, Math.min( CursorPos_max, this.CurPos.ContentPos  ) );
+        this.Set_ContentPos( Math.max( CursorPos_min, Math.min( CursorPos_max, this.CurPos.ContentPos  ) ) );
         this.Selection.StartPos = Math.max( CursorPos_min, Math.min( CursorPos_max, this.Selection.StartPos ) );
         this.Selection.EndPos   = Math.max( CursorPos_min, Math.min( CursorPos_max, this.Selection.EndPos   ) );
     },
@@ -12199,7 +12256,7 @@ Paragraph.prototype =
         this.Selection.Start    = false;
         this.Selection.StartPos = EndPos;
         this.Selection.EndPos   = EndPos;
-        this.CurPos.ContentPos  = EndPos;
+        this.Set_ContentPos( EndPos );
 
         this.Document_SetThisElementCurrent();
     },

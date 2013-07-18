@@ -1170,9 +1170,6 @@ CDocument.prototype =
                 else
                     Item.Split( NewParagraph );
 
-                // Выставляем курсор в начало параграфа
-                NewParagraph.CurPos.ContentPos = NewParagraph.Internal_GetStartPos();
-
                 this.Internal_Content_Add( this.CurPos.ContentPos + 1, NewParagraph );
 
                 this.CurPos.ContentPos++;
@@ -1916,7 +1913,7 @@ CDocument.prototype =
                                     // Просто удаляем предыдущий параграф
                                     this.Internal_Content_Remove( this.CurPos.ContentPos - 1, 1 );
                                     this.CurPos.ContentPos--;
-                                    this.Content[this.CurPos.ContentPos].Cursor_MoveToEndPos();
+                                    this.Content[this.CurPos.ContentPos].Cursor_MoveToStartPos();
                                 }
                                 else
                                 {

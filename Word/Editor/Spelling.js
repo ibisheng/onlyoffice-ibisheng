@@ -696,7 +696,7 @@ Paragraph.prototype.Continue_CheckSpelling = function()
     else if ( pararecalc_0_Spell_Pos === this.RecalcInfo.Recalc_0_Spell.Type )
     {
         var StartPos = this.RecalcInfo.Recalc_0_Spell.StartPos;
-        var EndPos   = this.RecalcInfo.Recalc_0_Spell.EndPos;
+        var EndPos   = Math.min( this.RecalcInfo.Recalc_0_Spell.EndPos, this.Content.length - 1 );
         var BoundElements = this.SpellChecker.Get_ElementsBeforeAfterPos(StartPos, EndPos);
 
         this.SpellChecker.Clear();
