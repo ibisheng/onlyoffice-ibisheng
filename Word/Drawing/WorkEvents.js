@@ -177,6 +177,7 @@ function CreateMouseUpEventObject(x, y)
     e.ctrlKey = global_mouseEvent.CtrlKey;
 
     e.srcElement = global_mouseEvent.Sender;
+    e.button = 0;
     return e;
 }
 
