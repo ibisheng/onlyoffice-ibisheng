@@ -271,6 +271,22 @@ CAbstractNum.prototype =
         }
     },
 
+    // Сдвигаем все уровни на заданное значение
+    Change_LeftInd : function(NewLeft)
+    {
+        var OldLeft = this.Lvl[0].ParaPr.Ind.Left;
+        for ( var Index = 0; Index < 9; Index++ )
+        {
+            var Lvl_new = this.Internal_CopyLvl( this.Lvl[Index] );
+            var Lvl_old = this.Lvl[Index];
+            Lvl_new.ParaPr.Ind.Left = Lvl_old.ParaPr.Ind.Left - OldLeft + NewLeft;
+
+            this.Internal_SetLvl( Index, Lvl_new );
+
+            History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : Index, Old : Lvl_old, New : Lvl_new } );
+        }
+    },
+
     Get_LvlByStyle : function(StyleId)
     {
         for ( var Index = 0; Index < 9; Index++ )

@@ -8156,17 +8156,14 @@ Paragraph.prototype =
 
                 if ( undefined != NumParaPr.Ind && undefined != NumParaPr.Ind.Left )
                 {
-                    var Left = LeftX + NumParaPr.Ind.Left;
+                    AbstractNum.Change_LeftInd( LeftX + NumParaPr.Ind.Left );
 
                     History.Add( this, { Type : historyitem_Paragraph_Ind_First, Old : ( undefined != this.Pr.Ind.FirstLine ? this.Pr.Ind.FirstLine : undefined ), New : undefined } );
-                    History.Add( this, { Type : historyitem_Paragraph_Ind_Left,  Old : ( undefined != this.Pr.Ind.Left      ? this.Pr.Ind.Left      : undefined ), New : Left      } );
-
-                    if ( undefined === this.Pr.Ind )
-                        this.Pr.Ind = new CParaInd();
+                    History.Add( this, { Type : historyitem_Paragraph_Ind_Left,  Old : ( undefined != this.Pr.Ind.Left      ? this.Pr.Ind.Left      : undefined ), New : undefined } );
 
                     // При добавлении списка в параграф, удаляем все собственные сдвиги
                     this.Pr.Ind.FirstLine = undefined;
-                    this.Pr.Ind.Left      = Left;
+                    this.Pr.Ind.Left      = undefined;
                 }
 
                 this.Pr.NumPr = new CNumPr();
