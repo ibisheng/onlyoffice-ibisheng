@@ -250,7 +250,7 @@ function Editor_Copy(api, bCut)
         if(true == bCut)
         {
             //������� ���������� ��������
-            api.WordControl.m_oLogicDocument.Remove(1, true, true);
+            api.WordControl.m_oLogicDocument.Remove(-1, true, true);
             api.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
         }
     }, 0);

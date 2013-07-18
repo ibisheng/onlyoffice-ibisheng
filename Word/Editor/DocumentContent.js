@@ -2029,7 +2029,11 @@ CDocumentContent.prototype =
                 else
                 {
                     this.CurPos.ContentPos = StartPos;
-                    if ( false === this.Content[StartPos].Remove( 1, true ) )
+                    if ( Count < 0 && type_Table === this.Content[StartPos].GetType() )
+                    {
+                        this.Table_RemoveRow();
+                    }
+                    else if ( false === this.Content[StartPos].Remove( Count, true ) )
                     {
                         // В ворде параграфы объединяются только когда у них все настройки совпадают.
                         // (почему то при изменении и обратном изменении настроек параграфы перестают объединятся)
