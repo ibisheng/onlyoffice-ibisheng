@@ -1951,6 +1951,12 @@ CGraphicObjects.prototype =
         this.updateSelectionState();
     },
 
+
+    getMajorParaDrawing: function()
+    {
+        return this.selectionInfo.selectionArray.length >  0  ? this.selectionInfo.selectionArray[0] : null;
+    },
+
     documentUpdateRulersState: function()
     {
         switch(this.curState.id)
