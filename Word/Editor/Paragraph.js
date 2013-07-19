@@ -5304,6 +5304,74 @@ Paragraph.prototype =
         this.RecalcInfo.Set_Type_0(pararecalc_0_All);
     },
 
+    // Данная функция вызывается, когда уже точно известно, что у нас либо выделение начинается с начала параграфа, либо мы стоим курсором в начале параграфа
+    Add_Tab : function(bShift)
+    {
+        var NumPr = this.Numbering_Get();
+
+        if ( undefined != NumPr )
+        {
+            this.Numbering_IndDec_Level( !bShift );
+        }
+        else if ( true === this.Is_SelectionUse() )
+        {
+            this.IncDec_Indent( !bShift );
+        }
+        else
+        {
+            var ParaPr = this.Get_CompiledPr2(false).ParaPr;
+
+            if ( true != bShift )
+            {
+                if ( ParaPr.Ind.FirstLine < 0 )
+                {
+                    this.Set_Ind( { FirstLine : 0 }, false );
+                    this.CompiledPr.NeedRecalc = true;
+                }
+                else if ( ParaPr.Ind.FirstLine < 12.5 )
+                {
+                    this.Set_Ind( { FirstLine : 12.5 }, false );
+                    this.CompiledPr.NeedRecalc = true;
+                }
+                else if ( X_Right_Field - X_Left_Margin > ParaPr.Ind.Left + 25 )
+                {
+                    this.Set_Ind( { Left : ParaPr.Ind.Left + 12.5 }, false );
+                    this.CompiledPr.NeedRecalc = true;
+                }
+            }
+            else
+            {
+                if ( ParaPr.Ind.FirstLine > 0 )
+                {
+                    if ( ParaPr.Ind.FirstLine > 12.5 )
+                        this.Set_Ind( { FirstLine : ParaPr.Ind.FirstLine - 12.5 }, false );
+                    else
+                        this.Set_Ind( { FirstLine : 0 }, false );
+
+                    this.CompiledPr.NeedRecalc = true;
+                }
+                else
+                {
+                    var Left = ParaPr.Ind.Left + ParaPr.Ind.FirstLine;
+                    if ( Left < 0 )
+                    {
+                        this.Set_Ind( { Left : -ParaPr.Ind.FirstLine }, false );
+                        this.CompiledPr.NeedRecalc = true;
+                    }
+                    else
+                    {
+                        if ( Left > 12.5 )
+                            this.Set_Ind( { Left : ParaPr.Ind.Left - 12.5 }, false );
+                        else
+                            this.Set_Ind( { Left : -ParaPr.Ind.FirstLine }, false );
+
+                        this.CompiledPr.NeedRecalc = true;
+                    }
+                }
+            }
+        }
+    },
+
     Internal_IncDecFontSize : function(bIncrease, Value)
     {
         // Закон изменения размеров :
@@ -8000,6 +8068,7 @@ Paragraph.prototype =
 
     Get_SelectedElementsInfo : function(Info)
     {
+        Info.Set_Paragraph( this );
     },
 
     // Проверяем пустой ли параграф
@@ -8842,6 +8911,22 @@ Paragraph.prototype =
             return false;
         else
             return true;
+    },
+
+    // Проверим, начинается ли выделение с начала параграфа
+    Selection_IsFromStart : function()
+    {
+        if ( true === this.Is_SelectionUse() )
+        {
+            var StartPos = ( this.Selection.StartPos > this.Selection.EndPos ? this.Selection.EndPos : this.Selection.StartPos );
+
+            if ( true != this.Cursor_IsStart( StartPos ) )
+                return false;
+
+            return true;
+        }
+
+        return false;
     },
 
     // Очищение форматирования параграфа

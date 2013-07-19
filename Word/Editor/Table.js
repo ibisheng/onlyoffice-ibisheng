@@ -8544,6 +8544,17 @@ CTable.prototype =
 
                 if ( null != TempCell )
                     CurCell = TempCell;
+                else
+                {
+                    this.Row_Add(false);
+
+                    var TempCell = this.Internal_Get_NextCell( Pos );
+                    while ( null != TempCell && vmerge_Restart != TempCell.Get_VMerge() )
+                        TempCell = this.Internal_Get_NextCell( Pos );
+
+                    if ( null != TempCell )
+                        CurCell = TempCell;
+                }
             }
             else
             {

@@ -369,6 +369,7 @@ function CSelectedElementsInfo()
     this.m_bTable          = false; // Находится курсор или выделение целиком в какой-нибудь таблице
     this.m_bMixedSelection = false; // Попадает ли в выделение одновременно несколько элементов
     this.m_nDrawing        = selected_None;
+    this.m_pParagraph      = null;  // Параграф, в котором находится выделение
 
     this.Reset = function()
     {
@@ -376,6 +377,16 @@ function CSelectedElementsInfo()
         this.m_bTable          = false;
         this.m_bMixedSelection = false;
         this.m_nDrawing        = -1;
+    };
+
+    this.Set_Paragraph = function(Para)
+    {
+        this.m_pParagraph = Para;
+    };
+
+    this.Get_Paragraph = function()
+    {
+        return this.m_pParagraph;
     };
 
     this.Set_Table = function()
@@ -6673,11 +6684,27 @@ CDocument.prototype =
             {
                 if ( true === SelectedInfo.Is_MixedSelection() )
                 {
-                    editor.IncreaseIndent();
+                    if ( true === e.ShiftKey )
+                        editor.DecreaseIndent();
+                    else
+                        editor.IncreaseIndent();
                 }
                 else
                 {
-                    if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
+                    var Paragraph = SelectedInfo.Get_Paragraph();
+                    if ( null != Paragraph && ( true === Paragraph.Cursor_IsStart() || true === Paragraph.Selection_IsFromStart() ) && ( undefined != Paragraph.Numbering_Get() || true != Paragraph.IsEmpty() ) )
+                    {
+                        if ( false === this.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_Element_and_Type, Element : Paragraph, CheckType : changestype_Paragraph_Properties } ) )
+                        {
+                            this.Create_NewHistoryPoint();
+                            Paragraph.Add_Tab(e.ShiftKey);
+                            this.Recalculate();
+
+                            this.Document_UpdateInterfaceState();
+                            this.Document_UpdateSelectionState();
+                        }
+                    }
+                    else if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
                     {
                         this.Create_NewHistoryPoint();
                         this.Paragraph_Add( new ParaTab() );
