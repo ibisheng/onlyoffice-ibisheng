@@ -445,10 +445,10 @@ WordGraphicObject.prototype =
             this.graphicObject.updateSelectionState();
     },
 
-    remove: function(Count, bOnlyText, bRemoveOnlySelection)
+    remove: function(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd)
     {
         if(isRealObject(this.graphicObject) && typeof this.graphicObject.remove === "function")
-            this.graphicObject.remove(Count, bOnlyText, bRemoveOnlySelection);
+            this.graphicObject.remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd);
     },
 
     hitToWrapPolygonPoint: function(x, y)

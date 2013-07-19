@@ -392,9 +392,6 @@ Paragraph.prototype =
             History.Add( this, { Type : historyitem_Paragraph_RemoveItem, Pos : ClearPos, EndPos : ClearPos, Items : [ Item ] } );
         }
 
-        if ( this.CurPos.ContentPos > Pos )
-            this.Set_ContentPos( this.CurPos.ContentPos - 1 );
-
         if ( this.Selection.StartPos <= this.Selection.EndPos )
         {
             if ( this.Selection.StartPos > Pos )
@@ -443,6 +440,9 @@ Paragraph.prototype =
         }
 
         this.Content.splice( Pos, 1 );
+
+        if ( this.CurPos.ContentPos > Pos )
+            this.Set_ContentPos( this.CurPos.ContentPos - 1 );
 
         // Комментарий удаляем после, чтобы не нарушить позиции
         if ( true === this.DeleteCommentOnRemove && ( para_CommentStart === Item.Type || para_CommentEnd === Item.Type ) )

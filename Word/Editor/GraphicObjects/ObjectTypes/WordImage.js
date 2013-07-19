@@ -1762,10 +1762,10 @@ WordImage.prototype =
         return false;
     },
 
-    remove: function(Count, bOnlyText, bRemoveOnlySelection)
+    remove: function(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd)
     {
         if(this.textBoxContent)
-            this.textBoxContent.Remove(Count, bOnlyText, bRemoveOnlySelection);
+            this.textBoxContent.Remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd);
     },
 
     hitToAdj: function(x, y)

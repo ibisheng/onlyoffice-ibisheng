@@ -1483,7 +1483,7 @@ CDocument.prototype =
                     {
                         // Если у нас что-то заселекчено и мы вводим текст или пробел
                         // и т.д., тогда сначала удаляем весь селект.
-                        this.Remove( 1, true );
+                        this.Remove( 1, true, false, true );
                         break;
                     }
                     case para_TextPr:
@@ -1696,22 +1696,25 @@ CDocument.prototype =
         }
     },
 
-    Remove : function(Count, bOnlyText, bRemoveOnlySelection)
+    Remove : function(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd)
     {
-        if ( "undefined" === typeof(bRemoveOnlySelection) )
+        if ( undefined === bRemoveOnlySelection )
             bRemoveOnlySelection = false;
+
+        if ( undefined === bOnTextAdd )
+            bOnTextAdd = false;
 
         // Работаем с колонтитулом
         if ( docpostype_HdrFtr === this.CurPos.Type )
         {
-            var Res = this.HdrFtr.Remove(Count, bOnlyText, bRemoveOnlySelection);
+            var Res = this.HdrFtr.Remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd);
             this.Document_UpdateInterfaceState();
             this.Document_UpdateRulersState();
             return Res;
         }
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
-            var Res = this.DrawingObjects.remove(Count, bOnlyText, bRemoveOnlySelection);
+            var Res = this.DrawingObjects.remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd);
             this.Document_UpdateInterfaceState();
             this.Document_UpdateRulersState();
             return Res;
@@ -1750,6 +1753,14 @@ CDocument.prototype =
 
                     var bStartEmpty, bEndEmpty;
 
+                    // Если удаление идет по добавлению текста и выделение заканчивается таблицей,
+                    // тогда мы просто сбрасываем выделение.
+                    if ( true === bOnTextAdd && type_Table == EndType )
+                    {
+                        this.CurPos.ContentPos = StartPos;
+                        return this.Cursor_MoveLeft(false, false);
+                    }
+
                     if ( type_Paragraph == StartType )
                     {
                         // Удаляем выделенную часть параграфа
@@ -1787,24 +1798,41 @@ CDocument.prototype =
                             this.Content[StartPos].CurPos.ContentPos = this.Content[StartPos].Internal_GetEndPos();
                             this.Remove( 1, true );
                         }
+                        else
+                        {
+                            this.CurPos.ContentPos = StartPos + 1;
+                            this.Content[StartPos + 1].Cursor_MoveToStartPos();
+                        }
                     }
                     else if ( true != bStartEmpty )
                     {
-                        // Удаляем весь промежуточный контент и последний параграф
-                        this.Internal_Content_Remove( StartPos + 1, EndPos - StartPos );
+                        if ( true === bOnTextAdd && type_Table == StartType )
+                        {
+                            // Удаляем весь промежуточный контент, но последний параграф не удаляем
+                            this.Internal_Content_Remove( StartPos + 1, EndPos - StartPos - 1 );
 
-                        if ( type_Paragraph == StartType )
-                        {
-                            // Встаем в конец параграфа
-                            this.CurPos.ContentPos = StartPos;
-                            this.Content[StartPos].CurPos.ContentPos = this.Content[StartPos].Internal_GetEndPos();
-                        }
-                        else if ( type_Table == StartType )
-                        {
-                            // У нас обязательно есть элемент после таблицы (либо снова таблица, либо параграф)
-                            // Встаем в начало следующего элемента.
+                            // Встаем в начало параграфа
                             this.CurPos.ContentPos = StartPos + 1;
                             this.Content[StartPos + 1].Cursor_MoveToStartPos();
+                        }
+                        else
+                        {
+                            // Удаляем весь промежуточный контент и последний параграф
+                            this.Internal_Content_Remove( StartPos + 1, EndPos - StartPos );
+
+                            if ( type_Paragraph == StartType )
+                            {
+                                // Встаем в конец параграфа
+                                this.CurPos.ContentPos = StartPos;
+                                this.Content[StartPos].CurPos.ContentPos = this.Content[StartPos].Internal_GetEndPos();
+                            }
+                            else if ( type_Table == StartType )
+                            {
+                                // У нас обязательно есть элемент после таблицы (либо снова таблица, либо параграф)
+                                // Встаем в начало следующего элемента.
+                                this.CurPos.ContentPos = StartPos + 1;
+                                this.Content[StartPos + 1].Cursor_MoveToStartPos();
+                            }
                         }
                     }
                     else if ( true != bEndEmpty )
@@ -1818,51 +1846,27 @@ CDocument.prototype =
                     }
                     else
                     {
-                        // Удаляем весь промежуточный контент, начальный и конечный параграфы
-                        // При таком удалении надо убедиться, что в документе останется хотя бы один элемент
-                        if ( 0 === StartPos && (EndPos - StartPos + 1) >= this.Content.length )
+                        if ( true === bOnTextAdd )
                         {
-                            var NewPara = new Paragraph( this.DrawingDocument, this, 0, 0, 0, X_Right_Field, Y_Bottom_Field );
-                            this.Internal_Content_Add( 0, NewPara );
-                            this.Internal_Content_Remove( 1, this.Content.length - 1 );
-                        }
-                        else
-                        {
-                            this.Internal_Content_Remove( StartPos, EndPos - StartPos + 1 );
-                        }
-
-                        // Выставляем текущую позицию
-                        if ( StartPos >= this.Content.length )
-                        {
-                            // Документ не должен заканчиваться таблицей, поэтому здесь проверку не делаем
-                            this.CurPos.ContentPos = this.Content.length - 1;
-                            this.Content[this.CurPos.ContentPos].CurPos.ContentPos = this.Content[this.CurPos.ContentPos].Internal_GetEndPos();
-                        }
-                        else
-                        {
+                            // Удаляем весь промежуточный контент, начальный параграф, а конечный не удаляем
+                            this.Internal_Content_Remove( StartPos, EndPos - StartPos );
                             this.CurPos.ContentPos = StartPos;
                             this.Content[StartPos].Cursor_MoveToStartPos();
                         }
-                    }
-                }
-                else
-                {
-                    this.CurPos.ContentPos = StartPos;
-
-                    if ( Count < 0 && type_Table === this.Content[StartPos].GetType() )
-                    {
-                        return this.Table_RemoveRow();
-                    }
-                    else if ( false === this.Content[StartPos].Remove( Count, true ) )
-                    {
-                        // В ворде параграфы объединяются только когда у них все настройки совпадают.
-                        // (почему то при изменении и обратном изменении настроек параграфы перестают объединятся)
-                        // Пока у нас параграфы будут объединяться всегда и настройки будут браться из первого
-                        // параграфа, кроме случая, когда первый параграф полностью удаляется.
-
-                        if ( true === this.Content[StartPos].IsEmpty() && this.Content.length > 1 )
+                        else
                         {
-                            this.Internal_Content_Remove( StartPos, 1 );
+                            // Удаляем весь промежуточный контент, начальный и конечный параграфы
+                            // При таком удалении надо убедиться, что в документе останется хотя бы один элемент
+                            if ( 0 === StartPos && (EndPos - StartPos + 1) >= this.Content.length )
+                            {
+                                var NewPara = new Paragraph( this.DrawingDocument, this, 0, 0, 0, X_Right_Field, Y_Bottom_Field );
+                                this.Internal_Content_Add( 0, NewPara );
+                                this.Internal_Content_Remove( 1, this.Content.length - 1 );
+                            }
+                            else
+                            {
+                                this.Internal_Content_Remove( StartPos, EndPos - StartPos + 1 );
+                            }
 
                             // Выставляем текущую позицию
                             if ( StartPos >= this.Content.length )
@@ -1876,23 +1880,61 @@ CDocument.prototype =
                                 this.CurPos.ContentPos = StartPos;
                                 this.Content[StartPos].Cursor_MoveToStartPos();
                             }
-
-                            // Нам нужно пересчитать все изменения, начиная с текущего элемента
-                            this.ContentLastChangePos = this.CurPos.ContentPos;
-                            this.Recalculate();
-
-                            this.Interface_Update_ParaPr();
-                            this.Interface_Update_TextPr();
-
-                            return;
                         }
-                        else if ( this.CurPos.ContentPos < this.Content.length - 1 && type_Paragraph == this.Content[this.CurPos.ContentPos + 1].GetType() )
-                        {
-                            // Соединяем текущий и предыдущий параграфы
-                            this.Content[StartPos].Concat( this.Content[StartPos + 1] );
-                            this.Internal_Content_Remove( StartPos + 1, 1 );
+                    }
+                }
+                else
+                {
+                    this.CurPos.ContentPos = StartPos;
 
-                            this.Interface_Update_ParaPr();
+                    if ( Count < 0 && type_Table === this.Content[StartPos].GetType() && true != bOnTextAdd )
+                    {
+                        return this.Table_RemoveRow();
+                    }
+                    else if ( false === this.Content[StartPos].Remove( Count, true, bRemoveOnlySelection, bOnTextAdd ) )
+                    {
+                        // При добавлении текста, параграф не объединяется
+                        if ( true != bOnTextAdd )
+                        {
+                            // В ворде параграфы объединяются только когда у них все настройки совпадают.
+                            // (почему то при изменении и обратном изменении настроек параграфы перестают объединятся)
+                            // Пока у нас параграфы будут объединяться всегда и настройки будут браться из первого
+                            // параграфа, кроме случая, когда первый параграф полностью удаляется.
+
+                            if ( true === this.Content[StartPos].IsEmpty() && this.Content.length > 1 )
+                            {
+                                this.Internal_Content_Remove( StartPos, 1 );
+
+                                // Выставляем текущую позицию
+                                if ( StartPos >= this.Content.length )
+                                {
+                                    // Документ не должен заканчиваться таблицей, поэтому здесь проверку не делаем
+                                    this.CurPos.ContentPos = this.Content.length - 1;
+                                    this.Content[this.CurPos.ContentPos].CurPos.ContentPos = this.Content[this.CurPos.ContentPos].Internal_GetEndPos();
+                                }
+                                else
+                                {
+                                    this.CurPos.ContentPos = StartPos;
+                                    this.Content[StartPos].Cursor_MoveToStartPos();
+                                }
+
+                                // Нам нужно пересчитать все изменения, начиная с текущего элемента
+                                this.ContentLastChangePos = this.CurPos.ContentPos;
+                                this.Recalculate();
+
+                                this.Interface_Update_ParaPr();
+                                this.Interface_Update_TextPr();
+
+                                return;
+                            }
+                            else if ( this.CurPos.ContentPos < this.Content.length - 1 && type_Paragraph == this.Content[this.CurPos.ContentPos + 1].GetType() )
+                            {
+                                // Соединяем текущий и предыдущий параграфы
+                                this.Content[StartPos].Concat( this.Content[StartPos + 1] );
+                                this.Internal_Content_Remove( StartPos + 1, 1 );
+
+                                this.Interface_Update_ParaPr();
+                            }
                         }
                     }
                 }
@@ -1907,7 +1949,7 @@ CDocument.prototype =
             }
             else
             {
-                if ( true === bRemoveOnlySelection )
+                if ( true === bRemoveOnlySelection || true === bOnTextAdd )
                     return;
 
                 if ( type_Paragraph == this.Content[this.CurPos.ContentPos].GetType() )

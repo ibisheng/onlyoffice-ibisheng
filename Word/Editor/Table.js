@@ -7689,7 +7689,7 @@ CTable.prototype =
             this.CurCell.Content.Paragraph_Format_Paste(TextPr, ParaPr, false);
     },
 
-    Remove : function(Count, bOnlyText, bRemoveOnlySelection)
+    Remove : function(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd)
     {
         if ( true === this.ApplyToAll || ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0 ) )
         {
@@ -7702,7 +7702,7 @@ CTable.prototype =
 
                 var Cell_Content = Cell.Content;
                 Cell_Content.Set_ApplyToAll( true );
-                Cell.Content.Remove(Count, bOnlyText, bRemoveOnlySelection);
+                Cell.Content.Remove(Count, bOnlyText, bRemoveOnlySelection, false);
                 Cell_Content.Set_ApplyToAll( false );
             }
 
@@ -7715,7 +7715,7 @@ CTable.prototype =
             }
         }
         else
-            this.CurCell.Content.Remove(Count, bOnlyText, bRemoveOnlySelection);
+            this.CurCell.Content.Remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd);
     },
 
     Cursor_GetPos : function()

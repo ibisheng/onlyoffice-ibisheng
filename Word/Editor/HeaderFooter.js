@@ -713,9 +713,9 @@ CHeaderFooter.prototype =
         this.Content.Paragraph_Format_Paste( TextPr, ParaPr, ApplyPara );
     },
 
-    Remove : function(Count, bOnlyText, bRemoveOnlySelection)
+    Remove : function(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd)
     {
-        this.Content.Remove(Count, bOnlyText, bRemoveOnlySelection);
+        this.Content.Remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd);
     },
 
     Cursor_GetPos : function()
@@ -2184,10 +2184,10 @@ CHeaderFooterController.prototype =
             return this.CurHdrFtr.Paragraph_Format_Paste( TextPr, ParaPr, ApplyPara );
     },
 
-    Remove : function(Count, bOnlyText, bRemoveOnlySelection)
+    Remove : function(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd)
     {
         if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Remove(Count, bOnlyText, bRemoveOnlySelection);
+            return this.CurHdrFtr.Remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd);
     },
 
     Cursor_GetPos : function()

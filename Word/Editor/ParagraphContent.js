@@ -5503,10 +5503,10 @@ ParaDrawing.prototype =
             this.GraphicObj.cursorMoveStartOfLine(AddToSelect);
     },
 
-    remove: function(Count, bOnlyText, bRemoveOnlySelection)
+    remove: function(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd)
     {
         if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.remove === "function")
-            this.GraphicObj.remove(Count, bOnlyText, bRemoveOnlySelection);
+            this.GraphicObj.remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd);
     },
 
     hitToWrapPolygonPoint: function(x, y)

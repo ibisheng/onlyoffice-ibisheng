@@ -8257,10 +8257,10 @@ CShape.prototype =
         }
     },
 
-    Remove : function(Count, bOnlyText, bRemoveOnlySelection) {
+    Remove : function(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd) {
         if(this.txBody ) {
 
-            this.txBody.content.Remove(Count, bOnlyText, bRemoveOnlySelection)
+            this.txBody.content.Remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd)
         }
     },
 

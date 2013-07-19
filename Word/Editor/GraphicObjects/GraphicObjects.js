@@ -4007,19 +4007,19 @@ CGraphicObjects.prototype =
         }
     },
 
-    remove: function(Count, bOnlyText, bRemoveOnlySelection)
+    remove: function(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd)
     {
         switch(this.curState.id)
         {
             case STATES_ID_TEXT_ADD:
             {
-                this.curState.textObject.remove(Count, bOnlyText, bRemoveOnlySelection);
+                this.curState.textObject.remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd);
                 break;
             }
             case STATES_ID_TEXT_ADD_IN_GROUP:
             {
                 if(typeof this.curState.textObject.remove === "function")
-                    this.curState.textObject.remove(Count, bOnlyText, bRemoveOnlySelection);
+                    this.curState.textObject.remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd);
                 break;
             }
             case STATES_ID_GROUP:
