@@ -1015,6 +1015,10 @@ asc_docs_api.prototype.OpenDocument2 = function(url, gObject)
 	}
 	else
 		editor.asc_fireCallback("asc_onError",c_oAscError.ID.MobileUnexpectedCharCount,c_oAscError.Level.Critical);
+
+
+    if (window.USER_AGENT_SAFARI_MACOS)
+        setInterval(SafariIntervalFocus, 10);
 }
 asc_docs_api.prototype.get_DocumentName = function()
 {

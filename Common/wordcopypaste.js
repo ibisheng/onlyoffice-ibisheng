@@ -21,15 +21,27 @@
     }
 }
 
+var USER_AGENT_SAFARI_MACOS = (navigator.userAgent.toLowerCase().indexOf('safari') > -1 && navigator.userAgent.toLowerCase().indexOf('mac') > -1) ? true : false;
+
+var COPY_ELEMENT_ID = "SelectId";
+var PASTE_ELEMENT_ID = "wrd_pastebin";
+var ELEMENT_DISPAY_STYLE = "none";
+
+if (USER_AGENT_SAFARI_MACOS)
+{
+    var PASTE_ELEMENT_ID = "SelectId";
+    var ELEMENT_DISPAY_STYLE = "block";
+}
+
 var g_bIsDocumentCopyPaste = true;
 var isOnlyLocalBufferSafariWord = false;
 function Editor_Copy_GetElem(api)
 {
-    var ElemToSelect = document.getElementById( "SelectId" );
+    var ElemToSelect = document.getElementById( COPY_ELEMENT_ID );
     if ( !ElemToSelect )
     {
         ElemToSelect = document.createElement("div");
-        ElemToSelect.id = "SelectId";
+        ElemToSelect.id = COPY_ELEMENT_ID;
         ElemToSelect.style.position = "absolute";
         //���� ������� width ���������, �� �������� ����� ��������� ������������ �� span
         //� �������� � ����� ������ ��������� ������ <span>1</span><span> </span><span>2</span>
@@ -242,7 +254,7 @@ function Editor_Copy(api, bCut)
     window.setTimeout( function()
     {
         //�������� ����������� ���������
-        ElemToSelect.style.display  = "none";
+        ElemToSelect.style.display  = ELEMENT_DISPAY_STYLE;
         document.body.style.MozUserSelect = "none";
         document.body.style["-khtml-user-select"] = "none";
         document.body.style["-o-user-select"] = "none";
@@ -1491,10 +1503,10 @@ CopyProcessor.prototype =
 function Editor_Paste_GetElem(api, bClean)
 {
     var oWordControl = api.WordControl;
-    var pastebin = document.getElementById('wrd_pastebin');
+    var pastebin = document.getElementById(PASTE_ELEMENT_ID);
     if(!pastebin){
         pastebin = document.createElement("div");
-        pastebin.setAttribute( 'id', 'wrd_pastebin' );
+        pastebin.setAttribute( 'id', PASTE_ELEMENT_ID );
         pastebin.style.position = 'absolute';
         pastebin.style.top = '-100px';
         pastebin.style.left = '0px';
@@ -1579,8 +1591,10 @@ function Editor_Paste_Button(api)
         //rangeToSelect.execCommand("paste", false);
         document.execCommand("paste");
 
-        pastebin.blur();
-        pastebin.style.display  = "none";
+        if (!USER_AGENT_SAFARI_MACOS)
+            pastebin.blur();
+
+        pastebin.style.display  = ELEMENT_DISPAY_STYLE;
 
         document.body.style.MozUserSelect = "none";
         document.body.style["-khtml-user-select"] = "none";
@@ -1593,7 +1607,7 @@ function Editor_Paste_Button(api)
     }
 	else
 	{
-		 var ElemToSelect = document.getElementById( "SelectId" );
+		 var ElemToSelect = document.getElementById( COPY_ELEMENT_ID );
 		 if(ElemToSelect)
             Editor_Paste_Exec(api, ElemToSelect);
 		return true;
@@ -1697,7 +1711,7 @@ function Editor_Paste(api, bClean)
         if(!oWordControl.bIsEventPaste)
             Editor_Paste_Exec(api, pastebin);
         else
-            pastebin.style.display  = "none";
+            pastebin.style.display  = ELEMENT_DISPAY_STYLE;
     }, 0 );
 };
 function CopyPasteCorrectString(str)
@@ -1752,7 +1766,7 @@ function Body_Paste(api, e)
 						bExist = true;
 					}
                 }
-                ifr.style.display  = "none";
+                ifr.style.display  = ELEMENT_DISPAY_STYLE;
             }
 
             if(bExist)
@@ -2172,7 +2186,7 @@ PasteProcessor.prototype =
                 }
 
                 node.blur();
-                node.style.display  = "none";
+                node.style.display  = ELEMENT_DISPAY_STYLE;
             });
     },
     _Prepeare : function(node, fCallback)
@@ -4273,3 +4287,62 @@ PasteProcessor.prototype =
         return bAddParagraph;
     }
 };
+
+function SafariIntervalFocus()
+{
+    if (window.editor && window.editor.WordControl && window.editor.WordControl.IsFocus && !editor.WordControl.TextBoxInputMode)
+    {
+        var pastebin = document.getElementById(COPY_ELEMENT_ID);
+        if (pastebin)
+            pastebin.focus();
+        else
+        {
+            // create
+            Editor_CopyPaste_Create(window.editor);
+        }
+    }
+}
+
+function Editor_CopyPaste_Create(api)
+{
+    var ElemToSelect = document.createElement("div");
+    ElemToSelect.id = COPY_ELEMENT_ID;
+    ElemToSelect.style.position = "absolute";
+
+    ElemToSelect.style.left = '0px';
+    ElemToSelect.style.top = '100px';
+    ElemToSelect.style.width = '1000px';
+    ElemToSelect.style.height = '100px';
+    ElemToSelect.style.overflow = 'hidden';
+    ElemToSelect.style.zIndex = -1000;
+    ElemToSelect.style.MozUserSelect = "text";
+    ElemToSelect.style["-khtml-user-select"] = "text";
+    ElemToSelect.style["-o-user-select"] = "text";
+    ElemToSelect.style["user-select"] = "text";
+    ElemToSelect.style["-webkit-user-select"] = "text";
+    ElemToSelect.setAttribute("contentEditable", true);
+
+    var Def_rPr = api.WordControl.m_oLogicDocument.Styles.Default.TextPr;
+    ElemToSelect.style.fontFamily = Def_rPr.FontFamily.Name;
+
+    if (!api.DocumentReaderMode)
+        ElemToSelect.style.fontSize = Def_rPr.FontSize + "pt";
+    else
+    {
+        api.DocumentReaderMode.CorrectDefaultFontSize(Def_rPr.FontSize);
+        ElemToSelect.style.fontSize = "1em";
+    }
+
+    ElemToSelect.style.lineHeight = "1px";
+
+    ElemToSelect.onpaste = function(e){
+        //Editor_Paste(api, true);
+        Body_Paste(api,e);
+    };
+
+    ElemToSelect.onbeforecopy = function(e){
+        Editor_Copy(api,false);
+    };
+
+    document.body.appendChild( ElemToSelect );
+}
