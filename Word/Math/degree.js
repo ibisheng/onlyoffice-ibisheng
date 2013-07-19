@@ -7,14 +7,17 @@ function CDegreeOrdinary()
 extend(CDegreeOrdinary, CMathBase);
 CDegreeOrdinary.prototype.init = function()
 {
+    var oBase = new CMathContent();
+    this.init_2(oBase);
+}
+CDegreeOrdinary.prototype.init_2 = function(base)
+{
     this.setDimension(1, 2);
 
-    var oBase = new CMathContent();
+    var degree = new CMathContent();
+    degree.setReduct(DEGR_REDUCT);
 
-    var oDegree = new CMathContent();
-    oDegree.setReduct(DEGR_REDUCT);
-
-    this.addMCToContent(oBase, oDegree);
+    this.addMCToContent(base, degree);
 }
 CDegreeOrdinary.prototype.old_setContent = function()
 {

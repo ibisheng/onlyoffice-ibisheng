@@ -73,8 +73,32 @@ CNary.prototype.init = function(index, orderType, iterType)
             base.init(sign);
         }
     }
+    else if(orderType == 1)
+    {
+        if(iterType == 1)
+        {
+            base = new CDegreeOrdinary();
+            base.init_2(sign);
+            base.setIndex(1);
+        }
+        else if(iterType == 2)
+        {
+            base = new CDegreeOrdinary();
+            base.init_2(sign);
+            base.setIndex(-1);
+        }
+        else if(iterType == 3)
+        {
+            base = new CDegreeSubSup(0);
+            base.init_2(sign);
+        }
+    }
 
     this.addMCToContent(base, arg);
+}
+CNary.prototype.setDistance = function()
+{
+    this.dW = this.Parent.getTxtPrp().FontSize/36*2.45;
 }
 CNary.prototype.getBase = function()
 {
@@ -110,7 +134,11 @@ CNaryUnd.prototype.setDistance = function()
 }
 CNaryUnd.prototype.getCenter = function()
 {
-    return this.elements[0][0].size.height + this.dW + this.elements[1][0].size.center ;
+    return this.elements[0][0].size.height + this.dH + this.elements[1][0].size.center ;
+}
+CNaryUnd.prototype.getUpperIterator = function()
+{
+    return this.elements[0][0];
 }
 
 
@@ -136,6 +164,10 @@ CNaryOvr.prototype.setDistance = function()
 CNaryOvr.prototype.getCenter = function()
 {
     return this.elements[0][0].size.center;
+}
+CNaryOvr.prototype.getLowerIterator= function()
+{
+    return this.elements[1][0];
 }
 
 function CNaryUndOvr()
@@ -239,6 +271,15 @@ CNaryUndOvr.prototype.findDisposition = function(mCoord)
 
     return {pos: {x: pos_x, y: pos_y}, mCoord: {x: X, y: Y}, inside_flag: inside_flag};
 }
+CNaryUndOvr.prototype.getLowerIterator = function()
+{
+    return this.elements[2][0];
+}
+CNaryUndOvr.prototype.getUpperIterator = function()
+{
+    return this.elements[0][0];
+}
+
 
 
 function CNaryOperator(flip)
@@ -444,7 +485,7 @@ CSigma.prototype.getCoord = function()
     X[35] = 16252; Y[35] = 5200;
 
 
-    var textScale = this.params.font.FontSize/850; // 1000 pt
+    var textScale =  this.Parent.getTxtPrp().FontSize/850; // 1000 pt
     var alpha = textScale*25.4/96 /64;
 
     var h1 = Y[0] - Y[21],
@@ -515,7 +556,7 @@ CSigma.prototype.calculateSizeGlyph = function()
 {
     // пока размер не меняем в зависимости от высоты аргумента
 
-    var betta = this.params.font.FontSize/36;
+    var betta = this.Parent.getTxtPrp().FontSize/36;
 
     var _width = 8.997900390624999*betta,
         _height = 11.994444444444444*betta;
@@ -646,7 +687,7 @@ CProduct.prototype.getCoord = function()
     X[62] = 67894; Y[62] = 0;
 
 
-    var textScale = this.params.font.FontSize/850, // 1000 pt
+    var textScale = this.Parent.getTxtPrp().FontSize/850, // 1000 pt
         alpha = textScale*25.4/96 /64;
 
     var h1 = Y[9],
@@ -676,7 +717,7 @@ CProduct.prototype.getCoord = function()
 }
 CProduct.prototype.calculateSizeGlyph = function()
 {
-    var betta = this.params.font.FontSize/36;
+    var betta = this.Parent.getTxtPrp().FontSize/36;
 
     var _width = 10.312548828125*betta,
         _height = 11.994444444444444*betta;
@@ -747,8 +788,7 @@ CUnion.prototype.getCoord = function()
 }
 CUnion.prototype.calculateSizeGlyph = function()
 {
-
-    var betta = this.params.font.FontSize/36;
+    var betta = this.Parent.getTxtPrp().FontSize/36;
     this.gap = 0.93*betta;
 
     var _width = 9.38*betta,
@@ -866,7 +906,7 @@ CLogicalOr.prototype.getCoord = function()
     X[6] = 10613; Y[6] = 0;
     X[7] = 0; Y[7] = 0;
 
-    var textScale = this.params.font.FontSize/850, // 1000 pt
+    var textScale = this.Parent.getTxtPrp().FontSize/850, // 1000 pt
         alpha = textScale*25.4/96 /64;
 
     var w1 = X[1],
@@ -897,14 +937,7 @@ CLogicalOr.prototype.getCoord = function()
 }
 CLogicalOr.prototype.calculateSizeGlyph = function()
 {
-    /*var sign = new CMathText(this.params);
-    sign.init(0x22C1);
-
-    var size = sign.size;*/
-
-    //var _width = 8.819444444444445,
-
-    var betta = this.params.font.FontSize/36;
+    var betta = this.Parent.getTxtPrp().FontSize/36;
 
     var _width = 9.6159*betta,
         _height = 11.994444444444444*betta;
@@ -1173,7 +1206,7 @@ CDoubleIntegral.prototype.drawPath = function(XX, YY)
 }
 CDoubleIntegral.prototype.calculateSizeGlyph = function()
 {
-    var betta = this.params.font.FontSize/36;
+    var betta = this.Parent.getTxtPrp().FontSize/36;
 
     var _width = 14.2296*betta,
         _height = 13.7*betta;
@@ -1223,7 +1256,7 @@ CTripleIntegral.prototype.drawPath = function(XX, YY)
 }
 CTripleIntegral.prototype.calculateSizeGlyph = function()
 {
-    var betta = this.params.font.FontSize/36;
+    var betta = this.Parent.getTxtPrp().FontSize/36;
 
     var _width = 18.925368*betta,
         _height = 13.7*betta;
@@ -2664,7 +2697,7 @@ CContourIntegral.prototype.draw = function()
         WW = coord2.W,
         HH = coord2.H;
 
-    var textScale = this.params.font.FontSize/850; // 1000 pt
+    var textScale =  this.Parent.getTxtPrp().FontSize/850;// 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент; используется для того чтобы перевести координаты в миллиметры
 
     var shX = (WW - W)*alpha/2,
@@ -2708,7 +2741,7 @@ CContourIntegral.prototype.draw = function()
 }
 CContourIntegral.prototype.calculateSizeGlyph = function()
 {
-    var betta = this.params.font.FontSize/36;
+    var betta = this.Parent.getTxtPrp().FontSize/36;
 
     var _width =  8.624*betta,
         _height = 13.7*betta;
@@ -3167,7 +3200,7 @@ CSurfaceIntegral.prototype.draw = function()
         HH = coord2.H;
 
 
-    var textScale = this.params.font.FontSize/850; // 1000 pt
+    var textScale =  this.Parent.getTxtPrp().FontSize/850; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент; используется для того чтобы перевести координаты в миллиметры
 
 
@@ -3213,7 +3246,7 @@ CSurfaceIntegral.prototype.draw = function()
 }
 CSurfaceIntegral.prototype.calculateSizeGlyph = function()
 {
-    var betta = this.params.font.FontSize/36;
+    var betta = this.Parent.getTxtPrp().FontSize/36;
 
     var _width =  14.2296*betta,
         _height = 13.7*betta;
@@ -3742,7 +3775,7 @@ CVolumeIntegral.prototype.draw = function()
         HH = coord2.H;
 
 
-    var textScale = this.params.font.FontSize/850; // 1000 pt
+    var textScale =  this.Parent.getTxtPrp().FontSize/850; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент; используется для того чтобы перевести координаты в миллиметры
 
 
@@ -3788,7 +3821,7 @@ CVolumeIntegral.prototype.draw = function()
 }
 CVolumeIntegral.prototype.calculateSizeGlyph = function()
 {
-    var betta = this.params.font.FontSize/36;
+    var betta = this.Parent.getTxtPrp().FontSize/36;
 
     var _width =  18.925368*betta,
         _height = 13.7*betta;

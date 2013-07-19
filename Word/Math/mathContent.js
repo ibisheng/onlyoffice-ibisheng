@@ -205,6 +205,9 @@ CMathContent.prototype =
             case 8:
                 mathElem = new CNary();
                 break;
+            case 30:
+                mathElem = new CMathBase();
+                break;
         }
 
         if( mathElem !== null )
@@ -438,11 +441,319 @@ CMathContent.prototype =
                 integr.init(0,0,0);
                 integr.fillPlaceholders();
                 break;
+            case 24:
+                var integr = this.createMComponent(8);
+                integr.init(0,1,3);
+                integr.fillPlaceholders();
+                break;
             case 25:
                 var integr = this.createMComponent(8);
                 integr.init(0,0,3);
                 integr.fillPlaceholders();
                 break;
+            case 26:
+                var integr = this.createMComponent(8);
+                integr.init(1,0,0);
+                integr.fillPlaceholders();
+                break;
+            case 27:
+                var integr = this.createMComponent(8);
+                integr.init(1,1,3);
+                integr.fillPlaceholders();
+                break;
+            case 28:
+                var integr = this.createMComponent(8);
+                integr.init(1,0,3);
+                integr.fillPlaceholders();
+                break;
+            case 29:
+                var integr = this.createMComponent(8);
+                integr.init(2,0,0);
+                integr.fillPlaceholders();
+                break;
+            case 30:
+                var integr = this.createMComponent(8);
+                integr.init(2,1,3);
+                integr.fillPlaceholders();
+                break;
+            case 31:
+                var integr = this.createMComponent(8);
+                integr.init(2,0,3);
+                integr.fillPlaceholders();
+                break;
+            case 32:
+                var integr = this.createMComponent(8);
+                integr.init(3,0,0);
+                integr.fillPlaceholders();
+                break;
+            case 33:
+                var integr = this.createMComponent(8);
+                integr.init(3,1,3);
+                integr.fillPlaceholders();
+                break;
+            case 34:
+                var integr = this.createMComponent(8);
+                integr.init(3,0,3);
+                integr.fillPlaceholders();
+                break;
+            case 35:
+                var integr = this.createMComponent(8);
+                integr.init(4,0,0);
+                integr.fillPlaceholders();
+                break;
+            case 36:
+                var integr = this.createMComponent(8);
+                integr.init(4,1,3);
+                integr.fillPlaceholders();
+                break;
+            case 37:
+                var integr = this.createMComponent(8);
+                integr.init(4,0,3);
+                integr.fillPlaceholders();
+                break;
+            case 38:
+                var integr = this.createMComponent(8);
+                integr.init(5,0,0);
+                integr.fillPlaceholders();
+                break;
+            case 39:
+                var integr = this.createMComponent(8);
+                integr.init(5,1,3);
+                integr.fillPlaceholders();
+                break;
+            case 40:
+                var integr = this.createMComponent(8);
+                integr.init(5,0,3);
+                integr.fillPlaceholders();
+                break;
+            case 41:
+                var base = this.createMComponent(30);
+                base.setDimension(1,1);
+                base.setContent();
+                var elem = base.getElement(0,0);
+                elem.addTxt("dx");
+                break;
+            case 42:
+                var base = this.createMComponent(30);
+                base.setDimension(1,1);
+                base.setContent();
+                var elem = base.getElement(0,0);
+                elem.addTxt("dy");
+                break;
+            case 43:
+                var base = this.createMComponent(30);
+                base.setDimension(1,1);
+                base.setContent();
+                var elem = base.getElement(0,0);
+                elem.addTxt("dθ");
+                break;
+            case 44:
+                var sigma = this.createMComponent(8);
+                sigma.init(6,0,0);
+                sigma.fillPlaceholders();
+                break;
+            case 45:
+                var sigma = this.createMComponent(8);
+                sigma.init(6,0,3);
+                sigma.fillPlaceholders();
+                break;
+            case 46:
+                var sigma = this.createMComponent(8);
+                sigma.init(6,1,3);
+                sigma.fillPlaceholders();
+                break;
+            case 47:
+                var sigma = this.createMComponent(8);
+                sigma.init(6,0,2);
+                sigma.fillPlaceholders();
+                break;
+            case 48:
+                var sigma = this.createMComponent(8);
+                sigma.init(6,1,2);
+                sigma.fillPlaceholders();
+                break;
+            case 49:
+                var product = this.createMComponent(8);
+                product.init(7,0,0);
+                product.fillPlaceholders();
+                break;
+            case 50:
+                var product = this.createMComponent(8);
+                product.init(7,0,3);
+                product.fillPlaceholders();
+                break;
+            case 51:
+                var product = this.createMComponent(8);
+                product.init(7,1,3);
+                product.fillPlaceholders();
+                break;
+            case 52:
+                var product = this.createMComponent(8);
+                product.init(7,0,2);
+                product.fillPlaceholders();
+                break;
+            case 53:
+                var product = this.createMComponent(8);
+                product.init(7,1,2);
+                product.fillPlaceholders();
+                break;
+
+            case 54:
+                var product = this.createMComponent(8);
+                product.init(8,0,0);
+                product.fillPlaceholders();
+                break;
+            case 55:
+                var product = this.createMComponent(8);
+                product.init(8,0,3);
+                product.fillPlaceholders();
+                break;
+            case 56:
+                var product = this.createMComponent(8);
+                product.init(8,1,3);
+                product.fillPlaceholders();
+                break;
+            case 57:
+                var product = this.createMComponent(8);
+                product.init(8,0,2);
+                product.fillPlaceholders();
+                break;
+            case 58:
+                var product = this.createMComponent(8);
+                product.init(8,1,2);
+                product.fillPlaceholders();
+                break;
+
+            case 59:
+                var union = this.createMComponent(8);
+                union.init(9,0,0);
+                union.fillPlaceholders();
+                break;
+            case 60:
+                var union = this.createMComponent(8);
+                union.init(9,0,3);
+                union.fillPlaceholders();
+                break;
+            case 61:
+                var union = this.createMComponent(8);
+                union.init(9,1,3);
+                union.fillPlaceholders();
+                break;
+            case 62:
+                var union = this.createMComponent(8);
+                union.init(9,0,2);
+                union.fillPlaceholders();
+                break;
+            case 63:
+                var union = this.createMComponent(8);
+                union.init(9,1,2);
+                union.fillPlaceholders();
+                break;
+
+            case 64:
+                var union = this.createMComponent(8);
+                union.init(10,0,0);
+                union.fillPlaceholders();
+                break;
+            case 65:
+                var union = this.createMComponent(8);
+                union.init(10,0,3);
+                union.fillPlaceholders();
+                break;
+            case 66:
+                var union = this.createMComponent(8);
+                union.init(10,1,3);
+                union.fillPlaceholders();
+                break;
+            case 67:
+                var union = this.createMComponent(8);
+                union.init(10,0,2);
+                union.fillPlaceholders();
+                break;
+            case 68:
+                var union = this.createMComponent(8);
+                union.init(10,1,2);
+                union.fillPlaceholders();
+                break;
+
+            case 69:
+                var logicalOr = this.createMComponent(8);
+                logicalOr.init(11,0,0);
+                logicalOr.fillPlaceholders();
+                break;
+            case 70:
+                var logicalOr = this.createMComponent(8);
+                logicalOr.init(11,0,3);
+                logicalOr.fillPlaceholders();
+                break;
+            case 71:
+                var logicalOr = this.createMComponent(8);
+                logicalOr.init(11,1,3);
+                logicalOr.fillPlaceholders();
+                break;
+            case 72:
+                var logicalOr = this.createMComponent(8);
+                logicalOr.init(11,0,2);
+                logicalOr.fillPlaceholders();
+                break;
+            case 73:
+                var logicalOr = this.createMComponent(8);
+                logicalOr.init(11,1,2);
+                logicalOr.fillPlaceholders();
+                break;
+
+            case 74:
+                var logicalOr = this.createMComponent(8);
+                logicalOr.init(12,0,0);
+                logicalOr.fillPlaceholders();
+                break;
+            case 75:
+                var logicalOr = this.createMComponent(8);
+                logicalOr.init(12,0,3);
+                logicalOr.fillPlaceholders();
+                break;
+            case 76:
+                var logicalOr = this.createMComponent(8);
+                logicalOr.init(12,1,3);
+                logicalOr.fillPlaceholders();
+                break;
+            case 77:
+                var logicalOr = this.createMComponent(8);
+                logicalOr.init(12,0,2);
+                logicalOr.fillPlaceholders();
+                break;
+            case 78:
+                var logicalOr = this.createMComponent(8);
+                logicalOr.init(12,1,2);
+                logicalOr.fillPlaceholders();
+                break;
+
+            case 79:
+                var sigma = this.createMComponent(8);
+                sigma.init(6,0,2);
+                var iter = sigma.getLowerIterator();
+                iter.addTxt("k");
+                var base = sigma.getBase();
+                var fract = base.createMComponent(0);
+                fract.init();
+                fract.hideBar(true);
+                var num = fract.getNumerator();
+                num.addTxt("n");
+                var den = fract.getDenominator();
+                den.addTxt("k");
+                break;
+
+            case 80:
+                var sigma = this.createMComponent(8);
+                sigma.init(6,0,3);
+                var iterUp = sigma.getUpperIterator();
+                iterUp.addTxt("n");
+                var iterLow = sigma.getLowerIterator();
+                iterLow.addTxt("i=0");
+                var base = sigma.getBase();
+                base.fillPlaceholders();
+                break;
+            
             /*case 24:
                 var integr = this.createMComponent(8);
                 integr.init(0,0,1);
