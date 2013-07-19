@@ -1267,7 +1267,7 @@
 							var sortState = undefined;
 							if(curFilForSort.SortState)
 							{
-								if(curFilForSort.SortState.SortConditions[0].Ref.split(':')[0] ==  buttons[i].id)
+								if(curFilForSort.SortState.SortConditions && curFilForSort.SortState.SortConditions.length != 0 && curFilForSort.SortState.SortConditions[0].Ref.split(':')[0] ==  buttons[i].id)
 								{
 									if(curFilForSort.SortState.SortConditions[0].ConditionDescending)
 										sortState = false;
@@ -1376,6 +1376,9 @@
 							};
 							currentFilter.SortState.SortConditions[0] = {};
 						}
+						if(!currentFilter.SortState.SortConditions[0])
+							currentFilter.SortState.SortConditions[0] = {};
+							
 						currentFilter.SortState.SortConditions[0].Ref = cellId + ":" + newEndId;
 						currentFilter.SortState.SortConditions[0].ConditionDescending = type;
 						//сама сортировка
