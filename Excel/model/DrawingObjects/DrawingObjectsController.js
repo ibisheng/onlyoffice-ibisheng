@@ -280,7 +280,7 @@ DrawingObjectsController.prototype =
         return this.curState.isPointInDrawingObjects(x, y);
     },
 	
-	getGraphicObjectProps: function()
+	getGraphicObjectProps: function()	// Все свойства делаем чераз asc_классы
 	{
 		var shape_props, image_props;
         
@@ -372,47 +372,51 @@ DrawingObjectsController.prototype =
                             if (!isRealObject(shape_props))
                             {
                                 shape_props = {};
-                                //shape_props =  s_arr[i].Get_Props(null);
-                                shape_props.ShapeProperties =
-                                {
-                                    type: c_obj.getPresetGeom(),
-                                    fill: c_obj.getFill(),
-                                    stroke: c_obj.getStroke(),
-                                    canChangeArrows: c_obj.canChangeArrows()
-                                };
+                                shape_props =  c_obj.Get_Props(null);
+								shape_props.ShapeProperties = new asc_CShapeProperty();
+								
+								shape_props.ShapeProperties.type = c_obj.getPresetGeom();
+                                shape_props.ShapeProperties.fill = c_obj.getFill();
+                                shape_props.ShapeProperties.stroke = c_obj.getStroke();
+                                shape_props.ShapeProperties.canChangeArrows = c_obj.canChangeArrows();
+								
                                 //shape_props.verticalTextAlign = c_obj.bodyPr.anchor;
                             }
                             else
                             {
-                                ShapeProperties =
-                                {
-                                    type: c_obj.getPresetGeom(),
-                                    fill: c_obj.getFill(),
-                                    stroke: c_obj.getStroke(),
-                                    canChangeArrows: c_obj.canChangeArrows()
-                                };
-                                shape_props =  s_arr[i].Get_Props(shape_props);
+								/* TODO
+								ShapeProperties = new asc_CShapeProperty();
+								ShapeProperties.type = c_obj.getPresetGeom();
+                                ShapeProperties.fill = c_obj.getFill();
+                                ShapeProperties.stroke = c_obj.getStroke();
+                                ShapeProperties.canChangeArrows = c_obj.canChangeArrows();
+								                                
+                                shape_props =  c_obj.Get_Props(shape_props);
                                 shape_props.ShapeProperties = CompareShapeProperties(ShapeProperties, shape_props.ShapeProperties);
                                 shape_props.verticalTextAlign = undefined;
+								*/
                             }
                         }
                         if (c_obj.isImage())
                         {
                             if (!isRealObject(image_props))
                             {
-                                image_props = {};
-                                //image_props = s_arr[i].Get_Props(null);
+                                image_props = new asc_CImgProperty;
+                                image_props.Width = c_obj.extX;
+								image_props.Height = c_obj.extY;
                                 image_props.ImageUrl = c_obj.getImageUrl();
                             }
-                            /*else
+                            else
                             {
-                                image_props = s_arr[i].Get_Props(image_props);
+								/* TODO
+                                image_props = c_obj.Get_Props(image_props);
                                 if (image_props.ImageUrl != null && c_obj.getImageUrl() !== image_props.ImageUrl)
                                     image_props.ImageUrl = null;
-                            }*/
+								*/
+                            }
                         }
                         
-                        if (c_obj.isGroup())
+                        /*if (c_obj.isGroup())
                         {
                             var shape_props2 = c_obj.getShapeProps();
                             var image_props2 = c_obj.getImageProps2();
@@ -477,7 +481,7 @@ DrawingObjectsController.prototype =
                                 }
                             }
 
-                        }
+                        }*/
                     }
                 }
                 break;
@@ -495,7 +499,7 @@ DrawingObjectsController.prototype =
                     this.drawingDocument.DrawImageTextureFillShape(pr.fill.fill.RasterImageId);
                 }
 
-                shape_props.ShapeProperties = CreateAscShapePropFromProp(shape_props.ShapeProperties);
+                //shape_props.ShapeProperties = CreateAscShapePropFromProp(shape_props.ShapeProperties);		// уже не надо, т.к. это asc_класс
             }
             
             ret.push(shape_props);
@@ -503,8 +507,8 @@ DrawingObjectsController.prototype =
 
         if (isRealObject(image_props))
         {
-            if (image_props.ShapeProperties)
-                image_props.ShapeProperties = CreateAscShapePropFromProp(image_props.ShapeProperties);
+            //if (image_props.ShapeProperties)
+            //    image_props.ShapeProperties = CreateAscShapePropFromProp(image_props.ShapeProperties);		// уже не надо, т.к. это asc_класс
             
             ret.push(image_props);
         }

@@ -2166,6 +2166,39 @@ prot["asc_putShapeProperties"] = prot.asc_putShapeProperties;
 //}
 
 //-----------------------------------------------------------------------------------
+// CShapeProperty
+//-----------------------------------------------------------------------------------
+
+function asc_CShapeProperty() {
+    this.type = null; // custom
+    this.fill = null;
+    this.stroke = null;
+}
+
+asc_CShapeProperty.prototype = {
+	
+	asc_getType: function() { return this.type; },
+	asc_putType: function(v) { this.type = v; },
+	asc_getFill: function() { return this.fill; },
+	asc_putFill: function(v) { this.fill = v; },
+	asc_getStroke: function() { return this.stroke; },
+	asc_putStroke: function(v) { this.stroke = v; }
+}
+
+//{ asc_CShapeProperty export
+window["Asc"].asc_CShapeProperty = asc_CShapeProperty;
+window["Asc"]["asc_CShapeProperty"] = asc_CShapeProperty;
+prot = asc_CShapeProperty.prototype;
+
+prot["asc_getType"] = prot.asc_getType;
+prot["asc_putType"] = prot.asc_putType;
+prot["asc_getFill"] = prot.asc_getFill;
+prot["asc_putFill"] = prot.asc_putFill;
+prot["asc_getStroke"] = prot.asc_getStroke;
+prot["asc_putStroke"] = prot.asc_putStroke;
+//}
+
+//-----------------------------------------------------------------------------------
 // Undo/Redo
 //-----------------------------------------------------------------------------------
 	
@@ -4393,6 +4426,8 @@ function DrawingObjects() {
 		if ( _this.drawingDocument ) {
 			_this.controller.drawSelection(_this.drawingDocument);
 			_this.drawWorksheetHeaders();
+			
+			//var xxx = _this.controller.getGraphicObjectProps();
 		}
 	}
 	

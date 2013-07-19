@@ -329,13 +329,50 @@ var c_oAscFill = {
     FILL_TYPE_SOLID	 : 3
 };
 
+var c_oAscFillBlipType = {
+    STRETCH : 1,
+    TILE    : 2
+};
+
 var c_oAscStrokeType = {
     STROKE_NONE: 0,
     STROKE_COLOR: 1
 };
 
-var c_oAscTypeSelectElement =
-{
+var c_oAscLineJoinType = {
+    Round : 1,
+    Bevel : 2,
+    Miter : 3
+};
+
+var c_oAscLineCapType = {
+    Flat : 0,
+    Round : 1,
+    Square : 2
+};
+
+var c_oAscLineBeginType = {
+    None: 0,
+    Arrow: 1,
+    Diamond: 2,
+    Oval: 3,
+    Stealth: 4,
+    Triangle: 5
+};
+
+var c_oAscLineBeginSize = {
+    small_small : 0,
+    small_mid : 1,
+    small_large : 2,
+    mid_small : 3,
+    mid_mid : 4,
+    mid_large : 5,
+    large_small : 6,
+    large_mid : 7,
+    large_large : 8
+};
+
+var c_oAscTypeSelectElement = {
 	Paragraph  : 0,
 	Table      : 1,
 	Image      : 2,

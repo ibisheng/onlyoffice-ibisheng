@@ -1114,7 +1114,7 @@ CShape.prototype =
         return this.brush;
     },
 	
-	 getStroke: function()
+	getStroke: function()
     {
         if(!isRealObject(this.pen))
             return null;
@@ -1436,7 +1436,15 @@ CShape.prototype =
         }
     },
 
-
+	Get_Props: function(OtherProps)
+    {
+		var Props = new Object();
+        Props.Width  = this.extX;
+        Props.Height = this.extY;
+		
+		return Props;
+	},
+	
     Undo: function(type, data)
     {
         switch (type)

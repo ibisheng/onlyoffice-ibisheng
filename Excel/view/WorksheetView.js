@@ -5943,8 +5943,11 @@
 
 				if ( index < 0 )
 					this.drawDepCells();
-				else
+				else {
+					// отправляем евент для получения свойств картинки, шейпа или группы
 					this._trigger("setFocusDrawingObject", true);
+					this._trigger("selectionChanged", this.getSelectionInfo());
+				}
 					
 				this.cellCommentator.drawCommentCells(false);
 				
