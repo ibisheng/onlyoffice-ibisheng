@@ -21,13 +21,13 @@
     }
 }
 
-var USER_AGENT_SAFARI_MACOS = (navigator.userAgent.toLowerCase().indexOf('safari') > -1 && navigator.userAgent.toLowerCase().indexOf('mac') > -1) ? true : false;
+window.USER_AGENT_SAFARI_MACOS = (navigator.userAgent.toLowerCase().indexOf('safari') > -1 && navigator.userAgent.toLowerCase().indexOf('mac') > -1) ? true : false;
 
 var COPY_ELEMENT_ID = "SelectId";
 var PASTE_ELEMENT_ID = "wrd_pastebin";
 var ELEMENT_DISPAY_STYLE = "none";
 
-if (USER_AGENT_SAFARI_MACOS)
+if (window.USER_AGENT_SAFARI_MACOS)
 {
     var PASTE_ELEMENT_ID = "SelectId";
     var ELEMENT_DISPAY_STYLE = "block";
@@ -1591,7 +1591,7 @@ function Editor_Paste_Button(api)
         //rangeToSelect.execCommand("paste", false);
         document.execCommand("paste");
 
-        if (!USER_AGENT_SAFARI_MACOS)
+        if (!window.USER_AGENT_SAFARI_MACOS)
             pastebin.blur();
 
         pastebin.style.display  = ELEMENT_DISPAY_STYLE;
