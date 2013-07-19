@@ -2052,7 +2052,10 @@
 						var image = drawings[isSelectedImages[j]];
 						var cloneImg = worksheet.objectRender.cloneDrawingObject(image);
 						var curImage = new Image();
-						curImage.src = cloneImg.image.src;
+						var url = cloneImg.image.src;
+						if(cloneImg.graphicObject && cloneImg.graphicObject.isImage())
+							url = cloneImg.graphicObject.getImageUrl()
+						curImage.src = url;
 						curImage.width = cloneImg.getWidthFromTo();
 						curImage.height = cloneImg.getHeightFromTo();
 						curImage.name = image.guid;
@@ -2074,6 +2077,7 @@
 							t.lStorage[nLoc].image = curImage;
 							t.lStorage[nLoc].fromCol = cloneImg.from.col;
 							t.lStorage[nLoc].fromRow = cloneImg.from.row;
+							nLoc++;
 							isImage = true;
 							
 						}
@@ -2482,7 +2486,7 @@
 				if(images)
 				{
 					for (var i = 0; i < images.length; i++) {
-						if (images[i].flags.selected == true)
+						if ((images[i].graphicObject && images[i].graphicObject.selected == true) || (images[i].flags.selected == true))
 						{
 							arrImages[n] = i;
 							n++;
