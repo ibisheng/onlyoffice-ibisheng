@@ -4310,8 +4310,8 @@ function Editor_CopyPaste_Create(api)
     ElemToSelect.style.position = "absolute";
 
     ElemToSelect.style.left = '0px';
-    ElemToSelect.style.top = '100px';
-    ElemToSelect.style.width = '1000px';
+    ElemToSelect.style.top = '-100px';
+    ElemToSelect.style.width = '10000px';
     ElemToSelect.style.height = '100px';
     ElemToSelect.style.overflow = 'hidden';
     ElemToSelect.style.zIndex = -1000;
@@ -4340,7 +4340,7 @@ function Editor_CopyPaste_Create(api)
         Body_Paste(api,e);
     };
 
-    ElemToSelect.onbeforecopy = function(e){
+    ElemToSelect["onbeforecopy"] = function(e){
         Editor_Copy(api,false);
     };
 
