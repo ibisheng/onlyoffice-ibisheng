@@ -357,14 +357,6 @@ CNaryOperator.prototype.recalculateSize = function()
 
     this.size = {height: height, width: width, center: center};
 }
-CNaryOperator.prototype.setComposition = function()
-{
-
-}
-CNaryOperator.prototype.setReduct = function()
-{
-
-}
 CNaryOperator.prototype.Resize = function()
 {
     this.recalculateSize();

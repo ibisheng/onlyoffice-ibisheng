@@ -52,8 +52,9 @@ CMathBase.prototype =
             {
                 this.elements[i][j] = new CMathContent();
                 this.elements[i][j].relate(this);
-                this.elements[i][j].setComposition(this.Composition);
                 this.elements[i][j].setReduct(this.reduct);
+                this.elements[i][j].setComposition(this.Composition);
+
             }
         }
     },
@@ -129,8 +130,11 @@ CMathBase.prototype =
                 {
                     this.elements[i][j] = arguments[j + i*this.nCol];
                     this.elements[i][j].relate(this);
-                    this.elements[i][j].setComposition(this.Composition);
-                    this.elements[i][j].setReduct(this.reduct);
+                    if(! this.elements[i][j].IsJustDraw() )
+                    {
+                        this.elements[i][j].setComposition(this.Composition);
+                        this.elements[i][j].setReduct(this.reduct);
+                    }
                     this.elements[i][j].bMObjs = true;
                 }
             }

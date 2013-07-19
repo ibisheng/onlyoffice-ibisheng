@@ -205,6 +205,9 @@ CMathContent.prototype =
             case 8:
                 mathElem = new CNary();
                 break;
+            case 9:
+                mathElem = new CDelimiter();
+                break;
             case 30:
                 mathElem = new CMathBase();
                 break;
@@ -753,7 +756,71 @@ CMathContent.prototype =
                 var base = sigma.getBase();
                 base.fillPlaceholders();
                 break;
-            
+            case 81:
+                break;
+            case 82:
+                break;
+            case 83:
+                var delim = this.createMComponent(9);
+                delim.init(0, 4, 0, 1);
+                delim.fillPlaceholders();
+                break;
+            case 84:
+                var delim = this.createMComponent(9);
+                delim.init(2, 4, 0, 1);
+                delim.fillPlaceholders();
+                break;
+            case 85:
+                var delim = this.createMComponent(9);
+                delim.init(1, 4, 0, 1);
+                delim.fillPlaceholders();
+                break;
+            case 86:
+                var delim = this.createMComponent(9);
+                delim.init(3, 4, 0, 1);
+                delim.fillPlaceholders();
+                break;
+            case 87:
+                var delim = this.createMComponent(9);
+                delim.init(4, 4, 0, 1);
+                delim.fillPlaceholders();
+                break;
+            case 88:
+                var delim = this.createMComponent(9);
+                delim.init(4, 4, 2, 3);
+                delim.fillPlaceholders();
+                break;
+            case 89:
+                var delim = this.createMComponent(9);
+                delim.init(5, 4, 0, 1);
+                delim.fillPlaceholders();
+                break;
+            case 90:
+                var delim = this.createMComponent(9);
+                delim.init(6, 4, 0, 1);
+                delim.fillPlaceholders();
+                break;
+            case 91:
+                var delim = this.createMComponent(9);
+                delim.init(2, 4, 0, 0);
+                delim.fillPlaceholders();
+                break;
+            case 92:
+                var delim = this.createMComponent(9);
+                delim.init(2, 4, 1, 1);
+                delim.fillPlaceholders();
+                break;
+            case 93:
+                var delim = this.createMComponent(9);
+                delim.init(2, 4, 1, 0);
+                delim.fillPlaceholders();
+                break;
+            case 94:
+                var delim = this.createMComponent(9);
+                delim.init(7, 4, 0, 1);
+                delim.fillPlaceholders();
+                break;
+
             /*case 24:
                 var integr = this.createMComponent(8);
                 integr.init(0,0,1);

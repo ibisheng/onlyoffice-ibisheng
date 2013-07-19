@@ -10,10 +10,6 @@ function CGlyphOperator()
     this.penW = 1; // px
 
 }
-CGlyphOperator.prototype.init = function(params)
-{
-    this.params = params;
-}
 CGlyphOperator.prototype.setLocation = function(loc, turn)
 {
     // location
@@ -36,14 +32,14 @@ CGlyphOperator.prototype.setLocation = function(loc, turn)
 CGlyphOperator.prototype.setPosition = function(pos)
 {
     this.pos = pos;
-    //this.pos = {x: pos.x, y: pos.y - this.size.center};
+    //this.pos = {x: pos.x, y : pos.y - this.size.center};
 }
 CGlyphOperator.prototype.recalculateSize = function(measure)
 {
     var sizeGlyph = this.calcSize(measure);
     var width, height, center;
 
-    var betta = this.params.font.FontSize/36;
+    var betta = this.Parent.getTxtPrp().FontSize/36;
     var bHor = this.loc == 0 || this.loc  == 1;
 
     if(bHor)
@@ -279,13 +275,17 @@ CGlyphOperator.prototype.draw = function()
     MathControl.pGraph.SetIntegerGrid(intGrid);
 
 }
-CGlyphOperator.prototype.relate = function()
-{
-
-}
 CGlyphOperator.prototype.IsJustDraw = function()
 {
     return true;
+}
+CGlyphOperator.prototype.relate = function(parent)
+{
+    this.Parent = parent;
+}
+CGlyphOperator.prototype.Resize = function()
+{
+    this.recalculateSize();
 }
 
 function COperator(loc, turn)
@@ -364,7 +364,7 @@ COperator.prototype.getCenter = function()
     return center;
 }
 
-function CDelimiter(type, loc, turn1, turn2)
+function CDelimiter()
 {
     // location
 
@@ -375,58 +375,154 @@ function CDelimiter(type, loc, turn1, turn2)
     // 4 - left/right
     // 5 - up/down
 
-    this.type = type;
-    this.loc = loc;
+    this.type = null;
+    this.loc = null;
     this.base = null;
 
-    var countRow, countCol;
+    CMathBase.call(this);
+}
+extend(CDelimiter, CMathBase);
+CDelimiter.prototype.init = function(type, loc, turn1, turn2)
+{
+    this.type = type;
+    this.loc = loc;
+
+    var nRow, nCol,
+        tturn1, tturn2;
 
     if(loc== 0)
     {
-        countRow = 2;
-        countCol = 1;
-        this.turn1 = turn1;
+        nRow = 2;
+        nCol = 1;
+        tturn1 = turn1;
     }
     else if(loc == 1)
     {
-        countRow = 2;
-        countCol = 1;
-        this.turn2 = turn1;
+        nRow = 2;
+        nCol = 1;
+        tturn2 = turn1;
     }
     else if(loc == 2)
     {
-        countRow = 1;
-        countCol = 2;
+        nRow = 1;
+        nCol = 2;
 
-        this.turn1 = turn1;
+        tturn1 = turn1;
     }
     else if(loc == 3)
     {
-        countRow = 1;
-        countCol = 2;
-        this.turn2 = turn1;
+        nRow = 1;
+        nCol = 2;
+        tturn2 = turn1;
     }
     else if(loc == 4)
     {
-        countRow = 1;
-        countCol = 3;
+        nRow = 1;
+        nCol = 3;
 
-        this.turn1 = turn1;
-        this.turn2 = turn2;
+        tturn1 = turn1;
+        tturn2 = turn2;
     }
     else
     {
-        countRow = 3;
-        countCol = 1;
+        nRow = 3;
+        nCol = 1;
 
-        this.turn1 = turn1;
-        this.turn2 = turn2;
+        tturn1 = turn1;
+        tturn2 = turn2;
+    }
+    
+    this.setDimension(nRow, nCol);
+
+    var operator1, operator2,
+        loc1, loc2;
+
+    if(this.loc == 0)
+        loc1 = 0;
+    else if(this.loc == 1)
+        loc2 = 1;
+    else if(this.loc == 2)
+        loc1 = 2;
+    else if(this.loc == 3)
+        loc2 = 3;
+    else if(this.loc == 4)
+    {
+        loc1 = 2;
+        loc2 = 3;
+    }
+    else
+    {
+        loc1 = 0;
+        loc2 = 1;
     }
 
-    CMathBase.call(this, countRow, countCol);
+
+    if(this.type == 0)
+    {
+        operator1 = new COperatorParenthesis();
+        operator2 = new COperatorParenthesis();
+    }
+    else if(this.type == 1)
+    {
+        operator1 = new COperatorBracket();
+        operator2 = new COperatorBracket();
+    }
+    else if(this.type == 2)
+    {
+        operator1 = new CSquareBracket();
+        operator2 = new CSquareBracket();
+    }
+    else if(this.type == 3)
+    {
+        operator1 = new COperatorAngleBracket();
+        operator2 = new COperatorAngleBracket();
+    }
+    else if(this.type == 4)
+    {
+        operator1 = new CHalfSquareBracket();
+        operator2 = new CHalfSquareBracket();
+    }
+    else if(this.type == 5)
+    {
+        operator1 = new COperatorLine();
+        operator2 = new COperatorLine();
+    }
+    else if(this.type == 6)
+    {
+        operator1 = new COperatorDoubleLine();
+        operator2 = new COperatorDoubleLine();
+    }
+    else
+    {
+        operator1 = new CWhiteSquareBracket();
+        operator2 = new CWhiteSquareBracket();
+    }
+
+    operator1.setLocation(loc1, tturn1);
+    operator1.relate(this);
+    operator2.setLocation(loc2, tturn2);
+    operator2.relate(this);
+
+    var argument = new CMathContent();
+    argument.relate(this);
+
+    this.base = argument;
+
+    if(this.loc == 0 || this.loc == 2)
+    {
+        this.addMCToContent(operator1, argument);
+    }
+    else if(this.loc == 1  || this.loc == 3)
+    {
+        this.addMCToContent(argument, operator2);
+    }
+    else
+    {
+        this.addMCToContent(operator1, argument, operator2);
+    }
+
 }
-extend(CDelimiter, CMathBase);
-CDelimiter.prototype.setContent = function(arg)
+CDelimiter.prototype.old_setContent = function(arg)
 {
     var operator1, operator2,
         loc1, loc2;
@@ -624,6 +720,26 @@ CDelimiter.prototype.getBase = function()
 {
     return this.base;
 }
+CDelimiter.prototype.setPosition = function(pos)
+{
+    var w = 0,
+        h = 0;
+    this.pos = {x: pos.x, y: pos.y - this.size.center};
+
+    var maxWH = this.getWidthsHeights();
+    var Widths = maxWH.widths;
+    var Heights = maxWH.heights;
+
+    for(var i = 0; i < this.nRow; i++)
+    {
+        for(var j = 0; j < this.nCol; j++)
+        {
+            this.elements[i][j].setPosition({x: this.pos.x + w, y: this.pos.y + h});
+            w += Widths[j];
+        }
+        h += Heights[i];
+    }
+}
 
 function COperatorBracket()
 {
@@ -632,7 +748,7 @@ function COperatorBracket()
 extend(COperatorBracket, CGlyphOperator);
 COperatorBracket.prototype.calcSize = function( measure )
 {
-    var betta = this.params.font.FontSize/36;
+    var betta = this.Parent.getTxtPrp().FontSize/36;
 
     // перевернутая скобка
     var minBoxH = 4.917529296874999 *betta, //width of 0x28
@@ -719,7 +835,7 @@ COperatorBracket.prototype.calcCoord = function(measure)
     //TODO
     // X[1] > X[52]
 
-    var textScale = this.params.font.FontSize/1000; // 1000 pt
+    var textScale = this.Parent.getTxtPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент используется для того, чтобы перевести координаты в миллиметры
     
     var augm = measure/((X[52] + (X[0] - X[1])/2 + X[1] - X[52])*alpha*2);
@@ -1149,7 +1265,7 @@ function COperatorParenthesis()
 extend(COperatorParenthesis, CGlyphOperator);
 COperatorParenthesis.prototype.calcSize = function(measure)
 {
-    var betta = this.params.font.FontSize/36;
+    var betta = this.Parent.getTxtPrp().FontSize/36;
     
     var maxBoxH =   9.63041992187 *betta, //9.63 width of 0x239D
         minBoxH =   5.27099609375 *betta, //width of 0x28
@@ -1181,7 +1297,7 @@ COperatorParenthesis.prototype.calcCoord = function(measure)
     X[8] = 24398; Y[8] = 26227;
     X[9] = 39470; Y[9] = 26227;
 
-    var textScale = this.params.font.FontSize/1000; // 1000 pt
+    var textScale = this.Parent.getTxtPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент используется для того, чтобы перевести координаты в миллиметры
 
     var aug = measure/(X[9]*alpha)/2; //Y[9]*alpha - высота скобки
@@ -1483,7 +1599,7 @@ COperatorAngleBracket.prototype.calcSize = function(measure)
 {
     //скобка перевернутая
 
-    var betta = this.params.font.FontSize/36;
+    var betta = this.Parent.getTxtPrp().FontSize/36;
     var widthBr = 11.994444444444444*betta;
 
     if( measure/widthBr > 3.768 )
@@ -1507,7 +1623,7 @@ COperatorAngleBracket.prototype.calcCoord = function(measure)
     X[6] = 76439; Y[6] = 21036;
     X[7] = 38990; Y[7] = 7665;
 
-    var textScale = this.params.font.FontSize/1000; // 1000 pt
+    var textScale = this.Parent.getTxtPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент используется для того, чтобы перевести координаты в миллиметры
 
     var augm = measure/(X[5]*alpha);
@@ -1603,7 +1719,7 @@ CSquareBracket.prototype.calcCoord = function(measure)
     X[7] = 76224; Y[7] = 6912;
     X[8] = 3200;  Y[8] = 6912;
 
-    var textScale = this.params.font.FontSize/1000; // 1000 pt
+    var textScale = this.Parent.getTxtPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент используется для того, чтобы перевести координаты в миллиметры
 
     var lng = measure/alpha - X[4] - 2*X[0];
@@ -1645,7 +1761,7 @@ CSquareBracket.prototype.drawPath = function(XX, YY)
 }
 CSquareBracket.prototype.calcSize = function()
 {
-    var betta = this.params.font.FontSize/36;
+    var betta = this.Parent.getTxtPrp().FontSize/36;
     
     var height = 4.446240234375*betta;
     //var width = 12.0*this.betta;
@@ -1672,7 +1788,7 @@ CHalfSquareBracket.prototype.calcCoord = function(measure)
     X[5] = 77522; Y[5] = 0;
     X[6] = 0; Y[6] = 0;
 
-    var textScale = this.params.font.FontSize/1000; // 1000 pt
+    var textScale = this.Parent.getTxtPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент используется для того, чтобы перевести координаты в миллиметры
 
     var w1 = X[4],
@@ -1703,7 +1819,7 @@ CHalfSquareBracket.prototype.calcCoord = function(measure)
 }
 CHalfSquareBracket.prototype.calcSize = function()
 {
-    var betta = this.params.font.FontSize/36;
+    var betta = this.Parent.getTxtPrp().FontSize/36;
 
     var height = 4.446240234375*betta;
     var width = 11.99444444444*betta;
@@ -1798,7 +1914,7 @@ COperatorLine.prototype.setContent = function()
 }
 COperatorLine.prototype.calcSize = function()
 {
-    var betta = this.params.font.FontSize/36;
+    var betta = this.Parent.getTxtPrp().FontSize/36;
 
     var height = 4.018359374999999*betta;
     var width = 11.99444444444*betta;
@@ -1816,7 +1932,7 @@ COperatorLine.prototype.calcCoord = function(measure)
     X[3] = 77504; Y[3] = 0;
     X[4] = 0;     Y[4] = 0;
 
-    var textScale = this.params.font.FontSize/1000; // 1000 pt
+    var textScale = this.Parent.getTxtPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент используется для того, чтобы перевести координаты в миллиметры
 
     var XX = new Array(),
@@ -1861,7 +1977,7 @@ function CWhiteSquareBracket()
 extend(CWhiteSquareBracket, CGlyphOperator);
 CWhiteSquareBracket.prototype.calcSize = function()
 {
-    var betta = this.params.font.FontSize/36;
+    var betta = this.Parent.getTxtPrp().FontSize/36;
 
     var height = 5.5872558593749995*betta;
     var width = 11.99444444444*betta;
@@ -1904,7 +2020,7 @@ CWhiteSquareBracket.prototype.calcCoord = function(measure)
     X[12] = 74304; Y[12] = 4600;
     X[13] = 74304; Y[13] = 12700;
 
-    var textScale = this.params.font.FontSize/1000; // 1000 pt
+    var textScale = this.Parent.getTxtPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент используется для того, чтобы перевести координаты в миллиметры
 
     var XX = new Array(),
@@ -1960,7 +2076,7 @@ function COperatorDoubleLine()
 extend(COperatorDoubleLine, CGlyphOperator);
 COperatorDoubleLine.prototype.calcSize = function()
 {
-    var betta = this.params.font.FontSize/36;
+    var betta = this.Parent.getTxtPrp().FontSize/36;
 
     var height = 6.715869140624999*betta,
         width = 11.99444444444*betta;
@@ -1986,7 +2102,7 @@ COperatorDoubleLine.prototype.calcCoord = function(measure)
     X[8] = 77504; Y[8] = 18112;
     X[9] = 0;     Y[9] = 18112;
 
-    var textScale = this.params.font.FontSize/1000; // 1000 pt
+    var textScale = this.Parent.getTxtPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент используется для того, чтобы перевести координаты в миллиметры
 
     var XX = new Array(),
