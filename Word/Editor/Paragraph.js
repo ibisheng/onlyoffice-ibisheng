@@ -2726,8 +2726,8 @@ Paragraph.prototype =
         switch (ParaPr.Jc)
         {
             case align_Left   : X = Range.X; break;
-            case align_Right  : X = Range.X +  RangeWidth - Range.W; break;
-            case align_Center : X = Range.X + (RangeWidth - Range.W) / 2; break
+            case align_Right  : X = Math.max(Range.X +  RangeWidth - Range.W, Range.X ); break;
+            case align_Center : X = Math.max(Range.X + (RangeWidth - Range.W) / 2, Range.X); break
             case align_Justify:
             {
                 X = Range.X;
@@ -2823,8 +2823,8 @@ Paragraph.prototype =
                     switch (ParaPr.Jc)
                     {
                         case align_Left   : X = Range.X; break;
-                        case align_Right  : X = Range.X +  RangeWidth - Range.W; break;
-                        case align_Center : X = Range.X + (RangeWidth - Range.W) / 2; break
+                        case align_Right  : X = Math.max(Range.X +  RangeWidth - Range.W, Range.X); break;
+                        case align_Center : X = Math.max(Range.X + (RangeWidth - Range.W) / 2, Range.X); break
                         case align_Justify:
                         {
                             X = Range.X;
@@ -2904,8 +2904,8 @@ Paragraph.prototype =
                     switch (ParaPr.Jc)
                     {
                         case align_Left   : X = Range.X; break;
-                        case align_Right  : X = Range.X +  RangeWidth - Range.W; break;
-                        case align_Center : X = Range.X + (RangeWidth - Range.W) / 2; break
+                        case align_Right  : X = Math.max(Range.X +  RangeWidth - Range.W, Range.X); break;
+                        case align_Center : X = Math.max(Range.X + (RangeWidth - Range.W) / 2, Range.X); break
                         case align_Justify:
                         {
                             X = Range.X;
