@@ -209,6 +209,11 @@ Paragraph.prototype =
         return this.Pages[PageIndex].Bounds;
     },
 
+    Get_EmptyHeight : function()
+    {
+
+    },
+
     Reset : function (X,Y, XLimit, YLimit, PageNum)
     {
         this.X = X;
@@ -4623,6 +4628,7 @@ Paragraph.prototype =
                 }
 
                 // Рисуем подчеркивание
+                aUnderline.Correct_w_ForUnderline();
                 Element = aUnderline.Get_Next();
                 while ( null != Element )
                 {
@@ -12894,5 +12900,46 @@ CParaDrawingRangeLines.prototype =
         this.Elements.length = Count;
 
         return Element;
+    },
+
+    Correct_w_ForUnderline : function()
+    {
+        var Count = this.Elements.length;
+        if ( Count <= 0 )
+            return;
+
+        var CurElements = new Array();
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            var Element = this.Elements[Index];
+            var CurCount = CurElements.length;
+
+            if ( 0 === CurCount )
+                CurElements.push( Element );
+            else
+            {
+                var PrevEl = CurElements[CurCount - 1];
+
+                if ( Math.abs( PrevEl.y0 - Element.y0 ) < 0.001 && Math.abs( PrevEl.y1 - Element.y1 ) < 0.001 && Math.abs( PrevEl.x1 - Element.x0 ) < 0.001 )
+                {
+                    // Сравниваем толщины линий
+                    if ( Element.w > PrevEl.w )
+                    {
+                        for ( var Index2 = 0; Index2 < CurCount; Index2++ )
+                            CurElements[Index2].w = Element.w;
+                    }
+                    else
+                        Element.w = PrevEl.w;
+                    
+                    CurElements.push( Element );
+                }
+                else
+                {
+                    CurElements.length = 0;
+                    CurElements.push( Element );
+                }
+            }
+        }
     }
+
 };
