@@ -3943,10 +3943,10 @@ Paragraph.prototype =
                             if ( undefined === pGraphics.RENDERER_PDF_FLAG )
                             {
                                 var CommentId = Item.Id;
-                                var CommentY  = this.Pages[PNum].Y + this.Lines[CurLine].Top;
+                                var CommentY  = this.Pages[CurPage].Y + this.Lines[CurLine].Top;
                                 var CommentH  = this.Lines[CurLine].Bottom - this.Lines[CurLine].Top;
 
-                                DocumentComments.Set_StartInfo( CommentId, this.Get_StartPage_Absolute() + PNum, X, CommentY, CommentH, this.Id );
+                                DocumentComments.Set_StartInfo( CommentId, this.Get_StartPage_Absolute() + CurPage, X, CommentY, CommentH, this.Id );
                                 DocumentComments.Add_CurrentDraw( CommentId );
                                 CommentsFlag = DocumentComments.Check_CurrentDraw();
                             }
@@ -3958,10 +3958,10 @@ Paragraph.prototype =
                             if ( undefined === pGraphics.RENDERER_PDF_FLAG )
                             {
                                 var CommentId = Item.Id;
-                                var CommentY  = this.Pages[PNum].Y + this.Lines[CurLine].Top;
+                                var CommentY  = this.Pages[CurPage].Y + this.Lines[CurLine].Top;
                                 var CommentH  = this.Lines[CurLine].Bottom - this.Lines[CurLine].Top;
 
-                                DocumentComments.Set_EndInfo( CommentId, this.Get_StartPage_Absolute() + PNum, X, CommentY, CommentH, this.Id );
+                                DocumentComments.Set_EndInfo( CommentId, this.Get_StartPage_Absolute() + CurPage, X, CommentY, CommentH, this.Id );
                                 DocumentComments.Remove_CurrentDraw( CommentId );
                                 CommentsFlag = DocumentComments.Check_CurrentDraw();
                             }
@@ -12309,6 +12309,45 @@ Paragraph.prototype =
         }
     },
 
+    Add_Comment2 : function(Comment, ObjectId)
+    {
+        var Pos = -1;
+        var Count = this.Content.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            var Item = this.Content[Index];
+            if ( para_Drawing === Item.Type )
+            {
+                Pos = Index;
+                break;
+            }
+        }
+
+        if ( -1 != Pos )
+        {
+            var StartPos = Pos;
+            var EndPos   = Pos + 1;
+
+            var PagePos = this.Internal_GetXYByContentPos( EndPos );
+            var Line    = this.Lines[PagePos.Internal.Line];
+            var LineA   = Line.Metrics.Ascent;
+            var LineH   = Line.Bottom - Line.Top;
+            Comment.Set_EndInfo( PagePos.PageNum, PagePos.X, PagePos.Y - LineA, LineH, this.Get_Id() );
+
+            var Item = new ParaCommentEnd(Comment.Get_Id());
+            this.Internal_Content_Add( EndPos, Item );
+
+            var PagePos = this.Internal_GetXYByContentPos( StartPos );
+            var Line    = this.Lines[PagePos.Internal.Line];
+            var LineA   = Line.Metrics.Ascent;
+            var LineH   = Line.Bottom - Line.Top;
+            Comment.Set_StartInfo( PagePos.PageNum, PagePos.X, PagePos.Y - LineA, LineH, this.Get_Id() );
+
+            var Item = new ParaCommentStart(Comment.Get_Id());
+            this.Internal_Content_Add( StartPos, Item );
+        }
+    },
+
     CanAdd_Comment : function()
     {
         if ( true === this.Selection.Use && true != this.Selection_IsEmpty() )
@@ -12930,7 +12969,7 @@ CParaDrawingRangeLines.prototype =
                     }
                     else
                         Element.w = PrevEl.w;
-                    
+
                     CurElements.push( Element );
                 }
                 else

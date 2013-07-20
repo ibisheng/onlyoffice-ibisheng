@@ -7693,7 +7693,10 @@ CDocumentContent.prototype =
         {
             if ( docpostype_DrawingObjects === this.CurPos.Type )
             {
-                return this.LogicDocument.DrawingObjects.canAddComment();
+                if ( true != this.LogicDocument.DrawingObjects.isSelectedText() )
+                    return true;
+                else
+                    return this.LogicDocument.DrawingObjects.canAddComment();
             }
             else //if ( docpostype_Content === this.CurPos.Type )
             {

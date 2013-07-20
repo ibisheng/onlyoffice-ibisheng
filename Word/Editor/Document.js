@@ -10119,7 +10119,19 @@ CDocument.prototype =
             }
             else if ( docpostype_DrawingObjects === this.CurPos.Type )
             {
-                this.DrawingObjects.addComment( Comment );
+                if ( true != this.DrawingObjects.isSelectedText() )
+                {
+                    var ParaDrawing = this.DrawingObjects.getMajorParaDrawing();
+                    if ( null != ParaDrawing )
+                    {
+                        var Paragraph = ParaDrawing.Parent;
+                        Paragraph.Add_Comment2(Comment, ParaDrawing.Get_Id());
+                    }
+                }
+                else
+                {
+                    this.DrawingObjects.addComment( Comment );
+                }
             }
             else // if ( docpostype_Content === this.CurPos.Type )
             {
@@ -10182,7 +10194,12 @@ CDocument.prototype =
         if ( docpostype_HdrFtr === this.CurPos.Type )
             return this.HdrFtr.CanAdd_Comment();
         else if ( docpostype_DrawingObjects == this.CurPos.Type )
-            return this.DrawingObjects.canAddComment();
+        {
+            if ( true != this.DrawingObjects.isSelectedText() )
+                return true;
+            else
+                return this.DrawingObjects.canAddComment();
+        }
         else //if ( docpostype_Content === this.CurPos.Type )
         {
             switch( this.Selection.Flag )
