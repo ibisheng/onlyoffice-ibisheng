@@ -2118,7 +2118,7 @@ c_oSerWorkbookPrTypes$Date1904:SA
 JSCompiler_StaticMethods_setBorderSrc:gN
 t1_done_loader:At
 Load_SBit_Const_Metrics:Fl
-_files$$inline_1156:T
+_files$$inline_1156:S
 WriteObjectLong:rQ
 c_oSer_DrawingExtType$Cx:qC
 c_oSerHyperlinkTypes$Hyperlink:GB
@@ -2837,7 +2837,7 @@ nSldLtTChartAndTx:SR
 arcTo:vU
 L 21:R
 L 20:O
-L 23:S
+L 23:T
 L 22:aa
 L 25:P
 L 24:na
