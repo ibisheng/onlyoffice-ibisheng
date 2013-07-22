@@ -1236,7 +1236,7 @@ Paragraph.prototype =
 
                             // Если слово только началось, и до него на строке ничего не было, и в строке нет разрывов, тогда не надо проверять убирается ли оно на строке.
                             var LetterLen = Item.Width;
-                            if ( !bFirstItemOnLine || 0 != RangesCount )
+                            if ( !bFirstItemOnLine || false === this.Internal_Check_Ranges(CurLine, CurRange) )
                             {
                                 if ( X + nSpaceLen + LetterLen > XEnd )
                                 {
@@ -1282,25 +1282,22 @@ Paragraph.prototype =
                                     // 3) Если у нас строка с вырезом и вырез последний, тогда ставим перенос
                                     //    строки в начале слова.
 
-                                    if ( 0 == RangesCount )
+                                    if ( false === this.Internal_Check_Ranges(CurLine, CurRange)  )
+                                    {
+                                        Pos = nWordStartPos - 1;
+
+                                        if ( RangesCount != CurRange )
+                                            bNewRange = true;
+                                        else
+                                            bNewLine = true;
+                                    }
+                                    else
                                     {
                                         bEmptyLine  = false;
 
                                         X += nWordLen;
 
                                         Pos--;
-
-                                        bNewLine = true;
-                                    }
-                                    else if ( RangesCount != CurRange )
-                                    {
-                                        Pos = nWordStartPos - 1;
-
-                                        bNewRange = true;
-                                    }
-                                    else
-                                    {
-                                        Pos = nWordStartPos - 1;
 
                                         bNewLine = true;
                                     }
@@ -1434,7 +1431,7 @@ Paragraph.prototype =
                                 nWordLen     = 0;
                             }
 
-                            if ( X + nSpaceLen + Item.Width > XEnd && ( false === bFirstItemOnLine || RangesCount > 0 ) )
+                            if ( X + nSpaceLen + Item.Width > XEnd && ( false === bFirstItemOnLine || false === this.Internal_Check_Ranges( CurLine, CurRange ) ) )
                             {
                                 if ( RangesCount == CurRange )
                                 {
@@ -3351,6 +3348,37 @@ Paragraph.prototype =
             return false;
 
         return true;
+    },
+
+    Internal_Check_Ranges : function(CurLine, CurRange)
+    {
+        var Ranges = this.Lines[CurLine].Ranges;
+        var RangesCount = Ranges.length;
+
+        if ( RangesCount <= 1 )
+            return true;
+        else if ( 2 === RangesCount )
+        {
+            var Range0 = Ranges[0];
+            var Range1 = Ranges[1];
+
+            if ( Math.abs( Range0.X - Range0.XEnd ) < 0.001 && 1 === CurRange )
+                return true;
+            else if ( Math.abs( Range1.X - Range1.XEnd ) < 0.001 && 0 === CurRange )
+                return true;
+            else
+                return false
+        }
+        else if ( 3 === RangesCount && 1 === CurRange )
+        {
+            var Range0 = Ranges[0];
+            var Range2 = Ranges[2];
+
+            if ( Math.abs( Range0.X - Range0.XEnd ) < 0.001 && Math.abs( Range2.X - Range2.XEnd ) )
+                return true;
+        }
+        else
+            return false;
     },
 
     Internal_Get_NumberingTextPr : function()
