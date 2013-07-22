@@ -8711,7 +8711,7 @@
 					.replace(/(~)?\?/g, function($0, $1){
 						return $1 ? $0 : '[\\w\\W]{1,1}';
 					})
-					.replace(/\~/g, "\\");
+                    .replace(/(~\*)/g,"\\*").replace(/(~\?)/g, "\\?");
 
 				valueForSearching = new RegExp(valueForSearching, findFlags);
 				// Попробуем сначана найти
