@@ -116,7 +116,10 @@ CMathBase.prototype =
         this.reduct = this.reduct*coeff;
         for(var i=0; i < this.nRow; i++)
             for(var j = 0; j < this.nCol; j++)
-                this.elements[i][j].setReduct(coeff);
+            {
+                if(! this.elements[i][j].IsJustDraw() )
+                    this.elements[i][j].setReduct(coeff);
+            }
     },
     addMCToContent: function()
     {

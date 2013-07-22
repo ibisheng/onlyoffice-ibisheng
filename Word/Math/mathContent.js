@@ -208,6 +208,9 @@ CMathContent.prototype =
             case 9:
                 mathElem = new CDelimiter();
                 break;
+            case 10:
+                mathElem = new CSeparatorDelimiter();
+                break;
             case 30:
                 mathElem = new CMathBase();
                 break;
@@ -736,8 +739,9 @@ CMathContent.prototype =
                 sigma.init(6,0,2);
                 var iter = sigma.getLowerIterator();
                 iter.addTxt("k");
-                var base = sigma.getBase();
-                var fract = base.createMComponent(0);
+                var delim = sigma.getBase().createMComponent(9);
+                delim.init(0, 4, 0, 1);
+                var fract = delim.getBase().createMComponent(0);
                 fract.init();
                 fract.hideBar(true);
                 var num = fract.getNumerator();
@@ -759,6 +763,39 @@ CMathContent.prototype =
             case 81:
                 break;
             case 82:
+                var union = this.createMComponent(8);
+                union.init(9,0,3);
+
+                var iterUp = union.getUpperIterator();
+                iterUp.addTxt("m");
+                var iterLow = union.getLowerIterator();
+                iterLow.addTxt("n=1");
+
+                var base = union.getBase();
+                var delim = base.createMComponent(9);
+                delim.init(0, 4, 0, 1);
+                var base2 = delim.getBase();
+
+                var degrX = base2.createMComponent(3);
+                degrX.init();
+                degrX.setIndex(-1);
+
+                var baseX = degrX.getBase();
+                baseX.addTxt("X");
+                var iterX = degrX.getIterator();
+                iterX.addTxt("n");
+
+                base2.addTxt("∩");
+
+                var degrY = base2.createMComponent(3);
+                degrY.init();
+                degrY.setIndex(-1);
+
+                var baseY = degrY.getBase();
+                baseY.addTxt("Y");
+                var iterY = degrY.getIterator();
+                iterY.addTxt("n");
+
                 break;
             case 83:
                 var delim = this.createMComponent(9);
@@ -820,17 +857,160 @@ CMathContent.prototype =
                 delim.init(7, 4, 0, 1);
                 delim.fillPlaceholders();
                 break;
-
-            /*case 24:
-                var integr = this.createMComponent(8);
-                integr.init(0,0,1);
-                integr.fillPlaceholders();
+            case 95:
+                var delim = this.createMComponent(10);
+                delim.init(0, 2);
+                delim.fillPlaceholders();
                 break;
-            case 26:
-                var integr = this.createMComponent(8);
-                integr.init(0,0,2);
-                integr.fillPlaceholders();
-                break;*/
+            case 96:
+                var delim = this.createMComponent(10);
+                delim.init(1, 2);
+                delim.fillPlaceholders();
+                break;
+            case 97:
+                var delim = this.createMComponent(10);
+                delim.init(3, 2);
+                delim.fillPlaceholders();
+                break;
+            case 98:
+                var delim = this.createMComponent(10);
+                delim.init(3, 3);
+                delim.fillPlaceholders();
+                break;
+            case 99:
+                var delim = this.createMComponent(9);
+                delim.init(0,2,0);
+                delim.fillPlaceholders();
+                break;
+            case 100:
+                var delim = this.createMComponent(9);
+                delim.init(0,3,1);
+                delim.fillPlaceholders();
+                break;
+            case 101:
+                var delim = this.createMComponent(9);
+                delim.init(2,2,0);
+                delim.fillPlaceholders();
+                break;
+            case 102:
+                var delim = this.createMComponent(9);
+                delim.init(2,3,1);
+                delim.fillPlaceholders();
+                break;
+            case 103:
+                var delim = this.createMComponent(9);
+                delim.init(1,2,0);
+                delim.fillPlaceholders();
+                break;
+            case 104:
+                var delim = this.createMComponent(9);
+                delim.init(1,3,1);
+                delim.fillPlaceholders();
+                break;
+            case 105:
+                var delim = this.createMComponent(9);
+                delim.init(3,2,0);
+                delim.fillPlaceholders();
+                break;
+            case 106:
+                var delim = this.createMComponent(9);
+                delim.init(3,3,1);
+                delim.fillPlaceholders();
+                break;
+            case 107:
+                var delim = this.createMComponent(9);
+                delim.init(4,2,0);
+                delim.fillPlaceholders();
+                break;
+            case 108:
+                var delim = this.createMComponent(9);
+                delim.init(4,3,1);
+                delim.fillPlaceholders();
+                break;
+            case 109:
+                var delim = this.createMComponent(9);
+                delim.init(4,2,2);
+                delim.fillPlaceholders();
+                break;
+            case 110:
+                var delim = this.createMComponent(9);
+                delim.init(4,3,3);
+                delim.fillPlaceholders();
+                break;
+            case 111:
+                var delim = this.createMComponent(9);
+                delim.init(5,2,0);
+                delim.fillPlaceholders();
+                break;
+            case 112:
+                var delim = this.createMComponent(9);
+                delim.init(5,3,1);
+                delim.fillPlaceholders();
+                break;
+            case 113:
+                var delim = this.createMComponent(9);
+                delim.init(6,2,0);
+                delim.fillPlaceholders();
+                break;
+            case 114:
+                var delim = this.createMComponent(9);
+                delim.init(6,3,1);
+                delim.fillPlaceholders();
+                break;
+            case 115:
+                var delim = this.createMComponent(9);
+                delim.init(7,2,0);
+                delim.fillPlaceholders();
+                break;
+            case 116:
+                var delim = this.createMComponent(9);
+                delim.init(7,3,1);
+                delim.fillPlaceholders();
+                break;
+            case 117:
+                break;
+            case 118:
+                break;
+            case 119:
+                var fract = this.createMComponent(0);
+                fract.init();
+                fract.hideBar(true);
+                fract.fillPlaceholders();
+                break;
+            case 120:
+                var delim = this.createMComponent(9);
+                delim.init(0, 4, 0, 1);
+                var fract = delim.getBase().createMComponent(0);
+                fract.init();
+                fract.hideBar(true);
+                fract.fillPlaceholders();
+                break;
+            case 121:
+                break;
+            case 122:
+                var delim = this.createMComponent(9);
+                delim.init(0, 4, 0, 1);
+                var fract = delim.getBase().createMComponent(0);
+                fract.init();
+                fract.hideBar(true);
+                var num = fract.getNumerator();
+                num.addTxt("n");
+
+                var den = fract.getDenominator();
+                den.addTxt("k");
+                break;
+            case 123:
+                var delim = this.createMComponent(9);
+                delim.init(3, 4, 0, 1);
+                var fract = delim.getBase().createMComponent(0);
+                fract.init();
+                fract.hideBar(true);
+                var num = fract.getNumerator();
+                num.addTxt("n");
+
+                var den = fract.getDenominator();
+                den.addTxt("k");
+                break;
         }
     },
     removeAreaSelect: function()

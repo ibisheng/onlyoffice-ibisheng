@@ -384,54 +384,70 @@ function CDelimiter()
 extend(CDelimiter, CMathBase);
 CDelimiter.prototype.init = function(type, loc, turn1, turn2)
 {
-    this.type = type;
-    this.loc = loc;
+    var base = new CMathContent();
+
+    var params =
+    {
+        type: type,
+        loc: loc,
+        turn1: turn1,
+        turn2: turn2
+    };
+
+    this.init_2(params, base);
+}
+CDelimiter.prototype.init_2 = function(params, base)
+{
+    this.type = params.type;
+    this.loc = params.loc;
+
+    this.base = base;
 
     var nRow, nCol,
         tturn1, tturn2;
 
-    if(loc== 0)
+    if(this.loc== 0)
     {
         nRow = 2;
         nCol = 1;
-        tturn1 = turn1;
+        tturn1 = params.turn1;
     }
-    else if(loc == 1)
+    else if(this.loc == 1)
     {
         nRow = 2;
         nCol = 1;
-        tturn2 = turn1;
+        tturn2 = params.turn1;
     }
-    else if(loc == 2)
+    else if(this.loc == 2)
     {
         nRow = 1;
         nCol = 2;
 
-        tturn1 = turn1;
+        tturn1 = params.turn1;
     }
-    else if(loc == 3)
+    else if(this.loc == 3)
     {
         nRow = 1;
         nCol = 2;
-        tturn2 = turn1;
+        tturn2 = params.turn1;
     }
-    else if(loc == 4)
+    else if(this.loc == 4)
     {
         nRow = 1;
         nCol = 3;
 
-        tturn1 = turn1;
-        tturn2 = turn2;
+        tturn1 = params.turn1;
+        tturn2 = params.turn2;
     }
     else
     {
         nRow = 3;
         nCol = 1;
 
-        tturn1 = turn1;
-        tturn2 = turn2;
+        tturn1 = params.turn1;
+        tturn2 = params.turn2;
     }
-    
+
     this.setDimension(nRow, nCol);
 
     var operator1, operator2,
@@ -502,25 +518,35 @@ CDelimiter.prototype.init = function(type, loc, turn1, turn2)
     operator1.relate(this);
     operator2.setLocation(loc2, tturn2);
     operator2.relate(this);
-
-    var argument = new CMathContent();
-    argument.relate(this);
-
-    this.base = argument;
+  
 
     if(this.loc == 0 || this.loc == 2)
     {
-        this.addMCToContent(operator1, argument);
+        this.addMCToContent(operator1, base);
     }
     else if(this.loc == 1  || this.loc == 3)
     {
-        this.addMCToContent(argument, operator2);
+        this.addMCToContent(base, operator2);
     }
     else
     {
-        this.addMCToContent(operator1, argument, operator2);
+        this.addMCToContent(operator1, base, operator2);
     }
 
+    //выравнивание для случая когда центр смещен (не середина), для вложенных дробей и т.п.
+    if(this.loc == 2)
+    {
+        this.alignVer(0, 0.5);
+    }
+    else if(this.loc == 3)
+    {
+        this.alignVer(1, 0.5);
+    }
+    if(this.loc == 4)
+    {
+        this.alignVer(0, 0.5);
+        this.alignVer(2, 0.5);
+    }
 }
 CDelimiter.prototype.old_setContent = function(arg)
 {
@@ -720,26 +746,16 @@ CDelimiter.prototype.getBase = function()
 {
     return this.base;
 }
-CDelimiter.prototype.setPosition = function(pos)
+CDelimiter.prototype.Resize = function()
 {
-    var w = 0,
-        h = 0;
-    this.pos = {x: pos.x, y: pos.y - this.size.center};
-
-    var maxWH = this.getWidthsHeights();
-    var Widths = maxWH.widths;
-    var Heights = maxWH.heights;
-
-    for(var i = 0; i < this.nRow; i++)
-    {
+    for(var i=0; i < this.nRow; i++)
         for(var j = 0; j < this.nCol; j++)
-        {
-            this.elements[i][j].setPosition({x: this.pos.x + w, y: this.pos.y + h});
-            w += Widths[j];
-        }
-        h += Heights[i];
-    }
+            if(! this.elements[i][j].IsJustDraw() )
+                this.elements[i][j].Resize();
+
+    this.recalculateSize();
 }
+
 
 function COperatorBracket()
 {
@@ -2933,14 +2949,26 @@ CCombiningDoubleArrow.prototype.calcCoord = function(measure)
 }
 
 
-function CSeparatorDelimiter(type, column)
+function CSeparatorDelimiter()
 {
-    this.column = column;
-
-    CDelimiter.call(this, type, 4, 0, 1);
+    CDelimiter.call(this);
 }
 extend(CSeparatorDelimiter, CDelimiter);
-CSeparatorDelimiter.prototype.setContent = function()
+CSeparatorDelimiter.prototype.init = function(type, column)
+{
+    var base = new CSeparator();
+    base.init(column);
+
+    var params =
+    {
+        type: type,
+        loc: 4,
+        turn1: 0,
+        turn2: 1
+    };
+    this.init_2(params, base);
+}
+CSeparatorDelimiter.prototype.old_setContent = function()
 {
     var arg = new CSeparator(this.column);
     arg.init(this.params);
@@ -2969,15 +2997,19 @@ CSeparatorDelimiter.prototype.mouseMove = function(mCoord)
     return {state: state, SelectContent: SelectContent};
 }
 
-function CSeparator(column)
+function CSeparator()
 {
-    CMathBase.call(this, 1, column);
+    CMathBase.call(this);
 }
 extend(CSeparator, CMathBase);
+CSeparator.prototype.init = function(column)
+{
+    this.setDimension(1, column);
+    this.setContent();
+}
 CSeparator.prototype.setDistance = function()
 {
-    this.dH = 0;
-    this.dW = this.params.font.FontSize/3*g_dKoef_pt_to_mm;
+    this.dW = this.Parent.getTxtPrp().FontSize/3*g_dKoef_pt_to_mm;
 }
 CSeparator.prototype.draw = function()
 {
@@ -2991,7 +3023,7 @@ CSeparator.prototype.draw = function()
     MathControl.pGraph.p_width(1000);
     MathControl.pGraph.b_color1(0,0,0, 255);
 
-    pW = this.params.font.FontSize/18*g_dKoef_pt_to_mm;
+    pW = this.Parent.getTxtPrp().FontSize/18*g_dKoef_pt_to_mm;
 
     for(var i = 0; i < this.nCol - 1; i++)
     {
