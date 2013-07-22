@@ -572,7 +572,7 @@ UndoRedoDataAddHandleXY:nO
 CAscShapeProp:Y3
 UndoRedoData_SheetAdd:RK
 numFormat_Scientific:Sb
-TT_SBit_MetricsRec:Uh
+TT_SBit_MetricsRec:Rh
 c_oSerWorksheetsTypes$Comment:qB
 m_bands:Wn
 COLOR_TYPE_SRGB:Vu
@@ -772,7 +772,7 @@ c_oSer_TablePart$SortState:UC
 UndoRedoDrawingObject:EK
 c_oSer_TablePart$Ref:QC
 CRasterDataInfo:ru
-_strncmp:ug
+_strncmp:rg
 FT_Glyph_Metrics:wi
 c_oSer_AutoFilter$Ref:rD
 UndoRedoDrawingLayer:FK
@@ -985,7 +985,7 @@ JSCompiler_StaticMethods_scrollByX:kP
 JSCompiler_StaticMethods_scrollByY:jP
 T1_Parse_Glyph_And_Get_Char_String:Zs
 ETableStyleType$tablestyletypeBlankRow:GG
-SFNT_HeaderRec:Jh
+SFNT_HeaderRec:Hh
 IS_PS_SPACE:zj
 t1_service_glyph_dict:Bt
 c_oSer_PageMargins$Left:FC
@@ -1821,7 +1821,7 @@ VERTICAL_ANCHOR_TYPE_CENTER:iT
 JSCompiler_StaticMethods__foreachRow:aN
 historyitem_Workbook_SheetRemove:XK
 historyitem_AutoShapes_RecalculateTransformUndo:TN
-JSCompiler_StaticMethods__ZeroPad:Uc
+JSCompiler_StaticMethods__ZeroPad:Sc
 fntStyleInd_minor:mR
 historyitem_Cell_Strikeout:MM
 CParaInd:N_
@@ -2532,7 +2532,7 @@ L 152:op
 L 153:pp
 JSCompiler_StaticMethods_buildDependency:MK
 c_oAscPrintDefaultSettings$PageRightField:oL
-L 154:Th
+L 154:Uh
 L 155:Ds
 L 156:Il
 L 157:oc
@@ -2543,7 +2543,7 @@ phType_sldNum:eR
 STATES_ID_PRE_RESIZE_IN_GROUP:HY
 L 148:Ub
 L 147:td
-L 149:Sh
+L 149:Th
 FT_Stream:Zf
 CBounds:f3
 TRaster:On
@@ -2614,7 +2614,7 @@ L 105:Fi
 L 106:Pf
 L 107:fn
 OpenColor:jH
-L 108:Rh
+L 108:Sh
 Col:qI
 L 109:ip
 cErrorType$division_by_zero:Dx
@@ -2852,14 +2852,14 @@ TRACK_CIRCLE_RADIUS:RZ
 T1_Loader:st
 L 59:yc
 nSldLtTClipArtAndTx:TR
-L 58:Tc
+L 58:Uc
 L 57:Be
 L 56:Hf
 L 55:xc
 L 54:ed
-L 53:Sc
+L 53:Tc
 L 52:ek
-L 51:rg
+L 51:sg
 FT_TT_SERVICES_GET:Lq
 FT_Memory:dg
 tt_get_kerning:Xq
@@ -2990,7 +2990,7 @@ TT_Face:iq
 L 73:Or
 JSCompiler_StaticMethods__moveCellVer:GL
 L 74:Do
-L 75:Hh
+L 75:Ih
 Int64:zg
 JSCompiler_StaticMethods_rebuildSeries:ue
 L 76:Qr
@@ -3035,7 +3035,7 @@ L 99:sk
 L 95:ac
 L 96:jj
 L 97:Lf
-L 98:tg
+L 98:ug
 c_oSer_ChartCatAxType$Title:GW
 c_oSerWorksheetColTypes$Width:CB
 STATES_ID_PRE_RESIZE:tY
@@ -3046,7 +3046,7 @@ L 92:Jf
 L 91:Kc
 L 94:Kf
 nSldLtTObjTx:bS
-L 93:Ih
+L 93:Jh
 Fill:gI
 CFontFileLoader:Q
 FT_RoundFix:yg
@@ -3064,7 +3064,7 @@ L 85:rl
 tt_size_request:Zq
 g_bIsAppleDevices:lu
 c_oSer_BasicChartType$Series:RW
-L 83:sg
+L 83:tg
 CellValueType$Number:ka
 L 82:Pr
 c_oSerPropLenType$Byte:nH
