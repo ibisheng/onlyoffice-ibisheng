@@ -16333,10 +16333,13 @@ CTable.prototype =
         // Сначала пробежимся по строкам и узнаем, какие строки нужно удалить
         var Rows_to_Delete = new Array();
         var Rows_to_CalcH  = new Array();
+        var Rows_to_CalcH2 = new Array();
         for ( var CurRow = 0; CurRow < this.Content.length; CurRow++ )
         {
             var Row = this.Content[CurRow];
 
+            var bVmerge_Restart  = false;
+            var bVmerge_Continue = false;
             var bNeedDeleteRow  = true;
             var bNeedCalcHeight = false;
 
@@ -16350,24 +16353,55 @@ CTable.prototype =
 
                 if ( VMerge != vmerge_Continue )
                 {
+                    var VMergeCount = this.Internal_GetVertMergeCount( CurRow, Row.Get_CellInfo( CurCell ).StartGridCol, Cell.Get_GridSpan() );
+                    if ( VMergeCount > 1 )
+                        bVmerge_Restart = true;
+
                     bNeedDeleteRow = false;
 
                     if ( true === bNeedCalcHeight )
                     {
-                        var VMergeCount = this.Internal_GetVertMergeCount( CurRow, Row.Get_CellInfo( CurCell ).StartGridCol, Cell.Get_GridSpan() );
                         if ( 1 === VMergeCount )
                             bNeedCalcHeight = false;
                     }
-                    else
-                        break;
                 }
+                else
+                    bVmerge_Continue = true;
             }
+
+            if ( true === bVmerge_Continue && true === bVmerge_Restart )
+                Rows_to_CalcH2.push( CurRow );
+            else if ( true === bNeedCalcHeight )
+                Rows_to_CalcH.push( CurRow );
 
             if ( true === bNeedDeleteRow )
                 Rows_to_Delete.push( CurRow );
+        }
 
-            if ( true === bNeedCalcHeight )
-                Rows_to_CalcH.push( CurRow );
+        // Сначала разберемся со строками, у которых надо проставить минимальную высоту
+        for ( var Index = 0; Index < Rows_to_CalcH2.length; Index++ )
+        {
+            var RowIndex = Rows_to_CalcH2[Index];
+            var MinHeight = -1;
+
+            var Row = this.Content[RowIndex];
+            var CellsCount = Row.Get_CellsCount()
+            for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
+            {
+                var Cell   = Row.Get_Cell( CurCell );
+                var VMerge = Cell.Get_VMerge();
+                if ( vmerge_Restart === VMerge )
+                {
+                    var CurMinHeight = Cell.Content.Get_EmptyHeight();
+                    if ( CurMinHeight < MinHeight || MinHeight === -1 )
+                        MinHeight = CurMinHeight;
+                }
+            }
+
+            var OldHeight = this.Content[RowIndex].Get_Height();
+
+            if ( undefined === OldHeight || heightrule_Auto == OldHeight.HRule || ( MinHeight > OldHeight.Value ) )
+                this.Content[RowIndex].Set_Height( MinHeight, heightrule_AtLeast );
         }
 
         if ( Rows_to_Delete.length <= 0 )

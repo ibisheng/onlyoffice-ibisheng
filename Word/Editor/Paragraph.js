@@ -211,7 +211,13 @@ Paragraph.prototype =
 
     Get_EmptyHeight : function()
     {
+        var EndTextPr = this.Get_CompiledPr2(false).TextPr.Copy();
+        EndTextPr.Merge( this.TextPr.Value );
 
+        g_oTextMeasurer.SetTextPr( EndTextPr );
+        g_oTextMeasurer.SetFontSlot( fontslot_ASCII );
+
+        return g_oTextMeasurer.GetHeight();
     },
 
     Reset : function (X,Y, XLimit, YLimit, PageNum)

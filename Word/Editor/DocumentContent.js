@@ -171,6 +171,20 @@ CDocumentContent.prototype =
             return { X : X_Left_Field, Y : Y_Top_Field, XLimit : X_Right_Field, YLimit : Y_Bottom_Field };
     },
 
+    Get_EmptyHeight : function()
+    {
+        var Count = this.Content.length;
+        if ( Count <= 0 )
+            return 0;
+
+        var Element = this.Content[Count - 1];
+
+        if ( type_Paragraph === Element.GetType() )
+            return Element.Get_EmptyHeight();
+        else
+            return 0;
+    },
+
     // Inner = true  - запрос пришел из содержимого,
     //         false - запрос пришел от родительского класса
     // Запрос от родительского класса нужен, например, для колонтитулов, потому
