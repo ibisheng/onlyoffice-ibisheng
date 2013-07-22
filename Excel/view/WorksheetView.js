@@ -8683,6 +8683,55 @@
 				return undefined;
 			},
 
+			replaceCellText: function (options) {
+				var ar = this.activeRange;
+				var mc = this._getMergedCellsRange(ar.startCol, ar.startRow);
+				var c1 = mc ? mc.c1 : ar.startCol;
+				var r1 = mc ? mc.r1 : ar.startRow;
+				var c = this._getVisibleCell(c1, r1);
+
+				if (c === undefined) {
+					asc_debug("log", "Unknown cell's info: col = " + c1 + ", row = " + r1);
+					return false;
+				}
+
+				var cellValue = c.getValueForEdit();
+
+				if (true === options.isWholeCell && cellValue.length !== options.findWhat.length)
+					return false;
+
+				var findFlags = "g"; // Заменяем все вхождения
+				if (true !== options.isMatchCase)
+					findFlags += "i"; // Не чувствителен к регистру
+
+				var valueForSearching = options.findWhat
+					.replace(/(~)?\*/g, function($0, $1){
+						return $1 ? $0 : '[\\w\\W]*';
+					})
+					.replace(/(~)?\?/g, function($0, $1){
+						return $1 ? $0 : '[\\w\\W]{1,1}';
+					})
+					.replace(/\~/g, "\\");
+
+				valueForSearching = new RegExp(valueForSearching, findFlags);
+				// Попробуем сначана найти
+				if (0 > cellValue.search(valueForSearching))
+					return false;
+
+				cellValue = cellValue.replace(valueForSearching, options.replaceWith);
+				var oCellEdit = new asc_Range(c1, r1, c1, r1);
+
+				var v, newValue;
+				// get first fragment and change its text
+				v = c.getValueForEdit2().slice(0, 1);
+				// Создаем новый массив, т.к. getValueForEdit2 возвращает ссылку
+				newValue = [];
+				newValue[0] = {text: cellValue, format: v[0].format.clone()};
+
+				this._saveCellValueAfterEdit(oCellEdit, c, newValue, /*flags*/undefined, /*skipNLCheck*/false);
+				return true;
+			},
+
 			findCell: function(reference) {
 				var t = this;
 				var match = (/(?:R(\d+)C(\d+)|([A-Z]+[0-9]+))(?::(?:R(\d+)C(\d+)|([A-Z]+[0-9]+)))?/i).exec(reference);
@@ -8782,6 +8831,60 @@
 				// Проверим замерженность
 				var mergedRange = this._getMergedCellsRange(col, row);
 				return mergedRange ? mergedRange : asc_Range(col, row, col, row);
+			},
+
+			_saveCellValueAfterEdit: function (oCellEdit, c, val, flags, skipNLCheck) {
+				var t = this;
+				var oldMode = t.isFormulaEditMode;
+				t.isFormulaEditMode = false;
+
+				t.model.onStartTriggerAction();
+				History.Create_NewPoint();
+				History.SetSelection(oCellEdit);
+				History.StartTransaction();
+
+				var isFormula = t._isFormula(val);
+
+				if (isFormula) {
+					var ftext = val.reduce(function (pv,cv) {return pv + cv.text;}, "");
+					var ret = true;
+					// ToDo - при вводе формулы в заголовок автофильтра надо писать "0"
+					c.setValue(ftext, function(r){ ret = r;} );
+					if(!ret) {
+						t.isFormulaEditMode = oldMode;
+						History.EndTransaction();
+						t.model.onEndTriggerAction();
+						return false;
+					}
+					isFormula = c.isFormula();
+				} else {
+					c.setValue2(val);
+					// Вызываем функцию пересчета для заголовков форматированной таблицы
+					t.autoFilters._renameTableColumn(t, oCellEdit);
+				}
+
+				if (!isFormula) {
+					// Нужно ли выставлять WrapText (ищем символ новой строки в тексте)
+					var bIsSetWrap = false;
+					if (!skipNLCheck) {
+						for (var key in val) {
+							if (val[key].text.indexOf(kNewLine) >= 0) {
+								bIsSetWrap = true;
+								break;
+							}
+						}
+					}
+					if (bIsSetWrap)
+						c.setWrap(true);
+
+					// Для формулы обновление будет в коде рассчета формулы
+					t._updateCellsRange(oCellEdit, /*canChangeColWidth*/c_oAscCanChangeColWidth.numbers);
+				}
+				History.EndTransaction();
+				t.model.onEndTriggerAction();
+
+				// если вернуть false, то редактор не закроется
+				return true;
 			},
 
 			openCellEditor: function (editor, x, y, isCoord, fragments, cursorPos, isFocus, isClearCell,
@@ -8923,58 +9026,8 @@
 					isClearCell: isClearCell,
 					isHideCursor: isHideCursor,
 					saveValueCallback: function (val, flags, skipNLCheck) {
-						var oldMode = t.isFormulaEditMode;
 						var oCellEdit = new asc_Range(col, row, col, row);
-						t.isFormulaEditMode = false;
-
-						t.model.onStartTriggerAction();
-						History.Create_NewPoint();
-						History.SetSelection(oCellEdit);
-						History.StartTransaction();
-
-						var isFormula = t._isFormula(val);
-
-						if (isFormula) {
-							var ftext = val.reduce(function (pv,cv) {return pv + cv.text;}, "");
-							var ret = true;
-							// ToDo - при вводе формулы в заголовок автофильтра надо писать "0"
-							c.setValue(ftext, function(r){ ret = r;} );
-							if(!ret) {
-								t.isFormulaEditMode = oldMode;
-								History.EndTransaction();
-								t.model.onEndTriggerAction();
-								return false;
-							}
-							isFormula = c.isFormula();
-						} else {
-							c.setValue2(val);
-							// Вызываем функцию пересчета для заголовков форматированной таблицы
-							t.autoFilters._renameTableColumn(t, oCellEdit);
-						}
-
-						if (!isFormula) {
-							// Нужно ли выставлять WrapText (ищем символ новой строки в тексте)
-							var bIsSetWrap = false;
-							if (!skipNLCheck) {
-								for (var key in val) {
-									if (val[key].text.indexOf(kNewLine) >= 0) {
-										bIsSetWrap = true;
-										break;
-									}
-								}
-							}
-							if (bIsSetWrap)
-								c.setWrap(true);
-
-							var range = asc_Range(ar.startCol, ar.startRow, ar.startCol, ar.startRow);
-							// Для формулы обновление будет в коде рассчета формулы
-							t._updateCellsRange(range, /*canChangeColWidth*/c_oAscCanChangeColWidth.numbers);
-						}
-						History.EndTransaction();
-						t.model.onEndTriggerAction();
-
-						// если вернуть false, то редактор не закроется
-						return true;
+						return t._saveCellValueAfterEdit(oCellEdit, c, val, flags, skipNLCheck);
 					}
 				});
 				// для отрисовки ранджей формулы

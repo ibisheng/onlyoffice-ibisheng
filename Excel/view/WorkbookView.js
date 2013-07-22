@@ -1341,6 +1341,15 @@
 				return ws.findCellText(options);
 			},
 
+			// Замена текста в листе
+			replaceCellText: function (options) {
+				var ws = this.getWorksheet();
+				// Останавливаем ввод данных в редакторе ввода
+				if (ws.getCellEditMode())
+					this._onStopCellEditing();
+				return ws.replaceCellText(options);
+			},
+
 			// Поиск ячейки по ссылке
 			findCell: function(reference) {
 				var ws = this.getWorksheet();

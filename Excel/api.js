@@ -1808,7 +1808,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 
 			asc_replaceText: function (findWhat, replaceWith, isReplaceAll, isMatchCase, isWholeCell) {
-				// ToDo add code here
+				var d = this.wb.replaceCellText({findWhat: findWhat, replaceWith: replaceWith, isReplaceAll: isReplaceAll,
+					isMatchCase: isMatchCase, isWholeCell: isWholeCell});
+
+				return !!d;
 			},
 
 			/**
