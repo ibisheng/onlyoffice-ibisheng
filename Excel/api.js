@@ -944,6 +944,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			 * asc_onHyperlinkClick			(sUrl)														- эвент на нажатие гиперлинка
 			 * asc_onСoAuthoringDisconnect	()															- эвент об отключении от сервера без попытки reconnect
 			 * asc_onSelectionRangeChanged	(selectRange)												- эвент о выборе диапазона для диаграммы (после нажатия кнопки выбора)
+			 * asc_onRenameCellTextEnd		(countCells, result)										- эвент об окончании замены текста в ячейках (мы не можем сразу прислать ответ)
 			 */
 
 			asc_StartAction: function (type, id) {
@@ -1799,7 +1800,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 			asc_findText: function (text, scanByRows, scanForward, isMatchCase, isWholeCell) {
 				var d = this.wb.findCellText({text: text, scanByRows: scanByRows, scanForward: scanForward,
-					isMatchCase: isMatchCase, isWholeCell: isWholeCell});
+					isMatchCase: isMatchCase, isWholeCell: isWholeCell, isNotSelect: false});
 				if (d) {
 					if (d.deltaX) {this.controller.scrollHorizontal(d.deltaX);}
 					if (d.deltaY) {this.controller.scrollVertical(d.deltaY);}
@@ -1808,10 +1809,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 
 			asc_replaceText: function (findWhat, replaceWith, isReplaceAll, isMatchCase, isWholeCell) {
-				var d = this.wb.replaceCellText({findWhat: findWhat, replaceWith: replaceWith, isReplaceAll: isReplaceAll,
+				this.wb.replaceCellText({findWhat: findWhat, replaceWith: replaceWith, isReplaceAll: isReplaceAll,
 					isMatchCase: isMatchCase, isWholeCell: isWholeCell});
-
-				return !!d;
 			},
 
 			/**

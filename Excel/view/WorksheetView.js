@@ -8574,7 +8574,7 @@
 				var self = this;
 				if (true !== options.isMatchCase)
 					options.text = options.text.toLowerCase();
-				var ar = this.activeRange;
+				var ar = options.activeRange ? options.activeRange : this.activeRange;
 				var c = ar.startCol;
 				var r = ar.startRow;
 				var minC = 0;
@@ -8624,7 +8624,7 @@
 						cellText = cellText.toLowerCase();
 					if (cellText.indexOf(options.text) >= 0) {
 						if (true !== options.isWholeCell || options.text.length === cellText.length)
-							return this._setActiveCell(c, r);
+							return (options.isNotSelect) ? new asc_Range(c, r, c, r) : this._setActiveCell(c, r);
 					}
 				}
 
@@ -8677,29 +8677,13 @@
 						cellText = cellText.toLowerCase();
 					if (cellText.indexOf(options.text) >= 0) {
 						if (true !== options.isWholeCell || options.text.length === cellText.length)
-							return this._setActiveCell(c, r);
+							return (options.isNotSelect) ? new asc_Range(c, r, c, r) : this._setActiveCell(c, r);
 					}
 				}
 				return undefined;
 			},
 
 			replaceCellText: function (options) {
-				var ar = this.activeRange;
-				var mc = this._getMergedCellsRange(ar.startCol, ar.startRow);
-				var c1 = mc ? mc.c1 : ar.startCol;
-				var r1 = mc ? mc.r1 : ar.startRow;
-				var c = this._getVisibleCell(c1, r1);
-
-				if (c === undefined) {
-					asc_debug("log", "Unknown cell's info: col = " + c1 + ", row = " + r1);
-					return false;
-				}
-
-				var cellValue = c.getValueForEdit();
-
-				if (true === options.isWholeCell && cellValue.length !== options.findWhat.length)
-					return false;
-
 				var findFlags = "g"; // Заменяем все вхождения
 				if (true !== options.isMatchCase)
 					findFlags += "i"; // Не чувствителен к регистру
@@ -8712,24 +8696,112 @@
 						return $1 ? $0 : '[\\w\\W]{1,1}';
 					})
                     .replace(/(~\*)/g,"\\*").replace(/(~\?)/g, "\\?");
-
 				valueForSearching = new RegExp(valueForSearching, findFlags);
-				// Попробуем сначана найти
-				if (0 > cellValue.search(valueForSearching))
-					return false;
 
-				cellValue = cellValue.replace(valueForSearching, options.replaceWith);
-				var oCellEdit = new asc_Range(c1, r1, c1, r1);
+				var t = this;
+				var ar = this.activeRange.clone();
+				ar.startCol = this.activeRange.startCol;
+				ar.startRow = this.activeRange.startRow;
+				var aReplaceCells = [];
+				if (options.isReplaceAll) {
+					var aReplaceCellsIndex = {};
+					var optionsFind = {text: options.findWhat, scanByRows: true, scanForward: true,
+						isMatchCase: options.isMatchCase, isWholeCell: options.isWholeCell, isNotSelect: true, activeRange: ar};
+					var findResult, index;
+					while (true) {
+						findResult = t.findCellText(optionsFind);
+						if (undefined === findResult)
+							break;
+						index = findResult.c1 + findResult.r1;
+						if (aReplaceCellsIndex[index])
+							break;
+						aReplaceCellsIndex[index] = true;
+						aReplaceCells.push(findResult);
+						ar.startCol = findResult.c1;
+						ar.startRow = findResult.r1;
+					}
+				} else {
+					var mc = t._getMergedCellsRange(ar.startCol, ar.startRow);
+					var c1 = mc ? mc.c1 : ar.startCol;
+					var r1 = mc ? mc.r1 : ar.startRow;
+					var c = t._getVisibleCell(c1, r1);
 
-				var v, newValue;
-				// get first fragment and change its text
-				v = c.getValueForEdit2().slice(0, 1);
-				// Создаем новый массив, т.к. getValueForEdit2 возвращает ссылку
-				newValue = [];
-				newValue[0] = {text: cellValue, format: v[0].format.clone()};
+					if (c === undefined) {
+						asc_debug("log", "Unknown cell's info: col = " + c1 + ", row = " + r1);
+						t._trigger("onRenameCellTextEnd", 0, false);
+						return;
+					}
 
-				this._saveCellValueAfterEdit(oCellEdit, c, newValue, /*flags*/undefined, /*skipNLCheck*/false);
-				return true;
+					var cellValue = c.getValueForEdit();
+
+					// Попробуем сначала найти
+					if ((true === options.isWholeCell && cellValue.length !== options.findWhat.length) ||
+						0 > cellValue.search(valueForSearching)) {
+						t._trigger("onRenameCellTextEnd", 0, false);
+						return;
+					}
+
+					aReplaceCells.push(new asc_Range(ar.startCol, ar.startRow, ar.startCol, ar.startRow));
+				}
+
+				if (0 > aReplaceCells.length) {
+					t._trigger("onRenameCellTextEnd", 0, false);
+					return;
+				}
+				this._replaceCellsText(aReplaceCells, valueForSearching, options);
+			},
+
+			_replaceCellsText: function (aReplaceCells, valueForSearching, options) {
+				var t = this;
+				var oSelectionHistory = this.activeRange.clone();
+				var onReplaceCallback = function (isSuccess) {
+					if (false === isSuccess) {
+						t._trigger("onRenameCellTextEnd", aReplaceCells.length, false);
+						return;
+					}
+
+					t.model.onStartTriggerAction();
+					History.Create_NewPoint();
+					History.SetSelection(oSelectionHistory);
+					History.StartTransaction();
+
+					var cell;
+					for (var i = 0, length = aReplaceCells.length; i < length; ++i) {
+						cell = aReplaceCells[i];
+
+						var mc = t._getMergedCellsRange(cell.c1, cell.r1);
+						var c1 = mc ? mc.c1 : cell.c1;
+						var r1 = mc ? mc.r1 : cell.r1;
+						var c = t._getVisibleCell(c1, r1);
+
+						if (c === undefined) {
+							asc_debug("log", "Unknown cell's info: col = " + c1 + ", row = " + r1);
+							continue;
+						}
+
+						var cellValue = c.getValueForEdit();
+
+						cellValue = cellValue.replace(valueForSearching, options.replaceWith);
+						var oCellEdit = new asc_Range(c1, r1, c1, r1);
+
+						var v, newValue;
+						// get first fragment and change its text
+						v = c.getValueForEdit2().slice(0, 1);
+						// Создаем новый массив, т.к. getValueForEdit2 возвращает ссылку
+						newValue = [];
+						newValue[0] = {text: cellValue, format: v[0].format.clone()};
+
+						t._saveCellValueAfterEdit(oCellEdit, c, newValue, /*flags*/undefined, /*skipNLCheck*/false,
+							/*isNotHistory*/true);
+					}
+
+					History.EndTransaction();
+					t.model.onEndTriggerAction();
+
+					t._trigger("onRenameCellTextEnd", aReplaceCells.length, true);
+				};
+
+				this._isLockedCells (aReplaceCells, /*subType*/null, onReplaceCallback);
 			},
 
 			findCell: function(reference) {
@@ -8833,15 +8905,17 @@
 				return mergedRange ? mergedRange : asc_Range(col, row, col, row);
 			},
 
-			_saveCellValueAfterEdit: function (oCellEdit, c, val, flags, skipNLCheck) {
+			_saveCellValueAfterEdit: function (oCellEdit, c, val, flags, skipNLCheck, isNotHistory) {
 				var t = this;
 				var oldMode = t.isFormulaEditMode;
 				t.isFormulaEditMode = false;
 
-				t.model.onStartTriggerAction();
-				History.Create_NewPoint();
-				History.SetSelection(oCellEdit);
-				History.StartTransaction();
+				if (!isNotHistory) {
+					t.model.onStartTriggerAction();
+					History.Create_NewPoint();
+					History.SetSelection(oCellEdit);
+					History.StartTransaction();
+				}
 
 				var isFormula = t._isFormula(val);
 
@@ -8880,8 +8954,11 @@
 					// Для формулы обновление будет в коде рассчета формулы
 					t._updateCellsRange(oCellEdit, /*canChangeColWidth*/c_oAscCanChangeColWidth.numbers);
 				}
-				History.EndTransaction();
-				t.model.onEndTriggerAction();
+
+				if (!isNotHistory) {
+					History.EndTransaction();
+					t.model.onEndTriggerAction();
+				}
 
 				// если вернуть false, то редактор не закроется
 				return true;
@@ -9027,7 +9104,7 @@
 					isHideCursor: isHideCursor,
 					saveValueCallback: function (val, flags, skipNLCheck) {
 						var oCellEdit = new asc_Range(col, row, col, row);
-						return t._saveCellValueAfterEdit(oCellEdit, c, val, flags, skipNLCheck);
+						return t._saveCellValueAfterEdit(oCellEdit, c, val, flags, skipNLCheck, /*isNotHistory*/false);
 					}
 				});
 				// для отрисовки ранджей формулы

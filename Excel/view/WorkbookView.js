@@ -356,7 +356,8 @@
 								"setFocusDrawingObject" : function (isFocusDrawingObject) { self.controller.setFocusDrawingObject(isFocusDrawingObject); },
 								"setAutoFiltersDialog"  : function (arrVal) {self.handlers.trigger("asc_onSetAFDialog", arrVal);},
 								"selectionRangeChanged"	: function (val) {self.handlers.trigger("asc_onSelectionRangeChanged", val);},
-								"getDCForCharts"		: function () { return self.drawingCtxCharts; }
+								"getDCForCharts"		: function () { return self.drawingCtxCharts; },
+								"onRenameCellTextEnd"	: function (count, res) {self.handlers.trigger("asc_onRenameCellTextEnd", count, res);}
 							});
 				return new asc_WSV(wsModel, this.buffers, this.stringRender, this.maxDigitWidth, this.collaborativeEditing, opt);
 			},
@@ -1347,7 +1348,7 @@
 				// Останавливаем ввод данных в редакторе ввода
 				if (ws.getCellEditMode())
 					this._onStopCellEditing();
-				return ws.replaceCellText(options);
+				ws.replaceCellText(options);
 			},
 
 			// Поиск ячейки по ссылке
