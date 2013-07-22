@@ -11701,9 +11701,62 @@ CTable.prototype =
             {
                 var Row = this.Content[CurRow];
 
+                var CurGridCol = 0;
+
                 // Смотрим на ширину пропущенных колонок сетки в начале строки
                 var BeforeInfo = Row.Get_Before();
-                var CurGridCol = BeforeInfo.GridBefore;
+                var GridBefore = BeforeInfo.GridBefore;
+                var WBefore    = BeforeInfo.WBefore;
+
+                if ( 1 === GridBefore )
+                {
+                    if ( WBefore.Type === tblwidth_Mm )
+                    {
+                        if ( MinContent[CurGridCol] < WBefore.W )
+                            MinContent[CurGridCol] = WBefore.W;
+
+                        if ( false === MaxFlags[CurGridCol] )
+                        {
+                            MaxFlags[CurGridCol] = true;
+                            MaxContent[CurGridCol] = WBefore.W;
+                        }
+                        else if ( MaxContent[CurGridCol] < WBefore.W )
+                            MaxContent[CurGridCol] = WBefore.W;
+                    }
+                }
+                else if ( GridBefore > 1 )
+                {
+                    var SumSpanMinContent = 0;
+                    var SumSpanMaxContent = 0;
+                    var SumSpanCurContent = 0;
+                    for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridBefore; CurSpan++ )
+                    {
+                        SumSpanMinContent += MinContent[CurSpan];
+                        SumSpanMaxContent += MaxContent[CurSpan];
+                        SumSpanCurContent += this.TableGrid[CurSpan];
+                    }
+
+                    if ( SumSpanMinContent < WBefore.W )
+                    {
+                        for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridSpan; CurSpan++ )
+                            MinContent[CurSpan] = WBefore.W * this.TableGrid[CurSpan] / SumSpanCurContent;
+                    }
+
+                    // Если у нас в объединении несколько колонок, тогда явно записанная ширина ячейки не
+                    // перекрывает ширину ни одной из колонок, она всего лишь учавствует в определении
+                    // максимальной ширины.
+                    if ( WBefore.Type === tblwidth_Mm && WBefore.W > SumSpanMaxContent )
+                    {
+                        // TODO: На самом деле, распределение здесь идет в каком-то отношении.
+                        //       Неплохо было бы выяснить как именно.
+                        var TempAdd = (WBefore.W - SumSpanMaxContent) / GridBefore;
+                        for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridBefore; CurSpan++ )
+                            MaxContent[CurSpan] = WBefore.W * this.TableGrid[CurSpan] / SumSpanCurContent;
+                    }
+                }
+
+
+                CurGridCol = BeforeInfo.GridBefore;
 
                 var CellsCount = Row.Get_CellsCount();
                 for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
@@ -11746,17 +11799,18 @@ CTable.prototype =
                     {
                         var SumSpanMinContent = 0;
                         var SumSpanMaxContent = 0;
+                        var SumSpanCurContent = 0;
                         for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridSpan; CurSpan++ )
                         {
                             SumSpanMinContent += MinContent[CurSpan];
                             SumSpanMaxContent += MaxContent[CurSpan];
+                            SumSpanCurContent += this.TableGrid[CurSpan];
                         }
 
                         if ( SumSpanMinContent < CellMin )
                         {
-                            var TempAdd = (CellMin - SumSpanMinContent) / GridSpan;
                             for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridSpan; CurSpan++ )
-                                MinContent[CurSpan] += TempAdd;
+                                MinContent[CurSpan] = CellMin * this.TableGrid[CurSpan] / SumSpanCurContent;
                         }
 
                         // Если у нас в объединении несколько колонок, тогда явно записанная ширина ячейки не
@@ -11771,7 +11825,7 @@ CTable.prototype =
                             //       Неплохо было бы выяснить как именно.
                             var TempAdd = (CellMax - SumSpanMaxContent) / GridSpan;
                             for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridSpan; CurSpan++ )
-                                MaxContent[CurSpan] += TempAdd;
+                                MaxContent[CurSpan] = CellMax * this.TableGrid[CurSpan] / SumSpanCurContent;
                         }
                     }
 
@@ -11782,6 +11836,57 @@ CTable.prototype =
                         RightMargin = CellMargins.Right.W;
 
                     CurGridCol += GridSpan;
+                }
+
+                var AfterInfo = Row.Get_After();
+                var GridAfter = AfterInfo.GridAfter;
+                var WAfter    = AfterInfo.WAfter;
+
+                if ( 1 === GridAfter )
+                {
+                    if ( WAfter.Type === tblwidth_Mm )
+                    {
+                        if ( MinContent[CurGridCol] < WAfter.W )
+                            MinContent[CurGridCol] = WAfter.W;
+
+                        if ( false === MaxFlags[CurGridCol] )
+                        {
+                            MaxFlags[CurGridCol] = true;
+                            MaxContent[CurGridCol] = WAfter.W;
+                        }
+                        else if ( MaxContent[CurGridCol] < WAfter.W )
+                            MaxContent[CurGridCol] = WAfter.W;
+                    }
+                }
+                else if ( GridAfter > 1 )
+                {
+                    var SumSpanMinContent = 0;
+                    var SumSpanMaxContent = 0;
+                    var SumSpanCurContent = 0;
+                    for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridAfter; CurSpan++ )
+                    {
+                        SumSpanMinContent += MinContent[CurSpan];
+                        SumSpanMaxContent += MaxContent[CurSpan];
+                        SumSpanCurContent += this.TableGrid[CurSpan];
+                    }
+
+                    if ( SumSpanMinContent < WAfter.W )
+                    {
+                        for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridSpan; CurSpan++ )
+                            MinContent[CurSpan] = WAfter.W * this.TableGrid[CurSpan] / SumSpanCurContent;
+                    }
+
+                    // Если у нас в объединении несколько колонок, тогда явно записанная ширина ячейки не
+                    // перекрывает ширину ни одной из колонок, она всего лишь учавствует в определении
+                    // максимальной ширины.
+                    if ( WAfter.Type === tblwidth_Mm && WAfter.W > SumSpanMaxContent )
+                    {
+                        // TODO: На самом деле, распределение здесь идет в каком-то отношении.
+                        //       Неплохо было бы выяснить как именно.
+                        var TempAdd = (WAfter.W - SumSpanMaxContent) / GridAfter;
+                        for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridAfter; CurSpan++ )
+                            MaxContent[CurSpan] = WAfter.W * this.TableGrid[CurSpan] / SumSpanCurContent;
+                    }
                 }
             }
 
@@ -11819,6 +11924,7 @@ CTable.prototype =
             for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
             {
                 var Temp = MinMargin[CurCol] + MinContent[CurCol];
+                TableGrid2[CurCol] = this.TableGridCalc[CurCol];
                 if ( Temp < this.TableGridCalc[CurCol] )
                 {
                     TableGrid2[CurCol] = this.TableGridCalc[CurCol];

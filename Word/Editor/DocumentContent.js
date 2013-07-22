@@ -1548,6 +1548,7 @@ CDocumentContent.prototype =
 
                 Image.init( Img, W, H, Chart );
                 this.Paragraph_Add( Drawing );
+                this.Select_DrawingObject( Drawing.Get_Id() );
             }
             else if ( type_Table == Item.GetType() )
             {
