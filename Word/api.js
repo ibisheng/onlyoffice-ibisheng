@@ -5984,6 +5984,7 @@ asc_docs_api.prototype.GoToHeader = function(pageNumber)
     this.WordControl.m_oLogicDocument.OnMouseUp(global_mouseEvent, 0, 0, pageNumber);
     this.WordControl.m_oLogicDocument.OnMouseMove(global_mouseEvent, 0, 0, pageNumber);
 
+    this.WordControl.m_oLogicDocument.Cursor_MoveLeft();
     this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
 
     global_mouseEvent.ClickCount = oldClickCount;
@@ -6001,6 +6002,7 @@ asc_docs_api.prototype.GoToFooter = function(pageNumber)
     this.WordControl.m_oLogicDocument.OnMouseUp(global_mouseEvent, 0, Page_Height, pageNumber);
     this.WordControl.m_oLogicDocument.OnMouseMove(global_mouseEvent, 0, 0, pageNumber);
 
+    this.WordControl.m_oLogicDocument.Cursor_MoveLeft();
     this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
 
     global_mouseEvent.ClickCount = oldClickCount;
