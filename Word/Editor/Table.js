@@ -7694,24 +7694,49 @@ CTable.prototype =
         if ( true === this.ApplyToAll || ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0 ) )
         {
             var Cells_array = this.Internal_Get_SelectionArray();
-            for ( var Index = 0; Index < Cells_array.length; Index++ )
+
+            if ( true === bOnTextAdd && Cells_array.length > 0 )
             {
-                var Pos = Cells_array[Index];
-                var Row = this.Content[Pos.Row];
-                var Cell = Row.Get_Cell( Pos.Cell );
+                // Снимаем выделением со всемх ячеек, кроме первой, попавшей в выделение
+                var Pos = Cells_array[0];
+                var Cell = this.Content[Pos.Row].Get_Cell( Pos.Cell );
+                Cell.Content.Select_All();
+                Cell.Content.Remove( Count, bOnlyText, bRemoveOnlySelection, true );
 
-                var Cell_Content = Cell.Content;
-                Cell_Content.Set_ApplyToAll( true );
-                Cell.Content.Remove(Count, bOnlyText, bRemoveOnlySelection, false);
-                Cell_Content.Set_ApplyToAll( false );
+                this.CurCell = Cell;
+
+                this.Selection.Use   = false;
+                this.Selection.Start = false;
+
+                this.Selection.StartPos.Pos = { Row : Cell.Row.Index, Cell : Cell.Index };
+                this.Selection.EndPos.Pos   = { Row : Cell.Row.Index, Cell : Cell.Index };
+
+                this.Document_SetThisElementCurrent();
+
+                editor.WordControl.m_oLogicDocument.Recalculate();
             }
-
-            if ( Cells_array[0].Row - 1 >= 0 )
-                this.Internal_RecalculateFrom( Cells_array[0].Row - 1, 0, true, true );
             else
             {
-                this.Internal_Recalculate_1();
-                this.Internal_OnContentRecalculate( true, 0, this.Index );
+                var Cells_array = this.Internal_Get_SelectionArray();
+                for ( var Index = 0; Index < Cells_array.length; Index++ )
+                {
+                    var Pos = Cells_array[Index];
+                    var Row = this.Content[Pos.Row];
+                    var Cell = Row.Get_Cell( Pos.Cell );
+
+                    var Cell_Content = Cell.Content;
+                    Cell_Content.Set_ApplyToAll( true );
+                    Cell.Content.Remove(Count, bOnlyText, bRemoveOnlySelection, false);
+                    Cell_Content.Set_ApplyToAll( false );
+                }
+
+                if ( Cells_array[0].Row - 1 >= 0 )
+                    this.Internal_RecalculateFrom( Cells_array[0].Row - 1, 0, true, true );
+                else
+                {
+                    this.Internal_Recalculate_1();
+                    this.Internal_OnContentRecalculate( true, 0, this.Index );
+                }
             }
         }
         else
