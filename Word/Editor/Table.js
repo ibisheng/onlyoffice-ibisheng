@@ -1068,7 +1068,7 @@ CTable.prototype =
         else
         {
             Pr.TableAlignment     = 0; // align_Left
-            Pr.TableIndent        = this.X_origin - X_Left_Field - this.Get_TableOffsetCorrection();
+            Pr.TableIndent        = this.X_origin - X_Left_Field;
             Pr.TableWrappingStyle = c_oAscWrapStyle.Flow;
 
             Pr.PositionH = new Object();
@@ -2400,7 +2400,7 @@ CTable.prototype =
     {
         var X = 0;
 
-        if ( true != this.Is_Inline() || true === this.Parent.Is_TableCellContent() )
+        if ( true === this.Parent.Is_TableCellContent() )
             return 0;
 
         var Row = this.Content[0];
@@ -13891,8 +13891,8 @@ CTable.prototype =
                 }
             }
 
-            this.AnchorPosition.CalcX = this.X;
-            this.AnchorPosition.Set_X( this.TableSumGrid[this.TableSumGrid.length - 1], this.X, X_Left_Field, X_Right_Field, Page_Width, PageLimits.X, PageLimits.XLimit );
+            this.AnchorPosition.CalcX = this.X_origin + TablePr.TableInd;
+            this.AnchorPosition.Set_X( this.TableSumGrid[this.TableSumGrid.length - 1], this.X_origin, X_Left_Field, X_Right_Field, Page_Width, PageLimits.X, PageLimits.XLimit );
         }
         else
         {
@@ -13910,7 +13910,7 @@ CTable.prototype =
             }
 
             this.X = this.X_origin + this.Get_TableOffsetCorrection();
-            this.AnchorPosition.Set_X( this.TableSumGrid[this.TableSumGrid.length - 1], this.X, X_Left_Field - OffsetCorrection_Left, X_Right_Field + OffsetCorrection_Right, Page_Width, PageLimits.X - OffsetCorrection_Left, PageLimits.XLimit + OffsetCorrection_Right );
+            this.AnchorPosition.Set_X( this.TableSumGrid[this.TableSumGrid.length - 1], this.X_origin, X_Left_Field - OffsetCorrection_Left, X_Right_Field + OffsetCorrection_Right, Page_Width, PageLimits.X - OffsetCorrection_Left, PageLimits.XLimit + OffsetCorrection_Right );
 
             this.X = this.AnchorPosition.Calculate_X(this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value);
             this.X_origin = this.X - this.Get_TableOffsetCorrection();
