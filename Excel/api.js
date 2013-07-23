@@ -2106,8 +2106,13 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				return ws.objectRender.controller.getGraphicObjectProps();
 			},
 			
-			asc_setGraphicObjectProps: function() {
+			asc_setGraphicObjectProps: function(props) {
 				// TODO
+			},
+			
+			asc_getOriginalImageSize: function() {
+				var ws = this.wb.getWorksheet();
+				return ws.objectRender.getOriginalImageSize();
 			},
 			
 			asyncImageStartLoaded: function() {
@@ -2903,6 +2908,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_unGroupGraphicsObjects"] = prot.asc_unGroupGraphicsObjects;
 		prot["asc_getGraphicObjectProps"] = prot.asc_getGraphicObjectProps;
 		prot["asc_setGraphicObjectProps"] = prot.asc_setGraphicObjectProps;
+		prot["asc_getOriginalImageSize"] = prot.asc_getOriginalImageSize;
 
 		// Cell interface
 		prot["asc_getCellInfo"] = prot.asc_getCellInfo;

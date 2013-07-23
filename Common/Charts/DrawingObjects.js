@@ -1029,8 +1029,7 @@ asc_CChart.prototype = {
 	asc_getChartEditorFlag: function() { return this.bChartEditor; },
 	asc_setChartEditorFlag: function(value) { this.bChartEditor = value; },
 	
-	generateFontMap: function(oFontMap)
-	{
+	generateFontMap: function(oFontMap) {
 		var font;
 		font = this.header.asc_getFont();
 		if(null != font)
@@ -1196,6 +1195,23 @@ asc_CChart.prototype = {
 				nameIndex++;
 			}
 		}
+	},
+	
+	getLegendInfo: function() {
+		
+		var aInfo = [];
+		function legendInfo() { return { text: null, color: null, marker: null } };
+		var aColors = generateColors(this.series.length, arrBaseColors, true);
+		
+		for ( var i = 0; i < this.series.length; i++ ) {
+		
+			var info = new legendInfo();
+			info.text = this.series[i].asc_getTitle();
+			info.color = aColors[i];
+			info.marker = c_oAscLegendMarkerType.Line;
+			aInfo.push(info);
+		}
+		return aInfo;
 	},
 	
 	//	For collaborative editing
@@ -2196,6 +2212,33 @@ prot["asc_getFill"] = prot.asc_getFill;
 prot["asc_putFill"] = prot.asc_putFill;
 prot["asc_getStroke"] = prot.asc_getStroke;
 prot["asc_putStroke"] = prot.asc_putStroke;
+//}
+
+//-----------------------------------------------------------------------------------
+// CImageSize
+//-----------------------------------------------------------------------------------
+
+function asc_CImageSize( width, height, isCorrect ) {
+	this.Width = (undefined == width) ? 0.0 : width;
+	this.Height = (undefined == height) ? 0.0 : height;
+    this.IsCorrect = isCorrect;
+}
+
+asc_CImageSize.prototype = {
+	
+	asc_getImageWidth: function() { return this.Width; },
+	asc_getImageHeight: function() { return this.Height; },
+	asc_getIsCorrect: function() { return this.IsCorrect; }
+}
+
+//{ asc_CImageSize export
+window["Asc"].asc_CImageSize = asc_CImageSize;
+window["Asc"]["asc_CImageSize"] = asc_CImageSize;
+prot = asc_CImageSize.prototype;
+
+prot["asc_getImageWidth"] = prot.asc_getImageWidth;
+prot["asc_getImageHeight"] = prot.asc_getImageHeight;
+prot["asc_getIsCorrect"] = prot.asc_getIsCorrect;
 //}
 
 //-----------------------------------------------------------------------------------
@@ -4491,6 +4534,31 @@ function DrawingObjects() {
 			else 
 				_this.showDrawingObjects(true);
 		}
+	}
+	
+	_this.getOriginalImageSize = function() {
+		
+		var selectedObjects = _this.controller.selectedObjects;
+		if ( (selectedObjects.length == 1) && selectedObjects[0].isImage() ) {
+		
+			var imageUrl = selectedObjects[0].getImageUrl();
+			
+			var _image = api.ImageLoader.map_image_index[getFullImageSrc(imageUrl)];
+			if (_image != undefined && _image.Image != null && _image.Status == ImageLoadStatus.Complete) {
+				
+				var _w = 1, _h = 1;
+				var bIsCorrect = false;
+				if (_image.Image != null) {
+				
+					bIsCorrect = true;
+					_w = Math.max( pxToMm(_image.Image.width), 1 );
+					_h = Math.max( pxToMm(_image.Image.height), 1 );					
+				}
+
+				return new asc_CImageSize( _w, _h, bIsCorrect);
+			}
+		}
+		return new asc_CImageSize( 50, 50, false );
 	}
 	
 	//-----------------------------------------------------------------------------------

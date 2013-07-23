@@ -189,6 +189,11 @@ var c_oAscSelectionType = {
 	RangeShape: 7
 };
 
+var c_oAscLegendMarkerType = {
+	Line: 0,
+	Square: 1
+}
+
 var c_oAscHyperlinkType = {
 	WebLink: 1,
 	RangeLink: 2
