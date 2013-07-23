@@ -4528,10 +4528,11 @@ Paragraph.prototype =
         var CurTextPr = this.Internal_CalculateTextPr( StartPagePos, Pr );
 
         // Выставляем цвет обводки
+        var CurColor;
         if ( true === bVisitedHyperlink )
-            pGraphics.p_color( 128, 0, 151, 255 );
+            CurColor = new CDocumentColor( 128, 0, 151 );
         else
-            pGraphics.p_color( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
+            CurColor = new CDocumentColor( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b );
 
         var StartLine = this.Pages[CurPage].StartLine;
         var EndLine   = this.Pages[CurPage].EndLine;
@@ -4585,12 +4586,12 @@ Paragraph.prototype =
                             if ( para_Drawing != Item.Type || drawing_Anchor != Item.DrawingType )
                             {
                                 if ( true === CurTextPr.DStrikeout )
-                                    aDStrikeout.Add( Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b );
+                                    aDStrikeout.Add( Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurColor.r, CurColor.g, CurColor.b );
                                 else if ( true === CurTextPr.Strikeout )
-                                    aStrikeout.Add( Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b );
+                                    aStrikeout.Add( Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurColor.r, CurColor.g, CurColor.b );
 
                                 if ( true === CurTextPr.Underline )
-                                    aUnderline.Add( Y + this.Lines[CurLine].Metrics.TextDescent * 0.4, Y + this.Lines[CurLine].Metrics.TextDescent * 0.4, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b );
+                                    aUnderline.Add( Y + this.Lines[CurLine].Metrics.TextDescent * 0.4, Y + this.Lines[CurLine].Metrics.TextDescent * 0.4, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurColor.r, CurColor.g, CurColor.b );
 
                                 if ( true != this.SpellChecker.Check_Spelling(Pos) )
                                     aSpelling.Add( Y + this.Lines[CurLine].Metrics.TextDescent * 0.4, Y + this.Lines[CurLine].Metrics.TextDescent * 0.4, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, 0, 0, 0 );
@@ -4606,12 +4607,12 @@ Paragraph.prototype =
                             if ( Pos >= this.Lines[CurLine].Ranges[CurRange].StartPos2 && Pos <= this.Lines[CurLine].Ranges[CurRange].EndPos2 )
                             {
                                 if ( true === CurTextPr.DStrikeout )
-                                    aDStrikeout.Add( Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b );
+                                    aDStrikeout.Add( Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurColor.r, CurColor.g, CurColor.b );
                                 else if ( true === CurTextPr.Strikeout )
-                                    aStrikeout.Add( Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b );
+                                    aStrikeout.Add( Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurColor.r, CurColor.g, CurColor.b );
 
                                 if ( true === CurTextPr.Underline )
-                                    aUnderline.Add( Y + this.Lines[CurLine].Metrics.TextDescent * 0.4, Y + this.Lines[CurLine].Metrics.TextDescent * 0.4, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b );
+                                    aUnderline.Add( Y + this.Lines[CurLine].Metrics.TextDescent * 0.4, Y + this.Lines[CurLine].Metrics.TextDescent * 0.4, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurColor.r, CurColor.g, CurColor.b );
                             }
 
                             X += Item.WidthVisible;
@@ -4624,9 +4625,9 @@ Paragraph.prototype =
 
                             // Выставляем цвет обводки
                             if ( true === bVisitedHyperlink )
-                                pGraphics.p_color( 128, 0, 151, 255 );
+                                CurColor.Set( 128, 0, 151, 255 );
                             else
-                                pGraphics.p_color( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
+                                CurColor.Set( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
 
                             switch( CurTextPr.VertAlign )
                             {
@@ -4657,16 +4658,16 @@ Paragraph.prototype =
 
                             // Выставляем цвет обводки
                             if ( true === bVisitedHyperlink )
-                                pGraphics.p_color( 128, 0, 151, 255 );
+                                CurColor.Set( 128, 0, 151, 255 );
                             else
-                                pGraphics.p_color( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
+                                CurColor.Set( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
 
                             break;
                         }
                         case para_HyperlinkEnd:
                         {
                             bVisitedHyperlink = false;
-                            pGraphics.p_color( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
+                            CurColor.Set( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b, 255);
                             break;
                         }
                     }
