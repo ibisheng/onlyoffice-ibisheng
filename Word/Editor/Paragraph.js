@@ -3162,6 +3162,31 @@ Paragraph.prototype =
                     X += Item.WidthVisible;
                     break;
                 }
+
+                case para_CommentStart:
+                {
+                    var DocumentComments = editor.WordControl.m_oLogicDocument.Comments;
+
+                    var CommentId = Item.Id;
+                    var CommentY  = this.Pages[CurPage].Y + this.Lines[CurLine].Top;
+                    var CommentH  = this.Lines[CurLine].Bottom - this.Lines[CurLine].Top;
+
+                    DocumentComments.Set_StartInfo( CommentId, this.Get_StartPage_Absolute() + CurPage, X, CommentY, CommentH, this.Id );
+
+                    break;
+                }
+
+                case para_CommentEnd:
+                {
+                    var DocumentComments = editor.WordControl.m_oLogicDocument.Comments;
+
+                    var CommentId = Item.Id;
+                    var CommentY  = this.Pages[CurPage].Y + this.Lines[CurLine].Top;
+                    var CommentH  = this.Lines[CurLine].Bottom - this.Lines[CurLine].Top;
+
+                    DocumentComments.Set_EndInfo( CommentId, this.Get_StartPage_Absolute() + CurPage, X, CommentY, CommentH, this.Id );
+                    break;
+                }
             }
         }
 
@@ -11610,13 +11635,13 @@ Paragraph.prototype =
                         {
                             var Comment = g_oTableId.Get_ById( Element.Id );
                             if ( null != Comment )
-                                Comment.Set_StartInfo( this.Internal_GetPage( Pos ), 0, 0, 0, this.Get_Id() );
+                                Comment.Set_StartInfo( 0, 0, 0, 0, this.Get_Id() );
                         }
                         else if ( Element instanceof ParaCommentEnd )
                         {
                             var Comment = g_oTableId.Get_ById( Element.Id );
                             if ( null != Comment )
-                                Comment.Set_EndInfo( this.Internal_GetPage( Pos ), 0, 0, 0, this.Get_Id() );
+                                Comment.Set_EndInfo( 0, 0, 0, 0, this.Get_Id() );
                         }
 
                         // TODO: Подумать над тем как по минимуму вставлять отметки совместного редактирования

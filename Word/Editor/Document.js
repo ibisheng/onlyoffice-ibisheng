@@ -83,7 +83,6 @@ function CDocumentPage()
     };
 
     this.Bounds = new CDocumentBounds(0,0,0,0);
-    this.FlowObjects = new FlowObjects(editor.WordControl.m_oLogicDocument, 0); // Используем данный объект только для хранения ссылок на Flow-таблицы
     this.Pos    = 0;
     this.EndPos = 0;
 

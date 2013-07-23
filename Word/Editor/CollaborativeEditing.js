@@ -301,16 +301,6 @@ function CCollaborativeChanges()
         {
             Class = editor.WordControl.m_oLogicDocument.HdrFtr;
         }
-        else if ( historyitem_type_FlowObjects === Type )
-        {
-            var SubType  = LoadData.Reader.GetLong();
-            var ParentId = LoadData.Reader.GetString2();
-            var PageNum  = LoadData.Reader.GetLong();
-
-            var Parent = g_oTableId.Get_ById( ParentId );
-
-            Class = Parent.Pages[PageNum].FlowObjects;
-        }
         else
             Class = g_oTableId.Get_ById( this.m_sId );
 
@@ -727,18 +717,6 @@ function CCollaborativeEditing()
             RecalculateData.HdrFtr.push( HdrFtr_Content.Header.Odd );
         if ( null != HdrFtr_Content.Footer.Odd )
             RecalculateData.HdrFtr.push( HdrFtr_Content.Footer.Odd );
-
-        for ( var PageIndex in LogicDocument.Pages )
-        {
-            var FlowObjects = LogicDocument.Pages[PageIndex].FlowObjects;
-            var Count = FlowObjects.Get_Count();
-            for ( var Index = 0; Index < Count; Index++ )
-            {
-                var FlowObject = FlowObjects.Get_ByIndex( Index );
-                if ( flowobject_Table === FlowObject.Get_Type() && 0 === FlowObject.PageController )
-                    RecalculateData.Flow.push( FlowObject );
-            }
-        }
 
         LogicDocument.Recalculate( false, false, RecalculateData );
         LogicDocument.Document_UpdateSelectionState();
