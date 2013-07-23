@@ -420,6 +420,8 @@ CHistory.prototype =
 
     Create_NewPoint : function()
     {
+        this.Clear_Additional();
+
         this.Check_UninonLastPoints();
 
         var State = this.Document.Get_SelectionState();
@@ -429,9 +431,10 @@ CHistory.prototype =
         // Создаем новую точку
         this.Points[++this.Index] =
         {
-            State : State, // Текущее состояние документа (курсор, селект)
-            Items : Items, // Массив изменений, начиная с текущего момента
-            Time  : Time   // Текущее время
+            State      : State, // Текущее состояние документа (курсор, селект)
+            Items      : Items, // Массив изменений, начиная с текущего момента
+            Time       : Time,  // Текущее время
+            Additional : {}     // Дополнительная информация
         };
 
         // Удаляем ненужные точки
@@ -664,5 +667,30 @@ CHistory.prototype =
         }
 
         return this.RecalculateData;
+    },
+
+    Set_Additional_ExtendDocumentToPos : function()
+    {
+        if ( this.Index >= 0 )
+        {
+            this.Points[this.Index].Additional.ExtendDocumentToPos = true;
+        }
+    },
+
+    Is_ExtendDocumentToPos : function()
+    {
+        if ( undefined === this.Points[this.Index] || undefined === this.Points[this.Index].Additional.ExtendDocumentToPos )
+            return false;
+
+        return true;
+    },
+
+    Clear_Additional : function()
+    {
+        if ( this.Index >= 0 )
+        {
+            this.Points[this.Index].Additional = new Object();
+        }
     }
+
 };

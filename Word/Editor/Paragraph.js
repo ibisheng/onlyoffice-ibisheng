@@ -211,7 +211,8 @@ Paragraph.prototype =
 
     Get_EmptyHeight : function()
     {
-        var EndTextPr = this.Get_CompiledPr2(false).TextPr.Copy();
+        var Pr = this.Get_CompiledPr();
+        var EndTextPr = Pr.TextPr.Copy();
         EndTextPr.Merge( this.TextPr.Value );
 
         g_oTextMeasurer.SetTextPr( EndTextPr );
@@ -5412,6 +5413,39 @@ Paragraph.prototype =
         }
     },
 
+    // Расширяем параграф до позиции X
+    Extend_ToPos : function(_X)
+    {
+        var Page = this.Pages[this.Pages.length - 1];
+
+        var X0 = Page.X;
+        var X1 = Page.XLimit - X0;
+        var X  = _X - X0;
+
+        if ( true === this.IsEmpty() )
+        {
+            if ( Math.abs(X - X1 / 2) < 12.5 )
+                return this.Set_Align( align_Center );
+            else if ( X > X1 - 12.5 )
+                return this.Set_Align( align_Right );
+            else if ( X < 12.5 )
+                return this.Set_Ind( { FirstLine : 12.5 }, false );
+        }
+
+        var Tabs = this.Get_CompiledPr2(false).ParaPr.Tabs.Copy();
+        var CurPos = this.Internal_GetEndPos();
+
+        if ( Math.abs(X - X1 / 2) < 12.5 )
+            Tabs.Add( new CParaTab( tab_Center, X1 / 2 ) );
+        else if ( X > X1 - 12.5 )
+            Tabs.Add( new CParaTab( tab_Right, X1 - 0.001 ) );
+        else
+            Tabs.Add( new CParaTab( tab_Left, X ) );
+
+        this.Set_Tabs( Tabs );
+        this.Internal_Content_Add( CurPos, new ParaTab() );
+    },
+
     Internal_IncDecFontSize : function(bIncrease, Value)
     {
         // Закон изменения размеров :
@@ -7675,6 +7709,10 @@ Paragraph.prototype =
     // Если bEnd = true, тогда это конец селекта.
     Selection_SetEnd : function(X,Y,PageNum, MouseEvent, bTableBorder)
     {
+        var PagesCount = this.Pages.length;
+        if ( null == this.Get_DocumentNext() && PageNum - this.PageNum >= PagesCount - 1 && Y > this.Pages[PagesCount - 1].Bounds.Bottom && MouseEvent.ClickCount >= 2 )
+            return this.Parent.Extend_ToPos( X, Y );
+
         this.CurPos.RealX = X;
         this.CurPos.RealY = Y;
         var Temp = this.Internal_GetContentPosByXY( X, Y, false, PageNum );
@@ -7685,7 +7723,24 @@ Paragraph.prototype =
             this.CurPos.Line       = Temp.Line;
 
             if ( true === Temp.End )
+            {
+                if (  PageNum - this.PageNum >= PagesCount - 1 && X > this.Lines[this.Lines.length - 1].Ranges[this.Lines[this.Lines.length - 1].Ranges.length - 1].W && MouseEvent.ClickCount >= 2 )
+                {
+                    if ( false === editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_Element_and_Type, Element : this, CheckType : changestype_Paragraph_Content } ) )
+                    {
+                        History.Create_NewPoint();
+                        History.Set_Additional_ExtendDocumentToPos();
+
+                        this.Extend_ToPos( X );
+                        this.Cursor_MoveToEndPos();
+                        this.Document_SetThisElementCurrent();
+                        editor.WordControl.m_oLogicDocument.Recalculate();
+                        return;
+                    }
+                }
+
                 this.Selection.EndPos = Pos + 1;
+            }
             else
                 this.Selection.EndPos = Pos;
 

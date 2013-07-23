@@ -1518,6 +1518,86 @@ CDocumentContent.prototype =
         }
     },
 
+    // Расширяем документ до точки (X,Y) с помощью новых параграфов
+    // Y0 - низ последнего параграфа, YLimit - предел страницы
+    Extend_ToPos : function(X, Y)
+    {
+        var LastPara = this.Content[this.Content.length - 1];
+        var LastPara2 = LastPara;
+
+        History.Create_NewPoint();
+        History.Set_Additional_ExtendDocumentToPos();
+
+        while ( true )
+        {
+            var NewParagraph = new Paragraph( this.DrawingDocument, this, 0, 0, 0, X_Left_Field, Y_Bottom_Field );
+
+            var StyleId = LastPara.Style_Get();
+            var NextId  = undefined;
+
+            if ( undefined != StyleId )
+            {
+                NextId = this.Styles.Get_Next( StyleId );
+
+                if ( null === NextId || undefined === NextId )
+                    NextId = StyleId;
+            }
+
+            // Простое добавление стиля, без дополнительных действий
+            if ( NextId === this.Styles.Get_Default_Paragraph() )
+                NewParagraph.Style_Remove();
+            else
+                NewParagraph.Style_Add_Open( NextId );
+
+            if ( undefined != LastPara.TextPr.Value.FontSize )
+            {
+                NewParagraph.TextPr.Set_FontSize(LastPara.TextPr.Value.FontSize);
+                NewParagraph.Internal_Content_Add( 0, new ParaTextPr( { FontSize : LastPara.TextPr.Value.FontSize, FontSizeCS : LastPara.TextPr.Value.FontSize } ) );
+            }
+
+            LastPara.Set_DocumentNext( NewParagraph );
+
+            NewParagraph.Set_DocumentPrev( LastPara );
+            NewParagraph.Set_DocumentIndex( LastPara.Index + 1 );
+
+            var CurPage = LastPara.Pages.length - 1;
+            var X0      = LastPara.Pages[CurPage].X;
+            var Y0      = LastPara.Pages[CurPage].Bounds.Bottom;
+            var XLimit  = LastPara.Pages[CurPage].XLimit;
+            var YLimit  = LastPara.Pages[CurPage].YLimit;
+            var PageNum = LastPara.PageNum;
+
+            NewParagraph.Reset( X0, Y0, XLimit, YLimit, PageNum );
+            var RecalcResult = NewParagraph.Recalculate_Page( PageNum );
+
+            if ( recalcresult_NextElement != RecalcResult )
+            {
+                LastPara.Next = null;
+                break;
+            }
+
+            this.Internal_Content_Add( this.Content.length, NewParagraph );
+
+            if ( NewParagraph.Pages[0].Bounds.Bottom > Y )
+                break;
+
+            LastPara = NewParagraph;
+        }
+
+        LastPara = this.Content[this.Content.length - 1];
+
+        if ( LastPara != LastPara2 || false === this.LogicDocument.Document_Is_SelectionLocked( changestype_None, { Type : changestype_2_Element_and_Type, Element : LastPara, CheckType : changestype_Paragraph_Content } ) )
+        {
+            // Теперь нам нужно вставить таб по X
+            LastPara.Extend_ToPos(X);
+        }
+
+        LastPara.Cursor_MoveToEndPos();
+        LastPara.Document_SetThisElementCurrent();
+
+        this.LogicDocument.Recalculate();
+    },
+
     Add_InlineImage : function(W, H, Img, Chart, bFlow)
     {
         if ( docpostype_DrawingObjects === this.CurPos.Type )
