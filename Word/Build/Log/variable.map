@@ -2094,7 +2094,7 @@ Paragraph:oc
 fontslot_ASCII:tO
 c_oAscError$ID$ConvertationTimeout:s3
 TT_RunIns:Rv
-cff_size_init:dz
+cff_size_init:cz
 phType_obj:IJ
 c_oSerParType$Content:lX
 TT_Goto_CodeRange:Uv
@@ -2133,7 +2133,7 @@ STATES_ID_START_ADD_TEXT_RECT:pF
 CParagraphTab:j4
 ParaCommentStart:DP
 FT_Outline_New_Internal:uo
-CellValueType$String:Ge
+CellValueType$String:Ee
 FT_Raster_Params:Np
 tab_Left:Zd
 CDocumentColor:me
@@ -2817,7 +2817,7 @@ pararecalc_0_None:aR
 L 39:Qi
 L 38:kh
 historyitem_SetTextBoxContent:vI
-L 37:Ee
+L 37:Fe
 locktype_None:MM
 PS_PrivateRec:Iq
 L 32:Ba
@@ -2897,7 +2897,7 @@ L 41:Sd
 TT_Post_NamesRec:up
 ft_bitmap_glyph_init:no
 JSCompiler_StaticMethods__read_rPr:Gd
-L 40:Fe
+L 40:Ge
 L 43:Sa
 L 42:Eb
 HSLToRGB:I0
