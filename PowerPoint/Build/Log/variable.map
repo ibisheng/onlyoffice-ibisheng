@@ -1374,7 +1374,7 @@ c_oAscSlideTransitionParams$Clock_Counterclockwise:II
 TABLE_STYLE_HEIGHT_PIX:aJ
 CTablePr:dg
 c_dScalePPTXSizes:He
-nSldLtTPicTx:UJ
+nSldLtTPicTx:jK
 T1_Face_Init:Eu
 CDrawingDocument:UI
 CFontSetup:Vy
@@ -1474,7 +1474,7 @@ ft_sid_names:rk
 historyitem_type_Comment:qC
 historyitem_TableId_Reset:Hw
 T1_Decoder_ZoneRec:nm
-L 102:jK
+L 102:iK
 T1_Size_Request:Au
 L 101:Hz
 L 100:Gz
@@ -1795,14 +1795,14 @@ T1_Loader:Iu
 nSldLtTClipArtAndTx:KJ
 L 59:Sk
 L 58:Rk
-L 57:aK
-L 56:$J
+L 57:$J
+L 56:ZJ
 L 55:Xs
 TT_Round_Super_45:Ip
 L 54:Ws
 tt_cmap10_char_index:Mn
 ps_parser_skip_spaces:Ol
-L 53:ZJ
+L 53:YJ
 L 52:Vs
 L 51:Us
 FT_TT_SERVICES_GET:Xr
@@ -1823,18 +1823,18 @@ GX_BlendRec:xr
 c_oAscAsyncAction$LoadTheme:Cw
 CSrcRect:sf
 L 49:Ss
-L 48:YJ
+L 48:XJ
 CControl:zz
 JSCompiler_StaticMethods_getVerticalAlign:OE
 L 45:lp
 tt_face_free_hdmx_stub:vo
 L 44:Qs
 L 47:Rs
-L 46:XJ
-L 41:WJ
+L 46:WJ
+L 41:VJ
 TT_Post_NamesRec:tj
 ft_bitmap_glyph_init:mi
-L 40:VJ
+L 40:UJ
 JSCompiler_StaticMethods__read_rPr:sd
 Get_Kerning:Xu
 L 43:Ps
@@ -2033,16 +2033,16 @@ L 95:at
 L 96:Ez
 L 97:bt
 JSCompiler_StaticMethods_Set_TableBorder_Top:hd
-L 98:iK
+L 98:hK
 CFF_Driver:hu
 sfnt_open_font:Lo
 FT_Request_Metrics:ls
 ParaPresentationNumbering:Sy
 SPH_ScaleRule:Mp
-L 92:gK
+L 92:fK
 L 91:Cz
 nSldLtTObjTx:TJ
-L 94:hK
+L 94:gK
 JSCompiler_StaticMethods_Document_UpdateUndoRedoState:sC
 CreateUIntArray:Ok
 L 93:Dz
@@ -2050,18 +2050,18 @@ global_keyboardEvent:nz
 FT_RoundFix:Xh
 CFontFileLoader:O
 CFontFilesCache:Nv
-L 90:fK
+L 90:eK
 _ph_summ__two_obj_and_tx:bL
 tt_name_entry_ascii_from_utf16:Io
 Editor_Copy_GetElem:oa
 JSCompiler_StaticMethods_Set_TableBorder_InsideV:ad
 L 88:Bz
-L 89:eK
-L 86:dK
+L 89:dK
+L 86:cK
 JSCompiler_StaticMethods_Set_Inline:OB
 L 87:lh
 L 84:$s
-L 85:cK
+L 85:bK
 FT_Glyph_Class:ep
 tt_size_run_prep:bq
 tt_size_request:ks
@@ -2075,7 +2075,7 @@ JSCompiler_StaticMethods_Create_Table_BorderedAndLined:Ex
 ScrollArrowType$ARROW_LEFT:xC
 L 83:kh
 L 82:Om
-L 81:bK
+L 81:aK
 L 80:Zs
 tt_cmap2_get_subheader:xn
 JSCompiler_StaticMethods_Cursor_IsEnd:KD
