@@ -523,7 +523,132 @@ DrawingObjectsController.prototype =
 	
 	setGraphicObjectProps: function(props)
 	{
-		// TODO
+		var properties;
+        if (props instanceof asc_CImgProperty)
+            properties = props.ShapeProperties;
+        else
+            properties = props;
+        
+        if (isRealObject(properties) || isRealObject(props))
+        {
+            var arr_pages = [];
+            if (isRealObject(props) && typeof props.verticalTextAlign === "number" && !isNaN(props.verticalTextAlign))
+            {
+                if (this.curState.id === STATES_ID_TEXT_ADD)
+                {
+                    if(typeof this.curState.textObject.GraphicObj.setTextVerticalAlign === "function")
+                        this.curState.textObject.GraphicObj.setTextVerticalAlign(props.verticalTextAlign);
+                }
+
+                if (this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP)
+                {
+                    if (typeof this.curState.textObject.setTextVerticalAlign === "function")
+                        this.curState.textObject.setTextVerticalAlign(props.verticalTextAlign);
+                }
+            }
+            if (!(this.curState.id === STATES_ID_GROUP || this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP) && isRealObject(properties))
+            {
+                var ArrGlyph = this.selectedObjects;
+                for (var i = 0;  i< ArrGlyph.length; ++i)
+                {
+                    //if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : ArrGlyph[i].Parent, CheckType : changestype_Paragraph_Content} ))
+                    {
+                        /*var cur_page_index = ArrGlyph[i].pageIndex;
+                        for (var j = 0; j < arr_pages.length; ++j)
+                        {
+                            if(arr_pages[j] === cur_page_index)
+                                break;
+                        }
+                        if (j === arr_pages.length)
+                            arr_pages.push(cur_page_index);*/
+							
+                        if (((ArrGlyph[i].isShape()) || (ArrGlyph[i].isGroup())))
+                        {
+                            if (properties.type != undefined && properties.type != -1)
+                            {
+                                ArrGlyph[i].changePresetGeometry(properties.type);
+                            }
+                            if (properties.fill)
+                            {
+                                ArrGlyph[i].changeFill(properties.fill);
+                            }
+                            if (properties.stroke)
+                            {
+                                ArrGlyph[i].changeLine(properties.stroke);
+                            }
+                        }
+                    }
+
+                    if (typeof props.verticalTextAlign === "number" && !isNaN(props.verticalTextAlign) && typeof ArrGlyph[i].setTextVerticalAlign === "function")
+                    {
+                        ArrGlyph[i].setTextVerticalAlign(props.verticalTextAlign);
+                    }
+
+                }
+                /*arr_pages.sort(function(a, b){return a-b;});
+                for (i = 0; i < arr_pages.length; ++i)
+                {
+                    this.drawingDocument.OnRecalculatePage(arr_pages[i], this.document.Pages[arr_pages[i]]);
+                }
+                this.drawingDocument.OnEndRecalculate(false, false);*/
+            }
+            else if (this.curState.id === STATES_ID_GROUP || this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP)
+            {
+                if (false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : this.curState.group.parent.Parent, CheckType : changestype_Paragraph_Content} ))
+                {
+                    if ( undefined != props.PositionH )
+                        this.curState.group.parent.Set_PositionH( props.PositionH.RelativeFrom, props.PositionH.UseAlign, ( true === props.PositionH.UseAlign ? props.PositionH.Align : props.PositionH.Value ) );
+
+                    if ( undefined != props.PositionV )
+                        this.curState.group.parent.Set_PositionV( props.PositionV.RelativeFrom, props.PositionV.UseAlign, ( true === props.PositionV.UseAlign ? props.PositionV.Align : props.PositionV.Value ) );
+
+                    ArrGlyph = this.curState.group.selectionInfo.selectionArray;
+                    var b_change_diagram = false;
+                    for (i = 0;  i< ArrGlyph.length; ++i)
+                    {
+                        if (ArrGlyph[i].isShape() && isRealObject(properties))
+                        {
+                            if (properties.type != undefined && properties.type != -1)
+                            {
+                                ArrGlyph[i].changePresetGeometry(properties.type);
+                            }
+                            if (properties.fill)
+                            {
+                                ArrGlyph[i].changeFill(properties.fill);
+                            }
+                            if (properties.stroke)
+                            {
+                                ArrGlyph[i].changeLine(properties.stroke);
+                            }
+                        }
+                        else if (isRealObject(props) && typeof  props.ImageUrl === "string" && ArrGlyph[i].isImage() && ArrGlyph[i].chart == null)
+                        {
+                            ArrGlyph[i].setRasterImage2(props.ImageUrl);
+                        }
+                        else if (ArrGlyph[i].chart != null && isRealObject(props) && isRealObject(props.ChartProperties))
+                        {
+                            b_change_diagram = true;
+                            ArrGlyph[i].setDiagram(props.ChartProperties)
+                        }
+
+                        if (typeof props.verticalTextAlign === "number" && !isNaN(props.verticalTextAlign) && typeof ArrGlyph[i].setTextVerticalAlign === "function")
+                        {
+                            ArrGlyph[i].setTextVerticalAlign(props.verticalTextAlign);
+                        }
+                    }
+                    if (b_change_diagram)
+                    {
+                        this.curState.group.updateSizes();
+                        this.curState.group.recalculate();
+                        var bounds = this.curState.group.parent.getBounds();
+                        if (!this.curState.group.parent.Is_Inline())
+                            this.curState.group.parent.OnEnd_ChangeFlow(this.curState.group.absOffsetX, this.curState.group.absOffsetY, this.curState.group.pageIndex, bounds.r - bounds.l, bounds.b - bounds.t, null, true, true);
+                        else
+                            this.curState.group.parent.OnEnd_ResizeInline(bounds.r - bounds.l, bounds.b - bounds.t);
+                    }
+                }
+            }
+        }
 	}
 };
 
@@ -639,6 +764,74 @@ function CreateAscColor(unicolor) {
         }
         default:
             break;
+    }
+    return ret;
+}
+
+function CorrectUniColor2(asc_color, unicolor) {
+    if (null == asc_color)
+        return unicolor;
+
+    var ret = unicolor;
+    if (null == ret)
+        ret = new CUniColor();
+
+    var _type = asc_color.asc_getType();
+    switch (_type)
+    {
+        case c_oAscColor.COLOR_TYPE_PRST:
+        {
+            if (ret.color == null || ret.color.type != COLOR_TYPE_PRST)
+            {
+                ret.color = new CPrstColor();
+            }
+            ret.color.id = asc_color.asc_getValue();
+            break;
+        }
+        case c_oAscColor.COLOR_TYPE_SCHEME:
+        {
+            if (ret.color == null || ret.color.type != COLOR_TYPE_SCHEME)
+            {
+                ret.color = new CSchemeColor();
+            }
+
+            // тут выставляется ТОЛЬКО из меню. поэтому:
+            var _index = parseInt(asc_color.asc_getValue());
+            var _id = (_index / 6) >> 0;
+            var _pos = _index - _id * 6;
+
+            var array_colors_types = [6, 15, 7, 16, 0, 1, 2, 3, 4, 5];
+            ret.color.id = array_colors_types[_id];
+
+            if (ret.Mods.Mods.length != 0)
+                ret.Mods.Mods.splice(0, ret.Mods.Mods.length);
+
+            if (1 <= _pos && _pos <= 5)
+            {
+                var _mods = g_oThemeColorsDefaultMods[_pos - 1];
+                var _ind = 0;
+                for (var k in _mods)
+                {
+                    ret.Mods.Mods[_ind] = new CColorMod();
+                    ret.Mods.Mods[_ind].name = k;
+                    ret.Mods.Mods[_ind].val = _mods[k];
+                    _ind++;
+                }
+            }
+
+            break;
+        }
+        default:
+        {
+            if (ret.color == null || ret.color.type != COLOR_TYPE_SRGB)
+            {
+                ret.color = new CRGBColor();
+            }
+            ret.color.RGBA.R = asc_color.get_r();
+            ret.color.RGBA.G = asc_color.get_g();
+            ret.color.RGBA.B = asc_color.get_b();
+            ret.color.RGBA.A = asc_color.get_a();
+        }
     }
     return ret;
 }
@@ -767,6 +960,72 @@ function CreateAscFill(unifill) {
     }
 
     ret.transparent = unifill.transparent;
+    return ret;
+}
+
+function CorrectUniFill2(asc_fill, unifill) {
+    if (null == asc_fill)
+        return unifill;
+
+    var ret = unifill;
+    if (null == ret)
+        ret = new CUniFill();
+
+    var _fill = asc_fill.asc_getFill();
+    var _type = asc_fill.asc_getType();
+
+    if (null != _type)
+    {
+        switch (_type)
+        {
+            case c_oAscFill.FILL_TYPE_NOFILL:
+            {
+                ret.fill = new CNoFill();
+                break;
+            }
+            case c_oAscFill.FILL_TYPE_BLIP:
+            {
+                if (ret.fill == null || ret.fill.type != FILL_TYPE_BLIP)
+                {
+                    ret.fill = new CBlipFill();
+                }
+
+                var _url = _fill.get_url();
+                var _tx_id = _fill.get_texture_id();
+                if (null != _tx_id && (0 <= _tx_id) && (_tx_id < g_oUserTexturePresets.length))
+                {
+                    _url = g_oUserTexturePresets[_tx_id];
+                }
+
+                if (_url != null && _url !== undefined && _url != "")
+                    ret.fill.RasterImageId = _url;
+
+                if (ret.fill.RasterImageId == null)
+                    ret.fill.RasterImageId = "";
+
+                var tile = _fill.get_type();
+                if (tile == c_oAscFillBlipType.STRETCH)
+                    ret.fill.tile = null;
+                else if (tile == c_oAscFillBlipType.TILE)
+                    ret.fill.tile = true;
+
+                break;
+            }
+            default:
+            {
+                if (ret.fill == null || ret.fill.type != FILL_TYPE_SOLID)
+                {
+                    ret.fill = new CSolidFill();
+                }
+                ret.fill.color = CorrectUniColor2(_fill.asc_getColor(), ret.fill.color);
+            }
+        }
+    }
+
+    var _alpha = asc_fill.asc_getTransparent();
+    if (null != _alpha)
+        ret.transparent = _alpha;
+
     return ret;
 }
 
@@ -932,6 +1191,91 @@ function CreateAscStroke(ln, _canChangeArrows) {
 
     if (true === _canChangeArrows)
         ret.canChangeArrows = true;
+
+    return ret;
+}
+
+function CorrectUniStroke2(asc_stroke, unistroke) {
+    if (null == asc_stroke)
+        return unistroke;
+
+    var ret = unistroke;
+    if (null == ret)
+        ret = new CLn();
+
+    var _type = asc_stroke.asc_getType();
+    var _w = asc_stroke.asc_getWidth();
+
+    if (_w != null && _w !== undefined)
+        ret.w = _w * 36000.0;
+
+    var _color = asc_stroke.asc_getColor();
+    if (_type == c_oAscStrokeType.STROKE_NONE)
+    {
+        ret.Fill = new CUniFill();
+        ret.Fill.fill = new CNoFill();
+    }
+    else if (_type != null)
+    {
+        if (null != _color && undefined !== _color)
+        {
+            ret.Fill = new CUniFill();
+            ret.Fill.type = FILL_TYPE_SOLID;
+            ret.Fill.fill = new CSolidFill();
+            ret.Fill.fill.color = CorrectUniColor2(_color, ret.Fill.fill.color);
+        }
+    }
+
+    var _join = asc_stroke.asc_getLinejoin();
+    if (null != _join)
+    {
+        ret.LineJoin = new LineJoin();
+        ret.LineJoin.type = _join;
+    }
+
+    var _cap = asc_stroke.asc_getLinecap();
+    if (null != _cap)
+    {
+        ret.cap = _cap;
+    }
+
+    var _begin_style = asc_stroke.asc_getLinebeginstyle();
+    if (null != _begin_style)
+    {
+        if (ret.headEnd == null)
+            ret.headEnd = new EndArrow();
+
+        ret.headEnd.type = _begin_style;
+    }
+
+    var _end_style = asc_stroke.asc_getLineendstyle();
+    if (null != _end_style)
+    {
+        if (ret.tailEnd == null)
+            ret.tailEnd = new EndArrow();
+
+        ret.tailEnd.type = _end_style;
+    }
+
+    var _begin_size = asc_stroke.asc_getLinebeginsize();
+    if (null != _begin_size)
+    {
+        if (ret.headEnd == null)
+            ret.headEnd = new EndArrow();
+
+        ret.headEnd.w = 2 - ((_begin_size/3) >> 0);
+        ret.headEnd.len = 2 - (_begin_size % 3);
+    }
+
+    var _end_size = asc_stroke.asc_getLineendsize();
+    if (null != _end_size)
+    {
+        if (ret.tailEnd == null)
+            ret.tailEnd = new EndArrow();
+
+        ret.tailEnd.w = 2 - ((_end_size/3) >> 0);
+        ret.tailEnd.len = 2 - (_end_size % 3);
+    }
 
     return ret;
 }

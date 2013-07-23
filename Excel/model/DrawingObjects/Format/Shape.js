@@ -230,6 +230,71 @@ CShape.prototype =
             this.recalculatePen();
     },
 
+	calculateFill: function()
+    {
+        /*var theme = this.document.theme;
+        var brush;
+        var colorMap = this.document.clrSchemeMap.color_map;
+        var RGBA = {R: 0, G: 0, B: 0, A: 255};
+        if (colorMap == null)
+            colorMap = GenerateDefaultColorMap().color_map;
+        if (theme && this.style != null && this.style.fillRef!=null)
+        {
+            brush = theme.getFillStyle(this.style.fillRef.idx);
+            this.style.fillRef.Color.Calculate(theme, colorMap, {R:0, G:0, B:0, A:255});
+            RGBA = this.style.fillRef.Color.RGBA;
+
+            if (this.style.fillRef.Color.color != null)
+            {
+                if (brush.fill != null && (brush.fill.type == FILL_TYPE_SOLID || brush.fill.type == FILL_TYPE_GRAD))
+                {
+                    brush.fill.color = this.style.fillRef.Color.createDuplicate();
+                }
+            }
+        }
+        else
+        {
+            brush = new CUniFill();
+        }
+
+
+        brush.merge(this.spPr.Fill);
+        this.brush = brush;
+        this.brush.calculate(theme, colorMap, RGBA);*/
+    },
+	
+	calculateLine: function()
+    {
+        /*var _calculated_line;
+        var _theme = this.document.theme;
+        var colorMap = this.document.clrSchemeMap.color_map;
+        if(colorMap==null)
+            colorMap = GenerateDefaultColorMap().color_map;
+        var RGBA = {R: 0, G: 0, B: 0, A: 255};
+        if(_theme !== null && typeof _theme === "object" && typeof _theme.getLnStyle === "function"
+            && this.style !== null && typeof  this.style === "object"
+            && this.style.lnRef !== null && typeof this.style.lnRef === "object" && typeof  this.style.lnRef.idx === "number"
+            && this.style.lnRef.Color !== null && typeof  this.style.lnRef.Color.Calculate === "function")
+        {
+            _calculated_line = _theme.getLnStyle(this.style.lnRef.idx);
+            this.style.lnRef.Color.Calculate(_theme, colorMap, {R: 0 , G: 0, B: 0, A: 255});
+            RGBA = this.style.lnRef.Color.RGBA;
+        }
+        else
+        {
+            _calculated_line = new CLn();
+        }
+
+        _calculated_line.merge(this.spPr.ln);
+
+        if(_calculated_line.Fill!=null)
+        {
+            _calculated_line.Fill.calculate(_theme, colorMap, RGBA) ;
+        }
+
+        this.pen = _calculated_line;*/
+    },
+	
     setPosition: function(x, y)
     {
         var model_id = this.drawingObjects.getWorksheet().model.getId();
@@ -1119,6 +1184,244 @@ CShape.prototype =
         if(!isRealObject(this.pen))
             return null;
         return this.pen;
+    },
+	
+	changeFill : function(ascFill)
+    {
+        //var historyObj = {Type: historyitem_ChangeFill};
+        if(this.spPr.Fill == null)
+        {
+            //historyObj.old_Fill = null;
+        }
+        else
+        {
+            //historyObj.old_Fill = this.spPr.Fill.createDuplicate();
+        }
+        if(this.spPr.Fill == null )
+        {
+            this.spPr.Fill = new CUniFill();
+        }
+
+        this.spPr.Fill = CorrectUniFill2(ascFill, this.spPr.Fill);
+        if(this.spPr.Fill == null)
+        {
+            //historyObj.new_Fill = null;
+        }
+        else
+        {
+            //historyObj.new_Fill = this.spPr.Fill.createDuplicate();
+        }
+       /* if(isRealObject(this.spPr.Fill) && isRealObject(this.spPr.Fill.fill) && this.spPr.Fill.fill.type === FILL_TYPE_BLIP)
+        {
+            editor.WordControl.m_oLogicDocument.DrawingObjects.urlMap.push(this.spPr.Fill.fill.RasterImageId);
+        }  */
+        //History.Add(this, historyObj);
+        this.calculateFill();
+    },
+
+    changeLine : function(line)
+    {
+        //var historyObj = {Type: historyitem_ChangeLine};
+        if(this.spPr.ln != null)
+        {
+            //historyObj.old_Line = this.spPr.ln.createDuplicate();
+        }
+        else
+        {
+            //historyObj.old_Line = null;
+        }
+        //this.spPr.ln.merge(line);
+        this.spPr.ln = CorrectUniStroke2(line, this.spPr.ln);
+        //historyObj.new_Line = this.spPr.ln.createDuplicate();
+
+        //History.Add(this, historyObj);
+        this.calculateLine();
+    },
+
+    changePresetGeometry: function(sPreset)
+    {
+        var _final_preset;
+        var _old_line;
+        var _new_line;
+
+
+        if(this.spPr.ln == null)
+        {
+            _old_line = null;
+        }
+        else
+        {
+            _old_line = this.spPr.ln.createDuplicate();
+        }
+        var _arrow_flag = false;
+        switch(sPreset)
+        {
+            case "lineWithArrow":
+            {
+                _final_preset = "line";
+                _arrow_flag = true;
+                if(_old_line == null)
+                {
+                    _new_line = new CLn();
+                }
+                else
+                {
+                    _new_line = this.spPr.ln.createDuplicate();
+                }
+                _new_line.tailEnd = new EndArrow();
+                _new_line.tailEnd.type = LineEndType.Arrow;
+                _new_line.tailEnd.len = LineEndSize.Mid;
+                _new_line.tailEnd.w = LineEndSize.Mid;
+                break;
+            }
+            case "lineWithTwoArrows":
+            {
+                _final_preset = "line";
+                _arrow_flag = true;
+                if(_old_line == null)
+                {
+                    _new_line = new CLn();
+
+                }
+                else
+                {
+                    _new_line = this.spPr.ln.createDuplicate();
+                }
+                _new_line.tailEnd = new EndArrow();
+                _new_line.tailEnd.type = LineEndType.Arrow;
+                _new_line.tailEnd.len = LineEndSize.Mid;
+                _new_line.tailEnd.w = LineEndSize.Mid;
+
+                _new_line.headEnd = new EndArrow();
+                _new_line.headEnd.type = LineEndType.Arrow;
+                _new_line.headEnd.len = LineEndSize.Mid;
+                _new_line.headEnd.w = LineEndSize.Mid;
+                break;
+            }
+            case "bentConnector5WithArrow":
+            {
+                _final_preset = "bentConnector5";
+                _arrow_flag = true;
+                if(_old_line == null)
+                {
+                    _new_line = new CLn();
+
+                }
+                else
+                {
+                    _new_line = this.spPr.ln.createDuplicate();
+                }
+                _new_line.tailEnd = new EndArrow();
+                _new_line.tailEnd.type = LineEndType.Arrow;
+                _new_line.tailEnd.len = LineEndSize.Mid;
+                _new_line.tailEnd.w = LineEndSize.Mid;
+                break;
+            }
+            case "bentConnector5WithTwoArrows":
+            {
+                _final_preset = "bentConnector5";
+                _arrow_flag = true;
+                if(_old_line == null)
+                {
+                    _new_line = new CLn();
+
+                }
+                else
+                {
+                    _new_line = this.spPr.ln.createDuplicate();
+                }
+                _new_line.tailEnd = new EndArrow();
+                _new_line.tailEnd.type = LineEndType.Arrow;
+                _new_line.tailEnd.len = LineEndSize.Mid;
+                _new_line.tailEnd.w = LineEndSize.Mid;
+
+                _new_line.headEnd = new EndArrow();
+                _new_line.headEnd.type = LineEndType.Arrow;
+                _new_line.headEnd.len = LineEndSize.Mid;
+                _new_line.headEnd.w = LineEndSize.Mid;
+                break;
+            }
+            case "curvedConnector3WithArrow":
+            {
+                _final_preset = "curvedConnector3";
+                _arrow_flag = true;
+                if(_old_line == null)
+                {
+                    _new_line = new CLn();
+
+                }
+                else
+                {
+                    _new_line = this.spPr.ln.createDuplicate();
+                }
+                _new_line.tailEnd = new EndArrow();
+                _new_line.tailEnd.type = LineEndType.Arrow;
+                _new_line.tailEnd.len = LineEndSize.Mid;
+                _new_line.tailEnd.w = LineEndSize.Mid;
+                break;
+            }
+            case "curvedConnector3WithTwoArrows":
+            {
+                _final_preset = "curvedConnector3";
+                _arrow_flag = true;
+                if(_old_line == null)
+                {
+                    _new_line = new CLn();
+
+                }
+                else
+                {
+                    _new_line = this.spPr.ln.createDuplicate();
+                }
+                _new_line.tailEnd = new EndArrow();
+                _new_line.tailEnd.type = LineEndType.Arrow;
+                _new_line.tailEnd.len = LineEndSize.Mid;
+                _new_line.tailEnd.w = LineEndSize.Mid;
+
+                _new_line.headEnd = new EndArrow();
+                _new_line.headEnd.type = LineEndType.Arrow;
+                _new_line.headEnd.len = LineEndSize.Mid;
+                _new_line.headEnd.w = LineEndSize.Mid;
+                break;
+            }
+            default  :
+            {
+                _final_preset = sPreset;
+                _arrow_flag = true;
+                if(_old_line == null)
+                {
+                    _new_line = new CLn();
+
+                }
+                else
+                {
+                    _new_line = this.spPr.ln.createDuplicate();
+                }
+                _new_line.tailEnd = null;
+
+                _new_line.headEnd = null;
+                break;
+            }
+        }
+
+        //var historyData = {Type: historyitem_ChangePresetGeom};
+        //historyData.arrowFlag = _arrow_flag;
+        if(_arrow_flag === true)
+        {
+            //historyData.oldLine = _old_line;
+            //historyData.newLine = _new_line;
+            this.spPr.ln = _new_line;
+            this.calculateLine();
+        }
+        //historyData.old_geometryPreset = isRealObject(this.spPr.geometry) ? this.spPr.geometry.preset : null;
+        //historyData.new_geometryPreset = _final_preset;
+
+
+        //History.Add(this, historyData);
+
+        this.spPr.geometry = CreateGeometry(_final_preset);
+        this.spPr.geometry.Init(100, 100);
+        this.calculateAfterResize();
     },
 	
 	canChangeArrows : function()
