@@ -150,10 +150,16 @@ CMinimax.prototype.setDistance = function()
 
 function CMathFunc()
 {
-    CMathBase.call(this, 1,2);
+    CMathBase.call(this);
 }
 extend(CMathFunc, CMathBase);
-CMathFunc.prototype.setContent = function()
+CMathFunc.prototype.init = function()
+{
+    this.setDimension(1, 2);
+    this.setContent();
+    this.elements[0][0].mergeTxtPrp({Italic: false}); // trigonometrical function
+}
+CMathFunc.prototype.old_setContent = function()
 {
     var oFunc = new CMathContent();
     var GParms = Common_CopyObj(this.params);
@@ -169,8 +175,7 @@ CMathFunc.prototype.setContent = function()
 }
 CMathFunc.prototype.setDistance = function()
 {
-    this.dW = this.params.font.FontSize/6*g_dKoef_pt_to_mm;
-    this.dH = 0;
+    this.dW = this.getTxtPrp().FontSize/6*g_dKoef_pt_to_mm;
 }
 CMathFunc.prototype.getFunction = function()
 {

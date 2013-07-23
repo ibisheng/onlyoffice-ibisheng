@@ -20,7 +20,7 @@ CMathTextPrp.prototype =
     Merge: function(prp)
     {
         if(prp.FontFamily !== undefined)
-            this.FontFamily = prp.FontFamily;
+            this.FontFamily = Common_CopyObj(prp.FontFamily);
 
         if(prp.FontSize !== undefined)
             this.FontSize = prp.FontSize;
@@ -31,6 +31,13 @@ CMathTextPrp.prototype =
         if(prp.Italic !== undefined)
             this.Italic = prp.Italic;
 
+    },
+    Set: function(prp)
+    {
+        this.FontFamily = Common_CopyObj(prp.FontFamily);
+        this.FontSize = prp.FontSize;
+        this.Bold = prp.Bold;
+        this.Italic = prp.Italic;
     }
 }
 
@@ -127,13 +134,6 @@ CMathText.prototype =
         txtPrp.Merge(this.textPrp);
 
         txtPrp.Italic = false; // всегда отправляем "false"!!
-
-        return txtPrp;
-    },
-    getTxtPrp_Out: function()
-    {
-        var txtPrp = this.Parent.getTxtPrp();
-        txtPrp.Merge(this.TextPrp);
 
         return txtPrp;
     },

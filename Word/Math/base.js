@@ -80,15 +80,17 @@ CMathBase.prototype =
 
         txtPrp.Merge(this.textPrp);
 
+        txtPrp.FontSize *= this.reduct;
+
         return txtPrp;
     },
-    getTxtPrp_2: function()
+    /*getTxtPrp_2: function()
     {
         var txtPrp = this.getTxtPrp();
         txtPrp.FontSize *= this.reduct;
 
         return txtPrp;
-    },
+    },*/
     setComposition: function(Compos)
     {
         this.Composition = Compos;

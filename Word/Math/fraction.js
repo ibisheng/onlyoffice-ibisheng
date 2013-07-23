@@ -18,12 +18,12 @@ CBarFraction.prototype.init = function()
 }
 CBarFraction.prototype.getCenter =  function()
 {
-    var penW = this.getTxtPrp_2().FontSize* 25.4/96 * 0.08 /2;
+    var penW = this.getTxtPrp().FontSize* 25.4/96 * 0.08 /2;
     return this.elements[0][0].size.height + penW;
 }
 CBarFraction.prototype.draw = function()
 {
-    var penW = this.getTxtPrp_2().FontSize* this.reduct* 25.4/96 * 0.08;
+    var penW = this.getTxtPrp().FontSize* this.reduct* 25.4/96 * 0.08;
 
     var x1 = this.pos.x,
         x2 = this.pos.x + this.size.width,
@@ -73,7 +73,7 @@ CNumerator.prototype.init = function()
 CNumerator.prototype.recalculateSize = function()
 {
     var arg = this.elements[0][0].size;
-    var txtPrp = this.getTxtPrp_2();
+    var txtPrp = this.getTxtPrp();
 
     var Descent = arg.height - arg.ascent; // baseLine
     var gap = 7.832769097222222 * txtPrp.FontSize/36,
@@ -177,7 +177,7 @@ CDenominator.prototype.init = function()
 CDenominator.prototype.recalculateSize = function()
 {
     var arg = this.elements[0][0].size;
-    var txtPrp = this.getTxtPrp_2();
+    var txtPrp = this.getTxtPrp();
 
     var gap = 7.832769097222222 * txtPrp.FontSize/36,
         Ascent = arg.ascent,

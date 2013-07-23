@@ -548,123 +548,6 @@ CDelimiter.prototype.init_2 = function(params, base)
         this.alignVer(2, 0.5);
     }
 }
-CDelimiter.prototype.old_setContent = function(arg)
-{
-    var operator1, operator2,
-        loc1, loc2;
-
-    if(this.loc == 0)
-        loc1 = 0;
-    else if(this.loc == 1)
-        loc2 = 1;
-    else if(this.loc == 2)
-        loc1 = 2;
-    else if(this.loc == 3)
-        loc2 = 3;
-    else if(this.loc == 4)
-    {
-        loc1 = 2;
-        loc2 = 3;
-    }
-    else
-    {
-        loc1 = 0;
-        loc2 = 1;
-    }
-
-
-    if(this.type == 0)
-    {
-        operator1 = new COperatorParenthesis();
-        operator2 = new COperatorParenthesis();
-    }
-    else if(this.type == 1)
-    {
-        operator1 = new COperatorBracket();
-        operator2 = new COperatorBracket();
-    }
-    else if(this.type == 2)
-    {
-        operator1 = new CSquareBracket();
-        operator2 = new CSquareBracket();
-    }
-    else if(this.type == 3)
-    {
-        operator1 = new COperatorAngleBracket();
-        operator2 = new COperatorAngleBracket();
-    }
-    else if(this.type == 4)
-    {
-        operator1 = new CHalfSquareBracket();
-        operator2 = new CHalfSquareBracket();
-    }
-    else if(this.type == 5)
-    {
-        operator1 = new COperatorLine();
-        operator2 = new COperatorLine();
-    }
-    else if(this.type == 6)
-    {
-        operator1 = new COperatorDoubleLine();
-        operator2 = new COperatorDoubleLine();
-    }
-    else
-    {
-        operator1 = new CWhiteSquareBracket();
-        operator2 = new CWhiteSquareBracket();
-    }
-
-    var params1 = Common_CopyObj(this.params),
-        params2 = Common_CopyObj(this.params);
-
-    operator1.init(params1);
-    operator1.setLocation(loc1, this.turn1);
-    operator2.init(params2);
-    operator2.setLocation(loc2, this.turn2);
-
-    var argument;
-    if(arg !== null && typeof(arg)!== "undefined")
-        argument = arg;
-    else
-    {
-        argument = new CMathContent();
-        argument.init(this.params);
-        argument.relate(this);
-        argument.fillPlaceholders();
-    }
-
-    this.base = argument;
-
-    if(this.loc == 0 || this.loc == 2)
-    {
-        CDelimiter.superclass.setContent.call(this, operator1, argument);
-    }
-    else if(this.loc == 1  || this.loc == 3)
-    {
-        CDelimiter.superclass.setContent.call(this, argument, operator2);
-    }
-    else
-    {
-        CDelimiter.superclass.setContent.call(this, operator1, argument, operator2);
-    }
-
-
-    //выравнивание для случая когда центр смещен (не середина), для вложенных дробей и т.п.
-    if(this.loc == 2)
-    {
-        this.alignVer(0, 0.5);
-    }
-    else if(this.loc == 3)
-    {
-        this.alignVer(1, 0.5);
-    }
-    if(this.loc == 4)
-    {
-        this.alignVer(0, 0.5);
-        this.alignVer(2, 0.5);
-    }
-
-}
 CDelimiter.prototype.recalculateSize = function()
 {
     var width, height, center;
@@ -2967,15 +2850,6 @@ CSeparatorDelimiter.prototype.init = function(type, column)
         turn2: 1
     };
     this.init_2(params, base);
-}
-CSeparatorDelimiter.prototype.old_setContent = function()
-{
-    var arg = new CSeparator(this.column);
-    arg.init(this.params);
-    arg.relate(this);
-    arg.fillPlaceholders();
-
-    CSeparatorDelimiter.superclass.setContent.call(this, arg);
 }
 CSeparatorDelimiter.prototype.mouseMove = function(mCoord)
 {
