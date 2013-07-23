@@ -376,8 +376,8 @@ DrawingObjectsController.prototype =
 								shape_props.ShapeProperties = new asc_CShapeProperty();
 								
 								shape_props.ShapeProperties.type = c_obj.getPresetGeom();
-                                shape_props.ShapeProperties.fill = CreateAscFill(c_obj.getFill());
-                                shape_props.ShapeProperties.stroke = CreateAscStroke(c_obj.getStroke());
+                                shape_props.ShapeProperties.fill = CreateAscFill2(c_obj.getFill());
+                                shape_props.ShapeProperties.stroke = CreateAscStroke2(c_obj.getStroke());
                                 shape_props.ShapeProperties.canChangeArrows = c_obj.canChangeArrows();
 								
                                 //shape_props.verticalTextAlign = c_obj.bodyPr.anchor;
@@ -914,7 +914,7 @@ prot["asc_getColor"] = prot.asc_getColor;
 prot["asc_putColor"] = prot.asc_putColor;
 //}
 
-function CreateAscFill(unifill) {
+function CreateAscFill2(unifill) {
     if (null == unifill || null == unifill.fill)
         return new asc_CShapeFill();
 
@@ -1100,7 +1100,7 @@ prot["asc_putLineendsize"] = prot.asc_putLineendsize;
 prot["asc_getCanChangeArrows"] = prot.asc_getCanChangeArrows;
 //}
 
-function CreateAscStroke(ln, _canChangeArrows) {
+function CreateAscStroke2(ln, _canChangeArrows) {
     if (null == ln || null == ln.Fill || ln.Fill.fill == null)
         return new asc_CStroke();
 
