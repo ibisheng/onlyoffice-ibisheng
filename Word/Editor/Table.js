@@ -873,6 +873,25 @@ CTable.prototype =
             var CellBorders = Cell.Get_Borders();
             var CellShd     = Cell.Get_Shd();
 
+            if ( true === Cell.Is_TableMargins() )
+            {
+                Pr.CellMargins =
+                {
+                    Flag : 0
+                };
+            }
+            else
+            {
+                Pr.CellMargins =
+                {
+                    Left   : CellMargins.Left.W,
+                    Right  : CellMargins.Right.W,
+                    Top    : CellMargins.Top.W,
+                    Bottom : CellMargins.Bottom.W,
+                    Flag   : 2
+                };
+            }
+
             Pr.CellsVAlign = Cell.Get_VAlign();
 
             var Spacing = this.Content[0].Get_CellSpacing();
@@ -1007,25 +1026,6 @@ CTable.prototype =
                     Bottom  : Border_bottom.Copy(),
                     InsideH : null === Border_insideH ? null : Border_insideH.Copy(),
                     InsideV : null === Border_insideV ? null : Border_insideV.Copy()
-                };
-            }
-
-            if ( true === Cell.Is_TableMargins() )
-            {
-                Pr.CellMargins =
-                {
-                    Flag : 0
-                };
-            }
-            else
-            {
-                Pr.CellMargins =
-                {
-                    Left   : CellMargins.Left.W,
-                    Right  : CellMargins.Right.W,
-                    Top    : CellMargins.Top.W,
-                    Bottom : CellMargins.Bottom.W,
-                    Flag   : 2
                 };
             }
         }
