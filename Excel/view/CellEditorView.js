@@ -29,6 +29,7 @@
 		var asc_TR = asc.CellTextRender;
 		var asc_FP = asc.FontProperties;
 		var asc_parsecolor = asc.parseColor;
+		var asc_incDecFonSize = asc.incDecFonSize;
 
 
 		/** @const */
@@ -1574,6 +1575,11 @@
 							formatAdditional.theme = val.theme;
 							formatAdditional.tint = val.tint;
 						}
+						break;
+					case "changeFontSize":
+						var newFontSize = asc_incDecFonSize(val, format.fs);
+						if (null !== newFontSize)
+							format.fs = newFontSize;
 						break;
 				}
 				return val;

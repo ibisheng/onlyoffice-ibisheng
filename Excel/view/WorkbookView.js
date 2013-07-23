@@ -1316,7 +1316,7 @@
 				if (!this.controller.isCellEditMode) {
 					this.getWorksheet().setSelectionInfo(prop, val);
 				} else {
-					//ToDo this.cellEditor.setTextStyle(prop, val);
+					this.cellEditor.setTextStyle(prop, val);
 				}
 			},
 
