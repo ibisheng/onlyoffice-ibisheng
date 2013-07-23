@@ -280,7 +280,7 @@ DrawingObjectsController.prototype =
         return this.curState.isPointInDrawingObjects(x, y);
     },
 	
-	getGraphicObjectProps: function()	// Все свойства делаем чераз asc_классы
+	getGraphicObjectProps: function()
 	{
 		var shape_props, image_props;
         
@@ -376,8 +376,8 @@ DrawingObjectsController.prototype =
 								shape_props.ShapeProperties = new asc_CShapeProperty();
 								
 								shape_props.ShapeProperties.type = c_obj.getPresetGeom();
-                                shape_props.ShapeProperties.fill = c_obj.getFill();
-                                shape_props.ShapeProperties.stroke = c_obj.getStroke();
+                                shape_props.ShapeProperties.fill = CreateAscFill(c_obj.getFill());
+                                shape_props.ShapeProperties.stroke = CreateAscStroke(c_obj.getStroke());
                                 shape_props.ShapeProperties.canChangeArrows = c_obj.canChangeArrows();
 								
                                 //shape_props.verticalTextAlign = c_obj.bodyPr.anchor;
@@ -519,5 +519,419 @@ DrawingObjectsController.prototype =
 		}
 		
         return ascSelectedObjects;
+	},
+	
+	setGraphicObjectProps: function(props)
+	{
+		// TODO
 	}
 };
+
+//-----------------------------------------------------------------------------------
+// ASC Classes
+//-----------------------------------------------------------------------------------
+
+function asc_CColor() {
+    this.type = c_oAscColor.COLOR_TYPE_SRGB;
+    this.value = null;
+    this.r = 0;
+    this.g = 0;
+    this.b = 0;
+    this.a = 255;
+
+    this.Mods = new Array();
+    this.ColorSchemeId = -1;
+}
+
+asc_CColor.prototype = {
+	asc_getR: function() { return this.r },
+	asc_putR: function(v) { this.r = v; this.hex = undefined; },
+	asc_getG: function() { return this.g; },
+	asc_putG: function(v) { this.g = v; this.hex = undefined; },
+	asc_getB: function() { return this.b; },
+	asc_putB: function(v) { this.b = v; this.hex = undefined; },
+	asc_getA: function() { return this.a; },
+	asc_putA: function(v) { this.a = v; this.hex = undefined; },
+	asc_getType: function() { return this.type; },
+	asc_putType: function(v) { this.type = v; },
+	asc_getValue: function() { return this.value; },
+	asc_putValue: function(v) { this.value = v; },
+	asc_getHex: function() {
+		if(!this.hex)
+		{
+			var a = this.a.toString(16);
+			var r = this.r.toString(16);
+			var g = this.g.toString(16);
+			var b = this.b.toString(16);
+			this.hex = ( a.length == 1? "0" + a: a) +
+						( r.length == 1? "0" + r: r) +
+						( g.length == 1? "0" + g: g) +
+						( b.length == 1? "0" + b: b);
+		}
+		return this.hex;
+	},
+	asc_getColor: function() {
+		var ret = new CColor(this.r, this.g, this.b);
+		return ret;
+	}
+}
+
+//{ asc_CColor export
+window["Asc"].asc_CColor = asc_CColor;
+window["Asc"]["asc_CColor"] = asc_CColor;
+prot = asc_CColor.prototype;
+
+prot["asc_getR"] = prot.asc_getR;
+prot["asc_putR"] = prot.asc_putR;
+prot["asc_getG"] = prot.asc_getG;
+prot["asc_putG"] = prot.asc_putG;
+prot["asc_getB"] = prot.asc_getB;
+prot["asc_putB"] = prot.asc_putB;
+prot["asc_getA"] = prot.asc_getA;
+prot["asc_putA"] = prot.asc_putA;
+prot["asc_getType"] = prot.asc_getType;
+prot["asc_putType"] = prot.asc_putType;
+prot["asc_getValue"] = prot.asc_getValue;
+prot["asc_putValue"] = prot.asc_putValue;
+prot["asc_getHex"] = prot.asc_getHex;
+prot["asc_getColor"] = prot.asc_getColor;
+//}
+
+function CreateAscColorCustom(r, g, b) {
+    var ret = new asc_CColor();
+    ret.type = c_oAscColor.COLOR_TYPE_SRGB;
+    ret.r = r;
+    ret.g = g;
+    ret.b = b;
+    ret.a = 255;
+    return ret;
+}
+
+function CreateAscColor(unicolor) {
+    if (null == unicolor || null == unicolor.color)
+        return new asc_CColor();
+
+    var ret = new asc_CColor();
+    ret.r = unicolor.RGBA.R;
+    ret.g = unicolor.RGBA.G;
+    ret.b = unicolor.RGBA.B;
+    ret.a = unicolor.RGBA.A;
+
+    var _color = unicolor.color;
+    switch (_color.type)
+    {
+        case COLOR_TYPE_SRGB:
+        case COLOR_TYPE_SYS:
+        {
+            break;
+        }
+        case COLOR_TYPE_PRST:
+        {
+            ret.type = c_oAscColor.COLOR_TYPE_PRST;
+            ret.value = _color.id;
+            break;
+        }
+        case COLOR_TYPE_SCHEME:
+        {
+            ret.type = c_oAscColor.COLOR_TYPE_SCHEME;
+            ret.value = _color.id;
+            break;
+        }
+        default:
+            break;
+    }
+    return ret;
+}
+
+function asc_CShapeFill() {
+    this.type = null;
+    this.fill = null;
+    this.transparent = null;
+}
+
+asc_CShapeFill.prototype = {
+	asc_getType: function() { return this.type; },
+	asc_putType: function(v) { this.type = v; },
+	asc_getFill: function() { return this.fill; },
+	asc_putFill: function(v) { this.fill = v; },
+	asc_getTransparent: function() { return this.transparent; },
+	asc_putTransparent: function(v) { this.transparent = v; }
+}
+
+//{ asc_CShapeFill export
+window["Asc"].asc_CShapeFill = asc_CShapeFill;
+window["Asc"]["asc_CShapeFill"] = asc_CShapeFill;
+prot = asc_CShapeFill.prototype;
+
+prot["asc_getType"] = prot.asc_getType;
+prot["asc_putType"] = prot.asc_putType;
+
+prot["asc_getFill"] = prot.asc_getFill;
+prot["asc_putFill"] = prot.asc_putFill;
+
+prot["asc_getTransparent"] = prot.asc_getTransparent;
+prot["asc_putTransparent"] = prot.asc_putTransparent;
+//}
+
+function asc_CFillBlip() {
+    this.type = c_oAscFillBlipType.STRETCH;
+    this.url = "";
+    this.texture_id = null;
+}
+
+asc_CFillBlip.prototype = {
+	asc_getType: function(){return this.type},
+	asc_putType: function(v){this.type = v;},
+	asc_getUrl: function(){return this.url;},
+	asc_putUrl: function(v){this.url = v;},
+	asc_getTextureId: function(){return this.texture_id;},
+	asc_putTextureId: function(v){this.texture_id = v;}
+}
+
+//{ asc_CFillBlip export
+window["Asc"].asc_CFillBlip = asc_CFillBlip;
+window["Asc"]["asc_CFillBlip"] = asc_CFillBlip;
+prot = asc_CFillBlip.prototype;
+
+prot["asc_getType"] = prot.asc_getType;
+prot["asc_putType"] = prot.asc_putType;
+
+prot["asc_getUrl"] = prot.asc_getUrl;
+prot["asc_putUrl"] = prot.asc_putUrl;
+
+prot["asc_getTextureId"] = prot.asc_getTextureId;
+prot["asc_putTextureId"] = prot.asc_putTextureId;
+//}
+
+function asc_CFillSolid() {
+    this.color = new CAscColor();
+}
+
+asc_CFillSolid.prototype = {
+	asc_getColor: function() { return this.color },
+	asc_putColor: function(v) { this.color = v; }
+}
+
+//{ asc_CFillSolid export
+window["Asc"].asc_CFillSolid = asc_CFillSolid;
+window["Asc"]["asc_CFillSolid"] = asc_CFillSolid;
+prot = asc_CFillSolid.prototype;
+
+prot["asc_getColor"] = prot.asc_getColor;
+prot["asc_putColor"] = prot.asc_putColor;
+//}
+
+function CreateAscFill(unifill) {
+    if (null == unifill || null == unifill.fill)
+        return new asc_CShapeFill();
+
+    var ret = new asc_CShapeFill();
+
+    var _fill = unifill.fill;
+    switch (_fill.type)
+    {
+        case FILL_TYPE_SOLID:
+        {
+            ret.type = c_oAscFill.FILL_TYPE_SOLID;
+            ret.fill = new asc_CFillSolid();
+            ret.fill.color = CreateAscColor(_fill.color);
+            break;
+        }
+        case FILL_TYPE_PATT:
+        {
+            ret.type = c_oAscFill.FILL_TYPE_SOLID;
+            ret.fill = new asc_CFillSolid();
+            ret.fill.color = CreateAscColor(_fill.fgClr);
+            break;
+        }
+        case FILL_TYPE_GRAD:
+        {
+            ret.type = c_oAscFill.FILL_TYPE_SOLID;
+            ret.fill = new asc_CFillSolid();
+
+            if (_fill.colors.length > 0)
+                ret.fill.color = CreateAscColor(_fill.colors[0].color);
+            break;
+        }
+        case FILL_TYPE_BLIP:
+        {
+            ret.type = c_oAscFill.FILL_TYPE_BLIP;
+            ret.fill = new asc_CFillBlip();
+
+            ret.fill.url = _fill.RasterImageId;
+            ret.fill.type = (_fill.tile == null) ? c_oAscFillBlipType.STRETCH : c_oAscFillBlipType.TILE;
+            break;
+        }
+        default:
+            break;
+    }
+
+    ret.transparent = unifill.transparent;
+    return ret;
+}
+
+function asc_CStroke() {
+    this.type = null;
+    this.width = null;
+    this.color = null;
+
+    this.LineJoin = null;
+    this.LineCap = null;
+
+    this.LineBeginStyle = null;
+    this.LineBeginSize = null;
+
+    this.LineEndStyle = null;
+    this.LineEndSize = null;
+
+    this.canChangeArrows = false;
+}
+
+asc_CStroke.prototype = {
+	asc_getType: function(){return this.type;},
+	asc_putType: function(v){this.type = v;},
+	asc_getWidth: function(){return this.width;},
+	asc_putWidth: function(v){this.width = v;},
+	asc_getColor: function(){return this.color;},
+	asc_putColor: function(v){this.color = v;},
+
+	asc_getLinejoin: function(){return this.LineJoin;},
+	asc_putLinejoin: function(v){this.LineJoin = v;},
+	asc_getLinecap: function(){return this.LineCap;},
+	asc_putLinecap: function(v){this.LineCap = v;},
+
+	asc_getLinebeginstyle: function(){return this.LineBeginStyle;},
+	asc_putLinebeginstyle: function(v){this.LineBeginStyle = v;},
+	asc_getLinebeginsize: function(){return this.LineBeginSize;},
+	asc_putLinebeginsize: function(v){this.LineBeginSize = v;},
+	asc_getLineendstyle: function(){return this.LineEndStyle;},
+	asc_putLineendstyle: function(v){this.LineEndStyle = v;},
+	asc_getLineendsize: function(){return this.LineEndSize;},
+	asc_putLineendsize: function(v){this.LineEndSize = v;},
+
+	asc_getCanChangeArrows: function(){return this.canChangeArrows;}
+}
+
+//{ asc_CStroke export
+window["Asc"].asc_CStroke = asc_CStroke;
+window["Asc"]["asc_CStroke"] = asc_CStroke;
+prot = asc_CStroke.prototype;
+
+prot["asc_getType"] = prot.asc_getType;
+prot["asc_putType"] = prot.asc_putType;
+prot["asc_getWidth"] = prot.asc_getWidth;
+prot["asc_putWidth"] = prot.asc_putWidth;
+prot["asc_getColor"] = prot.asc_getColor;
+prot["asc_putColor"] = prot.asc_putColor;
+
+prot["asc_getLinejoin"] = prot.asc_getLinejoin;
+prot["asc_putLinejoin"] = prot.asc_putLinejoin;
+prot["asc_getLinecap"] = prot.asc_getLinecap;
+prot["asc_putLinecap"] = prot.asc_putLinecap;
+
+prot["asc_getLinebeginstyle"] = prot.asc_getLinebeginstyle;
+prot["asc_putLinebeginstyle"] = prot.asc_putLinebeginstyle;
+prot["asc_getLinebeginsize"] = prot.asc_getLinebeginsize;
+prot["asc_putLinebeginsize"] = prot.asc_putLinebeginsize;
+prot["asc_getLineendstyle"] = prot.asc_getLineendstyle;
+prot["asc_putLineendstyle"] = prot.asc_putLineendstyle;
+prot["asc_getLineendsize"] = prot.asc_getLineendsize;
+prot["asc_putLineendsize"] = prot.asc_putLineendsize;
+
+prot["asc_getCanChangeArrows"] = prot.asc_getCanChangeArrows;
+//}
+
+function CreateAscStroke(ln, _canChangeArrows) {
+    if (null == ln || null == ln.Fill || ln.Fill.fill == null)
+        return new asc_CStroke();
+
+    var ret = new asc_CStroke();
+
+    var _fill = ln.Fill.fill;
+    if(_fill != null)
+    {
+        switch (_fill.type)
+        {
+            case FILL_TYPE_BLIP:
+            {
+                break;
+            }
+            case FILL_TYPE_SOLID:
+            {
+                ret.color = CreateAscColor(_fill.color);
+                ret.type = c_oAscStrokeType.STROKE_COLOR;
+                break;
+            }
+            case FILL_TYPE_GRAD:
+            {
+                var _c = _fill.colors;
+                if (_c != 0)
+                {
+                    ret.color = CreateAscColor(_fill.colors[0]);
+                    ret.type = c_oAscStrokeType.STROKE_COLOR;
+                }
+
+                break;
+            }
+            case FILL_TYPE_PATT:
+            {
+                ret.color = CreateAscColor(_fill.fgClr);
+                ret.type = c_oAscStrokeType.STROKE_COLOR;
+                break;
+            }
+            case FILL_TYPE_NOFILL:
+            {
+                ret.color = null;
+                ret.type = c_oAscStrokeType.STROKE_NONE;
+                break;
+            }
+            default:
+            {
+                break;
+            }
+        }
+    }
+
+
+    ret.width = (ln.w == null) ? 12700 : (ln.w >> 0);
+    ret.width /= 36000.0;
+
+    if (ln.cap != null)
+        ret.put_linecap(ln.cap);
+
+    if (ln.LineJoin != null)
+        ret.put_linejoin(ln.LineJoin.type);
+
+    if (ln.headEnd != null)
+    {
+        ret.put_linebeginstyle((ln.headEnd.type == null) ? LineEndType.None : ln.headEnd.type);
+
+        var _len = (null == ln.headEnd.len) ? 1 : (2 - ln.headEnd.len);
+        var _w = (null == ln.headEnd.w) ? 1 : (2 - ln.headEnd.w);
+
+        ret.asc_putLinebeginsize(_w * 3 + _len);
+    }
+    else
+    {
+        ret.asc_putLinebeginstyle(LineEndType.None);
+    }
+
+    if (ln.tailEnd != null)
+    {
+        ret.asc_putLineendstyle((ln.tailEnd.type == null) ? LineEndType.None : ln.tailEnd.type);
+
+        var _len = (null == ln.tailEnd.len) ? 1 : (2 - ln.tailEnd.len);
+        var _w = (null == ln.tailEnd.w) ? 1 : (2 - ln.tailEnd.w);
+
+        ret.asc_putLineendsize(_w * 3 + _len);
+    }
+    else
+    {
+        ret.asc_putLineendstyle(LineEndType.None);
+    }
+
+    if (true === _canChangeArrows)
+        ret.canChangeArrows = true;
+
+    return ret;
+}

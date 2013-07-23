@@ -2451,11 +2451,15 @@ function DrawingObjects() {
 				if ( (_t.graphicObject.x < 0) || (_t.graphicObject.y < 0) || (_t.graphicObject.extX <= 0) || (_t.graphicObject.extY <= 0) )
 					return;
 				
-				_t.from.col = _t.worksheet._findColUnderCursor( mmToPt(_t.graphicObject.x) /*+ _t.worksheet.getCellLeft(0, 1)*/, true).col;
-				_t.from.colOff = _t.graphicObject.x /*+ _t.worksheet.getCellLeft(0, 3)*/ - _t.worksheet.getCellLeft(_t.from.col, 3);
+				var foundCol = _t.worksheet._findColUnderCursor( mmToPt(_t.graphicObject.x), true);
+				if ( !foundCol ) return;
+				_t.from.col = foundCol.col;
+				_t.from.colOff = _t.graphicObject.x - _t.worksheet.getCellLeft(_t.from.col, 3);
 
-				_t.from.row = _t.worksheet._findRowUnderCursor( mmToPt(_t.graphicObject.y) /*+ _t.worksheet.getCellTop(0, 1)*/, true).row;
-				_t.from.rowOff = _t.graphicObject.y /*+ _t.worksheet.getCellTop(0, 3)*/ - _t.worksheet.getCellTop(_t.from.row, 3);
+				var foundRow = _t.worksheet._findRowUnderCursor( mmToPt(_t.graphicObject.y), true);
+				if ( !foundRow ) return;
+				_t.from.row = foundRow.row;
+				_t.from.rowOff = _t.graphicObject.y - _t.worksheet.getCellTop(_t.from.row, 3);
 
 				var _left = _t.getRealLeftOffset();
 				var _top = _t.getRealTopOffset();
@@ -4469,8 +4473,6 @@ function DrawingObjects() {
 		if ( _this.drawingDocument ) {
 			_this.controller.drawSelection(_this.drawingDocument);
 			_this.drawWorksheetHeaders();
-			
-			//var xxx = _this.controller.getGraphicObjectProps();
 		}
 	}
 	
