@@ -722,7 +722,7 @@ prot["asc_getHex"] = prot.asc_getHex;
 prot["asc_getColor"] = prot.asc_getColor;
 //}
 
-function CreateAscColorCustom(r, g, b) {
+function CreateAscColorCustom2(r, g, b) {
     var ret = new asc_CColor();
     ret.type = c_oAscColor.COLOR_TYPE_SRGB;
     ret.r = r;
@@ -732,7 +732,7 @@ function CreateAscColorCustom(r, g, b) {
     return ret;
 }
 
-function CreateAscColor(unicolor) {
+function CreateAscColor2(unicolor) {
     if (null == unicolor || null == unicolor.color)
         return new asc_CColor();
 
@@ -927,14 +927,14 @@ function CreateAscFill(unifill) {
         {
             ret.type = c_oAscFill.FILL_TYPE_SOLID;
             ret.fill = new asc_CFillSolid();
-            ret.fill.color = CreateAscColor(_fill.color);
+            ret.fill.color = CreateAscColor2(_fill.color);
             break;
         }
         case FILL_TYPE_PATT:
         {
             ret.type = c_oAscFill.FILL_TYPE_SOLID;
             ret.fill = new asc_CFillSolid();
-            ret.fill.color = CreateAscColor(_fill.fgClr);
+            ret.fill.color = CreateAscColor2(_fill.fgClr);
             break;
         }
         case FILL_TYPE_GRAD:
@@ -943,7 +943,7 @@ function CreateAscFill(unifill) {
             ret.fill = new asc_CFillSolid();
 
             if (_fill.colors.length > 0)
-                ret.fill.color = CreateAscColor(_fill.colors[0].color);
+                ret.fill.color = CreateAscColor2(_fill.colors[0].color);
             break;
         }
         case FILL_TYPE_BLIP:
@@ -1117,7 +1117,7 @@ function CreateAscStroke(ln, _canChangeArrows) {
             }
             case FILL_TYPE_SOLID:
             {
-                ret.color = CreateAscColor(_fill.color);
+                ret.color = CreateAscColor2(_fill.color);
                 ret.type = c_oAscStrokeType.STROKE_COLOR;
                 break;
             }
@@ -1126,7 +1126,7 @@ function CreateAscStroke(ln, _canChangeArrows) {
                 var _c = _fill.colors;
                 if (_c != 0)
                 {
-                    ret.color = CreateAscColor(_fill.colors[0]);
+                    ret.color = CreateAscColor2(_fill.colors[0]);
                     ret.type = c_oAscStrokeType.STROKE_COLOR;
                 }
 
@@ -1134,7 +1134,7 @@ function CreateAscStroke(ln, _canChangeArrows) {
             }
             case FILL_TYPE_PATT:
             {
-                ret.color = CreateAscColor(_fill.fgClr);
+                ret.color = CreateAscColor2(_fill.fgClr);
                 ret.type = c_oAscStrokeType.STROKE_COLOR;
                 break;
             }
