@@ -1300,7 +1300,10 @@ Paragraph.prototype =
 
                                         Pos--;
 
-                                        bNewLine = true;
+                                        if ( RangesCount != CurRange )
+                                            bNewRange = true;
+                                        else
+                                            bNewLine = true;
                                     }
                                 }
                                 else
