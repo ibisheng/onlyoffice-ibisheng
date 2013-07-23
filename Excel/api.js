@@ -2914,6 +2914,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_getGraphicObjectProps"] = prot.asc_getGraphicObjectProps;
 		prot["asc_setGraphicObjectProps"] = prot.asc_setGraphicObjectProps;
 		prot["asc_getOriginalImageSize"] = prot.asc_getOriginalImageSize;
+		prot["asc_changeShapeType"] = prot.asc_changeShapeType;
 
 		// Cell interface
 		prot["asc_getCellInfo"] = prot.asc_getCellInfo;
