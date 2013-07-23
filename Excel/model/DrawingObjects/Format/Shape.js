@@ -232,13 +232,14 @@ CShape.prototype =
 
 	calculateFill: function()
     {
-        /*var theme = this.document.theme;
+		var api = window["Asc"]["editor"];
+        var theme = api.wbModel.theme;
         var brush;
-        var colorMap = this.document.clrSchemeMap.color_map;
+        var colorMap = api.wbModel.clrSchemeMap.color_map;
         var RGBA = {R: 0, G: 0, B: 0, A: 255};
         if (colorMap == null)
             colorMap = GenerateDefaultColorMap().color_map;
-        if (theme && this.style != null && this.style.fillRef!=null)
+        if (theme && this.style != null && this.style.fillRef != null)
         {
             brush = theme.getFillStyle(this.style.fillRef.idx);
             this.style.fillRef.Color.Calculate(theme, colorMap, {R:0, G:0, B:0, A:255});
@@ -260,15 +261,16 @@ CShape.prototype =
 
         brush.merge(this.spPr.Fill);
         this.brush = brush;
-        this.brush.calculate(theme, colorMap, RGBA);*/
+        this.brush.calculate(theme, colorMap, RGBA);
     },
 	
 	calculateLine: function()
     {
-        /*var _calculated_line;
-        var _theme = this.document.theme;
-        var colorMap = this.document.clrSchemeMap.color_map;
-        if(colorMap==null)
+		var api = window["Asc"]["editor"];
+        var _calculated_line;
+        var _theme = api.wbModel.theme;
+        var colorMap = api.wbModel.clrSchemeMap.color_map;
+        if (colorMap == null)
             colorMap = GenerateDefaultColorMap().color_map;
         var RGBA = {R: 0, G: 0, B: 0, A: 255};
         if(_theme !== null && typeof _theme === "object" && typeof _theme.getLnStyle === "function"
@@ -287,12 +289,12 @@ CShape.prototype =
 
         _calculated_line.merge(this.spPr.ln);
 
-        if(_calculated_line.Fill!=null)
+        if (_calculated_line.Fill!=null)
         {
             _calculated_line.Fill.calculate(_theme, colorMap, RGBA) ;
         }
 
-        this.pen = _calculated_line;*/
+        this.pen = _calculated_line;
     },
 	
     setPosition: function(x, y)

@@ -649,6 +649,7 @@ DrawingObjectsController.prototype =
                 }
             }
         }
+		this.drawingObjects.showDrawingObjects(true);
 	}
 };
 
