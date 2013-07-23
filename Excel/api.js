@@ -2101,6 +2101,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				ws.objectRender.unGroupGraphicObjects();
 			},
 			
+			asc_changeShapeType: function(value) {
+				this.asc_setGraphicObjectProps(new asc_CImgProperty( {ShapeProperties:{type:value}} ));
+			},
+			
 			asc_getGraphicObjectProps: function() {
 				var ws = this.wb.getWorksheet();
 				return ws.objectRender.controller.getGraphicObjectProps();

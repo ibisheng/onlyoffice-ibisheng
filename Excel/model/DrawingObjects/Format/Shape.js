@@ -1002,6 +1002,56 @@ CShape.prototype =
         }
     },
 
+	calculateTransformMatrix: function()
+    {
+        var _transform = new CMatrix();
+
+        var _horizontal_center = this.absExtX*0.5;
+        var _vertical_center = this.absExtY*0.5;
+        global_MatrixTransformer.TranslateAppend(_transform, -_horizontal_center, -_vertical_center);
+
+        if(this.absFlipH)
+        {
+            global_MatrixTransformer.ScaleAppend(_transform, -1, 1);
+        }
+        if(this.absFlipV)
+        {
+            global_MatrixTransformer.ScaleAppend(_transform, 1, -1);
+        }
+
+        global_MatrixTransformer.RotateRadAppend(_transform, -this.absRot);
+
+        global_MatrixTransformer.TranslateAppend(_transform, this.absOffsetX, this.absOffsetY);
+        global_MatrixTransformer.TranslateAppend(_transform, _horizontal_center, _vertical_center);
+
+        if(this.mainGroup !== null)
+        {
+            global_MatrixTransformer.MultiplyAppend(_transform, this.mainGroup.getTransform());
+        }
+        this.transform = _transform;
+        this.ownTransform = _transform.CreateDublicate();
+    },
+	
+	calculateAfterResize: function()
+    {
+        if(this.spPr.geometry !== null)
+            this.spPr.geometry.Recalculate(this.extX, this.extY);
+        //this.calculateTransformMatrix();
+        this.calculateContent();
+        //this.calculateTransformTextMatrix();
+        this.calculateLeftTopPoint();
+    },
+	
+	calculateLeftTopPoint: function()
+    {
+        var _horizontal_center = this.absExtX*0.5;
+        var _vertical_enter = this.absExtY*0.5;
+        var _sin = Math.sin(this.absRot);
+        var _cos = Math.cos(this.absRot);
+        this.absXLT = -_horizontal_center*_cos + _vertical_enter*_sin +this.absOffsetX + _horizontal_center;
+        this.absYLT = -_horizontal_center*_sin - _vertical_enter*_cos +this.absOffsetY + _vertical_enter;
+    },
+	
     drawAdjustments: function(drawingDocument)
     {
         if(isRealObject(this.spPr.geometry))
