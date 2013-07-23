@@ -3024,6 +3024,7 @@
 					this.objectRender.raiseLayerDrawingObjects(true);
 				}
 				this.cellCommentator.drawCommentCells(false);
+				this.objectRender.selectGraphicObject();
 
 				this._drawActiveHeaders();
 			},
