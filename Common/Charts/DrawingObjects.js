@@ -3201,14 +3201,14 @@ function DrawingObjects() {
 		if ( null != event && null != event.data ) {
 
 			var data = JSON.parse(event.data);
-			if ( null != data && null != data.type )
+			if ((null != data) && (null != data["type"]))
 			{
-				if ( PostMessageType.UploadImage == data.type ) {
-					if(c_oAscServerError.NoError == data.error) {
+				if (PostMessageType.UploadImage == data["type"]) {
+					if (c_oAscServerError.NoError == data["error"]) {
 						var sheetId = null;
-						if(null != data.input)
-							sheetId = data.input.sheetId;
-						var url = data.url;
+						if (null != data["input"])
+							sheetId = data["input"]["sheetId"];
+						var url = data["url"];
 						
 						if (sheetId == worksheet.model.getId())
 							_this.addImageDrawingObject(url, false, null);
