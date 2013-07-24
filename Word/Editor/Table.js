@@ -17580,16 +17580,19 @@ CTable.prototype =
 
     Internal_Copy_Grid : function(Grid)
     {
-        var Count = Grid.length;
-        var NewGrid = new Array(Count);
-        var Index = 0;
-        for (; Index < Count; Index++ )
-            NewGrid[Index] = Grid[Index];
+        if ( undefined !== Grid && null !== Grid )
+        {
+            var Count = Grid.length;
+            var NewGrid = new Array(Count);
+            var Index = 0;
+            for (; Index < Count; Index++ )
+                NewGrid[Index] = Grid[Index];
 
-        return NewGrid;
+            return NewGrid;
+        }
+
+        return undefined;
     }
-
-
 };
 
 // Класс CTableRow
@@ -18809,7 +18812,7 @@ CTableRow.prototype =
                 if ( true === bUndefined )
                     this.Pr.TableHeader = undefined;
                 else
-                    this.Pr.TableHeader = Reader.Get_Bool();
+                    this.Pr.TableHeader = Reader.GetBool();
 
                 this.Recalc_CompiledPr();
                 break;
