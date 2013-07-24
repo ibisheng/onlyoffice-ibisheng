@@ -613,7 +613,8 @@ CHistory.prototype =
         {
             State : Point1.State,
             Items : Point1.Items.concat(Point2.Items),
-            Time  : Point1.Time
+            Time  : Point1.Time,
+            Additional : {}
         };
 
         this.Points.splice( this.Points.length - 2, 2, NewPoint );
@@ -679,7 +680,7 @@ CHistory.prototype =
 
     Is_ExtendDocumentToPos : function()
     {
-        if ( undefined === this.Points[this.Index] || undefined === this.Points[this.Index].Additional.ExtendDocumentToPos )
+        if ( undefined === this.Points[this.Index] || undefined === this.Points[this.Index].Additional || undefined === this.Points[this.Index].Additional.ExtendDocumentToPos )
             return false;
 
         return true;
