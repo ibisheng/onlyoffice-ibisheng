@@ -193,6 +193,15 @@ DrawingObjectsController.prototype =
 
     unGroup: function()
     {
+		if(isRealObject(this.curState.group) )
+		{
+			this.curState.group.resetSelection();
+		}
+		
+		if(isRealObject(this.curState.chart) )
+		{
+			this.curState.chart.resetSelection();
+		}
         var selected_objects = this.selectedObjects;
         var ungrouped_objects = [];
         for(var i = 0; i < selected_objects.length; ++i)
@@ -212,6 +221,8 @@ DrawingObjectsController.prototype =
             }
             this.drawingObjects.insertUngroupedObjects(ungrouped_objects[i].drawingBase.id, ungrouped_sp_tree);
         }
+		this.changeCurrentState(new NullState(this, this.drawingObjects));
+		
     },
 
     canGroup: function()

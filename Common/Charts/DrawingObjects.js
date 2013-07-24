@@ -4409,7 +4409,8 @@ function DrawingObjects() {
 	_this.unGroupGraphicObjects = function() {
 	
 		if ( _this.controller.canUnGroup() ) {
-			_this.controller.unGroup();	
+			_this.controller.unGroup();
+			api.isStartAddShape = false;
 		}
 	}
 	
@@ -4424,6 +4425,7 @@ function DrawingObjects() {
 				obj.graphicObject = aGraphics[i];
                 aGraphics[i].setDrawingBase(obj);
 				obj.graphicObject.select(_this.controller);
+				obj.setGraphicObjectCoords();
 				aSingleObjects.push(obj);
 			}
 			
@@ -5081,7 +5083,7 @@ function DrawingObjects() {
 			if (obj.graphicObject.isImage())
 				return c_oAscSelectionType.RangeImage;
 				
-			if (obj.graphicObject.isShape())
+			if (obj.graphicObject.isShape() || obj.graphicObject.isGroup())
 				return c_oAscSelectionType.RangeShape;
 		}
 		return undefined;
