@@ -4398,6 +4398,7 @@ function DrawingObjects() {
 			var group = _this.controller.createGroup(obj);
 			if ( group ) {
 				obj.graphicObject = group;
+				obj.setGraphicObjectCoords();
 				aObjects.push(obj);
 				_this.showDrawingObjects(false);
                 _this.selectGraphicObject();
