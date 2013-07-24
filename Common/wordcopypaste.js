@@ -1198,9 +1198,7 @@ CopyProcessor.prototype =
     CopyTable : function(oDomTarget, table, start, end)
     {
         this.CommitList(oDomTarget);
-        var resItem;
         var DomTable = document.createElement( "table" );
-        resItem = DomTable;
         var Pr = null;
         if(null != table.CompiledPr && null != table.CompiledPr.Pr && null != table.CompiledPr.Pr.TablePr)
             Pr = table.CompiledPr.Pr.TablePr;
@@ -1208,23 +1206,46 @@ CopyProcessor.prototype =
         var bBorder = false;
         if(null != Pr)
         {
-            if(null != Pr.Jc)
+			var align = "";
+            if(true != table.Inline && null != table.PositionH)
+			{
+				var PositionH = table.PositionH;
+				if(true == PositionH.Align)
+				{
+					switch(PositionH.Value)
+					{
+						case c_oAscXAlign.Outside:
+						case c_oAscXAlign.Right: align = "right";break;
+						case c_oAscXAlign.Center: align = "center";break;
+					}
+				}
+				else if(table.TableSumGrid)
+				{
+					var TableWidth = table.TableSumGrid[ table.TableSumGrid.length - 1 ];
+					var nLeft = PositionH.Value;
+					var nRight = nLeft + TableWidth;
+					var nFromLeft = Math.abs(nLeft - X_Left_Margin);
+					var nFromCenter = Math.abs((Page_Width - X_Right_Margin + X_Left_Margin) / 2 - (nLeft + nRight) / 2);
+					var nFromRight = Math.abs(Page_Width - nRight - X_Right_Margin);
+					if(nFromRight < nFromLeft || nFromCenter < nFromLeft)
+					{
+						if(nFromRight < nFromCenter)
+							align = "right";
+						else
+							align = "center";
+					}
+				}
+			}
+			else if(null != Pr.Jc)
             {
-                var align = "";
                 switch(Pr.Jc)
                 {
                     case align_Center:align = "center";break;
                     case align_Right:align = "right";break;
                 }
-                if("" != align)
-                {
-                    //�������� ����������� � div
-                    var wrapDiv = document.createElement( "div" );
-                    wrapDiv.setAttribute("align", align);
-                    wrapDiv.appendChild(DomTable);
-                    resItem = wrapDiv;
-                }
             }
+			if("" != align)
+				DomTable.setAttribute("align", align);
             if(null != Pr.TableInd)
                 tblStyle += "margin-left:"+(Pr.TableInd * g_dKoef_mm_to_pt)+"pt;";
             if(null != Pr.Shd && shd_Nil != Pr.Shd.Value)
@@ -1258,7 +1279,7 @@ CopyProcessor.prototype =
         for(var i = start.Row, length = table.Content.length; i < length && i <= end.Row; i++)
             this.CopyRow(DomTable, table, i ,start, end);
 
-        oDomTarget.appendChild(resItem);
+        oDomTarget.appendChild(DomTable);
     },
     CopyDocument : function(oDomTarget, oDocument, bUseSelection)
     {
