@@ -2954,6 +2954,7 @@ function DrawingObjects() {
 		_this.drawingDocument = new CDrawingDocument(this);
 		_this.drawingDocument.AutoShapesTrack = autoShapeTrack;
 		_this.drawingDocument.TargetHtmlElement = document.getElementById('id_target_cursor');
+		_this.drawingDocument.InitGuiCanvasShape(api.shapeElementId);
 				
 		isViewerMode =  function() { return worksheet._trigger("getViewerMode"); };
 
@@ -4584,6 +4585,11 @@ function DrawingObjects() {
 			}
 		}
 		return new asc_CImageSize( 50, 50, false );
+	}
+	
+	_this.sendSelectionChanged = function() {
+		if ( worksheet )
+			worksheet._trigger("selectionChanged", worksheet.getSelectionInfo());
 	}
 	
 	//-----------------------------------------------------------------------------------

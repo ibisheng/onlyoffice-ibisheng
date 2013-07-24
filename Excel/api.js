@@ -114,6 +114,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.addShapePreset = "";
 			this.ImageLoader = window.g_image_loader;
 			this.ImageLoader.put_Api(this);
+			this.shapeElementId = null;
 			
 			/**************************************/
 
@@ -2143,6 +2144,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				return ws.objectRender.getOriginalImageSize();
 			},
 			
+			asc_setInterfaceDrawImagePlaceShape: function(elementId) {
+				this.shapeElementId = elementId;
+			},
+			
 			asyncImageStartLoaded: function() {
 			},
 			
@@ -2944,7 +2949,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_setGraphicObjectProps"] = prot.asc_setGraphicObjectProps;
 		prot["asc_getOriginalImageSize"] = prot.asc_getOriginalImageSize;
 		prot["asc_changeShapeType"] = prot.asc_changeShapeType;
-
+		prot["asc_setInterfaceDrawImagePlaceShape"] = prot.asc_setInterfaceDrawImagePlaceShape;
+		
 		// Cell interface
 		prot["asc_getCellInfo"] = prot.asc_getCellInfo;
 		prot["asc_getActiveCellCoord"] = prot.asc_getActiveCellCoord;

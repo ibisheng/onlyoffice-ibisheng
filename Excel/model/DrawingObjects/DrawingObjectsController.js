@@ -376,8 +376,8 @@ DrawingObjectsController.prototype =
 								shape_props.ShapeProperties = new asc_CShapeProperty();
 								
 								shape_props.ShapeProperties.type = c_obj.getPresetGeom();
-                                shape_props.ShapeProperties.fill = CreateAscFillEx(c_obj.getFill());
-                                shape_props.ShapeProperties.stroke = CreateAscStrokeEx(c_obj.getStroke());
+                                shape_props.ShapeProperties.fill = c_obj.getFill();
+                                shape_props.ShapeProperties.stroke = c_obj.getStroke();
                                 shape_props.ShapeProperties.canChangeArrows = c_obj.canChangeArrows();
 								
                                 //shape_props.verticalTextAlign = c_obj.bodyPr.anchor;
@@ -496,8 +496,10 @@ DrawingObjectsController.prototype =
                 var pr = shape_props.ShapeProperties;
                 if (pr.fill != null && pr.fill.fill != null && pr.fill.fill.type == FILL_TYPE_BLIP)
                 {
-                    this.drawingDocument.DrawImageTextureFillShape(pr.fill.fill.RasterImageId);
+                    this.drawingObjects.drawingDocument.DrawImageTextureFillShape(pr.fill.fill.RasterImageId);
                 }
+				shape_props.ShapeProperties.fill = CreateAscFillEx(c_obj.getFill());
+				shape_props.ShapeProperties.stroke = CreateAscStrokeEx(c_obj.getStroke());
 
                 //shape_props.ShapeProperties = CreateAscShapePropFromProp(shape_props.ShapeProperties);		// уже не надо, т.к. это asc_класс
             }
@@ -651,6 +653,7 @@ DrawingObjectsController.prototype =
         }
 		this.drawingObjects.showDrawingObjects(true);
 		this.drawingObjects.selectGraphicObject();
+		this.drawingObjects.sendSelectionChanged();
 	}
 };
 

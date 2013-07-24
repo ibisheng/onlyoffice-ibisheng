@@ -4497,7 +4497,8 @@ function CDrawingDocument(drawingObjects)
         if (null == this.LastDrawingUrl)
             return;
 
-        var _img = this.m_oWordControl.m_oApi.ImageLoader.map_image_index[getFullImageSrc(this.LastDrawingUrl)];
+		var api = window["Asc"]["editor"];
+        var _img = api.ImageLoader.map_image_index[getFullImageSrc(this.LastDrawingUrl)];
         if (_img != undefined && _img.Image != null || _img.Status == ImageLoadStatus.Loading)
         {
             var _x = 0;
