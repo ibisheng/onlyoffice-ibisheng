@@ -707,7 +707,7 @@
 			setProperty : function (nType, value) {
 				switch (nType) {
 					case this.Properties.showGridLines: this.showGridLines = value;break;
-					case this.Properties.showRowColHeaders: this.sheet = showRowColHeaders;break;
+					case this.Properties.showRowColHeaders: this.showRowColHeaders = value;break;
 				}
 			}
 		};
