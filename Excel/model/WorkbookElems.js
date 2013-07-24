@@ -2718,23 +2718,20 @@ CCellValue.prototype =
 					}
 					else if(CellValueType.String == this.type)
 					{
-						if(oNumFormat.isTextFormat())
+						if(null != this.text)
 						{
-							if(null != this.text)
+							aText = oNumFormat.format(this.text, this.type, dDigitsCount, oAdditionalResult);
+							sText = null;
+						}
+						else if(null != this.multiText)
+						{
+							if("@" != oNumFormat.sFormat)
 							{
-								aText = oNumFormat.format(this.text, this.type, dDigitsCount, oAdditionalResult);
+								var sSimpleString = "";
+								for(var i = 0, length = this.multiText.length; i < length; ++i)
+									sSimpleString += this.multiText[i].text;
+								aText = oNumFormat.format(sSimpleString, this.type, dDigitsCount, oAdditionalResult);
 								sText = null;
-							}
-							else if(null != this.multiText)
-							{
-								if("@" != oNumFormat.sFormat)
-								{
-									var sSimpleString = "";
-									for(var i = 0, length = this.multiText.length; i < length; ++i)
-										sSimpleString += this.multiText[i].text;
-									aText = oNumFormat.format(sSimpleString, this.type, dDigitsCount, oAdditionalResult);
-									sText = null;
-								}
 							}
 						}
 					}
