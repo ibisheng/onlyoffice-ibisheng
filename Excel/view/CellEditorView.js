@@ -139,7 +139,7 @@
 			defaults: {
 				background  : "#fff",
 				font        : new asc_FP("Calibri", 11),
-				padding     : {left: 3, right: 4},
+				padding     : {left: 2, right: 4},
 				selectColor : "rgba(190,190,255,.5)",
 				textAlign   : kLeftAlign,
 				textColor   : "#000",

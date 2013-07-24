@@ -240,7 +240,7 @@
 					color: "#000",
 					colorNumber : 0
 				},
-				padding: 3/*px horizontal padding*/
+				padding: 2/*px horizontal padding*/
 			};
 			this.activeCellBorderColor			= "rgba(105,119,62,0.7)";
 			this.activeCellBackground			= "rgba(157,185,85,.2)";
