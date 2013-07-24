@@ -1813,6 +1813,7 @@ Paragraph.prototype =
                         nSpacesCount = 0;
                         bStartWord = true;
                         bWord = true;
+                        nWordStartPos = Pos;
 
                         break;
                     }
