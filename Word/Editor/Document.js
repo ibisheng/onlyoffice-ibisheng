@@ -7662,6 +7662,18 @@ CDocument.prototype =
             var X_abs = ConvertedPos.X;
             var Y_abs = ConvertedPos.Y;
 
+            // Проверим попадание в значок таблицы, если в него попадаем, тогда выделяем таблицу
+            if ( true === this.DrawingDocument.IsCursorInTableCur( X, Y, PageIndex ) )
+            {
+                var Table = this.DrawingDocument.TableOutlineDr.TableOutline.Table;
+                Table.Select_All();
+                Table.Document_SetThisElementCurrent();
+                this.Document_UpdateSelectionState();
+                this.Document_UpdateInterfaceState();
+                editor.sync_ContextMenuCallback( { Type : c_oAscContextMenuTypes.Common, X_abs : X_abs, Y_abs : Y_abs } );
+                return;
+            }
+
             // Сначала проверим попадание в Flow-таблицы и автофигуры
             var pFlowTable = this.DrawingObjects.getTableByXY( X, Y, PageIndex, this );
             var nInDrawing = this.DrawingObjects.isPointInDrawingObjects( X, Y, PageIndex, this );
