@@ -115,6 +115,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.ImageLoader = window.g_image_loader;
 			this.ImageLoader.put_Api(this);
 			this.shapeElementId = null;
+			this.isImageChangeUrl = false;
 			
 			/**************************************/
 
@@ -2146,6 +2147,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.shapeElementId = elementId;
 			},
 			
+			asc_changeImageFromFile: function() {
+				this.isImageChangeUrl = true;
+				this.asc_showImageFileDialog();
+			},
+			
 			asyncImageStartLoaded: function() {
 			},
 			
@@ -2951,6 +2957,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_getOriginalImageSize"] = prot.asc_getOriginalImageSize;
 		prot["asc_changeShapeType"] = prot.asc_changeShapeType;
 		prot["asc_setInterfaceDrawImagePlaceShape"] = prot.asc_setInterfaceDrawImagePlaceShape;
+		prot["asc_changeImageFromFile"] = prot.asc_changeImageFromFile;
 		
 		// Cell interface
 		prot["asc_getCellInfo"] = prot.asc_getCellInfo;

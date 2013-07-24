@@ -3210,8 +3210,14 @@ function DrawingObjects() {
 							sheetId = data["input"]["sheetId"];
 						var url = data["url"];
 						
-						if (sheetId == worksheet.model.getId())
-							_this.addImageDrawingObject(url, false, null);
+						if (sheetId == worksheet.model.getId()) {
+							if ( api.isImageChangeUrl ) {
+								_this.editImageDrawingObject(url);
+								api.isImageChangeUrl = false;
+							}
+							else
+								_this.addImageDrawingObject(url, false, null);
+						}
 						else
 							worksheet.model.workbook.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 					}
@@ -3726,6 +3732,39 @@ function DrawingObjects() {
 		}
 	}
 
+	_this.editImageDrawingObject = function(imageUrl) {
+		
+		if ( imageUrl && (_this.controller.selectedObjects.length == 1) ) {
+			var drawingObject = _this.controller.selectedObjects[0].drawingBase;
+			if ( drawingObject.graphicObject.isImage() ) {
+				
+				var _image = api.ImageLoader.LoadImage(imageUrl, 1);
+				
+				if (null != _image) {
+					addImageObject(_image);
+				}
+				else {
+					_this.asyncImageEndLoaded = function(_image) {
+						addImageObject(_image);
+					}
+				}
+				
+				function addImageObject(_image) {
+				
+					if ( !_image.Image ) {
+						worksheet.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.UplImageUrl, c_oAscError.Level.NoCritical);
+					}
+					else {
+						drawingObject.graphicObject.setRasterImage(_image.src);
+						_this.showDrawingObjects(true);
+						_this.selectGraphicObject();
+					}
+					worksheet.model.workbook.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+				}
+			}
+		}
+	}
+	
 	_this.addChartDrawingObject = function(chart, bWithoutHistory, options) {
 
 		if (isViewerMode())

@@ -544,124 +544,112 @@ DrawingObjectsController.prototype =
         
         if (isRealObject(properties) || isRealObject(props))
         {
-            var arr_pages = [];
-            if (isRealObject(props) && typeof props.verticalTextAlign === "number" && !isNaN(props.verticalTextAlign))
-            {
-                if (this.curState.id === STATES_ID_TEXT_ADD)
-                {
-                    if(typeof this.curState.textObject.GraphicObj.setTextVerticalAlign === "function")
-                        this.curState.textObject.GraphicObj.setTextVerticalAlign(props.verticalTextAlign);
-                }
+			if (props.ImageUrl != undefined && props.ImageUrl != null && props.ImageUrl != "")
+			{
+				this.drawingObjects.editImageDrawingObject(props.ImageUrl);
+			}
+			else
+			{
+				if (isRealObject(props) && typeof props.verticalTextAlign === "number" && !isNaN(props.verticalTextAlign))
+				{
+					if (this.curState.id === STATES_ID_TEXT_ADD)
+					{
+						if(typeof this.curState.textObject.GraphicObj.setTextVerticalAlign === "function")
+							this.curState.textObject.GraphicObj.setTextVerticalAlign(props.verticalTextAlign);
+					}
 
-                if (this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP)
-                {
-                    if (typeof this.curState.textObject.setTextVerticalAlign === "function")
-                        this.curState.textObject.setTextVerticalAlign(props.verticalTextAlign);
-                }
-            }
-            if (!(this.curState.id === STATES_ID_GROUP || this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP) && isRealObject(properties))
-            {
-                var ArrGlyph = this.selectedObjects;
-                for (var i = 0;  i< ArrGlyph.length; ++i)
-                {
-                    //if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : ArrGlyph[i].Parent, CheckType : changestype_Paragraph_Content} ))
-                    {
-                        /*var cur_page_index = ArrGlyph[i].pageIndex;
-                        for (var j = 0; j < arr_pages.length; ++j)
-                        {
-                            if(arr_pages[j] === cur_page_index)
-                                break;
-                        }
-                        if (j === arr_pages.length)
-                            arr_pages.push(cur_page_index);*/
-							
-                        if (((ArrGlyph[i].isShape()) || (ArrGlyph[i].isGroup())))
-                        {
-                            if (properties.type != undefined && properties.type != -1)
-                            {
-                                ArrGlyph[i].changePresetGeometry(properties.type);
-                            }
-                            if (properties.fill)
-                            {
-                                ArrGlyph[i].changeFill(properties.fill);
-                            }
-                            if (properties.stroke)
-                            {
-                                ArrGlyph[i].changeLine(properties.stroke);
-                            }
-                        }
-                    }
+					if (this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP)
+					{
+						if (typeof this.curState.textObject.setTextVerticalAlign === "function")
+							this.curState.textObject.setTextVerticalAlign(props.verticalTextAlign);
+					}
+				}
+				if (!(this.curState.id === STATES_ID_GROUP || this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP) && isRealObject(properties))
+				{
+					var ArrGlyph = this.selectedObjects;
+					for (var i = 0;  i< ArrGlyph.length; ++i)
+					{
+						if (((ArrGlyph[i].isShape()) || (ArrGlyph[i].isGroup())))
+						{
+							if (properties.type != undefined && properties.type != -1)
+							{
+								ArrGlyph[i].changePresetGeometry(properties.type);
+							}
+							if (properties.fill)
+							{
+								ArrGlyph[i].changeFill(properties.fill);
+							}
+							if (properties.stroke)
+							{
+								ArrGlyph[i].changeLine(properties.stroke);
+							}
+						}
 
-                    if (typeof props.verticalTextAlign === "number" && !isNaN(props.verticalTextAlign) && typeof ArrGlyph[i].setTextVerticalAlign === "function")
-                    {
-                        ArrGlyph[i].setTextVerticalAlign(props.verticalTextAlign);
-                    }
+						if (typeof props.verticalTextAlign === "number" && !isNaN(props.verticalTextAlign) && typeof ArrGlyph[i].setTextVerticalAlign === "function")
+						{
+							ArrGlyph[i].setTextVerticalAlign(props.verticalTextAlign);
+						}
 
-                }
-                /*arr_pages.sort(function(a, b){return a-b;});
-                for (i = 0; i < arr_pages.length; ++i)
-                {
-                    this.drawingDocument.OnRecalculatePage(arr_pages[i], this.document.Pages[arr_pages[i]]);
-                }
-                this.drawingDocument.OnEndRecalculate(false, false);*/
-            }
-            else if (this.curState.id === STATES_ID_GROUP || this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP)
-            {
-                if (false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : this.curState.group.parent.Parent, CheckType : changestype_Paragraph_Content} ))
-                {
-                    if ( undefined != props.PositionH )
-                        this.curState.group.parent.Set_PositionH( props.PositionH.RelativeFrom, props.PositionH.UseAlign, ( true === props.PositionH.UseAlign ? props.PositionH.Align : props.PositionH.Value ) );
+					}
+				}
+				else if (this.curState.id === STATES_ID_GROUP || this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP)
+				{
+					if (false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : this.curState.group.parent.Parent, CheckType : changestype_Paragraph_Content} ))
+					{
+						if ( undefined != props.PositionH )
+							this.curState.group.parent.Set_PositionH( props.PositionH.RelativeFrom, props.PositionH.UseAlign, ( true === props.PositionH.UseAlign ? props.PositionH.Align : props.PositionH.Value ) );
 
-                    if ( undefined != props.PositionV )
-                        this.curState.group.parent.Set_PositionV( props.PositionV.RelativeFrom, props.PositionV.UseAlign, ( true === props.PositionV.UseAlign ? props.PositionV.Align : props.PositionV.Value ) );
+						if ( undefined != props.PositionV )
+							this.curState.group.parent.Set_PositionV( props.PositionV.RelativeFrom, props.PositionV.UseAlign, ( true === props.PositionV.UseAlign ? props.PositionV.Align : props.PositionV.Value ) );
 
-                    ArrGlyph = this.curState.group.selectionInfo.selectionArray;
-                    var b_change_diagram = false;
-                    for (i = 0;  i< ArrGlyph.length; ++i)
-                    {
-                        if (ArrGlyph[i].isShape() && isRealObject(properties))
-                        {
-                            if (properties.type != undefined && properties.type != -1)
-                            {
-                                ArrGlyph[i].changePresetGeometry(properties.type);
-                            }
-                            if (properties.fill)
-                            {
-                                ArrGlyph[i].changeFill(properties.fill);
-                            }
-                            if (properties.stroke)
-                            {
-                                ArrGlyph[i].changeLine(properties.stroke);
-                            }
-                        }
-                        else if (isRealObject(props) && typeof  props.ImageUrl === "string" && ArrGlyph[i].isImage() && ArrGlyph[i].chart == null)
-                        {
-                            ArrGlyph[i].setRasterImage2(props.ImageUrl);
-                        }
-                        else if (ArrGlyph[i].chart != null && isRealObject(props) && isRealObject(props.ChartProperties))
-                        {
-                            b_change_diagram = true;
-                            ArrGlyph[i].setDiagram(props.ChartProperties)
-                        }
+						ArrGlyph = this.curState.group.selectionInfo.selectionArray;
+						var b_change_diagram = false;
+						for (i = 0;  i< ArrGlyph.length; ++i)
+						{
+							if (ArrGlyph[i].isShape() && isRealObject(properties))
+							{
+								if (properties.type != undefined && properties.type != -1)
+								{
+									ArrGlyph[i].changePresetGeometry(properties.type);
+								}
+								if (properties.fill)
+								{
+									ArrGlyph[i].changeFill(properties.fill);
+								}
+								if (properties.stroke)
+								{
+									ArrGlyph[i].changeLine(properties.stroke);
+								}
+							}
+							else if (isRealObject(props) && typeof  props.ImageUrl === "string" && ArrGlyph[i].isImage() && ArrGlyph[i].chart == null)
+							{
+								ArrGlyph[i].setRasterImage2(props.ImageUrl);
+							}
+							else if (ArrGlyph[i].chart != null && isRealObject(props) && isRealObject(props.ChartProperties))
+							{
+								b_change_diagram = true;
+								ArrGlyph[i].setDiagram(props.ChartProperties)
+							}
 
-                        if (typeof props.verticalTextAlign === "number" && !isNaN(props.verticalTextAlign) && typeof ArrGlyph[i].setTextVerticalAlign === "function")
-                        {
-                            ArrGlyph[i].setTextVerticalAlign(props.verticalTextAlign);
-                        }
-                    }
-                    if (b_change_diagram)
-                    {
-                        this.curState.group.updateSizes();
-                        this.curState.group.recalculate();
-                        var bounds = this.curState.group.parent.getBounds();
-                        if (!this.curState.group.parent.Is_Inline())
-                            this.curState.group.parent.OnEnd_ChangeFlow(this.curState.group.absOffsetX, this.curState.group.absOffsetY, this.curState.group.pageIndex, bounds.r - bounds.l, bounds.b - bounds.t, null, true, true);
-                        else
-                            this.curState.group.parent.OnEnd_ResizeInline(bounds.r - bounds.l, bounds.b - bounds.t);
-                    }
-                }
-            }
-        }
+							if (typeof props.verticalTextAlign === "number" && !isNaN(props.verticalTextAlign) && typeof ArrGlyph[i].setTextVerticalAlign === "function")
+							{
+								ArrGlyph[i].setTextVerticalAlign(props.verticalTextAlign);
+							}
+						}
+						if (b_change_diagram)
+						{
+							this.curState.group.updateSizes();
+							this.curState.group.recalculate();
+							var bounds = this.curState.group.parent.getBounds();
+							if (!this.curState.group.parent.Is_Inline())
+								this.curState.group.parent.OnEnd_ChangeFlow(this.curState.group.absOffsetX, this.curState.group.absOffsetY, this.curState.group.pageIndex, bounds.r - bounds.l, bounds.b - bounds.t, null, true, true);
+							else
+								this.curState.group.parent.OnEnd_ResizeInline(bounds.r - bounds.l, bounds.b - bounds.t);
+						}
+					}
+				}
+			}
+		}
 		this.drawingObjects.showDrawingObjects(true);
 		this.drawingObjects.selectGraphicObject();
 		this.drawingObjects.sendSelectionChanged();

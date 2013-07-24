@@ -73,8 +73,6 @@ function CImage(drawingBase, drawingObjects)
 
 CImage.prototype =
 {
-
-
     getObjectType: function()
     {
         return CLASS_TYPE_IMAGE;
@@ -160,6 +158,18 @@ CImage.prototype =
         };
     },
 
+	setRasterImage: function(img, canvas)
+    {
+
+        this.blipFill = new CBlipFill();
+        this.blipFill.RasterImageId = img;
+        if(isRealObject(canvas))
+            this.blipFill.canvas = canvas;
+        this.spPr.Fill = new CUniFill();
+        this.spPr.Fill.fill = this.blipFill;
+        this.brush = this.spPr.Fill;
+    },
+	
     updateDrawingBaseCoordinates: function()
     {
         if(isRealObject(this.drawingBase))
