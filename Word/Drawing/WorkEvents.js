@@ -150,7 +150,7 @@ function check_MouseMoveEvent(e)
     }
     global_mouseEvent.AltKey = e.altKey;
     global_mouseEvent.ShiftKey = e.shiftKey;
-    global_mouseEvent.CtrlKey = e.ctrlKey;
+    global_mouseEvent.CtrlKey = e.ctrlKey || e.metaKey;
 
     global_mouseEvent.Type = g_mouse_event_type_move;
 
@@ -196,7 +196,7 @@ function check_MouseUpEvent(e)
 
     global_mouseEvent.AltKey = e.altKey;
     global_mouseEvent.ShiftKey = e.shiftKey;
-    global_mouseEvent.CtrlKey = e.ctrlKey;
+    global_mouseEvent.CtrlKey = e.ctrlKey || e.metaKey;
 
     global_mouseEvent.Type = g_mouse_event_type_up;
     global_mouseEvent.Button = e.button;
@@ -242,7 +242,7 @@ function check_MouseDownEvent(e, isClicks)
 
     global_mouseEvent.AltKey = e.altKey;
     global_mouseEvent.ShiftKey = e.shiftKey;
-    global_mouseEvent.CtrlKey = e.ctrlKey;
+    global_mouseEvent.CtrlKey = e.ctrlKey || e.metaKey;
 
     global_mouseEvent.Type = g_mouse_event_type_down;
     global_mouseEvent.Button = e.button;
@@ -302,7 +302,7 @@ function global_OnMouseWheel(e)
 {
     global_mouseEvent.AltKey = e.altKey;
     global_mouseEvent.ShiftKey = e.shiftKey;
-    global_mouseEvent.CtrlKey = e.ctrlKey;
+    global_mouseEvent.CtrlKey = e.ctrlKey || e.metaKey;
 
     if (undefined != e.wheelDelta)
         global_mouseEvent.WheelDelta = (e.wheelDelta > 0) ? -45 : 45;
