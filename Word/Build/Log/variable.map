@@ -2613,7 +2613,7 @@ ShapeForResizeInGroup:YI
 L 111:UA
 L 110:TA
 L 113:Pn
-bIsSupportOriginalFormatFonts:RB
+bIsSupportOriginalFormatFonts:QB
 L 112:H2
 L 103:Hn
 L 104:fs
@@ -2929,13 +2929,13 @@ c_oSerBorderType$Color:xj
 BinaryCommonWriter:wj
 c_oSerProp_tblStylePrType$RunPr:WV
 FT_Grays_Raster:iv
-L 13:C
+L 13:B
 temp1:ho
 L 14:D
 temp2:jo
 L 11:A
 EWmlColorSchemeIndex$wmlcolorschemeindexHyperlink:e_
-L 12:B
+L 12:C
 global_mouseEvent:Y
 t1_lookup_glyph_by_stdcharcode:Yr
 ETblStyleOverrideType$tblstyleoverridetypeFirstCol:NZ
