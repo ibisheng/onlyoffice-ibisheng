@@ -1254,7 +1254,7 @@ CShape.prototype =
             this.spPr.Fill = new CUniFill();
         }
 
-        this.spPr.Fill = CorrectUniFill2(ascFill, this.spPr.Fill);
+        this.spPr.Fill = CorrectUniFillEx(ascFill, this.spPr.Fill);
         if(this.spPr.Fill == null)
         {
             //historyObj.new_Fill = null;
@@ -1283,7 +1283,7 @@ CShape.prototype =
             //historyObj.old_Line = null;
         }
         //this.spPr.ln.merge(line);
-        this.spPr.ln = CorrectUniStroke2(line, this.spPr.ln);
+        this.spPr.ln = CorrectUniStrokeEx(line, this.spPr.ln);
         //historyObj.new_Line = this.spPr.ln.createDuplicate();
 
         //History.Add(this, historyObj);

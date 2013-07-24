@@ -376,8 +376,8 @@ DrawingObjectsController.prototype =
 								shape_props.ShapeProperties = new asc_CShapeProperty();
 								
 								shape_props.ShapeProperties.type = c_obj.getPresetGeom();
-                                shape_props.ShapeProperties.fill = CreateAscFill2(c_obj.getFill());
-                                shape_props.ShapeProperties.stroke = CreateAscStroke2(c_obj.getStroke());
+                                shape_props.ShapeProperties.fill = CreateAscFillEx(c_obj.getFill());
+                                shape_props.ShapeProperties.stroke = CreateAscStrokeEx(c_obj.getStroke());
                                 shape_props.ShapeProperties.canChangeArrows = c_obj.canChangeArrows();
 								
                                 //shape_props.verticalTextAlign = c_obj.bodyPr.anchor;
@@ -650,6 +650,7 @@ DrawingObjectsController.prototype =
             }
         }
 		this.drawingObjects.showDrawingObjects(true);
+		this.drawingObjects.selectGraphicObject();
 	}
 };
 
@@ -723,7 +724,7 @@ prot["asc_getHex"] = prot.asc_getHex;
 prot["asc_getColor"] = prot.asc_getColor;
 //}
 
-function CreateAscColorCustom2(r, g, b) {
+function CreateAscColorCustomEx(r, g, b) {
     var ret = new asc_CColor();
     ret.type = c_oAscColor.COLOR_TYPE_SRGB;
     ret.r = r;
@@ -733,7 +734,7 @@ function CreateAscColorCustom2(r, g, b) {
     return ret;
 }
 
-function CreateAscColor2(unicolor) {
+function CreateAscColorEx(unicolor) {
     if (null == unicolor || null == unicolor.color)
         return new asc_CColor();
 
@@ -769,7 +770,7 @@ function CreateAscColor2(unicolor) {
     return ret;
 }
 
-function CorrectUniColor2(asc_color, unicolor) {
+function CorrectUniColorEx(asc_color, unicolor) {
     if (null == asc_color)
         return unicolor;
 
@@ -828,10 +829,10 @@ function CorrectUniColor2(asc_color, unicolor) {
             {
                 ret.color = new CRGBColor();
             }
-            ret.color.RGBA.R = asc_color.get_r();
-            ret.color.RGBA.G = asc_color.get_g();
-            ret.color.RGBA.B = asc_color.get_b();
-            ret.color.RGBA.A = asc_color.get_a();
+            ret.color.RGBA.R = asc_color.asc_getR();
+            ret.color.RGBA.G = asc_color.asc_getG();
+            ret.color.RGBA.B = asc_color.asc_getB();
+            ret.color.RGBA.A = asc_color.asc_getA();
         }
     }
     return ret;
@@ -915,7 +916,7 @@ prot["asc_getColor"] = prot.asc_getColor;
 prot["asc_putColor"] = prot.asc_putColor;
 //}
 
-function CreateAscFill2(unifill) {
+function CreateAscFillEx(unifill) {
     if (null == unifill || null == unifill.fill)
         return new asc_CShapeFill();
 
@@ -928,14 +929,14 @@ function CreateAscFill2(unifill) {
         {
             ret.type = c_oAscFill.FILL_TYPE_SOLID;
             ret.fill = new asc_CFillSolid();
-            ret.fill.color = CreateAscColor2(_fill.color);
+            ret.fill.color = CreateAscColorEx(_fill.color);
             break;
         }
         case FILL_TYPE_PATT:
         {
             ret.type = c_oAscFill.FILL_TYPE_SOLID;
             ret.fill = new asc_CFillSolid();
-            ret.fill.color = CreateAscColor2(_fill.fgClr);
+            ret.fill.color = CreateAscColorEx(_fill.fgClr);
             break;
         }
         case FILL_TYPE_GRAD:
@@ -944,7 +945,7 @@ function CreateAscFill2(unifill) {
             ret.fill = new asc_CFillSolid();
 
             if (_fill.colors.length > 0)
-                ret.fill.color = CreateAscColor2(_fill.colors[0].color);
+                ret.fill.color = CreateAscColorEx(_fill.colors[0].color);
             break;
         }
         case FILL_TYPE_BLIP:
@@ -964,7 +965,7 @@ function CreateAscFill2(unifill) {
     return ret;
 }
 
-function CorrectUniFill2(asc_fill, unifill) {
+function CorrectUniFillEx(asc_fill, unifill) {
     if (null == asc_fill)
         return unifill;
 
@@ -991,8 +992,8 @@ function CorrectUniFill2(asc_fill, unifill) {
                     ret.fill = new CBlipFill();
                 }
 
-                var _url = _fill.get_url();
-                var _tx_id = _fill.get_texture_id();
+                var _url = _fill.asc_getUrl();
+                var _tx_id = _fill.asc_getTextureId();
                 if (null != _tx_id && (0 <= _tx_id) && (_tx_id < g_oUserTexturePresets.length))
                 {
                     _url = g_oUserTexturePresets[_tx_id];
@@ -1004,7 +1005,7 @@ function CorrectUniFill2(asc_fill, unifill) {
                 if (ret.fill.RasterImageId == null)
                     ret.fill.RasterImageId = "";
 
-                var tile = _fill.get_type();
+                var tile = _fill.asc_getType();
                 if (tile == c_oAscFillBlipType.STRETCH)
                     ret.fill.tile = null;
                 else if (tile == c_oAscFillBlipType.TILE)
@@ -1018,7 +1019,7 @@ function CorrectUniFill2(asc_fill, unifill) {
                 {
                     ret.fill = new CSolidFill();
                 }
-                ret.fill.color = CorrectUniColor2(_fill.asc_getColor(), ret.fill.color);
+                ret.fill.color = CorrectUniColorEx(_fill.asc_getColor(), ret.fill.color);
             }
         }
     }
@@ -1101,7 +1102,7 @@ prot["asc_putLineendsize"] = prot.asc_putLineendsize;
 prot["asc_getCanChangeArrows"] = prot.asc_getCanChangeArrows;
 //}
 
-function CreateAscStroke2(ln, _canChangeArrows) {
+function CreateAscStrokeEx(ln, _canChangeArrows) {
     if (null == ln || null == ln.Fill || ln.Fill.fill == null)
         return new asc_CStroke();
 
@@ -1118,7 +1119,7 @@ function CreateAscStroke2(ln, _canChangeArrows) {
             }
             case FILL_TYPE_SOLID:
             {
-                ret.color = CreateAscColor2(_fill.color);
+                ret.color = CreateAscColorEx(_fill.color);
                 ret.type = c_oAscStrokeType.STROKE_COLOR;
                 break;
             }
@@ -1127,7 +1128,7 @@ function CreateAscStroke2(ln, _canChangeArrows) {
                 var _c = _fill.colors;
                 if (_c != 0)
                 {
-                    ret.color = CreateAscColor2(_fill.colors[0]);
+                    ret.color = CreateAscColorEx(_fill.colors[0]);
                     ret.type = c_oAscStrokeType.STROKE_COLOR;
                 }
 
@@ -1135,7 +1136,7 @@ function CreateAscStroke2(ln, _canChangeArrows) {
             }
             case FILL_TYPE_PATT:
             {
-                ret.color = CreateAscColor2(_fill.fgClr);
+                ret.color = CreateAscColorEx(_fill.fgClr);
                 ret.type = c_oAscStrokeType.STROKE_COLOR;
                 break;
             }
@@ -1196,7 +1197,7 @@ function CreateAscStroke2(ln, _canChangeArrows) {
     return ret;
 }
 
-function CorrectUniStroke2(asc_stroke, unistroke) {
+function CorrectUniStrokeEx(asc_stroke, unistroke) {
     if (null == asc_stroke)
         return unistroke;
 
@@ -1223,7 +1224,7 @@ function CorrectUniStroke2(asc_stroke, unistroke) {
             ret.Fill = new CUniFill();
             ret.Fill.type = FILL_TYPE_SOLID;
             ret.Fill.fill = new CSolidFill();
-            ret.Fill.fill.color = CorrectUniColor2(_color, ret.Fill.fill.color);
+            ret.Fill.fill.color = CorrectUniColorEx(_color, ret.Fill.fill.color);
         }
     }
 

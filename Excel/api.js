@@ -980,7 +980,20 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					this._gui_color_schemes = null;
 				} else if ("asc_onInitEditorShapes" === name) {
 					this.handlers.trigger("asc_onInitEditorShapes", g_oAutoShapesGroups, g_oAutoShapesTypes);
-				}
+				} else if ("asc_onInitStandartTextures" === name) {
+					var _count = g_oUserTexturePresets.length;
+					var arr = new Array(_count);
+					for (var i = 0; i < _count; ++i) {
+						arr[i] = new asc_CTexture();
+						arr[i].Id = i;
+						arr[i].Image = g_oUserTexturePresets[i];
+					}
+					this.ImageLoader.bIsAsyncLoadDocumentImages = false;
+					this.ImageLoader.LoadDocumentImages(g_oUserTexturePresets, false);
+					this.ImageLoader.bIsAsyncLoadDocumentImages = true;
+					
+					this.handlers.trigger("asc_onInitStandartTextures", arr);
+				}				
 			},
 
 			asc_unregisterCallback: function (name, callback) {
@@ -2091,9 +2104,19 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.isStartAddShape = false;
 			},
 			
+			asc_canGroupGraphicsObjects: function() {
+				var ws = this.wb.getWorksheet();
+				return ws.objectRender.controller.canGroup();
+			},
+			
 			asc_groupGraphicsObjects: function() {
 				var ws = this.wb.getWorksheet();
 				ws.objectRender.groupGraphicObjects();
+			},
+			
+			asc_canUnGroupGraphicsObjects: function() {
+				var ws = this.wb.getWorksheet();
+				return ws.objectRender.controller.canUnGroup();
 			},
 			
 			asc_unGroupGraphicsObjects: function() {
@@ -2124,18 +2147,22 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 			
 			asyncImageEndLoaded: function(_image) {
-				var ws = this.wb.getWorksheet();
-				if ( ws.objectRender.asyncImageEndLoaded )
-					ws.objectRender.asyncImageEndLoaded(_image);
+				if ( this.wb ) {
+					var ws = this.wb.getWorksheet();
+					if ( ws.objectRender.asyncImageEndLoaded )
+						ws.objectRender.asyncImageEndLoaded(_image);
+				}
 			},
 			
 			asyncImagesDocumentStartLoaded: function() {				
 			},
 			
 			asyncImagesDocumentEndLoaded: function() {
-				var ws = this.wb.getWorksheet();
-				if ( ws.objectRender.asyncImagesDocumentEndLoaded )
-					ws.objectRender.asyncImagesDocumentEndLoaded();
+				if ( this.wb ) {
+					var ws = this.wb.getWorksheet();
+					if ( ws.objectRender.asyncImagesDocumentEndLoaded )
+						ws.objectRender.asyncImagesDocumentEndLoaded();
+				}
 			},
 			
 			// Cell interface
@@ -2909,7 +2936,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		// Shapes
 		prot["asc_startAddShape"] = prot.asc_startAddShape;
 		prot["asc_endAddShape"] = prot.asc_endAddShape;
+		prot["asc_canGroupGraphicsObjects"] = prot.asc_canGroupGraphicsObjects;
 		prot["asc_groupGraphicsObjects"] = prot.asc_groupGraphicsObjects;
+		prot["asc_canUnGroupGraphicsObjects"] = prot.asc_canUnGroupGraphicsObjects;
 		prot["asc_unGroupGraphicsObjects"] = prot.asc_unGroupGraphicsObjects;
 		prot["asc_getGraphicObjectProps"] = prot.asc_getGraphicObjectProps;
 		prot["asc_setGraphicObjectProps"] = prot.asc_setGraphicObjectProps;

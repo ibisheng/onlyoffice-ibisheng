@@ -749,6 +749,7 @@ CShapeDrawer.prototype =
             }
             else
             {
+				var editor = window["Asc"]["editor"];
                 var _img = editor.ImageLoader.map_image_index[getFullImageSrc(this.UniFill.fill.RasterImageId)];
                 var _img_native = this.UniFill.fill.canvas;
                 if ((!_img_native) && (_img == undefined || _img.Image == null || _img.Status == ImageLoadStatus.Loading))
@@ -793,8 +794,8 @@ CShapeDrawer.prototype =
 
                     _ctx.save();
 
-                    var koefX = editor.WordControl.m_nZoomValue / 100;
-                    var koefY = editor.WordControl.m_nZoomValue / 100;
+                    var koefX = editor.asc_getZoom();
+                    var koefY = editor.asc_getZoom();
 
                     // TODO: !!!
                     _ctx.translate(this.min_x, this.min_y);

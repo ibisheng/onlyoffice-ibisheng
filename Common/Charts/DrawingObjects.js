@@ -2242,6 +2242,29 @@ prot["asc_getIsCorrect"] = prot.asc_getIsCorrect;
 //}
 
 //-----------------------------------------------------------------------------------
+// CTexture
+//-----------------------------------------------------------------------------------
+
+function asc_CTexture() {
+    this.Id = 0;
+    this.Image = "";
+}
+
+asc_CTexture.prototype = {
+	asc_getId: function() { return this.Id; },
+	asc_getImage: function() { return this.Image; }
+}
+
+//{ asc_CTexture export
+window["Asc"].asc_CTexture = asc_CTexture;
+window["Asc"]["asc_CTexture"] = asc_CTexture;
+prot = asc_CTexture.prototype;
+
+prot["asc_getId"] = prot.asc_getId;
+prot["asc_getImage"] = prot.asc_getImage;
+//}
+
+//-----------------------------------------------------------------------------------
 // Undo/Redo
 //-----------------------------------------------------------------------------------
 	
