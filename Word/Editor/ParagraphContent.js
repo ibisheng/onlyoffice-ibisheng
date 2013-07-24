@@ -3066,13 +3066,26 @@ ParaDrawing.prototype =
             }
         }
 
-        Props.Paddings =
+        if ( drawing_Inline === this.DrawingType )
         {
-            Left   : this.Distance.L,
-            Right  : this.Distance.R,
-            Top    : this.Distance.T,
-            Bottom : this.Distance.B
-        };
+            Props.Paddings =
+            {
+                Left   : 3.2,
+                Right  : 3.2,
+                Top    : 0,
+                Bottom : 0
+            };
+        }
+        else
+        {
+            Props.Paddings =
+            {
+                Left   : this.Distance.L,
+                Right  : this.Distance.R,
+                Top    : this.Distance.T,
+                Bottom : this.Distance.B
+            };
+        }
 
         Props.AllowOverlap = this.AllowOverlap;
 
