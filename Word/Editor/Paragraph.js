@@ -3209,6 +3209,14 @@ Paragraph.prototype =
         var X = this.Lines[CurLine].Ranges[CurRange].XVisible;
         var Y = this.Pages[CurPage].Y + this.Lines[CurLine].Y;
 
+        if ( Pos < this.Lines[CurLine].Ranges[CurRange].StartPos )
+        {
+            if ( true === ReturnTarget )
+                return { X : X, Y : TargetY, Height : 0, Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
+            else
+                return { X : X, Y : Y, PageNum : CurPage + this.Get_StartPage_Absolute(), Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
+        }
+
         for ( var ItemNum = this.Lines[CurLine].Ranges[CurRange].StartPos; ItemNum < this.Content.length; ItemNum++ )
         {
             var Item = this.Content[ItemNum];
@@ -3310,6 +3318,11 @@ Paragraph.prototype =
                 }
             }
         }
+
+        if ( true === ReturnTarget )
+            return { X : X, Y : TargetY, Height : Height, Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
+        else
+            return { X : X, Y : Y, PageNum : CurPage + this.Get_StartPage_Absolute(), Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
     },
 
     // Нужно ли добавлять нумерацию в начале данной строки
