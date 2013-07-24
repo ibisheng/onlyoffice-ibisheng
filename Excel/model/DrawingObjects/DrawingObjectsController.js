@@ -1161,14 +1161,14 @@ function CreateAscStrokeEx(ln, _canChangeArrows) {
     ret.width /= 36000.0;
 
     if (ln.cap != null)
-        ret.put_linecap(ln.cap);
+        ret.asc_putLinecap(ln.cap);
 
     if (ln.LineJoin != null)
-        ret.put_linejoin(ln.LineJoin.type);
+        ret.asc_putLinejoin(ln.LineJoin.type);
 
     if (ln.headEnd != null)
     {
-        ret.put_linebeginstyle((ln.headEnd.type == null) ? LineEndType.None : ln.headEnd.type);
+        ret.asc_putLinebeginstyle((ln.headEnd.type == null) ? LineEndType.None : ln.headEnd.type);
 
         var _len = (null == ln.headEnd.len) ? 1 : (2 - ln.headEnd.len);
         var _w = (null == ln.headEnd.w) ? 1 : (2 - ln.headEnd.w);

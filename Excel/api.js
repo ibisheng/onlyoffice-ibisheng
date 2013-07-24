@@ -988,10 +988,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						arr[i] = new asc_CTexture();
 						arr[i].Id = i;
 						arr[i].Image = g_oUserTexturePresets[i];
+						this.ImageLoader.LoadImage(g_oUserTexturePresets[i], 1);
 					}
-					this.ImageLoader.bIsAsyncLoadDocumentImages = false;
-					this.ImageLoader.LoadDocumentImages(g_oUserTexturePresets, false);
-					this.ImageLoader.bIsAsyncLoadDocumentImages = true;
 					
 					this.handlers.trigger("asc_onInitStandartTextures", arr);
 				}				
@@ -2168,6 +2166,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					if ( ws.objectRender.asyncImagesDocumentEndLoaded )
 						ws.objectRender.asyncImagesDocumentEndLoaded();
 				}
+			},
+			
+			asyncImageEndLoadedBackground: function() {
 			},
 			
 			// Cell interface
