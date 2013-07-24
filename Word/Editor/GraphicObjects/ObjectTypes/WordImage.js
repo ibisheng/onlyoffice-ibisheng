@@ -2868,7 +2868,7 @@ WordImage.prototype =
                 this.addGeometry("rect");
                 this.spPr.geometry.Init( this.absExtX, this.absExtY);
                 this.calculateTransformTextMatrix();
-                return this;
+                break;
             }
             case historyitem_ChangeDiagram:
             {
