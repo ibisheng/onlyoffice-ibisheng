@@ -760,11 +760,11 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 	}
 	else
     {
-        documentUrl = this.FontLoader.fontFilesPath + "../Word/document/";
+        documentUrl = this.FontLoader.fontFilesPath + "../Word/document2/";
         c_DocInfo.put_OfflineApp(true);
 
         // For test create unique id
-        documentId = "01234567890";
+        documentId = "qwerty";
         this.OfflineAppDocumentStartLoad();
 
         this.sync_zoomChangeCallback(this.WordControl.m_nZoomValue, 0);
@@ -953,7 +953,7 @@ asc_docs_api.prototype.OpenEmptyDocument = function()
 asc_docs_api.prototype.OpenTestDocument = function()
 {
     // For test create unique id
-    documentId = "01234567890";
+    documentId = "qwerty";
 
     editor.InitEditor();
 	this.LoadedObject = null;

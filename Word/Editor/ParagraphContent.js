@@ -3467,7 +3467,7 @@ ParaDrawing.prototype =
     Selection_Is_TableBorderMove: function()
     {
         if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.Selection_Is_TableBorderMove === "function")
-            this.GraphicObj.Selection_Is_TableBorderMove();
+            return this.GraphicObj.Selection_Is_TableBorderMove();
         return false;
     },
     Update_Position : function(X, Y, PageNum, LastItemW, ColumnStartX, ColumnEndX, Left_Margin, Right_Margin, Page_W, Top_Margin, Bottom_Margin, Page_H, MarginH, MarginV, LineTop, ParagraphTop, PageLimits)
