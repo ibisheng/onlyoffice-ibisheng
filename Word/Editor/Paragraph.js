@@ -297,7 +297,7 @@ Paragraph.prototype =
         var NumPr = this.Numbering_Get();
         if ( undefined != NumPr  )
         {
-            OtherParagraph.Numbering_Add( NumPr.NumId, NumPr.Lvl );
+            OtherParagraph.Numbering_Set( NumPr.NumId, NumPr.Lvl );
         }
 
         var Bullet = this.Get_PresentationNumbering();
@@ -8469,6 +8469,19 @@ Paragraph.prototype =
         this.CompiledPr.NeedRecalc = true;
     },
 
+    // Добавляем нумерацию к данному параграфу, не делая никаких дополнительных действий
+    Numbering_Set : function(NumId, Lvl)
+    {
+        var NumPr_old = this.Pr.NumPr;
+        this.Pr.NumPr = new CNumPr();
+        this.Pr.NumPr.Set( NumId, Lvl );
+
+        History.Add( this, { Type : historyitem_Paragraph_Numbering, Old : NumPr_old, New : this.Pr.NumPr } );
+
+        // Надо пересчитать конечный стиль
+        this.CompiledPr.NeedRecalc = true;
+    },
+
     // Изменяем уровень нумерации
     Numbering_IndDec_Level : function(bIncrease)
     {
@@ -8939,7 +8952,7 @@ Paragraph.prototype =
 
             // NumPr
             if ( undefined != ParaPr.NumPr )
-                this.Numbering_Add( ParaPr.NumPr.NumId, ParaPr.NumPr.Lvl );
+                this.Numbering_Set( ParaPr.NumPr.NumId, ParaPr.NumPr.Lvl );
             else
                 this.Numbering_Remove();
 
