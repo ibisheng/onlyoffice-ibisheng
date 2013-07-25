@@ -336,6 +336,9 @@ Paragraph.prototype =
         if ( this.Selection.EndPos >= Pos )
             this.Selection.EndPos++;
 
+        if ( this.Numbering.Pos >= Pos )
+            this.Numbering.Pos++;
+
         // Также передвинем всем метки переносов страниц и строк
         var LinesCount = this.Lines.length;
         for ( var CurLine = 0; CurLine < LinesCount; CurLine++ )
@@ -420,6 +423,9 @@ Paragraph.prototype =
             if ( this.Selection.EndPos > Pos )
                 this.Selection.EndPos--;
         }
+
+        if ( this.Numbering.Pos > Pos )
+            this.Numbering.Pos--;
 
         // Также передвинем всем метки переносов страниц и строк
         var LinesCount = this.Lines.length;
