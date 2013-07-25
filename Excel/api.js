@@ -1443,16 +1443,18 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 
 			_sendWorkbookStyles: function () {
-				// Отправка стилей форматированных таблиц
-				var autoFilters = new asc.AutoFilters();
-				var tablePictures = autoFilters.getTablePictures(this.wbModel);
-				var bResult = this.handlers.trigger("asc_onInitTablePictures", tablePictures);
-				this.tablePictures = (false === bResult) ? tablePictures : null;
+				if(this.wbModel) {
+					// Отправка стилей форматированных таблиц
+					var autoFilters = new asc.AutoFilters();
+					var tablePictures = autoFilters.getTablePictures(this.wbModel);
+					var bResult = this.handlers.trigger("asc_onInitTablePictures", tablePictures);
+					this.tablePictures = (false === bResult) ? tablePictures : null;
 
-				// Отправка стилей ячеек
-				var guiStyles = this.wb.getCellStyles();
-				bResult = this.handlers.trigger("asc_onInitEditorStyles", guiStyles);
-				this.guiStyles = (false === bResult) ? guiStyles : null;
+					// Отправка стилей ячеек
+					var guiStyles = this.wb.getCellStyles();
+					bResult = this.handlers.trigger("asc_onInitEditorStyles", guiStyles);
+					this.guiStyles = (false === bResult) ? guiStyles : null;
+				}
 			},
 
 			startCollaborationEditing: function () {
