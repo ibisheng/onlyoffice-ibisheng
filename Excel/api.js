@@ -580,6 +580,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						}
 						
 						this.isUseEmbeddedCutFonts = false;
+
+						// Отправка стилей
+						this._sendWorkbookStyles();
 					}
 				}
 			},
@@ -1436,6 +1439,19 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					var wsIndex = wsModel.getIndex();
 					t.handlers.trigger("asc_onWorksheetLocked", wsIndex, t.asc_isWorksheetLockedOrDeleted(wsIndex));
 				}
+			},
+
+			_sendWorkbookStyles: function () {
+				// Отправка стилей форматированных таблиц
+				var autoFilters = new asc.AutoFilters();
+				var tablePictures = autoFilters.getTablePictures(this.wbModel);
+				var bResult = this.handlers.trigger("asc_onInitTablePictures", tablePictures);
+				this.tablePictures = (false === bResult) ? tablePictures : null;
+
+				// Отправка стилей ячеек
+				var guiStyles = this.wb.getCellStyles();
+				bResult = this.handlers.trigger("asc_onInitEditorStyles", guiStyles);
+				this.guiStyles = (false === bResult) ? guiStyles : null;
 			},
 
 			startCollaborationEditing: function () {
@@ -2500,15 +2516,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.chartStyleManager.init();
 				this.chartPreviewManager.init();
 
-				var autoFilters = new asc.AutoFilters();
-				var tablePictures = autoFilters.getTablePictures(this.wbModel);
-				var bResult = this.handlers.trigger("asc_onInitTablePictures", tablePictures);
-				this.tablePictures = (false === bResult) ? tablePictures : null;
-
-				// Отправка стилей ячеек
-				var guiStyles = this.wb.getCellStyles();
-				bResult = this.handlers.trigger("asc_onInitEditorStyles", guiStyles);
-				this.guiStyles = (false === bResult) ? guiStyles : null;
+				// На view-режиме не нужно отправлять стили
+				if (this.controller.getViewerMode && true !== this.controller.getViewerMode()) {
+					// Отправка стилей
+					this._sendWorkbookStyles();
+				}
 					
 				if (bRedraw) {
 					var ws = this.wb.getWorksheet();
