@@ -1132,7 +1132,7 @@ CGraphicObjects.prototype =
             }
             case STATES_ID_TEXT_ADD_IN_GROUP:
             {
-                if(typeof  this.curState.textObject.addInlineImage === "function")
+                if(typeof  this.curState.textObject.Selection_Is_TableBorderMove === "function")
                     return this.curState.textObject.Selection_Is_TableBorderMove();
                 break;
             }
