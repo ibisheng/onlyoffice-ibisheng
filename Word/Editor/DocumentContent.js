@@ -2169,7 +2169,7 @@ CDocumentContent.prototype =
                 else
                 {
                     this.CurPos.ContentPos = StartPos;
-                    if ( Count < 0 && type_Table === this.Content[StartPos].GetType() && true != bOnTextAdd )
+                    if ( Count < 0 && type_Table === this.Content[StartPos].GetType() && table_Selection_Cell === this.Content[StartPos].Selection.Type && true != bOnTextAdd )
                     {
                         this.Table_RemoveRow();
                     }
