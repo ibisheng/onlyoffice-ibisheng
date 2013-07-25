@@ -67,6 +67,15 @@ WordShape.prototype =
         return true;
     },
 
+    Selection_Is_TableBorderMove: function()
+    {
+        if(isRealObject(this.textBoxContent) && isRealObject(this.textBoxContent.content))
+        {
+            return this.textBoxContent.content.Selection_Is_TableBorderMove();
+        }
+        return false;
+    },
+
     isCurrentElementParagraph: function()
     {
         if(isRealObject(this.textBoxContent))
