@@ -8357,11 +8357,29 @@ CDocument.prototype =
         {
             if ( true === this.Selection.Use )
             {
-                if ( this.Selection.StartPos != this.Selection.EndPos )
-                    Info.Set_MixedSelection();
+                if ( selectionflag_Numbering === this.Selection.Flag )
+                {
+                    // Текстовые настройки применяем к конкретной нумерации
+                    if ( !(null == this.Selection.Data || this.Selection.Data.length <= 0) )
+                    {
+                        var CurPara = this.Content[this.Selection.Data[0]];
+                        for ( var Index = 0; Index < this.Selection.Data.length; Index++ )
+                        {
+                            if ( this.CurPos.ContentPos === this.Selection.Data[Index] )
+                                CurPara = this.Content[this.Selection.Data[Index]];
+                        }
+
+                        CurPara.Get_SelectedElementsInfo(Info);
+                    }
+                }
                 else
                 {
-                    this.Content[this.Selection.StartPos].Get_SelectedElementsInfo(Info);
+                    if ( this.Selection.StartPos != this.Selection.EndPos )
+                        Info.Set_MixedSelection();
+                    else
+                    {
+                        this.Content[this.Selection.StartPos].Get_SelectedElementsInfo(Info);
+                    }
                 }
             }
             else

@@ -3286,18 +3286,36 @@ CDocumentContent.prototype =
                 this.LogicDocument.DrawingObjects.getSelectedElementsInfo(Info);
             else //if ( docpostype_Content == this.CurPos.Type )
             {
-                if ( true === this.Selection.Use )
+                if ( selectionflag_Numbering === this.Selection.Flag )
                 {
-                    if ( this.Selection.StartPos != this.Selection.EndPos )
-                        Info.Set_MixedSelection();
-                    else
+                    // Текстовые настройки применяем к конкретной нумерации
+                    if ( !(null == this.Selection.Data || this.Selection.Data.length <= 0) )
                     {
-                        this.Content[this.Selection.StartPos].Get_SelectedElementsInfo(Info);
+                        var CurPara = this.Content[this.Selection.Data[0]];
+                        for ( var Index = 0; Index < this.Selection.Data.length; Index++ )
+                        {
+                            if ( this.CurPos.ContentPos === this.Selection.Data[Index] )
+                                CurPara = this.Content[this.Selection.Data[Index]];
+                        }
+
+                        CurPara.Get_SelectedElementsInfo(Info);
                     }
                 }
                 else
                 {
-                    this.Content[this.CurPos.ContentPos].Get_SelectedElementsInfo(Info);
+                    if ( true === this.Selection.Use )
+                    {
+                        if ( this.Selection.StartPos != this.Selection.EndPos )
+                            Info.Set_MixedSelection();
+                        else
+                        {
+                            this.Content[this.Selection.StartPos].Get_SelectedElementsInfo(Info);
+                        }
+                    }
+                    else
+                    {
+                        this.Content[this.CurPos.ContentPos].Get_SelectedElementsInfo(Info);
+                    }
                 }
             }
         }
