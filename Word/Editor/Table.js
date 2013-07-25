@@ -10648,11 +10648,14 @@ CTable.prototype =
                     var TempCell_pos = Cells_pos[Index2];
 
                     TempCell.Set_GridSpan( Grid_Info_new[0] );
+                    TempCell.Set_W( new CTableMeasurement(tblwidth_Mm, Grid_width) );
+
                     for ( var Index = 1; Index < Cols; Index++ )
                     {
                         var NewCell = TempRow.Add_Cell( TempCell_pos.Cell + Index, TempRow, null, false );
                         NewCell.Copy_Pr( TempCell.Pr );
                         NewCell.Set_GridSpan( Grid_Info_new[Index] );
+                        NewCell.Set_W( new CTableMeasurement(tblwidth_Mm, Grid_width) );
                     }
                 }
             }
