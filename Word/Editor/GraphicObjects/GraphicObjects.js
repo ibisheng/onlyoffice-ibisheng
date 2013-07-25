@@ -1121,6 +1121,25 @@ CGraphicObjects.prototype =
         }
     },
 
+    selectionIsTableBorder: function()
+    {
+        switch(this.curState.id)
+        {
+            case STATES_ID_TEXT_ADD:
+            {
+                return sthis.curState.textObject.Selection_Is_TableBorderMove();
+                break;
+            }
+            case STATES_ID_TEXT_ADD_IN_GROUP:
+            {
+                if(typeof  this.curState.textObject.addInlineImage === "function")
+                    return this.curState.textObject.Selection_Is_TableBorderMove();
+                break;
+            }
+        }
+        return false;
+    },
+
 
 
     drawPageSelect: function(pageIndex)

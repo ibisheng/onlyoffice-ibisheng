@@ -66,6 +66,15 @@ CShape.prototype =
     {
     },
 
+    Selection_Is_TableBorderMove: function()
+    {
+        if(isRealObject(this.txBody) && isRealObject(this.txBody.content))
+        {
+            return this.txBody.content.Selection_Is_TableBorderMove();
+        }
+        return false;
+    },
+
     createFullCopy : function(parent, container)
     {
         var _copy = new CShape(parent);
