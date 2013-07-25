@@ -9407,7 +9407,7 @@ Paragraph.prototype =
             case historyitem_Paragraph_Borders_Top:     OldValue = this.Pr.Brd.Top;     this.Pr.Brd.Top     = Border; break;
         }
 
-        History.Add( this, { Type : historyitem_Paragraph_WidowControl, New : Border, Old : OldValue } );
+        History.Add( this, { Type : HistoryType, New : Border, Old : OldValue } );
 
         // Надо пересчитать конечный стиль
         this.CompiledPr.NeedRecalc = true;
