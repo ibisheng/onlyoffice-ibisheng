@@ -144,6 +144,39 @@ CTableAnchorPosition.prototype =
 
                 break;
             }
+
+            case c_oAscHAnchor.PageInternal:
+            {
+                if ( true === bAlign )
+                {
+                    switch ( Value )
+                    {
+                        case c_oAscXAlign.Center:
+                        {
+                            this.CalcX = (this.Page_W - this.W) / 2;
+                            break;
+                        }
+
+                        case c_oAscXAlign.Inside:
+                        case c_oAscXAlign.Outside:
+                        case c_oAscXAlign.Left:
+                        {
+                            this.CalcX = 0;
+                            break;
+                        }
+
+                        case c_oAscXAlign.Right:
+                        {
+                            this.CalcX = this.Page_W - this.W;
+                            break;
+                        }
+                    }
+                }
+                else
+                    this.CalcX = Value;
+
+                break;
+            }
         }
 
         return this.CalcX;
@@ -312,6 +345,12 @@ CTableAnchorPosition.prototype =
             {
                 Value = this.CalcX - this.X_min;
 
+                break;
+            }
+
+            case c_oAscHAnchor.PageInternal:
+            {
+                Value = this.CalcX;
                 break;
             }
         }
@@ -595,6 +634,8 @@ function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, 
         Value        : c_oAscXAlign.Center //
     };
 
+    this.PositionH_Old = undefined;
+
     // Позиция по горизонтали
     this.PositionV =
     {
@@ -602,6 +643,8 @@ function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, 
         Align        : true,               // true : В поле Value лежит тип прилегания, false - в поле Value лежит точное значени
         Value        : c_oAscYAlign.Center //
     };
+
+    this.PositionV_Old = undefined;
 
     // Расстояние до окружающего текста
     this.Distance =
@@ -2596,7 +2639,33 @@ CTable.prototype =
                 oLogicDocument.Create_NewHistoryPoint();
 
                 // Обновляем координаты
-                this.Internal_UpdateFlowPosition(X, Y);
+
+                // Здесь мы должны для первого рассчета оставить привязку относительно страницы, а после рассчета
+                // изменить привязку на старую, при этом пересчитав координаты так, чтобы картинка не изменила
+                // своего положения.
+
+                this.PositionH_Old =
+                {
+                    RelativeFrom : this.PositionH.RelativeFrom,
+                    Align        : this.PositionH.Align,
+                    Value        : this.PositionH.Value
+                };
+
+                this.PositionV_Old =
+                {
+                    RelativeFrom : this.PositionV.RelativeFrom,
+                    Align        : this.PositionV.Align,
+                    Value        : this.PositionV.Value
+                };
+
+                this.PositionH.RelativeFrom = c_oAscHAnchor.PageInternal;
+                this.PositionH.Align        = false;
+                this.PositionH.Value        = X;
+
+                this.PositionV.RelativeFrom = c_oAscVAnchor.Page;
+                this.PositionV.Align        = false;
+                this.PositionV.Value        = Y;
+
                 this.PageNum = PageNum;
 
                 // Переносим привязку (если получается, что заносим таблицу саму в себя, тогда привязку не меняем)
@@ -13914,6 +13983,23 @@ CTable.prototype =
 
             this.X = this.AnchorPosition.Calculate_X(this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value);
             this.X_origin = this.X - this.Get_TableOffsetCorrection();
+
+            if ( undefined != this.PositionH_Old )
+            {
+                // Восстанови старые значения, чтобы в историю изменений все нормально записалось
+                this.PositionH.RelativeFrom = this.PositionH_Old.RelativeFrom;
+                this.PositionH.Align        = this.PositionH_Old.Align;
+                this.PositionH.Value        = this.PositionH_Old.Value;
+
+                // Рассчитаем сдвиг с учетом старой привязки
+                var Value = this.AnchorPosition.Calculate_X_Value(this.PositionH_Old.RelativeFrom);
+                this.Set_PositionH( this.PositionH_Old.RelativeFrom, false, Value );
+                // На всякий случай пересчитаем заново координату
+                this.X = this.AnchorPosition.Calculate_X(this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value);
+                this.X_origin = this.X - this.Get_TableOffsetCorrection();
+
+                this.PositionH_Old = undefined;
+            }
         }
     },
 
@@ -13932,6 +14018,22 @@ CTable.prototype =
             var OtherFlowTables = editor.WordControl.m_oLogicDocument.DrawingObjects.getAllFloatTablesOnPage( this.Get_StartPage_Absolute() );
             this.AnchorPosition.Calculate_Y(this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value);
             this.AnchorPosition.Correct_Values( PageLimits.X, PageLimits.Y, PageLimits.XLimit, PageLimits.YLimit, this.AllowOverlap, OtherFlowTables, this );
+
+            if ( undefined != this.PositionV_Old )
+            {
+                // Восстанови старые значения, чтобы в историю изменений все нормально записалось
+                this.PositionV.RelativeFrom = this.PositionV_Old.RelativeFrom;
+                this.PositionV.Align        = this.PositionV_Old.Align;
+                this.PositionV.Value        = this.PositionV_Old.Value;
+
+                // Рассчитаем сдвиг с учетом старой привязки
+                var Value = this.AnchorPosition.Calculate_Y_Value(this.PositionV_Old.RelativeFrom);
+                this.Set_PositionV( this.PositionV_Old.RelativeFrom, false, Value );
+                // На всякий случай пересчитаем заново координату
+                this.AnchorPosition.Calculate_Y(this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value);
+
+                this.PositionV_Old = undefined;
+            }
 
             var NewX = this.AnchorPosition.CalcX;
             var NewY = this.AnchorPosition.CalcY;

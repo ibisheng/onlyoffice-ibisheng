@@ -267,7 +267,9 @@ var c_oAscHAnchor =
 {
     Margin : 0x00,
     Page   : 0x01,
-    Text   : 0x02
+    Text   : 0x02,
+
+    PageInternal : 0xFF // только для внутреннего использования
 };
 
 var c_oAscXAlign =
