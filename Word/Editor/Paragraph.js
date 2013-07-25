@@ -2534,6 +2534,11 @@ Paragraph.prototype =
                     }
                     else
                     {
+                        for ( var TempRange = CurRange + 1; TempRange <= RangesCount; TempRange++ )
+                            this.Lines[CurLine].Set_RangeStartPos( TempRange, Pos + 1 );
+
+                        this.Lines[CurLine].Set_EndPos( Pos, this );
+
                         // Проверим висячую строку
                         if ( true === ParaPr.WidowControl && CurLine === this.Pages[CurPage].StartLine && CurLine >= 1 )
                         {
@@ -4729,6 +4734,7 @@ Paragraph.prototype =
 
     Internal_Draw_6 : function(CurPage, pGraphics, Pr)
     {
+        var bEmpty  = this.IsEmpty();
         var X_left  = Math.min( this.Pages[CurPage].X + Pr.ParaPr.Ind.Left, this.Pages[CurPage].X + Pr.ParaPr.Ind.Left + Pr.ParaPr.Ind.FirstLine );
         var X_right = this.Pages[CurPage].XLimit - Pr.ParaPr.Ind.Right;
 
@@ -4762,7 +4768,7 @@ Paragraph.prototype =
                 var X0 = ( 0 === CurRange ? X_left : this.Lines[StartLine].Ranges[CurRange].X );
                 var X1 = ( RangesCount - 1 === CurRange ? X_right : this.Lines[StartLine].Ranges[CurRange].XEnd );
 
-                if ( this.Lines[StartLine].Ranges[CurRange].W > 0.001 )
+                if ( this.Lines[StartLine].Ranges[CurRange].W > 0.001 || ( true === bEmpty && 1 === RangesCount ) )
                     pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Top, Y_top, X0, X1, Pr.ParaPr.Brd.Top.Size, LeftMW, RightMW );
             }
         }
@@ -4791,7 +4797,7 @@ Paragraph.prototype =
                 var X0 = ( 0 === CurRange ? X_left : this.Lines[StartLine].Ranges[CurRange].X );
                 var X1 = ( RangesCount - 1 === CurRange ? X_right : this.Lines[StartLine].Ranges[CurRange].XEnd );
 
-                if ( this.Lines[StartLine].Ranges[CurRange].W > 0.001 )
+                if ( this.Lines[StartLine].Ranges[CurRange].W > 0.001 || ( true === bEmpty && 1 === RangesCount ) )
                     pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Top, Y, X0, X1, Size, LeftMW, RightMW );
             }
         }
@@ -4826,7 +4832,7 @@ Paragraph.prototype =
                 var X0 = ( 0 === CurRange ? X_left : this.Lines[EndLine].Ranges[CurRange].X );
                 var X1 = ( RangesCount - 1 === CurRange ? X_right : this.Lines[EndLine].Ranges[CurRange].XEnd );
 
-                if ( this.Lines[EndLine].Ranges[CurRange].W > 0.001 )
+                if ( this.Lines[EndLine].Ranges[CurRange].W > 0.001 || ( true === bEmpty && 1 === RangesCount ) )
                     pGraphics.drawHorLineExt( DrawLineRule, TempY, X0, X1, Pr.ParaPr.Brd.Bottom.Size, LeftMW, RightMW );
             }
         }
@@ -4845,7 +4851,7 @@ Paragraph.prototype =
                     var X0 = ( 0 === CurRange ? X_left : this.Lines[EndLine].Ranges[CurRange].X );
                     var X1 = ( RangesCount - 1 === CurRange ? X_right : this.Lines[EndLine].Ranges[CurRange].XEnd );
 
-                    if ( this.Lines[EndLine].Ranges[CurRange].W > 0.001 )
+                    if ( this.Lines[EndLine].Ranges[CurRange].W > 0.001 || ( true === bEmpty && 1 === RangesCount ) )
                         pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Top, this.Pages[CurPage].Y + this.Lines[CurLine].Y + this.Lines[CurLine].Metrics.Descent + this.Lines[CurLine].Metrics.LineGap, X0, X1, Pr.ParaPr.Brd.Bottom.Size, LeftMW, RightMW );
                 }
             }
