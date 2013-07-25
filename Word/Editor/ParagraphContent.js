@@ -887,9 +887,9 @@ ParaTextPr.prototype =
             case historyitem_TextPr_RFonts:
             {
                 if ( undefined != Data.Old )
-                    this.Value = Data.Old;
+                    this.Value.RFonts = Data.Old;
                 else
-                    this.Value = new CRFonts();
+                    this.Value.RFonts = new CRFonts();
 
                 break;
             }
@@ -897,9 +897,9 @@ ParaTextPr.prototype =
             case historyitem_TextPr_Lang:
             {
                 if ( undefined != Data.Old )
-                    this.Value = Data.Old;
+                    this.Value.Lang = Data.Old;
                 else
-                    this.Value = new CLang();
+                    this.Value.Lang = new CLang();
 
                 break;
             }
@@ -1082,9 +1082,9 @@ ParaTextPr.prototype =
             case historyitem_TextPr_RFonts:
             {
                 if ( undefined != Data.New )
-                    this.Value = Data.New;
+                    this.Value.RFonts = Data.New;
                 else
-                    this.Value = new CRFonts();
+                    this.Value.RFonts = new CRFonts();
 
                 break;
             }
@@ -1092,9 +1092,9 @@ ParaTextPr.prototype =
             case historyitem_TextPr_Lang:
             {
                 if ( undefined != Data.New )
-                    this.Value = Data.New;
+                    this.Value.Lang = Data.New;
                 else
-                    this.Value = new CLang();
+                    this.Value.Lang = new CLang();
 
                 break;
             }
