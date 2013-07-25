@@ -7228,6 +7228,18 @@ function ReadDefCellStyles(wb, oOutput)
 			// XfId
 			if (null !== oStyleObject.xfs.XfId)
 				oCellStyle.xfs.XfId = oStyleObject.xfs.XfId;
+			// ApplyBorder (ToDo возможно это свойство должно быть в xfs)
+			if (null !== oStyleObject.xfs.ApplyBorder)
+				oCellStyle.ApplyBorder = oStyleObject.xfs.ApplyBorder;
+			// ApplyFill (ToDo возможно это свойство должно быть в xfs)
+			if (null !== oStyleObject.xfs.ApplyFill)
+				oCellStyle.ApplyFill = oStyleObject.xfs.ApplyFill;
+			// ApplyFont (ToDo возможно это свойство должно быть в xfs)
+			if (null !== oStyleObject.xfs.ApplyFont)
+				oCellStyle.ApplyFont = oStyleObject.xfs.ApplyFont;
+			// ApplyNumberFormat (ToDo возможно это свойство должно быть в xfs)
+			if (null !== oStyleObject.xfs.ApplyNumberFormat)
+				oCellStyle.ApplyNumberFormat = oStyleObject.xfs.ApplyNumberFormat;
 
 			oOutput.push(oCellStyle);
 		} else

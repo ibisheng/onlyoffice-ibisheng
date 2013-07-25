@@ -1346,6 +1346,11 @@ function CCellStyle() {
 	this.XfId = null;
 
 	this.xfs = null;
+
+	this.ApplyBorder = true;
+	this.ApplyFill = true;
+	this.ApplyFont = true;
+	this.ApplyNumberFormat = true;
 }
 CCellStyle.prototype = {
 	clone: function () {
@@ -1355,6 +1360,11 @@ CCellStyle.prototype = {
 		oNewStyle.Hidden = this.Hidden;
 		oNewStyle.ILevel = this.ILevel;
 		oNewStyle.Name = this.Name;
+
+		oNewStyle.ApplyBorder = this.ApplyBorder;
+		oNewStyle.ApplyFill = this.ApplyFill;
+		oNewStyle.ApplyFont = this.ApplyFont;
+		oNewStyle.ApplyNumberFormat = this.ApplyNumberFormat;
 
 		oNewStyle.xfs = this.xfs.clone();
 		return oNewStyle;
@@ -2080,10 +2090,14 @@ Col.prototype =
 
 			// Выставляем стиль
 			var oStyle = this.cs.getStyleByXfId(oRes.newVal);
-			this.setFont(oStyle.getFont());
-			this.setFill(oStyle.getFill());
-			this.setBorder(oStyle.getBorder());
-			this.setNumFormat(oStyle.getNumFormatStr());
+			if (oStyle.ApplyFont)
+				this.setFont(oStyle.getFont());
+			if (oStyle.ApplyFill)
+				this.setFill(oStyle.getFill());
+			if (oStyle.ApplyBorder)
+				this.setBorder(oStyle.getBorder());
+			if (oStyle.ApplyNumberFormat)
+				this.setNumFormat(oStyle.getNumFormatStr());
 		}
 	},
 	setNumFormat : function(val)
@@ -2355,10 +2369,14 @@ Row.prototype =
 
 			// Выставляем стиль
 			var oStyle = this.cs.getStyleByXfId(oRes.newVal);
-			this.setFont(oStyle.getFont());
-			this.setFill(oStyle.getFill());
-			this.setBorder(oStyle.getBorder());
-			this.setNumFormat(oStyle.getNumFormatStr());
+			if (oStyle.ApplyFont)
+				this.setFont(oStyle.getFont());
+			if (oStyle.ApplyFill)
+				this.setFill(oStyle.getFill());
+			if (oStyle.ApplyBorder)
+				this.setBorder(oStyle.getBorder());
+			if (oStyle.ApplyNumberFormat)
+				this.setNumFormat(oStyle.getNumFormatStr());
 		}
 	},
 	setNumFormat : function(val)
