@@ -2292,6 +2292,7 @@ CGraphicObjects.prototype =
                             group_selection_array.length = 0;
                             group_selection_array.push(group_sp_tree[sp_index + 1]);
                             group_sp_tree[sp_index + 1].select();
+                            this.drawingDocument.m_oWordControl.OnUpdateOverlay();
                             return;
                         }
                         else
@@ -2349,6 +2350,7 @@ CGraphicObjects.prototype =
                                 start_array[j+1].select();
                                 selection_array.push(start_array[j+1]);
                                 this.changeCurrentState(new NullState(this));
+                                this.drawingDocument.m_oWordControl.OnUpdateOverlay();
                                 return;
                             }
                             else
@@ -2367,6 +2369,7 @@ CGraphicObjects.prototype =
                                         cur_array[0].select();
                                         selection_array.push(cur_array[0]);
                                         this.changeCurrentState(new NullState(this));
+                                        this.drawingDocument.m_oWordControl.OnUpdateOverlay();
                                         return;
                                     }
                                 }
@@ -2427,6 +2430,7 @@ CGraphicObjects.prototype =
                             start_array[j+1].select();
                             selection_array.push(start_array[j+1]);
                             this.changeCurrentState(new NullState(this));
+                            this.drawingDocument.m_oWordControl.OnUpdateOverlay();
                             return;
                         }
                         else
@@ -2445,6 +2449,7 @@ CGraphicObjects.prototype =
                                     cur_array[0].select();
                                     selection_array.push(cur_array[0]);
                                     this.changeCurrentState(new NullState(this));
+                                    this.drawingDocument.m_oWordControl.OnUpdateOverlay();
                                     return;
                                 }
                             }
@@ -2468,6 +2473,7 @@ CGraphicObjects.prototype =
                         this.changeCurrentState(new GroupState(this, last_selected_object));
                         last_selected_object.GraphicObj.spTree[0].select();
                         gr_sel_arr.push(last_selected_object.GraphicObj.spTree[0]);
+                        this.drawingDocument.m_oWordControl.OnUpdateOverlay();
                         return
                     }
                 }
@@ -2499,6 +2505,7 @@ CGraphicObjects.prototype =
                             group_selection_array.length = 0;
                             group_selection_array.push(group_sp_tree[sp_index - 1]);
                             group_sp_tree[sp_index - 1].select();
+                            this.drawingDocument.m_oWordControl.OnUpdateOverlay();
                             return;
                         }
                         else
@@ -2556,6 +2563,7 @@ CGraphicObjects.prototype =
                                 start_array[j-1].select();
                                 selection_array.push(start_array[j-1]);
                                 this.changeCurrentState(new NullState(this));
+                                this.drawingDocument.m_oWordControl.OnUpdateOverlay();
                                 return;
                             }
                             else
@@ -2574,6 +2582,7 @@ CGraphicObjects.prototype =
                                         cur_array[cur_array.length - 1].select();
                                         selection_array.push(cur_array[cur_array.length - 1]);
                                         this.changeCurrentState(new NullState(this));
+                                        this.drawingDocument.m_oWordControl.OnUpdateOverlay();
                                         return;
                                     }
                                 }
@@ -2634,6 +2643,7 @@ CGraphicObjects.prototype =
                             start_array[j-1].select();
                             selection_array.push(start_array[j-1]);
                             this.changeCurrentState(new NullState(this));
+                            this.drawingDocument.m_oWordControl.OnUpdateOverlay();
                             return;
                         }
                         else
@@ -2652,6 +2662,7 @@ CGraphicObjects.prototype =
                                     cur_array[cur_array.length - 1].select();
                                     selection_array.push(cur_array[cur_array.length - 1]);
                                     this.changeCurrentState(new NullState(this));
+                                    this.drawingDocument.m_oWordControl.OnUpdateOverlay();
                                     return;
                                 }
                             }
@@ -2675,6 +2686,7 @@ CGraphicObjects.prototype =
                         this.changeCurrentState(new GroupState(this, last_selected_object));
                         last_selected_object.GraphicObj.spTree[last_selected_object.GraphicObj.spTree.length-1].select();
                         gr_sel_arr.push(last_selected_object.GraphicObj.spTree[last_selected_object.GraphicObj.spTree.length-1]);
+                        this.drawingDocument.m_oWordControl.OnUpdateOverlay();
                         return
                     }
                 }
