@@ -1145,47 +1145,57 @@ CDocument.prototype =
             //    новый параграф будет без списка).
             if ( type_Paragraph == Item.GetType() )
             {
-                // Создаем новый параграф
-                var NewParagraph = new Paragraph( this.DrawingDocument, this, 0, 0, 0, X_Left_Field, Y_Bottom_Field );
-
-                // Проверим позицию в текущем параграфе
-                if ( true === Item.Cursor_IsEnd() )
+                // Если текущий параграф пустой и с нумерацией, тогда удаляем нумерацию и отступы левый и первой строки
+                if ( undefined != Item.Numbering_Get() && true === Item.IsEmpty() )
                 {
-                    var StyleId = Item.Style_Get();
-                    var NextId  = undefined;
-
-                    if ( undefined != StyleId )
-                    {
-                        NextId = this.Styles.Get_Next( StyleId );
-
-                        if ( null === NextId )
-                            NextId = StyleId;
-                    }
-
-
-                    if ( StyleId === NextId )
-                    {
-                        // Продолжаем (в плане настроек) новый параграф
-                        Item.Continue( NewParagraph );
-                    }
-                    else
-                    {
-                        // Простое добавление стиля, без дополнительных действий
-                        if ( NextId === this.Styles.Get_Default_Paragraph() )
-                            NewParagraph.Style_Remove();
-                        else
-                            NewParagraph.Style_Add_Open( NextId );
-                    }
+                    Item.Numbering_Remove();
+                    Item.Set_Ind( { FirstLine : undefined, Left : undefined, Right : Item.Pr.Ind.Right }, true );
                 }
                 else
-                    Item.Split( NewParagraph );
+                {
+                    // Создаем новый параграф
+                    var NewParagraph = new Paragraph( this.DrawingDocument, this, 0, 0, 0, X_Left_Field, Y_Bottom_Field );
 
-                this.Internal_Content_Add( this.CurPos.ContentPos + 1, NewParagraph );
+                    // Проверим позицию в текущем параграфе
+                    if ( true === Item.Cursor_IsEnd() )
+                    {
+                        var StyleId = Item.Style_Get();
+                        var NextId  = undefined;
 
-                this.CurPos.ContentPos++;
+                        if ( undefined != StyleId )
+                        {
+                            NextId = this.Styles.Get_Next( StyleId );
 
-                // Отмечаем, что последний измененный элемент - предыдущий параграф
-                this.ContentLastChangePos = this.CurPos.ContentPos - 1;
+                            if ( null === NextId )
+                                NextId = StyleId;
+                        }
+
+
+                        if ( StyleId === NextId )
+                        {
+                            // Продолжаем (в плане настроек) новый параграф
+                            Item.Continue( NewParagraph );
+                        }
+                        else
+                        {
+                            // Простое добавление стиля, без дополнительных действий
+                            if ( NextId === this.Styles.Get_Default_Paragraph() )
+                                NewParagraph.Style_Remove();
+                            else
+                                NewParagraph.Style_Add_Open( NextId );
+                        }
+                    }
+                    else
+                        Item.Split( NewParagraph );
+
+                    this.Internal_Content_Add( this.CurPos.ContentPos + 1, NewParagraph );
+
+                    this.CurPos.ContentPos++;
+
+                    // Отмечаем, что последний измененный элемент - предыдущий параграф
+                    this.ContentLastChangePos = this.CurPos.ContentPos - 1;
+
+                }
 
                 if ( false != bRecalculate )
                 {
