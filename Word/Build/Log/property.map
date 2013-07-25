@@ -718,7 +718,7 @@ Drawings:CC
 Remove_User:j0a
 m_bSelection:T6a
 ctPenXML:S3a
-KeepLines:Lg
+KeepLines:Mg
 Get_UserId:j_a
 numToFormatText:Yp
 white:l$a
@@ -862,7 +862,7 @@ ps_get_font_info:B8a
 TempImage:qB
 linearHoriAdvance:QD
 InitEditor:g5
-EastAsia:Cg
+EastAsia:Dg
 steelblue:F9a
 User:vB
 Select_DrawingObject:b_
@@ -1141,7 +1141,7 @@ asc_sdk_transitionProperty:$Ma
 isAbsB:sS
 ReadLongLE:V_a
 sync_StartAction:vu
-Y1:Fg
+Y1:Gg
 _xAxisTitle:Ak
 Y2:Zt
 onTouchMove_renderer:LTa
@@ -1343,7 +1343,7 @@ max_contours:uI
 RemoveRect:i0a
 HyperlinksChanged:Jma
 storage:NL
-Lang:Mg
+Lang:zg
 OpenNewDocument:JCa
 xHeight:EYa
 m_aComments:Ds
@@ -1659,7 +1659,7 @@ Internal_Load_Data2:cca
 UserId:qn
 ty:md
 SetCursorType:Hc
-tx:Bd
+tx:Cd
 _vdir:Oqa
 ClickCount:Ae
 GetDotsPerMM:TP
@@ -1784,7 +1784,7 @@ TableChunkHintEA:Joa
 ImageLeft:e5
 m_dIDet:M9
 getRgb:d5a
-bShow:Gg
+bShow:Hg
 originalCanvasY:QTa
 mergedStyles:kia
 min_Bottom_Side_Bearing:YSa
@@ -1843,7 +1843,7 @@ _filled_range:LQ
 numberToCardDirection:gG
 base_len:LH
 fonts_streams:L4a
-ArrayPoints:Jg
+ArrayPoints:Kg
 thistle:Q9a
 setAbsoluteTransform:qf
 map_bounds_shape:LSa
@@ -2015,7 +2015,7 @@ embeddedFilesPath:Ysa
 get_TextSpacing:tRa
 Bar:CG
 array_clone:Tp
-RFonts:Cd
+RFonts:Bd
 CheckFontNeeds:yla
 asc_setMarkerSize:lra
 selectAll:Sja
@@ -2267,7 +2267,7 @@ Read2Spreadsheet:UU
 resizedExtX:ag
 oldPos:eT
 resizedExtY:bg
-Found:Dg
+Found:Eg
 unicode_map:Y9a
 mediumseagreen:k7a
 Resize:mB
@@ -3032,7 +3032,7 @@ GuiCanvasTextPropsId:mBa
 put_TextPrSpacing:TVa
 WriteRecord3:et
 WriteRecord2:If
-WriteRecord1:Eg
+WriteRecord1:Fg
 SearchPage:yFa
 ratio:GO
 put_lineendstyle:Gja
@@ -4260,7 +4260,7 @@ __originalx__:UIa
 curRect:pA
 showMasterPhAnim:gY
 GetUShort:Ld
-hitToPath:Hg
+hitToPath:Ig
 calculateAfterOpenInGroup:P7
 SetUpMatrix:woa
 Bullet:Ps
@@ -4508,7 +4508,7 @@ gold:C5a
 _events_mousemove:jF
 Items:mi
 WriteFontRef:Sda
-transformText:Ig
+transformText:Jg
 pp4:Fn
 unicodes_char_index:vya
 pp1:mm
@@ -4778,7 +4778,7 @@ touchesDist:jYa
 private_size:x3
 tuplecount:qY
 _onGetLock:Fqa
-mainGroup:Ag
+mainGroup:Bg
 TrackKerns:aD
 ctPenSize:KOa
 InitSize:Oma
@@ -4794,7 +4794,7 @@ Set_Props:bV
 numCol:tO
 put_isChartPross:kWa
 rightField:jE
-xMin:Bg
+xMin:Cg
 ycount:Iaa
 Redo:tm
 _onConnectionStateChanged:eKa
@@ -4947,7 +4947,7 @@ Get_Value:rU
 asc_coAuthoringChatSendMessage:ZKa
 DStrikeout:xg
 getPageIndex:kv
-ConvertCoordsToCursorWR:Kg
+ConvertCoordsToCursorWR:Lg
 ycells:Haa
 DeleteCommentOnRemove:$L
 WriteLineJoin:AHa
@@ -5335,7 +5335,7 @@ Set_Name:r0a
 cid_font_version:vsa
 AddImageUrl2:Zka
 getBase64Img:FK
-Underline:zg
+Underline:Ag
 Set_FromObject:he
 put_value:oWa
 y_offset:SYa
