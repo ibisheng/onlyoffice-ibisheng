@@ -1367,7 +1367,7 @@
 				
 				if ( asc["editor"].isStartAddShape ) {
 					event.ClickCount = 2;
-					t.handlers.trigger("shapeMouseDown", event, coord.x, coord.y);
+					t.handlers.trigger("graphicObjectMouseDown", event, coord.x, coord.y);
 					return;
 				}
 			
