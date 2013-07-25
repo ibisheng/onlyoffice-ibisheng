@@ -22,9 +22,13 @@
 		<script src="../Common/downloaderfiles.js"></script>
 		<script src="../Common/docscoapisettings.js"></script>
 		<script src="../Common/docscoapicommon.js"></script>
+        <script type="text/javascript" src="../Common/spellCheckLanguage.js"></script>
+        <script type="text/javascript" src="../Common/spellCheckLanguagesAll.js"></script>
 		<script type="text/javascript" src="../Common/3rdparty/Underscore/underscore-min.js"></script>
         <script type="text/javascript" src="../Common/3rdparty/Sockjs/sockjs-0.3.min.js"></script>
 		<script type="text/javascript" src="../Common/docscoapi.js"></script>
+		<script type="text/javascript" src="../Common/spellcheckapisettings.js"></script>
+        <script type="text/javascript" src="../Common/spellcheckapi.js"></script>
         <script type="text/javascript" src="../Common/wordcopypaste.js"></script>
 		<script type="text/javascript" src="../Common/CommonDefines.js"></script>
 		<script type="text/javascript" src="../Common/NumFormat.js"></script>
@@ -88,7 +92,7 @@
         <!--<script type="text/javascript" src="Math/docfiles/main_menu.js"></script>-->
         <script type="text/javascript" src="Math/docfiles/Document.js"></script>
         <script type="text/javascript" src="Math/drawingBracket.js"></script>
-        <script type="text/javascript" src="Math/docfiles/DrawingDocument.js"></script>
+        <!--<script type="text/javascript" src="Math/docfiles/DrawingDocument.js"></script>-->
         <!---->
 
         <script type="text/javascript" src="Drawing/translations.js"></script>
@@ -132,6 +136,7 @@
 		<script type="text/javascript" src="Editor/Serialize2.js"></script>
         <script type="text/javascript" src="Editor/Search.js"></script>
         <script type="text/javascript" src="Editor/FontClassification.js"></script>
+        <script type="text/javascript" src="Editor/Spelling.js"></script>
 
         <script type="text/javascript" src="Drawing/Graphics.js"></script>
         <script type="text/javascript" src="Drawing/ArcTo.js"></script>
@@ -163,14 +168,13 @@
         <!---->
 
         <script type = "text/javascript" src ="Math/print.js"></script>
+        <script type="text/javascript" src = "Math/mathText.js"></script>
         <script type="text/javascript" src = "Math/mathContent.js"></script>
         <script type="text/javascript" src = "Math/actions.js"></script>
         <script type="text/javascript" src = "Math/base.js"></script>
         <script type="text/javascript" src = "Math/subBase.js"></script>
 
-
         <script type="text/javascript" src = "Math/fraction.js"></script>
-        <script type="text/javascript" src = "Math/mathText.js"></script>
 
         <script type="text/javascript" src ="Math/degree.js"></script>
         <script type="text/javascript" src = "Math/matrix.js"></script>
@@ -186,6 +190,12 @@
         <script type="text/javascript" src = "Math/borderBox.js"></script>
 
         <!---->
+		
+		<!--for presentation-->
+		<script type="text/javascript" src="../Common/PresentationSerializeAdapter.js"></script>
+		
+		<!--for charts-->
+		<script type="text/javascript" src="../Excel/graphics/DrawingContextWord.js"></script>
 		
     </head>
     <body id="id_body" class="block_elem" style="-moz-user-select:none;-khtml-user-select:none;user-select:none;width:100%;height:100%;background-color:#B0B0B0;overflow:hidden;position:fixed;" UNSELECTABLE="on">
@@ -2017,12 +2027,12 @@
 		</div>
 			<input id="imgApply" type="button"  value="imgApply"/>
 	</div>
-    <div id="prPropDrag"    style="display:none;width:300px;background-color:#fff;top:415px;left:25px;z-index:100;position:absolute;padding-top: 5px;border: 4px ridge silver;cursor:move;">
+    <div id="prPropDrag"    style="display:none;width:300px;background-color:#fff;top:106px;left:66px;z-index:100;position:absolute;padding-top: 5px;border: 4px ridge silver;cursor:move;">
         <div id="prPropDragCaption" style="float:left;width:300px;text-align: center;cursor:move;">
             <b>Paragraph</b>
         </div>
     </div>
-    <div id="prProp"        style="display:none;width:300px;background-color:#fff;top:445px;left:25px;z-index:100;position:absolute;padding-top: 5px;border: 4px ridge silver;">
+    <div id="prProp"        style="display:none;width:300px;background-color:#fff;top:136px;left:66px;z-index:100;position:absolute;padding-top: 5px;border: 4px ridge silver;">
         <div style="float:left;width:300px">
             <div style="float:left;width:300px;height:25px;text-align: center;">Indent</div>
             <div style="float:left;width:140px;padding-left: 10px">
@@ -2077,6 +2087,12 @@
             <div style="float:left;width:300px;padding-left: 10px">
                 <input id="prKeepLines" type="checkbox"/> Keep Lines
             </div>
+            <div style="float:left;width:300px;padding-left: 10px">
+                <input id="prKeepNext" type="checkbox"/> Keep Next
+            </div>
+            <div style="float:left;width:300px;padding-left: 10px">
+                <input id="prWidowControl" type="checkbox"/> Widow Control
+            </div>
         </div>
         <div style="float:left;border-top: 2px ridge silver;width:300px">
             <div style="float:left;width:300px;height:25px;text-align: center;">Borders</div>
@@ -2118,6 +2134,10 @@
                         </tbody>
                     </table>
                 </div>
+                <div id="prBrdSpace" style="float:left;width:150px;">
+                    <input id="prBrdSpaceVals" style="width: 100px" /> Space
+                </div>
+
                 <div style="float:left;width:150px;">
                     <input id="prBrdType" type="checkbox" checked="true"/> Single
                 </div>
@@ -2180,6 +2200,33 @@
             </div>
             <div style="float:left;width:300px;padding-left: 10px">
                 <input id="prTextPosition" style="width:30px;" value="0"/> Position
+            </div>
+        </div>
+
+        <div style="float:left;border-top: 2px ridge silver;width:300px">
+            <div style="float:left;width:300px;height:25px;padding-left: 10px">Default language</div>
+            <div style="float:left;width:300px">
+                <select id="prDefaultLang" style="float:left">
+                    <option value="0">Английский (США)</option>
+                    <option value="1">Русский</option>
+                    <option value="2">Немецкий</option>
+                </select>
+            </div>
+        </div>
+        <div style="float:left;border-top: 2px ridge silver;width:300px">
+            <div style="float:left;width:300px;height:25px;padding-left: 10px">Spelling</div>
+            <select id="prLang" style="float:left">
+                <option value="0">Английский (США)</option>
+                <option value="1">Русский</option>
+                <option value="2">Немецкий</option>
+            </select>
+
+            <select id="prSpellingVariants" style="float:left">
+            </select>
+
+            <div id="prIgnoreMisspelling_div" style="float:left;width:300px">
+                <input id="prIgnoreMisspelling" type="button" value="Ignore"/>
+                <input id="prIgnoreAllMisspelling" type="button" value="Ignore All"/>
             </div>
         </div>
 	</div>
@@ -2310,6 +2357,9 @@
                     <input id="tblDefMarBottom" style="width:50px;"/> Bottom
                 </div>
 
+            </div>
+            <div style="float:left;width:400px;">
+                <input id="tblLayout" type="checkbox" /> AutoFit
             </div>
         </div>
         <div style="float:left;border-top: 2px ridge silver;padding-left:5px;width:400px">

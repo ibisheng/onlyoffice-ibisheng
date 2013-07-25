@@ -15,16 +15,16 @@ function CBorderBox()
 //    this.bDown = false;
 //    this.bTop = false;
 
-//    this.bLDiag = true;
-//    this.bRDiag = true;
+    /*this.bLDiag = true;
+    this.bRDiag = true;*/
 
-    CMathBase.call(this, 1, 1);
+    CMathBase.call(this);
 }
 extend(CBorderBox, CMathBase);
-CBorderBox.prototype.init = function(params)
+CBorderBox.prototype.init = function()
 {
-    this.gapBrd = params.font.FontSize *0.08104587131076388;
-    this.params = Common_CopyObj(params);
+    this.setDimension(1, 1);
+    this.setContent();
 }
 CBorderBox.prototype.recalculateSize = function()
 {
@@ -33,6 +33,8 @@ CBorderBox.prototype.recalculateSize = function()
     var width = ss.width;
     var height = ss.height;
     var center = ss.center;
+
+    this.gapBrd = this.getTxtPrp().FontSize *0.08104587131076388;
 
     if(this.bTop)
     {
@@ -54,7 +56,7 @@ CBorderBox.prototype.draw = function()
 {
     this.elements[0][0].draw();
 
-    var penW = this.params.font.FontSize* 25.4/96 * 0.08 ;
+    var penW = this.getTxtPrp().FontSize* 25.4/96 * 0.08 ;
 
     if(this.bTop)
     {

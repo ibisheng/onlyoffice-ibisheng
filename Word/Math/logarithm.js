@@ -46,13 +46,24 @@ CLogarithm.prototype.getArgument = function()
     return this.elements[0][1];
 }
 
-function CMinimaxFunc(num)
+function CMinimaxFunc()
 {
-    this.num = num;
-    CMathBase.call(this, 2, 1);
+    CMathBase.call(this);
 }
 extend(CMinimaxFunc, CMathBase);
-CMinimaxFunc.prototype.setContent = function()
+CMinimaxFunc.prototype.init = function()
+{
+    this.setDimension(2, 1);
+
+    var oBase = new CMathContent();
+    oBase.mergeTxtPrp({Italic: false});
+
+    var oIter = new CMathContent();
+    oIter.setReduct(DEGR_REDUCT);
+
+    this.addMCToContent(oBase, oIter);
+}
+CMinimaxFunc.prototype.old_setContent = function()
 {
     var oBase = new CMathContent();
     var GParams = Common_CopyObj(this.params);
@@ -97,23 +108,32 @@ CMinimaxFunc.prototype.old_setDistance = function()
     this.dW = 0;
     //this.dH = this.params.font.FontSize/16*g_dKoef_pt_to_mm;
 }
-
-function CMinimax(num)
+CMinimaxFunc.prototype.setDistance = function()
 {
-    CSubMathBase.call(this, 1, 2);
-    if(this.num !== this.num - 0 && this.num < 0 && this.num > 2)
-        this.num = 0;
-    else
-        this.num = num;
+    this.dH = 0.03674768518518519*this.getTxtPrp().FontSize;
+}
+
+function CMinimax()
+{
+    CSubMathBase.call(this);
 }
 extend(CMinimax, CSubMathBase);
-CMinimax.prototype.setContent = function()
+CMinimax.prototype.init = function()
+{
+    this.setDimension(1, 2);
+    var oFunc = new CMinimaxFunc();
+    oFunc.init();
+
+    var oArg = new CMathContent();
+
+    this.addMCToContent(oFunc, oArg);
+}
+CMinimax.prototype.old_setContent = function()
 {
     var oFunc = new CMinimaxFunc(this.num);
     oFunc.init(this.params);
     oFunc.relate(this);
     oFunc.setContent();
-
 
     var oArg = new CMathContent();
     oArg.init(this.params);
@@ -121,9 +141,8 @@ CMinimax.prototype.setContent = function()
     oArg.fillPlaceholders();
 
     CMinimax.superclass.setContent.call(this, oFunc, oArg);
-
 }
-CMinimax.prototype.setDistance = function()
+CMinimax.prototype.old_setDistance = function()
 {
     //todo
     //переделать !
@@ -144,7 +163,7 @@ CMinimax.prototype.getArgument = function()
 }
 CMinimax.prototype.setDistance = function()
 {
-    this.dW = this.params.font.FontSize/6*g_dKoef_pt_to_mm;
+    this.dW = this.getTxtPrp().FontSize/6*g_dKoef_pt_to_mm;
     this.dH = 0;
 }
 
@@ -159,20 +178,6 @@ CMathFunc.prototype.init = function()
     this.setContent();
     this.elements[0][0].mergeTxtPrp({Italic: false}); // trigonometrical function
 }
-CMathFunc.prototype.old_setContent = function()
-{
-    var oFunc = new CMathContent();
-    var GParms = Common_CopyObj(this.params);
-    GParms.bMText = false; //!!
-
-    oFunc.init(GParms);
-
-    var oArg  = new CMathContent();
-    oArg.init(this.params);
-    oArg.fillPlaceholders();
-
-    CMathFunc.superclass.setContent.call(this, oFunc, oArg);
-}
 CMathFunc.prototype.setDistance = function()
 {
     this.dW = this.getTxtPrp().FontSize/6*g_dKoef_pt_to_mm;
@@ -186,43 +191,6 @@ CMathFunc.prototype.getArgument = function()
     return this.elements[0][1];
 }
 
-function old_CMathFunc(num)
-{
-    if(num > 19)
-        return;
-
-    this.num = num;
-    CMathBase.call(this, 1,2);
-
-}
-//extend(old_CMathFunc,CSubMathBase);
-extend(old_CMathFunc, CMathBase);
-old_CMathFunc.prototype.setContent = function()
-{
-    var oFunc = new CMathContent();
-    var GParms = Common_CopyObj(this.params);
-    GParms.bMText = false;
-
-    oFunc.init(GParms);
-    oFunc.addText(NameFunctions[this.num]);
-
-    var oArg  = new CMathContent();
-    oArg.init(this.params);
-    oArg.fillPlaceholders();
-
-    old_CMathFunc.superclass.setContent.call(this, oFunc, oArg);
-}
-old_CMathFunc.prototype.setDistance = function()
-{
-    //todo
-    //переделать!
-    this.dW = slashWidth(this.params.font);
-    this.dH = 0;
-}
-old_CMathFunc.prototype.addText = function(txt)
-{
-    this.elements[0][1].addText(txt);
-}
 
 function old_CDifferential(num)
 {

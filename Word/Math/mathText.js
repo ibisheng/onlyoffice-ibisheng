@@ -124,6 +124,10 @@ CMathText.prototype =
 
         this.value = code;
     },
+    add: function(code)
+    {
+        this.value = code;
+    },
     fillPlaceholders: function()
     {
         this.value = StartTextElement;
@@ -168,10 +172,11 @@ CMathText.prototype =
         var _ascent = metricsTxt.Ascent;
         var _descent = (metricsTxt.Height - metricsTxt.Ascent);
         var _height = _ascent + _descent;
+        var widthG =  metricsTxt.WidthG;
 
         var  _center = _ascent - 0.2798833819241982*g_oTextMeasurer.GetHeight(); // смещаем центр
 
-        this.size = {width: _width, height: _height, center: _center, ascent: _ascent, descent: _descent};
+        this.size = {width: _width, widthG: widthG, height: _height, center: _center, ascent: _ascent, descent: _descent};
     },
     draw: function()
     {
@@ -263,11 +268,30 @@ CMathText.prototype =
     },
     IsJustDraw: function()
     {
-        return bJDraw;
+        return this.bJDraw;
     },
     relate: function(parent) // for symbol only drawing
     {
         this.Parent = parent;
+    },
+    IsIncline: function()
+    {
+        // возвращаем не Italic, т.к. могут быть мат. текст, но буквы без наклона (placeholder и т.п.)
+
+        var bIncline = false;
+
+        bIncline = bIncline || (this.value == 0x210E);
+        bIncline = bIncline || (this.value == 0x1D6A4);
+        bIncline = bIncline || (this.value == 0x1D6A5);
+
+        bIncline = bIncline || (this.value > 0x0040 && this.value < 0x005B);
+        bIncline = bIncline || (this.value > 0x0060 && this.value < 0x007b);
+
+        return bIncline;
+    },
+    setJustDraw: function(bJustDraw)
+    {
+        this.bJDraw = bJustDraw;
     }
 
     /*draw2: function()
@@ -773,6 +797,10 @@ old_CMathText.prototype =
     },
     IsIncline: function()
     {
+
+    },
+    /*IsIncline: function()
+    {
         var flag = false;
 
         if(this.value >= 0x1D434 && this.value <= 0x1D44D ) // capitale
@@ -783,7 +811,7 @@ old_CMathText.prototype =
             flag = true;
 
         return flag;
-    },
+    },*/
     ResizeDirect: function()
     {
         this.recalculateSize();
