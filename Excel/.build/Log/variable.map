@@ -2557,7 +2557,7 @@ STATES_ID_PRE_RESIZE_IN_GROUP:VY
 L 148:Ub
 L 147:td
 L 149:Wh
-FT_Stream:hg
+FT_Stream:fg
 CBounds:B3
 TRaster:Vn
 UndoRedoWorkbook:EK
@@ -2617,7 +2617,7 @@ ShapeForResizeInGroup:y3
 ChangeAdjInGroupState:JZ
 L 111:Ll
 L 110:yp
-L 113:fg
+L 113:hg
 bIsSupportOriginalFormatFonts:iv
 L 112:zk
 L 103:uc
