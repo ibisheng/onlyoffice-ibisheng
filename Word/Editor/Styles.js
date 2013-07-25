@@ -579,11 +579,6 @@ CStyle.prototype =
                 Line     : 1,
                 LineRule : linerule_Auto,
                 After    : 0
-            },
-
-            Ind :
-            {
-                FirstLine : 10 // 1cm
             }
         };
 
