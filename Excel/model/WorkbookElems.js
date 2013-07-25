@@ -1380,6 +1380,11 @@ CCellStyle.prototype = {
 		if (null != this.xfs && null != this.xfs.border)
 			return this.xfs.border;
 		return g_oDefaultBorder;
+	},
+	getNumFormatStr: function () {
+		if(null != this.xfs && null != this.xfs.num)
+			return this.xfs.num.f;
+		return g_oDefaultNum.f;
 	}
 };
 /** @constructor */
@@ -2078,6 +2083,7 @@ Col.prototype =
 			this.setFont(oStyle.getFont());
 			this.setFill(oStyle.getFill());
 			this.setBorder(oStyle.getBorder());
+			this.setNumFormat(oStyle.getNumFormatStr());
 		}
 	},
 	setNumFormat : function(val)
@@ -2352,6 +2358,7 @@ Row.prototype =
 			this.setFont(oStyle.getFont());
 			this.setFill(oStyle.getFill());
 			this.setBorder(oStyle.getBorder());
+			this.setNumFormat(oStyle.getNumFormatStr());
 		}
 	},
 	setNumFormat : function(val)

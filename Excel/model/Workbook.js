@@ -4153,6 +4153,7 @@ Cell.prototype.setCellStyle=function(val){
 		this.setFont(oStyle.getFont());
 		this.setFill(oStyle.getFill());
 		this.setBorder(oStyle.getBorder());
+		this.setNumFormat(oStyle.getNumFormatStr());
 	}
 	this.bNeedCompileXfs = true;
 	this.oValue.cleanCache();
