@@ -947,6 +947,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			 * asc_onСoAuthoringDisconnect	()															- эвент об отключении от сервера без попытки reconnect
 			 * asc_onSelectionRangeChanged	(selectRange)												- эвент о выборе диапазона для диаграммы (после нажатия кнопки выбора)
 			 * asc_onRenameCellTextEnd		(countCells, result)										- эвент об окончании замены текста в ячейках (мы не можем сразу прислать ответ)
+			 * asc_onWorkbookLocked			(result)													- эвент залочена ли работа с листами или нет
+			 * asc_onWorksheetLocked		(index, result)												- эвент залочен ли лист или нет
 			 */
 
 			asc_StartAction: function (type, id) {
@@ -1189,6 +1191,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						if (t.wb) {
 							// Шлем update для toolbar-а, т.к. когда select в lock ячейке нужно заблокировать toolbar
 							t.wb._onWSSelectionChanged(/*info*/null);
+
+							// Шлем update для листов
+							t._onUpdateSheetsLock(lockElem);
+
 							var ws = t.wb.getWorksheet();
 							ws.cleanSelection();
 							ws._drawSelection();
@@ -1232,6 +1238,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						if (t.wb) {
 							// Шлем update для toolbar-а, т.к. когда select в lock ячейке нужно сбросить блокировку toolbar
 							t.wb._onWSSelectionChanged(/*info*/null);
+
+							// Шлем update для листов
+							t._onUpdateSheetsLock(lockElem);
 
 							var worksheet = t.wb.getWorksheet();
 							worksheet.objectRender.resetLockedDrawingObjects();
@@ -1412,6 +1421,20 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			_onShowComments: function () {
 				if (this.wb) {
 					this.wb.getWorksheet().cellCommentator.drawCommentCells(false);
+				}
+			},
+
+			_onUpdateSheetsLock: function (lockElem) {
+				var t = this;
+				// Шлем update для листов, т.к. нужно залочить лист
+				if (c_oAscLockTypeElem.Sheet === lockElem.Element["type"]) {
+					t.handlers.trigger("asc_onWorkbookLocked", t.asc_isWorkbookLocked());
+				}
+				// Шлем update для листа
+				var wsModel = t.wbModel.getWorksheetById(lockElem.Element["sheetId"]);
+				if (wsModel) {
+					var wsIndex = wsModel.getIndex();
+					t.handlers.trigger("asc_onWorksheetLocked", wsIndex, t.asc_isWorksheetLockedOrDeleted(wsIndex));
 				}
 			},
 
