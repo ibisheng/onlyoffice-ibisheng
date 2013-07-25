@@ -4774,31 +4774,37 @@ Paragraph.prototype =
         }
         else if ( false === Pr.ParaPr.Brd.First )
         {
+            var bDraw = true;
             var Size = 0;
             var Y    = 0;
             if ( 1 === CurPage && true === this.Is_StartFromNewPage() && border_Single === Pr.ParaPr.Brd.Top.Value )
             {
                 pGraphics.p_color( Pr.ParaPr.Brd.Top.Color.r, Pr.ParaPr.Brd.Top.Color.g, Pr.ParaPr.Brd.Top.Color.b, 255 );
-                Size = Pr.ParaPr.Brd.Top.Size;
-                Y    = this.Pages[CurPage].Y + this.Lines[this.Pages[CurPage].FirstLine].Top;
+                Size  = Pr.ParaPr.Brd.Top.Size;
+                Y     = this.Pages[CurPage].Y + this.Lines[this.Pages[CurPage].FirstLine].Top;
+                bDraw = true;
             }
             else if ( 0 === CurPage && false === this.Is_StartFromNewPage() && border_Single === Pr.ParaPr.Brd.Between.Value )
             {
                 pGraphics.p_color( Pr.ParaPr.Brd.Between.Color.r, Pr.ParaPr.Brd.Between.Color.g, Pr.ParaPr.Brd.Between.Color.b, 255 );
-                Size = Pr.ParaPr.Brd.Between.Size;
-                Y    = this.Pages[CurPage].Y;
+                Size  = Pr.ParaPr.Brd.Between.Size;
+                Y     = this.Pages[CurPage].Y;
+                bDraw = true;
             }
 
-            // Учтем разрывы из-за обтекания
-            var StartLine = this.Pages[CurPage].StartLine;
-            var RangesCount = this.Lines[StartLine].Ranges.length;
-            for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
+            if ( true === bDraw )
             {
-                var X0 = ( 0 === CurRange ? X_left : this.Lines[StartLine].Ranges[CurRange].X );
-                var X1 = ( RangesCount - 1 === CurRange ? X_right : this.Lines[StartLine].Ranges[CurRange].XEnd );
+                // Учтем разрывы из-за обтекания
+                var StartLine = this.Pages[CurPage].StartLine;
+                var RangesCount = this.Lines[StartLine].Ranges.length;
+                for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
+                {
+                    var X0 = ( 0 === CurRange ? X_left : this.Lines[StartLine].Ranges[CurRange].X );
+                    var X1 = ( RangesCount - 1 === CurRange ? X_right : this.Lines[StartLine].Ranges[CurRange].XEnd );
 
-                if ( this.Lines[StartLine].Ranges[CurRange].W > 0.001 || ( true === bEmpty && 1 === RangesCount ) )
-                    pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Top, Y, X0, X1, Size, LeftMW, RightMW );
+                    if ( this.Lines[StartLine].Ranges[CurRange].W > 0.001 || ( true === bEmpty && 1 === RangesCount ) )
+                        pGraphics.drawHorLineExt( c_oAscLineDrawingRule.Top, Y, X0, X1, Size, LeftMW, RightMW );
+                }
             }
         }
 
