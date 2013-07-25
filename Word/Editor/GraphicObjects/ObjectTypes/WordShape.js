@@ -69,9 +69,9 @@ WordShape.prototype =
 
     Selection_Is_TableBorderMove: function()
     {
-        if(isRealObject(this.textBoxContent) && isRealObject(this.textBoxContent.content))
+        if(isRealObject(this.textBoxContent))
         {
-            return this.textBoxContent.content.Selection_Is_TableBorderMove();
+            return this.textBoxContent.Selection_Is_TableBorderMove();
         }
         return false;
     },
