@@ -160,7 +160,6 @@ CImage.prototype =
 
 	setRasterImage: function(img, canvas)
     {
-
         this.blipFill = new CBlipFill();
         this.blipFill.RasterImageId = img;
         if(isRealObject(canvas))

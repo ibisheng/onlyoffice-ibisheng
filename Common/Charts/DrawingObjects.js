@@ -3211,9 +3211,10 @@ function DrawingObjects() {
 						var url = data["url"];
 						
 						if (sheetId == worksheet.model.getId()) {
-							if ( api.isImageChangeUrl ) {
-								_this.editImageDrawingObject(url);
+							if ( api.isImageChangeUrl || api.isShapeImageChangeUrl ) {
+								_this.editImageDrawingObject(url, api.isImageChangeUrl);
 								api.isImageChangeUrl = false;
+								api.isShapeImageChangeUrl = false;
 							}
 							else
 								_this.addImageDrawingObject(url, false, null);
@@ -3732,35 +3733,49 @@ function DrawingObjects() {
 		}
 	}
 
-	_this.editImageDrawingObject = function(imageUrl) {
+	_this.editImageDrawingObject = function(imageUrl, isImageChangeUrl) {
 		
 		if ( imageUrl && (_this.controller.selectedObjects.length == 1) ) {
 			var drawingObject = _this.controller.selectedObjects[0].drawingBase;
-			if ( drawingObject.graphicObject.isImage() ) {
-				
-				var _image = api.ImageLoader.LoadImage(imageUrl, 1);
-				
-				if (null != _image) {
-					addImageObject(_image);
+			
+			var _image = api.ImageLoader.LoadImage(imageUrl, 1);
+			if (null != _image) {
+				addImageObject(_image, isImageChangeUrl);
+			}
+			else {
+				_this.asyncImageEndLoaded = function(_image) {
+					addImageObject(_image, isImageChangeUrl);
+				}
+			}
+			
+			function addImageObject(_image, isImageChangeUrl) {
+			
+				if ( !_image.Image ) {
+					worksheet.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.UplImageUrl, c_oAscError.Level.NoCritical);
 				}
 				else {
-					_this.asyncImageEndLoaded = function(_image) {
-						addImageObject(_image);
+					if ( isImageChangeUrl ) {
+						if ( drawingObject.graphicObject.isImage() )
+							drawingObject.graphicObject.setRasterImage(_image.src);
+							
+						else if ( drawingObject.graphicObject.isShape() ) {
+							var imageProp = new asc_CImgProperty();
+							imageProp.ImageUrl = src;
+							_this.controller.setGraphicObjectProps(shapeProp);
+						}
 					}
+					else {	// isShapeImageChangeUrl
+						var shapeProp = new asc_CShapeProperty();
+						shapeProp.fill = new asc_CShapeFill();
+						shapeProp.fill.type = c_oAscFill.FILL_TYPE_BLIP;
+						shapeProp.fill.fill = new asc_CFillBlip();
+						shapeProp.fill.fill.asc_putUrl(_image.src);
+						_this.controller.setGraphicObjectProps(shapeProp);
+					}
+					_this.showDrawingObjects(true);
+					_this.selectGraphicObject();
 				}
-				
-				function addImageObject(_image) {
-				
-					if ( !_image.Image ) {
-						worksheet.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.UplImageUrl, c_oAscError.Level.NoCritical);
-					}
-					else {
-						drawingObject.graphicObject.setRasterImage(_image.src);
-						_this.showDrawingObjects(true);
-						_this.selectGraphicObject();
-					}
-					worksheet.model.workbook.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
-				}
+				worksheet.model.workbook.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 			}
 		}
 	}
@@ -4634,6 +4649,9 @@ function DrawingObjects() {
 			worksheet._trigger("selectionChanged", worksheet.getSelectionInfo());
 	}
 	
+	_this.showChartSettings = function() {
+		api.wb.handlers.trigger("asc_onShowChartDialog", true);
+	}
 	//-----------------------------------------------------------------------------------
 	// Graphic object mouse events
 	//-----------------------------------------------------------------------------------
