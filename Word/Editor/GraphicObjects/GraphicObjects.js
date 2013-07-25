@@ -1127,7 +1127,7 @@ CGraphicObjects.prototype =
         {
             case STATES_ID_TEXT_ADD:
             {
-                return sthis.curState.textObject.Selection_Is_TableBorderMove();
+                return this.curState.textObject.Selection_Is_TableBorderMove();
                 break;
             }
             case STATES_ID_TEXT_ADD_IN_GROUP:
