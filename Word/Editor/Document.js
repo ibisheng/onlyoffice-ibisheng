@@ -6549,8 +6549,15 @@ CDocument.prototype =
 
     Selection_Is_TableBorderMove : function()
     {
-        if ( null != this.Selection.Data && true === this.Selection.Data.TableBorder && type_Table == this.Content[this.Selection.Data.Pos].GetType() )
-            return true;
+        if ( docpostype_HdrFtr === this.CurPos.Type )
+            return this.HdrFtr.Selection_Is_TableBorderMove();
+        else if ( docpostype_DrawingObjects === this.CurPos.Type )
+            return this.DrawingObjects.selectionIsTableBorder();
+        else //if ( docpostype_Content === this.CurPos.Type )
+        {
+            if ( null != this.Selection.Data && true === this.Selection.Data.TableBorder && type_Table == this.Content[this.Selection.Data.Pos].GetType() )
+                return true;
+        }
 
         return false;
     },
@@ -6563,7 +6570,7 @@ CDocument.prototype =
             return this.HdrFtr.Selection_Check( X, Y, Page_Abs );
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
             return this.DrawingObjects.selectionCheck( X, Y, Page_Abs );
-        else //if ( docpostype_Content === thsi.CurPos.Type )
+        else //if ( docpostype_Content === this.CurPos.Type )
         {
             if ( true === this.Selection.Use )
             {

@@ -408,6 +408,19 @@ CDocumentContent.prototype =
         return false;
     },
 
+    Selection_Is_TableBorderMove : function()
+    {
+        if ( docpostype_DrawingObjects === this.CurPos.Type )
+            return this.DrawingObjects.selectionIsTableBorder();
+        else //if ( docpostype_Content === this.CurPos.Type )
+        {
+            if ( null != this.Selection.Data && true === this.Selection.Data.TableBorder && type_Table == this.Content[this.Selection.Data.Pos].GetType() )
+                return true;
+        }
+
+        return false;
+    },
+
     Check_TableCoincidence : function(Table)
     {
         return this.Parent.Check_TableCoincidence( Table );

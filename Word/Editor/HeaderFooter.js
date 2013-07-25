@@ -946,6 +946,11 @@ CHeaderFooter.prototype =
         return this.Content.Selection_SetEnd(X, Y, PageIndex, MouseEvent);
     },
 
+    Selection_Is_TableBorderMove : function()
+    {
+        return this.Content.Selection_Is_TableBorderMove();
+    },
+
     Selection_Check : function(X, Y, Page_Abs)
     {
         var HdrFtrPage = this.Content.Get_StartPage_Absolute();
@@ -2590,6 +2595,14 @@ CHeaderFooterController.prototype =
             if ( false === this.ChangeCurPageOnEnd )
                 this.CurHdrFtr.Content.Set_StartPage( this.CurPage );
         }
+    },
+
+    Selection_Is_TableBorderMove : function()
+    {
+        if ( null != this.CurHdrFtr )
+            return this.CurHdrFtr.Selection_Is_TableBorderMove();
+
+        return false;
     },
 
     Selection_Check : function(X, Y, Page_Abs)
