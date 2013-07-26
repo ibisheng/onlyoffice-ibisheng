@@ -2363,12 +2363,19 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap)
 			{
 				var row = cell.Row;
 				var table = row.Table;
-				var BeforeInfo = row.Get_Before();
-				var StartGridCol = BeforeInfo.GridBefore;
-				for(var i = 0; i < nColIndex; ++i)
+				var oCellInfo = row.Get_CellInfo( nColIndex );
+				var StartGridCol = 0;
+				if(null != oCellInfo)
+					StartGridCol = oCellInfo.StartGridCol;
+				else
 				{
-					var cellTemp = row.Get_Cell( i );
-					StartGridCol += cellTemp.Get_GridSpan();
+					var BeforeInfo = row.Get_Before();
+					StartGridCol = BeforeInfo.GridBefore;
+					for(var i = 0; i < nColIndex; ++i)
+					{
+						var cellTemp = row.Get_Cell( i );
+						StartGridCol += cellTemp.Get_GridSpan();
+					}
 				}
 				if(table.Internal_GetVertMergeCount( nRowIndex, StartGridCol, cell.Get_GridSpan() ) > 1)
 					vMerge = vmerge_Restart;
