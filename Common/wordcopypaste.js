@@ -1937,6 +1937,7 @@ function PasteProcessor(api, bUploadImage, bUploadFonts, bNested)
     this.bIgnoreNoBlockText = false;
 
     this.oCurPar = null;
+	this.oCurParContentPos = 0;
     this.oCur_rPr = new CTextPr();
 
     //Br ������� ������ ��� ���� ������ ����� �� ���� �������� br, ���� �� � ������������.
@@ -2126,13 +2127,17 @@ PasteProcessor.prototype =
                 if(nContentLength > 2)
                 {
                     var TextPr = Item.Internal_CalculateTextPr(Item.CurPos.ContentPos);
+					var nContentPos = Item.CurPos.ContentPos;
                     for(var i = 0; i < nContentLength - 2; ++i)// -2 �� ����������� ����� ���������
                     {
                         var oCurInsItem = oInsertPar.Content[i];
                         if(para_Numbering != oCurInsItem.Type)
-                            Item.Internal_Content_Add(Item.CurPos.ContentPos, oCurInsItem);
+						{
+                            Item.Internal_Content_Add(nContentPos, oCurInsItem);
+							nContentPos++;
+						}
                     }
-                    Item.Internal_Content_Add(Item.CurPos.ContentPos, new ParaTextPr(TextPr));
+                    Item.Internal_Content_Add(nContentPos, new ParaTextPr(TextPr));
                 }
 				Item.RecalcInfo.Set_Type_0(pararecalc_0_All);
                 this.oRecalcDocument.ContentLastChangePos = this.oRecalcDocument.CurPos.ContentPos;
@@ -2188,23 +2193,23 @@ PasteProcessor.prototype =
                 for(var i = nStartIndex; i <= nEndIndex; ++i )
                 {
                     var oElemToAdd = aNewContent[i];
-                    oDoc.CurPos.ContentPos++;
-                    oDoc.Internal_Content_Add(oDoc.CurPos.ContentPos, oElemToAdd);
+                    LastPosCurDoc++;
+                    oDoc.Internal_Content_Add(LastPosCurDoc, oElemToAdd);
                 }
                 if(null != oSourceLastPar)
                 {
                     //��������� ��������� ��������
-                    oDoc.CurPos.ContentPos++;
-                    oDoc.Internal_Content_Add(oDoc.CurPos.ContentPos, oSourceLastPar);
+                    LastPosCurDoc++;
+                    oDoc.Internal_Content_Add(LastPosCurDoc, oSourceLastPar);
                 }
                 if(null == oSourceFirstPar)
                 {
                     //������� ������ ��������, ������ ��� ����� ������ ���� � ��������� �� ����� �� ������ ���������
                     oDoc.Internal_Content_Remove(LastPosCurDoc, 1);
-                    oDoc.CurPos.ContentPos--;
+                    LastPosCurDoc--;
                 }
                 this.oRecalcDocument.ContentLastChangePos = LastPos;
-                //oDoc.CurPos.ContentPos = LastPos + (nEndIndex - nStartIndex + 1) + 1;
+                oDoc.CurPos.ContentPos = LastPosCurDoc;
             }
         }
 
@@ -3206,11 +3211,15 @@ PasteProcessor.prototype =
     _Paragraph_Add : function(elem)
     {
         if(null != this.oCurPar)
-            this.oCurPar.Internal_Content_Add( this.oCurPar.CurPos.ContentPos, elem );
+		{
+            this.oCurPar.Internal_Content_Add(this.oCurParContentPos, elem);
+			this.oCurParContentPos++;
+		}
     },
     _Add_NewParagraph : function()
     {
         this.oCurPar = new Paragraph(this.oDocument.DrawingDocument, this.oDocument, 0, 50, 50, X_Right_Field, Y_Bottom_Field );
+		this.oCurParContentPos = this.oCurPar.CurPos.ContentPos;
         this.aContent.push(this.oCurPar);
         //���������� ��������� �����
         this.oCur_rPr = new CTextPr();
