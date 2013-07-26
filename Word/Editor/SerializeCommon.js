@@ -88,7 +88,7 @@ function CPPTXContentLoader()
         return GrObject;
     }
 
-    this.ReadTextBody = function(reader, stream)
+    this.ReadTextBody = function(reader, stream, shape)
     {
         this.BaseReader = reader;
         if (this.Reader == null)
@@ -119,7 +119,7 @@ function CPPTXContentLoader()
         var s = this.stream;
         var _main_type = s.GetUChar(); // 0!!!
 
-        var txBody = this.Reader.ReadTextBody();
+        var txBody = this.Reader.ReadTextBody(shape);
 
         stream.pos = s.pos;
         stream.cur = s.cur;
