@@ -14,7 +14,6 @@ CBarFraction.prototype.init = function()
 
     this.setDimension(2, 1);
     this.addMCToContent(num, den);
-
 }
 CBarFraction.prototype.getCenter =  function()
 {
@@ -29,13 +28,12 @@ CBarFraction.prototype.draw = function()
         x2 = this.pos.x + this.size.width,
         y1 = y2 = this.pos.y + this.size.center - penW/2;
 
-    if( ! this.bHide)
+    if(!this.bHide)
     {
         MathControl.pGraph.p_color(0,0,0, 255);
         MathControl.pGraph.b_color1(0,0,0, 255);
         MathControl.pGraph.drawHorLine(0, y1, x1, x2, penW);
     }
-
 
     CBarFraction.superclass.draw.call(this);
 }
@@ -75,11 +73,15 @@ CNumerator.prototype.recalculateSize = function()
     var arg = this.elements[0][0].size;
     var txtPrp = this.getTxtPrp();
 
+    /*var font = GetMathFont(txtPrp);
+    var plH = font.metrics.Placeholder.Height/2;*/
+
     var Descent = arg.height - arg.ascent; // baseLine
     var gap = 7.832769097222222 * txtPrp.FontSize/36,
         minGap = txtPrp.FontSize* 25.4/96 * 0.16;
 
-    var delta = 0.65*gap - Descent;
+    // var delta = 0.65*gap - Descent;
+    var delta = 0.8076354679802956*gap - Descent;
 
     var GapNum = delta > minGap ? delta - 0.95*minGap: minGap;
 
@@ -180,7 +182,7 @@ CDenominator.prototype.recalculateSize = function()
     var txtPrp = this.getTxtPrp();
 
     var gap = 7.832769097222222 * txtPrp.FontSize/36,
-        Ascent = arg.ascent,
+        Ascent = arg.center -  4.938888888888888*txtPrp.FontSize/36,
         minGap = txtPrp.FontSize* 25.4/96 * 0.24;
 
     var delta = 0.47*gap - Ascent;

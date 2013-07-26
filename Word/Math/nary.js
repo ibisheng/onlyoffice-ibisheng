@@ -98,7 +98,7 @@ CNary.prototype.init = function(index, orderType, iterType)
 }
 CNary.prototype.setDistance = function()
 {
-    this.dW = this.Parent.getTxtPrp().FontSize/36*2.45;
+    this.dW = this.getTxtPrp().FontSize/36*2.45;
 }
 CNary.prototype.getBase = function()
 {

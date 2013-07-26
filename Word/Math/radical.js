@@ -282,7 +282,7 @@ CDegreeRadical.prototype.recalculateSize = function()
 
     var width = degr.width - wTick + sign.width;
 
-    var txtPrp = this.Parent.getTxtPrp();
+    var txtPrp = this.getTxtPrp();
     var plH = 9.877777777777776 * txtPrp.FontSize /36;
 
     if( sign.height < plH )

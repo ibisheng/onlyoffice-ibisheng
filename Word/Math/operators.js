@@ -2179,7 +2179,6 @@ CSingleArrow.prototype.calcCoord = function(measure)
         H = YY[6];
 
     return {XX: XX, YY: YY, W: W, H: H};
-
 }
 CSingleArrow.prototype.drawPath = function(XX, YY)
 {
@@ -2874,7 +2873,7 @@ CSeparator.prototype.draw = function()
     MathControl.pGraph.p_width(1000);
     MathControl.pGraph.b_color1(0,0,0, 255);
 
-    pW = this.Parent.getTxtPrp().FontSize/18*g_dKoef_pt_to_mm;
+    pW = this.getTxtPrp().FontSize/18*g_dKoef_pt_to_mm;
 
     for(var i = 0; i < this.nCol - 1; i++)
     {

@@ -149,7 +149,6 @@ CMathText.prototype =
     {
         this.bIterator = bIterator; // символы другие , чуть толще
     },
-
     // ascent = Symbol.Ascent // = Placeholder.Ascent (= Placeholder.Height)
     // descent = FontAscent - Placeholder.Height (FontAscent = FontHeight - FontDescent)
 
@@ -174,7 +173,13 @@ CMathText.prototype =
         var _height = _ascent + _descent;
         var widthG =  metricsTxt.WidthG;
 
-        var  _center = _ascent - 0.2798833819241982*g_oTextMeasurer.GetHeight(); // смещаем центр
+        var _center = _ascent - 0.2487852283770651*g_oTextMeasurer.GetHeight(); // смещаем центр
+
+        //var  _center = _ascent - 0.2798833819241982*g_oTextMeasurer.GetHeight(); // смещаем центр
+        /*var font = GetMathFont(txtPrp);
+         var placeholder = font.metrics.Placeholder;
+         var  _cent = placeholder.Height*0.375;
+         var HH = g_oTextMeasurer.GetHeight();*/
 
         this.size = {width: _width, widthG: widthG, height: _height, center: _center, ascent: _ascent, descent: _descent};
     },
