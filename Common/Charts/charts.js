@@ -526,90 +526,145 @@ function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY, chart)
 				left += 12;//width '%'
 		}
 	}
-
-	if(bar.type == 'pie')
+	
+	if(chart.margins)
 	{
-		var left = 0;
-		var bottom = 0;
-		var right = 0;
-		var top = 0;
-	}
-	else
-	{
-		if (bar._yAxisTitle._align == 'rev')
+		if(bar.type == 'pie')
 		{
-			var font = getFontProperties("yTitle");
-			var axisTitleProp = getMaxPropertiesText(context,font, bar._yAxisTitle._text);
-			var heigthText = (context.getHeightText()/0.75);
-			//прибавляем высоту текста названия + стандартный маргин 
-			left += heigthText + 12;
+			var left = 0;
+			var bottom = 0;
+			var right = 0;
+			var top = 0;
 		}
-		else if (bar._yAxisTitle._align == 'hor')
-			left += 95;
-		else if (bar._yAxisTitle._align == 'ver')
-			left += 0;
-
-		var right = 0;
-		var top = 0;
-		var bottom = 0;
-		if (bar._xAxisTitle._text != '')
+		else
 		{
-			var font = getFontProperties("xTitle");
-			var axisTitleProp = getMaxPropertiesText(context,font, bar._xAxisTitle._text);
-			var heigthText = (context.getHeightText()/0.75);
-			//прибавляем высоту текста названия + стандартный маргин 
-			bottom += heigthText + 14;
+			//+ширина названия OY
+			left += chart.margins.yAxisTitle.w;
+
+			var right = 0;
+			var top = 0;
+			var bottom = 0;
+			
+			//+выоста названия OX
+			bottom += chart.margins.xAxisTitle.h;
+		}
+		
+		//+высота названия диаграммы
+		top += chart.margins.title.h;
+		
+		//+ высота легенды
+		var positionKey = chart.margins.key.position;
+		if(positionKey == 'top' || positionKey == 'bottom')
+		{
+			var kF = 1;
+			if(bar.type == 'pie')
+				kF = 2;
+			if(positionKey == 'top')
+				top += (chart.margins.key.h)*kF;
+			else
+				bottom += (chart.margins.key.h)*kF;
+		}
+		//+ ширина легенды
+		if (positionKey == 'left' || positionKey == 'right')
+		{
+			//в MSExcel справа от легенды всегда остаётся такой маргин 
+			if(positionKey == 'left')
+				left += chart.margins.key.w;
+			else
+				right += chart.margins.key.w;
 		}
 		if ((min >= 0 || bar.type == 'hbar') &&  bar._otherProps._xlabels)
 		{
-			bottom +=20;
+			bottom +=25;
 		}
-		if(bar._xAxisTitle._text == '' && (min >= 0 || bar.type == 'hbar') &&  bar._otherProps._xlabels)
-			bottom += 7;
+	}
+	else
+	{
+		if(bar.type == 'pie')
+		{
+			var left = 0;
+			var bottom = 0;
+			var right = 0;
+			var top = 0;
+		}
+		else
+		{
+			if (bar._yAxisTitle._align == 'rev')
+			{
+				var font = getFontProperties("yTitle");
+				var axisTitleProp = getMaxPropertiesText(context,font, bar._yAxisTitle._text);
+				var heigthText = (context.getHeightText()/0.75);
+				//прибавляем высоту текста названия + стандартный маргин 
+				left += heigthText + 12;
+			}
+			else if (bar._yAxisTitle._align == 'hor')
+				left += 95;
+			else if (bar._yAxisTitle._align == 'ver')
+				left += 0;
+
+			var right = 0;
+			var top = 0;
+			var bottom = 0;
+			if (bar._xAxisTitle._text != '')
+			{
+				var font = getFontProperties("xTitle");
+				var axisTitleProp = getMaxPropertiesText(context,font, bar._xAxisTitle._text);
+				var heigthText = (context.getHeightText()/0.75);
+				//прибавляем высоту текста названия + стандартный маргин 
+				bottom += heigthText + 14;
+			}
+			if ((min >= 0 || bar.type == 'hbar') &&  bar._otherProps._xlabels)
+			{
+				bottom +=20;
+			}
+			if(bar._xAxisTitle._text == '' && (min >= 0 || bar.type == 'hbar') &&  bar._otherProps._xlabels)
+				bottom += 7;
+		}
+		
+		//+высота названия диаграммы
+		if (bar._chartTitle._text != null && bar._chartTitle._text != '')
+		{
+			var font = getFontProperties("title");
+			var axisTitleProp = getMaxPropertiesText(context,font, bar._chartTitle._text);
+			var heigthText = (context.getHeightText()/0.75);
+			//прибавляем высоту текста названия + стандартный маргин 
+			top += heigthText + 7;
+		}
+		//+ высота легенды
+		if(bar._otherProps._key_halign == 'top' || bar._otherProps._key_halign == 'bottom')
+		{
+			var font = getFontProperties("key");
+			var props = getMaxPropertiesText(context,font,bar._otherProps._key);
+			var heigthTextKey = (context.getHeightText()/0.75);
+			var kF = 1;
+			if(bar.type == 'pie')
+				kF = 2;
+			if(bar._otherProps._key_halign == 'top')
+				top += (heigthTextKey + 7)*kF;
+			else
+				bottom += (heigthTextKey + 7)*kF;
+		}
+		//+ ширина легенды
+		if (bar._otherProps._key_halign == 'left' || bar._otherProps._key_halign == 'right')
+		{
+			var widthLine = 28;
+			//находим ширину текста легенды(то есть её максимального элемента), в дальнейшем будем возвращать ширину автофигуры
+			var font = getFontProperties("key");
+			var widthText = getMaxPropertiesText(context,font,bar._otherProps._key);
+			var widthKey = widthText.width/scale + 2 + widthLine;
+			//в MSExcel справа от легенды всегда остаётся такой маргин 
+			if(bar._otherProps._key_halign == 'left')
+				left += widthKey + 7;
+			else
+				right += widthKey + 7;
+		}
 	}
 	
-	//+высота названия диаграммы
-	if (bar._chartTitle._text != null && bar._chartTitle._text != '')
-	{
-		var font = getFontProperties("title");
-		var axisTitleProp = getMaxPropertiesText(context,font, bar._chartTitle._text);
-		var heigthText = (context.getHeightText()/0.75);
-		//прибавляем высоту текста названия + стандартный маргин 
-		top += heigthText + 7;
-	}
-	//+ высота легенды
-	if(bar._otherProps._key_halign == 'top' || bar._otherProps._key_halign == 'bottom')
-	{
-		var font = getFontProperties("key");
-		var props = getMaxPropertiesText(context,font,bar._otherProps._key);
-		var heigthTextKey = (context.getHeightText()/0.75);
-		var kF = 1;
-		if(bar.type == 'pie')
-			kF = 2;
-		if(bar._otherProps._key_halign == 'top')
-			top += (heigthTextKey + 7)*kF;
-		else
-			bottom += (heigthTextKey + 7)*kF;
-	}
-	//+ ширина легенды
-	if (bar._otherProps._key_halign == 'left' || bar._otherProps._key_halign == 'right')
-	{
-		var widthLine = 28;
-		//находим ширину текста легенды(то есть её максимального элемента), в дальнейшем будем возвращать ширину автофигуры
-		var font = getFontProperties("key");
-		var widthText = getMaxPropertiesText(context,font,bar._otherProps._key);
-		var widthKey = widthText.width/scale + 2 + widthLine;
-		//в MSExcel справа от легенды всегда остаётся такой маргин 
-		if(bar._otherProps._key_halign == 'left')
-			left += widthKey + 7;
-		else
-			right += widthKey + 7;
-	}
 	
 	if(bottom == 0)
 		bottom = standartMargin;
 	var standartMarginTop = standartMargin;
-	if(bar.type == 'pie' && bar._otherProps._key_halign == 'top')
+	if(bar.type == 'pie' && (bar._otherProps._key_halign == 'top' || (positionKey && positionKey == 'top')))
 		standartMarginTop = 0;
 	bar._chartGutter._left = (left)*scale + standartMargin;
 	bar._chartGutter._right = (standartMargin + right)*scale;
@@ -1543,7 +1598,7 @@ function drawChart(chart, arrValues, width, height) {
 	if(chart.skipSeries)
 	{
 		var skipSeries = chart.skipSeries;
-		if(chart.type == 'Scatter' && chart.series && chart.series[0].xVal.Formula == null)
+		if(chart.type == 'Scatter' && chart.series && chart.series[0].xVal.Formula == null && chart.series.length != 1)
 		{
 			bar._otherProps._key.splice(bar._otherProps._key.length - 1, 1);
 			bar._otherProps._colors.splice(bar._otherProps._colors.length - 1, 1);
@@ -2361,7 +2416,7 @@ function getMaxPropertiesText(context, font, text)
 {
 	context.setFont(font);
 	var result = 0;
-	if(typeof text == "object")
+	if(typeof text == "object" && text.length != 0)
 	{	
 		// в данном случае ищем максимальную ширину текста
 		var maxLength = 0;

@@ -2443,11 +2443,11 @@ function DrawingObjects() {
 
 		// Свойства
 		_t.isImage = function() {
-			return !_t.isChart();
+			return _t.graphicObject ? _t.graphicObject.isImage() : false;
 		}
 		
 		_t.isChart = function() {
-			return _t.chart.type ? true : false;
+			return _t.graphicObject ? _t.graphicObject.isChart() : false;
 		}
 		
 		_t.isGraphicObject = function() {
@@ -2933,6 +2933,11 @@ function DrawingObjects() {
 		
 		copyObject.chart = new asc_CChart(obj.chart);
 		copyObject.graphicObject = obj.graphicObject;
+
+        if(isRealObject(copyObject.graphicObject) && typeof copyObject.graphicObject.setDrawingObjects === "function")
+        {
+            copyObject.graphicObject.setDrawingObjects(_this);
+        }
 		copyObject.chart.worksheet = obj.chart.worksheet;
 
 		return copyObject;
@@ -2982,11 +2987,26 @@ function DrawingObjects() {
 				aObjects.push( clone );
 			}
 				
-			if ( currentSheet.model.Drawings[i].isImage() ) {
+			if ( currentSheet.model.Drawings[i].imageUrl) {
 				
 				aObjectsSync[aObjectsSync.length] = clone;
 				aImagesSync[aImagesSync.length] = clone.imageUrl;
 			}
+
+
+            if (clone.graphicObject instanceof  CChartAsGroup) {
+
+
+                _this.calcChartInterval(clone.chart);
+                clone.worksheet = worksheet;
+                clone.graphicObject.drawingBase = clone;
+                clone.graphicObject.drawingObjects = _this;
+                if(clone.graphicObject.chartTitle)
+                    clone.graphicObject.chartTitle.drawingObjects = _this;
+                clone.graphicObject.chart.worksheet = worksheet;
+                clone.graphicObject.init(aImagesSync);
+                aObjects.push( clone );
+            }
 		}
 		
 		// Загружаем все картинки листа
@@ -3030,6 +3050,11 @@ function DrawingObjects() {
 			}
 		}
 	}
+
+    _this.getChartRender = function()
+    {
+        return chartRender;
+    };
 
     _this.getOverlay = function() {
         return trackOverlay;
@@ -3796,7 +3821,10 @@ function DrawingObjects() {
 
 		if (isViewerMode())
 			return;
-		
+
+
+
+
 		var wordChart = null;
 		var bWordChart = chart["bChartEditor"];
 		if ( bWordChart ) {
@@ -3863,7 +3891,8 @@ function DrawingObjects() {
 		var chartBase64 = chartRender.insertChart(chart, null, bWordChart ? wordChart.width : c_oAscChartDefines.defaultChartWidth, bWordChart ? wordChart.height : c_oAscChartDefines.defaultChartHeight, isNewChart);
 		if ( !chartBase64 )
 			return false;
-			
+
+        return this.controller.addChartDrawingObject(chart, bWithoutHistory, options);
 		imageLoader.addImage(chartBase64);
 
 		// draw
@@ -3927,6 +3956,8 @@ function DrawingObjects() {
 	}
 
 	_this.editChartDrawingObject = function(chart) {
+
+        return this.controller.editChartDrawingObjects(chart);
 
 		var index = _this.getSelectedDrawingObjectIndex();
 		
@@ -4756,6 +4787,9 @@ function DrawingObjects() {
 	}
 
 	_this.getAscChartObject = function() {		// Return new or existing chart. For image return null
+
+        return this.controller.getAscChartObject();
+
 		var index = _this.getSelectedDrawingObjectIndex();
 		if (index >= 0) {
 			if (aObjects[index].isChart())

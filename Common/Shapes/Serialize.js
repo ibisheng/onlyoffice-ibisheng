@@ -5729,6 +5729,7 @@ function BinaryPPTYLoader()
                     {
                         History.TurnOff();
                     }
+                    if(!txbody.content)
                     txbody.content = new CDocumentContent(shape, this.presentation.DrawingDocument, 0, 0, 0, 0, 0, 0);
                     if(_c>0)
                     {
@@ -5826,7 +5827,7 @@ function BinaryPPTYLoader()
 
     this.ReadParagraph = function(DocumentContent)
     {
-        var par = new Paragraph(this.presentation.DrawingDocument, DocumentContent, 0, 0, 0, 0, 0);
+        var par = new Paragraph(DocumentContent.DrawingDocument, DocumentContent, 0, 0, 0, 0, 0);
 
         var EndPos = par.Internal_GetEndPos();
 
