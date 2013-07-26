@@ -1219,16 +1219,6 @@ Binary_tblPrWriter.prototype =
 	WriteTbl: function(table)
     {
 		var oThis = this;
-		//Rows
-        if(null != table.Rows)
-        {
-            this.bs.WriteItem(c_oSerProp_tblPrType.Rows, function(){oThis.memory.WriteLong(table.Rows);});
-        }
-        //Cols
-        if(null != table.Cols)
-        {
-            this.bs.WriteItem(c_oSerProp_tblPrType.Cols, function(){oThis.memory.WriteLong(table.Cols);});
-        }
 		this.WriteTblPr(table.Pr, table);
 		//Look
 		var oLook = table.Get_TableLook();
@@ -2338,9 +2328,9 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap)
     {
         var oThis = this;
         for(var i = 0, length = Content.length; i < length; ++i)
-            this.bs.WriteItem(c_oSerDocTableType.Row, function(){oThis.WriteRow(Content[i]);});
+            this.bs.WriteItem(c_oSerDocTableType.Row, function(){oThis.WriteRow(Content[i], i);});
     };
-    this.WriteRow = function(Row)
+    this.WriteRow = function(Row, nRowIndex)
     {
         var oThis = this;
         //Pr
@@ -2351,18 +2341,18 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap)
         //Content
         if(null != Row.Content)
         {
-            this.bs.WriteItem(c_oSerDocTableType.Row_Content, function(){oThis.WriteRowContent(Row.Content);});
+            this.bs.WriteItem(c_oSerDocTableType.Row_Content, function(){oThis.WriteRowContent(Row.Content, nRowIndex);});
         }
     };
-    this.WriteRowContent = function(Content)
+    this.WriteRowContent = function(Content, nRowIndex)
     {
         var oThis = this;
         for(var i = 0, length = Content.length; i < length; i++)
         {
-            this.bs.WriteItem(c_oSerDocTableType.Cell, function(){oThis.WriteCell(Content[i]);});
+            this.bs.WriteItem(c_oSerDocTableType.Cell, function(){oThis.WriteCell(Content[i], nRowIndex, i);});
         }
     };
-    this.WriteCell = function(cell)
+    this.WriteCell = function(cell, nRowIndex, nColIndex)
     {
         var oThis = this;
         //Pr
@@ -2373,7 +2363,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap)
 			{
 				var row = cell.Row;
 				var table = row.Table;
-				if(table.Internal_GetVertMergeCount( row.Index, row.Get_CellInfo( cell.Index ).StartGridCol, cell.Get_GridSpan() ) > 1)
+				if(table.Internal_GetVertMergeCount( nRowIndex, row.Get_CellInfo( nColIndex ).StartGridCol, cell.Get_GridSpan() ) > 1)
 					vMerge = vmerge_Restart;
 			}
 			this.bs.WriteItem(c_oSerDocTableType.Cell_Pr, function(){oThis.btblPrs.WriteCellPr(cell.Pr, vMerge);});
@@ -3913,15 +3903,7 @@ Binary_tblPrReader.prototype =
 		}
 		else if(null != table)
 		{
-			if( c_oSerProp_tblPrType.Rows === type )
-			{
-				table.Rows = this.stream.GetULongLE();
-			}
-			else if( c_oSerProp_tblPrType.Cols === type )
-			{
-				table.Cols = this.stream.GetULongLE();
-			}
-			else if( c_oSerProp_tblPrType.tblpPr === type )
+			if( c_oSerProp_tblPrType.tblpPr === type )
 			{
 				table.Inline = false;
 				var oAdditionalPr = {PageNum: null, X: null, Y: null, Paddings: null};
@@ -5666,14 +5648,11 @@ function Binary_DocumentTableReader(doc, openParams, ImageMap, stream, bAllowFlo
         }
         else if( c_oSerDocTableType.Content === type )
         {
-            if(table.Cols > 0 && table.Rows > 0)
-            {
-                table.Content = new Array();
-                res = this.bcr.Read1(length, function(t, l){
-                    return oThis.Read_TableContent(t, l, table);
-                });
-                table.CurCell = table.Content[0].Get_Cell( 0 );
-            }
+            table.Content = new Array();
+            res = this.bcr.Read1(length, function(t, l){
+                return oThis.Read_TableContent(t, l, table);
+            });
+            table.CurCell = table.Content[0].Get_Cell( 0 );
         }
         else
             res = c_oSerConstants.ReadUnknown;
