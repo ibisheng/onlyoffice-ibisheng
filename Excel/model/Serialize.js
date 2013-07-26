@@ -4098,7 +4098,7 @@ function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
 			if (null !== oCellStyleXfs.ApplyNumberFormat)
 				oCellStyle.ApplyNumberFormat = oCellStyleXfs.ApplyNumberFormat;
 
-			this.wb.CellStyles.CustomStyles[oCellStyle.XfId] = oCellStyle;
+			this.wb.CellStyles.CustomStyles.push(oCellStyle);
 		}
 		for(var i in oStyleObject.oCustomTableStyles)
 		{
