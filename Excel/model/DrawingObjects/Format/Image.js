@@ -53,6 +53,7 @@ function CImage(drawingBase, drawingObjects)
     this.rot = null;
     this.flipH = null;
     this.flipV = null;
+	this.mainGroup = null;
     this.transform = new CMatrix();
     this.invertTransform = null;
     this.cursorTypes = [];
@@ -180,6 +181,109 @@ CImage.prototype =
         this.blipFill.RasterImageId = imageId;
     },
 
+	setAbsoluteTransform: function(offsetX, offsetY, extX, extY, rot, flipH, flipV, bAfterOpen)
+    {
+
+        if(offsetX != null)
+        {
+            this.absOffsetX = offsetX;
+        }
+
+        if(offsetY != null)
+        {
+            this.absOffsetY = offsetY;
+        }
+
+
+        if(extX != null)
+        {
+            this.absExtX = extX;
+        }
+
+        if(extY != null)
+        {
+            this.absExtY = extY;
+        }
+
+        if(rot != null)
+        {
+            this.absRot = rot;
+        }
+
+        if(flipH != null)
+        {
+            this.absFlipH = flipH;
+        }
+
+        if(flipV != null)
+        {
+            this.absFlipV = flipV;
+        }
+        if(this.parent)
+            this.parent.setAbsoluteTransform(offsetX, offsetY, extX, extY, rot, flipH, flipV, true);
+
+        var b_change_size = extX != null || extY != null;
+        this.recalculate(b_change_size, bAfterOpen);
+    },
+	
+	setXfrm: function(offsetX, offsetY, extX, extY, rot, flipH, flipV)
+    {
+        //var data = {Type: historyitem_SetXfrmShape};
+
+        var _xfrm = this.spPr.xfrm;
+        if(offsetX !== null)
+        {
+            //data.oldOffsetX = _xfrm.offX;
+            //data.newOffsetX = offsetX;
+            _xfrm.offX = offsetX;
+        }
+
+        if(offsetY !== null)
+        {
+            //data.oldOffsetY = _xfrm.offY;
+            //data.newOffsetY = offsetY;
+            _xfrm.offY = offsetY;
+        }
+
+
+        if(extX !== null)
+        {
+            //data.oldExtX = _xfrm.extX;
+            //data.newExtX = extX;
+            _xfrm.extX = extX;
+        }
+
+        if(extY !== null)
+        {
+            //data.oldExtY = _xfrm.extY;
+            //data.newExtY = extY;
+            _xfrm.extY = extY;
+        }
+
+        if(rot !== null)
+        {
+            //data.oldRot = _xfrm.rot == null ? 0 : _xfrm.rot;
+            //data.newRot = rot;
+            _xfrm.rot = rot;
+        }
+
+        if(flipH !== null)
+        {
+            //data.oldFlipH = _xfrm.flipH == null ? false : _xfrm.flipH;
+            //data.newFlipH = flipH;
+            _xfrm.flipH = flipH;
+        }
+
+        if(flipV !== null)
+        {
+            //data.oldFlipV = _xfrm.flipV == null ? false : _xfrm.flipV;
+            //data.newFlipV = flipV;
+            _xfrm.flipV = flipV;
+        }
+
+        //History.Add(this, data);
+    },
+	
     recalculate: function()
     {
         if(this.recalcInfo.recalculateTransform)
@@ -250,6 +354,121 @@ CImage.prototype =
 	
 	},
 
+	calculateAfterResize: function(transform, bChangeSize, bAfterOpen)
+    {
+        if(this.spPr.geometry !== null)
+            this.spPr.geometry.Recalculate(this.absExtX, this.absExtY);
+        this.calculateTransformMatrix(transform);
+
+        this.calculateTransformTextMatrix();
+        this.calculateLeftTopPoint();
+
+        if(isRealObject(this.chart) && (bChangeSize === true || this.chart.img == "")&& bAfterOpen !== true)
+        {
+            this.chart.width = this.drawingDocument.GetDotsPerMM(this.absExtX);
+            this.chart.height = this.drawingDocument.GetDotsPerMM(this.absExtY);
+
+            var chartRender = new ChartRender();
+            var chartBase64 = chartRender.insertChart(this.chart, null, this.chart.width, this.chart.height);
+            this.chart.img = chartBase64;
+            this.setRasterImage(this.chart.img);
+            editor.WordControl.m_oLogicDocument.DrawingObjects.urlMap.push(this.chart.img);
+        }
+        /*if(this.chart != null)
+        {
+            var chartRender = new ChartRender();
+            var width_pix = this.drawingDocument.GetDotsPerMM(this.absExtX);
+            var heght_pix = this.drawingDocument.GetDotsPerMM(this.absExtY);
+            var chartBase64 = chartRender.insertChart(this.chart, null, width_pix, heght_pix);
+            if ( !chartBase64 )
+                return;
+
+            var _image = editor.ImageLoader.LoadImage(_getFullImageSrc(chartBase64), 1);
+            var or_shp = this;
+            if (null != _image)
+            {
+                this.setRasterImage(chartBase64)
+            }
+            else
+            {
+                editor.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
+                editor.asyncImageEndLoaded2 = function(_image)
+                {
+                    or_shp.setRasterImage(_image.src);
+                    editor.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
+                    if(or_shp.group == null)
+                    {
+                        var or_gr_obj = or_shp.parent;
+                        var bounds_2 = or_gr_obj.getBounds();
+                        if(!or_gr_obj.Is_Inline())
+                        {
+                            or_gr_obj.calculateOffset();
+                            var pos_x = or_gr_obj.absOffsetX;
+                            var pos_y = or_gr_obj.absOffsetY;
+                            var near_pos = or_shp.document.Get_NearestPos(or_gr_obj.PageNum, bounds_2.l, bounds_2.t, true, or_gr_obj);
+                            var W = bounds_2.r - bounds_2.l;
+                            var H = bounds_2.b - bounds_2.t;
+                            or_gr_obj.OnEnd_ChangeFlow(pos_x, pos_y, or_gr_obj.pageIndex, W, H, near_pos, false, true);
+                        }
+                        else
+                        {
+                            or_gr_obj.OnEnd_ResizeInline(bounds_2.r - bounds_2.l, bounds_2.b - bounds_2.t);
+                        }
+                    }
+                }
+            }
+        }       */
+    },
+	
+	calculateTransformMatrix: function(transform)
+    {
+        var _transform = new CMatrix();
+
+        var _horizontal_center = this.extX * 0.5;
+        var _vertical_center = this.extY * 0.5;
+        global_MatrixTransformer.TranslateAppend(_transform, -_horizontal_center, -_vertical_center);
+
+        if(this.absFlipH)
+        {
+            global_MatrixTransformer.ScaleAppend(_transform, -1, 1);
+        }
+        if(this.absFlipV)
+        {
+            global_MatrixTransformer.ScaleAppend(_transform, 1, -1);
+        }
+
+        global_MatrixTransformer.RotateRadAppend(_transform, -this.absRot);
+
+        global_MatrixTransformer.TranslateAppend(_transform, this.absOffsetX, this.absOffsetY);
+        global_MatrixTransformer.TranslateAppend(_transform, _horizontal_center, _vertical_center);
+
+        if(this.mainGroup !== null)
+        {
+            global_MatrixTransformer.MultiplyAppend(_transform, this.mainGroup.getTransform());
+        }
+        if(isRealObject(transform))
+        {
+            global_MatrixTransformer.MultiplyPrepend(_transform, transform);
+        }
+        this.transform = _transform;
+        this.ownTransform = _transform.CreateDublicate();
+    },
+	
+	calculateLeftTopPoint: function()
+    {
+        var _horizontal_center = this.extX * 0.5;
+        var _vertical_enter = this.extY * 0.5;
+        var _sin = Math.sin(this.absRot);
+        var _cos = Math.cos(this.absRot);
+        this.absXLT = -_horizontal_center*_cos + _vertical_enter*_sin +this.absOffsetX + _horizontal_center;
+        this.absYLT = -_horizontal_center*_sin - _vertical_enter*_cos +this.absOffsetY + _vertical_enter;
+    },
+	
+	checkLine: function()
+    {
+        return false;
+    },
+	
     normalize: function()
     {
         var new_off_x, new_off_y, new_ext_x, new_ext_y;

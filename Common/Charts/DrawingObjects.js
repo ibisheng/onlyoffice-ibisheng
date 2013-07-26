@@ -20,6 +20,10 @@ function isObject(what) {
 	return ( (what != null) && (typeof(what) == "object") );
 }
 
+function isNullOrEmptyString(str) {
+	return (str == undefined) || (str == null) || (str == "");
+}
+
 function convertFormula(formula, ws) {
 	var range = null;
 
@@ -2458,6 +2462,10 @@ function DrawingObjects() {
             return _this.drawingDocument.CanvasHitContext;
         }
 
+		_t.setActive = function() {
+			worksheet._moveActiveCellToXY(_t.getVisibleLeftOffset(true) + 1, _t.getVisibleTopOffset(true) + 1);
+		}
+		
 		// GraphicObject: x, y, extX, extY
 		_t.getGraphicObjectMetrics = function() {
 			
@@ -3211,11 +3219,8 @@ function DrawingObjects() {
 						var url = data["url"];
 						
 						if (sheetId == worksheet.model.getId()) {
-							if ( api.isImageChangeUrl || api.isShapeImageChangeUrl ) {
-								_this.editImageDrawingObject(url, api.isImageChangeUrl);
-								api.isImageChangeUrl = false;
-								api.isShapeImageChangeUrl = false;
-							}
+							if ( api.isImageChangeUrl || api.isShapeImageChangeUrl )
+								_this.editImageDrawingObject(url);
 							else
 								_this.addImageDrawingObject(url, false, null);
 						}
@@ -3672,13 +3677,18 @@ function DrawingObjects() {
 					obj.graphicObject = new CImage(obj, _this);
 					obj.graphicObject.initDefault( x, y, w, h, _image.src );
 					obj.graphicObject.select(_this.controller);
-					obj.setGraphicObjectCoords();
 					aObjects.push(obj);
+					
+					obj.setGraphicObjectCoords();
+					obj.setActive();
 					
 					worksheet.autoFilters.drawAutoF(worksheet);
 					worksheet.cellCommentator.drawCommentCells(false);
 					
 					_this.showDrawingObjects(false);
+					_this.selectGraphicObject();
+					_this.sendGraphicObjectProps();
+					
 					_this.lockDrawingObject(obj.id, bPackage ? false : true, bPackage ? false : true);
 				}
 				
@@ -3733,45 +3743,41 @@ function DrawingObjects() {
 		}
 	}
 
-	_this.editImageDrawingObject = function(imageUrl, isImageChangeUrl) {
+	_this.editImageDrawingObject = function(imageUrl) {
 		
-		if ( imageUrl && (_this.controller.selectedObjects.length == 1) ) {
-			var drawingObject = _this.controller.selectedObjects[0].drawingBase;
-			
+		if ( imageUrl ) {
 			var _image = api.ImageLoader.LoadImage(imageUrl, 1);
 			if (null != _image) {
-				addImageObject(_image, isImageChangeUrl);
+				addImageObject(_image);
 			}
 			else {
 				_this.asyncImageEndLoaded = function(_image) {
-					addImageObject(_image, isImageChangeUrl);
+					addImageObject(_image);
 				}
 			}
 			
-			function addImageObject(_image, isImageChangeUrl) {
+			function addImageObject(_image) {
 			
 				if ( !_image.Image ) {
 					worksheet.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.UplImageUrl, c_oAscError.Level.NoCritical);
 				}
 				else {
-					if ( isImageChangeUrl ) {
-						if ( drawingObject.graphicObject.isImage() )
-							drawingObject.graphicObject.setRasterImage(_image.src);
-							
-						else if ( drawingObject.graphicObject.isShape() ) {
-							var imageProp = new asc_CImgProperty();
-							imageProp.ImageUrl = src;
-							_this.controller.setGraphicObjectProps(shapeProp);
-						}
+					if ( api.isImageChangeUrl ) {
+						var imageProp = new asc_CImgProperty();
+						imageProp.ImageUrl = _image.src;
+						_this.setGraphicObjectProps(imageProp);
+						api.isImageChangeUrl = false;
 					}
-					else {	// isShapeImageChangeUrl
+					else if ( api.isShapeImageChangeUrl ) {
 						var shapeProp = new asc_CShapeProperty();
 						shapeProp.fill = new asc_CShapeFill();
 						shapeProp.fill.type = c_oAscFill.FILL_TYPE_BLIP;
 						shapeProp.fill.fill = new asc_CFillBlip();
 						shapeProp.fill.fill.asc_putUrl(_image.src);
-						_this.controller.setGraphicObjectProps(shapeProp);
+						_this.setGraphicObjectProps(shapeProp);
+						api.isShapeImageChangeUrl = false;
 					}
+					
 					_this.showDrawingObjects(true);
 					_this.selectGraphicObject();
 				}
@@ -4437,9 +4443,15 @@ function DrawingObjects() {
         graphic.setDrawingBase(obj);
 				
 		obj.graphicObject.select(_this.controller);
-		obj.setGraphicObjectCoords();
 		aObjects.push(obj);
+		
+		obj.setGraphicObjectCoords();
+		obj.setActive();
+		
 		_this.showDrawingObjects(false);
+		_this.selectGraphicObject();
+		_this.sendGraphicObjectProps();
+		
 		worksheet.model.workbook.handlers.trigger("asc_onEndAddShape");
 		_this.lockDrawingObject(obj.id, true, true);
 	}
@@ -4644,14 +4656,56 @@ function DrawingObjects() {
 		return new asc_CImageSize( 50, 50, false );
 	}
 	
-	_this.sendSelectionChanged = function() {
+	_this.sendGraphicObjectProps = function() {
 		if ( worksheet )
 			worksheet._trigger("selectionChanged", worksheet.getSelectionInfo());
+	}
+	
+	_this.setGraphicObjectProps = function(props) {
+	
+		var objectProperties = props;
+				
+        if ( !isNullOrEmptyString(objectProperties.ImageUrl) ) {
+            var _img = api.ImageLoader.LoadImage(objectProperties.ImageUrl, 1) 
+            
+			if (null != _img) {
+                objectProperties.ImageUrl = _img.src;
+                _this.controller.setGraphicObjectProps( objectProperties );
+            }
+            else {
+                _this.asyncImageEndLoaded = function(_image) {
+                    objectProperties.ImageUrl = _image.src;
+                    _this.controller.setGraphicObjectProps( objectProperties );
+                }
+            }
+        }
+        else if ( objectProperties.ShapeProperties && objectProperties.ShapeProperties.fill && objectProperties.ShapeProperties.fill.fill && 
+					!isNullOrEmptyString(objectProperties.ShapeProperties.fill.fill.url) ) {
+					
+            var _img = api.ImageLoader.LoadImage(objectProperties.ShapeProperties.fill.fill.url, 1);            
+			if ( null != _img ) {
+                objectProperties.ImageUrl = _img.src;
+                _this.controller.setGraphicObjectProps( objectProperties );
+            }
+            else {
+                _this.asyncImageEndLoaded = function(_image) {
+                    objectProperties.ImageUrl = _image.src;
+                    _this.controller.setGraphicObjectProps( objectProperties );
+                }
+            }
+        }
+        else {
+            objectProperties.ImageUrl = null;
+            _this.controller.setGraphicObjectProps( objectProperties );
+        }
+		
+		_this.sendGraphicObjectProps();
 	}
 	
 	_this.showChartSettings = function() {
 		api.wb.handlers.trigger("asc_onShowChartDialog", true);
 	}
+	
 	//-----------------------------------------------------------------------------------
 	// Graphic object mouse events
 	//-----------------------------------------------------------------------------------

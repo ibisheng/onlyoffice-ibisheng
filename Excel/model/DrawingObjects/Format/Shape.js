@@ -148,6 +148,7 @@ function CShape(drawingBase, drawingObjects)
     this.rot = null;
     this.flipH = null;
     this.flipV = null;
+	this.mainGroup = null;
     this.transform = new CMatrix();
     this.invertTransform = null;
     this.transformText = new CMatrix();
@@ -381,6 +382,63 @@ CShape.prototype =
         }
     },
 
+	setXfrm: function(offsetX, offsetY, extX, extY, rot, flipH, flipV)
+    {
+        //var data = {Type: historyitem_SetXfrmShape};
+
+        var _xfrm = this.spPr.xfrm;
+        if(offsetX !== null)
+        {
+            //data.oldOffsetX = _xfrm.offX;
+            //data.newOffsetX = offsetX;
+            _xfrm.offX = offsetX;
+        }
+
+        if(offsetY !== null)
+        {
+            //data.oldOffsetY = _xfrm.offY;
+            //data.newOffsetY = offsetY;
+            _xfrm.offY = offsetY;
+        }
+
+
+        if(extX !== null)
+        {
+            //data.oldExtX = _xfrm.extX;
+            //data.newExtX = extX;
+            _xfrm.extX = extX;
+        }
+
+        if(extY !== null)
+        {
+            //data.oldExtY = _xfrm.extY;
+            //data.newExtY = extY;
+            _xfrm.extY = extY;
+        }
+
+        if(rot !== null)
+        {
+            //data.oldRot = _xfrm.rot == null ? 0 : _xfrm.rot;
+            //data.newRot = rot;
+            _xfrm.rot = rot;
+        }
+
+        if(flipH !== null)
+        {
+            //data.oldFlipH = _xfrm.flipH == null ? false : _xfrm.flipH;
+            //data.newFlipH = flipH;
+            _xfrm.flipH = flipH;
+        }
+
+        if(flipV !== null)
+        {
+            //data.oldFlipV = _xfrm.flipV == null ? false : _xfrm.flipV;
+            //data.newFlipV = flipV;
+            _xfrm.flipV = flipV;
+        }
+
+        //History.Add(this, data);
+    },
 
     paragraphAdd: function(paraItem, bRecalculate)
     {
@@ -754,6 +812,30 @@ CShape.prototype =
         this.invertTransformText = global_MatrixTransformer.Invert(this.transformText);
     },
 
+	calculateAfterResize: function()
+    {
+        if(this.spPr.geometry !== null)
+            this.spPr.geometry.Recalculate(this.absExtX, this.absExtY);
+        this.calculateTransformMatrix();
+        this.calculateContent();
+        this.calculateTransformTextMatrix();
+        this.calculateLeftTopPoint();
+    },
+	
+	calculateLeftTopPoint: function()
+    {
+        var _horizontal_center = this.extX * 0.5;
+        var _vertical_enter = this.extY * 0.5;
+        var _sin = Math.sin(this.absRot);
+        var _cos = Math.cos(this.absRot);
+        this.absXLT = -_horizontal_center*_cos + _vertical_enter*_sin +this.absOffsetX + _horizontal_center;
+        this.absYLT = -_horizontal_center*_sin - _vertical_enter*_cos +this.absOffsetY + _vertical_enter;
+    },
+	
+	checkLine: function()
+    {
+        return (this.spPr.geometry && CheckLinePreset(this.spPr.geometry.preset));
+    },
 
     addTextBody: function(textBody)
     {
@@ -815,6 +897,56 @@ CShape.prototype =
         this.txBody.selectionSetEnd(e, t_x, t_y);
     },
 
+	setAbsoluteTransform: function(offsetX, offsetY, extX, extY, rot, flipH, flipV, open)
+    {
+
+        if(offsetX != null)
+        {
+            this.absOffsetX = offsetX;
+        }
+
+        if(offsetY != null)
+        {
+            this.absOffsetY = offsetY;
+        }
+
+
+        if(extX != null)
+        {
+            this.absExtX = extX;
+        }
+
+        if(extY != null)
+        {
+            this.absExtY = extY;
+        }
+        /*if(extX != null || extY!=null)
+        {
+            if(this.spPr.geometry)
+                this.spPr.geometry.Recalculate(this.absExtX, this.absExtY);
+        }      */
+
+        if(rot != null)
+        {
+            this.absRot = rot;
+        }
+
+        if(flipH != null)
+        {
+            this.absFlipH = flipH;
+        }
+
+        if(flipV != null)
+        {
+            this.absFlipV = flipV;
+        }
+        if(this.parent)
+            this.parent.setAbsoluteTransform(offsetX, offsetY, extX, extY, rot, flipH, flipV, true);
+        if(open !== false)
+            this.calculateContent();
+        this.recalculate(open);
+    },
+	
     recalculateTransform: function()
     {
         var xfrm = this.spPr.xfrm;
@@ -1040,6 +1172,36 @@ CShape.prototype =
         this.calculateContent();
         //this.calculateTransformTextMatrix();
         this.calculateLeftTopPoint();
+    },
+	
+	calculateTransformMatrix: function()
+    {
+        var _transform = new CMatrix();
+
+        var _horizontal_center = this.extX * 0.5;
+        var _vertical_center = this.extY * 0.5;
+        global_MatrixTransformer.TranslateAppend(_transform, -_horizontal_center, -_vertical_center);
+
+        if(this.absFlipH)
+        {
+            global_MatrixTransformer.ScaleAppend(_transform, -1, 1);
+        }
+        if(this.absFlipV)
+        {
+            global_MatrixTransformer.ScaleAppend(_transform, 1, -1);
+        }
+
+        global_MatrixTransformer.RotateRadAppend(_transform, -this.absRot);
+
+        global_MatrixTransformer.TranslateAppend(_transform, this.absOffsetX, this.absOffsetY);
+        global_MatrixTransformer.TranslateAppend(_transform, _horizontal_center, _vertical_center);
+
+        if(this.mainGroup !== null)
+        {
+            global_MatrixTransformer.MultiplyAppend(_transform, this.mainGroup.getTransform());
+        }
+        this.transform = _transform;
+        this.ownTransform = _transform.CreateDublicate();
     },
 	
 	calculateLeftTopPoint: function()

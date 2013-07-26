@@ -2177,7 +2177,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			
 			asc_setGraphicObjectProps: function(props) {
 				var ws = this.wb.getWorksheet();
-				return ws.objectRender.controller.setGraphicObjectProps(props);
+				return ws.objectRender.setGraphicObjectProps(props);
 			},
 			
 			asc_getOriginalImageSize: function() {
