@@ -4081,7 +4081,7 @@ function Binary_StylesTableReader(stream, wb, aCellXfs, Dxfs)
 				oCellStyle.xfs.QuotePrefix = oCellStyleXfs.QuotePrefix;
 			// align
 			if(null != oCellStyleXfs.align)
-				oCellStyle.xfs.align = oCellStyleXfs.clone();
+				oCellStyle.xfs.align = oCellStyleXfs.align.clone();
 			// XfId
 			if (null !== oCellStyleXfs.XfId)
 				oCellStyle.xfs.XfId = oCellStyleXfs.XfId;
