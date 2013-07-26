@@ -961,7 +961,14 @@ CImage.prototype =
 		
 		return Props;
 	},
-	
+
+    addToDrawingObjects: function()
+    {
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Add_To_Drawing_Objects, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataClosePath()), null);
+        this.drawingObjects.addGraphicObject(this);
+    },
+
+
     Undo: function(type, data)
     {
         switch (type)

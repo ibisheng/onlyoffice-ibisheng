@@ -14,6 +14,8 @@
 // Selection_SetEnd, Selection_CalculateTextPr, IsEmpty, Selection_IsEmpty,
 // Cursor_IsStart, Cursor_IsEnd, Is_ContentOnFirstPage
 var type_Paragraph = 0x0001;
+var type_Table = 0x0002;
+
 
 var UnknownValue  = null;
 
@@ -8088,7 +8090,30 @@ Paragraph.prototype =
         var StyleId    = this.Style_Get();
 
         // Считываем свойства для текущего стиля
-        var Pr = Styles.Get_Pr( StyleId, styletype_Paragraph, TableStyle );
+        var Pr = Styles.Get_Pr( Styles.Id-1, styletype_Paragraph, TableStyle );
+
+        var theme = this.Parent.getTheme();
+        var color_map = this.Parent.getColorMap();
+        if(isRealObject(Pr.TextPr.unifill) && isRealObject(Pr.TextPr.unifill.fill))
+        {
+            Pr.TextPr.unifill.calculate(theme, color_map, {R:0, G: 0, B: 0, A:255});
+            if(isRealObject(Pr.TextPr.unifill.fill.color))
+            {
+                var color = Pr.TextPr.unifill.fill.color.RGBA;
+                Pr.TextPr.Color = new CDocumentColor(color.R, color.G, color.B);
+            }
+            else if(Array.isArray(Pr.TextPr.unifill.fill.colors) && isRealObject(Pr.TextPr.unifill.fill.colors[0]))
+            {
+                var color = Pr.TextPr.unifill.fill.colors[0].RGBA;
+                Pr.TextPr.Color = new CDocumentColor(color.R, color.G, color.B);
+            }
+        }
+
+        if(typeof Pr.TextPr.themeFont === "string")
+        {
+            var font_name = getFontInfo(Pr.TextPr.themeFont)(theme.themeElements.fontScheme);
+            Pr.TextPr.FontFamily = {Name: font_name, Index: -1};
+        }
 
         // Если в стиле была задана нумерация сохраним это в специальном поле
         if ( undefined != Pr.ParaPr.NumPr )

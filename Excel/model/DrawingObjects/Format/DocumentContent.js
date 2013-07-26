@@ -192,7 +192,7 @@ function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, 
     // Массив укзателей на все инлайновые графические объекты
    // this.DrawingObjects = this.LogicDocument.DrawingObjects;
 
-    this.Styles    = this.Parent.Get_Styles();
+   // this.Styles    = this.Parent.Get_Styles();
     //this.Numbering = editor.WordControl.m_oLogicDocument.Get_Numbering();
 
     this.ClipInfo =
@@ -369,14 +369,24 @@ CDocumentContent.prototype =
         return NumInfo;
     },
 
-    Get_Styles : function()
+    Get_Styles : function(level)
     {
-        return this.Styles;
+        return this.Parent.Get_Styles(isRealNumber(level) ? level : 0);
     },
 
     Get_TableStyleForPara : function()
     {
         return this.Parent.Get_TableStyleForPara();
+    },
+
+    getColorMap: function()
+    {
+        return this.Parent.getColorMap();
+    },
+
+    getTheme: function()
+    {
+        return this.Parent.getTheme();
     },
 
     Recalc_AllParagraphs_CompiledPr : function()
@@ -6689,6 +6699,21 @@ CDocumentContent.prototype =
         // Проверим, что последний элемент не таблица
         if ( type_Table == this.Content[this.Content.length - 1].GetType() )
             this.Internal_Content_Add(this.Content.length, new Paragraph( this.DrawingDocument, this, 0, 50, 50, this.XLimit, this.YLimit ) );
+    },
+
+    getTextString: function()
+    {
+        var ret = "";
+        for(var i = 0; i < this.Content.length; ++i)
+        {
+            for(var j = 0; j < this.Content[i].Content.length; ++j)
+            {
+                if(this.Content[i].Content[j].Type === para_Text)
+                    ret += this.Content[i].Content[j].Value;
+                if(this.Content[i].Content[j].Type === para_Space)
+                    ret += " ";
+            }
+        }
     },
 
     Clear_ContentChanges : function()

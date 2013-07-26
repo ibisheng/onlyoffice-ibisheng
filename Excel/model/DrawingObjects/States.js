@@ -39,9 +39,10 @@ var STATES_ID_ADD_PPOLY_LINE2 = 0x29;
 var STATES_ID_ADD_PPOLY_LINE22 = 0x30;
 var STATES_ID_ADD_PPOLY_LINE23 = 0x31;
 var STATES_ID_TEXT_ADD = 0x32;
-var STATES_ID_TEXT_ADD_IN_GROUP = 0x33;
-
-
+var STATES_ID_PRE_MOVE_INTERNAL_CHART_OBJECT = 0x33;
+var STATES_ID_MOVE_INTERNAL_CHART_OBJECT = 0x34;
+var STATES_ID_CHART = 0x35;
+var STATES_ID_CHART_TEXT_ADD = 0x36;
 
 
 
@@ -135,7 +136,7 @@ function NullState(drawingObjectsController, drawingObjects)
             if(cur_drawing_base.isGraphicObject())
             {
                 var cur_drawing = cur_drawing_base.graphicObject;
-                if(cur_drawing.isSimpleObject())
+                if(cur_drawing.isShape() || cur_drawing.isImage())
                 {
                     var hit_in_inner_area = cur_drawing.hitInInnerArea(x, y);
                     var hit_in_path = cur_drawing.hitInPath(x, y);
@@ -164,7 +165,7 @@ function NullState(drawingObjectsController, drawingObjects)
                         return;
                     }
                 }
-                else
+                else if(cur_drawing.isGroup())
                 {
                     var grouped_objects = cur_drawing.getArrGraphicObjects();
                     for(var j = grouped_objects.length - 1; j > -1; --j)
@@ -192,6 +193,72 @@ function NullState(drawingObjectsController, drawingObjects)
                         {
                             //TODO
                         }
+                    }
+                }
+                else if(cur_drawing.isChart())
+                {
+                    if(cur_drawing.hitInWorkArea(x, y))
+                    {
+
+                        if(!e.shiftKey && !e.ctrlKey)
+                        {
+
+                            if(isRealObject(cur_drawing.chartLegend))
+                            {
+                                //TODO
+                            }
+
+                            var object_for_move_in_chart = null;
+                            if(isRealObject(cur_drawing.chartTitle))
+                            {
+                                if(cur_drawing.chartTitle.hit(x, y))
+                                {
+                                    object_for_move_in_chart = cur_drawing.chartTitle;
+                                }
+                            }
+
+                            if(isRealObject(cur_drawing.hAxisTitle) && !isRealObject(object_for_move_in_chart))
+                            {
+                                if(cur_drawing.hAxisTitle.hit(x, y))
+                                {
+                                    object_for_move_in_chart = cur_drawing.hAxisTitle;
+                                }
+                            }
+
+                            if(isRealObject(cur_drawing.vAxisTitle) && !isRealObject(object_for_move_in_chart))
+                            {
+                                if(cur_drawing.vAxisTitle.hit(x, y))
+                                {
+                                    object_for_move_in_chart = cur_drawing.vAxisTitle;
+                                }
+                            }
+                            if(isRealObject(object_for_move_in_chart))
+                            {
+                                this.drawingObjectsController.resetSelection();
+                                cur_drawing.select(this.drawingObjectsController);
+                                object_for_move_in_chart.select();
+                                this.drawingObjectsController.clearPreTrackObjects();
+                                this.drawingObjectsController.addPreTrackObject(new MoveTitleInChart(object_for_move_in_chart));
+                                this.drawingObjectsController.changeCurrentState(new PreMoveInternalChartObjectState(this.drawingObjectsController, this.drawingObjects, x, y, object_for_move_in_chart));
+                                this.drawingObjects.selectGraphicObject();
+                                return;
+                            }
+                            this.drawingObjectsController.clearPreTrackObjects();
+                            var is_selected = cur_drawing.selected;
+                            if(!(e.ctrlKey || e.shiftKey) && !is_selected)
+                                this.drawingObjectsController.resetSelection();
+                            cur_drawing.select(this.drawingObjectsController);
+                            this.drawingObjects.selectGraphicObject();
+                            for(var j = 0; j < selected_objects.length; ++j)
+                            {
+                                this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
+                            }
+                            this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects,x, y, e.shiftKey, e.ctrl, cur_drawing, is_selected, true));
+                            return;
+                        }
+
+
+
                     }
                 }
             }
@@ -297,7 +364,7 @@ function NullState(drawingObjectsController, drawingObjects)
             if(cur_drawing_base.isGraphicObject())
             {
                 var cur_drawing = cur_drawing_base.graphicObject;
-                if(cur_drawing.isSimpleObject())
+                if(cur_drawing.isShape() || cur_drawing.isImage())
                 {
                     var hit_in_inner_area = cur_drawing.hitInInnerArea(x, y);
                     var hit_in_path = cur_drawing.hitInPath(x, y);
@@ -311,7 +378,7 @@ function NullState(drawingObjectsController, drawingObjects)
                         return {objectId: cur_drawing_base.id, cursorType: "move"};
                     }
                 }
-                else
+                else if(cur_drawing.isGroup())
                 {
                     var grouped_objects = cur_drawing.getArrGraphicObjects();
                     for(var j = grouped_objects.length - 1; j > -1; --j)
@@ -330,12 +397,645 @@ function NullState(drawingObjectsController, drawingObjects)
                         }
                     }
                 }
+                else if(cur_drawing.isChart())
+                {
+                    if(cur_drawing.hitInWorkArea(x, y))
+                    {
+                        return {objectId: cur_drawing.drawingBase.id, cursorType:"move"};
+                    }
+                }
             }
         }
         return null;
     };
 }
 
+function PreMoveInternalChartObjectState(drawingObjectsController, drawingObjects, startX, startY, chartElement)
+{
+    this.id = STATES_ID_PRE_MOVE_INTERNAL_CHART_OBJECT;
+    this.drawingObjectsController = drawingObjectsController;
+    this.drawingObjects = drawingObjects;
+    this.startX = startX;
+    this.startY = startY;
+    this.chartElement = chartElement;
+
+    this.onMouseDown = function(e, x, y)
+    {
+
+    };
+
+    this.onMouseMove = function(e, x, y)
+    {
+        this.drawingObjectsController.swapTrackObjects();
+        this.drawingObjectsController.changeCurrentState(new MoveInternalChartObjectState(this.drawingObjectsController, this.drawingObjects, this.startX, this.startY, this.chartElement))
+        this.drawingObjectsController.onMouseMove(e, x, y);
+    };
+
+    this.onMouseUp = function(e, x, y)
+    {
+        this.drawingObjectsController.clearPreTrackObjects();
+        this.drawingObjectsController.changeCurrentState(new ChartState(this.drawingObjectsController, this.drawingObjects, this.chartElement.chartGroup));
+    };
+
+    this.onKeyDown = function(e)
+    {};
+
+    this.onKeyPress = function(e)
+    {};
+
+    this.drawSelection = function(drawingDocument)
+    {
+        drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.chartElement.chartGroup.transform, 0, 0, this.chartElement.chartGroup.extX, this.chartElement.chartGroup.extY, false);
+        drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.chartElement.transform, 0, 0, this.chartElement.extX, this.chartElement.extY, false);
+    };
+
+    this.isPointInDrawingObjects = function(x, y)
+    {
+        return {objectsId: this.chartElement.chartGroup.drawingBase.id, cursorType:"move"};
+    };
+}
+
+
+function MoveInternalChartObjectState(drawingObjectsController, drawingObjects, startX, startY, chartElement)
+{
+    this.id = STATES_ID_MOVE_INTERNAL_CHART_OBJECT;
+    this.drawingObjectsController = drawingObjectsController;
+    this.drawingObjects = drawingObjects;
+    this.startX = startX;
+    this.startY = startY;
+    this.chartElement = chartElement;
+
+    this.onMouseDown = function(e, x, y)
+    {
+
+    };
+
+    this.onMouseMove = function(e, x, y)
+    {
+        var dx = x - this.startX;
+        var dy = y - this.startY;
+        this.drawingObjectsController.trackMoveObjects(dx, dy);
+        this.drawingObjects.selectGraphicObject();
+        this.drawingObjects.showOverlayGraphicObjects();
+
+    };
+
+    this.onMouseUp = function(e, x, y)
+    {
+        History.Create_NewPoint();
+        this.drawingObjectsController.trackEnd();
+        this.drawingObjectsController.clearTrackObjects();
+        this.drawingObjects.selectGraphicObject();
+        this.drawingObjectsController.changeCurrentState(new ChartState(this.drawingObjectsController, this.drawingObjects, this.chartElement.chartGroup));
+        asc["editor"].asc_endAddShape();
+    };
+
+    this.onKeyDown = function(e)
+    {};
+
+    this.onKeyPress = function(e)
+    {};
+
+    this.drawSelection = function(drawingDocument)
+    {
+        drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.chartElement.chartGroup.transform, 0, 0, this.chartElement.chartGroup.extX, this.chartElement.chartGroup.extY, false);
+        drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.chartElement.transform, 0, 0, this.chartElement.extX, this.chartElement.extY, false);
+    };
+
+    this.isPointInDrawingObjects = function(x, y)
+    {
+        return {objectsId: this.chartElement.chartGroup.drawingBase.id, cursorType:"move"};
+
+    };
+}
+
+
+function ChartState(drawingObjectsController, drawingObjects, chart)
+{
+    this.id = STATES_ID_CHART;
+    this.drawingObjectsController = drawingObjectsController;
+    this.drawingObjects = drawingObjects;
+    this.chart = chart;
+
+    this.onMouseDown = function(e, x, y)
+    {
+
+        var titles = [];
+        titles.push(this.chart.chartTitle);
+        titles.push(this.chart.hAxisTitle);
+        titles.push(this.chart.vAxisTitle);
+        if(!e.ctrlKey)
+        {
+
+            for(var i = 0; i < titles.length; ++i)
+            {
+                if(isRealObject(titles[i]) && titles[i].selected && titles[i].hitInBoundingRect(x, y))
+                {
+                    var title = titles[i];
+                    for(var j = 0; j < titles.length; ++j)
+                    {
+                        if(isRealObject(titles[j]))
+                            titles[j].deselect();
+                    }
+                    title.select();
+                    this.drawingObjectsController.clearPreTrackObjects();
+                    this.drawingObjectsController.addPreTrackObject(new MoveTitleInChart(title));
+                    this.drawingObjectsController.changeCurrentState(new PreMoveInternalChartObjectState(this.drawingObjectsController, this.drawingObjects, x, y, title));
+                    this.drawingObjects.selectGraphicObject();
+                    return;
+                }
+            }
+        }
+
+        if(this.chart.canResize())
+        {
+            var hit_to_handles = this.chart.hitToHandles(x, y);
+            if(hit_to_handles > -1 && hit_to_handles < 8)
+            {
+                for(var j = 0; j < titles.length; ++j)
+                {
+                    if(isRealObject(titles[j]))
+                        titles[j].deselect();
+                }
+                this.drawingObjectsController.clearPreTrackObjects();
+                var card_direction = this.chart.getCardDirectionByNum(hit_to_handles);
+
+                this.drawingObjectsController.addPreTrackObject(this.chart.createResizeTrack(card_direction));
+                this.drawingObjectsController.changeCurrentState(new PreResizeState(this.drawingObjectsController, this.drawingObjects, this.chart, card_direction));
+                this.drawingObjects.selectGraphicObject();
+                return;
+            }
+        }
+
+        if(this.chart.hitInBoundingRect(x, y))
+        {
+            for(var j = 0; j < titles.length; ++j)
+            {
+                if(isRealObject(titles[j]))
+                    titles[j].deselect();
+            }
+            this.drawingObjectsController.clearPreTrackObjects();
+
+            this.drawingObjectsController.addPreTrackObject(this.chart.createMoveTrack());
+            this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects, x, y, e.shiftKey, e.ctrlKey, this.chart, true, false));
+            this.drawingObjects.selectGraphicObject();
+            return;
+        }
+
+        var drawing_bases = this.drawingObjects.getDrawingObjects();
+        var selected_objects = this.drawingObjectsController.selectedObjects;
+        for(var i = drawing_bases.length - 1; i > -1; --i)
+        {
+            var cur_drawing_base = drawing_bases[i];
+            if(cur_drawing_base.isGraphicObject())
+            {
+                var cur_drawing = cur_drawing_base.graphicObject;
+                if(cur_drawing.isShape() || cur_drawing.isImage())
+                {
+                    var hit_in_inner_area = cur_drawing.hitInInnerArea(x, y);
+                    var hit_in_path = cur_drawing.hitInPath(x, y);
+                    var hit_in_text_rect = cur_drawing.hitInTextRect(x, y);
+                    if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
+                    {
+                        this.chart.resetSelection(this.drawingObjectsController);
+                        if(!(e.ctrlKey || e.shiftKey))
+                            this.drawingObjectsController.resetSelection();
+                        cur_drawing.select(this.drawingObjectsController);
+                        for(var j = 0; j < selected_objects.length; ++j)
+                        {
+                            this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
+                        }
+                        this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects,x, y, e.shiftKey, e.ctrl, cur_drawing, false, true));
+                        this.drawingObjects.selectGraphicObject();
+                        return;
+                    }
+                    else if(hit_in_text_rect)
+                    {
+                        //TODO
+                    }
+                }
+                else if(cur_drawing.isGroup())
+                {
+                    var grouped_objects = cur_drawing.getArrGraphicObjects();
+                    for(var j = grouped_objects.length - 1; j > -1; --j)
+                    {
+                        var cur_grouped_object = grouped_objects[j];
+                        var hit_in_inner_area = cur_grouped_object.hitInInnerArea(x, y);
+                        var hit_in_path = cur_grouped_object.hitInPath(x, y);
+                        var hit_in_text_rect = cur_grouped_object.hitInTextRect(x, y);
+                        if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
+                        {
+                            this.chart.resetSelection(this.drawingObjectsController);
+                            if(!(e.ctrlKey || e.shiftKey))
+                                this.drawingObjectsController.resetSelection();
+                            cur_drawing.select(this.drawingObjectsController);
+                            this.drawingObjects.selectGraphicObject();
+                            for(var j = 0; j < selected_objects.length; ++j)
+                            {
+                                this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
+                            }
+                            this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects,x, y, e.shiftKey, e.ctrl, cur_drawing, false, true));
+                            this.drawingObjectsController.selectGraphicObject();
+                            return;
+                        }
+                        else if(hit_in_text_rect)
+                        {
+                            //TODO
+                        }
+                    }
+                }
+                else if(cur_drawing.isChart())
+                {
+                    if(cur_drawing === this.chart)
+                    {
+                        for(var j = 0; j < titles.length; ++j)
+                        {
+                            title = titles[j];
+                            if(isRealObject(title))
+                            {
+                                if(!title.selected)
+                                {
+                                    if(title.hit(x, y))
+                                    {
+                                        this.chart.resetSelection();
+                                        title.select();
+                                        this.drawingObjectsController.clearPreTrackObjects();
+                                        this.drawingObjectsController.addPreTrackObject(new MoveTitleInChart(title));
+                                        this.drawingObjectsController.changeCurrentState(new PreMoveInternalChartObjectState(this.drawingObjectsController, this.drawingObjects, x, y, title));
+                                        this.drawingObjects.selectGraphicObject();
+                                        return;
+                                    }
+                                }
+                                else
+                                {
+                                    if(title.hit(x, y))
+                                    {
+                                        if(title.hitInTextRect(x, y))
+                                        {
+                                            title.selectionSetStart(e, x, y);
+                                            this.drawingObjectsController.changeCurrentState(new ChartTextAdd(this.drawingObjectsController, this.drawingObjects,  this.chart, title));
+                                            if(e.ClickCount < 2)
+                                                title.updateSelectionState(this.drawingObjects.drawingDocument);
+                                            return;
+                                        }
+                                        else
+                                        {
+
+                                            this.drawingObjectsController.clearPreTrackObjects();
+                                            this.drawingObjectsController.addPreTrackObject(new MoveTitleInChart(title));
+                                            this.drawingObjectsController.changeCurrentState(new PreMoveInternalChartObjectState(this.drawingObjectsController, this.drawingObjects, x, y, title));
+                                            this.drawingObjects.selectGraphicObject();
+                                        }
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                        if(cur_drawing.hitInWorkArea(x, y))
+                        {
+                            this.drawingObjectsController.clearPreTrackObjects();
+                            var is_selected = cur_drawing.selected;
+                            this.chart.resetSelection();
+                            if(!(e.ctrlKey || e.shiftKey) && !is_selected)
+                                this.drawingObjectsController.resetSelection();
+                            cur_drawing.select(this.drawingObjectsController);
+                            this.drawingObjects.selectGraphicObject();
+                            for(var j = 0; j < selected_objects.length; ++j)
+                            {
+                                this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
+                            }
+                            this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects,x, y, e.shiftKey, e.ctrl, cur_drawing, is_selected, true));
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        if(cur_drawing.hitInWorkArea(x, y))
+                        {
+
+                            if(!e.shiftKey && !e.ctrlKey)
+                            {
+
+                                if(isRealObject(cur_drawing.chartLegend))
+                                {
+                                    //TODO
+                                }
+
+                                var object_for_move_in_chart = null;
+                                if(isRealObject(cur_drawing.chartTitle))
+                                {
+                                    if(cur_drawing.chartTitle.hit(x, y))
+                                    {
+                                        object_for_move_in_chart = cur_drawing.chartTitle;
+                                    }
+                                }
+
+                                if(isRealObject(cur_drawing.hAxisTitle) && !isRealObject(object_for_move_in_chart))
+                                {
+                                    if(cur_drawing.hAxisTitle.hit(x, y))
+                                    {
+                                        object_for_move_in_chart = cur_drawing.hAxisTitle;
+                                    }
+                                }
+
+                                if(isRealObject(cur_drawing.vAxisTitle) && !isRealObject(object_for_move_in_chart))
+                                {
+                                    if(cur_drawing.vAxisTitle.hit(x, y))
+                                    {
+                                        object_for_move_in_chart = cur_drawing.vAxisTitle;
+                                    }
+                                }
+                                if(isRealObject(object_for_move_in_chart))
+                                {
+                                    this.chart.resetSelection();
+                                    this.drawingObjectsController.resetSelection();
+                                    cur_drawing.select(this.drawingObjectsController);
+                                    object_for_move_in_chart.select();
+                                    this.drawingObjectsController.clearPreTrackObjects();
+                                    this.drawingObjectsController.addPreTrackObject(new MoveTitleInChart(object_for_move_in_chart));
+                                    this.drawingObjectsController.changeCurrentState(new PreMoveInternalChartObjectState(this.drawingObjectsController, this.drawingObjects, x, y, object_for_move_in_chart));
+                                    this.drawingObjects.selectGraphicObject();
+                                    return;
+                                }
+                                this.drawingObjectsController.clearPreTrackObjects();
+                                var is_selected = cur_drawing.selected;
+                                this.chart.resetSelection();
+                                if(!(e.ctrlKey || e.shiftKey) && !is_selected)
+                                    this.drawingObjectsController.resetSelection();
+                                cur_drawing.select(this.drawingObjectsController);
+                                this.drawingObjects.selectGraphicObject();
+                                for(var j = 0; j < selected_objects.length; ++j)
+                                {
+                                    this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
+                                }
+                                this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects,x, y, e.shiftKey, e.ctrl, cur_drawing, is_selected, true));
+                                return;
+                            }
+
+
+
+                        }
+                    }
+                }
+            }
+        }
+        this.chart.resetSelection(this.drawingObjectsController);
+        this.drawingObjectsController.resetSelection();
+        this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
+        this.drawingObjects.selectGraphicObject();
+    };
+
+    this.onMouseMove = function(e, x, y)
+    {
+    };
+
+    this.onMouseUp = function(e, x, y)
+    {};
+
+    this.onKeyDown = function(e)
+    {};
+
+    this.onKeyPress = function(e)
+    {};
+
+    this.drawSelection = function(drawingDocument)
+    {
+        drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.chart.transform, 0, 0, this.chart.extX, this.chart.extY, false);
+    };
+
+    this.isPointInDrawingObjects = function(x, y)
+    {
+
+        var titles = [];
+        titles.push(this.chart.chartTitle);
+        titles.push(this.chart.hAxisTitle);
+        titles.push(this.chart.vAxisTitle);
+        if(/*!e.ctrlKey*/true)
+        {
+            for(var i = 0; i < titles.length; ++i)
+            {
+                if(isRealObject(titles[i]) && titles[i].selected && titles[i].hitInBoundingRect(x, y))
+                {
+                    return {objectId: this.chart.drawingBase.id, cursorType: "move"};
+                }
+            }
+        }
+
+        if(this.chart.canResize())
+        {
+            var hit_to_handles = this.chart.hitToHandles(x, y);
+            if(hit_to_handles > -1 && hit_to_handles < 8)
+            {
+                var card_direction = this.chart.getCardDirectionByNum(hit_to_handles);
+                return {objectId: this.chart.drawingBase.id, cursorType: CURSOR_TYPES_BY_CARD_DIRECTION[card_direction]};
+            }
+        }
+
+        if(this.chart.hitInBoundingRect(x, y))
+        {
+            return {objectId: this.chart.drawingBase.id, cursorType: "move"};
+
+        }
+
+        var drawing_bases = this.drawingObjects.getDrawingObjects();
+        var selected_objects = this.drawingObjectsController.selectedObjects;
+        for(var i = drawing_bases.length - 1; i > -1; --i)
+        {
+            var cur_drawing_base = drawing_bases[i];
+            if(cur_drawing_base.isGraphicObject())
+            {
+                var cur_drawing = cur_drawing_base.graphicObject;
+                if(cur_drawing.isShape() || cur_drawing.isImage())
+                {
+                    var hit_in_inner_area = cur_drawing.hitInInnerArea(x, y);
+                    var hit_in_path = cur_drawing.hitInPath(x, y);
+                    var hit_in_text_rect = cur_drawing.hitInTextRect(x, y);
+                    if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
+                    {
+                        return {objectId: cur_drawing.drawingBase.id, cursorType: "move"};
+                    }
+                    else if(hit_in_text_rect)
+                    {
+                        return {objectId: cur_drawing.drawingBase.id, cursorType: "move"};
+                    }
+                }
+                else if(cur_drawing.isGroup())
+                {
+                    var grouped_objects = cur_drawing.getArrGraphicObjects();
+                    for(var j = grouped_objects.length - 1; j > -1; --j)
+                    {
+                        var cur_grouped_object = grouped_objects[j];
+                        var hit_in_inner_area = cur_grouped_object.hitInInnerArea(x, y);
+                        var hit_in_path = cur_grouped_object.hitInPath(x, y);
+                        var hit_in_text_rect = cur_grouped_object.hitInTextRect(x, y);
+                        if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
+                        {
+                            return {objectId: cur_drawing.drawingBase.id, cursorType: "move"};
+                        }
+                        else if(hit_in_text_rect)
+                        {
+                            return {objectId: cur_drawing.drawingBase.id, cursorType: "move"};
+                        }
+                    }
+                }
+                else if(cur_drawing.isChart())
+                {
+                    if(cur_drawing === this.chart)
+                    {
+                        for(var j = 0; j < titles.length; ++j)
+                        {
+                            var title = titles[j];
+                            if(isRealObject(title))
+                            {
+                                if(!title.selected)
+                                {
+                                    if(title.hit(x, y))
+                                    {
+                                        return {objectId: this.chart.drawingBase.id, cursorType: "move"};
+                                    }
+
+                                }
+                                else
+                                {
+                                    if(title.hit(x, y))
+                                    {
+                                        if(title.hitInTextRect(x, y))
+                                        {
+                                            return {objectId: this.chart.drawingBase.id, cursorType: "move"};
+                                        }
+                                        else
+                                        {
+
+                                            return {objectId: this.chart.drawingBase.id, cursorType: "move"};
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        if(cur_drawing.hitInWorkArea(x, y))
+                        {
+                            return {objectId: this.chart.drawingBase.id, cursorType: "move"};
+                        }
+
+                    }
+                    else
+                    {
+                        if(cur_drawing.hitInWorkArea(x, y))
+                        {
+
+                            if(!e.shiftKey && !e.ctrlKey)
+                            {
+
+                                if(isRealObject(cur_drawing.chartLegend))
+                                {
+                                    //TODO
+                                }
+
+                                var object_for_move_in_chart = null;
+                                if(isRealObject(cur_drawing.chartTitle))
+                                {
+                                    if(cur_drawing.chartTitle.hit(x, y))
+                                    {
+                                        object_for_move_in_chart = cur_drawing.chartTitle;
+                                    }
+                                }
+
+                                if(isRealObject(cur_drawing.hAxisTitle) && !isRealObject(object_for_move_in_chart))
+                                {
+                                    if(cur_drawing.hAxisTitle.hit(x, y))
+                                    {
+                                        object_for_move_in_chart = cur_drawing.hAxisTitle;
+                                    }
+                                }
+
+                                if(isRealObject(cur_drawing.vAxisTitle) && !isRealObject(object_for_move_in_chart))
+                                {
+                                    if(cur_drawing.vAxisTitle.hit(x, y))
+                                    {
+                                        object_for_move_in_chart = cur_drawing.vAxisTitle;
+                                    }
+                                }
+                                if(isRealObject(object_for_move_in_chart))
+                                {
+                                    return {objectId: this.chart.drawingBase.id, cursorType: "move"};
+                                }
+
+                                return {objectId: this.chart.drawingBase.id, cursorType: "move"};
+
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    };
+}
+
+
+function ChartTextAdd(drawingObjectsController, drawingObjects, chart, textObject)
+{
+    this.id = STATES_ID_CHART_TEXT_ADD;
+    this.drawingObjectsController = drawingObjectsController;
+    this.drawingObjects = drawingObjects;
+    this.textObject = textObject;
+    this.chartState = new ChartState(drawingObjectsController, drawingObjects, chart);
+    this.chart = chart;
+
+    this.onMouseDown = function(e, x, y)
+    {
+        this.chartState.onMouseDown(e, x, y);
+        if(this.drawingObjectsController.curState.id !== STATES_ID_CHART_TEXT_ADD || this.drawingObjectsController.curState.textObject !== this.textObject)
+            this.chart.recalculate();
+    };
+
+    this.onMouseMove = function(e, x, y)
+    {
+        if(e.which > 0)
+        {
+            this.textObject.selectionSetEnd(e, x, y);
+            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+        }
+    };
+
+    this.onMouseUp = function(e, x, y)
+    {
+        this.textObject.selectionSetEnd(e, x, y);
+        this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+    };
+
+    this.onKeyDown = function(e)
+    {
+        var b_prevent_default = false;
+        switch (e.keyCode)
+        {
+            case 8:
+            {
+                b_prevent_default = true;
+            }
+        }
+        if(b_prevent_default)
+            e.preventDefault();
+    };
+
+    this.onKeyPress = function(e)
+    {
+        this.textObject.paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
+        this.drawingObjects.showDrawingObjects(true);
+    };
+
+    this.drawSelection = function(drawingDocument)
+    {
+        DrawDefaultSelection(this.drawingObjectsController, drawingDocument);
+        //this.textObject.updateSelectionState(drawingDocument);
+    };
+
+    this.isPointInDrawingObjects = function(x, y)
+    {
+        return this.chartState.isPointInDrawingObjects(x, y);
+    };
+}
 
 function TextAddState(drawingObjectsController, drawingObjects, textObject)
 {
@@ -781,6 +1481,7 @@ function TrackNewShapeState(drawingObjectsController, drawingObjects)
     this.onMouseUp = function(e, x, y)
     {
         this.drawingObjectsController.resetSelection();
+        History.Create_NewPoint();
         this.drawingObjectsController.trackEnd();
         this.drawingObjectsController.clearTrackObjects();
         this.drawingObjects.selectGraphicObject();
@@ -828,6 +1529,8 @@ function PreMoveState(drawingObjectsController, drawingObjects, startX, startY, 
 
     this.onMouseMove = function(e, x, y)
     {
+        if(this.startX === x && this.startY === y)
+            return;
         this.drawingObjectsController.swapTrackObjects();
         var track_objects = this.drawingObjectsController.getTrackObjects();
         var max_x, min_x, max_y, min_y;
@@ -855,6 +1558,26 @@ function PreMoveState(drawingObjectsController, drawingObjects, startX, startY, 
     this.onMouseUp = function(e, x, y)
     {
 
+        if(!this.ctrl && !this.shift)
+        {
+            //if(e.ClickCount > 1)
+            {
+                var gr_obj = this.majorObject;
+                if(gr_obj.isChart())
+                {
+                    this.drawingObjectsController.changeCurrentState(new ExtpectDoubleClickState(this.drawingObjectsController, this.drawingObjects));
+                    return;
+                    /* if(false === this.graphicObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : gr_obj.Parent, CheckType : changestype_Paragraph_Content} )) {
+                     var chart = this.graphicObjects.majorGraphicObject.GraphicObj.chart.serializeChart();
+                     chart["themeColors"] = [];
+                     for (var i = 0; i < this.graphicObjects.drawingDocument.GuiControlColorsMap.length; i++) {
+                     chart["themeColors"].push( this.graphicObjects.drawingDocument.GuiControlColorsMap[i].get_hex() );
+                     }
+                     editor.asc_fireCallback("asc_doubleClickOnChart", chart);
+                     }      */
+                }
+            }
+        }
         this.drawingObjectsController.clearPreTrackObjects();
         if(!(this.majorObject.isGroup() && this.bInside))
         {
@@ -896,6 +1619,60 @@ function PreMoveState(drawingObjectsController, drawingObjects, startX, startY, 
     this.isPointInDrawingObjects = function(x, y)
     {
         return {objectId:this.majorObject.drawingBase.id, cursorType: "move"}
+    };
+}
+
+function ExtpectDoubleClickState(drawingObjectsController, drawingObjects)
+{
+    this.id = null;
+    this.drawingObjects = drawingObjects;
+    this.drawingObjectsController = drawingObjectsController;
+    this.nullState = new NullState(drawingObjectsController, drawingObjects);
+
+    this.onMouseDown = function(e, x, y)
+    {
+        this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
+        if(e.ClickCount > 1)
+        {
+            this.drawingObjects.showChartSettings();
+        }
+        else
+        {
+            this.drawingObjectsController.onMouseDown(e, x, y);
+        }
+
+    };
+
+    this.onMouseMove = function(e, x, y)
+    {
+        this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
+        this.drawingObjectsController.onMouseMove(e, x, y);
+    };
+
+
+    this.onMouseUp = function(e, x, y)
+    {
+        this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
+        this.drawingObjectsController.onMouseUp(e, x, y);
+    };
+
+    this.onKeyDown = function(e)
+    {
+
+    };
+
+    this.onKeyPress = function(e)
+    {
+    };
+
+    this.drawSelection = function(drawingDocument)
+    {
+        DrawDefaultSelection(this.drawingObjectsController, drawingDocument);
+    };
+
+    this.isPointInDrawingObjects = function(x, y)
+    {
+        return this.nullState.isPointInDrawingObjects(x, y);
     };
 }
 
@@ -1024,6 +1801,7 @@ function ChangeAdjState(drawingObjectsController, drawingObjects)
 
     this.onMouseUp = function(e, x, y)
     {
+        History.Create_NewPoint();
         this.drawingObjectsController.trackEnd();
         this.drawingObjectsController.clearTrackObjects();
         this.drawingObjects.selectGraphicObject();

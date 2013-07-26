@@ -4369,9 +4369,9 @@ function CTextPr()
     this.Underline  = undefined;
     this.FontFamily = undefined;
     this.themeFont  = undefined;
+    this.unifill    = undefined;
     this.FontSize   = undefined;
     this.Color      = undefined;
-    this.unifill    = undefined;
     this.VertAlign  = undefined;
     this.HighLight  = undefined; // highlight_None/Color
     this.RStyle     = undefined;
@@ -4438,6 +4438,10 @@ CTextPr.prototype =
 
         TextPr.FontSize   = this.FontSize;
 
+        TextPr.themeFont = this.themeFont;
+        if(isRealObject(this.unifill))
+            TextPr.unifill = this.unifill.createDuplicate();
+
         if ( undefined != this.Color )
             TextPr.Color = new CDocumentColor(this.Color.r, this.Color.g, this.Color.b);
 
@@ -4487,6 +4491,16 @@ CTextPr.prototype =
             this.FontFamily.Name  = TextPr.FontFamily.Name;
             this.FontFamily.Index = TextPr.FontFamily.Index;
         }
+
+        if(isRealObject(TextPr.unifill))
+        {
+            if(!isRealObject(this.unifill))
+                this.unifill = new CUniFill();
+            this.unifill.merge(TextPr.unifill);
+        }
+
+        if(typeof TextPr.themeFont === "string")
+            this.themeFont = TextPr.themeFont;
 
         if ( undefined != TextPr.FontSize )
             this.FontSize = TextPr.FontSize;
@@ -5606,6 +5620,7 @@ function CParaPr()
     this.Tabs              = undefined; // Заданные табы
     this.NumPr             = undefined; // Нумерация
     this.PStyle            = undefined; // Стиль параграфа
+    this.defRPr = undefined;
 }
 
 CParaPr.prototype =

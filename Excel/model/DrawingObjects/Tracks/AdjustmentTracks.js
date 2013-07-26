@@ -165,7 +165,9 @@ function XYAdjustmentTrack(originalShape, adjIndex)
 
     this.trackEnd = function()
     {
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateGeometry_Undo, null, null, new UndoRedoDataGraphicObjects(this.originalShape.Id, new UndoRedoDataShapeRecalc()), null);
         this.originalShape.setAdjustmentValue(this.refX, this.geometry.gdLst[this.adjastment.gdRefX], this.refY, this.geometry.gdLst[this.adjastment.gdRefY]);
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateGeometry_Redo, null, null, new UndoRedoDataGraphicObjects(this.originalShape.Id, new UndoRedoDataShapeRecalc()), null);
         this.originalShape.recalculateGeometry();
         this.originalShape.calculateContent();
         this.originalShape.calculateTransformTextMatrix();

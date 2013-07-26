@@ -6069,6 +6069,19 @@ function CBodyPr()
         this.wrap           = nTWTSquare;
     };
 
+    this.setChartTitleInsets = function()
+    {
+        this.rIns = 0.3;
+        this.lIns = 0.3;
+        this.tIns = 0.3;
+        this.bIns = 0;
+    };
+
+    this.setVert = function(vert)
+    {
+        this.vert = vert;
+    };
+
     this.createDuplicate = function()
     {
 

@@ -211,9 +211,47 @@ CShape.prototype =
     initDefaultTextRect: function()
     {},
 
+    setDrawingObjects: function(drawingObjects)
+    {
+        this.drawingObjects = drawingObjects;
+    },
+
     setGroup: function(group)
     {
         this.group = group;
+    },
+
+    getStyles: function(level)
+    {
+        var styles = new CStyles();
+        var ref_style = new CStyle("ref_style", styles.Default.Paragraph, null, styletype_Paragraph);
+        if(isRealObject(this.style) && isRealObject(this.style.fontRef))
+        {
+            switch(this.style.fontRef.idx)
+            {
+                case fntStyleInd_major:
+                {
+                    ref_style.TextPr.themeFont = "+mj-lt";
+                    break;
+                }
+                case fntStyleInd_minor:
+                {
+                    ref_style.TextPr.themeFont = "+mj-lt";
+                    break;
+                }
+            }
+
+            if(isRealObject(this.style.fontRef.Color) && isRealObject(this.style.fontRef.Color.color))
+            {
+                var unifill = new CUniFill();
+                unifill.fill = new CSolidFill();
+                unifill.fill.color = this.style.fontRef.Color.createDuplicate();
+                ref_style.TextPr.unifill = unifill;
+            }
+        }
+        styles.Style[styles.Id] = ref_style;
+        ++styles.Id;
+        return styles;
     },
 
     setDrawingBase: function(drawingBase)
@@ -444,7 +482,7 @@ CShape.prototype =
     {
         if(!isRealObject(this.txBody))
         {
-            this.addTextBody(new CTxBody(this));
+            this.addTextBody(new CTextBody(this));
             this.txBody.calculateContent();
         }
         this.txBody.paragraphAdd(paraItem, bRecalculate);
@@ -1077,6 +1115,16 @@ CShape.prototype =
         this.pen = _calculated_line;
     },
 
+    getColorMap: function()
+    {
+        return this.drawingObjects.controller.getColorMap();
+    },
+
+    getTheme: function()
+    {
+        return this.drawingObjects.getWorkbook().theme;
+    },
+
     recalculateGeometry: function()
     {
         if(isRealObject(this.spPr.geometry))
@@ -1114,6 +1162,15 @@ CShape.prototype =
         {
             this.txBody.drawTextSelection();
         }
+    },
+
+    Selection_Is_TableBorderMove: function()
+    {
+        if(isRealObject(this.txBody) && isRealObject(this.txBody.content))
+        {
+            return this.txBody.content.Selection_Is_TableBorderMove();
+        }
+        return false;
     },
 
     check_bounds: function(checker)
@@ -1962,6 +2019,13 @@ CShape.prototype =
 		return Props;
 	},
 	
+
+    addToDrawingObjects: function()
+    {
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Add_To_Drawing_Objects, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataClosePath()), null);
+        this.drawingObjects.addGraphicObject(this);
+    },
+
     Undo: function(type, data)
     {
         switch (type)
@@ -1971,6 +2035,17 @@ CShape.prototype =
                 this.recalculateTransform();
                 this.calculateContent();
                 this.calculateTransformTextMatrix();
+                break;
+            }
+            case historyitem_AutoShapes_RecalculateGeometry_Undo:
+            {
+                if(isRealObject(this.spPr.geometry))
+                    this.spPr.geometry.Recalculate(this.extX, this.extY);
+                break;
+            }
+            case historyitem_AutoShapes_Add_To_Drawing_Objects:
+            {
+                this.drawingObjects.deleteDrawingBase(this.Id);
                 break;
             }
         }
@@ -1985,6 +2060,17 @@ CShape.prototype =
                 this.recalculateTransform();
                 this.calculateContent();
                 this.calculateTransformTextMatrix();
+                break;
+            }
+            case historyitem_AutoShapes_RecalculateGeometry_Redo:
+            {
+                if(isRealObject(this.spPr.geometry))
+                    this.spPr.geometry.Recalculate(this.extX, this.extY);
+                break;
+            }
+            case historyitem_AutoShapes_Add_To_Drawing_Objects:
+            {
+                this.drawingObjects.addGraphicObject(this);
                 break;
             }
         }

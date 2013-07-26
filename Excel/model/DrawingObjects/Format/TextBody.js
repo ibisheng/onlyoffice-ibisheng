@@ -5,7 +5,7 @@
  * Time: 5:25 PM
  * To change this template use File | Settings | File Templates.
  */
-function CTxBody(shape)
+function CTextBody(shape)
 {
     this.shape = shape;
 
@@ -17,8 +17,10 @@ function CTxBody(shape)
     this.contentWidth = 0;
     this.contentHeight = 0;
 
+    this.styles = [];
+
 }
-CTxBody.prototype =
+CTextBody.prototype =
 {
     draw: function(graphics)
     {
@@ -27,7 +29,19 @@ CTxBody.prototype =
 
     Get_Styles: function(level)
     {
-        return new CStyles();//this.shape.Get_Styles(level);
+        if(!isRealObject(this.styles[level]))
+        {
+            var styles = this.shape.getStyles(level);
+
+            if(isRealObject(this.lstStyle) && this.shape instanceof  CShape)
+            {
+                var style = new CStyle("textBodyStyle", styles.Style.length - 1, null, styletype_Paragraph);
+                styles.Style[styles.Id] = style;
+                ++styles.Id;
+            }
+            this.styles[level] = styles;
+        }
+        return this.styles[level];
     },
 
     Get_Numbering: function()
@@ -35,9 +49,32 @@ CTxBody.prototype =
         return  new CNumbering();
     },
 
+    isEmpty: function()
+    {
+        return this.content.Is_Empty();
+    },
+
     Get_TableStyleForPara: function()
     {
         return null;
+    },
+
+    initFromString: function(str)
+    {
+        for(var key in str)
+        {
+            this.content.Paragraph_Add(new ParaText(str[key]), false);
+        }
+    },
+
+    getColorMap: function()
+    {
+        return this.shape.getColorMap();
+    },
+
+    getTheme: function()
+    {
+        return this.shape.getTheme();
     },
 
     paragraphAdd: function(paraItem)
@@ -62,7 +99,10 @@ CTxBody.prototype =
 
     getBodyPr: function()
     {
-        return this.bodyPr;
+        var res = new CBodyPr();
+        res.setDefault();
+        res.merge(this.bodyPr);
+        return res;
     },
 
 
@@ -70,7 +110,7 @@ CTxBody.prototype =
     {
         var _l, _t, _r, _b;
 
-        var _body_pr = this.bodyPr;
+        var _body_pr = this.getBodyPr();
         var sp = this.shape;
         if(isRealObject(sp.spPr.geometry) && isRealObject(sp.spPr.geometry.rect))
         {
@@ -196,5 +236,38 @@ CTxBody.prototype =
     drawTextSelection: function()
     {
         this.content.Selection_Draw_Page(0);
+    },
+
+    getRectWidth: function(maxWidth)
+    {
+        var body_pr = this.getBodyPr();
+        var r_ins = body_pr.rIns;
+        var l_ins = body_pr.lIns;
+        var max_content_width = maxWidth - r_ins - l_ins;
+        this.content.Reset(0, 0, max_content_width, 20000);
+        this.content.Recalculate_Page(0, true);
+        var max_width = 0;
+        for(var i = 0; i < this.content.Content.length; ++i)
+        {
+            var par = this.content.Content[i];
+            for(var j = 0; j < par.Lines.length; ++j)
+            {
+                if(par.Lines[j].Ranges[0].W + 1> max_width)
+                {
+                    max_width = par.Lines[j].Ranges[0].W;
+                }
+            }
+        }
+        return max_width + r_ins + l_ins;
+    },
+
+    getRectHeight: function(maxHeight, width)
+    {
+        this.content.Reset(0, 0, width, 20000);
+        this.content.Recalculate_Page(0, true);
+        var content_height = this.getSummaryHeight();
+        var t_ins = isRealNumber(this.bodyPr.tIns) ? this.bodyPr.tIns : 1.27;
+        var b_ins = isRealNumber(this.bodyPr.bIns) ? this.bodyPr.bIns : 1.27;
+        return content_height + t_ins + b_ins;
     }
 };

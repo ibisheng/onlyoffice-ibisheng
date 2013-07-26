@@ -240,6 +240,6 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
     {
         var shape = new CShape(null, this.drawingOjects);
         shape.initDefault(this.x, this.y, this.extX, this.extY, false, false, this.presetGeom);
-        this.drawingOjects.addGraphicObject(shape);
+        shape.addToDrawingObjects();
     };
 }

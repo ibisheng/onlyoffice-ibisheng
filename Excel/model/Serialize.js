@@ -5523,7 +5523,8 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
         }
 		else if ( c_oSer_DrawingType.GraphicFrame == type )
         {
-			var oBinary_ChartReader = new Binary_ChartReader(this.stream, oDrawing.chart);
+            oDrawing.graphicObject = new CChartAsGroup(oDrawing, oDrawing.getDrawingObjects());
+			var oBinary_ChartReader = new Binary_ChartReader(this.stream,  oDrawing.graphicObject.chart,  oDrawing.graphicObject);
 			res = oBinary_ChartReader.Read(length);
         }
         else

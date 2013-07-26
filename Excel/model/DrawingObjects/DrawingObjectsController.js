@@ -13,10 +13,95 @@ function DrawingObjectsController(drawingObjects)
     this.selectedObjects = [];
     this.arrPreTrackObjects = [];
     this.arrTrackObjects = [];
+    this.defaultColorMap = GenerateDefaultColorMap().color_map;
 }
 
 DrawingObjectsController.prototype =
 {
+    getColorMap: function()
+    {
+        return this.defaultColorMap;
+    },
+
+    getAscChartObject: function()
+    {
+        if(this.selectedObjects.length === 1)
+        {
+            if(this.selectedObjects[0].isChart())
+                return this.selectedObjects[0].chart;
+            if(isRealObject(this.curState.group))
+            {
+                if(this.curState.group.selectedObjects.length === 1)
+                {
+                    if(this.curState.group.selectedObjects[0].isChart())
+                        return this.curState.group.selectedObjects[0].chart;
+                }
+            }
+        }
+        var chart = new asc_CChart();
+        var worksheet = this.drawingObjects.getWorksheet();
+        chart.range.interval = function() {
+            var result = "";
+            if (worksheet) {
+                var selectedRange = worksheet.getSelectedRange();
+                if (selectedRange) {
+                    var box = selectedRange.getBBox0();
+                    var startCell = new CellAddress(box.r1, box.c1, 0);
+                    var endCell = new CellAddress(box.r2, box.c2, 0);
+
+                    if (startCell && endCell) {
+                        var wsName = worksheet.model.sName;
+                        if ( !rx_test_ws_name.test(wsName) )
+                            wsName = "'" + wsName + "'";
+
+                        if (startCell.getID() == endCell.getID())
+                            result = wsName + "!" + startCell.getID();
+                        else
+                            result = wsName + "!" + startCell.getID() + ":" + endCell.getID();
+                    }
+                }
+            }
+            return result;
+        }();
+
+        chart.range.intervalObject = function() {
+            return worksheet ? worksheet.getSelectedRange() : null;
+        }();
+        return chart;
+    },
+
+    editChartDrawingObjects: function(chart)
+    {
+        if(this.selectedObjects.length === 1)
+        {
+            if(this.selectedObjects[0].isChart())
+            {
+                this.selectedObjects[0].setChart(chart);
+                this.selectedObjects[0].recalculate();
+                return;
+
+            }
+            if(isRealObject(this.curState.group))
+            {
+                if(this.curState.group.selectedObjects.length === 1)
+                {
+                    if(this.curState.group.selectedObjects[0].isChart())
+                    {
+                        this.curState.group.selectedObjects[0].setChart(chart);
+                        this.curState.group.selectedObjects[0].recalculate();
+                        return;
+                    }
+                }
+            }
+        }
+    },
+
+    addChartDrawingObject: function(chart, bWithoutHistory, options)
+    {
+        var chart_as_group = new CChartAsGroup(null, this.drawingObjects);
+        chart_as_group.initFromChartObject(chart, bWithoutHistory, options);
+    },
+
     changeCurrentState: function(newState)
     {
         this.curState = newState;
@@ -24,8 +109,19 @@ DrawingObjectsController.prototype =
 
     recalculateCurPos: function()
     {
+
         if(this.curState.id === STATES_ID_TEXT_ADD)
-            this.curState.textObject.recalculateCurPos();
+        {
+            try
+            {
+                this.curState.textObject.recalculateCurPos();
+            }
+            catch (e)
+            {
+
+            }
+
+        }
     },
 
     onMouseDown: function(e, x, y)

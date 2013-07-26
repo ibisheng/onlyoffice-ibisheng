@@ -80,6 +80,15 @@ CGroupShape.prototype =
         return false;
     },
 
+    setDrawingObjects: function(drawingObjects)
+    {
+        this.drawingObjects = drawingObjects;
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            this.spTree[i].setDrawingObjects(drawingObjects);
+        }
+    },
+
     setDrawingBase: function(drawingBase)
     {
         this.drawingBase = drawingBase;
@@ -821,7 +830,14 @@ CGroupShape.prototype =
     createResizeTrack: function(cardDirection)
     {
         return new ResizeTrackGroup(this, cardDirection);
+    },
+
+    addToDrawingObjects: function()
+    {
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Add_To_Drawing_Objects, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataClosePath()), null);
+        this.drawingObjects.addGraphicObject(this);
     }
+
 };
 
 function normalizeRotate(rot)

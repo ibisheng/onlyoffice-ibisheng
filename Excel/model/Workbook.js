@@ -2324,9 +2324,9 @@ Woorksheet.prototype.initPostOpen = function(){
 		for(var i = this.Drawings.length - 1; i >= 0; --i)
 		{
 			var obj = this.Drawings[i];
-			if(obj.isChart())
+			if(obj.graphicObject && obj.graphicObject.chart)
 			{
-				var chart = obj.chart;
+				var chart = obj.graphicObject.chart;
 				//анализируем series
 				var oBounds = null;
 				var ws = null;

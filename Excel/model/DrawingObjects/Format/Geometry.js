@@ -919,7 +919,7 @@ CGeometry.prototype=
 
     AddAdj: function(name, formula, x, y, z)
     {
-        History.Add(g_oUndoRedoGraphicObjects, this, historyitem_AutoShapes_Add_Adjustment, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataAddAdjustment(name, x)), null);
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Add_Adjustment, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataAddAdjustment(name, parseInt(x))), null);
         this.gdLst[name] = parseInt(x);
         this.avLst[name] = true;
 
@@ -927,7 +927,7 @@ CGeometry.prototype=
 
     AddGuide: function(name, formula, x, y, z)
     {
-        History.Add(g_oUndoRedoGraphicObjects, this, historyitem_AutoShapes_Add_Guide, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataAddGuide(name, formula, x, y, z)), null);
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Add_Guide, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataAddGuide(name, formula, x, y, z)), null);
         this.gdLstInfo.push(
             {
                 name: name,
@@ -941,7 +941,7 @@ CGeometry.prototype=
 
     AddCnx: function(ang, x, y)
     {
-        History.Add(g_oUndoRedoGraphicObjects, this, historyitem_AutoShapes_Add_Cnx, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataAddCnx(ang, x, y)), null);
+        History.Add(g_oUndoRedoGraphicObjects,  historyitem_AutoShapes_Add_Cnx, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataAddCnx(ang, x, y)), null);
         this.cnxLstInfo.push(
             {
                 ang:ang,
@@ -952,7 +952,7 @@ CGeometry.prototype=
 
     AddHandleXY: function(gdRefX, minX, maxX, gdRefY, minY, maxY, posX, posY)
     {
-        History.Add(g_oUndoRedoGraphicObjects, this, historyitem_AutoShapes_Add_Handle_XY, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataAddHandleXY(gdRefX, minX, maxX, gdRefY, minY, maxY, posX, posY)), null);
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Add_Handle_XY, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataAddHandleXY(gdRefX, minX, maxX, gdRefY, minY, maxY, posX, posY)), null);
         this.ahXYLstInfo.push(
             {
                 gdRefX:gdRefX,
@@ -970,7 +970,7 @@ CGeometry.prototype=
 
     AddHandlePolar: function(gdRefAng, minAng, maxAng, gdRefR, minR, maxR, posX, posY)
     {
-        History.Add(g_oUndoRedoGraphicObjects, this, historyitem_AutoShapes_Add_Handle_Polar, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataAddHandlePolar(gdRefAng, minAng, maxAng, gdRefR, minR, maxR, posX, posY)), null);
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Add_Handle_Polar, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataAddHandlePolar(gdRefAng, minAng, maxAng, gdRefR, minR, maxR, posX, posY)), null);
         this.ahPolarLstInfo.push(
             {
                 gdRefAng:gdRefAng,
@@ -1030,13 +1030,13 @@ CGeometry.prototype=
 
     AddPath: function(path)
     {
-        History.Add(g_oUndoRedoGraphicObjects, this, historyitem_AutoShapes_Add_Path, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataAddObject(path.Id)), null);
+        History.Add(g_oUndoRedoGraphicObjects,  historyitem_AutoShapes_Add_Path, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataAddObject(path.Id)), null);
         this.pathLst.push(path);
     },
 
     AddRect: function(l, t, r, b)
     {
-        History.Add(g_oUndoRedoGraphicObjects, this, historyitem_AutoShapes_Add_GeometryRect, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataAddGeometryRect(l, t, r, b)), null);
+        History.Add(g_oUndoRedoGraphicObjects,  historyitem_AutoShapes_Add_GeometryRect, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataAddGeometryRect(l, t, r, b)), null);
         this.rectS = {};
         this.rectS.l = l;
         this.rectS.t = t;
@@ -1306,7 +1306,7 @@ CGeometry.prototype=
     {
         if(isRealNumber(this.gdLst[gdRef]))
         {
-            History.Add(g_oUndoRedoDrawingObject, historyitem_AutoShapes_SetGuideValue, model_id, null, {object: this, data:{ gdRef: gdRef, oldValue: this.gdLst[gdRef], newValue: gdValue}});
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetGuideValue, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataSetAdjustmentValue(gdRef, this.gdLst[gdRef], gdValue)), null);
             this.gdLst[gdRef] = gdValue;
         }
     },
@@ -1391,12 +1391,30 @@ CGeometry.prototype=
                 delete this.rectS.b;
                 break;
             }
+
+            case historyitem_AutoShapes_SetGuideValue:
+            {
+                this.gdLst[data.gdName] = data.oldVal;
+                break;
+            }
+            case historyitem_AutoShapes_Add_Handle_XY:
+            {
+
+                this.ahXYLstInfo.splice(this.ahXYLstInfo.length - 1, 1);
+                break;
+            }
+            case historyitem_AutoShapes_Add_Handle_Polar:
+            {
+
+                this.ahPolarLstInfo.splice(this.ahPolarLstInfo.length - 1, 1);
+                break;
+            }
         }
     },
 
     Redo: function(type, data)
     {
-        switch(data.Type)
+        switch(type)
         {
             case historyitem_AutoShapes_Add_Adjustment:
             {
@@ -1483,6 +1501,46 @@ CGeometry.prototype=
                 this.rectS.t = data.t;
                 this.rectS.r = data.r;
                 this.rectS.b = data.b;
+                break;
+            }
+            case historyitem_AutoShapes_SetGuideValue:
+            {
+                this.gdLst[data.gdName] = data.newVal;
+                break;
+            }
+            case historyitem_AutoShapes_Add_Handle_XY:
+            {
+
+                this.ahXYLstInfo.push(
+                    {
+                        gdRefX:data.gdRefX,
+                        minX:data.minX,
+                        maxX:data.maxX,
+
+                        gdRefY:data.gdRefY,
+                        minY:data.minY,
+                        maxY:data.maxY,
+
+                        posX:data.posX,
+                        posY:data.posY
+                    });
+                break;
+            }
+            case historyitem_AutoShapes_Add_Handle_Polar:
+            {
+                this.ahPolarLstInfo.push(
+                    {
+                        gdRefAng:data.gdRefAng,
+                        minAng:data.minAng,
+                        maxAng:data.maxAng,
+
+                        gdRefR:data.gdRefR,
+                        minR:data.minR,
+                        maxR:data.maxR,
+
+                        posX:data.posX,
+                        posY:data.posY
+                    });
                 break;
             }
         }

@@ -350,6 +350,8 @@ var UndoRedoDataTypes = new function() {
     this.GOPathQuadBezTo = 59;
     this.GOPathCubicBezTo = 60;
     this.GOPathClose = 61;
+    this.GOSetAdjustmentValue = 62;
+
 
     this.Create = function(nType)
 	{
@@ -416,6 +418,7 @@ var UndoRedoDataTypes = new function() {
             case this.GOPathQuadBezTo: return new UndoRedoDataQuadBezTo(); break;
             case this.GOPathCubicBezTo: return new UndoRedoDataCubicBezTo(); break;
             case this.GOPathClose: return new UndoRedoDataClosePath(); break;
+            case this.GOSetAdjustmentValue: return new UndoRedoDataSetAdjustmentValue();
 
         }
 		return null;
@@ -954,6 +957,7 @@ function UndoRedoData_GTableIdAdd(object, id)
         id: 1
     };
 
+    if(typeof object.getObjectType === "function" )
     this.objectType = object.getObjectType();
     this.id = id;
 }
@@ -1803,7 +1807,7 @@ function UndoRedoDataAddGeometryRect(l, t, r, b)
     this.b = b;
 }
 
-UndoRedoDataAddObject.prototype =
+UndoRedoDataAddGeometryRect.prototype =
 {
     getType : function ()
     {
@@ -2069,6 +2073,53 @@ UndoRedoDataClosePath.prototype =
     setProperty : function (nType, value)
     {
 
+    }
+};
+
+function UndoRedoDataSetAdjustmentValue(gdName, oldVal, newVal)
+{
+    this.Properties = {
+        gdName:0,
+        oldVal: 1,
+        newVal: 2
+    };
+
+    this.gdName = gdName;
+    this.oldVal = oldVal;
+    this.newVal = newVal;
+}
+
+
+UndoRedoDataSetAdjustmentValue.prototype =
+{
+    getType : function ()
+    {
+        return UndoRedoDataTypes.GOSetAdjustmentValue;
+    },
+    getProperties : function ()
+    {
+        return this.Properties;
+    },
+    getProperty : function (nType)
+    {
+
+        switch (nType)
+        {
+            case this.Properties.gdName: return this.gdName;
+            case this.Properties.oldVal: return this.oldVal;
+            case this.Properties.newVal: return this.newVal;
+        }
+        return null;
+    },
+
+    setProperty : function (nType, value)
+    {
+        switch (nType)
+        {
+            case this.Properties.gdName: this.gdName = value; break;
+            case this.Properties.oldVal: this.oldVal = value; break;
+            case this.Properties.newVal: this.newVal = value; break;
+        }
     }
 };
 

@@ -101,6 +101,16 @@ var historyitem_AutoShapes_Add_PathArcTo = 20;
 var historyitem_AutoShapes_Add_PathQuadBezTo = 21;
 var historyitem_AutoShapes_Add_PathCubicBezTo = 22;
 var historyitem_AutoShapes_Add_PathClose = 23;
+var historyitem_AutoShapes_RecalculateGeometry_Undo = 24;
+var historyitem_AutoShapes_RecalculateGeometry_Redo = 25;
+var historyitem_AutoShapes_Add_To_Drawing_Objects = 26;
+var historyitem_AutoShapes_Layout_Set_X_Mode = 27;
+var historyitem_AutoShapes_Layout_Set_Y_Mode = 28;
+var historyitem_AutoShapes_Layout_Set_X = 29;
+var historyitem_AutoShapes_Layout_Set_Y = 30;
+
+
+
 
 
 
