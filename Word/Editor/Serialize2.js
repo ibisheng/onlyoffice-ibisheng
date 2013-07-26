@@ -2363,7 +2363,14 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap)
 			{
 				var row = cell.Row;
 				var table = row.Table;
-				if(table.Internal_GetVertMergeCount( nRowIndex, row.Get_CellInfo( nColIndex ).StartGridCol, cell.Get_GridSpan() ) > 1)
+				var BeforeInfo = row.Get_Before();
+				var StartGridCol = BeforeInfo.GridBefore;
+				for(var i = 0; i < nColIndex; ++i)
+				{
+					var cellTemp = row.Get_Cell( i );
+					StartGridCol += cellTemp.Get_GridSpan();
+				}
+				if(table.Internal_GetVertMergeCount( nRowIndex, StartGridCol, cell.Get_GridSpan() ) > 1)
 					vMerge = vmerge_Restart;
 			}
 			this.bs.WriteItem(c_oSerDocTableType.Cell_Pr, function(){oThis.btblPrs.WriteCellPr(cell.Pr, vMerge);});
