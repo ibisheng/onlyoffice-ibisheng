@@ -19,27 +19,6 @@ CDegreeOrdinary.prototype.init_2 = function(base)
 
     this.addMCToContent(base, degree);
 }
-CDegreeOrdinary.prototype.old_setContent = function()
-{
-    var oBase = null;
-    if(arguments.length > 0)
-        oBase = arguments[0];
-    else
-    {
-        oBase = new CMathContent();
-        oBase.init( this.params );
-        oBase.relate(this);
-        oBase.fillPlaceholders();
-    }
-
-    var oDegree = new CMathContent();
-    oDegree.init( this.params );
-    oDegree.relate(this);
-    oDegree.fillPlaceholders();
-    oDegree.setFont(getTypeDegree(this.params.font), -1);
-
-    CDegreeOrdinary.superclass.setContent.call(this, oBase, oDegree);
-}
 CDegreeOrdinary.prototype.setIndex = function(index)
 {
     this.index = index;
@@ -274,39 +253,6 @@ CDegreeSubSup.prototype.init_2 = function(oBase)
     {
         oIters.alignHor(-1, 1);
         this.addMCToContent(oIters, oBase);
-    }
-}
-CDegreeSubSup.prototype.old_setContent = function()
-{
-    var oBase = null;
-    if(arguments.length > 0)
-        oBase = arguments[0];
-    else
-    {
-        oBase = new CMathContent();
-        oBase.init( this.params );
-        oBase.relate(this);
-        oBase.fillPlaceholders();
-    }
-
-    var oIters = new CIterators();
-    oIters.init( this.params );
-    oIters.relate(this);
-    oIters.fillPlaceholders();
-    oIters.setFont(getTypeDegree(this.params.font), -1);
-
-    oIters.lUp = 0;
-    oIters.lD = 0;
-
-    if(this.type == 0)
-    {
-        oIters.alignHor(-1, 0);
-        CDegreeSubSup.superclass.setContent.call(this, oBase, oIters);
-    }
-    else
-    {
-        oIters.alignHor(-1, 1);
-        CDegreeSubSup.superclass.setContent.call(this, oIters, oBase);
     }
 }
 CDegreeSubSup.prototype.recalculateSize = function()

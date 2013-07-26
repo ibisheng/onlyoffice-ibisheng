@@ -2081,44 +2081,6 @@ CStructArrow.prototype.init = function(type, loc, turn)
         this.addMCToContent(argument, operator);
     
 }
-CStructArrow.prototype.old_setContent = function()
-{
-    var operator;
-
-    if(this.type == 0)
-        operator = new CHalfArrow();
-    else if(this.type == 1)
-        operator = new CSingleArrow();
-    else if(this.type == 2)
-        operator = new CLeftRightArrow();
-    else if(this.type == 3)
-        operator = new CDoubleArrow();
-    else if(this.type == 4)
-        operator = new CLR_DoubleArrow();
-    else if(this.type == 5)
-        operator = new CCombiningArrow();
-
-    operator.init(this.params);
-    operator.setLocation(this.loc, this.turn);
-
-    var params2 =  Common_CopyObj(this.params);
-    params2.font = getTypeDegree(params2.font);
-
-    var argument = new CMathContent();
-    //var argument = new CDenominator();
-    argument.init(params2);
-    argument.relate(this);
-    argument.fillPlaceholders();
-
-    if(this.loc == 0)
-    {
-        CStructArrow.superclass.setContent.call(this, operator, argument);
-    }
-    else
-    {
-        CStructArrow.superclass.setContent.call(this, argument, operator);
-    }
-}
 CStructArrow.prototype.getCenter = function()
 {
     var center, sizeGlyph;

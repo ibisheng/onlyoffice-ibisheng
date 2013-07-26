@@ -63,30 +63,6 @@ CMinimaxFunc.prototype.init = function()
 
     this.addMCToContent(oBase, oIter);
 }
-CMinimaxFunc.prototype.old_setContent = function()
-{
-    var oBase = new CMathContent();
-    var GParams = Common_CopyObj(this.params);
-    GParams.bMText = false;
-    oBase.init(GParams);
-    oBase.relate(this);
-
-    if(this.num == 0)
-        oBase.addText("min");
-    else if(this.num == 1)
-        oBase.addText("max");
-    else
-        oBase.addText("lim");
-
-    var oIter = new CMathContent();
-    GParams = Common_CopyObj(this.params);
-    GParams.font = getTypeDegree(this.params.font);
-    oIter.init(GParams);
-    oIter.relate(this);
-    oIter.fillPlaceholders();
-
-    CMinimaxFunc.superclass.setContent.call(this, oBase, oIter);
-}
 CMinimaxFunc.prototype.getCenter = function()
 {
     return this.elements[0][0].size.center;
@@ -127,27 +103,6 @@ CMinimax.prototype.init = function()
     var oArg = new CMathContent();
 
     this.addMCToContent(oFunc, oArg);
-}
-CMinimax.prototype.old_setContent = function()
-{
-    var oFunc = new CMinimaxFunc(this.num);
-    oFunc.init(this.params);
-    oFunc.relate(this);
-    oFunc.setContent();
-
-    var oArg = new CMathContent();
-    oArg.init(this.params);
-    oArg.relate(this);
-    oArg.fillPlaceholders();
-
-    CMinimax.superclass.setContent.call(this, oFunc, oArg);
-}
-CMinimax.prototype.old_setDistance = function()
-{
-    //todo
-    //переделать !
-    this.dW = slashWidth(this.params.font);
-    this.dH = 0;
 }
 CMinimax.prototype.getFunction = function()
 {

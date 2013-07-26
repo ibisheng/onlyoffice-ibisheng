@@ -248,6 +248,9 @@ CMathContent.prototype =
             case 20:
                 mathElem = new CStructArrow();
                 break;
+            case 21:
+                mathElem = new CMathMatrix();
+                break;
             case 30:
                 mathElem = new CMathBase();
                 break;
@@ -1752,6 +1755,256 @@ CMathContent.prototype =
                 var base = arrow.getBase();
                 base.addTxt("∆");
                 break;
+            case 206:
+                var matrix = this.createMComponent(21);
+                matrix.init(1, 2);
+                matrix.fillPlaceholders();
+                break;
+            case 207:
+                var matrix = this.createMComponent(21);
+                matrix.init(2, 1);
+                matrix.fillPlaceholders();
+                break;
+            case 208:
+                var matrix = this.createMComponent(21);
+                matrix.init(1, 3);
+                matrix.fillPlaceholders();
+                break;
+            case 209:
+                var matrix = this.createMComponent(21);
+                matrix.init(3, 1);
+                matrix.fillPlaceholders();
+                break;
+            case 210:
+                var matrix = this.createMComponent(21);
+                matrix.init(2, 2);
+                matrix.fillPlaceholders();
+                break;
+            case 211:
+                var matrix = this.createMComponent(21);
+                matrix.init(2, 3);
+                matrix.fillPlaceholders();
+                break;
+            case 212:
+                var matrix = this.createMComponent(21);
+                matrix.init(3, 2);
+                matrix.fillPlaceholders();
+                break;
+            case 213:
+                var matrix = this.createMComponent(21);
+                matrix.init(3, 3);
+                matrix.fillPlaceholders();
+                break;
+            case 214:
+                this.addTxt("⋯");
+                break;
+            case 215:
+                this.addTxt("…");
+                break;
+            case 216:
+                this.addTxt("⋮");
+                break;
+            case 217:
+                this.addTxt("⋱");
+                break;
+            case 218:
+                var matrix = this.createMComponent(21);
+                matrix.init(2, 2);
+                elem1 = matrix.getElement(0,0);
+                elem1.addTxt("1");
+
+                elem2 = matrix.getElement(0,1);
+                elem2.addTxt("0");
+
+                elem3 = matrix.getElement(1,0);
+                elem3.addTxt("0");
+
+                elem4 = matrix.getElement(1,1);
+                elem4.addTxt("1");
+                break;
+            case 219:
+                var matrix = this.createMComponent(21);
+                matrix.init(2, 2);
+                matrix.hidePlaceholder(true);
+
+                elem1 = matrix.getElement(0,0);
+                elem1.addTxt("1");
+
+                elem2 = matrix.getElement(0,1);
+                elem2.fillPlaceholders();
+
+                elem3 = matrix.getElement(1,0);
+                elem3.fillPlaceholders();
+
+                elem4 = matrix.getElement(1,1);
+                elem4.addTxt("1");
+                break;
+            case 220:
+                var matrix  = this.createMComponent(21);
+                matrix.init(3, 3);
+
+                elem1 = matrix.getElement(0,0);
+                elem1.addTxt("1");
+
+                elem2 = matrix.getElement(0,1);
+                elem2.addTxt("0");
+
+                elem3 = matrix.getElement(0,2);
+                elem3.addTxt("0");
+
+                elem4 = matrix.getElement(1,0);
+                elem4.addTxt("0");
+
+                elem5 = matrix.getElement(1,1);
+                elem5.addTxt("1");
+
+                elem6 = matrix.getElement(1,2);
+                elem6.addTxt("0");
+
+                elem7 = matrix.getElement(2,0);
+                elem7.addTxt("0");
+
+                elem8 = matrix.getElement(2,1);
+                elem8.addTxt("0");
+
+                elem9 = matrix.getElement(2,2);
+                elem9.addTxt("1");
+
+                break;
+            case 221:
+                var matrix  = this.createMComponent(21);
+                matrix.init(3, 3);
+                
+                matrix.hidePlaceholder(true);
+                elem1 = matrix.getElement(0,0);
+                elem1.addTxt("1");
+
+                elem2 = matrix.getElement(0,1);
+                elem2.fillPlaceholders();
+
+                elem3 = matrix.getElement(0,2);
+                elem3.fillPlaceholders();
+
+                elem4 = matrix.getElement(1,0);
+                elem4.fillPlaceholders();
+
+                elem5 = matrix.getElement(1,1);
+                elem5.addTxt("1");
+
+                elem6 = matrix.getElement(1,2);
+                elem6.fillPlaceholders();
+
+                elem7 = matrix.getElement(2,0);
+                elem7.fillPlaceholders();
+
+                elem8 = matrix.getElement(2,1);
+                elem8.fillPlaceholders();
+
+                elem9 = matrix.getElement(2,2);
+                elem9.addTxt("1");
+                break;
+            case 222:
+                var delim = this.createMComponent(9);
+                delim.init(0, 4, 0, 1);
+                base = delim.getBase();
+                var matrix = base.createMComponent(21);
+                matrix.init(2, 2);
+                matrix.fillPlaceholders();
+                break;
+            case 223:
+                var delim = this.createMComponent(9);
+                delim.init(2, 4, 0, 1);
+                base = delim.getBase();
+                var matrix = base.createMComponent(21);
+                matrix.init(2, 2);
+                matrix.fillPlaceholders();
+                break;
+            case 224:
+                var delim = this.createMComponent(9);
+                delim.init(5, 4, 0, 1);
+                base = delim.getBase();
+                var matrix = base.createMComponent(21);
+                matrix.init(2, 2);
+                matrix.fillPlaceholders();
+                break;
+            case 225:
+                var delim = this.createMComponent(9);
+                delim.init(6, 4, 0, 1);
+                base = delim.getBase();
+                var matrix = base.createMComponent(21);
+                matrix.init(2, 2);
+                matrix.fillPlaceholders();
+                break;
+            case 226:
+                var delim = this.createMComponent(9);
+                delim.init(0, 4, 0, 1);
+                base = delim.getBase();
+                var matrix  = base.createMComponent(21);
+                matrix.init(3, 3);
+
+                elem1 = matrix.getElement(0,0);
+                elem1.fillPlaceholders();
+
+                elem2 = matrix.getElement(0,1);
+                elem2.addTxt("⋯");
+
+                elem3 = matrix.getElement(0,2);
+                elem3.fillPlaceholders();
+
+                elem4 = matrix.getElement(1,0);
+                elem4.addTxt("⋮");
+
+                elem5 = matrix.getElement(1,1);
+                elem5.addTxt("⋱");
+
+                elem6 = matrix.getElement(1,2);
+                elem6.addTxt("⋮");
+
+                elem7 = matrix.getElement(2,0);
+                elem7.fillPlaceholders();
+
+                elem8 = matrix.getElement(2,1);
+                elem8.addTxt("⋯");
+
+                elem9 = matrix.getElement(2,2);
+                elem9.fillPlaceholders();
+
+                break;
+            case 227:
+                var delim = this.createMComponent(9);
+                delim.init(2, 4, 0, 1);
+                base = delim.getBase();
+                var matrix  = base.createMComponent(21);
+                matrix.init(3, 3);
+
+                elem1 = matrix.getElement(0,0);
+                elem1.fillPlaceholders();
+
+                elem2 = matrix.getElement(0,1);
+                elem2.addTxt("⋯");
+
+                elem3 = matrix.getElement(0,2);
+                elem3.fillPlaceholders();
+
+                elem4 = matrix.getElement(1,0);
+                elem4.addTxt("⋮");
+
+                elem5 = matrix.getElement(1,1);
+                elem5.addTxt("⋱");
+
+                elem6 = matrix.getElement(1,2);
+                elem6.addTxt("⋮");
+
+                elem7 = matrix.getElement(2,0);
+                elem7.fillPlaceholders();
+
+                elem8 = matrix.getElement(2,1);
+                elem8.addTxt("⋯");
+
+                elem9 = matrix.getElement(2,2);
+                elem9.fillPlaceholders();
+
+                break;
 
         }
     },
@@ -2329,6 +2582,8 @@ CMathContent.prototype =
     {
         for(var i = 0; i < this.content.length; i++)
             this.content[i].value.Resize();
+
+        this.rInterval.startPos = this.rInterval.endPos = this.CurPos;
 
         this.recalculateSize();
     },
