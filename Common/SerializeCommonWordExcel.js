@@ -1468,7 +1468,7 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
         if(c_oSer_ChartLegendEntryType.Index === type)
             oLegendEntry.idx = this.stream.GetULongLE();
 		else if(c_oSer_ChartLegendEntryType.Delete === type)
-            oLegendEntry.delete = this.stream.GetBool();
+            oLegendEntry.bDelete = this.stream.GetBool();
 		else if(c_oSer_ChartLegendEntryType.TxPrPptx === type)
 		{
             var oPresentationSimpleSerializer = new CPPTXContentLoader();
