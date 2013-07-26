@@ -894,7 +894,7 @@
 				t._updateUndoRedoChanged();
 			},
 
-			_fireUpdated: function () {
+            _fireUpdated: function () {
 				var t = this;
 				var s = t._getFragmentsText(t.options.fragments);
 				var isFormula = s.charAt(0) === "=";
@@ -905,9 +905,9 @@
 				}
 
 				if (isFormula) {
-					funcPos = asc_lastidx(s, t.reNotFormula, t.cursorPos) + 1;
+					funcPos = asc_lastidx(s,  /[^a-z0-9_]/i, t.cursorPos) + 1;
 					if (funcPos > 0) {
-						match = s.slice(funcPos).match(t.reFormula);
+						match = s.slice(funcPos).match( /^([a-z_][a-z0-9_]*)/i);
 					}
 					if (match) {
 						funcName = match[1];
