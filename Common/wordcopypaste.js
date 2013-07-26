@@ -1066,9 +1066,11 @@ CopyProcessor.prototype =
 
         tr.appendChild(tc);
     },
-    CopyRow : function(oDomTarget, table, nCurRow, start, end)
+    CopyRow : function(oDomTarget, table, nCurRow, elems, nMaxRow)
     {
         var row = table.Content[nCurRow];
+		if(null == elems)
+			elems = {Start: 0, End: row.Content.length - 1};
         var tr = document.createElement( "tr" );
         //Pr
         var grid = table.TableGrid;
@@ -1112,7 +1114,7 @@ CopyProcessor.prototype =
             tr.setAttribute("style", trStyle);
         //tc
 		var nSumGridSpan = nGridBefore;
-        for(var i = start.Cell, length = row.Content.length; i <= end.Cell && i < length; ++i)
+        for(var i = elems.Start; i <= elems.End; ++i)
         {
             var cell = row.Content[i];
             var nGridSpan = 1;
@@ -1128,7 +1130,7 @@ CopyProcessor.prototype =
                 width += grid[nGridBefore + nSumGridSpan + j];
 			//��������� rowspan
             var nRowSpan = 1;
-            for(var j = nCurRow + 1, length2 = table.Content.length; j <= end.Row && j < length2; ++j)
+            for(var j = nCurRow + 1; j <= nMaxRow; ++j)
             {
                 var bContinue = false;
 				var oBottomRow = table.Content[j];
@@ -1195,7 +1197,7 @@ CopyProcessor.prototype =
 
         oDomTarget.appendChild(tr);
     },
-    CopyTable : function(oDomTarget, table, start, end)
+    CopyTable : function(oDomTarget, table, oRowElems)
     {
         this.CommitList(oDomTarget);
         var DomTable = document.createElement( "table" );
@@ -1276,8 +1278,23 @@ CopyProcessor.prototype =
             DomTable.setAttribute("style", tblStyle);
 
         //rows
-        for(var i = start.Row, length = table.Content.length; i < length && i <= end.Row; i++)
-            this.CopyRow(DomTable, table, i ,start, end);
+		if(null == oRowElems)
+		{
+			for(var i = 0, length = table.Content.length; i < length; i++)
+				this.CopyRow(DomTable, table, i , null, table.Content.length - 1);
+		}
+		else
+		{
+			var nMaxRow = 0;
+			for(var i in oRowElems)
+			{
+				var nCurRow = i - 0;
+				if(nCurRow > nMaxRow)
+					nMaxRow = nCurRow;
+			}
+			for(var i in oRowElems)
+				this.CopyRow(DomTable, table, i - 0, oRowElems[i], nMaxRow);
+		}
 
         oDomTarget.appendChild(DomTable);
     },
@@ -1344,26 +1361,29 @@ CopyProcessor.prototype =
                     else if(table_Selection_Cell == Item.Selection.Type)
                     {
                         //������� �������� �����
-						var start = {Row:Item.Rows, Cell: Item.Cols};
-						var end = {Row:0, Cell: 0};
-						for(var i = 0, length = Item.Selection.Data.length; i < length; ++i)
-						{
-							var elem = Item.Selection.Data[i];
-							if(elem.Row > end.Row)
-								end.Row = elem.Row;
-							if(elem.Row < start.Row)
-								start.Row = elem.Row;
-							if(elem.Cell > end.Cell)
-								end.Cell = elem.Cell;
-							if(elem.Cell < start.Cell)
-								start.Cell = elem.Cell;
-						}
+						var oRowElems = new Object();
 						if(Item.Selection.Data.length > 0)
-                        	this.CopyTable(oDomTarget, Item, start, end);
+						{
+							for(var i = 0, length = Item.Selection.Data.length; i < length; ++i)
+							{
+								var elem = Item.Selection.Data[i];
+								var rowElem = oRowElems[elem.Row];
+								if(null == rowElem)
+								{
+									rowElem = {Start: elem.Cell, End: elem.Cell}
+									oRowElems[elem.Row] = rowElem;
+								}
+								if(elem.Cell < rowElem.Start)
+									rowElem.Start = elem.Cell;
+								if(elem.Cell > rowElem.End)
+									rowElem.End = elem.Cell;
+							}
+                        	this.CopyTable(oDomTarget, Item, oRowElems);
+						}
                     }
                 }
                 else
-                    this.CopyTable(oDomTarget, Item, {Row:0, Cell: 0}, {Row:Item.Rows, Cell: Item.Cols});
+                    this.CopyTable(oDomTarget, Item, null);
             }
             else if ( type_Paragraph === Item.GetType() )
             {
@@ -3585,7 +3605,7 @@ PasteProcessor.prototype =
             this._MergeCells(table, item.start, item.rowspan, item.colspan);
         }
         //After,Before
-        for(var i = 0; i < table.Rows; ++i)
+        for(var i = 0; i < table.Content.length; ++i)
         {
             var Row = table.Content[i];
             var nRowLength = Row.Content.length;
