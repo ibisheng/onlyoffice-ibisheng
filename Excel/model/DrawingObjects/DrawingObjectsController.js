@@ -768,7 +768,6 @@ DrawingObjectsController.prototype =
 			}
 		}
 		this.drawingObjects.showDrawingObjects(true);
-		this.drawingObjects.selectGraphicObject();
 		this.drawingObjects.sendGraphicObjectProps();
 	}
 };

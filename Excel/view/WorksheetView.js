@@ -6016,11 +6016,6 @@
 					// Не попали в выделение (меняем первую точку)
 					this.cleanSelection();
 					this._moveActiveCellToXY(x, y);
-					// Нет селекта при клике по drawing-объекту
-					if ( (ar.type !== c_oAscSelectionType.RangeImage) && (ar.type !== c_oAscSelectionType.RangeChart) ) {
-						this.objectRender.unselectDrawingObjects();
-						this._drawSelection();
-					}
 
 					this._trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
 					this._trigger("selectionChanged", this.getSelectionInfo());

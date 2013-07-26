@@ -3498,6 +3498,7 @@ function DrawingObjects() {
 				_this.raiseLayerDrawingObjects(true);
 			}
 		}
+		_this.selectGraphicObject();
 		_this.drawWorksheetHeaders();
 	}
 
@@ -3578,6 +3579,11 @@ function DrawingObjects() {
 	_this.drawWorksheetHeaders = function() {
 		worksheet._drawColumnHeaders();
 		worksheet._drawRowHeaders();
+				
+		// cols header on overlay
+		overlayCtx.clearRect( 0, 0, overlayCtx.getWidth(), worksheet.getCellTop(0, 1) );
+		// rows header on overlay
+		overlayCtx.clearRect( 0, 0, worksheet.getCellLeft(0, 1), overlayCtx.getHeight() );
 	}
 	
 	//-----------------------------------------------------------------------------------
@@ -4563,7 +4569,7 @@ function DrawingObjects() {
 	}
 	
 	_this.selectGraphicObject = function() {
-		if ( _this.drawingDocument ) {
+		if ( _this.drawingDocument && _this.controller.selectedObjects.length ) {
 			_this.controller.drawSelection(_this.drawingDocument);
 			_this.drawWorksheetHeaders();
 		}
