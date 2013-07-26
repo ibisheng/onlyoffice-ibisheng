@@ -5,7 +5,7 @@ var LEGEND_ELEMENT_TYPE_LINE = 0x01;
 
 function CLegendEntry()
 {
-    this.delete = null;
+    this.bDelete = null;
     this.idx = null;
     this.txPr = null;
 }
