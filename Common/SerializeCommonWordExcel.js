@@ -1320,6 +1320,7 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
         if ( c_oSer_ChartType.Legend === type )
         {
             this.chartAsGroup.chartLegend = new CChartLegend();
+            this.chartAsGroup.chartLegend.drawingObjects = this.chartAsGroup.drawingObjects;
             var legend = this.chartAsGroup.chartLegend;
 			res = this.bcr.Read1(length, function(t,l){
 					return oThis.ReadLegend(t,l, legend);
