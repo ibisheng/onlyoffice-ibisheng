@@ -70,6 +70,8 @@ function CImage(drawingBase, drawingObjects)
     this.pen = null;
 
     this.selected = false;
+    this.Id = g_oIdCounter.Get_NewId();
+    g_oTableId.Add(this, this.Id);
 }
 
 CImage.prototype =
