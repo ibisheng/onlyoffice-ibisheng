@@ -429,6 +429,7 @@
 
 			this.isSelectDialogRangeMode = false;
 			this.copyOfActiveRange = null;
+			this.newSelectRange = null; // Диапазон, который будет на начало выбора диапазона
 
 			this.startCellMoveResizeRange = null;
 			this.startCellMoveResizeRange2 = null;
@@ -8846,6 +8847,13 @@
 				return this.isFormulaEditMode;
 			},
 
+			// Функция выставляет диапазон для будующего селекта диапазона (ToDo стоит сделать по другому)
+			_setSelectDialogRange: function (newRange) {
+				if (this.isSelectDialogRangeMode)
+					return;
+				this.newSelectRange = newRange.clone();
+			},
+
 			setSelectDialogRangeMode: function (isSelectDialogRangeMode) {
 				if (isSelectDialogRangeMode === this.isSelectDialogRangeMode)
 					return;
@@ -8863,6 +8871,12 @@
 					this.copyOfActiveRange = this.activeRange.clone(true);
 					this.copyOfActiveRange.startCol = this.activeRange.startCol;
 					this.copyOfActiveRange.startRow = this.activeRange.startRow;
+					if (this.newSelectRange) {
+						this.activeRange = this.newSelectRange.clone(true);
+						this.activeRange.startCol = this.newSelectRange.startCol;
+						this.activeRange.startRow = this.newSelectRange.startRow;
+						this.newSelectRange = null;
+					}
 				}
 
 				this._drawSelection();
