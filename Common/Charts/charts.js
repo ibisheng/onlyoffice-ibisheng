@@ -549,6 +549,42 @@ function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY, chart)
 			bottom += chart.margins.xAxisTitle.h;
 		}
 		
+		if(!chart.margins.key || (chart.margins.key && (!chart.margins.key.h && !chart.margins.key.w)))
+		{
+			//+ высота легенды
+			if(bar._otherProps._key_halign == 'top' || bar._otherProps._key_halign == 'bottom')
+			{
+				var font = getFontProperties("key");
+				var props = getMaxPropertiesText(context,font,bar._otherProps._key);
+				var heigthTextKey = (context.getHeightText()/0.75);
+				var kF = 1;
+				if(bar.type == 'pie')
+					kF = 2;
+				if(bar._otherProps._key_halign == 'top')
+					top += (heigthTextKey + 7)*kF;
+				else
+					bottom += (heigthTextKey + 7)*kF;
+			}
+			//+ ширина легенды
+			if (bar._otherProps._key_halign == 'left' || bar._otherProps._key_halign == 'right')
+			{
+				var widthLine = 28;
+				//находим ширину текста легенды(то есть её максимального элемента), в дальнейшем будем возвращать ширину автофигуры
+				var font = getFontProperties("key");
+				var widthText = getMaxPropertiesText(context,font,bar._otherProps._key);
+				var widthKey = widthText.width/scale + 2 + widthLine;
+				//в MSExcel справа от легенды всегда остаётся такой маргин 
+				if(bar._otherProps._key_halign == 'left')
+					left += widthKey + 7;
+				else
+					right += widthKey + 7;
+			}
+			if(!chart.margins.key)
+				chart.margins.key = {};
+			chart.margins.key.h = heigthTextKey;
+			chart.margins.key.w = widthKey;
+		}
+		
 		//+высота названия диаграммы
 		top += chart.margins.title.h;
 		
