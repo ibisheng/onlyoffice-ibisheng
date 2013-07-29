@@ -167,6 +167,11 @@ function CShape(drawingBase, drawingObjects)
 
 CShape.prototype =
 {
+
+    Get_Id:  function()
+    {
+        return this.Id;
+    },
     getObjectType: function()
     {
         return CLASS_TYPE_SHAPE;
@@ -204,20 +209,38 @@ CShape.prototype =
         this.setExtents(extX, extY);
         this.setFlips(flipH, flipV);
         this.setPresetGeometry(presetGeom);
-        this.setStyle(CreateDefaultShapeStyle());
+        this.setDefaultStyle();
         this.recalculate();
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterInit, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
     },
 
     initDefaultTextRect: function()
     {},
 
+    setDefaultStyle: function()
+    {
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetDefaultStyle, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+        this.style = CreateDefaultShapeStyle();
+    },
+
     setDrawingObjects: function(drawingObjects)
     {
+        var newValue = isRealObject(drawingObjects) ? drawingObjects.getWorksheet().model.getId() : null;
+        var oldValue = isRealObject(this.drawingObjects) ? this.drawingObjects.getWorksheet().model.getId() : null;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetDrawingObjects, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
         this.drawingObjects = drawingObjects;
+
     },
 
     setGroup: function(group)
     {
+        var oldId = isRealObject(this.group) ? this.group.Get_Id() : null;
+        var newId = isRealObject(group) ? group.Get_Id() : null;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetGroup, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldId, newId)));
         this.group = group;
     },
 
@@ -379,7 +402,12 @@ CShape.prototype =
 
     setPresetGeometry: function(presetGeom)
     {
+        var oldId = isRealObject(this.spPr.geometry) ? this.spPr.geometry.Get_Id() : null;
         this.spPr.geometry = CreateGeometry(presetGeom);
+        var newId = this.spPr.geometry.Get_Id();
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetPresetGeometry, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldId, newId)));
+
         this.spPr.geometry.Init(5, 5);
     },
 
@@ -850,7 +878,7 @@ CShape.prototype =
         this.invertTransformText = global_MatrixTransformer.Invert(this.transformText);
     },
 
-	calculateAfterResize: function()
+	/*calculateAfterResize: function()
     {
         if(this.spPr.geometry !== null)
             this.spPr.geometry.Recalculate(this.absExtX, this.absExtY);
@@ -868,7 +896,7 @@ CShape.prototype =
         var _cos = Math.cos(this.absRot);
         this.absXLT = -_horizontal_center*_cos + _vertical_enter*_sin +this.absOffsetX + _horizontal_center;
         this.absYLT = -_horizontal_center*_sin - _vertical_enter*_cos +this.absOffsetY + _vertical_enter;
-    },
+    }, */
 	
 	checkLine: function()
     {
@@ -1220,7 +1248,7 @@ CShape.prototype =
         this.transform = _transform;
         this.ownTransform = _transform.CreateDublicate();
     },
-	
+
 	calculateAfterResize: function()
     {
         if(this.spPr.geometry !== null)
@@ -2030,6 +2058,12 @@ CShape.prototype =
     {
         switch (type)
         {
+            case historyitem_AutoShapes_SetPresetGeometry:
+            {
+                this.spPr.geometry = g_oTableId.Get_ById(data.oldValue);
+                break;
+            }
+
             case historyitem_AutoShapes_RecalculateTransformUndo:
             {
                 this.recalculateTransform();
@@ -2048,6 +2082,29 @@ CShape.prototype =
                 this.drawingObjects.deleteDrawingBase(this.Id);
                 break;
             }
+            case historyitem_AutoShapes_SetGroup:
+            {
+                this.group = g_oTableId.Get_ById(data.oldValue);
+                break;
+            }
+            case historyitem_AutoShapes_SetDefaultStyle:
+            {
+                this.style = null;
+                break;
+            }
+            case historyitem_AutoShapes_SetDrawingObjects:
+            {
+                if(data.oldValue !== null)
+                {
+                    var api = window["Asc"]["editor"];
+                    if ( api.wb )
+                    {
+                        var ws = api.wb.getWorksheetById(data.oldValue);
+                        this.drawingObjects = ws.objectRender;
+                    }
+                }
+                break;
+            }
         }
     },
 
@@ -2055,6 +2112,11 @@ CShape.prototype =
     {
         switch (type)
         {
+            case historyitem_AutoShapes_SetPresetGeometry:
+            {
+                this.spPr.geometry = g_oTableId.Get_ById(data.newValue);
+                break;
+            }
             case historyitem_AutoShapes_RecalculateTransformRedo:
             {
                 this.recalculateTransform();
@@ -2073,7 +2135,38 @@ CShape.prototype =
                 this.drawingObjects.addGraphicObject(this);
                 break;
             }
+            case historyitem_AutoShapes_SetGroup:
+            {
+                this.group = g_oTableId.Get_ById(data.newValue);
+                break;
+            }
+
+            case historyitem_AutoShapes_SetDefaultStyle:
+            {
+                this.style = CreateDefaultShapeStyle();
+                break;
+            }
+            case historyitem_AutoShapes_RecalculateAfterInit:
+            {
+                this.recalculateTransform();
+                this.recalculateBrush();
+                this.recalculatePen();
+                break;
+            }
+
+            case historyitem_AutoShapes_SetDrawingObjects:
+            {
+                if(data.newValue !== null)
+                {
+                    var api = window["Asc"]["editor"];
+                    if ( api.wb )
+                    {
+                        var ws = api.wb.getWorksheetById(data.newValue);
+                        this.drawingObjects = ws.objectRender;
+                    }
+                }
+                break;
+            }
         }
     }
-
 };
