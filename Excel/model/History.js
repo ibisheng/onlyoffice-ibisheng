@@ -108,6 +108,16 @@ var historyitem_AutoShapes_Layout_Set_X_Mode = 27;
 var historyitem_AutoShapes_Layout_Set_Y_Mode = 28;
 var historyitem_AutoShapes_Layout_Set_X = 29;
 var historyitem_AutoShapes_Layout_Set_Y = 30;
+var historyitem_AutoShapes_SetDrawingObjects = 31;
+var historyitem_AutoShapes_SetGroup = 32;
+var historyitem_AutoShapes_SetPresetGeometry = 33;
+var historyitem_AutoShapes_SetDefaultStyle = 34;
+var historyitem_AutoShapes_RecalculateAfterInit = 35;
+
+
+
+
+
 
 
 
