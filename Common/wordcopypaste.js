@@ -1070,10 +1070,10 @@ CopyProcessor.prototype =
     {
         var row = table.Content[nCurRow];
 		if(null == elems)
-			elems = {Start: 0, End: row.Content.length - 1};
+			elems = {gridStart: 0, gridEnd: table.TableGrid.length - 1, indexStart: null, indexEnd: null, after: null, before: null, cells: row.Content};
         var tr = document.createElement( "tr" );
         //Pr
-        var grid = table.TableGrid;
+		var gridSum = table.TableSumGrid;
         var trStyle = "";
         var nGridBefore = 0;
 		var rowPr = null;
@@ -1081,120 +1081,92 @@ CopyProcessor.prototype =
 			rowPr = row.CompiledPr.Pr;
         if(null != rowPr)
         {
-            //WBefore
-            if(null != rowPr.GridBefore)
-            {
-                if(rowPr.GridBefore > 0)
-                {
-                    nGridBefore = rowPr.GridBefore;
-                    var nWBefore = 0;
-                    for(var i = 0, length = grid.length; i < nGridBefore && i < length; ++i)
-                        nWBefore += grid[i];
-                    //���������� margin
-                    trStyle += "mso-row-margin-left:"+(nWBefore * g_dKoef_mm_to_pt)+"pt";
-                    //��������� td ��� ��� ��� �� �������� mso-row-margin-left
-                    var oNewTd = document.createElement( "td" );
-                    oNewTd.setAttribute("style", "mso-cell-special:placeholder;border:none;padding:0cm 0cm 0cm 0cm");
-                    oNewTd.setAttribute("width", Math.round(nWBefore * g_dKoef_mm_to_pix));
-                    if(nGridBefore > 1)
-                        oNewTd.setAttribute("colspan", nGridBefore);
-                    var oNewP = document.createElement( "p" );
-                    oNewP.appendChild(document.createTextNode( '\xa0' ));
-                    oNewTd.appendChild(oNewP);
-                    tr.appendChild(oNewTd);
-                }
-            }
+			if(null == elems.before && null != rowPr.GridBefore && rowPr.GridBefore > 0)
+			{
+                elems.before = rowPr.GridBefore;
+				elems.gridStart += rowPr.GridBefore;
+			}
+			if(null == elems.after && null != rowPr.GridAfter && rowPr.GridAfter > 0)
+			{
+                elems.after = rowPr.GridAfter;
+				elems.gridEnd -= rowPr.GridAfter;
+			}
             //height
             if(null != rowPr.Height && heightrule_Auto != rowPr.Height.HRule && null != rowPr.Height.Value)
             {
-                trStyle += "height:"+(rowPr.Height.Value * g_dKoef_mm_to_pt)+"pt";
+                trStyle += "height:"+(rowPr.Height.Value * g_dKoef_mm_to_pt)+"pt;";
+            }
+        }
+		//WBefore
+        if(null != elems.before)
+        {
+            if(elems.before > 0)
+            {
+                nGridBefore = elems.before;
+                var nWBefore = gridSum[elems.gridStart - 1] - gridSum[elems.gridStart - nGridBefore - 1];
+                //���������� margin
+                trStyle += "mso-row-margin-left:"+(nWBefore * g_dKoef_mm_to_pt)+"pt;";
+                //��������� td ��� ��� ��� �� �������� mso-row-margin-left
+                var oNewTd = document.createElement( "td" );
+                oNewTd.setAttribute("style", "mso-cell-special:placeholder;border:none;padding:0cm 0cm 0cm 0cm");
+                oNewTd.setAttribute("width", Math.round(nWBefore * g_dKoef_mm_to_pix));
+                if(nGridBefore > 1)
+                    oNewTd.setAttribute("colspan", nGridBefore);
+                var oNewP = document.createElement( "p" );
+				oNewP.setAttribute("style", "margin:0cm");
+                oNewP.appendChild(document.createTextNode( '\xa0' ));
+                oNewTd.appendChild(oNewP);
+                tr.appendChild(oNewTd);
+            }
+        }
+        //tc
+        for(var i in elems.cells)
+        {
+            var cell = row.Content[i];
+			if(vmerge_Continue != cell.Get_VMerge())
+			{
+				var StartGridCol = cell.Metrics.StartGridCol;
+				var GridSpan = cell.Get_GridSpan();
+				var width = gridSum[StartGridCol + GridSpan - 1] - gridSum[StartGridCol - 1];
+				//��������� rowspan
+				var nRowSpan = table.Internal_GetVertMergeCount(nCurRow, StartGridCol, GridSpan);
+				if(nCurRow + nRowSpan - 1 > nMaxRow)
+				{
+					nRowSpan = nMaxRow - nCurRow + 1;
+					if(nRowSpan <= 0)
+						nRowSpan = 1;
+				}
+				var tablePr = null;
+				if(null != table.CompiledPr && null != table.CompiledPr.Pr && null != table.CompiledPr.Pr.TablePr)
+					tablePr = table.CompiledPr.Pr.TablePr;
+				this.CopyCell(tr, cell, tablePr, width, nRowSpan);
+			}
+        }
+        //WAfter
+        if(null != elems.after)
+        {
+            if(elems.after > 0)
+            {
+                var nGridAfter = elems.after;
+                var nWAfter = gridSum[elems.gridEnd + nGridAfter] - gridSum[elems.gridEnd];
+                //���������� margin
+                trStyle += "mso-row-margin-right:"+(nWAfter * g_dKoef_mm_to_pt)+"pt;";
+                //��������� td ��� ��� ��� �� �������� mso-row-margin-left
+                var oNewTd = document.createElement( "td" );
+                oNewTd.setAttribute("style", "mso-cell-special:placeholder;border:none;padding:0cm 0cm 0cm 0cm");
+                oNewTd.setAttribute("width", Math.round(nWAfter * g_dKoef_mm_to_pix));
+                if(nGridAfter > 1)
+                    oNewTd.setAttribute("colspan", nGridAfter);
+                var oNewP = document.createElement( "p" );
+				oNewP.setAttribute("style", "margin:0cm");
+                oNewP.appendChild(document.createTextNode( '\xa0' ));
+                oNewTd.appendChild(oNewP);
+                tr.appendChild(oNewTd);
             }
         }
         if("" != trStyle)
             tr.setAttribute("style", trStyle);
-        //tc
-		var nSumGridSpan = nGridBefore;
-        for(var i = elems.Start; i <= elems.End; ++i)
-        {
-            var cell = row.Content[i];
-            var nGridSpan = 1;
-            if(null != cell.Pr && null != cell.Pr.GridSpan)
-                nGridSpan = cell.Pr.GridSpan;			
-            if(null != cell.Pr && vmerge_Continue == cell.Pr.VMerge)
-			{
-				nSumGridSpan += nGridSpan;
-                continue;
-			}
-            var width = 0;
-            for(var j = 0, length2 = grid.length; j < nGridSpan && nGridBefore + nSumGridSpan + j < length2; ++j)
-                width += grid[nGridBefore + nSumGridSpan + j];
-			//��������� rowspan
-            var nRowSpan = 1;
-            for(var j = nCurRow + 1; j <= nMaxRow; ++j)
-            {
-                var bContinue = false;
-				var oBottomRow = table.Content[j];
-				var bottomCell = null;
-				var nTempSumGridSpan = 0;
-				if(null != oBottomRow.Pr && null != oBottomRow.Pr.GridBefore)
-					nTempSumGridSpan = oBottomRow.Pr.GridBefore;
-				
-				for(var k = 0, length3 = oBottomRow.Content.length; k < length3; ++k)
-				{
-					var oTempCell = oBottomRow.Content[k];
-					if(nTempSumGridSpan >= nSumGridSpan)
-					{
-						bottomCell = oTempCell;
-						break;
-					}
-					else
-					{
-						if(null != oTempCell.Pr && null != oTempCell.Pr.GridSpan)
-							nTempSumGridSpan += oTempCell.Pr.GridSpan;
-						else
-							nTempSumGridSpan += 1;
-					}
-				}
-                if(null != bottomCell && null != bottomCell.Pr && vmerge_Continue == bottomCell.Pr.VMerge)
-                    bContinue = true;
-                if(false != bContinue)
-                    nRowSpan++;
-                else
-                    break;
-            };
-			nSumGridSpan += nGridSpan;
-			var tablePr = null;
-			if(null != table.CompiledPr && null != table.CompiledPr.Pr && null != table.CompiledPr.Pr.TablePr)
-				tablePr = table.CompiledPr.Pr.TablePr;
-            this.CopyCell(tr, cell, tablePr, width, nRowSpan);
-        }
-        //WAfter
-        if(null != rowPr)
-        {
-            if(null != rowPr.GridAfter)
-            {
-                if(rowPr.GridAfter > 0)
-                {
-                    var nGridAfter = rowPr.GridAfter;
-                    var nWAfter = 0;
-                    for(var i = 0, length = grid.length; i < nGridAfter && i < length; ++i)
-                        nWAfter += grid[length - i - 1];
-                    //���������� margin
-                    trStyle += "mso-row-margin-right:"+(nWAfter * g_dKoef_mm_to_pt)+"pt";
-                    //��������� td ��� ��� ��� �� �������� mso-row-margin-left
-                    var oNewTd = document.createElement( "td" );
-                    oNewTd.setAttribute("style", "mso-cell-special:placeholder;border:none;padding:0cm 0cm 0cm 0cm");
-                    oNewTd.setAttribute("width", Math.round(nWAfter * g_dKoef_mm_to_pix));
-                    if(nGridAfter > 1)
-                        oNewTd.setAttribute("colspan", nGridAfter);
-                    var oNewP = document.createElement( "p" );
-                    oNewP.appendChild(document.createTextNode( '\xa0' ));
-                    oNewTd.appendChild(oNewP);
-                    tr.appendChild(oNewTd);
-                }
-            }
-        }
-
+			
         oDomTarget.appendChild(tr);
     },
     CopyTable : function(oDomTarget, table, oRowElems)
@@ -1361,6 +1333,7 @@ CopyProcessor.prototype =
                     else if(table_Selection_Cell == Item.Selection.Type)
                     {
                         //������� �������� �����
+						var aSelectedRows = new Array();
 						var oRowElems = new Object();
 						if(Item.Selection.Data.length > 0)
 						{
@@ -1370,15 +1343,97 @@ CopyProcessor.prototype =
 								var rowElem = oRowElems[elem.Row];
 								if(null == rowElem)
 								{
-									rowElem = {Start: elem.Cell, End: elem.Cell}
+									rowElem = {gridStart: null, gridEnd: null, indexStart: null, indexEnd: null, after: null, before: null, cells: {}};
 									oRowElems[elem.Row] = rowElem;
+									aSelectedRows.push(elem.Row);
 								}
-								if(elem.Cell < rowElem.Start)
-									rowElem.Start = elem.Cell;
-								if(elem.Cell > rowElem.End)
-									rowElem.End = elem.Cell;
+								if(null == rowElem.indexEnd || elem.Cell > rowElem.indexEnd)
+									rowElem.indexEnd = elem.Cell;
+								if(null == rowElem.indexStart || elem.Cell < rowElem.indexStart)
+									rowElem.indexStart = elem.Cell;
+								rowElem.cells[elem.Cell] = 1;
 							}
-                        	this.CopyTable(oDomTarget, Item, oRowElems);
+						}
+						aSelectedRows.sort(fSortAscending);
+						var nMinGrid = null;
+						var nMaxGrid = null;
+						var nPrevStartGrid = null;
+						var nPrevEndGrid = null
+						var nPrevRowIndex = null;
+						for(var i = 0, length = aSelectedRows.length; i < length; ++i)
+						{
+							var nRowIndex = aSelectedRows[i];
+							if(null != nPrevRowIndex)
+							{
+								if(nPrevRowIndex + 1 != nRowIndex)
+								{
+									nMinGrid = null;
+									nMaxGrid = null;
+									break;
+								}
+							}
+							nPrevRowIndex = nRowIndex;
+							var elem = oRowElems[nRowIndex];
+							var row = Item.Content[nRowIndex];
+							var cellFirst = row.Get_Cell(elem.indexStart);
+							var cellLast = row.Get_Cell(elem.indexEnd);
+							var nCurStartGrid = cellFirst.Metrics.StartGridCol;
+							var nCurEndGrid = cellLast.Metrics.StartGridCol + cellLast.Get_GridSpan() - 1;
+							if(null != nPrevStartGrid && null != nPrevEndGrid)
+							{
+								//учитываем вертикальный merge, раздвигаем границы
+								if(nCurStartGrid > nPrevStartGrid)
+								{
+									for(var j = elem.indexStart - 1; j >= 0; --j)
+									{
+										var cellCur = row.Get_Cell(j);
+										if(vmerge_Continue == cellCur.Get_VMerge())
+										{
+											var nCurGridCol = cellCur.Metrics.StartGridCol;
+											if(nCurGridCol >= nPrevStartGrid)
+												nCurStartGrid = nCurGridCol;
+											else
+												break;
+										}
+										else
+											break;
+									}
+								}
+								if(nCurEndGrid < nPrevEndGrid)
+								{
+									for(var j = elem.indexEnd + 1; j < row.Get_CellsCount(); ++j)
+									{
+										var cellCur = row.Get_Cell(j);
+										if(vmerge_Continue == cellCur.Get_VMerge())
+										{
+											var nCurGridCol = cellCur.Metrics.StartGridCol + cellCur.Get_GridSpan() - 1;
+											if(nCurGridCol <= nPrevEndGrid)
+												nCurEndGrid = nCurGridCol;
+											else
+												break;
+										}
+										else
+											break;
+									}
+								}
+							}
+							elem.gridStart = nPrevStartGrid = nCurStartGrid;
+							elem.gridEnd = nPrevEndGrid = nCurEndGrid;
+							if(null == nMinGrid || nMinGrid > nCurStartGrid)
+								nMinGrid = nCurStartGrid;
+							if(null == nMaxGrid || nMaxGrid < nCurEndGrid)
+								nMaxGrid = nCurEndGrid;
+						}
+						if(null != nMinGrid && null != nMaxGrid)
+						{
+							//выставляем after, before
+							for(var i in oRowElems)
+							{
+								var elem = oRowElems[i];
+								elem.before = elem.gridStart - nMinGrid;
+								elem.after = nMaxGrid - elem.gridEnd;
+							}
+							this.CopyTable(oDomTarget, Item, oRowElems);
 						}
                     }
                 }
@@ -3419,15 +3474,18 @@ PasteProcessor.prototype =
                 nPrevIndex = nCurIndex;
             }
 			var CurPage = 0;
-            var table = new CTable(oDocument.DrawingDocument, oDocument, true, 0, 0, 0, X_Right_Field, Y_Bottom_Field, nRowCount, nMaxColCount, aGrid);
-			var RecalcResult = table.Recalculate_Page(CurPage);
-            while ( recalcresult_NextPage == RecalcResult  )
+            var table = new CTable(oDocument.DrawingDocument, oDocument, true, 0, 0, 0, X_Right_Field, Y_Bottom_Field, 0, 0, aGrid);
+			//считаем aSumGrid
+			var aSumGrid = new Array();
+			aSumGrid[-1] = 0;
+			var nSum = 0;
+			for(var i = 0, length = aGrid.length; i < length; ++i)
 			{
-				CurPage++;
-				RecalcResult = table.Recalculate_Page( CurPage );
+				nSum += aGrid[i];
+				aSumGrid[i] = nSum;
 			}
             //�������� content
-            this._ExecuteTable(tableNode, node, table, nMaxColCount != nMinColCount ? aColsCountByRow : null, pPr, bUseScaleKoef, dScaleKoef);
+            this._ExecuteTable(tableNode, node, table, aSumGrid, nMaxColCount != nMinColCount ? aColsCountByRow : null, pPr, bUseScaleKoef, dScaleKoef);
             table.Cursor_MoveToStartPos();
             this.aContent.push(table);
         }
@@ -3482,7 +3540,7 @@ PasteProcessor.prototype =
             return res;
         }
     },
-    _ExecuteTable : function(tableNode, node, table, aColsCountByRow, pPr, bUseScaleKoef, dScaleKoef)
+    _ExecuteTable : function(tableNode, node, table, aSumGrid, aColsCountByRow, pPr, bUseScaleKoef, dScaleKoef)
     {
         //Pr
         var Pr = table.Pr;
@@ -3595,129 +3653,18 @@ PasteProcessor.prototype =
         }
 
         //content
-        var nRowIndex = 0;
         var oRowSpans = new Object();
-        var aVerticalMerge = new Array();
-        var aAfterBefore = new Object();
         for(var i = 0, length = node.childNodes.length; i < length; ++i)
         {
             var tr = node.childNodes[i];
             if("tr" == tr.nodeName.toLowerCase())
             {
-                this._ExecuteTableRow(tr, table.Content[nRowIndex], nRowIndex, aAfterBefore, spacing, oRowSpans, aVerticalMerge, bUseScaleKoef, dScaleKoef);
-                nRowIndex++;
-            }
-        }
-        for(var i = 0, length = aVerticalMerge.length; i < length; ++i)
-        {
-            var item = aVerticalMerge[i];
-            this._MergeCells(table, item.start, item.rowspan, item.colspan);
-        }
-        //After,Before
-        for(var i = 0; i < table.Content.length; ++i)
-        {
-            var Row = table.Content[i];
-            var nRowLength = Row.Content.length;
-            var nAfterCell = 0;
-            var nBeforeCell = 0;
-            var nAfterGrid = 0;
-            var nBeforeGrid = 0;
-            if(null != aColsCountByRow)
-            {
-                nAfterCell += aColsCountByRow[i];
-                nAfterGrid += aColsCountByRow[i];
-            }
-            var item = aAfterBefore[i];
-            if(null != item)
-            {
-                if(null != item.Before && item.Before > 0)
-                {
-                    var oFirstcell = Row.Content[0];
-                    if(null != oFirstcell && null != oFirstcell.Pr && null != oFirstcell.Pr.GridSpan)
-                        nBeforeGrid += oFirstcell.Pr.GridSpan;
-                    else
-                        nBeforeGrid += 1;
-                    nBeforeCell += 1;
-                }
-                if(null != item.After && item.After > 0)
-                {
-                    var oLastcell = Row.Content[nRowLength - 1];
-                    if(null != oLastcell && null != oLastcell.Pr && null != oLastcell.Pr.GridSpan)
-                        nAfterGrid += oLastcell.Pr.GridSpan;
-                    else
-                        nAfterGrid += 1;
-                    nAfterCell += 1;
-                }
-            }
-            if(nAfterCell >= 0 && nBeforeCell >= 0 && (nAfterCell + nBeforeCell) < nRowLength)
-            {
-                if(nAfterCell > 0)
-                {
-                    Row.Set_After(nAfterGrid);
-                    for(var j = nRowLength - 1; j >= nRowLength - nAfterCell; --j )
-                        Row.Remove_Cell(j);
-                }
-                if(nBeforeCell > 0)
-                {
-                    Row.Set_Before(nBeforeGrid);
-                    Row.Remove_Cell(0);
-                }
+				var row = table.Internal_Add_Row(table.Content.length, 0);
+                this._ExecuteTableRow(tr, row, aSumGrid, spacing, oRowSpans, bUseScaleKoef, dScaleKoef);
             }
         }
     },
-    _MergeCells : function(table, StartPos, rowSpan, colSpan)
-    {
-        //�������� ������, ������� ���� ���������
-        table.Selection.Use  = true;
-        table.Selection.Type = table_Selection_Cell;
-        table.Selection.StartPos.Pos = StartPos;
-        if(1 == rowSpan)
-        {
-            table.Selection.EndPos.Pos = {Row: StartPos.Row, Cell: StartPos.Cell + colSpan - 1};
-            table.Selection.Data = new Array();
-            for( var i = StartPos.Cell; i <= StartPos.Cell + colSpan - 1; ++i )
-                table.Selection.Data.push( {Cell : i, Row : StartPos.Row} );
-        }
-        else
-        {
-            table.Selection.Data = new Array();
-            table.Selection.Data.push( StartPos );
-            //������� ������ ������
-            var nColIndexSpan = 0;
-            var oFirstRow = table.Content[StartPos.Row];
-            for(var i = 0; i < StartPos.Cell; ++i)
-            {
-                var Cell = oFirstRow.Content[i];
-                if(null != Cell && null != Cell.Pr && null != Cell.Pr.GridSpan)
-                    nColIndexSpan += Cell.Pr.GridSpan;
-                else
-                    nColIndexSpan += 1;
-            }
-            var nCurColIndexSpan = 0;
-            for( var i = StartPos.Row + 1; i <= StartPos.Row + rowSpan - 1; ++i )
-            {
-                var oCurRow = table.Content[i];
-                nCurColIndexSpan = 0;
-                for(var j = 0; j < oCurRow.Content.length; ++j)
-                {
-                    if(nColIndexSpan == nCurColIndexSpan)
-                    {
-                        table.Selection.Data.push( {Cell : j, Row : i} );
-                        break;
-                    }
-                    var Cell = oCurRow.Content[j];
-                    if(null != Cell && null != Cell.Pr && null != Cell.Pr.GridSpan)
-                        nCurColIndexSpan += Cell.Pr.GridSpan;
-                    else
-                        nCurColIndexSpan += 1;
-                }
-            }
-            table.Selection.EndPos.Pos = {Row: StartPos.Row + rowSpan - 1, Cell: nCurColIndexSpan};
-        }
-        //merge
-        table.Cell_Merge();
-    },
-    _ExecuteTableRow : function(node, row, index, aAfterBefore, spacing, oRowSpans, aVerticalMerge, bUseScaleKoef, dScaleKoef)
+    _ExecuteTableRow : function(node, row, aSumGrid, spacing, oRowSpans, bUseScaleKoef, dScaleKoef)
     {
         var oThis = this;
         var table = row.Table;
@@ -3729,19 +3676,19 @@ PasteProcessor.prototype =
             if(!("auto" == height || "inherit" == height || -1 != height.indexOf("%")) && null != (height = this._ValueToMm(height)))
                 row.Set_Height(height, heightrule_AtLeast);
         }
+		var bBefore = false;
+		var bAfter = false;
         var style = node.getAttribute("style");
         if(null != style)
         {
             var tcPr = new Object();
             this._parseCss(style, tcPr);
             var margin_left = tcPr["mso-row-margin-left"];
-            var item = {After: null, Before: null};
             if(margin_left && null != (margin_left = this._ValueToMm(margin_left)))
-                item.Before = margin_left;
+                bBefore = true;
             var margin_right = tcPr["mso-row-margin-right"];
             if(margin_right && null != (margin_right = this._ValueToMm(margin_right)))
-                item.After = margin_right;
-            aAfterBefore[index] = item;
+                bAfter = true;
         }
 
         //content
@@ -3750,16 +3697,36 @@ PasteProcessor.prototype =
         var fParseSpans = function()
         {
             var spans = oRowSpans[nCellIndexSpan];
-            while(null != spans && spans.row > 0)
+            while(null != spans)
             {
+				var oCurCell = row.Add_Cell(row.Get_CellsCount(), row, null, false);
+				oCurCell.Set_VMerge(vmerge_Continue);
                 if(spans.col > 1)
-                    oThis._MergeCells(table, {Row: index, Cell: nCellIndex}, 1, spans.col);
+                    oCurCell.Set_GridSpan(spans.col);
                 spans.row--;
-                nCellIndex++;
-                nCellIndexSpan+= spans.col;
+				if(spans.row <= 0)
+					delete oRowSpans[nCellIndexSpan];
+                nCellIndexSpan += spans.col;
                 spans = oRowSpans[nCellIndexSpan];
             }
         };
+		var oBeforeCell = null;
+		var oAfterCell = null;
+		if(bBefore || bAfter)
+		{
+			for(var i = 0, length = node.childNodes.length; i < length; ++i)
+			{
+				var tc = node.childNodes[i];
+				var tcName = tc.nodeName.toLowerCase();
+				if("td" == tcName || "th" == tcName)
+				{
+					if(bBefore && null != oBeforeCell)
+						oBeforeCell = tc;
+					else if(bAfter)
+						oAfterCell = tc;
+				}
+			}
+		}
         for(var i = 0, length = node.childNodes.length; i < length; ++i)
         {
             //����� ����� ���� ��� ��� ����� ����������� td, ������ ��� ����������� ���������� ������ ����������� � dom
@@ -3774,25 +3741,26 @@ PasteProcessor.prototype =
                     nColSpan = nColSpan - 0;
                 else
                     nColSpan = 1;
-
-                var oCurCell = row.Content[nCellIndex];
-
-                var nRowSpan = tc.getAttribute("rowspan");
-                if(null != nRowSpan)
-                    nRowSpan = nRowSpan - 0;
-                else
-                    nRowSpan = 1;
-                if(nColSpan > 1 || nRowSpan > 1)
-                {
-                    if(nRowSpan > 1)
-                    {
-                        oRowSpans[nCellIndexSpan] = {row: nRowSpan - 1, col: nColSpan};
-                        aVerticalMerge.push({start: {Row: index, Cell: nCellIndex}, rowspan: nRowSpan, colspan: nColSpan});
-                    }
-                    this._MergeCells(table, {Row: index, Cell: nCellIndex}, 1, nColSpan);
-                }
-                this._ExecuteTableCell(tc, oCurCell, bUseScaleKoef, dScaleKoef, spacing);
-                nCellIndex ++;
+				if(tc == oBeforeCell)
+					row.Set_Before(nColSpan);
+				else if(tc == oAfterCell)
+					row.Set_After(nColSpan);
+				else
+				{
+					var oCurCell = row.Add_Cell(row.Get_CellsCount(), row, null, false);
+					if(nColSpan > 1)
+						oCurCell.Set_GridSpan(nColSpan);
+					var width = aSumGrid[nCellIndexSpan + nColSpan - 1] - aSumGrid[nCellIndexSpan - 1];
+					oCurCell.Set_W(new CTableMeasurement(tblwidth_Mm, width));
+					var nRowSpan = tc.getAttribute("rowspan");
+					if(null != nRowSpan)
+						nRowSpan = nRowSpan - 0;
+					else
+						nRowSpan = 1;
+					if(nRowSpan > 1)
+						oRowSpans[nCellIndexSpan] = {row: nRowSpan - 1, col: nColSpan};
+					this._ExecuteTableCell(tc, oCurCell, bUseScaleKoef, dScaleKoef, spacing);
+				}
                 nCellIndexSpan+=nColSpan;
             }
         }
