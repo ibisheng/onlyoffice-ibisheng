@@ -4251,13 +4251,11 @@ Binary_tblPrReader.prototype =
         }
         else if( c_oSerProp_cellPrType.CellMar === type )
         {
-			var oW = {Type: null, W: null, WDocx: null};
-            res = this.bcr.Read2(length, function(t, l){
-                return oThis.ReadW(t, l, oW);
-            });
 			if(null == Pr.TableCellMar)
-                Pr.TableCellMar = new CTableMeasurement(tblwidth_Auto, 0);
-			this.ParseW(oW, Pr.TableCellMar);
+                Pr.TableCellMar = this.GetNewMargin();
+            res = this.bcr.Read1(length, function(t, l){
+                return oThis.ReadCellMargins(t, l, Pr.TableCellMar);
+            });
         }
         else if( c_oSerProp_cellPrType.TableCellW === type )
         {
