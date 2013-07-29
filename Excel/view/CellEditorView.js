@@ -162,6 +162,9 @@
 
 			rangeChars: "= - + * / ( { , < > ^ ! & : ;".split(' '),
 
+            reNotFormula: /[^a-z0-9_]/i,
+
+            reFormula: /^([a-z_][a-z0-9_]*)/i,
 
 			init: function () {
 				var t = this;
@@ -905,9 +908,9 @@
 				}
 
 				if (isFormula) {
-					funcPos = asc_lastidx(s,  /[^a-z0-9_]/i, t.cursorPos) + 1;
+					funcPos = asc_lastidx(s, t.reNotFormula, t.cursorPos) + 1;
 					if (funcPos > 0) {
-						match = s.slice(funcPos).match( /^([a-z_][a-z0-9_]*)/i);
+						match = s.slice(funcPos).match( t.reFormula );
 					}
 					if (match) {
 						funcName = match[1];
