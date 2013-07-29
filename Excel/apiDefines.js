@@ -148,7 +148,7 @@ var c_oAscFormatOptions = {
 	DateShort:  'm/d/yyyy',
 	DateLong:   '[$-F800]dddd, mmmm dd, yyyy',
 	Time:       '[$-F400]h:mm:ss AM/PM',
-	Percentage: '0.00%',
+	Percentage: '0%',
 	Fraction:   '# ?/?',
 	Scientific: '0.00E+00',
 	Text:       '@'

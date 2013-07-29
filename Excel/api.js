@@ -2340,21 +2340,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
                 this.wb.restoreFocus();
             },
 
-			asc_setCellFinancialFormat: function (format) {
-				this.wb.getWorksheet().setSelectionInfo("format", c_oAscFormatOptions.Accounting);
-				this.wb.restoreFocus();
-			},
-
-			asc_setCellPercentFormat: function () {
-				this.wb.getWorksheet().setSelectionInfo("format", '0%');
-				this.wb.restoreFocus();
-			},
-
-			asc_setCellDelimitedFormat: function () {
-				this.wb.getWorksheet().setSelectionInfo("format", '_(* #,##0.00_);_(* (#,##0.00);_(* "-"??_);_(@_)');
-				this.wb.restoreFocus();
-			},
-
 			asc_setCellStyle: function (name) {
 				this.wb.getWorksheet().setSelectionInfo("style", name);
 				this.wb.restoreFocus();
@@ -3024,9 +3009,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		//prot["asc_setCellValue"] = prot.asc_setCellValue; - не используется (и не стоит так делать)
 		prot["asc_setCellFormat"] = prot.asc_setCellFormat;
         prot["asc_setCellAngle"] = prot.asc_setCellAngle;
-		prot["asc_setCellFinancialFormat"] = prot.asc_setCellFinancialFormat;
-		prot["asc_setCellPercentFormat"] = prot.asc_setCellPercentFormat;
-		prot["asc_setCellDelimitedFormat"] = prot.asc_setCellDelimitedFormat;
 		prot["asc_setCellStyle"] = prot.asc_setCellStyle;
 		prot["asc_increaseCellDigitNumbers"] = prot.asc_increaseCellDigitNumbers;
 		prot["asc_decreaseCellDigitNumbers"] = prot.asc_decreaseCellDigitNumbers;
