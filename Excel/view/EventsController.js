@@ -53,7 +53,6 @@
 			this.isResizeMode = false;
 			this.isResizeModeMove = false;
 			// Режим автозаполнения
-			this.isFocusDrawingObject = false;
 			this.isSelectDrawingObject = false;
 			this.isFillHandleMode = false;
 			this.isMoveRangeMode = false;
@@ -192,11 +191,6 @@
 			/** @param isFormulaEditMode {Boolean} */
 			setFormulaEditMode: function (isFormulaEditMode) {
 				this.isFormulaEditMode = !!isFormulaEditMode;
-			},
-
-			/** @param isFocusDrawingObject {Boolean} */
-			setFocusDrawingObject: function (isFocusDrawingObject) {
-				this.isFocusDrawingObject = isFocusDrawingObject;
 			},
 
 			/**
@@ -467,11 +461,6 @@
 				var coord = this._getCoordinates(event);
 				this.handlers.trigger("resizeElementDone", this.targetInfo, coord.x, coord.y, this.isResizeModeMove);
 				this.isResizeModeMove = false;
-			},
-
-			/** @param event {jQuery.Event} */
-			_updateDrawingObjectDone: function (event) {
-				this.handlers.trigger("updateDrawingObjectDone");
 			},
 
 			/** @param event {jQuery.Event} */
@@ -980,12 +969,7 @@
 					this.isResizeMode = false;
 					this._resizeElementDone(event);
 				}
-				else if (this.isFocusDrawingObject) {
-					this.isFocusDrawingObject = false;
-					this._updateDrawingObjectDone();
-				}
-
-
+				
 				// Режим автозаполнения
 				if (this.isFillHandleMode) {
 					// Закончили автозаполнение
@@ -1018,12 +1002,7 @@
 					this.handlers.trigger("resizeElementDone", this.targetInfo, x, y, this.isResizeModeMove);
 					this.isResizeModeMove = false;
 				}
-				else if (this.isFocusDrawingObject || (this.targetInfo && (this.targetInfo.target === "drawingObject"))) {
-					this.isFocusDrawingObject = false;
-					this.handlers.trigger("updateDrawingObjectDone");
-				}
-
-
+				
 				// Режим автозаполнения
 				if (this.isFillHandleMode) {
 					// Закончили автозаполнение
@@ -1079,7 +1058,6 @@
 				var graphicsInfo = t.handlers.trigger("getGraphicsInfo", coord.x, coord.y);
 				if ( graphicsInfo && graphicsInfo.isGraphicObject ) {
 					asc["editor"].isStartAddShape = true;
-					t.isFocusDrawingObject = true;
 					t.isSelectDrawingObject = true;
 				}
 				
@@ -1123,12 +1101,10 @@
 				this.mouseDownLastCord = coord;
 
 				t.hasFocus = true;
-
-				t.isFocusDrawingObject = false;
 				t.isSelectDrawingObject = false;
 
 				if (!t.isCellEditMode) {
-					if (event.shiftKey && (t.targetInfo.target !== "drawingObject")) {
+					if (event.shiftKey) {
 						t._changeSelection(event, /*isSelectMode*/false);
 						return;
 					}
@@ -1147,9 +1123,6 @@
 							this.isMoveRangeMode = true;
 							t._moveRangeHandle(event);
 							return;
-						} else if (t.targetInfo && (t.targetInfo.target === "drawingObject")) {
-							t.isFocusDrawingObject = true;
-							t.isSelectDrawingObject = true;
 						}
 						else if (t.targetInfo && (t.targetInfo.target === "aFilterObject")) {
 							  t._autoFiltersClick(event);
@@ -1261,11 +1234,6 @@
 				
 				// Мы можем dblClick и не отработать, если вышли из области и отпустили кнопку мыши, нужно отработать
 				this.showCellEditorCursor();
-
-				if (this.isFocusDrawingObject) {
-					this.isFocusDrawingObject = false;
-					this._updateDrawingObjectDone();
-				}
 			},
 
 			/** @param event {jQuery.Event} */
@@ -1331,9 +1299,6 @@
 				if (this.isFillHandleMode){
 					t.fillHandleModeTimerId = window.setTimeout(function(){t._changeFillHandle2(event)},0)
 				}
-				if (this.isSelectDrawingObject){
-					// TODO: обработать выход из iframe
-				}
 				return true;
 			},
 
@@ -1373,10 +1338,6 @@
 			
 				if (this.handlers.trigger("isGlobalLockEditCell"))
 					return false;
-
-				if (this.isSelectDrawingObject && !this.settings.isViewerMode) {
-					this.handlers.trigger("editDrawingObjectMenu", this.targetInfo.drawingId);
-				}
 
 				// Браузер не поддерживает свойство originalEvent.detail (будем делать по координатам)
 				if (false === this.isDblClickInMouseDown)

@@ -315,7 +315,7 @@ DrawingObjectsController.prototype =
             {
                 ungrouped_sp_tree[j].recalculateTransform();
             }
-            this.drawingObjects.insertUngroupedObjects(ungrouped_objects[i].drawingBase.id, ungrouped_sp_tree);
+            this.drawingObjects.insertUngroupedObjects(ungrouped_objects[i].Id, ungrouped_sp_tree);
         }
 		this.changeCurrentState(new NullState(this, this.drawingObjects));
 		

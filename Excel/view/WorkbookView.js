@@ -171,9 +171,7 @@
 					"moveRangeHandleDone":		function () {self._onMoveRangeHandleDone.apply(self, arguments);},
 					"moveResizeRangeHandle":	function () {self._onMoveResizeRangeHandle.apply(self, arguments);},
 					"moveResizeRangeHandleDone":function () {self._onMoveResizeRangeHandleDone.apply(self, arguments);},
-					"updateDrawingObjectDone":	function () {self._onUpdateDrawingObjectDone.apply(self);},
 					"deleteDrawingObjectDone":	function () {self._onDeleteDrawingObjectDone.apply(self);},
-					"editDrawingObjectMenu":	function () {self._onEditDrawingObjectMenu.apply(self, arguments);},
 					"selectDrawingObjectEx":	function () {return self._onSelectDrawingObjectEx.apply(self, arguments);},
 					"editCell":          function () {self._onEditCell.apply(self, arguments);},
 					"stopCellEditing":   function () {return self._onStopCellEditing.apply(self, arguments);},
@@ -290,7 +288,7 @@
 							}
 							self.controller.setStrictClose(true);
 							self.cellEditor.callTopLineMouseup = true;
-							if (!self.controller.isCellEditMode && !self.controller.isFillHandleMode && !self.controller.isFocusDrawingObject) {
+							if (!self.controller.isCellEditMode && !self.controller.isFillHandleMode && !self.controller.isSelectDrawingObject) {
 								self._onEditCell(0, 0, /*isCoord*/false, /*isFocus*/true);
 							}
 						});
@@ -353,7 +351,6 @@
 								"selectionNameChanged"	: function () {self._onSelectionNameChanged.apply(self, arguments);},
 								"onErrorEvent"			: function (errorId, level) {self.handlers.trigger("asc_onError", errorId, level);},
 								"slowOperation"			: function (isStart) {self.handlers.trigger((isStart ? "asc_onStartAction" : "asc_onEndAction"), c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.SlowOperation);},
-								"setFocusDrawingObject" : function (isFocusDrawingObject) { self.controller.setFocusDrawingObject(isFocusDrawingObject); },
 								"setAutoFiltersDialog"  : function (arrVal) {self.handlers.trigger("asc_onSetAFDialog", arrVal);},
 								"selectionRangeChanged"	: function (val) {self.handlers.trigger("asc_onSelectionRangeChanged", val);},
 								"getDCForCharts"		: function () { return self.drawingCtxCharts; },
@@ -581,27 +578,10 @@
 				ws.draw();
 			},
 
-			_onUpdateDrawingObjectDone: function () {
-				var ws = this.getWorksheet();
-				ws.updateDrawingObjectDone();
-			},
-
 			_onDeleteDrawingObjectDone: function () {
 				var ws = this.getWorksheet();
 				ws.objectRender.deleteSelectedDrawingObject();
 				ws.autoFilters.drawAutoF(ws);
-			},
-
-			_onEditDrawingObjectMenu: function (drawingId) {
-				var _this = this;
-				var ws = _this.getWorksheet();
-				function callbackFunc(result) {
-					if ( result ) {
-						ws.objectRender.lockDrawingObject(drawingId, true, true);
-						_this.handlers.trigger("asc_onShowChartDialog", true);
-					}
-				}
-				ws.objectRender.isLockedDrawingObject(drawingId, callbackFunc);
 			},
 
 			_onSelectDrawingObjectEx: function (bNext) {
@@ -730,7 +710,7 @@
 						return;
 					}
 					
-					if ( isCoord && (ws.objectRender.inSelectionDrawingObjectIndex(x, y, true) >= 0) ) {
+					if ( isCoord && (ws.objectRender.checkCursorDrawingObject(x, y)) ) {
 						res = true;
 						if ($.isFunction(callback)) {callback(res);}
 						return;

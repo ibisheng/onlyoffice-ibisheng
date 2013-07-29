@@ -1390,7 +1390,6 @@ Workbook.prototype.initGlobalObjects=function(){
 	g_oUndoRedoCol = new UndoRedoRowCol(this, false);
 	g_oUndoRedoRow = new UndoRedoRowCol(this, true);
 	g_oUndoRedoComment = new UndoRedoComment(this);
-	g_oUndoRedoDrawingObject = new UndoRedoDrawingObject(this);
 	g_oUndoRedoDrawingLayer = new UndoRedoDrawingLayer(this);
 	g_oUndoRedoAutoFilters = new UndoRedoAutoFilters(this);
     g_oUndoRedoGraphicObjects = new UndoRedoGraphicObjects(this);

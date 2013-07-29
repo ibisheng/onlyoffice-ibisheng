@@ -1418,7 +1418,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			
 			_onShowDrawingObjects: function () {
 				if (this.wb) {
-					this.wb.getWorksheet().objectRender.showDrawingObjects(true, /*printOptions*/null, /*bUpdateCharts*/false);						
+					this.wb.getWorksheet().objectRender.showDrawingObjects(true);
 				}
 			},
 			
@@ -2006,7 +2006,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 
 			asc_addChartDrawingObject: function(chart) {
-				this.wb.controller.isSelectDrawingObject = true;
 				var ws = this.wb.getWorksheet();
 				return ws.objectRender.addChartDrawingObject(chart, this.isChartEditor);
 			},
@@ -2014,7 +2013,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			asc_editChartDrawingObject: function(chart) {
 				this.wb.controller.isSelectDrawingObject = true;
 				var ws = this.wb.getWorksheet();
-				return ws.objectRender.editChartDrawingObject(chart);
+				return ws.objectRender.controller.editChartDrawingObjects(chart);
 			},
 
 			asc_addImageDrawingObject: function(imageUrl) {

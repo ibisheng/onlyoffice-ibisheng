@@ -316,7 +316,7 @@ function NullState(drawingObjectsController, drawingObjects)
             {
                 if(selected_objects[0].canChangeAdjustments())
                 {
-                    return {objectId: selected_objects[0].drawingBase.id, cursorType: "crosshair"};
+                    return {objectId: selected_objects[0].Id, cursorType: "crosshair"};
                 }
             }
         }
@@ -330,7 +330,7 @@ function NullState(drawingObjectsController, drawingObjects)
                 {
                     if(!selected_objects[i].canRotate())
                         return null;
-                    return {objectId: selected_objects[i].drawingBase.id, cursorType: "crosshair"};
+                    return {objectId: selected_objects[i].Id, cursorType: "crosshair"};
                 }
                 else
                 {
@@ -343,7 +343,7 @@ function NullState(drawingObjectsController, drawingObjects)
                         if(selected_objects[j].canResize())
                             this.drawingObjectsController.addPreTrackObject(selected_objects[j].createResizeTrack(card_direction));
                     }
-                    return {objectId: selected_objects[i].drawingBase.id, cursorType: CURSOR_TYPES_BY_CARD_DIRECTION[card_direction]};
+                    return {objectId: selected_objects[i].Id, cursorType: CURSOR_TYPES_BY_CARD_DIRECTION[card_direction]};
                 }
             }
         }
@@ -354,7 +354,7 @@ function NullState(drawingObjectsController, drawingObjects)
             {
                 if(!selected_objects[i].canMove())
                     return null;
-                return {objectId: selected_objects[i].drawingBase.id, cursorType: "move"};
+                return {objectId: selected_objects[i].Id, cursorType: "move"};
             }
         }
 
@@ -372,11 +372,11 @@ function NullState(drawingObjectsController, drawingObjects)
                     var hit_in_text_rect = cur_drawing.hitInTextRect(x, y);
                     if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
                     {
-                        return {objectId: cur_drawing_base.id, cursorType: "move"};
+                        return {objectId: cur_drawing.Id, cursorType: "move"};
                     }
                     else if(hit_in_text_rect)
                     {
-                        return {objectId: cur_drawing_base.id, cursorType: "move"};
+                        return {objectId: cur_drawing.Id, cursorType: "move"};
                     }
                 }
                 else if(cur_drawing.isGroup())
@@ -390,7 +390,7 @@ function NullState(drawingObjectsController, drawingObjects)
                         var hit_in_text_rect = cur_grouped_object.hitInTextRect(x, y);
                         if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
                         {
-                            return {objectId: cur_drawing_base.id, cursorType: "move"};
+                            return {objectId: cur_grouped_object.Id, cursorType: "move"};
                         }
                         else if(hit_in_text_rect)
                         {
@@ -402,7 +402,7 @@ function NullState(drawingObjectsController, drawingObjects)
                 {
                     if(cur_drawing.hitInWorkArea(x, y))
                     {
-                        return {objectId: cur_drawing.drawingBase.id, cursorType:"move"};
+                        return {objectId: cur_drawing.Id, cursorType:"move"};
                     }
                 }
             }
@@ -452,7 +452,7 @@ function PreMoveInternalChartObjectState(drawingObjectsController, drawingObject
 
     this.isPointInDrawingObjects = function(x, y)
     {
-        return {objectsId: this.chartElement.chartGroup.drawingBase.id, cursorType:"move"};
+        return {objectsId: this.chartElement.chartGroup.Id, cursorType:"move"};
     };
 }
 
@@ -505,7 +505,7 @@ function MoveInternalChartObjectState(drawingObjectsController, drawingObjects, 
 
     this.isPointInDrawingObjects = function(x, y)
     {
-        return {objectsId: this.chartElement.chartGroup.drawingBase.id, cursorType:"move"};
+        return {objectsId: this.chartElement.chartGroup.Id, cursorType:"move"};
 
     };
 }
@@ -817,7 +817,7 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
             {
                 if(isRealObject(titles[i]) && titles[i].selected && titles[i].hitInBoundingRect(x, y))
                 {
-                    return {objectId: this.chart.drawingBase.id, cursorType: "move"};
+                    return {objectId: this.chart.Id, cursorType: "move"};
                 }
             }
         }
@@ -828,13 +828,13 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
             if(hit_to_handles > -1 && hit_to_handles < 8)
             {
                 var card_direction = this.chart.getCardDirectionByNum(hit_to_handles);
-                return {objectId: this.chart.drawingBase.id, cursorType: CURSOR_TYPES_BY_CARD_DIRECTION[card_direction]};
+                return {objectId: this.chart.Id, cursorType: CURSOR_TYPES_BY_CARD_DIRECTION[card_direction]};
             }
         }
 
         if(this.chart.hitInBoundingRect(x, y))
         {
-            return {objectId: this.chart.drawingBase.id, cursorType: "move"};
+            return {objectId: this.chart.Id, cursorType: "move"};
 
         }
 
@@ -853,11 +853,11 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
                     var hit_in_text_rect = cur_drawing.hitInTextRect(x, y);
                     if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
                     {
-                        return {objectId: cur_drawing.drawingBase.id, cursorType: "move"};
+                        return {objectId: cur_drawing.Id, cursorType: "move"};
                     }
                     else if(hit_in_text_rect)
                     {
-                        return {objectId: cur_drawing.drawingBase.id, cursorType: "move"};
+                        return {objectId: cur_drawing.Id, cursorType: "move"};
                     }
                 }
                 else if(cur_drawing.isGroup())
@@ -871,11 +871,11 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
                         var hit_in_text_rect = cur_grouped_object.hitInTextRect(x, y);
                         if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
                         {
-                            return {objectId: cur_drawing.drawingBase.id, cursorType: "move"};
+                            return {objectId: cur_drawing.Id, cursorType: "move"};
                         }
                         else if(hit_in_text_rect)
                         {
-                            return {objectId: cur_drawing.drawingBase.id, cursorType: "move"};
+                            return {objectId: cur_drawing.Id, cursorType: "move"};
                         }
                     }
                 }
@@ -892,7 +892,7 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
                                 {
                                     if(title.hit(x, y))
                                     {
-                                        return {objectId: this.chart.drawingBase.id, cursorType: "move"};
+                                        return {objectId: this.chart.Id, cursorType: "move"};
                                     }
 
                                 }
@@ -902,12 +902,12 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
                                     {
                                         if(title.hitInTextRect(x, y))
                                         {
-                                            return {objectId: this.chart.drawingBase.id, cursorType: "move"};
+                                            return {objectId: this.chart.Id, cursorType: "move"};
                                         }
                                         else
                                         {
 
-                                            return {objectId: this.chart.drawingBase.id, cursorType: "move"};
+                                            return {objectId: this.chart.Id, cursorType: "move"};
                                         }
                                     }
                                 }
@@ -916,7 +916,7 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
 
                         if(cur_drawing.hitInWorkArea(x, y))
                         {
-                            return {objectId: this.chart.drawingBase.id, cursorType: "move"};
+                            return {objectId: this.chart.Id, cursorType: "move"};
                         }
 
                     }
@@ -959,10 +959,10 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
                                 }
                                 if(isRealObject(object_for_move_in_chart))
                                 {
-                                    return {objectId: this.chart.drawingBase.id, cursorType: "move"};
+                                    return {objectId: this.chart.Id, cursorType: "move"};
                                 }
 
-                                return {objectId: this.chart.drawingBase.id, cursorType: "move"};
+                                return {objectId: this.chart.Id, cursorType: "move"};
 
                             }
                         }
@@ -1135,7 +1135,7 @@ function PreRotateState(drawingObjectsController, drawingObjects, majorObject)
 
     this.isPointInDrawingObjects = function(x, y)
     {
-        return {objectId: this.majorObject.drawingBase.id, cursorType: "crosshair"};
+        return {objectId: this.majorObject.Id, cursorType: "crosshair"};
     };
 }
 
@@ -1183,7 +1183,7 @@ function RotateState(drawingObjectsController, drawingObjects, majorObject)
 
     this.isPointInDrawingObjects = function(x, y)
     {
-        return {objectId: this.majorObject.drawingBase.id, cursorType: "crosshair"};
+        return {objectId: this.majorObject.Id, cursorType: "crosshair"};
     };
 }
 
@@ -1228,7 +1228,7 @@ function PreResizeState(drawingObjectsController, drawingObjects, majorObject, c
     this.isPointInDrawingObjects = function(x, y)
     {
 
-        return {objectId: this.majorObject.drawingBase.id, cursorType: CURSOR_TYPES_BY_CARD_DIRECTION[this.cardDirection]};
+        return {objectId: this.majorObject.Id, cursorType: CURSOR_TYPES_BY_CARD_DIRECTION[this.cardDirection]};
     };
 }
 
@@ -1279,7 +1279,7 @@ function ResizeState(drawingObjectsController, drawingObjects, majorObject, card
 
     this.isPointInDrawingObjects = function(x, y)
     {
-        return {objectId: this.majorObject.drawingBase.id, cursorType: CURSOR_TYPES_BY_CARD_DIRECTION[this.cardDirection]};
+        return {objectId: this.majorObject.Id, cursorType: CURSOR_TYPES_BY_CARD_DIRECTION[this.cardDirection]};
     };
 }
 
@@ -1373,7 +1373,7 @@ function BeginTrackNewShapeState(drawingObjectsController, drawingObjects, prese
             {
                 if(selected_objects[0].canChangeAdjustments())
                 {
-                    return {objectId: selected_objects[0].drawingBase.id, cursorType: "crosshair"};
+                    return {objectId: selected_objects[0].Id, cursorType: "crosshair"};
                 }
             }
         }
@@ -1387,7 +1387,7 @@ function BeginTrackNewShapeState(drawingObjectsController, drawingObjects, prese
                 {
                     if(!selected_objects[i].canRotate())
                         return null;
-                    return {objectId: selected_objects[i].drawingBase.id, cursorType: "crosshair"};
+                    return {objectId: selected_objects[i].Id, cursorType: "crosshair"};
                 }
                 else
                 {
@@ -1400,7 +1400,7 @@ function BeginTrackNewShapeState(drawingObjectsController, drawingObjects, prese
                         if(selected_objects[j].canResize())
                             this.drawingObjectsController.addPreTrackObject(selected_objects[j].createResizeTrack(card_direction));
                     }
-                    return {objectId: selected_objects[i].drawingBase.id, cursorType: CURSOR_TYPES_BY_CARD_DIRECTION[card_direction]};
+                    return {objectId: selected_objects[i].Id, cursorType: CURSOR_TYPES_BY_CARD_DIRECTION[card_direction]};
                 }
             }
         }
@@ -1411,7 +1411,7 @@ function BeginTrackNewShapeState(drawingObjectsController, drawingObjects, prese
             {
                 if(!selected_objects[i].canMove())
                     return null;
-                return {objectId: selected_objects[i].drawingBase.id, cursorType: "move"};
+                return {objectId: selected_objects[i].Id, cursorType: "move"};
             }
         }
 
@@ -1429,7 +1429,7 @@ function BeginTrackNewShapeState(drawingObjectsController, drawingObjects, prese
                     var hit_in_text_rect = cur_drawing.hitInTextRect(x, y);
                     if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
                     {
-                        return {objectId: cur_drawing_base.id, cursorType: "move"};
+                        return {objectId: cur_drawing.Id, cursorType: "move"};
                     }
                     else if(hit_in_text_rect)
                     {
@@ -1447,7 +1447,7 @@ function BeginTrackNewShapeState(drawingObjectsController, drawingObjects, prese
                         var hit_in_text_rect = cur_grouped_object.hitInTextRect(x, y);
                         if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
                         {
-                            return {objectId: cur_drawing_base.id, cursorType: "move"};
+                            return {objectId: cur_drawing.Id, cursorType: "move"};
                         }
                         else if(hit_in_text_rect)
                         {
@@ -1619,7 +1619,7 @@ function PreMoveState(drawingObjectsController, drawingObjects, startX, startY, 
 
     this.isPointInDrawingObjects = function(x, y)
     {
-        return {objectId:this.majorObject.drawingBase.id, cursorType: "move"}
+        return {objectId:this.majorObject.Id, cursorType: "move"}
     };
 }
 
@@ -1730,7 +1730,7 @@ function MoveState(drawingObjectsController, drawingObjects, startX, startY, rec
 
     this.isPointInDrawingObjects = function(x, y)
     {
-        return {objectId:this.majorObject.drawingBase.id, cursorType: "move"}
+        return {objectId:this.majorObject.Id, cursorType: "move"}
     };
 }
 
@@ -1778,7 +1778,7 @@ function PreChangeAdjState(drawingObjectsController, drawingObjects, majorObject
 
     this.isPointInDrawingObjects = function(x, y)
     {
-        return {objectId:this.majorObject.drawingBase.id, cursorType: "crosshair"}
+        return {objectId:this.majorObject.Id, cursorType: "crosshair"}
     };
 }
 
@@ -1827,7 +1827,7 @@ function ChangeAdjState(drawingObjectsController, drawingObjects)
 
     this.isPointInDrawingObjects = function(x, y)
     {
-        return {objectId:this.majorObject.drawingBase.id, cursorType: "crosshair"}
+        return {objectId:this.majorObject.Id, cursorType: "crosshair"}
     };
 }
 
@@ -2068,7 +2068,7 @@ function GroupState(drawingObjectsController, drawingObjects, group)
             var hit_to_adj = group_selected_objects[0].hitToAdjustment(x, y);
             if(hit_to_adj.hit)
             {
-                return {objectId: this.group.drawingBase.id, cursorType: "crosshair"};
+                return {objectId: this.group.Id, cursorType: "crosshair"};
             }
         }
         for(var i = group_selected_objects.length - 1; i  > -1; --i)
@@ -2080,14 +2080,14 @@ function GroupState(drawingObjectsController, drawingObjects, group)
                 {
                     if(!group_selected_objects[i].canRotate())
                         return null;
-                    return {objectId: this.group.drawingBase.id, cursorType: "crosshair"};
+                    return {objectId: this.group.Id, cursorType: "crosshair"};
                 }
                 else
                 {
                     if(!group_selected_objects[i].canResize())
                         return null;
                     var card_direction = group_selected_objects[i].getCardDirectionByNum(hit_to_handles);
-                    return {objectId: this.group.drawingBase.id, cursorType: CURSOR_TYPES_BY_CARD_DIRECTION[card_direction]};
+                    return {objectId: this.group.Id, cursorType: CURSOR_TYPES_BY_CARD_DIRECTION[card_direction]};
 
                 }
             }
@@ -2100,12 +2100,12 @@ function GroupState(drawingObjectsController, drawingObjects, group)
             {
                 if(!this.group.canRotate())
                     return null;
-                return {objectId: this.group.drawingBase.id, cursorType: "crosshair"};
+                return {objectId: this.group.Id, cursorType: "crosshair"};
             }
             else
             {
                 var card_direction = this.group.getCardDirectionByNum(hit_to_handles);
-                return {objectId: this.group.drawingBase.id, cursorType: CURSOR_TYPES_BY_CARD_DIRECTION[card_direction]};
+                return {objectId: this.group.Id, cursorType: CURSOR_TYPES_BY_CARD_DIRECTION[card_direction]};
             }
         }
 
@@ -2126,7 +2126,7 @@ function GroupState(drawingObjectsController, drawingObjects, group)
 
         if(this.group.hitInBoundingRect(x, y))
         {
-            return {objectId: this.group.drawingBase.id, cursorType: "move"};
+            return {objectId: this.group.Id, cursorType: "move"};
         }
 
         var drawing_bases = this.drawingObjects.getDrawingObjects();
@@ -2144,7 +2144,7 @@ function GroupState(drawingObjectsController, drawingObjects, group)
                     var hit_in_text_rect = cur_drawing.hitInTextRect(x, y);
                     if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
                     {
-                        return {objectId: cur_drawing.drawingBase.id, cursorType: "move"};
+                        return {objectId: cur_drawing.Id, cursorType: "move"};
                     }
                     else if(hit_in_text_rect)
                     {
@@ -2164,7 +2164,7 @@ function GroupState(drawingObjectsController, drawingObjects, group)
                             var hit_in_text_rect = cur_drawing.hitInTextRect(x, y);
                             if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
                             {
-                                return {objectId: this.group.drawingBase.id, cursorType: "move"};
+                                return {objectId: this.group.Id, cursorType: "move"};
                             }
                             else if(hit_in_text_rect)
                             {
@@ -2183,7 +2183,7 @@ function GroupState(drawingObjectsController, drawingObjects, group)
                             var hit_in_text_rect = cur_grouped_object.hitInTextRect(x, y);
                             if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
                             {
-                                return {objectId: cur_drawing.drawingBase.id, cursorType: "move"};
+                                return {objectId: cur_drawing.Id, cursorType: "move"};
                             }
                             else if(hit_in_text_rect)
                             {
@@ -2271,7 +2271,7 @@ function PreMoveInGroupState(drawingObjectsController, drawingObjects, group, st
 
     this.isPointInDrawingObjects = function(x, y)
     {
-        return {objectId: this.group.drawingBase.id, cursorType: "move"};
+        return {objectId: this.group.Id, cursorType: "move"};
     };
 }
 
@@ -2332,7 +2332,7 @@ function MoveInGroupState(drawingObjectsController, drawingObjects, group, start
 
     this.isPointInDrawingObjects = function(x, y)
     {
-        return {objectId: this.group.drawingBase.id, cursorType: "move"};
+        return {objectId: this.group.Id, cursorType: "move"};
     };
 }
 
@@ -2373,7 +2373,7 @@ function PreChangeAdjInGroupState(drawingObjectsController, drawingObjects, grou
 
     this.isPointInDrawingObjects = function(x, y)
     {
-        return {objectId: this.group.drawingBase.id, cursorType: "crosshair"};
+        return {objectId: this.group.Id, cursorType: "crosshair"};
     };
 }
 
@@ -2418,7 +2418,7 @@ function ChangeAdjInGroupState(drawingObjectsController, drawingObjects, group)
 
     this.isPointInDrawingObjects = function(x, y)
     {
-        return {objectId: this.group.drawingBase.id, cursorType: "crosshair"};
+        return {objectId: this.group.Id, cursorType: "crosshair"};
     };
 }
 
@@ -2459,7 +2459,7 @@ function PreRotateInGroupState(drawingObjectsController, drawingObjects, group, 
 
     this.isPointInDrawingObjects = function(x, y)
     {
-        return {objectId: this.group.drawingBase.id, cursorType: "crosshair"};
+        return {objectId: this.group.Id, cursorType: "crosshair"};
     };
 }
 
@@ -2508,7 +2508,7 @@ function RotateInGroupState(drawingObjectsController, drawingObjects, group, maj
 
     this.isPointInDrawingObjects = function(x, y)
     {
-        return {objectId: this.group.drawingBase.id, cursorType: "crosshair"};
+        return {objectId: this.group.Id, cursorType: "crosshair"};
     };
 }
 
@@ -2551,7 +2551,7 @@ function PreResizeInGroupState(drawingObjectsController, drawingObjects, group, 
 
     this.isPointInDrawingObjects = function(x, y)
     {
-        return {objectId: this.group.drawingBase.id, cursorType: CURSOR_TYPES_BY_CARD_DIRECTION[this.cardDirection]};
+        return {objectId: this.group.Id, cursorType: CURSOR_TYPES_BY_CARD_DIRECTION[this.cardDirection]};
     };
 }
 
@@ -2600,7 +2600,7 @@ function ResizeInGroupState(drawingObjectsController, drawingObjects, group, maj
 
     this.isPointInDrawingObjects = function(x, y)
     {
-        return {objectId: this.group.drawingBase.id, cursorType: CURSOR_TYPES_BY_CARD_DIRECTION[this.cardDirection]};
+        return {objectId: this.group.Id, cursorType: CURSOR_TYPES_BY_CARD_DIRECTION[this.cardDirection]};
     };
 }
 

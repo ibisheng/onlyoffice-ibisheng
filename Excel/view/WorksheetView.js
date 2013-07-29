@@ -1846,7 +1846,7 @@
 							bottom: printPagesData.bottomFieldInPt
 						}
 					};
-					this.objectRender.showDrawingObjects(false, drawingPrintOptions, false);
+					this.objectRender.showDrawingObjects(false, drawingPrintOptions);
 					this.visibleRange = tmpVisibleRange.clone(true);
 
                     if (isAppBridge) {window['appBridge']['dummyCommandUpdate'] ();}
@@ -1874,7 +1874,7 @@
 				}
 				//draw auto filters
 				this.autoFilters.drawAutoF(this);
-				this.objectRender.showDrawingObjects(false, null/*printOptions*/, true/*bUpdateCharts*/);
+				this.objectRender.showDrawingObjects(false);
 				this.cellCommentator.drawCommentCells(false);
 
 				return this;
@@ -3440,64 +3440,7 @@
 						.fillRect(0, y, w, this.height_1px);
 			},
 
-			updateDrawingObjectDone: function () {
-				var t = this, lockInfo;				
-				var updateObjectCallback = function (res) {
-					
-					t.overlayCtx.ctx.globalAlpha = 1;
-					if (res) {
-						// Все хорошо, мы залочили, теперь применяем
-						t.objectRender.showDrawingObjects(true, null, false);
-					}
-					else {
-						// Не удалось, восстанавливаем состояние
-						t.objectRender.restoreLockedDrawingObject();
-					}
-					t._drawCollaborativeElements(/*bIsDrawObjects*/true);
-				};
-
-				var sheetId = this.model.getId();
-				var objectId = t.objectRender.getSelectedDrawingObjectId();
-				
-				if ( objectId && t.objectRender.isChangedDrawingObject(objectId) ) {
-					if (false === t.collaborativeEditing.isCoAuthoringExcellEnable()) {
-						// Запрещено совместное редактирование
-						updateObjectCallback(true);
-						return;
-					}
-
-					lockInfo = t.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, /*subType*/null, sheetId, objectId);
-
-					if (false === t.collaborativeEditing.getCollaborativeEditing()) {
-						// Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
-						updateObjectCallback(true);
-						updateObjectCallback = undefined;
-					} else if (false !== t.collaborativeEditing.getLockIntersection(lockInfo,
-						c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/false)) {
-						// Редактируем сами
-						updateObjectCallback (true);
-						return;
-					}
-					else if (false !== t.collaborativeEditing.getLockIntersection(lockInfo,
-						c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false)) {
-						// Уже ячейку кто-то редактирует
-						updateObjectCallback (false);
-						return;
-					}
-
-					t.collaborativeEditing.onStartCheckLock();
-					t.collaborativeEditing.addCheckLock(lockInfo);
-					t.collaborativeEditing.onEndCheckLock(updateObjectCallback);
-				}
-				else
-					t.objectRender.clearUndoRedoDrawingObject();
-					
-				t.overlayCtx.ctx.globalAlpha = 1;
-				if ( objectId )
-					t.objectRender.selectDrawingObject(t.objectRender.getSelectedDrawingObjectIndex());
-			},
-
-
+			
 			// --- Cache ---
 
 			_cleanCache: function (range) {
@@ -5038,12 +4981,10 @@
 					return {cursor: kCurFillHandle, target: "shape", col: -1, row: -1};
 				
 				var drawingInfo = this.objectRender.checkCursorDrawingObject(x, y);
-				if (drawingInfo && drawingInfo.cursor) {
+				if (drawingInfo && drawingInfo.data) {
 					// Возможно картинка с lock
-					lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object,/*subType*/null,
-						sheetId, drawingInfo.data.id);
-					isLocked = this.collaborativeEditing.getLockIntersection(lockInfo,
-						c_oAscLockTypes.kLockTypeOther,/*bCheckOnlyLockAll*/false);
+					lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object,/*subType*/null, sheetId, drawingInfo.data);
+					isLocked = this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther,/*bCheckOnlyLockAll*/false);
 					if (false !== isLocked) {
 						// Кто-то сделал lock
 						userId = isLocked.UserId;
@@ -5051,8 +4992,7 @@
 						lockRangePosTop = drawingInfo.data.getVisibleTopOffset(/*withHeader*/true);
 					}
 
-					return {cursor: drawingInfo.cursor, target: "drawingObject", drawingId: drawingInfo.data.id, col: -1, row: -1, userId: userId,
-						lockRangePosLeft: lockRangePosLeft, lockRangePosTop: lockRangePosTop};
+					return {cursor: drawingInfo.cursor, target: "shape", drawingId: drawingInfo.data, col: -1, row: -1, userId: userId, lockRangePosLeft: lockRangePosLeft, lockRangePosTop: lockRangePosTop};
 				}
 					
 				var autoFilterCursor = this.autoFilters.isButtonAFClick(x,y,this);
@@ -5440,10 +5380,11 @@
 					ar.startCol = c;
 					ar.startRow = r;
 
-					var index = this.objectRender.inSelectionDrawingObjectIndex(xpos, ypos, true);
-					var graphicSelectionType = this.objectRender.getGraphicSelectionType(index);
-					if ( (index >= 0) && graphicSelectionType )
+					var cursorInfo = this.objectRender.checkCursorDrawingObject(xpos, ypos);
+					if ( cursorInfo ) {
+						var graphicSelectionType = this.objectRender.getGraphicSelectionType(cursorInfo.data);
 						ar.type = graphicSelectionType;
+					}
 					else
 					{
 						ar.type = c_oAscSelectionType.RangeCells;
@@ -5892,6 +5833,7 @@
 			},
 
 			changeSelectionStartPoint: function (x, y, isCoord, isSelectMode) {
+				
 				var ar = (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRanges.length - 1]: this.activeRange;
 				var sc = ar.startCol, sr = ar.startRow, ret = {};
 
@@ -5903,18 +5845,7 @@
 					this.cellCommentator.resetLastSelectedId();
 				}
 
-				var index = -1;
 				if (isCoord) {
-					// check drawing-objects coordinates
-					index = this.objectRender.inSelectionDrawingObjectIndex(x, y, true);
-					this.objectRender.unselectDrawingObjects();
-					this.objectRender.selectDrawingObject(index);
-					if ( index >= 0 ) {
-						this.objectRender.setStartPointDrawingObject(index, x, y);
-						this.objectRender.saveUndoRedoDrawingObject();
-						//return ret;
-					}
-					
 					var drawingInfo = this.objectRender.checkCursorDrawingObject(x, y);
 					if ( drawingInfo ) {
 						if ( drawingInfo.isGraphicObject )
@@ -5943,13 +5874,12 @@
 					}
 				}
 
-				if ( index < 0 )
-					this.drawDepCells();
-				else {
+				if ( drawingInfo && drawingInfo.isGraphicObject ) {
 					// отправляем евент для получения свойств картинки, шейпа или группы
-					this._trigger("setFocusDrawingObject", true);
 					this._trigger("selectionChanged", this.getSelectionInfo());
 				}
+				else
+					this.drawDepCells();
 					
 				this.cellCommentator.drawCommentCells(false);
 				
@@ -5960,11 +5890,9 @@
 			changeSelectionStartPointRightClick: function (x, y) {
 
 				// Выделяем объект
-				var index = this.objectRender.inSelectionDrawingObjectIndex(x, y);
-				if ( index >= 0 ) {
+				var cursorInfo = this.objectRender.checkCursorDrawingObject(x, y);
+				if ( !cursorInfo )
 					this.objectRender.unselectDrawingObjects();
-					this.objectRender.selectDrawingObject(index);
-				}
 
 				var ar = this.activeRange;
 
@@ -6017,6 +5945,12 @@
 					// Не попали в выделение (меняем первую точку)
 					this.cleanSelection();
 					this._moveActiveCellToXY(x, y);
+					
+					// Нет селекта при клике по drawing-объекту
+					if ( (ar.type !== c_oAscSelectionType.RangeImage) && (ar.type !== c_oAscSelectionType.RangeShape) && (ar.type !== c_oAscSelectionType.RangeChart) ) {
+						this.objectRender.unselectDrawingObjects();
+						this._drawSelection();
+					}
 
 					this._trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
 					this._trigger("selectionChanged", this.getSelectionInfo());
@@ -6026,22 +5960,7 @@
 			},
 
 			changeSelectionEndPoint: function (x, y, isCoord, isSelectMode) {
-				if (isCoord) {
-					// check drawing-objects coordinates
-					var index = this.objectRender.getSelectedDrawingObjectIndex();
-					if ( index >= 0 ) {
-						this.objectRender.moveDrawingObject(index, x, y);
-
-						var col = this._findColUnderCursor( x * asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIX() ), true );
-						var row = this._findRowUnderCursor( y * asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIY() ), true );
-						if ( col && row )
-							this.objectRender.showOverlayDrawingObjects();
-
-						this._drawCollaborativeElements(/*bIsDrawObjects*/false);
-						return this._calcActiveRangeOffset();
-					}
-				}
-
+				
 				var ar = (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRanges.length - 1] : this.activeRange;
 				var arOld = ar.clone();
 				var arnOld = ar.clone(true);
@@ -8042,7 +7961,7 @@
 					if (isUpdateCols) { t._updateVisibleColsCount(); }
 					if (isUpdateRows) { t._updateVisibleRowsCount(); }
 
-					t.objectRender.showDrawingObjects(true, null, true);
+					t.objectRender.showDrawingObjects(true);
 				};
 
 				switch (prop) {
@@ -8340,7 +8259,7 @@
 				if (isUpdateRows) { t._updateVisibleRowsCount(); }
 
 				if (false === lockDraw) {
-					t.objectRender.showDrawingObjects(true, null, true);
+					t.objectRender.showDrawingObjects(true);
 					t.autoFilters.drawAutoF(t);
 				}
 			},
@@ -8988,7 +8907,7 @@
 					t.activeRange.type = activeRange.type;
 				}
 
-				if (t.objectRender.inSelectionDrawingObjectIndex(x, y) >= 0)
+				if ( t.objectRender.checkCursorDrawingObject(x, y) )
 					return false;
 
 				function getLeftSide(col) {

@@ -475,11 +475,15 @@ function CGeometry()
 
 CGeometry.prototype=
 {
+	Get_Id: function()
+	{
+		return this.Id;
+	},
     getObjectType: function()
     {
         return CLASS_TYPE_GEOMETRY;
     },
-
+	
     Write_ToBinary: function(Writer)
     {
 
