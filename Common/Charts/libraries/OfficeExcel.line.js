@@ -1812,8 +1812,10 @@
 
             if ((
                    (i == 0 && coords[i])
-                /*|| (yPos < this._chartGutter._top)
+               /*|| (yPos < this._chartGutter._top)
                 || (prevY < this._chartGutter._top)*/
+				|| yPos == ''
+				|| prevY == ''
                 || (yPos > (height - this._chartGutter._bottom))
                 || (i > 0 && prevX > (width - this._chartGutter._right))
                 || (i > 0 && prevY > (height - this._chartGutter._bottom))
