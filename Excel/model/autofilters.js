@@ -2482,22 +2482,22 @@
 				for(var s = 0; s < arrLog.length; s++)
 				{
 					var filterVal;
-                    if(arrLog[s] == 1 || arrLog[s] == 2)//общие для числа и текста
+                    if(arrLog[s] == ECustomFilter.customfilterEqual || arrLog[s] == ECustomFilter.customfilterNotEqual)//общие для числа и текста
 					{
 						val = val.toString();
 						filterVal = valLog[s].toString();
-						if(arrLog[s] == 1)//equals
+						if(arrLog[s] == ECustomFilter.customfilterEqual)//equals
 						{
 							if(val == filterVal || valWithFormat == filterVal)
 								result[s] = true;
 						}
-						else if(arrLog[s] == 2)//doesNotEqual
+						else if(arrLog[s] == ECustomFilter.customfilterNotEqual)//doesNotEqual
 						{
 							if(val != filterVal || valWithFormat != filterVal)
 								result[s] = true;
 						}
 					}
-					else if(arrLog[s] == 3 || arrLog[s] == 4 || arrLog[s] == 5 || arrLog[s] == 6)//только для чисел
+					else if(arrLog[s] == ECustomFilter.customfilterGreaterThan || arrLog[s] == ECustomFilter.customfilterGreaterThanOrEqual || arrLog[s] == ECustomFilter.customfilterLessThan || arrLog[s] == ECustomFilter.customfilterLessThanOrEqual)//только для чисел
 					{
 						filterVal =  parseFloat(valLog[s]);
 						if(g_oFormatParser && g_oFormatParser.parse && g_oFormatParser.parse(valLog[s]) != null)
@@ -2508,19 +2508,19 @@
 						{
 							switch (arrLog[s])
 							{
-								case 3:
+								case ECustomFilter.customfilterGreaterThan:
 									if(val > filterVal)//isGreaterThan
 										result[s] = true;
 									break;
-								case 4: 
+								case ECustomFilter.customfilterGreaterThanOrEqual: 
 									if(val >= filterVal)//isGreaterThanOrEqualTo
 										result[s] = true;
 									break;
-								case 5: 
+								case ECustomFilter.customfilterLessThan: 
 									if(val < valLog[s])//isLessThan
 										result[s] = true;
 									break;
-								case 6: 
+								case ECustomFilter.customfilterLessThanOrEqual: 
 									if(val <= filterVal)//isLessThanOrEqualTo
 										result[s] = true;
 									break;
