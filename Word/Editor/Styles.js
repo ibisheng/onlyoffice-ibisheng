@@ -5604,6 +5604,17 @@ CNumPr.prototype =
     }
 };
 
+var dropcap_None   = 0x00;
+var dropcap_Drop   = 0x01;
+var dropcap_Margin = 0x02;
+
+var wrap_Around    = 0x01;
+var wrap_Auto      = 0x02;
+var wrap_None      = 0x03;
+var wrap_NotBeside = 0x04;
+var wrap_Through   = 0x05;
+var wrap_Tight     = 0x06;
+
 function CFramePr()
 {
     this.DropCap = undefined; // Является ли данный элемент буквицей
@@ -5631,17 +5642,212 @@ CFramePr.prototype =
         FramePr.DropCap = this.DropCap;
         FramePr.H       = this.H;
         FramePr.HAnchor = this.HAnchor;
-        FramePr.HRule = this.HRule;
-        FramePr.HSpace = this.HSpace;
-        FramePr.Lines = this.Lines;
+        FramePr.HRule   = this.HRule;
+        FramePr.HSpace  = this.HSpace;
+        FramePr.Lines   = this.Lines;
         FramePr.VAnchor = this.VAnchor;
-        FramePr.VSpace = this.VSpace;
-        FramePr.W = this.W;
-        FramePr.Wrap = this.Wrap;
-        FramePr.X = this.X;
-        FramePr.DropCap = this.DropCap;
-        FramePr.DropCap = this.DropCap;
+        FramePr.VSpace  = this.VSpace;
+        FramePr.W       = this.W;
+        FramePr.Wrap    = this.Wrap;
+        FramePr.X       = this.X;
+        FramePr.XAlign  = this.XAlign;
+        FramePr.Y       = this.Y;
+        FramePr.YAlign  = this.YAlign;
+
+        return FramePr;
+    },
+
+    Compare : function(FramePr)
+    {
+        if ( this.DropCap != FramePr.DropCap || Math.abs(this.H - FramePr.H) > 0.001 || this.HAnchor != FramePr.HAnchor || this.HRule != FramePr.HRule || this.HSpace != FramePr.HSpace ||
+             this.Lines != FramePr.Lines || this.VAnchor != FramePr.VAnchor || this.VSpace != FramePr.VSpace || Math.abs( this.W - FramePr.W ) > 0.001 || this.Wrap != FramePr.Wrap ||
+             Math.abs( this.X - FramePr.X ) > 0.001 || this.XAlign != FramePr.XAlign || Math.abs( this.Y - FramePr.Y ) > 0.001 || this.YAlign != FramePr.YAlign )
+            return false;
+
+        return true;
+    },
+
+    Set_FromObject : function(FramePr)
+    {
+        this.DropCap = FramePr.DropCap;
+        this.H       = FramePr.H;
+        this.HAnchor = FramePr.HAnchor;
+        this.HRule   = FramePr.HRule;
+        this.HSpace  = FramePr.HSpace;
+        this.Lines   = FramePr.Lines;
+        this.VAnchor = FramePr.VAnchor;
+        this.VSpace  = FramePr.VSpace;
+        this.W       = FramePr.W;
+        this.Wrap    = FramePr.Wrap;
+        this.X       = FramePr.X;
+        this.XAlign  = FramePr.XAlign;
+        this.Y       = FramePr.Y;
+        this.YAlign  = FramePr.YAlign;
+    },
+
+    Write_ToBinary : function(Writer)
+    {
+        var StartPos = Writer.GetCurPosition();
+        Writer.Skip(4);
+        var Flags = 0;
+
+        if ( undefined != this.DropCap )
+        {
+            Writer.WriteLong( this.DropCap );
+            Flags |= 1;
+        }
+
+        if ( undefined != this.H )
+        {
+            Writer.WriteDouble( this.H );
+            Flags |= 2;
+        }
+
+        if ( undefined != this.HAnchor )
+        {
+            Writer.WriteLong( this.HAnchor );
+            Flags |= 4;
+        }
+
+        if ( undefined != this.HRule )
+        {
+            Writer.WriteLong( this.HRule );
+            Flags |= 8;
+        }
+
+        if ( undefined != this.HSpace )
+        {
+            Writer.WriteDouble( this.HSpace );
+            Flags |= 16;
+        }
+
+        if ( undefined != this.Lines )
+        {
+            Writer.WriteLong( this.Lines );
+            Flags |= 32;
+        }
+
+        if ( undefined != this.VAnchor )
+        {
+            Writer.WriteLong( this.VAnchor );
+            Flags |= 64;
+        }
+
+        if ( undefined != this.VSpace )
+        {
+            Writer.WriteDouble( this.VSpace );
+            Flags |= 128;
+        }
+
+        if ( undefined != this.W )
+        {
+            Writer.WriteDouble( this.W );
+            Flags |= 256;
+        }
+
+        if ( undefined != this.X )
+        {
+            Writer.WriteDouble( this.X );
+            Flags |= 512;
+        }
+
+        if ( undefined != this.XAlign )
+        {
+            Writer.WriteLong( this.XAlign );
+            Flags |= 1024;
+        }
+
+        if ( undefined != this.Y )
+        {
+            Writer.WriteDouble( this.Y );
+            Flags |= 2048;
+        }
+
+        if ( undefined != this.YAlign )
+        {
+            Writer.WriteLong( this.YAlign );
+            Flags |= 4096;
+        }
+
+        var EndPos = Writer.GetCurPosition();
+        Writer.Seek( StartPos );
+        Writer.WriteLong( Flags );
+        Writer.Seek( EndPos );
+    },
+
+    Read_FromBinary : function(Reader)
+    {
+        var Flags = Reader.GetLong();
+
+        if ( Flags & 1 )
+            this.DropCap = Reader.GetLong();
+
+        if ( Flags & 2 )
+            this.H = Reader.GetDouble();
+
+        if ( Flags & 4 )
+            this.HAnchor = Reader.GetLong();
+
+        if ( Flags & 8 )
+            this.HRule = Reader.GetLong();
+
+        if ( Flags & 16 )
+            this.HSpace = Reader.GetDouble();
+
+        if ( Flags & 32 )
+            this.Lines = Reader.GetLong();
+
+        if ( Flags & 64 )
+            this.VAnchor = Reader.GetLong();
+
+        if ( Flags & 128 )
+            this.VSpace = Reader.GetDouble();
+
+        if ( Flags & 256 )
+            this.W = Reader.GetDouble();
+
+        if ( Flags & 512 )
+            this.X = Reader.GetDouble();
+
+        if ( Flags & 1024 )
+            this.XAlign = Reader.GetLong();
+
+        if ( Flags & 2048 )
+            this.Y = Reader.GetDouble();
+
+        if ( Flags & 4096 )
+            this.YAlign = Reader.GetLong();
+    },
+
+    Init_Default_DropCap : function(bInside)
+    {
+        this.DropCap = ( true === bInside ? dropcap_Drop : dropcap_Margin );
+        this.Lines   = 3;
+        this.Wrap    = wrap_Around;
+        this.VAnchor = c_oAscVAnchor.Text;
+        this.HAnchor = ( true === bInside ? c_oAscHAnchor.Text : c_oAscHAnchor.Page );
+    },
+
+    Get_W : function()
+    {
+        return this.W;
+    },
+
+    Get_H : function()
+    {
+        return this.H;
+    },
+
+    Is_DropCap : function()
+    {
+        if ( dropcap_Margin === this.DropCap || dropcap_Drop === this.DropCap )
+            return true;
+
+        return false;
     }
+
+
+
 };
 
 function CParaPr()
@@ -5722,6 +5928,11 @@ CParaPr.prototype =
         if ( undefined != this.PStyle )
             ParaPr.PStyle = this.PStyle;
 
+        if ( undefined != this.FramePr )
+            ParaPr.FramePr = this.FramePr.Copy();
+        else
+            ParaPr.FramePr = undefined;
+
         return ParaPr;
     },
 
@@ -5793,6 +6004,8 @@ CParaPr.prototype =
 
         if ( undefined != ParaPr.PStyle )
             this.PStyle = ParaPr.PStyle;
+
+        this.FramePr = undefined;
     },
 
     Init_Default : function()
@@ -5825,6 +6038,7 @@ CParaPr.prototype =
         this.Tabs                      = new CParaTabs();
         this.NumPr                     = undefined;
         this.PStyle                    = undefined;
+        this.FramePr                   = undefined;
     },
 
     Set_FromObject : function(ParaPr)
@@ -5928,6 +6142,14 @@ CParaPr.prototype =
         }
         else
             this.NumPr = undefined;
+
+        if ( undefined != ParaPr.FramePr )
+        {
+            this.FramePr = new CFramePr();
+            this.FramePr.Set_FromObject( ParaPr.FramePr );
+        }
+        else
+            this.FramePr = undefined;
     },
 
     Compare : function(ParaPr)
@@ -6027,6 +6249,10 @@ CParaPr.prototype =
             else
                 Result_ParaPr.Locked = ParaPr.Locked;
         }
+
+        // FramePr
+        if ( undefined != this.FramePr && undefined != ParaPr.FramePr && true === this.FramePr.Compare(ParaPr.FramePr) )
+            Result_ParaPr.FramePr = this.FramePr;
 
         return Result_ParaPr;
     },
@@ -6139,6 +6365,12 @@ CParaPr.prototype =
             Flags |= 65536;
         }
 
+        if ( undefined != this.FramePr )
+        {
+            this.FramePr.Write_ToBinary( Writer );
+            Flags |= 131072;
+        }
+
         var EndPos = Writer.GetCurPosition();
         Writer.Seek( StartPos );
         Writer.WriteLong( Flags );
@@ -6229,6 +6461,12 @@ CParaPr.prototype =
 
         if ( Flags & 65536 )
             this.PStyle = Reader.GetString2();
+
+        if ( Flags & 131072 )
+        {
+            this.FramePr = new CFramePr();
+            this.FramePr.Read_FromBinary( Reader );
+        }
     }
 }
 
