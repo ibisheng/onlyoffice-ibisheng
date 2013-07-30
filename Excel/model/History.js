@@ -73,10 +73,7 @@ var historyitem_Cell_SetQuotePrefix = 20;
 var historyitem_Cell_Angle = 21;
 var historyitem_Cell_Style = 22;
 
-var historyitem_DrawingObject_Add = 1;
-var historyitem_DrawingObject_Remove = 2;
-var historyitem_DrawingObject_Edit = 3;
-var historyitem_DrawingLayer = 4;
+var historyitem_DrawingLayer = 1;
 
 var historyitem_AutoShapes_Offset = 1;
 var historyitem_AutoShapes_Extents = 2;

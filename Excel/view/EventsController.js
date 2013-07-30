@@ -588,7 +588,7 @@
 				t.__retval = true;
 
 				//for Mac OS
-				if(event.metaKey)
+				if ( event.metaKey )
 					event.ctrlKey = true;
 
 				function stop(immediate) {
@@ -602,6 +602,12 @@
 				// этот код должен выполняться самым первым
 				if (event.which === 18) {
 					t.lastKeyCode = event.which;
+				}
+				
+				var graphicObjects = t.handlers.trigger("getSelectedGraphicObjects");
+				if ( graphicObjects.length ) {
+					t.handlers.trigger("graphicObjectWindowKeyDown", event);
+					return true;
 				}
 
 				// Двигаемся ли мы в выделенной области
@@ -849,12 +855,6 @@
 				} // end of switch
 
 				if ((dc !== 0 || dr !== 0) && false === t.handlers.trigger("isGlobalLockEditCell")) {
-
-					var graphicObjects = t.handlers.trigger("getSelectedGraphicObjects");
-					if ( graphicObjects.length ) {
-						t.handlers.trigger("graphicObjectWindowKeyDown", event);
-						return true;
-					}
 				
 					// Проверка на движение в выделенной области
 					if (selectionActivePointChanged) {

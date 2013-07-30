@@ -3068,11 +3068,10 @@ UndoRedoDrawingLayer.prototype = {
 			return;
 		var ws = api.wb.getWorksheetById(nSheetId);
 		
-		var objectRender = ws.objectRender;
-		if (bUndo == true)
-			objectRender.Undo(Type, Data);
+		if ( bUndo == true )
+			ws.objectRender.Undo(Type, Data);
 		else
-			objectRender.Redo(Type, Data);
+			ws.objectRender.Redo(Type, Data);
 	}
 };
 

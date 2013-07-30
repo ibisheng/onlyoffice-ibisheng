@@ -2277,22 +2277,6 @@ DrawingObjects.prototype = {
 	Undo: function(type, data) {
 
 		switch (type) {
-
-			case historyitem_DrawingObject_Add:
-				this.deleteDrawingObject(data);
-				break;
-
-			case historyitem_DrawingObject_Remove:
-				this.addDrawingObject(data);
-				break;
-
-			case historyitem_DrawingObject_Edit:
-				if ((data.flags.transactionState == c_oAscTransactionState.No) || (data.flags.transactionState == c_oAscTransactionState.Start)) {
-					this.deleteDrawingObject(data);
-					this.addDrawingObject(data);
-				}
-				break;
-			
 			case historyitem_DrawingLayer:
 				if ( data.aLayerBefore.length && data.aLayerAfter.length ) {
 					var aStorage = [];
@@ -2311,22 +2295,6 @@ DrawingObjects.prototype = {
 	Redo: function(type, data) {
 
 		switch (type) {
-
-			case historyitem_DrawingObject_Add:
-				this.addDrawingObject(data);
-				break;
-
-			case historyitem_DrawingObject_Remove:
-				this.deleteDrawingObject(data);
-				break;
-
-			case historyitem_DrawingObject_Edit:
-				if ((data.flags.transactionState == c_oAscTransactionState.No) || (data.flags.transactionState == c_oAscTransactionState.Stop)) {
-					this.deleteDrawingObject(data);
-					this.addDrawingObject(data);
-				}
-				break;
-			
 			case historyitem_DrawingLayer:
 				if ( data.aLayerBefore.length && data.aLayerAfter.length ) {
 					var aStorage = [];
@@ -3254,34 +3222,8 @@ function DrawingObjects() {
 		overlayCtx.clearRect( 0, 0, worksheet.getCellLeft(0, 1), overlayCtx.getHeight() );
 	}
 	
-	//-----------------------------------------------------------------------------------
-	// Common operation for Undo/Redo
-	//-----------------------------------------------------------------------------------
-	
 	_this.changeObjectStorage = function(storage) {
 		aObjects = storage;
-	}
-
-	_this.addDrawingObject = function(object) {
-
-		if (object) {
-			var urObj = _this.cloneDrawingObject(object);
-			aObjects.push(urObj);
-		}
-	}
-
-	_this.deleteDrawingObject = function(object) {
-
-		var bResult = false;
-		for (var i = 0; i < _this.countDrawingObjects(); i++) {
-			if (aObjects[i].id == object.id) {
-				aObjects.splice(i, 1);
-				_this.unselectDrawingObjects();
-				bResult = true;
-				break;
-			}
-		}
-		return bResult;
 	}
 
 	//-----------------------------------------------------------------------------------
@@ -4399,7 +4341,7 @@ function DrawingObjects() {
 	_this.getDrawingObject = function(id) {
 
 		for (var i = 0; i < _this.countDrawingObjects(); i++) {
-			if (aObjects[i].id == id)
+			if (aObjects[i].graphicObject.Id == id)
 				return aObjects[i];
 		}
 		return null;
@@ -4562,7 +4504,7 @@ function DrawingObjects() {
 		
 			var undoRedoLayer = new DrawingLayer();
 			for (var i = 0; i < _this.countDrawingObjects(); i++) {
-				undoRedoLayer.aLayerBefore[i] = aObjects[i].id;
+				undoRedoLayer.aLayerBefore[i] = aObjects[i].graphicObject.Id;
 			}
 
 			switch (layerType) {
@@ -4597,7 +4539,7 @@ function DrawingObjects() {
 			}
 			
 			for (var i = 0; i < _this.countDrawingObjects(); i++) {
-				undoRedoLayer.aLayerAfter[i] = aObjects[i].id;
+				undoRedoLayer.aLayerAfter[i] = aObjects[i].graphicObject.Id;
 			}
 			
 			History.Create_NewPoint();
@@ -4642,6 +4584,12 @@ function DrawingObjects() {
 			}
 			obj.to.row = foundRow.row;
 			obj.to.rowOff = pxToMm(top + obj.size.height - worksheet.getCellTop(obj.to.row, 0));
+			
+			// Update graphic object
+			obj.graphicObject.setPosition( pxToMm(obj.getRealLeftOffset(true)), pxToMm(obj.getRealTopOffset(true)) );
+			//obj.graphicObject.setExtents( pxToMm(obj.getWidthFromTo()), pxToMm(obj.getHeightFromTo()) );
+			obj.graphicObject.recalculateTransform();
+			obj.graphicObject.calculateTransformTextMatrix();
 		}
 	}
 
