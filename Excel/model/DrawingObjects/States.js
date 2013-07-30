@@ -280,9 +280,10 @@ function NullState(drawingObjectsController, drawingObjects)
 		var selected_objects = this.drawingObjectsController.selectedObjects;
         switch (e.keyCode)
         {
-            case 8:
+            case 8:		// Backspace
             {
                 b_prevent_default = true;
+				this.drawingObjectsController.drawingObjects.deleteSelectedDrawingObject();
             }
 			case 9:		// Tab (селект объектов)
 			{				
@@ -307,6 +308,10 @@ function NullState(drawingObjectsController, drawingObjects)
 						}
 					}
 				}
+			}
+			case 46:	// Delete
+			{
+				this.drawingObjectsController.drawingObjects.deleteSelectedDrawingObject();
 			}
         }
         if(b_prevent_default)
