@@ -2845,7 +2845,7 @@ function CDrawingDocument(drawingObjects)
 
     this.UpdateTarget = function(x, y, pageIndex)
     {
-        this.m_oWordControl.m_oLogicDocument.Set_TargetPos( x, y, pageIndex );
+       // this.m_oWordControl.m_oLogicDocument.Set_TargetPos( x, y, pageIndex );
 
         if (this.UpdateTargetFromPaint === false)
         {
@@ -2877,7 +2877,7 @@ function CDrawingDocument(drawingObjects)
             bIsPageChanged = true;
         }
 
-        var targetSize = Number(this.m_dTargetSize * this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100);
+        var targetSize = this.drawingDocument.convertMetric(this.m_dTargetSize , 3, 0); // Number(this.m_dTargetSize * this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100);
 
         var pos = null;
         var __x = x;
