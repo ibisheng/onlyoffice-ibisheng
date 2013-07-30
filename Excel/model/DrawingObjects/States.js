@@ -284,6 +284,7 @@ function NullState(drawingObjectsController, drawingObjects)
             {
                 b_prevent_default = true;
 				this.drawingObjectsController.drawingObjects.deleteSelectedDrawingObject();
+				break;
             }
 			case 9:		// Tab (селект объектов)
 			{				
@@ -308,13 +309,15 @@ function NullState(drawingObjectsController, drawingObjects)
 						}
 					}
 				}
+				break;
 			}
 			case 46:	// Delete
 			{
 				this.drawingObjectsController.drawingObjects.deleteSelectedDrawingObject();
+				break;
 			}
         }
-        if(b_prevent_default)
+        if (b_prevent_default)
             e.preventDefault();
     };
 
