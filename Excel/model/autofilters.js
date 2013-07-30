@@ -56,6 +56,24 @@
 			asc_setVisible: function (val) { this.visible = val; }
 		};
 		
+		function formatTablePictures (options) {
+			if ( !(this instanceof formatTablePictures) ) {return new formatTablePictures(options);}
+			
+			this.name = options.name;
+			this.displayName = options.displayName;
+			this.type = options.type;
+			this.image = options.image;
+		}
+
+		formatTablePictures.prototype = {
+			constructor: formatTablePictures,
+
+			asc_getName: function () { return this.name; },
+			asc_getDisplayName: function () { return this.displayName; },
+			asc_getType: function () { return this.type; },
+			asc_getImage: function () { return this.image; }
+		};
+		
 		function AutoFiltersOptions () {
 
 			if ( !(this instanceof AutoFiltersOptions) ) {return new AutoFiltersOptions();}
@@ -1529,6 +1547,7 @@
 				canvas.height = '46';
 				var customStyles = wb.TableStyles.CustomStyles;
 				var result  = [];
+				var options;
 				var n = 0;
 				if(customStyles)
 				{
@@ -1536,13 +1555,14 @@
 					{
 						if(customStyles[i].table)
 						{
-							result[n] = 
+							options = 
 							{
 								name: i,
 								displayName: i,
 								type: 'custom',
 								image: this._drawSmallIconTable(canvas,customStyles[i])
 							};
+							result[n] = new formatTablePictures(options);
 							n++;
 						}
 					}
@@ -1554,13 +1574,14 @@
 					{
 						if(defaultStyles[i].table)
 						{
-							result[n] = 
+							options = 
 							{
 								name: i,
 								displayName: i,
 								type: 'default',
 								image: this._drawSmallIconTable(canvas,defaultStyles[i])
 							};
+							result[n] = new formatTablePictures(options);
 							n++;
 						}
 					}
@@ -5041,5 +5062,12 @@
 		prot["asc_getIsTitle"]					= prot.asc_getIsTitle;
 		prot["asc_setRange"]					= prot.asc_setRange;
 		prot["asc_setIsTitle"]					= prot.asc_setIsTitle;
+		
+		window["Asc"]["formatTablePictures"]	= window["Asc"].formatTablePictures = formatTablePictures;
+		prot									= formatTablePictures.prototype;
+		prot["asc_getName"]					   	= prot.asc_getName;
+		prot["asc_getDisplayName"]				= prot.asc_getDisplayName;
+		prot["asc_getType"]						= prot.asc_getType;
+		prot["asc_getImage"]					= prot.asc_getImage;
 	}
 )(jQuery, window);
