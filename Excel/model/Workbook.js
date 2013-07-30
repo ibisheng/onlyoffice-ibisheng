@@ -1362,8 +1362,8 @@ function Workbook(sUrlPath, eventsHandlers, oApi){
 	g_oIdCounter = new CIdCounter();
 	g_oTableId = new CTableId();
 	
-	this.theme = GenerateDefaultTheme(this);
-	this.clrSchemeMap = GenerateDefaultColorMap();
+	this.theme = null;
+	this.clrSchemeMap = null;
 	
 	this.DefinedNames = new Object();
 	this.oRealDefinedNames = new Object();

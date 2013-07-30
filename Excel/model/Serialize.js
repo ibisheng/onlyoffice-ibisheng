@@ -6030,6 +6030,9 @@ function Binary_OtherTableReader(stream, oMedia, sUrlPath, wb)
 		var oRes = this.bcr.ReadTable(function(t, l){
                 return oThis.ReadOtherContent(t,l);
             });
+		this.wb.clrSchemeMap = GenerateDefaultColorMap();
+		if(null == this.wb.theme)
+			this.wb.theme = GenerateDefaultTheme(this.wb);
 		g_oColorManager.setTheme(this.wb.theme);
 		g_oDefaultFont = g_oDefaultFontAbs = new Font();
 		g_oDefaultFill = g_oDefaultFillAbs = new Fill();
