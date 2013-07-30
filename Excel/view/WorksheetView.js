@@ -8786,7 +8786,9 @@
 						selectRange = parserHelp.parse3DRef(selectRange);
 						if (selectRange) {
 							// ToDo стоит менять и лист
-							this.activeRange = selectRange.range;
+							selectRange = this.model.getRange2(selectRange.range);
+							if (null !== selectRange)
+								this.activeRange = selectRange.getBBox0();
 						}
 					}
 				}
