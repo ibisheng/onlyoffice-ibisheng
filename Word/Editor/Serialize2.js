@@ -165,7 +165,8 @@ var c_oSerProp_pPrType = {
     pPr_rPr: 26,
     pBdr: 27,
     Spacing_BeforeAuto: 28,
-    Spacing_AfterAuto: 29
+    Spacing_AfterAuto: 29,
+	FramePr: 30
 };
 var c_oSerProp_rPrType = {
     Bold:0,
@@ -448,6 +449,22 @@ var c_oSer_ClrSchemeMappingType = {
 	Hyperlink: 9,
 	T1: 10,
 	T2: 11
+};
+var c_oSer_FramePrType = {
+	DropCap: 0,
+	H: 1,
+	HAnchor: 2,
+	HRule: 3,
+	HSpace: 4,
+	Lines: 5,
+	VAnchor: 6,
+	VSpace: 7,
+	W: 8,
+	Wrap: 9,
+	X: 10,
+	XAlign: 11,
+	Y: 12,
+	YAlign: 13
 };
 var ETblStyleOverrideType = {
 	tblstyleoverridetypeBand1Horz:  0,
@@ -879,6 +896,13 @@ function Binary_pPrWriter(memory, oNumIdMap)
             this.memory.WriteByte(c_oSerPropLenType.Variable);
             this.bs.WriteItemWithLength(function(){oThis.bs.WriteBorders(pPr.Brd);});
         }
+		//FramePr
+        if(null != pPr.FramePr)
+        {
+            this.memory.WriteByte(c_oSerProp_pPrType.FramePr);
+            this.memory.WriteByte(c_oSerPropLenType.Variable);
+            this.bs.WriteItemWithLength(function(){oThis.WriteFramePr(pPr.FramePr);});
+        }
     };
     this.WriteInd = function(Ind)
     {
@@ -993,6 +1017,93 @@ function Binary_pPrWriter(memory, oNumIdMap)
             this.memory.WriteByte(c_oSerProp_pPrType.numPr_id);
             this.memory.WriteByte(c_oSerPropLenType.Long);
             this.memory.WriteLong(id);
+        }
+    };
+	this.WriteFramePr = function(oFramePr)
+    {
+        if(null != oFramePr.DropCap)
+        {
+            this.memory.WriteByte(c_oSer_FramePrType.DropCap);
+            this.memory.WriteByte(c_oSerPropLenType.Byte);
+            this.memory.WriteByte(oFramePr.DropCap);
+        }
+		if(null != oFramePr.H)
+        {
+            this.memory.WriteByte(c_oSer_FramePrType.H);
+            this.memory.WriteByte(c_oSerPropLenType.Long);
+            this.memory.WriteLong(g_dKoef_mm_to_twips * oFramePr.H);
+        }
+		if(null != oFramePr.HAnchor)
+        {
+            this.memory.WriteByte(c_oSer_FramePrType.HAnchor);
+            this.memory.WriteByte(c_oSerPropLenType.Byte);
+            this.memory.WriteByte(oFramePr.HAnchor);
+        }
+		if(null != oFramePr.HRule)
+        {
+            this.memory.WriteByte(c_oSer_FramePrType.HRule);
+            this.memory.WriteByte(c_oSerPropLenType.Byte);
+            this.memory.WriteByte(oFramePr.HRule);
+        }
+		if(null != oFramePr.HSpace)
+        {
+            this.memory.WriteByte(c_oSer_FramePrType.HSpace);
+            this.memory.WriteByte(c_oSerPropLenType.Long);
+            this.memory.WriteLong(g_dKoef_mm_to_twips * oFramePr.HSpace);
+        }
+		if(null != oFramePr.Lines)
+        {
+            this.memory.WriteByte(c_oSer_FramePrType.Lines);
+            this.memory.WriteByte(c_oSerPropLenType.Long);
+            this.memory.WriteLong(oFramePr.Lines);
+        }
+		if(null != oFramePr.VAnchor)
+        {
+            this.memory.WriteByte(c_oSer_FramePrType.VAnchor);
+            this.memory.WriteByte(c_oSerPropLenType.Byte);
+            this.memory.WriteByte(oFramePr.VAnchor);
+        }
+		if(null != oFramePr.VSpace)
+        {
+            this.memory.WriteByte(c_oSer_FramePrType.VSpace);
+            this.memory.WriteByte(c_oSerPropLenType.Long);
+            this.memory.WriteLong(g_dKoef_mm_to_twips * oFramePr.VSpace);
+        }
+		if(null != oFramePr.W)
+        {
+            this.memory.WriteByte(c_oSer_FramePrType.W);
+            this.memory.WriteByte(c_oSerPropLenType.Long);
+            this.memory.WriteLong(g_dKoef_mm_to_twips * oFramePr.W);
+        }
+		if(null != oFramePr.Wrap)
+        {
+            this.memory.WriteByte(c_oSer_FramePrType.Wrap);
+            this.memory.WriteByte(c_oSerPropLenType.Byte);
+            this.memory.WriteByte(oFramePr.Wrap);
+        }
+		if(null != oFramePr.X)
+        {
+            this.memory.WriteByte(c_oSer_FramePrType.X);
+            this.memory.WriteByte(c_oSerPropLenType.Long);
+            this.memory.WriteLong(g_dKoef_mm_to_twips * oFramePr.X);
+        }
+		if(null != oFramePr.XAlign)
+        {
+            this.memory.WriteByte(c_oSer_FramePrType.XAlign);
+            this.memory.WriteByte(c_oSerPropLenType.Byte);
+            this.memory.WriteByte(oFramePr.XAlign);
+        }
+		if(null != oFramePr.Y)
+        {
+            this.memory.WriteByte(c_oSer_FramePrType.Y);
+            this.memory.WriteByte(c_oSerPropLenType.Long);
+            this.memory.WriteLong(g_dKoef_mm_to_twips * oFramePr.Y);
+        }
+		if(null != oFramePr.YAlign)
+        {
+            this.memory.WriteByte(c_oSer_FramePrType.YAlign);
+            this.memory.WriteByte(c_oSerPropLenType.Byte);
+            this.memory.WriteByte(oFramePr.YAlign);
         }
     };
 };
@@ -3503,6 +3614,12 @@ function Binary_pPrReader(doc, stream, oDocxNum)
 				else
 					res = c_oSerConstants.ReadUnknown;
                 break;
+			case c_oSerProp_pPrType.FramePr:
+				pPr.FramePr = new CFramePr();
+                res = this.bcr.Read2(length, function(t, l){
+                        return oThis.ReadFramePr(t, l, pPr.FramePr);
+                    });
+                break;
             default:
                 res = c_oSerConstants.ReadUnknown;
                 break;
@@ -3689,6 +3806,41 @@ function Binary_pPrReader(doc, stream, oDocxNum)
             numPr.Lvl = this.stream.GetULongLE();
         else if(c_oSerProp_pPrType.numPr_id == type)
             numPr.NumId = this.stream.GetULongLE();
+        else
+            res = c_oSerConstants.ReadUnknown;
+        return res;
+    };
+	this.ReadFramePr = function(type, length, oFramePr)
+    {
+        var res = c_oSerConstants.ReadOk;
+        if(c_oSer_FramePrType.DropCap == type)
+            oFramePr.DropCap = this.stream.GetUChar();
+		else if(c_oSer_FramePrType.H == type)
+            oFramePr.H = g_dKoef_twips_to_mm * this.stream.GetULongLE();
+		else if(c_oSer_FramePrType.HAnchor == type)
+            oFramePr.HAnchor = this.stream.GetUChar();
+		else if(c_oSer_FramePrType.HRule == type)
+            oFramePr.HRule = this.stream.GetUChar();
+		else if(c_oSer_FramePrType.HSpace == type)
+            oFramePr.HSpace = g_dKoef_twips_to_mm * this.stream.GetULongLE();
+		else if(c_oSer_FramePrType.Lines == type)
+            oFramePr.Lines = this.stream.GetULongLE();
+		else if(c_oSer_FramePrType.VAnchor == type)
+            oFramePr.VAnchor = this.stream.GetUChar();
+		else if(c_oSer_FramePrType.VSpace == type)
+            oFramePr.VSpace = g_dKoef_twips_to_mm * this.stream.GetULongLE();
+		else if(c_oSer_FramePrType.W == type)
+            oFramePr.W = g_dKoef_twips_to_mm * this.stream.GetULongLE();
+		else if(c_oSer_FramePrType.Wrap == type)
+            oFramePr.Wrap = this.stream.GetUChar();
+		else if(c_oSer_FramePrType.X == type)
+            oFramePr.X = g_dKoef_twips_to_mm * this.stream.GetULongLE();
+		else if(c_oSer_FramePrType.XAlign == type)
+            oFramePr.XAlign = this.stream.GetUChar();
+		else if(c_oSer_FramePrType.Y == type)
+            oFramePr.Y = g_dKoef_twips_to_mm * this.stream.GetULongLE();
+		else if(c_oSer_FramePrType.YAlign == type)
+            oFramePr.YAlign = this.stream.GetUChar();
         else
             res = c_oSerConstants.ReadUnknown;
         return res;
