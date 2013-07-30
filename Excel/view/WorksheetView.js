@@ -5889,8 +5889,8 @@
 			changeSelectionStartPointRightClick: function (x, y) {
 
 				// Выделяем объект
-				var cursorInfo = this.objectRender.checkCursorDrawingObject(x, y);
-				if ( !cursorInfo )
+				var graphicCursorInfo = this.objectRender.checkCursorDrawingObject(x, y);
+				if ( !graphicCursorInfo )
 					this.objectRender.unselectDrawingObjects();
 
 				var ar = this.activeRange;
@@ -5944,17 +5944,15 @@
 					// Не попали в выделение (меняем первую точку)
 					this.cleanSelection();
 					this._moveActiveCellToXY(x, y);
-					
-					// Нет селекта при клике по drawing-объекту
-					if ( (ar.type !== c_oAscSelectionType.RangeImage) && (ar.type !== c_oAscSelectionType.RangeShape) && (ar.type !== c_oAscSelectionType.RangeChart) ) {
-						this.objectRender.unselectDrawingObjects();
+					if ( !graphicCursorInfo )
 						this._drawSelection();
-					}
 
 					this._trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
 					this._trigger("selectionChanged", this.getSelectionInfo());
 					return false;
 				}
+				if ( !graphicCursorInfo )
+					this._drawSelection();
 				return true;
 			},
 

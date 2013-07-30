@@ -2399,7 +2399,7 @@ function DrawingObjects() {
         }
 
 		_t.setActive = function() {
-			worksheet._moveActiveCellToXY(_t.getVisibleLeftOffset(true) + 1, _t.getVisibleTopOffset(true) + 1);
+			worksheet._moveActiveCellToXY( mmToPx(_t.graphicObject.x + 1), mmToPx(_t.graphicObject.y + 1) );
 		}
 		
 		// GraphicObject: x, y, extX, extY
