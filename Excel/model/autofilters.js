@@ -1558,7 +1558,7 @@
 							options = 
 							{
 								name: i,
-								displayName: i,
+								displayName: defaultStyles[i].displayName,
 								type: 'custom',
 								image: this._drawSmallIconTable(canvas,customStyles[i])
 							};
@@ -1577,7 +1577,7 @@
 							options = 
 							{
 								name: i,
-								displayName: i,
+								displayName: defaultStyles[i].displayName,
 								type: 'default',
 								image: this._drawSmallIconTable(canvas,defaultStyles[i])
 							};

@@ -8785,8 +8785,11 @@
 						if (selectRange) {
 							// ToDo стоит менять и лист
 							selectRange = this.model.getRange2(selectRange.range);
-							if (null !== selectRange)
+							if (null !== selectRange) {
 								this.activeRange = selectRange.getBBox0();
+								this.activeRange.startCol = this.activeRange.c1;
+								this.activeRange.startRow = this.activeRange.r1;
+							}
 						}
 					}
 				}
