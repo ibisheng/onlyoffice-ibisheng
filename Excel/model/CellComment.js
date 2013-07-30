@@ -739,7 +739,7 @@ function asc_CCellCommentator(currentSheet) {
 			if ( !metrics.result || (metrics.width <= 0) || (metrics.height <= 0) )
 				continue;
 			// Inside drawing object
-			if ( _this.worksheet.objectRender.inSelectionDrawingObjectIndex(metrics.left + metrics.width, metrics.top) >= 0 )
+			if ( _this.worksheet.objectRender.checkCursorDrawingObject(metrics.left + metrics.width, metrics.top) )
 				continue;
 
 			this.overlayCtx.beginPath();
