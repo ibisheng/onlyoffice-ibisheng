@@ -1309,8 +1309,8 @@
 				}
 			},
 
-			setSelectDialogRangeMode: function (isSelectDialogRangeMode) {
-				this.getWorksheet().setSelectDialogRangeMode(isSelectDialogRangeMode);
+			setSelectionDialogMode: function (isSelectionDialogMode, selectRange) {
+				this.getWorksheet().setSelectionDialogMode(isSelectionDialogMode, selectRange);
 			},
 
 			// Поиск текста в листе

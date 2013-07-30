@@ -2408,12 +2408,13 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 			/**
 			 * Режим выбора диапазона
-			 * @param {Boolean} isSelectDialogRangeMode
+			 * @param {Boolean} isSelectionDialogMode
+			 * @param selectRange
 			 */
-			asc_setSelectDialogRangeMode: function (isSelectDialogRangeMode) {
-				this.controller.setSelectDialogRangeMode(isSelectDialogRangeMode);
+			asc_setSelectionDialogMode: function (isSelectionDialogMode, selectRange) {
+				this.controller.setSelectionDialogMode(isSelectionDialogMode);
 				if (this.wb)
-					this.wb.setSelectDialogRangeMode(isSelectDialogRangeMode);
+					this.wb.setSelectionDialogMode(isSelectionDialogMode, selectRange);
 			},
 
 			asc_SendThemeColors : function (colors, standart_colors) {
@@ -3021,7 +3022,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_insertFormula"] = prot.asc_insertFormula;
 		prot["asc_getFormulasInfo"] = prot.asc_getFormulasInfo;
 		prot["asc_setFontRenderingMode"] = prot.asc_setFontRenderingMode;
-		prot["asc_setSelectDialogRangeMode"] = prot.asc_setSelectDialogRangeMode;
+		prot["asc_setSelectionDialogMode"] = prot.asc_setSelectionDialogMode;
 		prot["asc_ChangeColorScheme"] = prot.asc_ChangeColorScheme;
 		/////////////////////////////////////////////////////////////////////////
 		///////////////////CoAuthoring and Chat api//////////////////////////////

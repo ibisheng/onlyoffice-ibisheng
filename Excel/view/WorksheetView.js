@@ -427,9 +427,8 @@
 			this.isChartAreaEditMode = false;
 			this.lockDraw = false;
 
-			this.isSelectDialogRangeMode = false;
+			this.isSelectionDialogMode = false;
 			this.copyOfActiveRange = null;
-			this.newSelectRange = null; // Диапазон, который будет на начало выбора диапазона
 
 			this.startCellMoveResizeRange = null;
 			this.startCellMoveResizeRange2 = null;
@@ -2760,7 +2759,7 @@
 			 * @param {Asc.Range} range
 			 */
 			_drawSelection: function (range) {
-				if (!this.isSelectDialogRangeMode) {
+				if (!this.isSelectionDialogMode) {
 					this._drawCollaborativeElements(/*bIsDrawObjects*/true);
 					this._drawSelectionRange(range);
 					this.cellCommentator.drawCommentCells(false);
@@ -2779,7 +2778,7 @@
 					this.activeRange.c2 = this.cols.length - 1;
 				}
 
-				if (!this.isSelectDialogRangeMode)
+				if (!this.isSelectionDialogMode)
 					range = this.activeRange.intersection(range !== undefined ? range : this.visibleRange);
 				else
 					range = this.copyOfActiveRange.intersection(range !== undefined ? range : this.visibleRange);
@@ -2803,7 +2802,7 @@
 				var opt = this.settings;
 				var offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
 				var offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
-				var arn = (!this.isSelectDialogRangeMode) ? this.activeRange.clone(true) : this.copyOfActiveRange.clone(true);
+				var arn = (!this.isSelectionDialogMode) ? this.activeRange.clone(true) : this.copyOfActiveRange.clone(true);
 				var x1 = (range) ? (this.cols[range.c1].left - offsetX) : 0;
 				var x2 = (range) ? (this.cols[range.c2].left + this.cols[range.c2].width - offsetX) : 0;
 				var y1 = (range) ? (this.rows[range.r1].top - offsetY) : 0;
@@ -2923,7 +2922,7 @@
 					ctx.setFillStyle( opt.activeCellBackground )
 							.fillRect(lRect, tRect, rRect - lRect, bRect - tRect);
 
-					var firstCell = (!this.isSelectDialogRangeMode) ? this.activeRange : this.copyOfActiveRange;
+					var firstCell = (!this.isSelectionDialogMode) ? this.activeRange : this.copyOfActiveRange;
 					cr = this._getMergedCellsRange(firstCell.startCol, firstCell.startRow);
 					// Получаем активную ячейку в выделении
 					cr = range.intersection(cr !== undefined ? cr : asc_Range(firstCell.startCol, firstCell.startRow, firstCell.startCol, firstCell.startRow));
@@ -2989,7 +2988,7 @@
 					this._drawFormulaRange(this.arrActiveChartsRanges)
 				}
 
-				if (this.isSelectDialogRangeMode) {
+				if (this.isSelectionDialogMode) {
 					this._drawSelectRange(this.activeRange.clone(true));
 				}
 
@@ -5864,7 +5863,7 @@
 				}
 
 				if (!this.isCellEditMode && (sc !== ar.startCol || sr !== ar.startRow)) {
-					if (!this.isSelectDialogRangeMode) {
+					if (!this.isSelectionDialogMode) {
 						this._trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
 						if (!isSelectMode)
 							this._trigger("selectionChanged", this.getSelectionInfo());
@@ -5991,7 +5990,7 @@
 				ret = this._calcActiveRangeOffset();
 
 				if (!this.isCellEditMode && !arnOld.isEqual(ar.clone(true))) {
-					if (!this.isSelectDialogRangeMode) {
+					if (!this.isSelectionDialogMode) {
 						this._trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/true));
 						if (!isSelectMode)
 							this._trigger("selectionChanged", this.getSelectionInfo(false));
@@ -8766,20 +8765,13 @@
 				return this.isFormulaEditMode;
 			},
 
-			// Функция выставляет диапазон для будующего селекта диапазона (ToDo стоит сделать по другому)
-			_setSelectDialogRange: function (newRange) {
-				if (this.isSelectDialogRangeMode)
+			setSelectionDialogMode: function (isSelectionDialogMode, selectRange) {
+				if (isSelectionDialogMode === this.isSelectionDialogMode)
 					return;
-				this.newSelectRange = newRange.clone();
-			},
-
-			setSelectDialogRangeMode: function (isSelectDialogRangeMode) {
-				if (isSelectDialogRangeMode === this.isSelectDialogRangeMode)
-					return;
-				this.isSelectDialogRangeMode = isSelectDialogRangeMode;
+				this.isSelectionDialogMode = isSelectionDialogMode;
 				this.cleanSelection();
 
-				if (false === this.isSelectDialogRangeMode) {
+				if (false === this.isSelectionDialogMode) {
 					if (null !== this.copyOfActiveRange) {
 						this.activeRange = this.copyOfActiveRange.clone(true);
 						this.activeRange.startCol = this.copyOfActiveRange.startCol;
@@ -8790,11 +8782,12 @@
 					this.copyOfActiveRange = this.activeRange.clone(true);
 					this.copyOfActiveRange.startCol = this.activeRange.startCol;
 					this.copyOfActiveRange.startRow = this.activeRange.startRow;
-					if (this.newSelectRange) {
-						this.activeRange = this.newSelectRange.clone(true);
-						this.activeRange.startCol = this.newSelectRange.startCol;
-						this.activeRange.startRow = this.newSelectRange.startRow;
-						this.newSelectRange = null;
+					if (selectRange) {
+						selectRange = parserHelp.parse3DRef(selectRange);
+						if (selectRange) {
+							// ToDo стоит менять и лист
+							this.activeRange = selectRange.range;
+						}
 					}
 				}
 
