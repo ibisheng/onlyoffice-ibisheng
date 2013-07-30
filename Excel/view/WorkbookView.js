@@ -172,7 +172,6 @@
 					"moveResizeRangeHandle":	function () {self._onMoveResizeRangeHandle.apply(self, arguments);},
 					"moveResizeRangeHandleDone":function () {self._onMoveResizeRangeHandleDone.apply(self, arguments);},
 					"deleteDrawingObjectDone":	function () {self._onDeleteDrawingObjectDone.apply(self);},
-					"selectDrawingObjectEx":	function () {return self._onSelectDrawingObjectEx.apply(self, arguments);},
 					"editCell":          function () {self._onEditCell.apply(self, arguments);},
 					"stopCellEditing":   function () {return self._onStopCellEditing.apply(self, arguments);},
 					"emptyCell":				function () {self._onEmptyCell.apply(self, arguments);},
@@ -582,17 +581,6 @@
 				var ws = this.getWorksheet();
 				ws.objectRender.deleteSelectedDrawingObject();
 				ws.autoFilters.drawAutoF(ws);
-			},
-
-			_onSelectDrawingObjectEx: function (bNext) {
-				var result = false;
-				var ws = this.getWorksheet();
-				var index = ws.objectRender.getSelectedDrawingObjectIndex();
-				if ( index >= 0 ) {
-					ws.objectRender.selectDrawingObjectEx(index, bNext);
-					result = true;
-				}
-				return result;
 			},
 
 			// Обработка автозаполнения

@@ -4270,27 +4270,6 @@ function DrawingObjects() {
 		return false;
 	}
 
-	_this.selectDrawingObjectEx = function(index, bNext) {
-
-		if (_this.checkDrawingObjectIndex(index)) {
-			var toIndex = index;
-			_this.unselectDrawingObjects();
-
-			if (bNext) {
-				if (index + 1 < _this.countDrawingObjects())
-					_this.selectDrawingObject(index + 1);
-				else
-					_this.selectDrawingObject(0);
-			}
-			else {
-				if ((index - 1 >= 0) && (index - 1 < _this.countDrawingObjects()))
-					_this.selectDrawingObject(index - 1);
-				else
-					_this.selectDrawingObject(_this.countDrawingObjects() - 1);
-			}
-		}
-	}
-
 	_this.selectDrawingObjectRange = function(id) {
 
 		worksheet.arrActiveChartsRanges = [];

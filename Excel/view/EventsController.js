@@ -677,16 +677,13 @@
 						// Отключим стандартную обработку браузера нажатия tab
 						stop();
 
-						// Селект по drawing-объектам
-						if ( !t.handlers.trigger("selectDrawingObjectEx", !event.shiftKey) ) {
-							// Особый случай (возможно движение в выделенной области)
-							selectionActivePointChanged = true;
-							if (event.shiftKey){
-								dc = -1;                 // (shift + tab) - движение по ячейкам влево на 1 столбец
-								event.shiftKey = false;  // Сбросим shift, потому что мы не выделяем
-							} else {
-								dc = +1;                 // (tab) - движение по ячейкам вправо на 1 столбец
-							}
+						// Особый случай (возможно движение в выделенной области)
+						selectionActivePointChanged = true;
+						if (event.shiftKey){
+							dc = -1;                 // (shift + tab) - движение по ячейкам влево на 1 столбец
+							event.shiftKey = false;  // Сбросим shift, потому что мы не выделяем
+						} else {
+							dc = +1;                 // (tab) - движение по ячейкам вправо на 1 столбец
 						}
 						break;
 

@@ -276,12 +276,38 @@ function NullState(drawingObjectsController, drawingObjects)
     this.onKeyDown = function(e)
     {
         var b_prevent_default = false;
+		
+		var selected_objects = this.drawingObjectsController.selectedObjects;
         switch (e.keyCode)
         {
             case 8:
             {
                 b_prevent_default = true;
             }
+			case 9:		// Tab (селект объектов)
+			{				
+				var aObjects = this.drawingObjectsController.drawingObjects.getDrawingObjects();
+				
+				if ( aObjects.length > 1 ) {
+					var lastSelectedId = selected_objects[selected_objects.length - 1].Id;
+					this.drawingObjectsController.resetSelectionState();
+					
+					for (var i = 0; i < aObjects.length; i++) {
+						if ( aObjects[i].graphicObject.Id == lastSelectedId ) {
+							
+							var index = i;
+							if ( e.shiftKey ) 	// назад
+								index = (i > 0) ? i - 1 : aObjects.length - 1;
+							else
+								index = (i < aObjects.length - 1) ? i + 1 : 0;
+								
+							aObjects[index].graphicObject.select(this.drawingObjectsController);
+							this.drawingObjectsController.drawingObjects.showDrawingObjects(true);
+							break;
+						}
+					}
+				}
+			}
         }
         if(b_prevent_default)
             e.preventDefault();
