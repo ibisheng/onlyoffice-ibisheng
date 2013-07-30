@@ -3063,17 +3063,19 @@ function DrawingObjects() {
 		worksheet.autoFilters.drawAutoF(worksheet);
 	}
 
-	_this.raiseLayerDrawingObjects = function(bSelect) {
+	_this.raiseLayerDrawingObjects = function() {
 		
 		// слой c объектами должен быть выше селекта
-		var range = worksheet.getSelectedRange().bbox;
-		/*for (var i = 0; i < _this.countDrawingObjects(); i++) {
+		var bbox = worksheet.getSelectedRange().bbox;
+		for (var i = 0; i < _this.countDrawingObjects(); i++) {
 			
 			var obj = aObjects[i];
-			if ( (range.c1 >= obj.from.col) && (range.c1 <= obj.to.col) && (range.r1 >= obj.from.row) && (range.r1 <= obj.to.row) ) {
-				obj.graphicObject.draw(shapeCtx);
-			}
-		}*/
+			// Объекты не пересекаются
+			if ( (bbox.c2 < obj.from.col) || (bbox.r2 < obj.from.row ) || (bbox.c1 > obj.to.col) || (bbox.r1 > obj.to.row) )
+				continue;
+			else
+				obj.graphicObject.draw(shapeOverlayCtx);
+		}
 	}
 
 	_this.countDrawingObjects = function() {
@@ -3177,7 +3179,7 @@ function DrawingObjects() {
 			if ( _this.getSelectedDrawingObjectIndex() < 0 ) {
 				worksheet.cleanSelection();
 				worksheet._drawSelectionRange();
-				_this.raiseLayerDrawingObjects(true);
+				_this.raiseLayerDrawingObjects();
 			}
 		}
 		_this.selectGraphicObject();
@@ -4301,7 +4303,7 @@ function DrawingObjects() {
 				worksheet.overlayCtx.restore();
 				
 				// слой c объектами должен быть выше селекта
-				_this.raiseLayerDrawingObjects(false);
+				_this.raiseLayerDrawingObjects();
 			}
 		}
 	}
@@ -4420,15 +4422,6 @@ function DrawingObjects() {
 			// Редактируем сами
 			callbackFunc(true);
 		}
-	}
-
-	_this.getSelectedDrawingObjectId = function() {
-
-		for (var i = 0; i < _this.countDrawingObjects(); i++) {
-			if ( aObjects[i].graphicObject && aObjects[i].graphicObject.selected )
-				return aObjects[i].graphicObject.Id;
-		}
-		return null;
 	}
 
 	_this.selectLockedDrawingObject = function(id, lockState) {

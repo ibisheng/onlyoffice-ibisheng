@@ -1251,7 +1251,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 							worksheet.objectRender.showDrawingObjects(true);
 							worksheet.cellCommentator.unlockComments();
 							worksheet._drawSelection();
-							worksheet.objectRender.raiseLayerDrawingObjects(true);
+							worksheet.objectRender.raiseLayerDrawingObjects();
 							worksheet.objectRender.selectDrawingObject(worksheet.objectRender.getSelectedDrawingObjectIndex());
 						}
 					}

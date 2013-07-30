@@ -3021,7 +3021,7 @@
 				ctx.restore();
 				if(!this.isChartAreaEditMode){
 					this.objectRender.showDrawingObjectsLocks();
-					this.objectRender.raiseLayerDrawingObjects(true);
+					this.objectRender.raiseLayerDrawingObjects();
 				}
 				this.cellCommentator.drawCommentCells(false);
 				this.objectRender.selectGraphicObject();
@@ -6745,7 +6745,7 @@
 				this._drawSelection();
 				
 				// слой c объектами должен быть выше селекта
-				this.objectRender.raiseLayerDrawingObjects(false);
+				this.objectRender.raiseLayerDrawingObjects();
 				
 				return { ar: ret, d:d };
 			},
