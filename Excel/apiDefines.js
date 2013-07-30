@@ -287,11 +287,11 @@ var c_oAscLayoutPageType = {
 
  var c_oAscCustomAutoFilter = {
 	equals: 1, 
-	doesNotEqual: 2,
-	isGreaterThan: 3, 
-	isGreaterThanOrEqualTo: 4, 
-	isLessThan: 5, 
-	isLessThanOrEqualTo: 6,
+	doesNotEqual: 6,
+	isGreaterThan: 2, 
+	isGreaterThanOrEqualTo: 3, 
+	isLessThan: 4, 
+	isLessThanOrEqualTo: 5,
 	beginsWith: 7, 
 	doesNotBeginWith: 8, 
 	endsWith: 9, 
