@@ -1357,6 +1357,10 @@ function Workbook(sUrlPath, eventsHandlers, oApi){
 	this.dependencyFormulas = new DependencyGraph(this);
 	this.nActive = 0;
 
+	// Global counters
+	g_oIdCounter = new CIdCounter();
+	g_oTableId = new CTableId();
+	
 	this.theme = GenerateDefaultTheme(this);
 	this.clrSchemeMap = GenerateDefaultColorMap();
 	
@@ -1390,10 +1394,6 @@ Workbook.prototype.initGlobalObjects=function(){
 	g_oUndoRedoDrawingLayer = new UndoRedoDrawingLayer(this);
 	g_oUndoRedoAutoFilters = new UndoRedoAutoFilters(this);
     g_oUndoRedoGraphicObjects = new UndoRedoGraphicObjects(this);
-	
-	// Global counters
-	g_oIdCounter = new CIdCounter();
-	g_oTableId = new CTableId();
 }
 Workbook.prototype.init=function(){
 	if(this.nActive < 0)
