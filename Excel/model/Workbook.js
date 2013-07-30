@@ -1357,7 +1357,8 @@ function Workbook(sUrlPath, eventsHandlers, oApi){
 	this.dependencyFormulas = new DependencyGraph(this);
 	this.nActive = 0;
 
-	// Global counters
+	// Histoey & global counters
+	History = new CHistory(this);
 	g_oIdCounter = new CIdCounter();
 	g_oTableId = new CTableId();
 	
@@ -1384,7 +1385,6 @@ function Workbook(sUrlPath, eventsHandlers, oApi){
 	drawingPointer.initGlobalDrawingPointer();
 };
 Workbook.prototype.initGlobalObjects=function(){
-	History = new CHistory(this);
 	g_oUndoRedoCell = new UndoRedoCell(this);
 	g_oUndoRedoWorksheet = new UndoRedoWoorksheet(this);
 	g_oUndoRedoWorkbook = new UndoRedoWorkbook(this);
