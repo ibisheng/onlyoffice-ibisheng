@@ -19,9 +19,6 @@ var c_oRangeType =
 	All:3
 };
 
-function fSortAscending(a, b){return a - b;}
-function fSortDescending(a, b){return b - a;}
-
 function consolelog(text){
 	if( window.g_debug_mode && console && console.log )
 		console.log(text);
