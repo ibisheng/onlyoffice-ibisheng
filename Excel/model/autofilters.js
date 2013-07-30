@@ -1828,6 +1828,10 @@
 					}
 				}
 				return false;//к данному диапазону не применены форматированные таблицы и конфликтов с другими фильтрами нет*/
+				var alreadyAddFilter = this._searchFilters(activeCells,false,ws,aWs);
+				//в случае если меняем стиль фильтра
+				if((alreadyAddFilter && alreadyAddFilter.changeStyle) ||(alreadyAddFilter && !alreadyAddFilter.containsFilter && !alreadyAddFilter.all))
+					return false;
 				
 				var isTitle = this._isAddNameColumn(ws, activeCells);
 				objOptions.asc_setIsTitle(isTitle);
