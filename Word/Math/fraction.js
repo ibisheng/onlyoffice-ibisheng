@@ -157,7 +157,7 @@ CNumerator.prototype.setPosition = function(pos)
 
     this.elements[0][0].setPosition({x: x, y: y});
 }
-CNumerator.prototype.getElement = function(txt)
+CNumerator.prototype.getElement = function()
 {
     return this.elements[0][0];
 }

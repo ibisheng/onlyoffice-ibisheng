@@ -113,13 +113,58 @@ CMathContent.prototype =
         this.g_mContext = new dist(0,0,0,0);
         this.content.push( new mathElem(new CEmpty(), new dist(0,0,0,0), 0) );
     },
-    setTxtPrp: function(txtPrp)
+    ChangeTxtPrp: function(txtPrp)
     {
-        this.textPrp.Set(txtPrp);
+        var start, end;
+        if( this.selection.startPos != this.selection.endPos )
+        {
+            start = this.selection.startPos;
+            end = this.selection.endPos;
+            if(start > end)
+            {
+                tmp = start;
+                start = end;
+                end = tmp;
+            }
+        }
+
+        for(var i = start; i < end; i++)
+            this.content[i].value.setTxtPrp(txtPrp);
+    },
+    setTxtPrp: function(txtPrp) // для всего контента, в случае, когда селект вышел за пределы контента, когда начинали селект + когда в коннтенте есть мат. элементы
+    {
+        this.textPrp.Merge(txtPrp);
+
+        for(var i = 0; i < this.content.length; i++)
+            this.content[i].value.setTxtPrp(txtPrp);
+    },
+    setRunPrp: function(txtPrp)
+    {
+        this.setTxtPrp(txtPrp);
     },
     mergeTxtPrp: function(txtPrp)
     {
         this.textPrp.Merge(txtPrp);
+    },
+    getRunPrp: function(pos)
+    {
+        var runPrp = new CMathTextPrp();
+
+        if(this.content.length > 1)
+        {
+            if(pos == 1) //берем справa
+            {
+                var rPrp = this.content[pos].value.getRunPrp();
+                runPrp.Merge(rPrp);
+            }
+            else
+            {
+                var rPrp = this.content[pos].value.getRunPrp();
+                runPrp.Merge(rPrp);
+            }
+        }
+
+        return runPrp;
     },
     setComposition: function(Compos)
     {
@@ -127,7 +172,6 @@ CMathContent.prototype =
     },
     addTxt: function(txt)
     {
-
         for(var i = 0; i < txt.length; i++)
         {
             this.addLetter( txt.charCodeAt(i));
@@ -168,7 +212,12 @@ CMathContent.prototype =
 
         var symb = new CMathText();
         symb.relate(this);
-        symb.addCode(code);
+        symb.add(code);
+        symb.setTxtPrp( this.getRunPrp(this.CurPos) );
+
+        // txt properties
+
+
 
         this.addElementToContent(symb, gps);
 
@@ -260,10 +309,14 @@ CMathContent.prototype =
             mathElem.relate(this);
             mathElem.setComposition(this.Composition);
             mathElem.setReduct(this.reduct);
+            var runPrp = this.getRunPrp(this.CurPos);
+            mathElem.setRunPrp( runPrp );
 
             //l_gap = r_gap = Math.floor( this.font.FontSize / 5 )*g_dKoef_pix_to_mm;
             this.addElementToContent( mathElem, new dist(l_gap, r_gap, 0, 0) );
-            this.addElementToContent(new CEmpty());
+            var empty = new CEmpty();
+            empty.setTxtPrp(runPrp);
+            this.addElementToContent(empty);
 
             this.rInterval.endPos += 2;
         }
@@ -2580,7 +2633,7 @@ CMathContent.prototype =
             else
                 sAscent = Size.center;
 
-            _ascent = Size.ascent > sAscent ? Size.ascent : sAscent;
+            _ascent = _ascent > sAscent ? _ascent : sAscent;
         }
 
         _width += this.g_mContext.left + this.g_mContext.right;
@@ -2688,7 +2741,7 @@ CMathContent.prototype =
         return pos;
 
     },
-    getCoordElem: function(index, mCoord)  // without gaps of Math Component ( напримет, если справа/слева есть относительно мат элемента компонент, то добавляем gaps справа/слева для этого мат элемента )
+    getCoordElem: function(index, mCoord)  // without gaps of Math Component ( например, если справа/слева есть относительно мат элемента компонент, то добавляем gaps справа/слева для этого мат элемента )
     {
         var widthToPrev = this.content[index-1].widthToEl;
         var widthToCur = this.content[index].widthToEl;
@@ -2918,7 +2971,7 @@ CMathContent.prototype =
         this.setEnd_Selection(1);
         this.selection.active = false;
     },
-    setPosition: function( _pos )
+    old_setPosition: function( _pos )
     {
         this.pos = { x: _pos.x + this.g_mContext.left, y: _pos.y};
         var max_cent = this.size.center;
@@ -2926,6 +2979,26 @@ CMathContent.prototype =
         for(var i=1; i<this.content.length;i++)
         {
             var t = {x: this.pos.x + this.content[i-1].widthToEl + this.content[i].g_mContext.left, y: this.pos.y + max_cent };
+            this.content[i].value.setPosition(t);
+        }
+    },
+    setPosition: function( _pos )
+    {
+        this.pos = { x: _pos.x + this.g_mContext.left, y: _pos.y};
+        var max_cent = this.size.center;
+
+        //var baseLine = 0;
+
+        var txtPrp = this.getTxtPrp();
+        g_oTextMeasurer.SetFont ( txtPrp );
+        var baseLine = DIV_CENT*g_oTextMeasurer.GetHeight();
+
+        for(var i=1; i<this.content.length;i++)
+        {
+            var t = {x: this.pos.x + this.content[i-1].widthToEl + this.content[i].g_mContext.left, y: this.pos.y + max_cent };
+            if( ! this.content[i].value.SUBCONTENT )
+                t.y += baseLine;
+
             this.content[i].value.setPosition(t);
         }
     },
@@ -3307,13 +3380,13 @@ CMathContent.prototype =
     fillPlaceholder: function()
     {
         this.fillMComponent(0);
-        this.addCode(StartTextElement);
+        this.add(StartTextElement);
     },
     fillText: function(txt)
     {
         for(var i = 0; i < txt.length; i++)
         {
-            this.addCode( txt.charCodeAt(i) );
+            this.add( txt.charCodeAt(i) );
         }
 
         //  ??  this.recalculate();
@@ -3415,7 +3488,7 @@ CMathContent.prototype =
         {
             component = new CMathText();
             component.init(this.params);
-            component.addCode(StartTextElement);
+            component.add(StartTextElement);
             result = this;
         }
         else if(type == 1)
@@ -3588,10 +3661,6 @@ CMathComposition.prototype =
         this.TxtPrp.FontSize = 36;
         this.TxtPrp.Italic = true;
         this.TxtPrp.Bold = false;
-    },
-    SetTxtPrp: function(TxtPrp)
-    {
-        this.TxtPrp = TxtPrp;
     },
     Draw: function(context)
     {
@@ -3832,6 +3901,18 @@ CMathComposition.prototype =
             editor.WordControl.m_oLogicDocument.DrawingDocument.SelectClear();
             editor.WordControl.m_oLogicDocument.DrawingDocument.SelectEnabled(false);
         }
+    },
+    SetTxtPrp: function(txtPrp)
+    {
+        this.SelectContent.ChangeTxtPrp(txtPrp);
+        this.Resize();
+        this.UpdatePosition();
+        this.UpdateCursor();
+    },
+    UpdateCursor: function()
+    {
+        this.CurrentContent.update_Cursor();
+        this.ShowCursor();
     },
 
     ////  test function  ////
@@ -4647,7 +4728,8 @@ function CEmpty()
 {
     this.SUBCONTENT = false;
     this.empty = true;
-    this.pos;
+    this.pos = null;
+    this.textPrp = new CMathTextPrp();
     //this.size = {width: 0, ascent:0, descent: 0, height: 0, center: 0};
     this.size = {width: 0, height: 0, center: 0, ascent: 0};
     this.selection =
@@ -4657,14 +4739,17 @@ function CEmpty()
         endPos:     0
     };
 
-    this.draw = function(nothing) {}
-    this.mouseMove = function(nothing1, nothing2) { return true; }
-    this.setFont = function() {}
+    this.draw = function(nothing) {};
+    this.mouseMove = function(nothing1, nothing2) { return true; };
+    this.setFont = function() {};
 
-    this.setPosition = function (_pos) { this.pos = _pos; }
-    this.Resize = function(){}
+    this.setPosition = function (_pos) { this.pos = _pos; };
+    this.Resize = function(){};
 
-    this.IsHighElement =  function() { return false; }
+    this.IsHighElement =  function() { return false; };
+    this.setTxtPrp = function(txtPrp) { this.textPrp.Merge(txtPrp); };
+    this.getRunPrp = function() {return this.textPrp;};
+
 }
 
 function AddEquation(ind)

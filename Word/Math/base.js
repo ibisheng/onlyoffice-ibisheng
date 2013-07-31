@@ -19,7 +19,8 @@ function CMathBase()
     this.Parent = null;
     this.Composition = null; // ссылка на общую формулу
 
-    this.textPrp = new CMathTextPrp();
+    this.textPrp = new CMathTextPrp(); // для рассчета размера расстояний
+    this.RunPrp = new CMathTextPrp(); // запоминаем, если передаются спец. настройки для контента
 
     //todo
     //переделать
@@ -54,6 +55,7 @@ CMathBase.prototype =
                 this.elements[i][j].relate(this);
                 this.elements[i][j].setReduct(this.reduct);
                 this.elements[i][j].setComposition(this.Composition);
+                this.elements[i][j].setRunPrp(this.RunPrp);
 
             }
         }
@@ -102,9 +104,13 @@ CMathBase.prototype =
                     this.elements[i][j].setComposition(Compos);
             }
     },
-    setTxtPr: function(prp)
+    getRunPrp: function()
     {
-        this.txtPrp.Set(prp);
+        return this.textPrp;
+    },
+    setRunPrp: function(txtPrp)
+    {
+        this.RunPrp.Merge(txtPrp);
     },
     fillPlaceholders: function()
     {
@@ -141,6 +147,7 @@ CMathBase.prototype =
                         this.elements[i][j].setReduct(this.reduct);
                     }
                     this.elements[i][j].bMObjs = true;
+                    this.elements[i][j].setRunPrp(this.RunPrp);
                 }
             }
         }
@@ -861,6 +868,13 @@ CMathBase.prototype =
     getElement: function(x, y)
     {
      return this.elements[x][y];
+    },
+    setTxtPrp: function(txtPrp)
+    {
+        for(var i=0; i < this.nRow; i++)
+            for(var j = 0; j < this.nCol; j++)
+                if(!this.elements[i][j].IsJustDraw())
+                    this.elements[i][j].setTxtPrp(txtPrp);
     }
 }
 

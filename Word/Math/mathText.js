@@ -8,6 +8,8 @@
 //api 2212: asc_docs_api.prototype.sync_TextPrFontFamilyCallBack
 // возвращает название шрифта
 
+var DIV_CENT = 0.2487852283770651;
+
 function CMathTextPrp()
 {
     this.FontFamily = undefined;
@@ -66,12 +68,14 @@ function CMathText()
 }
 CMathText.prototype =
 {
-    addCode: function(code)
+    add: function(code)
     {
-        var Italic = this.textPrp.Italic;
-
-        if(Italic === "undefinded" || Italic == null)
-            Italic = this.Parent.getTxtPrp().Italic;
+        this.value = code;
+    },
+    getCode: function()
+    {
+        var code = this.value;
+        var Italic = this.getTxtPrp().Italic;
 
         if(Italic)
         {
@@ -99,34 +103,30 @@ CMathText.prototype =
                 code = 0x1D6A5;
 
         }
-        else
-        {
-            if(code == 0x210E) // h
-                code = 0x0068;
+        /*else
+         {
+         if(code == 0x210E) // h
+         code = 0x0068;
 
-            var bCapitale = (code >= 0x1D434 && code <= 0x1D44D),
-                bSmall = (code >= 0x1D44E && code <= 0x1D467);
+         var bCapitale = (code >= 0x1D434 && code <= 0x1D44D),
+         bSmall = (code >= 0x1D44E && code <= 0x1D467);
 
-            if(bCapitale)
-                code  = code - 0x1D3F3;
-            else if(bSmall)
-                code  = code - 0x1D3ED;
-            else if(bCapGreek)
-                code = code - 0x1D351;
-            else if(bSmallGreek)
-                code = code - 0x1D34B;
+         if(bCapitale)
+         code  = code - 0x1D3F3;
+         else if(bSmall)
+         code  = code - 0x1D3ED;
+         else if(bCapGreek)
+         code = code - 0x1D351;
+         else if(bSmallGreek)
+         code = code - 0x1D34B;
 
-            if(code == 0x1D6A4) // "i" without dot
-                code = 0x131;
-            else if(code == 0x1D6A5) // "j" without dot
-                code = 0x237;
-        }
+         if(code == 0x1D6A4) // "i" without dot
+         code = 0x131;
+         else if(code == 0x1D6A5) // "j" without dot
+         code = 0x237;
+         }*/
 
-        this.value = code;
-    },
-    add: function(code)
-    {
-        this.value = code;
+        return code;
     },
     fillPlaceholders: function()
     {
@@ -137,17 +137,21 @@ CMathText.prototype =
         var txtPrp = this.Parent.getTxtPrp();
         txtPrp.Merge(this.textPrp);
 
-        txtPrp.Italic = false; // всегда отправляем "false"!!
+        //txtPrp.Italic = false; // всегда отправляем "false"!!
 
         return txtPrp;
     },
     setTxtPrp: function(txtPrp)
     {
-        this.textPrp.Set(txtPrp);
+        this.textPrp.Merge(txtPrp);
     },
     setLIterator: function(bIterator)
     {
         this.bIterator = bIterator; // символы другие , чуть толще
+    },
+    getRunPrp: function()
+    {
+        return this.textPrp;
     },
     // ascent = Symbol.Ascent // = Placeholder.Ascent (= Placeholder.Height)
     // descent = FontAscent - Placeholder.Height (FontAscent = FontHeight - FontDescent)
@@ -159,10 +163,12 @@ CMathText.prototype =
     recalculateSize: function()
     {
         var txtPrp = this.getTxtPrp();
+        txtPrp.Italic = false;
 
         g_oTextMeasurer.SetFont ( txtPrp );
 
-        var metricsTxt = g_oTextMeasurer.Measure2Code(this.value);
+        var letter = this.getCode();
+        var metricsTxt = g_oTextMeasurer.Measure2Code(letter);
         var _width = metricsTxt.Width;
 
         //var _ascent = g_oTextMeasurer.GetHeight() + g_oTextMeasurer.GetDescender();
@@ -183,10 +189,11 @@ CMathText.prototype =
 
         this.size = {width: _width, widthG: widthG, height: _height, center: _center, ascent: _ascent, descent: _descent};
     },
-    draw: function()
+    old_draw: function()
     {
         var txtPrp = this.getTxtPrp();
         g_oTextMeasurer.SetFont ( txtPrp );
+
 
         MathControl.pGraph.b_color1(0,0,0,255);
         MathControl.pGraph.SetFont(txtPrp);
@@ -228,7 +235,56 @@ CMathText.prototype =
 
 
         MathControl.pGraph.transform(sx, shy, shx, sy, 0, 0);
-        MathControl.pGraph.FillTextCode(xx, yy , this.value);
+        MathControl.pGraph.FillTextCode(xx, yy , this.getCode());
+
+    },
+    draw: function()
+    {
+        var txtPrp = this.getTxtPrp();
+        txtPrp.Italic = false;
+        g_oTextMeasurer.SetFont ( txtPrp );
+
+        MathControl.pGraph.b_color1(0,0,0,255);
+        MathControl.pGraph.SetFont(txtPrp);
+
+        var X = this.pos.x ,
+            Y = this.pos.y;
+
+        var invert = new CMatrix();
+        invert.sx = this.transform.sx;
+        invert.sy = this.transform.sy;
+        invert.shx = this.transform.shx;
+        invert.shy = this.transform.shy;
+        invert.tx = 0;
+        invert.ty = 0;
+        invert.Invert();
+
+        var xx = invert.TransformPointX(X, Y);
+        var yy = invert.TransformPointY(X, Y);
+
+        /*var invert1= new CMatrix();
+         invert1.sx = this.transform.sx;
+         invert1.sy = this.transform.sy;
+         invert1.shx = this.transform.shx;
+         invert1.shy = this.transform.shy;
+         invert1.tx = 0;
+         invert1.ty = 0;
+
+         var xxx = invert1.TransformPointX(xx, yy);
+         var yyy = invert1.TransformPointY(xx, yy);*/
+
+        var sx = this.transform.sx, shx = this.transform.shx,
+            shy = this.transform.shy, sy = this.transform.sy;
+
+        /*var tx = 0;
+         var ty = 0;
+
+         var x = (X*sy  - Y*shx - tx*sy)/(sx*sy- shy*shx);
+         var y = (Y - x*shy - ty*shx)/sy;*/
+
+
+        MathControl.pGraph.transform(sx, shy, shx, sy, 0, 0);
+        MathControl.pGraph.FillTextCode(xx, yy , this.getCode());
 
     },
     setPosition: function( pos )
@@ -550,7 +606,7 @@ old_CMathText.prototype =
         //MathControl.pGraph.transform(sx, shy, shx, sy, tx, ty);
         //MathControl.pGraph.FillTextCode(x, y , this.value); // прибавляем аскент, тк на отрисовку символа отправляем положение baseLine
     },
-    draw: function()
+    old_old_draw: function()
     {
         MathControl.pGraph.b_color1(0,0,0,255);
         MathControl.pGraph.SetFont(this.font);
@@ -594,6 +650,54 @@ old_CMathText.prototype =
         MathControl.pGraph.FillTextCode(xx, yy , this.value);
 
     },
+    draw: function()
+    {
+        var txtPrp = this.getTxtPrp();
+        g_oTextMeasurer.SetFont ( txtPrp );
+
+        MathControl.pGraph.b_color1(0,0,0,255);
+        MathControl.pGraph.SetFont(txtPrp);
+
+        var X = this.pos.x ,
+            Y = this.pos.y; // прибавляем аскент, тк на отрисовку символа отправляем положение baseLine
+
+        var invert = new CMatrix();
+        invert.sx = this.transform.sx;
+        invert.sy = this.transform.sy;
+        invert.shx = this.transform.shx;
+        invert.shy = this.transform.shy;
+        invert.tx = 0;
+        invert.ty = 0;
+        invert.Invert();
+
+        var xx = invert.TransformPointX(X, Y);
+        var yy = invert.TransformPointY(X, Y);
+
+        /*var invert1= new CMatrix();
+         invert1.sx = this.transform.sx;
+         invert1.sy = this.transform.sy;
+         invert1.shx = this.transform.shx;
+         invert1.shy = this.transform.shy;
+         invert1.tx = 0;
+         invert1.ty = 0;
+
+         var xxx = invert1.TransformPointX(xx, yy);
+         var yyy = invert1.TransformPointY(xx, yy);*/
+
+        var sx = this.transform.sx, shx = this.transform.shx,
+            shy = this.transform.shy, sy = this.transform.sy;
+
+        /*var tx = 0;
+         var ty = 0;
+
+         var x = (X*sy  - Y*shx - tx*sy)/(sx*sy- shy*shx);
+         var y = (Y - x*shy - ty*shx)/sy;*/
+
+
+        MathControl.pGraph.transform(sx, shy, shx, sy, 0, 0);
+        MathControl.pGraph.FillTextCode(xx, yy , this.getCode() );
+
+    },
     draw2: function()
     {
         MathControl.pGraph.b_color1(0,0,0,255);
@@ -622,7 +726,7 @@ old_CMathText.prototype =
         this.font = font;
         this.recalculateSize();
     },
-    setPosition: function( _pos )
+    old_setPosition: function( _pos )
     {
         /*if(this.value == 0x307)
          this.pos = {x : _pos.x + this.size.width, y: _pos.y };
@@ -631,6 +735,13 @@ old_CMathText.prototype =
          */
 
         this.pos = {x : _pos.x, y: _pos.y };
+    },
+    setPosition: function( pos )
+    {
+        if( ! this.bJDraw)                      // for text
+            this.pos = {x : pos.x, y: pos.y };
+        else                                    // for symbol only drawing
+            this.pos = {x: pos.x , y: pos.y + this.size.center};
     },
     setIndefSize: function(indef)
     {

@@ -384,6 +384,17 @@ CControlComposition.prototype =
     {
         this.coord = pos;
         this.Content[this.CurPos].SetPosition(pos);
+    },
+    SetTxtPrp: function(txtPrp)
+    {
+        this.Content[this.CurPos].SetTxtPrp(txtPrp);
+
+        editor.WordControl.m_oLogicDocument.DrawingDocument.OnRecalculatePage(0, { Width : Page_Width, Height : Page_Height, Margins :  {
+            Left   : X_Left_Field,
+            Right  : X_Right_Field,
+            Top    : Y_Top_Field,
+            Bottom : Y_Bottom_Field
+        } } );
     }
 }
 var MathControl = new CControlComposition();
