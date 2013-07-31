@@ -329,7 +329,7 @@ function NullState(drawingObjectsController, drawingObjects)
             if(isRealNumber(e.charCode))
             {
                selected_objects[0].paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
-               this.drawingObjects.showDrawingObjects(true);
+               this.drawingObjects.showDrawingObjects(false);
             }
         }
 

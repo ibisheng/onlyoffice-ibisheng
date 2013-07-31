@@ -1947,14 +1947,7 @@ function DrawingObjects() {
 
 			currentSheet.model.Drawings[i].worksheet = worksheet;
 			var clone = _this.cloneDrawingObject(currentSheet.model.Drawings[i]);
-		
-			if ( currentSheet.model.Drawings[i].isChart() ) {
-				
-				_this.calcChartInterval(clone.chart);
-				clone.chart.worksheet = worksheet;
-				aObjects.push( clone );
-			}
-				
+
 			if ( currentSheet.model.Drawings[i].imageUrl) {
 				
 				aObjectsSync[aObjectsSync.length] = clone;
@@ -1963,9 +1956,6 @@ function DrawingObjects() {
 
 
             if (clone.graphicObject instanceof  CChartAsGroup) {
-
-
-                _this.calcChartInterval(clone.chart);
                 clone.worksheet = worksheet;
                 clone.graphicObject.drawingBase = clone;
                 clone.graphicObject.drawingObjects = _this;

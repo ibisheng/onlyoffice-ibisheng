@@ -146,11 +146,13 @@ DrawingObjectsController.prototype =
     onKeyDown: function(e)
     {
         this.curState.onKeyDown(e);
+		//return true;
     },
 
     onKeyPress: function(e)
     {
         this.curState.onKeyPress(e);
+		//return true;
     },
 
     resetSelectionState: function()
