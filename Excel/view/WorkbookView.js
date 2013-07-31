@@ -210,8 +210,8 @@
 					"graphicObjectMouseDown":				function () {self._onGraphicObjectMouseDown.apply(self, arguments);},
 					"graphicObjectMouseMove":				function () {self._onGraphicObjectMouseMove.apply(self, arguments);},
 					"graphicObjectMouseUp":					function () {self._onGraphicObjectMouseUp.apply(self, arguments);},
-					"graphicObjectWindowKeyDown":			function () {self._onGraphicObjectWindowKeyDown.apply(self, arguments);},
-					"graphicObjectWindowKeyPress":			function () {self._onGraphicObjectWindowKeyPress.apply(self, arguments);},
+					"graphicObjectWindowKeyDown":			function () {return self._onGraphicObjectWindowKeyDown.apply(self, arguments);},
+					"graphicObjectWindowKeyPress":			function () {return self._onGraphicObjectWindowKeyPress.apply(self, arguments);},
 					"getGraphicsInfo":						function () {return self._onGetGraphicsInfo.apply(self, arguments);},
 					"getSelectedGraphicObjects":			function () {return self._onGetSelectedGraphicObjects.apply(self, arguments);},
 					"resetSelectedGraphicObjects":			function () {return self._onResetSelectedGraphicObjects.apply(self, arguments);}
