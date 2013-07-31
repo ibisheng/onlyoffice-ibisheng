@@ -692,42 +692,7 @@ asc_CChart.prototype = {
 	asc_removeSeries: function() { this.series = []; },
 	
 	asc_getChartEditorFlag: function() { return this.bChartEditor; },
-	asc_setChartEditorFlag: function(value) { this.bChartEditor = value; },
-	
-	generateFontMap: function(oFontMap) {
-		/*var font;
-		font = this.header.asc_getFont();
-		if(null != font)
-			oFontMap[font.asc_getName()] = 1;
-		font = this.xAxis.asc_getTitleFont();
-		if(null != font)
-			oFontMap[font.asc_getName()] = 1;
-		font = this.xAxis.asc_getLabelFont();
-		if(null != font)
-			oFontMap[font.asc_getName()] = 1;
-		font = this.yAxis.asc_getTitleFont();
-		if(null != font)
-			oFontMap[font.asc_getName()] = 1;
-		font = this.yAxis.asc_getLabelFont();
-		if(null != font)
-			oFontMap[font.asc_getName()] = 1;
-		font = this.legend.asc_getFont();
-		if(null != font)
-			oFontMap[font.asc_getName()] = 1;
-		for(var i = 0, length = this.series.length; i < length; ++i)
-		{
-			var seria = this.series[i];
-			if(null != seria)
-			{
-				font = seria.asc_getTitleFont();
-				if(null != font)
-					oFontMap[font.asc_getName()] = 1;
-				font = seria.asc_getLabelFont();
-				if(null != font)
-					oFontMap[font.asc_getName()] = 1;
-			}
-		}*/
-	},
+	asc_setChartEditorFlag: function(value) { this.bChartEditor = value; },	
 	
 	rebuildSeries: function() {
 		var _t = this;

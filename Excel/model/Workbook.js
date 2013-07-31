@@ -2157,16 +2157,6 @@ Woorksheet.prototype.generateFontMap=function(oFontMap){
 			}
 		}
 	}
-	//пробегаемся по chart
-	for(var i = 0, length = this.Drawings.length; i < length; ++i)
-	{
-		var drawing = this.Drawings[i];
-		if(drawing.isChart())
-		{
-			var chart = drawing.chart;
-			chart.generateFontMap(oFontMap);
-		}
-	}
 }
 Woorksheet.prototype.clone=function(sNewId){
 	var oNewWs;

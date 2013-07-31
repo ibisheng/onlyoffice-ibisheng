@@ -2159,6 +2159,7 @@ function findPrevValue(originalData, num, max) {
 	}
 	return summ;
 }
+
 function setFontChart(chart)
 {
 	var defaultColor = "#000000"
@@ -2189,7 +2190,7 @@ function setFontChart(chart)
 		bar._xAxisTitle._bold = chart.xAxis.titleFont.bold ? chart.xAxis.titleFont.bold : true;
 		bar._xAxisTitle._color = chart.xAxis.titleFont.color ? chart.xAxis.titleFont.color : defaultColor;
 		bar._xAxisTitle._font = chart.xAxis.titleFont.name ? chart.xAxis.titleFont.name : defaultFont;
-		bar._xAxisTitle._size = chart.xAxis.titleFont.size ? chart.xAxis.titleFont.size : defaultFont;
+		bar._xAxisTitle._size = chart.xAxis.titleFont.size ? chart.xAxis.titleFont.size : defaultSize;
 		bar._xAxisTitle._italic = chart.xAxis.titleFont.italic ? chart.xAxis.titleFont.italic : false;
 		bar._xAxisTitle._underline = chart.xAxis.titleFont.underline ? chart.xAxis.titleFont.underline : false;
 	}
@@ -2198,7 +2199,7 @@ function setFontChart(chart)
 		bar._xAxisTitle._bold = true;
 		bar._xAxisTitle._color = defaultColor;
 		bar._xAxisTitle._font = defaultFont;
-		bar._xAxisTitle._size = defaultFont;
+		bar._xAxisTitle._size = defaultSize;
 		bar._xAxisTitle._italic = false;
 		bar._xAxisTitle._underline = false;
 	}
@@ -2208,7 +2209,7 @@ function setFontChart(chart)
 		bar._yAxisTitle._bold = chart.yAxis.titleFont.bold ? chart.yAxis.titleFont.bold : true;
 		bar._yAxisTitle._color = chart.yAxis.titleFont.color ? chart.yAxis.titleFont.color : defaultColor;
 		bar._yAxisTitle._font = chart.yAxis.titleFont.name ? chart.yAxis.titleFont.name : defaultFont;
-		bar._yAxisTitle._size = chart.yAxis.titleFont.size ? chart.yAxis.titleFont.size : defaultFont;
+		bar._yAxisTitle._size = chart.yAxis.titleFont.size ? chart.yAxis.titleFont.size : defaultSize;
 		bar._yAxisTitle._italic = chart.yAxis.titleFont.italic ? chart.yAxis.titleFont.italic : false;
 		bar._yAxisTitle._underline = chart.yAxis.titleFont.underline ? chart.yAxis.titleFont.underline : false;
 	}
@@ -2217,7 +2218,7 @@ function setFontChart(chart)
 		bar._yAxisTitle._bold = true;
 		bar._yAxisTitle._color = defaultColor;
 		bar._yAxisTitle._font = defaultFont;
-		bar._yAxisTitle._size = defaultFont;
+		bar._yAxisTitle._size = defaultSize;
 		bar._yAxisTitle._italic = false;
 		bar._yAxisTitle._underline = false;
 	}
@@ -2227,7 +2228,7 @@ function setFontChart(chart)
 		bar._otherProps._key_text_bold = chart.legend.font.bold ? chart.legend.font.bold : false;
 		bar._otherProps._key_text_color = chart.legend.font.color ? chart.legend.font.color : defaultColor;
 		bar._otherProps._key_text_font = chart.legend.font.name ? chart.legend.font.name : defaultFont;
-		bar._otherProps._key_text_size = chart.legend.font.size ? chart.legend.font.size : defaultFont;
+		bar._otherProps._key_text_size = chart.legend.font.size ? chart.legend.font.size : defaultSize;
 		bar._otherProps._key_text_italic = chart.legend.font.italic ? chart.legend.font.italic : false;
 		bar._otherProps._key_text_underline = chart.legend.font.underline ? chart.legend.font.underline : false;
 	}
@@ -2236,7 +2237,7 @@ function setFontChart(chart)
 		bar._otherProps._key_text_bold = false;
 		bar._otherProps._key_text_color = defaultColor;
 		bar._otherProps._key_text_font = defaultFont;
-		bar._otherProps._key_text_size = defaultFont;
+		bar._otherProps._key_text_size = defaultSize;
 		bar._otherProps._key_text_italic = false;
 		bar._otherProps._key_text_underline = false;
 	}
