@@ -904,8 +904,8 @@
 				
 				var graphicObjects = t.handlers.trigger("getSelectedGraphicObjects");
 				if ( graphicObjects.length ) {
-					t.handlers.trigger("graphicObjectWindowKeyPress", event);
-					return true;
+					if (t.handlers.trigger("graphicObjectWindowKeyPress", event))
+						return true;
 				}
 
 				// Для таких браузеров, которые не присылают отжатие левой кнопки мыши для двойного клика, при выходе из
