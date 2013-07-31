@@ -606,8 +606,8 @@
 				
 				var graphicObjects = t.handlers.trigger("getSelectedGraphicObjects");
 				if ( graphicObjects.length ) {
-					t.handlers.trigger("graphicObjectWindowKeyDown", event);
-					return true;
+					if (t.handlers.trigger("graphicObjectWindowKeyDown", event))
+						return true;
 				}
 
 				// Двигаемся ли мы в выделенной области

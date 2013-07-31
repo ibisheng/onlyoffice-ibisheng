@@ -1228,8 +1228,8 @@ CChartAsGroup.prototype =
                 }
             }
             this.chart.header.title = this.chartTitle.txBody.content.getTextString();
-            this.chart.header.font = new asc_CChartFont();
-            /*this.chartTitle.txBody.content.Set_ApplyToAll(true);
+            /*this.chart.header.font = new asc_CChartFont();
+            this.chartTitle.txBody.content.Set_ApplyToAll(true);
             this.chartTitle.txBody.content.Set_ParagraphAlign(align_Center);
             this.chartTitle.txBody.content.Set_ApplyToAll(false);*/
         }

@@ -2174,6 +2174,15 @@ function setFontChart(chart)
 		bar._chartTitle._italic = chart.header.font.italic ? chart.header.font.italic : false;
 		bar._chartTitle._underline = chart.header.font.underline ? chart.header.font.underline : false;
 	}
+	else
+	{
+		bar._chartTitle._bold = true;
+		bar._chartTitle._color = defaultColor;
+		bar._chartTitle._font = defaultFont;
+		bar._chartTitle._size = defaultSize;
+		bar._chartTitle._italic = false;
+		bar._chartTitle._underline = false;
+	}
 	
 	if(chart.xAxis.titleFont)//название оси OX
 	{
@@ -2183,6 +2192,15 @@ function setFontChart(chart)
 		bar._xAxisTitle._size = chart.xAxis.titleFont.size ? chart.xAxis.titleFont.size : defaultFont;
 		bar._xAxisTitle._italic = chart.xAxis.titleFont.italic ? chart.xAxis.titleFont.italic : false;
 		bar._xAxisTitle._underline = chart.xAxis.titleFont.underline ? chart.xAxis.titleFont.underline : false;
+	}
+	else
+	{
+		bar._xAxisTitle._bold = true;
+		bar._xAxisTitle._color = defaultColor;
+		bar._xAxisTitle._font = defaultFont;
+		bar._xAxisTitle._size = defaultFont;
+		bar._xAxisTitle._italic = false;
+		bar._xAxisTitle._underline = false;
 	}
 	
 	if(chart.yAxis.titleFont)//название оси OY
@@ -2194,6 +2212,15 @@ function setFontChart(chart)
 		bar._yAxisTitle._italic = chart.yAxis.titleFont.italic ? chart.yAxis.titleFont.italic : false;
 		bar._yAxisTitle._underline = chart.yAxis.titleFont.underline ? chart.yAxis.titleFont.underline : false;
 	}
+	else
+	{
+		bar._yAxisTitle._bold = true;
+		bar._yAxisTitle._color = defaultColor;
+		bar._yAxisTitle._font = defaultFont;
+		bar._yAxisTitle._size = defaultFont;
+		bar._yAxisTitle._italic = false;
+		bar._yAxisTitle._underline = false;
+	}
 	
 	if(chart.legend.font)//подписи легенды
 	{
@@ -2204,6 +2231,15 @@ function setFontChart(chart)
 		bar._otherProps._key_text_italic = chart.legend.font.italic ? chart.legend.font.italic : false;
 		bar._otherProps._key_text_underline = chart.legend.font.underline ? chart.legend.font.underline : false;
 	}
+	else
+	{
+		bar._otherProps._key_text_bold = false;
+		bar._otherProps._key_text_color = defaultColor;
+		bar._otherProps._key_text_font = defaultFont;
+		bar._otherProps._key_text_size = defaultFont;
+		bar._otherProps._key_text_italic = false;
+		bar._otherProps._key_text_underline = false;
+	}
 	
 	if(chart.xAxis.labelFont)//значения по оси OX
 	{
@@ -2213,7 +2249,16 @@ function setFontChart(chart)
 		bar._otherProps._xlabels_size = chart.xAxis.labelFont.size ? chart.xAxis.labelFont.size : defaultSize;
 		bar._otherProps._xlabels_italic = chart.xAxis.labelFont.italic ? chart.xAxis.labelFont.italic : false;
 		bar._otherProps._xlabels_underline = chart.xAxis.labelFont.underline ? chart.xAxis.labelFont.underline : false;
-	}	
+	}
+	else
+	{
+		bar._otherProps._xlabels_bold = false;
+		bar._otherProps._xlabels_color = defaultColor;
+		bar._otherProps._xlabels_font = defaultFont;
+		bar._otherProps._xlabels_size = defaultSize;
+		bar._otherProps._xlabels_italic = false;
+		bar._otherProps._xlabels_underline = false;
+	}
 	
 	if(chart.yAxis.labelFont)//значения по оси OY
 	{
@@ -2223,7 +2268,16 @@ function setFontChart(chart)
 		bar._otherProps._ylabels_size = chart.yAxis.labelFont.size ? chart.yAxis.labelFont.size : defaultSize;
 		bar._otherProps._ylabels_italic = chart.yAxis.labelFont.italic ? chart.yAxis.labelFont.italic : false;
 		bar._otherProps._ylabels_underline = chart.yAxis.labelFont.underline ? chart.yAxis.labelFont.underline : false;
-	}	
+	}
+	else
+	{
+		bar._otherProps._ylabels_bold = false;
+		bar._otherProps._ylabels_color = defaultColor;
+		bar._otherProps._ylabels_font = defaultFont;
+		bar._otherProps._ylabels_size = defaultSize;
+		bar._otherProps._ylabels_italic = false;
+		bar._otherProps._ylabels_underline = false;
+	}
 	
 	if(chart.legend.font)//подписи значений графика
 	{
@@ -2233,9 +2287,18 @@ function setFontChart(chart)
 		bar._otherProps._labels_above_size = chart.legend.font.size ? chart.legend.font.size : defaultSize;
 		bar._otherProps._labels_above_italic = chart.legend.font.italic ? chart.legend.font.italic : false;
 		bar._otherProps._labels_above_underline = chart.legend.font.underline ? chart.legend.font.underline : false;
-	}	
+	}
+	else
+	{
+		bar._otherProps._labels_above_bold = false;
+		bar._otherProps._labels_above_color = defaultColor;
+		bar._otherProps._labels_above_font = defaultFont;
+		bar._otherProps._labels_above_size = defaultSize;
+		bar._otherProps._labels_above_italic = false;
+		bar._otherProps._labels_above_underline = false;
+	}
 	
-	if(chart.xAxis.font)//остальные подписи
+	//if(chart.xAxis.font)//остальные подписи
 	{
 		bar._otherProps._text_color = defaultColor;
 		bar._otherProps._text_bold = false;

@@ -2239,72 +2239,137 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			asc_setCellFontName: function (fontName) {
 				var t = this;
 				t._loadFonts([fontName], function () {
-					t.wb.setFontAttributes("fn", fontName);
-					t.wb.restoreFocus();
+					var ws = t.wb.getWorksheet();
+					if ( ws.objectRender.selectedGraphicObjectsExists() && ws.objectRender.controller.setCellFontName )
+						ws.objectRender.controller.setCellFontName(fontName);
+					else {
+						t.wb.setFontAttributes("fn", fontName);
+						t.wb.restoreFocus();
+					}
 				});
 			},
 
 			asc_setCellFontSize: function (fontSize) {
-				this.wb.setFontAttributes("fs", fontSize);
-				this.wb.restoreFocus();
+				var ws = this.wb.getWorksheet();
+				if ( ws.objectRender.selectedGraphicObjectsExists() && ws.objectRender.controller.setCellFontSize )
+					ws.objectRender.controller.setCellFontSize(fontSize);
+				else {
+					this.wb.setFontAttributes("fs", fontSize);
+					this.wb.restoreFocus();
+				}
 			},
 
 			asc_setCellBold: function (isBold) {
-				this.wb.setFontAttributes("b", isBold);
-				this.wb.restoreFocus();
+				var ws = this.wb.getWorksheet();
+				if ( ws.objectRender.selectedGraphicObjectsExists() && ws.objectRender.controller.setCellBold )
+					ws.objectRender.controller.setCellBold(isBold);
+				else {
+					this.wb.setFontAttributes("b", isBold);
+					this.wb.restoreFocus();
+				}
 			},
 
 			asc_setCellItalic: function (isItalic) {
-				this.wb.setFontAttributes("i", isItalic);
-				this.wb.restoreFocus();
+				var ws = this.wb.getWorksheet();
+				if ( ws.objectRender.selectedGraphicObjectsExists() && ws.objectRender.controller.setCellItalic )
+					ws.objectRender.controller.setCellItalic(isItalic);
+				else {
+					this.wb.setFontAttributes("i", isItalic);
+					this.wb.restoreFocus();
+				}
 			},
 
 			asc_setCellUnderline: function (isUnderline) {
-				this.wb.setFontAttributes("u", isUnderline ? "single" : "none");
-				this.wb.restoreFocus();
+				var ws = this.wb.getWorksheet();
+				if ( ws.objectRender.selectedGraphicObjectsExists() && ws.objectRender.controller.setCellUnderline )
+					ws.objectRender.controller.setCellUnderline(isUnderline);
+				else {
+					this.wb.setFontAttributes("u", isUnderline ? "single" : "none");
+					this.wb.restoreFocus();
+				}
 			},
 
 			asc_setCellStrikeout: function (isStrikeout) {
-				this.wb.setFontAttributes("s", isStrikeout);
-				this.wb.restoreFocus();
+				var ws = this.wb.getWorksheet();
+				if ( ws.objectRender.selectedGraphicObjectsExists() && ws.objectRender.controller.setCellStrikeout )
+					ws.objectRender.controller.setCellStrikeout(isStrikeout);
+				else {
+					this.wb.setFontAttributes("s", isStrikeout);
+					this.wb.restoreFocus();
+				}
 			},
 
 			asc_setCellSubscript: function (isSubscript) {
-				this.wb.setFontAttributes("fa", isSubscript ? "subscript" : "none");
-				this.wb.restoreFocus();
+				var ws = this.wb.getWorksheet();
+				if ( ws.objectRender.selectedGraphicObjectsExists() && ws.objectRender.controller.setCellSubscript )
+					ws.objectRender.controller.setCellSubscript(isSubscript);
+				else {
+					this.wb.setFontAttributes("fa", isSubscript ? "subscript" : "none");
+					this.wb.restoreFocus();
+				}
 			},
 
 			asc_setCellSuperscript: function (isSuperscript) {
-				this.wb.setFontAttributes("fa", isSuperscript ? "superscript" : "none");
-				this.wb.restoreFocus();
+				var ws = this.wb.getWorksheet();
+				if ( ws.objectRender.selectedGraphicObjectsExists() && ws.objectRender.controller.setCellSuperscript )
+					ws.objectRender.controller.setCellSuperscript(isSuperscript);
+				else {
+					this.wb.setFontAttributes("fa", isSuperscript ? "superscript" : "none");
+					this.wb.restoreFocus();
+				}
 			},
 
 			asc_setCellAlign: function (align) {
-				this.wb.getWorksheet().setSelectionInfo("a", align);
-				this.wb.restoreFocus();
+				var ws = this.wb.getWorksheet();
+				if ( ws.objectRender.selectedGraphicObjectsExists() && ws.objectRender.controller.setCellAlign )
+					ws.objectRender.controller.setCellAlign(align);
+				else {
+					this.wb.getWorksheet().setSelectionInfo("a", align);
+					this.wb.restoreFocus();
+				}
 			},
 
 			asc_setCellVertAlign: function (align) {
-				this.wb.getWorksheet().setSelectionInfo("va", align);
-				this.wb.restoreFocus();
+				var ws = this.wb.getWorksheet();
+				if ( ws.objectRender.selectedGraphicObjectsExists() && ws.objectRender.controller.setCellVertAlign )
+					ws.objectRender.controller.setCellVertAlign(align);
+				else {
+					this.wb.getWorksheet().setSelectionInfo("va", align);
+					this.wb.restoreFocus();
+				}
 			},
 
 			asc_setCellTextWrap: function (isWrapped) {
-				this.wb.getWorksheet().setSelectionInfo("wrap", isWrapped);
-				this.wb.restoreFocus();
+				var ws = this.wb.getWorksheet();
+				if ( ws.objectRender.selectedGraphicObjectsExists() && ws.objectRender.controller.setCellTextWrap )
+					ws.objectRender.controller.setCellTextWrap(isWrapped);
+				else {
+					this.wb.getWorksheet().setSelectionInfo("wrap", isWrapped);
+					this.wb.restoreFocus();
+				}
 			},
 
 			asc_setCellTextShrink: function (isShrinked) {
-				this.wb.getWorksheet().setSelectionInfo("shrink", isShrinked);
-				this.wb.restoreFocus();
+				var ws = this.wb.getWorksheet();
+				if ( ws.objectRender.selectedGraphicObjectsExists() && ws.objectRender.controller.setCellTextShrink )
+					ws.objectRender.controller.setCellTextShrink(isShrinked);
+				else {
+					this.wb.getWorksheet().setSelectionInfo("shrink", isShrinked);
+					this.wb.restoreFocus();
+				}
 			},
 
 			asc_setCellTextColor: function (color) {
-				if(color instanceof CAscColor)
-				{
+				if (color instanceof CAscColor) {
 					color = CorrectAscColor(color);
-					this.wb.setFontAttributes("c", color);
-					this.wb.restoreFocus();
+					
+					var ws = this.wb.getWorksheet();
+					if ( ws.objectRender.selectedGraphicObjectsExists() && ws.objectRender.controller.setCellTextColor )
+						ws.objectRender.controller.setCellTextColor(color);
+					else {
+						this.wb.setFontAttributes("c", color);
+						this.wb.restoreFocus();
+					}
 				}
 			},
 

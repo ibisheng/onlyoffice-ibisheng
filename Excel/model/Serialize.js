@@ -5465,7 +5465,6 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 			var objectRender = new DrawingObjects();
 			var oFlags = {from: false, to: false, pos: false, ext: false};
 			var oNewDrawing = objectRender.createDrawingObject();
-			oNewDrawing.id = "sheet" + wsId + "_" + (aDrawings.length + 1);
             res = this.bcr.Read1(length, function(t, l) {
 				return oThis.ReadDrawing(t, l, oNewDrawing, oFlags);
 			});

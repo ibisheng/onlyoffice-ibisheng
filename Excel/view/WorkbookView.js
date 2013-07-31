@@ -654,12 +654,12 @@
 			
 			_onGraphicObjectWindowKeyDown: function (e) {
 				var ws = this.getWorksheet();
-				ws.objectRender.controller.onKeyDown(e);
+				return ws.objectRender.controller.onKeyDown(e);
 			},
 			
 			_onGraphicObjectWindowKeyPress: function (e) {
 				var ws = this.getWorksheet();
-				ws.objectRender.controller.onKeyPress(e);
+				return ws.objectRender.controller.onKeyPress(e);
 			},
 			
 			_onGetGraphicsInfo: function (x, y) {
