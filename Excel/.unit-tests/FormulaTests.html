@@ -9,38 +9,40 @@
 
 		<link rel="stylesheet" href="qunit/qunit-1.11.0.css" type="text/css" media="screen" />
 		<script type="text/javascript" src="qunit/qunit-1.11.0.js"></script>
-		<script type="text/javascript" src="../../Common/3rdparty/XRegExp/xregexp-all.js"></script>
+		<script type="text/javascript" src="../../../Common/3rdparty/XRegExp/xregexp-all.js"></script>
 
-		<script src="../../Common/downloaderfiles.js"></script>
+        <script src="../../Common/downloaderfiles.js"></script>
         <script type="text/javascript" src="../../Common/3rdparty/Underscore/underscore-min.js"></script>
         <script type="text/javascript" src="../../Common/3rdparty/Sockjs/sockjs-0.3.min.js"></script>
-		<script type="text/javascript" src="../../Common/docscoapicommon.js"></script>
+        <script type="text/javascript" src="../../Common/docscoapicommon.js"></script>
         <script type="text/javascript" src="../../Common/docscoapi.js"></script>
-		<script type="text/javascript" src="../../Common/Charts/DrawingObjects.js"></script>
-		<script type="text/javascript" src="../../Common/Charts/charts.js"></script>
-		<script type="text/javascript" src="../../Common/commonDefines.js"></script>
+        <script type="text/javascript" src="../../Common/Charts/DrawingObjects.js"></script>
+        <script type="text/javascript" src="../../Common/Charts/charts.js"></script>
+        <script type="text/javascript" src="../../Common/commonDefines.js"></script>
+        <script type="text/javascript" src="../../Common/editorscommon.js"></script>
 
-		<script type="text/javascript" src="../../Common/FontsFreeType/font_engine.js"></script>
-		<script type="text/javascript" src="../../Common/FontsFreeType/FontFile.js"></script>
-		<script type="text/javascript" src="../../Common/FontsFreeType/FontManager.js"></script>
+        <script type="text/javascript" src="../../Common/FontsFreeType/font_engine.js"></script>
+        <script type="text/javascript" src="../../Common/FontsFreeType/FontFile.js"></script>
+        <script type="text/javascript" src="../../Common/FontsFreeType/FontManager.js"></script>
 
-		<script type="text/javascript" src="../../Word/Drawing/Externals.js"></script>
-		<script type="text/javascript" src="../../Word/Drawing/Metafile.js"></script>
-		<script type="text/javascript" src="../../Word/Drawing/AllFonts.js"></script>
-		<script type="text/javascript" src="../../Word/Drawing/GlobalLoaders.js"></script>
+        <script type="text/javascript" src="../../Word/Drawing/Externals.js"></script>
+        <script type="text/javascript" src="../../Word/Drawing/Metafile.js"></script>
+        <script type="text/javascript" src="../../Word/Drawing/AllFonts.js"></script>
 
-		<script type="text/javascript" src="../utils/utils.js"></script>
-		<script type="text/javascript" src="../model/clipboard.js"></script>
-		<script type="text/javascript" src="../model/autofilters.js"></script>
+        <script type="text/javascript" src="../utils/utils.js"></script>
+        <script type="text/javascript" src="../model/clipboard.js"></script>
+        <script type="text/javascript" src="../model/autofilters.js"></script>
 
-		<script type="text/javascript" src="../graphics/DrawingContext.js"></script>
+        <script type="text/javascript" src="../graphics/DrawingContext.js"></script>
         <script type="text/javascript" src="../graphics/pdfprinter.js"></script>
 
-		<!-- <script type="text/javascript" src="../offlinedocs/test-workbook9/Editor.js"></script> -->
-		<script type="text/javascript" src="../offlinedocs/test-workbook2.js"></script>
+        <!--TODO: remove test data-->
+        <!-- <script type="text/javascript" src="../offlinedocs/test-workbook9/Editor.js"></script> -->
+        <script type="text/javascript" src="../offlinedocs/test-workbook2.js"></script>
 
-		<script type="text/javascript" src="../model/CollaborativeEditing.js"></script>
-		<script type="text/javascript" src="../model/parserFormula.js"></script>
+        <script type="text/javascript" src="../model/CollaborativeEditing.js"></script>
+        <script type="text/javascript" src="../model/ConditionalFormatting.js"></script>
+        <script type="text/javascript" src="../model/parserFormula.js"></script>
         <script type="text/javascript" src="../model/dateandtimeFunctions.js"></script>
         <script type="text/javascript" src="../model/engineeringFunctions.js"></script>
         <script type="text/javascript" src="../model/cubeFunctions.js"></script>
@@ -52,85 +54,108 @@
         <script type="text/javascript" src="../model/lookupandreferenceFunctions.js"></script>
         <script type="text/javascript" src="../model/informationFunctions.js"></script>
         <script type="text/javascript" src="../model/logicalFunctions.js"></script>
-		<script type="text/javascript" src="../model/CellComment.js"></script>
-		<script type="text/javascript" src="../../Common/NumFormat.js"></script>
-		<script type="text/javascript" src="../model/Serialize.js"></script>
-		<script type="text/javascript" src="../model/WorkbookElems.js"></script>
-		<script type="text/javascript" src="../model/Workbook.js"></script>
-		<script type="text/javascript" src="../model/CellInfo.js"></script>
-		<script type="text/javascript" src="../model/AdvancedOptions.js"></script>
-		<script type="text/javascript" src="../model/History.js"></script>
-		<script type="text/javascript" src="../model/UndoRedo.js"></script>
+        <script type="text/javascript" src="../model/CellComment.js"></script>
+        <script type="text/javascript" src="../../Common/NumFormat.js"></script>
+        <script type="text/javascript" src="../model/Serialize.js"></script>
+        <script type="text/javascript" src="../model/WorkbookElems.js"></script>
+        <script type="text/javascript" src="../model/Workbook.js"></script>
+        <script type="text/javascript" src="../model/CellInfo.js"></script>
+        <script type="text/javascript" src="../model/AdvancedOptions.js"></script>
+        <script type="text/javascript" src="../model/History.js"></script>
+        <script type="text/javascript" src="../model/UndoRedo.js"></script>
 
-		<script type="text/javascript" src="../view/scroll.js"></script>
-		<script type="text/javascript" src="../view/StringRender.js"></script>
-		<script type="text/javascript" src="../view/CellTextRender.js"></script>
-		<script type="text/javascript" src="../view/CellEditorView.js"></script>
-		<script type="text/javascript" src="../view/WorksheetView.js"></script>
-		<script type="text/javascript" src="../view/HandlerList.js"></script>
-		<script type="text/javascript" src="../view/EventsController.js"></script>
-		<script type="text/javascript" src="../view/WorkbookView.js"></script>
+        <script type="text/javascript" src="../view/scroll.js"></script>
+        <script type="text/javascript" src="../view/StringRender.js"></script>
+        <script type="text/javascript" src="../view/CellTextRender.js"></script>
+        <script type="text/javascript" src="../view/CellEditorView.js"></script>
+        <script type="text/javascript" src="../view/WorksheetView.js"></script>
+        <script type="text/javascript" src="../view/HandlerList.js"></script>
+        <script type="text/javascript" src="../view/EventsController.js"></script>
+        <script type="text/javascript" src="../view/WorkbookView.js"></script>
 
-		<script type="text/javascript" src="../apiDefines.js"></script>
-		<script type="text/javascript" src="../api.js"></script>
+        <script type="text/javascript" src="../apiDefines.js"></script>
+        <script type="text/javascript" src="../api.js"></script>
 
         <!--for presentation-->
-        <script type="text/javascript" src="../Common/PresentationSerializeAdapter.js"></script>
+        <script type="text/javascript" src="../../Common/PresentationSerializeAdapter.js"></script>
 
-		<!--for theme-->
-		<script type="text/javascript" src="../../Common/Shapes/EditorSettings.js"></script>
+        <!--for theme-->
+        <script type="text/javascript" src="../../Common/Shapes/EditorSettings.js"></script>
         <script type="text/javascript" src="../../Common/Shapes/Serialize.js"></script>
         <script type="text/javascript" src="../../Common/Shapes/SerializeWriter.js"></script>
         <script type="text/javascript" src="../../Word/Editor/SerializeCommon.js"></script>
-		<script type="text/javascript" src="../../Word/Editor/GraphicObjects/ObjectTypes/Format.js"></script>
-		<script type="text/javascript" src="../../Word/apiCommon.js"></script>
+        <script type="text/javascript" src="../model/DrawingObjects/Format/Format.js"></script>
+        <script type="text/javascript" src="../../Word/Editor/GraphicObjects/ObjectTypes/CreateGeometry.js"></script>
+        <script type="text/javascript" src="../model/DrawingObjects/Format/Geometry.js"></script>
+        <script type="text/javascript" src="../model/DrawingObjects/Format/Path.js"></script>
+        <script type="text/javascript" src="../../Word/Editor/GraphicObjects/Math.js"></script>
+        <script type="text/javascript" src="../../Word/Drawing/ArcTo.js"></script>
+        <script type="text/javascript" src="../../Word/Drawing/ColorArray.js"></script>
+        <script type="text/javascript" src="../../Word/apiCommon.js"></script>
 
-		<!--for chart-->
-		<script type="text/javascript" src="../../Common/SerializeCommonWordExcel.js"></script>
-		<script src="../../Common/Charts/libraries/OfficeExcel.common.core.js"></script>
+        <!--for chart-->
+        <script type="text/javascript" src="../../Common/SerializeCommonWordExcel.js"></script>
+        <script src="../../Common/Charts/libraries/OfficeExcel.common.core.js"></script>
 
-		<script src="../../Common/Charts/libraries/OfficeExcel.common.annotate.js"></script>
-		<script src="../../Common/Charts/libraries/OfficeExcel.common.context.js"></script>
-		<script src="../../Common/Charts/libraries/OfficeExcel.common.effects.js"></script>
-		<script src="../../Common/Charts/libraries/OfficeExcel.common.key.js"></script>
-		<script src="../../Common/Charts/libraries/OfficeExcel.common.resizing.js"></script>
-		<script src="../../Common/Charts/libraries/OfficeExcel.common.tooltips.js"></script>
-		<script src="../../Common/Charts/libraries/OfficeExcel.common.zoom.js"></script>
+        <script src="../../Common/Charts/libraries/OfficeExcel.common.annotate.js"></script>
+        <script src="../../Common/Charts/libraries/OfficeExcel.common.context.js"></script>
+        <script src="../../Common/Charts/libraries/OfficeExcel.common.effects.js"></script>
+        <script src="../../Common/Charts/libraries/OfficeExcel.common.key.js"></script>
+        <script src="../../Common/Charts/libraries/OfficeExcel.common.resizing.js"></script>
+        <script src="../../Common/Charts/libraries/OfficeExcel.common.tooltips.js"></script>
+        <script src="../../Common/Charts/libraries/OfficeExcel.common.zoom.js"></script>
 
-		<script src="../../Common/Charts/libraries/OfficeExcel.bar.js"></script>
-		<script src="../../Common/Charts/libraries/OfficeExcel.bipolar.js"></script>
+        <script src="../../Common/Charts/libraries/OfficeExcel.bar.js"></script>
+        <script src="../../Common/Charts/libraries/OfficeExcel.bipolar.js"></script>
 
-		<script src="../../Common/Charts/libraries/OfficeExcel.gantt.js"></script>
+        <script src="../../Common/Charts/libraries/OfficeExcel.gantt.js"></script>
 
-		<script src="../../Common/Charts/libraries/OfficeExcel.hbar.js"></script>
+        <script src="../../Common/Charts/libraries/OfficeExcel.hbar.js"></script>
 
-		<script src="../../Common/Charts/libraries/OfficeExcel.line.js"></script>
+        <script src="../../Common/Charts/libraries/OfficeExcel.line.js"></script>
 
-		<script src="../../Common/Charts/libraries/OfficeExcel.pie.js"></script>
-		<script src="../../Common/Charts/libraries/OfficeExcel.radar.js"></script>
-		<script src="../../Common/Charts/libraries/OfficeExcel.rose.js"></script>
-		<script src="../../Common/Charts/libraries/OfficeExcel.rscatter.js"></script>
-		<script src="../../Common/Charts/libraries/OfficeExcel.scatter.js"></script>
+        <script src="../../Common/Charts/libraries/OfficeExcel.pie.js"></script>
+        <script src="../../Common/Charts/libraries/OfficeExcel.radar.js"></script>
+        <script src="../../Common/Charts/libraries/OfficeExcel.rose.js"></script>
+        <script src="../../Common/Charts/libraries/OfficeExcel.rscatter.js"></script>
+        <script src="../../Common/Charts/libraries/OfficeExcel.scatter.js"></script>
 
-		<script src="../../Common/Charts/libraries/OfficeExcel.waterfall.js"></script>
-		<script src="../../Common/Charts/libraries/OfficeExcel.chartProperties.js"></script>
+        <script src="../../Common/Charts/libraries/OfficeExcel.waterfall.js"></script>
+        <script src="../../Common/Charts/libraries/OfficeExcel.chartProperties.js"></script>
 
-		<!--for colors-->
-		<script src="../../Common/Charts/libraries/hsv.js"></script>
-		<script src="../../Common/Charts/libraries/rgbcolor.js"></script>
+        <!--for colors-->
+        <script src="../../Common/Charts/libraries/hsv.js"></script>
+        <script src="../../Common/Charts/libraries/rgbcolor.js"></script>
 
         <!--for shapes-->
-        <script src="../../Word/Drawing/Graphics.js"></script>
+        <script src="../model/DrawingObjects/Graphics.js"></script>
+        <script src="../model/DrawingObjects/Overlay.js"></script>
+        <script src="../model/DrawingObjects/Controls.js"></script>
         <script src="../model/DrawingObjects/DrawingObjectsController.js"></script>
+        <script src="../model/DrawingObjects/DrawingDocument.js"></script>
         <script src="../model/DrawingObjects/States.js"></script>
+        <script src="../model/DrawingObjects/GlobalLoaders.js"></script>
+        <script src="../model/DrawingObjects/GlobalCounters.js"></script>
+        <script src="../model/DrawingObjects/ShapeDrawer.js"></script>
 
         <script src="../model/DrawingObjects/Format/GroupShape.js"></script>
         <script src="../model/DrawingObjects/Format/Image.js"></script>
         <script src="../model/DrawingObjects/Format/Shape.js"></script>
+        <script src="../model/DrawingObjects/Format/TextBody.js"></script>
+        <script src="../model/DrawingObjects/Format/Styles.js"></script>
+        <script src="../model/DrawingObjects/Format/Numbering.js"></script>
+        <script src="../model/DrawingObjects/Format/ParagraphContent.js"></script>
+        <script src="../model/DrawingObjects/Format/Paragraph.js"></script>
+        <script src="../model/DrawingObjects/Format/DocumentContent.js"></script>
+        <script src="../model/DrawingObjects/Format/FontClassification.js"></script>
 
+        <script src="../model/DrawingObjects/Tracks/AdjustmentTracks.js"></script>
         <script src="../model/DrawingObjects/Tracks/ResizeTracks.js"></script>
         <script src="../model/DrawingObjects/Tracks/RotateTracks.js"></script>
         <script src="../model/DrawingObjects/Tracks/NewShapeTracks.js"></script>
+        <script src="../model/DrawingObjects/Tracks/PolyLine.js"></script>
+        <script src="../model/DrawingObjects/Tracks/Spline.js"></script>
+        <script src="../model/DrawingObjects/Tracks/MoveTracks.js"></script>
         <script src="../model/DrawingObjects/Hit.js"></script>
 		
 		<script type="text/javascript" src="FormulaTests.js"></script>

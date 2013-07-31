@@ -460,7 +460,9 @@
 	api.asc_registerCallback("asc_onSetAFDialog", onSetAFDialog);
 
 	api.asc_registerCallback("asc_onActiveSheetChanged", onActiveSheetChanged);
-	
+
+//	api.asc_registerCallback("asc_onCellTextChanged", function(){console.log(arguments)});
+
 	api.asc_registerCallback("asc_onConfirmAction", function(){
 		var arg = arguments;
 		$("#ConfirmMess")
@@ -485,7 +487,7 @@
 	});
 
 	api.asc_registerCallback("asc_onEditCell", function (state) {
-		console.log("Cell Edit State - " + state);
+//		console.log("Cell Edit State - " + state);
 	});
 
 	api.asc_registerCallback("asc_onSelectionRangeChanged", function (val) {

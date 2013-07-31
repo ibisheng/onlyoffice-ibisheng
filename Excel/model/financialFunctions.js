@@ -6,123 +6,123 @@
  * To change this template use File | Settings | File Templates.
  */
 cFormulaFunction.Financial = {
-    'groupName' : "Financial",
-        'ACCRINT' : function(){
-        var r = new cBaseFunction("ACCRINT");
+    'groupName':"Financial",
+    'ACCRINT':function () {
+        var r = new cBaseFunction( "ACCRINT" );
         return r;
     },
-    'ACCRINTM' : function(){
-        var r = new cBaseFunction("ACCRINTM");
+    'ACCRINTM':function () {
+        var r = new cBaseFunction( "ACCRINTM" );
         return r;
     },
-    'AMORDEGRC' : function(){
-        var r = new cBaseFunction("AMORDEGRC");
+    'AMORDEGRC':function () {
+        var r = new cBaseFunction( "AMORDEGRC" );
         return r;
     },
-    'AMORLINC' : function(){
-        var r = new cBaseFunction("AMORLINC");
+    'AMORLINC':function () {
+        var r = new cBaseFunction( "AMORLINC" );
         return r;
     },
-    'COUPDAYBS' : function(){
-        var r = new cBaseFunction("COUPDAYBS");
+    'COUPDAYBS':function () {
+        var r = new cBaseFunction( "COUPDAYBS" );
         return r;
     },
-    'COUPDAYS' : function(){
-        var r = new cBaseFunction("COUPDAYS");
+    'COUPDAYS':function () {
+        var r = new cBaseFunction( "COUPDAYS" );
         return r;
     },
-    'COUPDAYSNC' : function(){
-        var r = new cBaseFunction("COUPDAYSNC");
+    'COUPDAYSNC':function () {
+        var r = new cBaseFunction( "COUPDAYSNC" );
         return r;
     },
-    'COUPNCD' : function(){
-        var r = new cBaseFunction("COUPNCD");
+    'COUPNCD':function () {
+        var r = new cBaseFunction( "COUPNCD" );
         return r;
     },
-    'COUPNUM' : function(){
-        var r = new cBaseFunction("COUPNUM");
+    'COUPNUM':function () {
+        var r = new cBaseFunction( "COUPNUM" );
         return r;
     },
-    'COUPPCD' : function(){
-        var r = new cBaseFunction("COUPPCD");
+    'COUPPCD':function () {
+        var r = new cBaseFunction( "COUPPCD" );
         return r;
     },
-    'CUMIPMT' : function(){
-        var r = new cBaseFunction("CUMIPMT");
+    'CUMIPMT':function () {
+        var r = new cBaseFunction( "CUMIPMT" );
         return r;
     },
-    'CUMPRINC' : function(){
-        var r = new cBaseFunction("CUMPRINC");
+    'CUMPRINC':function () {
+        var r = new cBaseFunction( "CUMPRINC" );
         return r;
     },
-    'DB' : function(){
-        var r = new cBaseFunction("DB");
+    'DB':function () {
+        var r = new cBaseFunction( "DB" );
         return r;
     },
-    'DDB' : function(){
-        var r = new cBaseFunction("DDB");
+    'DDB':function () {
+        var r = new cBaseFunction( "DDB" );
         return r;
     },
-    'DISC' : function(){
-        var r = new cBaseFunction("DISC");
+    'DISC':function () {
+        var r = new cBaseFunction( "DISC" );
         return r;
     },
-    'DOLLARDE' : function(){
-        var r = new cBaseFunction("DOLLARDE");
+    'DOLLARDE':function () {
+        var r = new cBaseFunction( "DOLLARDE" );
         return r;
     },
-    'DOLLARFR' : function(){
-        var r = new cBaseFunction("DOLLARFR");
+    'DOLLARFR':function () {
+        var r = new cBaseFunction( "DOLLARFR" );
         return r;
     },
-    'DURATION' : function(){
-        var r = new cBaseFunction("DURATION");
+    'DURATION':function () {
+        var r = new cBaseFunction( "DURATION" );
         return r;
     },
-    'EFFECT' : function(){
-        var r = new cBaseFunction("EFFECT");
+    'EFFECT':function () {
+        var r = new cBaseFunction( "EFFECT" );
         return r;
     },
-    'FV' : function(){
-        var r = new cBaseFunction("FV");
-        r.setArgumentsMin(3);
-        r.setArgumentsMax(5);
-        r.Calculate = function(arg){
-            var rate = arg[0], nper = arg[1], pmt = arg[2], pv = arg[3] ? arg[3] : new cNumber(0), type = arg[4] ? arg[4] : new cNumber(0);
+    'FV':function () {
+        var r = new cBaseFunction( "FV" );
+        r.setArgumentsMin( 3 );
+        r.setArgumentsMax( 5 );
+        r.Calculate = function ( arg ) {
+            var rate = arg[0], nper = arg[1], pmt = arg[2], pv = arg[3] ? arg[3] : new cNumber( 0 ), type = arg[4] ? arg[4] : new cNumber( 0 );
 
-            if ( rate instanceof cArea || rate instanceof cArea3D ){
-                rate = rate.cross(arguments[1].first);
+            if ( rate instanceof cArea || rate instanceof cArea3D ) {
+                rate = rate.cross( arguments[1].first );
             }
-            else if( rate instanceof cArray ){
-                rate = rate.getElementRowCol(0,0);
-            }
-
-            if ( nper instanceof cArea || nper instanceof cArea3D ){
-                nper = nper.cross(arguments[1].first);
-            }
-            else if( nper instanceof cArray ){
-                nper = nper.getElementRowCol(0,0);
+            else if ( rate instanceof cArray ) {
+                rate = rate.getElementRowCol( 0, 0 );
             }
 
-            if ( pmt instanceof cArea || pmt instanceof cArea3D ){
-                pmt = pmt.cross(arguments[1].first);
+            if ( nper instanceof cArea || nper instanceof cArea3D ) {
+                nper = nper.cross( arguments[1].first );
             }
-            else if( pmt instanceof cArray ){
-                pmt = pmt.getElementRowCol(0,0);
-            }
-
-            if ( pv instanceof cArea || pv instanceof cArea3D ){
-                pv = pv.cross(arguments[1].first);
-            }
-            else if( pv instanceof cArray ){
-                pv = pv.getElementRowCol(0,0);
+            else if ( nper instanceof cArray ) {
+                nper = nper.getElementRowCol( 0, 0 );
             }
 
-            if ( type instanceof cArea || type instanceof cArea3D ){
-                type = type.cross(arguments[1].first);
+            if ( pmt instanceof cArea || pmt instanceof cArea3D ) {
+                pmt = pmt.cross( arguments[1].first );
             }
-            else if( type instanceof cArray ){
-                type = type.getElementRowCol(0,0);
+            else if ( pmt instanceof cArray ) {
+                pmt = pmt.getElementRowCol( 0, 0 );
+            }
+
+            if ( pv instanceof cArea || pv instanceof cArea3D ) {
+                pv = pv.cross( arguments[1].first );
+            }
+            else if ( pv instanceof cArray ) {
+                pv = pv.getElementRowCol( 0, 0 );
+            }
+
+            if ( type instanceof cArea || type instanceof cArea3D ) {
+                type = type.cross( arguments[1].first );
+            }
+            else if ( type instanceof cArray ) {
+                type = type.getElementRowCol( 0, 0 );
             }
 
             rate = rate.tocNumber();
@@ -140,76 +140,147 @@ cFormulaFunction.Financial = {
             if ( type.getValue() != 1 && type.getValue() != 0 ) return this.value = new cError( cErrorType.not_numeric );
 
             var res;
-            if( rate.getValue() != 0 ){
-                res = -1*( pv.getValue()*Math.pow(1+rate.getValue(),nper.getValue())+pmt.getValue()*( 1 + rate.getValue()*type.getValue() )*(Math.pow((1+rate.getValue()),nper.getValue())-1)/rate.getValue() );
+            if ( rate.getValue() != 0 ) {
+                res = -1 * ( pv.getValue() * Math.pow( 1 + rate.getValue(), nper.getValue() ) + pmt.getValue() * ( 1 + rate.getValue() * type.getValue() ) * (Math.pow( (1 + rate.getValue()), nper.getValue() ) - 1) / rate.getValue() );
             }
-            else{
-                res = -1*( pv.getValue()+pmt.getValue()*nper.getValue() );
+            else {
+                res = -1 * ( pv.getValue() + pmt.getValue() * nper.getValue() );
             }
 
-            return this.value = new cNumber(res);
+            return this.value = new cNumber( res );
         }
-        r.getInfo = function(){
+        r.getInfo = function () {
             return {
                 name:this.name,
                 args:"( rate , nper , pmt [ , [ pv ] [ ,[ type ] ] ] )"
             };
         }
-        r.setFormat(r.formatType.noneFormat);
+        r.setFormat( r.formatType.noneFormat );
         return r;
     },
-    'FVSCHEDULE' : function(){
-        var r = new cBaseFunction("FVSCHEDULE");
+    'FVSCHEDULE':function () {
+        var r = new cBaseFunction( "FVSCHEDULE" );
         return r;
     },
-    'INTRATE' : function(){
-        var r = new cBaseFunction("INTRATE");
+    'INTRATE':function () {
+        var r = new cBaseFunction( "INTRATE" );
         return r;
     },
-    'IPMT' : function(){
-        var r = new cBaseFunction("IPMT");
+    'IPMT':function () {
+        var r = new cBaseFunction( "IPMT" );
         return r;
     },
-    'IRR' : function(){
-        var r = new cBaseFunction("IRR");
+    'IRR':function () {
+        var r = new cBaseFunction( "IRR" );
         return r;
     },
-    'ISPMT' : function(){
-        var r = new cBaseFunction("ISPMT");
+    'ISPMT':function () {
+        var r = new cBaseFunction( "ISPMT" );
         return r;
     },
-    'MDURATION' : function(){
-        var r = new cBaseFunction("MDURATION");
+    'MDURATION':function () {
+        var r = new cBaseFunction( "MDURATION" );
         return r;
     },
-    'MIRR' : function(){
-        var r = new cBaseFunction("MIRR");
+    'MIRR':function () {
+        var r = new cBaseFunction( "MIRR" );
         return r;
     },
-    'NOMINAL' : function(){
-        var r = new cBaseFunction("NOMINAL");
+    'NOMINAL':function () {
+        var r = new cBaseFunction( "NOMINAL" );
         return r;
     },
-    'NPER' : function(){
-        var r = new cBaseFunction("NPER");
+    'NPER':function () {
+        var r = new cBaseFunction( "NPER" );
+        r.setArgumentsMin( 3 );
+        r.setArgumentsMax( 5 );
+        r.Calculate = function ( arg ) {
+            var rate = arg[0], pmt = arg[1], pv = arg[2], fv = arg[3] ? arg[3] : new cNumber( 0 ), type = arg[4] ? arg[4] : new cNumber( 0 );
+
+            if ( rate instanceof cArea || rate instanceof cArea3D ) {
+                rate = rate.cross( arguments[1].first );
+            }
+            else if ( rate instanceof cArray ) {
+                rate = rate.getElementRowCol( 0, 0 );
+            }
+
+            if ( pmt instanceof cArea || pmt instanceof cArea3D ) {
+                pmt = pmt.cross( arguments[1].first );
+            }
+            else if ( pmt instanceof cArray ) {
+                pmt = pmt.getElementRowCol( 0, 0 );
+            }
+
+            if ( pv instanceof cArea || pv instanceof cArea3D ) {
+                pv = pv.cross( arguments[1].first );
+            }
+            else if ( pv instanceof cArray ) {
+                pv = pv.getElementRowCol( 0, 0 );
+            }
+
+            if ( fv instanceof cArea || fv instanceof cArea3D ) {
+                fv = fv.cross( arguments[1].first );
+            }
+            else if ( fv instanceof cArray ) {
+                fv = fv.getElementRowCol( 0, 0 );
+            }
+
+            if ( type instanceof cArea || type instanceof cArea3D ) {
+                type = type.cross( arguments[1].first );
+            }
+            else if ( type instanceof cArray ) {
+                type = type.getElementRowCol( 0, 0 );
+            }
+
+            rate = rate.tocNumber();
+            pmt = pmt.tocNumber();
+            pv = pv.tocNumber();
+            fv = fv.tocNumber();
+            type = type.tocNumber();
+
+            if ( rate instanceof cError ) return this.value = rate;
+            if ( pmt instanceof cError ) return this.value = pmt;
+            if ( pmt instanceof cError ) return this.value = pv;
+            if ( fv instanceof cError ) return this.value = fv;
+            if ( type instanceof cError ) return this.value = type;
+
+            if ( type.getValue() != 1 && type.getValue() != 0 ) return this.value = new cError( cErrorType.not_numeric );
+
+            var res;
+            if ( rate.getValue() != 0 ) {
+                res = -1 * ( fv.getValue() + pmt.getValue() * (1 + rate.getValue() * type.getValue()) * ( (Math.pow( (1 + rate.getValue()), nper.getValue() ) - 1) / rate.getValue() ) ) / Math.pow( 1 + rate.getValue(), nper.getValue() )
+            }
+            else {
+                res = -1 * ( fv.getValue() + pmt.getValue() * pmt.getValue() );
+            }
+
+            return this.value = new cNumber( res );
+        }
+        r.getInfo = function () {
+            return {
+                name:this.name,
+                args:"( rate , pmt , pv [ , [ fv ] [ , [ type ] ] ] )"
+            };
+        }
+        r.setFormat( r.formatType.noneFormat );
         return r;
     },
-    'NPV' : function(){
-        var r = new cBaseFunction("NPV");
-        r.setArgumentsMin(2);
-        r.setArgumentsMax(255);
-        r.Calculate = function(arg){
+    'NPV':function () {
+        var r = new cBaseFunction( "NPV" );
+        r.setArgumentsMin( 2 );
+        r.setArgumentsMax( 255 );
+        r.Calculate = function ( arg ) {
             var arg0 = arg[0], arg1 = arg[1], iStart = 1, res = 0, rate;
 
-            function elemCalc(rate,value,step){
-                return value / Math.pow(1+rate,step);
+            function elemCalc( rate, value, step ) {
+                return value / Math.pow( 1 + rate, step );
             }
 
-            if ( arg0 instanceof cArea || arg0 instanceof cArea3D ){
-                arg0 = arg0.cross(arguments[1].first);
+            if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+                arg0 = arg0.cross( arguments[1].first );
             }
-            else if( arg0 instanceof cArray ){
-                arg0 = arg0.getElementRowCol(0,0);
+            else if ( arg0 instanceof cArray ) {
+                arg0 = arg0.getElementRowCol( 0, 0 );
             }
 
             arg0 = arg0.tocNumber();
@@ -219,107 +290,107 @@ cFormulaFunction.Financial = {
 
             rate = arg0.getValue();
 
-            if( rate == -1)
+            if ( rate == -1 )
                 return this.value = new cError( cErrorType.division_by_zero );
 
 
-            for(var i = 1; i < this.getArguments(); i++){
+            for ( var i = 1; i < this.getArguments(); i++ ) {
                 var argI = arg[i];
-                if( argI instanceof cArea || argI instanceof cArea3D ){
+                if ( argI instanceof cArea || argI instanceof cArea3D ) {
                     var argIArr = argI.getValue();
-                    for (var j = 0; j < argIArr.length; j++){
-                        if( argIArr[j] instanceof cNumber ){
+                    for ( var j = 0; j < argIArr.length; j++ ) {
+                        if ( argIArr[j] instanceof cNumber ) {
                             res += elemCalc( rate, argIArr[j].getValue(), iStart++ );
                         }
                     }
                     continue;
                 }
-                else if( argI instanceof cArray ){
-                    argI.foreach(function(elem,r,c){
-                        if( elem instanceof cNumber ){
+                else if ( argI instanceof cArray ) {
+                    argI.foreach( function ( elem, r, c ) {
+                        if ( elem instanceof cNumber ) {
                             res += elemCalc( rate, elem.getValue(), iStart++ );
                         }
-                    })
+                    } )
                     continue;
                 }
 
                 argI = argI.tocNumber();
 
-                if( argI instanceof cError )
+                if ( argI instanceof cError )
                     continue;
 
                 res += elemCalc( rate, argI.getValue(), iStart++ );
 
             }
 
-            return this.value = new cNumber(res);
+            return this.value = new cNumber( res );
 
         };
-        r.getInfo = function(){
+        r.getInfo = function () {
             return {
                 name:this.name,
                 args:"( rate , argument-list )"
             };
         };
-        r.setFormat(r.formatType.noneFormat);
+        r.setFormat( r.formatType.noneFormat );
         return r;
     },
-    'ODDFPRICE' : function(){
-        var r = new cBaseFunction("ODDFPRICE");
+    'ODDFPRICE':function () {
+        var r = new cBaseFunction( "ODDFPRICE" );
         return r;
     },
-    'ODDFYIELD' : function(){
-        var r = new cBaseFunction("ODDFYIELD");
+    'ODDFYIELD':function () {
+        var r = new cBaseFunction( "ODDFYIELD" );
         return r;
     },
-    'ODDLPRICE' : function(){
-        var r = new cBaseFunction("ODDLPRICE");
+    'ODDLPRICE':function () {
+        var r = new cBaseFunction( "ODDLPRICE" );
         return r;
     },
-    'ODDLYIELD' : function(){
-        var r = new cBaseFunction("ODDLYIELD");
+    'ODDLYIELD':function () {
+        var r = new cBaseFunction( "ODDLYIELD" );
         return r;
     },
-    'PMT' : function(){
-        var r = new cBaseFunction("PMT");
-        r.setArgumentsMin(3);
-        r.setArgumentsMax(5);
-        r.Calculate = function(arg){
-            var rate = arg[0], nper = arg[1], pv = arg[2], fv = arg[3] ? arg[3] : new cNumber(0), type = arg[4] ? arg[4] : new cNumber(0);
+    'PMT':function () {
+        var r = new cBaseFunction( "PMT" );
+        r.setArgumentsMin( 3 );
+        r.setArgumentsMax( 5 );
+        r.Calculate = function ( arg ) {
+            var rate = arg[0], nper = arg[1], pv = arg[2], fv = arg[3] ? arg[3] : new cNumber( 0 ), type = arg[4] ? arg[4] : new cNumber( 0 );
 
-            if ( rate instanceof cArea || rate instanceof cArea3D ){
-                rate = rate.cross(arguments[1].first);
+            if ( rate instanceof cArea || rate instanceof cArea3D ) {
+                rate = rate.cross( arguments[1].first );
             }
-            else if( rate instanceof cArray ){
-                rate = rate.getElementRowCol(0,0);
-            }
-
-            if ( nper instanceof cArea || nper instanceof cArea3D ){
-                nper = nper.cross(arguments[1].first);
-            }
-            else if( nper instanceof cArray ){
-                nper = nper.getElementRowCol(0,0);
+            else if ( rate instanceof cArray ) {
+                rate = rate.getElementRowCol( 0, 0 );
             }
 
-            if ( pv instanceof cArea || pv instanceof cArea3D ){
-                pv = pv.cross(arguments[1].first);
+            if ( nper instanceof cArea || nper instanceof cArea3D ) {
+                nper = nper.cross( arguments[1].first );
             }
-            else if( pv instanceof cArray ){
-                pv = pv.getElementRowCol(0,0);
-            }
-
-            if ( fv instanceof cArea || fv instanceof cArea3D ){
-                fv = fv.cross(arguments[1].first);
-            }
-            else if( fv instanceof cArray ){
-                fv = fv.getElementRowCol(0,0);
+            else if ( nper instanceof cArray ) {
+                nper = nper.getElementRowCol( 0, 0 );
             }
 
-            if ( type instanceof cArea || type instanceof cArea3D ){
-                type = type.cross(arguments[1].first);
+            if ( pv instanceof cArea || pv instanceof cArea3D ) {
+                pv = pv.cross( arguments[1].first );
             }
-            else if( type instanceof cArray ){
-                type = type.getElementRowCol(0,0);
+            else if ( pv instanceof cArray ) {
+                pv = pv.getElementRowCol( 0, 0 );
+            }
+
+            if ( fv instanceof cArea || fv instanceof cArea3D ) {
+                fv = fv.cross( arguments[1].first );
+            }
+            else if ( fv instanceof cArray ) {
+                fv = fv.getElementRowCol( 0, 0 );
+            }
+
+            if ( type instanceof cArea || type instanceof cArea3D ) {
+                type = type.cross( arguments[1].first );
+            }
+            else if ( type instanceof cArray ) {
+                type = type.getElementRowCol( 0, 0 );
             }
 
             rate = rate.tocNumber();
@@ -340,81 +411,81 @@ cFormulaFunction.Financial = {
             if ( type.getValue() != 1 && type.getValue() != 0 ) return this.value = new cError( cErrorType.not_numeric );
 
             var res;
-            if( rate.getValue() != 0 ){
-                res = -1*( pv.getValue() * Math.pow( 1 + rate.getValue(), nper.getValue() ) + fv.getValue() ) /
-                    ( ( 1 + rate.getValue() * type.getValue() ) * ( Math.pow((1 + rate.getValue()), nper.getValue() ) - 1 ) / rate.getValue() );
+            if ( rate.getValue() != 0 ) {
+                res = -1 * ( pv.getValue() * Math.pow( 1 + rate.getValue(), nper.getValue() ) + fv.getValue() ) /
+                    ( ( 1 + rate.getValue() * type.getValue() ) * ( Math.pow( (1 + rate.getValue()), nper.getValue() ) - 1 ) / rate.getValue() );
             }
-            else{
-                res = -1*( pv.getValue()+fv.getValue() )/ nper.getValue();
+            else {
+                res = -1 * ( pv.getValue() + fv.getValue() ) / nper.getValue();
             }
 
-            return this.value = new cNumber(res);
+            return this.value = new cNumber( res );
         }
-        r.getInfo = function(){
+        r.getInfo = function () {
             return {
                 name:this.name,
                 args:"( rate , nper , pv [ , [ fv ] [ ,[ type ] ] ] )"
             };
         }
-        r.setFormat(r.formatType.noneFormat);
+        r.setFormat( r.formatType.noneFormat );
         return r;
     },
-    'PPMT' : function(){
-        var r = new cBaseFunction("PPMT");
+    'PPMT':function () {
+        var r = new cBaseFunction( "PPMT" );
         return r;
     },
-    'PRICE' : function(){
-        var r = new cBaseFunction("PRICE");
+    'PRICE':function () {
+        var r = new cBaseFunction( "PRICE" );
         return r;
     },
-    'PRICEDISC' : function(){
-        var r = new cBaseFunction("PRICEDISC");
+    'PRICEDISC':function () {
+        var r = new cBaseFunction( "PRICEDISC" );
         return r;
     },
-    'PRICEMAT' : function(){
-        var r = new cBaseFunction("PRICEMAT");
+    'PRICEMAT':function () {
+        var r = new cBaseFunction( "PRICEMAT" );
         return r;
     },
-    'PV' : function(){
-        var r = new cBaseFunction("PV");
-        r.setArgumentsMin(3);
-        r.setArgumentsMax(5);
-        r.Calculate = function(arg){
-            var rate = arg[0], nper = arg[1], pmt = arg[2], fv = arg[3] ? arg[3] : new cNumber(0), type = arg[4] ? arg[4] : new cNumber(0);
+    'PV':function () {
+        var r = new cBaseFunction( "PV" );
+        r.setArgumentsMin( 3 );
+        r.setArgumentsMax( 5 );
+        r.Calculate = function ( arg ) {
+            var rate = arg[0], nper = arg[1], pmt = arg[2], fv = arg[3] ? arg[3] : new cNumber( 0 ), type = arg[4] ? arg[4] : new cNumber( 0 );
 
-            if ( rate instanceof cArea || rate instanceof cArea3D ){
-                rate = rate.cross(arguments[1].first);
+            if ( rate instanceof cArea || rate instanceof cArea3D ) {
+                rate = rate.cross( arguments[1].first );
             }
-            else if( rate instanceof cArray ){
-                rate = rate.getElementRowCol(0,0);
-            }
-
-            if ( nper instanceof cArea || nper instanceof cArea3D ){
-                nper = nper.cross(arguments[1].first);
-            }
-            else if( nper instanceof cArray ){
-                nper = nper.getElementRowCol(0,0);
+            else if ( rate instanceof cArray ) {
+                rate = rate.getElementRowCol( 0, 0 );
             }
 
-            if ( pmt instanceof cArea || pmt instanceof cArea3D ){
-                pmt = pmt.cross(arguments[1].first);
+            if ( nper instanceof cArea || nper instanceof cArea3D ) {
+                nper = nper.cross( arguments[1].first );
             }
-            else if( pmt instanceof cArray ){
-                pmt = pmt.getElementRowCol(0,0);
-            }
-
-            if ( fv instanceof cArea || fv instanceof cArea3D ){
-                fv = fv.cross(arguments[1].first);
-            }
-            else if( fv instanceof cArray ){
-                fv = fv.getElementRowCol(0,0);
+            else if ( nper instanceof cArray ) {
+                nper = nper.getElementRowCol( 0, 0 );
             }
 
-            if ( type instanceof cArea || type instanceof cArea3D ){
-                type = type.cross(arguments[1].first);
+            if ( pmt instanceof cArea || pmt instanceof cArea3D ) {
+                pmt = pmt.cross( arguments[1].first );
             }
-            else if( type instanceof cArray ){
-                type = type.getElementRowCol(0,0);
+            else if ( pmt instanceof cArray ) {
+                pmt = pmt.getElementRowCol( 0, 0 );
+            }
+
+            if ( fv instanceof cArea || fv instanceof cArea3D ) {
+                fv = fv.cross( arguments[1].first );
+            }
+            else if ( fv instanceof cArray ) {
+                fv = fv.getElementRowCol( 0, 0 );
+            }
+
+            if ( type instanceof cArea || type instanceof cArea3D ) {
+                type = type.cross( arguments[1].first );
+            }
+            else if ( type instanceof cArray ) {
+                type = type.getElementRowCol( 0, 0 );
             }
 
             rate = rate.tocNumber();
@@ -432,74 +503,74 @@ cFormulaFunction.Financial = {
             if ( type.getValue() != 1 && type.getValue() != 0 ) return this.value = new cError( cErrorType.not_numeric );
 
             var res;
-            if( rate.getValue() != 0 ){
-                res = -1*( fv.getValue() + pmt.getValue()*(1+rate.getValue()*type.getValue())*( (Math.pow((1+rate.getValue()),nper.getValue())-1)/rate.getValue() ) )/Math.pow(1+rate.getValue(),nper.getValue())
+            if ( rate.getValue() != 0 ) {
+                res = -1 * ( fv.getValue() + pmt.getValue() * (1 + rate.getValue() * type.getValue()) * ( (Math.pow( (1 + rate.getValue()), nper.getValue() ) - 1) / rate.getValue() ) ) / Math.pow( 1 + rate.getValue(), nper.getValue() )
             }
-            else{
-                res = -1*( fv.getValue()+pmt.getValue()*nper.getValue() );
+            else {
+                res = -1 * ( fv.getValue() + pmt.getValue() * nper.getValue() );
             }
 
-            return this.value = new cNumber(res);
+            return this.value = new cNumber( res );
         }
-        r.getInfo = function(){
+        r.getInfo = function () {
             return {
                 name:this.name,
                 args:"( rate , nper , pmt [ , [ fv ] [ ,[ type ] ] ] )"
             };
         }
-        r.setFormat(r.formatType.noneFormat);
+        r.setFormat( r.formatType.noneFormat );
         return r;
     },
-    'RATE' : function(){
-        var r = new cBaseFunction("RATE");
+    'RATE':function () {
+        var r = new cBaseFunction( "RATE" );
         return r;
     },
-    'RECEIVED' : function(){
-        var r = new cBaseFunction("RECEIVED");
+    'RECEIVED':function () {
+        var r = new cBaseFunction( "RECEIVED" );
         return r;
     },
-    'SLN' : function(){
-        var r = new cBaseFunction("SLN");
+    'SLN':function () {
+        var r = new cBaseFunction( "SLN" );
         return r;
     },
-    'SYD' : function(){
-        var r = new cBaseFunction("SYD");
+    'SYD':function () {
+        var r = new cBaseFunction( "SYD" );
         return r;
     },
-    'TBILLEQ' : function(){
-        var r = new cBaseFunction("TBILLEQ");
+    'TBILLEQ':function () {
+        var r = new cBaseFunction( "TBILLEQ" );
         return r;
     },
-    'TBILLPRICE' : function(){
-        var r = new cBaseFunction("TBILLPRICE");
+    'TBILLPRICE':function () {
+        var r = new cBaseFunction( "TBILLPRICE" );
         return r;
     },
-    'TBILLYIELD' : function(){
-        var r = new cBaseFunction("TBILLYIELD");
+    'TBILLYIELD':function () {
+        var r = new cBaseFunction( "TBILLYIELD" );
         return r;
     },
-    'VDB' : function(){
-        var r = new cBaseFunction("VDB");
+    'VDB':function () {
+        var r = new cBaseFunction( "VDB" );
         return r;
     },
-    'XIRR' : function(){
-        var r = new cBaseFunction("XIRR");
+    'XIRR':function () {
+        var r = new cBaseFunction( "XIRR" );
         return r;
     },
-    'XNPV' : function(){
-        var r = new cBaseFunction("XNPV");
+    'XNPV':function () {
+        var r = new cBaseFunction( "XNPV" );
         return r;
     },
-    'YIELD' : function(){
-        var r = new cBaseFunction("YIELD");
+    'YIELD':function () {
+        var r = new cBaseFunction( "YIELD" );
         return r;
     },
-    'YIELDDISC' : function(){
-        var r = new cBaseFunction("YIELDDISC");
+    'YIELDDISC':function () {
+        var r = new cBaseFunction( "YIELDDISC" );
         return r;
     },
-    'YIELDMAT' : function(){
-        var r = new cBaseFunction("YIELDMAT");
+    'YIELDMAT':function () {
+        var r = new cBaseFunction( "YIELDMAT" );
         return r;
     }
 }
