@@ -255,7 +255,7 @@
 				else
 				{
 					ref = addFormatTableOptionsObj.asc_getRange();
-                    addNameColumn = addFormatTableOptionsObj.asc_getIsTitle();
+                    addNameColumn = !addFormatTableOptionsObj.asc_getIsTitle();
 					var newRange = this._refToRange(ref);
 					if(newRange)
 						activeCells = newRange;
@@ -1835,14 +1835,15 @@
 				if((alreadyAddFilter && alreadyAddFilter.changeStyle) ||(alreadyAddFilter && !alreadyAddFilter.containsFilter && !alreadyAddFilter.all))
 					return false;
 				
-				var isTitle = this._isAddNameColumn(ws, activeCells);
-				objOptions.asc_setIsTitle(isTitle);
-				
 				var mainAdjacentCells;
 				if(activeCells.r1 == activeCells.r2 && activeCells.c1 == activeCells.c2)//если ячейка выделенная одна
 					mainAdjacentCells = this._getAdjacentCellsAF(activeCells,ws,aWs);
 				else//выделено > 1 ячейки
 					mainAdjacentCells = Asc.clone(activeCells);
+					
+				//имеется ввиду то, что при выставленном флаге title используется первая строка в качестве заголовка, в противном случае - добавлются заголовки
+				var isTitle = this._isAddNameColumn(ws, mainAdjacentCells);
+				objOptions.asc_setIsTitle(isTitle);
 				var firstCellId = this._rangeToId(mainAdjacentCells); 
 				var endCellId = this._rangeToId({r1: mainAdjacentCells.r2, c1: mainAdjacentCells.c2, r2: mainAdjacentCells.r2, c2: mainAdjacentCells.c2}); 
 				var sListName = ws.model.getName();
@@ -4766,20 +4767,24 @@
 			
 			_isAddNameColumn: function(ws,range)
 			{
-				var result = true;
-				for(var col = range.c1; col <= range.c2; col++)
-				{	
-					var valFirst = ws.model.getCell(new CellAddress(range.r1,col,0));
-					if(valFirst != '')
-					{
-						for(var row = range.r1; row <= range.r1 + 3; row++)
+				//если в трёх первых строчках любых столбцов содержится текстовые данные
+				var result = false;
+				if(range.r1 != range.r2)
+				{
+					for(var col = range.c1; col <= range.c2; col++)
+					{	
+						var valFirst = ws.model.getCell(new CellAddress(range.r1,col,0));
+						if(valFirst != '')
 						{
-							var cell = ws.model.getCell(new CellAddress(row,col,0));
-							var type = cell.getType();
-							if(type == 1)
+							for(var row = range.r1; row <= range.r1 + 2; row++)
 							{
-								result = false;
-								break;
+								var cell = ws.model.getCell(new CellAddress(row,col,0));
+								var type = cell.getType();
+								if(type == 1)
+								{
+									result = true;
+									break;
+								}
 							}
 						}
 					}
