@@ -2349,7 +2349,6 @@ function DrawingObjects() {
 			}
 		}
 		_this.selectGraphicObject();
-		_this.drawWorksheetHeaders();
 	}
 
 	_this.showOverlayGraphicObjects = function() {
@@ -2381,13 +2380,25 @@ function DrawingObjects() {
 	}
 
 	_this.drawWorksheetHeaders = function() {
-		worksheet._drawColumnHeaders();
-		worksheet._drawRowHeaders();
-				
-		// cols header on overlay
-		overlayCtx.clearRect( 0, 0, overlayCtx.getWidth(), worksheet.getCellTop(0, 1) );
-		// rows header on overlay
-		overlayCtx.clearRect( 0, 0, worksheet.getCellLeft(0, 1), overlayCtx.getHeight() );
+	
+		// Проверяем выход за видимую область
+		var fvr = worksheet.getFirstVisibleRow();
+		var fvc = worksheet.getFirstVisibleCol();
+		
+		for (var i = 0; i < aObjects.length; i++) {
+			
+			var obj = aObjects[i];
+			if ( (obj.from.col < fvc) || (obj.from.row < fvr) ) {				
+				worksheet._drawColumnHeaders();
+				worksheet._drawRowHeaders();
+						
+				// cols header on overlay
+				overlayCtx.clearRect( 0, 0, overlayCtx.getWidth(), worksheet.getCellTop(0, 1) );
+				// rows header on overlay
+				overlayCtx.clearRect( 0, 0, worksheet.getCellLeft(0, 1), overlayCtx.getHeight() );
+				break;
+			}
+		}
 	}
 	
 	_this.changeObjectStorage = function(storage) {
