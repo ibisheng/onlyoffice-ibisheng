@@ -2054,9 +2054,14 @@
 						var image = drawings[isSelectedImages[j]];
 						var cloneImg = worksheet.objectRender.cloneDrawingObject(image);
 						var curImage = new Image();
-						var url = cloneImg.image.src;
+						var url;
 						if(cloneImg.graphicObject && cloneImg.graphicObject.isImage())
-							url = cloneImg.graphicObject.getImageUrl()
+							url = cloneImg.graphicObject.getImageUrl();
+						else if(cloneImg.graphicObject.isChart() && cloneImg.graphicObject.brush.fill.RasterImageId)
+							url = cloneImg.graphicObject.brush.fill.RasterImageId;
+						else
+							url = cloneImg.image.src;
+							
 						curImage.src = url;
 						curImage.width = cloneImg.getWidthFromTo();
 						curImage.height = cloneImg.getHeightFromTo();
@@ -2065,7 +2070,7 @@
 						table.appendChild(curImage);
 						
 						//add image or chart in local buffer
-						if(image.isChart())
+						if(image.graphicObject.isChart())
 						{
 							isChart = {};
 							isChart.chart = cloneImg.chart;
