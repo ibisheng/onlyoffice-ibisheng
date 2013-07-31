@@ -4925,6 +4925,27 @@ Range.prototype.setCellStyle=function(val){
 			cell.setCellStyle(val);
 		});
 };
+Range.prototype.setTableStyle=function(val){
+	this.createCellOnRowColCross();
+	var fSetProperty = this._setProperty;
+	var nRangeType = this._getRangeType();
+	if(c_oRangeType.All == nRangeType)
+	{
+		//this.worksheet.getAllCol().setCellStyle(val);
+		fSetProperty = this._setPropertyNoEmpty;
+	}
+	fSetProperty.call(this, function(row){
+			if(c_oRangeType.All == nRangeType && null == row.xfs)
+				return;
+			//row.setCellStyle(val);
+		},
+		function(col){
+			//col.setCellStyle(val);
+		},
+		function(cell){
+			cell.setTableStyle(val);
+		});
+};
 Range.prototype.setNumFormat=function(val){
 	History.Create_NewPoint();
 	var oBBox = this.bbox;

@@ -1640,6 +1640,7 @@
 						{
 							if(cloneData.refTable == aWs.TableParts[l].Ref)
 							{
+								this._cleanStyleTable(aWs, cloneData.refTable);
 								aWs.TableParts.splice(l,1);
 							}	
 						}
@@ -1708,6 +1709,7 @@
 							{
 								if(cloneData.Ref == aWs.TableParts[l].Ref)
 								{
+									this._cleanStyleTable(aWs, cloneData.Ref);
 									aWs.TableParts.splice(l,1);
 								}	
 							}
@@ -2917,7 +2919,11 @@
 				}
 				
 			},
-			
+			_cleanStyleTable : function(ws, sRef)
+			{
+				var oRange = ws.getRange2(sRef);
+				oRange.setTableStyle(null);
+			},
 			_setColorStyleTable: function(id,idNext,ws,options, isOpenFilter)
 			{
 				var firstCellAddress = new CellAddress(id);
