@@ -1558,7 +1558,7 @@
 							options = 
 							{
 								name: i,
-								displayName: defaultStyles[i].displayName,
+								displayName: customStyles[i].displayName,
 								type: 'custom',
 								image: this._drawSmallIconTable(canvas,customStyles[i])
 							};
