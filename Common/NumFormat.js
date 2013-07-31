@@ -27,6 +27,19 @@ var oNumFormatCache;
 
 var FormatStates = {Decimal: 1, Frac: 2, Scientific: 3, Slash: 4};
 var SignType = {Positive: 1, Negative: 2, Null:3};
+var FormatType = {
+	General : 0,
+	Custom : 1,
+	Text : 2,
+	Number : 3,
+	Integer : 4,
+	Scientific : 5,
+	Currency : 6,
+	Date : 7,
+	Time : 8,
+	Percent : 9,
+	Fraction : 10
+}
 
 var monthCut =  ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 var monthShort = ['J','F','M','A','M','J','J','A','S','O','N','D'];
@@ -229,6 +242,9 @@ function NumFormat(bAddMinusIfNes)
     this.bMillisec = false;
     this.bSlash = false;
     this.bWhole = false;
+	this.bCurrency = false;
+	this.bNumber = false;
+	this.bInteger = false;
     this.Color = -1;
 	this.ComporationOperator = null;
     
@@ -1261,6 +1277,45 @@ NumFormat.prototype =
             {
                 //Анализируем
                 this.valid = this._prepareFormat();
+				if(this.valid)
+				{
+					//проверяем типы, которые мы не определяем в _prepareFormat
+					var aCurrencySymbols = ["$", "€", "£", "¥","р."];
+					var sText = "";
+					for(var i = 0, length = this.aRawFormat.length; i < length; ++i)
+					{
+						var item = this.aRawFormat[i];
+						if(numFormat_Text == item.type)
+							sText += item.val;
+						else if(numFormat_Bracket == item.type)
+						{
+							if(null != item.CurrencyString)
+								sText += item.CurrencyString;
+						}
+						else if(numFormat_DecimalPoint == item.type)
+							sText += ".";
+					}
+					if("" != sText)
+					{
+						for(var i = 0, length = aCurrencySymbols.length; i < length; ++i)
+						{
+							if(-1 != sText.indexOf(aCurrencySymbols[i]))
+							{
+								this.bCurrency = true;
+								break;
+							}
+						}
+					}
+					var rxNumber = new RegExp("^[0#?]+(.[0#?]+)?$");
+					var match = this.formatString.match(rxNumber);
+					if(null != match)
+					{
+						if(null != match[1])
+							this.bNumber = true;
+						else
+							this.bInteger = true;
+					}
+				}
             }
             return this.valid;
         }
@@ -1776,7 +1831,35 @@ NumFormat.prototype =
         }
         output.format = res;
         return true;
-    }
+    },
+	getType : function()
+	{
+		var nType = FormatType.Custom;
+		if(this.bGeneral)
+			nType = FormatType.General;
+		else if(this.bTextFormat)
+			nType = FormatType.Text;
+		else if(this.bDateTime)
+		{
+			if(this.bDate)
+				nType = FormatType.Date;
+			else
+				nType = FormatType.Time;
+		}
+		else if(this.nPercent > 0)
+			nType = FormatType.Percent;
+		else if(this.bScientific)
+			nType = FormatType.Scientific;
+		else if(this.bCurrency)
+			nType = FormatType.Currency;
+		else if(this.bSlash)
+			nType = FormatType.Fraction;
+		else if(this.bNumber)
+			nType = FormatType.Number;
+		else if(this.bInteger)
+			nType = FormatType.Integer;
+		return nType;
+	}
 };
 function NumFormatCache()
 {
@@ -2107,7 +2190,15 @@ CellFormat.prototype =
 			}
 		}
         return bRes;
-    }
+    },
+	getType: function()
+	{
+		if(null != this.oPositiveFormat)
+			return this.oPositiveFormat.getType();
+		else if(null != this.aComporationFormats && this.aComporationFormats.length > 0)
+			return this.aComporationFormats[0].getType();
+		return FormatType.General;
+	}
 };
 var oDecodeGeneralFormatCache = new Object();
 function DecodeGeneralFormat(val, nValType, dDigitsCount)
