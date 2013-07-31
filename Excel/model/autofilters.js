@@ -1836,7 +1836,9 @@
 					return false;
 				
 				var mainAdjacentCells;
-				if(activeCells.r1 == activeCells.r2 && activeCells.c1 == activeCells.c2)//если ячейка выделенная одна
+				if(alreadyAddFilter && alreadyAddFilter.changeAllFOnTable && alreadyAddFilter.range)//если к фильтру применяем форматированную таблицу
+					mainAdjacentCells = alreadyAddFilter.range;
+				else if(activeCells.r1 == activeCells.r2 && activeCells.c1 == activeCells.c2)//если ячейка выделенная одна
 					mainAdjacentCells = this._getAdjacentCellsAF(activeCells,ws,aWs);
 				else//выделено > 1 ячейки
 					mainAdjacentCells = Asc.clone(activeCells);
