@@ -12,10 +12,7 @@
 		 */
 		var doc = window.document;
 
-
-		var kElementId = "clipboard-helper";
-		var kElementTextId = "clipboard-helper-text";
-
+		
 		var kBorder = {
 			"thick"            : ["solid", 3],
 			"thin"             : ["solid", 1],
@@ -201,11 +198,11 @@
 				var found = true;
 
 				if (!t.element) {
-					t.element = doc.getElementById(kElementId);
+					t.element = doc.getElementById(COPY_ELEMENT_ID);
 					if (!t.element) {found = false; t.element = doc.createElement("DIV");}
 				}
 
-				t.element.id = kElementId;
+				t.element.id = COPY_ELEMENT_ID;
 				t.element.style.position = "absolute";
 				// Если сделать width маленьким, то параграф будет постоянно переноситься по span
 				// И например в таком случае пропадает пробел <span>1</span><span> </span><span>2</span>
@@ -215,7 +212,7 @@
 				t.element.style.height = '100px';
 				t.element.style.overflow = 'hidden';
 				t.element.style.zIndex = -1000;
-				t.element.style.display = "none";
+				t.element.style.display = ELEMENT_DISPAY_STYLE;
 				t.element.setAttribute("contentEditable", true);
 
 				if (!found) {doc.body.appendChild(t.element);}
@@ -241,7 +238,7 @@
 					t.elementText.style.overflow = 'hidden';
 					t.elementText.style.zIndex = -1000;
 					//if(/MSIE/g.test(navigator.userAgent))
-						t.elementText.style.display = "none";
+						t.elementText.style.display = ELEMENT_DISPAY_STYLE;
 					t.elementText.setAttribute("contentEditable", true);
 	
 					if (!foundText) {doc.body.appendChild(t.elementText);}
@@ -518,19 +515,20 @@
 				window.setTimeout(
 						function() {
 							// отменяем возможность выделения
-							t.element.style.display = "none";
+							t.element.style.display = ELEMENT_DISPAY_STYLE;
 							doc.body.style.MozUserSelect = "none";
 							doc.body.style["-khtml-user-select"] = "none";
 							doc.body.style["-o-user-select"] = "none";
 							doc.body.style["user-select"] = "none";
 							doc.body.style["-webkit-user-select"] = "none";
-							t.elementText.style.display = "none";
+							t.elementText.style.display = ELEMENT_DISPAY_STYLE;
 							var textInsert = t.elementText.value;
 							if(isOnlyLocalBufferSafari && navigator.userAgent.toLowerCase().indexOf('safari') > -1 && navigator.userAgent.toLowerCase().indexOf('mac') && t.lStorageText)
 								textInsert = t.lStorageText;
 							
 							// for paste event
-							callback(textInsert, []);
+							if(callback)
+								callback(textInsert, []);
 							if($.browser["mozilla"])
 								t._getStylesSelect();
 						},
@@ -727,8 +725,12 @@
 			// Private
 
 			_cleanElement: function () {
-				this.element.style.left = doc.body.offsetWidth + "px";
-				this.element.style.top = doc.body.offsetHeight + "px";
+				if(!window.USER_AGENT_SAFARI_MACOS)
+				{
+					this.element.style.left = doc.body.offsetWidth + "px";
+					this.element.style.top = doc.body.offsetHeight + "px";
+				}
+				
 				this.element.style.display = "block";
 
 				while (this.element.hasChildNodes()) {
@@ -795,11 +797,11 @@
                         t._editorPasteExec(worksheet, pastebin);
 					else if(is_chrome && !isTruePaste)
 						t._editorPasteExec(worksheet, pastebin);
-                    //else
-                        pastebin.style.display  = "none";
+                    
+                    pastebin.style.display  = ELEMENT_DISPAY_STYLE;
 						
 					if(/MSIE/g.test(navigator.userAgent))
-						pastebin.style.display  = "none";
+						pastebin.style.display  = ELEMENT_DISPAY_STYLE;
 					
 					if (callback && callback.call) {callback();}
                 }, 0 );
@@ -809,12 +811,12 @@
             {
                 //var oWordControl = api.WordControl;
                 var t = this;
-                var pastebin = document.getElementById('wrd_pastebin');
+                var pastebin = document.getElementById(PASTE_ELEMENT_ID);
                 if(!pastebin){
                     pastebin = document.createElement("div");
-                    pastebin.setAttribute( 'id', 'wrd_pastebin' );
+                    pastebin.setAttribute( 'id', PASTE_ELEMENT_ID );
                     pastebin.style.position = 'absolute';
-                    pastebin.style.top = '-100px';
+                    pastebin.style.top = '100px';
                     pastebin.style.left = '0px';
                     pastebin.style.width = '10000px';
                     pastebin.style.height = '100px';
@@ -1035,7 +1037,7 @@
 					}
 					bExist = true;
 				}
-				ifr.style.display  = "none";
+				ifr.style.display  = ELEMENT_DISPAY_STYLE;
 			},
 			_copyPasteCorrectString: function (str)
 			{
@@ -1908,7 +1910,7 @@
 				window.setTimeout(
 						function() {
 							// отменяем возможность выделения
-							t.element.style.display = "none";
+							t.element.style.display = ELEMENT_DISPAY_STYLE;
 							doc.body.style.MozUserSelect = "none";
 							doc.body.style["-khtml-user-select"] = "none";
 							doc.body.style["-o-user-select"] = "none";
@@ -2543,3 +2545,109 @@
 
 	}
 )(jQuery, window);
+
+window.USER_AGENT_SAFARI_MACOS = (navigator.userAgent.toLowerCase().indexOf('safari') > -1 && navigator.userAgent.toLowerCase().indexOf('mac') > -1) ? true : false;
+var COPY_ELEMENT_ID = "clipboard-helper";
+var PASTE_ELEMENT_ID = "wrd_pastebin";
+var ELEMENT_DISPAY_STYLE = "none";
+var kElementTextId = "clipboard-helper-text";
+
+if (window.USER_AGENT_SAFARI_MACOS)
+{
+	var PASTE_ELEMENT_ID = "clipboard-helper";
+	var ELEMENT_DISPAY_STYLE = "block";
+}
+function SafariIntervalFocus()
+{
+    var api = window["Asc"]["editor"];
+	if (api)
+    {
+        if(api.wb && api.wb.cellEditor && api.wb.cellEditor != null && api.wb.cellEditor.isTopLineActive)
+			return;
+		var pastebin = document.getElementById(COPY_ELEMENT_ID);
+		var pastebinText = document.getElementById(kElementTextId);
+		if(pastebinText && (api.wb && api.wb.getWorksheet() && api.wb.getWorksheet().isCellEditMode))
+		{
+			pastebinText.focus();
+		}	
+		else if (pastebin)
+            pastebin.focus();
+        else
+        {
+            // create
+            Editor_CopyPaste_Create(api);
+        }
+    }
+}
+
+function Editor_CopyPaste_Create(api)
+{
+    var ElemToSelect = document.createElement("div");
+    ElemToSelect.id = COPY_ELEMENT_ID;
+    ElemToSelect.style.position = "absolute";
+
+    ElemToSelect.style.left = '0px';
+    ElemToSelect.style.top = '-100px';
+    ElemToSelect.style.width = '1000px';
+    ElemToSelect.style.height = '100px';
+    ElemToSelect.style.overflow = 'hidden';
+    ElemToSelect.style.zIndex = -1000;
+    ElemToSelect.style.MozUserSelect = "text";
+    ElemToSelect.style["-khtml-user-select"] = "text";
+    ElemToSelect.style["-o-user-select"] = "text";
+    ElemToSelect.style["user-select"] = "text";
+    ElemToSelect.style["-webkit-user-select"] = "text";
+    ElemToSelect.setAttribute("contentEditable", true);
+
+   /* var Def_rPr = api.WordControl.m_oLogicDocument.Styles.Default.TextPr;
+    ElemToSelect.style.fontFamily = Def_rPr.FontFamily.Name;
+
+    if (!api.DocumentReaderMode)
+        ElemToSelect.style.fontSize = Def_rPr.FontSize + "pt";
+    else
+    {
+        api.DocumentReaderMode.CorrectDefaultFontSize(Def_rPr.FontSize);
+        ElemToSelect.style.fontSize = "1em";
+    }*/
+
+    ElemToSelect.style.lineHeight = "1px";
+
+    ElemToSelect["onpaste"] = function(e){
+        api.wb.clipboard._bodyPaste(api.wb.getWorksheet(), e);
+    };
+
+    ElemToSelect["onbeforecopy"] = function(e){
+		api.wb.clipboard.copyRange(api.wb.getWorksheet().getSelectedRange(), api.wb.getWorksheet());
+    };
+
+    document.body.appendChild( ElemToSelect );
+	
+	//для редактора ячейки
+	var elementText = document.createElement("textarea");
+
+	elementText.id = kElementTextId;
+	elementText.style.position = "absolute";
+
+	elementText.style.width = '10000px';
+	elementText.style.height = '100px';
+	elementText.style.left = '0px';
+	elementText.style.top = '-100px';
+	elementText.style.overflow = 'hidden';
+	elementText.style.zIndex = -1000;
+	elementText.style.display = ELEMENT_DISPAY_STYLE;
+	elementText.setAttribute("contentEditable", true);
+	
+	 elementText["onbeforecopy"] = function(e){
+		if((api.wb && api.wb.getWorksheet() && api.wb.getWorksheet().isCellEditMode))
+		{
+			v = api.wb.cellEditor.copySelection();
+			if (v) {api.wb.clipboard.copyCellValue(v, api.wb.cellEditor.hasBackground ? api.wb.cellEditor.background : null);}
+		}	
+    };
+	
+	/*elementText["onpaste"] = function(e){
+		api.wb.clipboard.pasteAsText();
+    };*/
+
+	document.body.appendChild(elementText);
+}

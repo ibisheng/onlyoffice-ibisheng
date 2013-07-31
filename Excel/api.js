@@ -1098,6 +1098,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.asyncServerIdStartLoaded();
 				var fonts = $.map(this.wbModel.generateFontMap(), function (fname) {return new CFont(fname, 0, "", 0);});
 				this.FontLoader.LoadDocumentFonts(fonts);
+				
+				 if (window.USER_AGENT_SAFARI_MACOS)
+					setInterval(SafariIntervalFocus, 10);
 			},
 
 			// Стартуем соединение с сервером для совместного редактирования
