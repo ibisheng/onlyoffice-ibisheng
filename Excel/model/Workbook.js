@@ -1360,6 +1360,7 @@ function Workbook(sUrlPath, eventsHandlers, oApi){
 	// Histoey & global counters
 	History = new CHistory(this);
 	g_oIdCounter = new CIdCounter();
+	g_oIdCounter.Set_UserId(this.oApi.User.asc_getId());
 	g_oTableId = new CTableId();
 	
 	this.theme = null;
