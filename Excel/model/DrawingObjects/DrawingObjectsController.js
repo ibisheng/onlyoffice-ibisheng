@@ -146,13 +146,13 @@ DrawingObjectsController.prototype =
     onKeyDown: function(e)
     {
         this.curState.onKeyDown(e);
-		//return true;
+		return true;
     },
 
     onKeyPress: function(e)
     {
         this.curState.onKeyPress(e);
-		//return true;
+		return true;
     },
 
     resetSelectionState: function()
@@ -771,6 +771,12 @@ DrawingObjectsController.prototype =
 		}
 		this.drawingObjects.showDrawingObjects(true);
 		this.drawingObjects.sendGraphicObjectProps();
+	},
+	
+	applyColorScheme: function()
+	{
+		var api = window["Asc"]["editor"];
+		var themeColors = api.GuiControlColorsMap;
 	}
 };
 

@@ -2556,6 +2556,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			asc_ApplyColorScheme : function(bRedraw) {
 				this.chartStyleManager.init();
 				this.chartPreviewManager.init();
+				var ws = this.wb.getWorksheet();
+				ws.objectRender.controller.applyColorScheme();
 
 				// На view-режиме не нужно отправлять стили
 				if (this.controller.getViewerMode && true !== this.controller.getViewerMode()) {
