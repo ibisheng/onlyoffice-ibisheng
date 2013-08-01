@@ -118,6 +118,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.isImageChangeUrl = false;
 			this.isShapeImageChangeUrl = false;
 			
+			//находится ли фокус в рабочей области редактора(используется для copy/paste в MAC)
+			this.IsFocus = null;
 			/**************************************/
 
 			this.OpenDocumentProgress = {
@@ -1851,7 +1853,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			asc_enableKeyEvents: function (isEnabled) {
 				if (this.wb)
 					this.wb.enableKeyEventsHandler(isEnabled);
-				//находится ли фокус в рабочей поверхности редактора(используется для copy/paste в MAC)
+				//наличие фокуса в рабочей области редактора(используется для copy/paste в MAC)
 				this.IsFocus = isEnabled;
 			},
 
