@@ -2567,15 +2567,15 @@ function SafariIntervalFocus()
     var api = window["Asc"]["editor"];
 	if (api)
     {
-        if(api.wb && api.wb.cellEditor && api.wb.cellEditor != null && api.wb.cellEditor.isTopLineActive)
+		if((api.wb && api.wb.cellEditor && api.wb.cellEditor != null && api.wb.cellEditor.isTopLineActive) || (api.wb && api.wb.getWorksheet() && api.wb.getWorksheet().isSelectionDialogMode))
 			return;
 		var pastebin = document.getElementById(COPY_ELEMENT_ID);
 		var pastebinText = document.getElementById(kElementTextId);
-		if(pastebinText && (api.wb && api.wb.getWorksheet() && api.wb.getWorksheet().isCellEditMode))
+		if(pastebinText && (api.wb && api.wb.getWorksheet() && api.wb.getWorksheet().isCellEditMode) && api.IsFocus)
 		{
 			pastebinText.focus();
 		}	
-		else if (pastebin)
+		else if (pastebin && api.IsFocus)
             pastebin.focus();
         else
         {
@@ -2604,17 +2604,6 @@ function Editor_CopyPaste_Create(api)
     ElemToSelect.style["-webkit-user-select"] = "text";
     ElemToSelect.setAttribute("contentEditable", true);
 
-   /* var Def_rPr = api.WordControl.m_oLogicDocument.Styles.Default.TextPr;
-    ElemToSelect.style.fontFamily = Def_rPr.FontFamily.Name;
-
-    if (!api.DocumentReaderMode)
-        ElemToSelect.style.fontSize = Def_rPr.FontSize + "pt";
-    else
-    {
-        api.DocumentReaderMode.CorrectDefaultFontSize(Def_rPr.FontSize);
-        ElemToSelect.style.fontSize = "1em";
-    }*/
-
     ElemToSelect.style.lineHeight = "1px";
 
     ElemToSelect["onpaste"] = function(e){
@@ -2624,6 +2613,10 @@ function Editor_CopyPaste_Create(api)
     ElemToSelect["onbeforecopy"] = function(e){
 		api.wb.clipboard.copyRange(api.wb.getWorksheet().getSelectedRange(), api.wb.getWorksheet());
     };
+	
+	/*ElemToSelect["onbeforecut"] = function(e){
+		api.wb.clipboard.copyRange(api.wb.getWorksheet().getSelectedRange(), api.wb.getWorksheet());
+    };*/
 
     document.body.appendChild( ElemToSelect );
 	
@@ -2649,6 +2642,14 @@ function Editor_CopyPaste_Create(api)
 			if (v) {api.wb.clipboard.copyCellValue(v, api.wb.cellEditor.hasBackground ? api.wb.cellEditor.background : null);}
 		}	
     };
+	
+	/*elementText["onbeforecut"] = function(e){
+		if((api.wb && api.wb.getWorksheet() && api.wb.getWorksheet().isCellEditMode))
+		{
+			v = api.wb.cellEditor.copySelection();
+			if (v) {api.wb.clipboard.copyCellValue(v, api.wb.cellEditor.hasBackground ? api.wb.cellEditor.background : null);}
+		}	
+    };*/
 	
 	/*elementText["onpaste"] = function(e){
 		api.wb.clipboard.pasteAsText();

@@ -1851,6 +1851,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			asc_enableKeyEvents: function (isEnabled) {
 				if (this.wb)
 					this.wb.enableKeyEventsHandler(isEnabled);
+				//находится ли фокус в рабочей поверхности редактора(используется для copy/paste в MAC)
+				this.IsFocus = isEnabled;
 			},
 
 			asc_findText: function (text, scanByRows, scanForward, isMatchCase, isWholeCell) {
