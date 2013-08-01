@@ -8679,7 +8679,7 @@
 
 			_replaceCellText: function (aReplaceCells, valueForSearching, options) {
 				var t = this;
-				if (options.indexInArray === aReplaceCells.length) {
+				if (options.indexInArray >= aReplaceCells.length) {
 					History.EndTransaction();
 					t.model.onEndTriggerAction();
 
@@ -8717,7 +8717,7 @@
 						}
 					}
 
-					t._replaceCellText(aReplaceCells, valueForSearching, options);
+					window.setTimeout(function () {t._replaceCellText(aReplaceCells, valueForSearching, options)}, 1);
 				};
 
 				this._isLockedCells (aReplaceCells[options.indexInArray], /*subType*/null, onReplaceCallback);
