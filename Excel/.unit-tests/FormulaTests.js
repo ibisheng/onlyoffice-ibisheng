@@ -1403,5 +1403,76 @@
 
     } )
 
+    test( "Test: \"SUMXMY2\"", function () {
+
+        oParser = new parserFormula( "SUMXMY2({2,3,9,1,8,7,5},{6,5,11,7,5,4,4})", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 79 );
+
+        oParser = new parserFormula( "SUMXMY2({2,3,9;1,8,7},{6,5,11;7,5,4})", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 78 );
+
+        oParser = new parserFormula( "SUMXMY2(7,5)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "#VALUE!" );
+
+    } )
+
+    test( "Test: \"SUMX2MY2\"", function () {
+
+        oParser = new parserFormula( "SUMX2MY2({2,3,9,1,8,7,5},{6,5,11,7,5,4,4})", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), -55 );
+
+        oParser = new parserFormula( "SUMX2MY2({2,3,9;1,8,7},{6,5,11;7,5,4})", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), -64 );
+
+        oParser = new parserFormula( "SUMX2MY2(7,5)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "#VALUE!" );
+
+    } )
+
+    test( "Test: \"SUMX2MY2\"", function () {
+
+        oParser = new parserFormula( "SUMX2PY2({2,3,9,1,8,7,5},{6,5,11,7,5,4,4})", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 521 );
+
+        oParser = new parserFormula( "SUMX2PY2({2,3,9;1,8,7},{6,5,11;7,5,4})", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 480 );
+
+        oParser = new parserFormula( "SUMX2PY2(7,5)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "#VALUE!" );
+
+    } )
+
+    test( "Test: \"SERIESSUM\"", function () {
+
+        ws.getRange2( "A2" ).setValue( "=1" );
+        ws.getRange2( "A3" ).setValue( "=-1/Fact(2)" );
+        ws.getRange2( "A4" ).setValue( "=1/Fact(4)" );
+        ws.getRange2( "A5" ).setValue( "=-1/Fact(6)" );
+
+        oParser = new parserFormula( "SERIESSUM(PI()/4,0,2,A2:A5)", "A7", ws );
+        ok( oParser.parse() );
+        ok( Math.abs( oParser.calculate().getValue() - (1 - 1 / 2 * Math.pow( Math.PI / 4, 2 ) + 1 / Math.fact( 4 ) * Math.pow( Math.PI / 4, 4 ) - 1 / Math.fact( 6 ) * Math.pow( Math.PI / 4, 6 )) ) < dif );
+
+        ws.getRange2( "B2" ).setValue( "=1" );
+        ws.getRange2( "B3" ).setValue( "=-1/Fact(3)" );
+        ws.getRange2( "B4" ).setValue( "=1/Fact(5)" );
+        ws.getRange2( "B5" ).setValue( "=-1/Fact(7)" );
+
+        oParser = new parserFormula( "SERIESSUM(PI()/4,1,2,B2:B5)", "B7", ws );
+        ok( oParser.parse() );
+        ok( Math.abs( oParser.calculate().getValue() - (Math.PI / 4 - 1 / Math.fact( 3 ) * Math.pow( Math.PI / 4, 3 ) + 1 / Math.fact( 5 ) * Math.pow( Math.PI / 4, 5 ) - 1 / Math.fact( 7 ) * Math.pow( Math.PI / 4, 7 )) ) < dif );
+//        strictEqual( oParser.calculate().getValue(), Math.PI / 4 - 1 / Math.fact( 3 ) * Math.pow( Math.PI / 4, 3 ) + 1 / Math.fact( 5 ) * Math.pow( Math.PI / 4, 5 ) - 1 / Math.fact( 7 ) * Math.pow( Math.PI / 4, 7 ) );
+
+    } )
+
 
 } );

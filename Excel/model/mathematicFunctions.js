@@ -2254,7 +2254,7 @@ cFormulaFunction.Mathematic = {
 
                     for ( var i = 0; i <= nMaxIndex / 2; i++ ) {
                         var nIndex = 2 * i;
-                        var nDigit = parseInt(nVal / pValues[ nIndex ]);
+                        var nDigit = parseInt( nVal / pValues[ nIndex ] );
 
                         if ( (nDigit % 5) == 4 ) {
                             var nIndex2 = (nDigit == 4) ? nIndex - 1 : nIndex - 2;
@@ -2274,15 +2274,15 @@ cFormulaFunction.Mathematic = {
                         else {
                             if ( nDigit > 4 )
                                 aRoman += pChars[ nIndex - 1 ];
-                            for(var j = nDigit % 5; j> 0; j-- ){
-                                aRoman+=pChars[ nIndex ];
+                            for ( var j = nDigit % 5; j > 0; j-- ) {
+                                aRoman += pChars[ nIndex ];
                             }
                             nVal %= pValues[ nIndex ];
                         }
                     }
                     return new cString( aRoman );
                 }
-                else{
+                else {
                     return new cError( cErrorType.wrong_value_type );
                 }
             }
@@ -2306,7 +2306,7 @@ cFormulaFunction.Mathematic = {
                         var a = elem;
                         b = arg1.getElementRowCol( r, c );
                         if ( a instanceof cNumber && b instanceof cNumber ) {
-                            this.array[r][c] = roman(a.getValue(), b.getValue());
+                            this.array[r][c] = roman( a.getValue(), b.getValue() );
                         }
                         else
                             this.array[r][c] = new cError( cErrorType.wrong_value_type );
@@ -2331,7 +2331,7 @@ cFormulaFunction.Mathematic = {
                     var a = arg0,
                         b = elem;
                     if ( a instanceof cNumber && b instanceof cNumber ) {
-                        this.array[r][c] = roman(a.getValue(), b.getValue())
+                        this.array[r][c] = roman( a.getValue(), b.getValue() )
                     }
                     else
                         this.array[r][c] = new cError( cErrorType.wrong_value_type );
@@ -2339,7 +2339,7 @@ cFormulaFunction.Mathematic = {
                 return this.value = arg1;
             }
 
-            return this.value = roman(arg0.getValue(), arg1.getValue());
+            return this.value = roman( arg0.getValue(), arg1.getValue() );
 
         }
         r.getInfo = function () {
@@ -2709,6 +2709,70 @@ cFormulaFunction.Mathematic = {
     },
     'SERIESSUM':function () {
         var r = new cBaseFunction( "SERIESSUM" );
+        r.setArgumentsMin( 4 );
+        r.setArgumentsMax( 4 );
+        r.Calculate = function ( arg ) {
+
+            function SERIESSUM( x, n, m, a ) {
+
+                x = x.getValue();
+                n = n.getValue();
+                m = m.getValue();
+
+                for ( var i = 0; i < a.length; i++ ) {
+                    if ( !( a[i] instanceof cNumber) )
+                        return new cError( cErrorType.wrong_value_type );
+                    a[i] = a[i].getValue();
+                }
+
+                function sumSeries( x, n, m, a ) {
+                    var sum = 0;
+                    for ( var i = 0; i < a.length; i++ ) {
+                        sum += a[i] * Math.pow( x, n + i * m )
+                    }
+                    return sum;
+                }
+
+                return new cNumber( sumSeries(x,n,m,a) );
+            }
+
+            var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3];
+            if( arg0 instanceof  cNumber || arg0 instanceof cRef || arg0 instanceof cRef3D ){
+                arg0 = arg0.tocNumber();
+            }
+            else
+                return this.value = new cError( cErrorType.wrong_value_type );
+
+            if( arg1 instanceof  cNumber || arg1 instanceof cRef || arg1 instanceof cRef3D ){
+                arg1 = arg1.tocNumber();
+            }
+            else
+                return this.value = new cError( cErrorType.wrong_value_type );
+
+            if( arg2 instanceof  cNumber || arg2 instanceof cRef || arg2 instanceof cRef3D ){
+                arg2 = arg2.tocNumber();
+            }
+            else
+                return this.value = new cError( cErrorType.wrong_value_type );
+
+            if( arg3 instanceof  cNumber || arg3 instanceof cRef || arg3 instanceof cRef3D ){
+                arg3 = [arg3.tocNumber()];
+            }
+            else if( arg3 instanceof  cArea || arg3 instanceof  cArea3D ){
+                arg3 = arg3.getValue();
+            }
+            else
+                return this.value = new cError( cErrorType.wrong_value_type );
+
+            return this.value = SERIESSUM( arg0, arg1, arg2, arg3 );
+
+        }
+        r.getInfo = function () {
+            return {
+                name:this.name,
+                args:"( input-value , initial-power , step , coefficients )"
+            };
+        }
         return r;
     },
     'SIGN':function () {
@@ -3223,14 +3287,251 @@ cFormulaFunction.Mathematic = {
     },
     'SUMX2MY2':function () {
         var r = new cBaseFunction( "SUMX2MY2" );
+        r.setArgumentsMin( 2 );
+        r.setArgumentsMax( 2 );
+        r.Calculate = function ( arg ) {
+
+            function sumX2MY2( a, b, _3d ) {
+                var sum = 0;
+
+                function a2Mb2( a, b ) {
+                    return a * a - b * b;
+                }
+
+                if ( !_3d ) {
+                    if ( a.length == b.length && a[0].length == b[0].length ) {
+                        for ( var i = 0; i < a.length; i++ ) {
+                            for ( var j = 0; j < a[0].length; j++ ) {
+                                if ( a[i][j] instanceof cNumber && b[i][j] instanceof cNumber ) {
+                                    sum += a2Mb2( a[i][j].getValue(), b[i][j].getValue() )
+                                }
+                                else
+                                    return new cError( cErrorType.wrong_value_type );
+                            }
+                        }
+                        return new cNumber( sum );
+                    }
+                    else {
+                        return new cError( cErrorType.wrong_value_type );
+                    }
+                }
+                else {
+                    if ( a.length == b.length && a[0].length == b[0].length && a[0][0].length == b[0][0].length ) {
+                        for ( var i = 0; i < a.length; i++ ) {
+                            for ( var j = 0; j < a[0].length; j++ ) {
+                                for ( var k = 0; k < a[0][0].length; k++ ) {
+                                    if ( a[i][j][k] instanceof cNumber && b[i][j][k] instanceof cNumber ) {
+                                        sum += a2Mb2( a[i][j][k].getValue(), b[i][j][k].getValue() )
+                                    }
+                                    else
+                                        return new cError( cErrorType.wrong_value_type );
+                                }
+                            }
+                        }
+                        return new cNumber( sum );
+                    }
+                    else {
+                        return new cError( cErrorType.wrong_value_type );
+                    }
+                }
+            }
+
+            var arg0 = arg[0], arg1 = arg[1];
+
+            if ( arg0 instanceof cArea3D && arg1 instanceof cArea3D ) {
+                return this.value = sumX2MY2( arg0.getMatrix(), arg1.getMatrix(), true );
+            }
+
+            if ( arg0 instanceof cArea || arg0 instanceof  cArray ) {
+                arg0 = arg0.getMatrix();
+            }
+            else if ( arg0 instanceof cError )
+                return this.value = arg0;
+            else
+                return this.value = new cError( cErrorType.wrong_value_type );
+
+            if ( arg1 instanceof cArea || arg1 instanceof  cArray || arg1 instanceof cArea3D ) {
+                arg1 = arg1.getMatrix();
+            }
+            else if ( arg1 instanceof cError )
+                return this.value = arg1;
+            else
+                return this.value = new cError( cErrorType.wrong_value_type );
+
+            return this.value = sumX2MY2( arg0, arg1, false );
+        }
+        r.getInfo = function () {
+            return {
+                name:this.name,
+                args:"( array-1 , array-2 )"
+            };
+        }
         return r;
     },
     'SUMX2PY2':function () {
         var r = new cBaseFunction( "SUMX2PY2" );
+        r.setArgumentsMin( 2 );
+        r.setArgumentsMax( 2 );
+        r.Calculate = function ( arg ) {
+
+            function sumX2MY2( a, b, _3d ) {
+                var sum = 0;
+
+                function a2Mb2( a, b ) {
+                    return a * a + b * b;
+                }
+
+                if ( !_3d ) {
+                    if ( a.length == b.length && a[0].length == b[0].length ) {
+                        for ( var i = 0; i < a.length; i++ ) {
+                            for ( var j = 0; j < a[0].length; j++ ) {
+                                if ( a[i][j] instanceof cNumber && b[i][j] instanceof cNumber ) {
+                                    sum += a2Mb2( a[i][j].getValue(), b[i][j].getValue() )
+                                }
+                                else
+                                    return new cError( cErrorType.wrong_value_type );
+                            }
+                        }
+                        return new cNumber( sum );
+                    }
+                    else {
+                        return new cError( cErrorType.wrong_value_type );
+                    }
+                }
+                else {
+                    if ( a.length == b.length && a[0].length == b[0].length && a[0][0].length == b[0][0].length ) {
+                        for ( var i = 0; i < a.length; i++ ) {
+                            for ( var j = 0; j < a[0].length; j++ ) {
+                                for ( var k = 0; k < a[0][0].length; k++ ) {
+                                    if ( a[i][j][k] instanceof cNumber && b[i][j][k] instanceof cNumber ) {
+                                        sum += a2Mb2( a[i][j][k].getValue(), b[i][j][k].getValue() )
+                                    }
+                                    else
+                                        return new cError( cErrorType.wrong_value_type );
+                                }
+                            }
+                        }
+                        return new cNumber( sum );
+                    }
+                    else {
+                        return new cError( cErrorType.wrong_value_type );
+                    }
+                }
+            }
+
+            var arg0 = arg[0], arg1 = arg[1];
+
+            if ( arg0 instanceof cArea3D && arg1 instanceof cArea3D ) {
+                return this.value = sumX2MY2( arg0.getMatrix(), arg1.getMatrix(), true );
+            }
+
+            if ( arg0 instanceof cArea || arg0 instanceof  cArray ) {
+                arg0 = arg0.getMatrix();
+            }
+            else if ( arg0 instanceof cError )
+                return this.value = arg0;
+            else
+                return this.value = new cError( cErrorType.wrong_value_type );
+
+            if ( arg1 instanceof cArea || arg1 instanceof  cArray || arg1 instanceof cArea3D ) {
+                arg1 = arg1.getMatrix();
+            }
+            else if ( arg1 instanceof cError )
+                return this.value = arg1;
+            else
+                return this.value = new cError( cErrorType.wrong_value_type );
+
+            return this.value = sumX2MY2( arg0, arg1, false );
+        }
+        r.getInfo = function () {
+            return {
+                name:this.name,
+                args:"( array-1 , array-2 )"
+            };
+        }
         return r;
     },
     'SUMXMY2':function () {
         var r = new cBaseFunction( "SUMXMY2" );
+        r.setArgumentsMin( 2 );
+        r.setArgumentsMax( 2 );
+        r.Calculate = function ( arg ) {
+
+            function sumX2MY2( a, b, _3d ) {
+                var sum = 0;
+
+                function a2Mb2( a, b ) {
+                    return ( a - b ) * ( a - b );
+                }
+
+                if ( !_3d ) {
+                    if ( a.length == b.length && a[0].length == b[0].length ) {
+                        for ( var i = 0; i < a.length; i++ ) {
+                            for ( var j = 0; j < a[0].length; j++ ) {
+                                if ( a[i][j] instanceof cNumber && b[i][j] instanceof cNumber ) {
+                                    sum += a2Mb2( a[i][j].getValue(), b[i][j].getValue() )
+                                }
+                                else
+                                    return new cError( cErrorType.wrong_value_type );
+                            }
+                        }
+                        return new cNumber( sum );
+                    }
+                    else {
+                        return new cError( cErrorType.wrong_value_type );
+                    }
+                }
+                else {
+                    if ( a.length == b.length && a[0].length == b[0].length && a[0][0].length == b[0][0].length ) {
+                        for ( var i = 0; i < a.length; i++ ) {
+                            for ( var j = 0; j < a[0].length; j++ ) {
+                                for ( var k = 0; k < a[0][0].length; k++ ) {
+                                    if ( a[i][j][k] instanceof cNumber && b[i][j][k] instanceof cNumber ) {
+                                        sum += a2Mb2( a[i][j][k].getValue(), b[i][j][k].getValue() )
+                                    }
+                                    else
+                                        return new cError( cErrorType.wrong_value_type );
+                                }
+                            }
+                        }
+                        return new cNumber( sum );
+                    }
+                    else {
+                        return new cError( cErrorType.wrong_value_type );
+                    }
+                }
+            }
+
+            var arg0 = arg[0], arg1 = arg[1];
+
+            if ( arg0 instanceof cArea3D && arg1 instanceof cArea3D ) {
+                return this.value = sumX2MY2( arg0.getMatrix(), arg1.getMatrix(), true );
+            }
+
+            if ( arg0 instanceof cArea || arg0 instanceof  cArray ) {
+                arg0 = arg0.getMatrix();
+            }
+            else if ( arg0 instanceof cError )
+                return this.value = arg0;
+            else
+                return this.value = new cError( cErrorType.wrong_value_type );
+
+            if ( arg1 instanceof cArea || arg1 instanceof  cArray || arg1 instanceof cArea3D ) {
+                arg1 = arg1.getMatrix();
+            }
+            else if ( arg1 instanceof cError )
+                return this.value = arg1;
+            else
+                return this.value = new cError( cErrorType.wrong_value_type );
+
+            return this.value = sumX2MY2( arg0, arg1, false );
+        }
+        r.getInfo = function () {
+            return {
+                name:this.name,
+                args:"( array-1 , array-2 )"
+            };
+        }
         return r;
     },
     'TAN':function () {

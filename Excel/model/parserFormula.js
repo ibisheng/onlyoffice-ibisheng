@@ -2189,6 +2189,42 @@ cArea3D.prototype.countCells = function () {
     }
     return new cNumber( count );
 };
+cArea3D.prototype.getMatrix = function () {
+    var arr = [],
+        r = this.getRange();
+    for ( var k = 0; k < r.length; k++ ) {
+        arr[k] = [];
+        r[k]._foreach2( function ( cell, i, j, r1, c1 ) {
+            if ( !arr[k][i - r1] )
+                arr[k][i - r1] = [];
+            if ( cell ) {
+                switch ( cell.getType() ) {
+                    case CellValueType.Number:
+                        arr[k][i - r1][j - c1] = cell.getValueWithoutFormat() == "" ? new cEmpty() : new cNumber( cell.getValueWithoutFormat() )
+                        break;
+                    case CellValueType.Bool:
+                        arr[k][i - r1][j - c1] = new cBool( cell.getValueWithoutFormat() );
+                        break;
+                    case CellValueType.Error:
+                        arr[k][i - r1][j - c1] = new cError( cell.getValueWithoutFormat() );
+                        break;
+                    case CellValueType.String:
+                        arr[k][i - r1][j - c1] = new cString( cell.getValueWithoutFormat() );
+                        break;
+                    default:
+                        if ( cell.getValueWithoutFormat() && cell.getValueWithoutFormat() != "" ) {
+                            arr[k][i - r1][j - c1] = new cNumber( cell.getValueWithoutFormat() )
+                        }
+                        else
+                            arr[k][i - r1][j - c1] = checkTypeCell( "" + cell.getValueWithoutFormat() );
+                }
+            }
+            else
+                arr[k][i - r1][j - c1] = new cEmpty();
+        } )
+    }
+    return arr;
+}
 
 /** @constructor */
 function cRef3D( val, _wsFrom, wb ) {/*Ref means Sheat1!A1 for example*/
