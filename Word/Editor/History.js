@@ -47,6 +47,7 @@ var historyitem_Paragraph_Borders_Top               = 30; // Изменяем н
 var historyitem_Paragraph_Pr                        = 31; // Изменяем свойства полностью
 var historyitem_Paragraph_PresentationPr_Bullet     = 32; // Изменяем свойства нумерации у параграфа в презентации
 var historyitem_Paragraph_PresentationPr_Level      = 33; // Изменяем уровень параграфа в презентациях
+var historyitem_Paragraph_FramePr                   = 34; // Изменяем настройки рамки
 
 // Типы изменений в классе ParaTextPr
 var historyitem_TextPr_Change     =  1; // Изменяем настройку
@@ -692,6 +693,41 @@ CHistory.prototype =
         {
             this.Points[this.Index].Additional = new Object();
         }
+    },
+
+    Get_EditingTime : function(dTime)
+    {
+        var Count = this.Points.length;
+
+        var TimeLine = new Array();
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            var PointTime = this.Points[Index].Time;
+            TimeLine.push( { t0 : PointTime - dTime, t1 : PointTime } );
+        }
+
+        Count = TimeLine.length;
+        for ( var Index = 1; Index < Count; Index++ )
+        {
+            var CurrEl = TimeLine[Index];
+            var PrevEl = TimeLine[Index - 1];
+            if ( CurrEl.t0 <= PrevEl.t1 )
+            {
+                PrevEl.t1 = CurrEl.t1;
+                TimeLine.splice( Index, 1 );
+                Index--;
+                Count--;
+            }
+        }
+
+        Count = TimeLine.length;
+        var OverallTime = 0;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            OverallTime += TimeLine[Index].t1 - TimeLine[Index].t0;
+        }
+
+        return OverallTime;
     }
 
 };
