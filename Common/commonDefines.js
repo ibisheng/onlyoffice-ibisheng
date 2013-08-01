@@ -9,6 +9,21 @@ var CellValueType =
 	Error:3
 }
 
+//NumFormat defines
+var c_oAscNumFormatType = {
+	General : 0,
+	Custom : 1,
+	Text : 2,
+	Number : 3,
+	Integer : 4,
+	Scientific : 5,
+	Currency : 6,
+	Date : 7,
+	Time : 8,
+	Percent : 9,
+	Fraction : 10
+}
+
 // Chart defines
 var c_oAscChartType = {
 	line: "Line",

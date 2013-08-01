@@ -27,19 +27,6 @@ var oNumFormatCache;
 
 var FormatStates = {Decimal: 1, Frac: 2, Scientific: 3, Slash: 4};
 var SignType = {Positive: 1, Negative: 2, Null:3};
-var FormatType = {
-	General : 0,
-	Custom : 1,
-	Text : 2,
-	Number : 3,
-	Integer : 4,
-	Scientific : 5,
-	Currency : 6,
-	Date : 7,
-	Time : 8,
-	Percent : 9,
-	Fraction : 10
-}
 
 var monthCut =  ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 var monthShort = ['J','F','M','A','M','J','J','A','S','O','N','D'];
@@ -1834,30 +1821,30 @@ NumFormat.prototype =
     },
 	getType : function()
 	{
-		var nType = FormatType.Custom;
+		var nType = c_oAscNumFormatType.Custom;
 		if(this.bGeneral)
-			nType = FormatType.General;
+			nType = c_oAscNumFormatType.General;
 		else if(this.bTextFormat)
-			nType = FormatType.Text;
+			nType = c_oAscNumFormatType.Text;
 		else if(this.bDateTime)
 		{
 			if(this.bDate)
-				nType = FormatType.Date;
+				nType = c_oAscNumFormatType.Date;
 			else
-				nType = FormatType.Time;
+				nType = c_oAscNumFormatType.Time;
 		}
 		else if(this.nPercent > 0)
-			nType = FormatType.Percent;
+			nType = c_oAscNumFormatType.Percent;
 		else if(this.bScientific)
-			nType = FormatType.Scientific;
+			nType = c_oAscNumFormatType.Scientific;
 		else if(this.bCurrency)
-			nType = FormatType.Currency;
+			nType = c_oAscNumFormatType.Currency;
 		else if(this.bSlash)
-			nType = FormatType.Fraction;
+			nType = c_oAscNumFormatType.Fraction;
 		else if(this.bNumber)
-			nType = FormatType.Number;
+			nType = c_oAscNumFormatType.Number;
 		else if(this.bInteger)
-			nType = FormatType.Integer;
+			nType = c_oAscNumFormatType.Integer;
 		return nType;
 	}
 };
@@ -2197,7 +2184,7 @@ CellFormat.prototype =
 			return this.oPositiveFormat.getType();
 		else if(null != this.aComporationFormats && this.aComporationFormats.length > 0)
 			return this.aComporationFormats[0].getType();
-		return FormatType.General;
+		return c_oAscNumFormatType.General;
 	}
 };
 var oDecodeGeneralFormatCache = new Object();
