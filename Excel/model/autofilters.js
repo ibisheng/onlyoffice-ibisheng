@@ -1487,21 +1487,17 @@
 				var activeCells = ar;
 				if(aWs.AutoFilter)
 				{
-					var ref = aWs.AutoFilter.Ref.split(':');
-					var startCell = ws.model.getCell(new CellAddress(ref[0]));
-					var endCell = ws.model.getCell(new CellAddress(ref[1]));
+					var oRange = aWs.getRange2(aWs.AutoFilter.Ref);
+					var bbox = oRange.getBBox0();
 					//смотрим находится ли фильтр внутри выделенного фрагмента
-					if(activeCells.r1 <= startCell.first.row - 1 && activeCells.r2 >= endCell.first.row - 1 && activeCells.c1 <= startCell.first.col - 1 && activeCells.c2 >= endCell.first.col - 1)
+					if(activeCells.r1 <= bbox.r1 && activeCells.r2 >= bbox.r2 && activeCells.c1 <= bbox.c1 && activeCells.c2 >= bbox.c2)
 					{
 						var oldFilter = aWs.AutoFilter;
-						delete aWs.AutoFilter;
-						//открываем диапазон
-						for(s = startCell.first.row - 1; s <= endCell.first.row - 1; s++)
-						{
-							ws.model._getRow(s).hd = false;
-						}
-						this._addHistoryObj(ws, oldFilter, historyitem_AutoFilter_Empty,
-							{activeCells: activeCells});
+						aWs.AutoFilter = null;
+						//открываем скрытые строки
+						aWs.setRowHidden(false, bbox.r1, bbox.r2);
+						//заносим в историю
+						this._addHistoryObj(ws, oldFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells});
 					}
 				}
 				if(aWs.TableParts)
@@ -1510,28 +1506,22 @@
 					var k = 0;
 					for(var i = 0; i < aWs.TableParts.length; i++)
 					{
-						var ref = aWs.TableParts[i].Ref.split(':');
-						var startCell = ws.model.getCell(new CellAddress(ref[0]));
-						var endCell = ws.model.getCell(new CellAddress(ref[1]));
+						var oCurFilter = aWs.TableParts[i];
+						var oRange = aWs.getRange2(oCurFilter.Ref);
+						var bbox = oRange.getBBox0();
 						//смотрим находится ли фильтр внутри выделенного фрагмента
-						if(activeCells.r1 <= startCell.first.row - 1 && activeCells.r2 >= endCell.first.row - 1 && activeCells.c1 <= startCell.first.col - 1 && activeCells.c2 >= endCell.first.col - 1)
+						if(activeCells.r1 <= bbox.r1 && activeCells.r2 >= bbox.r2 && activeCells.c1 <= bbox.c1 && activeCells.c2 >= bbox.c2)
 						{	
-							var oldFilter = aWs.TableParts[i];
-							//отменяем заливку и бордеры
-							var allRange = ws.model.getRange(new CellAddress(ref[0]), new CellAddress(ref[1]));
-							allRange.setFill(new RgbColor(Asc.parseColor('white')));
-							//открываем диапазон
-							for(var s = startCell.first.row - 1; s <= endCell.first.row - 1; s++)
-							{
-								ws.model._getRow(s).hd = false;
-							}
-							allRange.setBorder(null);
-							this._addHistoryObj(ws, oldFilter, historyitem_AutoFilter_Empty,
-								{activeCells: activeCells});
+							//удаляем форматирование
+							oRange.setTableStyle(null);
+							//открываем скрытые строки
+							aWs.setRowHidden(false, bbox.r1, bbox.r2);
+							//заносим в историю
+							this._addHistoryObj(ws, oCurFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells});
 						}
 						else
 						{
-							newTableParts[k] = aWs.TableParts[i];
+							newTableParts[k] = oCurFilter;
 							k++;
 						}
 					}
@@ -1685,6 +1675,8 @@
 								if(!aWs.TableParts)
 									aWs.TableParts = [];
 								aWs.TableParts[aWs.TableParts.length] = data;
+								var splitRange = data.Ref.split(':');
+								this._setColorStyleTable(splitRange[0],splitRange[1],ws,data);
 								this._addButtonAF({result: data.result,isVis: true},ws);
 							}
 							else
