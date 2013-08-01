@@ -170,11 +170,21 @@ CMathContent.prototype =
 
         return runPrp;
     },
-    getSelectTPrp: function()
+    getSelectTPrp: function(bSelect)
     {
         var start, end;
-        start = this.selection.startPos;
-        end = this.selection.endPos;
+
+        if(bSelect)
+        {
+            start = this.selection.startPos;
+            end = this.selection.endPos;
+        }
+        else
+        {
+            start = 0;
+            end = this.content.length;
+        }
+
         if( this.selection.startPos != this.selection.endPos )
         {
 
@@ -185,7 +195,7 @@ CMathContent.prototype =
                 end = tmp;
             }
         }
-        var TComp;
+        var TComp = new CMathTextPrp();
 
         if(start !== end)
         {
@@ -218,7 +228,9 @@ CMathContent.prototype =
                         txtPrp.FontFamily = -1;
                 }
             }
-            TComp = this.getTxtPrp();
+            TComp.Merge( this.textPrp );
+            TComp.Merge(this.Composition.TxtPrp);
+
             TComp.Merge(txtPrp);
 
             if(TComp.FontSize == -1)
@@ -236,8 +248,8 @@ CMathContent.prototype =
         }
         else
         {
-            TComp = this.getRunPrp(start);
-            TComp.Merge(this.getTxtPrp());
+            TComp.Merge( this.getRunPrp(start) );
+            TComp.Merge(this.Composition.TxtPrp);
         }
               
         
@@ -3993,7 +4005,7 @@ CMathComposition.prototype =
     },
     GetPrpSelectContent: function()
     {
-        return this.SelectContent.getSelectTPrp();
+        return this.SelectContent.getSelectTPrp(true);
     },
 
     ////  test function  ////
@@ -4830,6 +4842,7 @@ function CEmpty()
     this.IsHighElement =  function() { return false; };
     this.setTxtPrp = function(txtPrp) { this.textPrp.Merge(txtPrp); };
     this.getRunPrp = function() {return this.textPrp;};
+    this.getOwnTPrp = function() {return this.textPrp;}
 
 }
 

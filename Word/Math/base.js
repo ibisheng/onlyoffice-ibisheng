@@ -88,7 +88,7 @@ CMathBase.prototype =
     },
     getOwnTPrp: function()
     {
-        return this.txtPrp();
+        return this.textPrp;
     },
     /*getTxtPrp_2: function()
     {

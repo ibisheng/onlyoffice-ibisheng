@@ -155,7 +155,7 @@ CMathText.prototype =
     },
     getOwnTPrp: function()
     {
-        return this.txtPrp();
+        return this.textPrp;
     },
     // ascent = Symbol.Ascent // = Placeholder.Ascent (= Placeholder.Height)
     // descent = FontAscent - Placeholder.Height (FontAscent = FontHeight - FontDescent)

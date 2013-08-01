@@ -398,7 +398,7 @@ CControlComposition.prototype =
     },
     GetTxtPrp: function()
     {
-        var txtPrp = this.Content[this.CurPos].GetPrpSelectContent();
+        return this.Content[this.CurPos].GetPrpSelectContent();
     }
 }
 var MathControl = new CControlComposition();
