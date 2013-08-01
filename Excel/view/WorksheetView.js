@@ -5721,6 +5721,8 @@
 				cell_info.border.diagDown = new asc_CBorder(b.dd.w, b.dd.s, b.dd.c);
 				cell_info.border.diagUp = new asc_CBorder(b.du.w, b.du.s, b.du.c);
 
+				cell_info.numFormatType = c.getNumFormatType();
+
 				// Получаем гиперссылку
 				var ar = this.activeRange.clone();
 				var range = this.model.getRange3(ar.r1, ar.c1, ar.r2, ar.c2);
