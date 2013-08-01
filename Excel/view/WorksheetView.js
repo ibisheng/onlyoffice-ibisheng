@@ -1135,6 +1135,7 @@
 				this.maxRowHeight = asc_calcnpt( 409, this._getPPIY() );
 				this.defaultRowDescender = this._calcRowDescender(this.settings.cells.fontSize);
 				this.defaultRowHeight = asc_calcnpt( this.settings.cells.fontSize * this.vspRatio, this._getPPIY() ) + this.height_1px;
+				gc_dDefaultRowHeightAttribute = this.model.getDefaultHeight() || this.defaultRowHeight;
 			},
 			_initCellsArea: function (fullRecalc) {
 				this.width_1px = asc_calcnpt(0, this._getPPIX(), 1/*px*/);
@@ -3636,10 +3637,8 @@
 						History.Create_NewPoint();
 						History.SetSelection(null, true);
 						History.StartTransaction();
-						// Выставляем ширину в модели
-						self.model.setColWidth(modelw, col, col);
 						// Выставляем, что это bestFit
-						self.model.setColBestFit (true, col, col);
+						self.model.setColBestFit (true, modelw, col, col);
 						History.EndTransaction();
 
 						self._updateColumnPositions();
@@ -8401,9 +8400,8 @@
 					History.Create_NewPoint();
 					History.SetSelection(null, true);
 					History.StartTransaction();
-					t.model.setColWidth(cw, col, col);
 					// Выставляем, что это bestFit
-					t.model.setColBestFit(true, col, col);
+					t.model.setColBestFit(true, cw, col, col);
 					History.EndTransaction();
 
 					t.nColsCount = 0;
@@ -8444,9 +8442,8 @@
 					History.Create_NewPoint();
 					History.SetSelection(null, true);
 					History.StartTransaction();
-					t.model.setRowHeight(Math.min(height + t.height_1px, t.maxRowHeight), row, row);
 					// Выставляем, что это bestFit
-					t.model.setRowBestFit (true, row, row);
+					t.model.setRowBestFit (true, Math.min(height + t.height_1px, t.maxRowHeight), row, row);
 					History.EndTransaction();
 
 					t.nRowsCount = 0;

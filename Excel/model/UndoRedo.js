@@ -750,15 +750,9 @@ function UndoRedoData_ColProp(col){
 UndoRedoData_ColProp.prototype = {
 	isEqual : function(val)
 	{
-		var bRes = this.width == val.width && this.hd == val.hd && this.CustomWidth == val.CustomWidth;
-		if(bRes)
-		{
-			if((null == this.BestFit || true == this.BestFit) && (null == val.BestFit || true == val.BestFit))
-				bRes = true;
-			else
-				bRes = false;
-		}
-		return bRes;
+		return this.hd == val.hd && this.CustomWidth == val.CustomWidth && ((this.BestFit == val.BestFit && this.width == val.width) || 
+			((null == this.width || gc_dDefaultColWidthCharsAttribute == this.width) && (null == this.BestFit || true == this.BestFit) &&
+			(null == val.width || gc_dDefaultColWidthCharsAttribute == val.width) && (null == val.BestFit || true == val.BestFit)));
 	},
 	getType : function()
 	{
@@ -810,6 +804,12 @@ function UndoRedoData_RowProp(row){
 	}
 }
 UndoRedoData_RowProp.prototype = {
+	isEqual : function(val)
+	{
+		return this.hd == val.hd && ((this.CustomHeight == val.CustomHeight && this.h == val.h) || 
+			((null == this.h || gc_dDefaultRowHeightAttribute == this.h) && (null == this.CustomHeight || false == this.CustomHeight) &&
+			(null == val.h || gc_dDefaultRowHeightAttribute == val.h) && (null == val.CustomHeight || false == val.CustomHeight)));
+	},
 	getType : function()
 	{
 		return UndoRedoDataTypes.RowProp;

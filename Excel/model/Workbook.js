@@ -2,6 +2,7 @@ var d1,d2,d3;
 var g_nHSLMaxValue = 240;
 var g_nVerticalTextAngle = 255;
 var gc_dDefaultColWidthCharsAttribute;//определяется в WorksheetView.js
+var gc_dDefaultRowHeightAttribute;//определяется в WorksheetView.js
 var g_nNextWorksheetId = 1;
 var g_sNewSheetNamePattern = "Sheet";
 var g_nSheetNameMaxLength = 31;
@@ -2102,6 +2103,8 @@ function Woorksheet(wb, _index, bAddUserId, sId){
 	this.aGCells = new Object();// 0 based
 	this.aCols = new Array();// 0 based
 	this.Drawings = new Array();
+	this.TableParts = new Array();
+	this.AutoFilter = null;
 	this.oAllCol = null;
 	this.objForRebuldFormula = {};
 	this.aComments = new Array();
@@ -2903,18 +2906,28 @@ Woorksheet.prototype.setColHidden=function(bHidden, start, stop){
 	};
 	if(0 != start && gc_nMaxCol0 == stop)
 	{
-		var col = this.getAllCol();
-		fProcessCol(col);
+		var col = null;
+		if(false == bHidden)
+			col = this.oAllCol;
+		else
+			col = this.getAllCol();
+		if(null != col)
+			fProcessCol(col);
 	}
 	else
 	{
 		for(var i = start; i <= stop; i++){
-			var col = this._getCol(i);
-			fProcessCol(col);
+			var col = null;
+			if(false == bHidden)
+				col = this._getColNoEmpty(i);
+			else
+				col = this._getCol(i);
+			if(null != col)
+				fProcessCol(col);
 		}
 	}
 };
-Woorksheet.prototype.setColBestFit=function(bBestFit, start, stop){
+Woorksheet.prototype.setColBestFit=function(bBestFit, width, start, stop){
 	//start, stop 0 based
 	if(null == start)
 		return;
@@ -2924,34 +2937,42 @@ Woorksheet.prototype.setColBestFit=function(bBestFit, start, stop){
 	History.SetSelection(null, true);
 	var oThis = this;
 	var fProcessCol = function(col){
-		if(col.BestFit != bBestFit)
+		var oOldProps = col.getWidthProp();
+		if(bBestFit)
 		{
-			var oOldProps = col.getWidthProp();
-			if(bBestFit)
-			{
-				col.BestFit = bBestFit;
-				col.hd = null;
-			}
-			else
-				col.BestFit = null;
-			var oNewProps = col.getWidthProp();
-			if(false == oOldProps.isEqual(oNewProps))
-			{
-				History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ColProp, oThis.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(col.index, false, oOldProps, oNewProps));
-				History.AddTrigger(["changeWorksheetUpdate", oThis.getId()]);
-			}
+			col.BestFit = bBestFit;
+			col.hd = null;
+		}
+		else
+			col.BestFit = null;
+		col.width = width;
+		var oNewProps = col.getWidthProp();
+		if(false == oOldProps.isEqual(oNewProps))
+		{
+			History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ColProp, oThis.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(col.index, false, oOldProps, oNewProps));
+			History.AddTrigger(["changeWorksheetUpdate", oThis.getId()]);
 		}
 	};
 	if(0 != start && gc_nMaxCol0 == stop)
 	{
-		var col = this.getAllCol();
-		fProcessCol(col);
+		var col = null;
+		if(bBestFit && gc_dDefaultColWidthCharsAttribute == width)
+			col = this.oAllCol;
+		else
+			col = this.getAllCol();
+		if(null != col)
+			fProcessCol(col);
 	}
 	else
 	{
 		for(var i = start; i <= stop; i++){
-			var col = this._getCol(i);
-			fProcessCol(col);
+			var col = null;
+			if(bBestFit && gc_dDefaultColWidthCharsAttribute == width)
+				col = this._getColNoEmpty(i);
+			else
+				col = this._getCol(i);
+			if(null != col)
+				fProcessCol(col);
 		}
 	}
 };
@@ -3002,8 +3023,12 @@ Woorksheet.prototype.setRowHidden=function(bHidden, start, stop){
 	History.Create_NewPoint();
 	History.SetSelection(null, true);
 	for(var i = start;i <= stop; i++){
-		var oCurRow = this._getRow(i);
-		if(oCurRow.hd != bHidden)
+		var oCurRow = null;
+		if(false == bHidden)
+			oCurRow = this._getRowNoEmpty(i);
+		else
+			oCurRow = this._getRow(i);
+		if(null != oCurRow && oCurRow.hd != bHidden)
 		{
 			var oOldProps = oCurRow.getHeightProp();
 			if(bHidden)
@@ -3024,7 +3049,7 @@ Woorksheet.prototype.setRowHidden=function(bHidden, start, stop){
 		}
 	}
 };
-Woorksheet.prototype.setRowBestFit=function(bBestFit, start, stop){
+Woorksheet.prototype.setRowBestFit=function(bBestFit, height, start, stop){
 	//start, stop 0 based
 	if(null == start)
 		return;
@@ -3033,14 +3058,21 @@ Woorksheet.prototype.setRowBestFit=function(bBestFit, start, stop){
 	History.Create_NewPoint();
 	History.SetSelection(null, true);
 	for(var i = start;i <= stop; i++){
-		var oCurRow = this._getRow(i);
-		if(bBestFit && oCurRow.CustomHeight)
+		var oCurRow = null;
+		if(true == bBestFit && gc_dDefaultRowHeightAttribute == height)
+			oCurRow = this._getRowNoEmpty(i);
+		else
+			oCurRow = this._getRow(i);
+		if(null != oCurRow)
 		{
 			var oOldProps = oCurRow.getHeightProp();
 			if(true == bBestFit)
 				oCurRow.CustomHeight = null;
+			else
+				oCurRow.CustomHeight = true;
+			oCurRow.height = height;
 			var oNewProps = oCurRow.getHeightProp();
-			if(false == Asc.isEqual(oOldProps, oNewProps))
+			if(false == oOldProps.isEqual(oNewProps))
 			{
 				History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RowProp, this.getId(), new Asc.Range(0, i, gc_nMaxCol0, i), new UndoRedoData_IndexSimpleProp(i, true, oOldProps, oNewProps));
 				History.AddTrigger(["changeWorksheetUpdate", this.getId()]);
