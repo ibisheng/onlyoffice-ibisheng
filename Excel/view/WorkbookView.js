@@ -353,7 +353,7 @@
 								"setAutoFiltersDialog"  : function (arrVal) {self.handlers.trigger("asc_onSetAFDialog", arrVal);},
 								"selectionRangeChanged"	: function (val) {self.handlers.trigger("asc_onSelectionRangeChanged", val);},
 								"getDCForCharts"		: function () { return self.drawingCtxCharts; },
-								"onRenameCellTextEnd"	: function (count, res) {self.handlers.trigger("asc_onRenameCellTextEnd", count, res);}
+								"onRenameCellTextEnd"	: function (countFind, countReplace) {self.handlers.trigger("asc_onRenameCellTextEnd", countFind, countReplace);}
 							});
 				return new asc_WSV(wsModel, this.buffers, this.stringRender, this.maxDigitWidth, this.collaborativeEditing, opt);
 			},

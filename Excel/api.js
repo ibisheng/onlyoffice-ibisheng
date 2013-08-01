@@ -950,7 +950,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			 * asc_onHyperlinkClick			(sUrl)														- эвент на нажатие гиперлинка
 			 * asc_onСoAuthoringDisconnect	()															- эвент об отключении от сервера без попытки reconnect
 			 * asc_onSelectionRangeChanged	(selectRange)												- эвент о выборе диапазона для диаграммы (после нажатия кнопки выбора)
-			 * asc_onRenameCellTextEnd		(countCells, result)										- эвент об окончании замены текста в ячейках (мы не можем сразу прислать ответ)
+			 * asc_onRenameCellTextEnd		(countCellsFind, countCellsReplace)							- эвент об окончании замены текста в ячейках (мы не можем сразу прислать ответ)
 			 * asc_onWorkbookLocked			(result)													- эвент залочена ли работа с листами или нет
 			 * asc_onWorksheetLocked		(index, result)												- эвент залочен ли лист или нет
 			 */

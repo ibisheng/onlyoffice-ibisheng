@@ -8641,7 +8641,7 @@
 
 					if (c === undefined) {
 						asc_debug("log", "Unknown cell's info: col = " + c1 + ", row = " + r1);
-						t._trigger("onRenameCellTextEnd", 0, false);
+						t._trigger("onRenameCellTextEnd", 0, 0);
 						return;
 					}
 
@@ -8650,7 +8650,7 @@
 					// Попробуем сначала найти
 					if ((true === options.isWholeCell && cellValue.length !== options.findWhat.length) ||
 						0 > cellValue.search(valueForSearching)) {
-						t._trigger("onRenameCellTextEnd", 0, false);
+						t._trigger("onRenameCellTextEnd", 0, 0);
 						return;
 					}
 
@@ -8658,29 +8658,40 @@
 				}
 
 				if (0 > aReplaceCells.length) {
-					t._trigger("onRenameCellTextEnd", 0, false);
+					t._trigger("onRenameCellTextEnd", 0, 0);
 					return;
 				}
 				this._replaceCellsText(aReplaceCells, valueForSearching, options);
 			},
 
 			_replaceCellsText: function (aReplaceCells, valueForSearching, options) {
-				var t = this;
 				var oSelectionHistory = this.activeRange.clone();
+				this.model.onStartTriggerAction();
+				History.Create_NewPoint();
+				History.SetSelection(oSelectionHistory);
+				History.StartTransaction();
+
+				options.indexInArray = 0;
+				options.countFind = aReplaceCells.length;
+				options.countReplace = 0;
+				this._replaceCellText(aReplaceCells, valueForSearching, options);
+			},
+
+			_replaceCellText: function (aReplaceCells, valueForSearching, options) {
+				var t = this;
+				if (options.indexInArray === aReplaceCells.length) {
+					History.EndTransaction();
+					t.model.onEndTriggerAction();
+
+					t._trigger("onRenameCellTextEnd", options.countFind, options.countReplace);
+					return;
+				}
+
 				var onReplaceCallback = function (isSuccess) {
-					if (false === isSuccess) {
-						t._trigger("onRenameCellTextEnd", aReplaceCells.length, false);
-						return;
-					}
-
-					t.model.onStartTriggerAction();
-					History.Create_NewPoint();
-					History.SetSelection(oSelectionHistory);
-					History.StartTransaction();
-
-					var cell;
-					for (var i = 0, length = aReplaceCells.length; i < length; ++i) {
-						cell = aReplaceCells[i];
+					var cell = aReplaceCells[options.indexInArray];
+					++options.indexInArray;
+					if (false !== isSuccess) {
+						++options.countReplace;
 
 						var mc = t._getMergedCellsRange(cell.c1, cell.r1);
 						var c1 = mc ? mc.c1 : cell.c1;
@@ -8689,32 +8700,27 @@
 
 						if (c === undefined) {
 							asc_debug("log", "Unknown cell's info: col = " + c1 + ", row = " + r1);
-							continue;
+						} else {
+							var cellValue = c.getValueForEdit();
+							cellValue = cellValue.replace(valueForSearching, options.replaceWith);
+
+							var oCellEdit = new asc_Range(c1, r1, c1, r1);
+							var v, newValue;
+							// get first fragment and change its text
+							v = c.getValueForEdit2().slice(0, 1);
+							// Создаем новый массив, т.к. getValueForEdit2 возвращает ссылку
+							newValue = [];
+							newValue[0] = {text: cellValue, format: v[0].format.clone()};
+
+							t._saveCellValueAfterEdit(oCellEdit, c, newValue, /*flags*/undefined, /*skipNLCheck*/false,
+								/*isNotHistory*/true);
 						}
-
-						var cellValue = c.getValueForEdit();
-
-						cellValue = cellValue.replace(valueForSearching, options.replaceWith);
-						var oCellEdit = new asc_Range(c1, r1, c1, r1);
-
-						var v, newValue;
-						// get first fragment and change its text
-						v = c.getValueForEdit2().slice(0, 1);
-						// Создаем новый массив, т.к. getValueForEdit2 возвращает ссылку
-						newValue = [];
-						newValue[0] = {text: cellValue, format: v[0].format.clone()};
-
-						t._saveCellValueAfterEdit(oCellEdit, c, newValue, /*flags*/undefined, /*skipNLCheck*/false,
-							/*isNotHistory*/true);
 					}
 
-					History.EndTransaction();
-					t.model.onEndTriggerAction();
-
-					t._trigger("onRenameCellTextEnd", aReplaceCells.length, true);
+					t._replaceCellText(aReplaceCells, valueForSearching, options);
 				};
 
-				this._isLockedCells (aReplaceCells, /*subType*/null, onReplaceCallback);
+				this._isLockedCells (aReplaceCells[options.indexInArray], /*subType*/null, onReplaceCallback);
 			},
 
 			findCell: function(reference) {
