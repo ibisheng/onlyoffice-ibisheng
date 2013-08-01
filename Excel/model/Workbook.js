@@ -6112,6 +6112,9 @@ Range.prototype.getNumFormatStr=function(){
 	}
     return g_oDefaultNum.f;
 };
+Range.prototype.getNumFormatType=function(){
+	return this.getNumFormat().getType();
+}
 Range.prototype.getFont = function(){
 	var nRow = this.bbox.r1;
 	var nCol = this.bbox.c1;
