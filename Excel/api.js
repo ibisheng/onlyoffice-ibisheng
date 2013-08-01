@@ -140,8 +140,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 		spreadsheet_api.prototype = {
 		
-			asc_CheckGuiControlColors : function()
-			{
+			asc_CheckGuiControlColors : function() {
 				// потом реализовать проверку на то, что нужно ли посылать
 				var _theme  = this.wbModel.theme;
 
@@ -185,8 +184,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					this.asc_SendControlColors();
 				}
 			},
-			asc_SendControlColors : function()
-			{
+			
+			asc_SendControlColors : function() {
 				var standart_colors = null;
 				if (!this.IsSendStandartColors)
 				{
@@ -219,8 +218,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 				this.asc_SendThemeColors(_ret_array, standart_colors);
 			},
-			asc_SendThemeColorScheme : function()
-			{
+			
+			asc_SendThemeColorScheme : function() {
 				var infos = new Array();
 				var _index = 0;
 
@@ -339,26 +338,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.asc_SendThemeColorSchemes(infos);
 			},
 
-			// для диаграмм в редакторе документов
-			asc_openChartSpreadsheet: function (wBin) { 
-				
-				var chartBinTemplate;
-				if ( wBin )
-					chartBinTemplate = wBin;
-				else
-					chartBinTemplate = getChartBinTemplate() + "";
-					
-				if	( chartBinTemplate.length && (c_oSerFormat.Signature === chartBinTemplate.substring(0, c_oSerFormat.Signature.length)) ) {
-					var wb = new Workbook("", this.handlers);
-					wb.initGlobalObjects();
-					this.wbModel = wb;
-					var oBinaryFileReader = new BinaryFileReader("");
-					oBinaryFileReader.Read(chartBinTemplate, wb);
-					
-					this._startOpenDocument({returnCode: 0, val:wb});					
-				}				
-			},
-
 			asc_Init: function(fontsPath) {
 				var t = this;
 				asc["editor"] = ( asc["editor"] || t );
@@ -412,7 +391,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				var emptyWorkbook = getEmptyWorkbook() + "";
 				if	( emptyWorkbook.length && (c_oSerFormat.Signature === emptyWorkbook.substring(0, c_oSerFormat.Signature.length)) ) {
 					this.isChartEditor = true;
-					var wb = new Workbook("", this.handlers);
+					var wb = new Workbook("", this.handlers, this);
 					wb.initGlobalObjects();
 					this.wbModel = wb;
 					var oBinaryFileReader = new BinaryFileReader("");
@@ -2918,7 +2897,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot = spreadsheet_api.prototype;
 
 		prot["asc_Init"] = prot.asc_Init;
-		prot["asc_openChartSpreadsheet"] = prot.asc_openChartSpreadsheet;
 		prot["asc_LoadDocument"] = prot.asc_LoadDocument;
 		prot["asc_LoadEmptyDocument"] = prot.asc_LoadEmptyDocument;
 		prot["asc_DownloadAs"] = prot.asc_DownloadAs;
