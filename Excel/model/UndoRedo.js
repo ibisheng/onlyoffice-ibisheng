@@ -350,6 +350,7 @@ var UndoRedoDataTypes = new function() {
     this.GOPathCubicBezTo = 60;
     this.GOPathClose = 61;
     this.GOSetAdjustmentValue = 62;
+	this.AddFormatTableOptions = 63;
 
 
     this.Create = function(nType)
@@ -388,6 +389,7 @@ var UndoRedoDataTypes = new function() {
 			case this.AutoFilter: return new UndoRedoData_AutoFilter(); break;
 			case this.AutoFiltersOptions: return new Asc.AutoFiltersOptions(); break;
 			case this.AutoFiltersOptionsElements: return new Asc.AutoFiltersOptionsElements(); break;
+			case this.AddFormatTableOptions: return new Asc.AddFormatTableOptions(); break;
 			case this.SingleProperty: return new UndoRedoData_SingleProperty(); break;
 			case this.RgbColor: return new RgbColor(); break;
 			case this.ThemeColor: return new ThemeColor(); break;
@@ -1142,7 +1144,8 @@ function UndoRedoData_AutoFilter() {
 		lTable				: 1,
 		type				: 2,
 		cellId				: 3,
-		autoFiltersObject	: 4
+		autoFiltersObject	: 4,
+		addFormatTableOptionsObj: 5
 	};
 
 	this.undo				= null;
@@ -1152,6 +1155,7 @@ function UndoRedoData_AutoFilter() {
 	this.type				= null;
 	this.cellId				= null;
 	this.autoFiltersObject	= null;
+	this.addFormatTableOptionsObj = null;
 }
 UndoRedoData_AutoFilter.prototype = {
 	getType : function ()
@@ -1171,6 +1175,7 @@ UndoRedoData_AutoFilter.prototype = {
 			case this.Properties.type: return this.type; break;
 			case this.Properties.cellId: return this.cellId; break;
 			case this.Properties.autoFiltersObject: return this.autoFiltersObject; break;
+			case this.Properties.addFormatTableOptionsObj: return this.addFormatTableOptionsObj; break;
 		}
 
 		return null;
@@ -1184,6 +1189,7 @@ UndoRedoData_AutoFilter.prototype = {
 			case this.Properties.type: this.type = value;break;
 			case this.Properties.cellId: this.cellId = value;break;
 			case this.Properties.autoFiltersObject: this.autoFiltersObject = value;break;
+			case this.Properties.addFormatTableOptionsObj: return this.addFormatTableOptionsObj = value; break;
 		}
 	},
 	applyCollaborative : function (nSheetId, collaborativeEditing) {

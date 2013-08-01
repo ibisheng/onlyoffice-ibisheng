@@ -189,6 +189,11 @@
 
 			if ( !(this instanceof AddFormatTableOptions) ) {return new AddFormatTableOptions();};
 
+			this.Properties = {
+				range		: 0,
+				isTitle		: 1
+			};
+			
 			this.range = null;
 			this.isTitle = null;
 			return this;
@@ -196,6 +201,26 @@
 
 		AddFormatTableOptions.prototype = {
 			constructor: AddFormatTableOptions,
+			getType : function () {
+				return UndoRedoDataTypes.AddFormatTableOptions;
+			},
+			getProperties : function () {
+				return this.Properties;
+			},
+			getProperty : function (nType) {
+				switch (nType) {
+					case this.Properties.range: return this.range; break;
+					case this.Properties.isTitle: return this.isTitle; break;
+				}
+				return null;
+			},
+			setProperty : function (nType, value) {
+				switch (nType) {
+					case this.Properties.range: this.range = value;break;
+					case this.Properties.isTitle: this.isTitle = value;break;
+				}
+			},
+			
 			asc_setRange : function(range) { this.range = range;},
 			asc_setIsTitle : function(isTitle) { this.isTitle = isTitle;},
 
@@ -464,7 +489,7 @@
 									if(addNameColumn)
 										changesElemHistory.addColumn = true;
 									t._addHistoryObj(ws, changesElemHistory, historyitem_AutoFilter_Add,
-											{activeCells: cloneAC, lTable: lTable});
+											{activeCells: cloneAC, lTable: lTable, addFormatTableOptionsObj: addFormatTableOptionsObj});
 									
 									if(isInsertButton){
 										if (bIsActiveSheet)
@@ -756,8 +781,10 @@
 						{
 							Ref: result[0].id + ':' + result[result.length -1].idNext
 						};
+						if(addNameColumn && addFormatTableOptionsObj)
+							addFormatTableOptionsObj.range = ref;
 						t._addHistoryObj(ws, ref, historyitem_AutoFilter_Add,
-								{activeCells: activeCells, lTable: lTable});
+								{activeCells: activeCells, lTable: lTable, addFormatTableOptionsObj: addFormatTableOptionsObj});
 						
 						if(isInsertButton){
 							if (bIsActiveSheet)
@@ -1595,7 +1622,7 @@
 				History.TurnOff();
 				switch (type) {
 					case historyitem_AutoFilter_Add:
-						this.addAutoFilter(data.worksheet, data.lTable, data.activeCells, /*openFilter*/undefined, true);
+						this.addAutoFilter(data.worksheet, data.lTable, data.activeCells, /*openFilter*/undefined, true, data.addFormatTableOptionsObj);
 						break;
 					case historyitem_AutoFilter_Sort:
 						this.sortColFilter(data.type, data.cellId, data.worksheet, data.activeCells, true);
@@ -4755,6 +4782,7 @@
 				oHistoryObject.type					= redoObject.type;
 				oHistoryObject.cellId				= redoObject.cellId;
 				oHistoryObject.autoFiltersObject	= redoObject.autoFiltersObject;
+				oHistoryObject.addFormatTableOptionsObj = redoObject.addFormatTableOptionsObj;
 
 				History.Add(g_oUndoRedoAutoFilters, type, ws.model.getId(), null, oHistoryObject);
 			},
