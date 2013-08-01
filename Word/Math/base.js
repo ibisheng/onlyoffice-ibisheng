@@ -86,6 +86,10 @@ CMathBase.prototype =
 
         return txtPrp;
     },
+    getOwnTPrp: function()
+    {
+        return this.txtPrp();
+    },
     /*getTxtPrp_2: function()
     {
         var txtPrp = this.getTxtPrp();
@@ -111,6 +115,7 @@ CMathBase.prototype =
     setRunPrp: function(txtPrp)
     {
         this.RunPrp.Merge(txtPrp);
+        this.setTxtPrp(txtPrp);
     },
     fillPlaceholders: function()
     {
@@ -145,9 +150,9 @@ CMathBase.prototype =
                     {
                         this.elements[i][j].setComposition(this.Composition);
                         this.elements[i][j].setReduct(this.reduct);
+                        this.elements[i][j].setRunPrp(this.RunPrp);
                     }
                     this.elements[i][j].bMObjs = true;
-                    this.elements[i][j].setRunPrp(this.RunPrp);
                 }
             }
         }

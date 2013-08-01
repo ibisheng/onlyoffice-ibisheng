@@ -704,7 +704,10 @@ CAccent.prototype.setPosition = function(pos)
         align2 = (first.widthG - second.width)/2;
     }
 
-    var pos1 = {x: this.pos.x + shX + align1, y: this.pos.y},
+  /*  var pos1 = {x: this.pos.x + shX + align1, y: this.pos.y},
+        pos2 = {x: this.pos.x + align2, y: this.pos.y + first.height + this.dH};*/
+    
+    var pos1 = {x: this.pos.x + shX + align1, y: this.pos.y + first.ascent - first.center},
         pos2 = {x: this.pos.x + align2, y: this.pos.y + first.height + this.dH};
 
     this.elements[0][0].setPosition(pos1);

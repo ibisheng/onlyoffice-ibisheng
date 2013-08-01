@@ -90,7 +90,8 @@ CMathMatrix.prototype.recalculateSize = function()
         }
     }
     else /*this.baseJc == 0*/
-        center = height/2;
+        center = this.getCenter(height);
+        //center = height/2;
 
     this.size = {width: width, height: height, center: center};
 

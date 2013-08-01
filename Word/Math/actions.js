@@ -395,6 +395,10 @@ CControlComposition.prototype =
             Top    : Y_Top_Field,
             Bottom : Y_Bottom_Field
         } } );
+    },
+    GetTxtPrp: function()
+    {
+        var txtPrp = this.Content[this.CurPos].GetPrpSelectContent();
     }
 }
 var MathControl = new CControlComposition();

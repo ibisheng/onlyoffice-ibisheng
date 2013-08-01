@@ -146,9 +146,7 @@ CNumerator.prototype.findDisposition = function(mCoord)
     if(mCoord.y > arg.height)
         mCoord.y = arg.height;
 
-    var result = CNumerator.superclass.findDisposition.call(this, mCoord);
-
-    return result;
+    return CNumerator.superclass.findDisposition.call(this, mCoord);
 }
 CNumerator.prototype.setPosition = function(pos)
 {
@@ -247,12 +245,12 @@ CDenominator.prototype.findDisposition = function(mCoord)
 
     if(mCoord.y < gap)
         mCoord.y = 0;
+    else if (mCoord.y > arg.height + gap)
+        mCoord.y = arg.height;
     else
         mCoord.y -= gap;
 
-    var result = CNumerator.superclass.findDisposition.call(this, mCoord);
-
-    return result;
+    return CDenominator.superclass.findDisposition.call(this, mCoord);
 }
 CDenominator.prototype.setPosition = function(pos)
 {

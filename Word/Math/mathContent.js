@@ -152,9 +152,9 @@ CMathContent.prototype =
 
         if(this.content.length > 1)
         {
-            if(pos == 1) //берем справa
+            if(pos == 0)
             {
-                var rPrp = this.content[pos].value.getRunPrp();
+                var rPrp = this.content[pos+1].value.getRunPrp();
                 runPrp.Merge(rPrp);
             }
             else
@@ -163,8 +163,85 @@ CMathContent.prototype =
                 runPrp.Merge(rPrp);
             }
         }
+        else
+        {
+            runPrp.Merge(this.textPrp);
+        }
 
         return runPrp;
+    },
+    getSelectTPrp: function()
+    {
+        var start, end;
+        start = this.selection.startPos;
+        end = this.selection.endPos;
+        if( this.selection.startPos != this.selection.endPos )
+        {
+
+            if(start > end)
+            {
+                tmp = start;
+                start = end;
+                end = tmp;
+            }
+        }
+        var TComp;
+
+        if(start !== end)
+        {
+              var txtPrp = this.content[start].value.getOwnTPrp();
+
+            for(var i = start + 1; i < end; i++)
+            {
+                txtPrp2 = this.content[i].value.getOwnTPrp();
+                if(txtPrp.FontSize !== -1)
+                {
+                    if(txtPrp.FontSize !== txtPrp2.FontSize)
+                        txtPrp.FontSize = -1;
+                }
+
+                if(txtPrp.Bold !== -1)
+                {
+                    if(txtPrp.Bold !== txtPrp2.Bold)
+                        txtPrp.Bold = -1;
+                }
+
+                if(txtPrp.Italic !== -1)
+                {
+                    if(txtPrp.Italic !== txtPrp2.Italic)
+                        txtPrp.Italic = -1;
+                }
+
+                if(txtPrp.FontFamily !== -1)
+                {
+                    if( Common_CmpObj2 (txtPrp.FontFamily, txtPrp2.FontFamily) )
+                        txtPrp.FontFamily = -1;
+                }
+            }
+            TComp = this.getTxtPrp();
+            TComp.Merge(txtPrp);
+
+            if(TComp.FontSize == -1)
+                TComp.FontSize = undefined;
+
+            if(TComp.Bold == -1)
+                TComp.Bold = undefined;
+
+            if(TComp.Italic == -1)
+                TComp.Italic = undefined;
+
+            if(TComp.FontFamily == -1)
+                TComp.FontFamily = undefined;
+
+        }
+        else
+        {
+            TComp = this.getRunPrp(start);
+            TComp.Merge(this.getTxtPrp());
+        }
+              
+        
+        return TComp;
     },
     setComposition: function(Compos)
     {
@@ -3913,6 +3990,10 @@ CMathComposition.prototype =
     {
         this.CurrentContent.update_Cursor();
         this.ShowCursor();
+    },
+    GetPrpSelectContent: function()
+    {
+        return this.SelectContent.getSelectTPrp();
     },
 
     ////  test function  ////
