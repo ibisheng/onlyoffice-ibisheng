@@ -6710,6 +6710,8 @@ Range.prototype.merge=function(type){
 	}
 	if(type == c_oAscMergeOptions.MergeCenter && bHasMerged)
 	{
+		//сбрасываем AlignHorizontal
+		this.setAlignHorizontal("none");
 		History.EndTransaction();
 		return;
 	}
