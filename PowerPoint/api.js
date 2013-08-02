@@ -892,6 +892,7 @@ asc_docs_api.prototype.asc_Save = function(){
 		oAdditionalData["id"] = documentId;
 		oAdditionalData["vkey"] = documentVKey;
 		oAdditionalData["outputformat"] = c_oAscFileType.INNER;
+		oAdditionalData["innersave"] = true;
 		oAdditionalData["savetype"] = "completeall";
 		var sData = "mnuSaveAs" + cCharDelimiter + JSON.stringify(oAdditionalData) + cCharDelimiter + data;
 		sendCommand(editor, function(incomeObject){

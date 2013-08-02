@@ -2218,6 +2218,7 @@ function OnSave_Callback(e)
 			oAdditionalData["id"] = documentId;
             oAdditionalData["vkey"] = documentVKey;
             oAdditionalData["outputformat"] = c_oAscFileType.INNER;
+			oAdditionalData["innersave"] = true;
 			var data = oBinaryFileWriter.Write();
 			oAdditionalData["savetype"] = "completeall";
 			////uncoment to save changes only instead send file complete

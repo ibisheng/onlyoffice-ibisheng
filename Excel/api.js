@@ -813,6 +813,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				oAdditionalData["id"] = this.documentId;
 				oAdditionalData["vkey"] = this.documentVKey;
 				oAdditionalData["outputformat"] = c_oAscFileType.INNER;
+				oAdditionalData["innersave"] = true;
 				oAdditionalData["savetype"] = "completeall";
 				this._asc_sendCommand (/*callback*/ function(incomeObject){
 					if(null != incomeObject && "save" == incomeObject.type)
