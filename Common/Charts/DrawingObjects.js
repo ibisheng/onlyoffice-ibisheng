@@ -1541,7 +1541,7 @@ function DrawingObjects() {
 		_t.ext = { cx: 0, cy: 0 };
 		_t.size = { width: 0, height: 0 };
 
-		_t.graphicObject = null; // CShape or GroupShape
+		_t.graphicObject = null; // CImage, CShape, GroupShape or CChartAsGroup
 
 		_t.flags = {
 			anchorUpdated: false,
@@ -2123,8 +2123,9 @@ function DrawingObjects() {
 		trackOverlay.init( shapeOverlayCtx.m_oContext, "ws-canvas-overlay", 0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix, shapeOverlayCtx.m_dWidthMM, shapeOverlayCtx.m_dHeightMM );
 		autoShapeTrack.init( trackOverlay, 0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix, shapeOverlayCtx.m_dWidthMM, shapeOverlayCtx.m_dHeightMM );		
 		autoShapeTrack.Graphics.CalculateFullTransform();
-		
+				
 		_this.showDrawingObjects(true);
+		_this.rebuildChartGraphicObjects();
 	}
 	
 	_this.getWorkbook = function() {
