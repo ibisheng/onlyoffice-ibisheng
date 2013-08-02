@@ -526,8 +526,8 @@
 						if (!oRecalcIndexResult.hasOwnProperty(sheetId)) {
 							oRecalcIndexResult[sheetId] = new CRecalcIndex();
 						}
-						for (; nIndex < oRecalcIndex[sheetId]._arrElements.length; ++nIndex) {
-							oRecalcIndexElement = oRecalcIndex[sheetId]._arrElements[nIndex];
+						for (; nIndex < oRecalcIndex[sheetId]["_arrElements"].length; ++nIndex) {
+							oRecalcIndexElement = oRecalcIndex[sheetId]["_arrElements"][nIndex];
 							if (true === oRecalcIndexElement.m_bIsSaveIndex)
 								continue;
 							nRecalcType = (c_oAscRecalcIndexTypes.RecalcIndexAdd === oRecalcIndexElement._recalcType) ?
