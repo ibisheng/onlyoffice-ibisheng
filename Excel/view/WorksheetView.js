@@ -5848,10 +5848,11 @@
 				if (isCoord) {
 					var drawingInfo = this.objectRender.checkCursorDrawingObject(x, y);
 					if ( drawingInfo ) {
-						if ( drawingInfo.isGraphicObject )
-								asc["editor"].isStartAddShape = true;
-							else
-								asc["editor"].isStartAddShape = false;
+						this.objectRender.selectGraphicObject();
+					}
+					else {
+						if ( !asc["editor"].isStartAddShape )
+							this.objectRender.unselectDrawingObjects();
 					}
 					
 					// move active range to coordinates x,y
@@ -9136,6 +9137,7 @@
 					t._trigger("selectionChanged", t.getSelectionInfo());
 				}
 
+				t.objectRender.rebuildChartGraphicObjects();
 				t.cellCommentator.updateCommentPosition();
 				t.draw(lockDraw);
 			},

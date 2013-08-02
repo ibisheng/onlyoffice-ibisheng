@@ -1541,7 +1541,6 @@ function DrawingObjects() {
 		_t.ext = { cx: 0, cy: 0 };
 		_t.size = { width: 0, height: 0 };
 
-		_t.chart = new asc_CChart();
 		_t.graphicObject = null; // CShape or GroupShape
 
 		_t.flags = {
@@ -1843,35 +1842,6 @@ function DrawingObjects() {
 	_this.createDrawingObject = function() {
 	
 		var drawing = new DrawingBase(worksheet);
-		
-		drawing.chart.range.interval = function() {
-			var result = "";
-			if (worksheet) {
-				var selectedRange = worksheet.getSelectedRange();
-				if (selectedRange) {
-					var box = selectedRange.getBBox0();
-					var startCell = new CellAddress(box.r1, box.c1, 0);
-					var endCell = new CellAddress(box.r2, box.c2, 0);
-
-					if (startCell && endCell) {
-						var wsName = worksheet.model.sName;								
-						if ( !rx_test_ws_name.test(wsName) )
-							wsName = "'" + wsName + "'";
-						
-						if (startCell.getID() == endCell.getID())
-							result = wsName + "!" + startCell.getID();
-						else
-							result = wsName + "!" + startCell.getID() + ":" + endCell.getID();
-					}
-				}
-			}
-			return result;
-		}();
-
-		drawing.chart.range.intervalObject = function() {
-			return worksheet ? worksheet.getSelectedRange() : null;
-		}();
-				
 		return drawing;
 	}
 
@@ -1879,14 +1849,13 @@ function DrawingObjects() {
 
 		var copyObject = _this.createDrawingObject();
 		
-		copyObject.worksheet = obj.worksheet;
+		copyObject.worksheet = worksheet;
 
 		copyObject.Type = obj.Type;
 		copyObject.Pos.X = obj.Pos.X;
 		copyObject.Pos.Y = obj.Pos.Y;
 		copyObject.ext.cx = obj.ext.cx;
 		copyObject.ext.cy = obj.ext.cy;
-
 		copyObject.imageUrl = obj.imageUrl;
 
 		copyObject.from.col = obj.from.col;
@@ -1899,15 +1868,7 @@ function DrawingObjects() {
 		copyObject.to.row = obj.to.row;
 		copyObject.to.rowOff = obj.to.rowOff;
 		
-		copyObject.chart = new asc_CChart(obj.chart);
 		copyObject.graphicObject = obj.graphicObject;
-
-        if (isRealObject(copyObject.graphicObject) && typeof copyObject.graphicObject.setDrawingObjects === "function")
-        {
-            copyObject.graphicObject.setDrawingObjects(_this);
-        }
-		copyObject.chart.worksheet = obj.chart.worksheet;
-
 		return copyObject;
 	}
 
@@ -1944,26 +1905,27 @@ function DrawingObjects() {
 		aObjectsSync = [];
 		
 		for (var i = 0; currentSheet.model.Drawings && (i < currentSheet.model.Drawings.length); i++) {
-
-			currentSheet.model.Drawings[i].worksheet = worksheet;
-			var clone = _this.cloneDrawingObject(currentSheet.model.Drawings[i]);
-
-			if ( currentSheet.model.Drawings[i].imageUrl) {
+			
+			var drawingObject = _this.cloneDrawingObject(currentSheet.model.Drawings[i]);
+			
+			if ( drawingObject.imageUrl) {
 				
-				aObjectsSync[aObjectsSync.length] = clone;
-				aImagesSync[aImagesSync.length] = clone.imageUrl;
+				aObjectsSync[aObjectsSync.length] = drawingObject;
+				aImagesSync[aImagesSync.length] = drawingObject.imageUrl;
 			}
-
-
-            if (clone.graphicObject instanceof  CChartAsGroup) {
-                clone.worksheet = worksheet;
-                clone.graphicObject.drawingBase = clone;
-                clone.graphicObject.drawingObjects = _this;
-                if(clone.graphicObject.chartTitle)
-                    clone.graphicObject.chartTitle.drawingObjects = _this;
-                clone.graphicObject.chart.worksheet = worksheet;
-                clone.graphicObject.init(aImagesSync);
-                aObjects.push( clone );
+			
+            if (drawingObject.graphicObject instanceof  CChartAsGroup) {
+                
+				_this.calcChartInterval(drawingObject.graphicObject.chart);
+				drawingObject.graphicObject.drawingBase = drawingObject;
+                drawingObject.graphicObject.drawingObjects = _this;
+                
+				if (drawingObject.graphicObject.chartTitle)
+                    drawingObject.graphicObject.chartTitle.drawingObjects = _this;
+					
+                drawingObject.graphicObject.chart.worksheet = worksheet;
+                drawingObject.graphicObject.init(aImagesSync);
+                aObjects.push( drawingObject );
             }
 		}
 		
@@ -1972,7 +1934,7 @@ function DrawingObjects() {
 			
 			for (var i = 0; i < aObjectsSync.length; i++) {
 			
-				var clone = aObjectsSync[i];
+				var drawingObject = aObjectsSync[i];
 				var image = api.ImageLoader.LoadImage(aImagesSync[i], 1);	// Должна быть в мапе
 				
 				if ( image != null ) {
@@ -1980,17 +1942,17 @@ function DrawingObjects() {
 					var headerTop = worksheet.getCellTop(0, 0);
 					var headerLeft = worksheet.getCellLeft(0, 0);
 									
-					var x = pxToMm(clone.getVisibleLeftOffset() + headerLeft);
-					var y = pxToMm(clone.getVisibleTopOffset() + headerTop);
-					var w = pxToMm(clone.getWidthFromTo());
-					var h = pxToMm(clone.getHeightFromTo());
+					var x = pxToMm(drawingObject.getVisibleLeftOffset() + headerLeft);
+					var y = pxToMm(drawingObject.getVisibleTopOffset() + headerTop);
+					var w = pxToMm(drawingObject.getWidthFromTo());
+					var h = pxToMm(drawingObject.getHeightFromTo());
 					
 					// CImage
-					clone.graphicObject = new CImage(clone, _this);
-					clone.graphicObject.initDefault( x, y, w, h, image.src );
-					clone.setGraphicObjectCoords();
-					clone.graphicObject.draw(shapeCtx);
-					aObjects.push(clone);
+					drawingObject.graphicObject = new CImage(drawingObject, _this);
+					drawingObject.graphicObject.initDefault( x, y, w, h, image.src );
+					drawingObject.setGraphicObjectCoords();
+					drawingObject.graphicObject.draw(shapeCtx);
+					aObjects.push(drawingObject);
 				}
 			}
 		}	
@@ -2225,6 +2187,7 @@ function DrawingObjects() {
 		worksheet._drawGrid();
 		worksheet._drawCells();
 		worksheet._drawCellsBorders();
+		worksheet._drawSelection();
 		worksheet.cellCommentator.drawCommentCells(false);
 		worksheet.autoFilters.drawAutoF(worksheet);
 	}
@@ -2292,24 +2255,13 @@ function DrawingObjects() {
 					if ( !obj.canDraw() )
 						continue;
 						
-					if (!obj.flags.anchorUpdated)
+					if ( !obj.flags.anchorUpdated )
 						obj.updateAnchorPosition();
 					
 					// Shape render
 					if ( obj.isGraphicObject() ) {
 						obj.graphicObject.draw(shapeCtx);
 						continue;
-					}
-					
-					
-					
-					
-					// Выход за границы
-					while (worksheet.nColsCount < obj.to.col + 1) {
-						worksheet.expandColsOnScroll(true);
-					}
-					while (worksheet.nRowsCount < obj.to.row + 1) {
-						worksheet.expandRowsOnScroll(true);
 					}
 
 					/*if ( printOptions ) {
@@ -2338,22 +2290,18 @@ function DrawingObjects() {
 					
 			}
 		}
-		
-		if ( !printOptions ) {
-			worksheet._drawCollaborativeElements();
-		
-			if ( _this.getSelectedDrawingObjectIndex() < 0 ) {
-				worksheet.cleanSelection();
-				worksheet._drawSelectionRange();
-				_this.raiseLayerDrawingObjects();
-			}
-		}
+		if ( _this.selectedGraphicObjectsExists() )
+			worksheet.cleanSelection();
+		_this.raiseLayerDrawingObjects();
 		_this.selectGraphicObject();
 	}
 
 	_this.showOverlayGraphicObjects = function() {
 		shapeOverlayCtx.put_GlobalAlpha(true, 0.5);
 		shapeOverlayCtx.m_oContext.clearRect(0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix);
+		worksheet._drawSelection();
+		worksheet.cellCommentator.drawCommentCells(false);
+		worksheet.autoFilters.drawAutoF(worksheet);
 		_this.controller.drawTracks(shapeOverlayCtx);
 		shapeOverlayCtx.put_GlobalAlpha(true, 1);
 	}
@@ -2641,6 +2589,23 @@ function DrawingObjects() {
         return this.controller.addChartDrawingObject(chart, bWithoutHistory, options);
 	}
 
+	_this.editChartDrawingObject = function(chart) {
+		if ( chart ) {
+			chart.rebuildSeries();
+			chart.range.intervalObject = convertFormula(chart.range.interval, worksheet);
+			_this.controller.editChartDrawingObjects(chart);
+			_this.showDrawingObjects(false);
+		}
+	}
+	
+	_this.rebuildChartGraphicObjects = function() {
+		for (var i = 0; i < _this.countDrawingObjects(); i++) {
+			var chart = aObjects[i].graphicObject;
+			if ( chart.isChart() )
+				chart.recalculate();
+		}
+	}
+	
 	_this.deleteSelectedDrawingObject = function() {
 
 		var bResult = false;
@@ -2679,24 +2644,20 @@ function DrawingObjects() {
 
 		for (var i = 0; i < _this.countDrawingObjects(); i++) {
 			var obj = aObjects[i];
-			var bbox = obj.isChart() ? obj.chart.range.intervalObject.getBBox0() : null;
+			var bbox = obj.isChart() ? obj.graphicObject.chart.range.intervalObject.getBBox0() : null;
 
-			if (obj.isChart() || obj.isImage()) {
+			if ( obj.isChart() || obj.isImage() ) {
 
-				//History.StartTransaction();
 				metrics = { from: {}, to: {} };
-
 				metrics.from.col = obj.from.col; metrics.to.col = obj.to.col;
 				metrics.from.colOff = obj.from.colOff; metrics.to.colOff = obj.to.colOff;
 				metrics.from.row = obj.from.row; metrics.to.row = obj.to.row;
 				metrics.from.rowOff = obj.from.rowOff; metrics.to.rowOff = obj.to.rowOff;
-
-
-				if (bInsert) {	// Insert
+				
+				if (bInsert) {		// Insert
 					switch (operType) {
 						case c_oAscInsertOptions.InsertColumns: 
 							{
-
 								var count = updateRange.c2 - updateRange.c1 + 1;
 
 								// Position
@@ -2969,15 +2930,11 @@ function DrawingObjects() {
 					changedRange = new Range(worksheet.model, bbox.r1, bbox.c1, bbox.r2, bbox.c2);
 				}
 
-				if (changedRange || metrics) {
-
-					//var copyObject = _this.cloneDrawingObject(obj);
-					//copyObject.flags.transactionState = c_oAscTransactionState.Start;
-					//History.Add(g_oUndoRedoDrawingObject, historyitem_DrawingObject_Edit, worksheet.model.getId(), null, copyObject);
-
+				if ( changedRange || metrics ) {
+				
 					if (changedRange) {
-						obj.chart.range.intervalObject = changedRange;
-						_this.calcChartInterval(obj.chart);
+						obj.graphicObject.chart.range.intervalObject = changedRange;
+						_this.calcChartInterval(obj.graphicObject.chart);
 					}
 					if (metrics) {
 						obj.from.col = metrics.from.col;
@@ -2990,13 +2947,12 @@ function DrawingObjects() {
 						obj.to.row = metrics.to.row;
 						obj.to.rowOff = metrics.to.rowOff;
 					}
-
-					//var copyObject = _this.cloneDrawingObject(obj);
-					//copyObject.flags.transactionState = c_oAscTransactionState.Stop;
-					//History.Add(g_oUndoRedoDrawingObject, historyitem_DrawingObject_Edit, worksheet.model.getId(), null, copyObject);
+					
+					// Update graphic object
+					obj.graphicObject.setPosition( pxToMm(obj.getRealLeftOffset(true)), pxToMm(obj.getRealTopOffset(true)) );
+					obj.graphicObject.recalculateTransform();
+					obj.graphicObject.calculateTransformTextMatrix();
 				}
-
-				//History.EndTransaction();
 			}
 		}
 	}
@@ -3005,33 +2961,35 @@ function DrawingObjects() {
 		
 		if ( oBBoxFrom && oBBoxTo ) {
 						
-			function editChart(chartObject) {
-				var copyObject = _this.cloneDrawingObject(chartObject);
+			function editChart(drawingObject) {
 				
-				copyObject.chart.range.intervalObject = worksheet._getRange(oBBoxTo.c1, oBBoxTo.r1, oBBoxTo.c2, oBBoxTo.r2);
-				_this.calcChartInterval(copyObject.chart);
-				copyObject.chart.rebuildSeries();
+				drawingObject.graphicObject.chart.range.intervalObject = worksheet._getRange(oBBoxTo.c1, oBBoxTo.r1, oBBoxTo.c2, oBBoxTo.r2);
+				_this.calcChartInterval(drawingObject.graphicObject.chart);
+				drawingObject.graphicObject.chart.rebuildSeries();
 				
-				_this.unselectDrawingObjects();
-				_this.editChartDrawingObject(copyObject.chart);
+				drawingObject.graphicObject.recalculate();
+				_this.editChartDrawingObject(drawingObject.graphicObject.chart);
 			}
 			
+			var bChartExists = false;
 			for (var i = 0; i < _this.countDrawingObjects(); i++) {
 								
-				var obj = aObjects[i];
-				if ( obj.isChart() ) {
-					var bbox = obj.chart.range.intervalObject.getBBox0();
+				var drawingObject = aObjects[i];
+				if ( drawingObject.isChart() ) {
+					var bbox = drawingObject.graphicObject.chart.range.intervalObject.getBBox0();
 					if ( oBBoxFrom.isEqual(bbox) ) {
-				
-						if ( bResize && obj.graphicObject.selected ) {
-							editChart(obj);
+						bChartExists = true;
+						if ( bResize && drawingObject.graphicObject.selected ) {
+							editChart(drawingObject);
 							return;
 						}
 						else
-							editChart(obj);
+							editChart(drawingObject);
 					}
 				}
 			}
+			if ( bChartExists )
+				_this.selectGraphicObject();
 		}
 	}
 
@@ -3212,12 +3170,12 @@ function DrawingObjects() {
 		if ( _this.drawingDocument && _this.controller.selectedObjects.length ) {
 			_this.controller.drawSelection(_this.drawingDocument);
 			
-			/*for (var i = 0; i < _this.controller.selectedObjects.length; i++) {
+			for (var i = 0; i < _this.controller.selectedObjects.length; i++) {
 				var graphicObject = _this.controller.selectedObjects[i];
 				if ( graphicObject.isChart() ) {
 					_this.selectDrawingObjectRange(graphicObject.Id);
 				}
-			}*/
+			}
 			
 			_this.drawWorksheetHeaders();
 		}
@@ -3407,27 +3365,39 @@ function DrawingObjects() {
 		return null;
 	}
 
-	_this.getAscChartObject = function() {		// Return new or existing chart. For image return null
+	_this.getAscChartObject = function() {
 
-        return this.controller.getAscChartObject();
+        var chart = this.controller.getAscChartObject();
+		if ( !chart ) {
+			chart = new asc_CChart();			
+			chart.range.interval = function() {
+				var result = "";
+				if (worksheet) {
+					var selectedRange = worksheet.getSelectedRange();
+					if (selectedRange) {
+						var box = selectedRange.getBBox0();
+						var startCell = new CellAddress(box.r1, box.c1, 0);
+						var endCell = new CellAddress(box.r2, box.c2, 0);
 
-		var index = _this.getSelectedDrawingObjectIndex();
-		if (index >= 0) {
-			if (aObjects[index].isChart())
-				return new asc.asc_CChart(aObjects[index].chart);
-			else null;
+						if (startCell && endCell) {
+							var wsName = worksheet.model.sName;
+							if ( !rx_test_ws_name.test(wsName) )
+								wsName = "'" + wsName + "'";
+
+							if (startCell.getID() == endCell.getID())
+								result = wsName + "!" + startCell.getID();
+							else
+								result = wsName + "!" + startCell.getID() + ":" + endCell.getID();
+						}
+					}
+				}
+				return result;
+			}();
+			chart.range.intervalObject = function() {
+				return worksheet ? worksheet.getSelectedRange() : null;
+			}();
 		}
-		else {
-			// Check iframe chart editor
-			for (var i = 0; i < _this.countDrawingObjects(); i++) {
-				if ( aObjects[i].isChart() && aObjects[i].chart.bChartEditor )
-					return new asc.asc_CChart(aObjects[i].chart);
-			}
-		
-			// New chart object
-			var chart = new asc.asc_CChart(_this.createDrawingObject().chart);
-			return chart;
-		}
+		return chart;
 	}
 	
 	//-----------------------------------------------------------------------------------
@@ -3456,32 +3426,26 @@ function DrawingObjects() {
 	_this.selectDrawingObjectRange = function(id) {
 
 		worksheet.arrActiveChartsRanges = [];
-	
 		for (var i = 0; i < aObjects.length; i++) {
 
-			var obj = aObjects[i];
-			if ( obj.isChart() && (obj.graphicObject.Id == id) ) {
+			var drawingObject = aObjects[i].graphicObject;
+			if ( drawingObject.isChart() && (drawingObject.Id == id) ) {
 
-				if ( !obj.chart.range.intervalObject )
-					_this.intervalToIntervalObject(obj.chart);
+				if ( !drawingObject.chart.range.intervalObject )
+					_this.intervalToIntervalObject(drawingObject.chart);
 				
 				// Проверка для id листа				
-				if (obj.chart.range.intervalObject.worksheet.Id != worksheet.model.Id)
+				if ( drawingObject.chart.range.intervalObject.worksheet.Id != worksheet.model.Id )
 					return;
 					
-				var BB = obj.chart.range.intervalObject.getBBox0(),
+				var BB = drawingObject.chart.range.intervalObject.getBBox0(), 
 					range = asc.Range(BB.c1,BB.r1,BB.c2,BB.r2,true);
 					
 				worksheet.arrActiveChartsRanges.push(range);
 				worksheet.isChartAreaEditMode = true;
 				
-				worksheet.overlayCtx.save()
-									.beginPath()
-									.rect(worksheet.cellsLeft, worksheet.cellsTop, worksheet.overlayCtx.getWidth() - worksheet.cellsLeft, worksheet.overlayCtx.getHeight() - worksheet.cellsTop)
-									.clip();
-				worksheet.overlayCtx.clear();
-				worksheet._drawFormulaRange(worksheet.arrActiveChartsRanges)
-				worksheet.overlayCtx.restore();
+				worksheet.overlayCtx.rect(worksheet.cellsLeft, worksheet.cellsTop, worksheet.overlayCtx.getWidth() - worksheet.cellsLeft, worksheet.overlayCtx.getHeight() - worksheet.cellsTop);
+				worksheet._drawFormulaRange(worksheet.arrActiveChartsRanges);
 				
 				// слой c объектами должен быть выше селекта
 				_this.raiseLayerDrawingObjects();
@@ -3740,7 +3704,6 @@ function DrawingObjects() {
 			
 			// Update graphic object
 			obj.graphicObject.setPosition( pxToMm(obj.getRealLeftOffset(true)), pxToMm(obj.getRealTopOffset(true)) );
-			//obj.graphicObject.setExtents( pxToMm(obj.getWidthFromTo()), pxToMm(obj.getHeightFromTo()) );
 			obj.graphicObject.recalculateTransform();
 			obj.graphicObject.calculateTransformTextMatrix();
 		}

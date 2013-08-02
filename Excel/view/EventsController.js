@@ -605,7 +605,7 @@
 				}
 				
 				var graphicObjects = t.handlers.trigger("getSelectedGraphicObjects");
-				if ( graphicObjects.length ) {
+				if ( graphicObjects.length && t.enableKeyEvents ) {
 					if (t.handlers.trigger("graphicObjectWindowKeyDown", event))
 						return true;
 				}
@@ -903,7 +903,7 @@
 				if (t.settings.isViewerMode || t.isSelectionDialogMode) {return true;}
 				
 				var graphicObjects = t.handlers.trigger("getSelectedGraphicObjects");
-				if ( graphicObjects.length ) {
+				if ( graphicObjects.length && t.enableKeyEvents ) {
 					if (t.handlers.trigger("graphicObjectWindowKeyPress", event))
 						return true;
 				}

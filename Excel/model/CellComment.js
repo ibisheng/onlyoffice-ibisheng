@@ -739,8 +739,8 @@ function asc_CCellCommentator(currentSheet) {
 			if ( !metrics.result || (metrics.width <= 0) || (metrics.height <= 0) )
 				continue;
 			// Inside drawing object
-			if ( _this.worksheet.objectRender.checkCursorDrawingObject(metrics.left + metrics.width, metrics.top) )
-				continue;
+			//if ( _this.worksheet.objectRender.checkCursorDrawingObject(metrics.left + metrics.width, metrics.top) )
+			//	continue;
 
 			this.overlayCtx.beginPath();
 			this.overlayCtx.setFillStyle(this.commentIconColor);

@@ -329,7 +329,7 @@ function NullState(drawingObjectsController, drawingObjects)
             if(isRealNumber(e.charCode))
             {
                selected_objects[0].paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
-               this.drawingObjects.showDrawingObjects(false);
+               this.drawingObjects.showDrawingObjects(true);
             }
         }
 
@@ -1601,6 +1601,7 @@ function PreMoveState(drawingObjectsController, drawingObjects, startX, startY, 
                 if(gr_obj.isChart())
                 {
                     this.drawingObjectsController.changeCurrentState(new ExtpectDoubleClickState(this.drawingObjectsController, this.drawingObjects));
+					asc["editor"].asc_endAddShape();
                     return;
                     /* if(false === this.graphicObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : gr_obj.Parent, CheckType : changestype_Paragraph_Content} )) {
                      var chart = this.graphicObjects.majorGraphicObject.GraphicObj.chart.serializeChart();

@@ -25,7 +25,7 @@ DrawingObjectsController.prototype =
 
     getAscChartObject: function()
     {
-        if(this.selectedObjects.length === 1)
+        if (this.selectedObjects.length === 1)
         {
             if(this.selectedObjects[0].isChart())
                 return this.selectedObjects[0].chart;
@@ -38,36 +38,8 @@ DrawingObjectsController.prototype =
                 }
             }
         }
-        var chart = new asc_CChart();
-        var worksheet = this.drawingObjects.getWorksheet();
-        chart.range.interval = function() {
-            var result = "";
-            if (worksheet) {
-                var selectedRange = worksheet.getSelectedRange();
-                if (selectedRange) {
-                    var box = selectedRange.getBBox0();
-                    var startCell = new CellAddress(box.r1, box.c1, 0);
-                    var endCell = new CellAddress(box.r2, box.c2, 0);
-
-                    if (startCell && endCell) {
-                        var wsName = worksheet.model.sName;
-                        if ( !rx_test_ws_name.test(wsName) )
-                            wsName = "'" + wsName + "'";
-
-                        if (startCell.getID() == endCell.getID())
-                            result = wsName + "!" + startCell.getID();
-                        else
-                            result = wsName + "!" + startCell.getID() + ":" + endCell.getID();
-                    }
-                }
-            }
-            return result;
-        }();
-
-        chart.range.intervalObject = function() {
-            return worksheet ? worksheet.getSelectedRange() : null;
-        }();
-        return chart;
+		
+        return null;
     },
 
     editChartDrawingObjects: function(chart)
@@ -777,6 +749,12 @@ DrawingObjectsController.prototype =
 	{
 		var api = window["Asc"]["editor"];
 		var themeColors = api.GuiControlColorsMap;
+		
+		var aObjects = this.drawingObjects.getDrawingObjects();
+		for (var i = 0; i < aObjects.length; i++) {
+			if ( aObjects[i].graphicObject.isChart() )
+				aObjects[i].graphicObject.recalculate();
+		}
 	}
 };
 
