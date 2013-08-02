@@ -166,7 +166,7 @@
              * Применяем только трансформации поворота в области
              * @param {type} angle  Угол поворота в градусах
              */
-            setRotatationAt: function (drawingCtx, angle, x, y) {
+            rotateAtPoint: function (drawingCtx, angle, x, y) {
 
                 var m = new asc.Matrix();   m.rotate(angle, 0);
                 var mbt = new asc.Matrix();
