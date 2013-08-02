@@ -1382,7 +1382,7 @@ Woorksheet:QI
 historyitem_RowCol_SetFont:RJ
 PreMoveInGroupState:L_
 dublicate_vector:gi
-FT_Match_Size:Gl
+FT_Match_Size:Fl
 JSCompiler_StaticMethods_setSheetViewSettings:eM
 JSCompiler_StaticMethods_Internal_Get_Pr:X0
 FT_Service_GlyphDictRec:Cf
@@ -2285,7 +2285,7 @@ tab_Center:j2
 numFormat_Hour:Rb
 CFontFile:Ut
 tt_face_free_ps_names:yl
-asc_CStroke:zZ
+asc_CStroke:yZ
 c_oSer_ChartSeriesNumCacheType$NumCacheVal:SX
 _ph_summ__two_obj_and_two_tx:ET
 tt_cmap14_init:Bm
@@ -2372,7 +2372,7 @@ JSCompiler_StaticMethods__removeCell:iM
 STATES_ID_ROTATE_IN_GROUP:QZ
 FT_SqrtFixed:Cg
 c_oSer_CellStyle$Name:bG
-tt_cmap2_char_index:Xl
+tt_cmap2_char_index:Tl
 JSCompiler_StaticMethods_Serialize:GO
 c_oMainTables$NotesMasters:qW
 c_oSerWorkbookTypes$WorkbookPr:XA
@@ -2553,7 +2553,7 @@ contentchanges_Remove:P3
 t1_services:At
 EVerticalAlignment$verticalalignmentBottom:XG
 c_oAscInsertOptions$InsertColumns:bf
-L 159:Wl
+L 159:Xl
 L 158:B5
 FT_Lookup_Renderer:Pt
 JSCompiler_StaticMethods__scrollH:uQ
@@ -2593,7 +2593,7 @@ JSCompiler_StaticMethods_buildDependency:oL
 c_oAscPrintDefaultSettings$PageRightField:QL
 L 154:ci
 L 155:gt
-L 156:Vl
+L 156:Wl
 L 157:tc
 ft_adobe_glyph_list:Ti
 JSCompiler_StaticMethods__shiftCellsLeft:SM
@@ -2608,7 +2608,7 @@ FT_Stream:Qf
 TRaster:Jn
 UndoRedoWorkbook:gL
 cff_index_init:Ar
-L 124:Ul
+L 124:Vl
 L 123:WQ
 L 122:lz
 L 121:kz
@@ -2661,7 +2661,7 @@ gr_state_pen:Fv
 Binary_StylesTableReader:AI
 ShapeForResizeInGroup:G4
 ChangeAdjInGroupState:P_
-L 111:Tl
+L 111:Ul
 L 110:Op
 L 113:pg
 bIsSupportOriginalFormatFonts:Yu
@@ -3131,7 +3131,7 @@ L 86:Fi
 CHART_TITLE_TYPE_V_AXIS:ZY
 L 87:Bd
 L 84:oe
-L 85:Fl
+L 85:Gl
 tt_size_request:Uq
 g_bIsAppleDevices:gu
 c_oSer_SheetPr$SyncRef:iG
