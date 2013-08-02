@@ -2569,7 +2569,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					var ws = this.wb.getWorksheet();
 					// ToDo - от _reDrawFilters в будущем стоит избавиться, ведь она проставляет стили ячейкам, а это не нужно делать (сменить отрисовку)
 					// ToDo - и еще, в _reDrawFilters делается отрисовка + в drawWS делается отрисовка
-					autoFilters._reDrawFilters(ws,true);
+					ws.autoFilters._reDrawFilters(ws,true);
 					this.wb.drawWS();
 				}
 			},
