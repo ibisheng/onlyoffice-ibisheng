@@ -8075,6 +8075,18 @@ Range.prototype.promote=function(bCtrl, bVertical, nIndex){
     
 	if((true == bVertical && 1 == nHeight) || (false == bVertical && 1 == nWidth))
 		bCtrl = !bCtrl;
+	var fFinishSection = function(param, oPromoteHelper)
+	{
+		if(null != param && null != param.prefix)
+		{
+			if(false == oPromoteHelper.isOnlyIntegerSequence())
+			{
+				param.valid = false;
+				oPromoteHelper.removeLast();
+			}
+		}
+		oPromoteHelper.finishSection();
+	}
     if(true == bVertical)
     {
 		//todo слишком простое решение, возможно в случае строки надо создавать массив колонок
@@ -8109,33 +8121,73 @@ Range.prototype.promote=function(bCtrl, bVertical, nIndex){
                 //пробегаемся по диапазону запоминаем ячеек смотрим какие из них числа
                 var aCells = new Array();
 				var oPromoteHelper = new PromoteHelper();
+				var oDigParams = null;
                 for(var j = oBBox.r1; j <= oBBox.r2; ++j)
                 {
                     var oCurCell = this.worksheet._getCellNoEmpty(j, i);
                     var nVal = null, nF = null;
+					var sCurPrefix = null;
                     if(null != oCurCell)
                     {
 						if (!oCurCell.sFormula)
                         {
 							var nType = oCurCell.getType();
-							if(CellValueType.Number == nType)
+							if(CellValueType.Number == nType || CellValueType.String == nType)
 							{
                                 var sValue = oCurCell.getValueWithoutFormat();
                                 if("" != sValue)
                                 {
-                                    nVal = sValue - 0;
-									oPromoteHelper.add(nVal);
+									if(CellValueType.Number == nType)
+										nVal = sValue - 0;
+									else
+									{
+										//если текст заканчивается на цифру тоже используем ее
+										var nEndIndex = sValue.length;
+										for(var k = sValue.length - 1; k >= 0; --k)
+										{
+											var sCurChart = sValue[k];
+											if('0' <= sCurChart && sCurChart <= '9')
+												nEndIndex--;
+											else
+												break;
+										}
+										if(sValue.length != nEndIndex)
+										{
+											sCurPrefix = sValue.substring(0, nEndIndex);
+											nVal = sValue.substring(nEndIndex) - 0;
+										}
+									}
+									if(null != nVal)
+									{
+										if(null == oDigParams)
+											oDigParams = {valid: true, prefix: sCurPrefix};
+										else if(sCurPrefix != oDigParams.prefix)
+										{
+											fFinishSection(oDigParams, oPromoteHelper);
+											oDigParams = {valid: true, prefix: sCurPrefix};
+										}
+										oPromoteHelper.add(nVal);
+									}
+									else
+									{
+										fFinishSection(oDigParams, oPromoteHelper);
+										oDigParams = null;
+									}
                                 }
                             }
-							else
-								oPromoteHelper.finishSection();
 						}
 						else{
+							fFinishSection(oDigParams, oPromoteHelper);
+							oDigParams = null;
 							nF = true;
 						}
                     }
-                    aCells.push({digit: nVal, cell: oCurCell, formula:nF});
+					if(null == nVal)
+						aCells.push({digparams: null, cell: oCurCell, formula:nF});
+					else
+						aCells.push({digparams: oDigParams, cell: oCurCell, formula:nF});
                 }
+				fFinishSection(oDigParams, oPromoteHelper);
 				oPromoteHelper.finishAdd();
                 var bExistDigit = false;
                 if(false == bCtrl && false == oPromoteHelper.isEmpty())
@@ -8184,10 +8236,14 @@ Range.prototype.promote=function(bCtrl, bVertical, nIndex){
                         var oCopyCell = this.worksheet._getCell(j, i);
                         oCopyCell.setStyle(oCurItem.cell.getStyle());
                         oCopyCell.setType(oCurItem.cell.getType());
-                        if(bExistDigit && null != oCurItem.digit)
+                        if(bExistDigit && null != oCurItem.digparams && true == oCurItem.digparams.valid)
                         {
 							var dNewValue = oPromoteHelper.getNext();
-                            oCopyCell.setValue(dNewValue + "");
+							var sVal = "";
+							if(null != oCurItem.digparams.prefix)
+								sVal += oCurItem.digparams.prefix;
+							sVal += dNewValue;
+                            oCopyCell.setValue(sVal);
                         }
                         else
                         {
@@ -8268,33 +8324,73 @@ Range.prototype.promote=function(bCtrl, bVertical, nIndex){
                 //пробегаемся по диапазону запоминаем ячеек смотрим какие из них числа
                 var aCells = new Array();
 				var oPromoteHelper = new PromoteHelper();
+				var oDigParams = null;
                 for(var j = oBBox.c1; j <= oBBox.c2; ++j)
                 {
                     var oCurCell = this.worksheet._getCellNoEmpty(i, j);
                     var nVal = null, nF = null;
+					var sCurPrefix = null;
                     if(null != oCurCell)
                     {
                         if (!oCurCell.sFormula)
 						{
 							var nType = oCurCell.getType();
-							if(CellValueType.Number == nType)
+							if(CellValueType.Number == nType || CellValueType.String == nType)
 							{
 								var sValue = oCurCell.getValueWithoutFormat();
                                 if("" != sValue)
                                 {
-                                    nVal = sValue - 0;
-									oPromoteHelper.add(nVal);
+									if(CellValueType.Number == nType)
+										nVal = sValue - 0;
+									else
+									{
+										//если текст заканчивается на цифру тоже используем ее
+										var nEndIndex = sValue.length;
+										for(var k = sValue.length - 1; k >= 0; --k)
+										{
+											var sCurChart = sValue[k];
+											if('0' <= sCurChart && sCurChart <= '9')
+												nEndIndex--;
+											else
+												break;
+										}
+										if(sValue.length != nEndIndex)
+										{
+											sCurPrefix = sValue.substring(0, nEndIndex);
+											nVal = sValue.substring(nEndIndex) - 0;
+										}
+									}
+									if(null != nVal)
+									{
+										if(null == oDigParams)
+											oDigParams = {valid: true, prefix: sCurPrefix};
+										else if(sCurPrefix != oDigParams.prefix)
+										{
+											fFinishSection(oDigParams, oPromoteHelper);
+											oDigParams = {valid: true, prefix: sCurPrefix};
+										}
+										oPromoteHelper.add(nVal);
+									}
+									else
+									{
+										fFinishSection(oDigParams, oPromoteHelper);
+										oDigParams = null;
+									}
                                 }
                             }
-							else
-								oPromoteHelper.finishSection();
                         }
 						else{
+							fFinishSection(oDigParams, oPromoteHelper);
+							oDigParams = null;
 							nF = true;
 						}
                     }
-                    aCells.push({digit: nVal, cell: oCurCell, formula:nF});
+                    if(null == nVal)
+						aCells.push({digparams: null, cell: oCurCell, formula:nF});
+					else
+						aCells.push({digparams: oDigParams, cell: oCurCell, formula:nF});
                 }
+				fFinishSection(oDigParams, oPromoteHelper);
 				oPromoteHelper.finishAdd();
                 var bExistDigit = false;
                 if(false == bCtrl && false == oPromoteHelper.isEmpty())
@@ -8342,10 +8438,14 @@ Range.prototype.promote=function(bCtrl, bVertical, nIndex){
                         var oCopyCell = this.worksheet._getCell(i, j);
                         oCopyCell.setStyle(oCurItem.cell.getStyle());
                         oCopyCell.setType(oCurItem.cell.getType());
-                        if(bExistDigit && null != oCurItem.digit)
+                        if(bExistDigit && null != oCurItem.digparams && true == oCurItem.digparams.valid)
                         {
 							var dNewValue = oPromoteHelper.getNext();
-                            oCopyCell.setValue(dNewValue + "");
+							var sVal = "";
+							if(null != oCurItem.digparams.prefix)
+								sVal += oCurItem.digparams.prefix;
+							sVal += dNewValue;
+                            oCopyCell.setValue(sVal);
                         }
                         else
                         {
@@ -8440,6 +8540,32 @@ PromoteHelper.prototype = {
 			this.aSequence.push({digits: this.aCurDigits, a0: 0, a1: 0, nX: 0, length: this.aCurDigits.length});
 			this.aCurDigits = new Array();
 		}
+	},
+	isOnlyIntegerSequence: function()
+	{
+		var bRes = true;
+		var nPrevValue = null;
+		var nDiff = null;
+		for(var i = 0, length = this.aCurDigits.length; i < length; ++i)
+		{
+			var nCurValue = this.aCurDigits[i];
+			if(null != nPrevValue)
+			{
+				if(null == nDiff)
+					nDiff = nCurValue - nPrevValue;
+				else if(nCurValue != nPrevValue + nDiff)
+				{
+					bRes = false;
+					break;
+				}
+			}
+			nPrevValue = nCurValue;
+		}
+		return bRes;
+	},
+	removeLast: function()
+	{
+		this.aCurDigits = new Array();
 	},
 	finishAdd: function(){
 		if(this.aCurDigits.length > 0)
