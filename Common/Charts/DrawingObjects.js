@@ -2914,9 +2914,11 @@ function DrawingObjects() {
 
 				if ( changedRange || metrics ) {
 				
-					if (changedRange) {
+					if ( obj.isChart() && changedRange ) {
 						obj.graphicObject.chart.range.intervalObject = changedRange;
 						_this.calcChartInterval(obj.graphicObject.chart);
+						obj.graphicObject.chart.rebuildSeries();
+						obj.graphicObject.recalculate();
 					}
 					if (metrics) {
 						obj.from.col = metrics.from.col;

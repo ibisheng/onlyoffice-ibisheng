@@ -760,11 +760,12 @@ DrawingObjectsController.prototype =
 	getSelectionState: function()
 	{
 		// TODO
-		return new Object();
+		return (this.selectedObjects.length > 0) ? new Object() : null;
 	},
 	
 	setSelectionState: function(state)
 	{
+		// TODO
 		var st = state;
 	}
 };
