@@ -8617,6 +8617,8 @@
 				ar.startRow = this.activeRange.startRow;
 				var aReplaceCells = [];
 				if (options.isReplaceAll) {
+					// На ReplaceAll ставим медленную операцию
+					t._trigger("slowOperation", true);
 					var aReplaceCellsIndex = {};
 					var optionsFind = {text: options.findWhat, scanByRows: true, scanForward: true,
 						isMatchCase: options.isMatchCase, isWholeCell: options.isWholeCell, isNotSelect: true, activeRange: ar};
@@ -8682,6 +8684,10 @@
 				if (options.indexInArray >= aReplaceCells.length) {
 					History.EndTransaction();
 					t.model.onEndTriggerAction();
+					if (options.isReplaceAll) {
+						// Завершаем медленную операцию
+						t._trigger("slowOperation", false);
+					}
 
 					t._trigger("onRenameCellTextEnd", options.countFind, options.countReplace);
 					return;
