@@ -134,7 +134,7 @@ g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("fr-FR", 0x040c));
 //{ "he-IL", 0x040d },
 //{ "hu-HU", 0x040e },
 //{ "is-IS", 0x040f },
-//{ "it-IT", 0x0410 },
+g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("it-IT", 0x0410));
 //{ "ja-JP", 0x0411 },
 //{ "ko-KR", 0x0412 },
 //{ "nl-NL", 0x0413 },
