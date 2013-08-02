@@ -916,6 +916,27 @@
 			}
 		};
 
+		/** @constructor */
+		function asc_CSheetPr() {
+			if (!(this instanceof asc_CSheetPr)) {
+				return new asc_CSheetPr();
+			}
+
+			this.CodeName = null;
+			this.EnableFormatConditionsCalculation = null;
+			this.FilterMode = null;
+			this.Published = null;
+			this.SyncHorizontal = null;
+			this.SyncRef = null;
+			this.SyncVertical = null;
+			this.TransitionEntry = null;
+			this.TransitionEvaluation = null;
+
+			this.TabColor = null;
+
+			return this;
+		}
+
 		/*
 		 * Export
 		 * -----------------------------------------------------------------------------
@@ -1057,6 +1078,8 @@
 		prot["asc_getDocStyles"] = prot.asc_getDocStyles;
 		prot["asc_getDefaultStylesImage"] = prot.asc_getDefaultStylesImage;
 		prot["asc_getDocStylesImage"] = prot.asc_getDocStylesImage;
+
+		window["Asc"]["asc_CSheetPr"] = window["Asc"].asc_CSheetPr = asc_CSheetPr;
 
 }
 )(jQuery, window);

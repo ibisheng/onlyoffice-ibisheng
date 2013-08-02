@@ -173,7 +173,8 @@ var c_oSerWorksheetsTypes =
 	Comment: 20,
 	ConditionalFormatting: 21,
 	SheetViews: 22,
-	SheetView: 23
+	SheetView: 23,
+	SheetPr: 24
 };
 /** @enum */
 var c_oSerWorksheetPropTypes =
@@ -298,17 +299,6 @@ var c_oSer_ColorObjectType =
 var c_oSer_ColorType =
 {
     Auto: 0
-};
-/** @enum */
-var c_oSer_CalcChainType =
-{
-	CalcChainItem: 0,
-	Array: 1,
-	SheetId: 2,
-	DependencyLevel: 3,
-	Ref: 4,
-	ChildChain: 5,
-	NewThread: 6
 };
 /** @enum */
 var  c_oSer_PageMargins =
@@ -576,6 +566,7 @@ var c_oSer_SheetView = {
 	ZoomScalePageLayoutView		: 17,
 	ZoomScaleSheetLayoutView	: 18
 };
+/** @enum */
 var c_oSer_CellStyle = {
 	BuiltinId		: 0,
 	CustomBuiltin	: 1,
@@ -583,6 +574,20 @@ var c_oSer_CellStyle = {
 	ILevel			: 3,
 	Name			: 4,
 	XfId			: 5
+};
+/** @enum */
+var c_oSer_SheetPr = {
+	CodeName							: 0,
+	EnableFormatConditionsCalculation	: 1,
+	FilterMode							: 2,
+	Published							: 3,
+	SyncHorizontal						: 4,
+	SyncRef								: 5,
+	SyncVertical						: 6,
+	TransitionEntry						: 7,
+	TransitionEvaluation				: 8,
+
+	TabColor							: 9
 };
 /** @enum */
 var EBorderStyle =
@@ -5105,6 +5110,11 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 			res = this.bcr.Read1(length, function (t, l) {
 				return oThis.ReadSheetViews(t, l, oWorksheet.sheetViews);
 			});
+		} else if (c_oSerWorksheetsTypes.SheetPr === type) {
+			oWorksheet.sheetPr = new Asc.asc_CSheetPr();
+			res = this.bcr.Read1(length, function (t, l) {
+				return oThis.ReadSheetPr(t, l, oWorksheet.sheetPr);
+			});
 		} else
             res = c_oSerConstants.ReadUnknown;
         return res;
@@ -5921,6 +5931,42 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 			oSheetView.showRowColHeaders = this.stream.GetBool();
 		} else
 			res = c_oSerConstants.ReadUnknown;
+		return res;
+	};
+	this.ReadSheetPr = function (type, length, oSheetPr) {
+		var oThis = this;
+		var res = c_oSerConstants.ReadOk;
+		if (c_oSer_SheetPr.CodeName === type)
+			oSheetPr.CodeName = this.stream.GetString2LE(length);
+		else if (c_oSer_SheetPr.EnableFormatConditionsCalculation === type)
+			oSheetPr.EnableFormatConditionsCalculation = this.stream.GetBool();
+		else if (c_oSer_SheetPr.FilterMode === type)
+			oSheetPr.FilterMode = this.stream.GetBool();
+		else if (c_oSer_SheetPr.Published === type)
+			oSheetPr.Published = this.stream.GetBool();
+		else if (c_oSer_SheetPr.SyncHorizontal === type)
+			oSheetPr.SyncHorizontal = this.stream.GetBool();
+		else if (c_oSer_SheetPr.SyncRef === type)
+			oSheetPr.SyncRef = this.stream.GetString2LE(length);
+		else if (c_oSer_SheetPr.SyncVertical === type)
+			oSheetPr.SyncVertical = this.stream.GetBool();
+		else if (c_oSer_SheetPr.TransitionEntry === type)
+			oSheetPr.TransitionEntry = this.stream.GetBool();
+		else if (c_oSer_SheetPr.TransitionEvaluation === type)
+			oSheetPr.TransitionEvaluation = this.stream.GetBool();
+		else if (c_oSer_SheetPr.TabColor === type) {
+			var oObject = new OpenColor();
+			res = this.bcr.Read2Spreadsheet(length, function(t,l){
+				return oThis.bcr.ReadColorSpreadsheet(t,l, oObject);
+			});
+			if(null != oObject.theme)
+				oSheetPr.TabColor = g_oColorManager.getThemeColor(oObject.theme, oObject.tint);
+			else if(null != oObject.rgb)
+				oSheetPr.TabColor = new RgbColor(0x00ffffff & oObject.rgb);
+		}
+		else
+			res = c_oSerConstants.ReadUnknown;
+
 		return res;
 	};
 	this.Iso8601ToDate = function(sDate)

@@ -2113,6 +2113,7 @@ function Woorksheet(wb, _index, bAddUserId, sId){
 
 	this.sheetViews = [];
 	this.aConditionalFormatting = [];
+	this.sheetPr = null;
 	
 	this.nActionNested = 0;
 	this.bUpdateHyperlinks = false;
