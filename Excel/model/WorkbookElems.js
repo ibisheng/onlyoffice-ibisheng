@@ -2916,7 +2916,7 @@ CCellValue.prototype =
 				else if(this.multiText)
 					oValueArray = this.multiText;
 			}
-			if(null != xfs && true == xfs.QuotePrefix && CellValueType.String == this.type)
+			if(null != xfs && true == xfs.QuotePrefix && CellValueType.String == this.type && false == this.cell.isFormula())
 			{
 				if(null != oValueText)
 					oValueText = "'" + oValueText;
