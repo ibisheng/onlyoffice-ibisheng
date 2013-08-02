@@ -272,6 +272,8 @@ CHistory.prototype =
 		}
 		if(false == Point.bNoSelect && null != oSelectRange)
 			this.workbook.handlers.trigger("setSelection", oSelectRange.clone(), /*validRange*/false);
+		if ( Point.SelectionState != null )
+			this.workbook.handlers.trigger("setSelectionState", Point.SelectionState);
 		
 		this._sendCanUndoRedo();
 
@@ -333,6 +335,8 @@ CHistory.prototype =
 			if (g_oUndoRedoWorksheet === Item.Class && historyitem_Worksheet_SetViewSettings === Item.Type)
 				oRedoObjectParam.bIsReInit = true;
         }
+		if ( Point.SelectionState != null )
+			this.workbook.handlers.trigger("setSelectionState", Point.SelectionState);
 	},
 	RedoEnd : function(Point, oRedoObjectParam)
 	{
@@ -408,7 +412,8 @@ CHistory.prototype =
 			SelectRange : null,
 			SelectRangeRedo : null,
 			bNoSelect : false,
-            Time  : Time   // Текущее время
+            Time  : Time,   // Текущее время
+			SelectionState : this.workbook.handlers.trigger("getSelectionState")
         };
     },
 	

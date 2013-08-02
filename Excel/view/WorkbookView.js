@@ -244,6 +244,12 @@
 				this.model.handlers.add("setSelection", function () {
 					self._onSetSelection.apply(self, arguments);
 				});
+				this.model.handlers.add("getSelectionState", function () {
+					return self._onGetSelectionState.apply(self);
+				});
+				this.model.handlers.add("setSelectionState", function () {
+					self._onSetSelectionState.apply(self, arguments);
+				});
 				this.model.handlers.add("reInit", function () {
 					self.reInit.apply(self, arguments);
 				});
@@ -421,6 +427,16 @@
 					if (d.deltaX) {this.controller.scrollHorizontal(d.deltaX);}
 					if (d.deltaY) {this.controller.scrollVertical(d.deltaY);}
 				}
+			},
+			
+			_onGetSelectionState: function () {
+				var ws = this.getWorksheet();
+				return ws.objectRender.controller.getSelectionState();
+			},
+			
+			_onSetSelectionState: function (state) {
+				var ws = this.getWorksheet();
+				ws.objectRender.controller.setSelectionState(state);
 			},
 
 			_onChangeSelection: function (isStartPoint, dc, dr, isCoord, isSelectMode, callback) {

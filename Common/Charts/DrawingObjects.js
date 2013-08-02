@@ -2189,22 +2189,13 @@ function DrawingObjects() {
 		worksheet._drawCells();
 		worksheet._drawCellsBorders();
 		worksheet._drawSelection();
-		worksheet.cellCommentator.drawCommentCells(false);
-		worksheet.autoFilters.drawAutoF(worksheet);
 	}
 
 	_this.raiseLayerDrawingObjects = function() {
 		
-		// слой c объектами должен быть выше селекта
-		var bbox = worksheet.getSelectedRange().bbox;
 		for (var i = 0; i < _this.countDrawingObjects(); i++) {
-			
 			var obj = aObjects[i];
-			// Объекты не пересекаются
-			if ( (bbox.c2 < obj.from.col) || (bbox.r2 < obj.from.row ) || (bbox.c1 > obj.to.col) || (bbox.r1 > obj.to.row) )
-				continue;
-			else
-				obj.graphicObject.draw(shapeOverlayCtx);
+			obj.graphicObject.draw(shapeOverlayCtx);
 		}
 	}
 
@@ -2250,49 +2241,44 @@ function DrawingObjects() {
 			
 			for (var i = 0; i < _this.countDrawingObjects(); i++) {
 
-					var index = i;
-					var obj = aObjects[i];
+				var index = i;
+				var obj = aObjects[i];
+				
+				if ( !obj.canDraw() )
+					continue;
 					
-					if ( !obj.canDraw() )
-						continue;
-						
-					if ( !obj.flags.anchorUpdated )
-						obj.updateAnchorPosition();
-					
-					// Shape render
-					if ( obj.isGraphicObject() ) {
-						obj.graphicObject.draw(shapeCtx);
-						continue;
+				if ( !obj.flags.anchorUpdated )
+					obj.updateAnchorPosition();
+				
+				// Shape render
+				if ( obj.isGraphicObject() ) {
+					obj.graphicObject.draw(shapeCtx);
+					continue;
+				}
+
+				/*if ( printOptions ) {
+					if ( obj.isChart() ) {
+						srcForPrint = obj.image.src; // base64
+					}
+					else {
+						srcForPrint = obj.imageUrl;
 					}
 
-					/*if ( printOptions ) {
-						if ( obj.isChart() ) {
-							srcForPrint = obj.image.src; // base64
-						}
-						else {
-							srcForPrint = obj.imageUrl;
-						}
+					var marginRight = 0;
+					if (worksheet.getCellLeft(worksheet.getLastVisibleCol(), 0) + worksheet.getColumnWidth(worksheet.getLastVisibleCol()) < obj.getRealLeftOffset() + obj.getVisibleWidth())
+						marginRight = printOptions.margin.right;
 
-						var marginRight = 0;
-						if (worksheet.getCellLeft(worksheet.getLastVisibleCol(), 0) + worksheet.getColumnWidth(worksheet.getLastVisibleCol()) < obj.getRealLeftOffset() + obj.getVisibleWidth())
-							marginRight = printOptions.margin.right;
-
-						printOptions.ctx.drawImage(srcForPrint,
-						// обрезаем
-													pxToPt(obj.getInnerOffsetLeft()), pxToPt(obj.getInnerOffsetTop()),
-													pxToPt(sWidth) - marginRight, pxToPt(sHeight),
-						// вставляем
-													pxToPt(obj.getVisibleLeftOffset(true)) + printOptions.margin.left, pxToPt(obj.getVisibleTopOffset(true)) + printOptions.margin.top,
-													pxToPt(obj.getVisibleWidth()), pxToPt(obj.getVisibleHeight()),
-													pxToPt(obj.image.width), pxToPt(obj.image.height));
-					}*/
-					
-
-					
+					printOptions.ctx.drawImage(srcForPrint,
+					// обрезаем
+												pxToPt(obj.getInnerOffsetLeft()), pxToPt(obj.getInnerOffsetTop()),
+												pxToPt(sWidth) - marginRight, pxToPt(sHeight),
+					// вставляем
+												pxToPt(obj.getVisibleLeftOffset(true)) + printOptions.margin.left, pxToPt(obj.getVisibleTopOffset(true)) + printOptions.margin.top,
+												pxToPt(obj.getVisibleWidth()), pxToPt(obj.getVisibleHeight()),
+												pxToPt(obj.image.width), pxToPt(obj.image.height));
+				}*/
 			}
 		}
-		if ( _this.selectedGraphicObjectsExists() )
-			worksheet.cleanSelection();
 		_this.raiseLayerDrawingObjects();
 		_this.selectGraphicObject();
 	}
@@ -2301,8 +2287,6 @@ function DrawingObjects() {
 		shapeOverlayCtx.put_GlobalAlpha(true, 0.5);
 		shapeOverlayCtx.m_oContext.clearRect(0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix);
 		worksheet._drawSelection();
-		worksheet.cellCommentator.drawCommentCells(false);
-		worksheet.autoFilters.drawAutoF(worksheet);
 		_this.controller.drawTracks(shapeOverlayCtx);
 		shapeOverlayCtx.put_GlobalAlpha(true, 1);
 	}
@@ -2415,9 +2399,6 @@ function DrawingObjects() {
 					
 					obj.setGraphicObjectCoords();
 					obj.setActive();
-					
-					worksheet.autoFilters.drawAutoF(worksheet);
-					worksheet.cellCommentator.drawCommentCells(false);
 					
 					_this.showDrawingObjects(false);
 					_this.selectGraphicObject();
@@ -3169,8 +3150,8 @@ function DrawingObjects() {
 	
 	_this.selectGraphicObject = function() {
 		if ( _this.drawingDocument && _this.controller.selectedObjects.length ) {
-			_this.controller.drawSelection(_this.drawingDocument);
 			
+			// Сначала селект диапазона диаграммы
 			for (var i = 0; i < _this.controller.selectedObjects.length; i++) {
 				var graphicObject = _this.controller.selectedObjects[i];
 				if ( graphicObject.isChart() ) {
@@ -3178,8 +3159,9 @@ function DrawingObjects() {
 				}
 			}
 			
-			_this.drawWorksheetHeaders();
+			_this.controller.drawSelection(_this.drawingDocument);
 		}
+		_this.drawWorksheetHeaders();
 	}
 	
 	_this.setScrollOffset = function(x_px, y_px) {

@@ -755,6 +755,17 @@ DrawingObjectsController.prototype =
 			if ( aObjects[i].graphicObject.isChart() )
 				aObjects[i].graphicObject.recalculate();
 		}
+	},
+	
+	getSelectionState: function()
+	{
+		// TODO
+		return new Object();
+	},
+	
+	setSelectionState: function(state)
+	{
+		var st = state;
 	}
 };
 

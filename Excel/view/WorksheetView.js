@@ -1872,11 +1872,8 @@
 				if (this.overlayCtx) {
 					this._drawSelection();
 				}
-				//draw auto filters
-				this.autoFilters.drawAutoF(this);
 				this.objectRender.showDrawingObjects(false);
-				this.cellCommentator.drawCommentCells(false);
-
+				
 				return this;
 			},
 
@@ -2761,8 +2758,8 @@
 				if (!this.isSelectionDialogMode) {
 					this._drawCollaborativeElements(/*bIsDrawObjects*/true);
 					this._drawSelectionRange(range);
-					this.cellCommentator.drawCommentCells(false);
-				} else {
+				} 
+				else {
 					this._drawSelectionRange(range);
 				}
 			},
@@ -2794,6 +2791,8 @@
 
 				if (!range && !aFHIntersection && !this.isFormulaEditMode && !this.activeMoveRange && !this.isChartAreaEditMode) {
 					this._drawActiveHeaders();
+					this.autoFilters.drawAutoF(this);
+					this.cellCommentator.drawCommentCells(false);
 					return;
 				}
 
@@ -3018,12 +3017,14 @@
 				
 				// restore canvas' original clipping range
 				ctx.restore();
-				if(!this.isChartAreaEditMode){
+				
+				this.autoFilters.drawAutoF(this);
+				this.cellCommentator.drawCommentCells(false);
+				
+				if ( !this.isChartAreaEditMode ){
 					this.objectRender.showDrawingObjectsLocks();
 					this.objectRender.raiseLayerDrawingObjects();
 				}
-				this.cellCommentator.drawCommentCells(false);
-				this.objectRender.selectGraphicObject();
 
 				this._drawActiveHeaders();
 			},
@@ -4812,11 +4813,8 @@
 					if (widthChanged) {this._trigger("reinitializeScrollX");}
 				}
 
-				this.overlayCtx.clear();
 				this._updateHyperlinksCache();
-				this.cellCommentator.drawCommentCells(true);
 				this.cellCommentator.updateCommentPosition();
-				this.autoFilters.drawAutoF(this);
 				this.drawDepCells();
 				this.objectRender.showDrawingObjects(true);
 				return this;
@@ -4867,12 +4865,9 @@
 					this._fixSelectionOfMergedCells();
 					this._drawSelection();
 				}
-				
-				this.overlayCtx.clear();
-				this.cellCommentator.drawCommentCells(true);
+												
 				this.cellCommentator.updateCommentPosition();
 				this._updateHyperlinksCache();
-				this.autoFilters.drawAutoF(this);
 				this.drawDepCells();
 				this.objectRender.showDrawingObjects(true);
 				return this;
@@ -5894,8 +5889,6 @@
 				}
 				else
 					this.drawDepCells();
-					
-				this.cellCommentator.drawCommentCells(false);
 				
 				return ret;
 			},
@@ -8271,8 +8264,9 @@
 				if (isUpdateRows) { t._updateVisibleRowsCount(); }
 
 				if (false === lockDraw) {
-					t.objectRender.showDrawingObjects(true);
 					t.autoFilters.drawAutoF(t);
+					t.cellCommentator.drawCommentCells(false);
+					t.objectRender.showDrawingObjects(true);
 				}
 			},
 
