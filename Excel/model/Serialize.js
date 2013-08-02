@@ -2222,6 +2222,9 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, oDrawings, aDxf
 
 		this.bs.WriteItem(c_oSerWorksheetsTypes.SheetViews, function(){oThis.WriteSheetViews(ws);});
 
+		if (null !== ws.sheetPr)
+			this.bs.WriteItem(c_oSerWorksheetsTypes.SheetPr, function () {oThis.WriteSheetPr(ws.sheetPr);});
+
         this.bs.WriteItem(c_oSerWorksheetsTypes.SheetFormatPr, function(){oThis.WriteSheetFormatPr(ws);});
 		
 		if(null != ws.PagePrintOptions)
@@ -2424,6 +2427,57 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, oDrawings, aDxf
 			this.memory.WriteByte(c_oSer_SheetView.ShowRowColHeaders);
 			this.memory.WriteByte(c_oSerPropLenType.Byte);
 			this.memory.WriteBool(oSheetView.showRowColHeaders);
+		}
+	};
+	this.WriteSheetPr = function (sheetPr) {
+		var oThis = this;
+		if (null !== sheetPr.CodeName) {
+			this.memory.WriteByte(c_oSer_SheetPr.CodeName);
+			this.memory.WriteString2(sheetPr.CodeName);
+		}
+		if (null !== sheetPr.EnableFormatConditionsCalculation) {
+			this.memory.WriteByte(c_oSer_SheetPr.EnableFormatConditionsCalculation);
+			this.memory.WriteByte(c_oSerPropLenType.Byte);
+			this.memory.WriteBool(sheetPr.EnableFormatConditionsCalculation);
+		}
+		if (null !== sheetPr.FilterMode) {
+			this.memory.WriteByte(c_oSer_SheetPr.FilterMode);
+			this.memory.WriteByte(c_oSerPropLenType.Byte);
+			this.memory.WriteBool(sheetPr.FilterMode);
+		}
+		if (null !== sheetPr.Published) {
+			this.memory.WriteByte(c_oSer_SheetPr.Published);
+			this.memory.WriteByte(c_oSerPropLenType.Byte);
+			this.memory.WriteBool(sheetPr.Published);
+		}
+		if (null !== sheetPr.SyncHorizontal) {
+			this.memory.WriteByte(c_oSer_SheetPr.SyncHorizontal);
+			this.memory.WriteByte(c_oSerPropLenType.Byte);
+			this.memory.WriteBool(sheetPr.SyncHorizontal);
+		}
+		if (null !== sheetPr.SyncRef) {
+			this.memory.WriteByte(c_oSer_SheetPr.SyncRef);
+			this.memory.WriteString2(sheetPr.SyncRef);
+		}
+		if (null !== sheetPr.SyncVertical) {
+			this.memory.WriteByte(c_oSer_SheetPr.SyncVertical);
+			this.memory.WriteByte(c_oSerPropLenType.Byte);
+			this.memory.WriteBool(sheetPr.SyncVertical);
+		}
+		if (null !== sheetPr.TransitionEntry) {
+			this.memory.WriteByte(c_oSer_SheetPr.TransitionEntry);
+			this.memory.WriteByte(c_oSerPropLenType.Byte);
+			this.memory.WriteBool(sheetPr.TransitionEntry);
+		}
+		if (null !== sheetPr.TransitionEvaluation) {
+			this.memory.WriteByte(c_oSer_SheetPr.TransitionEvaluation);
+			this.memory.WriteByte(c_oSerPropLenType.Byte);
+			this.memory.WriteBool(sheetPr.TransitionEvaluation);
+		}
+		if (null !== sheetPr.TabColor) {
+			this.memory.WriteByte(c_oSer_SheetPr.TabColor);
+			this.memory.WriteByte(c_oSerPropLenType.Variable);
+			this.bs.WriteItemWithLength(function(){oThis.bs.WriteColorSpreadsheet(sheetPr.TabColor);});
 		}
 	};
     this.WriteSheetFormatPr = function(ws)
