@@ -1232,11 +1232,11 @@
 
 			cutToClipboard: function () {
 				var t = this, ws, v;
-				if (!t.controller.isCellEditMode) {
+				if (!t.controller.isCellEditMode && !window.USER_AGENT_SAFARI_MACOS) {
 					ws = t.getWorksheet();
 					t.clipboard.copyRange(ws.getSelectedRange(), ws);
 					ws.setSelectionInfo("empty", c_oAscCleanOptions.All);
-				} else {
+				} else if(!window.USER_AGENT_SAFARI_MACOS){
 					v = t.cellEditor.cutSelection();
 					if (v) {t.clipboard.copyCellValue(v, t.cellEditor.hasBackground ? t.cellEditor.background : null);}
 				}

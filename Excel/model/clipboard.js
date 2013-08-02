@@ -2556,6 +2556,7 @@ var COPY_ELEMENT_ID = "clipboard-helper";
 var PASTE_ELEMENT_ID = "wrd_pastebin";
 var ELEMENT_DISPAY_STYLE = "none";
 var kElementTextId = "clipboard-helper-text";
+var isNeedEmptyAfterCut = false;
 
 if (window.USER_AGENT_SAFARI_MACOS)
 {
@@ -2577,7 +2578,7 @@ function SafariIntervalFocus()
 		}	
 		else if (pastebin && api.IsFocus)
             pastebin.focus();
-        else
+        else if(!pastebin || !pastebinText)
         {
             // create
             Editor_CopyPaste_Create(api);
@@ -2614,9 +2615,16 @@ function Editor_CopyPaste_Create(api)
 		api.wb.clipboard.copyRange(api.wb.getWorksheet().getSelectedRange(), api.wb.getWorksheet());
     };
 	
-	/*ElemToSelect["onbeforecut"] = function(e){
+	ElemToSelect["onbeforecut"] = function(e){
 		api.wb.clipboard.copyRange(api.wb.getWorksheet().getSelectedRange(), api.wb.getWorksheet());
-    };*/
+		if(isNeedEmptyAfterCut)
+		{
+			isNeedEmptyAfterCut = false;
+			api.wb.getWorksheet().setSelectionInfo("empty", c_oAscCleanOptions.All);
+		}
+		else
+			isNeedEmptyAfterCut = true;		
+    };
 
     document.body.appendChild( ElemToSelect );
 	
@@ -2643,13 +2651,20 @@ function Editor_CopyPaste_Create(api)
 		}	
     };
 	
-	/*elementText["onbeforecut"] = function(e){
-		if((api.wb && api.wb.getWorksheet() && api.wb.getWorksheet().isCellEditMode))
+	elementText["onbeforecut"] = function(e){
+		api.wb.clipboard.copyRange(api.wb.getWorksheet().getSelectedRange(), api.wb.getWorksheet());
+		if(isNeedEmptyAfterCut == true)
 		{
-			v = api.wb.cellEditor.copySelection();
-			if (v) {api.wb.clipboard.copyCellValue(v, api.wb.cellEditor.hasBackground ? api.wb.cellEditor.background : null);}
-		}	
-    };*/
+			isNeedEmptyAfterCut = false;
+			if((api.wb && api.wb.getWorksheet() && api.wb.getWorksheet().isCellEditMode))
+			{
+				v = api.wb.cellEditor.cutSelection();
+				if (v) {api.wb.clipboard.copyCellValue(v, api.wb.cellEditor.hasBackground ? api.wb.cellEditor.background : null);}
+			}	
+		}
+		else
+			isNeedEmptyAfterCut = true;		
+    };
 	
 	/*elementText["onpaste"] = function(e){
 		api.wb.clipboard.pasteAsText();
