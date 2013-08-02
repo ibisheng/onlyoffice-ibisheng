@@ -156,7 +156,7 @@ g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("ru-RU", 0x0419));
 //{ "be-BY", 0x0423 },
 //{ "sl-SI", 0x0424 },
 //{ "et-EE", 0x0425 },
-//{ "lv-LV", 0x0426 },
+g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("lv-LV", 0x0426));
 //{ "lt-LT", 0x0427 },
 //{ "tg-Cyrl-TJ", 0x0428 },
 //{ "fa-IR", 0x0429 },
