@@ -699,15 +699,10 @@ function asc_CCellCommentator(currentSheet) {
 		return (findCol && findRow) ? _this.asc_getComments(findCol.col, findRow.row) : [];
 	}
 
-	_this.drawCommentCells = function(clearOverlay) {
+	_this.drawCommentCells = function() {
 	
 		if ( isViewerMode() )
 			return;
-
-		if (clearOverlay) {
-			//_this.overlayCtx.clear();
-			//_this.worksheet._drawSelection();
-		}
 
 		if (!_this.bShow)
 			return;
@@ -813,7 +808,7 @@ function asc_CCellCommentator(currentSheet) {
 				var commentList = _this.asc_getComments(comment.asc_getCol(), comment.asc_getRow());
 				if (commentList.length) {
 
-					_this.drawCommentCells(true);
+					_this.drawCommentCells();
 					var coords = _this.getCommentsCoords(commentList);
 
 					var indexes = [];
@@ -842,7 +837,6 @@ function asc_CCellCommentator(currentSheet) {
 		
 		function updateCommentsList(aComments) {
 			if ( aComments.length ) {
-				//History.StartTransaction();
 				
 				_this.bSaveHistory = false;
 				for (var i = 0; i < aComments.length; i++) {
@@ -855,9 +849,7 @@ function asc_CCellCommentator(currentSheet) {
 						_this.asc_removeComment(aComments[i].comment.asc_getId());
 				}
 				_this.bSaveHistory = true;
-				
-				//History.EndTransaction();
-				_this.drawCommentCells(false);
+				_this.drawCommentCells();
 			}
 		}	
 		
@@ -1003,7 +995,7 @@ function asc_CCellCommentator(currentSheet) {
 				}
 				
 				History.EndTransaction();
-				_this.drawCommentCells(false);
+				_this.drawCommentCells();
 			}
 		}
 		
@@ -1040,7 +1032,7 @@ function asc_CCellCommentator(currentSheet) {
 					}
 					
 					History.EndTransaction();
-					_this.drawCommentCells(false);
+					_this.drawCommentCells();
 				}
 			}
 			
@@ -1271,13 +1263,13 @@ asc_CCellCommentator.prototype = {
 	asc_showComments: function() {
 		var _this = this;
 		_this.bShow = true;
-		_this.drawCommentCells(true);
+		_this.drawCommentCells();
 	},
 
 	asc_hideComments: function() {
 		var _this = this;
 		_this.bShow = false;
-		_this.drawCommentCells(true);
+		_this.drawCommentCells();
 		_this.worksheet.model.workbook.handlers.trigger("asc_onHideComment");
 	},
 
@@ -1311,7 +1303,7 @@ asc_CCellCommentator.prototype = {
 						_this.worksheet.model.workbook.handlers.trigger("asc_onHideComment");
 					
 					_this.worksheet.model.workbook.handlers.trigger("asc_onShowComment", indexes, coords.asc_getLeftPX(), coords.asc_getTopPX(), coords.asc_getReverseLeftPX());
-					_this.drawCommentCells(true);
+					_this.drawCommentCells();
 				}
 				_this.lastSelectedId = id;
 			}
@@ -1414,7 +1406,7 @@ asc_CCellCommentator.prototype = {
 				History.Add(g_oUndoRedoComment, historyitem_Comment_Add, _this.worksheet.model.getId(), null, new asc_CCommentData(oComment));
 
 				_this.aComments.push(oComment);
-				_this.drawCommentCells(false);
+				_this.drawCommentCells();
 
 				_this.worksheet.model.workbook.handlers.trigger("asc_onAddComment", oComment.asc_getId(), oComment);
 			}
@@ -1475,7 +1467,7 @@ asc_CCellCommentator.prototype = {
 					History.Add(g_oUndoRedoComment, historyitem_Comment_Change, _this.worksheet.model.getId(), null, compositeComment);
 				}
 				
-				_this.drawCommentCells(true);
+				_this.drawCommentCells();
 			}
 		}
 
@@ -1527,7 +1519,7 @@ asc_CCellCommentator.prototype = {
 							}
 						}
 					}
-					_this.drawCommentCells(true);
+					_this.drawCommentCells();
 					_this.worksheet.model.workbook.handlers.trigger("asc_onRemoveComment", id);
 				}
 			}

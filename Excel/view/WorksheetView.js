@@ -2791,8 +2791,7 @@
 
 				if (!range && !aFHIntersection && !this.isFormulaEditMode && !this.activeMoveRange && !this.isChartAreaEditMode) {
 					this._drawActiveHeaders();
-					this.autoFilters.drawAutoF(this);
-					this.cellCommentator.drawCommentCells(false);
+					this._drawGraphic();
 					return;
 				}
 
@@ -3017,9 +3016,7 @@
 				
 				// restore canvas' original clipping range
 				ctx.restore();
-				
-				this.autoFilters.drawAutoF(this);
-				this.cellCommentator.drawCommentCells(false);
+				this._drawGraphic();
 				
 				if ( !this.isChartAreaEditMode ){
 					this.objectRender.showDrawingObjectsLocks();
@@ -3216,6 +3213,11 @@
 				ctx.restore();
 			},
 
+			_drawGraphic: function() {
+				this.autoFilters.drawAutoF(this);
+				this.cellCommentator.drawCommentCells();
+			},
+			
 			cleanSelection: function () {
 				var ctx = this.overlayCtx;
 				var arn = this.activeRange.clone(true);
@@ -5856,6 +5858,8 @@
 				if (isCoord) {
 					var drawingInfo = this.objectRender.checkCursorDrawingObject(x, y);
 					if ( drawingInfo ) {
+						this.overlayCtx.clear();
+						this._drawGraphic();
 						this.objectRender.selectGraphicObject();
 					}
 					else {
@@ -8263,11 +8267,8 @@
 				if (isUpdateCols) { t._updateVisibleColsCount(); }
 				if (isUpdateRows) { t._updateVisibleRowsCount(); }
 
-				if (false === lockDraw) {
-					t.autoFilters.drawAutoF(t);
-					t.cellCommentator.drawCommentCells(false);
+				if (false === lockDraw)
 					t.objectRender.showDrawingObjects(true);
-				}
 			},
 
 			expandColsOnScroll: function (isNotActive, updateColsCount, newColsCount) {

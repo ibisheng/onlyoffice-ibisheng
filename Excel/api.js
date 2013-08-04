@@ -1406,7 +1406,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			
 			_onShowComments: function () {
 				if (this.wb) {
-					this.wb.getWorksheet().cellCommentator.drawCommentCells(false);
+					this.wb.getWorksheet().cellCommentator.drawCommentCells();
 				}
 			},
 

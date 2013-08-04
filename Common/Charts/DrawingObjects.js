@@ -2188,7 +2188,8 @@ function DrawingObjects() {
 		worksheet._drawGrid();
 		worksheet._drawCells();
 		worksheet._drawCellsBorders();
-		worksheet._drawSelection();
+		if ( !_this.selectedGraphicObjectsExists() )
+			worksheet._drawSelection();
 	}
 
 	_this.raiseLayerDrawingObjects = function() {
@@ -2229,14 +2230,14 @@ function DrawingObjects() {
 		*****************************************/
 
 		if ( drawingCtx ) {
-
-			// всё чистим
-			if ( clearCanvas )
-				_this.clearDrawingObjects();
 				
 			if ( !_this.countDrawingObjects() )
 				return;
 			
+			if ( clearCanvas )
+				_this.clearDrawingObjects();
+			
+			worksheet._drawGraphic();
 			worksheet.model.Drawings = aObjects;
 			
 			for (var i = 0; i < _this.countDrawingObjects(); i++) {
@@ -2286,7 +2287,7 @@ function DrawingObjects() {
 	_this.showOverlayGraphicObjects = function() {
 		shapeOverlayCtx.put_GlobalAlpha(true, 0.5);
 		shapeOverlayCtx.m_oContext.clearRect(0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix);
-		worksheet._drawSelection();
+		worksheet._drawGraphic();
 		_this.controller.drawTracks(shapeOverlayCtx);
 		shapeOverlayCtx.put_GlobalAlpha(true, 1);
 	}
@@ -3161,6 +3162,7 @@ function DrawingObjects() {
 				}
 			}
 			
+			_this.raiseLayerDrawingObjects();
 			_this.controller.drawSelection(_this.drawingDocument);
 		}
 		_this.drawWorksheetHeaders();
