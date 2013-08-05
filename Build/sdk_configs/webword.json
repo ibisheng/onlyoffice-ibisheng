@@ -10,7 +10,8 @@
     "concat_api": {
         "../Word/api-all.js": [
             "../Word/api.js",
-            "../Word/apiCommon.js"
+            "../Word/apiCommon.js",
+			"../Common/apiCommon.js"
         ]
     },
     "extract_api": {
@@ -201,7 +202,8 @@
                 "files": {
                     "<%= pkg.menu_path %>/Common/": [
                         "../Common/docscoapisettings.js",
-                        "../Common/commonDefines.js"
+                        "../Common/commonDefines.js",
+						"../Common/apiCommon.js"
                     ]
                 }
             },
