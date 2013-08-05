@@ -5730,7 +5730,7 @@ function BinaryPPTYLoader()
                         History.TurnOff();
                     }
                     if(!txbody.content)
-                    txbody.content = new CDocumentContent(shape, this.presentation.DrawingDocument, 0, 0, 0, 0, 0, 0);
+                    txbody.content = new CDocumentContent(shape, this.presentation ? this.presentation.DrawingDocument : null, 0, 0, 0, 0, 0, 0);
                     if(_c>0)
                     {
                         txbody.content.Content.length = 0;
@@ -5872,6 +5872,8 @@ function BinaryPPTYLoader()
                     var endRunPr =  this.ReadRunProperties();
                     var _value_text_pr = new CTextPr();
                     _value_text_pr.Set_FromObject(endRunPr);
+                    if(typeof par.setTextPr === "function")
+                        par.setTextPr(new ParaTextPr());
                     par.TextPr.Value = _value_text_pr;//endRunProperties
                     break;
                 }

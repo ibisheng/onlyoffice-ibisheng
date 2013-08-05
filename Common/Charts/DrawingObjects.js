@@ -1994,6 +1994,7 @@ function DrawingObjects() {
 
         var drDoc = this.drawingDocument;
 
+        this.drawingDocument.Overlay = overlay;
        /* if (drDoc.m_bIsSearching)
         {
             ctx.fillStyle = "rgba(255,200,0,1)";
@@ -2060,6 +2061,9 @@ function DrawingObjects() {
             }
         }   */
 
+
+        shapeOverlayCtx.m_oContext.clearRect(0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix);
+
         if (null == drDoc.m_oDocumentRenderer)
         {
             if (drDoc.m_bIsSelection)
@@ -2073,11 +2077,8 @@ function DrawingObjects() {
                         overlay.m_oContext = overlay.m_oControl.HtmlElement.getContext('2d');
                 }
                 drDoc.private_StartDrawSelection(overlay);
-
-
                 this.controller.drawTextSelection();
                 drDoc.private_EndDrawSelection();
-
             }
 
             ctx.globalAlpha = 1.0;
@@ -2086,9 +2087,12 @@ function DrawingObjects() {
             if (_this.controller.needUpdateOverlay())
             {
                 overlay.Show();
-                this.drawingDocument.AutoShapesTrack.PageIndex = -1;
-                this.controller.drawTracks(this.m_oDrawingDocument.AutoShapesTrack);
-                this.drawingDocument.AutoShapesTrack.CorrectOverlayBounds();
+               // this.drawingDocument.AutoShapesTrack.PageIndex = -1;
+
+                shapeOverlayCtx.put_GlobalAlpha(true, 0.5);
+                _this.controller.drawTracks(shapeOverlayCtx);
+                shapeOverlayCtx.put_GlobalAlpha(true, 1);
+                //autoShapeTrack.CorrectOverlayBounds();
             }
 
         }
@@ -2100,7 +2104,7 @@ function DrawingObjects() {
             for (var i = drDoc.m_lDrawingFirst; i <= drDoc.m_lDrawingEnd; i++)
             {
                 var drawPage = drDoc.m_arrPages[i].drawingPage;
-                drDoc.m_oDocumentRenderer.DrawSelection(i, overlay, drawPage.left, drawPage.top, drawPage.right - drawPage.left, drawPage.bottom - drawPage.top);
+                drDoc.m_oDocumentRenderer.DrawSelection(i, overlay, drawPage.left /*+ scrollOffset.x*/, drawPage.top/* + scrollOffset.y*/, drawPage.right - drawPage.left, drawPage.bottom - drawPage.top);
             }
 
             ctx.globalAlpha = 0.2;
@@ -2309,7 +2313,6 @@ function DrawingObjects() {
 			if (aObjects[i].to.row >= metrics.maxRow)
 				metrics.maxRow = aObjects[i].to.row + 1; // учитываем rowOff
 		}
-
 		return metrics;
 	}
 
@@ -3025,15 +3028,25 @@ function DrawingObjects() {
 	// Graphic object
 	//-----------------------------------------------------------------------------------
 	
-	_this.addGraphicObject = function(graphic) {
+	_this.addGraphicObject = function(graphic, position) {
 		
 		var obj = _this.createDrawingObject();
 		obj.graphicObject = graphic;
         graphic.setDrawingBase(obj);
 				
-		obj.graphicObject.select(_this.controller);
-		aObjects.push(obj);
-		
+		//obj.graphicObject.select(_this.controller);
+        var ret;
+        if(isRealNumber(position))
+        {
+            aObjects.splice(position, 0, obj);
+            ret = position;
+        }
+        else
+        {
+            ret = aObjects.length;
+            aObjects.push(obj);
+        }
+
 		obj.setGraphicObjectCoords();
 		obj.setActive();
 		
@@ -3043,13 +3056,14 @@ function DrawingObjects() {
 		
 		worksheet.model.workbook.handlers.trigger("asc_onEndAddShape");
 		_this.lockDrawingObject(obj.id, true, true);
+        return ret;
 	}
 	
 	_this.groupGraphicObjects = function() {
 	
 		if ( _this.controller.canGroup() ) {
-			
-			var obj = _this.createDrawingObject();
+            _this.controller.createGroup(null);
+			/*var obj = _this.createDrawingObject();
 			var group = _this.controller.createGroup(obj);
 			if ( group ) {
 				obj.graphicObject = group;
@@ -3057,7 +3071,7 @@ function DrawingObjects() {
 				aObjects.push(obj);
 				_this.showDrawingObjects(false);
                 _this.selectGraphicObject();
-			}
+			} */
 		}
 	}
 	
@@ -3105,10 +3119,11 @@ function DrawingObjects() {
 		for (var i = 0; i < _this.countDrawingObjects(); i++) {
 			if ( aObjects[i].graphicObject.Id == graphicId ) {
 				aObjects.splice(i, 1);
-				break;
+                return i;
 			}
 		}
-	}
+        return null;
+	};
 	
 	_this.checkGraphicObjectPosition = function(x, y, w, h) {
 	
@@ -3163,8 +3178,9 @@ function DrawingObjects() {
 			}
 			
 			_this.raiseLayerDrawingObjects();
-			_this.controller.drawSelection(_this.drawingDocument);
-		}
+			//_this.controller.drawSelection(_this.drawingDocument);
+            _this.OnUpdateOverlay();
+        }
 		_this.drawWorksheetHeaders();
 	}
 	
@@ -3174,7 +3190,7 @@ function DrawingObjects() {
 		
 			scrollOffset.x -= x_px;
 			scrollOffset.y -= y_px;
-			
+
 			shapeCtx.m_oCoordTransform.tx -= x_px;
 			shapeCtx.m_oCoordTransform.ty -= y_px;
 			shapeCtx.CalculateFullTransform();
@@ -3646,7 +3662,7 @@ function DrawingObjects() {
 				undoRedoLayer.aLayerAfter[i] = aObjects[i].graphicObject.Id;
 			}
 			
-			History.Create_NewPoint();
+			///History.Create_NewPoint();
 			History.Add(g_oUndoRedoDrawingLayer, historyitem_DrawingLayer, worksheet.model.getId(), null, undoRedoLayer);
 			
 			_this.showDrawingObjects(true);

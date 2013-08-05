@@ -1606,11 +1606,13 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 		}
 		else if ( c_oSer_ChartCatAxType.TxPrPptx === type )
 		{
-			var oPresentationSimpleSerializer = new PresentationSimpleSerializer();
+			/*var oPresentationSimpleSerializer = new PresentationSimpleSerializer();
 			var textBody = oPresentationSimpleSerializer.ReadTextBody(this.stream);
 			var params = this.ParsePptxParagraph(textBody);
 			if(null != params.font)
-				oAx.lablefont = params.font;
+				oAx.lablefont = params.font;               */
+            var oPresentationSimpleSerializer = new CPPTXContentLoader();
+            var textBody = oPresentationSimpleSerializer.ReadTextBody(null, this.stream,  oAx.chartTitle);
 		}
 		else
             res = c_oSerConstants.ReadUnknown;
