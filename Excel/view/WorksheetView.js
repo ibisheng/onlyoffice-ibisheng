@@ -4996,8 +4996,8 @@
 					if (false !== isLocked) {
 						// Кто-то сделал lock
 						userId = isLocked.UserId;
-						lockRangePosLeft = drawingInfo.data.getVisibleLeftOffset(/*withHeader*/true);
-						lockRangePosTop = drawingInfo.data.getVisibleTopOffset(/*withHeader*/true);
+						lockRangePosLeft =0;// drawingInfo.data.getVisibleLeftOffset(/*withHeader*/true);
+						lockRangePosTop = 0;//drawingInfo.data.getVisibleTopOffset(/*withHeader*/true);
 					}
 
 					return {cursor: drawingInfo.cursor, target: "shape", drawingId: drawingInfo.data, col: -1, row: -1, userId: userId, lockRangePosLeft: lockRangePosLeft, lockRangePosTop: lockRangePosTop};

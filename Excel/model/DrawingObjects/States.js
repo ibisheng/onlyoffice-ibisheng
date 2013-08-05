@@ -2901,12 +2901,44 @@ function MoveInGroupState(drawingObjectsController, drawingObjects, group, start
 
     this.onMouseUp = function(e, x, y)
     {
-        this.drawingObjectsController.trackEnd();
-        this.group.normalize();
-        this.group.updateCoordinatesAfterInternalResize();
-        this.group.recalculateTransform();
+
+        var worksheet = this.drawingObjects.getWorksheet();
+        worksheet.collaborativeEditing.onStartCheckLock();
+        this.drawingObjects.lockDrawingObject(this.group.Get_Id(), true, true);
+        var track_objects2 = [];
+        for(var i = 0; i < this.drawingObjectsController.arrTrackObjects.length; ++i)
+        {
+            track_objects2.push(this.drawingObjectsController.arrTrackObjects[i]);
+        }
+
+        var drawingObjects = this.drawingObjects;
+        var group = this.group;
+        var callback = function(bLock)
+        {
+            if(bLock)
+            {
+                History.Create_NewPoint();
+                History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateUndo, null, null,
+                    new UndoRedoDataGraphicObjects(group.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+                for(var i = 0; i < track_objects2.length; ++i)
+                    track_objects2[i].trackEnd();
+                group.normalize();
+                group.updateCoordinatesAfterInternalResize();
+                History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateRedo, null, null,
+                    new UndoRedoDataGraphicObjects(group.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+                group.recalculateTransform();
+                drawingObjects.showDrawingObjects(true);
+
+            }
+        };
+
+        worksheet.collaborativeEditing.onEndCheckLock(callback);
+        //this.drawingObjectsController.trackEnd();
+       // this.group.normalize();
+       // this.group.updateCoordinatesAfterInternalResize();
+        //this.group.recalculateTransform();
         this.drawingObjectsController.clearTrackObjects();
-        this.drawingObjects.showDrawingObjects(true);
+        //this.drawingObjects.showDrawingObjects(true);
         this.drawingObjects.OnUpdateOverlay();
         this.drawingObjectsController.changeCurrentState(new GroupState(this.drawingObjectsController, this.drawingObjects, this.group));
 
@@ -2995,7 +3027,30 @@ function ChangeAdjInGroupState(drawingObjectsController, drawingObjects, group)
     {
 
 
-        this.drawingObjectsController.trackEnd();
+        var worksheet = this.drawingObjects.getWorksheet();
+        worksheet.collaborativeEditing.onStartCheckLock();
+        this.drawingObjects.lockDrawingObject(this.group.Get_Id(), true, true);
+        var track_objects2 = [];
+        for(var i = 0; i < this.drawingObjectsController.arrTrackObjects.length; ++i)
+        {
+            track_objects2.push(this.drawingObjectsController.arrTrackObjects[i]);
+        }
+
+        var drawingObjects = this.drawingObjects;
+        var group = this.group;
+        var callback = function(bLock)
+        {
+            if(bLock)
+            {
+                History.Create_NewPoint();
+                for(var i = 0; i < track_objects2.length; ++i)
+                    track_objects2[i].trackEnd();
+                group.recalculateTransform();
+                drawingObjects.showDrawingObjects(true);
+            }
+        };
+        worksheet.collaborativeEditing.onEndCheckLock(callback);
+
         this.drawingObjectsController.clearTrackObjects();
         this.drawingObjects.OnUpdateOverlay();
         this.drawingObjectsController.changeCurrentState(new GroupState(this.drawingObjectsController, this.drawingObjects, this.group));
@@ -3081,13 +3136,48 @@ function RotateInGroupState(drawingObjectsController, drawingObjects, group, maj
 
     this.onMouseUp = function(e, x, y)
     {
-        this.drawingObjectsController.trackEnd();
-        this.group.normalize();
-        this.group.updateCoordinatesAfterInternalResize();
-        this.group.recalculateTransform();
+
+        var worksheet = this.drawingObjects.getWorksheet();
+        worksheet.collaborativeEditing.onStartCheckLock();
+        this.drawingObjects.lockDrawingObject(this.group.Get_Id(), true, true);
+        var track_objects2 = [];
+        for(var i = 0; i < this.drawingObjectsController.arrTrackObjects.length; ++i)
+        {
+            track_objects2.push(this.drawingObjectsController.arrTrackObjects[i]);
+        }
+
+        var drawingObjects = this.drawingObjects;
+        var group = this.group;
+        var callback = function(bLock)
+        {
+            if(bLock)
+            {
+                History.Create_NewPoint();
+                History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateUndo, null, null,
+                    new UndoRedoDataGraphicObjects(group.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+                for(var i = 0; i < track_objects2.length; ++i)
+                    track_objects2[i].trackEnd();
+                group.normalize();
+                group.updateCoordinatesAfterInternalResize();
+                History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateRedo, null, null,
+                    new UndoRedoDataGraphicObjects(group.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+                group.recalculateTransform();
+                drawingObjects.showDrawingObjects(true);
+
+            }
+        };
+
+        worksheet.collaborativeEditing.onEndCheckLock(callback);
+        //this.drawingObjectsController.trackEnd();
+        // this.group.normalize();
+        // this.group.updateCoordinatesAfterInternalResize();
+        //this.group.recalculateTransform();
         this.drawingObjectsController.clearTrackObjects();
+        //this.drawingObjects.showDrawingObjects(true);
         this.drawingObjects.OnUpdateOverlay();
         this.drawingObjectsController.changeCurrentState(new GroupState(this.drawingObjectsController, this.drawingObjects, this.group));
+
+
     };
 
     this.onKeyDown = function(e)
@@ -3174,10 +3264,35 @@ function ResizeInGroupState(drawingObjectsController, drawingObjects, group, maj
 
     this.onMouseUp = function(e, x, y)
     {
-        this.drawingObjectsController.trackEnd();
-        this.group.normalize();
-        this.group.updateCoordinatesAfterInternalResize();
-        this.group.recalculateTransform();
+        var worksheet = this.drawingObjects.getWorksheet();
+        worksheet.collaborativeEditing.onStartCheckLock();
+        this.drawingObjects.lockDrawingObject(this.group.Get_Id(), true, true);
+        var track_objects2 = [];
+        for(var i = 0; i < this.drawingObjectsController.arrTrackObjects.length; ++i)
+        {
+            track_objects2.push(this.drawingObjectsController.arrTrackObjects[i]);
+        }
+        var drawingObjects = this.drawingObjects;
+        var group = this.group;
+        var callback = function(bLock)
+        {
+            if(bLock)
+            {
+                History.Create_NewPoint();
+                History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateUndo, null, null,
+                    new UndoRedoDataGraphicObjects(group.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+                for(var i = 0; i < track_objects2.length; ++i)
+                    track_objects2[i].trackEnd();
+                group.normalize();
+                group.updateCoordinatesAfterInternalResize();
+                History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateRedo, null, null,
+                    new UndoRedoDataGraphicObjects(group.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+                group.recalculateTransform();
+                drawingObjects.showDrawingObjects(true);
+            }
+        };
+
+        worksheet.collaborativeEditing.onEndCheckLock(callback);
         this.drawingObjectsController.clearTrackObjects();
         this.drawingObjects.OnUpdateOverlay();
         this.drawingObjectsController.changeCurrentState(new GroupState(this.drawingObjectsController, this.drawingObjects, this.group));

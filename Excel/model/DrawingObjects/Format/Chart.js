@@ -1344,7 +1344,14 @@ CChartAsGroup.prototype =
         this.chart = chart;
     },
 
-
+    deleteDrawingBase: function()
+    {
+        var position = this.drawingObjects.deleteDrawingBase(this.Get_Id());
+        if(isRealNumber(position))
+        {
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_DeleteDrawingBase, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(position, null)), null);
+        }
+    },
 
     initFromChartObject: function(chart, bWithoutHistory, options)
     {
