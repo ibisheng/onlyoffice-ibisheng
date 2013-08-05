@@ -93,7 +93,7 @@ tt_face_free_name:$m
 JSCompiler_StaticMethods_Update_TableMarkupFromRuler:jA
 CreateAscColor:jM
 historyitem_Table_RemoveRow:dB
-check_table_dir:Sm
+check_table_dir:Nm
 FT_ENCODING_UNICODE:Fv
 JSCompiler_StaticMethods_Set_Underline:sy
 g_fontManager:lI
@@ -1249,7 +1249,7 @@ pin:HG
 JSCompiler_StaticMethods_AddEllipse:RH
 JSCompiler_StaticMethods_AddLineDash:NH
 JSCompiler_StaticMethods_private_FillGlyph:LH
-cff_parse_real:bt
+cff_parse_real:Ns
 JSCompiler_StaticMethods__drawArrow:LC
 FT_CFF_SERVICE_PS_NAME_GET:iu
 TT_CMap13Rec:bo
@@ -1437,10 +1437,10 @@ JSCompiler_StaticMethods__BordersToStyle:ub
 FONT_TYPE_ADDITIONAL_CUT:ow
 CAscSlideProps:pM
 L 118:Lz
-L 119:at
-L 116:Rm
+L 119:bt
+L 116:Sm
 ParaNewLine:Jc
-L 117:pp
+L 117:qp
 L 114:Xk
 L 115:Kz
 TT_GaspRange:uj
@@ -1500,7 +1500,7 @@ JSCompiler_StaticMethods_Internal_RecalculateGrid:CA
 plusDiv:zG
 L 105:Iz
 CAscFill:nM
-L 106:Qm
+L 106:Rm
 L 107:Ve
 L 108:Cj
 L 109:Wk
@@ -1779,7 +1779,7 @@ L 23:T
 L 22:Z
 L 25:ea
 L 24:ka
-L 50:Rs
+L 50:Ss
 tt_find_sbit_image:wn
 tt_size_reset:us
 _strcmp_data:bi
@@ -1798,14 +1798,14 @@ L 59:Sk
 L 58:Rk
 L 57:aK
 L 56:$J
-L 55:Vs
+L 55:Ws
 TT_Round_Super_45:Qp
-L 54:Us
+L 54:Vs
 tt_cmap10_char_index:Un
 ps_parser_skip_spaces:Wl
 L 53:ZJ
-L 52:Ts
-L 51:Ss
+L 52:Us
+L 51:Ts
 FT_TT_SERVICES_GET:es
 g_fonts_streams:Uv
 CDocumentRenderer:pz
@@ -1823,14 +1823,14 @@ nSldLtTClipArtAndVertTx:MJ
 GX_BlendRec:Fr
 c_oAscAsyncAction$LoadTheme:Kw
 CSrcRect:Bf
-L 49:Qs
+L 49:Rs
 L 48:YJ
 CControl:Tz
 JSCompiler_StaticMethods_getVerticalAlign:QE
-L 45:mp
+L 45:np
 tt_face_free_hdmx_stub:Do
-L 44:Os
-L 47:Ps
+L 44:Ps
+L 47:Qs
 L 46:XJ
 L 41:WJ
 TT_Post_NamesRec:Hj
@@ -1838,9 +1838,9 @@ ft_bitmap_glyph_init:ui
 L 40:VJ
 JSCompiler_StaticMethods__read_rPr:Bd
 Get_Kerning:ev
-L 43:Ns
+L 43:Os
 HSLToRGB:XG
-L 42:Nm
+L 42:Om
 changestype_Paragraph_Content:qx
 ft_outline_glyph_done:Di
 JSCompiler_StaticMethods_Set_FontSize:uy
@@ -2015,11 +2015,11 @@ L 62:yj
 BULLET_TYPE_TYPEFACE_BUFONT:xg
 CUniFill:pf
 L 63:zj
-L 68:np
-L 69:op
+L 68:op
+L 69:pp
 L 66:Tk
 Ins_MSIRP:cr
-L 67:Om
+L 67:Pm
 JSCompiler_StaticMethods_getSrc:Ba
 CMouseMoveData:Ry
 g_NumberingArr:jE
@@ -2027,12 +2027,12 @@ phType_title:kE
 JSCompiler_StaticMethods_Internal_Get_TableMinWidth:HB
 tt_sfnt_id_rec:ys
 tt_face_load_name:Zm
-L 61:Ws
+L 61:Xs
 L 60:Wa
 L 99:Fz
-L 95:Zs
+L 95:$s
 L 96:Ez
-L 97:$s
+L 97:at
 JSCompiler_StaticMethods_Set_TableBorder_Top:td
 L 98:iK
 CFF_Driver:pu
@@ -2061,9 +2061,9 @@ L 89:eK
 L 86:dK
 JSCompiler_StaticMethods_Set_Inline:PB
 L 87:mh
-L 84:Ys
+L 84:Zs
 L 85:cK
-FT_Glyph_Class:qp
+FT_Glyph_Class:mp
 tt_size_run_prep:kq
 tt_size_request:ss
 JSCompiler_StaticMethods_Numbering_Remove:Zd
@@ -2075,9 +2075,9 @@ numbering_numfmt_UpperLetter:ab
 JSCompiler_StaticMethods_Create_Table_BorderedAndLined:Mx
 ScrollArrowType$ARROW_LEFT:yC
 L 83:lh
-L 82:Pm
+L 82:Qm
 L 81:bK
-L 80:Xs
+L 80:Ys
 tt_cmap2_get_subheader:Fn
 JSCompiler_StaticMethods_Cursor_IsEnd:LD
 historyitem_Table_Inline:bB
