@@ -351,6 +351,14 @@ var UndoRedoDataTypes = new function() {
     this.GOPathClose = 61;
     this.GOSetAdjustmentValue = 62;
 	this.AddFormatTableOptions = 63;
+  	this.DocContentAddItem = 64;
+    this.DocContentRemoveItems = 65;
+    this.DocContentParaItemId = 66;
+    this.ParagraphAddParaItem = 67;
+    this.ParagraphParaItemAdd = 68;
+
+
+
 
 
     this.Create = function(nType)
@@ -402,6 +410,8 @@ var UndoRedoDataTypes = new function() {
 			case this.ChartFont: return new asc_CChartFont(); break;
 			case this.SheetViewSettings: return new Asc.asc_CSheetViewSettings(); break;
             case this.GraphicObjects: return new UndoRedoDataGraphicObjects();break;
+            case this.GlobalTableIdAdd: return new UndoRedoData_GTableIdAdd(); break;
+
             case this.GOPairProps: return new UndoRedoDataGOPairProps(); break;
             case this.GOSingleProp: return new UndoRedoDataGOSingleProp(); break;
             case this.GOShapeRecalcTransform: return new UndoRedoDataShapeRecalc(); break;
@@ -419,7 +429,8 @@ var UndoRedoDataTypes = new function() {
             case this.GOPathCubicBezTo: return new UndoRedoDataCubicBezTo(); break;
             case this.GOPathClose: return new UndoRedoDataClosePath(); break;
             case this.GOSetAdjustmentValue: return new UndoRedoDataSetAdjustmentValue();
-
+            case this.ParagraphAddParaItem: return new UndoRedoDataAddParaItem();
+            case this.ParagraphParaItemAdd: return new UndoRedoData_historyitem_Paragraph_AddItem();
         }
 		return null;
 	};
@@ -957,7 +968,7 @@ function UndoRedoData_GTableIdAdd(object, id)
         id: 1
     };
 
-    if(typeof object.getObjectType === "function" )
+    if( isRealObject(object) && typeof object.getObjectType === "function" )
     this.objectType = object.getObjectType();
     this.id = id;
 }
@@ -1007,7 +1018,426 @@ UndoRedoData_GTableIdAdd.prototype =
 };
 
 
-    function UndoRedoData_SheetAdd(insertBefore, name, sheetidfrom, sheetid){
+function UndoRedoData_historyitem_Paragraph_AddItem(startPos, endPos, itemsIds)
+{
+    this.Properties =
+    {
+        startPos: 0,
+        endPos: 1,
+        itemsIds: 2
+    };
+
+    this.startPos = startPos;
+    this.endPos = endPos;
+    this.itemsIds = itemsIds;
+}
+UndoRedoData_historyitem_Paragraph_AddItem.prototype =
+{
+    getType: function()
+    {
+        return UndoRedoDataTypes.ParagraphParaItemAdd;
+    },
+
+    getProperties: function()
+    {
+        return this.Properties;
+    },
+
+    getProperty: function(nType)
+    {
+        switch (nType)
+        {
+            case this.Properties.startPos:
+            {
+                return this.startPos;
+            }
+            case this.Properties.endPos:
+            {
+                return this.endPos;
+            }
+            case this.Properties.itemsIds:
+            {
+                return this.itemsIds;
+            }
+        }
+    },
+
+    setProperty: function(nType, value)
+    {
+        switch (nType)
+        {
+            case this.Properties.startPos:
+            {
+                this.startPos = value;
+                break;
+            }
+            case this.Properties.endPos:
+            {
+                this.endPos = value;
+                break;
+            }
+            case this.Properties.itemsIds:
+            {
+                this.itemsIds = value;
+            }
+        }
+    }
+};
+
+function UndoRedoDataDocContentAddItem(pos, objectId)
+{
+    this.Properties =
+    {
+        pos: 0,
+        objectId: 1
+    };
+    this.pos = pos;
+    this.objectId = objectId;
+}
+
+UndoRedoDataDocContentAddItem.prototype =
+{
+    getType: function()
+    {
+        return UndoRedoDataTypes.DocContentAddItem;
+    },
+
+    getProperties: function()
+    {
+        return this.Properties;
+    },
+
+    getProperty: function(nType)
+    {
+        switch(nType)
+        {
+            case this.Properties.pos:
+            {
+                return this.pos;
+            }
+            case this.Properties.objectId:
+            {
+                return this.objectId;
+            }
+        }
+    },
+
+    setProperty: function(nType, value)
+    {
+        switch (nType)
+        {
+            case this.Properties.pos:
+            {
+                this.pos = value;
+                break;
+            }
+            case this.Properties.objectId:
+            {
+                this.objectId = value;
+                break;
+            }
+        }
+    }
+};
+
+
+function UndoRedoDataTypeParaItemId(itemId)
+{
+    this.Properties =
+    {
+        itemId: 0
+    };
+    this.itemId = itemId;
+}
+
+UndoRedoDataTypeParaItemId.prototype =
+{
+    getType: function()
+    {
+        return UndoRedoDataTypes.DocContentParaItemId;
+    },
+
+    getProperties: function()
+    {
+        return this.Properties;
+    },
+
+    getProperty: function(nType)
+    {
+        switch(nType)
+        {
+            case this.Properties.itemId:
+            {
+                return this.itemId;
+            }
+
+        }
+    },
+
+    setProperty: function(nType, value)
+    {
+        switch (nType)
+        {
+            case this.Properties.itemId:
+            {
+                this.itemId = value;
+                break;
+            }
+        }
+    }
+};
+
+
+
+function UndoRedoDataAddParaItem(type, value)
+{
+    this.Properties =
+    {
+        type: 0, value : 1
+    };
+    this.type = type;
+    this.value = value;
+}
+
+UndoRedoDataAddParaItem.prototype =
+{
+    getType: function()
+    {
+        return UndoRedoDataTypes.ParagraphAddParaItem;
+    },
+
+    getProperties: function()
+    {
+        return this.Properties;
+    },
+
+    getProperty: function(nType)
+    {
+        switch(nType)
+        {
+            case this.Properties.type:
+            {
+                return this.type;
+            }
+            case this.Properties.value:
+            {
+                return this.value;
+            }
+        }
+    },
+
+    setProperty: function(nType, value)
+    {
+        switch (nType)
+        {
+            case this.Properties.type:
+            {
+                this.type = value;
+                break;
+            }
+            case this.Properties.value:
+            {
+                this.value = value;
+                break;
+            }
+        }
+    }
+};
+
+function UndoRedoDataDocContentRemoveItems(pos, aItems)
+{
+    this.Properties =
+    {
+        pos: 0,
+        aItems: 1
+    };
+    this.pos = pos;
+    this.aItems = aItems;
+}
+
+UndoRedoDataDocContentRemoveItems.prototype =
+{
+    getType: function()
+    {
+        return UndoRedoDataTypes.DocContentRemoveItems;
+    },
+
+    getProperties: function()
+    {
+        return this.Properties;
+    },
+
+    getProperty: function(nType)
+    {
+        switch(nType)
+        {
+            case this.Properties.pos:
+            {
+                return this.pos;
+            }
+            case this.Properties.aItems:
+            {
+                return this.aItems;
+            }
+        }
+    },
+
+    setProperty: function(nType, value)
+    {
+        switch (nType)
+        {
+            case this.Properties.pos:
+            {
+                this.pos = value;
+                break;
+            }
+            case this.Properties.aItems:
+            {
+                this.aItems = value;
+                break;
+            }
+        }
+    }
+};
+
+function UndoRedoDataParaPr(paraPr)
+{
+    this.Properties =
+    {
+        ContextualSpacing : 0,
+        IndLeft      : 1, // Левый отступ
+        IndRight     : 2, // Правый отступ
+        IndFirstLine : 3, // Первая строка// Удалять ли интервал между параграфами одинакового стиля
+        Jc                : 4,          // Прилегание параграфа
+        KeepLines         : 5,          // Неразрывный параграф
+        KeepNext          : 6,          // Не разъединять со следующим параграфом
+        PageBreakBefore   : 7,          // Разрыв страницы перед параграфом
+        SpacingLine              : 8, // Расстояние между строками внутри абзаца
+        SpacingLineRule          : 9, // Тип расстрояния между строками
+        SpacingBefore            : 10, // Дополнительное расстояние до абзаца
+        SpacingBeforeAutoSpacing : 11, // Использовать ли автоматический расчет расстояния до параграфа
+        SpacingAfter             : 12, // Дополнительное расстояние после абзаца
+        SpacingAfterAutoSpacing  : 13, // Использовать ли автоматический расчет расстояния после параграфа
+        Shd               : 14,          // Заливка параграфа
+        BrdFirst   : 15,            // Является ли данный параграф первым в группе параграфов с одинаковыми краями и настройками границ
+        BrdLast    : 16,            // Является ли данный параграф последним в группе параграфов с одинаковыми краями и настройками границ
+        BrdBetween : 17,
+        BrdBottom  : 18,
+        BrdLeft    : 19,
+        BrdRight   : 20,
+        BrdTop     : 21,
+        WidowControl      : 22, // Запрет висячих строк
+        Tabs              : 23, // Заданные табы
+        NumPr             : 24, // Нумерация
+        PStyle            : 25 // Стиль параграфа
+    };
+
+    this.ContextualSpacing = paraPr.ContextualSpacing;
+    this.IndLeft      = paraPr.Ind.Left     ; // Левый отступ
+    this.IndRight     = paraPr.Ind.Right    ; // Правый отступ
+    this.IndFirstLine = paraPr.Ind.FirstLine; // Первая строка// Удалять ли интервал между параграфами одинакового стиля
+    this.Jc                = paraPr.Jc;          // Прилегание параграфа
+    this.KeepLines         = paraPr.KeepLines;          // Неразрывный параграф
+    this.KeepNext          = paraPr.KeepNext;          // Не разъединять со следующим параграфом
+    this.PageBreakBefore   = paraPr.PageBreakBefore;          // Разрыв страницы перед параграфом
+    this.SpacingLine              = paraPr.Spacing.Line             ; // Расстояние между строками внутри абзаца
+    this.SpacingLineRule          = paraPr.Spacing.LineRule         ; // Тип расстрояния между строками
+    this.SpacingBefore            = paraPr.Spacing.Before           ; // Дополнительное расстояние до абзаца
+    this.SpacingBeforeAutoSpacing = paraPr.Spacing.BeforeAutoSpacing; // Использовать ли автоматический расчет расстояния до параграфа
+    this.SpacingAfter             = paraPr.Spacing.After            ; // Дополнительное расстояние после абзаца
+    this.SpacingAfterAutoSpacing  = paraPr.Spacing.AfterAutoSpacing ; // Использовать ли автоматический расчет расстояния после параграфа
+    this.Shd               = paraPr.Shd;          // Заливка параграфа
+    this.BrdFirst   = paraPr.BrdFirst  ;            // Является ли данный параграф первым в группе параграфов с одинаковыми краями и настройками границ
+    this.BrdLast    = paraPr.BrdLast   ;            // Является ли данный параграф последним в группе параграфов с одинаковыми краями и настройками границ
+    this.BrdBetween = paraPr.BrdBetween;
+    this.BrdBottom  = paraPr.BrdBottom ;
+    this.BrdLeft    = paraPr.BrdLeft   ;
+    this.BrdRight   = paraPr.BrdRight  ;
+    this.BrdTop     = paraPr.BrdTop    ;
+    this.WidowControl      = paraPr.WidowControl; // Запрет висячих строк
+    this.Tabs              = paraPr.Tabs        ; // Заданные табы
+    this.NumPr             = paraPr.NumPr       ; // Нумерация
+    this.PStyle            = paraPr.PStyle      ;// Стиль параграфа
+
+}
+
+UndoRedoDataParaPr.prototype = {
+    getType : function()
+    {
+        return UndoRedoDataTypes.SheetPositions;
+    },
+    getProperties : function()
+    {
+        return this.Properties;
+    },
+    getProperty : function(nType)
+    {
+        switch(nType)
+        {
+               case this.Properties.ContextualSpacing       : return   this.ContextualSpacing       ;
+               case this.Properties.IndLeft                 : return   this.IndLeft                 ;
+               case this.Properties.IndRight                : return   this.IndRight                ;
+               case this.Properties.IndFirstLine            : return   this.IndFirstLine            ;
+               case this.Properties.Jc                      : return   this.Jc                      ;
+               case this.Properties.KeepLines               : return   this.KeepLines               ;
+               case this.Properties.KeepNext                : return   this.KeepNext                ;
+               case this.Properties.PageBreakBefore         : return   this.PageBreakBefore         ;
+               case this.Properties.SpacingLine             : return   this.SpacingLine             ;
+               case this.Properties.SpacingLineRule         : return   this.SpacingLineRule         ;
+               case this.Properties.SpacingBefore           : return   this.SpacingBefore           ;
+               case this.Properties.SpacingBeforeAutoSpacing: return   this.SpacingBeforeAutoSpacing;
+               case this.Properties.SpacingAfter            : return   this.SpacingAfter            ;
+               case this.Properties.SpacingAfterAutoSpacing : return   this.SpacingAfterAutoSpacing ;
+               case this.Properties.Shd                     : return   this.Shd                     ;
+               case this.Properties.BrdFirst                : return   this.BrdFirst                ;
+               case this.Properties.BrdLast                 : return   this.BrdLast                 ;
+               case this.Properties.BrdBetween              : return   this.BrdBetween              ;
+               case this.Properties.BrdBottom               : return   this.BrdBottom               ;
+               case this.Properties.BrdLeft                 : return   this.BrdLeft                 ;
+               case this.Properties.BrdRight                : return   this.BrdRight                ;
+               case this.Properties.BrdTop                  : return   this.BrdTop                  ;
+               case this.Properties.WidowControl            : return   this.WidowControl            ;
+               case this.Properties.Tabs                    : return   this.Tabs                    ;
+               case this.Properties.NumPr                   : return   this.NumPr                   ;
+               case this.Properties.PStyle                  : return   this.PStyle                  ;
+        }
+    },
+    setProperty : function(nType, value)
+    {
+        switch(nType)
+        {
+            case this.Properties.ContextualSpacing       : this.ContextualSpacing        = value; break;
+            case this.Properties.IndLeft                 : this.IndLeft                  = value; break;
+            case this.Properties.IndRight                : this.IndRight                 = value; break;
+            case this.Properties.IndFirstLine            : this.IndFirstLine             = value; break;
+            case this.Properties.Jc                      : this.Jc                       = value; break;
+            case this.Properties.KeepLines               : this.KeepLines                = value; break;
+            case this.Properties.KeepNext                : this.KeepNext                 = value; break;
+            case this.Properties.PageBreakBefore         : this.PageBreakBefore          = value; break;
+            case this.Properties.SpacingLine             : this.SpacingLine              = value; break;
+            case this.Properties.SpacingLineRule         : this.SpacingLineRule          = value; break;
+            case this.Properties.SpacingBefore           : this.SpacingBefore            = value; break;
+            case this.Properties.SpacingBeforeAutoSpacing: this.SpacingBeforeAutoSpacing = value; break;
+            case this.Properties.SpacingAfter            : this.SpacingAfter             = value; break;
+            case this.Properties.SpacingAfterAutoSpacing : this.SpacingAfterAutoSpacing  = value; break;
+            case this.Properties.Shd                     : this.Shd                      = value; break;
+            case this.Properties.BrdFirst                : this.BrdFirst                 = value; break;
+            case this.Properties.BrdLast                 : this.BrdLast                  = value; break;
+            case this.Properties.BrdBetween              : this.BrdBetween               = value; break;
+            case this.Properties.BrdBottom               : this.BrdBottom                = value; break;
+            case this.Properties.BrdLeft                 : this.BrdLeft                  = value; break;
+            case this.Properties.BrdRight                : this.BrdRight                 = value; break;
+            case this.Properties.BrdTop                  : this.BrdTop                   = value; break;
+            case this.Properties.WidowControl            : this.WidowControl             = value; break;
+            case this.Properties.Tabs                    : this.Tabs                     = value; break;
+            case this.Properties.NumPr                   : this.NumPr                    = value; break;
+            case this.Properties.PStyle                  : this.PStyle                   = value; break;
+        }
+    }
+};
+
+
+function UndoRedoData_SheetAdd(insertBefore, name, sheetidfrom, sheetid){
 	this.Properties = {
 		name: 0,
 		sheetidfrom: 1,
@@ -1361,7 +1791,7 @@ function UndoRedoDataGOSingleProp(oldValue, newValue)
 
 }
 
-UndoRedoDataGOPairProps.prototype = {
+UndoRedoDataGOSingleProp.prototype = {
     getType : function ()
     {
         return UndoRedoDataTypes.GOSingleProp;
@@ -2160,6 +2590,8 @@ UndoRedoGraphicObjects.prototype =
                 if(typeof target_object.Undo === "function")
                 {
                     target_object.Undo(Type, Data.drawingData);
+                    if(typeof target_object.Refresh_RecalcData === "function")
+                        target_object.Refresh_RecalcData(Type, Data);
                 }
             }
             else
@@ -2167,6 +2599,8 @@ UndoRedoGraphicObjects.prototype =
                 if(typeof target_object.Redo === "function")
                 {
                     target_object.Redo(Type, Data.drawingData);
+                    if(typeof target_object.Refresh_RecalcData === "function")
+                        target_object.Refresh_RecalcData(Type, Data);
                 }
             }
         }

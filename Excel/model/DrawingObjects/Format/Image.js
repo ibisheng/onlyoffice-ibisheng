@@ -108,11 +108,17 @@ CImage.prototype =
 
     initDefault: function(x, y, extX, extY, imageId)
     {
+        this.setXfrmObject(new CXfrm());
         this.setPosition(x, y);
         this.setExtents(extX, extY);
         this.setImageId(imageId);
         this.setPresetGeometry("rect");
         this.recalculate();
+    },
+
+    setXfrmObject: function(xfrm)
+    {
+        this.spPr.xfrm = xfrm;
     },
 
     setDrawingBase: function(drawingBase)

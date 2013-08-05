@@ -437,6 +437,7 @@
 			_onSetSelectionState: function (state) {
 				var ws = this.getWorksheet();
 				ws.objectRender.controller.setSelectionState(state);
+                ws.objectRender.controller.updateSelectionState();
 			},
 
 			_onChangeSelection: function (isStartPoint, dc, dr, isCoord, isSelectMode, callback) {

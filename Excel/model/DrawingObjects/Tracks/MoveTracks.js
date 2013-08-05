@@ -191,6 +191,7 @@ function MoveTitleInChart(originalObject)
     var pen = new CLn();
     pen.Fill = new CUniFill();
     pen.Fill.fill = new CSolidFill();
+    pen.Fill.fill.color = new CUniColor();
     pen.Fill.fill.color.color = new CRGBColor();
     this.overlayObject = new OverlayObject(this.originalObject.spPr.geometry, this.originalObject.extX, this.originalObject.extY, this.originalObject.brush,/* this.originalObject.pen*/pen, this.transform);
     this.inv = global_MatrixTransformer.Invert(originalObject.chartGroup.transform);
@@ -256,12 +257,14 @@ function MoveTrackChart(originalObject)
     geometry.Recalculate(this.originalObject.extX, this.originalObject.extY);
     var brush = new CUniFill();
     brush.fill = new CSolidFill();
+    brush.fill.color = new CUniColor();
     brush.fill.color.RGBA = {R:255, G:255, B:255, A:255};
     brush.fill.color.color = new CRGBColor();
     brush.fill.color.color.RGBA = {R:255, G:255, B:255, A:255};
     var pen = new CLn();
     pen.Fill = new CUniFill();
     pen.Fill.fill = new CSolidFill();
+    pen.Fill.fill.color = new CUniColor();
     pen.Fill.fill.color.color = new CRGBColor();
 
     this.overlayObject = new OverlayObject(this.originalObject.spPr.geometry, this.originalObject.extX, this.originalObject.extY, brush, pen, this.transform);

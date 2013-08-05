@@ -126,7 +126,7 @@ function CMouseEventHandler()
 function CShape(drawingBase, drawingObjects)
 {
     this.drawingBase = drawingBase;
-    this.drawingObjects = drawingObjects;
+    this.drawingObjects = null;//drawingObjects;
     this.nvSpPr = null;
     this.spPr = new CSpPr();
     this.style = null;
@@ -162,6 +162,8 @@ function CShape(drawingBase, drawingObjects)
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
+    if(isRealObject(drawingObjects))
+        this.setDrawingObjects(drawingObjects);
 }
 
 
@@ -202,9 +204,493 @@ CShape.prototype =
         return true;
     },
 
+    OnContentRecalculate: function()
+    {
+        this.calculateContent();
+        this.calculateTransformTextMatrix();
+    },
+
+    deleteDrawingBase: function()
+    {
+        var position = this.drawingObjects.deleteDrawingBase(this.Get_Id());
+        if(isRealNumber(position))
+        {
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_DeleteDrawingBase, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(position, null)), null);
+        }
+    },
+
+    addToDrawingObjects: function(pos)
+    {
+        var position = this.drawingObjects.addGraphicObject(this, pos);
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Add_To_Drawing_Objects, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(position, null)), null);
+    },
+
+    setCellFontName: function (fontName) {
+        if(isRealObject(this.txBody))
+        {
+            var text_pr = new ParaTextPr();
+            text_pr.Set_FontFamily({Name: fontName, Index: -1});
+            this.txBody.paragraphAdd(text_pr);
+            this.calculateTransformTextMatrix();
+            this.drawingObjects.showDrawingObjects();
+        }
+    },
+
+    setCellFontSize: function (fontSize) {
+        if(isRealObject(this.txBody))
+        {
+            var text_pr = new ParaTextPr();
+            text_pr.Set_FontSize(fontSize);
+            this.txBody.paragraphAdd(text_pr);
+            this.calculateTransformTextMatrix();
+            this.drawingObjects.showDrawingObjects();
+        }
+    },
+
+    setCellBold: function (isBold) {
+        if(isRealObject(this.txBody))
+        {
+            var text_pr = new ParaTextPr();
+            text_pr.Set_Bold(isBold);
+            this.txBody.paragraphAdd(text_pr);
+            this.calculateTransformTextMatrix();
+            this.drawingObjects.showDrawingObjects();
+        }
+    },
+
+    setCellItalic: function (isItalic) {
+        if(isRealObject(this.txBody))
+        {
+            var text_pr = new ParaTextPr();
+            text_pr.Set_Italic(isItalic);
+            this.txBody.paragraphAdd(text_pr);
+            this.calculateTransformTextMatrix();
+            this.drawingObjects.showDrawingObjects();
+        }
+    },
+
+    setCellUnderline: function (isUnderline) {
+        if(isRealObject(this.txBody))
+        {
+            var text_pr = new ParaTextPr();
+            text_pr.Set_Underline(isUnderline);
+            this.txBody.paragraphAdd(text_pr);
+            this.calculateTransformTextMatrix();
+
+        }
+    },
+
+    setCellStrikeout: function (isStrikeout) {
+        if(isRealObject(this.txBody))
+        {
+            var text_pr = new ParaTextPr();
+            text_pr.Set_Strikeout(isStrikeout);
+            this.txBody.paragraphAdd(text_pr);
+            this.calculateTransformTextMatrix();
+
+        }
+    },
+
+    setCellSubscript: function (isSubscript) {
+        if(isRealObject(this.txBody))
+        {
+            var text_pr = new ParaTextPr();
+            text_pr.Set_VertAlign(isSubscript ? vertalign_SubScript : vertalign_Baseline);
+            this.txBody.paragraphAdd(text_pr);
+            this.calculateTransformTextMatrix();
+
+        }
+    },
+
+    setCellSuperscript: function (isSuperscript) {
+        if(isRealObject(this.txBody))
+        {
+            var text_pr = new ParaTextPr();
+            text_pr.Set_VertAlign(isSubscript ? vertalign_SuperScript : vertalign_Baseline);
+            this.txBody.paragraphAdd(text_pr);
+            this.calculateTransformTextMatrix();
+
+        }
+    },
+
+    setCellAlign: function (align) {
+        if(isRealObject(this.txBody))
+        {
+            var align_num = null;
+            switch(align)
+            {
+                case "left":
+                {
+                    align_num = align_Left;
+                    break;
+                }
+                case "right":
+                {
+                    align_num = align_Right;
+                    break;
+                }
+                case "center":
+                {
+                    align_num = align_Center;
+                    break;
+                }
+
+                case "justify":
+                {
+                    align_num = align_Justify;
+                    break;
+                }
+
+            }
+            if(isRealNumber(align_num))
+            {
+                this.txBody.content.Set_ParagraphAlign(align_num);
+                //this.calculateTransformTextMatrix();
+
+            }
+        }
+    },
+
+
+
+    setCellVertAlign: function (align) {
+        if(isRealObject(this.txBody))
+        {
+            this.txBody.setVerticalAlign(align);
+            this.calculateTransformTextMatrix();
+        }
+    },
+
+    setCellTextWrap: function (isWrapped) {
+        if(isRealObject(this.txBody))
+        {
+            var text_pr = new ParaTextPr();
+            text_pr.Set_FontFamily({Name: fontName, Index: -1});
+            this.txBody.paragraphAdd(text_pr);
+            this.calculateTransformTextMatrix();
+
+        }
+    },
+
+    setCellTextShrink: function (isShrinked) {
+        if(isRealObject(this.txBody))
+        {
+            var text_pr = new ParaTextPr();
+            text_pr.Set_FontFamily({Name: fontName, Index: -1});
+            this.txBody.paragraphAdd(text_pr);
+            this.calculateTransformTextMatrix();
+
+        }
+    },
+
+    setCellTextColor: function (color) {
+        if(isRealObject(this.txBody))
+        {
+            var unifill = new CUniFill();
+            unifill.setFill(new CSolidFill());
+            unifill.fill.setColor(CorrectUniColor(color, null));
+            var text_pr = new ParaTextPr();
+            text_pr.SetUniFill(unifill);
+            this.txBody.paragraphAdd(text_pr);
+            this.calculateTransformTextMatrix();
+
+        }
+
+    },
+
+    setCellBackgroundColor: function (color) {
+
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateBrushUndo, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+        var unifill = new CUniFill();
+        unifill.setFill(new CSolidFill());
+        unifill.fill.setColor(CorrectUniColor(color, null));
+        this.setUniFill(unifill);
+        this.recalculateBrush();
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateBrushRedo, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+
+    },
+
+
+    setCellAngle: function (angle) {
+        if(isRealObject(this.txBody))
+        {
+            this.txBody.setVert(angle);
+            this.calculateContent();
+            this.calculateTransformTextMatrix();
+        }
+    },
+
+    setCellStyle: function (name) {
+        if(isRealObject(this.txBody))
+        {
+            var text_pr = new ParaTextPr();
+            text_pr.Set_FontFamily({Name: fontName, Index: -1});
+            this.txBody.paragraphAdd(text_pr);
+            this.calculateTransformTextMatrix();
+
+        }
+    },
+
+
+    setCellAllFontName: function (fontName) {
+        if(isRealObject(this.txBody))
+        {
+            var text_pr = new ParaTextPr();
+            text_pr.Set_FontFamily({Name: fontName, Index: -1});
+            this.txBody.content.Set_ApplyToAll(true);
+            this.txBody.paragraphAdd(text_pr);
+            this.txBody.content.Set_ApplyToAll(false);
+            this.calculateTransformTextMatrix();
+
+        }
+    },
+
+    setCellAllFontSize: function (fontSize) {
+        if(isRealObject(this.txBody))
+        {
+            var text_pr = new ParaTextPr();
+            text_pr.Set_FontSize(fontSize);
+            this.txBody.content.Set_ApplyToAll(true);
+            this.txBody.paragraphAdd(text_pr);
+            this.txBody.content.Set_ApplyToAll(false);
+            this.calculateTransformTextMatrix();
+
+        }
+    },
+
+    setCellAllBold: function (isBold) {
+        if(isRealObject(this.txBody))
+        {
+            var text_pr = new ParaTextPr();
+            text_pr.Set_Bold(isBold);
+            this.txBody.content.Set_ApplyToAll(true);
+            this.txBody.paragraphAdd(text_pr);
+            this.txBody.content.Set_ApplyToAll(false);
+            this.calculateTransformTextMatrix();
+
+        }
+    },
+
+    setCellAllItalic: function (isItalic) {
+        if(isRealObject(this.txBody))
+        {
+            var text_pr = new ParaTextPr();
+            text_pr.Set_Italic(isItalic);
+            this.txBody.content.Set_ApplyToAll(true);
+            this.txBody.paragraphAdd(text_pr);
+            this.txBody.content.Set_ApplyToAll(false);
+            this.calculateTransformTextMatrix();
+
+        }
+    },
+
+    setCellAllUnderline: function (isUnderline) {
+        if(isRealObject(this.txBody))
+        {
+            var text_pr = new ParaTextPr();
+            text_pr.Set_Underline(isUnderline);
+            this.txBody.content.Set_ApplyToAll(true);
+            this.txBody.paragraphAdd(text_pr);
+            this.txBody.content.Set_ApplyToAll(false);
+            this.calculateTransformTextMatrix();
+
+        }
+    },
+
+    setCellAllStrikeout: function (isStrikeout) {
+        if(isRealObject(this.txBody))
+        {
+            var text_pr = new ParaTextPr();
+            text_pr.Set_Strikeout(isStrikeout);
+            this.txBody.content.Set_ApplyToAll(true);
+            this.txBody.paragraphAdd(text_pr);
+            this.txBody.content.Set_ApplyToAll(false);
+            this.calculateTransformTextMatrix();
+
+        }
+    },
+
+    setCellAllSubscript: function (isSubscript) {
+        if(isRealObject(this.txBody))
+        {
+            var text_pr = new ParaTextPr();
+            text_pr.Set_VertAlign(isSubscript ? vertalign_SubScript : vertalign_Baseline);
+            this.txBody.content.Set_ApplyToAll(true);
+            this.txBody.paragraphAdd(text_pr);
+            this.txBody.content.Set_ApplyToAll(false);
+            this.calculateTransformTextMatrix();
+
+        }
+    },
+
+    setCellAllSuperscript: function (isSuperscript) {
+        if(isRealObject(this.txBody))
+        {
+            var text_pr = new ParaTextPr();
+            text_pr.Set_VertAlign(isSubscript ? vertalign_SuperScript : vertalign_Baseline);
+            this.txBody.content.Set_ApplyToAll(true);
+            this.txBody.paragraphAdd(text_pr);
+            this.txBody.content.Set_ApplyToAll(false);
+            this.calculateTransformTextMatrix();
+        }
+    },
+
+    setCellAllAlign: function (align) {
+        if(isRealObject(this.txBody))
+        {
+            var align_num = null;
+            switch(align)
+            {
+                case "left":
+                {
+                    align_num = align_Left;
+                    break;
+                }
+                case "right":
+                {
+                    align_num = align_Right;
+                    break;
+                }
+                case "center":
+                {
+                    align_num = align_Center;
+                    break;
+                }
+
+                case "justify":
+                {
+                    align_num = align_Justify;
+                    break;
+                }
+
+            }
+            if(isRealNumber(align_num))
+            {
+                this.txBody.content.Set_ApplyToAll(true);
+                this.txBody.content.Set_ParagraphAlign(align_num);
+                this.txBody.content.Set_ApplyToAll(false);
+                //this.calculateTransformTextMatrix();
+            }
+        }
+    },
+
+
+
+    setCellAllVertAlign: function (align) {
+        if(isRealObject(this.txBody))
+        {
+            this.txBody.setVerticalAlign(align);
+            this.calculateTransformTextMatrix();
+        }
+    },
+
+    setCellAllTextWrap: function (isWrapped) {
+        if(isRealObject(this.txBody))
+        {
+            var text_pr = new ParaTextPr();
+            text_pr.Set_FontFamily({Name: fontName, Index: -1});
+            this.txBody.paragraphAdd(text_pr);
+            this.calculateTransformTextMatrix();
+        }
+    },
+
+    setCellAllTextShrink: function (isShrinked) {
+        if(isRealObject(this.txBody))
+        {
+            var text_pr = new ParaTextPr();
+            text_pr.Set_FontFamily({Name: fontName, Index: -1});
+            this.txBody.paragraphAdd(text_pr);
+            this.calculateTransformTextMatrix();
+        }
+    },
+
+    setCellAllTextColor: function (color) {
+        if(isRealObject(this.txBody))
+        {
+            var unifill = new CUniFill();
+            unifill.setFill(new CSolidFill());
+            unifill.fill.setColor(CorrectUniColor(color, null));
+            var text_pr = new ParaTextPr();
+            text_pr.SetUniFill(unifill);
+            this.txBody.content.Set_ApplyToAll(true);
+            this.txBody.paragraphAdd(text_pr);
+            this.txBody.content.Set_ApplyToAll(false);
+            this.calculateTransformTextMatrix();
+        }
+
+    },
+
+    setCellAllBackgroundColor: function (color) {
+
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateBrushUndo, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+        var unifill = new CUniFill();
+        unifill.setFill(new CSolidFill());
+        unifill.fill.setColor(CorrectUniColor(color, null));
+        this.setUniFill(unifill);
+        this.recalculateBrush();
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateBrushRedo, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+
+    },
+
+
+    setCellAllAngle: function (angle) {
+        if(isRealObject(this.txBody))
+        {
+            this.txBody.setVert(angle);
+            this.calculateContent();
+            this.calculateTransformTextMatrix();
+        }
+    },
+
+    setCellAllStyle: function (name) {
+        if(isRealObject(this.txBody))
+        {
+            var text_pr = new ParaTextPr();
+            text_pr.Set_FontFamily({Name: fontName, Index: -1});
+            this.txBody.paragraphAdd(text_pr);
+            this.calculateTransformTextMatrix();
+        }
+    },
+
+    // Увеличение размера шрифта
+    increaseFontSize: function () {
+        if(isRealObject(this.txBody))
+        {
+            this.txBody.content.Paragraph_IncDecFontSize(true);
+            this.txBody.calculateContent();
+            this.calculateTransformTextMatrix();
+        }
+    },
+
+    // Уменьшение размера шрифта
+    decreaseFontSize: function () {
+        if(isRealObject(this.txBody))
+        {
+            this.txBody.content.Paragraph_IncDecFontSize(false);
+            this.txBody.calculateContent();
+            this.calculateTransformTextMatrix();
+        }
+    },
+
+
+    insertHyperlink: function (options) {
+        if(typeof this.curState.insertHyperlink === "function")
+        {
+            var text_pr = new ParaTextPr();
+            text_pr.Set_FontFamily({Name: fontName, Index: -1});
+            this.txBody.paragraphAdd(text_pr);
+            this.calculateTransformTextMatrix();
+        }
+    },
+
 
     initDefault: function(x, y, extX, extY, flipH, flipV, presetGeom)
     {
+        this.setXfrmObject(new CXfrm());
         this.setPosition(x, y);
         this.setExtents(extX, extY);
         this.setFlips(flipH, flipV);
@@ -215,14 +701,77 @@ CShape.prototype =
             new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
     },
 
-    initDefaultTextRect: function()
-    {},
+    setXfrmObject: function(xfrm)
+    {
+        var oldId = isRealObject(this.spPr.xfrm) ? this.spPr.xfrm.Get_Id() : null;
+        var newId = isRealObject(xfrm) ? xfrm.Get_Id() : null;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetXfrm, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldId, newId)));
+        this.spPr.xfrm = xfrm;
+    },
+
+    initDefaultTextRect: function(x, y, extX, extY, flipH, flipV)
+    {
+        this.setXfrmObject(new CXfrm());
+        this.setPosition(x, y);
+        this.setExtents(extX, extY);
+        this.setFlips(flipH, flipV);
+        this.setPresetGeometry("rect");
+        this.setDefaultTextRectStyle();
+        var uni_fill = new CUniFill();
+        uni_fill.setFill(new CSolidFill());
+        uni_fill.fill.setColor(new CUniColor());
+        uni_fill.fill.color.setColor(new CSchemeColor());
+        uni_fill.fill.color.color.setColorId(12);
+        this.setUniFill(uni_fill);
+
+        var ln = new CLn();
+        ln.setW(6350);
+        ln.setFill(new CUniFill());
+        ln.Fill.setFill(new CSolidFill());
+        ln.Fill.fill.setColor(new CUniColor());
+        ln.Fill.fill.color.setColor(new CPrstColor());
+        ln.Fill.fill.color.color.setColorId("black");
+        this.setUniLine(ln);
+        this.addTextBody(new CTextBody(this));
+
+        this.recalculate();
+        this.txBody.calculateContent();
+        this.calculateTransformTextMatrix();
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterInit, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+    },
 
     setDefaultStyle: function()
     {
         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetDefaultStyle, null, null,
             new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
         this.style = CreateDefaultShapeStyle();
+    },
+
+    setDefaultTextRectStyle: function()
+    {
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetDefaultTextRectStyle, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+        this.style = CreateDefaultTextRectStyle();
+    },
+
+    setUniFill: function(unifill)
+    {
+        var oldValue = isRealObject(this.spPr.Fill) ? this.spPr.Fill.Get_Id() : null;
+        var newValue = isRealObject(unifill) ? unifill.Get_Id() : null;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetUniFill, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
+        this.spPr.Fill = unifill;
+    },
+
+    setUniLine: function(ln)
+    {
+        var oldValue = isRealObject(this.spPr.ln) ? this.spPr.ln.Get_Id() : null;
+        var newValue = isRealObject(ln) ? ln.Get_Id() : null;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetUniLine, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
+        this.spPr.ln = ln;
     },
 
     setDrawingObjects: function(drawingObjects)
@@ -508,12 +1057,19 @@ CShape.prototype =
 
     paragraphAdd: function(paraItem, bRecalculate)
     {
+        History.Create_NewPoint();
+
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddUndo, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
         if(!isRealObject(this.txBody))
         {
             this.addTextBody(new CTextBody(this));
             this.txBody.calculateContent();
         }
         this.txBody.paragraphAdd(paraItem, bRecalculate);
+
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddRedo, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
     },
 
     calculateContent: function()
@@ -905,6 +1461,10 @@ CShape.prototype =
 
     addTextBody: function(textBody)
     {
+        var oldId = isRealObject(this.txBody) ? this.txBody.Get_Id() : null;
+        var newId = isRealObject(textBody) ? textBody.Get_Id() : null;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_AddTextBody, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldId, newId)));
         this.txBody = textBody;
     },
 
@@ -2048,16 +2608,26 @@ CShape.prototype =
 	},
 	
 
-    addToDrawingObjects: function()
-    {
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Add_To_Drawing_Objects, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataClosePath()), null);
-        this.drawingObjects.addGraphicObject(this);
-    },
 
     Undo: function(type, data)
     {
         switch (type)
         {
+
+            case historyitem_AutoShapes_RecalculateAfterParagraphAddUndo:
+            {
+                if(isRealObject(this.txBody))
+                {
+                    this.txBody.calculateContent();
+                    this.calculateTransformTextMatrix();
+                }
+                break;
+            }
+            case historyitem_AutoShapes_SetDefaultTextRectStyle:
+            {
+                this.style = null;
+                break;
+            }
             case historyitem_AutoShapes_SetPresetGeometry:
             {
                 this.spPr.geometry = g_oTableId.Get_ById(data.oldValue);
@@ -2082,6 +2652,13 @@ CShape.prototype =
                 this.drawingObjects.deleteDrawingBase(this.Id);
                 break;
             }
+
+            case historyitem_AutoShapes_DeleteDrawingBase:
+            {
+                this.drawingObjects.addGraphicObject(this, data.oldValue);
+                break;
+            }
+
             case historyitem_AutoShapes_SetGroup:
             {
                 this.group = g_oTableId.Get_ById(data.oldValue);
@@ -2090,6 +2667,16 @@ CShape.prototype =
             case historyitem_AutoShapes_SetDefaultStyle:
             {
                 this.style = null;
+                break;
+            }
+            case historyitem_AutoShapes_SetUniFill:
+            {
+                this.spPr.Fill = g_oTableId.Get_ById(data.oldValue);
+                break;
+            }
+            case historyitem_AutoShapes_SetUniLine:
+            {
+                this.spPr.ln = g_oTableId.Get_ById(data.oldValue);
                 break;
             }
             case historyitem_AutoShapes_SetDrawingObjects:
@@ -2105,6 +2692,23 @@ CShape.prototype =
                 }
                 break;
             }
+
+            case historyitem_AutoShapes_SetXfrm:
+            {
+                this.spPr.xfrm = g_oTableId.Get_ById(data.oldValue);
+                break;
+            }
+            case historyitem_AutoShapes_AddTextBody:
+            {
+                this.txBody = g_oTableId.Get_ById(data.oldValue);
+                break;
+            }
+
+            case historyitem_AutoShapes_RecalculateBrushUndo:
+            {
+                this.recalculateBrush();
+                break;
+            }
         }
     },
 
@@ -2112,6 +2716,25 @@ CShape.prototype =
     {
         switch (type)
         {
+            case historyitem_AutoShapes_RecalculateBrushRedo:
+            {
+                this.recalculateBrush();
+                break;
+            }
+            case historyitem_AutoShapes_RecalculateAfterParagraphAddRedo:
+            {
+                if(isRealObject(this.txBody))
+                {
+                    this.txBody.calculateContent();
+                    this.calculateTransformTextMatrix();
+                }
+                break;
+            }
+            case historyitem_AutoShapes_SetDefaultTextRectStyle:
+            {
+                this.style = CreateDefaultTextRectStyle();
+                break;
+            }
             case historyitem_AutoShapes_SetPresetGeometry:
             {
                 this.spPr.geometry = g_oTableId.Get_ById(data.newValue);
@@ -2132,7 +2755,13 @@ CShape.prototype =
             }
             case historyitem_AutoShapes_Add_To_Drawing_Objects:
             {
-                this.drawingObjects.addGraphicObject(this);
+                this.drawingObjects.addGraphicObject(this, data.oldValue);
+                break;
+            }
+
+            case historyitem_AutoShapes_DeleteDrawingBase:
+            {
+                this.drawingObjects.deleteDrawingBase(this.Id);
                 break;
             }
             case historyitem_AutoShapes_SetGroup:
@@ -2154,6 +2783,16 @@ CShape.prototype =
                 break;
             }
 
+            case historyitem_AutoShapes_SetUniFill:
+            {
+                this.spPr.Fill = g_oTableId.Get_ById(data.newValue);
+                break;
+            }
+            case historyitem_AutoShapes_SetUniLine:
+            {
+                this.spPr.ln = g_oTableId.Get_ById(data.newValue);
+                break;
+            }
             case historyitem_AutoShapes_SetDrawingObjects:
             {
                 if(data.newValue !== null)
@@ -2167,6 +2806,155 @@ CShape.prototype =
                 }
                 break;
             }
+
+            case historyitem_AutoShapes_SetXfrm:
+            {
+                this.spPr.xfrm = g_oTableId.Get_ById(data.newValue);
+                break;
+            }
+            case historyitem_AutoShapes_AddTextBody:
+            {
+                this.txBody = g_oTableId.Get_ById(data.newValue);
+                break;
+            }
         }
     }
 };
+
+
+function CorrectUniFill(asc_fill, unifill)
+{
+    if (null == asc_fill)
+        return unifill;
+
+    var ret = unifill;
+    if (null == ret)
+        ret = new CUniFill();
+
+    var _fill = asc_fill.get_fill();
+    var _type = asc_fill.get_type();
+
+    if (null != _type)
+    {
+        switch (_type)
+        {
+            case c_oAscFill.FILL_TYPE_NOFILL:
+            {
+                ret.setFill(new CNoFill());
+                break;
+            }
+            case c_oAscFill.FILL_TYPE_BLIP:
+            {
+                if (ret.fill == null || ret.fill.type != FILL_TYPE_BLIP)
+                {
+                    ret.setFill( new CBlipFill() );
+                }
+
+                var _url = _fill.get_url();
+                var _tx_id = _fill.get_texture_id();
+                if (null != _tx_id && (0 <= _tx_id) && (_tx_id < g_oUserTexturePresets.length))
+                {
+                    _url = g_oUserTexturePresets[_tx_id];
+                }
+
+                if (_url != null && _url !== undefined && _url != "")
+                    ret.fill.setRasterImageId(_url);
+
+                if (ret.fill.RasterImageId == null)
+                    ret.fill.setRasterImageId("");
+
+                var tile = _fill.get_type();
+                if (tile == c_oAscFillBlipType.STRETCH)
+                    ret.fill.tile = null;
+                else if (tile == c_oAscFillBlipType.TILE)
+                    ret.fill.tile = true;
+
+                break;
+            }
+            default:
+            {
+                if (ret.fill == null || ret.fill.type != FILL_TYPE_SOLID)
+                {
+                    ret.setFill(new CSolidFill());
+                }
+                ret.fill.setColor(CorrectUniColor(_fill.get_color(), ret.fill.color));
+            }
+        }
+    }
+
+    var _alpha = asc_fill.get_transparent();
+    if (null != _alpha)
+        ret.transparent = _alpha;
+
+    return ret;
+}
+
+function CorrectUniColor(asc_color, unicolor)
+{
+    if (null == asc_color)
+        return unicolor;
+
+    var ret = unicolor;
+    if (null == ret)
+        ret = new CUniColor();
+
+    var _type = asc_color.get_type();
+    switch (_type)
+    {
+        case c_oAscColor.COLOR_TYPE_PRST:
+        {
+            if (ret.color == null || ret.color.type != COLOR_TYPE_PRST)
+            {
+                ret.setColor(new CPrstColor());
+            }
+            ret.color.setId(asc_color.get_value());
+            break;
+        }
+        case c_oAscColor.COLOR_TYPE_SCHEME:
+        {
+            if (ret.color == null || ret.color.type != COLOR_TYPE_SCHEME)
+            {
+                ret.setColor(new CSchemeColor());
+            }
+
+            // тут выставляется ТОЛЬКО из меню. поэтому:
+            var _index = parseInt(asc_color.get_value());
+            var _id = (_index / 6) >> 0;
+            var _pos = _index - _id * 6;
+
+            var array_colors_types = [6, 15, 7, 16, 0, 1, 2, 3, 4, 5];
+            ret.color.id = array_colors_types[_id];
+
+            if (ret.Mods.Mods.length != 0)
+                ret.Mods.Mods.splice(0, ret.Mods.Mods.length);
+
+            if (1 <= _pos && _pos <= 5)
+            {
+                var _mods = g_oThemeColorsDefaultMods[_pos - 1];
+                var _ind = 0;
+                for (var k in _mods)
+                {
+                    ret.Mods.Mods[_ind] = new CColorMod();
+                    ret.Mods.Mods[_ind].name = k;
+                    ret.Mods.Mods[_ind].val = _mods[k];
+                    _ind++;
+                }
+            }
+
+            break;
+        }
+        default:
+        {
+            if (ret.color == null || ret.color.type != COLOR_TYPE_SRGB)
+            {
+                ret.setColor(new CRGBColor());
+            }
+            ret.color.setColor(asc_color.get_r()*16*16 + asc_color.get_g()*16 + asc_color.get_b());
+            /*ret.color.RGBA.R = asc_color.get_r();
+            ret.color.RGBA.G = asc_color.get_g();
+            ret.color.RGBA.B = asc_color.get_b();
+            ret.color.RGBA.A = asc_color.get_a();           */
+        }
+    }
+    return ret;
+}

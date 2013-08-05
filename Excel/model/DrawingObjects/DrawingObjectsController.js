@@ -18,6 +18,165 @@ function DrawingObjectsController(drawingObjects)
 
 DrawingObjectsController.prototype =
 {
+
+
+    setCellFontName: function (fontName) {
+        if(typeof this.curState.setCellFontName === "function")
+        {
+            History.Create_NewPoint();
+            this.curState.setCellFontName(fontName);
+        }
+    },
+
+    setCellFontSize: function (fontSize) {
+        if(typeof this.curState.setCellFontSize === "function")
+        {
+            History.Create_NewPoint();
+            this.curState.setCellFontSize(fontSize);
+        }
+    },
+
+    setCellBold: function (isBold) {
+        if(typeof this.curState.setCellBold === "function")
+        {
+            History.Create_NewPoint();
+            this.curState.setCellBold(isBold);
+        }
+    },
+
+    setCellItalic: function (isItalic) {
+        if(typeof this.curState.setCellItalic === "function")
+        {
+            History.Create_NewPoint();
+            this.curState.setCellItalic(isItalic);
+        }
+    },
+
+    setCellUnderline: function (isUnderline) {
+        if(typeof this.curState.setCellUnderline === "function")
+        {
+            History.Create_NewPoint();
+            this.curState.setCellUnderline(isUnderline);
+        }
+    },
+
+    setCellStrikeout: function (isStrikeout) {
+        if(typeof this.curState.setCellStrikeout === "function")
+        {
+            History.Create_NewPoint();
+            this.curState.setCellStrikeout(isStrikeout);
+        }
+    },
+
+    setCellSubscript: function (isSubscript) {
+        if(typeof this.curState.setCellSubscript === "function")
+        {
+            History.Create_NewPoint();
+            this.curState.setCellSubscript(isSubscript);
+        }
+    },
+
+    setCellSuperscript: function (isSuperscript) {
+        if(typeof this.curState.setCellSuperscript === "function")
+        {
+            History.Create_NewPoint();
+            this.curState.setCellSuperscript(isSuperscript);
+        }
+    },
+
+    setCellAlign: function (align) {
+        if(typeof this.curState.setCellAlign === "function")
+        {
+            History.Create_NewPoint();
+            this.curState.setCellAlign(align);
+        }
+    },
+
+    setCellVertAlign: function (align) {
+        if(typeof this.curState.setCellVertAlign === "function")
+        {
+            History.Create_NewPoint();
+            this.curState.setCellVertAlign(align);
+        }
+    },
+
+    setCellTextWrap: function (isWrapped) {
+        if(typeof this.curState.setCellTextWrap === "function")
+        {
+            History.Create_NewPoint();
+            this.curState.setCellTextWrap(isWrapped);
+        }
+    },
+
+    setCellTextShrink: function (isShrinked) {
+        if(typeof this.curState.setCellTextShrink === "function")
+        {
+            History.Create_NewPoint();
+            this.curState.setCellTextShrink(isShrinked);
+        }
+    },
+
+    setCellTextColor: function (color) {
+        if(typeof this.curState.setCellTextColor === "function")
+        {
+                History.Create_NewPoint();
+                this.curState.setCellTextColor(color);
+        }
+
+    },
+
+    setCellBackgroundColor: function (color) {
+        if(typeof this.curState.setCellBackgroundColor === "function")
+        {
+                History.Create_NewPoint();;
+                this.curState.setCellBackgroundColor(color);
+        }
+    },
+
+
+    setCellAngle: function (angle) {
+        if(typeof this.curState.setCellAngle === "function")
+        {
+            History.Create_NewPoint();
+            this.curState.setCellAngle(angle);
+        }
+    },
+
+    setCellStyle: function (name) {
+        if(typeof this.curState.setCellStyle === "function")
+        {
+            History.Create_NewPoint();
+            this.curState.setCellStyle(name);
+        }
+    },
+
+    // Увеличение размера шрифта
+    increaseFontSize: function () {
+        if(typeof this.curState.increaseFontSize === "function")
+        {
+            History.Create_NewPoint();
+            this.curState.increaseFontSize();
+        }
+    },
+
+    // Уменьшение размера шрифта
+    decreaseFontSize: function () {
+        if(typeof this.curState.decreaseFontSize === "function")
+        {
+            History.Create_NewPoint();
+            this.curState.decreaseFontSize();
+        }
+    },
+
+
+    insertHyperlink: function (options) {
+        if(typeof this.curState.insertHyperlink === "function")
+        {
+            this.curState.insertHyperlink(options);
+        }
+    },
+
+
     getColorMap: function()
     {
         return this.defaultColorMap;
@@ -93,6 +252,14 @@ DrawingObjectsController.prototype =
 
             }
 
+        }
+    },
+
+    updateSelectionState: function()
+    {
+        if(isRealObject(this.curState.textObject))
+        {
+            this.curState.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
         }
     },
 
@@ -224,6 +391,7 @@ DrawingObjectsController.prototype =
         if(grouped_objects.length < 2)
             return null;
 
+        History.Create_NewPoint();
         this.resetSelection();
         var max_x, min_x, max_y, min_y;
         var bounds = grouped_objects[0].getBoundsInGroup();
@@ -243,21 +411,26 @@ DrawingObjectsController.prototype =
             if(min_y > bounds.minY)
                 min_y = bounds.minY;
         }
-        var group = new CGroupShape(drawingBase, this.drawingObjects);
+        var group = new CGroupShape(null, this.drawingObjects);
+        group.setXfrmObject(new CXfrm());
         group.setPosition(min_x, min_y);
         group.setExtents(max_x - min_x, max_y - min_y);
         group.setChildExtents(max_x - min_x, max_y - min_y);
         group.setChildOffsets(0, 0);
         for(i = 0; i < grouped_objects.length; ++i)
         {
-            this.drawingObjects.deleteDrawingBase(grouped_objects[i].Id);
-            grouped_objects[i].setDrawingBase(null);
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null,
+                new UndoRedoDataGraphicObjects(grouped_objects[i].Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+            grouped_objects[i].deleteDrawingBase();
             grouped_objects[i].setPosition(grouped_objects[i].x - min_x, grouped_objects[i].y - min_y);
             grouped_objects[i].setGroup(group);
             group.addToSpTree(grouped_objects[i]);
         }
         group.recalculate();
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateRedo, null, null,
+            new UndoRedoDataGraphicObjects(group.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
         group.select(this);
+        group.addToDrawingObjects();
         return group;
     },
 
@@ -282,17 +455,36 @@ DrawingObjectsController.prototype =
 
             }
         }
+        var drawing_bases = this.drawingObjects.getDrawingObjects();
+        this.resetSelection();
         for(i = 0; i < ungrouped_objects.length; ++i)
         {
+            var cur_group = ungrouped_objects[i];
+            var start_position = null;
+            for(var j = 0; j < drawing_bases.length; ++j)
+            {
+                if(drawing_bases[j].graphicObject === cur_group)
+                {
+                    start_position = j;
+                    break;
+                }
+            }
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateUndo, null, null,
+                new UndoRedoDataGraphicObjects(ungrouped_objects[i].Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+            cur_group.deleteDrawingBase();
             var ungrouped_sp_tree = ungrouped_objects[i].getUnGroupedSpTree();
+
             for(var j = 0; j < ungrouped_sp_tree.length; ++j)
             {
                 ungrouped_sp_tree[j].recalculateTransform();
+                History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null,
+                    new UndoRedoDataGraphicObjects(ungrouped_sp_tree[j].Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+                ungrouped_sp_tree[j].addToDrawingObjects(start_position + j);
+                ungrouped_sp_tree[j].select(this);
             }
-            this.drawingObjects.insertUngroupedObjects(ungrouped_objects[i].Id, ungrouped_sp_tree);
         }
 		this.changeCurrentState(new NullState(this, this.drawingObjects));
-		
+		this.drawingObjects.OnUpdateOverlay();
     },
 
     canGroup: function()
@@ -330,6 +522,80 @@ DrawingObjectsController.prototype =
                 break;
             }
         }
+    },
+
+
+    getSelectionState: function()
+    {
+        var state = {};
+        switch(this.curState.id)
+        {
+            case STATES_ID_TEXT_ADD:
+            {
+                state.id = STATES_ID_TEXT_ADD;
+                state.textObjectId = this.curState.textObject.Get_Id();
+                state.textState = this.curState.textObject.txBody.content.Get_SelectionState();
+                break;
+            }
+            case STATES_ID_GROUP:
+            {
+                state.id = STATES_ID_GROUP;
+                state.groupId = this.curState.group.Get_Id();
+                state.selectedObjects = [];
+                for(var i = 0; i < this.curState.group.selectedObjects; ++i)
+                {
+                    state.selectedObjects.push(this.curState.group.selectedObjects[i].Get_Id());
+                }
+                break;
+            }
+            default :
+            {
+                state.id = STATES_ID_NULL;
+                state.selectedObjects = [];
+                for(var i = 0; i < this.selectedObjects.length; ++i)
+                {
+                    state.selectedObjects.push(this.selectedObjects[i].Get_Id());
+                }
+                break;
+            }
+        }
+        return state;
+    },
+
+    setSelectionState: function(state)
+    {
+        this.resetSelectionState();
+        switch(state.id)
+        {
+            case STATES_ID_TEXT_ADD:
+            {
+                var text_object = g_oTableId.Get_ById(state.textObjectId);
+                text_object.select(this);
+                text_object.txBody.content.Set_SelectionState(state.textState, state.textState.length - 1);
+                this.changeCurrentState(new TextAddState(this, this.drawingObjects, text_object));
+                break;
+            }
+            case STATES_ID_GROUP:
+            {
+                var group = g_oTableId.Get_ById(state.groupId);
+                group.select(this);
+                for(var i = 0; i < state.selectedObjects.length; ++i)
+                {
+                    g_oTableId.Get_ById(state.selectedObjects[i]).select(group);
+                }
+                this.changeCurrentState(new GroupState(this, this.drawingObjects, group));
+                break;
+            }
+            default :
+            {
+                for(var i = 0; i < state.selectedObjects.length; ++i)
+                {
+                    g_oTableId.Get_ById(state.selectedObjects[i]).select(this);
+                }
+                break;
+            }
+        }
+        return state;
     },
 
     drawTracks: function(overlay)
@@ -755,18 +1021,6 @@ DrawingObjectsController.prototype =
 			if ( aObjects[i].graphicObject.isChart() )
 				aObjects[i].graphicObject.recalculate();
 		}
-	},
-	
-	getSelectionState: function()
-	{
-		// TODO
-		return (this.selectedObjects.length > 0) ? new Object() : null;
-	},
-	
-	setSelectionState: function(state)
-	{
-		// TODO
-		var st = state;
 	}
 };
 
@@ -1396,4 +1650,15 @@ function CorrectUniStrokeEx(asc_stroke, unistroke) {
     }
 
     return ret;
+}
+
+
+function DeleteSelectedObjects(controller)
+{
+    var selected_objects = controller.selectedObjects;
+    for(var i = selected_objects.length - 1; i > -1; --i)
+    {
+        selected_objects[i].deleteDrawingBase();
+    }
+    controller.resetSelection();
 }

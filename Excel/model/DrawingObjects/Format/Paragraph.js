@@ -38,7 +38,7 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit)
 
     this.Index = -1;
 
-    this.Parent  = Parent;
+    this.Parent  = null;///Parent;
     this.PageNum = PageNum;
 
     this.X      = X;
@@ -54,8 +54,8 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit)
     this.Pr = new CParaPr();
 
     // Данный TextPr будет относится только к символу конца параграфа
-    this.TextPr = new ParaTextPr();
-    this.TextPr.Parent = this;
+    this.TextPr = null;// new ParaTextPr();
+   //this.TextPr.Parent = this;
 
     this.Bounds = new CDocumentBounds( X, Y, 4000, Y );
 
@@ -92,7 +92,7 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit)
 
 
     this.NeedReDraw = true;
-    this.DrawingDocument = DrawingDocument;
+    this.DrawingDocument = null;//DrawingDocument;
     //this.LogicDocument   = editor.WordControl.m_oLogicDocument;
 
     this.TurnOffRecalcEvent = false;
@@ -101,11 +101,11 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit)
                              // True, если ячейка попадает в выделение по ячейкам.
 
    // this.Lock = new CLock(); // Зажат ли данный параграф другим пользователем
-    if ( false === g_oIdCounter.m_bLoad )
+   /* if ( false === g_oIdCounter.m_bLoad )
     {
         this.Lock.Set_Type( locktype_Mine, false );
         CollaborativeEditing.Add_Unlock2( this );
-    }
+    }  */
 
     this.DeleteCollaborativeMarks = true;
     this.DeleteCommentOnRemove    = true; // Удаляем ли комменты в функциях Internal_Content_Remove
@@ -131,10 +131,55 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit)
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
+    if(isRealObject(DrawingDocument) && isRealObject(Parent))
+    {
+        this.setDrawingDocument(DrawingDocument);
+        this.setParent(Parent);
+        this.setTextPr(new ParaTextPr());
+    }
 }
 
 Paragraph.prototype =
 {
+
+    setDrawingDocument: function(drawingDocument)
+    {
+        var oldValue = isRealObject(this.DrawingDocument) && isRealObject(this.DrawingDocument.drawingObjects) ? this.DrawingDocument.drawingObjects.getWorksheet().model.getId() : null;
+        var newValue = isRealObject(drawingDocument) && isRealObject(drawingDocument.drawingObjects) ? drawingDocument.drawingObjects.getWorksheet().model.getId() : null;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_AddDrawingDocument, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
+        this.DrawingDocument = drawingDocument;
+    },
+
+    setParent: function(parent)
+    {
+        var oldValue = isRealObject(this.Parent)  ? this.Parent.Get_Id() : null;
+        var newValue = isRealObject(parent) ? parent.Get_Id(): null;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_AddParent, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
+        this.Parent = parent;
+    },
+
+    setTextPr: function(textPr)
+    {
+        var oldValue = isRealObject(this.TextPr)  ? this.TextPr.Get_Id() : null;
+        var newValue = isRealObject(textPr) ? textPr.Get_Id(): null;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetTextPr, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
+        this.TextPr = textPr;
+        textPr.setParent(this);
+    },
+
+    getObjectType: function()
+    {
+        return CLASS_TYPE_PARAGRAPH;
+    },
+
+    getType: function()
+    {
+        return CLASS_TYPE_PARAGRAPH;
+    },
+
     GetType : function()
     {
         return type_Paragraph;
@@ -169,7 +214,8 @@ Paragraph.prototype =
 
         var Pr_old = Para.Pr;
         var Pr_new = this.Pr.Copy();
-        History.Add( Para, { Type : historyitem_Paragraph_Pr, Old : Pr_old, New : Pr_new } );
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_Paragraph_Pr, null, null, new UndoRedoDataGraphicObjects(Para.Get_Id(), new UndoRedoDataGOSingleProp(new UndoRedoDataParaPr(Pr_old), new UndoRedoDataParaPr(Pr_new))));
+       // History.Add( Para, { Type : historyitem_Paragraph_Pr, Old : Pr_old, New : Pr_new } );
 
         Para.Pr = Pr_new;
 
@@ -316,7 +362,9 @@ Paragraph.prototype =
         // их изменить.
         var oOldPr = OtherParagraph.Pr;
         OtherParagraph.Pr = this.Pr.Copy();
-        History.Add( OtherParagraph, { Type : historyitem_Paragraph_Pr, Old : oOldPr, New : OtherParagraph.Pr } );
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_Paragraph_Pr, null, null, new UndoRedoDataGraphicObjects(OtherParagraph.Get_Id(), new UndoRedoDataGOSingleProp(new UndoRedoDataParaPr(oOldPr), new UndoRedoDataParaPr(OtherParagraph.Pr))));
+
+
 
         OtherParagraph.Style_Add( this.Style_Get(), true );
     },
@@ -327,8 +375,13 @@ Paragraph.prototype =
     {
         if ( true === Item.Is_RealContent() )
         {
+            var type = Item.Type;
+            var value = Item.getValue();
             var ClearPos = this.Internal_Get_ClearPos( Pos );
-            History.Add( this, { Type : historyitem_Paragraph_AddItem, Pos : ClearPos, EndPos : ClearPos, Items : [ Item ] } );
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_Paragraph_AddItem, null, null,
+                new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoData_historyitem_Paragraph_AddItem(ClearPos, ClearPos, [new UndoRedoDataAddParaItem(type, value)])));
+
+            //History.Add( this, { Type : historyitem_Paragraph_AddItem, Pos : ClearPos, EndPos : ClearPos, Items : [ Item ] } );
         }
 
         this.Content.splice( Pos, 0, Item );
@@ -394,8 +447,17 @@ Paragraph.prototype =
         var StartPos = this.Content.length;
         this.Content = this.Content.concat( NewItems );
 
-        History.Add( this, { Type : historyitem_Paragraph_AddItem, Pos : this.Internal_Get_ClearPos( StartPos ), EndPos : this.Internal_Get_ClearPos( this.Content.length - 1 ), Items : NewItems } );
-
+        //History.Add( this, { Type : historyitem_Paragraph_AddItem, Pos : this.Internal_Get_ClearPos( StartPos ), EndPos : this.Internal_Get_ClearPos( this.Content.length - 1 ), Items : NewItems } );
+        var ids = [];
+        for(var i = 0; i < NewItems.length; ++i)
+        {
+            var Item = NewItems[i];
+            var type = Item.Type;
+            var value = Item.getValue();
+            ids.push(new UndoRedoDataAddParaItem(type, value));
+        }
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_Paragraph_AddItem, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoData_historyitem_Paragraph_AddItem(this.Internal_Get_ClearPos( StartPos ), this.Internal_Get_ClearPos( this.Content.length - 1 ), ids)));
         this.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
     },
 
@@ -406,8 +468,12 @@ Paragraph.prototype =
         var Item = this.Content[Pos];
         if ( true === Item.Is_RealContent() )
         {
+            var type = Item.Type;
+            var value = Item.getValue();
             var ClearPos = this.Internal_Get_ClearPos( Pos );
-            History.Add( this, { Type : historyitem_Paragraph_RemoveItem, Pos : ClearPos, EndPos : ClearPos, Items : [ Item ] } );
+            //History.Add( this, { Type : historyitem_Paragraph_RemoveItem, Pos : ClearPos, EndPos : ClearPos, Items : [ Item ] } );
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_Paragraph_RemoveItem, null, null,
+                new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoData_historyitem_Paragraph_AddItem(ClearPos, ClearPos, [new UndoRedoDataAddParaItem(type, value)])));
         }
 
         if ( this.CurPos.ContentPos > Pos )
@@ -509,8 +575,16 @@ Paragraph.prototype =
                 LastItems.push( LastArray[Index] );
         }
 
-        History.Add( this, { Type : historyitem_Paragraph_RemoveItem, Pos : this.Internal_Get_ClearPos( Pos ), EndPos : this.Internal_Get_ClearPos(Pos + Count - 1), Items : LastItems } );
-
+        //History.Add( this, { Type : historyitem_Paragraph_RemoveItem, Pos : this.Internal_Get_ClearPos( Pos ), EndPos : this.Internal_Get_ClearPos(Pos + Count - 1), Items : LastItems } );
+        var ids = [];
+        for(var i = 0; i < LastItems.length; ++i)
+        {
+            var type = LastItems[i].Type;
+            var value =  LastItems[i].getValue();
+            ids.push(new UndoRedoDataAddParaItem(type, value));
+        }
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_Paragraph_RemoveItem, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoData_historyitem_Paragraph_AddItem(this.Internal_Get_ClearPos( Pos ), this.Internal_Get_ClearPos(Pos + Count - 1), ids)));
         if ( this.CurPos.ContentPos > Pos )
         {
             if ( this.CurPos.ContentPos > Pos + Count )
@@ -4974,7 +5048,13 @@ Paragraph.prototype =
         var CurPos = this.CurPos.ContentPos;
 
         if ( "undefined" != typeof(Item.Parent) )
-            Item.Parent = this;
+        {
+            if(typeof(Item.Set_Parent) === "function")
+                Item.Set_Parent(this);
+            else
+                Item.Parent = this;
+        }
+
 
         switch (Item.Type)
         {
@@ -6299,6 +6379,33 @@ Paragraph.prototype =
     {
         this.Internal_Clear_EmptyTextPr();
 
+        var theme = this.Parent.getTheme();
+        var color_map = this.Parent.getColorMap();
+        if(isRealObject(TextPr.unifill) && isRealObject(TextPr.unifill.fill))
+        {
+            TextPr.unifill.calculate(theme, color_map, {R:0, G: 0, B: 0, A:255});
+            if(isRealObject(TextPr.unifill.fill.color))
+            {
+                var color = TextPr.unifill.fill.color.RGBA;
+                TextPr.Color = new CDocumentColor(color.R, color.G, color.B);
+            }
+            else if(Array.isArray(TextPr.unifill.fill.colors) && isRealObject(TextPr.unifill.fill.colors[0]))
+            {
+                var color = TextPr.unifill.fill.colors[0].RGBA;
+                TextPr.Color = new CDocumentColor(color.R, color.G, color.B);
+            }
+        }
+
+        if(typeof TextPr.themeFont === "string")
+        {
+            var font_name = getFontInfo(TextPr.themeFont)(theme.themeElements.fontScheme);
+            TextPr.FontFamily = {Name: font_name, Index: -1};
+        }
+
+
+
+
+
         if ( undefined != TextPr.FontFamily )
         {
             var FName  = TextPr.FontFamily.Name;
@@ -6325,7 +6432,8 @@ Paragraph.prototype =
 
             // Выставляем настройки для символа параграфа
             this.TextPr.Apply_TextPr( TextPr );
-
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_Paragraph_Recalculate_Text_Pr, null, null,
+                new UndoRedoDataGraphicObjects(this.Get_Id(), null));
             return;
         }
 
@@ -6376,7 +6484,8 @@ Paragraph.prototype =
                     this.Content[Pos].Apply_TextPr( TextPr );
                 }
             }
-
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_Paragraph_Recalculate_Text_Pr, null, null,
+                new UndoRedoDataGraphicObjects(this.Get_Id(), null));
             return;
         }
 
@@ -6456,6 +6565,8 @@ Paragraph.prototype =
                     this.Content[Pos].Apply_TextPr( TextPr );
             }
         }
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_Paragraph_Recalculate_Text_Pr, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), null));
     },
 
     Internal_AddHyperlink : function(Hyperlink_start)
@@ -8426,19 +8537,26 @@ Paragraph.prototype =
 
         if ( ( undefined != Ind.FirstLine || true === bDeleteUndefined ) && this.Pr.Ind.FirstLine !== Ind.FirstLine )
         {
-            History.Add( this, { Type : historyitem_Paragraph_Ind_First, New : Ind.FirstLine, Old : ( undefined != this.Pr.Ind.FirstLine ? this.Pr.Ind.FirstLine : undefined ) } );
+            //History.Add( this, { Type : historyitem_Paragraph_Ind_First, New : Ind.FirstLine, Old : ( undefined != this.Pr.Ind.FirstLine ? this.Pr.Ind.FirstLine : undefined ) } );
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_Paragraph_Ind_First, null, null, new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp( ( undefined != this.Pr.Ind.FirstLine ? this.Pr.Ind.FirstLine : undefined ) , Ind.FirstLine)));
+
             this.Pr.Ind.FirstLine = Ind.FirstLine;
         }
 
         if ( ( undefined != Ind.Left || true === bDeleteUndefined ) && this.Pr.Ind.Left !== Ind.Left )
         {
-            History.Add( this, { Type : historyitem_Paragraph_Ind_Left, New : Ind.Left, Old : ( undefined != this.Pr.Ind.Left ? this.Pr.Ind.Left : undefined ) } );
+            //History.Add( this, { Type : historyitem_Paragraph_Ind_Left, New : Ind.Left, Old : ( undefined != this.Pr.Ind.Left ? this.Pr.Ind.Left : undefined ) } );
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_Paragraph_Ind_Left, null, null,
+                new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp( ( undefined != this.Pr.Ind.Left ? this.Pr.Ind.Left : undefined ) , Ind.Left)));
+
             this.Pr.Ind.Left = Ind.Left;
         }
 
         if ( ( undefined != Ind.Right || true === bDeleteUndefined ) && this.Pr.Ind.Right !== Ind.Right )
         {
-            History.Add( this, { Type : historyitem_Paragraph_Ind_Right, New : Ind.Right, Old : ( undefined != this.Pr.Ind.Right ? this.Pr.Ind.Right : undefined ) } );
+            //History.Add( this, { Type : historyitem_Paragraph_Ind_Right, New : Ind.Right, Old : ( undefined != this.Pr.Ind.Right ? this.Pr.Ind.Right : undefined ) } );
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_Paragraph_Ind_Right, null, null,
+                new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp( ( undefined != this.Pr.Ind.Right ? this.Pr.Ind.Right : undefined ) , Ind.Right)));
             this.Pr.Ind.Right = Ind.Right;
         }
 
@@ -8495,7 +8613,9 @@ Paragraph.prototype =
     {
         if ( this.Pr.Jc != Align )
         {
-            History.Add( this, { Type : historyitem_Paragraph_Align, New : Align, Old : ( undefined != this.Pr.Jc ? this.Pr.Jc : undefined ) } );
+          //  History.Add( this, { Type : historyitem_Paragraph_Align, New : Align, Old : ( undefined != this.Pr.Jc ? this.Pr.Jc : undefined ) } );
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_Paragraph_Align, null, null, new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp( undefined != this.Pr.Jc ? this.Pr.Jc : undefined, Align)));
+
             this.Pr.Jc = Align;
 
             // Надо пересчитать конечный стиль
@@ -8560,7 +8680,9 @@ Paragraph.prototype =
     {
         if ( Value != this.Pr.ContextualSpacing )
         {
-            History.Add( this, { Type : historyitem_Paragraph_ContextualSpacing, New : Value, Old : ( undefined != this.Pr.ContextualSpacing ? this.Pr.ContextualSpacing : undefined ) } );
+           // History.Add( this, { Type : historyitem_Paragraph_ContextualSpacing, New : Value, Old : ( undefined != this.Pr.ContextualSpacing ? this.Pr.ContextualSpacing : undefined ) } );
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_Paragraph_ContextualSpacing, null, null,
+                new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp( ( undefined != this.Pr.ContextualSpacing ? this.Pr.ContextualSpacing : undefined ),Value)));
             this.Pr.ContextualSpacing = Value;
 
             // Надо пересчитать конечный стиль
@@ -8572,7 +8694,9 @@ Paragraph.prototype =
     {
         if ( Value != this.Pr.PageBreakBefore )
         {
-            History.Add( this, { Type : historyitem_Paragraph_PageBreakBefore, New : Value, Old : ( undefined != this.Pr.PageBreakBefore ? this.Pr.PageBreakBefore : undefined ) } );
+           // History.Add( this, { Type : historyitem_Paragraph_PageBreakBefore, New : Value, Old : ( undefined != this.Pr.PageBreakBefore ? this.Pr.PageBreakBefore : undefined ) } );
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_Paragraph_PageBreakBefore, null, null,
+                new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(( undefined != this.Pr.PageBreakBefore ? this.Pr.PageBreakBefore : undefined ),Value)));
             this.Pr.PageBreakBefore = Value;
 
             // Надо пересчитать конечный стиль
@@ -8584,7 +8708,9 @@ Paragraph.prototype =
     {
         if ( Value != this.Pr.KeepLines )
         {
-            History.Add( this, { Type : historyitem_Paragraph_KeepLines, New : Value, Old : ( undefined != this.Pr.KeepLines ? this.Pr.KeepLines : undefined ) } );
+           // History.Add( this, { Type : historyitem_Paragraph_KeepLines, New : Value, Old : ( undefined != this.Pr.KeepLines ? this.Pr.KeepLines : undefined ) } );
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_Paragraph_KeepLines, null, null,
+                new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(( undefined != this.Pr.KeepLines ? this.Pr.KeepLines : undefined ),Value)));
             this.Pr.KeepLines = Value;
 
             // Надо пересчитать конечный стиль
@@ -8596,7 +8722,9 @@ Paragraph.prototype =
     {
         if ( Value != this.Pr.KeepNext )
         {
-            History.Add( this, { Type : historyitem_Paragraph_KeepNext, New : Value, Old : ( undefined != this.Pr.KeepNext ? this.Pr.KeepNext : undefined ) } );
+            //History.Add( this, { Type : historyitem_Paragraph_KeepNext, New : Value, Old : ( undefined != this.Pr.KeepNext ? this.Pr.KeepNext : undefined ) } );
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_Paragraph_KeepNext, null, null,
+                new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(( undefined != this.Pr.KeepNext ? this.Pr.KeepNext : undefined ),Value)));
             this.Pr.KeepNext = Value;
 
             // Надо пересчитать конечный стиль
@@ -8608,7 +8736,10 @@ Paragraph.prototype =
     {
         if ( Value != this.Pr.WidowControl )
         {
-            History.Add( this, { Type : historyitem_Paragraph_WidowControl, New : Value, Old : ( undefined != this.Pr.WidowControl ? this.Pr.WidowControl : undefined ) } );
+            //History.Add( this, { Type : historyitem_Paragraph_WidowControl, New : Value, Old : ( undefined != this.Pr.WidowControl ? this.Pr.WidowControl : undefined ) } );
+
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_Paragraph_WidowControl, null, null,
+                new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(( undefined != this.Pr.WidowControl ? this.Pr.WidowControl : undefined ),Value)));
             this.Pr.WidowControl = Value;
 
             // Надо пересчитать конечный стиль
@@ -8849,13 +8980,20 @@ Paragraph.prototype =
 
     Set_DocumentNext : function(Object)
     {
-        History.Add( this, { Type : historyitem_Paragraph_DocNext, New : Object, Old : this.Next } );
+        var oldId = isRealObject(this.Next) ? this.Next.Get_Id() : null;
+        var newId = isRealObject(Object) ? Object.Get_Id() : null;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_Paragraph_DocNext, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldId, newId)));
         this.Next = Object;
     },
 
     Set_DocumentPrev : function(Object)
     {
-        History.Add( this, { Type : historyitem_Paragraph_DocPrev, New : Object, Old : this.Prev } );
+        //History.Add( this, { Type : historyitem_Paragraph_DocPrev, New : Object, Old : this.Prev } );
+        var oldId = isRealObject(this.Prev) ? this.Prev.Get_Id() : null;
+        var newId = isRealObject(Object) ? Object.Get_Id() : null;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_Paragraph_DocPrev, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldId, newId)));
         this.Prev = Object;
     },
 
@@ -9662,16 +9800,45 @@ Paragraph.prototype =
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------
-    Undo : function(Data)
+    Undo : function(Type, Data)
     {
-        var Type = Data.Type;
 
         switch ( Type )
         {
+            case historyitem_AutoShapes_AddDrawingDocument:
+            {
+                if(Data.oldValue !== null)
+                {
+                    var api = window["Asc"]["editor"];
+                    if ( api.wb )
+                    {
+                        var ws = api.wb.getWorksheetById(Data.oldValue);
+                        this.DrawingDocument = ws.objectRender.drawingDocument;
+                    }
+                }
+                else
+                {
+                    this.DrawingDocument  = null;
+                }
+                break;
+            }
+
+            case historyitem_AutoShapes_AddParent:
+            {
+                this.Parent = g_oTableId.Get_ById(Data.oldValue);
+                break;
+            }
+
+            case historyitem_AutoShapes_SetTextPr:
+            {
+                this.TextPr = g_oTableId.Get_ById(Data.oldValue);
+                break;
+            }
             case  historyitem_Paragraph_AddItem:
             {
-                var StartPos = this.Internal_Get_RealPos( Data.Pos );
-                var EndPos   = this.Internal_Get_RealPos( Data.EndPos );
+
+                var StartPos = this.Internal_Get_RealPos( Data.startPos );
+                var EndPos   = this.Internal_Get_RealPos( Data.endPos );
 
                 this.Content.splice( StartPos, EndPos - StartPos + 1 );
 
@@ -9680,15 +9847,21 @@ Paragraph.prototype =
 
             case historyitem_Paragraph_RemoveItem:
             {
-                var Pos = this.Internal_Get_RealPos( Data.Pos );
+                var Pos = this.Internal_Get_RealPos( Data.startPos );
 
                 var Array_start = this.Content.slice( 0, Pos );
                 var Array_end   = this.Content.slice( Pos );
 
-                this.Content = Array_start.concat( Data.Items, Array_end );
+                var items = [];
+                for(var i = 0; i < Data.itemsIds.length; ++i)
+                {
+                    items.push(CreateParaItem(Data.itemsIds[i].type, Data.itemsIds[i].value));
+                }
+                this.Content = Array_start.concat( items, Array_end );
 
                 break;
             }
+
 
             case historyitem_Paragraph_Numbering:
             {
@@ -9705,7 +9878,7 @@ Paragraph.prototype =
 
             case historyitem_Paragraph_Align:
             {
-                this.Pr.Jc = Data.Old;
+                this.Pr.Jc = Data.oldValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -9717,7 +9890,7 @@ Paragraph.prototype =
                 if ( undefined === this.Pr.Ind )
                     this.Pr.Ind = new CParaSpacing();
 
-                this.Pr.Ind.FirstLine = Data.Old;
+                this.Pr.Ind.FirstLine = Data.oldValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -9729,7 +9902,7 @@ Paragraph.prototype =
                 if ( undefined === this.Pr.Ind )
                     this.Pr.Ind = new CParaSpacing();
 
-                this.Pr.Ind.Left = Data.Old;
+                this.Pr.Ind.Left = Data.oldValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -9741,7 +9914,7 @@ Paragraph.prototype =
                 if ( undefined === this.Pr.Ind )
                     this.Pr.Ind = new CParaSpacing();
 
-                this.Pr.Ind.Right = Data.Old;
+                this.Pr.Ind.Right = Data.oldValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -9750,7 +9923,7 @@ Paragraph.prototype =
 
             case historyitem_Paragraph_ContextualSpacing:
             {
-                this.Pr.ContextualSpacing = Data.Old;
+                this.Pr.ContextualSpacing = Data.oldValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -9759,7 +9932,7 @@ Paragraph.prototype =
 
             case historyitem_Paragraph_KeepLines:
             {
-                this.Pr.KeepLines = Data.Old;
+                this.Pr.KeepLines = Data.oldValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -9768,7 +9941,7 @@ Paragraph.prototype =
 
             case historyitem_Paragraph_KeepNext:
             {
-                this.Pr.KeepNext = Data.Old;
+                this.Pr.KeepNext = Data.oldValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -9777,7 +9950,7 @@ Paragraph.prototype =
 
             case historyitem_Paragraph_PageBreakBefore:
             {
-                this.Pr.PageBreakBefore = Data.Old;
+                this.Pr.PageBreakBefore = Data.oldValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -9789,7 +9962,7 @@ Paragraph.prototype =
                 if ( undefined === this.Pr.Spacing )
                     this.Pr.Spacing = new CParaSpacing();
 
-                this.Pr.Spacing.Line = Data.Old;
+                this.Pr.Spacing.Line = Data.oldValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -9801,7 +9974,7 @@ Paragraph.prototype =
                 if ( undefined === this.Pr.Spacing )
                     this.Pr.Spacing = new CParaSpacing();
 
-                this.Pr.Spacing.LineRule = Data.Old;
+                this.Pr.Spacing.LineRule = Data.oldValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -9813,7 +9986,7 @@ Paragraph.prototype =
                 if ( undefined === this.Pr.Spacing )
                     this.Pr.Spacing = new CParaSpacing();
 
-                this.Pr.Spacing.Before = Data.Old;
+                this.Pr.Spacing.Before = Data.oldValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -9825,7 +9998,7 @@ Paragraph.prototype =
                 if ( undefined === this.Pr.Spacing )
                     this.Pr.Spacing = new CParaSpacing();
 
-                this.Pr.Spacing.After = Data.Old;
+                this.Pr.Spacing.After = Data.oldValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -9837,7 +10010,7 @@ Paragraph.prototype =
                 if ( undefined === this.Pr.Spacing )
                     this.Pr.Spacing = new CParaSpacing();
 
-                this.Pr.Spacing.AfterAutoSpacing = Data.Old;
+                this.Pr.Spacing.AfterAutoSpacing = Data.oldValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -9849,7 +10022,7 @@ Paragraph.prototype =
                 if ( undefined === this.Pr.Spacing )
                     this.Pr.Spacing = new CParaSpacing();
 
-                this.Pr.Spacing.BeforeAutoSpacing = Data.Old;
+                this.Pr.Spacing.BeforeAutoSpacing = Data.oldValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -9862,7 +10035,7 @@ Paragraph.prototype =
                     this.Pr.Shd = new CDocumentShd();
 
                 if ( undefined != Data.Old )
-                    this.Pr.Shd.Value = Data.Old;
+                    this.Pr.Shd.Value = Data.oldValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -9875,7 +10048,7 @@ Paragraph.prototype =
                     this.Pr.Shd = new CDocumentShd();
 
                 if ( undefined != Data.Old )
-                    this.Pr.Shd.Color = Data.Old;
+                    this.Pr.Shd.Color = Data.oldValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -9884,7 +10057,7 @@ Paragraph.prototype =
 
             case historyitem_Paragraph_WidowControl:
             {
-                this.Pr.WidowControl = Data.Old;
+                this.Pr.WidowControl = Data.oldValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -9893,7 +10066,7 @@ Paragraph.prototype =
 
             case historyitem_Paragraph_Tabs:
             {
-                this.Pr.Tabs = Data.Old;
+                this.Pr.Tabs = Data.oldValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -9902,7 +10075,7 @@ Paragraph.prototype =
 
             case historyitem_Paragraph_PStyle:
             {
-                var Old = Data.Old;
+                var Old = Data.oldValue;
                 if ( undefined != Old )
                     this.Pr.PStyle = Old;
                 else
@@ -9915,13 +10088,13 @@ Paragraph.prototype =
 
             case historyitem_Paragraph_DocNext:
             {
-                this.Next = Data.Old;
+                this.Next = g_oTableId.Get_ById(Data.oldValue);
                 break;
             }
 
             case historyitem_Paragraph_DocPrev:
             {
-                this.Prev = Data.Old;
+                this.Prev =  g_oTableId.Get_ById(Data.oldValue);
                 break;
             }
 
@@ -9980,7 +10153,10 @@ Paragraph.prototype =
             {
                 var Old = Data.Old;
                 if ( undefined != Old )
-                    this.Pr = Old;
+                {
+                    this.Pr = new CParaPr();
+                    this.Pr.fromObject(Data.oldValue)
+                }
                 else
                     this.Pr = new CParaPr();
 
@@ -10006,20 +10182,86 @@ Paragraph.prototype =
         this.RecalcInfo.Set_Type_0_Spell(pararecalc_0_Spell_All);
     },
 
-    Redo : function(Data)
+    Redo : function(Type, Data)
     {
-        var Type = Data.Type;
-
         switch ( Type )
         {
+
+            case historyitem_Paragraph_Recalculate_Text_Pr:
+            {
+                var theme = this.Parent.getTheme();
+                var color_map = this.Parent.getColorMap();
+                for(var i = 0; i < this.Content.length; ++i)
+                {
+                    if(this.Content[i].Type === para_TextPr && isRealObject(this.Content[i].Value))
+                    {
+                        var TextPr = this.Content[i].Value;
+                        if(isRealObject(TextPr.unifill) && isRealObject(TextPr.unifill.fill))
+                        {
+                            TextPr.unifill.calculate(theme, color_map, {R:0, G: 0, B: 0, A:255});
+                            if(isRealObject(TextPr.unifill.fill.color))
+                            {
+                                var color = TextPr.unifill.fill.color.RGBA;
+                                TextPr.Color = new CDocumentColor(color.R, color.G, color.B);
+                            }
+                            else if(Array.isArray(TextPr.unifill.fill.colors) && isRealObject(TextPr.unifill.fill.colors[0]))
+                            {
+                                var color = TextPr.unifill.fill.colors[0].RGBA;
+                                TextPr.Color = new CDocumentColor(color.R, color.G, color.B);
+                            }
+                        }
+
+                        if(typeof TextPr.themeFont === "string")
+                        {
+                            var font_name = getFontInfo(TextPr.themeFont)(theme.themeElements.fontScheme);
+                            TextPr.FontFamily = {Name: font_name, Index: -1};
+                        }
+                    }
+                }
+                break;
+            }
+
+            case historyitem_AutoShapes_AddDrawingDocument:
+            {
+                if(Data.newValue !== null)
+                {
+                    var api = window["Asc"]["editor"];
+                    if ( api.wb )
+                    {
+                        var ws = api.wb.getWorksheetById(Data.newValue);
+                        this.DrawingDocument = ws.objectRender.drawingDocument;
+                    }
+                }
+                else
+                {
+                    this.DrawingDocument  = null;
+                }
+                break;
+            }
+
+            case historyitem_AutoShapes_AddParent:
+            {
+                this.Parent = g_oTableId.Get_ById(Data.newValue);
+                break;
+            }
+            case historyitem_AutoShapes_SetTextPr:
+            {
+                this.TextPr = g_oTableId.Get_ById(Data.newValue);
+                break;
+            }
             case  historyitem_Paragraph_AddItem:
             {
-                var Pos = this.Internal_Get_RealPos( Data.Pos );
+                var Pos = this.Internal_Get_RealPos( Data.startPos );
 
                 var Array_start = this.Content.slice( 0, Pos );
                 var Array_end   = this.Content.slice( Pos );
 
-                this.Content = Array_start.concat( Data.Items, Array_end );
+                var items = [];
+                for(var i = 0; i < Data.itemsIds.length; ++i)
+                {
+                    items.push(CreateParaItem(Data.itemsIds[i].type, Data.itemsIds[i].value));
+                }
+                this.Content = Array_start.concat(items, Array_end );
 
                 break;
 
@@ -10027,8 +10269,8 @@ Paragraph.prototype =
 
             case historyitem_Paragraph_RemoveItem:
             {
-                var StartPos = this.Internal_Get_RealPos( Data.Pos );
-                var EndPos   = this.Internal_Get_RealPos( Data.EndPos );
+                var StartPos = this.Internal_Get_RealPos( Data.startPos );
+                var EndPos   = this.Internal_Get_RealPos( Data.endPos );
 
                 this.Content.splice( StartPos, EndPos - StartPos + 1 );
 
@@ -10050,7 +10292,7 @@ Paragraph.prototype =
 
             case historyitem_Paragraph_Align:
             {
-                this.Pr.Jc = Data.New;
+                this.Pr.Jc = Data.newValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -10062,7 +10304,7 @@ Paragraph.prototype =
                 if ( undefined === this.Pr.Ind )
                     this.Pr.Ind = new CParaInd();
 
-                this.Pr.Ind.FirstLine = Data.New;
+                this.Pr.Ind.FirstLine = Data.newValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -10074,7 +10316,7 @@ Paragraph.prototype =
                 if ( undefined === this.Pr.Ind )
                     this.Pr.Ind = new CParaInd();
 
-                this.Pr.Ind.Left = Data.New;
+                this.Pr.Ind.Left = Data.newValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -10086,7 +10328,7 @@ Paragraph.prototype =
                 if ( undefined === this.Pr.Ind )
                     this.Pr.Ind = new CParaInd();
 
-                this.Pr.Ind.Right = Data.New;
+                this.Pr.Ind.Right = Data.newValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -10095,7 +10337,7 @@ Paragraph.prototype =
 
             case historyitem_Paragraph_ContextualSpacing:
             {
-                this.Pr.ContextualSpacing = Data.New;
+                this.Pr.ContextualSpacing = Data.newValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -10104,7 +10346,7 @@ Paragraph.prototype =
 
             case historyitem_Paragraph_KeepLines:
             {
-                this.Pr.KeepLines = Data.New;
+                this.Pr.KeepLines = Data.newValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -10113,7 +10355,7 @@ Paragraph.prototype =
 
             case historyitem_Paragraph_KeepNext:
             {
-                this.Pr.KeepNext = Data.New;
+                this.Pr.KeepNext = Data.newValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -10122,7 +10364,7 @@ Paragraph.prototype =
 
             case historyitem_Paragraph_PageBreakBefore:
             {
-                this.Pr.PageBreakBefore = Data.New;
+                this.Pr.PageBreakBefore = Data.newValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -10134,7 +10376,7 @@ Paragraph.prototype =
                 if ( undefined === this.Pr.Spacing )
                     this.Pr.Spacing = new CParaSpacing();
 
-                this.Pr.Spacing.Line = Data.New;
+                this.Pr.Spacing.Line = Data.newValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -10146,7 +10388,7 @@ Paragraph.prototype =
                 if ( undefined === this.Pr.Spacing )
                     this.Pr.Spacing = new CParaSpacing();
 
-                this.Pr.Spacing.LineRule = Data.New;
+                this.Pr.Spacing.LineRule = Data.newValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -10158,7 +10400,7 @@ Paragraph.prototype =
                 if ( undefined === this.Pr.Spacing )
                     this.Pr.Spacing = new CParaSpacing();
 
-                this.Pr.Spacing.Before = Data.New;
+                this.Pr.Spacing.Before = Data.newValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -10170,7 +10412,7 @@ Paragraph.prototype =
                 if ( undefined === this.Pr.Spacing )
                     this.Pr.Spacing = new CParaSpacing();
 
-                this.Pr.Spacing.After = Data.New;
+                this.Pr.Spacing.After = Data.newValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -10182,7 +10424,7 @@ Paragraph.prototype =
                 if ( undefined === this.Pr.Spacing )
                     this.Pr.Spacing = new CParaSpacing();
 
-                this.Pr.Spacing.AfterAutoSpacing = Data.New;
+                this.Pr.Spacing.AfterAutoSpacing = Data.newValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -10194,7 +10436,7 @@ Paragraph.prototype =
                 if ( undefined === this.Pr.Spacing )
                     this.Pr.Spacing = new CParaSpacing();
 
-                this.Pr.Spacing.BeforeAutoSpacing = Data.New;
+                this.Pr.Spacing.BeforeAutoSpacing = Data.newValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -10203,11 +10445,11 @@ Paragraph.prototype =
 
             case historyitem_Paragraph_Shd_Value:
             {
-                if ( undefined != Data.New && undefined === this.Pr.Shd )
+                if ( undefined != Data.newValue && undefined === this.Pr.Shd )
                     this.Pr.Shd = new CDocumentShd();
 
-                if ( undefined != Data.New )
-                    this.Pr.Shd.Value = Data.New;
+                if ( undefined != Data.newValue )
+                    this.Pr.Shd.Value = Data.newValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -10216,11 +10458,11 @@ Paragraph.prototype =
 
             case historyitem_Paragraph_Shd_Color:
             {
-                if ( undefined != Data.New && undefined === this.Pr.Shd )
+                if ( undefined != Data.newValue && undefined === this.Pr.Shd )
                     this.Pr.Shd = new CDocumentShd();
 
-                if ( undefined != Data.New )
-                    this.Pr.Shd.Color = Data.New;
+                if ( undefined != Data.newValue )
+                    this.Pr.Shd.Color = Data.newValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -10229,7 +10471,7 @@ Paragraph.prototype =
 
             case historyitem_Paragraph_WidowControl:
             {
-                this.Pr.WidowControl = Data.New;
+                this.Pr.WidowControl = Data.newValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -10238,7 +10480,7 @@ Paragraph.prototype =
 
             case historyitem_Paragraph_Tabs:
             {
-                this.Pr.Tabs = Data.New;
+                this.Pr.Tabs = Data.newValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -10260,25 +10502,25 @@ Paragraph.prototype =
 
             case historyitem_Paragraph_DocNext:
             {
-                this.Next = Data.New;
+                this.Next = g_oTableId.Get_ById(Data.newValue);
                 break;
             }
 
             case historyitem_Paragraph_DocPrev:
             {
-                this.Prev = Data.New;
+                this.Prev =  g_oTableId.Get_ById(Data.newValue);
                 break;
             }
 
             case historyitem_Paragraph_Parent:
             {
-                this.Parent = Data.New;
+                this.Parent = Data.newValue;
                 break;
             }
 
             case historyitem_Paragraph_Borders_Between:
             {
-                this.Pr.Brd.Between = Data.New;
+                this.Pr.Brd.Between = Data.newValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -10287,7 +10529,7 @@ Paragraph.prototype =
 
             case historyitem_Paragraph_Borders_Bottom:
             {
-                this.Pr.Brd.Bottom = Data.New;
+                this.Pr.Brd.Bottom = Data.newValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -10296,7 +10538,7 @@ Paragraph.prototype =
 
             case historyitem_Paragraph_Borders_Left:
             {
-                this.Pr.Brd.Left = Data.New;
+                this.Pr.Brd.Left = Data.newValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -10305,7 +10547,7 @@ Paragraph.prototype =
 
             case historyitem_Paragraph_Borders_Right:
             {
-                this.Pr.Brd.Right = Data.New;
+                this.Pr.Brd.Right = Data.newValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -10314,7 +10556,7 @@ Paragraph.prototype =
 
             case historyitem_Paragraph_Borders_Top:
             {
-                this.Pr.Brd.Top = Data.New;
+                this.Pr.Brd.Top = Data.newValue;
 
                 this.CompiledPr.NeedRecalc = true;
 
@@ -10323,9 +10565,12 @@ Paragraph.prototype =
             
             case historyitem_Paragraph_Pr:
             {
-                var New = Data.New;
+                var New = Data.newValue;
                 if ( undefined != New )
-                    this.Pr = New;
+                {
+                    this.Pr = new CParaPr();
+                    this.Pr.fromObject(Data.newValue)
+                }
                 else
                     this.Pr = new CParaPr();
 
@@ -10336,13 +10581,13 @@ Paragraph.prototype =
 
             case historyitem_Paragraph_PresentationPr_Bullet:
             {
-                this.PresentationPr.Bullet = Data.New;
+                this.PresentationPr.Bullet = Data.newValue;
                 break;
             }
 
             case historyitem_Paragraph_PresentationPr_Level:
             {
-                this.PresentationPr.Level = Data.New;
+                this.PresentationPr.Level = Data.newValue;
                 break;
             }
         }
@@ -10417,9 +10662,9 @@ Paragraph.prototype =
         return this.Parent.Get_ParentObject_or_DocumentPos(this.Index);
     },
 
-    Refresh_RecalcData : function(Data)
+    Refresh_RecalcData : function(Type, Data)
     {
-        var Type = Data.Type;
+       // var Type = Data.Type;
 
         var bNeedRecalc = false;
 
@@ -10500,7 +10745,7 @@ Paragraph.prototype =
             CurPage = 0;
 
         // Если Index < 0, значит данный элемент еще не был добавлен в родительский класс
-        if ( this.Index >= 0 )
+        if ( this.Index >= 0 && isRealObject(this.Parent) )
             this.Parent.Refresh_RecalcData2( this.Index, this.PageNum + CurPage );
     },
 

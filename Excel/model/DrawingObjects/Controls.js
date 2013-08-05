@@ -203,8 +203,6 @@ function CControl()
             this.HtmlElement.height = ((_b - _y) * g_dKoef_mm_to_pix + 0.5) >> 0;
         }
 	}
-
-    
 }
 
 function CControlContainer()

@@ -45,7 +45,25 @@ function CChartAsGroup(drawingBase, drawingObjects)
 CChartAsGroup.prototype =
 {
     getObjectType: function()
-    {},
+    {
+        return CLASS_TYPE_CHART_AS_GROUP;
+    },
+
+    Get_Id: function()
+    {
+        return this.Id;
+    },
+
+
+    setDrawingObjects: function(drawingObjects)
+    {
+        var newValue = isRealObject(drawingObjects) ? drawingObjects.getWorksheet().model.getId() : null;
+        var oldValue = isRealObject(this.drawingObjects) ? this.drawingObjects.getWorksheet().model.getId() : null;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetDrawingObjects, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
+        this.drawingObjects = drawingObjects;
+
+    },
 
     isChart: function()
     {
@@ -1199,11 +1217,21 @@ CChartAsGroup.prototype =
     }, */
 
 
+    setXfrmObject: function(xfrm)
+    {
+        var oldId = isRealObject(this.spPr.xfrm) ? this.spPr.xfrm.Get_Id() : null;
+        var newId = isRealObject(xfrm) ? xfrm.Get_Id() : null;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetXfrm, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldId, newId)));
+        this.spPr.xfrm = xfrm;
+    },
+
     init: function()
     {
         if(isRealObject(this.drawingBase))
         {
             var metrics = this.drawingBase.getGraphicObjectMetrics();
+            this.setXfrmObject(new CXfrm());
             this.spPr.xfrm.setPosition(metrics.x, metrics.y);
             this.spPr.xfrm.setExtents(metrics.extX, metrics.extY);
         }
@@ -1221,10 +1249,13 @@ CChartAsGroup.prototype =
             else
             {
                 var content = this.chartTitle.txBody.content;
-                content.DrawingDocument = this.drawingObjects.drawingDocument;
+                content.setParent(this.chartTitle.txBody);
+                content.setDrawingDocument(this.drawingObjects.drawingDocument);
                 for(var i = 0; i < content.Content.length; ++i)
                 {
-                    content.Content[i].DrawingDocument = this.drawingObjects.drawingDocument
+                    content.Content[i].setDrawingDocument(this.drawingObjects.drawingDocument);
+                    content.Content[i].setParent(content);
+                    content.Content[i].setTextPr(new ParaTextPr());
                 }
             }
             this.chart.header.title = this.chartTitle.txBody.content.getTextString();
@@ -1249,10 +1280,13 @@ CChartAsGroup.prototype =
             else
             {
                 var content = this.hAxisTitle.txBody.content;
-                content.DrawingDocument = this.drawingObjects.drawingDocument;
+                content.setParent(this.hAxisTitle.txBody);
+                content.setDrawingDocument(this.drawingObjects.drawingDocument);
                 for(var i = 0; i < content.Content.length; ++i)
                 {
-                    content.Content[i].DrawingDocument = this.drawingObjects.drawingDocument
+                    content.Content[i].setDrawingDocument(this.drawingObjects.drawingDocument);
+                    content.Content[i].setParent(content);
+                    content.Content[i].setTextPr(new ParaTextPr());
                 }
             }
 
@@ -1280,10 +1314,13 @@ CChartAsGroup.prototype =
             {
                 this.vAxisTitle.txBody.bodyPr.setVert(nVertTTvert270);
                 var content = this.vAxisTitle.txBody.content;
-                content.DrawingDocument = this.drawingObjects.drawingDocument;
+                content.setParent(this.vAxisTitle.txBody)
+                content.setDrawingDocument(this.drawingObjects.drawingDocument);
                 for(var i = 0; i < content.Content.length; ++i)
                 {
-                    content.Content[i].DrawingDocument = this.drawingObjects.drawingDocument
+                    content.Content[i].setDrawingDocument(this.drawingObjects.drawingDocument);
+                    content.Content[i].setParent(content);
+                    content.Content[i].setTextPr(new ParaTextPr());
                 }
             }
 
@@ -1312,6 +1349,7 @@ CChartAsGroup.prototype =
     initFromChartObject: function(chart, bWithoutHistory, options)
     {
         this.setChart(chart);
+        this.spPr.xfrm = new CXfrm();
         var xfrm = this.spPr.xfrm;
         var chartLeft = this.drawingObjects.convertMetric(options && options.left ? ptToPx(options.left) : (parseInt($("#ws-canvas").css('width')) / 2) - c_oAscChartDefines.defaultChartWidth / 2, 0, 3);
         var chartTop = this.drawingObjects.convertMetric(options && options.top ? ptToPx(options.top) : (parseInt($("#ws-canvas").css('height')) / 2) - c_oAscChartDefines.defaultChartHeight / 2, 0, 3);

@@ -26,10 +26,22 @@ function CChartLegend()
     this.extY = null;
 
     this.calculatedEntry = [];
+    this.Id = g_oIdCounter.Get_NewId();
+    g_oTableId.Add(this, this.Id);
 }
 
 CChartLegend.prototype =
 {
+    getObjectType: function()
+    {
+        return CLASS_TYPE_CHART_LEGEND;
+    },
+
+    Get_Id: function()
+    {
+        return this.Id;
+    },
+
     getStyles: function(level)
     {
         var styles = new CStyles();

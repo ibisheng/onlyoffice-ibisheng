@@ -6181,6 +6181,40 @@ CParaPr.prototype =
 
         if ( Flags & 65536 )
             this.PStyle = Reader.GetString2();
+    },
+
+    fromObject: function(o)
+    {
+        this.ContextualSpacing = o.ContextualSpacing;          // Удалять ли интервал между параграфами одинакового стиля
+        this.Ind.Left      = o.IndLeft      ; // Левый отступ
+        this.Ind.Right     = o.IndRight     ; // Правый отступ
+        this.Ind.FirstLine = o.IndFirstLine ; // Первая строка
+        this.Jc                = o.Jc             ;          // Прилегание параграфа
+        this.KeepLines         = o.KeepLines      ;          // Неразрывный параграф
+        this.KeepNext          = o.KeepNext       ;          // Не разъединять со следующим параграфом
+        this.PageBreakBefore   = o.PageBreakBefore;          // Разрыв страницы перед параграфом
+        this.Spacing           = new CParaSpacing(); // Расстояния между строками внутри параграфа и между параграфами
+        this.Spacing.Line              = o.SpacingLine              ;
+        this.Spacing.LineRule          = o.SpacingLineRule          ;
+        this.Spacing.Before            = o.SpacingBefore            ;
+        this.Spacing.BeforeAutoSpacing = o.SpacingBeforeAutoSpacing ;
+        this.Spacing.After             = o.SpacingAfter             ;
+        this.Spacing.AfterAutoSpacing  = o.SpacingAfterAutoSpacing  ;
+        this.Shd               = o.Shd;          // Заливка параграфа
+        this.Brd =
+        {
+            First   : o.BrdFirst  ,            // Является ли данный параграф первым в группе параграфов с одинаковыми краями и настр
+            Last    : o.BrdLast   ,            // Является ли данный параграф последним в группе параграфов с одинаковыми краями и на
+            Between : o.BrdBetween,
+            Bottom  : o.BrdBottom ,
+            Left    : o.BrdLeft   ,
+            Right   : o.BrdRight  ,
+            Top     : o.BrdTop
+        };
+        this.WidowControl      = o.WidowControl; // Запрет висячих строк
+        this.Tabs              = o.Tabs        ; // Заданные табы
+        this.NumPr             = o.NumPr       ; // Нумерация
+        this.PStyle            = o.PStyle      ; // Стиль параграфа
     }
 }
 

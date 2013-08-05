@@ -7,7 +7,7 @@
  */
 function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
 {
-    this.drawingOjects = drawingObjects;
+    this.drawingObjects = drawingObjects;
     this.presetGeom = presetGeom;
     this.startX = startX;
     this.startY = startY;
@@ -18,12 +18,17 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
     this.extY = null;
 
     this.transform = new CMatrix();
-    var geometry = CreateGeometry(presetGeom);
+    var geometry = CreateGeometry(presetGeom !== "textRect" ? presetGeom : "rect");
     geometry.Init(5, 5);
 
     var theme = drawingObjects.getWorkbook().theme;
     var color_map = GenerateDefaultColorMap().color_map;
-    var style = CreateDefaultShapeStyle();
+
+    var style;
+    if(presetGeom !== "textRect")
+        style = CreateDefaultShapeStyle();
+    else
+        style = CreateDefaultTextRectStyle();
     var brush = theme.getFillStyle(style.fillRef.idx);
     style.fillRef.Color.Calculate(theme, color_map, {R:0, G:0, B:0, A:255});
     var RGBA = style.fillRef.Color.RGBA;
@@ -35,13 +40,35 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
             brush.fill.color = style.fillRef.Color.createDuplicate();
         }
     }
-    brush.calculate(theme, color_map, RGBA) ;
+
+
 
     var pen = theme.getLnStyle(style.lnRef.idx);
     style.lnRef.Color.Calculate(theme, color_map, {R: 0 , G: 0, B: 0, A: 255});
     RGBA = style.lnRef.Color.RGBA;
 
+    if(presetGeom === "textRect")
+    {
+        var ln, fill;
+        ln = new CLn();
+        ln.w = 6350;
+        ln.Fill = new CUniFill();
+        ln.Fill.fill = new CSolidFill();
+        ln.Fill.fill.color = new CUniColor();
+        ln.Fill.fill.color.color  = new CPrstColor();
+        ln.Fill.fill.color.color.id = "black";
+
+        fill = new CUniFill();
+        fill.fill = new CSolidFill();
+        fill.fill.color = new CUniColor();
+        fill.fill.color.color  = new CSchemeColor();
+        fill.fill.color.color.id = 12;
+        pen.merge(ln);
+        brush.merge(fill);
+    }
+
     pen.Fill.calculate(theme, color_map, RGBA) ;
+    brush.calculate(theme, color_map, RGBA) ;
 
 
     this.overlayObject = new OverlayObject(geometry, 5, 5, brush, pen, this.transform);
@@ -238,8 +265,13 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
 
     this.trackEnd = function()
     {
-        var shape = new CShape(null, this.drawingOjects);
-        shape.initDefault(this.x, this.y, this.extX, this.extY, false, false, this.presetGeom);
+        var shape = new CShape(null, this.drawingObjects);
+        if(this.presetGeom !== "textRect")
+            shape.initDefault(this.x, this.y, this.extX, this.extY, false, false, this.presetGeom);
+        else
+            shape.initDefaultTextRect(this.x, this.y, this.extX, this.extY, false, false);
+        shape.select(this.drawingObjects.controller);
         shape.addToDrawingObjects();
+        this.drawingObjects.controller.curState.resultObject = shape;
     };
 }

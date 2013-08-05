@@ -110,6 +110,54 @@ var historyitem_AutoShapes_SetGroup = 32;
 var historyitem_AutoShapes_SetPresetGeometry = 33;
 var historyitem_AutoShapes_SetDefaultStyle = 34;
 var historyitem_AutoShapes_RecalculateAfterInit = 35;
+var historyitem_AutoShapes_SetXfrm = 36;
+var historyitem_AutoShapes_AddTextBody = 37;
+var historyitem_AutoShapes_AddDocContent = 38;
+var historyitem_AutoShapes_AddDrawingDocument = 39;
+var historyitem_AutoShapes_AddParent = 40;
+var historyitem_AutoShapes_AddParagraph = 41;
+var historyitem_AutoShapes_SetShape = 42;
+var historyitem_AutoShapes_SetTextPr = 43;
+var historyitem_AutoShapes_SetDefaultTextRectStyle = 44;
+var historyitem_AutoShapes_SetFill = 45;
+var historyitem_AutoShapes_SetFType = 46;
+var historyitem_AutoShapes_SetFgColor = 47;
+var historyitem_AutoShapes_SetBgColor = 48;
+var historyitem_AutoShapes_SetUniFill = 49;
+var historyitem_AutoShapes_SetUniLine = 50;
+var historyitem_AutoShapes_SetLineWidth = 51;
+var historyitem_AutoShapes_RecalculateAfterParagraphAddRedo = 52;
+var historyitem_AutoShapes_RecalculateAfterParagraphAddUndo = 53;
+var historyitem_AutoShapes_SetTransparent = 54;
+var historyitem_AutoShapes_RecalculateBrushRedo = 55;
+var historyitem_AutoShapes_RecalculateBrushUndo = 56;
+var historyitem_AutoShapes_AddToSpTree = 57;
+var historyitem_AutoShapes_DeleteDrawingBase = 58;
+var historyitem_AutoShapes_VerticalAlign = 59;
+var historyitem_AutoShapes_Vert = 60;
+var historyitem_AutoShapes_GroupRecalculateUndo = 61;
+var historyitem_AutoShapes_GroupRecalculateRedo = 62;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -136,6 +184,31 @@ var historyitem_AutoFilter_ApplyMF	= 5;
 // Типы изменений в классе CDocumentContent
 var historyitem_DocumentContent_AddItem     = 1; // Добавляем элемент в документ
 var historyitem_DocumentContent_RemoveItem  = 2; // Удаляем элемент из документа
+
+// Типы изменений в классе ParaTextPr
+var historyitem_TextPr_Change     =  1; // Изменяем настройку
+var historyitem_TextPr_Bold       =  2; // Изменяем жирность
+var historyitem_TextPr_Italic     =  3; // Изменяем наклонность
+var historyitem_TextPr_Strikeout  =  4; // Изменяем зачеркивание текста
+var historyitem_TextPr_Underline  =  5; // Изменяем подчеркивание текста
+var historyitem_TextPr_FontFamily =  6; // Изменяем имя шрифта
+var historyitem_TextPr_FontSize   =  7; // Изменяем размер шрифта
+var historyitem_TextPr_Color      =  8; // Изменяем цвет текста
+var historyitem_TextPr_VertAlign  =  9; // Изменяем вертикальное прилегание
+var historyitem_TextPr_HighLight  = 10; // Изменяем выделение текста
+var historyitem_TextPr_RStyle     = 11; // Изменяем стиль текста
+var historyitem_TextPr_Spacing    = 12; // Изменяем расстояние между символами
+var historyitem_TextPr_DStrikeout = 13; // Изменяем двойное зачеркивание
+var historyitem_TextPr_Caps       = 14; // Изменяем все буквы на прописные
+var historyitem_TextPr_SmallCaps  = 15; // Изменяем все буквы на малые прописные
+var historyitem_TextPr_Position   = 16; // Изменяем вертикальное положение
+var historyitem_TextPr_Value      = 17; // Изменяем целиком все настройки
+var historyitem_TextPr_RFonts     = 18; // Изменяем настройки шрифтов
+var historyitem_TextPr_Lang       = 19; // Изменяем настройку языка
+var historyitem_TextPr_ThemeFont  = 20; // Изменяем настройку языка
+var historyitem_TextPr_UniFill    = 21; // Изменяем настройку языка
+
+
 
 // Типы изменений в классе Paragraph
 var historyitem_Paragraph_AddItem                   =  1; // Добавляем элемент в параграф
@@ -171,6 +244,8 @@ var historyitem_Paragraph_Borders_Top               = 30; // Изменяем н
 var historyitem_Paragraph_Pr                        = 31; // Изменяем свойства полностью
 var historyitem_Paragraph_PresentationPr_Bullet     = 32; // Изменяем свойства нумерации у параграфа в презентации
 var historyitem_Paragraph_PresentationPr_Level      = 33; // Изменяем уровень параграфа в презентациях
+var historyitem_Paragraph_Recalculate_Text_Pr       = 34; // Изменяем уровень параграфа в презентациях
+
 
 // Типы изменений в классе CTableId
 var historyitem_TableId_Add   = 1; // Добавили новую ссылку в глобальную таблицу

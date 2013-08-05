@@ -5,23 +5,429 @@
  * Time: 5:25 PM
  * To change this template use File | Settings | File Templates.
  */
+
+
+
+
+function CTableId()
+{
+    this.m_aPairs   = new Object();
+    this.m_bTurnOff = false;
+
+
+    this.Id = g_oIdCounter.Get_NewId();
+    this.Add(this, this.Id);
+}
+
+
+CTableId.prototype =
+{
+    getObjectType: function()
+    {
+        return CLASS_TYPE_TABLE_ID;
+    },
+
+    Add: function(Class, Id, sheetId)
+    {
+        if ( false === this.m_bTurnOff )
+        {
+            Class.Id = Id;
+            this.m_aPairs[Id] = Class;
+            if(Class !== this && History instanceof CHistory)
+                History.Add(g_oUndoRedoGraphicObjects, historyitem_TableId_Add, null, null, new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoData_GTableIdAdd(Class, Id)));
+        }
+    },
+
+//this.Add(this);
+
+    // Получаем указатель на класс по Id
+    Get_ById: function(Id)
+    {
+        if ( "undefined" != typeof(this.m_aPairs[Id]) )
+            return this.m_aPairs[Id];
+
+        return null;
+    },
+
+    // Получаем Id, по классу (вообще, данную функцию лучше не использовать)
+    Get_ByClass: function(Class)
+    {
+        if ( "undefined" != typeof( Class.Get_Id ) )
+            return Class.Get_Id();
+
+        if ( "undefined" != typeof( Class.GetId() ) )
+            return Class.GetId();
+
+        return null;
+    },
+
+    Reset_Id: function(Class, Id_new, Id_old)
+    {
+        if ( Class === this.m_aPairs[Id_old] )
+        {
+            delete this.m_aPairs[Id_old];
+            this.m_aPairs[Id_new] = Class;
+
+            History.Add( this, { Type : historyitem_TableId_Reset, Id_new : Id_new, Id_old : Id_old  } );
+        }
+        else
+        {
+            this.Add( Class, Id_new );
+        }
+    },
+
+    Get_Id: function()
+    {
+        return this.Id;
+    },
+//-----------------------------------------------------------------------------------
+// Функции для работы с Undo/Redo
+//-----------------------------------------------------------------------------------
+    Undo: function(Data)
+    {
+        // Ничего не делаем (можно удалять/добавлять ссылки на классы в данном классе
+        // но это не обяательно, т.к. Id всегда уникальные)
+    },
+
+    Redo: function(type, data)
+    {
+        switch(type)
+        {
+            case historyitem_TableId_Add:
+            {
+                if(isRealObject(this.m_aPairs[data.id]) && this.m_aPairs[data.id].Id === data.id)
+                    break;
+                this.m_bTurnOff = true;
+                var Id    = data.id;
+                var  Class;
+                switch (data.objectType)
+                {
+                    case CLASS_TYPE_SHAPE:
+                    {
+                        Class = new CShape();
+                        break;
+                    }
+                    case CLASS_TYPE_XFRM:
+                    {
+                        Class = new CXfrm();
+                        break;
+                    }
+                    case CLASS_TYPE_GEOMETRY:
+                    {
+                        Class = new CGeometry();
+                        break;
+                    }
+
+                    case CLASS_TYPE_IMAGE:
+                    {
+                        Class = new CImage();
+                        break;
+                    }
+
+                    case CLASS_TYPE_GROUP:
+                    {
+                        Class = new CGroupShape();
+                        break;
+                    }
+                    case CLASS_TYPE_PATH:
+                    {
+                        Class = new Path();
+                        break;
+                    }
+                    case CLASS_TYPE_PARAGRAPH:
+                    {
+                        Class = new Paragraph();
+                        break;
+                    }
+                    case CLASS_TYPE_TEXT_BODY:
+                    {
+                        Class = new CTextBody();
+                        break;
+                    }
+                    case CLASS_TYPE_DOCUMENT_CONTENT:
+                    {
+                        Class = new CDocumentContent();
+                        break;
+                    }
+                    case CLASS_TYPE_TEXT_PR:
+                    {
+                        Class = new ParaTextPr();
+                        break;
+                    }
+
+                    case CLASS_TYPE_UNI_FILL:
+                    {
+                        Class = new CUniFill();
+                        break;
+                    }
+
+                    case CLASS_TYPE_PATTERN_FILL:
+                    {
+                        Class = new CPattFill();
+                        break;
+                    }
+                    case CLASS_TYPE_GRAD_FILL:
+                    {
+
+                        Class = new CGradFill();
+                        break;
+                    }
+                    case CLASS_TYPE_SOLID_FILL:
+                    {
+
+                        Class = new CSolidFill();
+                        break;
+                    }
+                    case CLASS_TYPE_UNI_COLOR:
+                    {
+
+                        Class = new CUniColor();
+                        break;
+                    }
+                    case CLASS_TYPE_SCHEME_COLOR :
+                    {
+                        Class = new CSchemeColor();
+                        break;
+                    }
+                    case CLASS_TYPE_RGB_COLOR:
+                    {
+                        Class = new CRGBColor();
+                        break;
+                    }
+                    case CLASS_TYPE_PRST_COLOR:
+                    {
+                        Class = new CPrstColor();
+                        break;
+                    }
+                    case CLASS_TYPE_SYS_COLOR:
+                    {
+                        Class = new CSysColor();
+                        break;
+                    }
+                    case CLASS_TYPE_LINE:
+                    {
+                        Class = new CLn();
+                        break;
+                    }
+                    case CLASS_TYPE_CHART_AS_GROUP:
+                    {
+                        Class = new CChartAsGroup();
+                        break;
+                    }
+                    case CLASS_TYPE_CHART_LEGEND:
+                    {
+                        Class = new CChartLegend();
+                        break;
+                    }
+                    case CLASS_TYPE_CHART_TITLE:
+                    {
+                        Class = new CChartTitle();
+                        break;
+                    }
+                }
+                Class.Id = Id;
+                this.m_aPairs[Id] = Class;
+
+                this.m_bTurnOff = false;
+                break;
+            }
+        }
+        // Ничего не делаем (можно удалять/добавлять ссылки на классы в данном классе
+        // но это не обяательно, т.к. Id всегда уникальные)
+    },
+//-----------------------------------------------------------------------------------
+// Функции для работы с совместным редактирования
+//-----------------------------------------------------------------------------------
+    Read_Class_FromBinary: function(Reader)
+    {
+        var ElementType = Reader.GetLong();
+        var Element = null;
+
+        // Временно отключаем регистрацию новых классов
+        this.m_bTurnOff = true;
+
+        switch( ElementType )
+        {
+            case historyitem_type_Paragraph        : Element = new Paragraph(); break;
+            case historyitem_type_TextPr           : Element = new ParaTextPr(); break;
+            case historyitem_type_Drawing          : Element = new ParaDrawing(); break;
+            //case historyitem_type_DrawingObjects   : Element = new CDrawingObjects(); break;
+            // case historyitem_type_FlowObjects      : Element = new FlowObjects(); break;
+            case historyitem_type_FlowImage        : Element = new FlowImage(); break;
+            case historyitem_type_Table            : Element = new CTable(); break;
+            case historyitem_type_TableRow         : Element = new CTableRow(); break;
+            case historyitem_type_TableCell        : Element = new CTableCell(); break;
+            case historyitem_type_DocumentContent  : Element = new CDocumentContent(); break;
+            case historyitem_type_FlowTable        : Element = new FlowTable(); break;
+            case historyitem_type_HdrFtr           : Element = new CHeaderFooter(); break;
+            case historyitem_type_AbstractNum      : Element = new CAbstractNum(); break;
+        }
+
+        Element.Read_FromBinary2(Reader);
+
+        // Включаем назад регистрацию новых классов
+        this.m_bTurnOff = false;
+
+        return Element;
+    },
+
+    Save_Changes: function(Data, Writer)
+    {
+        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
+        // Long : тип класса
+        // Long : тип изменений
+
+        Writer.WriteLong( historyitem_type_TableId );
+
+        var Type = Data.Type;
+
+        // Пишем тип
+        Writer.WriteLong( Type );
+        switch ( Type )
+        {
+            case historyitem_TableId_Add :
+            {
+                // String   : Id элемента
+                // Varibale : сам элемент
+
+                Writer.WriteString2( Data.Id );
+                Data.Class.Write_ToBinary2( Writer );
+
+                break;
+            }
+
+            case historyitem_TableId_Reset:
+            {
+                // String : Id_new
+                // String : Id_old
+
+                Writer.WriteString2( Data.Id_new );
+                Writer.WriteString2( Data.Id_old );
+
+                break;
+            }
+        }
+    },
+
+    Save_Changes2: function(Data, Writer)
+    {
+        return false;
+    },
+
+    Load_Changes: function(Reader, Reader2)
+    {
+        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
+        // Long : тип класса
+        // Long : тип изменений
+
+        var ClassType = Reader.GetLong();
+        if ( historyitem_type_TableId != ClassType )
+            return;
+
+        var Type = Reader.GetLong();
+
+        switch ( Type )
+        {
+            case historyitem_TableId_Add:
+            {
+                // String   : Id элемента
+                // Varibale : сам элемент
+
+                var Id    = Reader.GetString2();
+                var Class = this.Read_Class_FromBinary( Reader );
+
+                this.m_aPairs[Id] = Class;
+
+                break;
+            }
+
+            case historyitem_TableId_Reset:
+            {
+                // String : Id_new
+                // String : Id_old
+
+                var Id_new = Reader.GetString2();
+                var Id_old = Reader.GetString2();
+
+                if ( "undefined" != this.m_aPairs[Id_old] )
+                {
+                    var Class = this.m_aPairs[Id_old];
+                    delete this.m_aPairs[Id_old];
+                    this.m_aPairs[Id_new] = Class;
+                }
+
+                break;
+            }
+
+        }
+
+        return true;
+    },
+
+    Unlock: function(Data)
+    {
+        // Ничего не делаем
+    }
+};
+
 function CTextBody(shape)
 {
-    this.shape = shape;
+    //this.shape = shape;
 
     this.bodyPr = new CBodyPr();
     this.bodyPr.setDefault();
     this.lstStyle = null;
 
-    this.content = new CDocumentContent(this, shape.drawingObjects.drawingDocument, 0, 0, 200, 20000, false, false);
+    this.content = null;//new CDocumentContent(this, shape.drawingObjects.drawingDocument, 0, 0, 200, 20000, false, false);
     this.contentWidth = 0;
     this.contentHeight = 0;
 
     this.styles = [];
+    this.Id = g_oIdCounter.Get_NewId();
+    g_oTableId.Add(this, this.Id);
+    if(isRealObject(shape))
+    {
+        this.setShape(shape);
+        this.addDocumentContent(new CDocumentContent(this, shape.drawingObjects.drawingDocument, 0, 0, 200, 20000, false, false));
+    }
 
 }
 CTextBody.prototype =
 {
+    Get_Id: function()
+    {
+        return this.Id;
+    },
+
+    getType: function()
+    {
+        return CLASS_TYPE_TEXT_BODY;
+    },
+
+    getObjectType: function()
+    {
+        return CLASS_TYPE_TEXT_BODY;
+    },
+
+
+    setShape: function(shape)
+    {
+        var oldId = isRealObject(this.shape) ? this.shape.Get_Id() : null;
+        var newId = isRealObject(shape) ? shape.Get_Id() : null;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetShape, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldId, newId)));
+        this.shape  = shape;
+    },
+
+    addDocumentContent: function(docContent)
+    {
+        var oldId = isRealObject(this.content) ? this.content.Get_Id() : null;
+        var newId = isRealObject(docContent) ? docContent.Get_Id() : null;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_AddDocContent, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldId, newId)));
+        this.content = docContent;
+    },
+
     draw: function(graphics)
     {
         this.content.Draw(0, graphics);
@@ -87,6 +493,12 @@ CTextBody.prototype =
         }
     },
 
+    OnContentRecalculate: function()
+    {
+        if(isRealObject(this.shape) && typeof this.shape.OnContentRecalculate === "function")
+            this.shape.OnContentRecalculate();
+    },
+
     recalculate: function()
     {
 
@@ -105,6 +517,11 @@ CTextBody.prototype =
         return res;
     },
 
+    OnContentReDraw: function()
+    {
+        if(isRealObject(this.shape))
+            this.shape.drawingObjects.showDrawingObjects();
+    },
 
     calculateContent: function()
     {
@@ -227,6 +644,64 @@ CTextBody.prototype =
         }
     },
 
+    setVerticalAlign: function(align)
+    {
+        var anchor_num = null;
+        switch(align)
+        {
+            case "top":
+            {
+                anchor_num = VERTICAL_ANCHOR_TYPE_TOP;
+                break;
+            }
+            case "center":
+            {
+                anchor_num = VERTICAL_ANCHOR_TYPE_CENTER;
+                break;
+            }
+
+            case "bottom":
+            {
+                anchor_num = VERTICAL_ANCHOR_TYPE_BOTTOM;
+                break;
+            }
+        }
+        if(isRealNumber(anchor_num))
+        {
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_VerticalAlign, null, null,
+                new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(this.bodyPr.anchor, anchor_num)));
+            this.bodyPr.anchor = anchor_num;
+        }
+    },
+
+    setVert: function(angle)
+    {
+        var vert = null;
+        switch (angle)
+        {
+            case 0:
+            {
+                vert = nVertTThorz;
+                break;
+            }
+            case 90:
+            {
+                vert = nVertTTvert270;
+                break;
+            }
+            case -90:
+            {
+                vert = nVertTTvert;
+                break;
+            }
+        }
+        if(isRealNumber(vert))
+        {
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Vert, null, null,
+                new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(this.bodyPr.vert, vert)));
+            this.bodyPr.vert = vert;
+        }
+    },
 
     recalculateCurPos: function()
     {
@@ -269,5 +744,67 @@ CTextBody.prototype =
         var t_ins = isRealNumber(this.bodyPr.tIns) ? this.bodyPr.tIns : 1.27;
         var b_ins = isRealNumber(this.bodyPr.bIns) ? this.bodyPr.bIns : 1.27;
         return content_height + t_ins + b_ins;
+    },
+
+    Refresh_RecalcData2: function()
+    {
+        if(isRealObject(this.content))
+            this.content.Recalculate_Page(0, true);
+    },
+
+    Undo: function(type, data)
+    {
+        switch(type)
+        {
+            case historyitem_AutoShapes_AddDocContent:
+            {
+                this.content = g_oTableId.Get_ById(data.oldValue);
+                break;
+            }
+            case historyitem_AutoShapes_SetShape:
+            {
+                this.shape = g_oTableId.Get_ById(data.oldValue);
+                break;
+            }
+            case historyitem_AutoShapes_VerticalAlign:
+            {
+                this.bodyPr.anchor = data.oldValue;
+                break;
+            }
+            case historyitem_AutoShapes_Vert:
+            {
+                this.bodyPr.vert = data.oldValue;
+                break;
+            }
+        }
+    },
+
+    Redo: function(type, data)
+    {
+        switch(type)
+        {
+            case historyitem_AutoShapes_AddDocContent:
+            {
+                this.content = g_oTableId.Get_ById(data.newValue);
+                break;
+            }
+
+            case historyitem_AutoShapes_SetShape:
+            {
+                this.shape = g_oTableId.Get_ById(data.newValue);
+                break;
+            }
+
+            case historyitem_AutoShapes_VerticalAlign:
+            {
+                this.bodyPr.anchor = data.newValue;
+                break;
+            }
+            case historyitem_AutoShapes_Vert:
+            {
+                this.bodyPr.vert = data.newValue;
+                break;
+            }
+        }
     }
 };

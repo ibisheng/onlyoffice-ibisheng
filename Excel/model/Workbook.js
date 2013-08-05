@@ -1360,8 +1360,9 @@ function Workbook(sUrlPath, eventsHandlers, oApi){
 
 	// Histoey & global counters
 	History = new CHistory(this);
+
+    g_oIdCounter = new CIdCounter();
 	g_oTableId = new CTableId();
-	g_oIdCounter = new CIdCounter();
 	if ( this.oApi.User )
 		g_oIdCounter.Set_UserId(this.oApi.User.asc_getId());
 	
@@ -1397,6 +1398,7 @@ Workbook.prototype.initGlobalObjects=function(){
 	g_oUndoRedoDrawingLayer = new UndoRedoDrawingLayer(this);
 	g_oUndoRedoAutoFilters = new UndoRedoAutoFilters(this);
     g_oUndoRedoGraphicObjects = new UndoRedoGraphicObjects(this);
+    g_oIdCounter.Set_Load(false);
 }
 Workbook.prototype.init=function(){
 	if(this.nActive < 0)

@@ -47,6 +47,8 @@ function CGroupShape(drawingBase, drawingObjects)
     this.selected = false;
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
+    if(isRealObject(drawingObjects))
+        this.setDrawingObjects(drawingObjects);
 }
 
 CGroupShape.prototype =
@@ -59,6 +61,17 @@ CGroupShape.prototype =
     getObjectType: function()
     {
         return CLASS_TYPE_GROUP;
+    },
+
+
+    setDrawingObjects: function(drawingObjects)
+    {
+        var newValue = isRealObject(drawingObjects) ? drawingObjects.getWorksheet().model.getId() : null;
+        var oldValue = isRealObject(this.drawingObjects) ? this.drawingObjects.getWorksheet().model.getId() : null;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetDrawingObjects, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
+        this.drawingObjects = drawingObjects;
+
     },
 
     isShape: function()
@@ -87,13 +100,23 @@ CGroupShape.prototype =
         return false;
     },
 
-    setDrawingObjects: function(drawingObjects)
+    /*setDrawingObjects: function(drawingObjects)
     {
         this.drawingObjects = drawingObjects;
         for(var i = 0; i < this.spTree.length; ++i)
         {
             this.spTree[i].setDrawingObjects(drawingObjects);
         }
+    },       */
+
+    setXfrmObject: function(xfrm)
+    {
+        var oldId = isRealObject(this.spPr.xfrm) ? this.spPr.xfrm.Get_Id() : null;
+        var newId = isRealObject(xfrm) ? xfrm.Get_Id() : null;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetXfrm, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldId, newId)));
+        this.spPr.xfrm = xfrm;
+
     },
 
     setDrawingBase: function(drawingBase)
@@ -150,6 +173,8 @@ CGroupShape.prototype =
 
     addToSpTree: function(grObject)
     {
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_AddToSpTree, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(grObject.Get_Id(), null)));
         this.spTree.push(grObject);
         this.recalcInfo.recalculateArrGraphicObjects = true;
     },
@@ -358,9 +383,9 @@ CGroupShape.prototype =
 
     recalculate: function()
     {
-        if(this.recalcInfo.recalculateTransform)
+        //if(this.recalcInfo.recalculateTransform)
             this.recalculateTransform();
-        if(this.recalcInfo.recalculateArrGraphicObjects)
+       // if(this.recalcInfo.recalculateArrGraphicObjects)
             this.recalculateArrGraphicObjects();
     },
 
@@ -839,10 +864,119 @@ CGroupShape.prototype =
         return new ResizeTrackGroup(this, cardDirection);
     },
 
-    addToDrawingObjects: function()
+    deleteDrawingBase: function()
     {
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Add_To_Drawing_Objects, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataClosePath()), null);
-        this.drawingObjects.addGraphicObject(this);
+        var position = this.drawingObjects.deleteDrawingBase(this.Get_Id());
+        if(isRealNumber(position))
+        {
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_DeleteDrawingBase, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(position, null)), null);
+        }
+    },
+
+    addToDrawingObjects: function(pos)
+    {
+        var position = this.drawingObjects.addGraphicObject(this, pos);
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Add_To_Drawing_Objects, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(position, null)), null);
+    },
+
+    Undo: function(type, data)
+    {
+        switch(type)
+        {
+            case  historyitem_AutoShapes_AddToSpTree:
+            {
+                for(var i = this.spTree.length -1; i > -1; --i)
+                {
+                    if(this.spTree[i].Get_Id() === data.oldValue)
+                    {
+                        this.spTree.splice(i, 1);
+                        break;
+                    }
+                }
+                break;
+            }
+            case historyitem_AutoShapes_SetXfrm:
+            {
+                this.spPr.xfrm = g_oTableId.Get_ById(data.oldValue);
+                break;
+            }
+            case historyitem_AutoShapes_GroupRecalculateUndo:
+            {
+                this.recalculate();
+                break;
+            }
+            case historyitem_AutoShapes_Add_To_Drawing_Objects:
+            {
+                this.drawingObjects.deleteDrawingBase(this.Id);
+                break;
+            }
+
+
+            case historyitem_AutoShapes_DeleteDrawingBase:
+            {
+                this.drawingObjects.addGraphicObject(this, data.oldValue);
+                break;
+            }
+            case historyitem_AutoShapes_SetDrawingObjects:
+            {
+                if(data.newValue !== null)
+                {
+                    var api = window["Asc"]["editor"];
+                    if ( api.wb )
+                    {
+                        var ws = api.wb.getWorksheetById(data.oldValue);
+                        this.drawingObjects = ws.objectRender;
+                    }
+                }
+                break;
+            }
+        }
+    },
+
+    Redo: function(type, data)
+    {
+        switch(type)
+        {
+            case  historyitem_AutoShapes_AddToSpTree:
+            {
+                this.spTree.push(g_oTableId.Get_ById(data.oldValue));
+                break;
+            }
+            case historyitem_AutoShapes_GroupRecalculateRedo:
+            {
+                this.recalculate();
+                break;
+            }
+            case historyitem_AutoShapes_Add_To_Drawing_Objects:
+            {
+                this.drawingObjects.addGraphicObject(this, data.oldValue);
+                break;
+            }
+
+            case historyitem_AutoShapes_SetXfrm:
+            {
+                this.spPr.xfrm = g_oTableId.Get_ById(data.newValue);
+                break;
+            }
+            case historyitem_AutoShapes_DeleteDrawingBase:
+            {
+                this.drawingObjects.deleteDrawingBase(this.Id);
+                break;
+            }
+            case historyitem_AutoShapes_SetDrawingObjects:
+            {
+                if(data.newValue !== null)
+                {
+                    var api = window["Asc"]["editor"];
+                    if ( api.wb )
+                    {
+                        var ws = api.wb.getWorksheetById(data.newValue);
+                        this.drawingObjects = ws.objectRender;
+                    }
+                }
+                break;
+            }
+        }
     }
 
 };

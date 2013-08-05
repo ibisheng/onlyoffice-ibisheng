@@ -1988,12 +1988,14 @@ function ResizeTrackChart(originalObject, cardDirection)
     this.geometry.Recalculate(this.originalObject.extX, this.originalObject.extY);
     this.brush = new CUniFill();
     this.brush.fill = new CSolidFill();
+    this.brush.fill.color = new CUniColor();
     this.brush.fill.color.RGBA = {R:255, G:255, B:255, A:255};
     this.brush.fill.color.color = new CRGBColor();
     this.brush.fill.color.color.RGBA = {R:255, G:255, B:255, A:255};
     this.pen = new CLn();
     this.pen.Fill = new CUniFill();
     this.pen.Fill.fill = new CSolidFill();
+    this.pen.Fill.fill.color = new CUniColor();
     this.pen.Fill.fill.color.color = new CRGBColor();
 
     this.bChangeCoef = this.translatetNumberHandle % 2 === 0 && this.originalFlipH !== this.originalFlipV;

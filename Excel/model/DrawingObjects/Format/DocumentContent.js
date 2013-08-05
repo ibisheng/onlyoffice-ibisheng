@@ -139,8 +139,8 @@ function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, 
     this.XLimit = XLimit;
     this.YLimit = YLimit;
 
-    this.Parent = Parent;
-    this.DrawingDocument = DrawingDocument;
+    this.Parent = null;//Parent;
+    this.DrawingDocument = null;//DrawingDocument;
    // this.LogicDocument   = editor.WordControl.m_oLogicDocument;
 
     if ( "undefined" === typeof(TurnOffInnerWrap) )
@@ -164,9 +164,9 @@ function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, 
     this.Split = Split; // Разделяем ли на страницы
 
     this.Content = new Array();
-    this.Content[0] = new Paragraph( DrawingDocument, this, 0, X, Y, XLimit, YLimit );
+    /*this.Content[0] = new Paragraph( DrawingDocument, this, 0, X, Y, XLimit, YLimit );
     this.Content[0].Set_DocumentNext( null );
-    this.Content[0].Set_DocumentPrev( null );
+    this.Content[0].Set_DocumentPrev( null );     */
 
     this.CurPos  =
     {
@@ -210,10 +210,51 @@ function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, 
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
+    if(isRealObject(Parent) && isRealObject(DrawingDocument))
+    {
+        var par = new Paragraph(DrawingDocument, this, 0, X, Y, XLimit, YLimit);
+        par.Set_DocumentNext( null );
+        par.Set_DocumentPrev( null );
+        this.addParagraph(0, par);
+        this.setParent(Parent);
+        this.setDrawingDocument(DrawingDocument);
+    }
 }
 
 CDocumentContent.prototype =
 {
+
+    getObjectType: function()
+    {
+        return CLASS_TYPE_DOCUMENT_CONTENT;
+    },
+    setDrawingDocument: function(drawingDocument)
+    {
+        var oldValue = isRealObject(this.DrawingDocument) && isRealObject(this.DrawingDocument.drawingObjects) ? this.DrawingDocument.drawingObjects.getWorksheet().model.getId() : null;
+        var newValue = isRealObject(drawingDocument) && isRealObject(drawingDocument.drawingObjects) ? drawingDocument.drawingObjects.getWorksheet().model.getId() : null;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_AddDrawingDocument, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
+        this.DrawingDocument = drawingDocument;
+    },
+
+    setParent: function(parent)
+    {
+        var oldValue = isRealObject(this.Parent)  ? this.Parent.Get_Id() : null;
+        var newValue = isRealObject(parent) ? parent.Get_Id(): null;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_AddParent, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
+        this.Parent = parent;
+    },
+
+    addParagraph: function(pos, par)
+    {
+        var newValue = par.Get_Id();
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_AddParagraph, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(pos, newValue)));
+        this.Content.splice(pos, 0, par);
+
+    },
+
     getType: function()
     {
         return CLASS_TYPE_DOCUMENT_CONTENT;
@@ -1634,159 +1675,154 @@ CDocumentContent.prototype =
             return;
         }
 
-        if ( docpostype_DrawingObjects === this.CurPos.Type )
+
+        if ( true === this.Selection.Use )
         {
-            return this.LogicDocument.DrawingObjects.paragraphAdd( ParaItem, bRecalculate );
-        }
-        else // if ( docpostype_Content === this.CurPos.Type )
-        {
-            if ( true === this.Selection.Use )
+            var Type = ParaItem.Type;
+            switch ( Type )
             {
-                var Type = ParaItem.Type;
-                switch ( Type )
+                case para_NewLine:
+                case para_Text:
+                case para_Space:
                 {
-                    case para_NewLine:
-                    case para_Text:
-                    case para_Space:
+                    // Если у нас что-то заселекчено и мы вводим текст или пробел
+                    // и т.д., тогда сначала удаляем весь селект.
+                    this.Remove( 1, true );
+                    break;
+                }
+                case para_TextPr:
+                {
+                    switch( this.Selection.Flag )
                     {
-                        // Если у нас что-то заселекчено и мы вводим текст или пробел
-                        // и т.д., тогда сначала удаляем весь селект.
-                        this.Remove( 1, true );
-                        break;
-                    }
-                    case para_TextPr:
-                    {
-                        switch( this.Selection.Flag )
+                        case selectionflag_Common:
                         {
-                            case selectionflag_Common:
+                            // Текстовые настройки применяем ко всем параграфам, попавшим
+                            // в селект.
+                            var StartPos = this.Selection.StartPos;
+                            var EndPos   = this.Selection.EndPos;
+                            if ( EndPos < StartPos )
                             {
-                                // Текстовые настройки применяем ко всем параграфам, попавшим
-                                // в селект.
-                                var StartPos = this.Selection.StartPos;
-                                var EndPos   = this.Selection.EndPos;
-                                if ( EndPos < StartPos )
-                                {
-                                    var Temp = StartPos;
-                                    StartPos = EndPos;
-                                    EndPos   = Temp;
-                                }
-
-                                for ( var Index = StartPos; Index <= EndPos; Index++ )
-                                {
-                                    this.Content[Index].Add( ParaItem.Copy() );
-                                }
-
-                                if ( false != bRecalculate )
-                                {
-                                    // Если в TextPr только HighLight, тогда не надо ничего пересчитывать, только перерисовываем
-                                    if ( true === ParaItem.Value.Check_NeedRecalc() )
-                                    {
-                                        // Нам нужно пересчитать все изменения, начиная с первого элемента,
-                                        // попавшего в селект.
-                                        this.ContentLastChangePos = StartPos;
-                                        this.Recalculate();
-                                    }
-                                    else
-                                    {
-                                        // Просто перерисовываем нужные страницы
-                                        var StartPage = this.Content[StartPos].Get_StartPage_Absolute();
-                                        var EndPage   = this.Content[EndPos].Get_StartPage_Absolute() + this.Content[EndPos].Pages.length - 1;
-                                        this.ReDraw( StartPage, EndPage );
-                                    }
-                                }
-
-                                break;
+                                var Temp = StartPos;
+                                StartPos = EndPos;
+                                EndPos   = Temp;
                             }
-                            case selectionflag_Numbering:
+
+                            for ( var Index = StartPos; Index <= EndPos; Index++ )
                             {
-                                // Текстовые настройки применяем к конкретной нумерации
-                                if ( null == this.Selection.Data || this.Selection.Data.length <= 0 )
-                                    break;
+                                this.Content[Index].Add( ParaItem.Copy() );
+                            }
 
-                                var NumPr = this.Content[this.Selection.Data[0]].Numbering_Get();
-                                var AbstrNum = this.Numbering.Get_AbstractNum( NumPr.NumId );
-                                AbstrNum.Apply_TextPr( NumPr.Lvl, ParaItem.Value );
-
-                                if ( false != bRecalculate )
+                            if ( false != bRecalculate )
+                            {
+                                // Если в TextPr только HighLight, тогда не надо ничего пересчитывать, только перерисовываем
+                                if ( true === ParaItem.Value.Check_NeedRecalc() )
                                 {
                                     // Нам нужно пересчитать все изменения, начиная с первого элемента,
                                     // попавшего в селект.
-                                    this.ContentLastChangePos = this.Selection.Data[0];
+                                    this.ContentLastChangePos = StartPos;
                                     this.Recalculate();
                                 }
-
-                                break;
+                                else
+                                {
+                                    // Просто перерисовываем нужные страницы
+                                    var StartPage = this.Content[StartPos].Get_StartPage_Absolute();
+                                    var EndPage   = this.Content[EndPos].Get_StartPage_Absolute() + this.Content[EndPos].Pages.length - 1;
+                                    this.ReDraw( StartPage, EndPage );
+                                }
                             }
-                        }
 
-                        return;
+                            break;
+                        }
+                        case selectionflag_Numbering:
+                        {
+                            // Текстовые настройки применяем к конкретной нумерации
+                            if ( null == this.Selection.Data || this.Selection.Data.length <= 0 )
+                                break;
+
+                            var NumPr = this.Content[this.Selection.Data[0]].Numbering_Get();
+                            var AbstrNum = this.Numbering.Get_AbstractNum( NumPr.NumId );
+                            AbstrNum.Apply_TextPr( NumPr.Lvl, ParaItem.Value );
+
+                            if ( false != bRecalculate )
+                            {
+                                // Нам нужно пересчитать все изменения, начиная с первого элемента,
+                                // попавшего в селект.
+                                this.ContentLastChangePos = this.Selection.Data[0];
+                                this.Recalculate();
+                            }
+
+                            break;
+                        }
                     }
+
+                    return;
                 }
             }
+        }
 
-            var Item = this.Content[this.CurPos.ContentPos];
-            var ItemType = Item.GetType();
+        var Item = this.Content[this.CurPos.ContentPos];
+        var ItemType = Item.GetType();
 
-            if ( para_NewLine === ParaItem.Type && break_Page === ParaItem.BreakType )
+        if ( para_NewLine === ParaItem.Type && break_Page === ParaItem.BreakType )
+        {
+            if ( type_Paragraph === ItemType )
             {
-                if ( type_Paragraph === ItemType )
+                if ( true === Item.Cursor_IsStart() )
                 {
-                    if ( true === Item.Cursor_IsStart() )
-                    {
-                        this.Add_NewParagraph();
-                        this.Content[this.CurPos.ContentPos - 1].Add( ParaItem );
-                        this.Content[this.CurPos.ContentPos - 1].Clear_Formatting();
-                        // Нам нужно пересчитать все изменения, начиная с текущего элемента
-                        this.ContentLastChangePos = this.CurPos.ContentPos - 1;
-                    }
-                    else
-                    {
-                        this.Add_NewParagraph();
-                        this.Add_NewParagraph();
-                        this.Content[this.CurPos.ContentPos - 1].Add( ParaItem );
-                        this.Content[this.CurPos.ContentPos - 1].Clear_Formatting();
-                        // Нам нужно пересчитать все изменения, начиная с текущего элемента
-                        this.ContentLastChangePos = this.CurPos.ContentPos - 2;
-                    }
-
-                    if ( false != bRecalculate )
-                    {
-                        this.Recalculate();
-
-                        Item.CurPos.RealX = Item.CurPos.X;
-                        Item.CurPos.RealY = Item.CurPos.Y;
-                    }
+                    this.Add_NewParagraph();
+                    this.Content[this.CurPos.ContentPos - 1].Add( ParaItem );
+                    this.Content[this.CurPos.ContentPos - 1].Clear_Formatting();
+                    // Нам нужно пересчитать все изменения, начиная с текущего элемента
+                    this.ContentLastChangePos = this.CurPos.ContentPos - 1;
                 }
                 else
                 {
-                    // TODO: PageBreak в таблице не ставим
-                    return;
+                    this.Add_NewParagraph();
+                    this.Add_NewParagraph();
+                    this.Content[this.CurPos.ContentPos - 1].Add( ParaItem );
+                    this.Content[this.CurPos.ContentPos - 1].Clear_Formatting();
+                    // Нам нужно пересчитать все изменения, начиная с текущего элемента
+                    this.ContentLastChangePos = this.CurPos.ContentPos - 2;
+                }
+
+                if ( false != bRecalculate )
+                {
+                    this.Recalculate();
+
+                    Item.CurPos.RealX = Item.CurPos.X;
+                    Item.CurPos.RealY = Item.CurPos.Y;
                 }
             }
             else
             {
-                Item.Add( ParaItem );
+                // TODO: PageBreak в таблице не ставим
+                return;
+            }
+        }
+        else
+        {
+            Item.Add( ParaItem );
 
-                if ( false != bRecalculate )
+            if ( false != bRecalculate )
+            {
+                if ( para_TextPr === ParaItem.Type && false === ParaItem.Value.Check_NeedRecalc() )
                 {
-                    if ( para_TextPr === ParaItem.Type && false === ParaItem.Value.Check_NeedRecalc() )
-                    {
-                        // Просто перерисовываем нужные страницы
-                        var StartPage = Item.Get_StartPage_Absolute();
-                        var EndPage   = StartPage + Item.Pages.length - 1;
-                        this.ReDraw( StartPage, EndPage );
-                    }
-                    else
-                        this.Recalculate();
+                    // Просто перерисовываем нужные страницы
+                    var StartPage = Item.Get_StartPage_Absolute();
+                    var EndPage   = StartPage + Item.Pages.length - 1;
+                    this.ReDraw( StartPage, EndPage );
+                }
+                else
+                    this.Recalculate();
 
-                    if ( type_Paragraph === ItemType )
-                    {
-                        Item.CurPos.RealX = Item.CurPos.X;
-                        Item.CurPos.RealY = Item.CurPos.Y;
-                    }
+                if ( type_Paragraph === ItemType )
+                {
+                    Item.CurPos.RealX = Item.CurPos.X;
+                    Item.CurPos.RealY = Item.CurPos.Y;
                 }
             }
         }
+
     },
 
     Paragraph_ClearFormatting : function()
@@ -6650,7 +6686,8 @@ CDocumentContent.prototype =
         if ( "undefined" == typeof(NextObj) )
             NextObj = null;
 
-        History.Add( this, { Type : historyitem_DocumentContent_AddItem, Pos : Position, Item : NewObject } );
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_DocumentContent_AddItem, null, null, new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataDocContentAddItem(Position, NewObject.Get_Id())));
+
         this.Content.splice( Position, 0, NewObject );
         NewObject.Set_Parent( this );
         NewObject.Set_DocumentNext( NextObj );
@@ -6687,7 +6724,16 @@ CDocumentContent.prototype =
         for ( var Index = 0; Index < Count; Index++ )
             this.Content[Position + Index].PreDelete();
 
-        History.Add( this, { Type : historyitem_DocumentContent_RemoveItem, Pos : Position, Items : this.Content.slice( Position, Position + Count ) } );
+
+        var aItemIds = [];
+        var aPars = this.Content.slice( Position, Position + Count );
+        for(var i = 0; i < aPars.length; ++i)
+        {
+            aItemIds.push(new UndoRedoDataTypeParaItemId(aPars[i].Get_Id()));
+        }
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_DocumentContent_RemoveItem, null, null, new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataDocContentRemoveItems(Position, aItemIds)));
+
+        //History.Add( this, { Type : historyitem_DocumentContent_RemoveItem, Pos : Position, Items : this.Content.slice( Position, Position + Count ) } );
         this.Content.splice( Position, Count );
 
         if ( null != PrevObj )
@@ -6733,7 +6779,13 @@ CDocumentContent.prototype =
 
     Internal_Content_RemoveAll : function()
     {
-        History.Add( this, { Type : historyitem_DocumentContent_RemoveItem, Pos : 0, Items : this.Content.slice( 0, this.Content.length ) } );
+        var aItemIds = [];
+        var aPars = this.Content.slice( 0, this.Content.length );
+        for(var i = 0; i < aPars.length; ++i)
+        {
+            aItemIds.push(new UndoRedoDataTypeParaItemId(aPars[i].Get_Id()));
+        }
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_DocumentContent_RemoveItem, null, null, new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataDocContentRemoveItems(0, aItemIds)));
         this.Content = new Array();
     },
 
@@ -6763,12 +6815,40 @@ CDocumentContent.prototype =
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------
-    Undo : function(Data)
+    Undo : function(Type, Data)
     {
-        var Type = Data.Type;
+
 
         switch ( Type )
         {
+            case historyitem_AutoShapes_AddDrawingDocument:
+            {
+                if(Data.oldValue !== null)
+                {
+                    var api = window["Asc"]["editor"];
+                    if ( api.wb )
+                    {
+                        var ws = api.wb.getWorksheetById(Data.oldValue);
+                        this.DrawingDocument = ws.objectRender.drawingDocument;
+                    }
+                }
+                else
+                {
+                    this.DrawingDocument  = null;
+                }
+                break;
+            }
+
+            case historyitem_AutoShapes_AddParent:
+            {
+                this.Parent = g_oTableId.Get_ById(Data.oldValue);
+                break;
+            }
+            case historyitem_AutoShapes_AddParagraph:
+            {
+                this.Content.splice(Data.oldValue, 1);
+                break;
+            }
             case historyitem_DocumentContent_AddItem:
             {
                 this.Content.splice( Data.Pos, 1 );
@@ -6783,31 +6863,63 @@ CDocumentContent.prototype =
                 var Array_start = this.Content.slice( 0, Pos );
                 var Array_end   = this.Content.slice( Pos );
 
-                this.Content = Array_start.concat( Data.Items, Array_end );
+                var items = [];
+                for(var i = 0; i < Data.aItems.length; ++i)
+                {
+                    var item = g_oTableId.Get_ById(Data.aItems[i].itemId);
+                    if(isRealObject(item))
+                        items.push(item);
+                }
+                this.Content = Array_start.concat( items, Array_end );
 
                 break;
             }
         }
     },
 
-    Redo : function(Data)
+    Redo : function(Type, Data)
     {
-        var Type = Data.Type;
 
         switch ( Type )
         {
+            case historyitem_AutoShapes_AddDrawingDocument:
+            {
+                if(Data.newValue !== null)
+                {
+                    var api = window["Asc"]["editor"];
+                    if ( api.wb )
+                    {
+                        var ws = api.wb.getWorksheetById(Data.newValue);
+                        this.DrawingDocument = ws.objectRender.drawingDocument;
+                    }
+                }
+                else
+                {
+                    this.DrawingDocument  = null;
+                }
+                break;
+            }
+
+            case historyitem_AutoShapes_AddParent:
+            {
+                this.Parent = g_oTableId.Get_ById(Data.newValue);
+                break;
+            }
+            case historyitem_AutoShapes_AddParagraph:
+            {
+                this.Content.splice(Data.oldValue, 0, g_oTableId.Get_ById(Data.newValue));
+                break;
+            }
             case historyitem_DocumentContent_AddItem:
             {
                 var Pos = Data.Pos;
-                this.Content.splice( Pos, 0, Data.Item );
-
+                this.Content.splice( Pos, 0, g_oTableId.Get_ById(Data.objectId));
                 break;
             }
 
             case historyitem_DocumentContent_RemoveItem:
             {
-                this.Content.splice( Data.Pos, Data.Items.length );
-
+                this.Content.splice( Data.pos, Data.aItems.length );
                 break;
             }
         }
@@ -6958,11 +7070,11 @@ CDocumentContent.prototype =
         return this.Parent.Get_ParentObject_or_DocumentPos();
     },
 
-    Refresh_RecalcData : function(Data)
+    Refresh_RecalcData : function(Type, Data)
     {
         var bNeedRecalc = false;
 
-        var Type = Data.Type;
+       // var Type = Data.Type;
 
         var CurPage = 0;
 
@@ -6987,7 +7099,8 @@ CDocumentContent.prototype =
 
     Refresh_RecalcData2 : function(Index, Page_rel)
     {
-        this.Parent.Refresh_RecalcData2( this.StartPage + Page_rel );
+        if(isRealObject(this.Parent))
+            this.Parent.Refresh_RecalcData2( this.StartPage + Page_rel );
     },
 //-----------------------------------------------------------------------------------
 // Функции для работы с гиперссылками

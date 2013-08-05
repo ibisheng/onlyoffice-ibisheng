@@ -80,6 +80,36 @@ g_aNumber[0x0039] = 1;
 var g_aSpecialSymbols = [];
 g_aSpecialSymbols[0x00AE] = 1;
 
+
+function CreateParaItem(type, value)
+{
+    switch(type)
+    {
+          case   para_Empty                    : return new ParaEmpty(value);   break;
+          case   para_Text                     : return new ParaText(value);    break;
+          case   para_Space                    : return new ParaSpace(value);   break;
+          case   para_TextPr                   : return g_oTableId.Get_ById(value);   break;
+          case   para_End                      : return new ParaEnd();   break;
+          case   para_NewLine                  : return new ParaNewLine(value); break;
+          case   para_NewLineRendered          : return new ParaNewLineRendered();  break;
+          case   para_InlineBreak              : return new ParaInlineBreak();  break;
+          case   para_PageBreakRendered        : return new ParaPageBreakRenderer(); break;
+          case   para_Numbering                : return new ParaNumbering(); break;
+          case   para_Tab                      : return new ParaTab(value);     break;
+          case   para_Drawing                  : return new ParaDrawing();     break;
+          case   para_PageNum                  : return new ParaPageNum();  break;
+          case   para_FlowObjectAnchor         : return new ParaFlowObjectAnchor(); break;
+          case   para_HyperlinkStart           : return new ParaHyperlinkStart(value);     break;
+          case   para_HyperlinkEnd             : return new ParaHyperlinkEnd();     break;
+          case   para_CollaborativeChangesStart: return new ParaCollaborativeChangesStart(value);  break;
+          case   para_CollaborativeChangesEnd  : return new ParaCollaborativeChangesEnd();  break;
+          case   para_CommentStart             : return new ParaCommentStart(value);     break;
+          case   para_CommentEnd               : return new ParaCommentEnd(value);  break;
+          case   para_PresentationNumbering    : return new ParaPresentationNumbering(); break;
+    }
+    return null;
+}
+
 // Класс ParaText
 function ParaText(value)
 {
@@ -100,6 +130,16 @@ function ParaText(value)
 }
 ParaText.prototype =
 {
+
+    getValue: function()
+    {
+        return this.Value;
+    },
+
+    Get_Id: function()
+    {
+        return this.Id;
+    },
     Draw : function(X,Y,Context)
     {
         try
@@ -234,9 +274,16 @@ function ParaSpace(Count)
     this.Width        = 0;
     this.Height       = 0;
     this.WidthVisible = 0;
+    this.Id
 }
 ParaSpace.prototype =
 {
+
+
+    getValue: function()
+    {
+        return this.Value;
+    },
     Draw : function(X,Y, Context)
     {
         var sString = "";
@@ -364,16 +411,36 @@ function ParaTextPr(Props)
     this.Height       = 0;
     this.WidthVisible = 0;
 
-    if ( "object" == typeof(Props) )
-    {
-        this.Value.Set_FromObject( Props );
-    }
+
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
+    if(isRealObject(Props))
+    {
+        this.Set_Value(Props);
+    }
 }
 ParaTextPr.prototype =
 {
+    getObjectType: function()
+    {
+        return CLASS_TYPE_TEXT_PR;
+    },
+
+    setParent: function(parent)
+    {
+        var oldValue = isRealObject(this.Parent)  ? this.Parent.Get_Id() : null;
+        var newValue = isRealObject(parent) ? parent.Get_Id(): null;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_AddParent, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
+        this.Parent = parent;
+    },
+
+
+    getValue: function()
+    {
+        return this.Get_Id();
+    },
     Draw : function()//(X,Y,Context)
     {
         // Ничего не делаем
@@ -489,12 +556,14 @@ ParaTextPr.prototype =
     {
         var OldValue = ( undefined != this.Value.Bold ? this.Value.Bold : undefined );
 
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_TextPr_Bold, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(OldValue, Value)));
         if ( undefined != Value )
             this.Value.Bold = Value;
         else
             this.Value.Bold = undefined;
 
-        History.Add( this, { Type : historyitem_TextPr_Bold, New : Value, Old : OldValue } );
+        //History.Add( this, { Type : historyitem_TextPr_Bold, New : Value, Old : OldValue } );
     },
 
     Set_Italic : function(Value)
@@ -506,7 +575,9 @@ ParaTextPr.prototype =
         else
             this.Value.Italic = undefined;
 
-        History.Add( this, { Type : historyitem_TextPr_Italic, New : Value, Old : OldValue } );
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_TextPr_Italic, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(OldValue, Value)));
+       // History.Add( this, { Type : historyitem_TextPr_Italic, New : Value, Old : OldValue } );
     },
 
     Set_Strikeout : function(Value)
@@ -518,7 +589,9 @@ ParaTextPr.prototype =
         else
             this.Value.Strikeout = undefined;
 
-        History.Add( this, { Type : historyitem_TextPr_Strikeout, New : Value, Old : OldValue } );
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_TextPr_Strikeout, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(OldValue, Value)));
+        //History.Add( this, { Type : historyitem_TextPr_Strikeout, New : Value, Old : OldValue } );
     },
 
     Set_Underline : function(Value)
@@ -529,20 +602,25 @@ ParaTextPr.prototype =
             this.Value.Underline = Value;
         else
             this.Value.Underline = undefined;
-
-        History.Add( this, { Type : historyitem_TextPr_Underline, New : Value, Old : OldValue } );
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_TextPr_Underline, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(OldValue, Value)));
+        //History.Add( this, { Type : historyitem_TextPr_Underline, New : Value, Old : OldValue } );
     },
 
     Set_FontFamily : function(Value)
     {
         var OldValue = ( undefined != this.Value.FontFamily ? this.Value.FontFamily : undefined );
-
+        OldValue = isRealObject(this.Value.FontFamily) ? this.Value.FontFamily.Name : undefined;
+        var newValue = isRealObject(Value) ? Value.Name : undefined;
         if ( undefined != Value )
             this.Value.FontFamily = Value;
         else
             this.Value.FontFamily = undefined;
 
-        History.Add( this, { Type : historyitem_TextPr_FontFamily, New : Value, Old : OldValue } );
+
+     /*   History.Add(g_oUndoRedoGraphicObjects, historyitem_TextPr_FontFamily, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(OldValue, newValue))); */
+       // History.Add( this, { Type : historyitem_TextPr_FontFamily, New : Value, Old : OldValue } );
     },
 
     Set_FontSize : function(Value)
@@ -554,19 +632,34 @@ ParaTextPr.prototype =
         else
             this.Value.FontSize = undefined;
 
-        History.Add( this, { Type : historyitem_TextPr_FontSize, New : Value, Old : OldValue } );
+
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_TextPr_FontSize, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(OldValue, Value)));
+       // History.Add( this, { Type : historyitem_TextPr_FontSize, New : Value, Old : OldValue } );
     },
 
     Set_Color : function(Value)
     {
         var OldValue = ( undefined != this.Value.Color ? this.Value.Color : undefined );
 
+        var oldValue = null;
+        if(isRealObject(this.Value.Color))
+        {
+            oldValue = this.Value.Color.r*16*16 + this.Value.Color.g*16 + this.Value.Color.b
+        }
+        var newValue = null;
+        if(isRealObject(Value))
+        {
+            newValue = Value.r*16*16 + Value.g*16 + Value.b
+        }
         if ( undefined != Value )
             this.Value.Color = Value;
         else
             this.Value.Color = undefined;
 
-        History.Add( this, { Type : historyitem_TextPr_Color, New : Value, Old : OldValue } );
+        /*History.Add(g_oUndoRedoGraphicObjects, historyitem_TextPr_Color, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));*/
+        //History.Add( this, { Type : historyitem_TextPr_Color, New : Value, Old : OldValue } );
     },
 
     Set_VertAlign : function(Value)
@@ -578,7 +671,9 @@ ParaTextPr.prototype =
         else
             this.Value.VertAlign = undefined;
 
-        History.Add( this, { Type : historyitem_TextPr_VertAlign, New : Value, Old : OldValue } );
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_TextPr_VertAlign, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(OldValue, Value)));
+        //History.Add( this, { Type : historyitem_TextPr_VertAlign, New : Value, Old : OldValue } );
     },
 
     Set_HighLight : function(Value)
@@ -589,8 +684,9 @@ ParaTextPr.prototype =
             this.Value.HighLight = Value;
         else
             this.Value.HighLight = undefined;
-
-        History.Add( this, { Type : historyitem_TextPr_HighLight, New : Value, Old : OldValue } );
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_TextPr_HighLight, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(OldValue, Value)));
+        //History.Add( this, { Type : historyitem_TextPr_HighLight, New : Value, Old : OldValue } );
     },
 
     Set_RStyle : function(Value)
@@ -614,7 +710,9 @@ ParaTextPr.prototype =
         else
             this.Value.Spacing = undefined;
 
-        History.Add( this, { Type : historyitem_TextPr_Spacing, New : Value, Old : OldValue } );
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_TextPr_Spacing, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(OldValue, Value)));
+        //History.Add( this, { Type : historyitem_TextPr_Spacing, New : Value, Old : OldValue } );
     },
 
     Set_DStrikeout : function(Value)
@@ -626,7 +724,9 @@ ParaTextPr.prototype =
         else
             this.Value.DStrikeout = undefined;
 
-        History.Add( this, { Type : historyitem_TextPr_DStrikeout, New : Value, Old : OldValue } );
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_TextPr_DStrikeout, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(OldValue, Value)));
+       // History.Add( this, { Type : historyitem_TextPr_DStrikeout, New : Value, Old : OldValue } );
     },
 
     Set_Caps : function(Value)
@@ -637,8 +737,9 @@ ParaTextPr.prototype =
             this.Value.Caps = Value;
         else
             this.Value.Caps = undefined;
-
-        History.Add( this, { Type : historyitem_TextPr_Caps, New : Value, Old : OldValue } );
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_TextPr_Caps, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(OldValue, Value)));
+        //History.Add( this, { Type : historyitem_TextPr_Caps, New : Value, Old : OldValue } );
     },
 
     Set_SmallCaps : function(Value)
@@ -649,8 +750,9 @@ ParaTextPr.prototype =
             this.Value.SmallCaps = Value;
         else
             this.Value.SmallCaps = undefined;
-
-        History.Add( this, { Type : historyitem_TextPr_SmallCaps, New : Value, Old : OldValue } );
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_TextPr_SmallCaps, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(OldValue, Value)));
+       // History.Add( this, { Type : historyitem_TextPr_SmallCaps, New : Value, Old : OldValue } );
     },
 
     Set_Position : function(Value)
@@ -662,15 +764,82 @@ ParaTextPr.prototype =
         else
             this.Value.Position = undefined;
 
-        History.Add( this, { Type : historyitem_TextPr_Position, New : Value, Old : OldValue } );
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_TextPr_Position, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(OldValue, Value)));
+        //History.Add( this, { Type : historyitem_TextPr_Position, New : Value, Old : OldValue } );
+    },
+
+    SetThemeFont: function(value)
+    {
+        var oldValue = this.Value.themeFont;
+        var newValue = value;
+        this.Value.themeFont = value;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_TextPr_ThemeFont, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
+    },
+
+    SetUniFill: function(value)
+    {
+        var oldValue = isRealObject(this.Value.unifill) ? this.Value.unifill.Get_Id() : null;
+        var newValue =  isRealObject(value) ? value.Get_Id() : null;
+        this.Value.unifill = value;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_TextPr_UniFill, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
     },
 
     Set_Value : function(Value)
     {
+        if(isRealObject(Value))
+        {
+            this.Set_Bold(Value.Bold);
+            this.Set_Italic(Value.Italic);
+            this.Set_Strikeout(Value.Strikeout);
+            this.Set_Underline(Value.Underline);
+            this.Set_FontFamily(Value.FontFamily);
+            this.SetThemeFont(Value.themeFont);
+            this.Set_Color(Value.Color);
+            this.SetUniFill(isRealObject(Value.unifill) ? Value.unifill.Copy() : undefined);
+            this.Set_FontSize(Value.FontSize);
+            this.Set_VertAlign(Value.VertAlign);
+            this.Set_HighLight(Value.HighLight);
+            this.Set_Spacing(Value.Spacing);
+            this.Set_DStrikeout(Value.DStrikeout);
+            this.Set_Caps(Value.Caps);
+            this.Set_SmallCaps(Value.SmallCaps);
+            this.Set_Position(Value.Position);
+        }
+
+        /*this.Bold       = undefined; // Жирный текст
+        this.Italic     = undefined; // Наклонный текст
+        this.Strikeout  = undefined; // Зачеркивание
+        this.Underline  = undefined;
+        this.FontFamily = undefined;
+        this.themeFont  = undefined;
+        this.unifill    = undefined;
+        this.FontSize   = undefined;
+        this.Color      = undefined;
+        this.VertAlign  = undefined;
+        this.HighLight  = undefined; // highlight_None/Color
+        this.RStyle     = undefined;
+        this.Spacing    = undefined; // Дополнительное расстояние между символвами
+        this.DStrikeout = undefined; // Двойное зачеркивание
+        this.Caps       = undefined;
+        this.SmallCaps  = undefined;
+        this.Position   = undefined; // Смещение по Y
+
+        this.RFonts     = new CRFonts();
+        this.BoldCS     = undefined;
+        this.ItalicCS   = undefined;
+        this.FontSizeCS = undefined;
+        this.CS         = undefined;
+        this.RTL        = undefined;
+        this.Lang       = new CLang();
         var OldValue = this.Value;
         this.Value = Value;
 
-        History.Add( this, { Type : historyitem_TextPr_Value, New : Value, Old : OldValue } );
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_TextPr_Position, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(new UndoRedoOldValue, Value)));
+        History.Add( this, { Type : historyitem_TextPr_Value, New : Value, Old : OldValue } ); */
     },
 
     Set_RFonts : function(Value)
@@ -681,7 +850,7 @@ ParaTextPr.prototype =
         else
             this.Value.RFonts = new CRFonts();
 
-        History.Add( this, { Type : historyitem_TextPr_RFonts, New : Value, Old : OldValue } );
+       // History.Add( this, { Type : historyitem_TextPr_RFonts, New : Value, Old : OldValue } );
     },
 
     Set_Lang : function(Value)
@@ -694,17 +863,27 @@ ParaTextPr.prototype =
 
         this.Value.Lang = NewValue;
 
-        History.Add( this, { Type : historyitem_TextPr_Lang, New : NewValue, Old : OldValue } );
+        //History.Add( this, { Type : historyitem_TextPr_Lang, New : NewValue, Old : OldValue } );
     },
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------
-    Undo : function(Data)
+    Undo : function(Type, Data)
     {
-        var Type = Data.Type;
 
         switch ( Type )
         {
+            case historyitem_TextPr_ThemeFont:
+            {
+                this.Value.themeFont = Data.oldValue;
+                break;
+            }
+
+            case historyitem_TextPr_UniFill:
+            {
+                this.Value.unifill = g_oTableId.Get_ById(Data.oldValue);
+                break;
+            }
             case historyitem_TextPr_Change:
             {
                 if ( undefined != Data.Old )
@@ -717,8 +896,8 @@ ParaTextPr.prototype =
 
             case historyitem_TextPr_Bold:
             {
-                if ( undefined != Data.Old )
-                    this.Value.Bold = Data.Old;
+                if ( undefined != Data.oldValue )
+                    this.Value.Bold = Data.oldValue;
                 else
                     this.Value.Bold = undefined;
 
@@ -727,8 +906,8 @@ ParaTextPr.prototype =
 
             case historyitem_TextPr_Italic:
             {
-                if ( undefined != Data.Old )
-                    this.Value.Italic = Data.Old;
+                if ( undefined != Data.oldValue )
+                    this.Value.Italic = Data.oldValue;
                 else
                     this.Value.Italic = undefined;
 
@@ -737,8 +916,8 @@ ParaTextPr.prototype =
 
             case historyitem_TextPr_Strikeout:
             {
-                if ( undefined != Data.Old )
-                    this.Value.Strikeout = Data.Old;
+                if ( undefined != Data.oldValue )
+                    this.Value.Strikeout = Data.oldValue;
                 else
                     this.Value.Strikeout = undefined;
 
@@ -747,8 +926,8 @@ ParaTextPr.prototype =
 
             case historyitem_TextPr_Underline:
             {
-                if ( undefined != Data.Old )
-                    this.Value.Underline = Data.Old;
+                if ( undefined != Data.oldValue )
+                    this.Value.Underline = Data.oldValue;
                 else
                     this.Value.Underline = undefined;
 
@@ -757,8 +936,12 @@ ParaTextPr.prototype =
 
             case historyitem_TextPr_FontFamily:
             {
-                if ( undefined != Data.Old )
-                    this.Value.FontFamily = Data.Old;
+                if ( undefined != Data.oldValue )
+                {
+                    if(!isRealObject(this.Value.FontFamily))
+                        this.Value.FontFamily = {Name: undefined, Index: -1};
+                    this.Value.FontFamily.Name = Data.oldValue;
+                }
                 else
                     this.Value.FontFamily = undefined;
 
@@ -767,8 +950,8 @@ ParaTextPr.prototype =
 
             case historyitem_TextPr_FontSize:
             {
-                if ( undefined != Data.Old )
-                    this.Value.FontSize = Data.Old;
+                if ( undefined != Data.oldValue )
+                    this.Value.FontSize = Data.oldValue;
                 else
                     this.Value.FontSize = undefined;
 
@@ -777,8 +960,8 @@ ParaTextPr.prototype =
 
             case historyitem_TextPr_Color:
             {
-                if ( undefined != Data.Old )
-                    this.Value.Color = Data.Old;
+                if ( undefined != Data.oldValue )
+                    this.Value.Color = Data.oldValue;
                 else
                     this.Value.Color = undefined;
 
@@ -787,8 +970,8 @@ ParaTextPr.prototype =
 
             case historyitem_TextPr_VertAlign:
             {
-                if ( undefined != Data.Old )
-                    this.Value.VertAlign = Data.Old;
+                if ( undefined != Data.oldValue )
+                    this.Value.VertAlign = Data.oldValue;
                 else
                     this.Value.VertAlign = undefined;
 
@@ -797,8 +980,8 @@ ParaTextPr.prototype =
 
             case historyitem_TextPr_HighLight:
             {
-                if ( undefined != Data.Old )
-                    this.Value.HighLight = Data.Old;
+                if ( undefined != Data.oldValue )
+                    this.Value.HighLight = Data.oldValue;
                 else
                     this.Value.HighLight = undefined;
 
@@ -807,8 +990,8 @@ ParaTextPr.prototype =
 
             case historyitem_TextPr_RStyle:
             {
-                if ( undefined != Data.Old )
-                    this.Value.RStyle = Data.Old;
+                if ( undefined != Data.oldValue )
+                    this.Value.RStyle = Data.oldValue;
                 else
                     this.Value.RStyle = undefined;
 
@@ -817,8 +1000,8 @@ ParaTextPr.prototype =
 
             case historyitem_TextPr_Spacing:
             {
-                if ( undefined != Data.Old )
-                    this.Value.Spacing = Data.Old;
+                if ( undefined != Data.oldValue )
+                    this.Value.Spacing = Data.oldValue;
                 else
                     this.Value.Spacing = undefined;
 
@@ -826,8 +1009,8 @@ ParaTextPr.prototype =
             }
             case historyitem_TextPr_DStrikeout:
             {
-                if ( undefined != Data.Old )
-                    this.Value.DStrikeout = Data.Old;
+                if ( undefined != Data.oldValue )
+                    this.Value.DStrikeout = Data.oldValue;
                 else
                     this.Value.DStrikeout = undefined;
 
@@ -835,8 +1018,8 @@ ParaTextPr.prototype =
             }
             case historyitem_TextPr_Caps:
             {
-                if ( undefined != Data.Old )
-                    this.Value.Caps = Data.Old;
+                if ( undefined != Data.oldValue )
+                    this.Value.Caps = Data.oldValue;
                 else
                     this.Value.Caps = undefined;
 
@@ -844,8 +1027,8 @@ ParaTextPr.prototype =
             }
             case historyitem_TextPr_SmallCaps:
             {
-                if ( undefined != Data.Old )
-                    this.Value.SmallCaps = Data.Old;
+                if ( undefined != Data.oldValue )
+                    this.Value.SmallCaps = Data.oldValue;
                 else
                     this.Value.SmallCaps = undefined;
 
@@ -854,8 +1037,8 @@ ParaTextPr.prototype =
 
             case historyitem_TextPr_Position:
             {
-                if ( undefined != Data.Old )
-                    this.Value.Position = Data.Old;
+                if ( undefined != Data.oldValue )
+                    this.Value.Position = Data.oldValue;
                 else
                     this.Value.Position = undefined;
 
@@ -871,8 +1054,8 @@ ParaTextPr.prototype =
 
             case historyitem_TextPr_RFonts:
             {
-                if ( undefined != Data.Old )
-                    this.Value = Data.Old;
+                if ( undefined != Data.oldValue )
+                    this.Value = Data.oldValue;
                 else
                     this.Value = new CRFonts();
 
@@ -881,22 +1064,42 @@ ParaTextPr.prototype =
 
             case historyitem_TextPr_Lang:
             {
-                if ( undefined != Data.Old )
-                    this.Value = Data.Old;
+                if ( undefined != Data.oldValue )
+                    this.Value = Data.oldValue;
                 else
                     this.Value = new CLang();
 
                 break;
             }
+            case historyitem_AutoShapes_AddParent:
+            {
+                this.Parent = g_oTableId.Get_ById(Data.oldValue);
+                break;
+            }
         }
     },
 
-    Redo : function(Data)
+    Redo : function(Type, Data)
     {
-        var Type = Data.Type;
 
         switch ( Type )
         {
+            case historyitem_TextPr_ThemeFont:
+            {
+                this.Value.themeFont = Data.newValue;
+                break;
+            }
+
+            case historyitem_TextPr_UniFill:
+            {
+                this.Value.unifill = g_oTableId.Get_ById(Data.newValue);
+                break;
+            }
+            case historyitem_AutoShapes_AddParent:
+            {
+                this.Parent = g_oTableId.Get_ById(Data.newValue);
+                break;
+            }
             case historyitem_TextPr_Change:
             {
                 if ( undefined != Data.New )
@@ -909,8 +1112,8 @@ ParaTextPr.prototype =
 
             case historyitem_TextPr_Bold:
             {
-                if ( undefined != Data.New )
-                    this.Value.Bold = Data.New;
+                if ( undefined != Data.newValue )
+                    this.Value.Bold = Data.newValue;
                 else
                     this.Value.Bold = undefined;
 
@@ -919,8 +1122,8 @@ ParaTextPr.prototype =
 
             case historyitem_TextPr_Italic:
             {
-                if ( undefined != Data.New )
-                    this.Value.Italic = Data.New;
+                if ( undefined != Data.newValue )
+                    this.Value.Italic = Data.newValue;
                 else
                     this.Value.Italic = undefined;
 
@@ -929,8 +1132,8 @@ ParaTextPr.prototype =
 
             case historyitem_TextPr_Strikeout:
             {
-                if ( undefined != Data.New )
-                    this.Value.Strikeout = Data.New;
+                if ( undefined != Data.newValue )
+                    this.Value.Strikeout = Data.newValue;
                 else
                     this.Value.Strikeout = undefined;
 
@@ -939,8 +1142,8 @@ ParaTextPr.prototype =
 
             case historyitem_TextPr_Underline:
             {
-                if ( undefined != Data.New )
-                    this.Value.Underline = Data.New;
+                if ( undefined != Data.newValue )
+                    this.Value.Underline = Data.newValue;
                 else
                     this.Value.Underline = undefined;
 
@@ -949,8 +1152,11 @@ ParaTextPr.prototype =
 
             case historyitem_TextPr_FontFamily:
             {
-                if ( undefined != Data.New )
-                    this.Value.FontFamily = Data.New;
+                if ( undefined != Data.newValue )
+                {
+                    this.Value.FontFamily ={Name: Data.newValue, Index: -1};
+
+                }
                 else
                     this.Value.FontFamily = undefined;
 
@@ -959,8 +1165,8 @@ ParaTextPr.prototype =
 
             case historyitem_TextPr_FontSize:
             {
-                if ( undefined != Data.New )
-                    this.Value.FontSize = Data.New;
+                if ( undefined != Data.newValue )
+                    this.Value.FontSize = Data.newValue;
                 else
                     this.Value.FontSize = undefined;
 
@@ -969,8 +1175,8 @@ ParaTextPr.prototype =
 
             case historyitem_TextPr_Color:
             {
-                if ( undefined != Data.New )
-                    this.Value.Color = Data.New;
+                if ( undefined != Data.newValue )
+                    this.Value.Color = Data.newValue;
                 else
                     this.Value.Color = undefined;
 
@@ -979,8 +1185,8 @@ ParaTextPr.prototype =
 
             case historyitem_TextPr_VertAlign:
             {
-                if ( undefined != Data.New )
-                    this.Value.VertAlign = Data.New;
+                if ( undefined != Data.newValue )
+                    this.Value.VertAlign = Data.newValue;
                 else
                     this.Value.VertAlign = undefined;
 
@@ -989,8 +1195,8 @@ ParaTextPr.prototype =
 
             case historyitem_TextPr_HighLight:
             {
-                if ( undefined != Data.New )
-                    this.Value.HighLight = Data.New;
+                if ( undefined != Data.newValue )
+                    this.Value.HighLight = Data.newValue;
                 else
                     this.Value.HighLight = undefined;
 
@@ -999,8 +1205,8 @@ ParaTextPr.prototype =
 
             case historyitem_TextPr_RStyle:
             {
-                if ( undefined != Data.New )
-                    this.Value.RStyle = Data.New;
+                if ( undefined != Data.newValue )
+                    this.Value.RStyle = Data.newValue;
                 else
                     this.Value.RStyle = undefined;
 
@@ -1009,8 +1215,8 @@ ParaTextPr.prototype =
 
             case historyitem_TextPr_Spacing:
             {
-                if ( undefined != Data.New )
-                    this.Value.Spacing = Data.New;
+                if ( undefined != Data.newValue )
+                    this.Value.Spacing = Data.newValue;
                 else
                     this.Value.Spacing = undefined;
 
@@ -1019,8 +1225,8 @@ ParaTextPr.prototype =
 
             case historyitem_TextPr_DStrikeout:
             {
-                if ( undefined != Data.New )
-                    this.Value.DStrikeout = Data.New;
+                if ( undefined != Data.newValue )
+                    this.Value.DStrikeout = Data.newValue;
                 else
                     this.Value.DStrikeout = undefined;
 
@@ -1029,8 +1235,8 @@ ParaTextPr.prototype =
 
             case historyitem_TextPr_Caps:
             {
-                if ( undefined != Data.New )
-                    this.Value.Caps = Data.New;
+                if ( undefined != Data.newValue )
+                    this.Value.Caps = Data.newValue;
                 else
                     this.Value.Caps = undefined;
 
@@ -1039,8 +1245,8 @@ ParaTextPr.prototype =
 
             case historyitem_TextPr_SmallCaps:
             {
-                if ( undefined != Data.New )
-                    this.Value.SmallCaps = Data.New;
+                if ( undefined != Data.newValue )
+                    this.Value.SmallCaps = Data.newValue;
                 else
                     this.Value.SmallCaps = undefined;
 
@@ -1049,8 +1255,8 @@ ParaTextPr.prototype =
 
             case historyitem_TextPr_Position:
             {
-                if ( undefined != Data.New )
-                    this.Value.Position = Data.New;
+                if ( undefined != Data.newValue )
+                    this.Value.Position = Data.newValue;
                 else
                     this.Value.Position = undefined;
 
@@ -1066,8 +1272,8 @@ ParaTextPr.prototype =
 
             case historyitem_TextPr_RFonts:
             {
-                if ( undefined != Data.New )
-                    this.Value = Data.New;
+                if ( undefined != Data.newValue )
+                    this.Value = Data.newValue;
                 else
                     this.Value = new CRFonts();
 
@@ -1076,8 +1282,8 @@ ParaTextPr.prototype =
 
             case historyitem_TextPr_Lang:
             {
-                if ( undefined != Data.New )
-                    this.Value = Data.New;
+                if ( undefined != Data.newValue )
+                    this.Value = Data.newValue;
                 else
                     this.Value = new CLang();
 
@@ -1659,6 +1865,10 @@ function ParaEnd()
 
 ParaEnd.prototype =
 {
+    getValue: function()
+    {
+        return undefined;
+    },
     Draw : function(X,Y,Context, bEndCell)
     {
        /* Context.SetFontSlot( fontslot_ASCII );
@@ -1722,6 +1932,11 @@ function ParaNewLine(BreakType)
 
 ParaNewLine.prototype =
 {
+
+    getValue: function()
+    {
+        return this.BreakType;
+    },
     Draw : function(X,Y,Context)
     {
         if ( editor.ShowParaMarks )
@@ -1859,6 +2074,10 @@ function ParaNewLineRendered()
 
 ParaNewLineRendered.prototype =
 {
+    getValue: function()
+    {
+        return undefined;
+    },
     Draw : function()//(X,Y,Context)
     {
         // Ничего не делаем
@@ -1895,6 +2114,11 @@ function ParaInlineBreak()
 
 ParaInlineBreak.prototype =
 {
+
+    getValue: function()
+    {
+        return undefined;
+    },
     Draw : function()
     {
         // Ничего не делаем
@@ -1931,6 +2155,11 @@ function ParaPageBreakRenderer()
 
 ParaPageBreakRenderer.prototype =
 {
+
+    getValue: function()
+    {
+        return undefined;
+    },
     Draw : function()
     {
 
@@ -1972,6 +2201,10 @@ function ParaEmpty(bDelete)
 
 ParaEmpty.prototype =
 {
+    getValue: function()
+    {
+        return this.NeedToDelete;
+    },
     Draw : function()
     {
 
@@ -2027,6 +2260,10 @@ function ParaNumbering()
 
 ParaNumbering.prototype =
 {
+    getValue: function()
+    {
+        return undefined;
+    },
     Draw : function(X,Y,Context, Numbering, TextPr, NumPr)
     {
         Numbering.Draw( NumPr.NumId, NumPr.Lvl, X, Y, Context, this.Internal.NumInfo, TextPr );
@@ -2092,6 +2329,10 @@ function ParaTab()
 
 ParaTab.prototype =
 {
+    getValue: function()
+    {
+        return undefined;
+    },
     Draw : function(X,Y,Context)
     {
         if ( editor.ShowParaMarks )
@@ -5940,6 +6181,10 @@ function ParaPageNum()
 
 ParaPageNum.prototype =
 {
+    getValue: function()
+    {
+        return undefined;
+    },
     Draw : function(X,Y,Context, Value, Align)
     {
         // Value - реальное значение, которое должно быть отрисовано.
@@ -6104,6 +6349,10 @@ function ParaHyperlinkStart()
 
 ParaHyperlinkStart.prototype =
 {
+    getValue: function()
+    {
+        return this.Value;
+    },
     Get_Id : function()
     {
         return this.Id;
@@ -6349,6 +6598,10 @@ function ParaHyperlinkEnd()
 
 ParaHyperlinkEnd.prototype =
 {
+    getValue: function()
+    {
+        return undefined;
+    },
     Draw : function(X, Y, Context)
     {
 
@@ -6390,6 +6643,10 @@ function ParaCollaborativeChangesStart()
 
 ParaCollaborativeChangesStart.prototype =
 {
+    getValue: function()
+    {
+        return undefined;
+    },
     Draw : function()
     {
 
@@ -6427,6 +6684,11 @@ function ParaCollaborativeChangesEnd()
 
 ParaCollaborativeChangesEnd.prototype =
 {
+    getValue: function()
+    {
+        return undefined;
+    },
+
     Draw : function()
     {
 
@@ -6464,6 +6726,10 @@ function ParaCommentStart(Id)
 
 ParaCommentStart.prototype =
 {
+    getValue: function()
+    {
+        return this.Id;
+    },
     Draw : function()
     {
 
@@ -6509,6 +6775,10 @@ function ParaCommentEnd(Id)
 
 ParaCommentEnd.prototype =
 {
+    getValue: function()
+    {
+        return this.Id;
+    },
     Draw : function()
     {
 

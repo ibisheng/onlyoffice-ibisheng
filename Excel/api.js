@@ -2341,26 +2341,32 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 
 			asc_setCellTextColor: function (color) {
-				if (color instanceof CAscColor) {
-					color = CorrectAscColor(color);
-					
 					var ws = this.wb.getWorksheet();
 					if ( ws.objectRender.selectedGraphicObjectsExists() && ws.objectRender.controller.setCellTextColor )
 						ws.objectRender.controller.setCellTextColor(color);
 					else {
-						this.wb.setFontAttributes("c", color);
-						this.wb.restoreFocus();
+                        if (color instanceof CAscColor) {
+                            color = CorrectAscColor(color);
+                            this.wb.setFontAttributes("c", color);
+                            this.wb.restoreFocus();
+                        }
 					}
-				}
+
 			},
 
 			asc_setCellBackgroundColor: function (color) {
-				if(color instanceof CAscColor)
-				{
-					color = CorrectAscColor(color);
-					this.wb.getWorksheet().setSelectionInfo("bc", color);
-					this.wb.restoreFocus();
-				}
+                var ws = this.wb.getWorksheet();
+                if ( ws.objectRender.selectedGraphicObjectsExists() && ws.objectRender.controller.setCellBackgroundColor )
+                    ws.objectRender.controller.setCellBackgroundColor(color);
+                else
+                {
+                    if(color instanceof CAscColor)
+                    {
+                        color = CorrectAscColor(color);
+                        this.wb.getWorksheet().setSelectionInfo("bc", color);
+                        this.wb.restoreFocus();
+                    }
+                }
 			},
 
 			asc_setCellBorders: function (borders) {
@@ -2384,8 +2390,15 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 
             asc_setCellAngle: function (angle) {
-                this.wb.getWorksheet().setSelectionInfo("angle", angle);
-                this.wb.restoreFocus();
+
+                var ws = this.wb.getWorksheet();
+                if ( ws.objectRender.selectedGraphicObjectsExists() && ws.objectRender.controller.setCellAngle )
+                    ws.objectRender.controller.setCellAngle(angle);
+                else
+                {
+                    this.wb.getWorksheet().setSelectionInfo("angle", angle);
+                    this.wb.restoreFocus();
+                }
             },
 
 			asc_setCellStyle: function (name) {
@@ -2405,14 +2418,24 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 			// Увеличение размера шрифта
 			asc_increaseFontSize: function () {
-				this.wb.changeFontSize("changeFontSize", true);
-				this.wb.restoreFocus();
+                var ws = this.wb.getWorksheet();
+                if ( ws.objectRender.selectedGraphicObjectsExists() && ws.objectRender.controller.increaseFontSize )
+                    ws.objectRender.controller.increaseFontSize();
+                else{
+                    this.wb.changeFontSize("changeFontSize", true);
+                    this.wb.restoreFocus();
+                }
 			},
 
 			// Уменьшение размера шрифта
 			asc_decreaseFontSize: function () {
-				this.wb.changeFontSize("changeFontSize", false);
-				this.wb.restoreFocus();
+                var ws = this.wb.getWorksheet();
+                if ( ws.objectRender.selectedGraphicObjectsExists() && ws.objectRender.controller.decreaseFontSize )
+                    ws.objectRender.controller.decreaseFontSize();
+                else{
+                    this.wb.changeFontSize("changeFontSize", false);
+                    this.wb.restoreFocus();
+                }
 			},
 
 			asc_onMouseUp: function (x, y) {

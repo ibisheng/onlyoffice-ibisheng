@@ -475,10 +475,11 @@ function CGeometry()
 
 CGeometry.prototype=
 {
-	Get_Id: function()
-	{
-		return this.Id;
-	},
+
+    Get_Id: function()
+    {
+        return this.Id;
+    },
     getObjectType: function()
     {
         return CLASS_TYPE_GEOMETRY;
@@ -1128,6 +1129,15 @@ CGeometry.prototype=
 
     Recalculate: function(w, h)
     {
+        this.gdLst["_3cd4"]=16200000;
+        this.gdLst["_3cd8"]=8100000;
+        this.gdLst["_5cd8"]=13500000;
+        this.gdLst["_7cd8"]=18900000;
+        this.gdLst["cd2"]=10800000;
+        this.gdLst["cd4"]=5400000;
+        this.gdLst["cd8"]=2700000;
+        this.gdLst["l"]=0;
+        this.gdLst["t"]=0;
         this.gdLst["h"]=h;
         this.gdLst["b"]=h;
         this.gdLst["hd2"]=h*0.5;
@@ -1501,6 +1511,7 @@ CGeometry.prototype=
             }
             case historyitem_AutoShapes_Add_GeometryRect:
             {
+                this.rectS={};
                 this.rectS.l = data.l;
                 this.rectS.t = data.t;
                 this.rectS.r = data.r;
