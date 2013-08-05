@@ -2677,9 +2677,6 @@ function CDrawingDocument(drawingObjects)
     }
     this.TargetEnd = function()
     {
-        //if (!this.TargetShowFlag)
-        //    return;
-
         this.TargetShowFlag = false;
         this.TargetShowNeedFlag = false;
 
@@ -2715,8 +2712,18 @@ function CDrawingDocument(drawingObjects)
         var _oldW = this.TargetHtmlElement.width;
         var _oldH = this.TargetHtmlElement.height;
 
+        var dKoef = this.drawingObjects.convertMetric(1, 3, 0);
+
         var _newW = 2;
-        var _newH = (this.m_dTargetSize * this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100) >> 0;
+        var _newH = this.m_dTargetSize * dKoef;
+
+        var _offX = 0;
+        var _offY = 0;
+        if (this.AutoShapesTrack && this.AutoShapesTrack.Graphics && this.AutoShapesTrack.Graphics.m_oCoordTransform)
+        {
+            _offX = this.AutoShapesTrack.Graphics.m_oCoordTransform.tx;
+            _offY = this.AutoShapesTrack.Graphics.m_oCoordTransform.ty;
+        }
 
         if (null != this.TextMatrix && !global_MatrixTransformer.IsIdentity2(this.TextMatrix))
         {
@@ -2726,8 +2733,8 @@ function CDrawingDocument(drawingObjects)
             var _x2 = this.TextMatrix.TransformPointX(x, y + this.m_dTargetSize);
             var _y2 = this.TextMatrix.TransformPointY(x, y + this.m_dTargetSize);
 
-            var pos1 = this.ConvertCoordsToCursor2(_x1, _y1, this.m_lCurrentPage);
-            var pos2 = this.ConvertCoordsToCursor2(_x2, _y2, this.m_lCurrentPage);
+            var pos1 = { X : _offX + dKoef * _x1, Y : _offY + dKoef * _y1 };
+            var pos2 = { X : _offX + dKoef * _x2, Y : _offY + dKoef * _y2 };
 
             _newW = (Math.abs(pos1.X - pos2.X) >> 0) + 1;
             _newH = (Math.abs(pos1.Y - pos2.Y) >> 0) + 1;
@@ -2819,22 +2826,10 @@ function CDrawingDocument(drawingObjects)
                 y += this.TextMatrix.ty;
             }
 
-            var pos = this.ConvertCoordsToCursor2(x, y, this.m_lCurrentPage);
+            var pos = { X : _offX + dKoef * x, Y : _offY + dKoef * y };
 
-            if (!oThis.m_oWordControl.MobileTouchManager)
-            {
-                this.TargetHtmlElement.style.left = pos.X + "px";
-                this.TargetHtmlElement.style.top = pos.Y + "px";
-            }
-            else
-            {
-                oThis.TargetHtmlElement.style.left = "0px";
-                oThis.TargetHtmlElement.style.top  = "0px";
-                //oThis.TargetHtmlElement.style.webkitTransform = "translate(" + pos.X + "px," + pos.Y + "px)";
-                oThis.TargetHtmlElement.style["webkitTransform"] = "matrix(1, 0, 0, 1, " + pos.X + "," + pos.Y + ")";
-            }
-
-            this.m_oWordControl.CheckTextBoxInputPos();
+            this.TargetHtmlElement.style.left = pos.X + "px";
+            this.TargetHtmlElement.style.top = pos.Y + "px";
         }
     }
 
@@ -2845,8 +2840,7 @@ function CDrawingDocument(drawingObjects)
 
     this.UpdateTarget = function(x, y, pageIndex)
     {
-       // this.m_oWordControl.m_oLogicDocument.Set_TargetPos( x, y, pageIndex );
-
+        /*
         if (this.UpdateTargetFromPaint === false)
         {
             this.UpdateTargetCheck = true;
@@ -2858,6 +2852,7 @@ function CDrawingDocument(drawingObjects)
 
             return;
         }
+        */
 
         if (-1 != this.m_lTimerUpdateTargetID)
         {
@@ -2865,138 +2860,11 @@ function CDrawingDocument(drawingObjects)
             this.m_lTimerUpdateTargetID = -1;
         }
 
-        if (pageIndex >= this.m_arrPages.length)
-            return;
-
-        var bIsPageChanged = false;
-        if (this.m_lCurrentPage != pageIndex)
-        {
-            this.m_lCurrentPage = pageIndex;
-            this.m_oWordControl.SetCurrentPage2();
-            this.m_oWordControl.OnScroll();
-            bIsPageChanged = true;
-        }
-
-        var targetSize = this.drawingDocument.convertMetric(this.m_dTargetSize , 3, 0); // Number(this.m_dTargetSize * this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100);
-
-        var pos = null;
-        var __x = x;
-        var __y = y;
-        if (!this.TextMatrix)
-        {
-            pos = this.ConvertCoordsToCursor2(x, y, this.m_lCurrentPage);
-        }
-        else
-        {
-            __x = this.TextMatrix.TransformPointX(x, y);
-            __y = this.TextMatrix.TransformPointY(x, y);
-
-            pos = this.ConvertCoordsToCursor2(__x, __y, this.m_lCurrentPage);
-        }
-
-        //pos.Y -= targetSize;
-
-        if (true == pos.Error && (false == bIsPageChanged))
-            return;
-
-        // �������, ����� �� ������ �� ������
-        var boxX = 0;
-        var boxY = 0;
-        var boxR = this.m_oWordControl.m_oEditor.HtmlElement.width - 2;
-        var boxB = this.m_oWordControl.m_oEditor.HtmlElement.height - targetSize;
-
-        /*
-        if (true == this.m_oWordControl.m_bIsRuler)
-        {
-            boxX += Number(5 * g_dKoef_mm_to_pix);
-            boxY += Number(7 * g_dKoef_mm_to_pix);
-            boxR += Number(5 * g_dKoef_mm_to_pix);
-            boxB += Number(7 * g_dKoef_mm_to_pix);
-        }
-        */
-
-        var nValueScrollHor = 0;
-        if (pos.X < boxX)
-        {
-            //nValueScrollHor = boxX - pos.X;
-            //nValueScrollHor = pos.X;
-            nValueScrollHor = this.m_oWordControl.GetHorizontalScrollTo(__x - 5, pageIndex);
-        }
-        if (pos.X > boxR)
-        {
-            //nValueScrollHor = boxR - pos.X;
-            //nValueScrollHor = pos.X + this.m_oWordControl.m_oEditor.HtmlElement.width;
-            var _mem = __x + 5 - g_dKoef_pix_to_mm * this.m_oWordControl.m_oEditor.HtmlElement.width * 100 / this.m_oWordControl.m_nZoomValue;
-            nValueScrollHor = this.m_oWordControl.GetHorizontalScrollTo(_mem, pageIndex);
-        }
-
-        var nValueScrollVer = 0;
-        if (pos.Y < boxY)
-        {
-            //nValueScrollVer = boxY - pos.Y;
-            //nValueScrollVer = pos.Y;
-            nValueScrollVer = this.m_oWordControl.GetVerticalScrollTo(__y - 5, pageIndex);
-        }
-        if (pos.Y > boxB)
-        {
-            //nValueScrollVer = boxB - pos.Y;
-            //nValueScrollHor = pos.Y + this.m_oWordControl.m_oEditor.HtmlElement.height;
-            var _mem = __y + targetSize + 5 - g_dKoef_pix_to_mm * this.m_oWordControl.m_oEditor.HtmlElement.height * 100 / this.m_oWordControl.m_nZoomValue;
-            nValueScrollVer = this.m_oWordControl.GetVerticalScrollTo(_mem, pageIndex);
-        }
-
-        if (!this.NeedScrollToTarget)
-        {
-            nValueScrollHor = 0;
-            nValueScrollVer = 0;
-        }
-
-        if (0 != nValueScrollHor || 0 != nValueScrollVer)
-        {
-            if (this.m_oWordControl.m_bIsMouseUpSend === true && global_keyboardEvent.ClickCount != 1)
-            {
-                this.m_tempX = x;
-                this.m_tempY = y;
-                this.m_tempPageIndex = pageIndex;
-                var oThis = this;
-                this.m_lTimerUpdateTargetID = setTimeout(this.UpdateTargetTimer, 100);
-                return;
-            }
-        }
-
         this.m_dTargetX = x;
         this.m_dTargetY = y;
         this.m_lTargetPage = pageIndex;
-        var isNeedScroll = false;
-        if (0 != nValueScrollHor)
-        {
-            isNeedScroll = true;
-            this.m_oWordControl.m_bIsUpdateTargetNoAttack = true;
-            var temp = nValueScrollHor * this.m_oWordControl.m_dScrollX_max / (this.m_oWordControl.m_dDocumentWidth - this.m_oWordControl.m_oEditor.HtmlElement.width);
-            this.m_oWordControl.m_oScrollHorApi.scrollToX(parseInt(temp), false);
-        }
-        if (0 != nValueScrollVer)
-        {
-            isNeedScroll = true;
-            this.m_oWordControl.m_bIsUpdateTargetNoAttack = true;
-            var temp = nValueScrollVer * this.m_oWordControl.m_dScrollY_max / (this.m_oWordControl.m_dDocumentHeight - this.m_oWordControl.m_oEditor.HtmlElement.height);
-            this.m_oWordControl.m_oScrollVerApi.scrollToY(parseInt(temp), false);
-        }
-
-        if (true == isNeedScroll)
-        {
-            this.m_oWordControl.m_bIsUpdateTargetNoAttack = true;
-            this.m_oWordControl.OnScroll();
-            return;
-        }
 
         this.CheckTargetDraw(x, y);
-
-        if (this.m_bIsSearching && null != this.CurrentSearchNavi)
-        {
-            this.CurrentSearchNavi = null;
-            this.drawingObjects.OnUpdateOverlay();
-        }
     }
     this.UpdateTarget2 = function(x, y, pageIndex)
     {
@@ -3699,10 +3567,18 @@ function CDrawingDocument(drawingObjects)
         var dKoefX = this.drawingObjects.convertMetric(1, 3, 0);//(drawPage.right - drawPage.left) / page.width_mm;
         var dKoefY = dKoefX;//(drawPage.bottom - drawPage.top) / page.height_mm;
 
+        var _offX = 0;
+        var _offY = 0;
+        if (this.AutoShapesTrack && this.AutoShapesTrack.Graphics && this.AutoShapesTrack.Graphics.m_oCoordTransform)
+        {
+            _offX = this.AutoShapesTrack.Graphics.m_oCoordTransform.tx;
+            _offY = this.AutoShapesTrack.Graphics.m_oCoordTransform.ty;
+        }
+
         if (!this.IsTextMatrixUse)
         {
-            var _x = ((/*drawPage.left +*/ dKoefX * x) >> 0) - 0.5;
-            var _y = ((/*drawPage.top + */dKoefY * y) >> 0) - 0.5;
+            var _x = ((_offX + dKoefX * x) >> 0) - 0.5;
+            var _y = ((_offY + dKoefY * y) >> 0) - 0.5;
 
             var _w = (dKoefX * w + 1) >> 0;
             var _h = (dKoefY * h + 1) >> 0;
@@ -3724,17 +3600,17 @@ function CDrawingDocument(drawingObjects)
             var _x4 = this.TextMatrix.TransformPointX(x, y + h);
             var _y4 = this.TextMatrix.TransformPointY(x, y + h);
 
-            var x1 = /*drawPage.left +*/ dKoefX * _x1;
-            var y1 = /*drawPage.top + */dKoefY * _y1;
+            var x1 = _offX + dKoefX * _x1;
+            var y1 = _offY + dKoefY * _y1;
 
-            var x2 =/*drawPage.left +*/ dKoefX * _x2;
-            var y2 =/*drawPage.top + */dKoefY * _y2;
+            var x2 = _offX + dKoefX * _x2;
+            var y2 = _offY + dKoefY * _y2;
 
-            var x3 =/* drawPage.left +*/ dKoefX * _x3;
-            var y3 =/* drawPage.top + */dKoefY * _y3;
+            var x3 = _offX + dKoefX * _x3;
+            var y3 = _offY + dKoefY * _y3;
 
-            var x4 = /*drawPage.left +*/ dKoefX * _x4;
-            var y4 = /*drawPage.top + */dKoefY * _y4;
+            var x4 = _offX + dKoefX * _x4;
+            var y4 = _offY + dKoefY * _y4;
 
             this.Overlay.CheckPoint(x1, y1);
             this.Overlay.CheckPoint(x2, y2);

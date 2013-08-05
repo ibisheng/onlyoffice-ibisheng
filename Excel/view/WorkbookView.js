@@ -116,10 +116,16 @@
 				// Изначально мы инициализируем c_oAscFontRenderingModeType.noHinting
 				this.setFontRenderingMode(fontRenderingMode, /*isInit*/true);
 
+                var _head = document.getElementsByTagName('head')[0];
+                var style0 = document.createElement('style');
+                style0.type = 'text/css';
+                style0.innerHTML = ".block_elem { position:absolute;padding:0;margin:0; }";
+                _head.appendChild(style0);
+
 				// create canvas
 				var outer = this.element.find("#ws-canvas-outer");
 				if (outer.length < 1) {
-					outer = $('<div id="ws-canvas-outer"><canvas id="ws-canvas"/><canvas id="ws-canvas-overlay"/></div>')
+					outer = $('<div id="ws-canvas-outer"><canvas id="ws-canvas"/><canvas id="ws-canvas-overlay"/><canvas id=\"id_target_cursor\" class=\"block_elem\" width=\"1\" height=\"1\" style=\"width:2px;height:13px;display:none;z-index:1004;\"></canvas></div>')
 							.appendTo(this.element);
 				}
 				this.canvas = this.element.find("#ws-canvas")
