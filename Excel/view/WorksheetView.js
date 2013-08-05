@@ -5860,7 +5860,7 @@
 					if ( drawingInfo ) {
 						this.overlayCtx.clear();
 						this._drawGraphic();
-						this.objectRender.selectGraphicObject();
+						this.objectRender.OnUpdateOverlay();
 					}
 					else {
 						if ( !asc["editor"].isStartAddShape )

@@ -2063,6 +2063,18 @@ function DrawingObjects() {
 
 
         shapeOverlayCtx.m_oContext.clearRect(0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix);
+		
+		// Селекты для комментариев, фильтров и т.д.
+		if ( !_this.controller.selectedObjects.length )
+			worksheet._drawSelection();
+		worksheet._drawGraphic();
+		
+		for ( var i = 0; i < _this.controller.selectedObjects.length; i++ ) {
+			if ( _this.controller.selectedObjects[i].isChart() ) {
+				_this.selectDrawingObjectRange(_this.controller.selectedObjects[i].Id);
+			}
+		}
+		_this.raiseLayerDrawingObjects();
 
         if (null == drDoc.m_oDocumentRenderer)
         {
@@ -2294,6 +2306,7 @@ function DrawingObjects() {
 		worksheet._drawGraphic();
 		_this.controller.drawTracks(shapeOverlayCtx);
 		shapeOverlayCtx.put_GlobalAlpha(true, 1);
+		_this.drawWorksheetHeaders(true);
 	}
 	
 	_this.getDrawingAreaMetrics = function() {
@@ -2316,24 +2329,34 @@ function DrawingObjects() {
 		return metrics;
 	}
 
-	_this.drawWorksheetHeaders = function() {
+	_this.drawWorksheetHeaders = function(bOverlay) {
 	
 		// Проверяем выход за видимую область
 		var fvr = worksheet.getFirstVisibleRow();
 		var fvc = worksheet.getFirstVisibleCol();
 		
+		var top = worksheet.getCellTop(0, 3) + pxToMm(1);
+		var left = worksheet.getCellLeft(0, 3) + pxToMm(1);
+
 		for (var i = 0; i < aObjects.length; i++) {
 			
 			var obj = aObjects[i];
-			if ( (obj.from.col < fvc) || (obj.from.row < fvr) ) {				
-				worksheet._drawColumnHeaders();
-				worksheet._drawRowHeaders();
-						
-				// cols header on overlay
-				overlayCtx.clearRect( 0, 0, overlayCtx.getWidth(), worksheet.getCellTop(0, 1) );
-				// rows header on overlay
-				overlayCtx.clearRect( 0, 0, worksheet.getCellLeft(0, 1), overlayCtx.getHeight() );
-				break;
+			if ( bOverlay ) {	// Проверка по координатам graphicObject, From/To ещё не подсчитаны
+				
+				if ( (_this.controller.curState.id = STATES_ID_MOVE) || (_this.controller.curState.id == STATES_ID_RESIZE) ) {
+				}
+			}
+			else {
+				if ( (obj.from.col < fvc) || (obj.from.row < fvr) ) {				
+					worksheet._drawColumnHeaders();
+					worksheet._drawRowHeaders();
+							
+					// cols header on overlay
+					overlayCtx.clearRect( 0, 0, overlayCtx.getWidth(), worksheet.getCellTop(0, 1) );
+					// rows header on overlay
+					overlayCtx.clearRect( 0, 0, worksheet.getCellLeft(0, 1), overlayCtx.getHeight() );
+					break;
+				}
 			}
 		}
 	}
@@ -3449,9 +3472,6 @@ function DrawingObjects() {
 				
 				worksheet.overlayCtx.rect(worksheet.cellsLeft, worksheet.cellsTop, worksheet.overlayCtx.getWidth() - worksheet.cellsLeft, worksheet.overlayCtx.getHeight() - worksheet.cellsTop);
 				worksheet._drawFormulaRange(worksheet.arrActiveChartsRanges);
-				
-				// слой c объектами должен быть выше селекта
-				_this.raiseLayerDrawingObjects();
 			}
 		}
 	}
