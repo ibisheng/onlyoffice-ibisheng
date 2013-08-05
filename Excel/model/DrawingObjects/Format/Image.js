@@ -81,6 +81,11 @@ CImage.prototype =
         return CLASS_TYPE_IMAGE;
     },
 
+    Get_Id: function()
+    {
+        return this.Id;
+    },
+
     isShape: function()
     {
         return false;

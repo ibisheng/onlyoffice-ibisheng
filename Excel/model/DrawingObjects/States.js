@@ -1641,7 +1641,7 @@ function RotateState(drawingObjectsController, drawingObjects, majorObject)
             track_objects2.push(track_objects[i]);
         }
 
-        var drawibgObjects = this.drawingObjects;
+        var drawingObjects = this.drawingObjects;
         var callback = function(bLock)
         {
             if(bLock)
@@ -1649,7 +1649,6 @@ function RotateState(drawingObjectsController, drawingObjects, majorObject)
                 History.Create_NewPoint();
                 for(var i = 0; i < track_objects2.length; ++i)
                     track_objects2[i].trackEnd();
-
                 drawingObjects.showDrawingObjects(true);
 
             }
@@ -1752,8 +1751,38 @@ function ResizeState(drawingObjectsController, drawingObjects, majorObject, card
 
     this.onMouseUp = function(e, x, y)
     {
-        History.Create_NewPoint();
-        this.drawingObjectsController.trackEnd();
+
+        var worksheet = this.drawingObjects.getWorksheet();
+        worksheet.collaborativeEditing.onStartCheckLock();
+        var track_objects = this.drawingObjectsController.arrTrackObjects;
+        for(var i =0; i < track_objects.length; ++i)
+        {
+            this.drawingObjects.lockDrawingObject(track_objects[i].originalObject.Get_Id(), true, true)
+        }
+        var track_objects2 = [];
+        for(i = 0; i < track_objects.length; ++i)
+        {
+            track_objects2.push(track_objects[i]);
+        }
+
+        var drawingObjects = this.drawingObjects;
+        var callback = function(bLock)
+        {
+            if(bLock)
+            {
+                History.Create_NewPoint();
+                for(var i = 0; i < track_objects2.length; ++i)
+                    track_objects2[i].trackEnd();
+                drawingObjects.showDrawingObjects(true);
+
+            }
+        };
+
+        worksheet.collaborativeEditing.onEndCheckLock(callback);
+
+
+        //History.Create_NewPoint();
+        //this.drawingObjectsController.trackEnd();
         this.drawingObjectsController.clearTrackObjects();
         this.drawingObjects.OnUpdateOverlay();
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
@@ -1980,6 +2009,9 @@ function TrackNewShapeState(drawingObjectsController, drawingObjects, presetGeom
     this.onMouseUp = function(e, x, y)
     {
         this.drawingObjectsController.resetSelection();
+
+
+
         History.Create_NewPoint();
         this.drawingObjectsController.trackEnd();
         this.drawingObjectsController.clearTrackObjects();
@@ -1994,6 +2026,12 @@ function TrackNewShapeState(drawingObjectsController, drawingObjects, presetGeom
             /*this.resultObject.selectionSetStart(e, x, y);
             this.drawingObjectsController.onMouseUp(e, x, y);*/
         }
+
+        //лочим добавленный шейп
+        var worksheet = this.drawingObjects.getWorksheet();
+        worksheet.collaborativeEditing.onStartCheckLock();
+        this.drawingObjects.lockDrawingObject(this.resultObject.Get_Id(), true, true);
+        worksheet.collaborativeEditing.onEndCheckLock(function(bLock){});
         asc["editor"].asc_endAddShape();
     };
 
@@ -2213,8 +2251,35 @@ function MoveState(drawingObjectsController, drawingObjects, startX, startY, rec
 
     this.onMouseUp = function(e, x, y)
     {
-        History.Create_NewPoint();
-        this.drawingObjectsController.trackEnd();
+        var worksheet = this.drawingObjects.getWorksheet();
+        worksheet.collaborativeEditing.onStartCheckLock();
+        var track_objects = this.drawingObjectsController.arrTrackObjects;
+        for(var i =0; i < track_objects.length; ++i)
+        {
+            this.drawingObjects.lockDrawingObject(track_objects[i].originalObject.Get_Id(), true, true)
+        }
+        var track_objects2 = [];
+        for(i = 0; i < track_objects.length; ++i)
+        {
+            track_objects2.push(track_objects[i]);
+        }
+
+        var drawingObjects = this.drawingObjects;
+        var callback = function(bLock)
+        {
+            if(bLock)
+            {
+                History.Create_NewPoint();
+                for(var i = 0; i < track_objects2.length; ++i)
+                    track_objects2[i].trackEnd();
+                drawingObjects.showDrawingObjects(true);
+
+            }
+        };
+
+        worksheet.collaborativeEditing.onEndCheckLock(callback);
+        //History.Create_NewPoint();
+        //this.drawingObjectsController.trackEnd();
         this.drawingObjectsController.clearTrackObjects();
         this.drawingObjects.OnUpdateOverlay();
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
@@ -2308,8 +2373,35 @@ function ChangeAdjState(drawingObjectsController, drawingObjects)
 
     this.onMouseUp = function(e, x, y)
     {
-        History.Create_NewPoint();
-        this.drawingObjectsController.trackEnd();
+        var worksheet = this.drawingObjects.getWorksheet();
+        worksheet.collaborativeEditing.onStartCheckLock();
+        var track_objects = this.drawingObjectsController.arrTrackObjects;
+        for(var i =0; i < track_objects.length; ++i)
+        {
+            this.drawingObjects.lockDrawingObject(track_objects[i].originalShape.Get_Id(), true, true)
+        }
+        var track_objects2 = [];
+        for(i = 0; i < track_objects.length; ++i)
+        {
+            track_objects2.push(track_objects[i]);
+        }
+
+        var drawingObjects = this.drawingObjects;
+        var callback = function(bLock)
+        {
+            if(bLock)
+            {
+                History.Create_NewPoint();
+                for(var i = 0; i < track_objects2.length; ++i)
+                    track_objects2[i].trackEnd();
+                drawingObjects.showDrawingObjects(true);
+
+            }
+        };
+
+        worksheet.collaborativeEditing.onEndCheckLock(callback);
+        //History.Create_NewPoint();
+        //this.drawingObjectsController.trackEnd();
         this.drawingObjectsController.clearTrackObjects();
         this.drawingObjects.OnUpdateOverlay();
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
@@ -2901,6 +2993,8 @@ function ChangeAdjInGroupState(drawingObjectsController, drawingObjects, group)
 
     this.onMouseUp = function(e, x, y)
     {
+
+
         this.drawingObjectsController.trackEnd();
         this.drawingObjectsController.clearTrackObjects();
         this.drawingObjects.OnUpdateOverlay();
