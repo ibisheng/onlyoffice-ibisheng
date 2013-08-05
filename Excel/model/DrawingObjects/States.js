@@ -1349,6 +1349,11 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
     this.onMouseDown = function(e, x, y)
     {
         this.nullState.onMouseDown(e, x, y);
+        if(this.drawingObjectsController.curState.id !== STATES_ID_TEXT_ADD || this.drawingObjectsController.curState.id !== STATES_ID_TEXT_ADD_IN_GROUP)
+        {
+            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+
+        }
     };
 
     this.onMouseMove = function(e, x, y)
@@ -2651,6 +2656,18 @@ function GroupState(drawingObjectsController, drawingObjects, group)
 
     this.onKeyPress = function(e)
     {
+        var selected_objects = this.group.selectedObjects;
+        if(selected_objects.length === 1 && selected_objects[0].isShape())
+        {
+            if(isRealNumber(e.charCode))
+            {
+                selected_objects[0].paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
+                this.drawingObjectsController.changeCurrentState(new TextAddInGroup(this.drawingObjectsController, this.drawingObjects, this.group, selected_objects[0]));
+                this.drawingObjects.showDrawingObjects(true);
+                this.drawingObjects.OnUpdateOverlay();
+            }
+        }
+
     };
 
     this.drawSelection = function(drawingDocument)
@@ -2803,11 +2820,17 @@ function TextAddInGroup(drawingObjectsController, drawingObjects, group, textObj
     this.id = STATES_ID_TEXT_ADD_IN_GROUP;
     this.drawingObjectsController = drawingObjectsController;
     this.drawingObjects = drawingObjects;
-    this.groupState = new GroupState(drawingObjectsController, drawingObjectsController, group);
+    this.groupState = new GroupState(drawingObjectsController, drawingObjects, group);
     this.textObject = textObject;
+    this.group = group;
     this.onMouseDown = function(e, x, y)
     {
         this.groupState.onMouseDown(e, x, y);
+        if(this.drawingObjectsController.curState.id !== STATES_ID_TEXT_ADD || this.drawingObjectsController.curState.id !== STATES_ID_TEXT_ADD_IN_GROUP)
+        {
+            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+
+        }
     };
 
     this.onMouseMove = function(e, x, y)
@@ -2831,9 +2854,181 @@ function TextAddInGroup(drawingObjectsController, drawingObjects, group, textObj
         this.textObject.drawAdjustments(drawingDocument);
     };
 
+    this.onKeyDown = function(e)
+    {
+
+    };
+
+    this.onKeyPress = function(e)
+    {
+        this.textObject.paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
+        this.drawingObjectsController.updateSelectionState(this.drawingObjects.drawingDocument);
+        this.drawingObjects.showDrawingObjects(true);
+        this.drawingObjects.OnUpdateOverlay();
+    };
+
     this.isPointInDrawingObjects = function(x, y)
     {
         return this.groupState.isPointInDrawingObjects(x, y);
+    };
+    // Уменьшение размера шрифта
+    this.setCellFontName = function (fontName) {
+        if(typeof this.textObject.setCellFontName === "function")
+        {
+            this.textObject.setCellFontName(fontName);
+            this.drawingObjects.showDrawingObjects(true);
+            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+        }
+    };
+
+    // Уменьшение размера шрифта
+    this.setCellFontSize = function (fontSize) {
+        if(typeof this.textObject.setCellFontSize === "function")
+        {
+            this.textObject.setCellFontSize(fontSize);
+            this.drawingObjects.showDrawingObjects(true);
+            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+        }
+    };
+
+    // Уменьшение размера шрифта
+    this.setCellBold = function (isBold) {
+        if(typeof this.textObject.setCellBold === "function")
+        {
+            this.textObject.setCellBold(isBold);
+            this.drawingObjects.showDrawingObjects(true);
+            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+        }
+    };
+
+    // Уменьшение размера шрифта
+    this.setCellItalic = function (isItalic) {
+        if(typeof this.textObject.setCellItalic === "function")
+        {
+            this.textObject.setCellItalic(isItalic);
+            this.drawingObjects.showDrawingObjects(true);
+            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+        }
+    };
+
+    // Уменьшение размера шрифта
+    this.setCellUnderline = function (isUnderline) {
+        if(typeof this.textObject.setCellUnderline === "function")
+        {
+            this.textObject.setCellUnderline(isUnderline);
+            this.drawingObjects.showDrawingObjects(true);
+            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+        }
+    };
+
+    // Уменьшение размера шрифта
+    this.setCellStrikeout = function (isStrikeout) {
+        if(typeof this.textObject.setCellStrikeout === "function")
+        {
+            this.textObject.setCellStrikeout(isStrikeout);
+            this.drawingObjects.showDrawingObjects(true);
+            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+        }
+    };
+
+    // Уменьшение размера шрифта
+    this.setCellSubscript = function (isSubscript) {
+        if(typeof this.textObject.setCellSubscript === "function")
+        {
+            this.textObject.setCellSubscript(isSubscript);
+            this.drawingObjects.showDrawingObjects(true);
+            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+        }
+    };
+
+    // Уменьшение размера шрифта
+    this.setCellSuperscript = function (isSuperscript) {
+        if(typeof this.textObject.setCellSuperscript === "function")
+        {
+            this.textObject.setCellSuperscript(isSuperscript);
+            this.drawingObjects.showDrawingObjects(true);
+            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+        }
+    };
+
+    // Уменьшение размера шрифта
+    this.setCellAlign = function (align) {
+        if(typeof this.textObject.setCellAlign === "function")
+        {
+            this.textObject.setCellAlign(align);
+            this.drawingObjects.showDrawingObjects(true);
+            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+        }
+    };
+
+    // Уменьшение размера шрифта
+    this.setCellVertAlign = function (align) {
+        if(typeof this.textObject.setCellVertAlign === "function")
+        {
+            this.textObject.setCellVertAlign(align);
+            this.drawingObjects.showDrawingObjects(true);
+            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+        }
+    };
+
+    // Уменьшение размера шрифта
+    this.setCellTextColor = function (color) {
+        if(typeof this.textObject.setCellTextColor === "function")
+        {
+            this.textObject.setCellTextColor(color);
+            this.drawingObjects.showDrawingObjects(true);
+            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+        }
+
+    };
+
+    // Уменьшение размера шрифта
+    this.setCellBackgroundColor = function (color) {
+        if(typeof this.textObject.setCellBackgroundColor === "function")
+        {
+            this.textObject.setCellBackgroundColor(color);
+            this.drawingObjects.showDrawingObjects(true);
+        }
+    };
+
+    // Уменьшение размера шрифта
+    this.setCellAngle = function (angle) {
+        if(typeof this.textObject.setCellAngle === "function")
+        {
+            this.textObject.setCellAngle(angle);
+            this.drawingObjects.showDrawingObjects(true);
+            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+        }
+    };
+
+
+    // Уменьшение размера шрифта
+    this.increaseFontSize = function () {
+        if(typeof this.textObject.increaseFontSize === "function")
+        {
+            this.textObject.increaseFontSize();
+            this.drawingObjects.showDrawingObjects(true);
+            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+        }
+    };
+
+    // Уменьшение размера шрифта
+    this.decreaseFontSize = function () {
+        if(typeof this.textObject.decreaseFontSize === "function")
+        {
+            this.textObject.decreaseFontSize();
+            this.drawingObjects.showDrawingObjects(true);
+            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+        }
+    };
+
+
+    this.insertHyperlink = function (options) {
+        if(typeof this.textObject.insertHyperlink === "function")
+        {
+            this.textObject.insertHyperlink(options);
+            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+        }
     };
 }
 
