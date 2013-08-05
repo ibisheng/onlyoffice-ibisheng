@@ -37,9 +37,15 @@ window.addEventListener("message", function(event) {
                     bIsUseOrigF = true;
 
                 if (!bIsUseOrigF)
+                {
                     _files[i]._callback_font_load();
+                }
                 else
+                {
+                    bIsLocalFontsUse = false;
                     _files[i].LoadFontAsync(event.data.src, null);
+                    bIsLocalFontsUse = true;
+                }
 
                 break;
             }
