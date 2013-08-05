@@ -391,6 +391,8 @@ DrawingObjectsController.prototype =
         if(grouped_objects.length < 2)
             return null;
 
+
+
         History.Create_NewPoint();
         this.resetSelection();
         var max_x, min_x, max_y, min_y;

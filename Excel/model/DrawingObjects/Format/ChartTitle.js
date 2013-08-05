@@ -56,12 +56,10 @@ function CChartTitle(chartGroup, type)
 
 CChartTitle.prototype =
 {
-
     getObjectType: function()
     {
         return CLASS_TYPE_CHART_TITLE;
     },
-
 
     Get_Id: function()
     {
