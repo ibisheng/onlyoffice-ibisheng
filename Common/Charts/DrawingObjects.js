@@ -1518,7 +1518,8 @@ function DrawingObjects() {
 	
 	var userId = null;
 	var documentId = null;
-		
+	
+	_this.objectLocker = null;
 	_this.drawingDocument = null;
 	_this.asyncImageEndLoaded = null;
 	_this.asyncImagesDocumentEndLoaded = null;
@@ -1893,6 +1894,7 @@ function DrawingObjects() {
 		autoShapeTrack = new CAutoshapeTrack();
 		autoShapeTrack.init( trackOverlay, 0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix, shapeOverlayCtx.m_dWidthMM, shapeOverlayCtx.m_dHeightMM );
 		
+		_this.objectLocker = new ObjectLocker(worksheet);
 		_this.drawingDocument = new CDrawingDocument(this);
 		_this.drawingDocument.AutoShapesTrack = autoShapeTrack;
 		_this.drawingDocument.TargetHtmlElement = document.getElementById('id_target_cursor');
@@ -3078,7 +3080,12 @@ function DrawingObjects() {
 		_this.sendGraphicObjectProps();
 		
 		worksheet.model.workbook.handlers.trigger("asc_onEndAddShape");
-		_this.lockDrawingObject(obj.id, true, true);
+		
+		//_this.lockDrawingObject(obj.id, true, true);
+		_this.objectLocker.reset();
+		_this.objectLocker.addObjectId(obj.id);
+		_this.objectLocker.checkObjects( function(result){ return result; } );
+		
         return ret;
 	}
 	
@@ -3863,5 +3870,57 @@ function DrawingObjects() {
 	function pxToMm(val) {
 		var tmp = val * ascCvtRatio(0, 3);
 		return tmp;
+	}
+}
+
+//-----------------------------------------------------------------------------------
+// Universal object locker/checker
+//-----------------------------------------------------------------------------------
+
+function ObjectLocker(ws) {
+	
+	var _t = this;
+	var aObjectId = [];
+	var worksheet = ws;
+	
+	_t.reset = function() {
+		aObjectId = [];
+	}
+	
+	_t.addObjectId = function(id) {
+		aObjectId.push(id);
+	}
+	
+	_t.checkObjects = function(callback) {
+		
+		if (false === worksheet.collaborativeEditing.isCoAuthoringExcellEnable()) {
+			// Запрещено совместное редактирование
+			if ($.isFunction(callback)) {callback(true);}
+			return;
+		}
+		
+		var sheetId = worksheet.model.getId();
+		worksheet.collaborativeEditing.onStartCheckLock();
+		for ( var i = 0; i < aObjectId.length; i++ ) {
+			var lockInfo = worksheet.collaborativeEditing.getLockInfo( c_oAscLockTypeElem.Object, /*subType*/null, sheetId, aObjectId[i] );
+
+			if ( false === worksheet.collaborativeEditing.getCollaborativeEditing() ) {
+				// Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
+				if ($.isFunction(callback)) {callback(true);}
+			}
+			else if ( false !== worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine) ) {
+				// Редактируем сами
+				if ($.isFunction(callback)) {callback(true);}
+				return;
+			}
+			else if ( false !== worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther) ) {
+				// Уже ячейку кто-то редактирует
+				if ($.isFunction(callback)) {callback(false);}
+				return;
+			}		
+			
+			worksheet.collaborativeEditing.addCheckLock(lockInfo);
+		}
+		worksheet.collaborativeEditing.onEndCheckLock(callback);
 	}
 }
