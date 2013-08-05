@@ -2784,20 +2784,8 @@ function CDrawingDocument(drawingObjects)
                 ctx.stroke();
             }
 
-            if (!oThis.m_oWordControl.MobileTouchManager)
-            {
-                this.TargetHtmlElement.style.left = Math.min(pos1.X, pos2.X) + "px";
-                this.TargetHtmlElement.style.top = Math.min(pos1.Y, pos2.Y) + "px";
-            }
-            else
-            {
-                var __x =  Math.min(pos1.X, pos2.X);
-                var __y =  Math.min(pos1.Y, pos2.Y);
-                oThis.TargetHtmlElement.style.left = "0px";
-                oThis.TargetHtmlElement.style.top  = "0px";
-                //oThis.TargetHtmlElement.style.webkitTransform = "translate(" + __x + "px," + __y + "px)";
-                oThis.TargetHtmlElement.style["webkitTransform"] = "matrix(1, 0, 0, 1, " +__x + "," + __y + ")";
-            }
+            this.TargetHtmlElement.style.left = Math.min(pos1.X, pos2.X) + "px";
+            this.TargetHtmlElement.style.top = Math.min(pos1.Y, pos2.Y) + "px";
         }
         else
         {
