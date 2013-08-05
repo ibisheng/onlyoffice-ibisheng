@@ -172,6 +172,9 @@ prop:sync_EndCatchSelectedElements
 prop:getSelectedElements
 prop:sync_ChangeLastSelectedElement
 prop:Init
+prop:asc_getEditorPermissions
+prop:asc_getEditorPermissionsCallback
+prop:asc_setDocInfo
 prop:LoadDocument
 prop:SetFontsPath
 prop:SetTextBoxInputMode
@@ -1017,6 +1020,20 @@ prop:get_Type
 ---
 var:GenerateTableStyles
 ---
+var:CAscEditorPermissions
+prop:asc_getCanEdit
+prop:asc_getCanDownload
+prop:asc_getCanCoAuthoring
+prop:asc_getCanReaderMode
+prop:asc_getIsAutosaveEnable
+prop:asc_getAutosaveMinInterval
+prop:asc_setCanEdit
+prop:asc_setCanDownload
+prop:asc_setCanCoAuthoring
+prop:asc_setCanReaderMode
+prop:asc_setIsAutosaveEnable
+prop:asc_setAutosaveMinInterval
+---
 */
 window['CDocOpenProgress'] = CDocOpenProgress;
 CDocOpenProgress.prototype['get_Type'] = CDocOpenProgress.prototype.get_Type;
@@ -1173,6 +1190,9 @@ asc_docs_api.prototype['sync_EndCatchSelectedElements'] = asc_docs_api.prototype
 asc_docs_api.prototype['getSelectedElements'] = asc_docs_api.prototype.getSelectedElements;
 asc_docs_api.prototype['sync_ChangeLastSelectedElement'] = asc_docs_api.prototype.sync_ChangeLastSelectedElement;
 asc_docs_api.prototype['Init'] = asc_docs_api.prototype.Init;
+asc_docs_api.prototype['asc_getEditorPermissions'] = asc_docs_api.prototype.asc_getEditorPermissions;
+asc_docs_api.prototype['asc_getEditorPermissionsCallback'] = asc_docs_api.prototype.asc_getEditorPermissionsCallback;
+asc_docs_api.prototype['asc_setDocInfo'] = asc_docs_api.prototype.asc_setDocInfo;
 asc_docs_api.prototype['LoadDocument'] = asc_docs_api.prototype.LoadDocument;
 asc_docs_api.prototype['SetFontsPath'] = asc_docs_api.prototype.SetFontsPath;
 asc_docs_api.prototype['SetTextBoxInputMode'] = asc_docs_api.prototype.SetTextBoxInputMode;
@@ -1950,3 +1970,16 @@ CAscTableStyle.prototype['get_Id'] = CAscTableStyle.prototype.get_Id;
 CAscTableStyle.prototype['get_Image'] = CAscTableStyle.prototype.get_Image;
 CAscTableStyle.prototype['get_Type'] = CAscTableStyle.prototype.get_Type;
 window['GenerateTableStyles'] = GenerateTableStyles;
+window['CAscEditorPermissions'] = CAscEditorPermissions;
+CAscEditorPermissions.prototype['asc_getCanEdit'] = CAscEditorPermissions.prototype.asc_getCanEdit;
+CAscEditorPermissions.prototype['asc_getCanDownload'] = CAscEditorPermissions.prototype.asc_getCanDownload;
+CAscEditorPermissions.prototype['asc_getCanCoAuthoring'] = CAscEditorPermissions.prototype.asc_getCanCoAuthoring;
+CAscEditorPermissions.prototype['asc_getCanReaderMode'] = CAscEditorPermissions.prototype.asc_getCanReaderMode;
+CAscEditorPermissions.prototype['asc_getIsAutosaveEnable'] = CAscEditorPermissions.prototype.asc_getIsAutosaveEnable;
+CAscEditorPermissions.prototype['asc_getAutosaveMinInterval'] = CAscEditorPermissions.prototype.asc_getAutosaveMinInterval;
+CAscEditorPermissions.prototype['asc_setCanEdit'] = CAscEditorPermissions.prototype.asc_setCanEdit;
+CAscEditorPermissions.prototype['asc_setCanDownload'] = CAscEditorPermissions.prototype.asc_setCanDownload;
+CAscEditorPermissions.prototype['asc_setCanCoAuthoring'] = CAscEditorPermissions.prototype.asc_setCanCoAuthoring;
+CAscEditorPermissions.prototype['asc_setCanReaderMode'] = CAscEditorPermissions.prototype.asc_setCanReaderMode;
+CAscEditorPermissions.prototype['asc_setIsAutosaveEnable'] = CAscEditorPermissions.prototype.asc_setIsAutosaveEnable;
+CAscEditorPermissions.prototype['asc_setAutosaveMinInterval'] = CAscEditorPermissions.prototype.asc_setAutosaveMinInterval;
