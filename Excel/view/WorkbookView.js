@@ -473,6 +473,13 @@
 							isHyperlinkClick = true;
 					}
 					if (isHyperlinkClick) {
+						var oRangeHyperlink = ws.model.getCell3(ct.hyperlink.row, ct.hyperlink.col);
+						var hyp = oRangeHyperlink.getHyperlink();
+						if(null != hyp && false == hyp.getVisited())
+						{
+							hyp.setVisited(true);
+							ws.changeWorksheet("updateRange", {range: ct.hyperlink.hyperlinkRange, isLockDraw: false, canChangeColWidth: false});
+						}
 						var t = this;
 						if (c_oAscHyperlinkType.WebLink === ct.hyperlink.asc_getType()) {
 							// Это ссылка на Url. Отправляем не сразу, т.к. хочется dblClick обработать...

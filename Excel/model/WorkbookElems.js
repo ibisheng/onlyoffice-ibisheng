@@ -1889,6 +1889,15 @@ Hyperlink.prototype =
 	{
 		return null != this.Ref && (null != this.Location || null != this.Hyperlink);
 	},
+	setVisited : function(bVisited)
+	{
+		this.bVisited = bVisited;
+		this.Ref.cleanCache();
+	},
+	getVisited : function(bVisited)
+	{
+		return this.bVisited;
+	},
 	getType : function()
 	{
 		return UndoRedoDataTypes.Hyperlink;
@@ -2947,6 +2956,20 @@ CCellValue.prototype =
 			{
 				oNewItem.theme = oNewItem.format.c.theme;
 				oNewItem.tint = oNewItem.format.c.tint;
+				//для посещенных гиперссылок
+				if(g_nColorHyperlink == oNewItem.theme && null == oNewItem.tint)
+				{
+					var aHyperlinks = this.cell.getHyperlinks();
+					if(aHyperlinks.length > 0)
+					{
+						var hyperlink = aHyperlinks[aHyperlinks.length - 1];
+						if(hyperlink.getVisited())
+						{
+							oNewItem.format.c = g_oColorManager.getThemeColor(g_nColorHyperlinkVisited, null);
+							oNewItem.theme = g_nColorHyperlinkVisited;
+						}
+					}
+				}
 			}
 			oNewItem.format.c = oNewItem.format.getRgbOrNull();
 			oNewItem.format.skip = false;
@@ -2971,6 +2994,20 @@ CCellValue.prototype =
 					{
 						oNewItem.theme = oNewItem.format.c.theme;
 						oNewItem.tint = oNewItem.format.c.tint;
+						//для посещенных гиперссылок
+						if(g_nColorHyperlink == oNewItem.theme && null == oNewItem.tint)
+						{
+							var aHyperlinks = this.cell.getHyperlinks();
+							if(aHyperlinks.length > 0)
+							{
+								var hyperlink = aHyperlinks[aHyperlinks.length - 1];
+								if(hyperlink.getVisited())
+								{
+									oNewItem.format.c = g_oColorManager.getThemeColor(g_nColorHyperlinkVisited, null);
+									oNewItem.theme = g_nColorHyperlinkVisited;
+								}
+							}
+						}
 					}
 					oNewItem.format.c = oNewItem.format.getRgbOrNull();
 					aResult.push(oNewItem);

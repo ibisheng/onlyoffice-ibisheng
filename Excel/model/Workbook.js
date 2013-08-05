@@ -7731,6 +7731,11 @@ Range.prototype.intersect=function(range){
 		return this.worksheet.getRange3(r1, c1, r2, c2);
 	return null;
 }
+Range.prototype.cleanCache=function(){
+	this._setPropertyNoEmpty(null,null,function(cell, nRow0, nCol0, nRowStart, nColStart){
+		cell.cleanCache();
+	});
+}
 Range.prototype.cleanFormat=function(){
 	History.Create_NewPoint();
 	var oBBox = this.bbox;
