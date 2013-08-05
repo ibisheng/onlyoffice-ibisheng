@@ -32,7 +32,7 @@ window.addEventListener("message", function(event) {
             {
                 var bIsUseOrigF = false;
                 if (ASC_DOCS_API_USE_FONTS_ORIGINAL_FORMAT && // проставляется в true на этапе сборки
-                    this.CanUseOriginalFormat && // false if load embedded fonts
+                    _files[i].CanUseOriginalFormat && // false if load embedded fonts
                     bIsSupportOriginalFormatFonts) // false if work on ie9
                     bIsUseOrigF = true;
 
