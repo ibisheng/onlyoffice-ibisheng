@@ -30,7 +30,17 @@ window.addEventListener("message", function(event) {
         {
             if (_files[i].Id == _mess)
             {
-                _files[i]._callback_font_load();
+                var bIsUseOrigF = false;
+                if (ASC_DOCS_API_USE_FONTS_ORIGINAL_FORMAT && // проставляется в true на этапе сборки
+                    this.CanUseOriginalFormat && // false if load embedded fonts
+                    bIsSupportOriginalFormatFonts) // false if work on ie9
+                    bIsUseOrigF = true;
+
+                if (!bIsUseOrigF)
+                    _files[i]._callback_font_load();
+                else
+                    _files[i].LoadFontAsync(event.data.src, null);
+
                 break;
             }
 
@@ -128,12 +138,12 @@ function CFontFileLoader(id)
         if (-1 != this.Status)
             return true;
 
-        this.Status = 2;
         if (bIsLocalFontsUse)
         {
             postLoadScript(this.Id);
             return;
         }
+        this.Status = 2;
 
         var xhr = new XMLHttpRequest();
         xhr.open('GET', basePath + "native/" + this.Id, true); // TODO:
