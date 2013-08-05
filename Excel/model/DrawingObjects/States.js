@@ -1293,7 +1293,7 @@ function ChartTextAdd(drawingObjectsController, drawingObjects, chart, textObjec
 
     this.onMouseMove = function(e, x, y)
     {
-        if(e.which > 0)
+        if(e.which > 0 && e.type === "mousemove")
         {
             this.textObject.selectionSetEnd(e, x, y);
             this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
@@ -1353,7 +1353,7 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
 
     this.onMouseMove = function(e, x, y)
     {
-        if(e.which > 0)
+        if(e.which > 0 && e.type === "mousemove")
         {
             this.textObject.selectionSetEnd(e, x, y);
             this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
@@ -2798,6 +2798,45 @@ function GroupState(drawingObjectsController, drawingObjects, group)
 }
 
 
+function TextAddInGroup(drawingObjectsController, drawingObjects, group, textObject)
+{
+    this.id = STATES_ID_TEXT_ADD_IN_GROUP;
+    this.drawingObjectsController = drawingObjectsController;
+    this.drawingObjects = drawingObjects;
+    this.groupState = new GroupState(drawingObjectsController, drawingObjectsController, group);
+    this.textObject = textObject;
+    this.onMouseDown = function(e, x, y)
+    {
+        this.groupState.onMouseDown(e, x, y);
+    };
+
+    this.onMouseMove = function(e, x, y)
+    {
+        if(e.which > 0 && e.type === "mousemove")
+        {
+            this.textObject.selectionSetEnd(e, x, y);
+            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+        }
+    };
+
+    this.onMouseUp = function(e, x, y)
+    {
+        this.textObject.selectionSetEnd(e, x, y);
+        this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+    };
+    this.drawSelection = function(drawingDocument)
+    {
+        drawingDocument.DrawTrack(TYPE_TRACK_GROUP_PASSIVE, this.group.getTransform(), 0, 0, this.group.extX, this.group.extY, false/*, selected_objects[i].canRotate()TODO*/);
+        drawingDocument.DrawTrack(TYPE_TRACK_TEXT, this.textObject.getTransform(), 0, 0, this.textObject.extX, this.textObject.extY, false/*, selected_objects[i].canRotate()TODO*/)
+        this.textObject.drawAdjustments(drawingDocument);
+    };
+
+    this.isPointInDrawingObjects = function(x, y)
+    {
+        return this.groupState.isPointInDrawingObjects(x, y);
+    };
+}
+
 function PreMoveInGroupState(drawingObjectsController, drawingObjects, group, startX, startY, shiftKey, ctrlKey, majorObject,  majorObjectIsSelected)
 {
     this.id = STATES_ID_PRE_MOVE_IN_GROUP;
@@ -4005,7 +4044,7 @@ function AddPolyLine2State3(drawingObjectsController, drawingObjects, polyline)
 
     this.onMouseMove = function(e, x, y)
     {
-        if(e.which === 0)
+        if(e.which > 0 && e.type === "mousemove")
         {
             this.polyline.arrPoint[this.polyline.arrPoint.length - 1] = {x: x, y: y};
         }

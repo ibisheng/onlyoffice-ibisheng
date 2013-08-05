@@ -487,6 +487,7 @@ CTextBody.prototype =
     {
         this.content.Paragraph_Add(paraItem);
         this.content.Recalculate_Page(0, true );
+        this.content.RecalculateCurPos();
         if(this.bodyPr.anchor !== VERTICAL_ANCHOR_TYPE_TOP)
         {
             this.shape.calculateTransformTextMatrix();
