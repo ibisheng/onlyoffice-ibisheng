@@ -1627,17 +1627,37 @@ function RotateState(drawingObjectsController, drawingObjects, majorObject)
         {
             arr_track_objects.push(this.drawingObjectsController.arrTrackObjects[i]);
         }
-        var callback_function = function(bLock)
+
+        var worksheet = this.drawingObjects.getWorksheet();
+        worksheet.collaborativeEditing.onStartCheckLock();
+        var track_objects = this.drawingObjectsController.arrTrackObjects;
+        for(i =0; i < track_objects.length; ++i)
         {
-            if(bLock === true)
+            this.drawingObjects.lockDrawingObject(track_objects[i].originalObject.Get_Id(), true, true)
+        }
+        var track_objects2 = [];
+        for(i = 0; i < track_objects.length; ++i)
+        {
+            track_objects2.push(track_objects[i]);
+        }
+
+        var drawibgObjects = this.drawingObjects;
+        var callback = function(bLock)
+        {
+            if(bLock)
             {
-                for(var i = 0; i < arr_track_objects.length; ++i)
-                    arr_track_objects.trackEnd();
+                History.Create_NewPoint();
+                for(var i = 0; i < track_objects2.length; ++i)
+                    track_objects2[i].trackEnd();
+
+                drawingObjects.showDrawingObjects(true);
+
             }
         };
 
-        History.Create_NewPoint();
-        this.drawingObjectsController.trackEnd();
+        worksheet.collaborativeEditing.onEndCheckLock(callback);
+        //History.Create_NewPoint();
+        //this.drawingObjectsController.trackEnd();
         this.drawingObjectsController.clearTrackObjects();
         this.drawingObjects.OnUpdateOverlay();
 
