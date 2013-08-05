@@ -1495,7 +1495,7 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.font)
             oRes.oldVal = xfs.font;
 		else
-			oRes.oldVal = g_oDefaultFont;
+			oRes.oldVal = null;
         if(null == val)
         {
             if(null != xfs)
@@ -3089,6 +3089,16 @@ CCellValue.prototype =
 				}
 			}
 		}
+		if(0 == val.indexOf("http://") || 0 == val.indexOf("https://") || (0 == val.indexOf("www.") && val.length > 4))
+		{
+			var sRealUrl = val;
+			if(0 != val.indexOf("http://") && 0 != val.indexOf("https://"))
+				sRealUrl = "http://" + sRealUrl;
+			var oNewHyperlink = new Hyperlink();
+			oNewHyperlink.Ref = this.cell.ws.getCell3(this.cell.oId.getRow0(), this.cell.oId.getCol0());
+			oNewHyperlink.Hyperlink = sRealUrl;
+			oNewHyperlink.Ref.setHyperlink(oNewHyperlink);
+		}
 	},
 	setValue2 : function(aVal)
 	{
@@ -3096,7 +3106,7 @@ CCellValue.prototype =
 		for(var i = 0, length = aVal.length; i < length; ++i)
 			sSimpleText += aVal[i].text;
 		this.setValue(sSimpleText);
-		if(CellValueType.String == this.type)
+		if(CellValueType.String == this.type && 0 == this.cell.getHyperlinks().length)
 		{
 			this.clean();
 			this.type = CellValueType.String;

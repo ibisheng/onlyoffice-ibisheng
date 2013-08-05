@@ -7171,6 +7171,20 @@ Range.prototype.getHyperlinks=function(){
 Range.prototype.setHyperlink=function(val, bWithoutStyle){
 	if(null != val && false == val.isValid())
 		return;
+	//проверяем, может эта ссылка уже существует
+	var aHyperlinks = this.getHyperlinks();
+	var bExist = false;
+	for(var i = 0, length = aHyperlinks.length; i < length; ++i)
+	{
+		var elem = aHyperlinks[i];
+		if(elem.hyperlink.isEqual(val))
+		{
+			bExist = true;
+			break;
+		}
+	}
+	if(bExist)
+		return;
 	History.Create_NewPoint();
 	var oBBox = this.bbox;
 	History.SetSelection(new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2));
