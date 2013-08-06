@@ -1698,14 +1698,18 @@ function Editor_Paste_Button(api)
         document.body.style["user-select"] = "none";
         document.body.style["-webkit-user-select"] = "none";
 
+		History.Create_NewPoint();
         Editor_Paste(api, false);
         return true;
     }
 	else
 	{
-		 var ElemToSelect = document.getElementById( COPY_ELEMENT_ID );
-		 if(ElemToSelect)
-            Editor_Paste_Exec(api, ElemToSelect);
+		var ElemToSelect = document.getElementById( COPY_ELEMENT_ID );
+		if(ElemToSelect)
+		{
+			History.Create_NewPoint();
+			Editor_Paste_Exec(api, ElemToSelect);
+		}
 		return true;
 	}
     return false;
@@ -2204,7 +2208,8 @@ PasteProcessor.prototype =
                 //����� ��������� ��������
                 var oSourceFirstPar = Item;
                 var oSourceLastPar = new Paragraph(oDoc.DrawingDocument, oDoc, 0, 50, 50, X_Right_Field, Y_Bottom_Field );
-                oSourceFirstPar.Split(oSourceLastPar);
+				if(true !== oSourceFirstPar.Cursor_IsEnd())
+					oSourceFirstPar.Split(oSourceLastPar);
                 var oInsFirstPar = aNewContent[0];
                 var oInsLastPar = null;
                 if(nNewContentLength > 1)
