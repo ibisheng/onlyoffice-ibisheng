@@ -1070,7 +1070,7 @@
 						t.handlers.trigger("changeSelection", /*isStartPoint*/true, coord.x, coord.y, /*isCoord*/true, /*isSelectMode*/true);
 					return;
 				}
-				else if ( t.targetInfo.target != "moveResizeRange" )
+				else if ( t.targetInfo && t.targetInfo.target != "moveResizeRange" )
 					t.handlers.trigger("resetSelectedGraphicObjects");
 
 				if (event.originalEvent && 2 === event.originalEvent.detail) {

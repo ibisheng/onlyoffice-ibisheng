@@ -865,8 +865,6 @@ DrawingObjectsController.prototype =
                 }
 				shape_props.ShapeProperties.fill = CreateAscFillEx(c_obj.getFill());
 				shape_props.ShapeProperties.stroke = CreateAscStrokeEx(c_obj.getStroke());
-
-                //shape_props.ShapeProperties = CreateAscShapePropFromProp(shape_props.ShapeProperties);		// уже не надо, т.к. это asc_класс
             }
             
             ret.push(shape_props);
@@ -874,9 +872,6 @@ DrawingObjectsController.prototype =
 
         if (isRealObject(image_props))
         {
-            //if (image_props.ShapeProperties)
-            //    image_props.ShapeProperties = CreateAscShapePropFromProp(image_props.ShapeProperties);		// уже не надо, т.к. это asc_класс
-            
             ret.push(image_props);
         }
 			
