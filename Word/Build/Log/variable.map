@@ -369,7 +369,7 @@ JSCompiler_StaticMethods_getexploded:Jm
 PreChangeAdjInGroup:jG
 check_MouseMoveEvent:k2
 c_oSerProp_pPrType$Spacing:mW
-CFF_SizeRec:nz
+CFF_SizeRec:mz
 TT_Set_CodeRange:ew
 cff_size_select:rz
 FT_GlyphSlot:kq
@@ -1064,7 +1064,7 @@ ft_outline_glyph_copy:Lo
 c_oAscChartSubType$stacked:df
 c_oSerPosHV$RelativeFrom:EY
 JSCompiler_StaticMethods_Get_Pr:ZN
-cff_size_get_globals_funcs:oz
+cff_size_get_globals_funcs:nz
 isOnlyLocalBufferSafariWord:la
 CParagraphInd:B4
 JSCompiler_StaticMethods_DrawRscatter:Km
