@@ -647,7 +647,7 @@ DrawingObjectsController.prototype =
 	
 	getGraphicObjectProps: function()
 	{
-		var shape_props, image_props;
+		var shape_props, image_props, chart_props;
         
         switch (this.curState.id)
         {
@@ -780,6 +780,17 @@ DrawingObjectsController.prototype =
 								*/
                             }
                         }
+						
+						if (c_obj.isChart())
+                        {
+                            if (!isRealObject(chart_props))
+                            {
+								chart_props = new asc_CImgProperty;
+								chart_props.Width = c_obj.extX;
+								chart_props.Height = c_obj.extY;
+                                chart_props.ChartProperties = c_obj.chart;
+							}
+						}
                         
                         /*if (c_obj.isGroup())
                         {
@@ -873,6 +884,11 @@ DrawingObjectsController.prototype =
         if (isRealObject(image_props))
         {
             ret.push(image_props);
+        }
+		
+		if (isRealObject(chart_props))
+        {
+            ret.push(chart_props);
         }
 			
 		var ascSelectedObjects = [];

@@ -2651,19 +2651,20 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, oDrawings, aDxf
             this.bs.WriteItem(c_oSer_DrawingType.To, function(){oThis.WriteFromTo(oDrawing.to);});
         // if(null != oDrawing.Pos)
             // this.bs.WriteItem(c_oSer_DrawingType.Pos, function(){oThis.WritePos(oDrawing.Pos);});
-		if(oDrawing.isChart())
+		if (oDrawing.isChart())
 		{
 			var oBinaryChartWriter = new BinaryChartWriter(this.memory);
-			this.bs.WriteItem(c_oSer_DrawingType.GraphicFrame, function(){oBinaryChartWriter.Write(oDrawing.chart);});
+			this.bs.WriteItem(c_oSer_DrawingType.GraphicFrame, function(){oBinaryChartWriter.Write(oDrawing.graphicObject.chart);});
 		}
-		else
+		else if (oDrawing.isImage())
 		{
-            if ( (null != oDrawing.imageUrl) && ("" != oDrawing.imageUrl)) {
+			var imageUrl = oDrawing.graphicObject.getImageUrl();
+            if ( (null != imageUrl) && ("" != imageUrl)) {
 
                 if (window['scriptBridge']) {
-                    this.bs.WriteItem(c_oSer_DrawingType.Pic, function(){oThis.WritePic(oDrawing.imageUrl.replace(/^.*(\\|\/|\:)/, ''));});
+                    this.bs.WriteItem(c_oSer_DrawingType.Pic, function(){oThis.WritePic(imageUrl.replace(/^.*(\\|\/|\:)/, ''));});
                 } else {
-                    this.bs.WriteItem(c_oSer_DrawingType.Pic, function(){oThis.WritePic(oDrawing.imageUrl);});
+                    this.bs.WriteItem(c_oSer_DrawingType.Pic, function(){oThis.WritePic(imageUrl);});
                 }
             }
 		}
