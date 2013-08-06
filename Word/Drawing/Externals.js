@@ -15,7 +15,7 @@ function postLoadScript(scriptName)
     window.postMessage({type: "FROM_PAGE_LOAD_SCRIPT", text: scriptName}, "*");
 }
 
-window.addEventListener("message", function(event) {
+/*window.addEventListener("message", function(event) {
     // We only accept messages from ourselves
     if (event.source != window)
         return;
@@ -56,7 +56,7 @@ window.addEventListener("message", function(event) {
     {
         bIsLocalFontsUse = true;
     }
-}, false);
+}, false);*/
 
 function CFontFileLoader(id)
 {

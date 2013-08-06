@@ -1321,6 +1321,19 @@
                 editor.Init();
                 //editor.LoadDocument();
 
+				window.addEventListener("message", function(event) {
+					// We only accept messages from ourselves
+					if (null == event || null == event.data || event.source !== window)
+						return;
+
+					var data = JSON.parse(event.data);
+					if (null != data && null != data["type"]) {
+						if (PostMessageType.ExtensionExist == data["type"]) {
+							editor.SetFontsPath(data["url"]);
+						}
+					}
+				}, false);
+				
                 window.onresize = function()
                 {
                     if (false === editor.bInit_word_control)
