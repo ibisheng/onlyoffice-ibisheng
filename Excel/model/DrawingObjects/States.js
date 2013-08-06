@@ -2866,7 +2866,7 @@ function TextAddInGroup(drawingObjectsController, drawingObjects, group, textObj
         this.groupState.onMouseDown(e, x, y);
         if(this.drawingObjectsController.curState.id !== STATES_ID_TEXT_ADD || this.drawingObjectsController.curState.id !== STATES_ID_TEXT_ADD_IN_GROUP)
         {
-            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+            this.drawingObjectsController.updateSelectionState(this.drawingObjects.drawingDocument);
 
         }
     };
