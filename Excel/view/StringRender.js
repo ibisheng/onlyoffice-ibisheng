@@ -309,6 +309,13 @@
                 this.xtrange.sx = sx;
                 this.xtrange.sw = sw;
 
+
+                if (angle === 90 || angle === -90) {
+                    this.bound.height = textW;
+                } else {
+                    this.bound.height = Math.abs(Math.sin(angle / 180.0 * Math.PI) * textW) + (mul) * tm.height;
+                }
+
                 return this.bound;
             },
 

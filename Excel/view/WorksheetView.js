@@ -3813,14 +3813,12 @@
 
                     var rotateTextBound = this.stringRender.getTransformBound(c.getAngle(), 0, 0, this.cols[col].width, this.rows[row].height, tm.width, ha, va);
                     if (rotateTextBound) {
-
-                        if (this.rows[row].height < rotateTextBound.sw) {
-                            this.rows[row].height = Math.max(this.rows[row].height, rotateTextBound.sw);
+                        if (this.rows[row].height < rotateTextBound.height) {
+                            this.rows[row].height = Math.max(this.rows[row].height, rotateTextBound.height);
                             if (!this.rows[row].isDefaultHeight) {
                                 this.model.setRowHeight(this.rows[row].height + this.height_1px, row, row);
                             }
                         }
-
                         this.isChanged = true;
                     }
                 }
