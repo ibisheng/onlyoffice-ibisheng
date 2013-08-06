@@ -186,14 +186,19 @@ DrawingObjectsController.prototype =
     {
         if (this.selectedObjects.length === 1)
         {
-            if(this.selectedObjects[0].isChart())
+            if ( this.selectedObjects[0].isChart() ) {
+				this.selectedObjects[0].syncAscChart();
                 return this.selectedObjects[0].chart;
-            if(isRealObject(this.curState.group))
+			}
+			
+            if ( isRealObject(this.curState.group) )
             {
                 if(this.curState.group.selectedObjects.length === 1)
                 {
-                    if(this.curState.group.selectedObjects[0].isChart())
+                    if ( this.curState.group.selectedObjects[0].isChart() ) {
+						this.curState.group.selectedObjects[0].syncAscChart();
                         return this.curState.group.selectedObjects[0].chart;
+					}
                 }
             }
         }

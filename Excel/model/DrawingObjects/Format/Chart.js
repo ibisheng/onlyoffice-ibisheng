@@ -85,6 +85,18 @@ CChartAsGroup.prototype =
         return false;
     },
 
+	syncAscChart: function() {
+		
+		if ( this.chartTitle && this.chartTitle.txBody && this.chartTitle.txBody.content ) {
+			this.chart.asc_getHeader().asc_setTitle(this.chartTitle.txBody.content.getTextString());
+		}
+		if ( this.vAxisTitle && this.vAxisTitle.txBody && this.vAxisTitle.txBody.content ) {
+			this.chart.asc_getYAxis().asc_setTitle(this.vAxisTitle.txBody.content.getTextString());
+		}
+		if ( this.hAxisTitle && this.hAxisTitle.txBody && this.hAxisTitle.txBody.content ) {
+			this.chart.asc_getXAxis().asc_setTitle(this.hAxisTitle.txBody.content.getTextString());
+		}
+	},
 
     setDrawingObjects: function(drawingObjects)
     {

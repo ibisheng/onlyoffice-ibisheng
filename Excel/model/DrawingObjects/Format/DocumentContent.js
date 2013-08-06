@@ -6760,6 +6760,7 @@ CDocumentContent.prototype =
                     ret += " ";
             }
         }
+		return ret;
     },
 
     Clear_ContentChanges : function()

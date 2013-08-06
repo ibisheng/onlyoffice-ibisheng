@@ -3893,7 +3893,7 @@ function ObjectLocker(ws) {
 	
 	_t.checkObjects = function(callback) {
 		
-		if (false === worksheet.collaborativeEditing.isCoAuthoringExcellEnable()) {
+		if ( !aObjectId.length || (false === worksheet.collaborativeEditing.isCoAuthoringExcellEnable()) ) {
 			// Запрещено совместное редактирование
 			if ($.isFunction(callback)) {callback(true);}
 			return;
