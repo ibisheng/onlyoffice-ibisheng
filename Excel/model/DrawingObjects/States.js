@@ -2767,13 +2767,7 @@ function GroupState(drawingObjectsController, drawingObjects, group)
         {
             if(group_selected_objects[i].hitInBoundingRect(x, y))
             {
-                this.drawingObjectsController.clearPreTrackObjects();
-                for(var j = 0; j < group_selected_objects.length; ++j)
-                {
-                    this.drawingObjectsController.addPreTrackObject(group_selected_objects[j].createMoveInGroupTrack());
-                }
-                this.drawingObjectsController.changeCurrentState(new PreMoveInGroupState(this.drawingObjectsController, this.drawingObjects, this.group,
-                    x, y, e.shiftKey, e.ctrlKey, group_selected_objects[i], true));
+                return {objectId: this.group.Id, cursorType:"move"};
             }
         }
 
