@@ -2360,9 +2360,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
                     ws.objectRender.controller.setCellBackgroundColor(color);
                 else
                 {
-                    if(color instanceof CAscColor)
+                    if(color instanceof CAscColor || null == color)
                     {
-                        color = CorrectAscColor(color);
+						if(null != color)
+							color = CorrectAscColor(color);
                         this.wb.getWorksheet().setSelectionInfo("bc", color);
                         this.wb.restoreFocus();
                     }
