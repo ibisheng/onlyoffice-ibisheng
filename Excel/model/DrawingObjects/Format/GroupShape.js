@@ -451,6 +451,10 @@ CGroupShape.prototype =
         for(var i = 0; i < this.spTree.length; ++i)
         {
             this.spTree[i].recalculateTransform();
+            if(typeof this.spTree[i].calculateContent === "function")
+                this.spTree[i].calculateContent();
+            if(typeof this.spTree[i].calculateTransformTextMatrix === "function")
+                this.spTree[i].calculateTransformTextMatrix();
         }
     },
 

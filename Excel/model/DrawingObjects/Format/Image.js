@@ -101,6 +101,8 @@ CImage.prototype =
         return true;//TODO
     },
 
+
+
     isChart: function()
     {
         return false;/*TODO*/
@@ -109,6 +111,21 @@ CImage.prototype =
     isSimpleObject: function()
     {
         return true;
+    },
+
+    deleteDrawingBase: function()
+    {
+        var position = this.drawingObjects.deleteDrawingBase(this.Get_Id());
+        if(isRealNumber(position))
+        {
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_DeleteDrawingBase, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(position, null)), null);
+        }
+    },
+
+    addToDrawingObjects: function(pos)
+    {
+        var position = this.drawingObjects.addGraphicObject(this, pos);
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Add_To_Drawing_Objects, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(position, null)), null);
     },
 
     initDefault: function(x, y, extX, extY, imageId)
@@ -975,11 +992,7 @@ CImage.prototype =
 		return Props;
 	},
 
-    addToDrawingObjects: function()
-    {
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Add_To_Drawing_Objects, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataClosePath()), null);
-        this.drawingObjects.addGraphicObject(this);
-    },
+
 
 
     Undo: function(type, data)

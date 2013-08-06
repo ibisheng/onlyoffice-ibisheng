@@ -266,6 +266,14 @@ DrawingObjectsController.prototype =
         {
             this.curState.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
         }
+        else
+        {
+            this.drawingObjects.drawingDocument.UpdateTargetTransform(null);
+            this.drawingObjects.drawingDocument.TargetEnd();
+            this.drawingObjects.drawingDocument.SelectEnabled(false);
+            this.drawingObjects.drawingDocument.SelectClear();
+            this.drawingObjects.drawingDocument.SelectShow();
+        }
     },
 
     onMouseDown: function(e, x, y)
@@ -304,12 +312,15 @@ DrawingObjectsController.prototype =
         while(this.selectedObjects.length > 0)
             this.selectedObjects[0].deselect(this);
         this.changeCurrentState(new NullState(this, this.drawingObjects));
+        this.updateSelectionState();
     },
 
     resetSelection: function()
     {
         while(this.selectedObjects.length > 0)
             this.selectedObjects[0].deselect(this);
+        this.drawingObjects.drawingDocument.UpdateTargetTransform(null);
+        this.drawingObjects.drawingDocument.TargetEnd();
     },
 
     clearPreTrackObjects: function()

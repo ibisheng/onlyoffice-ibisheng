@@ -270,7 +270,11 @@ function RotateTrackGroup(originalObject)
 
     this.trackEnd = function()
     {
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateUndo, null, null,
+            new UndoRedoDataGraphicObjects(this.originalObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
         this.originalObject.setRotate(this.angle);
-        this.originalObject.recalculateTransform();
+        this.originalObject.recalculate();
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateRedo, null, null,
+            new UndoRedoDataGraphicObjects(this.originalObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
     }
 }

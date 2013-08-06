@@ -189,7 +189,14 @@ function NullState(drawingObjectsController, drawingObjects)
                         }
                         else if(hit_in_text_rect)
                         {
-                            //TODO
+                            this.drawingObjectsController.resetSelection();
+                            cur_grouped_object.select(this.drawingObjectsController);
+                            grouped_objects[i].select(cur_grouped_object);
+                            grouped_objects[i].selectionSetStart(e, x, y);
+                            this.drawingObjectsController.changeCurrentState(new TextAddInGroup(this.drawingObjectsController, this.drawingObjects, cur_drawing, grouped_objects[i]));
+                            if(e.ClickCount < 2)
+                                grouped_objects[i].updateSelectionState(this.drawingObjects.drawingDocument);
+                            return;
                         }
                     }
                 }
@@ -2417,7 +2424,6 @@ function ChangeAdjState(drawingObjectsController, drawingObjects)
                 for(var i = 0; i < track_objects2.length; ++i)
                     track_objects2[i].trackEnd();
                 drawingObjects.showDrawingObjects(true);
-
             }
         };
 
@@ -2430,7 +2436,6 @@ function ChangeAdjState(drawingObjectsController, drawingObjects)
         this.drawingObjects.OnUpdateOverlay();
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
         asc["editor"].asc_endAddShape();
-
     };
 
     this.onKeyDown = function(e)
@@ -2617,7 +2622,13 @@ function GroupState(drawingObjectsController, drawingObjects, group)
                             }
                             else if(hit_in_text_rect)
                             {
-                                //TODO
+                                this.drawingObjectsController.resetSelection();
+                                this.group.select(this.drawingObjectsController);
+                                cur_drawing.select(this.group);
+                                cur_drawing.selectionSetStart(e, x, y);
+                                this.drawingObjectsController.changeCurrentState(new TextAddInGroup(this.drawingObjectsController, this.drawingObjects, this.group, cur_drawing));
+                                if(e.ClickCount < 2)
+                                    cur_drawing.updateSelectionState(this.drawingObjects.drawingDocument);
                             }
                         }
                     }
@@ -2647,7 +2658,13 @@ function GroupState(drawingObjectsController, drawingObjects, group)
                             }
                             else if(hit_in_text_rect)
                             {
-                                //TODO
+                                this.drawingObjectsController.resetSelection();
+                                cur_drawing.select(this.drawingObjectsController);
+                                cur_grouped_object.select(this.group);
+                                cur_grouped_object.selectionSetStart(e, x, y);
+                                this.drawingObjectsController.changeCurrentState(new TextAddInGroup(this.drawingObjectsController, this.drawingObjects, this.group, cur_drawing));
+                                if(e.ClickCount < 2)
+                                    cur_drawing.updateSelectionState(this.drawingObjects.drawingDocument);
                             }
                         }
                     }

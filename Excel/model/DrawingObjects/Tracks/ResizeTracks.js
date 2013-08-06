@@ -1149,6 +1149,8 @@ function ResizeTrackShapeImageInGroup(originalObject, cardDirection)
 function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
 {
     this.original = originalObject;
+
+    this.originalObject = originalObject;
     this.parentTrack = parentTrack;
     var numberHandle;
     if(isRealNumber(cardDirection))
@@ -1760,6 +1762,9 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
 
     this.trackEnd = function()
     {
+
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateUndo, null, null,
+            new UndoRedoDataGraphicObjects(this.originalObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
         this.original.setPosition(this.x, this.y);
         this.original.setExtents(this.extX, this.extY);
         this.original.setChildExtents(this.extX, this.extY);
@@ -1769,7 +1774,10 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
             this.childs[i].trackEnd();
         }
         if(this.parentTrack == null)
-            this.original.recalculateTransform();
+            this.original.recalculate();
+
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateRedo, null, null,
+            new UndoRedoDataGraphicObjects(this.originalObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
     };
 
 

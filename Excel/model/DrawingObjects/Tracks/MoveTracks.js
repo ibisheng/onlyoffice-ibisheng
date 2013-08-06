@@ -174,9 +174,13 @@ function MoveGroupTrack(originalObject)
 
     this.trackEnd = function()
     {
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateUndo, null, null,
+            new UndoRedoDataGraphicObjects(this.originalObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
         this.originalObject.setPosition(this.x, this.y);
-        this.originalObject.recalculateTransform();
+        this.originalObject.recalculate();
         this.originalObject.updateDrawingBaseCoordinates();
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateRedo, null, null,
+            new UndoRedoDataGraphicObjects(this.originalObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
     };
 }
 
