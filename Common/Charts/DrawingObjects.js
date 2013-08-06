@@ -3906,12 +3906,11 @@ function ObjectLocker(ws) {
 
 			if ( false === worksheet.collaborativeEditing.getCollaborativeEditing() ) {
 				// Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
-				if ($.isFunction(callback)) {callback(true);}
+				if ($.isFunction(callback)) { callback(true); }
 			}
 			else if ( false !== worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine) ) {
-				// Редактируем сами
-				if ($.isFunction(callback)) {callback(true);}
-				return;
+				// Редактируем сами, проверяем дальше				
+				continue;
 			}
 			else if ( false !== worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther) ) {
 				// Уже ячейку кто-то редактирует
