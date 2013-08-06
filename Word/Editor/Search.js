@@ -137,7 +137,7 @@ CDocument.prototype.Search = function(Str, Props)
     this.DrawingDocument.ClearCachePages();
     this.DrawingDocument.FirePaint();
 
-    console.log( "Search logic: " + ((new Date().getTime() - StartTime) / 1000) + " s"  );
+    //console.log( "Search logic: " + ((new Date().getTime() - StartTime) / 1000) + " s"  );
 
     return this.SearchEngine;
 };
