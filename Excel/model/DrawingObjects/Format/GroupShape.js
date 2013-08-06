@@ -405,6 +405,8 @@ CGroupShape.prototype =
         }
     },
 
+
+
     recalculateTransform: function()
     {
         var xfrm = this.spPr.xfrm;
@@ -705,6 +707,139 @@ CGroupShape.prototype =
 
     },
 
+    setCellBackgroundColor: function(color)
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(typeof this.spTree[i].setCellBackgroundColor === "function")
+                this.spTree[i].setCellBackgroundColor(color);
+        }
+    },
+
+    setCellAllFontName: function(fontName)
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(typeof this.spTree[i].setCellAllFontName === "function")
+                this.spTree[i].setCellAllFontName(fontName);
+        }
+    },
+
+    setCellAllFontSize: function(val)
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(typeof this.spTree[i].setCellAllFontSize === "function")
+                this.spTree[i].setCellAllFontSize(val);
+        }
+    },
+
+    setCellAllBold: function(val)
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(typeof this.spTree[i].setCellAllBold === "function")
+                this.spTree[i].setCellAllBold(val);
+        }
+    },
+
+    setCellAllItalic: function(val)
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(typeof this.spTree[i].setCellAllItalic === "function")
+                this.spTree[i].setCellAllItalic(val);
+        }
+    },
+
+    setCellAllUnderline: function(val)
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(typeof this.spTree[i].setCellAllUnderline === "function")
+                this.spTree[i].setCellAllUnderline(val);
+        }
+    },
+
+    setCellAllStrikeout: function(val)
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(typeof this.spTree[i].setCellAllStrikeout === "function")
+                this.spTree[i].setCellAllStrikeout(val);
+        }
+    },
+
+    setCellAllSubscript: function(val)
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(typeof this.spTree[i].setCellAllSubscript === "function")
+                this.spTree[i].setCellAllSubscript(val);
+        }
+    },
+
+    setCellAllSuperscript: function(val)
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(typeof this.spTree[i].setCellAllSuperscript === "function")
+                this.spTree[i].setCellAllSuperscript(val);
+        }
+    },
+
+    setCellAllAlign: function(val)
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(typeof this.spTree[i].setCellAllAlign === "function")
+                this.spTree[i].setCellAllAlign(val);
+        }
+    },
+
+    setCellAllVertAlign: function(val)
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(typeof this.spTree[i].setCellAllVertAlign === "function")
+                this.spTree[i].setCellAllVertAlign(val);
+        }
+    },
+
+    setCellAllTextColor:  function(val)
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(typeof this.spTree[i].setCellAllTextColor === "function")
+                this.spTree[i].setCellAllTextColor(val);
+        }
+    },
+    setCellAllAngle: function(val)
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(typeof this.spTree[i].setCellAllAngle === "function")
+                this.spTree[i].setCellAllAngle(val);
+        }
+    },
+
+    increaseAllFontSize: function()
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(typeof this.spTree[i].increaseAllFontSize === "function")
+                this.spTree[i].increaseAllFontSize();
+        }
+    },
+
+    decreaseAllFontSize: function()
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(typeof this.spTree[i].decreaseAllFontSize === "function")
+                this.spTree[i].decreaseAllFontSize();
+        }
+    },
 
     drawAdjustments: function(drawingDocument)
     {
@@ -829,6 +964,16 @@ CGroupShape.prototype =
         return num === 0 || num === 4 ? _tmp_x/_tmp_y : _tmp_y/_tmp_x;
     },
 
+
+
+    recalculateColors: function()
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(typeof this.spTree[i].recalculateColors==="function")
+                this.spTree[i].recalculateColors();
+        }
+    },
 
     deselect: function(drawingObjectsController)
     {

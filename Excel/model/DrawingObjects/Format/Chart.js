@@ -65,6 +65,12 @@ CChartAsGroup.prototype =
 
     },
 
+
+    recalculateColors: function()
+    {
+        this.recalculate();
+    },
+
     isChart: function()
     {
         return true;

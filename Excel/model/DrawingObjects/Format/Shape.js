@@ -442,7 +442,6 @@ CShape.prototype =
             this.txBody.paragraphAdd(text_pr);
             this.txBody.content.Set_ApplyToAll(false);
             this.calculateTransformTextMatrix();
-
         }
     },
 
@@ -570,7 +569,8 @@ CShape.prototype =
                 this.txBody.content.Set_ApplyToAll(true);
                 this.txBody.content.Set_ParagraphAlign(align_num);
                 this.txBody.content.Set_ApplyToAll(false);
-                //this.calculateTransformTextMatrix();
+                this.calculateContent();
+                this.calculateTransformTextMatrix();
             }
         }
     },
@@ -676,6 +676,29 @@ CShape.prototype =
     },
 
 
+    increaseAllFontSize: function () {
+        if(isRealObject(this.txBody))
+        {
+            this.txBody.content.Set_ApplyToAll(true);
+            this.txBody.content.Paragraph_IncDecFontSize(true);
+            this.txBody.content.Set_ApplyToAll(false);
+            this.txBody.calculateContent();
+            this.calculateTransformTextMatrix();
+        }
+    },
+
+    // Уменьшение размера шрифта
+    decreaseAllFontSize: function () {
+        if(isRealObject(this.txBody))
+        {
+            this.txBody.content.Set_ApplyToAll(true);
+            this.txBody.content.Paragraph_IncDecFontSize(false);
+            this.txBody.content.Set_ApplyToAll(false);
+            this.txBody.calculateContent();
+            this.calculateTransformTextMatrix();
+        }
+    },
+
     insertHyperlink: function (options) {
         if(typeof this.curState.insertHyperlink === "function")
         {
@@ -709,6 +732,12 @@ CShape.prototype =
         this.spPr.xfrm = xfrm;
     },
 
+
+    recalculateColors: function()
+    {
+        this.recalculatePen();
+        this.recalculateBrush();
+    },
     initDefaultTextRect: function(x, y, extX, extY, flipH, flipV)
     {
         this.setXfrmObject(new CXfrm());
@@ -1058,7 +1087,6 @@ CShape.prototype =
 
     paragraphAdd: function(paraItem, bRecalculate)
     {
-        History.Create_NewPoint();
 
         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddUndo, null, null,
             new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
