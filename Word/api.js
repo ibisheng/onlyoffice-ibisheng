@@ -6226,18 +6226,24 @@ asc_docs_api.prototype.OnHandleMessage = function(event)
 {
 	if (null != event && null != event.data)
     {
-		var data = JSON.parse(event.data);
-		if(null != data && null != data.type)
-		{
-			if(PostMessageType.UploadImage == data.type)
-			{
-				editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-				if(c_oAscServerError.NoError == data.error)
-					this.AddImageUrl(data.url);
-				else
-					this.sync_ErrorCallback(_mapAscServerErrorToAscError(data.error), c_oAscError.Level.NoCritical);
-			}
-		}
+        try
+        {
+            var data = JSON.parse(event.data);
+            if(null != data && null != data.type)
+            {
+                if(PostMessageType.UploadImage == data.type)
+                {
+                    editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+                    if(c_oAscServerError.NoError == data.error)
+                        this.AddImageUrl(data.url);
+                    else
+                        this.sync_ErrorCallback(_mapAscServerErrorToAscError(data.error), c_oAscError.Level.NoCritical);
+                }
+            }
+        }
+        catch (err)
+        {
+        }
 	}
 }
 asc_docs_api.prototype.asyncImageEndLoaded2 = null;

@@ -1152,6 +1152,12 @@ CAutoshapeTrack.prototype =
 
                 break;
             }
+            case TYPE_TRACK_LOCK_SHAPE:
+            {
+                var _offset_eps = 5;
+				// TODO:
+                break;
+            }
 
             default:
                 break;

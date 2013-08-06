@@ -567,10 +567,23 @@ function CEditorPage(api)
 
             if (bIsAndroid)
             {
+                window.IS_USE_INPUT = true;
                 this.TextBoxBackground.HtmlElement["oninput"] = function(e)
                 {
                     var val = oThis.TextBoxBackground.HtmlElement.value;
                     oThis.TextBoxBackground.HtmlElement.value = "a";
+
+                    if (!window.IS_USE_INPUT && val == "aa")
+                    {
+                        if (e.preventDefault)
+                            e.preventDefault();
+
+                        e.returnValue = false;
+
+                        window.IS_USE_INPUT = true;
+                        return;
+                    }
+
                     if (val.length == 2)
                     {
                         var _e = {
@@ -585,9 +598,13 @@ function CEditorPage(api)
                             which : val.charCodeAt(1)
                         };
 
+                        _e.preventDefault = function()
+                        {
+                        };
+
                         if (_e.which == 32)
                         {
-                            _e.KeyCode = 32;
+                            _e.keyCode = 32;
                             oThis.onKeyDown(_e);
                         }
                         else
@@ -595,6 +612,16 @@ function CEditorPage(api)
                             oThis.onKeyPress(_e);
                         }
                     }
+                    else if (0 == val.length)
+                    {
+                        // пришла пустая. следом ждем "aa"
+                        window.IS_USE_INPUT = false;
+                    }
+
+                    if (e.preventDefault)
+                        e.preventDefault();
+
+                    e.returnValue = false;
                 }
             }
 
@@ -2093,7 +2120,7 @@ function CEditorPage(api)
 
     this.onKeyUp = function(e)
     {
-        global_keyboardEvent.AtlKey     = false;
+        global_keyboardEvent.AltKey     = false;
         global_keyboardEvent.CtrlKey    = false;
         global_keyboardEvent.ShiftKey   = false;
     }
@@ -2612,7 +2639,11 @@ function CEditorPage(api)
                 }
                 else
                 {
-                    this.m_oLogicDocument.Selection_Draw_Pages(0, drDoc.m_lPagesCount - 1);
+                    for (var i = 0; i <= drDoc.m_lPagesCount; i++)
+                    {
+                        if (!drDoc.IsFreezePage(i))
+                            this.m_oLogicDocument.Selection_Draw_Page(i);
+                    }
                 }
 
                 drDoc.private_EndDrawSelection();

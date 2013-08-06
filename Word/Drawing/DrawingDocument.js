@@ -3668,6 +3668,12 @@ function CDrawingDocument()
 
         if (this.IsTextMatrixUse)
             this.Overlay.m_oContext.strokeStyle = "#9ADBFE";
+
+        if (this.m_oWordControl.MobileTouchManager)
+        {
+            this.m_oWordControl.MobileTouchManager.RectSelect1 = null;
+            this.m_oWordControl.MobileTouchManager.RectSelect2 = null;
+        }
     }
     this.private_EndDrawSelection = function()
     {

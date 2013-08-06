@@ -106,7 +106,7 @@ function CMouseEventHandler()
 
 function CKeyboardEvent()
 {
-    this.AtlKey     = false;                        // ������ �� ������ alt
+    this.AltKey     = false;                        // ������ �� ������ alt
     this.CtrlKey    = false;                        // ������ �� ������ ctrl
     this.ShiftKey   = false;                        // ������ �� ������ shift
 
@@ -122,7 +122,12 @@ var global_keyboardEvent = new CKeyboardEvent();
 function check_KeyboardEvent(e)
 {
     global_keyboardEvent.AltKey = e.altKey;
-    global_keyboardEvent.CtrlKey = e.ctrlKey || e.metaKey;
+
+    if (e.metaKey !== undefined)
+        global_keyboardEvent.CtrlKey = e.ctrlKey || e.metaKey;
+    else
+        global_keyboardEvent.CtrlKey = e.ctrlKey;
+
     global_keyboardEvent.ShiftKey = e.shiftKey;
 
     global_keyboardEvent.Sender = (e.srcElement) ? e.srcElement : e.target;
