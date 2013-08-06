@@ -9,7 +9,7 @@
 	<script type="text/javascript" src="../downloaderfiles.js"></script>
 	<script type="text/javascript">
 		function load(){
-			getFile(decodeURI(location.search.substring(1).split("file=")[1]));
+			getFile(decodeURIComponent(location.search.substring(1).split("file=")[1]));
 		}
 	</script>
 </head>

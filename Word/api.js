@@ -6,6 +6,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 var documentId = undefined;
 var documentUrl = 'null';
 var documentTitle = 'null';
+var documentTitleWithoutExtention = 'null';
 var documentFormat = 'null';
 var documentVKey = null;
 var documentOrigin = "";
@@ -771,6 +772,12 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 		documentUrl = this.DocInfo.get_Url();
 		documentTitle = this.DocInfo.get_Title();
 		documentFormat = this.DocInfo.get_Format();
+		
+		var nIndex = documentTitle.lastIndexOf(".");
+		if(-1 != nIndex)
+			documentTitleWithoutExtention = documentTitle.substring(0, nIndex);
+		else
+			documentTitleWithoutExtention = documentTitle;
 		
 		documentVKey = this.DocInfo.get_VKey();
 		// documentOrigin  = this.DocInfo.get_Origin();
@@ -2173,10 +2180,7 @@ asc_docs_api.prototype.asc_Print = function()
 		else
 			_downloadAs(this, c_oAscFileType.PDF, function(incomeObject){
 				if(null != incomeObject && "save" == incomeObject.type)
-				{
-					var outputData = JSON.parse(incomeObject.data);
-					editor.processSavedFile(outputData.url, false);
-				}
+					editor.processSavedFile(incomeObject.data, false);
 				editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Print);}, true);
 	}
 }
@@ -2274,10 +2278,7 @@ function OnSave_Callback(e)
             var sData = "mnuSaveAs" + cCharDelimiter + JSON.stringify(oAdditionalData) + cCharDelimiter + data;
             sendCommand(editor, function(incomeObject){
 				if(null != incomeObject && "save" == incomeObject.type)
-				{
-					var outputData = JSON.parse(incomeObject.data);
-					editor.processSavedFile(outputData.url, true);
-				}
+					editor.processSavedFile(incomeObject.data, true);
 			}, sData);
         }
     } else {
@@ -2296,10 +2297,7 @@ asc_docs_api.prototype.asc_DownloadAs = function(typeFile){//передаем ч
 	var editor = this;
 	_downloadAs(this, typeFile, function(incomeObject){
 		if(null != incomeObject && "save" == incomeObject.type)
-		{
-			var outputData = JSON.parse(incomeObject.data);
-			editor.processSavedFile(outputData.url, false);
-		}
+			editor.processSavedFile(incomeObject.data, false);
 		editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);}, true);
 }
 asc_docs_api.prototype.Resize = function(){
@@ -2343,26 +2341,14 @@ asc_docs_api.prototype.processSavedFile = function(url, bInner)
 {
 	if(bInner)
 	{
-		var urlAbs = documentOrigin + g_sResourceServiceLocalUrl + encodeURIComponent(url);
-		this.asc_fireCallback("asc_onSaveUrl", urlAbs, function(hasError){});
+		this.asc_fireCallback("asc_onSaveUrl", url, function(hasError){});
 	}
 	else
 	{
-		var urlAbs = g_sResourceServiceLocalUrl + encodeURIComponent(url);
-		var nIndex = documentTitle.lastIndexOf(".");
-		if(-1 != nIndex)
-		{
-			var nIndexFormat = url.lastIndexOf(".");
-			var sDocumentFilename = documentTitle.substring(0, nIndex);
-			urlAbs += "&filename=" + encodeURIComponent(sDocumentFilename);
-			if(-1 != nIndexFormat)
-				urlAbs += url.substring(nIndexFormat);
-		}
-		if( this.isMobileVersion ){
-			window.open("../../../../Common/MobileDownloader/download.html?file="+urlAbs,"_parent","",false);
-		}
+		if( this.isMobileVersion )
+			window.open("/Common/MobileDownloader/download.html?file="+encodeURIComponent(url),"_parent","",false);
 		else
-			getFile(urlAbs);
+			getFile(url);
 	}	
 }
 asc_docs_api.prototype.startGetDocInfo = function(){
@@ -6466,7 +6452,7 @@ function sendCommand(editor, fCallback, rdata){
                 break;
                 case "waitsave":
 				{
-					var rData = {"id":documentId, "format": documentFormat, "c":"chsave", "data": incomeObject.data};
+					var rData = {"id":documentId, "title": documentTitleWithoutExtention, "c":"chsave", "data": incomeObject.data};
                     setTimeout( function(){sendCommand(editor, fCallback, JSON.stringify(rData))}, 3000);
 				}
                 break;

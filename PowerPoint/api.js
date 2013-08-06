@@ -8,6 +8,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 var documentId = undefined;
 var documentUrl = 'null';
 var documentTitle = 'null';
+var documentTitleWithoutExtention = 'null';
 var documentFormat = 'null';
 var documentVKey = null;
 var documentOrigin = "";
@@ -372,6 +373,12 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
         documentTitle = c_DocInfo.get_Title();
         documentFormat = c_DocInfo.get_Format();
 
+		var nIndex = documentTitle.lastIndexOf(".");
+		if(-1 != nIndex)
+			documentTitleWithoutExtention = documentTitle.substring(0, nIndex);
+		else
+			documentTitleWithoutExtention = documentTitle;
+		
         documentVKey = c_DocInfo.get_VKey();
         // documentOrigin  = c_DocInfo.get_Origin();
         var sProtocol = window.location.protocol;
@@ -854,10 +861,7 @@ asc_docs_api.prototype.asc_Print = function(){
 	var editor = this;
 	_downloadAs(this, c_oAscFileType.PDF, function(incomeObject){
 		if(null != incomeObject && "save" == incomeObject.type)
-		{
-			var outputData = JSON.parse(incomeObject.data);
-			editor.processSavedFile(outputData.url, false);
-		}
+			editor.processSavedFile(incomeObject.data, false);
 		editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Print);}, true);
 }
 asc_docs_api.prototype.Undo = function(){
@@ -897,10 +901,7 @@ asc_docs_api.prototype.asc_Save = function(){
 		var sData = "mnuSaveAs" + cCharDelimiter + JSON.stringify(oAdditionalData) + cCharDelimiter + data;
 		sendCommand(editor, function(incomeObject){
 			if(null != incomeObject && "save" == incomeObject.type)
-			{
-				var outputData = JSON.parse(incomeObject.data);
-				editor.processSavedFile(outputData.url, true);
-			}
+				editor.processSavedFile(incomeObject.data, true);
 		}, sData);
 	}
 }
@@ -913,28 +914,13 @@ asc_docs_api.prototype.asc_OnSaveEnd = function(isDocumentSaved){
 }
 asc_docs_api.prototype.processSavedFile = function(url, bInner){
 	if(bInner)
-	{
-		var urlAbs = documentOrigin + g_sResourceServiceLocalUrl + encodeURIComponent(url);
-		editor.asc_fireCallback("asc_onSaveUrl", urlAbs, function(hasError){});
-	}
+		editor.asc_fireCallback("asc_onSaveUrl", url, function(hasError){});
 	else
 	{
-		var urlAbs = g_sResourceServiceLocalUrl + encodeURIComponent(url);
-		var nIndex = documentTitle.lastIndexOf(".");
-		if(-1 != nIndex)
-		{
-			var nIndexFormat = url.lastIndexOf(".");
-			var sDocumentFilename = documentTitle.substring(0, nIndex);
-			urlAbs += "&filename=" + encodeURIComponent(sDocumentFilename);
-			if(-1 != nIndexFormat)
-				urlAbs += url.substring(nIndexFormat);
-		}
-		if( editor.isMobileVersion ){
-			window.open("../../../sdk/Common/MobileDownloader/download.html?file="+urlAbs,"_parent","",false);
-		}
-		else {
-			getFile(urlAbs);
-		}
+		if( editor.isMobileVersion )
+			window.open("../Common/MobileDownloader/download.html?file="+encodeURIComponent(url),"_parent","",false);
+		else
+			getFile(url);
 	}
 }
 asc_docs_api.prototype.asc_DownloadAs = function(typeFile){//передаем число соответствующее своему формату.
@@ -942,10 +928,7 @@ asc_docs_api.prototype.asc_DownloadAs = function(typeFile){//передаем ч
 	var editor = this;
 	_downloadAs(this, typeFile, function(incomeObject){
 		if(null != incomeObject && "save" == incomeObject.type)
-		{
-			var outputData = JSON.parse(incomeObject.data);
-			editor.processSavedFile(outputData.url, false);
-		}
+			editor.processSavedFile(incomeObject.data, false);
 		editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);}, true);
 }
 asc_docs_api.prototype.Resize = function(){
@@ -3878,7 +3861,7 @@ function sendCommand(editor, fCallback, rdata){
 						fCallback(incomeObject);
                 break;
                 case "waitsave":
-					var rData = {"id":documentId, "format": documentFormat, "c":"chsave", "data": incomeObject.data};
+					var rData = {"id":documentId, "title": documentTitleWithoutExtention, "c":"chsave", "data": incomeObject.data};
                     setTimeout( function(){sendCommand(editor, fCallback, JSON.stringify(rData))}, 3000);
                 break;
 				case "savepart":
