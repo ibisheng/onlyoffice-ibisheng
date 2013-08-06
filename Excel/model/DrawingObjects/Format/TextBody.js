@@ -224,6 +224,11 @@ CTableId.prototype =
                         Class = new CChartTitle();
                         break;
                     }
+                    case CLASS_TYPE_COLOR_MOD:
+                    {
+                        Class = new CColorMod();
+                        break;
+                    }
                 }
                 Class.Id = Id;
                 this.m_aPairs[Id] = Class;

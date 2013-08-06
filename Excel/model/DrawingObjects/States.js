@@ -191,11 +191,11 @@ function NullState(drawingObjectsController, drawingObjects)
                         {
                             this.drawingObjectsController.resetSelection();
                             cur_grouped_object.select(this.drawingObjectsController);
-                            grouped_objects[i].select(cur_grouped_object);
-                            grouped_objects[i].selectionSetStart(e, x, y);
-                            this.drawingObjectsController.changeCurrentState(new TextAddInGroup(this.drawingObjectsController, this.drawingObjects, cur_drawing, grouped_objects[i]));
+                            grouped_objects[j].select(cur_grouped_object);
+                            grouped_objects[j].selectionSetStart(e, x, y);
+                            this.drawingObjectsController.changeCurrentState(new TextAddInGroup(this.drawingObjectsController, this.drawingObjects, cur_drawing, grouped_objects[j]));
                             if(e.ClickCount < 2)
-                                grouped_objects[i].updateSelectionState(this.drawingObjects.drawingDocument);
+                                grouped_objects[j].updateSelectionState(this.drawingObjects.drawingDocument);
                             return;
                         }
                     }
@@ -495,11 +495,11 @@ function NullState(drawingObjectsController, drawingObjects)
                         var hit_in_text_rect = cur_grouped_object.hitInTextRect(x, y);
                         if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
                         {
-                            return {objectId: cur_grouped_object.Id, cursorType: "move"};
+                            return {objectId: cur_drawing.Id, cursorType: "move"};
                         }
                         else if(hit_in_text_rect)
                         {
-                            //TODO
+                            return {objectId: cur_drawing.Id, cursorType: "text"};
                         }
                     }
                 }
@@ -1358,7 +1358,7 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
         this.nullState.onMouseDown(e, x, y);
         if(this.drawingObjectsController.curState.id !== STATES_ID_TEXT_ADD || this.drawingObjectsController.curState.id !== STATES_ID_TEXT_ADD_IN_GROUP)
         {
-            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+            this.drawingObjectsController.updateSelectionState(this.drawingObjects.drawingDocument);
 
         }
     };
@@ -2629,6 +2629,7 @@ function GroupState(drawingObjectsController, drawingObjects, group)
                                 this.drawingObjectsController.changeCurrentState(new TextAddInGroup(this.drawingObjectsController, this.drawingObjects, this.group, cur_drawing));
                                 if(e.ClickCount < 2)
                                     cur_drawing.updateSelectionState(this.drawingObjects.drawingDocument);
+                                return;
                             }
                         }
                     }
@@ -2665,6 +2666,7 @@ function GroupState(drawingObjectsController, drawingObjects, group)
                                 this.drawingObjectsController.changeCurrentState(new TextAddInGroup(this.drawingObjectsController, this.drawingObjects, this.group, cur_drawing));
                                 if(e.ClickCount < 2)
                                     cur_drawing.updateSelectionState(this.drawingObjects.drawingDocument);
+                                return;
                             }
                         }
                     }
@@ -2799,7 +2801,7 @@ function GroupState(drawingObjectsController, drawingObjects, group)
                     }
                     else if(hit_in_text_rect)
                     {
-                        //TODO
+                        return {objectId: cur_drawing.Id, cursorType: "text"};
                     }
                 }
                 else
@@ -2819,7 +2821,7 @@ function GroupState(drawingObjectsController, drawingObjects, group)
                             }
                             else if(hit_in_text_rect)
                             {
-                                //TODO
+                                return {objectId: this.group.Id, cursorType: "text"};
                             }
                         }
                     }
@@ -2838,7 +2840,7 @@ function GroupState(drawingObjectsController, drawingObjects, group)
                             }
                             else if(hit_in_text_rect)
                             {
-                                //TODO
+                                return {objectId: cur_drawing.Id, cursorType: "text"};
                             }
                         }
                     }

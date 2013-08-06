@@ -398,8 +398,8 @@ CShape.prototype =
 
     },
 
-    setCellBackgroundColor: function (color) {
-
+    setCellBackgroundColor: function (color)
+    {
         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateBrushUndo, null, null,
             new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
         var unifill = new CUniFill();
@@ -409,7 +409,6 @@ CShape.prototype =
         this.recalculateBrush();
         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateBrushRedo, null, null,
             new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
-
     },
 
 
@@ -922,6 +921,8 @@ CShape.prototype =
 
     updateSelectionState: function(drawingDocument)
     {
+        drawingDocument.UpdateTargetTransform(this.transformText);
+        this.txBody.content.RecalculateCurPos();
         this.txBody.updateSelectionState(drawingDocument);
     },
 
@@ -1511,6 +1512,7 @@ CShape.prototype =
         var event =  new CMouseEventHandler();
         event.fromJQueryEvent(e);
         this.txBody.selectionSetStart(e, t_x, t_y);
+        this.txBody.content.RecalculateCurPos();
     },
 
     selectionSetEnd: function(e, x, y)
@@ -2923,7 +2925,7 @@ function CorrectUniColor(asc_color, unicolor)
             var _pos = _index - _id * 6;
 
             var array_colors_types = [6, 15, 7, 16, 0, 1, 2, 3, 4, 5];
-            ret.color.id = array_colors_types[_id];
+            ret.color.setColorId(array_colors_types[_id]);
 
             if (ret.Mods.Mods.length != 0)
                 ret.Mods.Mods.splice(0, ret.Mods.Mods.length);
@@ -2934,9 +2936,10 @@ function CorrectUniColor(asc_color, unicolor)
                 var _ind = 0;
                 for (var k in _mods)
                 {
-                    ret.Mods.Mods[_ind] = new CColorMod();
-                    ret.Mods.Mods[_ind].name = k;
-                    ret.Mods.Mods[_ind].val = _mods[k];
+                    var mod = new CColorMod();
+                    mod.setName(k);
+                    mod.setVal(_mods[k]);
+                    ret.addMod(mod);
                     _ind++;
                 }
             }

@@ -236,10 +236,22 @@ function CColorMod()
 {
     this.name = "";
     this.val = 0;
+    this.Id = g_oIdCounter.Get_NewId();
+    g_oTableId.Add(this, this.Id);
 }
 
 CColorMod.prototype =
 {
+    getObjectType: function()
+    {
+        return CLASS_TYPE_COLOR_MOD;
+    },
+
+    Get_Id: function()
+    {
+        return this.Id;
+    },
+
     createDuplicate : function()
     {
         var duplicate = new CColorMod();
@@ -250,12 +262,55 @@ CColorMod.prototype =
 
     setName: function(name)
     {
+        var oldValue = this.name;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddRedo, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, name)));
         this.name = name;
     },
 
     setVal: function(val)
     {
+
+        var oldValue = this.val;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddUndo, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, val)));
         this.val = val;
+    },
+
+    Undo: function(type, data)
+    {
+        switch(type)
+        {
+            case historyitem_AutoShapes_RecalculateAfterParagraphAddRedo:
+            {
+                this.name = data.oldValue;
+                break;
+            }
+
+            case historyitem_AutoShapes_RecalculateAfterParagraphAddUndo:
+            {
+                this.val = data.oldValue;
+                break;
+            }
+        }
+    },
+
+    Redo: function(type, data)
+    {
+        switch(type)
+        {
+            case historyitem_AutoShapes_RecalculateAfterParagraphAddRedo:
+            {
+                this.name = data.newValue;
+                break;
+            }
+
+            case historyitem_AutoShapes_RecalculateAfterParagraphAddUndo:
+            {
+                this.val = data.newValue;
+                break;
+            }
+        }
     }
 };
 
@@ -1028,6 +1083,14 @@ function CUniColor()
 
 CUniColor.prototype =
 {
+
+    addMod: function(mod)
+    {
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_AddColorMod, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(mod.Get_Id(), null)));
+        this.Mods.Mods.push(mod);
+    },
+
     Get_Id: function()
     {
         return this.Id;
@@ -1064,6 +1127,18 @@ CUniColor.prototype =
                 this.color = g_oTableId.Get_ById(data.oldValue);
                 break;
             }
+            case historyitem_AutoShapes_AddColorMod:
+            {
+                for(var i = 0; i < this.Mods.Mods.length; ++i)
+                {
+                    if(this.Mods.Mods[i].Get_Id() === data.oldValue)
+                    {
+                        this.Mods.Mods.splice(i, 1);
+                        break;
+                    }
+                }
+                break;
+            }
         }
     },
 
@@ -1074,6 +1149,11 @@ CUniColor.prototype =
             case historyitem_AutoShapes_SetFType:
             {
                 this.color = g_oTableId.Get_ById(data.newValue);
+                break;
+            }
+            case historyitem_AutoShapes_AddColorMod:
+            {
+                this.Mods.Mods.push(g_oTableId.Get_ById(data.oldValue));
                 break;
             }
         }
