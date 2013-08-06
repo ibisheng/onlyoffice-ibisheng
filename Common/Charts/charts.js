@@ -1664,13 +1664,13 @@ function drawChart(chart, arrValues, width, height) {
 	}
 	
 	// Название
-	if (chart.header.title) {
+	if (chart.header.title && !chart.margins) {
 		bar._chartTitle._text = chart.header.title;
 		bar._chartTitle._vpos = 32;
 		bar._chartTitle._hpos = 0.5;
 	}
 
-	if (chart.xAxis.title) {
+	if (chart.xAxis.title && !chart.margins) {
 		var legendTop = 0;
 		var widthXtitle =  bar.context.measureText(chart.xAxis.title).width;
 		if(chart.legend.position == 'bottom')
@@ -1678,7 +1678,7 @@ function drawChart(chart, arrValues, width, height) {
 		bar._xAxisTitle._text = chart.xAxis.title;
 	}
 
-	if (chart.yAxis.title) {
+	if (chart.yAxis.title && !chart.margins) {
 		var widthYtitle =  bar.context.measureText(chart.yAxis.title).width;
 		bar._yAxisTitle._text = chart.yAxis.title;
 		bar._yAxisTitle._align = 'rev';
@@ -1695,13 +1695,13 @@ function drawChart(chart, arrValues, width, height) {
 	var axis;
 	calcGutter(axis,chart.min,chart.max,chart.ymin,chart.ymax,chart.isSkip,chart.isFormatCell);
 	
-	if (chart.xAxis.title)
+	if (chart.xAxis.title && !chart.margins)
 	{
 		bar._xAxisTitle._vpos = bar.canvas.height - 23 - legendTop;
 		bar._xAxisTitle._hpos = bar._chartGutter._left + (bar.canvas.width - bar._chartGutter._left - bar._chartGutter._right ) / 2 ;
 	}
 	
-	if (chart.yAxis.title)
+	if (chart.yAxis.title && !chart.margins)
 	{
 		bar._yAxisTitle._vpos = bar._chartGutter._top + (bar.canvas.height - bar._chartGutter._top - bar._chartGutter._bottom) / 2 ;
 		bar._yAxisTitle._hpos = 23 + keyLeft;
