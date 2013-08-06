@@ -3313,7 +3313,7 @@
 											check = true;
 										for(var nVal = 0; nVal < filValue.length; nVal++)
 										{
-											if((filValue[nVal] == val) || (val == '' && isBlank == true))
+											if((filValue[nVal] == val2) || (val == '' && isBlank == true))
 											{
 												check = true;
 												break;
@@ -5030,6 +5030,15 @@
 					for(var i = 0; i < fColumns.length; i++)
 					{
 						var index = fColumns[i].ColId;
+						if(result[index].showButton == false)
+						{
+							for(var i = index; i < result.length; i++)
+							{
+								if(result[i].showButton != false)
+									break;
+							}
+							index = i;
+						}
 						if(result[index] && result[index].hiddenRows && result[index].hiddenRows.length != 0)
 						{
 							var arrHiddens = result[index].hiddenRows
