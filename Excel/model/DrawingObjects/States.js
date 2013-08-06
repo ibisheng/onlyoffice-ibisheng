@@ -2400,7 +2400,7 @@ function ChangeAdjState(drawingObjectsController, drawingObjects)
         for(var i =0; i < track_objects.length; ++i)
         {
             //this.drawingObjects.lockDrawingObject(track_objects[i].originalShape.Get_Id(), false, false);
-			this.drawingObjects.objectLocker.addObjectId(track_objects[i].originalObject.Get_Id());
+			this.drawingObjects.objectLocker.addObjectId(track_objects[i].originalShape.Get_Id());
         }
         var track_objects2 = [];
         for(i = 0; i < track_objects.length; ++i)
