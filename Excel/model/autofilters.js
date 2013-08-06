@@ -302,6 +302,7 @@
 							switch(paramsForCallBack)
 							{
 								case "changeStyle":
+								{
 									var cloneFilterOld = Asc.clone(filterChange);
 									filterChange.TableStyleInfo.Name = lTable;
 									splitRange = filterChange.Ref.split(':');
@@ -321,7 +322,9 @@
 										History.TurnOn();
 									return true;
 									break;
+								}
 								case 'deleteFilter':
+								{
 									var isReDrawFilter = false;
 									if(apocal.all)
 									{
@@ -391,7 +394,9 @@
 										return true;
 									}
 									break;
+								}
 								case 'changeAllFOnTable':
+								{
 									//удаляем фильтр
 									newRes = {
 										result: allAutoFilters[apocal.num].result,
@@ -517,7 +522,9 @@
 									if(isTurnOffHistory)
 										History.TurnOn();
 									return true;
+								}
 								case 'changeStyleWithoutFilter':
+								{
 									changesElemHistory = Asc.clone(filterChange);
 									filterChange.TableStyleInfo.Name = lTable;
 									splitRange = filterChange.Ref.split(':');
@@ -535,8 +542,10 @@
 									if(isTurnOffHistory)
 										History.TurnOn();
 									return true;
-									break;
+									break
+								}
 								case 'setStyleTableForAutoFilter':
+								{
 									changesElemHistory = Asc.clone(allAutoFilters[apocal.num -1]);
 									var ref = allAutoFilters[apocal.num - 1].Ref;
 									allAutoFilters[apocal.num - 1].AutoFilter = 
@@ -544,7 +553,9 @@
 										Ref: allAutoFilters[apocal.num - 1].Ref
 									};
 									break;
+								}
 								case 'setStyleTableForAutoFilter1':
+								{
 									changesElemHistory = Asc.clone(allAutoFilters[apocal.num]);
 									var ref = allAutoFilters[apocal.num].Ref;
 									allAutoFilters[apocal.num].AutoFilter = 
@@ -552,6 +563,7 @@
 										Ref: allAutoFilters[apocal.num].Ref
 									};
 									break;
+								}
 							}
 							if(paramsForCallBack == "setStyleTableForAutoFilter1" || paramsForCallBack == "setStyleTableForAutoFilter")
 							{
@@ -583,6 +595,7 @@
 							switch(paramsForCallBackAdd)
 							{
 								case "addTableFilterOneCell":
+								{
 									if(!isTurnOffHistory && addNameColumn)
 										rangeShift.addCellsShiftBottom();
 									if(lTable)
@@ -616,7 +629,9 @@
 									if(addNameColumn && !isTurnOffHistory)
 										mainAdjacentCells.r2 = mainAdjacentCells.r2 + 1;
 									break;
+								}
 								case "addTableFilterManyCells":
+								{
 									if(!isTurnOffHistory && addNameColumn)
 										rangeShift.addCellsShiftBottom();
 									if(lTable)
@@ -650,6 +665,7 @@
 									if(addNameColumn && !isTurnOffHistory)
 										activeCells.r2 = activeCells.r2 + 1;
 									break
+								}
 							}
 							if(paramsForCallBackAdd == "addTableFilterOneCell" || paramsForCallBackAdd == "addAutoFilterOneCell")
 							{
@@ -767,7 +783,8 @@
 						
 						if(openFilter == undefined) {
 							if(isAll) {
-								aWs.AutoFilter = {};
+								if(!aWs.AutoFilter)
+									aWs.AutoFilter = {};
 								aWs.AutoFilter.result = result;
 								aWs.AutoFilter.Ref = result[0].id + ':' + result[result.length -1].idNext;
 							}
@@ -819,7 +836,8 @@
 					else 
 						return false;
 				};
-					
+				//***andCallBack
+				
 				
 				//если уже применён общий автофильтр, то отменяем его
 				var isAll = true;
@@ -1005,14 +1023,15 @@
 							var cellId = idCell.getID();
 							//скрыты ли какие-нибудь строки данной ячейкой, если да, то добавляем их в массив this.hiddenRowsArr
 							//this._addRowsInHiddenArray(cellId,sCell,eCell,ws);
-							
+
 							result[n] = {
 								x: ws.cols[col].left,
 								y: ws.rows[sCell.first.row - 1].top,
 								width: ws.cols[col].width,
 								height: ws.rows[startCol].height,
 								id: cellId,
-								idNext: idCellNext.getID()
+								idNext: idCellNext.getID(),
+								showButton: this._isShowButton(aWs.AutoFilter.FilterColumns, col - startCol)
 							};
 							n++;
 						}
@@ -1278,7 +1297,20 @@
 								filters = currentFilter.FilterColumns;
 								for(var k= 0; k < filters.length; k++)
 								{
-									if(filters[k].ColId == filtersOp[1])
+									//для мерженных головных ячеек 
+									var colId = filters[k].ColId;
+									if(filters[k].ShowButton == false)
+									{
+										for(var sb = filters[k].ColId; sb < currentFilter.result.length; sb++)
+										{	
+											if(currentFilter.result[sb].showButton != false)
+											{
+												colId = sb;
+												break;
+											}
+										}
+									}	
+									if(colId == filtersOp[1] && (filters[k].Filters != null || filters[k].CustomFiltersObj != null))
 									{	
 										isSetFilter = true;
 										filters = filters[k];
@@ -1899,6 +1931,26 @@
 				
 				var startRange = ws.model.getCell(new CellAddress(startIdCell));
 				var endRange = ws.model.getCell(new CellAddress(endIdCell));
+				
+				var isMerged = startRange.hasMerged();
+				var startCell = this._idToRange(startIdCell);
+				if(isMerged && startCell.c1 != isMerged.c1)
+				{
+					var endCell = this._idToRange(endIdCell);
+					var diff = startCell.c1 - isMerged.c1;
+					filtersOp[1] = filtersOp[1] - diff;
+					startCell.c1 = isMerged.c1;
+					endCell.c1 = isMerged.c1;
+					startIdCell = this._rangeToId(startCell);
+					endIdCell = this._rangeToId(endCell);
+					startRange = ws.model.getCell(new CellAddress(startIdCell));
+					endRange = ws.model.getCell(new CellAddress(endIdCell));
+					isMerged = true;
+				}
+				else
+					isMerged = false;
+				
+				
 				var arrayFil = [];
 				if(conFilter.filter1 == null && conFilter.filter2 == null)
 					return;
@@ -1917,7 +1969,7 @@
 				}
 				var oldFilter = Asc.clone(currentFilter);
 				//**добавляем данные в aWs.AutoFilter или aWs.TableParts**
-				this._addCustomFilters(indexFilter,ws,aWs,conFilter);
+				this._addCustomFilters(filtersOp,ws,aWs,conFilter,isMerged);
 				
 				this._addHistoryObj(ws, oldFilter, historyitem_AutoFilter_ApplyDF,
 					{activeCells: ar, autoFiltersObject: autoFiltersObject});
@@ -1966,6 +2018,7 @@
 				//**получаем нужный фильтр**
 				var indexFilter = this._findArrayFromAllFilter3(newAcCells,ws,cellId);
 				var filtersOp = indexFilter.split(':');
+				
 				var currentFilter;
 				var ref;
 				var filterObj;
@@ -1986,6 +2039,18 @@
 					filterObj = aWs.TableParts[filtersOp[0]];
 				}
 				var oldFilter = Asc.clone(filterObj);
+				var cell = ws.model.getCell( new CellAddress(activeCells.r1, activeCells.c1,0));
+				var rangeStart = this._idToRange(ref.split(':')[0]);
+				if(newAcCells.c1 == (rangeStart.c1 + parseInt(filtersOp[1])))
+				{
+					var isMerged = cell.hasMerged();
+					if(isMerged)
+					{
+						var newCol = isMerged.c1 - rangeStart.c1;
+						filtersOp[1] = newCol;
+					}
+				}
+				
 				var isCurFilter;
 				for(var l = 0; l < currentFilter.length; l++)
 				{
@@ -1994,9 +2059,19 @@
 				}
 				
 				//**преобразуем массив в другой вид**
+				var isMerged = false;
 				if(!isArray)
 				{
 					var newArray = [];
+					//если имеются мерженные области в заголовке то смещаем activeCells.c и curCellId на начало мерженной области
+					var isMerged = cell.hasMerged();
+					if(isMerged && activeCells.c1 != isMerged.c1)
+					{
+						activeCells.c1 = isMerged.c1;
+					}
+					else
+						isMerged = false;
+					
 					for(var m = 0; m < array.length; m++)
 					{
 						var val = ws.model.getCell( new CellAddress(activeCells.r1 + m + 1, activeCells.c1,0)).getCells()[0].getValue();
@@ -2086,13 +2161,22 @@
 						{
 							if(isCurFilter == undefined)
 								isCurFilter = currentFilter.length;
-							currentFilter[isCurFilter] = {
-								ColId: filtersOp[1],
-								Filters:{}
-							};
+							if(currentFilter[isCurFilter])
+							{
+								currentFilter[isCurFilter].ColId = filtersOp[1];
+								currentFilter[isCurFilter].Filters = {};
+							}
+							else
+							{
+								currentFilter[isCurFilter] = {
+									ColId: filtersOp[1],
+									Filters:{}
+								};
+							}
 							currentFilter[isCurFilter].Filters.Values = [];
 						}
-						
+						if(isMerged)
+							currentFilter[isCurFilter].ShowButton = false;
 						if(cell.getNumFormat().isDateTimeFormat())//получаем данные в формате дата
 						{
 							if(!currentFilter[isCurFilter].Filters.Dates)
@@ -2155,7 +2239,21 @@
 					//в случае всех открытых строк - убираем фильтр из aWs
 					if(allVis)
 					{
-						currentFilter.splice(isCurFilter,1);
+						if(currentFilter[isCurFilter] && currentFilter[isCurFilter].ShowButton == false)
+						{
+							currentFilter[isCurFilter].Filters = null;
+							currentFilter[isCurFilter].CustomFiltersObj = null;
+						}	
+						else
+							currentFilter.splice(isCurFilter,1);
+						/*if(currentFilter[isCurFilter - 1] && currentFilter[isCurFilter - 1].ShowButton == false)
+						{	
+							for(var l = isCurFilter - 1; l >= 0 ;l--)
+							{
+								if(currentFilter[l].ShowButton == false)
+									currentFilter[l].Filters = null;
+							}
+						}*/
 						isPress = false;
 					}
 				}
@@ -2902,10 +3000,15 @@
 						if(!isButtonDraw)
 						{
 							var leng = this.allButtonAF.length;
+							var n = 0;
 							for(var i = 0; i < arr.result.length; i++)
 							{
-								this.allButtonAF[leng + i] = arr.result[i];
-								this.allButtonAF[leng + i].inFilter = arr.result[0].id + ':' + arr.result[arr.result.length - 1].idNext;
+								if(arr.result[i].showButton != false)
+								{
+									this.allButtonAF[leng + n] = arr.result[i];
+									this.allButtonAF[leng + n].inFilter = arr.result[0].id + ':' + arr.result[arr.result.length - 1].idNext;
+									n++;
+								}
 							}
 						}
 						
@@ -3105,6 +3208,21 @@
 								var isBlank = curFilter.Filters.Blank;
 								var nC = 0;
 								var acCell = currentFilter.result[curFilter.ColId];
+								//если имеются мерженные ячейки, переносим кнопку
+								if(acCell.showButton == false)
+								{
+									for(var sb = curFilter.ColId + 1; sb < currentFilter.result.length; sb++)
+									{
+										if(currentFilter.result[sb].showButton != false)
+										{
+											//acCell = currentFilter.result[sb];
+											break;
+										}	
+									}
+								}
+								if(sb && sb == numFilter)
+									numFilter = curFilter.ColId;
+								
 								var startRow = ws.model.getCell(new CellAddress(acCell.id)).first.row - 1;
 								var endRow = ws.model.getCell(new CellAddress(acCell.idNext)).first.row - 1;
 								var col = ws.model.getCell(new CellAddress(acCell.id)).first.col - 1;
@@ -3115,7 +3233,7 @@
 									var val2 = cell.getValueWithoutFormat();
 									if(!result[nC])
 										result[nC] = new AutoFiltersOptionsElements();
-									if(curFilter.ColId == numFilter)
+									if(curFilter.ColId == numFilter)//щёлкнули по кнопке данного фильтра
 									{
 										var isFilterCol = true;
 										var isInput = false;
@@ -3157,6 +3275,15 @@
 												}
 											}
 										}
+										else if(filValue && filValue.length == 0 && val2 == '' && isBlank == true)
+										{
+											result[nC].val = val;
+											result[nC].val2 = val2;
+											isInput = true;
+											if(result[nC].visible != 'hidden')
+												result[nC].visible = true;
+										}
+										
 										if(dataValues && dataValues.length != 0 && !isInput)
 										{
 											for(var nVal = 0; nVal < dataValues.length; nVal++)
@@ -3179,9 +3306,11 @@
 											}
 										}
 									}
-									else
+									else//тот же диапазон просмотатриваем другими кнопками фильтра
 									{
 										var check = false;
+										if(filValue.length == 0 && val == '' && isBlank == true)
+											check = true;
 										for(var nVal = 0; nVal < filValue.length; nVal++)
 										{
 											if((filValue[nVal] == val) || (val == '' && isBlank == true))
@@ -3232,6 +3361,20 @@
 							//var filValue = curFilter.Filters.Values;
 							var nC = 0;
 							var acCell = currentFilter.result[curFilter.ColId];
+							//если имеются мерженные ячейки, переносим кнопку
+							if(acCell.showButton == false)
+							{
+								for(var sb = curFilter.ColId + 1; sb < currentFilter.result.length; sb++)
+								{
+									if(currentFilter.result[sb].showButton != false)
+									{
+										//acCell = currentFilter.result[sb];
+										break;
+									}	
+								}
+							}
+							if(sb && sb == numFilter)
+								numFilter = curFilter.ColId;
 							var startRow = ws.model.getCell(new CellAddress(acCell.id)).first.row - 1;
 							var endRow = ws.model.getCell(new CellAddress(acCell.idNext)).first.row - 1;
 							var col = ws.model.getCell(new CellAddress(acCell.id)).first.col - 1;
@@ -3352,11 +3495,21 @@
 							}
 						}
 					}
-					if(!isFilterCol)
+					if(!isFilterCol)//если фильтр не применен
 					{
 						var ref = currentFilter.Ref;
 						var filterStart = ws.model.getCell(new CellAddress(ref.split(':')[0]));
 						var filterEnd = ws.model.getCell(new CellAddress(ref.split(':')[1]));
+						//если есть мерженные ячейки в головной строке
+						var cell = ws.model.getCell(new CellAddress(buttonId));
+						var isMerged = cell.hasMerged();
+						if(isMerged)
+						{
+							var range  = this._idToRange(buttonId);
+							range.c1 = isMerged.c1;
+							buttonId = this._rangeToId(range);
+						}
+						
 						var col = ws.model.getCell(new CellAddress(buttonId)).first.col - 1;
 						var startRow = filterStart.first.row;
 						var endRow = filterEnd.first.row - 1;
@@ -3405,6 +3558,28 @@
 							Ref: val[0].id + ':' + val[val.length - 1].idNext 
 						};
 					}
+					//проходимся по 1 строчке в поиске мерженных областей
+					var startCol = this._idToRange(val[0].id);
+					var endCol = this._idToRange(val[val.length - 1].idNext);
+					var row = startCol.r1;
+					var cell;
+					for(var col = startCol.c1; col <= endCol.c1; col++)
+					{
+						cell = aWs.getCell( new CellAddress(row, col, 0) );
+						var isMerged = cell.hasMerged();
+						if(isMerged && isMerged.c2 != col)
+						{
+							if(!aWs.AutoFilter.FilterColumns)
+								aWs.AutoFilter.FilterColumns = [];
+							aWs.AutoFilter.FilterColumns[aWs.AutoFilter.FilterColumns.length] = 
+							{
+								ColId: col - startCol.c1,
+								ShowButton: false
+							}
+							aWs.AutoFilter.result[col - startCol.c1].showButton = false;
+						}
+					}
+					
 					return 	aWs.AutoFilter;
 				}
 				else
@@ -3451,9 +3626,9 @@
 				return cell.getID();
 			},
 			
-			_addCustomFilters: function(index, ws, aWs, valFilter)
+			_addCustomFilters: function(index, ws, aWs, valFilter, isMerged)
 			{
-				var parIndex = index.split(':');
+				var parIndex = index;
 				var curFilter;
 				if(parIndex[0] == 'all')
 					curFilter = aWs.AutoFilter;
@@ -3473,11 +3648,16 @@
 					
 					if(isEn == undefined)
 					{
-						curFilter.FilterColumns[curFilter.FilterColumns.length] = this._addNewCustomFilter(valFilter,parIndex[1])
+						var length = curFilter.FilterColumns.length;
+						curFilter.FilterColumns[curFilter.FilterColumns.length] = this._addNewCustomFilter(valFilter,parIndex[1]);
+						if(isMerged)
+							curFilter.FilterColumns[length].ShowButton = false;
 					}
 					else
 					{
 						curFilter.FilterColumns[isEn] =  this._addNewCustomFilter(valFilter,parIndex[1])
+						if(isMerged)
+							curFilter.FilterColumns[isEn].ShowButton = false;
 					}
 					
 					
@@ -3486,6 +3666,8 @@
 				{
 					curFilter.FilterColumns = [];
 					curFilter.FilterColumns[0] = this._addNewCustomFilter(valFilter,parIndex[1]);
+					if(isMerged)
+							curFilter.FilterColumns[0].ShowButton = false;
 				}
 				
 			},
@@ -3568,6 +3750,17 @@
 						valFilter2: customFilter[1]?customFilter[1].Val : undefined,
 						isChecked: filter.CustomFiltersObj.And
 					};
+					
+					//для головных мерженных ячеек
+					if(filter.ShowButton == false)
+					{
+						var isMerged = ws.model.getCell( new CellAddress(startCell.r1, startCell.c1, 0)).hasMerged();
+						if(isMerged)
+						{
+							startCell.c1 = isMerged.c1;
+						}
+					}
+					
 					for(var m = startCell.r1 + 1; m <= endCell.r1; m++)
 					{
 						var cell = ws.model.getCell( new CellAddress(m, startCell.c1, 0)).getCells()[0]
@@ -3584,11 +3777,17 @@
 				{
 					var customFilter = filter.Filters.Values;
 					var isBlank  = filter.Filters.Blank;
+					//для головных мерженных ячеек
+					if(filter.ShowButton == false)
+					{
+						var isMerged = ws.model.getCell( new CellAddress(startCell.r1, startCell.c1, 0)).hasMerged();
+						if(isMerged)
+						{
+							startCell.c1 = isMerged.c1;
+						}
+					}
 					for(var m = startCell.r1 + 1; m <= endCell.r1; m++)
 					{
-						if(!filter.ShowButton)
-						{
-						}
 						var val = ws.model.getCell( new CellAddress(m, startCell.c1, 0)).getCells()[0].getValue();
 						var isVis = false;
 						for(var k = 0; k < customFilter.length;k++)
@@ -5046,6 +5245,21 @@
 						}
 					}
 				}
+			},
+			
+			//ShowButton(в случае объединенных ячеек в автофильтрах)
+			_isShowButton: function(filterColumns, colId)
+			{
+				var result = true;
+				if(filterColumns && filterColumns.length != 0)
+				{
+					for(var i = 0; i < filterColumns.length;i++)
+					{
+						if(colId == filterColumns[i].ColId && !filterColumns[i].ShowButton)
+							result = false;
+					}
+				}
+				return result;
 			}
 		};
 
