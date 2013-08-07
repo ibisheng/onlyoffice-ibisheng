@@ -222,7 +222,7 @@ function Editor_Copy(api, bCut)
             //�������� � webkit: ���� ���������� ����� ���� ��������, �� ���������� ������ ��� ������������
             //������ ��� docs.google ����������� ��� � ��� <b>
             var is_webkit = navigator.userAgent.toLowerCase().indexOf('webkit') > -1;
-            if(is_webkit)
+            if(is_webkit && (true !== window.USER_AGENT_SAFARI_MACOS))
             {
                 var aChildNodes = ElemToSelect.childNodes;
                 if(aChildNodes.length == 1)
@@ -250,7 +250,12 @@ function Editor_Copy(api, bCut)
             rangeToSelect.select ();
         }
     }
+
     //���� ���������� copy
+    var time_interval = 0;
+    if (window.USER_AGENT_SAFARI_MACOS)
+        time_interval = 200;
+
     window.setTimeout( function()
     {
         //�������� ����������� ���������
@@ -266,7 +271,7 @@ function Editor_Copy(api, bCut)
             api.WordControl.m_oLogicDocument.Remove(-1, true, true);
             api.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
         }
-    }, 0);
+    }, time_interval);
     /*
      if (e.dataTransfer)
      {
@@ -4363,8 +4368,30 @@ function Editor_CopyPaste_Create(api)
         Body_Paste(api,e);
     };
 
+    var TIME_PREVIOS_ONBEFORE_EVENTS = new Date().getTime();
+    // не разобравшись не править!
+    // эти евенты приходят дважды. так как операции могут быть длительтными,
+    // то смотрится время окончания предыдущего и начало следующего евента
+
+    ElemToSelect["onbeforecut"] = function(e){
+        var _time = new Date().getTime();
+        if (_time - TIME_PREVIOS_ONBEFORE_EVENTS < 100)
+            return;
+
+        api.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        Editor_Copy(api,true);
+
+        TIME_PREVIOS_ONBEFORE_EVENTS = new Date().getTime();
+    };
+
     ElemToSelect["onbeforecopy"] = function(e){
+        var _time = new Date().getTime();
+        if (_time - TIME_PREVIOS_ONBEFORE_EVENTS < 100)
+            return;
+
         Editor_Copy(api,false);
+
+        TIME_PREVIOS_ONBEFORE_EVENTS = new Date().getTime();
     };
 
     document.body.appendChild( ElemToSelect );
