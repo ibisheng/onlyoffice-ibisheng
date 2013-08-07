@@ -1510,7 +1510,7 @@ JSCompiler_StaticMethods_editChart:TE
 c_oSerTableTypes$Style:PU
 c_oSerProp_rPrType$Bold:HW
 selectionflag_DrawingObject:Ka
-FT_ServiceDescRec:Sn
+FT_ServiceDescRec:Rn
 g_bChartPreview:vm
 tt_driver_init:fy
 phType_subTitle:ZJ
@@ -2253,7 +2253,7 @@ c_oAscAlignV$Inside:sP
 c_oSerParType$pPr:oX
 LoadMobileImages:y2
 c_oAscFileType$INNER:I3
-FT_Service_MultiMastersRec:Kn
+FT_Service_MultiMastersRec:Fn
 JSCompiler_StaticMethods_Clear_Redo:XM
 JSCompiler_StaticMethods_Remove_CommentMarks:sN
 c_oSerImageType2$Locked:jY
@@ -2622,7 +2622,7 @@ historyitem_TableId_Reset:oM
 historyitem_type_Comment:LM
 T1_Decoder_ZoneRec:Bs
 L 102:Ek
-L 101:In
+L 101:Jn
 L 100:Tf
 historyitem_UpdateWrapSizes:tH
 CColorModifiers:xJ
@@ -2633,10 +2633,10 @@ historyitem_ChangeDiagram2:OI
 ShapeForResizeInGroup:kJ
 L 111:YA
 L 110:XA
-L 113:Rn
+L 113:Sn
 bIsSupportOriginalFormatFonts:cC
 L 112:e3
-L 103:Jn
+L 103:Kn
 L 104:ms
 CAutoshapeTrack:l1
 L 105:sA
@@ -2897,7 +2897,7 @@ L 56:Bl
 L 55:cs
 L 54:bs
 L 53:qA
-L 52:Fn
+L 52:Gn
 L 51:sv
 FT_TT_SERVICES_GET:cy
 FT_Memory:ao
@@ -3072,7 +3072,7 @@ c_oSer_ColorType$Auto:dk
 L 99:Gj
 L 95:uv
 L 96:ks
-L 97:Hn
+L 97:In
 L 98:vv
 c_oSer_ChartCatAxType$Title:Sk
 STATES_ID_PRE_RESIZE:pF
@@ -3091,7 +3091,7 @@ L 90:fi
 tt_name_entry_ascii_from_utf16:Ou
 Editor_Copy_GetElem:oa
 L 88:Dk
-L 89:Gn
+L 89:Hn
 L 86:Bk
 L 87:hs
 L 84:fs
