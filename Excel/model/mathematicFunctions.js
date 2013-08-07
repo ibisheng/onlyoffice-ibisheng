@@ -3026,7 +3026,7 @@ cFormulaFunction.Mathematic = {
         r.setArgumentsMin( 2 );
         r.setArgumentsMax( 3 );
         r.Calculate = function ( arg ) {
-            var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : arg[0], _count = 0, valueForSearching, regexpSearch;
+            var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : arg[0], _sum = 0, valueForSearching, regexpSearch;
             if ( !(arg0 instanceof cRef || arg0 instanceof cRef3D || arg0 instanceof cArea) ) {
                 return this.value = new cError( cErrorType.wrong_value_type );
             }
@@ -3077,11 +3077,11 @@ cFormulaFunction.Mathematic = {
             }
 
             arg1 = arg1.toString();
-            var operators = new RegExp( "^ *[<=> ]+ *" ), searchOperators = new RegExp( "^ *[*?]" )
+            var operators = new RegExp( "^ *[<=> ]+ *" );
             var match = arg1.match( operators );
             if ( match || parseNum( arg1 ) ) {
 
-                var search, oper, val, calcVal;
+                var search, oper, val;
                 if ( match ) {
                     search = arg1.substr( match[0].length );
                     oper = match[0].replace( /\s/g, "" );
@@ -3098,7 +3098,7 @@ cFormulaFunction.Mathematic = {
                                 r1 = r.first.getRow0() + i, c1 = arg2.getRange().first.getCol0();
                             r = new cRef( ws.getRange3( r1, c1, r1, c1 ).getName(), ws );
                             if ( r.getValue() instanceof cNumber ) {
-                                _count += r.getValue().getValue();
+                                _sum += r.getValue().getValue();
                             }
                         }
                     }
@@ -3110,7 +3110,7 @@ cFormulaFunction.Mathematic = {
                             r1 = r.first.getRow0() + 0, c1 = arg2.getRange().first.getCol0();
                         r = new cRef( ws.getRange3( r1, c1, r1, c1 ).getName(), ws );
                         if ( r.getValue() instanceof cNumber ) {
-                            _count += r.getValue().getValue();
+                            _sum += r.getValue().getValue();
                         }
                     }
                 }
@@ -3133,7 +3133,7 @@ cFormulaFunction.Mathematic = {
                                 r1 = r.first.getRow0() + i, c1 = arg2.getRange().first.getCol0();
                             r = new cRef( ws.getRange3( r1, c1, r1, c1 ).getName(), ws );
                             if ( r.getValue() instanceof cNumber ) {
-                                _count += r.getValue().getValue();
+                                _sum += r.getValue().getValue();
                             }
                         }
                     }
@@ -3145,18 +3145,18 @@ cFormulaFunction.Mathematic = {
                             r1 = r.first.getRow0() + 0, c1 = arg2.getRange().first.getCol0();
                         r = new cRef( ws.getRange3( r1, c1, r1, c1 ).getName(), ws );
                         if ( r.getValue() instanceof cNumber ) {
-                            _count += r.getValue().getValue();
+                            _sum += r.getValue().getValue();
                         }
                     }
                 }
             }
 
-            return this.value = new cNumber( _count );
+            return this.value = new cNumber( _sum );
         }
         r.getInfo = function () {
             return {
                 name:this.name,
-                args:"( cell-range, selection-criteria )"
+                args:"( cell-range, selection-criteria [ , sum-range ] )"
             };
         }
         return r;

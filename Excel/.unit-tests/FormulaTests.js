@@ -7,7 +7,7 @@
         sData = data + "";
     if ( c_oSerFormat.Signature === sData.substring( 0, c_oSerFormat.Signature.length ) ) {
         var sUrlPath = "offlinedocs/";
-        var wb = new Workbook( sUrlPath, new Asc.asc_CHandlersList(), null );
+        var wb = new Workbook( sUrlPath, new Asc.asc_CHandlersList(), {} );
         wb.initGlobalObjects();
         var oBinaryFileReader = new BinaryFileReader( sUrlPath );
         oBinaryFileReader.Read( sData, wb );
@@ -303,33 +303,64 @@
     } )
 
     test( "Test: \"SUM\"", function () {
-        oParser = new parserFormula( "SUM(S5:T5)", "A1", ws );
+
+        ws.getRange2( "S5" ).setValue( "=1" );
+        ws.getRange2( "S6" ).setValue( "=-1/Fact(2)" );
+        ws.getRange2( "S7" ).setValue( "=1/Fact(4)" );
+        ws.getRange2( "S8" ).setValue( "=-1/Fact(6)" );
+
+        oParser = new parserFormula( "SUM(S5:S8)", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 0 );
+//        strictEqual( oParser.calculate().getValue(), 1-1/Math.fact(2)+1/Math.fact(4)-1/Math.fact(6) );
+        ok( Math.abs( oParser.calculate().getValue() - (1-1/Math.fact(2)+1/Math.fact(4)-1/Math.fact(6)) ) < dif );
     } )
 
     test( "Test: \"MAX\"", function () {
-        oParser = new parserFormula( "MAX(S5:T5)", "A1", ws );
+
+        ws.getRange2( "S5" ).setValue( "=1" );
+        ws.getRange2( "S6" ).setValue( "=-1/Fact(2)" );
+        ws.getRange2( "S7" ).setValue( "=1/Fact(4)" );
+        ws.getRange2( "S8" ).setValue( "=-1/Fact(6)" );
+
+        oParser = new parserFormula( "MAX(S5:S8)", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 0 );
+        strictEqual( oParser.calculate().getValue(), 1 );
     } )
 
     test( "Test: \"MAXA\"", function () {
-        oParser = new parserFormula( "MAXA(S5:T5)", "A1", ws );
+
+        ws.getRange2( "S5" ).setValue( "=1" );
+        ws.getRange2( "S6" ).setValue( "=-1/Fact(2)" );
+        ws.getRange2( "S7" ).setValue( "=1/Fact(4)" );
+        ws.getRange2( "S8" ).setValue( "=-1/Fact(6)" );
+
+        oParser = new parserFormula( "MAXA(S5:S8)", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 0 );
+        strictEqual( oParser.calculate().getValue(), 1 );
     } )
 
     test( "Test: \"MIN\"", function () {
-        oParser = new parserFormula( "MIN(S5:T5)", "A1", ws );
+
+        ws.getRange2( "S5" ).setValue( "=1" );
+        ws.getRange2( "S6" ).setValue( "=-1/Fact(2)" );
+        ws.getRange2( "S7" ).setValue( "=1/Fact(4)" );
+        ws.getRange2( "S8" ).setValue( "=-1/Fact(6)" );
+
+        oParser = new parserFormula( "MIN(S5:S8)", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 0 );
+        strictEqual( oParser.calculate().getValue(), -1/Math.fact(2) );
     } )
 
     test( "Test: \"MINA\"", function () {
-        oParser = new parserFormula( "MINA(S5:T5)", "A1", ws );
+
+        ws.getRange2( "S5" ).setValue( "=1" );
+        ws.getRange2( "S6" ).setValue( "=-1/Fact(2)" );
+        ws.getRange2( "S7" ).setValue( "=1/Fact(4)" );
+        ws.getRange2( "S8" ).setValue( "=-1/Fact(6)" );
+
+        oParser = new parserFormula( "MINA(S5:S8)", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 0 );
+        strictEqual( oParser.calculate().getValue(), -1/Math.fact(2) );
     } )
 
     test( "Test: SUM(S7:S9,{1,2,3})", function () {
@@ -445,45 +476,6 @@
         oParser = new parserFormula( "FIXED(1234567)", "A1", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), "1,234,567" );
-    } )
-
-    test( "Test: \"COUNTIF\"", function () {
-
-        ws.getRange2( "A7" ).setValue( "3" );
-        ws.getRange2( "B7" ).setValue( "10" );
-        ws.getRange2( "C7" ).setValue( "7" );
-        ws.getRange2( "D7" ).setValue( "10" );
-
-        ws.getRange2( "A8" ).setValue( "apples" );
-        ws.getRange2( "B8" ).setValue( "oranges" );
-        ws.getRange2( "C8" ).setValue( "grapes" );
-        ws.getRange2( "D8" ).setValue( "melons" );
-
-
-        oParser = new parserFormula( "COUNTIF(A7:D7,\"=10\")", "A1", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 2 );
-
-        oParser = new parserFormula( "COUNTIF(A7:D7,\">5\")", "B1", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 3 );
-
-        oParser = new parserFormula( "COUNTIF(A7:D7,\"<>10\")", "C1", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 2 );
-
-        oParser = new parserFormula( "COUNTIF(A8:D8,\"*es\")", "A2", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 3 );
-
-        oParser = new parserFormula( "COUNTIF(A8:D8,\"??a*\")", "B2", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 2 );
-
-        oParser = new parserFormula( "COUNTIF(A8:D8,\"*l*\")", "C2", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 2 );
-
     } )
 
     test( "Test: \"REPLACE\"", function () {
@@ -896,10 +888,11 @@
     test( "Test: \"STDEV\"", function () {
 
         function stdev() {
-            var average = 0, sum = 0, res = 0;
+            var average = 0, res = 0;
             for ( var i = 0; i < arguments.length; i++ ) {
-                average += arguments[i] / arguments.length;
+                average += arguments[i];
             }
+            average /= arguments.length;
             for ( var i = 0; i < arguments.length; i++ ) {
                 res += (arguments[i] - average) * (arguments[i] - average);
             }
@@ -1470,7 +1463,274 @@
         oParser = new parserFormula( "SERIESSUM(PI()/4,1,2,B2:B5)", "B7", ws );
         ok( oParser.parse() );
         ok( Math.abs( oParser.calculate().getValue() - (Math.PI / 4 - 1 / Math.fact( 3 ) * Math.pow( Math.PI / 4, 3 ) + 1 / Math.fact( 5 ) * Math.pow( Math.PI / 4, 5 ) - 1 / Math.fact( 7 ) * Math.pow( Math.PI / 4, 7 )) ) < dif );
-//        strictEqual( oParser.calculate().getValue(), Math.PI / 4 - 1 / Math.fact( 3 ) * Math.pow( Math.PI / 4, 3 ) + 1 / Math.fact( 5 ) * Math.pow( Math.PI / 4, 5 ) - 1 / Math.fact( 7 ) * Math.pow( Math.PI / 4, 7 ) );
+
+    } )
+
+    /*
+    * Statical Function
+    * */
+    test( "Test: \"AVEDEV\"", function () {
+
+        oParser = new parserFormula( "AVEDEV(-3.5,1.4,6.9,-4.5)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 4.075 );
+
+        oParser = new parserFormula( "AVEDEV({-3.5,1.4,6.9,-4.5})", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 4.075 );
+
+        oParser = new parserFormula( "AVEDEV(-3.5,1.4,6.9,-4.5,-0.3)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 3.32 );
+
+    } )
+
+    test( "Test: \"AVERAGE\"", function () {
+
+        oParser = new parserFormula( "AVERAGE(1,2,3,4,5)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 3 );
+
+        oParser = new parserFormula( "AVERAGE({1,2;3,4})", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 2.5 );
+
+        oParser = new parserFormula( "AVERAGE({1,2,3,4,5},6,\"7\")", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 4 );
+
+        oParser = new parserFormula( "AVERAGE({1,\"2\",TRUE,4})", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 2.5 );
+
+    } )
+
+    test( "Test: \"AVERAGEA\"", function () {
+
+        ws.getRange2( "E2" ).setValue( "TRUE" );
+        ws.getRange2( "E3" ).setValue( "FALSE" );
+
+        oParser = new parserFormula( "AVERAGEA(10,E1)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 10 );
+
+        oParser = new parserFormula( "AVERAGEA(10,E2)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 5.5 );
+
+        oParser = new parserFormula( "AVERAGEA(10,E3)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 5 );
+
+    } )
+
+    test( "Test: \"AVERAGEIF\"", function () {
+
+        ws.getRange2( "E2" ).setValue( "10" );
+        ws.getRange2( "E3" ).setValue( "20" );
+        ws.getRange2( "E4" ).setValue( "28" );
+        ws.getRange2( "E5" ).setValue( "30" );
+
+        oParser = new parserFormula( "AVERAGEIF(E2:E5,\">15\")", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 26 );
+
+    } )
+
+    test( "Test: \"BINOMDIST\"", function () {
+
+        function binomCoeff(n,k){
+            return Math.fact( n ) / (Math.fact( k ) * Math.fact( n - k ));
+        }
+
+        function binomdist(x,n,p){
+            x= parseInt(x);
+            n = parseInt(n);
+            return binomCoeff(n,x)*Math.pow(p,x)*Math.pow(1-p,n-x);
+        }
+
+        oParser = new parserFormula( "BINOMDIST(6,10,0.5,FALSE)", "A1", ws );
+        ok( oParser.parse() );
+        ok( Math.abs( oParser.calculate().getValue() - binomdist(6,10,0.5) ) < dif );
+
+        oParser = new parserFormula( "BINOMDIST(6,10,0.5,TRUE)", "A1", ws );
+        ok( oParser.parse() );
+        ok( Math.abs( oParser.calculate().getValue() - (function(){
+            var bm = 0;
+            for(var y = 0; y <= 6; y++){
+                bm+=binomdist(y,10,0.5)
+            }
+            return bm;
+        })() ) < dif );
+
+        oParser = new parserFormula( "BINOMDIST(11,10,0.5,FALSE)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+    } )
+
+    test( "Test: \"CONFIDENCE\"", function () {
+
+        oParser = new parserFormula( "CONFIDENCE(0.4,5,12)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(),  1.214775614397568 );
+
+        oParser = new parserFormula( "CONFIDENCE(0.75,9,7)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(),  1.083909233527114 );
+
+    } )
+
+    test( "Test: \"CORREL\"", function () {
+
+        oParser = new parserFormula( "CORREL({2.532,5.621;2.1,3.4},{5.32,2.765;5.2,\"f\"})", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(),  -0.988112020032211 );
+
+        oParser = new parserFormula( "CORREL({1;2;3},{4;5;\"E\"})", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(),  1 );
+
+        oParser = new parserFormula( "CORREL({1,2},{1,\"e\"})", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(),  "#DIV/0!" );
+
+    } )
+
+    test( "Test: \"COUNT\"", function () {
+
+        ws.getRange2( "E2" ).setValue( "TRUE" );
+
+        oParser = new parserFormula( "COUNT({1,2,3,4,5})", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 5 );
+
+        oParser = new parserFormula( "COUNT(1,2,3,4,5)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 5 );
+
+        oParser = new parserFormula( "COUNT({1,2,3,4,5},6,\"7\")", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 7 );
+
+        oParser = new parserFormula( "COUNT(10,E150)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 1 );
+
+        oParser = new parserFormula( "COUNT(10,E2)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 1 );
+
+
+    } )
+
+    test( "Test: \"COUNTA\"", function () {
+
+        ws.getRange2( "E2" ).setValue( "TRUE" );
+
+        oParser = new parserFormula( "COUNTA({1,2,3,4,5})", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 5 );
+
+        oParser = new parserFormula( "COUNTA(1,2,3,4,5)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 5 );
+
+        oParser = new parserFormula( "COUNTA({1,2,3,4,5},6,\"7\")", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 7 );
+
+        oParser = new parserFormula( "COUNTA(10,E150)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 1 );
+
+        oParser = new parserFormula( "COUNTA(10,E2)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 2 );
+
+
+    } )
+
+    test( "Test: \"COUNTIF\"", function () {
+
+        ws.getRange2( "A7" ).setValue( "3" );
+        ws.getRange2( "B7" ).setValue( "10" );
+        ws.getRange2( "C7" ).setValue( "7" );
+        ws.getRange2( "D7" ).setValue( "10" );
+
+        ws.getRange2( "A8" ).setValue( "apples" );
+        ws.getRange2( "B8" ).setValue( "oranges" );
+        ws.getRange2( "C8" ).setValue( "grapes" );
+        ws.getRange2( "D8" ).setValue( "melons" );
+
+
+        oParser = new parserFormula( "COUNTIF(A7:D7,\"=10\")", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 2 );
+
+        oParser = new parserFormula( "COUNTIF(A7:D7,\">5\")", "B1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 3 );
+
+        oParser = new parserFormula( "COUNTIF(A7:D7,\"<>10\")", "C1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 2 );
+
+        oParser = new parserFormula( "COUNTIF(A8:D8,\"*es\")", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 3 );
+
+        oParser = new parserFormula( "COUNTIF(A8:D8,\"??a*\")", "B2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 2 );
+
+        oParser = new parserFormula( "COUNTIF(A8:D8,\"*l*\")", "C2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 2 );
+
+    } )
+
+    test( "Test: \"COVAR\"", function () {
+
+        oParser = new parserFormula( "COVAR({2.532,5.621;2.1,3.4},{5.32,2.765;5.2,6.7})", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), -1.3753740625 );
+
+        oParser = new parserFormula( "COVAR({1,2};{4,5})", "B1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 0.25 );
+
+    } )
+
+    test( "Test: \"CRITBINOM\"", function () {
+
+        oParser = new parserFormula( "CRITBINOM(6,0.5,0.75)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 4 );
+
+        oParser = new parserFormula( "CRITBINOM(12,0.3,0.95)", "B1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 6 );
+
+        oParser = new parserFormula( "CRITBINOM(-12,0.3,0.95)", "B1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+        oParser = new parserFormula( "CRITBINOM(-12,1.3,0.95)", "B1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+        oParser = new parserFormula( "CRITBINOM(-12,-1.3,0.95)", "B1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+        oParser = new parserFormula( "CRITBINOM(-12,0,0.95)", "B1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+        oParser = new parserFormula( "CRITBINOM(-12,0.3,1.95)", "B1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
 
     } )
 

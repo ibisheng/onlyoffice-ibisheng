@@ -1531,6 +1531,10 @@ function cNumber( val ) {
     cNumber.superclass.constructor.call( this, val );
     this.type = cElementType.number;
     this.value = parseFloat( val );
+    if( !isNaN( this.value ) && Math.abs(this.value)!=Infinity )
+        return this;
+   else
+        return new cError( cErrorType.not_numeric );
 }
 extend( cNumber, cBaseType );
 cNumber.prototype.getValue = function () {
@@ -1587,12 +1591,10 @@ function cBool( val ) {
     this.type = cElementType.bool;
     var that = this;
     switch ( val.toString().toUpperCase() ) {
-        case "TRUE"/* ||true */
-        :
+        case "TRUE":
             this.value = true;
             break;
-        case "FALSE"/* ||false */
-        :
+        case "FALSE":
             this.value = false;
             break;
     }
