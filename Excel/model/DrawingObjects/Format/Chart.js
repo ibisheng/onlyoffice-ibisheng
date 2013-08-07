@@ -65,6 +65,60 @@ CChartAsGroup.prototype =
 
     },
 
+    getBoundsInGroup: function()
+    {
+
+        return {minX: this.x, minY: this.y, maxX: this.x + this.extX, maxY: this.y + this.extY};
+        var r = this.rot;
+        if((r >= 0 && r < Math.PI*0.25)
+            || (r > 3*Math.PI*0.25 && r < 5*Math.PI*0.25)
+            || (r > 7*Math.PI*0.25 && r < 2*Math.PI))
+        {
+        }
+        else
+        {
+            var hc = this.extX*0.5;
+            var vc = this.extY*0.5;
+            var xc = this.x + hc;
+            var yc = this.y + vc;
+            return {minX: xc - vc, minY: yc - hc, maxX: xc + vc, maxY: yc + hc};
+        }
+    },
+    hitInTextRect: function()
+    {
+        return false;
+    },
+
+    setGroup: function(group)
+    {
+        var oldId = isRealObject(this.group) ? this.group.Get_Id() : null;
+        var newId = isRealObject(group) ? group.Get_Id() : null;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetGroup, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldId, newId)));
+        this.group = group;
+    },
+
+
+    hitInInnerArea: function(x, y)
+    {
+        var invert_transform = this.getInvertTransform();
+        var x_t = invert_transform.TransformPointX(x, y);
+        var y_t = invert_transform.TransformPointY(x, y);
+        if(isRealObject(this.spPr.geometry))
+            return this.spPr.geometry.hitInInnerArea(this.drawingObjects.getCanvasContext(), x_t, y_t);
+        return x_t > 0 && x_t < this.extX && y_t > 0 && y_t < this.extY;
+    },
+
+    hitInPath: function(x, y)
+    {
+        var invert_transform = this.getInvertTransform();
+        var x_t = invert_transform.TransformPointX(x, y);
+        var y_t = invert_transform.TransformPointY(x, y);
+        if(isRealObject(this.spPr.geometry))
+            return this.spPr.geometry.hitInPath(this.drawingObjects.getCanvasContext(), x_t, y_t);
+        return false;
+    },
+
 
     recalculateColors: function()
     {
@@ -89,6 +143,22 @@ CChartAsGroup.prototype =
     isGroup: function()
     {
         return false;
+    },
+
+    Get_Props: function(OtherProps)
+    {
+        var Props = new Object();
+        Props.Width  = this.extX;
+        Props.Height = this.extY;
+
+        if(!isRealObject(OtherProps))
+            return Props;
+
+
+        OtherProps.Width = OtherProps.Width === Props.Width ? Props.Width : undefined;
+        OtherProps.Height = OtherProps.Height === Props.Height ? Props.Height : undefined;
+
+        return OtherProps;
     },
 
 	syncAscChart: function() {
@@ -1974,6 +2044,11 @@ CChartAsGroup.prototype =
         var tx = this.invertTransform.TransformPointX(x, y);
         var ty = this.invertTransform.TransformPointY(x, y);
         return tx > 0 && tx < this.extX && ty > 0 && ty < this.extY;
+    },
+
+    canGroup: function()
+    {
+        return true;
     },
 
     canRotate: function()

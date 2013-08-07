@@ -2077,240 +2077,36 @@ CShape.prototype =
 	
 	changeFill : function(ascFill)
     {
-        //var historyObj = {Type: historyitem_ChangeFill};
-        if(this.spPr.Fill == null)
-        {
-            //historyObj.old_Fill = null;
-        }
-        else
-        {
-            //historyObj.old_Fill = this.spPr.Fill.createDuplicate();
-        }
-        if(this.spPr.Fill == null )
-        {
-            this.spPr.Fill = new CUniFill();
-        }
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateBrushUndo, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(null, null)), null);
 
-        this.spPr.Fill = CorrectUniFillEx(ascFill, this.spPr.Fill);
-        if(this.spPr.Fill == null)
-        {
-            //historyObj.new_Fill = null;
-        }
-        else
-        {
-            //historyObj.new_Fill = this.spPr.Fill.createDuplicate();
-        }
+        this.setUniFill(CorrectUniFillEx(ascFill, this.spPr.Fill));
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateBrushRedo, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(null, null)), null);
+
+        //this.spPr.Fill = CorrectUniFillEx(ascFill, this.spPr.Fill);
+
        /* if(isRealObject(this.spPr.Fill) && isRealObject(this.spPr.Fill.fill) && this.spPr.Fill.fill.type === FILL_TYPE_BLIP)
         {
             editor.WordControl.m_oLogicDocument.DrawingObjects.urlMap.push(this.spPr.Fill.fill.RasterImageId);
         }  */
         //History.Add(this, historyObj);
-        this.calculateFill();
+        this.recalculateBrush();
     },
 
     changeLine : function(line)
     {
-        //var historyObj = {Type: historyitem_ChangeLine};
-        if(this.spPr.ln != null)
-        {
-            //historyObj.old_Line = this.spPr.ln.createDuplicate();
-        }
-        else
-        {
-            //historyObj.old_Line = null;
-        }
-        //this.spPr.ln.merge(line);
-        this.spPr.ln = CorrectUniStrokeEx(line, this.spPr.ln);
-        //historyObj.new_Line = this.spPr.ln.createDuplicate();
-
-        //History.Add(this, historyObj);
-        this.calculateLine();
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateBrushUndo, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(null, null)), null);
+        this.setUniLine(CorrectUniStrokeEx(line, this.spPr.ln));
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateBrushRedo, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(null, null)), null);
+        this.recalculatePen();
     },
 
     changePresetGeometry: function(sPreset)
     {
-        var _final_preset;
-        var _old_line;
-        var _new_line;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(null, null)), null);
+        this.setPresetGeometry(sPreset);
+        this.spPr.geometry.Recalculate(this.extX, this.extY);
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(null, null)), null);
 
-
-        if(this.spPr.ln == null)
-        {
-            _old_line = null;
-        }
-        else
-        {
-            _old_line = this.spPr.ln.createDuplicate();
-        }
-        var _arrow_flag = false;
-        switch(sPreset)
-        {
-            case "lineWithArrow":
-            {
-                _final_preset = "line";
-                _arrow_flag = true;
-                if(_old_line == null)
-                {
-                    _new_line = new CLn();
-                }
-                else
-                {
-                    _new_line = this.spPr.ln.createDuplicate();
-                }
-                _new_line.tailEnd = new EndArrow();
-                _new_line.tailEnd.type = LineEndType.Arrow;
-                _new_line.tailEnd.len = LineEndSize.Mid;
-                _new_line.tailEnd.w = LineEndSize.Mid;
-                break;
-            }
-            case "lineWithTwoArrows":
-            {
-                _final_preset = "line";
-                _arrow_flag = true;
-                if(_old_line == null)
-                {
-                    _new_line = new CLn();
-
-                }
-                else
-                {
-                    _new_line = this.spPr.ln.createDuplicate();
-                }
-                _new_line.tailEnd = new EndArrow();
-                _new_line.tailEnd.type = LineEndType.Arrow;
-                _new_line.tailEnd.len = LineEndSize.Mid;
-                _new_line.tailEnd.w = LineEndSize.Mid;
-
-                _new_line.headEnd = new EndArrow();
-                _new_line.headEnd.type = LineEndType.Arrow;
-                _new_line.headEnd.len = LineEndSize.Mid;
-                _new_line.headEnd.w = LineEndSize.Mid;
-                break;
-            }
-            case "bentConnector5WithArrow":
-            {
-                _final_preset = "bentConnector5";
-                _arrow_flag = true;
-                if(_old_line == null)
-                {
-                    _new_line = new CLn();
-
-                }
-                else
-                {
-                    _new_line = this.spPr.ln.createDuplicate();
-                }
-                _new_line.tailEnd = new EndArrow();
-                _new_line.tailEnd.type = LineEndType.Arrow;
-                _new_line.tailEnd.len = LineEndSize.Mid;
-                _new_line.tailEnd.w = LineEndSize.Mid;
-                break;
-            }
-            case "bentConnector5WithTwoArrows":
-            {
-                _final_preset = "bentConnector5";
-                _arrow_flag = true;
-                if(_old_line == null)
-                {
-                    _new_line = new CLn();
-
-                }
-                else
-                {
-                    _new_line = this.spPr.ln.createDuplicate();
-                }
-                _new_line.tailEnd = new EndArrow();
-                _new_line.tailEnd.type = LineEndType.Arrow;
-                _new_line.tailEnd.len = LineEndSize.Mid;
-                _new_line.tailEnd.w = LineEndSize.Mid;
-
-                _new_line.headEnd = new EndArrow();
-                _new_line.headEnd.type = LineEndType.Arrow;
-                _new_line.headEnd.len = LineEndSize.Mid;
-                _new_line.headEnd.w = LineEndSize.Mid;
-                break;
-            }
-            case "curvedConnector3WithArrow":
-            {
-                _final_preset = "curvedConnector3";
-                _arrow_flag = true;
-                if(_old_line == null)
-                {
-                    _new_line = new CLn();
-
-                }
-                else
-                {
-                    _new_line = this.spPr.ln.createDuplicate();
-                }
-                _new_line.tailEnd = new EndArrow();
-                _new_line.tailEnd.type = LineEndType.Arrow;
-                _new_line.tailEnd.len = LineEndSize.Mid;
-                _new_line.tailEnd.w = LineEndSize.Mid;
-                break;
-            }
-            case "curvedConnector3WithTwoArrows":
-            {
-                _final_preset = "curvedConnector3";
-                _arrow_flag = true;
-                if(_old_line == null)
-                {
-                    _new_line = new CLn();
-
-                }
-                else
-                {
-                    _new_line = this.spPr.ln.createDuplicate();
-                }
-                _new_line.tailEnd = new EndArrow();
-                _new_line.tailEnd.type = LineEndType.Arrow;
-                _new_line.tailEnd.len = LineEndSize.Mid;
-                _new_line.tailEnd.w = LineEndSize.Mid;
-
-                _new_line.headEnd = new EndArrow();
-                _new_line.headEnd.type = LineEndType.Arrow;
-                _new_line.headEnd.len = LineEndSize.Mid;
-                _new_line.headEnd.w = LineEndSize.Mid;
-                break;
-            }
-            default  :
-            {
-                _final_preset = sPreset;
-                _arrow_flag = true;
-                if(_old_line == null)
-                {
-                    _new_line = new CLn();
-
-                }
-                else
-                {
-                    _new_line = this.spPr.ln.createDuplicate();
-                }
-                _new_line.tailEnd = null;
-
-                _new_line.headEnd = null;
-                break;
-            }
-        }
-
-        //var historyData = {Type: historyitem_ChangePresetGeom};
-        //historyData.arrowFlag = _arrow_flag;
-        if(_arrow_flag === true)
-        {
-            //historyData.oldLine = _old_line;
-            //historyData.newLine = _new_line;
-            this.spPr.ln = _new_line;
-            this.calculateLine();
-        }
-        //historyData.old_geometryPreset = isRealObject(this.spPr.geometry) ? this.spPr.geometry.preset : null;
-        //historyData.new_geometryPreset = _final_preset;
-
-
-        //History.Add(this, historyData);
-
-        this.spPr.geometry = CreateGeometry(_final_preset);
-        this.spPr.geometry.Init(100, 100);
-        this.calculateAfterResize();
     },
 	
 	canChangeArrows : function()
@@ -2633,8 +2429,15 @@ CShape.prototype =
 		var Props = new Object();
         Props.Width  = this.extX;
         Props.Height = this.extY;
-		
-		return Props;
+
+        if(!isRealObject(OtherProps))
+            return Props;
+
+
+        OtherProps.Width = OtherProps.Width === Props.Width ? Props.Width : undefined;
+        OtherProps.Height = OtherProps.Height === Props.Height ? Props.Height : undefined;
+
+		return OtherProps;
 	},
 	
 
@@ -2736,7 +2539,9 @@ CShape.prototype =
 
             case historyitem_AutoShapes_RecalculateBrushUndo:
             {
+
                 this.recalculateBrush();
+                this.recalculatePen();
                 break;
             }
         }
@@ -2749,6 +2554,7 @@ CShape.prototype =
             case historyitem_AutoShapes_RecalculateBrushRedo:
             {
                 this.recalculateBrush();
+                this.recalculatePen();
                 break;
             }
             case historyitem_AutoShapes_RecalculateAfterParagraphAddRedo:

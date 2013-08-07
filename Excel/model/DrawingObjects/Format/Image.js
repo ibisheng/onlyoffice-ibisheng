@@ -983,14 +983,26 @@ CImage.prototype =
     {
     },
 
-	Get_Props: function(OtherProps)
+    Get_Props: function(OtherProps)
     {
-		var Props = new Object();
+        var Props = new Object();
         Props.Width  = this.extX;
         Props.Height = this.extY;
-		
-		return Props;
-	},
+
+        if(!isRealObject(OtherProps))
+            return Props;
+
+
+        OtherProps.Width = OtherProps.Width === Props.Width ? Props.Width : undefined;
+        OtherProps.Height = OtherProps.Height === Props.Height ? Props.Height : undefined;
+
+        return OtherProps;
+    },
+
+    getImageProps: function()
+    {
+        return {ImageUrl: this.blipFill.RasterImageId, Width: this.extX, Height: this.extY};
+    },
 
 
 

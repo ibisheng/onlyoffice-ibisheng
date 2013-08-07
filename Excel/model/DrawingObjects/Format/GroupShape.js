@@ -1028,6 +1028,337 @@ CGroupShape.prototype =
         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Add_To_Drawing_Objects, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(position, null)), null);
     },
 
+    changePresetGeometry: function(preset)
+    {
+        for(var i =0; i < this.arrGraphicObjects.length; ++i)
+        {
+            if(typeof this.arrGraphicObjects[i].changePresetGeometry === "function")
+                this.arrGraphicObjects[i].changePresetGeometry(preset);
+        }
+    },
+
+    Get_Props: function(OtherProps)
+    {
+        var Props = new Object();
+        Props.Width  = this.extX;
+        Props.Height = this.extY;
+
+        if(!isRealObject(OtherProps))
+            return Props;
+
+
+        OtherProps.Width = OtherProps.Width === Props.Width ? Props.Width : undefined;
+        OtherProps.Height = OtherProps.Height === Props.Height ? Props.Height : undefined;
+
+        return OtherProps;
+    },
+
+    getFill: function()
+    {
+        var _ret = null;
+        var _shapes = this.arrGraphicObjects;
+        var _shape_index;
+        for(_shape_index = 0; _shape_index < _shapes.length; ++_shape_index)
+        {
+            if(_shapes[_shape_index].isShape())
+            {
+                _ret = _shapes[_shape_index].getFill();
+                if(_ret == null)
+                {
+                    return null;
+                }
+                break;
+            }
+        }
+        if(_shape_index < _shapes.length)
+        {
+            ++_shape_index;
+            var _cur_fill;
+            for(;_shape_index < _shapes.length; ++_shape_index)
+            {
+                if(_shapes[_shape_index].isShape())
+                {
+                    _cur_fill = _shapes[_shape_index].getFill();
+                    _ret = CompareUniFill(_ret, _cur_fill);
+                }
+            }
+        }
+        return _ret;
+    },
+
+    getStroke: function()
+    {
+        var _ret = null;
+        var _shapes = this.arrGraphicObjects;
+        var _shape_index;
+        for(_shape_index = 0; _shape_index < _shapes.length; ++_shape_index)
+        {
+            if(_shapes[_shape_index].isShape())
+            {
+                _ret = _shapes[_shape_index].getStroke();
+                if(_ret == null)
+                {
+                    return null;
+                }
+                break;
+            }
+        }
+        if(_shape_index < _shapes.length)
+        {
+            ++_shape_index;
+            var _cur_line;
+            for(;_shape_index < _shapes.length; ++_shape_index)
+            {
+                if(_shapes[_shape_index].isShape())
+                {
+                    _cur_line = _shapes[_shape_index].getStroke();
+                    if(_cur_line == null)
+                    {
+                        return null;
+                    }
+                    else
+                    {
+                        _ret = _ret.compare(_cur_line);
+                    }
+                }
+            }
+        }
+        return _ret;
+    },
+
+    canChangeArrows: function()
+    {
+        var _ret = false;
+        var _shapes = this.spTree;
+        var _shape_index;
+        for(_shape_index = 0; _shape_index < _shapes.length; ++_shape_index)
+        {
+            if(_shapes[_shape_index].canChangeArrows)
+            {
+                _ret = _shapes[_shape_index].canChangeArrows();
+                if(_ret == false)
+                {
+                    return false;
+                }
+                break;
+            }
+        }
+        if(_shape_index < _shapes.length)
+        {
+            ++_shape_index;
+            var _cur_line;
+            for(;_shape_index < _shapes.length; ++_shape_index)
+            {
+                if(_shapes[_shape_index].canChangeArrows)
+                {
+                    if(_shapes[_shape_index].canChangeArrows() == false)
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+        return _ret;
+    },
+
+
+    haveShapes: function()
+    {
+        for(var i = 0; i < this.arrGraphicObjects.length; ++i)
+        {
+            if(this.arrGraphicObjects[i].isShape())
+                return true;
+        }
+        return false;
+    },
+
+    haveImages: function()
+    {
+        for(var i = 0; i < this.arrGraphicObjects.length; ++i)
+        {
+            if(this.arrGraphicObjects[i].isImage())
+                return true;
+        }
+        return false;
+    },
+
+    haveChart: function()
+    {
+        for(var i = 0; i < this.arrGraphicObjects.length; ++i)
+        {
+            if(this.arrGraphicObjects[i].isChart())
+                return true;
+        }
+        return false;
+    },
+
+
+    getImageUrl: function()
+    {
+        var ret = null;
+        for(var i = 0; i < this.arrGraphicObjects.length; ++i)
+        {
+            if(this.arrGraphicObjects[i].isImage())
+            {
+                if(ret === null)
+                {
+                    ret = this.arrGraphicObjects[i].getImageUrl();
+                }
+                else
+                {
+                    if(ret !== this.arrGraphicObjects[i].getImageUrl())
+                        return undefined;
+                }
+            }
+        }
+        return ret;
+    },
+
+    getPresetGeom: function()
+    {
+        var _ret = null;
+        var _shapes = this.arrGraphicObjects;
+        var _shape_index;
+        for(_shape_index = 0; _shape_index < _shapes.length; ++_shape_index)
+        {
+            if(_shapes[_shape_index].isShape())
+            {
+                _ret = _shapes[_shape_index].getPresetGeom();
+                if(_ret == null)
+                {
+                    return null;
+                }
+                break;
+            }
+        }
+        if(_shape_index < _shapes.length)
+        {
+            ++_shape_index;
+            var _cur_preset;
+            for(;_shape_index < _shapes.length; ++_shape_index)
+            {
+                if(_shapes[_shape_index].isShape())
+                {
+                    _cur_preset = _shapes[_shape_index].getPresetGeom();
+                    if(_cur_preset == null || _cur_preset != _ret)
+                    {
+                        return null;
+                    }
+                }
+            }
+        }
+        return _ret;
+    },
+
+    getImageProps: function()
+    {
+        var _objects = this.arrGraphicObjects;
+        var _cur_object;
+        var _object_index;
+        var _object_count = _objects.length;
+        var _cur_image_props;
+        var _result_image_props = null;
+        for(_object_index = 0; _object_index < _object_count; ++_object_index)
+        {
+            _cur_object = _objects[_object_index];
+            if(_cur_object.isImage())
+            {
+                _cur_image_props = _cur_object.getImageProps();
+                if(_cur_image_props !== null)
+                {
+                    if(_result_image_props === null)
+                    {
+                        _result_image_props = _cur_image_props;
+                    }
+                    else
+                    {
+                        _result_image_props = CompareImageProperties(_result_image_props, _cur_image_props);
+                    }
+                }
+            }
+        }
+        return _result_image_props;
+    },
+
+
+    changeFill: function(fill)
+    {
+        for(var i = 0; i < this.arrGraphicObjects.length; ++i)
+        {
+            if(typeof this.arrGraphicObjects[i].changeFill ==="function")
+                this.arrGraphicObjects[i].changeFill(fill);
+        }
+    },
+
+
+    changeLine: function(line)
+    {
+        for(var i = 0; i < this.arrGraphicObjects.length; ++i)
+        {
+            if(typeof this.arrGraphicObjects[i].changeLine ==="function")
+                this.arrGraphicObjects[i].changeLine(line);
+        }
+    },
+
+    getShapeProps: function()
+    {
+        if(this.haveShapes())
+        {
+            var shape_props = new asc_CShapeProperty();
+            shape_props.type = this.getPresetGeom();
+            shape_props.fill = this.getFill();
+            shape_props.stroke = this.getStroke();
+            shape_props.canChangeArrows = this.canChangeArrows();
+            return {ShapeProperties : shape_props}
+        }
+        return null;
+    },
+
+    getImageProps2: function()
+    {
+        if(this.haveImages())
+        {
+            var img_pr = new asc_CImgProperty();
+            img_pr.ImageUrl = this.getImageUrl();
+        }
+            return img_pr;
+        return null;
+    },
+
+    getChartProps: function()
+    {
+        var ret = null;
+        for(var i = 0; i < this.arrGraphicObjects.length; ++i)
+        {
+            if(this.arrGraphicObjects[i].isChart())
+            {
+                if(!isRealObject(ret))
+                {
+                    ret = new asc_CImgProperty();
+                    ret.ChartProperties = this.arrGraphicObjects[i].chart;
+                }
+                else
+                {
+                    ret.severalCharts = true;
+                    if(ret.severalChartTypes !== true)
+                    {
+                        if(!(ret.ChartProperties.type === this.arrGraphicObjects[i].chart.type && ret.ChartProperties.subType === this.arrGraphicObjects[i].chart.subType) )
+                            ret.severalChartTypes = true;
+                    }
+                    if(ret.severalChartStyles !== true)
+                    {
+                        if(ret.ChartProperties.styleId !== this.arrGraphicObjects[i].chart.styleId )
+                            ret.severalChartStyles = true;
+                    }
+                }
+            }
+        }
+        return ret;
+    },
+
+
+
+
     Undo: function(type, data)
     {
         switch(type)

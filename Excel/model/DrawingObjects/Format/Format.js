@@ -2353,7 +2353,7 @@ function CompareUniFill(unifill_1, unifill_2)
 
 function CompareShapeProperties(shapeProp1, shapeProp2)
 {
-    var _result_shape_prop = {};
+    var _result_shape_prop = new asc_CShapeProperty();
     if(shapeProp1.type === shapeProp2.type)
     {
         _result_shape_prop.type = shapeProp1.type;
@@ -2382,7 +2382,7 @@ function CompareShapeProperties(shapeProp1, shapeProp2)
 
 function CompareImageProperties(imgProps1, imgProps2)
 {
-    var _result_image_properties = {};
+    var _result_image_properties = new asc_CImgProperty();
     if(imgProps1.Width == null || imgProps2.Width == null)
     {
         _result_image_properties.Width = null;
