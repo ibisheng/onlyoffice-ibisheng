@@ -658,7 +658,7 @@ historyitem_TableCell_Border_Left:hC
 tt_service_get_cmap_info:Mo
 tt_size_done:os
 tt_cmap2_char_next:In
-create_psnames_module:Yk
+create_psnames_module:Qk
 CFF_IndexRec:Bs
 PolyLineAddState2:yH
 FT_SubGlyph:Vi
@@ -1442,7 +1442,7 @@ L 119:$s
 L 116:Rm
 ParaNewLine:Kc
 L 117:op
-L 114:Xk
+L 114:Yk
 L 115:Kz
 TT_GaspRange:vj
 CopyProcessor:ua
@@ -1504,7 +1504,7 @@ CAscFill:oM
 L 106:Qm
 L 107:Ve
 L 108:Cj
-L 109:Wk
+L 109:Xk
 LineJoinType$Bevel:eI
 para_Empty:cy
 c_oAscSlideTransitionParams$Param_Left:wI
@@ -1737,7 +1737,7 @@ ParaHyperlinkEnd:Oc
 cff_builder_start_point:Zt
 pararecalc_0_None:mD
 LAYOUT_KIND:tA
-L 39:Qk
+L 39:Rk
 L 38:pd
 L 37:fd
 locktype_None:lx
@@ -1795,8 +1795,8 @@ TRACK_CIRCLE_RADIUS:hG
 tt_face_load_bhed:Ym
 T1_Loader:Ru
 nSldLtTClipArtAndTx:LJ
-L 59:Sk
-L 58:Rk
+L 59:Tk
+L 58:Sk
 L 57:bK
 L 56:aK
 L 55:Us
@@ -1991,8 +1991,8 @@ L 75:Aj
 _ph_summ__sec_head:ZK
 tt_face_load_bdf_props:Im
 L 76:Bj
-L 77:Uk
-L 78:Vk
+L 77:Vk
+L 78:Wk
 t1_args_count:lm
 dublicate_matrix:ak
 L 79:gi
@@ -2018,7 +2018,7 @@ CUniFill:qf
 L 63:zj
 L 68:mp
 L 69:np
-L 66:Tk
+L 66:Uk
 Ins_MSIRP:dr
 L 67:Om
 JSCompiler_StaticMethods_getSrc:Ba
