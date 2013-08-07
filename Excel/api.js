@@ -358,7 +358,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					this.chartEditor			= c_DocInfo["ChartEditor"];
 					this.documentOpenOptions 	= c_DocInfo["Options"];
 
-					var nIndex = this.documentTitle.lastIndexOf(".");
+					var nIndex = -1;
+					if(this.documentTitle)
+						nIndex = this.documentTitle.lastIndexOf(".");
 					if(-1 != nIndex)
 						this.documentTitleWithoutExtention = this.documentTitle.substring(0, nIndex);
 					else

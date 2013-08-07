@@ -373,7 +373,9 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
         documentTitle = c_DocInfo.get_Title();
         documentFormat = c_DocInfo.get_Format();
 
-		var nIndex = documentTitle.lastIndexOf(".");
+		var nIndex = -1;
+		if(documentTitle)
+			nIndex = documentTitle.lastIndexOf(".");
 		if(-1 != nIndex)
 			documentTitleWithoutExtention = documentTitle.substring(0, nIndex);
 		else
