@@ -563,6 +563,9 @@ asc_docs_api.prototype.OpenDocument2 = function(url, gObject)
 
 	this.FontLoader.LoadEmbeddedFonts(this.DocumentUrl, this.WordControl.m_oLogicDocument.EmbeddedFonts);
 	this.FontLoader.LoadDocumentFonts(this.WordControl.m_oLogicDocument.Fonts, false);
+
+    if (window.USER_AGENT_SAFARI_MACOS)
+        setInterval(SafariIntervalFocus, 10);
 }
 asc_docs_api.prototype.get_DocumentName = function()
 {
