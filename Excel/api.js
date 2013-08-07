@@ -2559,11 +2559,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.wbModel.rebuildColors();
 				this.asc_CheckGuiControlColors();
 				this.asc_ApplyColorScheme(true);
-				this.handlers.trigger("asc_onUpdateChartStyles");
 			},
 			asc_ApplyColorScheme : function(bRedraw) {
 				this.chartStyleManager.init();
 				this.chartPreviewManager.init();
+				this.handlers.trigger("asc_onUpdateChartStyles");
 				var ws = this.wb.getWorksheet();
 				ws.objectRender.controller.applyColorScheme();
 
