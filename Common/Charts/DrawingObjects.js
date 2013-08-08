@@ -2230,10 +2230,15 @@ function DrawingObjects() {
 		
 		function restoreSheetArea(checker) {
 		
-			var topRow = worksheet._findRowUnderCursor( mmToPt(checker.Bounds.min_y), true).row;
-			var leftCol = worksheet._findColUnderCursor( mmToPt(checker.Bounds.min_x), true).col;
-			var bottomRow = worksheet._findRowUnderCursor( mmToPt(checker.Bounds.max_y), true).row;
-			var rightcol = worksheet._findColUnderCursor( mmToPt(checker.Bounds.max_x), true).col;
+			var foundRow = worksheet._findRowUnderCursor( mmToPt(checker.Bounds.min_y + pxToMm(scrollOffset.y)), true);		
+			var topRow = foundRow ? foundRow.row : 0;
+			var foundCol = worksheet._findColUnderCursor( mmToPt(checker.Bounds.min_x + pxToMm(scrollOffset.x)), true);
+			var leftCol = foundCol ? foundCol.col : 0;
+			
+			foundRow = worksheet._findRowUnderCursor( mmToPt(checker.Bounds.max_y + pxToMm(scrollOffset.y)), true);
+			var bottomRow = foundRow ? foundRow.row : 0;
+			foundCol = worksheet._findColUnderCursor( mmToPt(checker.Bounds.max_x + pxToMm(scrollOffset.x)), true);
+			var rightcol = foundCol ? foundCol.col : 0;
 			
 			var r_ = asc_Range( leftCol, topRow, rightcol, bottomRow );
 			worksheet._drawGrid( undefined, r_);
