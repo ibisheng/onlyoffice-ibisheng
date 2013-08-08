@@ -1468,7 +1468,7 @@ tt_face_load_hmtx:ht
 c_oAscServerError$ConvertReadFile:Lf
 numbering_numfmt_UpperLetter:eb
 JSCompiler_StaticMethods_Create_Table_BorderedAndLined:RN
-ScrollArrowType$ARROW_LEFT:n3
+ScrollArrowType$ARROW_LEFT:c3
 NumComporationOperators$greater:tg
 JSCompiler_StaticMethods_Cursor_IsEnd:Bc
 CErrorData:CU
@@ -2587,17 +2587,17 @@ c_oSer_CommentsType$UserId:qZ
 L 123:$A
 L 122:ZA
 L 121:Sl
-L 120:m3
+L 120:n3
 JSCompiler_StaticMethods__BordersToStyle:Ab
 JSCompiler_StaticMethods_AddRoundRect:e1
 FONT_TYPE_ADDITIONAL_CUT:jC
-L 118:k3
-L 119:l3
+L 118:l3
+L 119:m3
 ParaNewLine:ad
-L 116:i3
-L 117:j3
-L 114:g3
-L 115:h3
+L 116:j3
+L 117:k3
+L 114:h3
+L 115:i3
 FT_Set_Transform:nB
 CAscTableStyle:f2
 cff_parse_fixed:Oy
@@ -2635,15 +2635,15 @@ L 111:YA
 L 110:XA
 L 113:Sn
 bIsSupportOriginalFormatFonts:dC
-L 112:f3
+L 112:g3
 L 103:Kn
 L 104:ms
 CAutoshapeTrack:m1
 L 105:sA
 historyitem_AddToSpTree:gJ
-L 106:c3
-L 107:d3
-L 108:e3
+L 106:d3
+L 107:e3
+L 108:f3
 L 109:WA
 FT_Service_PsFontNameRec:Mn
 vertalign_SubScript:hc
