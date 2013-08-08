@@ -2249,10 +2249,10 @@ function DrawingObjects() {
 
 	_this.raiseLayerDrawingObjects = function() {
 		
-		for (var i = 0; i < _this.countDrawingObjects(); i++) {
+		/*for (var i = 0; i < _this.countDrawingObjects(); i++) {
 			var obj = aObjects[i];
-			obj.graphicObject.draw(shapeOverlayCtx);
-		}
+			obj.graphicObject.draw(shapeOverlayCtx, true);
+		}*/
 	}
 
 	_this.countDrawingObjects = function() {
@@ -3245,7 +3245,6 @@ function DrawingObjects() {
 			}
 			
 			_this.raiseLayerDrawingObjects();
-			//_this.controller.drawSelection(_this.drawingDocument);
             _this.OnUpdateOverlay();
         }
 		_this.drawWorksheetHeaders();
