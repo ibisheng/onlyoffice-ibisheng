@@ -311,9 +311,15 @@ function CEditorPage(api)
 
         if (this.m_oApi.isMobileVersion)
         {
-            var _text_bx_back = document.createElement('textarea');
+            var _tag_background = "textarea";
+            if (bIsAndroid)
+                _tag_background = "input";
+
+            var _text_bx_back = document.createElement(_tag_background);
             _text_bx_back.id = "id_text_box_background";
             _text_bx_back.setAttribute("style", "background:transparent;border-style:none;border-color:transparent;overflow:hidden;z-index:4;font-family:arial;font-size:12pt;position:absolute;resize:none;padding:0px;margin:0px;font-weight:normal;box-sizing:content-box;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;");
+            _text_bx_back.setAttribute("spellcheck", "false");
+            _text_bx_back.willValidate = false;
             this.m_oMainView.HtmlElement.appendChild(_text_bx_back);
 
             this.TextBoxBackground = CreateControl("id_text_box_background");
@@ -321,7 +327,7 @@ function CEditorPage(api)
             this.TextBoxBackground.Anchor = (g_anchor_left | g_anchor_top | g_anchor_right |g_anchor_bottom);
             this.m_oMainView.AddControl(this.TextBoxBackground);
 
-            this.TextBoxBackground.HtmlElement.innerHTML = "a";
+            this.TextBoxBackground.HtmlElement.value = "a";
         }
 
         this.m_oEditor = CreateControl("id_viewer");
@@ -567,6 +573,31 @@ function CEditorPage(api)
 
             if (bIsAndroid)
             {
+                /*
+                var moveCursorToEnd = function(el)
+                {
+                    if (typeof el.selectionStart == "number")
+                    {
+                        el.selectionStart = el.selectionEnd = el.value.length;
+                    }
+                    else if (typeof el.createTextRange != "undefined")
+                    {
+                        el.focus();
+                        var range = el.createTextRange();
+                        range.collapse(false);
+                        range.select();
+                    }
+                };
+                */
+
+                this.TextBoxBackground.HtmlElement["oncontextmenu"] = function(e){
+                    if (e.preventDefault)
+                        e.preventDefault();
+
+                    e.returnValue = false;
+                    return false;
+                };
+
                 window.IS_USE_INPUT = true;
                 this.TextBoxBackground.HtmlElement["oninput"] = function(e)
                 {
