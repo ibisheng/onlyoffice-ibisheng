@@ -319,6 +319,13 @@ function CEditorPage(api)
             _text_bx_back.id = "id_text_box_background";
             _text_bx_back.setAttribute("style", "background:transparent;border-style:none;border-color:transparent;overflow:hidden;z-index:4;font-family:arial;font-size:12pt;position:absolute;resize:none;padding:0px;margin:0px;font-weight:normal;box-sizing:content-box;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;");
             _text_bx_back.setAttribute("spellcheck", "false");
+
+            if (bIsAndroid)
+            {
+                _text_bx_back.setAttribute("autocomplete", "off");
+                _text_bx_back.setAttribute("type", "password");
+            }
+
             _text_bx_back.willValidate = false;
             this.m_oMainView.HtmlElement.appendChild(_text_bx_back);
 
@@ -647,6 +654,38 @@ function CEditorPage(api)
                     {
                         // пришла пустая. следом ждем "aa"
                         window.IS_USE_INPUT = false;
+                    }
+                    else
+                    {
+                        var _len = val.length;
+                        for (var i = 1; i < _len; i++)
+                        {
+                            var _e = {
+                                altKey : global_keyboardEvent.AltKey,
+                                ctrlKey : global_keyboardEvent.CtrlKey,
+                                shiftKey : global_keyboardEvent.ShiftKey,
+
+                                srcElement : global_keyboardEvent.Sender,
+
+                                charCode : global_keyboardEvent.CharCode,
+                                keyCode : global_keyboardEvent.KeyCode,
+                                which : val.charCodeAt(i)
+                            };
+
+                            _e.preventDefault = function()
+                            {
+                            };
+
+                            if (_e.which == 32)
+                            {
+                                _e.keyCode = 32;
+                                oThis.onKeyDown(_e);
+                            }
+                            else
+                            {
+                                oThis.onKeyPress(_e);
+                            }
+                        }
                     }
 
                     if (e.preventDefault)
