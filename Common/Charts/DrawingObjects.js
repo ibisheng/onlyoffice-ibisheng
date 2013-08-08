@@ -1515,6 +1515,7 @@ function DrawingObjects() {
 	var scrollOffset = { x: 0, y: 0 };
 	
 	var aObjects = null;
+	var lastBoundsChecker = null;
 	
 	var userId = null;
 	var documentId = null;
@@ -2199,15 +2200,46 @@ function DrawingObjects() {
 	}
 
 	_this.clearDrawingObjects = function() {
-		worksheet._clean();
+		
+		/*worksheet._clean();
 		worksheet._drawCorner();
 		worksheet._drawColumnHeaders();
 		worksheet._drawRowHeaders();
 		worksheet._drawGrid();
 		worksheet._drawCells();
-		worksheet._drawCellsBorders();
-		if ( !_this.selectedGraphicObjectsExists() )
-			worksheet._drawSelection();
+		worksheet._drawCellsBorders();*/
+		
+		var asc = window["Asc"];
+		var asc_Range = asc.Range;
+		
+		var boundsChecker = new  CSlideBoundsChecker();
+		boundsChecker.init(1, 1, 1, 1);
+		
+		for ( var i = 0; i < aObjects.length; i++ ) {
+			var drawingObject = aObjects[i];
+			
+			drawingObject.graphicObject.draw(boundsChecker);
+			boundsChecker.CorrectBounds();
+		}
+		
+		if ( lastBoundsChecker )
+			restoreSheetArea(lastBoundsChecker);		
+		
+		restoreSheetArea(boundsChecker);
+		lastBoundsChecker = boundsChecker;
+		
+		function restoreSheetArea(checker) {
+		
+			var topRow = worksheet._findRowUnderCursor( mmToPt(checker.Bounds.min_y), true).row;
+			var leftCol = worksheet._findColUnderCursor( mmToPt(checker.Bounds.min_x), true).col;
+			var bottomRow = worksheet._findRowUnderCursor( mmToPt(checker.Bounds.max_y), true).row;
+			var rightcol = worksheet._findColUnderCursor( mmToPt(checker.Bounds.max_x), true).col;
+			
+			var r_ = asc_Range( leftCol, topRow, rightcol, bottomRow );
+			worksheet._drawGrid( undefined, r_);
+			worksheet._drawCells(r_);
+			worksheet._drawCellsBorders(undefined, r_);
+		}
 	}
 
 	_this.raiseLayerDrawingObjects = function() {
@@ -2248,12 +2280,12 @@ function DrawingObjects() {
 		*****************************************/
 
 		if ( drawingCtx ) {
-				
-			if ( !_this.countDrawingObjects() )
-				return;
 			
 			if ( clearCanvas )
 				_this.clearDrawingObjects();
+				
+			if ( !_this.countDrawingObjects() )
+				return;
 			
 			worksheet._drawGraphic();
 			worksheet.model.Drawings = aObjects;
