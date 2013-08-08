@@ -435,7 +435,12 @@ CTextBody.prototype =
 
     draw: function(graphics)
     {
-        this.content.Draw(0, graphics);
+        if(!graphics.IsNoSupportTextDraw)
+            this.content.Draw(0, graphics);
+        else
+        {
+            graphics.rect(0, 0, this.contentWidth, this.contentHeight);
+        }
     },
 
     Get_Styles: function(level)
