@@ -2251,7 +2251,7 @@ function DrawingObjects() {
 		
 		/*for (var i = 0; i < _this.countDrawingObjects(); i++) {
 			var obj = aObjects[i];
-			obj.graphicObject.draw(shapeOverlayCtx, true);
+			obj.graphicObject.draw(shapeOverlayCtx);
 		}*/
 	}
 

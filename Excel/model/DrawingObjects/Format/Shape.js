@@ -1751,7 +1751,7 @@ CShape.prototype =
         }
     },
 
-    draw: function(graphics, bOverlay)
+    draw: function(graphics)
     {
         graphics.SetIntegerGrid(false);
         graphics.transform3(this.transform, false);
@@ -1760,7 +1760,7 @@ CShape.prototype =
         shape_drawer.draw(this.spPr.geometry);
         graphics.reset();
         graphics.SetIntegerGrid(true);
-        if ( this.txBody && !bOverlay )
+        if ( this.txBody )
         {
             graphics.SetIntegerGrid(false);
             graphics.transform3(this.transformText);
