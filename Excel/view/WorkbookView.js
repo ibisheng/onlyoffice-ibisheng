@@ -684,12 +684,12 @@
 			
 			_onGraphicObjectWindowKeyDown: function (e) {
 				var ws = this.getWorksheet();
-				return ws.objectRender.controller.onKeyDown(e);
+				return ws.objectRender.graphicObjectKeyDown(e);
 			},
 			
 			_onGraphicObjectWindowKeyPress: function (e) {
 				var ws = this.getWorksheet();
-				return ws.objectRender.controller.onKeyPress(e);
+				return ws.objectRender.graphicObjectKeyPress(e);
 			},
 			
 			_onGetGraphicsInfo: function (x, y) {

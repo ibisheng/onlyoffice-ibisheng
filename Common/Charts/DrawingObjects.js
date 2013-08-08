@@ -1503,7 +1503,6 @@ function DrawingObjects() {
 	var api = asc["editor"];
 	var chartRender = new ChartRender();
 	var worksheet = null;
-	var isViewerMode = null;	
 	
 	var drawingCtx = null;
 	var overlayCtx = null;
@@ -1520,6 +1519,7 @@ function DrawingObjects() {
 	var userId = null;
 	var documentId = null;
 	
+	_this.isViewerMode = null;
 	_this.objectLocker = null;
 	_this.drawingDocument = null;
 	_this.asyncImageEndLoaded = null;
@@ -1901,7 +1901,7 @@ function DrawingObjects() {
 		_this.drawingDocument.TargetHtmlElement = document.getElementById('id_target_cursor');
 		_this.drawingDocument.InitGuiCanvasShape(api.shapeElementId);
 				
-		isViewerMode =  function() { return worksheet._trigger("getViewerMode"); };
+		_this.isViewerMode =  function() { return worksheet._trigger("getViewerMode"); };
 
 		aObjects = [];
 		aImagesSync = [];
@@ -2063,7 +2063,6 @@ function DrawingObjects() {
                 ctx.globalAlpha = 1.0;
             }
         }   */
-
 
         shapeOverlayCtx.m_oContext.clearRect(0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix);
 		
@@ -2230,6 +2229,12 @@ function DrawingObjects() {
 		
 		function restoreSheetArea(checker) {
 		
+			/*var _w = checker.Bounds.max_x - checker.Bounds.min_x;
+			var _h = checker.Bounds.max_y - checker.Bounds.min_y;
+			
+			overlayCtx.clearRect( mmToPt(checker.Bounds.min_x +  pxToMm(scrollOffset.x)), mmToPt(checker.Bounds.min_y +  pxToMm(scrollOffset.y)), mmToPt(_w +  pxToMm(scrollOffset.x)), mmToPt(_h +  pxToMm(scrollOffset.y)));
+			drawingCtx.clearRect( mmToPt(checker.Bounds.min_x +  pxToMm(scrollOffset.x)), mmToPt(checker.Bounds.min_y +  pxToMm(scrollOffset.y)), mmToPt(_w +  pxToMm(scrollOffset.x)), mmToPt(_h +  pxToMm(scrollOffset.y)));*/
+		
 			var foundRow = worksheet._findRowUnderCursor( mmToPt(checker.Bounds.min_y + pxToMm(scrollOffset.y)), true);		
 			var topRow = foundRow ? foundRow.row : 0;
 			var foundCol = worksheet._findColUnderCursor( mmToPt(checker.Bounds.min_x + pxToMm(scrollOffset.x)), true);
@@ -2335,8 +2340,9 @@ function DrawingObjects() {
 				}*/
 			}
 		}
-		_this.raiseLayerDrawingObjects();
-		_this.selectGraphicObject();
+		//_this.raiseLayerDrawingObjects();
+		//_this.selectGraphicObject();
+		_this.OnUpdateOverlay();
 	}
 
 	_this.showOverlayGraphicObjects = function() {
@@ -2410,7 +2416,7 @@ function DrawingObjects() {
 	
 	_this.addImageDrawingObject = function(imageUrl, bPackage, options) {
 
-		if (imageUrl && !isViewerMode()) {
+		if ( imageUrl && !_this.isViewerMode() ) {
 						
 			var _image = api.ImageLoader.LoadImage(imageUrl, 1);
 			var isOption = options && options.cell;
@@ -2569,7 +2575,7 @@ function DrawingObjects() {
 	
 	_this.addChartDrawingObject = function(chart, bWithoutHistory, options) {
 
-		if (isViewerMode())
+		if ( _this.isViewerMode() )
 			return;
 
 		var wordChart = null;
@@ -2658,7 +2664,7 @@ function DrawingObjects() {
 
 		var bResult = false;
 		
-		if ( !isViewerMode() ) {
+		if ( !_this.isViewerMode() ) {
 		
 			if ( _this.controller.selectedObjects.length ) {
 				
@@ -3234,7 +3240,7 @@ function DrawingObjects() {
 	}
 	
 	_this.selectGraphicObject = function() {
-		if ( _this.drawingDocument && _this.controller.selectedObjects.length ) {
+		/*if ( _this.drawingDocument && _this.controller.selectedObjects.length ) {
 			
 			// Сначала селект диапазона диаграммы
 			for (var i = 0; i < _this.controller.selectedObjects.length; i++) {
@@ -3247,7 +3253,7 @@ function DrawingObjects() {
 			_this.raiseLayerDrawingObjects();
             _this.OnUpdateOverlay();
         }
-		_this.drawWorksheetHeaders();
+		_this.drawWorksheetHeaders();*/
 	}
 	
 	_this.setScrollOffset = function(x_px, y_px) {
@@ -3405,6 +3411,14 @@ function DrawingObjects() {
 	
 	_this.graphicObjectMouseUp = function(e, x, y) {
 		_this.controller.onMouseUp( e, pxToMm(x - scrollOffset.x), pxToMm(y - scrollOffset.y) );
+	}
+	
+	_this.graphicObjectKeyDown = function(e) {
+		_this.controller.onKeyDown( e );
+	}
+	
+	_this.graphicObjectKeyPress = function(e) {
+		_this.controller.onKeyPress( e );
 	}
 	
 	//-----------------------------------------------------------------------------------
@@ -3816,7 +3830,7 @@ function DrawingObjects() {
 
 	_this.showImageFileDialog = function(documentId, documentFormat) {
 
-		if (isViewerMode())
+		if ( _this.isViewerMode() )
 			return;
 
 		var oImageUploader = document.getElementById("apiImageUpload");
