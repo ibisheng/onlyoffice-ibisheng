@@ -53,7 +53,7 @@ CMathBase.prototype =
             {
                 this.elements[i][j] = new CMathContent();
                 this.elements[i][j].relate(this);
-                this.elements[i][j].setReduct(this.reduct);
+                //this.elements[i][j].setReduct(this.reduct);
                 this.elements[i][j].setComposition(this.Composition);
                 this.elements[i][j].setRunPrp(this.RunPrp);
 
@@ -82,7 +82,7 @@ CMathBase.prototype =
 
         txtPrp.Merge(this.textPrp);
 
-        txtPrp.FontSize *= this.reduct;
+        //txtPrp.FontSize *= this.reduct;
 
         return txtPrp;
     },
@@ -124,7 +124,7 @@ CMathBase.prototype =
                 if(!this.elements[i][j].IsJustDraw())
                  this.elements[i][j].fillPlaceholders();
     },
-    setReduct: function(coeff)
+    old_setReduct: function(coeff)
     {
         this.reduct = this.reduct*coeff;
         for(var i=0; i < this.nRow; i++)
@@ -133,6 +133,14 @@ CMathBase.prototype =
                 if(! this.elements[i][j].IsJustDraw() )
                     this.elements[i][j].setReduct(coeff);
             }
+    },
+    setReduct: function(coeff)
+    {
+        this.reduct = this.reduct*coeff;
+    },
+    getReduct: function()
+    {
+        return this.reduct;
     },
     addMCToContent: function()
     {
@@ -149,7 +157,7 @@ CMathBase.prototype =
                     if(! this.elements[i][j].IsJustDraw() )
                     {
                         this.elements[i][j].setComposition(this.Composition);
-                        this.elements[i][j].setReduct(this.reduct);
+                        //this.elements[i][j].setReduct(this.reduct);
                         this.elements[i][j].setRunPrp(this.RunPrp);
                     }
                     this.elements[i][j].bMObjs = true;
@@ -758,9 +766,9 @@ CMathBase.prototype =
             for(var j = 0; j < this.nCol; j++)
                 this.elements[i][j].draw();
     },
-    remove: function()
+    remove: function(order)
     {
-        return this.Parent.remove();
+        return this.Parent.remove(order);
     },
     recalculateSize: function()
     {

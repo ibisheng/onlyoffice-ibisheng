@@ -1,6 +1,7 @@
 function CBarFraction()
 {
     this.bHide = false;
+    this.bSimple = false;
     CMathBase.call(this);
 }
 extend(CBarFraction, CMathBase);
@@ -51,10 +52,16 @@ CBarFraction.prototype.hideBar = function(flag)
 }
 CBarFraction.prototype.setSimple = function(flag)
 {
-    if(flag)
-        this.setReduct(DEGR_REDUCT);
-    else
-        this.setReduct(1);
+    this.bSimple = flag;
+}
+CBarFraction.prototype.getTxtPrp = function()
+{
+    var txtPrp = CBarFraction.superclass.getTxtPrp.call(this);
+
+    if(this.bSimple)
+        txtPrp.FontSize *= DEGR_REDUCT; // делаем здес, чтобы учесть при пересчете расстояний
+
+    return txtPrp;
 }
 //////////
 
@@ -163,6 +170,10 @@ CNumerator.prototype.getTxtPrp = function()
 {
     return this.Parent.getTxtPrp();
 }
+CNumerator.prototype.getReduct = function()
+{
+    return this.Parent.getReduct();
+}
 
 function CDenominator()
 {
@@ -266,6 +277,10 @@ CDenominator.prototype.getElement = function(txt)
 CDenominator.prototype.getTxtPrp = function()
 {
     return this.Parent.getTxtPrp();
+}
+CDenominator.prototype.getReduct = function()
+{
+    return this.Parent.getReduct();
 }
 
 

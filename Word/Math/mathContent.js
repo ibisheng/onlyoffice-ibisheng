@@ -20,6 +20,8 @@ function mathElem(_val)
     }; //mm
 }
 
+
+
 //TODO
 //переделать/продумать DotIndef, т.к. при перетаскивании из одного места в другое флаг DotIndef может измениться для другого контента
 
@@ -2187,7 +2189,7 @@ CMathContent.prototype =
             this.CurPos = 0;
         }
         else if( this.selection.startPos != this.selection.endPos ) //т.к. после того как удалили тагет у нас эти 2 значения не равны, равенство их выставляется позднее, после добавления символа
-            this.remove();
+            this.remove(1);
     },
     setReduct: function(coeff)
     {
@@ -2198,7 +2200,9 @@ CMathContent.prototype =
         var txtPrp;
 
         if(!this.bRoot)
+        {
             txtPrp = this.Parent.getTxtPrp();
+        }
         else
         {
             txtPrp = new CMathTextPrp();
@@ -2206,9 +2210,19 @@ CMathContent.prototype =
         }
 
         txtPrp.Merge(this.textPrp);
-        txtPrp.FontSize *= this.reduct; // для итераторов
+
+        //txtPrp.FontSize *= this.reduct; // для итераторов
 
         return txtPrp;
+    },
+    getReduct: function()
+    {
+        var result = this.reduct;
+
+        if(!this.bRoot)
+            result *= this.Parent.getReduct(); // чтобы не перекрывать
+
+        return result;
     },
     relate: function(parent)
     {
@@ -2854,7 +2868,7 @@ CMathContent.prototype =
 
         return {x: X, y: Y};
     },
-    remove: function()
+    old_remove: function()
     {
         var state =
         {
@@ -2862,7 +2876,7 @@ CMathContent.prototype =
             bBeginning:             false    /*в начале контента или нет*/
             //bTargetAfterRemove:     false   /*нужно ли селектить target, этот флаг выставляется в CMathBase*/
         };
-        var  CurrContent = SelectContent = null;
+        var CurrContent = SelectContent = null;
 
         if( this.IsTarget() )
         {
@@ -2923,7 +2937,7 @@ CMathContent.prototype =
                             end = tmp;
                         }
                     }
-                    else
+                    else //backspace
                     {
                         start = this.CurPos;
                         end = this.CurPos + 1;
@@ -2949,7 +2963,7 @@ CMathContent.prototype =
 
                     /*if(this.content.length == 1 && ! this.bRoot )//только CEmpty
                      {
-                     this.add(StartTextElement);
+                        this.add(StartTextElement);
                      }*/
 
                     //this.recalculate();
@@ -2966,10 +2980,147 @@ CMathContent.prototype =
                 CurrContent = SelectContent = this;
                 state.bBeginning = true;
             }
+        }
+
+        return {CurrContent : CurrContent, SelectContent: SelectContent, state: state };
+    },
+    remove: function(order)
+    {
+        var state =
+        {
+            bDelete:                false,    /* нужно ли пересчитывать позицию или нет, работает при backspace */
+            bBeging:                false,    /* в начале контента или нет */
+            bEnd:                   false     /* в конце */
+        };
+
+        var CurrContent = SelectContent = null;
+
+        if( this.IsTarget() )
+        {
+            if ( !this.bRoot )
+            {
+                var result = this.Parent.remove(-2);
+                SelectContent = result.SelectContent;
+                CurrContent = this;
+            }
+            else
+            {
+                //в основном контенте и элемент target
+                //переделать : вставлять объект типа placeholder
+                this.content.length = 0;
+                state.bDelete = true;
+
+                SelectContent = this;
+                CurrContent   = this;
+            }
+        }
+        else
+        {
+            var bFirst = order == 1 && this.CurPos == 0,
+                bLast = order == -1 && this.CurPos == this.content.length - 1;
+
+            if(bFirst)
+                state.bBeging = true;
+            else if(bLast)
+                state.bEnd = true;
+
+            if(bFirst || bLast)
+            {
+                if( ! this.bRoot )
+                {
+                    var result = this.Parent.remove(-2);
+                    SelectContent = result.SelectContent;
+                    CurrContent = this;
+                }
+                else
+                {
+                    CurrContent = SelectContent = this;
+                }
+            }
+            else if(order == 1 || order == -1)
+            {
+                state.bDelete = this.remove_internal(order);
+                SelectContent = this;
+                CurrContent   = this;
+            }
+            else if(order == -2)
+            {
+                this.setStart_Selection(this.CurPos + 1);
+                this.setEnd_Selection(this.CurPos - 1);
+                this.selection.active = false;
+
+                SelectContent = this;
+                CurrContent   = null; // т.к. пришли из другого контента
+            }
 
         }
 
         return {CurrContent : CurrContent, SelectContent: SelectContent, state: state };
+
+    },
+    remove_internal: function(order)
+    {
+        var bDelete = false;
+        var bSelect = this.selection.startPos !== this.selection.endPos;
+        var bMEDirect = order == 1 && this.content[this.CurPos].value.empty,
+            bMEReverse = order == -1 && this.content[this.CurPos + 1].value.SUBCONTENT;
+
+        if(!bSelect && bMEDirect)
+        {
+            this.setStart_Selection(this.CurPos);
+            this.setEnd_Selection( this.CurPos-2 );
+            this.selection.active = false;
+        }
+        else if(!bSelect && bMEReverse)
+        {
+            this.setStart_Selection(this.CurPos);
+            this.setEnd_Selection( this.CurPos + 2 );
+            this.selection.active = false;
+        }
+        else
+        {
+            var start, end;
+
+            if(bSelect)
+            {
+                start = this.selection.startPos;
+                end = this.selection.endPos;
+                if(start > end)
+                {
+                    tmp = start;
+                    start = end;
+                    end = tmp;
+                }
+            }
+            else if(order == 1)
+            {
+                start = this.CurPos;
+                end = this.CurPos + 1;
+            }
+            else if(order == -1)
+            {
+                start = this.CurPos + 1;
+                end = this.CurPos + 2;
+            }
+
+            var tmp = new Array();
+
+            for(var i = 0; i< start; i++)
+                tmp.push(this.content[i]);
+
+            for (var j = end; j < this.content.length; j++)
+                tmp.push(this.content[j]);
+            this.content.length = 0;
+            this.content = tmp;
+
+            this.CurPos = start - 1;
+            this.setStart_Selection(this.CurPos);
+            this.selection.active = false;
+
+            bDelete = true;
+        }
+
+        return bDelete;
     },
     setPlaceholderAfterRemove: function()  // чтобы не выставлялся тагет при вставке, когда заселекчен весь контент и мы добавляем, например, другой мат элемент
     {
@@ -3864,29 +4015,25 @@ CMathComposition.prototype =
     {
         return this.Root.size;
     },
-    Remove: function()
+    Remove: function(order)
     {
-        var result = false;
-
         this.ClearSelect();
 
-        var removal = this.SelectContent.remove();
-        this.CurrentContent = removal.CurrContent;
-        this.SelectContent  = removal.SelectContent;
+        var result = this.SelectContent.remove(order);
+        this.CurrentContent = result.CurrContent;
+        this.SelectContent  = result.SelectContent;
 
         this.CurrentContent.setPlaceholderAfterRemove(); // чтобы не выставлялся тагет при вставке, когда заселекчен весь контент и мы добавляем, например, другой мат элемент
 
-        if( removal.state.bRecPosition )
+        if( result.state.bDelete )
         {
             this.CurrentContent.RecalculateReverse();
             this.UpdatePosition();
-
-            result = true;
         }
 
         this.CheckTarget();
 
-        return result;
+        return result.state.bDelete;
     },
     UpdatePosition: function()
     {

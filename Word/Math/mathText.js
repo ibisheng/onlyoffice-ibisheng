@@ -136,7 +136,10 @@ CMathText.prototype =
     {
         var txtPrp = this.Parent.getTxtPrp();
         txtPrp.Merge(this.textPrp);
+        var reduct = this.Parent.getReduct(); // чтобы не перекрывать
+        txtPrp.FontSize *= reduct;
 
+        //txtPrp.FontSize *= this.Parent.getReduct(); // чтобы не перекрывать
         //txtPrp.Italic = false; // всегда отправляем "false"!!
 
         return txtPrp;

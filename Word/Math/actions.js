@@ -263,9 +263,9 @@ CControlComposition.prototype =
         //backspace
         else if(e.KeyCode==8)
         {
-            try{
-
-                if(this.Content[this.CurPos].Remove())
+            try
+            {
+                if(this.Content[this.CurPos].Remove(1))
                 {
                     //this.UpdatePosition();
                     editor.WordControl.m_oLogicDocument.DrawingDocument.OnRecalculatePage(0, editor.WordControl.m_oLogicDocument.Pages[0]);
@@ -279,8 +279,18 @@ CControlComposition.prototype =
 
             return true;
         }
+        //delete
+        else if ( e.KeyCode == 46)
+        {
+            if(this.Content[this.CurPos].Remove(-1))
+            {
+                //this.UpdatePosition();
+                editor.WordControl.m_oLogicDocument.DrawingDocument.OnRecalculatePage(0, editor.WordControl.m_oLogicDocument.Pages[0]);
 
-        return false;
+            }
+        }
+
+            return false;
     },
     OnKeyPress: function(e)
     {
