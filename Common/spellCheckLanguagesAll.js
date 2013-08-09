@@ -152,7 +152,7 @@ g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("ru-RU", 0x0419));
 //{ "tr-TR", 0x041f },
 //{ "ur-PK", 0x0420 },
 //{ "id-ID", 0x0421 },
-//{ "uk-UA", 0x0422 },
+g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("uk-UA", 0x0422));
 //{ "be-BY", 0x0423 },
 //{ "sl-SI", 0x0424 },
 //{ "et-EE", 0x0425 },
