@@ -11,6 +11,7 @@
 		 * -----------------------------------------------------------------------------
 		 */
 		var prot;
+		var turnOnProcessingSpecSymbols = true;
 
 		function AutoFiltersOptionsElements (val, visible) {
 			if ( !(this instanceof AutoFiltersOptionsElements) ) {return new AutoFiltersOptionsElements(val, visible);}
@@ -1955,6 +1956,8 @@
 				if(conFilter.filter1 == null && conFilter.filter2 == null)
 					return;
 				var n = 0;
+				//проверка на спец. символы
+				this._isSpecValueCustomFilter(conFilter);
 				for(var i = startRange.first.row; i < endRange.first.row; i++)
 				{
 					var cell = ws.model.getCell(new CellAddress(i,startRange.first.col - 1,0));
@@ -2604,7 +2607,7 @@
 				valLog[1] = conFilter.valFilter2;
                 var trueStr;
 				//пока в случае появления спецсимволов, игнорируем их
-				if(valLog[0] && typeof valLog[0] == "string" && (valLog[0].split("?").length > 1 || valLog[0].split("*").length > 1))
+				if(valLog[0] && typeof valLog[0] == "string" && (valLog[0].split("?").length > 1 || valLog[0].split("*").length > 1) && (conFilter.filterDisableSpecSymbols1 || this._getPositionSpecSymbols(valLog[0]) != null))
 				{
 					trueStr = "";
 					for(var i = 0; i < valLog[0].length; i++)
@@ -2614,7 +2617,7 @@
 					}
 					valLog[0] = trueStr;
 				}
-				if(typeof valLog[1] == "string" && valLog[1] && (valLog[1].split("?").length > 1 || valLog[1].split("*").length > 1))
+				if(typeof valLog[1] == "string" && valLog[1] && (valLog[1].split("?").length > 1 || valLog[1].split("*").length > 1) && (conFilter.filterDisableSpecSymbols1 || this._getPositionSpecSymbols(valLog[1]) != null))
 				{
 					trueStr = "";
 					for(var i = 0; i < valLog[1].length; i++)
@@ -2628,123 +2631,129 @@
 				var result = [];
 				for(var s = 0; s < arrLog.length; s++)
 				{
+					var checkComplexSymbols = this._parseComplexSpecSymbols(val, arrLog[s], valLog[s],type);
 					var filterVal;
-                    if(arrLog[s] == ECustomFilter.customfilterEqual || arrLog[s] == ECustomFilter.customfilterNotEqual)//общие для числа и текста
+					if(checkComplexSymbols != null)
+						result[s] = checkComplexSymbols;
+					else
 					{
-						val = val.toString();
-						filterVal = valLog[s].toString();
-						if(arrLog[s] == ECustomFilter.customfilterEqual)//equals
+						if(arrLog[s] == ECustomFilter.customfilterEqual || arrLog[s] == ECustomFilter.customfilterNotEqual)//общие для числа и текста
 						{
-							if(val == filterVal || valWithFormat == filterVal)
-								result[s] = true;
-						}
-						else if(arrLog[s] == ECustomFilter.customfilterNotEqual)//doesNotEqual
-						{
-							if(val != filterVal || valWithFormat != filterVal)
-								result[s] = true;
-						}
-					}
-					else if(arrLog[s] == ECustomFilter.customfilterGreaterThan || arrLog[s] == ECustomFilter.customfilterGreaterThanOrEqual || arrLog[s] == ECustomFilter.customfilterLessThan || arrLog[s] == ECustomFilter.customfilterLessThanOrEqual)//только для чисел
-					{
-						filterVal =  parseFloat(valLog[s]);
-						if(g_oFormatParser && g_oFormatParser.parse && g_oFormatParser.parse(valLog[s]) != null)
-							filterVal = g_oFormatParser.parse(valLog[s]).value;
-						if(isNaN(filterVal))
-							filterVal = '';
-						else
-						{
-							switch (arrLog[s])
+							val = val.toString();
+							filterVal = valLog[s].toString();
+							if(arrLog[s] == ECustomFilter.customfilterEqual)//equals
 							{
-								case ECustomFilter.customfilterGreaterThan:
-									if(val > filterVal)//isGreaterThan
-										result[s] = true;
-									break;
-								case ECustomFilter.customfilterGreaterThanOrEqual: 
-									if(val >= filterVal)//isGreaterThanOrEqualTo
-										result[s] = true;
-									break;
-								case ECustomFilter.customfilterLessThan: 
-									if(val < valLog[s])//isLessThan
-										result[s] = true;
-									break;
-								case ECustomFilter.customfilterLessThanOrEqual: 
-									if(val <= filterVal)//isLessThanOrEqualTo
-										result[s] = true;
-									break;
+								if(val == filterVal || valWithFormat == filterVal)
+									result[s] = true;
+							}
+							else if(arrLog[s] == ECustomFilter.customfilterNotEqual)//doesNotEqual
+							{
+								if(val != filterVal || valWithFormat != filterVal)
+									result[s] = true;
 							}
 						}
-					}
-					else if(arrLog[s] == 7 || arrLog[s] == 8 || arrLog[s] == 9 || arrLog[s] == 10 || arrLog[s] == 11 || arrLog[s] == 12 || arrLog[s] == 13)//только для текста
-					{
+						else if(arrLog[s] == ECustomFilter.customfilterGreaterThan || arrLog[s] == ECustomFilter.customfilterGreaterThanOrEqual || arrLog[s] == ECustomFilter.customfilterLessThan || arrLog[s] == ECustomFilter.customfilterLessThanOrEqual)//только для чисел
+						{
+							filterVal =  parseFloat(valLog[s]);
+							if(g_oFormatParser && g_oFormatParser.parse && g_oFormatParser.parse(valLog[s]) != null)
+								filterVal = g_oFormatParser.parse(valLog[s]).value;
+							if(isNaN(filterVal))
+								filterVal = '';
+							else
+							{
+								switch (arrLog[s])
+								{
+									case ECustomFilter.customfilterGreaterThan:
+										if(val > filterVal)//isGreaterThan
+											result[s] = true;
+										break;
+									case ECustomFilter.customfilterGreaterThanOrEqual: 
+										if(val >= filterVal)//isGreaterThanOrEqualTo
+											result[s] = true;
+										break;
+									case ECustomFilter.customfilterLessThan: 
+										if(val < valLog[s])//isLessThan
+											result[s] = true;
+										break;
+									case ECustomFilter.customfilterLessThanOrEqual: 
+										if(val <= filterVal)//isLessThanOrEqualTo
+											result[s] = true;
+										break;
+								}
+							}
+						}
+						else if(arrLog[s] == 7 || arrLog[s] == 8 || arrLog[s] == 9 || arrLog[s] == 10 || arrLog[s] == 11 || arrLog[s] == 12 || arrLog[s] == 13)//только для текста
+						{
+							
+							filterVal = valLog[s];
+							var newVal = val;
+							if(!isNaN(parseFloat(newVal)))
+								newVal = valWithFormat;
+								var position;
+								switch (arrLog[s])
+								{
+									case 7:
+										if(type == 1)
+										{
+											if(newVal.search("?") || newVal.search("*"))
+											if(newVal.search(filterVal) == 0)//beginsWith
+												result[s] = true;
+										}
+										break;
+									case 8: 
+										if(type == 1)
+										{
+											if(newVal.search(filterVal) != 0)//doesNotBeginWith
+												result[s] = true;
+										}
+										else
+											result[s] = true;
+										break;
+									case 9: 
+										position = newVal.length - filterVal.length;
+										if(type == 1)
+										{
+											if(newVal.lastIndexOf(filterVal) == position && position > 0)//endsWith
+												result[s] = true;
+										}
+										break;
+									case 10: 
+										position = newVal.length - filterVal.length;
+										if(type == 1)
+										{
+											if(newVal.lastIndexOf(filterVal) != position && position > 0)//doesNotEndWith
+												result[s] = true;
+										}
+										else
+											result[s] = true;
+										break;
+									case 11: 
+										if(type == 1)
+										{
+											if(newVal.search(filterVal) != -1)//contains
+												result[s] = true;
+										}
+										break;
+									case 12: 
+										if(type == 1)
+										{
+											if(newVal.search(filterVal) == -1)//doesNotContain
+												result[s] = true;
+										}
+										else
+											result[s] = true;
+										break
+								}
+						}
 						
-						filterVal = valLog[s];
-						var newVal = val;
-						if(!isNaN(parseFloat(newVal)))
-							newVal = valWithFormat;
-							var position;
-							switch (arrLog[s])
-							{
-								case 7:
-									if(type == 1)
-									{
-										if(newVal.search(filterVal) == 0)//beginsWith
-											result[s] = true;
-									}
-									break;
-								case 8: 
-									if(type == 1)
-									{
-										if(newVal.search(filterVal) != 0)//doesNotBeginWith
-											result[s] = true;
-									}
-									else
-										result[s] = true;
-									break;
-								case 9: 
-									position = newVal.length - filterVal.length;
-									if(type == 1)
-									{
-										if(newVal.lastIndexOf(filterVal) == position && position > 0)//endsWith
-											result[s] = true;
-									}
-									break;
-								case 10: 
-									position = newVal.length - filterVal.length;
-									if(type == 1)
-									{
-										if(newVal.lastIndexOf(filterVal) != position && position > 0)//doesNotEndWith
-											result[s] = true;
-									}
-									else
-										result[s] = true;
-									break;
-								case 11: 
-									if(type == 1)
-									{
-										if(newVal.search(filterVal) != -1)//contains
-											result[s] = true;
-									}
-									break;
-								case 12: 
-									if(type == 1)
-									{
-										if(newVal.search(filterVal) == -1)//doesNotContain
-											result[s] = true;
-									}
-									else
-										result[s] = true;
-									break
-							}
+						if(!result[s])
+						{
+							if(filterVal == '' || arrLog[s] == null)
+								result[s] = 'hidden';
+							else
+								result[s] = false;
+						}
 					}
-					
-					if(!result[s])
-					{
-						if(filterVal == '' || arrLog[s] == null)
-							result[s] = 'hidden';
-						else
-							result[s] = false;
-					}
-					
 				}
 				if(conFilter.isChecked == false)
 				{
@@ -5269,6 +5278,276 @@
 					}
 				}
 				return result;
+			},
+			
+			//проверка на предмет наличия спец. символов ? и *
+			_isSpecValueCustomFilter: function(autoFiltersOptions)
+			{
+				if(!turnOnProcessingSpecSymbols)
+					return;
+				var filters = [autoFiltersOptions.filter1,autoFiltersOptions.filter2];
+				var valFilters = [autoFiltersOptions.valFilter1,autoFiltersOptions.valFilter2];
+				var result = null;
+				var filterVal;
+				var filter;
+				for(var fil = 0;  fil <  filters.length; fil++)
+				{
+					filterVal = valFilters[fil];
+					filter = filters[fil];
+					if(filterVal && (filterVal.indexOf("?") != -1 || filterVal.indexOf("*") != -1))
+					{
+						//определяем где именно находятся спец. символы
+						var position = this._getPositionSpecSymbols(filterVal);
+						if(position == 'start')//вначале(меняем фильтр на "начинается с/не начинается с")
+						{
+							if(filter == 6 || filter == 8 || filter == 10 || filter == 12)
+								filter = 8;
+							else
+								filter = 7;
+							if(fil == 0)
+								autoFiltersOptions.filterDisableSpecSymbols1 = true;
+							else
+								autoFiltersOptions.filterDisableSpecSymbols2 = true;
+						}
+						else if(position == 'end')//вконце(меняем фильтр "заканчивается на/не заканчивается на")
+						{
+							if(filter == 6 || filter == 8 || filter == 10 || filter == 12)
+								filter = 10;
+							else
+								filter = 9;
+							if(fil == 0)
+								autoFiltersOptions.filterDisableSpecSymbols1 = true;
+							else
+								autoFiltersOptions.filterDisableSpecSymbols2 = true;
+						}
+						else if(position == 'center')//вначале + вконце(меняем значени а/ф на "содержит")
+						{
+							if(filter == 6 || filter == 8 || filter == 10 || filter == 12)
+								filter = 12;
+							else
+								filter = 11;
+							if(fil == 0)
+								autoFiltersOptions.filterDisableSpecSymbols1 = true;
+							else
+								autoFiltersOptions.filterDisableSpecSymbols2 = true;
+						}
+						else
+						{
+							
+						}
+						
+						if(fil == 0)
+							autoFiltersOptions.filter1 = filter;
+						else
+							autoFiltersOptions.filter2 = filter;
+					}
+				}
+			},
+			
+			_getPositionSpecSymbols: function(filterVal)
+			{
+				var position = null;
+				if(!turnOnProcessingSpecSymbols)
+					return position;
+				var firstLetter;
+				var firstSpecSymbol;
+				var endLetter;
+				var endSpecSymbol;
+				for(var i = 0; i < filterVal.length; i++)
+				{
+					if((filterVal[i] == '*' || filterVal[i] == '?') && firstSpecSymbol == undefined)
+						firstSpecSymbol = i;
+					else if(firstLetter == undefined && filterVal[i] != '*' && filterVal[i] != '?')
+						firstLetter = i;
+					if(filterVal[i] == '*' || filterVal[i] == '?')
+						endSpecSymbol = i;
+					else
+						endLetter = i;
+				}
+				var centerSpecSymbols = false;
+				for(var i = firstLetter; i <= endLetter; i++)
+				{
+					if(filterVal[i] == '*' || filterVal[i] == '?')
+						centerSpecSymbols = true;
+				}
+				if(!centerSpecSymbols && firstSpecSymbol == 0 && endLetter > endSpecSymbol && endSpecSymbol != filterVal.length - 1)//вначале(меняем фильтр на "начинается с/не начинается с")
+				{
+					position = "start";
+				}
+				else if(!centerSpecSymbols && endSpecSymbol == filterVal.length - 1 && firstSpecSymbol != 0)//вконце(меняем фильтр "заканчивается на/не заканчивается на")
+				{
+					position = "end";
+				}
+				else if(!centerSpecSymbols && endSpecSymbol == filterVal.length - 1 && firstSpecSymbol == 0)//вначале + вконце(меняем значени а/ф на "содержит")
+				{
+					position = "center";
+				}
+				return position;
+			},
+			
+			_parseComplexSpecSymbols: function(val, filter, filterVal, type)
+			{
+				var result = null;
+				if(!turnOnProcessingSpecSymbols)
+					return result;
+				if(filterVal != undefined && filter != undefined && (filterVal.indexOf("?") != -1 || filterVal.indexOf("*") != -1))
+				{
+					var isEqual = false;
+					var isStartWithVal = false;
+					var isConsist = false;
+					var isEndWith = false;
+					var endSpecSymbol;
+					result = false;
+					if(type == 1)
+					{
+						var splitFilterVal = filterVal.split("*");
+						var positionPrevBlock = 0;
+						var firstEnter = false;
+						isConsist = true;
+						isStartWithVal = false;
+						isEqual = false;
+						isEndWith = false;
+						for(var i = 0; i < splitFilterVal.length;i++)
+						{
+							if(splitFilterVal[i] != '')
+							{
+								if(splitFilterVal[i].indexOf("?") == -1)
+								{
+									firstEnter = true;
+									endSpecSymbol = false;
+									isConsistBlock = val.indexOf(splitFilterVal[i],positionPrevBlock);
+									if(isConsistBlock == 0)
+										isStartWithVal = true;
+									if(isConsistBlock == -1 || positionPrevBlock > isConsistBlock)
+									{
+										isConsist = false;
+										break;
+									}
+									else
+									{
+										positionPrevBlock = isConsistBlock + splitFilterVal[i].length;
+									}
+								}
+								else if(splitFilterVal[i].length != 1)
+								{
+									firstEnter = true;
+									endSpecSymbol = false;
+									var splitQuestion = splitFilterVal[i].split('?');
+									for(var k = 0; k < splitQuestion.length; k++)
+									{
+										if(k != 0 && k != splitQuestion.length - 1)
+											positionPrevBlock++;
+										var tempPosition = val.indexOf(splitFilterVal[i],positionPrevBlock)
+										if(tempPosition == 0)
+											isStartWithVal = true;
+										if(tempPosition != -1)
+											positionPrevBlock += splitFilterVal[i].length;
+										else
+										{
+											isConsist = false;
+											break;
+										}
+									}
+								}
+								else if(!firstEnter)
+									isStartWithVal = true;
+								else
+									endSpecSymbol = true;
+							}
+							else if(!firstEnter)
+								isStartWithVal = true;
+							else
+								endSpecSymbol = true;	
+						}
+						
+						
+						if(isConsist && (positionPrevBlock == val.length || endSpecSymbol))
+							isEndWith = true;
+						if(isStartWithVal && isConsist)
+							isStartWithVal = true;
+						else
+							isStartWithVal = false;
+						if(isConsist && isStartWithVal && isEndWith)
+							isEqual = true;
+					}
+					switch (filter)
+					{
+						case 1://равно
+						{
+							if(isEqual)
+								result = true;
+							break;
+						}
+						case 2://больше
+						{
+							if(val > filterVal && !isEqual)
+								result = true;
+							break;
+						}
+						case 3://больше или равно
+						{
+							if(val > filterVal || isEqual)
+								result = true;
+							break;
+						}
+						case 4://меньше
+						{
+							if(val < filterVal && !isEqual)
+								result = true;
+							break;
+						}
+						case 5://меньше или равно
+						{
+							if(val < filterVal || isEqual)
+								result = true;
+							break;
+						}
+						case 6://не равно
+						{
+							if(!isEqual)
+								result = true;
+							break;
+						}
+						case 7://начинается с
+						{
+							if(isStartWithVal)
+								result = true;
+							break;
+						}
+						case 8://не начинается с
+						{
+							if(!isStartWithVal)
+								result = true;
+							break;
+						}
+						case 9://заканчивается на
+						{
+							if(isEndWith)
+								result = true;
+							break;
+						}
+						case 10://не заканчивается на
+						{
+							if(!isEndWith)
+								result = true;
+							break;
+						}
+						case 11://содержит
+						{
+							if(isConsist)
+								result = true;
+							break;
+						}
+						case 12://не содержит
+						{
+							if(!isConsist)
+								result = true;
+							break;
+							
+						}
+					}
+					return result;
+				}	
 			}
 		};
 
