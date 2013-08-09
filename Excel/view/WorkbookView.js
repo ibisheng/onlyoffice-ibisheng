@@ -1060,6 +1060,11 @@
 				this.showWorksheet(undefined, true);
 			},
 
+			// Получаем свойство: редактируем мы сейчас или нет
+			getCellEditMode: function () {
+				return this.controller.isCellEditMode;
+			},
+
 			getZoom: function () {
 				return this.drawingCtx.getZoom();
 			},

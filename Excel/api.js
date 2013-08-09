@@ -104,6 +104,14 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.CoAuthoringApi = new CDocsCoApi();
 			this.collaborativeEditing = null;
 			this.isCoAuthoringEnable = true;
+
+			// AutoSave
+			this.autoSaveGap = 0;				// Интервал автосохранения (0 - означает, что автосохранения нет)
+			this.autoSaveTimeOutId = null;		// Идентификатор таймаута
+			this.isAutoSave = false;			// Флаг, означает что запущено автосохранение
+			this.autoSaveGapAsk = 5000;			// Константа для повторного запуска автосохранения, если не смогли сделать сразу lock (только при автосохранении)
+
+			this.canSave = true;				//Флаг нужен чтобы не происходило сохранение пока не завершится предыдущее сохранение
 			
 			// Режим вставки диаграмм в редакторе документов
 			this.isChartEditor = false;
@@ -429,39 +437,38 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				}, true);
 			},
 
-			asc_Save : function(){
+			asc_Save : function (isAutoSave) {
                 if (undefined != window['appBridge']) {
                     window['appBridge']['dummyCommandSave'] ();     // TEST
                     return;
                 }
 
-				if (this.collaborativeEditing.m_bGlobalLock || this.isChartEditor)
+				if (!this.canSave || this.isChartEditor)
 					return;
-				this.asc_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
+
+				// Не даем пользователю сохранять, пока не закончится сохранение
+				this.canSave = false;
+				this.isAutoSave = !!isAutoSave;
+				if (!this.isAutoSave) {
+					this.asc_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+					this.asc_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);
+				}
 				// Нужно закрыть редактор
 				this.asc_closeCellEditor();
-				
+
 				var t = this;
-
-				// Не даем пользователю что-нибудь менять пока не закончится сохранение
-				this.collaborativeEditing.m_bGlobalLock = true;
-
 				this.CoAuthoringApi.askSaveChanges (function (e) { t.onSaveCallback (e); });
 			},
 
 			asc_OnSaveEnd : function (isDocumentSaved) {
-				this.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
-				// Cбросим флаги модификации
-				History.Save();
-
+				this.canSave = true;
+				this.isAutoSave = false;
+				this.asc_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+				this.CoAuthoringApi.unSaveChanges();
 				if (isDocumentSaved) {
-					// Пересылаем свои изменения
-					this.collaborativeEditing.sendChanges();
-					// Шлем update для toolbar-а, т.к. когда select в lock ячейке нужно заблокировать toolbar
-					this.wb._onWSSelectionChanged(/*info*/null);
-					this.CoAuthoringApi.unSaveChanges();
+					// Запускаем таймер автосохранения
+					this.autoSaveInit();
 				} else {
-					this.CoAuthoringApi.unSaveChanges();
 					this.CoAuthoringApi.disconnect();
 				}
 			},
@@ -922,10 +929,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 			asc_StartAction: function (type, id) {
 				this.handlers.trigger("asc_onStartAction", type, id);
+				//console.log("asc_onStartAction: type = " + type + " id = " + id);
 			},
 
 			asc_EndAction: function (type, id) {
 				this.handlers.trigger("asc_onEndAction", type, id);
+				//console.log("asc_onEndAction: type = " + type + " id = " + id);
 			},
 
 			asc_registerCallback: function (name, callback, replaceOldCallback) {
@@ -1054,8 +1063,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 			_startOpenDocument: function (response) {
 				if (response.returnCode !== 0) {return;}
-				
-				this.asc_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadDocumentFonts);
 
 				this.wbModel = response.val;
 
@@ -1475,6 +1482,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
                 if (undefined != window['appBridge']) {
                     window['appBridge']['dummyCommandOpenDocumentProgress'] (10000);
                 }
+
+				// Запускаем таймер автосохранения
+				this.autoSaveInit();
 			},
 
 			// Переход на диапазон в листе
@@ -1502,20 +1512,47 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				var t = this;
 				var nState;
 				if (false == e["savelock"]) {
-					// Снимаем глобальный lock
-					this.collaborativeEditing.m_bGlobalLock = false;
+					if (this.isAutoSave) {
+						this.asc_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+						this.asc_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);
+					}
 
 					// Принимаем чужие изменения
 					t.collaborativeEditing.applyChanges();
 
 					// Сохраняем файл на сервер
 					this._asc_save();
+
+					// Cбросим флаги модификации
+					History.Save();
+
+					// Пересылаем свои изменения
+					this.collaborativeEditing.sendChanges();
+					// Шлем update для toolbar-а, т.к. когда select в lock ячейке нужно заблокировать toolbar
+					this.wb._onWSSelectionChanged(/*info*/null);
+
+					// Заканчиваем сохранение, т.к. мы хотим дать пользователю продолжать набирать документ
+					// Но сохранять до прихода ответа от сервера не сможет
+					this.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);
 				} else {
 					nState = t.CoAuthoringApi.get_state();
 					if (3 === nState) {
 						// Отключаемся от сохранения, соединение потеряно
-						this.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
+						if (!this.isAutoSave) {
+							this.asc_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);
+							this.asc_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+						}
+						this.isAutoSave = false;
+						this.canSave = true;
 					} else {
+						// Если автосохранение, то не будем ждать ответа, а просто перезапустим таймер на немного
+						if (this.isAutoSave) {
+							this.isAutoSave = false;
+							this.canSave = true;
+							this.autoSaveInit(this.autoSaveGapAsk);
+							return;
+						}
+
 						setTimeout(function () {
 							t.CoAuthoringApi.askSaveChanges(function (event) {
 								// Функция может быть долгой (и в IE10 происходит disconnect). Поэтому вызовем через timeout
@@ -2212,6 +2249,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				return this.wb.getWorksheet().getActiveCellCoord();
 			},
 
+			// Получаем свойство: редактируем мы сейчас или нет
+			asc_getCellEditMode: function () {
+				return this.wb.getCellEditMode();
+			},
+
 			asc_setCellFontName: function (fontName) {
 				var t = this;
 				t._loadFonts([fontName], function () {
@@ -2620,6 +2662,28 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				if (!this.CoAuthoringApi)
 					return; // Error
 				this.CoAuthoringApi.disconnect();
+			},
+			/////////////////////////////////////////////////////////////////////////
+			////////////////////////////AutoSave api/////////////////////////////////
+			/////////////////////////////////////////////////////////////////////////
+			autoSaveInit: function (autoSaveGap) {
+				if (autoSaveGap || this.autoSaveGap) {
+					// Очищаем предыдущий таймер
+					if (null !== this.autoSaveTimeOutId)
+						clearTimeout(this.autoSaveTimeOutId);
+					var t = this;
+					this.autoSaveTimeOutId = setTimeout(function () {
+						t.autoSaveTimeOutId = null;
+						if (t.asc_isDocumentModified()) {
+							// Если мы редактируем ячейку, то запустим автосохранение чуть позднее
+							if (t.asc_getCellEditMode())
+								t.autoSaveInit(t.autoSaveGapAsk);
+							else
+								t.asc_Save(/*isAutoSave*/true);
+						} else
+							t.autoSaveInit();
+					}, (autoSaveGap || this.autoSaveGap));
+				}
 			},
 
             // offline mode
