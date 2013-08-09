@@ -138,7 +138,7 @@ g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("it-IT", 0x0410));
 //{ "ja-JP", 0x0411 },
 g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("ko-KR", 0x0412));
 //{ "nl-NL", 0x0413 },
-//{ "nb-NO", 0x0414 },
+g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("nb-NO", 0x0414));
 g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("pl-PL", 0x0415));
 g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("pt-BR", 0x0416));
 //{ "rm-CH", 0x0417 },
