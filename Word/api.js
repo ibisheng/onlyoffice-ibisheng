@@ -2259,7 +2259,7 @@ asc_docs_api.prototype.asc_OnSaveEnd = function (isDocumentSaved) {
 		// Запускаем таймер автосохранения
 		this.autoSaveInit();
 	} else {
-		editor.CoAuthoringApi.logout();
+		editor.CoAuthoringApi.disconnect();
 	}
 };
 function OnSave_Callback(e)
