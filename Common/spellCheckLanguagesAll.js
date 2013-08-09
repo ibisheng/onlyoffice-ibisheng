@@ -259,7 +259,7 @@ g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("de-CH", 0x0807));
 //{ "fr-BE", 0x080c },
 //{ "it-CH", 0x0810 },
 //{ "nl-BE", 0x0813 },
-//{ "nn-NO", 0x0814 },
+g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("nn-NO", 0x0814));
 g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("pt-PT", 0x0816));
 //{ "ro-MO", 0x0818 },
 //{ "ru-MO", 0x0819 },
