@@ -208,6 +208,7 @@ prop:asc_coAuthoringGetUsers
 prop:asc_coAuthoringDisconnect
 prop:_coSpellCheckInit
 prop:asc_getSpellCheckLanguages
+prop:autoSaveInit
 prop:get_TextProps
 prop:GetJSONLogicDocument
 prop:get_ContentCount
@@ -504,6 +505,7 @@ prop:GetDocWidthPx
 prop:GetDocHeightPx
 prop:ClearSearch
 prop:GetCurrentVisiblePage
+prop:asc_setAutoSaveGap
 prop:SetMobileVersion
 prop:GoToHeader
 prop:GoToFooter
@@ -1226,6 +1228,7 @@ asc_docs_api.prototype['asc_coAuthoringGetUsers'] = asc_docs_api.prototype.asc_c
 asc_docs_api.prototype['asc_coAuthoringDisconnect'] = asc_docs_api.prototype.asc_coAuthoringDisconnect;
 asc_docs_api.prototype['_coSpellCheckInit'] = asc_docs_api.prototype._coSpellCheckInit;
 asc_docs_api.prototype['asc_getSpellCheckLanguages'] = asc_docs_api.prototype.asc_getSpellCheckLanguages;
+asc_docs_api.prototype['autoSaveInit'] = asc_docs_api.prototype.autoSaveInit;
 asc_docs_api.prototype['get_TextProps'] = asc_docs_api.prototype.get_TextProps;
 asc_docs_api.prototype['GetJSONLogicDocument'] = asc_docs_api.prototype.GetJSONLogicDocument;
 asc_docs_api.prototype['get_ContentCount'] = asc_docs_api.prototype.get_ContentCount;
@@ -1522,6 +1525,7 @@ asc_docs_api.prototype['GetDocWidthPx'] = asc_docs_api.prototype.GetDocWidthPx;
 asc_docs_api.prototype['GetDocHeightPx'] = asc_docs_api.prototype.GetDocHeightPx;
 asc_docs_api.prototype['ClearSearch'] = asc_docs_api.prototype.ClearSearch;
 asc_docs_api.prototype['GetCurrentVisiblePage'] = asc_docs_api.prototype.GetCurrentVisiblePage;
+asc_docs_api.prototype['asc_setAutoSaveGap'] = asc_docs_api.prototype.asc_setAutoSaveGap;
 asc_docs_api.prototype['SetMobileVersion'] = asc_docs_api.prototype.SetMobileVersion;
 asc_docs_api.prototype['GoToHeader'] = asc_docs_api.prototype.GoToHeader;
 asc_docs_api.prototype['GoToFooter'] = asc_docs_api.prototype.GoToFooter;
