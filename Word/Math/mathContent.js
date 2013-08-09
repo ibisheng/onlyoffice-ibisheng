@@ -81,7 +81,10 @@ function CMathContent()
     this.CurPos = 0;
     this.pos = {x:0, y:0};
     this.g_mContext =   null;
-    this.textPrp = new CMathTextPrp();
+
+    this.TxtPrp = new CMathTextPrp();
+    this.OwnTPrp = new CMathTextPrp();
+
     this.Composition = null; // ссылка на общую формулу
 
     this.reduct     =   1;      // индефикатор для степени (уменьшение размера шрифта)
@@ -115,7 +118,7 @@ CMathContent.prototype =
         this.g_mContext = new dist(0,0,0,0);
         this.content.push( new mathElem(new CEmpty(), new dist(0,0,0,0), 0) );
     },
-    ChangeTxtPrp: function(txtPrp)
+    old_ChangeTxtPrp: function(txtPrp)
     {
         var start, end;
         if( this.selection.startPos != this.selection.endPos )
@@ -133,14 +136,47 @@ CMathContent.prototype =
         for(var i = start; i < end; i++)
             this.content[i].value.setTxtPrp(txtPrp);
     },
-    setTxtPrp: function(txtPrp) // для всего контента, в случае, когда селект вышел за пределы контента, когда начинали селект + когда в коннтенте есть мат. элементы
+    old_setTxtPrp: function(txtPrp) // для всего контента, в случае, когда селект вышел за пределы контента, когда начинали селект + когда в коннтенте есть мат. элементы
     {
         this.textPrp.Merge(txtPrp);
 
         for(var i = 0; i < this.content.length; i++)
             this.content[i].value.setTxtPrp(txtPrp);
     },
-    setRunPrp: function(txtPrp)
+    setTxtPrp: function(txtPrp, start, end) //parent properties
+    {
+        this.TxtPrp  = new CMathTextPrp();
+        this.TxtPrp.Merge(txtPrp);
+        this.TxtPrp.Merge(this.OwnTPrp);
+
+        for(var i = start; i < end; i++)
+            this.content[i].value.setTxtPrp(this.TxtPrp);
+    },
+    changeTxtPrp: function(txtPrp, bAll)
+    {
+        var start, end;
+        if( this.selection.startPos != this.selection.endPos )
+        {
+            start = this.selection.startPos;
+            end = this.selection.endPos;
+            if(start > end)
+            {
+                tmp = start;
+                start = end;
+                end = tmp;
+            }
+        }
+
+        if(bAll)
+            this.setTxtPrp(txtPrp, 0, this.content.length);
+        else
+            this.setTxtPrp(txtPrp, start, end);
+    },
+    setOwnTPrp: function(txtPrp)
+    {
+        this.OwnTPrp.Merge(txtPrp);
+    },
+    old_setRunPrp: function(txtPrp)
     {
         this.setTxtPrp(txtPrp);
     },
@@ -167,7 +203,7 @@ CMathContent.prototype =
         }
         else
         {
-            runPrp.Merge(this.textPrp);
+            runPrp.Merge(this.TxtPrp);
         }
 
         return runPrp;
@@ -304,17 +340,16 @@ CMathContent.prototype =
         var symb = new CMathText();
         symb.relate(this);
         symb.add(code);
-        symb.setTxtPrp( this.getRunPrp(this.CurPos) );
+        var runPrp = this.getRunPrp(this.CurPos);
+        symb.setTxtPrp( runPrp );
 
         // txt properties
-
-
 
         this.addElementToContent(symb, gps);
 
         this.rInterval.endPos++; // max количество элементов this.CurPos
     },
-    createMComponent: function(ind)
+    addMComponent: function(ind)
     {
         var l_gap =  0, r_gap = 0;
         var mathElem = null;    //положение этого элемента будет this.CurPos + 1
@@ -401,7 +436,8 @@ CMathContent.prototype =
             mathElem.setComposition(this.Composition);
             mathElem.setReduct(this.reduct);
             var runPrp = this.getRunPrp(this.CurPos);
-            mathElem.setRunPrp( runPrp );
+            mathElem.setTxtPrp( runPrp );
+            //mathElem.setRunPrp( runPrp );
 
             //l_gap = r_gap = Math.floor( this.font.FontSize / 5 )*g_dKoef_pix_to_mm;
             this.addElementToContent( mathElem, new dist(l_gap, r_gap, 0, 0) );
@@ -429,25 +465,25 @@ CMathContent.prototype =
         this.setStart_Selection(this.CurPos);
         this.selection.active = false;
     },
-    addEquation: function(ind)
+    createEquation: function(ind)
     {
         switch(ind)
         {
             case 0:
             case 1:
             case 2:
-                var fract = this.createMComponent(ind);
+                var fract = this.addMComponent(ind);
                 fract.init();
                 fract.fillPlaceholders();
                 break;
             case 3:
-                var fract = this.createMComponent(0);
+                var fract = this.addMComponent(0);
                 fract.init();
                 fract.fillPlaceholders();
                 fract.setSimple(true);
                 break;
             case 4:
-                var fract = this.createMComponent(0);
+                var fract = this.addMComponent(0);
                 fract.init();
                 var num = fract.getNumerator();
                 num.addTxt("dy");
@@ -455,7 +491,7 @@ CMathContent.prototype =
                 den.addTxt("dx");
                 break;
             case 5:
-                var fract = this.createMComponent(0);
+                var fract = this.addMComponent(0);
                 fract.init();
                 var num = fract.getNumerator();
                 num.addTxt("Δy");
@@ -463,7 +499,7 @@ CMathContent.prototype =
                 den.addTxt("Δx");
                 break;
             case 6:
-                var fract = this.createMComponent(0);
+                var fract = this.addMComponent(0);
                 fract.init();
                 var num = fract.getNumerator();
                 num.addTxt("∂y");
@@ -471,7 +507,7 @@ CMathContent.prototype =
                 den.addTxt("∂x");
                 break;
             case 7:
-                var fract = this.createMComponent(0);
+                var fract = this.addMComponent(0);
                 fract.init();
                 var num = fract.getNumerator();
                 num.addTxt("δy");
@@ -479,7 +515,7 @@ CMathContent.prototype =
                 den.addTxt("δx");
                 break;
             case 8:
-                var fract = this.createMComponent(0);
+                var fract = this.addMComponent(0);
                 fract.init();
                 var num = fract.getNumerator();
                 num.addTxt("π");
@@ -487,36 +523,36 @@ CMathContent.prototype =
                 den.addTxt("2");
                 break;
             case 9:
-                var degr = this.createMComponent(3);
+                var degr = this.addMComponent(3);
                 degr.init();
                 degr.setIndex(1);
                 degr.fillPlaceholders();
                 break;
             case 10:
-                var degr = this.createMComponent(3);
+                var degr = this.addMComponent(3);
                 degr.init();
                 degr.setIndex(-1);
                 degr.fillPlaceholders();
                 break;
             case 11:
-                var degrSupSup = this.createMComponent(4);
+                var degrSupSup = this.addMComponent(4);
                 degrSupSup.init();
                 degrSupSup.fillPlaceholders();
                 break;
             case 12:
-                var degrSupSup = this.createMComponent(5);
+                var degrSupSup = this.addMComponent(5);
                 degrSupSup.init();
                 degrSupSup.fillPlaceholders();
                 break;
             case 13:
-                var degr = this.createMComponent(3);
+                var degr = this.addMComponent(3);
                 degr.init();
                 degr.setIndex(-1);
                 var base = degr.getBase();
                 base.addTxt("x");
                 var iter = degr.getIterator();
 
-                var degr2 = iter.createMComponent(3);
+                var degr2 = iter.addMComponent(3);
                 degr2.init();
                 degr2.setIndex(1);
                 var base2 = degr2.getBase();
@@ -526,7 +562,7 @@ CMathContent.prototype =
 
                 break;
             case 14:
-                var degr = this.createMComponent(3);
+                var degr = this.addMComponent(3);
                 degr.init();
                 degr.setIndex(1);
                 var base = degr.getBase();
@@ -535,7 +571,7 @@ CMathContent.prototype =
                 iter.addTxt("-iωt");
                 break;
             case 15:
-                var degr = this.createMComponent(3);
+                var degr = this.addMComponent(3);
                 degr.init();
                 degr.setIndex(1);
                 var base = degr.getBase();
@@ -544,7 +580,7 @@ CMathContent.prototype =
                 iter.addTxt("2");
                 break;
             case 16:
-                var degr = this.createMComponent(5);
+                var degr = this.addMComponent(5);
                 degr.init();
                 var base = degr.getBase();
                 base.addTxt("Y");
@@ -554,17 +590,17 @@ CMathContent.prototype =
                 iter2.addTxt("1");
                 break;
             case 17:
-                var rad = this.createMComponent(6);
+                var rad = this.addMComponent(6);
                 rad.init();
                 rad.fillPlaceholders();
                 break;
             case 18:
-                var rad = this.createMComponent(7);
+                var rad = this.addMComponent(7);
                 rad.init();
                 rad.fillPlaceholders();
                 break;
             case 19:
-                var rad = this.createMComponent(7);
+                var rad = this.addMComponent(7);
                 rad.init();
                 degr = rad.getDegree();
                 degr.addTxt("2");
@@ -572,7 +608,7 @@ CMathContent.prototype =
                 base.fillPlaceholders();
                 break;
             case 20:
-                var rad = this.createMComponent(7);
+                var rad = this.addMComponent(7);
                 rad.init();
                 degr = rad.getDegree();
                 degr.addTxt("3");
@@ -580,15 +616,15 @@ CMathContent.prototype =
                 base.fillPlaceholders();
                 break;
             case 21:
-                var fract = this.createMComponent(0);
+                var fract = this.addMComponent(0);
                 fract.init();
                 var num = fract.getNumerator();
                 num.addTxt("-b±");
 
-                var rad = num.createMComponent(6);
+                var rad = num.addMComponent(6);
                 rad.init();
                 var base = rad.getBase();
-                var degree = base.createMComponent(3);
+                var degree = base.addMComponent(3);
                 degree.init();
                 degree.setIndex(1);
                 var baseDg = degree.getBase();
@@ -601,11 +637,11 @@ CMathContent.prototype =
                 den.addTxt("2a");
                 break;
             case 22:
-                var rad = this.createMComponent(6);
+                var rad = this.addMComponent(6);
                 rad.init();
                 var base = rad.getBase();
 
-                degr1 = base.createMComponent(3);
+                degr1 = base.addMComponent(3);
                 degr1.init();
                 degr1.setIndex(1);
                 var base1 = degr1.getBase();
@@ -615,7 +651,7 @@ CMathContent.prototype =
 
                 base.addTxt("+");
 
-                degr2 = base.createMComponent(3);
+                degr2 = base.addMComponent(3);
                 degr2.init();
                 degr2.setIndex(1);
                 var base2 = degr2.getBase();
@@ -625,305 +661,305 @@ CMathContent.prototype =
 
                 break;
             case 23:
-                var integr = this.createMComponent(8);
+                var integr = this.addMComponent(8);
                 integr.init(0,0,0);
                 integr.fillPlaceholders();
                 break;
             case 24:
-                var integr = this.createMComponent(8);
+                var integr = this.addMComponent(8);
                 integr.init(0,1,3);
                 integr.fillPlaceholders();
                 break;
             case 25:
-                var integr = this.createMComponent(8);
+                var integr = this.addMComponent(8);
                 integr.init(0,0,3);
                 integr.fillPlaceholders();
                 break;
             case 26:
-                var integr = this.createMComponent(8);
+                var integr = this.addMComponent(8);
                 integr.init(1,0,0);
                 integr.fillPlaceholders();
                 break;
             case 27:
-                var integr = this.createMComponent(8);
+                var integr = this.addMComponent(8);
                 integr.init(1,1,3);
                 integr.fillPlaceholders();
                 break;
             case 28:
-                var integr = this.createMComponent(8);
+                var integr = this.addMComponent(8);
                 integr.init(1,0,3);
                 integr.fillPlaceholders();
                 break;
             case 29:
-                var integr = this.createMComponent(8);
+                var integr = this.addMComponent(8);
                 integr.init(2,0,0);
                 integr.fillPlaceholders();
                 break;
             case 30:
-                var integr = this.createMComponent(8);
+                var integr = this.addMComponent(8);
                 integr.init(2,1,3);
                 integr.fillPlaceholders();
                 break;
             case 31:
-                var integr = this.createMComponent(8);
+                var integr = this.addMComponent(8);
                 integr.init(2,0,3);
                 integr.fillPlaceholders();
                 break;
             case 32:
-                var integr = this.createMComponent(8);
+                var integr = this.addMComponent(8);
                 integr.init(3,0,0);
                 integr.fillPlaceholders();
                 break;
             case 33:
-                var integr = this.createMComponent(8);
+                var integr = this.addMComponent(8);
                 integr.init(3,1,3);
                 integr.fillPlaceholders();
                 break;
             case 34:
-                var integr = this.createMComponent(8);
+                var integr = this.addMComponent(8);
                 integr.init(3,0,3);
                 integr.fillPlaceholders();
                 break;
             case 35:
-                var integr = this.createMComponent(8);
+                var integr = this.addMComponent(8);
                 integr.init(4,0,0);
                 integr.fillPlaceholders();
                 break;
             case 36:
-                var integr = this.createMComponent(8);
+                var integr = this.addMComponent(8);
                 integr.init(4,1,3);
                 integr.fillPlaceholders();
                 break;
             case 37:
-                var integr = this.createMComponent(8);
+                var integr = this.addMComponent(8);
                 integr.init(4,0,3);
                 integr.fillPlaceholders();
                 break;
             case 38:
-                var integr = this.createMComponent(8);
+                var integr = this.addMComponent(8);
                 integr.init(5,0,0);
                 integr.fillPlaceholders();
                 break;
             case 39:
-                var integr = this.createMComponent(8);
+                var integr = this.addMComponent(8);
                 integr.init(5,1,3);
                 integr.fillPlaceholders();
                 break;
             case 40:
-                var integr = this.createMComponent(8);
+                var integr = this.addMComponent(8);
                 integr.init(5,0,3);
                 integr.fillPlaceholders();
                 break;
             case 41:
-                var base = this.createMComponent(22);
+                var base = this.addMComponent(22);
                 base.setDimension(1,1);
                 base.setContent();
                 var elem = base.getElement(0,0);
                 elem.addTxt("dx");
                 break;
             case 42:
-                var base = this.createMComponent(22);
+                var base = this.addMComponent(22);
                 base.setDimension(1,1);
                 base.setContent();
                 var elem = base.getElement(0,0);
                 elem.addTxt("dy");
                 break;
             case 43:
-                var base = this.createMComponent(22);
+                var base = this.addMComponent(22);
                 base.setDimension(1,1);
                 base.setContent();
                 var elem = base.getElement(0,0);
                 elem.addTxt("dθ");
                 break;
             case 44:
-                var sigma = this.createMComponent(8);
+                var sigma = this.addMComponent(8);
                 sigma.init(6,0,0);
                 sigma.fillPlaceholders();
                 break;
             case 45:
-                var sigma = this.createMComponent(8);
+                var sigma = this.addMComponent(8);
                 sigma.init(6,0,3);
                 sigma.fillPlaceholders();
                 break;
             case 46:
-                var sigma = this.createMComponent(8);
+                var sigma = this.addMComponent(8);
                 sigma.init(6,1,3);
                 sigma.fillPlaceholders();
                 break;
             case 47:
-                var sigma = this.createMComponent(8);
+                var sigma = this.addMComponent(8);
                 sigma.init(6,0,2);
                 sigma.fillPlaceholders();
                 break;
             case 48:
-                var sigma = this.createMComponent(8);
+                var sigma = this.addMComponent(8);
                 sigma.init(6,1,2);
                 sigma.fillPlaceholders();
                 break;
             case 49:
-                var product = this.createMComponent(8);
+                var product = this.addMComponent(8);
                 product.init(7,0,0);
                 product.fillPlaceholders();
                 break;
             case 50:
-                var product = this.createMComponent(8);
+                var product = this.addMComponent(8);
                 product.init(7,0,3);
                 product.fillPlaceholders();
                 break;
             case 51:
-                var product = this.createMComponent(8);
+                var product = this.addMComponent(8);
                 product.init(7,1,3);
                 product.fillPlaceholders();
                 break;
             case 52:
-                var product = this.createMComponent(8);
+                var product = this.addMComponent(8);
                 product.init(7,0,2);
                 product.fillPlaceholders();
                 break;
             case 53:
-                var product = this.createMComponent(8);
+                var product = this.addMComponent(8);
                 product.init(7,1,2);
                 product.fillPlaceholders();
                 break;
 
             case 54:
-                var product = this.createMComponent(8);
+                var product = this.addMComponent(8);
                 product.init(8,0,0);
                 product.fillPlaceholders();
                 break;
             case 55:
-                var product = this.createMComponent(8);
+                var product = this.addMComponent(8);
                 product.init(8,0,3);
                 product.fillPlaceholders();
                 break;
             case 56:
-                var product = this.createMComponent(8);
+                var product = this.addMComponent(8);
                 product.init(8,1,3);
                 product.fillPlaceholders();
                 break;
             case 57:
-                var product = this.createMComponent(8);
+                var product = this.addMComponent(8);
                 product.init(8,0,2);
                 product.fillPlaceholders();
                 break;
             case 58:
-                var product = this.createMComponent(8);
+                var product = this.addMComponent(8);
                 product.init(8,1,2);
                 product.fillPlaceholders();
                 break;
 
             case 59:
-                var union = this.createMComponent(8);
+                var union = this.addMComponent(8);
                 union.init(9,0,0);
                 union.fillPlaceholders();
                 break;
             case 60:
-                var union = this.createMComponent(8);
+                var union = this.addMComponent(8);
                 union.init(9,0,3);
                 union.fillPlaceholders();
                 break;
             case 61:
-                var union = this.createMComponent(8);
+                var union = this.addMComponent(8);
                 union.init(9,1,3);
                 union.fillPlaceholders();
                 break;
             case 62:
-                var union = this.createMComponent(8);
+                var union = this.addMComponent(8);
                 union.init(9,0,2);
                 union.fillPlaceholders();
                 break;
             case 63:
-                var union = this.createMComponent(8);
+                var union = this.addMComponent(8);
                 union.init(9,1,2);
                 union.fillPlaceholders();
                 break;
 
             case 64:
-                var union = this.createMComponent(8);
+                var union = this.addMComponent(8);
                 union.init(10,0,0);
                 union.fillPlaceholders();
                 break;
             case 65:
-                var union = this.createMComponent(8);
+                var union = this.addMComponent(8);
                 union.init(10,0,3);
                 union.fillPlaceholders();
                 break;
             case 66:
-                var union = this.createMComponent(8);
+                var union = this.addMComponent(8);
                 union.init(10,1,3);
                 union.fillPlaceholders();
                 break;
             case 67:
-                var union = this.createMComponent(8);
+                var union = this.addMComponent(8);
                 union.init(10,0,2);
                 union.fillPlaceholders();
                 break;
             case 68:
-                var union = this.createMComponent(8);
+                var union = this.addMComponent(8);
                 union.init(10,1,2);
                 union.fillPlaceholders();
                 break;
 
             case 69:
-                var logicalOr = this.createMComponent(8);
+                var logicalOr = this.addMComponent(8);
                 logicalOr.init(11,0,0);
                 logicalOr.fillPlaceholders();
                 break;
             case 70:
-                var logicalOr = this.createMComponent(8);
+                var logicalOr = this.addMComponent(8);
                 logicalOr.init(11,0,3);
                 logicalOr.fillPlaceholders();
                 break;
             case 71:
-                var logicalOr = this.createMComponent(8);
+                var logicalOr = this.addMComponent(8);
                 logicalOr.init(11,1,3);
                 logicalOr.fillPlaceholders();
                 break;
             case 72:
-                var logicalOr = this.createMComponent(8);
+                var logicalOr = this.addMComponent(8);
                 logicalOr.init(11,0,2);
                 logicalOr.fillPlaceholders();
                 break;
             case 73:
-                var logicalOr = this.createMComponent(8);
+                var logicalOr = this.addMComponent(8);
                 logicalOr.init(11,1,2);
                 logicalOr.fillPlaceholders();
                 break;
 
             case 74:
-                var logicalOr = this.createMComponent(8);
+                var logicalOr = this.addMComponent(8);
                 logicalOr.init(12,0,0);
                 logicalOr.fillPlaceholders();
                 break;
             case 75:
-                var logicalOr = this.createMComponent(8);
+                var logicalOr = this.addMComponent(8);
                 logicalOr.init(12,0,3);
                 logicalOr.fillPlaceholders();
                 break;
             case 76:
-                var logicalOr = this.createMComponent(8);
+                var logicalOr = this.addMComponent(8);
                 logicalOr.init(12,1,3);
                 logicalOr.fillPlaceholders();
                 break;
             case 77:
-                var logicalOr = this.createMComponent(8);
+                var logicalOr = this.addMComponent(8);
                 logicalOr.init(12,0,2);
                 logicalOr.fillPlaceholders();
                 break;
             case 78:
-                var logicalOr = this.createMComponent(8);
+                var logicalOr = this.addMComponent(8);
                 logicalOr.init(12,1,2);
                 logicalOr.fillPlaceholders();
                 break;
 
             case 79:
-                var sigma = this.createMComponent(8);
+                var sigma = this.addMComponent(8);
                 sigma.init(6,0,2);
                 var iter = sigma.getLowerIterator();
                 iter.addTxt("k");
-                var delim = sigma.getBase().createMComponent(9);
+                var delim = sigma.getBase().addMComponent(9);
                 delim.init(0, 4, 0, 1);
-                var fract = delim.getBase().createMComponent(0);
+                var fract = delim.getBase().addMComponent(0);
                 fract.init();
                 fract.hideBar(true);
                 var num = fract.getNumerator();
@@ -933,7 +969,7 @@ CMathContent.prototype =
                 break;
 
             case 80:
-                var sigma = this.createMComponent(8);
+                var sigma = this.addMComponent(8);
                 sigma.init(6,0,3);
                 var iterUp = sigma.getUpperIterator();
                 iterUp.addTxt("n");
@@ -943,14 +979,14 @@ CMathContent.prototype =
                 base.fillPlaceholders();
                 break;
             case 81:
-                var product = this.createMComponent(8);
+                var product = this.addMComponent(8);
                 product.init(7,0,3);
                 var iterUp = product.getUpperIterator();
                 iterUp.addTxt("n");
                 var iterLow = product.getLowerIterator();
                 iterLow.addTxt("k=1");
                 var base = product.getBase();
-                var degr = base.createMComponent(3);
+                var degr = base.addMComponent(3);
                 degr.init();
                 degr.setIndex(-1);
                 var baseDgr = degr.getBase();
@@ -961,7 +997,7 @@ CMathContent.prototype =
             case 82:
                 break;
             case 83:
-                var union = this.createMComponent(8);
+                var union = this.addMComponent(8);
                 union.init(9,0,3);
 
                 var iterUp = union.getUpperIterator();
@@ -970,11 +1006,11 @@ CMathContent.prototype =
                 iterLow.addTxt("n=1");
 
                 var base = union.getBase();
-                var delim = base.createMComponent(9);
+                var delim = base.addMComponent(9);
                 delim.init(0, 4, 0, 1);
                 var base2 = delim.getBase();
 
-                var degrX = base2.createMComponent(3);
+                var degrX = base2.addMComponent(3);
                 degrX.init();
                 degrX.setIndex(-1);
 
@@ -985,7 +1021,7 @@ CMathContent.prototype =
 
                 base2.addTxt("∩");
 
-                var degrY = base2.createMComponent(3);
+                var degrY = base2.addMComponent(3);
                 degrY.init();
                 degrY.setIndex(-1);
 
@@ -996,201 +1032,201 @@ CMathContent.prototype =
 
                 break;
             case 84:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(0, 4, 0, 1);
                 delim.fillPlaceholders();
                 break;
             case 85:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(2, 4, 0, 1);
                 delim.fillPlaceholders();
                 break;
             case 86:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(1, 4, 0, 1);
                 delim.fillPlaceholders();
                 break;
             case 87:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(3, 4, 0, 1);
                 delim.fillPlaceholders();
                 break;
             case 88:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(4, 4, 0, 1);
                 delim.fillPlaceholders();
                 break;
             case 89:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(4, 4, 2, 3);
                 delim.fillPlaceholders();
                 break;
             case 90:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(5, 4, 0, 1);
                 delim.fillPlaceholders();
                 break;
             case 91:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(6, 4, 0, 1);
                 delim.fillPlaceholders();
                 break;
             case 92:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(2, 4, 0, 0);
                 delim.fillPlaceholders();
                 break;
             case 93:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(2, 4, 1, 1);
                 delim.fillPlaceholders();
                 break;
             case 94:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(2, 4, 1, 0);
                 delim.fillPlaceholders();
                 break;
             case 95:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(7, 4, 0, 1);
                 delim.fillPlaceholders();
                 break;
             case 96:
-                var delim = this.createMComponent(10);
+                var delim = this.addMComponent(10);
                 delim.init(0, 2);
                 delim.fillPlaceholders();
                 break;
             case 97:
-                var delim = this.createMComponent(10);
+                var delim = this.addMComponent(10);
                 delim.init(1, 2);
                 delim.fillPlaceholders();
                 break;
             case 98:
-                var delim = this.createMComponent(10);
+                var delim = this.addMComponent(10);
                 delim.init(3, 2);
                 delim.fillPlaceholders();
                 break;
             case 99:
-                var delim = this.createMComponent(10);
+                var delim = this.addMComponent(10);
                 delim.init(3, 3);
                 delim.fillPlaceholders();
                 break;
             case 100:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(0,2,0);
                 delim.fillPlaceholders();
                 break;
             case 101:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(0,3,1);
                 delim.fillPlaceholders();
                 break;
             case 102:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(2,2,0);
                 delim.fillPlaceholders();
                 break;
             case 103:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(2,3,1);
                 delim.fillPlaceholders();
                 break;
             case 104:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(1,2,0);
                 delim.fillPlaceholders();
                 break;
             case 105:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(1,3,1);
                 delim.fillPlaceholders();
                 break;
             case 106:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(3,2,0);
                 delim.fillPlaceholders();
                 break;
             case 107:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(3,3,1);
                 delim.fillPlaceholders();
                 break;
             case 108:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(4,2,0);
                 delim.fillPlaceholders();
                 break;
             case 109:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(4,3,1);
                 delim.fillPlaceholders();
                 break;
             case 110:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(4,2,2);
                 delim.fillPlaceholders();
                 break;
             case 111:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(4,3,3);
                 delim.fillPlaceholders();
                 break;
             case 112:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(5,2,0);
                 delim.fillPlaceholders();
                 break;
             case 113:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(5,3,1);
                 delim.fillPlaceholders();
                 break;
             case 114:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(6,2,0);
                 delim.fillPlaceholders();
                 break;
             case 115:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(6,3,1);
                 delim.fillPlaceholders();
                 break;
             case 116:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(7,2,0);
                 delim.fillPlaceholders();
                 break;
             case 117:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(7,3,1);
                 delim.fillPlaceholders();
                 break;
             case 118:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(1,2,0);
                 var base = delim.getBase();
-                var matrix = base.createMComponent(21);
+                var matrix = base.addMComponent(21);
                 matrix.init(2, 1);
                 matrix.fillPlaceholders();
                 break;
             case 119:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(1,2,0);
                 var base = delim.getBase();
-                var matrix = base.createMComponent(21);
+                var matrix = base.addMComponent(21);
                 matrix.init(3, 1);
                 matrix.fillPlaceholders();
                 break;
             case 120:
-                var fract = this.createMComponent(0);
+                var fract = this.addMComponent(0);
                 fract.init();
                 fract.hideBar(true);
                 fract.fillPlaceholders();
                 break;
             case 121:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(0, 4, 0, 1);
-                var fract = delim.getBase().createMComponent(0);
+                var fract = delim.getBase().addMComponent(0);
                 fract.init();
                 fract.hideBar(true);
                 fract.fillPlaceholders();
@@ -1198,9 +1234,9 @@ CMathContent.prototype =
             case 122:
                 break;
             case 123:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(0, 4, 0, 1);
-                var fract = delim.getBase().createMComponent(0);
+                var fract = delim.getBase().addMComponent(0);
                 fract.init();
                 fract.hideBar(true);
                 var num = fract.getNumerator();
@@ -1210,9 +1246,9 @@ CMathContent.prototype =
                 den.addTxt("k");
                 break;
             case 124:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(3, 4, 0, 1);
-                var fract = delim.getBase().createMComponent(0);
+                var fract = delim.getBase().addMComponent(0);
                 fract.init();
                 fract.hideBar(true);
                 var num = fract.getNumerator();
@@ -1222,7 +1258,7 @@ CMathContent.prototype =
                 den.addTxt("k");
                 break;
             case 125:
-                var trig = this.createMComponent(11);
+                var trig = this.addMComponent(11);
                 trig.init();
                 var func = trig.getFunction();
                 func.addTxt("sin");
@@ -1230,7 +1266,7 @@ CMathContent.prototype =
                 arg.fillPlaceholders();
                 break;
             case 126:
-                var trig = this.createMComponent(11);
+                var trig = this.addMComponent(11);
                 trig.init();
                 var func = trig.getFunction();
                 func.addTxt("cos");
@@ -1238,7 +1274,7 @@ CMathContent.prototype =
                 arg.fillPlaceholders();
                 break;
             case 127:
-                var trig = this.createMComponent(11);
+                var trig = this.addMComponent(11);
                 trig.init();
                 var func = trig.getFunction();
                 func.addTxt("tan");
@@ -1246,7 +1282,7 @@ CMathContent.prototype =
                 arg.fillPlaceholders();
                 break;
             case 128:
-                var trig = this.createMComponent(11);
+                var trig = this.addMComponent(11);
                 trig.init();
                 var func = trig.getFunction();
                 func.addTxt("csc");
@@ -1254,7 +1290,7 @@ CMathContent.prototype =
                 arg.fillPlaceholders();
                 break;
             case 129:
-                var trig = this.createMComponent(11);
+                var trig = this.addMComponent(11);
                 trig.init();
                 var func = trig.getFunction();
                 func.addTxt("sec");
@@ -1262,7 +1298,7 @@ CMathContent.prototype =
                 arg.fillPlaceholders();
                 break;
             case 130:
-                var trig = this.createMComponent(11);
+                var trig = this.addMComponent(11);
                 trig.init();
                 var func = trig.getFunction();
                 func.addTxt("cot");
@@ -1271,10 +1307,10 @@ CMathContent.prototype =
                 break;
 
             case 131:
-                var trig = this.createMComponent(11);
+                var trig = this.addMComponent(11);
                 trig.init();
                 var func = trig.getFunction();
-                var degr = func.createMComponent(3);
+                var degr = func.addMComponent(3);
                 degr.init();
                 degr.setIndex(1);
                 var base = degr.getBase();
@@ -1286,10 +1322,10 @@ CMathContent.prototype =
                 arg.fillPlaceholders();
                 break;
             case 132:
-                var trig = this.createMComponent(11);
+                var trig = this.addMComponent(11);
                 trig.init();
                 var func = trig.getFunction();
-                var degr = func.createMComponent(3);
+                var degr = func.addMComponent(3);
                 degr.init();
                 degr.setIndex(1);
                 var base = degr.getBase();
@@ -1301,10 +1337,10 @@ CMathContent.prototype =
                 arg.fillPlaceholders();
                 break;
             case 133:
-                var trig = this.createMComponent(11);
+                var trig = this.addMComponent(11);
                 trig.init();
                 var func = trig.getFunction();
-                var degr = func.createMComponent(3);
+                var degr = func.addMComponent(3);
                 degr.init();
                 degr.setIndex(1);
                 var base = degr.getBase();
@@ -1316,10 +1352,10 @@ CMathContent.prototype =
                 arg.fillPlaceholders();
                 break;
             case 134:
-                var trig = this.createMComponent(11);
+                var trig = this.addMComponent(11);
                 trig.init();
                 var func = trig.getFunction();
-                var degr = func.createMComponent(3);
+                var degr = func.addMComponent(3);
                 degr.init();
                 degr.setIndex(1);
                 var base = degr.getBase();
@@ -1331,10 +1367,10 @@ CMathContent.prototype =
                 arg.fillPlaceholders();
                 break;
             case 135:
-                var trig = this.createMComponent(11);
+                var trig = this.addMComponent(11);
                 trig.init();
                 var func = trig.getFunction();
-                var degr = func.createMComponent(3);
+                var degr = func.addMComponent(3);
                 degr.init();
                 degr.setIndex(1);
                 var base = degr.getBase();
@@ -1346,10 +1382,10 @@ CMathContent.prototype =
                 arg.fillPlaceholders();
                 break;
             case 136:
-                var trig = this.createMComponent(11);
+                var trig = this.addMComponent(11);
                 trig.init();
                 var func = trig.getFunction();
-                var degr = func.createMComponent(3);
+                var degr = func.addMComponent(3);
                 degr.init();
                 degr.setIndex(1);
                 var base = degr.getBase();
@@ -1363,7 +1399,7 @@ CMathContent.prototype =
 
 
             case 137:
-                var trig = this.createMComponent(11);
+                var trig = this.addMComponent(11);
                 trig.init();
                 var func = trig.getFunction();
                 func.addTxt("sinh");
@@ -1371,7 +1407,7 @@ CMathContent.prototype =
                 arg.fillPlaceholders();
                 break;
             case 138:
-                var trig = this.createMComponent(11);
+                var trig = this.addMComponent(11);
                 trig.init();
                 var func = trig.getFunction();
                 func.addTxt("cosh");
@@ -1379,7 +1415,7 @@ CMathContent.prototype =
                 arg.fillPlaceholders();
                 break;
             case 139:
-                var trig = this.createMComponent(11);
+                var trig = this.addMComponent(11);
                 trig.init();
                 var func = trig.getFunction();
                 func.addTxt("tanh");
@@ -1387,7 +1423,7 @@ CMathContent.prototype =
                 arg.fillPlaceholders();
                 break;
             case 140:
-                var trig = this.createMComponent(11);
+                var trig = this.addMComponent(11);
                 trig.init();
                 var func = trig.getFunction();
                 func.addTxt("csch");
@@ -1395,7 +1431,7 @@ CMathContent.prototype =
                 arg.fillPlaceholders();
                 break;
             case 141:
-                var trig = this.createMComponent(11);
+                var trig = this.addMComponent(11);
                 trig.init();
                 var func = trig.getFunction();
                 func.addTxt("sech");
@@ -1403,7 +1439,7 @@ CMathContent.prototype =
                 arg.fillPlaceholders();
                 break;
             case 142:
-                var trig = this.createMComponent(11);
+                var trig = this.addMComponent(11);
                 trig.init();
                 var func = trig.getFunction();
                 func.addTxt("coth");
@@ -1412,10 +1448,10 @@ CMathContent.prototype =
                 break;
 
             case 143:
-                var trig = this.createMComponent(11);
+                var trig = this.addMComponent(11);
                 trig.init();
                 var func = trig.getFunction();
-                var degr = func.createMComponent(3);
+                var degr = func.addMComponent(3);
                 degr.init();
                 degr.setIndex(1);
                 var base = degr.getBase();
@@ -1427,10 +1463,10 @@ CMathContent.prototype =
                 arg.fillPlaceholders();
                 break;
             case 144:
-                var trig = this.createMComponent(11);
+                var trig = this.addMComponent(11);
                 trig.init();
                 var func = trig.getFunction();
-                var degr = func.createMComponent(3);
+                var degr = func.addMComponent(3);
                 degr.init();
                 degr.setIndex(1);
                 var base = degr.getBase();
@@ -1442,10 +1478,10 @@ CMathContent.prototype =
                 arg.fillPlaceholders();
                 break;
             case 145:
-                var trig = this.createMComponent(11);
+                var trig = this.addMComponent(11);
                 trig.init();
                 var func = trig.getFunction();
-                var degr = func.createMComponent(3);
+                var degr = func.addMComponent(3);
                 degr.init();
                 degr.setIndex(1);
                 var base = degr.getBase();
@@ -1457,10 +1493,10 @@ CMathContent.prototype =
                 arg.fillPlaceholders();
                 break;
             case 146:
-                var trig = this.createMComponent(11);
+                var trig = this.addMComponent(11);
                 trig.init();
                 var func = trig.getFunction();
-                var degr = func.createMComponent(3);
+                var degr = func.addMComponent(3);
                 degr.init();
                 degr.setIndex(1);
                 var base = degr.getBase();
@@ -1472,10 +1508,10 @@ CMathContent.prototype =
                 arg.fillPlaceholders();
                 break;
             case 147:
-                var trig = this.createMComponent(11);
+                var trig = this.addMComponent(11);
                 trig.init();
                 var func = trig.getFunction();
-                var degr = func.createMComponent(3);
+                var degr = func.addMComponent(3);
                 degr.init();
                 degr.setIndex(1);
                 var base = degr.getBase();
@@ -1487,10 +1523,10 @@ CMathContent.prototype =
                 arg.fillPlaceholders();
                 break;
             case 148:
-                var trig = this.createMComponent(11);
+                var trig = this.addMComponent(11);
                 trig.init();
                 var func = trig.getFunction();
-                var degr = func.createMComponent(3);
+                var degr = func.addMComponent(3);
                 degr.init();
                 degr.setIndex(1);
                 var base = degr.getBase();
@@ -1502,7 +1538,7 @@ CMathContent.prototype =
                 arg.fillPlaceholders();
                 break;
             case 149:
-                var trig = this.createMComponent(11);
+                var trig = this.addMComponent(11);
                 trig.init();
                 var func = trig.getFunction();
                 func.addTxt("sin");
@@ -1510,7 +1546,7 @@ CMathContent.prototype =
                 arg.addTxt("θ");
                 break;
             case 150:
-                var trig = this.createMComponent(11);
+                var trig = this.addMComponent(11);
                 trig.init();
                 var func = trig.getFunction();
                 func.addTxt("cos");
@@ -1518,129 +1554,129 @@ CMathContent.prototype =
                 arg.addTxt("2x");
                 break;
             case 151:
-                var trig = this.createMComponent(11);
+                var trig = this.addMComponent(11);
                 trig.init();
                 var func = trig.getFunction();
                 func.addTxt("tan");
                 var arg = trig.getArgument();
                 arg.addTxt("θ");
                 this.addTxt("=");
-                var fract = this.createMComponent(0);
+                var fract = this.addMComponent(0);
                 fract.init();
                 var num = fract.getNumerator();
-                var sin = num.createMComponent(11);
+                var sin = num.addMComponent(11);
                 sin.init();
                 sin.getFunction().addTxt("sin");
                 sin.getArgument().addTxt("θ");
                 var den = fract.getDenominator();
-                var cos = den.createMComponent(11);
+                var cos = den.addMComponent(11);
                 cos.init();
                 cos.getFunction().addTxt("cos");
                 cos.getArgument().addTxt("θ");
                 break;
             case 152:
-                var diac = this.createMComponent(15);
+                var diac = this.addMComponent(15);
                 diac.init(3);
                 diac.fillPlaceholders();
                 break;
             case 153:
-                var diac = this.createMComponent(15);
+                var diac = this.addMComponent(15);
                 diac.init(4);
                 diac.fillPlaceholders();
                 break;
             case 154:
-                var diac = this.createMComponent(15);
+                var diac = this.addMComponent(15);
                 diac.init(5);
                 diac.fillPlaceholders();
                 break;
             case 155:
-                var diac = this.createMComponent(12);
+                var diac = this.addMComponent(12);
                 diac.init();
                 diac.setIndex(-1);
                 diac.fillPlaceholders();
                 break;
             case 156:
-                var diac = this.createMComponent(12);
+                var diac = this.addMComponent(12);
                 diac.init();
                 diac.setIndex(1);
                 diac.fillPlaceholders();
                 break;
             case 157:
-                var diac = this.createMComponent(15);
+                var diac = this.addMComponent(15);
                 diac.init(2);
                 diac.fillPlaceholders();
                 break;
             case 158:
-                var diac = this.createMComponent(15);
+                var diac = this.addMComponent(15);
                 diac.init(1);
                 diac.fillPlaceholders();
                 break;
             case 159:
-                var diac = this.createMComponent(13);
+                var diac = this.addMComponent(13);
                 diac.init();
                 diac.setIndex(1);
                 diac.fillPlaceholders();
                 break;
             case 160:
-                var diac = this.createMComponent(13);
+                var diac = this.addMComponent(13);
                 diac.init();
                 diac.setIndex(2);
                 diac.fillPlaceholders();
                 break;
             case 161:
-                var line = this.createMComponent(14);
+                var line = this.addMComponent(14);
                 line.init();
                 line.setIndex(1);
                 line.fillPlaceholders();
                 break;
             case 162:
-                var line = this.createMComponent(14);
+                var line = this.addMComponent(14);
                 line.init();
                 line.setIndex(2);
                 line.fillPlaceholders();
                 break;
             case 163:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(1,0,1);
                 delim.fillPlaceholders();
                 break;
             case 164:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(1,1,2);
                 delim.fillPlaceholders();
                 break;
             case 165:
-                var groupDelim = this.createMComponent(16);
+                var groupDelim = this.addMComponent(16);
                 groupDelim.init(1);
                 groupDelim.fillPlaceholders();
                 break;
             case 166:
-                var groupDelim = this.createMComponent(16);
+                var groupDelim = this.addMComponent(16);
                 groupDelim.init(-1);
                 groupDelim.fillPlaceholders();
                 break;
             case 167:
-                var arrow = this.createMComponent(17);
+                var arrow = this.addMComponent(17);
                 arrow.init(1, 0, 0); // left arrow  top
                 arrow.fillPlaceholders();
                 break;
             case 168:
-                var arrow = this.createMComponent(17);
+                var arrow = this.addMComponent(17);
                 arrow.init(1, 0, 1); // right arrow  top
                 arrow.fillPlaceholders();
                 break;
             case 169:
-                var arrow = this.createMComponent(17);
+                var arrow = this.addMComponent(17);
                 arrow.init(2, 0, 0);
                 arrow.fillPlaceholders();
                 break;
             case 170:
-                var arrow = this.createMComponent(17);
+                var arrow = this.addMComponent(17);
                 arrow.init(0, 0, 0);
                 arrow.fillPlaceholders();
                 break;
             case 171:
-                var arrow = this.createMComponent(17);
+                var arrow = this.addMComponent(17);
                 arrow.init(0, 0, 1);
                 arrow.fillPlaceholders();
                 break;
@@ -1649,16 +1685,16 @@ CMathContent.prototype =
             case 173:
                 break;
             case 174:
-                var box = this.createMComponent(18);
+                var box = this.addMComponent(18);
                 box.init();
                 box.fillPlaceholders();
                 break;
             case 175:
-                var box = this.createMComponent(18);
+                var box = this.addMComponent(18);
                 box.init();
                 var arg = box.getElement();
 
-                var degrA = arg.createMComponent(3);
+                var degrA = arg.addMComponent(3);
                 degrA.init();
                 degrA.setIndex(1);
                 var baseA = degrA.getBase();
@@ -1668,7 +1704,7 @@ CMathContent.prototype =
 
                 arg.addTxt("=");
 
-                var degrB = arg.createMComponent(3);
+                var degrB = arg.addMComponent(3);
                 degrB.init();
                 degrB.setIndex(1);
                 var baseB = degrB.getBase();
@@ -1678,7 +1714,7 @@ CMathContent.prototype =
 
                 arg.addTxt("+");
 
-                var degrC = arg.createMComponent(3);
+                var degrC = arg.addMComponent(3);
                 degrC.init();
                 degrC.setIndex(1);
                 var baseC = degrC.getBase();
@@ -1692,11 +1728,11 @@ CMathContent.prototype =
             case 177:
                 break;
             case 178:
-                var struct = this.createMComponent(22); // logaithm
+                var struct = this.addMComponent(22); // logaithm
                 struct.setDimension(1,2);
                 struct.setContent();
                 var first = struct.getElement(0,0);
-                var degr = first.createMComponent(3);
+                var degr = first.addMComponent(3);
                 degr.init();
                 degr.setIndex(-1);
                 var base = degr.getBase();
@@ -1709,7 +1745,7 @@ CMathContent.prototype =
                 second.fillPlaceholders();
                 break;
             case 179:
-                var log = this.createMComponent(11);     // logaithm
+                var log = this.addMComponent(11);     // logaithm
                 log.init();
                 var func = log.getFunction();
                 func.addTxt("log");
@@ -1717,7 +1753,7 @@ CMathContent.prototype =
                 arg.fillPlaceholders();
                 break;
             case 180:
-                var minimax = this.createMComponent(19);
+                var minimax = this.addMComponent(19);
                 minimax.init();
                 var base = minimax.getFunction();
                 base.addTxt("lim");
@@ -1727,7 +1763,7 @@ CMathContent.prototype =
                 arg.fillPlaceholders();
                 break;
             case 181:
-                var minimax = this.createMComponent(19);
+                var minimax = this.addMComponent(19);
                 minimax.init();
                 var base = minimax.getFunction();
                 base.addTxt("min");
@@ -1737,7 +1773,7 @@ CMathContent.prototype =
                 arg.fillPlaceholders();
                 break;
             case 182:
-                var minimax = this.createMComponent(19);
+                var minimax = this.addMComponent(19);
                 minimax.init();
                 var base = minimax.getFunction();
                 base.addTxt("max");
@@ -1747,7 +1783,7 @@ CMathContent.prototype =
                 arg.fillPlaceholders();
                 break;
             case 183:
-                var log = this.createMComponent(11); // logaithm
+                var log = this.addMComponent(11); // logaithm
                 log.init();
                 var func = log.getFunction();
                 func.addTxt("ln");
@@ -1755,23 +1791,23 @@ CMathContent.prototype =
                 arg.fillPlaceholders();
                 break;
             case 184:
-                var minimax = this.createMComponent(19);
+                var minimax = this.addMComponent(19);
                 minimax.init();
                 var base = minimax.getFunction();
                 base.addTxt("lim");
                 var iter = minimax.getIterator();
                 iter.addTxt("n→∞");
                 var arg = minimax.getArgument();
-                var degr = arg.createMComponent(3);
+                var degr = arg.addMComponent(3);
                 degr.init();
                 degr.setIndex(1);
 
                 var base = degr.getBase();
-                var delim = base.createMComponent(9);
+                var delim = base.addMComponent(9);
                 delim.init(0, 4, 0, 1);
                 var separ = delim.getBase();
                 separ.addTxt("1+");
-                var fract = separ.createMComponent(0);
+                var fract = separ.addMComponent(0);
                 fract.init();
                 var num = fract.getNumerator();
                 num.addTxt("1");
@@ -1782,7 +1818,7 @@ CMathContent.prototype =
                 dgIter.addTxt("n");
                 break;
             case 185:
-                var minimax = this.createMComponent(19);
+                var minimax = this.addMComponent(19);
                 minimax.init();
                 var base = minimax.getFunction();
                 base.addTxt("max");
@@ -1790,14 +1826,14 @@ CMathContent.prototype =
                 iter.addTxt("0≤x≤1");
                 var arg = minimax.getArgument();
                 arg.addTxt("x");
-                var degr1 = arg.createMComponent(3);
+                var degr1 = arg.addMComponent(3);
                 degr1.init();
                 degr1.setIndex(1);
                 var base1 = degr1.getBase();
                 base1.addTxt("e");
                 var iter1 = degr1.getIterator();
                 iter1.addTxt("-");
-                var degr2 = iter1.createMComponent(3);
+                var degr2 = iter1.addMComponent(3);
                 degr2.init();
                 degr2.setIndex(1);
                 var base2 = degr2.getBase();
@@ -1806,163 +1842,163 @@ CMathContent.prototype =
                 iter2.addTxt("2");
                 break;
             case 186:
-                var base = this.createMComponent(22);
+                var base = this.addMComponent(22);
                 base.setDimension(1,1);
                 base.setContent();
                 var arg = base.getElement(0,0);
                 arg.addTxt("∶=");
                 break;
             case 187:
-                var base = this.createMComponent(22);
+                var base = this.addMComponent(22);
                 base.setDimension(1,1);
                 base.setContent();
                 var arg = base.getElement(0,0);
                 arg.addTxt("==");
                 break;
             case 188:
-                var base = this.createMComponent(22);
+                var base = this.addMComponent(22);
                 base.setDimension(1,1);
                 base.setContent();
                 var arg = base.getElement(0,0);
                 arg.addTxt("+=");
                 break;
             case 189:
-                var base = this.createMComponent(22);
+                var base = this.addMComponent(22);
                 base.setDimension(1,1);
                 base.setContent();
                 var arg = base.getElement(0,0);
                 arg.addTxt("-=");
                 break;
             case 190:
-                var base = this.createMComponent(22);
+                var base = this.addMComponent(22);
                 base.setDimension(1,1);
                 base.setContent();
                 var arg = base.getElement(0,0);
                 arg.addTxt("≝");
                 break;
             case 191:
-                var base = this.createMComponent(22);
+                var base = this.addMComponent(22);
                 base.setDimension(1,1);
                 base.setContent();
                 var arg = base.getElement(0,0);
                 arg.addTxt("≞");
                 break;
             case 192:
-                var base = this.createMComponent(22);
+                var base = this.addMComponent(22);
                 base.setDimension(1,1);
                 base.setContent();
                 var arg = base.getElement(0,0);
                 arg.addTxt("≜");
                 break;
             case 193:
-                var arrow = this.createMComponent(20);
+                var arrow = this.addMComponent(20);
                 arrow.init(1, 0, 0);
                 arrow.fillPlaceholders();
                 break;
             case 194:
-                var arrow = this.createMComponent(20);
+                var arrow = this.addMComponent(20);
                 arrow.init(1, 0, 1);
                 arrow.fillPlaceholders();
                 break;
             case 195:
-                var arrow = this.createMComponent(20);
+                var arrow = this.addMComponent(20);
                 arrow.init(1, 1, 0);
                 arrow.fillPlaceholders();
                 break;
             case 196:
-                var arrow = this.createMComponent(20);
+                var arrow = this.addMComponent(20);
                 arrow.init(1, 1, 1);
                 arrow.fillPlaceholders();
                 break;
             case 197:
-                var arrow = this.createMComponent(20);
+                var arrow = this.addMComponent(20);
                 arrow.init(3, 0, 0);
                 arrow.fillPlaceholders();
                 break;
             case 198:
-                var arrow = this.createMComponent(20);
+                var arrow = this.addMComponent(20);
                 arrow.init(3, 0, 1);
                 arrow.fillPlaceholders();
                 break;
             case 199:
-                var arrow = this.createMComponent(20);
+                var arrow = this.addMComponent(20);
                 arrow.init(3, 1, 0);
                 arrow.fillPlaceholders();
                 break;
             case 200:
-                var arrow = this.createMComponent(20);
+                var arrow = this.addMComponent(20);
                 arrow.init(3, 1, 1);
                 arrow.fillPlaceholders();
                 break;
             case 201:
-                var arrow = this.createMComponent(20);
+                var arrow = this.addMComponent(20);
                 arrow.init(2, 0, 0);
                 arrow.fillPlaceholders();
                 break;
             case 202:
-                var arrow = this.createMComponent(20);
+                var arrow = this.addMComponent(20);
                 arrow.init(2, 1, 0);
                 arrow.fillPlaceholders();
                 break;
             case 203:
-                var arrow = this.createMComponent(20);
+                var arrow = this.addMComponent(20);
                 arrow.init(4, 0, 0);
                 arrow.fillPlaceholders();
                 break;
             case 204:
-                var arrow = this.createMComponent(20);
+                var arrow = this.addMComponent(20);
                 arrow.init(4, 1, 0);
                 arrow.fillPlaceholders();
                 break;
             case 205:
-                var arrow = this.createMComponent(20);
+                var arrow = this.addMComponent(20);
                 arrow.init(1, 1, 1);
                 var base = arrow.getBase();
                 base.addTxt("yields");
                 break;
             case 206:
-                var arrow = this.createMComponent(20);
+                var arrow = this.addMComponent(20);
                 arrow.init(1, 1, 1);
                 var base = arrow.getBase();
                 base.addTxt("∆");
                 break;
             case 207:
-                var matrix = this.createMComponent(21);
+                var matrix = this.addMComponent(21);
                 matrix.init(1, 2);
                 matrix.fillPlaceholders();
                 break;
             case 208:
-                var matrix = this.createMComponent(21);
+                var matrix = this.addMComponent(21);
                 matrix.init(2, 1);
                 matrix.fillPlaceholders();
                 break;
             case 209:
-                var matrix = this.createMComponent(21);
+                var matrix = this.addMComponent(21);
                 matrix.init(1, 3);
                 matrix.fillPlaceholders();
                 break;
             case 210:
-                var matrix = this.createMComponent(21);
+                var matrix = this.addMComponent(21);
                 matrix.init(3, 1);
                 matrix.fillPlaceholders();
                 break;
             case 211:
-                var matrix = this.createMComponent(21);
+                var matrix = this.addMComponent(21);
                 matrix.init(2, 2);
                 matrix.fillPlaceholders();
                 break;
             case 212:
-                var matrix = this.createMComponent(21);
+                var matrix = this.addMComponent(21);
                 matrix.init(2, 3);
                 matrix.fillPlaceholders();
                 break;
             case 213:
-                var matrix = this.createMComponent(21);
+                var matrix = this.addMComponent(21);
                 matrix.init(3, 2);
                 matrix.fillPlaceholders();
                 break;
             case 214:
-                var matrix = this.createMComponent(21);
+                var matrix = this.addMComponent(21);
                 matrix.init(3, 3);
                 matrix.fillPlaceholders();
                 break;
@@ -1979,7 +2015,7 @@ CMathContent.prototype =
                 this.addTxt("⋱");
                 break;
             case 219:
-                var matrix = this.createMComponent(21);
+                var matrix = this.addMComponent(21);
                 matrix.init(2, 2);
                 elem1 = matrix.getElement(0,0);
                 elem1.addTxt("1");
@@ -1994,7 +2030,7 @@ CMathContent.prototype =
                 elem4.addTxt("1");
                 break;
             case 220:
-                var matrix = this.createMComponent(21);
+                var matrix = this.addMComponent(21);
                 matrix.init(2, 2);
                 matrix.hidePlaceholder(true);
 
@@ -2011,7 +2047,7 @@ CMathContent.prototype =
                 elem4.addTxt("1");
                 break;
             case 221:
-                var matrix  = this.createMComponent(21);
+                var matrix  = this.addMComponent(21);
                 matrix.init(3, 3);
 
                 elem1 = matrix.getElement(0,0);
@@ -2043,7 +2079,7 @@ CMathContent.prototype =
 
                 break;
             case 222:
-                var matrix  = this.createMComponent(21);
+                var matrix  = this.addMComponent(21);
                 matrix.init(3, 3);
                 
                 matrix.hidePlaceholder(true);
@@ -2075,42 +2111,42 @@ CMathContent.prototype =
                 elem9.addTxt("1");
                 break;
             case 223:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(0, 4, 0, 1);
                 base = delim.getBase();
-                var matrix = base.createMComponent(21);
+                var matrix = base.addMComponent(21);
                 matrix.init(2, 2);
                 matrix.fillPlaceholders();
                 break;
             case 224:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(2, 4, 0, 1);
                 base = delim.getBase();
-                var matrix = base.createMComponent(21);
+                var matrix = base.addMComponent(21);
                 matrix.init(2, 2);
                 matrix.fillPlaceholders();
                 break;
             case 225:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(5, 4, 0, 1);
                 base = delim.getBase();
-                var matrix = base.createMComponent(21);
+                var matrix = base.addMComponent(21);
                 matrix.init(2, 2);
                 matrix.fillPlaceholders();
                 break;
             case 226:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(6, 4, 0, 1);
                 base = delim.getBase();
-                var matrix = base.createMComponent(21);
+                var matrix = base.addMComponent(21);
                 matrix.init(2, 2);
                 matrix.fillPlaceholders();
                 break;
             case 227:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(0, 4, 0, 1);
                 base = delim.getBase();
-                var matrix  = base.createMComponent(21);
+                var matrix  = base.addMComponent(21);
                 matrix.init(3, 3);
 
                 elem1 = matrix.getElement(0,0);
@@ -2142,10 +2178,10 @@ CMathContent.prototype =
 
                 break;
             case 228:
-                var delim = this.createMComponent(9);
+                var delim = this.addMComponent(9);
                 delim.init(2, 4, 0, 1);
                 base = delim.getBase();
-                var matrix  = base.createMComponent(21);
+                var matrix  = base.addMComponent(21);
                 matrix.init(3, 3);
 
                 elem1 = matrix.getElement(0,0);
@@ -2195,7 +2231,7 @@ CMathContent.prototype =
     {
         this.reduct = this.reduct*coeff;
     },
-    getTxtPrp: function()
+    old_getTxtPrp: function()
     {
         var txtPrp;
 
@@ -2785,10 +2821,10 @@ CMathContent.prototype =
     },
     update_Cursor: function()
     {
-        var fontSize = this.getTxtPrp().FontSize;
-        var position = {x: this.pos.x + this.content[this.CurPos].widthToEl, y: this.pos.y + this.size.center - fontSize*g_dKoef_pt_to_mm /2 };
+        var sizeCursor = this.TxtPrp.FontSize *g_dKoef_pt_to_mm;
+        var position = {x: this.pos.x + this.content[this.CurPos].widthToEl, y: this.pos.y + this.size.center - sizeCursor/2 };
 
-        editor.WordControl.m_oLogicDocument.DrawingDocument.SetTargetSize( fontSize*g_dKoef_pt_to_mm );
+        editor.WordControl.m_oLogicDocument.DrawingDocument.SetTargetSize( sizeCursor );
         editor.WordControl.m_oDrawingDocument.UpdateTargetFromPaint = true;
         editor.WordControl.m_oLogicDocument.DrawingDocument.UpdateTarget( position.x, position.y, 0 );
         editor.WordControl.m_oDrawingDocument.UpdateTargetFromPaint = false;
@@ -3211,7 +3247,7 @@ CMathContent.prototype =
         this.setEnd_Selection(1);
         this.selection.active = false;
     },
-    old_setPosition: function( _pos )
+    old_old_setPosition: function( _pos )
     {
         this.pos = { x: _pos.x + this.g_mContext.left, y: _pos.y};
         var max_cent = this.size.center;
@@ -3222,7 +3258,7 @@ CMathContent.prototype =
             this.content[i].value.setPosition(t);
         }
     },
-    setPosition: function( _pos )
+    old_setPosition: function( _pos )
     {
         this.pos = { x: _pos.x + this.g_mContext.left, y: _pos.y};
         var max_cent = this.size.center;
@@ -3238,6 +3274,21 @@ CMathContent.prototype =
             var t = {x: this.pos.x + this.content[i-1].widthToEl + this.content[i].g_mContext.left, y: this.pos.y + max_cent };
             if( ! this.content[i].value.SUBCONTENT )
                 t.y += baseLine;
+
+            this.content[i].value.setPosition(t);
+        }
+    },
+    setPosition: function( _pos )
+    {
+        this.pos = { x: _pos.x + this.g_mContext.left, y: _pos.y};
+
+        for(var i=1; i<this.content.length;i++)
+        {
+            var t =
+            {
+                x: this.pos.x + this.content[i-1].widthToEl + this.content[i].g_mContext.left,
+                y: this.pos.y + this.size.center
+            };
 
             this.content[i].value.setPosition(t);
         }
@@ -3875,7 +3926,7 @@ function CMathComposition()
     this.TxtPrp = new CMathTextPrp();
 
     this.init();
-    this.setDefaultPrp();
+
 }
 CMathComposition.prototype =
 {
@@ -3889,6 +3940,8 @@ CMathComposition.prototype =
         this.Root = new CMathContent();
         this.Root.g_mContext = gps;
         this.Root.setComposition(this);
+        this.setDefaultPrp();
+        this.Root.changeTxtPrp(this.TxtPrp, false);
 
         this.CurrentContent = this.Root;
         this.SelectContent  = this.Root;
@@ -4070,12 +4123,12 @@ CMathComposition.prototype =
 
         this.ShowCursor();
     },
-    AddMathComponent: function(indef)
+    CreateEquation: function(indef)
     {
         this.ClearSelect();
 
         this.SelectContent.removeAreaSelect();
-        this.SelectContent.addEquation(indef);
+        this.SelectContent.createEquation(indef);
 
         ///
         this.RecalculateReverse();
@@ -4140,7 +4193,7 @@ CMathComposition.prototype =
     },
     SetTxtPrp: function(txtPrp)
     {
-        this.SelectContent.ChangeTxtPrp(txtPrp);
+        this.SelectContent.changeTxtPrp(txtPrp, false);
         this.Resize();
         this.UpdatePosition();
         this.UpdateCursor();
@@ -4969,7 +5022,8 @@ function CEmpty()
     this.SUBCONTENT = false;
     this.empty = true;
     this.pos = null;
-    this.textPrp = new CMathTextPrp();
+    this.TxtPrp = new CMathTextPrp();
+
     //this.size = {width: 0, ascent:0, descent: 0, height: 0, center: 0};
     this.size = {width: 0, height: 0, center: 0, ascent: 0};
     this.selection =
@@ -4987,13 +5041,12 @@ function CEmpty()
     this.Resize = function(){};
 
     this.IsHighElement =  function() { return false; };
-    this.setTxtPrp = function(txtPrp) { this.textPrp.Merge(txtPrp); };
-    this.getRunPrp = function() {return this.textPrp;};
-    this.getOwnTPrp = function() {return this.textPrp;}
+    this.setTxtPrp = function(txtPrp) { this.TxtPrp.Merge(txtPrp); };
+    this.getRunPrp = function() {return this.TxtPrp; };
 
 }
 
-function AddEquation(ind)
+function old_AddEquation(ind)
 {
     var mathElem = null;
 
@@ -5695,8 +5748,6 @@ function AddEquation(ind)
 
     return mathElem;
 }
-
-
 
 function Old_CMathComposition(font, pos)
 {

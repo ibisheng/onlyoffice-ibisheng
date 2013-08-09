@@ -53,7 +53,9 @@ function CMathText()
     this.SUBCONTENT = false;
     this.empty = false;
     this.Parent = null;
-    this.textPrp = new CMathTextPrp();
+
+    this.TxtPrp = new CMathTextPrp();
+    this.OwnTPrp = new CMathTextPrp();
 
     //this.sizeSymbol = null; // размер символа без учета трансформации
 
@@ -75,9 +77,8 @@ CMathText.prototype =
     getCode: function()
     {
         var code = this.value;
-        var Italic = this.getTxtPrp().Italic;
 
-        if(Italic)
+        if( this.TxtPrp.Italic )
         {
             if(code == 0x0068) // h
                 code = 0x210E;
@@ -132,7 +133,7 @@ CMathText.prototype =
     {
         this.value = StartTextElement;
     },
-    getTxtPrp: function()
+    old_getTxtPrp: function()
     {
         var txtPrp = this.Parent.getTxtPrp();
         txtPrp.Merge(this.textPrp);
@@ -146,7 +147,10 @@ CMathText.prototype =
     },
     setTxtPrp: function(txtPrp)
     {
-        this.textPrp.Merge(txtPrp);
+        this.TxtPrp  = new CMathTextPrp();
+        this.TxtPrp.Merge(txtPrp);
+        this.TxtPrp.Merge(this.OwnTPrp);
+
     },
     setLIterator: function(bIterator)
     {
@@ -154,7 +158,7 @@ CMathText.prototype =
     },
     getRunPrp: function()
     {
-        return this.textPrp;
+        return this.TxtPrp;
     },
     getOwnTPrp: function()
     {
@@ -169,10 +173,11 @@ CMathText.prototype =
     // gap = FontHeight - FontDescent - Placeholder.Height + FontDescent
     recalculateSize: function()
     {
-        var txtPrp = this.getTxtPrp();
+        var txtPrp = new CMathTextPrp();
+        txtPrp.Merge(this.TxtPrp);
         txtPrp.Italic = false;
 
-        g_oTextMeasurer.SetFont ( txtPrp );
+        g_oTextMeasurer.SetFont( txtPrp );
 
         var letter = this.getCode();
         var metricsTxt = g_oTextMeasurer.Measure2Code(letter);
@@ -199,8 +204,7 @@ CMathText.prototype =
     old_draw: function()
     {
         var txtPrp = this.getTxtPrp();
-        g_oTextMeasurer.SetFont ( txtPrp );
-
+        g_oTextMeasurer.SetFont( txtPrp );
 
         MathControl.pGraph.b_color1(0,0,0,255);
         MathControl.pGraph.SetFont(txtPrp);
@@ -247,9 +251,9 @@ CMathText.prototype =
     },
     draw: function()
     {
-        var txtPrp = this.getTxtPrp();
+        var txtPrp = new CMathTextPrp();
+        txtPrp.Merge(this.TxtPrp);
         txtPrp.Italic = false;
-        g_oTextMeasurer.SetFont ( txtPrp );
 
         MathControl.pGraph.b_color1(0,0,0,255);
         MathControl.pGraph.SetFont(txtPrp);

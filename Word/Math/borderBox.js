@@ -34,7 +34,7 @@ CBorderBox.prototype.recalculateSize = function()
     var height = ss.height;
     var center = ss.center;
 
-    this.gapBrd = this.getTxtPrp().FontSize *0.08104587131076388;
+    this.gapBrd = this.getTxtPrp().FontSize*0.08104587131076388;
 
     if(this.bTop)
     {
@@ -48,7 +48,6 @@ CBorderBox.prototype.recalculateSize = function()
         width += this.gapBrd;
     if(this.bRight)
         width += this.gapBrd;
-
 
     this.size = {width : width, height: height, center: center};
 }

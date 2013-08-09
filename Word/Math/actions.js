@@ -370,12 +370,12 @@ CControlComposition.prototype =
 
         return {x: _x, y: _y};
     },
-    AddMathComponent: function(indef)
+    // AddMathComponent -> CreateEquation
+    CreateEquation: function(indef)
     {
-        this.Content[this.CurPos].AddMathComponent(indef);
+        this.Content[this.CurPos].CreateEquation(indef);
         this.Content[this.CurPos].RecalculateReverse();
         this.Content[this.CurPos].UpdatePosition();
-        //this.Content[this.CurPos].AddMathComponent(indef);
     },
     Paragraph_Add: function(TextPr)
     {
@@ -608,82 +608,6 @@ function Create_Structures()
             var path = "url('Math/img/degree.png')";
             Set_Container(dim, path, 9);
 
-            /*var Cont = document.getElementById("Container");
-            Cont.style.display = "block";
-
-            while(Cont.firstChild)
-                Cont.removeChild(Cont.firstChild);
-
-            Cont.style.width = "320px";
-            Cont.style.height = "104px";
-
-            var SubScript = document.createElement("div");
-            SubScript.id                       = "id_SubScript";
-            SubScript.style["float"]           = "left";
-            SubScript.style.backgroundImage    = "url('Math/img/degree.png')";
-            SubScript.style.width              = "80px";
-            SubScript.style.height             = "104px";
-            SubScript.style.backgroundPosition = "0px 0px";
-            Cont.appendChild( SubScript );
-
-
-            SubScript.onmousedown = function()
-            {
-                document.getElementById("Container").style.display = "none";
-                MathControl.AddMathComponent(4);
-                MathRecalculate();
-            }
-
-            var SuperScript = document.createElement("div");
-            SuperScript.id                       = "id_SuperScript";
-            SuperScript.style["float"]           = "left";
-            SuperScript.style.backgroundImage    = "url('Math/img/degree.png')";
-            SuperScript.style.width              = "80px";
-            SuperScript.style.height             = "104px";
-            SuperScript.style.backgroundPosition = "240px 0px";
-            Cont.appendChild( SuperScript );
-
-
-            SuperScript.onmousedown = function()
-            {
-                document.getElementById("Container").style.display = "none";
-                MathControl.AddMathComponent(5);
-                MathRecalculate();
-            }
-
-            var SubSuperScript = document.createElement("div");
-            SubSuperScript.id                       = "id_SubSuperScript";
-            SubSuperScript.style["float"]           = "left";
-            SubSuperScript.style.backgroundImage    = "url('Math/img/degree.png')";
-            SubSuperScript.style.width              = "80px";
-            SubSuperScript.style.height             = "104px";
-            SubSuperScript.style.backgroundPosition = "160px 0px";
-            Cont.appendChild( SubSuperScript );
-
-            SubSuperScript.onmousedown = function()
-            {
-                document.getElementById("Container").style.display = "none";
-                MathControl.AddMathComponent(6);
-                MathRecalculate();
-            }
-
-            var Pre_SubSuperScript = document.createElement("div");
-            Pre_SubSuperScript.id                       = "id_Pre_SubSuperScript";
-            Pre_SubSuperScript.style["float"]           = "left";
-            Pre_SubSuperScript.style.backgroundImage    = "url('Math/img/degree.png')";
-            Pre_SubSuperScript.style.width              = "80px";
-            Pre_SubSuperScript.style.height             = "104px";
-            Pre_SubSuperScript.style.backgroundPosition = "80px 0px";
-            Cont.appendChild( Pre_SubSuperScript );
-
-
-            Pre_SubSuperScript.onmousedown = function()
-            {
-                document.getElementById("Container").style.display = "none";
-                MathControl.AddMathComponent(7);
-                MathRecalculate();
-            }*/
-
         }
 
         var Radical = document.createElement("div");
@@ -732,31 +656,6 @@ function Create_Structures()
             path = "url('Math/img/radical_equat.png')";
             Set_Container(dim, path, 21);
 
-
-            /*var Cont = document.getElementById("Container");
-            Cont.style.display = "block";
-
-            while(Cont.firstChild)
-                Cont.removeChild(Cont.firstChild);
-
-            Cont.style.width = "80px";
-            Cont.style.height = "104px";
-
-            var WO_Degr = document.createElement("div");
-            WO_Degr.id                       = "id_WO_Degr";
-            WO_Degr.style["float"]           = "left";
-            WO_Degr.style.backgroundImage    = "url('Math/img/radical.png')";
-            WO_Degr.style.width              = "80px";
-            WO_Degr.style.height             = "104px";
-            WO_Degr.style.backgroundPosition = "0px 0px";
-            Cont.appendChild( WO_Degr );
-
-            WO_Degr.onmousedown = function()
-            {
-                document.getElementById("Container").style.display = "none";
-                MathControl.AddMathComponent(8);
-                MathRecalculate();
-            }*/
 
         }
 
@@ -854,140 +753,6 @@ function Create_Structures()
             path = "url('Math/img/nary_2.png')";
             Set_Container(dim, path, 82);
 
-            /*dim =
-            {
-                sizeContainer: {column: 4, row : 7 },
-                countEqt:     2,
-                widthEqt:     80,
-                heightEqt:    104
-
-            };
-            path = "url('Math/img/radical_equat.png')";
-            Set_Container(dim, path, 21);*/
-
-            //document.getElementById("Container").style.height = "208px";
-
-           /* var Cont = document.getElementById("Container");
-            Cont.style.display = "block";
-
-            while(Cont.firstChild)
-                Cont.removeChild(Cont.firstChild);
-
-            Cont.style.width = "320px";
-            Cont.style.height = "208px";
-
-            var SingleNary = document.createElement("div");
-            SingleNary.id                       = "id_SingleNary";
-            SingleNary.style["float"]           = "left";
-            SingleNary.style.backgroundImage    = "url('Math/img/nary.png')";
-            SingleNary.style.width              = "80px";
-            SingleNary.style.height             = "104px";
-            SingleNary.style.backgroundPosition = "0px 0px";
-            Cont.appendChild( SingleNary );
-
-            SingleNary.onmousedown = function()
-            {
-                document.getElementById("Container").style.display = "none";
-                MathControl.AddMathComponent(10);
-                MathRecalculate();
-            }
-
-            var UndOvrNary = document.createElement("div");
-            UndOvrNary.id                       = "id_UndOvrNary";
-            UndOvrNary.style["float"]           = "left";
-            UndOvrNary.style.backgroundImage    = "url('Math/img/nary.png')";
-            UndOvrNary.style.width              = "80px";
-            UndOvrNary.style.height             = "104px";
-            UndOvrNary.style.backgroundPosition = "240px 0px";
-            Cont.appendChild( UndOvrNary );
-
-            UndOvrNary.onmousedown = function()
-            {
-                document.getElementById("Container").style.display = "none";
-                MathControl.AddMathComponent(11);
-                MathRecalculate();
-            }
-
-            var UndNary = document.createElement("div");
-            UndNary.id                       = "id_UndNary";
-            UndNary.style["float"]           = "left";
-            UndNary.style.backgroundImage    = "url('Math/img/nary.png')";
-            UndNary.style.width              = "80px";
-            UndNary.style.height             = "104px";
-            UndNary.style.backgroundPosition = "160px 0px";
-            Cont.appendChild( UndNary );
-
-
-            UndNary.onmousedown = function()
-            {
-                document.getElementById("Container").style.display = "none";
-                MathControl.AddMathComponent(12);
-                MathRecalculate();
-            }
-
-            var OvrNary = document.createElement("div");
-            OvrNary.id                       = "id_OvrNary";
-            OvrNary.style["float"]           = "left";
-            OvrNary.style.backgroundImage    = "url('Math/img/nary.png')";
-            OvrNary.style.width              = "80px";
-            OvrNary.style.height             = "104px";
-            OvrNary.style.backgroundPosition = "80px 0px";
-            Cont.appendChild( OvrNary );
-
-            OvrNary.onmousedown = function()
-            {
-                document.getElementById("Container").style.display = "none";
-                MathControl.AddMathComponent(13);
-                MathRecalculate();
-            }
-
-            var SubNary = document.createElement("div");
-            SubNary.id                       = "id_SubNary";
-            SubNary.style["float"]           = "left";
-            SubNary.style.backgroundImage    = "url('Math/img/nary.png')";
-            SubNary.style.width              = "80px";
-            SubNary.style.height             = "104px";
-            SubNary.style.backgroundPosition = "0px 208px";
-            Cont.appendChild( SubNary );
-
-            SubNary.onmousedown = function()
-            {
-                document.getElementById("Container").style.display = "none";
-                MathControl.AddMathComponent(14);
-                MathRecalculate();
-            }
-
-            var SubNaryUp = document.createElement("div");
-            SubNaryUp.id                       = "id_SubNaryUp";
-            SubNaryUp.style["float"]           = "left";
-            SubNaryUp.style.backgroundImage    = "url('Math/img/nary.png')";
-            SubNaryUp.style.width              = "80px";
-            SubNaryUp.style.height             = "104px";
-            SubNaryUp.style.backgroundPosition = "240px 208px";
-            Cont.appendChild( SubNaryUp );
-
-            SubNaryUp.onmousedown = function()
-            {
-                document.getElementById("Container").style.display = "none";
-                MathControl.AddMathComponent(15);
-                MathRecalculate();
-            }
-
-            var SubNaryDown = document.createElement("div");
-            SubNaryDown.id                       = "id_SubNaryDown";
-            SubNaryDown.style["float"]           = "left";
-            SubNaryDown.style.backgroundImage    = "url('Math/img/nary.png')";
-            SubNaryDown.style.width              = "80px";
-            SubNaryDown.style.height             = "104px";
-            SubNaryDown.style.backgroundPosition = "160px 208px";
-            Cont.appendChild( SubNaryDown );
-
-            SubNaryDown.onmousedown = function()
-            {
-                document.getElementById("Container").style.display = "none";
-                MathControl.AddMathComponent(16);
-                MathRecalculate();
-            }*/
 
         }
 
@@ -1480,7 +1245,8 @@ function Set_Container(dimension, path, index)
                     return function()
                     {
                         document.getElementById("Container").style.display = "none";
-                        MathControl.AddMathComponent(index + _i*column + _j);
+                        // AddMathComponent -> CreateEquation
+                        MathControl.CreateEquation(index + _i*column + _j);
                         editor.WordControl.m_oLogicDocument.DrawingDocument.OnRecalculatePage(0, { Width : Page_Width, Height : Page_Height, Margins :  {
                             Left   : X_Left_Field,
                             Right  : X_Right_Field,

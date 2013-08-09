@@ -19,8 +19,11 @@ function CMathBase()
     this.Parent = null;
     this.Composition = null; // ссылка на общую формулу
 
-    this.textPrp = new CMathTextPrp(); // для рассчета размера расстояний
-    this.RunPrp = new CMathTextPrp(); // запоминаем, если передаются спец. настройки для контента
+    this.TxtPrp = new CMathTextPrp();
+    this.OwnTPrp = new CMathTextPrp();
+
+    //this.textPrp = new CMathTextPrp(); // для рассчета размера расстояний
+    //this.RunPrp = new CMathTextPrp(); // запоминаем, если передаются спец. настройки для контента
 
     //todo
     //переделать
@@ -53,9 +56,9 @@ CMathBase.prototype =
             {
                 this.elements[i][j] = new CMathContent();
                 this.elements[i][j].relate(this);
-                //this.elements[i][j].setReduct(this.reduct);
                 this.elements[i][j].setComposition(this.Composition);
-                this.elements[i][j].setRunPrp(this.RunPrp);
+                //this.elements[i][j].setReduct(this.reduct);
+                //this.elements[i][j].setRunPrp(this.RunPrp);
 
             }
         }
@@ -75,7 +78,7 @@ CMathBase.prototype =
             this.alignment.wdt[u] = CENTER;
 
     },
-    getTxtPrp: function()
+    old_getTxtPrp: function()
     {
         var txtPrp = new CMathTextPrp();
         Common_CopyObj2(txtPrp, this.Composition.TxtPrp);
@@ -86,17 +89,20 @@ CMathBase.prototype =
 
         return txtPrp;
     },
+    setTxtPrp: function()
+    {
+        this.TxtPrp  = new CMathTextPrp();
+        this.TxtPrp.Merge(txtPrp);
+        this.TxtPrp.Merge(this.OwnTPrp);
+
+        for(var i=0; i < this.nRow; i++)
+            for(var j = 0; j < this.nCol; j++)
+                this.elements[i][j].setTxtPrp(TxtPrp);
+    },
     getOwnTPrp: function()
     {
         return this.textPrp;
     },
-    /*getTxtPrp_2: function()
-    {
-        var txtPrp = this.getTxtPrp();
-        txtPrp.FontSize *= this.reduct;
-
-        return txtPrp;
-    },*/
     setComposition: function(Compos)
     {
         this.Composition = Compos;
@@ -110,9 +116,9 @@ CMathBase.prototype =
     },
     getRunPrp: function()
     {
-        return this.textPrp;
+        return this.TxtPrp;
     },
-    setRunPrp: function(txtPrp)
+    old_setRunPrp: function(txtPrp)
     {
         this.RunPrp.Merge(txtPrp);
         this.setTxtPrp(txtPrp);
@@ -158,7 +164,7 @@ CMathBase.prototype =
                     {
                         this.elements[i][j].setComposition(this.Composition);
                         //this.elements[i][j].setReduct(this.reduct);
-                        this.elements[i][j].setRunPrp(this.RunPrp);
+                        //this.elements[i][j].setRunPrp(this.RunPrp);
                     }
                     this.elements[i][j].bMObjs = true;
                 }
@@ -882,7 +888,7 @@ CMathBase.prototype =
     {
      return this.elements[x][y];
     },
-    setTxtPrp: function(txtPrp)
+    old_setTxtPrp: function(txtPrp)
     {
         for(var i=0; i < this.nRow; i++)
             for(var j = 0; j < this.nCol; j++)
