@@ -4380,7 +4380,14 @@ function CDrawingDocument()
             var _count_mods = g_oThemeColorsDefaultMods.length;
             for (var j = 0; j < _count_mods; ++j)
             {
+                var _rgba = {R:_color_src.r, G: _color_src.g, B:_color_src.b, A: 255};
+
                 var _mods = g_oThemeColorsDefaultMods[j];
+                if (_rgba.R > 200 && _rgba.G > 200 && _rgba.B > 200)
+                    _mods = g_oThemeColorsDefaultMods1[j];
+                else if (_rgba.R < 40 && _rgba.G < 40 && _rgba.B < 40)
+                    _mods = g_oThemeColorsDefaultMods2[j];
+
                 var dst_mods = new CColorModifiers();
                 var _ind = 0;
                 for (var k in _mods)
@@ -4391,7 +4398,6 @@ function CDrawingDocument()
                     _ind++;
                 }
 
-                var _rgba = {R:_color_src.r, G: _color_src.g, B:_color_src.b, A: 255};
                 dst_mods.Apply(_rgba);
 
                 _ret_array[_cur_index] = new CColor(_rgba.R, _rgba.G, _rgba.B);

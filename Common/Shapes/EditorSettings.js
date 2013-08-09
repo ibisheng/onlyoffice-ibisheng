@@ -236,6 +236,22 @@ var g_oThemeColorsDefaultMods = [
     {lumMod: 50000}
 ];
 
+var g_oThemeColorsDefaultMods1 = [
+    {lumMod: 95000},
+    {lumMod: 85000},
+    {lumMod: 75000},
+    {lumMod: 65000},
+    {lumMod: 50000}
+];
+
+var g_oThemeColorsDefaultMods2 = [
+    {lumMod: 50000, lumOff: 50000},
+    {lumMod: 65000, lumOff: 35000},
+    {lumMod: 75000, lumOff: 25000},
+    {lumMod: 85000, lumOff: 15000},
+    {lumMod: 95000, lumOff: 5000}
+];
+
 var g_oUserColorScheme = new Array();
 g_oUserColorScheme[0] = {
     dk1:     {R: 240, G: 127, B: 9},
