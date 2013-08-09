@@ -1412,7 +1412,7 @@ FT_CFF_CMAP_UNICODE_CLASS_REC_GET:Qt
 tt_face_init:os
 FT_Vector:Si
 Editor_Copy:va
-JSCompiler_StaticMethods_Get_After:HB
+JSCompiler_StaticMethods_Get_After:GB
 JSCompiler_StaticMethods_Internal_FindWordStart:$D
 CTableCellPr:Px
 CThumbnailsManager:hJ
