@@ -253,7 +253,7 @@ g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("vi-VN", 0x042a));
 //{ "gd-GB", 0x0491 },
 //{ "ar-IQ", 0x0801 },
 //{ "zh-CN", 0x0804 },
-//{ "de-CH", 0x0807 },
+g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("de-CH", 0x0807));
 //{ "en-GB", 0x0809 },
 //{ "es-MX", 0x080a },
 //{ "fr-BE", 0x080c },
