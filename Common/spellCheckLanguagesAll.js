@@ -160,7 +160,7 @@ g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("lv-LV", 0x0426));
 //{ "lt-LT", 0x0427 },
 //{ "tg-Cyrl-TJ", 0x0428 },
 //{ "fa-IR", 0x0429 },
-//{ "vi-VN", 0x042a },
+g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("vi-VN", 0x042a));
 //{ "hy-AM", 0x042b },
 //{ "az-Latn-AZ", 0x042c },
 //{ "eu-ES", 0x042d },
