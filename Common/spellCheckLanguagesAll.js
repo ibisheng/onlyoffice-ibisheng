@@ -123,7 +123,7 @@ var g_spellCheckLanguages = [];
 //{ "bg-BG", 0x0402 },
 //{ "ca-ES", 0x0403 },
 //{ "zh-TW", 0x0404 },
-//{ "cs-CZ", 0x0405 },
+g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("cs-CZ", 0x0405));
 //{ "da-DK", 0x0406 },
 g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("de-DE", 0x0407));
 //{ "el-GR", 0x0408 },
