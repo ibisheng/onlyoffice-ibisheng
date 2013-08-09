@@ -132,7 +132,7 @@ g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("en-US", 0x0409));
 //{ "fi-FI", 0x040b },
 g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("fr-FR", 0x040c));
 //{ "he-IL", 0x040d },
-//{ "hu-HU", 0x040e },
+g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("hu-HU", 0x040e));
 //{ "is-IS", 0x040f },
 g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("it-IT", 0x0410));
 //{ "ja-JP", 0x0411 },
