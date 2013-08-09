@@ -284,7 +284,7 @@ g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("pt-PT", 0x0816));
 //{ "ti-ET", 0x0873 },
 //{ "ar-EG", 0x0c01 },
 //{ "zh-HK", 0x0c04 },
-//{ "de-AT", 0x0c07 },
+g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("de-AT", 0x0c07));
 //{ "en-AU", 0x0c09 },
 g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("es-ES", 0x0c0a));
 //{ "fr-CA", 0x0c0c },
