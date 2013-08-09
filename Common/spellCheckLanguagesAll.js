@@ -124,7 +124,7 @@ var g_spellCheckLanguages = [];
 g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("ca-ES", 0x0403));
 //{ "zh-TW", 0x0404 },
 g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("cs-CZ", 0x0405));
-//{ "da-DK", 0x0406 },
+g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("da-DK", 0x0406));
 g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("de-DE", 0x0407));
 g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("el-GR", 0x0408));
 g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("en-US", 0x0409));
