@@ -260,7 +260,7 @@ g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("lv-LV", 0x0426));
 //{ "it-CH", 0x0810 },
 //{ "nl-BE", 0x0813 },
 //{ "nn-NO", 0x0814 },
-//{ "pt-PT", 0x0816 },
+g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("pt-PT", 0x0816));
 //{ "ro-MO", 0x0818 },
 //{ "ru-MO", 0x0819 },
 //{ "sr-Latn-CS", 0x081a },
