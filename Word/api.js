@@ -755,6 +755,7 @@ asc_docs_api.prototype.asc_getEditorPermissionsCallback = function(incomeObject)
 		oEditorPermissions.asc_setCanDownload(oSettings["canDownload"]);
 		oEditorPermissions.asc_setCanCoAuthoring(oSettings["canCoAuthoring"]);
 		oEditorPermissions.asc_setCanReaderMode(oSettings["canReaderMode"]);
+		oEditorPermissions.asc_setCanBranding(oSettings["canBranding"]);
 		oEditorPermissions.asc_setIsAutosaveEnable(oSettings["isAutosaveEnable"]);
 		oEditorPermissions.asc_setAutosaveMinInterval(oSettings["AutosaveMinInterval"]);
 		
