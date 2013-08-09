@@ -157,7 +157,7 @@ g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("uk-UA", 0x0422));
 //{ "sl-SI", 0x0424 },
 //{ "et-EE", 0x0425 },
 g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("lv-LV", 0x0426));
-//{ "lt-LT", 0x0427 },
+g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("lt-LT", 0x0427));
 //{ "tg-Cyrl-TJ", 0x0428 },
 //{ "fa-IR", 0x0429 },
 g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("vi-VN", 0x042a));
