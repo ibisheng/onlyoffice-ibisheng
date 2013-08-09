@@ -1128,6 +1128,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					"drawSelection":			function () {t._onDrawSelection.apply(t, arguments);},
 					"showDrawingObjects":		function () {t._onShowDrawingObjects.apply(t, arguments);},
 					"showComments":				function () {t._onShowComments.apply(t, arguments);},
+					"unlockComments":			function () {t._onUnlockComments.apply(t);},
 					"cleanSelection":			function () {t._onCleanSelection.apply(t, arguments);},
 					"resetDrawingObject":		function () {t._onResetDrawingObject.apply(t, arguments);}
 				});
@@ -1392,6 +1393,13 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			_onShowComments: function () {
 				if (this.wb) {
 					this.wb.getWorksheet().cellCommentator.drawCommentCells();
+				}
+			},
+			
+			_onUnlockComments: function () {
+				if (this.wb) {
+					var ws = this.wb.getWorksheet();
+					ws.cellCommentator.unlockComments();
 				}
 			},
 

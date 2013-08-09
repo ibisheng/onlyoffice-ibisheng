@@ -260,8 +260,9 @@
 				// Перерисовываем
 				if (bCheckRedraw) {
 					this.handlers.trigger("drawSelection");
-					this.handlers.trigger("showDrawingObjects");
+					this.handlers.trigger("unlockComments");
 					this.handlers.trigger("showComments");
+					this.handlers.trigger("showDrawingObjects");
 				}
 			},
 
