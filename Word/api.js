@@ -1,4 +1,4 @@
-/** @define {boolean} */
+﻿/** @define {boolean} */
 var ASC_DOCS_API_DEBUG = true;
 
 var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
@@ -540,6 +540,12 @@ function asc_docs_api(name)
 	this.isSpellCheckEnable = true;
     /**************************************/
 
+	// AutoSave
+	this.autoSaveGap = 0;				// Интервал автосохранения (0 - означает, что автосохранения нет)
+	this.autoSaveTimeOutId = null;		// Идентификатор таймаута
+	this.isAutoSave = false;			// Флаг, означает что запущено автосохранение
+	this.autoSaveGapAsk = 5000;			// Константа для повторного запуска автосохранения, если не смогли сделать сразу lock (только при автосохранении)
+
     this.bInit_word_control = false;
 	this.isDocumentModify = false;
 
@@ -815,6 +821,7 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 	}
 	else
     {
+		// ToDo убрать зависимость от this.FontLoader.fontFilesPath
         documentUrl = this.FontLoader.fontFilesPath + "../Word/document/";
         this.DocInfo.put_OfflineApp(true);
 
@@ -1432,6 +1439,24 @@ asc_docs_api.prototype._coSpellCheckInit = function() {
 
 asc_docs_api.prototype.asc_getSpellCheckLanguages = function() {
 	return g_spellCheckLanguages;
+};
+/////////////////////////////////////////////////////////////////////////
+////////////////////////////AutoSave api/////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+asc_docs_api.prototype.autoSaveInit = function (autoSaveGap) {
+	if (autoSaveGap || this.autoSaveGap) {
+		// Очищаем предыдущий таймер
+		if (null !== this.autoSaveTimeOutId)
+			clearTimeout(this.autoSaveTimeOutId);
+		var t = this;
+		this.autoSaveTimeOutId = setTimeout(function () {
+			t.autoSaveTimeOutId = null;
+			if (t.isDocumentModified())
+				t.asc_Save(/*isAutoSave*/true);
+			else
+				t.autoSaveInit();
+		}, (autoSaveGap || this.autoSaveGap));
+	}
 };
 
 // get functions
@@ -2212,43 +2237,38 @@ asc_docs_api.prototype.Paste = function()
 asc_docs_api.prototype.Share = function(){
 
 }
-asc_docs_api.prototype.asc_Save = function()
-{
-	if(true == this.canSave)
-	{
+asc_docs_api.prototype.asc_Save = function (isAutoSave) {
+	if(true === this.canSave) {
 		this.canSave = false;
-		// Не даем пользователю что-нибудь менять пока не закончится сохранени
-		CollaborativeEditing.m_bGlobalLock = true;
-        editor.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
+        editor.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+		this.isAutoSave = !!isAutoSave;
+		if (!this.isAutoSave)
+			editor.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);
 
         this.CoAuthoringApi.askSaveChanges( OnSave_Callback );
 	}
-}
+};
 
-asc_docs_api.prototype.asc_OnSaveEnd = function(isDocumentSaved)
-{
+asc_docs_api.prototype.asc_OnSaveEnd = function (isDocumentSaved) {
 	this.canSave = true;
-    editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
-    //Обратно выставляем, что документ не модифицирован
-    editor.SetUnchangedDocument();
-    // Пересылаем свои изменения
-	if(isDocumentSaved)
-	{
-		CollaborativeEditing.Send_Changes();
+	this.isAutoSave = false;
+	editor.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+	if (isDocumentSaved) {
 		editor.CoAuthoringApi.unSaveChanges();
-	}
-	else
-	{
+
+		// Запускаем таймер автосохранения
+		this.autoSaveInit();
+	} else {
 		editor.CoAuthoringApi.unSaveChanges();
 		editor.CoAuthoringApi.logout();
 	}
-	return;
-}
+};
 function OnSave_Callback(e)
 {
 	var nState;
     if ( false == e["savelock"] ) {
-        CollaborativeEditing.m_bGlobalLock = false;
+		if (editor.isAutoSave)
+			editor.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);
 
         if ( c_oAscCollaborativeMarksShowType.LastChanges === editor.CollaborativeMarksShowType )
             CollaborativeEditing.Clear_CollaborativeMarks();
@@ -2283,12 +2303,33 @@ function OnSave_Callback(e)
 					editor.processSavedFile(incomeObject.data, true);
 			}, sData);
         }
+
+		// Пересылаем свои изменения
+		CollaborativeEditing.Send_Changes();
+		//Обратно выставляем, что документ не модифицирован
+		editor.SetUnchangedDocument();
+
+		// Заканчиваем сохранение, т.к. мы хотим дать пользователю продолжать набирать документ
+		// Но сохранять до прихода ответа от сервера не сможет
+		editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);
     } else {
 		nState = editor.CoAuthoringApi.get_state();
 		if (3 === nState) {
 			// Отключаемся от сохранения, соединение потеряно
-			editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
+			if (!editor.isAutoSave)
+				editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);
+			editor.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+			editor.isAutoSave = false;
+			editor.canSave = true;
 		} else {
+			// Если автосохранение, то не будем ждать ответа, а просто перезапустим таймер на немного
+			if (editor.isAutoSave) {
+				editor.isAutoSave = false;
+				editor.canSave = true;
+				editor.autoSaveInit(editor.autoSaveGapAsk);
+				return;
+			}
+			// Для автосохранения не стоит пытаться еще раз запросить... (нужно рестартовать функцию автосохранения)
         	setTimeout( function(){ editor.CoAuthoringApi.askSaveChanges( OnSave_Callback ); }, 1000 );
 		}
     }
@@ -5816,7 +5857,9 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
     {
         window['qtDocBridge']['documentContentReady'] ();
 	}
-    
+
+	// Запускаем таймер автосохранения
+	this.autoSaveInit();
 }
 
 asc_docs_api.prototype.UpdateInterfaceState = function()
@@ -6441,12 +6484,13 @@ function sendCommand(editor, fCallback, rdata){
                     setTimeout( function(){sendCommand(editor, fCallback,  JSON.stringify(rData))}, 3000);
                 break;
 				case "changes":
-					editor.canSave = true;
-					editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
 					//var rData = {"id":documentId, "c":"sfc", "outputformat": c_oAscFileType.DOCX};
 					//sendCommand(editor, fCallback,  JSON.stringify(rData));
 					if(fCallback)
 						fCallback(incomeObject);
+
+					// Важно: потом сверху этот эвент придти не должен (т.е. мы не отправляем ссылку на документ наверх)
+					editor.asc_OnSaveEnd(/*isDocumentSaved*/true);
 				break;
                 case "save":
 					if(fCallback)
