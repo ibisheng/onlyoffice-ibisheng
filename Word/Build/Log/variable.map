@@ -802,7 +802,7 @@ CReaderTouchManager:A2
 c_oSerProp_tblStylePrType$TrPr:cW
 FT_GlyphLoader_Rewind:hp
 historyitem_ChangeDiagram:QI
-CreateBinaryReader:Tc
+CreateBinaryReader:Sc
 JSCompiler_StaticMethods_Internal_Get_NextCell:tU
 JSCompiler_StaticMethods_Add_PresentationNumbering:ze
 PARRUN_TYPE_BR:Li
@@ -3107,7 +3107,7 @@ c_oSer_BasicChartType$Series:dl
 L 83:Ip
 L 82:uv
 c_oSerPropLenType$Byte:Dj
-L 81:Sc
+L 81:Tc
 CGeometry:FH
 tt_cmap2_get_subheader:Gt
 L 80:ve

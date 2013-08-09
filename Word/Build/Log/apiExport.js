@@ -1027,12 +1027,14 @@ prop:asc_getCanEdit
 prop:asc_getCanDownload
 prop:asc_getCanCoAuthoring
 prop:asc_getCanReaderMode
+prop:asc_getCanBranding
 prop:asc_getIsAutosaveEnable
 prop:asc_getAutosaveMinInterval
 prop:asc_setCanEdit
 prop:asc_setCanDownload
 prop:asc_setCanCoAuthoring
 prop:asc_setCanReaderMode
+prop:asc_setCanBranding
 prop:asc_setIsAutosaveEnable
 prop:asc_setAutosaveMinInterval
 ---
@@ -1979,11 +1981,13 @@ CAscEditorPermissions.prototype['asc_getCanEdit'] = CAscEditorPermissions.protot
 CAscEditorPermissions.prototype['asc_getCanDownload'] = CAscEditorPermissions.prototype.asc_getCanDownload;
 CAscEditorPermissions.prototype['asc_getCanCoAuthoring'] = CAscEditorPermissions.prototype.asc_getCanCoAuthoring;
 CAscEditorPermissions.prototype['asc_getCanReaderMode'] = CAscEditorPermissions.prototype.asc_getCanReaderMode;
+CAscEditorPermissions.prototype['asc_getCanBranding'] = CAscEditorPermissions.prototype.asc_getCanBranding;
 CAscEditorPermissions.prototype['asc_getIsAutosaveEnable'] = CAscEditorPermissions.prototype.asc_getIsAutosaveEnable;
 CAscEditorPermissions.prototype['asc_getAutosaveMinInterval'] = CAscEditorPermissions.prototype.asc_getAutosaveMinInterval;
 CAscEditorPermissions.prototype['asc_setCanEdit'] = CAscEditorPermissions.prototype.asc_setCanEdit;
 CAscEditorPermissions.prototype['asc_setCanDownload'] = CAscEditorPermissions.prototype.asc_setCanDownload;
 CAscEditorPermissions.prototype['asc_setCanCoAuthoring'] = CAscEditorPermissions.prototype.asc_setCanCoAuthoring;
 CAscEditorPermissions.prototype['asc_setCanReaderMode'] = CAscEditorPermissions.prototype.asc_setCanReaderMode;
+CAscEditorPermissions.prototype['asc_setCanBranding'] = CAscEditorPermissions.prototype.asc_setCanBranding;
 CAscEditorPermissions.prototype['asc_setIsAutosaveEnable'] = CAscEditorPermissions.prototype.asc_setIsAutosaveEnable;
 CAscEditorPermissions.prototype['asc_setAutosaveMinInterval'] = CAscEditorPermissions.prototype.asc_setAutosaveMinInterval;
