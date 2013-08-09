@@ -605,6 +605,40 @@ function CEditorPage(api)
                     return false;
                 };
 
+                this.TextBoxBackground.HtmlElement["onselectstart"] = function(e){
+                    oThis.m_oLogicDocument.Select_All();
+
+                    if (e.preventDefault)
+                        e.preventDefault();
+
+                    e.returnValue = false;
+                    return false;
+                };
+
+                /*
+                this.TextBoxBackground.HtmlElement["oncopy"] = function(e){
+                    Editor_Copy(oThis.m_oApi);
+                };
+
+                this.TextBoxBackground.HtmlElement["oncut"] = function(e){
+                    Editor_Copy(oThis.m_oApi, true);
+                };
+
+                this.TextBoxBackground.HtmlElement["onpaste"] = function(e){
+                    if ( false === oThis.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
+                    {
+                        oThis.m_oLogicDocument.Create_NewHistoryPoint();
+                        Editor_Paste(oThis.m_oApi, true);
+                    }
+
+                    if (e.preventDefault)
+                        e.preventDefault();
+
+                    e.returnValue = false;
+                    return false;
+                };
+                */
+
                 window.IS_USE_INPUT = true;
                 this.TextBoxBackground.HtmlElement["oninput"] = function(e)
                 {
