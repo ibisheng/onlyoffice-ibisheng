@@ -2240,10 +2240,11 @@ asc_docs_api.prototype.Share = function(){
 asc_docs_api.prototype.asc_Save = function (isAutoSave) {
 	if(true === this.canSave) {
 		this.canSave = false;
-        editor.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 		this.isAutoSave = !!isAutoSave;
-		if (!this.isAutoSave)
+		if (!this.isAutoSave) {
+			editor.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 			editor.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);
+		}
 
         this.CoAuthoringApi.askSaveChanges( OnSave_Callback );
 	}
@@ -2253,13 +2254,11 @@ asc_docs_api.prototype.asc_OnSaveEnd = function (isDocumentSaved) {
 	this.canSave = true;
 	this.isAutoSave = false;
 	editor.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+	editor.CoAuthoringApi.unSaveChanges();
 	if (isDocumentSaved) {
-		editor.CoAuthoringApi.unSaveChanges();
-
 		// Запускаем таймер автосохранения
 		this.autoSaveInit();
 	} else {
-		editor.CoAuthoringApi.unSaveChanges();
 		editor.CoAuthoringApi.logout();
 	}
 };
@@ -2267,8 +2266,10 @@ function OnSave_Callback(e)
 {
 	var nState;
     if ( false == e["savelock"] ) {
-		if (editor.isAutoSave)
+		if (editor.isAutoSave) {
+			editor.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 			editor.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);
+		}
 
         if ( c_oAscCollaborativeMarksShowType.LastChanges === editor.CollaborativeMarksShowType )
             CollaborativeEditing.Clear_CollaborativeMarks();
@@ -2316,9 +2317,10 @@ function OnSave_Callback(e)
 		nState = editor.CoAuthoringApi.get_state();
 		if (3 === nState) {
 			// Отключаемся от сохранения, соединение потеряно
-			if (!editor.isAutoSave)
+			if (!editor.isAutoSave) {
 				editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);
-			editor.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+				editor.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+			}
 			editor.isAutoSave = false;
 			editor.canSave = true;
 		} else {
@@ -2519,6 +2521,7 @@ asc_docs_api.prototype.sync_DownloadAsCallBack = function(){
 asc_docs_api.prototype.sync_StartAction = function(type, id){
 	//this.AsyncAction
 	this.asc_fireCallback("asc_onStartAction", type, id);
+	//console.log("asc_onStartAction: type = " + type + " id = " + id);
 
     if (c_oAscAsyncActionType.BlockInteraction == type)
         this.IsLongActionCurrent = true;
@@ -2526,6 +2529,7 @@ asc_docs_api.prototype.sync_StartAction = function(type, id){
 asc_docs_api.prototype.sync_EndAction = function(type, id){
 	//this.AsyncAction
 	this.asc_fireCallback("asc_onEndAction", type, id);
+	//console.log("asc_onEndAction: type = " + type + " id = " + id);
 
     if (c_oAscAsyncActionType.BlockInteraction == type)
         this.IsLongActionCurrent = false;
