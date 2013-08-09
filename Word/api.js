@@ -1444,10 +1444,11 @@ asc_docs_api.prototype.asc_getSpellCheckLanguages = function() {
 ////////////////////////////AutoSave api/////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 asc_docs_api.prototype.autoSaveInit = function (autoSaveGap) {
+	// Очищаем предыдущий таймер
+	if (null !== this.autoSaveTimeOutId)
+		clearTimeout(this.autoSaveTimeOutId);
+
 	if (autoSaveGap || this.autoSaveGap) {
-		// Очищаем предыдущий таймер
-		if (null !== this.autoSaveTimeOutId)
-			clearTimeout(this.autoSaveTimeOutId);
 		var t = this;
 		this.autoSaveTimeOutId = setTimeout(function () {
 			t.autoSaveTimeOutId = null;
@@ -6038,7 +6039,15 @@ asc_docs_api.prototype.GetCurrentVisiblePage = function()
         return lPage1;
 
     return lPage2;
-}
+};
+
+// Выставление интервала автосохранения (0 - означает, что автосохранения нет)
+asc_docs_api.prototype.asc_setAutoSaveGap = function (autoSaveGap) {
+	if (typeof autoSaveGap === "number") {
+		this.autoSaveGap = autoSaveGap;
+		this.autoSaveInit();
+	}
+};
 
 asc_docs_api.prototype.SetMobileVersion = function(val)
 {
@@ -6052,7 +6061,7 @@ asc_docs_api.prototype.SetMobileVersion = function(val)
 
         this.SetFontRenderingMode(1);
     }
-}
+};
 
 asc_docs_api.prototype.GoToHeader = function(pageNumber)
 {

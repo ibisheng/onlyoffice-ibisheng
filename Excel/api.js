@@ -538,10 +538,17 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				ws.sortColFilter(type,cellId);
 			},
 			
-			asc_getAddFormatTableOptions: function()
-			{
+			asc_getAddFormatTableOptions: function () {
 				var ws = this.wb.getWorksheet();
 				return ws.getAddFormatTableOptions();
+			},
+
+			// Выставление интервала автосохранения (0 - означает, что автосохранения нет)
+			asc_setAutoSaveGap: function (autoSaveGap) {
+				if (typeof autoSaveGap === "number") {
+					this.autoSaveGap = autoSaveGap;
+					this.autoSaveInit();
+				}
 			},
 			
 			asc_setMobileVersion: function (isMobile){
@@ -2667,10 +2674,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			////////////////////////////AutoSave api/////////////////////////////////
 			/////////////////////////////////////////////////////////////////////////
 			autoSaveInit: function (autoSaveGap) {
+				// Очищаем предыдущий таймер
+				if (null !== this.autoSaveTimeOutId)
+					clearTimeout(this.autoSaveTimeOutId);
+
 				if (autoSaveGap || this.autoSaveGap) {
-					// Очищаем предыдущий таймер
-					if (null !== this.autoSaveTimeOutId)
-						clearTimeout(this.autoSaveTimeOutId);
 					var t = this;
 					this.autoSaveTimeOutId = setTimeout(function () {
 						t.autoSaveTimeOutId = null;
@@ -2999,6 +3007,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_getDocumentName"] = prot.asc_getDocumentName;
 		prot["asc_getDocumentFormat"] = prot.asc_getDocumentFormat;
 		prot["asc_isDocumentModified"] = prot.asc_isDocumentModified;
+
+		prot["asc_setAutoSaveGap"] = prot.asc_setAutoSaveGap;
 
 		prot["asc_setMobileVersion"] = prot.asc_setMobileVersion;
 		prot["asc_setViewerMode"] = prot.asc_setViewerMode;
