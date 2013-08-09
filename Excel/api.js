@@ -518,8 +518,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			
 			asc_addAutoFilter: function(lTable, addFormatTableOptionsObj){
 				var ws = this.wb.getWorksheet();
-				var result = ws.addAutoFilter(lTable, addFormatTableOptionsObj);
-				return result;
+				return ws.addAutoFilter(lTable, addFormatTableOptionsObj);
 			},
 			
 			asc_applyAutoFilter: function(type,autoFilterObject){
@@ -535,8 +534,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			asc_getAddFormatTableOptions: function()
 			{
 				var ws = this.wb.getWorksheet();
-				var result = ws.getAddFormatTableOptions();
-				return result;
+				return ws.getAddFormatTableOptions();
 			},
 			
 			asc_setMobileVersion: function (isMobile){
@@ -1285,6 +1283,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				 * Event об отсоединении от сервера
 				 * @param {jQuery} e  event об отсоединении с причиной
 				 * @param {Bool} isDisconnectAtAll  окончательно ли отсоединяемся(true) или будем пробовать сделать reconnect(false) + сами отключились
+				 * @param {Bool} isCloseCoAuthoring
 				 */
 				this.CoAuthoringApi.onDisconnect				= function (e, isDisconnectAtAll, isCloseCoAuthoring) {
 					if (0 === t.CoAuthoringApi.get_state())
@@ -1468,10 +1467,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				//this.asc_Resize(); // Убрал, т.к. сверху приходит resize (http://bugzserver/show_bug.cgi?id=14680)
 				if( this.wbModel.startActionOn == false ){
 					this.wbModel.startActionOn = true;
-				}
-				else{
-					var thas = this;
-					setTimeout(function(){thas.asc_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Recalc)},500);
+				} else {
+					var t = this;
+					setTimeout(function(){t.asc_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Recalc)},500);
 				}
 
                 if (undefined != window['appBridge']) {
