@@ -147,7 +147,7 @@ g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("ru-RU", 0x0419));
 //{ "hr-HR", 0x041a },
 g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("sk-SK", 0x041b));
 //{ "sq-AL", 0x041c },
-//{ "sv-SE", 0x041d },
+g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("sv-SE", 0x041d));
 //{ "th-TH", 0x041e },
 g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("tr-TR", 0x041f));
 //{ "ur-PK", 0x0420 },
