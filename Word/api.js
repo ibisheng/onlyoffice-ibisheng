@@ -541,10 +541,10 @@ function asc_docs_api(name)
     /**************************************/
 
 	// AutoSave
-	this.autoSaveGap = 0;				// Интервал автосохранения (0 - означает, что автосохранения нет)
+	this.autoSaveGap = 0;				// Интервал автосохранения (0 - означает, что автосохранения нет) в милесекундах
 	this.autoSaveTimeOutId = null;		// Идентификатор таймаута
 	this.isAutoSave = false;			// Флаг, означает что запущено автосохранение
-	this.autoSaveGapAsk = 5000;			// Константа для повторного запуска автосохранения, если не смогли сделать сразу lock (только при автосохранении)
+	this.autoSaveGapAsk = 5000;			// Константа для повторного запуска автосохранения, если не смогли сделать сразу lock (только при автосохранении) в милесекундах
 
     this.bInit_word_control = false;
 	this.isDocumentModify = false;
@@ -1362,6 +1362,7 @@ asc_docs_api.prototype._coAuthoringInit = function()
 	 * Event об отсоединении от сервера
 	 * @param {jQuery} e  event об отсоединении с причиной
 	 * @param {Bool} isDisconnectAtAll  окончательно ли отсоединяемся(true) или будем пробовать сделать reconnect(false) + сами отключились
+	 * @param {Bool} isCloseCoAuthoring
 	 */
 	this.CoAuthoringApi.onDisconnect				= function (e, isDisconnectAtAll, isCloseCoAuthoring) {
 		if (0 === t.CoAuthoringApi.get_state())
@@ -2255,13 +2256,13 @@ asc_docs_api.prototype.asc_Save = function (isAutoSave) {
 asc_docs_api.prototype.asc_OnSaveEnd = function (isDocumentSaved) {
 	this.canSave = true;
 	this.isAutoSave = false;
-	editor.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
-	editor.CoAuthoringApi.unSaveChanges();
+	this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+	this.CoAuthoringApi.unSaveChanges();
 	if (isDocumentSaved) {
 		// Запускаем таймер автосохранения
 		this.autoSaveInit();
 	} else {
-		editor.CoAuthoringApi.disconnect();
+		this.CoAuthoringApi.disconnect();
 	}
 };
 function OnSave_Callback(e)
@@ -6045,7 +6046,7 @@ asc_docs_api.prototype.GetCurrentVisiblePage = function()
 // Выставление интервала автосохранения (0 - означает, что автосохранения нет)
 asc_docs_api.prototype.asc_setAutoSaveGap = function (autoSaveGap) {
 	if (typeof autoSaveGap === "number") {
-		this.autoSaveGap = autoSaveGap;
+		this.autoSaveGap = autoSaveGap * 1000; // Нам выставляют в секундах
 		this.autoSaveInit();
 	}
 };
