@@ -2322,20 +2322,30 @@ PasteProcessor.prototype =
 				numPr.NumId = 0;
 		}
 		//обрабатываем стили
-		for(var i = 0, length = oReadResult.paraStyles.length; i < length; ++i)
+		var fParseStyle = function(aStyles, oDocumentStyles, oReadResult, bParaStyle)
 		{
-			var elem = oReadResult.paraStyles[i];
-			var stylePaste = oReadResult.styles[elem.style];
-			if(null != stylePaste && null != stylePaste.style)
+			for(var i = 0, length = aStyles.length; i < length; ++i)
 			{
-				for(var j in this.oDocument.Styles.Style)
+				var elem = aStyles[i];
+				var stylePaste = oReadResult.styles[elem.style];
+				if(null != stylePaste && null != stylePaste.style)
 				{
-					var styleDoc = this.oDocument.Styles.Style[j];
-					if(styleDoc.Name == stylePaste.style.Name)
-						elem.pPr.PStyle = j;
+					for(var j in oDocumentStyles)
+					{
+						var styleDoc = oDocumentStyles[j];
+						if(styleDoc.Name == stylePaste.style.Name)
+						{
+							if(bParaStyle)
+								elem.pPr.PStyle = j;
+							else
+								elem.pPr.TableStyle = j;
+						}
+					}
 				}
 			}
 		}
+		fParseStyle(oBinaryFileReader.oReadResult.paraStyles, this.oDocument.Styles.Style, oBinaryFileReader.oReadResult, true);
+		fParseStyle(oBinaryFileReader.oReadResult.tableStyles, this.oDocument.Styles.Style, oBinaryFileReader.oReadResult, false);
 		var aContent = oBinaryFileReader.oReadResult.DocumentContent;
 		if(aContent.length > 0)
 		{

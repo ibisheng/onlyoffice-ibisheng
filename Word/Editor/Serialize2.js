@@ -628,8 +628,11 @@ function BinaryFileWriter(doc)
 		var oNumPr = Item.Numbering_Get();
 		if(null != oNumPr && 0 != oNumPr.NumId)
 		{
-			this.copyParams.oUsedNumIdMap[oNumPr.NumId] = this.copyParams.nNumIdIndex;
-			this.copyParams.nNumIdIndex++;
+			if(null == this.copyParams.oUsedNumIdMap[oNumPr.NumId])
+			{
+				this.copyParams.oUsedNumIdMap[oNumPr.NumId] = this.copyParams.nNumIdIndex;
+				this.copyParams.nNumIdIndex++;
+			}
 		}
         this.bs.WriteItem(c_oSerParType.Par, function(){oThis.copyParams.bdtw.WriteParapraph(Item, bUseSelection);});
 		this.copyParams.itemCount++;
@@ -637,6 +640,10 @@ function BinaryFileWriter(doc)
 	this.CopyTable = function(Item, oRowElems)
     {
 		var oThis = this;
+		//анализируем используемые списки и стили
+		var sTableStyle = Item.Get_TableStyle();
+		if(null != sParaStyle)
+			this.copyParams.oUsedStyleMap[sTableStyle] = 1;
         this.bs.WriteItem(c_oSerParType.Table, function(){oThis.copyParams.bdtw.WriteDocTable(Item);});
 		this.copyParams.itemCount++;
 	}
@@ -2900,6 +2907,8 @@ function BinaryFileReader(doc, openParams)
 		numToNumClass: null,
 		paraNumPrs: null,
 		styles: null,
+		paraStyles: null,
+		tableStyles: null,
 		DefpPr: null,
 		DefrPr: null,
 		DocumentContent: null
@@ -3060,6 +3069,7 @@ function BinaryFileReader(doc, openParams)
 		this.oReadResult.paraNumPrs = [];
 		this.oReadResult.styles = [];
 		this.oReadResult.paraStyles = [];
+		this.oReadResult.tableStyles = [];
 		this.oReadResult.DocumentContent = [];
 		
         var res = c_oSerConstants.ReadOk;
@@ -3252,12 +3262,22 @@ function BinaryFileReader(doc, openParams)
             }
             styles[oNewId.id] = oNewStyle;
 		}
-		for(var i = 0, length = this.oReadResult.paraStyles.length; i < length; ++i)
+		var fParseStyle = function(aStyles, oDocumentStyles, bParaStyle)
 		{
-			var elem = this.oReadResult.paraStyles[i];
-			if(null != this.Document.Styles.Style[elem.style])
-				elem.pPr.PStyle = elem.style;
+			for(var i = 0, length = aStyles.length; i < length; ++i)
+			{
+				var elem = aStyles[i];
+				if(null != oDocumentStyles[elem.style])
+				{
+					if(bParaStyle)
+						elem.pPr.PStyle = elem.style;
+					else
+						elem.pPr.TableStyle = elem.style;
+				}
+			}
 		}
+		fParseStyle(this.oReadResult.paraStyles, this.Document.Styles.Style, true);
+		fParseStyle(this.oReadResult.tableStyles, this.Document.Styles.Style, false);
 		var stDefault = this.Document.Styles.Default;
 		var nStId = styles.length;
         if(null == stDefault.Numbering)
@@ -3543,11 +3563,9 @@ function BinaryStyleTableReader(doc, oReadResult, stream)
         }
 		else if(c_oSer_sts.Style_TablePr == type)
         {
-			var TablePr = new CTablePr();
             res = this.bcr.Read1(length, function(t, l){
-                return oThis.btblPrr.Read_tblPr(t,l, TablePr);
+                return oThis.btblPrr.Read_tblPr(t,l, style.TablePr);
             });
-            style.TablePr.Set_FromObject( TablePr );
 		}
 		else if(c_oSer_sts.Style_RowPr == type)
         {
@@ -3638,11 +3656,9 @@ function BinaryStyleTableReader(doc, oReadResult, stream)
 		}
 		else if(c_oSerProp_tblStylePrType.TblPr == type)
 		{
-			var TablePr = {};
             res = this.bcr.Read1(length, function(t, l){
-                return oThis.btblPrr.Read_tblPr(t,l, TablePr);
+                return oThis.btblPrr.Read_tblPr(t,l, oNewTableStylePr.TablePr);
             });
-            oNewTableStylePr.TablePr.Set_FromObject( TablePr );
 		}
 		else if(c_oSerProp_tblStylePrType.TrPr == type)
 		{
@@ -4267,7 +4283,7 @@ Binary_tblPrReader.prototype =
 				table.Set_TableLook(new CTableLook(bFC, bFR, bLC, bLR, !bBH, !bBV));
 			}
 			else if( c_oSerProp_tblPrType.Style === type )
-				table.TableStyle = this.stream.GetString2LE(length);
+				this.oReadResult.tableStyles.push({pPr: table, style: this.stream.GetString2LE(length)});
 			else
 				res = c_oSerConstants.ReadUnknown;
 		}
