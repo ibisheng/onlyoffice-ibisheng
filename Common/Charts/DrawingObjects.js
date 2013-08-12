@@ -2000,7 +2000,7 @@ function DrawingObjects() {
         return trackOverlay;
     };
 
-    _this.OnUpdateOverlay = function(bFullClear) {
+    _this.OnUpdateOverlay = function() {
         
         var overlay = trackOverlay;
 		var ctx = overlay.m_oContext;
@@ -2008,6 +2008,9 @@ function DrawingObjects() {
 
         overlay.Clear();
         this.drawingDocument.Overlay = overlay;
+		
+		var bFullClear = (_this.controller.curState.id != STATES_ID_TEXT_ADD) && (_this.controller.curState.id != STATES_ID_TEXT_ADD_IN_GROUP);
+		//console.log("bFullClear - " + bFullClear);
 
 		if ( bFullClear )
 			shapeOverlayCtx.m_oContext.clearRect(0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix);
@@ -2297,15 +2300,6 @@ function DrawingObjects() {
 		_this.drawWorksheetHeaders();
 	}
 
-	_this.showOverlayGraphicObjects = function() {
-		shapeOverlayCtx.put_GlobalAlpha(true, 0.5);
-		shapeOverlayCtx.m_oContext.clearRect(0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix);
-		worksheet._drawGraphic();
-		_this.controller.drawTracks(shapeOverlayCtx);
-		shapeOverlayCtx.put_GlobalAlpha(true, 1);
-		_this.drawWorksheetHeaders();
-	}
-	
 	_this.getDrawingAreaMetrics = function() {
 
 		/*
