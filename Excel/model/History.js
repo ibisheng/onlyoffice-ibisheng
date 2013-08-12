@@ -138,6 +138,10 @@ var historyitem_AutoShapes_Vert = 60;
 var historyitem_AutoShapes_GroupRecalculateUndo = 61;
 var historyitem_AutoShapes_GroupRecalculateRedo = 62;
 var historyitem_AutoShapes_AddColorMod = 63;
+var historyitem_AutoShapes_RemoveFromSpTree = 64;
+var historyitem_AutoShapes_SwapGraphicObjects = 65;
+
+
 
 
 

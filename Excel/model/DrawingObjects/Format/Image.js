@@ -120,6 +120,7 @@ CImage.prototype =
         {
             History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_DeleteDrawingBase, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(position, null)), null);
         }
+        return position;
     },
 
     addToDrawingObjects: function(pos)

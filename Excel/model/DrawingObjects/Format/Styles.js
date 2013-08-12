@@ -5620,7 +5620,7 @@ function CParaPr()
     this.Tabs              = undefined; // Заданные табы
     this.NumPr             = undefined; // Нумерация
     this.PStyle            = undefined; // Стиль параграфа
-    this.defRPr = undefined;
+    this.defRPr = new CTextPr();
 }
 
 CParaPr.prototype =

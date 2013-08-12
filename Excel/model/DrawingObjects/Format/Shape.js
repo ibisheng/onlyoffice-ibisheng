@@ -123,7 +123,7 @@ function CMouseEventHandler()
 }
 
 
-function CShape(drawingBase, drawingObjects)
+function CShape(drawingBase, drawingObjects, legendEntry)
 {
     this.drawingBase = drawingBase;
     this.drawingObjects = null;//drawingObjects;
@@ -159,7 +159,7 @@ function CShape(drawingBase, drawingObjects)
     this.pen = null;
 
     this.selected = false;
-
+    this.legendEntry = legendEntry;
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
     if(isRealObject(drawingObjects))
@@ -217,6 +217,7 @@ CShape.prototype =
         {
             History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_DeleteDrawingBase, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(position, null)), null);
         }
+        return position;
     },
 
     addToDrawingObjects: function(pos)
@@ -306,7 +307,7 @@ CShape.prototype =
         if(isRealObject(this.txBody))
         {
             var text_pr = new ParaTextPr();
-            text_pr.Set_VertAlign(isSubscript ? vertalign_SuperScript : vertalign_Baseline);
+            text_pr.Set_VertAlign(isSuperscript ? vertalign_SuperScript : vertalign_Baseline);
             this.txBody.paragraphAdd(text_pr);
             this.calculateTransformTextMatrix();
 
@@ -738,6 +739,7 @@ CShape.prototype =
         this.recalculatePen();
         this.recalculateBrush();
     },
+
     initDefaultTextRect: function(x, y, extX, extY, flipH, flipV)
     {
         this.setXfrmObject(new CXfrm());
@@ -824,33 +826,40 @@ CShape.prototype =
     getStyles: function(level)
     {
         var styles = new CStyles();
-        var ref_style = new CStyle("ref_style", styles.Default.Paragraph, null, styletype_Paragraph);
-        if(isRealObject(this.style) && isRealObject(this.style.fontRef))
+        if(!isRealObject(this.legendEntry))
         {
-            switch(this.style.fontRef.idx)
+            var ref_style = new CStyle("ref_style", styles.Default.Paragraph, null, styletype_Paragraph);
+            if(isRealObject(this.style) && isRealObject(this.style.fontRef))
             {
-                case fntStyleInd_major:
+                switch(this.style.fontRef.idx)
                 {
-                    ref_style.TextPr.themeFont = "+mj-lt";
-                    break;
+                    case fntStyleInd_major:
+                    {
+                        ref_style.TextPr.themeFont = "+mj-lt";
+                        break;
+                    }
+                    case fntStyleInd_minor:
+                    {
+                        ref_style.TextPr.themeFont = "+mj-lt";
+                        break;
+                    }
                 }
-                case fntStyleInd_minor:
-                {
-                    ref_style.TextPr.themeFont = "+mj-lt";
-                    break;
-                }
-            }
 
-            if(isRealObject(this.style.fontRef.Color) && isRealObject(this.style.fontRef.Color.color))
-            {
-                var unifill = new CUniFill();
-                unifill.fill = new CSolidFill();
-                unifill.fill.color = this.style.fontRef.Color.createDuplicate();
-                ref_style.TextPr.unifill = unifill;
+                if(isRealObject(this.style.fontRef.Color) && isRealObject(this.style.fontRef.Color.color))
+                {
+                    var unifill = new CUniFill();
+                    unifill.fill = new CSolidFill();
+                    unifill.fill.color = this.style.fontRef.Color.createDuplicate();
+                    ref_style.TextPr.unifill = unifill;
+                }
             }
+            styles.Style[styles.Id] = ref_style;
+            ++styles.Id;
         }
-        styles.Style[styles.Id] = ref_style;
-        ++styles.Id;
+        else
+        {
+
+        }
         return styles;
     },
 
@@ -1097,6 +1106,24 @@ CShape.prototype =
         }
         this.txBody.paragraphAdd(paraItem, bRecalculate);
 
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddRedo, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+    },
+
+    addNewParagraph: function()
+    {
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddUndo, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+        this.txBody.addNewParagraph();
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddRedo, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+    },
+
+    remove: function(direction, bOnlyText)
+    {
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddUndo, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+        this.txBody.remove(direction, bOnlyText);
         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterParagraphAddRedo, null, null,
             new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
     },
@@ -2074,7 +2101,49 @@ CShape.prototype =
             return null;
         return this.pen;
     },
-	
+
+    getParagraphParaPr: function()
+    {
+        if(this.txBody)
+        {
+            return this.txBody.content.Get_Paragraph_ParaPr();
+        }
+        return null;
+    },
+
+    getParagraphTextPr: function()
+    {
+        if(this.txBody)
+        {
+            return this.txBody.content.Get_Paragraph_TextPr();
+        }
+        return null;
+    },
+
+    getAllParagraphParaPr: function()
+    {
+        if(this.txBody)
+        {
+            this.txBody.content.Set_ApplyToAll(true);
+            var paraPr = this.txBody.content.Get_Paragraph_ParaPr();
+            this.txBody.content.Set_ApplyToAll(false);
+            return paraPr;
+        }
+        return null;
+    },
+
+    getAllParagraphTextPr: function()
+    {
+        if(this.txBody)
+        {
+            this.txBody.content.Set_ApplyToAll(true);
+            var paraPr = this.txBody.content.Get_Paragraph_TextPr();
+            this.txBody.content.Set_ApplyToAll(false);
+            return paraPr;
+        }
+        return null;
+    },
+
 	changeFill : function(ascFill)
     {
         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateBrushUndo, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(null, null)), null);

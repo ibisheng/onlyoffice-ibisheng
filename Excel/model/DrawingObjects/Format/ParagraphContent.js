@@ -146,9 +146,9 @@ ParaText.prototype =
         {
             Context.SetFontSlot( this.FontSlot, this.FontKoef );
 
-            if ( true === this.Is_NBSP() && editor.ShowParaMarks )
+           /* if ( true === this.Is_NBSP() && editor.ShowParaMarks )
                 Context.FillText( X, Y, String.fromCharCode( 0x00B0 ) );
-            else
+            else      */
                 Context.FillText( X, Y, this.CalcValue );
         }
         catch(e)
@@ -321,8 +321,8 @@ ParaSpace.prototype =
                 Context.SetFont( TempFont );
             }*/
 
-            if ( editor.ShowParaMarks )
-                Context.FillText( X, Y, sString );
+            /*if ( editor.ShowParaMarks )
+                Context.FillText( X, Y, sString );   */
 
             //if ( true === this.SmallCaps )
 //                Context.SetFont(OldFont);
@@ -1939,7 +1939,7 @@ ParaNewLine.prototype =
     },
     Draw : function(X,Y,Context)
     {
-        if ( editor.ShowParaMarks )
+        if (false/* editor.ShowParaMarks*/ )
         {
             switch( this.BreakType )
             {
@@ -2335,7 +2335,7 @@ ParaTab.prototype =
     },
     Draw : function(X,Y,Context)
     {
-        if ( editor.ShowParaMarks )
+        /*if ( editor.ShowParaMarks )
         {
             var X0 = this.Width / 2 - this.RealWidth / 2;
 
@@ -2345,7 +2345,7 @@ ParaTab.prototype =
                 Context.FillText2( X + X0, Y, String.fromCharCode( tab_Symbol ), 0, this.Width );
             else
                 Context.FillText2( X, Y, String.fromCharCode( tab_Symbol ), this.RealWidth - this.Width, this.Width );
-        }
+        }       */
     },
 
     Measure : function (Context)

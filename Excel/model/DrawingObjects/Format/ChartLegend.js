@@ -8,7 +8,22 @@ function CLegendEntry()
     this.bDelete = null;
     this.idx = null;
     this.txPr = null;
+    this.Id = g_oIdCounter.Get_NewId();
+    g_oTableId.Add(this, this.Id);
 }
+
+CLegendEntry.prototype =
+{
+    Get_Id: function()
+    {
+        return this.Id;
+    },
+
+    getObjectType: function()
+    {
+        return CLASS_TYPE_LEGEND_ENTRY;
+    }
+};
 
 function CChartLegend()
 {
@@ -61,6 +76,8 @@ CChartLegend.prototype =
 
     init: function()
     {
+        this.setStartValues();
+        return;
         var chart = this.chartGroup.chart;
         var chart_legend = chart.getLegendInfo();
         if(chart_legend.length > 0)
@@ -70,7 +87,10 @@ CChartLegend.prototype =
             {
                 var legend_entry_obj = chart_legend[i];
                 var entry_string = legend_entry_obj.text;
-                var cur_legend_entry =  new CLegendEntryGroup();
+                var cur_legend_entry =  new CLegendEntryGroup(this);
+
+
+
                 cur_legend_entry.marker = chart_legend[0].marker;
                 cur_legend_entry.drawingObjects = this.chartGroup.drawingObjects;
                 cur_legend_entry.textBody = new CTextBody(cur_legend_entry);
@@ -93,12 +113,89 @@ CChartLegend.prototype =
 
     },
 
+    draw: function(graphics)
+    {
+        for(var i = 0; i < this.calculatedEntry.length; ++i)
+        {
+            this.calculatedEntry[i].draw(graphics);
+        }
+    },
+
+    setStartValues: function()
+    {
+        var is_on_history = History.Is_On();
+        var is_on_table_id = !g_oTableId.m_bTurnOff;
+
+        if(is_on_history)
+            History.TurnOff();
+
+        if(is_on_table_id)
+            g_oTableId.m_bTurnOff = true;
+
+        g_oTableId.m_bTurnOff = true;
+
+        var chart = this.chartGroup.chart;
+        var legend_info = chart.getLegendInfo();
+        this.calculatedEntry.length = 0;
+        if(legend_info.length > 0)
+        {
+            var bullet_type = legend_info[0].marker === c_oAscLegendMarkerType.Line ? "line" : "rect";
+            for(var i = 0; i < legend_info.length; ++i)
+            {
+                var cur_legend_info = legend_info[i];
+                var legend_entry = this.legendEntries[i];
+                if(isRealObject(legend_entry) && legend_entry.bDelete === true)
+                    continue;
+
+                var entry = new CLegendEntryGroup(this);
+                entry.bullet = new CShape(null, this.chartGroup.drawingObjects, legend_entry);
+                var uni_fill = new CUniFill();
+                uni_fill.setFill(new CSolidFill());
+                uni_fill.fill.setColor(new CUniColor());
+                uni_fill.fill.color.setColor(new CRGBColor());
+                uni_fill.fill.color.setColor(cur_legend_info.color.R*16*16 + cur_legend_info.color.G*16 +cur_legend_info.color.B);
+                if(bullet_type === "line")
+                {
+                    entry.bullet.setPresetGeometry("line");
+                    entry.bullet.setUniFill(uni_fill);
+                }
+                else
+                {
+                    entry.bullet.setPresetGeometry("rect");
+                    var shape_fill = new CUniFill();
+                    shape_fill.setFill(new CNoFill());
+                    var shape_line = new CLn();
+                    var line_fill = new CUniFill();
+                    line_fill.setFill(new CNoFill());
+                    shape_line.setFill(line_fill);
+                    entry.bullet.setUniFill(shape_fill);
+                    entry.bullet.setUniLine(shape_line);
+                    entry.bullet.addTextBody(new CTextBody(entry.bullet));
+                    entry.bullet.paragraphAdd(new ParaTextPr({unifill: uni_fill}));
+                    entry.bullet.paragraphAdd(new ParaText(String.fromCharCode(0x00A7)));
+                }
+                entry.title = new CShape(null, this.chartGroup.drawingObjects);
+                entry.title.addTextBody(new CTextBody(entry.title));
+                for(var i in cur_legend_info.text)
+                {
+                    entry.title.paragraphAdd(new ParaText(cur_legend_info.text[i]));
+                }
+                this.calculatedEntry.push(entry);
+            }
+        }
+        if(is_on_history)
+            History.TurnOn();
+
+        if(is_on_table_id)
+            g_oTableId.m_bTurnOff = false;
+    },
+
     setChartGroup: function(chartGroup)
     {
         this.chartGroup = chartGroup;
     },
 
-    recalculateExtents: function()
+    recalculateInternalPositionsAndExtents: function()
     {
         this.extX = null;
         this.extY = null;
@@ -106,7 +203,6 @@ CChartLegend.prototype =
         {
             this.extX = this.chartGroup.extX*this.layout.w;
             this.extY = this.chartGroup.extY*this.layout.h;
-
         }
         else
         {
@@ -130,39 +226,17 @@ CChartLegend.prototype =
     {}
 };
 
-function CLegendEntryGroup()
+function CLegendEntryGroup(legend)
 {
-    this.x = null;
-    this.y = null;
-    this.legendGroup = null;
-    this.drawingDocument = null;
-    this.idx = null;
-    this.spX = null;
-    this.spY = null;
-    this.markerType = null;
-
-    this.spExtX = null;
-    this.spExtY = null;
-    this.spTransform = null;
-    this.spBrush = null;
-    this.spPen = null;
-    this.geometry = null;
-
-    this.textX = null;
-    this.textY = null;
-    this.textExtX = null;
-    this.textExtY = null;
-
-    this.transform = null;
-    this.transformText = null;
-    this.textBody = null;
+    this.legend = legend;
+    this.bullet = null;
+    this.title = null;
 }
 
 CLegendEntryGroup.prototype =
 {
     setLegendGroup: function(legendGroup)
     {
-        this.legendGroup = legendGroup;
     },
 
     getStyles: function()
@@ -190,9 +264,26 @@ CLegendEntryGroup.prototype =
         return styles;
     },
 
+    getBulletStyles: function()
+    {
+
+    },
+
+    getTitleStyles: function()
+    {},
+
     recalculateInternalPosition: function()
     {
 
+    },
+
+    draw: function(graphics)
+    {
+        if(isRealObject(this.bullet) && isRealObject(this.title))
+        {
+            this.bullet.draw(graphics);
+            this.title.draw(graphics);
+        }
     }
 };
 

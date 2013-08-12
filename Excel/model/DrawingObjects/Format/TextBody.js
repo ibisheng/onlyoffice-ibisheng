@@ -229,6 +229,11 @@ CTableId.prototype =
                         Class = new CColorMod();
                         break;
                     }
+                    case CLASS_TYPE_LEGEND_ENTRY:
+                    {
+                        Class = new CLegendEntry();
+                        break;
+                    }
                 }
                 Class.Id = Id;
                 this.m_aPairs[Id] = Class;
@@ -393,7 +398,7 @@ function CTextBody(shape)
     if(isRealObject(shape))
     {
         this.setShape(shape);
-        this.addDocumentContent(new CDocumentContent(this, shape.drawingObjects.drawingDocument, 0, 0, 200, 20000, false, false));
+        this.addDocumentContent(new CDocumentContent(this, isRealObject(shape.drawingObjects) ? shape.drawingObjects.drawingDocument : null, 0, 0, 200, 20000, false, false));
     }
 
 }
@@ -455,6 +460,7 @@ CTextBody.prototype =
                 styles.Style[styles.Id] = style;
                 ++styles.Id;
             }
+
             this.styles[level] = styles;
         }
         return this.styles[level];
@@ -496,6 +502,28 @@ CTextBody.prototype =
     paragraphAdd: function(paraItem)
     {
         this.content.Paragraph_Add(paraItem);
+        this.content.Recalculate_Page(0, true );
+        this.content.RecalculateCurPos();
+        if(this.bodyPr.anchor !== VERTICAL_ANCHOR_TYPE_TOP)
+        {
+            this.shape.calculateTransformTextMatrix();
+        }
+    },
+
+    addNewParagraph: function()
+    {
+        this.content.Add_NewParagraph();
+        this.content.Recalculate_Page(0, true );
+        this.content.RecalculateCurPos();
+        if(this.bodyPr.anchor !== VERTICAL_ANCHOR_TYPE_TOP)
+        {
+            this.shape.calculateTransformTextMatrix();
+        }
+    },
+
+    remove: function(direction, bOnlyText)
+    {
+        this.content.Remove(direction, bOnlyText);
         this.content.Recalculate_Page(0, true );
         this.content.RecalculateCurPos();
         if(this.bodyPr.anchor !== VERTICAL_ANCHOR_TYPE_TOP)
@@ -653,6 +681,12 @@ CTextBody.prototype =
             drawingDocument.SelectEnabled(false);
             drawingDocument.CheckTargetShow();
         }
+    },
+
+
+    Get_PageContentStartPos: function(pageNum)
+    {
+        return {X: 0, Y: 0, XLimit: this.contentWidth, YLimit: 20000};
     },
 
     setVerticalAlign: function(align)

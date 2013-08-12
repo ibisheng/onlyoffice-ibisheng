@@ -74,6 +74,20 @@ CGroupShape.prototype =
 
     },
 
+
+    removeFromSpTree: function(id)
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(this.spTree[i].Get_Id() === id)
+            {
+                History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RemoveFromSpTree, null, null,
+                    new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(id, i)));
+                this.spTree.splice(i, 1);
+            }
+        }
+    },
+
     isShape: function()
     {
         return false;
@@ -98,6 +112,24 @@ CGroupShape.prototype =
     isSimpleObject: function()
     {
         return false;
+    },
+
+
+    swapGraphicObject: function(idRemove, idAdd)
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(this.spTree[i].Get_Id() === idRemove)
+            {
+                this.spTree.splice(i, 1)[0].setGroup(null);
+                var sp = g_oTableId.Get_ById(idAdd);
+                sp.setGroup(this);
+                this.spTree.splice(i, 0, sp);
+                History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SwapGraphicObjects, null, null,
+                    new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOPairProps(idRemove, idAdd, i, null)));
+                break;
+            }
+        }
     },
 
     /*setDrawingObjects: function(drawingObjects)
@@ -707,6 +739,51 @@ CGroupShape.prototype =
 
     },
 
+
+    getAllParagraphParaPr: function()
+    {
+        var result = null;
+        var cur_pr;
+        for(var i = 0; i < this.arrGraphicObjects.length; ++i)
+        {
+            if(typeof this.arrGraphicObjects[i].getAllParagraphParaPr === "function")
+                cur_pr = this.arrGraphicObjects[i].getAllParagraphParaPr();
+            else
+                cur_pr = null;
+
+            if(cur_pr != null)
+            {
+                if(result === null)
+                    result = cur_pr;
+                else
+                    result = result.Compare(cur_pr);
+            }
+        }
+        return result;
+    },
+
+    getAllParagraphTextPr: function()
+    {
+        var result = null;
+        var cur_pr;
+        for(var i = 0; i < this.arrGraphicObjects.length; ++i)
+        {
+            if(typeof this.arrGraphicObjects[i].getAllParagraphTextPr === "function")
+                cur_pr = this.arrGraphicObjects[i].getAllParagraphTextPr();
+            else
+                cur_pr = null;
+
+            if(cur_pr != null)
+            {
+                if(result === null)
+                    result = cur_pr;
+                else
+                    result = result.Compare(cur_pr);
+            }
+        }
+        return result;
+    },
+
     setCellBackgroundColor: function(color)
     {
         for(var i = 0; i < this.spTree.length; ++i)
@@ -1020,6 +1097,7 @@ CGroupShape.prototype =
         {
             History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_DeleteDrawingBase, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(position, null)), null);
         }
+        return position;
     },
 
     addToDrawingObjects: function(pos)
@@ -1410,6 +1488,17 @@ CGroupShape.prototype =
                 }
                 break;
             }
+            case historyitem_AutoShapes_RemoveFromSpTree:
+            {
+                this.spTree.splice(data.newValue, 0, g_oTableId.Get_ById(data.oldValue));
+                break;
+            }
+            case historyitem_AutoShapes_SwapGraphicObjects:
+            {
+                this.spTree.splice(data.newValue1, 1);
+                this.spTree.splice(data.newValue1, 0, g_oTableId.Get_ById(data.oldValue1));
+                break;
+            }
         }
     },
 
@@ -1454,6 +1543,25 @@ CGroupShape.prototype =
                         this.drawingObjects = ws.objectRender;
                     }
                 }
+                break;
+            }
+
+            case historyitem_AutoShapes_RemoveFromSpTree:
+            {
+                for(var i = 0; i < this.spTree.length; ++i)
+                {
+                    if(this.spTree[i].Id === data.oldValue)
+                    {
+                        this.spTree.splice(i, 1);
+                    }
+                }
+                break;
+            }
+
+            case historyitem_AutoShapes_SwapGraphicObjects:
+            {
+                this.spTree.splice(data.newValue1, 1);
+                this.spTree.splice(data.newValue1, 0, g_oTableId.Get_ById(data.oldValue2));
                 break;
             }
         }

@@ -5591,7 +5591,7 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
         }
 		else if ( c_oSer_DrawingType.GraphicFrame == type )
         {
-            oDrawing.graphicObject = new CChartAsGroup(oDrawing, oDrawing.getDrawingObjects());
+            oDrawing.graphicObject = new CChartAsGroup();
 			var oBinary_ChartReader = new Binary_ChartReader(this.stream,  oDrawing.graphicObject.chart,  oDrawing.graphicObject);
 			res = oBinary_ChartReader.Read(length);
         }

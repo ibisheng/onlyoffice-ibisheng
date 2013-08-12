@@ -649,8 +649,8 @@
 					case 8: // backspace
 						if (isViewerMode || t.isCellEditMode || t.isSelectionDialogMode) {return true;}
 						if (t.isSelectDrawingObject) {
-							t.handlers.trigger("deleteDrawingObjectDone");
-							t.isSelectDrawingObject = false;
+							//t.handlers.trigger("deleteDrawingObjectDone");
+							//t.isSelectDrawingObject = false;
 						} else {
 							// При backspace фокус не в редакторе (стираем содержимое)
 							t.handlers.trigger("editCell", 0, 0, /*isCoord*/false, /*isFocus*/false, /*isClearCell*/true, /*isHideCursor*/undefined,

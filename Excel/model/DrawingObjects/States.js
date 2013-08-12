@@ -281,6 +281,7 @@ function NullState(drawingObjectsController, drawingObjects)
 
     this.onKeyDown = function(e)
     {
+        return  DefaultKeyDownHandle(this.drawingObjectsController, e);
         var b_prevent_default = false;
 		
 		var selected_objects = this.drawingObjectsController.selectedObjects;
@@ -1392,16 +1393,7 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
 
     this.onKeyDown = function(e)
     {
-        var b_prevent_default = false;
-        switch (e.keyCode)
-        {
-            case 8:
-            {
-                b_prevent_default = true;
-            }
-        }
-        if(b_prevent_default)
-            e.preventDefault();
+        return DefaultKeyDownHandle(drawingObjectsController, e);
     };
 
     this.onKeyPress = function(e)
@@ -2721,7 +2713,7 @@ function GroupState(drawingObjectsController, drawingObjects, group)
 
     this.onKeyDown = function(e)
     {
-
+        return DefaultKeyDownHandle(this.drawingObjectsController, e);
     };
 
     this.onKeyPress = function(e)
@@ -4365,7 +4357,7 @@ function AddPolyLine2State3(drawingObjectsController, drawingObjects, polyline)
             var lt = this.graphicObjects.polyline.getLeftTopPoint();
             var near_pos =  this.graphicObjects.document.Get_NearestPos(this.graphicObjects.startTrackPos.pageIndex, lt.x, lt.y);
             near_pos.Page = this.graphicObjects.startTrackPos.pageIndex;
-            if(false === editor.isViewMode && near_pos != null &&
+            if(false === isViewMode && near_pos != null &&
                 false === this.graphicObjects.document.Document_Is_SelectionLocked(changestype_None, {Type : changestype_2_Element_and_Type , Element : near_pos.Paragraph, CheckType : changestype_Paragraph_Content} ))
             {
                 History.Create_NewPoint();
@@ -4408,7 +4400,6 @@ function AddPolyLine2State3(drawingObjectsController, drawingObjects, polyline)
     };
 }
 
-
 function DrawDefaultSelection(drawingObjectsController, drawingDocument)
 {
     var selected_objects = drawingObjectsController.selectedObjects;
@@ -4436,8 +4427,1455 @@ function DrawGroupSelection(group, drawingDocument)
     }
 }
 
+function DefaultKeyDownHandle(drawingObjectsController, e)
+{
+    var bRetValue = false;
+    var state = drawingObjectsController.curState;
+    var isViewMode = drawingObjectsController.drawingObjects.isViewerMode();
+    if ( e.keyCode == 8 && false === isViewMode ) // BackSpace
+    {
+
+        switch(state.id)
+        {
+            case STATES_ID_TEXT_ADD:
+            case STATES_ID_TEXT_ADD_IN_GROUP:
+            {
+                drawingObjectsController.drawingObjects.objectLocker.reset();
+                if(state.id === STATES_ID_TEXT_ADD)
+                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.textObject.Get_Id());
+                else
+                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.group.Get_Id());
+
+                var selection_state =  drawingObjectsController.getSelectionState();
+                var callback = function(bLock)
+                {
+                    if(bLock)
+                    {
+                        History.Create_NewPoint();
+                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.setSelectionState(selection_state);
+                        var state = drawingObjectsController.curState;
+                        state.textObject.remove(-1, true);
+                        drawingObjectsController.drawingObjects.showDrawingObjects(true);
+                        state.textObject.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
+                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                    }
+                };
+                drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
+                break;
+            }
+            case STATES_ID_GROUP:
+            {
+                drawingObjectsController.drawingObjects.objectLocker.reset();
+                drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.group.Get_Id());
+
+                var selection_state =  drawingObjectsController.getSelectionState();
+                var callback = function(bLock)
+                {
+                    if(bLock)
+                    {
+                        History.Create_NewPoint();
+                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.setSelectionState(selection_state);
+
+                        var state = drawingObjectsController.curState;
+                        var group = state.group;
+                        var selected_objects = [];
+                        for(var i = 0; i < group.selectedObjects.length; ++i)
+                        {
+                            selected_objects.push(group.selectedObjects[i]);
+                        }
+                        group.resetSelection();
+                        drawingObjectsController.resetSelectionState();
+                        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateUndo, null, null,
+                            new UndoRedoDataGraphicObjects(group.Id, new UndoRedoDataGOSingleProp(null, null)), null);
+                        var groups = [];
+                        for(i = 0; i < selected_objects.length; ++i)
+                        {
+                            var parent_group = selected_objects[i].group;
+                            parent_group.removeFromSpTree(selected_objects[i].Get_Id());
+                            for(var j = 0; j < groups.length; ++j)
+                            {
+                                if(groups[i] === parent_group)
+                                    break;
+                            }
+                            if(j === groups.length)
+                                groups.push(parent_group);
+                        }
+                        groups.sort(CompareGroups);
+                        for(i  = 0; i < groups.length; ++i)
+                        {
+                            var parent_group = groups[i];
+                            if(parent_group !== group)
+                            {
+                                if(parent_group.spTree.length === 0)
+                                {
+                                    parent_group.group.removeFromSpTree(parent_group.Get_Id());
+                                }
+                                if(parent_group.spTree.length === 1)
+                                {
+                                    var sp = parent_group.spTree[0];
+                                    sp.setRotate(normalizeRotate(isRealNumber(sp.spPr.xfrm.rot) ? sp.spPr.xfrm.rot : 0 + isRealNumber(parent_group.spPr.xfrm.rot) ? parent_group.spPr.xfrm.rot : 0 ));
+                                    sp.setFlips(sp.spPr.xfrm.flipH === true ? !(parent_group.spPr.xfrm.flipH === true) : parent_group.spPr.xfrm.flipH === true,
+                                        sp.spPr.xfrm.flipV === true ? !(parent_group.spPr.xfrm.flipV === true) : parent_group.spPr.xfrm.flipV === true);
+                                    sp.setPosition(sp.spPr.xfrm.x + parent_group.spPr.xfrm.x, sp.spPr.xfrm.y + parent_group.spPr.xfrm.y);
+                                    parent_group.group.swapGraphicObject(parent_group.Get_Id(), sp.Get_Id());
+                                }
+                            }
+                            else
+                            {
+                                switch (parent_group.spTree.length)
+                                {
+                                    case 0:
+                                    {
+                                        parent_group.deleteDrawingBase();
+                                        break;
+                                    }
+                                    case 1:
+                                    {
+                                        var sp = parent_group.spTree[0];
+                                        sp.setRotate(normalizeRotate(isRealNumber(sp.spPr.xfrm.rot) ? sp.spPr.xfrm.rot : 0 + isRealNumber(parent_group.spPr.xfrm.rot) ? parent_group.spPr.xfrm.rot : 0 ));
+                                        sp.setFlips(sp.spPr.xfrm.flipH === true ? !(parent_group.spPr.xfrm.flipH === true) : parent_group.spPr.xfrm.flipH === true,
+                                            sp.spPr.xfrm.flipV === true ? !(parent_group.spPr.xfrm.flipV === true) : parent_group.spPr.xfrm.flipV === true);
+                                        sp.setPosition(sp.spPr.xfrm.offX + parent_group.spPr.xfrm.offX, sp.spPr.xfrm.offY + parent_group.spPr.xfrm.offY);
+                                        sp.setGroup(null);
+                                        var pos = parent_group.deleteDrawingBase();
+                                        sp.addToDrawingObjects(pos);
+                                        sp.select(drawingObjectsController);
+                                        sp.recalculateTransform();
+                                        sp.calculateTransformTextMatrix();
+                                        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null,
+                                            new UndoRedoDataGraphicObjects(sp.Id, new UndoRedoDataGOSingleProp(null, null)), null);
+                                        break;
+                                    }
+                                    default:
+                                    {
+                                        parent_group.normalize();
+                                        parent_group.updateCoordinatesAfterInternalResize();
+                                        parent_group.select(drawingObjectsController);
+                                        parent_group.recalculate();
+                                        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateRedo, null, null,
+                                            new UndoRedoDataGraphicObjects(parent_group.Id, new UndoRedoDataGOSingleProp(null, null)), null);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
+                drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
+                break;
+            }
+            case STATES_ID_NULL:
+            {
+                drawingObjectsController.drawingObjects.objectLocker.reset();
+                for(var i = 0; i < drawingObjectsController.selectedObjects.length; ++i)
+                {
+                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(drawingObjectsController.selectedObjects[i].Get_Id());
+                }
+
+                var selection_state =  drawingObjectsController.getSelectionState();
+                var callback = function(bLock)
+                {
+                    if(bLock)
+                    {
+                        History.Create_NewPoint();
+                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.setSelectionState(selection_state);
+
+                        for(var i = 0; i < drawingObjectsController.selectedObjects.length; ++i)
+                        {
+                            drawingObjectsController.selectedObjects[i].deleteDrawingBase();
+                        }
+                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.drawingObjects.showDrawingObjects(true);
+                        drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
+                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                    }
+                };
+                drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
+
+                break;
+            }
+            default :
+            {
+                break;
+            }
+        }
+        bRetValue = true;
+    }
+    else if ( e.keyCode == 9 && false === isViewMode ) // Tab
+    {
+        switch(state.id)
+        {
+            case STATES_ID_TEXT_ADD:
+            case STATES_ID_TEXT_ADD_IN_GROUP:
+            {
+
+                drawingObjectsController.drawingObjects.objectLocker.reset();
+                if(state.id === STATES_ID_TEXT_ADD)
+                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.textObject.Get_Id());
+                else
+                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.group.Get_Id());
 
 
+                var selection_state =  drawingObjectsController.getSelectionState();
+                var callback = function(bLock)
+                {
+                    if(bLock)
+                    {
+                        History.Create_NewPoint();
+                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.setSelectionState(selection_state);
+                        state.textObject.paragraphAdd( new ParaTab() );
+                        drawingObjectsController.drawingObjects.showDrawingObjects(true);
+                        state.textObject.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
+                    }
+                };
+                drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
+                bRetValue = true;
+                break;
+            }
+            case STATES_ID_NULL:
+            {
+                var a_drawing_bases = drawingObjectsController.drawingObjects.getDrawingObjects();
+                if(!e.shiftKey)
+                {
+                    var last_selected = null, last_selected_index = null;
+                    for(var i = a_drawing_bases.length - 1;  i > -1; --i)
+                    {
+                        if(a_drawing_bases[i].graphicObject.selected)
+                        {
+                            last_selected = a_drawing_bases[i].graphicObject;
+                            last_selected_index = i;
+                            break;
+                        }
+                    }
+                    if(isRealObject(last_selected))
+                    {
+                        bRetValue = true;
+                        drawingObjectsController.resetSelection();
+                        if(!last_selected.isGroup() || last_selected.arrGraphicObjects.length === 0)
+                        {
+                            if(last_selected_index < a_drawing_bases.length - 1)
+                            {
+                                a_drawing_bases[last_selected_index+1].graphicObject.select(drawingObjectsController);
+                            }
+                            else
+                            {
+                                a_drawing_bases[0].graphicObject.select(drawingObjectsController);
+                            }
+                        }
+                        else
+                        {
+                            last_selected.select(drawingObjectsController);
+                            last_selected.arrGraphicObjects[0].select(last_selected);
+                            drawingObjectsController.changeCurrentState(new GroupState(drawingObjectsController, drawingObjectsController.drawingObjects, last_selected));
+                        }
+                    }
+                }
+                else
+                {
+                    var first_selected = null, first_selected_index = null;
+                    for(var i = 0; i < a_drawing_bases.length; ++i)
+                    {
+                        if(a_drawing_bases[i].graphicObject.selected)
+                        {
+                            first_selected = a_drawing_bases[i].graphicObject;
+                            first_selected_index = i;
+                            break;
+                        }
+                    }
+                    if(isRealObject(first_selected))
+                    {
+                        bRetValue = true;
+                        drawingObjectsController.resetSelection();
+                        if(first_selected_index > 0)
+                        {
+                            a_drawing_bases[first_selected_index - 1].graphicObject.select(drawingObjectsController);
+                        }
+                        else
+                        {
+                            a_drawing_bases[a_drawing_bases.length - 1].graphicObject.select(drawingObjectsController);
+                        }
+                    }
+                }
+                drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                break;
+            }
+            case STATES_ID_GROUP:
+            {
+                var group = state.group;
+                var arr_graphic_objects = group.arrGraphicObjects;
+                if(!e.shiftKey)
+                {
+                    for(var i = arr_graphic_objects.length - 1; i > -1; --i)
+                    {
+                        if(arr_graphic_objects[i].selected)
+                        {
+                            break;
+                        }
+                    }
+                    group.resetSelection();
+                    if(i < arr_graphic_objects.length - 1)
+                    {
+                        arr_graphic_objects[i+1].select(group);
+                    }
+                    else
+                    {
+                        drawingObjectsController.resetSelectionState();
+                        var a_drawing_bases = drawingObjectsController.drawingObjects.getDrawingObjects();
+                        for(var i = 0; i < a_drawing_bases.length; ++i)
+                        {
+                            if(a_drawing_bases.graphicObject === group)
+                            {
+                                break;
+                            }
+                        }
+                        if(i < a_drawing_bases.length)
+                        {
+                            a_drawing_bases[i+1].graphicObject.select(drawingObjectsController);
+                        }
+                        else
+                        {
+                            a_drawing_bases[0].graphicObject.select(drawingObjectsController);
+                        }
+                    }
+                }
+                else
+                {
+                    for(var i = 0; i < arr_graphic_objects.length; ++i)
+                    {
+                        if(arr_graphic_objects[i].selected)
+                        {
+                            break;
+                        }
+                    }
+                    group.resetSelection();
+                    if(i > 0)
+                    {
+                        arr_graphic_objects[i - 1].select(group);
+                    }
+                    else
+                    {
+                        drawingObjectsController.resetSelectionState();
+                        group.select(drawingObjectsController);
+                    }
+                }
+                drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                break;
+            }
+        }
+    }
+    else if ( e.keyCode == 13 && false === isViewMode ) // Enter
+    {
+        /*var Hyperlink = this.Hyperlink_Check(false);
+        if ( null != Hyperlink && false === e.ShiftKey )
+        {
+            editor.sync_HyperlinkClickCallback( Hyperlink.Get_Value() )
+            Hyperlink.Set_Visited(true);
+
+            // TODO: Пока сделаем так, потом надо будет переделать
+            this.DrawingDocument.ClearCachePages();
+            this.DrawingDocument.FirePaint();
+        }
+        else
+        {
+            var CheckType = ( e.ShiftKey || e.CtrlKey ? changestype_Paragraph_Content : changestype_Document_Content_Add );
+            if ( false === this.Document_Is_SelectionLocked(CheckType) )
+            {
+                this.Create_NewHistoryPoint();
+                if ( e.ShiftKey )
+                {
+                    this.Paragraph_Add( new ParaNewLine( break_Line ) );
+                }
+                else if ( e.CtrlKey )
+                {
+                    this.Paragraph_Add( new ParaNewLine( break_Page ) );
+                }
+                else
+                {
+                    this.Add_NewParagraph();
+                }
+            }
+        }  */
+        switch(state.id)
+        {
+            case STATES_ID_NULL:
+            {
+                if(drawingObjectsController.selectedObjects.length === 1 && drawingObjectsController.selectedObjects[0].isShape())
+                {
+                    drawingObjectsController.drawingObjects.objectLocker.reset();
+                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(drawingObjectsController.selectedObjects[0].Get_Id());
+
+                    var selection_state =  drawingObjectsController.getSelectionState();
+                    var callback = function(bLock)
+                    {
+                        if(bLock)
+                        {
+                            History.Create_NewPoint();
+                            drawingObjectsController.resetSelectionState();
+                            drawingObjectsController.setSelectionState(selection_state);
+                            var sp = drawingObjectsController.selectedObjects[0];
+                            drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, drawingObjectsController.drawingObjects, sp));
+                            if(isRealObject(sp.txBody))
+                            {
+                                sp.txBody.content.Select_All();
+                            }
+                            else
+                            {
+                                sp.addTextBody(new CTextBody(sp));
+                                sp.calculateContent();
+                                sp.calculateTransformTextMatrix();
+                            }
+                            sp.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
+                            drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                        }
+                    };
+                    drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
+
+                }
+                bRetValue = true;
+                break;
+            }
+            case STATES_ID_TEXT_ADD:
+            case STATES_ID_TEXT_ADD_IN_GROUP:
+            {
+                drawingObjectsController.drawingObjects.objectLocker.reset();
+                drawingObjectsController.drawingObjects.objectLocker.addObjectId(drawingObjectsController.textObject.Get_Id());
+
+                var selection_state =  drawingObjectsController.getSelectionState();
+                var callback = function(bLock)
+                {
+                    if(bLock)
+                    {
+                        History.Create_NewPoint();
+                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.setSelectionState(selection_state);
+                        var state = drawingObjectsController.curState;
+                        state.textObject.addNewParagraph();
+                        state.textObject.calculateContent();
+                        state.textObject.calculateTransformTextMatrix();
+                        drawingObjectsController.drawingObjects.showDrawingObjects(true);
+                        state.textObject.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
+                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                    }
+                };
+                drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
 
 
+                bRetValue = true;
+                break;
+            }
+        }
+        bRetValue = true;
+    }
+    else if ( e.keyCode == 27 ) // Esc
+    {
+        switch(state.id)
+        {
+            case STATES_ID_NULL:
+            {
+                bRetValue = true;
+                break;
+            }
+            case STATES_ID_TEXT_ADD:
+            case STATES_ID_TEXT_ADD_IN_GROUP:
+            {
+                state.textObject.txBody.content.Selection_Remove();
+                drawingObjectsController.changeCurrentState(new NullState(drawingObjectsController, drawingObjectsController.drawingObjects));
+                drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
+                drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                bRetValue = true;
+                break;
+            }
+        }
+    }
+    else if ( e.keyCode == 32 && false === isViewMode ) // Space
+    {
+
+        switch(state.id)
+        {
+            case STATES_ID_TEXT_ADD:
+            case STATES_ID_TEXT_ADD_IN_GROUP:
+            {
+                if(!e.ctrlKey)
+                {
+                    drawingObjectsController.drawingObjects.objectLocker.reset();
+                    if(state.id === STATES_ID_TEXT_ADD)
+                        drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.textObject.Get_Id());
+                    else
+                        drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.group.Get_Id());
+
+                    var selection_state =  drawingObjectsController.getSelectionState();
+                    var callback = function(bLock)
+                    {
+                        if(bLock)
+                        {
+                            History.Create_NewPoint();
+                            drawingObjectsController.resetSelectionState();
+                            drawingObjectsController.setSelectionState(selection_state);
+                            var state = drawingObjectsController.curState;
+                            state.textObject.paragraphAdd(new ParaSpace(1));
+                            drawingObjectsController.drawingObjects.showDrawingObjects(true);
+                            state.textObject.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
+                            drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                        }
+                    };
+                    drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
+                }
+                break;
+            }
+            case STATES_ID_GROUP:
+            {
+                if(!e.ctrlKey && state.group.selectedObjects.length === 1)
+                {
+                    drawingObjectsController.drawingObjects.objectLocker.reset();
+                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.group.Get_Id());
+
+                    var selection_state =  drawingObjectsController.getSelectionState();
+                    var callback = function(bLock)
+                    {
+                        if(bLock)
+                        {
+                            History.Create_NewPoint();
+                            drawingObjectsController.resetSelectionState();
+                            drawingObjectsController.setSelectionState(selection_state);
+                            var state = drawingObjectsController.curState;
+                            drawingObjectsController.changeCurrentState(new TextAddInGroup(drawingObjectsController, drawingObjectsController.drawingObjects, state.group, state.group.selectedObjects[0]));
+                            drawingObjectsController.state.textObject.paragraphAdd(new ParaSpace(1));
+                            drawingObjectsController.showDrawingObjects(true);
+                            drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
+                        }
+                    };
+                    drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
+                }
+                break;
+            }
+            case STATES_ID_NULL:
+            {
+                if(drawingObjectsController.selectedObjects.length === 1 && drawingObjectsController.selectedObjects[0].isShape() && !e.ctrlKey)
+                {
+                    drawingObjectsController.drawingObjects.objectLocker.reset();
+                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(drawingObjectsController.selectedObjects[0].Get_Id());
+                    var selection_state =  drawingObjectsController.getSelectionState();
+                    var callback = function(bLock)
+                    {
+                        if(bLock)
+                        {
+                            History.Create_NewPoint();
+                            drawingObjectsController.resetSelectionState();
+                            drawingObjectsController.setSelectionState(selection_state);
+                            drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, drawingObjectsController.drawingObjects, drawingObjectsController.selectedObjects[0]));
+                            drawingObjectsController.curState.textObject.paragraphAdd(new ParaSpace(1));
+                            drawingObjectsController.drawingObjects.showDrawingObjects(true);
+                            drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
+                            drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                        }
+                    };
+                    drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
+                }
+                break;
+            }
+            default :
+            {
+                break;
+            }
+        }
+
+        bRetValue = true;
+    }
+    else if ( e.keyCode == 33 ) // PgUp
+    {
+    }
+    else if ( e.keyCode == 34 ) // PgDn
+    {
+    }
+    else if ( e.keyCode == 35 ) // клавиша End
+    {
+        switch(state.id)
+        {
+            case STATES_ID_TEXT_ADD:
+            case STATES_ID_TEXT_ADD_IN_GROUP:
+            {
+                if (e.ctrlKey) // Ctrl + End - переход в конец документа
+                {
+                    state.textObject.txBody.content.Cursor_MoveToEndPos();
+                    drawingObjectsController.updateSelectionState();
+                }
+                else // Переходим в конец строки
+                {
+                    state.textObject.txBody.content.Cursor_MoveEndOfLine(e.shiftKey);
+                    drawingObjectsController.updateSelectionState();
+                }
+                break;
+            }
+        }
+
+        bRetValue = true;
+    }
+    else if ( e.keyCode == 36 ) // клавиша Home
+    {
+        switch(state.id)
+        {
+            case STATES_ID_TEXT_ADD:
+            case STATES_ID_TEXT_ADD_IN_GROUP:
+            {
+                if (e.ctrlKey) // Ctrl + End - переход в конец документа
+                {
+                    state.textObject.txBody.content.Cursor_MoveToStartPos();
+                    drawingObjectsController.updateSelectionState();
+                }
+                else // Переходим в конец строки
+                {
+                    state.textObject.txBody.content.Cursor_MoveStartOfLine(e.shiftKey);
+                    drawingObjectsController.updateSelectionState();
+                }
+                break;
+            }
+        }
+
+        bRetValue = true;
+    }
+    else if ( e.keyCode == 37 ) // Left Arrow
+    {
+        switch(state.id)
+        {
+            case STATES_ID_NULL:
+            {
+                //TODO реализовать изменение размеров объектов с ShiftKey
+                drawingObjectsController.drawingObjects.objectLocker.reset();
+                for(var i = 0; i < drawingObjectsController.selectedObjects.length; ++i)
+                {
+                    drawingObjectsController.drawingObjects.objectLocker.addObjectId( drawingObjectsController.selectedObjects[i].Get_Id());
+                }
+                var selection_state =  drawingObjectsController.getSelectionState();
+                var callback = function(bLock)
+                {
+                    if(bLock)
+                    {
+                        History.Create_NewPoint();
+                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.setSelectionState(selection_state);
+                        var state = drawingObjectsController.curState;
+                        for(var i = 0; i < drawingObjectsController.selectedObjects.length; ++i)
+                        {
+                            var xfrm = drawingObjectsController.selectedObjects[i].spPr.xfrm;
+                            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(drawingObjectsController.selectedObjects[i].Id, new UndoRedoDataShapeRecalc()), null);
+                            drawingObjectsController.selectedObjects[i].setPosition(xfrm.offX - 3, xfrm.offY);
+                            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(drawingObjectsController.selectedObjects[i].Id, new UndoRedoDataShapeRecalc()), null);
+                            drawingObjectsController.selectedObjects[i].recalculateTransform();
+                            drawingObjectsController.selectedObjects[i].calculateTransformTextMatrix();
+                        }
+
+                        drawingObjectsController.drawingObjects.showDrawingObjects(true);
+                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                    }
+                };
+                drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
+                bRetValue = true;
+                break;
+            }
+            case STATES_ID_GROUP:
+            {
+                drawingObjectsController.drawingObjects.objectLocker.reset();
+                drawingObjectsController.drawingObjects.objectLocker.addObjectId(drawingObjectsController.curState.group.Get_Id());
+
+                var selection_state =  drawingObjectsController.getSelectionState();
+                var callback = function(bLock)
+                {
+                    if(bLock)
+                    {
+                        History.Create_NewPoint();
+                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.setSelectionState(selection_state);
+                        var state = drawingObjectsController.curState;
+                        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(state.group.Id, new UndoRedoDataShapeRecalc()), null);
+                        for(var i = 0; i < state.group.selectedObjects.length; ++i)
+                        {
+                            var xfrm =  state.group.selectedObjects[i].spPr.xfrm;
+                            state.group.selectedObjects[i].setPosition(xfrm.offX - 3, xfrm.offY);
+                        }
+                        state.group.normalize();
+                        state.group.updateCoordinatesAfterInternalResize();
+                        state.group.recalculate();
+                        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(state.group.Id, new UndoRedoDataShapeRecalc()), null);
+                        drawingObjectsController.drawingObjects.showDrawingObjects(true);
+                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                    }
+                };
+                drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
+                bRetValue = true;
+                break;
+            }
+            case STATES_ID_TEXT_ADD:
+            case STATES_ID_TEXT_ADD_IN_GROUP:
+            {
+                state.textObject.txBody.content.Cursor_MoveLeft(e.shiftKey,e.ctrlKey );
+                drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
+                break;
+            }
+        }
+        bRetValue = true;
+    }
+    else if ( e.keyCode == 38 ) // Top Arrow
+    {
+        switch(state.id)
+        {
+            case STATES_ID_NULL:
+            {
+                //TODO реализовать изменение размеров объектов с ShiftKey
+                drawingObjectsController.drawingObjects.objectLocker.reset();
+                for(var i = 0; i < drawingObjectsController.selectedObjects.length; ++i)
+                {
+                    drawingObjectsController.drawingObjects.objectLocker.addObjectId( drawingObjectsController.selectedObjects[i].Get_Id());
+                }
+                var selection_state =  drawingObjectsController.getSelectionState();
+                var callback = function(bLock)
+                {
+                    if(bLock)
+                    {
+                        History.Create_NewPoint();
+                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.setSelectionState(selection_state);
+                        var state = drawingObjectsController.curState;
+                        for(var i = 0; i < drawingObjectsController.selectedObjects.length; ++i)
+                        {
+                            var xfrm = drawingObjectsController.selectedObjects[i].spPr.xfrm;
+                            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(drawingObjectsController.selectedObjects[i].Id, new UndoRedoDataShapeRecalc()), null);
+                            drawingObjectsController.selectedObjects[i].setPosition(xfrm.offX, xfrm.offY - 3);
+                            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(drawingObjectsController.selectedObjects[i].Id, new UndoRedoDataShapeRecalc()), null);
+                            drawingObjectsController.selectedObjects[i].recalculateTransform();
+                            drawingObjectsController.selectedObjects[i].calculateTransformTextMatrix();
+                        }
+
+                        drawingObjectsController.drawingObjects.showDrawingObjects(true);
+                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                    }
+                };
+                drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
+                bRetValue = true;
+                break;
+            }
+            case STATES_ID_GROUP:
+            {
+                drawingObjectsController.drawingObjects.objectLocker.reset();
+                drawingObjectsController.drawingObjects.objectLocker.addObjectId(drawingObjectsController.curState.group.Get_Id());
+
+                var selection_state =  drawingObjectsController.getSelectionState();
+                var callback = function(bLock)
+                {
+                    if(bLock)
+                    {
+                        History.Create_NewPoint();
+                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.setSelectionState(selection_state);
+                        var state = drawingObjectsController.curState;
+                        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(state.group.Id, new UndoRedoDataShapeRecalc()), null);
+                        for(var i = 0; i < state.group.selectedObjects.length; ++i)
+                        {
+                            var xfrm =  state.group.selectedObjects[i].spPr.xfrm;
+                            state.group.selectedObjects[i].setPosition(xfrm.offX, xfrm.offY - 3);
+                        }
+                        state.group.normalize();
+                        state.group.updateCoordinatesAfterInternalResize();
+                        state.group.recalculate();
+                        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(state.group.Id, new UndoRedoDataShapeRecalc()), null);
+                        drawingObjectsController.drawingObjects.showDrawingObjects(true);
+                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                    }
+                };
+                drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
+                bRetValue = true;
+                break;
+            }
+            case STATES_ID_TEXT_ADD:
+            case STATES_ID_TEXT_ADD_IN_GROUP:
+            {
+                state.textObject.txBody.content.Cursor_MoveUp(e.shiftKey,e.ctrlKey );
+                drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
+                break;
+            }
+        }
+        bRetValue = true;
+    }
+    else if ( e.keyCode == 39 ) // Right Arrow
+    {
+        switch(state.id)
+        {
+            case STATES_ID_NULL:
+            {
+                //TODO реализовать изменение размеров объектов с ShiftKey
+                drawingObjectsController.drawingObjects.objectLocker.reset();
+                for(var i = 0; i < drawingObjectsController.selectedObjects.length; ++i)
+                {
+                    drawingObjectsController.drawingObjects.objectLocker.addObjectId( drawingObjectsController.selectedObjects[i].Get_Id());
+                }
+                var selection_state =  drawingObjectsController.getSelectionState();
+                var callback = function(bLock)
+                {
+                    if(bLock)
+                    {
+                        History.Create_NewPoint();
+                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.setSelectionState(selection_state);
+                        var state = drawingObjectsController.curState;
+                        for(var i = 0; i < drawingObjectsController.selectedObjects.length; ++i)
+                        {
+                            var xfrm = drawingObjectsController.selectedObjects[i].spPr.xfrm;
+                            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(drawingObjectsController.selectedObjects[i].Id, new UndoRedoDataShapeRecalc()), null);
+                            drawingObjectsController.selectedObjects[i].setPosition(xfrm.offX + 3, xfrm.offY);
+                            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(drawingObjectsController.selectedObjects[i].Id, new UndoRedoDataShapeRecalc()), null);
+                            drawingObjectsController.selectedObjects[i].recalculateTransform();
+                            drawingObjectsController.selectedObjects[i].calculateTransformTextMatrix();
+                        }
+
+                        drawingObjectsController.drawingObjects.showDrawingObjects(true);
+                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                    }
+                };
+                drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
+                bRetValue = true;
+                break;
+            }
+            case STATES_ID_GROUP:
+            {
+                drawingObjectsController.drawingObjects.objectLocker.reset();
+                drawingObjectsController.drawingObjects.objectLocker.addObjectId(drawingObjectsController.curState.group.Get_Id());
+
+                var selection_state =  drawingObjectsController.getSelectionState();
+                var callback = function(bLock)
+                {
+                    if(bLock)
+                    {
+                        History.Create_NewPoint();
+                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.setSelectionState(selection_state);
+                        var state = drawingObjectsController.curState;
+                        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(state.group.Id, new UndoRedoDataShapeRecalc()), null);
+                        for(var i = 0; i < state.group.selectedObjects.length; ++i)
+                        {
+                            var xfrm =  state.group.selectedObjects[i].spPr.xfrm;
+                            state.group.selectedObjects[i].setPosition(xfrm.offX + 3, xfrm.offY);
+                        }
+                        state.group.normalize();
+                        state.group.updateCoordinatesAfterInternalResize();
+                        state.group.recalculate();
+                        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(state.group.Id, new UndoRedoDataShapeRecalc()), null);
+                        drawingObjectsController.drawingObjects.showDrawingObjects(true);
+                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                    }
+                };
+                drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
+                bRetValue = true;
+                break;
+            }
+            case STATES_ID_TEXT_ADD:
+            case STATES_ID_TEXT_ADD_IN_GROUP:
+            {
+                state.textObject.txBody.content.Cursor_MoveRight(e.shiftKey,e.ctrlKey );
+                drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
+                break;
+            }
+        }
+        bRetValue = true;
+    }
+    else if ( e.keyCode == 40 ) // Bottom Arrow
+    {
+        switch(state.id)
+        {
+            case STATES_ID_NULL:
+            {
+                //TODO реализовать изменение размеров объектов с ShiftKey
+                drawingObjectsController.drawingObjects.objectLocker.reset();
+                for(var i = 0; i < drawingObjectsController.selectedObjects.length; ++i)
+                {
+                    drawingObjectsController.drawingObjects.objectLocker.addObjectId( drawingObjectsController.selectedObjects[i].Get_Id());
+                }
+                var selection_state =  drawingObjectsController.getSelectionState();
+                var callback = function(bLock)
+                {
+                    if(bLock)
+                    {
+                        History.Create_NewPoint();
+                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.setSelectionState(selection_state);
+                        var state = drawingObjectsController.curState;
+                        for(var i = 0; i < drawingObjectsController.selectedObjects.length; ++i)
+                        {
+                            var xfrm = drawingObjectsController.selectedObjects[i].spPr.xfrm;
+                            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(drawingObjectsController.selectedObjects[i].Id, new UndoRedoDataShapeRecalc()), null);
+                            drawingObjectsController.selectedObjects[i].setPosition(xfrm.offX, xfrm.offY + 3);
+                            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(drawingObjectsController.selectedObjects[i].Id, new UndoRedoDataShapeRecalc()), null);
+                            drawingObjectsController.selectedObjects[i].recalculateTransform();
+                            drawingObjectsController.selectedObjects[i].calculateTransformTextMatrix();
+                        }
+
+                        drawingObjectsController.drawingObjects.showDrawingObjects(true);
+                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                    }
+                };
+                drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
+                bRetValue = true;
+                break;
+            }
+            case STATES_ID_GROUP:
+            {
+                drawingObjectsController.drawingObjects.objectLocker.reset();
+                drawingObjectsController.drawingObjects.objectLocker.addObjectId(drawingObjectsController.curState.group.Get_Id());
+
+                var selection_state =  drawingObjectsController.getSelectionState();
+                var callback = function(bLock)
+                {
+                    if(bLock)
+                    {
+                        History.Create_NewPoint();
+                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.setSelectionState(selection_state);
+                        var state = drawingObjectsController.curState;
+                        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(state.group.Id, new UndoRedoDataShapeRecalc()), null);
+                        for(var i = 0; i < state.group.selectedObjects.length; ++i)
+                        {
+                            var xfrm =  state.group.selectedObjects[i].spPr.xfrm;
+                            state.group.selectedObjects[i].setPosition(xfrm.offX, xfrm.offY + 3);
+                        }
+                        state.group.normalize();
+                        state.group.updateCoordinatesAfterInternalResize();
+                        state.group.recalculate();
+                        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(state.group.Id, new UndoRedoDataShapeRecalc()), null);
+                        drawingObjectsController.drawingObjects.showDrawingObjects(true);
+                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                    }
+                };
+                drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
+                bRetValue = true;
+                break;
+            }
+            case STATES_ID_TEXT_ADD:
+            case STATES_ID_TEXT_ADD_IN_GROUP:
+            {
+                state.textObject.txBody.content.Cursor_MoveDown(e.shiftKey,e.ctrlKey );
+                drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
+                break;
+            }
+        }
+        bRetValue = true;
+    }
+    else if ( e.keyCode == 45 ) // Insert
+    {
+        //TODO
+    }
+    else if ( e.keyCode == 46 && false === isViewMode ) // Delete
+    {
+        switch(state.id)
+        {
+            case STATES_ID_TEXT_ADD:
+            case STATES_ID_TEXT_ADD_IN_GROUP:
+            {
+                drawingObjectsController.drawingObjects.objectLocker.reset();
+                if(state.id === STATES_ID_TEXT_ADD)
+                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.textObject.Get_Id());
+                else
+                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.group.Get_Id());
+
+                var selection_state =  drawingObjectsController.getSelectionState();
+                var callback = function(bLock)
+                {
+                    if(bLock)
+                    {
+                        History.Create_NewPoint();
+                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.setSelectionState(selection_state);
+                        var state = drawingObjectsController.curState;
+                        state.textObject.remove(1, true);
+                        drawingObjectsController.drawingObjects.showDrawingObjects(true);
+                        state.textObject.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
+                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                    }
+                };
+                drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
+                break;
+            }
+            case STATES_ID_GROUP:
+            {
+                drawingObjectsController.drawingObjects.objectLocker.reset();
+                drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.group.Get_Id());
+
+                var selection_state =  drawingObjectsController.getSelectionState();
+                var callback = function(bLock)
+                {
+                    if(bLock)
+                    {
+                        History.Create_NewPoint();
+                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.setSelectionState(selection_state);
+
+                        var state = drawingObjectsController.curState;
+                        var group = state.group;
+                        var selected_objects = [];
+                        for(var i = 0; i < group.selectedObjects.length; ++i)
+                        {
+                            selected_objects.push(group.selectedObjects[i]);
+                        }
+                        group.resetSelection();
+                        drawingObjectsController.resetSelectionState();
+                        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateUndo, null, null,
+                            new UndoRedoDataGraphicObjects(group.Id, new UndoRedoDataGOSingleProp(null, null)), null);
+                        var groups = [];
+                        for(i = 0; i < selected_objects.length; ++i)
+                        {
+                            var parent_group = selected_objects[i].group;
+                            parent_group.removeFromSpTree(selected_objects[i].Get_Id());
+                            for(var j = 0; j < groups.length; ++j)
+                            {
+                                if(groups[i] === parent_group)
+                                    break;
+                            }
+                            if(j === groups.length)
+                                groups.push(parent_group);
+                        }
+                        groups.sort(CompareGroups);
+                        for(i  = 0; i < groups.length; ++i)
+                        {
+                            var parent_group = groups[i];
+                            if(parent_group !== group)
+                            {
+                                if(parent_group.spTree.length === 0)
+                                {
+                                    parent_group.group.removeFromSpTree(parent_group.Get_Id());
+                                }
+                                if(parent_group.spTree.length === 1)
+                                {
+                                    var sp = parent_group.spTree[0];
+                                    sp.setRotate(normalizeRotate(isRealNumber(sp.spPr.xfrm.rot) ? sp.spPr.xfrm.rot : 0 + isRealNumber(parent_group.spPr.xfrm.rot) ? parent_group.spPr.xfrm.rot : 0 ));
+                                    sp.setFlips(sp.spPr.xfrm.flipH === true ? !(parent_group.spPr.xfrm.flipH === true) : parent_group.spPr.xfrm.flipH === true,
+                                        sp.spPr.xfrm.flipV === true ? !(parent_group.spPr.xfrm.flipV === true) : parent_group.spPr.xfrm.flipV === true);
+                                    sp.setPosition(sp.spPr.xfrm.x + parent_group.spPr.xfrm.x, sp.spPr.xfrm.y + parent_group.spPr.xfrm.y);
+                                    parent_group.group.swapGraphicObject(parent_group.Get_Id(), sp.Get_Id());
+                                }
+                            }
+                            else
+                            {
+                                switch (parent_group.spTree.length)
+                                {
+                                    case 0:
+                                    {
+                                        parent_group.deleteDrawingBase();
+                                        break;
+                                    }
+                                    case 1:
+                                    {
+                                        var sp = parent_group.spTree[0];
+                                        sp.setRotate(normalizeRotate(isRealNumber(sp.spPr.xfrm.rot) ? sp.spPr.xfrm.rot : 0 + isRealNumber(parent_group.spPr.xfrm.rot) ? parent_group.spPr.xfrm.rot : 0 ));
+                                        sp.setFlips(sp.spPr.xfrm.flipH === true ? !(parent_group.spPr.xfrm.flipH === true) : parent_group.spPr.xfrm.flipH === true,
+                                            sp.spPr.xfrm.flipV === true ? !(parent_group.spPr.xfrm.flipV === true) : parent_group.spPr.xfrm.flipV === true);
+                                        sp.setPosition(sp.spPr.xfrm.offX + parent_group.spPr.xfrm.offX, sp.spPr.xfrm.offY + parent_group.spPr.xfrm.offY);
+                                        sp.setGroup(null);
+                                        var pos = parent_group.deleteDrawingBase();
+                                        sp.addToDrawingObjects(pos);
+                                        sp.select(drawingObjectsController);
+                                        sp.recalculateTransform();
+                                        sp.calculateTransformTextMatrix();
+                                        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null,
+                                            new UndoRedoDataGraphicObjects(sp.Id, new UndoRedoDataGOSingleProp(null, null)), null);
+                                        break;
+                                    }
+                                    default:
+                                    {
+                                        parent_group.normalize();
+                                        parent_group.updateCoordinatesAfterInternalResize();
+                                        parent_group.select(drawingObjectsController);
+                                        parent_group.recalculate();
+                                        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateRedo, null, null,
+                                            new UndoRedoDataGraphicObjects(parent_group.Id, new UndoRedoDataGOSingleProp(null, null)), null);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
+                drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
+                break;
+            }
+            case STATES_ID_NULL:
+            {
+                drawingObjectsController.drawingObjects.objectLocker.reset();
+                for(var i = 0; i < drawingObjectsController.selectedObjects.length; ++i)
+                {
+                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(drawingObjectsController.selectedObjects[i].Get_Id());
+                }
+
+                var selection_state =  drawingObjectsController.getSelectionState();
+                var callback = function(bLock)
+                {
+                    if(bLock)
+                    {
+                        History.Create_NewPoint();
+                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.setSelectionState(selection_state);
+
+                        for(var i = 0; i < drawingObjectsController.selectedObjects.length; ++i)
+                        {
+                            drawingObjectsController.selectedObjects[i].deleteDrawingBase();
+                        }
+                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.drawingObjects.showDrawingObjects(true);
+                        drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
+                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                    }
+                };
+                drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
+
+                break;
+            }
+            default :
+            {
+                break;
+            }
+        }
+        bRetValue = true;
+    }
+    else if ( e.keyCode == 65 && true === e.CtrlKey ) // Ctrl + A - выделяем все
+    {
+        switch(state.id)
+        {
+            case STATES_ID_NULL:
+            case STATES_ID_GROUP:
+            {
+                if(state.id === STATES_ID_GROUP)
+                    state.group.resetSelection();
+                state.resetSelectionState();
+                var drawing_bases = drawingObjectsController.drawingObjects.getDrawingObjects();
+                for(var i = 0; i < drawing_bases.length; ++i)
+                {
+                    drawing_bases.graphicObject.select(drawingObjectsController);
+                }
+                drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                break;
+            }
+        }
+
+        bRetValue = true;
+    }
+    else if ( e.keyCode == 66 && false === isViewMode && true === e.CtrlKey ) // Ctrl + B - делаем текст жирным
+    {
+        var TextPr = drawingObjectsController.getParagraphTextPr();
+        if ( isRealObject(TextPr))
+        {
+            if(typeof state.setCellBold === "function")
+            {
+                state.setCellBold(TextPr.Bold === true ? false : true );
+            }
+            bRetValue = true;
+        }
+    }
+    else if ( e.keyCode == 67 && true === e.CtrlKey ) // Ctrl + C + ...
+    {
+       //TODO
+    }
+    else if ( e.keyCode == 69 && false === isViewMode && true === e.CtrlKey ) // Ctrl + E - переключение прилегания параграфа между center и left
+    {
+
+        var ParaPr = drawingObjectsController.getParagraphParaPr();
+        if ( isRealObject(ParaPr))
+        {
+            if(typeof state.setCellAlign === "function")
+            {
+                state.setCellAlign(ParaPr.Jc === align_Center ? "left" : "center" );
+            }
+            bRetValue = true;
+        }
+    }
+    else if ( e.keyCode == 73 && false === isViewMode && true === e.CtrlKey ) // Ctrl + I - делаем текст наклонным
+    {
+        var TextPr = drawingObjectsController.getParagraphTextPr();
+        if ( isRealObject(TextPr))
+        {
+            if(typeof state.setCellItalic === "function")
+            {
+                state.setCellItalic(TextPr.Italic === true ? false : true );
+            }
+            bRetValue = true;
+        }
+    }
+    else if ( e.keyCode == 74 && false === isViewMode && true === e.CtrlKey ) // Ctrl + J переключение прилегания параграфа между justify и left
+    {
+        var ParaPr = drawingObjectsController.getParagraphParaPr();
+        if ( isRealObject(ParaPr))
+        {
+            if(typeof state.setCellAlign === "function")
+            {
+                state.setCellAlign(ParaPr.Jc === align_Justify ? "left" : "justify" );
+            }
+            bRetValue = true;
+        }
+    }
+    else if ( e.keyCode == 75 && false === isViewMode && true === e.CtrlKey ) // Ctrl + K - добавление гиперссылки
+    {
+        //TODO
+        bRetValue = true;
+    }
+    else if ( e.keyCode == 76 && false === isViewMode && true === e.ctrlKey ) // Ctrl + L + ...
+    {
+
+        var ParaPr = drawingObjectsController.getParagraphParaPr();
+        if ( isRealObject(ParaPr))
+        {
+            if(typeof state.setCellAlign === "function")
+            {
+                state.setCellAlign(ParaPr.Jc === align_Left ? "justify" : "left");
+            }
+            bRetValue = true;
+        }
+
+    }
+    else if ( e.keyCode == 77 && false === isViewMode && true === e.CtrlKey ) // Ctrl + M + ...
+    {
+        bRetValue = true;
+
+    }
+    else if ( e.keyCode == 80 && true === e.CtrlKey ) // Ctrl + P + ...
+    {
+        bRetValue = true;
+
+    }
+    else if ( e.keyCode == 82 && false === isViewMode && true === e.CtrlKey ) // Ctrl + R - переключение прилегания параграфа между right и left
+    {
+        var ParaPr = drawingObjectsController.getParagraphParaPr();
+        if ( isRealObject(ParaPr))
+        {
+            if(typeof state.setCellAlign === "function")
+            {
+                state.setCellAlign(ParaPr.Jc === align_Right ? "left" : "right");
+            }
+            bRetValue = true;
+        }
+    }
+    else if ( e.keyCode == 83 && false === isViewMode && true === e.CtrlKey ) // Ctrl + S - save
+    {
+        bRetValue = true;
+    }
+    else if ( e.keyCode == 85 && false === isViewMode && true === e.CtrlKey ) // Ctrl + U - делаем текст подчеркнутым
+    {
+        var TextPr = drawingObjectsController.getParagraphTextPr();
+        if ( isRealObject(TextPr))
+        {
+            if(typeof state.setCellUnderline === "function")
+            {
+                state.setCellUnderline(TextPr.Underline === true ? false : true );
+            }
+            bRetValue = true;
+        }
+    }
+    else if ( e.keyCode == 86 && false === isViewMode && true === e.CtrlKey ) // Ctrl + V - paste
+    {
+
+    }
+    else if ( e.keyCode == 88 && false === isViewMode && true === e.CtrlKey ) // Ctrl + X - cut
+    {
+        //не возвращаем true чтобы не было preventDefault
+    }
+    else if ( e.keyCode == 89 && false === isViewMode && true === e.CtrlKey ) // Ctrl + Y - Redo
+    {
+    }
+    else if ( e.keyCode == 90 && false === isViewMode && true === e.CtrlKey ) // Ctrl + Z - Undo
+    {
+    }
+    else if ( e.keyCode == 93 || 57351 == e.keyCode /*в Opera такой код*/ ) // контекстное меню
+    {
+        bRetValue = true;
+    }
+    else if ( e.keyCode == 121 && true === e.ShiftKey ) // Shift + F10 - контекстное меню
+    {
+    }
+    else if ( e.keyCode == 144 ) // Num Lock
+    {
+    }
+    else if ( e.keyCode == 145 ) // Scroll Lock
+    {
+    }
+    else if ( e.keyCode == 187 && false === isViewMode && true === e.CtrlKey ) // Ctrl + Shift + +, Ctrl + = - superscript/subscript
+    {
+        var TextPr = drawingObjectsController.getParagraphTextPr();
+        if ( isRealObject(TextPr))
+        {
+            if(typeof state.setCellSubscript === "function" && typeof state.setCellSuperscript === "function")
+            {
+                if ( true === e.ShiftKey )
+                    state.setCellSuperscript(TextPr.VertAlign === vertalign_SuperScript ? false : true );
+                else
+                    state.setCellSubscript(TextPr.VertAlign === vertalign_SubScript ? false : true );
+            }
+            bRetValue = true;
+        }
+    }
+    else if ( e.keyCode == 188 && true === e.CtrlKey ) // Ctrl + ,
+    {
+        var TextPr = drawingObjectsController.getParagraphTextPr();
+        if ( isRealObject(TextPr))
+        {
+            if(typeof state.setCellSuperscript === "function")
+            {
+                    state.setCellSuperscript(TextPr.VertAlign === vertalign_SuperScript ? false : true );
+            }
+            bRetValue = true;
+        }
+    }
+    else if ( e.keyCode == 189 && false === isViewMode ) // Клавиша Num-
+    {
+
+        var Item = null;
+        if ( true === e.CtrlKey && true === e.ShiftKey )
+        {
+            Item = new ParaText( String.fromCharCode( 0x2013 ) );
+            Item.SpaceAfter = false;
+        }
+        else if ( true === e.ShiftKey )
+            Item = new ParaText( "_" );
+        else
+            Item = new ParaText( "-" );
+        switch (state.id)
+        {
+            case STATES_ID_TEXT_ADD:
+            case STATES_ID_TEXT_ADD_IN_GROUP:
+            {
+                drawingObjectsController.drawingObjects.objectLocker.reset();
+                if(state.id === STATES_ID_TEXT_ADD)
+                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.textObject.Get_Id());
+                else
+                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.group.Get_Id());
+
+
+                var selection_state =  drawingObjectsController.getSelectionState();
+                var callback = function(bLock)
+                {
+                    if(bLock)
+                    {
+                        History.Create_NewPoint();
+                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.setSelectionState(selection_state);
+                        var state = drawingObjectsController.curState;
+                        state.textObject.paragraphAdd(Item);
+                        drawingObjectsController.drawingObjects.showDrawingObjects(true);
+                        state.textObject.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
+                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                    }
+                };
+                drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
+                break;
+            }
+
+            case STATES_ID_GROUP:
+            {
+                if(!e.ctrlKey && state.group.selectedObjects.length === 1)
+                {
+                    drawingObjectsController.drawingObjects.objectLocker.reset();
+                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(state.group.Get_Id());
+
+                    var selection_state =  drawingObjectsController.getSelectionState();
+                    var callback = function(bLock)
+                    {
+                        if(bLock)
+                        {
+                            History.Create_NewPoint();
+                            drawingObjectsController.resetSelectionState();
+                            drawingObjectsController.setSelectionState(selection_state);
+                            var state = drawingObjectsController.curState;
+                            drawingObjectsController.changeCurrentState(new TextAddInGroup(drawingObjectsController, drawingObjectsController.drawingObjects, state.group, state.group.selectedObjects[0]));
+                            drawingObjectsController.state.textObject.paragraphAdd(Item);
+                            drawingObjectsController.showDrawingObjects(true);
+                            drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
+                        }
+                    };
+                    drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
+                }
+                break;
+            }
+            case STATES_ID_NULL:
+            {
+                if(drawingObjectsController.selectedObjects.length === 1 && drawingObjectsController.selectedObjects[0].isShape() && !e.ctrlKey)
+                {
+                    drawingObjectsController.drawingObjects.objectLocker.reset();
+                    drawingObjectsController.drawingObjects.objectLocker.addObjectId(drawingObjectsController.selectedObjects[0].Get_Id());
+                    var selection_state =  drawingObjectsController.getSelectionState();
+                    var callback = function(bLock)
+                    {
+                        if(bLock)
+                        {
+                            History.Create_NewPoint();
+                            drawingObjectsController.resetSelectionState();
+                            drawingObjectsController.setSelectionState(selection_state);
+                            drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, drawingObjectsController.drawingObjects, drawingObjectsController.selectedObjects[0]));
+                            drawingObjectsController.curState.textObject.paragraphAdd(Item);
+                            drawingObjectsController.drawingObjects.showDrawingObjects(true);
+                            drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
+                            drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                        }
+                    };
+                    drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
+                }
+                break;
+            }
+        }
+        bRetValue = true;
+    }
+    else if ( e.keyCode == 190 && true === e.CtrlKey ) // Ctrl + .
+    {
+        var TextPr = drawingObjectsController.getParagraphTextPr();
+        if ( isRealObject(TextPr))
+        {
+            if(typeof state.setCellSubscript === "function")
+            {
+                state.setCellSubscript(TextPr.VertAlign === vertalign_SubScript ? false : true );
+            }
+            bRetValue = true;
+        }
+    }
+    else if ( e.keyCode == 219 && false === isViewMode && true === e.CtrlKey ) // Ctrl + [
+    {
+        if(typeof state.decreaseFontSize === "function")
+        {
+            state.decreaseFontSize();
+        }
+        bRetValue = true;
+    }
+    else if ( e.keyCode == 221 && false === isViewMode && true === e.CtrlKey ) // Ctrl + ]
+    {
+        if(typeof state.increaseFontSize === "function")
+        {
+            state.increaseFontSize();
+        }
+        bRetValue = true;
+    }
+    if(bRetValue)
+        e.preventDefault();
+    return bRetValue;
+}
+
+function CompareGroups(a, b)
+{
+    if(!isRealObject(a.group) && !isRealObject(b.group))
+        return 0;
+    if(!isRealObject(a.group))
+        return 1;
+    if(!isRealObject(b.group))
+        return -1;
+
+    var count1 = 0;
+    var cur_group = a.group;
+    while(isRealObject(cur_group))
+    {
+        ++count1;
+        cur_group = cur_group.group;
+    }
+    var count2 = 0;
+    cur_group = b.group;
+    while(isRealObject(cur_group))
+    {
+        ++count2;
+        cur_group = cur_group.group;
+    }
+    return count1 - count2;
+}
 

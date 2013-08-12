@@ -19,7 +19,6 @@ function DrawingObjectsController(drawingObjects)
 DrawingObjectsController.prototype =
 {
 
-
     setCellFontName: function (fontName) {
         if(typeof this.curState.setCellFontName === "function")
         {
@@ -177,6 +176,98 @@ DrawingObjectsController.prototype =
     },
 
 
+
+    getParagraphParaPr: function()
+    {
+        switch(this.curState.id)
+        {
+            case STATES_ID_TEXT_ADD:
+            {
+                var pr = this.curState.textObject.getParagraphParaPr();
+                if(pr != null)
+                    return pr;
+                else
+                    return new CParaPr();
+            }
+            case STATES_ID_TEXT_ADD_IN_GROUP:
+            {
+                if(typeof this.curState.textObject.getParagraphParaPr === "function")
+                {
+                    pr = this.curState.textObject.getParagraphParaPr();
+                    if(pr != null)
+                        return pr;
+                    return new CParaPr();
+                }
+                return new CParaPr();
+
+            }
+            default:
+            {
+                var result = null;
+                var selection_array = this.selectedObjects;
+                for(var i = 0; i < selection_array.length; ++i)
+                {
+                    var cur_pr = selection_array[i].getAllParagraphParaPr();
+                    if(cur_pr != null)
+                    {
+                        if(result == null)
+                            result = cur_pr;
+                        else
+                            result = result.Compare(cur_pr);
+                    }
+                }
+                if(result != null)
+                    return result;
+                return new CParaPr();
+            }
+        }
+    },
+
+    getParagraphTextPr: function()
+    {
+        switch(this.curState.id)
+        {
+            case STATES_ID_TEXT_ADD:
+            {
+                var pr = this.curState.textObject.getParagraphTextPr();
+                if(pr != null)
+                    return pr;
+                return new CTextPr();
+            }
+            case STATES_ID_TEXT_ADD_IN_GROUP:
+            {
+
+                if(typeof this.curState.textObject.getParagraphTextPr === "function")
+                {
+                    pr = this.curState.textObject.getParagraphTextPr();
+                    if(pr != null)
+                        return pr;
+                    return new CTextPr();
+                }
+                return new CTextPr();
+            }
+            default:
+            {
+                var result = null;
+                var selection_array = this.selectedObjects;
+                for(var i = 0; i < selection_array.length; ++i)
+                {
+                    var cur_pr = selection_array[i].getAllParagraphTextPr();
+                    if(cur_pr != null)
+                    {
+                        if(result == null)
+                            result = cur_pr;
+                        else
+                            result = result.Compare(cur_pr);
+                    }
+                }
+                if(result != null)
+                    return result;
+                return new CTextPr();
+            }
+        }
+    },
+
     getColorMap: function()
     {
         return this.defaultColorMap;
@@ -297,8 +388,7 @@ DrawingObjectsController.prototype =
 
     onKeyDown: function(e)
     {
-        this.curState.onKeyDown(e);
-		return true;
+        return this.curState.onKeyDown(e);
     },
 
     onKeyPress: function(e)
@@ -309,16 +399,24 @@ DrawingObjectsController.prototype =
 
     resetSelectionState: function()
     {
-        while(this.selectedObjects.length > 0)
+        var count = this.selectedObjects.length;
+        while(count > 0)
+        {
             this.selectedObjects[0].deselect(this);
+            --count;
+        }
         this.changeCurrentState(new NullState(this, this.drawingObjects));
         this.updateSelectionState();
     },
 
     resetSelection: function()
     {
-        while(this.selectedObjects.length > 0)
+        var count = this.selectedObjects.length;
+        while(count > 0)
+        {
             this.selectedObjects[0].deselect(this);
+            --count;
+        }
         this.drawingObjects.drawingDocument.UpdateTargetTransform(null);
         this.drawingObjects.drawingDocument.TargetEnd();
     },

@@ -184,7 +184,6 @@ function MoveGroupTrack(originalObject)
     };
 }
 
-
 function MoveTitleInChart(originalObject)
 {
     this.originalObject = originalObject;
@@ -248,7 +247,6 @@ function MoveTitleInChart(originalObject)
         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(this.originalObject.chartGroup.Id, new UndoRedoDataShapeRecalc()), null);
     }
 }
-
 
 function MoveTrackChart(originalObject)
 {

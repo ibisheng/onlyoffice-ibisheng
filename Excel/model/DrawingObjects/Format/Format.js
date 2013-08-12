@@ -874,6 +874,11 @@ CRGBColor.prototype =
         return CLASS_TYPE_RGB_COLOR;
     },
 
+    Get_Id: function()
+    {
+        return this.Id;
+    },
+
     setColor: function(RGB)
     {
 
