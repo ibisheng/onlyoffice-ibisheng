@@ -4989,14 +4989,14 @@
 				var drawingInfo = this.objectRender.checkCursorDrawingObject(x, y);
 				if (drawingInfo && drawingInfo.data) {
 					// Возможно картинка с lock
-					lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object,/*subType*/null, sheetId, drawingInfo.data);
-					isLocked = this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther,/*bCheckOnlyLockAll*/false);
+					/*lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, sheetId, drawingInfo.data);
+					isLocked = this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther,false);
 					if (false !== isLocked) {
 						// Кто-то сделал lock
 						userId = isLocked.UserId;
-						lockRangePosLeft =0;// drawingInfo.data.getVisibleLeftOffset(/*withHeader*/true);
-						lockRangePosTop = 0;//drawingInfo.data.getVisibleTopOffset(/*withHeader*/true);
-					}
+						lockRangePosLeft = drawingInfo.data.getVisibleLeftOffset(true);
+						lockRangePosTop = drawingInfo.data.getVisibleTopOffset(true);
+					}*/
 
 					return {cursor: drawingInfo.cursor, target: "shape", drawingId: drawingInfo.data, col: -1, row: -1, userId: userId, lockRangePosLeft: lockRangePosLeft, lockRangePosTop: lockRangePosTop};
 				}
@@ -5856,13 +5856,14 @@
 				if (isCoord) {
 					var drawingInfo = this.objectRender.checkCursorDrawingObject(x, y);
 					if ( drawingInfo ) {
-						//this.overlayCtx.clear();
 						this._drawGraphic();
 						this.objectRender.OnUpdateOverlay();
 					}
 					else {
-						if ( !asc["editor"].isStartAddShape )
+						if ( this.objectRender.controller.curState.id != STATES_ID_BEGIN_TRACK_NEW_SHAPE ) {
 							this.objectRender.unselectDrawingObjects();
+							asc["editor"].isStartAddShape = false;
+						}
 					}
 					
 					// move active range to coordinates x,y
