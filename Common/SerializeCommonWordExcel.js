@@ -30,13 +30,30 @@ function BinaryCommonWriter(memory)
         this.memory.WriteByte(type);
         this.WriteItemWithLength(fWrite);
     };
+	this.WriteItemStart = function(type)
+    {
+		this.memory.WriteByte(type);
+        return this.WriteItemWithLengthStart(fWrite);
+	};
+	this.WriteItemEnd = function(nStart)
+    {
+		this.WriteItemWithLengthEnd(nStart);
+	};
     this.WriteItemWithLength = function(fWrite)
+    {
+        var nStart = this.WriteItemWithLengthStart();
+        fWrite();
+        this.WriteItemWithLengthEnd(nStart);
+    };
+	this.WriteItemWithLengthStart = function()
     {
         //Запоминаем позицию чтобы в конце записать туда длину
         var nStart = this.memory.GetCurPosition();
         this.memory.Skip(4);
-        //pPr
-        fWrite();
+        return nStart;
+    };
+	this.WriteItemWithLengthEnd = function(nStart)
+    {
         //Length
         var nEnd = this.memory.GetCurPosition();
         this.memory.Seek(nStart);

@@ -299,6 +299,7 @@ function CopyProcessor(api, ElemToSelect)
 {
 	this.api = api;
     this.oDocument = api.WordControl.m_oLogicDocument;
+	this.oBinaryFileWriter = new BinaryFileWriter(this.oDocument);
     this.fontsArray = api.FontLoader.fontInfos;
     this.ElemToSelect = ElemToSelect;
     this.Ul = document.createElement( "ul" );
@@ -1438,16 +1439,25 @@ CopyProcessor.prototype =
 								elem.before = elem.gridStart - nMinGrid;
 								elem.after = nMaxGrid - elem.gridEnd;
 							}
+							this.oBinaryFileWriter.CopyTable(Item, oRowElems);
+							this.oBinaryFileWriter.copyParams.bLockCopyPar = true;
 							this.CopyTable(oDomTarget, Item, oRowElems);
+							this.oBinaryFileWriter.copyParams.bLockCopyPar = null;
 						}
                     }
                 }
                 else
+				{
+					this.oBinaryFileWriter.CopyTable(Item, null);
+					this.oBinaryFileWriter.copyParams.bLockCopyPar = true;
                     this.CopyTable(oDomTarget, Item, null);
+					this.oBinaryFileWriter.copyParams.bLockCopyPar = null;
+				}
             }
             else if ( type_Paragraph === Item.GetType() )
             {
                 //todo ����� ������ ��� �������� ������ ���� Index == End
+				this.oBinaryFileWriter.CopyParagraph(Item, bUseSelection);
                 this.CopyParagraph(oDomTarget, Item, Index == End, bUseSelection, oDocument.Content, Index);
             }
         }
@@ -1455,6 +1465,7 @@ CopyProcessor.prototype =
     },
     Start : function(node)
     {
+		this.oBinaryFileWriter.CopyStart();
         var oDocument = this.oDocument;
         if(g_bIsDocumentCopyPaste)
         {
@@ -1598,6 +1609,12 @@ CopyProcessor.prototype =
                 }
             }
         }
+		this.oBinaryFileWriter.CopyEnd();
+		if(this.oBinaryFileWriter.copyParams.itemCount > 0)
+		{
+			var sBase64 = this.oBinaryFileWriter.GetResult();
+			//this.ElemToSelect.innerHTML = sBase64;
+		}
     }
 };
 
@@ -2279,8 +2296,62 @@ PasteProcessor.prototype =
         }
 
     },
-    Start : function(node)
+    ReadFromBinary : function(sBase64)
+	{
+		var openParams = {checkFileSize: false, charCount: 0, parCount: 0};
+		var oBinaryFileReader = new BinaryFileReader(this.oDocument, openParams);
+		oBinaryFileReader.stream = oBinaryFileReader.getbase64DecodedData(sBase64);
+		oBinaryFileReader.ReadMainTable();
+		var oReadResult = oBinaryFileReader.oReadResult;
+		//обрабатываем списки
+		for(var i in oReadResult.numToNumClass)
+		{
+			var oNumClass = oReadResult.numToNumClass[i];
+			this.oDocument.Numbering.Add_AbstractNum(oNumClass);
+		}
+		for(var i = 0, length = oReadResult.paraNumPrs.length; i < length; ++i)
+		{
+			var numPr = oReadResult.paraNumPrs[i];
+			var oNumClass = oReadResult.numToNumClass[numPr.NumId];
+			if(null != oNumClass)
+				numPr.NumId = oNumClass.Get_Id();
+			else
+				numPr.NumId = 0;
+		}
+		//обрабатываем стили
+		for(var i = 0, length = oReadResult.paraStyles.length; i < length; ++i)
+		{
+			var elem = oReadResult.paraStyles[i];
+			var stylePaste = oReadResult.styles[elem.style];
+			if(null != stylePaste && null != stylePaste.style)
+			{
+				for(var j in this.oDocument.Styles.Style)
+				{
+					var styleDoc = this.oDocument.Styles.Style[j];
+					if(styleDoc.Name == stylePaste.style.Name)
+						elem.pPr.PStyle = j;
+				}
+			}
+		}
+		var aContent = oBinaryFileReader.oReadResult.DocumentContent;
+		if(aContent.length > 0)
+		{
+			//todo в зависимости от наличия символа конца параграфа
+			this.bInBlock = true;
+		}
+		return aContent
+	},
+	Start : function(node)
     {
+		// this.aContent = this.ReadFromBinary(node.innerText);
+        // if(false == this.bNested)
+        // {
+            // this.InsertInDocument();
+			// node.blur();
+			// node.style.display  = ELEMENT_DISPAY_STYLE;			
+        // }
+		// return;
+
         this.oRootNode = node;
         var oThis = this;
         this._Prepeare(node,

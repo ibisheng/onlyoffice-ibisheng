@@ -196,7 +196,7 @@ function CPPTXContentLoader()
                     oThis.stream.pos = s.pos;
                     oThis.stream.cur = s.cur;
 
-                    var oBinary_DocumentTableReader = new Binary_DocumentTableReader(shape.textBoxContent, null, oThis.ImageMap, oThis.stream, false, oThis.m_oDocxNum, oThis.oComments);
+                    var oBinary_DocumentTableReader = new Binary_DocumentTableReader(shape.textBoxContent, oThis.oReadResult, null, oThis.stream, false, oThis.oComments);
                     var nDocLength = oThis.stream.GetULongLE();
                     oThis.bcr.Read1(nDocLength, function(t,l){
                         return oBinary_DocumentTableReader.ReadDocumentContent(t,l, shape.textBoxContent.Content);

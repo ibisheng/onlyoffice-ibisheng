@@ -1073,7 +1073,7 @@ asc_docs_api.prototype.OpenDocument2 = function(url, gObject)
 
 		//this.asyncServerIdStartLoaded();
 
-		this.FontLoader.LoadEmbeddedFonts(this.DocumentUrl, this.WordControl.m_oLogicDocument.EmbeddedFonts);
+		//this.FontLoader.LoadEmbeddedFonts(this.DocumentUrl, this.WordControl.m_oLogicDocument.EmbeddedFonts);
 		this.FontLoader.LoadDocumentFonts(this.WordControl.m_oLogicDocument.Fonts, false);
 	}
 	else

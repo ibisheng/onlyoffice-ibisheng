@@ -1667,6 +1667,14 @@ CNumbering.prototype =
 
         return Id;
     },
+	
+	Add_AbstractNum : function(AbstractNum)
+    {
+        var Id = AbstractNum.Get_Id();
+        this.AbstractNum[Id] = AbstractNum;
+
+        return Id;
+    },
 
     Get_AbstractNum : function(Id)
     {
