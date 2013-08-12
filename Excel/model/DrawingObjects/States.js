@@ -1781,7 +1781,7 @@ function ResizeState(drawingObjectsController, drawingObjects, majorObject, card
     {
         var resize_coefficients = this.majorObject.getResizeCoefficients(this.handleNum, x, y);
         this.drawingObjectsController.trackResizeObjects(resize_coefficients.kd1, resize_coefficients.kd2, e);
-        this.drawingObjects.OnUpdateOverlay();
+        this.drawingObjects.OnUpdateOverlay(true);
 
     };
 
@@ -2037,7 +2037,7 @@ function TrackNewShapeState(drawingObjectsController, drawingObjects, presetGeom
     this.onMouseMove = function(e, x, y)
     {
         this.drawingObjectsController.trackNewShape(e, x, y);
-        this.drawingObjects.OnUpdateOverlay();
+        this.drawingObjects.OnUpdateOverlay(true);
     };
 
     this.onMouseUp = function(e, x, y)
@@ -2282,7 +2282,7 @@ function MoveState(drawingObjectsController, drawingObjects, startX, startY, rec
         var dy = y - this.startY;
         var check_position = this.drawingObjects.checkGraphicObjectPosition(this.rectX + dx, this.rectY + dy, this.rectW, this.rectH);
         this.drawingObjectsController.trackMoveObjects(dx + check_position.x, dy + check_position.y);
-        this.drawingObjects.OnUpdateOverlay();
+        this.drawingObjects.OnUpdateOverlay(true);
     };
 
     this.onMouseUp = function(e, x, y)

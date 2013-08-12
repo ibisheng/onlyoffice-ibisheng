@@ -1557,6 +1557,8 @@ function DrawingObjects() {
 	var _this = this;
 	var asc = window["Asc"];
 	var api = asc["editor"];
+	var asc_Range = asc.Range;
+	
 	var chartRender = new ChartRender();
 	var worksheet = null;
 	
@@ -1998,90 +2000,25 @@ function DrawingObjects() {
         return trackOverlay;
     };
 
-    _this.OnUpdateOverlay = function() {
-        /*if (this.IsUpdateOverlayOnlyEnd)
-        {
-            this.IsUpdateOverlayOnEndCheck = true;
-            return false;
-        }  */
-        //console.log("update_overlay");
+    _this.OnUpdateOverlay = function(bFullClear) {
+        
         var overlay = trackOverlay;
-        //if (!overlay.m_bIsShow)
-        //    return;
+		var ctx = overlay.m_oContext;
+		var drDoc = this.drawingDocument;
 
         overlay.Clear();
-        var ctx = overlay.m_oContext;
-
-        var drDoc = this.drawingDocument;
-
         this.drawingDocument.Overlay = overlay;
-       /* if (drDoc.m_bIsSearching)
-        {
-            ctx.fillStyle = "rgba(255,200,0,1)";
-            ctx.beginPath();
 
-            var drDoc = this.drawingDocument;
-            for (var i = drDoc.m_lDrawingFirst; i <= drDoc.m_lDrawingEnd; i++)
-            {
-                var drawPage = drDoc.m_arrPages[i].drawingPage;
-                drDoc.m_arrPages[i].pageIndex = i;
-                drDoc.m_arrPages[i].DrawSearch(overlay, drawPage.left, drawPage.top, drawPage.right - drawPage.left, drawPage.bottom - drawPage.top, drDoc);
-            }
-
-            ctx.globalAlpha = 0.5;
-            ctx.fill();
-            ctx.beginPath();
-            ctx.globalAlpha = 1.0;
-
-            if (null != drDoc.CurrentSearchNavi)
-            {
-                ctx.globalAlpha = 0.2;
-                ctx.fillStyle = "rgba(51,102,204,255)";
-
-                var places = drDoc.CurrentSearchNavi.Place;
-
-                switch ((drDoc.CurrentSearchNavi.Type & 0xFF))
-                {
-                    case search_HdrFtr_All:
-                    case search_HdrFtr_All_no_First:
-                    case search_HdrFtr_First:
-                    case search_HdrFtr_Even:
-                    case search_HdrFtr_Odd:
-                    case search_HdrFtr_Odd_no_First:
-                    {
-                        var _page_num = drDoc.CurrentSearchNavi.PageNum;
-                        for (var i = 0; i < places.length; i++)
-                        {
-                            var place = places[i];
-                            if (drDoc.m_lDrawingFirst <= _page_num && _page_num <= drDoc.m_lDrawingEnd)
-                            {
-                                var drawPage = drDoc.m_arrPages[_page_num].drawingPage;
-                                drDoc.m_arrPages[place.PageNum].DrawSearchCur1(overlay, drawPage.left, drawPage.top, drawPage.right - drawPage.left, drawPage.bottom - drawPage.top, place);
-                            }
-                        }
-                        break;
-                    }
-                    default:
-                    {
-                        for (var i = 0; i < places.length; i++)
-                        {
-                            var place = places[i];
-                            if (drDoc.m_lDrawingFirst <= place.PageNum && place.PageNum <= drDoc.m_lDrawingEnd)
-                            {
-                                var drawPage = drDoc.m_arrPages[place.PageNum].drawingPage;
-                                drDoc.m_arrPages[place.PageNum].DrawSearchCur1(overlay, drawPage.left, drawPage.top, drawPage.right - drawPage.left, drawPage.bottom - drawPage.top, place);
-                            }
-                        }
-                        break;
-                    }
-                }
-
-                ctx.fill();
-                ctx.globalAlpha = 1.0;
-            }
-        }   */
-
-        shapeOverlayCtx.m_oContext.clearRect(0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix);
+		if ( bFullClear )
+			shapeOverlayCtx.m_oContext.clearRect(0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix);
+		else {
+			for ( var i = 0; i < aObjects.length; i++ ) {
+				var boundsChecker = _this.getBoundsChecker(aObjects[i]);
+				var _w = boundsChecker.Bounds.max_x - boundsChecker.Bounds.min_x;
+				var _h = boundsChecker.Bounds.max_y - boundsChecker.Bounds.min_y;
+				shapeOverlayCtx.m_oContext.clearRect( mmToPx(boundsChecker.Bounds.min_x) + scrollOffset.x, mmToPx(boundsChecker.Bounds.min_y) + scrollOffset.y, mmToPx(_w), mmToPx(_h) );
+			}
+		}
 		
 		// Селекты для комментариев, фильтров и т.д.
 		worksheet._drawGraphic();
@@ -2116,12 +2053,9 @@ function DrawingObjects() {
             if (_this.controller.needUpdateOverlay())
             {
                 overlay.Show();
-               // this.drawingDocument.AutoShapesTrack.PageIndex = -1;
-
                 shapeOverlayCtx.put_GlobalAlpha(true, 0.5);
                 _this.controller.drawTracks(shapeOverlayCtx);
                 shapeOverlayCtx.put_GlobalAlpha(true, 1);
-                //autoShapeTrack.CorrectOverlayBounds();
             }
 
         }
@@ -2133,7 +2067,7 @@ function DrawingObjects() {
             for (var i = drDoc.m_lDrawingFirst; i <= drDoc.m_lDrawingEnd; i++)
             {
                 var drawPage = drDoc.m_arrPages[i].drawingPage;
-                drDoc.m_oDocumentRenderer.DrawSelection(i, overlay, drawPage.left /*+ scrollOffset.x*/, drawPage.top/* + scrollOffset.y*/, drawPage.right - drawPage.left, drawPage.bottom - drawPage.top);
+                drDoc.m_oDocumentRenderer.DrawSelection(i, overlay, drawPage.left, drawPage.top, drawPage.right - drawPage.left, drawPage.bottom - drawPage.top);
             }
 
             ctx.globalAlpha = 0.2;
@@ -2230,9 +2164,6 @@ function DrawingObjects() {
 		worksheet._drawCells();
 		worksheet._drawCellsBorders();*/
 		
-		var asc = window["Asc"];
-		var asc_Range = asc.Range;
-		
 		// Чистим предыдущие области
 		var bHeaders = false;
 		var _top = worksheet.getCellTop(worksheet.getFirstVisibleRow(), 3);
@@ -2249,43 +2180,44 @@ function DrawingObjects() {
 		
 		// Чистим текущие области
 		for ( var i = 0; i < aObjects.length; i++ ) {
-			
 			var boundsChecker = _this.getBoundsChecker(aObjects[i]);
 			restoreSheetArea(boundsChecker);
 			aBoundsCheckers.push(boundsChecker);
-		}
+		}		
+	}
+	
+	function restoreSheetArea(checker) {
+	
+		var _w = checker.Bounds.max_x - checker.Bounds.min_x;
+		var _h = checker.Bounds.max_y - checker.Bounds.min_y;
 		
-		function restoreSheetArea(checker) {
+		//overlayCtx.clearRect( mmToPt(checker.Bounds.min_x + pxToMm(scrollOffset.x)), mmToPt(checker.Bounds.min_y + pxToMm(scrollOffset.y)), mmToPt(_w), mmToPt(_h) );
+		//drawingCtx.clearRect( mmToPt(checker.Bounds.min_x + pxToMm(scrollOffset.x)), mmToPt(checker.Bounds.min_y + pxToMm(scrollOffset.y)), mmToPt(_w), mmToPt(_h) );
+	
+		var foundRow = worksheet._findRowUnderCursor( mmToPt(checker.Bounds.min_y + pxToMm(scrollOffset.y)), true);		
+		var topRow = foundRow ? foundRow.row : 0;
+		var foundCol = worksheet._findColUnderCursor( mmToPt(checker.Bounds.min_x + pxToMm(scrollOffset.x)), true);
+		var leftCol = foundCol ? foundCol.col : 0;
 		
-			var _w = checker.Bounds.max_x - checker.Bounds.min_x;
-			var _h = checker.Bounds.max_y - checker.Bounds.min_y;
-			
-			//overlayCtx.clearRect( mmToPt(checker.Bounds.min_x +  pxToMm(scrollOffset.x)), mmToPt(checker.Bounds.min_y +  pxToMm(scrollOffset.y)), mmToPt(_w +  pxToMm(scrollOffset.x)), mmToPt(_h +  pxToMm(scrollOffset.y)));
-			//drawingCtx.clearRect( mmToPt(checker.Bounds.min_x +  pxToMm(scrollOffset.x)), mmToPt(checker.Bounds.min_y +  pxToMm(scrollOffset.y)), mmToPt(_w +  pxToMm(scrollOffset.x)), mmToPt(_h +  pxToMm(scrollOffset.y)));
+		foundRow = worksheet._findRowUnderCursor( mmToPt(checker.Bounds.max_y + pxToMm(scrollOffset.y)), true);
+		var bottomRow = foundRow ? foundRow.row : 0;
+		foundCol = worksheet._findColUnderCursor( mmToPt(checker.Bounds.max_x + pxToMm(scrollOffset.x)), true);
+		var rightcol = foundCol ? foundCol.col : 0;
 		
-			var foundRow = worksheet._findRowUnderCursor( mmToPt(checker.Bounds.min_y + pxToMm(scrollOffset.y)), true);		
-			var topRow = foundRow ? foundRow.row : 0;
-			var foundCol = worksheet._findColUnderCursor( mmToPt(checker.Bounds.min_x + pxToMm(scrollOffset.x)), true);
-			var leftCol = foundCol ? foundCol.col : 0;
-			
-			foundRow = worksheet._findRowUnderCursor( mmToPt(checker.Bounds.max_y + pxToMm(scrollOffset.y)), true);
-			var bottomRow = foundRow ? foundRow.row : 0;
-			foundCol = worksheet._findColUnderCursor( mmToPt(checker.Bounds.max_x + pxToMm(scrollOffset.x)), true);
-			var rightcol = foundCol ? foundCol.col : 0;
-			
-			var r_ = asc_Range( leftCol, topRow, rightcol, bottomRow );
-			worksheet._drawGrid( undefined, r_);
-			worksheet._drawCells(r_);
-			worksheet._drawCellsBorders(undefined, r_);
-		}
+		var r_ = asc_Range( leftCol, topRow, rightcol, bottomRow );
+		worksheet._drawGrid( undefined, r_);
+		worksheet._drawCells(r_);
+		worksheet._drawCellsBorders(undefined, r_);
 	}
 
 	_this.raiseLayerDrawingObjects = function() {
 		
-		/*for (var i = 0; i < aObjects.length; i++) {
-			var obj = aObjects[i];
-			obj.graphicObject.draw(shapeOverlayCtx);
-		}*/
+		for ( var i = 0; i < aObjects.length; i++ ) {
+			var boundsChecker = _this.getBoundsChecker(aObjects[i]);
+			var _w = boundsChecker.Bounds.max_x - boundsChecker.Bounds.min_x;
+			var _h = boundsChecker.Bounds.max_y - boundsChecker.Bounds.min_y;
+			overlayCtx.clearRect( mmToPt(boundsChecker.Bounds.min_x + pxToMm(scrollOffset.x)), mmToPt(boundsChecker.Bounds.min_y + pxToMm(scrollOffset.y)), mmToPt(_w), mmToPt(_h) );
+		}
 	}
 
 	//-----------------------------------------------------------------------------------
@@ -2357,8 +2289,11 @@ function DrawingObjects() {
 				}*/
 			}
 		}
-		//_this.raiseLayerDrawingObjects();
-		_this.OnUpdateOverlay();
+		if ( _this.controller.selectedObjects.length )
+			_this.OnUpdateOverlay();
+		else
+			_this.raiseLayerDrawingObjects();
+			
 		_this.drawWorksheetHeaders();
 	}
 
