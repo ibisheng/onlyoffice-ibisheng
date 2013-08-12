@@ -772,7 +772,7 @@ function PreMoveInternalChartObjectState(drawingObjectsController, drawingObject
 
     this.isPointInDrawingObjects = function(x, y)
     {
-        return {objectsId: this.chartElement.chartGroup.Id, cursorType:"move"};
+        return {objectId: this.chartElement.chartGroup.Id, cursorType:"move"};
     };
 }
 
