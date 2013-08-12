@@ -2298,6 +2298,9 @@ PasteProcessor.prototype =
     },
     ReadFromBinary : function(sBase64)
 	{
+		//надо сбросить то, что остался после открытия документа
+		window.global_pptx_content_loader.Clear();
+		
 		var openParams = {checkFileSize: false, charCount: 0, parCount: 0};
 		var oBinaryFileReader = new BinaryFileReader(this.oDocument, openParams);
 		oBinaryFileReader.stream = oBinaryFileReader.getbase64DecodedData(sBase64);
@@ -2339,21 +2342,35 @@ PasteProcessor.prototype =
 			//todo в зависимости от наличия символа конца параграфа
 			this.bInBlock = true;
 		}
-		return aContent
+		//создаем список используемых шрифтов
+		var AllFonts = new Object();
+        for ( var Index = 0, Count = aContent.length; Index < Count; Index++ )
+            aContent[Index].Document_Get_AllFontNames( AllFonts );
+		var aPrepeareFonts = [];
+		for(var i in AllFonts)
+			aPrepeareFonts.push(new CFont(i, 0, "", 0));
+		//создаем список используемых картинок
+		var aPrepeareImages = [];
+		for(var i in window.global_pptx_content_loader.ImageMapChecker)
+			aPrepeareImages.push(i);
+		return {content: aContent, fonts: aPrepeareFonts, images: aPrepeareImages};
 	},
 	Start : function(node)
     {
-		// this.aContent = this.ReadFromBinary(node.innerText);
-        // if(false == this.bNested)
-        // {
-            // this.InsertInDocument();
-			// node.blur();
-			// node.style.display  = ELEMENT_DISPAY_STYLE;			
-        // }
+		var oThis = this;
+		// var oPasteContent = this.ReadFromBinary(node.innerText);
+		// this.aContent = oPasteContent.content;
+		// oThis.api.pre_Paste(oPasteContent.fonts, oPasteContent.images, function(){
+			// if(false == oThis.bNested)
+			// {
+				// oThis.InsertInDocument();
+				// node.blur();
+				// node.style.display  = ELEMENT_DISPAY_STYLE;			
+			// }
+		// });
 		// return;
 
         this.oRootNode = node;
-        var oThis = this;
         this._Prepeare(node,
             function(){
                 oThis.aContent = new Array();

@@ -558,6 +558,13 @@ function CPPTXContentLoader()
             logicDoc.ImageMap[index++] = i;
         }
     }
+	
+	this.Clear = function()
+    {
+		//вызывается пока только перед вставкой
+		this.stream = null;
+		this.ImageMapChecker = new Object();
+    }
 }
 
 function CPPTXContentWriter()
