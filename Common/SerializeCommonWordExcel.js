@@ -1316,12 +1316,10 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
         var oThis = this;
         if ( c_oSer_ChartType.Legend === type )
         {
-            this.chartAsGroup.chartLegend = new CChartLegend();
-            this.chartAsGroup.chartLegend.drawingObjects = this.chartAsGroup.drawingObjects;
-            var legend = this.chartAsGroup.chartLegend;
-			res = this.bcr.Read1(length, function(t,l){
-					return oThis.ReadLegend(t,l, legend);
-				});
+            this.chart.legend.bShow = true;
+            res = this.bcr.Read1(length, function(t,l){
+                return oThis.ReadLegend(t,l, oThis.oLegendEntries);
+            });
 		}
 		else if ( c_oSer_ChartType.Title === type )
 		{
@@ -1416,119 +1414,96 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
             res = c_oSerConstants.ReadUnknown;
 		return res;
 	};
-	this.ReadLegend = function(type, length, chartLegend)
-	{
+    this.ReadLegend = function(type, length, oLegendEntries)
+    {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
         if ( c_oSer_ChartLegendType.Layout === type )
         {
-			chartLegend.layout = new CChartLayout();
-			res = this.bcr.Read2Spreadsheet(length, function(t,l){
-					return oThis.ReadLegendLayout(t,l, chartLegend.layout);
-				});
-		}
-		else if ( c_oSer_ChartLegendType.LegendPos === type )
+            var oLegendLayout = new Object();
+            res = this.bcr.Read2Spreadsheet(length, function(t,l){
+                return oThis.ReadLegendLayout(t,l, oLegendLayout);
+            });
+        }
+        else if ( c_oSer_ChartLegendType.LegendPos === type )
         {
-			var byteLegendPos = this.stream.GetUChar();
-			switch(byteLegendPos)
-			{
-			case EChartLegendPos.chartlegendposLeft: chartLegend.legendPos = c_oAscChartLegend.left;break;
-			case EChartLegendPos.chartlegendposTop: chartLegend.legendPos = c_oAscChartLegend.top;break;
-			case EChartLegendPos.chartlegendposRight:
-			case EChartLegendPos.chartlegendposRightTop: chartLegend.legendPos = c_oAscChartLegend.right;break;
-			case EChartLegendPos.chartlegendposBottom: chartLegend.legendPos = c_oAscChartLegend.bottom;break;
-			}
-		}
-		else if ( c_oSer_ChartLegendType.Overlay === type )
-            chartLegend.overlay = this.stream.GetBool();
-		else if ( c_oSer_ChartLegendType.TxPrPptx === type )
-		{
-            var oPresentationSimpleSerializer = new CPPTXContentLoader();
-            chartLegend.txPr = oPresentationSimpleSerializer.ReadTextBody(null, this.stream,  chartLegend);
-		}
-		else if ( c_oSer_ChartLegendType.LegendEntry === type )
-		{
-			var oNewLegendEntry = new CLegendEntry();
-			res = this.bcr.Read1(length, function(t,l){
-					return oThis.ReadLegendEntry(t,l, oNewLegendEntry);
-				});
-			if(null != oNewLegendEntry.idx)
-                chartLegend.legendEntries[oNewLegendEntry.idx] = oNewLegendEntry;
-		}
-		else
+            var byteLegendPos = this.stream.GetUChar();
+            switch(byteLegendPos)
+            {
+                case EChartLegendPos.chartlegendposLeft: this.chart.legend.position = c_oAscChartLegend.left;break;
+                case EChartLegendPos.chartlegendposTop: this.chart.legend.position = c_oAscChartLegend.top;break;
+                case EChartLegendPos.chartlegendposRight:
+                case EChartLegendPos.chartlegendposRightTop: this.chart.legend.position = c_oAscChartLegend.right;break;
+                case EChartLegendPos.chartlegendposBottom: this.chart.legend.position = c_oAscChartLegend.bottom;break;
+            }
+        }
+        else if ( c_oSer_ChartLegendType.Overlay === type )
+            this.chart.legend.bOverlay = this.stream.GetBool();
+        else if ( c_oSer_ChartLegendType.TxPrPptx === type )
+        {
+            var oPresentationSimpleSerializer = new PresentationSimpleSerializer();
+            var textBody = oPresentationSimpleSerializer.ReadTextBody(this.stream);
+            var params = this.ParsePptxParagraph(textBody);
+            if(null != params.font)
+                this.chart.legend.font = params.font;
+        }
+        else if ( c_oSer_ChartLegendType.LegendEntry === type )
+        {
+            var oNewLegendEntry = {nIndex: null, bDelete: null, oTxPr: null};
+            res = this.bcr.Read1(length, function(t,l){
+                return oThis.ReadLegendEntry(t,l, oNewLegendEntry);
+            });
+            if(null != oNewLegendEntry.nIndex)
+                this.oLegendEntries[oNewLegendEntry.nIndex] = oNewLegendEntry;
+        }
+        else
             res = c_oSerConstants.ReadUnknown;
-		return res;
-	};
-	this.ReadLegendEntry = function(type, length, oLegendEntry)
-	{
+        return res;
+    };
+    this.ReadLegendEntry = function(type, length, oLegendEntry)
+    {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
         if(c_oSer_ChartLegendEntryType.Index === type)
-            oLegendEntry.idx = this.stream.GetULongLE();
-		else if(c_oSer_ChartLegendEntryType.Delete === type)
+            oLegendEntry.nIndex = this.stream.GetULongLE();
+        else if(c_oSer_ChartLegendEntryType.Delete === type)
             oLegendEntry.bDelete = this.stream.GetBool();
-		else if(c_oSer_ChartLegendEntryType.TxPrPptx === type)
-		{
-            var oPresentationSimpleSerializer = new CPPTXContentLoader();
-            oLegendEntry.txPr = oPresentationSimpleSerializer.ReadTextBody(null, this.stream,  oLegendEntry);
-		}
-		else
+        else if(c_oSer_ChartLegendEntryType.TxPrPptx === type)
+        {
+            var oPresentationSimpleSerializer = new PresentationSimpleSerializer();
+            var textBody = oPresentationSimpleSerializer.ReadTextBody(this.stream);
+            oLegendEntry.oTxPr = this.ParsePptxParagraph(textBody);
+        }
+        else
             res = c_oSerConstants.ReadUnknown;
-		return res;
-	};
-	this.ReadLegendLayout = function(type, length, chartLayout)
-	{
+        return res;
+    };
+    this.ReadLegendLayout = function(type, length, oLegendLayout)
+    {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
         if(c_oSer_ChartLegendLayoutType.H === type)
-        {
-            chartLayout.h = stream.GetDoubleLE();
-            chartLayout.isManual = true;
-        }
-		else if(c_oSer_ChartLegendLayoutType.HMode === type)
-        {
-            chartLayout.hMode = this.stream.GetUChar();
-            chartLayout.isManual = true;
-        }
-		else if(c_oSer_ChartLegendLayoutType.LayoutTarget === type)
-        {
-            chartLayout.layoutTarget = this.stream.GetUChar();
-            chartLayout.isManual = true;
-        }
-		else if(c_oSer_ChartLegendLayoutType.W === type)
-        {
-            chartLayout.w = stream.GetDoubleLE();
-            chartLayout.isManual = true;
-        }
-		else if(c_oSer_ChartLegendLayoutType.WMode === type)
-        {
-            chartLayout.wMode = this.stream.GetUChar();
-            chartLayout.isManual = true;
-        }
-		else if(c_oSer_ChartLegendLayoutType.X === type)
-        {
-            chartLayout.x = stream.GetDoubleLE();
-            chartLayout.isManual = true;
-        }
-		else if(c_oSer_ChartLegendLayoutType.XMode === type)
-        {
-            chartLayout.xMode = this.stream.GetUChar();
-            chartLayout.isManual = true;
-        }
-		else if(c_oSer_ChartLegendLayoutType.Y === type)
-        {
-            chartLayout.y = stream.GetDoubleLE();
-            chartLayout.isManual = true;
-        }
-		else if(c_oSer_ChartLegendLayoutType.YMode === type)
-        {
-            chartLayout.yMode = this.stream.GetUChar();
-            chartLayout.isManual = true;
-        }
-		else
+            oLegendLayout.H = stream.GetDoubleLE();
+        else if(c_oSer_ChartLegendLayoutType.HMode === type)
+            oLegendLayout.HMode = this.stream.GetUChar();
+        else if(c_oSer_ChartLegendLayoutType.LayoutTarget === type)
+            oLegendLayout.LayoutTarget = this.stream.GetUChar();
+        else if(c_oSer_ChartLegendLayoutType.W === type)
+            oLegendLayout.W = stream.GetDoubleLE();
+        else if(c_oSer_ChartLegendLayoutType.WMode === type)
+            oLegendLayout.WMode = this.stream.GetUChar();
+        else if(c_oSer_ChartLegendLayoutType.X === type)
+            oLegendLayout.X = stream.GetDoubleLE();
+        else if(c_oSer_ChartLegendLayoutType.XMode === type)
+            oLegendLayout.XMode = this.stream.GetUChar();
+        else if(c_oSer_ChartLegendLayoutType.Y === type)
+            oLegendLayout.Y = stream.GetDoubleLE();
+        else if(c_oSer_ChartLegendLayoutType.YMode === type)
+            oLegendLayout.YMode = this.stream.GetUChar();
+        else
             res = c_oSerConstants.ReadUnknown;
-		return res;
-	};
+        return res;
+    };
 	this.ReadPlotArea = function(type, length, oAxis)
 	{
         var res = c_oSerConstants.ReadOk;

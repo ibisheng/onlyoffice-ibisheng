@@ -1079,6 +1079,8 @@ function asc_CChartLegend(object) {
 	this.bOverlay = bCopy ? object.bOverlay : false;
 }
 
+
+
 asc_CChartLegend.prototype = {
 	asc_getPosition: function() { return this.position; },
 	asc_setPosition: function(pos) { this.position = pos; },
@@ -1089,6 +1091,106 @@ asc_CChartLegend.prototype = {
 	asc_getOverlayFlag: function() { return this.bOverlay; },
 	asc_setOverlayFlag: function(overlayFlag) { this.bOverlay = overlayFlag; }
 }
+
+
+function asc_CChartFont(object) {
+
+    var bCopy = isObject(object);
+
+    this.name = bCopy ? object.name : "Calibri";
+    this.size = bCopy ? object.size : 10;
+    this.color = bCopy ? object.color : "#000000";
+
+    this.bold = bCopy ? object.bold : 0;
+    this.italic = bCopy ? object.italic : 0;
+    this.underline = bCopy ? object.underline : 0;
+
+    this.Properties = {
+        name: 0,
+        size: 1,
+        color: 2,
+        bold: 3,
+        italic: 4,
+        underline: 5
+    }
+}
+
+asc_CChartFont.prototype = {
+    asc_getName: function() { return this.name; },
+    asc_setName: function(val) { this.name = val; },
+
+    asc_getSize: function() { return this.size; },
+    asc_setSize: function(val) { this.size = val; },
+
+    asc_getColor: function() { return this.color; },
+    asc_setColor: function(val) { this.color = val; },
+
+    asc_getBold: function() { return this.bold; },
+    asc_setBold: function(val) { this.bold = val; },
+
+    asc_getItalic: function() { return this.italic; },
+    asc_setItalic: function(val) { this.italic = val; },
+
+    asc_getUnderline: function() { return this.underline; },
+    asc_setUnderline: function(val) { this.underline = val; },
+
+    //	For collaborative editing
+    getType: function() {
+        return UndoRedoDataTypes.ChartFont;
+    },
+
+    getProperties: function() {
+        return this.Properties;
+    },
+
+    getProperty: function(nType) {
+        switch (nType) {
+            case this.Properties.name: return this.name; break;
+            case this.Properties.size: return this.size; break;
+            case this.Properties.color: return this.color; break;
+
+            case this.Properties.bold: return this.bold; break;
+            case this.Properties.italic: return this.italic; break;
+            case this.Properties.underline: return this.underline; break;
+        }
+    },
+
+    setProperty: function(nType, value) {
+        switch (nType) {
+            case this.Properties.name: this.name = value; break;
+            case this.Properties.size: this.size = value; break;
+            case this.Properties.color: this.color = value; break;
+
+            case this.Properties.bold: this.bold = value; break;
+            case this.Properties.italic: this.italic = value; break;
+            case this.Properties.underline: this.underline = value; break;
+        }
+    }
+}
+
+//{ asc_CChartFont export
+window["Asc"].asc_CChartFont = asc_CChartFont;
+window["Asc"]["asc_CChartFont"] = asc_CChartFont;
+prot = asc_CChartFont.prototype;
+
+prot["asc_getName"] = prot.asc_getName;
+prot["asc_setName"] = prot.asc_setName;
+
+prot["asc_getSize"] = prot.asc_getSize;
+prot["asc_setSize"] = prot.asc_setSize;
+
+prot["asc_getColor"] = prot.asc_getColor;
+prot["asc_setColor"] = prot.asc_setColor;
+
+prot["asc_getBold"] = prot.asc_getBold;
+prot["asc_setBold"] = prot.asc_setBold;
+
+prot["asc_getItalic"] = prot.asc_getItalic;
+prot["asc_setItalic"] = prot.asc_setItalic;
+
+prot["asc_getUnderline"] = prot.asc_getUnderline;
+prot["asc_setUnderline"] = prot.asc_setUnderline;
+//}
 
 //{ asc_CChartLegend export
 window["Asc"].asc_CChartLegend = asc_CChartLegend;
@@ -1168,6 +1270,9 @@ prot["asc_setOutlineColor"] = prot.asc_setOutlineColor;
 prot["asc_getFormatCode"] = prot.asc_getFormatCode;
 prot["asc_setFormatCode"] = prot.asc_setFormatCode;
 //}
+
+
+
 
 //-----------------------------------------------------------------------------------
 // Selected graphic object(properties)
@@ -1902,6 +2007,7 @@ function DrawingObjects() {
 		_this.drawingDocument.InitGuiCanvasShape(api.shapeElementId);
 				
 		_this.isViewerMode =  function() { return worksheet._trigger("getViewerMode"); };
+
 
 		aObjects = [];
 		aImagesSync = [];
@@ -3414,11 +3520,11 @@ function DrawingObjects() {
 	}
 	
 	_this.graphicObjectKeyDown = function(e) {
-		_this.controller.onKeyDown( e );
+		return _this.controller.onKeyDown( e );
 	}
 	
 	_this.graphicObjectKeyPress = function(e) {
-		_this.controller.onKeyPress( e );
+        return _this.controller.onKeyPress( e );
 	}
 	
 	//-----------------------------------------------------------------------------------

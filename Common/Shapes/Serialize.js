@@ -5667,6 +5667,10 @@ function BinaryPPTYLoader()
                 case 8:
                 {
                     tPr.rPr = this.ReadRunProperties();
+                    if(tPr.pPr.defRPr !== null && typeof tPr.pPr.defRPr === "object" && typeof tPr.pPr.defRPr.Set_FromObject === " function")
+                    {
+                        tPr.pPr.defRPr.Set_FromObject(tPr.rPr);
+                    }
                 }
                 default:
                 {
