@@ -21,6 +21,13 @@ var c_oSerPropLenType = {
     Double:5,
     Variable:6
 };
+function OpenColor() {
+	this.rgb = null;
+	this.auto = null;
+	this.theme = null;
+	this.tint = null;
+}
+
 function BinaryCommonWriter(memory)
 {
     this.memory = memory;

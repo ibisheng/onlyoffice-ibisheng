@@ -925,14 +925,6 @@ var DocumentPageSize = new function() {
         return this.oSizes[8];//A4
     };
 };
- 
-function OpenColor()
-{
-	this.rgb = null;
-	this.auto = null;
-	this.theme = null;
-	this.tint = null;
-}
 
 var g_nodeAttributeStart = 0xFA;
 var g_nodeAttributeEnd	= 0xFB;
