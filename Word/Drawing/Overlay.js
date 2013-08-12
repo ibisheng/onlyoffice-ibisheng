@@ -1652,6 +1652,7 @@ function CSlideBoundsChecker()
     this.Bounds = new CBoundsController();
 
     this.m_oCurFont     = null;
+    this.m_oTextPr      = null;
 
     this.m_oCoordTransform  = new CMatrixL();
     this.m_oTransform       = new CMatrixL();
@@ -1859,6 +1860,17 @@ CSlideBoundsChecker.prototype =
     SetFont : function(font)
     {
         this.m_oCurFont = font;
+    },
+    SetTextPr : function(textPr)
+    {
+        this.m_oTextPr = textPr;
+    },
+    SetFontSlot : function(slot, fontSizeKoef)
+    {
+    },
+    GetTextPr : function()
+    {
+        return this.m_oTextPr;
     },
     FillText : function(x,y,text)
     {
