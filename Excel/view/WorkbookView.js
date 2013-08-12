@@ -177,7 +177,6 @@
 					"moveRangeHandleDone":		function () {self._onMoveRangeHandleDone.apply(self, arguments);},
 					"moveResizeRangeHandle":	function () {self._onMoveResizeRangeHandle.apply(self, arguments);},
 					"moveResizeRangeHandleDone":function () {self._onMoveResizeRangeHandleDone.apply(self, arguments);},
-					"deleteDrawingObjectDone":	function () {self._onDeleteDrawingObjectDone.apply(self);},
 					"editCell":          function () {self._onEditCell.apply(self, arguments);},
 					"stopCellEditing":   function () {return self._onStopCellEditing.apply(self, arguments);},
 					"emptyCell":				function () {self._onEmptyCell.apply(self, arguments);},
@@ -605,12 +604,6 @@
 					ws.cellCommentator.updateCommentPosition();
 				}
 				ws.draw();
-			},
-
-			_onDeleteDrawingObjectDone: function () {
-				var ws = this.getWorksheet();
-				ws.objectRender.deleteSelectedDrawingObject();
-				ws.autoFilters.drawAutoF(ws);
 			},
 
 			// Обработка автозаполнения

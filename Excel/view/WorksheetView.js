@@ -2765,6 +2765,10 @@
 			},
 
 			_drawSelectionRange: function (range) {
+				
+				if ( asc["editor"].isStartAddShape )
+					return;
+				
 				if (c_oAscSelectionType.RangeMax === this.activeRange.type) {
 					this.activeRange.c2 = this.cols.length - 1;
 					this.activeRange.r2 = this.rows.length - 1;
@@ -3018,10 +3022,8 @@
 				ctx.restore();
 				this._drawGraphic();
 				
-				if ( !this.isChartAreaEditMode ){
-					this.objectRender.showDrawingObjectsLocks();
+				if ( !this.isChartAreaEditMode )
 					this.objectRender.raiseLayerDrawingObjects();
-				}
 
 				this._drawActiveHeaders();
 			},
@@ -3169,11 +3171,9 @@
 				if (bIsDrawObjects) {
 					var objectState = (c_oAscLockTypes.kLockTypeMine === type) ? c_oAscObjectLockState.Off : c_oAscObjectLockState.On;
 					var arrayObjects = (c_oAscLockTypes.kLockTypeMine === type) ? this.collaborativeEditing.getLockObjectsMe(currentSheetId) : this.collaborativeEditing.getLockObjectsOther(currentSheetId);
-					
-					//this.objectRender.resetLockedDrawingObjects();
-					for (i = 0; i < arrayObjects.length; ++i) {
-						this.objectRender.selectLockedDrawingObject(arrayObjects[i], objectState);
-					}
+						
+					if ( arrayObjects.length )
+						this.objectRender.showDrawingObjects(false);
 				}
 
 				// set clipping rect to cells area
@@ -5856,7 +5856,7 @@
 				if (isCoord) {
 					var drawingInfo = this.objectRender.checkCursorDrawingObject(x, y);
 					if ( drawingInfo ) {
-						this.overlayCtx.clear();
+						//this.overlayCtx.clear();
 						this._drawGraphic();
 						this.objectRender.OnUpdateOverlay();
 					}
@@ -7094,7 +7094,7 @@
 											{
 												var src = val.addImages[im].tag.src;
 												if(src && 0 != src.indexOf("file://"))
-													t.objectRender.addImageDrawingObject(src, true, { cell: val.addImages[im].curCell, width: val.addImages[im].tag.width, height: val.addImages[im].tag.height });
+													t.objectRender.addImageDrawingObject(src,  { cell: val.addImages[im].curCell, width: val.addImages[im].tag.width, height: val.addImages[im].tag.height });
 											}
 										}
 									});

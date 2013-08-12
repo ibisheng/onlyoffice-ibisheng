@@ -1384,9 +1384,6 @@ function Workbook(sUrlPath, eventsHandlers, oApi){
 	this.aCollaborativeActions = new Array();
 	this.bCollaborativeChanges = false;
 	this.aCollaborativeChangeElements = new Array();
-	
-	var drawingPointer = new DrawingObjects();
-	drawingPointer.initGlobalDrawingPointer();
 };
 Workbook.prototype.initGlobalObjects=function(){
 	g_oUndoRedoCell = new UndoRedoCell(this);
@@ -1395,7 +1392,6 @@ Workbook.prototype.initGlobalObjects=function(){
 	g_oUndoRedoCol = new UndoRedoRowCol(this, false);
 	g_oUndoRedoRow = new UndoRedoRowCol(this, true);
 	g_oUndoRedoComment = new UndoRedoComment(this);
-	g_oUndoRedoDrawingLayer = new UndoRedoDrawingLayer(this);
 	g_oUndoRedoAutoFilters = new UndoRedoAutoFilters(this);
     g_oUndoRedoGraphicObjects = new UndoRedoGraphicObjects(this);
     g_oIdCounter.Set_Load(false);

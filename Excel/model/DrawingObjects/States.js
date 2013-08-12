@@ -1664,13 +1664,11 @@ function RotateState(drawingObjectsController, drawingObjects, majorObject)
             arr_track_objects.push(this.drawingObjectsController.arrTrackObjects[i]);
         }
 
-        var worksheet = this.drawingObjects.getWorksheet();
-        //worksheet.collaborativeEditing.onStartCheckLock();
+        var worksheet = this.drawingObjects.getWorksheet();        
 		this.drawingObjects.objectLocker.reset();
         var track_objects = this.drawingObjectsController.arrTrackObjects;
         for(i =0; i < track_objects.length; ++i)
         {
-            //this.drawingObjects.lockDrawingObject(track_objects[i].originalObject.Get_Id(), false, false);
 			this.drawingObjects.objectLocker.addObjectId(track_objects[i].originalObject.Get_Id());
         }
         var track_objects2 = [];
@@ -1690,9 +1688,7 @@ function RotateState(drawingObjectsController, drawingObjects, majorObject)
                 drawingObjects.showDrawingObjects(true);
 
             }
-        };
-
-        //worksheet.collaborativeEditing.onEndCheckLock(callback);
+        };        
 		this.drawingObjects.objectLocker.checkObjects(callback);
 		
         //History.Create_NewPoint();
@@ -1793,12 +1789,10 @@ function ResizeState(drawingObjectsController, drawingObjects, majorObject, card
     {
 
         var worksheet = this.drawingObjects.getWorksheet();
-        //worksheet.collaborativeEditing.onStartCheckLock();
 		this.drawingObjects.objectLocker.reset();
         var track_objects = this.drawingObjectsController.arrTrackObjects;
         for(var i =0; i < track_objects.length; ++i)
         {
-            //this.drawingObjects.lockDrawingObject(track_objects[i].originalObject.Get_Id(), false, false);
 			this.drawingObjects.objectLocker.addObjectId(track_objects[i].originalObject.Get_Id());
         }
         var track_objects2 = [];
@@ -1819,8 +1813,6 @@ function ResizeState(drawingObjectsController, drawingObjects, majorObject, card
 
             }
         };
-
-        //worksheet.collaborativeEditing.onEndCheckLock(callback);
 		this.drawingObjects.objectLocker.checkObjects(callback);
 
         //History.Create_NewPoint();
@@ -2071,12 +2063,9 @@ function TrackNewShapeState(drawingObjectsController, drawingObjects, presetGeom
 
         //лочим добавленный шейп
         var worksheet = this.drawingObjects.getWorksheet();
-		
-		//worksheet.collaborativeEditing.onStartCheckLock();
+				
 		this.drawingObjects.objectLocker.reset();
-        //this.drawingObjects.lockDrawingObject(this.resultObject.Get_Id(), false, false);
 		this.drawingObjects.objectLocker.addObjectId(this.resultObject.Get_Id());
-        //worksheet.collaborativeEditing.onEndCheckLock(function(bLock){});
 		this.drawingObjects.objectLocker.checkObjects(function(bLock){});
 		
         asc["editor"].asc_endAddShape();
@@ -2299,12 +2288,10 @@ function MoveState(drawingObjectsController, drawingObjects, startX, startY, rec
     this.onMouseUp = function(e, x, y)
     {
         var worksheet = this.drawingObjects.getWorksheet();
-        //worksheet.collaborativeEditing.onStartCheckLock();
 		this.drawingObjects.objectLocker.reset();
         var track_objects = this.drawingObjectsController.arrTrackObjects;
         for(var i =0; i < track_objects.length; ++i)
         {
-            //this.drawingObjects.lockDrawingObject(track_objects[i].originalObject.Get_Id(), false, false);
 			this.drawingObjects.objectLocker.addObjectId(track_objects[i].originalObject.Get_Id());
         }
         var track_objects2 = [];
@@ -2325,8 +2312,6 @@ function MoveState(drawingObjectsController, drawingObjects, startX, startY, rec
 
             }
         };
-
-        //worksheet.collaborativeEditing.onEndCheckLock(callback);
 		this.drawingObjects.objectLocker.checkObjects(callback);
 		
         //History.Create_NewPoint();
@@ -2425,12 +2410,10 @@ function ChangeAdjState(drawingObjectsController, drawingObjects)
     this.onMouseUp = function(e, x, y)
     {
         var worksheet = this.drawingObjects.getWorksheet();
-        //worksheet.collaborativeEditing.onStartCheckLock();
 		this.drawingObjects.objectLocker.reset();
         var track_objects = this.drawingObjectsController.arrTrackObjects;
         for(var i =0; i < track_objects.length; ++i)
         {
-            //this.drawingObjects.lockDrawingObject(track_objects[i].originalShape.Get_Id(), false, false);
 			this.drawingObjects.objectLocker.addObjectId(track_objects[i].originalShape.Get_Id());
         }
         var track_objects2 = [];
@@ -2450,8 +2433,6 @@ function ChangeAdjState(drawingObjectsController, drawingObjects)
                 drawingObjects.showDrawingObjects(true);
             }
         };
-
-        //worksheet.collaborativeEditing.onEndCheckLock(callback);
 		this.drawingObjects.objectLocker.checkObjects(callback);
 		
         //History.Create_NewPoint();
@@ -3214,9 +3195,7 @@ function MoveInGroupState(drawingObjectsController, drawingObjects, group, start
     {
 
         var worksheet = this.drawingObjects.getWorksheet();
-        //worksheet.collaborativeEditing.onStartCheckLock();
 		this.drawingObjects.objectLocker.reset();
-        //this.drawingObjects.lockDrawingObject(this.group.Get_Id(), false, false);
 		this.drawingObjects.objectLocker.addObjectId(this.group.Get_Id());
         var track_objects2 = [];
         for(var i = 0; i < this.drawingObjectsController.arrTrackObjects.length; ++i)
@@ -3244,8 +3223,6 @@ function MoveInGroupState(drawingObjectsController, drawingObjects, group, start
 
             }
         };
-
-        //worksheet.collaborativeEditing.onEndCheckLock(callback);
 		this.drawingObjects.objectLocker.checkObjects(callback);
 		
         //this.drawingObjectsController.trackEnd();
@@ -3343,9 +3320,7 @@ function ChangeAdjInGroupState(drawingObjectsController, drawingObjects, group)
 
 
         var worksheet = this.drawingObjects.getWorksheet();
-        //worksheet.collaborativeEditing.onStartCheckLock();
 		this.drawingObjects.objectLocker.reset();
-        //this.drawingObjects.lockDrawingObject(this.group.Get_Id(), false, false);
 		this.drawingObjects.objectLocker.addObjectId(this.group.Get_Id());
         var track_objects2 = [];
         for(var i = 0; i < this.drawingObjectsController.arrTrackObjects.length; ++i)
@@ -3366,7 +3341,6 @@ function ChangeAdjInGroupState(drawingObjectsController, drawingObjects, group)
                 drawingObjects.showDrawingObjects(true);
             }
         };
-        //worksheet.collaborativeEditing.onEndCheckLock(callback);
 		this.drawingObjects.objectLocker.checkObjects(callback);
 
         this.drawingObjectsController.clearTrackObjects();
@@ -3456,9 +3430,7 @@ function RotateInGroupState(drawingObjectsController, drawingObjects, group, maj
     {
 
         var worksheet = this.drawingObjects.getWorksheet();
-        //worksheet.collaborativeEditing.onStartCheckLock();
 		this.drawingObjects.objectLocker.reset();
-        //this.drawingObjects.lockDrawingObject(this.group.Get_Id(), false, false);
 		this.drawingObjects.objectLocker.addObjectId(this.group.Get_Id());
         var track_objects2 = [];
         for(var i = 0; i < this.drawingObjectsController.arrTrackObjects.length; ++i)
@@ -3486,8 +3458,6 @@ function RotateInGroupState(drawingObjectsController, drawingObjects, group, maj
 
             }
         };
-
-        //worksheet.collaborativeEditing.onEndCheckLock(callback);
 		this.drawingObjects.objectLocker.checkObjects(callback);
 		
         //this.drawingObjectsController.trackEnd();
@@ -3587,9 +3557,7 @@ function ResizeInGroupState(drawingObjectsController, drawingObjects, group, maj
     this.onMouseUp = function(e, x, y)
     {
         var worksheet = this.drawingObjects.getWorksheet();
-        //worksheet.collaborativeEditing.onStartCheckLock();
 		this.drawingObjects.objectLocker.reset();
-        //this.drawingObjects.lockDrawingObject(this.group.Get_Id(), false, false);
 		this.drawingObjects.objectLocker.addObjectId(this.group.Get_Id());
         var track_objects2 = [];
         for(var i = 0; i < this.drawingObjectsController.arrTrackObjects.length; ++i)
@@ -3615,8 +3583,6 @@ function ResizeInGroupState(drawingObjectsController, drawingObjects, group, maj
                 drawingObjects.showDrawingObjects(true);
             }
         };
-
-        //worksheet.collaborativeEditing.onEndCheckLock(callback);
 		this.drawingObjects.objectLocker.checkObjects(callback);
 		
         this.drawingObjectsController.clearTrackObjects();

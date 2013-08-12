@@ -1158,6 +1158,12 @@ DrawingObjectsController.prototype =
             if(typeof aObjects[i].graphicObject.recalculateColors === "function")
 				aObjects[i].graphicObject.recalculateColors();
 		}
+	},
+	
+	// layers
+	setGraphicObjectLayer: function(layerType)
+	{
+		//oAscDrawingLayerType
 	}
 };
 

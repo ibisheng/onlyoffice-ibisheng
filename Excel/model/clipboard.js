@@ -1710,7 +1710,7 @@
 															imCount++;
 														}
 														
-														//worksheet.objectRender.addImageDrawingObject(tag.src, false, { cell: curCell, width: tag.width, height: tag.height });
+														//worksheet.objectRender.addImageDrawingObject(tag.src, { cell: curCell, width: tag.width, height: tag.height });
 													}
 													if(_tBody == undefined)
 														_tBody = document.createElement('td');
@@ -1753,7 +1753,7 @@
 													imCount++;
 												}
 												
-												//worksheet.objectRender.addImageDrawingObject(tag.src, false, { cell: curCell, width: tag.width, height: tag.height });
+												//worksheet.objectRender.addImageDrawingObject(tag.src, { cell: curCell, width: tag.width, height: tag.height });
 											}
 											aResult[tR][tC] = t._getArray(_tBody,isText);
 											fontsNew[l] = aResult[tR][tC][0].fonts;
@@ -2510,7 +2510,7 @@
 				//object{images:,fromCol,fromRow}
 				if(!array || array && array.length == 0)
 					return false;
-				ws.collaborativeEditing.onStartCheckLock();
+				
 				var firstRange = ws.activeRange.clone(true);
 				for(i=0;i < array.length;i++)
 				{
@@ -2534,10 +2534,9 @@
 							col: firstRange.c1 + (array[i].fromCol - array[0].fromCol),
 							row: firstRange.r1 + (array[i].fromRow - array[0].fromRow)
 						}
-						ws.objectRender.addImageDrawingObject(array[i].image.src, true, { cell: curCell, width: array[i].image.width, height: array[i].image.height });
+						ws.objectRender.addImageDrawingObject(array[i].image.src, { cell: curCell, width: array[i].image.width, height: array[i].image.height });
 					}
 				}
-				ws.collaborativeEditing.onEndCheckLock();
 				return true;
 			}
 

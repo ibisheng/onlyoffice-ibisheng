@@ -1141,8 +1141,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					"showDrawingObjects":		function () {t._onShowDrawingObjects.apply(t, arguments);},
 					"showComments":				function () {t._onShowComments.apply(t, arguments);},
 					"unlockComments":			function () {t._onUnlockComments.apply(t);},
-					"cleanSelection":			function () {t._onCleanSelection.apply(t, arguments);},
-					"resetDrawingObject":		function () {t._onResetDrawingObject.apply(t, arguments);}
+					"cleanSelection":			function () {t._onCleanSelection.apply(t, arguments);}
 				});
 
 				if (!this.CoAuthoringApi) {
@@ -1230,12 +1229,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 							t._onUpdateSheetsLock(lockElem);
 
 							var worksheet = t.wb.getWorksheet();
-							worksheet.objectRender.resetLockedDrawingObjects();
+							worksheet._drawSelection();
 							worksheet.objectRender.showDrawingObjects(true);
 							worksheet.cellCommentator.unlockComments();
-							worksheet._drawSelection();
-							worksheet.objectRender.raiseLayerDrawingObjects();
-							worksheet.objectRender.selectDrawingObject(worksheet.objectRender.getSelectedDrawingObjectIndex());
 						}
 					}
 				};
@@ -1389,12 +1385,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			_onDrawSelection: function () {
 				if (this.wb)
 					this.wb.getWorksheet()._drawSelection();
-			},
-
-			_onResetDrawingObject: function (idObject) {
-				if (this.wb) {
-					this.wb.getWorksheet().objectRender.resetLockedDrawingObject(idObject);
-				}
 			},
 			
 			_onShowDrawingObjects: function () {
@@ -2038,12 +2028,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			asc_addImageDrawingObject: function(imageUrl) {
 				this.wb.controller.isSelectDrawingObject = true;
 				var ws = this.wb.getWorksheet();
-				return ws.objectRender.addImageDrawingObject(imageUrl, false, null);
-			},
-
-			asc_deleteSelectedDrawingObject: function() {
-				var ws = this.wb.getWorksheet();
-				return ws.objectRender.deleteSelectedDrawingObject();
+				return ws.objectRender.addImageDrawingObject(imageUrl, null);
 			},
 
 			asc_showImageFileDialog: function (options) {
@@ -2058,7 +2043,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 			asc_setSelectedDrawingObjectLayer: function(layerType) {
 				var ws = this.wb.getWorksheet();
-				return ws.objectRender.setSelectedDrawingObjectLayer(layerType);
+				return ws.objectRender.setGraphicObjectLayer(layerType);
 			},
 			
 			asc_getChartPreviews: function(chartType, chartSubType) {
@@ -2744,7 +2729,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
                                 // console.log(picker);
                             }
 
-                            ws.objectRender.addImageDrawingObject(imageUrl, false, options);
+                            ws.objectRender.addImageDrawingObject(imageUrl, options);
                             ws.model.workbook.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
                         };
                     }
@@ -3092,7 +3077,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_addChartDrawingObject"] = prot.asc_addChartDrawingObject;
 		prot["asc_editChartDrawingObject"] = prot.asc_editChartDrawingObject;
 		prot["asc_addImageDrawingObject"] = prot.asc_addImageDrawingObject;
-		prot["asc_deleteSelectedDrawingObject"] = prot.asc_deleteSelectedDrawingObject;
 		prot["asc_setSelectedDrawingObjectLayer"] = prot.asc_setSelectedDrawingObjectLayer;
 		prot["asc_getChartPreviews"] = prot.asc_getChartPreviews;
 		prot["asc_checkChartInterval"] = prot.asc_checkChartInterval;

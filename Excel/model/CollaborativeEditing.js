@@ -218,10 +218,6 @@
 					oLock.setType(c_oAscLockTypes.kLockTypeNone, false);
 
 					this.handlers.trigger("releaseLocks", oLock.Element["guid"]);
-					if (c_oAscLockTypeElem.Object === oLock.Element["type"]) {
-						// Для объектов нужно сбросить тип блокировки
-						this.handlers.trigger("resetDrawingObject", oLock.Element["rangeOrObjectId"]);
-					}
 				}
 				// Очищаем примененные чужие изменения
 				var nIndex = 0;
@@ -229,11 +225,7 @@
 				for (; nIndex < nCount; ++nIndex) {
 					oLock = this.m_arrNeedUnlock[nIndex];
 					if (c_oAscLockTypes.kLockTypeOther2 === oLock.getType()) {
-						if (c_oAscLockTypeElem.Object === oLock.Element["type"]) {
-							// Для объектов нужно сбросить тип блокировки
-							this.handlers.trigger("resetDrawingObject", oLock.Element["rangeOrObjectId"]);
-						}
-
+						
 						this.m_arrNeedUnlock.splice(nIndex, 1);
 						--nIndex;
 						--nCount;

@@ -5,12 +5,6 @@
 * Date:   13/08/2012
 */
 
-//-----------------------------------------------------------------------------------
-// Global drawing pointers
-//-----------------------------------------------------------------------------------
-
-var DrawingObject = null;
-var DrawingObjectLayer = null;
 
 if ( !window["Asc"] ) {		// Для вставки диаграмм в Word
 	window["Asc"] = {};
@@ -1554,49 +1548,6 @@ prot["asc_getId"] = prot.asc_getId;
 prot["asc_getImage"] = prot.asc_getImage;
 //}
 
-//-----------------------------------------------------------------------------------
-// Undo/Redo
-//-----------------------------------------------------------------------------------
-	
-DrawingObjects.prototype = {
-
-	Undo: function(type, data) {
-
-		switch (type) {
-			case historyitem_DrawingLayer:
-				if ( data.aLayerBefore.length && data.aLayerAfter.length ) {
-					var aStorage = [];
-					for (var i = 0; i < data.aLayerBefore.length; i++) {
-						var obj = this.getDrawingObject(data.aLayerBefore[i]);
-						if ( obj )
-							aStorage.push(obj);
-					}
-					this.changeObjectStorage(aStorage);
-					this.showDrawingObjects(true);
-				}
-				break;
-		}
-	},
-
-	Redo: function(type, data) {
-
-		switch (type) {
-			case historyitem_DrawingLayer:
-				if ( data.aLayerBefore.length && data.aLayerAfter.length ) {
-					var aStorage = [];
-					for (var i = 0; i < data.aLayerAfter.length; i++) {
-						var obj = this.getDrawingObject(data.aLayerAfter[i]);
-						if ( obj )
-							aStorage.push(obj);
-					}
-					this.changeObjectStorage(aStorage);
-					this.showDrawingObjects(true);
-				}
-				break;
-		}
-	}
-}
-
 function DrawingObjects() {
 
 	//-----------------------------------------------------------------------------------
@@ -1619,7 +1570,7 @@ function DrawingObjects() {
 	var scrollOffset = { x: 0, y: 0 };
 	
 	var aObjects = null;
-	var lastBoundsChecker = null;
+	var aBoundsCheckers = [];
 	
 	var userId = null;
 	var documentId = null;
@@ -1703,37 +1654,34 @@ function DrawingObjects() {
 			
 				if ( (_t.graphicObject.x < 0) || (_t.graphicObject.y < 0) || (_t.graphicObject.extX <= 0) || (_t.graphicObject.extY <= 0) )
 					return;
-				
-				var foundCol = _t.worksheet._findColUnderCursor( mmToPt(_t.graphicObject.x), true);
+								
+				var foundCol = _t.worksheet._findColUnderCursor( mmToPt(_t.graphicObject.x - worksheet.getCellLeft(worksheet.getFirstVisibleCol(), 3) + worksheet.getCellLeft(0, 3)), true );
 				if ( !foundCol ) return;
 				_t.from.col = foundCol.col;
 				_t.from.colOff = _t.graphicObject.x - _t.worksheet.getCellLeft(_t.from.col, 3);
 
-				var foundRow = _t.worksheet._findRowUnderCursor( mmToPt(_t.graphicObject.y), true);
+				var foundRow = _t.worksheet._findRowUnderCursor( mmToPt(_t.graphicObject.y - worksheet.getCellTop(worksheet.getFirstVisibleRow(), 3) + worksheet.getCellTop(0, 3)), true );
 				if ( !foundRow ) return;
 				_t.from.row = foundRow.row;
 				_t.from.rowOff = _t.graphicObject.y - _t.worksheet.getCellTop(_t.from.row, 3);
 
-				var _left = _t.getRealLeftOffset();
-				var _top = _t.getRealTopOffset();
-
-				var foundCol = _t.worksheet._findColUnderCursor(pxToPt(_left + mmToPx(_t.graphicObject.extX)), true);
+				foundCol = _t.worksheet._findColUnderCursor( mmToPt(_t.graphicObject.x + _t.graphicObject.extX - worksheet.getCellLeft(worksheet.getFirstVisibleCol(), 3) + worksheet.getCellLeft(0, 3)), true );
 				while (foundCol == null) {
 					_t.worksheet.expandColsOnScroll(true);
 					_t.worksheet._trigger("reinitializeScrollX");
-					foundCol = _t.worksheet._findColUnderCursor(pxToPt(_left + mmToPx(_t.graphicObject.extX)), true);
+					foundCol = _t.worksheet._findColUnderCursor( mmToPt(_t.graphicObject.x + _t.graphicObject.extX - worksheet.getCellLeft(worksheet.getFirstVisibleCol(), 3) + worksheet.getCellLeft(0, 3)), true );
 				}
 				_t.to.col = foundCol.col;
-				_t.to.colOff = pxToMm(_left + mmToPx(_t.graphicObject.extX) - _t.worksheet.getCellLeft(_t.to.col, 0));
+				_t.to.colOff = _t.graphicObject.x + _t.graphicObject.extX - _t.worksheet.getCellLeft(_t.to.col, 3);
 
-				var foundRow = _t.worksheet._findRowUnderCursor(pxToPt(_top + mmToPx(_t.graphicObject.extY)), true);
+				foundRow = _t.worksheet._findRowUnderCursor( mmToPt(_t.graphicObject.y + _t.graphicObject.extY - worksheet.getCellTop(worksheet.getFirstVisibleRow(), 3) + worksheet.getCellTop(0, 3)), true );
 				while (foundRow == null) {
 					_t.worksheet.expandRowsOnScroll(true);
 					_t.worksheet._trigger("reinitializeScrollY");
-					foundRow = _t.worksheet._findRowUnderCursor(pxToPt(_top + mmToPx(_t.graphicObject.extY)), true);
+					foundRow = _t.worksheet._findRowUnderCursor( mmToPt(_t.graphicObject.y + _t.graphicObject.extY - worksheet.getCellTop(worksheet.getFirstVisibleRow(), 3) + worksheet.getCellTop(0, 3)), true );
 				}
 				_t.to.row = foundRow.row;
-				_t.to.rowOff = pxToMm(_top + mmToPx(_t.graphicObject.extY) - _t.worksheet.getCellTop(_t.to.row, 0));
+				_t.to.rowOff = _t.graphicObject.y + _t.graphicObject.extY - _t.worksheet.getCellTop(_t.to.row, 3);
 			}
 		}
 		
@@ -1903,46 +1851,6 @@ function DrawingObjects() {
 	}
 	
 	//-----------------------------------------------------------------------------------
-	// Create drawing layer
-	//-----------------------------------------------------------------------------------
-	
-	var DrawingLayer = function() {
-	
-		this.Properties = {
-			aLayerBefore: 1,
-			aLayerAfter: 2
-		}
-		
-		this.aLayerBefore = [];
-		this.aLayerAfter = [];
-	}
-
-	DrawingLayer.prototype = {
-	
-		getType: function() {
-			return UndoRedoDataTypes.DrawingObjectLayer;
-		},
-
-		getProperties: function() {
-			return this.Properties;
-		},
-
-		getProperty: function(nType) {
-			switch (nType) {
-				case this.Properties.aLayerBefore: return this.aLayerBefore; break;
-				case this.Properties.aLayerAfter: return this.aLayerAfter; break;
-			}
-		},
-		
-		setProperty: function(nType, value) {
-			switch (nType) {
-				case this.Properties.aLayerBefore: this.aLayerBefore = value; break;
-				case this.Properties.aLayerAfter: this.aLayerAfter = value; break;
-			}
-		}
-	}
-	
-	//-----------------------------------------------------------------------------------
 	// Constructor
 	//-----------------------------------------------------------------------------------
 	
@@ -2062,6 +1970,9 @@ function DrawingObjects() {
 					drawingObject.setGraphicObjectCoords();
 					drawingObject.graphicObject.draw(shapeCtx);
 					aObjects.push(drawingObject);
+					
+					var boundsChecker = _this.getBoundsChecker(drawingObject);
+					aBoundsCheckers.push(boundsChecker);
 				}
 			}
 		}	
@@ -2173,8 +2084,6 @@ function DrawingObjects() {
         shapeOverlayCtx.m_oContext.clearRect(0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix);
 		
 		// Селекты для комментариев, фильтров и т.д.
-		if ( !_this.controller.selectedObjects.length )
-			worksheet._drawSelection();
 		worksheet._drawGraphic();
 		
 		for ( var i = 0; i < _this.controller.selectedObjects.length; i++ ) {
@@ -2232,6 +2141,7 @@ function DrawingObjects() {
             ctx.beginPath();
             ctx.globalAlpha = 1.0;
         }
+		_this.drawWorksheetHeaders();
 
         return true;
     };
@@ -2268,11 +2178,6 @@ function DrawingObjects() {
 		return worksheet;
 	}
 
-	_this.initGlobalDrawingPointer = function() {
-		DrawingObject = DrawingBase;
-		DrawingObjectLayer = DrawingLayer;
-	}
-
 	_this._uploadMessage = function(event) {
 		if ( null != event && null != event.data ) {
 
@@ -2290,7 +2195,7 @@ function DrawingObjects() {
 							if ( api.isImageChangeUrl || api.isShapeImageChangeUrl )
 								_this.editImageDrawingObject(url);
 							else
-								_this.addImageDrawingObject(url, false, null);
+								_this.addImageDrawingObject(url, null);
 						}
 						else
 							worksheet.model.workbook.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
@@ -2304,6 +2209,17 @@ function DrawingObjects() {
 		}
 	}
 
+	_this.getBoundsChecker = function(drawingObject) {
+		if ( drawingObject && drawingObject.graphicObject ) {
+			var boundsChecker = new  CSlideBoundsChecker();
+			boundsChecker.init(1, 1, 1, 1);
+			drawingObject.graphicObject.draw(boundsChecker);
+			boundsChecker.CorrectBounds();
+			return boundsChecker;
+		}
+		return null;
+	}
+	
 	_this.clearDrawingObjects = function() {
 		
 		/*worksheet._clean();
@@ -2317,29 +2233,35 @@ function DrawingObjects() {
 		var asc = window["Asc"];
 		var asc_Range = asc.Range;
 		
-		var boundsChecker = new  CSlideBoundsChecker();
-		boundsChecker.init(1, 1, 1, 1);
-		
-		for ( var i = 0; i < aObjects.length; i++ ) {
-			var drawingObject = aObjects[i];
-			
-			drawingObject.graphicObject.draw(boundsChecker);
-			boundsChecker.CorrectBounds();
+		// Чистим предыдущие области
+		var bHeaders = false;
+		var _top = worksheet.getCellTop(worksheet.getFirstVisibleRow(), 3);
+		var _left = worksheet.getCellLeft(worksheet.getFirstVisibleCol(), 3);
+		for (var i = 0; i < aBoundsCheckers.length; i++) {
+			restoreSheetArea(aBoundsCheckers[i]);
+			if ( (_top >= aBoundsCheckers[i].Bounds.min_y) || (_left >= aBoundsCheckers[i].Bounds.min_x) )
+				bHeaders = true;
 		}
+		aBoundsCheckers = [];
 		
-		if ( lastBoundsChecker )
-			restoreSheetArea(lastBoundsChecker);		
+		if ( bHeaders )
+			_this.drawWorksheetHeaders(true);
 		
-		restoreSheetArea(boundsChecker);
-		lastBoundsChecker = boundsChecker;
+		// Чистим текущие области
+		for ( var i = 0; i < aObjects.length; i++ ) {
+			
+			var boundsChecker = _this.getBoundsChecker(aObjects[i]);
+			restoreSheetArea(boundsChecker);
+			aBoundsCheckers.push(boundsChecker);
+		}
 		
 		function restoreSheetArea(checker) {
 		
-			/*var _w = checker.Bounds.max_x - checker.Bounds.min_x;
+			var _w = checker.Bounds.max_x - checker.Bounds.min_x;
 			var _h = checker.Bounds.max_y - checker.Bounds.min_y;
 			
-			overlayCtx.clearRect( mmToPt(checker.Bounds.min_x +  pxToMm(scrollOffset.x)), mmToPt(checker.Bounds.min_y +  pxToMm(scrollOffset.y)), mmToPt(_w +  pxToMm(scrollOffset.x)), mmToPt(_h +  pxToMm(scrollOffset.y)));
-			drawingCtx.clearRect( mmToPt(checker.Bounds.min_x +  pxToMm(scrollOffset.x)), mmToPt(checker.Bounds.min_y +  pxToMm(scrollOffset.y)), mmToPt(_w +  pxToMm(scrollOffset.x)), mmToPt(_h +  pxToMm(scrollOffset.y)));*/
+			//overlayCtx.clearRect( mmToPt(checker.Bounds.min_x +  pxToMm(scrollOffset.x)), mmToPt(checker.Bounds.min_y +  pxToMm(scrollOffset.y)), mmToPt(_w +  pxToMm(scrollOffset.x)), mmToPt(_h +  pxToMm(scrollOffset.y)));
+			//drawingCtx.clearRect( mmToPt(checker.Bounds.min_x +  pxToMm(scrollOffset.x)), mmToPt(checker.Bounds.min_y +  pxToMm(scrollOffset.y)), mmToPt(_w +  pxToMm(scrollOffset.x)), mmToPt(_h +  pxToMm(scrollOffset.y)));
 		
 			var foundRow = worksheet._findRowUnderCursor( mmToPt(checker.Bounds.min_y + pxToMm(scrollOffset.y)), true);		
 			var topRow = foundRow ? foundRow.row : 0;
@@ -2360,21 +2282,10 @@ function DrawingObjects() {
 
 	_this.raiseLayerDrawingObjects = function() {
 		
-		/*for (var i = 0; i < _this.countDrawingObjects(); i++) {
+		/*for (var i = 0; i < aObjects.length; i++) {
 			var obj = aObjects[i];
 			obj.graphicObject.draw(shapeOverlayCtx);
 		}*/
-	}
-
-	_this.countDrawingObjects = function() {
-		return aObjects ? aObjects.length : 0;
-	}
-
-	_this.checkDrawingObjectIndex = function(index) {
-		if (_this.countDrawingObjects() && (index >= 0) && (index < _this.countDrawingObjects()))
-			return true;
-		else
-			return false;
 	}
 
 	//-----------------------------------------------------------------------------------
@@ -2400,13 +2311,13 @@ function DrawingObjects() {
 			if ( clearCanvas )
 				_this.clearDrawingObjects();
 				
-			if ( !_this.countDrawingObjects() )
+			if ( !aObjects.length )
 				return;
 			
 			worksheet._drawGraphic();
 			worksheet.model.Drawings = aObjects;
 			
-			for (var i = 0; i < _this.countDrawingObjects(); i++) {
+			for (var i = 0; i < aObjects.length; i++) {
 
 				var index = i;
 				var obj = aObjects[i];
@@ -2447,8 +2358,8 @@ function DrawingObjects() {
 			}
 		}
 		//_this.raiseLayerDrawingObjects();
-		//_this.selectGraphicObject();
 		_this.OnUpdateOverlay();
+		_this.drawWorksheetHeaders();
 	}
 
 	_this.showOverlayGraphicObjects = function() {
@@ -2457,7 +2368,7 @@ function DrawingObjects() {
 		worksheet._drawGraphic();
 		_this.controller.drawTracks(shapeOverlayCtx);
 		shapeOverlayCtx.put_GlobalAlpha(true, 1);
-		_this.drawWorksheetHeaders(true);
+		_this.drawWorksheetHeaders();
 	}
 	
 	_this.getDrawingAreaMetrics = function() {
@@ -2471,7 +2382,7 @@ function DrawingObjects() {
 			maxRow: 0
 		}
 
-		for (var i = 0; i < _this.countDrawingObjects(); i++) {
+		for (var i = 0; i < aObjects.length; i++) {
 			if (aObjects[i].to.col >= metrics.maxCol)
 				metrics.maxCol = aObjects[i].to.col + 1; // учитываем colOff
 			if (aObjects[i].to.row >= metrics.maxRow)
@@ -2480,7 +2391,7 @@ function DrawingObjects() {
 		return metrics;
 	}
 
-	_this.drawWorksheetHeaders = function(bOverlay) {
+	_this.drawWorksheetHeaders = function(bForce) {
 	
 		// Проверяем выход за видимую область
 		var fvr = worksheet.getFirstVisibleRow();
@@ -2492,35 +2403,24 @@ function DrawingObjects() {
 		for (var i = 0; i < aObjects.length; i++) {
 			
 			var obj = aObjects[i];
-			if ( bOverlay ) {	// Проверка по координатам graphicObject, From/To ещё не подсчитаны
-				
-				if ( (_this.controller.curState.id = STATES_ID_MOVE) || (_this.controller.curState.id == STATES_ID_RESIZE) ) {
-				}
-			}
-			else {
-				if ( (obj.from.col < fvc) || (obj.from.row < fvr) ) {				
-					worksheet._drawColumnHeaders();
-					worksheet._drawRowHeaders();
-							
-					// cols header on overlay
-					overlayCtx.clearRect( 0, 0, overlayCtx.getWidth(), worksheet.getCellTop(0, 1) );
-					// rows header on overlay
-					overlayCtx.clearRect( 0, 0, worksheet.getCellLeft(0, 1), overlayCtx.getHeight() );
-					break;
-				}
+			if ( bForce || (obj.from.col < fvc) || (obj.from.row < fvr) ) {
+				worksheet._drawColumnHeaders();
+				worksheet._drawRowHeaders();
+			
+				// cols header on overlay
+				overlayCtx.clearRect( 0, 0, overlayCtx.getWidth(), worksheet.getCellTop(0, 1) );
+				// rows header on overlay
+				overlayCtx.clearRect( 0, 0, worksheet.getCellLeft(0, 1), overlayCtx.getHeight() );
+				break;
 			}
 		}
 	}
 	
-	_this.changeObjectStorage = function(storage) {
-		aObjects = storage;
-	}
-
 	//-----------------------------------------------------------------------------------
 	// For object type
 	//-----------------------------------------------------------------------------------
 	
-	_this.addImageDrawingObject = function(imageUrl, bPackage, options) {
+	_this.addImageDrawingObject = function(imageUrl, options) {
 
 		if ( imageUrl && !_this.isViewerMode() ) {
 						
@@ -2579,10 +2479,14 @@ function DrawingObjects() {
 					obj.setActive();
 					
 					_this.showDrawingObjects(false);
-					_this.selectGraphicObject();
 					_this.sendGraphicObjectProps();
 					
-					_this.lockDrawingObject(obj.id, bPackage ? false : true, bPackage ? false : true);
+					var boundsChecker = _this.getBoundsChecker(obj);
+					aBoundsCheckers.push(boundsChecker);
+					
+					_this.objectLocker.reset();
+					_this.objectLocker.addObjectId(obj.id);
+					_this.objectLocker.checkObjects( function(result){ return result; } );
 				}
 				
 				worksheet.model.workbook.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
@@ -2672,7 +2576,6 @@ function DrawingObjects() {
 					}
 					
 					_this.showDrawingObjects(true);
-					_this.selectGraphicObject();
 				}
 				worksheet.model.workbook.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 			}
@@ -2759,42 +2662,13 @@ function DrawingObjects() {
 	}
 	
 	_this.rebuildChartGraphicObjects = function() {
-		for (var i = 0; i < _this.countDrawingObjects(); i++) {
+		for (var i = 0; i < aObjects.length; i++) {
 			var chart = aObjects[i].graphicObject;
 			if ( chart.isChart() )
 				chart.recalculate();
 		}
 	}
 	
-	_this.deleteSelectedDrawingObject = function() {
-
-		var bResult = false;
-		
-		if ( !_this.isViewerMode() ) {
-		
-			if ( _this.controller.selectedObjects.length ) {
-				
-				bResult = true;
-				var bRedraw = false;
-				
-				var graphicObjects = _this.controller.selectedObjects;
-				for ( var i = 0; i < graphicObjects.length; i++ ) {
-					for (var j = 0; j < aObjects.length; j++) {
-						if ( aObjects[j].graphicObject.Id == graphicObjects[i].Id ) {
-							graphicObjects[i].deselect(_this.controller);
-							aObjects.splice(j, 1);
-							bRedraw = true;
-							break;
-						}
-					}
-				}
-				if ( bRedraw )
-					_this.showDrawingObjects(true);
-			}
-		}
-		return bResult;
-	}
-
 	_this.updateDrawingObject = function(bInsert, operType, updateRange) {
 
 		// !!! Не вызывается сверху если Undo/Redo
@@ -2802,7 +2676,7 @@ function DrawingObjects() {
 		var changedRange = null;
 		var metrics = null;
 
-		for (var i = 0; i < _this.countDrawingObjects(); i++) {
+		for (var i = 0; i < aObjects.length; i++) {
 			var obj = aObjects[i];
 			var bbox = obj.isChart() ? obj.graphicObject.chart.range.intervalObject.getBBox0() : null;
 
@@ -3114,6 +2988,7 @@ function DrawingObjects() {
 					obj.graphicObject.setPosition( pxToMm(obj.getRealLeftOffset(true)), pxToMm(obj.getRealTopOffset(true)) );
 					obj.graphicObject.recalculateTransform();
 					obj.graphicObject.calculateTransformTextMatrix();
+					_this.showDrawingObjects(true);
 				}
 			}
 		}
@@ -3133,14 +3008,12 @@ function DrawingObjects() {
 				_this.editChartDrawingObject(drawingObject.graphicObject.chart);
 			}
 			
-			var bChartExists = false;
-			for (var i = 0; i < _this.countDrawingObjects(); i++) {
+			for (var i = 0; i < aObjects.length; i++) {
 								
 				var drawingObject = aObjects[i];
 				if ( drawingObject.isChart() ) {
 					var bbox = drawingObject.graphicObject.chart.range.intervalObject.getBBox0();
 					if ( oBBoxFrom.isEqual(bbox) ) {
-						bChartExists = true;
 						if ( bResize && drawingObject.graphicObject.selected ) {
 							editChart(drawingObject);
 							return;
@@ -3150,8 +3023,6 @@ function DrawingObjects() {
 					}
 				}
 			}
-			if ( bChartExists )
-				_this.selectGraphicObject();
 		}
 	}
 
@@ -3225,12 +3096,10 @@ function DrawingObjects() {
 		obj.setActive();
 		
 		_this.showDrawingObjects(false);
-		_this.selectGraphicObject();
 		_this.sendGraphicObjectProps();
 		
 		worksheet.model.workbook.handlers.trigger("asc_onEndAddShape");
 		
-		//_this.lockDrawingObject(obj.id, true, true);
 		_this.objectLocker.reset();
 		_this.objectLocker.addObjectId(obj.id);
 		_this.objectLocker.checkObjects( function(result){ return result; } );
@@ -3242,15 +3111,6 @@ function DrawingObjects() {
 	
 		if ( _this.controller.canGroup() ) {
             _this.controller.createGroup(null);
-			/*var obj = _this.createDrawingObject();
-			var group = _this.controller.createGroup(obj);
-			if ( group ) {
-				obj.graphicObject = group;
-				obj.setGraphicObjectCoords();
-				aObjects.push(obj);
-				_this.showDrawingObjects(false);
-                _this.selectGraphicObject();
-			} */
 		}
 	}
 	
@@ -3295,7 +3155,7 @@ function DrawingObjects() {
 	
 	_this.deleteDrawingBase = function(graphicId) {
 		
-		for (var i = 0; i < _this.countDrawingObjects(); i++) {
+		for (var i = 0; i < aObjects.length; i++) {
 			if ( aObjects[i].graphicObject.Id == graphicId ) {
 				aObjects.splice(i, 1);
                 return i;
@@ -3358,8 +3218,7 @@ function DrawingObjects() {
 			
 			_this.raiseLayerDrawingObjects();
             _this.OnUpdateOverlay();
-        }
-		_this.drawWorksheetHeaders();*/
+        }*/
 	}
 	
 	_this.setScrollOffset = function(x_px, y_px) {
@@ -3504,7 +3363,7 @@ function DrawingObjects() {
 	}
 	
 	//-----------------------------------------------------------------------------------
-	// Graphic object mouse events
+	// Graphic object mouse & keyboard events
 	//-----------------------------------------------------------------------------------
 	
 	_this.graphicObjectMouseDown = function(e, x, y) {
@@ -3519,12 +3378,14 @@ function DrawingObjects() {
 		_this.controller.onMouseUp( e, pxToMm(x - scrollOffset.x), pxToMm(y - scrollOffset.y) );
 	}
 	
+	// keyboard
+	
 	_this.graphicObjectKeyDown = function(e) {
 		return _this.controller.onKeyDown( e );
 	}
 	
 	_this.graphicObjectKeyPress = function(e) {
-        return _this.controller.onKeyPress( e );
+		return _this.controller.onKeyPress( e );
 	}
 	
 	//-----------------------------------------------------------------------------------
@@ -3540,7 +3401,7 @@ function DrawingObjects() {
 	}
 
 	_this.getWordChartObject = function() {
-		for (var i = 0; i < _this.countDrawingObjects(); i++) {
+		for (var i = 0; i < aObjects.length; i++) {
 			var obj = aObjects[i];
 			if (obj.isChart() && obj.chart.bChartEditor) {				
 				
@@ -3593,25 +3454,6 @@ function DrawingObjects() {
 	// Selection
 	//-----------------------------------------------------------------------------------
 
-	_this.selectDrawingObject = function(index, lockState, bWithoutRange) {
-
-		// locked - флаг для совместного редактирования
-		if (_this.checkDrawingObjectIndex(index)) {
-
-			var obj = aObjects[index];
-			if ( !obj.canDraw() )
-				return false;
-				
-			if ( obj.isGraphicObject() ) {
-				_this.selectGraphicObject();
-				return true;
-			}
-
-			worksheet._drawCollaborativeElements();
-		}
-		return false;
-	}
-
 	_this.selectDrawingObjectRange = function(id) {
 
 		worksheet.arrActiveChartsRanges = [];
@@ -3652,20 +3494,11 @@ function DrawingObjects() {
 
 	_this.getDrawingObject = function(id) {
 
-		for (var i = 0; i < _this.countDrawingObjects(); i++) {
+		for (var i = 0; i < aObjects.length; i++) {
 			if (aObjects[i].graphicObject.Id == id)
 				return aObjects[i];
 		}
 		return null;
-	}
-	
-	_this.getSelectedDrawingObjectIndex = function() {
-
-		for (var i = 0; i < _this.countDrawingObjects(); i++) {
-			if ( aObjects[i].graphicObject && aObjects[i].graphicObject.selected )
-				return i;
-		}
-		return -1;
 	}
 	
 	_this.getGraphicSelectionType = function(id) {
@@ -3687,174 +3520,16 @@ function DrawingObjects() {
 	}
 	
 	//-----------------------------------------------------------------------------------
-	// Multiple editing
-	//-----------------------------------------------------------------------------------
-	
-	_this.lockDrawingObject = function(id, bStart, bEnd, callbackFunc) {
-	
-		var sheetId = worksheet.model.getId();
-		var callbackFunc = callbackFunc ? callbackFunc : function(res) {
-			if (res)
-				worksheet._drawCollaborativeElements(true);
-		}
-		
-		if (false === worksheet.collaborativeEditing.isCoAuthoringExcellEnable()) {
-			// Запрещено совместное редактирование
-			callbackFunc(true);
-			return;
-		}
-		
-		if ( bStart )
-			worksheet.collaborativeEditing.onStartCheckLock();
-			
-		var lockInfo = worksheet.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, /*subType*/null, sheetId, id);
-
-		if (worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine)) {
-			// Редактируем сами
-			callbackFunc(true);
-			return;
-		}
-		else if (worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther)) {
-			// Уже ячейку кто-то редактирует
-			callbackFunc(false);
-			return;
-		}
-
-		worksheet.collaborativeEditing.addCheckLock(lockInfo);		
-		if ( bEnd ) {
-			worksheet.collaborativeEditing.onEndCheckLock(callbackFunc);
-		}
-	}
-	
-	_this.isLockedDrawingObject = function(id, callbackFunc) {
-	
-		var sheetId = worksheet.model.getId();
-		
-		if (false === worksheet.collaborativeEditing.isCoAuthoringExcellEnable()) {
-			// Запрещено совместное редактирование
-			callbackFunc(true);
-			return;
-		}
-				
-		worksheet.collaborativeEditing.onStartCheckLock();
-		var lockInfo = worksheet.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, /*subType*/null, sheetId, id);
-
-		if (worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine)) {
-			// Редактируем сами
-			callbackFunc(true);
-			return;
-		}
-		else if (worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther)) {
-			// Уже ячейку кто-то редактирует
-			callbackFunc(false);
-			return;
-		}
-		else {
-			// Редактируем сами
-			callbackFunc(true);
-		}
-	}
-
-	_this.selectLockedDrawingObject = function(id, lockState) {
-
-		var result = false;
-
-		for (var i = 0; i < _this.countDrawingObjects(); i++) {
-			if ( aObjects[i].graphicObject.Id === id ) {
-				_this.selectDrawingObject(i, lockState, true);
-				result = true;
-			}
-		}		
-
-		return result;
-	}
-
-	_this.resetLockedDrawingObject = function(id) {
-
-		var result = false;
-		for (var i = 0; i < _this.countDrawingObjects(); i++) {
-			if (aObjects[i].id === id) {
-				aObjects[i].flags.lockState = c_oAscObjectLockState.No;
-				result = true;
-			}
-		}
-		return result;
-	}
-
-	_this.resetLockedDrawingObjects = function() {
-
-		for (var i = 0; i < _this.countDrawingObjects(); i++) {
-			aObjects[i].flags.lockState = c_oAscObjectLockState.No;
-		}
-	}
-
-	_this.showDrawingObjectsLocks = function() {
-
-		for (var i = 0; i < _this.countDrawingObjects(); i++) {
-			if (aObjects[i].flags.lockState != c_oAscObjectLockState.No)
-				_this.selectLockedDrawingObject(aObjects[i].id, aObjects[i].flags.lockState);
-		}
-	}
-
-	//-----------------------------------------------------------------------------------
 	// Position
 	//-----------------------------------------------------------------------------------
 
-	_this.setSelectedDrawingObjectLayer = function(layerType) {
-
-		var index = _this.getSelectedDrawingObjectIndex();
-		if (index >= 0) {
-		
-			var undoRedoLayer = new DrawingLayer();
-			for (var i = 0; i < _this.countDrawingObjects(); i++) {
-				undoRedoLayer.aLayerBefore[i] = aObjects[i].graphicObject.Id;
-			}
-
-			switch (layerType) {
-				case c_oAscDrawingLayerType.BringToFront: 
-					{
-						var removedObj = aObjects.splice(index, 1);
-						aObjects.push(removedObj[0]);
-					}
-					break;
-				case c_oAscDrawingLayerType.SendToBack: 
-					{
-						var removedObj = aObjects.splice(index, 1);
-						aObjects.unshift(removedObj[0]);
-					}
-					break;
-				case c_oAscDrawingLayerType.BringForward: 
-					{
-						if (_this.checkDrawingObjectIndex(index + 1)) {
-							var removedObj = aObjects.splice(index, 1);
-							aObjects.splice(index + 1, 0, removedObj[0]);
-						}
-					}
-					break;
-				case c_oAscDrawingLayerType.SendBackward: 
-					{
-						if (_this.checkDrawingObjectIndex(index - 1)) {
-							var removedObj = aObjects.splice(index, 1);
-							aObjects.splice(index - 1, 0, removedObj[0]);
-						}
-					}
-					break;
-			}
-			
-			for (var i = 0; i < _this.countDrawingObjects(); i++) {
-				undoRedoLayer.aLayerAfter[i] = aObjects[i].graphicObject.Id;
-			}
-			
-			///History.Create_NewPoint();
-			History.Add(g_oUndoRedoDrawingLayer, historyitem_DrawingLayer, worksheet.model.getId(), null, undoRedoLayer);
-			
-			_this.showDrawingObjects(true);
-		}
+	_this.setGraphicObjectLayer = function(layerType) {
+		_this.controller.setGraphicObjectLayer(layerType);
 	}
 
 	_this.saveSizeDrawingObjects = function() {
 
-		for (var i = 0; i < _this.countDrawingObjects(); i++) {
+		for (var i = 0; i < aObjects.length; i++) {
 			var obj = aObjects[i];
 
 			obj.size.width = obj.getWidthFromTo();
@@ -3864,7 +3539,7 @@ function DrawingObjects() {
 
 	_this.updateSizeDrawingObjects = function() {
 
-		for (var i = 0; i < _this.countDrawingObjects(); i++) {
+		for (var i = 0; i < aObjects.length; i++) {
 			var obj = aObjects[i];
 
 			var left = obj.getRealLeftOffset();
@@ -3893,6 +3568,7 @@ function DrawingObjects() {
 			obj.graphicObject.recalculateTransform();
 			obj.graphicObject.calculateTransformTextMatrix();
 		}
+		_this.showDrawingObjects(true);
 	}
 
 	_this.checkCursorDrawingObject = function(x, y) {

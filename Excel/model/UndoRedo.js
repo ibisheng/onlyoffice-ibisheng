@@ -388,7 +388,6 @@ var UndoRedoDataTypes = new function() {
 			case this.StyleAlign: return new Align();break;
 			case this.CommentData: return new asc_CCommentData();break;
 			case this.CompositeCommentData: return new CompositeCommentData();break;
-			case this.DrawingObjectLayer: return new DrawingObjectLayer();break;
 			case this.ChartSeriesData: return new asc_CChartSeria();break;
 			case this.SheetAdd: return new UndoRedoData_SheetAdd();break;
 			case this.SheetRemove: return new UndoRedoData_SheetRemove();break;
@@ -3478,42 +3477,6 @@ UndoRedoComment.prototype = {
 		}
 	}
 }
-
-var g_oUndoRedoDrawingLayer = null;
-function UndoRedoDrawingLayer(wb){
-	this.wb = wb;
-	this.nType = UndoRedoClassTypes.Add(function(){return g_oUndoRedoDrawingLayer;});
-}
-UndoRedoDrawingLayer.prototype = {
-	getClassType : function()
-	{
-		return this.nType;
-	},
-	Undo : function(Type, Data, nSheetId)
-	{
-		this.UndoRedo(Type, Data, nSheetId, true);
-	},
-	Redo : function(Type, Data, nSheetId)
-	{
-		this.UndoRedo(Type, Data, nSheetId, false);
-	},
-	UndoRedo : function(Type, Data, nSheetId, bUndo)
-	{
-		var wsModel = this.wb.getWorksheetById(nSheetId);
-		if ( !wsModel.Drawings || !wsModel.Drawings.length )
-			return;
-		
-		var api = window["Asc"]["editor"];
-		if ( !api.wb )
-			return;
-		var ws = api.wb.getWorksheetById(nSheetId);
-		
-		if ( bUndo == true )
-			ws.objectRender.Undo(Type, Data);
-		else
-			ws.objectRender.Redo(Type, Data);
-	}
-};
 
 var g_oUndoRedoAutoFilters = null;
 function UndoRedoAutoFilters(wb){

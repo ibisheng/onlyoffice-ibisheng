@@ -648,28 +648,19 @@
 
 					case 8: // backspace
 						if (isViewerMode || t.isCellEditMode || t.isSelectionDialogMode) {return true;}
-						if (t.isSelectDrawingObject) {
-							//t.handlers.trigger("deleteDrawingObjectDone");
-							//t.isSelectDrawingObject = false;
-						} else {
-							// При backspace фокус не в редакторе (стираем содержимое)
-							t.handlers.trigger("editCell", 0, 0, /*isCoord*/false, /*isFocus*/false, /*isClearCell*/true, /*isHideCursor*/undefined,
-								function (res) {
-									if (res)
-										$(window).trigger(event);
-								});
-						}
+						
+						// При backspace фокус не в редакторе (стираем содержимое)
+						t.handlers.trigger("editCell", 0, 0, /*isCoord*/false, /*isFocus*/false, /*isClearCell*/true, /*isHideCursor*/undefined,
+							function (res) {
+								if (res)
+									$(window).trigger(event);
+							});
 						return true;
 
 					case 46: // Del
 						if (isViewerMode || t.isCellEditMode || t.isSelectionDialogMode) {return true;}
 						// Удаляем содержимое
-						if (t.isSelectDrawingObject) {
-							t.handlers.trigger("deleteDrawingObjectDone");
-							t.isSelectDrawingObject = false;
-						} else {
-							t.handlers.trigger("emptyCell");
-						}
+						t.handlers.trigger("emptyCell");
 						return true;
 
 					case 9: // tab
