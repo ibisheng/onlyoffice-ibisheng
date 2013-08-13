@@ -56,7 +56,8 @@ CMathBase.prototype =
             {
                 this.elements[i][j] = new CMathContent();
                 this.elements[i][j].relate(this);
-                this.elements[i][j].setComposition(this.Composition);
+                //this.elements[i][j].setComposition(this.Composition);
+                this.elements[i][j].setTxtPrp(this.TxtPrp);
                 //this.elements[i][j].setReduct(this.reduct);
                 //this.elements[i][j].setRunPrp(this.RunPrp);
 
@@ -89,15 +90,25 @@ CMathBase.prototype =
 
         return txtPrp;
     },
-    setTxtPrp: function()
+    getTxtPrp: function()
+    {
+        var txtPrp = new CMathTextPrp();
+        txtPrp.Merge(this.TxtPrp);
+        txtPrp.Merge(this.OwnTPrp);
+
+        txtPrp.FontSize *= this.reduct;
+
+        return txtPrp ;
+    },
+    setTxtPrp: function(txtPrp)
     {
         this.TxtPrp  = new CMathTextPrp();
         this.TxtPrp.Merge(txtPrp);
-        this.TxtPrp.Merge(this.OwnTPrp);
+        //this.TxtPrp.Merge(this.OwnTPrp);
 
         for(var i=0; i < this.nRow; i++)
             for(var j = 0; j < this.nCol; j++)
-                this.elements[i][j].setTxtPrp(TxtPrp);
+                this.elements[i][j].setTxtPrp(this.getTxtPrp());
     },
     getOwnTPrp: function()
     {
@@ -160,12 +171,7 @@ CMathBase.prototype =
                 {
                     this.elements[i][j] = arguments[j + i*this.nCol];
                     this.elements[i][j].relate(this);
-                    if(! this.elements[i][j].IsJustDraw() )
-                    {
-                        this.elements[i][j].setComposition(this.Composition);
-                        //this.elements[i][j].setReduct(this.reduct);
-                        //this.elements[i][j].setRunPrp(this.RunPrp);
-                    }
+                    this.elements[i][j].setTxtPrp(this.getTxtPrp());
                     this.elements[i][j].bMObjs = true;
                 }
             }

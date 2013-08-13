@@ -78,7 +78,7 @@ CMathText.prototype =
     {
         var code = this.value;
 
-        if( this.TxtPrp.Italic )
+        if( this.getTxtPrp().Italic )
         {
             if(code == 0x0068) // h
                 code = 0x210E;
@@ -149,7 +149,6 @@ CMathText.prototype =
     {
         this.TxtPrp  = new CMathTextPrp();
         this.TxtPrp.Merge(txtPrp);
-        this.TxtPrp.Merge(this.OwnTPrp);
 
     },
     setLIterator: function(bIterator)
@@ -159,6 +158,14 @@ CMathText.prototype =
     getRunPrp: function()
     {
         return this.TxtPrp;
+    },
+    getTxtPrp: function()
+    {
+        var txtPrp = new CMathTextPrp();
+        txtPrp.Merge(this.TxtPrp);
+        txtPrp.Merge(this.OwnTPrp);
+
+        return txtPrp ;
     },
     getOwnTPrp: function()
     {
@@ -174,7 +181,7 @@ CMathText.prototype =
     recalculateSize: function()
     {
         var txtPrp = new CMathTextPrp();
-        txtPrp.Merge(this.TxtPrp);
+        txtPrp.Merge(this.getTxtPrp());
         txtPrp.Italic = false;
 
         g_oTextMeasurer.SetFont( txtPrp );
@@ -252,7 +259,7 @@ CMathText.prototype =
     draw: function()
     {
         var txtPrp = new CMathTextPrp();
-        txtPrp.Merge(this.TxtPrp);
+        txtPrp.Merge(this.getTxtPrp());
         txtPrp.Italic = false;
 
         MathControl.pGraph.b_color1(0,0,0,255);

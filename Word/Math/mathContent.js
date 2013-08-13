@@ -136,14 +136,7 @@ CMathContent.prototype =
         for(var i = start; i < end; i++)
             this.content[i].value.setTxtPrp(txtPrp);
     },
-    old_setTxtPrp: function(txtPrp) // для всего контента, в случае, когда селект вышел за пределы контента, когда начинали селект + когда в коннтенте есть мат. элементы
-    {
-        this.textPrp.Merge(txtPrp);
-
-        for(var i = 0; i < this.content.length; i++)
-            this.content[i].value.setTxtPrp(txtPrp);
-    },
-    setTxtPrp: function(txtPrp, start, end) //parent properties
+    old_old_setTxtPrp: function(txtPrp, start, end) //parent properties
     {
         this.TxtPrp  = new CMathTextPrp();
         this.TxtPrp.Merge(txtPrp);
@@ -152,7 +145,7 @@ CMathContent.prototype =
         for(var i = start; i < end; i++)
             this.content[i].value.setTxtPrp(this.TxtPrp);
     },
-    changeTxtPrp: function(txtPrp, bAll)
+    old_changeTxtPrp: function(txtPrp, bAll)
     {
         var start, end;
         if( this.selection.startPos != this.selection.endPos )
@@ -171,6 +164,62 @@ CMathContent.prototype =
             this.setTxtPrp(txtPrp, 0, this.content.length);
         else
             this.setTxtPrp(txtPrp, start, end);
+    },
+    old_setTxtPrp: function(txtPrp, bAll)
+    {
+        var start, end;
+        if( this.selection.startPos != this.selection.endPos )
+        {
+            start = this.selection.startPos;
+            end = this.selection.endPos;
+            if(start > end)
+            {
+                tmp = start;
+                start = end;
+                end = tmp;
+            }
+        }
+
+        if(bAll)
+        {
+            this.TxtPrp  = new CMathTextPrp();
+            this.TxtPrp.Merge(txtPrp);
+            //this.TxtPrp.Merge(this.OwnTPrp);
+            start = 0;
+            end = this.content.length;
+        }
+
+        for(var i = start; i < end; i++)
+            this.content[i].value.setTxtPrp(txtPrp);
+
+    },
+    setTxtPrp: function(txtPrp)
+    {
+        this.TxtPrp  = new CMathTextPrp();
+        this.TxtPrp.Merge(txtPrp);
+        this.changeTxtPrp(txtPrp, 0, this.content.length);
+    },
+    setTxtPrp_2: function(txtPrp)
+    {
+        var start, end;
+        if( this.selection.startPos != this.selection.endPos )
+        {
+            start = this.selection.startPos;
+            end = this.selection.endPos;
+            if(start > end)
+            {
+                tmp = start;
+                start = end;
+                end = tmp;
+            }
+        }
+
+        this.changeTxtPrp(txtPrp, start, end);
+    },
+    changeTxtPrp: function(txtPrp, start, end)
+    {
+        for(var i = start; i < end; i++)
+            this.content[i].value.setTxtPrp(txtPrp);
     },
     setOwnTPrp: function(txtPrp)
     {
@@ -203,7 +252,7 @@ CMathContent.prototype =
         }
         else
         {
-            runPrp.Merge(this.TxtPrp);
+            runPrp.Merge(this.getTxtPrp());
         }
 
         return runPrp;
@@ -293,7 +342,7 @@ CMathContent.prototype =
         
         return TComp;
     },
-    setComposition: function(Compos)
+    old_setComposition: function(Compos)
     {
         this.Composition = Compos;
     },
@@ -433,7 +482,7 @@ CMathContent.prototype =
         if( mathElem !== null )
         {
             mathElem.relate(this);
-            mathElem.setComposition(this.Composition);
+            //mathElem.setComposition(this.Composition);
             mathElem.setReduct(this.reduct);
             var runPrp = this.getRunPrp(this.CurPos);
             mathElem.setTxtPrp( runPrp );
@@ -479,8 +528,8 @@ CMathContent.prototype =
             case 3:
                 var fract = this.addMComponent(0);
                 fract.init();
-                fract.fillPlaceholders();
                 fract.setSimple(true);
+                fract.fillPlaceholders();
                 break;
             case 4:
                 var fract = this.addMComponent(0);
@@ -2231,6 +2280,16 @@ CMathContent.prototype =
     {
         this.reduct = this.reduct*coeff;
     },
+    getTxtPrp: function()
+    {
+        var txtPrp = new CMathTextPrp();
+        txtPrp.Merge(this.TxtPrp);
+        txtPrp.Merge(this.OwnTPrp);
+
+        txtPrp.FontSize *= this.getReduct();
+
+        return txtPrp;
+    },
     old_getTxtPrp: function()
     {
         var txtPrp;
@@ -2279,6 +2338,8 @@ CMathContent.prototype =
         placeholder.relate(this);
         //placeholder.addCode(StartTextElement);
         placeholder.fillPlaceholders();
+        placeholder.setTxtPrp(this.getTxtPrp());
+
         this.content.push( new mathElem( placeholder ) );
 
     },
@@ -2821,7 +2882,7 @@ CMathContent.prototype =
     },
     update_Cursor: function()
     {
-        var sizeCursor = this.TxtPrp.FontSize *g_dKoef_pt_to_mm;
+        var sizeCursor = this.getTxtPrp().FontSize*g_dKoef_pt_to_mm;
         var position = {x: this.pos.x + this.content[this.CurPos].widthToEl, y: this.pos.y + this.size.center - sizeCursor/2 };
 
         editor.WordControl.m_oLogicDocument.DrawingDocument.SetTargetSize( sizeCursor );
@@ -3258,7 +3319,7 @@ CMathContent.prototype =
             this.content[i].value.setPosition(t);
         }
     },
-    old_setPosition: function( _pos )
+    setPosition: function( _pos )
     {
         this.pos = { x: _pos.x + this.g_mContext.left, y: _pos.y};
         var max_cent = this.size.center;
@@ -3278,7 +3339,7 @@ CMathContent.prototype =
             this.content[i].value.setPosition(t);
         }
     },
-    setPosition: function( _pos )
+    new_setPosition: function( _pos )
     {
         this.pos = { x: _pos.x + this.g_mContext.left, y: _pos.y};
 
@@ -3668,11 +3729,6 @@ CMathContent.prototype =
         return result;
 
     },
-    fillPlaceholder: function()
-    {
-        this.fillMComponent(0);
-        this.add(StartTextElement);
-    },
     fillText: function(txt)
     {
         for(var i = 0; i < txt.length; i++)
@@ -3939,9 +3995,9 @@ CMathComposition.prototype =
 
         this.Root = new CMathContent();
         this.Root.g_mContext = gps;
-        this.Root.setComposition(this);
+        //this.Root.setComposition(this);
         this.setDefaultPrp();
-        this.Root.changeTxtPrp(this.TxtPrp, false);
+        this.Root.setTxtPrp(this.TxtPrp, true);
 
         this.CurrentContent = this.Root;
         this.SelectContent  = this.Root;
@@ -4193,7 +4249,8 @@ CMathComposition.prototype =
     },
     SetTxtPrp: function(txtPrp)
     {
-        this.SelectContent.changeTxtPrp(txtPrp, false);
+        //this.SelectContent.changeTxtPrp(txtPrp, false);
+        this.SelectContent.setTxtPrp(txtPrp, false);
         this.Resize();
         this.UpdatePosition();
         this.UpdateCursor();
@@ -4261,7 +4318,7 @@ CMathComposition.prototype =
 
     //// finished equation ////
 
-    AddMathEquation: function (ind)
+    old_AddMathEquation: function (ind)
     {
         this.ClearSelect();
 

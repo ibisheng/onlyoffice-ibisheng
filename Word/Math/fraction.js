@@ -53,6 +53,11 @@ CBarFraction.prototype.hideBar = function(flag)
 CBarFraction.prototype.setSimple = function(flag)
 {
     this.bSimple = flag;
+
+    if(flag)
+        this.setReduct(DEGR_REDUCT);
+    else
+        this.setReduct(1);
 }
 CBarFraction.prototype.getTxtPrp = function()
 {
