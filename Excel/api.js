@@ -18,6 +18,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		var asc_CCollaborativeEditing = asc.CCollaborativeEditing;
 		var asc_CAdjustPrint = asc.asc_CAdjustPrint;
 		var asc_user  = asc.asc_CUser;
+		var asc_CAscEditorPermissions = asc.asc_CAscEditorPermissions;
 		var prot;
 
 
@@ -71,6 +72,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.cCharDelimiter = String.fromCharCode(5);
 			this.chartEditor = undefined;
 			this.documentOpenOptions = undefined;		// Опции при открытии (пока только опции для CSV)
+			this.DocInfo = null;
 
 			// объекты, нужные для отправки в тулбар (шрифты, стили)
 			this.guiFonts = null;		// Переменная для сохранения фонтов для облегченной версии (переход в edit mod)
@@ -353,18 +355,24 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				t.FontLoader.fontFilesPath = fontsPath;
 				t.asc_registerCallback("loadFonts", function (fonts, callback){t._loadFonts(fonts, callback);});
 			},
-
+			asc_setDocInfo: function (c_DocInfo) {
+				if(c_DocInfo)
+					this.DocInfo = c_DocInfo;			
+			},
 			asc_LoadDocument: function (c_DocInfo) {
 				var t = this;
-				if(c_DocInfo){
-					this.documentId     		= c_DocInfo["Id"];
-					this.documentUrl    		= c_DocInfo["Url"];
-					this.documentTitle  		= c_DocInfo["Title"];
-					this.documentFormat 		= c_DocInfo["Format"];
-					this.documentVKey   		= c_DocInfo["VKey"];
-					this.documentOrigin 		= c_DocInfo["Origin"];
-					this.chartEditor			= c_DocInfo["ChartEditor"];
-					this.documentOpenOptions 	= c_DocInfo["Options"];
+				
+				this.asc_setDocInfo(c_DocInfo);
+				
+				if(this.DocInfo){
+					this.documentId     		= this.DocInfo["Id"];
+					this.documentUrl    		= this.DocInfo["Url"];
+					this.documentTitle  		= this.DocInfo["Title"];
+					this.documentFormat 		= this.DocInfo["Format"];
+					this.documentVKey   		= this.DocInfo["VKey"];
+					this.documentOrigin 		= this.DocInfo["Origin"];
+					this.chartEditor			= this.DocInfo["ChartEditor"];
+					this.documentOpenOptions 	= this.DocInfo["Options"];
 
 					var nIndex = -1;
 					if(this.documentTitle)
@@ -376,8 +384,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 					// Выставляем пользователя
 					this.User = new asc_user();
-					this.User.asc_setId(c_DocInfo["UserId"]);
-					this.User.asc_setUserName(c_DocInfo["UserName"]);
+					this.User.asc_setId(this.DocInfo["UserId"]);
+					this.User.asc_setUserName(this.DocInfo["UserName"]);
 
 					//Взято из редактора документов
 					var sProtocol = window.location.protocol;
@@ -389,7 +397,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						this.documentOrigin = sHost;
 				}
 
-                if (c_DocInfo["OfflineApp"] && (true == c_DocInfo["OfflineApp"])) {
+                if (this.DocInfo["OfflineApp"] && (true == this.DocInfo["OfflineApp"])) {
                     this.isCoAuthoringEnable = false;
 
                     window['scriptBridge'] = {};
@@ -417,7 +425,26 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					this._startOpenDocument({returnCode: 0, val:wb});
 				}
 			},
-
+			
+			asc_getEditorPermissions : function(){
+				if (this.DocInfo && 
+					this.DocInfo["Id"] &&
+					this.DocInfo["Url"])
+				{
+					var t = this;
+					var v = {};
+					v["c"] = "getsettings";	
+					v["format"] = this.DocInfo["Format"];
+					v["vkey"] = this.DocInfo["VKey"];
+					v["editorid"] = c_oEditorId.Excel;
+					this._asc_sendCommand(function (response) {t._onGetEditorPermissions(response);}, JSON.stringify(v));
+				}
+				else
+				{
+					this.handlers.trigger("asc_onGetEditorPermissions", new asc_CAscEditorPermissions());
+				}
+			},
+			
 			asc_DownloadAs : function(typeFile){//передаем число соответствующее своему формату. например  c_oAscFileType.XLSX
                 if (undefined != window['appBridge']) {
                     window['appBridge']['dummyCommandDownloadAs'] ();     // TEST
@@ -767,6 +794,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 									var outputData = JSON.parse(incomeObject.data);
 									oThis._asc_downloadAs(outputData.format, callback, false, null, outputData.savekey);
 									break;
+								case "getsettings":
+									if(callback)
+										callback(incomeObject);
+									break;									
 								case "err":
 									result = {returnCode: c_oAscError.Level.Critical, val:parseInt(incomeObject.data)};
 									oThis.handlers.trigger("asc_onError", _mapAscServerErrorToAscError(parseInt(incomeObject.data)), c_oAscError.Level.Critical);
@@ -932,6 +963,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			 * asc_onRenameCellTextEnd		(countCellsFind, countCellsReplace)							- эвент об окончании замены текста в ячейках (мы не можем сразу прислать ответ)
 			 * asc_onWorkbookLocked			(result)													- эвент залочена ли работа с листами или нет
 			 * asc_onWorksheetLocked		(index, result)												- эвент залочен ли лист или нет
+			 * asc_onGetEditorPermissions	(permission)												- эвент о правах редактора.
 			 */
 
 			asc_StartAction: function (type, id) {
@@ -1080,6 +1112,20 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				
 				 if (window.USER_AGENT_SAFARI_MACOS)
 					setInterval(SafariIntervalFocus, 10);
+			},
+			
+			_onGetEditorPermissions: function(response) {
+				if(null != response && "getsettings" == response.type){
+					var oSettings = JSON.parse(response.data);
+					
+					//Set up coauthoring and spellcheker service
+					//window.g_cAscCoAuthoringUrl = oSettings['g_cAscCoAuthoringUrl'];
+					//window.g_cAscSpellCheckUrl = oSettings['g_cAscSpellCheckUrl'];
+					
+					var oEditorPermissions = new asc_CAscEditorPermissions(oSettings);
+					
+					this.handlers.trigger("asc_onGetEditorPermissions", oEditorPermissions);	
+				}
 			},
 
 			// Стартуем соединение с сервером для совместного редактирования
@@ -2976,6 +3022,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot = spreadsheet_api.prototype;
 
 		prot["asc_Init"] = prot.asc_Init;
+		prot["asc_setDocInfo"] = prot.asc_setDocInfo;
+		prot["asc_getEditorPermissions"] = prot.asc_getEditorPermissions;
 		prot["asc_LoadDocument"] = prot.asc_LoadDocument;
 		prot["asc_LoadEmptyDocument"] = prot.asc_LoadEmptyDocument;
 		prot["asc_DownloadAs"] = prot.asc_DownloadAs;

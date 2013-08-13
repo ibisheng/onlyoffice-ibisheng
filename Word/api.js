@@ -737,7 +737,8 @@ asc_docs_api.prototype.asc_getEditorPermissions = function()
 	}
 	else
 	{
-		editor.asc_fireCallback("asc_onGetEditorPermissions", new CAscEditorPermissions());	
+		var asc_CAscEditorPermissions = window["Asc"].asc_CAscEditorPermissions;
+		editor.asc_fireCallback("asc_onGetEditorPermissions", new asc_CAscEditorPermissions());	
 	}
 }
 
@@ -750,15 +751,8 @@ asc_docs_api.prototype.asc_getEditorPermissionsCallback = function(incomeObject)
 		window.g_cAscCoAuthoringUrl = oSettings['g_cAscCoAuthoringUrl'];
 		window.g_cAscSpellCheckUrl = oSettings['g_cAscSpellCheckUrl'];
 		
-		var oEditorPermissions = new CAscEditorPermissions();
-		oEditorPermissions.asc_setCanEdit(oSettings["canEdit"]);
-		oEditorPermissions.asc_setCanDownload(oSettings["canDownload"]);
-		oEditorPermissions.asc_setCanCoAuthoring(oSettings["canCoAuthoring"]);
-		oEditorPermissions.asc_setCanReaderMode(oSettings["canReaderMode"]);
-		oEditorPermissions.asc_setCanBranding(oSettings["canBranding"]);
-		oEditorPermissions.asc_setIsAutosaveEnable(oSettings["isAutosaveEnable"]);
-		oEditorPermissions.asc_setAutosaveMinInterval(oSettings["AutosaveMinInterval"]);
-		
+		var asc_CAscEditorPermissions = window["Asc"].asc_CAscEditorPermissions;
+		var oEditorPermissions = new asc_CAscEditorPermissions(oSettings);
 		editor.asc_fireCallback("asc_onGetEditorPermissions", oEditorPermissions);	
 	}
 }

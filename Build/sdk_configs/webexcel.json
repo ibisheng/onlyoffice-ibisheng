@@ -19,6 +19,7 @@
                 "../Common/docscoapicommon.js",
                 "../Common/docscoapi.js",
                 "../Common/downloaderfiles.js",
+				"../Common/apiCommon.js",
                 "../Common/commonDefines.js",
                 "../Common/editorscommon.js",
                 "../Common/NumFormat.js",
