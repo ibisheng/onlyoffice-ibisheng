@@ -221,6 +221,11 @@ CIterators.prototype.getLowerIterator = function()
 {
     return this.elements[1][0];
 }
+CIterators.prototype.setReduct = function(reduct)
+{
+    this.elements[0][0].setReduct(reduct);
+    this.elements[1][0].setReduct(reduct);
+}
 
 function CDegreeSubSup(type)
 {
