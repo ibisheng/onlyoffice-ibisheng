@@ -27,6 +27,7 @@
                 "../Common/wordcopypaste.js",
                 "../Common/downloaderfiles.js",
                 "../Common/editorscommon.js",
+				"../Common/apiCommon.js",
                 "../Common/Shapes/Serialize.js",
                 "../Common/Shapes/SerializeWriter.js",
                 "../Common/FontsFreeType/font_engine.js",

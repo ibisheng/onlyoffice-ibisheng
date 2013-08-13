@@ -43,6 +43,7 @@ function asc_docs_api(name)
 
     this.DocumentUrl = "";
     this.DocumentName = "";
+	this.DocInfo = null;
         
     this.ShowParaMarks = false;
 	this.isAddSpaceBetweenPrg = false;
@@ -362,16 +363,56 @@ asc_docs_api.prototype.Init = function()
 	}
 	this.WordControl.Init();
 }
+asc_docs_api.prototype.asc_getEditorPermissions = function()
+{
+	if(this.DocInfo && this.DocInfo.get_Id())
+	{
+		var rData = {};
+		rData["c"] = "getsettings";	
+		rData["format"] = this.DocInfo.get_Format();
+		rData["vkey"] = this.DocInfo.get_VKey();
+		rData["editorid"] = c_oEditorId.Presentation;
 
+		sendCommand( this, this.asc_getEditorPermissionsCallback, JSON.stringify(rData) );	
+	}
+	else
+	{
+		var asc_CAscEditorPermissions = window["Asc"].asc_CAscEditorPermissions;
+		editor.asc_fireCallback("asc_onGetEditorPermissions", new asc_CAscEditorPermissions());	
+	}
+}
+
+asc_docs_api.prototype.asc_getEditorPermissionsCallback = function(incomeObject)
+{				
+	if(null != incomeObject && "getsettings" == incomeObject.type){
+		var oSettings = JSON.parse(incomeObject.data);
+		
+		//Set up coauthoring and spellcheker service
+		window.g_cAscCoAuthoringUrl = oSettings['g_cAscCoAuthoringUrl'];
+		window.g_cAscSpellCheckUrl = oSettings['g_cAscSpellCheckUrl'];
+		
+		var asc_CAscEditorPermissions = window["Asc"].asc_CAscEditorPermissions;
+		var oEditorPermissions = new asc_CAscEditorPermissions(oSettings);
+		editor.asc_fireCallback("asc_onGetEditorPermissions", oEditorPermissions);	
+	}
+}
+asc_docs_api.prototype.asc_setDocInfo = function(c_DocInfo)
+{
+	if(c_DocInfo)
+		this.DocInfo = c_DocInfo;
+}
 asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 {
+
+	this.asc_setDocInfo(c_DocInfo);
+	
     this.WordControl.m_oDrawingDocument.m_bIsOpeningDocument = true;
 
-    if(c_DocInfo){
-        documentId = c_DocInfo.get_Id();
-        documentUrl = c_DocInfo.get_Url();
-        documentTitle = c_DocInfo.get_Title();
-        documentFormat = c_DocInfo.get_Format();
+	if(this.DocInfo){
+		documentId = this.DocInfo.get_Id();
+		documentUrl = this.DocInfo.get_Url();
+		documentTitle = this.DocInfo.get_Title();
+		documentFormat = this.DocInfo.get_Format();
 
 		var nIndex = -1;
 		if(documentTitle)
@@ -381,8 +422,8 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 		else
 			documentTitleWithoutExtention = documentTitle;
 		
-        documentVKey = c_DocInfo.get_VKey();
-        // documentOrigin  = c_DocInfo.get_Origin();
+		documentVKey = this.DocInfo.get_VKey();
+		// documentOrigin  = this.DocInfo.get_Origin();
         var sProtocol = window.location.protocol;
         var sHost = window.location.host;
         documentOrigin = "";
@@ -393,14 +434,14 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
 
 		var asc_user = window["Asc"].asc_CUser;
 		this.User = new asc_user();
-		this.User.asc_setId(c_DocInfo.get_UserId());
-		this.User.asc_setUserName(c_DocInfo.get_UserName());
+		this.User.asc_setId(this.DocInfo.get_UserId());
+		this.User.asc_setUserName(this.DocInfo.get_UserName());
     }
 
     this.DocumentName = documentTitle;
     var oThis = this;
 
-    if (c_DocInfo.get_OfflineApp() === true)
+    if (this.DocInfo.get_OfflineApp() === true)
     {
         this.OfflineAppDocumentStartLoad();
         return;
@@ -417,7 +458,7 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
     else
     {
         documentUrl =  "document/";
-        c_DocInfo.put_OfflineApp(true);
+        this.DocInfo.put_OfflineApp(true);
 
         // For test create unique id
         documentId = "0123456789";
@@ -3877,6 +3918,10 @@ function sendCommand(editor, fCallback, rdata){
                     if(fCallback)
                         fCallback(incomeObject);
                 break;
+				case "getsettings":
+					if(fCallback)
+						fCallback(incomeObject);
+				break;
                 case "err":
 					editor.asc_fireCallback("asc_onError",_mapAscServerErrorToAscError(parseInt(incomeObject.data)),c_oAscError.Level.Critical);
 					if(fCallback)
