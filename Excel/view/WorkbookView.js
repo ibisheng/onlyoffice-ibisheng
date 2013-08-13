@@ -872,6 +872,9 @@
 						val = !(selectionInfo.asc_getFont().asc_getUnderline());
 						val = val ? "single" : "none";
 						break;
+					case "s":
+						val = !(selectionInfo.asc_getFont().asc_getStrikeout());
+						break;
 				}
 				return this.setFontAttributes(prop, val);
 			},

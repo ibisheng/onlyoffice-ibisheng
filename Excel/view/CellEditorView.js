@@ -1558,7 +1558,10 @@
 						val = (null === val) ? ((format.u) ? !format.u : true) : val;
 						format.u = val;
 						break;
-					case "s":  format.s = val; break;
+					case "s":
+						val = (null === val) ? ((format.s) ? !format.s : true) : val;
+						format.s = val;
+						break;
 					case "fa": format.va = val; break;
 					case "c":
 						format.c = asc.numberToCSSColor(val.getRgb());
@@ -1724,6 +1727,18 @@
 						kind = event.ctrlKey ? kBeginOfText : kBeginOfLine;
 						event.shiftKey ? t._selectChars(kind) : t._moveCursor(kind);
 						return false;
+
+					case 53: // 5
+						if (event.ctrlKey) {
+							if (!t.hasFocus) {t.setFocus(true);}
+							// Отключим стандартную обработку браузера нажатия ctlr + 5
+							event.stopPropagation();
+							event.preventDefault();
+							if (hieroglyph) {t._syncEditors();}
+							t.setTextStyle("s", null);
+							return true;
+						}
+						break;
 
 					case 65: // A
 						if (event.ctrlKey) {

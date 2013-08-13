@@ -785,14 +785,15 @@
 						} */
 						break;
 
-					case 66: // make bold       Ctrl + b
-					case 73: // make italic     Ctrl + i
-					case 83: // save            Ctrl + s
-					case 85: // make underline  Ctrl + u
-					case 86: // paste           Ctrl + v
-					case 88: // cut             Ctrl + x
-					case 89: // redo            Ctrl + y
-					case 90: // undo            Ctrl + z
+					case 53: // make strikethrough	Ctrl + 5
+					case 66: // make bold			Ctrl + b
+					case 73: // make italic			Ctrl + i
+					case 83: // save				Ctrl + s
+					case 85: // make underline		Ctrl + u
+					case 86: // paste				Ctrl + v
+					case 88: // cut					Ctrl + x
+					case 89: // redo				Ctrl + y
+					case 90: // undo				Ctrl + z
 						if (isViewerMode || t.isSelectionDialogMode) {stop(); return false;}
 
 					case 65: // select all      Ctrl + a
@@ -807,6 +808,7 @@
 						// Вызовем обработчик
 						if (!t.__handlers) {
 							t.__handlers = {
+								53: function () {stop(); t.handlers.trigger("setFontAttributes", "s");},
 								65: function () {stop(); t.handlers.trigger("changeSelection", /*isStartPoint*/true,
 									0, 0, /*isCoord*/true, /*isSelectMode*/false);},
 								66: function () {stop(); t.handlers.trigger("setFontAttributes", "b");},
