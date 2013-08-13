@@ -94,11 +94,6 @@ function CPPTXContentLoader()
         if (this.Reader == null)
             this.Reader = new BinaryPPTYLoader();
 
-        if (null != paraDrawing)
-        {
-            this.ParaDrawing = paraDrawing;
-            this.TempMainObject = null;
-        }
         this.LogicDocument = null;
 
         this.Reader.ImageMapChecker = this.ImageMapChecker;
