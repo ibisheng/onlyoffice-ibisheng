@@ -9,6 +9,8 @@ function CGlyphOperator()
 
     this.penW = 1; // px
 
+    this.TxtPrp = new CMathTextPrp();
+
 }
 CGlyphOperator.prototype.setLocation = function(loc, turn)
 {
@@ -39,7 +41,7 @@ CGlyphOperator.prototype.recalculateSize = function(measure)
     var sizeGlyph = this.calcSize(measure);
     var width, height, center;
 
-    var betta = this.Parent.getTxtPrp().FontSize/36;
+    var betta = this.getTxtPrp().FontSize/36;
     var bHor = this.loc == 0 || this.loc  == 1;
 
     if(bHor)
@@ -286,6 +288,14 @@ CGlyphOperator.prototype.relate = function(parent)
 CGlyphOperator.prototype.Resize = function()
 {
     this.recalculateSize();
+}
+CGlyphOperator.prototype.getTxtPrp = function()
+{
+    return this.TxtPrp;
+}
+CGlyphOperator.prototype.setTxtPrp = function(txtPrp)
+{
+    this.TxtPrp.Merge(txtPrp);
 }
 
 function COperator(loc, turn)
@@ -647,7 +657,7 @@ function COperatorBracket()
 extend(COperatorBracket, CGlyphOperator);
 COperatorBracket.prototype.calcSize = function( measure )
 {
-    var betta = this.Parent.getTxtPrp().FontSize/36;
+    var betta = this.getTxtPrp().FontSize/36;
 
     // перевернутая скобка
     var minBoxH = 4.917529296874999 *betta, //width of 0x28
@@ -734,7 +744,7 @@ COperatorBracket.prototype.calcCoord = function(measure)
     //TODO
     // X[1] > X[52]
 
-    var textScale = this.Parent.getTxtPrp().FontSize/1000; // 1000 pt
+    var textScale = this.getTxtPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент используется для того, чтобы перевести координаты в миллиметры
     
     var augm = measure/((X[52] + (X[0] - X[1])/2 + X[1] - X[52])*alpha*2);
@@ -1164,7 +1174,7 @@ function COperatorParenthesis()
 extend(COperatorParenthesis, CGlyphOperator);
 COperatorParenthesis.prototype.calcSize = function(measure)
 {
-    var betta = this.Parent.getTxtPrp().FontSize/36;
+    var betta = this.getTxtPrp().FontSize/36;
     
     var maxBoxH =   9.63041992187 *betta, //9.63 width of 0x239D
         minBoxH =   5.27099609375 *betta, //width of 0x28
@@ -1196,7 +1206,7 @@ COperatorParenthesis.prototype.calcCoord = function(measure)
     X[8] = 24398; Y[8] = 26227;
     X[9] = 39470; Y[9] = 26227;
 
-    var textScale = this.Parent.getTxtPrp().FontSize/1000; // 1000 pt
+    var textScale = this.getTxtPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент используется для того, чтобы перевести координаты в миллиметры
 
     var aug = measure/(X[9]*alpha)/2; //Y[9]*alpha - высота скобки
@@ -1498,7 +1508,7 @@ COperatorAngleBracket.prototype.calcSize = function(measure)
 {
     //скобка перевернутая
 
-    var betta = this.Parent.getTxtPrp().FontSize/36;
+    var betta = this.getTxtPrp().FontSize/36;
     var widthBr = 11.994444444444444*betta;
 
     if( measure/widthBr > 3.768 )
@@ -1522,7 +1532,7 @@ COperatorAngleBracket.prototype.calcCoord = function(measure)
     X[6] = 76439; Y[6] = 21036;
     X[7] = 38990; Y[7] = 7665;
 
-    var textScale = this.Parent.getTxtPrp().FontSize/1000; // 1000 pt
+    var textScale = this.getTxtPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент используется для того, чтобы перевести координаты в миллиметры
 
     var augm = measure/(X[5]*alpha);
@@ -1618,7 +1628,7 @@ CSquareBracket.prototype.calcCoord = function(measure)
     X[7] = 76224; Y[7] = 6912;
     X[8] = 3200;  Y[8] = 6912;
 
-    var textScale = this.Parent.getTxtPrp().FontSize/1000; // 1000 pt
+    var textScale = this.getTxtPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент используется для того, чтобы перевести координаты в миллиметры
 
     var lng = measure/alpha - X[4] - 2*X[0];
@@ -1660,7 +1670,7 @@ CSquareBracket.prototype.drawPath = function(XX, YY)
 }
 CSquareBracket.prototype.calcSize = function()
 {
-    var betta = this.Parent.getTxtPrp().FontSize/36;
+    var betta = this.getTxtPrp().FontSize/36;
     
     var height = 4.446240234375*betta;
     //var width = 12.0*this.betta;
@@ -1687,7 +1697,7 @@ CHalfSquareBracket.prototype.calcCoord = function(measure)
     X[5] = 77522; Y[5] = 0;
     X[6] = 0; Y[6] = 0;
 
-    var textScale = this.Parent.getTxtPrp().FontSize/1000; // 1000 pt
+    var textScale = this.getTxtPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент используется для того, чтобы перевести координаты в миллиметры
 
     var w1 = X[4],
@@ -1718,7 +1728,7 @@ CHalfSquareBracket.prototype.calcCoord = function(measure)
 }
 CHalfSquareBracket.prototype.calcSize = function()
 {
-    var betta = this.Parent.getTxtPrp().FontSize/36;
+    var betta = this.getTxtPrp().FontSize/36;
 
     var height = 4.446240234375*betta;
     var width = 11.99444444444*betta;
@@ -1810,7 +1820,7 @@ COperatorLine.prototype.setContent = function()
 }
 COperatorLine.prototype.calcSize = function()
 {
-    var betta = this.Parent.getTxtPrp().FontSize/36;
+    var betta = this.getTxtPrp().FontSize/36;
 
     var height = 4.018359374999999*betta;
     var width = 11.99444444444*betta;
@@ -1828,7 +1838,7 @@ COperatorLine.prototype.calcCoord = function(measure)
     X[3] = 77504; Y[3] = 0;
     X[4] = 0;     Y[4] = 0;
 
-    var textScale = this.Parent.getTxtPrp().FontSize/1000; // 1000 pt
+    var textScale = this.getTxtPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент используется для того, чтобы перевести координаты в миллиметры
 
     var XX = new Array(),
@@ -1873,7 +1883,7 @@ function CWhiteSquareBracket()
 extend(CWhiteSquareBracket, CGlyphOperator);
 CWhiteSquareBracket.prototype.calcSize = function()
 {
-    var betta = this.Parent.getTxtPrp().FontSize/36;
+    var betta = this.getTxtPrp().FontSize/36;
 
     var height = 5.5872558593749995*betta;
     var width = 11.99444444444*betta;
@@ -1916,7 +1926,7 @@ CWhiteSquareBracket.prototype.calcCoord = function(measure)
     X[12] = 74304; Y[12] = 4600;
     X[13] = 74304; Y[13] = 12700;
 
-    var textScale = this.Parent.getTxtPrp().FontSize/1000; // 1000 pt
+    var textScale = this.getTxtPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент используется для того, чтобы перевести координаты в миллиметры
 
     var XX = new Array(),
@@ -1972,7 +1982,7 @@ function COperatorDoubleLine()
 extend(COperatorDoubleLine, CGlyphOperator);
 COperatorDoubleLine.prototype.calcSize = function()
 {
-    var betta = this.Parent.getTxtPrp().FontSize/36;
+    var betta = this.getTxtPrp().FontSize/36;
 
     var height = 6.715869140624999*betta,
         width = 11.99444444444*betta;
@@ -1998,7 +2008,7 @@ COperatorDoubleLine.prototype.calcCoord = function(measure)
     X[8] = 77504; Y[8] = 18112;
     X[9] = 0;     Y[9] = 18112;
 
-    var textScale = this.Parent.getTxtPrp().FontSize/1000; // 1000 pt
+    var textScale = this.getTxtPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент используется для того, чтобы перевести координаты в миллиметры
 
     var XX = new Array(),
@@ -2131,7 +2141,7 @@ function CSingleArrow()
 extend(CSingleArrow, CGlyphOperator);
 CSingleArrow.prototype.calcSize = function()
 {
-    var betta = this.Parent.getTxtPrp().FontSize/36;
+    var betta = this.getTxtPrp().FontSize/36;
     var height = 5.946923828125*betta;
     var width = 10.641210937499999*betta;
 
@@ -2154,7 +2164,7 @@ CSingleArrow.prototype.calcCoord = function(measure)
     X[9] = 56138; Y[9] = 17625;
     X[10] = 56138; Y[10] = 12300;
 
-    var textScale = this.Parent.getTxtPrp().FontSize/1000; // 1000 pt
+    var textScale = this.getTxtPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент используется для того, чтобы перевести координаты в миллиметры
 
     var XX = new Array(),
@@ -2196,7 +2206,7 @@ CSingleArrow.prototype.drawPath = function(XX, YY)
 }
 CSingleArrow.prototype.getSizeGlyph = function()
 {
-    var textScale = this.Parent.getTxtPrp().FontSize/1000; // 1000 pt
+    var textScale = this.getTxtPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64;
 
     var width = 62360*alpha;  // X[9]
@@ -2213,7 +2223,7 @@ function CLeftRightArrow()
 extend(CLeftRightArrow, CGlyphOperator);
 CLeftRightArrow.prototype.calcSize = function()
 {
-    var betta = this.Parent.getTxtPrp().FontSize/36;
+    var betta = this.getTxtPrp().FontSize/36;
 
     var height = 5.946923828125*betta;
     var width = 11.695410156249999*betta;
@@ -2243,7 +2253,7 @@ CLeftRightArrow.prototype.calcCoord = function(measure)
     X[15] = 8363; Y[15] = 17962;
     X[16] = 16950; Y[16] = 28912;
 
-    var textScale = this.Parent.getTxtPrp().FontSize/1000; // 1000 pt
+    var textScale = this.getTxtPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент используется для того, чтобы перевести координаты в миллиметры
 
     var XX = new Array(),
@@ -2292,7 +2302,7 @@ CLeftRightArrow.prototype.drawPath = function(XX, YY)
 }
 CLeftRightArrow.prototype.getSizeGlyph = function()
 {
-    var textScale = this.Parent.getTxtPrp().FontSize/1000; // 1000 pt
+    var textScale = this.getTxtPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64;
 
     var width = 62100*alpha;  // X[9]
@@ -2309,7 +2319,7 @@ function CDoubleArrow()
 extend(CDoubleArrow, CGlyphOperator);
 CDoubleArrow.prototype.calcSize = function()
 {
-    var betta = this.Parent.getTxtPrp().FontSize/36;
+    var betta = this.getTxtPrp().FontSize/36;
 
     var height = 6.7027777777777775*betta;
     var width = 10.994677734375*betta;
@@ -2341,7 +2351,7 @@ CDoubleArrow.prototype.calcCoord = function(measure)
     X[16] = 58950; Y[16] = 19495;
     X[17] = 58950; Y[17] = 19495;
 
-    var textScale = this.Parent.getTxtPrp().FontSize/1000; // 1000 pt
+    var textScale = this.getTxtPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент используется для того, чтобы перевести координаты в миллиметры
 
     var XX = new Array(),
@@ -2398,7 +2408,7 @@ CDoubleArrow.prototype.drawPath = function(XX, YY)
 }
 CDoubleArrow.prototype.getSizeGlyph = function()
 {
-    var textScale = this.Parent.getTxtPrp().FontSize/1000; // 1000 pt
+    var textScale = this.getTxtPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64;
 
     var width = 58950*alpha;
@@ -2415,7 +2425,7 @@ function CLR_DoubleArrow()
 extend(CLR_DoubleArrow, CGlyphOperator);
 CLR_DoubleArrow.prototype.calcSize = function()
 {
-    var betta = this.Parent.getTxtPrp().FontSize/36;
+    var betta = this.getTxtPrp().FontSize/36;
 
     var height = 6.7027777777777775*betta;
     var width = 13.146484375*betta;
@@ -2453,7 +2463,7 @@ CLR_DoubleArrow.prototype.calcCoord = function(measure)
     X[22] = 59925; Y[22] = 14213;
     X[23] = 59925; Y[23] = 14213;
 
-    var textScale = this.Parent.getTxtPrp().FontSize/1000; // 1000 pt
+    var textScale = this.getTxtPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64;
 
     var XX = new Array(),
@@ -2514,7 +2524,7 @@ CLR_DoubleArrow.prototype.drawPath = function(XX, YY)
 }
 CLR_DoubleArrow.prototype.getSizeGlyph = function()
 {
-    var textScale = this.Parent.getTxtPrp().FontSize/1000; // 1000 pt
+    var textScale = this.getTxtPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64;
 
     var width = 70875*alpha;
@@ -2594,7 +2604,7 @@ function CCombiningArrow()
 extend(CCombiningArrow, CGlyphOperator);
 CCombiningArrow.prototype.calcSize = function()
 {
-    var betta = this.Parent.getTxtPrp().FontSize/36;
+    var betta = this.getTxtPrp().FontSize/36;
 
     var height = 3.88*betta;
     var width = 4.938*betta;
@@ -2623,7 +2633,7 @@ CCombiningArrow.prototype.calcCoord = function(measure)
     X[9] = 0; Y[9] = 10312;
     X[10] = 0; Y[10] = 8137;
 
-    var textScale =  this.Parent.getTxtPrp().FontSize/1000; // 1000 pt
+    var textScale =  this.getTxtPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент используется для того, чтобы перевести координаты в миллиметры
 
     var XX = new Array(),
@@ -2664,7 +2674,7 @@ function CCombiningHalfArrow()
 extend(CCombiningHalfArrow, CGlyphOperator);
 CCombiningHalfArrow.prototype.calcSize = function()
 {
-    var betta = this.Parent.getTxtPrp().FontSize/36;
+    var betta = this.getTxtPrp().FontSize/36;
 
     // 0x21BC half, down
 
@@ -2703,7 +2713,7 @@ CCombiningHalfArrow.prototype.calcCoord = function(measure)
     X[6] = 0; Y[6] = 10987;
     X[7] = 0; Y[7] = 8137;
 
-    var textScale = this.Parent.getTxtPrp().FontSize/1000; // 1000 pt
+    var textScale = this.getTxtPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент используется для того, чтобы перевести координаты в миллиметры
 
     var XX = new Array(),
@@ -2730,7 +2740,7 @@ function CCombiningDoubleArrow()
 extend(CCombiningDoubleArrow, CGlyphOperator);
 CCombiningDoubleArrow.prototype.calcSize = function()
 {
-    var betta = this.Parent.getTxtPrp().FontSize/36;
+    var betta = this.getTxtPrp().FontSize/36;
 
     var height = 3.88*betta;
     var width = 4.938*betta;
@@ -2781,7 +2791,7 @@ CCombiningDoubleArrow.prototype.calcCoord = function(measure)
     X[15] = 0; Y[15] = 10312;
     X[16] = 0; Y[16] = 8137;
 
-    var textScale = this.Parent.getTxtPrp().FontSize/1000; // 1000 pt
+    var textScale = this.getTxtPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64; // коэффициент используется для того, чтобы перевести координаты в миллиметры
 
     var XX = new Array(),
@@ -2859,7 +2869,7 @@ CSeparator.prototype.init = function(column)
 }
 CSeparator.prototype.setDistance = function()
 {
-    this.dW = this.Parent.getTxtPrp().FontSize/3*g_dKoef_pt_to_mm;
+    this.dW = this.getTxtPrp().FontSize/3*g_dKoef_pt_to_mm;
 }
 CSeparator.prototype.draw = function()
 {
