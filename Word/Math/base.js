@@ -96,7 +96,8 @@ CMathBase.prototype =
         txtPrp.Merge(this.TxtPrp);
         txtPrp.Merge(this.OwnTPrp);
 
-        txtPrp.FontSize *= this.reduct;
+        if( typeof(txtPrp.FontSize) !== "undefined" )
+            txtPrp.FontSize *= this.reduct;
 
         return txtPrp ;
     },

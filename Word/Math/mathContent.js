@@ -1358,7 +1358,7 @@ CMathContent.prototype =
                 degr.init();
                 degr.setIndex(1);
                 var base = degr.getBase();
-                base.setTxtPrp({Italic: false});
+                base.setOwnTPrp({Italic: false});
                 base.addTxt("sin");
                 var iter = degr.getIterator();
                 iter.addTxt("-1");
@@ -1373,7 +1373,7 @@ CMathContent.prototype =
                 degr.init();
                 degr.setIndex(1);
                 var base = degr.getBase();
-                base.setTxtPrp({Italic: false});
+                base.setOwnTPrp({Italic: false});
                 base.addTxt("cos");
                 var iter = degr.getIterator();
                 iter.addTxt("-1");
@@ -1388,7 +1388,7 @@ CMathContent.prototype =
                 degr.init();
                 degr.setIndex(1);
                 var base = degr.getBase();
-                base.setTxtPrp({Italic: false});
+                base.setOwnTPrp({Italic: false});
                 base.addTxt("tan");
                 var iter = degr.getIterator();
                 iter.addTxt("-1");
@@ -1403,7 +1403,7 @@ CMathContent.prototype =
                 degr.init();
                 degr.setIndex(1);
                 var base = degr.getBase();
-                base.setTxtPrp({Italic: false});
+                base.setOwnTPrp({Italic: false});
                 base.addTxt("csc");
                 var iter = degr.getIterator();
                 iter.addTxt("-1");
@@ -1418,7 +1418,7 @@ CMathContent.prototype =
                 degr.init();
                 degr.setIndex(1);
                 var base = degr.getBase();
-                base.setTxtPrp({Italic: false});
+                base.setOwnTPrp({Italic: false});
                 base.addTxt("sec");
                 var iter = degr.getIterator();
                 iter.addTxt("-1");
@@ -1433,7 +1433,7 @@ CMathContent.prototype =
                 degr.init();
                 degr.setIndex(1);
                 var base = degr.getBase();
-                base.setTxtPrp({Italic: false});
+                base.setOwnTPrp({Italic: false});
                 base.addTxt("cot");
                 var iter = degr.getIterator();
                 iter.addTxt("-1");
@@ -1499,7 +1499,7 @@ CMathContent.prototype =
                 degr.init();
                 degr.setIndex(1);
                 var base = degr.getBase();
-                base.setTxtPrp({Italic: false});
+                base.setOwnTPrp({Italic: false});
                 base.addTxt("sinh");
                 var iter = degr.getIterator();
                 iter.addTxt("-1");
@@ -1514,7 +1514,7 @@ CMathContent.prototype =
                 degr.init();
                 degr.setIndex(1);
                 var base = degr.getBase();
-                base.setTxtPrp({Italic: false});
+                base.setOwnTPrp({Italic: false});
                 base.addTxt("cosh");
                 var iter = degr.getIterator();
                 iter.addTxt("-1");
@@ -1529,7 +1529,7 @@ CMathContent.prototype =
                 degr.init();
                 degr.setIndex(1);
                 var base = degr.getBase();
-                base.setTxtPrp({Italic: false});
+                base.setOwnTPrp({Italic: false});
                 base.addTxt("tanh");
                 var iter = degr.getIterator();
                 iter.addTxt("-1");
@@ -1544,7 +1544,7 @@ CMathContent.prototype =
                 degr.init();
                 degr.setIndex(1);
                 var base = degr.getBase();
-                base.setTxtPrp({Italic: false});
+                base.setOwnTPrp({Italic: false});
                 base.addTxt("csch");
                 var iter = degr.getIterator();
                 iter.addTxt("-1");
@@ -1559,7 +1559,7 @@ CMathContent.prototype =
                 degr.init();
                 degr.setIndex(1);
                 var base = degr.getBase();
-                base.setTxtPrp({Italic: false});
+                base.setOwnTPrp({Italic: false});
                 base.addTxt("sech");
                 var iter = degr.getIterator();
                 iter.addTxt("-1");
@@ -1574,7 +1574,7 @@ CMathContent.prototype =
                 degr.init();
                 degr.setIndex(1);
                 var base = degr.getBase();
-                base.setTxtPrp({Italic: false});
+                base.setOwnTPrp({Italic: false});
                 base.addTxt("coth");
                 var iter = degr.getIterator();
                 iter.addTxt("-1");
@@ -1780,7 +1780,7 @@ CMathContent.prototype =
                 degr.init();
                 degr.setIndex(-1);
                 var base = degr.getBase();
-                base.setTxtPrp({Italic: false});
+                base.setOwnTPrp({Italic: false});
                 base.addTxt("log");
                 var iter = degr.getIterator();
                 iter.fillPlaceholders();
@@ -2281,7 +2281,8 @@ CMathContent.prototype =
         txtPrp.Merge(this.TxtPrp);
         txtPrp.Merge(this.OwnTPrp);
 
-        txtPrp.FontSize *= this.getReduct();
+        if( typeof(txtPrp.FontSize) !== "undefined")
+            txtPrp.FontSize *= this.getReduct();
 
         return txtPrp;
     },
