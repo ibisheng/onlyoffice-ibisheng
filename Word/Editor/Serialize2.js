@@ -642,7 +642,7 @@ function BinaryFileWriter(doc)
 		var oThis = this;
 		//анализируем используемые списки и стили
 		var sTableStyle = Item.Get_TableStyle();
-		if(null != sParaStyle)
+		if(null != sTableStyle)
 			this.copyParams.oUsedStyleMap[sTableStyle] = 1;
         this.bs.WriteItem(c_oSerParType.Table, function(){oThis.copyParams.bdtw.WriteDocTable(Item);});
 		this.copyParams.itemCount++;
