@@ -10,8 +10,7 @@
     "concat_api": {
         "../Word/api-all.js": [
             "../Word/api.js",
-            "../Word/apiCommon.js",
-			"../Common/apiCommon.js"
+            "../Word/apiCommon.js"
         ]
     },
     "extract_api": {
@@ -26,6 +25,7 @@
                 "../Common/docscoapisettings.js",
                 "../Common/docscoapicommon.js",
                 "../Common/docscoapi.js",
+				"../Common/apiCommon.js",
                 "../Common/spellcheckapisettings.js",
                 "../Common/spellcheckapi.js",
                 "../Common/wordcopypaste.js",
