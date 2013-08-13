@@ -967,7 +967,7 @@ char_name:u9
 asc_CAscEditorPermissions:cVa
 returnNode:Cmb
 Ey:Gs
-oldVal:Qb
+oldVal:Rb
 short_metrics:j5
 Ex:Mo
 f_type:g$
@@ -2977,7 +2977,7 @@ _hotspot_xonly:qga
 minimalRealativeY:dma
 _onEmptyCell:aTa
 minimalRealativeX:cma
-gdLst:Sb
+gdLst:Tb
 DrawTrackSelectShapes:Ipa
 ctBrushRectableEnabled:L1a
 strictClose:doa
@@ -3144,7 +3144,7 @@ in_memory:kaa
 getRectBounds:rI
 service_MULTI_MASTERS:Xmb
 WriteTableColumn:xPa
-visibleRange:Tb
+visibleRange:Pb
 adjNum:OH
 _addHtmlToIframe:Fta
 sheetidfrom:wT
@@ -3663,7 +3663,7 @@ instructions:TBa
 ctResetTransform:Xgb
 reReplaceNL:una
 w_mm:of
-Memory:Rb
+Memory:Sb
 Fade:Lpa
 currentInfoLoaded:yN
 fsSelection:J2
@@ -6141,7 +6141,7 @@ realloc_long:Z7a
 userId:qJ
 ALLOW_X_DMOVE_Rules:uGa
 spDef:yFa
-Width:Pb
+Width:Qb
 tableStylesGuides:Mca
 UpdateTargetTimer:Gdb
 mmvar_len:u6a
