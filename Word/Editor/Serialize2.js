@@ -618,8 +618,6 @@ function BinaryFileWriter(doc)
 	}
 	this.CopyParagraph = function(Item, bUseSelection)
     {
-		if(true == this.copyParams.bLockCopyPar)
-			return;
 		var oThis = this;
 		//анализируем используемые списки и стили
 		var sParaStyle = Item.Style_Get();
@@ -634,6 +632,9 @@ function BinaryFileWriter(doc)
 				this.copyParams.nNumIdIndex++;
 			}
 		}
+		//сами параграфы скопируются в методе CopyTable, нужно только проанализировать стили
+		if(true == this.copyParams.bLockCopyPar)
+			return;
         this.bs.WriteItem(c_oSerParType.Par, function(){oThis.copyParams.bdtw.WriteParapraph(Item, bUseSelection);});
 		this.copyParams.itemCount++;
 	}
