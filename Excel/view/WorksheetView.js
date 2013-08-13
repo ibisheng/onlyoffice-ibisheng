@@ -2152,6 +2152,8 @@
 			_cleanColumnHeaders: function (colStart, colEnd) {
 				var offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
 				if (colEnd === undefined) {colEnd = colStart;}
+				colStart = Math.max(this.visibleRange.c1, colStart);
+				colEnd = Math.min(this.visibleRange.c2, colEnd);
 				for (var i = colStart; i <= colEnd; ++i) {
 					this.drawingCtx.clearRect(
 						this.cols[i].left - offsetX - this.width_1px, this.headersTop,
@@ -2162,6 +2164,8 @@
 			_cleanRowHeades: function (rowStart, rowEnd) {
 				var offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
 				if (rowEnd === undefined) {rowEnd = rowStart;}
+				rowStart = Math.max(this.visibleRange.r1, rowStart);
+				rowEnd = Math.min(this.visibleRange.r2, rowEnd);
 				for (var i = rowStart; i <= rowEnd; ++i) {
 					this.drawingCtx.clearRect(
 						this.headersLeft, this.rows[i].top - offsetY - this.height_1px,
