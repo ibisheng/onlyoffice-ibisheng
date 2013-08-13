@@ -2137,7 +2137,7 @@ Col.prototype =
 	},
 	setFontsize : function(val)
 	{
-		var oRes = this.sm.setFontname(this, val);
+		var oRes = this.sm.setFontsize(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
             History.Add(g_oUndoRedoCol, historyitem_RowCol_Fontsize, this.ws.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 	},
@@ -2416,7 +2416,7 @@ Row.prototype =
 	},
 	setFontsize : function(val)
 	{
-		var oRes = this.sm.setFontname(this, val);
+		var oRes = this.sm.setFontsize(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
             History.Add(g_oUndoRedoRow, historyitem_RowCol_Fontsize, this.ws.getId(), new Asc.Range(0, this.index, gc_nMaxCol0, this.index), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
 	},
