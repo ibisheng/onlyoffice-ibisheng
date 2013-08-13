@@ -20,6 +20,9 @@ prop:sync_EndCatchSelectedElements
 prop:getSelectedElements
 prop:sync_ChangeLastSelectedElement
 prop:Init
+prop:asc_getEditorPermissions
+prop:asc_getEditorPermissionsCallback
+prop:asc_setDocInfo
 prop:LoadDocument
 prop:SetFontsPath
 prop:SetThemesPath
@@ -875,6 +878,9 @@ asc_docs_api.prototype['sync_EndCatchSelectedElements'] = asc_docs_api.prototype
 asc_docs_api.prototype['getSelectedElements'] = asc_docs_api.prototype.getSelectedElements;
 asc_docs_api.prototype['sync_ChangeLastSelectedElement'] = asc_docs_api.prototype.sync_ChangeLastSelectedElement;
 asc_docs_api.prototype['Init'] = asc_docs_api.prototype.Init;
+asc_docs_api.prototype['asc_getEditorPermissions'] = asc_docs_api.prototype.asc_getEditorPermissions;
+asc_docs_api.prototype['asc_getEditorPermissionsCallback'] = asc_docs_api.prototype.asc_getEditorPermissionsCallback;
+asc_docs_api.prototype['asc_setDocInfo'] = asc_docs_api.prototype.asc_setDocInfo;
 asc_docs_api.prototype['LoadDocument'] = asc_docs_api.prototype.LoadDocument;
 asc_docs_api.prototype['SetFontsPath'] = asc_docs_api.prototype.SetFontsPath;
 asc_docs_api.prototype['SetThemesPath'] = asc_docs_api.prototype.SetThemesPath;
