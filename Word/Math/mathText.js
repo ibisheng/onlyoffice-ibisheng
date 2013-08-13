@@ -149,7 +149,6 @@ CMathText.prototype =
     {
         this.TxtPrp  = new CMathTextPrp();
         this.TxtPrp.Merge(txtPrp);
-
     },
     setLIterator: function(bIterator)
     {

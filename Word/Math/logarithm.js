@@ -56,7 +56,8 @@ CMinimaxFunc.prototype.init = function()
     this.setDimension(2, 1);
 
     var oBase = new CMathContent();
-    oBase.mergeTxtPrp({Italic: false});
+    //oBase.mergeTxtPrp({Italic: false});
+    oBase.setTxtPrp({Italic: false});
 
     var oIter = new CMathContent();
     oIter.setReduct(DEGR_REDUCT);
@@ -131,7 +132,9 @@ CMathFunc.prototype.init = function()
 {
     this.setDimension(1, 2);
     this.setContent();
-    this.elements[0][0].mergeTxtPrp({Italic: false}); // trigonometrical function
+    this.elements[0][0].setTxtPrp({Italic: false});  // trigonometrical function
+    //this.elements[0][0].mergeTxtPrp({Italic: false}); // trigonometrical function
+
 }
 CMathFunc.prototype.setDistance = function()
 {

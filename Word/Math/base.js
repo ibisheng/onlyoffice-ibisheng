@@ -102,9 +102,8 @@ CMathBase.prototype =
     },
     setTxtPrp: function(txtPrp)
     {
-        this.TxtPrp  = new CMathTextPrp();
+        //this.TxtPrp  = new CMathTextPrp();
         this.TxtPrp.Merge(txtPrp);
-        //this.TxtPrp.Merge(this.OwnTPrp);
 
         for(var i=0; i < this.nRow; i++)
             for(var j = 0; j < this.nCol; j++)
