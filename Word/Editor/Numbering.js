@@ -1646,7 +1646,40 @@ CAbstractNum.prototype =
     Load_LinkData : function(LinkData)
     {
 
-    }
+    },
+	
+	//сравниваем abstractNum
+	isEqual: function(abstractNum)
+	{
+		var lvlUsuallyAdd = this.Lvl;
+		var lvlNew = abstractNum.Lvl;
+		for(var lvl = 0; lvl < lvlUsuallyAdd.length; lvl++)
+		{
+			var LvlTextEqual;
+			var ParaPrEqual;
+			var TextPrEqual;
+			if(lvlUsuallyAdd[lvl].Format == lvlNew[lvl].Format && lvlUsuallyAdd[lvl].Jc == lvlNew[lvl].Jc && lvlUsuallyAdd[lvl].PStyle == lvlNew[lvl].PStyle && lvlUsuallyAdd[lvl].Restart == lvlNew[lvl].Restart && lvlUsuallyAdd[lvl].Start == lvlNew[lvl].Start && lvlUsuallyAdd[lvl].Suff == lvlNew[lvl].Suff)
+			{
+				LvlTextEqual = this._isEqualLvlText(lvlUsuallyAdd[lvl].LvlText, lvlNew[lvl].LvlText);
+				ParaPrEqual = lvlUsuallyAdd[lvl].ParaPr.isEqual(lvlUsuallyAdd[lvl].ParaPr, lvlNew[lvl].ParaPr);
+				TextPrEqual = lvlUsuallyAdd[lvl].TextPr.isEqual(lvlUsuallyAdd[lvl].TextPr, lvlNew[lvl].TextPr);
+			}
+			if(!LvlTextEqual || !ParaPrEqual || !TextPrEqual)
+				return false;
+		}
+		return true;
+	},
+	
+	_isEqualLvlText: function(LvlTextOld, LvlTextNew)
+	{
+		for(var LvlText = 0; LvlText < LvlTextOld.length; LvlText++)
+		{
+			if(LvlTextOld[LvlText].Type != LvlTextNew[LvlText].Type || LvlTextOld[LvlText].Value != LvlTextNew[LvlText].Value)
+				return false;
+		}
+		return true;
+	}
+	
 };
 
 function CNumbering()

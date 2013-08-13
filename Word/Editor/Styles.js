@@ -1884,7 +1884,23 @@ CStyle.prototype =
         this.TableBand2Horz.TableCellPr.Shd = new CDocumentShd();
         this.TableBand2Horz.TableCellPr.Shd.Value = shd_Clear;
         this.TableBand2Horz.TableCellPr.Shd.Color.Set( Color3.r, Color3.g, Color3.b );
-    }
+    },
+	
+	isEqual: function(cStyles)
+	{
+		var result = false;
+		if(this.BasedOn == cStyles.BasedOn && this.Name == cStyles.Name && this.Next == cStyles.Next && this.Type == cStyles.Type && this.hidden == cStyles.hidden)
+		{
+			if(this.qFormat == cStyles.qFormat && this.semiHidden == cStyles.semiHidden && this.uiPriority == cStyles.uiPriority && this.unhideWhenUsed == cStyles.unhideWhenUsed)
+			{
+				var isEqualParaPr = this.ParaPr.isEqual(this.ParaPr, cStyles.ParaPr);
+				var isEqualTextPr = this.TextPr.isEqual(this.TextPr, cStyles.TextPr);
+				if(isEqualParaPr && isEqualTextPr)	
+					result = true;
+			}
+		}
+		return result;
+	}
 };
 
 function CStyles()
@@ -5146,7 +5162,36 @@ CTextPr.prototype =
                 Size  : SizeCS
             };
         }
-    }
+    },
+	
+	isEqual: function(TextPrOld, TextPrNew)
+	{
+		if(TextPrOld == undefined || TextPrNew == undefined)
+			return false;
+		for(var TextPr in TextPrOld)
+		{
+			if(typeof TextPrOld[TextPr] == 'object')
+			{
+				/*for(var cpPr in TextPrOld[TextPr])
+				{
+					if(TextPrOld[TextPr][cpPr] != TextPrNew[TextPr][cpPr])
+						return false;
+				}*/
+				this.isEqual(TextPrOld[TextPr],TextPrNew[TextPr]);
+			}
+			else
+			{
+				if(typeof TextPrOld[TextPr] == "number" && typeof TextPrNew[TextPr] == "number")
+				{
+					if(Math.abs(TextPrOld[TextPr] - TextPrNew[TextPr]) > 0.001)
+						return false;
+				}
+				else if(TextPrOld[TextPr] != TextPrNew[TextPr])
+					return false;
+			}
+		}
+		return true;
+	}
 }
 
 function CParaTab(Value, Pos)
@@ -6467,7 +6512,32 @@ CParaPr.prototype =
             this.FramePr = new CFramePr();
             this.FramePr.Read_FromBinary( Reader );
         }
-    }
+    },
+	
+	isEqual: function(ParaPrUOld,ParaPrNew)
+	{
+		if(ParaPrUOld == undefined || ParaPrNew == undefined)
+			return false;
+		for(var pPr in ParaPrUOld)
+		{
+			if(typeof ParaPrUOld[pPr] == 'object')
+			{
+				if(!this.isEqual(ParaPrUOld[pPr],ParaPrNew[pPr]))
+					return false
+			}
+			else
+			{
+				if(typeof ParaPrUOld[pPr] == "number" && typeof ParaPrNew[pPr] == "number")
+				{
+					if(Math.abs(ParaPrUOld[pPr] - ParaPrNew[pPr]) > 0.001)
+						return false;
+				}
+				else if(ParaPrUOld[pPr] != ParaPrNew[pPr])
+					return false;
+			}
+		}
+		return true;
+	}
 }
 
 function Copy_Bounds(Bounds)

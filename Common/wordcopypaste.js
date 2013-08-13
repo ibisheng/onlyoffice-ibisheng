@@ -26,6 +26,7 @@ window.USER_AGENT_SAFARI_MACOS = (navigator.userAgent.toLowerCase().indexOf('saf
 var COPY_ELEMENT_ID = "SelectId";
 var PASTE_ELEMENT_ID = "wrd_pastebin";
 var ELEMENT_DISPAY_STYLE = "none";
+var copyPasteUseBinery = true;
 
 if (window.USER_AGENT_SAFARI_MACOS)
 {
@@ -1610,10 +1611,11 @@ CopyProcessor.prototype =
             }
         }
 		this.oBinaryFileWriter.CopyEnd();
-		if(this.oBinaryFileWriter.copyParams.itemCount > 0)
+		if(copyPasteUseBinery && this.oBinaryFileWriter.copyParams.itemCount > 0)
 		{
 			var sBase64 = this.oBinaryFileWriter.GetResult();
-			//this.ElemToSelect.innerHTML = sBase64;
+			if(this.ElemToSelect.children[0])
+				$(this.ElemToSelect.children[0]).addClass("docData;" + sBase64);
 		}
     }
 };
@@ -2310,7 +2312,25 @@ PasteProcessor.prototype =
 		for(var i in oReadResult.numToNumClass)
 		{
 			var oNumClass = oReadResult.numToNumClass[i];
-			this.oDocument.Numbering.Add_AbstractNum(oNumClass);
+			var documentANum = this.oDocument.Numbering.AbstractNum;
+			//проверка на уже существующий такой же AbstractNum
+			var isUsuallyContains = false;
+			for(var n in documentANum)
+			{
+				var isEqual = documentANum[n].isEqual(oNumClass);
+				if(isEqual == true)
+				{
+					isUsuallyContains = true;
+					break;
+				}
+			}
+			if(!isUsuallyContains)
+			{
+				this.oDocument.Numbering.Add_AbstractNum(oNumClass);
+			}
+			else
+				oReadResult.numToNumClass[i] = documentANum[n];
+				
 		}
 		for(var i = 0, length = oReadResult.paraNumPrs.length; i < length; ++i)
 		{
@@ -2322,6 +2342,7 @@ PasteProcessor.prototype =
 				numPr.NumId = 0;
 		}
 		//обрабатываем стили
+		var isUsuallyContainsStyle;
 		var fParseStyle = function(aStyles, oDocumentStyles, oReadResult, bParaStyle)
 		{
 			for(var i = 0, length = aStyles.length; i < length; ++i)
@@ -2333,12 +2354,14 @@ PasteProcessor.prototype =
 					for(var j in oDocumentStyles)
 					{
 						var styleDoc = oDocumentStyles[j];
-						if(styleDoc.Name == stylePaste.style.Name)
+						isUsuallyContainsStyle = styleDoc.isEqual(stylePaste.style);
+						if(isUsuallyContainsStyle)
 						{
 							if(bParaStyle)
 								elem.pPr.PStyle = j;
 							else
 								elem.pPr.TableStyle = j;
+							break;
 						}
 					}
 				}
@@ -2379,8 +2402,44 @@ PasteProcessor.prototype =
 			// }
 		// });
 		// return;
-
-        this.oRootNode = node;
+		
+		if(copyPasteUseBinery)
+		{
+			var base64 = null;
+			var classNode;
+			if(node.children[0] && node.children[0].getAttribute("class") != null)
+				classNode = node.children[0].getAttribute("class");
+			else if(node.children[0] && node.children[0].children[0] && node.children[0].children[0].getAttribute("class") != null)
+				classNode = node.children[0].children[0].getAttribute("class");	
+			if( classNode != null ){
+				cL = classNode.split(" ");
+				for (var i = 0; i < cL.length; i++){
+					if(cL[i].indexOf("docData;") > -1)
+					{
+						base64 = cL[i].split('docData;')[1];
+					}
+				}
+			}
+			var aContent;
+			if(base64 != null)
+				aContent = this.ReadFromBinary(base64);
+			if(aContent)
+			{
+				this.aContent = aContent.content;
+				this.api.pre_Paste(aContent.fonts, aContent.images, 
+				function() {
+					if(false == oThis.bNested)
+					{
+						oThis.InsertInDocument();
+						node.blur();
+						node.style.display  = ELEMENT_DISPAY_STYLE;
+					}
+				});
+				return;
+			}
+		}
+		
+		this.oRootNode = node;
         this._Prepeare(node,
             function(){
                 oThis.aContent = new Array();
