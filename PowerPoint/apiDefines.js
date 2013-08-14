@@ -1,102 +1,102 @@
-var c_oAscZoomType = {
+﻿var c_oAscZoomType = {
 	Current :0,		
 	FitWidth:1,
 	FitPage :2
-}
+};
 
 var c_oAscAsyncActionType = {
     Information : 0,
     BlockInteraction : 1
-}
+};
 
 var c_oAscAsyncAction = {
-	Open:0, // îòêðûòèå äîêóìåíòà
-	Save:1,
-	LoadDocumentFonts:2, // çàãðóæàåì ôîíòû äîêóìåíòà (ñðàçó ïîñëå îòêðûòèÿ)
-    LoadDocumentImages:3, // çàãðóæàåì êàðòèíêè äîêóìåíòà (ñðàçó ïîñëå çàãðóçêè øðèôòîâ)
-    LoadFont:4, // ïîäãðóçêà íóæíîãî øðèôòà
-    LoadImage:5, // ïîäãðóçêà êàðòèíêè
-	DownloadAs:6,
-	Print:7,//êîíâåðòàöèÿ â PDF è ñîõðàíåíèå ó ïîëüçîâàòåëÿ
-	UploadImage:8,
-    LoadTheme:9
-}
+	Open				: 0, // открытие документа
+	Save				: 1,
+	LoadDocumentFonts	: 2, // загружаем фонты документа (сразу после открытия)
+    LoadDocumentImages	: 3, // загружаем картинки документа (сразу после загрузки шрифтов)
+    LoadFont			: 4, // подгрузка нужного шрифта
+    LoadImage			: 5, // подгрузка картинки
+	DownloadAs			: 6,
+	Print				: 7, // конвертация в PDF и сохранение у пользователя
+	UploadImage			: 8,
+    LoadTheme			: 9,
+	ApplyChanges		: 10, // применение изменений от другого пользователя.
+	PrepareToSave		: 11  // Подготовка к сохранению
+};
 
-var c_oAscVertAlignJc =
-{
+var c_oAscVertAlignJc = {
     Top    : 0x00, // var vertalignjc_Top    = 0x00;
     Center : 0x01, // var vertalignjc_Center = 0x01;
     Bottom : 0x02  // var vertalignjc_Bottom = 0x02
 };
 //files type for Saving & DownloadAs
 var c_oAscFileType = {
-		INNER:	0x0081,
-		PDF:	0x0802,
-		PPTX:	0x0081,
-		PPT:	0x0082,
-		ODP:	0x0083
-	}
+	INNER:	0x0081,
+	PDF:	0x0802,
+	PPTX:	0x0081,
+	PPT:	0x0082,
+	ODP:	0x0083
+};
 
 // Right = 0; Left = 1; Center = 2; Justify = 3;
 var c_oAscAlignType = {
-		LEFT:0,
-		CENTER:1,
-		RIGHT:2,
-		JUSTIFY:3,
-		TOP:4,
-		MIDDLE:5,
-		BOTTOM:6
-	}
+	LEFT:0,
+	CENTER:1,
+	RIGHT:2,
+	JUSTIFY:3,
+	TOP:4,
+	MIDDLE:5,
+	BOTTOM:6
+};
 
 // image wrap style
 var c_oAscWrapStyle = {
 	Inline:0,
 	Flow : 1
-}
+};
 	
 	/*Error level & ID*/
 var c_oAscError = {
-		Level: {
-			Critical:-1,
-			NoCritical:0
-		},
-		ID : {
-			ServerSaveComplete: 	3,
-			ConvertationProgress: 	2,
-			DownloadProgress: 		1,
-			No: 					0,
-			Unknown: 			 	-1,
-			ConvertationTimeout: 	-2,
-			ConvertationError: 		-3,
-			DownloadError: 			-4,
-			UnexpectedGuid: 		-5,
-			Database: 				-6,
-			FileRequest: 			-7,
-			FileVKey: 				-8,
-			UplImageSize: 			-9,
-			UplImageExt: 			-10,
-			UplImageFileCount: 		-11,
-			NoSupportClipdoard:		-12,
-			CoAuthoringDisconnect:	-18,
-			
-			VKeyEncrypt: 			-20,
-			KeyExpire: 				-21,
-			UserCountExceed: 		-22
-		}
+	Level: {
+		Critical:-1,
+		NoCritical:0
+	},
+	ID : {
+		ServerSaveComplete: 	3,
+		ConvertationProgress: 	2,
+		DownloadProgress: 		1,
+		No: 					0,
+		Unknown: 			 	-1,
+		ConvertationTimeout: 	-2,
+		ConvertationError: 		-3,
+		DownloadError: 			-4,
+		UnexpectedGuid: 		-5,
+		Database: 				-6,
+		FileRequest: 			-7,
+		FileVKey: 				-8,
+		UplImageSize: 			-9,
+		UplImageExt: 			-10,
+		UplImageFileCount: 		-11,
+		NoSupportClipdoard:		-12,
+		CoAuthoringDisconnect:	-18,
+
+		VKeyEncrypt: 			-20,
+		KeyExpire: 				-21,
+		UserCountExceed: 		-22
 	}
+};
 var c_oAscTypeSelectElement = {
 	Paragraph: 0,
 	Table:1,
 	Image:2,
 	Shape:3,
     Slide:4
-}
+};
 
-var c_oAscContextMenuTypes =
-{
+var c_oAscContextMenuTypes = {
     Main       : 0,
     Thumbnails : 1
-}
+};
 
 var c_oAscTableBordersType = {
 	LEFT:0,
@@ -108,11 +108,11 @@ var c_oAscTableBordersType = {
 	INSIDE:6,
 	OUTSIDE:7,
 	ALL:8
-}
-var c_oAscImageUploadProp = {//Íå âñå áðàóçåðû ïîçâîëÿþò ïîëó÷èòü èíôîðìàöèþ î ôàéëå äî çàãðóçêè(íàïðèìåð ie9), ìåíÿÿ ïàðàìåòðû çäåñü íàäî ïîìåíÿòü àíàëîãè÷íûå ïàðàìåòðû â cwFileUploader.ashx
+};
+var c_oAscImageUploadProp = {//Не все браузеры позволяют получить информацию о файле до загрузки(например ie9), меняя параметры здесь надо поменять аналогичные параметры в cwFileUploader.ashx
 	MaxFileSize:25000000, //25 mb
 	SupportedFormats:[ "jpg", "jpeg", "jpe", "png", "gif", "bmp"]
-}
+};
 var FONT_THUMBNAIL_HEIGHT = parseInt(7 * 96.0 / 25.4);
 
 var THEME_THUMBNAIL_WIDTH = 180;
@@ -123,16 +123,15 @@ var LAYOUT_THUMBNAIL_HEIGHT = 135;
 var c_oAscStyleImage = {
     Default :0,
     Document:1
-}
+};
 
-var c_oAscLineDrawingRule =
-{
+var c_oAscLineDrawingRule = {
     Left   : 0,
     Center : 1,
     Right  : 2,
     Top    : 0,
     Bottom : 2
-}
+};
 
 var align_Right   = 0;
 var align_Left    = 1;
@@ -149,13 +148,12 @@ var hdrftr_Default = 0x01;
 var hdrftr_Even    = 0x02;
 var hdrftr_First   = 0x03;
 
-var c_oAscTableSelectionType =
-{
+var c_oAscTableSelectionType = {
     Cell   : 0,
     Row    : 1,
     Column : 2,
     Table  : 3
-}
+};
 
 var linerule_AtLeast = 0;
 var linerule_Auto    = 1;
@@ -225,8 +223,7 @@ var c_oAscLineBeginType = {
     Triangle: 5
 };
 
-var c_oAscLineBeginSize =
-{
+var c_oAscLineBeginSize = {
     small_small : 0,
     small_mid : 1,
     small_large : 2,
@@ -238,15 +235,13 @@ var c_oAscLineBeginSize =
     large_large : 8
 };
 
-var c_oAscMouseMoveDataTypes =
-{
+var c_oAscMouseMoveDataTypes = {
     Common       : 0,
     Hyperlink    : 1,
     LockedObject : 2
 };
 
-var c_oAscSlideTransitionTypes =
-{
+var c_oAscSlideTransitionTypes = {
     None    : 0,
     Fade    : 1,
     Push    : 2,
@@ -258,8 +253,7 @@ var c_oAscSlideTransitionTypes =
     Zoom    : 8
 };
 
-var c_oAscSlideTransitionParams =
-{
+var c_oAscSlideTransitionParams = {
     Fade_Smoothly       : 0,
     Fade_Through_Black  : 1,
 
