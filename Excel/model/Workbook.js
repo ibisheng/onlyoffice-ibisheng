@@ -1614,6 +1614,7 @@ Workbook.prototype.copyWorksheet=function(index, insertBefore, sName, sId){
 				newSheet.sName = sName;
 		}
 		newSheet.init();
+		newSheet.initPostOpen();
 		if(null != insertBefore && insertBefore >= 0 && insertBefore < this.aWorksheets.length){
 			//помещаем новый sheet перед insertBefore
 			this.aWorksheets.splice(insertBefore, 0, newSheet);

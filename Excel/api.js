@@ -1602,7 +1602,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 								window.setTimeout(function () {
 									t.onSaveCallback(event);
 								}, 10);
-							})
+							});
 						}, 1000);
 					}
 				}
