@@ -1,5 +1,9 @@
 ﻿$( function () {
 
+    function toFixed(n){
+        return n.toFixed(cExcelSignificantDigits)-0;
+    }
+
     var ver = 2;
 
     var oParser, wb, ws, date1, date2, dif = 1e-9,
@@ -1539,14 +1543,10 @@
 
     test( "Test: \"BINOMDIST\"", function () {
 
-        function binomCoeff(n,k){
-            return Math.fact( n ) / (Math.fact( k ) * Math.fact( n - k ));
-        }
-
         function binomdist(x,n,p){
             x= parseInt(x);
             n = parseInt(n);
-            return binomCoeff(n,x)*Math.pow(p,x)*Math.pow(1-p,n-x);
+            return Math.binomCoeff(n,x)*Math.pow(p,x)*Math.pow(1-p,n-x);
         }
 
         oParser = new parserFormula( "BINOMDIST(6,10,0.5,FALSE)", "A1", ws );
@@ -1734,5 +1734,413 @@
 
     } )
 
+    test( "Test: \"DEVSQ\"", function () {
 
+        var ws1 = wb.getWorksheet( 1 );
+
+        ws1.getRange2( "A1" ).setValue( "5.6" );
+        ws1.getRange2( "A2" ).setValue( "8.2" );
+        ws1.getRange2( "A3" ).setValue( "9.2" );
+
+        oParser = new parserFormula( "DEVSQ(5.6,8.2,9.2)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 6.906666666666665  );
+
+        oParser = new parserFormula( "DEVSQ({5.6,8.2,9.2})", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 6.906666666666665  );
+
+        oParser = new parserFormula( "DEVSQ(5.6,8.2,\"9.2\")", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 3.379999999999999  );
+
+        oParser = new parserFormula( "DEVSQ(Лист2!A1:A3)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 6.906666666666665  );
+
+    } )
+
+    test( "Test: \"EXPONDIST\"", function () {
+
+        oParser = new parserFormula( "EXPONDIST(0.2,10,FALSE)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 1.353352832366127 );
+
+        oParser = new parserFormula( "EXPONDIST(2.3,1.5,TRUE)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 0.968254363621932 );
+
+    } )
+
+    test( "Test: \"FISHER\"", function () {
+
+        function fisher(x){
+            return toFixed(0.5 * Math.ln( (1+x)/(1-x) ));
+        }
+
+        oParser = new parserFormula( "FISHER(-0.43)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), fisher( -.43 ) );
+
+        oParser = new parserFormula( "FISHER(0.578)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), fisher( 0.578 ) );
+
+        oParser = new parserFormula( "FISHER(1)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+        oParser = new parserFormula( "FISHER(-1)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+    } )
+
+    test( "Test: \"FISHERINV\"", function () {
+
+        function fisherInv(x){
+            return toFixed(( Math.exp( 2*x ) - 1 )/( Math.exp( 2*x ) + 1 ));
+        }
+
+        oParser = new parserFormula( "FISHERINV(-0.43)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), fisherInv( -.43 ) );
+
+        oParser = new parserFormula( "FISHERINV(0.578)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), fisherInv( 0.578 ) );
+
+        oParser = new parserFormula( "FISHERINV(1)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), fisherInv( 1 ) );
+
+        oParser = new parserFormula( "FISHERINV(-1)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), fisherInv( -1 ) );
+
+    } )
+
+    test( "Test: \"FORECAST\"", function () {
+
+        function forecast( fx, y, x ) {
+
+            var fSumDeltaXDeltaY = 0, fSumSqrDeltaX = 0, _x = 0, _y = 0, xLength = 0;
+            for ( var i = 0; i < x.length; i++ ) {
+                _x += x[i];
+                _y += y[i];
+                xLength++;
+            }
+
+            _x /= xLength;
+            _y /= xLength;
+
+            for ( var i = 0; i < x.length; i++ ) {
+
+                var fValX = x[i];
+                var fValY = y[i];
+
+                fSumDeltaXDeltaY += ( fValX - _x ) * ( fValY - _y );
+                fSumSqrDeltaX += ( fValX - _x ) * ( fValX - _x );
+
+            }
+
+            return toFixed( _y + fSumDeltaXDeltaY / fSumSqrDeltaX * ( fx - _x ) );
+
+        }
+
+        oParser = new parserFormula( "FORECAST(30,{6,7,9,15,21},{20,28,31,38,40})", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), forecast(30,[6,7,9,15,21],[20,28,31,38,40]) );
+
+    } )
+
+    test( "Test: \"FREQUENCY\"", function () {
+
+        ws.getRange2( "A202" ).setValue( "79" );
+        ws.getRange2( "A203" ).setValue( "85" );
+        ws.getRange2( "A204" ).setValue( "78" );
+        ws.getRange2( "A205" ).setValue( "85" );
+        ws.getRange2( "A206" ).setValue( "50" );
+        ws.getRange2( "A207" ).setValue( "81" );
+        ws.getRange2( "A208" ).setValue( "95" );
+        ws.getRange2( "A209" ).setValue( "88" );
+        ws.getRange2( "A210" ).setValue( "97" );
+
+        ws.getRange2( "B202" ).setValue( "70" );
+        ws.getRange2( "B203" ).setValue( "89" );
+        ws.getRange2( "B204" ).setValue( "79" );
+
+        oParser = new parserFormula( "FREQUENCY(A202:A210,B202:B204)", "A201", ws );
+        ok( oParser.parse() );
+        var a = oParser.calculate()
+        strictEqual( a.getElement(0).getValue(), 1 );
+        strictEqual( a.getElement(1).getValue(), 2 );
+        strictEqual( a.getElement(2).getValue(), 4 );
+        strictEqual( a.getElement(3).getValue(), 2 );
+
+    } )
+
+    test( "Test: \"GAMMALN\"", function () {
+
+        oParser = new parserFormula( "GAMMALN(4.5)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 2.453736570842442 );
+
+        oParser = new parserFormula( "GAMMALN(-4.5)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+    } )
+
+    test( "Test: \"GEOMEAN\"", function () {
+
+        function geommean( x ) {
+
+            var s1 = 0, _x = 1, xLength = 0, _tx;
+            for ( var i = 0; i < x.length; i++ ) {
+                _x *= x[i];
+            }
+
+            return  Math.pow( _x, 1 / x.length )
+        }
+
+        oParser = new parserFormula( "GEOMEAN(10.5,5.3,2.9)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), geommean([10.5,5.3,2.9]) );
+
+        oParser = new parserFormula( "GEOMEAN(10.5,{5.3,2.9},\"12\")", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), geommean([10.5,5.3,2.9,12]) );
+
+        oParser = new parserFormula( "GEOMEAN(10.5,{5.3,2.9},\"12\",0)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+    } )
+
+    test( "Test: \"HARMEAN\"", function () {
+
+        function harmmean( x ) {
+
+            var _x = 0, xLength = 0;
+            for ( var i = 0; i < x.length; i++ ) {
+                _x += 1/x[i];
+                xLength++;
+            }
+            return xLength / _x ;
+        }
+
+        oParser = new parserFormula( "HARMEAN(10.5,5.3,2.9)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), harmmean([10.5,5.3,2.9]) );
+
+        oParser = new parserFormula( "HARMEAN(10.5,{5.3,2.9},\"12\")", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), harmmean([10.5,5.3,2.9,12]) );
+
+        oParser = new parserFormula( "HARMEAN(10.5,{5.3,2.9},\"12\",0)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+    } )
+
+    test( "Test: \"HYPGEOMDIST\"", function () {
+
+        function hypgeomdist( x, n, M, N ) {
+            return toFixed(Math.binomCoeff(M,x)*Math.binomCoeff(N-M,n-x)/Math.binomCoeff(N,n));
+        }
+
+        oParser = new parserFormula( "HYPGEOMDIST(1,4,8,20)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), hypgeomdist(1,4,8,20) );
+
+        oParser = new parserFormula( "HYPGEOMDIST(1,4,8,20)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), hypgeomdist(1,4,8,20) );
+
+        oParser = new parserFormula( "HYPGEOMDIST(-1,4,8,20)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+        oParser = new parserFormula( "HYPGEOMDIST(5,4,8,20)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+    } )
+
+    test( "Test: \"INTERCEPT\"", function () {
+
+        function intercept( y, x ) {
+
+            var fSumDeltaXDeltaY = 0, fSumSqrDeltaX = 0, _x = 0, _y = 0, xLength = 0;
+            for ( var i = 0; i < x.length; i++ ) {
+                _x += x[i];
+                _y += y[i];
+                xLength++;
+            }
+
+            _x /= xLength;
+            _y /= xLength;
+
+            for ( var i = 0; i < x.length; i++ ) {
+
+                var fValX = x[i];
+                var fValY = y[i];
+
+                fSumDeltaXDeltaY += ( fValX - _x ) * ( fValY - _y );
+                fSumSqrDeltaX += ( fValX - _x ) * ( fValX - _x );
+
+            }
+
+            return toFixed( _y - fSumDeltaXDeltaY / fSumSqrDeltaX * _x );
+
+        }
+
+        oParser = new parserFormula( "INTERCEPT({6,7,9,15,21},{20,28,31,38,40})", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), intercept([6,7,9,15,21],[20,28,31,38,40]) );
+
+    } )
+
+    test( "Test: \"KURT\"", function () {
+
+        function kurt( x ) {
+
+            var sumSQRDeltaX = 0, _x = 0, xLength = 0, standDev = 0, sumSQRDeltaXDivstandDev = 0;
+            for ( var i = 0; i < x.length; i++ ) {
+                _x += x[i];
+                xLength++;
+            }
+
+            _x /= xLength;
+
+            for ( var i = 0; i < x.length; i++ ) {
+                sumSQRDeltaX+= Math.pow( x[i] - _x, 2);
+            }
+
+            standDev = Math.sqrt( sumSQRDeltaX / ( xLength - 1 ) );
+
+            for ( var i = 0; i < x.length; i++ ) {
+                sumSQRDeltaXDivstandDev+= Math.pow( (x[i] - _x)/standDev, 4);
+            }
+
+            return toFixed(xLength*(xLength+1)/(xLength-1)/(xLength-2)/(xLength-3)*sumSQRDeltaXDivstandDev-3*(xLength-1)*(xLength-1)/(xLength-2)/(xLength-3))
+
+        }
+
+        oParser = new parserFormula( "KURT(10.5,12.4,19.4,23.2)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), kurt([10.5,12.4,19.4,23.2]) );
+
+        oParser = new parserFormula( "KURT(10.5,{12.4,19.4},23.2)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), kurt([10.5,12.4,19.4,23.2]) );
+
+        oParser = new parserFormula( "KURT(10.5,12.4,19.4)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+    } )
+
+    test( "Test: \"LARGE\"", function () {
+
+        oParser = new parserFormula( "LARGE({3,5,3,5,4;4,2,4,6,7},3)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 5 );
+
+        oParser = new parserFormula( "LARGE({3,5,3,5,4;4,2,4,6,7},7)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 4 );
+
+    } )
+
+    test( "Test: \"SMALL\"", function () {
+
+        oParser = new parserFormula( "SMALL({3,5,3,5,4;4,2,4,6,7},3)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 3 );
+
+        oParser = new parserFormula( "SMALL({3,5,3,5,4;4,2,4,6,7},7)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 5 );
+
+    } )
+
+    test( "Test: \"MEDIAN\"", function () {
+
+        function median( x ) {
+
+            x.sort(function(a,b){return a - b;});
+
+            if( x.length % 2 )
+                return x[(x.length-1)/2];
+            else
+                return (x[x.length/2-1]+x[x.length/2])/2;
+        }
+
+        oParser = new parserFormula( "MEDIAN(10.5,12.4,19.4,23.2)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), median([10.5,12.4,19.4,23.2]) );
+
+        oParser = new parserFormula( "MEDIAN(10.5,{12.4,19.4},23.2)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), median([10.5,12.4,19.4,23.2]) );
+
+        oParser = new parserFormula( "MEDIAN(-3.5,1.4,6.9,-4.5)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), median([-3.5,1.4,6.9,-4.5]) );
+
+    } )
+
+    test( "Test: \"MODE\"", function () {
+
+        function mode( x ) {
+
+            x.sort( function ( a, b ) {
+                return b-a;
+            } );
+
+            if ( x.length < 1 )
+                return "#VALUE!";
+            else {
+                var nMaxIndex = 0, nMax = 1, nCount = 1, nOldVal = x[0], i;
+
+                for ( i = 1; i < x.length; i++ ) {
+                    if ( x[i] == nOldVal )
+                        nCount++;
+                    else {
+                        nOldVal = x[i];
+                        if ( nCount > nMax ) {
+                            nMax = nCount;
+                            nMaxIndex = i - 1;
+                        }
+                        nCount = 1;
+                    }
+                }
+                if ( nCount > nMax ) {
+                    nMax = nCount;
+                    nMaxIndex = i - 1;
+                }
+                if ( nMax == 1 && nCount == 1 )
+                    return "#VALUE!";
+                else if ( nMax == 1 )
+                    return nOldVal;
+                else
+                    return x[nMaxIndex];
+            }
+        }
+
+        oParser = new parserFormula( "MODE(9,1,5,1,9,5,6,6)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), mode([9,1,5,1,9,5,6,6]) );
+
+        oParser = new parserFormula( "MODE(1,9,5,1,9,5,6,6)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), mode([1,9,5,1,9,5,6,6]) );
+
+        oParser = new parserFormula( "MODE(1,9,5,5,9,5,6,6)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), mode([1,9,5,5,9,5,6,6]) );
+
+    } )
 } );

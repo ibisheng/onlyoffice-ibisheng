@@ -123,6 +123,13 @@ Math.fact = function ( n ) {
     return res;
 }
 
+Math.ln = function( x ){
+    return Math.log( x ) / Math.log( Math.E );
+}
+
+Math.binomCoeff = function ( n, k ) {
+    return this.fact( n ) / (this.fact( k ) * this.fact( n - k ));
+}
 var _func = [];//для велосипеда а-ля перегрузка функций.
 _func[cElementType.number] = [];
 _func[cElementType.string] = [];
@@ -1175,7 +1182,7 @@ function cBaseFunction( name ) {
 cBaseFunction.prototype = {
     constructor:cBaseFunction,
     Calculate:function () {
-        return this.value = new cError( cErrorType.unsupported_function )
+        return this.value = new cError( cErrorType.wrong_name )
     },
     setArgumentsMin:function ( count ) {
         this.argumentsMin = count;
@@ -1836,12 +1843,39 @@ cArea.prototype.countCells = function () {
     return new cNumber( count );
 };
 cArea.prototype.foreach = function ( action ) {
-    var _val = [], r = this.getRange();
-    if ( !r ) {
-        _val.push( new cError( cErrorType.bad_reference ) )
-    }
-    else
+    var r = this.getRange();
+    if ( r ) {
         r._foreach2( action )
+    }
+}
+cArea.prototype.foreach2 = function ( action ) {
+    var r = this.getRange();
+    if ( r ) {
+        r._foreach2( function ( _cell ) {
+            var val;
+            switch ( _cell.getType() ) {
+                case CellValueType.Number:
+                    _cell.getValueWithoutFormat() == "" ? val = new cEmpty() : val = new cNumber( _cell.getValueWithoutFormat() )
+                    break;
+                case CellValueType.Bool:
+                    val = new cBool( _cell.getValueWithoutFormat() );
+                    break;
+                case CellValueType.Error:
+                    val = new cError( _cell.getValueWithoutFormat() );
+                    break;
+                case CellValueType.String:
+                    val = new cString( _cell.getValueWithoutFormat() );
+                    break;
+                default:
+                    if ( _cell.getValueWithoutFormat() && _cell.getValueWithoutFormat() != "" ) {
+                        val = new cNumber( _cell.getValueWithoutFormat() )
+                    }
+                    else
+                        val = checkTypeCell( "" + _cell.getValueWithoutFormat() );
+            }
+            action(val);
+        } );
+    }
 }
 cArea.prototype.getMatrix = function () {
     var arr = [],
@@ -2226,6 +2260,39 @@ cArea3D.prototype.getMatrix = function () {
         } )
     }
     return arr;
+}
+cArea3D.prototype.foreach2 = function ( action ) {
+    var _wsA = this.wsRange();
+    if ( _wsA.length >= 1 ) {
+        var _r = this.range( _wsA );
+        for ( var i = 0; i < _r.length; i++ ) {
+            if ( _r[i] )
+                _r[i]._foreach2( function ( _cell ) {
+                    var val;
+                    switch ( _cell.getType() ) {
+                        case CellValueType.Number:
+                            _cell.getValueWithoutFormat() == "" ? val = new cEmpty() : val = new cNumber( _cell.getValueWithoutFormat() )
+                            break;
+                        case CellValueType.Bool:
+                            val = new cBool( _cell.getValueWithoutFormat() );
+                            break;
+                        case CellValueType.Error:
+                            val = new cError( _cell.getValueWithoutFormat() );
+                            break;
+                        case CellValueType.String:
+                            val = new cString( _cell.getValueWithoutFormat() );
+                            break;
+                        default:
+                            if ( _cell.getValueWithoutFormat() && _cell.getValueWithoutFormat() != "" ) {
+                                val = new cNumber( _cell.getValueWithoutFormat() )
+                            }
+                            else
+                                val = checkTypeCell( "" + _cell.getValueWithoutFormat() );
+                    }
+                    action(val);
+                } );
+        }
+    }
 }
 
 /** @constructor */

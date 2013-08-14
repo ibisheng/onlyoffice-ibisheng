@@ -482,7 +482,7 @@ cFormulaFunction.Mathematic = {
                         if ( a.getValue() <= 0 || b.getValue() <= 0 )
                             this.array[r][c] = new cError( cErrorType.not_numeric );
 
-                        this.array[r][c] = new cNumber( Math.fact( a.getValue() ) / (Math.fact( b.getValue() ) * Math.fact( a.getValue() - b.getValue() )) );
+                        this.array[r][c] = new cNumber( Math.binomCoeff(a.getValue(),b.getValue()) );
                     }
                     else
                         this.array[r][c] = new cError( cErrorType.wrong_value_type );
@@ -509,7 +509,7 @@ cFormulaFunction.Mathematic = {
             if ( arg0.getValue() <= 0 || arg1.getValue() <= 0 || arg0.getValue() < arg1.getValue() )
                 return this.value = new cError( cErrorType.not_numeric );
 
-            return this.value = new cNumber( Math.fact( arg0.getValue() ) / (Math.fact( arg1.getValue() ) * Math.fact( arg0.getValue() - arg1.getValue() )) );
+            return this.value = new cNumber( Math.binomCoeff(arg0.getValue(),arg1.getValue()) );
         }
         r.getInfo = function () {
             return {
