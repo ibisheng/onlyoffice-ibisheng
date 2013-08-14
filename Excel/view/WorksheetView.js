@@ -607,6 +607,7 @@
 			changeZoom: function (isUpdate) {
 				if (isUpdate) {
 					this.cleanSelection();
+					this._initConstValues();
 					this._initCellsArea(false);
 					this._normalizeViewRange();
 					this._cleanCellsTextMetricsCache();
@@ -1027,6 +1028,7 @@
 			// ----- Initialization -----
 
 			_init: function () {
+				this._initConstValues();
 				this._initWorksheetDefaultWidth();
 				this._initCellsArea(true);
 				this.autoFilters.addFiltersAfterOpen(this);
@@ -1132,20 +1134,24 @@
 				this.defaultColWidth = this._modelColWidthToColWidth(gc_dDefaultColWidthCharsAttribute);
 
 				// ToDo разобраться со значениями
-				this.maxRowHeight = asc_calcnpt( 409, this._getPPIY() );
+				this.maxRowHeight = asc_calcnpt(409, this._getPPIY());
 				this.defaultRowDescender = this._calcRowDescender(this.settings.cells.fontSize);
-				this.defaultRowHeight = asc_calcnpt( this.settings.cells.fontSize * this.vspRatio, this._getPPIY() ) + this.height_1px;
+				this.defaultRowHeight = asc_calcnpt(this.settings.cells.fontSize * this.vspRatio, this._getPPIY()) + this.height_1px;
 				gc_dDefaultRowHeightAttribute = this.model.getDefaultHeight() || this.defaultRowHeight;
 			},
-			_initCellsArea: function (fullRecalc) {
-				this.width_1px = asc_calcnpt(0, this._getPPIX(), 1/*px*/);
-				this.width_2px = asc_calcnpt(0, this._getPPIX(), 2/*px*/);
-				this.width_3px = asc_calcnpt(0, this._getPPIX(), 3/*px*/);
-				this.width_padding = asc_calcnpt(0, this._getPPIX(), this.settings.cells.padding/*px*/);
-				this.height_1px = asc_calcnpt(0, this._getPPIY(), 1/*px*/);
-				this.height_2px = asc_calcnpt(0, this._getPPIY(), 2/*px*/);
-				this.height_3px = asc_calcnpt(0, this._getPPIY(), 3/*px*/);
+			_initConstValues: function () {
+				var ppiX = this._getPPIX();
+				var ppiY = this._getPPIY();
+				this.width_1px = asc_calcnpt(0, ppiX, 1/*px*/);
+				this.width_2px = asc_calcnpt(0, ppiX, 2/*px*/);
+				this.width_3px = asc_calcnpt(0, ppiX, 3/*px*/);
+				this.width_padding = asc_calcnpt(0, ppiX, this.settings.cells.padding/*px*/);
 
+				this.height_1px = asc_calcnpt(0, ppiY, 1/*px*/);
+				this.height_2px = asc_calcnpt(0, ppiY, 2/*px*/);
+				this.height_3px = asc_calcnpt(0, ppiY, 3/*px*/);
+			},
+			_initCellsArea: function (fullRecalc) {
 				// calculate rows heights and visible rows
 				this._calcHeaderRowHeight();
 				this._calcRowHeights(fullRecalc ? 1 : 0);
