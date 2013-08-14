@@ -388,7 +388,8 @@ CGraphicObjects.prototype =
                                     type: c_obj.getPresetGeom(),
                                     fill: c_obj.getFill(),
                                     stroke: c_obj.getStroke(),
-                                    canChangeArrows: c_obj.canChangeArrows()
+                                    canChangeArrows: c_obj.canChangeArrows(),
+                                    paddings: c_obj.getPaddings()
                                 };
                                 shape_props.verticalTextAlign = c_obj.bodyPr.anchor;
                             }
@@ -399,7 +400,8 @@ CGraphicObjects.prototype =
                                     type: c_obj.getPresetGeom(),
                                     fill: c_obj.getFill(),
                                     stroke: c_obj.getStroke(),
-                                    canChangeArrows: c_obj.canChangeArrows()
+                                    canChangeArrows: c_obj.canChangeArrows(),
+                                    paddings: c_obj.getPaddings()
                                 };
                                 shape_props =  s_arr[i].Get_Props(shape_props);
                                 shape_props.ShapeProperties = CompareShapeProperties(ShapeProperties, shape_props.ShapeProperties);

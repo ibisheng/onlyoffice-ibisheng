@@ -627,6 +627,7 @@ function CAscShapeProp()
     this.type = null; // custom
     this.fill = null;
     this.stroke = null;
+    this.paddings = null;
 }
 CAscShapeProp.prototype.get_type = function(){return this.type}
 CAscShapeProp.prototype.put_type = function(v){this.type = v;}
@@ -634,6 +635,9 @@ CAscShapeProp.prototype.get_fill = function(){return this.fill}
 CAscShapeProp.prototype.put_fill = function(v){this.fill = v;}
 CAscShapeProp.prototype.get_stroke = function(){return this.stroke}
 CAscShapeProp.prototype.put_stroke = function(v){this.stroke = v;}
+
+CAscShapeProp.prototype.get_paddings = function(){return this.paddings}
+CAscShapeProp.prototype.put_paddings = function(v){this.paddings = v;}
 
 // эта функция ДОЛЖНА минимизироваться
 function CreateAscShapeProp(shape)
@@ -644,6 +648,31 @@ function CreateAscShapeProp(shape)
     var ret = new CAscShapeProp();
     ret.fill = CreateAscFill(shape.brush);
     ret.stroke = CreateAscStroke(shape.pen);
+    var paddings = null;
+    if(shape.textBoxContent)
+    {
+        var body_pr = shape.bodyPr;
+        paddings = new CPaddings();
+        if(typeof body_pr.lIns === "number")
+            paddings.Left = body_pr.lIns;
+        else
+            paddings.Left = 2.54;
+
+        if(typeof body_pr.tIns === "number")
+            paddings.Top = body_pr.tIns;
+        else
+            paddings.Top = 1.27;
+
+        if(typeof body_pr.rIns === "number")
+            paddings.Right = body_pr.rIns;
+        else
+            paddings.Right = 2.54;
+
+        if(typeof body_pr.bIns === "number")
+            paddings.Bottom = body_pr.bIns;
+        else
+            paddings.Bottom = 1.27;
+    }
     return ret;
 }
 
@@ -659,6 +688,8 @@ function CreateAscShapePropFromProp(shapeProp)
         obj.fill = CreateAscFill(shapeProp.fill);
     if(isRealObject(shapeProp.stroke))
         obj.stroke = CreateAscStroke(shapeProp.stroke, shapeProp.canChangeArrows);
+    if(isRealObject(shapeProp.paddings))
+        obj.paddings = shapeProp.paddings;
     return obj;
 }
 

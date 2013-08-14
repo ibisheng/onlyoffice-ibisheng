@@ -219,6 +219,35 @@ WordGroupShapes.prototype =
         return _ret;
     },
 
+    getPaddings: function()
+    {
+        var paddings = null;
+        var cur_paddings;
+        for(var i = 0; i < this.arrGraphicObjects.length; ++i)
+        {
+            cur_paddings = null;
+            if(typeof this.arrGraphicObjects[i].getPaddings === "function")
+            {
+                cur_paddings = this.arrGraphicObjects[i].getPaddings();
+            }
+            if(cur_paddings)
+            {
+                if(!paddings)
+                {
+                    paddings = cur_paddings;
+                }
+                else
+                {
+                    paddings.Left = isRealNumber(paddings.Left) ? (paddings.Left === cur_paddings.Left ? paddings.Left : undefined) : undefined;
+                    paddings.Top = isRealNumber(paddings.Top) ? (paddings.Top === cur_paddings.Top ? paddings.Top : undefined) : undefined;
+                    paddings.Right = isRealNumber(paddings.Right) ? (paddings.Right === cur_paddings.Right ? paddings.Right : undefined) : undefined;
+                    paddings.Bottom = isRealNumber(paddings.Bottom) ? (paddings.Bottom === cur_paddings.Bottom ? paddings.Bottom : undefined) : undefined;
+                }
+            }
+        }
+        return paddings;
+    },
+
     canChangeArrows: function()
     {
         var _ret = false;
@@ -371,7 +400,8 @@ WordGroupShapes.prototype =
                 type: this.getPresetGeom(),
                 fill: this.getFill(),
                 stroke: this.getStroke(),
-                canChangeArrows: this.canChangeArrows()
+                canChangeArrows: this.canChangeArrows(),
+                paddings: this.getPaddings()
             }}
         }
         return null;
@@ -5481,4 +5511,9 @@ function ShapeForResizeInGroup(originalShape, parentTrack)
         if(this.parentTrack)
             global_MatrixTransformer.MultiplyAppend(t, this.parentTrack.transform);
     };
+}
+
+function isRealNumber(number)
+{
+    return number === number && typeof number === "number";
 }

@@ -5179,6 +5179,37 @@ WordShape.prototype =
         }
     },
 
+    getPaddings: function()
+    {
+        var paddings = null;
+        var shape = this;
+        if(shape.textBoxContent)
+        {
+            var body_pr = shape.bodyPr;
+            paddings = new CPaddings();
+            if(typeof body_pr.lIns === "number")
+                paddings.Left = body_pr.lIns;
+            else
+                paddings.Left = 2.54;
+
+            if(typeof body_pr.tIns === "number")
+                paddings.Top = body_pr.tIns;
+            else
+                paddings.Top = 1.27;
+
+            if(typeof body_pr.rIns === "number")
+                paddings.Right = body_pr.rIns;
+            else
+                paddings.Right = 2.54;
+
+            if(typeof body_pr.bIns === "number")
+                paddings.Bottom = body_pr.bIns;
+            else
+                paddings.Bottom = 1.27;
+        }
+        return paddings;
+    },
+
     documentUpdateRulersState: function()
     {
         if(!isRealObject(this.textBoxContent) || !isRealObject(this.transform))
