@@ -630,6 +630,14 @@ function BinaryFileWriter(doc)
 			{
 				this.copyParams.oUsedNumIdMap[oNumPr.NumId] = this.copyParams.nNumIdIndex;
 				this.copyParams.nNumIdIndex++;
+				//проверяем PStyle уровней списка
+				var aNum = this.Document.Numbering.Get_AbstractNum(oNumPr.NumId);
+				for(var i = 0, length = aNum.Lvl.length; i < length; ++i)
+				{
+					var oLvl = aNum.Lvl[i];
+					if(null != oLvl.PStyle)
+						this.copyParams.oUsedStyleMap[oLvl.PStyle] = 1;
+				}
 			}
 		}
 		//сами параграфы скопируются в методе CopyTable, нужно только проанализировать стили
@@ -638,14 +646,14 @@ function BinaryFileWriter(doc)
         this.bs.WriteItem(c_oSerParType.Par, function(){oThis.copyParams.bdtw.WriteParapraph(Item, bUseSelection);});
 		this.copyParams.itemCount++;
 	}
-	this.CopyTable = function(Item, oRowElems)
+	this.CopyTable = function(Item, aRowElems, nMinGrid, nMaxGrid)
     {
 		var oThis = this;
 		//анализируем используемые списки и стили
 		var sTableStyle = Item.Get_TableStyle();
 		if(null != sTableStyle)
 			this.copyParams.oUsedStyleMap[sTableStyle] = 1;
-        this.bs.WriteItem(c_oSerParType.Table, function(){oThis.copyParams.bdtw.WriteDocTable(Item);});
+        this.bs.WriteItem(c_oSerParType.Table, function(){oThis.copyParams.bdtw.WriteDocTable(Item, aRowElems, nMinGrid, nMaxGrid);});
 		this.copyParams.itemCount++;
 	}
 	this.CopyEnd = function()
@@ -2549,7 +2557,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap)
 			this.memory.WriteDouble(oPoint.y);
 		}
 	}
-	this.WriteDocTable = function(table)
+	this.WriteDocTable = function(table, aRowElems, nMinGrid, nMaxGrid)
     {
         var oThis = this;
         //tblPr
@@ -2558,10 +2566,15 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap)
             this.bs.WriteItem(c_oSerDocTableType.tblPr, function(){oThis.btblPrs.WriteTbl(table);});
         //tblGrid
         if(null != table.TableGrid)
-            this.bs.WriteItem(c_oSerDocTableType.tblGrid, function(){oThis.WriteTblGrid(table.TableGrid);});
+		{
+			var aGrid = table.TableGrid;
+			if(null != nMinGrid && null != nMaxGrid && 0 != nMinGrid && aGrid.length - 1 != nMaxGrid)
+				aGrid = aGrid.slice( nMinGrid, nMaxGrid + 1);
+            this.bs.WriteItem(c_oSerDocTableType.tblGrid, function(){oThis.WriteTblGrid(aGrid);});
+		}
         //Content
         if(null != table.Content && table.Content.length > 0)
-            this.bs.WriteItem(c_oSerDocTableType.Content, function(){oThis.WriteTableContent(table.Content);});
+            this.bs.WriteItem(c_oSerDocTableType.Content, function(){oThis.WriteTableContent(table.Content, aRowElems);});
     };
     this.WriteTblGrid = function(grid)
     {
@@ -2573,30 +2586,64 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap)
             this.memory.WriteDouble(grid[i]);
         }
     };
-    this.WriteTableContent = function(Content)
+    this.WriteTableContent = function(Content, aRowElems)
     {
         var oThis = this;
-        for(var i = 0, length = Content.length; i < length; ++i)
-            this.bs.WriteItem(c_oSerDocTableType.Row, function(){oThis.WriteRow(Content[i], i);});
+		var nStart = 0;
+		var nEnd = Content.length - 1;
+		if(null != aRowElems && aRowElems.length > 0)
+		{
+			nStart = aRowElems[0].row;
+			nEnd = aRowElems[aRowElems.length - 1].row;
+		}
+        for(var i = nStart; i <= nEnd; ++i)
+		{
+			var oRowElem = null;
+			if(null != aRowElems)
+				oRowElem = aRowElems[i - nStart];
+            this.bs.WriteItem(c_oSerDocTableType.Row, function(){oThis.WriteRow(Content[i], i, oRowElem);});
+		}
     };
-    this.WriteRow = function(Row, nRowIndex)
+    this.WriteRow = function(Row, nRowIndex, oRowElem)
     {
         var oThis = this;
         //Pr
         if(null != Row.Pr)
         {
-            this.bs.WriteItem(c_oSerDocTableType.Row_Pr, function(){oThis.btblPrs.WriteRowPr(Row.Pr);});
+			var oRowPr = Row.Pr;
+			if(null != oRowElem)
+			{
+				oRowPr = oRowPr.Copy();
+				oRowPr.WAfter = null;
+				oRowPr.WBefore = null;
+				if(null != oRowElem.after)
+					oRowPr.GridAfter = oRowElem.after;
+				else
+					oRowPr.GridAfter = null;
+				if(null != oRowElem.before)
+					oRowPr.GridBefore = oRowElem.before;
+				else
+					oRowPr.GridBefore = null;
+			}
+            this.bs.WriteItem(c_oSerDocTableType.Row_Pr, function(){oThis.btblPrs.WriteRowPr(oRowPr);});
         }
         //Content
         if(null != Row.Content)
         {
-            this.bs.WriteItem(c_oSerDocTableType.Row_Content, function(){oThis.WriteRowContent(Row.Content, nRowIndex);});
+            this.bs.WriteItem(c_oSerDocTableType.Row_Content, function(){oThis.WriteRowContent(Row.Content, nRowIndex, oRowElem);});
         }
     };
-    this.WriteRowContent = function(Content, nRowIndex)
+    this.WriteRowContent = function(Content, nRowIndex, oRowElem)
     {
         var oThis = this;
-        for(var i = 0, length = Content.length; i < length; i++)
+		var nStart = 0;
+		var nEnd = Content.length - 1;
+		if(null != oRowElem)
+		{
+			nStart = oRowElem.indexStart;
+			nEnd = oRowElem.indexEnd;
+		}
+        for(var i = nStart; i <= nEnd; i++)
         {
             this.bs.WriteItem(c_oSerDocTableType.Cell, function(){oThis.WriteCell(Content[i], nRowIndex, i);});
         }
@@ -2910,6 +2957,7 @@ function BinaryFileReader(doc, openParams)
 		styles: null,
 		paraStyles: null,
 		tableStyles: null,
+		lvlStyles: null,
 		DefpPr: null,
 		DefrPr: null,
 		DocumentContent: null
@@ -3071,6 +3119,7 @@ function BinaryFileReader(doc, openParams)
 		this.oReadResult.styles = [];
 		this.oReadResult.paraStyles = [];
 		this.oReadResult.tableStyles = [];
+		this.oReadResult.lvlStyles = [];
 		this.oReadResult.DocumentContent = [];
 		
         var res = c_oSerConstants.ReadOk;
@@ -3263,22 +3312,26 @@ function BinaryFileReader(doc, openParams)
             }
             styles[oNewId.id] = oNewStyle;
 		}
-		var fParseStyle = function(aStyles, oDocumentStyles, bParaStyle)
+		var oStyleTypes = {par: 1, table: 2, lvl: 3};
+		var fParseStyle = function(aStyles, oDocumentStyles, nStyleType)
 		{
 			for(var i = 0, length = aStyles.length; i < length; ++i)
 			{
 				var elem = aStyles[i];
 				if(null != oDocumentStyles[elem.style])
 				{
-					if(bParaStyle)
+					if(oStyleTypes.par == nStyleType)
 						elem.pPr.PStyle = elem.style;
-					else
+					else if(oStyleTypes.table == nStyleType)
 						elem.pPr.TableStyle = elem.style;
+					else
+						elem.pPr.PStyle = elem.style;
 				}
 			}
 		}
-		fParseStyle(this.oReadResult.paraStyles, this.Document.Styles.Style, true);
-		fParseStyle(this.oReadResult.tableStyles, this.Document.Styles.Style, false);
+		fParseStyle(this.oReadResult.paraStyles, this.Document.Styles.Style, oStyleTypes.par);
+		fParseStyle(this.oReadResult.tableStyles, this.Document.Styles.Style, oStyleTypes.table);
+		fParseStyle(this.oReadResult.lvlStyles, this.Document.Styles.Style, oStyleTypes.lvl);
 		var stDefault = this.Document.Styles.Default;
 		var nStId = styles.length;
         if(null == stDefault.Numbering)
@@ -4848,7 +4901,7 @@ function Binary_NumberingTableReader(doc, oReadResult, stream)
         }
 		else if ( c_oSerNumTypes.lvl_PStyle === type )
         {
-            oNewLvl.PStyle = this.stream.GetString2LE(length);
+			this.oReadResult.lvlStyles.push({pPr: oNewLvl, style: this.stream.GetString2LE(length)});
         }
         else if ( c_oSerNumTypes.lvl_ParaPr === type )
         {

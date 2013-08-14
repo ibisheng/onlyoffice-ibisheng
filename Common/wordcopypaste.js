@@ -1176,7 +1176,7 @@ CopyProcessor.prototype =
 			
         oDomTarget.appendChild(tr);
     },
-    CopyTable : function(oDomTarget, table, oRowElems)
+    CopyTable : function(oDomTarget, table, aRowElems)
     {
         this.CommitList(oDomTarget);
         var DomTable = document.createElement( "table" );
@@ -1257,7 +1257,7 @@ CopyProcessor.prototype =
             DomTable.setAttribute("style", tblStyle);
 
         //rows
-		if(null == oRowElems)
+		if(null == aRowElems)
 		{
 			for(var i = 0, length = table.Content.length; i < length; i++)
 				this.CopyRow(DomTable, table, i , null, table.Content.length - 1);
@@ -1265,14 +1265,17 @@ CopyProcessor.prototype =
 		else
 		{
 			var nMaxRow = 0;
-			for(var i in oRowElems)
+			for(var i = 0, length = aRowElems.length; i < length; ++i)
 			{
-				var nCurRow = i - 0;
-				if(nCurRow > nMaxRow)
-					nMaxRow = nCurRow;
+				var elem = aRowElems[i];
+				if(elem.row > nMaxRow)
+					nMaxRow = elem.row;
 			}
-			for(var i in oRowElems)
-				this.CopyRow(DomTable, table, i - 0, oRowElems[i], nMaxRow);
+			for(var i = 0, length = aRowElems.length; i < length; ++i)
+			{
+				var elem = aRowElems[i];
+				this.CopyRow(DomTable, table, elem.row, elem, nMaxRow);
+			}
 		}
 
         oDomTarget.appendChild(DomTable);
@@ -1350,9 +1353,9 @@ CopyProcessor.prototype =
 								var rowElem = oRowElems[elem.Row];
 								if(null == rowElem)
 								{
-									rowElem = {gridStart: null, gridEnd: null, indexStart: null, indexEnd: null, after: null, before: null, cells: {}};
+									rowElem = {row: elem.Row, gridStart: null, gridEnd: null, indexStart: null, indexEnd: null, after: null, before: null, cells: {}};
 									oRowElems[elem.Row] = rowElem;
-									aSelectedRows.push(elem.Row);
+									aSelectedRows.push(rowElem);
 								}
 								if(null == rowElem.indexEnd || elem.Cell > rowElem.indexEnd)
 									rowElem.indexEnd = elem.Cell;
@@ -1361,7 +1364,9 @@ CopyProcessor.prototype =
 								rowElem.cells[elem.Cell] = 1;
 							}
 						}
-						aSelectedRows.sort(fSortAscending);
+						aSelectedRows.sort(function(a,b){
+							return a.row - b.row;
+						});
 						var nMinGrid = null;
 						var nMaxGrid = null;
 						var nPrevStartGrid = null;
@@ -1369,7 +1374,8 @@ CopyProcessor.prototype =
 						var nPrevRowIndex = null;
 						for(var i = 0, length = aSelectedRows.length; i < length; ++i)
 						{
-							var nRowIndex = aSelectedRows[i];
+							var elem = aSelectedRows[i];
+							var nRowIndex = elem.row;
 							if(null != nPrevRowIndex)
 							{
 								if(nPrevRowIndex + 1 != nRowIndex)
@@ -1380,7 +1386,6 @@ CopyProcessor.prototype =
 								}
 							}
 							nPrevRowIndex = nRowIndex;
-							var elem = oRowElems[nRowIndex];
 							var row = Item.Content[nRowIndex];
 							var cellFirst = row.Get_Cell(elem.indexStart);
 							var cellLast = row.Get_Cell(elem.indexEnd);
@@ -1398,7 +1403,10 @@ CopyProcessor.prototype =
 										{
 											var nCurGridCol = cellCur.Metrics.StartGridCol;
 											if(nCurGridCol >= nPrevStartGrid)
+											{
 												nCurStartGrid = nCurGridCol;
+												elem.indexStart = j;
+											}
 											else
 												break;
 										}
@@ -1415,7 +1423,10 @@ CopyProcessor.prototype =
 										{
 											var nCurGridCol = cellCur.Metrics.StartGridCol + cellCur.Get_GridSpan() - 1;
 											if(nCurGridCol <= nPrevEndGrid)
+											{
 												nCurEndGrid = nCurGridCol;
+												elem.indexEnd = j;
+											}
 											else
 												break;
 										}
@@ -1434,15 +1445,15 @@ CopyProcessor.prototype =
 						if(null != nMinGrid && null != nMaxGrid)
 						{
 							//выставляем after, before
-							for(var i in oRowElems)
+							for(var i = 0 ,length = aSelectedRows.length; i < length; ++i)
 							{
-								var elem = oRowElems[i];
+								var elem = aSelectedRows[i];
 								elem.before = elem.gridStart - nMinGrid;
 								elem.after = nMaxGrid - elem.gridEnd;
 							}
-							this.oBinaryFileWriter.CopyTable(Item, oRowElems);
+							this.oBinaryFileWriter.CopyTable(Item, aSelectedRows, nMinGrid, nMaxGrid);
 							this.oBinaryFileWriter.copyParams.bLockCopyPar = true;
-							this.CopyTable(oDomTarget, Item, oRowElems);
+							this.CopyTable(oDomTarget, Item, aSelectedRows);
 							this.oBinaryFileWriter.copyParams.bLockCopyPar = null;
 						}
                     }
@@ -2343,7 +2354,8 @@ PasteProcessor.prototype =
 		}
 		//обрабатываем стили
 		var isUsuallyContainsStyle;
-		var fParseStyle = function(aStyles, oDocumentStyles, oReadResult, bParaStyle)
+		var oStyleTypes = {par: 1, table: 2, lvl: 3};
+		var fParseStyle = function(aStyles, oDocumentStyles, oReadResult, nStyleType)
 		{
 			for(var i = 0, length = aStyles.length; i < length; ++i)
 			{
@@ -2357,18 +2369,21 @@ PasteProcessor.prototype =
 						isUsuallyContainsStyle = styleDoc.isEqual(stylePaste.style);
 						if(isUsuallyContainsStyle)
 						{
-							if(bParaStyle)
+							if(oStyleTypes.par == nStyleType)
 								elem.pPr.PStyle = j;
-							else
+							else if(oStyleTypes.table == nStyleType)
 								elem.pPr.TableStyle = j;
+							else
+								elem.pPr.PStyle = j;
 							break;
 						}
 					}
 				}
 			}
 		}
-		fParseStyle(oBinaryFileReader.oReadResult.paraStyles, this.oDocument.Styles.Style, oBinaryFileReader.oReadResult, true);
-		fParseStyle(oBinaryFileReader.oReadResult.tableStyles, this.oDocument.Styles.Style, oBinaryFileReader.oReadResult, false);
+		fParseStyle(oBinaryFileReader.oReadResult.paraStyles, this.oDocument.Styles.Style, oBinaryFileReader.oReadResult, oStyleTypes.par);
+		fParseStyle(oBinaryFileReader.oReadResult.tableStyles, this.oDocument.Styles.Style, oBinaryFileReader.oReadResult, oStyleTypes.table);
+		fParseStyle(oBinaryFileReader.oReadResult.lvlStyles, this.oDocument.Styles.Style, oBinaryFileReader.oReadResult, oStyleTypes.lvl);
 		var aContent = oBinaryFileReader.oReadResult.DocumentContent;
 		if(aContent.length > 0)
 		{
@@ -2391,6 +2406,7 @@ PasteProcessor.prototype =
 	Start : function(node)
     {
 		var oThis = this;
+		this.oDocument = this._GetTargetDocument(this.oDocument);
 		// var oPasteContent = this.ReadFromBinary(node.innerText);
 		// this.aContent = oPasteContent.content;
 		// oThis.api.pre_Paste(oPasteContent.fonts, oPasteContent.images, function(){
@@ -2443,7 +2459,6 @@ PasteProcessor.prototype =
         this._Prepeare(node,
             function(){
                 oThis.aContent = new Array();
-                oThis.oDocument = oThis._GetTargetDocument(oThis.oDocument);
                 //�� ����� ���������� �������� ��� ������� ��������� �������
                 oThis._Execute(node, {}, true, true, false);
 
