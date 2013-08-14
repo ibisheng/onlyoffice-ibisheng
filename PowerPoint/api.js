@@ -57,8 +57,6 @@ function asc_docs_api(name)
 
     this.bInit_word_control = false;
 	this.isDocumentModify = false;
-	//Флаг нужен чтобы не происходило сохранение пока не завершится предыдущее сохранение
-	this.canSave = true;
 
     this.isImageChangeUrl = false;
     this.isShapeImageChangeUrl = false;
@@ -92,6 +90,13 @@ function asc_docs_api(name)
     this.CoAuthoringApi = new CDocsCoApi();
     this.isCoAuthoringEnable = true;
     /**************************************/
+	// AutoSave
+	this.autoSaveGap = 0;				// Интервал автосохранения (0 - означает, что автосохранения нет) в милесекундах
+	this.autoSaveTimeOutId = null;		// Идентификатор таймаута
+	this.isAutoSave = false;			// Флаг, означает что запущено автосохранение
+	this.autoSaveGapAsk = 5000;			// Константа для повторного запуска автосохранения, если не смогли сделать сразу lock (только при автосохранении) в милесекундах
+
+	this.canSave = true;				//Флаг нужен чтобы не происходило сохранение пока не завершится предыдущее сохранение
 
     // объекты, нужные для отправки в тулбар (шрифты, стили)
     this._gui_fonts = null;
@@ -126,8 +131,7 @@ CChatMessage.prototype.get_Message = function() { return this.Message; }
  ToDo Register Callback OnCoAuthoringDisconnectUser возвращается userId
  */
 // Init CoAuthoring
-asc_docs_api.prototype._coAuthoringInit = function(docId, user)
-{
+asc_docs_api.prototype._coAuthoringInit = function (docId, user) {
     if (!this.CoAuthoringApi) {
         g_oIdCounter.Set_Load(false);
         this.asyncServerIdEndLoaded ();
@@ -139,19 +143,16 @@ asc_docs_api.prototype._coAuthoringInit = function(docId, user)
     this.CoAuthoringApi.onMessage               	= function (e) { oThis.asc_fireCallback( "asc_onCoAuthoringChatReceiveMessage", e ); };
     this.CoAuthoringApi.onConnectionStateChanged	= function (e) { oThis.asc_fireCallback( "asc_onConnectionStateChanged", e ); };
     this.CoAuthoringApi.onUserStateChanged			= function (e) { oThis.asc_fireCallback( "asc_onUserStateChanged", e ); };
-    this.CoAuthoringApi.onLocksAcquired				= function (e)
-    {
+    this.CoAuthoringApi.onLocksAcquired				= function (e) {
 		if (2 != e["state"]) {
 			// TODO: эвент о пришедших lock-ах
 		}
     };
-    this.CoAuthoringApi.onLocksReleased				= function (e, bChanges)
-    {
+    this.CoAuthoringApi.onLocksReleased				= function (e, bChanges) {
 		var element = e["block"];
         // TODO: эвент о снятии lock-ов другими пользователями
     };
-    this.CoAuthoringApi.onSaveChanges				= function (e, bSendEvent)
-    {
+    this.CoAuthoringApi.onSaveChanges				= function (e, bSendEvent) {
 		// bSendEvent = false - это означает, что мы загружаем имеющиеся изменения при открытии
 		var bAddChanges = false;
 
@@ -180,6 +181,7 @@ asc_docs_api.prototype._coAuthoringInit = function(docId, user)
 	 * Event об отсоединении от сервера
 	 * @param {jQuery} e  event об отсоединении с причиной
 	 * @param {Bool} isDisconnectAtAll  окончательно ли отсоединяемся(true) или будем пробовать сделать reconnect(false) + сами отключились
+	 * @param {Bool} isCloseCoAuthoring
 	 */
 	this.CoAuthoringApi.onDisconnect				= function (e, isDisconnectAtAll, isCloseCoAuthoring) {
 		if (0 === oThis.CoAuthoringApi.get_state())
@@ -200,23 +202,20 @@ asc_docs_api.prototype._coAuthoringInit = function(docId, user)
     });
 
     // ToDo init other callbacks
-}
-asc_docs_api.prototype._coAuthoringInitCallBack = function(_this)
-{
-	if(undefined !== window['g_cAscCoAuthoringUrl'])
+};
+asc_docs_api.prototype._coAuthoringInitCallBack = function (_this) {
+	if (undefined !== window['g_cAscCoAuthoringUrl'])
 		window.g_cAscCoAuthoringUrl = window['g_cAscCoAuthoringUrl'];
 
-    if(undefined !== window.g_cAscCoAuthoringUrl)
-    {
+    if (undefined !== window.g_cAscCoAuthoringUrl) {
         //Turn off CoAuthoring feature if it disabled
         if(!_this.isCoAuthoringEnable)
             window.g_cAscCoAuthoringUrl = "";
 
         _this._coAuthoringSetServerUrl(window.g_cAscCoAuthoringUrl);
     }
-    if(undefined === editor.User || null === editor.User ||
-		undefined === editor.User.asc_getId() || null === editor.User.asc_getId())
-    {
+    if (undefined === editor.User || null === editor.User ||
+		undefined === editor.User.asc_getId() || null === editor.User.asc_getId()) {
 		var asc_user = window["Asc"].asc_CUser;
 		editor.User = new asc_user();
 		editor.User.asc_setId("Unknown");
@@ -225,15 +224,14 @@ asc_docs_api.prototype._coAuthoringInitCallBack = function(_this)
         _this._coAuthoringSetServerUrl("");
     }
     _this._coAuthoringInit(documentId, editor.User);
-}
+};
 // Set CoAuthoring server url
-asc_docs_api.prototype._coAuthoringSetServerUrl = function(url)
-{
+asc_docs_api.prototype._coAuthoringSetServerUrl = function (url) {
     if (!this.CoAuthoringApi)
         return; // Error
 
     this.CoAuthoringApi.set_url(url);
-}
+};
 // server disconnect
 asc_docs_api.prototype.asc_coAuthoringDisconnect = function () {
 	//Just set viewer mode
@@ -243,53 +241,67 @@ asc_docs_api.prototype.asc_coAuthoringDisconnect = function () {
 	//if (!this.CoAuthoringApi)
 	//	return; // Error
 	//this.CoAuthoringApi.disconnect();
-}
+};
 // send chart message
-asc_docs_api.prototype.asc_coAuthoringChatSendMessage = function(message)
-{
+asc_docs_api.prototype.asc_coAuthoringChatSendMessage = function (message) {
     if (!this.CoAuthoringApi)
         return; // Error
     this.CoAuthoringApi.sendMessage(message);
-}
+};
 // get chart messages, возвращается массив CChatMessage
-asc_docs_api.prototype.asc_coAuthoringChatGetMessages = function()
-{
+asc_docs_api.prototype.asc_coAuthoringChatGetMessages = function () {
     if (!this.CoAuthoringApi)
 		return; // Error
 	this.CoAuthoringApi.getMessages();
-}
+};
 // get users, возвращается массив users
-asc_docs_api.prototype.asc_coAuthoringGetUsers = function()
-{
+asc_docs_api.prototype.asc_coAuthoringGetUsers = function () {
     if (!this.CoAuthoringApi)
 		return; // Error
 	this.CoAuthoringApi.getUsers();
-}
+};
+/////////////////////////////////////////////////////////////////////////
+////////////////////////////AutoSave api/////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+asc_docs_api.prototype.autoSaveInit = function (autoSaveGap) {
+	// Очищаем предыдущий таймер
+	if (null !== this.autoSaveTimeOutId)
+		clearTimeout(this.autoSaveTimeOutId);
 
-asc_docs_api.prototype.asyncServerIdStartLoaded = function()
-{
+	if (autoSaveGap || this.autoSaveGap) {
+		var t = this;
+		this.autoSaveTimeOutId = setTimeout(function () {
+			t.autoSaveTimeOutId = null;
+			if (t.isDocumentModified())
+				t.asc_Save(/*isAutoSave*/true);
+			else
+				t.autoSaveInit();
+		}, (autoSaveGap || this.autoSaveGap));
+	}
+};
+
+asc_docs_api.prototype.asyncServerIdStartLoaded = function () {
     //Загружаем скрипт с настройками, по окончанию инициализируем контрол для совместного редактирования
     //TODO: Вынести шрифты в коммоны, SetFontPath заменить на SetCommonPath,
     //пердаваемый путь использовать для загрузки шрифтов и настороек.
-	if(true == ASC_DOCS_API_LOAD_COAUTHORING_SETTINGS){
+	if(true == ASC_DOCS_API_LOAD_COAUTHORING_SETTINGS) {
+		// ToDo убрать зависимость от this.FontLoader.fontFilesPath
     	this.ScriptLoader.LoadScriptAsync( this.FontLoader.fontFilesPath + "../Common/docscoapisettings.js", this._coAuthoringInitCallBack, this);
-	}
-	else{
+	} else {
 		this._coAuthoringInitCallBack(this);
 	}
-}
+};
 
-asc_docs_api.prototype.asyncServerIdEndLoaded = function()
-{
+asc_docs_api.prototype.asyncServerIdEndLoaded = function () {
     this.ServerIdWaitComplete = true;
     if (true == this.ServerImagesWaitComplete)
         this.OpenDocumentEndCallback();
-}
+};
 
 // Эвент о пришедщих изменениях
 asc_docs_api.prototype.syncCollaborativeChanges = function () {
 	this.asc_fireCallback("asc_onCollaborativeChanges");
-}
+};
 
 ///////////////////////////////////////////
 asc_docs_api.prototype.SetUnchangedDocument = function()
@@ -931,33 +943,31 @@ asc_docs_api.prototype.Paste = function(){
 asc_docs_api.prototype.Share = function(){
 
 }
-asc_docs_api.prototype.asc_Save = function(){
-	if(true == this.canSave)
-	{
+asc_docs_api.prototype.asc_Save = function (isAutoSave) {
+	if (true === this.canSave) {
 		this.canSave = false;
-		this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
-		var data = this.WordControl.SaveDocument();
-		var oAdditionalData = new Object();
-		oAdditionalData["c"] = "save";
-		oAdditionalData["id"] = documentId;
-		oAdditionalData["vkey"] = documentVKey;
-		oAdditionalData["outputformat"] = c_oAscFileType.INNER;
-		oAdditionalData["innersave"] = true;
-		oAdditionalData["savetype"] = "completeall";
-		var sData = "mnuSaveAs" + cCharDelimiter + JSON.stringify(oAdditionalData) + cCharDelimiter + data;
-		sendCommand(editor, function(incomeObject){
-			if(null != incomeObject && "save" == incomeObject.type)
-				editor.processSavedFile(incomeObject.data, true);
-		}, sData);
+		this.isAutoSave = !!isAutoSave;
+		if (!this.isAutoSave) {
+			this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);
+		}
+
+		var t = this;
+		this.CoAuthoringApi.askSaveChanges (function (e) { t.onSaveCallback (e); });
 	}
-}
-asc_docs_api.prototype.asc_OnSaveEnd = function(isDocumentSaved){
+};
+asc_docs_api.prototype.asc_OnSaveEnd = function (isDocumentSaved) {
 	this.canSave = true;
-	this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
+	this.isAutoSave = false;
+	this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+	this.CoAuthoringApi.unSaveChanges();
 	if (isDocumentSaved) {
-		this.SetUnchangedDocument();
+		// Запускаем таймер автосохранения
+		this.autoSaveInit();
+	} else {
+		this.CoAuthoringApi.disconnect();
 	}
-}
+};
 asc_docs_api.prototype.processSavedFile = function(url, bInner){
 	if(bInner)
 		editor.asc_fireCallback("asc_onSaveUrl", url, function(hasError){});
@@ -1281,7 +1291,73 @@ asc_docs_api.prototype.sync_InitEditorThemes = function(gui_editor_themes, gui_d
 }
 asc_docs_api.prototype.sync_InitEditorTableStyles = function(styles){
     this.asc_fireCallback("asc_onInitTableTemplates",styles);
-}
+};
+
+asc_docs_api.prototype.onSaveCallback = function (e) {
+	var t = this;
+	var nState;
+	if (false == e["savelock"]) {
+		if (t.isAutoSave) {
+			t.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+			t.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);
+		}
+
+		// Принимаем чужие изменения (ToDo)
+		//CollaborativeEditing.Apply_Changes();
+
+		// Сохраняем файл на сервер
+		var data = this.WordControl.SaveDocument();
+		var oAdditionalData = new Object();
+		oAdditionalData["c"] = "save";
+		oAdditionalData["id"] = documentId;
+		oAdditionalData["vkey"] = documentVKey;
+		oAdditionalData["outputformat"] = c_oAscFileType.INNER;
+		oAdditionalData["innersave"] = true;
+		oAdditionalData["savetype"] = "completeall";
+		var sData = "mnuSaveAs" + cCharDelimiter + JSON.stringify(oAdditionalData) + cCharDelimiter + data;
+		sendCommand(editor, function(incomeObject){
+			if(null != incomeObject && "save" == incomeObject.type)
+				editor.processSavedFile(incomeObject.data, true);
+		}, sData);
+
+		// Пересылаем свои изменения (ToDo)
+		//CollaborativeEditing.Send_Changes();
+		//Обратно выставляем, что документ не модифицирован
+		t.SetUnchangedDocument();
+
+		// Заканчиваем сохранение, т.к. мы хотим дать пользователю продолжать набирать документ
+		// Но сохранять до прихода ответа от сервера не сможет
+		t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);
+	} else {
+		nState = t.CoAuthoringApi.get_state();
+		if (3 === nState) {
+			// Отключаемся от сохранения, соединение потеряно
+			if (!t.isAutoSave) {
+				t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);
+				t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+			}
+			t.isAutoSave = false;
+			t.canSave = true;
+		} else {
+			// Если автосохранение, то не будем ждать ответа, а просто перезапустим таймер на немного
+			if (t.isAutoSave) {
+				t.isAutoSave = false;
+				t.canSave = true;
+				t.autoSaveInit(t.autoSaveGapAsk);
+				return;
+			}
+
+			setTimeout(function () {
+				t.CoAuthoringApi.askSaveChanges(function (event) {
+					// Функция может быть долгой (и в IE10 происходит disconnect). Поэтому вызовем через timeout
+					window.setTimeout(function () {
+						t.onSaveCallback(event);
+					}, 10);
+				});
+			}, 1000);
+		}
+	}
+};
 
 /*----------------------------------------------------------------*/
 /*functions for working with paragraph*/
@@ -2943,7 +3019,10 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
 
     if (this.isViewMode)
         this.SetViewMode(true);
-}
+
+	// Запускаем таймер автосохранения
+	this.autoSaveInit();
+};
 
 asc_docs_api.prototype.asyncFontStartLoaded = function()
 {
@@ -3045,7 +3124,15 @@ asc_docs_api.prototype.ClearSearch = function()
 asc_docs_api.prototype.GetCurrentVisiblePage = function()
 {
     return this.WordControl.m_oDrawingDocument.SlideCurrent;
-}
+};
+
+// Выставление интервала автосохранения (0 - означает, что автосохранения нет)
+asc_docs_api.prototype.asc_setAutoSaveGap = function (autoSaveGap) {
+	if (typeof autoSaveGap === "number") {
+		this.autoSaveGap = autoSaveGap * 1000; // Нам выставляют в секундах
+		this.autoSaveInit();
+	}
+};
 
 asc_docs_api.prototype.SetMobileVersion = function(val)
 {
@@ -3055,7 +3142,7 @@ asc_docs_api.prototype.SetMobileVersion = function(val)
         this.WordControl.m_bIsRuler = false;
 		this.ShowParaMarks = false;
     }
-}
+};
 
 asc_docs_api.prototype.GoToHeader = function(pageNumber)
 {
