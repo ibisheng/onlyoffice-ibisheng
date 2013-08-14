@@ -2252,6 +2252,16 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.asc_showImageFileDialog();
 			},
 			
+			asc_putPrLineSpacing: function(type, value) {
+				var ws = this.wb.getWorksheet();
+				ws.objectRender.controller.putPrLineSpacing(type, value);
+			},
+			
+			asc_putLineSpacingBeforeAfter: function(type,value) { // "type == 0" means "Before", "type == 1" means "After"
+				var ws = this.wb.getWorksheet();
+				ws.objectRender.controller.putLineSpacingBeforeAfter(type, value);
+			},
+			
 			asyncImageStartLoaded: function() {
 			},
 			
@@ -3162,6 +3172,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_changeShapeType"] = prot.asc_changeShapeType;
 		prot["asc_setInterfaceDrawImagePlaceShape"] = prot.asc_setInterfaceDrawImagePlaceShape;
 		prot["asc_changeImageFromFile"] = prot.asc_changeImageFromFile;
+		prot["asc_putPrLineSpacing"] = prot.asc_putPrLineSpacing;
+		prot["asc_putLineSpacingBeforeAfter"] = prot.asc_putLineSpacingBeforeAfter;
 		prot["asc_changeShapeImageFromFile"] = prot.asc_changeShapeImageFromFile;
 		
 		// Cell interface

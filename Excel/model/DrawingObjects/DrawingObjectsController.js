@@ -1005,7 +1005,7 @@ DrawingObjectsController.prototype =
 	
 	prepareTextProperties: function(TextPr)
 	{
-		var _this = this;
+		/*var _this = this;
 		var trigger = this.drawingObjects.callTrigger;
 		
 		if ( "undefined" != typeof(TextPr) )
@@ -1033,7 +1033,7 @@ DrawingObjectsController.prototype =
 			{
 				oTextPrMap[Item]( this, TextPr[Item] );
 			}
-		}
+		}*/
 	},
 	
 	prepareParagraphProperties: function(ParaPr, TextPr)
@@ -1084,6 +1084,12 @@ DrawingObjectsController.prototype =
 		trigger("asc_onPrAlign", ParaPr.Jc);
 		
 		ascSelectedObjects.push(new asc_CSelectedObject( c_oAscTypeSelectElement.Paragraph, new asc_CParagraphProperty( ParaPr ) ));
+	},
+	
+	putPrLineSpacing: function(type, value) {
+	},
+	
+	putLineSpacingBeforeAfter: function(type, value) {
 	},
 	
 	setGraphicObjectProps: function(props)

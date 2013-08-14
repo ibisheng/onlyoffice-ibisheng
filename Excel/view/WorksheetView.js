@@ -5359,6 +5359,13 @@
 				var xpos = x;
 				var ypos = y;
 				var ar = (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRanges.length - 1] : this.activeRange;
+				
+				var cursorInfo = this.objectRender.checkCursorDrawingObject(xpos, ypos);
+				if ( cursorInfo ) {
+					var graphicSelectionType = this.objectRender.getGraphicSelectionType(cursorInfo.data);
+					ar.type = graphicSelectionType;
+					return;
+				}
 
 				x *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIX() );
 				y *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIY() );
@@ -5389,17 +5396,8 @@
 					ar.assign(c, r, c, r);
 					ar.startCol = c;
 					ar.startRow = r;
-
-					var cursorInfo = this.objectRender.checkCursorDrawingObject(xpos, ypos);
-					if ( cursorInfo ) {
-						var graphicSelectionType = this.objectRender.getGraphicSelectionType(cursorInfo.data);
-						ar.type = graphicSelectionType;
-					}
-					else
-					{
-						ar.type = c_oAscSelectionType.RangeCells;
-						this._fixSelectionOfMergedCells();
-					}
+					ar.type = c_oAscSelectionType.RangeCells;
+					this._fixSelectionOfMergedCells();
 				}
 			},
 
@@ -5713,15 +5711,31 @@
 				cell_info.flags.lockText = ("" !== cell_info.text && (isNumberFormat || "" !== cell_info.formula));
 
 				cell_info.font = new asc_CFont();
-				cell_info.font.name = c.getFontname();
-				cell_info.font.size = c.getFontsize();
-				cell_info.font.bold = c.getBold();
-				cell_info.font.italic = c.getItalic();
-				cell_info.font.underline = ("none" !== c.getUnderline()); // ToDo убрать, когда будет реализовано двойное подчеркивание
-				cell_info.font.strikeout = c.getStrikeout();
-				cell_info.font.subscript = fa === "subscript";
-				cell_info.font.superscript = fa === "superscript";
-				cell_info.font.color = (fc ? asc_obj2Color(fc) : asc_n2Color(c_opt.defaultState.colorNumber));
+				var isGraphicObject = this.objectRender.selectedGraphicObjectsExists();
+				var textPr = this.objectRender.controller.getParagraphTextPr();
+				
+				if ( isGraphicObject && textPr && (textPr.Bold != undefined) && (textPr.Italic != undefined) && (textPr.Underline != undefined) && (textPr.FontFamily != undefined) ) {
+					cell_info.font.name = textPr.FontFamily.Name;
+					cell_info.font.size = textPr.FontSize;
+					cell_info.font.bold = textPr.Bold;
+					cell_info.font.italic = textPr.Italic;
+					cell_info.font.underline = textPr.Underline;
+					cell_info.font.strikeout = textPr.Strikeout;
+					//cell_info.font.subscript = fa === "subscript";
+					//cell_info.font.superscript = fa === "superscript";
+					cell_info.font.color = CreateAscColorCustom(textPr.Color.r, textPr.Color.g, textPr.Color.b);
+				}
+				else {
+					cell_info.font.name = c.getFontname();
+					cell_info.font.size = c.getFontsize();
+					cell_info.font.bold = c.getBold();
+					cell_info.font.italic = c.getItalic();
+					cell_info.font.underline = ("none" !== c.getUnderline()); // ToDo убрать, когда будет реализовано двойное подчеркивание
+					cell_info.font.strikeout = c.getStrikeout();
+					cell_info.font.subscript = fa === "subscript";
+					cell_info.font.superscript = fa === "superscript";
+					cell_info.font.color = (fc ? asc_obj2Color(fc) : asc_n2Color(c_opt.defaultState.colorNumber));
+				}
 
 				cell_info.fill = new asc_CFill((null !==  bg && undefined !== bg) ? asc_obj2Color(bg) : bg);
 

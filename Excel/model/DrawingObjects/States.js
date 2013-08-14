@@ -4846,6 +4846,8 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
         {
             case STATES_ID_NULL:
             {
+				drawingObjectsController.drawingObjects.unselectDrawingObjects();
+				drawingObjectsController.drawingObjects.getWorksheet()._drawSelection();
                 bRetValue = true;
                 break;
             }
