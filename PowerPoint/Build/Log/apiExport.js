@@ -10,6 +10,7 @@ prop:asc_coAuthoringDisconnect
 prop:asc_coAuthoringChatSendMessage
 prop:asc_coAuthoringChatGetMessages
 prop:asc_coAuthoringGetUsers
+prop:autoSaveInit
 prop:asyncServerIdStartLoaded
 prop:asyncServerIdEndLoaded
 prop:syncCollaborativeChanges
@@ -122,6 +123,7 @@ prop:sync_PrLineSpacingCallBack
 prop:sync_InitEditorFonts
 prop:sync_InitEditorThemes
 prop:sync_InitEditorTableStyles
+prop:onSaveCallback
 prop:paraApply
 prop:put_PrAlign
 prop:put_TextPrBaseline
@@ -274,6 +276,7 @@ prop:GetDocWidthPx
 prop:GetDocHeightPx
 prop:ClearSearch
 prop:GetCurrentVisiblePage
+prop:asc_setAutoSaveGap
 prop:SetMobileVersion
 prop:GoToHeader
 prop:changeSlideSize
@@ -868,6 +871,7 @@ asc_docs_api.prototype['asc_coAuthoringDisconnect'] = asc_docs_api.prototype.asc
 asc_docs_api.prototype['asc_coAuthoringChatSendMessage'] = asc_docs_api.prototype.asc_coAuthoringChatSendMessage;
 asc_docs_api.prototype['asc_coAuthoringChatGetMessages'] = asc_docs_api.prototype.asc_coAuthoringChatGetMessages;
 asc_docs_api.prototype['asc_coAuthoringGetUsers'] = asc_docs_api.prototype.asc_coAuthoringGetUsers;
+asc_docs_api.prototype['autoSaveInit'] = asc_docs_api.prototype.autoSaveInit;
 asc_docs_api.prototype['asyncServerIdStartLoaded'] = asc_docs_api.prototype.asyncServerIdStartLoaded;
 asc_docs_api.prototype['asyncServerIdEndLoaded'] = asc_docs_api.prototype.asyncServerIdEndLoaded;
 asc_docs_api.prototype['syncCollaborativeChanges'] = asc_docs_api.prototype.syncCollaborativeChanges;
@@ -980,6 +984,7 @@ asc_docs_api.prototype['sync_PrLineSpacingCallBack'] = asc_docs_api.prototype.sy
 asc_docs_api.prototype['sync_InitEditorFonts'] = asc_docs_api.prototype.sync_InitEditorFonts;
 asc_docs_api.prototype['sync_InitEditorThemes'] = asc_docs_api.prototype.sync_InitEditorThemes;
 asc_docs_api.prototype['sync_InitEditorTableStyles'] = asc_docs_api.prototype.sync_InitEditorTableStyles;
+asc_docs_api.prototype['onSaveCallback'] = asc_docs_api.prototype.onSaveCallback;
 asc_docs_api.prototype['paraApply'] = asc_docs_api.prototype.paraApply;
 asc_docs_api.prototype['put_PrAlign'] = asc_docs_api.prototype.put_PrAlign;
 asc_docs_api.prototype['put_TextPrBaseline'] = asc_docs_api.prototype.put_TextPrBaseline;
@@ -1132,6 +1137,7 @@ asc_docs_api.prototype['GetDocWidthPx'] = asc_docs_api.prototype.GetDocWidthPx;
 asc_docs_api.prototype['GetDocHeightPx'] = asc_docs_api.prototype.GetDocHeightPx;
 asc_docs_api.prototype['ClearSearch'] = asc_docs_api.prototype.ClearSearch;
 asc_docs_api.prototype['GetCurrentVisiblePage'] = asc_docs_api.prototype.GetCurrentVisiblePage;
+asc_docs_api.prototype['asc_setAutoSaveGap'] = asc_docs_api.prototype.asc_setAutoSaveGap;
 asc_docs_api.prototype['SetMobileVersion'] = asc_docs_api.prototype.SetMobileVersion;
 asc_docs_api.prototype['GoToHeader'] = asc_docs_api.prototype.GoToHeader;
 asc_docs_api.prototype['changeSlideSize'] = asc_docs_api.prototype.changeSlideSize;
