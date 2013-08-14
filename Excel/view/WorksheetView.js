@@ -1872,7 +1872,7 @@
 				if (this.overlayCtx) {
 					this._drawSelection();
 				}
-				this.objectRender.showDrawingObjects(false);
+				this.objectRender.showDrawingObjects(true);
 				
 				return this;
 			},
