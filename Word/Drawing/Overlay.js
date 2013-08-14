@@ -2096,5 +2096,9 @@ CSlideBoundsChecker.prototype =
             this.Bounds.max_x += _correct;
             this.Bounds.max_y += _correct;
         }
+    },
+
+    DrawLockObjectRect : function()
+    {
     }
 };
