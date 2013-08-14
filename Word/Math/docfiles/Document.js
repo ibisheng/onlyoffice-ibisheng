@@ -7836,12 +7836,16 @@ CDocument.prototype =
     //**
     OnKeyDown : function(e)
     {
-        return MathControl.OnKeyDown(e);
+        var flag = MathControl.OnKeyDown(e);
+        this.Document_UpdateInterfaceState();
+        return flag;
 
     },
     OnKeyPress : function(e)
     {
-        return MathControl.OnKeyPress(e);
+        var flag = MathControl.OnKeyPress(e);
+        this.Document_UpdateInterfaceState();
+        return flag;
     },
     OnMouseDown : function(e, X, Y, PageIndex)
     {
@@ -9117,6 +9121,9 @@ CDocument.prototype =
 
         this.History.Undo();
         this.Recalculate( false, false, this.History.RecalculateData );
+        //**
+        MathControl.Recalculate();
+        //**
 
         this.Document_UpdateSelectionState();
         this.Document_UpdateInterfaceState();

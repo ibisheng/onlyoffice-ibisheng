@@ -409,6 +409,10 @@ CControlComposition.prototype =
     GetTxtPrp: function()
     {
         return this.Content[this.CurPos].GetPrpSelectContent();
+    },
+    Recalculate: function()
+    {
+        this.Content[this.CurPos].Refresh();
     }
 }
 var MathControl = new CControlComposition();

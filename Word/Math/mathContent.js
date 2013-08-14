@@ -1,3 +1,7 @@
+var historyitem_Math_AddItem                   =  1; // Добавляем элемент
+var historyitem_Math_RemoveItem                =  2; // Удаляем элемент
+
+
 var StartTextElement = 0x2B1A; // Cambria Math
 
 function dist(_left, _right, _top, _bottom)
@@ -392,7 +396,16 @@ CMathContent.prototype =
 
         this.addElementToContent(symb, gps);
 
+        var Pos = this.CurPos,
+            EndPos = this.CurPos + 1;
+
+        History.Add(this, {type: historyitem_Math_AddItem, Pos: Pos, PosEnd: EndPos});
+
+        //History.Add(this, {type: historyitem_Math_AddItem, Pos: this.CurPos, PosEnd: this.CurPos + 1});
+
         this.rInterval.endPos++; // max количество элементов this.CurPos
+
+
     },
     addMComponent: function(ind)
     {
@@ -511,6 +524,8 @@ CMathContent.prototype =
     },
     createEquation: function(ind)
     {
+        var Pos = this.CurPos;
+
         switch(ind)
         {
             case 0:
@@ -2257,6 +2272,10 @@ CMathContent.prototype =
                 break;
 
         }
+
+        var EndPos = this.CurPos;
+
+        History.Add(this, {type: historyitem_Math_AddItem, Pos: Pos, PosEnd: EndPos});
     },
     removeAreaSelect: function()
     {
@@ -3082,7 +3101,7 @@ CMathContent.prototype =
         {
             bDelete:                false,    /* нужно ли пересчитывать позицию или нет, работает при backspace */
             bBeging:                false,    /* в начале контента или нет */
-            bEnd:                   false     /* в конце */
+            bEnd:                   false,     /* в конце */
         };
 
         var CurrContent = SelectContent = null;
@@ -3147,7 +3166,7 @@ CMathContent.prototype =
 
         }
 
-        return {CurrContent : CurrContent, SelectContent: SelectContent, state: state };
+        return {CurrContent : CurrContent, SelectContent: SelectContent, state: state};
 
     },
     remove_internal: function(order)
@@ -3195,15 +3214,23 @@ CMathContent.prototype =
                 end = this.CurPos + 2;
             }
 
-            var tmp = new Array();
+            /*var tmp = new Array();
 
             for(var i = 0; i< start; i++)
                 tmp.push(this.content[i]);
 
             for (var j = end; j < this.content.length; j++)
-                tmp.push(this.content[j]);
-            this.content.length = 0;
-            this.content = tmp;
+                tmp.push(this.content[j]);*/
+
+            //var Content_start = this.content.slice(0, start);
+            //var Content_end   = this.content.slice(end, this.content.length);
+
+            History.Create_NewPoint();
+
+            var items = this.content.splice(start, end - start);
+
+            History.Add(this, {type: historyitem_Math_RemoveItem, Items: items, Pos: this.CurPos + 1});
+            //this.content = Content_start.concat(Content_end);
 
             this.CurPos = start - 1;
             this.setStart_Selection(this.CurPos);
@@ -3958,9 +3985,56 @@ CMathContent.prototype =
             this.content[i].value.ResizeDirect();
 
         this.recalculate();
-    }
+    },
 
     ////////////////////////////////////////////////////////////////
+
+    Undo: function(Data)
+    {
+        var type = Data.type;
+
+        switch(type)
+        {
+            case historyitem_Math_AddItem:
+            {
+                var Pos = Data.Pos,
+                    PosEnd = Data.PosEnd;
+
+                var Content_start = this.content.slice(0, Pos);
+                var Content_end   = this.content.slice(PosEnd);
+
+                this.content = Content_start.concat(Content_end);
+                this.CurPos = Pos - 1;
+
+              break;
+            }
+            case historyitem_Math_RemoveItem:
+            {
+                var Pos = Data.Pos;
+
+                var Content_start = this.content.slice(0, Pos);
+                var Content_end   = this.content.slice(Pos);
+
+                this.content = Content_start.concat(Data.Items, Content_end);
+                break;
+            }
+        }
+
+
+    },
+    Redo: function()
+    {
+
+    },
+    Save_Changes: function(Data, Writer)
+    {
+
+    },
+    Refresh_RecalcData: function()
+    {
+        this.RecalculateReverse();
+    }
+
 
 }
 //todo
@@ -4131,6 +4205,9 @@ CMathComposition.prototype =
 
         if( result.state.bDelete )
         {
+            //History.Create_NewPoint();
+            //var Pos = this.SelectContent.CurPos + 1;
+            ///History.Add(this, {type: historyitem_Math_RemoveItem, Items: result.interval, Pos: Pos});
             this.CurrentContent.RecalculateReverse();
             this.UpdatePosition();
         }
@@ -4161,8 +4238,14 @@ CMathComposition.prototype =
     {
         this.ClearSelect();
 
+        History.Create_NewPoint();
+
         this.SelectContent.removeAreaSelect();
         this.SelectContent.addLetter(code);
+
+        /*var Pos = this.SelectContent.CurPos,
+            EndPos = this.SelectContent.CurPos + 1;
+        History.Add(this, {type: historyitem_Math_AddItem, Pos: Pos, PosEnd: EndPos});*/
 
         ///
         this.RecalculateReverse();
@@ -4174,12 +4257,37 @@ CMathComposition.prototype =
 
         this.ShowCursor();
     },
+    Undo: function(Data)
+    {
+        this.SelectContent.Undo(Data);
+    },
+    Redo: function()
+    {
+
+    },
+    Refresh_RecalcData: function()
+    {
+        this.RecalculateReverse();
+        this.UpdatePosition();
+        this.CurrentContent.update_Cursor();
+        this.ShowCursor();
+    },
+    Save_Changes: function(Data, Writer)
+    {
+
+    },
     CreateEquation: function(indef)
     {
         this.ClearSelect();
 
+        History.Create_NewPoint();
+
         this.SelectContent.removeAreaSelect();
         this.SelectContent.createEquation(indef);
+
+        /*var Pos = this.SelectContent.CurPos - 1,
+            EndPos = this.SelectContent.CurPos + 1;
+        History.Add(this, {type: historyitem_Math_AddItem, Pos: Pos, PosEnd: EndPos});*/
 
         ///
         this.RecalculateReverse();
@@ -4309,6 +4417,11 @@ CMathComposition.prototype =
     DrawSelect2: function()
     {
         this.SelectContent.drawSelect2();
+    },
+    Refresh: function()
+    {
+        this.RecalculateReverse();
+        this.UpdatePosition();
     }
 }
 
@@ -5125,7 +5238,6 @@ Old_CMathComposition.prototype =
         }
 
         this.Root.draw();
-
 
     },
     Cursor_MoveRight: function()
