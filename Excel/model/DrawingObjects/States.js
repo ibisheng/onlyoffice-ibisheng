@@ -483,7 +483,7 @@ function NullState(drawingObjectsController, drawingObjects)
                     }
                     else if(hit_in_text_rect)
                     {
-                        return {objectId: cur_drawing.Id, cursorType: "move"};
+                        return {objectId: cur_drawing.Id, cursorType: "text"};
                     }
                 }
                 else if(cur_drawing.isGroup())

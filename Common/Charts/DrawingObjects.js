@@ -1881,6 +1881,167 @@ prot["asc_addTab"] = prot.asc_addTab;
 prot["asc_clear"] = prot.asc_clear;
 //}
 
+//-----------------------------------------------------------------------------------
+// CParagraphBorders
+//-----------------------------------------------------------------------------------
+
+function asc_CParagraphBorders(obj) {
+	
+	if (obj) {
+		this.Left = (undefined != obj.Left && null != obj.Left) ? new asc_CBorder (obj.Left) : null;
+		this.Top = (undefined != obj.Top && null != obj.Top) ? new asc_CBorder (obj.Top) : null;
+		this.Right = (undefined != obj.Right && null != obj.Right) ? new asc_CBorder (obj.Right) : null;
+		this.Bottom = (undefined != obj.Bottom && null != obj.Bottom) ? new asc_CBorder (obj.Bottom) : null;
+		this.Between = (undefined != obj.Between && null != obj.Between) ? new asc_CBorder (obj.Between) : null;
+	}
+	else {
+		this.Left = null;
+		this.Top = null;
+		this.Right = null;
+		this.Bottom = null;
+		this.Between = null;
+	}
+}
+
+asc_CParagraphBorders.prototype = {
+	asc_getLeft: function(){return this.Left; },
+	asc_putLeft: function(v){this.Left = (v) ? new asc_CBorder (v) : null;},
+	asc_getTop: function(){return this.Top; },
+	asc_putTop: function(v){this.Top = (v) ? new asc_CBorder (v) : null;},
+	asc_getRight: function(){return this.Right; },
+	asc_putRight: function(v){this.Right = (v) ? new asc_CBorder (v) : null;},
+	asc_getBottom: function(){return this.Bottom; },
+	asc_putBottom: function(v){this.Bottom = (v) ? new asc_CBorder (v) : null;},
+	asc_getBetween: function(){return this.Between; },
+	asc_putBetween: function(v){this.Between = (v) ? new asc_CBorder (v) : null;}
+}
+
+//{ asc_CParagraphBorders export
+window["Asc"].asc_CParagraphBorders = asc_CParagraphBorders;
+window["Asc"]["asc_CParagraphBorders"] = asc_CParagraphBorders;
+prot = asc_CParagraphBorders.prototype;
+
+prot["asc_getLeft"] = prot.asc_getLeft;
+prot["asc_putLeft"] = prot.asc_putLeft;
+prot["asc_getTop"] = prot.asc_getTop;
+prot["asc_putTop"] = prot.asc_putTop;
+prot["asc_getRight"] = prot.asc_getRight;
+prot["asc_putRight"] = prot.asc_putRight;
+prot["asc_getBottom"] = prot.asc_getBottom;
+prot["asc_putBottom"] = prot.asc_putBottom;
+prot["asc_getBetween"] = prot.asc_getBetween;
+prot["asc_putBetween"] = prot.asc_putBetween;
+//}
+
+//-----------------------------------------------------------------------------------
+// CBorder
+//-----------------------------------------------------------------------------------
+
+function asc_CBorder(obj) {
+	
+	if (obj) {
+		this.Color = (undefined != obj.Color && null != obj.Color) ? CreateAscColorCustomEx(obj.Color.r, obj.Color.g, obj.Color.b) : null;
+		this.Size = (undefined != obj.Size) ? obj.Size : null;
+		this.Value = (undefined != obj.Value) ? obj.Value : null;
+		this.Space = (undefined != obj.Space) ? obj.Space : null;
+	}
+	else {
+		this.Color = CreateAscColorCustomEx(0,0,0);
+		this.Size  = 0.5 * g_dKoef_pt_to_mm;
+		this.Value = border_Single;
+		this.Space = 0;
+	}
+}
+
+asc_CBorder.prototype = {
+	asc_getColor: function(){return this.Color; },
+	asc_putColor: function(v){this.Color = v;},
+	asc_getSize: function(){return this.Size; },
+	asc_putSize: function(v){this.Size = v;},
+	asc_getValue: function(){return this.Value; },
+	asc_putValue: function(v){this.Value = v;},
+	asc_getSpace: function(){return this.Space; },
+	asc_putSpace: function(v){this.Space = v;},
+	asc_getForSelectedCells: function(){return this.ForSelectedCells; },
+	asc_putForSelectedCells: function(v){this.ForSelectedCells = v;}
+}
+
+//{ asc_CBorder export
+window["Asc"].asc_CBorder = asc_CBorder;
+window["Asc"]["asc_CBorder"] = asc_CBorder;
+prot = asc_CBorder.prototype;
+
+prot["asc_getColor"] = prot.asc_getColor;
+prot["asc_putColor"] = prot.asc_putColor;
+prot["asc_getSize"] = prot.asc_getSize;
+prot["asc_putSize"] = prot.asc_putSize;
+prot["asc_getValue"] = prot.asc_getValue;
+prot["asc_putValue"] = prot.asc_putValue;
+prot["asc_getSpace"] = prot.asc_getSpace;
+prot["asc_putSpace"] = prot.asc_putSpace;
+prot["asc_getForSelectedCells"] = prot.asc_getForSelectedCells;
+prot["asc_putForSelectedCells"] = prot.asc_putForSelectedCells;
+//}
+
+//-----------------------------------------------------------------------------------
+// CListType
+//-----------------------------------------------------------------------------------
+
+function asc_CListType(obj) {
+	
+	if (obj) {
+		this.Type = (undefined == obj.Type) ? null : obj.Type;
+		this.SubType = (undefined == obj.Type) ? null : obj.SubType;
+	}
+	else {
+		this.Type = null;
+		this.SubType = null;
+	}
+}
+
+asc_CListType.prototype = {
+	asc_getListType: function() { return this.Type; },
+	asc_getListSubType: function() { return this.SubType; }
+}
+
+//{ asc_CListType export
+window["Asc"].asc_CListType = asc_CListType;
+window["Asc"]["asc_CListType"] = asc_CListType;
+prot = asc_CListType.prototype;
+
+prot["asc_getListType"] = prot.asc_getListType;
+prot["asc_getListSubType"] = prot.asc_getListSubType;
+//}
+
+//-----------------------------------------------------------------------------------
+// CTextFontFamily
+//-----------------------------------------------------------------------------------
+
+function asc_CTextFontFamily(obj) {
+	
+	if (obj) {
+		this.Name = (undefined != obj.Name) ? obj.Name : null; 		// "Times New Roman"
+		this.Index = (undefined != obj.Index) ? obj.Index : null;	// -1
+	}
+	else {
+		this.Name = "Times New Roman";
+		this.Index = -1;
+	}
+}
+
+asc_CTextFontFamily.prototype = {
+	asc_getName: function () { return this.Name; },
+	asc_getIndex: function () { return this.Index; }
+}
+
+//{ asc_CTextFontFamily export
+window["Asc"].asc_CTextFontFamily = asc_CTextFontFamily;
+window["Asc"]["asc_CTextFontFamily"] = asc_CTextFontFamily;
+prot = asc_CTextFontFamily.prototype;
+
+prot["asc_getName"] = prot.asc_getName;
+prot["asc_getIndex"] = prot.asc_getIndex;
+//}
 
 //-----------------------------------------------------------------------------------
 // Manager
