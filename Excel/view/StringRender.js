@@ -222,9 +222,10 @@
                 var posv = (angle === 90 || angle === -90) ? 0 : Math.abs(Math.cos(angle * Math.PI / 180.0) * textW);
                 var sx = 0, sw = 0;
 
-                if ('b' === av) {
+                if ('b' === av) {           //  bottom - vertical
                     if (angle < 0) {
-                        if ('l' === ah) { dx = (1 - mul * 0.5) * tm.height; sw = x + posv + (mul * 0.5) * tm.height; }
+                        if ('l' === ah) { dx = (posv* 0.5 + (1 - mul) * tm.height * 0.5);
+                            sw = x + posv + (mul * 0.5) * tm.height; }
                         if ('c' === ah) { dx = (w + tm.height - posv) * 0.5;
                             sx = x + (w - posv) * 0.5 - (mul * 0.5) * tm.height;
                             sw = x + (w + posv) * 0.5 + (mul * 0.5) * tm.height;
@@ -247,11 +248,11 @@
                             dy = h - mul * tm.height;
                         }
                     } else {
-                        if (angle > 0)  dy = h - mul * tm.height;
+                        if (angle > 0) {dy = h - mul * tm.height;} // Math.min(posh, posh - h); } //  dy = h - mul * tm.height;
                     }
                 }
 
-                if ('c' === av) {
+                if ('c' === av) {           //  center - vertical
                     if (angle < 0) {
                         if ('l' === ah) { dx = (1 - mul * 0.5) * tm.height; sw = x + posv + (mul * 0.5) * tm.height; }
                         if ('c' === ah) { dx = (w + tm.height - posv) * 0.5;
@@ -278,7 +279,7 @@
                     }
                 }
 
-                if ('t' === av) {
+                if ('t' === av) {           //  top - verictal
                     if (angle < 0) {
                         if ('l' === ah) { dx = (1 - mul * 0.5) * tm.height; sw = x + posv + (mul * 0.5) * tm.height; }
                         if ('c' === ah) { dx = (w + tm.height - posv) * 0.5;
@@ -298,17 +299,13 @@
                     }
                 }
 
-                this.bound.dx = dx;
-                this.bound.dy = dy;
-                this.bound.x = x;
-                this.bound.y = y;
+                this.bound.dx   =   dx;
+                this.bound.dy   =   dy;
+                this.bound.x    =   x;
+                this.bound.y    =   y;
 
-                this.bound.sx = sx;
-                this.bound.sw = sw;
-
-                this.xtrange.sx = sx;
-                this.xtrange.sw = sw;
-
+                this.bound.sx   =   sx;
+                this.bound.sw   =   sw;
 
                 if (angle === 90 || angle === -90) {
                     this.bound.height = textW;
@@ -316,81 +313,10 @@
                     this.bound.height = Math.abs(Math.sin(angle / 180.0 * Math.PI) * textW) + (mul) * tm.height;
                 }
 
-                return this.bound;
-            },
+              
 
-            getRotateOffset: function(angle, x, y, w, h, textW, alignH, alignV) {
-                this.angle = angle;
-
-                var dx = 0, dy = 0;
-                var tm = this._doMeasure(undefined);
-                var ah = alignH[0], av = alignV[0];
-                var mul = (90 - (Math.abs(angle)) ) / 90;
-                var posh = (angle === 90 || angle === -90) ? textW : Math.abs(Math.sin(angle * Math.PI / 180.0) * textW);
-                var posv = (angle === 90 || angle === -90) ? 0 : Math.abs(Math.cos(angle * Math.PI / 180.0) * textW);
-
-                if ('b' === av) {
-                    if (posh < h) {
-                        if (angle < 0) {
-                            if ('l' === ah) dx = (1 - mul * 0.5) * tm.height;
-                            if ('c' === ah) dx = (w + tm.height - posv) * 0.5;
-                            if ('r' === ah) dx = w - (mul * 0.5) * tm.height - posv;
-                            dy = h - (posh + mul * tm.height);
-                        } else {
-                            if ('c' === ah) dx = (w - tm.height - posv) * 0.5;
-                            if ('r' === ah) dx = w - posv - tm.height;
-                            dy = h - mul * tm.height;
-                        }
-                    } else {
-                        if (angle < 0) {
-                            if ('l' === ah) dx = (1 - mul * 0.5) * tm.height;
-                            if ('c' === ah) dx = (w + tm.height - posv) * 0.5;
-                            if ('r' === ah) dx = w - (mul * 0.5) * tm.height - posv;
-                        } else {
-                            if ('c' === ah) dx = (w - tm.height - posv) * 0.5;
-                            if ('r' === ah) dx = w - posv - tm.height;
-                            dy = h - mul * tm.height;
-                        }
-                    }
-                }
-
-                if ('c' === av) {
-                    if (posh < h) {
-                        if (angle < 0) {
-                            if ('l' === ah) dx = (1 - mul * 0.5) * tm.height;
-                            if ('c' === ah) dx = (w + tm.height - posv) * 0.5;
-                            if ('r' === ah) dx = w - (mul * 0.5) * tm.height - posv;
-                            dy = (h - posh) * 0.5;
-                        } else {
-                            if ('c' == ah) dx = (w - tm.height - posv) * 0.5;
-                            if ('r' === ah) dx = w - posv - tm.height;
-                            dy = (h + posh) * 0.5;
-                        }
-                    } else {
-                        if (angle < 0) {
-                            if ('l' === ah) dx = (1 - mul * 0.5) * tm.height;
-                            if ('c' === ah) dx = (w + tm.height - posv) * 0.5;
-                            if ('r' === ah) dx = w - (mul * 0.5) * tm.height - posv;
-                        } else {
-                            if ('c' === ah) dx = (w - tm.height - posv) * 0.5;
-                            if ('r' === ah) dx = w - posv - tm.height;
-                            dy = Math.min(h + tm.height * mul, posh);
-                        }
-                    }
-                }
-
-                if ('t' === av) {
-                    if (angle < 0) {
-                        if ('l' === ah) dx = (1 - mul * 0.5) * tm.height;
-                        if ('c' === ah) dx = (w + tm.height - posv) * 0.5;
-                        if ('r' === ah) dx = w - (mul * 0.5) * tm.height - posv;
-                    } else {
-                        if ('c' === ah) dx = (w - tm.height - posv) * 0.5;
-                        if ('r' === ah) dx = w - posv - tm.height;
-                        dy = Math.min(h + tm.height * mul, posh);
-                    }
-                }
-
+                return {x: this.bound.x, y: this.bound.y, dx: this.bound.dx, dy: this.bound.dy, sx: this.bound.sx, sw: this.bound.sw,
+                height: this.bound.height};
             },
 
             /**

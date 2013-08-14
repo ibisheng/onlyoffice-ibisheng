@@ -2405,149 +2405,124 @@
                 var textW = this._calcTextWidth(x1ct, x2ct, ct.metrics, ct.cellHA);
 
                 // TODO : все в отдельный метод
-                var xb1, yb1, wb, hb, bound, colLeft, colRight;
+                var xb1, yb1, wb, hb, bound, colLeft, colRight, sw, sx;
 
                 if (drawingCtx) {
                     if (ct.angle || 0) {
 
-                        xb1 = this.cols[col].left - offsetX;
-                        yb1 = this.rows[row].top - offsetY;
-                        wb = this.cols[col].width;
-                        hb = this.rows[row].height;
+                        xb1         =   this.cols[col].left - offsetX;
+                        yb1         =   this.rows[row].top - offsetY;
+                        wb          =   this.cols[col].width;
+                        hb          =   this.rows[row].height;
+                        sx          =   ct.textBound.sx + xb1;
+                        sw          =   ct.textBound.sw + xb1;
 
-                        bound = this.stringRender.
-                            getTransformBound(ct.angle, xb1, yb1, wb, hb, textW, ct.cellHA, ct.cellVA);
+                        bound       =   this.stringRender.getTransformBound(ct.angle, xb1, yb1, wb, hb, textW, ct.cellHA, ct.cellVA);
+                        bound.x     =   xb1;
+                        bound.y     =   yb1;
 
                         if (90 === ct.angle || -90 === ct.angle) {
-                            ctx.AddClipRect (xb1, yb1, wb, hb);                              // клип по ячейке
+                            // клип по ячейке
+                            ctx.AddClipRect (xb1, yb1, wb, hb);
                         } else {
-                            ctx.AddClipRect (0, yb1, this.drawingCtx.getWidth(), h);        // клип по строке
+                            // клип по строке
+                            ctx.AddClipRect (0, yb1, this.drawingCtx.getWidth(), h);
 
                             if (!isMerged && !isWrapped) {
                                 colLeft = col;
-                                if (0 !== bound.sx) {
+                                if (0 !== sx) {
                                     while (true) {
                                         if (0 == colLeft) break;
-                                        if (bound.sx > this.cols[colLeft].left) break;
+                                        if (bound.sx >= this.cols[colLeft].left) break;
                                         --colLeft;
                                     }
                                 }
 
                                 colRight = Math.min(col, this.nColsCount - 1);
-                                if (0 !== bound.sw) {
+                                if (0 !== sw) {
                                     while (true) {
                                         ++colRight;
                                         if (colRight >= this.nColsCount) { --colRight; break; }
-                                        if (bound.sw <= this.cols[colRight].left) { --colRight; break; }
+                                        if (sw <= this.cols[colRight].left) { --colRight; break; }
                                     }
                                 }
 
-                                colLeft = isMerged ? range.c1 : colLeft;
-                                colRight = isMerged ? Math.min(range.c2, this.nColsCount - 1) : colRight;
+                                colLeft     =   isMerged ? range.c1 : colLeft;
+                                colRight    =   isMerged ? Math.min(range.c2, this.nColsCount - 1) : colRight;
 
-                                this._eraseCellRightBorder(
-                                    drawingCtx, colLeft, colRight + (isTrimmedR ? 1 : 0), row,  offsetX, offsetY);
+                                this._eraseCellRightBorder(drawingCtx, colLeft, colRight + (isTrimmedR ? 1 : 0), row,  offsetX, offsetY);
                             }
                         }
 
                         this.stringRender.rotateAtPoint(drawingCtx, ct.angle, xb1, yb1);
 
-                        this.stringRender
-                            .restoreInternalState(ct.state)
-                            .renderForPrint(drawingCtx, 0, 0, textW, ct.color);
+                        this.stringRender.restoreInternalState(ct.state).renderForPrint(drawingCtx, 0, 0, textW, ct.color);
                         this.stringRender.resetTransform(drawingCtx);
                     } else {
                         ctx.AddClipRect (x1, y1, w, h);
-
-                        this.stringRender
-                            .restoreInternalState(ct.state)
-                            .renderForPrint(drawingCtx, textX, textY, textW, ct.color);
+                        this.stringRender.restoreInternalState(ct.state).renderForPrint(drawingCtx, textX, textY, textW, ct.color);
                     }
                     ctx.RemoveClipRect();
                 } else {
                     if (ct.angle || 0) {
 
-                        xb1 = this.cols[col].left - offsetX;
-                        yb1 = this.rows[row].top - offsetY;
-                        wb = this.cols[col].width;
-                        hb = this.rows[row].height;
+                        xb1         =   this.cols[col].left - offsetX;
+                        yb1         =   this.rows[row].top - offsetY;
+                        wb          =   this.cols[col].width;
+                        hb          =   this.rows[row].height;
+                        sx          =   ct.textBound.sx + xb1;
+                        sw          =   ct.textBound.sw + xb1;
 
-                        bound = this.stringRender.
-                            getTransformBound(ct.angle, xb1, yb1, wb, hb, textW, ct.cellHA, ct.cellVA);
+                        bound       =   this.stringRender.getTransformBound(ct.angle, xb1, yb1, wb, hb, textW, ct.cellHA, ct.cellVA);
+                        bound.x     =   xb1;
+                        bound.y     =   yb1;
+
+                        this.stringRender.bound = bound;
+                        //this.stringRender.fontNeedUpdate = true;
 
                         if (90 === ct.angle || -90 === ct.angle) {
-
                             // клип по ячейке
-
-                            ctx.save()
-                                .beginPath()
-                                .rect(xb1, yb1, wb, hb)
-                                .clip();
+                            ctx.save().beginPath().rect(xb1, yb1, wb, hb).clip();
                         } else {
-
                             // клип по строке
-
-                            ctx.save()
-                                .beginPath()
-                                .rect(0, y1, this.drawingCtx.getWidth(), h)
-                                .clip();
+                            ctx.save().beginPath().rect(0, y1, this.drawingCtx.getWidth(), h).clip();
 
                             if (!isMerged && !isWrapped) {
                                 colLeft = col;
-                                if (0 !== bound.sx) {
+                                if (0 !== sx) {
                                     while (true) {
                                         if (0 == colLeft) break;
-                                        if (bound.sx > this.cols[colLeft].left) break;
+                                        if (sx >= this.cols[colLeft].left) break;
                                         --colLeft;
                                     }
                                 }
 
                                 colRight = Math.min(col, this.nColsCount - 1);
-                                if (0 !== bound.sw) {
+                                if (0 !== sw) {
                                     while (true) {
                                         ++colRight;
                                         if (colRight >= this.nColsCount) { --colRight; break; }
-                                        if (bound.sw <= this.cols[colRight].left) { --colRight; break; }
+                                        if (sw <= this.cols[colRight].left) { --colRight; break; }
                                     }
                                 }
 
-                                colLeft = isMerged ? range.c1 : colLeft;
+                                colLeft  = isMerged ? range.c1 : colLeft;
                                 colRight = isMerged ? Math.min(range.c2, this.nColsCount - 1) : colRight;
 
-                                this._eraseCellRightBorder(
-                                    drawingCtx, colLeft, colRight + (isTrimmedR ? 1 : 0), row,  offsetX, offsetY);
+                                this._eraseCellRightBorder(drawingCtx, colLeft, colRight + (isTrimmedR ? 1 : 0), row,  offsetX, offsetY);
                             }
                         }
 
                         this.stringRender.rotateAtPoint(undefined, ct.angle, xb1, yb1);
-
-                        this.stringRender
-                            .restoreInternalState(ct.state)
-                            .render(0, 0, textW, ct.color);
+                        this.stringRender.restoreInternalState(ct.state).render(0, 0, textW, ct.color);
 
                         ctx.restore();
 
-                        // ctx
-                        //     //.setFillStyle("#fcd")
-                        //     //.fillRect(textX, textY, ct.metrics.width, ct.metrics.height);
-                        //     .restore();
-
                         this.stringRender.resetTransform(undefined);
                     } else {
-
-                        ctx.save()
-                            .beginPath()
-                            .rect(x1, y1, w, h)
-                            .clip();
-
-                        this.stringRender
-                            .restoreInternalState(ct.state)
-                            .render(textX, textY, textW, ct.color);
-
-                        ctx
-                            //     //.setFillStyle("#fcd")
-                            //     //.fillRect(textX, textY, ct.metrics.width, ct.metrics.height);
-                            .restore();
+                        ctx.save().beginPath().rect(x1, y1, w, h).clip();
+                        this.stringRender.restoreInternalState(ct.state).render(textX, textY, textW, ct.color);
+                        ctx.restore();
                     }
                 }
 
@@ -3709,10 +3684,7 @@
 				var pad = this.width_padding * 2 + this.width_1px;
 				var sstr, sfl, stm;
 
-				//TODO:
-				//this.stringRender.setRotation(c.getAngle() || 0);
-
-				if (!this.cols[col].isCustomWidth && isNumberFormat && !fMergedColumns &&
+                if (!this.cols[col].isCustomWidth && isNumberFormat && !fMergedColumns &&
 					(c_oAscCanChangeColWidth.numbers === canChangeColWidth ||
 						c_oAscCanChangeColWidth.all === canChangeColWidth)) {
 					colWidth = this.cols[col].innerWidth;
@@ -3779,7 +3751,13 @@
 				var oFontColor = c.getFontcolor();
 				if(null != oFontColor)
 					oFontColor = oFontColor.getRgb();
-				this._fetchCellCache(col, row).text = {
+
+                var textBound = {};
+                if (c.getAngle() || 0) {
+                    textBound = this.stringRender.getTransformBound(c.getAngle(), 0, 0, this.cols[col].width, this.rows[row].height, tm.width, ha, va);
+                }
+
+                this._fetchCellCache(col, row).text = {
 					state   : this.stringRender.getInternalState(),
 					flags   : fl,
 					color   : (oFontColor || this.settings.cells.defaultState.color),
@@ -3791,7 +3769,8 @@
 					sideR   : cto.rightSide,
 					cellType: cellType,
 					isFormula: c.getFormula().length > 0,
-					angle   : c.getAngle()
+					angle     : c.getAngle(),
+                    textBound : textBound
 				};
 
 				this._fetchCellCacheText(col, row).hasText = true;
@@ -3821,15 +3800,18 @@
 
                 if (c.getAngle() || 0) {
 
-                    var rotateTextBound = this.stringRender.getTransformBound(c.getAngle(), 0, 0, this.cols[col].width, this.rows[row].height, tm.width, ha, va);
-                    if (rotateTextBound) {
-                        if (this.rows[row].height < rotateTextBound.height) {
-                            this.rows[row].height = Math.max(this.rows[row].height, rotateTextBound.height);
-                            if (!this.rows[row].isDefaultHeight) {
-                                this.model.setRowHeight(this.rows[row].height + this.height_1px, row, row);
+                    if (this.isChanged) {
+                        if (textBound) {
+                            if (this.rows[row].height < textBound.height) {
+                                this.rows[row].height = Math.max(this.rows[row].height, textBound.height);
+
+                                if (!this.rows[row].isDefaultHeight) {
+                                    this.model.setRowHeight(this.rows[row].height + this.height_1px, row, row);
+                                }
                             }
+
+                            this.isChanged = true;
                         }
-                        this.isChanged = true;
                     }
                 }
 
