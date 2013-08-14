@@ -2382,6 +2382,14 @@ function CompareShapeProperties(shapeProp1, shapeProp2)
         _result_shape_prop.canChangeArrows = true;
 
     _result_shape_prop.fill = CompareUniFill(shapeProp1.fill, shapeProp2.fill);
+    if(isRealObject(shapeProp1.paddings) && isRealObject(shapeProp2.paddings))
+    {
+         _result_shape_prop.paddings = new asc_CPaddings();
+         _result_shape_prop.paddings.Left = isRealNumber(shapeProp1.paddings.Left) ? (shapeProp1.paddings.Left === shapeProp2.paddings.Left ? shapeProp1.paddings.Left : undefined) : undefined;
+         _result_shape_prop.paddings.Top = isRealNumber(shapeProp1.paddings.Top) ? (shapeProp1.paddings.Top === shapeProp2.paddings.Top ? shapeProp1.paddings.Top : undefined) : undefined;
+         _result_shape_prop.paddings.Right = isRealNumber(shapeProp1.paddings.Right) ? (shapeProp1.paddings.Right === shapeProp2.paddings.Right ? shapeProp1.paddings.Right : undefined) : undefined;
+         _result_shape_prop.paddings.Bottom = isRealNumber(shapeProp1.paddings.Bottom) ? (shapeProp1.paddings.Bottom === shapeProp2.paddings.Bottom ? shapeProp1.paddings.Bottom : undefined) : undefined;
+    }
     return _result_shape_prop;
 }
 

@@ -808,6 +808,7 @@ DrawingObjectsController.prototype =
                          shape_props.ShapeProperties.fill = c_obj.getFill();
                          shape_props.ShapeProperties.stroke = c_obj.getStroke();
                          shape_props.ShapeProperties.canChangeArrows = c_obj.canChangeArrows();
+                        shape_props.ShapeProperties.paddings = c_obj.getPaddings();
                         shape_props.verticalTextAlign = isRealObject(c_obj.txBody) ? c_obj.txBody.getBodyPr().anchor : null;
                     }
                     else
@@ -817,7 +818,8 @@ DrawingObjectsController.prototype =
                             type: c_obj.getPresetGeom(),
                             fill: c_obj.getFill(),
                             stroke: c_obj.getStroke(),
-                            canChangeArrows: c_obj.canChangeArrows()
+                            canChangeArrows: c_obj.canChangeArrows(),
+                            paddings: c_obj.getPaddings()
                         };
                         shape_props.ShapeProperties = CompareShapeProperties(ShapeProperties, shape_props.ShapeProperties);
                         shape_props.verticalTextAlign = undefined;
@@ -845,6 +847,7 @@ DrawingObjectsController.prototype =
                             shape_props.ShapeProperties.fill = c_obj.getFill();
                             shape_props.ShapeProperties.stroke = c_obj.getStroke();
                             shape_props.ShapeProperties.canChangeArrows = c_obj.canChangeArrows();
+                            shape_props.ShapeProperties.paddings = c_obj.getPaddings();
 
                             shape_props.verticalTextAlign = isRealObject(c_obj.txBody) ? c_obj.txBody.getBodyPr().anchor : null;
                         }
@@ -855,6 +858,7 @@ DrawingObjectsController.prototype =
                              ShapeProperties.fill = c_obj.getFill();
                              ShapeProperties.stroke = c_obj.getStroke();
                              ShapeProperties.canChangeArrows = c_obj.canChangeArrows();
+                             ShapeProperties.paddings = c_obj.getPaddings();
 
                              shape_props =  c_obj.Get_Props(shape_props);
                              shape_props.ShapeProperties = CompareShapeProperties(ShapeProperties, shape_props.ShapeProperties);
@@ -890,26 +894,6 @@ DrawingObjectsController.prototype =
                     }
                     if (c_obj.isGroup())
                     {
-                        var shape_props2 = c_obj.getShapeProps();
-                        var image_props2 = c_obj.getImageProps2();
-                        var chart_props2 = c_obj.getChartProps();
-                        if(isRealObject(shape_props2))
-                        {
-                            if (!isRealObject(shape_props))
-                            {
-                                shape_props = {};
-                                shape_props =  s_arr[i].Get_Props(null);
-                                shape_props.ShapeProperties = shape_props2.ShapeProperties;
-                            }
-                            else
-                            {
-                                shape_props =  s_arr[i].Get_Props(shape_props);
-                                shape_props.ShapeProperties = CompareShapeProperties(shape_props2.ShapeProperties, shape_props.ShapeProperties);
-                            }
-                        }
-
-                        if (c_obj.isGroup())
-                        {
                              var shape_props2 = c_obj.getShapeProps();
                              var image_props2 = c_obj.getImageProps2();
                              var chart_props2 = c_obj.getChartProps();
@@ -972,9 +956,7 @@ DrawingObjectsController.prototype =
                                      }
                                  }
                              }
-
-                        }
-                }
+                    }
                 }
             }
         }
@@ -1181,6 +1163,10 @@ DrawingObjectsController.prototype =
 						{
 							ArrGlyph[i].changeLine(properties.stroke);
 						}
+                        if(properties.paddings)
+                        {
+                            ArrGlyph[i].setPaddings(properties.paddings);
+                        }
 					}
 
 					if (typeof props.verticalTextAlign === "number" && !isNaN(props.verticalTextAlign) && typeof ArrGlyph[i].setTextVerticalAlign === "function")
@@ -1217,6 +1203,10 @@ DrawingObjectsController.prototype =
 							{
 								ArrGlyph[i].changeLine(properties.stroke);
 							}
+                            if(properties.paddings)
+                            {
+                                ArrGlyph[i].setPaddings(properties.paddings);
+                            }
 						}
 						else if (isRealObject(props) && typeof  props.ImageUrl === "string" && ArrGlyph[i].isImage())
 						{

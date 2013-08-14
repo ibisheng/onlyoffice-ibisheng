@@ -748,6 +748,58 @@ CTextBody.prototype =
         }
     },
 
+
+    setTopInset: function(ins)
+    {
+        if(isRealNumber(ins))
+        {
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_TopInset, null, null,
+                new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(this.bodyPr.tIns, ins)));
+            this.bodyPr.tIns = ins;
+        }
+    },
+
+    setRightInset: function(ins)
+    {
+        if(isRealNumber(ins))
+        {
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RightInset, null, null,
+                new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(this.bodyPr.rIns, ins)));
+            this.bodyPr.rIns = ins;
+        }
+    },
+
+    setLeftInset: function(ins)
+    {
+        if(isRealNumber(ins))
+        {
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_LeftInset, null, null,
+                new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(this.bodyPr.lIns, ins)));
+            this.bodyPr.lIns = ins;
+        }
+    },
+
+    setBottomInset: function(ins)
+    {
+        if(isRealNumber(ins))
+        {
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_LeftInset, null, null,
+                new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(this.bodyPr.bIns, ins)));
+            this.bodyPr.bIns = ins;
+        }
+    },
+
+    setPaddings: function(paddings)
+    {
+        if(isRealObject(paddings))
+        {
+            this.setBottomInset(paddings.Bottom);
+            this.setTopInset(paddings.Top);
+            this.setLeftInset(paddings.Left);
+            this.setRightInset(paddings.Right);
+        }
+    },
+
     recalculateCurPos: function()
     {
         this.content.RecalculateCurPos();

@@ -492,6 +492,17 @@ CGroupShape.prototype =
         }
     },
 
+    setPaddings: function(paddings)
+    {
+        for(var i =0; i < this.arrGraphicObjects.length; ++i)
+        {
+            if(typeof this.arrGraphicObjects[i].setPaddings === "function")
+            {
+                this.arrGraphicObjects[i].setPaddings(paddings);
+            }
+        }
+    },
+
     normalize: function()
     {
         for(var i = 0; i < this.spTree.length; ++i)
@@ -1387,9 +1398,40 @@ CGroupShape.prototype =
             shape_props.fill = this.getFill();
             shape_props.stroke = this.getStroke();
             shape_props.canChangeArrows = this.canChangeArrows();
+            shape_props.paddings = this.getPaddings();
+
             return {ShapeProperties : shape_props}
         }
         return null;
+    },
+
+    getPaddings: function()
+    {
+        var paddings = null;
+        var cur_paddings;
+        for(var i = 0; i < this.arrGraphicObjects.length; ++i)
+        {
+            cur_paddings = null;
+            if(typeof this.arrGraphicObjects[i].getPaddings === "function")
+            {
+                cur_paddings = this.arrGraphicObjects[i].getPaddings();
+            }
+            if(cur_paddings)
+            {
+                if(!paddings)
+                {
+                    paddings = cur_paddings;
+                }
+                else
+                {
+                    paddings.Left = isRealNumber(paddings.Left) ? (paddings.Left === cur_paddings.Left ? paddings.Left : undefined) : undefined;
+                    paddings.Top = isRealNumber(paddings.Top) ? (paddings.Top === cur_paddings.Top ? paddings.Top : undefined) : undefined;
+                    paddings.Right = isRealNumber(paddings.Right) ? (paddings.Right === cur_paddings.Right ? paddings.Right : undefined) : undefined;
+                    paddings.Bottom = isRealNumber(paddings.Bottom) ? (paddings.Bottom === cur_paddings.Bottom ? paddings.Bottom : undefined) : undefined;
+                }
+            }
+        }
+        return paddings;
     },
 
     getImageProps2: function()

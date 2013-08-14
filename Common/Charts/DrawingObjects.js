@@ -1467,10 +1467,38 @@ prot["asc_putShapeProperties"] = prot.asc_putShapeProperties;
 // CShapeProperty
 //-----------------------------------------------------------------------------------
 
+function asc_CPaddings( obj )
+{
+    if ( obj )
+    {
+        this.Left = (undefined == obj.Left) ? null : obj.Left;
+        this.Top = (undefined == obj.Top) ? null : obj.Top;
+        this.Bottom = (undefined == obj.Bottom) ? null : obj.Bottom;
+        this.Right = (undefined == obj.Right) ? null : obj.Right;
+    }
+    else
+    {
+        this.Left = null;
+        this.Top = null;
+        this.Bottom = null;
+        this.Right = null;
+    }
+}
+
+asc_CPaddings.prototype.asc_get_Left = function() { return this.Left; }
+asc_CPaddings.prototype.asc_put_Left = function(v) { this.Left = v; }
+asc_CPaddings.prototype.asc_get_Top = function() { return this.Top; }
+asc_CPaddings.prototype.asc_put_Top = function(v) { this.Top = v; }
+asc_CPaddings.prototype.asc_get_Bottom = function() { return this.Bottom; }
+asc_CPaddings.prototype.asc_put_Bottom = function(v) { this.Bottom = v; }
+asc_CPaddings.prototype.asc_get_Right = function() { return this.Right; }
+asc_CPaddings.prototype.asc_put_Right = function(v) { this.Right = v; }
+
 function asc_CShapeProperty() {
     this.type = null; // custom
     this.fill = null;
     this.stroke = null;
+    this.paddings = null;
 }
 
 asc_CShapeProperty.prototype = {
@@ -1480,7 +1508,9 @@ asc_CShapeProperty.prototype = {
 	asc_getFill: function() { return this.fill; },
 	asc_putFill: function(v) { this.fill = v; },
 	asc_getStroke: function() { return this.stroke; },
-	asc_putStroke: function(v) { this.stroke = v; }
+	asc_putStroke: function(v) { this.stroke = v; },
+    asc_getPaddings: function() { return this.paddings; },
+    asc_putPaddings: function(v) { this.paddings = v; }
 }
 
 //{ asc_CShapeProperty export

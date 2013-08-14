@@ -362,6 +362,15 @@ CShape.prototype =
         }
     },
 
+    setPaddings: function (paddings) {
+        if(isRealObject(this.txBody))
+        {
+            this.txBody.setPaddings(paddings);
+            this.calculateContent();
+            this.calculateTransformTextMatrix();
+        }
+    },
+
     setCellTextWrap: function (isWrapped) {
         if(isRealObject(this.txBody))
         {
@@ -2100,6 +2109,21 @@ CShape.prototype =
         if(!isRealObject(this.pen))
             return null;
         return this.pen;
+    },
+
+    getPaddings: function()
+    {
+        if(isRealObject(this.txBody))
+        {
+            var body_pr = this.txBody.getBodyPr();
+            var paddings = new asc_CPaddings();
+            paddings.Top = body_pr.tIns;
+            paddings.Left = body_pr.lIns;
+            paddings.Right = body_pr.rIns;
+            paddings.Bottom = body_pr.bIns;
+            return paddings;
+        }
+        return null;
     },
 
     getParagraphParaPr: function()

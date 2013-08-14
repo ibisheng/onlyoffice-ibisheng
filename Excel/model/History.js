@@ -140,6 +140,11 @@ var historyitem_AutoShapes_GroupRecalculateRedo = 62;
 var historyitem_AutoShapes_AddColorMod = 63;
 var historyitem_AutoShapes_RemoveFromSpTree = 64;
 var historyitem_AutoShapes_SwapGraphicObjects = 65;
+var historyitem_AutoShapes_TopInset = 66;
+var historyitem_AutoShapes_RightInset = 67;
+var historyitem_AutoShapes_LeftInset = 68;
+var historyitem_AutoShapes_BottomInset = 68;
+
 
 
 
