@@ -841,7 +841,7 @@ PARRUN_TYPE_BR:tv
 rx_LG:Iy
 TT_Get_MM_Var:Dq
 c_oSerWorksheetPropTypes$SheetId:dC
-BeginTrackNewShapeState:f0
+BeginTrackNewShapeState:g0
 CHART_TITLE_TYPE_H_AXIS:JZ
 para_TextPr:oX
 c_oAscChartType$line:ra
@@ -1380,7 +1380,7 @@ _weight_pic:ZT
 JSCompiler_StaticMethods__BuildDependencies:fL
 CChartAsGroup:Ze
 CGraphics:Wv
-JSCompiler_prototypeAlias:ia
+JSCompiler_prototypeAlias:ha
 c_oSer_SheetPr$TransitionEvaluation:IG
 CPdfPrinter:Jx
 DecodeBase64Char:Aw
@@ -2957,7 +2957,7 @@ c_oSer_TableStyle$Element:eF
 tt_services:cr
 Align:eJ
 TT_LongMetricsRec:di
-L 27:ha
+L 27:ia
 L 26:S
 L 29:wa
 L 28:Ba
