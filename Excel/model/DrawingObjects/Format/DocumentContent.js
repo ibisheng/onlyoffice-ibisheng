@@ -5271,13 +5271,13 @@ CDocumentContent.prototype =
             {
                 StartPr   = this.Content[0].Get_CompiledPr2().ParaPr;
                 Pr        = StartPr.Copy();
-                Pr.Locked = this.Content[0].Lock.Is_Locked();
+                //Pr.Locked = this.Content[0].Lock.Is_Locked();
             }
             else if ( type_Table == this.Content[0].GetType() )
             {
                 StartPr   = this.Content[0].Get_Paragraph_ParaPr();
                 Pr        = StartPr.Copy();
-                Pr.Locked = StartPr.Locked;
+                //Pr.Locked = StartPr.Locked;
             }
 
             for ( var Index = 1; Index < this.Content.length; Index++ )
@@ -5288,7 +5288,7 @@ CDocumentContent.prototype =
                 if ( type_Paragraph == Item.GetType() )
                 {
                     TempPr        = Item.Get_CompiledPr2(false).ParaPr.Copy();
-                    TempPr.Locked = Item.Lock.Is_Locked();
+                    //TempPr.Locked = Item.Lock.Is_Locked();
                 }
                 else if ( type_Table == Item.GetType() )
                 {
@@ -5333,13 +5333,13 @@ CDocumentContent.prototype =
                 {
                     StartPr   = this.Content[StartPos].Get_CompiledPr2(false).ParaPr;
                     Pr        = StartPr.Copy();
-                    Pr.Locked = this.Content[StartPos].Lock.Is_Locked();
+                    //Pr.Locked = this.Content[StartPos].Lock.Is_Locked();
                 }
                 else if ( type_Table == this.Content[StartPos].GetType() )
                 {
                     StartPr   = this.Content[StartPos].Get_Paragraph_ParaPr();
                     Pr        = StartPr.Copy();
-                    Pr.Locked = StartPr.Locked;
+                    //Pr.Locked = StartPr.Locked;
                 }
 
                 for ( var Index = StartPos + 1; Index <= EndPos; Index++ )
@@ -5350,7 +5350,7 @@ CDocumentContent.prototype =
                     if ( type_Paragraph == Item.GetType() )
                     {
                         TempPr        = Item.Get_CompiledPr2(false).ParaPr;
-                        TempPr.Locked = Item.Lock.Is_Locked();
+                        //TempPr.Locked = Item.Lock.Is_Locked();
                     }
                     else if ( type_Table == Item.GetType() )
                     {
@@ -5370,7 +5370,7 @@ CDocumentContent.prototype =
                     Pr.Ind.FirstLine = StartPr.Ind.FirstLine;
 
                 Result_ParaPr = Pr;
-                Result_ParaPr.CanAddTable = ( true === Locked ? false : true );
+                //Result_ParaPr.CanAddTable = ( true === Locked ? false : true );
             }
             else
             {
@@ -5378,11 +5378,11 @@ CDocumentContent.prototype =
                 if ( type_Paragraph == Item.GetType() )
                 {
                     var ParaPr = Item.Get_CompiledPr2(false).ParaPr;
-                    var Locked = Item.Lock.Is_Locked();
+                    //var Locked = Item.Lock.Is_Locked();
 
                     Result_ParaPr         = ParaPr.Copy();
                     Result_ParaPr.Locked  = Locked;
-                    Result_ParaPr.CanAddTable = ( ( true === Locked ) ? ( ( true === Item.Cursor_IsEnd() ) ? true : false ) : true );
+                    //Result_ParaPr.CanAddTable = ( ( true === Locked ) ? ( ( true === Item.Cursor_IsEnd() ) ? true : false ) : true );
                 }
                 else if ( type_Table == Item.GetType() )
                 {
@@ -5644,10 +5644,10 @@ CDocumentContent.prototype =
 
         if ( null != ParaPr )
         {
-            if ( undefined != ParaPr.Tabs )
-                editor.Update_ParaTab( Default_Tab_Stop, ParaPr.Tabs );
+            //if ( undefined != ParaPr.Tabs )
+            //    editor.Update_ParaTab( Default_Tab_Stop, ParaPr.Tabs );
 
-            editor.UpdateParagraphProp( ParaPr );
+            //editor.UpdateParagraphProp( ParaPr );
         }
     },
 
@@ -5656,8 +5656,8 @@ CDocumentContent.prototype =
     {
         var TextPr = this.Get_Paragraph_TextPr();
 
-        if ( null != TextPr )
-            editor.UpdateTextPr(TextPr);
+        //if ( null != TextPr )
+        //    editor.UpdateTextPr( TextPr );
     },
 
     Interface_Update_DrawingPr : function(Flag)

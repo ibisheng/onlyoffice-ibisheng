@@ -772,7 +772,7 @@ function PreMoveInternalChartObjectState(drawingObjectsController, drawingObject
 
     this.isPointInDrawingObjects = function(x, y)
     {
-        return {objectId: this.chartElement.chartGroup.Id, cursorType:"move"};
+        return {objectId: this.chartElement.chartGroup.Id, cursorType: "move"};
     };
 }
 
@@ -1433,7 +1433,10 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
 
     this.isPointInDrawingObjects = function(x, y)
     {
-        return this.nullState.isPointInDrawingObjects(x, y);
+        var cursorInfo = this.nullState.isPointInDrawingObjects(x, y);
+		//if ( cursorInfo )
+		//	cursorInfo.cursorType = "text";
+		return cursorInfo;
     };
 
     // Уменьшение размера шрифта
@@ -2339,7 +2342,7 @@ function MoveState(drawingObjectsController, drawingObjects, startX, startY, rec
 
     this.isPointInDrawingObjects = function(x, y)
     {
-        return {objectId:this.majorObject.Id, cursorType: "move"}
+        return { objectId: this.majorObject.Id, cursorType: "move" };
     };
 }
 

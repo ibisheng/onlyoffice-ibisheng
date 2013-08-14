@@ -1266,8 +1266,6 @@ prot["asc_setFormatCode"] = prot.asc_setFormatCode;
 //}
 
 
-
-
 //-----------------------------------------------------------------------------------
 // Selected graphic object(properties)
 //-----------------------------------------------------------------------------------	
@@ -1548,6 +1546,346 @@ prot["asc_getId"] = prot.asc_getId;
 prot["asc_getImage"] = prot.asc_getImage;
 //}
 
+//-----------------------------------------------------------------------------------
+// CParagraphProperty
+//-----------------------------------------------------------------------------------
+
+function asc_CParagraphProperty(obj) {
+	
+	if (obj) {
+		this.ContextualSpacing = (undefined != obj.ContextualSpacing)              ? obj.ContextualSpacing : null;
+		this.Ind               = (undefined != obj.Ind     && null != obj.Ind)     ? new asc_CParagraphInd (obj.Ind) : null;
+		this.KeepLines         = (undefined != obj.KeepLines)                      ? obj.KeepLines : null;
+        this.KeepNext          = (undefined != obj.KeepNext)                       ? obj.KeepNext  : undefined;
+        this.WidowControl      = (undefined != obj.WidowControl                    ? obj.WidowControl : undefined );
+		this.PageBreakBefore   = (undefined != obj.PageBreakBefore)                ? obj.PageBreakBefore : null;
+		this.Spacing           = (undefined != obj.Spacing && null != obj.Spacing) ? new asc_CParagraphSpacing (obj.Spacing) : null;
+		this.Brd               = (undefined != obj.Brd     && null != obj.Brd)     ? new asc_CParagraphBorders (obj.Brd) : null;
+		this.Shd               = (undefined != obj.Shd     && null != obj.Shd)     ? new asc_CParagraphShd (obj.Shd) : null;
+        this.Tabs              = (undefined != obj.Tabs)                           ? new asc_CParagraphTabs(obj.Tabs) : undefined;
+        this.DefaultTab        = Default_Tab_Stop;
+        this.Locked            = (undefined != obj.Locked  && null != obj.Locked ) ? obj.Locked : false;
+        this.CanAddTable       = (undefined != obj.CanAddTable )                   ? obj.CanAddTable : true;
+
+        this.Subscript         = (undefined != obj.Subscript)                      ? obj.Subscript : undefined;
+        this.Superscript       = (undefined != obj.Superscript)                    ? obj.Superscript : undefined;
+        this.SmallCaps         = (undefined != obj.SmallCaps)                      ? obj.SmallCaps : undefined;
+        this.AllCaps           = (undefined != obj.AllCaps)                        ? obj.AllCaps : undefined;
+        this.Strikeout         = (undefined != obj.Strikeout)                      ? obj.Strikeout : undefined;
+        this.DStrikeout        = (undefined != obj.DStrikeout)                     ? obj.DStrikeout : undefined;
+        this.TextSpacing       = (undefined != obj.TextSpacing)                    ? obj.TextSpacing : undefined;
+        this.Position          = (undefined != obj.Position)                       ? obj.Position : undefined;
+	}
+	else {
+		//ContextualSpacing : false,            // Удалять ли интервал между параграфами одинакового стиля
+		//
+		//    Ind :
+		//    {
+		//        Left      : 0,                    // Левый отступ
+		//        Right     : 0,                    // Правый отступ
+		//        FirstLine : 0                     // Первая строка
+		//    },
+		//
+		//    Jc : align_Left,                      // Прилегание параграфа
+		//
+		//    KeepLines : false,                    // переносить параграф на новую страницу,
+		//                                          // если на текущей он целиком не убирается
+		//    KeepNext  : false,                    // переносить параграф вместе со следующим параграфом
+		//
+		//    PageBreakBefore : false,              // начинать параграф с новой страницы
+
+		this.ContextualSpacing = undefined;
+		this.Ind               = new asc_CParagraphInd();
+		this.KeepLines         = undefined;
+        this.KeepNext          = undefined;
+        this.WidowControl      = undefined;
+		this.PageBreakBefore   = undefined;
+		this.Spacing           = new asc_CParagraphSpacing();
+		this.Brd               = undefined;
+        this.Shd               = undefined;
+        this.Locked            = false;
+        this.CanAddTable       = true;
+        this.Tabs              = undefined;
+
+        this.Subscript         = undefined;
+        this.Superscript       = undefined;
+        this.SmallCaps         = undefined;
+        this.AllCaps           = undefined;
+        this.Strikeout         = undefined;
+        this.DStrikeout        = undefined;
+        this.TextSpacing       = undefined;
+        this.Position          = undefined;
+    }
+}
+
+asc_CParagraphProperty.prototype = {
+	
+	asc_getContextualSpacing: function () { return this.ContextualSpacing; },
+	asc_putContextualSpacing: function (v) { this.ContextualSpacing = v; },
+	asc_getInd: function () { return this.Ind; },
+	asc_putInd: function (v) { this.Ind = v; },
+	asc_getKeepLines: function () { return this.KeepLines; },
+	asc_putKeepLines: function (v) { this.KeepLines = v; },
+	asc_getKeepNext: function () { return this.KeepNext; },
+	asc_putKeepNext: function (v) { this.KeepNext = v; },
+	asc_getPageBreakBefore: function (){ return this.PageBreakBefore; },
+	asc_putPageBreakBefore: function (v){ this.PageBreakBefore = v; },
+	asc_getWidowControl: function (){ return this.WidowControl; },
+	asc_putWidowControl: function (v){ this.WidowControl = v; },
+	asc_getSpacing: function () { return this.Spacing; },
+	asc_putSpacing: function (v) { this.Spacing = v; },
+	asc_getBorders: function () { return this.Brd; },
+	asc_putBorders: function (v) { this.Brd = v; },
+	asc_getShade: function () { return this.Shd; },
+	asc_putShade: function (v) { this.Shd = v; },
+	asc_getLocked: function() { return this.Locked; },
+	asc_getCanAddTable: function() { return this.CanAddTable; },
+	asc_getSubscript: function () { return this.Subscript; },
+	asc_putSubscript: function (v) { this.Subscript = v; },
+	asc_getSuperscript: function () { return this.Superscript; },
+	asc_putSuperscript: function (v) { this.Superscript = v; },
+	asc_getSmallCaps: function () { return this.SmallCaps; },
+	asc_putSmallCaps: function (v) { this.SmallCaps = v; },
+	asc_getAllCaps: function () { return this.AllCaps; },
+	asc_putAllCaps: function (v) { this.AllCaps = v; },
+	asc_getStrikeout: function () { return this.Strikeout; },
+	asc_putStrikeout: function (v) { this.Strikeout = v; },
+	asc_getDStrikeout: function () { return this.DStrikeout; },
+	asc_putDStrikeout: function (v) { this.DStrikeout = v; },
+	asc_getTextSpacing: function () { return this.TextSpacing; },
+	asc_putTextSpacing: function (v) { this.TextSpacing = v; },
+	asc_getPosition: function () { return this.Position; },
+	asc_putPosition: function (v) { this.Position = v; },
+	asc_getTabs: function () { return this.Tabs; },
+	asc_putTabs: function (v) { this.Tabs = v; },
+	asc_getDefaultTab: function () { return this.DefaultTab; },
+	asc_putDefaultTab: function (v) { this.DefaultTab = v; }
+}
+
+//{ asc_CParagraphProperty export
+window["Asc"].asc_CParagraphProperty = asc_CParagraphProperty;
+window["Asc"]["asc_CParagraphProperty"] = asc_CParagraphProperty;
+prot = asc_CParagraphProperty.prototype;
+
+prot["asc_getContextualSpacing"] = prot.asc_getContextualSpacing;
+prot["asc_putContextualSpacing"] = prot.asc_putContextualSpacing;
+prot["asc_getInd"] = prot.asc_getInd;
+prot["asc_putInd"] = prot.asc_putInd;
+prot["asc_getKeepLines"] = prot.asc_getKeepLines;
+prot["asc_putKeepLines"] = prot.asc_putKeepLines;
+prot["asc_getKeepNext"] = prot.asc_getKeepNext;
+prot["asc_putKeepNext"] = prot.asc_putKeepNext;
+prot["asc_getPageBreakBefore"] = prot.asc_getPageBreakBefore;
+prot["asc_putPageBreakBefore"] = prot.asc_putPageBreakBefore;
+prot["asc_getWidowControl"] = prot.asc_getWidowControl;
+prot["asc_putWidowControl"] = prot.asc_putWidowControl;
+prot["asc_getSpacing"] = prot.asc_getSpacing;
+prot["asc_putSpacing"] = prot.asc_putSpacing;
+prot["asc_getBorders"] = prot.asc_getBorders;
+prot["asc_putBorders"] = prot.asc_putBorders;
+prot["asc_getShade"] = prot.asc_getShade;
+prot["asc_putShade"] = prot.asc_putShade;
+prot["asc_getLocked"] = prot.asc_getLocked;
+prot["asc_getCanAddTable"] = prot.asc_getCanAddTable;
+prot["asc_getSubscript"] = prot.asc_getSubscript;
+prot["asc_putSubscript"] = prot.asc_putSubscript;
+prot["asc_getSuperscript"] = prot.asc_getSuperscript;
+prot["asc_putSuperscript"] = prot.asc_putSuperscript;
+prot["asc_getSmallCaps"] = prot.asc_getSmallCaps;
+prot["asc_putSmallCaps"] = prot.asc_putSmallCaps;
+prot["asc_getAllCaps"] = prot.asc_getAllCaps;
+prot["asc_putAllCaps"] = prot.asc_putAllCaps;
+prot["asc_getStrikeout"] = prot.asc_getStrikeout;
+prot["asc_putStrikeout"] = prot.asc_putStrikeout;
+prot["asc_getDStrikeout"] = prot.asc_getDStrikeout;
+prot["asc_putDStrikeout"] = prot.asc_putDStrikeout;
+prot["asc_getTextSpacing"] = prot.asc_getTextSpacing;
+prot["asc_putTextSpacing"] = prot.asc_putTextSpacing;
+prot["asc_getPosition"] = prot.asc_getPosition;
+prot["asc_putPosition"] = prot.asc_putPosition;
+prot["asc_getTabs"] = prot.asc_getTabs;
+prot["asc_putTabs"] = prot.asc_putTabs;
+prot["asc_getDefaultTab"] = prot.asc_getDefaultTab;
+prot["asc_putDefaultTab"] = prot.asc_putDefaultTab;
+//}
+
+//-----------------------------------------------------------------------------------
+// CParagraphInd
+//-----------------------------------------------------------------------------------
+
+function asc_CParagraphInd(obj) {
+	if (obj) {
+		this.Left      = (undefined != obj.Left     ) ? obj.Left      : null; // Левый отступ
+		this.Right     = (undefined != obj.Right    ) ? obj.Right     : null; // Правый отступ
+		this.FirstLine = (undefined != obj.FirstLine) ? obj.FirstLine : null; // Первая строка
+	}
+	else {
+		this.Left      = undefined; // Левый отступ
+		this.Right     = undefined; // Правый отступ
+		this.FirstLine = undefined; // Первая строка
+	}
+}
+
+asc_CParagraphInd.prototype = {
+	asc_getLeft: function () { return this.Left; },
+	asc_putLeft: function (v) { this.Left = v; },
+	asc_getRight: function () { return this.Right; },
+	asc_putRight: function (v) { this.Right = v; },
+	asc_getFirstLine: function () { return this.FirstLine; },
+	asc_putFirstLine: function (v) { this.FirstLine = v; }
+}
+
+//{ asc_CParagraphInd export
+window["Asc"].asc_CParagraphInd = asc_CParagraphInd;
+window["Asc"]["asc_CParagraphInd"] = asc_CParagraphInd;
+prot = asc_CParagraphInd.prototype;
+
+prot["asc_getLeft"] = prot.asc_getLeft;
+prot["asc_putLeft"] = prot.asc_putLeft;
+prot["asc_getRight"] = prot.asc_getRight;
+prot["asc_putRight"] = prot.asc_putRight;
+prot["asc_getFirstLine"] = prot.asc_getFirstLine;
+prot["asc_getFirstLine"] = prot.asc_getFirstLine;
+//}
+
+//-----------------------------------------------------------------------------------
+// CParagraphSpacing
+//-----------------------------------------------------------------------------------
+
+function asc_CParagraphSpacing(obj) {
+	
+	if (obj) {
+		this.Line     = (undefined != obj.Line    ) ? obj.Line     : null; // Расстояние между строками внутри абзаца
+		this.LineRule = (undefined != obj.LineRule) ? obj.LineRule : null; // Тип расстрояния между строками
+		this.Before   = (undefined != obj.Before  ) ? obj.Before   : null; // Дополнительное расстояние до абзаца
+		this.After    = (undefined != obj.After   ) ? obj.After    : null; // Дополнительное расстояние после абзаца
+	}
+	else {
+		this.Line     = undefined; // Расстояние между строками внутри абзаца
+		this.LineRule = undefined; // Тип расстрояния между строками
+		this.Before   = undefined; // Дополнительное расстояние до абзаца
+		this.After    = undefined; // Дополнительное расстояние после абзаца
+	}
+}
+
+asc_CParagraphSpacing.prototype = {
+	asc_getLine: function () { return this.Line; },
+	asc_getLineRule: function () { return this.LineRule; },
+	asc_getBefore: function () { return this.Before; },
+	asc_getAfter: function () { return this.After; }
+}
+
+//{ asc_CParagraphSpacing export
+window["Asc"].asc_CParagraphSpacing = asc_CParagraphSpacing;
+window["Asc"]["asc_CParagraphSpacing"] = asc_CParagraphSpacing;
+prot = asc_CParagraphSpacing.prototype;
+
+prot["asc_getLine"] = prot.asc_getLine;
+prot["asc_getLineRule"] = prot.asc_getLineRule;
+prot["asc_getBefore"] = prot.asc_getBefore;
+prot["asc_getAfter"] = prot.asc_getAfter;
+//}
+
+//-----------------------------------------------------------------------------------
+// CParagraphShd
+//-----------------------------------------------------------------------------------
+
+function asc_CParagraphShd(obj) {
+	
+	if (obj) {
+		this.Value = (undefined != obj.Value) ? obj.Value : null;
+		this.Color = (undefined != obj.Color && null != obj.Color) ? CreateAscColorCustom( obj.Color.r, obj.Color.g, obj.Color.b ) : null;
+	}
+	else {
+		this.Value = shd_Nil;
+		this.Color = CreateAscColorCustom(255, 255, 255);
+	}
+}
+
+asc_CParagraphShd.prototype = {
+	asc_getValue: function (){ return this.Value; },
+	asc_putValue: function (v){ this.Value = v; },
+	asc_getColor: function (){ return this.Color; },
+	asc_putColor: function (v){ this.Color = (v) ? v : null; }
+}
+
+//{ asc_CParagraphShd export
+window["Asc"].asc_CParagraphShd = asc_CParagraphShd;
+window["Asc"]["asc_CParagraphShd"] = asc_CParagraphShd;
+prot = asc_CParagraphShd.prototype;
+
+prot["asc_getValue"] = prot.asc_getValue;
+prot["asc_putValue"] = prot.asc_putValue;
+prot["asc_getColor"] = prot.asc_getColor;
+prot["asc_putColor"] = prot.asc_putColor;
+//}
+
+//-----------------------------------------------------------------------------------
+// CParagraphTab
+//-----------------------------------------------------------------------------------
+
+function asc_CParagraphTab(Pos, Value) {
+    this.Pos   = Pos;
+    this.Value = Value;
+}
+
+asc_CParagraphTab.prototype = {
+	asc_getValue: function (){ return this.Value; },
+	asc_putValue: function (v){ this.Value = v; },
+	asc_getPos: function (){ return this.Pos; },
+	asc_putPos: function (v){ this.Pos = v; }
+}
+
+//{ asc_CParagraphTab export
+window["Asc"].asc_CParagraphTab = asc_CParagraphTab;
+window["Asc"]["asc_CParagraphTab"] = asc_CParagraphTab;
+prot = asc_CParagraphTab.prototype;
+
+prot["asc_getValue"] = prot.asc_getValue;
+prot["asc_putValue"] = prot.asc_putValue;
+prot["asc_getPos"] = prot.asc_getPos;
+prot["asc_putPos"] = prot.asc_putPos;
+//}
+
+//-----------------------------------------------------------------------------------
+// CParagraphTabs
+//-----------------------------------------------------------------------------------
+
+function asc_CParagraphTabs(obj) {
+    this.Tabs = new Array();
+
+    if ( undefined != obj ) {
+        var Count = obj.Tabs.length;
+        for (var Index = 0; Index < Count; Index++)
+        {
+            this.Tabs.push( new asc_CParagraphTab(obj.Tabs[Index].Pos, obj.Tabs[Index].Value) );
+        }
+    }
+}
+
+asc_CParagraphTabs.prototype = {
+	asc_getCount: function (){ return this.Tabs.length; },
+	asc_getTab: function (Index){ return this.Tabs[Index]; },
+	asc_addTab: function (Tab){ this.Tabs.push(Tab) },
+	asc_clear: function (){ this.Tabs.length = 0; }
+}
+
+//{ asc_CParagraphTabs export
+window["Asc"].asc_CParagraphTabs = asc_CParagraphTabs;
+window["Asc"]["asc_CParagraphTabs"] = asc_CParagraphTabs;
+prot = asc_CParagraphTabs.prototype;
+
+prot["asc_getCount"] = prot.asc_getCount;
+prot["asc_getTab"] = prot.asc_getTab;
+prot["asc_addTab"] = prot.asc_addTab;
+prot["asc_clear"] = prot.asc_clear;
+//}
+
+
+//-----------------------------------------------------------------------------------
+// Manager
+//-----------------------------------------------------------------------------------
+
 function DrawingObjects() {
 
 	//-----------------------------------------------------------------------------------
@@ -1577,6 +1915,7 @@ function DrawingObjects() {
 	var userId = null;
 	var documentId = null;
 	
+	_this.zoom = 1;
 	_this.isViewerMode = null;
 	_this.objectLocker = null;
 	_this.drawingDocument = null;
@@ -2084,6 +2423,7 @@ function DrawingObjects() {
 
 	_this.changeZoom = function(factor) {
 		
+		_this.zoom = factor;
 		shapeCtx.init( drawingCtx.ctx, drawingCtx.getWidth(0), drawingCtx.getHeight(0), drawingCtx.getWidth(3), drawingCtx.getHeight(3) );
 		shapeCtx.CalculateFullTransform();
 		
@@ -2145,6 +2485,11 @@ function DrawingObjects() {
 		}
 	}
 
+	_this.callTrigger = function(triggerName, param) {
+		if ( triggerName )
+			worksheet.model.workbook.handlers.trigger(triggerName, param);
+	}
+	
 	_this.getBoundsChecker = function(drawingObject) {
 		if ( drawingObject && drawingObject.graphicObject ) {
 			var boundsChecker = new  CSlideBoundsChecker();
@@ -2157,14 +2502,6 @@ function DrawingObjects() {
 	}
 	
 	_this.clearDrawingObjects = function() {
-		
-		/*worksheet._clean();
-		worksheet._drawCorner();
-		worksheet._drawColumnHeaders();
-		worksheet._drawRowHeaders();
-		worksheet._drawGrid();
-		worksheet._drawCells();
-		worksheet._drawCellsBorders();*/
 		
 		// Чистим предыдущие области
 		var bHeaders = false;
@@ -3168,6 +3505,20 @@ function DrawingObjects() {
 			autoShapeTrack.Graphics.m_oCoordTransform.ty -= y_px;
 			autoShapeTrack.Graphics.CalculateFullTransform();
 		}
+	}
+	
+	_this.restoreScrollOffset = function() {
+		shapeCtx.m_oCoordTransform.tx = scrollOffset.x;
+		shapeCtx.m_oCoordTransform.ty = scrollOffset.y;
+		shapeCtx.CalculateFullTransform();
+		
+		shapeOverlayCtx.m_oCoordTransform.tx = scrollOffset.x;
+		shapeOverlayCtx.m_oCoordTransform.ty = scrollOffset.y;
+		shapeOverlayCtx.CalculateFullTransform();
+		
+		autoShapeTrack.Graphics.m_oCoordTransform.tx = scrollOffset.x;
+		autoShapeTrack.Graphics.m_oCoordTransform.ty = scrollOffset.y;
+		autoShapeTrack.Graphics.CalculateFullTransform();
 	}
 	
 	_this.convertMetric = function(val, from, to) {

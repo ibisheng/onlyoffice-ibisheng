@@ -14,6 +14,8 @@ function DrawingObjectsController(drawingObjects)
     this.arrPreTrackObjects = [];
     this.arrTrackObjects = [];
     this.defaultColorMap = GenerateDefaultColorMap().color_map;
+	
+	var ascSelectedObjects = [];
 }
 
 DrawingObjectsController.prototype =
@@ -746,7 +748,91 @@ DrawingObjectsController.prototype =
 	getGraphicObjectProps: function()
 	{
 		var shape_props, image_props, chart_props;
+		ascSelectedObjects = [];
+		
+		// Текстовые свойства объекта
+		var flag = false;
+        if(this.curState.id === STATES_ID_TEXT_ADD || this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP)
+        {
+            flag = true;
+        }
+        else
+        {
+            if(this.curState.id != STATES_ID_GROUP)
+            {
+                var s_arr2 = this.selectedObjects;
+                if(s_arr2.length === 1 && s_arr2[0] instanceof  CShape && !isRealObject(s_arr2[0].txBody))
+                    flag = true;
 
+                for(var i = 0; i < this.selectedObjects.length; ++i)
+                {
+                    if(this.selectedObjects[i].isShape() && this.selectedObjects[i].txBody)
+                    {
+                        flag = true;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                var gr_sel_array = this.curState.group.selectionInfo.selectionArray;
+
+                for(var i = 0; i < gr_sel_array.length; ++i)
+                {
+                    if(gr_sel_array[i].isShape() && gr_sel_array[i].textBoxContent)
+                    {
+                        flag = true;
+                        break;
+                    }
+                }
+            }
+        }
+        if(flag)
+        {
+            var cur_state = this.curState;
+            switch(this.curState.id)
+            {
+                case STATES_ID_TEXT_ADD:
+                {
+                    var text_object = cur_state.textObject;
+                    if(text_object != null && text_object != null && text_object.txBody.content != null)
+                        text_object.txBody.content.Document_UpdateInterfaceState();
+                    break;
+                }
+                case STATES_ID_TEXT_ADD_IN_GROUP:
+                {
+                    text_object = cur_state.textObject;
+                    if(text_object != null && text_object.txBody.content != null)
+                        text_object.txBody.content.Document_UpdateInterfaceState();
+                    break;
+                }
+                default:
+                {
+                    var para_pr = this.getParagraphParaPr();
+                    if(this.selectedObjects.length === 1
+                        && this.selectedObjects[0] instanceof CShape
+                        && !isRealObject(this.selectedObjects[0].textBoxContent))
+                    {
+                        if(isRealObject(this.selectedObjects[0].Parent) && typeof this.selectedObjects[0].Parent.Get_CompiledPr2 === "function")
+                        {
+                            var para_pr2 = this.selectedObjects[0].Parent.Get_CompiledPr2(false).ParaPr;
+                            if(isRealObject(para_pr2) && isRealObject(para_pr2.Ind))
+                            {
+                                para_pr.Ind = para_pr2.Ind;
+                            }
+                        }
+
+                    }
+                    //editor.UpdateParagraphProp(para_pr);
+                    //editor.UpdateTextPr(this.getParagraphTextPr());
+                    break;
+                }
+            }
+			
+			//ascSelectedObjects.push(new asc_CSelectedObject( c_oAscTypeSelectElement.Paragraph, new asc_CParagraphProperty( prProp ) );
+		}
+
+		// Основные свойства объекта
         if(isRealObject(this.curState.group))
         {
             var selected_objects = this.curState.group.selectedObjects;
@@ -1000,8 +1086,7 @@ DrawingObjectsController.prototype =
         {
             ret.push(chart_props);
         }
-			
-		var ascSelectedObjects = [];
+		
 		for (var i = 0; i < ret.length; i++) {
 			ascSelectedObjects.push(new asc_CSelectedObject( c_oAscTypeSelectElement.Image, new asc_CImgProperty(ret[i]) ));
 		}
