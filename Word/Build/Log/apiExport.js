@@ -998,6 +998,8 @@ prop:get_fill
 prop:put_fill
 prop:get_stroke
 prop:put_stroke
+prop:get_paddings
+prop:put_paddings
 ---
 var:CreateAscShapeProp
 ---
@@ -1944,6 +1946,8 @@ CAscShapeProp.prototype['get_fill'] = CAscShapeProp.prototype.get_fill;
 CAscShapeProp.prototype['put_fill'] = CAscShapeProp.prototype.put_fill;
 CAscShapeProp.prototype['get_stroke'] = CAscShapeProp.prototype.get_stroke;
 CAscShapeProp.prototype['put_stroke'] = CAscShapeProp.prototype.put_stroke;
+CAscShapeProp.prototype['get_paddings'] = CAscShapeProp.prototype.get_paddings;
+CAscShapeProp.prototype['put_paddings'] = CAscShapeProp.prototype.put_paddings;
 window['CreateAscShapeProp'] = CreateAscShapeProp;
 window['CreateAscShapePropFromProp'] = CreateAscShapePropFromProp;
 window['CorrectShapeProp'] = CorrectShapeProp;
