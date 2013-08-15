@@ -575,7 +575,7 @@ function CDrawingPage()
 function CDrawingDocument()
 {
     this.IsLockObjectsEnable = false;
-    
+
     this.cursorPaintFormat = "";
     if (bIsIE)
     {
@@ -1739,6 +1739,18 @@ function CDrawingDocument()
                 delete _drawing_map[i];
             }
         }
+    }
+
+    this.CheckFontNeeds = function()
+    {
+        var map_keys = this.m_oWordControl.m_oLogicDocument.Document_Get_AllFontNames();
+        var dstfonts = new Array();
+        for (var i in map_keys)
+        {
+            dstfonts[dstfonts.length] = new CFont(i, 0, "", 0, null);
+        }
+        this.m_oWordControl.m_oLogicDocument.Fonts = dstfonts;
+        return;
     }
 
     // вот здесь весь трекинг
