@@ -75,6 +75,10 @@ function asc_docs_api(name)
     this.pasteImageMap = null;
     this.EndActionLoadImages = 0;
 
+    this.isSaveFonts_Images = false;
+    this.saveImageMap = null;
+    this.canSave = true;//Флаг нужен чтобы не происходило сохранение пока не завершится предыдущее сохранение
+
     this.ServerIdWaitComplete = false;
     this.ServerImagesWaitComplete = false;
 
@@ -2933,6 +2937,21 @@ asc_docs_api.prototype.asyncFontsDocumentEndLoaded = function()
         this.ImageLoader.LoadDocumentImages(this.pasteImageMap, false);
         return;
     }
+    else if (this.isSaveFonts_Images)
+    {
+        var _count = 0;
+        for (var i in this.saveImageMap)
+            ++_count;
+
+        if (_count > 0)
+        {
+            this.EndActionLoadImages = 2;
+            this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
+        }
+
+        this.ImageLoader.LoadDocumentImages(this.saveImageMap, false);
+        return;
+    }
 
     this.GenerateStyles();
     // открытие после загрузки документа
@@ -2987,20 +3006,26 @@ asc_docs_api.prototype.asyncImagesDocumentEndLoaded = function()
     this.ImageLoader.bIsLoadDocumentFirst = false;
 
     // размораживаем меню... и начинаем считать документ
-    if (false === this.isPasteFonts_Images)
+    if (this.isPasteFonts_Images)
+    {
+        this.isPasteFonts_Images = false;
+        this.pasteImageMap = null;
+        this.pasteCallback();
+        this.pasteCallback = null;
+    }
+    else if (this.isSaveFonts_Images)
+    {
+        this.isSaveFonts_Images = false;
+        this.saveImageMap = null;
+        this.pre_SaveCallback();
+    }
+    else
     {
         this.ServerImagesWaitComplete = true;
         if (true == this.ServerIdWaitComplete)
             this.OpenDocumentEndCallback();
 
         this.asyncServerIdStartLoaded();
-    }
-    else
-    {
-        this.isPasteFonts_Images = false;
-        this.pasteImageMap = null;
-        this.pasteCallback();
-        this.pasteCallback = null;
     }
 }
 
@@ -3120,6 +3145,11 @@ asc_docs_api.prototype.pre_Paste = function(_fonts, _images, callback)
     this.pasteCallback = callback;
     this.pasteImageMap = _images;
     this.FontLoader.LoadDocumentFonts2(_fonts);
+}
+
+asc_docs_api.prototype.pre_SaveCallback = function()
+{
+    CollaborativeEditing.OnEnd_Load_Objects();
 }
 
 asc_docs_api.prototype.initEvents2MobileAdvances = function()
