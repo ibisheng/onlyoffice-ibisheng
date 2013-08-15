@@ -7,9 +7,9 @@ removeRowsRange:UEa
 CaseSensitive:tpa
 WriteBorderProp:yQ
 charstrings_index:vK
-_highlight_stroke:KH
+_highlight_stroke:LH
 RecalcInfo:Vi
-panose:IG
+panose:JG
 ReadTop10:rMa
 OnScroll:KJ
 getHeightCoeff:y4a
@@ -127,7 +127,7 @@ dualVector:os
 _ylabels_labels_above_labels_above_font:Ufb
 single_block:joa
 RoundRobin:Ydb
-fTop:UF
+fTop:VF
 m_oPen:il
 m_bStringGID:vO
 onLocksAcquired:CL
@@ -161,7 +161,7 @@ intervalToIntervalObject:Kaa
 pos_y:zx
 pos_x:yx
 onRelockFailed:ena
-cardDirection:gI
+cardDirection:hI
 getValueForEdit:QK
 get_Type:f5a
 asc_setGridFlag:Aia
@@ -184,18 +184,18 @@ filter2:gx
 IsFocus:qea
 face_flags:Rg
 getPoint:Ey
-m_nStartAt:nG
+m_nStartAt:oG
 bearing_x:W1
 asc_setCellStyle:m0a
-oTextFormat:CG
+oTextFormat:DG
 n_contours:Ke
-oldValue2:EG
+oldValue2:FG
 get_type:bw
 asc_getOutlineColor:wYa
 txPr:mda
 WriteBuffer:j0
 onStartCheckLock:EL
-oldValue1:DG
+oldValue1:EG
 oData:KD
 CustomStyles:Fl
 asc_getRepliesCount:oxa
@@ -241,7 +241,7 @@ bChartEditor:JF
 range_shift:a9a
 ReadExt:VKa
 txStyles:mGa
-ReadTable:rH
+ReadTable:sH
 full_name:yB
 originalh:jEa
 MultiplyAppendInvert:Gea
@@ -277,7 +277,7 @@ isMoveResizeChartsRange:Ala
 asc_getImage:Xha
 LoadFontAsync:rM
 cvt_program_size:e$
-updateSelectionState:ve
+updateSelectionState:we
 ReadArray:oKa
 func_round_sphn:Ijb
 minimum:QI
@@ -301,7 +301,7 @@ fVertBearingY:dX
 _drawRowBG:X7
 _xlabels_bold:$M
 STYLE_CLASS_Rules:SU
-asc_getHeight:aI
+asc_getHeight:bI
 originalw:kEa
 originalx:v8a
 originaly:w8a
@@ -321,7 +321,7 @@ Internal:UP
 skipSeries:MFa
 insertFormula:R5a
 MIRP_CVT_ZERO_RULES_SIZE:zJa
-overlayObjects:HG
+overlayObjects:IG
 get_r:qX
 _selectChars:vz
 StartTrackImage:reb
@@ -379,7 +379,7 @@ pageGridLines:pEa
 attrSaveSubsetFonts:Iya
 m_nNum:iDa
 Hidden:zC
-RENDERER_PDF_FLAG:qH
+RENDERER_PDF_FLAG:rH
 getCharWidth:n4a
 RecalculateCurPos:Po
 getLockMeRow:sBa
@@ -391,7 +391,7 @@ centery:Rb
 WordControl:xj
 getSelectionRangeValue:yBa
 stackedOrGrouped:moa
-ConvertCoordsFromCursor2:$G
+ConvertCoordsFromCursor2:aH
 FontNumber:vIa
 numFormatType:ZDa
 _fixSelectionOfHiddenCells:MQ
@@ -445,7 +445,7 @@ pageRange:rEa
 ctFontName:Y9
 severalChartTypes:uv
 lemonchiffon:ulb
-wsTo:VG
+wsTo:WG
 parser:Fo
 aFracFormat:g1
 unicodes_init:qGa
@@ -520,7 +520,7 @@ _animation_factor:J7
 GOPathQuadBezTo:uqa
 m_bUseKerning:hba
 CellData:vpa
-_factor:GH
+_factor:HH
 Get:Za
 leftRowBand2FC:H6a
 calcPagesPrint:uW
@@ -559,7 +559,7 @@ asc_putSmallCaps:H_a
 commentBefore:Bz
 FirstLoadChanges:q6
 WriteDouble2:qo
-IsIdentity:hH
+IsIdentity:iH
 fullRecalc:Gjb
 Get_Next:su
 _mergeFragments:Uga
@@ -585,7 +585,7 @@ minRealR:Cba
 Cursor_MoveUp_To_LastRow:nU
 isManual:c6a
 GetDescender:h_
-_area_border:DH
+_area_border:EH
 reWordBegining:JEa
 AbsW:xZ
 Wave2:bta
@@ -653,7 +653,7 @@ fonts_loading_after_style:NN
 ReadTableCustomStyle:fMa
 rightSide:aC
 setCellAllSuperscript:f5
-calculateTransformTextMatrix:ze
+calculateTransformTextMatrix:Ae
 canGroup:MF
 bytecode_ready:Y1
 _fetchRowCache:E0
@@ -734,7 +734,7 @@ GOSingleProp:xqa
 aComments:Ie
 _calcMaxBorderWidth:O7
 Get_StartPage_Relative:x6
-_text_angle:OH
+_text_angle:PH
 TextMetrics:KNa
 maxScrollX:MI
 Cur_Restart:PZ
@@ -840,7 +840,7 @@ GetFont:xE
 width_mm:nr
 numberToCSSColor:rY
 m_bGlobalLockEditCell:VX
-AbsolutePosition:WG
+AbsolutePosition:XG
 valWithFormat:Roa
 graphArea:h3
 VmlDrawing:cfb
@@ -929,14 +929,14 @@ setBwMode:m$a
 Add_LinkData:TGa
 asc_startAddShape:s1a
 asc_setFilter2:Rxa
-FontBBox:eH
+FontBBox:fH
 Check:W5
 SetDefaultFont:c7
 asc_setFilter1:Qxa
 asc_putSeveralCharts:D_a
 DrawIEShadow:jM
 bAddMinusIfNes:Q1
-m_dWidthMM:lG
+m_dWidthMM:mG
 StyleNumPr:wNa
 asc_putDefaultTab:j_a
 asc_putPositionH:x_a
@@ -950,7 +950,7 @@ steelblue:Yob
 User:oz
 WidthSuff:EM
 textFit:zoa
-tooltips:TG
+tooltips:UG
 ReadStylesContent:cMa
 font_map:I$
 setCellAllBold:Z4
@@ -994,7 +994,7 @@ dpiY:FAa
 ReadGrFrame:Jra
 get_table:o5a
 dpiX:EAa
-resizedRot:MG
+resizedRot:NG
 styleThumbnailWidth:Uca
 isLocked:zCa
 Set_RulerState_Table:geb
@@ -1084,7 +1084,7 @@ _initWorksheetDefaultWidth:rSa
 _coAuthoringSetServerUrl:Jua
 asc_putId:p_a
 _findCloneElement:Zua
-sTime:OG
+sTime:PG
 _annotate_color:$ta
 GetStyleName:tcb
 isErased:HX
@@ -1197,7 +1197,7 @@ autoFiltersObject:FF
 axisWidth:Xs
 m_lTimerUpdateTargetID:lba
 font_dict:wq
-_grouping:IH
+_grouping:JH
 Jc:Qd
 palegoldenrod:wnb
 _onMouseWheel:DTa
@@ -1360,7 +1360,7 @@ asc_setLegend:L0a
 Save:Zra
 oFontMap:NO
 TabPos:Aeb
-oNegativeFormat:BG
+oNegativeFormat:CG
 attrServerZoom:Jya
 aTextValue2:h1
 asc_unregisterCallback:u1a
@@ -1432,14 +1432,14 @@ arrActiveFormulaRanges:aj
 createDuplicateForTrack:Mhb
 onSaveCallback:gEa
 AddToMergedAndHyperlink:zda
-NeedStyles:nH
+NeedStyles:oH
 m_arrayPages:Ai
 asyncImagesDocumentEndLoaded:iW
 isNumber:AS
 preserve:E4
 _drawCollaborativeElementsMeOther:Pua
 _title_left:EUa
-nodeId:Fe
+nodeId:ve
 rightRowBand2ColBand2LC:K9a
 bRow:hR
 asc_replaceText:Z_a
@@ -1499,7 +1499,7 @@ oBorderMap:KO
 begin:Zw
 Filters:op
 charstrings_block:Iza
-getCellTop:Ae
+getCellTop:Be
 max_contours:OI
 RemoveRect:Ura
 HyperlinksChanged:Kqa
@@ -1573,7 +1573,7 @@ ReadColorSpreadsheet:fQ
 bMoveWithCells:r9
 ey:r$
 addImageDrawingObject:k1
-SavePen:vH
+SavePen:wH
 Ind:ua
 operator:WB
 dependencyFormulas:Qk
@@ -1608,7 +1608,7 @@ newFlipH:Bma
 WriteParagraph:wta
 bc:V1
 instanceCount:Haa
-getRow:Ee
+getRow:Fe
 initTableStyle:dCa
 ColId:On
 asc_getRow:ms
@@ -1623,7 +1623,7 @@ isMoveRangeMode:JB
 m_dDpiY:Wz
 Last:Aw
 m_dDpiX:Do
-maximum:tG
+maximum:uG
 themeElements:ml
 getProperty:Pf
 lighten:PCa
@@ -1714,7 +1714,7 @@ DrawKey_gutter:lIa
 _highlight_style:nSa
 parse_charstrings:A8a
 HMode:Acb
-moveble:vG
+moveble:wG
 asc_CLockInfo:BF
 fillHandleBorderColorSelect:W3a
 mm:H7a
@@ -2069,7 +2069,7 @@ forestgreen:wjb
 UpdateCanvas:jm
 _filled_range:KQ
 fonts_streams:vjb
-base_len:eI
+base_len:fI
 setFormulaEditMode:gC
 ArrayPoints:ue
 thistle:ppb
@@ -2097,7 +2097,7 @@ ReadCalcChainContent:wKa
 min_ptsize:oma
 incremental_interface:dn
 LoadScriptAsync:Wcb
-FontMap:fH
+FontMap:gH
 TT_CONFIG_OPTION_SUBPIXEL_HINTING:Qo
 TableWholeTable:lz
 Content:z
@@ -2164,7 +2164,7 @@ asc_getStyleThumbnailWidth:cZa
 _onCommentCellClick:oTa
 asyncImagesStartLoaded:Ugb
 Remove_Comment:FMa
-load_points:iG
+load_points:jG
 MozBoxShadow:YP
 offsetToData:yY
 isOneTable:CCa
@@ -2287,7 +2287,7 @@ pageMargins:jna
 embeddedFilesPath:NAa
 IconSet:YIa
 moveRangeTimerId:Gba
-Bar:YG
+Bar:ZG
 _isLockedCells:To
 setCellAlign:tt
 array_clone:Zp
@@ -2353,7 +2353,7 @@ UnfoldFromCenter:Peb
 rightBottomRowBand1ColBand2LC:z9a
 translatetNumberHandle:Bl
 to_token:rpb
-vertical:UG
+vertical:VG
 isDoBrowserDblClick:Raa
 createResizeInGroupTrack:eAa
 getBorder:qD
@@ -2371,7 +2371,7 @@ Set:Yd
 _isColDrawnPartially:AV
 orange:pnb
 color_map:Yn
-DrawKey:cH
+DrawKey:dH
 ShapeProperties:oi
 places:XB
 ReadRunProperties:hQ
@@ -2439,7 +2439,7 @@ fonts:sI
 axis_names:q9
 LockCursorType:uJa
 burlywood:lhb
-m_nGlyphIndex:mG
+m_nGlyphIndex:nG
 DrawLine:j6
 ascCvtRatio:Q8
 postscript:dJ
@@ -2471,7 +2471,7 @@ skip:jn
 updateVisibleRange:rab
 ReadConditionalFormatting:JKa
 addCommentSerialize:dVa
-Cursor_MoveToStartPos:aH
+Cursor_MoveToStartPos:bH
 ReadColorFilter:EKa
 wrd:FGa
 koef:JCa
@@ -2514,7 +2514,7 @@ maps:nL
 Api:oh
 cmap:Vh
 Add_CurrentDraw:$ab
-_setColorStyleTable:MH
+_setColorStyleTable:NH
 relativeArrPoints:$nb
 CheckFontsPaste:mbb
 addMod:M8
@@ -2557,7 +2557,7 @@ vscrollStep:gE
 check_points:Bhb
 oldXfrmFlipV:$ma
 max_profile:SB
-maxCol:qG
+maxCol:rG
 blue_shift:nR
 asc_getPageSetup:c9
 ctPathCommandStart:l3a
@@ -2565,7 +2565,7 @@ toolTip:jda
 min_after_BL:JDa
 asc_getOrientation:a9
 horiBearingY:pm
-digparams:SF
+digparams:TF
 sync_countPagesCallback:kpb
 horiBearingX:Dm
 asc_setHyperlinkRange:Dia
@@ -2574,7 +2574,7 @@ m_oTextMatrix:l7a
 Character:DP
 asc_setBottom:aW
 getActiveCellCoord:i4a
-_zoom:xe
+_zoom:ye
 Read2Spreadsheet:Ng
 resizedExtX:ae
 reDrawFilter:d9a
@@ -2653,7 +2653,7 @@ services:l$a
 m_arrCacheSizes:DD
 setParent:mA
 drawSearchResult:IAa
-Outside:pH
+Outside:qH
 m_lLineHeight:KI
 RgbColor:Wra
 nBottom:iY
@@ -2703,7 +2703,7 @@ lightslategray:Hlb
 DELTAP_SKIP_EXAGGERATED_VALUES_RULES_SIZE:$Ha
 isPhoto:Vaa
 Rose:V_
-asyncImageEndLoaded:cI
+asyncImageEndLoaded:dI
 ArrGlyph:Lo
 max_width:gma
 WriteSpPr:AQ
@@ -2842,7 +2842,7 @@ isNeedCacheClean:zS
 mouseDownArrow:e4
 Get_CurPage:xcb
 Images:H6
-contentHeight:QF
+contentHeight:RF
 _isExcel:BV
 invertTransform:av
 _callback_script_load:hRa
@@ -2864,9 +2864,9 @@ Row:RU
 load_glyph:Kla
 Internal_Content_Remove:lq
 textValue:hZ
-sUserName:QG
+sUserName:RG
 IsDrawBorderInNoneMode:hJa
-_xlabels:PH
+_xlabels:QH
 _onEditCell:Zga
 bNoSelect:Via
 onStopEditCell:n8a
@@ -2920,7 +2920,7 @@ asc_getRange:gN
 nColsCount:Oe
 RelativeIndent:Bt
 asc_getCanReaderMode:UWa
-isRange:gG
+isRange:hG
 _ylabels_count:$g
 ReadCommentData:Ara
 rIns:bm
@@ -3030,7 +3030,7 @@ commentFillColor:L2a
 EditorThemes:o6
 asc_CStroke:Lgb
 SerifStyle:bNa
-WriteBorder:AH
+WriteBorder:BH
 setCellStrikeout:ZD
 access_glyph_frame:swa
 bChange:E1a
@@ -3078,7 +3078,7 @@ InstallUserClickListener:BE
 ClearCachePages:wbb
 isEmptyToSave:t3
 insideV:Xkb
-maxRow:sG
+maxRow:tG
 isArea:Vt
 ItalicCS:vr
 sph_set_tweaks:F$a
@@ -3121,7 +3121,7 @@ isComleteRenderer:Zkb
 _italic:jF
 zones:WT
 _onMoveResizeRangeHandleDone:HTa
-_smallyticks:NH
+_smallyticks:OH
 asc_getFromGroup:JXa
 isRightParentheses:f6a
 anchorUpdated:Ewa
@@ -3129,7 +3129,7 @@ CGradient:gHa
 auto:z1a
 aValAx:aR
 raster_render:rca
-_highlight_fill:JH
+_highlight_fill:KH
 _bottom:La
 Snap:meb
 bAspect:qy
@@ -3145,7 +3145,7 @@ avar_checked:Oya
 setWrap:Xy
 _calcHeaderColumnWidth:pua
 mediumvioletred:Emb
-onLocksReleased:FG
+onLocksReleased:GG
 cvt:Bm
 documentTitleWithoutExtention:CAa
 m_lDrawingFirst:pt
@@ -3171,7 +3171,7 @@ getRectBounds:uI
 service_MULTI_MASTERS:yob
 WriteTableColumn:OPa
 visibleRange:Sb
-adjNum:VH
+adjNum:WH
 _addHtmlToIframe:Vta
 sheetidfrom:GT
 Get_TableStyleForPara:iea
@@ -3209,7 +3209,7 @@ removeNodeBySheetId:r9a
 DELTAP_RTG_Rules:Mbb
 Location:Lq
 m_lMaxSize:rmb
-isMoveResizeRange:fG
+isMoveResizeRange:gG
 asc_setUnderline:g1a
 params:Cnb
 getCardDirectionByNum:rD
@@ -3254,7 +3254,7 @@ lightsteelblue:Ilb
 WriteWorkbookContent:eQa
 X_ColumnStart:Eta
 _labels_offset:MSa
-control_data:RF
+control_data:SF
 EndSearch:Ybb
 thirdColumnSubheading:dda
 asc_getBottom:YC
@@ -3415,7 +3415,7 @@ Undo:Xi
 ReadStyleRef:jQ
 ChildChain:vbb
 screenH:RY
-array_exp:XH
+array_exp:YH
 Col:Epa
 content2:Ija
 WriteTableProps:TPa
@@ -3426,7 +3426,7 @@ _xscale_units_pre:UUa
 delta_shift:LW
 WriteBool:ma
 read_simple_glyph:MEa
-itemsIds:hG
+itemsIds:iG
 _sortArrayMinMax:DUa
 Set_Spacing:Y_
 Right_Margin:V6
@@ -3447,13 +3447,13 @@ InitDocument:Gcb
 WriteThemeElements:$Pa
 ChartFont:zpa
 get_Index:d5a
-sUrlPath:PG
+sUrlPath:QG
 cursorShape:r3a
 _colors_alternate:pRa
 _moveActiveCellToXY:Vga
 extX:ba
 ClrScheme:Dpa
-Ascender:XG
+Ascender:YG
 extY:ca
 load_os2:X6a
 arrayChanges:Fwa
@@ -3493,7 +3493,7 @@ start_glyph:TFa
 m_lPagesCount:Sc
 getFormula:X$
 m_dDocumentWidth:lmb
-IsIdentity2:iH
+IsIdentity2:jH
 wrong_value_type:Opb
 NeedScrollToTargetFlag:jdb
 SortConditions:Fv
@@ -3529,9 +3529,9 @@ blipFill:lB
 force_bold_threshold:WAa
 ROUND_NONPIXEL_Y_MOVES_Rules:kKa
 SKIP_INLINE_DELTAS_Rules:QMa
-getCellLeft:De
+getCellLeft:Ee
 xTickGap:Woa
-Center:ZG
+Center:$G
 StartPos:bb
 copyText:Qu
 ctPathCommandMoveTo:k3a
@@ -3542,7 +3542,7 @@ GetDefaultFont:Aqa
 dxf:fc
 charstrings:uy
 header_top:Ikb
-addFormatTableOptionsObj:UH
+addFormatTableOptionsObj:VH
 ctPathCommandText:nib
 FontsCount:bea
 ROUND_NONPIXEL_Y_MOVES_Rules_Exceptions:lKa
@@ -3618,7 +3618,7 @@ scrollHorizontal:hA
 lockDraw:dba
 TrackTablePos:nz
 is_offset_one:Fla
-m_dHeightMM:kG
+m_dHeightMM:lG
 getOriginalBoundsRect:QN
 setGraphicObjectCoords:ZO
 m_oMainContent:jDa
@@ -3783,11 +3783,11 @@ DecrementArguments:Tpa
 defaultFont:qB
 GetVerticalScrollTo:MIa
 code_to_sid:Xza
-ReadTextBody:sH
+ReadTextBody:tH
 DocumentName:Obb
 createMoveTrack:wy
 startRow:Gc
-eventListeners:TF
+eventListeners:UF
 asc_setShowValueFlag:a1a
 ChartProperties:pn
 compensations:Uq
@@ -3800,7 +3800,7 @@ calculateTransformMatrix:oja
 addNode2:l1
 GOSetAdjustmentValue:vqa
 targetArr:hP
-_fixSelectionOfMergedCells:HH
+_fixSelectionOfMergedCells:IH
 lightenLess:QCa
 _xticks:eK
 Internal_Position:Is
@@ -3845,7 +3845,7 @@ increaseFontSize:Rz
 ctFontXML:iib
 FireCustomEvent:Ti
 bit_depth:dja
-band_size:dI
+band_size:eI
 asc_setHeader:C0a
 ReadSheetView:WLa
 getNumFormatStr:gl
@@ -3938,7 +3938,7 @@ headerRightTop:I5a
 ReadAx:wra
 themeTint:MT
 firstRowStripe:vq
-applyCollaborative:WH
+applyCollaborative:XH
 m_tempX:n7a
 m_tempY:o7a
 ReadBg:qKa
@@ -3989,10 +3989,10 @@ cid_font_name:M9
 private_offset:G4
 dHeightMM:EW
 inline_delta:gCa
-getHeightText:ZF
+getHeightText:$F
 WriteDataLabels:DOa
 asyncFontStartLoaded:w1a
-aCellXfs:QH
+aCellXfs:RH
 buffer_size:sW
 ReadHF:Kra
 _drawCollaborativeElements:NRa
@@ -4067,7 +4067,7 @@ sid_to_string:JFa
 asc_insertFormula:MZa
 GuiCanvasFillTextureParentId:z6
 _applyDigitalFilter:aua
-WriteUniColor:BH
+WriteUniColor:CH
 bIsNoFillAttack:oW
 load_directory:Rlb
 sTypoLineGap:mFa
@@ -4095,7 +4095,7 @@ WriteShd:nfb
 spTree:lc
 ySubscriptXOffset:Nab
 m_oHorRuler:oba
-getFont:YF
+getFont:ZF
 path_begun:IL
 aCFVOs:f1
 check_fonts_loaded_sync:Ahb
@@ -4177,7 +4177,7 @@ GetStringGID:scb
 WriteSeriesNumCacheValue:zta
 Pitch:aKa
 printPagesData:BY
-ReadUShort:tH
+ReadUShort:uH
 fillRef:ej
 gutterRight:E5a
 asc_getViewerMode:rZa
@@ -4237,7 +4237,7 @@ asc_getLine:fYa
 aMerged:I8
 instanceSize:rla
 getStrokeStyle:S4a
-After:we
+After:xe
 asc_getRightOffset:bia
 Clipboard:LHa
 pint:jca
@@ -4322,7 +4322,7 @@ copyFrom:U9
 _key_color_shape:kF
 ReadSeriesNumCacheValues:OLa
 t_sort_slave:woa
-returnCode:NG
+returnCode:OG
 Mathematic:cra
 GetTextPr:k_
 Core:Opa
@@ -4424,7 +4424,7 @@ _top:Y
 GlobalTableIdAdd:Fqa
 font_files:Q2
 _onResizeElementDone:MTa
-Space:Be
+Space:Ce
 dLeftPX:w2
 newXfrmExtX:Gma
 newXfrmExtY:Hma
@@ -4487,7 +4487,7 @@ code_first:Vza
 topfont:dab
 glyf_len:sX
 minAng:er
-asc_getComments:ZH
+asc_getComments:$H
 defRPr:f$
 _c2:aF
 is_member_of_style_class:FCa
@@ -4505,7 +4505,7 @@ hdmx_record_count:F5a
 isBlack:kt
 bInside:F1a
 asc_getActiveWorksheetId:Vwa
-isChecked:dG
+isChecked:eG
 checkObjects:fl
 fillStyleLst:JN
 ctBrushTextureMode:$2a
@@ -4561,7 +4561,7 @@ oApi:VB
 intersect:sla
 redo:M4
 ctPenDashStyle:tib
-release:LG
+release:MG
 Marker:tM
 drawStyle:JAa
 faceIndex:ojb
@@ -4774,7 +4774,7 @@ kern_table:Zaa
 adobe_std_encoding:Bwa
 redo_function:IY
 asc_setChartEditorFlag:u0a
-asc_getDocumentFlag:$H
+asc_getDocumentFlag:aI
 asc_changeShapeImageFromFile:fWa
 Cursor_MoveEndOfLine:kU
 _scale_thousand:t8
@@ -4859,7 +4859,7 @@ moveSheet:tma
 m_oEditor:Xz
 m_oCanvas:QB
 coeffR:E2a
-Descender:bH
+Descender:cH
 mediumslateblue:Bmb
 asc_hideRows:FZa
 coeffX:F2a
@@ -4912,7 +4912,7 @@ DateAndTime:Spa
 getLnStyle:iS
 firstHeaderCell:mD
 asc_drawingObjectsExist:wWa
-StartMousePosition:wH
+StartMousePosition:xH
 Set_EndInfo:jsa
 getValue:j
 secondRowStripe:Dq
@@ -4923,7 +4923,7 @@ offsetToCoord:eEa
 _fetchCellCacheText:URa
 symmetrical_smoothing:$Fa
 rightFieldInPt:cFa
-m_aPairs:jG
+m_aPairs:kG
 _cleanCache:oV
 _CoAuthoringApi:ck
 asc_getCanAddTable:NWa
@@ -4993,7 +4993,7 @@ pen:Gk
 OpenDocument:wdb
 num_locations:JO
 bcr:bc
-asc_getUserId:bI
+asc_getUserId:cI
 _onScrollReinitialize:PTa
 m_arrayCommands:hmb
 attrBookmarkIdSeed:Bya
@@ -5026,7 +5026,7 @@ GetULong:Qa
 asc_getObjectType:rYa
 graphicObjectKeyDown:v5a
 asc_setIsChecked:Wxa
-getSelectedRange:cG
+getSelectedRange:dG
 func_read_cvt:U2
 render_glyph:WEa
 asc_setStyleId:c1a
@@ -5055,7 +5055,7 @@ ndv_idx:XDa
 YLimit:km
 pasteText:uEa
 ConvertCoordsFromCursor:zbb
-_recalcType:LH
+_recalcType:MH
 cache_count:gja
 WriteCellStyles:qOa
 lastCellAddress:NB
@@ -5119,7 +5119,7 @@ memory_size:Hmb
 _isHiddenAnotherFilter:BSa
 isFunc:Y5a
 _isEqualRange:ySa
-getRealLeftOffset:aG
+getRealLeftOffset:bG
 add_point:bgb
 _addCustomFilters:DQa
 hdmx_record_size:G5a
@@ -5430,11 +5430,11 @@ ReadSortCondition:aMa
 private_StartDrawSelection:N8a
 ReadParagraph:O6
 severalCharts:hC
-aCollaborativeChangeElements:RH
+aCollaborativeChangeElements:SH
 Get_CurPosXY:CJ
 m_oDefaultFont:mba
 evt_mousedown:R3a
-aSequence:TH
+aSequence:UH
 addFormulaRange:fVa
 aRuleElements:UV
 aCurDigits:vF
@@ -5522,7 +5522,7 @@ isViewerMode:vs
 subfonts:dE
 WriteFilters:ROa
 setFontRef:q$a
-asc_StartAction:YH
+asc_StartAction:ZH
 m_bTurnOff:dL
 asc_getRecommendedSettings:EYa
 ReadFilter:ZKa
@@ -5545,7 +5545,7 @@ asc_getTransparent:txa
 cachedImage:bx
 onSaveChanges:RO
 done_face:k$
-OutlineLvl:oH
+OutlineLvl:pH
 callback_OnLocksAcquired:lza
 ShowZoomWindow:NE
 curFrame:q2
@@ -5604,7 +5604,7 @@ delimiterName:wAa
 _addNewFilter:Yta
 ctDrawPath:Qja
 _thumbnail_width:d1
-nvGrpSpPr:AG
+nvGrpSpPr:BG
 image_offset:n3
 WriteCommentData:ita
 oMedia:Y7a
@@ -5677,7 +5677,7 @@ cvt_size:xy
 Focused:hcb
 ServerIdWaitComplete:lfa
 magenta:tmb
-adjastment:ye
+adjastment:ze
 WritePageMargins:jPa
 sync_currentPageCallback:lpb
 yAxisTitle:Jab
@@ -5694,7 +5694,7 @@ WriteCellStyle:oOa
 GridBefore:zE
 StartTrackTable:seb
 StartLine:wu
-recalculateCurPos:KG
+recalculateCurPos:LG
 headerRow:Or
 Set_Value:i7
 _onFirstLoadChanges:sTa
@@ -5744,7 +5744,7 @@ num_sbit_scales:cnb
 asc_coAuthoringGetUsers:nWa
 Selection_Remove:Nk
 navajowhite:Rmb
-m_oFontsCache:oG
+m_oFontsCache:pG
 calculate:Qv
 rightBottomRowBand2ColBand1LC:B9a
 OnRePaintAttack:sdb
@@ -5765,7 +5765,7 @@ asc_getLineRule:gYa
 _offset_tags:wn
 sortVal:IT
 CheckImagesForNeed:CHa
-colLetter:hI
+colLetter:iI
 borders:$p
 _getSelectedDrawingIndex:hSa
 asc_getFlags:zXa
@@ -5798,11 +5798,11 @@ nPercent:Kba
 applyMoveResizeRangeHandle:pVa
 unSaveChanges:Ioa
 sync_MouseMoveCallback:fpb
-getColorMap:XF
+getColorMap:YF
 StyleAlign:xsa
 Load_Changes:sM
 Header:WIa
-Dxfs:dH
+Dxfs:eH
 TrackOffsetX:aB
 WriteLineBreak:$Oa
 TrackOffsetY:bB
@@ -5894,7 +5894,7 @@ targetInfo:Ln
 VertAlign:Yi
 bottomFieldInPt:eza
 last_glyph:$aa
-num_subfonts:zG
+num_subfonts:AG
 ctrl:Cz
 asc_setBottomOffset:Mxa
 norm:Vmb
@@ -5969,7 +5969,7 @@ asc_getDisplayName:rXa
 onLockMouse:Zba
 _key_text_color:JSa
 GOAddGuide:kqa
-shapeHeight:RG
+shapeHeight:SG
 valWithoutFormat:yGa
 read_composite_glyph:KEa
 ColorBackOver:OHa
@@ -5978,8 +5978,8 @@ DefaultTableStyle:Qda
 variant_list:Aab
 m_nMaxY:hL
 m_nMaxX:gL
-map_image_index:pG
-getImageUrl:$F
+map_image_index:qG
+getImageUrl:aG
 ctBrushXML:Qhb
 horz_metrics:Nkb
 setCellTextShrink:i5
@@ -5998,9 +5998,9 @@ _right:kc
 sUserId:PL
 sandybrown:job
 getTablePictures:T4a
-modules:uG
+modules:vG
 pathH:PD
-LinesBusy:kH
+LinesBusy:lH
 resizedflipV:Ig
 Expand:bcb
 hotpink:Qkb
@@ -6019,7 +6019,7 @@ leftBottomRowBand2FC:E6a
 ReadSheetPr:VLa
 asc_getLeft:yz
 year:fM
-Values:zH
+Values:AH
 NO_DELTAP_AFTER_IUP_RULES_SIZE:QJa
 asc_setHeadings:Cia
 _position:pF
@@ -6094,7 +6094,7 @@ char_code:Pk
 m_bFirst_Col:c7a
 set_field:Gx
 fontsNew:Z3a
-step_ins:SG
+step_ins:TG
 skyblue:Rob
 function_defs:Q$
 asc_setMobileVersion:M0a
@@ -6211,7 +6211,7 @@ tableStylesGuides:$ca
 UpdateTargetTimer:Zeb
 mmvar_len:I7a
 selectionTimeout:g$a
-_addChars:CH
+_addChars:DH
 Recalc_0_Spell:PU
 canRotate:Az
 oAllCol:Ci
@@ -6335,7 +6335,7 @@ FontId:fqa
 ReadDataBar:OKa
 darkgoldenrod:Lib
 BinaryFileWriter:or
-nType:yG
+nType:zG
 move_to:K7a
 getWidestCharWidth:Y4a
 BrdLast:vP
@@ -6361,7 +6361,7 @@ _line_linewidth:RSa
 m_fY:dp
 sideR:Mca
 m_fX:cp
-IsTrack:jH
+IsTrack:kH
 nominal_width:sL
 xAvgCharWidth:GGa
 _key_text_italic:wva
@@ -6395,7 +6395,7 @@ setCellAllFontSize:b5
 asc_putWidowControl:U_a
 glyph_loader:cla
 bMoveTo:S1
-canvasOverlay:fI
+canvasOverlay:gI
 asc_getVerticalTextAlign:qZa
 get_transparent:Xka
 m_bNeedDoItalic:gba
@@ -6434,7 +6434,7 @@ copyCellValueButton:Zza
 curState:Ua
 isIE7:Z5a
 isIE9:clb
-isIE8:eG
+isIE8:fG
 get_colors:j5a
 updateDrawingBaseCoordinates:dM
 showMasterSp:cP
@@ -6535,7 +6535,7 @@ rectH:Lna
 transformPointY:Eoa
 memory_base:Gmb
 transformPointX:Doa
-TextAndData:xH
+TextAndData:yH
 setPageIndex:coa
 Paragraph:$j
 _yaxispos:yf
@@ -6608,10 +6608,10 @@ drawVerLine:G2
 Reset:Wi
 asc_getType:xp
 defaultRowHeight:HW
-opc:GG
+opc:HG
 SelectShow:dsa
 cover:Ot
-_drawRowHeaders:FH
+_drawRowHeaders:GH
 drawAutoF:GAa
 min_Top_Side_Bearing:D7a
 isDefaultText:alb
@@ -6723,7 +6723,7 @@ ReadSharedString:RLa
 reinit:Qna
 getFullRotate:OK
 _boxplot_capped:fga
-getRealTopOffset:bG
+getRealTopOffset:cG
 _angle:Zfa
 get_globals_funcs:k5a
 legendPos:tlb
@@ -6747,7 +6747,7 @@ tags:ff
 ctPathCommandTextEx:oib
 _hdir:eva
 ySuperscriptYSize:Uab
-maxDigitWidth:rG
+maxDigitWidth:sG
 getAsFile:Ojb
 getArguments:jBa
 pixel_mode:QD
@@ -6807,12 +6807,12 @@ SmallCaps:Th
 ForSelectedCells:zIa
 advance_Width_Max:Dwa
 Error:AA
-ppiY:JG
+ppiY:KG
 ppiX:YB
 _syncEditors:my
 addImages:eN
 Font_Direction:wIa
-containCell:iI
+containCell:QF
 sheetsChanged:bP
 asc_setCellId:Nxa
 _xlabels_font:aN
@@ -6876,7 +6876,7 @@ _getCellTitle:Up
 family:K2
 _isAuth:kva
 drawTextSelection:NR
-getBounds:WF
+getBounds:XF
 _moveActivePointInSelection:$Sa
 asc_getGraphicObjectProps:KXa
 intervalObject:bh
@@ -6913,9 +6913,9 @@ seac:dC
 _cleanRowHeades:Hua
 IsNoSupportTextDraw:J6
 _onChangeSelectionDone:kTa
-_drawColumnHeaders:EH
+_drawColumnHeaders:FH
 GetBase64Memory2:zqa
-aColors:SH
+aColors:TH
 asc_showColumns:o1a
 ushGID:uJ
 num_fixed_sizes:bT
@@ -7038,7 +7038,7 @@ asyncServerIdStartLoaded:y1a
 threshold:jP
 m_sLockedCursorType:cY
 ThemeLoader:ds
-nLastSheetId:xG
+nLastSheetId:yG
 _onlineWork:oF
 asc_getFill:ZV
 getOriginalImageSize:J4a
@@ -7142,7 +7142,7 @@ asc_openNewDocument:YZa
 oldFlipV:f8a
 Refresh_RecalcData2:wM
 get_EditorThemes:b5a
-Inside:gH
+Inside:hH
 ReadBodyPr:Qea
 AutoFiltersOptions:AZ
 SetStringGID:RJ
@@ -7202,7 +7202,7 @@ privates:qna
 asc_setCellBackgroundColor:e0a
 _tickdirection:v8
 put_width:Y8a
-SaveBrush:uH
+SaveBrush:vH
 m_oInsertColumns:Yz
 Lvl:Wd
 _drawCellsBorders:JQ
@@ -7282,8 +7282,8 @@ asc_getPrintType:lxa
 Assemble:$T
 gep1:oD
 defaultStyles:$ja
-gep0:VF
-UpdateMatrix1:yH
+gep0:WF
+UpdateMatrix1:zH
 UpdateMatrix0:Wsa
 nTopOffset:mY
 lvl:$K
@@ -7376,7 +7376,7 @@ absYLT:ZUa
 _onShowDrawingObjects:$Ta
 asc_getStyleId:$Ya
 BuiltinId:uA
-Max:mH
+Max:nH
 CurrentSearchNavi:c6
 CellValue:xpa
 asc_getStrikeout:e9
@@ -7507,7 +7507,7 @@ ctPenAlign:pib
 load_hdmx_stub:Slb
 _openDocumentEndCallback:Pva
 getInvertTransform:Bn
-nId:wG
+nId:xG
 num_charmaps:YI
 fontScheme:KN
 lvl1pPr:Zlb
@@ -7584,14 +7584,14 @@ GetTargetStyle:hea
 ReadComments:IKa
 _setProperty:hs
 Words:Ki
-LinesFree:lH
+LinesFree:mH
 _getStylesSelect:b8
 getLockOther:tD
 __crosshairs_x__:xfb
 isDefaultHeight:zla
 glyph_bbox:kaa
 textBB_l:T$a
-cSld:Ce
+cSld:De
 callback_OnSetIndexUser:mza
 _search_HdrFtr_First:W0
 textBB_b:S$a
