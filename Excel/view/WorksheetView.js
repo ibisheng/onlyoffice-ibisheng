@@ -5725,7 +5725,13 @@
 				cell_info.flags.merge = !!this._getMergedCellsRange(c1, r1);
 				cell_info.flags.shrinkToFit = c.getShrinkToFit();
 				cell_info.flags.wrapText = c.getWrap();
-				cell_info.flags.selectionType = this.activeRange.type;
+				
+				var graphicObjects = this.objectRender.getSelectedGraphicObjects();
+				if ( graphicObjects.length == 1 )
+					cell_info.flags.selectionType = this.objectRender.getGraphicSelectionType(graphicObjects[0].Id);
+				else
+					cell_info.flags.selectionType = this.activeRange.type;
+				
 				cell_info.flags.lockText = ("" !== cell_info.text && (isNumberFormat || "" !== cell_info.formula));
 
 				cell_info.font = new asc_CFont();

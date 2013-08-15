@@ -186,6 +186,7 @@ CChartAsGroup.prototype =
     addToDrawingObjects: function()
     {
         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Add_To_Drawing_Objects, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataClosePath()), null);
+		this.select(this.drawingObjects.controller);
         this.drawingObjects.addGraphicObject(this);
     },
 
@@ -489,7 +490,7 @@ CChartAsGroup.prototype =
         }
 
         this.init();
-        this.addToDrawingObjects()
+        this.addToDrawingObjects();
     },
 
     setDrawingBase: function(drawingBase)
