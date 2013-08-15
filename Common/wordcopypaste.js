@@ -1551,6 +1551,24 @@ CopyProcessor.prototype =
                                 if(isRealObject(cur_element.parent))
                                 {
                                     var base64_img = cur_element.parent.getBase64Img();
+									
+									if(copyPasteUseBinery)
+									{
+										var wrappingType = cur_element.parent.wrappingType;
+										var DrawingType = cur_element.parent.DrawingType;
+										var tempParagraph = new Paragraph(oDocument, oDocument, 0, 0, 0, 0, 0);
+										var index = 0;
+										tempParagraph.Content.unshift(new ParaDrawing());
+										tempParagraph.Content[index].wrappingType = wrappingType;
+										tempParagraph.Content[index].DrawingType = DrawingType;
+										tempParagraph.Content[index].GraphicObj = cur_element
+										tempParagraph.Selection.EndPos = index;
+										tempParagraph.Selection.StartPos = index;
+										tempParagraph.Selection.Use = true;
+										
+										this.oBinaryFileWriter.CopyParagraph(tempParagraph, true);
+									}
+									
                                     var src = this.getSrc(base64_img);
                                     var alt_content = cur_element.parent.writeToBinaryForCopyPaste();
 
@@ -1561,6 +1579,15 @@ CopyProcessor.prototype =
 
                             }
                             this.CommitSpan(false);
+							
+							if(copyPasteUseBinery)
+							{
+								this.oBinaryFileWriter.CopyEnd();
+								var sBase64 = this.oBinaryFileWriter.GetResult();
+								if(this.ElemToSelect.children[0])
+									$(this.ElemToSelect.children[0]).addClass("docData;" + sBase64);
+							}
+							
                             return;
                         }
                         default :
@@ -2427,18 +2454,16 @@ PasteProcessor.prototype =
 					}
 					if(!isAlreadyContainsStyle && isEqualName != null)//если нашли имя такого же стиля
 					{
-						if(nStyleType == 1)
+						if(nStyleType == 1 || nStyleType == 3)
 							elem.pPr.PStyle = isEqualName;
 						else if (nStyleType == 2)
 							elem.pPr.TableStyle = isEqualName;
 						addStyles[addStyles.length] = isEqualName;
-						//пока пользуемся тем стилем, который определен в документе
-						//oDocumentStyles[isEqualName] = stylePaste.style;
 					}
 					else if(!isAlreadyContainsStyle && isEqualName == null)//нужно добавить новый стиль
 					{
 						oDocumentStyles[stylePaste.style.Name] = stylePaste.style;
-						if(nStyleType == 1)
+						if(nStyleType == 1 || nStyleType == 3)
 							elem.pPr.PStyle = stylePaste.style.Name;
 						else if (nStyleType == 2)
 							elem.pPr.TableStyle = stylePaste.style.Name;
