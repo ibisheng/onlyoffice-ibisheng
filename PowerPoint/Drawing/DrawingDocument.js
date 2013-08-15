@@ -574,6 +574,8 @@ function CDrawingPage()
 
 function CDrawingDocument()
 {
+    this.IsLockObjectsEnable = false;
+    
     this.cursorPaintFormat = "";
     if (bIsIE)
     {
@@ -674,6 +676,12 @@ function CDrawingDocument()
     this.GetTargetStyle = function()
     {
         return "rgb(" + this.TargetCursorColor.R + "," + this.TargetCursorColor.G + "," + this.TargetCursorColor.B + ")";
+    }
+
+    this.Start_CollaborationEditing = function()
+    {
+        this.IsLockObjectsEnable = true;
+        this.m_oWordControl.OnRePaintAttack();
     }
 
     this.SetCursorType = function(sType)
