@@ -961,6 +961,12 @@ CUniColor.prototype =
             }
         }
         return _ret;
+    },
+
+    getCSSColor : function()
+    {
+        var _css = "rgba(" + this.RGBA.R + "," + this.RGBA.G + "," + this.RGBA.B + "," + (this.RGBA.A / 255) + ")";
+        return _css;
     }
 };
 
@@ -1260,11 +1266,96 @@ CGs.prototype =
     }
 };
 
+function GradLin()
+{
+    this.angle = 5400000;
+    this.scale = true;
+}
+GradLin.prototype =
+{
+    Write_ToBinary2 : function(Writer)
+    {
+        Writer.WriteLong(this.angle);
+        Writer.WriteBool(this.scale)
+    },
+
+    Read_FromBinary2 : function(Reader)
+    {
+        this.angle = Reader.GetLong();
+        this.scale = (1 == Reader.GetBool()) ? true : false;
+    },
+
+    IsIdentical : function(lin)
+    {
+        if (this.angle != lin.angle)
+            return false;
+        if (this.scale != lin.scale)
+            return false;
+
+        return true;
+    },
+
+    createDuplicate : function()
+    {
+        var duplicate = new GradLin();
+        duplicate.angle = this.angle;
+        duplicate.scale = this.scale;
+        return duplicate;
+    },
+
+    compare : function(lin)
+    {
+        return null;
+    }
+};
+
+function GradPath()
+{
+    this.path = 0;
+    this.rect = null;
+}
+GradPath.prototype =
+{
+    Write_ToBinary2 : function(Writer)
+    {
+        Writer.WriteByte(this.path);
+        // TODO:
+    },
+
+    Read_FromBinary2 : function(Reader)
+    {
+        this.path = Reader.GetUChar();
+        // TODO:
+    },
+
+    IsIdentical : function(path)
+    {
+        if (this.path != path.path)
+            return false;
+        return true;
+    },
+
+    createDuplicate : function()
+    {
+        var duplicate = new GradPath();
+        duplicate.path = this.path;
+        return duplicate;
+    },
+
+    compare : function(path)
+    {
+        return null;
+    }
+};
+
 function CGradFill()
 {
     this.type = FILL_TYPE_GRAD;
     // пока просто front color
     this.colors = new Array();
+
+    this.lin = null;
+    this.path = null;
 }
 
 CGradFill.prototype =
@@ -1321,6 +1412,12 @@ CGradFill.prototype =
         {
             duplicate.colors[i] = this.colors[i].createDuplicate();
         }
+
+        if (this.lin)
+            duplicate.lin = this.lin.createDuplicate();
+
+        if (this.path)
+            duplicate.path = this.path.createDuplicate();
 
         return duplicate;
     },
@@ -1400,7 +1497,7 @@ CPattFill.prototype =
             _ret.ftype = this.ftype;
         }
         _ret.fgClr = this.fgClr.compare(fill.fgClr);
-        _ret.fgClr = this.fgClr.compare(fill.fgClr);
+        _ret.bgClr = this.bgClr.compare(fill.bgClr);
         return _ret;
     }
 };

@@ -1525,6 +1525,24 @@ function CBinaryFileWriter()
                     oThis.EndRecord();
                 }
 
+                if (fill.lin)
+                {
+                    oThis.StartRecord(1);
+                    oThis.WriteUChar(g_nodeAttributeStart);
+                    oThis._WriteInt1(0, fill.lin.angle);
+                    oThis._WriteBool1(1, fill.lin.scale);
+                    oThis.WriteUChar(g_nodeAttributeEnd);
+                    oThis.EndRecord();
+                }
+                if (fill.path)
+                {
+                    oThis.StartRecord(2);
+                    oThis.WriteUChar(g_nodeAttributeStart);
+                    oThis._WriteUChar1(0, fill.path.path);
+                    oThis.WriteUChar(g_nodeAttributeEnd);
+                    oThis.EndRecord();
+                }
+
                 oThis.EndRecord();
 
                 oThis.EndRecord();

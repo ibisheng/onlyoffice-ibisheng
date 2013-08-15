@@ -475,6 +475,8 @@ CShapeDrawer.prototype =
         this.max_x = -0xFFFF;
         this.max_y = -0xFFFF;
 
+        var bIsCheckBounds = false;
+
         if (this.UniFill == null || this.UniFill.fill == null)
             this.bIsNoFillAttack = true;
         else
@@ -500,11 +502,13 @@ CShapeDrawer.prototype =
                     else
                         this.FillUniColor = _fill.colors[0].color.RGBA;
 
+                    bIsCheckBounds = true;
+
                     break;
                 }
                 case FILL_TYPE_PATT:
                 {
-                    this.FillUniColor = _fill.fgClr.RGBA;
+                    bIsCheckBounds = true;
                     break;
                 }
                 case FILL_TYPE_NOFILL:
@@ -584,7 +588,7 @@ CShapeDrawer.prototype =
                 this.OldLineJoin = this.Graphics.m_oContext.lineJoin;
         }
 
-        if (this.bIsTexture)
+        if (this.bIsTexture || bIsCheckBounds)
         {
             // сначала нужно определить границы
             this.bIsCheckBounds = true;
@@ -784,11 +788,6 @@ CShapeDrawer.prototype =
 
                     var _ctx = (this.Graphics.IsTrack === true) ? this.Graphics.Graphics.m_oContext : this.Graphics.m_oContext;
 
-                    /*
-                    var _test_pattern = GetHatchBrush("horzBrick", 255, 255, 255, 240, 0, 0);
-                    var patt = !_img_native ? _ctx.createPattern(_test_pattern.Canvas, "repeat") : _ctx.createPattern(_img_native, "repeat");
-                    */
-
                     var patt = !_img_native ? _ctx.createPattern(_img.Image, "repeat") : _ctx.createPattern(_img_native, "repeat");
 
                     _ctx.save();
@@ -826,6 +825,114 @@ CShapeDrawer.prototype =
                 }
             }
             return;
+        }
+
+        if (this.UniFill != null && this.UniFill.fill != null)
+        {
+            var _fill = this.UniFill.fill;
+            if (_fill.type == FILL_TYPE_PATT)
+            {
+                var _is_ctx = false;
+                if (this.Graphics.IsNoSupportTextDraw === true || undefined === this.Graphics.m_oContext || (null == this.UniFill.transparent) || (this.UniFill.transparent == 255))
+                {
+                    _is_ctx = false;
+                }
+                else
+                {
+                    _is_ctx = true;
+                }
+
+                var _ctx = (this.Graphics.IsTrack === true) ? this.Graphics.Graphics.m_oContext : this.Graphics.m_oContext;
+
+                var _patt_name = global_hatch_names[_fill.ftype];
+                if (undefined == _patt_name)
+                    _patt_name = "cross";
+
+                var _fc = _fill.fgClr.RGBA;
+                var _bc = _fill.bgClr.RGBA;
+
+                var _test_pattern = GetHatchBrush(_patt_name, _fc.R, _fc.G, _fc.B, _bc.R, _bc.G, _bc.B);
+                var patt = _ctx.createPattern(_test_pattern.Canvas, "repeat");
+
+                _ctx.save();
+
+                var koefX = editor.WordControl.m_nZoomValue / 100;
+                var koefY = editor.WordControl.m_nZoomValue / 100;
+
+                // TODO: !!!
+                _ctx.translate(this.min_x, this.min_y);
+
+                if (this.Graphics.MaxEpsLine === undefined)
+                {
+                    _ctx.scale(koefX * this.Graphics.TextureFillTransformScaleX, koefY * this.Graphics.TextureFillTransformScaleY);
+                }
+                else
+                {
+                    _ctx.scale(koefX * this.Graphics.Graphics.TextureFillTransformScaleX, koefY * this.Graphics.Graphics.TextureFillTransformScaleY);
+                }
+
+                if (_is_ctx === true)
+                {
+                    var _old_global_alpha = _ctx.globalAlpha;
+                    _ctx.globalAlpha = this.UniFill.transparent / 255;
+                    _ctx.fillStyle = patt;
+                    _ctx.fill();
+                    _ctx.globalAlpha = _old_global_alpha;
+                }
+                else
+                {
+                    _ctx.fillStyle = patt;
+                    _ctx.fill();
+                }
+
+                _ctx.restore();
+                return;
+            }
+            else if (_fill.type == FILL_TYPE_GRAD)
+            {
+                var _is_ctx = false;
+                if (this.Graphics.IsNoSupportTextDraw === true || undefined === this.Graphics.m_oContext || (null == this.UniFill.transparent) || (this.UniFill.transparent == 255))
+                {
+                    _is_ctx = false;
+                }
+                else
+                {
+                    _is_ctx = true;
+                }
+
+                var _ctx = (this.Graphics.IsTrack === true) ? this.Graphics.Graphics.m_oContext : this.Graphics.m_oContext;
+
+                var gradObj = _ctx.createLinearGradient(this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y));
+
+                /*
+                var _max_ = Math.max((this.max_x - this.min_x), (this.max_y - this.min_y));
+                var _cx_ = (this.min_x + this.max_x) / 2;
+                var _cy_ = (this.min_y + this.max_y) / 2;
+                var _x_ = _cx_ - _max_ / 2;
+                var _y_ = _cy_ - _max_ / 2;
+
+                var gradObj = _ctx.createLinearGradient(_x_, _y_, _max_, _max_);
+                */
+
+                /*
+                var _a_ = (this.max_x - this.min_x);
+                var _b_ = (this.max_y - this.min_y);
+                var _angle_ = Math.atan2(_b_, _a_);
+                var _x_ = 2 * _b_ * Math.sin(_angle_);
+                var _w_ = _x_ * Math.cos(_angle_);
+                var _h_ = 2 * _b_ - _x_ * Math.sin(_angle_);
+                var gradObj = _ctx.createLinearGradient(this.min_x, this.min_y, _w_, _h_);
+                */
+
+                for (var i = 0; i < _fill.colors.length; i++)
+                {
+                    gradObj.addColorStop(_fill.colors[i].pos / 100000, _fill.colors[i].color.getCSSColor());
+                }
+
+                _ctx.fillStyle = gradObj;
+                _ctx.fill();
+                return;
+            }
         }
 
         var rgba = this.FillUniColor;

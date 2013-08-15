@@ -1805,6 +1805,9 @@ function BinaryPPTYLoader()
                                 }
 
                                 s.Seek2(_e);
+
+                                uni_fill.fill.colors.sort(function(a,b){return a.pos- b.pos;});
+
                                 break;
                             }
                             case 1:
@@ -1835,19 +1838,50 @@ function BinaryPPTYLoader()
                 }
                 case FILL_TYPE_PATT:
                 {
-                    s.Skip2(4);
+                    uni_fill.fill = new CPattFill();
 
                     s.Skip2(1);
-                    uni_fill.fill = new CPattFill();
-                    uni_fill.fill.ftype = s.GetUChar();
+                    while (true)
+                    {
+                        var _atPF = s.GetUChar();
+                        if (_atPF == g_nodeAttributeEnd)
+                            break;
 
-                    if (g_nodeAttributeEnd == uni_fill.fill.ftype)
-                        uni_fill.fill.ftype = 0;
-                    else
-                        s.Skip2(1);
+                        switch (_atPF)
+                        {
+                            case 0:
+                            {
+                                uni_fill.fill.ftype = s.GetUChar();
+                                break;
+                            }
+                            default:
+                                break;
+                        }
+                    }
 
-                    uni_fill.fill.fgClr = this.ReadUniColor();
-                    uni_fill.fill.bgClr = this.ReadUniColor();
+                    while (s.cur < _e)
+                    {
+                        var rec = s.GetUChar();
+
+                        switch (rec)
+                        {
+                            case 0:
+                            {
+                                uni_fill.fill.fgClr = this.ReadUniColor();
+                                break;
+                            }
+                            case 1:
+                            {
+                                uni_fill.fill.bgClr = this.ReadUniColor();
+                                break;
+                            }
+                            default:
+                            {
+                                // пока никаких настроек градиента нет
+                                s.SkipRecord();
+                            }
+                        }
+                    }
 
                     break;
                 }
