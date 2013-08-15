@@ -5308,7 +5308,7 @@ CDocumentContent.prototype =
                 Pr.Ind.FirstLine = StartPr.Ind.FirstLine;
 
             Result_ParaPr = Pr;
-            Result_ParaPr.CanAddTable = ( true === Pr.Locked ? false : true );
+            //Result_ParaPr.CanAddTable = ( true === Pr.Locked ? false : true );
 
             return Result_ParaPr;
         }
@@ -5381,7 +5381,7 @@ CDocumentContent.prototype =
                     //var Locked = Item.Lock.Is_Locked();
 
                     Result_ParaPr         = ParaPr.Copy();
-                    Result_ParaPr.Locked  = Locked;
+                    //Result_ParaPr.Locked  = Locked;
                     //Result_ParaPr.CanAddTable = ( ( true === Locked ) ? ( ( true === Item.Cursor_IsEnd() ) ? true : false ) : true );
                 }
                 else if ( type_Table == Item.GetType() )
