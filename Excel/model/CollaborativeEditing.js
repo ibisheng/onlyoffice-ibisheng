@@ -154,17 +154,6 @@
 				this.m_arrNeedUnlock.push (LockClass);
 			},
 			addUnlock2: function (Lock) {
-				// Если мы добавили или удалили строку/столбец, нужно добавить в пересчет
-				if (null !== Lock.Element["subType"]) {
-					switch (Lock.Element["subType"]) {
-						case c_oAscLockTypeElemSubType.InsertColumns:
-							this.addCols(Lock.Element["sheetId"], Lock.Element["rangeOrObjectId"]["c1"], Lock.Element["rangeOrObjectId"]["c2"] - Lock.Element["rangeOrObjectId"]["c1"] + 1);
-							break;
-						case c_oAscLockTypeElemSubType.InsertRows:
-							this.addRows(Lock.Element["sheetId"], Lock.Element["rangeOrObjectId"]["r1"], Lock.Element["rangeOrObjectId"]["r2"] - Lock.Element["rangeOrObjectId"]["r1"] + 1);
-							break;
-					}
-				}
 				this.m_arrNeedUnlock2.push (Lock);
 			},
 
@@ -537,6 +526,25 @@
 				return oRecalcIndexResult;
 			},
 
+			// Undo для добавления/удаления столбцов
+			undoCols: function (sheetId, count) {
+				if (this.isCoAuthoringExcellEnable()) {
+					if (!this.m_oRecalcIndexColumns.hasOwnProperty(sheetId)) {
+						this.m_oRecalcIndexColumns[sheetId] = new CRecalcIndex();
+					}
+					this.m_oRecalcIndexColumns[sheetId].remove(count);
+				}
+			},
+			// Undo для добавления/удаления строк
+			undoRows: function (sheetId, count) {
+				if (this.isCoAuthoringExcellEnable()) {
+					if (!this.m_oRecalcIndexRows.hasOwnProperty(sheetId)) {
+						this.m_oRecalcIndexRows[sheetId] = new CRecalcIndex();
+					}
+					this.m_oRecalcIndexRows[sheetId].remove(count);
+				}
+			},
+
 			removeCols: function (sheetId, position, count) {
 				if (this.isCoAuthoringExcellEnable()) {
 					if (!this.m_oRecalcIndexColumns.hasOwnProperty(sheetId)) {
@@ -882,7 +890,7 @@
 				else
 					return (position + inc);
 			}
-		}
+		};
 
 		function CRecalcIndex() {
 			if ( !(this instanceof CRecalcIndex) ) {
@@ -899,6 +907,11 @@
 			add: function (recalcType, position, count, bIsSaveIndex) {
 				for (var i = 0; i < count; ++i)
 					this._arrElements.push(new CRecalcIndexElement(recalcType, position, bIsSaveIndex));
+			},
+			// Удаляет из пересчета, для undo
+			remove: function (count) {
+				for (var i = 0; i < count; ++i)
+					this._arrElements.pop();
 			},
 			clear: function () {
 				this._arrElements.length = 0;
@@ -952,7 +965,7 @@
 
 				return newPosition;
 			}
-		}
+		};
 
 		/*
 		 * Export

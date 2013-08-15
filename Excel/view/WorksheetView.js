@@ -7916,14 +7916,18 @@
 						} else {
 							if (c_oAscLockTypeElemSubType.InsertColumns === subType) {
 								newCallback = function (isSuccess) {
-									if (isSuccess)
+									if (isSuccess) {
 										t.collaborativeEditing.addColsRange(sheetId, range.clone(true));
+										t.collaborativeEditing.addCols(sheetId, range.c1, range.c2 - range.c1 + 1);
+									}
 									callback(isSuccess);
 								};
 							} else if (c_oAscLockTypeElemSubType.InsertRows === subType) {
 								newCallback = function (isSuccess) {
-									if (isSuccess)
+									if (isSuccess) {
 										t.collaborativeEditing.addRowsRange(sheetId, range.clone(true));
+										t.collaborativeEditing.addRows(sheetId, range.r1, range.r2 - range.r1 + 1);
+									}
 									callback(isSuccess);
 								};
 							} else if (c_oAscLockTypeElemSubType.DeleteColumns === subType) {
@@ -7948,8 +7952,10 @@
 					} else {
 						if (c_oAscLockTypeElemSubType.InsertColumns === subType) {
 							t.collaborativeEditing.addColsRange(sheetId, range.clone(true));
+							t.collaborativeEditing.addCols(sheetId, range.c1, range.c2 - range.c1 + 1);
 						} else if (c_oAscLockTypeElemSubType.InsertRows === subType) {
 							t.collaborativeEditing.addRowsRange(sheetId, range.clone(true));
+							t.collaborativeEditing.addRows(sheetId, range.r1, range.r2 - range.r1 + 1);
 						} else if (c_oAscLockTypeElemSubType.DeleteColumns === subType) {
 							t.collaborativeEditing.removeColsRange(sheetId, range.clone(true));
 							t.collaborativeEditing.removeCols(sheetId, range.c1, range.c2 - range.c1 + 1);

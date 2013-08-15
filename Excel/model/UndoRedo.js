@@ -3007,10 +3007,15 @@ UndoRedoWoorksheet.prototype = {
 					this.wb.aCollaborativeChangeElements.push(oLockInfo);
 				}
 			}
+			var range = Asc.Range(0, from, gc_nMaxCol0, to);
 			if((true == bUndo && historyitem_Worksheet_AddRows == Type) || (false == bUndo && historyitem_Worksheet_RemoveRows == Type))
-				ws.workbook.handlers.trigger("deleteCell", nSheetId, c_oAscDeleteOptions.DeleteRows, Asc.Range(0, from, gc_nMaxCol0, to));
+				ws.workbook.handlers.trigger("deleteCell", nSheetId, c_oAscDeleteOptions.DeleteRows, range);
 			else
-				ws.workbook.handlers.trigger("insertCell", nSheetId, c_oAscInsertOptions.InsertRows, Asc.Range(0, from, gc_nMaxCol0, to));
+				ws.workbook.handlers.trigger("insertCell", nSheetId, c_oAscInsertOptions.InsertRows, range);
+
+			// Нужно поменять пересчетные индексы для совместного редактирования (lock-элементы), но только если это не изменения от другого пользователя
+			if (true !== this.wb.bCollaborativeChanges)
+				ws.workbook.handlers.trigger("undoRedoAddRemoveRowCols", nSheetId, Type, range, bUndo);
 		}
 		else if(historyitem_Worksheet_AddCols == Type || historyitem_Worksheet_RemoveCols == Type)
 		{
@@ -3029,10 +3034,16 @@ UndoRedoWoorksheet.prototype = {
 					this.wb.aCollaborativeChangeElements.push(oLockInfo);
 				}
 			}
+
+			var range = Asc.Range(from, 0, to, gc_nMaxRow0);
 			if((true == bUndo && historyitem_Worksheet_AddCols == Type) || (false == bUndo && historyitem_Worksheet_RemoveCols == Type))
-				ws.workbook.handlers.trigger("deleteCell", nSheetId, c_oAscDeleteOptions.DeleteColumns, Asc.Range(from, 0, to, gc_nMaxRow0));
+				ws.workbook.handlers.trigger("deleteCell", nSheetId, c_oAscDeleteOptions.DeleteColumns, range);
 			else
-				ws.workbook.handlers.trigger("insertCell", nSheetId, c_oAscInsertOptions.InsertColumns, Asc.Range(from, 0, to, gc_nMaxRow0));
+				ws.workbook.handlers.trigger("insertCell", nSheetId, c_oAscInsertOptions.InsertColumns, range);
+
+			// Нужно поменять пересчетные индексы для совместного редактирования (lock-элементы), но только если это не изменения от другого пользователя
+			if (true !== this.wb.bCollaborativeChanges)
+				ws.workbook.handlers.trigger("undoRedoAddRemoveRowCols", nSheetId, Type, range, bUndo);
 		}
 		else if(historyitem_Worksheet_ShiftCellsLeft == Type || historyitem_Worksheet_ShiftCellsRight == Type)
 		{
