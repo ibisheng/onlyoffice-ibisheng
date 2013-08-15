@@ -52,8 +52,9 @@
 			this.targetInfo = undefined;
 			this.isResizeMode = false;
 			this.isResizeModeMove = false;
+			// Для обработки событий автофигур
+			this.isGraphicObjectMode = false;
 			// Режим автозаполнения
-			this.isSelectDrawingObject = false;
 			this.isFillHandleMode = false;
 			this.isMoveRangeMode = false;
 			this.isMoveResizeRange = false;
@@ -1045,13 +1046,15 @@
 				}
 				
 				// Shapes
+				this.isGraphicObjectMode = false;
 				var graphicsInfo = t.handlers.trigger("getGraphicsInfo", coord.x, coord.y);
-				if ( graphicsInfo && graphicsInfo.isGraphicObject ) {
-					asc["editor"].isStartAddShape = true;
-					t.isSelectDrawingObject = true;
+				
+				if ( asc["editor"].isStartAddShape || (graphicsInfo && graphicsInfo.isGraphicObject) ) {
+					this.isGraphicObjectMode = true;
+					asc["editor"].isStartAddShape = false;
 				}
 				
-				if ( asc["editor"].isStartAddShape ) {
+				if ( this.isGraphicObjectMode ) {
 					event.ClickCount = 1;
 					t.handlers.trigger("graphicObjectMouseDown", event, coord.x, coord.y);
 					if ( t.isCellEditMode )
@@ -1063,8 +1066,10 @@
 						t.handlers.trigger("changeSelection", /*isStartPoint*/true, coord.x, coord.y, /*isCoord*/true, /*isSelectMode*/true);
 					return;
 				}
-				else if ( t.targetInfo && t.targetInfo.target != "moveResizeRange" )
+				else if ( t.targetInfo && t.targetInfo.target != "moveResizeRange" ) {
 					t.handlers.trigger("resetSelectedGraphicObjects");
+					this.isGraphicObjectMode = false;
+				}
 
 				if (event.originalEvent && 2 === event.originalEvent.detail) {
 					// Это означает, что это MouseDown для dblClick эвента (его обрабатывать не нужно)
@@ -1091,8 +1096,6 @@
 				this.mouseDownLastCord = coord;
 
 				t.hasFocus = true;
-				t.isSelectDrawingObject = false;
-
 				if (!t.isCellEditMode) {
 					if (event.shiftKey) {
 						t._changeSelection(event, /*isSelectMode*/false);
@@ -1189,9 +1192,11 @@
 			
 				// Shapes
 				var coord = this._getCoordinates(event);
-				if ( asc["editor"].isStartAddShape ) {
+				if ( this.isGraphicObjectMode ) {
 					this.handlers.trigger("graphicObjectMouseUp", event, coord.x, coord.y);
-					return;
+					this._changeSelectionDone(event);
+					this.isGraphicObjectMode = false;
+					return true;
 				}
 			
 				if (this.isSelectMode) {
@@ -1233,7 +1238,7 @@
 				t.hasCursor = true;
 				
 				// Shapes
-				if ( asc["editor"].isStartAddShape ) {
+				if ( this.isGraphicObjectMode ) {
 					t.handlers.trigger("graphicObjectMouseMove", event, coord.x, coord.y);
 					t.handlers.trigger("updateWorksheet", t.element[0], coord.x, coord.y, event.ctrlKey, function(info){t.targetInfo = info;});
 					return;
@@ -1297,7 +1302,7 @@
 			 * @param delta {Number}
 			 */
 			_onMouseWheel: function (event, delta) {
-				if (this.isFillHandleMode || this.isMoveRangeMode || this.isMoveResizeChartsRange || (this.isSelectDrawingObject && event.shiftKey) || this.isMoveResizeRange) {
+				if (this.isFillHandleMode || this.isMoveRangeMode || this.isMoveResizeChartsRange || this.isMoveResizeRange) {
 					return true;
 				}
 				var self = this;

@@ -88,3 +88,11 @@ var c_oAscChartDefines = {
 	defaultChartWidth: 478,
 	defaultChartHeight: 286
 };
+
+var c_oAscLineDrawingRule = {
+    Left   : 0,
+    Center : 1,
+    Right  : 2,
+    Top    : 0,
+    Bottom : 2
+};

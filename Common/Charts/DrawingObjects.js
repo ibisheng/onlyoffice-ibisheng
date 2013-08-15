@@ -3022,12 +3022,14 @@ function DrawingObjects() {
 						api.isImageChangeUrl = false;
 					}
 					else if ( api.isShapeImageChangeUrl ) {
+						var imgProps = new asc_CImgProperty();
 						var shapeProp = new asc_CShapeProperty();
+						imgProps.ShapeProperties = shapeProp;
 						shapeProp.fill = new asc_CShapeFill();
 						shapeProp.fill.type = c_oAscFill.FILL_TYPE_BLIP;
 						shapeProp.fill.fill = new asc_CFillBlip();
 						shapeProp.fill.fill.asc_putUrl(_image.src);
-						_this.setGraphicObjectProps(shapeProp);
+						_this.setGraphicObjectProps(imgProps);
 						api.isShapeImageChangeUrl = false;
 					}
 					
@@ -3136,7 +3138,7 @@ function DrawingObjects() {
 			var obj = aObjects[i];
 			var bbox = obj.isChart() ? obj.graphicObject.chart.range.intervalObject.getBBox0() : null;
 
-			if ( obj.isChart() || obj.isImage() ) {
+			if ( obj.isChart() || obj.isImage() || obj.isShape() ) {
 
 				metrics = { from: {}, to: {} };
 				metrics.from.col = obj.from.col; metrics.to.col = obj.to.col;
@@ -3720,12 +3722,7 @@ function DrawingObjects() {
 	}
 	
 	_this.getSelectedGraphicObjects = function() {
-		var selArray = [];
-		for (var i = 0; i < aObjects.length; i++) {
-			if ( aObjects[i].isGraphicObject() && aObjects[i].graphicObject.selected )
-				selArray.push(aObjects[i]);
-		}
-		return selArray;
+		return _this.controller.selectedObjects;
 	}
 	
 	_this.selectedGraphicObjectsExists = function() {
@@ -3830,6 +3827,11 @@ function DrawingObjects() {
 	
 	_this.showChartSettings = function() {
 		api.wb.handlers.trigger("asc_onShowChartDialog", true);
+	}
+	
+	_this.setDrawImagePlaceParagraph = function(element_id, props) {
+		_this.drawingDocument.InitGuiCanvasTextProps(element_id);
+		_this.drawingDocument.DrawGuiCanvasTextProps(props);
 	}
 	
 	//-----------------------------------------------------------------------------------

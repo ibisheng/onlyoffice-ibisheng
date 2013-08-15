@@ -426,6 +426,7 @@
 			this.isFormulaEditMode = false;
 			this.isChartAreaEditMode = false;
 			this.lockDraw = false;
+			this.isUpdateSelection = false;
 
 			this.isSelectionDialogMode = false;
 			this.copyOfActiveRange = null;
@@ -5681,13 +5682,42 @@
 				var fa = c.getFontAlign().toLowerCase();
 				var cellType = c.getType();
 				var isNumberFormat = (!cellType || CellValueType.Number === cellType);
+				
+				var isGraphicObject = this.objectRender.selectedGraphicObjectsExists();
+				var textPr = this.objectRender.controller.getParagraphTextPr();
+				var paraPr = this.objectRender.controller.getParagraphParaPr();
 
 				var cell_info = new asc_CCellInfo();
 				cell_info.name =  this._getColumnTitle(c1) + this._getRowTitle(r1);
 				cell_info.formula = c.getFormula();
 				cell_info.text = c.getValueForEdit();
-				cell_info.halign = c.getAlignHorizontalByValue().toLowerCase();
-				cell_info.valign = c.getAlignVertical().toLowerCase();
+				
+				this.isUpdateSelection = false;
+				if ( isGraphicObject && textPr && paraPr ) {
+					this.isUpdateSelection = true;
+					
+					var horAlign = "center";
+					switch (paraPr.Jc) {
+						case align_Left:						horAlign = "left";			break;
+						case align_Right:						horAlign = "right";			break;
+						case align_Center:						horAlign = "center";		break;
+						case align_Justify:						horAlign = "justify";		break;
+					}					
+					var vertAlign = "center";
+					/*switch (textPr.VertAlign) {
+						case VERTICAL_ANCHOR_TYPE_TOP:			vertAlign = "top";			break;
+						case VERTICAL_ANCHOR_TYPE_CENTER:		vertAlign = "center";		break;
+						case VERTICAL_ANCHOR_TYPE_BOTTOM:		vertAlign = "bottom";		break;
+					}*/
+					
+					cell_info.halign = horAlign;
+					cell_info.valign = vertAlign;
+				}
+				else {
+					cell_info.halign = c.getAlignHorizontalByValue().toLowerCase();
+					cell_info.valign = c.getAlignVertical().toLowerCase();
+				}
+				
 				cell_info.isFormatTable = this.autoFilters.searchRangeInTableParts(activeCell, this);
 				cell_info.styleName = c.getStyleName();
 
@@ -5699,19 +5729,18 @@
 				cell_info.flags.lockText = ("" !== cell_info.text && (isNumberFormat || "" !== cell_info.formula));
 
 				cell_info.font = new asc_CFont();
-				var isGraphicObject = this.objectRender.selectedGraphicObjectsExists();
-				var textPr = this.objectRender.controller.getParagraphTextPr();
-				
-				if ( isGraphicObject && textPr && (textPr.Bold != undefined) && (textPr.Italic != undefined) && (textPr.Underline != undefined) && (textPr.FontFamily != undefined) ) {
+
+				if ( isGraphicObject && textPr && paraPr ) {
 					cell_info.font.name = textPr.FontFamily.Name;
 					cell_info.font.size = textPr.FontSize;
 					cell_info.font.bold = textPr.Bold;
 					cell_info.font.italic = textPr.Italic;
 					cell_info.font.underline = textPr.Underline;
 					cell_info.font.strikeout = textPr.Strikeout;
-					//cell_info.font.subscript = fa === "subscript";
-					//cell_info.font.superscript = fa === "superscript";
-					cell_info.font.color = CreateAscColorCustom(textPr.Color.r, textPr.Color.g, textPr.Color.b);
+					cell_info.font.subscript = (textPr.VertAlign == vertalign_SubScript) ? true : false;
+					cell_info.font.superscript = (textPr.VertAlign == vertalign_SuperScript) ? true : false;
+					if ( textPr.Color )
+						cell_info.font.color = CreateAscColorCustom(textPr.Color.r, textPr.Color.g, textPr.Color.b);
 				}
 				else {
 					cell_info.font.name = c.getFontname();
@@ -5869,6 +5898,9 @@
 						if ( this.objectRender.controller.curState.id != STATES_ID_BEGIN_TRACK_NEW_SHAPE ) {
 							this.objectRender.unselectDrawingObjects();
 							asc["editor"].isStartAddShape = false;
+							
+							if ( this.isUpdateSelection )
+								this._trigger("selectionChanged", this.getSelectionInfo());
 						}
 					}
 					

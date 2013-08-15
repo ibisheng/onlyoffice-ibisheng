@@ -2066,13 +2066,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 
 			asc_editChartDrawingObject: function(chart) {
-				this.wb.controller.isSelectDrawingObject = true;
 				var ws = this.wb.getWorksheet();
 				return ws.objectRender.editChartDrawingObject(chart);
 			},
 
 			asc_addImageDrawingObject: function(imageUrl) {
-				this.wb.controller.isSelectDrawingObject = true;
 				var ws = this.wb.getWorksheet();
 				return ws.objectRender.addImageDrawingObject(imageUrl, null);
 			},
@@ -2260,6 +2258,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			asc_putLineSpacingBeforeAfter: function(type,value) { // "type == 0" means "Before", "type == 1" means "After"
 				var ws = this.wb.getWorksheet();
 				ws.objectRender.controller.putLineSpacingBeforeAfter(type, value);
+			},
+			
+			asc_setDrawImagePlaceParagraph: function(element_id, props) {
+				var ws = this.wb.getWorksheet();
+				ws.objectRender.setDrawImagePlaceParagraph(element_id, props);
 			},
 			
 			asyncImageStartLoaded: function() {
@@ -2773,8 +2776,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
                     if (!window['scriptBridge']['addFileImage']) {
                         window['scriptBridge']['addFileImage'] = function(imageUrl, x, y, width, height) {
-                            t.wb.controller.isSelectDrawingObject = true;
-
+                            
                             var ws = t.wb.getWorksheet();
                             ws.model.workbook.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 
@@ -3174,6 +3176,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_changeImageFromFile"] = prot.asc_changeImageFromFile;
 		prot["asc_putPrLineSpacing"] = prot.asc_putPrLineSpacing;
 		prot["asc_putLineSpacingBeforeAfter"] = prot.asc_putLineSpacingBeforeAfter;
+		prot["asc_setDrawImagePlaceParagraph"] = prot.asc_setDrawImagePlaceParagraph;
 		prot["asc_changeShapeImageFromFile"] = prot.asc_changeShapeImageFromFile;
 		
 		// Cell interface

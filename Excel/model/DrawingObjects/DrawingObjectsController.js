@@ -209,14 +209,17 @@ DrawingObjectsController.prototype =
                 var selection_array = this.selectedObjects;
                 for(var i = 0; i < selection_array.length; ++i)
                 {
-                    var cur_pr = selection_array[i].getAllParagraphParaPr();
-                    if(cur_pr != null)
-                    {
-                        if(result == null)
-                            result = cur_pr;
-                        else
-                            result = result.Compare(cur_pr);
-                    }
+					if ( typeof(selection_array[i].getAllParagraphParaPr) === "function" )
+					{
+						var cur_pr = selection_array[i].getAllParagraphParaPr();
+						if(cur_pr != null)
+						{
+							if(result == null)
+								result = cur_pr;
+							else
+								result = result.Compare(cur_pr);
+						}
+					}
                 }
                 if(result != null)
                     return result;
@@ -232,9 +235,10 @@ DrawingObjectsController.prototype =
             case STATES_ID_TEXT_ADD:
             {
                 var pr = this.curState.textObject.getParagraphTextPr();
-                if(pr != null)
+                /*if(pr != null)
                     return pr;
-                return new CTextPr();
+                return new CTextPr();*/
+				return pr;
             }
             case STATES_ID_TEXT_ADD_IN_GROUP:
             {
@@ -242,11 +246,13 @@ DrawingObjectsController.prototype =
                 if(typeof this.curState.textObject.getParagraphTextPr === "function")
                 {
                     pr = this.curState.textObject.getParagraphTextPr();
-                    if(pr != null)
+                    /*if(pr != null)
                         return pr;
-                    return new CTextPr();
+                    return new CTextPr();*/
+					return pr;
                 }
-                return new CTextPr();
+                //return new CTextPr();
+				return null;
             }
             default:
             {
@@ -254,18 +260,23 @@ DrawingObjectsController.prototype =
                 var selection_array = this.selectedObjects;
                 for(var i = 0; i < selection_array.length; ++i)
                 {
-                    var cur_pr = selection_array[i].getAllParagraphTextPr();
-                    if(cur_pr != null)
-                    {
-                        if(result == null)
-                            result = cur_pr;
-                        else
-                            result = result.Compare(cur_pr);
-                    }
+					if ( typeof(selection_array[i].getAllParagraphTextPr) === "function" )
+					{
+						var cur_pr = selection_array[i].getAllParagraphTextPr();
+						if(cur_pr != null)
+						{
+							if(result == null)
+								result = cur_pr;
+							else
+								result = result.Compare(cur_pr);
+						}
+					}
                 }
-                if(result != null)
+                /*if(result != null)
                     return result;
-                return new CTextPr();
+                return new CTextPr();*/			
+				
+				return result;
             }
         }
     },
@@ -994,47 +1005,12 @@ DrawingObjectsController.prototype =
 		// Текстовые свойства объекта
 		var ParaPr = this.getParagraphParaPr();
 		var TextPr = this.getParagraphTextPr();
-		if ( ParaPr && TextPr ) {
-					
-			this.prepareTextProperties(TextPr);
+		if ( ParaPr && TextPr ) {			
 			this.prepareParagraphProperties(ParaPr, TextPr);
 		}
 		
         return ascSelectedObjects;
     },
-	
-	prepareTextProperties: function(TextPr)
-	{
-		/*var _this = this;
-		var trigger = this.drawingObjects.callTrigger;
-		
-		if ( "undefined" != typeof(TextPr) )
-		{
-			var oTextPrMap =
-			{
-				Bold       : function(_this, v){ trigger("asc_onBold", v); },
-				Italic     : function(_this, v){ trigger("asc_onItalic", v); },
-				Underline  : function(_this, v){ trigger("asc_onUnderline", v); },
-				Strikeout  : function(_this, v){ trigger("asc_onStrikeout", v); },
-				FontSize   : function(_this, v){ trigger("asc_onFontSize", v); },
-				FontFamily : function(_this, v){ (v != undefined) ? trigger("asc_onFontFamily", new asc_CTextFontFamily(v)) : new asc_CTextFontFamily( { Name : "", Index : -1 } ); },
-				VertAlign  : function(_this, v){ trigger("asc_onVerticalAlign", v); },
-				Color      : function(_this, v){ if (v != undefined) trigger("asc_onTextColor", CreateAscColorCustomEx(v.r, v.g, v.b)); },
-				HighLight  : function(_this, v){ if (v != undefined) trigger("asc_onTextHighLight", new asc_CColor(v.r, v.g, v.b)); },
-				Spacing    : function(_this, v){ trigger("asc_onTextSpacing", v); },
-				DStrikeout : function(_this, v){ trigger("asc_onTextDStrikeout", v); },
-				Caps       : function(_this, v){ trigger("asc_onTextDStrikeout", v); },
-				SmallCaps  : function(_this, v){ trigger("asc_onTextSmallCaps", v); },
-				Position   : function(_this, v){ trigger("asc_onTextPosition", v); },
-				Lang       : function(_this, v){ trigger("asc_onTextLanguage", v);}
-			}
-
-			for ( var Item in oTextPrMap )
-			{
-				oTextPrMap[Item]( this, TextPr[Item] );
-			}
-		}*/
-	},
 	
 	prepareParagraphProperties: function(ParaPr, TextPr)
 	{	
@@ -1086,17 +1062,19 @@ DrawingObjectsController.prototype =
 		ascSelectedObjects.push(new asc_CSelectedObject( c_oAscTypeSelectElement.Paragraph, new asc_CParagraphProperty( ParaPr ) ));
 	},
 	
-	putPrLineSpacing: function(type, value) {
+	putPrLineSpacing: function(type, value)
+	{
 	},
 	
-	putLineSpacingBeforeAfter: function(type, value) {
+	putLineSpacingBeforeAfter: function(type, value)
+	{
 	},
 	
 	setGraphicObjectProps: function(props)
 	{
         History.Create_NewPoint();
 		var properties;
-        if ( (props instanceof asc_CImgProperty) && props.ShapeProperties)
+        if ( (props instanceof asc_CImgProperty) && props.ShapeProperties )
             properties = props.ShapeProperties;
         else
             properties = props;
@@ -1117,7 +1095,7 @@ DrawingObjectsController.prototype =
 						this.curState.textObject.setTextVerticalAlign(props.verticalTextAlign);
 				}
 			}
-			if (!(this.curState.id === STATES_ID_GROUP || this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP) && isRealObject(properties))
+			if ( !(this.curState.id === STATES_ID_GROUP || this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP) )
 			{
 				var ArrGlyph = this.selectedObjects;
 				for (var i = 0;  i< ArrGlyph.length; ++i)
@@ -1143,10 +1121,12 @@ DrawingObjectsController.prototype =
 							result_height = ArrGlyph[i].extY;
 
 						if (ArrGlyph[i].isShape() || ArrGlyph[i].isImage())
-						{
-							ArrGlyph[i].setAbsoluteTransform(null, null, result_width, result_height, null, false, false);
+						{				
+							ArrGlyph[i].setExtents(result_width, result_height);
 							ArrGlyph[i].setXfrm(null, null, result_width, result_height, null, null, null);
-							ArrGlyph[i].calculateAfterResize();
+							ArrGlyph[i].recalculateTransform();
+							ArrGlyph[i].calculateContent();
+							ArrGlyph[i].calculateTransformTextMatrix();
 						}
 					}
 				

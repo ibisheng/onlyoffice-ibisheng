@@ -298,7 +298,7 @@
 							}
 							self.controller.setStrictClose(true);
 							self.cellEditor.callTopLineMouseup = true;
-							if (!self.controller.isCellEditMode && !self.controller.isFillHandleMode && !self.controller.isSelectDrawingObject) {
+							if (!self.controller.isCellEditMode && !self.controller.isFillHandleMode) {
 								self._onEditCell(0, 0, /*isCoord*/false, /*isFocus*/true);
 							}
 						});

@@ -228,12 +228,12 @@ CImage.prototype =
 
         if(extX != null)
         {
-            this.absExtX = extX;
+            this.extX = extX;
         }
 
         if(extY != null)
         {
-            this.absExtY = extY;
+            this.extY = extY;
         }
 
         if(rot != null)
@@ -388,7 +388,7 @@ CImage.prototype =
 	calculateAfterResize: function(transform, bChangeSize, bAfterOpen)
     {
         if(this.spPr.geometry !== null)
-            this.spPr.geometry.Recalculate(this.absExtX, this.absExtY);
+            this.spPr.geometry.Recalculate(this.extX, this.extY);
         this.calculateTransformMatrix(transform);
 
         this.calculateTransformTextMatrix();
@@ -396,8 +396,8 @@ CImage.prototype =
 
         if(isRealObject(this.chart) && (bChangeSize === true || this.chart.img == "")&& bAfterOpen !== true)
         {
-            this.chart.width = this.drawingDocument.GetDotsPerMM(this.absExtX);
-            this.chart.height = this.drawingDocument.GetDotsPerMM(this.absExtY);
+            this.chart.width = this.drawingDocument.GetDotsPerMM(this.extX);
+            this.chart.height = this.drawingDocument.GetDotsPerMM(this.extY);
 
             var chartRender = new ChartRender();
             var chartBase64 = chartRender.insertChart(this.chart, null, this.chart.width, this.chart.height);

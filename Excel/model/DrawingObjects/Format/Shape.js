@@ -1605,12 +1605,12 @@ CShape.prototype =
 
         if(extX != null)
         {
-            this.absExtX = extX;
+            this.extX = extX;
         }
 
         if(extY != null)
         {
-            this.absExtY = extY;
+            this.extY = extY;
         }
         /*if(extX != null || extY!=null)
         {
@@ -2750,6 +2750,10 @@ CShape.prototype =
     }
 };
 
+function CheckLinePreset(preset)
+{
+    return preset === "line";
+}
 
 function CorrectUniFill(asc_fill, unifill)
 {

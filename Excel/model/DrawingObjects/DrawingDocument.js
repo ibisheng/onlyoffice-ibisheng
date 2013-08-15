@@ -1,3 +1,10 @@
+
+var g_dDpiX = 96.0;
+var g_dDpiY = 96.0;
+
+var g_dKoef_mm_to_pix = g_dDpiX / 25.4;
+var g_dKoef_pix_to_mm = 25.4 / g_dDpiX;
+
 var g_fontManager = new CFontManager();
 g_fontManager.Initialize(true);
 
@@ -4493,7 +4500,7 @@ function CDrawingDocument(drawingObjects)
         {
             bIsChange = true;
 
-            this.GuiLastTextProps = new CParagraphProp();
+            this.GuiLastTextProps = new asc_CParagraphProperty();
 
             this.GuiLastTextProps.Subscript     = props.Subscript;
             this.GuiLastTextProps.Superscript   = props.Superscript;
@@ -4558,10 +4565,14 @@ function CDrawingDocument(drawingObjects)
             return;
 
         History.TurnOff();
-        var _oldTurn = editor.isViewMode;
-        editor.isViewMode = true;
+        //var _oldTurn = editor.isViewMode;
+        //editor.isViewMode = true;
 
-        var par = new Paragraph(this, this.m_oWordControl.m_oLogicDocument, 0, 0, 0, 1000, 1000);
+        //var par = new Paragraph(this, this.m_oWordControl.m_oLogicDocument, 0, 0, 0, 1000, 1000);
+		
+		var shape = new CShape(null, this.drawingObjects);
+		shape.addTextBody(new CTextBody(shape));
+        var par = shape.txBody.content.Content[0];
 
         par.Cursor_MoveToStartPos();
 
@@ -4599,7 +4610,9 @@ function CDrawingDocument(drawingObjects)
         par.Add(new ParaText("l"));
         par.Add(new ParaText("d"));
 
-        par.Recalculate_Page(0);
+		shape.txBody.content.Reset(0, 0, 1000, 1000);
+		shape.txBody.content.Recalculate_Page(0,true);
+    
 
         var baseLineOffset = par.Lines[0].Y;
         var _bounds = par.Get_PageBounds(0);
@@ -4655,13 +4668,13 @@ function CDrawingDocument(drawingObjects)
 
         graphics.transform(1,0,0,1,0,0);
 
-        var old_marks = this.m_oWordControl.m_oApi.ShowParaMarks;
-        this.m_oWordControl.m_oApi.ShowParaMarks = false;
+        //var old_marks = this.m_oWordControl.m_oApi.ShowParaMarks;
+        //this.m_oWordControl.m_oApi.ShowParaMarks = false;
         par.Draw(0, graphics);
-        this.m_oWordControl.m_oApi.ShowParaMarks = old_marks;
+        //this.m_oWordControl.m_oApi.ShowParaMarks = old_marks;
 
         History.TurnOn();
-        editor.isViewMode = _oldTurn;
+        //editor.isViewMode = _oldTurn;
     }
 
     this.CheckTableStyles = function(tableLook)
