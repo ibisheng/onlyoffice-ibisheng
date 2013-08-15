@@ -513,7 +513,7 @@ CFF_SizeRec:Lt
 SplineCommandLineTo:xH
 cff_size_select:Pt
 FT_GlyphSlot:pk
-CParagraphProp:bM
+CParagraphProp:cM
 ft_extra_glyph_names:Qk
 tt_size_select:Ds
 JSCompiler_StaticMethods_Check_Null:cy
@@ -550,7 +550,7 @@ JSCompiler_StaticMethods_Set_Ind:Hd
 T1_GlyphSlot_Done:Ru
 CHist_Clip:lz
 historyitem_TextPr_Italic:xy
-JSCompiler_StaticMethods_Internal_ScaleTableWidth:NB
+JSCompiler_StaticMethods_Internal_ScaleTableWidth:MB
 JSCompiler_StaticMethods_Get_Props:$B
 JSCompiler_StaticMethods_IncDecFontSize:ME
 sendCommand:je
@@ -1579,7 +1579,7 @@ CFontManager:ow
 TWorker:Ap
 CDocumentBounds:jD
 tt_cmap10_char_next:co
-JSCompiler_StaticMethods_Internal_CompareBorders3:QB
+JSCompiler_StaticMethods_Internal_CompareBorders3:PB
 JSCompiler_StaticMethods_Internal_CompareBorders2:RB
 FT_BBox:Tj
 load_truetype_glyph:gs
@@ -1740,8 +1740,8 @@ cff_builder_start_point:fu
 pararecalc_0_None:sD
 LAYOUT_KIND:yA
 L 39:Vk
-L 38:pd
-L 37:fd
+L 38:qd
+L 37:gd
 locktype_None:rx
 c_oAscServerError$VKeyEncrypt:Ve
 PS_PrivateRec:hl
@@ -1787,7 +1787,7 @@ L 50:Us
 tt_find_sbit_image:En
 tt_size_reset:Cs
 _strcmp_data:pi
-JSCompiler_StaticMethods_Internal_CheckNullBorder:PB
+JSCompiler_StaticMethods_Internal_CheckNullBorder:OB
 LineEndType$None:sF
 CParagraphAndTextProp:gM
 JSCompiler_StaticMethods_Set_CellInfo:KB
@@ -1919,7 +1919,7 @@ _ph_summ__tx:lL
 JSCompiler_StaticMethods_Internal_GetVertMergeCount:kb
 _ph_summ__obj_and_tx:bL
 TT_Gasp:Jj
-JSCompiler_StaticMethods__ExecuteTable:gd
+JSCompiler_StaticMethods__ExecuteTable:fd
 historyitem_Table_DocNext:DA
 historyitem_TableCell_VMerge:tC
 FT_UnitVector:cq
@@ -1957,7 +1957,7 @@ JSCompiler_StaticMethods_resetStateCurSlide:KE
 RotateState:tH
 CShapeColor:aH
 BULLET_TYPE_BULLET_CHAR:Lg
-JSCompiler_StaticMethods_Set_TableBorder_Left:qd
+JSCompiler_StaticMethods_Set_TableBorder_Left:pd
 c_oAscSlideTransitionParams$Param_TopRight:HI
 locktype_Other2:Jx
 RULER_OBJECT_TYPE_FOOTER:gA
@@ -2029,7 +2029,7 @@ JSCompiler_StaticMethods_getSrc:Ca
 CMouseMoveData:Yy
 g_NumberingArr:pE
 phType_title:qE
-JSCompiler_StaticMethods_Internal_Get_TableMinWidth:OB
+JSCompiler_StaticMethods_Internal_Get_TableMinWidth:NB
 tt_sfnt_id_rec:Gs
 tt_face_load_name:gn
 L 61:Zs
