@@ -1467,33 +1467,6 @@ prot["asc_putShapeProperties"] = prot.asc_putShapeProperties;
 // CShapeProperty
 //-----------------------------------------------------------------------------------
 
-function asc_CPaddings( obj )
-{
-    if ( obj )
-    {
-        this.Left = (undefined == obj.Left) ? null : obj.Left;
-        this.Top = (undefined == obj.Top) ? null : obj.Top;
-        this.Bottom = (undefined == obj.Bottom) ? null : obj.Bottom;
-        this.Right = (undefined == obj.Right) ? null : obj.Right;
-    }
-    else
-    {
-        this.Left = null;
-        this.Top = null;
-        this.Bottom = null;
-        this.Right = null;
-    }
-}
-
-asc_CPaddings.prototype.asc_get_Left = function() { return this.Left; }
-asc_CPaddings.prototype.asc_put_Left = function(v) { this.Left = v; }
-asc_CPaddings.prototype.asc_get_Top = function() { return this.Top; }
-asc_CPaddings.prototype.asc_put_Top = function(v) { this.Top = v; }
-asc_CPaddings.prototype.asc_get_Bottom = function() { return this.Bottom; }
-asc_CPaddings.prototype.asc_put_Bottom = function(v) { this.Bottom = v; }
-asc_CPaddings.prototype.asc_get_Right = function() { return this.Right; }
-asc_CPaddings.prototype.asc_put_Right = function(v) { this.Right = v; }
-
 function asc_CShapeProperty() {
     this.type = null; // custom
     this.fill = null;
@@ -1524,6 +1497,52 @@ prot["asc_getFill"] = prot.asc_getFill;
 prot["asc_putFill"] = prot.asc_putFill;
 prot["asc_getStroke"] = prot.asc_getStroke;
 prot["asc_putStroke"] = prot.asc_putStroke;
+//}
+
+//-----------------------------------------------------------------------------------
+// CPaddings
+//-----------------------------------------------------------------------------------
+
+function asc_CPaddings(obj) {
+    
+	if ( obj ) {
+        this.Left = (undefined == obj.Left) ? null : obj.Left;
+        this.Top = (undefined == obj.Top) ? null : obj.Top;
+        this.Bottom = (undefined == obj.Bottom) ? null : obj.Bottom;
+        this.Right = (undefined == obj.Right) ? null : obj.Right;
+    }
+    else {
+        this.Left = null;
+        this.Top = null;
+        this.Bottom = null;
+        this.Right = null;
+    }
+}
+
+asc_CPaddings.prototype = {
+	asc_getLeft: function() { return this.Left; },
+	asc_putLeft: function(v) { this.Left = v; },
+	asc_getTop: function() { return this.Top; },
+	asc_putTop: function(v) { this.Top = v; },
+	asc_getBottom: function() { return this.Bottom; },
+	asc_putBottom: function(v) { this.Bottom = v; },
+	asc_getRight: function() { return this.Right; },
+	asc_putRight: function(v) { this.Right = v; }
+}
+
+//{ asc_CPaddings export
+window["Asc"].asc_CPaddings = asc_CPaddings;
+window["Asc"]["asc_CPaddings"] = asc_CPaddings;
+prot = asc_CPaddings.prototype;
+
+prot["asc_getLeft"] = prot.asc_getLeft;
+prot["asc_putLeft"] = prot.asc_putLeft;
+prot["asc_getTop"] = prot.asc_getTop;
+prot["asc_putTop"] = prot.asc_putTop;
+prot["asc_getBottom"] = prot.asc_getBottom;
+prot["asc_putBottom"] = prot.asc_putBottom;
+prot["asc_getRight"] = prot.asc_getRight;
+prot["asc_putRight"] = prot.asc_putRight;
 //}
 
 //-----------------------------------------------------------------------------------
