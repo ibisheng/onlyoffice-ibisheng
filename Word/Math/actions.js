@@ -413,6 +413,10 @@ CControlComposition.prototype =
     Recalculate: function()
     {
         this.Content[this.CurPos].Refresh();
+    },
+    Set_SelectionState: function()
+    {
+
     }
 }
 var MathControl = new CControlComposition();

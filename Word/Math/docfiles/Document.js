@@ -9123,9 +9123,9 @@ CDocument.prototype =
         this.Recalculate( false, false, this.History.RecalculateData );
         //**
         MathControl.Recalculate();
+        //this.Document_UpdateSelectionState();
         //**
 
-        this.Document_UpdateSelectionState();
         this.Document_UpdateInterfaceState();
     },
 
@@ -9214,7 +9214,13 @@ CDocument.prototype =
         return State;
     },
 
+    //**
     Set_SelectionState : function(State)
+    {
+        MathControl.Set_SelectionState(State);
+    },
+    //**
+    /*Set_SelectionState : function(State)
     {
         if ( docpostype_DrawingObjects === this.CurPos.Type )
             this.DrawingObjects.resetSelection();
@@ -9285,7 +9291,7 @@ CDocument.prototype =
             else
                 this.Content[this.CurPos.ContentPos].Set_SelectionState( State, StateIndex );
         }
-    },
+    },*/
 
     Undo : function(Data)
     {
