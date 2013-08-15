@@ -1570,6 +1570,8 @@ CopyProcessor.prototype =
 
                             this.Para = document.createElement( "span" );
                             this.InitRun();
+							var selectionTrue;
+							var selectIndex;
                             for(var i = 0; i < selection_array.length; ++i)
                             {
                                 var cur_element = selection_array[i];
@@ -1580,8 +1582,46 @@ CopyProcessor.prototype =
                                 this.aInnerHtml.push("<img width=\""+Math.round(/*cur_element.W*/5 * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(/*cur_element.H*/5 * g_dKoef_mm_to_pix)+"\" src=\""+src+"\" alt=\""+alt_content+"\" />");
 
                                 this.ElemToSelect.appendChild( this.Para );
+								
+								if(copyPasteUseBinery)
+								{
+									var index = cur_element.Parent.Index;
+									selectionTrue = 
+									{
+										EndPos : oDocument.Content[index].Selection.EndPos,
+										StartPos: oDocument.Content[index].Selection.StartPos
+									};
+									var inIndex;
+									for(var k = 0; k < oDocument.Content[index].Content.length;k++)
+									{
+										if(oDocument.Content[index].Content[k] == cur_element)
+										{
+											inIndex = k;
+											break;
+										}
+									}
+									//меняем Selection
+									oDocument.Content[index].Selection.EndPos = inIndex;
+									oDocument.Content[index].Selection.StartPos = inIndex;
+									oDocument.Content[index].Selection.Use = true;
+									
+									this.oBinaryFileWriter.CopyParagraph(oDocument.Content[index], true);
+									
+									//возвращаем Selection
+									oDocument.Content[index].Selection.StartPos = selectionTrue.StartPos;
+									oDocument.Content[index].Selection.EndPos = selectionTrue.EndPos;
+								}
                             }
+							
                             this.CommitSpan(false);
+						
+							if(copyPasteUseBinery)
+							{
+								this.oBinaryFileWriter.CopyEnd();
+								var sBase64 = this.oBinaryFileWriter.GetResult();
+								if(this.ElemToSelect.children[0])
+									$(this.ElemToSelect.children[0]).addClass("docData;" + sBase64);
+							}
                             return;
                         }
 
@@ -2325,17 +2365,17 @@ PasteProcessor.prototype =
 			var oNumClass = oReadResult.numToNumClass[i];
 			var documentANum = this.oDocument.Numbering.AbstractNum;
 			//проверка на уже существующий такой же AbstractNum
-			var isUsuallyContains = false;
+			var isAlreadyContains = false;
 			for(var n in documentANum)
 			{
 				var isEqual = documentANum[n].isEqual(oNumClass);
 				if(isEqual == true)
 				{
-					isUsuallyContains = true;
+					isAlreadyContains = true;
 					break;
 				}
 			}
-			if(!isUsuallyContains)
+			if(!isAlreadyContains)
 			{
 				this.oDocument.Numbering.Add_AbstractNum(oNumClass);
 			}
@@ -2353,21 +2393,28 @@ PasteProcessor.prototype =
 				numPr.NumId = 0;
 		}
 		//обрабатываем стили
-		var isUsuallyContainsStyle;
+		var isAlreadyContainsStyle;
+		var addStyles = [];
+		var api = this.api;
 		var oStyleTypes = {par: 1, table: 2, lvl: 3};
 		var fParseStyle = function(aStyles, oDocumentStyles, oReadResult, nStyleType)
 		{
+			if(aStyles == undefined)
+				return;
 			for(var i = 0, length = aStyles.length; i < length; ++i)
 			{
 				var elem = aStyles[i];
 				var stylePaste = oReadResult.styles[elem.style];
+				var isEqualName = null;
 				if(null != stylePaste && null != stylePaste.style)
 				{
 					for(var j in oDocumentStyles)
 					{
 						var styleDoc = oDocumentStyles[j];
-						isUsuallyContainsStyle = styleDoc.isEqual(stylePaste.style);
-						if(isUsuallyContainsStyle)
+						isAlreadyContainsStyle = styleDoc.isEqual(stylePaste.style);
+						if(styleDoc.Name == stylePaste.style.Name)
+							isEqualName = j;
+						if(isAlreadyContainsStyle)
 						{
 							if(oStyleTypes.par == nStyleType)
 								elem.pPr.PStyle = j;
@@ -2378,6 +2425,27 @@ PasteProcessor.prototype =
 							break;
 						}
 					}
+					if(!isAlreadyContainsStyle && isEqualName != null)//если нашли имя такого же стиля
+					{
+						if(nStyleType == 1)
+							elem.pPr.PStyle = isEqualName;
+						else if (nStyleType == 2)
+							elem.pPr.TableStyle = isEqualName;
+						addStyles[addStyles.length] = isEqualName;
+						//пока пользуемся тем стилем, который определен в документе
+						//oDocumentStyles[isEqualName] = stylePaste.style;
+					}
+					else if(!isAlreadyContainsStyle && isEqualName == null)//нужно добавить новый стиль
+					{
+						oDocumentStyles[stylePaste.style.Name] = stylePaste.style;
+						if(nStyleType == 1)
+							elem.pPr.PStyle = stylePaste.style.Name;
+						else if (nStyleType == 2)
+							elem.pPr.TableStyle = stylePaste.style.Name;
+						addStyles[addStyles.length] = stylePaste.style.Name;
+						//добавляем картинки стилей в меню
+						api.GenerateStyles();
+					}
 				}
 			}
 		}
@@ -2385,6 +2453,28 @@ PasteProcessor.prototype =
 		fParseStyle(oBinaryFileReader.oReadResult.tableStyles, this.oDocument.Styles.Style, oBinaryFileReader.oReadResult, oStyleTypes.table);
 		fParseStyle(oBinaryFileReader.oReadResult.lvlStyles, this.oDocument.Styles.Style, oBinaryFileReader.oReadResult, oStyleTypes.lvl);
 		var aContent = oBinaryFileReader.oReadResult.DocumentContent;
+		//добавляем во вставляемые параграфы стили(если уже данные стили присутcтвуют)
+		var styleName;
+		if(addStyles && addStyles.length != 0)
+		{
+			for(var i in aContent)
+			{
+				if(!aContent[i].TableGrid)
+				{
+					styleName = aContent[i].Style_Get();
+					for(var k = 0; k < addStyles.length; k++)
+					{
+						if(styleName == addStyles[k])
+						{
+							aContent[i].Style_Add(styleName);
+							break;
+						}
+					}
+				}
+				
+			}
+		}
+		
 		if(aContent.length > 0)
 		{
 			//todo в зависимости от наличия символа конца параграфа
