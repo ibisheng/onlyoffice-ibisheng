@@ -2073,13 +2073,13 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 					History.RedoAdd(oRedoObjectParam, oHistoryPositions.oClass, oHistoryPositions.nActionType, oHistoryPositions.nSheetId, oHistoryPositions.oRange, oHistoryPositions.oData);
 			
 				History.RedoEnd(null, oRedoObjectParam);
-				this.bCollaborativeChanges = false;
+				oThis.bCollaborativeChanges = false;
 				History.Clear();
 				if(null != fCallback)
 					fCallback();
 			});
 	}
-}
+};
 //-------------------------------------------------------------------------------------------------
 /**
  * @constructor

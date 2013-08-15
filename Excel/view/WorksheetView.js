@@ -7993,16 +7993,14 @@
 					case "insColBefore":
 						functionModelAction = function () {
 							fullRecalc = true;
-							var ar = t.activeRange.clone(true);
-							t.autoFilters.insertColumn(t, prop, val, ar);
+							t.autoFilters.insertColumn(t, prop, val, arn);
 							t.model.insertColsBefore(arn.c1, val);
 						};
 						return this._isLockedCells (new asc_Range(arn.c1, 0, arn.c1 + val - 1, gc_nMaxRow0), c_oAscLockTypeElemSubType.InsertColumns, onChangeWorksheetCallback);
 					case "insColAfter":
 						functionModelAction = function () {
 							fullRecalc = true;
-							var ar = t.activeRange.clone(true);
-							t.autoFilters.insertColumn(t, prop, val, ar);
+							t.autoFilters.insertColumn(t, prop, val, arn);
 							t.model.insertColsAfter(arn.c2, val);
 						};
 						return this._isLockedCells (new asc_Range(arn.c2, 0, arn.c2 + val - 1, gc_nMaxRow0), c_oAscLockTypeElemSubType.InsertColumns, onChangeWorksheetCallback);
@@ -8111,8 +8109,7 @@
 									t.model.onStartTriggerAction();
 									t.model.insertColsBefore(_updateRangeIns.c1, _updateRangeIns.c2 - _updateRangeIns.c1 + 1);
 									t.model.onEndTriggerAction();
-									var ar = t.activeRange.clone(true);
-									t.autoFilters.insertColumn(t, prop, _updateRangeIns, ar);
+									t.autoFilters.insertColumn(t, prop, _updateRangeIns, arn);
 									
 									if ( !bUndoRedo ) {
 										t.objectRender.updateDrawingObject(true, val, _updateRangeIns);
@@ -8132,8 +8129,7 @@
 									t.model.onStartTriggerAction();
 									t.model.insertRowsBefore(_updateRangeIns.r1, _updateRangeIns.r2 - _updateRangeIns.r1 + 1);
 									t.model.onEndTriggerAction();
-									var ar = t.activeRange.clone(true);
-									t.autoFilters.insertRows(t, prop,_updateRangeIns, ar);
+									t.autoFilters.insertRows(t, prop,_updateRangeIns, arn);
 									
 									if ( !bUndoRedo ) {
 										t.objectRender.updateDrawingObject(true, val, _updateRangeIns);
@@ -8193,8 +8189,7 @@
 								functionModelAction = function () {
 									fullRecalc = true;
 									t.model.removeCols(_updateRangeDel.c1, _updateRangeDel.c2);
-									var ar = t.activeRange.clone(true);
-									t.autoFilters.insertColumn(t, prop,_updateRangeDel, ar);
+									t.autoFilters.insertColumn(t, prop,_updateRangeDel, arn);
 									if (!bUndoRedo) {
 										t.objectRender.updateDrawingObject(false, val, _updateRangeDel);
 									}
@@ -8211,8 +8206,7 @@
 								functionModelAction = function () {
 									fullRecalc = true;
 									t.model.removeRows(_updateRangeDel.r1, _updateRangeDel.r2);
-									var ar = t.activeRange.clone(true);
-									t.autoFilters.insertRows(t, prop,_updateRangeDel, ar);
+									t.autoFilters.insertRows(t, prop,_updateRangeDel, arn);
 									if (!bUndoRedo) {
 										t.objectRender.updateDrawingObject(false, val, _updateRangeDel);
 									}
