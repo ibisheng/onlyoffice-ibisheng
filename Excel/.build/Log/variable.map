@@ -1408,7 +1408,7 @@ cff_parse_num:Or
 para_Numbering:b3
 nSldLtTTwoObjOverTx:PT
 lineTo:aW
-StartTrackNewShapeState:g0
+StartTrackNewShapeState:h0
 JSCompiler_StaticMethods_updateCoordinatesAfterInternalResize:u0
 HitInLine:jW
 _ph_summ__tx:BU
