@@ -4,6 +4,8 @@
 /*
 var:asc_docs_api
 prop:_coAuthoringInit
+prop:pre_Save
+prop:sync_CollaborativeChanges
 prop:_coAuthoringInitCallBack
 prop:_coAuthoringSetServerUrl
 prop:asc_coAuthoringDisconnect
@@ -269,6 +271,7 @@ prop:get_PresentationHeight
 prop:SendOpenProgress
 prop:sync_SendProgress
 prop:pre_Paste
+prop:pre_SaveCallback
 prop:initEvents2MobileAdvances
 prop:ViewScrollToX
 prop:ViewScrollToY
@@ -865,6 +868,8 @@ prop:get_Type
 */
 window['asc_docs_api'] = asc_docs_api;
 asc_docs_api.prototype['_coAuthoringInit'] = asc_docs_api.prototype._coAuthoringInit;
+asc_docs_api.prototype['pre_Save'] = asc_docs_api.prototype.pre_Save;
+asc_docs_api.prototype['sync_CollaborativeChanges'] = asc_docs_api.prototype.sync_CollaborativeChanges;
 asc_docs_api.prototype['_coAuthoringInitCallBack'] = asc_docs_api.prototype._coAuthoringInitCallBack;
 asc_docs_api.prototype['_coAuthoringSetServerUrl'] = asc_docs_api.prototype._coAuthoringSetServerUrl;
 asc_docs_api.prototype['asc_coAuthoringDisconnect'] = asc_docs_api.prototype.asc_coAuthoringDisconnect;
@@ -1130,6 +1135,7 @@ asc_docs_api.prototype['get_PresentationHeight'] = asc_docs_api.prototype.get_Pr
 asc_docs_api.prototype['SendOpenProgress'] = asc_docs_api.prototype.SendOpenProgress;
 asc_docs_api.prototype['sync_SendProgress'] = asc_docs_api.prototype.sync_SendProgress;
 asc_docs_api.prototype['pre_Paste'] = asc_docs_api.prototype.pre_Paste;
+asc_docs_api.prototype['pre_SaveCallback'] = asc_docs_api.prototype.pre_SaveCallback;
 asc_docs_api.prototype['initEvents2MobileAdvances'] = asc_docs_api.prototype.initEvents2MobileAdvances;
 asc_docs_api.prototype['ViewScrollToX'] = asc_docs_api.prototype.ViewScrollToX;
 asc_docs_api.prototype['ViewScrollToY'] = asc_docs_api.prototype.ViewScrollToY;
