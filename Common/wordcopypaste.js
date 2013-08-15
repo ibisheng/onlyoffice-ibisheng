@@ -1545,6 +1545,36 @@ CopyProcessor.prototype =
 
                             this.Para = document.createElement( "span" );
                             this.InitRun();
+							
+							if(copyPasteUseBinery)
+							{
+								var newArr = null;
+								var tempAr = null;
+								if(s_arr)
+								{
+									tempAr = [];
+									for(var k = 0; k < s_arr.length; k++)
+									{
+										tempAr[k] = s_arr[k].absOffsetY;
+									}
+								}
+								tempAr.sort(function(a,b){return a-b;})
+								newArr = [];
+								for(var k = 0; k < tempAr.length; k++)
+								{
+									var absOffsetY = tempAr[k];
+									for(var i = 0; i < s_arr.length; i++)
+									{
+										if(absOffsetY == s_arr[i].absOffsetY)
+										{
+											newArr[k] = s_arr[i];
+										}
+									}
+								}
+								if(newArr != null)
+									s_arr = newArr;
+							}
+		
                             for(var i = 0; i < s_arr.length; ++i)
                             {
                                 var cur_element = s_arr[i];
