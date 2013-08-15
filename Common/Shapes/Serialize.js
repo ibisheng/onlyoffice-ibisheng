@@ -1498,6 +1498,74 @@ function BinaryPPTYLoader()
         return _ret;
     }
 
+    this.ReadGradLin = function()
+    {
+        var _lin = new GradLin();
+        var s = this.stream;
+
+        var _rec_start = s.cur;
+        var _end_rec = _rec_start + s.GetLong() + 4;
+
+        s.Skip2(1); // start attributes
+
+        while (true)
+        {
+            var _at = s.GetUChar();
+            if (_at == g_nodeAttributeEnd)
+                break;
+
+            switch (_at)
+            {
+                case 0:
+                {
+                    _lin.angle = s.GetLong();
+                    break;
+                }
+                case 1:
+                {
+                    _lin.scale = s.GetBool();
+                }
+                default:
+                    break;
+            }
+        }
+
+        s.Seek2(_end_rec);
+        return _lin;
+    }
+
+    this.ReadGradPath = function()
+    {
+        var _path = new GradPath();
+        var s = this.stream;
+
+        var _rec_start = s.cur;
+        var _end_rec = _rec_start + s.GetLong() + 4;
+
+        s.Skip2(1); // start attributes
+
+        while (true)
+        {
+            var _at = s.GetUChar();
+            if (_at == g_nodeAttributeEnd)
+                break;
+
+            switch (_at)
+            {
+                case 0:
+                {
+                    _path.path = s.GetUChar();
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+
+        s.Seek2(_end_rec);
+        return _path;
+    }
+
     this.ReadUniFill = function()
     {
         var s = this.stream;
@@ -1737,6 +1805,21 @@ function BinaryPPTYLoader()
                                 }
 
                                 s.Seek2(_e);
+                                break;
+                            }
+                            case 1:
+                            {
+                                uni_fill.fill.lin = this.ReadGradLin();
+                                break;
+                            }
+                            case 2:
+                            {
+                                uni_fill.fill.path = this.ReadGradPath();
+                                break;
+                            }
+                            case 3:
+                            {
+                                s.SkipRecord();
                                 break;
                             }
                             default:
@@ -3686,6 +3769,44 @@ function BinaryPPTYLoader()
     }
 
     // ------------------------------------------
+
+    this.ReadGraphicObject = function()
+    {
+        var _type = s.GetUChar();
+        var _object = null;
+
+        switch (_type)
+        {
+            case 1:
+            {
+                _object = this.ReadShape();
+                break;
+            }
+            case 2:
+            {
+                _object = this.ReadPic();
+                break;
+            }
+            case 3:
+            {
+                _object = this.ReadCxn();
+                break;
+            }
+            case 4:
+            {
+                _object = this.ReadGroupShape();
+                break;
+            }
+            case 5:
+            {
+                _object = this.ReadGrFrame();
+            }
+            default:
+                break;
+        }
+
+        return _object;
+    }
 
     // SHAPE PROPERTIES -------------------------
 
