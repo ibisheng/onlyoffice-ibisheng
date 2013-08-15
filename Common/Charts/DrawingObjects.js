@@ -2499,6 +2499,15 @@ function DrawingObjects() {
 				
 				drawingObject.graphicObject.drawingBase = drawingObject;
                 drawingObject.graphicObject.drawingObjects = _this;
+				
+				History.TurnOff();
+				var metrics = drawingObject.getGraphicObjectMetrics();
+				drawingObject.graphicObject.setPosition( metrics.x, metrics.y );
+				drawingObject.graphicObject.setExtents( metrics.extX, metrics.extY );
+				drawingObject.graphicObject.recalculateTransform();
+				drawingObject.graphicObject.calculateTransformTextMatrix();
+				History.TurnOn();
+				
 				aObjects.push( drawingObject );
 			}
 		}
