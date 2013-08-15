@@ -2495,6 +2495,12 @@ function DrawingObjects() {
                 drawingObject.graphicObject.init(aImagesSync);
                 aObjects.push( drawingObject );
             }
+			if (drawingObject.graphicObject instanceof  CShape) {
+				
+				drawingObject.graphicObject.drawingBase = drawingObject;
+                drawingObject.graphicObject.drawingObjects = _this;
+				aObjects.push( drawingObject );
+			}
 		}
 		
 		// Загружаем все картинки листа
