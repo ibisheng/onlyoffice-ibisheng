@@ -39,7 +39,8 @@ function CImageShape(drawingBase, drawingObjects)
     this.drawingBase = drawingBase;
     this.drawingObjects = drawingObjects;
 
-    this.blipFill = new CBlipFill();
+    this.blipFill = new CUniFill();
+    this.blipFill.fill = new CBlipFill();
     this.spPr = new CSpPr();
     this.nvSpPr = null;
     this.style = null;
@@ -209,7 +210,7 @@ CImageShape.prototype =
 
     setImageId: function(imageId)
     {
-        this.blipFill.RasterImageId = imageId;
+        this.blipFill.fill.RasterImageId = imageId;
     },
 
 	setAbsoluteTransform: function(offsetX, offsetY, extX, extY, rot, flipH, flipV, bAfterOpen)
@@ -314,20 +315,35 @@ CImageShape.prototype =
 
         //History.Add(this, data);
     },
-	
-    recalculate: function()
+
+
+    setDrawingDocument: function(drawingDocument)
+    {
+        this.drawingObjects = drawingDocument.drawingObjects;
+    },
+    recalculate: function(aImagesSync)
     {
         if(this.recalcInfo.recalculateTransform)
+        {
             this.recalculateTransform();
+            this.recalcInfo.recalculateTransform = false;
+        }
         if(this.recalcInfo.recalculateBrush)
-            this.recalculateBrush();
+        {
+            this.recalculateBrush(aImagesSync);
+            this.recalcInfo.recalculateTransform = false;
+        }
     },
 
-    recalculateBrush: function()
+    recalculateBrush: function(aImagesSync)
     {
         this.brush = new CUniFill();
         this.brush.fill = new CBlipFill();
-        this.brush.fill.RasterImageId = this.blipFill.RasterImageId;
+        this.brush.fill.RasterImageId = this.blipFill.fill.RasterImageId;
+        if(Array.isArray(aImagesSync))
+        {
+            aImagesSync.push(this.brush.fill.RasterImageId);
+        }
     },
 
     recalculateTransform: function()

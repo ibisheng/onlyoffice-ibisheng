@@ -413,12 +413,16 @@ CGroupShape.prototype =
             this.spTree[i].draw(graphics);
     },
 
-    recalculate: function()
+    recalculate: function(aImages)
     {
         //if(this.recalcInfo.recalculateTransform)
             this.recalculateTransform();
        // if(this.recalcInfo.recalculateArrGraphicObjects)
             this.recalculateArrGraphicObjects();
+        for(var i = 0; i< this.arrGraphicObjects.length; ++i)
+        {
+            this.arrGraphicObjects[i].recalculate(aImages);
+        }
     },
 
     recalculateArrGraphicObjects: function()
@@ -1443,6 +1447,18 @@ CGroupShape.prototype =
         }
             return img_pr;
         return null;
+    },
+
+    setDrawingDocument: function(drawingDocument)
+    {
+        this.drawingObjects = drawingDocument.drawingObjects;
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(typeof this.spTree[i].setDrawingDocument === "function")
+            {
+                this.spTree[i].setDrawingDocument(drawingDocument);
+            }
+        }
     },
 
     getChartProps: function()

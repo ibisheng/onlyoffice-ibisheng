@@ -901,6 +901,23 @@ CShape.prototype =
 				this.spPr.geometry.Recalculate(this.extX, this.extY);
 			}
 		}
+        this.calculateContent();
+        this.calculateTransformTextMatrix();
+    },
+
+    setDrawingDocument: function(drawingDocument)
+    {
+        this.drawingObjects = drawingDocument.drawingObjects;
+        if(this.txBody)
+        {
+            this.txBody.content.Parent = this.txBody;
+            this.txBody.content.DrawingDocuemnt = drawingDocument;
+            for(var i = 0; i < this.txBody.content.Content.length; ++i)
+            {
+                this.txBody.content.Content[i].DrawingDocument = drawingDocument;
+                this.txBody.content.Content[i].Parent = this.txBody.content;
+            }
+        }
     },
 
 	calculateFill: function()

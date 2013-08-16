@@ -2509,10 +2509,27 @@ function DrawingObjects() {
 				
 				drawingObject.graphicObject.drawingBase = drawingObject;
                 drawingObject.graphicObject.drawingObjects = _this;
+                drawingObject.graphicObject.setDrawingDocument(this.drawingDocument);
 				drawingObject.graphicObject.recalculate();
 				
 				aObjects.push( drawingObject );
 			}
+            if (drawingObject.graphicObject instanceof  CImageShape) {
+
+                drawingObject.graphicObject.drawingBase = drawingObject;
+                drawingObject.graphicObject.drawingObjects = _this;
+                drawingObject.graphicObject.recalculate(aImagesSync);
+                aObjects.push( drawingObject );
+            }
+
+            if (drawingObject.graphicObject instanceof  CGroupShape) {
+
+                drawingObject.graphicObject.drawingBase = drawingObject;
+                drawingObject.graphicObject.drawingObjects = _this;
+                drawingObject.graphicObject.setDrawingDocument(this.drawingDocument);
+                drawingObject.graphicObject.recalculate(aImagesSync);
+                aObjects.push( drawingObject );
+            }
 		}
 		
 		// Загружаем все картинки листа
