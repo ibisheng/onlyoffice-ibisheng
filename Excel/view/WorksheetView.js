@@ -5589,21 +5589,8 @@
 			getSelectionMergeInfo: function (options) {
 				var t = this;
 				var arn = t.activeRange.clone(true);
-				var range;
 				var notEmpty = false;
 				var r, c;
-				if (c_oAscSelectionType.RangeMax === t.activeRange.type) {
-					range = t.model.getRange3(/*arn.r1*/0, /*arn.c1*/0, gc_nMaxRow0, gc_nMaxCol0);
-				}
-				else if (c_oAscSelectionType.RangeCol === t.activeRange.type) {
-					range = t.model.getRange3(/*arn.r1*/0, arn.c1, gc_nMaxRow0, arn.c2);
-				}
-				else if (c_oAscSelectionType.RangeRow === t.activeRange.type) {
-					range = t.model.getRange3(arn.r1, /*arn.c1*/0, arn.r2, gc_nMaxCol0);
-				}
-				else {
-					range = t.model.getRange3(arn.r1, arn.c1, arn.r2, arn.c2);
-				}
 
 				switch (options) {
 					case c_oAscMergeOptions.Merge:
@@ -5619,8 +5606,7 @@
 						}
 						break;
 					case c_oAscMergeOptions.MergeAcross:
-						for (r = arn.r1; r <= arn.r2; ++r)
-						{
+						for (r = arn.r1; r <= arn.r2; ++r) {
 							notEmpty = false;
 							for (c = arn.c1; c <= arn.c2; ++c) {
 								if (false === this._isCellEmpty(c, r)) {
