@@ -510,15 +510,15 @@
 						}
 						for (; nIndex < oRecalcIndex[sheetId]["_arrElements"].length; ++nIndex) {
 							oRecalcIndexElement = oRecalcIndex[sheetId]["_arrElements"][nIndex];
-							if (true === oRecalcIndexElement.m_bIsSaveIndex)
+							if (true === oRecalcIndexElement["m_bIsSaveIndex"])
 								continue;
-							nRecalcType = (c_oAscRecalcIndexTypes.RecalcIndexAdd === oRecalcIndexElement._recalcType) ?
+							nRecalcType = (c_oAscRecalcIndexTypes.RecalcIndexAdd === oRecalcIndexElement["_recalcType"]) ?
 								c_oAscRecalcIndexTypes.RecalcIndexRemove : c_oAscRecalcIndexTypes.RecalcIndexAdd;
-							oRecalcIndexTmp[sheetId].add(nRecalcType, oRecalcIndexElement._position,
-								oRecalcIndexElement._count, /*bIsSaveIndex*/true);
+							oRecalcIndexTmp[sheetId].add(nRecalcType, oRecalcIndexElement["_position"],
+								oRecalcIndexElement["_count"], /*bIsSaveIndex*/true);
 							// Дублируем для возврата результата (нам нужно пересчитать только по последнему индексу
-							oRecalcIndexResult[sheetId].add(nRecalcType, oRecalcIndexElement._position,
-								oRecalcIndexElement._count, /*bIsSaveIndex*/true);
+							oRecalcIndexResult[sheetId].add(nRecalcType, oRecalcIndexElement["_position"],
+								oRecalcIndexElement["_count"], /*bIsSaveIndex*/true);
 						}
 					}
 				}
