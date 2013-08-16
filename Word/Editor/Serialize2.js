@@ -525,7 +525,7 @@ function BinaryFileWriter(doc)
 	this.nStart = 0;
     this.bs = new BinaryCommonWriter(this.memory);
 	this.copyParams = {
-		bLockCopyPar: null,
+		bLockCopyElems: null,
 		itemCount: null,
 		bdtw: null,
 		oUsedNumIdMap: null,
@@ -602,6 +602,7 @@ function BinaryFileWriter(doc)
 	this.CopyStart = function()
     {
 		window.global_pptx_content_writer._Start();
+		this.copyParams.bLockCopyElems = 0;
 		this.copyParams.itemCount = 0;
 		this.copyParams.oUsedNumIdMap = new Object();
 		this.copyParams.nNumIdIndex = 1;
@@ -641,7 +642,7 @@ function BinaryFileWriter(doc)
 			}
 		}
 		//сами параграфы скопируются в методе CopyTable, нужно только проанализировать стили
-		if(true == this.copyParams.bLockCopyPar)
+		if(this.copyParams.bLockCopyElems > 0)
 			return;
         this.bs.WriteItem(c_oSerParType.Par, function(){oThis.copyParams.bdtw.WriteParapraph(Item, bUseSelection);});
 		this.copyParams.itemCount++;
@@ -653,6 +654,9 @@ function BinaryFileWriter(doc)
 		var sTableStyle = Item.Get_TableStyle();
 		if(null != sTableStyle)
 			this.copyParams.oUsedStyleMap[sTableStyle] = 1;
+		//сама таблица скопируются в методе CopyTable у родительской таблицы, нужно только проанализировать стили
+		if(this.copyParams.bLockCopyElems > 0)
+			return;
         this.bs.WriteItem(c_oSerParType.Table, function(){oThis.copyParams.bdtw.WriteDocTable(Item, aRowElems, nMinGrid, nMaxGrid);});
 		this.copyParams.itemCount++;
 	}

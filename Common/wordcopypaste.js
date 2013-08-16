@@ -1452,18 +1452,18 @@ CopyProcessor.prototype =
 								elem.after = nMaxGrid - elem.gridEnd;
 							}
 							this.oBinaryFileWriter.CopyTable(Item, aSelectedRows, nMinGrid, nMaxGrid);
-							this.oBinaryFileWriter.copyParams.bLockCopyPar = true;
+							this.oBinaryFileWriter.copyParams.bLockCopyElems++;
 							this.CopyTable(oDomTarget, Item, aSelectedRows);
-							this.oBinaryFileWriter.copyParams.bLockCopyPar = null;
+							this.oBinaryFileWriter.copyParams.bLockCopyElems--;
 						}
                     }
                 }
                 else
 				{
 					this.oBinaryFileWriter.CopyTable(Item, null);
-					this.oBinaryFileWriter.copyParams.bLockCopyPar = true;
+					this.oBinaryFileWriter.copyParams.bLockCopyElems++;
                     this.CopyTable(oDomTarget, Item, null);
-					this.oBinaryFileWriter.copyParams.bLockCopyPar = null;
+					this.oBinaryFileWriter.copyParams.bLockCopyElems--;
 				}
             }
             else if ( type_Paragraph === Item.GetType() )
