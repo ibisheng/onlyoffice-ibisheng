@@ -676,9 +676,7 @@ function DependencyGraph(wb) {
 	this.helper = function(BBox,wsId){
 		var move = {}, recalc = {},
 			range = this.wb.getWorksheetById(wsId).getRange(new CellAddress(BBox.r1, BBox.c1, 0), new CellAddress(BBox.r2, BBox.c2, 0)),
-			exist = false,
-			n = new Vertex(range.getWorksheet().getId(),range.getName()),
-			nID = getVertexId(range.getWorksheet().getId(),range.getName());
+			n = new Vertex(range.getWorksheet().getId(),range.getName());
 		
 		if( n.isArea ){
 			if( n.nodeId in nodes ){
@@ -715,7 +713,7 @@ function DependencyGraph(wb) {
 				}
 			}
 		}
-		
+
 		return {move:move,recalc:recalc};
 	}
 
@@ -3369,44 +3367,48 @@ Woorksheet.prototype._prepareMoveRange=function(oBBoxFrom, oBBoxTo){
 		})
 	return res;
 }
-Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
+Woorksheet.prototype._moveRecalcGraph=function(oBBoxFrom, offset){
+    var move = this.workbook.dependencyFormulas.helper(oBBoxFrom,this.Id), rec = {length:0};
+    for(var id in move.recalc){
+        var n = move.recalc[id];
+        var _sn = n.getSlaveEdges2();
+        for( var _id in _sn ){
+            rec[_sn[_id].nodeId] = [ _sn[_id].sheetId, _sn[_id].cellId ];
+            rec.length++;
+        }
+    }
+
+    for( var id in move.move ){
+        var n = move.move[id];
+        var _sn = n.getSlaveEdges2();
+        for( var _id in _sn ){
+            var cell = _sn[_id].returnCell();
+            if( undefined == cell || null == cell ) { continue; }
+            if( cell.formulaParsed ){
+                cell.formulaParsed.shiftCells( offset, oBBoxFrom, n, this.Id, false );
+                cell.setFormula(cell.formulaParsed.assemble());
+                rec[cell.getName()] = [ cell.ws.getId(), cell.getName() ];
+                rec.length++;
+            }
+        }
+    }
+
+    return rec;
+}
+Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo){
 	History.Create_NewPoint();
 	History.SetSelection(new Asc.Range(oBBoxFrom.c1, oBBoxFrom.r1, oBBoxFrom.c2, oBBoxFrom.r2));
 	History.SetSelectionRedo(new Asc.Range(oBBoxTo.c1, oBBoxTo.r1, oBBoxTo.c2, oBBoxTo.r2));
 	// History.StartTransaction();
 	History.TurnOff();
 	
-	var arrUndo={from:[],to:[]};
-	var merged = this.getRange(new CellAddress(oBBoxTo.r1, oBBoxTo.c1, 0), new CellAddress(oBBoxTo.r2, oBBoxTo.c2, 0)).hasMergedAll();
+	var arrUndo={from:[],to:[]},
+        offset = { offsetRow : oBBoxTo.r1 - oBBoxFrom.r1, offsetCol : oBBoxTo.c1 - oBBoxFrom.c1 }, rec,
 
-	var t = this, offset = { offsetRow : oBBoxTo.r1 - oBBoxFrom.r1, offsetCol : oBBoxTo.c1 - oBBoxFrom.c1 }, rec = {length:0};
-		
-	var move = this.workbook.dependencyFormulas.helper(oBBoxFrom,this.Id), c = {}, ret = {}, arrFrom = [], arrTo = [];
+        arrFrom = [], arrTo = [];
 
-	for(var id in move.recalc){
-		var n = move.recalc[id];
-		var _sn = n.getSlaveEdges2();
-		for( var _id in _sn ){
-			rec[_sn[_id].nodeId] = [ _sn[_id].sheetId, _sn[_id].cellId ];
-			rec.length++;
-		}
-	}
-	
-	for( var id in move.move ){
-		var n = move.move[id];
-		var _sn = n.getSlaveEdges2();
-		for( var _id in _sn ){
-			var cell = _sn[_id].returnCell();
-			if( undefined == cell || null == cell ) { continue; }
-			if( cell.formulaParsed ){
-				cell.formulaParsed.shiftCells( offset, oBBoxFrom, n, this.Id, false );
-				cell.setFormula(cell.formulaParsed.assemble());
-				rec[cell.getName()] = [ cell.ws.getId(), cell.getName() ];
-				rec.length++;
-			}
-		}
-	}
-	
+    rec = this._moveRecalcGraph(oBBoxFrom, offset);
+
 	for(var nRow = oBBoxFrom.r2; nRow >= oBBoxFrom.r1; nRow-- ){
 	
 		arrFrom[nRow] = [];

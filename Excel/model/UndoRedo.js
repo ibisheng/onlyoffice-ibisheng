@@ -3127,7 +3127,7 @@ UndoRedoWoorksheet.prototype = {
 		{
 			if( bUndo ){
 			
-				var rec = {length:0};
+				var rec = {length:0}, rec2;
 				for(var ind = 0; ind < Data.arr.to.length; ind++ ){
 					var nRow = Data.arr.to[ind].getCellAddress().getRow0(),
 						nCol = Data.arr.to[ind].getCellAddress().getCol0();
@@ -3195,8 +3195,17 @@ UndoRedoWoorksheet.prototype = {
 						}
 					}
 				}
-				
+
+                var offset = { offsetRow : Data.from.r1 - Data.to.r1, offsetCol : Data.from.c1 - Data.to.c1 }
+
+                rec2 = ws._moveRecalcGraph(Data.to, offset);
+
 				this.wb.buildDependency();
+                rec.length += rec2.length;
+                for( var id in rec2 ){
+                    if( id == "length" ) continue;
+                    rec[id] = rec2[id];
+                }
 				this.wb.needRecalc = rec;
 				recalc(this.wb);
 			
