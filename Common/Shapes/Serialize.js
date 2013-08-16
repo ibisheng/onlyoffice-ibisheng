@@ -1804,7 +1804,7 @@ function BinaryPPTYLoader()
                                     uni_fill.fill.colors[uni_fill.fill.colors.length] = _gs;
                                 }
 
-                                s.Seek2(_e);
+                                s.Seek2(_e1);
 
                                 uni_fill.fill.colors.sort(function(a,b){return a.pos- b.pos;});
 

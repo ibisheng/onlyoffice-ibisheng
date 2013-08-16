@@ -1113,6 +1113,7 @@ function CDrawingDocument()
 
     this.ClearCachePages = function()
     {
+        this.m_oWordControl.SlideDrawer.IsCached = false;
         return;
     }
 
