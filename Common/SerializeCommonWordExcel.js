@@ -749,7 +749,8 @@ var c_oSer_DrawingType =
     PicSrc:5,
 	GraphicFrame: 6,
 	Chart: 7,
-	Ext: 8
+	Ext: 8,
+	pptxDrawing: 9
 };
 /** @enum */
 var c_oSer_ChartType =
@@ -760,7 +761,8 @@ var c_oSer_ChartType =
 	Style: 3,
 	TitlePptx: 4,
 	TitleTxPrPptx: 5,
-	ShowBorder: 6
+	ShowBorder: 6,
+	SpPr: 7
 };
 /** @enum */
 var c_oSer_ChartLegendType =
@@ -833,7 +835,8 @@ var c_oSer_ChartSeriesType =
 	TxRef: 5,
 	Index: 6,
 	Order: 7,
-	DataLabels: 8
+	DataLabels: 8,
+	SpPr: 9
 };
 /** @enum */
 var c_oSer_ChartSeriesMarkerType =

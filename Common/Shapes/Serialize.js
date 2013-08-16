@@ -3806,6 +3806,7 @@ function BinaryPPTYLoader()
 
     this.ReadGraphicObject = function()
     {
+		var s = this.stream;
         var _type = s.GetUChar();
         var _object = null;
 

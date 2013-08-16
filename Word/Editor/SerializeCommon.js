@@ -87,7 +87,45 @@ function CPPTXContentLoader()
 
         return GrObject;
     }
+	
+    this.ReadGraphicObject = function(stream)
+    {
+        if (this.Reader == null)
+            this.Reader = new BinaryPPTYLoader();
 
+        this.LogicDocument = null;
+
+        this.Reader.ImageMapChecker = this.ImageMapChecker;
+
+        if (null == this.stream)
+        {
+            this.stream = new FileStream();
+            this.stream.obj    = stream.obj;
+            this.stream.data   = stream.data;
+            this.stream.size   = stream.size;
+        }
+
+        this.stream.pos    = stream.pos;
+        this.stream.cur    = stream.cur;
+		
+		this.Reader.stream = this.stream;
+
+        var s = this.stream;
+        var _main_type = s.GetUChar(); // 0!!!
+
+        var _rec_start = s.cur;
+        var _end_rec = _rec_start + s.GetULong() + 4;
+
+        s.Skip2(5); // 1 + 4 byte - len
+
+		var GrObject = this.Reader.ReadGraphicObject();
+        
+        s.Seek2(_end_rec);
+        stream.pos = s.pos;
+        stream.cur = s.cur;
+		return GrObject;
+    }
+	
     this.ReadTextBody = function(reader, stream, shape)
     {
         this.BaseReader = reader;

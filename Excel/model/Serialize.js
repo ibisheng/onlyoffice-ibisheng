@@ -4955,6 +4955,7 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
     this.bcr = new Binary_CommonReader(this.stream);
 	this.aMerged = new Array();
 	this.aHyperlinks = new Array();
+	this.oPPTXContentLoader = new CPPTXContentLoader();
     this.Read = function()
     {
         var oThis = this;
@@ -5587,6 +5588,15 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 			var oBinary_ChartReader = new Binary_ChartReader(this.stream,  oDrawing.graphicObject.chart,  oDrawing.graphicObject);
 			res = oBinary_ChartReader.Read(length);
         }
+		else if ( c_oSer_DrawingType.pptxDrawing == type )
+        {
+            var oGraphicObject = this.oPPTXContentLoader.ReadGraphicObject(this.stream);
+			if(null != oGraphicObject)
+			{
+				oDrawing.graphicObject = oGraphicObject;
+				oGraphicObject.setDrawingBase(oDrawing);
+			}
+		}
         else
             res = c_oSerConstants.ReadUnknown;
         return res;
@@ -5968,6 +5978,8 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 			});
 			aSheetViews.push(oSheetView);
 		}
+		else
+			res = c_oSerConstants.ReadUnknown;
 		return res;
 	};
 	this.ReadSheetView = function (type, length, oSheetView) {
