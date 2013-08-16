@@ -902,27 +902,23 @@ CShapeDrawer.prototype =
 
                 var _ctx = (this.Graphics.IsTrack === true) ? this.Graphics.Graphics.m_oContext : this.Graphics.m_oContext;
 
-                var gradObj = _ctx.createLinearGradient(this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y));
-
-                /*
-                var _max_ = Math.max((this.max_x - this.min_x), (this.max_y - this.min_y));
-                var _cx_ = (this.min_x + this.max_x) / 2;
-                var _cy_ = (this.min_y + this.max_y) / 2;
-                var _x_ = _cx_ - _max_ / 2;
-                var _y_ = _cy_ - _max_ / 2;
-
-                var gradObj = _ctx.createLinearGradient(_x_, _y_, _max_, _max_);
-                */
-
-                /*
-                var _a_ = (this.max_x - this.min_x);
-                var _b_ = (this.max_y - this.min_y);
-                var _angle_ = Math.atan2(_b_, _a_);
-                var _x_ = 2 * _b_ * Math.sin(_angle_);
-                var _w_ = _x_ * Math.cos(_angle_);
-                var _h_ = 2 * _b_ - _x_ * Math.sin(_angle_);
-                var gradObj = _ctx.createLinearGradient(this.min_x, this.min_y, _w_, _h_);
-                */
+                var gradObj = null;
+                if (_fill.lin)
+                {
+                    var points = this.getGradientPoints(this.min_x, this.min_y, this.max_x, this.max_y, _fill.lin.angle, _fill.lin.scale);
+                    gradObj = _ctx.createLinearGradient(points.x0, points.y0, points.x1, points.y1);
+                }
+                else if (_fill.path)
+                {
+                    var _cx = (this.min_x + this.max_x) / 2;
+                    var _cy = (this.min_y + this.max_y) / 2;
+                    var _r = Math.max(this.max_x - this.min_x, this.max_y - this.min_y) / 2;
+                    gradObj = _ctx.createRadialGradient(_cx, _cy, 1, _cx, _cy, _r);
+                }
+                else
+                {
+                    gradObj = _ctx.createLinearGradient(this.min_x, this.min_y, this.max_x, this.min_y);
+                }
 
                 for (var i = 0; i < _fill.colors.length; i++)
                 {
@@ -1287,6 +1283,211 @@ CShapeDrawer.prototype =
     check_bounds : function()
     {
         this.Shape.check_bounds(this);
+    },
+
+    // common funcs
+    getNormalPoint : function(x0, y0, angle, x1, y1)
+    {
+        // точка - пересечение прямой, проходящей через точку (x0, y0) под углом angle и
+        // перпендикуляра к первой прямой, проведенной из точки (x1, y1)
+        var ex1 = Math.cos(angle);
+        var ey1 = Math.sin(angle);
+
+        var ex2 = -ey1;
+        var ey2 = ex1;
+
+        var a = ex1 / ey1;
+        var b = ex2 / ey2;
+
+        var x = ((a * b * y1 - a * b * y0) - (a * x1 - b * x0)) / (b - a);
+        var y = (x - x0) / a + y0;
+
+        return { X : x, Y : y };
+    },
+
+    getGradientPoints : function(min_x, min_y, max_x, max_y, _angle, scale)
+    {
+        var points = { x0 : 0, y0 : 0, x1 : 0, y1 : 0 };
+
+        var angle = _angle / 60000;
+        while (angle < 0)
+            angle += 360;
+        while (angle >= 360)
+            angle -= 360;
+
+        if (Math.abs(angle) < 1)
+        {
+            points.x0 = min_x;
+            points.y0 = min_y;
+            points.x1 = max_x;
+            points.y1 = min_y;
+
+            return points;
+        }
+        else if (Math.abs(angle - 90) < 1)
+        {
+            points.x0 = min_x;
+            points.y0 = min_y;
+            points.x1 = min_x;
+            points.y1 = max_y;
+
+            return points;
+        }
+        else if (Math.abs(angle - 180) < 1)
+        {
+            points.x0 = max_x;
+            points.y0 = min_y;
+            points.x1 = min_x;
+            points.y1 = min_y;
+
+            return points;
+        }
+        else if (Math.abs(angle - 270) < 1)
+        {
+            points.x0 = min_x;
+            points.y0 = max_y;
+            points.x1 = min_x;
+            points.y1 = min_y;
+
+            return points;
+        }
+
+        var grad_a = deg2rad(angle);
+        if (!scale)
+        {
+            if (angle > 0 && angle < 90)
+            {
+                var p = this.getNormalPoint(min_x, min_y, grad_a, max_x, max_y);
+
+                points.x0 = min_x;
+                points.y0 = min_y;
+                points.x1 = p.X;
+                points.y1 = p.Y;
+
+                return points;
+            }
+            if (angle > 90 && angle < 180)
+            {
+                var p = this.getNormalPoint(max_x, min_y, grad_a, min_x, max_y);
+
+                points.x0 = max_x;
+                points.y0 = min_y;
+                points.x1 = p.X;
+                points.y1 = p.Y;
+
+                return points;
+            }
+            if (angle > 180 && angle < 270)
+            {
+                var p = this.getNormalPoint(max_x, max_y, grad_a, min_x, min_y);
+
+                points.x0 = max_x;
+                points.y0 = max_y;
+                points.x1 = p.X;
+                points.y1 = p.Y;
+
+                return points;
+            }
+            if (angle > 270 && angle < 360)
+            {
+                var p = this.getNormalPoint(min_x, max_y, grad_a, max_x, min_y);
+
+                points.x0 = min_x;
+                points.y0 = max_y;
+                points.x1 = p.X;
+                points.y1 = p.Y;
+
+                return points;
+            }
+            // никогда сюда не зайдем
+            return points;
+        }
+
+        // scale == true
+        var _grad_45 = (Math.PI / 2) - Math.atan2(max_y - min_y, max_x - min_x);
+        var _grad_90_45 = (Math.PI / 2) - _grad_45;
+        if (angle > 0 && angle < 90)
+        {
+            if (angle <= 45)
+            {
+                grad_a = (_grad_45 * angle / 45);
+            }
+            else
+            {
+                grad_a = _grad_45 + _grad_90_45 * (angle - 45) / 45;
+            }
+
+            var p = this.getNormalPoint(min_x, min_y, grad_a, max_x, max_y);
+
+            points.x0 = min_x;
+            points.y0 = min_y;
+            points.x1 = p.X;
+            points.y1 = p.Y;
+
+            return points;
+        }
+        if (angle > 90 && angle < 180)
+        {
+            if (angle <= 135)
+            {
+                grad_a = Math.PI / 2 + _grad_90_45 * (angle - 90) / 45;
+            }
+            else
+            {
+                grad_a = Math.PI - _grad_45 * (angle - 135) / 45;
+            }
+
+            var p = this.getNormalPoint(max_x, min_y, grad_a, min_x, max_y);
+
+            points.x0 = max_x;
+            points.y0 = min_y;
+            points.x1 = p.X;
+            points.y1 = p.Y;
+
+            return points;
+        }
+        if (angle > 180 && angle < 270)
+        {
+            if (angle <= 225)
+            {
+                grad_a = Math.PI + _grad_45 * (angle - 180) / 45;
+            }
+            else
+            {
+                grad_a = 3 * Math.PI / 2 - _grad_90_45 * (angle - 225) / 45;
+            }
+
+            var p = this.getNormalPoint(max_x, max_y, grad_a, min_x, min_y);
+
+            points.x0 = max_x;
+            points.y0 = max_y;
+            points.x1 = p.X;
+            points.y1 = p.Y;
+
+            return points;
+        }
+        if (angle > 270 && angle < 360)
+        {
+            if (angle <= 315)
+            {
+                grad_a = 3 * Math.PI / 2 + _grad_90_45 * (angle - 270) / 45;
+            }
+            else
+            {
+                grad_a = 2 * Math.PI - _grad_45 * (angle - 315) / 45;
+            }
+
+            var p = this.getNormalPoint(min_x, max_y, grad_a, max_x, min_y);
+
+            points.x0 = min_x;
+            points.y0 = max_y;
+            points.x1 = p.X;
+            points.y1 = p.Y;
+
+            return points;
+        }
+        // никогда сюда не зайдем
+        return points;
     }
 };
 
