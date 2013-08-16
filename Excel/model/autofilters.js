@@ -1957,7 +1957,7 @@
 					return;
 				var n = 0;
 				//проверка на спец. символы
-				this._isSpecValueCustomFilter(conFilter);
+				//this._isSpecValueCustomFilter(conFilter);
 				for(var i = startRange.first.row; i < endRange.first.row; i++)
 				{
 					var cell = ws.model.getCell(new CellAddress(i,startRange.first.col - 1,0));
@@ -2607,7 +2607,8 @@
 				valLog[1] = conFilter.valFilter2;
                 var trueStr;
 				//пока в случае появления спецсимволов, игнорируем их
-				if(valLog[0] && typeof valLog[0] == "string" && (valLog[0].split("?").length > 1 || valLog[0].split("*").length > 1) && (conFilter.filterDisableSpecSymbols1 || this._getPositionSpecSymbols(valLog[0]) != null))
+				var turnOnAllSym = true;
+				if(!turnOnAllSym && valLog[0] && typeof valLog[0] == "string" && (valLog[0].split("?").length > 1 || valLog[0].split("*").length > 1) && (conFilter.filterDisableSpecSymbols1 || this._getPositionSpecSymbols(valLog[0]) != null))
 				{
 					trueStr = "";
 					for(var i = 0; i < valLog[0].length; i++)
@@ -2617,7 +2618,7 @@
 					}
 					valLog[0] = trueStr;
 				}
-				if(typeof valLog[1] == "string" && valLog[1] && (valLog[1].split("?").length > 1 || valLog[1].split("*").length > 1) && (conFilter.filterDisableSpecSymbols1 || this._getPositionSpecSymbols(valLog[1]) != null))
+				if(!turnOnAllSym && typeof valLog[1] == "string" && valLog[1] && (valLog[1].split("?").length > 1 || valLog[1].split("*").length > 1) && (conFilter.filterDisableSpecSymbols1 || this._getPositionSpecSymbols(valLog[1]) != null))
 				{
 					trueStr = "";
 					for(var i = 0; i < valLog[1].length; i++)
@@ -5396,6 +5397,7 @@
 					var isStartWithVal = false;
 					var isConsist = false;
 					var isEndWith = false;
+					var endBlockEqual = false;
 					var endSpecSymbol;
 					result = false;
 					if(type == 1)
@@ -5426,6 +5428,8 @@
 									else
 									{
 										positionPrevBlock = isConsistBlock + splitFilterVal[i].length;
+										if(i == (splitFilterVal.length - 1))
+											endBlockEqual = true;
 									}
 								}
 								else if(splitFilterVal[i].length != 1)
@@ -5433,15 +5437,41 @@
 									firstEnter = true;
 									endSpecSymbol = false;
 									var splitQuestion = splitFilterVal[i].split('?');
+									var startText = 0;
+									if(i == 0)
+									{
+										for(var k = 0; k < splitQuestion.length; k++)
+										{
+											if(splitQuestion[k] != '')
+											{
+												startText = k;
+												break;
+											}
+										}
+									}
+									var tempPosition;
 									for(var k = 0; k < splitQuestion.length; k++)
 									{
-										if(k != 0 && k != splitQuestion.length - 1)
+										/*if(((k != 0 && k != splitQuestion.length - 1) || (k != splitQuestion.length - 1)) && splitQuestion[k] != '' )
+										{
 											positionPrevBlock++;
-										var tempPosition = val.indexOf(splitFilterVal[i],positionPrevBlock)
-										if(tempPosition == 0)
+											if(splitQuestion[k] == '')
+												continue;
+										}*/
+										//позиция начала блока в val
+										if(splitQuestion[k] == '')
+											tempPosition++;
+										else
+											tempPosition = val.indexOf(splitQuestion[k],positionPrevBlock);
+										if(tempPosition == startText)
 											isStartWithVal = true;
 										if(tempPosition != -1)
-											positionPrevBlock += splitFilterVal[i].length;
+										{
+											positionPrevBlock += splitQuestion[k].length;
+											tempPosition += splitQuestion[k].length;
+											if(i == (splitFilterVal.length - 1) && k == (splitQuestion.length - 1) && (tempPosition == (val.length)))
+												endBlockEqual = true;
+										}
 										else
 										{
 											isConsist = false;
@@ -5461,7 +5491,7 @@
 						}
 						
 						
-						if(isConsist && (positionPrevBlock == val.length || endSpecSymbol))
+						if(isConsist && (positionPrevBlock == val.length || endSpecSymbol || endBlockEqual))
 							isEndWith = true;
 						if(isStartWithVal && isConsist)
 							isStartWithVal = true;
@@ -5469,6 +5499,14 @@
 							isStartWithVal = false;
 						if(isConsist && isStartWithVal && isEndWith)
 							isEqual = true;
+						
+						if(val.length == 1)
+						{
+							isEndWith = true;
+							isStartWithVal = true;
+							isEqual = true;
+							isConsist = true;
+						}
 					}
 					switch (filter)
 					{
@@ -5480,25 +5518,29 @@
 						}
 						case 2://больше
 						{
-							if(val > filterVal && !isEqual)
+							if(type == 1 && !isEqual)
+								result = true;
+							else if(val > filterVal && !isEqual)
 								result = true;
 							break;
 						}
 						case 3://больше или равно
 						{
-							if(val > filterVal || isEqual)
+							if(val > filterVal || isEqual || type == 1)
 								result = true;
 							break;
 						}
 						case 4://меньше
 						{
-							if(val < filterVal && !isEqual)
+							if(type == 1 && !isEqual)
+								result = false;
+							else if(val < filterVal && !isEqual)
 								result = true;
 							break;
 						}
 						case 5://меньше или равно
 						{
-							if(val < filterVal || isEqual)
+							if((val < filterVal && type != 1) || isEqual)
 								result = true;
 							break;
 						}
