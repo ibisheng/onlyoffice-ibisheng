@@ -120,7 +120,7 @@ CTableId.prototype =
 
                     case CLASS_TYPE_IMAGE:
                     {
-                        Class = new CImage();
+                        Class = new CImageShape();
                         break;
                     }
 

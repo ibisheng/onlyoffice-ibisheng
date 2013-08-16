@@ -34,7 +34,7 @@ function isRealNumber(number)
     return number === number && typeof number === "number";
 }
 
-function CImage(drawingBase, drawingObjects)
+function CImageShape(drawingBase, drawingObjects)
 {
     this.drawingBase = drawingBase;
     this.drawingObjects = drawingObjects;
@@ -74,7 +74,7 @@ function CImage(drawingBase, drawingObjects)
     g_oTableId.Add(this, this.Id);
 }
 
-CImage.prototype =
+CImageShape.prototype =
 {
     getObjectType: function()
     {

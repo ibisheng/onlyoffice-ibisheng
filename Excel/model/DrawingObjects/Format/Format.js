@@ -1791,7 +1791,7 @@ CGs.prototype =
     }
 };
 
-function CGradFill()
+/*function CGradFill()
 {
     this.type = FILL_TYPE_GRAD;
     // пока просто front color
@@ -1867,6 +1867,129 @@ CGradFill.prototype =
         {
             duplicate.colors[i] = this.colors[i].createDuplicate();
         }
+
+        return duplicate;
+    },
+
+    compare : function(fill)
+    {
+        if(fill == null || fill.type !== FILL_TYPE_GRAD)
+        {
+            return null;
+        }
+        var _ret  = new CGradFill();
+        return _ret;
+    }
+};       */
+
+
+function GradLin()
+{
+    this.angle = 5400000;
+    this.scale = true;
+}
+GradLin.prototype =
+{
+    IsIdentical : function(lin)
+    {
+        if (this.angle != lin.angle)
+            return false;
+        if (this.scale != lin.scale)
+            return false;
+
+        return true;
+    },
+
+    createDuplicate : function()
+    {
+        var duplicate = new GradLin();
+        duplicate.angle = this.angle;
+        duplicate.scale = this.scale;
+        return duplicate;
+    },
+
+    compare : function(lin)
+    {
+        return null;
+    }
+};
+
+function GradPath()
+{
+    this.path = 0;
+    this.rect = null;
+}
+GradPath.prototype =
+{
+    IsIdentical : function(path)
+    {
+        if (this.path != path.path)
+            return false;
+        return true;
+    },
+
+    createDuplicate : function()
+    {
+        var duplicate = new GradPath();
+        duplicate.path = this.path;
+        return duplicate;
+    },
+
+    compare : function(path)
+    {
+        return null;
+    }
+};
+
+function CGradFill()
+{
+    this.type = FILL_TYPE_GRAD;
+    // пока просто front color
+    this.colors = new Array();
+
+    this.lin = null;
+    this.path = null;
+}
+
+CGradFill.prototype =
+{
+    IsIdentical : function(fill)
+    {
+        if(fill == null)
+        {
+            return false;
+        }
+        if(fill.type !=  FILL_TYPE_GRAD)
+        {
+            return false;
+        }
+        if(fill.colors.length!= this.colors.length)
+        {
+            return false;
+        }
+        for(var i = 0; i < this.colors.length; ++i)
+        {
+            if(!this.colors[i].IsIdentical(fill.colors[i]))
+            {
+                return false;
+            }
+        }
+        return true;
+    },
+
+    createDuplicate : function()
+    {
+        var duplicate = new CGradFill();
+        for(var i=0; i<this.colors.length; ++i)
+        {
+            duplicate.colors[i] = this.colors[i].createDuplicate();
+        }
+
+        if (this.lin)
+            duplicate.lin = this.lin.createDuplicate();
+
+        if (this.path)
+            duplicate.path = this.path.createDuplicate();
 
         return duplicate;
     },

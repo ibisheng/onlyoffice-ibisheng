@@ -2534,7 +2534,7 @@ function DrawingObjects() {
 					var h = pxToMm(drawingObject.getHeightFromTo());
 					
 					// CImage
-					drawingObject.graphicObject = new CImage(drawingObject, _this);
+					drawingObject.graphicObject = new CImageShape(drawingObject, _this);
 					drawingObject.graphicObject.initDefault( x, y, w, h, image.src );
 					drawingObject.setGraphicObjectCoords();
 					drawingObject.graphicObject.draw(shapeCtx);
@@ -2963,7 +2963,7 @@ function DrawingObjects() {
 					var h = pxToMm(obj.getHeightFromTo());
 					
 					// CImage
-					obj.graphicObject = new CImage(obj, _this);
+					obj.graphicObject = new CImageShape(obj, _this);
 					obj.graphicObject.initDefault( x, y, w, h, _image.src );
 					obj.graphicObject.select(_this.controller);
 					aObjects.push(obj);
