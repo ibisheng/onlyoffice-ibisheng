@@ -880,11 +880,27 @@ CShape.prototype =
     recalculate: function()
     {
         if(this.recalcInfo.recalculateTransform)
+		{
             this.recalculateTransform();
+			this.recalcInfo.recalculateTransform = false;
+		}
         if(this.recalcInfo.recalculateBrush)
+		{
             this.recalculateBrush();
-        if(this.recalcInfo.recalculatePen)
+			this.recalcInfo.recalculateBrush = false;
+		}
+		if(this.recalcInfo.recalculatePen)
+		{
             this.recalculatePen();
+			this.recalcInfo.recalculatePen = false;
+		}
+		if(this.recalInfo.recalculateGeometry)
+		{
+			if(this.spPr.geometry)
+			{
+				this.spPr.geometry.Recalculate(this.extX, this.extY);
+			}
+		}
     },
 
 	calculateFill: function()

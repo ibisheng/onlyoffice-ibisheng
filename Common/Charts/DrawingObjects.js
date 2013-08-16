@@ -2178,6 +2178,16 @@ function DrawingObjects() {
 			return _t.graphicObject != null;
 		}
 		
+		_t.isLocked = function(callback) {
+			_this.objectLocker.reset();
+			if ( _t.graphicObject ) {
+				_this.objectLocker.addObjectId(_t.graphicObject.Id);
+				_this.objectLocker.checkObjects(callback);
+			}
+			else
+				callback(true);
+		}
+		
 		_t.getWorkbook = function() {
 			return (_t.worksheet ? _t.worksheet.model.workbook : null);
 		}
@@ -2499,14 +2509,7 @@ function DrawingObjects() {
 				
 				drawingObject.graphicObject.drawingBase = drawingObject;
                 drawingObject.graphicObject.drawingObjects = _this;
-				
-				History.TurnOff();
-				var metrics = drawingObject.getGraphicObjectMetrics();
-				drawingObject.graphicObject.setPosition( metrics.x, metrics.y );
-				drawingObject.graphicObject.setExtents( metrics.extX, metrics.extY );
-				drawingObject.graphicObject.recalculateTransform();
-				drawingObject.graphicObject.calculateTransformTextMatrix();
-				History.TurnOn();
+				drawingObject.graphicObject.recalculate();
 				
 				aObjects.push( drawingObject );
 			}
@@ -3169,318 +3172,325 @@ function DrawingObjects() {
 		var metrics = null;
 
 		for (var i = 0; i < aObjects.length; i++) {
+			
 			var obj = aObjects[i];
-			var bbox = obj.isChart() ? obj.graphicObject.chart.range.intervalObject.getBBox0() : null;
+			obj.isLocked(callbackFunc);
+			
+			function callbackFunc(result) {
+				if ( result ) {
+					var bbox = obj.isChart() ? obj.graphicObject.chart.range.intervalObject.getBBox0() : null;
 
-			if ( obj.isChart() || obj.isImage() || obj.isShape() ) {
+					if ( obj.isChart() || obj.isImage() || obj.isShape() ) {
 
-				metrics = { from: {}, to: {} };
-				metrics.from.col = obj.from.col; metrics.to.col = obj.to.col;
-				metrics.from.colOff = obj.from.colOff; metrics.to.colOff = obj.to.colOff;
-				metrics.from.row = obj.from.row; metrics.to.row = obj.to.row;
-				metrics.from.rowOff = obj.from.rowOff; metrics.to.rowOff = obj.to.rowOff;
-				
-				if (bInsert) {		// Insert
-					switch (operType) {
-						case c_oAscInsertOptions.InsertColumns: 
-							{
-								var count = updateRange.c2 - updateRange.c1 + 1;
+						metrics = { from: {}, to: {} };
+						metrics.from.col = obj.from.col; metrics.to.col = obj.to.col;
+						metrics.from.colOff = obj.from.colOff; metrics.to.colOff = obj.to.colOff;
+						metrics.from.row = obj.from.row; metrics.to.row = obj.to.row;
+						metrics.from.rowOff = obj.from.rowOff; metrics.to.rowOff = obj.to.rowOff;
+						
+						if (bInsert) {		// Insert
+							switch (operType) {
+								case c_oAscInsertOptions.InsertColumns: 
+									{
+										var count = updateRange.c2 - updateRange.c1 + 1;
 
-								// Position
-								if (updateRange.c1 <= obj.from.col) {
-									metrics.from.col += count;
-									metrics.to.col += count;
-								}
-								else if ((updateRange.c1 > obj.from.col) && (updateRange.c1 <= obj.to.col)) {
-									metrics.to.col += count;
-								}
-								else
-									metrics = null;
-
-								// Range
-								if (obj.isChart()) {
-									if (updateRange.c1 <= bbox.c1)
-										changedRange = new Range(worksheet.model, bbox.r1 , bbox.c1 + count , bbox.r2 , bbox.c2 + count );
-
-									else if (updateRange.c1 <= bbox.c2)
-										changedRange = new Range(worksheet.model, bbox.r1 , bbox.c1 , bbox.r2 , bbox.c2 + count );
-								}
-							}
-							break;
-						case c_oAscInsertOptions.InsertRows: 
-							{
-
-								// Position
-								var count = updateRange.r2 - updateRange.r1 + 1;
-
-								if (updateRange.r1 <= obj.from.row) {
-									metrics.from.row += count;
-									metrics.to.row += count;
-								}
-								else if ((updateRange.r1 > obj.from.row) && (updateRange.r1 <= obj.to.row)) {
-									metrics.to.row += count;
-								}
-								else
-									metrics = null;
-
-								// Range
-								if (obj.isChart()) {
-									if (updateRange.r1 <= bbox.r1)
-										changedRange = new Range(worksheet.model, bbox.r1 + count , bbox.c1 , bbox.r2 + count , bbox.c2 );
-
-									else if (updateRange.r1 <= bbox.r2)
-										changedRange = new Range(worksheet.model, bbox.r1 , bbox.c1 , bbox.r2 + count , bbox.c2 );
-								}
-							}
-							break;
-					}
-				}
-				else {				// Delete
-					switch (operType) {
-						case c_oAscDeleteOptions.DeleteColumns: 
-							{
-
-								// Position
-								var count = updateRange.c2 - updateRange.c1 + 1;
-
-								if (updateRange.c1 <= obj.from.col) {
-
-									// outside
-									if (updateRange.c2 < obj.from.col) {
-										metrics.from.col -= count;
-										metrics.to.col -= count;
-									}
-									// inside
-									else {
-										metrics.from.col = updateRange.c1;
-										metrics.from.colOff = 0;
-
-										var offset = 0;
-										if (obj.to.col - updateRange.c2 - 1 > 0)
-											offset = obj.to.col - updateRange.c2 - 1;
-										else {
-											offset = 1;
-											metrics.to.colOff = 0;
+										// Position
+										if (updateRange.c1 <= obj.from.col) {
+											metrics.from.col += count;
+											metrics.to.col += count;
 										}
-										metrics.to.col = metrics.from.col + offset;
+										else if ((updateRange.c1 > obj.from.col) && (updateRange.c1 <= obj.to.col)) {
+											metrics.to.col += count;
+										}
+										else
+											metrics = null;
+
+										// Range
+										if (obj.isChart()) {
+											if (updateRange.c1 <= bbox.c1)
+												changedRange = new Range(worksheet.model, bbox.r1 , bbox.c1 + count , bbox.r2 , bbox.c2 + count );
+
+											else if (updateRange.c1 <= bbox.c2)
+												changedRange = new Range(worksheet.model, bbox.r1 , bbox.c1 , bbox.r2 , bbox.c2 + count );
+										}
 									}
-								}
+									break;
+								case c_oAscInsertOptions.InsertRows: 
+									{
 
-								else if ((updateRange.c1 > obj.from.col) && (updateRange.c1 <= obj.to.col)) {
+										// Position
+										var count = updateRange.r2 - updateRange.r1 + 1;
 
-									// outside
-									if (updateRange.c2 >= obj.to.col) {
-										metrics.to.col = updateRange.c1;
-										metrics.to.colOff = 0;
+										if (updateRange.r1 <= obj.from.row) {
+											metrics.from.row += count;
+											metrics.to.row += count;
+										}
+										else if ((updateRange.r1 > obj.from.row) && (updateRange.r1 <= obj.to.row)) {
+											metrics.to.row += count;
+										}
+										else
+											metrics = null;
+
+										// Range
+										if (obj.isChart()) {
+											if (updateRange.r1 <= bbox.r1)
+												changedRange = new Range(worksheet.model, bbox.r1 + count , bbox.c1 , bbox.r2 + count , bbox.c2 );
+
+											else if (updateRange.r1 <= bbox.r2)
+												changedRange = new Range(worksheet.model, bbox.r1 , bbox.c1 , bbox.r2 + count , bbox.c2 );
+										}
 									}
-									else
-										metrics.to.col -= count;
-								}
-								else
-									metrics = null;
+									break;
+							}
+						}
+						else {				// Delete
+							switch (operType) {
+								case c_oAscDeleteOptions.DeleteColumns: 
+									{
 
-								// Range
-								if (obj.isChart()) {
-									var count = updateRange.c2 - updateRange.c1 + 1;
+										// Position
+										var count = updateRange.c2 - updateRange.c1 + 1;
 
-									if (updateRange.c1 < bbox.c1) {
-
-										if (updateRange.c2 < bbox.c1)
-											changedRange = new Range(worksheet.model, bbox.r1, bbox.c1 - count , bbox.r2 , bbox.c2 - count );
-										else {
+										if (updateRange.c1 <= obj.from.col) {
 
 											// outside
-											if (updateRange.c2 > bbox.c2)
-												changedRange = new Range(worksheet.model, bbox.r1 , updateRange.c1 , bbox.r2 , updateRange.c1);
-
+											if (updateRange.c2 < obj.from.col) {
+												metrics.from.col -= count;
+												metrics.to.col -= count;
+											}
 											// inside
 											else {
-												var offset = bbox.c2 - updateRange.c2;
-												changedRange = new Range(worksheet.model, bbox.r1 , updateRange.c1 , bbox.r2 , updateRange.c1 + offset - 1);
+												metrics.from.col = updateRange.c1;
+												metrics.from.colOff = 0;
+
+												var offset = 0;
+												if (obj.to.col - updateRange.c2 - 1 > 0)
+													offset = obj.to.col - updateRange.c2 - 1;
+												else {
+													offset = 1;
+													metrics.to.colOff = 0;
+												}
+												metrics.to.col = metrics.from.col + offset;
+											}
+										}
+
+										else if ((updateRange.c1 > obj.from.col) && (updateRange.c1 <= obj.to.col)) {
+
+											// outside
+											if (updateRange.c2 >= obj.to.col) {
+												metrics.to.col = updateRange.c1;
+												metrics.to.colOff = 0;
+											}
+											else
+												metrics.to.col -= count;
+										}
+										else
+											metrics = null;
+
+										// Range
+										if (obj.isChart()) {
+											var count = updateRange.c2 - updateRange.c1 + 1;
+
+											if (updateRange.c1 < bbox.c1) {
+
+												if (updateRange.c2 < bbox.c1)
+													changedRange = new Range(worksheet.model, bbox.r1, bbox.c1 - count , bbox.r2 , bbox.c2 - count );
+												else {
+
+													// outside
+													if (updateRange.c2 > bbox.c2)
+														changedRange = new Range(worksheet.model, bbox.r1 , updateRange.c1 , bbox.r2 , updateRange.c1);
+
+													// inside
+													else {
+														var offset = bbox.c2 - updateRange.c2;
+														changedRange = new Range(worksheet.model, bbox.r1 , updateRange.c1 , bbox.r2 , updateRange.c1 + offset - 1);
+													}
+												}
+											}
+
+											else if ((updateRange.c1 >= bbox.c1) && (updateRange.c1 <= bbox.c2)) {
+
+												// outside
+												if (updateRange.c2 > bbox.c2) {
+													var offset = (bbox.c1 + 1 > updateRange.c1) ? 1 : 0;
+													changedRange = new Range(worksheet.model, bbox.r1 , bbox.c1 , bbox.r2 , updateRange.c1 + offset - 1);
+												}
+
+												// inside
+												else {
+													var offset = bbox.c2 + 1 - bbox.c1 - count;
+													if (offset <= 0)
+														offset = 1;
+													changedRange = new Range(worksheet.model, bbox.r1 , bbox.c1 , bbox.r2 , bbox.c1 + offset - 1);
+												}
 											}
 										}
 									}
+									break;
 
-									else if ((updateRange.c1 >= bbox.c1) && (updateRange.c1 <= bbox.c2)) {
+								case c_oAscDeleteOptions.DeleteRows: 
+									{
 
-										// outside
-										if (updateRange.c2 > bbox.c2) {
-											var offset = (bbox.c1 + 1 > updateRange.c1) ? 1 : 0;
-											changedRange = new Range(worksheet.model, bbox.r1 , bbox.c1 , bbox.r2 , updateRange.c1 + offset - 1);
-										}
+										// Position
+										var count = updateRange.r2 - updateRange.r1 + 1;
 
-										// inside
-										else {
-											var offset = bbox.c2 + 1 - bbox.c1 - count;
-											if (offset <= 0)
-												offset = 1;
-											changedRange = new Range(worksheet.model, bbox.r1 , bbox.c1 , bbox.r2 , bbox.c1 + offset - 1);
-										}
-									}
-								}
-							}
-							break;
-
-						case c_oAscDeleteOptions.DeleteRows: 
-							{
-
-								// Position
-								var count = updateRange.r2 - updateRange.r1 + 1;
-
-								if (updateRange.r1 <= obj.from.row) {
-
-									// outside
-									if (updateRange.r2 < obj.from.row) {
-										metrics.from.row -= count;
-										metrics.to.row -= count;
-									}
-									// inside
-									else {
-										metrics.from.row = updateRange.r1;
-										metrics.from.colOff = 0;
-
-										var offset = 0;
-										if (obj.to.row - updateRange.r2 - 1 > 0)
-											offset = obj.to.row - updateRange.r2 - 1;
-										else {
-											offset = 1;
-											metrics.to.colOff = 0;
-										}
-										metrics.to.row = metrics.from.row + offset;
-									}
-								}
-
-								else if ((updateRange.r1 > obj.from.row) && (updateRange.r1 <= obj.to.row)) {
-
-									// outside
-									if (updateRange.r2 >= obj.to.row) {
-										metrics.to.row = updateRange.r1;
-										metrics.to.colOff = 0;
-									}
-									else
-										metrics.to.row -= count;
-								}
-								else
-									metrics = null;
-
-								// range
-								if (obj.isChart()) {
-									var count = updateRange.r2 - updateRange.r1 + 1;
-
-									if (updateRange.r1 < bbox.r1) {
-
-										if (updateRange.r2 < bbox.r1)
-											changedRange = new Range(worksheet.model, bbox.r1 - count, bbox.c1 , bbox.r2 - count , bbox.c2 );
-										else {
+										if (updateRange.r1 <= obj.from.row) {
 
 											// outside
-											if (updateRange.r2 >= bbox.r2)
-												changedRange = new Range(worksheet.model, updateRange.r1 , bbox.c1 , updateRange.r1 , bbox.c2);
-
+											if (updateRange.r2 < obj.from.row) {
+												metrics.from.row -= count;
+												metrics.to.row -= count;
+											}
 											// inside
 											else {
-												var offset = bbox.r1 + 1 - updateRange.r2;
-												changedRange = new Range(worksheet.model, updateRange.r1 , bbox.c1 , updateRange.r1 + offset, bbox.c2);
+												metrics.from.row = updateRange.r1;
+												metrics.from.colOff = 0;
+
+												var offset = 0;
+												if (obj.to.row - updateRange.r2 - 1 > 0)
+													offset = obj.to.row - updateRange.r2 - 1;
+												else {
+													offset = 1;
+													metrics.to.colOff = 0;
+												}
+												metrics.to.row = metrics.from.row + offset;
+											}
+										}
+
+										else if ((updateRange.r1 > obj.from.row) && (updateRange.r1 <= obj.to.row)) {
+
+											// outside
+											if (updateRange.r2 >= obj.to.row) {
+												metrics.to.row = updateRange.r1;
+												metrics.to.colOff = 0;
+											}
+											else
+												metrics.to.row -= count;
+										}
+										else
+											metrics = null;
+
+										// range
+										if (obj.isChart()) {
+											var count = updateRange.r2 - updateRange.r1 + 1;
+
+											if (updateRange.r1 < bbox.r1) {
+
+												if (updateRange.r2 < bbox.r1)
+													changedRange = new Range(worksheet.model, bbox.r1 - count, bbox.c1 , bbox.r2 - count , bbox.c2 );
+												else {
+
+													// outside
+													if (updateRange.r2 >= bbox.r2)
+														changedRange = new Range(worksheet.model, updateRange.r1 , bbox.c1 , updateRange.r1 , bbox.c2);
+
+													// inside
+													else {
+														var offset = bbox.r1 + 1 - updateRange.r2;
+														changedRange = new Range(worksheet.model, updateRange.r1 , bbox.c1 , updateRange.r1 + offset, bbox.c2);
+													}
+												}
+											}
+
+											else if ((updateRange.r1 >= bbox.r1) && (updateRange.r1 <= bbox.r2)) {
+
+												// outside
+												if (updateRange.r2 > bbox.r2) {
+													var offset = (bbox.r1 + 1 > updateRange.r1) ? 1 : 0;
+													changedRange = new Range(worksheet.model, bbox.r1 , bbox.c1 , updateRange.r1 + offset - 1, bbox.c2 );
+												}
+
+												// inside
+												else {
+													var offset = bbox.r2 + 1 - bbox.r1 - count;
+													if (offset <= 0) offset = 1;
+													changedRange = new Range(worksheet.model, bbox.r1 , bbox.c1 , bbox.r1 + offset - 1, bbox.c2 );
+												}
 											}
 										}
 									}
-
-									else if ((updateRange.r1 >= bbox.r1) && (updateRange.r1 <= bbox.r2)) {
-
-										// outside
-										if (updateRange.r2 > bbox.r2) {
-											var offset = (bbox.r1 + 1 > updateRange.r1) ? 1 : 0;
-											changedRange = new Range(worksheet.model, bbox.r1 , bbox.c1 , updateRange.r1 + offset - 1, bbox.c2 );
-										}
-
-										// inside
-										else {
-											var offset = bbox.r2 + 1 - bbox.r1 - count;
-											if (offset <= 0) offset = 1;
-											changedRange = new Range(worksheet.model, bbox.r1 , bbox.c1 , bbox.r1 + offset - 1, bbox.c2 );
-										}
-									}
-								}
+									break;
 							}
-							break;
-					}
-				}
+						}
 
-				// Normalize position
-				if (metrics) {
-					if (metrics.from.col < 0) {
-						metrics.from.col = 0;
-						metrics.from.colOff = 0;
-					}
+						// Normalize position
+						if (metrics) {
+							if (metrics.from.col < 0) {
+								metrics.from.col = 0;
+								metrics.from.colOff = 0;
+							}
 
-					if (metrics.to.col <= 0) {
-						metrics.to.col = 1;
-						metrics.to.colOff = 0;
-					}
+							if (metrics.to.col <= 0) {
+								metrics.to.col = 1;
+								metrics.to.colOff = 0;
+							}
 
-					if (metrics.from.row < 0) {
-						metrics.from.row = 0;
-						metrics.from.rowOff = 0;
-					}
+							if (metrics.from.row < 0) {
+								metrics.from.row = 0;
+								metrics.from.rowOff = 0;
+							}
 
-					if (metrics.to.row <= 0) {
-						metrics.to.row = 1;
-						metrics.to.rowOff = 0;
-					}
+							if (metrics.to.row <= 0) {
+								metrics.to.row = 1;
+								metrics.to.rowOff = 0;
+							}
 
-					if (metrics.from.col == metrics.to.col) {
-						metrics.to.col++;
-						metrics.to.colOff = 0;
-					}
-					if (metrics.from.row == metrics.to.row) {
-						metrics.to.row++;
-						metrics.to.rowOff = 0;
-					}
-				}
+							if (metrics.from.col == metrics.to.col) {
+								metrics.to.col++;
+								metrics.to.colOff = 0;
+							}
+							if (metrics.from.row == metrics.to.row) {
+								metrics.to.row++;
+								metrics.to.rowOff = 0;
+							}
+						}
 
-				// Normalize range
-				if (changedRange) {
-					var bbox = changedRange.getBBox0();
+						// Normalize range
+						if (changedRange) {
+							var bbox = changedRange.getBBox0();
 
-					var tmp;
-					if (bbox.c1 > bbox.c2) {
-						tmp = bbox.c1;
-						bbox.c1 = bbox.c2;
-						bbox.c2 = tmp;
-					}
-					if (bbox.r1 > bbox.r2) {
-						tmp = bbox.r1;
-						bbox.r1 = bbox.r2;
-						bbox.r2 = tmp;
-					}
-					changedRange = new Range(worksheet.model, bbox.r1, bbox.c1, bbox.r2, bbox.c2);
-				}
+							var tmp;
+							if (bbox.c1 > bbox.c2) {
+								tmp = bbox.c1;
+								bbox.c1 = bbox.c2;
+								bbox.c2 = tmp;
+							}
+							if (bbox.r1 > bbox.r2) {
+								tmp = bbox.r1;
+								bbox.r1 = bbox.r2;
+								bbox.r2 = tmp;
+							}
+							changedRange = new Range(worksheet.model, bbox.r1, bbox.c1, bbox.r2, bbox.c2);
+						}
 
-				if ( changedRange || metrics ) {
-				
-					if ( obj.isChart() && changedRange ) {
-						obj.graphicObject.chart.range.intervalObject = changedRange;
-						_this.calcChartInterval(obj.graphicObject.chart);
-						obj.graphicObject.chart.rebuildSeries();
-						obj.graphicObject.recalculate();
-					}
-					if (metrics) {
-						obj.from.col = metrics.from.col;
-						obj.from.colOff = metrics.from.colOff;
-						obj.from.row = metrics.from.row;
-						obj.from.rowOff = metrics.from.rowOff;
+						if ( changedRange || metrics ) {
+						
+							if ( obj.isChart() && changedRange ) {
+								obj.graphicObject.chart.range.intervalObject = changedRange;
+								_this.calcChartInterval(obj.graphicObject.chart);
+								obj.graphicObject.chart.rebuildSeries();
+								obj.graphicObject.recalculate();
+							}
+							if (metrics) {
+								obj.from.col = metrics.from.col;
+								obj.from.colOff = metrics.from.colOff;
+								obj.from.row = metrics.from.row;
+								obj.from.rowOff = metrics.from.rowOff;
 
-						obj.to.col = metrics.to.col;
-						obj.to.colOff = metrics.to.colOff;
-						obj.to.row = metrics.to.row;
-						obj.to.rowOff = metrics.to.rowOff;
+								obj.to.col = metrics.to.col;
+								obj.to.colOff = metrics.to.colOff;
+								obj.to.row = metrics.to.row;
+								obj.to.rowOff = metrics.to.rowOff;
+							}
+							
+							// Update graphic object
+							obj.graphicObject.setPosition( pxToMm(obj.getRealLeftOffset(true)), pxToMm(obj.getRealTopOffset(true)) );
+							obj.graphicObject.recalculateTransform();
+							obj.graphicObject.calculateTransformTextMatrix();
+							_this.showDrawingObjects(true);
+						}
 					}
-					
-					// Update graphic object
-					obj.graphicObject.setPosition( pxToMm(obj.getRealLeftOffset(true)), pxToMm(obj.getRealTopOffset(true)) );
-					obj.graphicObject.recalculateTransform();
-					obj.graphicObject.calculateTransformTextMatrix();
-					_this.showDrawingObjects(true);
 				}
 			}
 		}
