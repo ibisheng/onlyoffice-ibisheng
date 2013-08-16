@@ -602,7 +602,13 @@ CShapeDrawer.prototype =
         if (this.bIsNoStrokeAttack && this.bIsNoFillAttack)
             return;
 
-        if (this.bIsTexture && this.Graphics.RENDERER_PDF_FLAG)
+        var bIsPatt = false;
+        if (this.UniFill != null && this.UniFill.fill != null && this.UniFill.fill.type == FILL_TYPE_PATT)
+        {
+            bIsPatt = true;
+        }
+
+        if (this.Graphics.RENDERER_PDF_FLAG && (this.bIsTexture || bIsPatt))
         {
             this.Graphics.put_TextureBoundsEnabled(true);
             this.Graphics.put_TextureBounds(this.min_x, this.min_y, this.max_x - this.min_x, this.max_y - this.min_y);
@@ -625,7 +631,7 @@ CShapeDrawer.prototype =
         }
         this.Graphics.ArrayPoints = null;
 
-        if (this.bIsTexture && this.Graphics.RENDERER_PDF_FLAG)
+        if (this.Graphics.RENDERER_PDF_FLAG && (this.bIsTexture || bIsPatt))
         {
             this.Graphics.put_TextureBoundsEnabled(false);
         }
@@ -1101,6 +1107,8 @@ CShapeDrawer.prototype =
             if (fill_mode == "none" || this.bIsNoFillAttack)
                 bIsFill = false;
 
+            var bIsPattern = false;
+
             if (bIsFill)
             {
                 if (this.bIsTexture)
@@ -1153,39 +1161,74 @@ CShapeDrawer.prototype =
                 }
                 else
                 {
-                    var rgba = this.FillUniColor;
-                    if (fill_mode == "darken")
+                    var _fill = this.UniFill.fill;
+                    if (_fill.type == FILL_TYPE_PATT)
                     {
-                        var _color1 = new CShapeColor(rgba.R, rgba.G, rgba.B);
-                        var rgb = _color1.darken();
-                        rgba = { R: rgb.r, G: rgb.g, B: rgb.b, A: rgba.A };
+                        var _patt_name = global_hatch_names[_fill.ftype];
+                        if (undefined == _patt_name)
+                            _patt_name = "cross";
+
+                        var _fc = _fill.fgClr.RGBA;
+                        var _bc = _fill.bgClr.RGBA;
+
+                        var _pattern = GetHatchBrush(_patt_name, _fc.R, _fc.G, _fc.B, _bc.R, _bc.G, _bc.B);
+
+                        var _url64 = "";
+                        try
+                        {
+                            _url64 = _pattern.Canvas.toDataURL("image/png");
+                        }
+                        catch (err)
+                        {
+                            _url64 = "";
+                        }
+
+                        this.Graphics.put_brushTexture(_url64, 1);
+                        this.Graphics.put_BrushTextureAlpha(this.UniFill.transparent);
+
+                        bIsPattern = true;
                     }
-                    else if (fill_mode == "darkenLess")
+                    else if (_fill.type == FILL_TYPE_GRAD)
                     {
-                        var _color1 = new CShapeColor(rgba.R, rgba.G, rgba.B);
-                        var rgb = _color1.darkenLess();
-                        rgba = { R: rgb.r, G: rgb.g, B: rgb.b, A: rgba.A };
+                        var points = this.getGradientPoints(this.min_x, this.min_y, this.max_x, this.max_y, 0, false);
+                        return;
                     }
-                    else if (fill_mode == "lighten")
+                    else
                     {
-                        var _color1 = new CShapeColor(rgba.R, rgba.G, rgba.B);
-                        var rgb = _color1.lighten();
-                        rgba = { R: rgb.r, G: rgb.g, B: rgb.b, A: rgba.A };
+                        var rgba = this.FillUniColor;
+                        if (fill_mode == "darken")
+                        {
+                            var _color1 = new CShapeColor(rgba.R, rgba.G, rgba.B);
+                            var rgb = _color1.darken();
+                            rgba = { R: rgb.r, G: rgb.g, B: rgb.b, A: rgba.A };
+                        }
+                        else if (fill_mode == "darkenLess")
+                        {
+                            var _color1 = new CShapeColor(rgba.R, rgba.G, rgba.B);
+                            var rgb = _color1.darkenLess();
+                            rgba = { R: rgb.r, G: rgb.g, B: rgb.b, A: rgba.A };
+                        }
+                        else if (fill_mode == "lighten")
+                        {
+                            var _color1 = new CShapeColor(rgba.R, rgba.G, rgba.B);
+                            var rgb = _color1.lighten();
+                            rgba = { R: rgb.r, G: rgb.g, B: rgb.b, A: rgba.A };
+                        }
+                        else if (fill_mode == "lightenLess")
+                        {
+                            var _color1 = new CShapeColor(rgba.R, rgba.G, rgba.B);
+                            var rgb = _color1.lightenLess();
+                            rgba = { R: rgb.r, G: rgb.g, B: rgb.b, A: rgba.A };
+                        }
+                        if (rgba)
+                            this.Graphics.b_color1(rgba.R, rgba.G, rgba.B, rgba.A);
                     }
-                    else if (fill_mode == "lightenLess")
-                    {
-                        var _color1 = new CShapeColor(rgba.R, rgba.G, rgba.B);
-                        var rgb = _color1.lightenLess();
-                        rgba = { R: rgb.r, G: rgb.g, B: rgb.b, A: rgba.A };
-                    }
-                    if (rgba)
-                        this.Graphics.b_color1(rgba.R, rgba.G, rgba.B, rgba.A);
                 }
             }
 
             if (bIsFill && bIsStroke)
             {
-                if (this.bIsTexture)
+                if (this.bIsTexture || bIsPattern)
                 {
                     this.Graphics.drawpath(256);
                     this.Graphics.drawpath(1);
