@@ -159,6 +159,41 @@ function CPPTXContentLoader()
 
         return txBody;
     }
+	
+	this.ReadShapeProperty = function(stream)
+    {
+        if (this.Reader == null)
+            this.Reader = new BinaryPPTYLoader();
+
+        this.LogicDocument = null;
+
+        this.Reader.ImageMapChecker = this.ImageMapChecker;
+
+        if (null == this.stream)
+        {
+            this.stream = new FileStream();
+            this.stream.obj    = stream.obj;
+            this.stream.data   = stream.data;
+            this.stream.size   = stream.size;
+        }
+
+        this.stream.pos    = stream.pos;
+        this.stream.cur    = stream.cur;
+
+        this.Reader.stream = this.stream;
+
+        var s = this.stream;
+        var _main_type = s.GetUChar(); // 0!!!
+
+		var oNewSpPr = new CSpPr();
+		
+        this.Reader.ReadSpPr(oNewSpPr);
+
+        stream.pos = s.pos;
+        stream.cur = s.cur;
+
+        return oNewSpPr;
+    }
 
     this.ReadShape = function()
     {

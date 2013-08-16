@@ -1435,8 +1435,15 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
             else
                 this.chartAsGroup.chartTitle.txPr = textBody;
 		}
-		else if ( c_oSer_ChartType.ShowBorder === type )
-			this.chart.bShowBorder = this.stream.GetBool();
+		else if ( c_oSer_ChartType.SpPr === type )
+		{
+            var oPresentationSimpleSerializer = new CPPTXContentLoader();
+			var oNewSpPr = oPresentationSimpleSerializer.ReadShapeProperty(this.stream);
+			if(null != oNewSpPr && null != oNewSpPr.ln && null != oNewSpPr.ln.Fill && null != oNewSpPr.ln.Fill.fill && FILL_TYPE_NOFILL == oNewSpPr.ln.Fill.fill.type)
+				this.chart.bShowBorder = false;
+			else
+				this.chart.bShowBorder = true;
+		}
 		else
             res = c_oSerConstants.ReadUnknown;
 		return res;
@@ -1725,17 +1732,6 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 					return oThis.ReadSeriesMarkers(t,l, seria.Marker);
 				});
 		}
-		else if ( c_oSer_ChartSeriesType.OutlineColor === type )
-		{
-            var color = new OpenColor();
-            res = this.bcr.Read2Spreadsheet(length, function(t,l){
-                    return oThis.bcr.ReadColorSpreadsheet(t,l, color);
-                });
-			if(null != color.theme)
-				seria.OutlineColor = g_oColorManager.getThemeColor(color.theme, color.tint);
-			else if(null != color.rgb)
-                seria.OutlineColor = new RgbColor(0x00ffffff & color.rgb);
-		}
 		else if ( c_oSer_ChartSeriesType.Index === type )
 		{
             this.oSeriesByIndex[this.stream.GetULongLE()] = seria;
@@ -1752,6 +1748,11 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 				});
 			if(null != oOutput.TxPrPptx && null != oOutput.TxPrPptx.font)
 				seria.LabelFont = oOutput.TxPrPptx.font;
+		}
+		else if ( c_oSer_ChartSeriesType.SpPr === type )
+		{
+            var oPresentationSimpleSerializer = new CPPTXContentLoader();
+			var oNewSpPr = oPresentationSimpleSerializer.ReadShapeProperty(this.stream);
 		}
 		else
             res = c_oSerConstants.ReadUnknown;
