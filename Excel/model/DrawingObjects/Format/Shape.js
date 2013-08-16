@@ -894,7 +894,7 @@ CShape.prototype =
             this.recalculatePen();
 			this.recalcInfo.recalculatePen = false;
 		}
-		if(this.recalInfo.recalculateGeometry)
+		if(this.recalcInfo.recalculateGeometry)
 		{
 			if(this.spPr.geometry)
 			{
