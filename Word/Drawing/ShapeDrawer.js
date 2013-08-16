@@ -1190,8 +1190,25 @@ CShapeDrawer.prototype =
                     }
                     else if (_fill.type == FILL_TYPE_GRAD)
                     {
-                        var points = this.getGradientPoints(this.min_x, this.min_y, this.max_x, this.max_y, 0, false);
-                        return;
+                        var points = null;
+                        if (_fill.lin)
+                        {
+                            points = this.getGradientPoints(this.min_x, this.min_y, this.max_x, this.max_y, _fill.lin.angle, _fill.lin.scale);
+                        }
+                        else if (_fill.path)
+                        {
+                            var _cx = (this.min_x + this.max_x) / 2;
+                            var _cy = (this.min_y + this.max_y) / 2;
+                            var _r = Math.max(this.max_x - this.min_x, this.max_y - this.min_y) / 2;
+
+                            points = { x0 : _cx, y0 : _cy, x1 : _cx, y1 : _cy, r0 : 1, r1 : _r };
+                        }
+                        else
+                        {
+                            points = this.getGradientPoints(this.min_x, this.min_y, this.max_x, this.max_y, 90 * 60000, false);
+                        }
+
+                        this.Graphics.put_BrushGradient(_fill, points);
                     }
                     else
                     {

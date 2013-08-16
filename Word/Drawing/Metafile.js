@@ -653,6 +653,7 @@ function CCommandsType()
     this.ctBrushTextureMode				= 28;
     this.ctBrushRectable				= 29;
     this.ctBrushRectableEnabled 		= 30;
+    this.ctBrushGradient                = 31;
 
     // font
     this.ctFontXML						= 40;
@@ -730,6 +731,12 @@ function CCommandsType()
 
 var CommandType = new CCommandsType();
 
+var MetaBrushType = {
+    Solid : 0,
+    Gradient : 1,
+    Texture : 2
+};
+
 function CMetafile(width, height)
 {
     this.Width   = width;
@@ -750,7 +757,7 @@ function CMetafile(width, height)
     this.Memory = null;
     this.VectorMemoryForPrint = null;
 
-    this.BrushTypeSolid = true;
+    this.BrushType = MetaBrushType.Solid;
 
     // RFonts
     this.m_oTextPr      = null;
@@ -792,11 +799,11 @@ CMetafile.prototype =
     // brush methods
     b_color1 : function(r,g,b,a)
     {
-        if (this.BrushTypeSolid != true)
+        if (this.BrushType != MetaBrushType.Solid)
         {
             this.Memory.WriteByte(CommandType.ctBrushType);
             this.Memory.WriteLong(1000);
-            this.BrushTypeSolid = true;
+            this.BrushType = MetaBrushType.Solid;
         }
 
         if (this.m_oBrush.Color1.R != r || this.m_oBrush.Color1.G != g || this.m_oBrush.Color1.B != b)
@@ -838,11 +845,11 @@ CMetafile.prototype =
 
     put_brushTexture : function(src, mode)
     {
-        if (this.BrushTypeSolid != false)
+        if (this.BrushType != MetaBrushType.Texture)
         {
             this.Memory.WriteByte(CommandType.ctBrushType);
             this.Memory.WriteLong(3008);
-            this.BrushTypeSolid = false;
+            this.BrushType = MetaBrushType.Texture;
         }
 
         this.m_oBrush.Color1.R = -1;
@@ -869,6 +876,63 @@ CMetafile.prototype =
 
         this.Memory.WriteByte(CommandType.ctBrushTextureAlpha);
         this.Memory.WriteByte(write);
+    },
+
+    put_BrushGradient : function(gradFill, points)
+    {
+        this.BrushType = MetaBrushType.Gradient;
+
+        this.Memory.WriteByte(CommandType.ctBrushGradient);
+
+        this.Memory.WriteByte(g_nodeAttributeStart);
+
+        if (gradFill.path != null)
+        {
+            this.Memory.WriteByte(1);
+            this.Memory.WriteByte(gradFill.path);
+
+            this.Memory.WriteDouble(points.x0);
+            this.Memory.WriteDouble(points.y0);
+            this.Memory.WriteDouble(points.x1);
+            this.Memory.WriteDouble(points.y1);
+            this.Memory.WriteDouble(points.r0);
+            this.Memory.WriteDouble(points.r1);
+        }
+        else
+        {
+            this.Memory.WriteByte(0);
+            if (null == gradFill.lin)
+            {
+                this.Memory.WriteLong(90 * 60000);
+                this.Memory.WriteBool(false);
+            }
+            else
+            {
+                this.Memory.WriteLong(gradFill.lin.angle);
+                this.Memory.WriteBool(gradFill.lin.scale);
+            }
+
+            this.Memory.WriteDouble(points.x0);
+            this.Memory.WriteDouble(points.y0);
+            this.Memory.WriteDouble(points.x1);
+            this.Memory.WriteDouble(points.y1);
+        }
+
+        var _colors = gradFill.colors;
+        this.Memory.WriteByte(2);
+        this.Memory.WriteLong(_colors.length);
+
+        for (var i = 0; i < _colors.length; i++)
+        {
+            this.Memory.WriteLong(_colors[i].pos);
+
+            this.Memory.WriteByte(_colors[i].color.RGBA.R);
+            this.Memory.WriteByte(_colors[i].color.RGBA.G);
+            this.Memory.WriteByte(_colors[i].color.RGBA.B);
+            this.Memory.WriteByte(_colors[i].color.RGBA.A);
+        }
+
+        this.Memory.WriteByte(g_nodeAttributeEnd);
     },
 
     transform : function(sx,shy,shx,sy,tx,ty)
@@ -1746,6 +1810,11 @@ CDocumentRenderer.prototype =
     {
         if (0 != this.m_lPagesCount)
             this.m_arrayPages[this.m_lPagesCount - 1].put_BrushTextureAlpha(alpha);
+    },
+    put_BrushGradient : function(gradFill, points)
+    {
+        if (0 != this.m_lPagesCount)
+            this.m_arrayPages[this.m_lPagesCount - 1].put_BrushGradient(gradFill, points);
     },
 
     // функции клиппирования
