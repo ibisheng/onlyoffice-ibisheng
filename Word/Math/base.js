@@ -56,7 +56,8 @@ CMathBase.prototype =
             {
                 this.elements[i][j] = new CMathContent();
                 this.elements[i][j].relate(this);
-                this.elements[i][j].setComposition(this.Composition);
+                if( !this.elements[i][j].IsJustDraw())
+                    this.elements[i][j].setComposition(this.Composition);
                 this.elements[i][j].setTxtPrp(this.TxtPrp);
                 //this.elements[i][j].setReduct(this.reduct);
                 //this.elements[i][j].setRunPrp(this.RunPrp);
@@ -900,5 +901,33 @@ CMathBase.prototype =
             for(var j = 0; j < this.nCol; j++)
                 if(!this.elements[i][j].IsJustDraw())
                     this.elements[i][j].setTxtPrp(txtPrp);
+    },
+    getRealPosition: function()
+    {
+        var pos = this.elements[this.CurPos_X][this.CurPos_Y].getRealPosition();
+
+        var WH = this.getWidthsHeights();
+
+        for(var j = 0; j < this.CurPos_Y; j++)
+            pos.Y += WH.heights[j];
+
+        for(var i = 0; i < this.CurPos_X; i++)
+            pos.X += WH.widths[i];
+
+        return pos;
+    },
+    getRealPosition_2: function()
+    {
+        var pos = this.elements[this.CurPos_X][this.CurPos_Y].getRealPosition_2();
+
+        var WH = this.getWidthsHeights();
+
+        for(var j = 0; j < this.CurPos_Y; j++)
+            pos.Y += WH.heights[j];
+
+        for(var i = 0; i < this.CurPos_X; i++)
+            pos.X += WH.widths[i];
+
+        return pos;
     }
 }

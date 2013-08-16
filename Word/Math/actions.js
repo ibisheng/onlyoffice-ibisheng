@@ -414,9 +414,13 @@ CControlComposition.prototype =
     {
         this.Content[this.CurPos].Refresh();
     },
-    Set_SelectionState: function()
+    Set_SelectionState: function(State)
     {
-
+        this.Content[this.CurPos].Set_SelectionState(State);
+    },
+    Get_SelectionState: function()
+    {
+        return this.Content[this.CurPos].Get_SelectionState();
     }
 }
 var MathControl = new CControlComposition();

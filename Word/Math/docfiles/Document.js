@@ -9143,7 +9143,7 @@ CDocument.prototype =
         this.Document_UpdateInterfaceState();
     },
 
-    Get_SelectionState : function()
+    /*Get_SelectionState : function()
     {
         var DocState = new Object();
         DocState.CurPos =
@@ -9212,9 +9212,13 @@ CDocument.prototype =
         State.push( DocState );
 
         return State;
-    },
+    },*/
 
     //**
+    Get_SelectionState : function()
+    {
+        return MathControl.Get_SelectionState();
+    },
     Set_SelectionState : function(State)
     {
         MathControl.Set_SelectionState(State);

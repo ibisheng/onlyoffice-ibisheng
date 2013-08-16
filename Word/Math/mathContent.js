@@ -1,6 +1,7 @@
 var historyitem_Math_AddItem                   =  1; // Добавляем элемент
 var historyitem_Math_RemoveItem                =  2; // Удаляем элемент
 
+var TEST = true;
 
 var StartTextElement = 0x2B1A; // Cambria Math
 
@@ -265,6 +266,8 @@ CMathContent.prototype =
     },
     addTxt: function(txt)
     {
+        var Pos = this.CurPos;
+
         for(var i = 0; i < txt.length; i++)
         {
             this.addLetter( txt.charCodeAt(i));
@@ -272,6 +275,12 @@ CMathContent.prototype =
 
         this.setStart_Selection(this.CurPos);
         this.selection.active = false;
+
+        var EndPos = this.CurPos;
+
+        var items = this.content.slice(Pos, EndPos);
+
+        return {Items: items};
     },
     addLetter: function(code)
     {
@@ -312,13 +321,21 @@ CMathContent.prototype =
         // txt properties
 
         this.addElementToContent(symb, gps);
+        var item = symb;
 
-        /*var Pos = this.CurPos,
-            EndPos = this.CurPos + 1;
+        if(!TEST)
+        {
+            History.Create_NewPoint();
 
-        History.Add(this, {type: historyitem_Math_AddItem, Pos: Pos, PosEnd: EndPos});*/
+            var Pos = this.CurPos,
+                EndPos = this.CurPos + 1;
+
+            History.Add(this, {Type: historyitem_Math_AddItem, Items: [item], Pos: Pos, PosEnd: EndPos});
+        }
 
         this.rInterval.endPos++; // max количество элементов this.CurPos
+
+        return { Items: [item] };
     },
     addMComponent: function(ind)
     {
@@ -441,7 +458,7 @@ CMathContent.prototype =
     },
     createEquation: function(ind)
     {
-        //var Pos = this.CurPos;
+        var Pos = this.CurPos;
 
         switch(ind)
         {
@@ -2190,10 +2207,18 @@ CMathContent.prototype =
 
         }
 
-        //var EndPos = this.CurPos;
+        var EndPos = this.CurPos;
 
-        //History.Add(this, {type: historyitem_Math_AddItem, Pos: Pos, PosEnd: EndPos});
+        if(!TEST)
+        {
+            History.Create_NewPoint();
+            var Items = this.content.slice(Pos, EndPos);
+            History.Add(this, {Type: historyitem_Math_AddItem, Items: Items, Pos: Pos, PosEnd: EndPos});
+        }
 
+        var items = this.content.slice(Pos, EndPos);
+
+        return {Items: items};
     },
     removeAreaSelect: function()
     {
@@ -2825,13 +2850,45 @@ CMathContent.prototype =
 
         return {x: x, y: y};
     },
+    old_findPosition: function(mCoord)
+    {
+        var mouseX = mCoord.x;
+        //var mouseY = mCoord.y;
+
+        var pos = 0;
+        while( pos < (this.content.length - 1) &&  this.content[pos].widthToEl < mouseX )
+            pos++;
+
+        var gps = this.content[pos].g_mContext;
+        if(pos !== 0)
+        {
+            if( this.content[ pos ].value.SUBCONTENT )
+            {
+                if( this.content[ pos - 1].widthToEl <= mouseX && mouseX < (this.content[pos - 1].widthToEl + gps.left) )
+                    pos--;
+                else if( (this.content[ pos ].widthToEl - gps.right) < mouseX && mouseX <= this.content[ pos ].widthToEl)
+                    pos++;
+            }
+            else
+            {
+                if( this.content[ pos - 1].widthToEl <= mouseX && mouseX < (this.content[ pos - 1].widthToEl + gps.left) )
+                    pos--;
+                else if( (this.content[ pos ].widthToEl - (this.content[ pos ].value.size.width/2) - this.content[ pos ].g_mContext.left ) > mouseX )
+                    pos--;
+            }
+        }
+
+        return pos;
+
+    },
     findPosition: function(mCoord)
     {
         var mouseX = mCoord.x;
         //var mouseY = mCoord.y;
-        var pos = 0;
-        while( pos < (this.content.length - 1) &&  this.content[pos].widthToEl < mouseX )
-            pos++;
+
+        var pos = this.content.length - 1;
+        while( pos > 0 &&  this.content[pos].widthToEl > mouseX )
+            pos--;
 
         var gps = this.content[pos].g_mContext;
         if(pos !== 0)
@@ -3078,6 +3135,8 @@ CMathContent.prototype =
         var bMEDirect = order == 1 && this.content[this.CurPos].value.empty,
             bMEReverse = order == -1 && this.content[this.CurPos + 1].value.SUBCONTENT;
 
+        var items = null;
+
         if(!bSelect && bMEDirect)
         {
             this.setStart_Selection(this.CurPos);
@@ -3124,15 +3183,20 @@ CMathContent.prototype =
             for (var j = end; j < this.content.length; j++)
                 tmp.push(this.content[j]);*/
 
-            //var Content_start = this.content.slice(0, start);
-            //var Content_end   = this.content.slice(end, this.content.length);
+            /*var Content_start = this.content.slice(0, start);
+            var Content_end   = this.content.slice(end, this.content.length);
+            this.content = Content_start.concat(Content_end);*/
 
-            //History.Create_NewPoint();
+            items = this.content.splice(start, end - start);
 
-            var items = this.content.splice(start, end - start);
+            if(!TEST)
+            {
+                History.Create_NewPoint();
+                //items = this.content.splice(start, end - start);
+                History.Add(this, {Type: historyitem_Math_RemoveItem, Items: items, Pos: start});
+            }
 
-            //History.Add(this, {type: historyitem_Math_RemoveItem, Items: items, Pos: start});
-            //this.content = Content_start.concat(Content_end);
+
 
             this.CurPos = start - 1;
             this.setStart_Selection(this.CurPos);
@@ -3411,7 +3475,7 @@ CMathContent.prototype =
 
     Undo: function(Data)
     {
-        var type = Data.type;
+        var type = Data.Type;
 
         switch(type)
         {
@@ -3452,6 +3516,55 @@ CMathContent.prototype =
     Refresh_RecalcData: function()
     {
         this.RecalculateReverse();
+    },
+    _Check_HistoryUninon: function(Data1, Data2)
+    {
+        var Type1 = Data1.Type;
+        var Type2 = Data2.Type;
+
+        if ( historyitem_Paragraph_AddItem === Type1 && historyitem_Paragraph_AddItem === Type2 )
+        {
+            if ( 1 === Data1.Items.length && 1 === Data2.Items.length && Data1.Pos === Data2.Pos - 1 && !this.content[Data1.Pos].SUBCONTENT && !this.content[Data2.Pos].SUBCONTENT )
+                return true;
+        }
+        return false
+    },
+    Check_HistoryUninon: function(Data1, Data2)
+    {
+        return false;
+    },
+    getRealPosition: function()
+    {
+        var X = this.content[this.CurPos].widthToEl,
+            Y = 0;
+        if( this.content[this.CurPos].value.SUBCONTENT )
+        {
+            var intPos =  this.content[this.CurPos].value.getRealPosition();
+            X += intPos.X;
+            Y += intPos.Y;
+        }
+
+        return {X: X, Y: Y};
+    },
+    getRealPosition_2: function()
+    {
+        var pos = {X: null, Y : null};
+        if(this.selection.start == this.selection.end && this.content[this.CurPos].value.SUBCONTENT)
+        {
+             pos = this.content[this.CurPos].value.getRealPosition_2();
+        }
+        else if(this.selection.start !== this.selection.end)
+        {
+            pos.X =  this.content[ this.selection.start ].widthToEl;
+            pos.Y = 0;
+        }
+        else
+        {
+            pos.X = this.content[this.CurPos].widthToEl;
+            pos.Y = 0;
+        }
+
+        return pos;
     },
     old_CheckTarget: function()
     {
@@ -3631,6 +3744,11 @@ CMathComposition.prototype =
     },
     Remove: function(order)
     {
+        if(TEST)
+        {
+            History.Create_NewPoint();
+        }
+
         this.ClearSelect();
 
         var result = this.SelectContent.remove(order);
@@ -3641,11 +3759,15 @@ CMathComposition.prototype =
 
         if( result.state.bDelete )
         {
-            History.Create_NewPoint();
-            var Pos = this.CurrentContent.CurPos + 1;
-            History.Add(this, {type: historyitem_Math_RemoveItem, content: this.CurrentContent, Items: result.items, Pos: Pos});
             this.CurrentContent.RecalculateReverse();
             this.UpdatePosition();
+
+            if(TEST)
+            {
+                var Pos = this.CurrentContent.CurPos + 1;
+                History.Add(this.CurrentContent, {Type: historyitem_Math_RemoveItem, Items: result.items, Pos: Pos});
+            }
+
         }
 
         this.CheckTarget();
@@ -3672,32 +3794,100 @@ CMathComposition.prototype =
     //// edit ////
     AddLetter: function(code)
     {
+        if(TEST)
+        {
+            History.Create_NewPoint();
+        }
+
         this.ClearSelect();
 
-        History.Create_NewPoint();
-
         this.SelectContent.removeAreaSelect();
-        this.SelectContent.addLetter(code);
-
-        var Pos = this.SelectContent.CurPos,
-            EndPos = this.SelectContent.CurPos + 1;
-
-        /*var current = this.CurrentContent,
-            select = this.SelectContent;*/
-
-        History.Add(this, {type: historyitem_Math_AddItem, content: this.SelectContent, Pos: Pos, PosEnd: EndPos});
+        var items =  this.SelectContent.addLetter(code);
 
         ///
         this.RecalculateReverse();
         this.UpdatePosition();
         ///
 
+        if(TEST)
+        {
+            var Pos = this.SelectContent.CurPos,
+                EndPos = this.SelectContent.CurPos + 1;
+
+            History.Add(this.CurrentContent, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: EndPos});
+        }
+
         this.CurrentContent = this.SelectContent;
         this.CurrentContent.update_Cursor();
 
         this.ShowCursor();
     },
-    Undo: function(Data)
+    CreateEquation: function(indef)
+    {
+        if(TEST)
+        {
+            History.Create_NewPoint();
+        }
+
+        this.ClearSelect();
+
+        this.SelectContent.removeAreaSelect();
+        var items = this.SelectContent.createEquation(indef);
+
+        ///
+        this.RecalculateReverse();
+        this.UpdatePosition();
+        ///
+
+        if(TEST)
+        {
+            var Pos = this.SelectContent.CurPos - 1,
+                EndPos = this.SelectContent.CurPos + 1;
+            History.Add(this.CurrentContent, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: EndPos});
+        }
+
+        this.CurrentContent = this.SelectContent;
+        this.CurrentContent.update_Cursor();
+
+        this.ShowCursor();
+    },
+    Get_SelectionState : function()
+    {
+        var State = new Object();
+        var RealPos = this.Root.getRealPosition();
+        State.Current =
+        {
+            CurPos:             this.CurrentContent.CurPos,
+            RealX:              RealPos.X,
+            RealY:              RealPos.Y
+        };
+        var RealPos_2 = this.Root.getRealPosition_2();
+        State.Select =
+        {
+            StartSelect:    this.SelectContent.selection.startPos,
+            EndSelect:      this.SelectContent.selection.endPos,
+            RealX:              RealPos_2.X,
+            RealY:              RealPos_2.Y
+        };
+
+        return State;
+    },
+    Set_SelectionState : function(State)
+    {
+        var selPos = {x:  State.Select.RealX, y: State.Select.RealY};
+        this.SelectContent = this.Root.afterDisplacement(selPos);
+
+        this.SelectContent.setStart_Selection(State.Select.StartSelect);
+        this.SelectContent.setEnd_Selection(State.Select.EndSelect);
+        this.SelectContent.selection.active = false;
+
+        var currPos = {x:  State.Current.RealX, y: State.Current.RealY};
+        this.CurrentContent = this.Root.afterDisplacement(currPos);
+
+        this.CurrentContent.CurPos = State.Current.CurPos;
+
+    },
+    /*Undo: function(Data)
     {
         var content = Data.content;
         content.Undo(Data);
@@ -3717,30 +3907,7 @@ CMathComposition.prototype =
     Save_Changes: function(Data, Writer)
     {
 
-    },
-    CreateEquation: function(indef)
-    {
-        this.ClearSelect();
-
-        History.Create_NewPoint();
-
-        this.SelectContent.removeAreaSelect();
-        this.SelectContent.createEquation(indef);
-
-        var Pos = this.SelectContent.CurPos - 1,
-            EndPos = this.SelectContent.CurPos + 1;
-        History.Add(this, {type: historyitem_Math_AddItem, content: this.SelectContent, Pos: Pos, PosEnd: EndPos});
-
-        ///
-        this.RecalculateReverse();
-        this.UpdatePosition();
-        ///
-
-        this.CurrentContent = this.SelectContent;
-        this.CurrentContent.update_Cursor();
-
-        this.ShowCursor();
-    },
+    },*/
     ////
 
     ClearSelect: function()
