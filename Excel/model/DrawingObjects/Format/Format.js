@@ -2013,7 +2013,7 @@ function CPattFill()
     this.bgClr = null;//new CUniColor();
 
     this.Id = g_oIdCounter.Get_NewId();
-    g_oIdCounter.Add(this, this.Id);
+    g_oTableId.Add(this, this.Id);
 }
 
 CPattFill.prototype =
@@ -2176,7 +2176,7 @@ function CNoFill()
 {
     this.type = FILL_TYPE_NOFILL;
     this.Id = g_oIdCounter.Get_NewId();
-    g_oIdCounter.Add(this, this.Id);
+    g_oTableId.Add(this, this.Id);
 }
 
 CNoFill.prototype =
