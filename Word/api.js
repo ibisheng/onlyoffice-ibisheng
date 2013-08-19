@@ -2239,11 +2239,11 @@ asc_docs_api.prototype.asc_Save = function (isAutoSave) {
 		this.canSave = false;
 		this.isAutoSave = !!isAutoSave;
 		if (!this.isAutoSave) {
-			editor.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
-			editor.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);
+			this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.PrepareToSave);
 		}
 
-        this.CoAuthoringApi.askSaveChanges( OnSave_Callback );
+        this.CoAuthoringApi.askSaveChanges(OnSave_Callback);
 	}
 };
 
@@ -2328,7 +2328,7 @@ function OnSave_Callback(e)
 				editor.autoSaveInit(editor.autoSaveGapAsk);
 				return;
 			}
-			// Для автосохранения не стоит пытаться еще раз запросить... (нужно рестартовать функцию автосохранения)
+			
         	setTimeout( function(){ editor.CoAuthoringApi.askSaveChanges( OnSave_Callback ); }, 1000 );
 		}
     }
@@ -5416,6 +5416,13 @@ asc_docs_api.prototype.asc_enableKeyEvents = function(value){
 
 		this.asc_fireCallback("asc_onEnableKeyEventsChanged", value);
 	}
+}
+
+asc_docs_api.prototype.asc_findText = function (text, scanByRows, scanForward, isMatchCase, isWholeCell) {
+	// ToDo add code here
+}
+asc_docs_api.prototype.asc_replaceText = function (findWhat, replaceWith, isReplaceAll, isMatchCase, isWholeCell) {
+	// ToDo add code here
 }
 
 asc_docs_api.prototype.asyncServerIdStartLoaded = function()
