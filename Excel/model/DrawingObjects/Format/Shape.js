@@ -131,6 +131,7 @@ function CShape(drawingBase, drawingObjects, legendEntry)
     this.spPr = new CSpPr();
     this.style = null;
     this.txBody = null;
+	this.lockType = c_oAscLockTypes.kLockTypeNone;
 
     this.group = null;
 
@@ -1827,6 +1828,40 @@ CShape.prototype =
         var shape_drawer = new CShapeDrawer();
         shape_drawer.fromShape(this, graphics);
         shape_drawer.draw(this.spPr.geometry);
+		
+		if(graphics instanceof CGraphics)
+		{
+			var transform = this.transform;
+			var extX = this.extX;
+			var extY = this.extY;
+			
+			/*var callback = function(result)
+			{
+				var lockType = parseInt(result);
+				if ( !isNaN(lockType) )
+				{
+					graphics.SetIntegerGrid(false);
+					graphics.transform3(transform, false);		
+					graphics.DrawLockObjectRect(lockType, 0, 0, extX, extY );
+					graphics.reset();
+					graphics.SetIntegerGrid(true);
+				}
+			}
+			
+			if(!isRealObject(this.group))
+			{
+				this.drawingBase.isLocked(callback);
+			}*/
+			
+			if(!isRealObject(this.group))
+			{
+				graphics.SetIntegerGrid(false);
+				graphics.transform3(transform, false);		
+				graphics.DrawLockObjectRect(this.lockType, 0, 0, extX, extY );
+				graphics.reset();
+				graphics.SetIntegerGrid(true);
+			}
+		}
         graphics.reset();
         graphics.SetIntegerGrid(true);
         if ( this.txBody )

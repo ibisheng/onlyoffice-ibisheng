@@ -5,6 +5,11 @@
 * Date:   13/08/2012
 */
 
+var locktype_None   = 1; // никто не залочил данный объект
+var locktype_Mine   = 2; // данный объект залочен текущим пользователем
+var locktype_Other  = 3; // данный объект залочен другим(не текущим) пользователем
+var locktype_Other2 = 4; // данный объект залочен другим(не текущим) пользователем (обновления уже пришли)
+var locktype_Other3 = 5; // данный объект был залочен (обновления пришли) и снова стал залочен
 
 if ( !window["Asc"] ) {		// Для вставки диаграмм в Word
 	window["Asc"] = {};
@@ -2178,16 +2183,6 @@ function DrawingObjects() {
 			return _t.graphicObject != null;
 		}
 		
-		_t.isLocked = function(callback) {
-			_this.objectLocker.reset();
-			if ( _t.graphicObject ) {
-				_this.objectLocker.addObjectId(_t.graphicObject.Id);
-				_this.objectLocker.checkObjects(callback);
-			}
-			else
-				callback(true);
-		}
-		
 		_t.getWorkbook = function() {
 			return (_t.worksheet ? _t.worksheet.model.workbook : null);
 		}
@@ -2468,6 +2463,7 @@ function DrawingObjects() {
 		
 		autoShapeTrack = new CAutoshapeTrack();
 		autoShapeTrack.init( trackOverlay, 0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix, shapeOverlayCtx.m_dWidthMM, shapeOverlayCtx.m_dHeightMM );
+		shapeCtx.m_oAutoShapesTrack = autoShapeTrack;
 		
 		_this.objectLocker = new ObjectLocker(worksheet);
 		_this.drawingDocument = new CDrawingDocument(this);
@@ -2520,7 +2516,7 @@ function DrawingObjects() {
                 drawingObject.graphicObject.drawingObjects = _this;
                 drawingObject.graphicObject.recalculate(aImagesSync);
                 aObjects.push( drawingObject );
-            }
+		}
 
             if (drawingObject.graphicObject instanceof  CGroupShape) {
 
@@ -2741,6 +2737,12 @@ function DrawingObjects() {
 			boundsChecker.init(1, 1, 1, 1);
 			drawingObject.graphicObject.draw(boundsChecker);
 			boundsChecker.CorrectBounds();
+			// Коррекция для селекта при блокировке
+			var delta = 12;
+			boundsChecker.Bounds.min_x -= delta;
+			boundsChecker.Bounds.min_y -= delta;
+			boundsChecker.Bounds.max_x += delta;
+			boundsChecker.Bounds.max_y += delta;
 			return boundsChecker;
 		}
 		return null;
@@ -2759,15 +2761,15 @@ function DrawingObjects() {
 		}
 		aBoundsCheckers = [];
 		
-		if ( bHeaders )
-			_this.drawWorksheetHeaders(true);
-		
 		// Чистим текущие области
 		for ( var i = 0; i < aObjects.length; i++ ) {
 			var boundsChecker = _this.getBoundsChecker(aObjects[i]);
 			restoreSheetArea(boundsChecker);
 			aBoundsCheckers.push(boundsChecker);
-		}		
+		}
+		
+		if ( bHeaders )
+			_this.drawWorksheetHeaders(true);
 	}
 	
 	function restoreSheetArea(checker) {
@@ -2826,7 +2828,7 @@ function DrawingObjects() {
 			
 			if ( clearCanvas )
 				_this.clearDrawingObjects();
-				
+
 			if ( !aObjects.length )
 				return;
 			
@@ -2877,7 +2879,7 @@ function DrawingObjects() {
 			_this.OnUpdateOverlay();
 		else
 			_this.raiseLayerDrawingObjects();
-			
+
 		_this.drawWorksheetHeaders();
 	}
 
@@ -3182,8 +3184,6 @@ function DrawingObjects() {
 	}
 	
 	_this.updateDrawingObject = function(bInsert, operType, updateRange) {
-
-		// !!! Не вызывается сверху если Undo/Redo
 
 		var changedRange = null;
 		var metrics = null;
@@ -3502,9 +3502,11 @@ function DrawingObjects() {
 							}
 							
 							// Update graphic object
+							History.TurnOff();
 							obj.graphicObject.setPosition( pxToMm(obj.getRealLeftOffset(true)), pxToMm(obj.getRealTopOffset(true)) );
 							obj.graphicObject.recalculateTransform();
 							obj.graphicObject.calculateTransformTextMatrix();
+							History.TurnOn();
 							_this.showDrawingObjects(true);
 						}
 					}
@@ -3598,7 +3600,6 @@ function DrawingObjects() {
 		obj.graphicObject = graphic;
         graphic.setDrawingBase(obj);
 				
-		//obj.graphicObject.select(_this.controller);
         var ret;
         if(isRealNumber(position))
         {
@@ -3620,8 +3621,8 @@ function DrawingObjects() {
 		worksheet.model.workbook.handlers.trigger("asc_onEndAddShape");
 		
 		_this.objectLocker.reset();
-		_this.objectLocker.addObjectId(obj.id);
-		_this.objectLocker.checkObjects( function(result){ return result; } );
+		_this.objectLocker.addObjectId(obj.graphicObject.Id);
+		_this.objectLocker.checkObjects( function(result) {} );
 		
         return ret;
 	}
@@ -3670,6 +3671,14 @@ function DrawingObjects() {
 				}
 			}
 		}
+	}
+	
+	_this.getDrawingBase = function(graphicId) {
+		for (var i = 0; i < aObjects.length; i++) {
+			if ( aObjects[i].graphicObject.Id == graphicId )
+				return aObjects[i];
+		}
+		return null;
 	}
 	
 	_this.deleteDrawingBase = function(graphicId) {
@@ -3724,20 +3733,23 @@ function DrawingObjects() {
 		return response;
 	}
 	
-	_this.selectGraphicObject = function() {
-		/*if ( _this.drawingDocument && _this.controller.selectedObjects.length ) {
-			
-			// Сначала селект диапазона диаграммы
-			for (var i = 0; i < _this.controller.selectedObjects.length; i++) {
-				var graphicObject = _this.controller.selectedObjects[i];
-				if ( graphicObject.isChart() ) {
-					_this.selectDrawingObjectRange(graphicObject.Id);
-				}
+	_this.setGraphicObjectLockState = function(id, state) {
+		
+		for (var i = 0; i < aObjects.length; i++) {
+			if ( id == aObjects[i].graphicObject.Id ) {
+				aObjects[i].graphicObject.lockType = state;
+				shapeCtx.DrawLockObjectRect(aObjects[i].graphicObject.lockType, aObjects[i].graphicObject.x, aObjects[i].graphicObject.y, aObjects[i].graphicObject.extX, aObjects[i].graphicObject.extY );
+				break;
 			}
-			
-			_this.raiseLayerDrawingObjects();
-            _this.OnUpdateOverlay();
-        }*/
+		}
+	}
+	
+	_this.reseltLockedGraphicObjects = function() {
+		
+		for (var i = 0; i < aObjects.length; i++) {
+			aObjects[i].graphicObject.lockType = c_oAscLockTypes.kLockTypeNone;
+		}
+		_this.showDrawingObjects(true);
 	}
 	
 	_this.setScrollOffset = function(x_px, y_px) {
@@ -3788,9 +3800,6 @@ function DrawingObjects() {
 	
 	_this.selectedGraphicObjectsExists = function() {
 		return _this.controller.selectedObjects.length > 0;
-	}
-	
-	_this.getSelectedObjectsStack = function() {
 	}
 	
 	_this.loadImageRedraw = function(imageUrl) {
@@ -4108,13 +4117,15 @@ function DrawingObjects() {
 		if ( !aObjects.length )
 			return null;
 
-		var objectInfo = { cursor: null, data: null, isGraphicObject: false };
+		var objectInfo = { cursor: null, id: null, object: null, isGraphicObject: false };
 		var graphicObjectInfo = _this.controller.isPointInDrawingObjects( pxToMm(x - scrollOffset.x), pxToMm(y - scrollOffset.y) );
 		
 		if ( graphicObjectInfo && graphicObjectInfo.objectId ) {
-			objectInfo.data = graphicObjectInfo.objectId;
+			objectInfo.id = graphicObjectInfo.objectId;
+			objectInfo.object = _this.getDrawingBase(graphicObjectInfo.objectId);
 			objectInfo.cursor = graphicObjectInfo.cursorType;
 			objectInfo.isGraphicObject = true;
+			
 			return objectInfo;
 		}		
 		return null;
@@ -4255,35 +4266,44 @@ function ObjectLocker(ws) {
 		aObjectId.push(id);
 	}
 	
+	// For array of objects -=Use reset before use=-
 	_t.checkObjects = function(callback) {
+		
+		function callbackEx(result) {
+			worksheet._drawCollaborativeElements(true);
+			if ( callback )
+				callback(result);
+		}
 		
 		if ( !aObjectId.length || (false === worksheet.collaborativeEditing.isCoAuthoringExcellEnable()) ) {
 			// Запрещено совместное редактирование
-			if ($.isFunction(callback)) {callback(true);}
+			if ($.isFunction(callback)) {callbackEx(true);}
 			return;
 		}
 		
 		var sheetId = worksheet.model.getId();
 		worksheet.collaborativeEditing.onStartCheckLock();
 		for ( var i = 0; i < aObjectId.length; i++ ) {
+			
 			var lockInfo = worksheet.collaborativeEditing.getLockInfo( c_oAscLockTypeElem.Object, /*subType*/null, sheetId, aObjectId[i] );
 
 			if ( false === worksheet.collaborativeEditing.getCollaborativeEditing() ) {
 				// Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
-				if ($.isFunction(callback)) { callback(true); }
+				if ($.isFunction(callback)) { callbackEx(true); }
+				callback = undefined;
 			}
 			else if ( false !== worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine) ) {
-				// Редактируем сами, проверяем дальше				
+				// Редактируем сами, проверяем дальше
 				continue;
 			}
 			else if ( false !== worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther) ) {
 				// Уже ячейку кто-то редактирует
-				if ($.isFunction(callback)) {callback(false);}
+				if ($.isFunction(callback)) {callbackEx(false);}
 				return;
-			}		
-			
+			}
 			worksheet.collaborativeEditing.addCheckLock(lockInfo);
 		}
-		worksheet.collaborativeEditing.onEndCheckLock(callback);
+		
+		worksheet.collaborativeEditing.onEndCheckLock(callbackEx);
 	}
 }

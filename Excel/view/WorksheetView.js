@@ -3158,8 +3158,9 @@
 					var objectState = (c_oAscLockTypes.kLockTypeMine === type) ? c_oAscObjectLockState.Off : c_oAscObjectLockState.On;
 					var arrayObjects = (c_oAscLockTypes.kLockTypeMine === type) ? this.collaborativeEditing.getLockObjectsMe(currentSheetId) : this.collaborativeEditing.getLockObjectsOther(currentSheetId);
 						
-					if ( arrayObjects.length )
-						this.objectRender.showDrawingObjects(false);
+					for (i = 0; i < arrayObjects.length; ++i) {
+						this.objectRender.setGraphicObjectLockState(arrayObjects[i], (c_oAscLockTypes.kLockTypeMine === type) ? c_oAscLockTypes.kLockTypeMine : c_oAscLockTypes.kLockTypeOther);
+					}
 				}
 
 				// set clipping rect to cells area
@@ -4980,18 +4981,18 @@
 					return {cursor: kCurFillHandle, target: "shape", col: -1, row: -1};
 				
 				var drawingInfo = this.objectRender.checkCursorDrawingObject(x, y);
-				if (drawingInfo && drawingInfo.data) {
+				if (drawingInfo && drawingInfo.id) {
 					// Возможно картинка с lock
-					/*lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, sheetId, drawingInfo.data);
+					lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, sheetId, drawingInfo.id);
 					isLocked = this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther,false);
 					if (false !== isLocked) {
 						// Кто-то сделал lock
 						userId = isLocked.UserId;
-						lockRangePosLeft = drawingInfo.data.getVisibleLeftOffset(true);
-						lockRangePosTop = drawingInfo.data.getVisibleTopOffset(true);
-					}*/
+						lockRangePosLeft = drawingInfo.object.getVisibleLeftOffset(true);
+						lockRangePosTop = drawingInfo.object.getVisibleTopOffset(true);
+					}
 
-					return {cursor: drawingInfo.cursor, target: "shape", drawingId: drawingInfo.data, col: -1, row: -1, userId: userId, lockRangePosLeft: lockRangePosLeft, lockRangePosTop: lockRangePosTop};
+					return {cursor: drawingInfo.cursor, target: "shape", drawingId: drawingInfo.id, col: -1, row: -1, userId: userId, lockRangePosLeft: lockRangePosLeft, lockRangePosTop: lockRangePosTop};
 				}
 					
 				var autoFilterCursor = this.autoFilters.isButtonAFClick(x,y,this);
@@ -5351,7 +5352,7 @@
 				
 				var cursorInfo = this.objectRender.checkCursorDrawingObject(xpos, ypos);
 				if ( cursorInfo ) {
-					var graphicSelectionType = this.objectRender.getGraphicSelectionType(cursorInfo.data);
+					var graphicSelectionType = this.objectRender.getGraphicSelectionType(cursorInfo.id);
 					ar.type = graphicSelectionType;
 					return;
 				}
@@ -8141,9 +8142,9 @@
 									t.model.onEndTriggerAction();
 									t.autoFilters.insertColumn(t, prop, _updateRangeIns, arn);
 									
-									if ( !bUndoRedo ) {
+									//if ( !bUndoRedo ) {
 										t.objectRender.updateDrawingObject(true, val, _updateRangeIns);
-									}
+									//}
 									t.cellCommentator.updateCommentsDependencies(true, val, _updateRangeIns);
 								};
 								if(bUndoRedo)
@@ -8161,9 +8162,9 @@
 									t.model.onEndTriggerAction();
 									t.autoFilters.insertRows(t, prop,_updateRangeIns, arn);
 									
-									if ( !bUndoRedo ) {
+									//if ( !bUndoRedo ) {
 										t.objectRender.updateDrawingObject(true, val, _updateRangeIns);
-									}
+									//}
 									t.cellCommentator.updateCommentsDependencies(true, val, _updateRangeIns);
 								};
 								if(bUndoRedo)
@@ -8220,9 +8221,9 @@
 									fullRecalc = true;
 									t.model.removeCols(_updateRangeDel.c1, _updateRangeDel.c2);
 									t.autoFilters.insertColumn(t, prop,_updateRangeDel, arn);
-									if (!bUndoRedo) {
+									//if (!bUndoRedo) {
 										t.objectRender.updateDrawingObject(false, val, _updateRangeDel);
-									}
+									//}
 									t.cellCommentator.updateCommentsDependencies(false, val, _updateRangeDel);
 								};
 								if(bUndoRedo)
@@ -8237,9 +8238,9 @@
 									fullRecalc = true;
 									t.model.removeRows(_updateRangeDel.r1, _updateRangeDel.r2);
 									t.autoFilters.insertRows(t, prop,_updateRangeDel, arn);
-									if (!bUndoRedo) {
+									//if (!bUndoRedo) {
 										t.objectRender.updateDrawingObject(false, val, _updateRangeDel);
-									}
+									//}
 									t.cellCommentator.updateCommentsDependencies(false, val, _updateRangeDel);
 								};
 								if(bUndoRedo)

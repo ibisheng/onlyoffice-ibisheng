@@ -462,6 +462,7 @@ function CGraphics()
 
     this.m_oPen     = new CPen();
     this.m_oBrush   = new CBrush();
+	this.m_oAutoShapesTrack = null;
 
     this.m_oFontManager = null;
 	this.m_bIsFillTextCanvasColor = 0;
@@ -1800,7 +1801,7 @@ CGraphics.prototype =
 
     DrawLockObjectRect : function(lock_type, x, y, w, h)
     {
-        if (lock_type == locktype_None || editor.WordControl.m_oDrawingDocument.IsLockObjectsEnable === false || editor.isViewMode)
+        if (lock_type == locktype_None)
             return;
 
         if (lock_type == locktype_Mine)
@@ -1823,7 +1824,7 @@ CGraphics.prototype =
             var w_dot = 2 * dKoefMMToPx;
             var w_dist = 1 * dKoefMMToPx;
 
-            var _interf = editor.WordControl.m_oDrawingDocument.AutoShapesTrack;
+            var _interf = this.m_oAutoShapesTrack;
 
             var eps = 5 * dKoefMMToPx;
             var _x = x - eps;

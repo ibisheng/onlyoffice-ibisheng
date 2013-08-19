@@ -1178,16 +1178,17 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				var t = this;
 
 				this.collaborativeEditing = new asc_CCollaborativeEditing(/*handlers*/{
-					"askLock":					function () {t.CoAuthoringApi.askLock.apply(t.CoAuthoringApi, arguments);},
-					"releaseLocks":				function () {t.CoAuthoringApi.releaseLocks.apply(t.CoAuthoringApi, arguments);},
-					"sendChanges":				function () {t._onSaveChanges.apply(t, arguments);},
-					"applyChanges":				function () {t._onApplyChanges.apply(t, arguments);},
-					"updateAfterApplyChanges":	function () {t._onUpdateAfterApplyChanges.apply(t, arguments);},
-					"drawSelection":			function () {t._onDrawSelection.apply(t, arguments);},
-					"showDrawingObjects":		function () {t._onShowDrawingObjects.apply(t, arguments);},
-					"showComments":				function () {t._onShowComments.apply(t, arguments);},
-					"unlockComments":			function () {t._onUnlockComments.apply(t);},
-					"cleanSelection":			function () {t._onCleanSelection.apply(t, arguments);}
+					"askLock":							function () {t.CoAuthoringApi.askLock.apply(t.CoAuthoringApi, arguments);},
+					"releaseLocks":						function () {t.CoAuthoringApi.releaseLocks.apply(t.CoAuthoringApi, arguments);},
+					"sendChanges":						function () {t._onSaveChanges.apply(t, arguments);},
+					"applyChanges":						function () {t._onApplyChanges.apply(t, arguments);},
+					"updateAfterApplyChanges":			function () {t._onUpdateAfterApplyChanges.apply(t, arguments);},
+					"drawSelection":					function () {t._onDrawSelection.apply(t, arguments);},
+					"showDrawingObjects":				function () {t._onShowDrawingObjects.apply(t, arguments);},
+					"resetLockedGraphicObjects":		function () {t._onResetLockedGraphicObjects.apply(t, arguments);},
+					"showComments":						function () {t._onShowComments.apply(t, arguments);},
+					"unlockComments":					function () {t._onUnlockComments.apply(t);},
+					"cleanSelection":					function () {t._onCleanSelection.apply(t, arguments);}
 				});
 
 				if (!this.CoAuthoringApi) {
@@ -1436,6 +1437,12 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			_onShowDrawingObjects: function () {
 				if (this.wb) {
 					this.wb.getWorksheet().objectRender.showDrawingObjects(true);
+				}
+			},
+			
+			_onResetLockedGraphicObjects: function () {
+				if (this.wb) {
+					this.wb.getWorksheet().objectRender.reseltLockedGraphicObjects();
 				}
 			},
 			
