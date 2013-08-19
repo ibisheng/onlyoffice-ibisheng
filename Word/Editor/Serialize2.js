@@ -2088,11 +2088,6 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap)
                 ParaStart = Temp2;
             }
         }
-        //Расчитываем настройки для спецсивола конца параграфа
-        var pPr_rPr = null;
-        if(par.Content.length > 2)
-            pPr_rPr = par.Internal_CalculateTextPr(par.Content.length - 2);
-        
         //pPr
         var ParaStyle = par.Style_Get();
         var pPr = par.Pr;
@@ -2128,6 +2123,30 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap)
         this.sCurText = "";
         //todo hyperlinkStart, commentStart для копирования
         var oThis = this;
+		var bExistHyperlink = false;
+		//если выделение не сначала, нужно посмотреть не было ли до этого HyperlinkStart
+		if(bUseSelection && ParaStart > 0)
+		{
+			for ( var i = ParaStart - 1; i >= 0; --i )
+			{
+				var item = Content[i];
+				if(para_HyperlinkStart == item.Type)
+				{
+                    this.WriteText();
+                    var sField = "HYPERLINK \"" + item.Value.replace("\"", "\\\"") + "\"";
+                    if(null != item.ToolTip)
+                        sField += " \\o \"" + item.ToolTip.replace("\"", "\\\"") + "\"";
+                    this.WriteRun(function(){
+                        oThis.memory.WriteByte(c_oSerRunType.fldstart);
+                        oThis.memory.WriteString2(sField);
+                    });
+					bExistHyperlink = true;
+					break;
+				}
+				else if(para_HyperlinkEnd == item.Type)
+					break;
+			}
+		}
         for ( var i = ParaStart; i <= ParaEnd; ++i )
         {
             var item = Content[i];
@@ -2190,6 +2209,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap)
                         oThis.memory.WriteByte(c_oSerRunType.fldstart);
                         oThis.memory.WriteString2(sField);
                     });
+					bExistHyperlink = true;
                     break;
                 case para_HyperlinkEnd:
                     this.WriteText();
@@ -2197,6 +2217,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap)
                         oThis.memory.WriteByte(c_oSerRunType.fldend);
                         oThis.memory.WriteLong(c_oSerPropLenType.Null);
                     });
+					bExistHyperlink = false;
                     break;
 				case para_CommentStart:
 					if(null != this.oMapCommentId)
@@ -2232,6 +2253,13 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap)
             }
         }
         this.WriteText();
+		if(bExistHyperlink)
+		{
+			this.WriteRun(function(){
+                    oThis.memory.WriteByte(c_oSerRunType.fldend);
+                    oThis.memory.WriteLong(c_oSerPropLenType.Null);
+                });
+		}
     };
     this.WriteText = function()
     {
