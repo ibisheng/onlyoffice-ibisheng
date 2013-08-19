@@ -3993,6 +3993,10 @@ function CSpPr()
         var boolBWMode = Reader.GetBool();
 
         this.bwMode = boolBWMode ? 1 : 0;
+        if(!this.xfrm)
+        {
+            this.xfrm = new CXfrm();
+        }
         this.xfrm.Read_FromBinary2(Reader);
         var flag = Reader.GetBool();
         if(flag)
