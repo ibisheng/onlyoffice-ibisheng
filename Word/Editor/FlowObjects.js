@@ -4,8 +4,9 @@
  * Time: 13:56
  */
 
-var flowobject_Image = 0x01;
-var flowobject_Table = 0x02;
+var flowobject_Image     = 0x01;
+var flowobject_Table     = 0x02;
+var flowobject_Paragraph = 0x03;
 
 // Сортируем объекты {X0, X1} по X0
 function Sort_Ranges_X0(A,B)
@@ -2281,4 +2282,48 @@ CFlowTable2.prototype =
 
     }
 
+};
+
+function CFlowParagraph(Paragraph, X, Y, W, H, Dx, Dy)
+{
+    this.Table     = Paragraph;
+    this.Paragraph = Paragraph;
+    this.Id        = Paragraph.Get_Id();
+
+    this.PageNum   = Paragraph.PageNum;
+    this.PageController = 0;
+
+    this.Distance =
+    {
+        T : Dy,
+        B : Dy,
+        L : Dx,
+        R : Dx
+    };
+
+    this.X = X;
+    this.Y = Y;
+    this.W = W;
+    this.H = H;
+}
+
+CFlowParagraph.prototype =
+{
+    Get_Type : function()
+    {
+        return flowobject_Paragraph;
+    },
+
+    IsPointIn : function(X,Y)
+    {
+        if ( X <= this.X + this.W && X >= this.X && Y >= this.Y && Y <= this.Y + this.H )
+            return true;
+
+        return false;
+    },
+
+    Update_CursorType : function(X, Y, PageIndex)
+    {
+
+    }
 };

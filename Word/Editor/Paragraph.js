@@ -143,6 +143,22 @@ Paragraph.prototype =
         return this.SetId( newId );
     },
 
+    Use_Wrap : function()
+    {
+        if ( undefined != this.Get_FramePr() )
+            return false;
+
+        return true;
+    },
+
+    Use_YLimit : function()
+    {
+        if ( undefined != this.Get_FramePr() )
+            return false;
+
+        return true;
+    },
+
     Copy : function(Parent)
     {
         var Para = new Paragraph(this.DrawingDocument, Parent, 0, 0, 0, 0, 0);
@@ -231,7 +247,7 @@ Paragraph.prototype =
         this.PageNum = PageNum;
 
         // При первом пересчете параграфа this.Parent.RecalcInfo.FlowObject всегда будет null, а вот при повторных уже нет
-        if ( null === this.Parent.RecalcInfo.FlowObject )
+        if ( null === this.Parent.RecalcInfo.FlowObject && ( this.Parent instanceof CDocumentContent || ( null === this.Parent.RecalcInfo.WidowControlParagraph && null === this.Parent.RecalcInfo.KeepNextParagraph ) ) )
         {
             var Ranges = this.Parent.CheckRange( X, Y, XLimit, Y, Y, Y, X, XLimit, this.PageNum, true );
             if ( Ranges.length > 0 )
@@ -733,6 +749,7 @@ Paragraph.prototype =
         TextHeight  = g_oTextMeasurer.GetHeight();
         TextDescent = Math.abs( g_oTextMeasurer.GetDescender() );
         TextAscent  = TextHeight - TextDescent;
+        TextAscent2 = g_oTextMeasurer.GetAscender();
 
         var ContentLength = this.Content.length;
 
@@ -811,7 +828,8 @@ Paragraph.prototype =
                     g_oTextMeasurer.SetFontSlot( fontslot_ASCII );
                     TextDescent = Math.abs( g_oTextMeasurer.GetDescender() );
                     TextHeight  = g_oTextMeasurer.GetHeight();
-                    TextAscent = TextHeight - TextDescent;
+                    TextAscent  = TextHeight - TextDescent;
+                    TextAscent2 = g_oTextMeasurer.GetAscender();
 
                     break;
                 }
@@ -834,6 +852,7 @@ Paragraph.prototype =
             Item.TextAscent  = TextAscent;
             Item.TextDescent = TextDescent;
             Item.TextHeight  = TextHeight;
+            Item.TextAscent2 = TextAscent2;
             Item.YOffset     = CurTextPr.Position;
         }
 
@@ -938,12 +957,14 @@ Paragraph.prototype =
         // Под Descent мы будем понимать descent + linegap (которые записаны в шрифте)
         var TextAscent  = 0;
         var TextDescent = 0;
+        var TextAscent2 = 0;
 
         this.Lines.length = CurLine + 1;
         this.Lines[CurLine] = new CParaLine(StartPos);
 
         var LineTextAscent  = 0;
         var LineTextDescent = 0;
+        var LineTextAscent2 = 0;
         var LineAscent      = 0;
         var LineDescent     = 0;
 
@@ -986,6 +1007,7 @@ Paragraph.prototype =
             }
             else if  ( this === this.Parent.RecalcInfo.WidowControlParagraph && CurLine === this.Parent.RecalcInfo.WidowControlLine )
             {
+                this.Parent.RecalcInfo.FlowObject            = null;
                 this.Parent.RecalcInfo.WidowControlParagraph = null;
                 this.Parent.RecalcInfo.WidowControlLine      = -1;
 
@@ -1042,6 +1064,9 @@ Paragraph.prototype =
 
                 if ( undefined != Item.TextAscent )
                     TextAscent  = Item.TextAscent;
+
+                if ( undefined != Item.TextAscent2 )
+                    TextAscent2 = Item.TextAscent2;
 
                 if ( undefined != Item.TextDescent )
                     TextDescent = Item.TextDescent;
@@ -1224,6 +1249,9 @@ Paragraph.prototype =
 
                         if ( LineTextAscent < TextAscent )
                             LineTextAscent = TextAscent;
+
+                        if ( LineTextAscent2 < TextAscent2 )
+                            LineTextAscent2 = TextAscent2;
 
                         if ( LineTextDescent < TextDescent )
                             LineTextDescent = TextDescent;
@@ -1611,6 +1639,9 @@ Paragraph.prototype =
                         if ( LineTextAscent < TextAscent )
                             LineTextAscent = TextAscent;
 
+                        if ( LineTextAscent2 < TextAscent2 )
+                            LineTextAscent2 = TextAscent2;
+
                         if ( LineTextDescent < TextDescent )
                             LineTextDescent = TextDescent;
 
@@ -1953,6 +1984,9 @@ Paragraph.prototype =
                     if ( LineTextAscent < TextAscent )
                         LineTextAscent = TextAscent;
 
+                    if ( LineTextAscent2 < TextAscent2 )
+                        LineTextAscent2 = TextAscent2;
+
                     if ( LineTextDescent < TextDescent )
                         LineTextDescent = TextDescent;
 
@@ -1964,7 +1998,7 @@ Paragraph.prototype =
                 }
 
                 // Рассчитаем метрики строки
-                this.Lines[CurLine].Metrics.Update( LineTextAscent, LineTextDescent, LineAscent, LineDescent, ParaPr );
+                this.Lines[CurLine].Metrics.Update( LineTextAscent, LineTextAscent2, LineTextDescent, LineAscent, LineDescent, ParaPr );
 
                 bFirstItemOnLine  = true;
                 bStartWord        = false;
@@ -2227,7 +2261,7 @@ Paragraph.prototype =
 
                 // Сначала проверяем не нужно ли сделать перенос страницы в данном месте
                 // Перенос не делаем, если это первая строка на новой странице
-                if ( (Top > this.YLimit || Bottom2 > this.YLimit ) && ( CurLine != this.Pages[CurPage].FirstLine || ( 0 === CurPage && ( null != this.Get_DocumentPrev() || true === this.Parent.Is_TableCellContent() ) ) ) && false === bBreakPageLineEmpty )
+                if ( true === this.Use_YLimit() && (Top > this.YLimit || Bottom2 > this.YLimit ) && ( CurLine != this.Pages[CurPage].FirstLine || ( 0 === CurPage && ( null != this.Get_DocumentPrev() || true === this.Parent.Is_TableCellContent() ) ) ) && false === bBreakPageLineEmpty )
                 {
                     // Проверим висячую строку
                     if ( this.Parent instanceof CDocument && true === ParaPr.WidowControl && CurLine - this.Pages[CurPage].StartLine <= 1 && CurLine >= 1 && true != bBreakPageLine )
@@ -2269,7 +2303,11 @@ Paragraph.prototype =
                 var Right  = this.XLimit - ParaPr.Ind.Right;
 
                 var PageFields = this.Parent.Get_PageFields( this.PageNum + CurPage );
-                var Ranges2 = this.Parent.CheckRange( Left, Top, Right, Bottom, Top2, Bottom2, PageFields.X, PageFields.XLimit, this.PageNum + CurPage, true );
+                var Ranges2;
+                if ( true === this.Use_Wrap() )
+                    Ranges2 = this.Parent.CheckRange( Left, Top, Right, Bottom, Top2, Bottom2, PageFields.X, PageFields.XLimit, this.PageNum + CurPage, true );
+                else
+                    Ranges2 = new Array();
 
                 // Проверяем совпали ли промежутки. Если совпали, тогда данная строчка рассчитана верно,
                 // и мы переходим к следующей, если нет, тогда заново рассчитываем данную строчку, но
@@ -2293,13 +2331,17 @@ Paragraph.prototype =
                         X = this.X + ParaPr.Ind.Left;
 
                     this.Lines[CurLine].Reset();
-                    this.Lines[CurLine].Metrics.Update( TextAscent, TextDescent, TextAscent, TextDescent, ParaPr );
+                    //this.Lines[CurLine].Metrics.Update( TextAscent, TextAscent2, TextDescent, TextAscent, TextDescent, ParaPr );
 
                     LineTextAscent  = 0;
+                    LineTextAscent2 = 0;
                     LineTextDescent = 0;
                     LineAscent      = 0;
                     LineDescent     = 0;
 
+                    TextAscent  = 0;
+                    TextDescent = 0;
+                    TextAscent2 = 0;
 
                     RangesCount = Ranges.length;
 
@@ -2469,12 +2511,17 @@ Paragraph.prototype =
                             }
                         }
                         this.Lines[CurLine] = new CParaLine(Pos + 1);
-                        //this.Lines[CurLine].Metrics.Update( TextAscent, TextDescent, TextAscent, TextDescent, ParaPr );
+                        //this.Lines[CurLine].Metrics.Update( TextAscent, TextAscent2, TextDescent, TextAscent, TextDescent, ParaPr );
 
                         LineTextAscent  = 0;
                         LineTextDescent = 0;
+                        LineTextAscent2 = 0;
                         LineAscent      = 0;
                         LineDescent     = 0;
+
+                        TextAscent  = 0;
+                        TextDescent = 0;
+                        TextAscent2 = 0;
 
                         // Верх следующей строки
                         var TempY;
@@ -3775,6 +3822,43 @@ Paragraph.prototype =
 
         var Pr = this.Get_CompiledPr();
 
+        // Задаем обрезку, если данный параграф является рамкой
+        var FramePr = this.Get_FramePr();
+        if ( undefined != FramePr )
+        {
+            var Bounds = this.Pages[CurPage].Bounds;
+            var BoundsW = Bounds.Right - Bounds.Left;
+            var BoundsH = Bounds.Bottom - Bounds.Top;
+
+            var PrevElement = this.Get_DocumentPrev();
+            var NextElement = this.Get_DocumentNext();
+
+            var bFullLen = false;
+            if ( null != PrevElement && type_Paragraph === PrevElement.GetType() )
+            {
+                var PrevFramePr = PrevElement.Get_FramePr();
+                if ( undefined != PrevFramePr && true === PrevFramePr.Compare( FramePr ) )
+                    bFullLen = true;
+            }
+
+            if ( false === bFullLen && null != NextElement && type_Paragraph === NextElement.GetType() )
+            {
+                var NextFramePr = NextElement.Get_FramePr();
+                if ( undefined != NextFramePr && true === NextFramePr.Compare( FramePr ) )
+                    bFullLen = true;
+            }
+
+            var BoundsL = Bounds.Left;
+            if ( false === bFullLen && 1 === this.Lines.length )
+            {
+                BoundsL = this.Lines[0].Ranges[0].X;
+                BoundsW = this.Lines[0].Ranges[0].W;
+            }
+
+            pGraphics.SaveGrState();
+            pGraphics.AddClipRect( BoundsL, Bounds.Top, BoundsW, BoundsH );
+        }
+
         // 1 часть отрисовки :
         //    Рисуем слева от параграфа знак, если данный параграф зажат другим пользователем
         this.Internal_Draw_1( CurPage, pGraphics, Pr );
@@ -3801,6 +3885,12 @@ Paragraph.prototype =
         // 6 часть отрисовки :
         //    Рисуем верхнюю, нижнюю и промежуточную границы
         this.Internal_Draw_6( CurPage, pGraphics, Pr );
+
+        // Убираем обрезку
+        if ( undefined != FramePr )
+        {
+            pGraphics.RestoreGrState();
+        }
     },
 
     Internal_Draw_1 : function(CurPage, pGraphics, Pr)
@@ -8852,6 +8942,12 @@ Paragraph.prototype =
         if ( -1 != Lvl && undefined != Pr.ParaPr.NumPr )
             Pr.ParaPr.NumPr.Lvl = Lvl;
 
+        // Настройки рамки не наследуются
+        if ( undefined === this.Pr.FramePr )
+            Pr.ParaPr.FramePr = undefined;
+        else
+            Pr.ParaPr.FramePr = this.Pr.FramePr.Copy();
+
         return Pr;
     },
 
@@ -10299,6 +10395,39 @@ Paragraph.prototype =
         return false;
     },
 
+    Is_Inline : function()
+    {
+        if ( undefined != this.Pr.FramePr )
+            return false;
+
+        return true;
+    },
+
+    Get_FramePr : function()
+    {
+        return this.Pr.FramePr;
+    },
+
+    Set_FramePr : function(FramePr, bDelete)
+    {
+        var FramePr_old = this.Pr.FramePr;
+        if ( undefined === bDelete )
+            bDelete = false;
+
+        if ( true === bDelete )
+        {
+            this.Pr.FramePr = undefined;
+            History.Add( this, { Type : historyitem_Paragraph_FramePr, Old : FramePr_old, New : undefined } );
+            this.CompiledPr.NeedRecalc = true;
+            return;
+        }
+
+        this.Pr.FramePr = new CFramePr();
+        this.Pr.FramePr.Set_FromObject( FramePr );
+        History.Add( this, { Type : historyitem_Paragraph_FramePr, Old : FramePr_old, New : this.Pr.FramePr } );
+        this.CompiledPr.NeedRecalc = true;
+    },
+
     // Разделяем данный параграф
     Split : function(NewParagraph, Pos)
     {
@@ -10718,6 +10847,13 @@ Paragraph.prototype =
                 this.PresentationPr.Level = Data.Old;
                 break;
             }
+
+            case historyitem_Paragraph_FramePr:
+            {
+                this.Pr.FramePr = Data.Old;
+                this.CompiledPr.NeedRecalc = true;
+                break;
+            }
         }
 
         this.RecalcInfo.Set_Type_0(pararecalc_0_All);
@@ -11063,6 +11199,13 @@ Paragraph.prototype =
                 this.PresentationPr.Level = Data.New;
                 break;
             }
+
+            case historyitem_Paragraph_FramePr:
+            {
+                this.Pr.FramePr = Data.New;
+                this.CompiledPr.NeedRecalc = true;
+                break;
+            }
         }
 
         this.RecalcInfo.Set_Type_0(pararecalc_0_All);
@@ -11191,6 +11334,7 @@ Paragraph.prototype =
             case historyitem_Paragraph_Borders_Left:
             case historyitem_Paragraph_Borders_Right:
             case historyitem_Paragraph_Borders_Top:
+            case historyitem_Paragraph_FramePr:
             {
                 bNeedRecalc = true;
                 break;
@@ -11638,6 +11782,23 @@ Paragraph.prototype =
             {
                 // Long : Level
                 Writer.WriteLong( Data.New );
+                break;
+            }
+
+            case historyitem_Paragraph_FramePr:
+            {
+                // Bool : IsUndefined
+                // false ->
+                //   Variable : CFramePr
+
+                if ( undefined === Data.New )
+                    Writer.WriteBool( true );
+                else
+                {
+                    Writer.WriteBool( false );
+                    Data.New.Write_ToBinary( Writer );
+                }
+
                 break;
             }
         }
@@ -12261,6 +12422,27 @@ Paragraph.prototype =
                 this.PresentationPr.Level = Reader.GetLong();
                 break;
             }
+
+            case historyitem_Paragraph_FramePr:
+            {
+                // Bool : IsUndefined
+                // false ->
+                //   Variable : CFramePr
+
+                if ( false === Reader.GetBool() )
+                {
+                    this.Pr.FramePr = new CFramePr();
+                    this.Pr.FramePr.Read_FromBinary( Reader );
+                }
+                else
+                {
+                    this.Pr.FramePr = undefined;
+                }
+
+                this.CompiledPr.NeedRecalc = true;
+
+                break;
+            }
         }
 
         this.RecalcInfo.Set_Type_0(pararecalc_0_All);
@@ -12693,16 +12875,20 @@ function CParaLineMetrics()
     this.Ascent      = 0; // Высота над BaseLine
     this.Descent     = 0; // Высота после BaseLine
     this.TextAscent  = 0; // Высота текста над BaseLine
+    this.TextAscent2 = 0; // Высота текста над BaseLine
     this.TextDescent = 0; // Высота текста после BaseLine
     this.LineGap     = 0; // Дополнительное расстояние между строками
 }
 
 CParaLineMetrics.prototype =
 {
-    Update : function(TextAscent, TextDescent, Ascent, Descent, ParaPr)
+    Update : function(TextAscent, TextAscent2, TextDescent, Ascent, Descent, ParaPr)
     {
         if ( TextAscent > this.TextAscent )
             this.TextAscent = TextAscent;
+
+        if ( TextAscent2 > this.TextAscent2 )
+            this.TextAscent2 = TextAscent2;
 
         if ( TextDescent > this.TextDescent )
             this.TextDescent = TextDescent;
@@ -12712,6 +12898,12 @@ CParaLineMetrics.prototype =
 
         if ( Descent > this.Descent )
             this.Descent = Descent;
+
+        if ( this.Ascent < this.TextAscent )
+            this.TextAscent = this.Ascent;
+
+        if ( this.Descent < this.TextDescent )
+            this.TextDescent = this.Descent;
 
         this.LineGap = this.Recalculate_LineGap( ParaPr, this.TextAscent, this.TextDescent );
     },
@@ -12730,6 +12922,40 @@ CParaLineMetrics.prototype =
             {
                 var ExactValue = Math.max( 1, ParaPr.Spacing.Line );
                 LineGap = ExactValue - ( TextAscent + TextDescent );
+
+                if ( LineGap < 0 )
+                {
+                    var Ascent_old  = this.Ascent;
+                    var Descent_old = this.Descent;
+                    var TextDescent_old = this.TextDescent;
+                    var TextAscent_old  = this.TextAscent;
+
+                    var DiffAsc = Ascent_old  - TextAscent_old;
+                    var DiffDes = Descent_old - TextDescent_old;
+
+                    if ( -LineGap < DiffAsc + DiffDes )
+                    {
+                        var NewVal = DiffAsc + DiffDes + LineGap;
+                        var DiffAsc_new = NewVal * DiffAsc / (DiffAsc + DiffDes);
+                        var DiffDes_new = NewVal * DiffDes / (DiffAsc + DiffDes);
+
+                        this.Ascent  = TextAscent_old  + DiffAsc_new;
+                        this.Descent = TextDescent_old + DiffDes_new;
+                    }
+                    else
+                    {
+                        LineGap += DiffAsc + DiffDes;
+
+                        Ascent_old  = TextAscent_old;
+                        Descent_old = TextDescent_old;
+
+                        this.Ascent  = ExactValue * Ascent_old  / ( Ascent_old + Descent_old );
+                        this.Descent = ExactValue * Descent_old / ( Ascent_old + Descent_old );
+                    }
+
+                    LineGap = 0;
+                }
+
                 break;
             }
             case linerule_AtLeast:

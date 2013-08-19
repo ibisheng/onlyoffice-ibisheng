@@ -69,6 +69,14 @@ var historyitem_TextPr_Position   = 16; // Изменяем вертикальн
 var historyitem_TextPr_Value      = 17; // Изменяем целиком все настройки
 var historyitem_TextPr_RFonts     = 18; // Изменяем настройки шрифтов
 var historyitem_TextPr_Lang       = 19; // Изменяем настройку языка
+var historyitem_TextPr_RFonts_Ascii    = 20; // Изменяем настройки шрифтов
+var historyitem_TextPr_RFonts_HAnsi    = 21; // Изменяем настройки шрифтов
+var historyitem_TextPr_RFonts_CS       = 22; // Изменяем настройки шрифтов
+var historyitem_TextPr_RFonts_EastAsia = 23; // Изменяем настройки шрифтов
+var historyitem_TextPr_RFonts_Hint     = 24; // Изменяем настройки шрифтов
+var historyitem_TextPr_Lang_Bidi       = 25; // Изменяем настройку языка
+var historyitem_TextPr_Lang_EastAsia   = 26; // Изменяем настройку языка
+var historyitem_TextPr_Lang_Val        = 27; // Изменяем настройку языка
 
 // Типы изменений в классе ParaDrawing
 var historyitem_Drawing_Size              = 1; // Изменяем размер картинки

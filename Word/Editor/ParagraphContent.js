@@ -474,7 +474,7 @@ ParaTextPr.prototype =
             this.Set_Position( TextPr.Position );
 
         if ( undefined != TextPr.RFonts )
-            this.Set_RFonts( TextPr.RFonts );
+            this.Set_RFonts2( TextPr.RFonts );
 
         if ( undefined != TextPr.Lang )
             this.Set_Lang( TextPr.Lang );
@@ -690,7 +690,7 @@ ParaTextPr.prototype =
 
     Set_RFonts : function(Value)
     {
-        var OldValue = this.Value;
+        var OldValue = this.RFonts.Value;
         if ( undefined != Value )
             this.Value.RFonts = Value;
         else
@@ -699,9 +699,90 @@ ParaTextPr.prototype =
         History.Add( this, { Type : historyitem_TextPr_RFonts, New : Value, Old : OldValue } );
     },
 
+    Set_RFonts2 : function(RFonts)
+    {
+        if ( undefined != RFonts )
+        {
+            if ( undefined != RFonts.Ascii )
+                this.Set_RFonts_Ascii( RFonts.Ascii );
+
+            if ( undefined != RFonts.HAnsi )
+                this.Set_RFonts_HAnsi( RFonts.HAnsi );
+
+            if ( undefined != RFonts.CS )
+                this.Set_RFonts_CS( RFonts.CS );
+
+            if ( undefined != RFonts.EastAsia )
+                this.Set_RFonts_EastAsia( RFonts.EastAsia );
+
+            if ( undefined != RFonts.Hint )
+                this.Set_RFonts_Hint( RFonts.Hint );
+        }
+    },
+
+    Set_RFonts_Ascii : function(Value)
+    {
+        var OldValue = this.Value.RFonts.Ascii;
+
+        if ( undefined != Value )
+            this.Value.RFonts.Ascii = Value;
+        else
+            this.Value.RFonts.Ascii = undefined;
+
+        History.Add( this, { Type : historyitem_TextPr_RFonts_Ascii, New : Value, Old : OldValue } );
+    },
+
+    Set_RFonts_HAnsi : function(Value)
+    {
+        var OldValue = this.Value.RFonts.HAnsi;
+
+        if ( undefined != Value )
+            this.Value.RFonts.HAnsi = Value;
+        else
+            this.Value.RFonts.HAnsi = undefined;
+
+        History.Add( this, { Type : historyitem_TextPr_RFonts_HAnsi, New : Value, Old : OldValue } );
+    },
+
+    Set_RFonts_CS : function(Value)
+    {
+        var OldValue = this.Value.RFonts.CS;
+
+        if ( undefined != Value )
+            this.Value.RFonts.CS = Value;
+        else
+            this.Value.RFonts.CS = undefined;
+
+        History.Add( this, { Type : historyitem_TextPr_RFonts_CS, New : Value, Old : OldValue } );
+    },
+
+    Set_RFonts_EastAsia : function(Value)
+    {
+        var OldValue = this.Value.RFonts.EastAsia;
+
+        if ( undefined != Value )
+            this.Value.RFonts.EastAsia = Value;
+        else
+            this.Value.RFonts.EastAsia = undefined;
+
+        History.Add( this, { Type : historyitem_TextPr_RFonts_EastAsia, New : Value, Old : OldValue } );
+    },
+
+    Set_RFonts_Hint : function(Value)
+    {
+        var OldValue = this.Value.RFonts.Hint;
+
+        if ( undefined != Value )
+            this.Value.RFonts.Hint = Value;
+        else
+            this.Value.RFonts.Hint = undefined;
+
+        History.Add( this, { Type : historyitem_TextPr_RFonts_Hint, New : Value, Old : OldValue } );
+    },
+
     Set_Lang : function(Value)
     {
-        var OldValue = this.Value;
+        var OldValue = this.Value.Lang;
 
         var NewValue = new CLang();
         if ( undefined != Value )
@@ -710,6 +791,42 @@ ParaTextPr.prototype =
         this.Value.Lang = NewValue;
 
         History.Add( this, { Type : historyitem_TextPr_Lang, New : NewValue, Old : OldValue } );
+    },
+
+    Set_Lang_Bidi : function(Value)
+    {
+        var OldValue = this.Value.Lang.Bidi;
+
+        if ( undefined != Value )
+            this.Value.Lang.Bidi = Value;
+        else
+            this.Value.Lang.Bidi = undefined;
+
+        History.Add( this, { Type : historyitem_TextPr_Lang_Bidi, New : Value, Old : OldValue } );
+    },
+
+    Set_Lang_EastAsia : function(Value)
+    {
+        var OldValue = this.Value.Lang.EastAsia;
+
+        if ( undefined != Value )
+            this.Value.Lang.EastAsia = Value;
+        else
+            this.Value.Lang.EastAsia = undefined;
+
+        History.Add( this, { Type : historyitem_TextPr_Lang_EastAsia, New : Value, Old : OldValue } );
+    },
+
+    Set_Lang_Val : function(Value)
+    {
+        var OldValue = this.Value.Lang.Val;
+
+        if ( undefined != Value )
+            this.Value.Lang.Val = Value;
+        else
+            this.Value.Lang.Val = undefined;
+
+        History.Add( this, { Type : historyitem_TextPr_Lang_Val, New : Value, Old : OldValue } );
     },
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
@@ -900,6 +1017,81 @@ ParaTextPr.prototype =
                     this.Value.Lang = Data.Old;
                 else
                     this.Value.Lang = new CLang();
+
+                break;
+            }
+
+            case historyitem_TextPr_RFonts_Ascii:
+            {
+                if ( undefined != Data.Old )
+                    this.Value.RFonts.Ascii = Data.Old;
+                else
+                    this.Value.RFonts.Ascii = undefined;
+                break;
+            }
+
+            case historyitem_TextPr_RFonts_HAnsi:
+            {
+                if ( undefined != Data.Old )
+                    this.Value.RFonts.Ascii = Data.Old;
+                else
+                    this.Value.RFonts.Ascii = undefined;
+                break;
+            }
+
+            case historyitem_TextPr_RFonts_CS:
+            {
+                if ( undefined != Data.Old )
+                    this.Value.RFonts.Ascii = Data.Old;
+                else
+                    this.Value.RFonts.Ascii = undefined;
+                break;
+            }
+
+            case historyitem_TextPr_RFonts_EastAsia:
+            {
+                if ( undefined != Data.Old )
+                    this.Value.RFonts.Ascii = Data.Old;
+                else
+                    this.Value.RFonts.Ascii = undefined;
+                break;
+            }
+
+            case historyitem_TextPr_RFonts_Hint:
+            {
+                if ( undefined != Data.Old )
+                    this.Value.RFonts.Ascii = Data.Old;
+                else
+                    this.Value.RFonts.Ascii = undefined;
+                break;
+            }
+
+            case historyitem_TextPr_Lang_Bidi:
+            {
+                if ( undefined != Data.Old )
+                    this.Value.Lang.Bidi = Data.Old;
+                else
+                    this.Value.Lang.Bidi = undefined;
+
+                break;
+            }
+
+            case historyitem_TextPr_Lang_EastAsia:
+            {
+                if ( undefined != Data.Old )
+                    this.Value.Lang.EastAsia = Data.Old;
+                else
+                    this.Value.Lang.EastAsia = undefined;
+
+                break;
+            }
+
+            case historyitem_TextPr_Lang_Val:
+            {
+                if ( undefined != Data.Old )
+                    this.Value.Lang.Val = Data.Old;
+                else
+                    this.Value.Lang.Val = undefined;
 
                 break;
             }
@@ -1095,6 +1287,86 @@ ParaTextPr.prototype =
                     this.Value.Lang = Data.New;
                 else
                     this.Value.Lang = new CLang();
+
+                break;
+            }
+
+            case historyitem_TextPr_RFonts_Ascii:
+            {
+                if ( undefined != Data.New )
+                    this.Value.RFonts.Ascii = Data.New;
+                else
+                    this.Value.RFonts.Ascii = undefined;
+
+                break;
+            }
+
+            case historyitem_TextPr_RFonts_HAnsi:
+            {
+                if ( undefined != Data.New )
+                    this.Value.RFonts.Ascii = Data.New;
+                else
+                    this.Value.RFonts.Ascii = undefined;
+
+                break;
+            }
+
+            case historyitem_TextPr_RFonts_CS:
+            {
+                if ( undefined != Data.New )
+                    this.Value.RFonts.Ascii = Data.New;
+                else
+                    this.Value.RFonts.Ascii = undefined;
+
+                break;
+            }
+
+            case historyitem_TextPr_RFonts_EastAsia:
+            {
+                if ( undefined != Data.New )
+                    this.Value.RFonts.Ascii = Data.New;
+                else
+                    this.Value.RFonts.Ascii = undefined;
+
+                break;
+            }
+
+            case historyitem_TextPr_RFonts_Hint:
+            {
+                if ( undefined != Data.New )
+                    this.Value.RFonts.Ascii = Data.New;
+                else
+                    this.Value.RFonts.Ascii = undefined;
+
+                break;
+            }
+
+            case historyitem_TextPr_Lang_Bidi:
+            {
+                if ( undefined != Data.New )
+                    this.Value.Lang.Bidi = Data.New;
+                else
+                    this.Value.Lang.Bidi = undefined;
+
+                break;
+            }
+
+            case historyitem_TextPr_Lang_EastAsia:
+            {
+                if ( undefined != Data.New )
+                    this.Value.Lang.EastAsia = Data.New;
+                else
+                    this.Value.Lang.EastAsia = undefined;
+
+                break;
+            }
+
+            case historyitem_TextPr_Lang_Val:
+            {
+                if ( undefined != Data.New )
+                    this.Value.Lang.Val = Data.New;
+                else
+                    this.Value.Lang.Val = undefined;
 
                 break;
             }
@@ -1365,6 +1637,58 @@ ParaTextPr.prototype =
                 {
                     Writer.WriteBool( false );
                     Data.New.Write_ToBinary( Writer );
+                }
+                else
+                    Writer.WriteBool( true );
+
+                break;
+            }
+
+            case historyitem_TextPr_RFonts_Ascii:
+            case historyitem_TextPr_RFonts_HAnsi:
+            case historyitem_TextPr_RFonts_CS:
+            case historyitem_TextPr_RFonts_EastAsia:
+            {
+                // Bool : undefined?
+                // false -> String
+
+                if ( undefined != Data.Old )
+                {
+                    Writer.WriteBool( false );
+                    Writer.WriteString2( Data.Old.Name );
+                }
+                else
+                    Writer.WriteBool( true );
+
+                break;
+            }
+
+            case historyitem_TextPr_RFonts_Hint:
+            {
+                // Bool : undefined?
+                // false -> Long
+
+                if ( undefined != Data.Old )
+                {
+                    Writer.WriteBool( false );
+                    Writer.WriteLong( Data.Old );
+                }
+                else
+                    Writer.WriteBool( true );
+
+                break;
+            }
+
+            case historyitem_TextPr_Lang_Bidi:
+            case historyitem_TextPr_Lang_EastAsia:
+            case historyitem_TextPr_Lang_Val:
+            {
+                // Bool : undefined ?
+                // false -> Long
+                if ( undefined != Data.Old )
+                {
+                    Writer.WriteBool( false );
+                    Writer.WriteLong( Data.Old );
                 }
                 else
                     Writer.WriteBool( true );
@@ -1659,6 +1983,129 @@ ParaTextPr.prototype =
                 }
                 else
                     this.Value.Lang = new CLang();
+
+                break;
+            }
+
+            case historyitem_TextPr_RFonts_Ascii:
+            {
+                // Bool : undefined ?
+                // false -> String
+                if ( false === Reader.GetBool() )
+                {
+                    this.Value.RFonts.Ascii =
+                    {
+                        Name  : Reader.GetString2(),
+                        Index : -1
+                    };
+                }
+                else
+                    this.Value.RFonts.Ascii = undefined;
+
+                break;
+            }
+
+            case historyitem_TextPr_RFonts_HAnsi:
+            {
+                // Bool : undefined ?
+                // false -> String
+                if ( false === Reader.GetBool() )
+                {
+                    this.Value.RFonts.HAnsi =
+                    {
+                        Name  : Reader.GetString2(),
+                        Index : -1
+                    };
+                }
+                else
+                    this.Value.RFonts.HAnsi = undefined;
+
+                break;
+            }
+
+            case historyitem_TextPr_RFonts_CS:
+            {
+                // Bool : undefined ?
+                // false -> String
+                if ( false === Reader.GetBool() )
+                {
+                    this.Value.RFonts.CS =
+                    {
+                        Name  : Reader.GetString2(),
+                        Index : -1
+                    };
+                }
+                else
+                    this.Value.RFonts.CS = undefined;
+
+                break;
+            }
+
+            case historyitem_TextPr_RFonts_EastAsia:
+            {
+                // Bool : undefined ?
+                // false -> String
+                if ( false === Reader.GetBool() )
+                {
+                    this.Value.RFonts.EastAsia =
+                    {
+                        Name  : Reader.GetString2(),
+                        Index : -1
+                    };
+                }
+                else
+                    this.Value.RFonts.Ascii = undefined;
+
+                break;
+            }
+
+            case historyitem_TextPr_RFonts_Hint:
+            {
+                // Bool : undefined ?
+                // false -> Long
+                if ( false === Reader.GetBool() )
+                    this.Value.RFonts.Hint = Reader.GetLong();
+                else
+                    this.Value.RFonts.Hint = undefined;
+
+                break;
+            }
+
+            case historyitem_TextPr_Lang_Bidi:
+            {
+                // Bool : undefined ?
+                // false -> Long
+
+                if ( false === Reader.GetBool() )
+                    this.Value.Lang.Bidi = Reader.GetLong();
+                else
+                    this.Value.Lang.Bidi = undefined;
+
+                break;
+            }
+
+            case historyitem_TextPr_Lang_EastAsia:
+            {
+                // Bool : undefined ?
+                // false -> Long
+
+                if ( false === Reader.GetBool() )
+                    this.Value.Lang.EastAsia = Reader.GetLong();
+                else
+                    this.Value.Lang.EastAsia = undefined;
+
+                break;
+            }
+
+            case historyitem_TextPr_Lang_Val:
+            {
+                // Bool : undefined ?
+                // false -> Long
+
+                if ( false === Reader.GetBool() )
+                    this.Value.Lang.Val = Reader.GetLong();
+                else
+                    this.Value.Lang.Val = undefined;
 
                 break;
             }
