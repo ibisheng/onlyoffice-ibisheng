@@ -1050,6 +1050,34 @@ CImageShape.prototype =
                 break;
             }
         }
+    },
+
+    getBase64Image: function()
+    {
+        return ShapeToImageConverter(this, this.pageIndex).ImageUrl;
+    },
+
+    writeToBinaryForCopyPaste: function(w)
+    {
+        this.blipFill.Write_ToBinary2(w);
+        this.spPr.Write_ToBinary2(w);
+
+    },
+
+    readFromBinaryForCopyPaste: function(r, group, drawingObjects)
+    {
+        this.group = group;
+        this.drawingObjects = drawingObjects;
+        this.blipFill.Read_FromBinary2(r);
+        this.spPr.Read_FromBinary2(r);
+
+        if(!isRealObject(group))
+        {
+            this.recalculate();
+            this.recalculateTransform();
+            this.calculateContent();
+            this.calculateTransformTextMatrix();
+        }
     }
 
 };

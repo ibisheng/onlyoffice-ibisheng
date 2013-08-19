@@ -903,5 +903,16 @@ CTextBody.prototype =
                 break;
             }
         }
+    },
+
+    writeToBinaryForCopyPaste: function(w)
+    {
+        this.bodyPr.Write_ToBinary2(w);
+    },
+
+    readFromBinaryForCopyPaste: function(r, drawingDocument)
+    {
+        this.bodyPr.Read_FromBinary2(r);
+        this.content = new CDocumentContent(this, drawingDocument, 0, 0, 0, 20000, false, false);
     }
 };

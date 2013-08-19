@@ -1623,6 +1623,65 @@ CGroupShape.prototype =
                 break;
             }
         }
+    },
+
+    writeToBinaryForCopyPaste: function(w)
+    {
+        this.spPr.Write_ToBinary2(w);
+        w.WriteLong(this.spTree.length);
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            w.WriteLong(this.spTree[i].getObjectType());
+            this.spTree[i].writeToBinaryForCopyPaste(w);
+        }
+    },
+
+
+    getBase64Image: function()
+    {
+        return ShapeToImageConverter(this, this.pageIndex).ImageUrl;
+    },
+
+    readFromBinaryForCopyPaste: function(r, group, drawingObjects)
+    {
+        this.group = group;
+        this.drawingObjects = drawingObjects;
+        this.spPr.Read_FromBinary2(r);
+        var l = r.GetLong();
+        for(var i = 0; i < l;++i)
+        {
+            switch (r.GetLong())
+            {
+                case CLASS_TYPE_SHAPE:
+                {
+                    this.spTree[i] = new CShape(null, drawingObjects);
+                    this.spTree[i].readFromBinaryForCopyPaste(r, this, drawingObjects);
+                    break;
+                }
+
+                case CLASS_TYPE_IMAGE:
+                {
+                    this.spTree[i] = new CImageShape(null, drawingObjects);
+                    this.spTree[i].readFromBinaryForCopyPaste(r, this, drawingObjects);
+                    break;
+                }
+
+                case CLASS_TYPE_GROUP:
+                {
+                    this.spTree[i] = new CGroupShape(null, drawingObjects);
+                    this.spTree[i].readFromBinaryForCopyPaste(r, this, drawingObjects);
+                    break;
+                }
+            }
+        }
+
+        if(!isRealObject(group))
+        {
+            this.recalculate();
+            this.recalculateTransform();
+            this.calculateContent();
+            this.calculateTransformTextMatrix();
+        }
     }
 
 };

@@ -2780,6 +2780,54 @@ CShape.prototype =
                 break;
             }
         }
+    },
+
+
+    getBase64Image: function()
+    {
+        return ShapeToImageConverter(this, this.pageIndex).ImageUrl;
+    },
+
+    writeToBinaryForCopyPaste: function()
+    {
+        var w = new CMemory();
+        var start_string = "";
+        this.spPr.Write_ToBinary2(w);
+        w.WriteBool(isRealObject(this.style));
+        if(isRealObject(this.style))
+        {
+            this.style.Write_ToBinary2(w);
+        }
+        w.WriteBool(isRealObject(this.txBody));
+        if(isRealObject(this.txBody))
+        {
+            this.txBody.writeToBinaryForCopyPaste(w);
+        }
+        return start_string + w.pos + ";" + w.GetBase64Memory();
+    },
+
+    readFromBinaryForCopyPaste: function(r, group, drawingObjects)
+    {
+        this.group = group;
+        this.drawingObjects = drawingObjects;
+        this.spPr.Read_FromBinary2(r);
+        if(r.GetBool())
+        {
+            this.style = new CShapeStyle();
+            this.style.Read_FromBinary2(r);
+        }
+        if(r.GetBool())
+        {
+            this.txBody = new CTextBody(this);
+            this.txBody.Read_FromBinary2(r);
+        }
+        if(!isRealObject(group))
+        {
+            this.recalculate();
+            this.recalculateTransform();
+            this.calculateContent();
+            this.calculateTransformTextMatrix();
+        }
     }
 };
 
