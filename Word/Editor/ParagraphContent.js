@@ -97,70 +97,55 @@ function ParaText(value)
     this.Width        = 0;
     this.Height       = 0;
     this.WidthVisible = 0;
+
+    this.IsNBSP       = (this.Value === nbsp_string ? true : false);
 }
 ParaText.prototype =
 {
     Draw : function(X,Y,Context)
     {
-        try
-        {
-            Context.SetFontSlot( this.FontSlot, this.FontKoef );
+        Context.SetFontSlot( this.FontSlot, this.FontKoef );
 
-            if ( true === this.Is_NBSP() && editor.ShowParaMarks )
-                Context.FillText( X, Y, String.fromCharCode( 0x00B0 ) );
-            else
-                Context.FillText( X, Y, this.CalcValue );
-        }
-        catch(e)
-        {
-
-        }
+        if ( true === this.IsNBSP && editor.ShowParaMarks )
+            Context.FillText( X, Y, String.fromCharCode( 0x00B0 ) );
+        else
+            Context.FillText( X, Y, this.CalcValue );
     },
 
     Measure : function(Context, TextPr)
     {
-        try
+        this.FontKoef = TextPr.Get_FontKoef();
+
+        var bCapitals = false;
+        if ( true === TextPr.Caps || true === TextPr.SmallCaps )
         {
-            this.FontKoef = TextPr.Get_FontKoef();
-
-            var bCapitals = false;
-            if ( true === TextPr.Caps || true === TextPr.SmallCaps )
-            {
-                this.CalcValue = this.Value.toUpperCase();
-                bCapitals  = ( this.CalcValue === this.Value ? true : false );
-            }
-            else
-            {
-                this.CalcValue = this.Value;
-                bCapitals  = false;
-            }
-
-            if ( true != TextPr.Caps && true === TextPr.SmallCaps && false === bCapitals )
-                this.FontKoef *= smallcaps_Koef;
-
-            var Hint = TextPr.RFonts.Hint;
-            var bCS  = TextPr.CS;
-            var bRTL = TextPr.RTL;
-            var lcid = TextPr.Lang.EastAsia;
-
-            this.FontSlot = g_font_detector.Get_FontClass( this.CalcValue.charCodeAt(0), Hint, lcid, bCS, bRTL );
-
-            Context.SetFontSlot( this.FontSlot, this.FontKoef );
-            var Temp = Context.Measure( this.CalcValue );
-
-            Temp.Width = Math.max( Temp.Width + TextPr.Spacing, 0 );
-
-            this.Width        = Temp.Width;
-            this.Height       = Temp.Height;
-            this.WidthVisible = Temp.Width;
+            this.CalcValue = this.Value.toUpperCase();
+            bCapitals  = ( this.CalcValue === this.Value ? true : false );
         }
-        catch(e)
+        else
         {
-            this.CalcValue    = this.Value;
-            this.Width        = 0;
-            this.Height       = 0;
-            this.WidthVisible = 0;
+            this.CalcValue = this.Value;
+            bCapitals  = false;
         }
+
+        if ( true != TextPr.Caps && true === TextPr.SmallCaps && false === bCapitals )
+            this.FontKoef *= smallcaps_Koef;
+
+        var Hint = TextPr.RFonts.Hint;
+        var bCS  = TextPr.CS;
+        var bRTL = TextPr.RTL;
+        var lcid = TextPr.Lang.EastAsia;
+
+        this.FontSlot = g_font_detector.Get_FontClass( this.CalcValue.charCodeAt(0), Hint, lcid, bCS, bRTL );
+
+        Context.SetFontSlot( this.FontSlot, this.FontKoef );
+        var Temp = Context.Measure( this.CalcValue );
+
+        Temp.Width = Math.max( Temp.Width + TextPr.Spacing, 0 );
+
+        this.Width        = Temp.Width;
+        this.Height       = Temp.Height;
+        this.WidthVisible = Temp.Width;
     },
 
     Is_RealContent : function()
@@ -255,40 +240,10 @@ ParaSpace.prototype =
             }
         }
 
-        try
-        {
-            Context.SetFontSlot( fontslot_ASCII, this.FontKoef );
-            /*var OldFont;
-            if ( true === this.SmallCaps )
-            {
-                OldFont = Context.GetFont();
+        Context.SetFontSlot( fontslot_ASCII, this.FontKoef );
 
-                var TempFont =
-                {
-                    FontFamily :
-                    {
-                        Index : OldFont.FontFamily.Index,
-                        Name  : OldFont.FontFamily.Name
-                    },
-
-                    FontSize : OldFont.FontSize * smallcaps_Koef,
-                    Bold     : OldFont.Bold,
-                    Italic   : OldFont.Italic
-                };
-
-                Context.SetFont( TempFont );
-            }*/
-
-            if ( editor.ShowParaMarks )
-                Context.FillText( X, Y, sString );
-
-            //if ( true === this.SmallCaps )
-//                Context.SetFont(OldFont);
-        }
-        catch(e)
-        {
-
-        }
+        if ( editor.ShowParaMarks )
+            Context.FillText( X, Y, sString );
     },
 
     Measure : function(Context, TextPr)
@@ -304,31 +259,20 @@ ParaSpace.prototype =
             }
         }
 
-        try
-        {
-            this.FontKoef = TextPr.Get_FontKoef();
+        this.FontKoef = TextPr.Get_FontKoef();
 
-            if ( true != TextPr.Caps && true === TextPr.SmallCaps )
-                this.FontKoef *= smallcaps_Koef;
+        if ( true != TextPr.Caps && true === TextPr.SmallCaps )
+            this.FontKoef *= smallcaps_Koef;
 
-            Context.SetFontSlot( fontslot_ASCII, this.FontKoef );
+        Context.SetFontSlot( fontslot_ASCII, this.FontKoef );
 
-            var Temp = Context.Measure( sString );
+        var Temp = Context.Measure( sString );
 
-            Temp.Width = Math.max( Temp.Width + TextPr.Spacing, 0 );
+        Temp.Width = Math.max( Temp.Width + TextPr.Spacing, 0 );
 
-            this.Width        = Temp.Width;
-            this.Height       = Temp.Height;
-            this.WidthVisible = Temp.Width;
-        }
-        catch(e)
-        {
-            this.Width        = 0;
-            this.Height       = 0;
-            this.WidthVisible = 0;
-        }
-
-        //return { Width : this.Width, Height : this.Height, WidthVisible : this.WidthVisible };
+        this.Width        = Temp.Width;
+        this.Height       = Temp.Height;
+        this.WidthVisible = Temp.Width;
     },
 
     Is_RealContent : function()
@@ -369,6 +313,7 @@ function ParaTextPr(Props)
     this.Type   = para_TextPr;
     this.Value  = new CTextPr();
     this.Parent = null;
+    this.CalcValue = this.Value;
 
     this.Width        = 0;
     this.Height       = 0;
@@ -2117,6 +2062,8 @@ ParaTextPr.prototype =
 function ParaEnd()
 {
     this.Type = para_End;
+
+    this.TextPr = null; // Рассчитанные настройки текста для символа конца параграфа
 }
 
 ParaEnd.prototype =

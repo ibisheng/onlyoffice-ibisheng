@@ -213,6 +213,25 @@ CParaSpellChecker.prototype =
         return true;
     },
 
+    Get_DrawingInfo : function()
+    {
+        var DrawingObject = new Object();
+
+        var Count = this.Elements.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            var Element = this.Elements[Index];
+
+            if ( false === Element.Checked )
+            {
+                for ( var Pos = Element.StartPos; Pos <= Element.EndPos; Pos++ )
+                    DrawingObject[Pos] = true;
+            }
+        }
+
+        return DrawingObject;
+    },
+
     Document_UpdateInterfaceState : function(StartPos, EndPos)
     {
         // Надо определить, попадает ли какое-либо неверно набранное слово в заданный промежуток, и одно ли оно

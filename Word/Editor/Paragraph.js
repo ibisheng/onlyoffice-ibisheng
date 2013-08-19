@@ -824,6 +824,7 @@ Paragraph.prototype =
                 case para_TextPr:
                 {
                     CurTextPr = this.Internal_CalculateTextPr( Pos );
+                    Item.CalcValue = CurTextPr; // копировать не надо, т.к. CurTextPr здесь дальше не меняется, а в функции он создается изначально
                     g_oTextMeasurer.SetTextPr( CurTextPr );
                     g_oTextMeasurer.SetFontSlot( fontslot_ASCII );
                     TextDescent = Math.abs( g_oTextMeasurer.GetDescender() );
@@ -841,6 +842,7 @@ Paragraph.prototype =
 
                     var EndTextPr = this.Get_CompiledPr2(false).TextPr.Copy();
                     EndTextPr.Merge( this.TextPr.Value );
+                    Item.TextPr = EndTextPr;
                     g_oTextMeasurer.SetTextPr( EndTextPr );
                     Item.Measure( g_oTextMeasurer, bEndCell );
                     g_oTextMeasurer.SetTextPr( CurTextPr );
@@ -895,6 +897,7 @@ Paragraph.prototype =
         // рассчитанных переносов строк в промежутке StartPos и EndPos.
         this.Pages.length = CurPage + 1;
         this.Pages[CurPage] = new CParaPage( _X, Y, _XLimit, YLimit, CurLine );
+        this.Pages[CurPage].TextPr = this.Internal_CalculateTextPr( StartPos, Pr );
 
         var LineStart_Pos = StartPos;
 
@@ -3872,15 +3875,15 @@ Paragraph.prototype =
         // 3 часть отрисовки :
         //    Рисуем заливку параграфа и различные выделения текста (highlight, поиск, совместное редактирование).
         //    Кроме этого рисуем боковые линии обводки параграфа.
-        this.Internal_Draw_3( CurPage, pGraphics );
+        this.Internal_Draw_3( CurPage, pGraphics, Pr );
 
         // 4 часть отрисовки :
         //    Рисуем сами элементы параграфа
-        this.Internal_Draw_4( CurPage, pGraphics );
+        this.Internal_Draw_4( CurPage, pGraphics, Pr );
 
         // 5 часть отрисовки :
         //    Рисуем различные подчеркивания и зачеркивания.
-        this.Internal_Draw_5( CurPage, pGraphics );
+        this.Internal_Draw_5( CurPage, pGraphics, Pr );
 
         // 6 часть отрисовки :
         //    Рисуем верхнюю, нижнюю и промежуточную границы
@@ -3930,14 +3933,16 @@ Paragraph.prototype =
         }
     },
 
-    Internal_Draw_3 : function(CurPage, pGraphics)
+    Internal_Draw_3 : function(CurPage, pGraphics, Pr)
     {
+        var _Page = this.Pages[CurPage];
+
         var DocumentComments = editor.WordControl.m_oLogicDocument.Comments;
         var bDrawComments    = DocumentComments.Is_Use();
         var CommentsFlag     = DocumentComments.Check_CurrentDraw();
 
         var CollaborativeChanges = 0;
-        var StartPagePos = this.Lines[this.Pages[CurPage].StartLine].StartPos;
+        var StartPagePos = this.Lines[_Page.StartLine].StartPos;
 
         // в PDF не рисуем метки совместного редактирования
         if ( undefined === pGraphics.RENDERER_PDF_FLAG  )
@@ -3955,37 +3960,46 @@ Paragraph.prototype =
             }
         }
 
-        var Pr = { TextPr : null, ParaPr : null };
-        var CurTextPr = this.Internal_CalculateTextPr( StartPagePos, Pr );
+        var CurTextPr = _Page.TextPr;
 
-        var StartLine = this.Pages[CurPage].StartLine;
-        var EndLine   = this.Pages[CurPage].EndLine;
+        var StartLine = _Page.StartLine;
+        var EndLine   = _Page.EndLine;
+
+        var aHigh = new CParaDrawingRangeLines();
+        var aColl = new CParaDrawingRangeLines();
+        var aFind = new CParaDrawingRangeLines();
+        var aComm = new CParaDrawingRangeLines();
 
         for ( var CurLine = StartLine; CurLine <= EndLine; CurLine++ )
         {
-            var EndLinePos = this.Lines[CurLine].EndPos;
+            var _Line        = this.Lines[CurLine];
+            var _LineMetrics = _Line.Metrics;
 
-            var Y0 = (this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent);
-            var Y1 = (this.Pages[CurPage].Y + this.Lines[CurLine].Y + this.Lines[CurLine].Metrics.Descent);
-            if ( this.Lines[CurLine].Metrics.LineGap < 0 )
-                Y1 += this.Lines[CurLine].Metrics.LineGap;
+            var EndLinePos = _Line.EndPos;
 
-            var RangesCount = this.Lines[CurLine].Ranges.length;
+            var Y0 = (_Page.Y + _Line.Y - _LineMetrics.Ascent);
+            var Y1 = (_Page.Y + _Line.Y + _LineMetrics.Descent);
+            if ( _LineMetrics.LineGap < 0 )
+                Y1 += _LineMetrics.LineGap;
+
+            var RangesCount = _Line.Ranges.length;
             for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
             {
-                var aHigh = new CParaDrawingRangeLines();
-                var aColl = new CParaDrawingRangeLines();
-                var aFind = new CParaDrawingRangeLines();
-                var aComm = new CParaDrawingRangeLines();
+                var _Range = _Line.Ranges[CurRange];
+
+                aHigh.Clear();
+                aColl.Clear();
+                aFind.Clear();
+                aComm.Clear();
 
                 // Сначала проанализируем данную строку: в массивы aHigh, aColl, aFind
                 // сохраним позиции начала и конца продолжительных одинаковых настроек
                 // выделения, совместного редатирования и поиска соответственно.
 
-                var X = this.Lines[CurLine].Ranges[CurRange].XVisible;
+                var X = _Range.XVisible;
 
-                var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
-                var EndPos   = ( CurRange === RangesCount - 1 ? EndLinePos : this.Lines[CurLine].Ranges[CurRange + 1].StartPos - 1 );
+                var StartPos = _Range.StartPos;
+                var EndPos   = ( CurRange === RangesCount - 1 ? EndLinePos : _Line.Ranges[CurRange + 1].StartPos - 1 );
 
                 for ( var Pos = StartPos; Pos <= EndPos; Pos++ )
                 {
@@ -4069,7 +4083,7 @@ Paragraph.prototype =
                         case para_Space:
                         {
                             // Пробелы в конце строки (и строку состоящую из пробелов) не подчеркиваем, не зачеркиваем и не выделяем
-                            if ( Pos >= this.Lines[CurLine].Ranges[CurRange].StartPos2 && Pos <= this.Lines[CurLine].Ranges[CurRange].EndPos2 )
+                            if ( Pos >= _Range.StartPos2 && Pos <= _Range.EndPos2 )
                             {
                                 if ( CommentsFlag != comments_NoComment && bDrawComments )
                                     aComm.Add( Y0, Y1, X, X + Item.WidthVisible, 0, 0, 0, 0, { Active : CommentsFlag === comments_ActiveComment ? true : false } );
@@ -4088,7 +4102,7 @@ Paragraph.prototype =
                         }
                         case para_TextPr:
                         {
-                            CurTextPr = this.Internal_CalculateTextPr( Pos );
+                            CurTextPr = Item.CalcValue;
                             break;
                         }
                         case para_End:
@@ -4151,7 +4165,7 @@ Paragraph.prototype =
                 //----------------------------------------------------------------------------------------------------------
                 // Заливка параграфа
                 //----------------------------------------------------------------------------------------------------------
-                if ( (this.Lines[CurLine].Ranges[CurRange].W > 0.001 || true === this.IsEmpty() ) && ( ( this.Pages.length - 1 === CurPage ) || ( CurLine < this.Pages[CurPage + 1].FirstLine ) ) && shd_Clear === Pr.ParaPr.Shd.Value )
+                if ( (_Range.W > 0.001 || true === this.IsEmpty() ) && ( ( this.Pages.length - 1 === CurPage ) || ( CurLine < this.Pages[CurPage + 1].FirstLine ) ) && shd_Clear === Pr.ParaPr.Shd.Value )
                 {
                     var TempX0 = this.Lines[CurLine].Ranges[CurRange].X;
                     if ( 0 === CurRange )
@@ -4345,7 +4359,7 @@ Paragraph.prototype =
         }
     },
 
-    Internal_Draw_4 : function(CurPage, pGraphics)
+    Internal_Draw_4 : function(CurPage, pGraphics, Pr)
     {
         var StartPagePos = this.Lines[this.Pages[CurPage].StartLine].StartPos;
 
@@ -4355,8 +4369,7 @@ Paragraph.prototype =
         if ( true === HyperPos.Found && para_HyperlinkStart === HyperPos.Type )
             bVisitedHyperlink = this.Content[HyperPos.LetterPos].Get_Visited();
 
-        var Pr = { TextPr : null, ParaPr : null };
-        var CurTextPr = this.Internal_CalculateTextPr( StartPagePos, Pr );
+        var CurTextPr = this.Pages[CurPage].TextPr;
 
         // Выставляем шрифт и заливку текста
         pGraphics.SetTextPr( CurTextPr );
@@ -4570,7 +4583,7 @@ Paragraph.prototype =
                     }
                     case para_TextPr:
                     {
-                        CurTextPr = this.Internal_CalculateTextPr( Pos );
+                        CurTextPr = Item.CalcValue;//this.Internal_CalculateTextPr( Pos );
                         pGraphics.SetTextPr( CurTextPr );
 
                         if ( true === bVisitedHyperlink )
@@ -4583,8 +4596,7 @@ Paragraph.prototype =
                     case para_End:
                     {
                         // Выставляем настройки для символа параграфа
-                        var EndTextPr = this.Get_CompiledPr2(false).TextPr.Copy();
-                        EndTextPr.Merge( this.TextPr.Value );
+                        var EndTextPr = Item.TextPr;
 
                         pGraphics.SetTextPr( EndTextPr );
                         pGraphics.b_color1( EndTextPr.Color.r, EndTextPr.Color.g, EndTextPr.Color.b, 255);
@@ -4629,9 +4641,10 @@ Paragraph.prototype =
         }
     },
 
-    Internal_Draw_5 : function(CurPage, pGraphics)
+    Internal_Draw_5 : function(CurPage, pGraphics, Pr)
     {
-        var StartPagePos = this.Lines[this.Pages[CurPage].StartLine].StartPos;
+        var _Page = this.Pages[CurPage];
+        var StartPagePos = this.Lines[_Page.StartLine].StartPos;
 
         var HyperPos = this.Internal_FindBackward( StartPagePos, [para_HyperlinkStart, para_HyperlinkEnd] );
         var bVisitedHyperlink = false;
@@ -4639,8 +4652,7 @@ Paragraph.prototype =
         if ( true === HyperPos.Found && para_HyperlinkStart === HyperPos.Type )
             bVisitedHyperlink = this.Content[HyperPos.LetterPos].Get_Visited();
 
-        var Pr = { TextPr : null, ParaPr : null };
-        var CurTextPr = this.Internal_CalculateTextPr( StartPagePos, Pr );
+        var CurTextPr = _Page.TextPr;
 
         // Выставляем цвет обводки
         var CurColor;
@@ -4649,31 +4661,44 @@ Paragraph.prototype =
         else
             CurColor = new CDocumentColor( CurTextPr.Color.r, CurTextPr.Color.g, CurTextPr.Color.b );
 
-        var StartLine = this.Pages[CurPage].StartLine;
-        var EndLine   = this.Pages[CurPage].EndLine;
+        var StartLine = _Page.StartLine;
+        var EndLine   = _Page.EndLine;
 
+        var CheckSpelling = this.SpellChecker.Get_DrawingInfo();
+
+        var aStrikeout  = new CParaDrawingRangeLines();
+        var aDStrikeout = new CParaDrawingRangeLines();
+        var aUnderline  = new CParaDrawingRangeLines();
+        var aSpelling   = new CParaDrawingRangeLines();
         for ( var CurLine = StartLine; CurLine <= EndLine; CurLine++ )
         {
-            var EndLinePos = this.Lines[CurLine].EndPos;
-            var LineY      = this.Pages[CurPage].Y + this.Lines[CurLine].Y;
+            var _Line      = this.Lines[CurLine];
+            var EndLinePos = _Line.EndPos;
+            var LineY      = _Page.Y + _Line.Y;
             var Y          = LineY;
 
-            var RangesCount = this.Lines[CurLine].Ranges.length;
+            var LineM      = _Line.Metrics;
+            var LineM_D_04 = LineM.TextDescent * 0.4;
+
+            var RangesCount = _Line.Ranges.length;
+
+            aStrikeout.Clear();
+            aDStrikeout.Clear();
+            aUnderline.Clear();
+            aSpelling.Clear();
+
             for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
             {
-                var aStrikeout  = new CParaDrawingRangeLines();
-                var aDStrikeout = new CParaDrawingRangeLines();
-                var aUnderline  = new CParaDrawingRangeLines();
-                var aSpelling   = new CParaDrawingRangeLines();
+                var _Range = _Line.Ranges[CurRange];
 
                 // Сначала проанализируем данную строку: в массивы aStrikeout, aDStrikeout, aUnderline
                 // aSpelling сохраним позиции начала и конца продолжительных одинаковых настроек зачеркивания,
                 // двойного зачеркивания, подчеркивания и подчеркивания орфографии.
 
-                var X = this.Lines[CurLine].Ranges[CurRange].XVisible;
+                var X = _Range.XVisible;
 
-                var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
-                var EndPos   = ( CurRange === RangesCount - 1 ? EndLinePos : this.Lines[CurLine].Ranges[CurRange + 1].StartPos - 1 );
+                var StartPos = _Range.StartPos;
+                var EndPos   = ( CurRange === RangesCount - 1 ? EndLinePos : _Line.Ranges[CurRange + 1].StartPos - 1 );
 
                 for ( var Pos = StartPos; Pos <= EndPos; Pos++ )
                 {
@@ -4708,8 +4733,8 @@ Paragraph.prototype =
                                 if ( true === CurTextPr.Underline )
                                     aUnderline.Add( Y + this.Lines[CurLine].Metrics.TextDescent * 0.4, Y + this.Lines[CurLine].Metrics.TextDescent * 0.4, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurColor.r, CurColor.g, CurColor.b );
 
-                                if ( true != this.SpellChecker.Check_Spelling(Pos) )
-                                    aSpelling.Add( Y + this.Lines[CurLine].Metrics.TextDescent * 0.4, Y + this.Lines[CurLine].Metrics.TextDescent * 0.4, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, 0, 0, 0 );
+                                if ( true === CheckSpelling[Pos] )
+                                    aSpelling.Add( Y + LineM_D_04, Y + LineM_D_04, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, 0, 0, 0 );
 
                                 X += Item.WidthVisible;
                             }
@@ -4719,7 +4744,7 @@ Paragraph.prototype =
                         case para_Space:
                         {
                             // Пробелы в конце строки (и строку состоящую из пробелов) не подчеркиваем, не зачеркиваем и не выделяем
-                            if ( Pos >= this.Lines[CurLine].Ranges[CurRange].StartPos2 && Pos <= this.Lines[CurLine].Ranges[CurRange].EndPos2 )
+                            if ( Pos >= _Range.StartPos2 && Pos <= _Range.EndPos2 )
                             {
                                 if ( true === CurTextPr.DStrikeout )
                                     aDStrikeout.Add( Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurColor.r, CurColor.g, CurColor.b );
@@ -4727,7 +4752,7 @@ Paragraph.prototype =
                                     aStrikeout.Add( Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, Y - CurTextPr.FontSize * g_dKoef_pt_to_mm * 0.27, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurColor.r, CurColor.g, CurColor.b );
 
                                 if ( true === CurTextPr.Underline )
-                                    aUnderline.Add( Y + this.Lines[CurLine].Metrics.TextDescent * 0.4, Y + this.Lines[CurLine].Metrics.TextDescent * 0.4, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurColor.r, CurColor.g, CurColor.b );
+                                    aUnderline.Add( Y + LineM_D_04, Y + LineM_D_04, X, X + Item.WidthVisible, (CurTextPr.FontSize / 18) * g_dKoef_pt_to_mm, CurColor.r, CurColor.g, CurColor.b );
                             }
 
                             X += Item.WidthVisible;
@@ -4736,7 +4761,7 @@ Paragraph.prototype =
                         }
                         case para_TextPr:
                         {
-                            CurTextPr = this.Internal_CalculateTextPr( Pos );
+                            CurTextPr = Item.CalcValue;
 
                             // Выставляем цвет обводки
                             if ( true === bVisitedHyperlink )
@@ -4787,43 +4812,43 @@ Paragraph.prototype =
                         }
                     }
                 }
+            }
 
-                // Рисуем зачеркивание
-                var Element = aStrikeout.Get_Next();
-                while ( null != Element )
-                {
-                    pGraphics.p_color( Element.r, Element.g, Element.b, 255 );
-                    pGraphics.drawHorLine(c_oAscLineDrawingRule.Top, Element.y0, Element.x0, Element.x1, Element.w );
-                    Element = aStrikeout.Get_Next();
-                }
+            // Рисуем зачеркивание
+            var Element = aStrikeout.Get_Next();
+            while ( null != Element )
+            {
+                pGraphics.p_color( Element.r, Element.g, Element.b, 255 );
+                pGraphics.drawHorLine(c_oAscLineDrawingRule.Top, Element.y0, Element.x0, Element.x1, Element.w );
+                Element = aStrikeout.Get_Next();
+            }
 
-                // Рисуем двойное зачеркивание
+            // Рисуем двойное зачеркивание
+            Element = aDStrikeout.Get_Next();
+            while ( null != Element )
+            {
+                pGraphics.p_color( Element.r, Element.g, Element.b, 255 );
+                pGraphics.drawHorLine2(c_oAscLineDrawingRule.Top, Element.y0, Element.x0, Element.x1, Element.w );
                 Element = aDStrikeout.Get_Next();
-                while ( null != Element )
-                {
-                    pGraphics.p_color( Element.r, Element.g, Element.b, 255 );
-                    pGraphics.drawHorLine2(c_oAscLineDrawingRule.Top, Element.y0, Element.x0, Element.x1, Element.w );
-                    Element = aDStrikeout.Get_Next();
-                }
+            }
 
-                // Рисуем подчеркивание
-                aUnderline.Correct_w_ForUnderline();
+            // Рисуем подчеркивание
+            aUnderline.Correct_w_ForUnderline();
+            Element = aUnderline.Get_Next();
+            while ( null != Element )
+            {
+                pGraphics.p_color( Element.r, Element.g, Element.b, 255 );
+                pGraphics.drawHorLine(0, Element.y0, Element.x0, Element.x1, Element.w );
                 Element = aUnderline.Get_Next();
-                while ( null != Element )
-                {
-                    pGraphics.p_color( Element.r, Element.g, Element.b, 255 );
-                    pGraphics.drawHorLine(0, Element.y0, Element.x0, Element.x1, Element.w );
-                    Element = aUnderline.Get_Next();
-                }
+            }
 
-                // Рисуем подчеркивание орфографии
-                pGraphics.p_color( 255, 0, 0, 255 );
+            // Рисуем подчеркивание орфографии
+            pGraphics.p_color( 255, 0, 0, 255 );
+            Element = aSpelling.Get_Next();
+            while ( null != Element )
+            {
+                pGraphics.drawHorLine(0, Element.y0, Element.x0, Element.x1, Element.w );
                 Element = aSpelling.Get_Next();
-                while ( null != Element )
-                {
-                    pGraphics.drawHorLine(0, Element.y0, Element.x0, Element.x1, Element.w );
-                    Element = aSpelling.Get_Next();
-                }
             }
         }
     },
@@ -13235,6 +13260,7 @@ function CParaPage(X, Y, XLimit, YLimit, FirstLine)
     this.Bounds    = new CDocumentBounds( X, Y, XLimit, Y );
     this.StartLine = FirstLine; // Номер строки, с которой начинается данная страница
     this.EndLine   = FirstLine; // Номер последней строки на данной странице
+    this.TextPr    = null;      // Расситанные текстовые настройки для начала страницы
 }
 
 CParaPage.prototype =
@@ -13297,6 +13323,11 @@ function CParaDrawingRangeLines()
 
 CParaDrawingRangeLines.prototype =
 {
+    Clear : function()
+    {
+        this.Elements = new Array();
+    },
+
     Add : function (y0, y1, x0, x1, w, r, g, b, Additional)
     {
         this.Elements.push( new CParaDrawingRangeLinesElement(y0, y1, x0, x1, w, r, g, b, Additional) );
