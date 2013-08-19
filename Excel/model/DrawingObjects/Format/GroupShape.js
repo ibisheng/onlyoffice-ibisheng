@@ -1635,7 +1635,7 @@ CGroupShape.prototype =
             w.WriteLong(this.spTree[i].getObjectType());
             this.spTree[i].writeToBinaryForCopyPaste(w);
         }
-        return w.GetBase64Memory();
+        return  "TeamLabGroup" + w.pos + ";" + w.GetBase64Memory();
     },
 
 
