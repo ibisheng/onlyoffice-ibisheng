@@ -5626,7 +5626,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
     }
     else if ( e.keyCode == 83 && false === isViewMode && true === e.ctrlKey ) // Ctrl + S - save
     {
-        bRetValue = true;
+        bRetValue = false;
     }
     else if ( e.keyCode == 85 && false === isViewMode && true === e.ctrlKey ) // Ctrl + U - делаем текст подчеркнутым
     {

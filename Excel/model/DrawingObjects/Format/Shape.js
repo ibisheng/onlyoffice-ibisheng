@@ -2825,7 +2825,6 @@ CShape.prototype =
 
     writeToBinaryForCopyPaste: function(w)
     {
-        w.WriteLong(CLASS_TYPE_SHAPE);
         this.spPr.Write_ToBinary2(w);
         w.WriteBool(isRealObject(this.style));
         if(isRealObject(this.style))
