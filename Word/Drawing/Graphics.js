@@ -544,6 +544,27 @@ CGraphics.prototype =
             this.m_oContext.globalAlpha = alpha;
         }
     },
+    Start_GlobalAlpha : function()
+    {
+    },
+    End_GlobalAlpha : function()
+    {
+        if (false === this.m_bIntegerGrid)
+        {
+            this.m_oContext.setTransform(1,0,0,1,0,0);
+        }
+
+        this.b_color1(255, 255, 255, 140);
+
+        this.m_oContext.fillRect(0, 0, this.m_lWidthPix, this.m_lHeightPix);
+        this.m_oContext.beginPath();
+
+        if (false === this.m_bIntegerGrid)
+        {
+            this.m_oContext.setTransform(this.m_oFullTransform.sx,this.m_oFullTransform.shy,this.m_oFullTransform.shx,
+                this.m_oFullTransform.sy,this.m_oFullTransform.tx,this.m_oFullTransform.ty);
+        }
+    },
     // pen methods
     p_color : function(r,g,b,a)
     {

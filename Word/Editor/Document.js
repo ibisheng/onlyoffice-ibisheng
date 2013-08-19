@@ -1328,7 +1328,7 @@ CDocument.prototype =
 
         // Рисуем содержимое документа на данной странице
         if ( docpostype_HdrFtr === this.CurPos.Type )
-            pGraphics.Start_GlobalAlpha();
+            pGraphics.put_GlobalAlpha(true, 0.4);
         else
             pGraphics.End_GlobalAlpha();
 
@@ -1345,7 +1345,7 @@ CDocument.prototype =
         this.DrawingObjects.drawBeforeObjects( nPageIndex, pGraphics );
 
         if ( docpostype_HdrFtr === this.CurPos.Type )
-            pGraphics.End_GlobalAlpha();
+            pGraphics.put_GlobalAlpha(false, 1.0);
     },
 
     Add_NewParagraph : function(bRecalculate)

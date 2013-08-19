@@ -1695,6 +1695,12 @@ CSlideBoundsChecker.prototype =
     put_GlobalAlpha : function(enable, alpha)
     {
     },
+    Start_GlobalAlpha : function()
+    {
+    },
+    End_GlobalAlpha : function()
+    {
+    },
     // pen methods
     p_color : function(r,g,b,a)
     {

@@ -1641,6 +1641,12 @@ CDocumentRenderer.prototype =
     put_GlobalAlpha : function(enable, alpha)
     {
     },
+    Start_GlobalAlpha : function()
+    {
+    },
+    End_GlobalAlpha : function()
+    {
+    },
     DrawHeaderEdit : function(yPos)
     {
     },
