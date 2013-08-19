@@ -2788,10 +2788,8 @@ CShape.prototype =
         return ShapeToImageConverter(this, this.pageIndex).ImageUrl;
     },
 
-    writeToBinaryForCopyPaste: function()
+    writeToBinaryForCopyPaste: function(w)
     {
-        var w = new CMemory();
-        var start_string = "";
         this.spPr.Write_ToBinary2(w);
         w.WriteBool(isRealObject(this.style));
         if(isRealObject(this.style))
@@ -2803,7 +2801,6 @@ CShape.prototype =
         {
             this.txBody.writeToBinaryForCopyPaste(w);
         }
-        return start_string + w.pos + ";" + w.GetBase64Memory();
     },
 
     readFromBinaryForCopyPaste: function(r, group, drawingObjects)
