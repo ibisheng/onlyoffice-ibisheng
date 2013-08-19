@@ -247,7 +247,7 @@ CMathMatrix.prototype.addRow = function()
         this.elements[this.nRow-1][j] = new CMathContent();
         this.elements[this.nRow-1][j].relate(this);
         this.elements[this.nRow-1][j].setReduct(this.reduct);
-        this.elements[this.nRow-1][j].setComposition(this.Composition);
+        //this.elements[this.nRow-1][j].setComposition(this.Composition);
     }
 
     this.recalculateSize();

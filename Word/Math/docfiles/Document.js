@@ -9122,7 +9122,7 @@ CDocument.prototype =
         this.History.Undo();
         this.Recalculate( false, false, this.History.RecalculateData );
         //**
-        MathControl.Recalculate();
+        //MathControl.Recalculate();
         //this.Document_UpdateSelectionState();
         //**
 

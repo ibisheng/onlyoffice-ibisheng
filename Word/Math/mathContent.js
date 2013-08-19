@@ -89,6 +89,7 @@ function CMathContent()
 
     this.TxtPrp = new CMathTextPrp();
     this.OwnTPrp = new CMathTextPrp();
+    this.TxtH = 0;
 
     this.Composition = null; // ссылка на общую формулу
 
@@ -125,7 +126,6 @@ CMathContent.prototype =
     },
     setTxtPrp: function(txtPrp)
     {
-        //this.TxtPrp  = new CMathTextPrp();
         this.TxtPrp.Merge(txtPrp);
         this.setTPrpToInterval(txtPrp, 0, this.content.length);
     },
@@ -452,7 +452,7 @@ CMathContent.prototype =
         this.setStart_Selection(this.CurPos);
         this.selection.active = false;
     },
-    setComposition: function(Compos)
+    old_setComposition: function(Compos)
     {
         this.Composition = Compos;
     },
@@ -2726,12 +2726,13 @@ CMathContent.prototype =
     afterDisplacement: function(coord) //аналог mouseDown для goToUpperLevel и goToLowerLever
     {
         var content = null;
-        var msCoord = this.coordWOGaps(coord);
-        this.CurPos = this.findPosition( msCoord );
+        //var msCoord = this.coordWOGaps(coord);
+
+        this.CurPos = this.findPosition( coord );
 
         if( this.content[this.CurPos].value.SUBCONTENT )
         {
-            var _coord = this.getCoordElem(this.CurPos, msCoord);
+            var _coord = this.getCoordElem(this.CurPos, coord);
             content = this.content[this.CurPos].value.afterDisplacement(_coord);
         }
         else
@@ -2850,7 +2851,7 @@ CMathContent.prototype =
 
         return {x: x, y: y};
     },
-    old_findPosition: function(mCoord)
+    findPosition: function(mCoord)
     {
         var mouseX = mCoord.x;
         //var mouseY = mCoord.y;
@@ -2859,36 +2860,6 @@ CMathContent.prototype =
         while( pos < (this.content.length - 1) &&  this.content[pos].widthToEl < mouseX )
             pos++;
 
-        var gps = this.content[pos].g_mContext;
-        if(pos !== 0)
-        {
-            if( this.content[ pos ].value.SUBCONTENT )
-            {
-                if( this.content[ pos - 1].widthToEl <= mouseX && mouseX < (this.content[pos - 1].widthToEl + gps.left) )
-                    pos--;
-                else if( (this.content[ pos ].widthToEl - gps.right) < mouseX && mouseX <= this.content[ pos ].widthToEl)
-                    pos++;
-            }
-            else
-            {
-                if( this.content[ pos - 1].widthToEl <= mouseX && mouseX < (this.content[ pos - 1].widthToEl + gps.left) )
-                    pos--;
-                else if( (this.content[ pos ].widthToEl - (this.content[ pos ].value.size.width/2) - this.content[ pos ].g_mContext.left ) > mouseX )
-                    pos--;
-            }
-        }
-
-        return pos;
-
-    },
-    findPosition: function(mCoord)
-    {
-        var mouseX = mCoord.x;
-        //var mouseY = mCoord.y;
-
-        var pos = this.content.length - 1;
-        while( pos > 0 &&  this.content[pos].widthToEl > mouseX )
-            pos--;
 
         var gps = this.content[pos].g_mContext;
         if(pos !== 0)
@@ -2910,7 +2881,6 @@ CMathContent.prototype =
         }
 
         return pos;
-
     },
     getCoordElem: function(index, mCoord)  // without gaps of Math Component ( например, если справа/слева есть относительно мат элемента компонент, то добавляем gaps справа/слева для этого мат элемента )
     {
@@ -3533,35 +3503,70 @@ CMathContent.prototype =
     {
         return false;
     },
-    getRealPosition: function()
+    getRealPosition: function(type)
     {
-        var X = this.content[this.CurPos].widthToEl,
+        var X = 0,
             Y = 0;
-        if( this.content[this.CurPos].value.SUBCONTENT )
+
+        var txtW = this.TxtPrp.FontSize*g_dKoef_pt_to_mm*0.01;
+        var pos;
+
+        var bSelect = this.selection.startPos !== this.selection.endPos && !this.IsTarget();
+
+        if(type == 2 && bSelect )
+            pos = this.selection.startPos < this.selection.endPos ?  this.selection.startPos - 1 : this.selection.endPos - 1;
+        else
+            pos = this.CurPos;
+
+        if( this.content[pos].value.SUBCONTENT )
         {
-            var intPos =  this.content[this.CurPos].value.getRealPosition();
-            X += intPos.X;
+
+            var intPos =  this.content[pos].value.getRealPosition(type);
+            X = this.content[pos - 1].widthToEl + intPos.X;
             Y += intPos.Y;
+        }
+        else if(pos == this.content.length - 1)
+        {
+
+            X = this.content[pos].widthToEl - txtW;
+        }
+        else if(pos == 0)
+        {
+            X = this.content[pos].widthToEl + txtW;
+        }
+        else
+        {
+            X = this.content[pos].widthToEl;
         }
 
         return {X: X, Y: Y};
     },
-    getRealPosition_2: function()
+    old_getRealPosition_2: function()
     {
         var pos = {X: null, Y : null};
+        var txtW = this.TxtPrp.FontSize*g_dKoef_pt_to_mm*0.01;
+
         if(this.selection.start == this.selection.end && this.content[this.CurPos].value.SUBCONTENT)
         {
              pos = this.content[this.CurPos].value.getRealPosition_2();
         }
         else if(this.selection.start !== this.selection.end)
         {
-            pos.X =  this.content[ this.selection.start ].widthToEl;
+            pos.X =  this.content[ this.selection.start ].widthToEl - txtW;
             pos.Y = 0;
+        }
+        else if(this.CurPos == this.content.length - 1)
+        {
+
+            X = this.content[this.CurPos].widthToEl - txtW;
+        }
+        else if(this.CurPos == 0)
+        {
+            X = this.content[this.CurPos].widthToEl + txtW;
         }
         else
         {
-            pos.X = this.content[this.CurPos].widthToEl;
-            pos.Y = 0;
+            X = this.content[this.CurPos].widthToEl;
         }
 
         return pos;
@@ -3618,7 +3623,7 @@ CMathComposition.prototype =
 
         this.Root = new CMathContent();
         this.Root.g_mContext = gps;
-        this.Root.setComposition(this);
+        //this.Root.setComposition(this);
         this.SetDefaultPrp();
         this.Root.setTxtPrp(this.TxtPrp, true);
 
@@ -3854,38 +3859,57 @@ CMathComposition.prototype =
     Get_SelectionState : function()
     {
         var State = new Object();
-        var RealPos = this.Root.getRealPosition();
+        var RealPos = this.GetRealPosition(1);
         State.Current =
         {
             CurPos:             this.CurrentContent.CurPos,
             RealX:              RealPos.X,
             RealY:              RealPos.Y
         };
-        var RealPos_2 = this.Root.getRealPosition_2();
+
+        var RealPos_2 = this.GetRealPosition(2);
         State.Select =
         {
-            StartSelect:    this.SelectContent.selection.startPos,
-            EndSelect:      this.SelectContent.selection.endPos,
+            StartSelect:        this.SelectContent.selection.startPos - 1,
+            EndSelect:          this.SelectContent.selection.endPos - 1,
             RealX:              RealPos_2.X,
             RealY:              RealPos_2.Y
         };
 
         return State;
     },
+    GetRealPosition: function(type)
+    {
+        var pos = this.Root.getRealPosition(type);
+
+        pos.x += this.Root.g_mContext.top;
+        pos.y += this.Root.g_mContext.left;
+
+        return pos;
+    },
     Set_SelectionState : function(State)
     {
+        this.ClearSelect();
+        this.RecalculateReverse();
+        this.UpdatePosition();
+
         var selPos = {x:  State.Select.RealX, y: State.Select.RealY};
         this.SelectContent = this.Root.afterDisplacement(selPos);
-
-        this.SelectContent.setStart_Selection(State.Select.StartSelect);
-        this.SelectContent.setEnd_Selection(State.Select.EndSelect);
-        this.SelectContent.selection.active = false;
 
         var currPos = {x:  State.Current.RealX, y: State.Current.RealY};
         this.CurrentContent = this.Root.afterDisplacement(currPos);
 
-        this.CurrentContent.CurPos = State.Current.CurPos;
 
+        if(this.SelectContent.IsTarget())
+            this.CheckTarget();
+        else if( State.Select.StartSelect !== State.Select.EndSelect )
+        {
+            this.SelectContent.setStart_Selection(State.Select.StartSelect );
+            this.SelectContent.setEnd_Selection(State.Select.EndSelect);
+            this.SelectContent.selection.active = false;
+        }
+        else
+            this.UpdateCursor();
     },
     /*Undo: function(Data)
     {
@@ -4024,8 +4048,10 @@ CMathComposition.prototype =
     Refresh: function()
     {
         this.ClearSelect();
+
         this.RecalculateReverse();
         this.UpdatePosition();
+        //this.SelectContent.drawSelect();
         this.CheckTarget();
     }
 }
