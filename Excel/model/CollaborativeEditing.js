@@ -607,7 +607,7 @@
 				}
 				var arrInsertRows = this.m_oInsertRows[sheetId];
 				// Перед добавлением нужно передвинуть имеющиеся
-				var countRows = range.c2 - range.c1 + 1;
+				var countRows = range.r2 - range.r1 + 1;
 				var isAddNewRange = true;
 				for (var i = 0; i < arrInsertRows.length; ++i) {
 					if (arrInsertRows[i].r1 > range.r1) {
