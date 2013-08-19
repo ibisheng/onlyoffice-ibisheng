@@ -44,6 +44,7 @@ function CImageShape(drawingBase, drawingObjects)
     this.spPr = new CSpPr();
     this.nvSpPr = null;
     this.style = null;
+	this.lockType = c_oAscLockTypes.kLockTypeNone;
 
     this.group = null;
 

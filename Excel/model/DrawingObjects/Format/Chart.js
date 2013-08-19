@@ -17,6 +17,7 @@ function CChartAsGroup(drawingBase, drawingObjects)
     this.y = null;
     this.extX = null;
     this.extY = null;
+	this.lockType = c_oAscLockTypes.kLockTypeNone;
 
     this.spPr.geometry = CreateGeometry("rect");
     this.spPr.geometry.Init(5, 5);

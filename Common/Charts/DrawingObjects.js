@@ -2735,6 +2735,8 @@ function DrawingObjects() {
 		if ( drawingObject && drawingObject.graphicObject ) {
 			var boundsChecker = new  CSlideBoundsChecker();
 			boundsChecker.init(1, 1, 1, 1);
+			boundsChecker.transform3(drawingObject.graphicObject.transform);
+			boundsChecker.rect(0,0, drawingObject.graphicObject.extX, drawingObject.graphicObject.extY);
 			drawingObject.graphicObject.draw(boundsChecker);
 			boundsChecker.CorrectBounds();
 			// Коррекция для селекта при блокировке

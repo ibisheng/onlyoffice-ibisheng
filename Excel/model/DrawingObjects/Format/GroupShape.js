@@ -18,7 +18,7 @@ function CGroupShape(drawingBase, drawingObjects)
     this.selectedObjects = [];
 
     this.group = null;
-
+	this.lockType = c_oAscLockTypes.kLockTypeNone;
 
     this.recalcInfo =
     {
