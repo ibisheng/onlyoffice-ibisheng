@@ -472,6 +472,8 @@ prop:async_SaveToPdf
 prop:async_SaveToPdf_PartCallback
 prop:async_SaveToPdf_Progress
 prop:asc_enableKeyEvents
+prop:asc_findText
+prop:asc_replaceText
 prop:asyncServerIdStartLoaded
 prop:asyncServerIdEndLoaded
 prop:asyncFontsDocumentStartLoaded
@@ -1480,6 +1482,8 @@ asc_docs_api.prototype['async_SaveToPdf'] = asc_docs_api.prototype.async_SaveToP
 asc_docs_api.prototype['async_SaveToPdf_PartCallback'] = asc_docs_api.prototype.async_SaveToPdf_PartCallback;
 asc_docs_api.prototype['async_SaveToPdf_Progress'] = asc_docs_api.prototype.async_SaveToPdf_Progress;
 asc_docs_api.prototype['asc_enableKeyEvents'] = asc_docs_api.prototype.asc_enableKeyEvents;
+asc_docs_api.prototype['asc_findText'] = asc_docs_api.prototype.asc_findText;
+asc_docs_api.prototype['asc_replaceText'] = asc_docs_api.prototype.asc_replaceText;
 asc_docs_api.prototype['asyncServerIdStartLoaded'] = asc_docs_api.prototype.asyncServerIdStartLoaded;
 asc_docs_api.prototype['asyncServerIdEndLoaded'] = asc_docs_api.prototype.asyncServerIdEndLoaded;
 asc_docs_api.prototype['asyncFontsDocumentStartLoaded'] = asc_docs_api.prototype.asyncFontsDocumentStartLoaded;
