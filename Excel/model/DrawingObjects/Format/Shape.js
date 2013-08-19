@@ -2802,6 +2802,7 @@ CShape.prototype =
         {
             this.txBody.writeToBinaryForCopyPaste(w);
         }
+        return w.GetBase64Memory();
     },
 
     readFromBinaryForCopyPaste: function(r, group, drawingObjects)

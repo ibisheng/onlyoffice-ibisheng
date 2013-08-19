@@ -1063,6 +1063,7 @@ CImageShape.prototype =
         w.WriteLong(CLASS_TYPE_IMAGE);
         this.blipFill.Write_ToBinary2(w);
         this.spPr.Write_ToBinary2(w);
+        return w.GetBase64Memory();
 
     },
 
