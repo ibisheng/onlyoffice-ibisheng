@@ -9289,8 +9289,15 @@
 			},
 			
 			sortColFilter: function (type,cellId) {
+				var t = this;
 				var ar = this.activeRange.clone(true);
-				this.autoFilters.sortColFilter(type, cellId, this, ar);
+				var onChangeAutoFilterCallback = function (isSuccess) {
+					if (false === isSuccess)
+						return;
+
+					return t.autoFilters.sortColFilter(type, cellId, t, ar);
+				};
+				this._isLockedAll (onChangeAutoFilterCallback);
 			},
 			
 			getAddFormatTableOptions: function(nameOption)
