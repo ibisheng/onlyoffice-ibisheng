@@ -896,6 +896,23 @@ CMathBase.prototype =
     {
      return this.elements[x][y];
     },
+    getStackPositions: function(stack)
+    {
+        stack.push({X: this.CurPos_X, Y: this.CurPos_Y});
+        this.Parent.getStackPositions(stack);
+    },
+    getContent: function(stack, bCurrent)
+    {
+        var pos = stack.pop();
+        if(bCurrent)
+        {
+            this.CurPos_X = pos.X;
+            this.CurPos_Y = pos.Y;
+        }
+
+        var content = this.elements[pos.X][pos.Y].getContent(stack, bCurrent);
+        return content;
+    },
     old_setTxtPrp: function(txtPrp)
     {
         for(var i=0; i < this.nRow; i++)
@@ -903,7 +920,7 @@ CMathBase.prototype =
                 if(!this.elements[i][j].IsJustDraw())
                     this.elements[i][j].setTxtPrp(txtPrp);
     },
-    getRealPosition: function(type)
+    old_getRealPosition: function(type)
     {
         var pos = this.elements[this.CurPos_X][this.CurPos_Y].getRealPosition(type);
 

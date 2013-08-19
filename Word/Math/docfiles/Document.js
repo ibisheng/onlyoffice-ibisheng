@@ -9139,7 +9139,7 @@ CDocument.prototype =
         this.History.Redo();
         this.Recalculate( false, false, this.History.RecalculateData );
 
-        this.Document_UpdateSelectionState();
+        //this.Document_UpdateSelectionState();
         this.Document_UpdateInterfaceState();
     },
 
