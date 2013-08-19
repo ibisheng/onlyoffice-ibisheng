@@ -17813,8 +17813,11 @@ CTableRow.prototype =
 
     Set_Index : function(Index)
     {
-        this.Index = Index;
-        this.Recalc_CompiledPr();
+        if ( Index != this.Index )
+        {
+            this.Index = Index;
+            this.Recalc_CompiledPr();
+        }
     },
 
     Set_Metrics_X : function(x_min, x_max)
@@ -19105,8 +19108,11 @@ CTableCell.prototype =
 
     Set_Index : function(Index)
     {
-        this.Index = Index;
-        this.Recalc_CompiledPr();
+        if ( Index != this.Index )
+        {
+            this.Index = Index;
+            this.Recalc_CompiledPr();
+        }
     },
 
     Set_Metrics : function(StartGridCol, X_grid_start, X_grid_end, X_cell_start, X_cell_end, X_content_start, X_content_end )
