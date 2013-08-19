@@ -1753,6 +1753,8 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 		{
             var oPresentationSimpleSerializer = new CPPTXContentLoader();
 			var oNewSpPr = oPresentationSimpleSerializer.ReadShapeProperty(this.stream);
+			if(null != oNewSpPr.Fill && null != oNewSpPr.Fill.fill && null != oNewSpPr.Fill.fill.color)
+				seria.OutlineColor = oNewSpPr.Fill.fill.color;
 		}
 		else
             res = c_oSerConstants.ReadUnknown;
