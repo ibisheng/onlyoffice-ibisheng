@@ -1627,6 +1627,7 @@ CGroupShape.prototype =
 
     writeToBinaryForCopyPaste: function(w)
     {
+        w.WriteLong(CLASS_TYPE_GROUP);
         this.spPr.Write_ToBinary2(w);
         w.WriteLong(this.spTree.length);
         for(var i = 0; i < this.spTree.length; ++i)
@@ -1644,6 +1645,7 @@ CGroupShape.prototype =
 
     readFromBinaryForCopyPaste: function(r, group, drawingObjects)
     {
+
         this.group = group;
         this.drawingObjects = drawingObjects;
         this.spPr.Read_FromBinary2(r);
