@@ -260,7 +260,7 @@ phType_tbl:yK
 c_oAscChartSubType$normal:gf
 c_oSerPropLenType$Three:Kj
 tt_face_load_gasp:Dt
-JSCompiler_StaticMethods_AddPathCommand:R
+JSCompiler_StaticMethods_AddPathCommand:Q
 ft_smooth_init:$v
 JSCompiler_StaticMethods__Prepeare_recursive:we
 JSCompiler_StaticMethods_removeObjectFromArrGraphicObjects:dE
@@ -2884,7 +2884,7 @@ arcTo:Bj
 nSldLtTChartAndTx:OK
 L 21:U
 L 20:O
-L 23:Q
+L 23:R
 L 22:aa
 c_oSerSimplePos$Y:eZ
 L 25:W

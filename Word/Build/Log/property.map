@@ -2358,7 +2358,7 @@ GridSpan:hg
 ALLOW_X_DMOVEX_RULES_SIZE:BAa
 CanvasHitContext:FM
 Clear_LinkData:GBa
-TableOutline:Af
+TableOutline:zf
 SkipImage:aW
 CheckGuiControlColors:IZ
 arg2:WF
@@ -2972,7 +2972,7 @@ RemoveCustomEventListener:z3a
 caret_Slope_Run:Nga
 oImages:yr
 oldId:KY
-OnMouseMove:Df
+OnMouseMove:Cf
 worksheet:Ti
 set_url:MP
 m_bIsBreak:yT
@@ -3248,7 +3248,7 @@ m_arrCTM:Ju
 recalculateTransformMatrix:I4
 ImageTrackType:$ca
 WriteGeometry:jJa
-TableGrid:zf
+TableGrid:Ff
 OldFlowPos:e3a
 put_CellsMargin:yXa
 F_dot_P:fD
@@ -3906,7 +3906,7 @@ SpellChecker:Ro
 IsCursorInTableCur:loa
 CopyParagraph:UZ
 max_cells:$$
-RasterImageId:Ef
+RasterImageId:Df
 Orientation_new:Qoa
 lime:S9a
 isSkip:Z2
@@ -4358,7 +4358,7 @@ deeppink:S7a
 WriteTblStyleProperty:pKa
 ReadViewProps:t3a
 isLoadNoCutFonts:Xia
-Is_SelectionUse:Cf
+Is_SelectionUse:Bf
 Reset_NeedLock:cHa
 ReadHyperlink:CFa
 oTagPr:iJ
@@ -5976,7 +5976,7 @@ m_nIdCounterEdit:Fwa
 Id_new:mDa
 UpdateTargetFromPaint:XH
 drawVerLine:SA
-Reset:Ff
+Reset:Ef
 sync_TblAlignChangedCallback:j0a
 can_AddQuotedComment:aRa
 asc_getType:bga
@@ -6407,7 +6407,7 @@ bIsRetinaNoSupportAttack:Cta
 MoveMinDist:C6
 cursorMoveUp:WK
 get_Format:Zha
-len:Bf
+len:Af
 m_oPage:Kz
 WriteLong:pa
 shapeWidth:TC
