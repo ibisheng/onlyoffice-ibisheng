@@ -1211,7 +1211,7 @@ function asc_CChartLegend(object) {
 asc_CChartLegend.prototype = {
 
 	isEqual: function(object) {
-		return ( (this.position == object.position) && (this.bShow = object.bShow) && (this.bOverlay == object.bOverlay) );
+		return ( (this.position == object.position) && (this.bShow == object.bShow) && (this.bOverlay == object.bOverlay) );
 	},
 
 	asc_getPosition: function() { return this.position; },

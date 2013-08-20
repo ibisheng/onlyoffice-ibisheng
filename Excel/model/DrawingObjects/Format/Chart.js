@@ -461,7 +461,7 @@ CChartAsGroup.prototype =
 			
 			if ( !this.chart.legend.isEqual(chart.legend) ) {
 				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_ChangeLegend, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.legend, chart.legend)));
-				this.chart.legend = new asc_CChartAxisY(chart.legend);
+				this.chart.legend = new asc_CChartLegend(chart.legend);
 			}
 		}
 		else
