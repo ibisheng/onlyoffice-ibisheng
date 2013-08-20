@@ -268,7 +268,8 @@ var c_oSerRunType = {
     fldstart: 9,
     fldend: 10,
 	CommentReference: 11,
-	pptxDrawing: 12
+	pptxDrawing: 12,
+	_LastRun: 13 //для копирования через бинарник
 };
 var c_oSerImageType = {
     MediaId:0,
@@ -2260,6 +2261,13 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap)
                     oThis.memory.WriteLong(c_oSerPropLenType.Null);
                 });
 		}
+		if(bUseSelection && ParaEnd < Content.length - 1)
+		{
+			this.WriteRun(function(){
+                    oThis.memory.WriteByte(c_oSerRunType._LastRun);
+					oThis.memory.WriteLong(c_oSerPropLenType.Null);
+                });
+		}
     };
     this.WriteText = function()
     {
@@ -2992,7 +3000,8 @@ function BinaryFileReader(doc, openParams)
 		lvlStyles: null,
 		DefpPr: null,
 		DefrPr: null,
-		DocumentContent: null
+		DocumentContent: null,
+		bLastRun: null
 	};
     this.getbase64DecodedData = function(szSrc)
     {
@@ -3153,6 +3162,7 @@ function BinaryFileReader(doc, openParams)
 		this.oReadResult.tableStyles = [];
 		this.oReadResult.lvlStyles = [];
 		this.oReadResult.DocumentContent = [];
+		this.oReadResult.bLastRun = null;
 		
         var res = c_oSerConstants.ReadOk;
         //mtLen
@@ -5530,6 +5540,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 					this.oComments[oCommon.Id] = {Ref: oCommon};
 			}
         }
+		else if (c_oSerRunType._LastRun === type)
+			this.oReadResult.bLastRun = true;
         else
             res = c_oSerConstants.ReadUnknown;
         return res;

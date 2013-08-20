@@ -2530,11 +2530,10 @@ PasteProcessor.prototype =
 			}
 		}
 		
-		if(aContent.length > 0)
-		{
-			//todo в зависимости от наличия символа конца параграфа
+		if(oReadResult.bLastRun)
+			this.bInBlock = false;
+		else
 			this.bInBlock = true;
-		}
 		//создаем список используемых шрифтов
 		var AllFonts = new Object();
         for ( var Index = 0, Count = aContent.length; Index < Count; Index++ )
