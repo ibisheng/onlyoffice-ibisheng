@@ -7125,8 +7125,66 @@
 											for(var im = 0; im < val.addImages.length; im++)//вставляем изображения
 											{
 												var src = val.addImages[im].tag.src;
-												if(src && 0 != src.indexOf("file://"))
-													t.objectRender.addImageDrawingObject(src,  { cell: val.addImages[im].curCell, width: val.addImages[im].tag.width, height: val.addImages[im].tag.height });
+												if(src)
+												{
+													var binary_shape = val.addImages[im].tag.getAttribute("alt");
+													var sub;
+													if(typeof binary_shape === "string")
+														sub = binary_shape.substr(0, 12);
+													if(typeof binary_shape === "string" &&( sub === "TeamLabShape" || sub === "TeamLabImage" /*|| sub === "TeamLabChart" */|| sub === "TeamLabGroup"))
+													{
+														var reader = CreateBinaryReader(binary_shape, 12, binary_shape.length);
+														if(isRealObject(reader))
+															reader.oImages = this.oImages;
+														var first_string = null;
+														if(reader !== null && typeof  reader === "object")
+														{
+															first_string = sub;
+														}
+														var positionX = null
+														var positionY = null;
+														
+														if(t.cols && val.addImages[im].curCell && val.addImages[im].curCell.col && t.cols[val.addImages[im].curCell.col].left)
+															positionX = t.cols[val.addImages[im].curCell.col].left;
+														if(t.rows && val.addImages[im].curCell && val.addImages[im].curCell.row && t.rows[val.addImages[im].curCell.row].top)
+															positionY = t.rows[val.addImages[im].curCell.row].top
+														
+														var Drawing;
+														switch(first_string)
+														{
+															case "TeamLabImage":
+															{
+																Drawing = new CImageShape();
+																break;
+															}
+															case "TeamLabShape":
+															{
+																Drawing = new CShape();
+																break;
+															}
+															case "TeamLabGroup":
+															{
+																Drawing = new CGroupShape();
+																break;
+															}
+															default :
+															{
+																Drawing = CreateImageFromBinary(src);
+																break;
+															}
+														}
+														if(positionX && positionY && t.objectRender)
+															Drawing.readFromBinaryForCopyPaste(reader,null, t.objectRender,t.objectRender.convertMetric(positionX,1,3),t.objectRender.convertMetric(positionY,1,3));
+														else
+															Drawing.readFromBinaryForCopyPaste(reader,null, t.objectRender);
+														Drawing.drawingObjects = t.objectRender;
+														Drawing.addToDrawingObjects();
+													}
+													else if(0 != src.indexOf("file://"))
+													{
+														t.objectRender.addImageDrawingObject(src,  { cell: val.addImages[im].curCell, width: val.addImages[im].tag.width, height: val.addImages[im].tag.height });
+													}
+												}	
 											}
 										}
 									});
