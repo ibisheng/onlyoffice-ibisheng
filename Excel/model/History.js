@@ -25,6 +25,8 @@ var historyitem_Worksheet_SetHyperlink = 16;
 var historyitem_Worksheet_RemoveHyperlink = 17;
 var historyitem_Worksheet_Rename = 18;
 var historyitem_Worksheet_Hide = 19;
+//не добавляем в историю события historyitem_Worksheet_CreateRow, CreateCol, CreateCell - потому что появляется много ошибок(например удаление строк, если снизу были данные и undo)
+//они решают только одну проблему, что когда есть стиль колонки, а мы создаем ячейку, при полном undo не отменится стиль ячейки.
 var historyitem_Worksheet_CreateRow = 20;
 var historyitem_Worksheet_CreateCol = 21;
 var historyitem_Worksheet_CreateCell = 22;
