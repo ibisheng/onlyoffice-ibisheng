@@ -994,7 +994,10 @@ CDocument.prototype =
         if ( true === this.NeedUpdateTarget && true === bFlag && false === this.Selection_Is_TableBorderMove() )
         {
             this.Document_UpdateRulersState();
-            this.RecalculateCurPos();
+            //**
+            MathControl.UpdateCursor();
+            //this.RecalculateCurPos();
+            //**
             this.NeedUpdateTarget = false;
         }
     },

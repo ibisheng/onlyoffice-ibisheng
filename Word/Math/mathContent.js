@@ -2,7 +2,6 @@ var historyitem_Math_AddItem                   =  1; // Добавляем эл�
 var historyitem_Math_RemoveItem                =  2; // Удаляем элемент
 
 var TEST = true;
-var TEST_2 = false;
 
 var StartTextElement = 0x2B1A; // Cambria Math
 
@@ -281,7 +280,7 @@ CMathContent.prototype =
 
         var items = this.content.slice(Pos, EndPos);
 
-        return {Items: items};
+        return items;
     },
     addLetter: function(code)
     {
@@ -322,7 +321,7 @@ CMathContent.prototype =
         // txt properties
 
         this.addElementToContent(symb, gps);
-        var item = symb;
+        var item = this.content[this.CurPos];
 
         if(!TEST)
         {
@@ -336,7 +335,7 @@ CMathContent.prototype =
 
         this.rInterval.endPos++; // max количество элементов this.CurPos
 
-        return { Items: [item] };
+        return [item];
     },
     addMComponent: function(ind)
     {
@@ -459,7 +458,7 @@ CMathContent.prototype =
     },
     createEquation: function(ind)
     {
-        var Pos = this.CurPos;
+        var Pos = this.CurPos + 1;
 
         switch(ind)
         {
@@ -2208,7 +2207,7 @@ CMathContent.prototype =
 
         }
 
-        var EndPos = this.CurPos;
+        var EndPos = this.CurPos + 1;
 
         if(!TEST)
         {
@@ -2219,7 +2218,7 @@ CMathContent.prototype =
 
         var items = this.content.slice(Pos, EndPos);
 
-        return {Items: items};
+        return items;
     },
     removeAreaSelect: function()
     {
@@ -3485,7 +3484,7 @@ CMathContent.prototype =
     },
     Redo: function(Data)
     {
-        /*var type = Data.Type;
+        var type = Data.Type;
 
         switch(type)
         {
@@ -3502,6 +3501,9 @@ CMathContent.prototype =
 
                 var Content_start = this.content.slice(0, Pos);
                 var Content_end   = this.content.slice(Pos);
+                
+                this.setStart_Selection(Pos);
+                this.selection.active = false;
 
                 this.content = Content_start.concat(Data.Items, Content_end);
                 break;
@@ -3510,10 +3512,12 @@ CMathContent.prototype =
             {
 
                 var Pos = Data.Pos,
-                    PosEnd = Data.PosEnd;
+                    PosEnd = Pos + Data.Items.length;
 
                 var Content_start = this.content.slice(0, Pos);
                 var Content_end   = this.content.slice(PosEnd);
+                this.setStart_Selection(Pos - 1);
+                this.selection.active = false;
 
                 this.content = Content_start.concat(Content_end);
                 this.CurPos = Pos - 1;
@@ -3522,7 +3526,7 @@ CMathContent.prototype =
                 break;
 
             }
-        }*/
+        }
     },
     Save_Changes: function(Data, Writer)
     {
@@ -3564,7 +3568,7 @@ CMathContent.prototype =
         if(bCurrent)
             this.CurPos = pos.X;
 
-        if(stack.length > 0 && this.content[pos.X].value.SUBCONTENT)
+        if(stack.length > 0)
             content = this.content[pos.X].value.getContent(stack, bCurrent);
         else
             content = this;
@@ -3762,9 +3766,6 @@ CMathComposition.prototype =
     },
     Remove: function(order)
     {
-        if(TEST_2)
-            var temp = 0;
-
         if(TEST)
         {
             History.Create_NewPoint();
@@ -3792,7 +3793,6 @@ CMathComposition.prototype =
 
         this.CheckTarget();
 
-        TEST_2 = !TEST_2;
 
         return result.state.bDelete;
     },
@@ -3854,6 +3854,10 @@ CMathComposition.prototype =
         this.ClearSelect();
 
         this.SelectContent.removeAreaSelect();
+
+        if(TEST)
+            var Pos = this.SelectContent.CurPos + 1;
+
         var items = this.SelectContent.createEquation(indef);
 
         ///
@@ -3863,8 +3867,8 @@ CMathComposition.prototype =
 
         if(TEST)
         {
-            var Pos = this.SelectContent.CurPos - 1,
-                EndPos = this.SelectContent.CurPos + 1;
+            //var Pos = this.SelectContent.CurPos - 1,
+            var EndPos = this.SelectContent.CurPos + 1;
             History.Add(this.CurrentContent, {Type: historyitem_Math_AddItem, Items: items, Pos: Pos, PosEnd: EndPos});
         }
 
@@ -3911,8 +3915,11 @@ CMathComposition.prototype =
         this.RecalculateReverse();
         this.UpdatePosition();
 
-        this.SelectContent = this.Root.getContent( State.Select.stack, false );
-        this.CurrentContent = this.Root.getContent( State.Current.stack, true );
+        var stackSelect = Common_CopyObj(State.Select.stack),
+            stackCurrent = Common_CopyObj(State.Current.stack);
+
+        this.SelectContent = this.Root.getContent( stackSelect, false );
+        this.CurrentContent = this.Root.getContent( stackCurrent, true );
 
         if(this.SelectContent.IsTarget())
             this.CheckTarget();
