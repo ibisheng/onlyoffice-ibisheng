@@ -2058,12 +2058,15 @@
 
 						if(cloneImg.graphicObject.isChart() && cloneImg.graphicObject.brush.fill.RasterImageId)
 							url = cloneImg.graphicObject.brush.fill.RasterImageId;
-						else if(cloneImg.graphicObject && (cloneImg.graphicObject.isShape() || cloneImg.graphicObject.isImage()))
+						else if(cloneImg.graphicObject && (cloneImg.graphicObject.isShape() || cloneImg.graphicObject.isImage() || cloneImg.graphicObject.isGroup()))
 						{
 							var cMemory = new CMemory();
 							var altAttr = cloneImg.graphicObject.writeToBinaryForCopyPaste(cMemory);
-							var imageUrl = cloneImg.graphicObject.getImageUrl();
-							if(cloneImg.graphicObject.isImage() && imageUrl)
+							var isImage = cloneImg.graphicObject.isImage();
+							var imageUrl;
+							if(isImage)
+								imageUrl = cloneImg.graphicObject.getImageUrl();
+							if(isImage && imageUrl)
 								url = imageUrl;
 							else
 								url = cloneImg.graphicObject.getBase64Image();
