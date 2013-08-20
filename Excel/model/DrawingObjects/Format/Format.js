@@ -1508,14 +1508,14 @@ CBlipFill.prototype =
         if(flag)
         {
             var string_to_write =  getFullImageSrc(this.RasterImageId);
-            if(string_to_write.indexOf(documentOrigin) !== 0
+            /*if(string_to_write.indexOf(documentOrigin) !== 0
                 && string_to_write.indexOf("http:") !== 0
                 && string_to_write.indexOf("https:") !== 0
                 && string_to_write.indexOf("ftp:") !== 0
                 && string_to_write.indexOf("data:") !== 0)
             {
                 string_to_write = documentOrigin + string_to_write;
-            }
+            }  */
             Writer.WriteString2(string_to_write);
         }
 
@@ -1547,10 +1547,10 @@ CBlipFill.prototype =
 			else
 				this.RasterImageId = imageId;
 
-            if(typeof this.RasterImageId === "string" && isRealObject(Reader.oImages))
+            /*if(typeof this.RasterImageId === "string" && isRealObject(Reader.oImages))
             {
                 editor.WordControl.m_oLogicDocument.DrawingObjects.urlMap.push(this.RasterImageId);
-            }
+            }  */
         }
 
         flag = Reader.GetBool();
