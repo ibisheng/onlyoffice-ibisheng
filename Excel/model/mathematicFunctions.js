@@ -462,10 +462,10 @@ cFormulaFunction.Mathematic = {
                 }
                 else {
                     arg0.foreach( function ( elem, r, c ) {
-                        var a = elem;
-                        b = arg1.getElementRowCol( r, c );
+                        var a = elem,
+                            b = arg1.getElementRowCol( r, c );
                         if ( a instanceof cNumber && b instanceof cNumber ) {
-                            this.array[r][c] = new cNumber( Math.fact( a.getValue() ) / (Math.fact( b.getValue() ) * Math.fact( a.getValue() - b.getValue() )) );
+                            this.array[r][c] = new cNumber( Math.binomCoeff( a.getValue(), b.getValue() ) );
                         }
                         else
                             this.array[r][c] = new cError( cErrorType.wrong_value_type );
@@ -498,7 +498,7 @@ cFormulaFunction.Mathematic = {
                         if ( a.getValue() <= 0 || b.getValue() <= 0 || a.getValue() < b.getValue() )
                             this.array[r][c] = new cError( cErrorType.not_numeric );
 
-                        this.array[r][c] = new cNumber( Math.fact( a.getValue() ) / (Math.fact( b.getValue() ) * Math.fact( a.getValue() - b.getValue() )) );
+                        this.array[r][c] = new cNumber( Math.binomCoeff( a.getValue(), b.getValue() ) );
                     }
                     else
                         this.array[r][c] = new cError( cErrorType.wrong_value_type );

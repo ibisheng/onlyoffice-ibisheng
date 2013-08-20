@@ -1,7 +1,7 @@
 ﻿$( function () {
 
-    function toFixed(n){
-        return n.toFixed(cExcelSignificantDigits)-0;
+    function toFixed( n ) {
+        return n.toFixed( cExcelSignificantDigits ) - 0;
     }
 
     var ver = 2;
@@ -316,7 +316,7 @@
         oParser = new parserFormula( "SUM(S5:S8)", "A1", ws );
         ok( oParser.parse() );
 //        strictEqual( oParser.calculate().getValue(), 1-1/Math.fact(2)+1/Math.fact(4)-1/Math.fact(6) );
-        ok( Math.abs( oParser.calculate().getValue() - (1-1/Math.fact(2)+1/Math.fact(4)-1/Math.fact(6)) ) < dif );
+        ok( Math.abs( oParser.calculate().getValue() - (1 - 1 / Math.fact( 2 ) + 1 / Math.fact( 4 ) - 1 / Math.fact( 6 )) ) < dif );
     } )
 
     test( "Test: \"MAX\"", function () {
@@ -352,7 +352,7 @@
 
         oParser = new parserFormula( "MIN(S5:S8)", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), -1/Math.fact(2) );
+        strictEqual( oParser.calculate().getValue(), -1 / Math.fact( 2 ) );
     } )
 
     test( "Test: \"MINA\"", function () {
@@ -364,7 +364,7 @@
 
         oParser = new parserFormula( "MINA(S5:S8)", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), -1/Math.fact(2) );
+        strictEqual( oParser.calculate().getValue(), -1 / Math.fact( 2 ) );
     } )
 
     test( "Test: SUM(S7:S9,{1,2,3})", function () {
@@ -886,26 +886,6 @@
         oParser = new parserFormula( "FV(0.06/12,12,-100,-1000,1)", "A2", ws );
         ok( oParser.parse() );
         ok( Math.abs( oParser.calculate().getValue() - fv( 0.06 / 12, 12, -100, -1000, 1 ) ) < dif );
-
-    } )
-
-    test( "Test: \"STDEV\"", function () {
-
-        function stdev() {
-            var average = 0, res = 0;
-            for ( var i = 0; i < arguments.length; i++ ) {
-                average += arguments[i];
-            }
-            average /= arguments.length;
-            for ( var i = 0; i < arguments.length; i++ ) {
-                res += (arguments[i] - average) * (arguments[i] - average);
-            }
-            return Math.sqrt( res / (arguments.length - 1) );
-        }
-
-        oParser = new parserFormula( "STDEV(123,134,143,173,112,109)", "A2", ws );
-        ok( oParser.parse() );
-        ok( Math.abs( oParser.calculate().getValue() - stdev( 123, 134, 143, 173, 112, 109 ) ) < dif );
 
     } )
 
@@ -1471,8 +1451,8 @@
     } )
 
     /*
-    * Statical Function
-    * */
+     * Statical Function
+     * */
     test( "Test: \"AVEDEV\"", function () {
 
         oParser = new parserFormula( "AVEDEV(-3.5,1.4,6.9,-4.5)", "A1", ws );
@@ -1543,22 +1523,22 @@
 
     test( "Test: \"BINOMDIST\"", function () {
 
-        function binomdist(x,n,p){
-            x= parseInt(x);
-            n = parseInt(n);
-            return Math.binomCoeff(n,x)*Math.pow(p,x)*Math.pow(1-p,n-x);
+        function binomdist( x, n, p ) {
+            x = parseInt( x );
+            n = parseInt( n );
+            return Math.binomCoeff( n, x ) * Math.pow( p, x ) * Math.pow( 1 - p, n - x );
         }
 
         oParser = new parserFormula( "BINOMDIST(6,10,0.5,FALSE)", "A1", ws );
         ok( oParser.parse() );
-        ok( Math.abs( oParser.calculate().getValue() - binomdist(6,10,0.5) ) < dif );
+        ok( Math.abs( oParser.calculate().getValue() - binomdist( 6, 10, 0.5 ) ) < dif );
 
         oParser = new parserFormula( "BINOMDIST(6,10,0.5,TRUE)", "A1", ws );
         ok( oParser.parse() );
-        ok( Math.abs( oParser.calculate().getValue() - (function(){
+        ok( Math.abs( oParser.calculate().getValue() - (function () {
             var bm = 0;
-            for(var y = 0; y <= 6; y++){
-                bm+=binomdist(y,10,0.5)
+            for ( var y = 0; y <= 6; y++ ) {
+                bm += binomdist( y, 10, 0.5 )
             }
             return bm;
         })() ) < dif );
@@ -1573,11 +1553,11 @@
 
         oParser = new parserFormula( "CONFIDENCE(0.4,5,12)", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(),  1.214775614397568 );
+        strictEqual( oParser.calculate().getValue(), 1.214775614397568 );
 
         oParser = new parserFormula( "CONFIDENCE(0.75,9,7)", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(),  1.083909233527114 );
+        strictEqual( oParser.calculate().getValue(), 1.083909233527114 );
 
     } )
 
@@ -1585,15 +1565,15 @@
 
         oParser = new parserFormula( "CORREL({2.532,5.621;2.1,3.4},{5.32,2.765;5.2,\"f\"})", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(),  -0.988112020032211 );
+        strictEqual( oParser.calculate().getValue(), -0.988112020032211 );
 
         oParser = new parserFormula( "CORREL({1;2;3},{4;5;\"E\"})", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(),  1 );
+        strictEqual( oParser.calculate().getValue(), 1 );
 
         oParser = new parserFormula( "CORREL({1,2},{1,\"e\"})", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(),  "#DIV/0!" );
+        strictEqual( oParser.calculate().getValue(), "#DIV/0!" );
 
     } )
 
@@ -1744,19 +1724,19 @@
 
         oParser = new parserFormula( "DEVSQ(5.6,8.2,9.2)", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 6.906666666666665  );
+        strictEqual( oParser.calculate().getValue(), 6.906666666666665 );
 
         oParser = new parserFormula( "DEVSQ({5.6,8.2,9.2})", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 6.906666666666665  );
+        strictEqual( oParser.calculate().getValue(), 6.906666666666665 );
 
         oParser = new parserFormula( "DEVSQ(5.6,8.2,\"9.2\")", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 3.379999999999999  );
+        strictEqual( oParser.calculate().getValue(), 3.379999999999999 );
 
         oParser = new parserFormula( "DEVSQ(Лист2!A1:A3)", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 6.906666666666665  );
+        strictEqual( oParser.calculate().getValue(), 6.906666666666665 );
 
     } )
 
@@ -1774,8 +1754,8 @@
 
     test( "Test: \"FISHER\"", function () {
 
-        function fisher(x){
-            return toFixed(0.5 * Math.ln( (1+x)/(1-x) ));
+        function fisher( x ) {
+            return toFixed( 0.5 * Math.ln( (1 + x) / (1 - x) ) );
         }
 
         oParser = new parserFormula( "FISHER(-0.43)", "A1", ws );
@@ -1798,8 +1778,8 @@
 
     test( "Test: \"FISHERINV\"", function () {
 
-        function fisherInv(x){
-            return toFixed(( Math.exp( 2*x ) - 1 )/( Math.exp( 2*x ) + 1 ));
+        function fisherInv( x ) {
+            return toFixed( ( Math.exp( 2 * x ) - 1 ) / ( Math.exp( 2 * x ) + 1 ) );
         }
 
         oParser = new parserFormula( "FISHERINV(-0.43)", "A1", ws );
@@ -1850,7 +1830,7 @@
 
         oParser = new parserFormula( "FORECAST(30,{6,7,9,15,21},{20,28,31,38,40})", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), forecast(30,[6,7,9,15,21],[20,28,31,38,40]) );
+        strictEqual( oParser.calculate().getValue(), forecast( 30, [6, 7, 9, 15, 21], [20, 28, 31, 38, 40] ) );
 
     } )
 
@@ -1873,10 +1853,10 @@
         oParser = new parserFormula( "FREQUENCY(A202:A210,B202:B204)", "A201", ws );
         ok( oParser.parse() );
         var a = oParser.calculate()
-        strictEqual( a.getElement(0).getValue(), 1 );
-        strictEqual( a.getElement(1).getValue(), 2 );
-        strictEqual( a.getElement(2).getValue(), 4 );
-        strictEqual( a.getElement(3).getValue(), 2 );
+        strictEqual( a.getElement( 0 ).getValue(), 1 );
+        strictEqual( a.getElement( 1 ).getValue(), 2 );
+        strictEqual( a.getElement( 2 ).getValue(), 4 );
+        strictEqual( a.getElement( 3 ).getValue(), 2 );
 
     } )
 
@@ -1884,7 +1864,7 @@
 
         oParser = new parserFormula( "GAMMALN(4.5)", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 2.453736570842442 );
+        strictEqual( oParser.calculate().getValue().toFixed( 14 ) - 0, 2.45373657084244 );
 
         oParser = new parserFormula( "GAMMALN(-4.5)", "A1", ws );
         ok( oParser.parse() );
@@ -1906,11 +1886,11 @@
 
         oParser = new parserFormula( "GEOMEAN(10.5,5.3,2.9)", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), geommean([10.5,5.3,2.9]) );
+        strictEqual( oParser.calculate().getValue(), geommean( [10.5, 5.3, 2.9] ) );
 
         oParser = new parserFormula( "GEOMEAN(10.5,{5.3,2.9},\"12\")", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), geommean([10.5,5.3,2.9,12]) );
+        strictEqual( oParser.calculate().getValue(), geommean( [10.5, 5.3, 2.9, 12] ) );
 
         oParser = new parserFormula( "GEOMEAN(10.5,{5.3,2.9},\"12\",0)", "A1", ws );
         ok( oParser.parse() );
@@ -1924,19 +1904,19 @@
 
             var _x = 0, xLength = 0;
             for ( var i = 0; i < x.length; i++ ) {
-                _x += 1/x[i];
+                _x += 1 / x[i];
                 xLength++;
             }
-            return xLength / _x ;
+            return xLength / _x;
         }
 
         oParser = new parserFormula( "HARMEAN(10.5,5.3,2.9)", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), harmmean([10.5,5.3,2.9]) );
+        strictEqual( oParser.calculate().getValue(), harmmean( [10.5, 5.3, 2.9] ) );
 
         oParser = new parserFormula( "HARMEAN(10.5,{5.3,2.9},\"12\")", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), harmmean([10.5,5.3,2.9,12]) );
+        strictEqual( oParser.calculate().getValue(), harmmean( [10.5, 5.3, 2.9, 12] ) );
 
         oParser = new parserFormula( "HARMEAN(10.5,{5.3,2.9},\"12\",0)", "A1", ws );
         ok( oParser.parse() );
@@ -1947,16 +1927,16 @@
     test( "Test: \"HYPGEOMDIST\"", function () {
 
         function hypgeomdist( x, n, M, N ) {
-            return toFixed(Math.binomCoeff(M,x)*Math.binomCoeff(N-M,n-x)/Math.binomCoeff(N,n));
+            return toFixed( Math.binomCoeff( M, x ) * Math.binomCoeff( N - M, n - x ) / Math.binomCoeff( N, n ) );
         }
 
         oParser = new parserFormula( "HYPGEOMDIST(1,4,8,20)", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), hypgeomdist(1,4,8,20) );
+        strictEqual( oParser.calculate().getValue(), hypgeomdist( 1, 4, 8, 20 ) );
 
         oParser = new parserFormula( "HYPGEOMDIST(1,4,8,20)", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), hypgeomdist(1,4,8,20) );
+        strictEqual( oParser.calculate().getValue(), hypgeomdist( 1, 4, 8, 20 ) );
 
         oParser = new parserFormula( "HYPGEOMDIST(-1,4,8,20)", "A1", ws );
         ok( oParser.parse() );
@@ -1998,7 +1978,7 @@
 
         oParser = new parserFormula( "INTERCEPT({6,7,9,15,21},{20,28,31,38,40})", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), intercept([6,7,9,15,21],[20,28,31,38,40]) );
+        strictEqual( oParser.calculate().getValue(), intercept( [6, 7, 9, 15, 21], [20, 28, 31, 38, 40] ) );
 
     } )
 
@@ -2015,26 +1995,26 @@
             _x /= xLength;
 
             for ( var i = 0; i < x.length; i++ ) {
-                sumSQRDeltaX+= Math.pow( x[i] - _x, 2);
+                sumSQRDeltaX += Math.pow( x[i] - _x, 2 );
             }
 
             standDev = Math.sqrt( sumSQRDeltaX / ( xLength - 1 ) );
 
             for ( var i = 0; i < x.length; i++ ) {
-                sumSQRDeltaXDivstandDev+= Math.pow( (x[i] - _x)/standDev, 4);
+                sumSQRDeltaXDivstandDev += Math.pow( (x[i] - _x) / standDev, 4 );
             }
 
-            return toFixed(xLength*(xLength+1)/(xLength-1)/(xLength-2)/(xLength-3)*sumSQRDeltaXDivstandDev-3*(xLength-1)*(xLength-1)/(xLength-2)/(xLength-3))
+            return toFixed( xLength * (xLength + 1) / (xLength - 1) / (xLength - 2) / (xLength - 3) * sumSQRDeltaXDivstandDev - 3 * (xLength - 1) * (xLength - 1) / (xLength - 2) / (xLength - 3) )
 
         }
 
         oParser = new parserFormula( "KURT(10.5,12.4,19.4,23.2)", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), kurt([10.5,12.4,19.4,23.2]) );
+        strictEqual( oParser.calculate().getValue(), kurt( [10.5, 12.4, 19.4, 23.2] ) );
 
         oParser = new parserFormula( "KURT(10.5,{12.4,19.4},23.2)", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), kurt([10.5,12.4,19.4,23.2]) );
+        strictEqual( oParser.calculate().getValue(), kurt( [10.5, 12.4, 19.4, 23.2] ) );
 
         oParser = new parserFormula( "KURT(10.5,12.4,19.4)", "A1", ws );
         ok( oParser.parse() );
@@ -2054,41 +2034,31 @@
 
     } )
 
-    test( "Test: \"SMALL\"", function () {
-
-        oParser = new parserFormula( "SMALL({3,5,3,5,4;4,2,4,6,7},3)", "A1", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 3 );
-
-        oParser = new parserFormula( "SMALL({3,5,3,5,4;4,2,4,6,7},7)", "A1", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 5 );
-
-    } )
-
     test( "Test: \"MEDIAN\"", function () {
 
         function median( x ) {
 
-            x.sort(function(a,b){return a - b;});
+            x.sort( function ( a, b ) {
+                return a - b;
+            } );
 
-            if( x.length % 2 )
-                return x[(x.length-1)/2];
+            if ( x.length % 2 )
+                return x[(x.length - 1) / 2];
             else
-                return (x[x.length/2-1]+x[x.length/2])/2;
+                return (x[x.length / 2 - 1] + x[x.length / 2]) / 2;
         }
 
         oParser = new parserFormula( "MEDIAN(10.5,12.4,19.4,23.2)", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), median([10.5,12.4,19.4,23.2]) );
+        strictEqual( oParser.calculate().getValue(), median( [10.5, 12.4, 19.4, 23.2] ) );
 
         oParser = new parserFormula( "MEDIAN(10.5,{12.4,19.4},23.2)", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), median([10.5,12.4,19.4,23.2]) );
+        strictEqual( oParser.calculate().getValue(), median( [10.5, 12.4, 19.4, 23.2] ) );
 
         oParser = new parserFormula( "MEDIAN(-3.5,1.4,6.9,-4.5)", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), median([-3.5,1.4,6.9,-4.5]) );
+        strictEqual( oParser.calculate().getValue(), median( [-3.5, 1.4, 6.9, -4.5] ) );
 
     } )
 
@@ -2097,7 +2067,7 @@
         function mode( x ) {
 
             x.sort( function ( a, b ) {
-                return b-a;
+                return b - a;
             } );
 
             if ( x.length < 1 )
@@ -2132,15 +2102,704 @@
 
         oParser = new parserFormula( "MODE(9,1,5,1,9,5,6,6)", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), mode([9,1,5,1,9,5,6,6]) );
+        strictEqual( oParser.calculate().getValue(), mode( [9, 1, 5, 1, 9, 5, 6, 6] ) );
 
         oParser = new parserFormula( "MODE(1,9,5,1,9,5,6,6)", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), mode([1,9,5,1,9,5,6,6]) );
+        strictEqual( oParser.calculate().getValue(), mode( [1, 9, 5, 1, 9, 5, 6, 6] ) );
 
         oParser = new parserFormula( "MODE(1,9,5,5,9,5,6,6)", "A1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), mode([1,9,5,5,9,5,6,6]) );
+        strictEqual( oParser.calculate().getValue(), mode( [1, 9, 5, 5, 9, 5, 6, 6] ) );
+
+    } )
+
+    test( "Test: \"NORMDIST\"", function () {
+
+        function normdist( x, mue, sigma, kum ) {
+            if ( sigma <= 0 || x < 0 || x > 1 )
+                return "#NUM!";
+            else if ( kum == false )
+                return toFixed( phi( (x - mue) / sigma ) / sigma );
+            else
+                return toFixed( 0.5 + gauss( (x - mue) / sigma ) );
+
+        }
+
+        oParser = new parserFormula( "NORMDIST(42,40,1.5,TRUE)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), normdist( 42, 40, 1.5, true ) );
+
+        oParser = new parserFormula( "NORMDIST(42,40,1.5,FALSE)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), normdist( 42, 40, 1.5, false ) );
+
+        oParser = new parserFormula( "NORMDIST(42,40,-1.5,TRUE)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), normdist( 42, 40, -1.5, true ) );
+
+    } )
+
+    test( "Test: \"NORMSDIST\"", function () {
+
+        function normsdist( x ) {
+            return toFixed( 0.5 + gauss( x ) );
+        }
+
+        oParser = new parserFormula( "NORMSDIST(1.333333)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), normsdist( 1.333333 ) );
+
+        oParser = new parserFormula( "NORMSDIST(-1.5)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), normsdist( -1.5 ) );
+
+    } )
+
+    test( "Test: \"NEGBINOMDIST\"", function () {
+
+        function negbinomdist( x, r, p ) {
+            x = parseInt( x );
+            r = parseInt( r );
+            if ( x < 0 || r < 1 || p < 0 || p > 1 )
+                return "#NUM!";
+            else
+                return toFixed( Math.binomCoeff( x + r - 1, r - 1 ) * Math.pow( p, r ) * Math.pow( 1 - p, x ) );
+        }
+
+        oParser = new parserFormula( "NEGBINOMDIST(6,10,0.5)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), negbinomdist( 6, 10, 0.5 ) );
+
+        oParser = new parserFormula( "NEGBINOMDIST(6,10,1.5)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), negbinomdist( 6, 10, 1.5 ) );
+
+        oParser = new parserFormula( "NEGBINOMDIST(20,10,0.63)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), negbinomdist( 20, 10, 0.63 ) );
+
+    } )
+
+    test( "Test: \"NORMSINV\"", function () {
+
+        function normsinv( x ) {
+            if ( x <= 0.0 || x >= 1.0 )
+                return "#N/A";
+            else
+                return toFixed( gaussinv( x ) );
+        }
+
+        oParser = new parserFormula( "NORMSINV(0.954)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), normsinv( 0.954 ) );
+
+        oParser = new parserFormula( "NORMSINV(0.13)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), normsinv( 0.13 ) );
+
+        oParser = new parserFormula( "NORMSINV(0.6782136)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), normsinv( 0.6782136 ) );
+
+        oParser = new parserFormula( "NORMSINV(1.6782136)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), normsinv( 1.6782136 ) );
+
+        oParser = new parserFormula( "NORMSINV(-1.6782136)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), normsinv( -1.6782136 ) );
+
+    } )
+
+    test( "Test: \"LOGINV\"", function () {
+
+        function loginv( x, mue, sigma ) {
+            if ( sigma <= 0 || x <= 0 || x >= 1 )
+                return "#NUM!";
+            else
+                return toFixed( Math.exp( mue + sigma * ( gaussinv( x ) ) ) );
+        }
+
+        oParser = new parserFormula( "LOGINV(0.039084,3.5,1.2)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), loginv( 0.039084, 3.5, 1.2 ) );
+
+        oParser = new parserFormula( "LOGINV(0,3.5,1.2)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), loginv( 0, 3.5, 1.2 ) );
+
+        oParser = new parserFormula( "LOGINV(0,3.5,1.2)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), loginv( 10, 3.5, 1.2 ) );
+
+        oParser = new parserFormula( "LOGINV(0,3.5,1.2)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), loginv( -10, 3.5, 1.2 ) );
+    } )
+
+    test( "Test: \"NORMINV\"", function () {
+
+        function norminv( x, mue, sigma ) {
+            if ( sigma <= 0.0 || x <= 0.0 || x >= 1.0 )
+                return "#NUM!";
+            else
+                return toFixed( gaussinv( x ) * sigma + mue );
+        }
+
+        oParser = new parserFormula( "NORMINV(0.954,40,1.5)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), norminv( 0.954, 40, 1.5 ) );
+
+        oParser = new parserFormula( "NORMINV(0.13,100,0.5)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), norminv( 0.13, 100, 0.5 ) );
+
+        oParser = new parserFormula( "NORMINV(0.6782136,6,0.005)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), norminv( 0.6782136, 6, 0.005 ) );
+
+        oParser = new parserFormula( "NORMINV(-1.6782136,7,0)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), norminv( -1.6782136, 7, 0 ) );
+
+    } )
+
+    test( "Test: \"PEARSON\"", function () {
+
+        function pearson( x, y ) {
+
+            var sumXDeltaYDelta = 0, sqrXDelta = 0, sqrYDelta = 0, _x = 0, _y = 0, xLength = 0;
+
+            if ( x.length != y.length )
+                return "#N/A"
+            for ( var i = 0; i < x.length; i++ ) {
+
+                _x += x[i]
+                _y += y[i]
+                xLength++;
+            }
+
+            _x /= xLength;
+            _y /= xLength;
+
+            for ( var i = 0; i < x.length; i++ ) {
+
+                sumXDeltaYDelta += (x[i] - _x) * (y[i] - _y);
+                sqrXDelta += (x[i] - _x) * (x[i] - _x);
+                sqrYDelta += (y[i] - _y) * (y[i] - _y);
+
+            }
+
+            if ( sqrXDelta == 0 || sqrYDelta == 0 )
+                return "#DIV/0!"
+            else
+                return toFixed( sumXDeltaYDelta / Math.sqrt( sqrXDelta * sqrYDelta ) );
+        }
+
+        oParser = new parserFormula( "PEARSON({9,7,5,3,1},{10,6,1,5,3})", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), pearson( [9, 7, 5, 3, 1], [10, 6, 1, 5, 3] ) );
+
+    } )
+
+    test( "Test: \"PERCENTILE\"", function () {
+
+        function percentile( A, k ) {
+
+            A.sort( function ( a, b ) {
+                return a - b;
+            } )
+
+            var nSize = A.length;
+            if ( A.length < 1 || nSize == 0 )
+                return new cError( cErrorType.not_available ).toString();
+            else {
+                if ( nSize == 1 )
+                    return toFixed( A[0] );
+                else {
+                    var nIndex = Math.floor( k * (nSize - 1) );
+                    var fDiff = k * (nSize - 1) - Math.floor( k * (nSize - 1) );
+                    if ( fDiff == 0.0 )
+                        return toFixed( A[nIndex] );
+                    else {
+                        return toFixed( A[nIndex] +
+                            fDiff * (A[nIndex + 1] - A[nIndex]) );
+                    }
+                }
+            }
+
+        }
+
+        oParser = new parserFormula( "PERCENTILE({1,3,2,4},0.3)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), percentile( [1, 3, 2, 4], 0.3 ) );
+
+        oParser = new parserFormula( "PERCENTILE({1,3,2,4},0.75)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), percentile( [1, 3, 2, 4], 0.75 ) );
+
+    } )
+
+    test( "Test: \"PERCENTRANK\"", function () {
+
+        function percentrank( A, x, k ) {
+
+            var tA = A, t, fNum = x;
+
+            if ( !k ) k = 3;
+
+            tA.sort( function ( a, b ) {
+                return a - b;
+            } );
+
+            var nSize = tA.length;
+            if ( tA.length < 1 || nSize == 0 )
+                return "#N/A";
+
+            else {
+                if ( fNum < tA[0] || fNum > tA[nSize - 1] )
+                    return "#N/A";
+                else if ( nSize == 1 )
+                    return 1
+                else {
+                    var fRes, nOldCount = 0, fOldVal = tA[0], i;
+                    for ( i = 1; i < nSize && tA[i] < fNum; i++ ) {
+                        if ( tA[i] != fOldVal ) {
+                            nOldCount = i;
+                            fOldVal = tA[i];
+                        }
+                    }
+                    if ( tA[i] != fOldVal )
+                        nOldCount = i;
+                    if ( fNum == tA[i] )
+                        fRes = nOldCount / (nSize - 1);
+                    else {
+                        if ( nOldCount == 0 ) {
+                            fRes = 0.0;
+                        }
+                        else {
+                            var fFract = ( fNum - tA[nOldCount - 1] ) /
+                                ( tA[nOldCount] - tA[nOldCount - 1] );
+                            fRes = ( nOldCount - 1 + fFract ) / (nSize - 1);
+                        }
+                    }
+                    return fRes.toString().substr( 0, fRes.toString().indexOf( "." ) + 1 + k ) - 0;
+                }
+            }
+        }
+
+        oParser = new parserFormula( "PERCENTRANK({12,6,7,9,3,8},4)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), percentrank( [12, 6, 7, 9, 3, 8], 4 ) );
+
+        oParser = new parserFormula( "PERCENTRANK({12,6,7,9,3,8},5)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), percentrank( [12, 6, 7, 9, 3, 8], 5 ) );
+
+    } )
+
+    test( "Test: \"POISSON\"", function () {
+
+        function poisson( x, l, cumulativeFlag ) {
+            var _x = parseInt( x ), _l = l, f = cumulativeFlag;
+
+            if ( f ) {
+                var sum = 0;
+                for ( var k = 0; k <= x; k++ ) {
+                    sum += Math.pow( _l, k ) / Math.fact( k );
+                }
+                sum *= Math.exp( -_l );
+                return toFixed( sum );
+            }
+            else {
+                return toFixed( Math.exp( -_l ) * Math.pow( _l, _x ) / Math.fact( _x ) );
+            }
+
+        }
+
+        oParser = new parserFormula( "POISSON(8,2,false)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), poisson( 8, 2, false ) );
+
+        oParser = new parserFormula( "POISSON(8,2,true)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), poisson( 8, 2, true ) );
+
+        oParser = new parserFormula( "POISSON(2.6,5,false)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), poisson( 2, 5, false ) );
+
+        oParser = new parserFormula( "POISSON(2,5.7,true)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), poisson( 2, 5.7, true ) );
+
+        oParser = new parserFormula( "POISSON(-6,5,true)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+        oParser = new parserFormula( "POISSON(6,-5,false)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), "#NUM!" );
+    } )
+
+    test( "Test: \"PROB\"", function () {
+
+        oParser = new parserFormula( "PROB({0,1,2,3},{0.2,0.3,0.1,0.4},2)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 0.1 );
+
+        oParser = new parserFormula( "PROB({0,1,2,3},{0.2,0.3,0.1,0.4},1,4)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 0.8 );
+
+    } )
+
+    test( "Test: \"PROB\"", function () {
+
+        function quartile( A, k ) {
+
+            var fFlag = k;
+
+            A.sort( function ( a, b ) {
+                return a - b;
+            } )
+
+            var nSize = A.length;
+            if ( A.length < 1 || nSize == 0 )
+                return "#N/A"
+            else {
+                if ( nSize == 1 )
+                    return toFixed( A[0] );
+                else {
+
+                    if ( fFlag < 0.0 || fFlag > 4 )
+                        return "#NUM!";
+                    else if ( fFlag == 0.0 )
+                        return toFixed( A[0] );
+                    else if ( fFlag == 1.0 ) {
+                        var nIndex = Math.floor( 0.25 * (nSize - 1) ),
+                            fDiff = 0.25 * (nSize - 1) - Math.floor( 0.25 * (nSize - 1) );
+                        if ( fDiff == 0.0 )
+                            return toFixed( A[nIndex] );
+                        else {
+                            return toFixed( A[nIndex] +
+                                fDiff * (A[nIndex + 1] - A[nIndex]) );
+                        }
+                    }
+                    else if ( fFlag == 2.0 ) {
+                        if ( nSize % 2 == 0 )
+                            return toFixed( (A[nSize / 2 - 1] + A[nSize / 2]) / 2.0 );
+                        else
+                            return toFixed( A[(nSize - 1) / 2] );
+                    }
+                    else if ( fFlag == 3.0 ) {
+                        var nIndex = Math.floor( 0.75 * (nSize - 1) ),
+                            fDiff = 0.75 * (nSize - 1) - Math.floor( 0.75 * (nSize - 1) );
+                        if ( fDiff == 0.0 )
+                            return toFixed( A[nIndex] );
+                        else {
+                            return toFixed( A[nIndex] +
+                                fDiff * (A[nIndex + 1] - A[nIndex]) );
+                        }
+                    }
+                    else
+                        return toFixed( A[nSize - 1] );
+
+                }
+            }
+
+        }
+
+        oParser = new parserFormula( "QUARTILE({1,2,4,7,8,9,10,12},-1)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), quartile( [1, 2, 4, 7, 8, 9, 10, 12], -1 ) );
+
+        oParser = new parserFormula( "QUARTILE({1,2,4,7,8,9,10,12},0)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), quartile( [1, 2, 4, 7, 8, 9, 10, 12], 0 ) );
+
+        oParser = new parserFormula( "QUARTILE({1,2,4,7,8,9,10,12},1)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), quartile( [1, 2, 4, 7, 8, 9, 10, 12], 1 ) );
+
+        oParser = new parserFormula( "QUARTILE({1,2,4,7,8,9,10,12},2)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), quartile( [1, 2, 4, 7, 8, 9, 10, 12], 2 ) );
+
+        oParser = new parserFormula( "QUARTILE({1,2,4,7,8,9,10,12},3)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), quartile( [1, 2, 4, 7, 8, 9, 10, 12], 3 ) );
+
+        oParser = new parserFormula( "QUARTILE({1,2,4,7,8,9,10,12},4)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), quartile( [1, 2, 4, 7, 8, 9, 10, 12], 4 ) );
+
+        oParser = new parserFormula( "QUARTILE({1,2,4,7,8,9,10,12},5)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), quartile( [1, 2, 4, 7, 8, 9, 10, 12], 5 ) );
+
+    } )
+
+    test( "Test: \"RSQ\"", function () {
+
+        function rsq( x, y ) {
+
+            var sumXDeltaYDelta = 0, sqrXDelta = 0, sqrYDelta = 0, _x = 0, _y = 0, xLength = 0;
+
+            if ( x.length != y.length )
+                return "#N/A"
+            for ( var i = 0; i < x.length; i++ ) {
+
+                _x += x[i]
+                _y += y[i]
+                xLength++;
+            }
+
+            _x /= xLength;
+            _y /= xLength;
+
+            for ( var i = 0; i < x.length; i++ ) {
+
+                sumXDeltaYDelta += (x[i] - _x) * (y[i] - _y);
+                sqrXDelta += (x[i] - _x) * (x[i] - _x);
+                sqrYDelta += (y[i] - _y) * (y[i] - _y);
+
+            }
+
+            if ( sqrXDelta == 0 || sqrYDelta == 0 )
+                return "#DIV/0!"
+            else
+                return toFixed( Math.pow( sumXDeltaYDelta / Math.sqrt( sqrXDelta * sqrYDelta ), 2 ) );
+        }
+
+        oParser = new parserFormula( "RSQ({9,7,5,3,1},{10,6,1,5,3})", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), rsq( [9, 7, 5, 3, 1], [10, 6, 1, 5, 3] ) );
+
+        oParser = new parserFormula( "RSQ({2,3,9,1,8,7,5},{6,5,11,7,5,4,4})", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), rsq( [2, 3, 9, 1, 8, 7, 5], [6, 5, 11, 7, 5, 4, 4] ) );
+
+    } )
+
+    test( "Test: \"SKEW\"", function () {
+
+        function skew( x ) {
+
+            var sumSQRDeltaX = 0, _x = 0, xLength = 0, standDev = 0, sumSQRDeltaXDivstandDev = 0;
+            for ( var i = 0; i < x.length; i++ ) {
+
+                _x += x[i];
+                xLength++;
+
+            }
+
+            if ( xLength <= 2 )
+                return "#N/A"
+
+            _x /= xLength;
+
+            for ( var i = 0; i < x.length; i++ ) {
+
+                sumSQRDeltaX += Math.pow( x[i] - _x, 2 );
+
+            }
+
+            standDev = Math.sqrt( sumSQRDeltaX / ( xLength - 1 ) );
+
+            for ( var i = 0; i < x.length; i++ ) {
+
+                sumSQRDeltaXDivstandDev += Math.pow( (x[i] - _x) / standDev, 3 );
+
+            }
+
+            return toFixed( xLength / (xLength - 1) / (xLength - 2) * sumSQRDeltaXDivstandDev )
+
+        }
+
+        oParser = new parserFormula( "SKEW(3,4,5,2,3,4,5,6,4,7)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), skew( [3, 4, 5, 2, 3, 4, 5, 6, 4, 7] ) );
+
+        oParser = new parserFormula( "SKEW({2,3,9,1,8,7,5},{6,5,11,7,5,4,4})", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), skew( [2, 3, 9, 1, 8, 7, 5, 6, 5, 11, 7, 5, 4, 4] ) );
+
+    } )
+
+    test( "Test: \"SMALL\"", function () {
+
+        oParser = new parserFormula( "SMALL({3,5,3,5,4;4,2,4,6,7},3)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 3 );
+
+        oParser = new parserFormula( "SMALL({3,5,3,5,4;4,2,4,6,7},7)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 5 );
+
+    } )
+
+    test( "Test: \"SLOPE\"", function () {
+
+        function slope( y, x ) {
+
+            var sumXDeltaYDelta = 0, sqrXDelta = 0, _x = 0, _y = 0, xLength = 0;
+
+            if ( x.length != y.length )
+                return "#N/A"
+            for ( var i = 0; i < x.length; i++ ) {
+
+                _x += x[i]
+                _y += y[i]
+                xLength++;
+            }
+
+            _x /= xLength;
+            _y /= xLength;
+
+            for ( var i = 0; i < x.length; i++ ) {
+
+                sumXDeltaYDelta += (x[i] - _x) * (y[i] - _y);
+                sqrXDelta += (x[i] - _x) * (x[i] - _x);
+
+            }
+
+            if ( sqrXDelta == 0 )
+                return "#DIV/0!"
+            else
+                return toFixed( sumXDeltaYDelta / sqrXDelta );
+        }
+
+        oParser = new parserFormula( "SLOPE({9,7,5,3,1},{10,6,1,5,3})", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), slope( [9, 7, 5, 3, 1], [10, 6, 1, 5, 3] ) );
+
+        oParser = new parserFormula( "SLOPE({2,3,9,1,8,7,5},{6,5,11,7,5,4,4})", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), slope( [2, 3, 9, 1, 8, 7, 5], [6, 5, 11, 7, 5, 4, 4] ) );
+
+    } )
+
+    test( "Test: \"STANDARDIZE\"", function () {
+
+        function STANDARDIZE( x, mean, sigma ) {
+
+            if ( sigma <= 0 )
+                return "#NUM!"
+            else
+                return toFixed( (x - mean) / sigma );
+        }
+
+        oParser = new parserFormula( "STANDARDIZE(42,40,1.5)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), STANDARDIZE( 42, 40, 1.5 ) );
+
+        oParser = new parserFormula( "STANDARDIZE(22,12,2)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), STANDARDIZE( 22, 12, 2 ) );
+
+        oParser = new parserFormula( "STANDARDIZE(22,12,-2)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), STANDARDIZE( 22, 12, -2 ) );
+
+    } )
+
+    test( "Test: \"STDEV\"", function () {
+
+        function stdev() {
+            var average = 0, res = 0;
+            for ( var i = 0; i < arguments.length; i++ ) {
+                average += arguments[i];
+            }
+            average /= arguments.length;
+            for ( var i = 0; i < arguments.length; i++ ) {
+                res += (arguments[i] - average) * (arguments[i] - average);
+            }
+            return toFixed(Math.sqrt( res / (arguments.length - 1) ));
+        }
+
+        oParser = new parserFormula( "STDEV(123,134,143,173,112,109)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), stdev( 123, 134, 143, 173, 112, 109 ) );
+
+        ws.getRange2( "E400" ).setValue( "\"123\"" );
+        ws.getRange2( "E401" ).setValue( "134" );
+        ws.getRange2( "E402" ).setValue( "143" );
+        ws.getRange2( "E403" ).setValue( "173" );
+        ws.getRange2( "E404" ).setValue( "112" );
+        ws.getRange2( "E405" ).setValue( "109" );
+
+        oParser = new parserFormula( "STDEV(E400:E405)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), stdev( 134, 143, 173, 112, 109 ) );
+
+    } )
+
+    test( "Test: \"STDEVA\"", function () {
+
+        ws.getRange2( "E400" ).setValue( "\"123\"" );
+        ws.getRange2( "E401" ).setValue( "134" );
+        ws.getRange2( "E402" ).setValue( "143" );
+        ws.getRange2( "E403" ).setValue( "173" );
+        ws.getRange2( "E404" ).setValue( "112" );
+        ws.getRange2( "E405" ).setValue( "109" );
+
+
+
+        function stdeva() {
+            var average = 0, res = 0;
+            for ( var i = 0; i < arguments.length; i++ ) {
+                average += arguments[i];
+            }
+            average /= arguments.length;
+            for ( var i = 0; i < arguments.length; i++ ) {
+                res += (arguments[i] - average) * (arguments[i] - average);
+            }
+            return toFixed(Math.sqrt( res / (arguments.length - 1) ) );
+        }
+
+        oParser = new parserFormula( "STDEVA(123,134,143,173,112,109)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), stdeva( 123, 134, 143, 173, 112, 109 ) );
+
+        oParser = new parserFormula( "STDEVA(123,134,143,173,112,109)", "A2", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), stdeva( 123, 134, 143, 173, 112, 109 ) );
+
+    } )
+
+    test( "Test: \"VAR\"", function () {
+
+        function _var( x ) {
+
+            var sumSQRDeltaX = 0, _x = 0, xLength = 0, standDev = 0, sumSQRDeltaXDivstandDev = 0;
+            for ( var i = 0; i < x.length; i++ ) {
+                _x += x[i];
+                xLength++;
+            }
+
+            _x /= xLength;
+
+            for ( var i = 0; i < x.length; i++ ) {
+                sumSQRDeltaX += Math.pow( x[i] - _x, 2 );
+            }
+
+            return toFixed( sumSQRDeltaX / (xLength - 1) )
+
+        }
+
+        oParser = new parserFormula( "VAR(10.5,12.4,19.4,23.2)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), _var( [10.5, 12.4, 19.4, 23.2] ) );
+
+        oParser = new parserFormula( "VAR(10.5,{12.4,19.4},23.2)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), _var( [10.5, 12.4, 19.4, 23.2] ) );
+
+        oParser = new parserFormula( "VAR(10.5,12.4,19.4)", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), _var( [10.5, 12.4, 19.4] ) );
 
     } )
 } );
