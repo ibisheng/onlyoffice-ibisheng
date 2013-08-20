@@ -1919,6 +1919,10 @@ WordShape.prototype =
 
     calculateAfterResize: function()
     {
+        if(isRealObject(this.parent))
+        {
+            this.parent.bNeedUpdateWH = true;
+        }
         if(this.spPr.geometry !== null)
             this.spPr.geometry.Recalculate(this.absExtX, this.absExtY);
         this.calculateTransformMatrix();

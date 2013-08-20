@@ -1049,12 +1049,17 @@ WordGroupShapes.prototype =
 
     calculateAfterRotate: function()
     {
+
+        if(isRealObject(this.parent))
+            this.parent.bNeedUpdateWH = true;
         this.calculateTransformMatrix();
         this.calculateLeftTopPoint();
     },
 
     calculateAfterResize: function()
     {
+        if(isRealObject(this.parent))
+            this.parent.bNeedUpdateWH = true;
         for(var i = 0; i < this.spTree.length; ++i)
         {
             var cur_sp = this.spTree[i];
@@ -1510,6 +1515,8 @@ WordGroupShapes.prototype =
 
     recalculateAfterInternalResize: function()
     {
+        if(isRealObject(this.parent))
+            this.parent.bNeedUpdateWH = true;
         var _hc, _vc;
         var _x_min, _y_min, _x_max, _y_max;
         var _cur_element = this.arrGraphicObjects[0];

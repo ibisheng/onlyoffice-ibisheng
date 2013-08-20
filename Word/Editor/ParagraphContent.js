@@ -3420,6 +3420,7 @@ function ParaDrawing(W, H, GraphicObj, DrawingDocument, DocumentContent, Parent)
 
     this.snapArrayX = [];
     this.snapArrayY = [];
+    this.bNeedUpdateWH = true;
     this.setZIndex();
 //------------------------------------------------------------
     g_oTableId.Add( this, this.Id );
@@ -3752,7 +3753,8 @@ ParaDrawing.prototype =
 
     Measure : function(Context)
     {
-        this.updateWidthHeight();
+        if(this.bNeedUpdateWH)
+            this.updateWidthHeight();
         this.Width        = this.W;
         this.Height       = this.H;
         this.WidthVisible = this.W;
@@ -4147,6 +4149,7 @@ ParaDrawing.prototype =
             this.W = bounds.r - bounds.l;
             this.H = bounds.b - bounds.t;
         }
+        this.bNeedUpdateWH = false;
     },
 
     Set_AllowOverlap : function(AllowOverlap)
