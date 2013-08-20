@@ -1643,12 +1643,16 @@ CGroupShape.prototype =
         return ShapeToImageConverter(this, this.pageIndex).ImageUrl;
     },
 
-    readFromBinaryForCopyPaste: function(r, group, drawingObjects)
+    readFromBinaryForCopyPaste: function(r, group, drawingObjects, x, y)
     {
 
         this.group = group;
         this.drawingObjects = drawingObjects;
         this.spPr.Read_FromBinary2(r);
+        if(isRealNumber(x) && isRealNumber(y))
+        {
+            this.setPosition(x, y);
+        }
         var l = r.GetLong();
         for(var i = 0; i < l;++i)
         {

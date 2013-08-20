@@ -1067,12 +1067,16 @@ CImageShape.prototype =
 
     },
 
-    readFromBinaryForCopyPaste: function(r, group, drawingObjects)
+    readFromBinaryForCopyPaste: function(r, group, drawingObjects, x, y)
     {
         this.group = group;
         this.drawingObjects = drawingObjects;
         this.blipFill.Read_FromBinary2(r);
         this.spPr.Read_FromBinary2(r);
+        if(isRealNumber(x) && isRealNumber(y))
+        {
+            this.setPosition(x, y);
+        }
 
         if(!isRealObject(group))
         {

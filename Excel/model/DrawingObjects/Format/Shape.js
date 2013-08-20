@@ -2839,11 +2839,15 @@ CShape.prototype =
         return  "TeamLabShape" + w.pos + ";" + w.GetBase64Memory();
     },
 
-    readFromBinaryForCopyPaste: function(r, group, drawingObjects)
+    readFromBinaryForCopyPaste: function(r, group, drawingObjects, x, y)
     {
         this.group = group;
         this.drawingObjects = drawingObjects;
         this.spPr.Read_FromBinary2(r);
+        if(isRealNumber(x) && isRealNumber(y))
+        {
+            this.setPosition(x, y);
+        }
         if(r.GetBool())
         {
             this.style = new CShapeStyle();
