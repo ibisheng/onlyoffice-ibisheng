@@ -2454,6 +2454,7 @@ PasteProcessor.prototype =
 		var addStyles = [];
 		var api = this.api;
 		var oStyleTypes = {par: 1, table: 2, lvl: 3};
+		var addNewStyles = false;
 		var fParseStyle = function(aStyles, oDocumentStyles, oReadResult, nStyleType)
 		{
 			if(aStyles == undefined)
@@ -2484,26 +2485,29 @@ PasteProcessor.prototype =
 					}
 					if(!isAlreadyContainsStyle && isEqualName != null)//если нашли имя такого же стиля
 					{
-						if(nStyleType == 1 || nStyleType == 3)
+						if(nStyleType == oStyleTypes.par || nStyleType == oStyleTypes.lvl)
 							elem.pPr.PStyle = isEqualName;
-						else if (nStyleType == 2)
+						else if (nStyleType == oStyleTypes.table)
 							elem.pPr.TableStyle = isEqualName;
 						addStyles[addStyles.length] = isEqualName;
 					}
 					else if(!isAlreadyContainsStyle && isEqualName == null)//нужно добавить новый стиль
 					{
 						oDocumentStyles[stylePaste.style.Name] = stylePaste.style;
-						if(nStyleType == 1 || nStyleType == 3)
+						if(nStyleType == oStyleTypes.par || nStyleType == oStyleTypes.lvl)
 							elem.pPr.PStyle = stylePaste.style.Name;
-						else if (nStyleType == 2)
+						else if (nStyleType == oStyleTypes.table)
 							elem.pPr.TableStyle = stylePaste.style.Name;
 						addStyles[addStyles.length] = stylePaste.style.Name;
-						//добавляем картинки стилей в меню
-						api.GenerateStyles();
+						addNewStyles = true;
 					}
 				}
 			}
+			//добавляем картинки стилей в меню
+			if(addNewStyles)
+				api.GenerateStyles();
 		}
+		
 		fParseStyle(oBinaryFileReader.oReadResult.paraStyles, this.oDocument.Styles.Style, oBinaryFileReader.oReadResult, oStyleTypes.par);
 		fParseStyle(oBinaryFileReader.oReadResult.tableStyles, this.oDocument.Styles.Style, oBinaryFileReader.oReadResult, oStyleTypes.table);
 		fParseStyle(oBinaryFileReader.oReadResult.lvlStyles, this.oDocument.Styles.Style, oBinaryFileReader.oReadResult, oStyleTypes.lvl);
@@ -2514,7 +2518,7 @@ PasteProcessor.prototype =
 		{
 			for(var i in aContent)
 			{
-				if(!aContent[i].TableGrid)
+				if(aContent[i].GetType() != oStyleTypes.table)
 				{
 					styleName = aContent[i].Style_Get();
 					for(var k = 0; k < addStyles.length; k++)
