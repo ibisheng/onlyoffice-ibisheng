@@ -8141,10 +8141,7 @@
 									t.model.insertColsBefore(_updateRangeIns.c1, _updateRangeIns.c2 - _updateRangeIns.c1 + 1);
 									t.model.onEndTriggerAction();
 									t.autoFilters.insertColumn(t, prop, _updateRangeIns, arn);
-									
-									//if ( !bUndoRedo ) {
-										t.objectRender.updateDrawingObject(true, val, _updateRangeIns);
-									//}
+									t.objectRender.updateDrawingObject(true, val, _updateRangeIns);
 									t.cellCommentator.updateCommentsDependencies(true, val, _updateRangeIns);
 								};
 								if(bUndoRedo)
@@ -8161,10 +8158,7 @@
 									t.model.insertRowsBefore(_updateRangeIns.r1, _updateRangeIns.r2 - _updateRangeIns.r1 + 1);
 									t.model.onEndTriggerAction();
 									t.autoFilters.insertRows(t, prop,_updateRangeIns, arn);
-									
-									//if ( !bUndoRedo ) {
-										t.objectRender.updateDrawingObject(true, val, _updateRangeIns);
-									//}
+									t.objectRender.updateDrawingObject(true, val, _updateRangeIns);
 									t.cellCommentator.updateCommentsDependencies(true, val, _updateRangeIns);
 								};
 								if(bUndoRedo)
@@ -8221,9 +8215,7 @@
 									fullRecalc = true;
 									t.model.removeCols(_updateRangeDel.c1, _updateRangeDel.c2);
 									t.autoFilters.insertColumn(t, prop,_updateRangeDel, arn);
-									//if (!bUndoRedo) {
-										t.objectRender.updateDrawingObject(false, val, _updateRangeDel);
-									//}
+									t.objectRender.updateDrawingObject(false, val, _updateRangeDel);
 									t.cellCommentator.updateCommentsDependencies(false, val, _updateRangeDel);
 								};
 								if(bUndoRedo)
@@ -8237,10 +8229,8 @@
 								functionModelAction = function () {
 									fullRecalc = true;
 									t.model.removeRows(_updateRangeDel.r1, _updateRangeDel.r2);
-									t.autoFilters.insertRows(t, prop,_updateRangeDel, arn);
-									//if (!bUndoRedo) {
-										t.objectRender.updateDrawingObject(false, val, _updateRangeDel);
-									//}
+									t.autoFilters.insertRows(t, prop,_updateRangeDel, arn);									
+									t.objectRender.updateDrawingObject(false, val, _updateRangeDel);
 									t.cellCommentator.updateCommentsDependencies(false, val, _updateRangeDel);
 								};
 								if(bUndoRedo)

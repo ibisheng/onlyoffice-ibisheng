@@ -1835,24 +1835,6 @@ CShape.prototype =
 			var extX = this.extX;
 			var extY = this.extY;
 			
-			/*var callback = function(result)
-			{
-				var lockType = parseInt(result);
-				if ( !isNaN(lockType) )
-				{
-					graphics.SetIntegerGrid(false);
-					graphics.transform3(transform, false);		
-					graphics.DrawLockObjectRect(lockType, 0, 0, extX, extY );
-					graphics.reset();
-					graphics.SetIntegerGrid(true);
-				}
-			}
-			
-			if(!isRealObject(this.group))
-			{
-				this.drawingBase.isLocked(callback);
-			}*/
-			
 			if(!isRealObject(this.group))
 			{
 				graphics.SetIntegerGrid(false);

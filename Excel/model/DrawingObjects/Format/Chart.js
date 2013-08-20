@@ -408,9 +408,54 @@ CChartAsGroup.prototype =
     },
 
 
-    setChart: function(chart)
+    setChart: function(chart, bEdit)
     {
-        this.chart = chart;
+		if ( bEdit ) {
+		
+			History.Create_NewPoint();
+			
+			if ( this.chart.type != chart.type ) {
+				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_ChangeType, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.type, chart.type)));
+				this.chart.type = chart.type;
+			}
+			
+			if ( this.chart.subType != chart.subType ) {
+				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_ChangeSubType, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.subType, chart.subType)));
+				this.chart.subType = chart.subType;
+			}
+				
+			if ( this.chart.styleId != chart.styleId ) {
+				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_ChangeStyle, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.styleId, chart.styleId)));
+				this.chart.styleId = chart.styleId;
+			}
+			
+			if ( !this.chart.range.isEqual(chart.range) ) {
+				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_ChangeRange, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.range, chart.range)));
+				this.chart.range = new asc_CChartRange(chart.range);
+			}
+			
+			if ( !this.chart.header.isEqual(chart.header) ) {
+				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_ChangeHeader, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.header, chart.header)));
+				this.chart.header = new asc_CChartHeader(chart.header);
+			}
+			
+			if ( !this.chart.xAxis.isEqual(chart.xAxis) ) {
+				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_ChangeAxisX, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.xAxis, chart.xAxis)));
+				this.chart.xAxis = new asc_CChartAxisX(chart.xAxis);
+			}
+			
+			if ( !this.chart.yAxis.isEqual(chart.yAxis) ) {
+				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_ChangeAxisY, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.yAxis, chart.yAxis)));
+				this.chart.yAxis = new asc_CChartAxisY(chart.yAxis);
+			}
+			
+			if ( !this.chart.legend.isEqual(chart.legend) ) {
+				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_ChangeLegend, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.legend, chart.legend)));
+				this.chart.legend = new asc_CChartAxisY(chart.legend);
+			}
+		}
+		else
+			this.chart = chart;
     },
 
     deleteDrawingBase: function()
@@ -422,7 +467,7 @@ CChartAsGroup.prototype =
         }
     },
 
-    initFromChartObject: function(chart, bWithoutHistory, options)
+    initFromChartObject: function(chart, options)
     {
         this.setChart(chart);
         this.spPr.xfrm = new CXfrm();
@@ -642,6 +687,23 @@ CChartAsGroup.prototype =
         var shape_drawer = new CShapeDrawer();
         shape_drawer.fromShape(this, graphics);
         shape_drawer.draw(this.spPr.geometry);
+		
+		if(graphics instanceof CGraphics)
+		{
+			var transform = this.transform;
+			var extX = this.extX;
+			var extY = this.extY;
+			
+			if(!isRealObject(this.group))
+			{
+				graphics.SetIntegerGrid(false);
+				graphics.transform3(transform, false);		
+				graphics.DrawLockObjectRect(this.lockType, 0, 0, extX, extY );
+				graphics.reset();
+				graphics.SetIntegerGrid(true);
+			}
+		}
+		
         graphics.reset();
         graphics.SetIntegerGrid(true);
         if(this.chartTitle)

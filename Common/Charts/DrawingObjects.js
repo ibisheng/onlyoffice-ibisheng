@@ -5,11 +5,6 @@
 * Date:   13/08/2012
 */
 
-var locktype_None   = 1; // никто не залочил данный объект
-var locktype_Mine   = 2; // данный объект залочен текущим пользователем
-var locktype_Other  = 3; // данный объект залочен другим(не текущим) пользователем
-var locktype_Other2 = 4; // данный объект залочен другим(не текущим) пользователем (обновления уже пришли)
-var locktype_Other3 = 5; // данный объект был залочен (обновления пришли) и снова стал залочен
 
 if ( !window["Asc"] ) {		// Для вставки диаграмм в Word
 	window["Asc"] = {};
@@ -616,8 +611,8 @@ prot["asc_setImageUrl"] = prot.asc_setImageUrl;
 function asc_CChart(object) {
 
 	var bCopy = isObject(object);
-
-	this.bChartEditor = bCopy ? object.bChartEditor : false;
+	
+	this.worksheet = bCopy ? object.worksheet : null;
 	this.type = bCopy ? object.type : null;
 	this.subType = bCopy ? object.subType : c_oAscChartSubType.normal;
 	
@@ -652,7 +647,10 @@ function asc_CChart(object) {
 
 			this.series.push(ser);
 		}
-	}	
+	}
+ 	
+	this.Id = g_oIdCounter.Get_NewId();
+	g_oTableId.Add(this, this.Id);
 }
 
 asc_CChart.prototype = {
@@ -841,6 +839,103 @@ asc_CChart.prototype = {
 			aInfo.push(info);
 		}
 		return aInfo;
+	},
+	
+	Get_Id: function() {
+		return this.Id;
+	},
+	
+	Undo: function(type, data) {
+		
+		switch (type) {
+		
+			case historyitem_Chart_ChangeType:
+				this.type = data.oldValue;
+				break;
+				
+			case historyitem_Chart_ChangeSubType:
+				this.subType = data.oldValue;
+				break;
+				
+			case historyitem_Chart_ChangeStyle:
+				this.styleId = data.oldValue;
+				break;
+				
+			case historyitem_Chart_ChangeRange:
+				this.range = new asc_CChartRange(data.oldValue);
+				if ( this.worksheet ) {
+					this.range.intervalObject = convertFormula(this.range.interval, this.worksheet);
+					this.rebuildSeries();
+				}
+				break;
+				
+			case historyitem_Chart_ChangeHeader:
+				this.header = new asc_CChartHeader(data.oldValue);
+				break;
+				
+			case historyitem_Chart_ChangeAxisX:
+				this.xAxis = new asc_CChartAxisX(data.oldValue);
+				break;
+				
+			case historyitem_Chart_ChangeAxisY:
+				this.yAxis = new asc_CChartAxisY(data.oldValue);
+				break;
+				
+			case historyitem_Chart_ChangeLegend:
+				this.legend = new asc_CChartLegend(data.oldValue);
+				break;
+			
+		}
+		if ( this.worksheet ) {
+			this.worksheet.objectRender.rebuildChartGraphicObjects();
+			this.worksheet.objectRender.showDrawingObjects(false);
+		}
+	},
+	
+	Redo: function(type, data) {
+		
+		switch (type) {
+			
+			case historyitem_Chart_ChangeType:
+				this.type = data.newValue;
+				break;
+				
+			case historyitem_Chart_ChangeSubType:
+				this.subType = data.newValue;
+				break;
+				
+			case historyitem_Chart_ChangeStyle:
+				this.styleId = data.newValue;
+				break;
+				
+			case historyitem_Chart_ChangeRange:
+				this.range = new asc_CChartRange(data.newValue);
+				if ( this.worksheet ) {
+					this.range.intervalObject = convertFormula(this.range.interval, this.worksheet);
+					this.rebuildSeries();
+				}
+				break;
+				
+			case historyitem_Chart_ChangeHeader:
+				this.header = new asc_CChartHeader(data.newValue);
+				break;
+				
+			case historyitem_Chart_ChangeAxisX:
+				this.xAxis = new asc_CChartAxisX(data.newValue);
+				break;
+				
+			case historyitem_Chart_ChangeAxisY:
+				this.yAxis = new asc_CChartAxisY(data.newValue);
+				break;
+				
+			case historyitem_Chart_ChangeLegend:
+				this.legend = new asc_CChartLegend(data.newValue);
+				break;
+		}
+		if ( this.worksheet ) {
+			this.worksheet.objectRender.rebuildChartGraphicObjects();
+			this.worksheet.objectRender.showDrawingObjects(false);
+		}
 	}
 }
 
@@ -903,6 +998,10 @@ function asc_CChartRange(object) {
 
 asc_CChartRange.prototype = {
 
+	isEqual: function(object) {
+		return ( (this.interval == object.interval) && (this.rows == object.rows) && (this.columns == object.columns) );
+	},
+
 	asc_getInterval: function() { return this.interval; },
 	asc_setInterval: function(interval) { this.interval = interval; },
 
@@ -948,6 +1047,11 @@ function asc_CChartHeader(object) {
 }
 
 asc_CChartHeader.prototype = {
+
+	isEqual: function(object) {
+		return ( (this.title == object.title) && (this.subTitle == object.subTitle) && (this.bDefaultTitle == object.bDefaultTitle) );
+	},
+
 	asc_getTitle: function() { return this.title; },
 	asc_setTitle: function(title) { this.title = title; },
 	
@@ -988,6 +1092,11 @@ function asc_CChartAxisX(object) {
 }
 
 asc_CChartAxisX.prototype = {
+
+	isEqual: function(object) {
+		return ( (this.title == object.title) && (this.bDefaultTitle == object.bDefaultTitle) && (this.bShow == object.bShow) && (this.bGrid == object.bGrid) );
+	},
+
 	asc_getTitle: function() { return this.title; },
 	asc_setTitle: function(title) { this.title = title; },
 
@@ -1034,6 +1143,11 @@ function asc_CChartAxisY(object) {
 }
 
 asc_CChartAxisY.prototype = {
+
+	isEqual: function(object) {
+		return ( (this.title == object.title) && (this.bDefaultTitle == object.bDefaultTitle) && (this.bShow == object.bShow) && (this.bGrid == object.bGrid) );
+	},
+
 	asc_getTitle: function() { return this.title; },
 	asc_setTitle: function(title) { this.title = title; },
 
@@ -1078,9 +1192,12 @@ function asc_CChartLegend(object) {
 	this.bOverlay = bCopy ? object.bOverlay : false;
 }
 
-
-
 asc_CChartLegend.prototype = {
+
+	isEqual: function(object) {
+		return ( (this.position == object.position) && (this.bShow = object.bShow) && (this.bOverlay == object.bOverlay) );
+	},
+
 	asc_getPosition: function() { return this.position; },
 	asc_setPosition: function(pos) { this.position = pos; },
 
@@ -1091,6 +1208,24 @@ asc_CChartLegend.prototype = {
 	asc_setOverlayFlag: function(overlayFlag) { this.bOverlay = overlayFlag; }
 }
 
+//{ asc_CChartLegend export
+window["Asc"].asc_CChartLegend = asc_CChartLegend;
+window["Asc"]["asc_CChartLegend"] = asc_CChartLegend;
+prot = asc_CChartLegend.prototype;
+
+prot["asc_getPosition"] = prot.asc_getPosition;
+prot["asc_setPosition"] = prot.asc_setPosition;
+
+prot["asc_getShowFlag"] = prot.asc_getShowFlag;
+prot["asc_setShowFlag"] = prot.asc_setShowFlag;
+
+prot["asc_getOverlayFlag"] = prot.asc_getOverlayFlag;
+prot["asc_setOverlayFlag"] = prot.asc_setOverlayFlag;
+//}
+
+//-----------------------------------------------------------------------------------
+// Chart font
+//-----------------------------------------------------------------------------------
 
 function asc_CChartFont(object) {
 
@@ -1189,21 +1324,6 @@ prot["asc_setItalic"] = prot.asc_setItalic;
 
 prot["asc_getUnderline"] = prot.asc_getUnderline;
 prot["asc_setUnderline"] = prot.asc_setUnderline;
-//}
-
-//{ asc_CChartLegend export
-window["Asc"].asc_CChartLegend = asc_CChartLegend;
-window["Asc"]["asc_CChartLegend"] = asc_CChartLegend;
-prot = asc_CChartLegend.prototype;
-
-prot["asc_getPosition"] = prot.asc_getPosition;
-prot["asc_setPosition"] = prot.asc_setPosition;
-
-prot["asc_getShowFlag"] = prot.asc_getShowFlag;
-prot["asc_setShowFlag"] = prot.asc_setShowFlag;
-
-prot["asc_getOverlayFlag"] = prot.asc_getOverlayFlag;
-prot["asc_setOverlayFlag"] = prot.asc_setOverlayFlag;
 //}
 
 //-----------------------------------------------------------------------------------
@@ -2482,12 +2602,6 @@ function DrawingObjects() {
 			
 			var drawingObject = _this.cloneDrawingObject(currentSheet.model.Drawings[i]);
 			
-			if ( drawingObject.imageUrl) {
-				
-				aObjectsSync[aObjectsSync.length] = drawingObject;
-				aImagesSync[aImagesSync.length] = drawingObject.imageUrl;
-			}
-			
             if (drawingObject.graphicObject instanceof  CChartAsGroup) {
                 
 				_this.calcChartInterval(drawingObject.graphicObject.chart);
@@ -2498,7 +2612,7 @@ function DrawingObjects() {
                     drawingObject.graphicObject.chartTitle.drawingObjects = _this;
 					
                 drawingObject.graphicObject.chart.worksheet = worksheet;
-                drawingObject.graphicObject.init(aImagesSync);
+                drawingObject.graphicObject.init();
                 aObjects.push( drawingObject );
             }
 			if (drawingObject.graphicObject instanceof  CShape) {
@@ -2512,6 +2626,7 @@ function DrawingObjects() {
 			}
             if (drawingObject.graphicObject instanceof  CImageShape) {
 
+				aObjectsSync[aObjectsSync.length] = drawingObject;
                 drawingObject.graphicObject.drawingBase = drawingObject;
                 drawingObject.graphicObject.drawingObjects = _this;
                 drawingObject.graphicObject.recalculate(aImagesSync);
@@ -3098,7 +3213,7 @@ function DrawingObjects() {
 		}
 	}
 	
-	_this.addChartDrawingObject = function(chart, bWithoutHistory, options) {
+	_this.addChartDrawingObject = function(chart, options) {
 
 		if ( _this.isViewerMode() )
 			return;
@@ -3165,14 +3280,14 @@ function DrawingObjects() {
 		chart.rebuildSeries();
 		chart.worksheet = worksheet; 	// Для формул серий
 		
-        return this.controller.addChartDrawingObject(chart, bWithoutHistory, options);
+        return this.controller.addChartDrawingObject(chart, options);
 	}
 
 	_this.editChartDrawingObject = function(chart) {
 		if ( chart ) {
+			_this.controller.editChartDrawingObjects(chart);
 			chart.rebuildSeries();
 			chart.range.intervalObject = convertFormula(chart.range.interval, worksheet);
-			_this.controller.editChartDrawingObjects(chart);
 			_this.showDrawingObjects(false);
 		}
 	}

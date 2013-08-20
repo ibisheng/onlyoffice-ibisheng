@@ -292,7 +292,7 @@ DrawingObjectsController.prototype =
         {
             if ( this.selectedObjects[0].isChart() ) {
 				this.selectedObjects[0].syncAscChart();
-                return this.selectedObjects[0].chart;
+                return new asc_CChart(this.selectedObjects[0].chart);
 			}
 			
             if ( isRealObject(this.curState.group) )
@@ -301,7 +301,7 @@ DrawingObjectsController.prototype =
                 {
                     if ( this.curState.group.selectedObjects[0].isChart() ) {
 						this.curState.group.selectedObjects[0].syncAscChart();
-                        return this.curState.group.selectedObjects[0].chart;
+                        return new asc_CChart(this.curState.group.selectedObjects[0].chart);
 					}
                 }
             }
@@ -316,7 +316,7 @@ DrawingObjectsController.prototype =
         {
             if(this.selectedObjects[0].isChart())
             {
-                this.selectedObjects[0].setChart(chart);
+                this.selectedObjects[0].setChart(chart, true);
                 this.selectedObjects[0].recalculate();
                 return;
 
@@ -327,7 +327,7 @@ DrawingObjectsController.prototype =
                 {
                     if(this.curState.group.selectedObjects[0].isChart())
                     {
-                        this.curState.group.selectedObjects[0].setChart(chart);
+                        this.curState.group.selectedObjects[0].setChart(chart, true);
                         this.curState.group.selectedObjects[0].recalculate();
                         return;
                     }
@@ -336,10 +336,10 @@ DrawingObjectsController.prototype =
         }
     },
 
-    addChartDrawingObject: function(chart, bWithoutHistory, options)
+    addChartDrawingObject: function(chart, options)
     {
         var chart_as_group = new CChartAsGroup(null, this.drawingObjects);
-        chart_as_group.initFromChartObject(chart, bWithoutHistory, options);
+        chart_as_group.initFromChartObject(chart, options);
     },
 
     changeCurrentState: function(newState)

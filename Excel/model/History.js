@@ -73,7 +73,14 @@ var historyitem_Cell_SetQuotePrefix = 20;
 var historyitem_Cell_Angle = 21;
 var historyitem_Cell_Style = 22;
 
-var historyitem_DrawingLayer = 1;
+var historyitem_Chart_ChangeType = 1;
+var historyitem_Chart_ChangeSubType = 2;
+var historyitem_Chart_ChangeStyle = 3;
+var historyitem_Chart_ChangeRange = 4;
+var historyitem_Chart_ChangeHeader = 5;
+var historyitem_Chart_ChangeAxisX = 6;
+var historyitem_Chart_ChangeAxisY = 7;
+var historyitem_Chart_ChangeLegend = 8;
 
 var historyitem_AutoShapes_Offset = 1;
 var historyitem_AutoShapes_Extents = 2;

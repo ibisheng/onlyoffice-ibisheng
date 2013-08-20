@@ -343,7 +343,7 @@ CImageShape.prototype =
         this.brush.fill.RasterImageId = this.blipFill.fill.RasterImageId;
         if(Array.isArray(aImagesSync))
         {
-            aImagesSync.push(this.brush.fill.RasterImageId);
+            aImagesSync.push(getFullImageSrc(this.brush.fill.RasterImageId));
         }
     },
 
@@ -731,6 +731,23 @@ CImageShape.prototype =
         var shape_drawer = new CShapeDrawer();
         shape_drawer.fromShape(this, graphics);
         shape_drawer.draw(this.spPr.geometry);
+		
+		if(graphics instanceof CGraphics)
+		{
+			var transform = this.transform;
+			var extX = this.extX;
+			var extY = this.extY;
+			
+			if(!isRealObject(this.group))
+			{
+				graphics.SetIntegerGrid(false);
+				graphics.transform3(transform, false);		
+				graphics.DrawLockObjectRect(this.lockType, 0, 0, extX, extY );
+				graphics.reset();
+				graphics.SetIntegerGrid(true);
+			}
+		}
+		
         graphics.reset();
         graphics.SetIntegerGrid(true);
     },

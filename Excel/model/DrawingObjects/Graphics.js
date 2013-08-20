@@ -1709,10 +1709,10 @@ CGraphics.prototype =
 
     DrawLockParagraph : function(lock_type, x, y1, y2)
     {
-        if (lock_type == locktype_None || editor.WordControl.m_oDrawingDocument.IsLockObjectsEnable === false || editor.isViewMode)
+        if (lock_type == c_oAscLockTypes.kLockTypeNone || editor.WordControl.m_oDrawingDocument.IsLockObjectsEnable === false || editor.isViewMode)
             return;
 
-        if (lock_type == locktype_Mine)
+        if (lock_type == c_oAscLockTypes.kLockTypeMine)
         {
             this.p_color(22, 156, 0, 255);
             //this.p_color(155, 187, 277, 255);
@@ -1801,10 +1801,10 @@ CGraphics.prototype =
 
     DrawLockObjectRect : function(lock_type, x, y, w, h)
     {
-        if (lock_type == locktype_None)
+        if (lock_type == c_oAscLockTypes.kLockTypeNone)
             return;
 
-        if (lock_type == locktype_Mine)
+        if (lock_type == c_oAscLockTypes.kLockTypeMine)
         {
             this.p_color(22, 156, 0, 255);
             //this.p_color(155, 187, 277, 255);
