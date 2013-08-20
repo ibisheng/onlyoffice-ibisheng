@@ -530,18 +530,16 @@
 			// Undo для добавления/удаления столбцов
 			undoCols: function (sheetId, count) {
 				if (this.isCoAuthoringExcellEnable()) {
-					if (!this.m_oRecalcIndexColumns.hasOwnProperty(sheetId)) {
-						this.m_oRecalcIndexColumns[sheetId] = new CRecalcIndex();
-					}
+					if (!this.m_oRecalcIndexColumns.hasOwnProperty(sheetId))
+						return;
 					this.m_oRecalcIndexColumns[sheetId].remove(count);
 				}
 			},
 			// Undo для добавления/удаления строк
 			undoRows: function (sheetId, count) {
 				if (this.isCoAuthoringExcellEnable()) {
-					if (!this.m_oRecalcIndexRows.hasOwnProperty(sheetId)) {
-						this.m_oRecalcIndexRows[sheetId] = new CRecalcIndex();
-					}
+					if (!this.m_oRecalcIndexRows.hasOwnProperty(sheetId))
+						return;
 					this.m_oRecalcIndexRows[sheetId].remove(count);
 				}
 			},
@@ -623,9 +621,8 @@
 					arrInsertRows.push(range);
 			},
 			removeColsRange: function (sheetId, range) {
-				if (!this.m_oInsertColumns.hasOwnProperty(sheetId)) {
-					this.m_oInsertColumns[sheetId] = [];
-				}
+				if (!this.m_oInsertColumns.hasOwnProperty(sheetId))
+					return;
 				var arrInsertColumns = this.m_oInsertColumns[sheetId];
 				// Нужно убрать те колонки, которые входят в диапазон
 				var countCols = range.c2 - range.c1 + 1;
@@ -653,9 +650,8 @@
 				}
 			},
 			removeRowsRange: function (sheetId, range) {
-				if (!this.m_oInsertRows.hasOwnProperty(sheetId)) {
-					this.m_oInsertRows[sheetId] = [];
-				}
+				if (!this.m_oInsertRows.hasOwnProperty(sheetId))
+					return;
 				var arrInsertRows = this.m_oInsertRows[sheetId];
 				// Нужно убрать те строки, которые входят в диапазон
 				var countRows = range.r2 - range.r1 + 1;
@@ -683,9 +679,8 @@
 				}
 			},
 			isIntersectionInCols: function (sheetId, col) {
-				if (!this.m_oInsertColumns.hasOwnProperty(sheetId)) {
-					this.m_oInsertColumns[sheetId] = [];
-				}
+				if (!this.m_oInsertColumns.hasOwnProperty(sheetId))
+					return false;
 				var arrInsertColumns = this.m_oInsertColumns[sheetId];
 				for (var i = 0; i < arrInsertColumns.length; ++i) {
 					if (arrInsertColumns[i].c1 <= col && col <= arrInsertColumns[i].c2)
@@ -694,9 +689,8 @@
 				return false;
 			},
 			isIntersectionInRows: function (sheetId, row) {
-				if (!this.m_oInsertRows.hasOwnProperty(sheetId)) {
-					this.m_oInsertRows[sheetId] = [];
-				}
+				if (!this.m_oInsertRows.hasOwnProperty(sheetId))
+					return false;
 				var arrInsertRows = this.m_oInsertRows[sheetId];
 				for (var i = 0; i < arrInsertRows.length; ++i) {
 					if (arrInsertRows[i].r1 <= row && row <= arrInsertRows[i].r2)
@@ -705,55 +699,49 @@
 				return false;
 			},
 			getArrayInsertColumnsBySheetId: function (sheetId) {
-				if (!this.m_oInsertColumns.hasOwnProperty(sheetId)) {
-					this.m_oInsertColumns[sheetId] = [];
-				}
+				if (!this.m_oInsertColumns.hasOwnProperty(sheetId))
+					return [];
+
 				return this.m_oInsertColumns[sheetId];
 			},
 			getArrayInsertRowsBySheetId: function (sheetId) {
-				if (!this.m_oInsertRows.hasOwnProperty(sheetId)) {
-					this.m_oInsertRows[sheetId] = [];
-				}
+				if (!this.m_oInsertRows.hasOwnProperty(sheetId))
+					return [];
+
 				return this.m_oInsertRows[sheetId];
 			},
 			getLockMeColumn: function (sheetId, col) {
-				if (!this.m_oRecalcIndexColumns.hasOwnProperty(sheetId)) {
-					this.m_oRecalcIndexColumns[sheetId] = new CRecalcIndex();
-				}
+				if (!this.m_oRecalcIndexColumns.hasOwnProperty(sheetId))
+					return col;
 				return this.m_oRecalcIndexColumns[sheetId].getLockMe(col);
 			},
 			getLockMeRow: function (sheetId, row) {
-				if (!this.m_oRecalcIndexRows.hasOwnProperty(sheetId)) {
-					this.m_oRecalcIndexRows[sheetId] = new CRecalcIndex();
-				}
+				if (!this.m_oRecalcIndexRows.hasOwnProperty(sheetId))
+					return row;
 				return this.m_oRecalcIndexRows[sheetId].getLockMe(row);
 			},
 			// Только когда от других пользователей изменения колонок (для пересчета)
 			getLockMeColumn2: function (sheetId, col) {
-				if (!this.m_oRecalcIndexColumns.hasOwnProperty(sheetId)) {
-					this.m_oRecalcIndexColumns[sheetId] = new CRecalcIndex();
-				}
+				if (!this.m_oRecalcIndexColumns.hasOwnProperty(sheetId))
+					return col;
 				return this.m_oRecalcIndexColumns[sheetId].getLockMe2(col);
 			},
 			// Только когда от других пользователей изменения строк (для пересчета)
 			getLockMeRow2: function (sheetId, row) {
-				if (!this.m_oRecalcIndexRows.hasOwnProperty(sheetId)) {
-					this.m_oRecalcIndexRows[sheetId] = new CRecalcIndex();
-				}
+				if (!this.m_oRecalcIndexRows.hasOwnProperty(sheetId))
+					return row;
 				return this.m_oRecalcIndexRows[sheetId].getLockMe2(row);
 			},
 			// Только для принятия изменений от других пользователей! (для пересчета только в сохранении)
 			getLockOtherColumn2: function (sheetId, col) {
-				if (!this.m_oRecalcIndexColumns.hasOwnProperty(sheetId)) {
-					this.m_oRecalcIndexColumns[sheetId] = new CRecalcIndex();
-				}
+				if (!this.m_oRecalcIndexColumns.hasOwnProperty(sheetId))
+					return col;
 				return this.m_oRecalcIndexColumns[sheetId].getLockSaveOther(col);
 			},
 			// Только для принятия изменений от других пользователей! (для пересчета только в сохранении)
 			getLockOtherRow2: function (sheetId, row) {
-				if (!this.m_oRecalcIndexRows.hasOwnProperty(sheetId)) {
-					this.m_oRecalcIndexRows[sheetId] = new CRecalcIndex();
-				}
+				if (!this.m_oRecalcIndexRows.hasOwnProperty(sheetId))
+					return row;
 				return this.m_oRecalcIndexRows[sheetId].getLockSaveOther(row);
 			}
 		};
