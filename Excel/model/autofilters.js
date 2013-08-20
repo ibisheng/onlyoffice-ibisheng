@@ -2075,9 +2075,12 @@
 					else
 						isMerged = false;
 					
-					for(var m = 0; m < array.length; m++)
+					var lengthRows = array.length;
+					if(ref && ref.split(":")[1])
+						lengthRows = this._idToRange(ref.split(":")[1]).r1;
+					for(var m = 0; m < lengthRows; m++)
 					{
-						var val = ws.model.getCell( new CellAddress(activeCells.r1 + m + 1, activeCells.c1,0)).getCells()[0].getValue();
+						var val = ws.model._getCell(activeCells.r1 + m + 1,activeCells.c1).getValue();
 						var anotherFilterHidden = this._isHiddenAnotherFilter2(curCellId,activeCells.r1 + m + 1,ws,ref);
 						if(anotherFilterHidden == 'hidden')
 							newArray[m] = 'hidden';
@@ -2315,8 +2318,8 @@
 					{
 						if(k < 0)
 							continue;
-						cell = ws.model.getCell( new CellAddress(n, k, 0)).getCells();
-						if(cell[0].getValue() != '')
+						cell = ws.model._getCell(n,k);
+						if(cell.getValueWithoutFormat() != '')
 						{
 							if(k < cloneActiveRange.c1)
 							{
@@ -3547,11 +3550,15 @@
 					}
 					if(idDigitalFilter)
 						result.dF = true;
-					for(var l = 0; l < result.length; l++)
+					for(var l = 0; l < result.length; )
 					{
 						if(result[l].rep)
+							result.splice(l,1);
+						else
+							l++
+						/*if(result[l].rep)
 							result[l].visible = 'hidden';
-						delete result[l].rep;
+						delete result[l].rep;*/
 					}
 					return result;
 				}
@@ -4392,7 +4399,7 @@
 			
 			_sortArrayMinMax: function(elements)
 			{
-				var sortArray = [];
+				/*var sortArray = [];
 				for(var j = 0; j < elements.length; j++)
 				{
 					sortArray[j] = elements[j].val2;
@@ -4438,7 +4445,12 @@
 				}
 				if(elements.dF)
 					finishArray.dF = true;
-				return finishArray;
+				return finishArray;*/
+				elements.sort (function sortArr(a, b)
+				{
+					return a["val2"] - b["val2"];
+				})
+				return elements;
 			},
 			
 			_crossRange: function(sRange,bRange)
