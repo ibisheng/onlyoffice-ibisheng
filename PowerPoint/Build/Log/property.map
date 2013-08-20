@@ -216,7 +216,7 @@ ins_pos:gT
 get_Type:xz
 ctShadowXML:Dya
 rp2:wr
-GetType:kc
+GetType:jc
 get_url:LZ
 put_WrappingStyle:Dra
 usBreakChar:yba
@@ -544,7 +544,7 @@ FontNumber:Dda
 shapes_alignCenter:iaa
 Cols:Jh
 sync_HyperlinkClickCallback:cV
-contours:Bf
+contours:Af
 ChangeAdjXY:AV
 stream:Mb
 validator:bCa
@@ -953,7 +953,7 @@ StartMainRecord:aq
 GetPercentage:iQ
 put_FirstCol:eqa
 ClipInfo:FD
-points:Ef
+points:Df
 selectionInfo:msa
 rowsH:V$
 get_linebeginstyle:s8
@@ -1279,7 +1279,7 @@ ReadCSld:TW
 m_oEditor:Qd
 WriteGuides:ria
 m_bIsOpeningDocument:$za
-m_oCanvas:Df
+m_oCanvas:Cf
 DeleteSlide:$ca
 DistributeHorizontally:ida
 Descender:Dw
@@ -1631,7 +1631,7 @@ IntToUInt:ki
 texture_id:pba
 X0:me
 Items:Ug
-X1:zf
+X1:yf
 selectCell:hsa
 X2:gu
 headEnd:Ad
@@ -1847,7 +1847,7 @@ RepaintChecker:$q
 charstrings_len:EY
 WriteClrScheme:t5
 TopDy:kB
-Seek2:jc
+Seek2:kc
 sync_TblPropCallback:k1
 offX:zb
 offY:Sb
@@ -1952,7 +1952,7 @@ Grid_start:vH
 df:Io
 pad2:NAa
 pad1:MAa
-current:Cf
+current:Bf
 WE_HAVE_A_2X2:DX
 ds:Jk
 get_Left:vz
@@ -3069,7 +3069,7 @@ m_pGlyphsBuffer:Ak
 TextAscent:zE
 format_tag:tz
 effectStyleLst:Iya
-Paragraph_Add:Ff
+Paragraph_Add:Ef
 GetFillStyle:gQ
 isPasteFonts_Images:hJ
 FT_Err_Too_Few_Arguments:$ua
@@ -4521,7 +4521,7 @@ ClearCache:GA
 Get_Numbering:en
 isRightURL:$na
 TableTRCell:dr
-TableGrid:yf
+TableGrid:Ff
 put_CellsMargin:Ypa
 F_dot_P:Ft
 vert_metrics_offset:eCa
@@ -4867,7 +4867,7 @@ ctFontXML:fya
 sync_UpdateZoom:yta
 bit_depth:qY
 band_size:vx
-_offset_org:Af
+_offset_org:zf
 DocumentUrl:Cr
 textBB_t:RBa
 textBB_r:QBa
