@@ -101,7 +101,7 @@ cFormulaFunction.Statistical = {
                             count++;
                         }
                         else if ( __arg instanceof cError ) {
-                            return this.value = _argV;
+                            return this.value = __arg;
                         }
                     }
                 }
