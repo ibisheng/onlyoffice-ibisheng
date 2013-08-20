@@ -623,7 +623,12 @@ DrawingObjectsController.prototype =
 
     canUnGroup: function()
     {
-        return true;
+		for (var i = 0; i < this.selectedObjects.length; i++)
+		{
+			if (this.selectedObjects[i].isGroup())
+				return true;
+		}
+		return false;
     },
 
     startTrackNewShape: function(presetGeom)

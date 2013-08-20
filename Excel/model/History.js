@@ -77,12 +77,14 @@ var historyitem_Cell_Style = 22;
 
 var historyitem_Chart_ChangeType = 1;
 var historyitem_Chart_ChangeSubType = 2;
-var historyitem_Chart_ChangeStyle = 3;
-var historyitem_Chart_ChangeRange = 4;
-var historyitem_Chart_ChangeHeader = 5;
-var historyitem_Chart_ChangeAxisX = 6;
-var historyitem_Chart_ChangeAxisY = 7;
-var historyitem_Chart_ChangeLegend = 8;
+var historyitem_Chart_ChangeShowValue = 3;
+var historyitem_Chart_ChangeShowBorder = 4;
+var historyitem_Chart_ChangeStyle = 5;
+var historyitem_Chart_ChangeRange = 6;
+var historyitem_Chart_ChangeHeader = 7;
+var historyitem_Chart_ChangeAxisX = 8;
+var historyitem_Chart_ChangeAxisY = 9;
+var historyitem_Chart_ChangeLegend = 10;
 
 var historyitem_AutoShapes_Offset = 1;
 var historyitem_AutoShapes_Extents = 2;

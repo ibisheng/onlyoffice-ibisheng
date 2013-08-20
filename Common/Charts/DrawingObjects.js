@@ -857,6 +857,14 @@ asc_CChart.prototype = {
 				this.subType = data.oldValue;
 				break;
 				
+			case historyitem_Chart_ChangeShowValue:
+				this.bShowValue = data.oldValue;
+				break;
+			
+			case historyitem_Chart_ChangeShowBorder:
+				this.bShowBorder = data.oldValue;
+				break;
+				
 			case historyitem_Chart_ChangeStyle:
 				this.styleId = data.oldValue;
 				break;
@@ -902,6 +910,14 @@ asc_CChart.prototype = {
 				
 			case historyitem_Chart_ChangeSubType:
 				this.subType = data.newValue;
+				break;
+				
+			case historyitem_Chart_ChangeShowValue:
+				this.bShowValue = data.newValue;
+				break;
+			
+			case historyitem_Chart_ChangeShowBorder:
+				this.bShowBorder = data.newValue;
 				break;
 				
 			case historyitem_Chart_ChangeStyle:
@@ -2257,6 +2273,17 @@ function DrawingObjects() {
 	_this.asyncImageEndLoaded = null;
 	_this.asyncImagesDocumentEndLoaded = null;
 	
+	// Task timer
+	var aDrawTasks = [];
+	var drawTaskTimerId = null;
+	function drawTaskFunction() {
+		if ( aDrawTasks.length ) {
+			//console.log("Task count = " + aDrawTasks.length);
+			_this.showDrawingObjectsEx(aDrawTasks[0].params[0], aDrawTasks[0].params[1]);
+			aDrawTasks.splice(0, 1);
+		}
+	}
+	
 	//-----------------------------------------------------------------------------------
 	// Create drawing
 	//-----------------------------------------------------------------------------------
@@ -2568,6 +2595,8 @@ function DrawingObjects() {
 	//-----------------------------------------------------------------------------------
 	
 	_this.init = function(currentSheet) {
+	
+		var taskTimerId = setInterval(drawTaskFunction, 10);
 
 		userId = api.User.asc_getId();
 		documentId = api.documentId;
@@ -2854,8 +2883,9 @@ function DrawingObjects() {
 			boundsChecker.rect(0,0, drawingObject.graphicObject.extX, drawingObject.graphicObject.extY);
 			drawingObject.graphicObject.draw(boundsChecker);
 			boundsChecker.CorrectBounds();
+			
 			// Коррекция для селекта при блокировке
-			var delta = 12;
+			var delta = (drawingObject.graphicObject.lockType == c_oAscLockTypes.kLockTypeNone) ? 0 : 6;
 			boundsChecker.Bounds.min_x -= delta;
 			boundsChecker.Bounds.min_y -= delta;
 			boundsChecker.Bounds.max_x += delta;
@@ -2921,13 +2951,24 @@ function DrawingObjects() {
 			var _h = boundsChecker.Bounds.max_y - boundsChecker.Bounds.min_y;
 			overlayCtx.clearRect( mmToPt(boundsChecker.Bounds.min_x + pxToMm(scrollOffset.x)), mmToPt(boundsChecker.Bounds.min_y + pxToMm(scrollOffset.y)), mmToPt(_w), mmToPt(_h) );
 		}
-	}
+	}	
 
 	//-----------------------------------------------------------------------------------
 	// Drawing objects
 	//-----------------------------------------------------------------------------------
 
 	_this.showDrawingObjects = function(clearCanvas, printOptions) {
+		
+		var currDate = new Date();
+		var currTime = currDate.getTime();
+		if ( aDrawTasks.length ) {
+			if ( currTime - aDrawTasks[aDrawTasks.length - 1].time < 40 )
+				return;
+		}
+		aDrawTasks.push( { time: currTime, params: [clearCanvas, printOptions] } );
+	}
+	
+	_this.showDrawingObjectsEx = function(clearCanvas, printOptions) {
 
 		/*********** Print Options ***************
 		printOptions : {
@@ -2941,6 +2982,9 @@ function DrawingObjects() {
 		}
 		*****************************************/
 
+		//var date = new Date();
+		//var timeBefore = date.getTime();
+		
 		if ( drawingCtx ) {
 			
 			if ( clearCanvas )
@@ -2951,6 +2995,12 @@ function DrawingObjects() {
 			
 			worksheet._drawGraphic();
 			worksheet.model.Drawings = aObjects;
+			
+			var printCtx = null;
+			if ( printOptions ) {
+				printCtx = new CGraphics();
+				// TODO: printCtx.init( printOptions.ctx.getCanvas(), printOptions.ctx.getWidth(0), printOptions.ctx.getHeight(0), printOptions.ctx.getWidth(3), printOptions.ctx.getHeight(3) );
+			}
 			
 			for (var i = 0; i < aObjects.length; i++) {
 
@@ -2964,32 +3014,18 @@ function DrawingObjects() {
 					obj.updateAnchorPosition();
 				
 				// Shape render
-				if ( obj.isGraphicObject() ) {
-					obj.graphicObject.draw(shapeCtx);
-					continue;
+				if ( !printOptions ) {
+					if ( obj.isGraphicObject() ) {
+						obj.graphicObject.draw(shapeCtx);
+						continue;
+					}
 				}
-
-				/*if ( printOptions ) {
-					if ( obj.isChart() ) {
-						srcForPrint = obj.image.src; // base64
+				else {
+					if ( obj.isGraphicObject() ) {
+						// TODO: obj.graphicObject.draw(printCtx);
+						continue;
 					}
-					else {
-						srcForPrint = obj.imageUrl;
-					}
-
-					var marginRight = 0;
-					if (worksheet.getCellLeft(worksheet.getLastVisibleCol(), 0) + worksheet.getColumnWidth(worksheet.getLastVisibleCol()) < obj.getRealLeftOffset() + obj.getVisibleWidth())
-						marginRight = printOptions.margin.right;
-
-					printOptions.ctx.drawImage(srcForPrint,
-					// обрезаем
-												pxToPt(obj.getInnerOffsetLeft()), pxToPt(obj.getInnerOffsetTop()),
-												pxToPt(sWidth) - marginRight, pxToPt(sHeight),
-					// вставляем
-												pxToPt(obj.getVisibleLeftOffset(true)) + printOptions.margin.left, pxToPt(obj.getVisibleTopOffset(true)) + printOptions.margin.top,
-												pxToPt(obj.getVisibleWidth()), pxToPt(obj.getVisibleHeight()),
-												pxToPt(obj.image.width), pxToPt(obj.image.height));
-				}*/
+				}
 			}
 		}
 		if ( _this.controller.selectedObjects.length )
@@ -2998,6 +3034,10 @@ function DrawingObjects() {
 			_this.raiseLayerDrawingObjects();
 
 		_this.drawWorksheetHeaders();
+		
+		//date = new Date();
+		//var drawTime = date.getTime() - timeBefore;
+		//console.log("Draw time = " + drawTime);
 	}
 
 	_this.getDrawingAreaMetrics = function() {

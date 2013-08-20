@@ -423,6 +423,16 @@ CChartAsGroup.prototype =
 				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_ChangeSubType, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.subType, chart.subType)));
 				this.chart.subType = chart.subType;
 			}
+			
+			if ( this.chart.bShowValue != chart.bShowValue ) {
+				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_ChangeShowValue, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.bShowValue, chart.bShowValue)));
+				this.chart.bShowValue = chart.bShowValue;
+			}
+			
+			if ( this.chart.bShowBorder != chart.bShowBorder ) {
+				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_ChangeShowBorder, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.bShowBorder, chart.bShowBorder)));
+				this.chart.bShowBorder = chart.bShowBorder;
+			}
 				
 			if ( this.chart.styleId != chart.styleId ) {
 				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_ChangeStyle, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.styleId, chart.styleId)));

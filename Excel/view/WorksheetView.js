@@ -6039,7 +6039,7 @@
 						this._trigger("selectionRangeChanged", this.getSelectionRangeValue());
 					}
 				}
-
+				
 				return ret;
 			},
 
