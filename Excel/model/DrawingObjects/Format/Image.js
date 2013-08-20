@@ -1077,7 +1077,7 @@ CImageShape.prototype =
 
     writeToBinaryForCopyPaste: function(w)
     {
-
+        w.WriteLong(CLASS_TYPE_IMAGE);
         this.blipFill.Write_ToBinary2(w);
         this.spPr.Write_ToBinary2(w);
         return  "TeamLabImage" + w.pos + ";" + w.GetBase64Memory();
