@@ -7890,7 +7890,7 @@ Range.prototype.sort=function(nOption, nStartCol){
 			return ( ( str1 == str2 ) ? 0 : ( ( str1 > str2 ) ? 1 : -1 ) );
 		}
 	aSortElems.sort(function(a, b){
-		var res;
+		var res = 0;
 		if(null != a.text)
 		{
 			if(null != b.text)
@@ -7905,10 +7905,11 @@ Range.prototype.sort=function(nOption, nStartCol){
 			else
 				res = -1;
 		}
-		if(bAscent)
-			return res;
-		else
-			return -res;
+		if(0 == res)
+			res = a.row - b.row;
+		else if(!bAscent)
+			res = -res;
+		return res;
 	});
 	//проверяем что это не пустая операция
 	var aSortData = new Array();
