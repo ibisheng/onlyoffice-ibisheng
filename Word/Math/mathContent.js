@@ -3769,6 +3769,14 @@ CMathComposition.prototype =
         if(TEST)
         {
             History.Create_NewPoint();
+            var start = this.SelectContent.selection.startPos,
+                end = this.SelectContent.selection.endPos;
+            var Pos;
+
+            if(start !== end)
+                Pos = start < end ? start: end;
+            else
+                Pos = this.SelectContent.CurPos;
         }
 
         this.ClearSelect();
@@ -3783,7 +3791,6 @@ CMathComposition.prototype =
         {
             if(TEST)
             {
-                var Pos = this.CurrentContent.CurPos + 1;
                 History.Add(this.CurrentContent, {Type: historyitem_Math_RemoveItem, Items: result.items, Pos: Pos});
             }
 
@@ -3930,7 +3937,11 @@ CMathComposition.prototype =
             this.SelectContent.selection.active = false;
         }
         else
+        {
+            this.SelectContent.setStart_Selection(State.Select.StartSelect - 1);
+            this.SelectContent.selection.active = false;
             this.UpdateCursor();
+        }
     },
     /*Undo: function(Data)
     {
@@ -3974,7 +3985,10 @@ CMathComposition.prototype =
     UpdateCursor: function()
     {
         this.CurrentContent.update_Cursor();
-        this.ShowCursor();
+        if( this.SelectContent.selection.startPos !== this.SelectContent.selection.endPos)
+            this.HideCursor();
+        else
+            this.ShowCursor();
     },
     GetPrpSelectContent: function()
     {
