@@ -110,6 +110,13 @@ CMathBase.prototype =
             for(var j = 0; j < this.nCol; j++)
                 this.elements[i][j].setTxtPrp(this.getTxtPrp());
     },
+    setOwnTPrp: function(txtPrp)
+    {
+        for(var i=0; i < this.nRow; i++)
+            for(var j = 0; j < this.nCol; j++)
+                if( !this.elements[i][j].IsJustDraw())
+                    this.elements[i][j].setOwnTPrp(txtPrp);
+    },
     getOwnTPrp: function()
     {
         return this.textPrp;

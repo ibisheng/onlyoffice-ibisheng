@@ -89,7 +89,6 @@ function CMathContent()
 
     this.TxtPrp = new CMathTextPrp();
     this.OwnTPrp = new CMathTextPrp();
-    this.TxtH = 0;
 
     this.Composition = null; // ссылка на общую формулу
 
@@ -127,7 +126,8 @@ CMathContent.prototype =
     setTxtPrp: function(txtPrp)
     {
         this.TxtPrp.Merge(txtPrp);
-        this.setTPrpToInterval(txtPrp, 0, this.content.length);
+        for(var i = 0; i < this.content.length; i++)
+            this.content[i].value.setTxtPrp(txtPrp);
     },
     changeTxtPrp: function(txtPrp)
     {
@@ -144,16 +144,14 @@ CMathContent.prototype =
             }
         }
 
-        this.setTPrpToInterval(txtPrp, start, end);
-    },
-    setTPrpToInterval: function(txtPrp, start, end)
-    {
         for(var i = start; i < end; i++)
-            this.content[i].value.setTxtPrp(txtPrp);
+            this.content[i].value.setOwnTPrp(txtPrp);
     },
     setOwnTPrp: function(txtPrp)
     {
         this.OwnTPrp.Merge(txtPrp);
+        for(var i = 0; i < this.content.length; i++)
+            this.content[i].value.setOwnTPrp(txtPrp);
     },
     getRunPrp: function(pos)
     {
@@ -163,12 +161,12 @@ CMathContent.prototype =
         {
             if(pos == 0)
             {
-                var rPrp = this.content[pos+1].value.getRunPrp();
+                var rPrp = this.content[pos+1].value.getTxtPrp();
                 runPrp.Merge(rPrp);
             }
             else
             {
-                var rPrp = this.content[pos].value.getRunPrp();
+                var rPrp = this.content[pos].value.getTxtPrp();
                 runPrp.Merge(rPrp);
             }
         }
@@ -3978,8 +3976,8 @@ CMathComposition.prototype =
     },
     SetTxtPrp: function(txtPrp)
     {
-        //this.SelectContent.changeTxtPrp(txtPrp, false);
-        this.SelectContent.setTxtPrp(txtPrp, false);
+        this.SelectContent.changeTxtPrp(txtPrp, false);
+        //this.SelectContent.setTxtPrp(txtPrp, false);
         this.Resize();
         this.UpdatePosition();
         this.UpdateCursor();
@@ -4119,5 +4117,6 @@ function CEmpty()
     this.IsHighElement =  function() { return false; };
     this.setTxtPrp = function(txtPrp) { this.TxtPrp.Merge(txtPrp); };
     this.getRunPrp = function() {return this.TxtPrp; };
+    this.setOwnTPrp = function() {};
 
 }

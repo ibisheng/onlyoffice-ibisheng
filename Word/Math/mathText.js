@@ -150,6 +150,10 @@ CMathText.prototype =
         this.TxtPrp  = new CMathTextPrp();
         this.TxtPrp.Merge(txtPrp);
     },
+    setOwnTPrp: function(txtPrp)
+    {
+        this.OwnTPrp.Merge(txtPrp);
+    },
     setLIterator: function(bIterator)
     {
         this.bIterator = bIterator; // символы другие , чуть толще
