@@ -209,6 +209,7 @@ prop:asc_coAuthoringDisconnect
 prop:_coSpellCheckInit
 prop:asc_getSpellCheckLanguages
 prop:autoSaveInit
+prop:put_FramePr
 prop:get_TextProps
 prop:GetJSONLogicDocument
 prop:get_ContentCount
@@ -264,12 +265,12 @@ prop:GetActiveHeader
 prop:gotoHeader
 prop:sync_ChangeActiveHeaderCallback
 prop:sync_ReturnHeadersCallback
-prop:startSearchText
-prop:gotoSearchResultText
-prop:stopSearchText
-prop:sync_SearchFoundCallback
-prop:sync_SearchStartCallback
-prop:sync_SearchStopCallback
+prop:asc_findText
+prop:asc_findForward
+prop:asc_replaceText
+prop:asc_selectSearchingResults
+prop:asc_isSelectSearchingResults
+prop:sync_ReplaceAllCallback
 prop:sync_SearchEndCallback
 prop:put_TextPrFontName
 prop:put_TextPrFontSize
@@ -472,8 +473,6 @@ prop:async_SaveToPdf
 prop:async_SaveToPdf_PartCallback
 prop:async_SaveToPdf_Progress
 prop:asc_enableKeyEvents
-prop:asc_findText
-prop:asc_replaceText
 prop:asyncServerIdStartLoaded
 prop:asyncServerIdEndLoaded
 prop:asyncFontsDocumentStartLoaded
@@ -578,6 +577,36 @@ prop:get_Tab
 prop:add_Tab
 prop:clear
 ---
+var:CParagraphFrame
+prop:get_DropCap
+prop:put_DropCap
+prop:get_H
+prop:put_H
+prop:get_HAnchor
+prop:put_HAnchor
+prop:get_HRule
+prop:put_HRule
+prop:get_HSpace
+prop:put_HSpace
+prop:get_Lines
+prop:put_Lines
+prop:get_VAnchor
+prop:put_VAnchor
+prop:get_VSpace
+prop:put_VSpace
+prop:get_W
+prop:put_W
+prop:get_Wrap
+prop:put_Wrap
+prop:get_X
+prop:put_X
+prop:get_XAlign
+prop:put_XAlign
+prop:get_Y
+prop:put_Y
+prop:get_YAlign
+prop:put_YAlign
+---
 var:CParagraphProp
 prop:get_ContextualSpacing
 prop:put_ContextualSpacing
@@ -619,6 +648,8 @@ prop:get_Tabs
 prop:put_Tabs
 prop:get_DefaultTab
 prop:put_DefaultTab
+prop:get_FramePr
+prop:put_FramePr
 ---
 var:CParagraphPropEx
 prop:get_ContextualSpacing
@@ -675,13 +706,6 @@ prop:get_pageNumber
 prop:get_X
 prop:get_Y
 prop:get_Level
----
-var:CSearchResult
-prop:get_Text
-prop:get_Type
-prop:get_Navigator
-prop:put_Navigator
-prop:put_Text
 ---
 var:CParagraphBorders
 prop:get_Left
@@ -1219,6 +1243,7 @@ asc_docs_api.prototype['asc_coAuthoringDisconnect'] = asc_docs_api.prototype.asc
 asc_docs_api.prototype['_coSpellCheckInit'] = asc_docs_api.prototype._coSpellCheckInit;
 asc_docs_api.prototype['asc_getSpellCheckLanguages'] = asc_docs_api.prototype.asc_getSpellCheckLanguages;
 asc_docs_api.prototype['autoSaveInit'] = asc_docs_api.prototype.autoSaveInit;
+asc_docs_api.prototype['put_FramePr'] = asc_docs_api.prototype.put_FramePr;
 asc_docs_api.prototype['get_TextProps'] = asc_docs_api.prototype.get_TextProps;
 asc_docs_api.prototype['GetJSONLogicDocument'] = asc_docs_api.prototype.GetJSONLogicDocument;
 asc_docs_api.prototype['get_ContentCount'] = asc_docs_api.prototype.get_ContentCount;
@@ -1274,12 +1299,12 @@ asc_docs_api.prototype['GetActiveHeader'] = asc_docs_api.prototype.GetActiveHead
 asc_docs_api.prototype['gotoHeader'] = asc_docs_api.prototype.gotoHeader;
 asc_docs_api.prototype['sync_ChangeActiveHeaderCallback'] = asc_docs_api.prototype.sync_ChangeActiveHeaderCallback;
 asc_docs_api.prototype['sync_ReturnHeadersCallback'] = asc_docs_api.prototype.sync_ReturnHeadersCallback;
-asc_docs_api.prototype['startSearchText'] = asc_docs_api.prototype.startSearchText;
-asc_docs_api.prototype['gotoSearchResultText'] = asc_docs_api.prototype.gotoSearchResultText;
-asc_docs_api.prototype['stopSearchText'] = asc_docs_api.prototype.stopSearchText;
-asc_docs_api.prototype['sync_SearchFoundCallback'] = asc_docs_api.prototype.sync_SearchFoundCallback;
-asc_docs_api.prototype['sync_SearchStartCallback'] = asc_docs_api.prototype.sync_SearchStartCallback;
-asc_docs_api.prototype['sync_SearchStopCallback'] = asc_docs_api.prototype.sync_SearchStopCallback;
+asc_docs_api.prototype['asc_findText'] = asc_docs_api.prototype.asc_findText;
+asc_docs_api.prototype['asc_findForward'] = asc_docs_api.prototype.asc_findForward;
+asc_docs_api.prototype['asc_replaceText'] = asc_docs_api.prototype.asc_replaceText;
+asc_docs_api.prototype['asc_selectSearchingResults'] = asc_docs_api.prototype.asc_selectSearchingResults;
+asc_docs_api.prototype['asc_isSelectSearchingResults'] = asc_docs_api.prototype.asc_isSelectSearchingResults;
+asc_docs_api.prototype['sync_ReplaceAllCallback'] = asc_docs_api.prototype.sync_ReplaceAllCallback;
 asc_docs_api.prototype['sync_SearchEndCallback'] = asc_docs_api.prototype.sync_SearchEndCallback;
 asc_docs_api.prototype['put_TextPrFontName'] = asc_docs_api.prototype.put_TextPrFontName;
 asc_docs_api.prototype['put_TextPrFontSize'] = asc_docs_api.prototype.put_TextPrFontSize;
@@ -1482,8 +1507,6 @@ asc_docs_api.prototype['async_SaveToPdf'] = asc_docs_api.prototype.async_SaveToP
 asc_docs_api.prototype['async_SaveToPdf_PartCallback'] = asc_docs_api.prototype.async_SaveToPdf_PartCallback;
 asc_docs_api.prototype['async_SaveToPdf_Progress'] = asc_docs_api.prototype.async_SaveToPdf_Progress;
 asc_docs_api.prototype['asc_enableKeyEvents'] = asc_docs_api.prototype.asc_enableKeyEvents;
-asc_docs_api.prototype['asc_findText'] = asc_docs_api.prototype.asc_findText;
-asc_docs_api.prototype['asc_replaceText'] = asc_docs_api.prototype.asc_replaceText;
 asc_docs_api.prototype['asyncServerIdStartLoaded'] = asc_docs_api.prototype.asyncServerIdStartLoaded;
 asc_docs_api.prototype['asyncServerIdEndLoaded'] = asc_docs_api.prototype.asyncServerIdEndLoaded;
 asc_docs_api.prototype['asyncFontsDocumentStartLoaded'] = asc_docs_api.prototype.asyncFontsDocumentStartLoaded;
@@ -1581,6 +1604,35 @@ CParagraphTabs.prototype['get_Count'] = CParagraphTabs.prototype.get_Count;
 CParagraphTabs.prototype['get_Tab'] = CParagraphTabs.prototype.get_Tab;
 CParagraphTabs.prototype['add_Tab'] = CParagraphTabs.prototype.add_Tab;
 CParagraphTabs.prototype['clear'] = CParagraphTabs.prototype.clear;
+window['CParagraphFrame'] = CParagraphFrame;
+CParagraphFrame.prototype['get_DropCap'] = CParagraphFrame.prototype.get_DropCap;
+CParagraphFrame.prototype['put_DropCap'] = CParagraphFrame.prototype.put_DropCap;
+CParagraphFrame.prototype['get_H'] = CParagraphFrame.prototype.get_H;
+CParagraphFrame.prototype['put_H'] = CParagraphFrame.prototype.put_H;
+CParagraphFrame.prototype['get_HAnchor'] = CParagraphFrame.prototype.get_HAnchor;
+CParagraphFrame.prototype['put_HAnchor'] = CParagraphFrame.prototype.put_HAnchor;
+CParagraphFrame.prototype['get_HRule'] = CParagraphFrame.prototype.get_HRule;
+CParagraphFrame.prototype['put_HRule'] = CParagraphFrame.prototype.put_HRule;
+CParagraphFrame.prototype['get_HSpace'] = CParagraphFrame.prototype.get_HSpace;
+CParagraphFrame.prototype['put_HSpace'] = CParagraphFrame.prototype.put_HSpace;
+CParagraphFrame.prototype['get_Lines'] = CParagraphFrame.prototype.get_Lines;
+CParagraphFrame.prototype['put_Lines'] = CParagraphFrame.prototype.put_Lines;
+CParagraphFrame.prototype['get_VAnchor'] = CParagraphFrame.prototype.get_VAnchor;
+CParagraphFrame.prototype['put_VAnchor'] = CParagraphFrame.prototype.put_VAnchor;
+CParagraphFrame.prototype['get_VSpace'] = CParagraphFrame.prototype.get_VSpace;
+CParagraphFrame.prototype['put_VSpace'] = CParagraphFrame.prototype.put_VSpace;
+CParagraphFrame.prototype['get_W'] = CParagraphFrame.prototype.get_W;
+CParagraphFrame.prototype['put_W'] = CParagraphFrame.prototype.put_W;
+CParagraphFrame.prototype['get_Wrap'] = CParagraphFrame.prototype.get_Wrap;
+CParagraphFrame.prototype['put_Wrap'] = CParagraphFrame.prototype.put_Wrap;
+CParagraphFrame.prototype['get_X'] = CParagraphFrame.prototype.get_X;
+CParagraphFrame.prototype['put_X'] = CParagraphFrame.prototype.put_X;
+CParagraphFrame.prototype['get_XAlign'] = CParagraphFrame.prototype.get_XAlign;
+CParagraphFrame.prototype['put_XAlign'] = CParagraphFrame.prototype.put_XAlign;
+CParagraphFrame.prototype['get_Y'] = CParagraphFrame.prototype.get_Y;
+CParagraphFrame.prototype['put_Y'] = CParagraphFrame.prototype.put_Y;
+CParagraphFrame.prototype['get_YAlign'] = CParagraphFrame.prototype.get_YAlign;
+CParagraphFrame.prototype['put_YAlign'] = CParagraphFrame.prototype.put_YAlign;
 window['CParagraphProp'] = CParagraphProp;
 CParagraphProp.prototype['get_ContextualSpacing'] = CParagraphProp.prototype.get_ContextualSpacing;
 CParagraphProp.prototype['put_ContextualSpacing'] = CParagraphProp.prototype.put_ContextualSpacing;
@@ -1622,6 +1674,8 @@ CParagraphProp.prototype['get_Tabs'] = CParagraphProp.prototype.get_Tabs;
 CParagraphProp.prototype['put_Tabs'] = CParagraphProp.prototype.put_Tabs;
 CParagraphProp.prototype['get_DefaultTab'] = CParagraphProp.prototype.get_DefaultTab;
 CParagraphProp.prototype['put_DefaultTab'] = CParagraphProp.prototype.put_DefaultTab;
+CParagraphProp.prototype['get_FramePr'] = CParagraphProp.prototype.get_FramePr;
+CParagraphProp.prototype['put_FramePr'] = CParagraphProp.prototype.put_FramePr;
 window['CParagraphPropEx'] = CParagraphPropEx;
 CParagraphPropEx.prototype['get_ContextualSpacing'] = CParagraphPropEx.prototype.get_ContextualSpacing;
 CParagraphPropEx.prototype['get_Ind'] = CParagraphPropEx.prototype.get_Ind;
@@ -1671,12 +1725,6 @@ CHeader.prototype['get_pageNumber'] = CHeader.prototype.get_pageNumber;
 CHeader.prototype['get_X'] = CHeader.prototype.get_X;
 CHeader.prototype['get_Y'] = CHeader.prototype.get_Y;
 CHeader.prototype['get_Level'] = CHeader.prototype.get_Level;
-window['CSearchResult'] = CSearchResult;
-CSearchResult.prototype['get_Text'] = CSearchResult.prototype.get_Text;
-CSearchResult.prototype['get_Type'] = CSearchResult.prototype.get_Type;
-CSearchResult.prototype['get_Navigator'] = CSearchResult.prototype.get_Navigator;
-CSearchResult.prototype['put_Navigator'] = CSearchResult.prototype.put_Navigator;
-CSearchResult.prototype['put_Text'] = CSearchResult.prototype.put_Text;
 window['CParagraphBorders'] = CParagraphBorders;
 CParagraphBorders.prototype['get_Left'] = CParagraphBorders.prototype.get_Left;
 CParagraphBorders.prototype['put_Left'] = CParagraphBorders.prototype.put_Left;
