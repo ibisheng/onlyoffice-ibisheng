@@ -2658,7 +2658,6 @@ function DrawingObjects() {
                 drawingObject.graphicObject.drawingObjects = _this;
                 drawingObject.graphicObject.setDrawingDocument(this.drawingDocument);
 				drawingObject.graphicObject.recalculate();
-				
 				aObjects.push( drawingObject );
 			}
             if (drawingObject.graphicObject instanceof  CImageShape) {
@@ -2667,8 +2666,7 @@ function DrawingObjects() {
                 drawingObject.graphicObject.drawingBase = drawingObject;
                 drawingObject.graphicObject.drawingObjects = _this;
                 drawingObject.graphicObject.recalculate(aImagesSync);
-                aObjects.push( drawingObject );
-		}
+			}
 
             if (drawingObject.graphicObject instanceof  CGroupShape) {
 
@@ -3004,12 +3002,6 @@ function DrawingObjects() {
 			worksheet._drawGraphic();
 			worksheet.model.Drawings = aObjects;
 			
-			var printCtx = null;
-			if ( printOptions ) {
-				printCtx = new CGraphics();
-				// TODO: printCtx.init( printOptions.ctx.getCanvas(), printOptions.ctx.getWidth(0), printOptions.ctx.getHeight(0), printOptions.ctx.getWidth(3), printOptions.ctx.getHeight(3) );
-			}
-			
 			for (var i = 0; i < aObjects.length; i++) {
 
 				var index = i;
@@ -3022,26 +3014,21 @@ function DrawingObjects() {
 					obj.updateAnchorPosition();
 				
 				// Shape render
-				if ( !printOptions ) {
-					if ( obj.isGraphicObject() ) {
-						obj.graphicObject.draw(shapeCtx);
-						continue;
-					}
-				}
-				else {
-					if ( obj.isGraphicObject() ) {
-						// TODO: obj.graphicObject.draw(printCtx);
-						continue;
-					}
+				if ( obj.isGraphicObject() ) {
+					obj.graphicObject.draw( printOptions ? printOptions.ctx : shapeCtx);
+					continue;
 				}
 			}
 		}
-		if ( _this.controller.selectedObjects.length )
-			_this.OnUpdateOverlay();
-		else
-			_this.raiseLayerDrawingObjects();
+		
+		if ( !printOptions ) {
+			if ( _this.controller.selectedObjects.length )
+				_this.OnUpdateOverlay();
+			else
+				_this.raiseLayerDrawingObjects();
 
-		_this.drawWorksheetHeaders();
+			_this.drawWorksheetHeaders();
+		}
 		
 		//date = new Date();
 		//var drawTime = date.getTime() - timeBefore;

@@ -340,7 +340,7 @@ CImageShape.prototype =
     {
         this.brush = new CUniFill();
         this.brush.fill = new CBlipFill();
-        this.brush.fill.RasterImageId = this.blipFill.fill.RasterImageId;
+        this.brush.fill.RasterImageId = getFullImageSrc(this.blipFill.fill.RasterImageId);
         if(Array.isArray(aImagesSync))
         {
             aImagesSync.push(getFullImageSrc(this.brush.fill.RasterImageId));
