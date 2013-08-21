@@ -1436,7 +1436,10 @@
 				var sortRange;
 				var oldFilter;
 				var activeCells;
+				var newEndId;
+				var newStartId;
 				var t = this;
+				var selectionRange;
 				var onSortAutoFilterCallback = function(success)
 				{
 					if(success)
@@ -1478,6 +1481,31 @@
 					else
 						return false;
 				};
+				var standartSort = function(success)
+				{
+					if(success)
+					{
+						if(isTurnOffHistory)
+							History.TurnOff();
+						History.Create_NewPoint();
+						History.StartTransaction();
+						sortRange.sort(type,sortCol);
+						if(currentFilter.TableStyleInfo)
+							t._setColorStyleTable(currentFilter.Ref.split(":")[0],currentFilter.Ref.split(":")[1],ws,currentFilter);
+						History.EndTransaction();
+						History.SetSelection(selectionRange);
+						ws._cleanCache(selectionRange);
+						ws.isChanged = true;
+						ws.changeWorksheet("update");
+						if(isTurnOffHistory)
+							History.TurnOn();
+					}
+					else
+					{
+						return false;
+					}
+				};
+					
 				
 				if(type == 'ascending' || type == 'descending')
 				{
@@ -1489,21 +1517,64 @@
 						type = true;
 					else
 						type = false;
-					if((filter && activeRange.r1 == activeRange.r2 && activeRange.c1 == activeRange.c2))
+					if(filter && filter == "error")//если захвачена часть фильтра
+					{
+						return;
+					}
+					else if(filter)
 					{
 						var allAutoFilters = aWs.TableParts;
 						if(filter.all)
 							allAutoFilters = [aWs.AutoFilter];
-						var curFilter = allAutoFilters[filter.num];
-						for(var i = 0; i < curFilter.result.length; i++)
+						var num = filter.num;
+						if(aWs.AutoFilter && !filter.all)
+							num = filter.num - 1;
+						var curFilter = allAutoFilters[num];
+						var splitRef = curFilter.Ref.split(":");
+						var startCellFilter = this._idToRange(splitRef[0]);
+						var endCellFilter = this._idToRange(splitRef[1]);
+						if(activeRange.r1 == activeRange.r2 && activeRange.c1 == activeRange.c2)//внутри фильтра одна выделенная ячейка
 						{
-							var rangeCol = t._idToRange(curFilter.result[i].id);
-							if(rangeCol.c1 == activeRange.c1)
+							for(var i = 0; i < curFilter.result.length; i++)
 							{
-								cellId = curFilter.result[i].id;
-								break;
+								var rangeCol = t._idToRange(curFilter.result[i].id);
+								if(rangeCol.c1 == activeRange.c1)
+								{
+									cellId = curFilter.result[i].id;
+									break;
+								}
 							}
 						}
+						else if(startCellFilter.r1 == activeRange.r1 && startCellFilter.c1 == activeRange.c1 && endCellFilter.r1 == activeRange.r2 && endCellFilter.c1 == activeRange.c2)//выделен весь фильтр(сортируем по 1 столбцу)
+						{
+							cellId = splitRef[0];
+						}
+						else if(startCellFilter.r1 == activeRange.r1)//захват в выделенную область части заголовка - сортируем выделенную область, за исключением заголовка
+						{
+							var newStartCell = 
+							{
+								r1: activeRange.r1 + 1,
+								c1: activeRange.c1
+							};
+							sortCol = activeRange.c1;
+							newStartId = t._rangeToId(newStartCell);
+							newEndId = t._rangeToId({r1: activeRange.r2, c1: activeRange.c2});
+							sortRange = ws.model.getRange(new CellAddress(newStartId), new CellAddress(newEndId));
+							selectionRange = activeRange;
+							var sortRange1 = t._getAscRange(sortRange.bbox);
+							currentFilter = curFilter;
+							if(isTurnOffHistory)
+								standartSort(true);
+							else
+								ws._isLockedCells (sortRange1, /*subType*/null, standartSort);
+							return;
+						}
+						else
+						{
+							ws.setSelectionInfo("sort", type);
+							return;
+						}
+						
 					}
 					else
 					{
@@ -1528,10 +1599,10 @@
 				var endCell = t._idToRange(rangeCell[1]);
 				curCell = t._idToRange(cellId);
 				curCell.r1 = endCell.r1;
-				var selectionRange = new Asc.Range(startCell.c1, startCell.r1 + 1, endCell.c2, endCell.r2);
-				var newEndId = t._rangeToId(curCell);
+				selectionRange = new Asc.Range(startCell.c1, startCell.r1 + 1, endCell.c2, endCell.r2);
+				newEndId = t._rangeToId(curCell);
 				startCell.r1 = startCell.r1 + 1;
-				var newStartId = t._rangeToId(startCell);
+				newStartId = t._rangeToId(startCell);
 				sortRange = ws.model.getRange(new CellAddress(newStartId), new CellAddress(rangeCell[1]));
 				var sortRange1 = t._getAscRange(sortRange.bbox);
 				if(isTurnOffHistory)
