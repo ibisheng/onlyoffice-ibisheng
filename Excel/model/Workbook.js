@@ -2635,8 +2635,8 @@ Woorksheet.prototype._removeRows=function(start, stop){
 	helpFunction(this.workbook);
 	unLockDraw(this.workbook);
 		
-	for(var id  in res)
-		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(0, res[id].nRow, gc_nMaxCol0, res[id].nRow), new UndoRedoData_CellSimpleData(res[id].nRow, res[id].nCol, res[id].data, null));
+//	for(var id  in res)
+//		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(0, res[id].nRow, gc_nMaxCol0, res[id].nRow), new UndoRedoData_CellSimpleData(res[id].nRow, res[id].nCol, res[id].data, null));
 		
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveRows, this.getId(), new Asc.Range(0, start, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(true, start, stop));
 	return true;
@@ -2692,8 +2692,8 @@ Woorksheet.prototype._insertRowsBefore=function(index, count){
 	
 	this.nRowsCount += count;
 	
-	for(var id  in res)
-		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(0, res[id].nRow, gc_nMaxCol0, res[id].nRow), new UndoRedoData_CellSimpleData(res[id].nRow, res[id].nCol, res[id].data, null));
+//	for(var id  in res)
+//		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(0, res[id].nRow, gc_nMaxCol0, res[id].nRow), new UndoRedoData_CellSimpleData(res[id].nRow, res[id].nCol, res[id].data, null));
 		
 	History.TurnOn();
 	return true;
@@ -2749,8 +2749,8 @@ Woorksheet.prototype._removeCols=function(start, stop){
 	
 	this.aCols.splice(start, stop - start + 1);
 	
-	for(var id  in res)
-		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(0, res[id].nRow, gc_nMaxCol0, res[id].nRow), new UndoRedoData_CellSimpleData(res[id].nRow, res[id].nCol, res[id].data, null));
+//	for(var id  in res)
+//		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(0, res[id].nRow, gc_nMaxCol0, res[id].nRow), new UndoRedoData_CellSimpleData(res[id].nRow, res[id].nCol, res[id].data, null));
 		
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCols, this.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(false, start, stop));
 	return true;
@@ -2809,8 +2809,8 @@ Woorksheet.prototype._insertColsBefore=function(index, count){
     }
 	this.nColsCount += count;
 	
-	for(var id  in res)
-		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(0, res[id].nRow, gc_nMaxCol0, res[id].nRow), new UndoRedoData_CellSimpleData(res[id].nRow, res[id].nCol, res[id].data, null));
+//	for(var id  in res)
+//		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(0, res[id].nRow, gc_nMaxCol0, res[id].nRow), new UndoRedoData_CellSimpleData(res[id].nRow, res[id].nCol, res[id].data, null));
 	
 	History.TurnOn();
 	return true;
@@ -3551,8 +3551,8 @@ Woorksheet.prototype._shiftCellsLeft=function(oBBox){
 	
 	//todo проверить не уменьшились ли границы таблицы
 	
-	for(var id  in res)
-		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(0, res[id].nRow, gc_nMaxCol0, res[id].nRow), new UndoRedoData_CellSimpleData(res[id].nRow, res[id].nCol, res[id].data, null));
+//	for(var id  in res)
+//		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(0, res[id].nRow, gc_nMaxCol0, res[id].nRow), new UndoRedoData_CellSimpleData(res[id].nRow, res[id].nCol, res[id].data, null));
 	
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsLeft, this.getId(), new Asc.Range(0, oBBox.r1, gc_nMaxCol0, oBBox.r1), new UndoRedoData_BBox(oBBox));
 };
@@ -3597,9 +3597,9 @@ Woorksheet.prototype._shiftCellsUp=function(oBBox){
 	
 	//todo проверить не уменьшились ли границы таблицы
 	
-	for(var id  in res)
-		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(0, res[id].nRow, gc_nMaxCol0, res[id].nRow), new UndoRedoData_CellSimpleData(res[id].nRow, res[id].nCol, res[id].data, null));
-		
+//	for(var id  in res)
+//		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(0, res[id].nRow, gc_nMaxCol0, res[id].nRow), new UndoRedoData_CellSimpleData(res[id].nRow, res[id].nCol, res[id].data, null));
+
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsTop, this.getId(), new Asc.Range(0, oBBox.r1, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_BBox(oBBox));
 };
 Woorksheet.prototype._shiftCellsRight=function(oBBox){
@@ -3638,8 +3638,8 @@ Woorksheet.prototype._shiftCellsRight=function(oBBox){
 	helpFunction(this.workbook);
 	unLockDraw(this.workbook);
 		
-	for(var id  in res)
-		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(0, res[id].nRow, gc_nMaxCol0, res[id].nRow), new UndoRedoData_CellSimpleData(res[id].nRow, res[id].nCol, res[id].data, null));
+//	for(var id  in res)
+//		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(0, res[id].nRow, gc_nMaxCol0, res[id].nRow), new UndoRedoData_CellSimpleData(res[id].nRow, res[id].nCol, res[id].data, null));
 	
 	History.TurnOn();
 };
@@ -3677,8 +3677,8 @@ Woorksheet.prototype._shiftCellsBottom=function(oBBox){
 	helpFunction(this.workbook);
 	unLockDraw(this.workbook);
 		
-	for(var id  in res)
-		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(0, res[id].nRow, gc_nMaxCol0, res[id].nRow), new UndoRedoData_CellSimpleData(res[id].nRow, res[id].nCol, res[id].data, null));
+//	for(var id  in res)
+//		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(0, res[id].nRow, gc_nMaxCol0, res[id].nRow), new UndoRedoData_CellSimpleData(res[id].nRow, res[id].nCol, res[id].data, null));
 	
 	History.TurnOn();
 };
@@ -3799,21 +3799,21 @@ Woorksheet.prototype.renameDependencyNodes = function(offset,oBBox,rec, noDelete
 		var n = objForRebuldFormula.move[id].node;
 		var _sn = n.getSlaveEdges2();
 		for( var _id in _sn ){
-			var cell = _sn[_id].returnCell();
+			var cell = _sn[_id].returnCell(), cellName = cell.getName();
 			if( undefined == cell ) { continue; }
 			if( cell.formulaParsed ){
 				var oUndoRedoData_CellData = new UndoRedoData_CellData(cell.getValueData(), null);
 				if(null != cell.xfs)
 					oUndoRedoData_CellData.style = cell.xfs.clone();
-				ret[cell.getName()] = {};
-				ret[cell.getName()].data = oUndoRedoData_CellData;
-				ret[cell.getName()].id = this.getId();
-				ret[cell.getName()].nRow = cell.getCellAddress().getRow0();
-				ret[cell.getName()].nCol = cell.getCellAddress().getCol0();
+				ret[cellName] = {};
+				ret[cellName].data = oUndoRedoData_CellData;
+				ret[cellName].id = this.getId();
+				ret[cellName].nRow = cell.getCellAddress().getRow0();
+				ret[cellName].nCol = cell.getCellAddress().getCol0();
 				
 				cell.formulaParsed.shiftCells( objForRebuldFormula.move[id].offset, oBBox, n, this.Id, objForRebuldFormula.move[id].toDelete );
 				cell.setFormula(cell.formulaParsed.assemble());
-				c[cell.getName()] = cell;
+				c[cellName] = cell;
 			}
 		}
 		if( n.cellId.indexOf(":")<0){
@@ -3833,22 +3833,21 @@ Woorksheet.prototype.renameDependencyNodes = function(offset,oBBox,rec, noDelete
 			}
 		}
 		for( var _id in _sn ){
-			var cell = _sn[_id].returnCell();
+			var cell = _sn[_id].returnCell(), cellName = cell.getName();
 			if( cell && cell.formulaParsed ){
 				if( !(cell.getName() in ret) ){
 					var oUndoRedoData_CellData = new UndoRedoData_CellData(cell.getValueData(), null);
 					if(null != cell.xfs)
 						oUndoRedoData_CellData.style = cell.xfs.clone();
-					ret[cell.getName()] = {};
-					ret[cell.getName()].data = oUndoRedoData_CellData;
-					ret[cell.getName()].id = this.getId();
-					ret[cell.getName()].nRow = cell.getCellAddress().getRow0();
-					ret[cell.getName()].nCol = cell.getCellAddress().getCol0();
+					ret[cellName] = {};
+					ret[cellName].data = oUndoRedoData_CellData;
+					ret[cellName].id = this.getId();
+					ret[cellName].nRow = cell.getCellAddress().getRow0();
+					ret[cellName].nCol = cell.getCellAddress().getCol0();
 				}
 				cell.formulaParsed.stretchArea( objForRebuldFormula.stretch[id].offset, oBBox, n, this.Id );
 				cell.setFormula(cell.formulaParsed.assemble());
-				c[cell.getName()] = cell;
-				
+				c[cellName] = cell;
 			}
 		}
 	}

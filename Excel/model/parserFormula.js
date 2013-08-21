@@ -1245,6 +1245,7 @@ function cBaseType( val ) {
     this.type = null;
     this.value = val;
     this.ca = false;
+    this.node = undefined;
 }
 cBaseType.prototype = {
     constructor:cBaseType,
@@ -1256,7 +1257,8 @@ cBaseType.prototype = {
     },
     toString:function () {
         return this.value.toString();
-    }
+    },
+    setNode:function(node){this.node = node;}
 }
 
 /* cFormulaOperators is container for holding all ECMA-376 operators, see chapter $18.17.2.2 in "ECMA-376, Second Edition, Part 1 - Fundamentals And Markup Language Reference" */
@@ -3131,7 +3133,7 @@ parserFormula.prototype = {
                     this.outStack[i] = new cError( cErrorType.bad_reference )
                     continue;
                 }
-                if ( node.cellId == this.outStack[i]._cells.replace( /\$/ig, "" ) ) {
+                if ( node.cellId == this.outStack[i].node.cellId/*_cells.replace( /\$/ig, "" )*/ ) {
                     if ( this.outStack[i].isAbsolute ) {
                         this._changeOffsetHelper( this.outStack[i], offset );
                     }
@@ -3148,7 +3150,7 @@ parserFormula.prototype = {
                 }
             }
             else if ( this.outStack[i] instanceof cRef3D ) {
-                if ( node.cellId == this.outStack[i]._cells.replace( /\$/ig, "" ) && this.outStack[i].ws == node.sheetId ) {
+                if ( node.nodeId == this.outStack[i].node.nodeId /*_cells.replace( /\$/ig, "" ) && this.outStack[i].ws == node.sheetId*/ ) {
                     if ( this.outStack[i].isAbsolute ) {
                         this._changeOffsetHelper( this.outStack[i], offset );
                     }
@@ -3191,7 +3193,7 @@ parserFormula.prototype = {
                     continue;
                 }
 
-                if ( node.cellId == this.outStack[i]._cells.replace( /\$/ig, "" ) ) {
+                if ( node.cellId == this.outStack[i].node.cellId /*_cells.replace( /\$/ig, "" )*/ ) {
 
                     if ( this.outStack[i].isAbsolute ) {
                         this._changeOffsetHelper( this.outStack[i], offset );
@@ -3406,7 +3408,12 @@ parserFormula.prototype = {
             }
 
             if ( (ref instanceof cRef || ref instanceof cRef3D || ref instanceof cArea) && ref.isValid() ) {
-                this.wb.dependencyFormulas.addEdge( this.ws.Id, this.cellId.replace( /\$/g, "" ), ref.getWsId(), ref._cells.replace( /\$/g, "" ) );
+                var nFrom = new Vertex( this.ws.Id, this.cellId.replace( /\$/g, "" ), this.wb ),
+                    nTo = new Vertex( ref.getWsId(), ref._cells.replace( /\$/g, "" ), this.wb );
+                ref.setNode(nTo);
+
+//                this.wb.dependencyFormulas.addEdge( this.ws.Id, this.cellId.replace( /\$/g, "" ), ref.getWsId(), ref._cells.replace( /\$/g, "" ) );
+                this.wb.dependencyFormulas.addEdge2( nFrom, nTo );
             }
             else if ( ref instanceof cArea3D && ref.isValid() ) {
                 var wsR = ref.wsRange();
