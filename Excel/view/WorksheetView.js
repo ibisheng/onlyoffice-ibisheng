@@ -7134,6 +7134,7 @@
 													if(typeof binary_shape === "string" &&( sub === "TeamLabShape" || sub === "TeamLabImage" /*|| sub === "TeamLabChart" */|| sub === "TeamLabGroup"))
 													{
 														var reader = CreateBinaryReader(binary_shape, 12, binary_shape.length);
+														reader.GetLong();
 														if(isRealObject(reader))
 															reader.oImages = this.oImages;
 														var first_string = null;
@@ -7144,9 +7145,9 @@
 														var positionX = null
 														var positionY = null;
 														
-														if(t.cols && val.addImages[im].curCell && val.addImages[im].curCell.col && t.cols[val.addImages[im].curCell.col].left)
+														if(t.cols && val.addImages[im].curCell && val.addImages[im].curCell.col != undefined && t.cols[val.addImages[im].curCell.col].left != undefined)
 															positionX = t.cols[val.addImages[im].curCell.col].left;
-														if(t.rows && val.addImages[im].curCell && val.addImages[im].curCell.row && t.rows[val.addImages[im].curCell.row].top)
+														if(t.rows && val.addImages[im].curCell && val.addImages[im].curCell.row != undefined && t.rows[val.addImages[im].curCell.row].top != undefined)
 															positionY = t.rows[val.addImages[im].curCell.row].top
 														
 														var Drawing;
