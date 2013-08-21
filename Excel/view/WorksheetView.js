@@ -7831,7 +7831,10 @@
 									range.setFill(newVal.fill);
 
 									range.setWrap(newVal.wrap);
-
+									
+									if(newVal.angle)
+										range.setAngle(newVal.angle);
+										
 									if(newVal.hyperlink != null)
 									{
 										newVal.hyperlink.Ref = range;

@@ -2244,7 +2244,8 @@
 						wrap: cell.getWrap(),
 						fill: cell.getFill(),
 						hyperlink: cell.getHyperlink(),
-						valWithoutFormat: cell.getValueWithoutFormat()
+						valWithoutFormat: cell.getValueWithoutFormat(),
+						angle: cell.getAngle()
 					}
 					if(cell.getQuotePrefix() && t.lStorage[row][col] && t.lStorage[row][col].value2 && t.lStorage[row][col].value2[0])
 						t.lStorage[row][col].value2[0].text = "'" + t.lStorage[row][col].value2[0].text;
