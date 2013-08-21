@@ -2815,6 +2815,14 @@ function DrawingObjects() {
 	_this.changeZoom = function(factor) {
 		
 		_this.zoom = factor;
+		_this.resizeCanvas();
+				
+		_this.showDrawingObjects(true);
+		_this.rebuildChartGraphicObjects();
+	}
+	
+	_this.resizeCanvas = function() {
+	
 		shapeCtx.init( drawingCtx.ctx, drawingCtx.getWidth(0), drawingCtx.getHeight(0), drawingCtx.getWidth(3), drawingCtx.getHeight(3) );
 		shapeCtx.CalculateFullTransform();
 		
@@ -2824,9 +2832,6 @@ function DrawingObjects() {
 		trackOverlay.init( shapeOverlayCtx.m_oContext, "ws-canvas-overlay", 0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix, shapeOverlayCtx.m_dWidthMM, shapeOverlayCtx.m_dHeightMM );
 		autoShapeTrack.init( trackOverlay, 0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix, shapeOverlayCtx.m_dWidthMM, shapeOverlayCtx.m_dHeightMM );		
 		autoShapeTrack.Graphics.CalculateFullTransform();
-				
-		_this.showDrawingObjects(true);
-		_this.rebuildChartGraphicObjects();
 	}
 	
 	_this.getWorkbook = function() {
@@ -2930,8 +2935,8 @@ function DrawingObjects() {
 		var _w = checker.Bounds.max_x - checker.Bounds.min_x;
 		var _h = checker.Bounds.max_y - checker.Bounds.min_y;
 		
-		//overlayCtx.clearRect( mmToPt(checker.Bounds.min_x + pxToMm(scrollOffset.x)), mmToPt(checker.Bounds.min_y + pxToMm(scrollOffset.y)), mmToPt(_w), mmToPt(_h) );
-		//drawingCtx.clearRect( mmToPt(checker.Bounds.min_x + pxToMm(scrollOffset.x)), mmToPt(checker.Bounds.min_y + pxToMm(scrollOffset.y)), mmToPt(_w), mmToPt(_h) );
+		overlayCtx.clearRect( mmToPt(checker.Bounds.min_x + pxToMm(scrollOffset.x)), mmToPt(checker.Bounds.min_y + pxToMm(scrollOffset.y)), mmToPt(_w), mmToPt(_h) );
+		drawingCtx.clearRect( mmToPt(checker.Bounds.min_x + pxToMm(scrollOffset.x)), mmToPt(checker.Bounds.min_y + pxToMm(scrollOffset.y)), mmToPt(_w), mmToPt(_h) );
 	
 		var foundRow = worksheet._findRowUnderCursor( mmToPt(checker.Bounds.min_y + pxToMm(scrollOffset.y)), true);		
 		var topRow = foundRow ? foundRow.row : 0;
@@ -2944,7 +2949,7 @@ function DrawingObjects() {
 		var rightcol = foundCol ? foundCol.col : 0;
 		
 		var r_ = asc_Range( leftCol, topRow, rightcol, bottomRow );
-		worksheet._drawGrid( undefined, r_);
+		worksheet._drawGrid( drawingCtx, r_);
 		worksheet._drawCells(r_);
 		worksheet._drawCellsBorders(undefined, r_);
 	}
@@ -3772,6 +3777,9 @@ function DrawingObjects() {
 		_this.objectLocker.reset();
 		_this.objectLocker.addObjectId(obj.graphicObject.Id);
 		_this.objectLocker.checkObjects( function(result) {} );
+		
+		var boundsChecker = _this.getBoundsChecker(obj);
+		aBoundsCheckers.push(boundsChecker);
 		
         return ret;
 	}

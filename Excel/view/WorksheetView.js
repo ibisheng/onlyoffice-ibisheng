@@ -2208,13 +2208,16 @@
 						.fillRect(x1, y1, x2 - x1, y2 - y1)
 						.setStrokeStyle(this.settings.cells.defaultState.border)
 						.setLineWidth(1);
-				for (var i = range.c1, x = x1; i <= range.c2 && x <= x2; ++i) {
-					x += this.cols[i].width;
-					ctx.beginPath().moveTo(x, y1, -0.5, 0).lineTo(x, y2, -0.5, 0).stroke();
-				}
-				for (var j = range.r1, y = y1; j <= range.r2 && y <= y2; ++j) {
-					y += this.rows[j].height;
-					ctx.beginPath().moveTo(x1, y, 0, -0.5).lineTo(x2, y, 0, -0.5).stroke();
+						
+				if ( true === this.model.sheetViews[0].asc_getShowGridLines() ) {
+					for (var i = range.c1, x = x1; i <= range.c2 && x <= x2; ++i) {
+						x += this.cols[i].width;
+						ctx.beginPath().moveTo(x, y1, -0.5, 0).lineTo(x, y2, -0.5, 0).stroke();
+					}
+					for (var j = range.r1, y = y1; j <= range.r2 && y <= y2; ++j) {
+						y += this.rows[j].height;
+						ctx.beginPath().moveTo(x1, y, 0, -0.5).lineTo(x2, y, 0, -0.5).stroke();
+					}
 				}
 			},
 

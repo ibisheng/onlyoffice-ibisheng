@@ -989,6 +989,9 @@
 				// Мы меняли zoom, но не перерисовывали данный лист (он был не активный)
 				if (ws.updateZoom)
 					ws.changeZoom(true);
+				if (isResized)
+					ws.objectRender.resizeCanvas();
+					
 				ws.objectRender.restoreScrollOffset();
 				ws.draw();
 				this._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
