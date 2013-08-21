@@ -4155,18 +4155,24 @@ $(".colorWatch").mouseover(function(){
          var String    = document.getElementById("searchString").value;
          var MatchCase = document.getElementById("searchMatchCase").checked;
 
-         editor.asc_findText(String, MatchCase);
+         editor.asc_findText(String, true, MatchCase);
          Search_Start();
      });
 
      $("#searchNext").click(function()
      {
-         editor.asc_findForward(true);
+         var String    = document.getElementById("searchString").value;
+         var MatchCase = document.getElementById("searchMatchCase").checked;
+
+         editor.asc_findText(String, true, MatchCase);
          //Search_NextElemet(true);
      });
      $("#searchPrev").click(function()
      {
-         editor.asc_findForward(false);
+         var String    = document.getElementById("searchString").value;
+         var MatchCase = document.getElementById("searchMatchCase").checked;
+
+         editor.asc_findText(String, false, MatchCase);
          //Search_NextElemet(false);
      });
 
@@ -4188,15 +4194,21 @@ $(".colorWatch").mouseover(function(){
 
      $("#replaceStringButton").click(function()
      {
-         var String = document.getElementById("replaceString").value;
-         editor.asc_replaceText(String, false);
+         var srcString = document.getElementById("searchString").value;
+         var MatchCase = document.getElementById("searchMatchCase").checked;
+
+         var repString = document.getElementById("replaceString").value;
+         editor.asc_replaceText(srcString, repString, false, MatchCase);
 
          //Search_Replace(false);
      });
      $("#replaceAllStringButton").click(function()
      {
-         var String = document.getElementById("replaceString").value;
-         editor.asc_replaceText(String, true);
+         var srcString = document.getElementById("searchString").value;
+         var MatchCase = document.getElementById("searchMatchCase").checked;
+
+         var repString = document.getElementById("replaceString").value;
+         editor.asc_replaceText(srcString, repString, true, MatchCase);
 
          //Search_Replace(true);
      });

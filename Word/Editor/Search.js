@@ -22,6 +22,9 @@ function CParagraphSearchElement(StartPos, EndPos, Type)
 //----------------------------------------------------------------------------------------------------------------------
 function CDocumentSearch()
 {
+    this.Text          = "";
+    this.IsMatchCase   = false;
+
     this.Id            = 0;
     this.Count         = 0;
     this.Elements      = new Array();
@@ -33,8 +36,25 @@ function CDocumentSearch()
 
 CDocumentSearch.prototype =
 {
+    Set : function(Text, Props)
+    {
+        this.Text        = Text;
+        this.IsMatchCase = Props.IsMatchCase;
+    },
+
+    Compare : function(Text, Props)
+    {
+        if ( this.Text === Text && this.IsMatchCase === Props.IsMatchCase )
+            return true;
+
+        return false;
+    },
+
     Clear : function()
     {
+        this.Text          = "";
+        this.IsMatchCase   = false;
+
         // Очищаем предыдущие элементы поиска
         for ( var Id in this.Elements )
         {
@@ -154,7 +174,11 @@ CDocument.prototype.Search = function(Str, Props)
 {
     var StartTime = new Date().getTime();
 
+    if ( true === this.SearchEngine.Compare( Str, Props ) )
+        return this.SearchEngine;
+
     this.SearchEngine.Clear();
+    this.SearchEngine.Set( Str, Props );
 
     // Поиск в основном документе
     var Count = this.Content.length;

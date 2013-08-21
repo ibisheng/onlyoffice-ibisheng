@@ -2740,10 +2740,11 @@ asc_docs_api.prototype.sync_ReturnHeadersCallback = function (headers){
 	}
 */
 
-asc_docs_api.prototype.asc_findText = function(text, isMatchCase)
+asc_docs_api.prototype.asc_findText = function(text, isNext, isMatchCase)
 {
     var SearchEngine = editor.WordControl.m_oLogicDocument.Search( text, { MatchCase : isMatchCase } );
-    var Id = this.WordControl.m_oLogicDocument.Search_GetId( true );
+
+    var Id = this.WordControl.m_oLogicDocument.Search_GetId( isNext );
 
     if ( null != Id )
         this.WordControl.m_oLogicDocument.Search_Select( Id );
@@ -2751,21 +2752,10 @@ asc_docs_api.prototype.asc_findText = function(text, isMatchCase)
     return SearchEngine.Count;
 }
 
-asc_docs_api.prototype.asc_findForward = function(isNext)
+asc_docs_api.prototype.asc_replaceText = function(text, replaceWith, isReplaceAll, isMatchCase)
 {
-    var Id = this.WordControl.m_oLogicDocument.Search_GetId( isNext );
+    editor.WordControl.m_oLogicDocument.Search( text, { MatchCase : isMatchCase } );
 
-    if ( null != Id )
-    {
-        this.WordControl.m_oLogicDocument.Search_Select( Id );
-        return true;
-    }
-
-    return false;
-}
-
-asc_docs_api.prototype.asc_replaceText = function(replaceWith, isReplaceAll)
-{
     if ( true === isReplaceAll )
         this.WordControl.m_oLogicDocument.Search_Replace(replaceWith, true, -1);
     else
