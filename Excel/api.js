@@ -120,6 +120,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			this.chartStyleManager = new ChartStyleManager();
 			this.chartPreviewManager = new ChartPreviewManager();
 			
+			// Chart
+			this.chartTranslate = new asc_CChartTranslate();
+			
 			// Shapes
 			this.isStartAddShape = false;
 			this.addShapePreset = "";
@@ -2053,6 +2056,10 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 
 			// Images & Charts
+			
+			asc_setChartTranslate: function(translate) {
+				this.chartTranslate = translate;
+			},
 
 			asc_drawingObjectsExist: function(chart) {
 				for (var i = 0; i < this.wb.model.aWorksheets.length; i++) {
@@ -3139,6 +3146,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		// Drawing objects interface
 
 		prot["asc_showDrawingObjects"] = prot.asc_showDrawingObjects;
+		prot["asc_setChartTranslate"] = prot.asc_setChartTranslate;
 		prot["asc_drawingObjectsExist"] = prot.asc_drawingObjectsExist;
 		prot["asc_getChartObject"] = prot.asc_getChartObject;
 		prot["asc_addChartDrawingObject"] = prot.asc_addChartDrawingObject;

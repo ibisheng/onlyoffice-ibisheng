@@ -607,6 +607,51 @@ prot["asc_setImageUrl"] = prot.asc_setImageUrl;
 //}
 
 //-----------------------------------------------------------------------------------
+// Chart translate
+//-----------------------------------------------------------------------------------
+
+function asc_CChartTranslate() {
+	
+	this.title = "Diagram Title";
+	this.xAxis = "X Axis";
+	this.yAxis = "Y Axis";
+	this.series = "Series";
+}
+
+asc_CChartTranslate.prototype = {
+	
+	asc_getTitle: function() { return this.title; },
+	asc_setTitle: function(val) { this.title = val; },
+	
+	asc_getXAxis: function() { return this.xAxis; },
+	asc_setXAxis: function(val) { this.xAxis = val; },
+	
+	asc_getYAxis: function() { return this.yAxis; },
+	asc_setYAxis: function(val) { this.yAxis = val; },
+	
+	asc_getSeries: function() { return this.series; },
+	asc_setSeries: function(val) { this.series = val; }
+}
+
+//{ asc_CChartTranslate export
+window["Asc"].asc_CChartTranslate = asc_CChartTranslate;
+window["Asc"]["asc_CChartTranslate"] = asc_CChartTranslate;
+prot = asc_CChartTranslate.prototype;
+
+prot["asc_getTitle"] = prot.asc_getTitle;
+prot["asc_setTitle"] = prot.asc_setTitle;
+
+prot["asc_getXAxis"] = prot.asc_getXAxis;
+prot["asc_setXAxis"] = prot.asc_setXAxis;
+
+prot["asc_getYAxis"] = prot.asc_getYAxis;
+prot["asc_setYAxis"] = prot.asc_setYAxis;
+
+prot["asc_getSeries"] = prot.asc_getSeries;
+prot["asc_setSeries"] = prot.asc_setSeries;
+//}
+
+//-----------------------------------------------------------------------------------
 // Chart
 //-----------------------------------------------------------------------------------
 
@@ -699,6 +744,7 @@ asc_CChart.prototype = {
 		var bbox = _t.range.intervalObject.getBBox0();
 		_t.series = [];
 		var nameIndex = 1;
+		var api = window["Asc"]["editor"];
 		
 		function isNumber(n) {
 			return !isNaN(parseFloat(n)) && isFinite(n);
@@ -784,7 +830,7 @@ asc_CChart.prototype = {
 					ser.xVal.NumCache = getNumCache( bbox.c1 + (parsedHeaders.bLeft ? 1 : 0), bbox.c2, bbox.r1, bbox.r1 );
 				}
 				
-				var seriaName = parsedHeaders.bLeft ? ( _t.range.intervalObject.worksheet.getCell(new CellAddress(i, bbox.c1, 0)).getValue() ) : ("Series" + nameIndex);
+				var seriaName = parsedHeaders.bLeft ? ( _t.range.intervalObject.worksheet.getCell(new CellAddress(i, bbox.c1, 0)).getValue() ) : (api.chartTranslate.series + nameIndex);
 				ser.Tx = seriaName;
 				_t.series.push(ser);
 				nameIndex++;
@@ -819,7 +865,7 @@ asc_CChart.prototype = {
 					ser.xVal.NumCache = getNumCache( bbox.c1, bbox.c1, bbox.r1 + (parsedHeaders.bTop ? 1 : 0), bbox.r2 );
 				}
 				
-				var seriaName = parsedHeaders.bTop ? ( _t.range.intervalObject.worksheet.getCell(new CellAddress(bbox.r1, i, 0)).getValue() ) : ("Series" + nameIndex);
+				var seriaName = parsedHeaders.bTop ? ( _t.range.intervalObject.worksheet.getCell(new CellAddress(bbox.r1, i, 0)).getValue() ) : (api.chartTranslate.series + nameIndex);
 				ser.Tx = seriaName;
 				_t.series.push(ser);
 				nameIndex++;

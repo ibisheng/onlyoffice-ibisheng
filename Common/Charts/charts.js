@@ -1504,9 +1504,11 @@ function arrReverse(arr) {
 function drawChart(chart, arrValues, width, height) {
 
 	var data = arrValues;
-	var defaultXTitle = 'X Axis';
-	var defaultYTitle = 'Y Axis';
-	var defaultTitle = 'Diagram Title';
+	var api = window["Asc"]["editor"];
+	var defaultXTitle = api.chartTranslate.xAxis;
+	var defaultYTitle = api.chartTranslate.yAxis;
+	var defaultTitle = api.chartTranslate.title;
+	
 	if(OfficeExcel.drawingCtxCharts)
 		OfficeExcel.drawingCtxCharts.setCanvas(chartCanvas);
 	// По типу
