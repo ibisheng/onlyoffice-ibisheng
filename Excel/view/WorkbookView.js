@@ -226,7 +226,7 @@
 					var ws = self.getWorksheetById(wsId);
 					if (ws)
 						ws.changeWorksheet("updateRange", {range: range,
-							isLockDraw: parseInt(wsId) !== self.getWorksheet(self.wsActive).model.getId(),
+							isLockDraw: wsId != self.getWorksheet(self.wsActive).model.getId(),
 							canChangeColWidth: canChangeColWidth});
 				});
 				this.model.handlers.add("changeWorksheetUpdate", function (wsId, val) {
