@@ -6482,25 +6482,25 @@ Range.prototype.getBorderFull=function(){
 	var nCol = this.bbox.c1;    
 	if("none" == borders.l.s){
 		if(nCol > 1){
-			var left = this.getBorder(new CellAddress(nRow, nCol - 1));
+			var left = this.getBorder(new CellAddress(nRow, nCol - 1, 0));
 			if("none" != left.r.s)
 				borders.l = left.r;
 		}
 	}
 	if("none" == borders.t.s){
 		if(nRow > 1){
-			var top = this.getBorder(new CellAddress(nRow - 1, nCol));
+			var top = this.getBorder(new CellAddress(nRow - 1, nCol, 0));
 			if("none" != top.b.s)
 				borders.t = top.b;
 		}
 	}
 	if("none" == borders.r.s){
-		var right = this.getBorder(new CellAddress(nRow, nCol + 1));
+		var right = this.getBorder(new CellAddress(nRow, nCol + 1, 0));
 		if("none" != right.l.s)
 			borders.r = right.l;
 	}
 	if("none" == borders.b.s){
-		var bottom = this.getBorder(new CellAddress(nRow + 1, nCol));
+		var bottom = this.getBorder(new CellAddress(nRow + 1, nCol, 0));
 		if("none" != bottom.t.s)
 			borders.b = bottom.t;
 	}
