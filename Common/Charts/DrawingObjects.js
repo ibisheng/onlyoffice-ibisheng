@@ -656,6 +656,7 @@ function asc_CChart(object) {
 }
 
 asc_CChart.prototype = {
+
 	asc_getType: function() { return this.type; },
 	asc_setType: function(type) { this.type = type; },
 
@@ -851,48 +852,100 @@ asc_CChart.prototype = {
 		
 		switch (type) {
 		
-			case historyitem_Chart_ChangeType:
+			// type, subType, styleId
+			case historyitem_Chart_Type:
 				this.type = data.oldValue;
 				break;
 				
-			case historyitem_Chart_ChangeSubType:
+			case historyitem_Chart_SubType:
 				this.subType = data.oldValue;
 				break;
 				
-			case historyitem_Chart_ChangeShowValue:
-				this.bShowValue = data.oldValue;
-				break;
-			
-			case historyitem_Chart_ChangeShowBorder:
-				this.bShowBorder = data.oldValue;
-				break;
-				
-			case historyitem_Chart_ChangeStyle:
+			case historyitem_Chart_Style:
 				this.styleId = data.oldValue;
 				break;
 				
-			case historyitem_Chart_ChangeRange:
-				this.range = new asc_CChartRange(data.oldValue);
+			// showValue, showBorder
+			case historyitem_Chart_IsShowValue:
+				this.bShowValue = data.oldValue;
+				break;
+			
+			case historyitem_Chart_IsShowBorder:
+				this.bShowBorder = data.oldValue;
+				break;
+				
+			// range
+			case historyitem_Chart_RangeInterval:
+				this.range.interval = data.oldValue;
 				if ( this.worksheet ) {
 					this.range.intervalObject = convertFormula(this.range.interval, this.worksheet);
 					this.rebuildSeries();
 				}
 				break;
 				
-			case historyitem_Chart_ChangeHeader:
-				this.header = new asc_CChartHeader(data.oldValue);
+			case historyitem_Chart_RangeRowColumns:
+				this.range.rows = data.oldValue;
+				this.range.columns = !data.oldValue;
 				break;
 				
-			case historyitem_Chart_ChangeAxisX:
-				this.xAxis = new asc_CChartAxisX(data.oldValue);
+			// header
+			case historyitem_Chart_HeaderTitle:
+				this.header.title = data.oldValue;
 				break;
 				
-			case historyitem_Chart_ChangeAxisY:
-				this.yAxis = new asc_CChartAxisY(data.oldValue);
+			case historyitem_Chart_HeaderSubTitle:
+				this.header.subTitle = data.oldValue;
 				break;
 				
-			case historyitem_Chart_ChangeLegend:
-				this.legend = new asc_CChartLegend(data.oldValue);
+			case historyitem_Chart_IsDefaultHeaderTitle:
+				this.header.bDefaultTitle = data.oldValue;
+				break;
+			
+			// xAxis
+			case historyitem_Chart_xAxisTitle:
+				this.xAxis.title = data.oldValue;
+				break;
+				
+			case historyitem_Chart_xAxisIsDefaultTitle:
+				this.xAxis.bDefaultTitle = data.oldValue;
+				break;
+				
+			case historyitem_Chart_xAxisIsShow:
+				this.xAxis.bShow = data.oldValue;
+				break;
+				
+			case historyitem_Chart_xAxisIsGrid:
+				this.xAxis.bGrid = data.oldValue;
+				break;
+				
+			// yAxis
+			case historyitem_Chart_yAxisTitle:
+				this.yAxis.title = data.oldValue;
+				break;
+				
+			case historyitem_Chart_yAxisIsDefaultTitle:
+				this.yAxis.bDefaultTitle = data.oldValue;
+				break;
+				
+			case historyitem_Chart_yAxisIsShow:
+				this.yAxis.bShow = data.oldValue;
+				break;
+				
+			case historyitem_Chart_yAxisIsGrid:
+				this.yAxis.bGrid = data.oldValue;
+				break;
+				
+			// legend
+			case historyitem_Chart_LegendPosition:
+				this.legend.position = data.oldValue;
+				break;
+				
+			case historyitem_Chart_LegendIsShow:
+				this.legend.bShow = data.oldValue;
+				break;
+				
+			case historyitem_Chart_LegendIsOverlay:
+				this.legend.bOverlay = data.oldValue;
 				break;
 			
 		}
@@ -904,50 +957,101 @@ asc_CChart.prototype = {
 	
 	Redo: function(type, data) {
 		
+		// type, subType, styleId
 		switch (type) {
-			
-			case historyitem_Chart_ChangeType:
+			case historyitem_Chart_Type:
 				this.type = data.newValue;
 				break;
 				
-			case historyitem_Chart_ChangeSubType:
+			case historyitem_Chart_SubType:
 				this.subType = data.newValue;
 				break;
 				
-			case historyitem_Chart_ChangeShowValue:
-				this.bShowValue = data.newValue;
-				break;
-			
-			case historyitem_Chart_ChangeShowBorder:
-				this.bShowBorder = data.newValue;
-				break;
-				
-			case historyitem_Chart_ChangeStyle:
+			case historyitem_Chart_Style:
 				this.styleId = data.newValue;
 				break;
 				
-			case historyitem_Chart_ChangeRange:
-				this.range = new asc_CChartRange(data.newValue);
+			// showValue, showBorder
+			case historyitem_Chart_IsShowValue:
+				this.bShowValue = data.newValue;
+				break;
+			
+			case historyitem_Chart_IsShowBorder:
+				this.bShowBorder = data.newValue;
+				break;
+				
+			// range
+			case historyitem_Chart_RangeInterval:
+				this.range.interval = data.newValue;
 				if ( this.worksheet ) {
 					this.range.intervalObject = convertFormula(this.range.interval, this.worksheet);
 					this.rebuildSeries();
 				}
 				break;
 				
-			case historyitem_Chart_ChangeHeader:
-				this.header = new asc_CChartHeader(data.newValue);
+			case historyitem_Chart_RangeRowColumns:
+				this.range.rows = data.newValue;
+				this.range.columns = !data.newValue;
 				break;
 				
-			case historyitem_Chart_ChangeAxisX:
-				this.xAxis = new asc_CChartAxisX(data.newValue);
+			// header
+			case historyitem_Chart_HeaderTitle:
+				this.header.title = data.newValue;
 				break;
 				
-			case historyitem_Chart_ChangeAxisY:
-				this.yAxis = new asc_CChartAxisY(data.newValue);
+			case historyitem_Chart_HeaderSubTitle:
+				this.header.subTitle = data.newValue;
 				break;
 				
-			case historyitem_Chart_ChangeLegend:
-				this.legend = new asc_CChartLegend(data.newValue);
+			case historyitem_Chart_IsDefaultHeaderTitle:
+				this.header.bDefaultTitle = data.newValue;
+				break;
+			
+			// xAxis
+			case historyitem_Chart_xAxisTitle:
+				this.xAxis.title = data.newValue;
+				break;
+				
+			case historyitem_Chart_xAxisIsDefaultTitle:
+				this.xAxis.bDefaultTitle = data.newValue;
+				break;
+				
+			case historyitem_Chart_xAxisIsShow:
+				this.xAxis.bShow = data.newValue;
+				break;
+				
+			case historyitem_Chart_xAxisIsGrid:
+				this.xAxis.bGrid = data.newValue;
+				break;
+				
+			// yAxis
+			case historyitem_Chart_yAxisTitle:
+				this.yAxis.title = data.newValue;
+				break;
+				
+			case historyitem_Chart_yAxisIsDefaultTitle:
+				this.yAxis.bDefaultTitle = data.newValue;
+				break;
+				
+			case historyitem_Chart_yAxisIsShow:
+				this.yAxis.bShow = data.newValue;
+				break;
+				
+			case historyitem_Chart_yAxisIsGrid:
+				this.yAxis.bGrid = data.newValue;
+				break;
+				
+			// legend
+			case historyitem_Chart_LegendPosition:
+				this.legend.position = data.newValue;
+				break;
+				
+			case historyitem_Chart_LegendIsShow:
+				this.legend.bShow = data.newValue;
+				break;
+				
+			case historyitem_Chart_LegendIsOverlay:
+				this.legend.bOverlay = data.newValue;
 				break;
 		}
 		if ( this.worksheet ) {
@@ -3332,8 +3436,6 @@ function DrawingObjects() {
 	_this.editChartDrawingObject = function(chart) {
 		if ( chart ) {
 			_this.controller.editChartDrawingObjects(chart);
-			chart.rebuildSeries();
-			chart.range.intervalObject = convertFormula(chart.range.interval, worksheet);
 			_this.showDrawingObjects(false);
 		}
 	}

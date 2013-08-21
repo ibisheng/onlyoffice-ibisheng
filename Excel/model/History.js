@@ -75,17 +75,36 @@ var historyitem_Cell_SetQuotePrefix = 20;
 var historyitem_Cell_Angle = 21;
 var historyitem_Cell_Style = 22;
 
-var historyitem_Chart_ChangeType = 1;
-var historyitem_Chart_ChangeSubType = 2;
-var historyitem_Chart_ChangeShowValue = 3;
-var historyitem_Chart_ChangeShowBorder = 4;
-var historyitem_Chart_ChangeStyle = 5;
-var historyitem_Chart_ChangeRange = 6;
-var historyitem_Chart_ChangeHeader = 7;
-var historyitem_Chart_ChangeAxisX = 8;
-var historyitem_Chart_ChangeAxisY = 9;
-var historyitem_Chart_ChangeLegend = 10;
+// Chart
+var historyitem_Chart_Type = 1;
+var historyitem_Chart_SubType = 2;
+var historyitem_Chart_Style = 3;
 
+var historyitem_Chart_IsShowValue = 10;
+var historyitem_Chart_IsShowBorder = 11;
+
+var historyitem_Chart_RangeInterval = 20;
+var historyitem_Chart_RangeRowColumns = 21;
+
+var historyitem_Chart_HeaderTitle = 30;
+var historyitem_Chart_HeaderSubTitle = 31;
+var historyitem_Chart_IsDefaultHeaderTitle = 32;
+
+var historyitem_Chart_xAxisTitle = 40;
+var historyitem_Chart_xAxisIsDefaultTitle = 41;
+var historyitem_Chart_xAxisIsShow = 42;
+var historyitem_Chart_xAxisIsGrid = 43;
+
+var historyitem_Chart_yAxisTitle = 50;
+var historyitem_Chart_yAxisIsDefaultTitle = 51;
+var historyitem_Chart_yAxisIsShow = 52;
+var historyitem_Chart_yAxisIsGrid = 53;
+
+var historyitem_Chart_LegendPosition = 60;
+var historyitem_Chart_LegendIsShow = 61;
+var historyitem_Chart_LegendIsOverlay = 62;
+
+// AutoShapes
 var historyitem_AutoShapes_Offset = 1;
 var historyitem_AutoShapes_Extents = 2;
 var historyitem_AutoShapes_Child_Offset = 3;

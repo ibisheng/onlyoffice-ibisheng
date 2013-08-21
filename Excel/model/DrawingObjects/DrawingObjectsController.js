@@ -794,7 +794,7 @@ DrawingObjectsController.prototype =
                         chart_props = new asc_CImgProperty();
 
                         chart_props.fromGroup = true;
-                        chart_props.ChartProperties = c_obj.chart;
+                        chart_props.ChartProperties = new asc_CChart(c_obj.chart);
                     }
                     else
                     {
@@ -905,7 +905,7 @@ DrawingObjectsController.prototype =
                             chart_props = new asc_CImgProperty();
                             chart_props.Width = c_obj.extX;
                             chart_props.Height = c_obj.extY;
-                            chart_props.ChartProperties = c_obj.chart;
+                            chart_props.ChartProperties = new asc_CChart(c_obj.chart);
                         }
                     }
                     if (c_obj.isGroup())
@@ -1166,7 +1166,7 @@ DrawingObjectsController.prototype =
 					}
                     if(ArrGlyph[i].isChart() && isRealObject(props.ChartProperties))
                     {
-                        ArrGlyph[i].chart = props.ChartProperties;
+                        ArrGlyph[i].setChart(props.ChartProperties, true);
                         ArrGlyph[i].recalculate();
                     }
 
