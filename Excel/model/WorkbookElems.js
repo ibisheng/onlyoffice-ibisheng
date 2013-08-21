@@ -1428,7 +1428,7 @@ StyleManager.prototype =
     _prepareSet : function(oItemWithXfs)
 	{
 		if(null == oItemWithXfs.xfs)
-			oItemWithXfs.xfs = oItemWithXfs.getDefaultFormat(this.oDefaultXfs).clone();
+			oItemWithXfs.xfs = this.oDefaultXfs.clone();
         return oItemWithXfs.xfs;
 	},
     _prepareSetFont : function(oItemWithXfs)
@@ -2059,13 +2059,6 @@ Col.prototype =
 		else
 			this.BestFit = null;
 	},
-	getDefaultFormat : function(oDefault)
-	{
-		if(null != this.ws.oAllCol && null != this.ws.oAllCol.xfs)
-			return this.ws.oAllCol.xfs;
-		else
-			return oDefault;
-	},
 	getMerged : function()
 	{
 		return this.merged;
@@ -2337,13 +2330,6 @@ Row.prototype =
 			this.CustomHeight = otherRow.CustomHeight;
 		if(null != otherRow.hd)
 			this.hd = otherRow.hd;
-	},
-	getDefaultFormat : function(oDefault)
-	{
-		if(null != this.ws.oAllCol && null != this.ws.oAllCol.xfs)
-			return this.ws.oAllCol.xfs;
-		else
-			return oDefault;
 	},
 	getMerged : function()
 	{

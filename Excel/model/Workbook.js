@@ -3278,6 +3278,8 @@ Woorksheet.prototype._getRow=function(row){
 	if(!oCurRow){
 		oCurRow = new Row(this);
 		oCurRow.create(row + 1);
+		if(null != this.oAllCol && null != this.oAllCol.xfs)
+			oCurRow.xfs = this.oAllCol.xfs.clone();
 		this.aGCells[row] = oCurRow;
 		this.nRowsCount = row > this.nRowsCount ? row : this.nRowsCount ;
 		//History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_CreateRow, this.getId(), null, new UndoRedoData_SingleProperty(row));
@@ -4156,17 +4158,6 @@ Cell.prototype.setType=function(type){
 };
 Cell.prototype.getType=function(){
 	return this.oValue.type;
-};
-Cell.prototype.getDefaultFormat=function(oDefault){
-	var nRow = this.oId.getRow0();
-	var nCol = this.oId.getCol0();
-	var row = this.ws._getRowNoEmpty(nRow);
-	if(null != row && null != row.xfs)
-		return row.xfs;
-	var col = this.ws._getColNoEmptyWithAll(nCol);
-	if(null != col && null != col.xfs)
-		return col.xfs;
-	return oDefault;
 };
 Cell.prototype.setCellStyle=function(val){
 	var newVal = this.cs._prepareCellStyle(val);
