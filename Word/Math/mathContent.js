@@ -3775,8 +3775,10 @@ CMathComposition.prototype =
 
             if(start !== end)
                 Pos = start < end ? start: end;
-            else
+            else if(order == 1)
                 Pos = this.SelectContent.CurPos;
+            else
+                Pos = this.SelectContent.CurPos + 1;
         }
 
         this.ClearSelect();
