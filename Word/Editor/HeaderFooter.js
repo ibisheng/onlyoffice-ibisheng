@@ -254,6 +254,9 @@ CHeaderFooter.prototype =
 
     Set_CurrentElement : function()
     {
+        this.Parent.CurHdrFtr = this;
+        this.LogicDocument.CurPos.Type = docpostype_HdrFtr;
+
         this.LogicDocument.Document_UpdateInterfaceState();
         this.LogicDocument.Document_UpdateRulersState();
         this.LogicDocument.Document_UpdateSelectionState();

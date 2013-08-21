@@ -354,3 +354,10 @@ var c_oAscLineBeginSize = {
 
 var TABLE_STYLE_WIDTH_PIX   = 70;
 var TABLE_STYLE_HEIGHT_PIX  = 50;
+
+var c_oAscDropCap =
+{
+    None   : 0,
+    Drop   : 1,
+    Margin : 2
+};

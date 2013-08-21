@@ -17,6 +17,7 @@ var g_arrLockedInfo = new Array();
 var g_oTextPr    = new Object(); // CTextPr
 var g_oImagePr   = new Object();//
 var g_nImageWrap = 0;//c_oAscWrapStyle2.Inline;
+var g_nParaWrap  = 1;//c_oAscWrapStyle2.Square;
 var g_bImageCanBeFlow = true;
 var g_oTablePr   = new Object();
 var g_oSpellCheck = new Object();
@@ -375,7 +376,7 @@ $(document).ready(function(){
         }
     );
 
-$("#imgW, #imgH, #imgLeft, #imgTop, #imgRight, #imgBottom, #imgX, #imgY, #hafHF, #tblW, #tblCS, #tblMarLeft, #tblMarTop, #tblMarRight, #tblMarBottom, #tblIndentLeft, #tblLeft, #tblTop, #tblRight, #tblBottom, #tblBrdBGColor, #imgURL, #tblDefMarLeft, #tblDefMarTop, #tblDefMarRight, #tblDefMarBottom, #tblX, #tblY, #prFirst, #prLeft, #prRight, #prLineHeight, #prAfter, #prBefore, #hyperToolTip, #hyperUrl, #hyperText, #prTextSpacing, #prTextPosition, #prTextPosition, #imgPositionVPosValueCombo, #imgPositionHPosValueCombo, #tblHeaderRowsCount, #tblPositionVPosValueCombo, #tblPositionHPosValueCombo, #searchString, #replaceString, #prBrdSpaceVals")
+$("#imgW, #imgH, #imgLeft, #imgTop, #imgRight, #imgBottom, #imgX, #imgY, #hafHF, #tblW, #tblCS, #tblMarLeft, #tblMarTop, #tblMarRight, #tblMarBottom, #tblIndentLeft, #tblLeft, #tblTop, #tblRight, #tblBottom, #tblBrdBGColor, #imgURL, #tblDefMarLeft, #tblDefMarTop, #tblDefMarRight, #tblDefMarBottom, #tblX, #tblY, #prFirst, #prLeft, #prRight, #prLineHeight, #prAfter, #prBefore, #hyperToolTip, #hyperUrl, #hyperText, #prTextSpacing, #prTextPosition, #prTextPosition, #imgPositionVPosValueCombo, #imgPositionHPosValueCombo, #tblHeaderRowsCount, #tblPositionVPosValueCombo, #tblPositionHPosValueCombo, #searchString, #replaceString, #prBrdSpaceVals, #prFrameHSpace, #prFrameVSpace, #prFramePositionVPosValueCombo, #prFramePositionHPosValueCombo, #prFrameHeightValue, #prFrameWidthValue")
 .focus(function(){editor.asc_enableKeyEvents(false);})
 .blur(function(){editor.asc_enableKeyEvents(true);})
 
@@ -1008,11 +1009,17 @@ $("#td_formatmodel,#td_info, #td_redo, #td_undo, #td_orient, #td_bold, #td_itali
 
             //editor.WordControl.m_oLogicDocument.Document_CreateFontMap();
 
-            Menu_Hyperlink_Add();
+
+            //Menu_Hyperlink_Add();
+            editor.WordControl.m_oLogicDocument.Add_DropCap();
 
             //editor.WordControl.m_oLogicDocument.Search_Start(String);
 			break;
 		case "td_indent":
+
+            //var Time = History.Get_EditingTime(10000);
+            //alert("Время редактирования " + (Time / 1000) );
+
 			editor.IncreaseIndent()
 			break;
 		case "td_outdent":
@@ -1827,6 +1834,17 @@ $(".colorWatch").mouseover(function(){
          editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
      });
 
+     editor.asc_registerCallback("asc_onSearchEnd", function()
+     {
+         Search_Clear();
+     });
+
+     editor.asc_registerCallback("asc_onReplaceAll", function()
+     {
+         var Count = arguments[0];
+
+         alert("Сделано " + Count + " замен");
+     });
 
      $("#hafFP").click(function(){
 		editor.HeadersAndFooters_DifferentFirstPage(document.getElementById ("hafFP").checked);
@@ -2791,6 +2809,242 @@ $(".colorWatch").mouseover(function(){
                     document.getElementById("prKeepNext").checked      = elemVal.KeepNext;
 					document.getElementById("prPageBreak").checked     = elemVal.PageBreakBefore;
                     document.getElementById("prWidowControl").checked  = elemVal.WidowControl;
+
+                    var FramePr = elemVal.get_FramePr();
+                    if ( undefined != FramePr )
+                    {
+                        document.getElementById("prFramePr").style.display = "block";
+
+                        var bFrameWrap = FramePr.get_Wrap();
+                        if ( true === bFrameWrap )
+                            ParagraphFrame_OnWrapChange( c_oAscWrapStyle2.Square );
+                        else
+                            ParagraphFrame_OnWrapChange( c_oAscWrapStyle2.TopAndBottom );
+
+                        var FrameW = FramePr.get_W();
+                        if ( undefined === FrameW )
+                        {
+                            document.getElementById("prFrameWidthType").selectedIndex = 0;
+                            ParagraphFrame_OnChangeWidthType( 0 );
+                        }
+                        else
+                        {
+                            document.getElementById("prFrameWidthType").selectedIndex = 1;
+                            ParagraphFrame_OnChangeWidthType( 1 );
+                            document.getElementById("prFrameWidthValue").value = FrameW;
+                        }
+
+                        var FrameHRule = FramePr.get_HRule();
+                        if ( undefined === FrameHRule )
+                            FrameHRule = linerule_Auto;
+
+                        switch ( FrameHRule )
+                        {
+                            case linerule_Auto :
+                            {
+                                document.getElementById("prFrameHeightType").selectedIndex = 0;
+                                ParagraphFrame_OnChangeHeightType( 0 );
+                                break;
+                            }
+                            case linerule_AtLeast :
+                            {
+                                document.getElementById("prFrameHeightType").selectedIndex = 1;
+                                document.getElementById("prFrameHeightValue").value = FramePr.get_H();
+                                ParagraphFrame_OnChangeHeightType( 1 );
+                                break;
+                            }
+
+                            case linerule_Exact :
+                            {
+                                document.getElementById("prFrameHeightType").selectedIndex = 2;
+                                document.getElementById("prFrameHeightValue").value = FramePr.get_H();
+                                ParagraphFrame_OnChangeHeightType( 2 );
+                                break;
+                            }
+                        }
+
+                        var FrameHAnchor = FramePr.get_HAnchor();
+                        var FrameXAlign  = FramePr.get_XAlign();
+                        var FrameX       = FramePr.get_X();
+                        if ( undefined != FrameXAlign || undefined === FrameX )
+                        {
+                            document.getElementById('prFramePositionHAlignRadio').checked = true;
+                            document.getElementById('prFramePositionHPosRadio').checked = false;
+                            ParagraphFrame_UpdatePositionH();
+
+                            if ( undefined === FrameXAlign )
+                                FrameXAlign = c_oAscXAlign.Left;
+
+                            switch ( FrameXAlign )
+                            {
+                                case c_oAscXAlign.Inside:
+                                case c_oAscXAlign.Outside:
+                                case c_oAscXAlign.Left:
+                                {
+                                    document.getElementById('prFramePositionHAlignValueCombo').selectedIndex = 0;
+                                    break;
+                                }
+                                case c_oAscXAlign.Center:
+                                {
+                                    document.getElementById('prFramePositionHAlignValueCombo').selectedIndex = 1;
+                                    break;
+                                }
+                                case c_oAscXAlign.Right:
+                                {
+                                    document.getElementById('prFramePositionHAlignValueCombo').selectedIndex = 2;
+                                    break;
+                                }
+                            }
+
+                            switch (FrameHAnchor)
+                            {
+                                case c_oAscHAnchor.Margin :
+                                {
+                                    document.getElementById('prFramePositionHAlignTypeCombo').selectedIndex = 0;
+                                    break;
+                                }
+                                case c_oAscHAnchor.Page :
+                                {
+                                    document.getElementById('prFramePositionHAlignTypeCombo').selectedIndex = 1;
+                                    break;
+                                }
+                                case c_oAscHAnchor.Text :
+                                {
+                                    document.getElementById('prFramePositionHAlignTypeCombo').selectedIndex = 2;
+                                    break;
+                                }
+                            }
+
+                        }
+                        else
+                        {
+                            document.getElementById('prFramePositionHAlignRadio').checked = false;
+                            document.getElementById('prFramePositionHPosRadio').checked = true;
+                            ParagraphFrame_UpdatePositionH();
+
+                            if ( undefined === FrameX )
+                                FrameX = 0;
+
+                            document.getElementById('prFramePositionVPosValueCombo').value = FrameX;
+
+                            switch (FrameHAnchor)
+                            {
+                                case c_oAscHAnchor.Margin :
+                                {
+                                    document.getElementById('prFramePositionHPosTypeCombo').selectedIndex = 0;
+                                    break;
+                                }
+                                case c_oAscHAnchor.Page :
+                                {
+                                    document.getElementById('prFramePositionHPosTypeCombo').selectedIndex = 1;
+                                    break;
+                                }
+                                case c_oAscHAnchor.Text :
+                                {
+                                    document.getElementById('prFramePositionHPosTypeCombo').selectedIndex = 2;
+                                    break;
+                                }
+                            }
+                        }
+
+                        var FrameVAnchor = FramePr.get_VAnchor();
+                        var FrameYAlign  = FramePr.get_YAlign();
+                        if ( undefined != FrameYAlign )
+                        {
+                            document.getElementById('prFramePositionVAlignRadio').checked = true;
+                            document.getElementById('prFramePositionVPosRadio').checked = false;
+                            ParagraphFrame_UpdatePositionV();
+
+                            switch ( FrameYAlign )
+                            {
+                                case c_oAscYAlign.Inside:
+                                case c_oAscYAlign.Outside:
+                                case c_oAscYAlign.Inline:
+                                case c_oAscYAlign.Top:
+                                {
+                                    document.getElementById('prFramePositionVAlignValueCombo').selectedIndex = 0;
+                                    break;
+                                }
+                                case c_oAscYAlign.Center:
+                                {
+                                    document.getElementById('prFramePositionVAlignValueCombo').selectedIndex = 1;
+                                    break;
+                                }
+                                case c_oAscYAlign.Bottom:
+                                {
+                                    document.getElementById('prFramePositionVAlignValueCombo').selectedIndex = 2;
+                                    break;
+                                }
+                            }
+
+                            switch (FrameVAnchor)
+                            {
+                                case c_oAscVAnchor.Margin :
+                                {
+                                    document.getElementById('prFramePositionVAlignTypeCombo').selectedIndex = 0;
+                                    break;
+                                }
+                                case c_oAscVAnchor.Page :
+                                {
+                                    document.getElementById('prFramePositionVAlignTypeCombo').selectedIndex = 1;
+                                    break;
+                                }
+                                case c_oAscVAnchor.Text :
+                                {
+                                    document.getElementById('prFramePositionVAlignTypeCombo').selectedIndex = 2;
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            document.getElementById('prFramePositionVAlignRadio').checked = false;
+                            document.getElementById('prFramePositionVPosRadio').checked = true;
+                            ParagraphFrame_UpdatePositionV();
+
+                            var FrameY = FramePr.get_Y();
+                            if ( undefined === FrameY )
+                                FrameY = 0;
+
+                            document.getElementById('prFramePositionVPosValueCombo').value = FrameY;
+
+
+                            switch (FrameVAnchor)
+                            {
+                                case c_oAscVAnchor.Margin :
+                                {
+                                    document.getElementById('prFramePositionVPosTypeCombo').selectedIndex = 0;
+                                    break;
+                                }
+                                case c_oAscVAnchor.Page :
+                                {
+                                    document.getElementById('prFramePositionVPosTypeCombo').selectedIndex = 1;
+                                    break;
+                                }
+                                case c_oAscVAnchor.Text :
+                                {
+                                    document.getElementById('prFramePositionVPosTypeCombo').selectedIndex = 2;
+                                    break;
+                                }
+                            }
+                        }
+
+                        var FrameHSpace = FramePr.get_HSpace();
+                        if ( undefined === FrameHSpace )
+                            FrameHSpace = 0;
+
+                        document.getElementById('prFrameHSpace').value = FrameHSpace;
+
+                        var FrameVSpace = FramePr.get_VSpace();
+                        if ( undefined === FrameVSpace )
+                            FrameVSpace = 0;
+
+                        document.getElementById('prFrameVSpace').value = FrameVSpace;
+                    }
+                    else
+                    {
+                        document.getElementById("prFramePr").style.display = "none";
+                    }
 				}
                 else if ( ObjectType == c_oAscTypeSelectElement.Hyperlink )
                 {
@@ -3150,6 +3404,122 @@ $(".colorWatch").mouseover(function(){
              editor.put_Borders( BrdObj );
          }
      );
+
+     $("#prFrameApply").click(function()
+     {
+         var FramePr = new CParagraphFrame();
+         FramePr.put_Wrap( g_nParaWrap );
+
+         if ( 0 === document.getElementById('prFrameWidthType').selectedIndex )
+            FramePr.put_W( undefined );
+         else
+         {
+             var W = parseFloat(document.getElementById("prFrameWidthValue").value);
+             FramePr.put_W( ( isNaN( W ) ? 0 : W ) );
+         }
+
+         var HRule = document.getElementById("prFrameHeightType").selectedIndex;
+         switch(HRule)
+         {
+             case 0 :
+             {
+                 FramePr.put_HRule( linerule_Auto );
+                 break;
+             }
+
+             case 1:
+             {
+                 FramePr.put_HRule( linerule_AtLeast );
+
+                 var H = parseFloat(document.getElementById("prFrameHeightValue").value);
+                 FramePr.put_H( ( isNaN( H ) ? 0 : H ) );
+
+                 break;
+             }
+
+             case 2:
+             {
+                 FramePr.put_HRule( linerule_Exact );
+
+                 var H = parseFloat(document.getElementById("prFrameHeightValue").value);
+                 FramePr.put_H( ( isNaN( H ) ? 0 : H ) );
+
+                 break;
+             }
+         }
+
+         if ( true === document.getElementById("prFramePositionHAlignRadio").checked )
+         {
+             var XAlign = document.getElementById("prFramePositionHAlignValueCombo").selectedIndex;
+             switch (XAlign)
+             {
+                 case 0: FramePr.put_XAlign(c_oAscXAlign.Left);   break;
+                 case 1: FramePr.put_XAlign(c_oAscXAlign.Center); break;
+                 case 2: FramePr.put_XAlign(c_oAscXAlign.Right);  break;
+             }
+
+             var HAnchor = document.getElementById("prFramePositionHAlignTypeCombo").selectedIndex;
+             switch (HAnchor)
+             {
+                 case 0: FramePr.put_HAnchor(c_oAscHAnchor.Margin); break;
+                 case 1: FramePr.put_HAnchor(c_oAscHAnchor.Page);   break;
+                 case 2: FramePr.put_HAnchor(c_oAscHAnchor.Text);   break;
+             }
+         }
+         else
+         {
+             var X = parseFloat(document.getElementById("prFramePositionHPosValueCombo").value);
+             FramePr.put_X( ( isNaN( X ) ? 0 : X ) );
+
+             var HAnchor = document.getElementById("prFramePositionHPosTypeCombo").selectedIndex;
+             switch (HAnchor)
+             {
+                 case 0: FramePr.put_HAnchor(c_oAscHAnchor.Margin); break;
+                 case 1: FramePr.put_HAnchor(c_oAscHAnchor.Page);   break;
+                 case 2: FramePr.put_HAnchor(c_oAscHAnchor.Text);   break;
+             }
+         }
+
+         if ( true === document.getElementById("prFramePositionVAlignRadio").checked )
+         {
+             var YAlign = document.getElementById("prFramePositionVAlignValueCombo").selectedIndex;
+             switch(YAlign)
+             {
+                 case 0: FramePr.put_YAlign( c_oAscYAlign.Top );    break;
+                 case 1: FramePr.put_YAlign( c_oAscYAlign.Center ); break;
+                 case 2: FramePr.put_YAlign( c_oAscYAlign.Bottom ); break;
+             }
+
+             var VAnchor = document.getElementById("prFramePositionVAlignTypeCombo").selectedIndex;
+             switch(VAnchor)
+             {
+                 case 0: FramePr.put_VAnchor( c_oAscVAnchor.Margin ); break;
+                 case 1: FramePr.put_VAnchor( c_oAscVAnchor.Page   ); break;
+                 case 2: FramePr.put_VAnchor( c_oAscVAnchor.Text   ); break;
+             }
+         }
+         else
+         {
+             var Y = parseFloat(document.getElementById("prFramePositionVPosValueCombo").value);
+             FramePr.put_Y( ( isNaN( Y ) ? 0 : Y ) );
+
+             var VAnchor = document.getElementById("prFramePositionVPosTypeCombo").selectedIndex;
+             switch(VAnchor)
+             {
+                 case 0: FramePr.put_VAnchor( c_oAscVAnchor.Margin ); break;
+                 case 1: FramePr.put_VAnchor( c_oAscVAnchor.Page   ); break;
+                 case 2: FramePr.put_VAnchor( c_oAscVAnchor.Text   ); break;
+             }
+         }
+
+         var HSpace = parseFloat(document.getElementById("prFrameHSpace").value);
+         FramePr.put_HSpace( isNaN( HSpace ) ? 0 : HSpace );
+
+         var VSpace = parseFloat(document.getElementById("prFrameVSpace").value);
+         FramePr.put_VSpace( isNaN( VSpace ) ? 0 : VSpace );
+
+         editor.put_FramePr( FramePr );
+     });
 
      $("#prAddMessage").click(function()
          {
@@ -3780,10 +4150,56 @@ $(".colorWatch").mouseover(function(){
          }
      );
 
-     $("#searchStringButton").click(function(){Search_Start();});
+     $("#searchStringButton").click(function()
+     {
+         var String    = document.getElementById("searchString").value;
+         var MatchCase = document.getElementById("searchMatchCase").checked;
 
-     $("#replaceStringButton").click(function(){Search_Replace(false);});
-     $("#replaceAllStringButton").click(function(){Search_Replace(true);});
+         editor.asc_findText(String, MatchCase);
+         Search_Start();
+     });
+
+     $("#searchNext").click(function()
+     {
+         editor.asc_findForward(true);
+         //Search_NextElemet(true);
+     });
+     $("#searchPrev").click(function()
+     {
+         editor.asc_findForward(false);
+         //Search_NextElemet(false);
+     });
+
+     $("#searchSelect").click(function()
+     {
+         var CurValue = editor.asc_isSelectSearchingResults();
+
+         if ( true === CurValue )
+         {
+             this.value = "Select All";
+             editor.asc_selectSearchingResults(false);
+         }
+         else
+         {
+             this.value = "Remove selection";
+             editor.asc_selectSearchingResults(true);
+         }
+     });
+
+     $("#replaceStringButton").click(function()
+     {
+         var String = document.getElementById("replaceString").value;
+         editor.asc_replaceText(String, false);
+
+         //Search_Replace(false);
+     });
+     $("#replaceAllStringButton").click(function()
+     {
+         var String = document.getElementById("replaceString").value;
+         editor.asc_replaceText(String, true);
+
+         //Search_Replace(true);
+     });
 
 
      var sProtocol = window.location.protocol;
@@ -4843,15 +5259,13 @@ var g_SearchCurrentId = null;
 function Search_Start()
 {
     g_SearchCurrentId = null;
-    var String    = document.getElementById("searchString").value;
-    var MatchCase = document.getElementById("searchMatchCase").checked;
 
     var Div = document.getElementById( "searchResults" );
 
     while ( null != Div.firstChild )
         Div.removeChild( Div.firstChild );
 
-    var SearchEngine  = editor.WordControl.m_oLogicDocument.Search( String, { MatchCase : MatchCase } );
+    var SearchEngine  = editor.WordControl.m_oLogicDocument.SearchEngine;
     var SearchResults = SearchEngine.Elements;
     for ( var Id in SearchResults )
     {
@@ -4861,6 +5275,23 @@ function Search_Start()
 
     var Caption = "\<b\>Search\</b\> (Results : " + SearchEngine.Count + ")";
     document.getElementById("searchCaption").innerHTML = Caption;
+}
+
+function Search_Clear()
+{
+    var Div = document.getElementById( "searchResults" );
+
+    while ( null != Div.firstChild )
+        Div.removeChild( Div.firstChild );
+
+    document.getElementById("searchCaption").innerHTML = "\<b\>Search\</b\>";
+}
+
+function Search_NextElemet(bNext)
+{
+    var Id = editor.WordControl.m_oLogicDocument.Search_GetId( bNext );
+    if ( null != Id )
+        editor.WordControl.m_oLogicDocument.Search_Select( Id );
 }
 
 function Search_AddSearchElement(ParentDiv, SearchElement)
@@ -4949,6 +5380,97 @@ function Search_Replace(bAll)
             while ( null != Div.firstChild )
                 Div.removeChild( Div.firstChild );
         }
+    }
+}
+
+function ParagraphFrame_OnWrapChange(Wrap)
+{
+    var sEmptyColor = 'RGB(255, 255, 255)';
+    var sColor = 'RGB(249, 201, 16)';
+    g_nParaWrap = Wrap;
+
+    document.getElementById('prWrapAround_div').style.backgroundColor = sEmptyColor;
+    document.getElementById('prWrapNone_div').style.backgroundColor = sEmptyColor;
+
+    switch(g_nParaWrap)
+    {
+        case c_oAscWrapStyle2.Square      : document.getElementById('prWrapAround_div').style.backgroundColor = sColor; break;
+        case c_oAscWrapStyle2.TopAndBottom: document.getElementById('prWrapNone_div').style.backgroundColor   = sColor; break;
+    }
+}
+
+function ParagraphFrame_OnChangeWidthType(Value)
+{
+    switch ( Value )
+    {
+        case 0 :
+        {
+            document.getElementById('prFrameWidthValue').disabled = "disabled";
+            break;
+        }
+        case 1 :
+        {
+            document.getElementById('prFrameWidthValue').disabled = 0;
+            break;
+        }
+    }
+}
+
+function ParagraphFrame_OnChangeHeightType(Value)
+{
+    switch ( Value )
+    {
+        case 0 :
+        {
+            document.getElementById('prFrameHeightValue').disabled = "disabled";
+            break;
+        }
+        case 1 :
+        case 2 :
+        {
+            document.getElementById('prFrameHeightValue').disabled = 0;
+            break;
+        }
+    }
+}
+
+function ParagraphFrame_UpdatePositionH()
+{
+    if ( document.getElementById('prFramePositionHAlignRadio').checked )
+    {
+        document.getElementById('prFramePositionHAlignValueCombo').disabled = 0;
+        document.getElementById('prFramePositionHAlignTypeCombo').disabled  = 0;
+
+        document.getElementById('prFramePositionHPosValueCombo').disabled = "disabled";
+        document.getElementById('prFramePositionHPosTypeCombo').disabled  = "disabled";
+    }
+    else
+    {
+        document.getElementById('prFramePositionHPosValueCombo').disabled = 0;
+        document.getElementById('prFramePositionHPosTypeCombo').disabled  = 0;
+
+        document.getElementById('prFramePositionHAlignValueCombo').disabled = "disabled";
+        document.getElementById('prFramePositionHAlignTypeCombo').disabled  = "disabled";
+    }
+}
+
+function ParagraphFrame_UpdatePositionV()
+{
+    if ( document.getElementById('prFramePositionVAlignRadio').checked )
+    {
+        document.getElementById('prFramePositionVAlignValueCombo').disabled = 0;
+        document.getElementById('prFramePositionVAlignTypeCombo').disabled  = 0;
+
+        document.getElementById('prFramePositionVPosValueCombo').disabled = "disabled";
+        document.getElementById('prFramePositionVPosTypeCombo').disabled  = "disabled";
+    }
+    else
+    {
+        document.getElementById('prFramePositionVPosValueCombo').disabled = 0;
+        document.getElementById('prFramePositionVPosTypeCombo').disabled  = 0;
+
+        document.getElementById('prFramePositionVAlignValueCombo').disabled = "disabled";
+        document.getElementById('prFramePositionVAlignTypeCombo').disabled  = "disabled";
     }
 }
 

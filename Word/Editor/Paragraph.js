@@ -3943,6 +3943,7 @@ Paragraph.prototype =
 
         var CollaborativeChanges = 0;
         var StartPagePos = this.Lines[_Page.StartLine].StartPos;
+        var DrawSearch = editor.WordControl.m_oLogicDocument.SearchEngine.Selection;
 
         // в PDF не рисуем метки совместного редактирования
         if ( undefined === pGraphics.RENDERER_PDF_FLAG  )
@@ -4006,13 +4007,16 @@ Paragraph.prototype =
                     var Item = this.Content[Pos];
 
                     var bSearchResult = false;
-                    for ( var SId in this.SearchResults )
+                    if ( true === DrawSearch )
                     {
-                        var SResult = this.SearchResults[SId];
-                        if ( Pos >= SResult.StartPos && Pos < SResult.EndPos )
+                        for ( var SId in this.SearchResults )
                         {
-                            bSearchResult = true;
-                            break;
+                            var SResult = this.SearchResults[SId];
+                            if ( Pos >= SResult.StartPos && Pos < SResult.EndPos )
+                            {
+                                bSearchResult = true;
+                                break;
+                            }
                         }
                     }
 

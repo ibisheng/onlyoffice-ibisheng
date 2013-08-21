@@ -577,8 +577,14 @@ CDocument.prototype =
         this.DrawingObjects.updateCharts();
 
         // Останавливаем поиск
-        if ( null != this.SearchInfo.Id )
-            this.Search_Stop(true);
+        if ( this.SearchEngine.Count > 0 && false != this.SearchEngine.ClearOnRecalc )
+        {
+            this.SearchEngine.Clear();
+            editor.sync_SearchEndCallback();
+
+            this.DrawingDocument.ClearCachePages();
+            this.DrawingDocument.FirePaint();
+        }
 
         // Обновляем позицию курсора
         this.NeedUpdateTarget = true;
@@ -7117,6 +7123,10 @@ CDocument.prototype =
         if ( true === this.History.Is_ExtendDocumentToPos() )
             this.History.Clear_Additional();
 
+        // Сбрасываем текущий элемент в поиске
+        if ( this.SearchEngine.Count > 0 )
+            this.SearchEngine.Reset_Current();
+
         var bUpdateSelection = true;
         var bRetValue = false;
 
@@ -7938,6 +7948,10 @@ CDocument.prototype =
     {
         if ( PageIndex < 0 )
             return;
+
+        // Сбрасываем текущий элемент в поиске
+        if ( this.SearchEngine.Count > 0 )
+            this.SearchEngine.Reset_Current();
 
         // Обработка правой кнопки мыши происходит на событии MouseUp
         if ( g_mouse_button_right === e.Button )
