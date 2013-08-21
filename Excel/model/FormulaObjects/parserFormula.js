@@ -50,7 +50,10 @@ Date.prototype.isLeapYear = function () {
 };
 
 Date.prototype.getDaysInMonth = function () {
-    return arguments.callee[this.isLeapYear() ? 'L' : 'R'][this.getMonth()];
+//    return arguments.callee[this.isLeapYear() ? 'L' : 'R'][this.getMonth()];
+    return this.isLeapYear() ?
+        this.getDaysInMonth.L[this.getMonth()] :
+        this.getDaysInMonth.R[this.getMonth()]
 };
 
 // durations of months for the regular year
@@ -3431,6 +3434,28 @@ function parseNum( str ) {
     return !isNaN( str );
 }
 
+function searchRegExp(str, flags){
+    var vFS = str
+        .replace( /(\\)/g, "\\" )
+        .replace( /(\^)/g, "\\^" )
+        .replace( /(\()/g, "\\(" )
+        .replace( /(\))/g, "\\)" )
+        .replace( /(\+)/g, "\\+" )
+        .replace( /(\[)/g, "\\[" )
+        .replace( /(\])/g, "\\]" )
+        .replace( /(\{)/g, "\\{" )
+        .replace( /(\})/g, "\\}" )
+        .replace( /(\$)/g, "\\$" )
+        .replace( /(~)?\*/g, function ( $0, $1 ) {
+            return $1 ? $0 : '(.*)';
+        } )
+        .replace( /(~)?\?/g, function ( $0, $1 ) {
+            return $1 ? $0 : '.';
+        } )
+        .replace( /(~\*)/g, "\\*" ).replace( /(~\?)/g, "\\?" );
+
+    return new RegExp( vFS + "$", flags ? flags : "i" );
+}
 
 function phi( x ) {
     return  0.39894228040143268 * Math.exp( -(x * x) / 2.0 );
