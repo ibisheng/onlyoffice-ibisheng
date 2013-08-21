@@ -2281,10 +2281,14 @@ function DrawingObjects() {
 	var aDrawTasks = [];
 	var drawTaskTimerId = null;
 	function drawTaskFunction() {
-		if ( aDrawTasks.length ) {
-			//console.log("Task count = " + aDrawTasks.length);
-			_this.showDrawingObjectsEx(aDrawTasks[0].params[0], aDrawTasks[0].params[1]);
-			aDrawTasks.splice(0, 1);
+	
+		var taskLen = aDrawTasks.length;
+		if ( taskLen ) {
+		
+			//console.log("Task count = " + taskLen);
+			
+			_this.showDrawingObjectsEx(aDrawTasks[taskLen - 1].params[0], aDrawTasks[taskLen - 1].params[1]);
+			aDrawTasks.splice(0, (taskLen - 1 > 0) ? taskLen - 1 : 1);
 		}
 	}
 	
@@ -2604,7 +2608,7 @@ function DrawingObjects() {
 	
 	_this.init = function(currentSheet) {
 	
-		var taskTimerId = setInterval(drawTaskFunction, 10);
+		var taskTimerId = setInterval(drawTaskFunction, 5);
 
 		userId = api.User.asc_getId();
 		documentId = api.documentId;
@@ -3083,6 +3087,8 @@ function DrawingObjects() {
 				break;
 			}
 		}
+		if ( !_this.selectedGraphicObjectsExists() )
+			worksheet._drawActiveHeaders();
 	}
 	
 	//-----------------------------------------------------------------------------------
