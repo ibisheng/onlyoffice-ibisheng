@@ -266,7 +266,6 @@ prop:gotoHeader
 prop:sync_ChangeActiveHeaderCallback
 prop:sync_ReturnHeadersCallback
 prop:asc_findText
-prop:asc_findForward
 prop:asc_replaceText
 prop:asc_selectSearchingResults
 prop:asc_isSelectSearchingResults
@@ -1300,7 +1299,6 @@ asc_docs_api.prototype['gotoHeader'] = asc_docs_api.prototype.gotoHeader;
 asc_docs_api.prototype['sync_ChangeActiveHeaderCallback'] = asc_docs_api.prototype.sync_ChangeActiveHeaderCallback;
 asc_docs_api.prototype['sync_ReturnHeadersCallback'] = asc_docs_api.prototype.sync_ReturnHeadersCallback;
 asc_docs_api.prototype['asc_findText'] = asc_docs_api.prototype.asc_findText;
-asc_docs_api.prototype['asc_findForward'] = asc_docs_api.prototype.asc_findForward;
 asc_docs_api.prototype['asc_replaceText'] = asc_docs_api.prototype.asc_replaceText;
 asc_docs_api.prototype['asc_selectSearchingResults'] = asc_docs_api.prototype.asc_selectSearchingResults;
 asc_docs_api.prototype['asc_isSelectSearchingResults'] = asc_docs_api.prototype.asc_isSelectSearchingResults;
