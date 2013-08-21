@@ -4162,7 +4162,7 @@ Cell.prototype.getType=function(){
 Cell.prototype.setCellStyle=function(val){
 	var newVal = this.cs._prepareCellStyle(val);
 	var oRes = this.sm.setCellStyle(this, newVal);
-	if(History.Is_On() && oRes.oldVal != oRes.newVal) {
+	if(History.Is_On()) {
 		var oldStyleName = this.cs.getStyleNameByXfId(oRes.oldVal);
 		History.Add(g_oUndoRedoCell, historyitem_Cell_Style, this.ws.getId(), new Asc.Range(0, this.oId.getRow0(), gc_nMaxCol0, this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oldStyleName, val));
 
