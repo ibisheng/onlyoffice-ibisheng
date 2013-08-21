@@ -3128,7 +3128,7 @@ function DrawingObjects() {
 				
 				// Shape render
 				if ( obj.isGraphicObject() ) {
-					obj.graphicObject.draw( printOptions ? printOptions.ctx : shapeCtx);
+					obj.graphicObject.draw( printOptions ? printOptions.ctx.DocumentRenderer : shapeCtx);
 					continue;
 				}
 			}
