@@ -381,10 +381,20 @@
 					oRangeOrObjectId = element["rangeOrObjectId"];
 					// Для диапазона нужно сделать пересчет с учетом удаленных или добавленных строк/столбцов
 					if (c_oAscLockTypeElem.Range === typeElem) {
-						c1 = this.m_oRecalcIndexColumns[sheetId].getLockOther(oRangeOrObjectId["c1"], type);
-						c2 = this.m_oRecalcIndexColumns[sheetId].getLockOther(oRangeOrObjectId["c2"], type);
-						r1 = this.m_oRecalcIndexRows[sheetId].getLockOther(oRangeOrObjectId["r1"], type);
-						r2 = this.m_oRecalcIndexRows[sheetId].getLockOther(oRangeOrObjectId["r2"], type);
+						// Пересчитывать для удаленных строк/столбцов у другого пользователя не нужно
+						if (c_oAscLockTypes.kLockTypeMine !== type && c_oAscLockTypeElem.Range === typeElem &&
+							(c_oAscLockTypeElemSubType.DeleteColumns === element["subType"] ||
+								c_oAscLockTypeElemSubType.DeleteRows === element["subType"])) {
+							c1 = oRangeOrObjectId["c1"];
+							c2 = oRangeOrObjectId["c2"];
+							r1 = oRangeOrObjectId["r1"];
+							r2 = oRangeOrObjectId["r2"];
+						} else {
+							c1 = this.m_oRecalcIndexColumns[sheetId].getLockOther(oRangeOrObjectId["c1"], type);
+							c2 = this.m_oRecalcIndexColumns[sheetId].getLockOther(oRangeOrObjectId["c2"], type);
+							r1 = this.m_oRecalcIndexRows[sheetId].getLockOther(oRangeOrObjectId["r1"], type);
+							r2 = this.m_oRecalcIndexRows[sheetId].getLockOther(oRangeOrObjectId["r2"], type);
+						}
 						if (null === c1 || null === c2 || null === r1 || null === r2)
 							continue;
 
@@ -442,9 +452,12 @@
 
 				for (i = 0; i < count; ++i) {
 					element = arrayElements[i].Element;
+					// Для удаления пересчитывать индексы не нужно
 					if (c_oAscLockTypeElem.Range !== element["type"] ||
 						c_oAscLockTypeElemSubType.InsertColumns === element["subType"] ||
-						c_oAscLockTypeElemSubType.InsertRows === element["subType"])
+						c_oAscLockTypeElemSubType.InsertRows === element["subType"] ||
+						c_oAscLockTypeElemSubType.DeleteColumns === element["subType"] ||
+						c_oAscLockTypeElemSubType.DeleteRows === element["subType"])
 						continue;
 					sheetId = element["sheetId"];
 
@@ -802,7 +815,7 @@
 			getUserId: function() {
 				return this.UserId;
 			}
-		}
+		};
 
 		function CRecalcIndexElement(recalcType, position, bIsSaveIndex) {
 			if ( !(this instanceof CRecalcIndexElement) ) {
@@ -909,11 +922,32 @@
 			// Пересчет для других
 			getLockOther: function (position, type) {
 				var newPosition = position;
-				var count = this._arrElements.length;
+				/*var count = this._arrElements.length;
 				for (var i = 0; i < count; ++i) {
 					newPosition = this._arrElements[i].getLockOther(newPosition, type);
 					if (null === newPosition)
 						break;
+				}*/
+
+				var count = this._arrElements.length;
+				if (0 >= count)
+					return newPosition;
+				// Для пересчета, когда добавил сам - обратный порядок
+				// Для пересчета, когда добавил кто-то другой - прямой
+				var bIsDirect = !this._arrElements[0].m_bIsSaveIndex;
+				var i;
+				if (bIsDirect) {
+					for (i = 0; i < count; ++i) {
+						newPosition = this._arrElements[i].getLockOther(newPosition, type);
+						if (null === newPosition)
+							break;
+					}
+				} else {
+					for (i = count - 1; i >= 0; --i) {
+						newPosition = this._arrElements[i].getLockOther(newPosition, type);
+						if (null === newPosition)
+							break;
+					}
 				}
 
 				return newPosition;
@@ -934,10 +968,24 @@
 			getLockMe: function (position) {
 				var newPosition = position;
 				var count = this._arrElements.length;
-				for (var i = count - 1; i >= 0; --i) {
-					newPosition = this._arrElements[i].getLockMe(newPosition);
-					if (null === newPosition)
-						break;
+				if (0 >= count)
+					return newPosition;
+				// Для пересчета, когда добавил сам - обратный порядок
+				// Для пересчета, когда добавил кто-то другой - прямой
+				var bIsDirect = this._arrElements[0].m_bIsSaveIndex;
+				var i;
+				if (bIsDirect) {
+					for (i = 0; i < count; ++i) {
+						newPosition = this._arrElements[i].getLockMe(newPosition);
+						if (null === newPosition)
+							break;
+					}
+				} else {
+					for (i = count - 1; i >= 0; --i) {
+						newPosition = this._arrElements[i].getLockMe(newPosition);
+						if (null === newPosition)
+							break;
+					}
 				}
 
 				return newPosition;
@@ -946,10 +994,24 @@
 			getLockMe2: function (position) {
 				var newPosition = position;
 				var count = this._arrElements.length;
-				for (var i = count - 1; i >= 0; --i) {
-					newPosition = this._arrElements[i].getLockMe2(newPosition);
-					if (null === newPosition)
-						break;
+				if (0 >= count)
+					return newPosition;
+				// Для пересчета, когда добавил сам - обратный порядок
+				// Для пересчета, когда добавил кто-то другой - прямой
+				var bIsDirect = this._arrElements[0].m_bIsSaveIndex;
+				var i;
+				if (bIsDirect) {
+					for (i = 0; i < count; ++i) {
+						newPosition = this._arrElements[i].getLockMe2(newPosition);
+						if (null === newPosition)
+							break;
+					}
+				} else {
+					for (i = count - 1; i >= 0; --i) {
+						newPosition = this._arrElements[i].getLockMe2(newPosition);
+						if (null === newPosition)
+							break;
+					}
 				}
 
 				return newPosition;
