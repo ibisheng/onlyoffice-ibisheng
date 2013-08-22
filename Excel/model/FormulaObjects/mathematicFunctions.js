@@ -3148,7 +3148,7 @@ cFormulaFunction.Mathematic = {
             for ( var i = 0; i < arg.length; i++ ) {
 
                 if ( arg[i] instanceof cArea3D )
-                    return this.value = new cError( bad_reference );
+                    return this.value = new cError( cErrorType.bad_reference );
 
                 if ( arg[i] instanceof cArea || arg[i] instanceof cArray ) {
                     resArr[i] = arg[i].getMatrix();

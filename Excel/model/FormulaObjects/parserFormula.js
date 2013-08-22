@@ -2425,7 +2425,10 @@ cName.prototype.toRef = function ( wsID ) {
         _wsFrom = _3DRefTmp[1];
         _wsTo = ( (_3DRefTmp[2] !== null) && (_3DRefTmp[2] !== undefined) ) ? _3DRefTmp[2] : _wsFrom;
         if ( parserHelp.isArea( ref, ref.indexOf( "!" ) + 1 ) ) {
-            return new cArea3D( parserHelp.operand_str, _wsFrom, _wsTo, this.wb );
+            if( _wsFrom == _wsTo )
+                return new cArea( parserHelp.operand_str, this.wb.getWorksheetByName(_wsFrom) );
+            else
+                return new cArea3D( parserHelp.operand_str, _wsFrom, _wsTo, this.wb );
         }
         else if ( parserHelp.isRef( ref, ref.indexOf( "!" ) + 1 ) ) {
             return new cRef3D( parserHelp.operand_str, _wsFrom, this.wb );
