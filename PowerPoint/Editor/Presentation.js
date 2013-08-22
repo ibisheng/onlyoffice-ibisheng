@@ -615,19 +615,26 @@ CPresentation.prototype = {
             return;
         }
         var curSlide = this.Slides[this.CurPage];
-        var master = curSlide.Layout.Master;
-        if(curSlide.calculatedType == null)
+        var master;
+        if(curSlide)
+            master = curSlide.Layout.Master;
+        if(curSlide && curSlide.calculatedType == null)
         {
             curSlide.Layout.calculateType();
         }
 
         var matchingLayout;
-        if(layoutIndex == null)
+        if(curSlide && layoutIndex == null)
         {
             matchingLayout = curSlide.Layout.Master.getMatchingLayout(curSlide.Layout.type, curSlide.Layout.matchingName, curSlide.Layout.cSld.name);
         }
+        else if(master)
+        {
+            matchingLayout = master.sldLayoutLst[layoutIndex];
+        }
         else
         {
+            master = this.slideMasters[0];
             matchingLayout = master.sldLayoutLst[layoutIndex];
         }
         //getMatchingLayout(layoutType != null ? layoutType :curSlide.Layout.calculatedType);//layoutType != undefined ? layoutType : ((curSlide.Layout.type == nSldLtTTitle)  ? nSldLtTObj : curSlide.Layout.type), null, null);
@@ -728,7 +735,6 @@ CPresentation.prototype = {
 
         this.Document_UpdateUndoRedoState();
     },
-
 
     deleteSlides : function(arrInd)
     {
@@ -1869,6 +1875,7 @@ CPresentation.prototype = {
     // Пересчет содержимого Документа
     Recalculate : function()
     {
+
         this.DrawingDocument.OnRecalculatePage( this.CurPage, this.Slides[this.CurPage] );
         this.DrawingDocument.OnEndRecalculate();
         //TODO: Пока обновляем состояние линейки после каждого обсчета. Надо будет переделать.
