@@ -3806,7 +3806,7 @@
 
                 // TODO: отступы
 
-                if (c.getAngle() || 0) {
+                if ((c.getAngle() || 0) && !this.rows[row].isCustomHeight) {
 
                     if (this.isChanged) {
                         if (textBound) {
