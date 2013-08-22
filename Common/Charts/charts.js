@@ -784,6 +784,8 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 	var api_doc = window["editor"];
 	var api_sheet = window["Asc"]["editor"];
 	var styleManager = api_doc ? api_doc.chartStyleManager : api_sheet.chartStyleManager;
+	if ( !styleManager.isReady() )
+		styleManager.init();
 	
 	arrBaseColors = styleManager.getBaseColors( parseInt(chart.styleId) );
 	var arrFormatAdobeLabels = [];
