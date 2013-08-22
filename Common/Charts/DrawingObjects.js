@@ -894,6 +894,101 @@ asc_CChart.prototype = {
 		return this.Id;
 	},
 	
+	getObjectType: function() {
+        return CLASS_TYPE_CHART_DATA;
+    },
+	
+	Write_ToBinary2: function(Writer) {
+		
+		Writer.WriteLong(CLASS_TYPE_CHART_DATA);
+		Writer.WriteString2( this.Id );
+		
+		Writer.WriteString2( this.type );
+		Writer.WriteString2( this.subType );
+		Writer.WriteLong( this.styleId );
+		
+		Writer.WriteBool( this.bShowValue );
+		Writer.WriteBool( this.bShowBorder );
+		
+		// Header
+		Writer.WriteString2( this.header.title );
+		Writer.WriteString2( this.header.subTitle );
+		Writer.WriteBool( this.header.bDefaultTitle );
+			
+		// Range
+		Writer.WriteString2( this.range.interval );
+		Writer.WriteBool( this.range.rows );
+		Writer.WriteBool( this.range.columns );
+			
+		// Axis X
+		Writer.WriteString2( this.xAxis.title );
+		Writer.WriteBool( this.xAxis.bDefaultTitle );
+		Writer.WriteBool( this.xAxis.bShow );
+		Writer.WriteBool( this.xAxis.bGrid );
+		
+		// Axis Y
+		Writer.WriteString2( this.yAxis.title );
+		Writer.WriteBool( this.yAxis.bDefaultTitle );
+		Writer.WriteBool( this.yAxis.bShow );
+		Writer.WriteBool( this.yAxis.bGrid );
+		
+		// Legend
+		Writer.WriteString2( this.legend.position );
+		Writer.WriteBool( this.legend.bShow );
+		Writer.WriteBool( this.legend.bOverlay );
+	},
+	
+	Read_FromBinary2: function(Reader) {
+		
+		this.Id = Reader.GetString2();
+		
+		this.type = Reader.GetString2();
+		this.subType = Reader.GetString2();
+		this.styleId = Reader.GetLong();
+		
+		this.bShowValue = Reader.GetBool();
+		this.bShowBorder = Reader.GetBool();
+		
+		// Header
+		this.header.title = Reader.GetString2();
+		this.header.subTitle = Reader.GetString2();
+		this.header.bDefaultTitle = Reader.GetBool();
+		
+		// Range
+		this.range.interval = Reader.GetString2();
+		this.range.rows = Reader.GetBool();
+		this.range.columns = Reader.GetBool();
+			
+		// Axis X
+		this.xAxis.title = Reader.GetString2();
+		this.xAxis.bDefaultTitle = Reader.GetBool();
+		this.xAxis.bShow = Reader.GetBool();
+		this.xAxis.bGrid = Reader.GetBool();
+		
+		// Axis Y
+		this.yAxis.title = Reader.GetString2();
+		this.yAxis.bDefaultTitle = Reader.GetBool();
+		this.yAxis.bShow = Reader.GetBool();
+		this.yAxis.bGrid = Reader.GetBool();
+		
+		// Legend
+		this.legend.position = Reader.GetString2();
+		this.legend.bShow = Reader.GetBool();
+		this.legend.bOverlay = Reader.GetBool();
+	},
+	
+	Save_Changes: function(data, Writer) {
+		this.Write_ToBinary2(Writer);
+	},
+	
+	Load_Changes: function(Reader) {
+		Reader.GetLong();	// CLASS_TYPE_CHART_DATA
+		this.Read_FromBinary2(Reader);
+	},
+	
+	Refresh_RecalcData: function(data) {
+	},
+	
 	Undo: function(type, data) {
 		
 		switch (type) {
@@ -2906,15 +3001,14 @@ function DrawingObjects() {
 			}
 		}
 		
-		// Селекты для комментариев, фильтров и т.д.
-		worksheet._drawGraphic();
+		worksheet._drawCollaborativeElements(false);
 		
 		for ( var i = 0; i < _this.controller.selectedObjects.length; i++ ) {
 			if ( _this.controller.selectedObjects[i].isChart() ) {
 				_this.selectDrawingObjectRange(_this.controller.selectedObjects[i].Id);
+				_this.controller.selectedObjects[i].draw(shapeOverlayCtx);
 			}
 		}
-		_this.raiseLayerDrawingObjects();
 
         if (null == drDoc.m_oDocumentRenderer)
         {
@@ -3089,8 +3183,8 @@ function DrawingObjects() {
 		var _w = checker.Bounds.max_x - checker.Bounds.min_x;
 		var _h = checker.Bounds.max_y - checker.Bounds.min_y;
 		
-		overlayCtx.clearRect( mmToPt(checker.Bounds.min_x + pxToMm(scrollOffset.x)), mmToPt(checker.Bounds.min_y + pxToMm(scrollOffset.y)), mmToPt(_w), mmToPt(_h) );
-		drawingCtx.clearRect( mmToPt(checker.Bounds.min_x + pxToMm(scrollOffset.x)), mmToPt(checker.Bounds.min_y + pxToMm(scrollOffset.y)), mmToPt(_w), mmToPt(_h) );
+		//overlayCtx.clearRect( mmToPt(checker.Bounds.min_x + pxToMm(scrollOffset.x)), mmToPt(checker.Bounds.min_y + pxToMm(scrollOffset.y)), mmToPt(_w), mmToPt(_h) );
+		//drawingCtx.clearRect( mmToPt(checker.Bounds.min_x + pxToMm(scrollOffset.x)), mmToPt(checker.Bounds.min_y + pxToMm(scrollOffset.y)), mmToPt(_w), mmToPt(_h) );
 	
 		var foundRow = worksheet._findRowUnderCursor( mmToPt(checker.Bounds.min_y + pxToMm(scrollOffset.y)), true);		
 		var topRow = foundRow ? foundRow.row : 0;
@@ -3111,10 +3205,12 @@ function DrawingObjects() {
 	_this.raiseLayerDrawingObjects = function() {
 		
 		for ( var i = 0; i < aObjects.length; i++ ) {
-			var boundsChecker = _this.getBoundsChecker(aObjects[i]);
+			/*var boundsChecker = _this.getBoundsChecker(aObjects[i]);
 			var _w = boundsChecker.Bounds.max_x - boundsChecker.Bounds.min_x;
 			var _h = boundsChecker.Bounds.max_y - boundsChecker.Bounds.min_y;
-			overlayCtx.clearRect( mmToPt(boundsChecker.Bounds.min_x + pxToMm(scrollOffset.x)), mmToPt(boundsChecker.Bounds.min_y + pxToMm(scrollOffset.y)), mmToPt(_w), mmToPt(_h) );
+			overlayCtx.clearRect( mmToPt(boundsChecker.Bounds.min_x + pxToMm(scrollOffset.x)), mmToPt(boundsChecker.Bounds.min_y + pxToMm(scrollOffset.y)), mmToPt(_w), mmToPt(_h) );*/
+			
+			aObjects[i].graphicObject.draw(shapeOverlayCtx);
 		}
 	}	
 
@@ -3146,9 +3242,6 @@ function DrawingObjects() {
 		}
 		}
 		*****************************************/
-
-		//var date = new Date();
-		//var timeBefore = date.getTime();
 		
 		if ( drawingCtx ) {
 			
@@ -3187,11 +3280,7 @@ function DrawingObjects() {
 				_this.raiseLayerDrawingObjects();
 
 			_this.drawWorksheetHeaders();
-		}
-		
-		//date = new Date();
-		//var drawTime = date.getTime() - timeBefore;
-		//console.log("Draw time = " + drawTime);
+		}		
 	}
 
 	_this.getDrawingAreaMetrics = function() {
@@ -4269,6 +4358,11 @@ function DrawingObjects() {
 	}
 
 	_this.getAscChartObject = function() {
+	
+		if ( !api.chartStyleManager.isReady() )
+			api.chartStyleManager.init();
+		if ( !api.chartPreviewManager.isReady() )
+			api.chartPreviewManager.init();
 
         var chart = this.controller.getAscChartObject();
 		if ( !chart ) {

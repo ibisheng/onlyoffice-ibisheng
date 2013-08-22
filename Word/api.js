@@ -673,6 +673,18 @@ asc_docs_api.prototype.sync_BeginCatchSelectedElements = function()
 }
 asc_docs_api.prototype.sync_EndCatchSelectedElements = function()
 {
+	if ( !this.chartStyleManager.isReady() || !this.chartPreviewManager.isReady() )
+	{
+		for ( var i = 0; i < this.SelectedObjectsStack.length; i++ )
+		{
+			if ( this.SelectedObjectsStack[i].Value.ChartProperties )
+			{
+				this.chartStyleManager.init();
+				this.chartPreviewManager.init();
+				break;
+			}
+		}
+	}
     this.asc_fireCallback("asc_onFocusObject", this.SelectedObjectsStack);
 }
 asc_docs_api.prototype.getSelectedElements = function(bUpdate)

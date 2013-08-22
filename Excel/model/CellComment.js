@@ -497,7 +497,7 @@ function asc_CCellCommentator(currentSheet) {
 	var isViewerMode =  function() { return _this.worksheet._trigger("getViewerMode"); };
 	
 	_this.worksheet = currentSheet;
-	_this.overlayCtx = currentSheet.overlayCtx;
+	_this.overlayCtx = currentSheet.drawingCtx;
 
 	// Drawing settings
 	_this.bShow = true;

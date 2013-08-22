@@ -358,9 +358,6 @@ var UndoRedoDataTypes = new function() {
     this.ParagraphParaItemAdd = 68;
 
 
-
-
-
     this.Create = function(nType)
 	{
 		switch(nType)

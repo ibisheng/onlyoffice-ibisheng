@@ -2680,8 +2680,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				this.asc_ApplyColorScheme(true);
 			},
 			asc_ApplyColorScheme : function(bRedraw) {
-				this.chartStyleManager.init();
-				this.chartPreviewManager.init();
 				this.handlers.trigger("asc_onUpdateChartStyles");
 				var ws = this.wb.getWorksheet();
 				ws.objectRender.controller.applyColorScheme();
@@ -2693,6 +2691,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				}
 					
 				if (bRedraw) {
+					this.chartStyleManager.init();
+					this.chartPreviewManager.init();
+					
 					var ws = this.wb.getWorksheet();
 					// ToDo - от _reDrawFilters в будущем стоит избавиться, ведь она проставляет стили ячейкам, а это не нужно делать (сменить отрисовку)
 					// ToDo - и еще, в _reDrawFilters делается отрисовка + в drawWS делается отрисовка

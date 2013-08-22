@@ -1879,6 +1879,7 @@
 				if (this.overlayCtx) {
 					this._drawSelection();
 				}
+				this._drawGraphic();
 				this.objectRender.showDrawingObjects(true);
 				
 				return this;
@@ -2755,8 +2756,12 @@
 
 			_drawSelectionRange: function (range) {
 				
-				if ( asc["editor"].isStartAddShape )
+				if ( asc["editor"].isStartAddShape || this.objectRender.selectedGraphicObjectsExists() ) {
+					if ( this.isChartAreaEditMode ) {
+						this._drawFormulaRange(this.arrActiveChartsRanges)
+					}
 					return;
+				}
 				
 				if (c_oAscSelectionType.RangeMax === this.activeRange.type) {
 					this.activeRange.c2 = this.cols.length - 1;
@@ -2784,7 +2789,6 @@
 
 				if (!range && !aFHIntersection && !this.isFormulaEditMode && !this.activeMoveRange && !this.isChartAreaEditMode) {
 					this._drawActiveHeaders();
-					this._drawGraphic();
 					return;
 				}
 
@@ -2971,11 +2975,11 @@
 				}
 
 				if (this.isFormulaEditMode) {
-					this._drawFormulaRange(this.arrActiveFormulaRanges)
+					this._drawFormulaRange(this.arrActiveFormulaRanges);
 				}
 
 				if (this.isChartAreaEditMode) {
-					this._drawFormulaRange(this.arrActiveChartsRanges)
+					this._drawFormulaRange(this.arrActiveChartsRanges);
 				}
 
 				if (this.isSelectionDialogMode) {
@@ -3009,7 +3013,6 @@
 				
 				// restore canvas' original clipping range
 				ctx.restore();
-				this._drawGraphic();
 				
 				if ( !this.isChartAreaEditMode )
 					this.objectRender.raiseLayerDrawingObjects();
@@ -5887,7 +5890,6 @@
 				if (isCoord) {
 					var drawingInfo = this.objectRender.checkCursorDrawingObject(x, y);
 					if ( drawingInfo ) {
-						this._drawGraphic();
 						this.objectRender.OnUpdateOverlay();
 					}
 					else {

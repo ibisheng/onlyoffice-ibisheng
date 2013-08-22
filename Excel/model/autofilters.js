@@ -2621,7 +2621,7 @@
 				var zoom = ws.getZoom();
 				var x1 = x1/zoom;
 				var y1 = y1/zoom;
-				ws.overlayCtx
+				ws.drawingCtx
 					.setFillStyle(ws.settings.cells.defaultState.background)
 					.setLineWidth(1)
 					.setStrokeStyle(ws.settings.cells.defaultState.border)
@@ -2638,7 +2638,7 @@
 			{
 				var shift = 0.5;
 				var size = 4*index;
-				ws.overlayCtx
+				ws.drawingCtx
 				.beginPath()
 				.moveTo(x, y, 0, 0)
 				.lineTo(x,y - size/2, 0, 0)
@@ -2654,7 +2654,7 @@
 			{
 				var size = 4*index;
 				var shift = 0.5;
-				ws.overlayCtx
+				ws.drawingCtx
 					.beginPath()
 					.moveTo(x , y , -shift, 0)
 					.lineTo(x + size,y, -shift,0.5)

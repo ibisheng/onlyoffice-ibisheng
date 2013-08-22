@@ -3132,9 +3132,6 @@ function BinaryFileReader(doc, openParams)
     };
 	this.PreLoadPrepare = function()
 	{
-		this.Document.DrawingDocument.m_oWordControl.m_oApi.chartStyleManager.init();
-		this.Document.DrawingDocument.m_oWordControl.m_oApi.chartPreviewManager.init();
-
 		var styles = this.Document.Styles.Style;
         
         var stDefault = this.Document.Styles.Default;
