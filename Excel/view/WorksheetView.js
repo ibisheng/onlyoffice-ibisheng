@@ -7239,7 +7239,11 @@
 									var hyperlinkRange = t._getCellTitle(hyperlinkRangeBBox0.c1, hyperlinkRangeBBox0.r1);
 									if (hyperlinkRangeBBox0.c1 !== hyperlinkRangeBBox0.c2 || hyperlinkRangeBBox0.r1 !== hyperlinkRangeBBox0.r2)
 										hyperlinkRange += ":" + t._getCellTitle(hyperlinkRangeBBox0.c2, hyperlinkRangeBBox0.r2);
-									location = val.asc_getSheet() + "!" + hyperlinkRange;
+									// Проверка имени листа на наличие пробелов (если в имени листа есть пробелы, то оно берется в одинарные кавычки)
+									var hyperlinkSheet = val.asc_getSheet();
+									if (hyperlinkSheet.indexOf(" "))
+										hyperlinkSheet = "'" + hyperlinkSheet + "'";
+									location = hyperlinkSheet + "!" + hyperlinkRange;
 								}
 								var newHyperlink = new Hyperlink();
 								newHyperlink.Hyperlink = val.asc_getHyperlinkUrl();
