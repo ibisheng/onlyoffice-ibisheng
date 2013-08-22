@@ -830,7 +830,7 @@ asc_CChart.prototype = {
 					ser.xVal.NumCache = getNumCache( bbox.c1 + (parsedHeaders.bLeft ? 1 : 0), bbox.c2, bbox.r1, bbox.r1 );
 				}
 				
-				var seriaName = parsedHeaders.bLeft ? ( _t.range.intervalObject.worksheet.getCell(new CellAddress(i, bbox.c1, 0)).getValue() ) : (api.chartTranslate.series + nameIndex);
+				var seriaName = parsedHeaders.bLeft ? ( _t.range.intervalObject.worksheet.getCell(new CellAddress(i, bbox.c1, 0)).getValue() ) : (api.chartTranslate.series + " " + nameIndex);
 				ser.Tx = seriaName;
 				_t.series.push(ser);
 				nameIndex++;
@@ -865,12 +865,42 @@ asc_CChart.prototype = {
 					ser.xVal.NumCache = getNumCache( bbox.c1, bbox.c1, bbox.r1 + (parsedHeaders.bTop ? 1 : 0), bbox.r2 );
 				}
 				
-				var seriaName = parsedHeaders.bTop ? ( _t.range.intervalObject.worksheet.getCell(new CellAddress(bbox.r1, i, 0)).getValue() ) : (api.chartTranslate.series + nameIndex);
+				var seriaName = parsedHeaders.bTop ? ( _t.range.intervalObject.worksheet.getCell(new CellAddress(bbox.r1, i, 0)).getValue() ) : (api.chartTranslate.series + " " + nameIndex);
 				ser.Tx = seriaName;
 				_t.series.push(ser);
 				nameIndex++;
 			}
 		}
+		
+		// Colors
+		var seriaUniColors = _t.generateUniColors(_t.series.length);
+		
+		if ( _t.type == c_oAscChartType.hbar )
+			seriaUniColors = OfficeExcel.array_reverse(seriaUniColors);
+		
+		for ( var i = 0; i < _t.series.length; i++ ) {
+			_t.series[i].OutlineColor = seriaUniColors[i];
+		}
+	},
+	
+	generateUniColors: function(count) {
+		var uniColors = [];
+		var api = window["Asc"]["editor"];
+		
+		if ( count > 0 ) {
+			if ( !api.chartStyleManager.isReady() )
+				api.chartStyleManager.init();
+				
+			var baseColors = api.chartStyleManager.getBaseColors( parseInt(this.styleId) );
+			var colors = generateColors(count, baseColors, true);
+		}
+		for ( var i = 0; i < colors.length; i++ ) {
+			var rgbColor = new RGBColor(colors[i]);
+			var uniColor = CreateUniColorRGB(rgbColor.r, rgbColor.g, rgbColor.b);
+			uniColors.push(uniColor);
+		}
+		
+		return uniColors;
 	},
 	
 	getLegendInfo: function() {
@@ -2844,6 +2874,22 @@ function DrawingObjects() {
 		copyObject.to.rowOff = obj.to.rowOff;
 		
 		copyObject.graphicObject = obj.graphicObject;
+		
+		// Series colors
+		if ( copyObject.graphicObject instanceof  CChartAsGroup ) {
+		
+			var chart = copyObject.graphicObject.chart;
+			var uniColors = chart.generateUniColors(chart.series.length);
+			
+			if ( chart.type == c_oAscChartType.hbar )
+				uniColors = OfficeExcel.array_reverse(uniColors);
+			
+			for (var i = 0; i < chart.series.length; i++) {
+				if ( !chart.series[i].OutlineColor )
+					chart.series[i].OutlineColor = uniColors[i];
+			}
+		}
+		
 		return copyObject;
 	}
 

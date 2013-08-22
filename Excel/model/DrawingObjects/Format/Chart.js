@@ -528,6 +528,7 @@ CChartAsGroup.prototype =
 				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_LegendIsOverlay, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.legend.bOverlay, chart.legend.bOverlay)));
 				this.chart.legend.bOverlay = chart.legend.bOverlay;
 			}
+			this.chart.rebuildSeries();
 		}
 		else
 			this.chart = chart;
