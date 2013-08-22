@@ -2887,6 +2887,8 @@ function DrawingObjects() {
 			for (var i = 0; i < chart.series.length; i++) {
 				if ( !chart.series[i].OutlineColor )
 					chart.series[i].OutlineColor = uniColors[i];
+				if ( !chart.series[i].Tx )
+					chart.series[i].Tx = api.chartTranslate.series + " " + (i + 1);
 			}
 		}
 		
