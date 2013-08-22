@@ -1313,6 +1313,32 @@ function recalc(wb){
 	}
 }
 
+function angleFormatToInterface(val)
+{
+	var nRes = 0;
+	if(0 <= val && val <= 180)
+		nRes = val <= 90 ? val : 90 - val;
+	return nRes;
+}
+function angleFormatToInterface2(val)
+{
+	if(g_nVerticalTextAngle == val)
+		return val;
+	else
+		return angleFormatToInterface(val);
+}
+function angleInterfaceToFormat(val)
+{
+	var nRes = val;
+	if(-90 <= val && val <= 90)
+	{
+		if(val < 0)
+			nRes = 90 - val;
+	}
+	else if(g_nVerticalTextAngle != val)
+		nRes = 0;
+	return nRes;
+}
 //-------------------------------------------------------------------------------------------------
 $(function(){
 	aStandartNumFormats = new Array();
@@ -6555,28 +6581,23 @@ Range.prototype.getAngle=function(){
 	var nRow = this.bbox.r1;
 	var nCol = this.bbox.c1;
 	var cell = this.worksheet._getCellNoEmpty(nRow, nCol);
-	var fProcAngle = function(val){
-		if(0 <= val && val <= 180)
-			return val <= 90 ? val : 90 - val;
-		return 0;
-	};
 	if(null != cell)
     {
 		var xfs = cell.getStyle();
         if(null != xfs && null != xfs.align)
-            return fProcAngle(xfs.align.angle);
+            return angleFormatToInterface(xfs.align.angle);
     }
 	else
 	{
 		//стили столбов и колонок
 		var row = this.worksheet._getRowNoEmpty(nRow);
 		if(null != row && null != row.xfs && null != row.xfs.align)
-			return fProcAngle(row.xfs.align.angle);
+			return angleFormatToInterface(row.xfs.align.angle);
 		var col = this.worksheet._getColNoEmptyWithAll(nCol);
 		if(null != col && null != col.xfs && null != col.xfs.align)
-			return fProcAngle(col.xfs.align.angle);
+			return angleFormatToInterface(col.xfs.align.angle);
 	}
-    return fProcAngle(g_oDefaultAlign.angle);
+    return angleFormatToInterface(g_oDefaultAlign.angle);
 };
 Range.prototype.getVerticalText=function(){
 	var nRow = this.bbox.r1;

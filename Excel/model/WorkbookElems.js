@@ -1811,18 +1811,12 @@ StyleManager.prototype =
     setAngle : function(oItemWithXfs, val)
     {
         var xfs = oItemWithXfs.xfs;
-		if(-90 <= val && val <= 90)
-		{
-			if(val < 0)
-				val = 90 - val;
-		}
-		else if(g_nVerticalTextAngle != val)
-			val = 0;
-        var oRes = {newVal: val, oldVal: null};
+		var oRes = {newVal: val, oldVal: null};
+		val = angleInterfaceToFormat(val);
         if(null != xfs && null != xfs.align)
-            oRes.oldVal = xfs.align.angle;
+            oRes.oldVal = angleFormatToInterface2(xfs.align.angle);
 		else
-			oRes.oldVal = g_oDefaultAlign.angle;
+			oRes.oldVal = angleFormatToInterface2(g_oDefaultAlign.angle);
         if(null == val)
         {
             if(null != xfs && null != xfs.align)
