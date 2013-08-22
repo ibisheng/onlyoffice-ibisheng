@@ -227,11 +227,12 @@ CDocument.prototype.Search_Replace = function(NewStr, bAll, Id)
             CheckParagraphs.push( this.SearchEngine.Elements[Id] );
     }
 
+    var AllCount = this.SearchEngine.Count;
+
     if ( false === this.Document_Is_SelectionLocked( changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : CheckParagraphs, CheckType : changestype_Paragraph_Content } ) )
     {
         History.Create_NewPoint();
 
-        var AllCount = this.SearchEngine.Count;
         if ( true === bAll )
             this.SearchEngine.Replace_All( NewStr );
         else
@@ -246,12 +247,12 @@ CDocument.prototype.Search_Replace = function(NewStr, bAll, Id)
         bResult = true;
 
         if ( true === bAll )
-            editor.sync_ReplaceAllCallback(AllCount);
+            editor.sync_ReplaceAllCallback(AllCount, AllCount);
     }
     else
     {
         if ( true === bAll )
-            editor.sync_ReplaceAllCallback(0);
+            editor.sync_ReplaceAllCallback(0, AllCount);
     }
 
     this.Document_UpdateInterfaceState();

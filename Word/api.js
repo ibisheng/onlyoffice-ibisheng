@@ -2803,9 +2803,9 @@ asc_docs_api.prototype.asc_isSelectSearchingResults = function()
     return this.WordControl.m_oLogicDocument.Search_Get_Selection();
 }
 
-asc_docs_api.prototype.sync_ReplaceAllCallback = function(Count)
+asc_docs_api.prototype.sync_ReplaceAllCallback = function(ReplaceCount, OverallCount)
 {
-    this.asc_fireCallback("asc_onReplaceAll", Count);
+    this.asc_fireCallback("asc_onReplaceAll", ReplaceCount, OverallCount);
 }
 
 asc_docs_api.prototype.sync_SearchEndCallback = function()
