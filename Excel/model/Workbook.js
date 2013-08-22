@@ -7971,6 +7971,7 @@ Range.prototype.sort=function(nOption, nStartCol){
 }
 Range.prototype._sortByArray=function(oBBox, aSortData, bUndo){
 	//сортируются только одинарные гиперссылки, все неодинарные убираем и восстанавливаем после сортировки
+    var rec = {length:0};
 	var oExpandedHyperlinkRange = new Object();
 	var oSortRange = this.worksheet.getRange3(oBBox.r1, oBBox.c1, oBBox.r2, oBBox.c2);
 	oSortRange._setPropertyNoEmpty(null, null, function(cell, nRow0, nCol0, nRowStart, nColStart){
@@ -8032,7 +8033,9 @@ Range.prototype._sortByArray=function(oBBox, aSortData, bUndo){
 					this.worksheet.workbook.dependencyFormulas.deleteMasterNodes( this.worksheet.Id, lastName );//разрываем ссылки между старой ячейкой и ведущими ячейками для нее.
 					delete this.worksheet.workbook.cwf[this.worksheet.Id].cells[lastName];
 					this.worksheet._BuildDependencies({sNewName:sNewName})// строим новые зависимости для новой ячейки.
-					this.worksheet._RecalculatedFunctions(sNewName);// пересчитываем новую ячейку.
+                    rec[sNewName] = [ this.worksheet.getId(), sNewName ];
+                    rec.length++;
+//					this.worksheet._RecalculatedFunctions(sNewName);// пересчитываем новую ячейку.
 				}
 				else{
 					sortDependency(this.worksheet, {sNewName:sNewName});
@@ -8055,6 +8058,12 @@ Range.prototype._sortByArray=function(oBBox, aSortData, bUndo){
 		var hyperlink = oExpandedHyperlinkRange[i];
 		hyperlink.Ref.setHyperlink(hyperlink);
 	}
+
+//    this.worksheet.workbook.buildDependency();
+    this.worksheet.workbook.needRecalc = rec;
+
+    recalc(this.worksheet.workbook);
+
 };
 Range.prototype.promote=function(bCtrl, bVertical, nIndex){
 	var oBBox = this.bbox;
