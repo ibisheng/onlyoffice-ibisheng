@@ -58,8 +58,20 @@ CBarFraction.prototype.setSimple = function(flag)
         this.setReduct(DEGR_REDUCT);
     else
         this.setReduct(1);
+
+    this.Resize();
 }
-CBarFraction.prototype.getTxtPrp = function()
+
+/*CBarFraction.prototype.getTxtPrp_2 = function()
+{
+    var txtPrp = new CMathTextPrp();
+    txtPrp.Merge(this.TxtPrp);
+
+    txtPrp.FontSze *= this.reduct;
+
+    return txtPrp;
+}*/
+/*CBarFraction.prototype.getTxtPrp = function()
 {
     var txtPrp = CBarFraction.superclass.getTxtPrp.call(this);
 
@@ -67,7 +79,7 @@ CBarFraction.prototype.getTxtPrp = function()
         txtPrp.FontSize *= DEGR_REDUCT; // делаем здес, чтобы учесть при пересчете расстояний
 
     return txtPrp;
-}
+}*/
 //////////
 
 function CNumerator()
@@ -84,6 +96,7 @@ CNumerator.prototype.recalculateSize = function()
 {
     var arg = this.elements[0][0].size;
     var txtPrp = this.getTxtPrp();
+    txtPrp.FontSize *= this.Parent.reduct;
 
     var Descent = arg.height - arg.ascent; // baseLine
     var gap = 7.832769097222222 * txtPrp.FontSize/36,
@@ -143,6 +156,7 @@ CDenominator.prototype.recalculateSize = function()
 {
     var arg = this.elements[0][0].size;
     var txtPrp = this.getTxtPrp();
+    txtPrp.FontSize *= this.Parent.reduct;
 
     var gap = 7.832769097222222 * txtPrp.FontSize/36,
         Ascent = arg.center -  4.938888888888888*txtPrp.FontSize/36,

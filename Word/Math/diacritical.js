@@ -662,7 +662,7 @@ CAccent.prototype.recalculateSize = function()
 }
 CAccent.prototype.getCenter = function()
 {
-    return this.elements[0][0].size.height + this.elements[1][0].size.center;
+    return this.elements[0][0].size.height + this.elements[1][0].size.center + this.dH;
 }
 CAccent.prototype.setPosition = function(pos)
 {

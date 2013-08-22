@@ -96,8 +96,8 @@ CMathBase.prototype =
         txtPrp.Merge(this.TxtPrp);
         txtPrp.Merge(this.OwnTPrp);
 
-        if( typeof(txtPrp.FontSize) !== "undefined" )
-            txtPrp.FontSize *= this.reduct;
+        /*if( typeof(txtPrp.FontSize) !== "undefined" )
+            txtPrp.FontSize *= this.reduct;*/
 
         return txtPrp ;
     },
@@ -131,10 +131,6 @@ CMathBase.prototype =
                 if(!this.elements[i][j].IsJustDraw())
                     this.elements[i][j].setComposition(Compos);
             }
-    },
-    getRunPrp: function()
-    {
-        return this.TxtPrp;
     },
     old_setRunPrp: function(txtPrp)
     {

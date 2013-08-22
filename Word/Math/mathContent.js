@@ -423,7 +423,7 @@ CMathContent.prototype =
         if( mathElem !== null )
         {
             mathElem.relate(this);
-            mathElem.setReduct(this.reduct);
+            //mathElem.setReduct(this.reduct);
             var runPrp = this.getRunPrp(this.CurPos);
             mathElem.setTxtPrp( runPrp );
             //mathElem.setRunPrp( runPrp );
