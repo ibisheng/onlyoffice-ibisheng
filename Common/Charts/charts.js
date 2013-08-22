@@ -1504,10 +1504,12 @@ function arrReverse(arr) {
 function drawChart(chart, arrValues, width, height) {
 
 	var data = arrValues;
-	var api = window["Asc"]["editor"];
-	var defaultXTitle = api.chartTranslate.xAxis;
-	var defaultYTitle = api.chartTranslate.yAxis;
-	var defaultTitle = api.chartTranslate.title;
+	var api_doc = window["editor"];
+	var api_sheet = window["Asc"]["editor"];
+	
+	var defaultXTitle = api_sheet ? api_sheet.chartTranslate.xAxis : api_doc.chartTranslate.xAxis;
+	var defaultYTitle = api_sheet ? api_sheet.chartTranslate.yAxis : api_doc.chartTranslate.yAxis;
+	var defaultTitle = api_sheet ? api_sheet.chartTranslate.title : api_doc.chartTranslate.title;
 	
 	if(OfficeExcel.drawingCtxCharts)
 		OfficeExcel.drawingCtxCharts.setCanvas(chartCanvas);

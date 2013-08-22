@@ -538,6 +538,10 @@ function asc_docs_api(name)
 	// Spell Checking
 	this.SpellCheckApi = new CSpellCheckApi();
 	this.isSpellCheckEnable = true;
+	
+	// Chart
+	this.chartTranslate = new asc_CChartTranslate();
+	
     /**************************************/
 
 	// AutoSave
