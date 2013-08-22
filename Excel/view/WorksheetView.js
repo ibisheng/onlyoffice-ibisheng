@@ -1875,7 +1875,7 @@
 				this._drawCells();
 				this._drawCellsBorders(/*drawingCtx*/undefined);
 				this._fixSelectionOfMergedCells();
-				this._fixSelectionOfHiddenCells(undefined, undefined, /*isDraw*/true);
+				this._fixSelectionOfHiddenCells();
 				if (this.overlayCtx) {
 					this._drawSelection();
 				}
@@ -4732,7 +4732,16 @@
 
 			scrollVertical: function (delta, editor) {
 				var vr = this.visibleRange;
+				var reinitScrollY = false;
 				var start = this._calcCellPosition(vr.c1, vr.r1, 0, delta).row;
+				var fixStartRow = asc_Range(vr.c1, start, vr.c2, start);
+				fixStartRow.startCol = vr.c1;
+				fixStartRow.startRow = start;
+				this._fixSelectionOfHiddenCells(0, delta >= 0 ? +1 : -1, fixStartRow);
+				reinitScrollY = start !== fixStartRow.r1;
+				if (reinitScrollY && 0 > delta) // Для скролла вверх обычный сдвиг + дорисовка
+					delta += fixStartRow.r1 - start;
+				start = fixStartRow.r1;
 
 				if (start === vr.r1) {return this;}
 
@@ -4813,6 +4822,9 @@
 					if (widthChanged) {this._trigger("reinitializeScrollX");}
 				}
 
+				if (reinitScrollY)
+					this._trigger("reinitializeScrollY");
+
 				this._updateHyperlinksCache();
 				this.cellCommentator.updateCommentPosition();
 				this.drawDepCells();
@@ -4822,7 +4834,16 @@
 
 			scrollHorizontal: function (delta, editor) {
 				var vr = this.visibleRange;
+				var reinitScrollX = false;
 				var start = this._calcCellPosition(vr.c1, vr.r1, delta, 0).col;
+				var fixStartCol = asc_Range(start, vr.r1, start, vr.r1);
+				fixStartCol.startCol = start;
+				fixStartCol.startRow = vr.r1;
+				this._fixSelectionOfHiddenCells(0, delta >= 0 ? +1 : -1, fixStartCol);
+				reinitScrollX = start !== fixStartCol.c1;
+				if (reinitScrollX && 0 > delta) // Для скролла влево обычный сдвиг + дорисовка
+					delta += fixStartCol.c1 - start;
+				start = fixStartCol.c1;
 
 				if (start === vr.c1) {return this;}
 
@@ -4865,6 +4886,9 @@
 					this._fixSelectionOfMergedCells();
 					this._drawSelection();
 				}
+
+				if (reinitScrollX)
+					this._trigger("reinitializeScrollX");
 												
 				this.cellCommentator.updateCommentPosition();
 				this._updateHyperlinksCache();
@@ -5275,9 +5299,8 @@
 				ar.r2 = ar.r1 === res.r1 ? Math.min(res.r2, this.nRowsCount - 1) : res.r1;
 			},
 
-			/* isDraw - отрисовываем ли мы из draw (после сброса) */
-			_fixSelectionOfHiddenCells: function (dc, dr, isDraw) {
-				var t = this, ar = t.activeRange, c1, c2, r1, r2, mc, i, arn = t.activeRange.clone(true);
+			_fixSelectionOfHiddenCells: function (dc, dr, range) {
+				var t = this, ar = (range) ? range : t.activeRange, c1, c2, r1, r2, mc, i, arn = ar.clone(true);
 
 				if (dc === undefined) {dc = +1;}
 				if (dr === undefined) {dr = +1;}
