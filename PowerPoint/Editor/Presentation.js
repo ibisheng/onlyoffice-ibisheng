@@ -7787,8 +7787,9 @@ CPresentation.prototype = {
     Get_SelectionState : function()
     {
         var State = {};
-        State.curSlideNum = this.CurPage;
-        State.autoShapesSelection = this.Slides[this.CurPage].elementsManipulator.getSelectionState();
+        State.curSlideNum = this.CurPage > -1 ? this.CurPage : undefined;
+        if(this.CurPage > -1)
+            State.autoShapesSelection = this.Slides[this.CurPage].elementsManipulator.getSelectionState();
         return State;
     },
 
