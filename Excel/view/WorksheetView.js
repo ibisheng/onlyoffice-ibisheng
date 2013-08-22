@@ -8701,15 +8701,19 @@
 					findFlags += "i"; // Не чувствителен к регистру
 
 				var valueForSearching = options.findWhat
-					.replace(/(~)?\*/g, function($0, $1){
-						return $1 ? $0 : '[\\w\\W]*';
-					})
-					.replace(/(~)?\?/g, function($0, $1){
-						return $1 ? $0 : '[\\w\\W]{1,1}';
-					})
-                    .replace(/(~\*)/g,"\\*").replace(/(~\?)/g, "\\?");
+                    .replace( /(\\)/g, "\\" ).replace( /(\^)/g, "\\^" )
+                    .replace( /(\()/g, "\\(" ).replace( /(\))/g, "\\)" )
+                    .replace( /(\+)/g, "\\+" ).replace( /(\[)/g, "\\[" )
+                    .replace( /(\])/g, "\\]" ).replace( /(\{)/g, "\\{" )
+                    .replace( /(\})/g, "\\}" ).replace( /(\$)/g, "\\$" )
+                    .replace( /(~)?\*/g, function ( $0, $1 ) {
+                        return $1 ? $0 : '(.*)';
+                    } )
+                    .replace( /(~)?\?/g, function ( $0, $1 ) {
+                        return $1 ? $0 : '.';
+                    } )
+                    .replace( /(~\*)/g, "\\*" ).replace( /(~\?)/g, "\\?" );
 				valueForSearching = new RegExp(valueForSearching, findFlags);
-
 				var t = this;
 				var ar = this.activeRange.clone();
 				ar.startCol = this.activeRange.startCol;

@@ -953,15 +953,24 @@ cFormulaFunction.TextAndData = {
 
             var string1 = arg0.getValue(), string2 = arg1.getValue(),
                 valueForSearching = string1
+                    .replace( /(\\)/g, "\\" )
+                    .replace( /(\^)/g, "\\^" )
+                    .replace( /(\()/g, "\\(" )
+                    .replace( /(\))/g, "\\)" )
+                    .replace( /(\+)/g, "\\+" )
+                    .replace( /(\[)/g, "\\[" )
+                    .replace( /(\])/g, "\\]" )
+                    .replace( /(\{)/g, "\\{" )
+                    .replace( /(\})/g, "\\}" )
+                    .replace( /(\$)/g, "\\$" )
                     .replace( /(~)?\*/g, function ( $0, $1 ) {
-                        return $1 ? $0 : '[\\w\\W]*';
+                        return $1 ? $0 : '(.*)';
                     } )
                     .replace( /(~)?\?/g, function ( $0, $1 ) {
-                        return $1 ? $0 : '[\\w\\W]{1,1}';
+                        return $1 ? $0 : '.';
                     } )
                     .replace( /(~\*)/g, "\\*" ).replace( /(~\?)/g, "\\?" );
-
-            valueForSearching = new RegExp( valueForSearching, "ig" )
+            valueForSearching = new RegExp( valueForSearching, "ig" );
             if ( string1 == "" )
                 return this.value = arg2;
 

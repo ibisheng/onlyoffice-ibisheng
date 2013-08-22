@@ -242,15 +242,16 @@ cFormulaFunction.LookupAndReference = {
 
             if ( arg0 instanceof cString ) {
                 valueForSearching = arg0.getValue();
-                valueForSearching = valueForSearching
-                    .replace( /(~)?\*/g, function ( $0, $1 ) {
+                /*valueForSearching = valueForSearching
+                    .replace( /(~)?\*//*g, function ( $0, $1 ) {
                         return $1 ? $0 : '[\\w\\W]*';
                     } )
                     .replace( /(~)?\?/g, function ( $0, $1 ) {
                         return $1 ? $0 : '[\\w\\W]{1,1}';
                     } )
                     .replace( /\~/g, "\\" );
-                regexp = new XRegExp( valueForSearching + "$", "i" );
+                regexp = new XRegExp( valueForSearching + "$", "i" );*/
+                regexp = searchRegExp(valueForSearching);
             }
             else if ( arg0 instanceof cError )
                 return this.value = arg0;
@@ -672,15 +673,16 @@ cFormulaFunction.LookupAndReference = {
 
             if ( arg0 instanceof cString ) {
                 valueForSearching = arg0.getValue();
-                valueForSearching = valueForSearching
-                    .replace( /(~)?\*/g, function ( $0, $1 ) {
+                /*valueForSearching = valueForSearching
+                    .replace( /(~)?\*//*g, function ( $0, $1 ) {
                         return $1 ? $0 : '[\\w\\W]*';
                     } )
                     .replace( /(~)?\?/g, function ( $0, $1 ) {
                         return $1 ? $0 : '[\\w\\W]{1,1}';
                     } )
                     .replace( /\~/g, "\\" );
-                regexp = new XRegExp( valueForSearching + "$", "i" );
+                regexp = new XRegExp( valueForSearching + "$", "i" );*/
+                regexp = searchRegExp(valueForSearching);
             }
             else if ( arg0 instanceof cError )
                 return this.value = arg0;

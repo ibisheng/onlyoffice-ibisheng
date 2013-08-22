@@ -219,9 +219,21 @@ cFormulaFunction.Statistical = {
                 return this.value = new cError( cErrorType.wrong_value_type );
             }
 
-            function matching( x, y, oper, startCell, pos ) {
-                var res = false;
-                if ( typeof x === typeof y ) {
+            function matching( x, y, oper ) {
+                var res = false, rS;
+                if ( y instanceof cString ) {
+                    rS = searchRegExp(y.toString())
+                    switch ( oper ) {
+                        case "<>":
+                            res = !rS.test( x.value );
+                            break;
+                        case "=":
+                        default:
+                            res = rS.test( x.value );
+                            break;
+                    }
+                }
+                else if ( typeof x === typeof y ) {
                     switch ( oper ) {
                         case "<>":
                             res = (x.value != y.value);
@@ -248,38 +260,22 @@ cFormulaFunction.Statistical = {
             }
 
             arg1 = arg1.toString();
-            var operators = new RegExp( "^ *[<=> ]+ *" );
-            var match = arg1.match( operators );
-            if ( match || parseNum( arg1 ) ) {
-
-                var search, oper, val;
-                if ( match ) {
-                    search = arg1.substr( match[0].length );
-                    oper = match[0].replace( /\s/g, "" );
-                }
-                else {
-                    search = arg1;
-                }
-                valueForSearching = parseNum( search ) ? new cNumber( search ) : new cString( search );
-                if ( arg0 instanceof cArea ) {
-                    val = arg0.getValue();
-                    for ( var i = 0; i < val.length; i++ ) {
-                        if ( matching( val[i], valueForSearching, oper ) ) {
-                            var r = arg0.getRange(), ws = arg0.getWS(),
-                                r1 = r.first.getRow0() + i, c1 = arg2.getRange().first.getCol0();
-                            r = new cRef( ws.getRange3( r1, c1, r1, c1 ).getName(), ws );
-                            if ( r.getValue() instanceof cNumber ) {
-                                _sum += r.getValue().getValue();
-                                _count++;
-                            }
-                        }
-                    }
-                }
-                else {
-                    val = arg0.getValue();
-                    if ( matching( val, valueForSearching, oper ) ) {
+            var operators = new RegExp( "^ *[<=> ]+ *" ), match = arg1.match( operators ),
+                search, oper, val;
+            if ( match ) {
+                search = arg1.substr( match[0].length );
+                oper = match[0].replace( /\s/g, "" );
+            }
+            else {
+                search = arg1;
+            }
+            valueForSearching = parseNum( search ) ? new cNumber( search ) : new cString( search );
+            if ( arg0 instanceof cArea ) {
+                val = arg0.getValue();
+                for ( var i = 0; i < val.length; i++ ) {
+                    if ( matching( val[i], valueForSearching, oper ) ) {
                         var r = arg0.getRange(), ws = arg0.getWS(),
-                            r1 = r.first.getRow0() + 0, c1 = arg2.getRange().first.getCol0();
+                            r1 = r.first.getRow0() + i, c1 = arg2.getRange().first.getCol0();
                         r = new cRef( ws.getRange3( r1, c1, r1, c1 ).getName(), ws );
                         if ( r.getValue() instanceof cNumber ) {
                             _sum += r.getValue().getValue();
@@ -289,44 +285,24 @@ cFormulaFunction.Statistical = {
                 }
             }
             else {
-                valueForSearching = arg1
-                    .replace( /(~)?\*/g, function ( $0, $1 ) {
-                        return $1 ? $0 : '[\\w\\W]*';
-                    } )
-                    .replace( /(~)?\?/g, function ( $0, $1 ) {
-                        return $1 ? $0 : '[\\w\\W]{1,1}';
-                    } )
-                    .replace( /(~\*)/g, "\\*" ).replace( /(~\?)/g, "\\?" );
-                regexpSearch = new RegExp( valueForSearching + "$", "i" );
-                if ( arg0 instanceof cArea ) {
-                    val = arg0.getValue();
-                    for ( var i = 0; i < val.length; i++ ) {
-                        if ( regexpSearch.test( val[i].value ) ) {
-                            var r = arg0.getRange(), ws = arg0.getWS(),
-                                r1 = r.first.getRow0() + i, c1 = arg2.getRange().first.getCol0();
-                            r = new cRef( ws.getRange3( r1, c1, r1, c1 ).getName(), ws );
-                            if ( r.getValue() instanceof cNumber ) {
-                                _sum += r.getValue().getValue();
-                                _count++;
-                            }
-                        }
-                    }
-                }
-                else {
-                    val = arg0.getValue();
-                    if ( regexpSearch.test( val.value ) ) {
-                        var r = arg0.getRange(), ws = arg0.getWS(),
-                            r1 = r.first.getRow0() + 0, c1 = arg2.getRange().first.getCol0();
-                        r = new cRef( ws.getRange3( r1, c1, r1, c1 ).getName(), ws );
-                        if ( r.getValue() instanceof cNumber ) {
-                            _sum += r.getValue().getValue();
-                            _count++;
-                        }
+                val = arg0.getValue();
+                if ( matching( val, valueForSearching, oper ) ) {
+                    var r = arg0.getRange(), ws = arg0.getWS(),
+                        r1 = r.first.getRow0() + 0, c1 = arg2.getRange().first.getCol0();
+                    r = new cRef( ws.getRange3( r1, c1, r1, c1 ).getName(), ws );
+                    if ( r.getValue() instanceof cNumber ) {
+                        _sum += r.getValue().getValue();
+                        _count++;
                     }
                 }
             }
 
-            return this.value = new cNumber( _sum / _count );
+            if( _count == 0 ){
+                return new cError( cErrorType.division_by_zero );
+            }
+            else{
+                return this.value = new cNumber( _sum / _count );
+            }
         }
         r.getInfo = function () {
             return {
@@ -701,8 +677,20 @@ cFormulaFunction.Statistical = {
             }
 
             function matching( x, y, oper ) {
-                var res = 0;
-                if ( typeof x === typeof y ) {
+                var res = false, rS;
+                if ( y instanceof cString ) {
+                    rS = searchRegExp(y.toString())
+                    switch ( oper ) {
+                        case "<>":
+                            res = !rS.test( x.value );
+                            break;
+                        case "=":
+                        default:
+                            res = rS.test( x.value );
+                            break;
+                    }
+                }
+                else if ( typeof x === typeof y ) {
                     switch ( oper ) {
                         case "<>":
                             res = (x.value != y.value);
@@ -723,74 +711,38 @@ cFormulaFunction.Statistical = {
                         default:
                             res = (x.value == y.value);
                             break;
-
                     }
                 }
-                _count += res;
+                return res;
             }
 
             arg1 = arg1.toString();
-            var operators = new RegExp( "^ *[<=> ]+ *" ), searchOperators = new RegExp( "^ *[*?]" )
-            var match = arg1.match( operators );
-            if ( match || parseNum( arg1 ) ) {
+            var operators = new RegExp( "^ *[<=> ]+ *" ), searchOperators = new RegExp( "^ *[*?]" ), search, oper, val,
+                match = arg1.match( operators );
 
-                var search, oper, val;
-                if ( match ) {
-                    search = arg1.substr( match[0].length );
-                    oper = match[0].replace( /\s/g, "" );
+            if ( match ) {
+                search = arg1.substr( match[0].length );
+                oper = match[0].replace( /\s/g, "" );
+            }
+            else {
+                search = arg1;
+            }
+            valueForSearching = parseNum( search ) ? new cNumber( search ) : new cString( search );
+            if ( arg0 instanceof cArea ) {
+                val = arg0.getValue();
+                for ( var i = 0; i < val.length; i++ ) {
+                    _count += matching( val[i], valueForSearching, oper );
                 }
-                else {
-                    search = arg1;
-                }
-                valueForSearching = parseNum( search ) ? new cNumber( search ) : new cString( search );
-                if ( arg0 instanceof cArea ) {
-                    val = arg0.getValue();
-                    for ( var i = 0; i < val.length; i++ ) {
-                        matching( val[i], valueForSearching, oper );
-                    }
-                }
-                else if ( arg0 instanceof cArea3D ) {
-                    val = arg0.getValue();
-                    for ( var i = 0; i < val.length; i++ ) {
-                        matching( val[i], valueForSearching, oper );
-                    }
-                }
-                else {
-                    val = arg0.getValue();
-                    matching( val, valueForSearching, oper );
+            }
+            else if ( arg0 instanceof cArea3D ) {
+                val = arg0.getValue();
+                for ( var i = 0; i < val.length; i++ ) {
+                    _count += matching( val[i], valueForSearching, oper );
                 }
             }
             else {
-                match = arg1.match( searchOperators )
-                if ( match ) {
-                    valueForSearching = arg1
-                        .replace( /(~)?\*/g, function ( $0, $1 ) {
-                            return $1 ? $0 : '[\\w\\W]*';
-                        } )
-                        .replace( /(~)?\?/g, function ( $0, $1 ) {
-                            return $1 ? $0 : '[\\w\\W]{1,1}';
-                        } )
-                        .replace( /(~\*)/g, "\\*" ).replace( /(~\?)/g, "\\?" )
-                    regexpSearch = new RegExp( valueForSearching + "$", "i" );
-                    if ( arg0 instanceof cArea ) {
-                        val = arg0.getValue();
-                        for ( var i = 0; i < val.length; i++ ) {
-                            _count += regexpSearch.test( val[i].value );
-                        }
-                    }
-                    else if ( arg0 instanceof cArea3D ) {
-                        val = arg0.getValue();
-                        for ( var i in val ) {
-                            for ( var j in val[i] ) {
-                                _count += regexpSearch.test( val[i][j].value );
-                            }
-                        }
-                    }
-                    else {
-                        val = arg0.getValue();
-                        _count += regexpSearch.test( val.value );
-                    }
-                }
+                val = arg0.getValue();
+                _count += matching( val, valueForSearching, oper );
             }
 
             return this.value = new cNumber( _count );
