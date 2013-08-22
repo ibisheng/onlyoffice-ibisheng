@@ -156,17 +156,21 @@ CMathContent.prototype =
     getRunPrp: function(pos)
     {
         var runPrp = new CMathTextPrp();
+        var rPrp = null;
 
         if(this.content.length > 1)
         {
             if(pos == 0)
             {
-                var rPrp = this.content[pos+1].value.getTxtPrp();
+                rPrp = this.content[pos+1].value.getTxtPrp();
                 runPrp.Merge(rPrp);
             }
             else
             {
-                var rPrp = this.content[pos].value.getTxtPrp();
+                if(this.content[pos].value.empty) // возможность, когда в контенте один CEmpty исключили в начале
+                    rPrp = this.content[pos-1].value.getTxtPrp();
+                else
+                    rPrp = this.content[pos].value.getTxtPrp();
                 runPrp.Merge(rPrp);
             }
         }

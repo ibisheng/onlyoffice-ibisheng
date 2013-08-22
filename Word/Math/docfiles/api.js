@@ -538,6 +538,10 @@ function asc_docs_api(name)
 	// Spell Checking
 	this.SpellCheckApi = new CSpellCheckApi();
 	this.isSpellCheckEnable = true;
+	
+	// Chart
+	this.chartTranslate = new asc_CChartTranslate();
+	
     /**************************************/
 
 	// AutoSave
@@ -1633,6 +1637,82 @@ CParagraphTabs.prototype.get_Tab = function (Index){ return this.Tabs[Index]; }
 CParagraphTabs.prototype.add_Tab = function (Tab){ this.Tabs.push(Tab) }
 CParagraphTabs.prototype.clear = function (){ this.Tabs.length = 0; }
 
+function CParagraphFrame(obj)
+{
+    if ( obj )
+    {
+        this.DropCap = ( dropcap_None === obj.DropCap ? c_oAscDropCap.None : ( dropcap_Drop === obj.DropCap ? c_oAscDropCap.Drop : ( dropcap_Margin === obj.DropCap ? c_oAscDropCap.Margin : undefined ) ) );
+        this.H       = obj.H;
+        this.HAnchor = obj.HAnchor;
+        this.HRule   = ( heightrule_AtLeast ===  obj.HRule ? linerule_AtLeast : ( heightrule_Auto === obj.HRule  ? linerule_Auto : ( heightrule_Exact === obj.HRule ? linerule_Exact : undefined ) ) );
+        this.HSpace  = obj.HSpace;
+        this.Lines   = obj.Lines;
+        this.VAnchor = obj.VAnchor;
+        this.VSpace  = obj.VSpace;
+        this.W       = obj.W;
+        this.Wrap    = ( wrap_Around === obj.Wrap ? true : ( wrap_None === obj.Wrap ? false : undefined ) );
+        this.X       = obj.X;
+        this.XAlign  = obj.XAlign;
+        this.Y       = obj.Y;
+        this.YAlign  = obj.YAlign;
+    }
+    else
+    {
+        this.DropCap = undefined;
+        this.H       = undefined;
+        this.HAnchor = undefined;
+        this.HRule   = undefined;
+        this.HSpace  = undefined;
+        this.Lines   = undefined;
+        this.VAnchor = undefined;
+        this.VSpace  = undefined;
+        this.W       = undefined;
+        this.Wrap    = undefined;
+        this.X       = undefined;
+        this.XAlign  = undefined;
+        this.Y       = undefined;
+        this.YAlign  = undefined;
+    }
+}
+
+CParagraphFrame.prototype.get_DropCap = function () { return this.DropCap; }
+CParagraphFrame.prototype.put_DropCap = function (v) { this.DropCap = v; }
+CParagraphFrame.prototype.get_H = function () { return this.H; }
+CParagraphFrame.prototype.put_H = function (v) { this.H = v; }
+CParagraphFrame.prototype.get_HAnchor = function () { return this.HAnchor; }
+CParagraphFrame.prototype.put_HAnchor = function (v) { this.HAnchor = v; }
+CParagraphFrame.prototype.get_HRule = function () { return this.HRule; }
+CParagraphFrame.prototype.put_HRule = function (v) { this.HRule = v; }
+CParagraphFrame.prototype.get_HSpace = function () { return this.HSpace; }
+CParagraphFrame.prototype.put_HSpace = function (v) { this.HSpace = v; }
+CParagraphFrame.prototype.get_Lines = function () { return this.Lines; }
+CParagraphFrame.prototype.put_Lines = function (v) { this.Lines = v; }
+CParagraphFrame.prototype.get_VAnchor = function () { return this.VAnchor; }
+CParagraphFrame.prototype.put_VAnchor = function (v) { this.VAnchor = v; }
+CParagraphFrame.prototype.get_VSpace = function () { return this.VSpace; }
+CParagraphFrame.prototype.put_VSpace = function (v) { this.VSpace = v; }
+CParagraphFrame.prototype.get_W = function () { return this.W; }
+CParagraphFrame.prototype.put_W = function (v) { this.W = v; }
+CParagraphFrame.prototype.get_Wrap = function () { return this.Wrap; }
+CParagraphFrame.prototype.put_Wrap = function (v) { this.Wrap = v; }
+CParagraphFrame.prototype.get_X = function () { return this.X; }
+CParagraphFrame.prototype.put_X = function (v) { this.X = v; }
+CParagraphFrame.prototype.get_XAlign = function () { return this.XAlign; }
+CParagraphFrame.prototype.put_XAlign = function (v) { this.XAlign = v; }
+CParagraphFrame.prototype.get_Y = function () { return this.Y; }
+CParagraphFrame.prototype.put_Y = function (v) { this.Y = v; }
+CParagraphFrame.prototype.get_YAlign = function () { return this.YAlign; }
+CParagraphFrame.prototype.put_YAlign = function (v) { this.YAlign = v; }
+
+asc_docs_api.prototype.put_FramePr = function(Obj)
+{
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
+    {
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        this.WordControl.m_oLogicDocument.Set_ParagraphFramePr( Obj );
+    }
+}
+
 function CParagraphProp (obj)
 {
 	if (obj)
@@ -1650,6 +1730,7 @@ function CParagraphProp (obj)
         this.DefaultTab        = Default_Tab_Stop;
         this.Locked            = (undefined != obj.Locked  && null != obj.Locked ) ? obj.Locked : false;
         this.CanAddTable       = (undefined != obj.CanAddTable )                   ? obj.CanAddTable : true;
+        this.FramePr           = (undefined != obj.FramePr )                       ? new CParagraphFrame( obj.FramePr ) : undefined;
 
         this.Subscript         = (undefined != obj.Subscript)                      ? obj.Subscript   : undefined;
         this.Superscript       = (undefined != obj.Superscript)                    ? obj.Superscript : undefined;
@@ -1743,6 +1824,8 @@ CParagraphProp.prototype.get_Tabs = function () { return this.Tabs; }
 CParagraphProp.prototype.put_Tabs = function (v) { this.Tabs = v; }
 CParagraphProp.prototype.get_DefaultTab = function () { return this.DefaultTab; }
 CParagraphProp.prototype.put_DefaultTab = function (v) { this.DefaultTab = v; }
+CParagraphProp.prototype.get_FramePr = function () { return this.FramePr; }
+CParagraphProp.prototype.put_FramePr = function (v) { this.FramePr = v; }
 
 // Paragraph properties
 function CParagraphPropEx (obj)
@@ -2662,69 +2745,61 @@ asc_docs_api.prototype.sync_ReturnHeadersCallback = function (headers){
 		Y: 0//координаты по OY начала последовательности на данной страницы
 	}
 */
-asc_docs_api.prototype.startSearchText = function(what){// "what" means word(s) what we search
-	this._searchCur = 0;
-	this.sync_SearchStartCallback();
 
-    if (null != this.WordControl.m_oLogicDocument)
-        this.WordControl.m_oLogicDocument.Search_Start(what);
+asc_docs_api.prototype.asc_findText = function(text, isNext, isMatchCase)
+{
+    var SearchEngine = editor.WordControl.m_oLogicDocument.Search( text, { MatchCase : isMatchCase } );
+
+    var Id = this.WordControl.m_oLogicDocument.Search_GetId( isNext );
+
+    if ( null != Id )
+        this.WordControl.m_oLogicDocument.Search_Select( Id );
+
+    return SearchEngine.Count;
+}
+
+asc_docs_api.prototype.asc_replaceText = function(text, replaceWith, isReplaceAll, isMatchCase)
+{
+    editor.WordControl.m_oLogicDocument.Search( text, { MatchCase : isMatchCase } );
+
+    if ( true === isReplaceAll )
+        this.WordControl.m_oLogicDocument.Search_Replace(replaceWith, true, -1);
     else
-        this.WordControl.m_oDrawingDocument.m_oDocumentRenderer.StartSearch(what);
-}
-asc_docs_api.prototype.gotoSearchResultText = function(navigator){//переход к результату.
+    {
+        var CurId = this.WordControl.m_oLogicDocument.SearchEngine.CurId;
+        var bDirection = this.WordControl.m_oLogicDocument.SearchEngine.Direction;
+        if ( -1 != CurId )
+            this.WordControl.m_oLogicDocument.Search_Replace(replaceWith, false, CurId);
 
-    this.WordControl.m_oDrawingDocument.CurrentSearchNavi = navigator;
-    this.WordControl.ToSearchResult();
-}
-asc_docs_api.prototype.stopSearchText = function(){
-	this.sync_SearchStopCallback();
+        var Id = this.WordControl.m_oLogicDocument.Search_GetId( bDirection );
 
-    if (this.WordControl.m_oLogicDocument != null)
-        this.WordControl.m_oLogicDocument.Search_Stop();
-    else
-        this.WordControl.m_oDrawingDocument.m_oDocumentRenderer.StopSearch();
+        if ( null != Id )
+        {
+            this.WordControl.m_oLogicDocument.Search_Select( Id );
+            return true;
+        }
+
+        return false;
+    }
 }
 
-// CSearchResult - returns result of searching
-function CSearchResult (obj)
+asc_docs_api.prototype.asc_selectSearchingResults = function(bShow)
 {
-    this.Object = obj;
+    this.WordControl.m_oLogicDocument.Search_Set_Selection(bShow);
 }
 
-CSearchResult.prototype.get_Text = function ()
+asc_docs_api.prototype.asc_isSelectSearchingResults = function()
 {
-    return this.Object.text;
+    return this.WordControl.m_oLogicDocument.Search_Get_Selection();
 }
 
-CSearchResult.prototype.get_Type = function ()
+asc_docs_api.prototype.sync_ReplaceAllCallback = function(Count)
 {
-    return this.Object.navigator.Type & 0xFF00;
+    this.asc_fireCallback("asc_onReplaceAll", Count);
 }
 
-CSearchResult.prototype.get_Navigator = function ()
+asc_docs_api.prototype.sync_SearchEndCallback = function()
 {
-    return this.Object.navigator;
-}
-
-CSearchResult.prototype.put_Navigator = function (obj)
-{
-    this.Object.navigator = obj;
-}
-CSearchResult.prototype.put_Text = function (obj)
-{
-    this.Object.text = obj;
-}
-// returns: CSearchResult
-asc_docs_api.prototype.sync_SearchFoundCallback = function(obj){
-	this.asc_fireCallback("asc_onSearchFound", new CSearchResult(obj));
-}
-asc_docs_api.prototype.sync_SearchStartCallback = function(){
-	this.asc_fireCallback("asc_onSearchStart");
-}
-asc_docs_api.prototype.sync_SearchStopCallback = function(){
-	this.asc_fireCallback("asc_onSearchStop");
-}
-asc_docs_api.prototype.sync_SearchEndCallback = function(){
 	this.asc_fireCallback("asc_onSearchEnd");
 }
 /*----------------------------------------------------------------*/
@@ -2761,7 +2836,7 @@ asc_docs_api.prototype.put_TextPrBold = function(value)
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
     {
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-    	//this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { Bold : value } ) );
+        //this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { Bold : value } ) );
         //**
         MathControl.SetTxtPrp( { Bold : value } );
         //**
@@ -2772,7 +2847,7 @@ asc_docs_api.prototype.put_TextPrItalic = function(value)
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
     {
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-	    //this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { Italic : value } ) );
+        //this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { Italic : value } ) );
         //**
         MathControl.SetTxtPrp( { Italic : value } );
         //**
@@ -5427,13 +5502,6 @@ asc_docs_api.prototype.asc_enableKeyEvents = function(value){
 
 		this.asc_fireCallback("asc_onEnableKeyEventsChanged", value);
 	}
-}
-
-asc_docs_api.prototype.asc_findText = function (text, scanByRows, scanForward, isMatchCase, isWholeCell) {
-	// ToDo add code here
-}
-asc_docs_api.prototype.asc_replaceText = function (findWhat, replaceWith, isReplaceAll, isMatchCase, isWholeCell) {
-	// ToDo add code here
 }
 
 asc_docs_api.prototype.asyncServerIdStartLoaded = function()

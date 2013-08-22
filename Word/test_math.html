@@ -83,6 +83,9 @@
 
         <script src="../Common/FontsFreeType/FontFile.js"></script>
         <script src="../Common/FontsFreeType/FontManager.js"></script>
+		
+		<script src="../Common/apiCommon.js"></script>
+		
         <script src="Drawing/Externals.js"></script>
         <script src="Drawing/AllFonts.js"></script>
         <!--<script src="Drawing/GlobalLoaders.js"></script>-->
@@ -167,7 +170,6 @@
         <script type="text/javascript" src="../Common/Shapes/SerializeWriter.js"></script>
         <script type="text/javascript" src="../Common/SerializeCommonWordExcel.js"></script>
         <script type="text/javascript" src="Editor/SerializeCommon.js"></script>
-
 
         <!---->
 
@@ -1356,6 +1358,19 @@
                 editor.Init();
                 //editor.LoadDocument();
 
+				window.addEventListener("message", function(event) {
+					// We only accept messages from ourselves
+					if (null == event || null == event.data || event.source !== window)
+						return;
+
+					var data = JSON.parse(event.data);
+					if (null != data && null != data["type"]) {
+						if (PostMessageType.ExtensionExist == data["type"]) {
+							editor.SetFontsPath(data["url"]);
+						}
+					}
+				}, false);
+				
                 window.onresize = function()
                 {
                     if (false === editor.bInit_word_control)
@@ -2166,6 +2181,162 @@
                 </div>
             </div>
         </div>
+        <div style="float:left;border-top: 2px ridge silver;width:300px;" id="prFramePr">
+            <div style="float:left;width:300px;height:25px;text-align: center;">Frame Properties</div>
+            <div style="float:left;width:300px;border-top: 2px ridge silver;padding:2px">
+                <div id="prWrapNone_div" style="float:left;width:54px;height:54px;margin-left:64px" onmousedown="ParagraphFrame_OnWrapChange(c_oAscWrapStyle2.TopAndBottom)">
+                    <img id="prWrapNone" src="menu/img/Wrap_TopAndBottom.PNG" title="None"/>
+                </div>
+                <div id="prWrapAround_div" style="float:left;width:54px;height:54px;margin-left:64px" onmousedown="ParagraphFrame_OnWrapChange(c_oAscWrapStyle2.Square)">
+                    <img id="prWrapAround" src="menu/img/Wrap_Square.png" title="Square"/>
+                </div>
+            </div>
+            <div style="float:left;width:300px;border-top: 2px ridge silver;padding:2px">
+                <div style="float:left;width:300px">
+                    <div style="float:left;width:75px;text-align: right;padding-right:5px">
+                        Width
+                    </div>
+                    <div style="float:left;width:80px">
+                        <select id="prFrameWidthType" style="width:80px" onchange="ParagraphFrame_OnChangeWidthType(this.selectedIndex)">
+                            <option value="0">Auto</option>
+                            <option value="1">Exact</option>
+                        </select>
+                    </div>
+                    <div style="float:left;width:140px;">
+                        <div style="float:left;width:55px;text-align: right;padding-right:5px">
+                            Value
+                        </div>
+                        <div style="float:left;width:80px">
+                            <input id="prFrameWidthValue" style="width:61px;"/>
+                        </div>
+                    </div>
+                </div>
+                <div style="float:left;width:300px">
+                    <div style="float:left;width:75px;text-align: right;padding-right:5px">
+                        Height
+                    </div>
+                    <div style="float:left;width:80px">
+                        <select id="prFrameHeightType"  style="width:80px" onchange="ParagraphFrame_OnChangeHeightType(this.selectedIndex)">
+                            <option value="0">Auto</option>
+                            <option value="1">At Least</option>
+                            <option value="2">Exact</option>
+                        </select>
+                    </div>
+                    <div style="float:left;width:140px;">
+                        <div style="float:left;width:55px;text-align: right; padding-right:5px">
+                            Value
+                        </div>
+                        <div style="float:left;width:80px">
+                            <input id="prFrameHeightValue" style="width:61px;"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="float:left;width:300px;">
+                <div style="float:left;width:300px;border-top: 2px ridge silver;">Horizontal position</div>
+                <div style="float:left;width:300px">
+                    <div style="float:left;width:300px">
+                        <div style="float:left;width:80px">
+                            <div style="float:left;width:80px">
+                                <input id="prFramePositionHAlignRadio" type="radio" onchange="ParagraphFrame_UpdatePositionH()" name="prFramePosH"/>Align
+                            </div>
+                            <div style="float:left;width:80px">
+                                <input id="prFramePositionHPosRadio" type="radio" onchange="ParagraphFrame_UpdatePositionH()" name="prFramePosH"/>Position
+                            </div>
+                        </div>
+                        <div style="float:left;width:80px">
+                            <div style="float:left;width:80px">
+                                <select id="prFramePositionHAlignValueCombo">
+                                    <option value="0">Left</option>
+                                    <option value="1">Center</option>
+                                    <option value="2">Right</option>
+                                </select>
+                            </div>
+                            <div style="float:left;width:80px">
+                                <input id="prFramePositionHPosValueCombo" style="width:61px;"/>
+                            </div>
+                        </div>
+                        <div style="float:left;width:140px">
+                            <div style="float:left;width:140px">
+                                <select id="prFramePositionHAlignTypeCombo">
+                                    <option value="0">Margin</option>
+                                    <option value="1">Page</option>
+                                    <option value="2">Column</option>
+                                </select>
+                            </div>
+                            <div style="float:left;width:140px">
+                                <select id="prFramePositionHPosTypeCombo">
+                                    <option value="0">Margin</option>
+                                    <option value="1">Page</option>
+                                    <option value="2">Column</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="float:left;width:140px;margin-left: 160px">
+                    <div style="float:left;width:55px;text-align: right; padding-right:5px">
+                        HSpace
+                    </div>
+                    <div style="float:left;width:80px">
+                        <input id="prFrameHSpace" style="width:61px;"/>
+                    </div>
+                </div>
+                <div style="float:left;width:300px;border-top: 2px ridge silver;">Vertical position</div>
+                <div style="float:left;width:300px;">
+                    <div style="float:left;width:300px">
+                        <div style="float:left;width:80px">
+                            <div style="float:left;width:80px">
+                                <input id="prFramePositionVAlignRadio" type="radio" onchange="ParagraphFrame_UpdatePositionV()" name="imgPosV"/>Align
+                            </div>
+                            <div style="float:left;width:80px">
+                                <input id="prFramePositionVPosRadio" type="radio" onchange="ParagraphFrame_UpdatePositionV()" name="imgPosV"/>Position
+                            </div>
+                        </div>
+                        <div style="float:left;width:80px">
+                            <div style="float:left;width:80px">
+                                <select id="prFramePositionVAlignValueCombo">
+                                    <option value="0">Top</option>
+                                    <option value="1">Center</option>
+                                    <option value="2">Bottom</option>
+                                </select>
+                            </div>
+                            <div style="float:left;width:80px">
+                                <input id="prFramePositionVPosValueCombo" style="width:61px;"/>
+                            </div>
+                        </div>
+                        <div style="float:left;width:140px">
+                            <div style="float:left;width:140px">
+                                <select id="prFramePositionVAlignTypeCombo">
+                                    <option value="0">Margin</option>
+                                    <option value="1">Page</option>
+                                    <option value="2">Text</option>
+                                </select>
+                            </div>
+                            <div style="float:left;width:140px">
+                                <select id="prFramePositionVPosTypeCombo">
+                                    <option value="0">Margin</option>
+                                    <option value="1">Page</option>
+                                    <option value="2">Text</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="float:left;width:140px;margin-left: 160px">
+                    <div style="float:left;width:55px;text-align: right; padding-right:5px">
+                        VSpace
+                    </div>
+                    <div style="float:left;width:80px">
+                        <input id="prFrameVSpace" style="width:61px;"/>
+                    </div>
+                </div>
+
+            </div>
+            <div style="float:left;width:150px">
+                <input id="prFrameApply" type="button" value="Apply FramePr"/>
+            </div>
+        </div>
         <div style="float:left;border-top: 2px ridge silver;width:300px;text-align: center;">
             <b>Text</b>
         </div>
@@ -2205,7 +2376,6 @@
                 <input id="prTextPosition" style="width:30px;" value="0"/> Position
             </div>
         </div>
-
         <div style="float:left;border-top: 2px ridge silver;width:300px">
             <div style="float:left;width:300px;height:25px;padding-left: 10px">Default language</div>
             <div style="float:left;width:300px">
@@ -3179,6 +3349,11 @@
             </div>
             <div style="float:left;width:430px;border-bottom: 2px ridge silver;">
                 <input id="searchMatchCase" style="flaot:left;" type="checkbox" value="false"/> Match case
+            </div>
+            <div style="float:left;width:430px;border-bottom: 2px ridge silver;">
+                <input id="searchPrev" style="flaot:left;" type="button" value="Prev" />
+                <input id="searchNext" style="flaot:left;" type="button" value="Next" />
+                <input id="searchSelect" style="flaot:left;" type="button" value="Select All" />
             </div>
             <div style="float:left;width:430px;border-bottom: 4px ridge silver;">
                 <input id="replaceString" style="margin-left:10px;float:left;width:260px;"/>
