@@ -1202,7 +1202,7 @@ CGradFill.prototype =
 function CPattFill()
 {
     this.type = FILL_TYPE_PATT;
-    this.ftype = "";
+    this.ftype = 0;
     this.fgClr = new CUniColor();
     this.bgClr = new CUniColor();
 }

@@ -202,7 +202,14 @@ var c_oAscColor = {
 var c_oAscFill = {
     FILL_TYPE_BLIP   : 1,
     FILL_TYPE_NOFILL : 2,
-    FILL_TYPE_SOLID	 : 3
+    FILL_TYPE_SOLID	 : 3,
+    FILL_TYPE_PATT   : 4,
+    FILL_TYPE_GRAD   : 5
+};
+
+var c_oAscFillGradType  = {
+    GRAD_LINEAR : 1,
+    GRAD_PATH   : 2
 };
 
 var c_oAscFillBlipType = {

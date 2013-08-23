@@ -677,7 +677,8 @@ function CEditorPage(api)
         oWordControl.m_bIsRePaintOnScroll = true;
         oWordControl.OnScroll();
 
-        oWordControl.m_oLogicDocument.Document_UpdateInterfaceState();
+        if (!oWordControl.m_oDrawingDocument.IsEmptyPresentation)
+            oWordControl.m_oLogicDocument.Document_UpdateInterfaceState();
     }
 
     this.zoom_Out = function()
@@ -1308,6 +1309,12 @@ function CEditorPage(api)
         {
             global_mouseEvent.Button = 0;
             oWordControl.m_bIsMouseLock = true;
+
+            if (oWordControl.m_oDrawingDocument.IsEmptyPresentation)
+            {
+                oWordControl.m_oLogicDocument.addNextSlide();
+                return;
+            }
         }
 
         if ((0 == global_mouseEvent.Button) || (undefined == global_mouseEvent.Button) || (2 == global_mouseEvent.Button))
@@ -1351,6 +1358,9 @@ function CEditorPage(api)
         if (oWordControl.DemonstrationManager.Mode)
             return false;
 
+        if (oWordControl.m_oDrawingDocument.IsEmptyPresentation)
+            return;
+
         check_MouseMoveEvent(e);
         var pos = oWordControl.m_oDrawingDocument.ConvertCoordsFromCursor2(global_mouseEvent.X, global_mouseEvent.Y);
         if (pos.Page == -1)
@@ -1369,6 +1379,9 @@ function CEditorPage(api)
         var oWordControl = oThis;
         var pos = oWordControl.m_oDrawingDocument.ConvertCoordsFromCursor2(global_mouseEvent.X, global_mouseEvent.Y);
         if (pos.Page == -1)
+            return;
+
+        if (oWordControl.m_oDrawingDocument.IsEmptyPresentation)
             return;
 
         oWordControl.m_oLogicDocument.OnMouseMove(global_mouseEvent, pos.X, pos.Y, pos.Page);
@@ -1392,6 +1405,10 @@ function CEditorPage(api)
         }
 
         check_MouseUpEvent(e);
+
+        if (oWordControl.m_oDrawingDocument.IsEmptyPresentation)
+            return;
+
         var pos = oWordControl.m_oDrawingDocument.ConvertCoordsFromCursor2(global_mouseEvent.X, global_mouseEvent.Y);
         if (pos.Page == -1)
             return;
@@ -1449,6 +1466,9 @@ function CEditorPage(api)
         global_mouseEvent.UnLockMouse();
 
         global_mouseEvent.IsPressed = false;
+
+        if (oWordControl.m_oDrawingDocument.IsEmptyPresentation)
+            return;
 
         //---
         var pos = oWordControl.m_oDrawingDocument.ConvertCoordsFromCursor2(global_mouseEvent.X, global_mouseEvent.Y);
@@ -1677,36 +1697,44 @@ function CEditorPage(api)
         if (0 != this.MainScrollsEnabledFlag)
             return;
 
-        if (this.StartVerticalScroll)
+        if (!this.m_oDrawingDocument.IsEmptyPresentation)
         {
-            this.VerticalScrollOnMouseUp.ScrollY = scrollPositionY;
-            this.VerticalScrollOnMouseUp.ScrollY_max = maxY;
-
-            this.VerticalScrollOnMouseUp.SlideNum = (scrollPositionY * this.m_oDrawingDocument.SlidesCount / Math.max(1, maxY)) >> 0;
-            if (this.VerticalScrollOnMouseUp.SlideNum >= this.m_oDrawingDocument.SlidesCount)
-                this.VerticalScrollOnMouseUp.SlideNum = this.m_oDrawingDocument.SlidesCount - 1;
-
-            this.m_oApi.asc_fireCallback("asc_onPaintSlideNum", this.VerticalScrollOnMouseUp.SlideNum);
-            return;
-        }
-
-        var lNumSlide = ((scrollPositionY / this.m_dDocumentPageHeight) + 0.1) >> 0; // 0.1 - ошибка округления!!
-        if (lNumSlide != this.m_oDrawingDocument.SlideCurrent)
-        {
-            if (this.IsGoToPageMAXPosition)
+            if (this.StartVerticalScroll)
             {
-                if (lNumSlide >= this.m_oDrawingDocument.SlideCurrent)
-                    this.IsGoToPageMAXPosition = false;
+                this.VerticalScrollOnMouseUp.ScrollY = scrollPositionY;
+                this.VerticalScrollOnMouseUp.ScrollY_max = maxY;
+
+                this.VerticalScrollOnMouseUp.SlideNum = (scrollPositionY * this.m_oDrawingDocument.SlidesCount / Math.max(1, maxY)) >> 0;
+                if (this.VerticalScrollOnMouseUp.SlideNum >= this.m_oDrawingDocument.SlidesCount)
+                    this.VerticalScrollOnMouseUp.SlideNum = this.m_oDrawingDocument.SlidesCount - 1;
+
+                this.m_oApi.asc_fireCallback("asc_onPaintSlideNum", this.VerticalScrollOnMouseUp.SlideNum);
+                return;
             }
 
-            this.GoToPage(lNumSlide);
-            return;
+            var lNumSlide = ((scrollPositionY / this.m_dDocumentPageHeight) + 0.1) >> 0; // 0.1 - ошибка округления!!
+            if (lNumSlide != this.m_oDrawingDocument.SlideCurrent)
+            {
+                if (this.IsGoToPageMAXPosition)
+                {
+                    if (lNumSlide >= this.m_oDrawingDocument.SlideCurrent)
+                        this.IsGoToPageMAXPosition = false;
+                }
+
+                this.GoToPage(lNumSlide);
+                return;
+            }
+            else if (this.SlideScrollMAX < scrollPositionY)
+            {
+                this.IsGoToPageMAXPosition = false;
+                this.GoToPage(this.m_oDrawingDocument.SlideCurrent + 1);
+                return;
+            }
         }
-        else if (this.SlideScrollMAX < scrollPositionY)
+        else
         {
-            this.IsGoToPageMAXPosition = false;
-            this.GoToPage(this.m_oDrawingDocument.SlideCurrent + 1);
-            return;
+            if (this.StartVerticalScroll)
+                return;
         }
 
         var oWordControl = oThis;
@@ -1724,6 +1752,13 @@ function CEditorPage(api)
     {
         if (0 != this.MainScrollsEnabledFlag || !this.StartVerticalScroll)
             return;
+
+        if (this.m_oDrawingDocument.IsEmptyPresentation)
+        {
+            this.StartVerticalScroll = false;
+            this.m_oScrollVerApi.scrollByY(0, false);
+            return;
+        }
 
         if (this.VerticalScrollOnMouseUp.SlideNum != this.m_oDrawingDocument.SlideCurrent)
             this.GoToPage(this.VerticalScrollOnMouseUp.SlideNum);
@@ -2140,7 +2175,7 @@ function CEditorPage(api)
         ctx.globalAlpha = 1.0;
         ctx = null;
 
-        if (this.m_oLogicDocument != null)
+        if (this.m_oLogicDocument != null && drDoc.SlideCurrent >= 0)
         {
             this.m_oLogicDocument.Slides[drDoc.SlideCurrent].drawSelect();
 
@@ -2311,6 +2346,9 @@ function CEditorPage(api)
         this.m_dDocumentWidth = one_slide_width;
         this.m_dDocumentHeight = (one_slide_height * this.m_oDrawingDocument.SlidesCount) >> 0;
 
+        if (0 == this.m_oDrawingDocument.SlidesCount)
+            this.m_dDocumentHeight = one_slide_height >> 0;
+
         if (!bIsAttack && this.OldDocumentWidth == this.m_dDocumentWidth && this.OldDocumentHeight == this.m_dDocumentHeight)
         {
             /*
@@ -2327,6 +2365,12 @@ function CEditorPage(api)
 
         this.SlideScrollMIN = this.m_oDrawingDocument.SlideCurrent * one_slide_height;
         this.SlideScrollMAX = this.SlideScrollMIN + one_slide_height - this.m_oEditor.HtmlElement.height;
+
+        if (0 == this.m_oDrawingDocument.SlidesCount)
+        {
+            this.SlideScrollMIN = 0;
+            this.SlideScrollMAX = this.SlideScrollMIN + one_slide_height - this.m_oEditor.HtmlElement.height;
+        }
 
         // теперь проверим необходимость перезуммирования
         if (1 == this.m_nZoomType)
@@ -2604,7 +2648,14 @@ function CEditorPage(api)
     this.GoToPage = function(lPageNum)
     {
         var drDoc = this.m_oDrawingDocument;
-        if (lPageNum < 0 || lPageNum >= drDoc.SlidesCount)
+
+        this.m_oDrawingDocument.IsEmptyPresentation = false;
+        if (-1 == lPageNum)
+        {
+            this.m_oDrawingDocument.IsEmptyPresentation = true;
+        }
+
+        if (lPageNum != -1 && (lPageNum < 0 || lPageNum >= drDoc.SlidesCount))
             return;
 
         this.Thumbnails.LockMainObjType = true;

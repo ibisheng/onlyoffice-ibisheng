@@ -7592,6 +7592,12 @@ CPresentation.prototype = {
 
     Set_CurPage : function(PageNum)
     {
+        if (-1 == PageNum)
+        {
+            this.CurPage = -1;
+            return;
+        }
+
         var oldCurPage = this.CurPage;
         this.CurPage = Math.min( this.Slides.length - 1, Math.max( 0, PageNum ) );
         if(oldCurPage != this.CurPage && this.CurPage < this.Slides.length)

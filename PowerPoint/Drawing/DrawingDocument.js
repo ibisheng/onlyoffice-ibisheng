@@ -942,6 +942,7 @@ function CDrawingDocument()
     this.m_oLogicDocument   = null;
 
     this.SlidesCount        = 0;
+    this.IsEmptyPresentation = false;
 
     this.SlideCurrent       = -1;
     this.SlideCurrectRect   = new CDrawingPage();
@@ -2757,6 +2758,8 @@ function CThumbnailsManager()
     this.const_offsetX = 0;
     this.const_border_w = 4;
 
+    this.bIsEmptyDrawed = false;
+
     this.m_oCacheManager = new CCacheManager();
 
     this.FocusObjType = FOCUS_OBJECT_MAIN;
@@ -3680,8 +3683,26 @@ function CThumbnailsManager()
 
     this.onCheckUpdate = function()
     {
-        if (!this.m_bIsVisible || this.m_lDrawingFirst == -1 || this.m_lDrawingEnd == -1)
+        if (!this.m_bIsVisible)
             return;
+
+        if (this.m_lDrawingFirst == -1 || this.m_lDrawingEnd == -1)
+        {
+            if (this.m_oWordControl.m_oDrawingDocument.IsEmptyPresentation)
+            {
+                if (!this.bIsEmptyDrawed)
+                {
+                    this.bIsEmptyDrawed = true;
+                    this.OnPaint();
+                }
+                return;
+            }
+
+            this.bIsEmptyDrawed = false;
+            return;
+        }
+
+        this.bIsEmptyDrawed = false;
 
         if (!this.m_bIsUpdate)
         {
@@ -3903,13 +3924,21 @@ function CThumbnailsManager()
             case 46:
             {
                 var _delete_array = this.GetSelectedArray();
-                if (_delete_array.length == this.m_oWordControl.m_oDrawingDocument.SlidesCount)
-                    _delete_array.splice(0, 1);
+
+                if (!this.m_oWordControl.m_oApi.IsSupportEmptyPresentation)
+                {
+                    if (_delete_array.length == this.m_oWordControl.m_oDrawingDocument.SlidesCount)
+                        _delete_array.splice(0, 1);
+                }
 
                 if (_delete_array.length != 0)
                 {
                     this.m_oWordControl.m_oLogicDocument.deleteSlides(_delete_array);
                 }
+
+                if (0 == this.m_oWordControl.m_oLogicDocument.Slides.length)
+                    this.m_bIsUpdate = true;
+
                 break;
             }
             case 34: //PgDown
@@ -4432,8 +4461,14 @@ function CSlideDrawer()
 
     this.BoundsChecker      = new CSlideBoundsChecker();
 
+    this.bIsEmptyPresentation = false;
+
     this.CheckSlide = function(slideNum)
     {
+        this.bIsEmptyPresentation = false;
+        if (-1 == slideNum)
+            this.bIsEmptyPresentation = true;
+
         var dKoef = this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100;
         var w_mm = this.m_oWordControl.m_oLogicDocument.Width;
         var h_mm = this.m_oWordControl.m_oLogicDocument.Height;
@@ -4442,6 +4477,18 @@ function CSlideDrawer()
 
         this.BoundsChecker.init(w_px, h_px, w_mm, h_mm);
         this.BoundsChecker.transform(1,0,0,1,0,0);
+
+        if (this.bIsEmptyPresentation)
+        {
+            this.BoundsChecker._s();
+            this.BoundsChecker._m(0, 0);
+            this.BoundsChecker._l(w_mm, 0);
+            this.BoundsChecker._l(w_mm, h_mm);
+            this.BoundsChecker._l(0, h_mm);
+            this.BoundsChecker._z();
+
+            return;
+        }
 
         this.m_oWordControl.m_oLogicDocument.DrawPage(slideNum, this.BoundsChecker);
 
@@ -4513,6 +4560,23 @@ function CSlideDrawer()
         var _bounds = this.BoundsChecker.Bounds;
         var _x = _rect.left + _bounds.min_x;
         var _y = _rect.top + _bounds.min_y;
+
+        if (this.bIsEmptyPresentation)
+        {
+            var w_px = _bounds.max_x - _bounds.min_x + 1;
+            var h_px = _bounds.max_y - _bounds.min_y + 1;
+
+            outputCtx.lineWidth = 1;
+            outputCtx.strokeStyle = "#000000";
+
+            outputCtx.beginPath();
+            this.m_oWordControl.m_oDrawingDocument.AutoShapesTrack.AddRectDashClever(outputCtx, _x >> 0, _y >> 0, (_x + w_px) >> 0, (_y + h_px) >> 0, 2, 2);
+            outputCtx.stroke();
+            outputCtx.beginPath();
+
+            return;
+        }
+
         if (this.IsCached)
         {
             var w_px = _bounds.max_x - _bounds.min_x + 1;

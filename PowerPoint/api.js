@@ -44,6 +44,8 @@ function asc_docs_api(name)
     this.DocumentUrl = "";
     this.DocumentName = "";
 	this.DocInfo = null;
+
+    this.IsSupportEmptyPresentation = true;
         
     this.ShowParaMarks = false;
 	this.isAddSpaceBetweenPrg = false;
@@ -3298,8 +3300,12 @@ asc_docs_api.prototype.AddSlide = function(layoutIndex)
 asc_docs_api.prototype.DeleteSlide = function()
 {
     var _delete_array = this.WordControl.Thumbnails.GetSelectedArray();
-    if (_delete_array.length == this.WordControl.m_oDrawingDocument.SlidesCount)
-        _delete_array.splice(0, 1);
+
+    if (!this.IsSupportEmptyPresentation)
+    {
+        if (_delete_array.length == this.WordControl.m_oDrawingDocument.SlidesCount)
+            _delete_array.splice(0, 1);
+    }
 
     if (_delete_array.length != 0)
     {

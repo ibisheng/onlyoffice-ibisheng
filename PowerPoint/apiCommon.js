@@ -394,8 +394,45 @@ function CAscFillSolid()
 {
     this.color = new CAscColor();
 }
-CAscFillSolid.prototype.get_color = function(){return this.color}
+CAscFillSolid.prototype.get_color = function(){return this.color;}
 CAscFillSolid.prototype.put_color = function(v){this.color = v;}
+
+function CAscFillHatch()
+{
+    this.PatternType = 0;
+    this.fgClr = new CAscColor();
+    this.bgClr = new CAscColor();
+}
+CAscFillHatch.prototype.get_pattern_type = function(){return this.PatternType;}
+CAscFillHatch.prototype.put_pattern_type = function(v){this.PatternType = v;}
+CAscFillHatch.prototype.get_color_fg = function(){return this.fgClr;}
+CAscFillHatch.prototype.put_color_fg = function(v){this.fgClr = v;}
+CAscFillHatch.prototype.get_color_bg = function(){return this.bgClr;}
+CAscFillHatch.prototype.put_color_bg = function(v){this.bgClr = v;}
+
+function CAscFillGrad()
+{
+    this.Colors = new Array();
+    this.Positions = new Array();
+    this.GradType = 0;
+
+    this.LinearAngle = 0;
+    this.LinearScale = true;
+
+    this.PathType = 0;
+}
+CAscFillGrad.prototype.get_colors = function(){return this.Colors;}
+CAscFillGrad.prototype.put_colors = function(v){this.Colors = v;}
+CAscFillGrad.prototype.get_positions = function(){return this.Positions;}
+CAscFillGrad.prototype.put_positions = function(v){this.Positions = v;}
+CAscFillGrad.prototype.get_grad_type = function(){return this.GradType;}
+CAscFillGrad.prototype.put_grad_type = function(v){this.GradType = v;}
+CAscFillGrad.prototype.get_linear_angle = function(){return this.LinearAngle;}
+CAscFillGrad.prototype.put_linear_angle = function(v){this.LinearAngle = v;}
+CAscFillGrad.prototype.get_linear_scale = function(){return this.LinearScale;}
+CAscFillGrad.prototype.put_linear_scale = function(v){this.LinearScale = v;}
+CAscFillGrad.prototype.get_path_type = function(){return this.PathType;}
+CAscFillGrad.prototype.put_path_type = function(v){this.PathType = v;}
 
 function CAscFill()
 {
@@ -430,18 +467,36 @@ function CreateAscFill(unifill)
         }
         case FILL_TYPE_PATT:
         {
-            ret.type = c_oAscFill.FILL_TYPE_SOLID;
-            ret.fill = new CAscFillSolid();
-            ret.fill.color = CreateAscColor(_fill.fgClr);
+            ret.type = c_oAscFill.FILL_TYPE_PATT;
+            ret.fill = new CAscFillHatch();
+            ret.fill.PatternType = _fill.ftype;
+            ret.fill.fgClr = CreateAscColor(_fill.fgClr);
+            ret.fill.bgClr = CreateAscColor(_fill.bgClr);
             break;
         }
         case FILL_TYPE_GRAD:
         {
-            ret.type = c_oAscFill.FILL_TYPE_SOLID;
-            ret.fill = new CAscFillSolid();
+            ret.type = c_oAscFill.FILL_TYPE_GRAD;
+            ret.fill = new CAscFillGrad();
 
-            if (_fill.colors.length > 0)
-                ret.fill.color = CreateAscColor(_fill.colors[0].color);
+            for (var i = 0; i < _fill.colors.length; i++)
+            {
+                ret.fill.Colors.push(CreateAscColor(_fill.colors[i].color));
+                ret.fill.Positions.push(_fill.colors[i].pos);
+            }
+
+            if (_fill.lin)
+            {
+                ret.fill.GradType = c_oAscFillGradType.GRAD_LINEAR;
+                ret.fill.LinearAngle = _fill.lin.angle;
+                ret.fill.LinearScale = _fill.lin.scale;
+            }
+            else
+            {
+                ret.fill.GradType = c_oAscFillGradType.GRAD_PATH;
+                ret.fill.PathType = 0;
+            }
+
             break;
         }
         case FILL_TYPE_BLIP:
@@ -507,6 +562,76 @@ function CorrectUniFill(asc_fill, unifill)
                 else if (tile == c_oAscFillBlipType.TILE)
                     ret.fill.tile = true;
 
+                break;
+            }
+            case c_oAscFill.FILL_TYPE_PATT:
+            {
+                if (ret.fill == null || ret.fill.type != FILL_TYPE_PATT)
+                {
+                    ret.fill = new CPattFill();
+                }
+
+                if (undefined != _fill.PatternType)
+                {
+                    ret.ftype = _fill.PatternType;
+                }
+                if (undefined != _fill.fgClr)
+                {
+                    ret.fill.fgClr = CorrectUniColor(_fill.get_color_fg(), ret.fill.fgClr);
+                }
+                if (undefined != _fill.bgClr)
+                {
+                    ret.fill.bgClr = CorrectUniColor(_fill.get_color_bg(), ret.fill.bgClr);
+                }
+
+                break;
+            }
+            case c_oAscFill.FILL_TYPE_GRAD:
+            {
+                if (ret.fill == null || ret.fill.type != FILL_TYPE_GRAD)
+                {
+                    ret.fill = new CGradFill();
+                }
+
+                var _colors     = _fill.get_colors();
+                var _positions  = _fill.get_positions();
+                if (undefined != _colors && undefined != _positions)
+                {
+                    if (_colors.length == _positions.length)
+                    {
+                        ret.fill.colors.splice(0, ret.fill.colors.length);
+
+                        for (var i = 0; i < _colors.length; i++)
+                        {
+                            var _gs = new CGs();
+                            _gs.color = CorrectUniColor(_colors[i], _gs.color);
+                            _gs.pos = _positions[i];
+
+                            ret.fill.colors.push(_gs);
+                        }
+                    }
+                }
+
+                var _grad_type = _fill.get_grad_type();
+
+                if (c_oAscFillGradType.GRAD_LINEAR == _grad_type)
+                {
+                    var _angle = _fill.get_linear_angle();
+                    var _scale = _fill.get_linear_scale();
+
+                    if (!ret.fill.lin)
+                        ret.fill.lin = new GradLin();
+
+                    if (undefined != _angle)
+                        ret.fill.lin.angle = _angle;
+                    if (undefined != _scale)
+                        ret.fill.lin.scale = _scale;
+                }
+                else if (c_oAscFillGradType.GRAD_PATH == _grad_type)
+                {
+                    ret.fill.lin = null;
+                    ret.fill.path = new GradPath();
+                }
                 break;
             }
             default:
