@@ -4,9 +4,44 @@
 	FitPage :2
 };
 
+var c_oAscCollaborativeMarksShowType = {
+    All         : 0,
+    LastChanges : 1
+};
+
 var c_oAscAsyncActionType = {
     Information : 0,
     BlockInteraction : 1
+};
+
+var c_oAscHAnchor = {
+    Margin : 0x00,
+    Page   : 0x01,
+    Text   : 0x02,
+
+    PageInternal : 0xFF // только для внутреннего использования
+};
+var c_oAscXAlign = {
+    Center  : 0x00,
+    Inside  : 0x01,
+    Left    : 0x02,
+    Outside : 0x03,
+    Right   : 0x04
+};
+
+var c_oAscYAlign = {
+    Bottom  : 0x00,
+    Center  : 0x01,
+    Inline  : 0x02,
+    Inside  : 0x03,
+    Outside : 0x04,
+    Top     : 0x05
+};
+
+var c_oAscVAnchor = {
+    Margin : 0x00,
+    Page   : 0x01,
+    Text   : 0x02
 };
 
 var c_oAscAsyncAction = {
@@ -274,6 +309,12 @@ var c_oAscSlideTransitionParams = {
     Zoom_In             : 0,
     Zoom_Out            : 1,
     Zoom_AndRotate      : 2
+};
+
+var c_oAscLockTypeElemPresentation = {
+    Object		: 1,
+    Slide		: 2,
+    Presentation: 3
 };
 
 var TABLE_STYLE_WIDTH_PIX   = 70;

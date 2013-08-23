@@ -42,7 +42,6 @@ function GroupShape(parent)
 
 GroupShape.prototype=
 {
-
     IsLine : function()
     {
         return false;

@@ -13,6 +13,14 @@ var styles_Numbering = 0x02;
 var styles_Table     = 0x03;
 var styles_Character = 0x04;
 
+var tblwidth_Auto = 0x00;
+var tblwidth_Mm   = 0x01;
+var tblwidth_Nil  = 0x02;
+var tblwidth_Pct  = 0x03;
+
+var tbllayout_Fixed   = 0x00;
+var tbllayout_AutoFit = 0x01;
+
 var align_Right   = 0;
 var align_Left    = 1;
 var align_Center  = 2;
@@ -62,6 +70,13 @@ var styletype_Numbering = 0x02;
 var styletype_Paragraph = 0x03;
 var styletype_Table = 0x04;
 
+
+
+
+function isRealObject(obj)
+{
+    return obj !== null && typeof obj === "object";
+}
 function CTableStylePr()
 {
     this.TextPr      = new CTextPr();
@@ -4115,7 +4130,7 @@ CTableCellPr.prototype =
     }
 }
 
-function CTextPr()
+/*function CTextPr()
 {
     this.Bold       = undefined;
     this.Italic     = undefined;
@@ -4560,7 +4575,1183 @@ CTextPr.prototype =
             }
         }
     }
+}   */
+
+function CTextPr()
+{
+    this.Bold       = undefined; // Жирный текст
+    this.Italic     = undefined; // Наклонный текст
+    this.Strikeout  = undefined; // Зачеркивание
+    this.Underline  = undefined;
+    this.FontFamily = undefined;
+    this.FontSize   = undefined;
+    this.Color      = undefined;
+    this.VertAlign  = undefined;
+    this.HighLight  = undefined; // highlight_None/Color
+    this.RStyle     = undefined;
+    this.Spacing    = undefined; // Дополнительное расстояние между символвами
+    this.DStrikeout = undefined; // Двойное зачеркивание
+    this.Caps       = undefined;
+    this.SmallCaps  = undefined;
+    this.Position   = undefined; // Смещение по Y
+
+    this.RFonts     = new CRFonts();
+    this.BoldCS     = undefined;
+    this.ItalicCS   = undefined;
+    this.FontSizeCS = undefined;
+    this.CS         = undefined;
+    this.RTL        = undefined;
+    this.Lang       = new CLang();
 }
+
+CTextPr.prototype =
+{
+    Clear : function()
+    {
+        this.Bold       = undefined;
+        this.Italic     = undefined;
+        this.Strikeout  = undefined;
+        this.Underline  = undefined;
+        this.FontFamily = undefined;
+        this.FontSize   = undefined;
+        this.Color      = undefined;
+        this.VertAlign  = undefined;
+        this.HighLight  = undefined;
+        this.RStyle     = undefined;
+        this.Spacing    = undefined;
+        this.DStrikeout = undefined;
+        this.Caps       = undefined;
+        this.SmallCaps  = undefined;
+        this.Position   = undefined;
+
+        this.RFonts     = new CRFonts();
+        this.BoldCS     = undefined;
+        this.ItalicCS   = undefined;
+        this.FontSizeCS = undefined;
+        this.CS         = undefined;
+        this.RTL        = undefined;
+        this.Lang       = new CLang();
+    },
+
+    Copy : function()
+    {
+        var TextPr = new CTextPr();
+        TextPr.Bold      = this.Bold;
+        TextPr.Italic    = this.Italic;
+        TextPr.Strikeout = this.Strikeout;
+        TextPr.Underline = this.Underline;
+
+        if ( undefined != this.FontFamily )
+        {
+            TextPr.FontFamily = new Object();
+            TextPr.FontFamily.Name  = this.FontFamily.Name;
+            TextPr.FontFamily.Index = this.FontFamily.Index;
+        }
+
+        TextPr.FontSize   = this.FontSize;
+
+        if ( undefined != this.Color )
+            TextPr.Color = new CDocumentColor(this.Color.r, this.Color.g, this.Color.b);
+
+        TextPr.VertAlign = this.VertAlign;
+
+        if ( undefined === this.HighLight )
+            TextPr.HighLight = undefined;
+        else if ( highlight_None === this.HighLight )
+            TextPr.HighLight = highlight_None;
+        else
+            TextPr.HighLight = this.HighLight.Copy();
+
+        TextPr.RStyle     = this.RStyle;
+        TextPr.Spacing    = this.Spacing;
+        TextPr.DStrikeout = this.DStrikeout;
+        TextPr.Caps       = this.Caps;
+        TextPr.SmallCaps  = this.SmallCaps;
+        TextPr.Position   = this.Position;
+        TextPr.RFonts     = this.RFonts.Copy();
+        TextPr.BoldCS     = this.BoldCS;
+        TextPr.ItalicCS   = this.ItalicCS;
+        TextPr.FontSizeCS = this.FontSizeCS;
+        TextPr.CS         = this.CS;
+        TextPr.RTL        = this.RTL;
+        TextPr.Lang       = this.Lang.Copy();
+        if(isRealObject(this.unifill))
+        {
+            TextPr.unifill = this.unifill.createDuplicate();
+        }
+        return TextPr;
+    },
+
+    Merge : function(TextPr)
+    {
+        if ( undefined != TextPr.Bold )
+            this.Bold = TextPr.Bold;
+
+        if ( undefined != TextPr.Italic )
+            this.Italic = TextPr.Italic;
+
+        if ( undefined != TextPr.Strikeout )
+            this.Strikeout = TextPr.Strikeout;
+
+        if ( undefined != TextPr.Underline )
+            this.Underline = TextPr.Underline;
+
+        if ( undefined != TextPr.FontFamily )
+        {
+            this.FontFamily = new Object();
+            this.FontFamily.Name  = TextPr.FontFamily.Name;
+            this.FontFamily.Index = TextPr.FontFamily.Index;
+        }
+
+        if ( undefined != TextPr.FontSize )
+            this.FontSize = TextPr.FontSize;
+
+        if ( undefined != TextPr.Color )
+            this.Color = TextPr.Color.Copy();
+
+        if ( undefined != TextPr.VertAlign )
+            this.VertAlign = TextPr.VertAlign;
+
+        if ( undefined === TextPr.HighLight )
+        {}
+        else if ( highlight_None === TextPr.HighLight )
+            this.HighLight = highlight_None;
+        else
+            this.HighLight = TextPr.HighLight.Copy();
+
+        if ( undefined != TextPr.RStyle )
+            this.RStyle = TextPr.RStyle;
+
+        if ( undefined != TextPr.Spacing )
+            this.Spacing = TextPr.Spacing;
+
+        if ( undefined != TextPr.DStrikeout )
+            this.DStrikeout = TextPr.DStrikeout;
+
+        if ( undefined != TextPr.SmallCaps )
+            this.SmallCaps = TextPr.SmallCaps;
+
+        if ( undefined != TextPr.Caps )
+            this.Caps = TextPr.Caps;
+
+        if ( undefined != TextPr.Position )
+            this.Position = TextPr.Position;
+
+        this.RFonts.Merge( TextPr.RFonts );
+
+        if ( undefined != TextPr.BoldCS )
+            this.BoldCS = TextPr.BoldCS;
+
+        if ( undefined != TextPr.ItalicCS )
+            this.ItalicCS = TextPr.ItalicCS;
+
+        if ( undefined != TextPr.FontSizeCS )
+            this.FontSizeCS = TextPr.FontSizeCS;
+
+        if ( undefined != TextPr.CS )
+            this.CS = TextPr.CS;
+
+        if ( undefined != TextPr.RTL )
+            this.RTL = TextPr.RTL;
+
+        this.Lang.Merge( TextPr.Lang );
+        if(isRealObject(TextPr.unifill) && isRealObject(TextPr.unifill.fill))
+        {
+            this.unifill = TextPr.unifill.createDuplicate();
+        }
+    },
+
+    Init_Default : function()
+    {
+        this.Bold       = false;
+        this.Italic     = false;
+        this.Underline  = false;
+        this.Strikeout  = false;
+        this.FontFamily =
+        {
+            Name  : "Arial",
+            Index : -1
+        };
+        this.FontSize   = 11;
+        this.Color      = new CDocumentColor(0, 0, 0);
+        this.VertAlign  = vertalign_Baseline;
+        this.HighLight  = highlight_None;
+        this.RStyle     = undefined;
+        this.Spacing    = 0;
+        this.DStrikeout = false;
+        this.SmallCaps  = false;
+        this.Caps       = false;
+        this.Position   = 0;
+        this.RFonts.Init_Default();
+        this.BoldCS     = false;
+        this.ItalicCS   = false;
+        this.FontSizeCS = 11;
+        this.CS         = false;
+        this.RTL        = false;
+        this.Lang.Init_Default();
+    },
+
+    Set_FromObject : function(TextPr)
+    {
+        this.Bold      = TextPr.Bold;
+        this.Italic    = TextPr.Italic;
+        this.Strikeout = TextPr.Strikeout;
+        this.Underline = TextPr.Underline;
+
+        if ( undefined != TextPr.FontFamily )
+        {
+            this.FontFamily = new Object();
+            this.FontFamily.Name  = TextPr.FontFamily.Name;
+            this.FontFamily.Index = TextPr.FontFamily.Index;
+        }
+        else
+            this.FontFamily = undefined;
+
+        this.FontSize   = TextPr.FontSize;
+
+        if ( undefined != TextPr.Color )
+            this.Color = new CDocumentColor( TextPr.Color.r, TextPr.Color.g, TextPr.Color.b );
+        else
+            this.Color = undefined;
+
+        this.VertAlign = TextPr.VertAlign;
+
+        if ( undefined === TextPr.HighLight )
+            this.HighLight = undefined;
+        else if ( highlight_None === TextPr.HighLight )
+            this.HighLight = highlight_None;
+        else
+            this.HighLight = new CDocumentColor( TextPr.HighLight.r, TextPr.HighLight.g, TextPr.HighLight.b );
+
+        if ( undefined != TextPr.RStyle )
+            this.RStyle = TextPr.RStyle;
+
+        this.Spacing    = TextPr.Spacing;
+        this.DStrikeout = TextPr.DStrikeout;
+        this.Caps       = TextPr.Caps;
+        this.SmallCaps  = TextPr.SmallCaps;
+        this.Position   = TextPr.Position;
+
+        if ( undefined != TextPr.RFonts )
+            this.RFonts.Set_FromObject( TextPr.RFonts );
+
+        this.BoldCS       = TextPr.BoldCS;
+        this.ItalicCS     = TextPr.ItalicCS;
+        this.FontSizeCS   = TextPr.FontSizeCS;
+        this.CS           = TextPr.CS;
+        this.RTL          = TextPr.RTL;
+
+        if ( undefined != TextPr.Lang )
+            this.Lang.Set_FromObject( TextPr.Lang );
+        if(isRealObject(TextPr.unifill))
+        {
+            this.unifill = TextPr.unifill.createDuplicate();
+        }
+    },
+
+    Compare : function(TextPr)
+    {
+        var Result_TextPr = new CTextPr();
+
+        // Bold
+        if ( this.Bold === TextPr.Bold )
+            Result_TextPr.Bold = TextPr.Bold;
+
+        // Italic
+        if ( this.Italic === TextPr.Italic )
+            Result_TextPr.Italic = TextPr.Italic;
+
+        // Strikeout
+        if ( this.Strikeout === TextPr.Strikeout )
+            Result_TextPr.Strikeout = TextPr.Strikeout;
+
+        // Underline
+        if ( this.Underline === TextPr.Underline )
+            Result_TextPr.Underline = TextPr.Underline;
+
+        // FontFamily
+        if ( undefined != this.FontFamily && undefined != TextPr.FontFamily && this.FontFamily.Name === TextPr.FontFamily.Name )
+        {
+            Result_TextPr.FontFamily = {};
+            Result_TextPr.FontFamily.Name  = TextPr.FontFamily.Name;
+            Result_TextPr.FontFamily.Index = -1;
+        }
+
+        // FontSize
+        if ( undefined != this.FontSize && undefined != TextPr.FontSize && Math.abs( this.FontSize - TextPr.FontSize ) < 0.001 )
+            Result_TextPr.FontSize = TextPr.FontSize;
+
+        // Color
+        if ( undefined != this.Color && undefined != TextPr.Color && true === this.Color.Compare(TextPr.Color) )
+            Result_TextPr.Color = new CDocumentColor( TextPr.Color.r, TextPr.Color.g, TextPr.Color.b );
+
+        // VertAlign
+        if ( this.VertAlign === TextPr.VertAlign )
+            Result_TextPr.VertAlign = TextPr.VertAlign;
+
+        // HighLight
+        if ( undefined != this.HighLight && undefined != TextPr.HighLight )
+        {
+            if ( highlight_None === this.HighLight && highlight_None === TextPr.HighLight )
+                Result_TextPr.HighLight = highlight_None;
+            else if ( highlight_None != this.HighLight && highlight_None != TextPr.HighLight && this.HighLight.Compare( TextPr.HighLight ) )
+                Result_TextPr.HighLight = new CDocumentColor( TextPr.HighLight.r, TextPr.HighLight.g, TextPr.HighLight.b );
+        }
+
+        // RStyle
+        if ( undefined != this.RStyle && undefined != TextPr.RStyle && this.RStyle === TextPr.RStyle )
+            Result_TextPr.RStyle = TextPr.RStyle;
+
+        // Spacing
+        if ( undefined != this.Spacing && undefined != TextPr.Spacing && Math.abs(this.Spacing - TextPr.Spacing) < 0.001 )
+            Result_TextPr.Spacing = TextPr.Spacing;
+
+        // DStrikeout
+        if ( undefined != this.DStrikeout && undefined != TextPr.DStrikeout && this.DStrikeout === TextPr.DStrikeout )
+            Result_TextPr.DStrikeout = TextPr.DStrikeout;
+
+        // Caps
+        if ( undefined != this.Caps && undefined != TextPr.Caps && this.Caps === TextPr.Caps )
+            Result_TextPr.Caps = TextPr.Caps;
+
+        // SmallCaps
+        if ( undefined != this.SmallCaps && undefined != TextPr.SmallCaps && this.SmallCaps === TextPr.SmallCaps )
+            Result_TextPr.SmallCaps = TextPr.SmallCaps;
+
+        // Position
+        if ( undefined != this.Position && undefined != TextPr.Position && Math.abs(this.Position - TextPr.Position) < 0.001 )
+            Result_TextPr.Position = TextPr.Position;
+
+        // RFonts
+        Result_TextPr.RFonts = this.RFonts.Compare( TextPr.RFonts );
+
+        // BoldCS
+        if ( this.BoldCS === TextPr.BoldCS )
+            Result_TextPr.BoldCS = TextPr.BoldCS;
+
+        // ItalicCS
+        if ( this.ItalicCS === TextPr.ItalicCS )
+            Result_TextPr.ItalicCS = TextPr.ItalicCS;
+
+        // FontSizeCS
+        if ( undefined != this.FontSizeCS && undefined != TextPr.FontSizeCS && Math.abs( this.FontSizeCS - TextPr.FontSizeCS ) < 0.001 )
+            Result_TextPr.FontSizeCS = TextPr.FontSizeCS;
+
+        // CS
+        if ( this.CS === TextPr.CS )
+            Result_TextPr.CS = TextPr.CS;
+
+        // RTL
+        if ( this.RTL === TextPr.RTL )
+            Result_TextPr.RTL = TextPr.RTL;
+
+        // Lang
+        Result_TextPr.Lang = this.Lang.Compare( TextPr.Lang );
+
+        return Result_TextPr;
+    },
+
+    Write_ToBinary : function(Writer)
+    {
+        var StartPos = Writer.GetCurPosition();
+        Writer.Skip(4);
+        var Flags = 0;
+
+        if ( undefined != this.Bold )
+        {
+            Writer.WriteBool( this.Bold );
+            Flags |= 1;
+        }
+
+        if ( undefined != this.Italic )
+        {
+            Writer.WriteBool( this.Italic );
+            Flags |= 2;
+        }
+
+        if ( undefined != this.Underline )
+        {
+            Writer.WriteBool( this.Underline );
+            Flags |= 4;
+        }
+
+        if ( undefined != this.Strikeout )
+        {
+            Writer.WriteBool( this.Strikeout );
+            Flags |= 8;
+        }
+
+        if ( undefined != this.FontFamily )
+        {
+            Writer.WriteString2( this.FontFamily.Name );
+            Flags |= 16;
+        }
+
+        if ( undefined != this.FontSize )
+        {
+            Writer.WriteDouble( this.FontSize );
+            Flags |= 32;
+        }
+
+        if ( undefined != this.Color )
+        {
+            this.Color.Write_ToBinary(Writer);
+            Flags |= 64;
+        }
+
+        if ( undefined != this.VertAlign )
+        {
+            Writer.WriteLong( this.VertAlign );
+            Flags |= 128;
+        }
+
+        if ( undefined != this.HighLight )
+        {
+            if ( highlight_None === this.HighLight )
+            {
+                Writer.WriteLong( highlight_None );
+            }
+            else
+            {
+                Writer.WriteLong( 0 );
+                this.HighLight.Write_ToBinary( Writer );
+            }
+
+            Flags |= 256;
+        }
+
+        if ( undefined != this.RStyle )
+        {
+            Writer.WriteString2( this.RStyle );
+            Flags |= 512;
+        }
+
+        if ( undefined != this.Spacing )
+        {
+            Writer.WriteDouble( this.Spacing );
+            Flags |= 1024;
+        }
+
+        if ( undefined != this.DStrikeout )
+        {
+            Writer.WriteBool( this.DStrikeout );
+            Flags |= 2048;
+        }
+
+        if ( undefined != this.Caps )
+        {
+            Writer.WriteBool( this.Caps );
+            Flags |= 4096;
+        }
+
+        if ( undefined != this.SmallCaps )
+        {
+            Writer.WriteBool( this.SmallCaps );
+            Flags |= 8192;
+        }
+
+        if ( undefined != this.Position )
+        {
+            Writer.WriteDouble( this.Position );
+            Flags |= 16384;
+        }
+
+        if ( undefined != this.RFonts )
+        {
+            this.RFonts.Write_ToBinary( Writer );
+            Flags |= 32768;
+        }
+
+        if ( undefined != this.BoldCS )
+        {
+            Writer.WriteBool( this.BoldCS );
+            Flags |= 65536;
+        }
+
+        if ( undefined != this.ItalicCS )
+        {
+            Writer.WriteBool( this.ItalicCS );
+            Flags |= 131072;
+        }
+
+        if ( undefined != this.FontSizeCS )
+        {
+            Writer.WriteDouble( this.FontSizeCS );
+            Flags |= 262144;
+        }
+
+        if ( undefined != this.CS )
+        {
+            Writer.WriteBool( this.CS );
+            Flags |= 524288;
+        }
+
+        if ( undefined != this.RTL )
+        {
+            Writer.WriteBool( this.RTL );
+            Flags |= 1048576;
+        }
+
+        if ( undefined != this.Lang )
+        {
+            this.Lang.Write_ToBinary( Writer );
+            Flags |= 2097152;
+        }
+
+        var EndPos = Writer.GetCurPosition();
+        Writer.Seek( StartPos );
+        Writer.WriteLong( Flags );
+        Writer.Seek( EndPos );
+    },
+
+    Read_FromBinary : function(Reader)
+    {
+        var Flags = Reader.GetLong();
+
+        // Bold
+        if ( Flags & 1 )
+            this.Bold = Reader.GetBool();
+
+        // Italic
+        if ( Flags & 2 )
+            this.Italic = Reader.GetBool();
+
+        // Underline
+        if ( Flags & 4 )
+            this.Underline = Reader.GetBool();
+
+        // Strikeout
+        if ( Flags & 8 )
+            this.Strikeout = Reader.GetBool();
+
+        // FontFamily
+        if ( Flags & 16 )
+            this.FontFamily = { Name : Reader.GetString2(), Index : -1 };
+
+        // FontSize
+        if ( Flags & 32 )
+            this.FontSize = Reader.GetDouble();
+
+        // Color
+        if ( Flags & 64 )
+        {
+            this.Color = new CDocumentColor(0, 0, 0);
+            this.Color.Read_FromBinary(Reader);
+        }
+
+        // VertAlign
+        if ( Flags & 128 )
+            this.VertAlign = Reader.GetLong();
+
+        // HighLight
+        if ( Flags & 256 )
+        {
+            var HL_type = Reader.GetLong();
+            if ( highlight_None == HL_type )
+                this.HighLight = highlight_None;
+            else
+            {
+                this.HighLight = new CDocumentColor(0, 0, 0);
+                this.HighLight.Read_FromBinary(Reader);
+            }
+        }
+
+        // RStyle
+        if ( Flags & 512 )
+            this.RStyle = Reader.GetString2();
+
+        // Spacing
+        if ( Flags & 1024 )
+            this.Spacing = Reader.GetDouble();
+
+        // DStrikeout
+        if ( Flags & 2048 )
+            this.DStrikeout = Reader.GetBool();
+
+        // Caps
+        if ( Flags & 4096 )
+            this.Caps = Reader.GetBool();
+
+        // SmallCaps
+        if ( Flags & 8192 )
+            this.SmallCaps = Reader.GetBool();
+
+        // Position
+        if ( Flags & 16384 )
+            this.Position = Reader.GetDouble();
+
+        // RFonts
+        if ( Flags & 32768 )
+            this.RFonts.Read_FromBinary( Reader );
+
+        // BoldCS
+        if ( Flags & 65536 )
+            this.BoldCS = Reader.GetBool();
+
+        // ItalicCS
+        if ( Flags & 131072 )
+            this.ItalicCS = Reader.GetBool();
+
+        // FontSizeCS
+        if ( Flags & 262144 )
+            this.FontSizeCS = Reader.GetDouble();
+
+        // CS
+        if ( Flags & 524288 )
+            this.CS = Reader.GetBool();
+
+        // RTL
+        if ( Flags & 1048576 )
+            this.RTL = Reader.GetBool();
+
+        // Lang
+        if ( Flags & 2097152 )
+            this.Lang.Read_FromBinary( Reader );
+    },
+
+    Check_NeedRecalc : function()
+    {
+        if ( undefined != this.Bold )
+            return true;
+
+        if ( undefined != this.Italic )
+            return true;
+
+        if ( undefined != this.FontFamily )
+            return true;
+
+        if ( undefined != this.FontSize )
+            return true;
+
+        if ( undefined != this.VertAlign )
+            return true;
+
+        if ( undefined != this.Spacing )
+            return true;
+
+        if ( undefined != this.Caps )
+            return true;
+
+        if ( undefined != this.SmallCaps )
+            return true;
+
+        if ( undefined != this.Position )
+            return true;
+
+        if ( undefined != this.RFonts.Ascii )
+            return true;
+
+        if ( undefined != this.RFonts.EastAsia )
+            return true;
+
+        if ( undefined != this.RFonts.HAnsi )
+            return true;
+
+        if ( undefined != this.RFonts.CS )
+            return true;
+
+        if ( undefined != this.RTL || undefined != this.CS || undefined != this.BoldCS || undefined != this.ItalicCS || undefined != this.FontSizeCS )
+            return true;
+
+        if ( undefined != this.Lang.Val )
+            return true;
+
+        return false;
+    },
+
+    Get_FontKoef : function()
+    {
+        var dFontKoef  = 1;
+
+        switch ( this.VertAlign )
+        {
+            case vertalign_Baseline:
+            {
+                dFontKoef = 1;
+                break;
+            }
+            case vertalign_SubScript:
+            case vertalign_SuperScript:
+            {
+                dFontKoef = vertalign_Koef_Size;
+                break;
+            }
+        }
+
+        return dFontKoef;
+    },
+
+    Document_Get_AllFontNames : function(AllFonts)
+    {
+        if ( undefined != this.RFonts.Ascii )
+            AllFonts[this.RFonts.Ascii.Name] = true;
+
+        if ( undefined != this.RFonts.HAnsi )
+            AllFonts[this.RFonts.HAnsi.Name] = true;
+
+        if ( undefined != this.RFonts.EastAsia )
+            AllFonts[this.RFonts.EastAsia.Name] = true;
+
+        if ( undefined != this.RFonts.CS )
+            AllFonts[this.RFonts.CS.Name] = true;
+    },
+
+    Document_CreateFontMap : function(FontMap)
+    {
+        var Style   = ( true === this.Bold   ? 1 : 0 ) + ( true === this.Italic   ? 2 : 0 );
+        var StyleCS = ( true === this.BoldCS ? 1 : 0 ) + ( true === this.ItalicCS ? 2 : 0 );
+        var Size    = this.FontSize;
+        var SizeCS  = this.FontSizeCS;
+
+        var RFonts = this.RFonts;
+        if ( undefined != RFonts.Ascii )
+        {
+            var Key = "" + RFonts.Ascii.Name + "_" + Style + "_" + Size;
+            FontMap[Key] =
+            {
+                Name  : RFonts.Ascii.Name,
+                Style : Style,
+                Size  : Size
+            };
+        }
+
+        if ( undefined != RFonts.EastAsia )
+        {
+            var Key = "" + RFonts.EastAsia.Name + "_" + Style + "_" + Size;
+            FontMap[Key] =
+            {
+                Name  : RFonts.EastAsia.Name,
+                Style : Style,
+                Size  : Size
+            };
+        }
+
+        if ( undefined != RFonts.HAnsi )
+        {
+            var Key = "" + RFonts.HAnsi.Name + "_" + Style + "_" + Size;
+            FontMap[Key] =
+            {
+                Name  : RFonts.HAnsi.Name,
+                Style : Style,
+                Size  : Size
+            };
+        }
+
+        if ( undefined != RFonts.CS )
+        {
+            var Key = "" + RFonts.CS.Name + "_" + StyleCS + "_" + SizeCS;
+            FontMap[Key] =
+            {
+                Name  : RFonts.CS.Name,
+                Style : StyleCS,
+                Size  : SizeCS
+            };
+        }
+    },
+
+    isEqual: function(TextPrOld, TextPrNew)
+    {
+        if(TextPrOld == undefined || TextPrNew == undefined)
+            return false;
+        for(var TextPr in TextPrOld)
+        {
+            if(typeof TextPrOld[TextPr] == 'object')
+            {
+                /*for(var cpPr in TextPrOld[TextPr])
+                 {
+                 if(TextPrOld[TextPr][cpPr] != TextPrNew[TextPr][cpPr])
+                 return false;
+                 }*/
+                this.isEqual(TextPrOld[TextPr],TextPrNew[TextPr]);
+            }
+            else
+            {
+                if(typeof TextPrOld[TextPr] == "number" && typeof TextPrNew[TextPr] == "number")
+                {
+                    if(Math.abs(TextPrOld[TextPr] - TextPrNew[TextPr]) > 0.001)
+                        return false;
+                }
+                else if(TextPrOld[TextPr] != TextPrNew[TextPr])
+                    return false;
+            }
+        }
+        return true;
+    }
+}
+
+
+function CRFonts()
+{
+    this.Ascii    = undefined;
+    this.EastAsia = undefined;
+    this.HAnsi    = undefined;
+    this.CS       = undefined;
+    this.Hint     = undefined;
+}
+
+CRFonts.prototype =
+{
+    Set_All : function(FontName, FontIndex)
+    {
+        this.Ascii =
+        {
+            Name  : FontName,
+            Index : FontIndex
+        };
+
+        this.EastAsia =
+        {
+            Name  : FontName,
+            Index : FontIndex
+        };
+
+        this.HAnsi =
+        {
+            Name  : FontName,
+            Index : FontIndex
+        };
+
+        this.CS =
+        {
+            Name  : FontName,
+            Index : FontIndex
+        };
+
+        this.Hint = fonthint_Default;
+    },
+
+    Copy : function()
+    {
+        var RFonts = new CRFonts();
+        RFonts.Ascii    = this.Ascii;
+        RFonts.EastAsia = this.EastAsia;
+        RFonts.HAnsi    = this.HAnsi;
+        RFonts.CS       = this.CS;
+        RFonts.Hint     = this.Hint;
+        return RFonts;
+    },
+
+    Merge : function(RFonts)
+    {
+        if(!isRealObject(RFonts))
+            return;
+        if ( undefined !== RFonts.Ascii )
+            this.Ascii = RFonts.Ascii;
+
+        if ( undefined != RFonts.EastAsia )
+            this.EastAsia = RFonts.EastAsia;
+
+        if ( undefined != RFonts.HAnsi )
+            this.HAnsi = RFonts.HAnsi;
+
+        if ( undefined != RFonts.CS )
+            this.CS = RFonts.CS;
+
+        if ( undefined != RFonts.Hint )
+            this.Hint = RFonts.Hint;
+    },
+
+    Init_Default : function()
+    {
+        this.Ascii =
+        {
+            Name  : "Arial",
+            Index : -1
+        };
+
+        this.EastAsia =
+        {
+            Name  : "Arial",
+            Index : -1
+        };
+
+        this.HAnsi =
+        {
+            Name  : "Arial",
+            Index : -1
+        };
+
+        this.CS =
+        {
+            Name  : "Arial",
+            Index : -1
+        };
+
+        this.Hint = fonthint_Default;
+    },
+
+    Set_FromObject : function(RFonts)
+    {
+        if ( undefined != RFonts.Ascii )
+        {
+            this.Ascii =
+            {
+                Name  : RFonts.Ascii.Name,
+                Index : RFonts.Ascii.Index
+            };
+        }
+        else
+            this.Ascii = undefined;
+
+        if ( undefined != RFonts.EastAsia )
+        {
+            this.EastAsia =
+            {
+                Name  : RFonts.EastAsia.Name,
+                Index : RFonts.EastAsia.Index
+            };
+        }
+        else
+            this.EastAsia = undefined;
+
+        if ( undefined != RFonts.HAnsi )
+        {
+            this.HAnsi =
+            {
+                Name  : RFonts.HAnsi.Name,
+                Index : RFonts.HAnsi.Index
+            };
+        }
+        else
+            this.HAnsi = undefined;
+
+        if ( undefined != RFonts.CS )
+        {
+            this.CS =
+            {
+                Name  : RFonts.CS.Name,
+                Index : RFonts.CS.Index
+            };
+        }
+        else
+            this.CS = undefined;
+
+        this.Hint = RFonts.Hint;
+    },
+
+    Compare : function(RFonts)
+    {
+        var Result_RFonts = new CRFonts();
+
+        // Ascii
+        if ( undefined != this.Ascii && undefined != RFonts.Ascii && this.Ascii.Name === RFonts.Ascii.Name )
+        {
+            Result_RFonts.Ascii = {};
+            Result_RFonts.Ascii.Name  = RFonts.Ascii.Name;
+            Result_RFonts.Ascii.Index = -1;
+        }
+
+        // EastAsia
+        if ( undefined != this.EastAsia && undefined != RFonts.EastAsia && this.EastAsia.Name === RFonts.EastAsia.Name )
+        {
+            Result_RFonts.EastAsia = {};
+            Result_RFonts.EastAsia.Name  = RFonts.EastAsia.Name;
+            Result_RFonts.EastAsia.Index = -1;
+        }
+
+        // Ascii
+        if ( undefined != this.HAnsi && undefined != RFonts.HAnsi && this.HAnsi.Name === RFonts.HAnsi.Name )
+        {
+            Result_RFonts.HAnsi = {};
+            Result_RFonts.HAnsi.Name  = RFonts.HAnsi.Name;
+            Result_RFonts.HAnsi.Index = -1;
+        }
+
+        // Ascii
+        if ( undefined != this.CS && undefined != RFonts.CS && this.CS.Name === RFonts.CS.Name )
+        {
+            Result_RFonts.CS = {};
+            Result_RFonts.CS.Name  = RFonts.CS.Name;
+            Result_RFonts.CS.Index = -1;
+        }
+
+        // Hint
+        if ( this.Hint === RFonts.Hint )
+            Result_RFonts.Hint = RFonts.Hint;
+
+        return Result_RFonts;
+    },
+
+    Write_ToBinary : function(Writer)
+    {
+        var StartPos = Writer.GetCurPosition();
+        Writer.Skip(4);
+        var Flags = 0;
+
+        if ( undefined != this.Ascii )
+        {
+            Writer.WriteString2( this.Ascii.Name );
+            Flags |= 1;
+        }
+
+        if ( undefined != this.EastAsia )
+        {
+            Writer.WriteString2( this.EastAsia.Name );
+            Flags |= 2;
+        }
+
+        if ( undefined != this.HAnsi )
+        {
+            Writer.WriteString2( this.HAnsi.Name );
+            Flags |= 4;
+        }
+
+        if ( undefined != this.CS )
+        {
+            Writer.WriteString2( this.CS.Name );
+            Flags |= 8;
+        }
+
+        if ( undefined != this.Hint )
+        {
+            Writer.WriteLong( this.Hint );
+            Flags |= 16;
+        }
+
+        var EndPos = Writer.GetCurPosition();
+        Writer.Seek( StartPos );
+        Writer.WriteLong( Flags );
+        Writer.Seek( EndPos );
+    },
+
+    Read_FromBinary : function(Reader)
+    {
+        var Flags = Reader.GetLong();
+
+        // Ascii
+        if ( Flags & 1 )
+            this.Ascii = { Name : Reader.GetString2(), Index : -1 };
+
+        // EastAsia
+        if ( Flags & 2 )
+            this.EastAsia = { Name : Reader.GetString2(), Index : -1 };
+
+        // HAnsi
+        if ( Flags & 4 )
+            this.HAnsi = { Name : Reader.GetString2(), Index : -1 };
+
+        // CS
+        if ( Flags & 8 )
+            this.CS = { Name : Reader.GetString2(), Index : -1 };
+
+        // Hint
+        if ( Flags & 16 )
+            this.Hint = Reader.GetLong();
+    }
+};
+
+function CLang()
+{
+    this.Bidi     = undefined;
+    this.EastAsia = undefined;
+    this.Val      = undefined;
+}
+
+CLang.prototype =
+{
+    Copy : function()
+    {
+        var Lang = new CLang();
+        Lang.Bidi     = this.Bidi;
+        Lang.EastAsia = this.EastAsia;
+        Lang.Val      = this.Val;
+        return Lang;
+    },
+
+    Merge : function(Lang)
+    {
+        if(!isRealObject(Lang))
+            return;
+        if ( undefined !== Lang.Bidi )
+            this.Bidi = Lang.Bidi;
+
+        if ( undefined !== Lang.EastAsia )
+            this.EastAsia = Lang.EastAsia;
+
+        if ( undefined !== Lang.Val )
+            this.Val = Lang.Val;
+    },
+
+    Init_Default : function()
+    {
+        this.Bidi     = lcid_enUS;
+        this.EastAsia = lcid_enUS;
+        this.Val      = lcid_enUS;
+    },
+
+    Set_FromObject : function(Lang)
+    {
+        this.Bidi     = Lang.Bidi;
+        this.EastAsia = Lang.EastAsia;
+        this.Val      = Lang.Val;
+    },
+
+    Compare : function(Lang)
+    {
+        var Result_Lang = new CLang();
+
+        // Bidi
+        if ( this.Bidi === Lang.Bidi )
+            Result_Lang.Bidi = Lang.Bidi;
+
+        // EastAsia
+        if ( this.EastAsia === Lang.EastAsia )
+            Result_Lang.EastAsia = Lang.EastAsia;
+
+        // Val
+        if ( this.Val === Lang.Val )
+            Result_Lang.Val = Lang.Val;
+
+        return Result_Lang;
+    },
+
+    Write_ToBinary : function(Writer)
+    {
+        var StartPos = Writer.GetCurPosition();
+        Writer.Skip(4);
+        var Flags = 0;
+
+        if ( undefined != this.Bidi )
+        {
+            Writer.WriteLong( this.Bidi );
+            Flags |= 1;
+        }
+
+        if ( undefined != this.EastAsia )
+        {
+            Writer.WriteLong( this.EastAsia );
+            Flags |= 2;
+        }
+
+        if ( undefined != this.Val )
+        {
+            Writer.WriteLong( this.Val );
+            Flags |= 4;
+        }
+
+        var EndPos = Writer.GetCurPosition();
+        Writer.Seek( StartPos );
+        Writer.WriteLong( Flags );
+        Writer.Seek( EndPos );
+    },
+
+    Read_FromBinary : function(Reader)
+    {
+        var Flags = Reader.GetLong();
+
+        // Bidi
+        if ( Flags & 1 )
+            this.Bidi = Reader.GetLong();
+
+        // EastAsia
+        if ( Flags & 2 )
+            this.EastAsia = Reader.GetLong();
+
+        // Val
+        if ( Flags & 4 )
+            this.Val = Reader.GetLong();
+    }
+};
 
 function CParaTab(Value, Pos)
 {

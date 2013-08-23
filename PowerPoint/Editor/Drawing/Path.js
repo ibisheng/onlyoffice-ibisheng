@@ -5,6 +5,9 @@ var moveTo=0,
     bezier4=4,
     close=5;
 
+var PATH_COMMAND_START = 0x101;
+var PATH_COMMAND_END = 0x102;
+
 var cToRad = Math.PI / 10800000.0;
 var cToDeg = 1/cToRad;
 
@@ -39,20 +42,207 @@ function Path(extrusionOk, fill, stroke, w, h)
         }
 
         /*for (i = 0; i < this.ArrPathCommand.length; ++i)
-        {
-            duplicate.ArrPathCommand[i] = clonePrototype(this.ArrPathCommand[i]);
-        }  */
+         {
+         duplicate.ArrPathCommand[i] = clonePrototype(this.ArrPathCommand[i]);
+         }  */
         return duplicate;
-    }
+    };
+
+    this.Id = g_oIdCounter.Get_NewId();
+    g_oTableId.Add(this, this.Id);
 }
 
 Path.prototype = {
+
+    getObjectType: function()
+    {
+        return CLASS_TYPE_PATH;
+    },
+
+    Write_ToBinary2: function(writer)
+    {
+        writer.WriteBool(this.stroke);
+        writer.WriteBool(this.extrusionOk);
+        writer.WriteString2(this.fill);
+
+        var flag = this.pathW != undefined;
+        writer.WriteBool(flag);
+        if(flag)
+            writer.WriteLong(this.pathW);
+
+        flag = this.pathH != undefined;
+        writer.WriteBool(flag);
+        if(flag)
+            writer.WriteLong(this.pathH);
+
+        flag = this.divPW != undefined;
+        writer.WriteBool(flag);
+        if(flag)
+            writer.WriteDouble(this.divPW);
+
+        flag = this.divPH != undefined;
+        writer.WriteBool(flag);
+        if(flag)
+            writer.WriteDouble(this.divPH);
+
+        var path_command_count = this.ArrPathCommandInfo.length;
+        writer.WriteLong(path_command_count);
+        var write_function = /*typeof this.pathH === "number" ? writer.WriteLong :*/ writer.WriteString2;
+        for(var index = 0; index < path_command_count; ++index)
+        {
+            var c = this.ArrPathCommandInfo[index];
+            switch (c.id)
+            {
+                case moveTo:
+                case lineTo:
+                {
+                    writer.WriteLong(c.id);
+                    write_function.call(writer,c.X);
+                    write_function.call(writer,c.Y);
+                    break;
+                }
+                case bezier3:
+                {
+                    writer.WriteLong(c.id);
+                    write_function.call(writer,c.X0);
+                    write_function.call(writer,c.Y0);
+                    write_function.call(writer,c.X1);
+                    write_function.call(writer,c.Y1);
+                    break;
+                }
+                case bezier4:
+                {
+                    writer.WriteLong(c.id);
+                    write_function.call(writer,c.X0);
+                    write_function.call(writer,c.Y0);
+                    write_function.call(writer,c.X1);
+                    write_function.call(writer,c.Y1);
+                    write_function.call(writer,c.X2);
+                    write_function.call(writer,c.Y2);
+                    break;
+                }
+                case arcTo:
+                {
+                    writer.WriteLong(c.id);
+                    write_function.call(writer,c.hR);
+                    write_function.call(writer,c.wR);
+                    write_function.call(writer,c.stAng);
+                    write_function.call(writer,c.swAng);
+
+                    break;
+                }
+                case close:
+                {
+                    writer.WriteLong(c.id);
+                    break;
+                }
+            }
+        }
+        for(index = 0; index < path_command_count; ++index)
+        {
+            WriteObjectLong(writer, this.ArrPathCommand[index]);
+        }
+    },
+
+    Read_FromBinary2: function(Reader)
+    {
+        this.stroke = Reader.GetBool();
+        this.extrusionOk = Reader.GetBool();
+        this.fill = Reader.GetString2();
+
+        var flag = Reader.GetBool();
+        if(flag)
+            this.pathW = Reader.GetLong();
+
+        flag = Reader.GetBool();
+        if(flag)
+            this.pathH = Reader.GetLong();
+
+        flag = Reader.GetBool();
+        if(flag)
+            this.divPW = Reader.GetDouble();
+
+        flag = Reader.GetBool();
+        if(flag)
+            this.divPH = Reader.GetDouble();
+
+        if(typeof this.pathW === "number")
+            this.divPW = 1/this.pathW;
+
+
+        if(typeof this.pathH === "number")
+            this.divPH = 1/this.pathH;
+
+        var path_command_count = Reader.GetLong();
+        var read_function = /*typeof this.pathH === "number" ? Reader.GetLong :*/ Reader.GetString2;
+        for(var index = 0; index < path_command_count; ++index)
+        {
+            var c = {};
+            var id = Reader.GetLong();
+            c.id = id;
+            switch (id)
+            {
+                case moveTo:
+                case lineTo:
+                {
+                    c.X = read_function.call(Reader);
+                    c.Y = read_function.call(Reader);
+
+                    break;
+                }
+                case bezier3:
+                {
+                    c.X0 = read_function.call(Reader);
+                    c.Y0 = read_function.call(Reader);
+                    c.X1 = read_function.call(Reader);
+                    c.Y1 = read_function.call(Reader);
+                    break;
+                }
+                case bezier4:
+                {
+                    c.X0 = read_function.call(Reader);
+                    c.Y0 = read_function.call(Reader);
+                    c.X1 = read_function.call(Reader);
+                    c.Y1 = read_function.call(Reader);
+                    c.X2 = read_function.call(Reader);
+                    c.Y2 = read_function.call(Reader);
+                    break;
+                }
+                case arcTo:
+                {
+                    c.hR = read_function.call(Reader);
+                    c.wR = read_function.call(Reader);
+                    c.stAng = read_function.call(Reader);
+                    c.swAng = read_function.call(Reader);
+
+                    break;
+                }
+                case close:
+                {
+                    break;
+                }
+            }
+            for(var key in c)
+            {
+                if(!isNaN(parseInt(c[key], 10)))
+                    c[key] = parseInt(c[key], 10);
+            }
+            this.ArrPathCommandInfo.push(c);
+        }
+        for(index = 0; index < path_command_count; ++index)
+        {
+            this.ArrPathCommand[index] = ReadObjectLong(Reader);
+        }
+    },
+
     moveTo: function(x, y)
     {
         if(!isNaN(parseInt(x,10)))
             x=parseInt(x,10);
         if(!isNaN(parseInt(y,10)))
             y=parseInt(y,10);
+
+        //History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Add_PathMoveTo, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataMoveToLineTo(x, y, true)), null);
         this.ArrPathCommandInfo.push({id:moveTo, X:x, Y:y});
     },
 
@@ -62,6 +252,8 @@ Path.prototype = {
             x=parseInt(x,10);
         if(!isNaN(parseInt(y,10)))
             y=parseInt(y,10);
+
+        //History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Add_PathLineTo, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataMoveToLineTo(x, y, false)), null);
         this.ArrPathCommandInfo.push({id:lineTo, X:x, Y:y});
     },
 
@@ -76,6 +268,9 @@ Path.prototype = {
             stAng=parseInt(stAng,10);
         if(!isNaN(parseInt(swAng,10)))
             swAng=parseInt(swAng,10);
+
+
+        //History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Add_PathArcTo, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataArcTo(wR, hR, stAng, swAng)), null);
         this.ArrPathCommandInfo.push({id: arcTo, wR: wR, hR: hR, stAng: stAng, swAng: swAng});
     },
 
@@ -90,6 +285,7 @@ Path.prototype = {
             x1=parseInt(x1,10);
         if(!isNaN(parseInt(y1,10)))
             y1=parseInt(y1,10);
+        //History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Add_PathQuadBezTo, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataQuadBezTo(x0, y0, x1, y1)), null);
         this.ArrPathCommandInfo.push({id:bezier3, X0:x0, Y0:y0, X1:x1, Y1:y1});
     },
 
@@ -109,16 +305,24 @@ Path.prototype = {
             x2=parseInt(x2,10);
         if(!isNaN(parseInt(y2,10)))
             y2=parseInt(y2,10);
+        //History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Add_PathCubicBezTo, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataCubicBezTo(x0, y0, x1, y1, x2, y2)), null);
         this.ArrPathCommandInfo.push({id:bezier4, X0:x0, Y0:y0, X1:x1, Y1:y1, X2:x2, Y2:y2});
     },
 
     close: function()
     {
+        //History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Add_PathClose, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataClosePath()), null);
         this.ArrPathCommandInfo.push({id:close});
     },
 
     init: function(gdLst)
     {
+        if(this.ArrPathCommandInfo.length === this.ArrPathCommand.length)
+        {
+            this.ArrPathCommand.length = 0;
+            /*this.recalculate(gdLst);
+             return; */
+        }
         var ch, cw;
         if(this.pathW!=undefined)
         {
@@ -156,7 +360,7 @@ Path.prototype = {
 
                     lastX=x0*cw;
                     lastY=y0*ch;
-                    
+
                     break;
                 }
                 case bezier3:
@@ -186,7 +390,7 @@ Path.prototype = {
                     }
 
                     this.ArrPathCommand.push({id:bezier3, X0:x0*cw, Y0: y0*ch, X1:x1*cw, Y1:y1*ch});
-                    
+
                     lastX=x1*cw;
                     lastY=y1*ch;
                     break;
@@ -231,7 +435,7 @@ Path.prototype = {
                         y2=gdLst[cmd.Y2];
                     }
 
-                    
+
                     this.ArrPathCommand.push({id:bezier4, X0:x0*cw, Y0: y0*ch, X1:x1*cw, Y1:y1*ch, X2:x2*cw, Y2:y2*ch});
 
                     lastX=x2*cw;
@@ -253,7 +457,7 @@ Path.prototype = {
                         wR=gdLst[cmd.wR];
                     }
 
-                    
+
                     stAng=parseInt(cmd.stAng);
                     if(isNaN(stAng))
                     {
@@ -305,22 +509,22 @@ Path.prototype = {
                     lastY = yc + l1 * sin1;
 
                     /*
-                    var sin1 = Math.sin(stAng+swAng);
-                    var cos1 = Math.cos(stAng+swAng);
+                     var sin1 = Math.sin(stAng+swAng);
+                     var cos1 = Math.cos(stAng+swAng);
 
-                    var __x = cos1 / (wR*cw);
-                    var __y = sin1 / (hR*ch);
-                    var l = 1 / Math.sqrt(__x * __x + __y * __y);
+                     var __x = cos1 / (wR*cw);
+                     var __y = sin1 / (hR*ch);
+                     var l = 1 / Math.sqrt(__x * __x + __y * __y);
 
-                    var xc = lastX - l * cos1;
-                    var yc = lastY - l * sin1;
+                     var xc = lastX - l * cos1;
+                     var yc = lastY - l * sin1;
 
-                    lastX=xc+cw*wR*Math.cos(AngToEllPrm(stAng+swAng, wR, hR));
-                    lastY=yc+ch*hR*Math.sin(AngToEllPrm(stAng+swAng, wR, hR));
-                    */
+                     lastX=xc+cw*wR*Math.cos(AngToEllPrm(stAng+swAng, wR, hR));
+                     lastY=yc+ch*hR*Math.sin(AngToEllPrm(stAng+swAng, wR, hR));
+                     */
                     //lastX=lastX+wR*cw*(-Math.cos(stAng*cToRad)+Math.cos((stAng+swAng)*cToRad));
                     //lastY=lastY+hR*ch*(-Math.sin(stAng*cToRad)+Math.sin((stAng+swAng)*cToRad));
-                    
+
                     break;
                 }
                 case close:
@@ -440,13 +644,13 @@ Path.prototype = {
                     x2=gdLst[cmd.X2];
                     if(x2===undefined)
                     {
-                       x2=cmd.X2;
+                        x2=cmd.X2;
                     }
 
                     y2=gdLst[cmd.Y2];
                     if(y2===undefined)
                     {
-                       y2=cmd.Y2;
+                        y2=cmd.Y2;
                     }
 
 
@@ -459,11 +663,11 @@ Path.prototype = {
                 }
                 case arcTo:
                 {
-                     hR=gdLst[cmd.hR];
+                    hR=gdLst[cmd.hR];
 
                     if(hR===undefined)
                     {
-                       hR=cmd.hR;
+                        hR=cmd.hR;
                     }
 
 
@@ -608,13 +812,13 @@ Path.prototype = {
 
         shape_drawer._e();
         /*
-        shape_drawer.df(this.fill);
+         shape_drawer.df(this.fill);
 
-        if (this.stroke && !shape_drawer.bIsNoStrokeAttack)
-        {
-            shape_drawer.ds();
-        }
-        */
+         if (this.stroke && !shape_drawer.bIsNoStrokeAttack)
+         {
+         shape_drawer.ds();
+         }
+         */
     },
 
     check_bounds: function(checker)
@@ -657,5 +861,305 @@ Path.prototype = {
                 }
             }
         }
+    },
+
+    hitInInnerArea: function(canvasContext, x, y)
+    {
+        if(this.fill === "none")
+            return false;
+
+        var _arr_commands = this.ArrPathCommand;
+        var _commands_count = _arr_commands.length;
+        var _command_index;
+        var _command;
+        canvasContext.beginPath();
+        for(_command_index = 0; _command_index < _commands_count; ++_command_index)
+        {
+            _command = _arr_commands[_command_index];
+            switch(_command.id)
+            {
+                case moveTo:
+                {
+                    canvasContext.moveTo(_command.X, _command.Y);
+                    break;
+                }
+                case lineTo:
+                {
+                    canvasContext.lineTo(_command.X, _command.Y);
+                    break;
+                }
+                case arcTo:
+                {
+                    ArcToOnCanvas(canvasContext, _command.stX, _command.stY, _command.wR, _command.hR, _command.stAng, _command.swAng);
+                    break;
+                }
+                case bezier3:
+                {
+                    canvasContext.quadraticCurveTo(_command.X0, _command.Y0, _command.X1, _command.Y1);
+                    break;
+                }
+                case bezier4:
+                {
+                    canvasContext.bezierCurveTo(_command.X0, _command.Y0, _command.X1, _command.Y1, _command.X2, _command.Y2);
+                    break;
+                }
+                case close:
+                {
+                    canvasContext.closePath();
+                    if(canvasContext.isPointInPath(x, y))
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    },
+
+    hitInPath: function(canvasContext, x, y)
+    {
+        var _arr_commands = this.ArrPathCommand;
+        var _commands_count = _arr_commands.length;
+        var _command_index;
+        var _command;
+        var _last_x, _last_y;
+        var _begin_x, _begin_y;
+        for(_command_index = 0; _command_index< _commands_count; ++_command_index)
+        {
+            _command = _arr_commands[_command_index];
+            switch(_command.id)
+            {
+                case moveTo:
+                {
+                    _last_x = _command.X;
+                    _last_y = _command.Y;
+                    _begin_x = _command.X;
+                    _begin_y = _command.Y;
+                    break;
+                }
+                case lineTo:
+                {
+                    if(HitInLine(canvasContext, x, y, _last_x, _last_y, _command.X, _command.Y))
+                        return true;
+                    _last_x = _command.X;
+                    _last_y = _command.Y;
+                    break;
+                }
+                case arcTo:
+                {
+                    if(HitToArc(canvasContext, x, y,  _command.stX, _command.stY, _command.wR, _command.hR, _command.stAng, _command.swAng))
+                        return true;
+                    _last_x=(_command.stX-_command.wR*Math.cos(_command.stAng)+_command.wR*Math.cos(_command.swAng));
+                    _last_y=(_command.stY-_command.hR*Math.sin(_command.stAng)+_command.hR*Math.sin(_command.swAng));
+                    break;
+                }
+                case bezier3:
+                {
+                    if(HitInBezier3(canvasContext, x, y, _last_x, _last_y, _command.X0, _command.Y0, _command.X1, _command.Y1))
+                        return true;
+                    _last_x=_command.X1;
+                    _last_y=_command.Y1;
+                    break;
+                }
+                case bezier4:
+                {
+                    if(HitInBezier4(canvasContext, x, y, _last_x, _last_y, _command.X0, _command.Y0, _command.X1, _command.Y1, _command.X2, _command.Y2))
+                        return true;
+                    _last_x=_command.X2;
+                    _last_y=_command.Y2;
+                    break;
+                }
+                case close:
+                {
+                    if(HitInLine(canvasContext, x, y, _last_x, _last_y, _begin_x, _begin_y))
+                        return true;
+                }
+            }
+        }
+        return false;
+    },
+
+    calculateWrapPolygon: function(epsilon, graphics)
+    {
+        var arr_polygons = [];
+        var cur_polygon = [];
+        var path_commands = this.ArrPathCommand;
+        var path_commands_count = path_commands.length;
+        var last_x, last_y;
+        for(var  index = 0; index < path_commands_count; ++index)
+        {
+            var cur_command = path_commands[index];
+            switch (cur_command.id)
+            {
+                case moveTo:
+                case lineTo:
+                {
+                    cur_polygon.push({x: cur_command.X, y: cur_command.Y});
+                    last_x = cur_command.X;
+                    last_y = cur_command.Y;
+                    break;
+                }
+                case bezier3:
+                {
+                    cur_polygon = cur_polygon.concat(partition_bezier3(last_x, last_y, cur_command.X0, cur_command.Y0, cur_command.X1, cur_command.Y1, epsilon));
+                    last_x = cur_command.X1;
+                    last_y = cur_command.Y1;
+                    break;
+                }
+                case bezier4:
+                {
+                    cur_polygon = cur_polygon.concat(partition_bezier4(last_x, last_y, cur_command.X0, cur_command.Y0, cur_command.X1, cur_command.Y1, cur_command.X2, cur_command.Y2, epsilon));
+                    last_x = cur_command.X2;
+                    last_y = cur_command.Y2;
+                    break;
+                }
+
+                case arcTo:
+                {
+                    var arr_curve_bezier = getArrayPointsCurveBezierAtArcTo(last_x, last_y, cur_command.stX, cur_command.stY, cur_command.wR, cur_command.hR, cur_command.stAng, cur_command.swAng);
+                    if(arr_curve_bezier.length > 0)
+                    {
+                        last_x = arr_curve_bezier[arr_curve_bezier.length - 1].x4;
+                        last_y = arr_curve_bezier[arr_curve_bezier.length - 1].y4;
+                        for(var i = 0;  i < arr_curve_bezier.length; ++i)
+                        {
+                            var cur_curve_bezier = arr_curve_bezier[i];
+                            cur_polygon = cur_polygon.concat(partition_bezier4(cur_curve_bezier.x0, cur_curve_bezier.y0, cur_curve_bezier.x1, cur_curve_bezier.y1, cur_curve_bezier.x2, cur_curve_bezier.y2, cur_curve_bezier.x3, cur_curve_bezier.y3, epsilon))
+                        }
+                    }
+                    break;
+                }
+                case close:
+                {
+                    arr_polygons.push(cur_polygon);
+                    cur_polygon = [];
+                }
+            }
+        }
+
+        for(i = 0; i < arr_polygons.length; ++i)
+        {
+            var cur_polygon = arr_polygons[i];
+            graphics._m(cur_polygon[0].x, cur_polygon[0].y);
+            for(var j = 0; j < cur_polygon.length; ++j)
+            {
+                graphics._l(cur_polygon[j].x, cur_polygon[j].y);
+            }
+            graphics._z();
+            graphics.ds();
+        }
+    },
+
+
+    Undo: function(type, data)
+    {
+        switch(type)
+        {
+            case historyitem_AutoShapes_Add_PathMoveTo:
+            case historyitem_AutoShapes_Add_PathLineTo:
+            case historyitem_AutoShapes_Add_PathArcTo:
+            case historyitem_AutoShapes_Add_PathQuadBezTo:
+            case historyitem_AutoShapes_Add_PathCubicBezTo:
+            {
+                this.ArrPathCommandInfo.splice(this.ArrPathCommandInfo.length - 1, 1);
+            }
+        }
+    },
+
+    Redo: function(type, data)
+    {
+        switch (type)
+        {
+            case historyitem_AutoShapes_Add_PathMoveTo:
+            {
+                this.ArrPathCommandInfo.push({id:moveTo, X: data.x, Y: data.y});
+                break;
+            }
+
+            case historyitem_AutoShapes_Add_PathLineTo:
+            {
+                this.ArrPathCommandInfo.push({id:lineTo, X: data.x, Y: data.y});
+                break;
+            }
+
+
+            case historyitem_AutoShapes_Add_PathArcTo:
+            {
+                this.ArrPathCommandInfo.push({id:arcTo, wR: data.wR, hR: data.hR, stAng: data.stAng, swAng: data.swAng});
+                break;
+            }
+            case historyitem_AutoShapes_Add_PathClose:
+            {
+                this.ArrPathCommandInfo.push({id: close});
+                break;
+            }
+        }
     }
 };
+
+
+function partition_bezier3(x0, y0, x1, y1, x2, y2, epsilon)
+{
+    var dx01 = x1 - x0;
+    var dy01 = y1 - y0;
+    var dx12 = x2 - x1;
+    var dy12 = y2 - y1;
+
+    var r01 = Math.sqrt(dx01*dx01 + dy01*dy01);
+    var r12 = Math.sqrt(dx12*dx12 + dy12*dy12);
+    if(Math.max(r01, r12) < epsilon)
+        return [{x: x0, y: y0}, {x: x1, y: y1}, {x: x2, y: y2}];
+
+    var x01 = (x0 + x1)*0.5;
+    var y01 = (y0 + y1)*0.5;
+
+    var x12 = (x1 + x2)*0.5;
+    var y12 = (y1 + y2)*0.5;
+
+    var x012 = (x01 + x12)*0.5;
+    var y012 = (y01 + y12)*0.5;
+
+    return  partition_bezier3(x0, y0, x01, y01, x012, y012, epsilon).concat(partition_bezier3(x012, y012, x12, y12, x2, y2, epsilon));
+}
+
+function partition_bezier4(x0, y0, x1, y1, x2, y2, x3, y3, epsilon)
+{
+    var dx01 = x1 - x0;
+    var dy01 = y1 - y0;
+    var dx12 = x2 - x1;
+    var dy12 = y2 - y1;
+    var dx23 = x3 - x2;
+    var dy23 = y3 - y2;
+
+    var r01 = Math.sqrt(dx01*dx01 + dy01*dy01);
+    var r12 = Math.sqrt(dx12*dx12 + dy12*dy12);
+    var r23 = Math.sqrt(dx23*dx23 + dy23*dy23);
+
+    if(Math.max(r01, r12, r23) < epsilon)
+        return [{x: x0, y: y0}, {x: x1, y: y1}, {x: x2, y: y2}, {x: x3, y: y3}];
+
+
+    var x01 = (x0 + x1)*0.5;
+    var y01 = (y0 + y1)*0.5;
+
+    var x12 = (x1 + x2)*0.5;
+    var y12 = (y1 + y2)*0.5;
+
+    var x23 = (x2 + x3)*0.5;
+    var y23 = (y2 + y3)*0.5;
+
+    var x012 = (x01 + x12)*0.5;
+    var y012 = (y01 + y12)*0.5;
+
+    var x123 = (x12 + x23)*0.5;
+    var y123 = (y12 + y23)*0.5;
+
+    var x0123 = (x012 + x123)*0.5;
+    var y0123 = (y012 + y123)*0.5;
+
+    return partition_bezier4(x0, y0, x01, y01, x012, y012, x0123, y0123, epsilon).concat(partition_bezier4(x0123, y0123, x123, y123, x23, y23, x3, y3, epsilon));
+}
+
+
+
+

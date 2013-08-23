@@ -4,6 +4,12 @@
  * Time: 14:35
  */
 
+/**
+ * User: Ilja.Kirillov
+ * Date: 11.04.12
+ * Time: 14:35
+ */
+
 var historyitem_Unknown = 0;
 
 // Типы изменений в классе CDocument
@@ -60,11 +66,31 @@ var historyitem_TextPr_Color      =  8; // Изменяем цвет текст�
 var historyitem_TextPr_VertAlign  =  9; // Изменяем вертикальное прилегание
 var historyitem_TextPr_HighLight  = 10; // Изменяем выделение текста
 var historyitem_TextPr_RStyle     = 11; // Изменяем стиль текста
-var historyitem_TextPr_Unifill     = 12; // Изменяем стиль текста
+var historyitem_TextPr_Spacing    = 12; // Изменяем расстояние между символами
+var historyitem_TextPr_DStrikeout = 13; // Изменяем двойное зачеркивание
+var historyitem_TextPr_Caps       = 14; // Изменяем все буквы на прописные
+var historyitem_TextPr_SmallCaps  = 15; // Изменяем все буквы на малые прописные
+var historyitem_TextPr_Position   = 16; // Изменяем вертикальное положение
+var historyitem_TextPr_Value      = 17; // Изменяем целиком все настройки
+var historyitem_TextPr_Unifill    = 18;
+var historyitem_TextPr_RFonts     = 19; // Изменяем настройки шрифтов
+var historyitem_TextPr_Lang       = 20; // Изменяем настройку языка
 
 // Типы изменений в классе ParaDrawing
-var historyitem_Drawing_Size = 1; // Изменяем размер картинки
-var historyitem_Drawing_Url  = 2; // Изменяем адрес картинку (т.е. меняем само изображение)
+var historyitem_Drawing_Size              = 1; // Изменяем размер картинки
+var historyitem_Drawing_Url               = 2; // Изменяем адрес картинку (т.е. меняем само изображение)
+var historyitem_Drawing_DrawingType       = 3; // Изменяем тип объекта (anchor/inline)
+var historyitem_Drawing_WrappingType      = 4; // Изменяем тип обтекания
+var historyitem_Drawing_Distance          = 5; // Изменяем расстояние до окружающего текста
+var historyitem_Drawing_AllowOverlap      = 6; // Изменяем возможность перекрытия плавающих картинок
+var historyitem_Drawing_PositionH         = 7; // Изменяем привязку по горизонтали
+var historyitem_Drawing_PositionV         = 8; // Изменяем привязку по вертикали
+var historyitem_Drawing_AbsoluteTransform = 9;
+var historyitem_Drawing_BehindDoc         = 10; // Изменяем положение объекта (за/перед текстом)
+var historyitem_Drawing_SetZIndex         = 11;
+var historyitem_Drawing_SetGraphicObject  = 12;
+var historyitem_CalculateAfterPaste = 13;
+
 
 // Типы изменений в классе CDrawingObjects
 var historyitem_DrawingObjects_AddItem    = 1;
@@ -105,6 +131,12 @@ var historyitem_Table_TableLook             = 19; // Изменяем тип у�
 var historyitem_Table_TableStyleRowBandSize = 20; // Изменяем количество строк в группе
 var historyitem_Table_TableStyleColBandSize = 21; // Изменяем количество колонок в группе
 var historyitem_Table_TableStyle            = 22; // Изменяем стиль таблицы
+var historyitem_Table_AllowOverlap          = 23; // Изменяем возможность перекрытия плавающих таблиц
+var historyitem_Table_PositionH             = 24; // Изменяем привязку по горизонтали
+var historyitem_Table_PositionV             = 25; // Изменяем привязку по вертикали
+var historyitem_Table_Distance              = 26; // Изменяем расстояние до окружающего текста
+var historyitem_Table_Pr                    = 27; // Изменяем настройки таблицы целиком
+var historyitem_Table_TableLayout           = 28; // Изменяем настройки рассчета ширины колонок
 
 // Типы изменений в классе CTableRow
 var historyitem_TableRow_Before      = 1; // Изменяем свойство Before
@@ -113,16 +145,20 @@ var historyitem_TableRow_CellSpacing = 3; // Изменяем свойство C
 var historyitem_TableRow_Height      = 4; // Изменяем свойство Height
 var historyitem_TableRow_AddCell     = 5; // Добавляем ячейку
 var historyitem_TableRow_RemoveCell  = 6; // Удаляем ячейку
+var historyitem_TableRow_TableHeader = 7; // Изменяем свойство TableHeader
+var historyitem_TableRow_Pr          = 8; // Изменяем настройки строки целиком
 
 // Типы изменений в классе CTableCell
-var historyitem_TableCell_GridSpan      = 1; // Изменяем горизонтальное объединение
-var historyitem_TableCell_Margins       = 2; // Изменяем отступы
-var historyitem_TableCell_Shd           = 3; // Изменяем заливку
-var historyitem_TableCell_VMerge        = 4; // Изменяем вертикальное объединение
-var historyitem_TableCell_Border_Left   = 5; // Изменяем левую границу ячейки
-var historyitem_TableCell_Border_Right  = 6; // Изменяем правую границу ячейки
-var historyitem_TableCell_Border_Top    = 7; // Изменяем верхнюю границу ячейки
-var historyitem_TableCell_Border_Bottom = 8; // Изменяем нижнюю границу ячейки
+var historyitem_TableCell_GridSpan      =  1; // Изменяем горизонтальное объединение
+var historyitem_TableCell_Margins       =  2; // Изменяем отступы
+var historyitem_TableCell_Shd           =  3; // Изменяем заливку
+var historyitem_TableCell_VMerge        =  4; // Изменяем вертикальное объединение
+var historyitem_TableCell_Border_Left   =  5; // Изменяем левую границу ячейки
+var historyitem_TableCell_Border_Right  =  6; // Изменяем правую границу ячейки
+var historyitem_TableCell_Border_Top    =  7; // Изменяем верхнюю границу ячейки
+var historyitem_TableCell_Border_Bottom =  8; // Изменяем нижнюю границу ячейки
+var historyitem_TableCell_VAlign        =  9; // Изменяем вертикальное выравнивание ячейки
+var historyitem_TableCell_W             = 10; // Изменяем ширину ячейки
 
 // Типы изменений в классе CDocumentContent
 var historyitem_DocumentContent_AddItem     = 1; // Добавляем элемент в документ
@@ -157,6 +193,106 @@ var historyitem_Comments_Remove = 2; // Удалили комментарий
 var historyitem_Comment_Change   = 1; // Изменили комментарий
 var historyitem_Comment_TypeInfo = 2; // Изменили информацию о типе комментария
 
+// Типы изменений в классе CParaHyperlinkStart
+var historyitem_Hyperlink_Value   = 1; // Изменяем значение гиперссылки
+var historyitem_Hyperlink_ToolTip = 2; // Изменяем подсказку гиперссылки
+
+//Типы изменений в классе CGraphicObjects
+var historyitem_AddNewGraphicObject = 0;
+var historyitem_RemoveGraphicObject = 1;
+
+
+//Типы изменений в классе CGeometry
+var historyitem_SetGuideValue = 0;
+var historyitem_SetAdjustmentValue = 1;
+
+//Типы изменений в классе CSlide
+var historyitem_RemoveFromSpTree = 0;
+var historyitem_AddToSlideSpTree = 1;
+
+
+
+//Типы изменений в классе Presenattion
+// Типы изменений в классе CDocument
+var historyitem_Presenattion_AddSlide     = 1; // Добавляем слайд
+var historyitem_Presenattion_RemoveSlide  = 2; // Удаляем слайд
+var historyitem_Presenattion_SlideSize    = 3; // Меняем размер слайда
+
+
+
+//Типы изменений в классе WordShape
+var historyitem_SetAbsoluteTransform = 0;
+var historyitem_SetXfrmShape = 1;
+var historyitem_SetRotate = 2;
+var historyitem_SetSizes = 3;
+var historyitem_SetSizesInGroup = 4;
+var historyitem_SetAdjValue = 5;
+var historyitem_SetMainGroup = 7;
+var historyitem_SetGroup = 8;
+var historyitem_InitShape = 9;
+var historyitem_AddGraphicObject = 10;
+var historyitem_AddToSpTree = 11;
+var historyitem_ChangeDiagram = 12;
+var historyitem_Init2Shape = 13;
+var historyitem_ChangeFill = 14;
+var historyitem_ChangeLine = 15;
+var historyitem_ChangePresetGeom = 16;
+var historyitem_CreatePolyine = 17;
+var historyitem_AddDocContent = 18;
+var historyitem_SetSizes2 = 19;
+var historyitem_RemoveFromSpTree = 20;
+var historyitem_RemoveFromArrGraphicObj = 21;
+var historyitem_RemoveFromArrGraphicObj2 = 22;
+var historyitem_MoveShapeInArray = 23;
+var historyitem_UpadteSpTreeBefore = 24;
+var historyitem_UpadteSpTreeAfter = 25;
+var historyitem_ChangeDiagram2 = 26;
+var historyitem_SwapGrObject = 27;
+var historyitem_SetSpPr = 28;
+var historyitem_SetStyle = 29;
+var historyitem_SetBodyPr = 30;
+var historyitem_SetTextBoxContent = 31;
+var historyitem_SetRasterImage2 = 32;
+var historyitem_CalculateAfterCopyInGroup = 33;
+var historyitem_SetVerticalShapeAlign = 34;
+var historyitem_SetParent = 35;
+
+
+//Типы изменений в классе CShape
+var historyitem_SetShapeRot = 0;
+var historyitem_SetShapeOffset = 1;
+var historyitem_SetShapeExtents = 2;
+var historyitem_SetShapeFlips = 3;
+var historyitem_SetShapeParent = 4;
+
+
+
+//Типы изменений в классе GraphicObjects
+var historyitem_AddHdrFtrGrObjects = 0;
+var historyitem_ChangeColorScheme = 1;
+
+//Типы изменений в классе HeaderFooterGraphicObjects
+var historyitem_AddHdr = 0;
+var historyitem_AddFtr = 1;
+var historyitem_RemoveHdr = 2;
+var historyitem_RemoveFtr = 3;
+
+
+
+//Типы изменений в классе WordGroupShapes
+var historyitem_InternalChanges = 6;
+var historyitem_GroupRecalculate = 32;
+
+
+
+//Типы изменений в классе WrapPolygon
+var historyitem_AddNewPoint = 0;
+var historyitem_RemovePoint = 1;
+var historyitem_MovePoint   = 2;
+var historyitem_UpdateWrapSizes = 3;
+var historyitem_ChangePolygon = 4;
+
+
 // Тип класса, к которому относится данный элемент истории
 var historyitem_State_Unknown         = 0;
 var historyitem_State_Document        = 1;
@@ -189,6 +325,16 @@ var historyitem_type_HdrFtr           = 15;
 var historyitem_type_AbstractNum      = 16;
 var historyitem_type_Comment          = 17;
 var historyitem_type_Comments         = 18;
+var historyitem_type_Shape            = 19;
+var historyitem_type_Image            = 20;
+var historyitem_type_GroupShapes      = 21;
+var historyitem_type_Geometry         = 22;
+var historyitem_type_WrapPolygon      = 23;
+var historyitem_type_Chart			  = 24;
+var historyitem_type_HdrFtrGrObjects  = 25;
+var historyitem_type_GrObjects        = 26;
+var historyitem_type_Hyperlink        = 27;
+
 
 function CHistory(Document)
 {
@@ -199,7 +345,7 @@ function CHistory(Document)
 
     this.RecalculateData =
     {
-        Inline : -1,
+        Inline : { Pos : -1, PageNum : 0 },
         Flow   : new Array(),
         HdrFtr : new Array()
     };
@@ -222,6 +368,7 @@ CHistory.prototype =
     Clear : function()
     {
         this.Index         = -1;
+        this.SavedIndex    = -1;
         this.Points.length = 0;
         this.Internal_RecalcData_Clear();
     },
@@ -263,6 +410,7 @@ CHistory.prototype =
         {
             var Item = Point.Items[Index];
             Item.Class.Undo( Item.Data );
+            Item.Class.Refresh_RecalcData( Item.Data );
         }
 
         this.Document.Set_SelectionState( Point.State );
@@ -285,6 +433,7 @@ CHistory.prototype =
         {
             var Item = Point.Items[Index];
             Item.Class.Redo( Item.Data );
+            Item.Class.Refresh_RecalcData( Item.Data );
         }
 
         // Восстанавливаем состояние на следующую точку
@@ -301,6 +450,8 @@ CHistory.prototype =
 
     Create_NewPoint : function()
     {
+        this.Clear_Additional();
+
         this.Check_UninonLastPoints();
 
         var State = this.Document.Get_SelectionState();
@@ -310,9 +461,10 @@ CHistory.prototype =
         // Создаем новую точку
         this.Points[++this.Index] =
         {
-            State : State, // Текущее состояние документа (курсор, селект)
-            Items : Items, // Массив изменений, начиная с текущего момента
-            Time  : Time   // Текущее время
+            State      : State, // Текущее состояние документа (курсор, селект)
+            Items      : Items, // Массив изменений, начиная с текущего момента
+            Time       : Time,  // Текущее время
+            Additional : {}     // Дополнительная информация
         };
 
         // Удаляем ненужные точки
@@ -336,38 +488,47 @@ CHistory.prototype =
         if ( this.Index < 0 )
             return;
 
-        //var Binary_Pos = this.BinaryWriter.GetCurPosition();
+        var Binary_Pos = this.BinaryWriter.GetCurPosition();
 
-        //Class.Save_Changes( Data, this.BinaryWriter );
+        Class.Save_Changes( Data, this.BinaryWriter );
 
-        //var Binary_Len = this.BinaryWriter.GetCurPosition() - Binary_Pos;
+        var Binary_Len = this.BinaryWriter.GetCurPosition() - Binary_Pos;
 
         var Item =
         {
             Class : Class,
-            Data  : Data//,
-//            Binary:
-  //          {
-    //            Pos : Binary_Pos,
-      //          Len : Binary_Len
-        //    }
+            Data  : Data,
+            Binary:
+            {
+                Pos : Binary_Pos,
+                Len : Binary_Len
+            }
         };
 
         this.Points[this.Index].Items.push( Item );
 
-        if ( ( Class instanceof CPresentation        && ( historyitem_Document_AddItem        === Data.Type || historyitem_Document_RemoveItem        === Data.Type ) ) ||
-             ( Class instanceof CDocumentContent && ( historyitem_DocumentContent_AddItem === Data.Type || historyitem_DocumentContent_RemoveItem === Data.Type ) ) ||
-             ( Class instanceof CTable           && ( historyitem_Table_AddRow            === Data.Type || historyitem_Table_RemoveRow            === Data.Type ) ) ||
-             ( Class instanceof CTableRow        && ( historyitem_TableRow_AddCell        === Data.Type || historyitem_TableRow_RemoveCell        === Data.Type ) ) )
+        if ( ( Class instanceof CPresentation        && ( historyitem_Presenattion_AddSlide      === Data.Type || historyitem_Presenattion_RemoveSlide === Data.Type ) ) ||
+            ( Class instanceof CDocumentContent && ( historyitem_DocumentContent_AddItem === Data.Type || historyitem_DocumentContent_RemoveItem === Data.Type ) ) ||
+            ( Class instanceof CTable           && ( historyitem_Table_AddRow            === Data.Type || historyitem_Table_RemoveRow            === Data.Type ) ) ||
+            ( Class instanceof CTableRow        && ( historyitem_TableRow_AddCell        === Data.Type || historyitem_TableRow_RemoveCell        === Data.Type ) ) ||
+            ( Class instanceof Paragraph        && ( historyitem_Paragraph_AddItem       === Data.Type || historyitem_Paragraph_RemoveItem       === Data.Type ) ) )
         {
-            var bAdd = ( ( Class instanceof CPresentation        && historyitem_Document_AddItem        === Data.Type ) ||
-                         ( Class instanceof CDocumentContent && historyitem_DocumentContent_AddItem === Data.Type ) ||
-                         ( Class instanceof CTable           && historyitem_Table_AddRow            === Data.Type ) ||
-                         ( Class instanceof CTableRow        && historyitem_TableRow_AddCell        === Data.Type )
-                       ) ? true : false;
+            var bAdd = ( ( Class instanceof CPresentation        && historyitem_Presenattion_AddSlide  === Data.Type ) ||
+                ( Class instanceof CDocumentContent && historyitem_DocumentContent_AddItem === Data.Type ) ||
+                ( Class instanceof CTable           && historyitem_Table_AddRow            === Data.Type ) ||
+                ( Class instanceof CTableRow        && historyitem_TableRow_AddCell        === Data.Type ) ||
+                ( Class instanceof Paragraph        && historyitem_Paragraph_AddItem       === Data.Type )
+                ) ? true : false;
 
-            var ContentChanges = new CContentChanges( ( bAdd == true ? contentchanges_Add : contentchanges_Remove ), Data.Pos, Item );
+            var Count = 1;
+
+            if ( ( Class instanceof Paragraph )                                                                ||
+                ( Class instanceof CDocumentContent && historyitem_DocumentContent_RemoveItem === Data.Type ) )
+                Count = Data.Items.length;
+
+            var ContentChanges = new CContentChangesElement( ( bAdd == true ? contentchanges_Add : contentchanges_Remove ), Data.Pos, Count, Item );
             Class.Add_ContentChanges( ContentChanges );
+            CollaborativeEditing.Add_NewDC( Class );
         }
     },
 
@@ -375,7 +536,7 @@ CHistory.prototype =
     {
         this.RecalculateData =
         {
-            Inline : -1,
+            Inline : { Pos : -1, PageNum : 0 },
             Flow   : new Array(),
             HdrFtr : new Array()
         };
@@ -383,10 +544,8 @@ CHistory.prototype =
 
     RecalcData_Add : function(Data)
     {
-
-        if (  null === Data || !(typeof Data === "object") || !(Data instanceof  CDocumentContent || Data instanceof  CTable))
+        if ( "undefined" === typeof(Data) || null === Data )
             return;
-
 
         switch ( Data.Type )
         {
@@ -414,7 +573,7 @@ CHistory.prototype =
                     break;
 
                 var bNew = true;
-                for ( var Index = 0; Index < this.RecalculateData.Flow.length; Index++ )
+                for ( var Index = 0; Index < this.RecalculateData.HdrFtr.length; Index++ )
                 {
                     if ( this.RecalculateData.HdrFtr[Index] === Data.Data )
                     {
@@ -431,18 +590,21 @@ CHistory.prototype =
 
             case historyrecalctype_Inline:
             {
-                if ( Data.Data < this.RecalculateData.Inline || this.RecalculateData.Inline < 0 )
-                    this.RecalculateData.Inline = Data.Data;
+                if ( Data.Data.Pos < this.RecalculateData.Inline.Pos || this.RecalculateData.Inline.Pos < 0 )
+                {
+                    this.RecalculateData.Inline.Pos     = Data.Data.Pos;
+                    this.RecalculateData.Inline.PageNum = Data.Data.PageNum;
+                }
 
                 break;
             }
         }
-        this.RecalculateData = Data;
     },
 
     Check_UninonLastPoints : function()
     {
-        if ( this.Points.length < 2 )
+        // Не объединяем точки истории, если на предыдущей точке произошло сохранение
+        if ( this.Points.length < 2 || this.SavedIndex >= this.Points.length - 2 )
             return;
 
         var Point1 = this.Points[this.Points.length - 2];
@@ -480,7 +642,8 @@ CHistory.prototype =
         {
             State : Point1.State,
             Items : Point1.Items.concat(Point2.Items),
-            Time  : Point1.Time
+            Time  : Point1.Time,
+            Additional : {}
         };
 
         this.Points.splice( this.Points.length - 2, 2, NewPoint );
@@ -514,5 +677,85 @@ CHistory.prototype =
             return true;
 
         return false;
+    },
+
+    Get_RecalcData : function()
+    {
+        if ( this.Index >= 0 )
+        {
+            // Считываем изменения, начиная с последней точки, и смотрим что надо пересчитать.
+            var Point = this.Points[this.Index];
+
+            this.Internal_RecalcData_Clear();
+
+            // Выполняем все действия в прямом порядке
+            for ( var Index = 0; Index < Point.Items.length; Index++ )
+            {
+                var Item = Point.Items[Index];
+                Item.Class.Refresh_RecalcData( Item.Data );
+            }
+        }
+
+        return this.RecalculateData;
+    },
+
+    Set_Additional_ExtendDocumentToPos : function()
+    {
+        if ( this.Index >= 0 )
+        {
+            this.Points[this.Index].Additional.ExtendDocumentToPos = true;
+        }
+    },
+
+    Is_ExtendDocumentToPos : function()
+    {
+        if ( undefined === this.Points[this.Index] || undefined === this.Points[this.Index].Additional || undefined === this.Points[this.Index].Additional.ExtendDocumentToPos )
+            return false;
+
+        return true;
+    },
+
+    Clear_Additional : function()
+    {
+        if ( this.Index >= 0 )
+        {
+            this.Points[this.Index].Additional = new Object();
+        }
+    },
+
+    Get_EditingTime : function(dTime)
+    {
+        var Count = this.Points.length;
+
+        var TimeLine = new Array();
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            var PointTime = this.Points[Index].Time;
+            TimeLine.push( { t0 : PointTime - dTime, t1 : PointTime } );
+        }
+
+        Count = TimeLine.length;
+        for ( var Index = 1; Index < Count; Index++ )
+        {
+            var CurrEl = TimeLine[Index];
+            var PrevEl = TimeLine[Index - 1];
+            if ( CurrEl.t0 <= PrevEl.t1 )
+            {
+                PrevEl.t1 = CurrEl.t1;
+                TimeLine.splice( Index, 1 );
+                Index--;
+                Count--;
+            }
+        }
+
+        Count = TimeLine.length;
+        var OverallTime = 0;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            OverallTime += TimeLine[Index].t1 - TimeLine[Index].t0;
+        }
+
+        return OverallTime;
     }
+
 };

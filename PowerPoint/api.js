@@ -93,6 +93,7 @@ function asc_docs_api(name)
     this.User = undefined;
     this.CoAuthoringApi = new CDocsCoApi();
     this.isCoAuthoringEnable = true;
+    this.CoAuthoringApi.isPowerPoint = true;
     /**************************************/
 	// AutoSave
 	this.autoSaveGap = 0;				// Интервал автосохранения (0 - означает, что автосохранения нет) в милесекундах
@@ -149,79 +150,130 @@ asc_docs_api.prototype._coAuthoringInit = function (docId, user) {
     this.CoAuthoringApi.onUserStateChanged			= function (e) { oThis.asc_fireCallback( "asc_onUserStateChanged", e ); };
     this.CoAuthoringApi.onLocksAcquired				= function (e) {
 		if (2 != e["state"]) {
+
+            var block_value = e["blockValue"];
+            var classes = [];
+            switch(block_value["type"])
+            {
+                case c_oAscLockTypeElemPresentation.Object:
+                {
+                    classes.push(block_value["objId"]);
+                    classes.push(block_value["slideId"]);
+                    break;
+                }
+                case c_oAscLockTypeElemPresentation.Slide:
+                {
+                    classes.push(block_value["val"]);
+                    break;
+                }
+                case c_oAscLockTypeElemPresentation.Presentation:
+                {
+                    break;
+                }
+            }
             var Id = e["block"];
+
+            for(var i = 0; i < classes.length; ++i)
+            {
+
+                var Class = g_oTableId.Get_ById(classes[i]);// g_oTableId.Get_ById( Id );
+                if ( null != Class )
+                {
+                    var Lock = Class.Lock;
+
+                    var OldType = Class.Lock.Get_Type();
+                    if ( locktype_Other2 === OldType || locktype_Other3 === OldType )
+                        Lock.Set_Type( locktype_Other3, true );
+                    else
+                        Lock.Set_Type( locktype_Other, true );
+
+                    // Выставляем ID пользователя, залочившего данный элемент
+                    Lock.Set_UserId( e["user"] );
+
+                    /* if ( Class instanceof CHeaderFooterController )
+                     editor.sync_LockHeaderFooters();
+                     else if ( Class instanceof CDocument )
+                     editor.sync_LockDocumentProps();
+                     else if ( Class instanceof CComment )
+                     editor.sync_LockComment(Class.Get_Id(), e["user"]);
+                     else if ( Class instanceof CGraphicObjects )
+                     editor.sync_LockDocumentSchema();          */
+
+                    // TODO: Здесь для ускорения надо сделать проверку, является ли текущим элемент с
+                    //       заданным Id. Если нет, тогда и не надо обновлять состояние.
+                    editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
+                }
+                else
+                {
+                    CollaborativeEditing.Add_NeedLock(classes[i], e["user"]);
+                }
+                // TODO: эвент о пришедших lock-ах
+            }
+		}
+    };
+    this.CoAuthoringApi.onLocksReleased = function (e, bChanges) {
+        var Id;
+        var block_value = e["block"];
+        var classes = [];
+        switch(block_value["type"])
+        {
+            case c_oAscLockTypeElemPresentation.Object:
+            {
+                classes.push(block_value["objId"]);
+                classes.push(block_value["slideId"]);
+                break;
+            }
+            case c_oAscLockTypeElemPresentation.Slide:
+            {
+                classes.push(block_value["val"]);
+                break;
+            }
+            case c_oAscLockTypeElemPresentation.Presentation:
+            {
+                break;
+            }
+        }
+        for(var i = 0; i < classes.length; ++i)
+        {
+            Id = classes[i];
             var Class = g_oTableId.Get_ById( Id );
             if ( null != Class )
             {
                 var Lock = Class.Lock;
 
-                var OldType = Class.Lock.Get_Type();
-                if ( locktype_Other2 === OldType || locktype_Other3 === OldType )
-                    Lock.Set_Type( locktype_Other3, true );
-                else
-                    Lock.Set_Type( locktype_Other, true );
+                if ( "undefined" != typeof(Lock) )
+                {
+                    var CurType = Lock.Get_Type();
 
-                // Выставляем ID пользователя, залочившего данный элемент
-                Lock.Set_UserId( e["user"] );
+                    var NewType = locktype_None;
 
-               /* if ( Class instanceof CHeaderFooterController )
-                    editor.sync_LockHeaderFooters();
-                else if ( Class instanceof CDocument )
-                    editor.sync_LockDocumentProps();
-                else if ( Class instanceof CComment )
-                    editor.sync_LockComment(Class.Get_Id(), e["user"]);
-                else if ( Class instanceof CGraphicObjects )
-                    editor.sync_LockDocumentSchema();          */
+                    if ( CurType === locktype_Other )
+                    {
+                        if ( true != bChanges )
+                            NewType = locktype_None;
+                        else
+                        {
+                            NewType = locktype_Other2;
+                            CollaborativeEditing.Add_Unlock(Class);
+                        }
+                    }
+                    else if ( CurType === locktype_Mine )
+                    {
+                        // Такого быть не должно
+                        NewType = locktype_Mine;
+                    }
+                    else if ( CurType === locktype_Other2 || CurType === locktype_Other3 )
+                        NewType = locktype_Other2;
 
-                // TODO: Здесь для ускорения надо сделать проверку, является ли текущим элемент с
-                //       заданным Id. Если нет, тогда и не надо обновлять состояние.
-                editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
+                    Lock.Set_Type( NewType, true );
+                }
             }
             else
             {
-                CollaborativeEditing.Add_NeedLock(Id, e["user"]);
+                CollaborativeEditing.Remove_NeedLock(Id);
             }
-			// TODO: эвент о пришедших lock-ах
-		}
-    };
-    this.CoAuthoringApi.onLocksReleased				= function (e, bChanges) {
-        var Id = e["block"];
-        var Class = g_oTableId.Get_ById( Id );
-        if ( null != Class )
-        {
-            var Lock = Class.Lock;
-            if ( "undefined" != typeof(Lock) )
-            {
-                var CurType = Lock.Get_Type();
-
-                var NewType = locktype_None;
-
-                if ( CurType === locktype_Other )
-                {
-                    if ( true != bChanges )
-                        NewType = locktype_None;
-                    else
-                    {
-                        NewType = locktype_Other2;
-                        CollaborativeEditing.Add_Unlock(Class);
-                    }
-                }
-                else if ( CurType === locktype_Mine )
-                {
-                    // Такого быть не должно
-                    NewType = locktype_Mine;
-                }
-                else if ( CurType === locktype_Other2 || CurType === locktype_Other3 )
-                    NewType = locktype_Other2;
-
-                Lock.Set_Type( NewType, true );
-            }
+            // TODO: эвент о снятии lock-ов другими пользователями
         }
-        else
-        {
-            CollaborativeEditing.Remove_NeedLock(Id);
-        }
-        // TODO: эвент о снятии lock-ов другими пользователями
     };
     this.CoAuthoringApi.onSaveChanges				= function (e, bSendEvent) {
 		// bSendEvent = false - это означает, что мы загружаем имеющиеся изменения при открытии
@@ -247,7 +299,7 @@ asc_docs_api.prototype._coAuthoringInit = function (docId, user) {
 			oThis.syncCollaborativeChanges();
     };
     this.CoAuthoringApi.onFirstLoadChanges			= function (e) {
-        this.CoAuthoringApi.onSaveChanges(e,false);
+        oThis.CoAuthoringApi.onSaveChanges(e,false);
         CollaborativeEditing.Apply_Changes();
         // TODO: Загружаем изменения от других пользователей при открытии
     };
@@ -274,7 +326,7 @@ asc_docs_api.prototype._coAuthoringInit = function (docId, user) {
 	 * @param {Bool} isCloseCoAuthoring
 	 */
 	this.CoAuthoringApi.onDisconnect				= function (e, isDisconnectAtAll, isCloseCoAuthoring) {
-        var t = this;
+        var t = oThis;
         if (0 === t.CoAuthoringApi.get_state())
             t.asyncServerIdEndLoaded();
         if (isDisconnectAtAll) {
@@ -3060,82 +3112,9 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
     {
         if(this.LoadedObject)
         {
+            this.WordControl.m_oLogicDocument.RecalculateAfterOpen();
             var presentation = this.WordControl.m_oLogicDocument;
 
-            /* for(var i = 0; i <presentation.slideLayouts.length; ++i)
-             {
-             presentation.slideLayouts[i].elementsManipulator = new AutoShapesContainer(presentation, 0);
-             for(var j = 0; j < presentation.slideLayouts[i].cSld.spTree.length; ++j)
-             {
-             presentation.slideLayouts[i].cSld.spTree[j].setParent(presentation.slideLayouts[i]);
-             presentation.slideLayouts[i].cSld.spTree[j].setContainer(presentation.slideLayouts[i].elementsManipulator);
-             presentation.slideLayouts[i].cSld.spTree[j].calculate();
-             }
-             }
-
-
-             for(i = 0; i <presentation.slideMasters.length; ++i)
-             {
-             presentation.slideMasters[i].elementsManipulator = new AutoShapesContainer(presentation, 0);
-             for(j = 0; j < presentation.slideMasters[i].cSld.spTree.length; ++j)
-             {
-             presentation.slideMasters[i].cSld.spTree[j].setParent(presentation.slideMasters[i]);
-             presentation.slideMasters[i].cSld.spTree[j].setContainer(presentation.slideMasters[i].elementsManipulator);
-             presentation.slideMasters[i].cSld.spTree[j].calculate();
-             }
-             }       */
-
-
-            var _slides = presentation.Slides;
-            var _slide_index;
-            var  _slide_count = _slides.length;
-            var _cur_slide;
-            for(_slide_index = 0; _slide_index < _slide_count; ++_slide_index)
-            {
-                _cur_slide = _slides[_slide_index];
-                if(!_cur_slide.Layout.calculated)
-                {
-                    var _cur_layout = _cur_slide.Layout;
-                    _cur_layout.elementsManipulator = new AutoShapesContainer(presentation, 0);
-                    var _layout_shape_index;
-                    var _layout_shapes = _cur_layout.cSld.spTree;
-                    var _layout_shape_count = _layout_shapes.length;
-                    var _layout_shape;
-                    for(_layout_shape_index = 0; _layout_shape_index < _layout_shape_count; ++_layout_shape_index)
-                    {
-                        _layout_shape = _layout_shapes[_layout_shape_index];
-                        if(!_layout_shape.isPlaceholder())
-                        {
-                            _layout_shape.setParent(_cur_layout);
-                            _layout_shape.setContainer(_cur_layout.elementsManipulator);
-                            _layout_shape.calculate();
-                        }
-                    }
-                    _cur_layout.calculated = true;
-                }
-                if(!_cur_slide.Layout.Master.calculated)
-                {
-                    var _cur_master = _cur_slide.Layout.Master;
-                    _cur_master.elementsManipulator = new AutoShapesContainer(presentation, 0);
-                    var _master_shape_index;
-                    var _master_shapes = _cur_master.cSld.spTree;
-                    var _master_shape_count = _master_shapes.length;
-                    var _master_shape;
-                    for(_master_shape_index = 0; _master_shape_index < _master_shape_count; ++_master_shape_index)
-                    {
-                        _master_shape = _master_shapes[_master_shape_index];
-                        if(!_master_shape.isPlaceholder())
-                        {
-                            _master_shape.setParent(_cur_master);
-                            _master_shape.setContainer(_cur_master.elementsManipulator);
-                            _master_shape.calculate();
-                        }
-                    }
-                    _cur_master.calculated = true;
-                }
-                _cur_slide.calculate();
-                presentation.DrawingDocument.OnRecalculatePage( _slide_index, _cur_slide );
-            }
             presentation.DrawingDocument.OnEndRecalculate();
 
             this.asc_fireCallback("asc_onPresentationSize", presentation.Width, presentation.Height);

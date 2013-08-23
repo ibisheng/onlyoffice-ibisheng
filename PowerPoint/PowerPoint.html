@@ -48,10 +48,9 @@
 
         <link type="text/css" href="../Word/Drawing/styles/word.css" rel="stylesheet"/>
 
-        <script type="text/javascript" src="Editor/CollaborativeEditing.js"></script>
+        <script type="text/javascript" src="Editor/Format/CollaborativeEditing.js"></script>
 
-        <script type="text/javascript" src="Editor/Styles.js"></script>
-        <script type="text/javascript" src="Editor/ParagraphContent.js"></script>
+
         <script type="text/javascript" src="../Word/Drawing/Metafile.js"></script>
         <script type="text/javascript" src="../Word/Drawing/GraphicsEvents.js"></script>
         <script type="text/javascript" src="../Word/Drawing/WorkEvents.js"></script>
@@ -59,22 +58,51 @@
         <script type="text/javascript" src="../Word/Drawing/Rulers.js"></script>
         <script type="text/javascript" src="../Word/Editor/Common.js"></script>
         <script type="text/javascript" src="../Word/Editor/Sections.js"></script>
-        <script type="text/javascript" src="../Word/Editor/CollaborativeEditing.js"></script>
         <script type="text/javascript" src="../Word/Drawing/scrolls/scroll.js"></script>
 
 		<script type="text/javascript" src="themes/Themes.js"></script>
-        <script type="text/javascript" src="Editor/Table.js"></script>
+        <script type="text/javascript" src="Editor/Format/Table.js"></script>
         <script type="text/javascript" src="Editor/FlowObjects.js"></script>
         <script type="text/javascript" src="Editor/History.js"></script>
-	    <script type="text/javascript" src="Editor/Paragraph.js"></script>
-        <script type="text/javascript" src="Editor/DocumentContent.js"></script>
 
-	    <script type="text/javascript" src="Editor/Presentation.js"></script>
-        <script type="text/javascript" src="Editor/Shape.js"></script>
-        <script type="text/javascript" src="Editor/GraphicFrame.js"></script>
+
+        <script type="text/javascript" src="Editor/Format/GraphicFrame.js"></script>
         <script type="text/javascript" src="Editor/Numbering.js"></script>
 
-        <script type="text/javascript" src="Editor/TextBody.js"></script>
+        <script type="text/javascript" src="Editor/Format/Presentation.js"></script>
+        <script type="text/javascript" src="Editor/Format/Shape.js"></script>
+        <script type="text/javascript" src="Editor/Format/Image.js"></script>
+        <script type="text/javascript" src="Editor/Format/GroupShape.js"></script>
+        <script type="text/javascript" src="Editor/Format/Slide.js"></script>
+        <script type="text/javascript" src="Editor/Format/SlideMaster.js"></script>
+        <script type="text/javascript" src="Editor/Format/Layout.js"></script>
+        <script type="text/javascript" src="Editor/Format/Paragraph.js"></script>
+        <script type="text/javascript" src="Editor/Format/FontClassification.js"></script>
+        <script type="text/javascript" src="Editor/Format/ParagraphContent.js"></script>
+        <script type="text/javascript" src="Editor/Format/Spelling.js"></script>
+
+        <script type="text/javascript" src="Editor/Format/DocumentContent.js"></script>
+        <script type="text/javascript" src="Editor/Styles.js"></script>
+
+        <script type="text/javascript" src="../Common/SerializeCommonWordExcel.js"></script>
+
+        <script type="text/javascript" src="Editor/GraphicObjects.js"></script>
+        <script type="text/javascript" src="Editor/States.js"></script>
+
+        <script type="text/javascript" src="Editor/TrackObjects/AdjustmentTracks.js"></script>
+        <script type="text/javascript" src="Editor/TrackObjects/MoveTracks.js"></script>
+        <script type="text/javascript" src="Editor/TrackObjects/NewShapeTracks.js"></script>
+        <script type="text/javascript" src="Editor/TrackObjects/PolyLine.js"></script>
+        <script type="text/javascript" src="Editor/TrackObjects/ResizeTracks.js"></script>
+        <script type="text/javascript" src="Editor/TrackObjects/RotateTracks.js"></script>
+        <script type="text/javascript" src="Editor/TrackObjects/Spline.js"></script>
+
+
+
+
+
+
+        <script type="text/javascript" src="Editor/Format/TextBody.js"></script>
 
         <script type="text/javascript" src="Editor/Drawing/Geometry.js"></script>
         <script type="text/javascript" src="Editor/Drawing/CreateGoemetry.js"></script>
@@ -85,8 +113,6 @@
         <script type="text/javascript" src="Editor/Drawing/GraphicFigure.js"></script>
         <script type="text/javascript" src="Editor/Drawing/Clone.js"></script>
         <script type="text/javascript" src="Editor/Drawing/CImage.js"></script>
-        <script type="text/javascript" src="Editor/Drawing/StatesAutoShapes.js"></script>
-        <script type="text/javascript" src="Editor/Drawing/AutoShapesContainer.js"></script>
         <script type="text/javascript" src="Editor/Drawing/Spline.js"></script>
         <script type="text/javascript" src="Editor/Drawing/PolyLine.js"></script>
         <script type="text/javascript" src="Editor/Drawing/PolyLine2.js"></script>
@@ -1240,6 +1266,7 @@
                 // на всякий случай. Наверное этого не надо, сообщение пошлется в конце
                 editor.Resize();
                 ResizeStatus();
+                g_oToolBox.Init();
 
             </script>
         </div>
@@ -1890,6 +1917,18 @@
         </div>
 	</div>
 
+        <div id="prUsersDrag"	style="display:none;width:200px;background-color:#fff;top:215px;right:50px;z-index:100;position:absolute;border: 4px ridge silver;cursor:move;">
+            <div style="float:left;width:180px;text-align: center;cursor:move;">
+                <b>Users</b>
+            </div>
+            <div style="float:left;cursor:default;width:20px;height:20px;" onmousemove="this.style.backgroundColor = 'RGB(249, 201, 16)';" onmouseout="this.style.backgroundColor = 'RGB(255, 255, 255)' " onmousedown="if ( c_oAscCollaborativeMarksShowType.LastChanges === editor.CollaborativeMarksShowType ) {CollaborativeEditing.Clear_CollaborativeMarks();} CollaborativeEditing.Apply_Changes(); setTimeout(function() {CollaborativeEditing.Send_Changes();}, 100);">
+                <img style="margin: 2px 3px" src="menu/img/savechanges.png" title="Save Changes" />
+            </div>
+        </div>
+        <div id="prUsers"		style="display:none;width:200px;background-color:#fff;top:240px;right:50px;z-index:100;position:absolute;padding-top: 5px;border: 4px ridge silver;cursor:move;">
+            <div style="float:left;width:200px;text-align: center;cursor:move;" id="usersView">
+            </div>
+        </div>
 
     <div id="shapeProp" style="display:none;width:400px;background-color:#fff;top:87px;right:25px;z-index:100;position:absolute;padding-top: 5px;border: 4px ridge silver;">
 
@@ -2278,7 +2317,19 @@
 		</div>
 		
 	</div>
-	
-	
+
+        <script>
+
+            Drag.init( document.getElementById("prUsersDrag"), null, null, null, null, null, true );
+            document.getElementById("prUsersDrag").onDrag = function(X, Y)
+            {
+                var sTop = Y + 25 + "px", sRight = X + "px";
+                document.getElementById("prUsers").style.top   = sTop;
+                document.getElementById("prUsers").style.right = sRight;
+            };
+
+
+
+        </script>
 	</body>
 </html>

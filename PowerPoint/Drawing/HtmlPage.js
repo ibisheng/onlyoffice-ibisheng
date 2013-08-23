@@ -2144,7 +2144,7 @@ function CEditorPage(api)
         {
             this.m_oLogicDocument.Slides[drDoc.SlideCurrent].drawSelect();
 
-            var elements = this.m_oLogicDocument.Slides[this.m_oLogicDocument.CurPage].elementsManipulator;
+            var elements = this.m_oLogicDocument.Slides[this.m_oLogicDocument.CurPage].graphicObjects;
             if (elements.State.id!=0 && -1 != drDoc.SlideCurrent)
             {
                 var drawPage = drDoc.SlideCurrectRect;
