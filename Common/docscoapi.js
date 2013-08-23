@@ -324,6 +324,8 @@
             }
 			if (this._isExcel)
 				this._send({"type": "getlockrange", "block": arrayBlockId});
+			else if (this._isPresentation)
+				this._send({"type": "getlockpresentation", "block": arrayBlockId});
 			else
             	this._send({"type": "getlock", "block": arrayBlockId});
 		} else {
