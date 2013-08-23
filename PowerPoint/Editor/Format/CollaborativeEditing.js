@@ -638,6 +638,8 @@ function CCollaborativeEditing()
             if  ( locktype_Other3 != CurLockType && locktype_Other != CurLockType )
             {
                 this.m_aNeedUnlock[Index].Lock.Set_Type( locktype_None, false);
+                if(this.m_aNeedUnlock[Index] instanceof Slide)
+                    editor.WordControl.m_oLogicDocument.DrawingDocument.LockSlide(this.m_aNeedUnlock[Index].num);
 
                 /*if ( this.m_aNeedUnlock[Index] instanceof CHeaderFooterController )
                     editor.sync_UnLockHeaderFooters();
@@ -651,6 +653,8 @@ function CCollaborativeEditing()
             else if ( locktype_Other3 === CurLockType )
             {
                 this.m_aNeedUnlock[Index].Lock.Set_Type( locktype_Other, false);
+                if(this.m_aNeedUnlock[Index] instanceof Slide)
+                    editor.WordControl.m_oLogicDocument.DrawingDocument.LockSlide(this.m_aNeedUnlock[Index].num);
             }
         }
 
@@ -659,7 +663,34 @@ function CCollaborativeEditing()
         {
             var Class = this.m_aNeedUnlock2[Index];
             Class.Lock.Set_Type( locktype_None, false);
-            editor.CoAuthoringApi.releaseLocks( Class.Get_Id() );
+            if(Class instanceof Slide)
+                editor.WordControl.m_oLogicDocument.DrawingDocument.UnLockSlide(Class.num);
+
+            var check_obj = null;
+            if(Class instanceof CShape
+                || Class instanceof CImageShape
+                || Class instanceof CGroupShape
+                )
+            {
+                check_obj =
+                {
+                    "type": c_oAscLockTypeElemPresentation.Object,
+                    "slideId": Class.parent.Get_Id(),
+                    "objId": Class.Get_Id(),
+                    "guid": Class.Get_Id()
+                };
+            }
+            else if(Class instanceof Slide)
+            {
+                check_obj =
+                {
+                    "type": c_oAscLockTypeElemPresentation.Slide,
+                    "val": Class.Get_Id(),
+                    "guid": Class.Get_Id()
+                };
+            }
+            if(isRealObject(check_obj))
+                editor.CoAuthoringApi.releaseLocks( check_obj );
         }
 
         this.m_aNeedUnlock.length  = 0;
@@ -831,6 +862,8 @@ function CCollaborativeEditing()
                             if ( null != Class )
                             {
                                 Class.Lock.Set_Type( locktype_Mine );
+                                if(Class instanceof Slide)
+                                    editor.WordControl.m_oLogicDocument.DrawingDocument.UnLockSlide(Class.num);
                                 this.Add_Unlock2( Class );
                             }
                         }
@@ -881,6 +914,8 @@ function CCollaborativeEditing()
                     if ( null != Class )
                     {
                         Class.Lock.Set_Type( locktype_Mine );
+                        if(Class instanceof Slide)
+                            editor.WordControl.m_oLogicDocument.DrawingDocument.UnLockSlide(Class.num);
                         oThis.Add_Unlock2( Class );
                     }
                 }
@@ -928,6 +963,8 @@ function CCollaborativeEditing()
             {
                 var Lock = Class.Lock;
                 Lock.Set_Type( locktype_Other, false );
+                if(Class instanceof Slide)
+                    editor.WordControl.m_oLogicDocument.DrawingDocument.UnLockSlide(Class.num);
                 Lock.Set_UserId( this.m_aNeedLock[Id] );
             }
         }
