@@ -26,7 +26,7 @@
 		}
 	};
 
-	CDocsCoApi.prototype.init = function (user, docid, isviewermode, token, serverHost, serverPath, callback, isExcel) {
+	CDocsCoApi.prototype.init = function (user, docid, isviewermode, token, serverHost, serverPath, callback, editorType) {
 		if (this._CoAuthoringApi && this._CoAuthoringApi.isRightURL()) {
 			var t = this;
 			this._CoAuthoringApi.onAuthParticipantsChanged = function (e) {t.callback_OnAuthParticipantsChanged(e);};
@@ -43,7 +43,7 @@
 			// Callback есть пользователей больше 1
 			this._CoAuthoringApi.onStartCoAuthoring = function (e) {t.callback_OnStartCoAuthoring(e);};
 
-			this._CoAuthoringApi.init(user, docid, isviewermode, token, serverHost, serverPath, callback, isExcel);
+			this._CoAuthoringApi.init(user, docid, isviewermode, token, serverHost, serverPath, callback, editorType);
 			this._onlineWork = true;
 		}
 		else {
