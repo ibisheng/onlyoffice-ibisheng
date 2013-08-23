@@ -763,6 +763,7 @@ DrawingObjectsController.prototype =
 	
 	getGraphicObjectProps: function()
 	{
+		var api = window["Asc"]["editor"];
 		var shape_props, image_props, chart_props;
 		ascSelectedObjects = [];
 
@@ -789,6 +790,11 @@ DrawingObjectsController.prototype =
                 }
                 if(c_obj.isChart())
                 {
+					/*if ( !api.chartStyleManager.isReady() )
+						api.chartStyleManager.init();
+					if ( !api.chartPreviewManager.isReady() )
+						api.chartPreviewManager.init();*/
+				
                     if(!isRealObject(chart_props))
                     {
                         chart_props = new asc_CImgProperty();
@@ -900,6 +906,11 @@ DrawingObjectsController.prototype =
                     }
                     if (c_obj.isChart())
                     {
+						/*if ( !api.chartStyleManager.isReady() )
+							api.chartStyleManager.init();
+						if ( !api.chartPreviewManager.isReady() )
+							api.chartPreviewManager.init();*/
+					
                         if (!isRealObject(chart_props))
                         {
                             chart_props = new asc_CImgProperty();

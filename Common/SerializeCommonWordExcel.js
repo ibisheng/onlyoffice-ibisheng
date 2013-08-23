@@ -1416,8 +1416,10 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 				this.chart.xAxis = this.chart.yAxis;
 				this.chart.yAxis = oTemp;
 			}
-            this.chartAsGroup.hAxisTitle = xAxis.chartTitle;
-            this.chartAsGroup.vAxisTitle = yAxis.chartTitle;
+			if ( xAxis )
+				this.chartAsGroup.hAxisTitle = xAxis.chartTitle;
+			if ( yAxis )
+				this.chartAsGroup.vAxisTitle = yAxis.chartTitle;
 		}
 		else if ( c_oSer_ChartType.Style === type )
 		{

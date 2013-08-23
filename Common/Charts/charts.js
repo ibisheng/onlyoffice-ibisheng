@@ -75,7 +75,6 @@ function ChartStyleManager() {
 			return arr_colors;
 		};
 		
-		
 		_this.colorMap[1] = [ "#555555", "#9E9E9E", "#727272", "#464646", "#838383", "#C1C1C1" ];
 		_this.colorMap[2] = [ themeColors[4].get_hex(), themeColors[5].get_hex(), themeColors[6].get_hex(), themeColors[7].get_hex(), themeColors[8].get_hex(), themeColors[9].get_hex() ];	
 		_this.colorMap[3] = [ themeColors[4].get_hex() ];
@@ -162,6 +161,7 @@ function ChartPreviewManager() {
 			
 			// Set data
 			chart.data = [];
+			var uniColors = chart.generateUniColors(4);
 			
 			switch (chart.type) {
 			
@@ -172,39 +172,118 @@ function ChartPreviewManager() {
 							chart.data.push( [createItem(3), createItem(2)] );
 							chart.data.push( [createItem(2), createItem(3)] );
 							chart.data.push( [createItem(3), createItem(2)] );
+							
+							// var ser = new asc_CChartSeria();
+							// ser.Val.NumCache = [ createItem(2), createItem(3), createItem(2), createItem(3) ];
+							// ser.OutlineColor = uniColors[0];
+							// chart.series.push(ser);
+							
+							// ser = new asc_CChartSeria();
+							// ser.Val.NumCache = [ createItem(1), createItem(2), createItem(3), createItem(2) ];
+							// ser.OutlineColor = uniColors[1];
+							// chart.series.push(ser);							
+							
 							break;
 						case c_oAscChartSubType.stacked:
 							chart.data.push( [createItem(1), createItem(4)] );
 							chart.data.push( [createItem(6), createItem(4)] );
 							chart.data.push( [createItem(2), createItem(4)] );
 							chart.data.push( [createItem(8), createItem(5)] );
+							
+							// var ser = new asc_CChartSeria();
+							// ser.Val.NumCache = [ createItem(1), createItem(6), createItem(2), createItem(8) ];
+							// ser.OutlineColor = uniColors[0];
+							// chart.series.push(ser);
+							
+							// ser = new asc_CChartSeria();
+							// ser.Val.NumCache = [ createItem(4), createItem(4), createItem(4), createItem(5) ];
+							// ser.OutlineColor = uniColors[1];
+							// chart.series.push(ser);				
+							
 							break;
 						case c_oAscChartSubType.stackedPer:
 							chart.data.push( [createItem(2), createItem(2)] );
 							chart.data.push( [createItem(4), createItem(2)] );
 							chart.data.push( [createItem(2), createItem(2)] );
 							chart.data.push( [createItem(4), createItem(2)] );
+							
+							// var ser = new asc_CChartSeria();
+							// ser.Val.NumCache = [ createItem(2), createItem(4), createItem(2), createItem(4) ];
+							// ser.OutlineColor = uniColors[0];
+							// chart.series.push(ser);
+							
+							// ser = new asc_CChartSeria();
+							// ser.Val.NumCache = [ createItem(2), createItem(2), createItem(2), createItem(2) ];
+							// ser.OutlineColor = uniColors[1];
+							// chart.series.push(ser);
+							
 							break;
 					}
 					
 					break;
 					
 				case c_oAscChartType.hbar:
+					
+					var uniColorsReverse = OfficeExcel.array_reverse(uniColors);
+					
 					switch (chart.subType) {
 						case c_oAscChartSubType.normal:
-							chart.data.push( [createItem(4), createItem(3), createItem(2), createItem(1)] );							
+							chart.data.push( [createItem(4), createItem(3), createItem(2), createItem(1)] );
+							
+							// var ser = new asc_CChartSeria();
+							// ser.Val.NumCache = [ createItem(4) ];
+							// ser.OutlineColor = uniColors[0];
+							// chart.series.push(ser);
+							
+							// var ser = new asc_CChartSeria();
+							// ser.Val.NumCache = [ createItem(3) ];
+							// ser.OutlineColor = uniColors[1];
+							// chart.series.push(ser);
+							
+							// var ser = new asc_CChartSeria();
+							// ser.Val.NumCache = [ createItem(2) ];
+							// ser.OutlineColor = uniColors[2];
+							// chart.series.push(ser);
+							
+							// var ser = new asc_CChartSeria();
+							// ser.Val.NumCache = [ createItem(1) ];
+							// ser.OutlineColor = uniColors[3];
+							// chart.series.push(ser);
+							
 							break;
 						case c_oAscChartSubType.stacked:
 							chart.data.push( [createItem(4), createItem(5)] );
 							chart.data.push( [createItem(3), createItem(4)] );
 							chart.data.push( [createItem(2), createItem(3)] );
 							chart.data.push( [createItem(1), createItem(2)] );
+							
+							// var ser = new asc_CChartSeria();
+							// ser.Val.NumCache = [ createItem(4), createItem(3), createItem(2), createItem(1) ];
+							// ser.OutlineColor = uniColors[0];
+							// chart.series.push(ser);
+							
+							// ser = new asc_CChartSeria();
+							// ser.Val.NumCache = [ createItem(5), createItem(4), createItem(3), createItem(2) ];
+							// ser.OutlineColor = uniColors[1];
+							// chart.series.push(ser);
+							
 							break;
 						case c_oAscChartSubType.stackedPer:
 							chart.data.push( [createItem(7), createItem(7)] );
 							chart.data.push( [createItem(5), createItem(6)] );
 							chart.data.push( [createItem(3), createItem(5)] );
 							chart.data.push( [createItem(1), createItem(4)] );
+							
+							// var ser = new asc_CChartSeria();
+							// ser.Val.NumCache = [ createItem(7), createItem(5), createItem(3), createItem(1) ];
+							// ser.OutlineColor = uniColors[0];
+							// chart.series.push(ser);
+							
+							// ser = new asc_CChartSeria();
+							// ser.Val.NumCache = [ createItem(7), createItem(6), createItem(5), createItem(4) ];
+							// ser.OutlineColor = uniColors[1];
+							// chart.series.push(ser);
+							
 							break;
 					}
 					break;
@@ -213,18 +292,61 @@ function ChartPreviewManager() {
 					switch (chart.subType) {
 						case c_oAscChartSubType.normal:
 							chart.data.push( [createItem(1), createItem(2), createItem(3), createItem(4)] );
+							
+							// var ser = new asc_CChartSeria();
+							// ser.Val.NumCache = [ createItem(1) ];
+							// ser.OutlineColor = uniColors[0];
+							// chart.series.push(ser);
+							
+							// var ser = new asc_CChartSeria();
+							// ser.Val.NumCache = [ createItem(2) ];
+							// ser.OutlineColor = uniColors[1];
+							// chart.series.push(ser);
+							
+							// var ser = new asc_CChartSeria();
+							// ser.Val.NumCache = [ createItem(3) ];
+							// ser.OutlineColor = uniColors[2];
+							// chart.series.push(ser);
+							
+							// var ser = new asc_CChartSeria();
+							// ser.Val.NumCache = [ createItem(4) ];
+							// ser.OutlineColor = uniColors[3];
+							// chart.series.push(ser);
+							
 							break;
 						case c_oAscChartSubType.stacked:
 							chart.data.push( [createItem(1), createItem(2)] );
 							chart.data.push( [createItem(2), createItem(3)] );
 							chart.data.push( [createItem(3), createItem(4)] );
 							chart.data.push( [createItem(4), createItem(5)] );
+							
+							// var ser = new asc_CChartSeria();
+							// ser.Val.NumCache = [ createItem(1), createItem(2), createItem(3), createItem(4) ];
+							// ser.OutlineColor = uniColors[0];
+							// chart.series.push(ser);
+							
+							// ser = new asc_CChartSeria();
+							// ser.Val.NumCache = [ createItem(2), createItem(3), createItem(4), createItem(5) ];
+							// ser.OutlineColor = uniColors[1];
+							// chart.series.push(ser);
+							
 							break;
 						case c_oAscChartSubType.stackedPer:
 							chart.data.push( [createItem(1), createItem(4)] );
 							chart.data.push( [createItem(3), createItem(5)] );
 							chart.data.push( [createItem(5), createItem(6)] );
 							chart.data.push( [createItem(7), createItem(7)] );
+							
+							// var ser = new asc_CChartSeria();
+							// ser.Val.NumCache = [ createItem(1), createItem(3), createItem(5), createItem(7) ];
+							// ser.OutlineColor = uniColors[0];
+							// chart.series.push(ser);
+							
+							// ser = new asc_CChartSeria();
+							// ser.Val.NumCache = [ createItem(4), createItem(5), createItem(6), createItem(7) ];
+							// ser.OutlineColor = uniColors[1];
+							// chart.series.push(ser);
+							
 							break;
 					}
 					
@@ -233,6 +355,17 @@ function ChartPreviewManager() {
 				case c_oAscChartType.pie:
 					chart.data.push( [createItem(3)] );
 					chart.data.push( [createItem(1)] );
+					
+					// var ser = new asc_CChartSeria();
+					// ser.Val.NumCache = [ createItem(3) ];
+					// ser.OutlineColor = uniColors[0];
+					// chart.series.push(ser);
+					
+					// var ser = new asc_CChartSeria();
+					// ser.Val.NumCache = [ createItem(1) ];
+					// ser.OutlineColor = uniColors[1];
+					// chart.series.push(ser);
+					
 					break;
 					
 				case c_oAscChartType.area:
@@ -242,18 +375,51 @@ function ChartPreviewManager() {
 							chart.data.push( [createItem(8), createItem(4)] );
 							chart.data.push( [createItem(5), createItem(2)] );
 							chart.data.push( [createItem(6), createItem(9)] );
+							
+							// var ser = new asc_CChartSeria();
+							// ser.Val.NumCache = [ createItem(0), createItem(8), createItem(5), createItem(6) ];
+							// ser.OutlineColor = uniColors[0];
+							// chart.series.push(ser);
+							
+							// ser = new asc_CChartSeria();
+							// ser.Val.NumCache = [ createItem(0), createItem(4), createItem(2), createItem(9) ];
+							// ser.OutlineColor = uniColors[1];
+							// chart.series.push(ser);
+							
 							break;
 						case c_oAscChartSubType.stacked:
 							chart.data.push( [createItem(0), createItem(4)] );
 							chart.data.push( [createItem(8), createItem(4)] );
 							chart.data.push( [createItem(5), createItem(4)] );
 							chart.data.push( [createItem(11), createItem(4)] );
+							
+							// var ser = new asc_CChartSeria();
+							// ser.Val.NumCache = [ createItem(0), createItem(8), createItem(5), createItem(11) ];
+							// ser.OutlineColor = uniColors[0];
+							// chart.series.push(ser);
+							
+							// ser = new asc_CChartSeria();
+							// ser.Val.NumCache = [ createItem(4), createItem(4), createItem(4), createItem(4) ];
+							// ser.OutlineColor = uniColors[1];
+							// chart.series.push(ser);
+							
 							break;
 						case c_oAscChartSubType.stackedPer:
 							chart.data.push( [createItem(0), createItem(4)] );
 							chart.data.push( [createItem(4), createItem(4)] );
 							chart.data.push( [createItem(1), createItem(4)] );
 							chart.data.push( [createItem(16), createItem(4)] );
+							
+							// var ser = new asc_CChartSeria();
+							// ser.Val.NumCache = [ createItem(0), createItem(4), createItem(1), createItem(16) ];
+							// ser.OutlineColor = uniColors[0];
+							// chart.series.push(ser);
+							
+							// ser = new asc_CChartSeria();
+							// ser.Val.NumCache = [ createItem(4), createItem(4), createItem(4), createItem(4) ];
+							// ser.OutlineColor = uniColors[1];
+							// chart.series.push(ser);
+							
 							break;
 					}
 					break;
@@ -271,6 +437,27 @@ function ChartPreviewManager() {
 						}
 						chart.data.push(values);
 					}
+					
+					// var ser = new asc_CChartSeria();
+					// ser.Val.NumCache = [ createItem(1), createItem(5) ];
+					// ser.OutlineColor = uniColors[0];
+					// chart.series.push(ser);
+					
+					// ser = new asc_CChartSeria();
+					// ser.Val.NumCache = [ createItem(2), createItem(6) ];
+					// ser.OutlineColor = uniColors[1];
+					// chart.series.push(ser);
+					
+					// ser = new asc_CChartSeria();
+					// ser.Val.NumCache = [ createItem(3), createItem(7) ];
+					// ser.OutlineColor = uniColors[2];
+					// chart.series.push(ser);
+					
+					// ser = new asc_CChartSeria();
+					// ser.Val.NumCache = [ createItem(4), createItem(8) ];
+					// ser.OutlineColor = uniColors[3];
+					// chart.series.push(ser);
+					
 					break;
 			}	
 		}
@@ -287,7 +474,8 @@ function ChartPreviewManager() {
 			for (var style in styleManager.colorMap) {
 				
 				// Create and minimize properties
-				var chart = new CChartData(false);
+				var chart = new asc_CChart();
+				chart.range.interval = "Sheet1!A1:C3";
 				chart.xAxis.bShow = chart.xAxis.bGrid = false;
 				chart.yAxis.bShow = chart.yAxis.bGrid = false;
 				chart.legend.bShow = false;

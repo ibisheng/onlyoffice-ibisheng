@@ -742,9 +742,15 @@ asc_CChart.prototype = {
 	rebuildSeries: function() {
 		var _t = this;
 		var bbox = _t.range.intervalObject.getBBox0();
-		_t.series = [];
 		var nameIndex = 1;
 		var api = window["Asc"]["editor"];
+		
+		// Save old series colors
+		var oldSeriaData = [];
+		for ( var i = 0; i < _t.series.length; i++ ) {
+			oldSeriaData.push( {color: _t.series[i].OutlineColor, seriaTx: _t.series[i].Tx } );
+		}
+		_t.series = [];
 		
 		function isNumber(n) {
 			return !isNaN(parseFloat(n)) && isFinite(n);
@@ -758,13 +764,25 @@ asc_CChart.prototype = {
 			if ( c1 == c2 ) {		// vertical cache
 				for (var row = r1; row <= r2; row++) {
 					var cell = _t.range.intervalObject.worksheet.getCell( new CellAddress(row, c1, 0) );
-					cache.push(cell.getValue());
+					
+					var item = {};
+					item.numFormatStr = cell.getNumFormatStr();
+					item.isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
+					item.value = cell.getValue();
+					
+					cache.push(item);
 				}
 			}
 			else /*r1 == r2*/ {		// horizontal cache
 				for (var col = c1; col <= c2; col++) {
 					var cell = _t.range.intervalObject.worksheet.getCell( new CellAddress(r1, col, 0) );
-					cache.push(cell.getValue());
+					
+					var item = {};
+					item.numFormatStr = cell.getNumFormatStr();
+					item.isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
+					item.value = cell.getValue();
+					
+					cache.push(item);
 				}
 			}
 			
@@ -877,9 +895,16 @@ asc_CChart.prototype = {
 		
 		if ( _t.type == c_oAscChartType.hbar )
 			seriaUniColors = OfficeExcel.array_reverse(seriaUniColors);
-		
+			
+		// Restore old series colors
 		for ( var i = 0; i < _t.series.length; i++ ) {
-			_t.series[i].OutlineColor = seriaUniColors[i];
+			
+			if ( i < oldSeriaData.length ) {
+				_t.series[i].OutlineColor = oldSeriaData[i].color;
+				_t.series[i].Tx = oldSeriaData[i].seriaTx;
+			}
+			else
+				_t.series[i].OutlineColor = seriaUniColors[i];
 		}
 	},
 	
@@ -1626,7 +1651,8 @@ prot["asc_setUnderline"] = prot.asc_setUnderline;
 function asc_CChartSeria() {
 	this.Val = { Formula: null, NumCache: [] };
 	this.xVal = { Formula: null, NumCache: [] };
-	this.Tx = null;
+	this.Tx = null;		// пока оставил
+	this.TxCache = { Formula: null, Tx: null };
 	this.Marker = { Size: null, Symbol: null };
 	this.OutlineColor = null;
 	this.FormatCode = "";
@@ -3260,6 +3286,7 @@ function DrawingObjects() {
 			
 			aObjects[i].graphicObject.draw(shapeOverlayCtx);
 		}
+		_this.drawWorksheetHeaders();
 	}	
 
 	//-----------------------------------------------------------------------------------
@@ -3625,9 +3652,11 @@ function DrawingObjects() {
 	
 	_this.rebuildChartGraphicObjects = function() {
 		for (var i = 0; i < aObjects.length; i++) {
-			var chart = aObjects[i].graphicObject;
-			if ( chart.isChart() )
-				chart.recalculate();
+			var graphicObject = aObjects[i].graphicObject;
+			if ( graphicObject.isChart() ) {
+				graphicObject.chart.rebuildSeries();
+				graphicObject.recalculate();
+			}
 		}
 	}
 	
