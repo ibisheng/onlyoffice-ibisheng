@@ -2304,12 +2304,14 @@ CShape.prototype =
         }
 
         graphics.transform3(this.transform);
-        graphics.SetIntegerGrid(true);
+
+        graphics.SetIntegerGrid(false);
 
         if(locktype_None != this.Lock.Get_Type())
             graphics.DrawLockObjectRect(this.Lock.Get_Type() , 0, 0, this.extX, this.extY);
 
         graphics.reset();
+        graphics.SetIntegerGrid(true);
     },
 
 
