@@ -295,7 +295,7 @@
 		var isLock = false;
 		var idLockInArray = null;
 		for (; i < lengthArray; ++i) {
-			idLockInArray = (this._isExcel) ? arrayBlockId[i].guid : arrayBlockId[i];
+			idLockInArray = (this._isExcel) ? arrayBlockId[i].guid : (this._isPresentation) ? arrayBlockId[i]["guid"] : arrayBlockId[i];
 			if (this._locks[idLockInArray] && 0 !== this._locks[idLockInArray].state) {
 				isLock = true;
 				break;
@@ -304,7 +304,7 @@
 		if (0 === lengthArray)
 			isLock = true;
 
-		idLockInArray = (this._isExcel) ? arrayBlockId[0].guid : arrayBlockId[0];
+		idLockInArray = (this._isExcel) ? arrayBlockId[0].guid : (this._isPresentation) ? arrayBlockId[i]["guid"] : arrayBlockId[0];
 
 		if (!isLock) {
 			//Ask
@@ -458,7 +458,9 @@
         if (data["locks"]) {
             for (var key in data["locks"]) {
                 if (data["locks"].hasOwnProperty(key)) {
-                    var lock = data["locks"][key], blockTmp = (this._isExcel) ? lock["block"]["guid"] : key, blockValue = (this._isExcel) ? lock["block"] : key;
+                    var lock = data["locks"][key],
+						blockTmp = (this._isExcel) ? lock["block"]["guid"] : (this._isPresentation) ? lock["block"]["guid"] : key,
+						blockValue = (this._isExcel) ? lock["block"] : (this._isPresentation) ? lock["block"] : key;
                     if (lock !== null) {
                         var changed = true;
                         if (this._locks[blockTmp] && 1 !== this._locks[blockTmp].state /*asked for it*/) {
