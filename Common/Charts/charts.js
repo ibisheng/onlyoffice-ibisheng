@@ -1569,7 +1569,6 @@ function drawChart(chart, arrValues, width, height) {
 		else
 			lengthOfSeries = data[0].length;
 	}
-	bar._otherProps._colors = generateColors(lengthOfSeries, arrBaseColors, true);
 
 	//check default title
 	if((!chart.yAxis.title || chart.yAxis.title == null || chart.yAxis.title == undefined || chart.yAxis.title == '') && chart.yAxis.bDefaultTitle)
@@ -1586,21 +1585,40 @@ function drawChart(chart, arrValues, width, height) {
 		bar._otherProps._key_halign = chart.legend.position;
 				
 		var legendCnt = (chart.type == "Scatter") ? data.length : data.length;
+		var curColor;
+		var rgba;
 		if(chart.type == 'Pie' || chart.type == 'Bar' || chart.type == 'HBar')
 			legendCnt = data[0].length
 		if(chart.type == "Stock")
 			legendCnt = 4;
-		if(chart.series && chart.series.length != 0 && chart.series[0].Tx)
+		//если есть объект series
+		if(chart.series && chart.series.length != 0 && (chart.series[0].Tx || chart.series[0].OutlineColor) )
 		{
 			for (var j = 0; j < chart.series.length; j++) {
-				bar._otherProps._key[j] = chart.series[j].Tx;
+				if(chart.series[j].Tx)
+					bar._otherProps._key[j] = chart.series[j].Tx;
+				if(chart.series[j].OutlineColor && chart.series[j].OutlineColor.color.RGBA)
+				{
+					rgba = chart.series[j].OutlineColor.color.RGBA;
+					curColor = getHexColor(rgba.R, rgba.G, rgba.B);
+					bar._otherProps._colors[j] = curColor;
+				}	
 			}	
 		}
-		else
+		if(!chart.series[0].Tx || !chart.series[0].OutlineColor)
 		{
-			for (var j = 0; j < legendCnt; j++) {
-				bar._otherProps._key[j] = 'Series' + (j + 1);
-			}	
+			if(!chart.series[0].Tx)
+			{
+				for (var j = 0; j < legendCnt; j++) {
+					bar._otherProps._key[j] = 'Series' + (j + 1);
+				}
+			}
+			if(!chart.series[0].OutlineColor)
+			{
+				bar._otherProps._colors = generateColors(lengthOfSeries, arrBaseColors, true);
+				if(chart.type == 'HBar')
+					bar._otherProps._colors = OfficeExcel.array_reverse(bar._otherProps._colors);
+			}
 		}
 			
 		// без рамки
@@ -1613,13 +1631,7 @@ function drawChart(chart, arrValues, width, height) {
 		if(chart.type == 'HBar' && chart.subType != 'stacked' && chart.subType != 'stackedPer')
 		{
 			bar._otherProps._key = OfficeExcel.array_reverse(bar._otherProps._key);
-			bar._otherProps._colors = bar._otherProps._colors;
 		}
-		else if(chart.type == 'HBar')
-			bar._otherProps._colors = bar._otherProps._colors;
-			
-		if(chart.type == 'HBar')
-			bar._otherProps._colors = OfficeExcel.array_reverse(bar._otherProps._colors);
 		
 		if((chart.legend.position == 'left' || chart.legend.position == 'right' ))
 		{
@@ -2575,4 +2587,15 @@ function getMinValueArray(array)
 		}
 	}
 	return min;
+}
+
+function getHexColor(r,g,b) 
+{
+	var r = r.toString(16);
+	var g = g.toString(16);
+	var b = b.toString(16);
+	if (r.length == 1) r = '0' + r;
+	if (g.length == 1) g = '0' + g;
+	if (b.length == 1) b = '0' + b;
+	return '#' + r + g + b;
 }
