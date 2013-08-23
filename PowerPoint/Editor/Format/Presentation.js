@@ -6186,6 +6186,8 @@ CPresentation.prototype =
 
         if(CheckType === changestype_Drawing_Props)
         {
+            if(cur_slide.Lock.Type !== locktype_Mine || cur_slide.Lock.Type !== locktype_None)
+                return true;
             var selected_objects = cur_slide.graphicObjects.selectedObjects;
             for(var i = 0; i < selected_objects.length; ++i)
             {
@@ -6202,6 +6204,8 @@ CPresentation.prototype =
 
         if(CheckType === changestype_Text_Props)
         {
+            if(cur_slide.Lock.Type !== locktype_Mine || cur_slide.Lock.Type !== locktype_None)
+                return true;
             var selected_objects = cur_slide.graphicObjects.selectedObjects;
             for(var i = 0; i < selected_objects.length; ++i)
             {
