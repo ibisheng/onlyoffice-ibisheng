@@ -228,6 +228,7 @@ prop:StartAddShape
 prop:canGroup
 prop:canUnGroup
 prop:AddImageUrl
+prop:AddImageUrlAction
 prop:ImgApply
 prop:set_Size
 prop:set_ConstProportions
@@ -1092,6 +1093,7 @@ asc_docs_api.prototype['StartAddShape'] = asc_docs_api.prototype.StartAddShape;
 asc_docs_api.prototype['canGroup'] = asc_docs_api.prototype.canGroup;
 asc_docs_api.prototype['canUnGroup'] = asc_docs_api.prototype.canUnGroup;
 asc_docs_api.prototype['AddImageUrl'] = asc_docs_api.prototype.AddImageUrl;
+asc_docs_api.prototype['AddImageUrlAction'] = asc_docs_api.prototype.AddImageUrlAction;
 asc_docs_api.prototype['ImgApply'] = asc_docs_api.prototype.ImgApply;
 asc_docs_api.prototype['set_Size'] = asc_docs_api.prototype.set_Size;
 asc_docs_api.prototype['set_ConstProportions'] = asc_docs_api.prototype.set_ConstProportions;
