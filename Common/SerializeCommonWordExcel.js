@@ -1718,14 +1718,20 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 				});
 		}
 		else if ( c_oSer_ChartSeriesType.Tx === type )
-			seria.title = this.stream.GetString2LE(length);
-		// else if ( c_oSer_ChartSeriesType.TxRef === type )
-		// {
-			// seria.TxRef = new Object();
-			// res = this.bcr.Read1(length, function(t,l){
-					// return oThis.ReadSeriesNumCache(t,l, seria.TxRef);
-				// });
-		// }
+			seria.Tx = this.stream.GetString2LE(length);
+		else if ( c_oSer_ChartSeriesType.TxRef === type )
+		{
+			var oTxRef = { Formula: null, NumCache: [] };
+			res = this.bcr.Read1(length, function(t,l){
+					return oThis.ReadSeriesNumCache(t,l, oTxRef);
+				});
+			if(oTxRef.NumCache.length > 0)
+			{
+				var elem = oTxRef.NumCache[0];
+				if(null != elem && null != elem.val)
+					seria.Tx = elem.val;
+			}
+		}
 		else if ( c_oSer_ChartSeriesType.Marker === type )
 		{
 			res = this.bcr.Read2Spreadsheet(length, function(t,l){
