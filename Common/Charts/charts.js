@@ -1578,76 +1578,97 @@ function drawChart(chart, arrValues, width, height) {
 	if((!chart.header.title || chart.header.title == null || chart.header.title == undefined || chart.header.title == '') && chart.header.bDefaultTitle)
 		chart.header.title = defaultTitle;
 		
-	// Легенда
-	if (chart.legend.bShow && chart.legend.position != '') {
-		bar._otherProps._key_position = 'graph';
-		bar._otherProps._key = [];
-		bar._otherProps._key_halign = chart.legend.position;
-				
-		var legendCnt = (chart.type == "Scatter") ? data.length : data.length;
-		var curColor;
-		var rgba;
-		if(chart.type == 'Pie' || chart.type == 'Bar' || chart.type == 'HBar')
-			legendCnt = data[0].length
-		if(chart.type == "Stock")
-			legendCnt = 4;
-		//если есть объект series
-		if(chart.series && chart.series.length != 0 && (chart.series[0].Tx || chart.series[0].OutlineColor) )
-		{
-			for (var j = 0; j < chart.series.length; j++) {
-				if(chart.series[j].Tx)
-					bar._otherProps._key[j] = chart.series[j].Tx;
-				if(chart.series[j].OutlineColor && chart.series[j].OutlineColor.color.RGBA)
-				{
-					rgba = chart.series[j].OutlineColor.color.RGBA;
-					curColor = getHexColor(rgba.R, rgba.G, rgba.B);
-					bar._otherProps._colors[j] = curColor;
-				}	
+	
+	// *****Легенда******
+	bar._otherProps._key_position = 'graph';
+	bar._otherProps._key = [];
+	bar._otherProps._key_halign = chart.legend.position;
+			
+	var legendCnt = (chart.type == "Scatter") ? data.length : data.length;
+	var curColor;
+	var rgba;
+	if(chart.type == 'Pie' || chart.type == 'Bar' || chart.type == 'HBar')
+		legendCnt = data[0].length
+	if(chart.type == "Stock")
+		legendCnt = 4;
+	//если есть объект series
+	var theme;
+	var colorMap;
+	var RGBA;
+	if(api_sheet && chart.worksheet)
+	{
+		var wb = api_sheet.wbModel;
+		theme = wb.theme;
+		colorMap = GenerateDefaultColorMap().color_map;
+		RGBA = {R: 0, G: 0, B: 0, A: 255};
+	}
+	else if(api_doc)
+	{
+		theme  = api.WordControl.m_oLogicDocument.theme;
+		colorMap = api.WordControl.m_oLogicDocument.clrSchemeMap.color_map;
+		RGBA = {R: 0, G: 0, B: 0, A: 255};
+		if(colorMap==null)
+			colorMap = GenerateDefaultColorMap().color_map;
+	}
+	
+	if(chart.series && chart.series.length != 0 && (chart.series[0].Tx || chart.series[0].OutlineColor) && (theme && colorMap))
+	{
+		for (var j = 0; j < chart.series.length; j++) {
+			if(chart.series[j].Tx)
+				bar._otherProps._key[j] = chart.series[j].Tx;
+			if(chart.series[j].OutlineColor)
+			{
+				chart.series[j].OutlineColor.Calculate(theme, colorMap, RGBA);
+				rgba = chart.series[j].OutlineColor.RGBA;
+				curColor = getHexColor(rgba.R, rgba.G, rgba.B);
+				bar._otherProps._colors[j] = curColor;
 			}	
-		}
-		if(!chart.series[0].Tx || !chart.series[0].OutlineColor)
+		}	
+	}
+	if((chart.series && chart.series[0]) && (chart.series[0].Tx || chart.series[0].OutlineColor))
+	{
+		if(!chart.series[0].Tx)
 		{
-			if(!chart.series[0].Tx)
-			{
-				for (var j = 0; j < legendCnt; j++) {
-					bar._otherProps._key[j] = 'Series' + (j + 1);
-				}
-			}
-			if(!chart.series[0].OutlineColor)
-			{
-				bar._otherProps._colors = generateColors(lengthOfSeries, arrBaseColors, true);
-				if(chart.type == 'HBar')
-					bar._otherProps._colors = OfficeExcel.array_reverse(bar._otherProps._colors);
+			for (var j = 0; j < legendCnt; j++) {
+				bar._otherProps._key[j] = 'Series' + (j + 1);
 			}
 		}
-			
-		// без рамки
-		bar._otherProps._key_rounded = null;
+		if(!chart.series[0].OutlineColor)
+		{
+			bar._otherProps._colors = generateColors(lengthOfSeries, arrBaseColors, true);
+			if(chart.type == 'HBar')
+				bar._otherProps._colors = OfficeExcel.array_reverse(bar._otherProps._colors);
+		}
+	}
+		
+	// без рамки
+	bar._otherProps._key_rounded = null;
 
-		if (bar._otherProps._filled != true && bar.type != 'bar' && bar.type != 'hbar' && bar.type != 'pie')
-			bar._otherProps._key_color_shape = 'line';
-		
-		
-		if(chart.type == 'HBar' && chart.subType != 'stacked' && chart.subType != 'stackedPer')
-		{
-			bar._otherProps._key = OfficeExcel.array_reverse(bar._otherProps._key);
-		}
-		
-		if((chart.legend.position == 'left' || chart.legend.position == 'right' ))
-		{
-			var heightKey = bar._otherProps._key.length*23.5;
-			if(heightKey > bar.canvas.height - 50)
-			{
-				var lengthKey = Math.round((bar.canvas.height - 50)/23.5)
-				bar._otherProps._key = bar._otherProps._key.slice(0,lengthKey);
-			}
-			
-		}
+	if (bar._otherProps._filled != true && bar.type != 'bar' && bar.type != 'hbar' && bar.type != 'pie')
+		bar._otherProps._key_color_shape = 'line';
+	
+	
+	if(chart.type == 'HBar' && chart.subType != 'stacked' && chart.subType != 'stackedPer')
+	{
+		bar._otherProps._key = OfficeExcel.array_reverse(bar._otherProps._key);
 	}
-	else{
-		bar._otherProps._key_halign = 'none';
+	
+	if((chart.legend.position == 'left' || chart.legend.position == 'right' ))
+	{
+		var heightKey = bar._otherProps._key.length*23.5;
+		if(heightKey > bar.canvas.height - 50)
+		{
+			var lengthKey = Math.round((bar.canvas.height - 50)/23.5)
+			bar._otherProps._key = bar._otherProps._key.slice(0,lengthKey);
+		}
+		
+	}
+	if (!chart.legend.bShow || chart.legend.position == '')
+	{
 		bar._otherProps._key = [];
+		bar._otherProps._key_halign = 'none';
 	}
+		
 	//в случае наличия скрытых строчек или столбов(в итоге скрытых серий)
 	if(chart.skipSeries)
 	{
