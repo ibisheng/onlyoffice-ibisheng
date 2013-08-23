@@ -2302,6 +2302,10 @@ CShape.prototype =
 
             graphics.SetIntegerGrid(true);
         }
+        graphics.SetIntegerGrid(false);
+        if(locktype_None != this.Lock.Get_Type())
+            graphics.DrawLockObjectRect(this.Lock.Get_Type() , 0, 0, this.extX, this.extY);
+        graphics.SetIntegerGrid(true);
 
         graphics.reset();
         graphics.SetIntegerGrid(true);
