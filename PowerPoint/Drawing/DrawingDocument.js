@@ -1457,7 +1457,13 @@ function CDrawingDocument()
 
     this.FirePaint = function()
     {
+        //this.m_oWordControl.OnScroll();
+
+        this.m_oWordControl.Thumbnails.LockMainObjType = true;
+        this.m_oWordControl.SlideDrawer.CheckSlide(this.SlideCurrent);
+        this.m_oWordControl.CalculateDocumentSize(false);
         this.m_oWordControl.OnScroll();
+        this.m_oWordControl.Thumbnails.LockMainObjType = false;
     }
 
     this.StartTrackAutoshape = function()
