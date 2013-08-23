@@ -486,6 +486,28 @@ var:CAscFillSolid
 prop:get_color
 prop:put_color
 ---
+var:CAscFillHatch
+prop:get_pattern_type
+prop:put_pattern_type
+prop:get_color_fg
+prop:put_color_fg
+prop:get_color_bg
+prop:put_color_bg
+---
+var:CAscFillGrad
+prop:get_colors
+prop:put_colors
+prop:get_positions
+prop:put_positions
+prop:get_grad_type
+prop:put_grad_type
+prop:get_linear_angle
+prop:put_linear_angle
+prop:get_linear_scale
+prop:put_linear_scale
+prop:get_path_type
+prop:put_path_type
+---
 var:CAscFill
 prop:get_type
 prop:put_type
@@ -1330,6 +1352,26 @@ CAscFillBlip.prototype['put_texture_id'] = CAscFillBlip.prototype.put_texture_id
 window['CAscFillSolid'] = CAscFillSolid;
 CAscFillSolid.prototype['get_color'] = CAscFillSolid.prototype.get_color;
 CAscFillSolid.prototype['put_color'] = CAscFillSolid.prototype.put_color;
+window['CAscFillHatch'] = CAscFillHatch;
+CAscFillHatch.prototype['get_pattern_type'] = CAscFillHatch.prototype.get_pattern_type;
+CAscFillHatch.prototype['put_pattern_type'] = CAscFillHatch.prototype.put_pattern_type;
+CAscFillHatch.prototype['get_color_fg'] = CAscFillHatch.prototype.get_color_fg;
+CAscFillHatch.prototype['put_color_fg'] = CAscFillHatch.prototype.put_color_fg;
+CAscFillHatch.prototype['get_color_bg'] = CAscFillHatch.prototype.get_color_bg;
+CAscFillHatch.prototype['put_color_bg'] = CAscFillHatch.prototype.put_color_bg;
+window['CAscFillGrad'] = CAscFillGrad;
+CAscFillGrad.prototype['get_colors'] = CAscFillGrad.prototype.get_colors;
+CAscFillGrad.prototype['put_colors'] = CAscFillGrad.prototype.put_colors;
+CAscFillGrad.prototype['get_positions'] = CAscFillGrad.prototype.get_positions;
+CAscFillGrad.prototype['put_positions'] = CAscFillGrad.prototype.put_positions;
+CAscFillGrad.prototype['get_grad_type'] = CAscFillGrad.prototype.get_grad_type;
+CAscFillGrad.prototype['put_grad_type'] = CAscFillGrad.prototype.put_grad_type;
+CAscFillGrad.prototype['get_linear_angle'] = CAscFillGrad.prototype.get_linear_angle;
+CAscFillGrad.prototype['put_linear_angle'] = CAscFillGrad.prototype.put_linear_angle;
+CAscFillGrad.prototype['get_linear_scale'] = CAscFillGrad.prototype.get_linear_scale;
+CAscFillGrad.prototype['put_linear_scale'] = CAscFillGrad.prototype.put_linear_scale;
+CAscFillGrad.prototype['get_path_type'] = CAscFillGrad.prototype.get_path_type;
+CAscFillGrad.prototype['put_path_type'] = CAscFillGrad.prototype.put_path_type;
 window['CAscFill'] = CAscFill;
 CAscFill.prototype['get_type'] = CAscFill.prototype.get_type;
 CAscFill.prototype['put_type'] = CAscFill.prototype.put_type;
