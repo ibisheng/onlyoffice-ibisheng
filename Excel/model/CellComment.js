@@ -497,7 +497,8 @@ function asc_CCellCommentator(currentSheet) {
 	var isViewerMode =  function() { return _this.worksheet._trigger("getViewerMode"); };
 	
 	_this.worksheet = currentSheet;
-	_this.overlayCtx = currentSheet.drawingCtx;
+	_this.overlayCtx = currentSheet.overlayCtx;
+	_this.drawingCtx = currentSheet.drawingCtx;
 
 	// Drawing settings
 	_this.bShow = true;
@@ -535,25 +536,31 @@ function asc_CCellCommentator(currentSheet) {
 		// Комментарий к документу блокируем как Range
 		if ( !oComment.asc_getDocumentFlag() ) {
 			
+			/*
 			if (false === _this.worksheet.collaborativeEditing.isCoAuthoringExcellEnable()) {
 				// Запрещено совместное редактирование
-				callbackFunc(true);
+				if ($.isFunction(callbackFunc)) { callbackFunc(true); }
 				return;
 			}
 			
 			_this.worksheet.collaborativeEditing.onStartCheckLock();
-			lockInfo = _this.worksheet.collaborativeEditing.getLockInfo( c_oAscLockTypeElem.Range, /*subType*/null, sheetId,  new asc_CCollaborativeRange(c1, r1, c2, r2) );
-
-			if (false !== _this.worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/false)) {
+			lockInfo = _this.worksheet.collaborativeEditing.getLockInfo( c_oAscLockTypeElem.Range, null, sheetId,  new asc_CCollaborativeRange(c1, r1, c2, r2) );
+			
+			if ( false === _this.worksheet.collaborativeEditing.getCollaborativeEditing() ) {
+				// Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
+				if ($.isFunction(callbackFunc)) { callbackFunc(true); }
+				callbackFunc = undefined;
+			}
+			else if (false !== _this.worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine, false)) {
 				// Редактируем сами
-				callbackFunc(true);
+				if ($.isFunction(callbackFunc)) { callbackFunc(true); }
 				return;
 			}
-			else if (false !== _this.worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false)) {
+			else if (false !== _this.worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, false)) {
 				// Уже ячейку кто-то редактирует
-				callbackFunc(false);
+				if ($.isFunction(callbackFunc)) { callbackFunc(false); }
 				return;
-			}
+			}*/
 			
 			// Блокируем
 			_this.worksheet._isLockedCells(new asc_Range(c1, r1, c2, r2), null, callbackFunc);
@@ -562,9 +569,10 @@ function asc_CCellCommentator(currentSheet) {
 		
 			var objectGuid = oComment.asc_getId();
 			if (objectGuid) {
+			
 				if (false === _this.worksheet.collaborativeEditing.isCoAuthoringExcellEnable()) {
 					// Запрещено совместное редактирование
-					callbackFunc(true);
+					if ($.isFunction(callbackFunc)) { callbackFunc(true); }
 					return;
 				}
 
@@ -573,15 +581,17 @@ function asc_CCellCommentator(currentSheet) {
 
 				if (false === _this.worksheet.collaborativeEditing.getCollaborativeEditing()) {
 					// Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
-					callbackFunc(true);
+					if ($.isFunction(callbackFunc)) { callbackFunc(true); }
 					callbackFunc = undefined;
-				} else if (false !== _this.worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/false)) {
+				}
+				else if (false !== _this.worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/false)) {
 					// Редактируем сами
-					callbackFunc(true);
+					if ($.isFunction(callbackFunc)) { callbackFunc(true); }
 					return;
-				} else if (false !== _this.worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false)) {
+				}
+				else if (false !== _this.worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false)) {
 					// Уже ячейку кто-то редактирует
-					callbackFunc(false);
+					if ($.isFunction(callbackFunc)) { callbackFunc(false); }
 					return;
 				}
 				
@@ -594,69 +604,10 @@ function asc_CCellCommentator(currentSheet) {
 	}
 
 	_this.isLockedComment = function(oComment, callbackFunc) {
-
+	
 		var _this = this;
-		var c1, r1, c2, r2, lockInfo;
-
-		var sheetId = _this.worksheet.model.getId();
-		var mergedRange = _this.worksheet._getMergedCellsRange(oComment.asc_getCol(), oComment.asc_getRow());
-
-		c1 = mergedRange ? mergedRange.c1 : oComment.asc_getCol();
-		r1 = mergedRange ? mergedRange.r1 : oComment.asc_getRow();
-		c2 = mergedRange ? mergedRange.c2 : oComment.asc_getCol();
-		r2 = mergedRange ? mergedRange.r2 : oComment.asc_getRow();
-
-		if ( !oComment.asc_getDocumentFlag() ) {
-			
-			if (false === _this.worksheet.collaborativeEditing.isCoAuthoringExcellEnable()) {
-				// Запрещено совместное редактирование
-				callbackFunc(true);
-				return;
-			}
-			
-			_this.worksheet.collaborativeEditing.onStartCheckLock();
-			lockInfo = _this.worksheet.collaborativeEditing.getLockInfo( c_oAscLockTypeElem.Range, /*subType*/null, sheetId,  new asc_CCollaborativeRange(c1, r1, c2, r2) );
-
-			if (false !== _this.worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/false)) {
-				// Редактируем сами
-				callbackFunc(true);
-				return;
-			}
-			else if (false !== _this.worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false)) {
-				// Уже ячейку кто-то редактирует
-				callbackFunc(false);
-				return;
-			}
-			else
-				callbackFunc(true);
-		}
-		else {
-		
-			var objectGuid = oComment.asc_getId();
-			if (objectGuid) {
-				if (false === _this.worksheet.collaborativeEditing.isCoAuthoringExcellEnable()) {
-					// Запрещено совместное редактирование
-					callbackFunc(true);
-					return;
-				}
-
-				_this.worksheet.collaborativeEditing.onStartCheckLock();
-				lockInfo = _this.worksheet.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, /*subType*/null, sheetId, objectGuid);
-
-				if (false !== _this.worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/false)) {
-					// Редактируем сами
-					callbackFunc(true);
-					return;
-				}
-				else if (false !== _this.worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false)) {
-					// Уже ячейку кто-то редактирует
-					callbackFunc(false);
-					return;
-				}
-				else
-					callbackFunc(true);
-			}
-		}
+		_this.lockComment(oComment, callbackFunc);
+		return;
 	}
 	
 	_this.callLockComments = function(range) {
@@ -734,14 +685,14 @@ function asc_CCellCommentator(currentSheet) {
 			if ( !metrics.result || (metrics.width <= 0) || (metrics.height <= 0) )
 				continue;
 
-			this.overlayCtx.beginPath();
-			this.overlayCtx.setFillStyle(this.commentIconColor);
+			this.drawingCtx.beginPath();
+			this.drawingCtx.setFillStyle(this.commentIconColor);
 
-			this.overlayCtx.moveTo(this.pxToPt(metrics.left + metrics.width - 7), this.pxToPt(metrics.top));
-			this.overlayCtx.lineTo(this.pxToPt(metrics.left + metrics.width - 1), this.pxToPt(metrics.top));
-			this.overlayCtx.lineTo(this.pxToPt(metrics.left + metrics.width - 1), this.pxToPt(metrics.top + 6));
-			this.overlayCtx.closePath();
-			this.overlayCtx.fill();
+			this.drawingCtx.moveTo(this.pxToPt(metrics.left + metrics.width - 7), this.pxToPt(metrics.top));
+			this.drawingCtx.lineTo(this.pxToPt(metrics.left + metrics.width - 1), this.pxToPt(metrics.top));
+			this.drawingCtx.lineTo(this.pxToPt(metrics.left + metrics.width - 1), this.pxToPt(metrics.top + 6));
+			this.drawingCtx.closePath();
+			this.drawingCtx.fill();
 
 			drawCells[cellId] = cellId;
 		}
@@ -1226,6 +1177,14 @@ function asc_CCellCommentator(currentSheet) {
 		_this.calcCommentsCoords(true);
 	}
 
+	_this.restoreRange = function(range) {
+		if ( range ) {
+			worksheet._drawGrid( drawingCtx, range);
+			worksheet._drawCells(range);
+			worksheet._drawCellsBorders(undefined, range);
+		}
+	}
+	
 	//-----------------------------------------------------------------------------------
 	// Misc methods
 	//-----------------------------------------------------------------------------------
@@ -1339,11 +1298,17 @@ asc_CCellCommentator.prototype = {
 					//extraOffset = 2;
 				}
 
+				var x = _this.pxToPt(metrics.left + rangeOffset);
+				var y = _this.pxToPt(metrics.top + rangeOffset);
+				var w = _this.pxToPt(metrics.width - extraOffset - rangeOffset);
+				var h = _this.pxToPt(metrics.height - extraOffset - rangeOffset);
+
 				_this.overlayCtx.ctx.globalAlpha = 0.2;
 				_this.overlayCtx.beginPath();
-				_this.overlayCtx.rect(_this.pxToPt(metrics.left + rangeOffset), _this.pxToPt(metrics.top + rangeOffset), _this.pxToPt(metrics.width - extraOffset - rangeOffset), _this.pxToPt(metrics.height - extraOffset - rangeOffset), .5, .5);
+				_this.overlayCtx.clearRect(x, y, w, h, .5, .5);
+				_this.overlayCtx.rect(x, y, w, h, .5, .5);
 				_this.overlayCtx.setFillStyle(_this.commentFillColor);
-				_this.overlayCtx.fillRect(_this.pxToPt(metrics.left + rangeOffset), _this.pxToPt(metrics.top + rangeOffset), _this.pxToPt(metrics.width - extraOffset - rangeOffset), _this.pxToPt(metrics.height - extraOffset - rangeOffset));
+				_this.overlayCtx.fillRect(x, y, w, h);
 				_this.overlayCtx.ctx.globalAlpha = 1;
 			}
 		}
@@ -1399,7 +1364,6 @@ asc_CCellCommentator.prototype = {
 				return;
 			}
 			else {
-				_this.lockComment(oComment, function(res) {});
 				_this.worksheet.model.workbook.handlers.trigger("asc_onUnLockComment", oComment.asc_getId());
 				
 				History.Create_NewPoint();
@@ -1426,7 +1390,6 @@ asc_CCellCommentator.prototype = {
 				return;
 			}
 			else {
-				_this.lockComment(comment, function(res) {});
 				_this.worksheet.model.workbook.handlers.trigger("asc_onUnLockComment", comment.asc_getId());
 				
 				var commentBefore = new asc_CCommentData(comment);
@@ -1485,7 +1448,6 @@ asc_CCellCommentator.prototype = {
 				return;
 			}
 			else {
-				_this.lockComment(comment, function(res) {});
 				_this.worksheet.model.workbook.handlers.trigger("asc_onUnLockComment", comment.asc_getId());
 				
 				if (comment) {
