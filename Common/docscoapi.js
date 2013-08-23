@@ -755,7 +755,7 @@
     }
 
 
-    DocsCoApi.prototype.init = function (user, docid, isviewermode, token, serverHost, serverPath, callback, isExcel) {
+    DocsCoApi.prototype.init = function (user, docid, isviewermode, token, serverHost, serverPath, callback, editorType) {
         this._user = user;
         this._docid = docid;
 		this._isviewermode = isviewermode;
@@ -769,7 +769,8 @@
 		this._serverPath = serverPath;
 		this.sockjs_url = this._url + '/doc/'+docid+'/c';
         this.sockjs = initSocksJs(this.sockjs_url, this);
-		this._isExcel = isExcel;
+		this._isExcel = c_oAscEditorsType.Excel === editorType;
+		this._isPresentation = c_oAscEditorsType.Presentation === editorType;
 		this._isAuth = false;
 
         this.dataHandler =

@@ -96,3 +96,9 @@ var c_oAscLineDrawingRule = {
     Top    : 0,
     Bottom : 2
 };
+
+var c_oAscEditorsType = {
+	Word			: 0,
+	Excel			: 1,
+	Presentation	: 2
+};
