@@ -304,7 +304,7 @@
 		if (0 === lengthArray)
 			isLock = true;
 
-		idLockInArray = (this._isExcel) ? arrayBlockId[0].guid : (this._isPresentation) ? arrayBlockId[i]["guid"] : arrayBlockId[0];
+		idLockInArray = (this._isExcel) ? arrayBlockId[0].guid : (this._isPresentation) ? arrayBlockId[0]["guid"] : arrayBlockId[0];
 
 		if (!isLock) {
 			//Ask
