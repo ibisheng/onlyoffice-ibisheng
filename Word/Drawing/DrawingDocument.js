@@ -4003,7 +4003,7 @@ function CDrawingDocument()
 
     this.Set_RulerState_Paragraph = function(margins)
     {
-        if (margins && margins.Frame === true)
+        if (margins && margins.Frame !== undefined)
         {
             var bIsUpdate = false;
 
