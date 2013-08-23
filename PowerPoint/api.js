@@ -160,7 +160,7 @@ asc_docs_api.prototype._coAuthoringInit = function (docId, user) {
                 case c_oAscLockTypeElemPresentation.Object:
                 {
                     classes.push(block_value["objId"]);
-                    classes.push(block_value["slideId"]);
+                    //classes.push(block_value["slideId"]);
                     break;
                 }
                 case c_oAscLockTypeElemPresentation.Slide:
@@ -223,7 +223,7 @@ asc_docs_api.prototype._coAuthoringInit = function (docId, user) {
             case c_oAscLockTypeElemPresentation.Object:
             {
                 classes.push(block_value["objId"]);
-                classes.push(block_value["slideId"]);
+                //classes.push(block_value["slideId"]);
                 break;
             }
             case c_oAscLockTypeElemPresentation.Slide:

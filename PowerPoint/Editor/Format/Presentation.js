@@ -6228,6 +6228,11 @@ CPresentation.prototype =
             var selected_slides = editor.WordControl.Thumbnails.GetSelectedArray();
             for(var i = 0; i < selected_slides.length; ++i)
             {
+                if(this.Slides[selected_slides[i]].isLockedObject())
+                    return true;
+            }
+            for(var i = 0; i < selected_slides.length; ++i)
+            {
                 var check_obj =
                 {
                     "type": c_oAscLockTypeElemPresentation.Slide,
