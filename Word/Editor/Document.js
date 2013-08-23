@@ -1026,6 +1026,7 @@ CDocument.prototype =
                     {
                         var TempElement = this.Content[TempIndex];
                         TempElement.Shift( 0, FrameX, FrameY );
+                        TempElement.Set_CalculatedFrame( FrameX, FrameY, FrameW, FrameH );
                     }
 
                     var FrameDx = ( undefined === FramePr.HSpace ? 0 : FramePr.HSpace );
@@ -9281,7 +9282,43 @@ CDocument.prototype =
                 if ( this.Selection.StartPos == this.Selection.EndPos && type_Table === this.Content[this.Selection.StartPos].GetType() )
                     this.Content[this.Selection.StartPos].Document_UpdateRulersState(this.CurPage);
                 else
-                    this.DrawingDocument.Set_RulerState_Paragraph( null );
+                {
+                    var StartPos = ( this.Selection.EndPos <= this.Selection.StartPos ? this.Selection.EndPos   : this.Selection.StartPos );
+                    var EndPos   = ( this.Selection.EndPos <= this.Selection.StartPos ? this.Selection.StartPos : this.Selection.EndPos );
+
+                    var FramePr = undefined;
+
+                    for ( var Pos = StartPos; Pos <= EndPos; Pos++ )
+                    {
+                        var Element = this.Content[Pos];
+                        if ( type_Paragraph != Element.GetType() )
+                        {
+                            FramePr = undefined;
+                            break;
+                        }
+                        else
+                        {
+                            var TempFramePr = Element.Get_FramePr();
+                            if ( undefined === FramePr )
+                            {
+                                if ( undefined === TempFramePr )
+                                    break;
+
+                                FramePr = TempFramePr;
+                            }
+                            else if ( false === FramePr.Compare(TempFramePr) )
+                            {
+                                FramePr = undefined;
+                                break;
+                            }
+                        }
+                    }
+
+                    if ( undefined === FramePr )
+                        this.DrawingDocument.Set_RulerState_Paragraph( null );
+                    else
+                        this.Content[StartPos].Document_UpdateRulersState();
+                }
             }
             else
             {
@@ -9291,7 +9328,7 @@ CDocument.prototype =
                 if ( type_Table === Item.GetType() )
                     Item.Document_UpdateRulersState(this.CurPage);
                 else
-                    this.DrawingDocument.Set_RulerState_Paragraph( null );
+                    Item.Document_UpdateRulersState();
             }
         }
     },

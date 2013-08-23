@@ -34,6 +34,15 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit)
     };
     this.Pr = new CParaPr();
 
+    // Рассчитанное положение рамки
+    this.CalculatedFrame =
+    {
+        L : 0,
+        T : 0,
+        W : 0,
+        H : 0
+    };
+
     // Данный TextPr будет относится только к символу конца параграфа
     this.TextPr = new ParaTextPr();
     this.TextPr.Parent = this;
@@ -10250,6 +10259,19 @@ Paragraph.prototype =
         }
     },
 
+    // Обновляем линейку
+    Document_UpdateRulersState : function()
+    {
+        var FramePr = this.Get_FramePr();
+        if ( undefined === FramePr )
+            this.Parent.DrawingDocument.Set_RulerState_Paragraph( null );
+        else
+        {
+            var Frame = this.CalculatedFrame;
+            this.Parent.DrawingDocument.Set_RulerState_Paragraph( { L : Frame.L, T : Frame.T, R : Frame.L + Frame.W, B : Frame.T + Frame.H, Frame : true } );
+        }
+    },
+
     // Пока мы здесь проверяем только, находимся ли мы внутри гиперссылки
     Document_UpdateInterfaceState : function()
     {
@@ -10455,6 +10477,14 @@ Paragraph.prototype =
         this.Pr.FramePr.Set_FromObject( FramePr );
         History.Add( this, { Type : historyitem_Paragraph_FramePr, Old : FramePr_old, New : this.Pr.FramePr } );
         this.CompiledPr.NeedRecalc = true;
+    },
+
+    Set_CalculatedFrame : function(L, T, W, H)
+    {
+        this.CalculatedFrame.T = T;
+        this.CalculatedFrame.L = L;
+        this.CalculatedFrame.W = W;
+        this.CalculatedFrame.H = H;
     },
 
     // Разделяем данный параграф
