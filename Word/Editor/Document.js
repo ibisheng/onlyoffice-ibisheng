@@ -871,7 +871,7 @@ CDocument.prototype =
                         FrameH = TempElement.Get_PageBounds( PageIndex - TempElement.Get_StartPage_Absolute()).Bottom;
                     }
 
-                    if ( -1 === FrameW && 1 === FlowCount && 1 === Element.Lines.length )
+                    if ( -1 === FrameW && 1 === FlowCount && 1 === Element.Lines.length && undefined === FramePr.Get_W() )
                     {
                         FrameW = Element.Lines[0].Ranges[0].W;
                         var ParaPr = Element.Get_CompiledPr2(false).ParaPr;

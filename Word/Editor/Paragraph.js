@@ -3838,37 +3838,13 @@ Paragraph.prototype =
         var FramePr = this.Get_FramePr();
         if ( undefined != FramePr )
         {
-            var Bounds = this.Pages[CurPage].Bounds;
-            var BoundsW = Bounds.Right - Bounds.Left;
-            var BoundsH = Bounds.Bottom - Bounds.Top;
-
-            var PrevElement = this.Get_DocumentPrev();
-            var NextElement = this.Get_DocumentNext();
-
-            var bFullLen = false;
-            if ( null != PrevElement && type_Paragraph === PrevElement.GetType() )
-            {
-                var PrevFramePr = PrevElement.Get_FramePr();
-                if ( undefined != PrevFramePr && true === PrevFramePr.Compare( FramePr ) )
-                    bFullLen = true;
-            }
-
-            if ( false === bFullLen && null != NextElement && type_Paragraph === NextElement.GetType() )
-            {
-                var NextFramePr = NextElement.Get_FramePr();
-                if ( undefined != NextFramePr && true === NextFramePr.Compare( FramePr ) )
-                    bFullLen = true;
-            }
-
-            var BoundsL = Bounds.Left;
-            if ( false === bFullLen && 1 === this.Lines.length )
-            {
-                BoundsL = this.Lines[0].Ranges[0].X;
-                BoundsW = this.Lines[0].Ranges[0].W;
-            }
+            var BoundsL = this.CalculatedFrame.L;
+            var BoundsT = this.CalculatedFrame.T;
+            var BoundsH = this.CalculatedFrame.H;
+            var BoundsW = this.CalculatedFrame.W;
 
             pGraphics.SaveGrState();
-            pGraphics.AddClipRect( BoundsL, Bounds.Top, BoundsW, BoundsH );
+            pGraphics.AddClipRect( BoundsL, BoundsT, BoundsW, BoundsH );
         }
 
         // 1 часть отрисовки :
@@ -10268,7 +10244,7 @@ Paragraph.prototype =
         else
         {
             var Frame = this.CalculatedFrame;
-            this.Parent.DrawingDocument.Set_RulerState_Paragraph( { L : Frame.L, T : Frame.T, R : Frame.L + Frame.W, B : Frame.T + Frame.H, Frame : true } );
+            this.Parent.DrawingDocument.Set_RulerState_Paragraph( { L : Frame.L, T : Frame.T, R : Frame.L + Frame.W, B : Frame.T + Frame.H, Frame : this } );
         }
     },
 
@@ -10485,6 +10461,124 @@ Paragraph.prototype =
         this.CalculatedFrame.L = L;
         this.CalculatedFrame.W = W;
         this.CalculatedFrame.H = H;
+    },
+
+    Internal_Get_FrameParagraphs : function()
+    {
+        var FrameParas = new Array();
+
+        var FramePr = this.Get_FramePr();
+        if ( undefined === FramePr )
+            return FrameParas;
+
+        FrameParas.push( this );
+
+        var Prev = this.Get_DocumentPrev();
+        while ( null != Prev )
+        {
+            if ( type_Paragraph === Prev.GetType() )
+            {
+                var PrevFramePr = Prev.Get_FramePr();
+                if ( undefined != PrevFramePr && true === FramePr.Compare( PrevFramePr ) )
+                {
+                    FrameParas.push(  Prev );
+                    Prev = Prev.Get_DocumentPrev();
+                }
+                else
+                    break;
+            }
+            else
+                break;
+        }
+
+        var Next = this.Get_DocumentNext();
+        while ( null != Next )
+        {
+            if ( type_Paragraph === Next.GetType() )
+            {
+                var NextFramePr = Next.Get_FramePr();
+                if ( undefined != NextFramePr && true === FramePr.Compare( NextFramePr ) )
+                {
+                    FrameParas.push(  Next );
+                    Next = Next.Get_DocumentNext();
+                }
+                else
+                    break;
+            }
+            else
+                break;
+        }
+
+        return FrameParas;
+    },
+
+    Move_Frame : function(X, Y)
+    {
+        var LogicDocument = editor.WordControl.m_oLogicDocument;
+
+        var FramePr = this.Get_FramePr();
+        if ( undefined === FramePr || ( Math.abs( Y - this.CalculatedFrame.T ) < 0.001 && Math.abs( X - this.CalculatedFrame.L ) < 0.001 ) )
+            return;
+
+        var FrameParas = this.Internal_Get_FrameParagraphs();
+        if ( false === LogicDocument.Document_Is_SelectionLocked( changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : FrameParas, CheckType : changestype_Paragraph_Content } ) )
+        {
+            History.Create_NewPoint();
+            var NewFramePr = FramePr.Copy();
+            NewFramePr.X       = X;
+            NewFramePr.XAlign  = undefined;
+            NewFramePr.HAnchor = c_oAscHAnchor.Page;
+            NewFramePr.Y       = Y;
+            NewFramePr.YAlign  = undefined;
+            NewFramePr.VAnchor = c_oAscVAnchor.Page;
+
+            var Count = FrameParas.length;
+            for ( var Index = 0; Index < Count; Index++ )
+            {
+                var Para = FrameParas[Index];
+                Para.Set_FramePr( NewFramePr, false );
+            }
+
+            LogicDocument.Recalculate();
+        }
+    },
+
+    Resize_Frame : function(W, H)
+    {
+        var LogicDocument = editor.WordControl.m_oLogicDocument;
+
+        var FramePr = this.Get_FramePr();
+        if ( undefined === FramePr || ( Math.abs( W - this.CalculatedFrame.W ) < 0.001 && Math.abs( H - this.CalculatedFrame.H ) < 0.001 ) )
+            return;
+
+        var FrameParas = this.Internal_Get_FrameParagraphs();
+        if ( false === LogicDocument.Document_Is_SelectionLocked( changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : FrameParas, CheckType : changestype_Paragraph_Content } ) )
+        {
+            History.Create_NewPoint();
+            var NewFramePr = FramePr.Copy();
+
+            if ( Math.abs( W - this.CalculatedFrame.W ) > 0.001 )
+                NewFramePr.W = W;
+
+            if ( Math.abs( H - this.CalculatedFrame.H ) > 0.001 )
+            {
+                if ( H <= this.CalculatedFrame.H )
+                    NewFramePr.HRule = linerule_Exact;
+                else
+                    NewFramePr.HRule = linerule_AtLeast;
+
+                NewFramePr.H = H;
+            }
+
+            var Count = FrameParas.length;
+            for ( var Index = 0; Index < Count; Index++ )
+            {
+                var Para = FrameParas[Index];
+                Para.Set_FramePr( NewFramePr, false );
+            }
+
+            LogicDocument.Recalculate();
+        }
     },
 
     // Разделяем данный параграф
