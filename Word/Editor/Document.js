@@ -1026,7 +1026,7 @@ CDocument.prototype =
                     {
                         var TempElement = this.Content[TempIndex];
                         TempElement.Shift( 0, FrameX, FrameY );
-                        TempElement.Set_CalculatedFrame( FrameX, FrameY, FrameW, FrameH );
+                        TempElement.Set_CalculatedFrame( FrameX, FrameY, FrameW, FrameH, PageIndex );
                     }
 
                     var FrameDx = ( undefined === FramePr.HSpace ? 0 : FramePr.HSpace );

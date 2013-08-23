@@ -40,7 +40,8 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit)
         L : 0,
         T : 0,
         W : 0,
-        H : 0
+        H : 0,
+        PageIndex : 0
     };
 
     // Данный TextPr будет относится только к символу конца параграфа
@@ -10244,7 +10245,7 @@ Paragraph.prototype =
         else
         {
             var Frame = this.CalculatedFrame;
-            this.Parent.DrawingDocument.Set_RulerState_Paragraph( { L : Frame.L, T : Frame.T, R : Frame.L + Frame.W, B : Frame.T + Frame.H, Frame : this } );
+            this.Parent.DrawingDocument.Set_RulerState_Paragraph( { L : Frame.L, T : Frame.T, R : Frame.L + Frame.W, B : Frame.T + Frame.H, PageIndex : Frame.PageIndex, Frame : this } );
         }
     },
 
@@ -10455,12 +10456,13 @@ Paragraph.prototype =
         this.CompiledPr.NeedRecalc = true;
     },
 
-    Set_CalculatedFrame : function(L, T, W, H)
+    Set_CalculatedFrame : function(L, T, W, H, PageIndex)
     {
         this.CalculatedFrame.T = T;
         this.CalculatedFrame.L = L;
         this.CalculatedFrame.W = W;
         this.CalculatedFrame.H = H;
+        this.CalculatedFrame.PageIndex = PageIndex;
     },
 
     Internal_Get_FrameParagraphs : function()
@@ -10512,12 +10514,12 @@ Paragraph.prototype =
         return FrameParas;
     },
 
-    Move_Frame : function(X, Y)
+    Change_Frame : function(X, Y, W, H, PageIndex)
     {
         var LogicDocument = editor.WordControl.m_oLogicDocument;
 
         var FramePr = this.Get_FramePr();
-        if ( undefined === FramePr || ( Math.abs( Y - this.CalculatedFrame.T ) < 0.001 && Math.abs( X - this.CalculatedFrame.L ) < 0.001 ) )
+        if ( undefined === FramePr || ( Math.abs( Y - this.CalculatedFrame.T ) < 0.001 && Math.abs( X - this.CalculatedFrame.L ) < 0.001 && Math.abs( W - this.CalculatedFrame.W ) < 0.001 && Math.abs( H - this.CalculatedFrame.H ) < 0.001 && PageIndex === this.CalculatedFrame.PageIndex ) )
             return;
 
         var FrameParas = this.Internal_Get_FrameParagraphs();
@@ -10525,37 +10527,20 @@ Paragraph.prototype =
         {
             History.Create_NewPoint();
             var NewFramePr = FramePr.Copy();
-            NewFramePr.X       = X;
-            NewFramePr.XAlign  = undefined;
-            NewFramePr.HAnchor = c_oAscHAnchor.Page;
-            NewFramePr.Y       = Y;
-            NewFramePr.YAlign  = undefined;
-            NewFramePr.VAnchor = c_oAscVAnchor.Page;
 
-            var Count = FrameParas.length;
-            for ( var Index = 0; Index < Count; Index++ )
+            if ( Math.abs( X - this.CalculatedFrame.L ) > 0.001 )
             {
-                var Para = FrameParas[Index];
-                Para.Set_FramePr( NewFramePr, false );
+                NewFramePr.X       = X;
+                NewFramePr.XAlign  = undefined;
+                NewFramePr.HAnchor = c_oAscHAnchor.Page;
             }
 
-            LogicDocument.Recalculate();
-        }
-    },
-
-    Resize_Frame : function(W, H)
-    {
-        var LogicDocument = editor.WordControl.m_oLogicDocument;
-
-        var FramePr = this.Get_FramePr();
-        if ( undefined === FramePr || ( Math.abs( W - this.CalculatedFrame.W ) < 0.001 && Math.abs( H - this.CalculatedFrame.H ) < 0.001 ) )
-            return;
-
-        var FrameParas = this.Internal_Get_FrameParagraphs();
-        if ( false === LogicDocument.Document_Is_SelectionLocked( changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : FrameParas, CheckType : changestype_Paragraph_Content } ) )
-        {
-            History.Create_NewPoint();
-            var NewFramePr = FramePr.Copy();
+            if ( Math.abs( Y - this.CalculatedFrame.T ) > 0.001 )
+            {
+                NewFramePr.Y       = Y;
+                NewFramePr.YAlign  = undefined;
+                NewFramePr.VAnchor = c_oAscVAnchor.Page;
+            }
 
             if ( Math.abs( W - this.CalculatedFrame.W ) > 0.001 )
                 NewFramePr.W = W;
