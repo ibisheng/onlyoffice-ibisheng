@@ -4015,7 +4015,8 @@ function CDrawingDocument()
                 if (this.FrameRect.Rect.X != margins.L ||
                     this.FrameRect.Rect.Y != margins.T ||
                     this.FrameRect.Rect.R != margins.R ||
-                    this.FrameRect.Rect.B != margins.B)
+                    this.FrameRect.Rect.B != margins.B ||
+                    this.FrameRect.PageIndex != margins.PageIndex)
                 {
                     bIsUpdate = true;
                 }
@@ -4026,6 +4027,7 @@ function CDrawingDocument()
             this.FrameRect.Rect.Y = margins.T;
             this.FrameRect.Rect.R = margins.R;
             this.FrameRect.Rect.B = margins.B;
+            this.FrameRect.PageIndex = margins.PageIndex;
 
             if (bIsUpdate)
             {

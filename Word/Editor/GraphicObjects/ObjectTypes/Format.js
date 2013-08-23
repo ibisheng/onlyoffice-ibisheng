@@ -1636,6 +1636,10 @@ CUniFill.prototype =
                     this.fill.colors[i].color.Calculate(theme, clrMap, RGBA);
                 }
             }
+            if (this.fill.fgClr)
+                this.fill.fgClr.Calculate(theme, clrMap, RGBA);
+            if (this.fill.bgClr)
+                this.fill.bgClr.Calculate(theme, clrMap, RGBA);
         }
     },
 
