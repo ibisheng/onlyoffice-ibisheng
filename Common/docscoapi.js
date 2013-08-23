@@ -518,12 +518,13 @@
         if (data["locks"]) {
             for (var block in data["locks"]) {
                 if (data["locks"].hasOwnProperty(block)) {
-                    var lock = data["locks"][block];
+                    var lock = data["locks"][block],
+						blockTmp = (this._isExcel) ? lock["block"]["guid"] : (this._isPresentation) ? lock["block"]["guid"] : lock["block"];
                     if (lock !== null) {
-                        this._locks[lock["block"]] = {"state":0, "user":lock["user"], "time":lock["time"], "changes":lock["changes"], "block":lock["block"]};
+                        this._locks[blockTmp] = {"state":0, "user":lock["user"], "time":lock["time"], "changes":lock["changes"], "block":lock["block"]};
                         if (this.onLocksReleased) {
 							// true - lock with save
-                            this.onLocksReleased(this._locks[lock["block"]], true);
+                            this.onLocksReleased(this._locks[blockTmp], true);
                         }
                     }
                 }
