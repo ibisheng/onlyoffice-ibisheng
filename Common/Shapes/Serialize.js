@@ -4190,10 +4190,10 @@ function BinaryPPTYLoader()
         var _end_rec = _rec_start + s.GetULong() + 4;
 
         var _graphic_frame = new CGraphicFrame(this.TempMainObject);
-        if (null != this.TempGroupObject)
+       /* if (null != this.TempGroupObject)
             _graphic_frame.Container = this.TempGroupObject;
         else
-            _graphic_frame.Container = _graphic_frame.parent.elementsManipulator;
+            _graphic_frame.Container = _graphic_frame.parent.elementsManipulator;   */
 
         this.TempGroupObject = _graphic_frame;
 
