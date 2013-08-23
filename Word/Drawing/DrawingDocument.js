@@ -1775,6 +1775,9 @@ function CDrawingDocument()
     this.m_lDrawingEnd      = -1;
     this.m_lCurrentPage     = -1;
 
+    this.IsMoveFrame = false;
+    this.FrameRect = { IsActive : false, IsMoveFrame : false, Rect : { X : 0, Y : 0, R : 0, B : 0 }, PageIndex : 0 };
+
     this.m_oCacheManager    = new CCacheManager();
 
     this.m_lCountCalculatePages = 0;
@@ -2059,8 +2062,16 @@ function CDrawingDocument()
                 }
             }
 
+            if (bIsSendCurPage && this.FrameRect.IsActive)
+            {
+                bIsSendCurPage = false;
+                this.m_oWordControl.SetCurrentPage(false);
+            }
+
             if (bIsSendCurPage)
+            {
                 this.m_oWordControl.SetCurrentPage();
+            }
 		}
 
         if (isFull)
@@ -3275,6 +3286,68 @@ function CDrawingDocument()
             }
         }
     }
+
+    this.DrawFrameTrack = function(overlay)
+    {
+        if (!this.FrameRect.IsActive)
+            return;
+
+        var _page = this.m_arrPages[this.FrameRect.PageIndex];
+        var drPage = _page.drawingPage;
+
+        var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
+        var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
+
+        var _x = (drPage.left + dKoefX * this.FrameRect.Rect.X);
+        var _y = (drPage.top + dKoefY * this.FrameRect.Rect.Y);
+        var _r = (drPage.left + dKoefX * this.FrameRect.Rect.R);
+        var _b = (drPage.top + dKoefY * this.FrameRect.Rect.B);
+
+        if (_x < overlay.min_x)
+            overlay.min_x = _x;
+        if (_r > overlay.max_x)
+            overlay.max_x = _r;
+
+        if (_y < overlay.min_y)
+            overlay.min_y = _y;
+        if (_b > overlay.max_y)
+            overlay.max_y = _b;
+
+        var ctx = overlay.m_oContext;
+        ctx.strokeStyle = "#939393";
+        ctx.lineWidth = 1;
+
+        ctx.beginPath();
+        this.AutoShapesTrack.AddRectDashClever(ctx, _x >> 0, _y >> 0, _r >> 0, _b >> 0, 2, 2);
+        ctx.stroke();
+        ctx.beginPath();
+
+        var _w = 4;
+        var _wc = 5;
+
+        var _x1 = (_x >> 0) + 1;
+        var _y1 = (_y >> 0) + 1;
+
+        var _x2 = (_r >> 0) - _w;
+        var _y2 = (_b >> 0) - _w;
+
+        var _xc = ((_x + _r - _wc) / 2) >> 0;
+        var _yc = ((_y + _b - _wc) / 2) >> 0;
+
+        ctx.rect(_x1, _y1, _w, _w);
+        ctx.rect(_xc, _y1, _wc, _w);
+        ctx.rect(_x2, _y1, _w, _w);
+        ctx.rect(_x1, _yc, _w, _wc);
+        ctx.rect(_x2, _yc, _w, _wc);
+        ctx.rect(_x1, _y2, _w, _w);
+        ctx.rect(_xc, _y2, _wc, _w);
+        ctx.rect(_x2, _y2, _w, _w);
+
+        ctx.fillStyle = "#777777";
+        ctx.fill();
+        ctx.beginPath();
+    }
+
     this.DrawTableTrack = function(overlay)
     {
         if (null == this.TableOutlineDr.TableOutline)
@@ -3882,6 +3955,8 @@ function CDrawingDocument()
 
     this.Set_RulerState_Table = function(markup, transform)
     {
+        this.FrameRect.IsActive = false;
+
         var hor_ruler = this.m_oWordControl.m_oHorRuler;
         var ver_ruler = this.m_oWordControl.m_oVerRuler;
 
@@ -3928,6 +4003,43 @@ function CDrawingDocument()
 
     this.Set_RulerState_Paragraph = function(margins)
     {
+        if (margins && margins.Frame === true)
+        {
+            var bIsUpdate = false;
+
+            if (!this.FrameRect.IsActive)
+                bIsUpdate = true;
+
+            if (!bIsUpdate)
+            {
+                if (this.FrameRect.Rect.X != margins.L ||
+                    this.FrameRect.Rect.Y != margins.T ||
+                    this.FrameRect.Rect.R != margins.R ||
+                    this.FrameRect.Rect.B != margins.B)
+                {
+                    bIsUpdate = true;
+                }
+            }
+
+            this.FrameRect.IsActive = true;
+            this.FrameRect.Rect.X = margins.L;
+            this.FrameRect.Rect.Y = margins.T;
+            this.FrameRect.Rect.R = margins.R;
+            this.FrameRect.Rect.B = margins.B;
+
+            if (bIsUpdate)
+            {
+                if (this.m_oWordControl.m_oOverlay.HtmlElement.style.display != "block")
+                    this.m_oWordControl.ShowOverlay();
+
+                this.m_oWordControl.OnUpdateOverlay();
+            }
+        }
+        else
+        {
+            this.FrameRect.IsActive = false;
+        }
+
         var hor_ruler = this.m_oWordControl.m_oHorRuler;
         var ver_ruler = this.m_oWordControl.m_oVerRuler;
 
@@ -4005,6 +4117,8 @@ function CDrawingDocument()
 
     this.Set_RulerState_HdrFtr = function(bHeader, Y0, Y1)
     {
+        this.FrameRect.IsActive = false;
+
         var hor_ruler = this.m_oWordControl.m_oHorRuler;
         var ver_ruler = this.m_oWordControl.m_oVerRuler;
 

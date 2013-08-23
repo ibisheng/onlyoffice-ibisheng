@@ -723,6 +723,9 @@ CShapeDrawer.prototype =
         if (mode == "none" || this.bIsNoFillAttack)
             return;
 
+        if (this.Graphics.IsSlideBoundsCheckerType === true)
+            return;
+
         if (this.bIsTexture)
         {
             if (this.Graphics.RENDERER_PDF_FLAG)

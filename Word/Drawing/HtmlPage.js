@@ -2795,6 +2795,11 @@ function CEditorPage(api)
             {
                 drDoc.DrawTableTrack(overlay);
             }
+
+            if (drDoc.FrameRect.IsActive)
+            {
+                drDoc.DrawFrameTrack(overlay);
+            }
         }
         else
         {
