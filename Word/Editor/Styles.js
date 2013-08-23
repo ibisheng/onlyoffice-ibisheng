@@ -5071,6 +5071,13 @@ CTextPr.prototype =
         if ( undefined != this.Lang.Val )
             return true;
 
+        // Потому что в параграфе внутри Internal_recalculate_0 кэшируются ParaTextPr
+        if ( undefined != this.Color )
+            return true;
+
+        if ( undefined != this.HighLight )
+            return true;
+
         return false;
     },
 
