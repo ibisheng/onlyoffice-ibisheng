@@ -2091,12 +2091,14 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			asc_addImageDrawingObject: function(imageUrl) {
 				var rData = {"id":this.documentId, "c":"imgurl", "data": imageUrl};
 				var oThis = this;
+				this.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 				this._asc_sendCommand( function(incomeObject){
 					if(null != incomeObject && "imgurl" == incomeObject.type)
 					{
 						var ws = oThis.wb.getWorksheet();
 						return ws.objectRender.addImageDrawingObject(incomeObject.data, null);
 					}
+					oThis.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 				}, JSON.stringify(rData) );
 			},
 

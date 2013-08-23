@@ -4640,9 +4640,11 @@ asc_docs_api.prototype.AddImageUrl = function(url, imgProp)
 		{
 			var rData = {"id":documentId, "c":"imgurl", "data": url};
 			var oThis = this;
+			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
 			sendCommand( oThis, function(incomeObject){
 				if(null != incomeObject && "imgurl" ==incomeObject.type)
 					oThis.AddImageUrlAction(incomeObject.data, imgProp);
+				oThis.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
 				}, JSON.stringify(rData) );
 		}
     }
