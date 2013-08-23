@@ -2098,6 +2098,26 @@ function CDrawingDocument()
         this.AutoShapesTrack.DrawTrack(type, matrix, left, top, width, height, isLine);
     }
 
+    this.LockSlide = function(slideNum)
+    {
+        var _th_manager = this.m_oWordControl.Thumbnails;
+
+        if (slideNum >= 0 && slideNum < _th_manager.m_arrPages.length)
+            _th_manager.m_arrPages[slideNum].IsLocked = true;
+
+        _th_manager.OnUpdateOverlay();
+    }
+
+    this.UnLockSlide = function(slideNum)
+    {
+        var _th_manager = this.m_oWordControl.Thumbnails;
+
+        if (slideNum >= 0 && slideNum < _th_manager.m_arrPages.length)
+            _th_manager.m_arrPages[slideNum].IsLocked = false;
+
+        _th_manager.OnUpdateOverlay();
+    }
+
     this.DrawTrackSelectShapes = function(x, y, w, h)
     {
         this.AutoShapesTrack.DrawTrackSelectShapes(x, y, w, h);
@@ -2705,6 +2725,7 @@ function CThPage()
 
     this.IsSelected = false;
     this.IsFocused = false;
+    this.IsLocked = false;
 
     this.Draw = function(context, xDst, yDst, wDst, hDst, contextW, contextH)
     {
@@ -3622,6 +3643,43 @@ function CThumbnailsManager()
         for (var i = 0; i < this.SlidesCount; i++)
         {
             var page = this.m_arrPages[i];
+
+            if (page.IsLocked)
+            {
+                if (page.IsSelected && page.IsFocused)
+                {
+                    context.fillStyle = "#FF00FF";
+                    this.FocusRectDraw(context, _border, page.top - _border, page.right + _border, page.bottom + _border);
+                    context.fill();
+                    context.beginPath();
+                    context.fillStyle = _style_select;
+                }
+                else if (page.IsSelected)
+                {
+                    context.fillStyle = "#ED9870";
+                    this.FocusRectDraw(context, _border, page.top - _border, page.right + _border, page.bottom + _border);
+                    context.fill();
+                    context.beginPath();
+                    context.fillStyle = _style_select;
+                }
+                else if (page.IsFocused)
+                {
+                    context.fillStyle = "#8080FF";
+                    this.FocusRectDraw(context, _border, page.top - _border, page.right + _border, page.bottom + _border);
+                    context.fill();
+                    context.beginPath();
+                    context.fillStyle = _style_select;
+                }
+                else
+                {
+                    context.fillStyle = "#EE3525";
+                    this.FocusRectDraw(context, _border, page.top - _border, page.right + _border, page.bottom + _border);
+                    context.fill();
+                    context.beginPath();
+                    context.fillStyle = _style_select;
+                }
+                continue;
+            }
 
             if (page.IsSelected && page.IsFocused)
             {
