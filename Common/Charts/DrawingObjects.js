@@ -3169,7 +3169,7 @@ function DrawingObjects() {
 							worksheet.model.workbook.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 					}
 					else {
-						worksheet.model.workbook.handlers.trigger("asc_onError", _mapAscServerErrorToAscError(data.error), c_oAscError.Level.NoCritical);
+						worksheet.model.workbook.handlers.trigger("asc_onError", api.asc_mapAscServerErrorToAscError(data.error), c_oAscError.Level.NoCritical);
 						worksheet.model.workbook.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 					}
 				}
@@ -4629,6 +4629,44 @@ function DrawingObjects() {
 		var fileSubmit = frameWindow.document.getElementById("apiiuSubmit");
 
 		fileName.onchange = function(e) {
+			if(e && e.target && e.target.files)
+			{
+				var files = e.target.files;
+				if(files.length > 0)
+				{
+					var file = files[0];
+					//проверяем расширение файла
+					var sName = file.fileName || file.name;
+					if(sName)
+					{
+						var bSupported = false;
+						var nIndex = sName.lastIndexOf(".");
+						if(-1 != nIndex)
+						{
+							var ext = sName.substring(nIndex + 1).toLowerCase();
+							for(var i = 0, length = c_oAscImageUploadProp.SupportedFormats.length; i < length; i++)
+							{
+								if(c_oAscImageUploadProp.SupportedFormats[i] == ext)
+								{
+									bSupported = true;
+									break;
+								}
+							}
+						}
+						if(false == bSupported)
+						{
+							worksheet.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.UplImageExt, c_oAscError.Level.NoCritical);
+							return;
+						}
+					}
+					var nSize = file.fileSize || file.size;
+					if(nSize && c_oAscImageUploadProp.MaxFileSize < nSize)
+					{
+						worksheet.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.UplImageSize, c_oAscError.Level.NoCritical);
+						return;
+					}
+				}
+			}
 			fileSubmit.click();
 			worksheet.model.workbook.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 		}

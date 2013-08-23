@@ -2514,6 +2514,21 @@ asc_docs_api.prototype.canUnGroup = function()
 }
 
 asc_docs_api.prototype.AddImageUrl = function(url){
+	if(0 == url.indexOf(this.DocumentUrl))
+	{
+		this.AddImageUrlAction(url);
+	}
+	else
+	{
+		var rData = {"id":documentId, "c":"imgurl", "data": url};
+		var oThis = this;
+		sendCommand(this,  function(incomeObject){
+			if(null != incomeObject && "imgurl" == incomeObject.type)
+				oThis.AddImageUrlAction(incomeObject.data);
+		}, JSON.stringify(rData) );
+	}
+};
+asc_docs_api.prototype.AddImageUrlAction = function(url){
     var _image = this.ImageLoader.LoadImage(url, 1);
     if (null != _image)
     {
@@ -4132,10 +4147,6 @@ function sendCommand(editor, fCallback, rdata){
 					var outputData = JSON.parse(incomeObject.data);
                     _downloadAs(editor, outputData.format, fCallback, false, outputData.savekey);
                 break;
-                case "imgurl":
-                    if(fCallback)
-                        fCallback(incomeObject);
-                break;
 				case "getsettings":
 					if(fCallback)
 						fCallback(incomeObject);
@@ -4145,6 +4156,10 @@ function sendCommand(editor, fCallback, rdata){
 					if(fCallback)
 						fCallback(incomeObject);
                 break;
+				default:
+					if(fCallback)
+						fCallback(incomeObject);
+					break;
             }
 		}
 	})

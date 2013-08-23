@@ -4636,10 +4636,6 @@ asc_docs_api.prototype.AddImageUrl = function(url, imgProp)
 		{
 			this.AddImageUrlAction(url, imgProp);
 		}
-		else if(0 == url.indexOf("data:"))
-		{
-			this.AddImageUrlAction(url, imgProp);
-		}
 		else
 		{
 			var rData = {"id":documentId, "c":"imgurl", "data": url};

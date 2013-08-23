@@ -122,10 +122,6 @@ var c_oAscTableBordersType = {
 	OUTSIDE:7,
 	ALL:8
 };
-var c_oAscImageUploadProp = {//Не все браузеры позволяют получить информацию о файле до загрузки(например ie9), меняя параметры здесь надо поменять аналогичные параметры в cwFileUploader.ashx
-	MaxFileSize:25000000, //25 mb
-	SupportedFormats:[ "jpg", "jpeg", "jpe", "png", "gif", "bmp"]
-};
 var FONT_THUMBNAIL_HEIGHT = parseInt(7 * 96.0 / 25.4);
 
 var c_oAscStyleImage = {

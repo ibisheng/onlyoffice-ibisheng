@@ -803,9 +803,13 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 									break;									
 								case "err":
 									result = {returnCode: c_oAscError.Level.Critical, val:parseInt(incomeObject.data)};
-									oThis.handlers.trigger("asc_onError", _mapAscServerErrorToAscError(parseInt(incomeObject.data)), c_oAscError.Level.Critical);
+									oThis.handlers.trigger("asc_onError", asc_mapAscServerErrorToAscError(parseInt(incomeObject.data)), c_oAscError.Level.Critical);
 									if(callback)
 										callback(result);
+									break;
+								default:
+									if(callback)
+										callback(incomeObject);
 									break;
 							}
 						}
@@ -2085,8 +2089,15 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 
 			asc_addImageDrawingObject: function(imageUrl) {
-				var ws = this.wb.getWorksheet();
-				return ws.objectRender.addImageDrawingObject(imageUrl, null);
+				var rData = {"id":this.documentId, "c":"imgurl", "data": imageUrl};
+				var oThis = this;
+				this._asc_sendCommand( function(incomeObject){
+					if(null != incomeObject && "imgurl" == incomeObject.type)
+					{
+						var ws = oThis.wb.getWorksheet();
+						return ws.objectRender.addImageDrawingObject(incomeObject.data, null);
+					}
+				}, JSON.stringify(rData) );
 			},
 
 			asc_showImageFileDialog: function (options) {
@@ -3007,7 +3018,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 			init(obj);
 		};
-		function _mapAscServerErrorToAscError(nServerError)
+		function asc_mapAscServerErrorToAscError(nServerError)
 		{
 			var nRes = c_oAscError.ID.Unknown;
 			switch(nServerError)
@@ -3223,6 +3234,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_decreaseFontSize"] = prot.asc_decreaseFontSize;
 
 		prot["asc_onMouseUp"] = prot.asc_onMouseUp;
+		prot["asc_mapAscServerErrorToAscError"] = asc_mapAscServerErrorToAscError;
 
 		prot["asc_selectFunction"] = prot.asc_selectFunction;
 		prot["asc_insertHyperlink"] = prot.asc_insertHyperlink;
