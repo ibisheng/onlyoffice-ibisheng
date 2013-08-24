@@ -775,7 +775,7 @@ var rx_operators = new RegExp( "^ *[-+*/^&%<=>:] *" ),
     rgRange = new RegExp( "^\\$?[A-Za-z]+\\$?\\d+:\\$?[A-Za-z]+\\$?\\d+" ),
     rgCols = new RegExp( "^\\$?[A-Za-z]+:\\$?[A-Za-z]+" ),
     rgRows = new RegExp( "^\\$?\\d+:\\$?\\d+" ),
-    rx_ref = new RegExp( "^(\\$?[A-Za-z]{1,3}\\$?(\\d{1,7}))([-+*/^&%<=>: ;),]|$)" ),
+    rx_ref = new RegExp( "^ *(\\$?[A-Za-z]{1,3}\\$?(\\d{1,7}))([-+*/^&%<=>: ;),]|$)" ),
     rx_refAll = new RegExp( "^(\\$?[A-Za-z]+\\$?(\\d+))([-+*/^&%<=>: ;),]|$)" ),
     rx_ref3D_non_quoted = new XRegExp( "^(?<name_from>[\\p{L}\\d.]+)(:(?<name_to>[\\p{L}\\d.]+))?!" ),
     rx_ref3D_quoted = new XRegExp( "^'(?<name_from>(?:''|[^\\[\\]'\\/*?:])*)(?::(?<name_to>(?:''|[^\\[\\]'\\/*?:])*))?'!" ),
@@ -866,9 +866,8 @@ parserHelper.prototype = {
         if ( match != null || match != undefined ) {
             if ( match.length >= 3 &&
                 g_oCellAddressUtils.colstrToColnum( match[1].substr( 0, (match[1].length - match[2].length) ) ) <= g_oCellAddressUtils.colstrToColnum( "XFD" ) &&
-                parseInt( match[2] ) <= 1048576
-                ) {
-                this.pCurrPos += match[1].length;
+                parseInt( match[2] ) <= 1048576 ) {
+                this.pCurrPos += match[0].indexOf(" ")>-1 ? match[0].length-1 : match[1].length;
                 this.operand_str = match[1];
                 return true;
             }

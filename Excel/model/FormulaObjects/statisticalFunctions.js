@@ -596,21 +596,21 @@ cFormulaFunction.Statistical = {
                 var _arg = arg[i];
                 if ( _arg instanceof cRef || _arg instanceof cRef3D ) {
                     var _argV = _arg.getValue();
-                    if ( _argV instanceof cNumber || _argV instanceof cBool || _argV instanceof cError ) {
+                    if ( !(_argV instanceof cEmpty) ) {
                         count++;
                     }
                 }
                 else if ( _arg instanceof cArea || _arg instanceof cArea3D ) {
                     var _argAreaValue = _arg.getValue();
                     for ( var j = 0; j < _argAreaValue.length; j++ ) {
-                        if ( _argAreaValue[j] instanceof cNumber || _argAreaValue[j] instanceof cBool || _argAreaValue[j] instanceof cError ) {
+                        if ( !(_argAreaValue[j] instanceof cEmpty) ) {
                             count++;
                         }
                     }
                 }
                 else if ( _arg instanceof cArray ) {
                     _arg.foreach( function ( elem ) {
-                        if ( elem instanceof cNumber || elem instanceof cBool || elem instanceof cError ) {
+                        if ( !(elem instanceof cEmpty) ) {
                             count++;
                         }
                     } )
