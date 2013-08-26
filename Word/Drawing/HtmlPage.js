@@ -1473,23 +1473,9 @@ function CEditorPage(api)
             if (null == oWordControl.m_oDrawingDocument.m_oDocumentRenderer)
             {
                 // теперь проверить трек таблиц
-                var _ret = oWordControl.m_oDrawingDocument.TableOutlineDr.checkMouseDown(pos, oWordControl);
-                if (_ret === true)
-                {
-                    oWordControl.m_oLogicDocument.Selection_Remove();
-                    oWordControl.m_oDrawingDocument.TableOutlineDr.bIsTracked = true;
-                    oWordControl.m_oDrawingDocument.LockCursorType("move");
-
-                    oWordControl.m_oDrawingDocument.TableOutlineDr.TableOutline.Table.Select_All();
-                    oWordControl.m_oDrawingDocument.TableOutlineDr.TableOutline.Table.Document_SetThisElementCurrent();
-
-                    if (-1 == oWordControl.m_oTimerScrollSelect)
-                    {
-                        oWordControl.m_oTimerScrollSelect = setInterval(oWordControl.SelectWheel, 20);
-                    }
-                    oWordControl.EndUpdateOverlay();
+                var ret = oWordControl.m_oDrawingDocument.checkMouseDown_Drawing(pos);
+                if (ret === true)
                     return;
-                }
 
                 oWordControl.m_oDrawingDocument.NeedScrollToTargetFlag = true;
                 oWordControl.m_oLogicDocument.OnMouseDown(global_mouseEvent, pos.X, pos.Y, pos.Page);
@@ -1546,14 +1532,9 @@ function CEditorPage(api)
         }
 
         oWordControl.StartUpdateOverlay();
-        if (oWordControl.m_oDrawingDocument.TableOutlineDr.bIsTracked)
-        {
-            oWordControl.m_oDrawingDocument.TableOutlineDr.checkMouseMove(global_mouseEvent.X, global_mouseEvent.Y, oWordControl);
-            oWordControl.ShowOverlay();
-            oWordControl.OnUpdateOverlay();
-            oWordControl.EndUpdateOverlay();
+        var is_drawing = oWordControl.m_oDrawingDocument.checkMouseMove_Drawing(pos);
+        if (is_drawing === true)
             return;
-        }
 
         oWordControl.m_oDrawingDocument.TableOutlineDr.bIsNoTable = true;
         oWordControl.m_oLogicDocument.OnMouseMove(global_mouseEvent, pos.X, pos.Y, pos.Page);
@@ -1593,15 +1574,10 @@ function CEditorPage(api)
 
         oWordControl.StartUpdateOverlay();
 
-        if (oWordControl.m_oDrawingDocument.TableOutlineDr.bIsTracked)
-        {
-            oWordControl.m_oDrawingDocument.TableOutlineDr.checkMouseMove(global_mouseEvent.X, global_mouseEvent.Y, oWordControl);
-            oWordControl.ShowOverlay();
-            oWordControl.OnUpdateOverlay();
-            oWordControl.EndUpdateOverlay();
+        var is_drawing = oWordControl.m_oDrawingDocument.checkMouseMove_Drawing(pos);
+        if (is_drawing === true)
             return;
-        }
-        
+
         oWordControl.m_oLogicDocument.OnMouseMove(global_mouseEvent, pos.X, pos.Y, pos.Page);
         oWordControl.EndUpdateOverlay();
     }
@@ -1643,22 +1619,9 @@ function CEditorPage(api)
         // восстанавливаем фокус
         oWordControl.m_bIsMouseLock = false;
 
-        if (oWordControl.m_oDrawingDocument.TableOutlineDr.bIsTracked)
-        {
-            oWordControl.m_oDrawingDocument.TableOutlineDr.checkMouseUp(global_mouseEvent.X, global_mouseEvent.Y, oWordControl);
-            oWordControl.m_oLogicDocument.Document_UpdateInterfaceState();
-            oWordControl.m_oLogicDocument.Document_UpdateRulersState();
-
-            if (-1 != oWordControl.m_oTimerScrollSelect)
-            {
-                clearInterval(oWordControl.m_oTimerScrollSelect);
-                oWordControl.m_oTimerScrollSelect = -1;
-            }
-            oWordControl.OnUpdateOverlay();
-
-            oWordControl.EndUpdateOverlay();
+        var is_drawing = oWordControl.m_oDrawingDocument.checkMouseUp_Drawing(pos);
+        if (is_drawing === true)
             return;
-        }
 
         if (-1 != oWordControl.m_oTimerScrollSelect)
         {
@@ -1739,22 +1702,9 @@ function CEditorPage(api)
         // восстанавливаем фокус
         oWordControl.m_bIsMouseLock = false;
 
-        if (oWordControl.m_oDrawingDocument.TableOutlineDr.bIsTracked)
-        {
-            oWordControl.m_oDrawingDocument.TableOutlineDr.checkMouseUp(global_mouseEvent.X, global_mouseEvent.Y, oWordControl);
-            oWordControl.m_oLogicDocument.Document_UpdateInterfaceState();
-            oWordControl.m_oLogicDocument.Document_UpdateRulersState();
-
-            if (-1 != oWordControl.m_oTimerScrollSelect)
-            {
-                clearInterval(oWordControl.m_oTimerScrollSelect);
-                oWordControl.m_oTimerScrollSelect = -1;
-            }
-            oWordControl.OnUpdateOverlay();
-
-            oWordControl.EndUpdateOverlay();
+        var is_drawing = oWordControl.m_oDrawingDocument.checkMouseUp_Drawing(pos);
+        if (is_drawing === true)
             return;
-        }
 
         if (-1 != oWordControl.m_oTimerScrollSelect)
         {
