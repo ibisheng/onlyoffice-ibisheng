@@ -256,8 +256,8 @@ CAscFillSolid.prototype.put_color = function(v){this.color = v;}
 function CAscFillHatch()
 {
     this.PatternType = 0;
-    this.fgClr = new CAscColor();
-    this.bgClr = new CAscColor();
+    this.fgClr = undefined;
+    this.bgClr = undefined;
 }
 CAscFillHatch.prototype.get_pattern_type = function(){return this.PatternType;}
 CAscFillHatch.prototype.put_pattern_type = function(v){this.PatternType = v;}
@@ -268,8 +268,8 @@ CAscFillHatch.prototype.put_color_bg = function(v){this.bgClr = v;}
 
 function CAscFillGrad()
 {
-    this.Colors = new Array();
-    this.Positions = new Array();
+    this.Colors = undefined;
+    this.Positions = undefined;
     this.GradType = 0;
 
     this.LinearAngle = 0;
