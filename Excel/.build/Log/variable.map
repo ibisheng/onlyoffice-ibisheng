@@ -2569,7 +2569,7 @@ ECellTypeType$celltypeError:uI
 c_oAscSelectionType$RangeRow:vQ
 c_oAscAsyncActionType$Information:g8
 nSldLtTTwoObjAndTx:BU
-FormatObjDateVal:xc
+FormatObjDateVal:yc
 c_oSerFormulaTypes$R1:ID
 c_oSerTableTypes$Other:QA
 asc_CChartStyle:Cd
@@ -3051,7 +3051,7 @@ L 45:ze
 L 44:Rb
 L 47:Ze
 L 46:$b
-L 41:yc
+L 41:xc
 L 40:jc
 ft_bitmap_glyph_init:Oh
 TT_Post_NamesRec:cj
