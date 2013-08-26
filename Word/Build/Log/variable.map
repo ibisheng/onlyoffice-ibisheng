@@ -913,7 +913,7 @@ tt_cmap14_char_var_index:Zu
 JSCompiler_StaticMethods_Set_ToolTip:Wc
 STATES_ID_CHANGE_ADJ_GROUPED:KD
 CSelectedObject:D5
-FT_ValidatorRec:kq
+FT_ValidatorRec:dq
 FT_GlyphLoader_Add:Up
 historyitem_SetGuideValue:OM
 JSCompiler_StaticMethods_Set_VAlign:KU
@@ -2945,10 +2945,10 @@ L 58:nB
 L 57:Js
 L 56:Is
 L 55:$n
-L 54:eq
+L 54:fq
 L 53:Nk
 _files$$inline_1335:W
-L 52:dq
+L 52:eq
 L 51:Ld
 FT_TT_SERVICES_GET:My
 FT_Memory:Lo
@@ -3126,9 +3126,9 @@ L 61:Ad
 L 60:ao
 c_oSer_ColorType$Auto:mk
 L 99:Pl
-L 95:hq
+L 95:iq
 L 96:Ol
-L 97:iq
+L 97:kq
 L 98:Ms
 c_oSer_ChartCatAxType$Title:cl
 STATES_ID_PRE_RESIZE:XF
@@ -3148,8 +3148,8 @@ tt_name_entry_ascii_from_utf16:wv
 Editor_Copy_GetElem:pa
 L 88:cw
 L 89:kj
-L 86:fq
-L 87:gq
+L 86:gq
+L 87:hq
 L 84:ce
 CFlowParagraph:tP
 L 85:bw
