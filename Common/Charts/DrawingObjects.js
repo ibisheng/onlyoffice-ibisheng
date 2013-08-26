@@ -827,6 +827,9 @@ asc_CChart.prototype = {
 				var ser = new asc_CChartSeria();
 				var startCell = new CellAddress(i, bbox.c1 + (parsedHeaders.bLeft ? 1 : 0), 0);
 				var endCell = new CellAddress(i, bbox.c2, 0);
+				
+				if ( _t.range.intervalObject.worksheet._getRow(i).hd === true )
+					ser.isHidden = true;
 
 				// Val
 				if (startCell && endCell) {
@@ -868,6 +871,9 @@ asc_CChart.prototype = {
 				var ser = new asc_CChartSeria();
 				var startCell = new CellAddress(bbox.r1 + (parsedHeaders.bTop ? 1 : 0), i, 0);
 				var endCell = new CellAddress(bbox.r2, i, 0);
+				
+				if ( _t.range.intervalObject.worksheet._getCol(i).hd === true )
+					ser.isHidden = true;
 
 				// Val
 				if (startCell && endCell) {
@@ -1670,6 +1676,7 @@ function asc_CChartSeria() {
 	this.Marker = { Size: null, Symbol: null };
 	this.OutlineColor = null;
 	this.FormatCode = "";
+	this.isHidden = false;
 }
 
 asc_CChartSeria.prototype = {
