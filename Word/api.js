@@ -1651,6 +1651,8 @@ function CParagraphFrame(obj)
 {
     if ( obj )
     {
+        this.FromDropCapMenu = false;
+
         this.DropCap = ( dropcap_None === obj.DropCap ? c_oAscDropCap.None : ( dropcap_Drop === obj.DropCap ? c_oAscDropCap.Drop : ( dropcap_Margin === obj.DropCap ? c_oAscDropCap.Margin : undefined ) ) );
         this.H       = obj.H;
         this.HAnchor = obj.HAnchor;
@@ -1665,9 +1667,13 @@ function CParagraphFrame(obj)
         this.XAlign  = obj.XAlign;
         this.Y       = obj.Y;
         this.YAlign  = obj.YAlign;
+        this.Brd     = (undefined != obj.Brd     && null != obj.Brd) ? new CParagraphBorders (obj.Brd) : null;
+        this.FontFamily = (undefined != obj.FontFamily && null != obj.FontFamily) ? new CTextFontFamily (obj.FontFamily) : null;
     }
     else
     {
+        this.FromDropCapMenu = false;
+
         this.DropCap = undefined;
         this.H       = undefined;
         this.HAnchor = undefined;
@@ -1682,6 +1688,8 @@ function CParagraphFrame(obj)
         this.XAlign  = undefined;
         this.Y       = undefined;
         this.YAlign  = undefined;
+        this.Brd     = null;
+        this.FontFamily = null;
     }
 }
 
@@ -1713,6 +1721,11 @@ CParagraphFrame.prototype.get_Y = function () { return this.Y; }
 CParagraphFrame.prototype.put_Y = function (v) { this.Y = v; }
 CParagraphFrame.prototype.get_YAlign = function () { return this.YAlign; }
 CParagraphFrame.prototype.put_YAlign = function (v) { this.YAlign = v; }
+CParagraphFrame.prototype.get_Borders = function () { return this.Brd; }
+CParagraphFrame.prototype.put_Borders = function (v) { this.Brd = v; }
+CParagraphFrame.prototype.get_FontFamily = function () { return this.FontFamily; }
+CParagraphFrame.prototype.put_FontFamily = function (v) { this.FontFamily = v; }
+CParagraphFrame.prototype.put_FromDropCapMenu = function (v) { this.FromDropCapMenu = v; }
 
 asc_docs_api.prototype.put_FramePr = function(Obj)
 {
@@ -1721,6 +1734,11 @@ asc_docs_api.prototype.put_FramePr = function(Obj)
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Set_ParagraphFramePr( Obj );
     }
+}
+
+asc_docs_api.prototype.asc_addDropCap = function(bInText)
+{
+    this.WordControl.m_oLogicDocument.Add_DropCap( bInText );
 }
 
 function CParagraphProp (obj)
@@ -1741,6 +1759,7 @@ function CParagraphProp (obj)
         this.Locked            = (undefined != obj.Locked  && null != obj.Locked ) ? obj.Locked : false;
         this.CanAddTable       = (undefined != obj.CanAddTable )                   ? obj.CanAddTable : true;
         this.FramePr           = (undefined != obj.FramePr )                       ? new CParagraphFrame( obj.FramePr ) : undefined;
+        this.CanAddDropCap     = (undefined != obj.CanAddDropCap )                 ? obj.CanAddDropCap : false;
 
         this.Subscript         = (undefined != obj.Subscript)                      ? obj.Subscript   : undefined;
         this.Superscript       = (undefined != obj.Superscript)                    ? obj.Superscript : undefined;
@@ -1782,6 +1801,7 @@ function CParagraphProp (obj)
         this.Locked            = false;
         this.CanAddTable       = true;
         this.Tabs              = undefined;
+        this.CanAddDropCap     = false;
 
         this.Subscript         = undefined;
         this.Superscript       = undefined;
@@ -1836,6 +1856,7 @@ CParagraphProp.prototype.get_DefaultTab = function () { return this.DefaultTab; 
 CParagraphProp.prototype.put_DefaultTab = function (v) { this.DefaultTab = v; }
 CParagraphProp.prototype.get_FramePr = function () { return this.FramePr; }
 CParagraphProp.prototype.put_FramePr = function (v) { this.FramePr = v; }
+CParagraphProp.prototype.get_CanAddDropCap = function() { return this.CanAddDropCap; }
 
 // Paragraph properties
 function CParagraphPropEx (obj)

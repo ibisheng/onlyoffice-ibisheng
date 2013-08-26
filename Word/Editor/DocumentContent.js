@@ -5898,6 +5898,8 @@ CDocumentContent.prototype =
 
         if ( null != ParaPr )
         {
+            ParaPr.CanAddDropCap = false;
+
             if ( undefined != ParaPr.Tabs )
                 editor.Update_ParaTab( Default_Tab_Stop, ParaPr.Tabs );
 

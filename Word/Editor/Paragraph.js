@@ -10566,6 +10566,63 @@ Paragraph.prototype =
         }
     },
 
+    Supplement_FramePr : function(FramePr)
+    {
+        if ( undefined != FramePr.DropCap && dropcap_None != FramePr.DropCap )
+        {
+            var _FramePr = this.Get_FramePr();
+            var FirstFramePara = this;
+            var Prev = FirstFramePara.Get_DocumentPrev();
+            while ( null != Prev )
+            {
+                if ( type_Paragraph === Prev.GetType() )
+                {
+                    var PrevFramePr = Prev.Get_FramePr();
+                    if ( undefined != PrevFramePr && true === _FramePr.Compare( PrevFramePr ) )
+                    {
+                        FirstFramePara = Prev;
+                        Prev = Prev.Get_DocumentPrev();
+                    }
+                    else
+                        break;
+                }
+                else
+                    break;
+            }
+
+            var TextPr = FirstFramePara.Internal_CalculateTextPr(0);
+            FramePr.FontFamily =
+            {
+                Name  : TextPr.RFonts.Ascii.Name,
+                Index : TextPr.RFonts.Ascii.Index
+            };
+        }
+
+        var FrameParas = this.Internal_Get_FrameParagraphs();
+        var Count = FrameParas.length;
+
+        var ParaPr = FrameParas[0].Get_CompiledPr2(false).ParaPr.Copy();
+        for ( var Index = 1; Index < Count; Index++ )
+        {
+            var TempPr= FrameParas[Index].Get_CompiledPr2(false).ParaPr;
+            ParaPr = ParaPr.Compare(TempPr);
+        }
+
+        FramePr.Brd = ParaPr.Brd;
+    },
+
+    Can_AddDropCap : function()
+    {
+        var Count = this.Content.length;
+        for ( var Pos = 0; Pos < Count; Pos++ )
+        {
+            if ( para_Text === this.Content[Pos].Type )
+                return true;
+        }
+
+        return false;
+    },
+
     // Разделяем данный параграф
     Split : function(NewParagraph, Pos)
     {

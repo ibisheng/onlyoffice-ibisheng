@@ -2284,7 +2284,7 @@ CFlowTable2.prototype =
 
 };
 
-function CFlowParagraph(Paragraph, X, Y, W, H, Dx, Dy)
+function CFlowParagraph(Paragraph, X, Y, W, H, Dx, Dy, StartIndex, FlowCount)
 {
     this.Table     = Paragraph;
     this.Paragraph = Paragraph;
@@ -2292,6 +2292,9 @@ function CFlowParagraph(Paragraph, X, Y, W, H, Dx, Dy)
 
     this.PageNum   = Paragraph.PageNum;
     this.PageController = 0;
+
+    this.StartIndex = StartIndex;
+    this.FlowCount  = FlowCount;
 
     this.Distance =
     {

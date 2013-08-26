@@ -1032,7 +1032,7 @@ CDocument.prototype =
                     var FrameDx = ( undefined === FramePr.HSpace ? 0 : FramePr.HSpace );
                     var FrameDy = ( undefined === FramePr.VSpace ? 0 : FramePr.VSpace );
 
-                    this.DrawingObjects.addFloatTable( new CFlowParagraph( Element, FrameX, FrameY, FrameW, FrameH, FrameDx, FrameDy ) );
+                    this.DrawingObjects.addFloatTable( new CFlowParagraph( Element, FrameX, FrameY, FrameW, FrameH, FrameDx, FrameDy, Index, FlowCount ) );
 
                     Index += FlowCount - 1;
 
@@ -5389,9 +5389,11 @@ CDocument.prototype =
                 }
 
                 // Раз дошли до сюда, значит можно у всех выделенных параграфов менять настройку рамки
-                for ( var Pos = StartPos; Pos < EndPos; Pos++ )
+                var FrameParas = this.Content[StartPos].Internal_Get_FrameParagraphs();
+                var FrameCount = FrameParas.length;
+                for ( var Pos = 0; Pos < FrameCount; Pos++ )
                 {
-                    this.Content[Pos].Set_FramePr(FramePr, bDelete);
+                    FrameParas[Pos].Set_FramePr(FramePr, bDelete);
                 }
             }
             else
@@ -5401,7 +5403,13 @@ CDocument.prototype =
                 if ( type_Paragraph != Element.GetType() || undefined === Element.Get_FramePr() )
                     return;
 
-                Element.Set_FramePr(FramePr, bDelete);
+                var FrameParas = Element.Internal_Get_FrameParagraphs();
+                var FrameCount = FrameParas.length;
+                for ( var Pos = 0; Pos < FrameCount; Pos++ )
+                {
+                    FrameParas[Pos].Set_FramePr(FramePr, bDelete);
+                }
+
             }
         }
 
@@ -5753,6 +5761,10 @@ CDocument.prototype =
 
                 Result_ParaPr             = Pr;
                 Result_ParaPr.CanAddTable = ( true === Pr.Locked ? false : true );
+
+                // Если мы находимся в рамке, тогда дополняем ее свойства настройками границы и настройкой текста (если это буквица)
+                if ( undefined != Result_ParaPr.FramePr )
+                    this.Content[StartPos].Supplement_FramePr( Result_ParaPr.FramePr );
             }
             else
             {
@@ -5765,6 +5777,10 @@ CDocument.prototype =
                     Result_ParaPr             = ParaPr.Copy();
                     Result_ParaPr.Locked      = Locked;
                     Result_ParaPr.CanAddTable = ( ( true === Locked ) ? ( ( true === Item.Cursor_IsEnd() ) ? true : false ) : true );
+
+                    // Если мы находимся в рамке, тогда дополняем ее свойства настройками границы и настройкой текста (если это буквица)
+                    if ( undefined != Result_ParaPr.FramePr )
+                        Item.Supplement_FramePr( Result_ParaPr.FramePr );
                 }
                 else if ( type_Table == Item.GetType() )
                 {
@@ -6096,6 +6112,27 @@ CDocument.prototype =
 
         if ( null != ParaPr )
         {
+            // Проверим, можно ли добавить буквицу
+            ParaPr.CanAddDropCap = false;
+
+            if ( docpostype_Content === this.CurPos.Type )
+            {
+                var Para = null;
+                if ( false === this.Selection.Use && type_Paragraph === this.Content[this.CurPos.ContentPos].GetType() )
+                    Para = this.Content[this.CurPos.ContentPos];
+                else if ( true === this.Selection.Use && this.Selection.StartPos <= this.Selection.EndPos && type_Paragraph === this.Content[this.Selection.StartPos].GetType() )
+                    Para = this.Content[this.Selection.StartPos];
+                else if ( true === this.Selection.Use && this.Selection.StartPos > this.Selection.EndPos && type_Paragraph === this.Content[this.Selection.EndPos].GetType() )
+                    Para = this.Content[this.Selection.EndPos];
+
+                if ( null != Para && undefined === Para.Get_FramePr() )
+                {
+                    var Prev = Para.Get_DocumentPrev();
+                    if ( (null === Prev || undefined === Prev.Get_FramePr() || undefined === Prev.Get_FramePr().DropCap) && true === Para.Can_AddDropCap() )
+                        ParaPr.CanAddDropCap = true;
+                }
+            }
+
             if ( undefined != ParaPr.Tabs )
                 editor.Update_ParaTab( Default_Tab_Stop, ParaPr.Tabs );
 
@@ -6168,7 +6205,27 @@ CDocument.prototype =
         // Сначала проверим Flow-таблицы
         var FlowTable = this.DrawingObjects.getTableByXY( X, Y, PageNum, this );
         if ( null != FlowTable )
-            return FlowTable.Table.Index;
+        {
+            if ( flowobject_Table === FlowTable.Get_Type() )
+                return FlowTable.Table.Index;
+            else
+            {
+                var Frame = FlowTable;
+
+                var StartPos  = Frame.StartIndex;
+                var FlowCount = Frame.FlowCount;
+
+                for ( var Pos = StartPos; Pos < StartPos + FlowCount; Pos++ )
+                {
+                    var Item = this.Content[Pos];
+
+                    if ( Y < Item.Pages[0].Bounds.Bottom )
+                        return Pos;
+                }
+
+                return StartPos + FlowCount - 1;
+            }
+        }
 
         var StartPos = this.Pages[PageNum].Pos;
         var EndPos   = this.Content.length - 1;
@@ -6181,7 +6238,7 @@ CDocument.prototype =
         for ( var Index = StartPos; Index <= EndPos; Index++ )
         {
             var Item = this.Content[Index];
-            if ( type_Table != Item.GetType() || false != Item.Is_Inline() )
+            if ( false != Item.Is_Inline() )
                 InlineElements.push( Index );
         }
 
@@ -9306,7 +9363,7 @@ CDocument.prototype =
 
                                 FramePr = TempFramePr;
                             }
-                            else if ( false === FramePr.Compare(TempFramePr) )
+                            else if ( undefined === TempFramePr || false === FramePr.Compare(TempFramePr) )
                             {
                                 FramePr = undefined;
                                 break;
