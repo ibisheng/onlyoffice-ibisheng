@@ -955,7 +955,7 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
                                 this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
                             }
                             this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects,x, y, e.shiftKey, e.ctrl, cur_drawing, false, true));
-                            this.drawingObjectsController.OnUpdateOverlay();
+                            this.drawingObjects.OnUpdateOverlay();
                             return;
                         }
                         else if(hit_in_text_rect)
@@ -2663,7 +2663,7 @@ function GroupState(drawingObjectsController, drawingObjects, group)
                                     this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
                                 }
                                 this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects,x, y, e.shiftKey, e.ctrl, cur_drawing, false, true));
-                                this.drawingObjectsController.OnUpdateOverlay();
+                                this.drawingObjects.OnUpdateOverlay();
                                 return;
                             }
                             else if(hit_in_text_rect)
