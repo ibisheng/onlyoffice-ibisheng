@@ -399,7 +399,7 @@ CShape.prototype =
         {
             var unifill = new CUniFill();
             unifill.setFill(new CSolidFill());
-            unifill.fill.setColor(CorrectUniColor(color, null));
+            unifill.fill.setColor(CorrectUniColor2(color, null));
             var text_pr = new ParaTextPr();
             text_pr.SetUniFill(unifill);
             this.txBody.paragraphAdd(text_pr);
@@ -415,7 +415,7 @@ CShape.prototype =
             new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
         var unifill = new CUniFill();
         unifill.setFill(new CSolidFill());
-        unifill.fill.setColor(CorrectUniColor(color, null));
+        unifill.fill.setColor(CorrectUniColor2(color, null));
         this.setUniFill(unifill);
         this.recalculateBrush();
         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateBrushRedo, null, null,
@@ -621,7 +621,7 @@ CShape.prototype =
         {
             var unifill = new CUniFill();
             unifill.setFill(new CSolidFill());
-            unifill.fill.setColor(CorrectUniColor(color, null));
+            unifill.fill.setColor(CorrectUniColor2(color, null));
             var text_pr = new ParaTextPr();
             text_pr.SetUniFill(unifill);
             this.txBody.content.Set_ApplyToAll(true);
@@ -638,7 +638,7 @@ CShape.prototype =
             new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
         var unifill = new CUniFill();
         unifill.setFill(new CSolidFill());
-        unifill.fill.setColor(CorrectUniColor(color, null));
+        unifill.fill.setColor(CorrectUniColor2(color, null));
         this.setUniFill(unifill);
         this.recalculateBrush();
         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateBrushRedo, null, null,
@@ -2917,7 +2917,7 @@ function CorrectUniFill(asc_fill, unifill)
                 {
                     ret.setFill(new CSolidFill());
                 }
-                ret.fill.setColor(CorrectUniColor(_fill.get_color(), ret.fill.color));
+                ret.fill.setColor(CorrectUniColor2(_fill.get_color(), ret.fill.color));
             }
         }
     }
@@ -2929,7 +2929,7 @@ function CorrectUniFill(asc_fill, unifill)
     return ret;
 }
 
-function CorrectUniColor(asc_color, unicolor)
+function CorrectUniColor2(asc_color, unicolor)
 {
     if (null == asc_color)
         return unicolor;
