@@ -354,7 +354,7 @@ c_oSerWorksheetColTypes$CustomWidth:hD
 Move_Zp2_Point:pq
 c_oAscServerError$ConvertDownload:nb
 ColorManager:LK
-FormatParser:dd
+FormatParser:cd
 TTC_HeaderRec:Qi
 historyitem_Workbook_SheetMove:KM
 CNumbering:O2
@@ -1884,7 +1884,7 @@ ft_outline_glyph_prepare:gi
 cff_cmap_unicode_class_rec:Ys
 T1_Driver_Done:nu
 JSCompiler_StaticMethods__arrowUpMouseDown:SR
-CSchemeColor:xd
+CSchemeColor:vd
 COLOR_TYPE_PRST:Vv
 c_oSerWorkbookTypes$DefinedNames:sC
 T1_BuilderRec:Ul
@@ -1953,7 +1953,7 @@ VERTICAL_ANCHOR_TYPE_CENTER:CV
 JSCompiler_StaticMethods__foreachRow:KO
 historyitem_AutoShapes_RecalculateTransformUndo:wg
 historyitem_Workbook_SheetRemove:NM
-JSCompiler_StaticMethods__ZeroPad:Mc
+JSCompiler_StaticMethods__ZeroPad:Lc
 fntStyleInd_minor:FT
 historyitem_Cell_Strikeout:vO
 CParaInd:m3
@@ -2768,7 +2768,7 @@ L 110:er
 L 113:Wg
 bIsSupportOriginalFormatFonts:fw
 L 112:tl
-L 103:Lc
+L 103:Mc
 L 104:le
 CAutoshapeTrack:Nf
 L 105:Fj
@@ -3009,8 +3009,8 @@ UndoRedoWoorksheet:uM
 sfnt_load_face:to
 nSldLtTChartAndTx:jU
 arcTo:PW
-L 21:S
-L 20:R
+L 21:R
+L 20:S
 L 23:V
 L 22:ba
 L 25:W
@@ -3028,12 +3028,12 @@ T1_Loader:ou
 JSCompiler_StaticMethods_changeCurrentState:O_
 L 59:Qc
 nSldLtTClipArtAndTx:kU
-L 58:wd
+L 58:xd
 L 57:of
 L 56:qg
 L 55:Pc
 L 54:Gd
-L 53:vd
+L 53:wd
 L 52:ob
 L 51:kh
 FT_TT_SERVICES_GET:Or
@@ -3109,9 +3109,9 @@ t1_lookup_glyph_by_stdcharcode:Ll
 L 10:A
 L 19:P
 T1_Driver:Mu
-L 17:K
+L 17:J
 L 18:L
-L 15:J
+L 15:K
 L 16:I
 historyitem_Worksheet_Hide:rN
 c_oAscChartLegend$bottom:Ia
@@ -3233,7 +3233,7 @@ SPH_ScaleRule:up
 EHorizontalAlignment$horizontalalignmentCenter:gI
 JSCompiler_StaticMethods_setFgColor:LS
 L 92:sg
-L 91:cd
+L 91:dd
 L 94:tg
 nSldLtTObjTx:tU
 L 93:zi
