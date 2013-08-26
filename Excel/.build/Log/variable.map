@@ -595,7 +595,7 @@ CTableStyle:cK
 cErrorType$unsupported_function:bz
 CAbstractNum:N2
 FT_Module_Class:Rj
-c_oAscFill$FILL_TYPE_BLIP:cg
+c_oAscFill$FILL_TYPE_BLIP:bg
 c_oAscAsyncAction$Save:i8
 ft_glyphslot_done:Vj
 c_oSer_ConditionalFormattingIconSet$CFVO:fH
@@ -1405,7 +1405,7 @@ JSCompiler_StaticMethods_Set_RangeStartPos:t5
 isRealObject:M
 _weight_pic:UU
 JSCompiler_StaticMethods__BuildDependencies:bM
-CChartAsGroup:Jf
+CChartAsGroup:Hf
 CGraphics:Fw
 JSCompiler_prototypeAlias:fa
 c_oSer_SheetPr$TransitionEvaluation:DH
@@ -2324,7 +2324,7 @@ JSCompiler_StaticMethods_fromShape:T1
 cElementType$bool:My
 gc_nMaxMantissa:gc
 historyitem_Worksheet_RowProp:SN
-STATES_ID_ADD_PPOLY_LINE22:y0
+STATES_ID_ADD_PPOLY_LINE22:x0
 FT_Outline_Get_CBox:fi
 STATES_ID_ADD_PPOLY_LINE23:z0
 selectionflag_Common:e5
@@ -2687,7 +2687,7 @@ L 137:yB
 L 136:P7
 g_oUndoRedoCol:bL
 JSCompiler_StaticMethods_RedoPrepare:TM
-L 150:bg
+L 150:cg
 JSCompiler_StaticMethods_RedoEnd:ZM
 L 151:ci
 L 152:jr
@@ -2753,9 +2753,9 @@ JSCompiler_StaticMethods_Get_ParaPr:C3
 FT_Glyph_Get_CBox:Vu
 TT_CMap14Rec:Hn
 ft_sid_names:Zj
-L 102:Mf
+L 102:Nf
 T1_Decoder_ZoneRec:Vl
-L 101:Lf
+L 101:Mf
 L 100:xk
 c_oAscAsyncAction$Recalc:lM
 CColorModifiers:nS
@@ -2771,7 +2771,7 @@ bIsSupportOriginalFormatFonts:fw
 L 112:sl
 L 103:Mc
 L 104:le
-CAutoshapeTrack:Nf
+CAutoshapeTrack:Lf
 L 105:Ej
 L 106:Bg
 CLegendEntryGroup:M6
@@ -3184,7 +3184,7 @@ JSCompiler_StaticMethods_rebuildSeries:Ae
 L 76:It
 _ph_summ__sec_head:iV
 L 77:qj
-L 78:If
+L 78:Jf
 L 79:sb
 t1_args_count:Kl
 c_oAscSelectionType$RangeShape:Kg
@@ -3262,7 +3262,7 @@ CellValueType$Number:na
 L 83:oh
 L 82:Ht
 c_oSerPropLenType$Byte:gJ
-L 81:Hf
+L 81:If
 CGeometry:NT
 tt_cmap2_get_subheader:dn
 L 80:qo
