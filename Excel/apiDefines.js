@@ -55,7 +55,7 @@ var c_oAscFileType = {
 	ODS:		0x0103,
 	CSV:		0x0104,
 	HTML:		0x0803,
-	PDFPRINT:	0x0802,
+	PDFPRINT:	0x0201,
 	ZIP:		0x0803,
 	XLSY:		0x1002
 };

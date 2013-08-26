@@ -32,7 +32,7 @@ var c_oAscFileType = {
 	TXT: 		0x0045,
 	HTML_ZIP: 	0x0803,
 	MHT: 		0x0047,
-	PDF: 		0x0802,
+	PDF: 		0x0201,
 	EPUB: 		0x0048,
 	FB2: 		0x0049,
 	MOBI: 		0x004a,

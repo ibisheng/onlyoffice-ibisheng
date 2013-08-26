@@ -67,7 +67,7 @@ var c_oAscVertAlignJc = {
 //files type for Saving & DownloadAs
 var c_oAscFileType = {
 	INNER:	0x0081,
-	PDF:	0x0802,
+	PDF:	0x0201,
 	PPTX:	0x0081,
 	PPT:	0x0082,
 	ODP:	0x0083
