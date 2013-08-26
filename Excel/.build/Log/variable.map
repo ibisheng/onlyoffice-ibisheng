@@ -352,7 +352,7 @@ SplineBezierState2:s1
 JSCompiler_StaticMethods_drawStrokeFillStyle:t7
 c_oSerWorksheetColTypes$CustomWidth:hD
 Move_Zp2_Point:pq
-c_oAscServerError$ConvertDownload:pb
+c_oAscServerError$ConvertDownload:nb
 ColorManager:LK
 FormatParser:dd
 TTC_HeaderRec:Qi
@@ -3034,7 +3034,7 @@ L 56:qg
 L 55:Pc
 L 54:Gd
 L 53:vd
-L 52:nb
+L 52:ob
 L 51:kh
 FT_TT_SERVICES_GET:Or
 FT_Memory:lh
@@ -3056,7 +3056,7 @@ L 40:jc
 ft_bitmap_glyph_init:Oh
 TT_Post_NamesRec:cj
 L 43:ke
-L 42:ob
+L 42:pb
 HSLToRGB:cX
 c_oSer_TableColumns$Name:NE
 CLegendEntry:L2
