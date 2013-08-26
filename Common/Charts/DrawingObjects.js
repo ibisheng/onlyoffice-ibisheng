@@ -748,7 +748,7 @@ asc_CChart.prototype = {
 		// Save old series colors
 		var oldSeriaData = [];
 		for ( var i = 0; i < _t.series.length; i++ ) {
-			oldSeriaData.push( {color: _t.series[i].OutlineColor, seriaTx: _t.series[i].Tx } );
+			oldSeriaData.push( {color: _t.series[i].OutlineColor, seriaTxCache: _t.series[i].TxCache } );
 		}
 		_t.series = [];
 		
@@ -769,6 +769,7 @@ asc_CChart.prototype = {
 					item.numFormatStr = cell.getNumFormatStr();
 					item.isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
 					item.value = cell.getValue();
+					item.isHidden = (_t.range.intervalObject.worksheet._getCol(c1).hd === true) || (_t.range.intervalObject.worksheet._getRow(row).hd === true);
 					
 					cache.push(item);
 				}
@@ -781,6 +782,7 @@ asc_CChart.prototype = {
 					item.numFormatStr = cell.getNumFormatStr();
 					item.isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
 					item.value = cell.getValue();
+					item.isHidden = (_t.range.intervalObject.worksheet._getCol(col).hd === true) || (_t.range.intervalObject.worksheet._getRow(r1).hd === true);
 					
 					cache.push(item);
 				}
@@ -848,8 +850,14 @@ asc_CChart.prototype = {
 					ser.xVal.NumCache = getNumCache( bbox.c1 + (parsedHeaders.bLeft ? 1 : 0), bbox.c2, bbox.r1, bbox.r1 );
 				}
 				
+				if ( parsedHeaders.bLeft ) {
+					var formulaCell = new CellAddress(i, bbox.c1 + (parsedHeaders.bLeft ? 1 : 0));
+					ser.TxCache.Formula = ( !rx_test_ws_name.test(_t.range.intervalObject.worksheet.sName) ? "'" +_t.range.intervalObject.worksheet.sName+ "'" : _t.range.intervalObject.worksheet.sName )
+											+ "!" + formulaCell.getID();
+				}
+				
 				var seriaName = parsedHeaders.bLeft ? ( _t.range.intervalObject.worksheet.getCell(new CellAddress(i, bbox.c1, 0)).getValue() ) : (api.chartTranslate.series + " " + nameIndex);
-				ser.Tx = seriaName;
+				ser.TxCache.Tx = seriaName;
 				_t.series.push(ser);
 				nameIndex++;
 			}
@@ -883,8 +891,14 @@ asc_CChart.prototype = {
 					ser.xVal.NumCache = getNumCache( bbox.c1, bbox.c1, bbox.r1 + (parsedHeaders.bTop ? 1 : 0), bbox.r2 );
 				}
 				
+				if ( parsedHeaders.bTop ) {
+					var formulaCell = new CellAddress(bbox.r1 + (parsedHeaders.bTop ? 1 : 0), i);
+					ser.TxCache.Formula = ( !rx_test_ws_name.test(_t.range.intervalObject.worksheet.sName) ? "'" +_t.range.intervalObject.worksheet.sName+ "'" : _t.range.intervalObject.worksheet.sName )
+											+ "!" + formulaCell.getID();
+				}
+				
 				var seriaName = parsedHeaders.bTop ? ( _t.range.intervalObject.worksheet.getCell(new CellAddress(bbox.r1, i, 0)).getValue() ) : (api.chartTranslate.series + " " + nameIndex);
-				ser.Tx = seriaName;
+				ser.TxCache.Tx = seriaName;
 				_t.series.push(ser);
 				nameIndex++;
 			}
@@ -901,7 +915,8 @@ asc_CChart.prototype = {
 			
 			if ( i < oldSeriaData.length ) {
 				_t.series[i].OutlineColor = oldSeriaData[i].color;
-				_t.series[i].Tx = oldSeriaData[i].seriaTx;
+				_t.series[i].TxCache.Tx = oldSeriaData[i].seriaTxCache.Tx;
+				_t.series[i].TxCache.Formula = oldSeriaData[i].seriaTxCache.Formula;
 			}
 			else
 				_t.series[i].OutlineColor = seriaUniColors[i];
@@ -1651,7 +1666,6 @@ prot["asc_setUnderline"] = prot.asc_setUnderline;
 function asc_CChartSeria() {
 	this.Val = { Formula: null, NumCache: [] };
 	this.xVal = { Formula: null, NumCache: [] };
-	this.Tx = null;		// пока оставил
 	this.TxCache = { Formula: null, Tx: null };
 	this.Marker = { Size: null, Symbol: null };
 	this.OutlineColor = null;

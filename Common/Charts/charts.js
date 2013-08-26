@@ -1799,11 +1799,11 @@ function drawChart(chart, arrValues, width, height) {
 			colorMap = GenerateDefaultColorMap().color_map;
 	}
 	
-	if(chart.series && chart.series.length != 0 && (chart.series[0].Tx || chart.series[0].OutlineColor) && (theme && colorMap))
+	if(chart.series && chart.series.length != 0 && (chart.series[0].TxCache.Tx || chart.series[0].OutlineColor) && (theme && colorMap))
 	{
 		for (var j = 0; j < chart.series.length; j++) {
-			if(chart.series[j].Tx)
-				bar._otherProps._key[j] = chart.series[j].Tx;
+			if(chart.series[j].TxCache.Tx)
+				bar._otherProps._key[j] = chart.series[j].TxCache.Tx;
 			if(chart.series[j].OutlineColor)
 			{
 				chart.series[j].OutlineColor.Calculate(theme, colorMap, RGBA);
@@ -1813,9 +1813,9 @@ function drawChart(chart, arrValues, width, height) {
 			}	
 		}	
 	}
-	if((chart.series && chart.series[0]) && (chart.series[0].Tx || chart.series[0].OutlineColor))
+	if((chart.series && chart.series[0]) && (chart.series[0].TxCache.Tx || chart.series[0].OutlineColor))
 	{
-		if(!chart.series[0].Tx)
+		if(!chart.series[0].TxCache.Tx)
 		{
 			for (var j = 0; j < legendCnt; j++) {
 				bar._otherProps._key[j] = 'Series' + (j + 1);
