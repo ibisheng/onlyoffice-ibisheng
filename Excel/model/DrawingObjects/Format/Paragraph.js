@@ -131,7 +131,7 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit)
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
-    if(isRealObject(DrawingDocument) && isRealObject(Parent))
+    if(/*isRealObject(DrawingDocument) &&*/ isRealObject(Parent))
     {
         this.setDrawingDocument(DrawingDocument);
         this.setParent(Parent);

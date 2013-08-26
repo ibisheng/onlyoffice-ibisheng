@@ -1396,8 +1396,8 @@ CShape.prototype =
             var _full_rotate = this.getFullRotate();
             var _full_flip = this.getFullFlip();
 
-            var _hc = this.absExtX*0.5;
-            var _vc = this.absExtY*0.5;
+            var _hc = this.extX*0.5;
+            var _vc = this.extY*0.5;
             var _transformed_shape_xc = this.transform.TransformPointX(_hc, _vc);
             var _transformed_shape_yc = this.transform.TransformPointY(_hc, _vc);
 
@@ -1518,7 +1518,7 @@ CShape.prototype =
             }
             global_MatrixTransformer.TranslateAppend(_text_transform, _transformed_text_xc - _content_width*0.5,  _transformed_text_yc - content_height2*0.5);
 
-            var body_pr = this.bodyPr;
+            var body_pr = this.txBody.bodyPr;
             var l_ins = typeof body_pr.lIns === "number" ? body_pr.lIns : 2.54;
             var t_ins = typeof body_pr.tIns === "number" ? body_pr.tIns : 1.27;
             var r_ins = typeof body_pr.rIns === "number" ? body_pr.rIns : 2.54;
@@ -1531,6 +1531,10 @@ CShape.prototype =
             };
         }
         this.invertTransformText = global_MatrixTransformer.Invert(this.transformText);
+    },
+    getFullFlip: function()
+    {
+        return {flipH: this.getFullFlipH(), flipV: this.getFullFlipV()};
     },
 
 	/*calculateAfterResize: function()
@@ -2017,6 +2021,8 @@ CShape.prototype =
             return this.flipV;
         return this.group.getFullFlipV() ? !this.flipV : this.flipV;
     },
+
+
 
     getAspect: function(num)
     {
