@@ -937,7 +937,18 @@ CShapeDrawer.prototype =
                 }
 
                 _ctx.fillStyle = gradObj;
-                _ctx.fill();
+
+                if (null !== this.UniFill.transparent && undefined !== this.UniFill.transparent)
+                {
+                    var _old_global_alpha = this.Graphics.m_oContext.globalAlpha;
+                    _ctx.globalAlpha = this.UniFill.transparent / 255;
+                    _ctx.fill();
+                    _ctx.globalAlpha = _old_global_alpha;
+                }
+                else
+                {
+                    _ctx.fill();
+                }
                 return;
             }
         }
