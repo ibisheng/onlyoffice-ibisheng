@@ -1720,7 +1720,7 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 				});
 		}
 		else if ( c_oSer_ChartSeriesType.Tx === type )
-			seria.Tx = this.stream.GetString2LE(length);
+			seria.TxCache.Tx = this.stream.GetString2LE(length);
 		else if ( c_oSer_ChartSeriesType.TxRef === type )
 		{
 			var oTxRef = { Formula: null, NumCache: [] };
@@ -1729,9 +1729,10 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 				});
 			if(oTxRef.NumCache.length > 0)
 			{
+				seria.TxCache.Formula = oTxRef.Formula;
 				var elem = oTxRef.NumCache[0];
 				if(null != elem && null != elem.val)
-					seria.Tx = elem.val;
+					seria.TxCache.Tx = elem.val;
 			}
 		}
 		else if ( c_oSer_ChartSeriesType.Marker === type )
