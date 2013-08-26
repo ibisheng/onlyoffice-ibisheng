@@ -622,9 +622,9 @@ CShapeDrawer.prototype =
         {
             this._s();
             this._m(0, 0);
-            this._l(this.Shape.ext.cx, 0);
-            this._l(this.Shape.ext.cx, this.Shape.ext.cy);
-            this._l(0, this.Shape.ext.cy);
+            this._l(this.Shape.extX, 0);
+            this._l(this.Shape.extX, this.Shape.extY);
+            this._l(0, this.Shape.extY);
             this._z();
             this.drawFillStroke(true, "norm", true && !this.bIsNoStrokeAttack);
             this._e();

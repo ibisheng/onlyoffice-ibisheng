@@ -3115,19 +3115,19 @@ function BinaryFileReader(doc, openParams)
     };
     this.Read = function(data)
     {
-		try{
+		//try{
 			this.stream = this.getbase64DecodedData(data);
 			this.PreLoadPrepare();
 			this.ReadMainTable();
 			this.PostLoadPrepare();
-		}
+		/*}
 		catch(e)
 		{
 			if(e.message == g_sErrorCharCountMessage)
 				return false;
 			else
 				throw "open error";
-		}
+		}*/
 		return true;
     };
 	this.PreLoadPrepare = function()
@@ -5466,14 +5466,14 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			res = this.bcr.Read2(length, function(t, l){
                     return oThis.ReadPptxDrawing(t, l, oParaDrawing, oChartObject);
                 });
-			if(null != oChartObject.chart && null != oParaDrawing.Extent.W && null != oParaDrawing.Extent.H)
+			if(null != oParaDrawing.chart && null != oParaDrawing.Extent.W && null != oParaDrawing.Extent.H)
 			{
-				oChartObject.chart.width = oParaDrawing.Extent.W * g_dKoef_mm_to_pix;
-				oChartObject.chart.height = oParaDrawing.Extent.H * g_dKoef_mm_to_pix;
+                oParaDrawing.chart.width = oParaDrawing.Extent.W * g_dKoef_mm_to_pix;
+                oParaDrawing.chart.height = oParaDrawing.Extent.H * g_dKoef_mm_to_pix;
 				var doc = this.Document;
-				var Image = new WordImage( oParaDrawing, doc, doc.DrawingDocument, null );
-				Image.init( null, oParaDrawing.Extent.W, oParaDrawing.Extent.H, oChartObject.chart );
-				window.global_pptx_content_loader.ImageMapChecker[oChartObject.chart.img] = true;
+				/*var Image = new WordImage( oParaDrawing, doc, doc.DrawingDocument, null );
+				Image.init( null, oParaDrawing.Extent.W, oParaDrawing.Extent.H, oChartObject.chart );*/
+				window.global_pptx_content_loader.ImageMapChecker[oParaDrawing.chart.img] = true;
 			}
 			//Copy вызывется только, потому что обьект создавался по пустому конструктору, а в нем могли совершаться какие-то операции над членами.
             oParaDrawing.init();
@@ -5727,8 +5727,9 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 		}
 		else if( c_oSerImageType2.Chart === type )
         {
-			var chart = new CChartData(true);
-			var oBinary_ChartReader = new Binary_ChartReader(this.stream, chart);
+            oParaDrawing.GraphicObj = new CChartAsGroup();
+			var oBinary_ChartReader = new Binary_ChartReader(this.stream, oParaDrawing.GraphicObj.chart, oParaDrawing.GraphicObj);
+            var chart = oParaDrawing.GraphicObj.chart;
 			oBinary_ChartReader.PreRead();
 			res = this.bcr.Read1(length, function(t,l){
 					return oBinary_ChartReader.ReadChart(t,l);

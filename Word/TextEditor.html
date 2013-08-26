@@ -111,6 +111,16 @@
         <script type="text/javascript" src="Editor/GraphicObjects/ObjectTypes/GroupTracks.js"></script>
         <script type="text/javascript" src="Editor/GraphicObjects/ObjectTypes/CreateGeometry.js"></script>
         <script type="text/javascript" src="Editor/GraphicObjects/ObjectTypes/Path.js"></script>
+        <script type="text/javascript" src="Editor/GraphicObjects/ObjectTypes/Chart.js"></script>
+        <script type="text/javascript" src="Editor/GraphicObjects/ObjectTypes/ChartLayout.js"></script>
+        <script type="text/javascript" src="Editor/GraphicObjects/ObjectTypes/ChartLegend.js"></script>
+        <script type="text/javascript" src="Editor/GraphicObjects/ObjectTypes/ChartTitle.js"></script>
+        <script type="text/javascript" src="Editor/GraphicObjects/ObjectTypes/TextBody.js"></script>
+
+
+
+
+
 
         <script type="text/javascript" src="Editor/CollaborativeEditing.js"></script>
         <script type="text/javascript" src="Editor/Comments.js"></script>
@@ -2367,17 +2377,32 @@
             </div>
         </div>
 	</div>
-	<div id="prUsersDrag"	style="display:none;width:200px;background-color:#fff;top:215px;right:50px;z-index:100;position:absolute;border: 4px ridge silver;cursor:move;">
-		<div style="float:left;width:180px;text-align: center;cursor:move;">
-		<b>Users</b>
-		</div>
+    <div id="prUsersDrag"	style="display:none;width:200px;background-color:#fff;top:215px;right:50px;z-index:100;position:absolute;border: 4px ridge silver;cursor:move;">
+        <div style="float:left;width:180px;text-align: center;cursor:move;">
+            <b>Users</b>
+        </div>
         <div style="float:left;cursor:default;width:20px;height:20px;" onmousemove="this.style.backgroundColor = 'RGB(249, 201, 16)';" onmouseout="this.style.backgroundColor = 'RGB(255, 255, 255)' " onmousedown="if ( c_oAscCollaborativeMarksShowType.LastChanges === editor.CollaborativeMarksShowType ) {CollaborativeEditing.Clear_CollaborativeMarks();} CollaborativeEditing.Apply_Changes(); setTimeout(function() {CollaborativeEditing.Send_Changes();}, 100);">
             <img style="margin: 2px 3px" src="menu/img/savechanges.png" title="Save Changes" />
         </div>
     </div>
-	<div id="prUsers"		style="display:none;width:200px;background-color:#fff;top:240px;right:50px;z-index:100;position:absolute;padding-top: 5px;border: 4px ridge silver;cursor:move;">
-		<div style="float:left;width:200px;text-align: center;cursor:move;" id="usersView">
-		</div>
+    <div id="prUsers"		style="display:none;width:200px;background-color:#fff;top:240px;right:50px;z-index:100;position:absolute;padding-top: 5px;border: 4px ridge silver;cursor:move;">
+        <div style="float:left;width:200px;text-align: center;cursor:move;" id="usersView">
+        </div>
+    </div>
+    <div id="prChatDrag"	style="display:none;width:300px;background-color:#fff;top:415px;right:50px;z-index:100;position:absolute;padding-top: 5px;border: 4px ridge silver;cursor:move;">
+        <div style="float:left;width:300px;text-align: center;cursor:move;">
+            <b>Chat</b>
+            <input id="prAddMessage" type="button" value="Add Messsage"/>
+        </div>
+    </div>
+    <div id="prChat"		style="display:none;width:300px;background-color:#fff;top:445px;right:50px;z-index:100;position:absolute;padding-top: 5px;border: 4px ridge silver;cursor:move;">
+        <div style="float:left;width:300px;text-align: center;cursor:move;" id="messagesView">
+        </div>
+    </div>
+
+    <div id="prUsers"		style="display:none;width:200px;background-color:#fff;top:240px;right:50px;z-index:100;position:absolute;padding-top: 5px;border: 4px ridge silver;cursor:move;">
+    <div style="float:left;width:200px;text-align: center;cursor:move;" id="usersView">
+    </div>
 	</div>
 	<div id="prChatDrag"	style="display:none;width:300px;background-color:#fff;top:415px;right:50px;z-index:100;position:absolute;padding-top: 5px;border: 4px ridge silver;cursor:move;">
 		<div style="float:left;width:300px;text-align: center;cursor:move;">

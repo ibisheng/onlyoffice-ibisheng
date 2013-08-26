@@ -3987,10 +3987,13 @@ ParaDrawing.prototype =
         if(typeof this.GraphicObj.setStartPage === "function")
             this.GraphicObj.setStartPage(pageIndex);
         this.graphicObjects.addObjectOnPage(pageIndex, this);
-        var bounds = this.getBounds();
-        this.W = bounds.r - bounds.l;
-        this.H = bounds.b - bounds.t;
-       // this.X = bounds.l;
+        if(this.bNeedUpdateWH)
+        {
+            this.updateWidthHeight();
+        }
+        var bounds = this;
+
+        // this.X = bounds.l;
        // this.Y = bounds.t;
 
         if(!(isRealObject(this.Parent) && isRealObject(this.Parent.Parent) && typeof this.Parent.Parent.Is_HdrFtr === "function" && this.Parent.Parent.Is_HdrFtr()))
@@ -4148,6 +4151,10 @@ ParaDrawing.prototype =
             var bounds = this.getBounds();
             this.W = bounds.r - bounds.l;
             this.H = bounds.b - bounds.t;
+            this.l = bounds.l;
+            this.t = bounds.t;
+            this.r = bounds.r;
+            this.b = bounds.b;
         }
         this.bNeedUpdateWH = false;
     },
@@ -6015,6 +6022,7 @@ ParaDrawing.prototype =
         {
             this.GraphicObj.calculateAfterOpen();
             this.GraphicObj.recalculate(false, true);
+
             var bounds = this.getBounds();
             this.W = bounds.r - bounds.l;
             this.H = bounds.b - bounds.t;

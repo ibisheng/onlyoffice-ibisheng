@@ -246,6 +246,16 @@ CColorMod.prototype =
         duplicate.name = this.name;
         duplicate.val = this.val;
         return duplicate;
+    },
+
+    setName: function(name)
+    {
+        this.name = name;
+    },
+
+    setVal: function(val)
+    {
+        this.val = val;
     }
 };
 
@@ -576,6 +586,27 @@ CColorModifiers.prototype =
                 RGBA.B = Math.max(0, parseInt(255 - (255 - RGBA.B) * val));
             }
         }
+    },
+
+    clearMods: function()
+    {
+        this.Mods.length = 0;
+    },
+
+    copyFromOther: function(o)
+    {
+        this.clearMods();
+        for(var i = 0; i < o.Mods.length; ++i)
+        {
+            this.addMod()
+        }
+
+
+    },
+
+    addMod: function(mod)
+    {
+        this.Mods.push(mod);
     }
 };
 
@@ -619,6 +650,16 @@ CSysColor.prototype =
         duplicate.RGBA.B = this.RGBA.B;
         duplicate.RGBA.A = this.RGBA.A;
         return duplicate;
+    },
+
+    copyFromOther: function(p)
+    {
+        this.id = p.id;
+    },
+
+    setId: function(id)
+    {
+        this.id = id;
     }
 };
 
@@ -666,6 +707,15 @@ CPrstColor.prototype =
         this.RGBA.R = (RGB >> 16) & 0xFF;
         this.RGBA.G = (RGB >> 8) & 0xFF;
         this.RGBA.B = RGB & 0xFF;
+    },
+    copyFromOther: function(p)
+    {
+        this.id = p.id;
+    },
+
+    setId: function(id)
+    {
+        this.id = id;
     }
 };
 
@@ -763,6 +813,16 @@ CSchemeColor.prototype =
                     this.RGBA = theme.themeElements.clrScheme.colors[this.id].color.RGBA;
             }
         }
+    },
+
+    copyFromOther: function(s)
+    {
+        this.setId(s.id);
+    },
+
+    setId: function(id)
+    {
+        this.id = id;
     }
 };
 
@@ -775,6 +835,12 @@ function CUniColor()
 
 CUniColor.prototype =
 {
+    getCSSColor : function()
+    {
+        var _css = "rgba(" + this.RGBA.R + "," + this.RGBA.G + "," + this.RGBA.B + "," + (this.RGBA.A / 255) + ")";
+        return _css;
+    },
+
     Write_ToBinary2 : function(Writer)
     {
         var flag = this.color != null;
@@ -963,10 +1029,43 @@ CUniColor.prototype =
         return _ret;
     },
 
-    getCSSColor : function()
+    copyFromOther: function(u)
     {
-        var _css = "rgba(" + this.RGBA.R + "," + this.RGBA.G + "," + this.RGBA.B + "," + (this.RGBA.A / 255) + ")";
-        return _css;
+        if(isRealObject(u.color))
+        {
+            if(!isRealObject(this.color) || this.color.type !== u.color.type)
+            {
+                switch(u.color.type)
+                {
+                    case COLOR_TYPE_SCHEME:
+                    {
+                        this.setColor(new CSchemeColor());
+                        break;
+                    }
+                    case COLOR_TYPE_SRGB:
+                    {
+                        this.setColor(new CRGBColor());
+                        break;
+                    }
+                    case COLOR_TYPE_PRST:
+                    {
+                        this.setColor(new CPrstColor());
+                        break;
+                    }
+                    case COLOR_TYPE_SYS:
+                    {
+                        this.setColor(new CSysColor());
+                        break;
+                    }
+                }
+            }
+            this.color.copyFromOther(u.color);
+        }
+    },
+
+    setColor: function(color)
+    {
+        this.color = color;
     }
 };
 
@@ -1759,6 +1858,14 @@ function CompareShapeProperties(shapeProp1, shapeProp2)
         _result_shape_prop.canChangeArrows = true;
 
     _result_shape_prop.fill = CompareUniFill(shapeProp1.fill, shapeProp2.fill);
+    if(isRealObject(shapeProp1.paddings) && isRealObject(shapeProp2.paddings))
+    {
+        _result_shape_prop.paddings = new CPaddings();
+        _result_shape_prop.paddings.Left = isRealNumber(shapeProp1.paddings.Left) ? (shapeProp1.paddings.Left === shapeProp2.paddings.Left ? shapeProp1.paddings.Left : undefined) : undefined;
+        _result_shape_prop.paddings.Top = isRealNumber(shapeProp1.paddings.Top) ? (shapeProp1.paddings.Top === shapeProp2.paddings.Top ? shapeProp1.paddings.Top : undefined) : undefined;
+        _result_shape_prop.paddings.Right = isRealNumber(shapeProp1.paddings.Right) ? (shapeProp1.paddings.Right === shapeProp2.paddings.Right ? shapeProp1.paddings.Right : undefined) : undefined;
+        _result_shape_prop.paddings.Bottom = isRealNumber(shapeProp1.paddings.Bottom) ? (shapeProp1.paddings.Bottom === shapeProp2.paddings.Bottom ? shapeProp1.paddings.Bottom : undefined) : undefined;
+    }
     return _result_shape_prop;
 }
 
@@ -1794,6 +1901,7 @@ function CompareImageProperties(imgProps1, imgProps2)
     {
         _result_image_properties = imgProps1.ImageUrl;
     }
+
 
     return _result_image_properties;
 }
@@ -2396,6 +2504,17 @@ function StyleRef()
     {
         this.idx = Reader.GetLong();
         this.Color.Read_FromBinary2(Reader);
+    };
+
+    this.copyFromOther = function(s)
+    {
+        this.setIdx(s.idx);
+        this.Color.copyFromOther(s.Color);
+    };
+
+    this.setIdx = function(idx)
+    {
+        this.idx = idx;
     }
 }
 
@@ -2437,6 +2556,27 @@ function FontRef()
             this.Color = new CUniColor();
             this.Color.Read_FromBinary2(Reader);
         }
+    };
+
+    this.copyFromOther = function(r)
+    {
+        this.setIdx(r.idx);
+        if(isRealObject(r.Color))
+        {
+            if(!isRealObject(this.Color))
+                this.setColor(new CUniColor());
+            this.Color.copyFromOther(r.Color);
+        }
+    };
+
+    this.setIdx = function(idx)
+    {
+        this.idx = idx;
+    };
+
+    this.setColor = function(color)
+    {
+        this.Color = color;
     }
 }
 
@@ -2541,7 +2681,7 @@ function CShapeStyle()
                 this.fontRef = style.fontRef.createDuplicate();
             }
         }
-    }
+    };
 
     this.createDuplicate =  function()
     {
@@ -2564,7 +2704,69 @@ function CShapeStyle()
             duplicate.fontRef = this.fontRef.createDuplicate();
         }
         return duplicate;
+    };
+
+    this.copyFromOther = function(s)
+    {
+        if(isRealObject(s.lnRef))
+        {
+            if(!isRealObject(this.lnRef))
+            {
+                this.setLnRef(new StyleRef());
+            }
+            this.lnRef.copyFromOther(s.lnRef);
+        }
+
+        if(isRealObject(s.fillRef))
+        {
+            if(!isRealObject(this.fillRef))
+            {
+                this.setFillRef(new StyleRef());
+            }
+            this.fillRef.copyFromOther(s.fillRef);
+        }
+
+        if(isRealObject(s.effectRef))
+        {
+            if(!isRealObject(this.effectRef))
+            {
+                this.setEffectRef(new StyleRef());
+            }
+            this.effectRef.copyFromOther(s.effectRef);
+        }
+
+
+        if(isRealObject(s.fontRef))
+        {
+            if(!isRealObject(this.fontRef))
+            {
+                this.setFontRef(new FontRef());
+            }
+            this.fontRef.copyFromOther(s.fontRef);
+        }
+
+    };
+
+    this.setLnRef = function(lnRef)
+    {
+        this.lnRef = lnRef;
+    };
+
+    this.setFillRef = function(fillRef)
+    {
+        this.fillRef = fillRef;
+    };
+
+    this.setEffectRef = function(effectRef)
+    {
+        this.effectRef = effectRef;
+    };
+
+    this.setFontRef = function(fontRef)
+    {
+        this.fontRef = fontRef;
     }
+
 }
 
 function CreateDefaultShapeStyle()
