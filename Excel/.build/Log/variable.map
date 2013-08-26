@@ -1904,7 +1904,7 @@ c_oSerTableTypes$CalcChain:VA
 c_oAscChartType$bar:ta
 CChartData:de
 fonthint_Default:g3
-FT_GlyphLoader_Adjust_Points:zi
+FT_GlyphLoader_Adjust_Points:xi
 JSCompiler_StaticMethods_DeserializeData:WM
 FORMULA_TYPE_PLUS_DIV:iW
 STATES_ID_MOVE:d0
@@ -2505,7 +2505,7 @@ DocumentPageSize:cJ
 STATES_ID_RESIZE:$_
 c_oAscAsyncAction$DownloadAs:e8
 nSldLtTTxAndMedia:GU
-FT_Outline_Translate:di
+FT_Outline_Translate:ci
 EBorderStyle$borderstyleThick:RH
 c_oSer_ChartLegendType$Overlay:AY
 c_oSer_TableColumns$TotalsRowFormula:TE
@@ -2688,7 +2688,7 @@ g_oUndoRedoCol:bL
 JSCompiler_StaticMethods_RedoPrepare:TM
 L 150:bg
 JSCompiler_StaticMethods_RedoEnd:ZM
-L 151:ci
+L 151:di
 L 152:jr
 L 153:kr
 JSCompiler_StaticMethods_buildDependency:CM
@@ -3177,7 +3177,7 @@ TT_Face:mr
 L 73:Gt
 JSCompiler_StaticMethods__moveCellVer:vN
 L 74:tq
-L 75:xi
+L 75:yi
 Int64:Fh
 JSCompiler_StaticMethods_rebuildSeries:Ae
 L 76:It
@@ -3236,7 +3236,7 @@ L 92:sg
 L 91:cd
 L 94:tg
 nSldLtTObjTx:tU
-L 93:yi
+L 93:zi
 Fill:aK
 CFontFileLoader:O
 FT_RoundFix:Eh
