@@ -11,14 +11,26 @@
 //  0 - итраторы по прямой линии
 //  1 - итераторы расположены также, как у степени
 
-
-
 function CNary()
+{
+
+}
+extend(CNary, CSubMathBase);
+CNary.prototype.init = function(props)
+{
+    this.typeSign = props.sign;
+    this.limLoc = props.limLoc;
+    this.supHide = props.supHide;
+    this.subHide = props.subHide;
+}
+
+
+function old_CNary()
 {
     CSubMathBase.call(this);
 }
-extend(CNary, CSubMathBase);
-CNary.prototype.init = function(index, orderType, iterType)
+extend(old_CNary, CSubMathBase);
+old_CNary.prototype.init = function(index, orderType, iterType)
 {
     this.setDimension(1, 2);
 
@@ -96,19 +108,19 @@ CNary.prototype.init = function(index, orderType, iterType)
 
     this.addMCToContent(base, arg);
 }
-CNary.prototype.setDistance = function()
+old_CNary.prototype.setDistance = function()
 {
     this.dW = this.getTxtPrp().FontSize/36*2.45;
 }
-CNary.prototype.getBase = function()
+old_CNary.prototype.getBase = function()
 {
     return this.elements[0][1];
 }
-CNary.prototype.getUpperIterator = function()
+old_CNary.prototype.getUpperIterator = function()
 {
     return this.elements[0][0].getUpperIterator();
 }
-CNary.prototype.getLowerIterator = function()
+old_CNary.prototype.getLowerIterator = function()
 {
     return this.elements[0][0].getLowerIterator();
 }

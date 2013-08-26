@@ -46,78 +46,74 @@ CLogarithm.prototype.getArgument = function()
     return this.elements[0][1];
 }
 
-function CMinimaxFunc()
+function CLimLowUp()
 {
     CMathBase.call(this);
 }
-extend(CMinimaxFunc, CMathBase);
-CMinimaxFunc.prototype.init = function()
+extend(CLimLowUp, CMathBase);
+CLimLowUp.prototype.init = function(props)
 {
+
+    this.type = props.type;
     this.setDimension(2, 1);
 
     var oBase = new CMathContent();
-    //oBase.mergeTxtPrp({Italic: false});
     oBase.setOwnTPrp({Italic: false});
 
     var oIter = new CMathContent();
     oIter.setReduct(DEGR_REDUCT);
 
-    this.addMCToContent(oBase, oIter);
+    if(props.type == LIMIT_LOW)
+        this.addMCToContent(oBase, oIter);
+    else if(props.type == LIMIT_UP)
+        this.addMCToContent(oIter, oBase);
 }
-CMinimaxFunc.prototype.getCenter = function()
+CLimLowUp.prototype.getCenter = function()
 {
     return this.elements[0][0].size.center;
 }
-CMinimaxFunc.prototype.getBase = function()
+CLimLowUp.prototype.getFName = function()
 {
     return this.elements[0][0];
 }
-CMinimaxFunc.prototype.getIterator = function()
+CLimLowUp.prototype.getIterator = function()
 {
     return this.elements[1][0];
 }
-CMinimaxFunc.prototype.old_setDistance = function()
-{
-    var iter = this.elements[1][0].size,
-        ascent = iter.center + this.params.font.metrics.Placeholder.Height*DIV_CENTER;
-
-    this.dH = this.params.font.metrics.Placeholder.Height - ascent;
-    this.dW = 0;
-    //this.dH = this.params.font.FontSize/16*g_dKoef_pt_to_mm;
-}
-CMinimaxFunc.prototype.setDistance = function()
+CLimLowUp.prototype.setDistance = function()
 {
     this.dH = 0.03674768518518519*this.getTxtPrp().FontSize;
 }
 
-function CMinimax()
+
+function old_CMinimax()
 {
     CSubMathBase.call(this);
 }
-extend(CMinimax, CSubMathBase);
-CMinimax.prototype.init = function()
+extend(old_CMinimax, CSubMathBase);
+old_CMinimax.prototype.init = function()
 {
     this.setDimension(1, 2);
-    var oFunc = new CMinimaxFunc();
+    var oFunc = new old_CMinimaxFunc();
     oFunc.init();
 
     var oArg = new CMathContent();
 
     this.addMCToContent(oFunc, oArg);
 }
-CMinimax.prototype.getFunction = function()
+old_CMinimax.prototype.getFName = function()
 {
     return this.elements[0][0].getBase();
 }
-CMinimax.prototype.getIterator = function()
+old_CMinimax.prototype.getIterator = function()
 {
     return this.elements[0][0].getIterator();
 }
-CMinimax.prototype.getArgument = function()
+old_CMinimax.prototype.getArgument = function()
 {
     return this.elements[0][1];
 }
-CMinimax.prototype.setDistance = function()
+old_CMinimax.prototype.setDistance = function()
 {
     this.dW = this.getTxtPrp().FontSize/6*g_dKoef_pt_to_mm;
     this.dH = 0;
@@ -140,7 +136,7 @@ CMathFunc.prototype.setDistance = function()
 {
     this.dW = this.getTxtPrp().FontSize/6*g_dKoef_pt_to_mm;
 }
-CMathFunc.prototype.getFunction = function()
+CMathFunc.prototype.getFName = function()
 {
     return this.elements[0][0];
 }

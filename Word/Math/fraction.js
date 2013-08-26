@@ -1,27 +1,77 @@
-function CBarFraction()
+function CFraction()
 {
-    this.bHide = false;
-    this.bSimple = false;
+    this.type = null;
+    this.bHideBar = false;
     CMathBase.call(this);
 }
-extend(CBarFraction, CMathBase);
-CBarFraction.prototype.init = function()
+extend(CFraction, CMathBase);
+CFraction.prototype.init = function(props)
 {
-    var num = new CNumerator();
-    num.init();
+    if( typeof(props.type) !== "undefined" || props.type !== null )
+        this.type = props.type;
+    else
+        this.type = BAR_FRACTION;
 
-    var den = new CDenominator();
-    den.init();
+    if(this.type == BAR_FRACTION || this.type == NO_BAR_FRACTION)
+    {
+        var num = new CNumerator();
+        num.init();
 
-    this.setDimension(2, 1);
-    this.addMCToContent(num, den);
+        var den = new CDenominator();
+        den.init();
+
+        this.setDimension(2, 1);
+
+        if(this.type == NO_BAR_FRACTION)
+            this.bHideBar = true;
+
+        this.addMCToContent(num, den);
+    }
+    else if(this.type == SKEWED_FRACTION)
+    {
+        this.setDimension(1, 2);
+        this.setContent();
+    }
+    else if(this.type == LINEAR_FRACTION)
+    {
+        this.setDimension(1, 2);
+        this.setContent();
+    }
 }
-CBarFraction.prototype.getCenter =  function()
+CFraction.prototype.getType = function()
 {
-    var penW = this.getTxtPrp().FontSize* 25.4/96 * 0.08 /2;
-    return this.elements[0][0].size.height + penW;
+    return this.type;
 }
-CBarFraction.prototype.draw = function()
+CFraction.prototype.getCenter = function()
+{
+    var center;
+
+    if(this.type == BAR_FRACTION || this.type == NO_BAR_FRACTION)
+    {
+        var penW = this.getTxtPrp().FontSize* 25.4/96 * 0.08 /2;
+        center = this.elements[0][0].size.height + penW;
+    }
+    else if(this.type == SKEWED_FRACTION)
+    {
+        center = this.elements[0][0].size.height;
+    }
+    else if(this.type == LINEAR_FRACTION)
+    {
+        center = CFraction.superclass.getCenter.call(this);
+    }
+
+    return center;
+}
+CFraction.prototype.draw = function()
+{
+    if(this.type == BAR_FRACTION || this.type == NO_BAR_FRACTION)
+        this.drawBarFraction();
+    else if(this.type == SKEWED_FRACTION)
+        this.drawSkewedFraction();
+    else if(this.type == LINEAR_FRACTION)
+        this.drawLinearFraction();
+}
+CFraction.prototype.drawBarFraction = function()
 {
     var penW = this.getTxtPrp().FontSize* this.reduct* 25.4/96 * 0.08;
 
@@ -29,58 +79,293 @@ CBarFraction.prototype.draw = function()
         x2 = this.pos.x + this.size.width,
         y1 = y2 = this.pos.y + this.size.center - penW/2;
 
-    if(!this.bHide)
+    if( !this.bHideBar )
     {
         MathControl.pGraph.p_color(0,0,0, 255);
         MathControl.pGraph.b_color1(0,0,0, 255);
         MathControl.pGraph.drawHorLine(0, y1, x1, x2, penW);
     }
 
-    CBarFraction.superclass.draw.call(this);
+    CFraction.superclass.draw.call(this);
 }
-CBarFraction.prototype.getNumerator = function()
+CFraction.prototype.drawSkewedFraction = function()
 {
-    return this.elements[0][0].getElement();
-}
-CBarFraction.prototype.getDenominator = function()
-{
-    return this.elements[1][0].getElement();
-}
-CBarFraction.prototype.hideBar = function(flag)
-{
-    this.bHide = flag;
-}
-CBarFraction.prototype.setSimple = function(flag)
-{
-    this.bSimple = flag;
+    var fontSize = this.getTxtPrp().FontSize;
+    var penW = fontSize/12.5*g_dKoef_pix_to_mm;
 
-    if(flag)
-        this.setReduct(DEGR_REDUCT);
+    var gap = this.gapSlash/2 - penW/7.5;
+    var plh = 9.877777777777776 * fontSize / 36;
+
+    var minHeight = 2*this.gapSlash,
+        middleHeight = plh*4/3,
+        maxHeight = (3*this.gapSlash + 5*plh)*2/3;
+
+    var tg1 = -2.22,
+        tg2 = -3.7;
+
+    var heightSlash = this.size.height*2/3;
+
+    if(heightSlash < maxHeight)
+    {
+        if(heightSlash < minHeight)
+        {
+            heightSlash = minHeight;
+            tg = tg1;
+        }
+        else
+        {
+            heightSlash = this.size.height*2/3;
+            tg = (heightSlash - maxHeight)*(tg1 - tg2)/(middleHeight - maxHeight) + tg2;
+        }
+
+        var b = this.elements[0][0].size.height - tg*(this.elements[0][0].size.width + gap);
+
+        var y1 =  this.elements[0][0].size.height/3,
+            y2 =  this.elements[0][0].size.height/3 + heightSlash;
+
+        var x1 =  (y1 - b)/tg,
+            x2 =  (y2 - b)/tg;
+
+        var xx1 = this.pos.x + x1,
+            xx2 = this.pos.x + x2;
+
+        var yy1 = this.pos.y  + y1,
+            yy2 = this.pos.y  + y2;
+
+    }
     else
-        this.setReduct(1);
+    {
+        heightSlash = maxHeight;
+        tg = tg2;
+        var coeff = this.elements[0][0].size.height/this.size.height;
+        shift = heightSlash*coeff;
 
-    this.Resize();
+        var minVal = plh/2,
+            maxVal = heightSlash - minVal;
+
+        if(shift < minVal)
+            shift = minVal;
+        else if(shift > maxVal)
+            shift = maxVal;
+
+        var y0 = this.elements[0][0].size.height - shift;
+        var b = this.elements[0][0].size.height - tg*(this.elements[0][0].size.width + gap);
+
+        var y1 = y0,
+            y2 = y0 + heightSlash;
+
+        var x1 = (y1 - b)/tg,
+            x2 = (y2 - b)/tg;
+
+        var xx1 = this.pos.x + x1,
+            xx2 = this.pos.x + x2;
+
+        var yy1 = this.pos.y + y1 ,
+            yy2 = this.pos.y + y2;
+
+    }
+
+    MathControl.pGraph.p_width(penW*1000);
+
+    MathControl.pGraph.p_color(0,0,0, 255);
+    MathControl.pGraph.b_color1(0,0,0, 255);
+    MathControl.pGraph._s();
+    MathControl.pGraph._m(xx1, yy1);
+    MathControl.pGraph._l(xx2, yy2);
+    MathControl.pGraph.ds();
+
+    CFraction.superclass.draw.call(this);
+}
+CFraction.prototype.drawLinearFraction = function()
+{
+    var first = this.elements[0][0].size,
+        sec = this.elements[0][1].size;
+
+    var cent = first.center > sec.center ? first.center : sec.center,
+        desc1 = first.height - first.center, desc2 = sec.height - sec.center,
+        desc =  desc1 > desc2 ? desc1 : desc2;
+
+    var shift = 0.1*this.dW;
+
+    var x1 = this.pos.x + this.elements[0][0].size.width + this.dW - shift,
+        y1 = this.pos.y + this.size.center - cent,
+        x2 = this.pos.x + this.elements[0][0].size.width + shift,
+        y2 = this.pos.y + this.size.center + desc;
+
+    var penW = this.getTxtPrp().FontSize/12.5*g_dKoef_pix_to_mm;
+
+    MathControl.pGraph.p_width(penW*1000);
+
+    MathControl.pGraph.p_color(0,0,0, 255);
+    MathControl.pGraph.b_color1(0,0,0, 255);
+
+    MathControl.pGraph._s();
+    MathControl.pGraph._m(x1, y1);
+    MathControl.pGraph._l(x2, y2);
+    MathControl.pGraph.ds();
+
+    CFraction.superclass.draw.call(this);
+}
+CFraction.prototype.getNumerator = function()
+{
+    var numerator;
+
+    if(this.type == BAR_FRACTION || this.type == NO_BAR_FRACTION)
+        numerator = this.elements[0][0].getElement();
+    else
+        numerator = this.elements[0][0];
+
+    return numerator;
+}
+CFraction.prototype.getDenominator = function()
+{
+    var denominator;
+
+    if(this.type == BAR_FRACTION || this.type == NO_BAR_FRACTION)
+        denominator = this.elements[1][0].getElement();
+    else
+        denominator = this.elements[0][1];
+
+    return denominator;
+}
+CFraction.prototype.recalculateSize = function()
+{
+    if(this.type == BAR_FRACTION || this.type == NO_BAR_FRACTION)
+        CFraction.superclass.recalculateSize.call(this);
+    else if(this.type == SKEWED_FRACTION)
+        this.recalculateSkewed();
+    else if(this.type == LINEAR_FRACTION)
+        this.recalculateLinear();
+}
+CFraction.prototype.recalculateSkewed = function()
+{
+    this.gapSlash = 5.011235894097222 * this.getTxtPrp().FontSize/36;
+    var _width = this.elements[0][0].size.width + this.gapSlash + this.elements[0][1].size.width;
+    var _height = this.elements[0][0].size.height + this.elements[0][1].size.height;
+    var _center = this.getCenter();
+
+    this.size =  {width: _width, height: _height, center: _center};
+}
+CFraction.prototype.recalculateLinear = function()
+{
+    var H = this.elements[0][0].size.center + this.elements[0][1].size.height - this.elements[0][1].size.center;
+    var txtPrp = this.getTxtPrp();
+
+    var gap = 5.011235894097222*txtPrp.FontSize/36;
+
+    var H3 = gap*4.942252165543792,
+        H4 = gap*7.913378248315688,
+        H5 = gap*9.884504331087584;
+
+    if( H < H3 )
+        this.dW = gap;
+    else if( H < H4 )
+        this.dW = 2*gap;
+    else if( H < H5 )
+        this.dW = 2.8*gap;
+    else
+        this.dW = 3.4*gap;
+
+    var h1 = this.elements[0][0].size.height,
+        h2 = this.elements[0][1].size.height;
+
+    var c1 = this.elements[0][0].size.center,
+        c2 = this.elements[0][1].size.center;
+
+    var asc = c1 > c2 ? c1 : c2;
+    var desc = h1 - c1 > h2 - c2 ? h1- c1 : h2 - c2;
+
+    var height = asc + desc;
+
+    var width = this.elements[0][0].size.width + this.dW + this.elements[0][1].size.width;
+    var center = this.getCenter();
+
+    this.size = {height: height, width: width, center: center};
+}
+CFraction.prototype.setPosition = function(pos)
+{
+    if(this.type == SKEWED_FRACTION)
+    {
+        this.pos = {x: pos.x, y: pos.y - this.size.center};
+        this.elements[0][0].setPosition(this.pos);
+
+        var x = this.pos.x + this.elements[0][0].size.width + this.gapSlash,
+            y = this.pos.y +  this.size.center;
+
+        this.elements[0][1].setPosition({x: x, y: y});
+
+    }
+    else
+        CFraction.superclass.setPosition.call(this, pos);
+}
+CFraction.prototype.findDisposition = function( mCoord )
+{
+    var disposition;
+
+    if(this.type == SKEWED_FRACTION)
+    {
+        var mouseCoord = {x: mCoord.x, y: mCoord.y},
+            posCurs =    {x: null, y: null},
+            inside_flag = -1;
+
+        posCurs.x = 0;
+
+        if( mCoord.x < (this.elements[0][0].size.width + this.gapSlash/2))
+        {
+            var sizeFirst = this.elements[0][0].size;
+            if(sizeFirst.width < mCoord.x)
+            {
+                mouseCoord.x = sizeFirst.width;
+                inside_flag = 1;
+            }
+            if(sizeFirst.height < mCoord.y)
+            {
+                mouseCoord.y = sizeFirst.height;
+                inside_flag = 2;
+            }
+
+            posCurs.y = 0;
+        }
+        else
+        {
+            var sizeSec = this.elements[0][1].size;
+            if(mCoord.x < this.size.width - sizeSec.width)
+            {
+                mouseCoord.x = 0;
+                inside_flag = 0;
+            }
+            else if( mCoord.x > this.size.width)
+            {
+                mouseCoord.x = sizeSec.width;
+                inside_flag = 1;
+            }
+            else
+                mouseCoord.x = mCoord.x - this.elements[0][0].size.width - this.gapSlash;
+
+            if( mCoord.y < this.size.height - this.elements[0][1].size.height)
+            {
+                mouseCoord.y = 0;
+                inside_flag = 2;
+            }
+            else if(mCoord.y > this.size.height)
+            {
+                mouseCoord.y = sizeSec.height;
+                inside_flag = 2;
+            }
+            else
+                mouseCoord.y = mCoord.y - this.elements[0][0].size.height;
+
+            posCurs.y = 1;
+        }
+
+        disposition =  {pos: posCurs, mCoord: mouseCoord, inside_flag: inside_flag};
+    }
+    else
+        disposition = CFraction.superclass.findDisposition.call(this, mCoord);
+
+    return disposition;
 }
 
-/*CBarFraction.prototype.getTxtPrp_2 = function()
-{
-    var txtPrp = new CMathTextPrp();
-    txtPrp.Merge(this.TxtPrp);
-
-    txtPrp.FontSze *= this.reduct;
-
-    return txtPrp;
-}*/
-/*CBarFraction.prototype.getTxtPrp = function()
-{
-    var txtPrp = CBarFraction.superclass.getTxtPrp.call(this);
-
-    if(this.bSimple)
-        txtPrp.FontSize *= DEGR_REDUCT; // делаем здес, чтобы учесть при пересчете расстояний
-
-    return txtPrp;
-}*/
-//////////
 
 function CNumerator()
 {
@@ -207,6 +492,72 @@ CDenominator.prototype.getReduct = function()
 
 //////////
 
+function CBarFraction()
+{
+    this.bHide = false;
+    this.bSimple = false;
+    CMathBase.call(this);
+}
+extend(CBarFraction, CMathBase);
+CBarFraction.prototype.init = function()
+{
+    var num = new CNumerator();
+    num.init();
+
+    var den = new CDenominator();
+    den.init();
+
+    this.setDimension(2, 1);
+    this.addMCToContent(num, den);
+}
+CBarFraction.prototype.getCenter =  function()
+{
+    var penW = this.getTxtPrp().FontSize* 25.4/96 * 0.08 /2;
+    return this.elements[0][0].size.height + penW;
+}
+CBarFraction.prototype.draw = function()
+{
+    var penW = this.getTxtPrp().FontSize* this.reduct* 25.4/96 * 0.08;
+
+    var x1 = this.pos.x,
+        x2 = this.pos.x + this.size.width,
+        y1 = y2 = this.pos.y + this.size.center - penW/2;
+
+    if(!this.bHide)
+    {
+        MathControl.pGraph.p_color(0,0,0, 255);
+        MathControl.pGraph.b_color1(0,0,0, 255);
+        MathControl.pGraph.drawHorLine(0, y1, x1, x2, penW);
+    }
+
+    CBarFraction.superclass.draw.call(this);
+}
+CBarFraction.prototype.getNumerator = function()
+{
+    return this.elements[0][0].getElement();
+}
+CBarFraction.prototype.getDenominator = function()
+{
+    return this.elements[1][0].getElement();
+}
+CBarFraction.prototype.hideBar = function(flag)
+{
+    this.bHide = flag;
+}
+CBarFraction.prototype.setSimple = function(flag)
+{
+    this.bSimple = flag;
+
+    if(flag)
+        this.setReduct(DEGR_REDUCT);
+    else
+        this.setReduct(1);
+
+    this.Resize();
+}
+
+//////////
+
 function CSkewedFraction()
 {
     this.gapSlash = 0;
@@ -236,7 +587,7 @@ CSkewedFraction.prototype.setPosition = function(pos)
 
     this.elements[0][1].setPosition({x: this.pos.x + this.elements[0][0].size.width - shiftWidth, y: this.pos.y + shiftHeight });
     this.elements[0][2].setPosition({x: this.pos.x + this.elements[0][0].size.width + WidthSlash, y: this.pos.y +  this.size.center});*/
-};
+}
 CSkewedFraction.prototype.recalculateSize = function()
 {
     this.gapSlash = 5.011235894097222 * this.getTxtPrp().FontSize/36;
@@ -245,7 +596,7 @@ CSkewedFraction.prototype.recalculateSize = function()
     var _center = this.getCenter();
 
     this.size =  {width: _width, height: _height, center: _center};
-};
+}
 CSkewedFraction.prototype.getCenter = function()
 {
     return this.elements[0][0].size.height;
@@ -308,10 +659,9 @@ CSkewedFraction.prototype.findDisposition = function( mCoord )
 
     return {pos: posCurs, mCoord: mouseCoord, inside_flag: inside_flag};
 
-};
+}
 CSkewedFraction.prototype.draw = function()
 {
-    CSkewedFraction.superclass.draw.call(this);
     var fontSize = this.getTxtPrp().FontSize;
     var penW = fontSize/12.5*g_dKoef_pix_to_mm;
 
@@ -398,6 +748,8 @@ CSkewedFraction.prototype.draw = function()
     MathControl.pGraph._m(xx1, yy1);
     MathControl.pGraph._l(xx2, yy2);
     MathControl.pGraph.ds();
+
+    CSkewedFraction.superclass.draw.call(this);
 }
 CSkewedFraction.prototype.getNumerator = function()
 {
@@ -485,7 +837,6 @@ CLinearFraction.prototype.draw = function()
     MathControl.pGraph.ds();
 
     CLinearFraction.superclass.draw.call(this);
-
 }
 CLinearFraction.prototype.getNumerator = function()
 {
