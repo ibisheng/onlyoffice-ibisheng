@@ -210,6 +210,7 @@ prop:_coSpellCheckInit
 prop:asc_getSpellCheckLanguages
 prop:autoSaveInit
 prop:put_FramePr
+prop:asc_addDropCap
 prop:get_TextProps
 prop:GetJSONLogicDocument
 prop:get_ContentCount
@@ -605,6 +606,11 @@ prop:get_Y
 prop:put_Y
 prop:get_YAlign
 prop:put_YAlign
+prop:get_Borders
+prop:put_Borders
+prop:get_FontFamily
+prop:put_FontFamily
+prop:put_FromDropCapMenu
 ---
 var:CParagraphProp
 prop:get_ContextualSpacing
@@ -649,6 +655,7 @@ prop:get_DefaultTab
 prop:put_DefaultTab
 prop:get_FramePr
 prop:put_FramePr
+prop:get_CanAddDropCap
 ---
 var:CParagraphPropEx
 prop:get_ContextualSpacing
@@ -1265,6 +1272,7 @@ asc_docs_api.prototype['_coSpellCheckInit'] = asc_docs_api.prototype._coSpellChe
 asc_docs_api.prototype['asc_getSpellCheckLanguages'] = asc_docs_api.prototype.asc_getSpellCheckLanguages;
 asc_docs_api.prototype['autoSaveInit'] = asc_docs_api.prototype.autoSaveInit;
 asc_docs_api.prototype['put_FramePr'] = asc_docs_api.prototype.put_FramePr;
+asc_docs_api.prototype['asc_addDropCap'] = asc_docs_api.prototype.asc_addDropCap;
 asc_docs_api.prototype['get_TextProps'] = asc_docs_api.prototype.get_TextProps;
 asc_docs_api.prototype['GetJSONLogicDocument'] = asc_docs_api.prototype.GetJSONLogicDocument;
 asc_docs_api.prototype['get_ContentCount'] = asc_docs_api.prototype.get_ContentCount;
@@ -1653,6 +1661,11 @@ CParagraphFrame.prototype['get_Y'] = CParagraphFrame.prototype.get_Y;
 CParagraphFrame.prototype['put_Y'] = CParagraphFrame.prototype.put_Y;
 CParagraphFrame.prototype['get_YAlign'] = CParagraphFrame.prototype.get_YAlign;
 CParagraphFrame.prototype['put_YAlign'] = CParagraphFrame.prototype.put_YAlign;
+CParagraphFrame.prototype['get_Borders'] = CParagraphFrame.prototype.get_Borders;
+CParagraphFrame.prototype['put_Borders'] = CParagraphFrame.prototype.put_Borders;
+CParagraphFrame.prototype['get_FontFamily'] = CParagraphFrame.prototype.get_FontFamily;
+CParagraphFrame.prototype['put_FontFamily'] = CParagraphFrame.prototype.put_FontFamily;
+CParagraphFrame.prototype['put_FromDropCapMenu'] = CParagraphFrame.prototype.put_FromDropCapMenu;
 window['CParagraphProp'] = CParagraphProp;
 CParagraphProp.prototype['get_ContextualSpacing'] = CParagraphProp.prototype.get_ContextualSpacing;
 CParagraphProp.prototype['put_ContextualSpacing'] = CParagraphProp.prototype.put_ContextualSpacing;
@@ -1696,6 +1709,7 @@ CParagraphProp.prototype['get_DefaultTab'] = CParagraphProp.prototype.get_Defaul
 CParagraphProp.prototype['put_DefaultTab'] = CParagraphProp.prototype.put_DefaultTab;
 CParagraphProp.prototype['get_FramePr'] = CParagraphProp.prototype.get_FramePr;
 CParagraphProp.prototype['put_FramePr'] = CParagraphProp.prototype.put_FramePr;
+CParagraphProp.prototype['get_CanAddDropCap'] = CParagraphProp.prototype.get_CanAddDropCap;
 window['CParagraphPropEx'] = CParagraphPropEx;
 CParagraphPropEx.prototype['get_ContextualSpacing'] = CParagraphPropEx.prototype.get_ContextualSpacing;
 CParagraphPropEx.prototype['get_Ind'] = CParagraphPropEx.prototype.get_Ind;
