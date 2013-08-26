@@ -1845,7 +1845,7 @@ ConvertCoordsFromCursorPage:ycb
 asinh:dza
 asc_getHiddenFlag:s9
 raster_new:wFa
-wb:I
+wb:H
 SyncHorizontal:ega
 NoShadow:Rl
 Numbering:vQ
@@ -2556,7 +2556,7 @@ oldXfrmFlipH:Kna
 asc_registerCallback:rya
 asc_setDocInfo:wya
 EnterFrame:Lf
-drawingObjectsController:H
+drawingObjectsController:I
 updateSelection:gHa
 LoadFont:Iv
 ReadSortState:Esa
