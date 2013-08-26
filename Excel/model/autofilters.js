@@ -1611,8 +1611,13 @@
 					ws._isLockedCells (sortRange1, /*subType*/null, onSortAutoFilterCallback);
 			},
 			
-			isEmptyAutoFilters: function(ws, ar)
+			isEmptyAutoFilters: function(ws, ar, turnOnHistory)
 			{
+				if(turnOnHistory)
+				{
+					History.TurnOn();
+					History.Create_NewPoint();
+				}
 				History.StartTransaction();
 				var aWs = this._getCurrentWS(ws);
 				var activeCells = ar;
@@ -1659,6 +1664,8 @@
 					aWs.TableParts = newTableParts;
 				}
 				History.EndTransaction();
+				if(turnOnHistory)
+					History.TurnOff();
 			},
 			
 			getTablePictures: function(wb)
@@ -4106,7 +4113,41 @@
 					if(filter.AutoFilter)
 						filterColums = filter.AutoFilter.FilterColumns;
 				}
-					
+				
+				if(val < 0)
+				{
+					var activeRange = ws.activeRange;
+					var splitRefFilter = filter.Ref.split(":");
+					var startCell = this._idToRange(splitRefFilter[0]);
+					var endCell = this._idToRange(splitRefFilter[1]);
+					var isDelFilter = false;
+					//в данных случаях нужно удалять весь фильтр, как в EXCEl
+					if(activeRange.contains(startCell.c1,startCell.r1) && activeRange.contains(startCell.c1,endCell.r1) && activeRange.contains(endCell.c1,startCell.r1) && activeRange.contains(endCell.c1,endCell.r1))//под удаление попал весь фильтр
+					{
+						isDelFilter = true;
+					}
+					else if(type == 'insRow' && activeRange.r1 == startCell.r1 && activeRange.r2 == endCell.r1 && activeRange.c1 >= startCell.c1 && activeRange.c2 <= endCell.c1)//выделен один из столбцов и удаляем строки
+					{
+						isDelFilter = true;
+					}
+					else if(type != 'insRow' && activeRange.c1 == startCell.c1 && activeRange.c2 == endCell.c1 && activeRange.r1 >= startCell.r1 && activeRange.r2 <= endCell.r1)//выделена одина из строк и удаляем столбцы
+					{
+						isDelFilter = true;
+					}
+					if(isDelFilter)
+					{	
+						activeRange = 
+						{
+							r1: startCell.r1,
+							c1: startCell.c1,
+							r2: endCell.r1,
+							c2: endCell.c1
+						}
+						this.isEmptyAutoFilters(ws, activeRange, true);
+						return;
+					}
+				}
+				
 				if(!col)//добавляем колонку, смещаем фильтры
 				{
 					//change Ref into filter
@@ -4114,11 +4155,19 @@
 					{
 						cRange.start.r1 = cRange.start.r1 + val;
 						cRange.end.r1 = cRange.end.r1 + val;
+						if(cRange.start.r1 < 0)
+							cRange.start.r1 = 0;
+						if(cRange.end.r1 < 0)
+							cRange.end.r1 = 0;
 					}
 					else
 					{
 						cRange.start.c1 = cRange.start.c1 + val;
 						cRange.end.c1 = cRange.end.c1 + val;
+						if(cRange.start.c1 < 0)
+							cRange.start.c1 = 0;
+						if(cRange.end.c1 < 0)
+							cRange.end.c1 = 0;
 					}
 					
 					filter.Ref = this._rangeToId(cRange.start) + ":" + this._rangeToId(cRange.end);
@@ -4134,11 +4183,19 @@
 							{
 								newFirstCol.r1 = newFirstCol.r1 + val;
 								newNextCol.r1 = newNextCol.r1 + val;
+								if(newFirstCol.r1 < 0)
+									newFirstCol.r1 = 0;
+								if(newNextCol.r1 < 0)
+									newNextCol.r1 = 0;
 							}
 							else
 							{
 								newFirstCol.c1 = newFirstCol.c1 + val;
 								newNextCol.c1 = newNextCol.c1 + val;
+								if(newFirstCol.c1 < 0)
+									newFirstCol.c1 = 0;
+								if(newNextCol.c11 < 0)
+									newNextCol.c1 = 0;
 							}
 							
 							 var id = this._rangeToId(newFirstCol);
@@ -5069,7 +5126,7 @@
 				var oHistoryObject = new UndoRedoData_AutoFilter();
 				oHistoryObject.undo = oldObj;
 
-				oHistoryObject.activeCells			= redoObject.activeCells;
+				oHistoryObject.activeCells			= Asc.clone(redoObject.activeCells);
 				oHistoryObject.lTable				= redoObject.lTable;
 				oHistoryObject.type					= redoObject.type;
 				oHistoryObject.cellId				= redoObject.cellId;

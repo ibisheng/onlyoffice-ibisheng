@@ -8307,8 +8307,12 @@
 							case c_oAscDeleteOptions.DeleteColumns:
 								functionModelAction = function () {
 									fullRecalc = true;
-									t.model.removeCols(_updateRangeDel.c1, _updateRangeDel.c2);
+									History.Create_NewPoint();
+									History.StartTransaction();
 									t.autoFilters.insertColumn(t, prop,_updateRangeDel, arn);
+									t.model.removeCols(_updateRangeDel.c1, _updateRangeDel.c2);
+									History.EndTransaction();
+									
 									t.objectRender.updateDrawingObject(false, val, _updateRangeDel);
 									t.cellCommentator.updateCommentsDependencies(false, val, _updateRangeDel);
 								};
@@ -8322,8 +8326,12 @@
 							case c_oAscDeleteOptions.DeleteRows:
 								functionModelAction = function () {
 									fullRecalc = true;
+									History.Create_NewPoint();
+									History.StartTransaction();
+									t.autoFilters.insertRows(t, prop,_updateRangeDel, arn);
 									t.model.removeRows(_updateRangeDel.r1, _updateRangeDel.r2);
-									t.autoFilters.insertRows(t, prop,_updateRangeDel, arn);									
+									History.EndTransaction();
+									
 									t.objectRender.updateDrawingObject(false, val, _updateRangeDel);
 									t.cellCommentator.updateCommentsDependencies(false, val, _updateRangeDel);
 								};
