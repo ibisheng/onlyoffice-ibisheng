@@ -1456,7 +1456,7 @@ FT_NEXT_SHORT:mj
 CMetafile:aD
 _cmap_classes$$inline_395:Pn
 ResizeInGroupState:yC
-para_End:gc
+para_End:hc
 fontstyle_mask_regular:gx
 nSldLtTTwoObjAndTx:NL
 T1_Get_Multi_Master:Hv
@@ -1497,7 +1497,7 @@ tt_cmap4_char_map_binary:To
 cff_index_done:du
 hdrftr_Header:yJ
 numbering_presentationnumfrmt_None:NH
-FT_Bitmap_Size:ul
+FT_Bitmap_Size:sl
 Ph:Ah
 Read_CVT_Stretched:xs
 JSCompiler_StaticMethods_Remove_Cell:lG
@@ -1666,7 +1666,7 @@ find_sbit_range:Bo
 ChangeAdjInGroupState:wC
 L 111:Xv
 L 110:Wv
-L 113:tl
+L 113:ul
 tt_get_interface:nt
 L 112:SO
 bIsSupportOriginalFormatFonts:$w
@@ -1678,7 +1678,7 @@ L 104:ng
 L 105:hs
 CAscFill:JQ
 L 106:Vv
-L 107:sl
+L 107:tl
 L 108:mp
 L 109:np
 LineJoinType$Bevel:uN
@@ -1850,7 +1850,7 @@ JSCompiler_StaticMethods_Numbering_Set:lI
 cff_builder_add_point:Lu
 CTableOutline:hF
 Move_CVT_Stretched:zs
-ft_stub_set_pixel_sizes:Ik
+ft_stub_set_pixel_sizes:Ek
 _ph_summ__obj_and_two_obj:lP
 historyitem_Table_TableAlign:rF
 FORMULA_TYPE_SQRT:gM
@@ -2012,11 +2012,11 @@ tt_face_load_bhed:co
 T1_Loader:Fv
 JSCompiler_StaticMethods_changeCurrentState:nB
 nSldLtTClipArtAndTx:rL
-L 59:Gk
+L 59:Hk
 L 58:hj
 L 57:Df
-L 56:Fk
-L 55:Ek
+L 56:Gk
+L 55:Fk
 TT_Round_Super_45:Uq
 L 54:Ne
 tt_cmap10_char_index:$o
@@ -2056,7 +2056,7 @@ ft_bitmap_glyph_init:Jj
 L 40:De
 JSCompiler_StaticMethods__read_rPr:$d
 Get_Kerning:Uv
-L 43:hc
+L 43:gc
 HSLToRGB:wM
 L 42:vd
 STATES_ID_POLY_LINE_ADD:SB
@@ -2294,7 +2294,7 @@ L 88:yg
 L 89:ai
 JSCompiler_StaticMethods_Set_Inline:HE
 L 86:kj
-L 87:Hk
+L 87:Ik
 L 84:$h
 L 85:kf
 FT_Glyph_Class:uq
