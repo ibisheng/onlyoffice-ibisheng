@@ -337,6 +337,12 @@ function CreateAscFill(unifill)
 
             for (var i = 0; i < _fill.colors.length; i++)
             {
+                if (0 == i)
+                {
+                    ret.fill.Colors = new Array();
+                    ret.fill.Positions = new Array();
+                }
+
                 ret.fill.Colors.push(CreateAscColor(_fill.colors[i].color));
                 ret.fill.Positions.push(_fill.colors[i].pos);
             }
@@ -464,6 +470,26 @@ function CorrectUniFill(asc_fill, unifill)
                             _gs.pos = _positions[i];
 
                             ret.fill.colors.push(_gs);
+                        }
+                    }
+                }
+                else if (undefined != _colors)
+                {
+                    if (_colors.length == ret.fill.colors.length)
+                    {
+                        for (var i = 0; i < _colors.length; i++)
+                        {
+                            ret.fill.colors[i].color = CorrectUniColor(_colors[i], ret.fill.colors[i].color);
+                        }
+                    }
+                }
+                else if (undefined != _positions)
+                {
+                    if (_positions.length == ret.fill.colors.length)
+                    {
+                        for (var i = 0; i < _positions.length; i++)
+                        {
+                            ret.fill.colors[i].pos = _positions[i];
                         }
                     }
                 }
