@@ -443,6 +443,9 @@ function CGlobalMatrixTransformer()
 
 var global_MatrixTransformer = new CGlobalMatrixTransformer();
 
+var global_map_bounds_shape = {};
+global_map_bounds_shape["heart"] = true;
+
 function CGraphics()
 {
     this.m_oContext     = null;
