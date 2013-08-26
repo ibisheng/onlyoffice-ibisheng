@@ -255,7 +255,7 @@ CAscFillSolid.prototype.put_color = function(v){this.color = v;}
 
 function CAscFillHatch()
 {
-    this.PatternType = 0;
+    this.PatternType = undefined;
     this.fgClr = undefined;
     this.bgClr = undefined;
 }
@@ -429,7 +429,7 @@ function CorrectUniFill(asc_fill, unifill)
 
                 if (undefined != _fill.PatternType)
                 {
-                    ret.ftype = _fill.PatternType;
+                    ret.fill.ftype = _fill.PatternType;
                 }
                 if (undefined != _fill.fgClr)
                 {
