@@ -602,7 +602,7 @@ CHist_Clip:UC
 T1_GlyphSlot_Done:yv
 historyitem_TextPr_Italic:pz
 JSCompiler_StaticMethods_Internal_ScaleTableWidth:fG
-sendCommand:Xe
+sendCommand:Ye
 CHeaderProp:HQ
 clone:uK
 JSCompiler_StaticMethods_Set_CurPosXY:PF
@@ -845,7 +845,7 @@ selected_DrawingObject:cJ
 c_oAscFill$FILL_TYPE_PATT:YP
 JSCompiler_StaticMethods_Set_DrawingType:bA
 global_SubpixHintingHacks:Fs
-documentId:Ye
+documentId:Xe
 JSCompiler_StaticMethods_default_tt:ar
 RULER_OBJECT_TYPE_HEADER:FD
 AFM_FontInfoRec:sm
