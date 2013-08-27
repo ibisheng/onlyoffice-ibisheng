@@ -25,7 +25,7 @@ c_oAscWrapStyle2$Square:EQ
 JSCompiler_StaticMethods_ParseW:q1
 g_mouse_event_type_up:ER
 ParagraphContent_Read_FromBinary:WQ
-JSCompiler_returnArg:ba
+JSCompiler_returnArg:ca
 TT_Get_VMetrics:yy
 JSCompiler_StaticMethods_Set_GraphicObject:Qc
 JSCompiler_StaticMethods_Set_Type_0_Spell:bR
@@ -2928,7 +2928,7 @@ L 22:W
 c_oSerSimplePos$Y:BZ
 L 25:la
 c_oSerSimplePos$X:AZ
-L 24:ca
+L 24:ba
 L 50:$n
 tt_size_reset:bz
 recalcresult_PrevPage:tR
