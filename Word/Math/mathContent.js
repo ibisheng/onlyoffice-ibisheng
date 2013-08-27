@@ -1,8 +1,19 @@
+//поправить центр у N-арных операторов
+/*
+ FRACTION
+ MATH_FUNCTION
+ NARY
+ BOX (доделать Spacing)
+ DEGREE
+ DEGREE_SubSup
+ RADICAL
+ LIMIT (доделать для случая limLow)
+ */
 var historyitem_Math_AddItem                   =  1; // Добавляем элемент
 var historyitem_Math_RemoveItem                =  2; // Удаляем элемент
 
 var TEST = true;
-var TEST_2 = true;
+var TEST_2 = false;
 
 var StartTextElement = 0x2B1A; // Cambria Math
 
@@ -2466,295 +2477,611 @@ CMathContent.prototype =
 
                     break;
                 case 23:
-                    var integr = this.addMComponent(8);
-                    integr.init(0,0,0);
+                    var integr = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_INTEGRAL,
+                        limLocType:     NARY_UndOvr,
+                        subHide:        1,
+                        supHide:        1
+                    };
+                    integr.init(props);
                     integr.fillPlaceholders();
                     break;
                 case 24:
-                    var integr = this.addMComponent(8);
-                    integr.init(0,1,3);
+                    var integr = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_INTEGRAL,
+                        limLocType:     NARY_SubSup
+                    };
+                    integr.init(props);
                     integr.fillPlaceholders();
                     break;
                 case 25:
-                    var integr = this.addMComponent(8);
-                    integr.init(0,0,3);
+                    var integr = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_INTEGRAL,
+                        limLocType:     NARY_UndOvr
+                    };
+                    integr.init(props);
                     integr.fillPlaceholders();
                     break;
                 case 26:
-                    var integr = this.addMComponent(8);
-                    integr.init(1,0,0);
+                    var integr = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_DOUBLE_INTEGRAL,
+                        limLocType:     NARY_UndOvr,
+                        subHide:        1,
+                        supHide:        1
+                    };
+                    integr.init(props);
                     integr.fillPlaceholders();
                     break;
                 case 27:
-                    var integr = this.addMComponent(8);
-                    integr.init(1,1,3);
+                    var integr = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_DOUBLE_INTEGRAL,
+                        limLocType:     NARY_SubSup
+                    };
+                    integr.init(props);
                     integr.fillPlaceholders();
                     break;
                 case 28:
-                    var integr = this.addMComponent(8);
-                    integr.init(1,0,3);
+                    var integr = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_DOUBLE_INTEGRAL,
+                        limLocType:     NARY_UndOvr
+                    };
+                    integr.init(props);
                     integr.fillPlaceholders();
                     break;
                 case 29:
-                    var integr = this.addMComponent(8);
-                    integr.init(2,0,0);
+                    var integr = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_TRIPLE_INTEGRAL,
+                        limLocType:     NARY_UndOvr,
+                        subHide:        1,
+                        supHide:        1
+                    };
+                    integr.init(props);
                     integr.fillPlaceholders();
                     break;
                 case 30:
-                    var integr = this.addMComponent(8);
-                    integr.init(2,1,3);
+                    var integr = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_TRIPLE_INTEGRAL,
+                        limLocType:     NARY_SubSup
+                    };
+                    integr.init(props);
                     integr.fillPlaceholders();
                     break;
                 case 31:
-                    var integr = this.addMComponent(8);
-                    integr.init(2,0,3);
+                    var integr = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_TRIPLE_INTEGRAL,
+                        limLocType:     NARY_UndOvr
+                    };
+                    integr.init(props);
                     integr.fillPlaceholders();
                     break;
                 case 32:
-                    var integr = this.addMComponent(8);
-                    integr.init(3,0,0);
+                    var integr = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_CONTOUR_INTEGRAL,
+                        limLocType:     NARY_UndOvr,
+                        subHide:        1,
+                        supHide:        1
+                    };
+                    integr.init(props);
                     integr.fillPlaceholders();
                     break;
                 case 33:
-                    var integr = this.addMComponent(8);
-                    integr.init(3,1,3);
+                    var integr = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_CONTOUR_INTEGRAL,
+                        limLocType:     NARY_SubSup
+                    };
+                    integr.init(props);
                     integr.fillPlaceholders();
                     break;
                 case 34:
-                    var integr = this.addMComponent(8);
-                    integr.init(3,0,3);
+                    var integr = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_CONTOUR_INTEGRAL,
+                        limLocType:     NARY_UndOvr
+                    };
+                    integr.init(props);
                     integr.fillPlaceholders();
                     break;
                 case 35:
-                    var integr = this.addMComponent(8);
-                    integr.init(4,0,0);
+                    var integr = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_SURFACE_INTEGRAL,
+                        limLocType:     NARY_UndOvr,
+                        subHide:        1,
+                        supHide:        1
+                    };
+                    integr.init(props);
                     integr.fillPlaceholders();
                     break;
                 case 36:
-                    var integr = this.addMComponent(8);
-                    integr.init(4,1,3);
+                    var integr = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_SURFACE_INTEGRAL,
+                        limLocType:     NARY_SubSup
+                    };
+                    integr.init(props);
                     integr.fillPlaceholders();
                     break;
                 case 37:
-                    var integr = this.addMComponent(8);
-                    integr.init(4,0,3);
+                    var integr = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_SURFACE_INTEGRAL,
+                        limLocType:     NARY_UndOvr
+                    };
+                    integr.init(props);
                     integr.fillPlaceholders();
                     break;
                 case 38:
-                    var integr = this.addMComponent(8);
-                    integr.init(5,0,0);
+                    var integr = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_VOLUME_INTEGRAL,
+                        limLocType:     NARY_UndOvr,
+                        subHide:        1,
+                        supHide:        1
+                    };
+                    integr.init(props);
                     integr.fillPlaceholders();
                     break;
                 case 39:
-                    var integr = this.addMComponent(8);
-                    integr.init(5,1,3);
+                    var integr = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_VOLUME_INTEGRAL,
+                        limLocType:     NARY_SubSup
+                    };
+                    integr.init(props);
                     integr.fillPlaceholders();
                     break;
                 case 40:
-                    var integr = this.addMComponent(8);
-                    integr.init(5,0,3);
+                    var integr = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_VOLUME_INTEGRAL,
+                        limLocType:     NARY_UndOvr
+                    };
+                    integr.init(props);
                     integr.fillPlaceholders();
                     break;
                 case 41:
-                    var base = this.addMComponent(22);
-                    base.setDimension(1,1);
-                    base.setContent();
-                    var elem = base.getElement(0,0);
-                    elem.addTxt("dx");
+                    var box = this.addMComponent(MATH_BOX);
+                    var props =
+                    {
+                        type:       BOX_DIFF,
+                        spacing:    1
+                    };
+                    box.init(props);
+                    var base = box.getElement();
+                    base.addTxt("dx");
                     break;
                 case 42:
-                    var base = this.addMComponent(22);
-                    base.setDimension(1,1);
-                    base.setContent();
-                    var elem = base.getElement(0,0);
-                    elem.addTxt("dy");
+                    var box = this.addMComponent(MATH_BOX);
+                    var props =
+                    {
+                        type:       BOX_DIFF,
+                        spacing:    1
+                    };
+                    box.init(props);
+                    var base = box.getElement();
+                    base.addTxt("dy");
                     break;
                 case 43:
-                    var base = this.addMComponent(22);
-                    base.setDimension(1,1);
-                    base.setContent();
-                    var elem = base.getElement(0,0);
-                    elem.addTxt("dθ");
+                    var box = this.addMComponent(MATH_BOX);
+                    var props =
+                    {
+                        type:       BOX_DIFF,
+                        spacing:    1
+                    };
+                    box.init(props);
+                    var base = box.getElement();
+                    base.addTxt("dθ");
                     break;
                 case 44:
-                    var sigma = this.addMComponent(8);
-                    sigma.init(6,0,0);
-                    sigma.fillPlaceholders();
+                    var integr = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_SIGMA,
+                        limLocType:     NARY_UndOvr,
+                        subHide:        1,
+                        supHide:        1
+                    };
+                    integr.init(props);
+                    integr.fillPlaceholders();
                     break;
                 case 45:
-                    var sigma = this.addMComponent(8);
-                    sigma.init(6,0,3);
+                    var sigma = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_SIGMA,
+                        limLocType:     NARY_UndOvr
+                    };
+                    sigma.init(props);
                     sigma.fillPlaceholders();
                     break;
                 case 46:
-                    var sigma = this.addMComponent(8);
-                    sigma.init(6,1,3);
+                    var sigma = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_SIGMA,
+                        limLocType:     NARY_SubSup
+                    };
+                    sigma.init(props);
                     sigma.fillPlaceholders();
                     break;
                 case 47:
-                    var sigma = this.addMComponent(8);
-                    sigma.init(6,0,2);
+                    var sigma = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_SIGMA,
+                        limLocType:     NARY_UndOvr,
+                        subHide:        1
+                    };
+                    sigma.init(props);
                     sigma.fillPlaceholders();
                     break;
                 case 48:
-                    var sigma = this.addMComponent(8);
-                    sigma.init(6,1,2);
+                    var sigma = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_SIGMA,
+                        limLocType:     NARY_SubSup,
+                        subHide:        1
+                    };
+                    sigma.init(props);
                     sigma.fillPlaceholders();
                     break;
                 case 49:
-                    var product = this.addMComponent(8);
-                    product.init(7,0,0);
+                    var product = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_PRODUCT,
+                        limLocType:     NARY_UndOvr,
+                        subHide:        1,
+                        supHide:        1
+                    };
+                    product.init(props);
                     product.fillPlaceholders();
                     break;
                 case 50:
-                    var product = this.addMComponent(8);
-                    product.init(7,0,3);
+                    var product = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_PRODUCT,
+                        limLocType:     NARY_UndOvr
+                    };
+                    product.init(props);
                     product.fillPlaceholders();
                     break;
                 case 51:
-                    var product = this.addMComponent(8);
-                    product.init(7,1,3);
+                    var product = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_PRODUCT,
+                        limLocType:     NARY_SubSup
+                    };
+                    product.init(props);
                     product.fillPlaceholders();
                     break;
                 case 52:
-                    var product = this.addMComponent(8);
-                    product.init(7,0,2);
+                    var product = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_PRODUCT,
+                        limLocType:     NARY_UndOvr,
+                        subHide:        1
+                    };
+                    product.init(props);
                     product.fillPlaceholders();
                     break;
                 case 53:
-                    var product = this.addMComponent(8);
-                    product.init(7,1,2);
+                    var product = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_PRODUCT,
+                        limLocType:     NARY_SubSup,
+                        subHide:        1
+                    };
+                    product.init(props);
                     product.fillPlaceholders();
                     break;
-
                 case 54:
-                    var product = this.addMComponent(8);
-                    product.init(8,0,0);
-                    product.fillPlaceholders();
+                    var coproduct = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_COPRODUCT,
+                        limLocType:     NARY_UndOvr,
+                        subHide:        1,
+                        supHide:        1
+                    };
+                    coproduct.init(props);
+                    coproduct.fillPlaceholders();
                     break;
                 case 55:
-                    var product = this.addMComponent(8);
-                    product.init(8,0,3);
-                    product.fillPlaceholders();
+                    var coproduct = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_COPRODUCT,
+                        limLocType:     NARY_UndOvr
+                    };
+                    coproduct.init(props);
+                    coproduct.fillPlaceholders();
                     break;
                 case 56:
-                    var product = this.addMComponent(8);
-                    product.init(8,1,3);
-                    product.fillPlaceholders();
+                    var coproduct = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_COPRODUCT,
+                        limLocType:     NARY_SubSup
+                    };
+                    coproduct.init(props);
+                    coproduct.fillPlaceholders();
                     break;
                 case 57:
-                    var product = this.addMComponent(8);
-                    product.init(8,0,2);
-                    product.fillPlaceholders();
+                    var coproduct = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_COPRODUCT,
+                        limLocType:     NARY_UndOvr,
+                        subHide:        1
+                    };
+                    coproduct.init(props);
+                    coproduct.fillPlaceholders();
                     break;
                 case 58:
-                    var product = this.addMComponent(8);
-                    product.init(8,1,2);
-                    product.fillPlaceholders();
+                    var coproduct = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_COPRODUCT,
+                        limLocType:     NARY_SubSup,
+                        subHide:        1
+                    };
+                    coproduct.init(props);
+                    coproduct.fillPlaceholders();
                     break;
 
                 case 59:
-                    var union = this.addMComponent(8);
-                    union.init(9,0,0);
+                    var union = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_UNION,
+                        limLocType:     NARY_UndOvr,
+                        subHide:        1,
+                        supHide:        1
+                    };
+                    union.init(props);
                     union.fillPlaceholders();
                     break;
                 case 60:
-                    var union = this.addMComponent(8);
-                    union.init(9,0,3);
+                    var union = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_UNION,
+                        limLocType:     NARY_UndOvr
+                    };
+                    union.init(props);
                     union.fillPlaceholders();
                     break;
                 case 61:
-                    var union = this.addMComponent(8);
-                    union.init(9,1,3);
+                    var union = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_UNION,
+                        limLocType:     NARY_SubSup
+                    };
+                    union.init(props);
                     union.fillPlaceholders();
                     break;
                 case 62:
-                    var union = this.addMComponent(8);
-                    union.init(9,0,2);
+                    var union = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_UNION,
+                        limLocType:     NARY_UndOvr,
+                        subHide:        1
+                    };
+                    union.init(props);
                     union.fillPlaceholders();
                     break;
                 case 63:
-                    var union = this.addMComponent(8);
-                    union.init(9,1,2);
+                    var union = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_UNION,
+                        limLocType:     NARY_SubSup,
+                        subHide:        1
+                    };
+                    union.init(props);
                     union.fillPlaceholders();
                     break;
 
                 case 64:
-                    var union = this.addMComponent(8);
-                    union.init(10,0,0);
-                    union.fillPlaceholders();
+                    var intersection = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_INTERSECTION,
+                        limLocType:     NARY_UndOvr,
+                        subHide:        1,
+                        supHide:        1
+                    };
+                    intersection.init(props);
+                    intersection.fillPlaceholders();
                     break;
                 case 65:
-                    var union = this.addMComponent(8);
-                    union.init(10,0,3);
-                    union.fillPlaceholders();
+                    var intersection = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_INTERSECTION,
+                        limLocType:     NARY_UndOvr
+                    };
+                    intersection.init(props);
+                    intersection.fillPlaceholders();
                     break;
                 case 66:
-                    var union = this.addMComponent(8);
-                    union.init(10,1,3);
-                    union.fillPlaceholders();
+                    var intersection = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_INTERSECTION,
+                        limLocType:     NARY_SubSup
+                    };
+                    intersection.init(props);
+                    intersection.fillPlaceholders();
                     break;
                 case 67:
-                    var union = this.addMComponent(8);
-                    union.init(10,0,2);
-                    union.fillPlaceholders();
+                    var intersection = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_INTERSECTION,
+                        limLocType:     NARY_UndOvr,
+                        subHide:        1
+                    };
+                    intersection.init(props);
+                    intersection.fillPlaceholders();
                     break;
                 case 68:
-                    var union = this.addMComponent(8);
-                    union.init(10,1,2);
-                    union.fillPlaceholders();
+                    var intersection = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_INTERSECTION,
+                        limLocType:     NARY_SubSup,
+                        subHide:        1
+                    };
+                    intersection.init(props);
+                    intersection.fillPlaceholders();
                     break;
 
                 case 69:
-                    var logicalOr = this.addMComponent(8);
-                    logicalOr.init(11,0,0);
+                    var logicalOr = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_LOGICAL_OR,
+                        limLocType:     NARY_UndOvr,
+                        subHide:        1,
+                        supHide:        1
+                    };
+                    logicalOr.init(props);
                     logicalOr.fillPlaceholders();
                     break;
                 case 70:
-                    var logicalOr = this.addMComponent(8);
-                    logicalOr.init(11,0,3);
+                    var logicalOr = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_LOGICAL_OR,
+                        limLocType:     NARY_UndOvr
+                    };
+                    logicalOr.init(props);
                     logicalOr.fillPlaceholders();
                     break;
                 case 71:
-                    var logicalOr = this.addMComponent(8);
-                    logicalOr.init(11,1,3);
+                    var logicalOr = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_LOGICAL_OR,
+                        limLocType:     NARY_SubSup
+                    };
+                    logicalOr.init(props);
                     logicalOr.fillPlaceholders();
                     break;
                 case 72:
-                    var logicalOr = this.addMComponent(8);
-                    logicalOr.init(11,0,2);
+                    var logicalOr = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_LOGICAL_OR,
+                        limLocType:     NARY_UndOvr,
+                        subHide:        1
+                    };
+                    logicalOr.init(props);
                     logicalOr.fillPlaceholders();
                     break;
                 case 73:
-                    var logicalOr = this.addMComponent(8);
-                    logicalOr.init(11,1,2);
+                    var logicalOr = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_LOGICAL_OR,
+                        limLocType:     NARY_SubSup,
+                        subHide:        1
+                    };
+                    logicalOr.init(props);
                     logicalOr.fillPlaceholders();
                     break;
 
                 case 74:
-                    var logicalOr = this.addMComponent(8);
-                    logicalOr.init(12,0,0);
-                    logicalOr.fillPlaceholders();
+                    var logicalAnd = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_LOGICAL_AND,
+                        limLocType:     NARY_UndOvr,
+                        subHide:        1,
+                        supHide:        1
+                    };
+                    logicalAnd.init(props);
+                    logicalAnd.fillPlaceholders();
                     break;
                 case 75:
-                    var logicalOr = this.addMComponent(8);
-                    logicalOr.init(12,0,3);
-                    logicalOr.fillPlaceholders();
+                    var logicalAnd = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_LOGICAL_AND,
+                        limLocType:     NARY_UndOvr
+                    };
+                    logicalAnd.init(props);
+                    logicalAnd.fillPlaceholders();
                     break;
                 case 76:
-                    var logicalOr = this.addMComponent(8);
-                    logicalOr.init(12,1,3);
-                    logicalOr.fillPlaceholders();
+                    var logicalAnd = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_LOGICAL_AND,
+                        limLocType:     NARY_SubSup
+                    };
+                    logicalAnd.init(props);
+                    logicalAnd.fillPlaceholders();
                     break;
                 case 77:
-                    var logicalOr = this.addMComponent(8);
-                    logicalOr.init(12,0,2);
-                    logicalOr.fillPlaceholders();
+                    var logicalAnd = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_LOGICAL_AND,
+                        limLocType:     NARY_UndOvr,
+                        subHide:        1
+                    };
+                    logicalAnd.init(props);
+                    logicalAnd.fillPlaceholders();
                     break;
                 case 78:
-                    var logicalOr = this.addMComponent(8);
-                    logicalOr.init(12,1,2);
-                    logicalOr.fillPlaceholders();
+                    var logicalAnd = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_LOGICAL_AND,
+                        limLocType:     NARY_SubSup,
+                        subHide:        1
+                    };
+                    logicalAnd.init(props);
+                    logicalAnd.fillPlaceholders();
                     break;
 
                 case 79:
@@ -2774,8 +3101,14 @@ CMathContent.prototype =
                     break;
 
                 case 80:
-                    var sigma = this.addMComponent(8);
-                    sigma.init(6,0,3);
+                    var sigma = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_SIGMA,
+                        limLocType:     NARY_UndOvr
+                    };
+                    sigma.init(props);
+
                     var iterUp = sigma.getUpperIterator();
                     iterUp.addTxt("n");
                     var iterLow = sigma.getLowerIterator();
@@ -2784,16 +3117,20 @@ CMathContent.prototype =
                     base.fillPlaceholders();
                     break;
                 case 81:
-                    var product = this.addMComponent(8);
-                    product.init(7,0,3);
+                    var product = this.addMComponent(MATH_NARY);
+                    props =
+                    {
+                        signType:       NARY_PRODUCT,
+                        limLocType:     NARY_UndOvr
+                    };
+                    product.init(props);
                     var iterUp = product.getUpperIterator();
                     iterUp.addTxt("n");
                     var iterLow = product.getLowerIterator();
                     iterLow.addTxt("k=1");
                     var base = product.getBase();
-                    var degr = base.addMComponent(3);
-                    degr.init();
-                    degr.setIndex(-1);
+                    var degr = base.addMComponent(MATH_DEGREE);
+                    degr.init({type: SUBSCRIPT});
                     var baseDgr = degr.getBase();
                     baseDgr.addTxt("A");
                     var iter = degr.getIterator();
@@ -5949,3 +6286,5 @@ function CEmpty()
     this.setOwnTPrp = function() {};
 
 }
+
+

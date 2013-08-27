@@ -219,3 +219,22 @@ CBorderBox.prototype.getElement = function()
 {
     return this.elements[0][0];
 }
+
+
+function CBox()
+{
+    this.type = null;
+    CMathBase.call(this);
+}
+extend(CBox, CMathBase);
+CBox.prototype.init = function(props)
+{
+    this.type   = props.type;
+    this.bSpacing  = ( props.spacing === 1 || props.spacing === true ) ? true : false;
+    this.setDimension(1, 1);
+    this.setContent();
+}
+CBox.prototype.getElement = function()
+{
+    return this.elements[0][0];
+}

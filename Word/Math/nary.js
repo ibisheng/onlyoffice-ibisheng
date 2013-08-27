@@ -13,15 +13,118 @@
 
 function CNary()
 {
-
+    CSubMathBase.call(this);
 }
 extend(CNary, CSubMathBase);
 CNary.prototype.init = function(props)
 {
-    this.typeSign = props.sign;
-    this.limLoc = props.limLoc;
-    this.supHide = props.supHide;
-    this.subHide = props.subHide;
+    if(props.limLoc == "undOvr" || props.limLocType == NARY_UndOvr)
+        this.limLoc = 0;
+    else if(props.limLoc === "subSup"|| props.limLocType == NARY_SubSup)
+        this.limLoc = 1;
+    else
+        this.limLoc = 1;
+
+    this.supHide = (props.supHide === 1 || props.supHide === true) ? true : false;
+    this.subHide = (props.subHide === 1 || props.subHide === true) ? true : false;
+
+    this.setDimension(1, 2);
+
+    var sign = null;
+
+    if(props.sign == 0x222B || props.signType == NARY_INTEGRAL)
+        sign = new CIntegral();
+    else if(props.sign == 0x222C || props.signType == NARY_DOUBLE_INTEGRAL)
+        sign = new CDoubleIntegral();
+    else if(props.sign == 0x222D || props.signType == NARY_TRIPLE_INTEGRAL)
+        sign = new CTripleIntegral();
+    else if(props.sign == 0x222E || props.signType == NARY_CONTOUR_INTEGRAL )
+        sign = new CContourIntegral();
+    else if(props.sign == 0x222F || props.signType == NARY_SURFACE_INTEGRAL )
+        sign = new CSurfaceIntegral();
+    else if(props.sign == 0x2230 || props.signType == NARY_VOLUME_INTEGRAL)
+        sign = new CVolumeIntegral();
+    else if(props.sign ==0x2211 || props.signType == NARY_SIGMA)
+        sign = new CSigma();
+    else if(props.sign == 0x220F || props.signType == NARY_PRODUCT)
+        sign = new CProduct();
+    else if(props.sign ==0x2210 || props.signType == NARY_COPRODUCT)
+        sign = new CProduct(-1);
+    else if(props.sign == 0x22C3 || props.signType == NARY_UNION)
+        sign = new CUnion();
+    else if(props.sign == 0x22C2 || props.signType == NARY_INTERSECTION)
+        sign = new CUnion(-1);
+    else if(props.sign == 0x22C1 || props.signType == NARY_LOGICAL_OR)
+        sign  = new CLogicalOr();
+    else if(props.sign == 0x22C0 || props.signType == NARY_LOGICAL_AND)
+        sign  = new CLogicalOr(-1);
+    else
+        sign = new CIntegral();
+
+    var arg = new CMathContent(),
+        base;
+
+    if(this.limLoc === 0)
+    {
+        if(this.supHide && this.subHide)
+        {
+            base = sign;
+        }
+        else if( this.supHide && !this.subHide )
+        {
+            base = new CNaryUnd();
+            base.init(sign);
+        }
+        else if( !this.supHide && this.subHide )
+        {
+            base = new CNaryOvr();
+            base.init(sign);
+        }
+        else
+        {
+            base = new CNaryUndOvr();
+            base.init(sign);
+        }
+    }
+    else
+    {
+        if( this.supHide && !this.subHide )
+        {
+            base = new CDegree();
+            props = {type: SUPERSCRIPT};
+            base.init_2(props, sign);
+        }
+        else if( !this.supHide && this.subHide )
+        {
+            base = new CDegree();
+            props = {type: SUBSCRIPT};
+            base.init_2(props, sign);
+        }
+        else
+        {
+            base = new CDegreeSubSup();
+            props = {type: SubSup};
+            base.init_2(props, sign);
+        }
+    }
+
+    this.addMCToContent(base, arg);
+}
+CNary.prototype.setDistance = function()
+{
+    this.dW = this.getTxtPrp().FontSize/36*2.45;
+}
+CNary.prototype.getBase = function()
+{
+    return this.elements[0][1];
+}
+CNary.prototype.getUpperIterator = function()
+{
+    return this.elements[0][0].getUpperIterator();
+}
+CNary.prototype.getLowerIterator = function()
+{
+    return this.elements[0][0].getLowerIterator();
 }
 
 

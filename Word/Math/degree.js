@@ -7,14 +7,7 @@ function CDegree()
 extend(CDegree, CMathBase);
 CDegree.prototype.init = function(props)
 {
-    this.type = props.type;
-    this.setDimension(1, 2);
-
-    var oBase = new CMathContent();
-    var oDegree = new CMathContent();
-    oDegree.setReduct(DEGR_REDUCT);
-
-    this.addMCToContent(oBase, oDegree);
+    this.init_2( props, new CMathContent() );
 }
 CDegree.prototype.init_2 = function(props, oBase)
 {
@@ -42,12 +35,12 @@ CDegree.prototype.recalculateSize = function()
 
     _width += this.dW;
 
-    if(this.type === 1 )
+    if(this.type === SUPERSCRIPT )
     {
         this.shiftDegree = 0;
         _center = _height - (this.elements[0][0].size.height - this.elements[0][0].size.center);
     }
-    else if(this.type === -1 )
+    else if(this.type === SUBSCRIPT )
     {
         this.shiftDegree = _height - this.elements[0][1].size.height;
         _center = this.elements[0][0].size.center;
