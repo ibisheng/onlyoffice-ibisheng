@@ -27,6 +27,7 @@ function FileHandler()
         frame.style.width = "0px";
         frame.style.height = "0px";
         frame.style.border = "0px";
+		frame.style.display = "none";
     }
     var generateIFrameContent = function(file) 
     {
