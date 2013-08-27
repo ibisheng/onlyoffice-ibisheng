@@ -2218,6 +2218,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			
 			asc_endAddShape: function() {
 				this.isStartAddShape = false;
+				this.handlers.trigger("asc_onEndAddShape");
 			},
 			
 			asc_isAddAutoshape: function() {
