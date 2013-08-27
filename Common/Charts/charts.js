@@ -168,54 +168,54 @@ function ChartPreviewManager() {
 				case c_oAscChartType.line:
 					switch (chart.subType) {
 						case c_oAscChartSubType.normal:
-							chart.data.push( [createItem(2), createItem(1)] );
+							/*chart.data.push( [createItem(2), createItem(1)] );
 							chart.data.push( [createItem(3), createItem(2)] );
 							chart.data.push( [createItem(2), createItem(3)] );
-							chart.data.push( [createItem(3), createItem(2)] );
+							chart.data.push( [createItem(3), createItem(2)] );*/
 							
-							// var ser = new asc_CChartSeria();
-							// ser.Val.NumCache = [ createItem(2), createItem(3), createItem(2), createItem(3) ];
-							// ser.OutlineColor = uniColors[0];
-							// chart.series.push(ser);
+							var ser = new asc_CChartSeria();
+							ser.Val.NumCache = [ createItem(2), createItem(3), createItem(2), createItem(3) ];
+							ser.OutlineColor = uniColors[0];
+							chart.series.push(ser);
 							
-							// ser = new asc_CChartSeria();
-							// ser.Val.NumCache = [ createItem(1), createItem(2), createItem(3), createItem(2) ];
-							// ser.OutlineColor = uniColors[1];
-							// chart.series.push(ser);							
+							ser = new asc_CChartSeria();
+							ser.Val.NumCache = [ createItem(1), createItem(2), createItem(3), createItem(2) ];
+							ser.OutlineColor = uniColors[1];
+							chart.series.push(ser);							
 							
 							break;
 						case c_oAscChartSubType.stacked:
-							chart.data.push( [createItem(1), createItem(4)] );
+							/*chart.data.push( [createItem(1), createItem(4)] );
 							chart.data.push( [createItem(6), createItem(4)] );
 							chart.data.push( [createItem(2), createItem(4)] );
-							chart.data.push( [createItem(8), createItem(5)] );
+							chart.data.push( [createItem(8), createItem(5)] );*/
 							
-							// var ser = new asc_CChartSeria();
-							// ser.Val.NumCache = [ createItem(1), createItem(6), createItem(2), createItem(8) ];
-							// ser.OutlineColor = uniColors[0];
-							// chart.series.push(ser);
+							var ser = new asc_CChartSeria();
+							ser.Val.NumCache = [ createItem(1), createItem(6), createItem(2), createItem(8) ];
+							ser.OutlineColor = uniColors[0];
+							chart.series.push(ser);
 							
-							// ser = new asc_CChartSeria();
-							// ser.Val.NumCache = [ createItem(4), createItem(4), createItem(4), createItem(5) ];
-							// ser.OutlineColor = uniColors[1];
-							// chart.series.push(ser);				
+							ser = new asc_CChartSeria();
+							ser.Val.NumCache = [ createItem(4), createItem(4), createItem(4), createItem(5) ];
+							ser.OutlineColor = uniColors[1];
+							chart.series.push(ser);				
 							
 							break;
 						case c_oAscChartSubType.stackedPer:
-							chart.data.push( [createItem(2), createItem(2)] );
+							/*chart.data.push( [createItem(2), createItem(2)] );
 							chart.data.push( [createItem(4), createItem(2)] );
 							chart.data.push( [createItem(2), createItem(2)] );
-							chart.data.push( [createItem(4), createItem(2)] );
+							chart.data.push( [createItem(4), createItem(2)] );*/
 							
-							// var ser = new asc_CChartSeria();
-							// ser.Val.NumCache = [ createItem(2), createItem(4), createItem(2), createItem(4) ];
-							// ser.OutlineColor = uniColors[0];
-							// chart.series.push(ser);
+							var ser = new asc_CChartSeria();
+							ser.Val.NumCache = [ createItem(2), createItem(4), createItem(2), createItem(4) ];
+							ser.OutlineColor = uniColors[0];
+							chart.series.push(ser);
 							
-							// ser = new asc_CChartSeria();
-							// ser.Val.NumCache = [ createItem(2), createItem(2), createItem(2), createItem(2) ];
-							// ser.OutlineColor = uniColors[1];
-							// chart.series.push(ser);
+							ser = new asc_CChartSeria();
+							ser.Val.NumCache = [ createItem(2), createItem(2), createItem(2), createItem(2) ];
+							ser.OutlineColor = uniColors[1];
+							chart.series.push(ser);
 							
 							break;
 					}
@@ -228,61 +228,61 @@ function ChartPreviewManager() {
 					
 					switch (chart.subType) {
 						case c_oAscChartSubType.normal:
-							chart.data.push( [createItem(4), createItem(3), createItem(2), createItem(1)] );
+							//chart.data.push( [createItem(4), createItem(3), createItem(2), createItem(1)] );
 							
-							// var ser = new asc_CChartSeria();
-							// ser.Val.NumCache = [ createItem(4) ];
-							// ser.OutlineColor = uniColors[0];
-							// chart.series.push(ser);
+							var ser = new asc_CChartSeria();
+							ser.Val.NumCache = [ createItem(4) ];
+							ser.OutlineColor = uniColors[0];
+							chart.series.push(ser);
 							
-							// var ser = new asc_CChartSeria();
-							// ser.Val.NumCache = [ createItem(3) ];
-							// ser.OutlineColor = uniColors[1];
-							// chart.series.push(ser);
+							var ser = new asc_CChartSeria();
+							ser.Val.NumCache = [ createItem(3) ];
+							ser.OutlineColor = uniColors[1];
+							chart.series.push(ser);
 							
-							// var ser = new asc_CChartSeria();
-							// ser.Val.NumCache = [ createItem(2) ];
-							// ser.OutlineColor = uniColors[2];
-							// chart.series.push(ser);
+							var ser = new asc_CChartSeria();
+							ser.Val.NumCache = [ createItem(2) ];
+							ser.OutlineColor = uniColors[2];
+							chart.series.push(ser);
 							
-							// var ser = new asc_CChartSeria();
-							// ser.Val.NumCache = [ createItem(1) ];
-							// ser.OutlineColor = uniColors[3];
-							// chart.series.push(ser);
+							var ser = new asc_CChartSeria();
+							ser.Val.NumCache = [ createItem(1) ];
+							ser.OutlineColor = uniColors[3];
+							chart.series.push(ser);
 							
 							break;
 						case c_oAscChartSubType.stacked:
-							chart.data.push( [createItem(4), createItem(5)] );
+							/*chart.data.push( [createItem(4), createItem(5)] );
 							chart.data.push( [createItem(3), createItem(4)] );
 							chart.data.push( [createItem(2), createItem(3)] );
-							chart.data.push( [createItem(1), createItem(2)] );
+							chart.data.push( [createItem(1), createItem(2)] );*/
 							
-							// var ser = new asc_CChartSeria();
-							// ser.Val.NumCache = [ createItem(4), createItem(3), createItem(2), createItem(1) ];
-							// ser.OutlineColor = uniColors[0];
-							// chart.series.push(ser);
+							var ser = new asc_CChartSeria();
+							ser.Val.NumCache = [ createItem(4), createItem(3), createItem(2), createItem(1) ];
+							ser.OutlineColor = uniColors[0];
+							chart.series.push(ser);
 							
-							// ser = new asc_CChartSeria();
-							// ser.Val.NumCache = [ createItem(5), createItem(4), createItem(3), createItem(2) ];
-							// ser.OutlineColor = uniColors[1];
-							// chart.series.push(ser);
+							ser = new asc_CChartSeria();
+							ser.Val.NumCache = [ createItem(5), createItem(4), createItem(3), createItem(2) ];
+							ser.OutlineColor = uniColors[1];
+							chart.series.push(ser);
 							
 							break;
 						case c_oAscChartSubType.stackedPer:
-							chart.data.push( [createItem(7), createItem(7)] );
+							/*chart.data.push( [createItem(7), createItem(7)] );
 							chart.data.push( [createItem(5), createItem(6)] );
 							chart.data.push( [createItem(3), createItem(5)] );
-							chart.data.push( [createItem(1), createItem(4)] );
+							chart.data.push( [createItem(1), createItem(4)] );*/
 							
-							// var ser = new asc_CChartSeria();
-							// ser.Val.NumCache = [ createItem(7), createItem(5), createItem(3), createItem(1) ];
-							// ser.OutlineColor = uniColors[0];
-							// chart.series.push(ser);
+							var ser = new asc_CChartSeria();
+							ser.Val.NumCache = [ createItem(7), createItem(5), createItem(3), createItem(1) ];
+							ser.OutlineColor = uniColors[0];
+							chart.series.push(ser);
 							
-							// ser = new asc_CChartSeria();
-							// ser.Val.NumCache = [ createItem(7), createItem(6), createItem(5), createItem(4) ];
-							// ser.OutlineColor = uniColors[1];
-							// chart.series.push(ser);
+							ser = new asc_CChartSeria();
+							ser.Val.NumCache = [ createItem(7), createItem(6), createItem(5), createItem(4) ];
+							ser.OutlineColor = uniColors[1];
+							chart.series.push(ser);
 							
 							break;
 					}
@@ -291,61 +291,61 @@ function ChartPreviewManager() {
 				case c_oAscChartType.bar:
 					switch (chart.subType) {
 						case c_oAscChartSubType.normal:
-							chart.data.push( [createItem(1), createItem(2), createItem(3), createItem(4)] );
+							//chart.data.push( [createItem(1), createItem(2), createItem(3), createItem(4)] );
 							
-							// var ser = new asc_CChartSeria();
-							// ser.Val.NumCache = [ createItem(1) ];
-							// ser.OutlineColor = uniColors[0];
-							// chart.series.push(ser);
+							var ser = new asc_CChartSeria();
+							ser.Val.NumCache = [ createItem(1) ];
+							ser.OutlineColor = uniColors[0];
+							chart.series.push(ser);
 							
-							// var ser = new asc_CChartSeria();
-							// ser.Val.NumCache = [ createItem(2) ];
-							// ser.OutlineColor = uniColors[1];
-							// chart.series.push(ser);
+							var ser = new asc_CChartSeria();
+							ser.Val.NumCache = [ createItem(2) ];
+							ser.OutlineColor = uniColors[1];
+							chart.series.push(ser);
 							
-							// var ser = new asc_CChartSeria();
-							// ser.Val.NumCache = [ createItem(3) ];
-							// ser.OutlineColor = uniColors[2];
-							// chart.series.push(ser);
+							var ser = new asc_CChartSeria();
+							ser.Val.NumCache = [ createItem(3) ];
+							ser.OutlineColor = uniColors[2];
+							chart.series.push(ser);
 							
-							// var ser = new asc_CChartSeria();
-							// ser.Val.NumCache = [ createItem(4) ];
-							// ser.OutlineColor = uniColors[3];
-							// chart.series.push(ser);
+							var ser = new asc_CChartSeria();
+							ser.Val.NumCache = [ createItem(4) ];
+							ser.OutlineColor = uniColors[3];
+							chart.series.push(ser);
 							
 							break;
 						case c_oAscChartSubType.stacked:
-							chart.data.push( [createItem(1), createItem(2)] );
+							/*chart.data.push( [createItem(1), createItem(2)] );
 							chart.data.push( [createItem(2), createItem(3)] );
 							chart.data.push( [createItem(3), createItem(4)] );
-							chart.data.push( [createItem(4), createItem(5)] );
+							chart.data.push( [createItem(4), createItem(5)] );*/
 							
-							// var ser = new asc_CChartSeria();
-							// ser.Val.NumCache = [ createItem(1), createItem(2), createItem(3), createItem(4) ];
-							// ser.OutlineColor = uniColors[0];
-							// chart.series.push(ser);
+							var ser = new asc_CChartSeria();
+							ser.Val.NumCache = [ createItem(1), createItem(2), createItem(3), createItem(4) ];
+							ser.OutlineColor = uniColors[0];
+							chart.series.push(ser);
 							
-							// ser = new asc_CChartSeria();
-							// ser.Val.NumCache = [ createItem(2), createItem(3), createItem(4), createItem(5) ];
-							// ser.OutlineColor = uniColors[1];
-							// chart.series.push(ser);
+							ser = new asc_CChartSeria();
+							ser.Val.NumCache = [ createItem(2), createItem(3), createItem(4), createItem(5) ];
+							ser.OutlineColor = uniColors[1];
+							chart.series.push(ser);
 							
 							break;
 						case c_oAscChartSubType.stackedPer:
-							chart.data.push( [createItem(1), createItem(4)] );
+							/*chart.data.push( [createItem(1), createItem(4)] );
 							chart.data.push( [createItem(3), createItem(5)] );
 							chart.data.push( [createItem(5), createItem(6)] );
-							chart.data.push( [createItem(7), createItem(7)] );
+							chart.data.push( [createItem(7), createItem(7)] );*/
 							
-							// var ser = new asc_CChartSeria();
-							// ser.Val.NumCache = [ createItem(1), createItem(3), createItem(5), createItem(7) ];
-							// ser.OutlineColor = uniColors[0];
-							// chart.series.push(ser);
+							var ser = new asc_CChartSeria();
+							ser.Val.NumCache = [ createItem(1), createItem(3), createItem(5), createItem(7) ];
+							ser.OutlineColor = uniColors[0];
+							chart.series.push(ser);
 							
-							// ser = new asc_CChartSeria();
-							// ser.Val.NumCache = [ createItem(4), createItem(5), createItem(6), createItem(7) ];
-							// ser.OutlineColor = uniColors[1];
-							// chart.series.push(ser);
+							ser = new asc_CChartSeria();
+							ser.Val.NumCache = [ createItem(4), createItem(5), createItem(6), createItem(7) ];
+							ser.OutlineColor = uniColors[1];
+							chart.series.push(ser);
 							
 							break;
 					}
@@ -353,79 +353,79 @@ function ChartPreviewManager() {
 					break;
 			
 				case c_oAscChartType.pie:
-					chart.data.push( [createItem(3)] );
-					chart.data.push( [createItem(1)] );
+					/*chart.data.push( [createItem(3)] );
+					chart.data.push( [createItem(1)] );*/
 					
-					// var ser = new asc_CChartSeria();
-					// ser.Val.NumCache = [ createItem(3) ];
-					// ser.OutlineColor = uniColors[0];
-					// chart.series.push(ser);
+					var ser = new asc_CChartSeria();
+					ser.Val.NumCache = [ createItem(3) ];
+					ser.OutlineColor = uniColors[0];
+					chart.series.push(ser);
 					
-					// var ser = new asc_CChartSeria();
-					// ser.Val.NumCache = [ createItem(1) ];
-					// ser.OutlineColor = uniColors[1];
-					// chart.series.push(ser);
+					var ser = new asc_CChartSeria();
+					ser.Val.NumCache = [ createItem(1) ];
+					ser.OutlineColor = uniColors[1];
+					chart.series.push(ser);
 					
 					break;
 					
 				case c_oAscChartType.area:
 					switch (chart.subType) {
 						case c_oAscChartSubType.normal:
-							chart.data.push( [createItem(0), createItem(0)] );
+							/*chart.data.push( [createItem(0), createItem(0)] );
 							chart.data.push( [createItem(8), createItem(4)] );
 							chart.data.push( [createItem(5), createItem(2)] );
-							chart.data.push( [createItem(6), createItem(9)] );
+							chart.data.push( [createItem(6), createItem(9)] );*/
 							
-							// var ser = new asc_CChartSeria();
-							// ser.Val.NumCache = [ createItem(0), createItem(8), createItem(5), createItem(6) ];
-							// ser.OutlineColor = uniColors[0];
-							// chart.series.push(ser);
+							var ser = new asc_CChartSeria();
+							ser.Val.NumCache = [ createItem(0), createItem(8), createItem(5), createItem(6) ];
+							ser.OutlineColor = uniColors[0];
+							chart.series.push(ser);
 							
-							// ser = new asc_CChartSeria();
-							// ser.Val.NumCache = [ createItem(0), createItem(4), createItem(2), createItem(9) ];
-							// ser.OutlineColor = uniColors[1];
-							// chart.series.push(ser);
+							ser = new asc_CChartSeria();
+							ser.Val.NumCache = [ createItem(0), createItem(4), createItem(2), createItem(9) ];
+							ser.OutlineColor = uniColors[1];
+							chart.series.push(ser);
 							
 							break;
 						case c_oAscChartSubType.stacked:
-							chart.data.push( [createItem(0), createItem(4)] );
+							/*chart.data.push( [createItem(0), createItem(4)] );
 							chart.data.push( [createItem(8), createItem(4)] );
 							chart.data.push( [createItem(5), createItem(4)] );
-							chart.data.push( [createItem(11), createItem(4)] );
+							chart.data.push( [createItem(11), createItem(4)] );*/
 							
-							// var ser = new asc_CChartSeria();
-							// ser.Val.NumCache = [ createItem(0), createItem(8), createItem(5), createItem(11) ];
-							// ser.OutlineColor = uniColors[0];
-							// chart.series.push(ser);
+							var ser = new asc_CChartSeria();
+							ser.Val.NumCache = [ createItem(0), createItem(8), createItem(5), createItem(11) ];
+							ser.OutlineColor = uniColors[0];
+							chart.series.push(ser);
 							
-							// ser = new asc_CChartSeria();
-							// ser.Val.NumCache = [ createItem(4), createItem(4), createItem(4), createItem(4) ];
-							// ser.OutlineColor = uniColors[1];
-							// chart.series.push(ser);
+							ser = new asc_CChartSeria();
+							ser.Val.NumCache = [ createItem(4), createItem(4), createItem(4), createItem(4) ];
+							ser.OutlineColor = uniColors[1];
+							chart.series.push(ser);
 							
 							break;
 						case c_oAscChartSubType.stackedPer:
-							chart.data.push( [createItem(0), createItem(4)] );
+							/*chart.data.push( [createItem(0), createItem(4)] );
 							chart.data.push( [createItem(4), createItem(4)] );
 							chart.data.push( [createItem(1), createItem(4)] );
-							chart.data.push( [createItem(16), createItem(4)] );
+							chart.data.push( [createItem(16), createItem(4)] );*/
 							
-							// var ser = new asc_CChartSeria();
-							// ser.Val.NumCache = [ createItem(0), createItem(4), createItem(1), createItem(16) ];
-							// ser.OutlineColor = uniColors[0];
-							// chart.series.push(ser);
+							var ser = new asc_CChartSeria();
+							ser.Val.NumCache = [ createItem(0), createItem(4), createItem(1), createItem(16) ];
+							ser.OutlineColor = uniColors[0];
+							chart.series.push(ser);
 							
-							// ser = new asc_CChartSeria();
-							// ser.Val.NumCache = [ createItem(4), createItem(4), createItem(4), createItem(4) ];
-							// ser.OutlineColor = uniColors[1];
-							// chart.series.push(ser);
+							ser = new asc_CChartSeria();
+							ser.Val.NumCache = [ createItem(4), createItem(4), createItem(4), createItem(4) ];
+							ser.OutlineColor = uniColors[1];
+							chart.series.push(ser);
 							
 							break;
 					}
 					break;
 			
 				default:
-					for (var row = 0; row < maxRow; row++) {
+					/*for (var row = 0; row < maxRow; row++) {
 						var values = [];
 						for (var col = 0; col < maxCol; col++) {
 			
@@ -436,27 +436,27 @@ function ChartPreviewManager() {
 							values.push(item);
 						}
 						chart.data.push(values);
-					}
+					}*/
 					
-					// var ser = new asc_CChartSeria();
-					// ser.Val.NumCache = [ createItem(1), createItem(5) ];
-					// ser.OutlineColor = uniColors[0];
-					// chart.series.push(ser);
+					var ser = new asc_CChartSeria();
+					ser.Val.NumCache = [ createItem(1), createItem(5) ];
+					ser.OutlineColor = uniColors[0];
+					chart.series.push(ser);
 					
-					// ser = new asc_CChartSeria();
-					// ser.Val.NumCache = [ createItem(2), createItem(6) ];
-					// ser.OutlineColor = uniColors[1];
-					// chart.series.push(ser);
+					ser = new asc_CChartSeria();
+					ser.Val.NumCache = [ createItem(2), createItem(6) ];
+					ser.OutlineColor = uniColors[1];
+					chart.series.push(ser);
 					
-					// ser = new asc_CChartSeria();
-					// ser.Val.NumCache = [ createItem(3), createItem(7) ];
-					// ser.OutlineColor = uniColors[2];
-					// chart.series.push(ser);
+					ser = new asc_CChartSeria();
+					ser.Val.NumCache = [ createItem(3), createItem(7) ];
+					ser.OutlineColor = uniColors[2];
+					chart.series.push(ser);
 					
-					// ser = new asc_CChartSeria();
-					// ser.Val.NumCache = [ createItem(4), createItem(8) ];
-					// ser.OutlineColor = uniColors[3];
-					// chart.series.push(ser);
+					ser = new asc_CChartSeria();
+					ser.Val.NumCache = [ createItem(4), createItem(8) ];
+					ser.OutlineColor = uniColors[3];
+					chart.series.push(ser);
 					
 					break;
 			}	
@@ -977,7 +977,209 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 	
 	arrBaseColors = styleManager.getBaseColors( parseInt(chart.styleId) );
 	var arrFormatAdobeLabels = [];
-	if(chart.series && chart.series.length !=0 && api_sheet)
+	
+	if(chart.series && chart.series.length != 0 /*&& !chart.range.intervalObject*/)//берём данные из NumCache
+	{
+		isSeries = true;
+		var series = chart.series;
+		var arrValues = [];
+		var max = 0;
+		var min = 0; 
+		var minY = 0;
+		var maxY = 0;
+		var isSkip = [];
+		var skipSeries = [];
+		
+		var isEn = false;
+		var isEnY = false;
+		
+		if (chart.type == 'Scatter' && series[0].xVal.Formula != null)//в случае точечной диаграммы отдельная обработка
+		{
+			var isEnY = false
+			for(l = 0; l < series.length; ++l)
+			{
+				var n = 0;
+				arrValues[l] = [];
+				arrFormatAdobeLabels[l] = [];
+				
+				var firstCol = 0;
+				var firstRow = 0;
+				var lastCol = series[l].Val.NumCache.length;
+				var lastRow = series[l].Val.NumCache.length;
+				
+				var xfirstCol = 0;
+				var xfirstRow = 0;
+				var xlastCol = series[l].xVal.NumCache.length;
+				var xlastRow = series[l].xVal.NumCache.length;
+				
+				var isRow = false;
+				if(xfirstCol == xlastCol)
+					isRow  = true;
+				
+	
+				var row = xfirstRow;
+				for(col = xfirstCol; col <= xlastCol; ++col)
+				{
+					arrValues[l][n] = [];
+					arrFormatAdobeLabels[l][n] = [];
+					var cell = series[l].xVal.NumCache[col];
+					var cellY = series[l].Val.NumCache[col + n];
+					//var cell = ws.getCell(new CellAddress(row - 1, col - 1, 0));
+					//var cellY = ws.getCell(new CellAddress(firstRow - 1, firstCol + n - 1, 0));
+					
+					if(row == xfirstRow && col == xfirstCol && chart.subType != 'stackedPer' && chart.type != 'Stock')
+					{
+						formatCell = cell.numFormatStr;
+						isDateTimeFormat = cell.isDateTimeFormat;
+					}
+					
+					if(row == firstRow && col == firstCol - 1 && chart.subType != 'stackedPer' && chart.range.rows && chart.type != 'Stock')
+						formatCellScOy = cell.numFormatStr;
+					else if(row == firstRow - 1 && col == firstCol && chart.subType != 'stackedPer' && !chart.range.rows && chart.type != 'Stock')
+						formatCellScOy = cell.numFormatStr;
+					
+					var orValue = cell.value;
+					var orValueY = cellY.value;
+					
+					var value =  parseFloat(orValue);
+					var valueY = parseFloat(orValueY);
+					
+					if(orValue == '')
+						arrValues[l][n][0] = value;
+					else if (isNaN(value))
+						arrValues[l][n][0] = 0;
+					else
+						arrValues[l][n][0] = value;
+					
+					if(orValueY == '')
+						arrValues[l][n][1] = orValueY;
+					else if (isNaN(valueY))
+						arrValues[l][n][1] = 0;
+					else
+						arrValues[l][n][1] = valueY;
+					
+					arrFormatAdobeLabels[l][n][0] = cell.numFormatStr;
+					arrFormatAdobeLabels[l][n][1] = cellY.numFormatStr;
+					
+					if(value.toString() != '' && !isEn)
+					{
+						min = value;
+						max = value;
+						isEn = true;
+					}
+					if(valueY.toString() != '' && !isEnY)
+					{
+						minY = valueY;
+						maxY = valueY;
+						isEnY = true;
+					}
+					
+					if(min > value && value != '')
+						min =  value
+					if(max < value && value != '')
+						max = value
+					if(minY > valueY && valueY != '')
+						minY =  valueY
+					if(maxY < valueY && valueY != '')
+						maxY = valueY
+					
+					n++;
+				}
+			}
+			
+			if(minY && maxY)
+			{
+				chart.ymin = minY;
+				chart.ymax = maxY;
+			}
+			var newArr = arrValues;
+		}
+		else//для всех остальных диаграмм при условии что данные приходят в виде серий
+		{
+			var numSeries = 0;
+			for(l = 0; l < series.length; ++l)
+			{
+				var firstCol = 0;
+				var firstRow = 0;
+				var lastCol = series[l].Val.NumCache.length;
+				skipSeries[l] = true;
+				var isRow = false;
+				if(firstCol == lastCol)
+					isRow  = true;
+			
+				if(series[l].isHidden == true)
+				{
+					continue;
+				}
+			
+				skipSeries[l] = false;
+				arrValues[numSeries] = [];
+				arrFormatAdobeLabels[numSeries] = [];
+				isSkip[numSeries] = true;
+		
+				var row = firstRow;
+				var n = 0;
+				for(col = firstCol; col < lastCol; ++col)
+				{
+					if(series[l].Val.NumCache[col].isHidden == true)
+					{
+						continue;
+					}
+					
+					//var cell = ws.getCell(new CellAddress(row - 1, col - 1, 0));
+					var cell = series[l].Val.NumCache[col];
+					
+					if(numSeries == 0 && col == firstCol && chart.subType != 'stackedPer' && chart.type != 'Stock')
+					{
+						formatCell = cell.numFormatStr;
+						isDateTimeFormat = cell.isDateTimeFormat;
+					}
+					else if(chart.type == 'Stock' && numSeries == 0 && col == firstCol)
+					{
+						formatCellScOy = cell.numFormatStr;
+						isDateTimeFormat = cell.isDateTimeFormat;
+					}
+					
+					if(chart.type == 'Scatter')
+					{
+						if(numSeries == 1 && col == firstCol && chart.subType != 'stackedPer' && chart.type != 'Stock')
+							formatCellScOy = cell.numFormatStr;
+					}
+					
+					formatAdobeLabel = cell.numFormatStr;
+					
+					var orValue = cell.value;
+					if('' != orValue)
+						isSkip[numSeries] = false;
+					var value =  parseFloat(orValue)
+					if(!isEn && !isNaN(value))
+					{
+						min = value;
+						max = value;
+						isEn = true;
+					}
+					if(!isNaN(value) && value > max)
+						max = value
+					if(!isNaN(value) && value < min)
+						min = value
+					if(isNaN(value) && orValue == '' && (((chart.type == 'Line' ) && chart.subType == 'normal') || (chart.type == 'Scatter' )))
+					{
+						value = '';
+					}
+					else if (isNaN(value))
+						value = 0;
+					if(chart.type == 'Pie')
+						arrValues[numSeries][n] = Math.abs(value);
+					else
+						arrValues[numSeries][n] = value;
+					arrFormatAdobeLabels[numSeries][n] = formatAdobeLabel;
+					n++;
+				}
+				numSeries++;
+			}
+		}
+	}
+	else if(chart.series && chart.series.length !=0 && api_sheet)
 	{
 		isSeries = true;
 		var series = chart.series;
@@ -1783,7 +1985,7 @@ function drawChart(chart, arrValues, width, height) {
 	var theme;
 	var colorMap;
 	var RGBA;
-	if(api_sheet && chart.worksheet)
+	if(api_sheet)
 	{
 		var wb = api_sheet.wbModel;
 		theme = wb.theme;
