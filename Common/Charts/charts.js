@@ -968,6 +968,7 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 	var isSeries = false;
 	var formatCell = 'General';
 	var formatCellScOy = 'General';
+	var defaultFormat = 'General';
 	
 	var api_doc = window["editor"];
 	var api_sheet = window["Asc"]["editor"];
@@ -1029,14 +1030,14 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 					
 					if(row == xfirstRow && col == xfirstCol && chart.subType != 'stackedPer' && chart.type != 'Stock')
 					{
-						formatCell = cell.numFormatStr;
+						formatCell = cell.numFormatStr ? cell.numFormatStr : defaultFormat;
 						isDateTimeFormat = cell.isDateTimeFormat;
 					}
 					
 					if(row == firstRow && col == firstCol - 1 && chart.subType != 'stackedPer' && chart.range.rows && chart.type != 'Stock')
-						formatCellScOy = cell.numFormatStr;
+						formatCellScOy = cell.numFormatStr ? cell.numFormatStr : defaultFormat;
 					else if(row == firstRow - 1 && col == firstCol && chart.subType != 'stackedPer' && !chart.range.rows && chart.type != 'Stock')
-						formatCellScOy = cell.numFormatStr;
+						formatCellScOy = cell.numFormatStr ? cell.numFormatStr : defaultFormat;
 					
 					var orValue = cell.value;
 					var orValueY = cellY.value;
@@ -1131,19 +1132,19 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 					
 					if(numSeries == 0 && col == firstCol && chart.subType != 'stackedPer' && chart.type != 'Stock')
 					{
-						formatCell = cell.numFormatStr;
+						formatCell = cell.numFormatStr ? cell.numFormatStr : defaultFormat;
 						isDateTimeFormat = cell.isDateTimeFormat;
 					}
 					else if(chart.type == 'Stock' && numSeries == 0 && col == firstCol)
 					{
-						formatCellScOy = cell.numFormatStr;
+						formatCellScOy = cell.numFormatStr ? cell.numFormatStr : defaultFormat;
 						isDateTimeFormat = cell.isDateTimeFormat;
 					}
 					
 					if(chart.type == 'Scatter')
 					{
 						if(numSeries == 1 && col == firstCol && chart.subType != 'stackedPer' && chart.type != 'Stock')
-							formatCellScOy = cell.numFormatStr;
+							formatCellScOy = cell.numFormatStr ? cell.numFormatStr : defaultFormat;
 					}
 					
 					formatAdobeLabel = cell.numFormatStr;
