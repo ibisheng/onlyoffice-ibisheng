@@ -2622,6 +2622,7 @@ PasteProcessor.prototype =
     },
     _Prepeare : function(node, fCallback)
     {
+		var oThis = this;
         if(true == this.bUploadImage || true == this.bUploadFonts)
         {
             //����������� �� ��������� �������� ������ ������� � ��������.
@@ -2654,35 +2655,26 @@ PasteProcessor.prototype =
 				else if(false == (0 == src.indexOf("data:") ||  0 == src.indexOf(documentOrigin + this.api.DocumentUrl) && 0 == src.indexOf(this.api.DocumentUrl)))
 					aImagesToDownload.push(src);
 			}
-			var oThis = this;
-			var nCurIndex = 0;
-			var fDownloadImages = function(){
-				if(nCurIndex < aImagesToDownload.length)
-				{
-					var src = aImagesToDownload[nCurIndex];
-					var rData = {"id":documentId, "c":"imgurl", "data": src};
-					sendCommand( oThis.api, function(incomeObject){
-						if(null != incomeObject && "imgurl" ==incomeObject.type)
-							oThis.oImages[src] = incomeObject.data;
-						else
-							oThis.oImages[src] = "error";
-						nCurIndex++;
-						fDownloadImages();
-						}, JSON.stringify(rData) );
-				}
-				else
-				{
-					var oPrepeareImages = new Object();
-					var nImagesCount = 0;
-					for(image in oThis.oImages)
-					{
-						oPrepeareImages[nImagesCount] = oThis.oImages[image];
-						nImagesCount++;
-					}
-					oThis.api.pre_Paste(aPrepeareFonts, oPrepeareImages, fCallback);
-				}
-			};
-			fDownloadImages();
+			var oPrepeareImages = new Object();
+			if(aImagesToDownload.length > 0)
+			{
+				var rData = {"id":documentId, "c":"imgurls", "data": JSON.stringify(aImagesToDownload)};
+				sendCommand( this.api, function(incomeObject){
+						if(incomeObject && "imgurls" == incomeObject.type)
+						{
+							var aImages = JSON.parse(incomeObject.data);
+							for(var i = 0, length1 = aImages.length, length2 = aImagesToDownload.length; i < length1 && i < length2; ++i)
+							{
+								var sNewSrc = aImages[i];
+								oThis.oImages[aImagesToDownload[i]] = sNewSrc
+								oPrepeareImages[i] = sNewSrc;
+							}
+						}
+						oThis.api.pre_Paste(aPrepeareFonts, oPrepeareImages, fCallback);
+					}, JSON.stringify(rData) );
+			}
+			else
+				this.api.pre_Paste(aPrepeareFonts, oPrepeareImages, fCallback);
         }
         else
             fCallback();

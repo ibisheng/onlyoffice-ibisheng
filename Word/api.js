@@ -6621,10 +6621,6 @@ function sendCommand(editor, fCallback, rdata){
 					var outputData = JSON.parse(incomeObject.data);
                     _downloadAs(editor, outputData.format, fCallback, false, outputData.savekey);
                 break;
-				case "imgurl":
-					if(fCallback)
-                        fCallback(incomeObject);
-                break;
 				case "getsettings":
 					if(fCallback)
                         fCallback(incomeObject);
@@ -6634,6 +6630,10 @@ function sendCommand(editor, fCallback, rdata){
 					if(fCallback)
 						fCallback(incomeObject);
                 break;
+				default:
+					if(fCallback)
+                        fCallback(incomeObject);
+				break;
             }
 		}
 	})
