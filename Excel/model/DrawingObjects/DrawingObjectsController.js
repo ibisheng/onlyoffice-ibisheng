@@ -1784,7 +1784,7 @@ function CorrectUniFillEx(asc_fill, unifill) {
                 if (c_oAscFillGradType.GRAD_LINEAR == _grad_type)
                 {
                     var _angle = _fill.asc_getLinearAngle();
-                    var _scale = _fill.getLinearScale();
+                    var _scale = _fill.asc_getLinearScale();
 
                     if (!ret.fill.lin)
                         ret.fill.lin = new GradLin();
