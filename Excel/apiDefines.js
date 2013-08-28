@@ -385,7 +385,12 @@ var c_oAscTypeSelectElement = {
 	Header     : 3,
     Hyperlink  : 4,
     SpellCheck : 5
-}
+};
+
+var c_oAscFillGradType  = {
+    GRAD_LINEAR : 1,
+    GRAD_PATH   : 2
+};
  
 var c_oAscCoAuthoringMeBorderColor					= "rgba(22,156,0,1)";
 var c_oAscCoAuthoringOtherBorderColor				= "rgba(238,53,37,1)";
