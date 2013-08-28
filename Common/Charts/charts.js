@@ -994,7 +994,7 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 		var isEn = false;
 		var isEnY = false;
 		
-		if (chart.type == 'Scatter' && series[0].xVal.Formula != null)//в случае точечной диаграммы отдельная обработка
+		if (chart.type == 'Scatter' && series[0].xVal.Formula != null && isEn)//в случае точечной диаграммы отдельная обработка
 		{
 			var isEnY = false
 			for(l = 0; l < series.length; ++l)
@@ -1023,8 +1023,8 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 				{
 					arrValues[l][n] = [];
 					arrFormatAdobeLabels[l][n] = [];
-					var cell = series[l].xVal.NumCache[col];
-					var cellY = series[l].Val.NumCache[col + n];
+					var cell = series[l].xVal.NumCache[n];
+					var cellY = series[l].Val.NumCache[n];
 					//var cell = ws.getCell(new CellAddress(row - 1, col - 1, 0));
 					//var cellY = ws.getCell(new CellAddress(firstRow - 1, firstCol + n - 1, 0));
 					
@@ -1098,12 +1098,19 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 		else//для всех остальных диаграмм при условии что данные приходят в виде серий
 		{
 			var numSeries = 0;
+			var curSeria;	
 			for(l = 0; l < series.length; ++l)
 			{
 				var firstCol = 0;
 				var firstRow = 0;
-				var lastCol = series[l].Val.NumCache.length;
-				skipSeries[l] = true;
+				if(series[0].xVal.Formula != null && numSeries == 0)
+				{
+					curSeria = series[numSeries].xVal.NumCache;
+				}
+				else
+					curSeria = series[l].Val.NumCache;
+				var lastCol = curSeria.length;
+				skipSeries[numSeries] = true;
 				var isRow = false;
 				if(firstCol == lastCol)
 					isRow  = true;
@@ -1112,8 +1119,9 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 				{
 					continue;
 				}
-			
-				skipSeries[l] = false;
+				if(series[0].xVal.Formula != null && numSeries == 0)
+					l--;
+				skipSeries[numSeries] = false;
 				arrValues[numSeries] = [];
 				arrFormatAdobeLabels[numSeries] = [];
 				isSkip[numSeries] = true;
@@ -1122,13 +1130,13 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 				var n = 0;
 				for(col = firstCol; col < lastCol; ++col)
 				{
-					if(series[l].Val.NumCache[col].isHidden == true)
+					if(curSeria[col].isHidden == true)
 					{
 						continue;
 					}
 					
 					//var cell = ws.getCell(new CellAddress(row - 1, col - 1, 0));
-					var cell = series[l].Val.NumCache[col];
+					var cell = curSeria[col];
 					
 					if(numSeries == 0 && col == firstCol && chart.subType != 'stackedPer' && chart.type != 'Stock')
 					{
@@ -1150,6 +1158,8 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 					formatAdobeLabel = cell.numFormatStr;
 					
 					var orValue = cell.val;
+					if(series[0].xVal.Formula != null && numSeries == 0 && isNaN(orValue))
+						orValue = col - firstCol + 1;
 					if('' != orValue)
 						isSkip[numSeries] = false;
 					var value =  parseFloat(orValue)
