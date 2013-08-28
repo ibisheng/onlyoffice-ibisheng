@@ -95,8 +95,6 @@
                 "../PowerPoint/Editor/Drawing/GraphicFigure.js",
                 "../PowerPoint/Editor/Drawing/Clone.js",
                 "../PowerPoint/Editor/Drawing/CImage.js",
-                "../PowerPoint/Editor/Drawing/StatesAutoShapes.js",
-                "../PowerPoint/Editor/Drawing/AutoShapesContainer.js",
                 "../PowerPoint/Editor/Drawing/Spline.js",
                 "../PowerPoint/Editor/Drawing/PolyLine.js",
                 "../PowerPoint/Editor/Drawing/PolyLine2.js",
