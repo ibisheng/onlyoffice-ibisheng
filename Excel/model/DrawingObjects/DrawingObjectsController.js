@@ -1496,6 +1496,81 @@ prot["asc_getTextureId"] = prot.asc_getTextureId;
 prot["asc_putTextureId"] = prot.asc_putTextureId;
 //}
 
+function asc_CFillHatch() {
+    this.PatternType = undefined;
+    this.fgClr = undefined;
+    this.bgClr = undefined;
+}
+
+asc_CFillHatch.prototype = {
+	asc_getPatternType: function(){return this.PatternType;},
+	asc_putPatternType: function(v){this.PatternType = v;},
+	asc_getColorFg: function(){return this.fgClr;},
+	asc_putColorFg: function(v){this.fgClr = v;},
+	asc_getColorBg: function(){return this.bgClr;},
+	asc_putColorBg: function(v){this.bgClr = v;}
+}
+
+//{ asc_CFillHatch export
+window["Asc"].asc_CFillHatch = asc_CFillHatch;
+window["Asc"]["asc_CFillHatch"] = asc_CFillHatch;
+prot = asc_CFillHatch.prototype;
+
+prot["asc_getPatternType"] = prot.asc_getPatternType;
+prot["asc_putPatternType"] = prot.asc_putPatternType;
+
+prot["asc_getColorFg"] = prot.asc_getColorFg;
+prot["asc_putColorFg"] = prot.asc_putColorFg;
+
+prot["asc_getColorBg"] = prot.asc_getColorBg;
+prot["asc_putColorBg"] = prot.asc_putColorBg;
+//}
+
+function asc_CFillGrad() {
+    this.Colors = undefined;
+    this.Positions = undefined;
+    this.GradType = 0;
+
+    this.LinearAngle = 0;
+    this.LinearScale = true;
+
+    this.PathType = 0;
+}
+
+asc_CFillGrad.prototype = {
+	asc_getColors: function(){return this.Colors;},
+	asc_putColors: function(v){this.Colors = v;},
+	asc_getPositions: function(){return this.Positions;},
+	asc_putPositions: function(v){this.Positions = v;},
+	asc_getGradType: function(){return this.GradType;},
+	asc_putGradType: function(v){this.GradType = v;},
+	asc_getLinearAngle: function(){return this.LinearAngle;},
+	asc_putLinearAngle: function(v){this.LinearAngle = v;},
+	asc_getLinearScale: function(){return this.LinearScale;},
+	asc_putLinearScale: function(v){this.LinearScale = v;},
+	asc_getPathType: function(){return this.PathType;},
+	asc_putPathType: function(v){this.PathType = v;}
+}
+
+//{ asc_CFillGrad export
+window["Asc"].asc_CFillGrad = asc_CFillGrad;
+window["Asc"]["asc_CFillGrad"] = asc_CFillGrad;
+prot = asc_CFillGrad.prototype;
+
+prot["asc_getColors"] = prot.asc_getColors;
+prot["asc_putColors"] = prot.asc_putColors;
+prot["asc_getPositions"] = prot.asc_getPositions;
+prot["asc_putPositions"] = prot.asc_putPositions;
+prot["asc_getGradType"] = prot.asc_getGradType;
+prot["asc_putGradType"] = prot.asc_putGradType;
+prot["asc_getLinearAngle"] = prot.asc_getLinearAngle;
+prot["asc_putLinearAngle"] = prot.asc_putLinearAngle;
+prot["asc_getLinearScale"] = prot.asc_getLinearScale;
+prot["asc_putLinearScale"] = prot.asc_putLinearScale;
+prot["asc_getPathType"] = prot.asc_getPathType;
+prot["asc_putPathType"] = prot.asc_putPathType;
+//}
+
 function asc_CFillSolid() {
     this.color = new CAscColor();
 }
@@ -1532,18 +1607,42 @@ function CreateAscFillEx(unifill) {
         }
         case FILL_TYPE_PATT:
         {
-            ret.type = c_oAscFill.FILL_TYPE_SOLID;
-            ret.fill = new asc_CFillSolid();
-            ret.fill.color = CreateAscColorEx(_fill.fgClr);
+            ret.type = c_oAscFill.FILL_TYPE_PATT;
+            ret.fill = new asc_CFillHatch();
+            ret.fill.PatternType = _fill.ftype;
+            ret.fill.fgClr = CreateAscColorEx(_fill.fgClr);
+            ret.fill.bgClr = CreateAscColorEx(_fill.bgClr);
             break;
         }
         case FILL_TYPE_GRAD:
         {
-            ret.type = c_oAscFill.FILL_TYPE_SOLID;
-            ret.fill = new asc_CFillSolid();
+            ret.type = c_oAscFill.FILL_TYPE_GRAD;
+            ret.fill = new asc_CFillGrad();
 
-            if (_fill.colors.length > 0)
-                ret.fill.color = CreateAscColorEx(_fill.colors[0].color);
+            for (var i = 0; i < _fill.colors.length; i++)
+            {
+                if (0 == i)
+                {
+                    ret.fill.Colors = new Array();
+                    ret.fill.Positions = new Array();
+                }
+
+                ret.fill.Colors.push(CreateAscColorEx(_fill.colors[i].color));
+                ret.fill.Positions.push(_fill.colors[i].pos);
+            }
+
+            if (_fill.lin)
+            {
+                ret.fill.GradType = c_oAscFillGradType.GRAD_LINEAR;
+                ret.fill.LinearAngle = _fill.lin.angle;
+                ret.fill.LinearScale = _fill.lin.scale;
+            }
+            else
+            {
+                ret.fill.GradType = c_oAscFillGradType.GRAD_PATH;
+                ret.fill.PathType = 0;
+            }
+
             break;
         }
         case FILL_TYPE_BLIP:
@@ -1564,7 +1663,8 @@ function CreateAscFillEx(unifill) {
 }
 
 function CorrectUniFillEx(asc_fill, unifill) {
-    if (null == asc_fill)
+    
+	if (null == asc_fill)
         return unifill;
 
     var ret = unifill;
@@ -1580,14 +1680,14 @@ function CorrectUniFillEx(asc_fill, unifill) {
         {
             case c_oAscFill.FILL_TYPE_NOFILL:
             {
-                ret.setFill( new CNoFill());
+                ret.fill = new CNoFill();
                 break;
             }
             case c_oAscFill.FILL_TYPE_BLIP:
             {
                 if (ret.fill == null || ret.fill.type != FILL_TYPE_BLIP)
                 {
-                    ret.setFill(new CBlipFill());
+                    ret.fill = new CBlipFill();
                 }
 
                 var _url = _fill.asc_getUrl();
@@ -1598,10 +1698,10 @@ function CorrectUniFillEx(asc_fill, unifill) {
                 }
 
                 if (_url != null && _url !== undefined && _url != "")
-                    ret.fill.setRasterImageId(_url);
+                    ret.fill.RasterImageId = _url;
 
                 if (ret.fill.RasterImageId == null)
-                    ret.fill.setRasterImageId("");
+                    ret.fill.RasterImageId = "";
 
                 var tile = _fill.asc_getType();
                 if (tile == c_oAscFillBlipType.STRETCH)
@@ -1611,20 +1711,110 @@ function CorrectUniFillEx(asc_fill, unifill) {
 
                 break;
             }
+            case c_oAscFill.FILL_TYPE_PATT:
+            {
+                if (ret.fill == null || ret.fill.type != FILL_TYPE_PATT)
+                {
+                    ret.fill = new CPattFill();
+                }
+
+                if (undefined != _fill.PatternType)
+                {
+                    ret.fill.ftype = _fill.PatternType;
+                }
+                if (undefined != _fill.fgClr)
+                {
+                    ret.fill.fgClr = CorrectUniColorEx(_fill.asc_getColorFg(), ret.fill.fgClr);
+                }
+                if (undefined != _fill.bgClr)
+                {
+                    ret.fill.bgClr = CorrectUniColorEx(_fill.asc_getColorBg(), ret.fill.bgClr);
+                }
+
+                break;
+            }
+            case c_oAscFill.FILL_TYPE_GRAD:
+            {
+                if (ret.fill == null || ret.fill.type != FILL_TYPE_GRAD)
+                {
+                    ret.fill = new CGradFill();
+                }
+
+                var _colors     = _fill.asc_getColors();
+                var _positions  = _fill.asc_getPositions();
+                if (undefined != _colors && undefined != _positions)
+                {
+                    if (_colors.length == _positions.length)
+                    {
+                        ret.fill.colors.splice(0, ret.fill.colors.length);
+
+                        for (var i = 0; i < _colors.length; i++)
+                        {
+                            var _gs = new CGs();
+                            _gs.color = CorrectUniColorEx(_colors[i], _gs.color);
+                            _gs.pos = _positions[i];
+
+                            ret.fill.colors.push(_gs);
+                        }
+                    }
+                }
+                else if (undefined != _colors)
+                {
+                    if (_colors.length == ret.fill.colors.length)
+                    {
+                        for (var i = 0; i < _colors.length; i++)
+                        {
+                            ret.fill.colors[i].color = CorrectUniColorEx(_colors[i], ret.fill.colors[i].color);
+                        }
+                    }
+                }
+                else if (undefined != _positions)
+                {
+                    if (_positions.length == ret.fill.colors.length)
+                    {
+                        for (var i = 0; i < _positions.length; i++)
+                        {
+                            ret.fill.colors[i].pos = _positions[i];
+                        }
+                    }
+                }
+
+                var _grad_type = _fill.asc_getGradType();
+
+                if (c_oAscFillGradType.GRAD_LINEAR == _grad_type)
+                {
+                    var _angle = _fill.asc_getLinearAngle();
+                    var _scale = _fill.getLinearScale();
+
+                    if (!ret.fill.lin)
+                        ret.fill.lin = new GradLin();
+
+                    if (undefined != _angle)
+                        ret.fill.lin.angle = _angle;
+                    if (undefined != _scale)
+                        ret.fill.lin.scale = _scale;
+                }
+                else if (c_oAscFillGradType.GRAD_PATH == _grad_type)
+                {
+                    ret.fill.lin = null;
+                    ret.fill.path = new GradPath();
+                }
+                break;
+            }
             default:
             {
                 if (ret.fill == null || ret.fill.type != FILL_TYPE_SOLID)
                 {
-                    ret.setFill(new CSolidFill());
+                    ret.fill = new CSolidFill();
                 }
-                ret.fill.setColor(CorrectUniColorEx(_fill.asc_getColor(), ret.fill.color));
+                ret.fill.color = CorrectUniColorEx(_fill.asc_getColor(), ret.fill.color);
             }
         }
     }
 
     var _alpha = asc_fill.asc_getTransparent();
     if (null != _alpha)
-        ret.setTransparent(_alpha);
+        ret.transparent = _alpha;
 
     return ret;
 }

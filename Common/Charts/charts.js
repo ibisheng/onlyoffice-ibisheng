@@ -161,6 +161,7 @@ function ChartPreviewManager() {
 			
 			// Set data
 			chart.data = [];
+			chart.series = [];
 			var uniColors = chart.generateUniColors(4);
 			
 			switch (chart.type) {
