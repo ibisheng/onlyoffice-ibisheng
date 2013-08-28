@@ -29,6 +29,7 @@
                 "../Common/FontsFreeType/FontFile.js",
                 "../Common/FontsFreeType/FontManager.js",
                 "../Common/PresentationSerializeAdapter.js",
+				"../Word/Drawing/HatchPattern.js",
                 "../Word/Drawing/Externals.js",
                 "../Word/Drawing/Graphics.js",
                 "../Word/Drawing/Metafile.js",
