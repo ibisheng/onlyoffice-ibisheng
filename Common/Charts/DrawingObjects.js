@@ -14,6 +14,10 @@ function isObject(what) {
 	return ( (what != null) && (typeof(what) == "object") );
 }
 
+function isNumber(n) {
+	return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
 function isNullOrEmptyString(str) {
 	return (str == undefined) || (str == null) || (str == "");
 }
@@ -737,7 +741,38 @@ asc_CChart.prototype = {
 	asc_removeSeries: function() { this.series = []; },
 	
 	asc_getChartEditorFlag: function() { return this.bChartEditor; },
-	asc_setChartEditorFlag: function(value) { this.bChartEditor = value; },	
+	asc_setChartEditorFlag: function(value) { this.bChartEditor = value; },
+	
+	parseSeriesHeaders: function() {
+		
+		var cntLeft = 0, cntTop = 0;
+		var headers = { bLeft: false, bTop: false };
+		
+		var _t = this;
+		var bbox = _t.range.intervalObject.getBBox0();
+		
+		for (var i = bbox.r1; i <= bbox.r2; i++) {
+			
+			var cell = _t.range.intervalObject.worksheet.getCell( new CellAddress(i, bbox.c1, 0) );
+			var value = cell.getValue();
+			if ( !isNumber(value) && (value != "") )
+				cntLeft++;
+		}
+		if ( (cntLeft > 0) && (cntLeft >= bbox.r2 - bbox.r1) )
+			headers.bLeft = true;
+		
+		for (var i = bbox.c1; i <= bbox.c2; i++) {
+			
+			var cell = _t.range.intervalObject.worksheet.getCell( new CellAddress(bbox.r1, i, 0) );
+			var value = cell.getValue();
+			if ( !isNumber(value) && (value != "") )
+				cntTop++;
+		}
+		if ( (cntTop > 0) && (cntTop >= bbox.c2 - bbox.c1) )
+			headers.bTop = true;
+		
+		return headers;
+	},
 	
 	rebuildSeries: function() {
 		var _t = this;
@@ -752,10 +787,6 @@ asc_CChart.prototype = {
 		}
 		_t.series = [];
 		
-		function isNumber(n) {
-			return !isNaN(parseFloat(n)) && isFinite(n);
-		}
-		
 		function getNumCache(c1, c2, r1, r2) {
 			
 			// (c1 == c2) || (r1 == r2)
@@ -768,7 +799,7 @@ asc_CChart.prototype = {
 					var item = {};
 					item.numFormatStr = cell.getNumFormatStr();
 					item.isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
-					item.value = cell.getValue();
+					item.val = cell.getValue();
 					item.isHidden = (_t.range.intervalObject.worksheet._getCol(c1).hd === true) || (_t.range.intervalObject.worksheet._getRow(row).hd === true);
 					
 					cache.push(item);
@@ -781,7 +812,7 @@ asc_CChart.prototype = {
 					var item = {};
 					item.numFormatStr = cell.getNumFormatStr();
 					item.isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
-					item.value = cell.getValue();
+					item.val = cell.getValue();
 					item.isHidden = (_t.range.intervalObject.worksheet._getCol(col).hd === true) || (_t.range.intervalObject.worksheet._getRow(r1).hd === true);
 					
 					cache.push(item);
@@ -791,35 +822,7 @@ asc_CChart.prototype = {
 			return cache;
 		}
 		
-		function parseSeriesHeaders() {
-			
-			var cntLeft = 0, cntTop = 0;
-			var headers = { bLeft: false, bTop: false };
-			
-			for (var i = bbox.r1; i <= bbox.r2; i++) {
-				
-				var cell = _t.range.intervalObject.worksheet.getCell( new CellAddress(i, bbox.c1, 0) );
-				var value = cell.getValue();
-				if ( !isNumber(value) && (value != "") )
-					cntLeft++;
-			}
-			if ( (cntLeft > 0) && (cntLeft >= bbox.r2 - bbox.r1) )
-				headers.bLeft = true;
-			
-			for (var i = bbox.c1; i <= bbox.c2; i++) {
-				
-				var cell = _t.range.intervalObject.worksheet.getCell( new CellAddress(bbox.r1, i, 0) );
-				var value = cell.getValue();
-				if ( !isNumber(value) && (value != "") )
-					cntTop++;
-			}
-			if ( (cntTop > 0) && (cntTop >= bbox.c2 - bbox.c1) )
-				headers.bTop = true;
-			
-			return headers;
-		}
-		
-		var parsedHeaders = parseSeriesHeaders();
+		var parsedHeaders = _t.parseSeriesHeaders();
 		
 		if (_t.range.rows) {
 			for (var i = bbox.r1 + (parsedHeaders.bTop ? 1 : 0); i <= bbox.r2; i++) {
@@ -1672,6 +1675,7 @@ prot["asc_setUnderline"] = prot.asc_setUnderline;
 function asc_CChartSeria() {
 	this.Val = { Formula: null, NumCache: [] };
 	this.xVal = { Formula: null, NumCache: [] };
+	this.Cat = { Formula: null, NumCache: [] };
 	this.TxCache = { Formula: null, Tx: null };
 	this.Marker = { Size: null, Symbol: null };
 	this.OutlineColor = null;
@@ -4502,6 +4506,12 @@ function DrawingObjects() {
 	_this.selectDrawingObjectRange = function(id) {
 
 		worksheet.arrActiveChartsRanges = [];
+		
+		function getRandomColor() {
+			var r = function () { return Math.floor(Math.random()*256) };
+			return "rgb(" + r() + "," + r() + "," + r() + ")";
+		}
+		
 		for (var i = 0; i < aObjects.length; i++) {
 
 			var drawingObject = aObjects[i].graphicObject;
@@ -4514,13 +4524,47 @@ function DrawingObjects() {
 				if ( drawingObject.chart.range.intervalObject.worksheet.Id != worksheet.model.Id )
 					return;
 					
-				var BB = drawingObject.chart.range.intervalObject.getBBox0(), 
-					range = asc.Range(BB.c1,BB.r1,BB.c2,BB.r2,true);
+				var BB = drawingObject.chart.range.intervalObject.getBBox0();
+				var range = asc.Range(BB.c1, BB.r1, BB.c2, BB.r2, true);
+				
+				var fvr = worksheet.getFirstVisibleRow();
+				var fvc = worksheet.getFirstVisibleCol();
+				var headers = drawingObject.chart.parseSeriesHeaders();
+				
+				var c1 = BB.c1 - fvc;
+				var c2 = BB.c2 - fvc;
+				var r1 = BB.r1 - fvr;
+				var r2 = BB.r2 - fvr;
+				
+				if ( headers.bTop && (r1 >= 0) && (r1 != r2) ) {
+					var _c1 = (c1 >= 0) ? c1 /*+ (headers.bLeft ? 1 : 0)*/ : 0;
+					var x = worksheet.getCellLeft(_c1, 1);
+					var y = worksheet.getCellTop(r1 + 1, 1);
+					var w = worksheet.getCellLeft(c2 + 1, 1);
+					var h = y;
+					
+					overlayCtx.setStrokeStyle("#ff0000");
+					overlayCtx.beginPath();
+					overlayCtx.moveTo(x, y, -0.5, -0.5);
+					overlayCtx.lineTo(w, h, -0.5, -0.5);
+					overlayCtx.stroke();
+				}
+				if ( headers.bLeft && (c1 >= 0) && (c1 != c2) ) {
+					var _r1 = (r1 >= 0) ? r1 /*+ (headers.bTop ? 1 : 0)*/ : 0;
+					var x = worksheet.getCellLeft(c1 + 1, 1);
+					var y = worksheet.getCellTop(_r1, 1);
+					var w = x;
+					var h = worksheet.getCellTop(r2 + 1, 1);
+					
+					overlayCtx.setStrokeStyle("#ff0000");
+					overlayCtx.beginPath();
+					overlayCtx.moveTo(x, y, -0.5, -0.5);
+					overlayCtx.lineTo(w, h, -0.5, -0.5);
+					overlayCtx.stroke();
+				}
 					
 				worksheet.arrActiveChartsRanges.push(range);
 				worksheet.isChartAreaEditMode = true;
-				
-				worksheet.overlayCtx.rect(worksheet.cellsLeft, worksheet.cellsTop, worksheet.overlayCtx.getWidth() - worksheet.cellsLeft, worksheet.overlayCtx.getHeight() - worksheet.cellsTop);
 				worksheet._drawFormulaRange(worksheet.arrActiveChartsRanges);
 			}
 		}

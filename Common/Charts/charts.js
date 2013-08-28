@@ -154,7 +154,7 @@ function ChartPreviewManager() {
 		var preview_w = 50, preview_h = 50;
 		
 		function createItem(value) {
-			return { numFormatStr: "General", isDateTimeFormat: false, value: value };
+			return { numFormatStr: "General", isDateTimeFormat: false, val: value };
 		}
 		
 		function fillChartData(chart) {
@@ -1039,8 +1039,8 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 					else if(row == firstRow - 1 && col == firstCol && chart.subType != 'stackedPer' && !chart.range.rows && chart.type != 'Stock')
 						formatCellScOy = cell.numFormatStr ? cell.numFormatStr : defaultFormat;
 					
-					var orValue = cell.value;
-					var orValueY = cellY.value;
+					var orValue = cell.val;
+					var orValueY = cellY.val;
 					
 					var value =  parseFloat(orValue);
 					var valueY = parseFloat(orValueY);
@@ -1149,7 +1149,7 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 					
 					formatAdobeLabel = cell.numFormatStr;
 					
-					var orValue = cell.value;
+					var orValue = cell.val;
 					if('' != orValue)
 						isSkip[numSeries] = false;
 					var value =  parseFloat(orValue)
