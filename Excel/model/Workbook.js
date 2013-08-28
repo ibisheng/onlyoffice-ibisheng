@@ -2330,12 +2330,12 @@ Woorksheet.prototype.initPostOpen = function(){
 		{
 			if(null == oBounds)
 			{
-				chart.range.rows = false;
+				/*chart.range.rows = false;
 				chart.range.columns = false;
 				if(oNewBounds.bbox.c2 - oNewBounds.bbox.c1 > oNewBounds.bbox.r2 - oNewBounds.bbox.r1)
 					chart.range.rows = true;
 				else
-					chart.range.columns = true;
+					chart.range.columns = true;*/
 				oBounds = oNewBounds.range;
 			}
 			else
@@ -2399,11 +2399,27 @@ Woorksheet.prototype.initPostOpen = function(){
 						}
 					}
 				}
-				if(null != oBounds)
+				if (null != oBounds)
 				{
 					chart.range.intervalObject = ws.getRange(new CellAddress(oBounds.r1, oBounds.c1, 0), new CellAddress(oBounds.r2, oBounds.c2, 0));
 					if(null != chart.range.intervalObject)
 						chart.range.interval = chart.range.intervalObject.getName();
+						
+					if ( chart.series.length && chart.series[0].Val.Formula )	// Rows/Columns по диапазону первой серии
+					{
+						chart.range.rows = false;
+						chart.range.columns = false;
+						
+						var sRef = chart.series[0].Val.Formula.replace(/\$/g, "");
+						var bounds = fParseRef(sRef);
+						if ( null != bounds )
+						{
+							if (bounds.bbox.c2 - bounds.bbox.c1 > bounds.bbox.r2 - bounds.bbox.r1)
+								chart.range.rows = true;
+							else
+								chart.range.columns = true;
+						}
+					}
 				}
 				else
 					this.Drawings.splice(i, 1);
