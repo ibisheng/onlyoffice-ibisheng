@@ -783,7 +783,7 @@ asc_CChart.prototype = {
 		// Save old series colors
 		var oldSeriaData = [];
 		for ( var i = 0; i < _t.series.length; i++ ) {
-			oldSeriaData.push( {color: _t.series[i].OutlineColor, seriaTxCache: _t.series[i].TxCache } );
+			oldSeriaData.push( _t.series[i].OutlineColor );
 		}
 		_t.series = [];
 		
@@ -851,9 +851,18 @@ asc_CChart.prototype = {
 					var start = new CellAddress(bbox.r1, bbox.c1 + (parsedHeaders.bLeft ? 1 : 0), 0);
 					var end = new CellAddress(bbox.r1, bbox.c2, 0);
 					
-					ser.xVal.Formula = ( !rx_test_ws_name.test(_t.range.intervalObject.worksheet.sName) ? "'" +_t.range.intervalObject.worksheet.sName+ "'" : _t.range.intervalObject.worksheet.sName )
+					var formula = ( !rx_test_ws_name.test(_t.range.intervalObject.worksheet.sName) ? "'" +_t.range.intervalObject.worksheet.sName+ "'" : _t.range.intervalObject.worksheet.sName )
 										+ "!" + start.getID() + ":" + end.getID();
-					ser.xVal.NumCache = getNumCache( bbox.c1 + (parsedHeaders.bLeft ? 1 : 0), bbox.c2, bbox.r1, bbox.r1 );
+					var numCache = getNumCache( bbox.c1 + (parsedHeaders.bLeft ? 1 : 0), bbox.c2, bbox.r1, bbox.r1 );
+					
+					if ( _t.type == c_oAscChartType.scatter ) {
+						ser.xVal.Formula = formula;
+						ser.xVal.NumCache = numCache;
+					}
+					else {
+						ser.Cat.Formula = formula;
+						ser.Cat.NumCache = numCache;
+					}
 				}
 				
 				if ( parsedHeaders.bLeft ) {
@@ -895,9 +904,18 @@ asc_CChart.prototype = {
 					var start = new CellAddress(bbox.r1 + (parsedHeaders.bTop ? 1 : 0), bbox.c1, 0);
 					var end = new CellAddress(bbox.r2, bbox.c1, 0);
 					
-					ser.xVal.Formula = ( !rx_test_ws_name.test(_t.range.intervalObject.worksheet.sName) ? "'" +_t.range.intervalObject.worksheet.sName+ "'" : _t.range.intervalObject.worksheet.sName )
+					var formula = ( !rx_test_ws_name.test(_t.range.intervalObject.worksheet.sName) ? "'" +_t.range.intervalObject.worksheet.sName+ "'" : _t.range.intervalObject.worksheet.sName )
 										+ "!" + start.getID() + ":" + end.getID();
-					ser.xVal.NumCache = getNumCache( bbox.c1, bbox.c1, bbox.r1 + (parsedHeaders.bTop ? 1 : 0), bbox.r2 );
+					var numCache = getNumCache( bbox.c1, bbox.c1, bbox.r1 + (parsedHeaders.bTop ? 1 : 0), bbox.r2 );
+					
+					if ( _t.type == c_oAscChartType.scatter ) {
+						ser.xVal.Formula = formula;
+						ser.xVal.NumCache = numCache;
+					}
+					else {
+						ser.Cat.Formula = formula;
+						ser.Cat.NumCache = numCache;
+					}
 				}
 				
 				if ( parsedHeaders.bTop ) {
@@ -923,9 +941,7 @@ asc_CChart.prototype = {
 		for ( var i = 0; i < _t.series.length; i++ ) {
 			
 			if ( i < oldSeriaData.length ) {
-				_t.series[i].OutlineColor = oldSeriaData[i].color;
-				_t.series[i].TxCache.Tx = oldSeriaData[i].seriaTxCache.Tx;
-				_t.series[i].TxCache.Formula = oldSeriaData[i].seriaTxCache.Formula;
+				_t.series[i].OutlineColor = oldSeriaData[i];
 			}
 			else
 				_t.series[i].OutlineColor = seriaUniColors[i];

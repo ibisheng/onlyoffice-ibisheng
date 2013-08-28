@@ -2376,6 +2376,17 @@ Woorksheet.prototype.initPostOpen = function(){
 							oBounds = fAddBounds(oBounds, oNewBounds, chart);
 						}
 					}
+					if(0 == j && null != seria && null != seria.Cat && null != seria.Cat.Formula)
+					{
+						var sRef = seria.Cat.Formula.replace(/\$/g,"");
+						var oNewBounds = fParseRef(sRef);
+						if(null != oNewBounds)
+						{
+							if(null == oBounds)
+								ws = oNewBounds.sheet;
+							oBounds = fAddBounds(oBounds, oNewBounds, chart);
+						}
+					}
 					if(null != seria && null != seria.Val && null != seria.Val.Formula)
 					{
 						var sRef = seria.Val.Formula.replace(/\$/g,"");
