@@ -993,100 +993,97 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 		
 		var isEn = false;
 		var isEnY = false;
-		
-	
-			var numSeries = 0;
-			var curSeria;	
-			for(l = 0; l < series.length; ++l)
+		var numSeries = 0;
+		var curSeria;	
+		for(l = 0; l < series.length; ++l)
+		{
+			var firstCol = 0;
+			var firstRow = 0;
+			if(series[0].xVal.Formula != null && numSeries == 0)
 			{
-				var firstCol = 0;
-				var firstRow = 0;
-				if(series[0].xVal.Formula != null && numSeries == 0)
-				{
-					curSeria = series[numSeries].xVal.NumCache;
-				}
-				else
-					curSeria = series[l].Val.NumCache;
-				var lastCol = curSeria.length;
-				skipSeries[numSeries] = true;
-				var isRow = false;
-				if(firstCol == lastCol)
-					isRow  = true;
-			
-				if(series[l].isHidden == true)
+				curSeria = series[numSeries].xVal.NumCache;
+			}
+			else
+				curSeria = series[l].Val.NumCache;
+			var lastCol = curSeria.length;
+			skipSeries[numSeries] = true;
+			var isRow = false;
+			if(firstCol == lastCol)
+				isRow  = true;
+		
+			if(series[l].isHidden == true)
+			{
+				continue;
+			}
+			if(series[0].xVal.Formula != null && numSeries == 0)
+				l--;
+			skipSeries[numSeries] = false;
+			arrValues[numSeries] = [];
+			arrFormatAdobeLabels[numSeries] = [];
+			isSkip[numSeries] = true;
+	
+			var row = firstRow;
+			var n = 0;
+			for(col = firstCol; col < lastCol; ++col)
+			{
+				if(curSeria[col].isHidden == true)
 				{
 					continue;
 				}
-				if(series[0].xVal.Formula != null && numSeries == 0)
-					l--;
-				skipSeries[numSeries] = false;
-				arrValues[numSeries] = [];
-				arrFormatAdobeLabels[numSeries] = [];
-				isSkip[numSeries] = true;
-		
-				var row = firstRow;
-				var n = 0;
-				for(col = firstCol; col < lastCol; ++col)
+				
+				//var cell = ws.getCell(new CellAddress(row - 1, col - 1, 0));
+				var cell = curSeria[col];
+				
+				if(numSeries == 0 && col == firstCol && chart.subType != 'stackedPer' && chart.type != 'Stock')
 				{
-					if(curSeria[col].isHidden == true)
-					{
-						continue;
-					}
-					
-					//var cell = ws.getCell(new CellAddress(row - 1, col - 1, 0));
-					var cell = curSeria[col];
-					
-					if(numSeries == 0 && col == firstCol && chart.subType != 'stackedPer' && chart.type != 'Stock')
-					{
-						formatCell = cell.numFormatStr ? cell.numFormatStr : defaultFormat;
-						isDateTimeFormat = cell.isDateTimeFormat;
-					}
-					else if(chart.type == 'Stock' && numSeries == 0 && col == firstCol)
-					{
-						formatCellScOy = cell.numFormatStr ? cell.numFormatStr : defaultFormat;
-						isDateTimeFormat = cell.isDateTimeFormat;
-					}
-					
-					if(chart.type == 'Scatter')
-					{
-						if(numSeries == 1 && col == firstCol && chart.subType != 'stackedPer' && chart.type != 'Stock')
-							formatCellScOy = cell.numFormatStr ? cell.numFormatStr : defaultFormat;
-					}
-					
-					formatAdobeLabel = cell.numFormatStr;
-					
-					var orValue = cell.val;
-					if(series[0].xVal.Formula != null && numSeries == 0 && isNaN(orValue))
-						orValue = col - firstCol + 1;
-					if('' != orValue)
-						isSkip[numSeries] = false;
-					var value =  parseFloat(orValue)
-					if(!isEn && !isNaN(value))
-					{
-						min = value;
-						max = value;
-						isEn = true;
-					}
-					if(!isNaN(value) && value > max)
-						max = value
-					if(!isNaN(value) && value < min)
-						min = value
-					if(isNaN(value) && orValue == '' && (((chart.type == 'Line' ) && chart.subType == 'normal') || (chart.type == 'Scatter' )))
-					{
-						value = '';
-					}
-					else if (isNaN(value))
-						value = 0;
-					if(chart.type == 'Pie')
-						arrValues[numSeries][n] = Math.abs(value);
-					else
-						arrValues[numSeries][n] = value;
-					arrFormatAdobeLabels[numSeries][n] = formatAdobeLabel;
-					n++;
+					formatCell = cell.numFormatStr ? cell.numFormatStr : defaultFormat;
+					isDateTimeFormat = cell.isDateTimeFormat;
 				}
-				numSeries++;
+				else if(chart.type == 'Stock' && numSeries == 0 && col == firstCol)
+				{
+					formatCellScOy = cell.numFormatStr ? cell.numFormatStr : defaultFormat;
+					isDateTimeFormat = cell.isDateTimeFormat;
+				}
+				
+				if(chart.type == 'Scatter')
+				{
+					if(numSeries == 1 && col == firstCol && chart.subType != 'stackedPer' && chart.type != 'Stock')
+						formatCellScOy = cell.numFormatStr ? cell.numFormatStr : defaultFormat;
+				}
+				
+				formatAdobeLabel = cell.numFormatStr;
+				
+				var orValue = cell.val;
+				if(series[0].xVal.Formula != null && numSeries == 0 && isNaN(orValue))
+					orValue = col - firstCol + 1;
+				if('' != orValue)
+					isSkip[numSeries] = false;
+				var value =  parseFloat(orValue)
+				if(!isEn && !isNaN(value))
+				{
+					min = value;
+					max = value;
+					isEn = true;
+				}
+				if(!isNaN(value) && value > max)
+					max = value
+				if(!isNaN(value) && value < min)
+					min = value
+				if(isNaN(value) && orValue == '' && (((chart.type == 'Line' ) && chart.subType == 'normal') || (chart.type == 'Scatter' )))
+				{
+					value = '';
+				}
+				else if (isNaN(value))
+					value = 0;
+				if(chart.type == 'Pie')
+					arrValues[numSeries][n] = Math.abs(value);
+				else
+					arrValues[numSeries][n] = value;
+				arrFormatAdobeLabels[numSeries][n] = formatAdobeLabel;
+				n++;
 			}
-
+			numSeries++;
+		}
 	}
 	else if(chart.series && chart.series.length !=0 && api_sheet)
 	{
