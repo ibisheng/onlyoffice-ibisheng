@@ -475,6 +475,8 @@ CShapeDrawer.prototype =
         this.max_x = -0xFFFF;
         this.max_y = -0xFFFF;
 
+        var bIsCheckBounds = false;
+
         if (this.UniFill == null || this.UniFill.fill == null)
             this.bIsNoFillAttack = true;
         else
@@ -500,11 +502,13 @@ CShapeDrawer.prototype =
                     else
                         this.FillUniColor = _fill.colors[0].color.RGBA;
 
+                    bIsCheckBounds = true;
+
                     break;
                 }
                 case FILL_TYPE_PATT:
                 {
-                    this.FillUniColor = _fill.fgClr.RGBA;
+                    bIsCheckBounds = true;
                     break;
                 }
                 case FILL_TYPE_NOFILL:
@@ -584,7 +588,7 @@ CShapeDrawer.prototype =
                 this.OldLineJoin = this.Graphics.m_oContext.lineJoin;
         }
 
-        if (this.bIsTexture)
+        if (this.bIsTexture || bIsCheckBounds)
         {
             // сначала нужно определить границы
             this.bIsCheckBounds = true;
@@ -598,7 +602,13 @@ CShapeDrawer.prototype =
         if (this.bIsNoStrokeAttack && this.bIsNoFillAttack)
             return;
 
-        if (this.bIsTexture && this.Graphics.RENDERER_PDF_FLAG)
+        var bIsPatt = false;
+        if (this.UniFill != null && this.UniFill.fill != null && this.UniFill.fill.type == FILL_TYPE_PATT)
+        {
+            bIsPatt = true;
+        }
+
+        if (this.Graphics.RENDERER_PDF_FLAG && (this.bIsTexture || bIsPatt))
         {
             this.Graphics.put_TextureBoundsEnabled(true);
             this.Graphics.put_TextureBounds(this.min_x, this.min_y, this.max_x - this.min_x, this.max_y - this.min_y);
@@ -612,16 +622,16 @@ CShapeDrawer.prototype =
         {
             this._s();
             this._m(0, 0);
-            this._l(this.Shape.ext.cx, 0);
-            this._l(this.Shape.ext.cx, this.Shape.ext.cy);
-            this._l(0, this.Shape.ext.cy);
+            this._l(this.Shape.extX, 0);
+            this._l(this.Shape.extX, this.Shape.extY);
+            this._l(0, this.Shape.extY);
             this._z();
             this.drawFillStroke(true, "norm", true && !this.bIsNoStrokeAttack);
             this._e();
         }
         this.Graphics.ArrayPoints = null;
 
-        if (this.bIsTexture && this.Graphics.RENDERER_PDF_FLAG)
+        if (this.Graphics.RENDERER_PDF_FLAG && (this.bIsTexture || bIsPatt))
         {
             this.Graphics.put_TextureBoundsEnabled(false);
         }
@@ -713,6 +723,9 @@ CShapeDrawer.prototype =
         if (mode == "none" || this.bIsNoFillAttack)
             return;
 
+        if (this.Graphics.IsSlideBoundsCheckerType === true)
+            return;
+
         if (this.bIsTexture)
         {
             if (this.Graphics.RENDERER_PDF_FLAG)
@@ -785,11 +798,6 @@ CShapeDrawer.prototype =
 
                     var _ctx = (this.Graphics.IsTrack === true) ? this.Graphics.Graphics.m_oContext : this.Graphics.m_oContext;
 
-                    /*
-                    var _test_pattern = GetHatchBrush("horzBrick", 255, 255, 255, 240, 0, 0);
-                    var patt = !_img_native ? _ctx.createPattern(_test_pattern.Canvas, "repeat") : _ctx.createPattern(_img_native, "repeat");
-                    */
-
                     var patt = !_img_native ? _ctx.createPattern(_img.Image, "repeat") : _ctx.createPattern(_img_native, "repeat");
 
                     _ctx.save();
@@ -827,6 +835,124 @@ CShapeDrawer.prototype =
                 }
             }
             return;
+        }
+
+        if (this.UniFill != null && this.UniFill.fill != null)
+        {
+            var _fill = this.UniFill.fill;
+            if (_fill.type == FILL_TYPE_PATT)
+            {
+                var _is_ctx = false;
+                if (this.Graphics.IsNoSupportTextDraw === true || undefined === this.Graphics.m_oContext || (null == this.UniFill.transparent) || (this.UniFill.transparent == 255))
+                {
+                    _is_ctx = false;
+                }
+                else
+                {
+                    _is_ctx = true;
+                }
+
+                var _ctx = (this.Graphics.IsTrack === true) ? this.Graphics.Graphics.m_oContext : this.Graphics.m_oContext;
+
+                var _patt_name = global_hatch_names[_fill.ftype];
+                if (undefined == _patt_name)
+                    _patt_name = "cross";
+
+                var _fc = _fill.fgClr.RGBA;
+                var _bc = _fill.bgClr.RGBA;
+
+                var _test_pattern = GetHatchBrush(_patt_name, _fc.R, _fc.G, _fc.B, _bc.R, _bc.G, _bc.B);
+                var patt = _ctx.createPattern(_test_pattern.Canvas, "repeat");
+
+                _ctx.save();
+
+                var editor = window["Asc"]["editor"];
+                var koefX = editor.asc_getZoom();
+                var koefY = editor.asc_getZoom();
+
+                // TODO: !!!
+                _ctx.translate(this.min_x, this.min_y);
+
+                if (this.Graphics.MaxEpsLine === undefined)
+                {
+                    _ctx.scale(koefX * this.Graphics.TextureFillTransformScaleX, koefY * this.Graphics.TextureFillTransformScaleY);
+                }
+                else
+                {
+                    _ctx.scale(koefX * this.Graphics.Graphics.TextureFillTransformScaleX, koefY * this.Graphics.Graphics.TextureFillTransformScaleY);
+                }
+
+                if (_is_ctx === true)
+                {
+                    var _old_global_alpha = _ctx.globalAlpha;
+                    _ctx.globalAlpha = this.UniFill.transparent / 255;
+                    _ctx.fillStyle = patt;
+                    _ctx.fill();
+                    _ctx.globalAlpha = _old_global_alpha;
+                }
+                else
+                {
+                    _ctx.fillStyle = patt;
+                    _ctx.fill();
+                }
+
+                _ctx.restore();
+                return;
+            }
+            else if (_fill.type == FILL_TYPE_GRAD)
+            {
+                var _is_ctx = false;
+                if (this.Graphics.IsNoSupportTextDraw === true || undefined === this.Graphics.m_oContext || (null == this.UniFill.transparent) || (this.UniFill.transparent == 255))
+                {
+                    _is_ctx = false;
+                }
+                else
+                {
+                    _is_ctx = true;
+                }
+
+                var _ctx = (this.Graphics.IsTrack === true) ? this.Graphics.Graphics.m_oContext : this.Graphics.m_oContext;
+
+                var gradObj = null;
+                if (_fill.lin)
+                {
+                    var points = this.getGradientPoints(this.min_x, this.min_y, this.max_x, this.max_y, _fill.lin.angle, _fill.lin.scale);
+                    gradObj = _ctx.createLinearGradient(points.x0, points.y0, points.x1, points.y1);
+                }
+                else if (_fill.path)
+                {
+                    var _cx = (this.min_x + this.max_x) / 2;
+                    var _cy = (this.min_y + this.max_y) / 2;
+                    var _r = Math.max(this.max_x - this.min_x, this.max_y - this.min_y) / 2;
+                    gradObj = _ctx.createRadialGradient(_cx, _cy, 1, _cx, _cy, _r);
+                }
+                else
+                {
+                    //gradObj = _ctx.createLinearGradient(this.min_x, this.min_y, this.max_x, this.min_y);
+                    var points = this.getGradientPoints(this.min_x, this.min_y, this.max_x, this.max_y, 90 * 60000, false);
+                    gradObj = _ctx.createLinearGradient(points.x0, points.y0, points.x1, points.y1);
+                }
+
+                for (var i = 0; i < _fill.colors.length; i++)
+                {
+                    gradObj.addColorStop(_fill.colors[i].pos / 100000, _fill.colors[i].color.getCSSColor());
+                }
+
+                _ctx.fillStyle = gradObj;
+
+                if (null !== this.UniFill.transparent && undefined !== this.UniFill.transparent)
+                {
+                    var _old_global_alpha = this.Graphics.m_oContext.globalAlpha;
+                    _ctx.globalAlpha = this.UniFill.transparent / 255;
+                    _ctx.fill();
+                    _ctx.globalAlpha = _old_global_alpha;
+                }
+                else
+                {
+                    _ctx.fill();
+                }
+                return;
+            }
         }
 
         var rgba = this.FillUniColor;
@@ -997,6 +1123,8 @@ CShapeDrawer.prototype =
             if (fill_mode == "none" || this.bIsNoFillAttack)
                 bIsFill = false;
 
+            var bIsPattern = false;
+
             if (bIsFill)
             {
                 if (this.bIsTexture)
@@ -1049,39 +1177,91 @@ CShapeDrawer.prototype =
                 }
                 else
                 {
-                    var rgba = this.FillUniColor;
-                    if (fill_mode == "darken")
+                    var _fill = this.UniFill.fill;
+                    if (_fill.type == FILL_TYPE_PATT)
                     {
-                        var _color1 = new CShapeColor(rgba.R, rgba.G, rgba.B);
-                        var rgb = _color1.darken();
-                        rgba = { R: rgb.r, G: rgb.g, B: rgb.b, A: rgba.A };
+                        var _patt_name = global_hatch_names[_fill.ftype];
+                        if (undefined == _patt_name)
+                            _patt_name = "cross";
+
+                        var _fc = _fill.fgClr.RGBA;
+                        var _bc = _fill.bgClr.RGBA;
+
+                        var _pattern = GetHatchBrush(_patt_name, _fc.R, _fc.G, _fc.B, _bc.R, _bc.G, _bc.B);
+
+                        var _url64 = "";
+                        try
+                        {
+                            _url64 = _pattern.Canvas.toDataURL("image/png");
+                        }
+                        catch (err)
+                        {
+                            _url64 = "";
+                        }
+
+                        this.Graphics.put_brushTexture(_url64, 1);
+                        this.Graphics.put_BrushTextureAlpha(this.UniFill.transparent);
+
+                        bIsPattern = true;
                     }
-                    else if (fill_mode == "darkenLess")
+                    else if (_fill.type == FILL_TYPE_GRAD)
                     {
-                        var _color1 = new CShapeColor(rgba.R, rgba.G, rgba.B);
-                        var rgb = _color1.darkenLess();
-                        rgba = { R: rgb.r, G: rgb.g, B: rgb.b, A: rgba.A };
+                        var points = null;
+                        if (_fill.lin)
+                        {
+                            points = this.getGradientPoints(this.min_x, this.min_y, this.max_x, this.max_y, _fill.lin.angle, _fill.lin.scale);
+                        }
+                        else if (_fill.path)
+                        {
+                            var _cx = (this.min_x + this.max_x) / 2;
+                            var _cy = (this.min_y + this.max_y) / 2;
+                            var _r = Math.max(this.max_x - this.min_x, this.max_y - this.min_y) / 2;
+
+                            points = { x0 : _cx, y0 : _cy, x1 : _cx, y1 : _cy, r0 : 1, r1 : _r };
+                        }
+                        else
+                        {
+                            points = this.getGradientPoints(this.min_x, this.min_y, this.max_x, this.max_y, 90 * 60000, false);
+                        }
+
+                        this.Graphics.put_BrushGradient(_fill, points);
                     }
-                    else if (fill_mode == "lighten")
+                    else
                     {
-                        var _color1 = new CShapeColor(rgba.R, rgba.G, rgba.B);
-                        var rgb = _color1.lighten();
-                        rgba = { R: rgb.r, G: rgb.g, B: rgb.b, A: rgba.A };
+                        var rgba = this.FillUniColor;
+                        if (fill_mode == "darken")
+                        {
+                            var _color1 = new CShapeColor(rgba.R, rgba.G, rgba.B);
+                            var rgb = _color1.darken();
+                            rgba = { R: rgb.r, G: rgb.g, B: rgb.b, A: rgba.A };
+                        }
+                        else if (fill_mode == "darkenLess")
+                        {
+                            var _color1 = new CShapeColor(rgba.R, rgba.G, rgba.B);
+                            var rgb = _color1.darkenLess();
+                            rgba = { R: rgb.r, G: rgb.g, B: rgb.b, A: rgba.A };
+                        }
+                        else if (fill_mode == "lighten")
+                        {
+                            var _color1 = new CShapeColor(rgba.R, rgba.G, rgba.B);
+                            var rgb = _color1.lighten();
+                            rgba = { R: rgb.r, G: rgb.g, B: rgb.b, A: rgba.A };
+                        }
+                        else if (fill_mode == "lightenLess")
+                        {
+                            var _color1 = new CShapeColor(rgba.R, rgba.G, rgba.B);
+                            var rgb = _color1.lightenLess();
+                            rgba = { R: rgb.r, G: rgb.g, B: rgb.b, A: rgba.A };
+                        }
+                        if (rgba)
+                            this.Graphics.b_color1(rgba.R, rgba.G, rgba.B, rgba.A);
                     }
-                    else if (fill_mode == "lightenLess")
-                    {
-                        var _color1 = new CShapeColor(rgba.R, rgba.G, rgba.B);
-                        var rgb = _color1.lightenLess();
-                        rgba = { R: rgb.r, G: rgb.g, B: rgb.b, A: rgba.A };
-                    }
-                    if (rgba)
-                        this.Graphics.b_color1(rgba.R, rgba.G, rgba.B, rgba.A);
                 }
             }
 
             if (bIsFill && bIsStroke)
             {
-                if (this.bIsTexture)
+                if (this.bIsTexture || bIsPattern)
                 {
                     this.Graphics.drawpath(256);
                     this.Graphics.drawpath(1);
@@ -1181,6 +1361,211 @@ CShapeDrawer.prototype =
     check_bounds : function()
     {
         this.Shape.check_bounds(this);
+    },
+
+    // common funcs
+    getNormalPoint : function(x0, y0, angle, x1, y1)
+    {
+        // точка - пересечение прямой, проходящей через точку (x0, y0) под углом angle и
+        // перпендикуляра к первой прямой, проведенной из точки (x1, y1)
+        var ex1 = Math.cos(angle);
+        var ey1 = Math.sin(angle);
+
+        var ex2 = -ey1;
+        var ey2 = ex1;
+
+        var a = ex1 / ey1;
+        var b = ex2 / ey2;
+
+        var x = ((a * b * y1 - a * b * y0) - (a * x1 - b * x0)) / (b - a);
+        var y = (x - x0) / a + y0;
+
+        return { X : x, Y : y };
+    },
+
+    getGradientPoints : function(min_x, min_y, max_x, max_y, _angle, scale)
+    {
+        var points = { x0 : 0, y0 : 0, x1 : 0, y1 : 0 };
+
+        var angle = _angle / 60000;
+        while (angle < 0)
+            angle += 360;
+        while (angle >= 360)
+            angle -= 360;
+
+        if (Math.abs(angle) < 1)
+        {
+            points.x0 = min_x;
+            points.y0 = min_y;
+            points.x1 = max_x;
+            points.y1 = min_y;
+
+            return points;
+        }
+        else if (Math.abs(angle - 90) < 1)
+        {
+            points.x0 = min_x;
+            points.y0 = min_y;
+            points.x1 = min_x;
+            points.y1 = max_y;
+
+            return points;
+        }
+        else if (Math.abs(angle - 180) < 1)
+        {
+            points.x0 = max_x;
+            points.y0 = min_y;
+            points.x1 = min_x;
+            points.y1 = min_y;
+
+            return points;
+        }
+        else if (Math.abs(angle - 270) < 1)
+        {
+            points.x0 = min_x;
+            points.y0 = max_y;
+            points.x1 = min_x;
+            points.y1 = min_y;
+
+            return points;
+        }
+
+        var grad_a = deg2rad(angle);
+        if (!scale)
+        {
+            if (angle > 0 && angle < 90)
+            {
+                var p = this.getNormalPoint(min_x, min_y, grad_a, max_x, max_y);
+
+                points.x0 = min_x;
+                points.y0 = min_y;
+                points.x1 = p.X;
+                points.y1 = p.Y;
+
+                return points;
+            }
+            if (angle > 90 && angle < 180)
+            {
+                var p = this.getNormalPoint(max_x, min_y, grad_a, min_x, max_y);
+
+                points.x0 = max_x;
+                points.y0 = min_y;
+                points.x1 = p.X;
+                points.y1 = p.Y;
+
+                return points;
+            }
+            if (angle > 180 && angle < 270)
+            {
+                var p = this.getNormalPoint(max_x, max_y, grad_a, min_x, min_y);
+
+                points.x0 = max_x;
+                points.y0 = max_y;
+                points.x1 = p.X;
+                points.y1 = p.Y;
+
+                return points;
+            }
+            if (angle > 270 && angle < 360)
+            {
+                var p = this.getNormalPoint(min_x, max_y, grad_a, max_x, min_y);
+
+                points.x0 = min_x;
+                points.y0 = max_y;
+                points.x1 = p.X;
+                points.y1 = p.Y;
+
+                return points;
+            }
+            // никогда сюда не зайдем
+            return points;
+        }
+
+        // scale == true
+        var _grad_45 = (Math.PI / 2) - Math.atan2(max_y - min_y, max_x - min_x);
+        var _grad_90_45 = (Math.PI / 2) - _grad_45;
+        if (angle > 0 && angle < 90)
+        {
+            if (angle <= 45)
+            {
+                grad_a = (_grad_45 * angle / 45);
+            }
+            else
+            {
+                grad_a = _grad_45 + _grad_90_45 * (angle - 45) / 45;
+            }
+
+            var p = this.getNormalPoint(min_x, min_y, grad_a, max_x, max_y);
+
+            points.x0 = min_x;
+            points.y0 = min_y;
+            points.x1 = p.X;
+            points.y1 = p.Y;
+
+            return points;
+        }
+        if (angle > 90 && angle < 180)
+        {
+            if (angle <= 135)
+            {
+                grad_a = Math.PI / 2 + _grad_90_45 * (angle - 90) / 45;
+            }
+            else
+            {
+                grad_a = Math.PI - _grad_45 * (angle - 135) / 45;
+            }
+
+            var p = this.getNormalPoint(max_x, min_y, grad_a, min_x, max_y);
+
+            points.x0 = max_x;
+            points.y0 = min_y;
+            points.x1 = p.X;
+            points.y1 = p.Y;
+
+            return points;
+        }
+        if (angle > 180 && angle < 270)
+        {
+            if (angle <= 225)
+            {
+                grad_a = Math.PI + _grad_45 * (angle - 180) / 45;
+            }
+            else
+            {
+                grad_a = 3 * Math.PI / 2 - _grad_90_45 * (angle - 225) / 45;
+            }
+
+            var p = this.getNormalPoint(max_x, max_y, grad_a, min_x, min_y);
+
+            points.x0 = max_x;
+            points.y0 = max_y;
+            points.x1 = p.X;
+            points.y1 = p.Y;
+
+            return points;
+        }
+        if (angle > 270 && angle < 360)
+        {
+            if (angle <= 315)
+            {
+                grad_a = 3 * Math.PI / 2 + _grad_90_45 * (angle - 270) / 45;
+            }
+            else
+            {
+                grad_a = 2 * Math.PI - _grad_45 * (angle - 315) / 45;
+            }
+
+            var p = this.getNormalPoint(min_x, max_y, grad_a, max_x, min_y);
+
+            points.x0 = min_x;
+            points.y0 = max_y;
+            points.x1 = p.X;
+            points.y1 = p.Y;
+
+            return points;
+        }
+        // никогда сюда не зайдем
+        return points;
     }
 };
 

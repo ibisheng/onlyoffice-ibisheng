@@ -1089,6 +1089,11 @@ function CUniColor()
 
 CUniColor.prototype =
 {
+    getCSSColor : function()
+    {
+        var _css = "rgba(" + this.RGBA.R + "," + this.RGBA.G + "," + this.RGBA.B + "," + (this.RGBA.A / 255) + ")";
+        return _css;
+    },
 
     addMod: function(mod)
     {
@@ -2167,7 +2172,7 @@ CPattFill.prototype =
             _ret.ftype = this.ftype;
         }
         _ret.fgClr = this.fgClr.compare(fill.fgClr);
-        _ret.fgClr = this.fgClr.compare(fill.fgClr);
+        _ret.bgClr = this.bgClr.compare(fill.bgClr);
         return _ret;
     }
 };
@@ -2343,6 +2348,10 @@ CUniFill.prototype =
                     this.fill.colors[i].color.Calculate(theme, clrMap, RGBA);
                 }
             }
+            if (this.fill.fgClr)
+                this.fill.fgClr.Calculate(theme, clrMap, RGBA);
+            if (this.fill.bgClr)
+                this.fill.bgClr.Calculate(theme, clrMap, RGBA);
         }
     },
 
