@@ -15,6 +15,8 @@
     <link rel="stylesheet" type="text/css" href="../../common/main/resources/css/chat-panel.css">
     <link rel="stylesheet" type="text/css" href="../../common/main/resources/css/jquery.jscrollpane.css">
     <link rel="stylesheet" type="text/css" href="../../common/main/resources/css/asc.css">
+    <link rel="stylesheet" type="text/css" href="../../common/main/resources/css/searchfield.css">
+    <link rel="stylesheet" type="text/css" href="../../common/main/resources/css/searchdialog.css">
 
     <link rel="stylesheet" type="text/css" href="resources/css/de-main-colors.css">
     <link rel="stylesheet" type="text/css" href="resources/css/header.css">
@@ -105,36 +107,36 @@
 	<script type="text/javascript" src="../../../../OfficeWeb/Common/Charts/charts.js"></script>
 	<script type="text/javascript" src="../../../../OfficeWeb/Common/commonDefines.js"></script>
 	<script type="text/javascript" src="../../../../OfficeWeb/Common/SerializeCommonWordExcel.js"></script>
-	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.core.js"></script>
-	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.annotate.js"></script>
-	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.context.js"></script>
-	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.effects.js"></script>
-	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.key.js"></script>
-	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.resizing.js"></script>
-	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.tooltips.js"></script>
-	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.zoom.js"></script>
-	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.bar.js"></script>
-	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.bipolar.js"></script>
-	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.gantt.js"></script>
-	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.hbar.js"></script>
-	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.line.js"></script>
-	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.pie.js"></script>
-	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.radar.js"></script>
-	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.rose.js"></script>
-	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.rscatter.js"></script>
-	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.scatter.js"></script>
-	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.waterfall.js"></script>
-	<script src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.chartProperties.js"></script>				
-	<script src="../../../../OfficeWeb/Common/Charts/libraries/hsv.js"></script>
-	<script src="../../../../OfficeWeb/Common/Charts/libraries/rgbcolor.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.core.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.annotate.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.context.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.effects.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.key.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.resizing.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.tooltips.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.zoom.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.bar.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.bipolar.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.gantt.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.hbar.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.line.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.pie.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.radar.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.rose.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.rscatter.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.scatter.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.waterfall.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/Charts/libraries/OfficeExcel.chartProperties.js"></script>				
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/Charts/libraries/hsv.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/Charts/libraries/rgbcolor.js"></script>
 
-    <script src="../../../../OfficeWeb/Common/FontsFreeType/font_engine.js"></script>
+    <script type="text/javascript" src="../../../../OfficeWeb/Common/FontsFreeType/font_engine.js"></script>
 	
-	<script src="../../../../OfficeWeb/Common/FontsFreeType/FontFile.js"></script>
-    <script src="../../../../OfficeWeb/Common/FontsFreeType/FontManager.js"></script>
-    <script src="../../../../OfficeWeb/Word/Drawing/Externals.js"></script>
-    <script src="../../../../OfficeWeb/Word/Drawing/AllFonts.js"></script>
-    <script src="../../../../OfficeWeb/Word/Drawing/GlobalLoaders.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/FontsFreeType/FontFile.js"></script>
+    <script type="text/javascript" src="../../../../OfficeWeb/Common/FontsFreeType/FontManager.js"></script>
+    <script type="text/javascript" src="../../../../OfficeWeb/Word/Drawing/Externals.js"></script>
+    <script type="text/javascript" src="../../../../OfficeWeb/Word/Drawing/AllFonts.js"></script>
+    <script type="text/javascript" src="../../../../OfficeWeb/Word/Drawing/GlobalLoaders.js"></script>
 
     <script type="text/javascript" src="../../../../OfficeWeb/Word/Drawing/translations.js"></script>
 
@@ -221,6 +223,7 @@
 
     <script type="text/javascript" src="../../common/Analytics.js"></script>
     <script type="text/javascript" src="../../common/Gateway.js"></script>
+    <script type="text/javascript" src="../../common/IrregularStack.js"></script>
     <script type="text/javascript" src="../../common/main/loader.js"></script>
     <script type="text/javascript" src="app.js"></script>
     <script type="text/javascript" src="../../common/locale.js"></script>
@@ -231,9 +234,8 @@
         window.g_cAscCoAuthoringUrl = "http://192.168.3.213:3000";
     </script>
 
-    <script type="text/javascript" src="../../../sdk/Common/docscoapisettings.js"></script>
-	<script type="text/javascript" src="../../../sdk/Common/spellcheckapisettings.js"></script>
-    <!--<script type="text/javascript" src="../../../sdk/Word/sdk-all.js"></script>-->
+    <script type="text/javascript" src="../../../../OfficeWeb/Common/docscoapisettings.js"></script>
+	<script type="text/javascript" src="../../../../OfficeWeb/Common/spellcheckapisettings.js"></script>
 
     <script type="text/javascript">
         var isBrowserSupported = function() {
@@ -262,8 +264,8 @@
             return ['../../common/main/resources/css/dataview-picker.css', '../../common/main/resources/css/hsb-colorpicker.css',
                     '../../common/main/resources/css/comments-panel.css', '../../common/main/resources/css/comments-popover.css',
                     '../../common/main/resources/css/themecolorpalette.css',
-                    '../../common/main/resources/css/grouped-data-view.css',
-                    'resources/css/toolbar.css', 'resources/css/dimension-picker.css', 'resources/css/dataview-combo.css',
+                    '../../common/main/resources/css/grouped-data-view.css', '../../common/main/resources/css/multislider-gradient.css',
+                    'resources/css/toolbar.css', 'resources/css/dimension-picker.css', '../../common/main/resources/css/dataview-combo.css',
                     'resources/css/table-border-styler.css', 'resources/css/right-panels.css',
                     'resources/css/advanced-settings-dialog.css', '../../common/main/resources/css/synchronize-tip.css'];
         };
