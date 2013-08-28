@@ -994,109 +994,7 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 		var isEn = false;
 		var isEnY = false;
 		
-		if (chart.type == 'Scatter' && series[0].xVal.Formula != null && isEn)//в случае точечной диаграммы отдельная обработка
-		{
-			var isEnY = false
-			for(l = 0; l < series.length; ++l)
-			{
-				var n = 0;
-				arrValues[l] = [];
-				arrFormatAdobeLabels[l] = [];
-				
-				var firstCol = 0;
-				var firstRow = 0;
-				var lastCol = series[l].Val.NumCache.length;
-				var lastRow = series[l].Val.NumCache.length;
-				
-				var xfirstCol = 0;
-				var xfirstRow = 0;
-				var xlastCol = series[l].xVal.NumCache.length;
-				var xlastRow = series[l].xVal.NumCache.length;
-				
-				var isRow = false;
-				if(xfirstCol == xlastCol)
-					isRow  = true;
-				
 	
-				var row = xfirstRow;
-				for(col = xfirstCol; col <= xlastCol; ++col)
-				{
-					arrValues[l][n] = [];
-					arrFormatAdobeLabels[l][n] = [];
-					var cell = series[l].xVal.NumCache[n];
-					var cellY = series[l].Val.NumCache[n];
-					//var cell = ws.getCell(new CellAddress(row - 1, col - 1, 0));
-					//var cellY = ws.getCell(new CellAddress(firstRow - 1, firstCol + n - 1, 0));
-					
-					if(row == xfirstRow && col == xfirstCol && chart.subType != 'stackedPer' && chart.type != 'Stock')
-					{
-						formatCell = cell.numFormatStr ? cell.numFormatStr : defaultFormat;
-						isDateTimeFormat = cell.isDateTimeFormat;
-					}
-					
-					if(row == firstRow && col == firstCol - 1 && chart.subType != 'stackedPer' && chart.range.rows && chart.type != 'Stock')
-						formatCellScOy = cell.numFormatStr ? cell.numFormatStr : defaultFormat;
-					else if(row == firstRow - 1 && col == firstCol && chart.subType != 'stackedPer' && !chart.range.rows && chart.type != 'Stock')
-						formatCellScOy = cell.numFormatStr ? cell.numFormatStr : defaultFormat;
-					
-					var orValue = cell.val;
-					var orValueY = cellY.val;
-					
-					var value =  parseFloat(orValue);
-					var valueY = parseFloat(orValueY);
-					
-					if(orValue == '')
-						arrValues[l][n][0] = value;
-					else if (isNaN(value))
-						arrValues[l][n][0] = 0;
-					else
-						arrValues[l][n][0] = value;
-					
-					if(orValueY == '')
-						arrValues[l][n][1] = orValueY;
-					else if (isNaN(valueY))
-						arrValues[l][n][1] = 0;
-					else
-						arrValues[l][n][1] = valueY;
-					
-					arrFormatAdobeLabels[l][n][0] = cell.numFormatStr;
-					arrFormatAdobeLabels[l][n][1] = cellY.numFormatStr;
-					
-					if(value.toString() != '' && !isEn)
-					{
-						min = value;
-						max = value;
-						isEn = true;
-					}
-					if(valueY.toString() != '' && !isEnY)
-					{
-						minY = valueY;
-						maxY = valueY;
-						isEnY = true;
-					}
-					
-					if(min > value && value != '')
-						min =  value
-					if(max < value && value != '')
-						max = value
-					if(minY > valueY && valueY != '')
-						minY =  valueY
-					if(maxY < valueY && valueY != '')
-						maxY = valueY
-					
-					n++;
-				}
-			}
-			
-			if(minY && maxY)
-			{
-				chart.ymin = minY;
-				chart.ymax = maxY;
-			}
-			var newArr = arrValues;
-		}
-		else//для всех остальных диаграмм при условии что данные приходят в виде серий
-		{
 			var numSeries = 0;
 			var curSeria;	
 			for(l = 0; l < series.length; ++l)
@@ -1188,7 +1086,7 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 				}
 				numSeries++;
 			}
-		}
+
 	}
 	else if(chart.series && chart.series.length !=0 && api_sheet)
 	{
