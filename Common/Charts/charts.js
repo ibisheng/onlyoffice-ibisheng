@@ -2311,6 +2311,8 @@ function DrawLineChart(chartCanvas, chartType, chartSubType, data, chart) {
 	//подписи по оси OX
 	if(chart && chart.series && chart.series[0] && chart.series[0].xVal && chart.series[0].xVal.NumCache && chart.series[0].xVal.Formula != null && chart.series[0].xVal.NumCache.length != 0)
 		bar._otherProps._labels = chart.series[0].xVal.NumCache;
+	else if(chart && chart.series && chart.series[0] && chart.series[0].Cat && chart.series[0].Cat.NumCache && chart.series[0].Cat.Formula != null && chart.series[0].Cat.NumCache.length != 0)
+		bar._otherProps._labels = chart.series[0].Cat.NumCache;
 	else
 		bar._otherProps._labels = tempMas;
 		
