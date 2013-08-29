@@ -75,10 +75,10 @@ CGraphicObjects.prototype =
                         var kw = para_drawing.GraphicObj.absExtX/0.6;
                         var kh = para_drawing.GraphicObj.absExtY/0.6;
                         var rel_points = para_drawing.wrappingPolygon.relativeArrPoints;
-                        for(var i = 0; i < rel_points.length; ++i)
+                        for(var j = 0; j < rel_points.length; ++j)
                         {
-                            rel_points[i].x *= kw;
-                            rel_points[i].y *= kh;
+                            rel_points[j].x *= kw;
+                            rel_points[j].y *= kh;
                         }
                     }
                 }

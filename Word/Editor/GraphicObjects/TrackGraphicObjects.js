@@ -772,6 +772,8 @@ function CTrackNewObject2(presetGeom, pen, brush, startX, startY, pageIndex)
         {
 
         }
+        this.extX = this.absExtX;
+        this.extY = this.absExtY;
         this.calculateTransform();
     };
 
