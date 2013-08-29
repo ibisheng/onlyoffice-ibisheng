@@ -2176,6 +2176,11 @@ function DrawingObjects() {
 			lockState: c_oAscObjectLockState.No
 		};
 
+
+        _t.getAllFonts = function(AllFonts) {
+            _t.graphicObject && _t.graphicObject.getAllFonts && _t.graphicObject.getAllFonts(AllFonts);
+        };
+
 		// Свойства
 		_t.isImage = function() {
 			return _t.graphicObject ? _t.graphicObject.isImage() : false;
@@ -2608,6 +2613,11 @@ function DrawingObjects() {
 			}
 		}
 	}
+
+    _this.getAllFonts = function(AllFonts)
+    {
+
+    },
 
     _this.getChartRender = function() {
         return chartRender;

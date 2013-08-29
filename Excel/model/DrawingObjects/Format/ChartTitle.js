@@ -941,5 +941,53 @@ CChartTitle.prototype =
     getInvertTransform: function()
     {
         return this.invertTransform;
+    },
+
+    getAllFonts: function(AllFonts)
+    {
+        if(this.txBody && this.txBody.content)
+        {
+            this.txBody.content.Document_Get_AllFontNames(AllFonts);
+        }
+    },
+
+    writeToBinary: function(w)
+    {
+        w.WriteBool(isRealObject(this.layout));
+        if(isRealOBject(this.layout))
+            this.layout.writeToBinary(w);
+        w.WriteBool(this.overlay);
+        this.spPr.Write_ToBinary2(w);
+        w.WriteBool(isRealObject(this.txPr));
+        if(isRealObject(this.txPr))
+            this.txPr.writeToBinary(w);
+
+        w.WriteBool(isRealObject(this.txBody));
+        if(isRealObject(this.txBody))
+            this.txBody.writeToBinary(w);
+
+    },
+
+    readFromBinary: function(r)
+    {
+        if(r.GetBool())
+        {
+            this.layout = new CChartLayout();
+            this.layout.readFromBinary(r);
+        }
+        this.overlay = r.GetBool();
+        this.spPr.Read_FromBinary2(r);
+        if(r.GetBool())
+        {
+            this.txPr = new CTextBody(this);
+            this.txPr.readFromBinary(r);
+        }
+
+        if(r.GetBool())
+        {
+            this.txBody = new CTextBody(this);
+            this.txBody.readFromBinary(r);
+        }
+
     }
 };

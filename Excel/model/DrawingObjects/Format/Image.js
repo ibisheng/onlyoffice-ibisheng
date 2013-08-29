@@ -78,6 +78,10 @@ function CImageShape(drawingBase, drawingObjects)
 
 CImageShape.prototype =
 {
+    getAllFonts: function(AllFonts)
+    {
+    },
+
     getObjectType: function()
     {
         return CLASS_TYPE_IMAGE;

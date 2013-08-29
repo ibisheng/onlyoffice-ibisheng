@@ -20,6 +20,10 @@ function DrawingObjectsController(drawingObjects)
 
 DrawingObjectsController.prototype =
 {
+    getAllFontNames: function()
+    {
+
+    },
 
     setCellFontName: function (fontName) {
         if(typeof this.curState.setCellFontName === "function")

@@ -180,6 +180,14 @@ CShape.prototype =
         return CLASS_TYPE_SHAPE;
     },
 
+    getAllFonts: function(AllFonts)
+    {
+        if(this.txBody && this.txBody.content)
+        {
+            this.txBody.content.Document_Get_AllFontNames(AllFonts);
+        }
+    },
+
     isShape: function()
     {
         return true;

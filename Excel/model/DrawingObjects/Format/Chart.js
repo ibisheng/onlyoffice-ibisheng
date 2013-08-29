@@ -1495,16 +1495,57 @@ CChartAsGroup.prototype =
             }
         }
     },
-	
-	getChartBinary: function()
-	{
-		// Записываем объект в бинарник для редактора документов
-		return "_chart_";
-	},
-	
-	setChartBinary: function(binary)
-	{
-		// Приводим бинарник к внутренней структуре
-	}
+
+
+    getAllFonts: function(AllFonts)
+    {
+        if(isRealObject(this.chartTitle))
+        {
+            this.chartTitle.getAllFonts(AllFonts);
+        }
+
+        if(isRealObject(this.vAxisTitle))
+        {
+            this.vAxisTitle.getAllFonts(AllFonts);
+        }
+
+        if(isRealObject(this.hAxisTitle))
+        {
+            this.hAxisTitle.getAllFonts(AllFonts);
+        }
+
+    },
+
+    getChartBinary: function()
+    {
+        // Р—Р°РїРёСЃС‹РІР°РµРј РѕР±СЉРµРєС‚ РІ Р±РёРЅР°СЂРЅРёРє РґР»СЏ СЂРµРґР°РєС‚РѕСЂР° РґРѕРєСѓРјРµРЅС‚РѕРІ
+        var w = new CMemory();
+        w.WriteBool(isRealObject(this.chartTitle));
+        if(isRealObject(this.chartTitle))
+        {
+            this.chartTitle.writeToBinary();
+        }
+
+        w.WriteBool(isRealObject(this.vAxisTitle));
+        if(isRealObject(this.vAxisTitle))
+        {
+            this.vAxisTitle.writeToBinary();
+        }
+
+        w.WriteBool(isRealObject(this.hAxisTitle));
+        if(isRealObject(this.hAxisTitle))
+        {
+            this.hAxisTitle.writeToBinary();
+        }
+
+        this.chart.Write_ToBinary2(w);
+        this.spPr.Write_ToBinary2(w);
+        return w.pos + ";" + w.GetBase64Memory();
+    },
+
+    setChartBinary: function(binary)
+    {
+        // РџСЂРёРІРѕРґРёРј Р±РёРЅР°СЂРЅРёРє Рє РІРЅСѓС‚СЂРµРЅРЅРµР№ СЃС‚СЂСѓРєС‚СѓСЂРµ
+    }
 };
 

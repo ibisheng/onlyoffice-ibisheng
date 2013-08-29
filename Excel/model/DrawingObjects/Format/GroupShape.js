@@ -54,6 +54,17 @@ function CGroupShape(drawingBase, drawingObjects)
 CGroupShape.prototype =
 {
 
+    getAllFonts: function(AllFonts)
+    {
+       for(var i = 0;  i< this.spTree.length; ++i)
+       {
+           if(typeof  this.spTree[i].getAllFonts === "function")
+           {
+               this.spTree[i].getAllFonts(AllFonts);
+           }
+       }
+    },
+
     Get_Id: function()
     {
         return this.Id;
