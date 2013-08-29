@@ -836,7 +836,8 @@ var c_oSer_ChartSeriesType =
 	Index: 6,
 	Order: 7,
 	DataLabels: 8,
-	SpPr: 9
+	SpPr: 9,
+	Cat: 10
 };
 /** @enum */
 var c_oSer_ChartSeriesMarkerType =
@@ -1764,6 +1765,12 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 			var oNewSpPr = oPresentationSimpleSerializer.ReadShapeProperty(this.stream);
 			if(null != oNewSpPr.Fill && null != oNewSpPr.Fill.fill && null != oNewSpPr.Fill.fill.color)
 				seria.OutlineColor = oNewSpPr.Fill.fill.color;
+		}
+		else if ( c_oSer_ChartSeriesType.Cat === type )
+		{
+            res = this.bcr.Read1(length, function(t,l){
+					return oThis.ReadSeriesNumCache(t,l, seria.Cat);
+				});
 		}
 		else
             res = c_oSerConstants.ReadUnknown;
