@@ -242,15 +242,6 @@ cFormulaFunction.LookupAndReference = {
 
             if ( arg0 instanceof cString ) {
                 valueForSearching = arg0.getValue();
-                /*valueForSearching = valueForSearching
-                    .replace( /(~)?\*//*g, function ( $0, $1 ) {
-                        return $1 ? $0 : '[\\w\\W]*';
-                    } )
-                    .replace( /(~)?\?/g, function ( $0, $1 ) {
-                        return $1 ? $0 : '[\\w\\W]{1,1}';
-                    } )
-                    .replace( /\~/g, "\\" );
-                regexp = new XRegExp( valueForSearching + "$", "i" );*/
                 regexp = searchRegExp(valueForSearching);
             }
             else if ( arg0 instanceof cError )
@@ -262,11 +253,22 @@ cFormulaFunction.LookupAndReference = {
             var found = false, bb,
                 f = function ( cell, r, c, r1, c1 ) {
                     if ( r == r1 ) {
-                        var cv = cell.getValueWithoutFormat();
+                        var cv = cell.getValueWithoutFormat(), cvType = checkTypeCell(cv);
                         if ( c == c1 )
                             min = cv;
                         if ( arg3.value == true ) {
-                            if ( valueForSearching == cv ) {
+                            if ( arg0 instanceof cString ) {
+                                if ( cvType instanceof cString ){
+                                    if( valueForSearching.localeCompare( cvType.getValue() ) == 0 ){
+                                        resC = r;
+                                        found = true;
+                                    }
+                                    else if( valueForSearching.localeCompare( cvType.getValue() ) == 1 && !found ){
+                                        resC = r;
+                                    }
+                                }
+                            }
+                            else if ( valueForSearching == cv ) {
                                 resC = c;
                                 found = true;
                             }
@@ -283,11 +285,11 @@ cFormulaFunction.LookupAndReference = {
                                 resC = c;
                             }
                         }
-                        if ( resC > -1 ) {
+                        /*if ( resC > -1 ) {
                             min = Math.min( min, cv );
                             if ( arg3.value == false )
                                 return true;
-                        }
+                        }*/
                     }
                 };
 
@@ -462,7 +464,7 @@ cFormulaFunction.LookupAndReference = {
         r.setArgumentsMax( 3 );
         r.Calculate = function ( arg ) {
             var arg0 = arg[0], arg1 = arg[1], arg2 = this.argumentsCurrent == 2 ? arg1 : arg[2],
-                valueForSearching, resC = -1, resR = -1;
+                resC = -1, resR = -1;
 
             if ( arg0 instanceof cError ) {
                 return this.value = arg0;
@@ -535,29 +537,48 @@ cFormulaFunction.LookupAndReference = {
                 if ( arg1 instanceof cArea3D && arg1Range.length > 1 || arg2 instanceof cArea3D && arg2Range.length > 1 )
                     return this.value = new cError( cErrorType.not_available );
 
-                if ( arg1 instanceof cArea3D )
-                    arg1Range = arg1Range[0];
-
-                if ( arg2 instanceof cArea3D )
-                    arg2Range = arg2Range[0];
-
-                var oBBox1 = arg1Range.getBBox0(), oBBox2 = arg2Range.getBBox0();
-
-                if ( !(oBBox1.r1 == oBBox1.r2 || oBBox1.c1 == oBBox1.c2) && !(oBBox2.r1 == oBBox2.r2 || oBBox2.c1 == oBBox2.c2) ) {
-                    return this.value = new cError( cErrorType.not_available );
+                if ( arg1 instanceof cArea3D ){
+                    arg1Range = arg1.getMatrix()[0];
+//                    arg1Range = arg1Range[0];
+                }
+                else if( arg1 instanceof cArea ){
+                    arg1Range = arg1.getMatrix();
                 }
 
-                var index;
 
-                if ( (oBBox1.r1 == oBBox1.r2 && ( (oBBox2.r1 == oBBox2.r2 && oBBox1.r1 - oBBox1.r2 == oBBox2.r1 - oBBox2.r2) || (oBBox2.c1 == oBBox2.c2 && oBBox1.r1 - oBBox1.r2 == oBBox2.c1 - oBBox2.c2)))
-                    ||
-                    (oBBox1.c1 == oBBox1.c2 && ( (oBBox2.r1 == oBBox2.r2 && oBBox1.c1 - oBBox1.c2 == oBBox2.r1 - oBBox2.r2) || (oBBox2.c1 == oBBox2.c2 && oBBox1.c1 - oBBox1.c2 == oBBox2.c1 - oBBox2.c2)))
-                    ) {
-                    index = _func.binarySearch( arg0, arg1.getValue() )
-                    if ( index < 0 ) return this.value = new cError( cErrorType.not_available );
+                if ( arg2 instanceof cArea3D ){
+                    arg2Range = arg2.getMatrix()[0];
+//                    arg2Range = arg2Range[0];
                 }
-                else {
-                    return this.value = new cError( cErrorType.not_available );
+                else if( arg2 instanceof cArea ){
+                    arg2Range = arg2.getMatrix();
+                }
+
+                index = _func.binarySearch( arg0, function(){
+                    var a = []
+                    for(var i=0;i<arg1Range.length;i++){
+                        a.push(arg1Range[i][0])
+                    }
+                    return a;
+                }() )
+
+
+                if ( index < 0 ) return this.value = new cError( cErrorType.not_available );
+                if( this.argumentsCurrent == 2 ){
+                    if( arg1Range[0].length >= 2 ){
+                        var b = arg1.getBBox();
+                        return this.value = new cRef(arg1.ws.getCell3( (b.r1-1)+index, (b.c1-1)+1 ).getName(),arg1.ws);
+                    }
+                    else
+                        return this.value = new cRef(arg1.ws.getCell3( (b.r1-1)+0, (b.c1-1)+index ).getName(),arg1.ws);
+                }
+                else{
+                    var b = arg2.getBBox();
+                    if( arg2Range.length == 1 ){
+                        return this.value = new cRef(arg1.ws.getCell3( (b.r1-1)+0, (b.c1-1)+index ).getName(),arg1.ws);
+                    }
+                    else
+                        return this.value = new cRef(arg1.ws.getCell3( (b.r1-1)+index, (b.c1-1)+0 ).getName(),arg1.ws);
                 }
 
                 return this.value = arg2.getValue()[index];
@@ -671,17 +692,12 @@ cFormulaFunction.LookupAndReference = {
             if ( numberCol < 0 )
                 return this.value = new cError( cErrorType.wrong_value_type );
 
+            if( arg0 instanceof cRef ){
+                arg0 = arg0.getValue()
+            }
+
             if ( arg0 instanceof cString ) {
                 valueForSearching = arg0.getValue();
-                /*valueForSearching = valueForSearching
-                    .replace( /(~)?\*//*g, function ( $0, $1 ) {
-                        return $1 ? $0 : '[\\w\\W]*';
-                    } )
-                    .replace( /(~)?\?/g, function ( $0, $1 ) {
-                        return $1 ? $0 : '[\\w\\W]{1,1}';
-                    } )
-                    .replace( /\~/g, "\\" );
-                regexp = new XRegExp( valueForSearching + "$", "i" );*/
                 regexp = searchRegExp(valueForSearching);
             }
             else if ( arg0 instanceof cError )
@@ -694,11 +710,22 @@ cFormulaFunction.LookupAndReference = {
             var found = false, bb,
                 f = function ( cell, r, c, r1, c1 ) {
                     if ( c == c1 ) {
-                        var cv = cell.getValueWithoutFormat();
+                        var cv = cell.getValueWithoutFormat(), cvType = checkTypeCell(cv);
                         if ( r == r1 )
                             min = cv;
                         if ( arg3.value == true ) {
-                            if ( valueForSearching == cv ) {
+                            if ( arg0 instanceof cString ) {
+                                if ( cvType instanceof cString ){
+                                    if( valueForSearching.localeCompare( cvType.getValue() ) == 0 ){
+                                        resR = r;
+                                        found = true;
+                                    }
+                                    else if( valueForSearching.localeCompare( cvType.getValue() ) == 1 && !found ){
+                                        resR = r;
+                                    }
+                                }
+                            }
+                            else if ( valueForSearching == cv ) {
                                 resR = r;
                                 found = true;
                             }
@@ -715,11 +742,11 @@ cFormulaFunction.LookupAndReference = {
                                 resR = r;
                             }
                         }
-                        if ( resR > -1 ) {
-                            min = Math.min( min, cv );
+                        /*if ( resR > -1 ) {
+                            min = min > cv ? cv : min;
                             if ( arg3.value == false )
                                 return true;
-                        }
+                        }*/
                     }
                 };
 
@@ -728,7 +755,6 @@ cFormulaFunction.LookupAndReference = {
                 bb = range.getBBox0();
                 if ( numberCol > bb.c2 - bb.c1 )
                     return this.value = new cError( cErrorType.bad_reference );
-
                 range._foreachRowNoEmpty( /*func for col*/ null, /*func for cell in col*/ f );
             }
             else if ( arg1 instanceof cArea3D ) {
