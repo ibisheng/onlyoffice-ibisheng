@@ -272,7 +272,7 @@ function CAscFillGrad()
     this.Positions = undefined;
     this.GradType = 0;
 
-    this.LinearAngle = 0;
+    this.LinearAngle = undefined;
     this.LinearScale = true;
 
     this.PathType = 0;

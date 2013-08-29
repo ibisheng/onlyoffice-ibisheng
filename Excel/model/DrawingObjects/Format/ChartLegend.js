@@ -153,7 +153,7 @@ CChartLegend.prototype =
                 uni_fill.setFill(new CSolidFill());
                 uni_fill.fill.setColor(new CUniColor());
                 uni_fill.fill.color.setColor(new CRGBColor());
-                uni_fill.fill.color.setColor(cur_legend_info.color.R*16*16 + cur_legend_info.color.G*16 +cur_legend_info.color.B);
+                uni_fill.fill.color.setColor(cur_legend_info.color.R*256*256 + cur_legend_info.color.G*256 +cur_legend_info.color.B);
                 if(bullet_type === "line")
                 {
                     entry.bullet.setPresetGeometry("line");

@@ -882,7 +882,7 @@ CRGBColor.prototype =
     setColor: function(RGB)
     {
 
-        var oldValue = this.RGBA.R*16*16 + this.RGBA.G*16 + this.RGBA.B;
+        var oldValue = ((this.RGBA.R << 16) & 0xFF0000) + ((this.RGBA.G << 8) & 0xFF00) + this.RGBA.B;
         var newValue = RGB;
         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetFType, null, null,
             new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
@@ -894,7 +894,7 @@ CRGBColor.prototype =
     Copy: function()
     {
         var ret = new CRGBColor();
-        ret.setColor(this.RGBA.R*16*16 + this.RGBA.G*16 + this.RGBA.B);
+        ret.setColor(((this.RGBA.R << 16) & 0xFF0000) + ((this.RGBA.G << 8) & 0xFF00) + this.RGBA.B);
         return ret;
     },
 

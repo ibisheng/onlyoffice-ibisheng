@@ -645,12 +645,12 @@ ParaTextPr.prototype =
         var oldValue = null;
         if(isRealObject(this.Value.Color))
         {
-            oldValue = this.Value.Color.r*16*16 + this.Value.Color.g*16 + this.Value.Color.b
+            oldValue = this.Value.Color.r*256*256 + this.Value.Color.g*256 + this.Value.Color.b;
         }
         var newValue = null;
         if(isRealObject(Value))
         {
-            newValue = Value.r*16*16 + Value.g*16 + Value.b
+            newValue = Value.r*256*256 + Value.g*256 + Value.b
         }
         if ( undefined != Value )
             this.Value.Color = Value;

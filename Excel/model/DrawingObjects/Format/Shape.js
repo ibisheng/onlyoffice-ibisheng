@@ -2990,7 +2990,7 @@ function CorrectUniColor2(asc_color, unicolor)
             {
                 ret.setColor(new CRGBColor());
             }
-            ret.color.setColor(asc_color.get_r()*16*16 + asc_color.get_g()*16 + asc_color.get_b());
+            ret.color.setColor(asc_color.get_r()*256*256 + asc_color.get_g()*256 + asc_color.get_b());
             /*ret.color.RGBA.R = asc_color.get_r();
             ret.color.RGBA.G = asc_color.get_g();
             ret.color.RGBA.B = asc_color.get_b();
