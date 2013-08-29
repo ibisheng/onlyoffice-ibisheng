@@ -6859,8 +6859,9 @@ CErrorData.prototype.get_Value = function() { return this.Value; };
 // Вставка диаграмм
 asc_docs_api.prototype.asc_getChartObject = function()
 {	
-	this.isChartEditor = true;
-	var chart = this.WordControl.m_oLogicDocument.Get_ChartObject();
+	this.isChartEditor = true;		// Для совместного редактирования
+	
+	/*var chart = this.WordControl.m_oLogicDocument.Get_ChartObject();
 	if ( chart.type != "" )
 		this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props);
 	else
@@ -6869,14 +6870,15 @@ asc_docs_api.prototype.asc_getChartObject = function()
 	chart["themeColors"] = [];
 	for (var i = 0; i < this.WordControl.m_oDrawingDocument.GuiControlColorsMap.length; i++) {
 		chart["themeColors"].push( this.WordControl.m_oDrawingDocument.GuiControlColorsMap[i].get_hex() );
-	}
+	}*/
 		
+	var chart;		// Объект типа CChartAsGroup. Внутри asc_CChart
     return  chart;
 }
 
-asc_docs_api.prototype.asc_addChartDrawingObject = function(chart)
+asc_docs_api.prototype.asc_addChartDrawingObject = function(chartBinary)
 {
-    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) ) 
+    /*if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) ) 
     {
         History.Create_NewPoint();
         var diagramm = new CChartData(true);
@@ -6899,12 +6901,14 @@ asc_docs_api.prototype.asc_addChartDrawingObject = function(chart)
                 this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
             }
         }
-    }
+    }*/
+	
+	// Приводим бинарик к объекту типа CChartAsGroup и добавляем объект
 }
 
-asc_docs_api.prototype.asc_editChartDrawingObject = function(chart)
+asc_docs_api.prototype.asc_editChartDrawingObject = function(chartBinary)
 {
-    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
+    /*if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
     {
         History.Create_NewPoint();
         var diagramm = new CChartData(true);
@@ -6925,7 +6929,9 @@ asc_docs_api.prototype.asc_editChartDrawingObject = function(chart)
                 this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
             }
         }
-    }
+    }*/
+	
+	// Находим выделенную диаграмму и накатываем бинарник
 }
 
 asc_docs_api.prototype.asc_getChartPreviews = function(chartType, chartSubType)

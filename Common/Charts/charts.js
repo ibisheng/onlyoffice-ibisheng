@@ -1909,10 +1909,10 @@ function drawChart(chart, arrValues, width, height) {
 		colorMap = GenerateDefaultColorMap().color_map;
 		RGBA = {R: 0, G: 0, B: 0, A: 255};
 	}
-	else if(api_doc)
+	else if (api_doc)
 	{
-		theme  = api.WordControl.m_oLogicDocument.theme;
-		colorMap = api.WordControl.m_oLogicDocument.clrSchemeMap.color_map;
+		theme  = api_doc.WordControl.m_oLogicDocument.theme;
+		colorMap = api_doc.WordControl.m_oLogicDocument.clrSchemeMap.color_map;
 		RGBA = {R: 0, G: 0, B: 0, A: 255};
 		if(colorMap==null)
 			colorMap = GenerateDefaultColorMap().color_map;

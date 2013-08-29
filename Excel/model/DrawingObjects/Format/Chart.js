@@ -1494,7 +1494,17 @@ CChartAsGroup.prototype =
                 this.recalculate();
             }
         }
-    }
-
+    },
+	
+	getChartBinary: function()
+	{
+		// Записываем объект в бинарник для редактора документов
+		return "_chart_";
+	},
+	
+	setChartBinary: function(binary)
+	{
+		// Приводим бинарник к внутренней структуре
+	}
 };
 
