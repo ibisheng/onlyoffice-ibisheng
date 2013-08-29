@@ -25,8 +25,8 @@ CNary.prototype.init = function(props)
     else
         this.limLoc = 1;
 
-    this.supHide = (props.supHide === 1 || props.supHide === true) ? true : false;
-    this.subHide = (props.subHide === 1 || props.subHide === true) ? true : false;
+    this.supHide = (props.supHide === "1" || props.supHide === true) ? true : false;
+    this.subHide = (props.subHide === "1" || props.subHide === true) ? true : false;
 
     this.setDimension(1, 2);
 
@@ -91,19 +91,19 @@ CNary.prototype.init = function(props)
         if( this.supHide && !this.subHide )
         {
             base = new CDegree();
-            props = {type: SUPERSCRIPT};
+            props = {type: DEGREE_SUPERSCRIPT};
             base.init_2(props, sign);
         }
         else if( !this.supHide && this.subHide )
         {
             base = new CDegree();
-            props = {type: SUBSCRIPT};
+            props = {type: DEGREE_SUBSCRIPT};
             base.init_2(props, sign);
         }
         else
         {
             base = new CDegreeSubSup();
-            props = {type: SubSup};
+            props = {type: DEGREE_SubSup};
             base.init_2(props, sign);
         }
     }

@@ -7,7 +7,7 @@
  DEGREE
  DEGREE_SubSup
  RADICAL
- LIMIT (доделать для случая limLow)
+ LIMIT
  */
 var historyitem_Math_AddItem                   =  1; // Добавляем элемент
 var historyitem_Math_RemoveItem                =  2; // Удаляем элемент
@@ -420,8 +420,7 @@ CMathContent.prototype =
                     mathElem = new CBorderBox();
                     break;
                 case 19:
-                    //mathElem = new CMinimax();
-                    mathElem = new CLimLowUp();
+                    mathElem = new CMinimax();
                     break;
                 case 20:
                     mathElem = new CStructArrow();
@@ -455,8 +454,8 @@ CMathContent.prototype =
                 case MATH_DELIMITER:
                     mathElem = new CDelimiter();
                     break;
-                case MATH_GROUP_CHARACTER:
-                    mathElem = new CGroupCharacter();
+                case MATH_SEPARATOR_DELIMITER:
+                    mathElem = new CSeparatorDelimiter();
                     break;
                 case MATH_FUNCTION:
                     mathElem = new CMathFunc();
@@ -468,7 +467,7 @@ CMathContent.prototype =
                     mathElem = new CBorderBox();
                     break;
                 case MATH_LIMIT:
-                    mathElem = new CLimLowUp();
+                    mathElem = new CLimit();
                     break;
                 case MATH_MATRIX:
                     mathElem = new CMathMatrix();
@@ -2349,33 +2348,33 @@ CMathContent.prototype =
                     break;
                 case 9:
                     var degr = this.addMComponent(MATH_DEGREE);
-                    degr.init({type: SUPERSCRIPT});
+                    degr.init({type: DEGREE_SUPERSCRIPT});
                     degr.fillPlaceholders();
                     break;
                 case 10:
                     var degr = this.addMComponent(MATH_DEGREE);
-                    degr.init({type: SUBSCRIPT});
+                    degr.init({type: DEGREE_SUBSCRIPT});
                     degr.fillPlaceholders();
                     break;
                 case 11:
                     var degrSupSup = this.addMComponent(MATH_DEGREESubSup);
-                    degrSupSup.init({type: SubSup});
+                    degrSupSup.init({type: DEGREE_SubSup});
                     degrSupSup.fillPlaceholders();
                     break;
                 case 12:
                     var degrSupSup = this.addMComponent(MATH_DEGREESubSup);
-                    degrSupSup.init({type: PreSubSup});
+                    degrSupSup.init({type: DEGREE_PreSubSup});
                     degrSupSup.fillPlaceholders();
                     break;
                 case 13:
                     var degr = this.addMComponent(MATH_DEGREE);
-                    degr.init({type: SUBSCRIPT});
+                    degr.init({type: DEGREE_SUBSCRIPT});
                     var base = degr.getBase();
                     base.addTxt("x");
                     var iter = degr.getIterator();
 
                     var degr2 = iter.addMComponent(MATH_DEGREE);
-                    degr2.init({type: SUPERSCRIPT});
+                    degr2.init({type: DEGREE_SUPERSCRIPT});
                     var base2 = degr2.getBase();
                     base2.addTxt("y");
                     var iter2 = degr2.getIterator();
@@ -2384,7 +2383,7 @@ CMathContent.prototype =
                     break;
                 case 14:
                     var degr = this.addMComponent(MATH_DEGREE);
-                    degr.init({type: SUPERSCRIPT});
+                    degr.init({type: DEGREE_SUPERSCRIPT});
                     var base = degr.getBase();
                     base.addTxt("e");
                     var iter = degr.getIterator();
@@ -2392,7 +2391,7 @@ CMathContent.prototype =
                     break;
                 case 15:
                     var degr = this.addMComponent(MATH_DEGREE);
-                    degr.init({type: SUPERSCRIPT});
+                    degr.init({type: DEGREE_SUPERSCRIPT});
                     var base = degr.getBase();
                     base.addTxt("x");
                     var iter = degr.getIterator();
@@ -2400,7 +2399,7 @@ CMathContent.prototype =
                     break;
                 case 16:
                     var degrSupSup = this.addMComponent(MATH_DEGREESubSup);
-                    degrSupSup.init({type: PreSubSup});
+                    degrSupSup.init({type: DEGREE_PreSubSup});
                     var base = degrSupSup.getBase();
                     base.addTxt("Y");
                     var iter1 = degrSupSup.getUpperIterator();
@@ -2444,7 +2443,7 @@ CMathContent.prototype =
                     rad.init({type: SQUARE_RADICAL});
                     var base = rad.getBase();
                     var degree = base.addMComponent(MATH_DEGREE);
-                    degree.init({type: SUPERSCRIPT});
+                    degree.init({type: DEGREE_SUPERSCRIPT});
                     var baseDg = degree.getBase();
                     baseDg.addTxt("b");
                     var iter = degree.getIterator();
@@ -2460,7 +2459,7 @@ CMathContent.prototype =
                     var base = rad.getBase();
 
                     degr1 = base.addMComponent(MATH_DEGREE);
-                    degr1.init({type: SUPERSCRIPT});
+                    degr1.init({type: DEGREE_SUPERSCRIPT});
                     var base1 = degr1.getBase();
                     base1.addTxt("a");
                     var iter1 = degr1.getIterator();
@@ -2469,7 +2468,7 @@ CMathContent.prototype =
                     base.addTxt("+");
 
                     degr2 = base.addMComponent(MATH_DEGREE);
-                    degr2.init({type: SUPERSCRIPT});
+                    degr2.init({type: DEGREE_SUPERSCRIPT});
                     var base2 = degr2.getBase();
                     base2.addTxt("b");
                     var iter2 = degr2.getIterator();
@@ -2482,8 +2481,8 @@ CMathContent.prototype =
                     {
                         signType:       NARY_INTEGRAL,
                         limLocType:     NARY_UndOvr,
-                        subHide:        1,
-                        supHide:        1
+                        subHide:        true,
+                        supHide:        true
                     };
                     integr.init(props);
                     integr.fillPlaceholders();
@@ -2514,8 +2513,8 @@ CMathContent.prototype =
                     {
                         signType:       NARY_DOUBLE_INTEGRAL,
                         limLocType:     NARY_UndOvr,
-                        subHide:        1,
-                        supHide:        1
+                        subHide:        true,
+                        supHide:        true
                     };
                     integr.init(props);
                     integr.fillPlaceholders();
@@ -2546,8 +2545,8 @@ CMathContent.prototype =
                     {
                         signType:       NARY_TRIPLE_INTEGRAL,
                         limLocType:     NARY_UndOvr,
-                        subHide:        1,
-                        supHide:        1
+                        subHide:        true,
+                        supHide:        true
                     };
                     integr.init(props);
                     integr.fillPlaceholders();
@@ -2578,8 +2577,8 @@ CMathContent.prototype =
                     {
                         signType:       NARY_CONTOUR_INTEGRAL,
                         limLocType:     NARY_UndOvr,
-                        subHide:        1,
-                        supHide:        1
+                        subHide:        true,
+                        supHide:        true
                     };
                     integr.init(props);
                     integr.fillPlaceholders();
@@ -2610,8 +2609,8 @@ CMathContent.prototype =
                     {
                         signType:       NARY_SURFACE_INTEGRAL,
                         limLocType:     NARY_UndOvr,
-                        subHide:        1,
-                        supHide:        1
+                        subHide:        true,
+                        supHide:        true
                     };
                     integr.init(props);
                     integr.fillPlaceholders();
@@ -2642,8 +2641,8 @@ CMathContent.prototype =
                     {
                         signType:       NARY_VOLUME_INTEGRAL,
                         limLocType:     NARY_UndOvr,
-                        subHide:        1,
-                        supHide:        1
+                        subHide:        true,
+                        supHide:        true
                     };
                     integr.init(props);
                     integr.fillPlaceholders();
@@ -2707,8 +2706,8 @@ CMathContent.prototype =
                     {
                         signType:       NARY_SIGMA,
                         limLocType:     NARY_UndOvr,
-                        subHide:        1,
-                        supHide:        1
+                        subHide:        true,
+                        supHide:        true
                     };
                     integr.init(props);
                     integr.fillPlaceholders();
@@ -2739,7 +2738,7 @@ CMathContent.prototype =
                     {
                         signType:       NARY_SIGMA,
                         limLocType:     NARY_UndOvr,
-                        subHide:        1
+                        subHide:        true
                     };
                     sigma.init(props);
                     sigma.fillPlaceholders();
@@ -2750,7 +2749,7 @@ CMathContent.prototype =
                     {
                         signType:       NARY_SIGMA,
                         limLocType:     NARY_SubSup,
-                        subHide:        1
+                        subHide:        true
                     };
                     sigma.init(props);
                     sigma.fillPlaceholders();
@@ -2761,8 +2760,8 @@ CMathContent.prototype =
                     {
                         signType:       NARY_PRODUCT,
                         limLocType:     NARY_UndOvr,
-                        subHide:        1,
-                        supHide:        1
+                        subHide:        true,
+                        supHide:        true
                     };
                     product.init(props);
                     product.fillPlaceholders();
@@ -2793,7 +2792,7 @@ CMathContent.prototype =
                     {
                         signType:       NARY_PRODUCT,
                         limLocType:     NARY_UndOvr,
-                        subHide:        1
+                        subHide:        true
                     };
                     product.init(props);
                     product.fillPlaceholders();
@@ -2804,7 +2803,7 @@ CMathContent.prototype =
                     {
                         signType:       NARY_PRODUCT,
                         limLocType:     NARY_SubSup,
-                        subHide:        1
+                        subHide:        true
                     };
                     product.init(props);
                     product.fillPlaceholders();
@@ -2815,8 +2814,8 @@ CMathContent.prototype =
                     {
                         signType:       NARY_COPRODUCT,
                         limLocType:     NARY_UndOvr,
-                        subHide:        1,
-                        supHide:        1
+                        subHide:        true,
+                        supHide:        true
                     };
                     coproduct.init(props);
                     coproduct.fillPlaceholders();
@@ -2847,7 +2846,7 @@ CMathContent.prototype =
                     {
                         signType:       NARY_COPRODUCT,
                         limLocType:     NARY_UndOvr,
-                        subHide:        1
+                        subHide:        true
                     };
                     coproduct.init(props);
                     coproduct.fillPlaceholders();
@@ -2858,7 +2857,7 @@ CMathContent.prototype =
                     {
                         signType:       NARY_COPRODUCT,
                         limLocType:     NARY_SubSup,
-                        subHide:        1
+                        subHide:        true
                     };
                     coproduct.init(props);
                     coproduct.fillPlaceholders();
@@ -2870,8 +2869,8 @@ CMathContent.prototype =
                     {
                         signType:       NARY_UNION,
                         limLocType:     NARY_UndOvr,
-                        subHide:        1,
-                        supHide:        1
+                        subHide:        true,
+                        supHide:        true
                     };
                     union.init(props);
                     union.fillPlaceholders();
@@ -2902,7 +2901,7 @@ CMathContent.prototype =
                     {
                         signType:       NARY_UNION,
                         limLocType:     NARY_UndOvr,
-                        subHide:        1
+                        subHide:        true
                     };
                     union.init(props);
                     union.fillPlaceholders();
@@ -2913,7 +2912,7 @@ CMathContent.prototype =
                     {
                         signType:       NARY_UNION,
                         limLocType:     NARY_SubSup,
-                        subHide:        1
+                        subHide:        true
                     };
                     union.init(props);
                     union.fillPlaceholders();
@@ -2925,8 +2924,8 @@ CMathContent.prototype =
                     {
                         signType:       NARY_INTERSECTION,
                         limLocType:     NARY_UndOvr,
-                        subHide:        1,
-                        supHide:        1
+                        subHide:        true,
+                        supHide:        true
                     };
                     intersection.init(props);
                     intersection.fillPlaceholders();
@@ -2957,7 +2956,7 @@ CMathContent.prototype =
                     {
                         signType:       NARY_INTERSECTION,
                         limLocType:     NARY_UndOvr,
-                        subHide:        1
+                        subHide:        true
                     };
                     intersection.init(props);
                     intersection.fillPlaceholders();
@@ -2968,7 +2967,7 @@ CMathContent.prototype =
                     {
                         signType:       NARY_INTERSECTION,
                         limLocType:     NARY_SubSup,
-                        subHide:        1
+                        subHide:        true
                     };
                     intersection.init(props);
                     intersection.fillPlaceholders();
@@ -2980,8 +2979,8 @@ CMathContent.prototype =
                     {
                         signType:       NARY_LOGICAL_OR,
                         limLocType:     NARY_UndOvr,
-                        subHide:        1,
-                        supHide:        1
+                        subHide:        true,
+                        supHide:        true
                     };
                     logicalOr.init(props);
                     logicalOr.fillPlaceholders();
@@ -3012,7 +3011,7 @@ CMathContent.prototype =
                     {
                         signType:       NARY_LOGICAL_OR,
                         limLocType:     NARY_UndOvr,
-                        subHide:        1
+                        subHide:        true
                     };
                     logicalOr.init(props);
                     logicalOr.fillPlaceholders();
@@ -3023,7 +3022,7 @@ CMathContent.prototype =
                     {
                         signType:       NARY_LOGICAL_OR,
                         limLocType:     NARY_SubSup,
-                        subHide:        1
+                        subHide:        true
                     };
                     logicalOr.init(props);
                     logicalOr.fillPlaceholders();
@@ -3035,8 +3034,8 @@ CMathContent.prototype =
                     {
                         signType:       NARY_LOGICAL_AND,
                         limLocType:     NARY_UndOvr,
-                        subHide:        1,
-                        supHide:        1
+                        subHide:        true,
+                        supHide:        true
                     };
                     logicalAnd.init(props);
                     logicalAnd.fillPlaceholders();
@@ -3067,7 +3066,7 @@ CMathContent.prototype =
                     {
                         signType:       NARY_LOGICAL_AND,
                         limLocType:     NARY_UndOvr,
-                        subHide:        1
+                        subHide:        true
                     };
                     logicalAnd.init(props);
                     logicalAnd.fillPlaceholders();
@@ -3078,7 +3077,7 @@ CMathContent.prototype =
                     {
                         signType:       NARY_LOGICAL_AND,
                         limLocType:     NARY_SubSup,
-                        subHide:        1
+                        subHide:        true
                     };
                     logicalAnd.init(props);
                     logicalAnd.fillPlaceholders();
@@ -3130,7 +3129,7 @@ CMathContent.prototype =
                     iterLow.addTxt("k=1");
                     var base = product.getBase();
                     var degr = base.addMComponent(MATH_DEGREE);
-                    degr.init({type: SUBSCRIPT});
+                    degr.init({type: DEGREE_SUBSCRIPT});
                     var baseDgr = degr.getBase();
                     baseDgr.addTxt("A");
                     var iter = degr.getIterator();

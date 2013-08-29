@@ -35,12 +35,12 @@ CDegree.prototype.recalculateSize = function()
 
     _width += this.dW;
 
-    if(this.type === SUPERSCRIPT )
+    if(this.type === DEGREE_SUPERSCRIPT )
     {
         this.shiftDegree = 0;
         _center = _height - (this.elements[0][0].size.height - this.elements[0][0].size.center);
     }
-    else if(this.type === SUBSCRIPT )
+    else if(this.type === DEGREE_SUBSCRIPT )
     {
         this.shiftDegree = _height - this.elements[0][1].size.height;
         _center = this.elements[0][0].size.center;
@@ -386,12 +386,12 @@ CDegreeSubSup.prototype.init_2 = function(props, oBase)
     oIters.lUp = 0;
     oIters.lD = 0;
 
-    if(this.type == SubSup)
+    if(this.type == DEGREE_SubSup)
     {
         oIters.alignHor(-1, 0);
         this.addMCToContent(oBase, oIters);
     }
-    else if(this.type == PreSubSup)
+    else if(this.type == DEGREE_PreSubSup)
     {
         oIters.alignHor(-1, 1);
         this.addMCToContent(oIters, oBase);
@@ -399,14 +399,14 @@ CDegreeSubSup.prototype.init_2 = function(props, oBase)
 }
 CDegreeSubSup.prototype.recalculateSize = function()
 {
-    if(this.type == SubSup)
+    if(this.type == DEGREE_SubSup)
     {
         this.elements[0][1].lUp = this.elements[0][0].size.center;
         this.elements[0][1].lD = this.elements[0][0].size.height - this.elements[0][0].size.center;
         this.elements[0][1].setDistance();
         this.elements[0][1].recalculateSize();
     }
-    else if(this.type == PreSubSup)
+    else if(this.type == DEGREE_PreSubSup)
     {
         this.elements[0][0].lUp = this.elements[0][1].size.center;
         this.elements[0][0].lD = this.elements[0][1].size.height - this.elements[0][1].size.center;
@@ -420,9 +420,9 @@ CDegreeSubSup.prototype.getBase = function()
 {
     var base;
 
-    if(this.type == SubSup)
+    if(this.type == DEGREE_SubSup)
         base = this.elements[0][0];
-    else if(this.type == PreSubSup)
+    else if(this.type == DEGREE_PreSubSup)
         base = this.elements[0][1];
 
     return base;
@@ -431,9 +431,9 @@ CDegreeSubSup.prototype.getUpperIterator = function()
 {
     var iter;
 
-    if(this.type == SubSup)
+    if(this.type == DEGREE_SubSup)
         iter = this.elements[0][1].getUpperIterator();
-    else if(this.type == PreSubSup)
+    else if(this.type == DEGREE_PreSubSup)
         iter = this.elements[0][0].getUpperIterator();
 
     return iter;
@@ -442,9 +442,9 @@ CDegreeSubSup.prototype.getLowerIterator = function()
 {
     var iter;
 
-    if(this.type == SubSup)
+    if(this.type == DEGREE_SubSup)
         iter = this.elements[0][1].getLowerIterator();
-    else if(this.type == PreSubSup)
+    else if(this.type == DEGREE_PreSubSup)
         iter = this.elements[0][0].getLowerIterator();
 
     return iter;
