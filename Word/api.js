@@ -6872,7 +6872,7 @@ asc_docs_api.prototype.asc_getChartObject = function()
 		chart["themeColors"].push( this.WordControl.m_oDrawingDocument.GuiControlColorsMap[i].get_hex() );
 	}*/
 		
-	var chart;		// Объект типа CChartAsGroup. Внутри asc_CChart
+	var chart = new CChartAsGroup();		// Внутри asc_CChart
     return  chart;
 }
 

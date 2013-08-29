@@ -5,6 +5,7 @@
 * Date:   13/08/2012
 */
 
+var CLASS_TYPE_CHART_DATA = 1000;
 
 if ( !window["Asc"] ) {		// Для вставки диаграмм в Word
 	window["Asc"] = {};
@@ -53,531 +54,6 @@ function getFullImageSrc(src) {
 		return src;
 };
 
-//-----------------------------------------------------------------------------------
-// Интерфейс < Excel - Word >
-//-----------------------------------------------------------------------------------
-
-function CChartData(bWordContext, chart) {
-
-	var _this = this;
-	
-	_this.Id = bWordContext ? g_oIdCounter.Get_NewId() : "";
-	_this.img = chart ? chart.img : "";
-	_this.width = chart ? chart.width : c_oAscChartDefines.defaultChartWidth;
-	_this.height = chart ? chart.height : c_oAscChartDefines.defaultChartHeight;
-	_this.bChartEditor = chart ? chart.bChartEditor : true;
-	
-	_this.type = chart ? chart.type : "";
-	_this.subType = chart ? chart.subType : c_oAscChartSubType.normal;
-
-	if ( chart ) {
-		_this.header = {
-			title: chart.header.title,
-			subTitle: chart.header.subTitle,
-			bDefaultTitle: chart.header.bDefaultTitle
-		};
-		_this.range = {
-			interval: chart.range.interval,
-			rows: chart.range.rows,
-			columns: chart.range.columns
-		};
-		_this.xAxis = {
-			title: chart.xAxis.title,
-			bDefaultTitle: chart.xAxis.bDefaultTitle,
-			bShow: chart.xAxis.bShow,
-			bGrid: chart.xAxis.bGrid
-		};
-		_this.yAxis = {
-			title: chart.yAxis.title,
-			bDefaultTitle: chart.yAxis.bDefaultTitle,
-			bShow: chart.yAxis.bShow,
-			bGrid: chart.yAxis.bGrid
-		};
-		_this.legend = {
-			position: chart.legend.position,
-			bShow: chart.legend.bShow,
-			bOverlay: chart.legend.bOverlay
-		};
-	}
-	else {
-		_this.header = {
-			title: "",
-			subTitle: "",
-			bDefaultTitle: false
-		};
-		_this.range = {
-			interval: bWordContext ? "" : "Sheet1!A1:C3",
-			rows: false,
-			columns: true
-		};
-		_this.xAxis = {
-			title: "",
-			bDefaultTitle: false,
-			bShow: true,
-			bGrid: true
-		};
-		_this.yAxis = {
-			title: "",
-			bDefaultTitle: false,
-			bShow: true,
-			bGrid: true
-		};
-		_this.legend = {
-			position: c_oAscChartLegend.right,
-			bShow: true,
-			bOverlay: false
-		};
-	}			
-	
-	_this.bShowValue = chart ? chart.bShowValue : false;
-	_this.bShowBorder = chart ? chart.bShowBorder : true;
-	_this.styleId = chart ? chart.styleId : c_oAscChartStyle.Standart;
-	
-	_this.data = [];
-	_this.themeColors = [];
-	_this.series = [];
-	
-	if ( chart ) {
-		for (var row = 0; row < chart.data.length; row++) {
-		
-			var values = [];
-			for (var col = 0; col < chart.data[row].length; col++) {
-		
-				var item = {};
-				item.numFormatStr = chart.data[row][col].numFormatStr;
-				item.isDateTimeFormat = chart.data[row][col].isDateTimeFormat;
-				item.value = chart.data[row][col].value;
-				values.push(item);
-			}
-			_this.data.push(values);
-		}
-		
-		for (var i = 0; i < chart.themeColors.length; i++) {
-			_this.themeColors.push(chart.themeColors[i]);
-		}
-	}
-		
-	
-	//-----------------------------------------------------------------------------------
-	// Methods
-	//-----------------------------------------------------------------------------------
-	
-	_this.clone = function() {
-	
-		function clone(o) {
-			if ( !o || "object" !== typeof o )  {
-				return o;
-			}
-			var c = "function" === typeof o.pop ? [] : {};
-			var p, v;
-			for ( p in o ) {
-				if ( o.hasOwnProperty(p) ) {
-					v = o[p];
-					if ( v && "object" === typeof v ) {
-						c[p] = clone(v);
-					}
-				else c[p] = v;
-				}
-			}
-			return c;
-		}
-	
-		return clone(_this);
-	}
-	
-	_this.serializeChart = function() {
-	
-		var chart = {};
-		
-		chart["img"] = _this.img;
-		chart["width"] = _this.width;
-		chart["height"] = _this.height;
-		chart["type"] = _this.type;
-		chart["subType"] = _this.subType;
-		chart["bShowValue"] = _this.bShowValue;
-		chart["bShowBorder"] = _this.bShowBorder;
-		chart["styleId"] = _this.styleId;
-		chart["bChartEditor"] = _this.bChartEditor;
-		
-		// Header
-		chart["header"] = {};
-		chart["header"]["title"] = _this.header.title;
-		chart["header"]["subTitle"] = _this.header.subTitle;
-		chart["header"]["bDefaultTitle"] = _this.header.bDefaultTitle;
-
-		// Range
-		chart["range"] = {};
-		chart["range"]["interval"] = _this.range.interval;
-		chart["range"]["rows"] = _this.range.rows;
-		chart["range"]["columns"] = _this.range.columns;
-
-		// Axis X
-		chart["xAxis"] = {};
-		chart["xAxis"]["title"] = _this.xAxis.title;
-		chart["xAxis"]["bDefaultTitle"] = _this.xAxis.bDefaultTitle;
-		chart["xAxis"]["bShow"] = _this.xAxis.bShow;
-		chart["xAxis"]["bGrid"] = _this.xAxis.bGrid;
-
-		// Axis Y
-		chart["yAxis"] = {};
-		chart["yAxis"]["title"] = _this.yAxis.title;
-		chart["yAxis"]["bDefaultTitle"] = _this.yAxis.bDefaultTitle;
-		chart["yAxis"]["bShow"] = _this.yAxis.bShow;
-		chart["yAxis"]["bGrid"] = _this.yAxis.bGrid;
-		
-		// Legeng
-		chart["legend"] = {};
-		chart["legend"]["position"] = _this.legend.position;
-		chart["legend"]["bShow"] = _this.legend.bShow;
-		chart["legend"]["bOverlay"] = _this.legend.bOverlay;
-		
-		if ( _this.data ) {
-			chart["data"] = [];
-			
-			for (var row = 0; row < _this.data.length; row++) {
-					
-				var values = [];
-				for (var col = 0; col < _this.data[row].length; col++) {
-										
-					var item = {};
-					item["numFormatStr"] = _this.data[row][col].numFormatStr;
-					item["isDateTimeFormat"] = _this.data[row][col].isDateTimeFormat;
-					item["value"] = _this.data[row][col].value;
-					values.push(item);
-				}
-				chart["data"].push(values);
-			}
-		}
-		
-		if ( _this.themeColors ) {
-			chart["themeColors"] = [];
-			
-			for (var i = 0; i < _this.themeColors.length; i++) {
-				chart["themeColors"].push(_this.themeColors[i]);
-			}
-		}
-		
-		return chart;
-	}
-	
-	_this.deserializeChart = function(chart) {
-		
-		_this.img = chart["img"];
-		_this.width = chart["width"];
-		_this.height = chart["height"];
-		
-		_this.type = chart["type"];
-		_this.subType = chart["subType"];
-		_this.bShowValue = chart["bShowValue"];
-		_this.bShowBorder = chart["bShowBorder"];
-		_this.styleId = chart["styleId"];
-		_this.bChartEditor = chart["bChartEditor"];
-		
-		// Header
-		_this.header.title = chart["header"]["title"];
-		_this.header.subTitle = chart["header"]["subTitle"];
-		_this.header.bDefaultTitle = chart["header"]["bDefaultTitle"];
-		
-		// Range
-		_this.range.interval = chart["range"]["interval"];
-		_this.range.rows = chart["range"]["rows"];
-		_this.range.columns = chart["range"]["columns"];
-			
-		// Axis X
-		_this.xAxis.title = chart["xAxis"]["title"];
-		_this.xAxis.bDefaultTitle = chart["xAxis"]["bDefaultTitle"];
-		_this.xAxis.bShow = chart["xAxis"]["bShow"];
-		_this.xAxis.bGrid = chart["xAxis"]["bGrid"];
-		
-		// Axis Y
-		_this.yAxis.title = chart["yAxis"]["title"];
-		_this.yAxis.bDefaultTitle = chart["yAxis"]["bDefaultTitle"];
-		_this.yAxis.bShow = chart["yAxis"]["bShow"];
-		_this.yAxis.bGrid = chart["yAxis"]["bGrid"];
-		
-		// Legend
-		_this.legend.position = chart["legend"]["position"];
-		_this.legend.bShow = chart["legend"]["bShow"];
-		_this.legend.bOverlay = chart["legend"]["bOverlay"];
-		
-		if ( chart["data"] ) {
-			_this.data = [];
-			
-			for (var row = 0; row < chart["data"].length; row++) {
-					
-				var values = [];
-				for (var col = 0; col < chart["data"][row].length; col++) {
-										
-					var item = {};
-					item.numFormatStr = chart["data"][row][col]["numFormatStr"];
-					item.isDateTimeFormat = chart["data"][row][col]["isDateTimeFormat"];
-					item.value = chart["data"][row][col]["value"];
-					values.push(item);
-				}
-				_this.data.push(values);
-			}
-		}
-		
-		if ( chart["themeColors"] ) {
-			_this.themeColors = [];
-			
-			for (var i = 0; i < chart["themeColors"].length; i++) {
-				_this.themeColors.push(chart["themeColors"][i]);
-			}
-		}
-	}
-
-	_this.readFromDrawingObject = function(object) {
-		
-		if ( object && object.isChart() ) {
-			
-			// Доп. параметры
-			_this.img = object.image.src;
-			_this.width = object.image.width;
-			_this.height = object.image.height;;
-			
-			_this.type = object.chart.type;
-			_this.subType = object.chart.subType;
-			_this.bShowValue = object.chart.bShowValue;
-			_this.bShowBorder = object.chart.bShowBorder;
-			_this.styleId = object.chart.styleId;
-			_this.bChartEditor = object.chart.bChartEditor;
-			
-			// Header
-			_this.header.title = object.chart.header.title;
-			_this.header.subTitle = object.chart.header.subTitle;
-			_this.header.bDefaultTitle = object.chart.header.bDefaultTitle;
-				
-			// Range
-			_this.range.interval = object.chart.range.interval;
-			_this.range.rows = object.chart.range.rows;
-			_this.range.columns = object.chart.range.columns;
-				
-			// Axis X
-			_this.xAxis.title = object.chart.xAxis.title;
-			_this.xAxis.bDefaultTitle = object.chart.xAxis.bDefaultTitle;
-			_this.xAxis.bShow = object.chart.xAxis.bShow;
-			_this.xAxis.bGrid = object.chart.xAxis.bGrid;
-			
-			// Axis Y
-			_this.yAxis.title = object.chart.yAxis.title;
-			_this.yAxis.bDefaultTitle = object.chart.yAxis.bDefaultTitle;
-			_this.yAxis.bShow = object.chart.yAxis.bShow;
-			_this.yAxis.bGrid = object.chart.yAxis.bGrid;
-			
-			// Legend
-			_this.legend.position = object.chart.legend.position;
-			_this.legend.bShow = object.chart.legend.bShow;
-			_this.legend.bOverlay = object.chart.legend.bOverlay;
-			
-			_this.data = [];
-			if ( object.chart.range.intervalObject ) {
-				var bbox = object.chart.range.intervalObject.getBBox0();
-					
-				for (var row = bbox.r1; row <= bbox.r2; row++) {
-						
-					var values = [];
-					for (var col = bbox.c1; col <= bbox.c2; col++) {
-						
-						var cell = object.chart.range.intervalObject.worksheet.getCell(new CellAddress(row, col, 0));
-						var item = {};
-						item.numFormatStr = cell.getNumFormatStr();
-						item.isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
-						item.value = cell.getValue();
-						values.push(item);
-					}
-					_this.data.push(values);
-				}
-			}
-		}
-	}
-		
-	_this.Get_Id = function() {
-		return this.Id;
-	}
-	
-	_this.Write_ToBinary2 = function(Writer) {
-			
-		var _this = this;
-		Writer.WriteLong(historyitem_type_Chart);
-		Writer.WriteString2( _this.Id );
-		Writer.WriteString2( _this.img );
-		Writer.WriteLong( _this.width );
-		Writer.WriteLong( _this.height );
-		Writer.WriteString2( _this.type );
-		Writer.WriteString2( _this.subType );
-		Writer.WriteBool( _this.bShowValue );
-		Writer.WriteBool( _this.bShowBorder );
-		Writer.WriteLong( _this.styleId );
-		Writer.WriteBool( _this.bChartEditor );
-		
-		// Header
-		Writer.WriteString2( _this.header.title );
-		Writer.WriteString2( _this.header.subTitle );
-		Writer.WriteBool( _this.header.bDefaultTitle );
-			
-		// Range
-		Writer.WriteString2( _this.range.interval );
-		Writer.WriteBool( _this.range.rows );
-		Writer.WriteBool( _this.range.columns );
-			
-		// Axis X
-		Writer.WriteString2( _this.xAxis.title );
-		Writer.WriteBool( _this.xAxis.bDefaultTitle );
-		Writer.WriteBool( _this.xAxis.bShow );
-		Writer.WriteBool( _this.xAxis.bGrid );
-		
-		// Axis Y
-		Writer.WriteString2( _this.yAxis.title );
-		Writer.WriteBool( _this.yAxis.bDefaultTitle );
-		Writer.WriteBool( _this.yAxis.bShow );
-		Writer.WriteBool( _this.yAxis.bGrid );
-		
-		// Legend
-		Writer.WriteString2( _this.legend.position );
-		Writer.WriteBool( _this.legend.bShow );
-		Writer.WriteBool( _this.legend.bOverlay );
-		
-		/*
-		* numFormatStr
-		* isDateTimeFormat
-		* value
-		*/
-		
-		var rowsCount = _this.data.length;
-		Writer.WriteLong( rowsCount );
-		
-		for (var i = 0; i < rowsCount; i++) {
-		
-			var colsCount = _this.data[i].length;
-			Writer.WriteLong( colsCount );
-			
-			for (var j = 0; j < colsCount; j++) {
-			
-				Writer.WriteString2( _this.data[i][j].numFormatStr );
-				Writer.WriteBool( _this.data[i][j].isDateTimeFormat );
-				Writer.WriteString2( _this.data[i][j].value );
-			}
-		}
-	}
-
-	_this.Read_FromBinary2 = function(Reader) {
-		
-		var _this = this;
-		_this.Id = Reader.GetString2();
-		_this.img = Reader.GetString2();
-		_this.width = Reader.GetLong();
-		_this.height = Reader.GetLong();
-		_this.type = Reader.GetString2();
-		_this.subType = Reader.GetString2();
-		_this.bShowValue = Reader.GetBool();
-		_this.bShowBorder = Reader.GetBool();
-		_this.styleId = Reader.GetLong();
-		_this.bChartEditor = Reader.GetBool();
-		
-		// Header
-		_this.header.title = Reader.GetString2();
-		_this.header.subTitle = Reader.GetString2();
-		_this.header.bDefaultTitle = Reader.GetBool();
-		
-		// Range
-		_this.range.interval = Reader.GetString2();
-		_this.range.rows = Reader.GetBool();
-		_this.range.columns = Reader.GetBool();
-			
-		// Axis X
-		_this.xAxis.title = Reader.GetString2();
-		_this.xAxis.bDefaultTitle = Reader.GetBool();
-		_this.xAxis.bShow = Reader.GetBool();
-		_this.xAxis.bGrid = Reader.GetBool();
-		
-		// Axis Y
-		_this.yAxis.title = Reader.GetString2();
-		_this.yAxis.bDefaultTitle = Reader.GetBool();
-		_this.yAxis.bShow = Reader.GetBool();
-		_this.yAxis.bGrid = Reader.GetBool();
-		
-		// Legend
-		_this.legend.position = Reader.GetString2();
-		_this.legend.bShow = Reader.GetBool();
-		_this.legend.bOverlay = Reader.GetBool();
-		
-		/*
-		* numFormatStr
-		* isDateTimeFormat
-		* value
-		*/
-		
-		_this.data = [];
-		var rowsCount = Reader.GetLong();
-					
-		for (var i = 0; i < rowsCount; i++) {
-		
-			var values = [];
-			var colsCount = Reader.GetLong();
-							
-			for (var j = 0; j < colsCount; j++) {
-			
-				var item = {};
-				item.numFormatStr = Reader.GetString2();
-				item.isDateTimeFormat = Reader.GetBool();
-				item.value = Reader.GetString2();
-				values.push(item);					
-			}
-			_this.data.push(values);
-		}
-		CollaborativeEditing.Add_NewObject( _this );
-	}
-	
-	_this.Save_Changes = function(data, Writer) {
-		_this.Write_ToBinary2(Writer);
-	}
-	
-	_this.Load_Changes = function(Reader) {
-		Reader.GetLong();	// historyitem_type_Chart
-		_this.Read_FromBinary2(Reader);
-	}
-	
-	_this.Refresh_RecalcData = function(data) {
-	}
-	
-	_this.Undo = function(data) {
-	}
-	
-	_this.Redo = function(data) {
-	}
-	
-	_this.putToHistory = function() {
-		var cloneChart = _this.clone();
-		History.Add( _this, { chart: cloneChart } );
-	}
-	
-	_this.documentGetAllFontNames = function(AllFonts) {
-		this.documentGetAllFontNames_ExecuteFont(AllFonts, this.header.font);
-		this.documentGetAllFontNames_ExecuteFont(AllFonts, this.xAxis.titleFont);
-		this.documentGetAllFontNames_ExecuteFont(AllFonts, this.xAxis.labelFont);
-		this.documentGetAllFontNames_ExecuteFont(AllFonts, this.yAxis.titleFont);
-		this.documentGetAllFontNames_ExecuteFont(AllFonts, this.yAxis.labelFont);
-		this.documentGetAllFontNames_ExecuteFont(AllFonts, this.legend.font);
-		this.documentGetAllFontNames_ExecuteFont(AllFonts, this.legend.font);
-		for(var i = 0, length = this.series.length; i < length; ++i)
-		{
-			var seria = this.series[i];
-			if(null != seria)
-			{
-				this.documentGetAllFontNames_ExecuteFont(AllFonts, seria.titleFont);
-				this.documentGetAllFontNames_ExecuteFont(AllFonts, seria.labelFont);
-			}
-		}
-	}
-	_this.documentGetAllFontNames_ExecuteFont = function(AllFonts, font) {
-		if(null != font && null != font.name)
-			AllFonts[font.name] = true;
-	}
-	
-	if ( bWordContext )
-		g_oTableId.Add( _this, _this.Id );
-}
 
 //{ ASC Classes
 
@@ -739,9 +215,6 @@ asc_CChart.prototype = {
 	asc_getSeria: function(index) { return (index < this.series.length) ? this.series[index] : null; },
 	asc_setSeria: function(seriaObj) { if (seriaObj) this.series.push(seriaObj); },
 	asc_removeSeries: function() { this.series = []; },
-	
-	asc_getChartEditorFlag: function() { return this.bChartEditor; },
-	asc_setChartEditorFlag: function(value) { this.bChartEditor = value; },
 	
 	parseSeriesHeaders: function() {
 		
@@ -950,7 +423,9 @@ asc_CChart.prototype = {
 	
 	generateUniColors: function(count) {
 		var uniColors = [];
-		var api = window["Asc"]["editor"];
+		var api_doc = window["editor"];
+		var api_sheet = window["Asc"]["editor"];
+		var api = api_sheet ? api_sheet : api_doc;
 		
 		if ( count > 0 ) {
 			if ( !api.chartStyleManager.isReady() )
@@ -1335,9 +810,32 @@ prot["asc_setLegend"] = prot.asc_setLegend;
 prot["asc_getSeria"] = prot.asc_getSeria;
 prot["asc_setSeria"] = prot.asc_setSeria;
 prot["asc_removeSeries"] = prot.asc_removeSeries;
+//}
 
-prot["asc_getChartEditorFlag"] = prot.asc_getChartEditorFlag;
-prot["asc_setChartEditorFlag"] = prot.asc_setChartEditorFlag;
+//-----------------------------------------------------------------------------------
+// Chart binary
+//-----------------------------------------------------------------------------------
+
+function asc_CChartBinary(chart) {
+	
+	this["binary"] = null;
+	if (chart instanceof CChartAsGroup)
+		this["binary"] = chart.getChartBinary();
+}
+
+asc_CChartBinary.prototype = {
+	
+	asc_getBinary: function() { return this["binary"]; },
+	asc_setBinary: function(val) { this["binary"] = val; }
+}
+
+//{ asc_CChartBinary export
+window["Asc"].asc_CChartBinary = asc_CChartBinary;
+window["Asc"]["asc_CChartBinary"] = asc_CChartBinary;
+prot = asc_CChartBinary.prototype;
+
+prot["asc_getBinary"] = prot.asc_getBinary;
+prot["asc_setBinary"] = prot.asc_setBinary;
 //}
 
 //-----------------------------------------------------------------------------------
@@ -3625,14 +3123,19 @@ function DrawingObjects() {
 		if ( _this.isViewerMode() )
 			return;
 
-		var wordChart = null;
-		var bWordChart = chart["bChartEditor"];
-		if ( bWordChart ) {
+		if ( chart instanceof asc_CChart ) {
+			var _range = convertFormula(chart.range.interval, worksheet);
+			if (_range)
+				chart.range.intervalObject = _range;
+
+			chart.rebuildSeries();
+			chart.worksheet = worksheet; 	// Для формул серий
 			
-			// Заполняем объект
-			wordChart = new CChartData(false);
-			wordChart.deserializeChart(chart);
+			return this.controller.addChartDrawingObject(chart, options);
+		}
+		else if ( isObject(chart) && chart["binary"] ) {
 			
+			/* Вставка данных в таблицу и применение темы
 			// Инжектим тему и перестраиваем превью диаграмм
 			if ( wordChart.themeColors ) {
 				
@@ -3644,18 +3147,9 @@ function DrawingObjects() {
 				}
 				api.chartStyleManager.init();
 				api.chartPreviewManager.init();
-			}
-			
-			var copyChart = _this.createDrawingObject();
-			copyChart.chart = new asc_CChart(wordChart);
-			
-			copyChart.chart.data = wordChart.data ? wordChart.data : [];
-			
-			chart = copyChart.chart;
-			_this.intervalToIntervalObject(chart);
+			}			
 			
 			// Заполняем таблицу
-			
 			if ( chart.data.length ) {
 				var bbox = chart.range.intervalObject.getBBox0();
 				var r = bbox.r1, c = bbox.c1;
@@ -3677,17 +3171,8 @@ function DrawingObjects() {
 				}
 			}
 			worksheet._updateCellsRange(chart.range.intervalObject.getBBox0());
-			_this.showDrawingObjects(false);
+			*/
 		}
-
-		var _range = convertFormula(chart.range.interval, worksheet);
-		if (_range)
-			chart.range.intervalObject = _range;
-
-		chart.rebuildSeries();
-		chart.worksheet = worksheet; 	// Для формул серий
-		
-        return this.controller.addChartDrawingObject(chart, options);
 	}
 
 	_this.editChartDrawingObject = function(chart) {
@@ -4468,12 +3953,10 @@ function DrawingObjects() {
 
 	_this.getWordChartObject = function() {
 		for (var i = 0; i < aObjects.length; i++) {
-			var obj = aObjects[i];
-			if (obj.isChart() && obj.chart.bChartEditor) {				
-				
-				var chart = new CChartData(false);
-				chart.readFromDrawingObject(obj);
-				chart = chart.serializeChart();				
+			var drawingObject = aObjects[i];
+			
+			if ( drawingObject.isChart() ) {
+				drawingObject.getChartBinary();
 				_this.cleanWorksheet();
 				return chart;
 			}
