@@ -5771,10 +5771,17 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			if(nRowCount > 0)
 				nColCount = chart.data[0].length;*/
 				
-			var nRowCount = chart.series.length;
+			var nRowCount = 0;
 			var nColCount = 0;
-			if(nRowCount > 0)
+			
+			if ( chart.range.rows ) {
+				nRowCount = chart.series.length;
 				nColCount = chart.series[0].Val.NumCache.length;
+			}
+			else {
+				nRowCount = chart.series[0].Val.NumCache.length;
+				nColCount = chart.series.length;
+			}
 				
 			if(0 != nRowCount && 0 != nColCount)
 			{
@@ -5791,8 +5798,6 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 				sColLetter += String.fromCharCode( (n % 26) + 65);
 				
 				chart.range.interval = "Sheet1!A1:" + sColLetter + nRowCount;
-				//var chartRender = new ChartRender();
-				//chart.img = chartRender.insertChart(chart, null, chart.width, chart.height);
 				oChartObject.chart = chart;
 			}
 		}

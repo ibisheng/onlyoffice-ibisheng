@@ -183,6 +183,13 @@ function asc_CChart(object) {
 		}
 	}
  	
+	this.themeColors = [];
+	if ( bCopy && object.themeColors ) {
+		for (var i = 0; i < object.themeColors.length; i++) {
+			this.themeColors.push(object.themeColors[i]);
+		}
+	}
+	
 	this.Id = g_oIdCounter.Get_NewId();
 	g_oTableId.Add(this, this.Id);
 }
@@ -513,6 +520,53 @@ asc_CChart.prototype = {
 		Writer.WriteString2( this.legend.position );
 		Writer.WriteBool( this.legend.bShow );
 		Writer.WriteBool( this.legend.bOverlay );
+		
+		// Series
+		Writer.WriteLong( this.series.length );
+		for (var i = 0; i < this.series.length; i++) {
+			
+			Writer.WriteString2(this.series[i].Val.Formula);
+			Writer.WriteLong(this.series[i].Val.NumCache.length);
+			for (var j = 0; j < this.series[i].Val.NumCache.length; j++) {
+				Writer.WriteString2(this.series[i].Val.NumCache[j].numFormatStr);
+				Writer.WriteBool(this.series[i].Val.NumCache[j].isDateTimeFormat);
+				Writer.WriteString2(this.series[i].Val.NumCache[j].val);
+				Writer.WriteBool(this.series[i].Val.NumCache[j].isHidden);
+			}
+			
+			Writer.WriteString2(this.series[i].xVal.Formula);
+			Writer.WriteLong(this.series[i].xVal.NumCache.length);
+			for (var j = 0; j < this.series[i].xVal.NumCache.length; j++) {
+				Writer.WriteString2(this.series[i].xVal.NumCache[j].numFormatStr);
+				Writer.WriteBool(this.series[i].xVal.NumCache[j].isDateTimeFormat);
+				Writer.WriteString2(this.series[i].xVal.NumCache[j].val);
+				Writer.WriteBool(this.series[i].xVal.NumCache[j].isHidden);
+			}
+			
+			Writer.WriteString2(this.series[i].Cat.Formula);
+			Writer.WriteLong(this.series[i].Cat.NumCache.length);
+			for (var j = 0; j < this.series[i].Cat.NumCache.length; j++) {
+				Writer.WriteString2(this.series[i].Cat.NumCache[j].numFormatStr);
+				Writer.WriteBool(this.series[i].Cat.NumCache[j].isDateTimeFormat);
+				Writer.WriteString2(this.series[i].Cat.NumCache[j].val);
+				Writer.WriteBool(this.series[i].Cat.NumCache[j].isHidden);
+			}
+			
+			Writer.WriteString2(this.series[i].TxCache.Tx);
+			Writer.WriteString2(this.series[i].TxCache.Formula);
+			
+			Writer.WriteString2(this.series[i].Marker.Size);
+			Writer.WriteString2(this.series[i].Marker.Symbol);
+			
+			Writer.WriteString2(this.series[i].FormatCode);
+			Writer.WriteBool(this.series[i].isHidden);
+		}
+		
+		// Theme Colors
+		Writer.WriteLong( this.themeColors.length );
+		for (var i = 0; i < this.themeColors.length; i++) {
+			Writer.WriteString2(this.themeColors[i]);
+		}
 	},
 	
 	Read_FromBinary2: function(Reader) {
@@ -552,6 +606,59 @@ asc_CChart.prototype = {
 		this.legend.position = Reader.GetString2();
 		this.legend.bShow = Reader.GetBool();
 		this.legend.bOverlay = Reader.GetBool();
+		
+		// Series
+		this.series = [];
+		var seriesCount = Reader.GetLong();
+		for (var i = 0; i < seriesCount; i++) {
+		
+			var seria = new asc_CChartSeria();
+			seria.Val.Formula = Reader.GetString2();
+			
+			var numCacheCount = Reader.GetLong();
+			for (var j = 0; j < numCacheCount; j++) {
+				this.series[i].Val.NumCache[j].numFormatStr = Reader.GetString2();
+				this.series[i].Val.NumCache[j].isDateTimeFormat = Reader.GetBool();
+				this.series[i].Val.NumCache[j].val = Reader.GetString2();
+				this.series[i].Val.NumCache[j].isHidden = Reader.GetBool();
+			}
+			
+			seria.xVal.Formula = Reader.GetString2();
+			numCacheCount = Reader.GetLong();
+			for (var j = 0; j < numCacheCount; j++) {
+				this.series[i].xVal.NumCache[j].numFormatStr = Reader.GetString2();
+				this.series[i].xVal.NumCache[j].isDateTimeFormat = Reader.GetBool();
+				this.series[i].xVal.NumCache[j].val = Reader.GetString2();
+				this.series[i].xVal.NumCache[j].isHidden = Reader.GetBool();
+			}
+			
+			seria.Cat.Formula = Reader.GetString2();
+			numCacheCount = Reader.GetLong();
+			for (var j = 0; j < numCacheCount; j++) {
+				this.series[i].Cat.NumCache[j].numFormatStr = Reader.GetString2();
+				this.series[i].Cat.NumCache[j].isDateTimeFormat = Reader.GetBool();
+				this.series[i].Cat.NumCache[j].val = Reader.GetString2();
+				this.series[i].Cat.NumCache[j].isHidden = Reader.GetBool();
+			}
+			
+			seria.TxCache.Tx = Reader.GetString2();
+			seria.TxCache.Formula = Reader.GetString2();
+			
+			seria.Marker.Size = Reader.GetString2();
+			seria.Marker.Symbol = Reader.GetString2();
+			
+			seria.FormatCode = Reader.GetString2();
+			seria.isHidden = Reader.GetBool();
+			
+			this.series.push(seria);
+		}		
+		
+		// Theme Colors
+		this.themeColors = [];
+		var themeColorsCount = Reader.GetLong();
+		for (var i = 0; i < themeColorsCount; i++) {
+			this.themeColors.push(Reader.GetString2());
+		}
 	},
 	
 	Save_Changes: function(data, Writer) {
@@ -2526,7 +2633,7 @@ function DrawingObjects() {
 			var drawingObject = _this.cloneDrawingObject(currentSheet.model.Drawings[i]);
 			
             if (drawingObject.graphicObject instanceof  CChartAsGroup) {
-                
+				
 				_this.calcChartInterval(drawingObject.graphicObject.chart);
 				drawingObject.graphicObject.drawingBase = drawingObject;
                 drawingObject.graphicObject.drawingObjects = _this;
@@ -2614,8 +2721,7 @@ function DrawingObjects() {
 		}
 	}
 
-    _this.getAllFonts = function(AllFonts)
-    {
+    _this.getAllFonts = function(AllFonts) {
 
     },
 
