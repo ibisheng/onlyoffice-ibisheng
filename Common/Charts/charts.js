@@ -2062,6 +2062,8 @@ function drawChart(chart, arrValues, width, height) {
 		{
 			labels[i] = NumCache[i].val;
 		}
+		if(chart.type == 'HBar')
+			labels = OfficeExcel.array_reverse(labels);
 		bar._otherProps._labels = labels;
 	}
 	//выставляем параметры текса
