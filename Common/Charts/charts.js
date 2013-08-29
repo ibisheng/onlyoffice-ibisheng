@@ -1062,7 +1062,7 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 						formatCellScOy = cell.numFormatStr ? cell.numFormatStr : defaultFormat;
 				}
 				
-				formatAdobeLabel = cell.numFormatStr;
+				formatAdobeLabel = cell.numFormatStr ? cell.numFormatStr : defaultFormat;
 				
 				var orValue = cell.val;
 				if(series[0].xVal.Formula != null && numSeries == 0 && !isNumberVal && chart.type == 'Scatter')
