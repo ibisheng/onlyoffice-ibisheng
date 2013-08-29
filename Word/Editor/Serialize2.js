@@ -5673,7 +5673,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 	},
 	this.PrepareSeria = function(val, chart, formula)
 	{
-		var bbox = this.ParseFormula(formula);
+		/*var bbox = this.ParseFormula(formula);
 		if(null != bbox)
 		{
 			var length = 0;
@@ -5708,7 +5708,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 					row.push(item);
 				}
 			}
-		}
+		}*/
 	}
     this.ReadPptxDrawing = function(type, length, oParaDrawing, oChartObject)
 	{
@@ -5765,10 +5765,17 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 						this.PrepareSeria(seria.Val.NumCache, chart, seria.Val.Formula);
 				}
 			}
-			var nRowCount = chart.data.length;
+			
+			/*var nRowCount = chart.data.length;
 			var nColCount = 0;
 			if(nRowCount > 0)
-				nColCount = chart.data[0].length;
+				nColCount = chart.data[0].length;*/
+				
+			var nRowCount = chart.series.length;
+			var nColCount = 0;
+			if(nRowCount > 0)
+				nColCount = chart.series[0].Val.NumCache.length;
+				
 			if(0 != nRowCount && 0 != nColCount)
 			{
 				var sColLetter = "";
@@ -5784,7 +5791,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 				sColLetter += String.fromCharCode( (n % 26) + 65);
 				
 				chart.range.interval = "Sheet1!A1:" + sColLetter + nRowCount;
-				var chartRender = new ChartRender();
+				//var chartRender = new ChartRender();
 				//chart.img = chartRender.insertChart(chart, null, chart.width, chart.height);
 				oChartObject.chart = chart;
 			}

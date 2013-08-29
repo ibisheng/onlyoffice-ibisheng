@@ -160,11 +160,18 @@ function asc_CChart(object) {
 		for (var i = 0; i < object.series.length; i++) {
 			var ser = new asc_CChartSeria();
 
-			ser.asc_setTitle(object.series[i].Tx);
+			ser.asc_setTitle(object.series[i].TxCache.Tx);
+			ser.asc_setTitleFormula(object.series[i].TxCache.Formula);
+			
 			if (object.series[i].Val && object.series[i].Val.Formula)
 				ser.asc_setValFormula(object.series[i].Val.Formula);
+				
 			if (object.series[i].xVal && object.series[i].xVal.Formula)
 				ser.asc_setxValFormula(object.series[i].xVal.Formula);
+				
+			if (object.series[i].Cat && object.series[i].Cat.Formula)
+				ser.asc_setCatFormula(object.series[i].Cat.Formula);
+				
 			if (object.series[i].Marker) {
 				ser.asc_setMarkerSize(object.series[i].Marker.Size);
 				ser.asc_setMarkerSymbol(object.series[i].Marker.Symbol);
@@ -1204,9 +1211,15 @@ asc_CChartSeria.prototype = {
 
 	asc_getxValFormula: function() { return this.xVal.Formula; },
 	asc_setxValFormula: function(formula) { this.xVal.Formula = formula; },
+	
+	asc_getCatFormula: function() { return this.Cat.Formula; },
+	asc_setCatFormula: function(formula) { this.Cat.Formula = formula; },
 
-	asc_getTitle: function() { return this.Tx; },
-	asc_setTitle: function(title) { this.Tx = title; },
+	asc_getTitle: function() { return this.TxCache.Tx; },
+	asc_setTitle: function(title) { this.TxCache.Tx = title; },
+	
+	asc_getTitleFormula: function() { return this.TxCache.Formula; },
+	asc_setTitleFormula: function(val) { this.TxCache.Formula = val; },
 	
 	asc_getMarkerSize: function() { return this.Marker.Size; },
 	asc_setMarkerSize: function(size) { this.Marker.Size = size; },
@@ -1232,8 +1245,14 @@ prot["asc_setValFormula"] = prot.asc_setValFormula;
 prot["asc_getxValFormula"] = prot.asc_getxValFormula;
 prot["asc_setxValFormula"] = prot.asc_setxValFormula;
 
+prot["asc_getCatFormula"] = prot.asc_getCatFormula;
+prot["asc_setCatFormula"] = prot.asc_setCatFormula;
+
 prot["asc_getTitle"] = prot.asc_getTitle;
 prot["asc_setTitle"] = prot.asc_setTitle;
+
+prot["asc_getTitleFormula"] = prot.asc_getTitleFormula;
+prot["asc_setTitleFormula"] = prot.asc_setTitleFormula;
 
 prot["asc_getMarkerSize"] = prot.asc_getMarkerSize;
 prot["asc_setMarkerSize"] = prot.asc_setMarkerSize;
