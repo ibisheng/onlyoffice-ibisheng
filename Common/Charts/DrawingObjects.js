@@ -3013,7 +3013,13 @@ function DrawingObjects() {
                     drawingObject.graphicObject.chartTitle.drawingObjects = _this;
 					
                 drawingObject.graphicObject.chart.worksheet = worksheet;
-                drawingObject.graphicObject.init();
+				
+				if ( drawingObject.graphicObject.chart.series.length && !drawingObject.graphicObject.chart.series[0].Val.NumCache.length ) {
+					drawingObject.graphicObject.chart.rebuildSeries();
+				}
+				
+                drawingObject.graphicObject.init();	
+				
                 aObjects.push( drawingObject );
             }
 			if (drawingObject.graphicObject instanceof  CShape) {
