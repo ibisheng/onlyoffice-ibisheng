@@ -101,7 +101,7 @@ c_oAscError$ID$FileVKey:g8
 ps_unicodes_init:kk
 STATES_ID_SPLINE_BEZIER5:D0
 c_oSerRowTypes$CustomHeight:DD
-STATES_ID_SPLINE_BEZIER2:A0
+STATES_ID_SPLINE_BEZIER2:z0
 STATES_ID_SPLINE_BEZIER3:B0
 JSCompiler_StaticMethods__moveRecalcGraph:fO
 c_oSerWorksheetsTypes$ConditionalFormatting:cD
@@ -265,7 +265,7 @@ tt_cmap12_char_next:zn
 Load_SBit_Image:Sm
 g_anchor_bottom:e7
 _ph_summ__two_col_tx:rV
-NumComporationOperators$less:jc
+NumComporationOperators$less:ic
 c_oMainTables$ImageMap:cY
 FT_GlyphLoader_New:ui
 ScrollArrowType$ARROW_RIGHT:HR
@@ -801,7 +801,7 @@ nSldLtTTwoObj:FU
 c_oSer_TableColumns$TotalsRowFunction:$E
 historyitem_Worksheet_Unmerge:mP
 JSCompiler_StaticMethods_DrawChart:u_
-STATES_ID_SPLINE_BEZIER33:z0
+STATES_ID_SPLINE_BEZIER33:y0
 c_oSer_CalcChainType$NewThread:pE
 MASTER_KIND:nS
 JSCompiler_StaticMethods_RedoAdd:eN
@@ -1005,7 +1005,7 @@ CreateAscColorCustom:wf
 c_oAscBorderOptions$Top:fR
 fontstyle_mask_regular:sw
 T1_Get_Multi_Master:pu
-NumComporationOperators$greaterorequal:lc
+NumComporationOperators$greaterorequal:kc
 Round_To_Half_Grid:eq
 c_oSer_Comments$LeftOffset:rG
 cff_face_init:ft
@@ -2684,7 +2684,7 @@ tt_face_init:Tr
 CLASS_TYPE_SOLID_FILL:KS
 JSCompiler_StaticMethods_setUniFill:v2
 getMinValueArray:Yd
-L 139:kc
+L 139:lc
 historyitem_RowCol_SetCellStyle:nL
 L 138:Hd
 JSCompiler_StaticMethods_Internal_FindWordStart:x6
@@ -3057,7 +3057,7 @@ L 44:Qb
 L 47:Ye
 L 46:Zb
 L 41:yc
-L 40:ic
+L 40:jc
 ft_bitmap_glyph_init:Nh
 TT_Post_NamesRec:bj
 L 43:ke
