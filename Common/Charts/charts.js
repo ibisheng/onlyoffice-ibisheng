@@ -2053,6 +2053,17 @@ function drawChart(chart, arrValues, width, height) {
 		bar._yAxisTitle._hpos = 23 + keyLeft;
 	}
 	bar.arrFormatAdobeLabels = chart.arrFormatAdobeLabels;
+	//bar._otherProps._labels
+	if(bar._otherProps._labels.length && typeof bar._otherProps._labels[0] == 'object')
+	{
+		var labels = [];
+		var NumCache = bar._otherProps._labels;
+		for(var i = 0; i < NumCache.length; i++)
+		{
+			labels[i] = NumCache[i].val;
+		}
+		bar._otherProps._labels = labels;
+	}
 	//выставляем параметры текса
 	setFontChart(chart);
 	calcAllMargin(chart.isFormatCell,chart.isformatCellScOy,chart.min,chart.max,chart.ymin,chart.ymax, chart);
@@ -2308,26 +2319,13 @@ function DrawLineChart(chartCanvas, chartType, chartSubType, data, chart) {
 			tempMas[i] = i;
 		}
 	}
-	var NumCache = null;
 	//подписи по оси OX
 	if(chart && chart.series && chart.series[0] && chart.series[0].xVal && chart.series[0].xVal.NumCache && chart.series[0].xVal.Formula != null && chart.series[0].xVal.NumCache.length != 0)
-	{
-		NumCache = chart.series[0].xVal.NumCache;
-	}
+		bar._otherProps._labels = chart.series[0].xVal.NumCache;
 	else if(chart && chart.series && chart.series[0] && chart.series[0].Cat && chart.series[0].Cat.NumCache && chart.series[0].Cat.Formula != null && chart.series[0].Cat.NumCache.length != 0)
-		NumCache = chart.series[0].Cat.NumCache;
+		bar._otherProps._labels = chart.series[0].Cat.NumCache;
 	else
 		bar._otherProps._labels = tempMas;
-	//обработка для подписей по оси OX()	
-	if(NumCache)
-	{
-		var labels = [];
-		for(var i = 0; i < NumCache.length; i++)
-		{
-			labels[i] = NumCache[i].val;
-		}
-		bar._otherProps._labels = labels;
-	}
 		
 	if (bar._otherProps._autoGrouping == 'stackedPer')
 		bar._otherProps._units_post = '%';
@@ -2382,6 +2380,8 @@ function DrawBarChart(chartCanvas, chartSubType, data, chart) {
 	//подписи по оси OX
 	if(chart && chart.series && chart.series[0] && chart.series[0].xVal && chart.series[0].xVal.NumCache && chart.series[0].xVal.Formula != null && chart.series[0].xVal.NumCache.length != 0)
 		bar._otherProps._labels = chart.series[0].xVal.NumCache;
+	else if(chart && chart.series && chart.series[0] && chart.series[0].Cat && chart.series[0].Cat.NumCache && chart.series[0].Cat.Formula != null && chart.series[0].Cat.NumCache.length != 0)
+		bar._otherProps._labels = chart.series[0].Cat.NumCache;
 	else
 		bar._otherProps._labels = tempMas;
 
@@ -2484,6 +2484,8 @@ function DrawHBarChart(chartCanvas, chartSubType, data, chart) {
 	//подписи по оси OY
 	if(chart && chart.series && chart.series[0] && chart.series[0].xVal && chart.series[0].xVal.NumCache && chart.series[0].xVal.Formula != null && chart.series[0].xVal.NumCache.length != 0)
 		bar._otherProps._labels = chart.series[0].xVal.NumCache;
+	else if(chart && chart.series && chart.series[0] && chart.series[0].Cat && chart.series[0].Cat.NumCache && chart.series[0].Cat.Formula != null && chart.series[0].Cat.NumCache.length != 0)
+		bar._otherProps._labels = chart.series[0].Cat.NumCache;
 	else
 		bar._otherProps._labels = tempMas;
 	bar._otherProps._background_grid_autofit_numhlines = data.length;
