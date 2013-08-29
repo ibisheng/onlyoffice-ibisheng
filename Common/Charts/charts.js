@@ -995,12 +995,22 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 		var isEn = false;
 		var isEnY = false;
 		var numSeries = 0;
-		var curSeria;	
+		var curSeria;
+		var isNumberVal = true;
+		if(series[0] && series[0].xVal && series[0].xVal.Formula != null && chart.type == 'Scatter')
+		{
+			var cash = series[0].xVal.NumCache;
+			for(var i = 0; i < cash.length; i++)
+			{
+				if(!isNumber(cash.val))
+					isNumberVal = false;
+			}
+		}
 		for(l = 0; l < series.length; ++l)
 		{
 			var firstCol = 0;
 			var firstRow = 0;
-			if(series[0].xVal.Formula != null && numSeries == 0)
+			if(series[0].xVal.Formula != null && numSeries == 0 && chart.type == 'Scatter')
 			{
 				curSeria = series[numSeries].xVal.NumCache;
 			}
@@ -1016,7 +1026,7 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 			{
 				continue;
 			}
-			if(series[0].xVal.Formula != null && numSeries == 0)
+			if(series[0].xVal.Formula != null && numSeries == 0 && chart.type == 'Scatter')
 				l--;
 			skipSeries[numSeries] = false;
 			arrValues[numSeries] = [];
@@ -1055,7 +1065,7 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 				formatAdobeLabel = cell.numFormatStr;
 				
 				var orValue = cell.val;
-				if(series[0].xVal.Formula != null && numSeries == 0 && isNaN(orValue))
+				if(series[0].xVal.Formula != null && numSeries == 0 && !isNumberVal && chart.type == 'Scatter')
 					orValue = col - firstCol + 1;
 				if('' != orValue)
 					isSkip[numSeries] = false;
