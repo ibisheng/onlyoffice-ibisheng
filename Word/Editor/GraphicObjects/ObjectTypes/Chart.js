@@ -8,7 +8,7 @@ function CChartAsGroup(drawingBase, drawingObjects)
     this.vAxisTitle = null;
     this.hAxisTitle = null;
 
-    this.chart = new CChartData(true);
+    this.chart = new asc_CChart();
 
     this.brush = new CBlipFill();
     this.spPr = new CSpPr();
@@ -47,15 +47,18 @@ function CChartAsGroup(drawingBase, drawingObjects)
 
 CChartAsGroup.prototype =
 {
+	asc_getChart: function()
+	{
+		return this.chart;
+	},
+	
     calculateAfterOpen10: function()
     {
         this.init();
         this.recalculate();
         this.recalculateTransform();
     },
-
-
-
+	
     getArrayWrapPolygons: function()
     {
         if(this.spPr.geometry)
@@ -1819,7 +1822,20 @@ CChartAsGroup.prototype =
                 break;
             }
         }
-    }
-
+    },
+	
+	getChartBinary: function()
+	{
+		return "_chart_";
+	},
+	
+	setChartBinary: function(binary)
+	{
+	}
 };
 
+window["Asc"].CChartAsGroup = CChartAsGroup;
+window["Asc"]["CChartAsGroup"] = CChartAsGroup;
+prot = CChartAsGroup.prototype;
+
+prot["asc_getChart"] = prot.asc_getChart;
