@@ -36,47 +36,36 @@ cFormulaFunction.DateAndTime = {
         r.Calculate = function(arg){
             var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], year, month, day;
 
-            for (var i = 0; i<this.argumentsCurrent;i++){
-                var arg0 = arg[i];
-                if( arg0 instanceof cArray ){
-                    arg0 = arg0.getElement(0);
-                }
-                else if( arg0 instanceof cArea || arg0 instanceof cArea3D ){
-                    arg0 = arg0.cross(arguments[1].first).tocNumber();
-                }
-
-                if(arg0 instanceof cError){
-                    return this.setCA(arg0,true);
-                }
-                else if( arg0 instanceof cNumber || arg0 instanceof cBool){
-                    if(i==0)year = arg0.tocNumber().getValue();
-                    if(i==1)month = arg0.tocNumber().getValue();
-                    if(i==2)day = arg0.tocNumber().getValue();
-                }
-                else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ){
-                    var val = arg0.getValue();
-                    if(val instanceof cError) return this.setCA(val,true);
-                    else if( val instanceof cNumber || val instanceof cBool ){
-                        if(i==0)year = arg0.tocNumber().getValue();
-                        if(i==1)month = arg0.tocNumber().getValue();
-                        if(i==2)day = arg0.tocNumber().getValue();
-                    }
-                    else{
-                        return this.setCA(new cError( cErrorType.wrong_value_type ),true);
-                    }
-                }
-                else if(arg0 instanceof cString || arg0 instanceof cEmpty){
-                    var val = arg0.tocNumber();
-                    if(val instanceof cError){
-                        return this.setCA(val,true);
-                    }
-                    else {
-                        if(i==0)year = arg0.tocNumber().getValue();
-                        if(i==1)month = arg0.tocNumber().getValue();
-                        if(i==2)day = arg0.tocNumber().getValue();
-                    }
-                }
+            if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
+                arg0 = arg0.cross( arguments[1].first );
             }
+            else if( arg0 instanceof cArray ){
+                arg0 = arg0.getElement(0);
+            }
+            if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
+                arg1 = arg1.cross( arguments[1].first );
+            }
+            else if( arg1 instanceof cArray ){
+                arg1 = arg1.getElement(0);
+            }
+            if ( arg2 instanceof cArea || arg2 instanceof cArea3D ) {
+                arg2 = arg2.cross( arguments[1].first );
+            }
+            else if( arg2 instanceof cArray ){
+                arg2 = arg2.getElement(0);
+            }
+
+            arg0 = arg0.tocNumber();
+            arg1 = arg1.tocNumber();
+            arg2 = arg2.tocNumber();
+
+            if ( arg0 instanceof cError )    return this.setCA(arg0,true);
+            if ( arg1 instanceof cError )    return this.setCA(arg1,true);
+            if ( arg2 instanceof cError )    return this.setCA(arg2,true);
+
+            year = arg0.getValue();
+            month = arg1.getValue();
+            day = arg2.getValue();
 
             if( year >= 0 && year <= 1899)
                 year+=1900;
@@ -856,44 +845,39 @@ cFormulaFunction.DateAndTime = {
         r.setArgumentsMin(3);
         r.setArgumentsMax(3);
         r.Calculate = function(arg){
-            var hour,minute,second;
-            for (var i = 0; i<this.argumentsCurrent;i++){
-                var arg0 = arg[i];
-                if( arg0 instanceof cArray ){
-                    arg0 = arg0.getElement(0);
-                }
-                else if ( arg0 instanceof cArea || arg0 instanceof cArea3D ){
-                    arg0 = arg0.cross(arguments[1].first).tocNumber();
-                }
+            var hour = arg[0], minute = arg[1], second = arg[2];
 
-                if(arg0 instanceof cError) return this.setCA( arg0 ,true);
-                else if( arg0 instanceof cNumber || arg0 instanceof cBool){
-                    if(i==0)hour = arg0.tocNumber().getValue();
-                    if(i==1)minute = arg0.tocNumber().getValue();
-                    if(i==2)second = arg0.tocNumber().getValue();
-                }
-                else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ){
-                    var val = arg0.getValue();
-                    if(val instanceof cError) return this.setCA( val ,true);
-                    else if( val instanceof cNumber || val instanceof cBool ){
-                        if(i==0)hour = arg0.tocNumber().getValue();
-                        if(i==1)minute = arg0.tocNumber().getValue();
-                        if(i==2)second = arg0.tocNumber().getValue();
-                    }
-                    else{
-                        return this.setCA( new cError( cErrorType.wrong_value_type ) ,true);
-                    }
-                }
-                else if(arg0 instanceof cString || arg0 instanceof cEmpty){
-                    var val = arg0.tocNumber();
-                    if(val instanceof cError) return this.setCA( val ,true);
-                    else {
-                        if(i==0)hour = arg0.tocNumber().getValue();
-                        if(i==1)minute = arg0.tocNumber().getValue();
-                        if(i==2)second = arg0.tocNumber().getValue();
-                    }
-                }
+            if ( hour instanceof cArea || hour instanceof cArea3D ) {
+                hour = hour.cross( arguments[1].first );
             }
+            else if( hour instanceof cArray ){
+                hour = hour.getElement(0);
+            }
+            if ( minute instanceof cArea || minute instanceof cArea3D ) {
+                minute = minute.cross( arguments[1].first );
+            }
+            else if( minute instanceof cArray ){
+                minute = minute.getElement(0);
+            }
+            if ( second instanceof cArea || second instanceof cArea3D ) {
+                second = second.cross( arguments[1].first );
+            }
+            else if( second instanceof cArray ){
+                second = second.getElement(0);
+            }
+
+            hour = hour.tocNumber();
+            minute = minute.tocNumber();
+            second = second.tocNumber();
+
+            if ( hour instanceof cError )    return this.setCA(hour,true);
+            if ( minute instanceof cError )    return this.setCA(minute,true);
+            if ( second instanceof cError )    return this.setCA(second,true);
+
+            hour = hour.getValue();
+            minute = minute.getValue();
+            second = second.getValue();
+
             var v = (hour*60*60+minute*60+second)/c_sPerDay;
             this.setCA( new cNumber( v - Math.floor(v) ) ,true);
             if( arguments[1].getNumFormatStr().toLowerCase() === "general" )
