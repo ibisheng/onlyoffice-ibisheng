@@ -1,0 +1,246 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+	<title>DocumentViewer</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=9">
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, target-densitydpi=device-dpi"/>
+	
+	<script type="text/javascript" src="../../OfficeWeb/Word/menu/js/jquery-1.6.1.min.js"></script>
+	<!-- SDK -->
+	<script type="text/javascript" src="../../OfficeWeb/Common/downloaderfiles.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/docscoapicommon.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/spellCheckLanguage.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/spellCheckLanguagesAll.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/3rdparty/Underscore/underscore-min.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/3rdparty/Sockjs/sockjs-0.3.min.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/docscoapi.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/spellcheckapisettings.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/spellcheckapi.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/wordcopypaste.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/CommonDefines.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/NumFormat.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/editorscommon.js"></script>		
+	
+	<script type="text/javascript" src="../../OfficeWeb/Common/apiCommon.js"></script>
+	
+	<!-- For chart editor -->
+	<script type="text/javascript" src="../../OfficeWeb/Excel/apiDefines.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/Charts/DrawingObjects.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/Charts/charts.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/commonDefines.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/SerializeCommonWordExcel.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.core.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.annotate.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.context.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.effects.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.key.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.resizing.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.tooltips.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/Charts/libraries/OfficeExcel.common.zoom.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/Charts/libraries/OfficeExcel.bar.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/Charts/libraries/OfficeExcel.bipolar.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/Charts/libraries/OfficeExcel.gantt.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/Charts/libraries/OfficeExcel.hbar.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/Charts/libraries/OfficeExcel.line.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/Charts/libraries/OfficeExcel.pie.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/Charts/libraries/OfficeExcel.radar.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/Charts/libraries/OfficeExcel.rose.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/Charts/libraries/OfficeExcel.rscatter.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/Charts/libraries/OfficeExcel.scatter.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/Charts/libraries/OfficeExcel.waterfall.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/Charts/libraries/OfficeExcel.chartProperties.js"></script>				
+	<script type="text/javascript" src="../../OfficeWeb/Common/Charts/libraries/hsv.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/Charts/libraries/rgbcolor.js"></script>
+
+    <script type="text/javascript" src="../../OfficeWeb/Common/FontsFreeType/font_engine.js"></script>
+	
+	<script type="text/javascript" src="../../OfficeWeb/Common/FontsFreeType/FontFile.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Common/FontsFreeType/FontManager.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Drawing/Externals.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Drawing/AllFonts.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Drawing/GlobalLoaders.js"></script>
+
+    <script type="text/javascript" src="../../OfficeWeb/Word/Drawing/translations.js"></script>
+
+    <script type="text/javascript" src="../../OfficeWeb/Word/Editor/GraphicObjects/GraphicObjects.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Editor/GraphicObjects/GraphicPage.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Editor/GraphicObjects/States.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Editor/GraphicObjects/Math.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Editor/GraphicObjects/TrackGraphicObjects.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Editor/GraphicObjects/WrapManager.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Editor/GraphicObjects/Spline.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Editor/GraphicObjects/PolyLine.js"></script>
+
+
+    <script type="text/javascript" src="../../OfficeWeb/Word/Editor/GraphicObjects/ObjectTypes/WordShape.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Editor/GraphicObjects/ObjectTypes/WordImage.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Editor/GraphicObjects/ObjectTypes/WordGroupShapes.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Editor/GraphicObjects/ObjectTypes/Format.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Editor/GraphicObjects/ObjectTypes/Geometry.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Editor/GraphicObjects/ObjectTypes/ShapeTracks.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Editor/GraphicObjects/ObjectTypes/GroupTracks.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Editor/GraphicObjects/ObjectTypes/CreateGeometry.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Editor/GraphicObjects/ObjectTypes/Path.js"></script>
+
+    <script type="text/javascript" src="../../OfficeWeb/Word/Editor/CollaborativeEditing.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Editor/Comments.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Editor/History.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Editor/Styles.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Editor/DrawingObjects.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Editor/FlowObjects.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Word/Editor/ParagraphContent.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Word/Editor/Paragraph.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Word/Editor/Sections.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Editor/Numbering.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Editor/HeaderFooter.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Word/Editor/Document.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Word/Editor/Common.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Word/Editor/Numbering.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Editor/DocumentContent.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Editor/Table.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Word/Editor/Serialize2.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Word/Editor/Search.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Word/Editor/FontClassification.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Editor/Spelling.js"></script>
+
+	<script type="text/javascript" src="../../OfficeWeb/Word/Drawing/HatchPattern.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Drawing/Graphics.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Drawing/ArcTo.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Drawing/Hit.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Drawing/ColorArray.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Drawing/Overlay.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Drawing/ShapeDrawer.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Drawing/Metafile.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Drawing/DrawingDocument.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Drawing/GraphicsEvents.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Drawing/scrolls/iscroll.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Drawing/WorkEvents.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Drawing/Controls.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Drawing/Rulers.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Drawing/HtmlPage.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Drawing/documentrenderer.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Word/apiDefines.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/apiCommon.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Word/api.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Drawing/scrolls/scroll.js"></script>
+
+    <script type="text/javascript" src="../../OfficeWeb/Common/Shapes/EditorSettings.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Common/Shapes/Serialize.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Common/Shapes/SerializeWriter.js"></script>
+    <script type="text/javascript" src="../../OfficeWeb/Word/Editor/SerializeCommon.js"></script>
+	
+	<!--for presentation-->
+	<script type="text/javascript" src="../../OfficeWeb/Common/PresentationSerializeAdapter.js"></script>
+		
+	<!--for charts-->
+	<script type="text/javascript" src="../../OfficeWeb/Excel/graphics/DrawingContextWord.js"></script>
+
+    <script>
+        window.g_cAscCoAuthoringUrl = "http://192.168.3.213:3000";
+    </script>
+
+    <script type="text/javascript" src="../../OfficeWeb/Common/docscoapisettings.js"></script>
+	<script type="text/javascript" src="../../OfficeWeb/Common/spellcheckapisettings.js"></script>
+	
+	<script type="text/javascript">
+	
+	function _checkBodyWidth()
+	{
+		var w = 0;
+		if (window.innerWidth)
+			w = window.innerWidth;
+		else if (document.documentElement && document.documentElement.clientWidth)
+			w = document.documentElement.clientWidth;
+		else if (document.body)
+			w = document.body.clientWidth;
+		return w;
+	}
+	function _checkBodyHeight()
+	{
+		var h = 0;
+		if (window.innerHeight)
+			h = window.innerHeight;
+		else if (document.documentElement && document.documentElement.clientHeight)
+			h = document.documentElement.clientHeight;
+		else if (document.body)
+			h = document.body.clientHeight;
+		return h;
+	}
+
+		document.addEventListener('DOMContentLoaded', function () 
+		{
+			setTimeout(function(){
+            var sdkTop = 0, statusBarHeight = 0;
+			var html_element = document.getElementById("editor_sdk");
+			html_element.style.left = "0px";
+			html_element.style.top = sdkTop+"px";
+			html_element.style.width = _checkBodyWidth() + "px";
+			html_element.style.height = (_checkBodyHeight() - sdkTop - statusBarHeight) + "px";
+			
+			var editor = new asc_docs_api("editor_sdk");
+			editor.SetMobileVersion(true);
+			editor.CreateComponents();
+			editor.SetFontsPath("../Fonts/");
+			editor.Init();
+			
+			var sProtocol = window.location.protocol;
+			var sHost = window.location.host;
+			var documentOrigin = "";
+			if(sProtocol && "" != sProtocol)
+				documentOrigin = sProtocol + "//" + sHost;
+			else
+				documentOrigin = sHost;	
+			var c_DocInfo = new CDocInfo ();
+			c_DocInfo.put_Id( getURLParameter("key") ?
+									decodeURIComponent(getURLParameter("key")) :
+									undefined );
+			c_DocInfo.put_Url( getURLParameter("key") ?
+									decodeURIComponent(getURLParameter("url")) :
+									undefined );
+			c_DocInfo.put_Title( getURLParameter("key") ?
+									decodeURIComponent(getURLParameter("title")).replace(new RegExp("\\+",'g')," ") :
+									undefined );
+			c_DocInfo.put_Format( getURLParameter("key") ?
+									decodeURIComponent(getURLParameter("filetype")) :
+									undefined );
+			c_DocInfo.put_VKey( getURLParameter("key") ?
+									decodeURIComponent(getURLParameter("vkey")) :
+									undefined );
+			globalCurentUser = "user_" + Math.floor((Math.random()*100)+1);
+			c_DocInfo.put_UserId( globalCurentUser );
+			
+			var isViewMode = "true" == getURLParameter("isViewMode");
+			editor.SetViewMode(isViewMode);
+			
+			editor.LoadDocument(c_DocInfo);
+			
+			window.onresize = function()
+			{
+				if (false === editor.bInit_word_control)
+					return;
+					
+				var html_element = document.getElementById("editor_sdk");
+				html_element.style.left = "0px";
+				html_element.style.top = sdkTop + "px";
+				html_element.style.width = _checkBodyWidth() + "px";
+				html_element.style.height = (_checkBodyHeight() - sdkTop - statusBarHeight) + "px";
+
+
+				editor.Resize();
+				editor.zoomFitToWidth();
+			}
+
+			// на всякий случай. Наверное этого не надо, сообщение пошлется в конце
+			editor.Resize();			
+		}, 200); }, false);
+	</script>
+	
+</head>
+<body class="block_elem" style="width:100%;height:100%;background-color:#B0B0B0;overflow:hidden;-ms-zoom:1;zoom:1;">
+ <div id="editor_sdk" style="position:absolute;left:0px;top:86px;"></div>
+    <div id="scroller" style="background-color:transparent;">
+        <div id="main_div" style="z-index:4;width:100%; height:100%; margin:0; padding:0;"></div>
+    </div>
+</div>	
+</body>
+</html>
