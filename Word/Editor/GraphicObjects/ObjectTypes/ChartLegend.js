@@ -62,7 +62,9 @@ CChartLegend.prototype =
         var styles = new CStyles();
         var default_legend_style = new CStyle("defaultLegendStyle", styles.Default, null, styletype_Paragraph);
         default_legend_style.TextPr.FontSize = 10;
-        default_legend_style.TextPr.themeFont = "Calibri";
+        default_legend_style.TextPr.FontFamily.Name = "Calibri";
+        default_legend_style.TextPr.Bold = true;
+       // default_legend_style.TextPr.RFonts. = "Calibri";
         //TODO:ParaPr: default_legend_style.ParaPr.Ind
         var tx_pr;
         if(isRealObject(this.txPr))

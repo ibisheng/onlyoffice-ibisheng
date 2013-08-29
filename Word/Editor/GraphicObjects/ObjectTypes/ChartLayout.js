@@ -20,36 +20,32 @@ function CChartLayout()
     this.y = null;
     this.w = null;
     this.h = null;
-    this.Id = g_oIdCounter.Get_NewId();
-    g_oTableId.Add(this, this.Id, null)
+   // this.Id = g_oIdCounter.Get_NewId();
+   // g_oTableId.Add(this, this.Id, null)
 }
 
 CChartLayout.prototype =
 {
     setXMode: function(mode)
     {
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Layout_Set_X_Mode, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(this.xMode, mode)), null);
         this.xMode = mode;
     },
 
     setYMode: function(mode)
     {
 
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Layout_Set_Y_Mode, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(this.yMode, mode)), null);
         this.yMode = mode;
     },
 
 
     setX: function(x)
     {
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Layout_Set_X, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(this.x, x)), null);
 
         this.x = x;
     },
 
     setY: function(y)
     {
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Layout_Set_Y, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(this.y, y)), null);
         this.y = y;
     },
 

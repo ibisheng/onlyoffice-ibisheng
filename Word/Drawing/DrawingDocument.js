@@ -4422,9 +4422,9 @@ function CDrawingDocument()
     }
 
     // вот здесь весь трекинг
-    this.DrawTrack = function(type, matrix, left, top, width, height, isLine)
+    this.DrawTrack = function(type, matrix, left, top, width, height, isLine, canRotate)
     {
-        this.AutoShapesTrack.DrawTrack(type, matrix, left, top, width, height, isLine);
+        this.AutoShapesTrack.DrawTrack(type, matrix, left, top, width, height, isLine, canRotate);
     }
 
     this.DrawTrackSelectShapes = function(x, y, w, h)

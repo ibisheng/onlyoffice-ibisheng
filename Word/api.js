@@ -5939,6 +5939,7 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
                 }
 
 
+                Document.DrawingObjects.calculateAfterOpen();
                 Document.DrawingObjects.calculateAfterChangeTheme();
 
                 Document.Recalculate();

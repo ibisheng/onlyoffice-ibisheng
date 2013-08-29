@@ -574,7 +574,6 @@ CDocument.prototype =
         if ( true === this.TurnOffRecalc )
             return;
 
-        this.DrawingObjects.updateCharts();
 
         // Останавливаем поиск
         if ( this.SearchEngine.Count > 0 && false != this.SearchEngine.ClearOnRecalc )
@@ -691,6 +690,7 @@ CDocument.prototype =
         this.FullRecalc.StartIndex = StartIndex;
         this.FullRecalc.StartPage  = StartPage;
 
+        this.DrawingObjects.updateCharts();
         this.DrawingDocument.OnStartRecalculate( StartPage );
         this.Recalculate_Page(StartPage, true, StartIndex);
 

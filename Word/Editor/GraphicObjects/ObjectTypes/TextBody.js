@@ -72,10 +72,27 @@ CTextBody.prototype =
         this.content = docContent;
     },
 
-    draw: function(graphics)
+    draw: function(graphics, pageIndex)
     {
         if(!graphics.IsNoSupportTextDraw)
-            this.content.Draw(0, graphics);
+        {
+            if(typeof pageIndex === "number")
+            {
+                var old_start_page = this.textBoxContent.Get_StartPage_Relative();
+                this.content.Set_StartPage(pageIndex);
+            }
+            var result_page_index = typeof pageIndex === "number" ? pageIndex : this.shape.pageIndex;
+            this.content.Set_StartPage(result_page_index);
+            this.content.Draw(result_page_index, graphics);
+
+            if(typeof pageIndex === "number")
+            {
+                this.content.Set_StartPage(old_start_page);
+            }
+
+         //   this.content.Draw(this.shape.pageIndex, graphics);
+        }
+
         else
         {
             graphics.rect(0, 0, this.contentWidth, this.contentHeight);
@@ -84,6 +101,8 @@ CTextBody.prototype =
 
     Get_Styles: function(level)
     {
+        if(this.shape && typeof this.shape.getStyles === "function")
+            return this.shape.getStyles();
        return editor.WordControl.m_oLogicDocument.Get_Styles();
     },
 
@@ -108,6 +127,11 @@ CTextBody.prototype =
         {
             this.content.Paragraph_Add(new ParaText(str[key]), false);
         }
+    },
+
+    Is_ThisElementCurrent: function()
+    {
+        return false;
     },
 
     getColorMap: function()
@@ -285,22 +309,22 @@ CTextBody.prototype =
         this.content.Selection_SetEnd(x, y, 0, e);
     },
 
-    updateSelectionState: function(drawingDocument)
+    updateSelectionState: function()
     {
         var Doc = this.content;
+        var dd = editor.WordControl.m_oLogicDocument.DrawingDocument;
         if ( true === Doc.Is_SelectionUse() && !Doc.Selection_IsEmpty()) {
-            drawingDocument.UpdateTargetTransform(this.shape.transformText);
-            drawingDocument.TargetEnd();
-            drawingDocument.SelectEnabled(true);
-            drawingDocument.SelectClear();
-            drawingDocument.SelectShow();
+           dd.UpdateTargetTransform(this.shape.transformText);
+           dd.TargetEnd();
+           dd.SelectEnabled(true);
+           dd.SelectClear();
+           dd.SelectShow();
         }
-        else
+        else /*if(this.parent.elementsManipulator.Document.CurPos.Type == docpostype_FlowObjects ) */
         {
-            drawingDocument.UpdateTargetTransform(this.shape.transformText);
-            drawingDocument.TargetShow();
-            drawingDocument.SelectEnabled(false);
-            drawingDocument.CheckTargetShow();
+            dd.UpdateTargetTransform(this.shape.transformText);
+            dd.TargetShow();
+            dd.SelectEnabled(false);
         }
     },
 

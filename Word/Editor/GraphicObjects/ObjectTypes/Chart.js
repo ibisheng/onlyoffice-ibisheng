@@ -15,9 +15,13 @@ function CChartAsGroup(drawingBase, drawingObjects)
 
     this.x = null;
     this.y = null;
-    this.extX = null;
-    this.extY = null;
-	this.lockType = c_oAscLockTypes.kLockTypeNone;
+    this.absExtX = null;
+    this.absExtY = null;
+    this.absOffsetX = 0;
+    this.absOffsetY = 0;
+    this.absRot = null;
+    this.absFlipH = null;
+    this.absFlipV = null;
 
     this.spPr.geometry = CreateGeometry("rect");
     this.spPr.geometry.Init(5, 5);
@@ -28,30 +32,115 @@ function CChartAsGroup(drawingBase, drawingObjects)
     this.transform = new CMatrix();
     this.invertTransform = new CMatrix();
     this.group = null;
-
-    this.recalculateInfo =
-    {
-        recalculateAll: true
-    };
+    this.pageIndex = -1;
 
     this.selectedObjects =
     [];
-
+    this.selected = false;
+    this.mainGroup = null;
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
+
+    this.bFirstRecalc = true;
 }
 
 
 CChartAsGroup.prototype =
 {
+    calculateAfterOpen10: function()
+    {
+        this.init();
+        this.recalculate();
+        this.recalculateTransform();
+    },
+
+
+
+    getArrayWrapPolygons: function()
+    {
+        if(this.spPr.geometry)
+            return this.spPr.geometry.getArrayPolygons();
+
+        return [];
+    },
+
+    getOwnTransform: function()
+    {
+        return this.transform;
+    },
+
+
     getObjectType: function()
     {
         return CLASS_TYPE_CHART_AS_GROUP;
     },
 
+    setPageIndex: function(pageIndex)
+    {
+        this.pageIndex = pageIndex;
+        if(isRealObject(this.chartTitle))
+            this.chartTitle.pageIndex = pageIndex;
+        if(isRealObject(this.hAxisTitle))
+            this.hAxisTitle.pageIndex = pageIndex;
+        if(isRealObject(this.vAxisTitle))
+            this.vAxisTitle.pageIndex = pageIndex;
+    },
+
     Get_Id: function()
     {
         return this.Id;
+    },
+
+
+
+    setSizes: function(posX, posY, w, h, flipH, flipV)
+    {
+        var data = {};
+        data.Type = historyitem_SetSizes;
+        data.oldW = this.absExtX;
+        data.oldH = this.absExtY;
+        data.newW = w;
+        data.newH = h;
+        data.oldFlipH = this.absFlipH;
+        data.oldFlipV = this.absFlipV;
+        data.newFlipH = flipH;
+        data.newFlipV = flipV;
+        data.oldPosX = this.absOffsetX;
+        data.oldPosY = this.absOffsetY;
+        data.newPosX = posX;
+        data.newPosY = posY;
+
+        History.Add(this, data);
+
+        this.spPr.xfrm.extX = w;
+        this.spPr.xfrm.extY = h;
+        this.spPr.xfrm.flipH = flipH;
+        this.spPr.xfrm.flipV = flipV;
+        this.absExtX = w;
+        this.absExtY = h;
+        this.absFlipH = flipH;
+        this.absFlipV = flipV;
+        this.absOffsetX = posX;
+        this.absOffsetY = posY;
+        if(this.parent)
+        {
+            this.parent.absOffsetX = posX;
+            this.parent.absOffsetY = posY;
+            this.parent.absExtX = w;
+            this.parent.absExtY = h;
+            this.parent.flipH = flipH;
+            this.parent.flipV = flipV;
+        }
+        this.calculateAfterResize();
+    },
+
+    calculateAfterResize: function()
+    {
+        if(isRealObject(this.parent))
+        {
+            this.parent.bNeedUpdateWH = true;
+        }
+        this.recalculate();
     },
 
 
@@ -68,7 +157,7 @@ CChartAsGroup.prototype =
     getBoundsInGroup: function()
     {
 
-        return {minX: this.x, minY: this.y, maxX: this.x + this.extX, maxY: this.y + this.extY};
+        return {minX: this.x, minY: this.y, maxX: this.x + this.absExtX, maxY: this.y + this.absExtY};
         var r = this.rot;
         if((r >= 0 && r < Math.PI*0.25)
             || (r > 3*Math.PI*0.25 && r < 5*Math.PI*0.25)
@@ -77,13 +166,22 @@ CChartAsGroup.prototype =
         }
         else
         {
-            var hc = this.extX*0.5;
-            var vc = this.extY*0.5;
+            var hc = this.absExtX*0.5;
+            var vc = this.absExtY*0.5;
             var xc = this.x + hc;
             var yc = this.y + vc;
             return {minX: xc - vc, minY: yc - hc, maxX: xc + vc, maxY: yc + hc};
         }
     },
+
+    hit: function(x, y)
+    {
+        var invert_transform = this.getInvertTransform();
+        var tx = invert_transform.TransformPointX(x, y);
+        var ty = invert_transform.TransformPointY(x, y);
+        return tx >=0 && tx <= this.absExtX && ty >=0 && ty <= this.absExtY;
+    },
+
     hitInTextRect: function()
     {
         return false;
@@ -105,8 +203,8 @@ CChartAsGroup.prototype =
         var x_t = invert_transform.TransformPointX(x, y);
         var y_t = invert_transform.TransformPointY(x, y);
         if(isRealObject(this.spPr.geometry))
-            return this.spPr.geometry.hitInInnerArea(this.drawingObjects.getCanvasContext(), x_t, y_t);
-        return x_t > 0 && x_t < this.extX && y_t > 0 && y_t < this.extY;
+            return this.spPr.geometry.hitInInnerArea(editor.WordControl.m_oLogicDocument.DrawingDocument.CanvasHitContext, x_t, y_t);
+        return x_t > 0 && x_t < this.absExtX && y_t > 0 && y_t < this.absExtY;
     },
 
     hitInPath: function(x, y)
@@ -115,7 +213,7 @@ CChartAsGroup.prototype =
         var x_t = invert_transform.TransformPointX(x, y);
         var y_t = invert_transform.TransformPointY(x, y);
         if(isRealObject(this.spPr.geometry))
-            return this.spPr.geometry.hitInPath(this.drawingObjects.getCanvasContext(), x_t, y_t);
+            return this.spPr.geometry.hitInPath(editor.WordControl.m_oLogicDocument.DrawingDocument.CanvasHitContext, x_t, y_t);
         return false;
     },
 
@@ -147,8 +245,8 @@ CChartAsGroup.prototype =
     Get_Props: function(OtherProps)
     {
         var Props = new Object();
-        Props.Width  = this.extX;
-        Props.Height = this.extY;
+        Props.Width  = this.absExtX;
+        Props.Height = this.absExtY;
 
         if(!isRealObject(OtherProps))
             return Props;
@@ -203,20 +301,29 @@ CChartAsGroup.prototype =
         xfrm = this.spPr.xfrm;
         if(!isRealObject(this.group))
         {
-            this.x = xfrm.offX;
-            this.y = xfrm.offY;
-            this.extX = xfrm.extX;
-            this.extY = xfrm.extY;
+        /*    if(isRealObject(this.parent))
+            {
+                var ext = this.parent.Extent;
+                this.absExtX = ext.W;
+                this.absExtY = ext.H;
+            }
+            else
+            {     */
+                //this.absOffsetX = 0;
+                //this.absOffsetY = 0;
+                this.absExtX = xfrm.extX;
+                this.absExtY = xfrm.extY;
+            //}
         }
         else
         {
             var scale_scale_coefficients = this.group.getResultScaleCoefficients();
-            this.x = scale_scale_coefficients.cx*(xfrm.offX - this.group.spPr.xfrm.chOffX);
-            this.y = scale_scale_coefficients.cy*(xfrm.offY - this.group.spPr.xfrm.chOffY);
-            this.extX = scale_scale_coefficients.cx*xfrm.extX;
-            this.extY = scale_scale_coefficients.cy*xfrm.extY;
+            this.absOffsetX = scale_scale_coefficients.cx*(xfrm.offX - this.group.spPr.xfrm.chOffX);
+            this.absOffsetY = scale_scale_coefficients.cy*(xfrm.offY - this.group.spPr.xfrm.chOffY);
+            this.absExtX = scale_scale_coefficients.cx*xfrm.extX;
+            this.absExtY = scale_scale_coefficients.cy*xfrm.extY;
         }
-        this.spPr.geometry.Recalculate(this.extX, this.extY);
+        this.spPr.geometry.Recalculate(this.absExtX, this.absExtY);
     },
 
     recalculateTransform: function()
@@ -225,16 +332,21 @@ CChartAsGroup.prototype =
         this.recalculateMatrix();
     },
 
+    getTransformMatrix: function()
+    {
+        return this.transform;
+    },
+
     recalculateMatrix: function()
     {
         this.transform.Reset();
         var hc, vc;
-        hc = this.extX*0.5;
-        vc = this.extY*0.5;
-        this.spPr.geometry.Recalculate(this.extX, this.extY);
+        hc = this.absExtX*0.5;
+        vc = this.absExtY*0.5;
+        this.spPr.geometry.Recalculate(this.absExtX, this.absExtY);
         global_MatrixTransformer.TranslateAppend(this.transform, -hc, -vc);
 
-        global_MatrixTransformer.TranslateAppend(this.transform, this.x + hc, this.y + vc);
+        global_MatrixTransformer.TranslateAppend(this.transform, this.absOffsetX + hc, this.absOffsetY + vc);
         if(isRealObject(this.group))
         {
             global_MatrixTransformer.MultiplyAppend(this.transform, this.group.getTransform());
@@ -260,46 +372,6 @@ CChartAsGroup.prototype =
         }
     },
 
-    recalculateTransform2: function()
-    {
-        var xfrm;
-        if(isRealObject(this.drawingBase))
-        {
-            xfrm = this.drawingBase.getGraphicObjectMetrics();
-            xfrm.offX = xfrm.x;
-            xfrm.offY = xfrm.y;
-        }
-        else
-            xfrm = this.spPr.xfrm;
-        if(!isRealObject(this.group))
-        {
-            this.x = xfrm.offX;
-            this.y = xfrm.offY;
-            this.extX = xfrm.extX;
-            this.extY = xfrm.extY;
-        }
-        else
-        {
-            var scale_scale_coefficients = this.group.getResultScaleCoefficients();
-            this.x = scale_scale_coefficients.cx*(xfrm.offX - this.group.spPr.xfrm.chOffX);
-            this.y = scale_scale_coefficients.cy*(xfrm.offY - this.group.spPr.xfrm.chOffY);
-            this.extX = scale_scale_coefficients.cx*xfrm.extX;
-            this.extY = scale_scale_coefficients.cy*xfrm.extY;
-        }
-        this.transform.Reset();
-        var hc, vc;
-        hc = this.extX*0.5;
-        vc = this.extY*0.5;
-        this.spPr.geometry.Recalculate(this.extX, this.extY);
-        global_MatrixTransformer.TranslateAppend(this.transform, -hc, -vc);
-
-        global_MatrixTransformer.TranslateAppend(this.transform, this.x + hc, this.y + vc);
-        if(isRealObject(this.group))
-        {
-            global_MatrixTransformer.MultiplyAppend(this.transform, this.group.getTransform());
-        }
-        this.invertTransform = global_MatrixTransformer.Invert(this.transform);
-    },
 
 
     setXfrmObject: function(xfrm)
@@ -311,9 +383,11 @@ CChartAsGroup.prototype =
         this.spPr.xfrm = xfrm;
     },
 
-    init: function()
+   /* init: function()
     {
-        return;
+        var is_on = History.Is_On();
+        if(is_on)
+            History.TurnOff();
         if(isRealObject(this.chartTitle))
         {
             this.chartTitle.setType(CHART_TITLE_TYPE_TITLE);
@@ -327,15 +401,14 @@ CChartAsGroup.prototype =
             }
             else
             {
-              //  var content = this.chartTitle.txBody.content;
-              //  content.setParent(this.chartTitle.txBody);
-              //  content.setDrawingDocument(this.drawingObjects.drawingDocument);
-              //  for(var i = 0; i < content.Content.length; ++i)
-              //  {
-              //      content.Content[i].setDrawingDocument(this.drawingObjects.drawingDocument);
-              //      content.Content[i].setParent(content);
-              //      content.Content[i].setTextPr(new ParaTextPr());
-              //  }
+                var content = this.chartTitle.txBody.content;
+                content.Parent = this.chartTitle.txBody;
+                content.DrawingDocument = this.drawingDocument;
+                for(var i = 0; i < content.Content.length; ++i)
+                {
+                    content.Content[i].DrawingDocument = this.drawingDocument;
+                    content.Content[i].Parent = content;
+                }
             }
             var content2 =  this.chartTitle.txBody.content.Content;
             for(var i = 0; i < content2.length; ++i)
@@ -358,15 +431,14 @@ CChartAsGroup.prototype =
             }
             else
             {
-                //var content = this.hAxisTitle.txBody.content;
-                //content.setParent(this.hAxisTitle.txBody);
-                //content.setDrawingDocument(this.drawingObjects.drawingDocument);
-                //for(var i = 0; i < content.Content.length; ++i)
-                //{
-                //    content.Content[i].setDrawingDocument(this.drawingObjects.drawingDocument);
-                //    content.Content[i].setParent(content);
-                //    content.Content[i].setTextPr(new ParaTextPr());
-                //}
+                var content = this.hAxisTitle.txBody.content;
+                content.Parent = this.hAxisTitle.txBody;
+                content.DrawingDocument = this.drawingDocument;
+                for(var i = 0; i < content.Content.length; ++i)
+                {
+                    content.Content[i].DrawingDocument = this.drawingDocument;
+                    content.Content[i].Parent = content;
+                }
             }
             var content2 =  this.hAxisTitle.txBody.content.Content;
             for(var i = 0; i < content2.length; ++i)
@@ -390,19 +462,26 @@ CChartAsGroup.prototype =
 
                 for(var i in title_str)
                     this.vAxisTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
+
+                this.vAxisTitle.txBody.content.Set_ApplyToAll(true);
+                this.vAxisTitle.txBody.content.Set_ParagraphAlign(align_Center);
+                this.vAxisTitle.txBody.content.Set_ApplyToAll(false);
             }
             else
             {
-               // this.vAxisTitle.txBody.bodyPr.setVert(nVertTTvert270);
-               // var content = this.vAxisTitle.txBody.content;
-               // //content.setParent(this.vAxisTitle.txBody);
-               // //content.setDrawingDocument(this.drawingObjects.drawingDocument);
-               // for(var i = 0; i < content.Content.length; ++i)
-               // {
-               //     content.Content[i].setDrawingDocument(this.drawingObjects.drawingDocument);
-               //     content.Content[i].setParent(content);
-               //     content.Content[i].setTextPr(new ParaTextPr());
-               // }
+                this.vAxisTitle.txBody.bodyPr.vert = (nVertTTvert270);
+
+                var content = this.vAxisTitle.txBody.content;
+                content.Parent = this.vAxisTitle.txBody;
+                content.DrawingDocument = this.drawingDocument;
+                for(var i = 0; i < content.Content.length; ++i)
+                {
+                    content.Content[i].DrawingDocument = this.drawingDocument;
+                    content.Content[i].Parent = content;
+                }
+                content.Set_ApplyToAll(true);
+                content.Set_ParagraphAlign(align_Center);
+                content.Set_ApplyToAll(false);
             }
             var content2 =  this.vAxisTitle.txBody.content.Content;
             for(var i = 0; i < content2.length; ++i)
@@ -412,8 +491,10 @@ CChartAsGroup.prototype =
           //  this.chart.yAxis.title = this.vAxisTitle.txBody.content.getTextString();
         }
 
-        this.recalculate();
-    },
+        if(is_on)
+            History.TurnOn();
+        //this.recalculate();
+    },   */
 
     calculateAfterOpen: function()
     {
@@ -649,159 +730,23 @@ CChartAsGroup.prototype =
         this.vAxisTitle = yAxisTitle;
     },
 
-    recalculateTitleAfterMove: function()
+
+    draw: function(graphics, pageIndex)
     {
-        if(isRealObject(this.chartTitle))
-        {
-            var title = this.chartTitle;
-            var tx_body = title.txBody;
-            var body_pr = tx_body.bodyPr;
-
-            body_pr.rIns = 0.3;
-            body_pr.lIns = 0.3;
-            body_pr.tIns = 0.3;
-            body_pr.bIns = 0;
-
-            var paragraphs = tx_body.content.Content;
-            for(var i = 0; i < paragraphs.length; ++i)
-            {
-                paragraphs[i].Pr.Jc = align_Center;
-                paragraphs[i].Pr.Spacing.After = 0;
-                paragraphs[i].Pr.Spacing.Before = 0;
-            }
-            paragraphs[0].Pr.Spacing.Before = 0.75;
-
-            var title_height, title_width;
-            if(!(isRealObject(title.layout) && title.layout.isManual))
-            {
-                var max_content_width = this.extX*0.8 - (body_pr.rIns + body_pr.lIns);
-                tx_body.content.Reset(0, 0, max_content_width, 20000);
-                tx_body.content.Recalculate_Page(0, true);
-                var result_width;
-                if(!(tx_body.content.Content.length > 1 || tx_body.content.Content[0].Lines.length > 1))
-                {
-                    if(tx_body.content.Content[0].Lines[0].Ranges[0].W < max_content_width)
-                    {
-                        tx_body.content.Reset(0, 0, tx_body.content.Content[0].Lines[0].Ranges[0].W, 20000);
-                        tx_body.content.Recalculate_Page(0, true);
-                    }
-                    result_width = tx_body.content.Content[0].Lines[0].Ranges[0].W + body_pr.rIns + body_pr.lIns;
-                }
-                else
-                {
-                    var width = 0;
-                    for(var i = 0; i < tx_body.content.Content.length; ++i)
-                    {
-                        var par = tx_body.content.Content[i];
-                        for(var j = 0; j < par.Lines.length; ++j)
-                        {
-                            if(par.Lines[j].Ranges[0].W > width)
-                                width = par.Lines[j].Ranges[0].W;
-                        }
-                    }
-                    result_width = width + body_pr.rIns + body_pr.lIns;
-                }
-                this.chartTitle.extX = result_width;
-                this.chartTitle.extY = tx_body.content.Get_SummaryHeight();
-                this.chartTitle.x = (this.extX - this.chartTitle.extX)*0.5;
-                this.chartTitle.y = this.drawingObjects.convertMetric(7, 0, 3);
-                this.chartTitle.transform.Reset();
-                global_MatrixTransformer.TranslateAppend(this.chartTitle.transform, this.chartTitle.x, this.chartTitle.y);
-                global_MatrixTransformer.MultiplyAppend(this.chartTitle.transform, this.transform);
-                this.chartTitle.invertTransform = global_MatrixTransformer.Invert(this.chartTitle.transform);
-                this.chartTitle.calculateTransformTextMatrix();
-
-                title_width = this.chartTitle.extX;
-                title_height = this.chartTitle.y + this.chartTitle.extY;
-
-            }
-            else
-            {
-                var max_content_width = this.extX*0.8 - (body_pr.rIns + body_pr.lIns);
-                tx_body.content.Reset(0, 0, max_content_width, 20000);
-                tx_body.content.Recalculate_Page(0, true);
-                var result_width;
-                if(!(tx_body.content.Content.length > 1 || tx_body.content.Content[0].Lines.length > 1))
-                {
-                    if(tx_body.content.Content[0].Lines[0].Ranges[0].W < max_content_width)
-                    {
-                        tx_body.content.Reset(0, 0, tx_body.content.Content[0].Lines[0].Ranges[0].W, 20000);
-                        tx_body.content.Recalculate_Page(0, true);
-                    }
-                    result_width = tx_body.content.Content[0].Lines[0].Ranges[0].W + body_pr.rIns + body_pr.lIns;
-                }
-                else
-                {
-                    var width = 0;
-                    for(var i = 0; i < tx_body.content.Content.length; ++i)
-                    {
-                        var par = tx_body.content.Content[i];
-                        for(var j = 0; j < par.Lines.length; ++j)
-                        {
-                            if(par.Lines[j].Ranges[0].W > width)
-                                width = par.Lines[j].Ranges[0].W;
-                        }
-                    }
-                    result_width = width + body_pr.rIns + body_pr.lIns;
-                }
-                this.chartTitle.extX = result_width;
-                this.chartTitle.extY = tx_body.content.Get_SummaryHeight();
-
-                if(this.chartTitle.layout.xMode === LAYOUT_MODE_EDGE)
-                    this.chartTitle.x = this.extX*this.chartTitle.layout.x;
-                else
-                    this.chartTitle.x = (this.extX - this.chartTitle.extX)*0.5;
-
-                if(this.chartTitle.layout.yMode === LAYOUT_MODE_EDGE)
-                    this.chartTitle.y = this.extY*this.chartTitle.layout.y;
-                else
-                    this.chartTitle.y = this.drawingObjects.convertMetric(7, 0, 3);
-
-                this.chartTitle.transform.Reset();
-                global_MatrixTransformer.TranslateAppend(this.chartTitle.transform, this.chartTitle.x, this.chartTitle.y);
-                global_MatrixTransformer.MultiplyAppend(this.chartTitle.transform, this.transform);
-                this.chartTitle.invertTransform = global_MatrixTransformer.Invert(this.chartTitle.transform);
-                this.chartTitle.calculateTransformTextMatrix();
-
-                title_width = this.chartTitle.extX;
-                title_height =  this.drawingObjects.convertMetric(7, 0, 3) + this.chartTitle.extY;
-            }
-        }
-    },
-
-    draw: function(graphics)
-    {
-        return;
         graphics.SetIntegerGrid(false);
         graphics.transform3(this.transform, false);
         var shape_drawer = new CShapeDrawer();
         shape_drawer.fromShape(this, graphics);
         shape_drawer.draw(this.spPr.geometry);
-		
-		if(graphics instanceof CGraphics)
-		{
-			var transform = this.transform;
-			var extX = this.extX;
-			var extY = this.extY;
-			
-			if(!isRealObject(this.group))
-			{
-				graphics.SetIntegerGrid(false);
-				graphics.transform3(transform, false);		
-				graphics.DrawLockObjectRect(this.lockType, 0, 0, extX, extY );
-				graphics.reset();
-				graphics.SetIntegerGrid(true);
-			}
-		}
-		
+
         graphics.reset();
         graphics.SetIntegerGrid(true);
         if(this.chartTitle)
-            this.chartTitle.draw(graphics);
+            this.chartTitle.draw(graphics, pageIndex);
         if(this.hAxisTitle)
-            this.hAxisTitle.draw(graphics);
+            this.hAxisTitle.draw(graphics, pageIndex);
         if(this.vAxisTitle)
-            this.vAxisTitle.draw(graphics);
+            this.vAxisTitle.draw(graphics, pageIndex);
     },
 
     check_bounds: function(checker)
@@ -814,9 +759,9 @@ CChartAsGroup.prototype =
         {
             checker._s();
             checker._m(0, 0);
-            checker._l(this.extX, 0);
-            checker._l(this.extX, this.extY);
-            checker._l(0, this.extY);
+            checker._l(this.absExtX, 0);
+            checker._l(this.absExtX, this.absExtY);
+            checker._l(0, this.absExtY);
             checker._z();
             checker._e();
         }
@@ -832,41 +777,40 @@ CChartAsGroup.prototype =
         return [];
     },
 
-    select: function(drawingObjectsController)
+
+    select: function(pageIndex)
     {
         this.selected = true;
-        var selected_objects;
-        if(!isRealObject(this.group))
-            selected_objects = drawingObjectsController.selectedObjects;
-        else
-            selected_objects = this.group.getMainGroup().selectedObjects;
-        for(var i = 0; i < selected_objects.length; ++i)
-        {
-            if(selected_objects[i] === this)
-                break;
-        }
-        if(i === selected_objects.length)
-            selected_objects.push(this);
+        if(typeof pageIndex === "number")
+            this.selectStartPage = pageIndex;
+
     },
 
-    deselect: function(drawingObjectsController)
+    deselect: function()
     {
         this.selected = false;
-        var selected_objects;
-        if(!isRealObject(this.group))
-            selected_objects = drawingObjectsController.selectedObjects;
-        else
-            selected_objects = this.group.getMainGroup().selectedObjects;
-        for(var i = 0; i < selected_objects.length; ++i)
+        this.selectStartPage = -1;
+
+        if(isRealObject(this.chartTitle))
         {
-            if(selected_objects[i] === this)
-            {
-                selected_objects.splice(i, 1);
-                break;
-            }
+            this.chartTitle.deselect();
+        }
+        if(isRealObject(this.hAxisTitle))
+        {
+            this.hAxisTitle.deselect();
         }
 
+        if(isRealObject(this.vAxisTitle))
+        {
+            this.vAxisTitle.deselect();
+        }
     },
+
+    getPageIndex: function()
+    {
+        return this.pageIndex;
+    },
+
 
     resetSelection: function()
     {
@@ -900,24 +844,24 @@ CChartAsGroup.prototype =
         if(Math.sqrt(sqr_x + sqr_y) < radius)
             return 0;
 
-        var hc = this.extX*0.5;
+        var hc = this.absExtX*0.5;
         var dist_x = t_x - hc;
         sqr_x = dist_x*dist_x;
         if(Math.sqrt(sqr_x + sqr_y) < radius)
             return 1;
 
-        dist_x = t_x - this.extX;
+        dist_x = t_x - this.absExtX;
         sqr_x = dist_x*dist_x;
         if(Math.sqrt(sqr_x + sqr_y) < radius)
             return 2;
 
-        var vc = this.extY*0.5;
+        var vc = this.absExtY*0.5;
         var dist_y = t_y - vc;
         sqr_y = dist_y*dist_y;
         if(Math.sqrt(sqr_x + sqr_y) < radius)
             return 3;
 
-        dist_y = t_y - this.extY;
+        dist_y = t_y - this.absExtY;
         sqr_y = dist_y*dist_y;
         if(Math.sqrt(sqr_x + sqr_y) < radius)
             return 4;
@@ -949,44 +893,41 @@ CChartAsGroup.prototype =
 
     },
 
-
-
-    recalculate: function()
+    recalculate: function(updateImage)
     {
-        return;
         this.recalculatePosExt();
         this.recalculateTransform();
         if(isRealObject(this.chartTitle))
         {
-            var max_title_width = this.extX*0.8;
+            var max_title_width = this.absExtX*0.8;
             var title_width = this.chartTitle.txBody.getRectWidth(max_title_width);
             this.chartTitle.extX = title_width;
-            this.chartTitle.extY = this.chartTitle.txBody.getRectHeight(this.extY, title_width);
+            this.chartTitle.extY = this.chartTitle.txBody.getRectHeight(this.absExtY, title_width);
             this.chartTitle.spPr.geometry.Recalculate(this.chartTitle.extX, this.chartTitle.extY);
             if(isRealObject(this.chartTitle.layout) && isRealNumber(this.chartTitle.layout.x))
             {
-                this.chartTitle.x = this.extX*this.chartTitle.layout.x;
-                if(this.chartTitle.x + this.chartTitle.extX > this.extX)
-                    this.chartTitle.x = this.extX - this.chartTitle.extX;
+                this.chartTitle.x = this.absExtX*this.chartTitle.layout.x;
+                if(this.chartTitle.x + this.chartTitle.extX > this.absExtX)
+                    this.chartTitle.x = this.absExtX - this.chartTitle.extX;
                 if(this.chartTitle.x < 0)
                     this.chartTitle.x = 0;
             }
             else
             {
-                this.chartTitle.x = (this.extX - this.chartTitle.extX)*0.5;
+                this.chartTitle.x = (this.absExtX - this.chartTitle.extX)*0.5;
             }
 
             if(isRealObject(this.chartTitle.layout) && isRealNumber(this.chartTitle.layout.y))
             {
-                this.chartTitle.y = this.extY*this.chartTitle.layout.y;
-                if(this.chartTitle.y + this.chartTitle.extY > this.extY)
-                    this.chartTitle.y = this.extY - this.chartTitle.extY;
+                this.chartTitle.y = this.absExtY*this.chartTitle.layout.y;
+                if(this.chartTitle.y + this.chartTitle.extY > this.absExtY)
+                    this.chartTitle.y = this.absExtY - this.chartTitle.extY;
                 if(this.chartTitle.y < 0)
                     this.chartTitle.y = 0;
             }
             else
             {
-                this.chartTitle.y = this.drawingObjects.convertMetric(7, 0, 3);
+                this.chartTitle.y = this.drawingDocument.GetMMPerDot(7);
             }
 
             this.chartTitle.recalculateTransform();
@@ -994,61 +935,55 @@ CChartAsGroup.prototype =
             this.chartTitle.calculateTransformTextMatrix();
         }
 
-
-
-
         if(isRealObject(this.hAxisTitle))
         {
-            var max_title_widh = this.extX*0.8;
+            var max_title_widh = this.absExtX*0.8;
             var title_width = this.hAxisTitle.txBody.getRectWidth(max_title_width);
             this.hAxisTitle.extX = title_width;
-            this.hAxisTitle.extY = this.hAxisTitle.txBody.getRectHeight(this.extY, title_width);
+            this.hAxisTitle.extY = this.hAxisTitle.txBody.getRectHeight(this.absExtY, title_width);
             this.hAxisTitle.spPr.geometry.Recalculate(this.hAxisTitle.extX, this.hAxisTitle.extY);
-
         }
 
         if(isRealObject(this.vAxisTitle))
         {
-            var max_title_height = this.extY*0.8;
-
+            var max_title_height = this.absExtY*0.8;
             var body_pr = this.vAxisTitle.txBody.getBodyPr();
             this.vAxisTitle.extY = this.vAxisTitle.txBody.getRectWidth(max_title_height) - body_pr.rIns - body_pr.lIns + body_pr.tIns + body_pr.bIns;
-            this.vAxisTitle.extX = this.vAxisTitle.txBody.getRectHeight(this.extX, this.vAxisTitle.extY) - (- body_pr.rIns - body_pr.lIns + body_pr.tIns + body_pr.bIns);
+            this.vAxisTitle.extX = this.vAxisTitle.txBody.getRectHeight(this.absExtX, this.vAxisTitle.extY) - (- body_pr.rIns - body_pr.lIns + body_pr.tIns + body_pr.bIns);
             this.vAxisTitle.spPr.geometry.Recalculate(this.vAxisTitle.extX, this.vAxisTitle.extY);
 
         }
         var lInd, tInd, rInd, bInd;
-        tInd = this.convertMetric(7, 0, 3) + (isRealObject(this.chartTitle) ? this.chartTitle.extY : 0);
-        lInd = this.drawingObjects.convertMetric(7, 0, 3) + (isRealObject(this.vAxisTitle) ? this.vAxisTitle.extX : 0);
-        rInd = 0;//this.drawingObjects.convertMetric(7, 0, 3) + this.vAxisTitle.extX;
-        bInd = this.drawingObjects.convertMetric(7, 0, 3) + (isRealObject(this.hAxisTitle) ? this.hAxisTitle.extY : 0);
+        tInd = this.drawingDocument.GetMMPerDot(7) + (isRealObject(this.chartTitle) ? this.chartTitle.extY : 0);
+        lInd = this.drawingDocument.GetMMPerDot(7) + (isRealObject(this.vAxisTitle) ? this.vAxisTitle.extX : 0);
+        rInd = 0;
+        bInd = this.drawingDocument.GetMMPerDot(7) + (isRealObject(this.hAxisTitle) ? this.hAxisTitle.extY : 0);
         if(isRealObject(this.vAxisTitle))
         {
-
             if(isRealObject(this.vAxisTitle.layout) && isRealNumber(this.vAxisTitle.layout.x))
             {
-                this.vAxisTitle.x = this.extX*this.vAxisTitle.layout.x;
-                if(this.vAxisTitle.x + this.vAxisTitle.extX > this.extX)
-                    this.vAxisTitle.x = this.extX - this.vAxisTitle.extX;
+                this.vAxisTitle.x = this.absExtX*this.vAxisTitle.layout.x;
+                if(this.vAxisTitle.x + this.vAxisTitle.extX > this.absExtX)
+                    this.vAxisTitle.x = this.absExtX - this.vAxisTitle.extX;
                 if(this.vAxisTitle.x < 0)
                     this.vAxisTitle.x = 0;
             }
             else
             {
-                this.vAxisTitle.x = this.drawingObjects.convertMetric(7, 0, 3);
+                this.vAxisTitle.x = this.drawingDocument.GetMMPerDot(7);
             }
 
             if(isRealObject(this.vAxisTitle.layout) && isRealNumber(this.vAxisTitle.layout.y))
             {
-                this.vAxisTitle.y = this.extY*this.vAxisTitle.layout.y;
-                if(this.vAxisTitle.y + this.vAxisTitle.extY > this.extY)
-                    this.vAxisTitle.y = this.extY - this.vAxisTitle.extY;
+                this.vAxisTitle.y = this.absExtY*this.vAxisTitle.layout.y;
+                if(this.vAxisTitle.y + this.vAxisTitle.extY > this.absExtY)
+                    this.vAxisTitle.y = this.absExtY - this.vAxisTitle.extY;
                 if(this.vAxisTitle.y < 0)
                     this.vAxisTitle.y = 0;
             }
             else
             {
-                this.vAxisTitle.y = (this.extY - this.vAxisTitle.extY)*0.5;
+                this.vAxisTitle.y = (this.absExtY - this.vAxisTitle.extY)*0.5;
                 if(this.vAxisTitle.y < tInd)
                     this.vAxisTitle.y = tInd;
             }
@@ -1061,31 +996,30 @@ CChartAsGroup.prototype =
 
             if(isRealObject(this.hAxisTitle.layout) && isRealNumber(this.hAxisTitle.layout.x))
             {
-                this.hAxisTitle.x = this.extX*this.hAxisTitle.layout.x;
-                if(this.hAxisTitle.x + this.hAxisTitle.extX > this.extX)
-                    this.hAxisTitle.x = this.extX - this.hAxisTitle.extX;
+                this.hAxisTitle.x = this.absExtX*this.hAxisTitle.layout.x;
+                if(this.hAxisTitle.x + this.hAxisTitle.extX > this.absExtX)
+                    this.hAxisTitle.x = this.absExtX - this.hAxisTitle.extX;
                 if(this.hAxisTitle.x < 0)
                     this.hAxisTitle.x = 0;
             }
             else
             {
-
-                this.hAxisTitle.x = ((this.extX - rInd) - (lInd + this.drawingObjects.convertMetric(25, 0, 3)) - this.hAxisTitle.extX)*0.5 + lInd + this.drawingObjects.convertMetric(25, 0, 3);
-                if(this.hAxisTitle.x < lInd + this.drawingObjects.convertMetric(25, 0, 3))
-                    this.hAxisTitle.x = lInd + this.drawingObjects.convertMetric(25, 0, 3);
+                this.hAxisTitle.x = ((this.absExtX - rInd) - (lInd + this.drawingDocument.GetMMPerDot(25)) - this.hAxisTitle.extX)*0.5 + lInd + this.drawingDocument.GetMMPerDot(25);
+                if(this.hAxisTitle.x < lInd + this.drawingDocument.GetMMPerDot(25))
+                    this.hAxisTitle.x = lInd + this.drawingDocument.GetMMPerDot(25);
             }
 
             if(isRealObject(this.hAxisTitle.layout) && isRealNumber(this.hAxisTitle.layout.y))
             {
-                this.hAxisTitle.y = this.extY*this.hAxisTitle.layout.y;
-                if(this.hAxisTitle.y + this.hAxisTitle.extY > this.extY)
-                    this.hAxisTitle.y = this.extY - this.hAxisTitle.extY;
+                this.hAxisTitle.y = this.absExtY*this.hAxisTitle.layout.y;
+                if(this.hAxisTitle.y + this.hAxisTitle.extY > this.absExtY)
+                    this.hAxisTitle.y = this.absExtY - this.hAxisTitle.extY;
                 if(this.hAxisTitle.y < 0)
                     this.hAxisTitle.y = 0;
             }
             else
             {
-                this.hAxisTitle.y = this.extY - bInd;
+                this.hAxisTitle.y = this.absExtY - bInd;
             }
             this.hAxisTitle.recalculateTransform();
             this.hAxisTitle.calculateContent();
@@ -1098,8 +1032,8 @@ CChartAsGroup.prototype =
             if(!this.chartTitle.overlay)
             {
                 title_margin = {
-                    w: this.drawingObjects.convertMetric(this.chartTitle.extX, 3, 0),
-                    h: 7+this.drawingObjects.convertMetric(this.chartTitle.extY, 3, 0)
+                    w: this.drawingDocument.GetDotsPerMM(this.chartTitle.extX),
+                    h: 7+this.drawingDocument.GetDotsPerMM(this.chartTitle.extY)
                 }
             }
         }
@@ -1109,8 +1043,8 @@ CChartAsGroup.prototype =
             if(!this.hAxisTitle.overlay)
             {
                 xAxisTitle = {
-                    w: this.drawingObjects.convertMetric(this.hAxisTitle.extX, 3, 0),
-                    h: 7+this.drawingObjects.convertMetric(this.hAxisTitle.extY, 3, 0)
+                    w: this.drawingDocument.GetDotsPerMM(this.hAxisTitle.extX),
+                    h: 7+this.drawingDocument.GetDotsPerMM(this.hAxisTitle.extY)
                 }
             }
         }
@@ -1120,8 +1054,8 @@ CChartAsGroup.prototype =
             if(!this.vAxisTitle.overlay)
             {
                 yAxisTitle = {
-                    w:  7 + this.drawingObjects.convertMetric(this.vAxisTitle.extX, 3, 0),
-                    h: this.drawingObjects.convertMetric(this.vAxisTitle.extY, 3, 0)
+                    w:  7 + this.drawingDocument.GetDotsPerMM(this.vAxisTitle.extX),
+                    h: this.drawingDocument.GetDotsPerMM(this.vAxisTitle.extY)
                 }
             }
         }
@@ -1136,10 +1070,319 @@ CChartAsGroup.prototype =
             title: title_margin
         };
 
-        if ( !this.chart.range.intervalObject )
-            this.drawingObjects.intervalToIntervalObject(this.chart);
-        this.brush.fill.RasterImageId = this.drawingObjects.getChartRender().insertChart(this.chart, null, this.drawingObjects.convertMetric(this.extX, 3, 0),this.drawingObjects.convertMetric(this.extY, 3, 0));
-        this.drawingObjects.loadImageRedraw(this.brush.fill.RasterImageId);
+        /*if ( !this.chart.range.intervalObject )
+            this.drawingObjects.intervalToIntervalObject(this.chart);           */
+        if(!(updateImage === false))
+        {
+            this.brush.fill.RasterImageId = (new ChartRender()).insertChart(this.chart, null, this.drawingDocument.GetDotsPerMM(this.absExtX), this.drawingDocument.GetDotsPerMM(this.absExtY));
+            editor.WordControl.m_oLogicDocument.DrawingObjects.urlMap.push(this.brush.fill.RasterImageId);
+        }
+    },
+
+    init: function()
+    {
+        var is_on = History.Is_On();
+        if(is_on)
+            History.TurnOff();
+        if(isRealObject(this.parent))
+        {
+            var xfrm = this.spPr.xfrm;
+            xfrm.offX = 0;
+            xfrm.offY = 0;
+            xfrm.extX = this.parent.Extent.W;
+            xfrm.extY = this.parent.Extent.H;
+        }
+
+        if(isRealObject(this.chartTitle))
+        {
+            this.chartTitle.setType(CHART_TITLE_TYPE_TITLE);
+            this.chartTitle.txBody.content.Styles = this.chartTitle.getStyles();
+           //this.chartTitle.drawingObjects = this.drawingObjects;
+            if(this.chartTitle.isEmpty())
+            {
+                var title_str = "Chart Title";
+                this.chartTitle.setTextBody(new CTextBody(this.chartTitle));
+
+                for(var i in title_str)
+                    this.chartTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
+            }
+            else
+            {
+                var content = this.chartTitle.txBody.content;
+                content.Parent = this.chartTitle.txBody;
+                content.DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
+                for(var i = 0; i < content.Content.length; ++i)
+                {
+                    content.Content[i].DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
+                    content.Content[i].Parent = content;
+                }
+            }
+            var content = this.chartTitle.txBody.content;
+            for(var i = 0; i < content.Content.length; ++i)
+            {
+                content.Content[i].Pr.PStyle = this.chartTitle.txBody.content.Styles.Style.length - 1;
+            }
+
+            this.chartTitle.txBody.content.Set_ApplyToAll(true);
+            this.chartTitle.txBody.content.Set_ParagraphAlign(align_Center);
+            this.chartTitle.txBody.content.Set_ApplyToAll(false);
+           // this.chart.header.title = this.chartTitle.txBody.content.getTextString();TODO
+        }
+
+        if(isRealObject(this.hAxisTitle))
+        {
+            this.hAxisTitle.setType(CHART_TITLE_TYPE_H_AXIS);
+
+            this.hAxisTitle.txBody.content.Styles = this.hAxisTitle.getStyles();
+            //this.hAxisTitle.drawingObjects = this.drawingObjects;
+            if(this.hAxisTitle.isEmpty())
+            {
+                var title_str = "X Axis";
+                this.hAxisTitle.setTextBody(new CTextBody(this.hAxisTitle));
+                for(var i in title_str)
+                    this.hAxisTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
+            }
+            else
+            {
+                var content = this.hAxisTitle.txBody.content;
+                content.Parent = this.hAxisTitle.txBody;
+                content.DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
+                for(var i = 0; i < content.Content.length; ++i)
+                {
+                    content.Content[i].DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
+                    content.Content[i].Parent = content;
+                }
+            }
+
+
+            var content = this.hAxisTitle.txBody.content;
+            for(var i = 0; i < content.Content.length; ++i)
+            {
+                content.Content[i].Pr.PStyle = this.hAxisTitle.txBody.content.Styles.Style.length - 1;
+            }
+            this.hAxisTitle.txBody.content.Set_ApplyToAll(true);
+            this.hAxisTitle.txBody.content.Set_ParagraphAlign(align_Center);
+            this.hAxisTitle.txBody.content.Set_ApplyToAll(false);
+           // this.chart.xAxis.title = this.hAxisTitle.txBody.content.getTextString();   TODO
+        }
+
+        if(isRealObject(this.vAxisTitle))
+        {
+            this.chart.xAxis.title = "";
+            this.vAxisTitle.setType(CHART_TITLE_TYPE_V_AXIS);
+            this.vAxisTitle.txBody.content.Styles = this.vAxisTitle.getStyles();
+
+            //  this.vAxisTitle.drawingObjects = this.drawingObjects;
+            if(this.vAxisTitle.isEmpty())
+            {
+                var title_str = "Y Axis";
+                this.vAxisTitle.setTextBody(new CTextBody(this.vAxisTitle));
+                this.vAxisTitle.txBody.bodyPr.vert = (nVertTTvert270);
+
+                for(var i in title_str)
+                    this.vAxisTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
+            }
+            else
+            {
+                this.vAxisTitle.txBody.bodyPr.setVert(nVertTTvert270);
+                var content = this.vAxisTitle.txBody.content;
+                content.Parent = this.vAxisTitle.txBody;
+                content.DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
+                for(var i = 0; i < content.Content.length; ++i)
+                {
+                    content.Content[i].DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
+                    content.Content[i].Parent = content;
+                    //content.Content[i].setTextPr(new ParaTextPr());
+                }
+            }
+            var content = this.vAxisTitle.txBody.content;
+            for(var i = 0; i < content.Content.length; ++i)
+            {
+                content.Content[i].Pr.PStyle = this.vAxisTitle.txBody.content.Styles.Style.length - 1;
+            }
+            this.vAxisTitle.txBody.content.Set_ApplyToAll(true);
+            this.vAxisTitle.txBody.content.Set_ParagraphAlign(align_Center);
+            this.vAxisTitle.txBody.content.Set_ApplyToAll(false);
+            //this.chart.yAxis.title = this.vAxisTitle.txBody.content.getTextString();
+        }
+        if(is_on)
+            History.TurnOn();
+
+        this.recalculate();
+
+    },
+
+    hitToHandle: function(x, y, radius)
+    {
+        var _radius;
+        if(!(typeof radius === "number"))
+            _radius = this.drawingDocument.GetMMPerDot(TRACK_CIRCLE_RADIUS);
+        else
+        {
+            _radius = radius;
+        }
+        if(typeof global_mouseEvent.KoefPixToMM === "number" && !isNaN(global_mouseEvent.KoefPixToMM))
+            _radius *= global_mouseEvent.KoefPixToMM;
+
+        var t_x, t_y;
+        if(this.group != null)
+        {
+            var inv_t = global_MatrixTransformer.Invert(this.group.transform);
+            t_x = inv_t.TransformPointX(x, y);
+            t_y = inv_t.TransformPointY(x, y);
+        }
+        else
+        {
+            t_x = x;
+            t_y = y;
+        }
+        this.calculateLeftTopPoint();
+        var _temp_x = t_x - this.absXLT;
+        var _temp_y = t_y - this.absYLT;
+
+        var _sin = Math.sin(this.absRot);
+        var _cos = Math.cos(this.absRot);
+
+
+        var _relative_x = _temp_x*_cos + _temp_y*_sin;
+        var _relative_y = -_temp_x*_sin + _temp_y*_cos;
+
+
+        var _dist_x, _dist_y;
+        if(!this.checkLine())
+        {
+            _dist_x = _relative_x;
+            _dist_y = _relative_y;
+            if(Math.sqrt(_dist_x*_dist_x + _dist_y*_dist_y) < _radius)
+            {
+                return {hit: true, handleRotate: false, handleNum: 0};
+            }
+
+            _dist_x = _relative_x - this.absExtX;
+            if(Math.sqrt(_dist_x*_dist_x + _dist_y*_dist_y) < _radius)
+            {
+                return {hit: true, handleRotate: false, handleNum: 2};
+            }
+
+            _dist_y = _relative_y - this.absExtY;
+            if(Math.sqrt(_dist_x*_dist_x + _dist_y*_dist_y) < _radius)
+            {
+                return {hit: true, handleRotate: false, handleNum: 4};
+            }
+
+            _dist_x = _relative_x;
+            if(Math.sqrt(_dist_x*_dist_x + _dist_y*_dist_y) < _radius)
+            {
+                return {hit: true, handleRotate: false, handleNum: 6};
+            }
+
+            if(this.absExtY >= MIN_SHAPE_DIST)
+            {
+                var _vertical_center = this.absExtY*0.5;
+                _dist_x = _relative_x;
+                _dist_y = _relative_y - _vertical_center;
+
+                if(Math.sqrt(_dist_x*_dist_x + _dist_y*_dist_y) < _radius)
+                {
+                    return {hit: true, handleRotate: false, handleNum: 7};
+                }
+
+                _dist_x = _relative_x - this.absExtX;
+
+                if(Math.sqrt(_dist_x*_dist_x + _dist_y*_dist_y) < _radius)
+                {
+                    return {hit: true, handleRotate: false, handleNum: 3};
+                }
+            }
+
+            var _horizontal_center = this.absExtX*0.5;
+            if(this.absExtX >= MIN_SHAPE_DIST)
+            {
+                _dist_x = _relative_x - _horizontal_center;
+                _dist_y = _relative_y;
+                if(Math.sqrt(_dist_x*_dist_x + _dist_y*_dist_y) < _radius)
+                {
+                    return {hit: true, handleRotate: false, handleNum: 1};
+                }
+
+                _dist_y = _relative_y - this.absExtY;
+                if(Math.sqrt(_dist_x*_dist_x + _dist_y*_dist_y) < _radius)
+                {
+                    return {hit: true, handleRotate: false, handleNum: 5};
+                }
+            }
+        }
+        else
+        {
+            _dist_x = _relative_x;
+            _dist_y = _relative_y;
+            if(Math.sqrt(_dist_x*_dist_x + _dist_y*_dist_y) < _radius)
+            {
+                return {hit: true, handleRotate: false, handleNum: 0};
+            }
+
+            _dist_x = _relative_x - this.absExtX;
+            _dist_y = _relative_y - this.absExtY;
+            if(Math.sqrt(_dist_x*_dist_x + _dist_y*_dist_y) < _radius)
+            {
+                return {hit: true, handleRotate: false, handleNum: 4};
+            }
+        }
+
+        return {hit: false, handleRotate: false, handleNum: null};
+    },
+
+    setAbsoluteTransform: function(offsetX, offsetY, extX, extY, rot, flipH, flipV, open)
+    {
+
+        if(offsetX != null)
+        {
+            this.absOffsetX = offsetX;
+        }
+
+        if(offsetY != null)
+        {
+            this.absOffsetY = offsetY;
+        }
+
+
+        if(extX != null)
+        {
+            this.absExtX = extX;
+        }
+
+        if(extY != null)
+        {
+            this.absExtY = extY;
+        }
+
+
+        if(rot != null)
+        {
+            this.absRot = rot;
+        }
+
+        if(flipH != null)
+        {
+            this.absFlipH = flipH;
+        }
+
+        if(flipV != null)
+        {
+            this.absFlipV = flipV;
+        }
+        if(this.parent)
+            this.parent.setAbsoluteTransform(offsetX, offsetY, extX, extY, rot, flipH, flipV, true);
+
+        if((extY == null))
+        {
+            this.recalculatePosExt();
+            this.recalculateTransform();
+        }
+        else
+        {
+            this.recalculate(true);
+        }
     },
 
     getInvertTransform: function()
@@ -1154,12 +1397,12 @@ CChartAsGroup.prototype =
     {
         var tx = this.invertTransform.TransformPointX(x, y);
         var ty = this.invertTransform.TransformPointY(x, y);
-        return tx > 0 && tx < this.extX && ty > 0 && ty < this.extY;
+        return tx > 0 && tx < this.absExtX && ty > 0 && ty < this.absExtY;
     },
 
     canGroup: function()
     {
-        return true;
+        return false;
     },
 
     canRotate: function()
@@ -1179,18 +1422,44 @@ CChartAsGroup.prototype =
 
     createMoveTrack: function()
     {
-        return new MoveTrackChart(this);
+        return new MoveTrackChart(this, true);
     },
 
-    createResizeTrack: function(cardDirection)
+    createTrackObjectForResize: function(handleNum, pageIndex)
     {
-        return new ResizeTrackChart(this, cardDirection);
+        return new ResizeTrackShape(this, handleNum, pageIndex, true);
+    },
+
+    getPresetGeom: function()
+    {
+        return "rect";
+    },
+
+    createTrackObjectForMove: function(majorOffsetX, majorOffsetY)
+    {
+        return new MoveTrackShape(this, majorOffsetX, majorOffsetY, true);
+    },
+
+    checkLine: function()
+    {
+        return false;
+    },
+
+    calculateTransformMatrix:function(){ this.recalculateTransform();},
+    calculateLeftTopPoint: function()
+    {
+        var _horizontal_center = this.absExtX*0.5;
+        var _vertical_enter = this.absExtY*0.5;
+        var _sin = Math.sin(0);
+        var _cos = Math.cos(0);
+        this.absXLT = -_horizontal_center*_cos + _vertical_enter*_sin +this.absOffsetX + _horizontal_center;
+        this.absYLT = -_horizontal_center*_sin - _vertical_enter*_cos +this.absOffsetY + _vertical_enter;
     },
 
     getAspect: function(num)
     {
-        var _tmp_x = this.extX != 0 ? this.extX : 0.1;
-        var _tmp_y = this.extY != 0 ? this.extY : 0.1;
+        var _tmp_x = this.absExtX != 0 ? this.absExtX : 0.1;
+        var _tmp_y = this.absExtY != 0 ? this.absExtY : 0.1;
         return num === 0 || num === 4 ? _tmp_x/_tmp_y : _tmp_y/_tmp_x;
     },
 
@@ -1203,13 +1472,13 @@ CChartAsGroup.prototype =
 
     getNumByCardDirection: function(cardDirection)
     {
-        var hc = this.extX*0.5;
-        var vc = this.extY*0.5;
+        var hc = this.absExtX*0.5;
+        var vc = this.absExtY*0.5;
         var transform = this.getTransform();
         var y1, y3, y5, y7;
         y1 = transform.TransformPointY(hc, 0);
-        y3 = transform.TransformPointY(this.extX, vc);
-        y5 = transform.TransformPointY(hc, this.extY);
+        y3 = transform.TransformPointY(this.absExtX, vc);
+        y5 = transform.TransformPointY(hc, this.absExtY);
         y7 = transform.TransformPointY(0, vc);
 
         var north_number;
@@ -1244,8 +1513,8 @@ CChartAsGroup.prototype =
     getResizeCoefficients: function(numHandle, x, y)
     {
         var cx, cy;
-        cx= this.extX > 0 ? this.extX : 0.01;
-        cy= this.extY > 0 ? this.extY : 0.01;
+        cx= this.absExtX > 0 ? this.absExtX : 0.01;
+        cy= this.absExtY > 0 ? this.absExtY : 0.01;
 
         var invert_transform = this.getInvertTransform();
         var t_x = invert_transform.TransformPointX(x, y);
@@ -1276,8 +1545,8 @@ CChartAsGroup.prototype =
     getRectBounds: function()
     {
         var transform = this.getTransform();
-        var w = this.extX;
-        var h = this.extY;
+        var w = this.absExtX;
+        var h = this.absExtY;
         var rect_points = [{x:0, y:0}, {x: w, y: 0}, {x: w, y: h}, {x: 0, y: h}];
         var min_x, max_x, min_y, max_y;
         min_x = transform.TransformPointX(rect_points[0].x, rect_points[0].y);
@@ -1321,190 +1590,233 @@ CChartAsGroup.prototype =
             this.drawingBase.setGraphicObjectCoords();
     },
 
-    recalculateAfterResize: function()
+    numberToCardDirection: function(handleNumber)
     {
-        this.recalculateTransform2();
-        // this.recalculateTitleAfterMove();
-        if(isRealObject(this.chartTitle))
+        var y1, y3, y5, y7, hc, vc, numN, x1, x3, x5, x7;
+
+        hc = this.absExtX*0.5;
+        vc = this.absExtY*0.5;
+
+        var t_m = this.transform;
+        x1 = t_m.TransformPointX(hc, 0);
+        x3 = t_m.TransformPointX(this.absExtX, vc);
+        x5 = t_m.TransformPointX(hc, this.absExtY);
+        x7 = t_m.TransformPointX(0, vc);
+        y1 = t_m.TransformPointY(hc, 0);
+        y3 = t_m.TransformPointY(this.absExtX, vc);
+        y5 = t_m.TransformPointY(hc, this.absExtY);
+        y7 = t_m.TransformPointY(0, vc);
+
+        switch(Math.min(y1, y3, y5, y7))
         {
-            var title = this.chartTitle;
-            var tx_body = title.txBody;
-            var body_pr = tx_body.bodyPr;
-
-            body_pr.rIns = 0.3;
-            body_pr.lIns = 0.3;
-            body_pr.tIns = 0.3;
-            body_pr.bIns = 0;
-
-            var paragraphs = tx_body.content.Content;
-            tx_body.content.DrawingDocument = this.drawingObjects.drawingDocument;
-            for(var i = 0; i < paragraphs.length; ++i)
+            case y1:
             {
-                paragraphs[i].DrawingDocument = this.drawingObjects.drawingDocument;
-                paragraphs[i].Pr.Jc = align_Center;
-                paragraphs[i].Pr.Spacing.After = 0;
-                paragraphs[i].Pr.Spacing.Before = 0;
+                numN=1;
+                break;
             }
-            paragraphs[0].Pr.Spacing.Before = 0.75;
-
-            var title_height, title_width;
-            if(!(isRealObject(title.layout) && title.layout.isManual))
+            case y3:
             {
-                var max_content_width = this.extX*0.8 - (body_pr.rIns + body_pr.lIns);
-                tx_body.content.Reset(0, 0, max_content_width, 20000);
-                tx_body.content.Recalculate_Page(0, true);
-                var result_width;
-                if(!(tx_body.content.Content.length > 1 || tx_body.content.Content[0].Lines.length > 1))
-                {
-                    if(tx_body.content.Content[0].Lines[0].Ranges[0].W < max_content_width)
-                    {
-                        tx_body.content.Reset(0, 0, tx_body.content.Content[0].Lines[0].Ranges[0].W, 20000);
-                        tx_body.content.Recalculate_Page(0, true);
-                    }
-                    result_width = tx_body.content.Content[0].Lines[0].Ranges[0].W + body_pr.rIns + body_pr.lIns;
-                }
-                else
-                {
-                    var width = 0;
-                    for(var i = 0; i < tx_body.content.Content.length; ++i)
-                    {
-                        var par = tx_body.content.Content[i];
-                        for(var j = 0; j < par.Lines.length; ++j)
-                        {
-                            if(par.Lines[j].Ranges[0].W > width)
-                                width = par.Lines[j].Ranges[0].W;
-                        }
-                    }
-                    result_width = width + body_pr.rIns + body_pr.lIns;
-                }
-                this.chartTitle.extX = result_width;
-                this.chartTitle.extY = tx_body.content.Get_SummaryHeight();
-                this.chartTitle.x = (this.extX - this.chartTitle.extX)*0.5;
-                this.chartTitle.y = this.drawingObjects.convertMetric(7, 0, 3);
-                this.chartTitle.transform.Reset();
-                global_MatrixTransformer.TranslateAppend(this.chartTitle.transform, this.chartTitle.x, this.chartTitle.y);
-                global_MatrixTransformer.MultiplyAppend(this.chartTitle.transform, this.transform);
-
-                this.chartTitle.invertTransform = global_MatrixTransformer.Invert(this.chartTitle.transform);
-                this.chartTitle.calculateTransformTextMatrix();
-
-                title_width = this.chartTitle.extX;
-                title_height = this.chartTitle.y + this.chartTitle.extY;
-
+                numN=3;
+                break;
             }
+            case y5:
+            {
+                numN=5;
+                break;
+            }
+            case y7:
+            {
+                numN=7;
+                break;
+            }
+            default:
+            {
+                numN=1;
+            }
+        }
+
+        var tmpArr=[];
+        if((x5 - x1)*(y3-y7) - (y5-y1)*(x3-x7) >= 0)
+        {
+            tmpArr[numN] = CARD_DIRECTION_N;
+            tmpArr[(numN+1)%8] = CARD_DIRECTION_NE;
+            tmpArr[(numN+2)%8] = CARD_DIRECTION_E;
+            tmpArr[(numN+3)%8] = CARD_DIRECTION_SE;
+            tmpArr[(numN+4)%8] = CARD_DIRECTION_S;
+            tmpArr[(numN+5)%8] = CARD_DIRECTION_SW;
+            tmpArr[(numN+6)%8] = CARD_DIRECTION_W;
+            tmpArr[(numN+7)%8] = CARD_DIRECTION_NW;
+            return tmpArr[handleNumber];
+        }
+        else
+        {
+            var t;
+            tmpArr[numN] = CARD_DIRECTION_N;
+            t=numN-1;
+            if(t<0) t+=8;
+            tmpArr[t] = CARD_DIRECTION_NE;
+            t=numN-2;
+            if(t<0) t+=8;
+            tmpArr[t] = CARD_DIRECTION_E;
+            t=numN-3;
+            if(t<0) t+=8;
+            tmpArr[t] = CARD_DIRECTION_SE;
+            t=numN-4;
+            if(t<0) t+=8;
+            tmpArr[t] = CARD_DIRECTION_S;
+            t=numN-5;
+            if(t<0) t+=8;
+            tmpArr[t] = CARD_DIRECTION_SW;
+            t=numN-6;
+            if(t<0) t+=8;
+            tmpArr[t] = CARD_DIRECTION_W;
+            t=numN-7;
+            if(t<0) t+=8;
+            tmpArr[t] = CARD_DIRECTION_NW;
+            return tmpArr[handleNumber];
+        }
+    },
+
+    cardDirectionToNumber: function(cardDirection)
+    {
+        var y1, y3, y5, y7, hc, vc, sin, cos, numN, x1, x3, x5, x7;
+
+        hc=this.absExtX*0.5;
+        vc=this.absExtY*0.5;
+
+        sin=Math.sin(this.absRot);
+        cos=Math.cos(this.absRot);
+
+        y1=-cos*vc;
+        y3=sin*hc;
+        y5=cos*vc;
+        y7=-sin*hc;
+        var t_m = this.transform;
+        x1 = t_m.TransformPointX(hc, 0);
+        x3 = t_m.TransformPointX(this.absExtX, vc);
+        x5 = t_m.TransformPointX(hc, this.absExtY);
+        x7 = t_m.TransformPointX(0, vc);
+        y1 = t_m.TransformPointY(hc, 0);
+        y3 = t_m.TransformPointY(this.absExtX, vc);
+        y5 = t_m.TransformPointY(hc, this.absExtY);
+        y7 = t_m.TransformPointY(0, vc);
+
+        switch(Math.min(y1, y3, y5, y7))
+        {
+            case y1:
+            {
+                numN = 1;
+                break;
+            }
+            case y3:
+            {
+                numN = 3;
+                break;
+            }
+            case y5:
+            {
+                numN=5;
+                break;
+            }
+            case y7:
+            {
+
+                numN = 7;
+                break;
+            }
+            default:
+            {
+                numN = 1;
+            }
+        }
+        if((x5 - x1)*(y3-y7) - (y5-y1)*(x3-x7) >= 0)
+        {
+            return (cardDirection + numN) % 8;
+        }
+        else
+        {
+            var t = numN - cardDirection;
+            if(t<0)
+                return t+8;
             else
-            {
-                var max_content_width = this.extX*0.8 - (body_pr.rIns + body_pr.lIns);
-                tx_body.content.Reset(0, 0, max_content_width, 20000);
-                tx_body.content.Recalculate_Page(0, true);
-                var result_width;
-                if(!(tx_body.content.Content.length > 1 || tx_body.content.Content[0].Lines.length > 1))
-                {
-                    if(tx_body.content.Content[0].Lines[0].Ranges[0].W < max_content_width)
-                    {
-                        tx_body.content.Reset(0, 0, tx_body.content.Content[0].Lines[0].Ranges[0].W, 20000);
-                        tx_body.content.Recalculate_Page(0, true);
-                    }
-                    result_width = tx_body.content.Content[0].Lines[0].Ranges[0].W + body_pr.rIns + body_pr.lIns;
-                }
-                else
-                {
-                    var width = 0;
-                    for(var i = 0; i < tx_body.content.Content.length; ++i)
-                    {
-                        var par = tx_body.content.Content[i];
-                        for(var j = 0; j < par.Lines.length; ++j)
-                        {
-                            if(par.Lines[j].Ranges[0].W > width)
-                                width = par.Lines[j].Ranges[0].W;
-                        }
-                    }
-                    result_width = width + body_pr.rIns + body_pr.lIns;
-                }
-                this.chartTitle.extX = result_width;
-                this.chartTitle.extY = tx_body.content.Get_SummaryHeight();
-
-                if(this.chartTitle.layout.xMode === LAYOUT_MODE_EDGE)
-                    this.chartTitle.x = this.extX*this.chartTitle.layout.x;
-                else
-                    this.chartTitle.x = (this.extX - this.chartTitle.extX)*0.5;
-
-                if(this.chartTitle.layout.yMode === LAYOUT_MODE_EDGE)
-                    this.chartTitle.y = this.extY*this.chartTitle.layout.y;
-                else
-                    this.chartTitle.y = this.drawingObjects.convertMetric(7, 0, 3);
-
-                if(this.chartTitle.x + this.chartTitle.extX > this.extX)
-                    this.chartTitle.x = this.extX - this.chartTitle.extX;
-                if(this.chartTitle.x < 0)
-                    this.chartTitle.x = 0;
-
-                if(this.chartTitle.y + this.chartTitle.extY > this.extY)
-                    this.chartTitle.y = this.extY - this.chartTitle.extY;
-                if(this.chartTitle.y < 0)
-                    this.chartTitle.y = 0;
-
-
-                this.chartTitle.transform.Reset();
-                global_MatrixTransformer.TranslateAppend(this.chartTitle.transform, this.chartTitle.x, this.chartTitle.y);
-                global_MatrixTransformer.MultiplyAppend(this.chartTitle.transform, this.transform);
-                this.chartTitle.invertTransform = global_MatrixTransformer.Invert(this.chartTitle.transform);
-                this.chartTitle.calculateTransformTextMatrix();
-
-                title_width = this.chartTitle.extX;
-                title_height =  this.drawingObjects.convertMetric(7, 0, 3) + this.chartTitle.extY;
-            }
-
-            this.chartTitle.spPr.geometry.Recalculate(this.chartTitle.extX, this.chartTitle.extY);
-            this.chartTitle.txBody.calculateContent();
+                return t;
         }
-
-        var title_margin = {w:0, h: 0}, key = {w:0, h: 0}, xAxisTitle = {w:0, h: 0}, yAxisTitle = {w:0, h: 0};
-        if(isRealObject(this.chartTitle))
-        {
-            if(!this.chartTitle.overlay)
-            {
-                title_margin = {
-                    w: this.drawingObjects.convertMetric(title_width, 3, 0),
-                    h: this.drawingObjects.convertMetric(title_height, 3, 0)
-                }
-            }
-        }
-
-        this.chart.margins =
-        {
-            key: key,
-
-            xAxisTitle: xAxisTitle,
-
-            yAxisTitle: yAxisTitle,
-            title: title_margin
-        };
-
-        if ( !this.chart.range.intervalObject )
-            this.drawingObjects.intervalToIntervalObject(this.chart);
-        this.brush.fill.RasterImageId = this.drawingObjects.getChartRender().insertChart(this.chart, null, this.drawingObjects.convertMetric(this.extX, 3, 0),this.drawingObjects.convertMetric(this.extY, 3, 0));
-        this.drawingObjects.loadImageRedraw(this.brush.fill.RasterImageId);
     },
 
-    Undo: function(type, data)
+
+
+    Save_Changes: function()
+    {},
+
+    Load_Changes: function()
+    {},
+
+    Refresh_RecalcData: function()
+    {},
+
+    Refresh_RecalcData2: function()
+    {},
+
+    Undo: function(data)
     {
-        switch(type)
+        switch(data.Type)
         {
-            case historyitem_AutoShapes_RecalculateTransformUndo:
+            case historyitem_SetSizes:
             {
-                this.recalculate();
+                this.spPr.xfrm.extX = data.oldW;
+                this.spPr.xfrm.extY = data.oldH;
+                this.spPr.xfrm.flipH = data.oldFlipH;
+                this.spPr.xfrm.flipV = data.oldFlipV;
+                this.absExtX = data.oldW;
+                this.absExtY = data.oldH;
+                this.absFlipH = data.oldFlipH;
+                this.absFlipV = data.oldFlipV;
+                this.absOffsetX = data.oldPosX;
+                this.absOffsetY = data.oldPosY;
+                if(this.parent)
+                {
+                    this.parent.absOffsetX = data.oldPosX;
+                    this.parent.absOffsetY = data.oldPosY;
+                    this.parent.absExtX = data.oldW;
+                    this.parent.absExtY = data.oldH;
+                    this.parent.flipH = data.oldFlipH;
+                    this.parent.flipV = data.oldFlipV;
+                }
+
+                this.calculateAfterResize();
+                break;
             }
         }
     },
 
-    Redo: function(type, data)
+    Redo: function(data)
     {
-        switch(type)
+        switch(data.Type)
         {
-            case historyitem_AutoShapes_RecalculateTransformRedo:
+            case historyitem_SetSizes:
             {
-                this.recalculate();
+                this.spPr.xfrm.extX = data.oldW;
+                this.spPr.xfrm.extY = data.oldH;
+                this.spPr.xfrm.flipH = data.oldFlipH;
+                this.spPr.xfrm.flipV = data.oldFlipV;
+                this.absExtX = data.oldW;
+                this.absExtY = data.oldH;
+                this.absFlipH = data.oldFlipH;
+                this.absFlipV = data.oldFlipV;
+                this.absOffsetX = data.oldPosX;
+                this.absOffsetY = data.oldPosY;
+                if(this.parent)
+                {
+                    this.parent.absOffsetX = data.oldPosX;
+                    this.parent.absOffsetY = data.oldPosY;
+                    this.parent.absExtX = data.oldW;
+                    this.parent.absExtY = data.oldH;
+                    this.parent.flipH = data.oldFlipH;
+                    this.parent.flipV = data.oldFlipV;
+                }
+
+                this.calculateAfterResize();
+                break;
             }
         }
     }

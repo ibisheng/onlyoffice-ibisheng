@@ -57,14 +57,119 @@ function WordShape(parent/*(WordGraphicObject)*/, document, drawingDocument, gro
     this.contentHeight = 0;
     this.clipRect = {x: 0, y: 0, w: 0, h: 0};
     this.wrapPolygon = null;
+
+    this.recalcInfo =
+    {
+        recalculateTransform: true,
+        recalculateTextTransform: true,
+        recalculateBrush: true,
+        recalculatePen: true,
+        recalculateContent: true,
+        recalculateCursorTypes: true
+    };
+
     g_oTableId.Add( this, g_oIdCounter.Get_NewId());
 }
 
 WordShape.prototype =
 {
+    calculateAfterOpen10: function()
+    {
+        var xfrm = this.spPr.xfrm;
+        this.setAbsoluteTransform(xfrm.offX, xfrm.offY, xfrm.extX, xfrm.extY, xfrm.rot == null ? 0 : xfrm.rot, xfrm.flipH == null ? false : xfrm.flipH, xfrm.flipV == null ? false : xfrm.flipV, false);
+        if(this.spPr.geometry)
+        {
+            this.spPr.geometry.Init(xfrm.extX, xfrm.extY);
+        }
+        this.calculateTransformMatrix();
+        this.calculateFill();
+        this.calculateLine();
+    },
+
+
     isShape: function()
     {
         return true;
+    },
+
+    recalcTransform: function()
+    {
+        this.recalcInfo.recalculateTransform = true;
+        this.recalcInfo.recalculateTextTransform = true;
+    },
+
+    recalculate2: function()
+    {
+        if(this.recalcInfo.recalculateBrush)
+        {
+            this.calculateFill();
+            this.recalcInfo.recalculateBrush = false;
+        }
+        if(this.recalcInfo.recalculatePen)
+        {
+            this.calculateLine();
+            this.recalcInfo.recalculatePen = false;
+        }
+        if(this.recalcInfo.recalculateTransform.recalculateTransform)
+        {
+            this.recalculateTransform();
+            this.recalcInfo.recalculateTransform = true;
+        }
+        if(this.recalcInfo.recalculateContent)
+        {
+            this.calculateContent();
+            this.recalcInfo.recalculateContent = false;
+        }
+        if(this.recalcInfo.recalculateTextTransform)
+        {
+            this.calculateTransformTextMatrix();
+            this.recalcInfo.recalculateTextTransform = false;
+        }
+    },
+
+    recalculateTransform: function()
+    {
+        if(!isRealObject(this.group))
+        {
+            var xfrm = this.spPr.xfrm;
+            this.absOffsetX = isRealNumber(this.absOffsetX) ? this.absOffsetX : 0;
+            this.absOffsetX = isRealNumber(this.absOffsetY) ? this.absOffsetY : 0;
+            this.absExtX = xfrm.extX;
+            this.absExtY = xfrm.extY;
+            this.absRot = isRealNumber(xfrm.rot) ? xfrm.rot : 0;
+            this.absFlipH = xfrm.flipH === true;
+            this.absFlipV = xfrm.flipV === true;
+        }
+        else
+        {
+            var xfrm;
+            xfrm = this.spPr.xfrm;
+
+            var scale_scale_coefficients = this.group.getResultScaleCoefficients();
+            this.x = scale_scale_coefficients.cx*(xfrm.offX - this.group.spPr.xfrm.chOffX);
+            this.y = scale_scale_coefficients.cy*(xfrm.offY - this.group.spPr.xfrm.chOffY);
+            this.extX = scale_scale_coefficients.cx*xfrm.extX;
+            this.extY = scale_scale_coefficients.cy*xfrm.extY;
+            this.rot = isRealNumber(xfrm.rot) ? xfrm.rot : 0;
+            this.flipH = xfrm.flipH === true;
+            this.flipV = xfrm.flipV === true;
+        }
+        this.transform.Reset();
+        var hc = this.extX*0.5;
+        var vc = this.extY*0.5;
+        global_MatrixTransformer.TranslateAppend(this.transform, -hc, -vc);
+        if(this.absFlipH)
+            global_MatrixTransformer.ScaleAppend(this.transform, -1, 1);
+        if(this.absFlipV)
+            global_MatrixTransformer.ScaleAppend(this.transform, 1, -1);
+        global_MatrixTransformer.RotateRadAppend(this.transform, -this.absRot);
+        global_MatrixTransformer.TranslateAppend(this.transform, this.absOffsetX + hc, this.absOffsetY + vc);
+        if(isRealObject(this.group))
+        {
+            global_MatrixTransformer.MultiplyAppend(this.transform, this.group.getTransformMatrix());
+        }
+        this.invertTransform = global_MatrixTransformer.Invert(this.transform);
+
     },
 
     Selection_Is_TableBorderMove: function()
@@ -659,6 +764,8 @@ WordShape.prototype =
             this.setAbsoluteTransform(this.spPr.xfrm.offX, this.spPr.xfrm.offY, null, null, null, null, null);
         }
     },
+
+
 
 
     recalculateTransformMatrix: function()
@@ -3073,22 +3180,26 @@ WordShape.prototype =
         if(offsetX != null)
         {
             this.absOffsetX = offsetX;
+            this.recalcInfo.recalculateTextTransform = true;
         }
 
         if(offsetY != null)
         {
             this.absOffsetY = offsetY;
+            this.recalcInfo.recalculateTextTransform = true;
         }
 
 
         if(extX != null)
         {
             this.absExtX = extX;
+            this.recalcInfo.recalculateTextTransform = true;
         }
 
         if(extY != null)
         {
             this.absExtY = extY;
+            this.recalcInfo.recalculateTextTransform = true;
         }
         /*if(extX != null || extY!=null)
         {
@@ -5325,7 +5436,6 @@ WordShape.prototype =
                 if(isRealObject(cur_group.parent))
                     cur_group.parent.Refresh_RecalcData();
             }
-
         }
     },
 
@@ -5341,7 +5451,7 @@ WordShape.prototype =
                 while(isRealObject(cur_group.group))
                     cur_group = cur_group.group;
                 if(isRealObject(cur_group.parent))
-                    History.RecalcData_Add( { Type : historyrecalctype_Flow, Data : cur_group.parent});
+                    History.RecalcData_Add({ Type : historyrecalctype_Flow, Data : cur_group.parent});
             }
 
         }
@@ -5365,7 +5475,6 @@ WordShape.prototype =
             }
         }
     },
-
 
 //-----------------------------------------------------------------------------------
 // Функции для записи/чтения в поток

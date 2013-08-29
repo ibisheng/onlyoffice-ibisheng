@@ -60,6 +60,11 @@ function WordImage(parent/*(WordGraphicObject)*/, document, drawingDocument, gro
 
     this.chart = null;
 
+    this.recalcInfo =
+    {
+        recalculateTransform: true
+    };
+
     this.needRedrawChart = true;
 
     g_oTableId.Add( this, g_oIdCounter.Get_NewId());
@@ -67,6 +72,33 @@ function WordImage(parent/*(WordGraphicObject)*/, document, drawingDocument, gro
 
 WordImage.prototype =
 {
+    calculateAfterOpen10: function()
+    {
+        var xfrm = this.spPr.xfrm;
+        this.setAbsoluteTransform(xfrm.offX, xfrm.offY, xfrm.extX, xfrm.extY, xfrm.rot == null ? 0 : xfrm.rot, xfrm.flipH == null ? false : xfrm.flipH, xfrm.flipV == null ? false : xfrm.flipV, true);
+        if(this.spPr.geometry)
+        {
+            this.spPr.geometry.Init(xfrm.extX, xfrm.extY);
+        }
+        this.calculateTransformMatrix();
+        this.calculateFill();
+        this.calculateLine();
+    },
+
+    recalcTransform: function()
+    {
+        this.recalcInfo.recalculateTransform = true;
+    },
+
+    recalculate2: function()
+    {
+        if(this.recalcInfo.recalculateTransform.recalculateTransform)
+        {
+            this.recalculateTransform();
+            this.recalcInfo.recalculateTransform = true;
+        }
+    },
+
     isShape: function()
     {
         return false;

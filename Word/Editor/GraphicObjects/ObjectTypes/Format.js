@@ -5761,6 +5761,11 @@ function CBodyPr()
     this.textFit        = null;
 
 
+    this.setVert = function(val)
+    {
+        this.vert = val;
+    };
+
     this.Write_ToBinary2 = function(w)
     {
         var flag = this.flatTx != null;

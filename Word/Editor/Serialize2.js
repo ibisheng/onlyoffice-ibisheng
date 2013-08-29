@@ -5450,6 +5450,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 					History.RecalcData_Add( { Type : historyrecalctype_Flow, Data : drawing});
 				}
 				//Copy вызывется только, потому что обьект создавался по пустому конструктору, а в нем могли совершаться какие-то операции над членами.
+                editor.WordControl.m_oLogicDocument.DrawingObjects.arrForCalculateAfterOpen.push(drawing);
                 drawing.init();
 				if(null != drawing.GraphicObj)
 				{
@@ -5476,6 +5477,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 				window.global_pptx_content_loader.ImageMapChecker[oParaDrawing.chart.img] = true;
 			}
 			//Copy вызывется только, потому что обьект создавался по пустому конструктору, а в нем могли совершаться какие-то операции над членами.
+            editor.WordControl.m_oLogicDocument.DrawingObjects.arrForCalculateAfterOpen.push(oParaDrawing);
             oParaDrawing.init();
 			if(drawing_Anchor == oParaDrawing.DrawingType)
 				History.RecalcData_Add( { Type : historyrecalctype_Flow, Data : oParaDrawing});

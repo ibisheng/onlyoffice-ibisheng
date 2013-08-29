@@ -43,6 +43,8 @@ function CGraphicObjects(document, drawingDocument, api, documentContent)
     this.oddPage = null;
 
     this.urlMap = [];
+
+    this.arrForCalculateAfterOpen = [];
     this.Id = g_oIdCounter.Get_NewId();
     this.Lock = new CLock();
     g_oTableId.Add( this, this.Id );
@@ -50,6 +52,40 @@ function CGraphicObjects(document, drawingDocument, api, documentContent)
 
 CGraphicObjects.prototype =
 {
+    calculateAfterOpen: function()
+    {
+        if(this.arrForCalculateAfterOpen)
+        {
+            for(var i = 0; i < this.arrForCalculateAfterOpen.length; ++i)
+            {
+                var para_drawing = this.arrForCalculateAfterOpen[i];
+                var obj = para_drawing.GraphicObj;
+                if(isRealObject(obj))
+                {
+                    obj.parent = para_drawing;
+                    obj.drawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
+                    obj.calculateAfterOpen10();
+                    obj.recalculate();
+
+                    var bounds = para_drawing.getBounds();
+                    para_drawing.W = bounds.r - bounds.l;
+                    para_drawing.H = bounds.b - bounds.t;
+                    if(isRealObject(para_drawing.wrappingPolygon) && para_drawing.wrappingPolygon.edited === true)
+                    {
+                        var kw = para_drawing.GraphicObj.absExtX/0.6;
+                        var kh = para_drawing.GraphicObj.absExtY/0.6;
+                        var rel_points = para_drawing.wrappingPolygon.relativeArrPoints;
+                        for(var i = 0; i < rel_points.length; ++i)
+                        {
+                            rel_points[i].x *= kw;
+                            rel_points[i].y *= kh;
+                        }
+                    }
+                }
+            }
+        }
+    },
+
     Get_Id: function()
     {
         return this.Id;
@@ -3061,6 +3097,29 @@ CGraphicObjects.prototype =
                     selected_arr[0].drawAdjustments();
                 break;
             }
+            case STATES_ID_CHART_TITLE_TEXT:
+            {
+                var chart = this.curState.chart.GraphicObj;
+                var title = this.curState.title;
+                this.drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, chart.getTransformMatrix(), 0, 0, chart.absExtX, chart.absExtY, false, false);
+                this.drawingDocument.DrawTrack(TYPE_TRACK_TEXT, title.transform, 0, 0, title.extX, title.extY, false, false);
+                break;
+            }
+            case STATES_ID_CHART:
+            {
+                var chart = this.curState.chart.GraphicObj;
+                var title = null;
+                if(chart.chartTitle && chart.chartTitle.selected)
+                    title = chart.chartTitle;
+                else if(chart.hAxisTitle && chart.hAxisTitle.selected)
+                    title = chart.hAxisTitle;
+                else if(chart.vAxisTitle && chart.vAxisTitle.selected)
+                    title = chart.vAxisTitle;
+                this.drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, chart.getTransformMatrix(), 0, 0, chart.absExtX, chart.absExtY, false, false);
+                if(title)
+                    this.drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, title.transform, 0, 0, title.extX, title.extY, false, false);
+                break;
+            }
             default:
             {
                 selected_arr = this.selectionInfo.selectionArray;
@@ -3991,6 +4050,15 @@ CGraphicObjects.prototype =
                 group.selectionInfo.selectionArray.length = 0;
             }
         }
+
+        if(this.curState.id === STATES_ID_CHART_TITLE_TEXT)
+        {
+            this.curState.chart.GraphicObj.recalculate();
+            this.updateCharts();
+            this.curState.graphicObjects.drawingDocument.OnRecalculatePage(this.curState.chart.pageIndex, this.curState.graphicObjects.document.Pages[this.curState.chart.pageIndex]);
+
+        }
+
         for(var _sel_obj_index = 0; _sel_obj_index < this.selectionInfo.selectionArray.length; ++_sel_obj_index)
             this.selectionInfo.selectionArray[_sel_obj_index].deselect();
         this.selectionInfo.selectionArray.length = 0;
@@ -4033,10 +4101,14 @@ CGraphicObjects.prototype =
         if(this.curState.id === STATES_ID_TEXT_ADD )
             this.curState.textObject.recalculateCurPos();
 
-        if(this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP )
+        else if(this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP )
         {
             if(typeof this.curState.textObject.recalculateCurPos === "function")
                 this.curState.textObject.recalculateCurPos();
+        }
+        else if(this.curState.id === STATES_ID_CHART_TITLE_TEXT)
+        {
+            this.curState.title.recalculateCurPos();
         }
     },
 
@@ -5428,6 +5500,10 @@ CGraphicObjects.prototype =
         {
             this.curState.textObject.updateSelectionState();
         }
+        else if(this.curState.id === STATES_ID_CHART_TITLE_TEXT)
+        {
+            this.curState.title.updateSelectionState();
+        }
         else
         {
             this.drawingDocument.SelectClear();
@@ -5450,6 +5526,11 @@ CGraphicObjects.prototype =
             {
                 if(this.curState.textObject.pageIndex === pageIndex)
                     this.curState.textObject.textBoxContent.Selection_Draw_Page(pageIndex);
+            }
+            else if(this.curState.id === STATES_ID_CHART_TITLE_TEXT)
+            {
+                if(this.curState.chart.pageIndex === pageIndex)
+                    this.curState.title.txBody.content.Selection_Draw_Page(pageIndex);
             }
         }
         else
@@ -5952,6 +6033,16 @@ CGraphicObjects.prototype =
                         this.curState.groupWordGO.GoTo_Text();
                         this.resetSelection();
                     }
+                }
+            }
+            else if(cur_state.id === STATES_ID_CHART_TITLE_TEXT)
+            {
+                var parent = cur_state.chart;
+                if(isRealObject(parent) && isRealObject(parent.Parent)&&false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : parent.Parent, CheckType : changestype_Paragraph_Content} ))
+                {
+                    cur_state.title.paragraphAdd(paraItem, bRecalculate);
+                    this.drawingDocument.OnRecalculatePage(cur_state.chart.pageIndex, this.document.Pages[cur_state.chart.pageIndex]);
+                    this.drawingDocument.OnEndRecalculate(false, false);
                 }
             }
         }

@@ -50,6 +50,15 @@ function WordGroupShapes(parent, document, drawingDocument, group)
     {
         selectionArray: []
     };
+
+
+    this.recalcInfo =
+    {
+        recalculateTransform: true,
+        recalculateTextTransform: true,
+        recalculateCursorTypes: true
+    };
+
     this.majorGraphicObject = null;
     //-------------------------------------------------------------
     g_oTableId.Add( this, g_oIdCounter.Get_NewId());
@@ -57,6 +66,70 @@ function WordGroupShapes(parent, document, drawingDocument, group)
 
 WordGroupShapes.prototype =
 {
+
+
+    calculateAfterOpen10: function()
+    {
+        var kw, kh;
+        var xfrm = this.spPr.xfrm;
+        kw = this.parent.Extent.W/xfrm.extX;
+        kh = this.parent.Extent.H/xfrm.extY;
+        this.normalizeXfrm2(kw, kh);
+        this.normalizeXfrm();
+        xfrm.offX = 0;
+        xfrm.offY = 0;
+        this.setAbsoluteTransform(xfrm.offX, xfrm.offY, xfrm.extX, xfrm.extY, xfrm.rot == null ? 0 : xfrm.rot,  xfrm.flipH == null ? false : xfrm.flipH, xfrm.flipV == null ? false : xfrm.flipV, false);
+
+        var arr_gr_objects = this.arrGraphicObjects;
+        for(var i = 0; i < arr_gr_objects.length; ++i)
+        {
+            arr_gr_objects[i].setGroupAfterOpen(this);
+            arr_gr_objects[i].calculateAfterOpenInGroup();
+        }
+    },
+
+
+
+    recalcTransform: function()
+    {
+        this.recalcInfo.recalculateTransform = true;
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(typeof this.spTree[i].recalcTransform === "function")
+            {
+                this.spTree[i].recalcTransform();
+            }
+        }
+    },
+
+    recalculate2: function()
+    {
+        if(this.recalcInfo.recalculateBrush)
+        {
+            this.calculateFill();
+            this.recalcInfo.recalculateBrush = false;
+        }
+        if(this.recalcInfo.recalculatePen)
+        {
+            this.calculateLine();
+            this.recalcInfo.recalculatePen = false;
+        }
+        if(this.recalcInfo.recalculateTransform.recalculateTransform)
+        {
+            this.recalculateTransform();
+            this.recalcInfo.recalculateTransform = true;
+        }
+        if(this.recalcInfo.recalculateContent)
+        {
+            this.calculateContent();
+            this.recalcInfo.recalculateContent = false;
+        }
+        if(this.recalcInfo.recalculateTextTransform)
+        {
+            this.calculateTransformTextMatrix();
+            this.recalcInfo.recalculateTextTransform = false;
+        }
+    },
 
     Get_Id: function()
     {
@@ -144,6 +217,34 @@ WordGroupShapes.prototype =
                 this.spTree[i].calculateAfterChangeTheme();
             }
         }
+    },
+
+    getResultScaleCoefficients: function()
+    {
+        if(this.recalcInfo.recalculateScaleCoefficients)
+        {
+            var cx, cy;
+            if(this.spPr.xfrm.chExtX > 0)
+                cx = this.spPr.xfrm.extX/this.spPr.xfrm.chExtX;
+            else
+                cx = 1;
+
+            if(this.spPr.xfrm.chExtY > 0)
+                cy = this.spPr.xfrm.extY/this.spPr.xfrm.chExtY;
+            else
+                cy = 1;
+
+            if(isRealObject(this.group))
+            {
+                var group_scale_coefficients = this.group.getResultScaleCoefficients();
+                cx *= group_scale_coefficients.cx;
+                cy *= group_scale_coefficients.cy;
+            }
+            this.scaleCoefficients.cx = cx;
+            this.scaleCoefficients.cy = cy;
+            this.recalcInfo.recalculateScaleCoefficients = false;
+        }
+        return this.scaleCoefficients;
     },
 
     getFill: function()

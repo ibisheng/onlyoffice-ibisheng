@@ -50,8 +50,8 @@ function CChartTitle(chartGroup, type)
     };
 
     this.selected = false;
-    this.Id = g_oIdCounter.Get_NewId();
-    g_oTableId.Add(this, this.Id);
+    //this.Id = g_oIdCounter.Get_NewId();
+    //g_oTableId.Add(this, this.Id);
 }
 
 CChartTitle.prototype =
@@ -91,9 +91,10 @@ CChartTitle.prototype =
         return new CStyles();
     },
 
-    select: function()
+    select: function(pageIndex)
     {
         this.selected = true;
+        this.selectStartPage = pageIndex
     },
 
     deselect: function()
@@ -101,6 +102,7 @@ CChartTitle.prototype =
         this.selected = false;
         if(isRealObject(this.txBody) && isRealObject(this.txBody.content))
             this.txBody.content.Selection_Remove();
+        this.selectStartPage = -1;
     },
 
     getStyles: function()
@@ -108,8 +110,13 @@ CChartTitle.prototype =
         var styles = new CStyles();
         var default_legend_style = new CStyle("defaultLegendStyle", styles.Default, null, styletype_Paragraph);
 
-        default_legend_style.TextPr.themeFont = "Calibri";
+        default_legend_style.TextPr.FontFamily = { Name : "Calibri", Index : -1 };
         default_legend_style.TextPr.Bold = true;
+        default_legend_style.TextPr.RFonts = new CRFonts();
+        default_legend_style.TextPr.RFonts.Ascii    = { Name : "Calibri", Index : -1 };
+        default_legend_style.TextPr.RFonts.EastAsia = { Name : "Calibri", Index : -1 };
+        default_legend_style.TextPr.RFonts.HAnsi    = { Name : "Calibri", Index : -1 };
+        default_legend_style.TextPr.RFonts.CS       = { Name : "Calibri", Index : -1 };
         if(this.getTitleType() === CHART_TITLE_TYPE_TITLE)
             default_legend_style.TextPr.FontSize = 18;
         else
@@ -207,51 +214,51 @@ CChartTitle.prototype =
             case CHART_TITLE_TYPE_TITLE:
             case  CHART_TITLE_TYPE_H_AXIS:
             {
-                var max_title_width = this.chartGroup.extX*0.8;
+                var max_title_width = this.chartGroup.absExtX*0.8;
                 var title_width = this.txBody.getRectWidth(max_title_width);
                 this.extX = title_width;
                 this.extY = this.txBody.getRectHeight(this.extY, title_width);
 
                 this.x = old_cx - this.extX*0.5;
-                if(this.x + this.extX > this.chartGroup.extX)
-                    this.x = this.chartGroup.extX - this.extX;
+                if(this.x + this.extX > this.chartGroup.absExtX)
+                    this.x = this.chartGroup.absExtX - this.extX;
                 if(this.x < 0)
                     this.x = 0;
 
                 this.y = old_cy - this.extY*0.5;
-                if(this.y + this.extY > this.chartGroup.extY)
-                    this.y = this.chartGroup.extY - this.extY;
+                if(this.y + this.extY > this.chartGroup.absExtY)
+                    this.y = this.chartGroup.absExtY - this.extY;
                 if(this.y < 0)
                     this.y = 0;
 
                 if(isRealObject(this.layout) && isRealNumber(this.layout.x))
-                    this.layout.setX(this.x/this.chartGroup.extX);
+                    this.layout.setX(this.x/this.chartGroup.absExtX);
 
                 break;
             }
             case CHART_TITLE_TYPE_V_AXIS:
             {
-                var max_title_height = this.chartGroup.extY*0.8;
+                var max_title_height = this.chartGroup.absExtY*0.8;
 
                 var body_pr = this.txBody.getBodyPr();
                 this.extY = this.txBody.getRectWidth(max_title_height) - body_pr.rIns - body_pr.lIns + body_pr.tIns + body_pr.bIns;
-                this.extX = this.txBody.getRectHeight(this.chartGroup.extX, this.extY) - (- body_pr.rIns - body_pr.lIns + body_pr.tIns + body_pr.bIns);
+                this.extX = this.txBody.getRectHeight(this.chartGroup.absExtX, this.extY) - (- body_pr.rIns - body_pr.lIns + body_pr.tIns + body_pr.bIns);
                 this.spPr.geometry.Recalculate(this.extX, this.extY);
 
                 this.x = old_cx - this.extX*0.5;
-                if(this.x + this.extX > this.chartGroup.extX)
-                    this.x = this.chartGroup.extX - this.extX;
+                if(this.x + this.extX > this.chartGroup.absExtX)
+                    this.x = this.chartGroup.absExtX - this.extX;
                 if(this.x < 0)
                     this.x = 0;
 
                 this.y = old_cy - this.extY*0.5;
-                if(this.y + this.extY > this.chartGroup.extY)
-                    this.y = this.chartGroup.extY - this.extY;
+                if(this.y + this.extY > this.chartGroup.absExtY)
+                    this.y = this.chartGroup.absExtY - this.extY;
                 if(this.y < 0)
                     this.y = 0;
 
                 if(isRealObject(this.layout) && isRealNumber(this.layout.y))
-                    this.layout.setY(this.y/this.chartGroup.extY);
+                    this.layout.setY(this.y/this.chartGroup.absExtY);
                 break;
             }
         }
@@ -284,7 +291,7 @@ CChartTitle.prototype =
         var title_height, title_width;
       //  if(!(isRealObject(title.layout) && title.layout.isManual))
         {
-            var max_content_width = this.chartGroup.extX*0.8 - (body_pr.rIns + body_pr.lIns);
+            var max_content_width = this.chartGroup.absExtX*0.8 - (body_pr.rIns + body_pr.lIns);
             tx_body.content.Reset(0, 0, max_content_width, 20000);
             tx_body.content.Recalculate_Page(0, true);
             var result_width;
@@ -313,8 +320,8 @@ CChartTitle.prototype =
             }
             this.extX = result_width;
             this.extY = tx_body.content.Get_SummaryHeight();
-            this.x = (this.chartGroup.extX - this.extX)*0.5;
-            this.y = this.drawingObjects.convertMetric(7, 0, 3);
+            this.x = (this.chartGroup.absExtX - this.extX)*0.5;
+            this.y = editor.WordControl.m_oLogicDocument.DrawingDocument.GetMMPerDot(7);
             this.transform.Reset();
             global_MatrixTransformer.TranslateAppend(this.transform, this.x, this.y);
             global_MatrixTransformer.MultiplyAppend(this.transform, this.chartGroup.transform);
@@ -326,57 +333,6 @@ CChartTitle.prototype =
             title_height = this.y + this.extY;
 
         }
-      /*  else
-        {
-            var max_content_width = this.extX*0.8 - (body_pr.rIns + body_pr.lIns);
-            tx_body.content.Reset(0, 0, max_content_width, 20000);
-            tx_body.content.Recalculate_Page(0, true);
-            var result_width;
-            if(!(tx_body.content.Content.length > 1 || tx_body.content.Content[0].Lines.length > 1))
-            {
-                if(tx_body.content.Content[0].Lines[0].Ranges[0].W < max_content_width)
-                {
-                    tx_body.content.Reset(0, 0, tx_body.content.Content[0].Lines[0].Ranges[0].W, 20000);
-                    tx_body.content.Recalculate_Page(0, true);
-                }
-                result_width = tx_body.content.Content[0].Lines[0].Ranges[0].W + body_pr.rIns + body_pr.lIns;
-            }
-            else
-            {
-                var width = 0;
-                for(var i = 0; i < tx_body.content.Content.length; ++i)
-                {
-                    var par = tx_body.content.Content[i];
-                    for(var j = 0; j < par.Lines.length; ++j)
-                    {
-                        if(par.Lines[j].Ranges[0].W > width)
-                            width = par.Lines[j].Ranges[0].W;
-                    }
-                }
-                result_width = width + body_pr.rIns + body_pr.lIns;
-            }
-            this.chartTitle.extX = result_width;
-            this.chartTitle.extY = tx_body.content.Get_SummaryHeight();
-
-            if(this.chartTitle.layout.xMode === LAYOUT_MODE_EDGE)
-                this.chartTitle.x = this.extX*this.chartTitle.layout.x;
-            else
-                this.chartTitle.x = (this.extX - this.chartTitle.extX)*0.5;
-
-            if(this.chartTitle.layout.yMode === LAYOUT_MODE_EDGE)
-                this.chartTitle.y = this.extY*this.chartTitle.layout.y;
-            else
-                this.chartTitle.y = this.drawingObjects.convertMetric(7, 0, 3);
-
-            this.chartTitle.transform.Reset();
-            global_MatrixTransformer.TranslateAppend(this.chartTitle.transform, this.chartTitle.x, this.chartTitle.y);
-            global_MatrixTransformer.MultiplyAppend(this.chartTitle.transform, this.transform);
-            this.chartTitle.invertTransform = global_MatrixTransformer.Invert(this.chartTitle.transform);
-            this.chartTitle.calculateTransformTextMatrix();
-
-            title_width = this.chartTitle.extX;
-            title_height =  this.drawingObjects.convertMetric(7, 0, 3) + this.chartTitle.extY;
-        } */
     },
 
     updateSelectionState: function(drawingDocument)
@@ -825,11 +781,11 @@ CChartTitle.prototype =
     recalculatePen: function()
     {},
 
-    draw: function(graphics)
+    draw: function(graphics, pageIndex)
     {
         graphics.SetIntegerGrid(false);
         graphics.transform3(this.transformText);
-        this.txBody.draw(graphics);
+        this.txBody.draw(graphics, pageIndex);
         graphics.reset();
         graphics.SetIntegerGrid(true);
 
@@ -847,24 +803,44 @@ CChartTitle.prototype =
     },
 
 
-    selectionSetStart: function(e, x, y)
+   /* selectionSetStart: function(e, x, y, pageIndex)
     {
         var t_x, t_y;
         t_x = this.invertTransformText.TransformPointX(x, y);
         t_y = this.invertTransformText.TransformPointY(x, y);
-        var event =  new CMouseEventHandler();
-        event.fromJQueryEvent(e);
-        this.txBody.selectionSetStart(e, t_x, t_y);
+        this.txBody.selectionSetStart(e, t_x, t_y, pageIndex);
     },
 
-    selectionSetEnd: function(e, x, y)
+    selectionSetEnd: function(e, x, y, pageIndex)
     {
         var t_x, t_y;
         t_x = this.invertTransformText.TransformPointX(x, y);
         t_y = this.invertTransformText.TransformPointY(x, y);
-        var event =  new CMouseEventHandler();
-        event.fromJQueryEvent(e);
-        this.txBody.selectionSetEnd(e, t_x, t_y);
+        this.txBody.selectionSetEnd(e, t_x, t_y, pageIndex);
+    },*/
+
+    selectionSetStart: function(event, x, y, pageIndex)
+    {
+        var t_x, t_y;
+        t_x = this.invertTransformText.TransformPointX(x, y);
+        t_y = this.invertTransformText.TransformPointY(x, y);
+        if(typeof  this.selectStartPage === "number" && this.selectStartPage > -1)
+        {
+            this.txBody.content.Set_StartPage(this.selectStartPage);
+        }
+        this.txBody.content.Selection_SetStart(t_x, t_y, typeof  this.selectStartPage === "number"  && this.selectStartPage > -1 ? this.selectStartPage : this.pageIndex, event);
+    },
+
+    selectionSetEnd: function(event, x, y, pageIndex)
+    {
+        var t_x, t_y;
+        t_x = this.invertTransformText.TransformPointX(x, y);
+        t_y = this.invertTransformText.TransformPointY(x, y);
+        if(typeof  this.selectStartPage === "number" && this.selectStartPage > -1)
+        {
+            this.txBody.content.Set_StartPage(this.selectStartPage);
+        }
+        this.txBody.content.Selection_SetEnd(t_x, t_y, typeof  this.selectStartPage === "number"  && this.selectStartPage > -1 ? this.selectStartPage : this.pageIndex, event);
     },
 
     setPosition: function(x, y)
@@ -872,11 +848,12 @@ CChartTitle.prototype =
         if(!isRealObject(this.layout))
             this.setLayout(new CChartLayout());
 
+
         this.layout.setIsManual(true);
         this.layout.setXMode(LAYOUT_MODE_EDGE);
-        this.layout.setX(x/this.chartGroup.extX);
+        this.layout.setX(x/this.chartGroup.absExtX);
         this.layout.setYMode(LAYOUT_MODE_EDGE);
-        this.layout.setY(y/this.chartGroup.extY);
+        this.layout.setY(y/this.chartGroup.absExtY);
     },
 
     setLayout: function(layout)
@@ -897,7 +874,7 @@ CChartTitle.prototype =
         var x_t = invert_transform.TransformPointX(x, y);
         var y_t = invert_transform.TransformPointY(x, y);
         if(isRealObject(this.spPr.geometry))
-            return this.spPr.geometry.hitInPath(this.drawingObjects.getCanvasContext(), x_t, y_t);
+            return this.spPr.geometry.hitInPath(editor.WordControl.m_oLogicDocument.DrawingDocument.CanvasHitContext, x_t, y_t);
         return false;
     },
 
@@ -907,7 +884,7 @@ CChartTitle.prototype =
         var x_t = invert_transform.TransformPointX(x, y);
         var y_t = invert_transform.TransformPointY(x, y);
         if(isRealObject(this.spPr.geometry))
-            return this.spPr.geometry.hitInInnerArea(this.drawingObjects.getCanvasContext(), x_t, y_t);
+            return this.spPr.geometry.hitInInnerArea(editor.WordControl.m_oLogicDocument.DrawingDocument.CanvasHitContext, x_t, y_t);
         return x_t > 0 && x_t < this.extX && y_t > 0 && y_t < this.extY;
     },
 
@@ -929,7 +906,7 @@ CChartTitle.prototype =
         var x_t = invert_transform.TransformPointX(x, y);
         var y_t = invert_transform.TransformPointY(x, y);
 
-        var _hit_context = this.drawingObjects.getCanvasContext();
+        var _hit_context = editor.WordControl.m_oLogicDocument.DrawingDocument.CanvasHitContext;
 
         return (HitInLine(_hit_context, x_t, y_t, 0, 0, this.extX, 0) ||
             HitInLine(_hit_context, x_t, y_t, this.extX, 0, this.extX, this.extY)||

@@ -3986,7 +3986,12 @@ ParaDrawing.prototype =
         this.setPageIndex(pageIndex);
         if(typeof this.GraphicObj.setStartPage === "function")
             this.GraphicObj.setStartPage(pageIndex);
-        this.graphicObjects.addObjectOnPage(pageIndex, this);
+       /* this.graphicObjects.addObjectOnPage(pageIndex, this);
+
+        if(this.GraphicObj instanceof CChartAsGroup)
+        {
+            this.GraphicObj.recalculate();
+        }
         if(this.bNeedUpdateWH)
         {
             this.updateWidthHeight();
@@ -3995,6 +4000,19 @@ ParaDrawing.prototype =
 
         // this.X = bounds.l;
        // this.Y = bounds.t;
+
+        if(!(isRealObject(this.Parent) && isRealObject(this.Parent.Parent) && typeof this.Parent.Parent.Is_HdrFtr === "function" && this.Parent.Parent.Is_HdrFtr()))
+        {
+            if(this.selected && isRealObject(this.GraphicObj))
+                this.GraphicObj.selectStartPage = pageIndex;
+        }   */
+
+        this.graphicObjects.addObjectOnPage(pageIndex, this);
+        var bounds = this.getBounds();
+        this.W = bounds.r - bounds.l;
+        this.H = bounds.b - bounds.t;
+        // this.X = bounds.l;
+        // this.Y = bounds.t;
 
         if(!(isRealObject(this.Parent) && isRealObject(this.Parent.Parent) && typeof this.Parent.Parent.Is_HdrFtr === "function" && this.Parent.Parent.Is_HdrFtr()))
         {
@@ -6018,8 +6036,10 @@ ParaDrawing.prototype =
 
     calculateAfterOpen: function()
     {
-        if(isRealObject(this.GraphicObj) && typeof  this.GraphicObj.calculateAfterOpen === "function")
+        /*if(isRealObject(this.GraphicObj) && typeof  this.GraphicObj.calculateAfterOpen === "function")
         {
+            this.GraphicObj.parent = this;
+            this.GraphicObj.drawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
             this.GraphicObj.calculateAfterOpen();
             this.GraphicObj.recalculate(false, true);
 
@@ -6037,7 +6057,7 @@ ParaDrawing.prototype =
                     rel_points[i].y *= kh;
                 }
             }
-        }
+        }     */
     },
 
     calculateOffset: function()
@@ -6056,7 +6076,6 @@ ParaDrawing.prototype =
 
     getBounds: function()
     {
-
         if(this.GraphicObj.transform == null)
         {
             this.GraphicObj.transform = new CMatrix();
@@ -6073,6 +6092,7 @@ ParaDrawing.prototype =
         }
         bounds_checker.transform3(this.GraphicObj.transform);
         bounds_checker.rect(0,0, this.GraphicObj.absExtX, this.GraphicObj.absExtY);
+
         this.draw(bounds_checker);
         this.GraphicObj.transform = temp_transform;
 

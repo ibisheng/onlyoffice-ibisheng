@@ -52,7 +52,7 @@ var MIN_SHAPE_SIZE = 1.27;//размер меньше которого нель�
 var MIN_SHAPE_SIZE_DIV2 = MIN_SHAPE_SIZE/2.0;
 var MIN_ANGLE = 0.07;
 
-function MoveTrackShape(originalShape, majorOffsetX, majorOffsetY)
+function MoveTrackShape(originalShape, majorOffsetX, majorOffsetY, bChart)
 {
     this.originalShape = originalShape;
 
@@ -75,6 +75,22 @@ function MoveTrackShape(originalShape, majorOffsetX, majorOffsetY)
     this.geometry = originalShape.geometry;//копировать не будем, так как с геометрией во время движения ничего не происходит
     this.brush = originalShape.brush;
     this.pen = originalShape.pen;
+    if(bChart === true)
+    {
+        var brush = new CUniFill();
+        brush.fill = new CSolidFill();
+        brush.fill.color = new CUniColor();
+        brush.fill.color.RGBA = {R:255, G:255, B:255, A:255};
+        brush.fill.color.color = new CRGBColor();
+        brush.fill.color.color.RGBA = {R:255, G:255, B:255, A:255};
+        var pen = new CLn();
+        pen.Fill = new CUniFill();
+        pen.Fill.fill = new CSolidFill();
+        pen.Fill.fill.color = new CUniColor();
+        pen.Fill.fill.color.color = new CRGBColor();
+        this.brush = brush;
+        this.pen = pen;
+    }
 
     this.objectForOverlay = new ObjectForShapeDrawer(this.geometry, this.originalShape.absExtX, this.originalShape.absExtY, this.brush, this.pen, this.transformMatrix);
 
@@ -186,7 +202,7 @@ function MoveTrackShape(originalShape, majorOffsetX, majorOffsetY)
     };
 }
 
-function ResizeTrackShape(originalShape, numberHandle, pageIndex)
+function ResizeTrackShape(originalShape, numberHandle, pageIndex, bChart)
 {
     this.originalShape = originalShape;
     this.numberHandle = numberHandle;
@@ -202,6 +218,7 @@ function ResizeTrackShape(originalShape, numberHandle, pageIndex)
     var _sin = Math.sin(originalShape.absRot);
     var _cos = Math.cos(originalShape.absRot);
 
+    this.bChart = originalShape instanceof CChartAsGroup;
     var _translated_num_handle;
 
     if(!_flip_h && !_flip_v)
@@ -287,6 +304,22 @@ function ResizeTrackShape(originalShape, numberHandle, pageIndex)
     this.brush = originalShape.brush;
     this.pen = originalShape.pen;
 
+    if(bChart === true)
+    {
+        var brush = new CUniFill();
+        brush.fill = new CSolidFill();
+        brush.fill.color = new CUniColor();
+        brush.fill.color.RGBA = {R:255, G:255, B:255, A:255};
+        brush.fill.color.color = new CRGBColor();
+        brush.fill.color.color.RGBA = {R:255, G:255, B:255, A:255};
+        var pen = new CLn();
+        pen.Fill = new CUniFill();
+        pen.Fill.fill = new CSolidFill();
+        pen.Fill.fill.color = new CUniColor();
+        pen.Fill.fill.color.color = new CRGBColor();
+        this.brush = brush;
+        this.pen = pen;
+    }
     this.bChangeCoef = this.translatetNumberHandle % 2 === 0 && this.originalFlipH !== this.originalFlipV;
 
     this.objectForOverlay = new ObjectForShapeDrawer(this.geometry, this.resizedExtX, this.resizedExtY, this.brush, this.pen, this.transformMatrix);
@@ -350,11 +383,18 @@ function ResizeTrackShape(originalShape, numberHandle, pageIndex)
                 {
                     _real_width = this.usedExtX*kd1;
                     _abs_width = Math.abs(_real_width);
-                    this.resizedExtX = _abs_width >= MIN_SHAPE_SIZE || this.lineFlag ? _abs_width : MIN_SHAPE_SIZE;
-                    if(_real_width < 0)
-                        this.resizedflipH = !this.originalFlipH;
+                    if(!this.bChart)
+                    {
+                        this.resizedExtX = _abs_width >= MIN_SHAPE_SIZE || this.lineFlag ? _abs_width : MIN_SHAPE_SIZE;
+                        if(_real_width < 0)
+                            this.resizedflipH = !this.originalFlipH;
+                        else
+                            this.resizedflipH = this.originalFlipH;
+                    }
                     else
-                        this.resizedflipH = this.originalFlipH;
+                    {
+                        this.resizedExtX = _real_width >= MIN_SHAPE_SIZE ? _abs_width : MIN_SHAPE_SIZE;
+                    }
                 }
                 if(this.translatetNumberHandle === 1)
                 {
@@ -365,11 +405,18 @@ function ResizeTrackShape(originalShape, numberHandle, pageIndex)
 
                 _real_height = this.usedExtY*kd2;
                 _abs_height = Math.abs(_real_height);
-                this.resizedExtY = _abs_height >= MIN_SHAPE_SIZE || this.lineFlag ? _abs_height : MIN_SHAPE_SIZE;
-                if(_real_height < 0)
-                    this.resizedflipV = !this.originalFlipV;
+                if(!this.bChart)
+                {
+                    this.resizedExtY = (_abs_height >= MIN_SHAPE_SIZE) || this.lineFlag ? _abs_height : MIN_SHAPE_SIZE;
+                    if(_real_height < 0)
+                        this.resizedflipV = !this.originalFlipV;
+                    else
+                        this.resizedflipV = this.originalFlipV;
+                }
                 else
-                    this.resizedflipV = this.originalFlipV;
+                {
+                    this.resizedExtY = _real_height >= MIN_SHAPE_SIZE ? _abs_height : MIN_SHAPE_SIZE;
+                }
 
 
                 _new_resize_half_width = this.resizedExtX*0.5;
@@ -406,20 +453,34 @@ function ResizeTrackShape(originalShape, numberHandle, pageIndex)
                     kd1 = _temp;
                     _real_height = this.usedExtY*kd2;
                     _abs_height = Math.abs(_real_height);
-                    this.resizedExtY = _abs_height >= MIN_SHAPE_SIZE || this.lineFlag ? _abs_height : MIN_SHAPE_SIZE;
-                    if(_real_height < 0)
-                        this.resizedflipV = !this.originalFlipV;
+                    if(!this.bChart)
+                    {
+                        this.resizedExtY = (_abs_height >= MIN_SHAPE_SIZE) || this.lineFlag ? _abs_height : MIN_SHAPE_SIZE;
+                        if(_real_height < 0)
+                            this.resizedflipV = !this.originalFlipV;
+                        else
+                            this.resizedflipV = this.originalFlipV;
+                    }
                     else
-                        this.resizedflipV = this.originalFlipV;
+                    {
+                        this.resizedExtY = _real_height >= MIN_SHAPE_SIZE ? _abs_height : MIN_SHAPE_SIZE;
+                    }
                 }
 
                 _real_width = this.usedExtX*kd1;
                 _abs_width = Math.abs(_real_width);
-                this.resizedExtX = _abs_width >= MIN_SHAPE_SIZE || this.lineFlag ? _abs_width : MIN_SHAPE_SIZE;
-                if(_real_width < 0)
-                    this.resizedflipH = !this.originalFlipH;
+                if(!this.bChart)
+                {
+                    this.resizedExtX = _abs_width >= MIN_SHAPE_SIZE || this.lineFlag ? _abs_width : MIN_SHAPE_SIZE;
+                    if(_real_width < 0)
+                        this.resizedflipH = !this.originalFlipH;
+                    else
+                        this.resizedflipH = this.originalFlipH;
+                }
                 else
-                    this.resizedflipH = this.originalFlipH;
+                {
+                    this.resizedExtX = _real_width >= MIN_SHAPE_SIZE ? _abs_width : MIN_SHAPE_SIZE;
+                }
 
 
                 _new_resize_half_width = this.resizedExtX*0.5;
@@ -455,11 +516,18 @@ function ResizeTrackShape(originalShape, numberHandle, pageIndex)
                 {
                     _real_width = this.usedExtX*kd1;
                     _abs_width = Math.abs(_real_width);
-                    this.resizedExtX = _abs_width >= MIN_SHAPE_SIZE || this.lineFlag ? _abs_width : MIN_SHAPE_SIZE;
-                    if(_real_width < 0)
-                        this.resizedflipH = !this.originalFlipH;
+                    if(!this.bChart)
+                    {
+                        this.resizedExtX = _abs_width >= MIN_SHAPE_SIZE || this.lineFlag ? _abs_width : MIN_SHAPE_SIZE;
+                        if(_real_width < 0)
+                            this.resizedflipH = !this.originalFlipH;
+                        else
+                            this.resizedflipH = this.originalFlipH;
+                    }
                     else
-                        this.resizedflipH = this.originalFlipH;
+                    {
+                        this.resizedExtX = _real_width >= MIN_SHAPE_SIZE ? _abs_width : MIN_SHAPE_SIZE;
+                    }
                 }
                 else
                 {
@@ -470,11 +538,18 @@ function ResizeTrackShape(originalShape, numberHandle, pageIndex)
 
                 _real_height = this.usedExtY*kd2;
                 _abs_height = Math.abs(_real_height);
-                this.resizedExtY = _abs_height >= MIN_SHAPE_SIZE || this.lineFlag ? _abs_height : MIN_SHAPE_SIZE;
-                if(_real_height < 0)
-                    this.resizedflipV = !this.originalFlipV;
+                if(!this.bChart)
+                {
+                    this.resizedExtY = (_abs_height >= MIN_SHAPE_SIZE) || this.lineFlag ? _abs_height : MIN_SHAPE_SIZE;
+                    if(_real_height < 0)
+                        this.resizedflipV = !this.originalFlipV;
+                    else
+                        this.resizedflipV = this.originalFlipV;
+                }
                 else
-                    this.resizedflipV = this.originalFlipV;
+                {
+                    this.resizedExtY = _real_height >= MIN_SHAPE_SIZE ? _abs_height : MIN_SHAPE_SIZE;
+                }
 
                 _new_resize_half_width = this.resizedExtX*0.5;
                 _new_resize_half_height = this.resizedExtY*0.5;
@@ -509,11 +584,18 @@ function ResizeTrackShape(originalShape, numberHandle, pageIndex)
                 {
                     _real_height = this.usedExtY*kd1;
                     _abs_height = Math.abs(_real_height);
-                    this.resizedExtY = _abs_height >= MIN_SHAPE_SIZE || this.lineFlag ? _abs_height : MIN_SHAPE_SIZE;
-                    if(_real_height < 0)
-                        this.resizedflipV = !this.originalFlipV;
+                    if(!this.bChart)
+                    {
+                        this.resizedExtY = (_abs_height >= MIN_SHAPE_SIZE) || this.lineFlag ? _abs_height : MIN_SHAPE_SIZE;
+                        if(_real_height < 0)
+                            this.resizedflipV = !this.originalFlipV;
+                        else
+                            this.resizedflipV = this.originalFlipV;
+                    }
                     else
-                        this.resizedflipV = this.originalFlipV;
+                    {
+                        this.resizedExtY = _real_height >= MIN_SHAPE_SIZE ? _abs_height : MIN_SHAPE_SIZE;
+                    }
                 }
                 else
                 {
@@ -524,11 +606,18 @@ function ResizeTrackShape(originalShape, numberHandle, pageIndex)
 
                 _real_width = this.usedExtX*kd2;
                 _abs_width = Math.abs(_real_width);
-                this.resizedExtX = _abs_width >= MIN_SHAPE_SIZE || this.lineFlag ? _abs_width : MIN_SHAPE_SIZE;
-                if(_real_width < 0)
-                    this.resizedflipH = !this.originalFlipH;
+                if(!this.bChart)
+                {
+                    this.resizedExtX = _abs_width >= MIN_SHAPE_SIZE || this.lineFlag ? _abs_width : MIN_SHAPE_SIZE;
+                    if(_real_width < 0)
+                        this.resizedflipH = !this.originalFlipH;
+                    else
+                        this.resizedflipH = this.originalFlipH;
+                }
                 else
-                    this.resizedflipH = this.originalFlipH;
+                {
+                    this.resizedExtX = _real_width >= MIN_SHAPE_SIZE ? _abs_width : MIN_SHAPE_SIZE;
+                }
 
                 _new_resize_half_width = this.resizedExtX*0.5;
                 _new_resize_half_height = this.resizedExtY*0.5;
@@ -625,8 +714,18 @@ function ResizeTrackShape(originalShape, numberHandle, pageIndex)
             {
                 _real_width = this.usedExtX*kd1;
                 _abs_width = Math.abs(_real_width);
-                this.resizedExtX = _abs_width >= MIN_SHAPE_SIZE || this.lineFlag ? _abs_width : MIN_SHAPE_SIZE;
-                this.resizedflipH  = _real_width < 0 ? !this.originalFlipH : this.originalFlipH;
+
+                if(!this.bChart)
+                {
+
+                    this.resizedExtX = _abs_width >= MIN_SHAPE_SIZE || this.lineFlag ? _abs_width : MIN_SHAPE_SIZE;
+                    this.resizedflipH  = _real_width < 0 ? !this.originalFlipH : this.originalFlipH;
+                }
+                else
+                {
+                    this.resizedExtX = _real_width >= MIN_SHAPE_SIZE ? _abs_width : MIN_SHAPE_SIZE;
+
+                }
 
             }
             else
@@ -638,8 +737,16 @@ function ResizeTrackShape(originalShape, numberHandle, pageIndex)
 
             _real_height = this.usedExtY*kd2;
             _abs_height = Math.abs(_real_height);
-            this.resizedExtY = _abs_height >= MIN_SHAPE_SIZE || this.lineFlag ? _abs_height : MIN_SHAPE_SIZE;
-            this.resizedflipV  = _real_height < 0 ? !this.originalFlipV : this.originalFlipV;
+            if(!this.bChart)
+            {
+                this.resizedExtY = _abs_height >= MIN_SHAPE_SIZE || this.lineFlag ? _abs_height : MIN_SHAPE_SIZE;
+                this.resizedflipV  = _real_height < 0 ? !this.originalFlipV : this.originalFlipV;
+            }
+            else
+            {
+                this.resizedExtY = _real_height >= MIN_SHAPE_SIZE ? _abs_height : MIN_SHAPE_SIZE;
+
+            }
 
 
         }
@@ -653,14 +760,31 @@ function ResizeTrackShape(originalShape, numberHandle, pageIndex)
 
                 _real_height = this.usedExtY*kd2;
                 _abs_height = Math.abs(_real_height);
-                this.resizedExtY = _abs_height >= MIN_SHAPE_SIZE || this.lineFlag ? _abs_height : MIN_SHAPE_SIZE;
-                this.resizedflipV  = _real_height < 0 ? !this.originalFlipV : this.originalFlipV;
+                if(!this.bChart)
+                {
+
+                    this.resizedExtY = _abs_height >= MIN_SHAPE_SIZE || this.lineFlag ? _abs_height : MIN_SHAPE_SIZE;
+                    this.resizedflipV  = _real_height < 0 ? !this.originalFlipV : this.originalFlipV;
+                }
+                else
+                {
+                    this.resizedExtY = _real_height >= MIN_SHAPE_SIZE ? _abs_height : MIN_SHAPE_SIZE;
+
+                }
 
             }
             _real_width = this.usedExtX*kd1;
             _abs_width = Math.abs(_real_width);
-            this.resizedExtX = _abs_width >= MIN_SHAPE_SIZE || this.lineFlag ? _abs_width : MIN_SHAPE_SIZE;
-            this.resizedflipH  = _real_width < 0 ? !this.originalFlipH : this.originalFlipH;
+
+            if(!this.bChart)
+            {
+                this.resizedExtX = _abs_width >= MIN_SHAPE_SIZE || this.lineFlag ? _abs_width : MIN_SHAPE_SIZE;
+                this.resizedflipH  = _real_width < 0 ? !this.originalFlipH : this.originalFlipH;
+            }
+            else
+            {
+                this.resizedExtX = _real_width >= MIN_SHAPE_SIZE ? _abs_width : MIN_SHAPE_SIZE;
+            }
 
         }
 
