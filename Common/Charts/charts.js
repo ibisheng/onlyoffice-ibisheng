@@ -2308,13 +2308,26 @@ function DrawLineChart(chartCanvas, chartType, chartSubType, data, chart) {
 			tempMas[i] = i;
 		}
 	}
+	var NumCache = null;
 	//подписи по оси OX
 	if(chart && chart.series && chart.series[0] && chart.series[0].xVal && chart.series[0].xVal.NumCache && chart.series[0].xVal.Formula != null && chart.series[0].xVal.NumCache.length != 0)
-		bar._otherProps._labels = chart.series[0].xVal.NumCache;
+	{
+		NumCache = chart.series[0].xVal.NumCache;
+	}
 	else if(chart && chart.series && chart.series[0] && chart.series[0].Cat && chart.series[0].Cat.NumCache && chart.series[0].Cat.Formula != null && chart.series[0].Cat.NumCache.length != 0)
-		bar._otherProps._labels = chart.series[0].Cat.NumCache;
+		NumCache = chart.series[0].Cat.NumCache;
 	else
 		bar._otherProps._labels = tempMas;
+	//обработка для подписей по оси OX()	
+	if(NumCache)
+	{
+		var labels = [];
+		for(var i = 0; i < NumCache.length; i++)
+		{
+			labels[i] = NumCache[i].val;
+		}
+		bar._otherProps._labels = labels;
+	}
 		
 	if (bar._otherProps._autoGrouping == 'stackedPer')
 		bar._otherProps._units_post = '%';
