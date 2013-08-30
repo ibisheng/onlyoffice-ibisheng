@@ -3152,8 +3152,6 @@ cFormulaFunction.Mathematic = {
 
                 if ( arg[i] instanceof cArea || arg[i] instanceof cArray ) {
                     resArr[i] = arg[i].getMatrix();
-                    if ( row == 0 ) row = resArr[0].length;
-                    if ( col == 0 ) col = resArr[0][0].length;
                 }
                 else if ( arg[i] instanceof cRef || arg[i] instanceof cRef3D ) {
                     resArr[i] = [
@@ -3165,6 +3163,9 @@ cFormulaFunction.Mathematic = {
                         [arg[i]]
                     ];
                 }
+
+                row = Math.max(resArr[0].length,row);
+                col = Math.max(resArr[0][0].length,col);
 
                 if ( row != resArr[i].length || col != resArr[i][0].length ) {
                     return this.value = new cError( cErrorType.wrong_value_type );
@@ -3182,7 +3183,10 @@ cFormulaFunction.Mathematic = {
                         if ( arg0 instanceof cError )
                             return this.value = arg0;
                         else if ( arg0 instanceof cString ) {
-                            res *= 0;
+                            if(arg0.tocNumber() instanceof cError)
+                                res *= 0;
+                            else
+                                res *= arg0.tocNumber().getValue();
                         }
                         else
                             res *= arg0.tocNumber().getValue();
