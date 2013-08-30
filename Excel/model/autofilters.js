@@ -12,6 +12,7 @@
 		 */
 		var prot;
 		var turnOnProcessingSpecSymbols = true;
+		var maxCountIndValAF = 999;
 
 		function AutoFiltersOptionsElements (val, visible) {
 			if ( !(this instanceof AutoFiltersOptionsElements) ) {return new AutoFiltersOptionsElements(val, visible);}
@@ -2155,7 +2156,17 @@
 					
 					var lengthRows = array.length;
 					if(ref && ref.split(":")[1])
-						lengthRows = this._idToRange(ref.split(":")[1]).r1;
+						lengthRows = this._idToRange(ref.split(":")[1]).r1 - this._idToRange(ref.split(":")[0]).r1;
+					var allFilterOpenElements = true;
+					//возможно открыты все значения фильтра
+					for(var s = 0; s < array.length; s++)
+					{
+						if(array[s].visible == false)
+						{
+							allFilterOpenElements = false;
+							break;
+						}
+					}
 					for(var m = 0; m < lengthRows; m++)
 					{
 						var val = ws.model._getCell(activeCells.r1 + m + 1,activeCells.c1).getValue();
@@ -2164,18 +2175,25 @@
 							newArray[m] = 'hidden';
 						else
 						{
-							for(var s = 0; s < array.length; s++)
+							if(allFilterOpenElements)
+								newArray[m] = true;
+							else
 							{
-								if(array[s].val == val)
+								for(var s = 0; s < array.length; s++)
 								{
-									if(array[s].visible != 'hidden')
+									if(array[s].val == val)
 									{
-										newArray[m] = array[s].visible;
-										break;
+										if(array[s].visible != 'hidden')
+										{
+											newArray[m] = array[s].visible;
+											break;
+										}
 									}
+									else if(allFilterOpenElements && array[s].visible != 'hidden')
+										newArray[m] = true;
+									if(newArray[m] == undefined && s == array.length - 1)
+										newArray[m] = false;
 								}
-								if(newArray[m] == undefined && s == array.length - 1)
-									newArray[m] = false;
 							}
 						}
 					}
@@ -2191,7 +2209,8 @@
 				for(var i = 0; i < array.length; i++)
 				{
 					row = i + activeCells.r1 + cellAdd;
-					
+					if(array[i] == false)
+						allFilterOpenElements = false;
 					//проверка на повторяющиеся элементы
 					if(array[i] == 'rep')
 					{
@@ -2321,7 +2340,7 @@
 					
 					isPress = true;
 					//в случае всех открытых строк - убираем фильтр из aWs
-					if(allVis)
+					if(allVis || allFilterOpenElements)
 					{
 						if(currentFilter[isCurFilter] && currentFilter[isCurFilter].ShowButton == false)
 						{
@@ -3252,13 +3271,14 @@
 				var currentFilter;
 				var numFilter;
 				var curIndex = index.split(':');
+				var opFil;
 				if(curIndex[0] == 'all')
 				{
 					currentFilter = aWs.AutoFilter;
 					numFilter = curIndex[1];
 					if(!currentFilter.FilterColumns)
 						currentFilter.FilterColumns = [];
-					var opFil = currentFilter.FilterColumns;					
+					opFil = currentFilter.FilterColumns;					
 				}
 				else
 				{
@@ -3270,9 +3290,7 @@
 					}
 					if(!currentFilter.AutoFilter.FilterColumns)
 						currentFilter.AutoFilter.FilterColumns = [];
-						
-					var opFil = currentFilter.AutoFilter.FilterColumns;
-						
+					opFil = currentFilter.AutoFilter.FilterColumns;
 				}
 					
 
@@ -3317,6 +3335,7 @@
 								var startRow = ws.model.getCell(new CellAddress(acCell.id)).first.row - 1;
 								var endRow = ws.model.getCell(new CellAddress(acCell.idNext)).first.row - 1;
 								var col = ws.model.getCell(new CellAddress(acCell.id)).first.col - 1;
+								var visible;
 								for(var nRow = startRow + 1; nRow <= endRow; nRow++)
 								{
 									var cell = ws.model.getCell(new CellAddress(nRow,col,0));
@@ -3328,50 +3347,43 @@
 									{
 										var isFilterCol = true;
 										var isInput = false;
+										result[nC].val = val;
+										result[nC].val2 = val2;
+										visible = (result[nC].visible == "hidden") ? true : false;
 										if(filValue && filValue.length != 0)
 										{
 											for(var nVal = 0; nVal < filValue.length; nVal++)
 											{
 												if(val2 == '' && isBlank == null)
 												{
-													result[nC].val = val;
-													result[nC].val2 = val2;
-													if(result[nC].visible != 'hidden')
+													if(!visible)
 														result[nC].visible = false;
 												}
 												if(val2 == '' && isBlank == true)
 												{
-													result[nC].val = val;
-													result[nC].val2 = val2;
 													isInput = true;
-													if(result[nC].visible != 'hidden')
+													if(!visible)
 														result[nC].visible = true;
 													break;
 												}
 												else if(filValue[nVal] == val2)
 												{
-													result[nC].val = val;
-													result[nC].val2 = val2;
 													isInput = true;
-													if(result[nC].visible != 'hidden')
+													if(!visible)
 														result[nC].visible = true;
 													break;
 												}
 												else
 												{
-													result[nC].val = val;
-													result[nC].val2 = val2;
-													if(result[nC].visible != 'hidden')
+													if(!visible)
 														result[nC].visible = false;
 												}
 											}
 										}
 										else if(filValue && filValue.length == 0 && val2 == '' && isBlank == true)
 										{
-											result[nC].val = val;
-											result[nC].val2 = val2;
 											isInput = true;
-											if(result[nC].visible != 'hidden')
+											if(!visible)
 												result[nC].visible = true;
 										}
 										
@@ -3435,13 +3447,19 @@
 											result[nC].val2 = val2;
 										}
 											
-										var anotherFilterHidden = this._isHiddenAnotherFilter(buttonId,nRow,ws);
-										/*if(anotherFilterHidden != undefined)
+										/*var anotherFilterHidden = this._isHiddenAnotherFilter(buttonId,nRow,ws);
+										if(anotherFilterHidden != undefined)
 											result[nC].visible = anotherFilterHidden;
 										if(anotherFilterHidden == undefined && result[nC].visible == undefined)
 											result[nC].visible = false;*/
 									}
-									nC++;
+									
+									if(nC >= maxCountIndValAF)
+									{
+										break;
+									}
+									else
+										nC++;
 								}
 
 							}
@@ -3509,7 +3527,12 @@
 									}
 								}
 								this._isHiddenAnotherFilter(curFilter.ColId,nRow,ws);
-								nC++;
+								if(nC >= maxCountIndValAF)
+								{
+									break;
+								}
+								else
+									nC++;
 							}
 						}
 						else if(curFilter && curFilter.Top10)//Top10
@@ -3545,7 +3568,16 @@
 									top10Arr[nC] = val2;
 								}
 								this._isHiddenAnotherFilter(curFilter.ColId,nRow,ws);
-								nC++;
+								if(this._findCloneElement2(result,nC))
+								{
+									result.splice(nC,1);
+								}
+								else if(nC >= maxCountIndValAF)
+								{
+									break;
+								}
+								else
+									nC++;
 							}
 							if(top10Arr.length != 0)
 							{
@@ -3580,7 +3612,16 @@
 											if(val2 < limit)
 												result[nC].visible = 'hidden';
 										}
-										nC++;
+										if(this._findCloneElement2(result,nC))
+										{
+											result.splice(nC,1);
+										}
+										else if(nC >= maxCountIndValAF)
+										{
+											break;
+										}
+										else
+											nC++;
 									}
 								}
 							}
@@ -3604,40 +3645,50 @@
 						var col = ws.model.getCell(new CellAddress(buttonId)).first.col - 1;
 						var startRow = filterStart.first.row;
 						var endRow = filterEnd.first.row - 1;
-						
+						var nC = 0;
 						for(var s = startRow; s <= endRow; s++)
 						{
 							var cell = ws.model.getCell(new CellAddress(s,col,0));
-							if(!result[s - startRow])
-								result[s - startRow] = new AutoFiltersOptionsElements();
+							if(!result[nC])
+								result[nC] = new AutoFiltersOptionsElements();
 
-							result[s - startRow].val = cell.getValueWithFormat();
-							result[s - startRow].val2 = cell.getValueWithoutFormat();
-							if(result[s - startRow].visible != 'hidden')
-								result[s - startRow].visible = true;
-							if(result[s - startRow].visible != 'hidden')
+							result[nC].val = cell.getValueWithFormat();
+							result[nC].val2 = cell.getValueWithoutFormat();
+							if(result[nC].visible != 'hidden')
+								result[nC].visible = true;
+							if(result[nC].visible != 'hidden')
 							{
 								if(ws.model._getRow(s).hd)
-									result[s - startRow].visible = 'hidden';
+									result[nC].visible = 'hidden';
 							}
+							if(nC >= maxCountIndValAF)
+							{
+								break;
+							}
+							else
+								nC++;
 						}
 					}
 					for(var i = 0; i < result.length; i++)
 					{
-						result[i].rep = this._findCloneElement2(result,i);
+						if(this._findCloneElement2(result,i))
+						{
+							result.splice(i,1);
+							i--;
+						}
 					}
 					if(idDigitalFilter)
 						result.dF = true;
-					for(var l = 0; l < result.length; )
+					/*for(var l = 0; l < result.length; )
 					{
 						if(result[l].rep)
 							result.splice(l,1);
 						else
-							l++
+							l++*/
 						/*if(result[l].rep)
 							result[l].visible = 'hidden';
 						delete result[l].rep;*/
-					}
+					//}
 					return result;
 				}
 			},
