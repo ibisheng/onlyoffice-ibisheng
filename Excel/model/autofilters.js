@@ -12,7 +12,6 @@
 		 */
 		var prot;
 		var turnOnProcessingSpecSymbols = true;
-		var maxCountIndValAF = 999;
 
 		function AutoFiltersOptionsElements (val, visible) {
 			if ( !(this instanceof AutoFiltersOptionsElements) ) {return new AutoFiltersOptionsElements(val, visible);}
@@ -3454,7 +3453,7 @@
 											result[nC].visible = false;*/
 									}
 									
-									if(nC >= maxCountIndValAF)
+									if(nC >= 1000)
 									{
 										break;
 									}
@@ -3527,7 +3526,7 @@
 									}
 								}
 								this._isHiddenAnotherFilter(curFilter.ColId,nRow,ws);
-								if(nC >= maxCountIndValAF)
+								if(nC >= 1000)
 								{
 									break;
 								}
@@ -3572,7 +3571,7 @@
 								{
 									result.splice(nC,1);
 								}
-								else if(nC >= maxCountIndValAF)
+								else if(nC >= 1000)
 								{
 									break;
 								}
@@ -3616,7 +3615,7 @@
 										{
 											result.splice(nC,1);
 										}
-										else if(nC >= maxCountIndValAF)
+										else if(nC >= 1000)
 										{
 											break;
 										}
@@ -3661,7 +3660,7 @@
 								if(ws.model._getRow(s).hd)
 									result[nC].visible = 'hidden';
 							}
-							if(nC >= maxCountIndValAF)
+							if(nC >= 1000)
 							{
 								break;
 							}
