@@ -681,6 +681,7 @@ asc_docs_api.prototype.sync_EndCatchSelectedElements = function()
 			{
 				this.chartStyleManager.init();
 				this.chartPreviewManager.init();
+				this.asc_fireCallback("asc_onUpdateChartStyles");
 				break;
 			}
 		}
