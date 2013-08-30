@@ -926,7 +926,7 @@ CTextBody.prototype =
 
     readFromBinary: function(r,  drawingDocument)
     {
-        this.bodyPr.readFromBinary(r);
+        this.bodyPr.Read_FromBinary2(r);
         readFromBinaryDocContent(this.content, r);
     }
 };
@@ -961,7 +961,7 @@ function writeToBinaryParagraph(p, w)
 {
     p.Pr.Write_ToBinary( w );
 
-    p.TextPr.writeToBinary(w);
+    //p.TextPr.writeToBinary(w);
 
     var StartPos = w.GetCurPosition();
     w.Skip( 4 );
@@ -990,7 +990,7 @@ function readFromBinaryParagraph(p, r)
     p.Pr.Read_FromBinary( r );
 
     p.TextPr = new ParaTextPr();
-    p.TextPr.readFromBinary(r);
+    //p.TextPr.readFromBinary(r);
 
     p.Content = new Array();
     var Count = r.GetLong();

@@ -571,6 +571,7 @@ asc_CChart.prototype = {
 	
 	Read_FromBinary2: function(Reader) {
 		
+		Reader.GetLong();
 		this.Id = Reader.GetString2();
 		
 		this.type = Reader.GetString2();
@@ -617,28 +618,34 @@ asc_CChart.prototype = {
 			
 			var numCacheCount = Reader.GetLong();
 			for (var j = 0; j < numCacheCount; j++) {
-				this.series[i].Val.NumCache[j].numFormatStr = Reader.GetString2();
-				this.series[i].Val.NumCache[j].isDateTimeFormat = Reader.GetBool();
-				this.series[i].Val.NumCache[j].val = Reader.GetString2();
-				this.series[i].Val.NumCache[j].isHidden = Reader.GetBool();
+				var item = {};
+				item.numFormatStr = Reader.GetString2();
+				item.isDateTimeFormat = Reader.GetBool();
+				item.val = Reader.GetString2();
+				item.isHidden = Reader.GetBool();
+				seria.Val.NumCache.push(item);
 			}
 			
 			seria.xVal.Formula = Reader.GetString2();
 			numCacheCount = Reader.GetLong();
 			for (var j = 0; j < numCacheCount; j++) {
-				this.series[i].xVal.NumCache[j].numFormatStr = Reader.GetString2();
-				this.series[i].xVal.NumCache[j].isDateTimeFormat = Reader.GetBool();
-				this.series[i].xVal.NumCache[j].val = Reader.GetString2();
-				this.series[i].xVal.NumCache[j].isHidden = Reader.GetBool();
+				var item = {};
+				item.numFormatStr = Reader.GetString2();
+				item.isDateTimeFormat = Reader.GetBool();
+				item.val = Reader.GetString2();
+				item.isHidden = Reader.GetBool();
+				seria.xVal.NumCache.push(item);
 			}
 			
 			seria.Cat.Formula = Reader.GetString2();
 			numCacheCount = Reader.GetLong();
 			for (var j = 0; j < numCacheCount; j++) {
-				this.series[i].Cat.NumCache[j].numFormatStr = Reader.GetString2();
-				this.series[i].Cat.NumCache[j].isDateTimeFormat = Reader.GetBool();
-				this.series[i].Cat.NumCache[j].val = Reader.GetString2();
-				this.series[i].Cat.NumCache[j].isHidden = Reader.GetBool();
+				var item = {};
+				item.numFormatStr = Reader.GetString2();
+				item.isDateTimeFormat = Reader.GetBool();
+				item.val = Reader.GetString2();
+				item.isHidden = Reader.GetBool();
+				seria.Cat.NumCache.push(item);
 			}
 			
 			seria.TxCache.Tx = Reader.GetString2();
@@ -3269,6 +3276,9 @@ function DrawingObjects() {
 			return this.controller.addChartDrawingObject(chart, options);
 		}
 		else if ( isObject(chart) && chart["binary"] ) {
+			
+			var chartBin = new CChartAsGroup(null, _this);
+			chartBin.setChartBinary(chart["binary"]);
 			
 			/* Вставка данных в таблицу и применение темы
 			// Инжектим тему и перестраиваем превью диаграмм

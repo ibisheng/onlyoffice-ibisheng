@@ -954,7 +954,7 @@ CChartTitle.prototype =
     writeToBinary: function(w)
     {
         w.WriteBool(isRealObject(this.layout));
-        if(isRealOBject(this.layout))
+        if(isRealObject(this.layout))
             this.layout.writeToBinary(w);
         w.WriteBool(this.overlay);
         this.spPr.Write_ToBinary2(w);
