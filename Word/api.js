@@ -6876,7 +6876,11 @@ asc_docs_api.prototype.asc_getChartObject = function()
 		chart["themeColors"].push( this.WordControl.m_oDrawingDocument.GuiControlColorsMap[i].get_hex() );
 	}*/
 
-    return this.WordControl.m_oLogicDocument.Get_ChartObject();
+	var graphicObject = this.WordControl.m_oLogicDocument.Get_ChartObject();
+	for (var i = 0; i < this.WordControl.m_oDrawingDocument.GuiControlColorsMap.length; i++) {
+		graphicObject.chart.themeColors.push( this.WordControl.m_oDrawingDocument.GuiControlColorsMap[i].get_hex() );
+	}
+    return graphicObject;
 }
 
 asc_docs_api.prototype.asc_addChartDrawingObject = function(chartBinary)

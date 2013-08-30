@@ -3277,23 +3277,24 @@ function DrawingObjects() {
 		}
 		else if ( isObject(chart) && chart["binary"] ) {
 			
-			var chartBin = new CChartAsGroup(null, _this);
-			chartBin.setChartBinary(chart["binary"]);
+			var graphicObject = new CChartAsGroup(null, _this);
+			graphicObject.setChartBinary(chart["binary"]);
 			
-			/* Вставка данных в таблицу и применение темы
+			
 			// Инжектим тему и перестраиваем превью диаграмм
-			if ( wordChart.themeColors ) {
+			if ( graphicObject.chart.themeColors ) {
 				
 				api.GuiControlColorsMap = [];
 				for (var i = 0; i < wordChart.themeColors.length; i++) {
 					
-					var color = new RGBColor( wordChart.themeColors[i] );
+					var color = new RGBColor( graphicObject.chart.themeColors[i] );
 					api.GuiControlColorsMap.push(new CColor(color.r, color.g, color.b));
 				}
 				api.chartStyleManager.init();
 				api.chartPreviewManager.init();
 			}			
 			
+			/*
 			// Заполняем таблицу
 			if ( chart.data.length ) {
 				var bbox = chart.range.intervalObject.getBBox0();
