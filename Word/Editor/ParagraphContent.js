@@ -3689,7 +3689,7 @@ ParaDrawing.prototype =
 
         if(isRealObject(Props.ChartProperties))
         {
-            if(this.GraphicObj.isImage() && isRealObject(this.GraphicObj.chart))
+            if(this.GraphicObj.setDiagram)
             {
                 this.GraphicObj.setDiagram(Props.ChartProperties)
             }

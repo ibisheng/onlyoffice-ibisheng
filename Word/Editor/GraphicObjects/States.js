@@ -4320,8 +4320,6 @@ function TextAddInChartTitle(graphicObjects, chart, title)
         {
             this.chart.GraphicObj.recalculate();
             this.graphicObjects.updateCharts();
-         //   this.graphicObjects.drawingDocument.OnRecalculatePage(this.chart.pageIndex, this.graphicObjects.document.Pages[this.chart.pageIndex]);
-
         }
     };
 

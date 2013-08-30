@@ -95,6 +95,11 @@ CChartAsGroup.prototype =
     },
 
 
+    setDiagram: function(chart)
+    {
+        this.chart = chart;
+        this.recalculate();
+    },
 
     setSizes: function(posX, posY, w, h, flipH, flipV)
     {

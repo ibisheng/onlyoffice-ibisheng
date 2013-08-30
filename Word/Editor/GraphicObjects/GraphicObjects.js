@@ -4054,8 +4054,6 @@ CGraphicObjects.prototype =
         {
             this.curState.chart.GraphicObj.recalculate();
             this.updateCharts();
-            this.curState.graphicObjects.drawingDocument.OnRecalculatePage(this.curState.chart.pageIndex, this.curState.graphicObjects.document.Pages[this.curState.chart.pageIndex]);
-
         }
 
         for(var _sel_obj_index = 0; _sel_obj_index < this.selectionInfo.selectionArray.length; ++_sel_obj_index)
