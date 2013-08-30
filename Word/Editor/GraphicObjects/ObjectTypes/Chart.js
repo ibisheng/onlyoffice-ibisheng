@@ -101,6 +101,14 @@ CChartAsGroup.prototype =
         this.recalculate();
     },
 
+    OnContentReDraw: function()
+    {
+        if(isRealObject(this.parent))
+        {
+            this.parent.OnContentReDraw();
+        }
+    },
+
     setSizes: function(posX, posY, w, h, flipH, flipV)
     {
         var data = {};

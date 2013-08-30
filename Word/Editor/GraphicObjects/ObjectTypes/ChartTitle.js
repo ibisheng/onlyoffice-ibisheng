@@ -957,5 +957,11 @@ CChartTitle.prototype =
             this.txBody.readFromBinary(r);
         }
 
+    },
+
+    OnContentReDraw: function()
+    {
+        if(this.chartGroup)
+            this.chartGroup.OnContentReDraw();
     }
 };

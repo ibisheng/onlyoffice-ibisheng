@@ -204,7 +204,7 @@ CTextBody.prototype =
     OnContentReDraw: function()
     {
         if(isRealObject(this.shape))
-            this.shape.drawingObjects.showDrawingObjects();
+            this.shape.OnContentReDraw();
     },
 
     calculateContent: function()
