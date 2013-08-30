@@ -421,6 +421,9 @@ function CTableRecalcInfo()
 {
     this.TableGrid    = true;
     this.TableBorders = true;
+
+    this.CellsToRecalc = new Object();
+    this.CellsAll      = true;
 }
 
 CTableRecalcInfo.prototype =
@@ -428,6 +431,37 @@ CTableRecalcInfo.prototype =
     Set_Type_0 : function(Type)
     {
         this.Recalc_0_Type = Type;
+    },
+
+    Recalc_Borders : function()
+    {
+        this.TableBorders = true;
+    },
+
+    Add_Cell : function(Cell)
+    {
+        this.CellsToRecalc[Cell.Get_Id()] = Cell;
+    },
+
+    Check_Cell : function(Cell)
+    {
+        if ( true === this.CellsAll || undefined != this.CellsToRecalc[Cell.Get_Id()] )
+            return true;
+
+        return false;
+    },
+
+    Recalc_AllCells : function()
+    {
+        this.CellsAll = true;
+    },
+
+    Reset : function()
+    {
+        this.TableGrid     = false;
+        this.TableBorders  = false;
+        this.CellsAll      = false;
+        this.CellsToRecalc = new Object();
     }
 };
 
@@ -2855,6 +2889,9 @@ CTable.prototype =
 
         var Result = this.Internal_Recalculate_1_(PageIndex);
         this.Internal_Recalculate_Position_2(PageIndex);
+
+        if ( recalcresult_NextElement === Result )
+            this.RecalcInfo.Reset();
 
         return Result;
     },
@@ -5582,6 +5619,9 @@ CTable.prototype =
                 break;
             }
         }
+
+        this.RecalcInfo.Recalc_AllCells();
+        this.RecalcInfo.Recalc_Borders();
 
         if ( true === bNeedRecalc )
         {
@@ -13371,8 +13411,8 @@ CTable.prototype =
 
     Internal_Recalculate_Borders : function()
     {
-        //if ( true != this.RecalcInfo.TableBorders )
-        //    return;
+        if ( true != this.RecalcInfo.TableBorders )
+            return;
 
         // Обнуляем таблицу суммарных высот ячеек
         for ( var Index = -1; Index < this.Content.length; Index++ )
@@ -14434,6 +14474,7 @@ CTable.prototype =
             this.HeaderInfo.Pages[CurPage].Draw = false;
         }
 
+        var Shifted_Cell = new Object();
         var bNextPage = false;
         for ( var CurRow = FirstRow; CurRow < this.Content.length; CurRow++  )
         {
@@ -14528,7 +14569,7 @@ CTable.prototype =
 
             var RowH = Row.Get_Height();
 
-            var Merged_Cell = new Array();
+            var Merged_Cell  = new Array();
 
             for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
             {
@@ -14585,10 +14626,30 @@ CTable.prototype =
                     }
                 }
 
+                var bCanShift = false;
+                var ShiftDy   = 0;
+                var ShiftDx   = 0;
+
                 if ( (0 === Cell.Row.Index && 0 === CurPage) || Cell.Row.Index > FirstRow  )
                 {
                     Cell.PagesCount = 1;
                     Cell.Content.Set_StartPage( CurPage );
+
+                    if ( 1 === Cell.Content.Pages.length && true != this.RecalcInfo.Check_Cell( Cell ) )
+                    {
+                        var X_content_start_old  = Cell.Content.Pages[0].X;
+                        var X_content_end_old    = Cell.Content.Pages[0].XLimit;
+                        var Y_content_height_old = Cell.Content.Pages[0].Bounds.Bottom - Cell.Content.Pages[0].Bounds.Top;
+
+                        // Проверим по X, Y
+                        if ( Math.abs( X_content_start - X_content_start_old ) < 0.001 && Math.abs( X_content_end_old - X_content_end ) < 0.001 && Y_content_start + Y_content_height_old < Y_content_end )
+                        {
+                            bCanShift = true;
+                            ShiftDy   = -Cell.Content.Pages[0].Y + Y_content_start;
+                            Shifted_Cell[Cell.Get_Id()] = Cell;
+                        }
+                    }
+
                     Cell.Content.Reset( X_content_start, Y_content_start, X_content_end, Y_content_end );
                 }
 
@@ -14598,7 +14659,12 @@ CTable.prototype =
                 var CellPageIndex = CurPage - Cell.Content.Get_StartPage_Relative();
                 if ( CellPageIndex < Cell.PagesCount )
                 {
-                    if ( recalcresult2_NextPage === Cell.Content.Recalculate_Page( CellPageIndex, true ) )
+                    if ( true === bCanShift )
+                    {
+                        if ( Math.abs( ShiftDx ) > 0.001 || Math.abs( ShiftDy ) > 0.001 )
+                            Cell.Content.Shift( 0, ShiftDx, ShiftDy );
+                    }
+                    else if ( recalcresult2_NextPage === Cell.Content.Recalculate_Page( CellPageIndex, true ) )
                     {
                         Cell.PagesCount = Cell.Content.Pages.length + 1;
                         bNextPage = true;
@@ -14887,24 +14953,27 @@ CTable.prototype =
 
                 Y_0 += CellMar.Top.W;
 
-                var Y_1 = this.TableRowsBottom[CurRow][CurPage] - CellMar.Bottom.W;
-                var CellHeight = Y_1 - Y_0;
-
-                var CellContentBounds = Cell.Content.Get_PageBounds( CellPageIndex );
-                var ContentHeight = CellContentBounds.Bottom - CellContentBounds.Top;
-
-                var Dy = 0;
-                if ( CellHeight - ContentHeight > 0.001 )
+                if ( undefined === Shifted_Cell[Cell.Get_Id()] )
                 {
-                    if ( vertalignjc_Bottom === VAlign )
-                        Dy = CellHeight - ContentHeight;
-                    else if ( vertalignjc_Center === VAlign )
-                        Dy = (CellHeight - ContentHeight) / 2;
+                    var Y_1 = this.TableRowsBottom[CurRow][CurPage] - CellMar.Bottom.W;
+                    var CellHeight = Y_1 - Y_0;
 
-                    Cell.Content.Shift( CellPageIndex, 0, Dy );
+                    var CellContentBounds = Cell.Content.Get_PageBounds( CellPageIndex );
+                    var ContentHeight = CellContentBounds.Bottom - CellContentBounds.Top;
+
+                    var Dy = 0;
+                    if ( CellHeight - ContentHeight > 0.001 )
+                    {
+                        if ( vertalignjc_Bottom === VAlign )
+                            Dy = CellHeight - ContentHeight;
+                        else if ( vertalignjc_Center === VAlign )
+                            Dy = (CellHeight - ContentHeight) / 2;
+
+                        Cell.Content.Shift( CellPageIndex, 0, Dy );
+                    }
+
+                    Cell.Temp.Y_VAlign_offset[CellPageIndex] = Dy;
                 }
-
-                Cell.Temp.Y_VAlign_offset[CellPageIndex] = Dy;
             }
         }
 
@@ -18512,6 +18581,15 @@ CTableRow.prototype =
             }
         }
 
+        // Добавляем все ячейки для пересчета
+        var CellsCount = this.Get_CellsCount();
+        for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
+        {
+            this.Table.RecalcInfo.Add_Cell( this.Get_Cell(CurCell) );
+        }
+
+        this.Table.RecalcInfo.Recalc_Borders();
+
         if ( true === bNeedRecalc )
             this.Refresh_RecalcData2( 0, 0 );
     },
@@ -20382,11 +20460,15 @@ CTableCell.prototype =
             }
         }
 
+        this.Row.Table.RecalcInfo.Recalc_Borders();
+
         this.Refresh_RecalcData2( 0, 0 );
     },
 
     Refresh_RecalcData2 : function(Page_Rel)
     {
+        this.Row.Table.RecalcInfo.Add_Cell( this );
+
         var Table   = this.Row.Table;
         var TablePr = Table.Get_CompiledPr(false).TablePr;
         if ( tbllayout_AutoFit === TablePr.TableLayout )

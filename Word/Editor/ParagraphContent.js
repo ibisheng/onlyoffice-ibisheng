@@ -99,6 +99,12 @@ function ParaText(value)
     this.WidthVisible = 0;
 
     this.IsNBSP       = (this.Value === nbsp_string ? true : false);
+
+    this.TextAscent  = 0;
+    this.TextDescent = 0;
+    this.TextHeight  = 0;
+    this.TextAscent2 = 0;
+    this.YOffset     = 0;
 }
 ParaText.prototype =
 {
@@ -224,6 +230,12 @@ function ParaSpace(Count)
     this.Width        = 0;
     this.Height       = 0;
     this.WidthVisible = 0;
+
+    this.TextAscent  = 0;
+    this.TextDescent = 0;
+    this.TextHeight  = 0;
+    this.TextAscent2 = 0;
+    this.YOffset     = 0;
 }
 ParaSpace.prototype =
 {
@@ -2064,6 +2076,12 @@ function ParaEnd()
     this.Type = para_End;
 
     this.TextPr = null; // Рассчитанные настройки текста для символа конца параграфа
+
+    this.TextAscent  = 0;
+    this.TextDescent = 0;
+    this.TextHeight  = 0;
+    this.TextAscent2 = 0;
+    this.YOffset     = 0;
 }
 
 ParaEnd.prototype =
