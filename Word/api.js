@@ -6900,6 +6900,10 @@ asc_docs_api.prototype.asc_addChartDrawingObject = function(chartBinary)
     }*/
 	
 	// Приводим бинарик к объекту типа CChartAsGroup и добавляем объект
+	if ( isObject(chartBinary) )
+	{
+		var binary = chartBinary["binary"];
+	}
 }
 
 asc_docs_api.prototype.asc_editChartDrawingObject = function(chartBinary)
@@ -6928,6 +6932,10 @@ asc_docs_api.prototype.asc_editChartDrawingObject = function(chartBinary)
     }*/
 	
 	// Находим выделенную диаграмму и накатываем бинарник
+	if ( isObject(chartBinary) )
+	{
+		var binary = chartBinary["binary"];
+	}
 }
 
 asc_docs_api.prototype.asc_getChartPreviews = function(chartType, chartSubType)

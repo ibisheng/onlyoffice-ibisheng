@@ -4188,7 +4188,7 @@ function DrawingObjects() {
 			var drawingObject = aObjects[i];
 			
 			if ( drawingObject.isChart() ) {
-				var chart = drawingObject.graphicObject.getChartBinary();
+				var chart = new asc_CChartBinary(drawingObject.graphicObject);
 				_this.cleanWorksheet();
 				return chart;
 			}
