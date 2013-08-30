@@ -528,28 +528,28 @@ asc_CChart.prototype = {
 			Writer.WriteString2(this.series[i].Val.Formula);
 			Writer.WriteLong(this.series[i].Val.NumCache.length);
 			for (var j = 0; j < this.series[i].Val.NumCache.length; j++) {
-				Writer.WriteString2(this.series[i].Val.NumCache[j].numFormatStr);
-				Writer.WriteBool(this.series[i].Val.NumCache[j].isDateTimeFormat);
+				Writer.WriteString2( (this.series[i].Val.NumCache[j].numFormatStr != undefined) ? this.series[i].Val.NumCache[j].numFormatStr : "General" );
+				Writer.WriteBool( (this.series[i].Val.NumCache[j].isDateTimeFormat != undefined) ? this.series[i].Val.NumCache[j].isDateTimeFormat : false );
 				Writer.WriteString2(this.series[i].Val.NumCache[j].val);
-				Writer.WriteBool(this.series[i].Val.NumCache[j].isHidden);
+				Writer.WriteBool( (this.series[i].Val.NumCache[j].isHidden != undefined) ? this.series[i].Val.NumCache[j].isHidden : false );
 			}
 			
 			Writer.WriteString2(this.series[i].xVal.Formula);
 			Writer.WriteLong(this.series[i].xVal.NumCache.length);
 			for (var j = 0; j < this.series[i].xVal.NumCache.length; j++) {
-				Writer.WriteString2(this.series[i].xVal.NumCache[j].numFormatStr);
-				Writer.WriteBool(this.series[i].xVal.NumCache[j].isDateTimeFormat);
+				Writer.WriteString2( (this.series[i].xVal.NumCache[j].numFormatStr != undefined) ? this.series[i].xVal.NumCache[j].numFormatStr : "General" );
+				Writer.WriteBool( (this.series[i].xVal.NumCache[j].isDateTimeFormat != undefined) ? this.series[i].xVal.NumCache[j].isDateTimeFormat : false );
 				Writer.WriteString2(this.series[i].xVal.NumCache[j].val);
-				Writer.WriteBool(this.series[i].xVal.NumCache[j].isHidden);
+				Writer.WriteBool( (this.series[i].xVal.NumCache[j].isHidden != undefined) ? this.series[i].xVal.NumCache[j].isHidden : false );
 			}
 			
 			Writer.WriteString2(this.series[i].Cat.Formula);
 			Writer.WriteLong(this.series[i].Cat.NumCache.length);
 			for (var j = 0; j < this.series[i].Cat.NumCache.length; j++) {
-				Writer.WriteString2(this.series[i].Cat.NumCache[j].numFormatStr);
-				Writer.WriteBool(this.series[i].Cat.NumCache[j].isDateTimeFormat);
+				Writer.WriteString2( (this.series[i].Cat.NumCache[j].numFormatStr != undefined) ? this.series[i].Cat.NumCache[j].numFormatStr : "General" );
+				Writer.WriteBool( (this.series[i].Cat.NumCache[j].isDateTimeFormat != undefined) ? this.series[i].Cat.NumCache[j].isDateTimeFormat : false );
 				Writer.WriteString2(this.series[i].Cat.NumCache[j].val);
-				Writer.WriteBool(this.series[i].Cat.NumCache[j].isHidden);
+				Writer.WriteBool( (this.series[i].Cat.NumCache[j].isHidden != undefined) ? this.series[i].Cat.NumCache[j].isHidden : false );
 			}
 			
 			Writer.WriteString2(this.series[i].TxCache.Tx);
@@ -3315,12 +3315,12 @@ function DrawingObjects() {
 				}
 			}
 			else*/ {
-				var aCells = chart.range.intervalObject.getCells();
+				var aCells = graphicObject.chart.range.intervalObject.getCells();
 				for ( var i = 0; i < aCells.length; i++ ) {
 					aCells[i].setValue( (i + 1).toString() );
 				}
 			}
-			worksheet._updateCellsRange(chart.range.intervalObject.getBBox0());
+			worksheet._updateCellsRange(graphicObject.chart.range.intervalObject.getBBox0());
 		}
 	}
 

@@ -11,10 +11,16 @@ function ChartRender() {
 			g_bChartPreview = true;
 		else
 			g_bChartPreview = false;
-		if (chart.worksheet && !OfficeExcel.drawingCtxCharts)//выставление контекста для отрисовки
-			OfficeExcel.drawingCtxCharts = chart.worksheet.getDrawingContextCharts();
-		else if(window["editor"] && !OfficeExcel.drawingCtxCharts)
+			
+		var api_doc = window["editor"];
+		var api_sheet = window["Asc"]["editor"];
+			
+		if ( api_sheet && !OfficeExcel.drawingCtxCharts )	//выставление контекста для отрисовки
+			OfficeExcel.drawingCtxCharts = api_sheet.wb.drawingCtxCharts;
+		
+		else if ( api_doc && !OfficeExcel.drawingCtxCharts )
 			OfficeExcel.drawingCtxCharts = new CDrawingContextWord();
+			
 		chartCanvas = document.createElement('canvas');
 		$(chartCanvas).css('width', width);
 		$(chartCanvas).css('height', height);
