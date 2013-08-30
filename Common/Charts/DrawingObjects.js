@@ -2214,6 +2214,10 @@ prot["asc_getIndex"] = prot.asc_getIndex;
 // Manager
 //-----------------------------------------------------------------------------------
 
+function Exception(error) {
+	var err = error;
+}
+
 function DrawingObjects() {
 
 	//-----------------------------------------------------------------------------------
@@ -3277,50 +3281,124 @@ function DrawingObjects() {
 		}
 		else if ( isObject(chart) && chart["binary"] ) {
 			
-			var graphicObject = new CChartAsGroup(null, _this);
-			graphicObject.setChartBinary(chart["binary"]);
-			
-			var _range = convertFormula(graphicObject.chart.range.interval, worksheet);
-			if (_range)
-				graphicObject.chart.range.intervalObject = _range;
-
-			graphicObject.chart.rebuildSeries();
-			
-			// Инжектим тему и перестраиваем превью диаграмм
-			if ( graphicObject.chart.themeColors ) {
+			try {
+				var graphicObject = new CChartAsGroup(null, _this);
+				graphicObject.setChartBinary(chart["binary"]);
 				
-				api.GuiControlColorsMap = [];
-				for (var i = 0; i < graphicObject.chart.themeColors.length; i++) {
+				// Формируем общий диапазон по сериям
+				var seriesCount = graphicObject.chart.series.length;
+				if ( seriesCount ) {
 					
-					var color = new RGBColor( graphicObject.chart.themeColors[i] );
-					api.GuiControlColorsMap.push(new CColor(color.r, color.g, color.b));
+					// Нужно переименовать лист для совместимости языков
+					var resultRef = parserHelp.parse3DRef(graphicObject.chart.series[0].Val.Formula);
+					worksheet.model.workbook.aWorksheets[0].sName = resultRef.sheet;
+					
+					var colArray = [];
+					var rowArray = [];
+					
+					if ( graphicObject.chart.series[0].TxCache.Formula ) {
+						var range = convertFormula(graphicObject.chart.series[0].TxCache.Formula, worksheet);
+						if ( range ) {
+							colArray.push(range.bbox.c1);
+							rowArray.push(range.bbox.r1);
+						}
+					}
+					if ( graphicObject.chart.series[0].xVal.Formula ) {
+						var range = convertFormula(graphicObject.chart.series[0].xVal.Formula, worksheet);
+						if ( range ) {
+							colArray.push(range.bbox.c1);
+							rowArray.push(range.bbox.r1);
+						}
+					}
+					if ( graphicObject.chart.series[0].Val.Formula ) {
+						var range = convertFormula(graphicObject.chart.series[0].Val.Formula, worksheet);
+						if ( range ) {
+							colArray.push(range.bbox.c1);
+							rowArray.push(range.bbox.r1);
+						}
+					}
+					
+					if ( graphicObject.chart.series[seriesCount - 1].Val.Formula ) {
+						var range = convertFormula(graphicObject.chart.series[seriesCount - 1].Val.Formula, worksheet);
+						if ( range ) {
+							colArray.push(range.bbox.c2);
+							rowArray.push(range.bbox.r2);
+						}
+					}
+					var c1 = Math.min.apply(null, colArray);
+					var r1 = Math.min.apply(null, rowArray);
+					var c2 = Math.max.apply(null, colArray);
+					var r2 = Math.max.apply(null, rowArray);
+					
+					var _range = new Range(worksheet.model, r1, c1, r2, c2 );
+					graphicObject.chart.range.intervalObject = _range;
+					
+					_this.calcChartInterval(graphicObject.chart);
 				}
-				api.chartStyleManager.init();
-				api.chartPreviewManager.init();
-			}			
-			
-			// Заполняем таблицу
-			/*if ( graphicObject.chart.series.length ) {
-				var bbox = chart.range.intervalObject.getBBox0();
-				var r = bbox.r1, c = bbox.c1;
 				
-				for (var row = bbox.r1; row <= bbox.r2; row++) {
+				// Инжектим тему и перестраиваем превью диаграмм
+				if ( graphicObject.chart.themeColors ) {
 					
-					for (var col = bbox.c1; col <= bbox.c2; col++) {
-					
-						var cell = chart.range.intervalObject.worksheet.getCell(new CellAddress(row, col, 0));
-						cell.setNumFormat(chart.data[row - r][col - c].numFormatStr);
-						cell.setValue(chart.data[row - r][col - c].value);
+					api.GuiControlColorsMap = [];
+					for (var i = 0; i < graphicObject.chart.themeColors.length; i++) {
+						
+						var color = new RGBColor( graphicObject.chart.themeColors[i] );
+						api.GuiControlColorsMap.push(new CColor(color.r, color.g, color.b));
+					}
+					api.chartStyleManager.init();
+					api.chartPreviewManager.init();
+				}			
+				
+				// Заполняем таблицу
+				if ( graphicObject.chart.series.length ) {
+				
+					for (var i = 0; i < seriesCount; i++) {
+						
+						if ( graphicObject.chart.series[i].TxCache.Formula ) {
+							var range = convertFormula(graphicObject.chart.series[i].TxCache.Formula, worksheet);
+							if ( range ) {
+								var cell = graphicObject.chart.range.intervalObject.worksheet.getCell(new CellAddress(range.bbox.r1, range.bbox.c1, 0));
+								cell.setNumFormat("General");
+								cell.setValue(graphicObject.chart.series[i].TxCache.Tx);
+							}
+						}
+						
+						var range = convertFormula(graphicObject.chart.series[i].Val.Formula, worksheet);
+						if ( range ) {
+							if ( graphicObject.chart.range.rows ) {
+								var index = 0;
+								for (var j = range.bbox.c1; j <= range.bbox.c2; j++) {
+								
+									var cell = graphicObject.chart.range.intervalObject.worksheet.getCell(new CellAddress(range.bbox.r1, j, 0));
+									cell.setNumFormat(graphicObject.chart.series[i].Val.NumCache[index].numFormatStr);
+									cell.setValue(graphicObject.chart.series[i].Val.NumCache[index].val);
+								}
+							}
+							else {
+								var index = 0;
+								for (var j = range.bbox.r1; j <= range.bbox.r2; j++) {
+								
+									var cell = graphicObject.chart.range.intervalObject.worksheet.getCell(new CellAddress(j, range.bbox.c1, 0));
+									cell.setNumFormat(graphicObject.chart.series[i].Val.NumCache[index].numFormatStr);
+									cell.setValue(graphicObject.chart.series[i].Val.NumCache[index].val);
+									index++;
+								}
+							}
+						}
 					}
 				}
-			}
-			else*/ {
-				var aCells = graphicObject.chart.range.intervalObject.getCells();
-				for ( var i = 0; i < aCells.length; i++ ) {
-					aCells[i].setValue( (i + 1).toString() );
+				else {
+					var aCells = graphicObject.chart.range.intervalObject.getCells();
+					for ( var i = 0; i < aCells.length; i++ ) {
+						aCells[i].setValue( (i + 1).toString() );
+					}
 				}
+				worksheet._updateCellsRange(graphicObject.chart.range.intervalObject.getBBox0());
 			}
-			worksheet._updateCellsRange(graphicObject.chart.range.intervalObject.getBBox0());
+			catch (e) {
+				e.message = "Error paste chart";
+				Exception(e);
+			}	
 		}
 	}
 
@@ -4097,6 +4175,11 @@ function DrawingObjects() {
 		worksheet._clean();			
 		var listRange = new Range(worksheet.model, 0, 0, worksheet.nRowsCount - 1, worksheet.nColsCount - 1);
 		listRange.cleanAll();
+		
+		_this.controller.resetSelection();
+		shapeCtx.m_oContext.clearRect(0, 0, shapeCtx.m_lWidthPix, shapeCtx.m_lHeightPix);
+		shapeOverlayCtx.m_oContext.clearRect(0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix);
+		_this.OnUpdateOverlay();
 		History.Clear();
 	}
 
@@ -4105,7 +4188,7 @@ function DrawingObjects() {
 			var drawingObject = aObjects[i];
 			
 			if ( drawingObject.isChart() ) {
-				drawingObject.getChartBinary();
+				var chart = drawingObject.graphicObject.getChartBinary();
 				_this.cleanWorksheet();
 				return chart;
 			}
