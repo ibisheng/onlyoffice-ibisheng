@@ -4812,7 +4812,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
             case STATES_ID_TEXT_ADD_IN_GROUP:
             {
                 drawingObjectsController.drawingObjects.objectLocker.reset();
-                drawingObjectsController.drawingObjects.objectLocker.addObjectId(drawingObjectsController.textObject.Get_Id());
+                drawingObjectsController.drawingObjects.objectLocker.addObjectId(drawingObjectsController.curState.textObject.Get_Id());
 
                 var selection_state =  drawingObjectsController.getSelectionState();
                 var callback = function(bLock)
@@ -4865,7 +4865,6 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
     }
     else if ( e.keyCode == 32 && false === isViewMode ) // Space
     {
-
         switch(state.id)
         {
             case STATES_ID_TEXT_ADD:

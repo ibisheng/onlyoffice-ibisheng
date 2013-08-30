@@ -4466,11 +4466,11 @@ function PreMoveInlineObject(graphicObjects, objectId, ctrlShiftFlag, bSelectedM
             if(e.ClickCount > 1)
             {
                 var gr_obj = this.graphicObjects.majorGraphicObject;
-                if(gr_obj.GraphicObj.isImage() && isRealObject(gr_obj.GraphicObj.chart))
+                if( isRealObject(gr_obj.GraphicObj.chart))
                 {
 
                     if(false === this.graphicObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : gr_obj.Parent, CheckType : changestype_Paragraph_Content} )) {
-                        var chart = this.graphicObjects.majorGraphicObject.GraphicObj.chart.serializeChart();
+                        var chart = this.graphicObjects.majorGraphicObject.GraphicObj;
                         chart["themeColors"] = [];
                         for (var i = 0; i < this.graphicObjects.drawingDocument.GuiControlColorsMap.length; i++) {
                             chart["themeColors"].push( this.graphicObjects.drawingDocument.GuiControlColorsMap[i].get_hex() );
@@ -5086,10 +5086,10 @@ function PreMoveState(graphicObjects, ctrlShiftFlag/*был ли нажат Ctrl
             if(e.ClickCount > 1)
             {
                 var gr_obj = this.graphicObjects.majorGraphicObject;
-                if(gr_obj.GraphicObj.isImage() && isRealObject(gr_obj.GraphicObj.chart))
+                if(gr_obj.GraphicObj.chart)
                 {
                     if(false === this.graphicObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : gr_obj.Parent, CheckType : changestype_Paragraph_Content} )) {
-                        var chart = gr_obj.GraphicObj.chart.serializeChart();
+                        var chart = gr_obj.GraphicObj;
                         chart["themeColors"] = [];
                         for (var i = 0; i < this.graphicObjects.drawingDocument.GuiControlColorsMap.length; i++) {
                             chart["themeColors"].push( this.graphicObjects.drawingDocument.GuiControlColorsMap[i].get_hex() );
@@ -9497,10 +9497,10 @@ function PreMoveInGroup(graphicObjects, group, ctrlShift, bSelectedMajorObject, 
                 if(this.group.selectionInfo.selectionArray.length === 1)
                 {
                     var obj = this.group.selectionInfo.selectionArray[0];
-                    if(obj.isImage() && isRealObject(obj.chart))
+                    if( isRealObject(obj.chart))
                     {
                         if(false === this.graphicObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : this.group.parent.Parent, CheckType : changestype_Paragraph_Content} )) {
-                            var chart = obj.chart.serializeChart();
+                            var chart = obj;
                             chart["themeColors"] = [];
                             for (var i = 0; i < this.graphicObjects.drawingDocument.GuiControlColorsMap.length; i++) {
                                 chart["themeColors"].push( this.graphicObjects.drawingDocument.GuiControlColorsMap[i].get_hex() );

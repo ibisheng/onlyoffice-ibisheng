@@ -4629,3 +4629,148 @@ function ObjectLocker(ws) {
 		worksheet.collaborativeEditing.onEndCheckLock(callbackEx);
 	}
 }
+
+
+function writeToBinaryDocContent(docContent, w)
+{
+    w.WriteBool(docContent.TurnOffInnerWrap);
+    w.WriteBool(docContent.Split);
+    var Count = docContent.Content.length;
+    w.WriteLong(Count);
+    for ( var Index = 0; Index < Count; Index++ )
+        writeToBinaryParagraph(docContent.Content[Index], w);
+}
+
+function readFromBinaryDocContent(docContent, r)
+{
+    docContent.TurnOffInnerWrap   = r.GetBool();
+    docContent.Split              = r.GetBool();
+    var Count = r.GetLong();
+    docContent.Content = new Array();
+    for ( var Index = 0; Index < Count; Index++ )
+    {
+        var p = new Paragraph(docContent.DrawingDocument, docContent, 0, 0, 0, 0, 0);
+        readFromBinaryParagraph(p, r);
+        docContent.Content.push(p);
+    }
+}
+
+function writeToBinaryParagraph(p, w)
+{
+    p.Pr.Write_ToBinary( w );
+
+    //p.TextPr.writeToBinary(w);
+
+    var StartPos = w.GetCurPosition();
+    w.Skip( 4 );
+
+    var Len = p.Content.length;
+    var Count  = 0;
+    for ( var Index = 0; Index < Len; Index++ )
+    {
+        var Item = p.Content[Index];
+        if ( true === Item.Is_RealContent() )
+        {
+            writeToBinaryParagraphContent(Item, w);
+            Count++;
+        }
+    }
+
+    var EndPos = w.GetCurPosition();
+    w.Seek( StartPos );
+    w.WriteLong( Count );
+    w.Seek( EndPos );
+}
+
+function readFromBinaryParagraph(p, r)
+{
+    p.Pr = new CParaPr();
+    p.Pr.Read_FromBinary( r );
+
+    p.TextPr = new ParaTextPr();
+    //p.TextPr.readFromBinary(r);
+
+    p.Content = new Array();
+    var Count = r.GetLong();
+    for ( var Index = 0; Index < Count; Index++ )
+    {
+        var Element = readFromBinaryParagraphContent(r);
+        if ( null != Element )
+            p.Content.push( Element );
+    }
+}
+
+function writeToBinaryParagraphContent(Element, w)
+{
+    var ElementType = Element.Type;
+   // w.WriteLong(ElementType);
+    switch ( ElementType )
+    {
+        case para_TextPr            :
+            // case para_HyperlinkStart    :
+        {
+            w.WriteLong(ElementType);
+            Element.Value.Write_ToBinary(w);
+            break;
+        }
+        case para_Text                  :
+        case para_Space                 :
+        case para_End                   :
+        case para_NewLine               :
+        case para_NewLineRendered       :
+        case para_InlineBreak           :
+        case para_PageBreakRendered     :
+        case para_Empty                 :
+        case para_Numbering             :
+        case para_Tab                   :
+        case para_PageNum               :
+        case para_FlowObjectAnchor      :
+        case para_HyperlinkEnd          :
+        case para_CommentStart          :
+        case para_CommentEnd            :
+        case para_PresentationNumbering :
+            Element.Write_ToBinary(w);
+            break;
+    }
+    return Element;
+}
+
+function readFromBinaryParagraphContent(r)
+{
+    var ElementType = r.GetLong();
+
+    var Element = null;
+    switch ( ElementType )
+    {
+        case para_TextPr            :
+            // case para_Drawing           :
+            // case para_HyperlinkStart    :
+        {
+            Element = new ParaTextPr();
+            Element.Value = new CTextPr();
+            Element.Value.Read_FromBinary(r);
+            return Element;
+        }
+        case para_Text              : Element = new ParaText();              break;
+        case para_Space             : Element = new ParaSpace();             break;
+        case para_End               : Element = new ParaEnd();               break;
+        case para_NewLine           : Element = new ParaNewLine();           break;
+        case para_NewLineRendered   : Element = new ParaNewLineRendered();   break;
+        case para_InlineBreak       : Element = new ParaInlineBreak();       break;
+        case para_PageBreakRendered : Element = new ParaPageBreakRenderer(); break;
+        case para_Empty             : Element = new ParaEmpty();             break;
+        case para_Numbering         : Element = new ParaNumbering();         break;
+        case para_Tab               : Element = new ParaTab();               break;
+        case para_PageNum           : Element = new ParaPageNum();           break;
+        case para_FlowObjectAnchor  : Element = new ParaFlowObjectAnchor();  break;
+        case para_HyperlinkEnd      : Element = new ParaHyperlinkEnd();      break;
+        case para_CommentStart      : Element = new ParaCommentStart();      break;
+        case para_CommentEnd        : Element = new ParaCommentEnd();        break;
+        case para_PresentationNumbering : Element = new ParaPresentationNumbering(); break;
+    }
+
+    if ( null != Element )
+        Element.Read_FromBinary(r);
+
+    return Element;
+}
