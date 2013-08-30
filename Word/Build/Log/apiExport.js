@@ -608,6 +608,8 @@ prop:get_YAlign
 prop:put_YAlign
 prop:get_Borders
 prop:put_Borders
+prop:get_Shade
+prop:put_Shade
 prop:get_FontFamily
 prop:put_FontFamily
 prop:put_FromDropCapMenu
@@ -1663,6 +1665,8 @@ CParagraphFrame.prototype['get_YAlign'] = CParagraphFrame.prototype.get_YAlign;
 CParagraphFrame.prototype['put_YAlign'] = CParagraphFrame.prototype.put_YAlign;
 CParagraphFrame.prototype['get_Borders'] = CParagraphFrame.prototype.get_Borders;
 CParagraphFrame.prototype['put_Borders'] = CParagraphFrame.prototype.put_Borders;
+CParagraphFrame.prototype['get_Shade'] = CParagraphFrame.prototype.get_Shade;
+CParagraphFrame.prototype['put_Shade'] = CParagraphFrame.prototype.put_Shade;
 CParagraphFrame.prototype['get_FontFamily'] = CParagraphFrame.prototype.get_FontFamily;
 CParagraphFrame.prototype['put_FontFamily'] = CParagraphFrame.prototype.put_FontFamily;
 CParagraphFrame.prototype['put_FromDropCapMenu'] = CParagraphFrame.prototype.put_FromDropCapMenu;
