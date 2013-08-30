@@ -2156,6 +2156,13 @@ Woorksheet.prototype.rebuildColors=function(){
 	});
 }
 Woorksheet.prototype.generateFontMap=function(oFontMap){
+	//пробегаемся по Drawing
+	for(var i = 0, length = this.Drawings.length; i < length; ++i)
+	{
+		var drawing = this.Drawings[i];
+		if(drawing)
+			drawing.getAllFonts(oFontMap);
+	}
 	//пробегаемся по колонкам
 	for(var i in this.aCols)
 	{
