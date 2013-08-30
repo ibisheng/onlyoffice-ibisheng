@@ -763,10 +763,19 @@ function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY, chart)
 				var widthText = getMaxPropertiesText(context,font,bar._otherProps._key);
 				var widthKey = widthText.width/scale + 2 + widthLine;
 				//в MSExcel справа от легенды всегда остаётся такой маргин 
-				if(bar._otherProps._key_halign == 'left')
-					left += widthKey + 7;
+				var maxWidthLegendLeftOrRight = chartCanvas.width/3;//максимальный размер легенды - временно!
+				if(widthKey > maxWidthLegendLeftOrRight)//в данном случае легенду рисуем поверх
+				{
+					chart.legend.bOverlay = true;
+				}
 				else
-					right += widthKey + 7;
+				{
+					if(bar._otherProps._key_halign == 'left')
+						left += widthKey + 7;
+					else
+						right += widthKey + 7;
+				}
+				
 			}
 			if(!chart.margins.key)
 				chart.margins.key = {};
