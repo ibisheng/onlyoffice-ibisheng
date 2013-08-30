@@ -1929,6 +1929,7 @@ function drawChart(chart, arrValues, width, height) {
 	
 	if(chart.series && chart.series.length != 0 && (chart.series[0].TxCache.Tx || chart.series[0].OutlineColor) && (theme && colorMap))
 	{
+		var uniColors;
 		for (var j = 0; j < chart.series.length; j++) {
 			if(chart.series[j].TxCache.Tx)
 				bar._otherProps._key[j] = chart.series[j].TxCache.Tx;
@@ -1939,6 +1940,13 @@ function drawChart(chart, arrValues, width, height) {
 				curColor = getHexColor(rgba.R, rgba.G, rgba.B);
 				bar._otherProps._colors[j] = curColor;
 			}	
+			else
+			{
+				uniColors = !uniColors ? chart.generateUniColors(chart.series.length): uniColors;
+				rgba = uniColors[j].color.RGBA;
+				curColor = getHexColor(rgba.R, rgba.G, rgba.B);
+				bar._otherProps._colors[j] = curColor;
+			}
 		}	
 	}
 	if((chart.series && chart.series[0]) && (chart.series[0].TxCache.Tx || chart.series[0].OutlineColor))
