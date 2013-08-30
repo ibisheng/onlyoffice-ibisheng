@@ -1668,6 +1668,7 @@ function CParagraphFrame(obj)
         this.Y       = obj.Y;
         this.YAlign  = obj.YAlign;
         this.Brd     = (undefined != obj.Brd     && null != obj.Brd) ? new CParagraphBorders (obj.Brd) : null;
+        this.Shd     = (undefined != obj.Shd     && null != obj.Shd)     ? new CParagraphShd (obj.Shd) : null;
         this.FontFamily = (undefined != obj.FontFamily && null != obj.FontFamily) ? new CTextFontFamily (obj.FontFamily) : null;
     }
     else
@@ -1688,6 +1689,7 @@ function CParagraphFrame(obj)
         this.XAlign  = undefined;
         this.Y       = undefined;
         this.YAlign  = undefined;
+        this.Shd     = null;
         this.Brd     = null;
         this.FontFamily = null;
     }
@@ -1723,6 +1725,8 @@ CParagraphFrame.prototype.get_YAlign = function () { return this.YAlign; }
 CParagraphFrame.prototype.put_YAlign = function (v) { this.YAlign = v; }
 CParagraphFrame.prototype.get_Borders = function () { return this.Brd; }
 CParagraphFrame.prototype.put_Borders = function (v) { this.Brd = v; }
+CParagraphFrame.prototype.get_Shade = function () { return this.Shd; }
+CParagraphFrame.prototype.put_Shade = function (v) { this.Shd = v; }
 CParagraphFrame.prototype.get_FontFamily = function () { return this.FontFamily; }
 CParagraphFrame.prototype.put_FontFamily = function (v) { this.FontFamily = v; }
 CParagraphFrame.prototype.put_FromDropCapMenu = function (v) { this.FromDropCapMenu = v; }

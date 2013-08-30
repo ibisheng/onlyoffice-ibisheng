@@ -5026,6 +5026,9 @@ CTextPr.prototype =
 
     Check_NeedRecalc : function()
     {
+        // Потому что в параграфе внутри Internal_recalculate_0 кэшируются ParaTextPr
+        return true;
+
         if ( undefined != this.Bold )
             return true;
 
@@ -5878,6 +5881,15 @@ CFramePr.prototype =
         this.Wrap    = wrap_Around;
         this.VAnchor = c_oAscVAnchor.Text;
         this.HAnchor = ( true === bInside ? c_oAscHAnchor.Text : c_oAscHAnchor.Page );
+
+        this.X       = undefined;
+        this.XAlign  = undefined;
+        this.Y       = undefined;
+        this.YAlign  = undefined;
+
+        this.H       = undefined;
+        this.W       = undefined;
+        this.HRule   = undefined;
     },
 
     Get_W : function()

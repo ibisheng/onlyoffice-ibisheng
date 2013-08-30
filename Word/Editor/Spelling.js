@@ -110,7 +110,7 @@ CParaSpellChecker.prototype =
         this.Elements.push( new CParaSpellCheckerElement( StartPos, EndPos, Word, Lang ) );
     },
 
-    Check : function()
+    Check : function(ParagraphForceRedraw)
     {
         var Paragraph = g_oTableId.Get_ById( this.ParaId );
         var bCurrent = Paragraph.Is_ThisElementCurrent();
@@ -146,6 +146,8 @@ CParaSpellChecker.prototype =
 
         if ( 0 < usrWords.length )
             spellCheck(editor, {"type": "spell", "ParagraphId": this.ParaId, "RecalcId" : this.RecalcId, "ElementId" : 0, "usrWords" : usrWords, "usrLang" : usrLang });
+        else if ( undefined != ParagraphForceRedraw )
+            ParagraphForceRedraw.ReDraw();
     },
 
     Check_CallBack : function(RecalcId, UsrCorrect)
@@ -797,6 +799,33 @@ Paragraph.prototype.Continue_CheckSpelling = function()
     else if ( pararecalc_0_Spell_Lang === this.RecalcInfo.Recalc_0_Spell.Type )
         CheckLang = true;
 
+    var ParaForceRedraw = undefined;
+    var PrevPara = this.Get_DocumentPrev();
+    if ( null != PrevPara && type_Paragraph === PrevPara.GetType() && undefined != PrevPara.Get_FramePr() && undefined != PrevPara.Get_FramePr().DropCap )
+    {
+        if ( this.SpellChecker.Elements.length > 0 )
+        {
+            var bDontCheckFirstWord = true;
+            var Element = this.SpellChecker.Elements[0];
+            var StartPos = Element.StartPos;
+            for ( var TempPos = 0; TempPos < StartPos; TempPos++  )
+            {
+                var Item = this.Content[TempPos];
+                if ( para_Space === Item.Type )
+                {
+                    bDontCheckFirstWord = false;
+                    break;
+                }
+            }
+
+            if ( true === bDontCheckFirstWord && true != Element.Checked )
+            {
+                Element.Checked = true;
+                ParaForceRedraw = this;
+            }
+        }
+    }
+
     if ( true === CheckLang )
     {
         // Пройдемся по всем словам и проверим словарь, в котором должно проверяться слово (если словарь поменялся,
@@ -817,7 +846,7 @@ Paragraph.prototype.Continue_CheckSpelling = function()
 
     this.SpellChecker.RecalcId = this.LogicDocument.RecalcId;
     this.SpellChecker.ParaId   = this.Get_Id();
-    this.SpellChecker.Check();
+    this.SpellChecker.Check(ParaForceRedraw);
 
     this.RecalcInfo.Recalc_0_Spell.Type = pararecalc_0_Spell_None;
 };

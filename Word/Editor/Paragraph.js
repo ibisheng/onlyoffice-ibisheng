@@ -192,7 +192,7 @@ Paragraph.prototype =
         {
             var Item = this.Content[Index];
             if ( true === Item.Is_RealContent() )
-                Para.Internal_Content_Add( Para.Content.length, Item.Copy() );
+                Para.Internal_Content_Add( Para.Content.length, Item.Copy(), false );
         }
 
         return Para;
@@ -343,7 +343,7 @@ Paragraph.prototype =
 
     // Добавляем элемент в содержимое параграфа. (Здесь передвигаются все позиции
     // CurPos.ContentPos, Selection.StartPos, Selection.EndPos)
-    Internal_Content_Add : function (Pos, Item)
+    Internal_Content_Add : function (Pos, Item, bCorrectPos)
     {
         if ( true === Item.Is_RealContent() )
         {
@@ -354,7 +354,7 @@ Paragraph.prototype =
         this.Content.splice( Pos, 0, Item );
 
         if ( this.CurPos.ContentPos >= Pos )
-            this.Set_ContentPos( this.CurPos.ContentPos + 1 );
+            this.Set_ContentPos( this.CurPos.ContentPos + 1, bCorrectPos );
 
         if ( this.Selection.StartPos >= Pos )
             this.Selection.StartPos++;
@@ -1269,11 +1269,23 @@ Paragraph.prototype =
                         if ( LineTextDescent < TextDescent )
                             LineTextDescent = TextDescent;
 
-                        if ( LineAscent < TextAscent + Item.YOffset  )
-                            LineAscent = TextAscent + Item.YOffset;
+                        if ( linerule_Exact === ParaPr.Spacing.LineRule )
+                        {
+                            // Смещение не учитывается в метриках строки, когда расстояние между строк точное
+                            if ( LineAscent < TextAscent )
+                                LineAscent = TextAscent;
 
-                        if ( LineDescent < TextDescent - Item.YOffset )
-                            LineDescent = TextDescent - Item.YOffset;
+                            if ( LineDescent < TextDescent )
+                                LineDescent = TextDescent;
+                        }
+                        else
+                        {
+                            if ( LineAscent < TextAscent + Item.YOffset  )
+                                LineAscent = TextAscent + Item.YOffset;
+
+                            if ( LineDescent < TextDescent - Item.YOffset )
+                                LineDescent = TextDescent - Item.YOffset;
+                        }
 
                         if ( !bWord )
                         {
@@ -1500,14 +1512,25 @@ Paragraph.prototype =
                                 // Добавляем длину пробелов до слова
                                 X += nSpaceLen;
 
-                                if ( LineAscent < Item.Height + Item.YOffset )
-                                    LineAscent = Item.Height + Item.YOffset;
+                                if ( linerule_Exact === ParaPr.Spacing.LineRule )
+                                {
+                                    if ( LineAscent < Item.Height )
+                                        LineAscent = Item.Height;
 
-                                if ( Item.Height + Item.YOffset > this.Lines[CurLine].Metrics.Ascent )
-                                    this.Lines[CurLine].Metrics.Ascent = Item.Height + Item.YOffset;
+                                    if ( Item.Height > this.Lines[CurLine].Metrics.Ascent )
+                                        this.Lines[CurLine].Metrics.Ascent = Item.Height;
+                                }
+                                else
+                                {
+                                    if ( LineAscent < Item.Height + Item.YOffset )
+                                        LineAscent = Item.Height + Item.YOffset;
 
-                                if ( -Item.YOffset > this.Lines[CurLine].Metrics.Descent )
-                                    this.Lines[CurLine].Metrics.Descent = -Item.YOffset;
+                                    if ( Item.Height + Item.YOffset > this.Lines[CurLine].Metrics.Ascent )
+                                        this.Lines[CurLine].Metrics.Ascent = Item.Height + Item.YOffset;
+
+                                    if ( -Item.YOffset > this.Lines[CurLine].Metrics.Descent )
+                                        this.Lines[CurLine].Metrics.Descent = -Item.YOffset;
+                                }
 
                                 X += Item.Width;
 
@@ -1658,11 +1681,23 @@ Paragraph.prototype =
                         if ( LineTextDescent < TextDescent )
                             LineTextDescent = TextDescent;
 
-                        if ( LineAscent < TextAscent + Item.YOffset )
-                            LineAscent = TextAscent + Item.YOffset;
 
-                        if ( LineDescent < TextDescent - Item.YOffset )
-                            LineDescent = TextDescent - Item.YOffset;
+                        if ( linerule_Exact === ParaPr.Spacing.LineRule )
+                        {
+                            if ( LineAscent < TextAscent )
+                                LineAscent = TextAscent;
+
+                            if ( LineDescent < TextDescent )
+                                LineDescent = TextDescent;
+                        }
+                        else
+                        {
+                            if ( LineAscent < TextAscent + Item.YOffset )
+                                LineAscent = TextAscent + Item.YOffset;
+
+                            if ( LineDescent < TextDescent - Item.YOffset )
+                                LineDescent = TextDescent - Item.YOffset;
+                        }
 
                         if ( X + nSpaceLen + Item.Width > XEnd && ( false === bFirstItemOnLine || RangesCount > 0 ) )
                         {
@@ -3268,6 +3303,9 @@ Paragraph.prototype =
     // Пересчитываем заданную позицию элемента или текущую позицию курсора.
     Internal_Recalculate_CurPos : function(Pos, UpdateCurPos, UpdateTarget, ReturnTarget)
     {
+        if ( this.Lines.length <= 0 )
+            return { X : 0, Y : 0, Height : 0, Internal : { Line : 0, Page : 0, Range : 0 } };
+
         var LinePos = this.Internal_Get_ParaPos_By_Pos( Pos );
 
         var CurLine  = LinePos.Line;
@@ -10450,8 +10488,113 @@ Paragraph.prototype =
             return;
         }
 
-        this.Pr.FramePr = new CFramePr();
-        this.Pr.FramePr.Set_FromObject( FramePr );
+        var FrameParas = this.Internal_Get_FrameParagraphs();
+
+        // Тут FramePr- объект класса из api.js CParagraphFrame
+        if ( true === FramePr.FromDropCapMenu && 1 === FrameParas.length )
+        {
+            // Здесь мы смотрим только на количество строк, шрифт, тип и горизонтальный отступ от текста
+            var NewFramePr = FramePr_old.Copy();
+
+            if ( undefined != FramePr.DropCap )
+            {
+                var OldLines = NewFramePr.Lines;
+                NewFramePr.Init_Default_DropCap( FramePr.DropCap === c_oAscDropCap.Drop ? true : false );
+                NewFramePr.Lines = OldLines;
+            }
+
+            if ( undefined != FramePr.Lines )
+            {
+                var AnchorPara = this.Get_FrameAnchorPara();
+
+                if ( null === AnchorPara || AnchorPara.Lines.length <= 0 )
+                    return;
+
+                var LineH  = AnchorPara.Lines[0].Bottom - AnchorPara.Lines[0].Top;
+                var LineTA = AnchorPara.Lines[0].Metrics.TextAscent2;
+                var LineTD = AnchorPara.Lines[0].Metrics.TextDescent + AnchorPara.Lines[0].Metrics.LineGap;
+
+                this.Set_Spacing( { LineRule : linerule_Exact, Line : FramePr.Lines * LineH }, false );
+                this.Update_DropCapByLines( this.Internal_CalculateTextPr( this.Internal_GetStartPos() ), FramePr.Lines, LineH, LineTA, LineTD );
+            }
+
+            if ( undefined != FramePr.FontFamily )
+            {
+                var FF = new ParaTextPr( { RFonts : { Ascii : { Name : FramePr.FontFamily.Name, Index : -1 } }  } );
+                this.Select_All();
+                this.Add( FF );
+                this.Selection_Remove();
+            }
+
+            if ( undefined != FramePr.HSpace )
+                NewFramePr.HSpace = FramePr.HSpace;
+
+            this.Pr.FramePr = NewFramePr;
+        }
+        else
+        {
+            var NewFramePr = FramePr_old.Copy();
+
+            if ( undefined != FramePr.H )
+                NewFramePr.H = FramePr.H;
+
+            if ( undefined != FramePr.HAnchor )
+                NewFramePr.HAnchor = FramePr.HAnchor;
+
+            if ( undefined != FramePr.HRule )
+                NewFramePr.HRule = FramePr.HRule;
+
+            if ( undefined != FramePr.HSpace )
+                NewFramePr.HSpace = FramePr.HSpace;
+
+            if ( undefined != FramePr.Lines )
+                NewFramePr.Lines = FramePr.Lines;
+
+            if ( undefined != FramePr.VAnchor )
+                NewFramePr.VAnchor = FramePr.VAnchor;
+
+            if ( undefined != FramePr.VSpace )
+                NewFramePr.VSpace = FramePr.VSpace;
+
+            // Потому что undefined - нормальное значение (и W всегда заполняется в интерфейсе)
+            NewFramePr.W = FramePr.W;
+
+            if ( undefined != FramePr.Wrap )
+                NewFramePr.Wrap = FramePr.Wrap;
+
+            if ( undefined != FramePr.X )
+                NewFramePr.X = FramePr.X;
+
+            if ( undefined != FramePr.XAlign )
+                NewFramePr.XAlign = FramePr.XAlign;
+
+            if ( undefined != FramePr.Y )
+                NewFramePr.Y = FramePr.Y;
+
+            if ( undefined != FramePr.YAlign )
+                NewFramePr.YAlign = FramePr.YAlign;
+
+            this.Pr.FramePr = NewFramePr;
+        }
+
+        if ( undefined != FramePr.Brd )
+        {
+            var Count = FrameParas.length;
+            for ( var Index = 0; Index < Count; Index++ )
+            {
+                FrameParas[Index].Set_Borders( FramePr.Brd );
+            }
+        }
+
+        if ( undefined != FramePr.Shd )
+        {
+            var Count = FrameParas.length;
+            for ( var Index = 0; Index < Count; Index++ )
+            {
+                FrameParas[Index].Set_Shd( FramePr.Shd );
+            }
+        }
+
         History.Add( this, { Type : historyitem_Paragraph_FramePr, Old : FramePr_old, New : this.Pr.FramePr } );
         this.CompiledPr.NeedRecalc = true;
     },
@@ -10547,12 +10690,21 @@ Paragraph.prototype =
 
             if ( Math.abs( H - this.CalculatedFrame.H ) > 0.001 )
             {
-                if ( H <= this.CalculatedFrame.H )
+                if ( undefined != FramePr.DropCap && dropcap_None != FramePr.DropCap && 1 === FrameParas.length )
+                {
+                    NewFramePr.Lines = this.Update_DropCapByHeight( H );
                     NewFramePr.HRule = linerule_Exact;
+                    NewFramePr.H     = H;
+                }
                 else
-                    NewFramePr.HRule = linerule_AtLeast;
+                {
+                    if ( H <= this.CalculatedFrame.H )
+                        NewFramePr.HRule = linerule_Exact;
+                    else
+                        NewFramePr.HRule = linerule_AtLeast;
 
-                NewFramePr.H = H;
+                    NewFramePr.H = H;
+                }
             }
 
             var Count = FrameParas.length;
@@ -10609,6 +10761,7 @@ Paragraph.prototype =
         }
 
         FramePr.Brd = ParaPr.Brd;
+        FramePr.Shd = ParaPr.Shd;
     },
 
     Can_AddDropCap : function()
@@ -10621,6 +10774,229 @@ Paragraph.prototype =
         }
 
         return false;
+    },
+
+    Split_DropCap : function(NewParagraph)
+    {
+        var Count = this.Content.length;
+        var Pos = 0;
+        var PTextPr = null;
+        for (; Pos < Count; Pos++ )
+        {
+            var Type = this.Content[Pos].Type;
+            if ( para_TextPr === Type )
+                PTextPr = this.Content[Pos];
+            if ( para_Text === Type )
+                break;
+        }
+
+        if ( Pos >= Count )
+            return null;
+
+        var TextPr = this.Internal_CalculateTextPr(Pos);
+
+        var DropCap = this.Content[Pos];
+        this.Internal_Content_Remove2( 0, Pos + 1 );
+
+        if ( null != PTextPr )
+            this.Internal_Content_Add( 0, PTextPr );
+
+        NewParagraph.Internal_Content_Add( 0, DropCap );
+
+        return TextPr;
+    },
+
+    Update_DropCapByLines : function(TextPr, Count, LineH, LineTA, LineTD)
+    {
+        // Мы должны сделать так, чтобы высота данного параграфа была точно Count * LineH
+        this.Set_Spacing( { Before : 0, After : 0, LineRule : linerule_Exact, Line : Count * LineH - 0.001 }, false );
+
+        var FontSize = 72;
+        TextPr.FontSize = FontSize;
+
+        g_oTextMeasurer.SetTextPr(TextPr);
+        g_oTextMeasurer.SetFontSlot(fontslot_ASCII, 1);
+
+        var TDescent = null;
+        var TAscent  = null;
+
+        var TempCount = this.Content.length;
+        for ( var Index = 0; Index < TempCount; Index++ )
+        {
+            var Item = this.Content[Index];
+            if ( para_Text === Item.Type )
+            {
+                var Temp = g_oTextMeasurer.Measure2( Item.Value );
+
+                if ( null === TAscent || TAscent < Temp.Ascent )
+                    TAscent = Temp.Ascent;
+
+                if ( null === TDescent || TDescent > Temp.Ascent - Temp.Height )
+                    TDescent = Temp.Ascent - Temp.Height;
+            }
+        }
+
+        var THeight = 0;
+        if ( null === TAscent || null === TDescent )
+            THeight = g_oTextMeasurer.GetHeight();
+        else
+            THeight = -TDescent + TAscent;
+
+        var EmHeight = THeight;
+
+        var NewEmHeight = (Count - 1) * LineH + LineTA;
+        var Koef = NewEmHeight / EmHeight;
+
+        TextPr.FontSize *= Koef;
+
+        g_oTextMeasurer.SetTextPr(TextPr);
+        g_oTextMeasurer.SetFontSlot(fontslot_ASCII, 1);
+
+        var TNewDescent = null;
+        var TNewAscent  = null;
+
+        var TempCount = this.Content.length;
+        for ( var Index = 0; Index < TempCount; Index++ )
+        {
+            var Item = this.Content[Index];
+            if ( para_Text === Item.Type )
+            {
+                var Temp = g_oTextMeasurer.Measure2( Item.Value );
+
+                if ( null === TNewAscent || TNewAscent < Temp.Ascent )
+                    TNewAscent = Temp.Ascent;
+
+                if ( null === TNewDescent || TNewDescent > Temp.Ascent - Temp.Height )
+                    TNewDescent = Temp.Ascent - Temp.Height;
+            }
+        }
+
+        var TNewHeight = 0;
+        if ( null === TNewAscent || null === TNewDescent )
+            TNewHeight = g_oTextMeasurer.GetHeight();
+        else
+            TNewHeight = -TNewDescent + TNewAscent;
+
+        var Descent = g_oTextMeasurer.GetDescender();
+
+        var Dy = Descent + TNewHeight - TNewAscent + LineTD;
+
+        var PTextPr = new ParaTextPr( { RFonts : { Ascii : { Name : TextPr.RFonts.Ascii.Name, Index : -1 } }, FontSize : FontSize * Koef, Position : Dy } );
+
+        this.Select_All();
+        this.Add( PTextPr );
+        this.Selection_Remove();
+    },
+
+    Update_DropCapByHeight : function(Height)
+    {
+        // Ищем следующий параграф, к которому относится буквица
+        var AnchorPara = this.Get_FrameAnchorPara();
+        if ( null === AnchorPara || AnchorPara.Lines.length <= 0 )
+            return 1;
+
+        this.Set_Spacing( { LineRule : linerule_Exact, Line : Height }, false );
+
+        var LineH  = AnchorPara.Lines[0].Bottom - AnchorPara.Lines[0].Top;
+        var LineTA = AnchorPara.Lines[0].Metrics.TextAscent2;
+        var LineTD = AnchorPara.Lines[0].Metrics.TextDescent + AnchorPara.Lines[0].Metrics.LineGap;
+
+        // Посчитаем количество строк
+        var LinesCount = Math.ceil( Height / LineH );
+
+        var TextPr = this.Internal_CalculateTextPr(this.Internal_GetStartPos());
+        g_oTextMeasurer.SetTextPr(TextPr);
+        g_oTextMeasurer.SetFontSlot(fontslot_ASCII, 1);
+
+
+        var TDescent = null;
+        var TAscent  = null;
+
+        var TempCount = this.Content.length;
+        for ( var Index = 0; Index < TempCount; Index++ )
+        {
+            var Item = this.Content[Index];
+            if ( para_Text === Item.Type )
+            {
+                var Temp = g_oTextMeasurer.Measure2( Item.Value );
+
+                if ( null === TAscent || TAscent < Temp.Ascent )
+                    TAscent = Temp.Ascent;
+
+                if ( null === TDescent || TDescent > Temp.Ascent - Temp.Height )
+                    TDescent = Temp.Ascent - Temp.Height;
+            }
+        }
+
+        var THeight = 0;
+        if ( null === TAscent || null === TDescent )
+            THeight = g_oTextMeasurer.GetHeight();
+        else
+            THeight = -TDescent + TAscent;
+
+        var Koef = (Height - LineTD) / THeight;
+
+        TextPr.FontSize *= Koef;
+        g_oTextMeasurer.SetTextPr(TextPr);
+        g_oTextMeasurer.SetFontSlot(fontslot_ASCII, 1);
+
+        var TNewDescent = null;
+        var TNewAscent  = null;
+
+        var TempCount = this.Content.length;
+        for ( var Index = 0; Index < TempCount; Index++ )
+        {
+            var Item = this.Content[Index];
+            if ( para_Text === Item.Type )
+            {
+                var Temp = g_oTextMeasurer.Measure2( Item.Value );
+
+                if ( null === TNewAscent || TNewAscent < Temp.Ascent )
+                    TNewAscent = Temp.Ascent;
+
+                if ( null === TNewDescent || TNewDescent > Temp.Ascent - Temp.Height )
+                    TNewDescent = Temp.Ascent - Temp.Height;
+            }
+        }
+
+        var TNewHeight = 0;
+        if ( null === TNewAscent || null === TNewDescent )
+            TNewHeight = g_oTextMeasurer.GetHeight();
+        else
+            TNewHeight = -TNewDescent + TNewAscent;
+
+        var Descent = g_oTextMeasurer.GetDescender();
+
+        var Dy = Descent + TNewHeight - TNewAscent + LineTD;
+
+        var PTextPr = new ParaTextPr( { RFonts : { Ascii : { Name : TextPr.RFonts.Ascii.Name, Index : -1 } }, FontSize : TextPr.FontSize, Position : Dy } );
+        this.Select_All();
+        this.Add( PTextPr );
+        this.Selection_Remove();
+
+        return LinesCount;
+    },
+
+    Get_FrameAnchorPara : function()
+    {
+        var FramePr = this.Get_FramePr();
+        if ( undefined === FramePr )
+            return null;
+
+        var Next = this.Get_DocumentNext();
+        while ( null != Next )
+        {
+            if ( type_Paragraph === Next.GetType() )
+            {
+                var NextFramePr = Next.Get_FramePr();
+                if ( undefined === NextFramePr || false === FramePr.Compare( NextFramePr ) )
+                    return Next;
+            }
+
+            Next = Next.Get_DocumentNext();
+        }
+
+        return Next;
     },
 
     // Разделяем данный параграф
@@ -13118,38 +13494,51 @@ CParaLineMetrics.prototype =
                 var ExactValue = Math.max( 1, ParaPr.Spacing.Line );
                 LineGap = ExactValue - ( TextAscent + TextDescent );
 
-                if ( LineGap < 0 )
-                {
-                    var Ascent_old  = this.Ascent;
-                    var Descent_old = this.Descent;
-                    var TextDescent_old = this.TextDescent;
-                    var TextAscent_old  = this.TextAscent;
+                // TODO: пересмотреть тут
 
-                    var DiffAsc = Ascent_old  - TextAscent_old;
-                    var DiffDes = Descent_old - TextDescent_old;
+//                if ( LineGap < 0 )
+//                {
+//                    var Ascent_old  = this.Ascent;
+//                    var Descent_old = this.Descent;
+//                    var TextDescent_old = this.TextDescent;
+//                    var TextAscent_old  = this.TextAscent;
+//
+//                    var DiffAsc = Ascent_old  - TextAscent_old;
+//                    var DiffDes = Descent_old - TextDescent_old;
+//
+//                    LineGap += DiffAsc + DiffDes;
+//
+//                    Ascent_old  = TextAscent_old;
+//                    Descent_old = TextDescent_old;
+//
+//                    this.Ascent  = ExactValue * Ascent_old  / ( Ascent_old + Descent_old );
+//                    this.Descent = ExactValue * Descent_old / ( Ascent_old + Descent_old );
+//
+//                    LineGap = 0;
+//                }
+//                else
+//                {
+                    var Gap = this.Ascent + this.Descent - ExactValue;
 
-                    if ( -LineGap < DiffAsc + DiffDes )
+                    if ( Gap > 0 )
                     {
-                        var NewVal = DiffAsc + DiffDes + LineGap;
-                        var DiffAsc_new = NewVal * DiffAsc / (DiffAsc + DiffDes);
-                        var DiffDes_new = NewVal * DiffDes / (DiffAsc + DiffDes);
-
-                        this.Ascent  = TextAscent_old  + DiffAsc_new;
-                        this.Descent = TextDescent_old + DiffDes_new;
+                        if ( this.Ascent < Gap )
+                        {
+                            this.Ascent  = 0;
+                            this.Descent = ExactValue;
+                        }
+                        else
+                        {
+                            this.Ascent -= Gap; // уменьшаем Ascent
+                        }
                     }
                     else
                     {
-                        LineGap += DiffAsc + DiffDes;
-
-                        Ascent_old  = TextAscent_old;
-                        Descent_old = TextDescent_old;
-
-                        this.Ascent  = ExactValue * Ascent_old  / ( Ascent_old + Descent_old );
-                        this.Descent = ExactValue * Descent_old / ( Ascent_old + Descent_old );
+                        this.Ascent -= Gap; // все в Ascent
                     }
 
                     LineGap = 0;
-                }
+//                }
 
                 break;
             }

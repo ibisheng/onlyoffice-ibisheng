@@ -1773,25 +1773,171 @@ CDocument.prototype =
         this.Document_UpdateRulersState();
     },
 
-    Add_DropCap : function()
+    Add_DropCap : function(bInText)
     {
-        var NewParagraph = new Paragraph( this.DrawingDocument, this, 0, 0, 0, X_Right_Field, Y_Bottom_Field );
-        var OldParagraph = this.Content[this.CurPos.ContentPos];
-        OldParagraph.Cursor_MoveToStartPos();
-        OldParagraph.Cursor_MoveRight(1, false, false);
-        OldParagraph.Split(NewParagraph);
+        // Определим параграф, к которому мы будем добавлять буквицу
+        var Pos = -1;
 
-        OldParagraph.CompiledPr.NeedRecalc = true;
-        OldParagraph.Pr.FramePr = new CFramePr();
-        OldParagraph.Pr.FramePr.Init_Default_DropCap(false);
-        OldParagraph.Select_All();
-        OldParagraph.Add( new ParaTextPr( { FontSize : 20 } ) );
+        if ( false === this.Selection.Use && type_Paragraph === this.Content[this.CurPos.ContentPos].GetType() )
+            Pos = this.CurPos.ContentPos;
+        else if ( true === this.Selection.Use && this.Selection.StartPos <= this.Selection.EndPos && type_Paragraph === this.Content[this.Selection.StartPos].GetType() )
+            Pos = this.Selection.StartPos;
+        else if ( true === this.Selection.Use && this.Selection.StartPos > this.Selection.EndPos && type_Paragraph === this.Content[this.Selection.EndPos].GetType() )
+            Pos = this.Selection.EndPos;
 
-        this.Internal_Content_Add( this.CurPos.ContentPos + 1, NewParagraph );
+        if ( -1 === Pos )
+            return;
 
-        this.Recalculate();
+        var OldParagraph = this.Content[Pos];
+
+        if ( OldParagraph.Lines.length <= 0 )
+            return;
+
+        if ( false === this.Document_Is_SelectionLocked( changestype_None, { Type : changestype_2_Element_and_Type, Element : OldParagraph, CheckType : changestype_Paragraph_Content } ) )
+        {
+            this.Create_NewHistoryPoint();
+
+            var NewParagraph = new Paragraph( this.DrawingDocument, this, 0, 0, 0, X_Right_Field, Y_Bottom_Field );
+
+            var TextPr = OldParagraph.Split_DropCap( NewParagraph );
+            var LineH  = OldParagraph.Lines[0].Bottom - OldParagraph.Lines[0].Top;
+            var LineTA = OldParagraph.Lines[0].Metrics.TextAscent2;
+            var LineTD = OldParagraph.Lines[0].Metrics.TextDescent + OldParagraph.Lines[0].Metrics.LineGap;
+
+            NewParagraph.Pr.FramePr = new CFramePr();
+            NewParagraph.Pr.FramePr.Init_Default_DropCap( bInText );
+            NewParagraph.Update_DropCapByLines( TextPr, NewParagraph.Pr.FramePr.Lines, LineH, LineTA, LineTD );
+
+            this.Internal_Content_Add( Pos, NewParagraph );
+            NewParagraph.Cursor_MoveToStartPos();
+            NewParagraph.Document_SetThisElementCurrent();
+
+            this.Recalculate();
+        }
     },
 
+    Remove_DropCap : function(bDropCap)
+    {
+        var Pos = -1;
+
+        if ( false === this.Selection.Use && type_Paragraph === this.Content[this.CurPos.ContentPos].GetType() )
+            Pos = this.CurPos.ContentPos;
+        else if ( true === this.Selection.Use && this.Selection.StartPos <= this.Selection.EndPos && type_Paragraph === this.Content[this.Selection.StartPos].GetType() )
+            Pos = this.Selection.StartPos;
+        else if ( true === this.Selection.Use && this.Selection.StartPos > this.Selection.EndPos && type_Paragraph === this.Content[this.Selection.EndPos].GetType() )
+            Pos = this.Selection.EndPos;
+
+        if ( -1 === Pos )
+            return;
+
+        var Para = this.Content[Pos];
+        var FramePr = Para.Get_FramePr();
+
+        // Возможно буквицой является предыдущий параграф
+        if ( undefined === FramePr && true === bDropCap )
+        {
+            var Prev = Para.Get_DocumentPrev();
+            if ( null != Prev && type_Paragraph === Prev.GetType() )
+            {
+                var PrevFramePr = Prev.Get_FramePr();
+                if ( undefined != PrevFramePr && undefined != PrevFramePr.DropCap )
+                {
+                    Para = Prev;
+                    FramePr = PrevFramePr;
+                }
+                else
+                    return;
+            }
+            else
+                return;
+        }
+
+        if ( undefined === FramePr )
+            return;
+
+        var FrameParas = Para.Internal_Get_FrameParagraphs();
+
+        if ( false === bDropCap )
+        {
+            if ( false === this.Document_Is_SelectionLocked( changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : FrameParas, CheckType : changestype_Paragraph_Content } ) )
+            {
+                this.Create_NewHistoryPoint();
+                var Count = FrameParas.length;
+                for ( var Index = 0; Index < Count; Index++ )
+                {
+                    FrameParas[Index].Set_FramePr(undefined, true);
+                }
+
+                this.Recalculate();
+            }
+        }
+        else
+        {
+            // Сначала найдем параграф, к которому относится буквица
+            var Next = Para.Get_DocumentNext();
+            var Last = Para;
+            while ( null != Next )
+            {
+                if ( type_Paragraph != Next.GetType() || undefined === Next.Get_FramePr() || true != FramePr.Compare( Next.Get_FramePr() ) )
+                    break;
+
+                Last = Next;
+                Next = Next.Get_DocumentNext();
+            }
+
+            if ( null != Next && type_Paragraph === Next.GetType() )
+            {
+                FrameParas.push(Next);
+                if ( false === this.Document_Is_SelectionLocked( changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : FrameParas, CheckType : changestype_Paragraph_Content } ) )
+                {
+                    this.Create_NewHistoryPoint();
+
+                    // Удалим ненужный элемент
+                    FrameParas.splice( FrameParas.length - 1, 1 );
+
+                    // Передвинем курсор в начало следующего параграфа, и рассчитаем текстовые настройки и расстояния между строк
+                    Next.Cursor_MoveToStartPos();
+                    var Spacing = Next.Get_CompiledPr2(false).ParaPr.Spacing.Copy();
+                    var TextPr  = Next.Internal_CalculateTextPr(Next.CurPos.ContentPos);
+
+                    var Count = FrameParas.length;
+                    for ( var Index = 0; Index < Count; Index++ )
+                    {
+                        var FramePara = FrameParas[Index];
+                        FramePara.Set_FramePr( undefined, true );
+                        FramePara.Set_Spacing( Spacing, true );
+                        FramePara.Select_All();
+                        FramePara.Add( new ParaTextPr( TextPr ) );
+                    }
+
+
+                    Last.CopyPr( Next );
+                    Last.Concat( Next );
+
+                    this.Internal_Content_Remove(Next.Index, 1);
+
+                    Last.Cursor_MoveToStartPos();
+                    Last.Document_SetThisElementCurrent();
+
+                    this.Recalculate();
+                }
+            }
+            else
+            {
+                if ( false === this.Document_Is_SelectionLocked( changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : FrameParas, CheckType : changestype_Paragraph_Content } ) )
+                {
+                    this.Create_NewHistoryPoint();
+                    var Count = FrameParas.length;
+                    for ( var Index = 0; Index < Count; Index++ )
+                    {
+                        FrameParas[Index].Set_FramePr(undefined, true);
+                    }
+
+                    this.Recalculate();
+                }
+            }
+        }
+    },
 
     CheckRange : function(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, PageNum)
     {
