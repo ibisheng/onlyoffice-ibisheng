@@ -116,9 +116,10 @@ function CMouseEventHandler()
 
     this.fromJQueryEvent = function(e)
     {
-        this.ClickCount = e.ClickCount;
+        this.ClickCount = 1;//e.ClickCount;
         this.Type =  g_o_event_map[e.type];
         this.ShiftKey = e.shiftKey;
+        this.IsLocked = true;
     };
 }
 
@@ -1622,7 +1623,7 @@ CShape.prototype =
         t_y = this.invertTransformText.TransformPointY(x, y);
         var event =  new CMouseEventHandler();
         event.fromJQueryEvent(e);
-        this.txBody.selectionSetStart(e, t_x, t_y);
+        this.txBody.selectionSetStart(event, t_x, t_y);
         this.txBody.content.RecalculateCurPos();
     },
 
@@ -1633,7 +1634,7 @@ CShape.prototype =
         t_y = this.invertTransformText.TransformPointY(x, y);
         var event =  new CMouseEventHandler();
         event.fromJQueryEvent(e);
-        this.txBody.selectionSetEnd(e, t_x, t_y);
+        this.txBody.selectionSetEnd(event, t_x, t_y);
     },
 
 	setAbsoluteTransform: function(offsetX, offsetY, extX, extY, rot, flipH, flipV, open)

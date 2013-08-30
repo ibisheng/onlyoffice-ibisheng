@@ -198,12 +198,13 @@ CImageShape.prototype =
 
 	setRasterImage: function(img, canvas)
     {
-        this.blipFill = new CBlipFill();
-        this.blipFill.RasterImageId = img;
+        this.blipFill = new CUniFill();
+        this.blipFill.fill = new CBlipFill();
+        this.blipFill.fill.RasterImageId = img;
         if(isRealObject(canvas))
-            this.blipFill.canvas = canvas;
-        this.spPr.Fill = new CUniFill();
-        this.spPr.Fill.fill = this.blipFill;
+            this.blipFill.fill.canvas = canvas;
+     //   this.spPr.Fill = new CUniFill();
+        this.spPr.Fill = this.blipFill;
         this.brush = this.spPr.Fill;
     },
 	
@@ -336,7 +337,7 @@ CImageShape.prototype =
         if(this.recalcInfo.recalculateBrush)
         {
             this.recalculateBrush(aImagesSync);
-            this.recalcInfo.recalculateTransform = false;
+            this.recalcInfo.recalculateBrush = false;
         }
     },
 

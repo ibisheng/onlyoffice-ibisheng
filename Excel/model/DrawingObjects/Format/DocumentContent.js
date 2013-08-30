@@ -6634,10 +6634,53 @@ CDocumentContent.prototype =
         // TODO: изенить здесь
         PageNum = Math.min( PageNum, this.Pages.length - 1 );
 
-
+        // Сначала проверим Flow-таблицы
+        var FlowTable = null;
+        if ( null != FlowTable )
+            return FlowTable.Table.Index;
 
         var StartPos = this.Pages[PageNum].Pos;
-        return StartPos;
+        var EndPos   = this.Content.length - 1;
+
+        if ( PageNum < this.Pages.length - 1 )
+            EndPos = Math.min( this.Pages[PageNum + 1].Pos, EndPos );
+
+        // Сохраним позиции всех Inline элементов на данной странице
+        var InlineElements = new Array();
+        for ( var Index = StartPos; Index <= EndPos; Index++ )
+        {
+            var Item = this.Content[Index];
+            if ( type_Table != Item.GetType() || false != Item.Is_Inline() )
+                InlineElements.push( Index );
+        }
+
+        var Count = InlineElements.length;
+        if ( Count <= 0 )
+            return StartPos;
+
+        for ( var Pos = 0; Pos < Count - 1; Pos++ )
+        {
+            var Item = this.Content[InlineElements[Pos + 1]];
+
+            if ( Y < Item.Pages[0].Bounds.Top )
+                return InlineElements[Pos];
+
+            if ( Item.Pages.length > 1 )
+            {
+                if ( ( type_Paragraph === Item.GetType() && Item.Pages[0].FirstLine != Item.Pages[1].FirstLine ) || ( type_Table === Item.GetType() && true === Item.RowsInfo[0].FirstPage ) )
+                    return InlineElements[Pos + 1];
+
+                return InlineElements[Pos];
+            }
+
+            if ( Pos === Count - 2 )
+            {
+                // Такое возможно, если страница заканчивается Flow-таблицей
+                return InlineElements[Count - 1];
+            }
+        }
+
+        return InlineElements[0];
     },
 
     Internal_Content_Find : function(Id)
