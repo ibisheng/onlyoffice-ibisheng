@@ -444,7 +444,7 @@ CGraphicObjects.prototype =
                                 shape_props.verticalTextAlign = undefined;
                             }
                         }
-                        if(c_obj.isImage() && c_obj.chart == null)
+                        if(c_obj.isImage() )
                         {
                             if(!isRealObject(image_props))
                             {
@@ -459,7 +459,7 @@ CGraphicObjects.prototype =
                                     image_props.ImageUrl = null;
                             }
                         }
-                        if(c_obj.isImage() && isRealObject(c_obj.chart))
+                        if(c_obj.chart)
                         {
                             if(!isRealObject(chart_props))
                             {
@@ -592,10 +592,10 @@ CGraphicObjects.prototype =
             if(chart_props.ShapeProperties)
                 chart_props.ShapeProperties = CreateAscShapePropFromProp(chart_props.ShapeProperties);
 
-            if(chart_props.ChartProperties)
+           /* if(chart_props.ChartProperties)
             {
                 chart_props.ChartProperties = chart_props.ChartProperties.serializeChart();
-            }
+            }          */
             ret.push(chart_props);
         }
         return ret;
@@ -1089,11 +1089,10 @@ CGraphicObjects.prototype =
         for(var  i = 0;  i < selected_arr.length; ++i)
         {
             if(selected_arr[i].GraphicObj.chart != null)
-                return selected_arr[i].GraphicObj.chart.serializeChart();
+                return selected_arr[i].GraphicObj;
         }
 
-        var chart = new CChartData(false);
-        return chart.serializeChart();
+        return new CChartAsGroup();
     },
 
     updateCharts: function()

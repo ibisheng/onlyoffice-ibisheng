@@ -965,7 +965,6 @@ CChartTitle.prototype =
         w.WriteBool(isRealObject(this.txBody));
         if(isRealObject(this.txBody))
             this.txBody.writeToBinary(w);
-
     },
 
     readFromBinary: function(r)

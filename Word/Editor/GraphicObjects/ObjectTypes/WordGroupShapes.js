@@ -520,7 +520,7 @@ WordGroupShapes.prototype =
         var ret = null;
         for(var i = 0; i < this.spTree.length; ++i)
         {
-            if(this.spTree[i].isImage() && isRealObject(this.spTree[i].chart))
+            if(isRealObject(this.spTree[i].chart))
             {
                 if(!isRealObject(ret))
                     ret = {ChartProperties: this.spTree[i].chart};

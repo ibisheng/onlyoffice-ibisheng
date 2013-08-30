@@ -1823,24 +1823,59 @@ CChartAsGroup.prototype =
             }
         }
     },
-	
-	getChartBinary: function()
-	{
-		return "_chart_";
-	},
-	
-	setChartBinary: function(binary)
-	{
-	},
 
-    getBinary: function()
+    getChartBinary: function()
     {
+        var w = new CMemory();
+        w.WriteBool(isRealObject(this.chartTitle));
+        if(isRealObject(this.chartTitle))
+        {
+            this.chartTitle.writeToBinary(w);
+        }
 
+        w.WriteBool(isRealObject(this.vAxisTitle));
+        if(isRealObject(this.vAxisTitle))
+        {
+            this.vAxisTitle.writeToBinary(w);
+        }
+
+        w.WriteBool(isRealObject(this.hAxisTitle));
+        if(isRealObject(this.hAxisTitle))
+        {
+            this.hAxisTitle.writeToBinary(w);
+        }
+
+        this.chart.Write_ToBinary2(w);
+        this.spPr.Write_ToBinary2(w);
+        return w.pos + ";" + w.GetBase64Memory();
     },
 
-    readFromBinary: function(reader)
-    {}
+    setChartBinary: function(binary)
+    {
+        // Приводим бинарник к внутренней структуре
+        var r = CreateBinaryReader(binary, 0, binary.length);
+        if(r.GetBool())
+        {
+            this.chartTitle = new CChartTitle(this, CHART_TITLE_TYPE_TITLE);
+            this.chartTitle.readFromBinary(r);
+        }
 
+        if(r.GetBool())
+        {
+            this.vAxisTitle = new CChartTitle(this, CHART_TITLE_TYPE_V_AXIS);
+            this.vAxisTitle.readFromBinary(r);
+        }
+        if(r.GetBool())
+        {
+            this.hAxisTitle = new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS);
+            this.hAxisTitle.readFromBinary(r);
+        }
+        this.chart.Read_FromBinary2(r);
+        this.spPr.Read_FromBinary2(r);
+        this.init();
+        this.recalculate();
+        this.addToDrawingObjects();
+    }
 };
 
 window["Asc"].CChartAsGroup = CChartAsGroup;
@@ -1848,3 +1883,31 @@ window["Asc"]["CChartAsGroup"] = CChartAsGroup;
 prot = CChartAsGroup.prototype;
 
 prot["asc_getChart"] = prot.asc_getChart;
+
+var CLASS_TYPE_TABLE_ID = 0;
+var CLASS_TYPE_DOCUMENT_CONTENT = 1;
+var CLASS_TYPE_SHAPE = 2;
+var CLASS_TYPE_IMAGE = 3;
+var CLASS_TYPE_GROUP = 4;
+var CLASS_TYPE_XFRM = 5;
+var CLASS_TYPE_GEOMETRY = 6;
+var CLASS_TYPE_PATH = 7;
+var CLASS_TYPE_PARAGRAPH = 8;
+var CLASS_TYPE_TEXT_BODY = 9;
+var CLASS_TYPE_TEXT_PR = 10;
+var CLASS_TYPE_UNI_FILL = 11;
+var CLASS_TYPE_PATTERN_FILL = 12;
+var CLASS_TYPE_GRAD_FILL = 13;
+var CLASS_TYPE_SOLID_FILL = 14;
+var CLASS_TYPE_UNI_COLOR = 15;
+var CLASS_TYPE_SCHEME_COLOR = 16;
+var CLASS_TYPE_RGB_COLOR = 17;
+var CLASS_TYPE_PRST_COLOR = 18;
+var CLASS_TYPE_SYS_COLOR = 19;
+var CLASS_TYPE_LINE = 20;
+var CLASS_TYPE_CHART_AS_GROUP = 21;
+var CLASS_TYPE_CHART_LEGEND = 22;
+var CLASS_TYPE_CHART_TITLE = 23;
+var CLASS_TYPE_COLOR_MOD = 24;
+var CLASS_TYPE_LEGEND_ENTRY = 22;
+var CLASS_TYPE_CHART_DATA = 23;

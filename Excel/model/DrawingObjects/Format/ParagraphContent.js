@@ -257,6 +257,16 @@ ParaText.prototype =
     {
         this.Value      = Reader.GetString2();
         this.SpaceAfter = Reader.GetBool();
+    },
+
+    writeToBinary: function(w)
+    {
+        this.Write_ToBinary(w)
+    },
+
+    readFromBinary: function(r)
+    {
+        this.Read_FromBinary(r);
     }
 };
 
@@ -395,6 +405,16 @@ ParaSpace.prototype =
     Read_FromBinary : function(Reader)
     {
         this.Value = Reader.GetLong();
+    },
+
+    writeToBinary: function(w)
+    {
+        this.Write_ToBinary(w)
+    },
+
+    readFromBinary: function(r)
+    {
+        this.Read_FromBinary(r);
     }
 };
 
@@ -1854,6 +1874,16 @@ ParaTextPr.prototype =
                 break;
             }
         }
+    },
+
+    writeToBinary: function(w)
+    {
+        this.Write_ToBinary2(w)
+    },
+
+    readFromBinary: function(r)
+    {
+        this.Read_FromBinary2(r);
     }
 };
 
@@ -1913,8 +1943,19 @@ ParaEnd.prototype =
 
     Read_FromBinary : function(Reader)
     {
-    }
+    },
 
+
+
+    writeToBinary: function(w)
+    {
+        this.Write_ToBinary(w)
+    },
+
+    readFromBinary: function(r)
+    {
+        this.Read_FromBinary(r);
+    }
 
 };
 
@@ -2063,6 +2104,18 @@ ParaNewLine.prototype =
 
         if ( break_Page === this.BreakType )
             this.Flags = { NewLine : Reader.GetBool() };
+    },
+
+
+
+    writeToBinary: function(w)
+    {
+        this.Write_ToBinary(w)
+    },
+
+    readFromBinary: function(r)
+    {
+        this.Read_FromBinary(r);
     }
 };
 
@@ -2103,6 +2156,18 @@ ParaNewLineRendered.prototype =
 
     Read_FromBinary : function(Reader)
     {
+    },
+
+
+
+    writeToBinary: function(w)
+    {
+        this.Write_ToBinary(w)
+    },
+
+    readFromBinary: function(r)
+    {
+        this.Read_FromBinary(r);
     }
 };
 
@@ -2144,6 +2209,18 @@ ParaInlineBreak.prototype =
 
     Read_FromBinary : function(Reader)
     {
+    },
+
+
+
+    writeToBinary: function(w)
+    {
+        this.Write_ToBinary(w)
+    },
+
+    readFromBinary: function(r)
+    {
+        this.Read_FromBinary(r);
     }
 };
 
@@ -2185,6 +2262,18 @@ ParaPageBreakRenderer.prototype =
 
     Read_FromBinary : function(Reader)
     {
+    },
+
+
+
+    writeToBinary: function(w)
+    {
+        this.Write_ToBinary(w)
+    },
+
+    readFromBinary: function(r)
+    {
+        this.Read_FromBinary(r);
     }
 };
 
@@ -2243,6 +2332,18 @@ ParaEmpty.prototype =
     Read_FromBinary : function(Reader)
     {
         this.NeedToDelete = Reader.GetBool();
+    },
+
+
+
+    writeToBinary: function(w)
+    {
+        this.Write_ToBinary(w)
+    },
+
+    readFromBinary: function(r)
+    {
+        this.Read_FromBinary(r);
     }
 };
 
@@ -6904,5 +7005,43 @@ function ParagraphContent_Read_FromBinary(Reader)
 }
 
 
+function ParagraphContent_Read_FromBinary2(Reader)
+{
+    var ElementType = Reader.GetLong();
+
+    var Element = null;
+    switch ( ElementType )
+    {
+        case para_TextPr            :
+        case para_Drawing           :
+        case para_HyperlinkStart    :
+        {
+            var ElementId = Reader.GetString2();
+            Element = g_oTableId.Get_ById( ElementId );
+            return Element;
+        }
+        case para_Text              : Element = new ParaText();              break;
+        case para_Space             : Element = new ParaSpace();             break;
+        case para_End               : Element = new ParaEnd();               break;
+        case para_NewLine           : Element = new ParaNewLine();           break;
+        case para_NewLineRendered   : Element = new ParaNewLineRendered();   break;
+        case para_InlineBreak       : Element = new ParaInlineBreak();       break;
+        case para_PageBreakRendered : Element = new ParaPageBreakRenderer(); break;
+        case para_Empty             : Element = new ParaEmpty();             break;
+        case para_Numbering         : Element = new ParaNumbering();         break;
+        case para_Tab               : Element = new ParaTab();               break;
+        case para_PageNum           : Element = new ParaPageNum();           break;
+        case para_FlowObjectAnchor  : Element = new ParaFlowObjectAnchor();  break;
+        case para_HyperlinkEnd      : Element = new ParaHyperlinkEnd();      break;
+        case para_CommentStart      : Element = new ParaCommentStart();      break;
+        case para_CommentEnd        : Element = new ParaCommentEnd();        break;
+        case para_PresentationNumbering : Element = new ParaPresentationNumbering(); break;
+    }
+
+    if ( null != Element )
+        Element.readFromBinary(Reader);
+
+    return Element;
+}
 
 

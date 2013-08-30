@@ -1513,29 +1513,27 @@ CChartAsGroup.prototype =
         {
             this.hAxisTitle.getAllFonts(AllFonts);
         }
-
     },
 
     getChartBinary: function()
     {
-        // Записываем объект в бинарник для редактора документов
         var w = new CMemory();
         w.WriteBool(isRealObject(this.chartTitle));
         if(isRealObject(this.chartTitle))
         {
-            this.chartTitle.writeToBinary();
+            this.chartTitle.writeToBinary(w);
         }
 
         w.WriteBool(isRealObject(this.vAxisTitle));
         if(isRealObject(this.vAxisTitle))
         {
-            this.vAxisTitle.writeToBinary();
+            this.vAxisTitle.writeToBinary(w);
         }
 
         w.WriteBool(isRealObject(this.hAxisTitle));
         if(isRealObject(this.hAxisTitle))
         {
-            this.hAxisTitle.writeToBinary();
+            this.hAxisTitle.writeToBinary(w);
         }
 
         this.chart.Write_ToBinary2(w);
@@ -1546,6 +1544,28 @@ CChartAsGroup.prototype =
     setChartBinary: function(binary)
     {
         // Приводим бинарник к внутренней структуре
+        var r = CreateBinaryReader(binary, 0, binary.length);
+        if(r.GetBool())
+        {
+            this.chartTitle = new CChartTitle(this, CHART_TITLE_TYPE_TITLE);
+            this.chartTitle.readFromBinary(r);
+        }
+
+        if(r.GetBool())
+        {
+            this.vAxisTitle = new CChartTitle(this, CHART_TITLE_TYPE_V_AXIS);
+            this.vAxisTitle.readFromBinary(r);
+        }
+        if(r.GetBool())
+        {
+            this.hAxisTitle = new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS);
+            this.hAxisTitle.readFromBinary(r);
+        }
+        this.chart.Read_FromBinary2(r);
+        this.spPr.Read_FromBinary2(r);
+        this.init();
+        this.recalculate();
+        this.addToDrawingObjects();
     }
 };
 

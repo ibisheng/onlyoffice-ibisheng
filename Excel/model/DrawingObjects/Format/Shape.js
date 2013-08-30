@@ -1540,6 +1540,7 @@ CShape.prototype =
         }
         this.invertTransformText = global_MatrixTransformer.Invert(this.transformText);
     },
+
     getFullFlip: function()
     {
         return {flipH: this.getFullFlipH(), flipV: this.getFullFlipV()};

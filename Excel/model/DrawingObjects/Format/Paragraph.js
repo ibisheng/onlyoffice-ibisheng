@@ -180,6 +180,9 @@ Paragraph.prototype =
         return CLASS_TYPE_PARAGRAPH;
     },
 
+
+
+
     GetType : function()
     {
         return type_Paragraph;
