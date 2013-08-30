@@ -1936,6 +1936,7 @@ function drawChart(chart, arrValues, width, height) {
 	if(chart.series && chart.series.length != 0 && (chart.series[0].TxCache.Tx || chart.series[0].OutlineColor) && (theme && colorMap))
 	{
 		var uniColors;
+		bar._otherProps._colors = [];
 		for (var j = 0; j < chart.series.length; j++) {
 			if(chart.series[j].TxCache.Tx)
 				bar._otherProps._key[j] = chart.series[j].TxCache.Tx;
