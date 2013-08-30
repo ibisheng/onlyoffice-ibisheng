@@ -6864,17 +6864,6 @@ CErrorData.prototype.get_Value = function() { return this.Value; };
 asc_docs_api.prototype.asc_getChartObject = function()
 {	
 	this.isChartEditor = true;		// Для совместного редактирования
-	
-	/*var chart = this.WordControl.m_oLogicDocument.Get_ChartObject();
-	if ( chart.type != "" )
-		this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props);
-	else
-		this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content);
-		
-	chart["themeColors"] = [];
-	for (var i = 0; i < this.WordControl.m_oDrawingDocument.GuiControlColorsMap.length; i++) {
-		chart["themeColors"].push( this.WordControl.m_oDrawingDocument.GuiControlColorsMap[i].get_hex() );
-	}*/
 
 	var graphicObject = this.WordControl.m_oLogicDocument.Get_ChartObject();
 	for (var i = 0; i < this.WordControl.m_oDrawingDocument.GuiControlColorsMap.length; i++) {

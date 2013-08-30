@@ -3280,12 +3280,17 @@ function DrawingObjects() {
 			var graphicObject = new CChartAsGroup(null, _this);
 			graphicObject.setChartBinary(chart["binary"]);
 			
+			var _range = convertFormula(graphicObject.chart.range.interval, worksheet);
+			if (_range)
+				graphicObject.chart.range.intervalObject = _range;
+
+			graphicObject.chart.rebuildSeries();
 			
 			// Инжектим тему и перестраиваем превью диаграмм
 			if ( graphicObject.chart.themeColors ) {
 				
 				api.GuiControlColorsMap = [];
-				for (var i = 0; i < wordChart.themeColors.length; i++) {
+				for (var i = 0; i < graphicObject.chart.themeColors.length; i++) {
 					
 					var color = new RGBColor( graphicObject.chart.themeColors[i] );
 					api.GuiControlColorsMap.push(new CColor(color.r, color.g, color.b));
@@ -3294,9 +3299,8 @@ function DrawingObjects() {
 				api.chartPreviewManager.init();
 			}			
 			
-			/*
 			// Заполняем таблицу
-			if ( chart.data.length ) {
+			/*if ( graphicObject.chart.series.length ) {
 				var bbox = chart.range.intervalObject.getBBox0();
 				var r = bbox.r1, c = bbox.c1;
 				
@@ -3310,14 +3314,13 @@ function DrawingObjects() {
 					}
 				}
 			}
-			else {
+			else*/ {
 				var aCells = chart.range.intervalObject.getCells();
 				for ( var i = 0; i < aCells.length; i++ ) {
 					aCells[i].setValue( (i + 1).toString() );
 				}
 			}
 			worksheet._updateCellsRange(chart.range.intervalObject.getBBox0());
-			*/
 		}
 	}
 
