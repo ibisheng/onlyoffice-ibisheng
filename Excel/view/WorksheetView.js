@@ -3025,7 +3025,7 @@
 					opt = this.settings,
 					offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft,
 					offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
-					
+
 				ctx.setLineWidth(1);
 					
 				for (var i in arr) {
@@ -5280,7 +5280,7 @@
 				}
 
 				var ar = fixedRange ? fixedRange : ((this.isFormulaEditMode) ?
-					t.arrActiveFormulaRanges[t.arrActiveFormulaRanges.length - 1] : t.activeRange);
+					t.arrActiveFormulaRanges[t.arrActiveFormulaRanges.length - 1].clone(true) : t.activeRange);
 
 				if( !ar ) { return; }
 
