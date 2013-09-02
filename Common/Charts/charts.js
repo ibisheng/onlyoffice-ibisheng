@@ -999,6 +999,13 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 	{
 		isSeries = true;
 		var series = chart.series;
+        chart.reSeries = chart.series;
+        if(chart.type == 'Pie')
+        {
+            series = chart.getReverseSeries(true);
+            chart.reSeries = series;
+        }
+
 		var arrValues = [];
 		var max = 0;
 		var min = 0; 
@@ -1878,9 +1885,9 @@ function drawChart(chart, arrValues, width, height) {
 
 	
 	var lengthOfSeries;
-	if(chart.series && chart.series.length != 0 && window["Asc"]["editor"])
+	if(chart.reSeries && chart.reSeries.length != 0 && window["Asc"]["editor"])
 	{
-			lengthOfSeries = chart.series.length;
+			lengthOfSeries = chart.reSeries.length;
 	}
 	else
 	{
@@ -1933,38 +1940,38 @@ function drawChart(chart, arrValues, width, height) {
 			colorMap = GenerateDefaultColorMap().color_map;
 	}
 	
-	if(chart.series && chart.series.length != 0 && (chart.series[0].TxCache.Tx || chart.series[0].OutlineColor) && (theme && colorMap))
+	if(chart.reSeries && chart.reSeries.length != 0 && (chart.reSeries[0].TxCache.Tx || chart.reSeries[0].OutlineColor) && (theme && colorMap))
 	{
 		var uniColors;
 		bar._otherProps._colors = [];
-		for (var j = 0; j < chart.series.length; j++) {
-			if(chart.series[j].TxCache.Tx)
-				bar._otherProps._key[j] = chart.series[j].TxCache.Tx;
-			if(chart.series[j].OutlineColor)
+		for (var j = 0; j < chart.reSeries.length; j++) {
+			if(chart.reSeries[j].TxCache.Tx)
+				bar._otherProps._key[j] = chart.reSeries[j].TxCache.Tx;
+			if(chart.reSeries[j].OutlineColor)
 			{
-				chart.series[j].OutlineColor.Calculate(theme, colorMap, RGBA);
-				rgba = chart.series[j].OutlineColor.RGBA;
+				chart.reSeries[j].OutlineColor.Calculate(theme, colorMap, RGBA);
+				rgba = chart.reSeries[j].OutlineColor.RGBA;
 				curColor = getHexColor(rgba.R, rgba.G, rgba.B);
 				bar._otherProps._colors[j] = curColor;
-			}	
+			}
 			else
 			{
-				uniColors = !uniColors ? chart.generateUniColors(chart.series.length): uniColors;
+				uniColors = !uniColors ? chart.generateUniColors(chart.reSeries.length): uniColors;
 				rgba = uniColors[j].color.RGBA;
 				curColor = getHexColor(rgba.R, rgba.G, rgba.B);
 				bar._otherProps._colors[j] = curColor;
 			}
-		}	
+		}
 	}
-	if((chart.series && chart.series[0]) && (chart.series[0].TxCache.Tx || chart.series[0].OutlineColor))
+	if((chart.reSeries && chart.reSeries[0]) && (chart.reSeries[0].TxCache.Tx || chart.reSeries[0].OutlineColor))
 	{
-		if(!chart.series[0].TxCache.Tx)
+		if(!chart.reSeries[0].TxCache.Tx)
 		{
 			for (var j = 0; j < legendCnt; j++) {
 				bar._otherProps._key[j] = 'Series' + (j + 1);
 			}
 		}
-		if(!chart.series[0].OutlineColor)
+		if(!chart.reSeries[0].OutlineColor)
 		{
 			bar._otherProps._colors = generateColors(lengthOfSeries, arrBaseColors, true);
 			if(chart.type == 'HBar')
@@ -2004,7 +2011,7 @@ function drawChart(chart, arrValues, width, height) {
 	if(chart.skipSeries)
 	{
 		var skipSeries = chart.skipSeries;
-		if(chart.type == 'Scatter' && chart.series && chart.series[0].xVal.Formula == null && chart.series.length != 1)
+		if(chart.type == 'Scatter' && chart.reSeries && chart.reSeries[0].xVal.Formula == null && chart.reSeries.length != 1)
 		{
 			bar._otherProps._key.splice(bar._otherProps._key.length - 1, 1);
 			bar._otherProps._colors.splice(bar._otherProps._colors.length - 1, 1);
