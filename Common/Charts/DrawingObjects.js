@@ -2688,6 +2688,20 @@ function DrawingObjects() {
 			
 			var drawingObject = _this.cloneDrawingObject(currentSheet.model.Drawings[i]);
 			
+			if ( !worksheet.cols[drawingObject.to.col] ) {
+				while ( !worksheet.cols[drawingObject.to.col] ) {
+					worksheet.expandColsOnScroll(true);
+				}
+				worksheet.expandColsOnScroll(true); 	// для colOff
+			}
+			
+			if ( !worksheet.rows[drawingObject.to.row] ) {
+				while ( !worksheet.rows[drawingObject.to.row] ) {
+					worksheet.expandRowsOnScroll(true);
+				}
+				worksheet.expandRowsOnScroll(true); 	// для rowOff
+			}
+			
             if (drawingObject.graphicObject instanceof  CChartAsGroup) {
 				
 				_this.calcChartInterval(drawingObject.graphicObject.chart);
