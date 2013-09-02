@@ -2538,21 +2538,20 @@ Woorksheet.prototype.setName=function(name){
 		//перестраиваем формулы, если у них были ссылки на лист со старым именем.
 		for(var id in this.workbook.cwf) {
 			this.workbook.getWorksheetById(id)._ReBuildFormulas(this.workbook.cwf[id].cells,lastName,this.sName);
+		}
 			
 		if ( this.Drawings ) {
 			for (var i = 0; i < this.Drawings.length; i++) {
-				var obj = this.Drawings[i];
-				if ( obj.isChart && obj.isChart() ) {
+				var drawingObject = this.Drawings[i];
+				if ( drawingObject.graphicObject && drawingObject.isChart() ) {
 						var _lastName =  !rx_test_ws_name.test(lastName) ? "'" + lastName + "'" : lastName;
-						if ( obj.chart.range.interval.indexOf(_lastName + "!") >= 0 ) {
-							obj.chart.range.interval = obj.chart.range.interval.replace(_lastName, !rx_test_ws_name.test(this.sName) ? "'" + this.sName + "'" : this.sName);
-						obj.chart.range.intervalToIntervalObject();
-						obj.chart.buildSeries();
+						if ( drawingObject.graphicObject.chart.range.interval.indexOf(_lastName + "!") >= 0 ) {
+							drawingObject.graphicObject.chart.range.interval = drawingObject.graphicObject.chart.range.interval.replace(_lastName, !rx_test_ws_name.test(this.sName) ? "'" + this.sName + "'" : this.sName);
+						drawingObject.graphicObject.chart.rebuildSeries();
 					}
 				}
 			}
 		}
-	}
 	}
 };
 Woorksheet.prototype.renameWsToCollaborate=function(name){

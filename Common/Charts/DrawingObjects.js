@@ -4251,6 +4251,17 @@ function DrawingObjects() {
 					var selectedRange = worksheet.getSelectedRange();
 					if (selectedRange) {
 						var box = selectedRange.getBBox0();
+						
+						// Rows/Columns
+						if ( box.r2 - box.r1 < box.c2 - box.c1 ) {
+							chart.range.rows = true;
+							chart.range.columns = false;
+						}
+						else {
+							chart.range.rows = false;
+							chart.range.columns = true;
+						}
+						
 						var startCell = new CellAddress(box.r1, box.c1, 0);
 						var endCell = new CellAddress(box.r2, box.c2, 0);
 
