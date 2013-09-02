@@ -316,7 +316,7 @@ function Font(val)
 	{
 		val = {
 			fn : "Calibri",
-			scheme : EFontScheme.fontschemeMinor,
+			scheme : null,
 			fs : 11,
 			b : false,
 			i : false,
