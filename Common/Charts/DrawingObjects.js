@@ -349,8 +349,11 @@ asc_CChart.prototype = {
 		}
 		
 		var parsedHeaders = _t.parseSeriesHeaders();
+		var byRows = _t.range.rows;
+		if ( bReverse )
+			byRows = !byRows;
 		
-		if (_t.range.rows) {
+		if ( byRows ) {
 			for (var i = bbox.r1 + (parsedHeaders.bTop ? 1 : 0); i <= bbox.r2; i++) {
 				
 				var ser = new asc_CChartSeria();
