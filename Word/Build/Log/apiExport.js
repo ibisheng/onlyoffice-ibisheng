@@ -211,6 +211,7 @@ prop:asc_getSpellCheckLanguages
 prop:autoSaveInit
 prop:put_FramePr
 prop:asc_addDropCap
+prop:removeDropcap
 prop:get_TextProps
 prop:GetJSONLogicDocument
 prop:get_ContentCount
@@ -1275,6 +1276,7 @@ asc_docs_api.prototype['asc_getSpellCheckLanguages'] = asc_docs_api.prototype.as
 asc_docs_api.prototype['autoSaveInit'] = asc_docs_api.prototype.autoSaveInit;
 asc_docs_api.prototype['put_FramePr'] = asc_docs_api.prototype.put_FramePr;
 asc_docs_api.prototype['asc_addDropCap'] = asc_docs_api.prototype.asc_addDropCap;
+asc_docs_api.prototype['removeDropcap'] = asc_docs_api.prototype.removeDropcap;
 asc_docs_api.prototype['get_TextProps'] = asc_docs_api.prototype.get_TextProps;
 asc_docs_api.prototype['GetJSONLogicDocument'] = asc_docs_api.prototype.GetJSONLogicDocument;
 asc_docs_api.prototype['get_ContentCount'] = asc_docs_api.prototype.get_ContentCount;
