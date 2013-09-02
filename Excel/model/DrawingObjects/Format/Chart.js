@@ -1563,6 +1563,9 @@ CChartAsGroup.prototype =
         }
         this.chart.Read_FromBinary2(r);
         this.spPr.Read_FromBinary2(r);
+        var chartLeft =this.drawingObjects.convertMetric((parseInt($("#ws-canvas").css('width')) / 2) - c_oAscChartDefines.defaultChartWidth / 2, 0, 3);
+        var chartTop = this.drawingObjects.convertMetric((parseInt($("#ws-canvas").css('height')) / 2) - c_oAscChartDefines.defaultChartHeight / 2, 0, 3);
+        this.spPr.xfrm.setPosition(chartLeft, chartTop);
         this.init();
         this.recalculate();
         this.addToDrawingObjects();

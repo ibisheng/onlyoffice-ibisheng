@@ -994,8 +994,8 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
                                         {
                                             title.selectionSetStart(e, x, y);
                                             this.drawingObjectsController.changeCurrentState(new ChartTextAdd(this.drawingObjectsController, this.drawingObjects,  this.chart, title));
-                                            if(e.ClickCount < 2)
-                                                title.updateSelectionState(this.drawingObjects.drawingDocument);
+                                             if(e.ClickCount < 2)
+                                                 this.drawingObjectsController.updateSelectionState(this.drawingObjects.drawingDocument);
                                             return;
                                         }
                                         else
@@ -1245,47 +1245,41 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
                     {
                         if(cur_drawing.hitInWorkArea(x, y))
                         {
-
-                            if(!e.shiftKey && !e.ctrlKey)
+                            if(isRealObject(cur_drawing.chartLegend))
                             {
-
-                                if(isRealObject(cur_drawing.chartLegend))
-                                {
-                                    //TODO
-                                }
-
-                                var object_for_move_in_chart = null;
-                                if(isRealObject(cur_drawing.chartTitle))
-                                {
-                                    if(cur_drawing.chartTitle.hit(x, y))
-                                    {
-                                        object_for_move_in_chart = cur_drawing.chartTitle;
-                                    }
-                                }
-
-                                if(isRealObject(cur_drawing.hAxisTitle) && !isRealObject(object_for_move_in_chart))
-                                {
-                                    if(cur_drawing.hAxisTitle.hit(x, y))
-                                    {
-                                        object_for_move_in_chart = cur_drawing.hAxisTitle;
-                                    }
-                                }
-
-                                if(isRealObject(cur_drawing.vAxisTitle) && !isRealObject(object_for_move_in_chart))
-                                {
-                                    if(cur_drawing.vAxisTitle.hit(x, y))
-                                    {
-                                        object_for_move_in_chart = cur_drawing.vAxisTitle;
-                                    }
-                                }
-                                if(isRealObject(object_for_move_in_chart))
-                                {
-                                    return {objectId: this.chart.Id, cursorType: "move"};
-                                }
-
-                                return {objectId: this.chart.Id, cursorType: "move"};
-
+                                //TODO
                             }
+
+                            var object_for_move_in_chart = null;
+                            if(isRealObject(cur_drawing.chartTitle))
+                            {
+                                if(cur_drawing.chartTitle.hit(x, y))
+                                {
+                                    object_for_move_in_chart = cur_drawing.chartTitle;
+                                }
+                            }
+
+                            if(isRealObject(cur_drawing.hAxisTitle) && !isRealObject(object_for_move_in_chart))
+                            {
+                                if(cur_drawing.hAxisTitle.hit(x, y))
+                                {
+                                    object_for_move_in_chart = cur_drawing.hAxisTitle;
+                                }
+                            }
+
+                            if(isRealObject(cur_drawing.vAxisTitle) && !isRealObject(object_for_move_in_chart))
+                            {
+                                if(cur_drawing.vAxisTitle.hit(x, y))
+                                {
+                                    object_for_move_in_chart = cur_drawing.vAxisTitle;
+                                }
+                            }
+                            if(isRealObject(object_for_move_in_chart))
+                            {
+                                return {objectId: this.chart.Id, cursorType: "move"};
+                            }
+
+                            return {objectId: this.chart.Id, cursorType: "move"};
                         }
                     }
                 }

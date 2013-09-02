@@ -353,19 +353,8 @@ DrawingObjectsController.prototype =
 
     recalculateCurPos: function()
     {
-
-        if(this.curState.id === STATES_ID_TEXT_ADD)
-        {
-            try
-            {
-                this.curState.textObject.recalculateCurPos();
-            }
-            catch (e)
-            {
-
-            }
-
-        }
+        if(this.curState.textObject && this.curState.textObject.recalculateCurPos)
+            this.curState.textObject.recalculateCurPos();
     },
 
     updateSelectionState: function()
