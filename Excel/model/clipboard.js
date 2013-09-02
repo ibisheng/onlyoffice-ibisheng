@@ -2378,7 +2378,7 @@
 
 				Array.prototype.forEach.call(node, function processElement(elem) {
 					if (elem.nodeType === Node.TEXT_NODE || (elem.nodeName.toLowerCase() == 'br' && $(node).children('br').length != 0 && elem.parentNode.nodeName.toLowerCase() == 'span') || (elem.parentNode.getAttribute != undefined && elem.parentNode.getAttribute("class") != null && elem.parentNode.getAttribute("class") == "qPrefix") || (elem.getAttribute != undefined && elem.getAttribute("class") != null&& elem.getAttribute("class") == "qPrefix")) {
-						if(elem.textContent.replace(/(\r|\t|\n| )/g, '') != '' || elem.textContent == ' ')
+						if(elem.textContent.replace(/(\r|\t|\n| )/g, '') != '' || elem.textContent == ' ' || elem.nodeName.toLowerCase() == 'br')
 						{
 						var parent = elem.parentNode;
 						if(elem.getAttribute != undefined && elem.getAttribute("class") == "qPrefix")
