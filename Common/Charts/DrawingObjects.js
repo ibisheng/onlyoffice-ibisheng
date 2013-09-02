@@ -306,8 +306,6 @@ asc_CChart.prototype = {
 		var nameIndex = 1;
 		var api = window["Asc"]["editor"];
 		
-		var revSeries = _t.getReverseSeries();
-		
 		// Save old series colors
 		var oldSeriaData = [];
 		for ( var i = 0; i < _t.series.length; i++ ) {
