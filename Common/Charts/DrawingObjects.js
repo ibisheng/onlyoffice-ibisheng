@@ -2931,7 +2931,7 @@ function DrawingObjects() {
 							worksheet.model.workbook.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 					}
 					else {
-						worksheet.model.workbook.handlers.trigger("asc_onError", api.asc_mapAscServerErrorToAscError(data.error), c_oAscError.Level.NoCritical);
+						worksheet.model.workbook.handlers.trigger("asc_onError", api.asc_mapAscServerErrorToAscError(data["error"]), c_oAscError.Level.NoCritical);
 						worksheet.model.workbook.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 					}
 				}
@@ -3151,16 +3151,53 @@ function DrawingObjects() {
 						
 			var _image = api.ImageLoader.LoadImage(imageUrl, 1);
 			var isOption = options && options.cell;
-			
-			if (null != _image) {
-				addImageObject(_image);
-			}
-			else {
-				_this.asyncImageEndLoaded = function(_image) {
-					addImageObject(_image);
+
+			function calculateObjectMetrics(object, width, height) {
+				// Обработка картинок большого разрешения
+				var metricCoeff = 1;
+				
+				var realTopOffset = object.getRealTopOffset();
+				var realLeftOffset = object.getRealLeftOffset();
+				
+				var areaWidth = worksheet.getCellLeft(worksheet.getLastVisibleCol(), 0) - worksheet.getCellLeft(worksheet.getFirstVisibleCol(), 0); 	// по ширине
+				if (areaWidth < width) {
+					metricCoeff = width / areaWidth;
+
+					width = areaWidth;
+					height /= metricCoeff;
 				}
+
+				var areaHeight = worksheet.getCellTop(worksheet.getLastVisibleRow(), 0) - worksheet.getCellTop(worksheet.getFirstVisibleRow(), 0); 	// по высоте
+				if (areaHeight < height) {
+					metricCoeff = height / areaHeight;
+
+					height = areaHeight;
+					width /= metricCoeff;
+				}
+
+				var endPoint = worksheet._findColUnderCursor(pxToPt(realLeftOffset + width), true);
+				while (endPoint == null) {
+					worksheet.expandColsOnScroll(true);
+					endPoint = worksheet._findColUnderCursor(pxToPt(realLeftOffset + width), true);
+				}
+				worksheet.expandColsOnScroll(true); 	// для colOff
+
+				object.to.col = worksheet._findColUnderCursor(pxToPt(realLeftOffset + width), true).col;
+				object.to.colOff = pxToMm(realLeftOffset + width - worksheet.getCellLeft(object.to.col, 0));
+
+				endPoint = worksheet._findRowUnderCursor(pxToPt(realTopOffset + height), true);
+				while (endPoint == null) {
+					worksheet.expandRowsOnScroll(true);
+					endPoint = worksheet._findRowUnderCursor(pxToPt(realTopOffset + height), true);
+				}
+				worksheet.expandRowsOnScroll(true); 	// для rowOff
+
+				object.to.row = worksheet._findRowUnderCursor(pxToPt(realTopOffset + height), true).row;
+				object.to.rowOff = pxToMm(realTopOffset + height - worksheet.getCellTop(object.to.row, 0));
+				
+				worksheet._trigger("reinitializeScroll");
 			}
-			
+
 			function addImageObject(_image) {
 			
 				if ( !_image.Image ) {
@@ -3217,58 +3254,6 @@ function DrawingObjects() {
 				worksheet.model.workbook.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 			}
 			
-			function calculateObjectMetrics(object, width, height) {
-				// Обработка картинок большого разрешения
-				var metricCoeff = 1;
-				
-				var realTopOffset = object.getRealTopOffset();
-				var realLeftOffset = object.getRealLeftOffset();
-				
-				var areaWidth = worksheet.getCellLeft(worksheet.getLastVisibleCol(), 0) - worksheet.getCellLeft(worksheet.getFirstVisibleCol(), 0); 	// по ширине
-				if (areaWidth < width) {
-					metricCoeff = width / areaWidth;
-
-					width = areaWidth;
-					height /= metricCoeff;
-				}
-
-				var areaHeight = worksheet.getCellTop(worksheet.getLastVisibleRow(), 0) - worksheet.getCellTop(worksheet.getFirstVisibleRow(), 0); 	// по высоте
-				if (areaHeight < height) {
-					metricCoeff = height / areaHeight;
-
-					height = areaHeight;
-					width /= metricCoeff;
-				}
-
-				var endPoint = worksheet._findColUnderCursor(pxToPt(realLeftOffset + width), true);
-				while (endPoint == null) {
-					worksheet.expandColsOnScroll(true);
-					endPoint = worksheet._findColUnderCursor(pxToPt(realLeftOffset + width), true);
-				}
-				worksheet.expandColsOnScroll(true); 	// для colOff
-
-				object.to.col = worksheet._findColUnderCursor(pxToPt(realLeftOffset + width), true).col;
-				object.to.colOff = pxToMm(realLeftOffset + width - worksheet.getCellLeft(object.to.col, 0));
-
-				endPoint = worksheet._findRowUnderCursor(pxToPt(realTopOffset + height), true);
-				while (endPoint == null) {
-					worksheet.expandRowsOnScroll(true);
-					endPoint = worksheet._findRowUnderCursor(pxToPt(realTopOffset + height), true);
-				}
-				worksheet.expandRowsOnScroll(true); 	// для rowOff
-
-				object.to.row = worksheet._findRowUnderCursor(pxToPt(realTopOffset + height), true).row;
-				object.to.rowOff = pxToMm(realTopOffset + height - worksheet.getCellTop(object.to.row, 0));
-				
-				worksheet._trigger("reinitializeScroll");
-			}
-		}
-	}
-
-	_this.editImageDrawingObject = function(imageUrl) {
-		
-		if ( imageUrl ) {
-			var _image = api.ImageLoader.LoadImage(imageUrl, 1);
 			if (null != _image) {
 				addImageObject(_image);
 			}
@@ -3277,7 +3262,14 @@ function DrawingObjects() {
 					addImageObject(_image);
 				}
 			}
-			
+		}
+	}
+
+	_this.editImageDrawingObject = function(imageUrl) {
+		
+		if ( imageUrl ) {
+			var _image = api.ImageLoader.LoadImage(imageUrl, 1);
+
 			function addImageObject(_image) {
 			
 				if ( !_image.Image ) {
@@ -3305,6 +3297,15 @@ function DrawingObjects() {
 					_this.showDrawingObjects(true);
 				}
 				worksheet.model.workbook.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+			}
+			
+			if (null != _image) {
+				addImageObject(_image);
+			}
+			else {
+				_this.asyncImageEndLoaded = function(_image) {
+					addImageObject(_image);
+				}
 			}
 		}
 	}
