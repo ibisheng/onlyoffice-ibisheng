@@ -5863,7 +5863,9 @@ asc_docs_api.prototype.asyncImagesDocumentEndLoaded = function()
         {
             this.isLoadImagesCustom = false;
             this.loadCustomImageMap = null;
-            this.SyncLoadImages_callback();
+
+            if (!this.ImageLoader.bIsAsyncLoadDocumentImages)
+                this.SyncLoadImages_callback();
         }
     }
 }
@@ -6084,8 +6086,20 @@ asc_docs_api.prototype.SyncLoadImages = function(_images)
     this.loadCustomImageMap = _images;
 
     var _count = 0;
-    for (var i in this.loadCustomImageMap)
+    var _loaded = this.ImageLoader.map_image_index;
+
+    var _new_len = this.loadCustomImageMap.length;
+    for (var i = 0; i < _new_len; i++)
+    {
+        if (undefined !== _loaded[this.loadCustomImageMap[i]])
+        {
+            this.loadCustomImageMap.splice(i, 1);
+            i--;
+            _new_len--;
+            continue;
+        }
         ++_count;
+    }
 
     if (_count > 0)
     {
