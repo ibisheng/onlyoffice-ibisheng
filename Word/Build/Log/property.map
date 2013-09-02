@@ -649,7 +649,7 @@ OnContentReDraw:Yt
 getSize:M$
 m_nCurrentTimeClearCache:xka
 setParagraphContextualSpacing:gN
-HdrFtr:Mb
+HdrFtr:Nb
 get_ContextualSpacing:gja
 calculateTransformTextMatrix:ij
 canGroup:yh
@@ -1484,7 +1484,7 @@ needR:XP
 Apply_Changes:Pca
 m_sUserName:Ix
 asc_getSolved:eua
-bs:Kb
+bs:Lb
 drawCollaborativeChanges:Hia
 m_bNeedDoBold:kD
 COURIER_NEW_2_HACK_Rules:DCa
@@ -1900,7 +1900,7 @@ m_dUnitsKoef:o4
 nLastFilePos:O4
 num_globals:W4
 Y_abs:Bt
-AddRect:Lb
+AddRect:Mb
 _key_text_font:Gga
 Set_TableProps:nI
 lock:vaa
@@ -2249,7 +2249,7 @@ m_dMarginTop:cF
 max_kern:zya
 paragraphClearFormatting:JZ
 HeaderBottom:ppa
-TableCellBorders:Ob
+TableCellBorders:Pb
 objectsMap:fQ
 Get_TypeInfo:R4a
 axis_names:A9
@@ -3294,7 +3294,7 @@ drawingDocument:aa
 nvPr:Oi
 put_PrIndent:l_a
 Orientation_old:fGa
-series:Pb
+series:Jb
 band_shoot:Mha
 LockCursorTypeCur:Gea
 deselect:ac
@@ -3363,7 +3363,7 @@ ImgApply:pW
 kern_table_size:Mxa
 WriteGrpSpPr:asa
 yMin:hh
-FontSize:Jb
+FontSize:Kb
 wrapperOffsetLeft:yna
 get_Name:B3
 GetLongLE:ipa
@@ -4953,7 +4953,7 @@ glyph_copy:bxa
 _ticksize:Pl
 ReadTableStyles:XHa
 Flags:BR
-Line:Nb
+Line:Ob
 Width_new:Qra
 put_TextPrItalic:W_a
 get_glyph_metrics:MT
