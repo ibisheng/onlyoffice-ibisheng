@@ -6875,67 +6875,33 @@ asc_docs_api.prototype.asc_getChartObject = function()
 
 asc_docs_api.prototype.asc_addChartDrawingObject = function(chartBinary)
 {
-    /*if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) ) 
-    {
-        History.Create_NewPoint();
-        var diagramm = new CChartData(true);
-        diagramm.deserializeChart(chart);
-		diagramm.putToHistory();
-		
-        var _image = this.ImageLoader.LoadImage(_getFullImageSrc(diagramm.img), 1);
-        if (null != _image)
-        {
-            this.WordControl.m_oLogicDocument.Add_InlineImage( this.WordControl.m_oLogicDocument.DrawingDocument.GetMMPerDot(diagramm.width),
-																this.WordControl.m_oLogicDocument.DrawingDocument.GetMMPerDot(diagramm.height), null, diagramm );
-        }
-        else
-        {
-            this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
-            this.asyncImageEndLoaded2 = function(_image)
-            {
-                this.WordControl.m_oLogicDocument.Add_InlineImage( this.WordControl.m_oLogicDocument.DrawingDocument.GetMMPerDot(diagramm.width),
-																	this.WordControl.m_oLogicDocument.DrawingDocument.GetMMPerDot(diagramm.height), null, diagramm);
-                this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
-            }
-        }
-    }*/
+    /**/
 	
 	// Приводим бинарик к объекту типа CChartAsGroup и добавляем объект
 	if ( isObject(chartBinary) )
 	{
 		var binary = chartBinary["binary"];
+        if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
+        {
+            History.Create_NewPoint();
+            this.WordControl.m_oLogicDocument.Add_InlineImage( null, null, null, binary );
+        }
 	}
 }
 
 asc_docs_api.prototype.asc_editChartDrawingObject = function(chartBinary)
 {
-    /*if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
-    {
-        History.Create_NewPoint();
-        var diagramm = new CChartData(true);
-        diagramm.deserializeChart(chart);
-		diagramm.putToHistory();
-
-        var _image = this.ImageLoader.LoadImage(_getFullImageSrc(diagramm.img), 1);
-        if (null != _image)
-        {
-            this.WordControl.m_oLogicDocument.Edit_Chart( diagramm );
-        }
-        else
-        {
-            this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
-            this.asyncImageEndLoaded2 = function(_image)
-            {
-                this.WordControl.m_oLogicDocument.Edit_Chart( diagramm );
-                this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
-            }
-        }
-    }*/
+    /**/
 	
 	// Находим выделенную диаграмму и накатываем бинарник
 	if ( isObject(chartBinary) )
 	{
 		var binary = chartBinary["binary"];
+        if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
+        {
+            History.Create_NewPoint();
+            this.WordControl.m_oLogicDocument.Edit_Chart(binary);
+        }
 	}
 }
 
