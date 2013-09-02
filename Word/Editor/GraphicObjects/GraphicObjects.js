@@ -1037,9 +1037,9 @@ CGraphicObjects.prototype =
                 {
                     var para_drawing = gr_objects[i];
 
-                    para_drawing.GraphicObj.setAbsoluteTransform(null, null,this.drawingDocument.GetMMPerDot(chart.width), this.drawingDocument.GetMMPerDot(chart.height), null, false, false);
+                   /* para_drawing.GraphicObj.setAbsoluteTransform(null, null,this.drawingDocument.GetMMPerDot(chart.width), this.drawingDocument.GetMMPerDot(chart.height), null, false, false);
                     para_drawing.GraphicObj.setXfrm(null, null, this.drawingDocument.GetMMPerDot(chart.width), this.drawingDocument.GetMMPerDot(chart.height), null, false, false);
-                    para_drawing.GraphicObj.calculateAfterResize();
+                    para_drawing.GraphicObj.calculateAfterResize();      */
                     para_drawing.GraphicObj.chartModify(chart);
                     if(para_drawing.Is_Inline())
                     {
@@ -1092,6 +1092,11 @@ CGraphicObjects.prototype =
                 return selected_arr[i].GraphicObj;
         }
 
+        var ret = new CChartAsGroup();
+        ret.spPr.xfrm.offX = 0;
+        ret.spPr.xfrm.offY = 0;
+        ret.spPr.xfrm.extX = 50;
+        ret.spPr.xfrm.extY = 50;
         return new CChartAsGroup();
     },
 
@@ -3105,6 +3110,8 @@ CGraphicObjects.prototype =
                 break;
             }
             case STATES_ID_CHART:
+            case STATES_ID_PRE_MOVE_CHART_TITLE:
+            case STATES_ID_MOVE_CHART_TITLE:
             {
                 var chart = this.curState.chart.GraphicObj;
                 var title = null;

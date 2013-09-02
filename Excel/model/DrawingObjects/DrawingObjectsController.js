@@ -1191,7 +1191,7 @@ DrawingObjectsController.prototype =
 			{
 				//if (false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : this.curState.group.parent.Parent, CheckType : changestype_Paragraph_Content} ))
 				{
-					ArrGlyph = this.curState.group.selectionInfo.selectionArray;
+					ArrGlyph = this.curState.group.selectedObjects;
 					var b_change_diagram = false;
 					for (i = 0;  i< ArrGlyph.length; ++i)
 					{

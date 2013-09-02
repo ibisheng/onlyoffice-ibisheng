@@ -1120,7 +1120,9 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
 
     this.drawSelection = function(drawingDocument)
     {
-        drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.chart.transform, 0, 0, this.chart.extX, this.chart.extY, false);
+
+        DrawChartSelection(this.chart, drawingDocument);
+
     };
 
     this.isPointInDrawingObjects = function(x, y)
@@ -1349,8 +1351,9 @@ function ChartTextAdd(drawingObjectsController, drawingObjects, chart, textObjec
 
     this.drawSelection = function(drawingDocument)
     {
-        DrawDefaultSelection(this.drawingObjectsController, drawingDocument);
+        //DrawDefaultSelection(this.drawingObjectsController, drawingDocument);
         //this.textObject.updateSelectionState(drawingDocument);
+        DrawChartTextSelection(this.chart, this.textObject, drawingDocument);
     };
 
     this.isPointInDrawingObjects = function(x, y)
@@ -4375,7 +4378,8 @@ function DrawDefaultSelection(drawingObjectsController, drawingDocument)
     var selected_objects = drawingObjectsController.selectedObjects;
     for(var i = 0; i < selected_objects.length; ++i)
     {
-        drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, selected_objects[i].getTransform(), 0, 0, selected_objects[i].extX, selected_objects[i].extY, false/*, selected_objects[i].canRotate()TODO*/);
+        var canRotate = selected_objects[i].canRotate ? selected_objects[i].canRotate() : false;
+        drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, selected_objects[i].getTransform(), 0, 0, selected_objects[i].extX, selected_objects[i].extY,false, canRotate);
     }
     if(selected_objects.length === 1)
     {
@@ -4385,16 +4389,40 @@ function DrawDefaultSelection(drawingObjectsController, drawingDocument)
 
 function DrawGroupSelection(group, drawingDocument)
 {
-    drawingDocument.DrawTrack(TYPE_TRACK_GROUP_PASSIVE, group.getTransform(), 0, 0, group.extX, group.extY, false/*, selected_objects[i].canRotate()TODO*/);
+    var canRotate = group.canRotate ? group.canRotate() : false;
+    drawingDocument.DrawTrack(TYPE_TRACK_GROUP_PASSIVE, group.getTransform(), 0, 0, group.extX, group.extY, false, canRotate);
     var group_selected_objects = group.selectedObjects;
     for(var i = 0; i < group_selected_objects.length; ++i)
     {
-        drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, group_selected_objects[i].getTransform(), 0, 0, group_selected_objects[i].extX, group_selected_objects[i].extY, false/*, selected_objects[i].canRotate()TODO*/)
+        var canRotate = group_selected_objects[i].canRotate ? group_selected_objects[i].canRotate() : false;
+
+        drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, group_selected_objects[i].getTransform(), 0, 0, group_selected_objects[i].extX, group_selected_objects[i].extY, false, canRotate)
     }
     if(group_selected_objects.length === 1)
     {
         group_selected_objects[0].drawAdjustments(drawingDocument);
     }
+}
+
+function DrawChartSelection(chart, drawingDocument)
+{
+    var canRotate = false;
+    drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, chart.getTransform(), 0, 0, chart.extX, chart.extY, false, canRotate);
+
+    if(chart.chartTitle && chart.chartTitle.selected)
+        drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, chart.chartTitle.transform, 0, 0, chart.chartTitle.extX, chart.chartTitle.extY, false, canRotate);
+    if(chart.hAxisTitle && chart.hAxisTitle.selected)
+        drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, chart.hAxisTitle.transform, 0, 0, chart.hAxisTitle.extX, chart.hAxisTitle.extY, false, canRotate);
+
+    if(chart.vAxisTitle && chart.vAxisTitle.selected)
+        drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, chart.vAxisTitle.transform, 0, 0, chart.vAxisTitle.extX, chart.vAxisTitle.extY, false, canRotate);
+}
+
+function DrawChartTextSelection(chart, textObject, drawingDocument)
+{
+    var canRotate = false;
+    drawingDocument.DrawTrack(TYPE_TRACK_GROUP_PASSIVE, chart.getTransform(), 0, 0, chart.extX, chart.extY, false, canRotate);
+    drawingDocument.DrawTrack(TYPE_TRACK_TEXT, textObject.transform, 0, 0, textObject.extX, textObject.extY, false, canRotate);
 }
 
 function DefaultKeyDownHandle(drawingObjectsController, e)

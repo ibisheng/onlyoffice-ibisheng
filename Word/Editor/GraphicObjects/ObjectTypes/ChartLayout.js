@@ -33,14 +33,12 @@ CChartLayout.prototype =
 
     setYMode: function(mode)
     {
-
         this.yMode = mode;
     },
 
 
     setX: function(x)
     {
-
         this.x = x;
     },
 
@@ -106,6 +104,91 @@ CChartLayout.prototype =
                 break;
             }
         }
-    }
+    },
 
+
+
+    writeToBinary: function(w)
+    {
+        w.WriteBool(isRealNumber(this.layoutTarget));
+        if(isRealNumber(this.layoutTarget))
+            w.WriteLong(this.layoutTarget);
+
+
+        w.WriteBool(isRealNumber(this.xMode));
+        if(isRealNumber(this.xMode))
+            w.WriteLong(this.xMode);
+
+
+        w.WriteBool(isRealNumber(this.yMode));
+
+        if(isRealNumber(this.yMode))
+            w.WriteLong(this.yMode);
+
+        w.WriteBool(isRealNumber(this.wMode));
+
+        if(isRealNumber(this.wMode))
+            w.WriteLong(this.wMode);
+
+        w.WriteBool(isRealNumber(this.hMode));
+
+        if(isRealNumber(this.hMode))
+            w.WriteLong(this.hMode);
+
+
+        w.WriteBool(isRealNumber(this.x));
+
+        if(isRealNumber(this.x))
+            w.WriteDouble(this.x);
+
+        w.WriteBool(isRealNumber(this.y));
+
+        if(isRealNumber(this.y))
+            w.WriteDouble(this.y);
+
+        w.WriteBool(isRealNumber(this.w));
+
+        if(isRealNumber(this.w))
+            w.WriteDouble(this.w);
+
+        w.WriteBool(isRealNumber(this.h));
+
+        if(isRealNumber(this.h))
+            w.WriteDouble(this.h);
+    },
+
+    readFromBinary: function(r)
+    {
+        if(r.GetBool())
+            this.layoutTarget = r.GetLong();
+
+
+        if(r.GetBool())
+            this.xMode = r.GetLong();
+
+
+        if(r.GetBool())
+            this.yMode = r.GetLong();
+
+
+        if(r.GetBool())
+            this.wMode = r.GetLong();
+
+
+        if(r.GetBool())
+            this.hMode = r.GetLong();
+
+
+        if(r.GetBool())
+            this.x = r.GetDouble();
+
+        if(r.GetBool())
+            this.y = r.GetDouble();
+
+        if(r.GetBool())
+            this.w = r.GetDouble();
+
+        if(r.GetBool())
+            this.h = r.GetDouble();
+    }
 };

@@ -21,12 +21,12 @@ function CTextBody(shape)
     this.contentHeight = 0;
 
     this.styles = [];
-    this.Id = g_oIdCounter.Get_NewId();
-    g_oTableId.Add(this, this.Id);
+    //this.Id = g_oIdCounter.Get_NewId();
+    //g_oTableId.Add(this, this.Id);
     if(isRealObject(shape))
     {
         this.setShape(shape);
-        this.addDocumentContent(new CDocumentContent(this, isRealObject(shape.drawingObjects) ? shape.drawingObjects.drawingDocument : null, 0, 0, 200, 20000, false, false));
+        this.addDocumentContent(new CDocumentContent(this, editor.WordControl.m_oLogicDocument.DrawingDocument, 0, 0, 200, 20000, false, false));
     }
 
 }
@@ -78,7 +78,7 @@ CTextBody.prototype =
         {
             if(typeof pageIndex === "number")
             {
-                var old_start_page = this.textBoxContent.Get_StartPage_Relative();
+                var old_start_page = this.content.Get_StartPage_Relative();
                 this.content.Set_StartPage(pageIndex);
             }
             var result_page_index = typeof pageIndex === "number" ? pageIndex : this.shape.pageIndex;

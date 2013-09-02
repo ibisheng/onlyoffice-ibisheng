@@ -1,8 +1,10 @@
 
-function CChartAsGroup(drawingBase, drawingObjects)
+function CChartAsGroup(parent/*(WordGraphicObject)*/, document, drawingDocument, group)
 {
-    this.drawingBase = drawingBase;
-    this.drawingObjects = drawingObjects;
+    this.parent = parent;
+    this.document = document;
+    this.drawingDocument = drawingDocument;
+    this.group = isRealObject(group) ? group : null;
 
     this.chartTitle = null;
     this.vAxisTitle = null;
@@ -12,6 +14,8 @@ function CChartAsGroup(drawingBase, drawingObjects)
 
     this.brush = new CBlipFill();
     this.spPr = new CSpPr();
+
+
 
     this.x = null;
     this.y = null;
@@ -653,82 +657,7 @@ CChartAsGroup.prototype =
         }
     },
 
-    initFromChartObject: function(chart, options)
-    {
-        this.setChart(chart);
-        this.spPr.xfrm = new CXfrm();
-        var xfrm = this.spPr.xfrm;
-        var chartLeft = this.drawingObjects.convertMetric(options && options.left ? ptToPx(options.left) : (parseInt($("#ws-canvas").css('width')) / 2) - c_oAscChartDefines.defaultChartWidth / 2, 0, 3);
-        var chartTop = this.drawingObjects.convertMetric(options && options.top ? ptToPx(options.top) : (parseInt($("#ws-canvas").css('height')) / 2) - c_oAscChartDefines.defaultChartHeight / 2, 0, 3);
-        xfrm.setPosition(chartLeft, chartTop);
-        var w = this.drawingObjects.convertMetric(c_oAscChartDefines.defaultChartWidth, 0, 3), h = this.drawingObjects.convertMetric(c_oAscChartDefines.defaultChartHeight, 0, 3);
-        if(isRealObject(options))
-        {
-            if(isRealNumber(options.width) && isRealNumber(options.height))
-            {
-                w = this.drawingObjects.convertMetric(options.width, 0, 3);
-                h = this.drawingObjects.convertMetric(options.height, 0, 3);
-            }
-        }
-        xfrm.setExtents(w, h);
-        if(isRealObject(this.chart.header))
-        {
-            var title_string;
-            if(this.chart.header.bDefaultTitle || !(typeof this.chart.header.title === "string"))
-                title_string = "Chart Title";
-            else
-                title_string = this.chart.header.title;
 
-            this.setChartTitle(new CChartTitle(this, CHART_TITLE_TYPE_TITLE));
-            this.chartTitle.setTextBody(new CTextBody(this.chartTitle));
-            for(var i in title_string)
-                this.chartTitle.txBody.content.Paragraph_Add(new ParaText(title_string[i]), false);
-        }
-
-        if(isRealObject(this.chart.xAxis) && this.chart.xAxis.bShow)
-        {
-            if(this.chart.xAxis.bDefaultTitle || !(typeof this.chart.xAxis.title === "string"))
-                title_string = "X Axis";
-            else
-                title_string = this.chart.xAxis.title;
-
-            this.setXAxisTitle(new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS));
-            this.hAxisTitle.setTextBody(new CTextBody(this.hAxisTitle));
-            for(var i in title_string)
-                this.hAxisTitle.txBody.content.Paragraph_Add(new ParaText(title_string[i]), false);
-
-
-            this.chart.xAxis.bDefaultTitle = false;
-            this.chart.xAxis.bShow = false;
-            this.chart.xAxis.title = "";
-        }
-
-        if(isRealObject(this.chart.yAxis) && this.chart.yAxis.bShow)
-        {
-            if(this.chart.yAxis.bDefaultTitle || !(typeof this.chart.yAxis.title === "string"))
-                title_string = "Y Axis";
-            else
-                title_string = this.chart.yAxis.title;
-
-            this.setYAxisTitle(new CChartTitle(this, CHART_TITLE_TYPE_V_AXIS));
-            this.vAxisTitle.setTextBody(new CTextBody(this.vAxisTitle));
-            for(var i in title_string)
-                this.vAxisTitle.txBody.content.Paragraph_Add(new ParaText(title_string[i]), false);
-
-
-            this.chart.yAxis.bDefaultTitle = false;
-            this.chart.yAxis.bShow = false;
-            this.chart.yAxis.title = "";
-        }
-
-        this.init();
-        this.addToDrawingObjects();
-    },
-
-    setDrawingBase: function(drawingBase)
-    {
-        this.drawingBase = drawingBase;
-    },
 
 
     setChartTitle: function(chartTitle)
@@ -1093,6 +1022,17 @@ CChartAsGroup.prototype =
             this.brush.fill.RasterImageId = (new ChartRender()).insertChart(this.chart, null, this.drawingDocument.GetDotsPerMM(this.absExtX), this.drawingDocument.GetDotsPerMM(this.absExtY));
             editor.WordControl.m_oLogicDocument.DrawingObjects.urlMap.push(this.brush.fill.RasterImageId);
         }
+    },
+
+    initFromBinary: function(binary)
+    {
+        this.setChartBinary(binary);
+    },
+
+    chartModify: function(chart)
+    {
+        this.setChartBinary(chart);
+        this.calculateAfterResize();
     },
 
     init: function()
@@ -1885,9 +1825,13 @@ CChartAsGroup.prototype =
         }
         this.chart.Read_FromBinary2(r);
         this.spPr.Read_FromBinary2(r);
+        if(isRealObject(this.parent))
+        {
+            this.parent.Extent.W = this.spPr.xfrm.extX;
+            this.parent.Extent.H = this.spPr.xfrm.extY;
+        }
         this.init();
         this.recalculate();
-        this.addToDrawingObjects();
     }
 };
 

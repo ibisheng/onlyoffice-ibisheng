@@ -712,7 +712,7 @@ CAutoshapeTrack.prototype =
     /*************************************************************************/
     /******************************** TRACKS *********************************/
     /*************************************************************************/
-    DrawTrack : function(type, matrix, left, top, width, height, isLine)
+    DrawTrack : function(type, matrix, left, top, width, height, isLine, isCanRotate)
     {
         // с самого начала нужно понять, есть ли поворот. Потому что если его нет, то можно
         // (и нужно!) рисовать все по-умному
@@ -796,7 +796,7 @@ CAutoshapeTrack.prototype =
 
                     var xC = ((x1 + x2) / 2) >> 0;
 
-                    if (!isLine)
+                    if (!isLine && isCanRotate)
                     {
                         ctx.moveTo(xC + 0.5, y1);
                         ctx.lineTo(xC + 0.5, y1 - TRACK_DISTANCE_ROTATE);
@@ -830,7 +830,7 @@ CAutoshapeTrack.prototype =
                     ctx.fill();
                     ctx.stroke();
 
-                    if (!isLine)
+                    if (!isLine && isCanRotate)
                     {
                         ctx.beginPath();
                         overlay.AddEllipse(xC, y1 - TRACK_DISTANCE_ROTATE, TRACK_CIRCLE_RADIUS);
@@ -869,7 +869,7 @@ CAutoshapeTrack.prototype =
                     var xc1 = (x1 + x2) / 2;
                     var yc1 = (y1 + y2) / 2;
 
-                    if (!isLine)
+                    if (!isLine && isCanRotate)
                     {
                         ctx.beginPath();
 
@@ -902,7 +902,7 @@ CAutoshapeTrack.prototype =
                     ctx.fill();
                     ctx.stroke();
 
-                    if (!isLine)
+                    if (!isLine && isCanRotate)
                     {
                         ctx.beginPath();
                         overlay.AddEllipse(xc1 + ex2 * TRACK_DISTANCE_ROTATE, yc1 + ey2 * TRACK_DISTANCE_ROTATE, TRACK_CIRCLE_RADIUS);
@@ -928,11 +928,16 @@ CAutoshapeTrack.prototype =
                     ctx.strokeStyle = _style_blue;
                     ctx.stroke();
 
-                    var xC = ((x1 + x2) / 2) >> 0;
-                    ctx.moveTo(xC + 0.5, y1);
-                    ctx.lineTo(xC + 0.5, y1 - TRACK_DISTANCE_ROTATE);
+                    if (isCanRotate)
+                    {
+                        ctx.beginPath();
 
-                    ctx.stroke();
+                        var xC = ((x1 + x2) / 2) >> 0;
+                        ctx.moveTo(xC + 0.5, y1);
+                        ctx.lineTo(xC + 0.5, y1 - TRACK_DISTANCE_ROTATE);
+
+                        ctx.stroke();
+                    }
 
                     ctx.beginPath();
 
@@ -957,12 +962,15 @@ CAutoshapeTrack.prototype =
                     ctx.fill();
                     ctx.stroke();
 
-                    ctx.beginPath();
-                    overlay.AddEllipse(xC, y1 - TRACK_DISTANCE_ROTATE, TRACK_CIRCLE_RADIUS);
+                    if (isCanRotate)
+                    {
+                        ctx.beginPath();
+                        overlay.AddEllipse(xC, y1 - TRACK_DISTANCE_ROTATE, TRACK_CIRCLE_RADIUS);
 
-                    ctx.fillStyle = _style_green;
-                    ctx.fill();
-                    ctx.stroke();
+                        ctx.fillStyle = _style_green;
+                        ctx.fill();
+                        ctx.stroke();
+                    }
 
                     ctx.beginPath();
                 }
@@ -983,14 +991,18 @@ CAutoshapeTrack.prototype =
                     var ex2 = (x1 - x3) / _len_y;
                     var ey2 = (y1 - y3) / _len_y;
 
-                    ctx.beginPath();
-
                     var xc1 = (x1 + x2) / 2;
                     var yc1 = (y1 + y2) / 2;
-                    ctx.moveTo(xc1, yc1);
-                    ctx.lineTo(xc1 + ex2 * TRACK_DISTANCE_ROTATE, yc1 + ey2 * TRACK_DISTANCE_ROTATE);
 
-                    ctx.stroke();
+                    if (isCanRotate)
+                    {
+                        ctx.beginPath();
+
+                        ctx.moveTo(xc1, yc1);
+                        ctx.lineTo(xc1 + ex2 * TRACK_DISTANCE_ROTATE, yc1 + ey2 * TRACK_DISTANCE_ROTATE);
+
+                        ctx.stroke();
+                    }
 
                     ctx.beginPath();
 
@@ -1012,12 +1024,15 @@ CAutoshapeTrack.prototype =
                     ctx.fill();
                     ctx.stroke();
 
-                    ctx.beginPath();
-                    overlay.AddEllipse(xc1 + ex2 * TRACK_DISTANCE_ROTATE, yc1 + ey2 * TRACK_DISTANCE_ROTATE, TRACK_CIRCLE_RADIUS);
+                    if (isCanRotate)
+                    {
+                        ctx.beginPath();
+                        overlay.AddEllipse(xc1 + ex2 * TRACK_DISTANCE_ROTATE, yc1 + ey2 * TRACK_DISTANCE_ROTATE, TRACK_CIRCLE_RADIUS);
 
-                    ctx.fillStyle = _style_green;
-                    ctx.fill();
-                    ctx.stroke();
+                        ctx.fillStyle = _style_green;
+                        ctx.fill();
+                        ctx.stroke();
+                    }
 
                     ctx.beginPath();
                 }
@@ -1150,12 +1165,6 @@ CAutoshapeTrack.prototype =
                     ctx.beginPath();
                 }
 
-                break;
-            }
-            case TYPE_TRACK_LOCK_SHAPE:
-            {
-                var _offset_eps = 5;
-				// TODO:
                 break;
             }
 

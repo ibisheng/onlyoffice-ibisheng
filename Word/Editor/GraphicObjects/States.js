@@ -1631,6 +1631,7 @@ function handleChart(paraDrawing, graphicObjects, x, y, e, pageIndex)
                 cur_title.selected = true;
                 graphicObjects.arrPreTrackObjects.push(new MoveTitleInChart(cur_title));
                 graphicObjects.changeCurrentState(new PreMoveChartTitleState(graphicObjects, cur_title, paraDrawing, x, y, pageIndex));
+                editor.WordControl.OnUpdateOverlay();
                 return true;
             }
             else
@@ -1643,12 +1644,16 @@ function handleChart(paraDrawing, graphicObjects, x, y, e, pageIndex)
                     graphicObjects.changeCurrentState(new TextAddInChartTitle(graphicObjects, paraDrawing, cur_title));
                     cur_title.selectionSetStart(e, x, y, pageIndex);
                     graphicObjects.updateSelectionState();
+                    editor.WordControl.OnUpdateOverlay();
                     return true;
                 }
                 else if(hit)
                 {
                     graphicObjects.arrPreTrackObjects.push(new MoveTitleInChart(cur_title));
                     graphicObjects.changeCurrentState(new PreMoveChartTitleState(graphicObjects, cur_title, paraDrawing, x, y, pageIndex));
+                    editor.WordControl.OnUpdateOverlay();
+
+
                     return true;
                 }
             }
@@ -1658,9 +1663,12 @@ function handleChart(paraDrawing, graphicObjects, x, y, e, pageIndex)
             if(hit && !hit_in_text_rect)
             {
                 paraDrawing.select(pageIndex);
+                cur_title.select();
                 graphicObjects.selectionInfo.selectionArray.push(paraDrawing);
                 graphicObjects.arrPreTrackObjects.push(new MoveTitleInChart(cur_title));
                 graphicObjects.changeCurrentState(new PreMoveChartTitleState(graphicObjects, cur_title, paraDrawing, x, y, pageIndex));
+                editor.WordControl.OnUpdateOverlay();
+
                 return true;
             }
             else if(hit_in_text_rect)
@@ -1671,6 +1679,7 @@ function handleChart(paraDrawing, graphicObjects, x, y, e, pageIndex)
                 graphicObjects.changeCurrentState(new TextAddInChartTitle(graphicObjects, paraDrawing, cur_title));
                 cur_title.selectionSetStart(e, x, y, pageIndex);
                 graphicObjects.updateSelectionState();
+                editor.WordControl.OnUpdateOverlay();
                 return true;
             }
         }
@@ -4365,7 +4374,10 @@ function PreMoveChartTitleState(graphicObjects, title, chart, startX, startY, st
 
     };
     this.OnMouseUp = function(e, x, y, pageIndex)
-    {};
+    {
+        this.graphicObjects.arrPreTrackObjects = [];
+        this.graphicObjects.changeCurrentState(new ChartState(this.graphicObjects, this.chart));
+    };
 
     this.updateCursorType = function(pageIndex, x, y, e, bTextFlag)
     {
