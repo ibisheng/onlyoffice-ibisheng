@@ -1746,6 +1746,11 @@ asc_docs_api.prototype.asc_addDropCap = function(bInText)
     this.WordControl.m_oLogicDocument.Add_DropCap( bInText );
 }
 
+asc_docs_api.prototype.removeDropcap = function(bDropCap)
+{
+    this.WordControl.m_oLogicDocument.Remove_DropCap( bDropCap );
+}
+
 function CParagraphProp (obj)
 {
 	if (obj)
