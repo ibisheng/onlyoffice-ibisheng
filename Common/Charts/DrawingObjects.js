@@ -306,6 +306,8 @@ asc_CChart.prototype = {
 		var nameIndex = 1;
 		var api = window["Asc"]["editor"];
 		
+		//var revSeries = _t.getReverseSeries();
+		
 		// Save old series colors
 		var oldSeriaData = [];
 		for ( var i = 0; i < _t.series.length; i++ ) {
@@ -479,6 +481,9 @@ asc_CChart.prototype = {
 		var _t = this;
 		var revSeries = [];
 		var serLen = _t.series.length;
+		var api_doc = window["editor"];
+		var api_sheet = window["Asc"]["editor"];
+		var api = api_sheet ? api_sheet : api_doc;
 		
 		if ( serLen ) {
 			for (var i = 0; i < _t.series[0].Val.NumCache.length; i++) {
@@ -492,6 +497,8 @@ asc_CChart.prototype = {
 					
 					if ( _t.series[j].Cat.Formula && _t.series[j].Cat.NumCache.length )
 						seria.TxCache.Tx = _t.series[j].Cat.NumCache[i].val;
+					else
+						seria.TxCache.Tx = api.chartTranslate.series + " " + i;
 				}
 				revSeries.push(seria);
 			}
