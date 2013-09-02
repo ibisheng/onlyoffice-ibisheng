@@ -925,7 +925,10 @@ function CAscShapeProp()
     this.type = null; // custom
     this.fill = null;
     this.stroke = null;
+    this.Locked = null;
 }
+CAscShapeProp.prototype.get_Locked = function(){return this.Locked}
+CAscShapeProp.prototype.put_Locked = function(v){this.Locked = v;}
 CAscShapeProp.prototype.get_type = function(){return this.type}
 CAscShapeProp.prototype.put_type = function(v){this.type = v;}
 CAscShapeProp.prototype.get_fill = function(){return this.fill}
@@ -1066,6 +1069,7 @@ function CImgProperty( obj )
         this.Position = (undefined != obj.Position && null != obj.Position) ? new CPosition (obj.Position) : null;
 
         this.ImageUrl = (undefined != obj.ImageUrl) ? obj.ImageUrl : null;
+        this.IsLocked = obj.IsLocked === true || obj.IsLocked === false ? obj.IsLocked : false;
     }
     else
     {
@@ -1075,11 +1079,14 @@ function CImgProperty( obj )
         this.Paddings = new CPaddings ();	// default values
         this.Position = new CPosition ();	// default values
         this.ImageUrl = null;
+        this.IsLocked = false;
     }
 }
 
 CImgProperty.prototype.get_Width = function() { return this.Width; }
 CImgProperty.prototype.put_Width = function(v) { this.Width = v; }
+CImgProperty.prototype.get_Locked = function() { return this.IsLocked; }
+CImgProperty.prototype.put_Locked = function(v) { this.IsLocked = v; }
 CImgProperty.prototype.get_Height = function() { return this.Height; }
 CImgProperty.prototype.put_Height = function(v) { this.Height = v; }
 CImgProperty.prototype.get_WrappingStyle = function() { return this.WrappingStyle; }

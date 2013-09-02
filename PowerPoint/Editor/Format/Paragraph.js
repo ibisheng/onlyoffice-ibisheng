@@ -10350,13 +10350,7 @@ Paragraph.prototype =
                 cur_parent = cur_parent.Parent.Row.Table.Parent;
             }
         }
-        if(cur_parent.Parent instanceof WordShape)
-        {
-            if(isRealObject(cur_parent.Parent.transformText))
-            {
-                text_transform = cur_parent.Parent.transformText;
-            }
-        }
+
         var MMData = new CMouseMoveData();
         var Coords = this.DrawingDocument.ConvertCoordsToCursorWR( X, Y, this.Get_StartPage_Absolute() + ( PageIndex - this.PageNum ), text_transform );
         MMData.X_abs = Coords.X;

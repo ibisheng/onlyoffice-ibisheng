@@ -6807,7 +6807,7 @@ function CompareImageProperties(imgProps1, imgProps2)
     {
         _result_image_properties = imgProps1.ImageUrl;
     }
-
+    _result_image_properties.IsLocked = imgProps1.IsLocked === true || imgProps2.IsLocked === true;
     return _result_image_properties;
 }
 

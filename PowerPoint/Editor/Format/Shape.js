@@ -1759,6 +1759,30 @@ CShape.prototype =
         }
     },
 
+    updateCursorType: function(x, y, e)
+    {
+       var tx = this.invertTransformText.TransformPointX(x, y);
+       var ty = this.invertTransformText.TransformPointY(x, y);
+        this.txBody.content.Update_CursorType(tx, ty, 0)
+    },
+
+
+    sendMouseData: function()
+    {
+        if ( true === this.Lock.Is_Locked() )
+        {
+            var MMData = new CMouseMoveData();
+            var Coords = editor.WordControl.m_oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(this.x, this.y, this.parent.num, null);
+            MMData.X_abs            = Coords.X - 5;
+            MMData.Y_abs            = Coords.Y;
+            MMData.Type             = c_oAscMouseMoveDataTypes.LockedObject;
+            MMData.UserId           = this.Lock.Get_UserId();
+            MMData.HaveChanges      = this.Lock.Have_Changes();
+            MMData.LockedObjectType = 0;
+            editor.sync_MouseMoveCallback( MMData );
+        }
+    },
+
     selectionSetStart: function(e, x, y, slideIndex)
     {
         if(isRealObject(this.txBody))

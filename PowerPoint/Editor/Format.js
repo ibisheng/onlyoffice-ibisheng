@@ -1433,6 +1433,7 @@ function CompareShapeProperties(shapeProp1, shapeProp2)
         _result_shape_prop.canChangeArrows = true;
 
     _result_shape_prop.fill = CompareUniFill(shapeProp1.fill, shapeProp2.fill);
+    _result_shape_prop.IsLocked = shapeProp1.IsLocked === true || shapeProp2.IsLocked === true;
     return _result_shape_prop;
 }
 

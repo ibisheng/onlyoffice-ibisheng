@@ -1084,6 +1084,8 @@ var changestype_Drawing_Props        = 51; // Изменение свойств 
 var changestype_ColorScheme          = 60; // Изменение свойств фигуры
 var changestype_Text_Props           = 61; // Изменение свойств фигуры
 var changestype_RemoveSlide          = 62; // Изменение свойств фигуры
+var changestype_PresentationProps    = 63; // Изменение темы, цветовой схемы, размера слайда;
+
 
 
 

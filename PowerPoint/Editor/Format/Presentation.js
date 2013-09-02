@@ -348,7 +348,7 @@ function CPresentation(DrawingDocument)
     this.notes        = [];
     this.globalTableStyles = [];
 
-
+    this.updateSlideIndex = false;
     this.recalcMap = {};
 
     this.forwardChangeThemeTimeOutId = null;
@@ -562,9 +562,26 @@ CPresentation.prototype =
             if(isRealObject(this.recalcMap[i]) && typeof this.recalcMap[i].recalculate === "function")
                 this.recalcMap[i].recalculate();
         }
+
+
+
         this.recalcMap = {};
+
+        if(this.updateSlideIndex)
+        {
+
+        }
+
         this.DrawingDocument.OnRecalculatePage( this.CurPage, this.Slides[this.CurPage] );
         this.DrawingDocument.OnEndRecalculate();
+    },
+
+    updateSlideIndexes: function()
+    {
+        for(var i = 0; i < this.Slides.length; ++i)
+        {
+            this.Slides[i].changeNum(i);
+        }
     },
 
 
@@ -2853,6 +2870,9 @@ CPresentation.prototype =
 
     Update_CursorType : function( X, Y, PageIndex, MouseEvent )
     {
+        editor.sync_MouseMoveStartCallback();
+        this.Slides[this.CurPage].graphicObjects.Update_CursorType( X, Y,  MouseEvent );
+        editor.sync_MouseMoveEndCallback();
         return;
         editor.sync_MouseMoveStartCallback();
 
@@ -3842,6 +3862,7 @@ CPresentation.prototype =
     {
         this.CurPage = PageIndex;
         this.Slides[this.CurPage].onMouseMove(e, X, Y);
+        this.Update_CursorType( X, Y, PageIndex, e );
         return;
         return;
         if ( PageIndex < 0 )
@@ -5179,9 +5200,6 @@ CPresentation.prototype =
 
     Document_UpdateUndoRedoState : function()
     {
-        return ;
-        // TODO: Возможно стоит перенсти эту проверку в класс CHistory и присылать
-        //       данные события при изменении значения History.Index
 
         // Проверяем состояние Undo/Redo
         editor.sync_CanUndoCallback( this.History.Can_Undo() );
@@ -6179,14 +6197,14 @@ CPresentation.prototype =
             return true;
 
         var cur_slide = this.Slides[this.CurPage];
-        var slide_id = cur_slide.Get_Id();
+        var slide_id = cur_slide.deleteLock.Get_Id();
 
 
         CollaborativeEditing.OnStart_CheckLock();
 
         if(CheckType === changestype_Drawing_Props)
         {
-            if(cur_slide.Lock.Type !== locktype_Mine && cur_slide.Lock.Type !== locktype_None)
+            if(cur_slide.deleteLock.Lock.Type !== locktype_Mine && cur_slide.deleteLock.Lock.Type !== locktype_None)
                 return true;
             var selected_objects = cur_slide.graphicObjects.selectedObjects;
             for(var i = 0; i < selected_objects.length; ++i)
@@ -6204,7 +6222,7 @@ CPresentation.prototype =
 
         if(CheckType === changestype_Text_Props)
         {
-            if(cur_slide.Lock.Type !== locktype_Mine && cur_slide.Lock.Type !== locktype_None)
+            if(cur_slide.deleteLock.Lock.Type !== locktype_Mine && cur_slide.deleteLock.Lock.Type !== locktype_None)
                 return true;
             var selected_objects = cur_slide.graphicObjects.selectedObjects;
             for(var i = 0; i < selected_objects.length; ++i)
@@ -6236,10 +6254,10 @@ CPresentation.prototype =
                 var check_obj =
                 {
                     "type": c_oAscLockTypeElemPresentation.Slide,
-                    "val": this.Slides[selected_slides[i]].Get_Id(),
-                    "guid": this.Slides[selected_slides[i]].Get_Id()
+                    "val": this.Slides[selected_slides[i]].deleteLock.Get_Id(),
+                    "guid": this.Slides[selected_slides[i]].deleteLock.Get_Id()
                 };
-                this.Slides[selected_slides[i]].Lock.Check(check_obj);
+                this.Slides[selected_slides[i]].deleteLock.Lock.Check(check_obj);
             }
         }
         var bResult = CollaborativeEditing.OnEnd_CheckLock();

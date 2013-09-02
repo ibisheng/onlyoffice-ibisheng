@@ -950,10 +950,24 @@ function Slide(presentation, slideLayout, slideNum)
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 
+    if(presentation)
+    {
+        this.setLocks(new PropLocker(), new PropLocker(), new PropLocker(), new PropLocker(), new PropLocker());
+    }
 }
 
 Slide.prototype =
 {
+    setLocks: function(deleteLock, backgroundLock, timingLock, transitionLock, layoutLock)
+    {
+        this.deleteLock = deleteLock;
+        this.backgroundLock = backgroundLock;
+        this.timingLock = timingLock;
+        this.transitionLock = transitionLock;
+        this.layoutLock = layoutLock;
+        History.Add(this, {Type: historyitem_AddSlideLocks, deleteLock: deleteLock.Get_Id(), backgroundLock: backgroundLock.Get_Id(), timingLock: timingLock.Get_Id(),
+            transitionLock: transitionLock.Get_Id(), layoutLock: layoutLock.Get_Id()})
+    },
 
     recalcAll: function()
     {
@@ -1396,6 +1410,15 @@ Slide.prototype =
                 this.cSld.spTree.splice(data.pos, 1);
                 break;
             }
+            case historyitem_AddSlideLocks:
+            {
+                this.deleteLock    = null;
+                this.backgroundLock = null;
+                this.timingLock    = null;
+                this.transitionLock = null;
+                this.layoutLock    = null;
+                break;
+            }
         }
     },
 
@@ -1413,6 +1436,15 @@ Slide.prototype =
                 this.cSld.spTree.splice(data.pos, 0, g_oTableId.Get_ById(data.objectId));
                 break;
             }
+            case historyitem_AddSlideLocks:
+            {
+                this.deleteLock     = g_oTableId.Get_ById(data.deleteLock);
+                this.backgroundLock = g_oTableId.Get_ById(data.backgroundLock);
+                this.timingLock     = g_oTableId.Get_ById(data.timingLock);
+                this.transitionLock = g_oTableId.Get_ById(data.transitionLock);
+                this.layoutLock     = g_oTableId.Get_ById(data.layoutLock);
+                break;
+            }
         }
     },
 
@@ -1423,8 +1455,75 @@ Slide.prototype =
     {},
 
     Save_Changes: function(data, w)
-    {},
+    {
+        w.WriteLong(data.Type);
+        switch(data.Type)
+        {
+            case historyitem_RemoveFromSpTree:
+            {
+                w.WriteLong(data.index);
+                break;
+            }
+            case historyitem_AddToSlideSpTree:
+            {
+                w.WriteLong(data.pos);
+                w.WriteString2(data.objectId);
+                break;
+            }
+            case historyitem_AddSlideLocks:
+            {
+                w.WriteString2(data.deleteLock);
+                w.WriteString2(data.backgroundLock);
+                w.WriteString2(data.timingLock);
+                w.WriteString2(data.transitionLock);
+                w.WriteString2(data.layoutLock);
+                break;
+            }
+        }
+    },
 
     Load_Changes: function(r)
-    {}
+    {
+        var type = r.GetLong();
+        switch(type)
+        {
+            case historyitem_RemoveFromSpTree:
+            {
+                this.cSld.spTree.splice(r.GetLong(), 1);
+                break;
+            }
+            case historyitem_AddToSlideSpTree:
+            {
+                var pos = r.GetLong();
+                var id = r.GetString2();
+                this.cSld.spTree.splice(pos, 0, id);
+                break;
+            }
+            case historyitem_AddSlideLocks:
+            {
+                this.deleteLock     = g_oTableId.Get_ById(r.GetString2());
+                this.backgroundLock = g_oTableId.Get_ById(r.GetString2());
+                this.timingLock     = g_oTableId.Get_ById(r.GetString2());
+                this.transitionLock = g_oTableId.Get_ById(r.GetString2());
+                this.layoutLock     = g_oTableId.Get_ById(r.GetString2());
+                break;
+            }
+        }
+    }
 };
+
+function PropLocker()
+{
+    this.Lock = new CLock();
+    this.Id = g_oIdCounter.Get_NewId();
+    g_oTableId.Add(this, this.Id);
+
+
+}
+
+PropLocker.prototype = {
+    Get_Id: function()
+    {
+        return this.Id;
+    }
+}

@@ -83,6 +83,222 @@ CGraphicObjects.prototype = {
         }
     },
 
+
+    Update_CursorType: function(x, y,  e )
+    {
+        switch(this.State.id)
+        {
+            case STATES_ID_GROUP:
+            case STATES_ID_TEXT_ADD_IN_GROUP:
+            {
+                break;
+            }
+            default :
+            {
+                var selected_objects = this.selectedObjects;
+                var drawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
+                if(selected_objects.length === 1)
+                {
+                    var hit_to_adj = selected_objects[0].hitToAdjustment(x, y);
+                    if(hit_to_adj.hit)
+                    {
+                        if(selected_objects[0].canChangeAdjustments())
+                        {
+                            drawingDocument.SetCursorType("crosshair");
+                            selected_objects[0].seendMouseData();
+                        }
+                        return;
+                    }
+                }
+
+                for(var i = selected_objects.length - 1; i > -1; --i)
+                {
+                    var hit_to_handles = selected_objects[i].hitToHandles(x, y);
+                    if(hit_to_handles > -1)
+                    {
+                        if(hit_to_handles === 8)
+                        {
+                            if(!selected_objects[i].canRotate())
+                                return;
+                            selected_objects[0].sendMouseData();
+                            drawingDocument.SetCursorType("crosshair");
+                        }
+                        else
+                        {
+                            if(!selected_objects[i].canResize())
+                                return;
+                            var card_direction = selected_objects[i].getCardDirectionByNum(hit_to_handles);
+                            drawingDocument.SetCursorType(CURSOR_TYPES_BY_CARD_DIRECTION[card_direction]);
+                            selected_objects[i].sendMouseData();
+
+                        }
+                        return;
+                    }
+                }
+
+                for(i = selected_objects.length - 1; i > -1; --i)
+                {
+                    if(selected_objects[i].hitInBoundingRect(x, y))
+                    {
+                        if(!selected_objects[i].canMove())
+                            return;
+                        drawingDocument.SetCursorType("move");
+                        selected_objects[i].sendMouseData();
+                        return;
+                    }
+                }
+
+                var arr_drawing_objects = this.slide.getDrawingObjects();
+                for(i = arr_drawing_objects.length-1; i > -1; --i)
+                {
+                    var cur_drawing_base = arr_drawing_objects[i];
+                    var cur_drawing = cur_drawing_base;
+                    if(cur_drawing.isShape() || cur_drawing.isImage())
+                    {
+                        var hit_in_inner_area = cur_drawing.hitInInnerArea(x, y);
+                        var hit_in_path = cur_drawing.hitInPath(x, y);
+                        var hit_in_text_rect = cur_drawing.hitInTextRect(x, y);
+                        if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
+                        {
+
+                            drawingDocument.SetCursorType("move");
+                            cur_drawing.sendMouseData();
+                            return;
+                        }
+                        else if(hit_in_text_rect)
+                        {
+                            cur_drawing.updateCursorType(x, y, e);
+                            cur_drawing.sendMouseData();
+
+                            return;
+                        }
+                    }
+                    else if(cur_drawing.isGroup())
+                    {
+                        var grouped_objects = cur_drawing.getArrGraphicObjects();
+                        for(var j = grouped_objects.length - 1; j > -1; --j)
+                        {
+                            var cur_grouped_object = grouped_objects[j];
+                            var hit_in_inner_area = cur_grouped_object.hitInInnerArea(x, y);
+                            var hit_in_path = cur_grouped_object.hitInPath(x, y);
+                            var hit_in_text_rect = cur_grouped_object.hitInTextRect(x, y);
+                            if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
+                            {
+
+                                cur_drawing.sendMouseData();
+
+                                drawingDocument.SetCursorType("move");
+                                return;
+                            }
+                            else if(hit_in_text_rect)
+                            {
+                                cur_drawing.sendMouseData();
+
+                                grouped_objects[j].txBody.updateCursorType(x, y, e);
+                                return;
+                            }
+                        }
+                    }
+                    else if(cur_drawing.isChart())
+                    {
+                        /*if(cur_drawing.hitInWorkArea(x, y))
+                        {
+
+                            if(!e.ShiftKey && !e.CtrlKey)
+                            {
+                                var object_for_move_in_chart = null;
+                                if(isRealObject(cur_drawing.chartTitle))
+                                {
+                                    if(cur_drawing.chartTitle.hit(x, y))
+                                    {
+                                        object_for_move_in_chart = cur_drawing.chartTitle;
+                                    }
+                                }
+
+                                if(isRealObject(cur_drawing.hAxisTitle) && !isRealObject(object_for_move_in_chart))
+                                {
+                                    if(cur_drawing.hAxisTitle.hit(x, y))
+                                    {
+                                        object_for_move_in_chart = cur_drawing.hAxisTitle;
+                                    }
+                                }
+
+                                if(isRealObject(cur_drawing.vAxisTitle) && !isRealObject(object_for_move_in_chart))
+                                {
+                                    if(cur_drawing.vAxisTitle.hit(x, y))
+                                    {
+                                        object_for_move_in_chart = cur_drawing.vAxisTitle;
+                                    }
+                                }
+                                if(isRealObject(object_for_move_in_chart))
+                                {
+                                    this.drawingObjectsController.resetSelection();
+                                    cur_drawing.select(this.drawingObjectsController);
+                                    object_for_move_in_chart.select();
+                                    this.drawingObjectsController.clearPreTrackObjects();
+                                    this.drawingObjectsController.addPreTrackObject(new MoveTitleInChart(object_for_move_in_chart));
+                                    this.drawingObjectsController.changeCurrentState(new PreMoveInternalChartObjectState(this.drawingObjectsController, this.drawingObjects, x, y, object_for_move_in_chart));
+                                    this.drawingObjects.OnUpdateOverlay();
+                                    return;
+                                }
+                                this.drawingObjectsController.clearPreTrackObjects();
+                                var is_selected = cur_drawing.selected;
+                                if(!(e.CtrlKey || e.ShiftKey) && !is_selected)
+                                    this.drawingObjectsController.resetSelection();
+                                cur_drawing.select(this.drawingObjectsController);
+                                this.drawingObjects.OnUpdateOverlay();
+                                for(var j = 0; j < selected_objects.length; ++j)
+                                {
+                                    this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
+                                }
+                                this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects,x, y, e.ShiftKey, e.ctrl, cur_drawing, is_selected, true));
+                                return;
+                            }
+
+
+
+                        }  */
+                    }
+                    else if(cur_drawing.isTable && cur_drawing.isTable())
+                    {
+                        /*var hit_in_inner_area = cur_drawing.hitInInnerArea(x, y);
+                        var hit_in_bounding_rect = cur_drawing.hitInBoundingRect(x, y);
+                        if(hit_in_bounding_rect || hit_in_inner_area)
+                        {
+                            if(e.CtrlKey && this.drawingObjectsController.selectedObjects.length > 0)
+                            {
+                                var b_selected = cur_drawing.selected;
+                                cur_drawing.select(this.drawingObjectsController);
+                                for(var j = 0; j < this.drawingObjectsController.selectedObjects.length; ++j)
+                                {
+                                    this.drawingObjectsController.addPreTrackObject(this.drawingObjectsController.selectedObjects[j].createMoveTrack());
+                                }
+                                this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects, x, y, e.ShiftKey, e.CtrlKey, cur_drawing, b_selected, true));
+                                this.drawingObjects.OnUpdateOverlay();
+                                return;
+                            }
+                            else
+                            {
+                                this.drawingObjectsController.resetSelection();
+                                cur_drawing.select(this.drawingObjectsController);
+                                cur_drawing.selectionSetStart(e, x, y);
+                                this.drawingObjectsController.changeCurrentState(new TextAddState(this.drawingObjectsController, this.drawingObjects, cur_drawing));
+                                this.drawingObjects.presentation.Document_UpdateSelectionState();
+                                this.drawingObjects.OnUpdateOverlay();
+                                return;
+
+                            }
+                        }     */
+
+                    }
+                }
+                drawingDocument.SetCursorType("default");
+                break;
+            }
+        }
+
+    },
+
     setParagraphAlign: function(val)
     {
         switch (this.State.id)
@@ -313,7 +529,8 @@ CGraphicObjects.prototype = {
                         type: _current_object.getPresetGeom(),
                         fill: _current_object.getFill(),
                         stroke: _current_object.getStroke(),
-                        canChangeArrows: _current_object.canChangeArrows()
+                        canChangeArrows: _current_object.canChangeArrows(),
+                        IsLocked: !(_current_object.Lock.Type === locktype_None || _current_object.Lock.Type === locktype_Mine)
                     };
 
                     if(shape_props === null)
@@ -488,8 +705,8 @@ CGraphicObjects.prototype = {
         }
         else
         {
-            ////editor.sync_PrLineSpacingCallBack(_empty_para_pr.Spacing);
-            // editor.UpdateParagraphProp(_empty_para_pr);
+            //editor.sync_PrLineSpacingCallBack(_empty_para_pr.Spacing);
+            //editor.UpdateParagraphProp(_empty_para_pr);
         }
 
         if(text_props != null)

@@ -209,6 +209,7 @@ var historyitem_SetAdjustmentValue = 1;
 //Типы изменений в классе CSlide
 var historyitem_RemoveFromSpTree = 0;
 var historyitem_AddToSlideSpTree = 1;
+var historyitem_AddSlideLocks = 2;
 
 
 

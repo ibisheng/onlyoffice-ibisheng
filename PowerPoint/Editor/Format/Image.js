@@ -57,6 +57,23 @@ function CImageShape(parent)
 CImageShape.prototype =
 {
 
+    sendMouseData: function()
+    {
+
+        if ( true === this.Lock.Is_Locked() )
+        {
+
+            var MMData = new CMouseMoveData();
+            var Coords = editor.WordControl.m_oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(this.x, this.y, this.parent.num, null);
+            MMData.X_abs            = Coords.X - 5;
+            MMData.Y_abs            = Coords.Y;
+            MMData.Type             = c_oAscMouseMoveDataTypes.LockedObject;
+            MMData.UserId           = this.Lock.Get_UserId();
+            MMData.HaveChanges      = this.Lock.Have_Changes();
+            MMData.LockedObjectType = 0;
+            editor.sync_MouseMoveCallback( MMData );
+        }
+    },
 
     recalcAll: function()
     {
@@ -277,6 +294,10 @@ CImageShape.prototype =
         if(this.blipFill && this.blipFill.fill && this.blipFill.fill.RasterImageId)
         {
             _result_image_props.ImageUrl = this.blipFill.fill.RasterImageId;
+        }
+        if(!isRealObject(this.group))
+        {
+            _result_image_props.IsLocked = !(this.Lock.Type === locktype_None || this.Lock.Type === locktype_Mine);
         }
 
         return _result_image_props;

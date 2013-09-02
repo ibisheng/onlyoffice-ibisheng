@@ -3384,6 +3384,21 @@ asc_docs_api.prototype.setVerticalAlign = function(align)
     this.WordControl.m_oLogicDocument.setVerticalAlign(align);
 }
 
+asc_docs_api.prototype.sync_MouseMoveStartCallback = function()
+{
+    this.asc_fireCallback("asc_onMouseMoveStart");
+}
+
+asc_docs_api.prototype.sync_MouseMoveEndCallback = function()
+{
+    this.asc_fireCallback("asc_onMouseMoveEnd");
+}
+
+asc_docs_api.prototype.sync_MouseMoveCallback = function(Data)
+{
+    this.asc_fireCallback("asc_onMouseMove", Data );
+}
+
 asc_docs_api.prototype.ShowThumbnails = function(bIsShow)
 {
     if (bIsShow)
