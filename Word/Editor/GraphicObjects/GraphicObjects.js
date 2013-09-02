@@ -1096,8 +1096,8 @@ CGraphicObjects.prototype =
 		ret.chart.initDefault();
         ret.spPr.xfrm.offX = 0;
         ret.spPr.xfrm.offY = 0;
-        ret.spPr.xfrm.extX = 50;
-        ret.spPr.xfrm.extY = 50;
+        ret.spPr.xfrm.extX = this.drawingDocument.GetMMPerDot(c_oAscChartDefines.defaultChartWidth);
+        ret.spPr.xfrm.extY = this.drawingDocument.GetMMPerDot(c_oAscChartDefines.defaultChartHeight);
         return ret;
     },
 
@@ -4327,6 +4327,12 @@ CGraphicObjects.prototype =
 
                 break;
             }
+
+            case STATES_ID_CHART_TITLE_TEXT:
+            {
+                //this.curState.textObject.remove()
+                break;
+            }
             default :
             {
                 var selected_objects = this.selectionInfo.selectionArray;
@@ -5587,7 +5593,7 @@ CGraphicObjects.prototype =
                         ret.push(cur_obj.GraphicObj.blipFill.RasterImageId);
                     }
 
-                    if(cur_obj.GraphicObj.isShape())
+                    if(cur_obj.GraphicObj.isShape() || cur_obj.GraphicObj.chart)
                     {
                         var sp = cur_obj.GraphicObj;
                         if(isRealObject(sp)
