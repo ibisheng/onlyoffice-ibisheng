@@ -1621,7 +1621,7 @@ L 0:a
 JSCompiler_StaticMethods_AddAdj:K
 GX_FVar_Head:py
 L 1:b
-c_oSer_BasicChartType$Grouping:dl
+c_oSer_BasicChartType$Grouping:cl
 X_Left_Margin:jb
 L 2:c
 CHeaderFooter:lO
@@ -2331,7 +2331,7 @@ break_Line:Jd
 JSCompiler_StaticMethods_Hue_2_RGB:wK
 phType_body:IK
 c_oAscFill$FILL_TYPE_NOFILL:B5
-c_oSer_BasicChartType$Overlap:il
+c_oSer_BasicChartType$Overlap:el
 JSCompiler_StaticMethods_Set_KeepLines:Yd
 t1_builder_funcs:Ms
 cff_size_request:bA
@@ -2963,7 +2963,7 @@ L 57:Us
 L 56:Ts
 L 55:io
 L 54:oq
-L 53:cl
+L 53:dl
 L 52:nq
 L 51:Sd
 FT_TT_SERVICES_GET:Ny
@@ -3098,10 +3098,10 @@ TT_Face:ly
 CTrackNewObject2:PG
 BinarySettingsTableWriter:X0
 L 73:Di
-L 74:fl
+L 74:gl
 JSCompiler_StaticMethods__draw:Z4
 Int64:cp
-L 75:gl
+L 75:hl
 JSCompiler_StaticMethods_rebuildSeries:Jn
 L 76:sj
 _ph_summ__sec_head:mM
@@ -3120,7 +3120,7 @@ JSCompiler_StaticMethods_Stop:FT
 JSCompiler_StaticMethods_updateCharts:rE
 c_oSerExtent$Cx:PZ
 c_oSerExtent$Cy:QZ
-L 70:el
+L 70:fl
 FT_PEEK_USHORT:Qo
 L 72:mh
 L 71:lh
@@ -3162,7 +3162,7 @@ JSCompiler_StaticMethods_Document_UpdateUndoRedoState:GO
 FT_RoundFix:bp
 CFontFileLoader:U
 ret$$inline_771:ut
-L 90:hl
+L 90:il
 tt_name_entry_ascii_from_utf16:xv
 Editor_Copy_GetElem:na
 L 88:tw
