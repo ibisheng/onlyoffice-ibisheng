@@ -294,6 +294,9 @@ prop:AddText
 prop:groupShapes
 prop:unGroupShapes
 prop:setVerticalAlign
+prop:sync_MouseMoveStartCallback
+prop:sync_MouseMoveEndCallback
+prop:sync_MouseMoveCallback
 prop:ShowThumbnails
 prop:syncOnThumbnailsShow
 prop:can_AddHyperlink
@@ -552,6 +555,8 @@ var:CreateAscStroke
 var:CorrectUniStroke
 ---
 var:CAscShapeProp
+prop:get_Locked
+prop:put_Locked
 prop:get_type
 prop:put_type
 prop:get_fill
@@ -600,6 +605,8 @@ prop:get_ImageHeight
 var:CImgProperty
 prop:get_Width
 prop:put_Width
+prop:get_Locked
+prop:put_Locked
 prop:get_Height
 prop:put_Height
 prop:get_WrappingStyle
@@ -1181,6 +1188,9 @@ asc_docs_api.prototype['AddText'] = asc_docs_api.prototype.AddText;
 asc_docs_api.prototype['groupShapes'] = asc_docs_api.prototype.groupShapes;
 asc_docs_api.prototype['unGroupShapes'] = asc_docs_api.prototype.unGroupShapes;
 asc_docs_api.prototype['setVerticalAlign'] = asc_docs_api.prototype.setVerticalAlign;
+asc_docs_api.prototype['sync_MouseMoveStartCallback'] = asc_docs_api.prototype.sync_MouseMoveStartCallback;
+asc_docs_api.prototype['sync_MouseMoveEndCallback'] = asc_docs_api.prototype.sync_MouseMoveEndCallback;
+asc_docs_api.prototype['sync_MouseMoveCallback'] = asc_docs_api.prototype.sync_MouseMoveCallback;
 asc_docs_api.prototype['ShowThumbnails'] = asc_docs_api.prototype.ShowThumbnails;
 asc_docs_api.prototype['syncOnThumbnailsShow'] = asc_docs_api.prototype.syncOnThumbnailsShow;
 asc_docs_api.prototype['can_AddHyperlink'] = asc_docs_api.prototype.can_AddHyperlink;
@@ -1409,6 +1419,8 @@ CAscStroke.prototype['get_canChangeArrows'] = CAscStroke.prototype.get_canChange
 window['CreateAscStroke'] = CreateAscStroke;
 window['CorrectUniStroke'] = CorrectUniStroke;
 window['CAscShapeProp'] = CAscShapeProp;
+CAscShapeProp.prototype['get_Locked'] = CAscShapeProp.prototype.get_Locked;
+CAscShapeProp.prototype['put_Locked'] = CAscShapeProp.prototype.put_Locked;
 CAscShapeProp.prototype['get_type'] = CAscShapeProp.prototype.get_type;
 CAscShapeProp.prototype['put_type'] = CAscShapeProp.prototype.put_type;
 CAscShapeProp.prototype['get_fill'] = CAscShapeProp.prototype.get_fill;
@@ -1448,6 +1460,8 @@ CImageSize.prototype['get_ImageHeight'] = CImageSize.prototype.get_ImageHeight;
 window['CImgProperty'] = CImgProperty;
 CImgProperty.prototype['get_Width'] = CImgProperty.prototype.get_Width;
 CImgProperty.prototype['put_Width'] = CImgProperty.prototype.put_Width;
+CImgProperty.prototype['get_Locked'] = CImgProperty.prototype.get_Locked;
+CImgProperty.prototype['put_Locked'] = CImgProperty.prototype.put_Locked;
 CImgProperty.prototype['get_Height'] = CImgProperty.prototype.get_Height;
 CImgProperty.prototype['put_Height'] = CImgProperty.prototype.put_Height;
 CImgProperty.prototype['get_WrappingStyle'] = CImgProperty.prototype.get_WrappingStyle;
