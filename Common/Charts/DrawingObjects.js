@@ -300,18 +300,20 @@ asc_CChart.prototype = {
 		return headers;
 	},
 	
-	rebuildSeries: function(bReverse) {
+	rebuildSeries: function() {
 		var _t = this;
 		var bbox = _t.range.intervalObject.getBBox0();
 		var nameIndex = 1;
 		var api = window["Asc"]["editor"];
+		
+		var revSeries = _t.getReverseSeries();
 		
 		// Save old series colors
 		var oldSeriaData = [];
 		for ( var i = 0; i < _t.series.length; i++ ) {
 			oldSeriaData.push( _t.series[i].OutlineColor );
 		}
-		var series = [];
+		_t.series = [];
 		
 		function getNumCache(c1, c2, r1, r2) {
 			
@@ -349,11 +351,8 @@ asc_CChart.prototype = {
 		}
 		
 		var parsedHeaders = _t.parseSeriesHeaders();
-		var byRows = _t.range.rows;
-		if ( bReverse )
-			byRows = !byRows;
 		
-		if ( byRows ) {
+		if ( _t.range.rows ) {
 			for (var i = bbox.r1 + (parsedHeaders.bTop ? 1 : 0); i <= bbox.r2; i++) {
 				
 				var ser = new asc_CChartSeria();
@@ -402,7 +401,7 @@ asc_CChart.prototype = {
 				
 				var seriaName = parsedHeaders.bLeft ? ( _t.range.intervalObject.worksheet.getCell(new CellAddress(i, bbox.c1, 0)).getValue() ) : (api.chartTranslate.series + " " + nameIndex);
 				ser.TxCache.Tx = seriaName;
-				series.push(ser);
+				_t.series.push(ser);
 				nameIndex++;
 			}
 		}
@@ -455,32 +454,52 @@ asc_CChart.prototype = {
 				
 				var seriaName = parsedHeaders.bTop ? ( _t.range.intervalObject.worksheet.getCell(new CellAddress(bbox.r1, i, 0)).getValue() ) : (api.chartTranslate.series + " " + nameIndex);
 				ser.TxCache.Tx = seriaName;
-				series.push(ser);
+				_t.series.push(ser);
 				nameIndex++;
 			}
 		}
 		
 		// Colors
-		var seriaUniColors = _t.generateUniColors(series.length);
+		var seriaUniColors = _t.generateUniColors(_t.series.length);
 		
 		if ( _t.type == c_oAscChartType.hbar )
 			seriaUniColors = OfficeExcel.array_reverse(seriaUniColors);
 			
 		// Restore old series colors
-		for ( var i = 0; i < series.length; i++ ) {
+		for ( var i = 0; i < _t.series.length; i++ ) {
 			
 			if ( i < oldSeriaData.length ) {
-				series[i].OutlineColor = oldSeriaData[i];
+				_t.series[i].OutlineColor = oldSeriaData[i];
 			}
 			else
-				series[i].OutlineColor = seriaUniColors[i];
+				_t.series[i].OutlineColor = seriaUniColors[i];
+		}
+	},
+	
+	getReverseSeries: function() {
+		
+		var _t = this;
+		var revSeries = [];
+		var serLen = _t.series.length;
+		
+		if ( serLen ) {
+			for (var i = 0; i < _t.series[0].Val.NumCache.length; i++) {
+				
+				var seria = new asc_CChartSeria();
+				for (var j = 0; j < _t.series.length; j++) {
+					seria.Val.NumCache.push(_t.series[j].Val.NumCache[i]);
+					
+					if ( _t.series[j].TxCache.Formula && _t.series[j].TxCache.Tx )
+						seria.Cat.NumCache.push( {val: _t.series[j].TxCache.Tx} );
+					
+					if ( _t.series[j].Cat.Formula && _t.series[j].Cat.NumCache.length )
+						seria.TxCache.Tx = _t.series[j].Cat.NumCache[i].val;
+				}
+				revSeries.push(seria);
+			}
 		}
 		
-		if ( bReverse )
-			return series;
-		else {
-			_t.series = series;
-		}
+		return revSeries;
 	},
 	
 	generateUniColors: function(count) {
