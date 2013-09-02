@@ -498,7 +498,7 @@ asc_CChart.prototype = {
 					if ( _t.series[j].Cat.Formula && _t.series[j].Cat.NumCache.length )
 						seria.TxCache.Tx = _t.series[j].Cat.NumCache[i].val;
 					else
-						seria.TxCache.Tx = api.chartTranslate.series + " " + i;
+						seria.TxCache.Tx = api.chartTranslate.series + " " + (i + 1);
 				}
 				revSeries.push(seria);
 			}

@@ -4482,12 +4482,12 @@ function PreMoveInlineObject(graphicObjects, objectId, ctrlShiftFlag, bSelectedM
                 {
 
                     if(false === this.graphicObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : gr_obj.Parent, CheckType : changestype_Paragraph_Content} )) {
-                        var chart = this.graphicObjects.majorGraphicObject.GraphicObj;
-                        chart["themeColors"] = [];
+                        var graphicObject = this.graphicObjects.majorGraphicObject.GraphicObj;
+                        graphicObject.chart.themeColors = [];
                         for (var i = 0; i < this.graphicObjects.drawingDocument.GuiControlColorsMap.length; i++) {
-                            chart["themeColors"].push( this.graphicObjects.drawingDocument.GuiControlColorsMap[i].get_hex() );
+                            graphicObject.chart.themeColors.push( this.graphicObjects.drawingDocument.GuiControlColorsMap[i].get_hex() );
                         }
-                        editor.asc_fireCallback("asc_doubleClickOnChart", chart);
+                        editor.asc_fireCallback("asc_doubleClickOnChart", graphicObject);
                     }
                 }
             }
@@ -5101,12 +5101,12 @@ function PreMoveState(graphicObjects, ctrlShiftFlag/*был ли нажат Ctrl
                 if(gr_obj.GraphicObj.chart)
                 {
                     if(false === this.graphicObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : gr_obj.Parent, CheckType : changestype_Paragraph_Content} )) {
-                        var chart = gr_obj.GraphicObj;
-                        chart["themeColors"] = [];
+                        var graphicObject = gr_obj.GraphicObj;
+                        graphicObject.chart.themeColors = [];
                         for (var i = 0; i < this.graphicObjects.drawingDocument.GuiControlColorsMap.length; i++) {
-                            chart["themeColors"].push( this.graphicObjects.drawingDocument.GuiControlColorsMap[i].get_hex() );
+                            graphicObject.chart.themeColors.push( this.graphicObjects.drawingDocument.GuiControlColorsMap[i].get_hex() );
                         }
-                        editor.asc_fireCallback("asc_doubleClickOnChart", chart);
+                        editor.asc_fireCallback("asc_doubleClickOnChart", graphicObject);
                     }
                 }
             }

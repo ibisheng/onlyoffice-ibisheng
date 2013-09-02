@@ -173,12 +173,9 @@ function ChartPreviewManager() {
 			switch (chart.type) {
 			
 				case c_oAscChartType.line:
+				
 					switch (chart.subType) {
 						case c_oAscChartSubType.normal:
-							/*chart.data.push( [createItem(2), createItem(1)] );
-							chart.data.push( [createItem(3), createItem(2)] );
-							chart.data.push( [createItem(2), createItem(3)] );
-							chart.data.push( [createItem(3), createItem(2)] );*/
 							
 							var ser = new asc_CChartSeria();
 							ser.Val.NumCache = [ createItem(2), createItem(3), createItem(2), createItem(3) ];
@@ -192,10 +189,6 @@ function ChartPreviewManager() {
 							
 							break;
 						case c_oAscChartSubType.stacked:
-							/*chart.data.push( [createItem(1), createItem(4)] );
-							chart.data.push( [createItem(6), createItem(4)] );
-							chart.data.push( [createItem(2), createItem(4)] );
-							chart.data.push( [createItem(8), createItem(5)] );*/
 							
 							var ser = new asc_CChartSeria();
 							ser.Val.NumCache = [ createItem(1), createItem(6), createItem(2), createItem(8) ];
@@ -209,10 +202,6 @@ function ChartPreviewManager() {
 							
 							break;
 						case c_oAscChartSubType.stackedPer:
-							/*chart.data.push( [createItem(2), createItem(2)] );
-							chart.data.push( [createItem(4), createItem(2)] );
-							chart.data.push( [createItem(2), createItem(2)] );
-							chart.data.push( [createItem(4), createItem(2)] );*/
 							
 							var ser = new asc_CChartSeria();
 							ser.Val.NumCache = [ createItem(2), createItem(4), createItem(2), createItem(4) ];
@@ -235,7 +224,6 @@ function ChartPreviewManager() {
 					
 					switch (chart.subType) {
 						case c_oAscChartSubType.normal:
-							//chart.data.push( [createItem(4), createItem(3), createItem(2), createItem(1)] );
 							
 							var ser = new asc_CChartSeria();
 							ser.Val.NumCache = [ createItem(4) ];
@@ -259,10 +247,6 @@ function ChartPreviewManager() {
 							
 							break;
 						case c_oAscChartSubType.stacked:
-							/*chart.data.push( [createItem(4), createItem(5)] );
-							chart.data.push( [createItem(3), createItem(4)] );
-							chart.data.push( [createItem(2), createItem(3)] );
-							chart.data.push( [createItem(1), createItem(2)] );*/
 							
 							var ser = new asc_CChartSeria();
 							ser.Val.NumCache = [ createItem(4), createItem(3), createItem(2), createItem(1) ];
@@ -276,10 +260,6 @@ function ChartPreviewManager() {
 							
 							break;
 						case c_oAscChartSubType.stackedPer:
-							/*chart.data.push( [createItem(7), createItem(7)] );
-							chart.data.push( [createItem(5), createItem(6)] );
-							chart.data.push( [createItem(3), createItem(5)] );
-							chart.data.push( [createItem(1), createItem(4)] );*/
 							
 							var ser = new asc_CChartSeria();
 							ser.Val.NumCache = [ createItem(7), createItem(5), createItem(3), createItem(1) ];
@@ -298,7 +278,6 @@ function ChartPreviewManager() {
 				case c_oAscChartType.bar:
 					switch (chart.subType) {
 						case c_oAscChartSubType.normal:
-							//chart.data.push( [createItem(1), createItem(2), createItem(3), createItem(4)] );
 							
 							var ser = new asc_CChartSeria();
 							ser.Val.NumCache = [ createItem(1) ];
@@ -322,10 +301,6 @@ function ChartPreviewManager() {
 							
 							break;
 						case c_oAscChartSubType.stacked:
-							/*chart.data.push( [createItem(1), createItem(2)] );
-							chart.data.push( [createItem(2), createItem(3)] );
-							chart.data.push( [createItem(3), createItem(4)] );
-							chart.data.push( [createItem(4), createItem(5)] );*/
 							
 							var ser = new asc_CChartSeria();
 							ser.Val.NumCache = [ createItem(1), createItem(2), createItem(3), createItem(4) ];
@@ -339,10 +314,6 @@ function ChartPreviewManager() {
 							
 							break;
 						case c_oAscChartSubType.stackedPer:
-							/*chart.data.push( [createItem(1), createItem(4)] );
-							chart.data.push( [createItem(3), createItem(5)] );
-							chart.data.push( [createItem(5), createItem(6)] );
-							chart.data.push( [createItem(7), createItem(7)] );*/
 							
 							var ser = new asc_CChartSeria();
 							ser.Val.NumCache = [ createItem(1), createItem(3), createItem(5), createItem(7) ];
@@ -360,28 +331,18 @@ function ChartPreviewManager() {
 					break;
 			
 				case c_oAscChartType.pie:
-					/*chart.data.push( [createItem(3)] );
-					chart.data.push( [createItem(1)] );*/
 					
 					var ser = new asc_CChartSeria();
-					ser.Val.NumCache = [ createItem(3) ];
+					ser.Val.NumCache = [ createItem(3), createItem(1) ];
 					ser.OutlineColor = uniColors[0];
-					chart.series.push(ser);
-					
-					var ser = new asc_CChartSeria();
-					ser.Val.NumCache = [ createItem(1) ];
-					ser.OutlineColor = uniColors[1];
 					chart.series.push(ser);
 					
 					break;
 					
 				case c_oAscChartType.area:
+				
 					switch (chart.subType) {
 						case c_oAscChartSubType.normal:
-							/*chart.data.push( [createItem(0), createItem(0)] );
-							chart.data.push( [createItem(8), createItem(4)] );
-							chart.data.push( [createItem(5), createItem(2)] );
-							chart.data.push( [createItem(6), createItem(9)] );*/
 							
 							var ser = new asc_CChartSeria();
 							ser.Val.NumCache = [ createItem(0), createItem(8), createItem(5), createItem(6) ];
@@ -395,10 +356,6 @@ function ChartPreviewManager() {
 							
 							break;
 						case c_oAscChartSubType.stacked:
-							/*chart.data.push( [createItem(0), createItem(4)] );
-							chart.data.push( [createItem(8), createItem(4)] );
-							chart.data.push( [createItem(5), createItem(4)] );
-							chart.data.push( [createItem(11), createItem(4)] );*/
 							
 							var ser = new asc_CChartSeria();
 							ser.Val.NumCache = [ createItem(0), createItem(8), createItem(5), createItem(11) ];
@@ -412,10 +369,6 @@ function ChartPreviewManager() {
 							
 							break;
 						case c_oAscChartSubType.stackedPer:
-							/*chart.data.push( [createItem(0), createItem(4)] );
-							chart.data.push( [createItem(4), createItem(4)] );
-							chart.data.push( [createItem(1), createItem(4)] );
-							chart.data.push( [createItem(16), createItem(4)] );*/
 							
 							var ser = new asc_CChartSeria();
 							ser.Val.NumCache = [ createItem(0), createItem(4), createItem(1), createItem(16) ];
@@ -430,21 +383,9 @@ function ChartPreviewManager() {
 							break;
 					}
 					break;
-			
-				default:
-					/*for (var row = 0; row < maxRow; row++) {
-						var values = [];
-						for (var col = 0; col < maxCol; col++) {
-			
-							var item = {};
-							item.numFormatStr = "General";
-							item.isDateTimeFormat = false;
-							item.value = row + col + 1;
-							values.push(item);
-						}
-						chart.data.push(values);
-					}*/
 					
+				case c_oAscChartType.scatter:
+				
 					var ser = new asc_CChartSeria();
 					ser.Val.NumCache = [ createItem(1), createItem(5) ];
 					ser.OutlineColor = uniColors[0];
@@ -454,14 +395,27 @@ function ChartPreviewManager() {
 					ser.Val.NumCache = [ createItem(2), createItem(6) ];
 					ser.OutlineColor = uniColors[1];
 					chart.series.push(ser);
+					break;
+			
+				default:
+					
+					var ser = new asc_CChartSeria();
+					ser.Val.NumCache = [ createItem(3), createItem(5), createItem(7) ];
+					ser.OutlineColor = uniColors[0];
+					chart.series.push(ser);
 					
 					ser = new asc_CChartSeria();
-					ser.Val.NumCache = [ createItem(3), createItem(7) ];
+					ser.Val.NumCache = [ createItem(10), createItem(12), createItem(14) ];
+					ser.OutlineColor = uniColors[1];
+					chart.series.push(ser);
+					
+					ser = new asc_CChartSeria();
+					ser.Val.NumCache = [ createItem(1), createItem(3), createItem(5) ];
 					ser.OutlineColor = uniColors[2];
 					chart.series.push(ser);
 					
 					ser = new asc_CChartSeria();
-					ser.Val.NumCache = [ createItem(4), createItem(8) ];
+					ser.Val.NumCache = [ createItem(8), createItem(10), createItem(12) ];
 					ser.OutlineColor = uniColors[3];
 					chart.series.push(ser);
 					
