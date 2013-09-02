@@ -284,7 +284,7 @@ asc_CChart.prototype = {
 			if ( !isNumber(value) && (value != "") )
 				cntLeft++;
 		}
-		if ( (cntLeft > 0) && (cntLeft >= bbox.r2 - bbox.r1) )
+		if ( (cntLeft > 0) && (cntLeft > bbox.r2 - bbox.r1) )
 			headers.bLeft = true;
 		
 		for (var i = bbox.c1; i <= bbox.c2; i++) {
@@ -294,13 +294,13 @@ asc_CChart.prototype = {
 			if ( !isNumber(value) && (value != "") )
 				cntTop++;
 		}
-		if ( (cntTop > 0) && (cntTop >= bbox.c2 - bbox.c1) )
+		if ( (cntTop > 0) && (cntTop > bbox.c2 - bbox.c1) )
 			headers.bTop = true;
 		
 		return headers;
 	},
 	
-	rebuildSeries: function() {
+	rebuildSeries: function(bReverse) {
 		var _t = this;
 		var bbox = _t.range.intervalObject.getBBox0();
 		var nameIndex = 1;
@@ -311,7 +311,7 @@ asc_CChart.prototype = {
 		for ( var i = 0; i < _t.series.length; i++ ) {
 			oldSeriaData.push( _t.series[i].OutlineColor );
 		}
-		_t.series = [];
+		var series = [];
 		
 		function getNumCache(c1, c2, r1, r2) {
 			
@@ -399,7 +399,7 @@ asc_CChart.prototype = {
 				
 				var seriaName = parsedHeaders.bLeft ? ( _t.range.intervalObject.worksheet.getCell(new CellAddress(i, bbox.c1, 0)).getValue() ) : (api.chartTranslate.series + " " + nameIndex);
 				ser.TxCache.Tx = seriaName;
-				_t.series.push(ser);
+				series.push(ser);
 				nameIndex++;
 			}
 		}
@@ -452,25 +452,31 @@ asc_CChart.prototype = {
 				
 				var seriaName = parsedHeaders.bTop ? ( _t.range.intervalObject.worksheet.getCell(new CellAddress(bbox.r1, i, 0)).getValue() ) : (api.chartTranslate.series + " " + nameIndex);
 				ser.TxCache.Tx = seriaName;
-				_t.series.push(ser);
+				series.push(ser);
 				nameIndex++;
 			}
 		}
 		
 		// Colors
-		var seriaUniColors = _t.generateUniColors(_t.series.length);
+		var seriaUniColors = _t.generateUniColors(series.length);
 		
 		if ( _t.type == c_oAscChartType.hbar )
 			seriaUniColors = OfficeExcel.array_reverse(seriaUniColors);
 			
 		// Restore old series colors
-		for ( var i = 0; i < _t.series.length; i++ ) {
+		for ( var i = 0; i < series.length; i++ ) {
 			
 			if ( i < oldSeriaData.length ) {
-				_t.series[i].OutlineColor = oldSeriaData[i];
+				series[i].OutlineColor = oldSeriaData[i];
 			}
 			else
-				_t.series[i].OutlineColor = seriaUniColors[i];
+				series[i].OutlineColor = seriaUniColors[i];
+		}
+		
+		if ( bReverse )
+			return series;
+		else {
+			_t.series = series;
 		}
 	},
 	
