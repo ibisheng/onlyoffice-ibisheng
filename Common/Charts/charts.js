@@ -160,7 +160,7 @@ function ChartPreviewManager() {
 		var preview_w = 50, preview_h = 50;
 		
 		function createItem(value) {
-			return { numFormatStr: "General", isDateTimeFormat: false, val: value };
+			return { numFormatStr: "General", isDateTimeFormat: false, val: value, isHidden: false };
 		}
 		
 		function fillChartData(chart) {

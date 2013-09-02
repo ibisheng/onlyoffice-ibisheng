@@ -230,6 +230,45 @@ asc_CChart.prototype = {
 	asc_setSeria: function(seriaObj) { if (seriaObj) this.series.push(seriaObj); },
 	asc_removeSeries: function() { this.series = []; },
 	
+	initDefault: function() {
+	
+		function createItem(value) {
+			return { numFormatStr: "General", isDateTimeFormat: false, val: value, isHidden: false };
+		}
+	
+		var api_doc = window["editor"];
+		var api_sheet = window["Asc"]["editor"];
+		var api = api_sheet ? api_sheet : api_doc;
+		this.range.interval = "Sheet1!A1:C3";
+		
+		this.series = [];
+		var uniColors = this.generateUniColors(3);
+		
+		var seria = new asc_CChartSeria();
+		seria.Val.Formula = "Sheet1!A2:A3";
+		seria.Val.NumCache = [ createItem(1), createItem(4) ];
+		seria.OutlineColor = uniColors[0];
+		seria.TxCache.Formula = "Sheet1!A1";
+		seria.TxCache.Tx = api.chartTranslate.series + " 1";
+		this.series.push(seria);
+		
+		seria = new asc_CChartSeria();
+		seria.Val.Formula = "Sheet1!B2:B3";
+		seria.Val.NumCache = [ createItem(2), createItem(5) ];
+		seria.OutlineColor = uniColors[1];
+		seria.TxCache.Formula = "Sheet1!B1";
+		seria.TxCache.Tx = api.chartTranslate.series + " 2";
+		this.series.push(seria);
+		
+		seria = new asc_CChartSeria();
+		seria.Val.Formula = "Sheet1!C2:C3";
+		seria.Val.NumCache = [ createItem(3), createItem(6) ];
+		seria.OutlineColor = uniColors[2];
+		seria.TxCache.Formula = "Sheet1!C1";
+		seria.TxCache.Tx = api.chartTranslate.series + " 2";
+		this.series.push(seria);
+	},
+	
 	parseSeriesHeaders: function() {
 		
 		var cntLeft = 0, cntTop = 0;
@@ -3281,7 +3320,7 @@ function DrawingObjects() {
 		}
 		else if ( isObject(chart) && chart["binary"] ) {
 			
-			try {
+			//try {
 				var graphicObject = new CChartAsGroup(null, _this);
 				graphicObject.setChartBinary(chart["binary"]);
 				
@@ -3394,11 +3433,11 @@ function DrawingObjects() {
 					}
 				}
 				worksheet._updateCellsRange(graphicObject.chart.range.intervalObject.getBBox0());
-			}
+			/*}
 			catch (e) {
 				e.message = "Error paste chart";
 				Exception(e);
-			}	
+			}*/	
 		}
 	}
 
