@@ -4369,15 +4369,21 @@ function DrawingObjects() {
 				
 		for ( var i = 0; i < aObjects.length; i++ ) {
 			var obj = aObjects[i];
-			if (obj.graphicObject.Id == id) {
-				if (obj.isChart())
+			if ( obj.graphicObject.Id == id ) {
+				if ( obj.isChart() ) {
+					if ( _this.controller.curState.id == STATES_ID_CHART_TEXT_ADD )
+						return c_oAscSelectionType.RangeShapeText;
 					return c_oAscSelectionType.RangeChart;
+				}
 					
-				if (obj.graphicObject.isImage())
+				if ( obj.graphicObject.isImage() )
 					return c_oAscSelectionType.RangeImage;
 					
-				if (obj.graphicObject.isShape() || obj.graphicObject.isGroup())
+				if ( obj.graphicObject.isShape() || obj.graphicObject.isGroup() ) {
+					if ( _this.controller.curState.id == STATES_ID_TEXT_ADD )
+						return c_oAscSelectionType.RangeShapeText;
 					return c_oAscSelectionType.RangeShape;
+				}
 			}
 		}
 		return undefined;

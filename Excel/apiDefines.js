@@ -187,7 +187,8 @@ var c_oAscSelectionType = {
 	RangeMax:	4,
 	RangeImage: 5,
 	RangeChart: 6,
-	RangeShape: 7
+	RangeShape: 7,
+	RangeShapeText: 8
 };
 
 var c_oAscLegendMarkerType = {
