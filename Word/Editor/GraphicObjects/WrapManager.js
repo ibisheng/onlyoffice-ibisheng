@@ -382,24 +382,36 @@ CWrapPolygon.prototype =
         var transform = this.wordGraphicObject.getTransformMatrix();
         var arrEdges = [];
         var arrPoints = [];
-        for(var polygon_index=0; polygon_index < arrPolygons.length; ++polygon_index)
+
+        var polygonsCount = arrPolygons.length;
+        for(var polygon_index=0; polygon_index < polygonsCount; ++polygon_index)
         {
             var cur_polygon = arrPolygons[polygon_index];
-            for(var point_index = 1; point_index < cur_polygon.length; ++point_index)
+            var curLen = cur_polygon.length;
+
+            if (curLen < 2)
+                continue;
+
+            var polygon_point0 = new CPolygonPoint();
+            polygon_point0.x = transform.TransformPointX(cur_polygon[0].x, cur_polygon[0].y);
+            polygon_point0.y = transform.TransformPointY(cur_polygon[0].x, cur_polygon[0].y);
+            arrPoints.push(polygon_point0);
+
+            for(var point_index = 1; point_index < curLen; ++point_index)
             {
-                var transformed_x0 = transform.TransformPointX(cur_polygon[point_index-1].x,  cur_polygon[point_index-1].y);
-                var transformed_y0 = transform.TransformPointY(cur_polygon[point_index-1].x,  cur_polygon[point_index-1].y);
-                var transformed_x1 = transform.TransformPointX(cur_polygon[point_index].x,  cur_polygon[point_index].y);
-                var transformed_y1 = transform.TransformPointY(cur_polygon[point_index].x,  cur_polygon[point_index].y);
-                var polygon_point0 = new CPolygonPoint();
-                polygon_point0.x = transformed_x0;
-                polygon_point0.y = transformed_y0;
-                var polygon_point1 = new CPolygonPoint();
-                polygon_point1.x = transformed_x1;
-                polygon_point1.y = transformed_y1;
-                arrEdges.push(new GraphEdge(polygon_point0, polygon_point1));
+                var transformed_x1 = transform.TransformPointX(cur_polygon[point_index].x, cur_polygon[point_index].y);
+                var transformed_y1 = transform.TransformPointY(cur_polygon[point_index].x, cur_polygon[point_index].y);
+
+                if (Math.abs(transformed_x1 - polygon_point0.x) < APPROXIMATE_EPSILON && Math.abs(transformed_y1 - polygon_point0.y) < APPROXIMATE_EPSILON)
+                    continue;
+
+                polygon_point0 = new CPolygonPoint();
+                polygon_point0.x = transformed_x1;
+                polygon_point0.y = transformed_y1;
+
+                var _prev = polygon_point0;
                 arrPoints.push(polygon_point0);
-                arrPoints.push(polygon_point1);
+                arrEdges.push(new GraphEdge(_prev, polygon_point0));
             }
         }
         if(arrPoints.length < 2)
@@ -435,30 +447,44 @@ CWrapPolygon.prototype =
         var cur_x_min, cur_x_max;
         var cur_y;
         var x_min = null, x_max = null;
+
+        var edgesCount = arrEdges.length;
         for(point_index = 0;  point_index < arrPoints.length; ++point_index)
         {
             cur_point = arrPoints[point_index];
             cur_x_min = cur_point.x;
             cur_x_max = cur_point.x;
             cur_y = cur_point.y;
-            for(var edge_index = cur_start_index; edge_index < arrEdges.length; ++edge_index)
+            for(var edge_index = cur_start_index; edge_index < edgesCount; ++edge_index)
             {
-                if(arrEdges[edge_index].point1.y <= cur_y)
+                if(arrEdges[edge_index].point2.y >= cur_y)
                 {
                     cur_start_index = edge_index;
                     break;
                 }
             }
-            for(edge_index = cur_start_index; edge_index < arrEdges.length; ++edge_index)
+
+            for(edge_index = cur_start_index; edge_index < edgesCount; ++edge_index)
             {
                 var cur_edge = arrEdges[edge_index];
-                var arr_x = cur_edge.getIntersectionPointX(cur_y);
-                if(arr_x.length > 0)
+
+                var inter = cur_edge.getIntersectionPointX(cur_y);
+                if (inter != null)
                 {
-                    if(arr_x[0] < cur_x_min)
-                        cur_x_min = arr_x[0];
-                    if(arr_x[arr_x.length - 1] > cur_x_max)
-                        cur_x_max = arr_x[arr_x.length - 1];
+                    if (inter.count == 1)
+                    {
+                        if(inter.x1 < cur_x_min)
+                            cur_x_min = inter.x1;
+                        if(inter.x1 > cur_x_max)
+                            cur_x_max = inter.x1;
+                    }
+                    else
+                    {
+                        if(inter.x1 < cur_x_min)
+                            cur_x_min = inter.x1;
+                        if(inter.x2 > cur_x_max)
+                            cur_x_max = inter.x2;
+                    }
                 }
             }
             if(cur_x_max <= cur_x_min)
@@ -489,7 +515,6 @@ CWrapPolygon.prototype =
             }
         }
 
-
         for(point_index = 1; point_index < left_path_arr.length - 1; ++point_index)
         {
             var point_prev = left_path_arr[point_index - 1];
@@ -511,7 +536,6 @@ CWrapPolygon.prototype =
                 left_path_arr.splice(point_index, 1);
                 --point_index;
             }
-
         }
 
         for(point_index = 1; point_index < right_path_arr.length - 1; ++point_index)
@@ -535,7 +559,6 @@ CWrapPolygon.prototype =
                 right_path_arr.splice(point_index, 1);
                 --point_index;
             }
-
         }
 
         this.arrPoints = [];
@@ -951,8 +974,8 @@ CWrapPolygon.prototype =
 
 function CPolygonPoint()
 {
-    this.x = null;
-    this.y = null;
+    this.x = +0;
+    this.y = +0;
 }
 
 

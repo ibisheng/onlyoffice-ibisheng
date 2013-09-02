@@ -1706,48 +1706,49 @@ function GraphEdge(point1, point2)
         this.point1 = point2;
         this.point2 = point1;
     }
+}
 
-    this.getIntersectionPointX = function(y)
+GraphEdge.prototype =
+{
+    getIntersectionPointX : function(y)
     {
-        var ret = [];
         if(this.point2.y < y || this.point1.y > y)
         {
-            return ret;
+            return null;
         }
-        else
+
+        var ret = { x1 : +0, x2 : +0, count : 1 | 0 };
+        if(this.point1.y === this.point2.y)
         {
-            if(this.point1.y === this.point2.y)
+            ret.count = 2;
+            if(this.point1.x <= this.point2.x)
             {
-                if(this.point1.x <= this.point2.x)
-                {
-                    ret.push(this.point1.x);
-                    ret.push(this.point2.x);
-                    return ret;
-                }
-                else
-                {
-                    ret.push(this.point2.x);
-                    ret.push(this.point1.x);
-                    return ret;
-                }
+                ret.x1 = this.point1.x;
+                ret.x2 = this.point2.x;
+                return ret;
             }
             else
             {
-                if(!(this.point1.x === this.point2.x))
-                {
-                    var ret_x = this.point1.x + ((y -  this.point1.y)/(this.point2.y - this.point1.y))*(this.point2.x - this.point1.x);
-                    ret.push(ret_x);
-                    return ret;
-                }
-                else
-                {
-                    ret.push(this.point1.x);
-                    return ret;
-                }
+                ret.x1 = this.point2.x;
+                ret.x2 = this.point1.x;
+                return ret;
+            }
+        }
+        else
+        {
+            if(!(this.point1.x === this.point2.x))
+            {
+                ret.x1 = this.point1.x + ((y -  this.point1.y)/(this.point2.y - this.point1.y))*(this.point2.x - this.point1.x);
+                return ret;
+            }
+            else
+            {
+                ret.x1 = this.point1.x;
+                return ret;
             }
         }
     }
-}
+};
 
 function ComparisonEdgeByTopPoint(graphEdge1, graphEdge2)
 {
