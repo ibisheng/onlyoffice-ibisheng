@@ -273,6 +273,11 @@
 					$(text).find('td')[0].innerHTML = '&nbsp;';
 				t.element.appendChild(text);
 				t.copyText = t._getTextFromTable(t.element.children[0]);
+                var randomVal = Math.floor(Math.random()*10000000);
+                t.copyText.pasteFragment = "pasteFragment_" + randomVal;
+                if(text)
+                    $(text).addClass("pasteFragment_" + randomVal);
+
 				if($(text).find('img')[0] && $.browser['opera'])
 				{
 					$(text)[0].innerHTML = "<tr><td>&nbsp;</td></tr>";
@@ -1458,7 +1463,7 @@
 					
 					//проверяем на равенство содержимому локального буфера
 					var textNode = t._getTextFromTable(node);
-					if(t._isEqualText(textNode))
+					if(t._isEqualText(textNode, node))
 					{
 						if(t.copyText.isImage)
 						{
@@ -1842,7 +1847,7 @@
 				worksheet.setSelectionInfo('paste',aResult,t);
             },
 			
-			_isEqualText: function(node){
+			_isEqualText: function(node, table){
 				var t = this;
 				if(undefined == t.copyText || node == undefined)
 					return false;
@@ -1857,25 +1862,22 @@
 					else if(node.rows && t.copyText.rows && node.rows == t.copyText.rows && node.cols && t.copyText.cols && node.cols == t.copyText.cols)
 						return true;
 				}
+
+                if(table && table.children[0] && node.text.replace(/(\r|\t|\n| |\s)/g, "") == t.copyText.text.replace(/(\r|\t|\n| |\s)/g, ""))
+                {
+                    if( table.children[0].getAttribute("class") != null ){
+                        cL = table.children[0].getAttribute("class").split(" ");
+                        for (var i = 0; i < cL.length; i++){
+                            if(cL[i].indexOf("pasteFragment_") > -1){
+                                if(cL[i] == t.copyText.pasteFragment)
+                                    return true;
+                                else
+                                    break;
+                            }
+                        }
+                    }
+                }
 				return false;
-					
-				
-				/*var localText = t.copyText;
-				var insertText = node.innerText;
-				if(localText == insertText)
-					return true;
-				var tabSpl = localText.split('\t');
-				for(i = 0;i < tabSpl.length ;i++)
-				{
-					for(j = 0;j < tabSpl[i].split('\n').length ;j++)
-					{
-						if(i == tabSpl.length -1 && j == tabSpl[i].split('\n').length -1 && tabSpl[i].split('\n')[j] == '')
-							return true;
-						if(tabSpl[i].split('\n')[j] != insertText.split('\t')[i].split('\n')[j])
-							return false;
-					}
-				}
-				return true;*/
 			},
 			
 			_selectElement: function (callback) {
