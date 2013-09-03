@@ -746,8 +746,8 @@
                 OfficeExcel.Text(context,
                             this._otherProps._text_font,
                             text_size,
-                            centerx + explosion_offsetx + ((this.radius + 10)* Math.cos(a)) + (this._otherProps._labels_sticks ? (a < 1.57 || a > 4.71 ? 2 : -2) : 0),
-                            this.centery + explosion_offsety + (((this.radius + 10) * Math.sin(a))),
+                            centerx + explosion_offsetx + ((this.radius - 10)* Math.cos(a)) + (this._otherProps._labels_sticks ? (a < 1.57 || a > 4.71 ? 2 : -2) : 0),
+                            this.centery + explosion_offsety + (((this.radius - 10) * Math.sin(a))),
                             OfficeExcel.numToFormatText(labels[i],isFormatCellTrue),
                             vAlignment,
                             hAlignment, false, null,null, bold, null, textOptions);
