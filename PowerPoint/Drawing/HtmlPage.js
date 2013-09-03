@@ -34,6 +34,11 @@ var selectionflag_DrawingObject = 0x002;
 var orientation_Portrait  = 0x00;
 var orientation_Landscape = 0x01;
 
+// не убирать!!! это для ие. чтобы не селектились элементы
+document.onselectstart= function() {
+    return false;
+}
+
 function CEditorPage(api)
 {
     // ------------------------------------------------------------------
@@ -162,6 +167,8 @@ function CEditorPage(api)
 
     this.bIsUseKeyPress = true;
     this.bIsEventPaste = false;
+
+    this.m_bIsIE = (/MSIE/g.test(navigator.userAgent)) ? true : false;
 
     // сплиттеры (для табнейлов и для заметок)
     this.Splitter1Pos = 0;
@@ -1281,10 +1288,13 @@ function CEditorPage(api)
 
         var oWordControl = oThis;
 
-        if (e.preventDefault)
-            e.preventDefault();
-        else
-            e.returnValue = false;
+        if (!oThis.m_bIsIE)
+        {
+            if (e.preventDefault)
+                e.preventDefault();
+            else
+                e.returnValue = false;
+        }
 
         oWordControl.Thumbnails.SetFocusElement(FOCUS_OBJECT_MAIN);
         if (oWordControl.DemonstrationManager.Mode)

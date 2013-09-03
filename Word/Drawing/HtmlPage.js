@@ -36,6 +36,11 @@ var orientation_Landscape = 0x01;
 
 var tableSpacingMinValue = 0.02;//0.02мм
 
+// не убирать!!! это для ие. чтобы не селектились элементы
+document.onselectstart= function() {
+    return false;
+}
+
 function CEditorPage(api)
 {
     this.Name = "";
@@ -62,6 +67,7 @@ function CEditorPage(api)
     this.ReaderModeDiv      = null;
 
     this.m_oOverlayApi      = new COverlay();
+    this.m_bIsIE            = (/MSIE/g.test(navigator.userAgent)) ? true : false;
 
     this.m_oPanelRight_buttonRulers    = null;
     this.m_oPanelRight_vertScroll      = null;
@@ -1417,10 +1423,13 @@ function CEditorPage(api)
         if (false === oThis.m_oApi.bInit_word_control)
             return;
 
-        if (e.preventDefault)
-            e.preventDefault();
-        else
-            e.returnValue = false;
+        if (!oThis.m_bIsIE)
+        {
+            if (e.preventDefault)
+                e.preventDefault();
+            else
+                e.returnValue = false;
+        }
 
         var oWordControl = oThis;
 
