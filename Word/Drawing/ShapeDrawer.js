@@ -436,6 +436,8 @@ function CShapeDrawer()
     this.IsCurrentPathCanArrows = true;
 
     this.bIsCheckBounds = false;
+
+    this.IsRectShape = false;
 }
 
 CShapeDrawer.prototype =
@@ -462,8 +464,24 @@ CShapeDrawer.prototype =
             this.max_y = y;
     },
 
+    fromShape2 : function(shape, graphics, geom)
+    {
+        this.fromShape(shape, graphics);
+
+        if (!geom)
+        {
+            this.IsRectShape = true;
+        }
+        else
+        {
+            if (geom.preset == "rect")
+                this.IsRectShape = true;
+        }
+    },
+
     fromShape : function(shape, graphics)
     {
+        this.IsRectShape = false;
         this.Shape = shape;
         this.Graphics = graphics;
         this.UniFill = shape.brush;
@@ -743,22 +761,41 @@ CShapeDrawer.prototype =
 
             if (null == this.UniFill.fill.tile || this.Graphics.m_oContext === undefined)
             {
-                this.Graphics.save();
-                this.Graphics.clip();
-
-                if (this.Graphics.IsNoSupportTextDraw == true || true == this.Graphics.IsTrack || (null == this.UniFill.transparent) || (this.UniFill.transparent == 255))
+                if (this.IsRectShape)
                 {
-                    this.Graphics.drawImage(_getFullImageSrc(this.UniFill.fill.RasterImageId), this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y), undefined, this.UniFill.fill.srcRect, this.UniFill.fill.canvas);
+                    this.Graphics._s();
+
+                    if ((null == this.UniFill.transparent) || (this.UniFill.transparent == 255))
+                    {
+                        this.Graphics.drawImage(_getFullImageSrc(this.UniFill.fill.RasterImageId), this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y), undefined, this.UniFill.fill.srcRect, this.UniFill.fill.canvas);
+                    }
+                    else
+                    {
+                        var _old_global_alpha = this.Graphics.m_oContext.globalAlpha;
+                        this.Graphics.m_oContext.globalAlpha = this.UniFill.transparent / 255;
+                        this.Graphics.drawImage(_getFullImageSrc(this.UniFill.fill.RasterImageId), this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y), undefined, this.UniFill.fill.srcRect, this.UniFill.fill.canvas);
+                        this.Graphics.m_oContext.globalAlpha = _old_global_alpha;
+                    }
                 }
                 else
                 {
-                    var _old_global_alpha = this.Graphics.m_oContext.globalAlpha;
-                    this.Graphics.m_oContext.globalAlpha = this.UniFill.transparent / 255;
-                    this.Graphics.drawImage(_getFullImageSrc(this.UniFill.fill.RasterImageId), this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y), undefined, this.UniFill.fill.srcRect, this.UniFill.fill.canvas);
-                    this.Graphics.m_oContext.globalAlpha = _old_global_alpha;
-                }
+                    this.Graphics.save();
+                    this.Graphics.clip();
 
-                this.Graphics.restore();
+                    if (this.Graphics.IsNoSupportTextDraw == true || true == this.Graphics.IsTrack || (null == this.UniFill.transparent) || (this.UniFill.transparent == 255))
+                    {
+                        this.Graphics.drawImage(_getFullImageSrc(this.UniFill.fill.RasterImageId), this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y), undefined, this.UniFill.fill.srcRect, this.UniFill.fill.canvas);
+                    }
+                    else
+                    {
+                        var _old_global_alpha = this.Graphics.m_oContext.globalAlpha;
+                        this.Graphics.m_oContext.globalAlpha = this.UniFill.transparent / 255;
+                        this.Graphics.drawImage(_getFullImageSrc(this.UniFill.fill.RasterImageId), this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y), undefined, this.UniFill.fill.srcRect, this.UniFill.fill.canvas);
+                        this.Graphics.m_oContext.globalAlpha = _old_global_alpha;
+                    }
+
+                    this.Graphics.restore();
+                }
             }
             else
             {
@@ -1021,7 +1058,15 @@ CShapeDrawer.prototype =
 
         var rgba = this.StrokeUniColor;
         this.Graphics.p_color(rgba.R, rgba.G, rgba.B, rgba.A);
-        this.Graphics.ds();
+
+        if (this.IsRectShape && this.Graphics.AddSmartRect !== undefined)
+        {
+            this.Graphics.AddSmartRect(0, 0, this.Shape.absExtX, this.Shape.absExtY, this.StrokeWidth);
+        }
+        else
+        {
+            this.Graphics.ds();
+        }
 
         if (null != this.OldLineJoin && !this.IsArrowsDrawing)
         {

@@ -2559,5 +2559,54 @@ CGraphics.prototype =
             r : (_r * this.m_oCoordTransform.sx) >> 0,
             b : (_b * this.m_oCoordTransform.sy) >> 0
         };
+    },
+
+    AddSmartRect : function(x, y, w, h, pen_w)
+    {
+        if (!global_MatrixTransformer.IsIdentity2(this.m_oTransform))
+        {
+            this.ds();
+            return;
+        }
+
+        var bIsSmartAttack = false;
+        if (!this.m_bIntegerGrid)
+        {
+            this.SetIntegerGrid(true);
+            bIsSmartAttack = true;
+        }
+
+        var _pen_w = (pen_w * this.m_oCoordTransform.sx + 0.5) >> 0;
+        if (0 >= _pen_w)
+            _pen_w = 1;
+
+        this._s();
+
+        if ((_pen_w & 0x01) == 0x01)
+        {
+            var _x = (this.m_oFullTransform.TransformPointX(x, y) >> 0) + 0.5;
+            var _y = (this.m_oFullTransform.TransformPointY(x, y) >> 0) + 0.5;
+            var _r = (this.m_oFullTransform.TransformPointX(x+w, y+h) >> 0) + 0.5;
+            var _b = (this.m_oFullTransform.TransformPointY(x+w, y+h) >> 0) + 0.5;
+
+            this.m_oContext.rect(_x, _y, _r - _x, _b - _y);
+        }
+        else
+        {
+            var _x = (this.m_oFullTransform.TransformPointX(x, y) + 0.5) >> 0;
+            var _y = (this.m_oFullTransform.TransformPointY(x, y) + 0.5) >> 0;
+            var _r = (this.m_oFullTransform.TransformPointX(x+w, y+h) + 0.5) >> 0;
+            var _b = (this.m_oFullTransform.TransformPointY(x+w, y+h) + 0.5) >> 0;
+
+            this.m_oContext.rect(_x, _y, _r - _x, _b - _y);
+        }
+
+        this.m_oContext.lineWidth = _pen_w;
+        this.ds();
+
+        if (bIsSmartAttack)
+        {
+            this.SetIntegerGrid(false);
+        }
     }
 };

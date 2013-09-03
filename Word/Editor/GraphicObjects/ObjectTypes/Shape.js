@@ -2012,7 +2012,7 @@ CShape.prototype =
             graphics.transform3(this.TransformMatrix, false);
 
             var shape_drawer = new CShapeDrawer();
-            shape_drawer.fromShape(this, graphics);
+            shape_drawer.fromShape2(this, graphics, this.geometry);
             shape_drawer.draw(this.geometry);
         }
         if(this.isEmptyPlaceholder() && graphics.IsNoDrawingEmptyPlaceholder !== true)

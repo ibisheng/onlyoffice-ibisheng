@@ -5559,7 +5559,7 @@ function ShapeForResizeInGroup(originalShape, parentTrack)
         overlay.SetCurrentPage(this.pageIndex);
         overlay.transform3(this.transform);
         var shape_drawer = new CShapeDrawer();
-        shape_drawer.fromShape(this.objectForOverlay, overlay);
+        shape_drawer.fromShape2(this.objectForOverlay, overlay, this.geometry);
         shape_drawer.draw(this.geometry);
         overlay.reset();
     };
