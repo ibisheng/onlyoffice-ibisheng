@@ -1110,6 +1110,8 @@
 					var comment = this.model.aComments[i];
 					this.cellCommentator.addCommentSerialize(comment);
 					commentList.push(comment);
+					// Если, например, перемещаем лист
+					this.model.workbook.handlers.trigger("asc_onRemoveComment", comment.asc_getId());
 				}
 				if ( commentList.length )
 					this.model.workbook.handlers.trigger("asc_onAddComments", commentList);
