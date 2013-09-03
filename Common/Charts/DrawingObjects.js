@@ -498,7 +498,7 @@ asc_CChart.prototype = {
 					if ( _t.series[j].Cat.Formula && _t.series[j].Cat.NumCache.length )
 						seria.TxCache.Tx = _t.series[j].Cat.NumCache[i].val;
 					else
-						seria.TxCache.Tx = /*api.chartTranslate.series + " " +*/ (i + 1);
+						seria.TxCache.Tx = (i + 1);
 				}
 				revSeries.push(seria);
 			}
@@ -1685,6 +1685,8 @@ prot["asc_getFill"] = prot.asc_getFill;
 prot["asc_putFill"] = prot.asc_putFill;
 prot["asc_getStroke"] = prot.asc_getStroke;
 prot["asc_putStroke"] = prot.asc_putStroke;
+prot["asc_getPaddings"] = prot.asc_getPaddings;
+prot["asc_putPaddings"] = prot.asc_putPaddings;
 //}
 
 //-----------------------------------------------------------------------------------

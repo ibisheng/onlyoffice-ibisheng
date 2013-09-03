@@ -394,6 +394,14 @@ var c_oAscFillGradType  = {
     GRAD_LINEAR : 1,
     GRAD_PATH   : 2
 };
+
+var c_oAscVerticalTextAlign = {
+    TEXT_ALIGN_BOTTOM : 0,// (Text Anchor Enum ( Bottom ))
+    TEXT_ALIGN_CTR : 1,// (Text Anchor Enum ( Center ))
+    TEXT_ALIGN_DIST : 2,// (Text Anchor Enum ( Distributed ))
+    TEXT_ALIGN_JUST : 3,// (Text Anchor Enum ( Justified ))
+    TEXT_ALIGN_TOP : 4// Top
+};
  
 var c_oAscCoAuthoringMeBorderColor					= "rgba(22,156,0,1)";
 var c_oAscCoAuthoringOtherBorderColor				= "rgba(238,53,37,1)";
