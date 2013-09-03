@@ -10,7 +10,7 @@ var g_nAllColIndex = -1;
 var History;
 var aStandartNumFormats;
 var aStandartNumFormatsId;
-var start, end, dep, cCharDelimiter = String.fromCharCode(5), arrRecalc = {};
+var start, end, dep, cCharDelimiter = String.fromCharCode(5), arrRecalc = {}, lc = 0;
 
 var c_oRangeType =
 {
@@ -1098,12 +1098,16 @@ function getVertexId(sheetId, cellId){
 	return sheetId + cCharDelimiter + cellId;
 }
 function lockDraw(wb){
+    lc++;
 	wb.isNeedCacheClean = false;
 	arrRecalc = {};
 }
 function unLockDraw(wb){
-	wb.isNeedCacheClean = true;
-	arrRecalc = {};
+    lc--;
+	if( lc == 0 ){
+        wb.isNeedCacheClean = true;
+        arrRecalc = {};
+    }
 }
 function helpFunction(_wb){
 	var wb = _wb, dep, sr1, sr2, sr, ws, ar;

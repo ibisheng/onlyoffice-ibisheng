@@ -2587,7 +2587,6 @@ function parserFormula( formula, _cellId, _ws ) {
     this.ws = _ws;
     this.wb = this.ws.workbook
     this.value = null;
-    this.Formula = "";
     this.pCurrPos = 0;
     this.elemArr = [];
     this.outStack = [];
