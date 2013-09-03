@@ -760,9 +760,14 @@ var c_oSer_ChartType =
 	PlotArea: 2,
 	Style: 3,
 	TitlePptx: 4,
-	TitleTxPrPptx: 5,
-	ShowBorder: 6,
-	SpPr: 7
+	ShowBorder: 5,
+	SpPr: 6
+};
+/** @enum */
+var c_oSer_ChartTitlePptxType =
+{
+	TxPptx: 0,
+	TxPrPptx: 1
 };
 /** @enum */
 var c_oSer_ChartLegendType =
@@ -810,7 +815,6 @@ var c_oSer_ChartCatAxType =
 	Delete: 2,
 	AxPos: 3,
 	TitlePptx: 4,
-	TitleTxPrPptx: 5,
 	TxPrPptx: 6
 };
 /** @enum */
@@ -1351,8 +1355,9 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 		}
 		else if ( c_oSer_ChartType.Title === type )
 		{
-			this.chart.header.title = this.stream.GetString2LE(length);
-			if("" == this.chart.header.title)
+			//todo
+			var sTitle = this.stream.GetString2LE(length);
+			if("" == sTitle)
 				this.chart.header.bDefaultTitle = true;
 		}
 		else if ( c_oSer_ChartType.PlotArea === type )
@@ -1426,17 +1431,15 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 		{
 			this.chart.styleId = this.stream.GetULongLE();
 		}
-		else if ( c_oSer_ChartType.TitlePptx === type || c_oSer_ChartType.TitleTxPrPptx === type)
+		else if ( c_oSer_ChartType.TitlePptx === type)
 		{
             if(!isRealObject(this.chartAsGroup.chartTitle))
                 this.chartAsGroup.chartTitle = new CChartTitle(this.chartAsGroup, CHART_TITLE_TYPE_TITLE);
-
-            var oPresentationSimpleSerializer = new CPPTXContentLoader();
-            var textBody = oPresentationSimpleSerializer.ReadTextBody(null, this.stream,  this.chartAsGroup.chartTitle);
-            if(c_oSer_ChartType.TitlePptx === type)
-                this.chartAsGroup.chartTitle.txBody = textBody;
-            else
-                this.chartAsGroup.chartTitle.txPr = textBody;
+			this.chart.header.bDefaultTitle = true;
+			
+			res = this.bcr.Read1(length, function(t,l){
+                return oThis.ReadChartTitle(t,l, oThis.chartAsGroup.chartTitle, oThis.chart.header);
+            });
 		}
 		else if ( c_oSer_ChartType.SpPr === type )
 		{
@@ -1451,6 +1454,25 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
             res = c_oSerConstants.ReadUnknown;
 		return res;
 	};
+	this.ReadChartTitle = function(type, length, chartTitlePptx, chartTitleHeader)
+    {
+		var res = c_oSerConstants.ReadOk;
+		if ( c_oSer_ChartTitlePptxType.TxPptx === type || c_oSer_ChartTitlePptxType.TxPrPptx === type)
+		{
+            var oPresentationSimpleSerializer = new CPPTXContentLoader();
+            var textBody = oPresentationSimpleSerializer.ReadTextBody(null, this.stream,  chartTitlePptx);
+            if(c_oSer_ChartTitlePptxType.TxPptx === type)
+			{
+                chartTitlePptx.txBody = textBody;
+				chartTitleHeader.bDefaultTitle = false;
+			}
+            else
+                chartTitlePptx.txPr = textBody;
+		}
+		else
+            res = c_oSerConstants.ReadUnknown;
+		return res;
+	}
     this.ReadLegend = function(type, length, oLegendEntries)
     {
         var res = c_oSerConstants.ReadOk;
@@ -1585,8 +1607,9 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
         var oThis = this;
         if ( c_oSer_ChartCatAxType.Title === type )
 		{
-			oAx.title = this.stream.GetString2LE(length);
-			if("" == oAx.title)
+			//todo
+			var sTitle = this.stream.GetString2LE(length);
+			if("" == sTitle)
 				oAx.bDefaultTitle = true;
 		}
 		else if ( c_oSer_ChartCatAxType.MajorGridlines === type )
@@ -1595,23 +1618,15 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 			oAx.bShow = !this.stream.GetBool();
 		else if ( c_oSer_ChartCatAxType.AxPos === type )
 			oAx.axPos = this.stream.GetUChar();
-		else if ( c_oSer_ChartCatAxType.TitlePptx === type || c_oSer_ChartCatAxType.TitleTxPrPptx === type)
+		else if ( c_oSer_ChartCatAxType.TitlePptx === type )
 		{
             if(!isRealObject(oAx.chartTitle))
                 oAx.chartTitle = new CChartTitle(this.chartAsGroup, CHART_TITLE_TYPE_TITLE);
-            var oPresentationSimpleSerializer = new CPPTXContentLoader();
-            var textBody = oPresentationSimpleSerializer.ReadTextBody(null, this.stream,  oAx.chartTitle);
-            if(c_oSer_ChartCatAxType.TitlePptx === type)
-                oAx.chartTitle.txBody = textBody;
-            else
-                oAx.chartTitle.txPr = textBody;
-			/*var params = this.ParsePptxParagraph(textBody);
-			if(c_oSer_ChartCatAxType.TitlePptx === type)
-				oAx.title = params.text;
-			else
-				oAx.bDefaultTitle = true;
-			if(null != params.font)
-				oAx.titlefont = params.font;   */
+			oAx.bDefaultTitle = true;
+			
+			res = this.bcr.Read1(length, function(t,l){
+                return oThis.ReadChartTitle(t,l, oAx.chartTitle, oAx);
+            });
 		}
 		else if ( c_oSer_ChartCatAxType.TxPrPptx === type )
 		{
