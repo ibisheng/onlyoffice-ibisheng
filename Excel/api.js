@@ -1871,8 +1871,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				if (1 === d)
 					where -= 1;
 
-				this.wbModel.replaceWorksheet(i, where);
 				this.wb.replaceWorksheet(i, where);
+				this.wbModel.replaceWorksheet(i, where);
 
 				// Обновим текущий номер
 				this.asc_showWorksheet(where);
