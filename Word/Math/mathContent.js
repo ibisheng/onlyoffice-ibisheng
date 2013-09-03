@@ -2477,7 +2477,7 @@ CMathContent.prototype =
                     break;
                 case 23:
                     var integr = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_INTEGRAL,
                         limLocType:     NARY_UndOvr,
@@ -2489,7 +2489,7 @@ CMathContent.prototype =
                     break;
                 case 24:
                     var integr = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_INTEGRAL,
                         limLocType:     NARY_SubSup
@@ -2499,7 +2499,7 @@ CMathContent.prototype =
                     break;
                 case 25:
                     var integr = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_INTEGRAL,
                         limLocType:     NARY_UndOvr
@@ -2509,7 +2509,7 @@ CMathContent.prototype =
                     break;
                 case 26:
                     var integr = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_DOUBLE_INTEGRAL,
                         limLocType:     NARY_UndOvr,
@@ -2521,7 +2521,7 @@ CMathContent.prototype =
                     break;
                 case 27:
                     var integr = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_DOUBLE_INTEGRAL,
                         limLocType:     NARY_SubSup
@@ -2531,7 +2531,7 @@ CMathContent.prototype =
                     break;
                 case 28:
                     var integr = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_DOUBLE_INTEGRAL,
                         limLocType:     NARY_UndOvr
@@ -2541,7 +2541,7 @@ CMathContent.prototype =
                     break;
                 case 29:
                     var integr = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_TRIPLE_INTEGRAL,
                         limLocType:     NARY_UndOvr,
@@ -2553,7 +2553,7 @@ CMathContent.prototype =
                     break;
                 case 30:
                     var integr = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_TRIPLE_INTEGRAL,
                         limLocType:     NARY_SubSup
@@ -2563,7 +2563,7 @@ CMathContent.prototype =
                     break;
                 case 31:
                     var integr = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_TRIPLE_INTEGRAL,
                         limLocType:     NARY_UndOvr
@@ -2573,7 +2573,7 @@ CMathContent.prototype =
                     break;
                 case 32:
                     var integr = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_CONTOUR_INTEGRAL,
                         limLocType:     NARY_UndOvr,
@@ -2585,7 +2585,7 @@ CMathContent.prototype =
                     break;
                 case 33:
                     var integr = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_CONTOUR_INTEGRAL,
                         limLocType:     NARY_SubSup
@@ -2595,7 +2595,7 @@ CMathContent.prototype =
                     break;
                 case 34:
                     var integr = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_CONTOUR_INTEGRAL,
                         limLocType:     NARY_UndOvr
@@ -2605,7 +2605,7 @@ CMathContent.prototype =
                     break;
                 case 35:
                     var integr = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_SURFACE_INTEGRAL,
                         limLocType:     NARY_UndOvr,
@@ -2617,7 +2617,7 @@ CMathContent.prototype =
                     break;
                 case 36:
                     var integr = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_SURFACE_INTEGRAL,
                         limLocType:     NARY_SubSup
@@ -2627,7 +2627,7 @@ CMathContent.prototype =
                     break;
                 case 37:
                     var integr = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_SURFACE_INTEGRAL,
                         limLocType:     NARY_UndOvr
@@ -2637,7 +2637,7 @@ CMathContent.prototype =
                     break;
                 case 38:
                     var integr = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_VOLUME_INTEGRAL,
                         limLocType:     NARY_UndOvr,
@@ -2649,7 +2649,7 @@ CMathContent.prototype =
                     break;
                 case 39:
                     var integr = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_VOLUME_INTEGRAL,
                         limLocType:     NARY_SubSup
@@ -2659,7 +2659,7 @@ CMathContent.prototype =
                     break;
                 case 40:
                     var integr = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_VOLUME_INTEGRAL,
                         limLocType:     NARY_UndOvr
@@ -2702,7 +2702,7 @@ CMathContent.prototype =
                     break;
                 case 44:
                     var integr = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_SIGMA,
                         limLocType:     NARY_UndOvr,
@@ -2714,7 +2714,7 @@ CMathContent.prototype =
                     break;
                 case 45:
                     var sigma = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_SIGMA,
                         limLocType:     NARY_UndOvr
@@ -2724,7 +2724,7 @@ CMathContent.prototype =
                     break;
                 case 46:
                     var sigma = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_SIGMA,
                         limLocType:     NARY_SubSup
@@ -2734,7 +2734,7 @@ CMathContent.prototype =
                     break;
                 case 47:
                     var sigma = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_SIGMA,
                         limLocType:     NARY_UndOvr,
@@ -2745,7 +2745,7 @@ CMathContent.prototype =
                     break;
                 case 48:
                     var sigma = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_SIGMA,
                         limLocType:     NARY_SubSup,
@@ -2756,7 +2756,7 @@ CMathContent.prototype =
                     break;
                 case 49:
                     var product = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_PRODUCT,
                         limLocType:     NARY_UndOvr,
@@ -2768,7 +2768,7 @@ CMathContent.prototype =
                     break;
                 case 50:
                     var product = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_PRODUCT,
                         limLocType:     NARY_UndOvr
@@ -2778,7 +2778,7 @@ CMathContent.prototype =
                     break;
                 case 51:
                     var product = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_PRODUCT,
                         limLocType:     NARY_SubSup
@@ -2788,7 +2788,7 @@ CMathContent.prototype =
                     break;
                 case 52:
                     var product = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_PRODUCT,
                         limLocType:     NARY_UndOvr,
@@ -2799,7 +2799,7 @@ CMathContent.prototype =
                     break;
                 case 53:
                     var product = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_PRODUCT,
                         limLocType:     NARY_SubSup,
@@ -2810,7 +2810,7 @@ CMathContent.prototype =
                     break;
                 case 54:
                     var coproduct = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_COPRODUCT,
                         limLocType:     NARY_UndOvr,
@@ -2822,7 +2822,7 @@ CMathContent.prototype =
                     break;
                 case 55:
                     var coproduct = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_COPRODUCT,
                         limLocType:     NARY_UndOvr
@@ -2832,7 +2832,7 @@ CMathContent.prototype =
                     break;
                 case 56:
                     var coproduct = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_COPRODUCT,
                         limLocType:     NARY_SubSup
@@ -2842,7 +2842,7 @@ CMathContent.prototype =
                     break;
                 case 57:
                     var coproduct = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_COPRODUCT,
                         limLocType:     NARY_UndOvr,
@@ -2853,7 +2853,7 @@ CMathContent.prototype =
                     break;
                 case 58:
                     var coproduct = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_COPRODUCT,
                         limLocType:     NARY_SubSup,
@@ -2865,7 +2865,7 @@ CMathContent.prototype =
 
                 case 59:
                     var union = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_UNION,
                         limLocType:     NARY_UndOvr,
@@ -2877,7 +2877,7 @@ CMathContent.prototype =
                     break;
                 case 60:
                     var union = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_UNION,
                         limLocType:     NARY_UndOvr
@@ -2887,7 +2887,7 @@ CMathContent.prototype =
                     break;
                 case 61:
                     var union = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_UNION,
                         limLocType:     NARY_SubSup
@@ -2897,7 +2897,7 @@ CMathContent.prototype =
                     break;
                 case 62:
                     var union = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_UNION,
                         limLocType:     NARY_UndOvr,
@@ -2908,7 +2908,7 @@ CMathContent.prototype =
                     break;
                 case 63:
                     var union = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_UNION,
                         limLocType:     NARY_SubSup,
@@ -2920,7 +2920,7 @@ CMathContent.prototype =
 
                 case 64:
                     var intersection = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_INTERSECTION,
                         limLocType:     NARY_UndOvr,
@@ -2932,7 +2932,7 @@ CMathContent.prototype =
                     break;
                 case 65:
                     var intersection = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_INTERSECTION,
                         limLocType:     NARY_UndOvr
@@ -2942,7 +2942,7 @@ CMathContent.prototype =
                     break;
                 case 66:
                     var intersection = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_INTERSECTION,
                         limLocType:     NARY_SubSup
@@ -2952,7 +2952,7 @@ CMathContent.prototype =
                     break;
                 case 67:
                     var intersection = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_INTERSECTION,
                         limLocType:     NARY_UndOvr,
@@ -2963,7 +2963,7 @@ CMathContent.prototype =
                     break;
                 case 68:
                     var intersection = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_INTERSECTION,
                         limLocType:     NARY_SubSup,
@@ -2975,7 +2975,7 @@ CMathContent.prototype =
 
                 case 69:
                     var logicalOr = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_LOGICAL_OR,
                         limLocType:     NARY_UndOvr,
@@ -2987,7 +2987,7 @@ CMathContent.prototype =
                     break;
                 case 70:
                     var logicalOr = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_LOGICAL_OR,
                         limLocType:     NARY_UndOvr
@@ -2997,7 +2997,7 @@ CMathContent.prototype =
                     break;
                 case 71:
                     var logicalOr = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_LOGICAL_OR,
                         limLocType:     NARY_SubSup
@@ -3007,7 +3007,7 @@ CMathContent.prototype =
                     break;
                 case 72:
                     var logicalOr = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_LOGICAL_OR,
                         limLocType:     NARY_UndOvr,
@@ -3018,7 +3018,7 @@ CMathContent.prototype =
                     break;
                 case 73:
                     var logicalOr = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_LOGICAL_OR,
                         limLocType:     NARY_SubSup,
@@ -3030,7 +3030,7 @@ CMathContent.prototype =
 
                 case 74:
                     var logicalAnd = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_LOGICAL_AND,
                         limLocType:     NARY_UndOvr,
@@ -3042,7 +3042,7 @@ CMathContent.prototype =
                     break;
                 case 75:
                     var logicalAnd = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_LOGICAL_AND,
                         limLocType:     NARY_UndOvr
@@ -3052,7 +3052,7 @@ CMathContent.prototype =
                     break;
                 case 76:
                     var logicalAnd = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_LOGICAL_AND,
                         limLocType:     NARY_SubSup
@@ -3062,7 +3062,7 @@ CMathContent.prototype =
                     break;
                 case 77:
                     var logicalAnd = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_LOGICAL_AND,
                         limLocType:     NARY_UndOvr,
@@ -3073,7 +3073,7 @@ CMathContent.prototype =
                     break;
                 case 78:
                     var logicalAnd = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_LOGICAL_AND,
                         limLocType:     NARY_SubSup,
@@ -3101,7 +3101,7 @@ CMathContent.prototype =
 
                 case 80:
                     var sigma = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_SIGMA,
                         limLocType:     NARY_UndOvr
@@ -3117,7 +3117,7 @@ CMathContent.prototype =
                     break;
                 case 81:
                     var product = this.addMComponent(MATH_NARY);
-                    props =
+                    var props =
                     {
                         signType:       NARY_PRODUCT,
                         limLocType:     NARY_UndOvr
@@ -3173,9 +3173,18 @@ CMathContent.prototype =
 
                     break;
                 case 84:
-                    var delim = this.addMComponent(9);
-                    delim.init(0, 4, 0, 1);
+                    var delim = this.addMComponent(MATH_DELIMITER);
+                    var props =
+                    {
+                        begChr:    {type: PARENTHESIS_LEFT},
+                        endChr:    {type: PARENTHESIS_RIGHT},
+                        column:    1
+                    };
+                    delim.init(props);
                     delim.fillPlaceholders();
+                    /*var delim = this.addMComponent(9);
+                    delim.init(0, 4, 0, 1);
+                    delim.fillPlaceholders();*/
                     break;
                 case 85:
                     var delim = this.addMComponent(9);
@@ -3446,16 +3455,13 @@ CMathContent.prototype =
                     var arg = trig.getArgument();
                     arg.fillPlaceholders();
                     break;
-
                 case 131:
-                    var trig = this.addMComponent(11);
+                    var trig = this.addMComponent(MATH_FUNCTION);
                     trig.init();
-                    var func = trig.getFunction();
-                    var degr = func.addMComponent(3);
-                    degr.init();
-                    degr.setIndex(1);
+                    var func = trig.getFName();
+                    var degr = func.addMComponent(MATH_DEGREE);
+                    degr.init({type: DEGREE_SUPERSCRIPT});
                     var base = degr.getBase();
-                    base.setOwnTPrp({Italic: false});
                     base.addTxt("sin");
                     var iter = degr.getIterator();
                     iter.addTxt("-1");
@@ -3463,14 +3469,12 @@ CMathContent.prototype =
                     arg.fillPlaceholders();
                     break;
                 case 132:
-                    var trig = this.addMComponent(11);
+                    var trig = this.addMComponent(MATH_FUNCTION);
                     trig.init();
-                    var func = trig.getFunction();
-                    var degr = func.addMComponent(3);
-                    degr.init();
-                    degr.setIndex(1);
+                    var func = trig.getFName();
+                    var degr = func.addMComponent(MATH_DEGREE);
+                    degr.init({type: DEGREE_SUPERSCRIPT});
                     var base = degr.getBase();
-                    base.setOwnTPrp({Italic: false});
                     base.addTxt("cos");
                     var iter = degr.getIterator();
                     iter.addTxt("-1");
@@ -3478,14 +3482,12 @@ CMathContent.prototype =
                     arg.fillPlaceholders();
                     break;
                 case 133:
-                    var trig = this.addMComponent(11);
+                    var trig = this.addMComponent(MATH_FUNCTION);
                     trig.init();
-                    var func = trig.getFunction();
-                    var degr = func.addMComponent(3);
-                    degr.init();
-                    degr.setIndex(1);
+                    var func = trig.getFName();
+                    var degr = func.addMComponent(MATH_DEGREE);
+                    degr.init({type: DEGREE_SUPERSCRIPT});
                     var base = degr.getBase();
-                    base.setOwnTPrp({Italic: false});
                     base.addTxt("tan");
                     var iter = degr.getIterator();
                     iter.addTxt("-1");
@@ -3493,14 +3495,12 @@ CMathContent.prototype =
                     arg.fillPlaceholders();
                     break;
                 case 134:
-                    var trig = this.addMComponent(11);
+                    var trig = this.addMComponent(MATH_FUNCTION);
                     trig.init();
-                    var func = trig.getFunction();
-                    var degr = func.addMComponent(3);
-                    degr.init();
-                    degr.setIndex(1);
+                    var func = trig.getFName();
+                    var degr = func.addMComponent(MATH_DEGREE);
+                    degr.init({type: DEGREE_SUPERSCRIPT});
                     var base = degr.getBase();
-                    base.setOwnTPrp({Italic: false});
                     base.addTxt("csc");
                     var iter = degr.getIterator();
                     iter.addTxt("-1");
@@ -3508,14 +3508,12 @@ CMathContent.prototype =
                     arg.fillPlaceholders();
                     break;
                 case 135:
-                    var trig = this.addMComponent(11);
+                    var trig = this.addMComponent(MATH_FUNCTION);
                     trig.init();
-                    var func = trig.getFunction();
-                    var degr = func.addMComponent(3);
-                    degr.init();
-                    degr.setIndex(1);
+                    var func = trig.getFName();
+                    var degr = func.addMComponent(MATH_DEGREE);
+                    degr.init({type: DEGREE_SUPERSCRIPT});
                     var base = degr.getBase();
-                    base.setOwnTPrp({Italic: false});
                     base.addTxt("sec");
                     var iter = degr.getIterator();
                     iter.addTxt("-1");
@@ -3523,14 +3521,12 @@ CMathContent.prototype =
                     arg.fillPlaceholders();
                     break;
                 case 136:
-                    var trig = this.addMComponent(11);
+                    var trig = this.addMComponent(MATH_FUNCTION);
                     trig.init();
-                    var func = trig.getFunction();
-                    var degr = func.addMComponent(3);
-                    degr.init();
-                    degr.setIndex(1);
+                    var func = trig.getFName();
+                    var degr = func.addMComponent(MATH_DEGREE);
+                    degr.init({type: DEGREE_SUPERSCRIPT});
                     var base = degr.getBase();
-                    base.setOwnTPrp({Italic: false});
                     base.addTxt("cot");
                     var iter = degr.getIterator();
                     iter.addTxt("-1");
@@ -3539,63 +3535,61 @@ CMathContent.prototype =
                     break;
 
                 case 137:
-                    var trig = this.addMComponent(11);
+                    var trig = this.addMComponent(MATH_FUNCTION);
                     trig.init();
-                    var func = trig.getFunction();
+                    var func = trig.getFName();
                     func.addTxt("sinh");
                     var arg = trig.getArgument();
                     arg.fillPlaceholders();
                     break;
                 case 138:
-                    var trig = this.addMComponent(11);
+                    var trig = this.addMComponent(MATH_FUNCTION);
                     trig.init();
-                    var func = trig.getFunction();
+                    var func = trig.getFName();
                     func.addTxt("cosh");
                     var arg = trig.getArgument();
                     arg.fillPlaceholders();
                     break;
                 case 139:
-                    var trig = this.addMComponent(11);
+                    var trig = this.addMComponent(MATH_FUNCTION);
                     trig.init();
-                    var func = trig.getFunction();
+                    var func = trig.getFName();
                     func.addTxt("tanh");
                     var arg = trig.getArgument();
                     arg.fillPlaceholders();
                     break;
                 case 140:
-                    var trig = this.addMComponent(11);
+                    var trig = this.addMComponent(MATH_FUNCTION);
                     trig.init();
-                    var func = trig.getFunction();
+                    var func = trig.getFName();
                     func.addTxt("csch");
                     var arg = trig.getArgument();
                     arg.fillPlaceholders();
                     break;
                 case 141:
-                    var trig = this.addMComponent(11);
+                    var trig = this.addMComponent(MATH_FUNCTION);
                     trig.init();
-                    var func = trig.getFunction();
+                    var func = trig.getFName();
                     func.addTxt("sech");
                     var arg = trig.getArgument();
                     arg.fillPlaceholders();
                     break;
                 case 142:
-                    var trig = this.addMComponent(11);
+                    var trig = this.addMComponent(MATH_FUNCTION);
                     trig.init();
-                    var func = trig.getFunction();
+                    var func = trig.getFName();
                     func.addTxt("coth");
                     var arg = trig.getArgument();
                     arg.fillPlaceholders();
                     break;
 
                 case 143:
-                    var trig = this.addMComponent(11);
+                    var trig = this.addMComponent(MATH_FUNCTION);
                     trig.init();
-                    var func = trig.getFunction();
-                    var degr = func.addMComponent(3);
-                    degr.init();
-                    degr.setIndex(1);
+                    var func = trig.getFName();
+                    var degr = func.addMComponent(MATH_DEGREE);
+                    degr.init({type: DEGREE_SUPERSCRIPT});
                     var base = degr.getBase();
-                    base.setOwnTPrp({Italic: false});
                     base.addTxt("sinh");
                     var iter = degr.getIterator();
                     iter.addTxt("-1");
@@ -3603,14 +3597,12 @@ CMathContent.prototype =
                     arg.fillPlaceholders();
                     break;
                 case 144:
-                    var trig = this.addMComponent(11);
+                    var trig = this.addMComponent(MATH_FUNCTION);
                     trig.init();
-                    var func = trig.getFunction();
-                    var degr = func.addMComponent(3);
-                    degr.init();
-                    degr.setIndex(1);
+                    var func = trig.getFName();
+                    var degr = func.addMComponent(MATH_DEGREE);
+                    degr.init({type: DEGREE_SUPERSCRIPT});
                     var base = degr.getBase();
-                    base.setOwnTPrp({Italic: false});
                     base.addTxt("cosh");
                     var iter = degr.getIterator();
                     iter.addTxt("-1");
@@ -3618,14 +3610,12 @@ CMathContent.prototype =
                     arg.fillPlaceholders();
                     break;
                 case 145:
-                    var trig = this.addMComponent(11);
+                    var trig = this.addMComponent(MATH_FUNCTION);
                     trig.init();
-                    var func = trig.getFunction();
-                    var degr = func.addMComponent(3);
-                    degr.init();
-                    degr.setIndex(1);
+                    var func = trig.getFName();
+                    var degr = func.addMComponent(MATH_DEGREE);
+                    degr.init({type: DEGREE_SUPERSCRIPT});
                     var base = degr.getBase();
-                    base.setOwnTPrp({Italic: false});
                     base.addTxt("tanh");
                     var iter = degr.getIterator();
                     iter.addTxt("-1");
@@ -3633,14 +3623,12 @@ CMathContent.prototype =
                     arg.fillPlaceholders();
                     break;
                 case 146:
-                    var trig = this.addMComponent(11);
+                    var trig = this.addMComponent(MATH_FUNCTION);
                     trig.init();
-                    var func = trig.getFunction();
-                    var degr = func.addMComponent(3);
-                    degr.init();
-                    degr.setIndex(1);
+                    var func = trig.getFName();
+                    var degr = func.addMComponent(MATH_DEGREE);
+                    degr.init({type: DEGREE_SUPERSCRIPT});
                     var base = degr.getBase();
-                    base.setOwnTPrp({Italic: false});
                     base.addTxt("csch");
                     var iter = degr.getIterator();
                     iter.addTxt("-1");
@@ -3648,14 +3636,12 @@ CMathContent.prototype =
                     arg.fillPlaceholders();
                     break;
                 case 147:
-                    var trig = this.addMComponent(11);
+                    var trig = this.addMComponent(MATH_FUNCTION);
                     trig.init();
-                    var func = trig.getFunction();
-                    var degr = func.addMComponent(3);
-                    degr.init();
-                    degr.setIndex(1);
+                    var func = trig.getFName();
+                    var degr = func.addMComponent(MATH_DEGREE);
+                    degr.init({type: DEGREE_SUPERSCRIPT});
                     var base = degr.getBase();
-                    base.setOwnTPrp({Italic: false});
                     base.addTxt("sech");
                     var iter = degr.getIterator();
                     iter.addTxt("-1");
@@ -3663,14 +3649,12 @@ CMathContent.prototype =
                     arg.fillPlaceholders();
                     break;
                 case 148:
-                    var trig = this.addMComponent(11);
+                    var trig = this.addMComponent(MATH_FUNCTION);
                     trig.init();
-                    var func = trig.getFunction();
-                    var degr = func.addMComponent(3);
-                    degr.init();
-                    degr.setIndex(1);
+                    var func = trig.getFName();
+                    var degr = func.addMComponent(MATH_DEGREE);
+                    degr.init({type: DEGREE_SUPERSCRIPT});
                     var base = degr.getBase();
-                    base.setOwnTPrp({Italic: false});
                     base.addTxt("coth");
                     var iter = degr.getIterator();
                     iter.addTxt("-1");
@@ -3678,41 +3662,45 @@ CMathContent.prototype =
                     arg.fillPlaceholders();
                     break;
                 case 149:
-                    var trig = this.addMComponent(11);
+                    var trig = this.addMComponent(MATH_FUNCTION);
                     trig.init();
-                    var func = trig.getFunction();
+                    var func = trig.getFName();
                     func.addTxt("sin");
                     var arg = trig.getArgument();
                     arg.addTxt("θ");
                     break;
                 case 150:
-                    var trig = this.addMComponent(11);
+                    var trig = this.addMComponent(MATH_FUNCTION);
                     trig.init();
-                    var func = trig.getFunction();
+                    var func = trig.getFName();
                     func.addTxt("cos");
                     var arg = trig.getArgument();
                     arg.addTxt("2x");
                     break;
                 case 151:
-                    var trig = this.addMComponent(11);
+                    var trig = this.addMComponent(MATH_FUNCTION);
                     trig.init();
-                    var func = trig.getFunction();
+                    var func = trig.getFName();
                     func.addTxt("tan");
                     var arg = trig.getArgument();
                     arg.addTxt("θ");
                     this.addTxt("=");
-                    var fract = this.addMComponent(0);
-                    fract.init();
+                    var fract = this.addMComponent(MATH_FRACTION);
+                    fract.init({type: BAR_FRACTION});
                     var num = fract.getNumerator();
-                    var sin = num.addMComponent(11);
+                    var sin = num.addMComponent(MATH_FUNCTION);
                     sin.init();
-                    sin.getFunction().addTxt("sin");
-                    sin.getArgument().addTxt("θ");
+                    var func1 = sin.getFName();
+                    func1.addTxt("sin");
+                    var arg1 = sin.getArgument();
+                    arg1.addTxt("θ");
                     var den = fract.getDenominator();
-                    var cos = den.addMComponent(11);
+                    var cos = den.addMComponent(MATH_FUNCTION);
                     cos.init();
-                    cos.getFunction().addTxt("cos");
-                    cos.getArgument().addTxt("θ");
+                    var func2 = cos.getFName();
+                    func2.addTxt("cos");
+                    var arg2 = cos.getArgument();
+                    arg2.addTxt("θ");
                     break;
                 case 152:
                     var diac = this.addMComponent(15);
@@ -5191,7 +5179,7 @@ CMathContent.prototype =
         {
             bDelete:                false,    /* нужно ли пересчитывать позицию или нет, работает при backspace */
             bBeging:                false,    /* в начале контента или нет */
-            bEnd:                   false,     /* в конце */
+            bEnd:                   false     /* в конце */
         };
 
         var CurrContent = SelectContent = null,

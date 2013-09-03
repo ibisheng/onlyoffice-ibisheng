@@ -12,7 +12,7 @@ function CGlyphOperator()
     this.TxtPrp = new CMathTextPrp();
 
 }
-CGlyphOperator.prototype.setLocation = function(loc, turn)
+/*CGlyphOperator.prototype.setLocation = function(loc, turn)
 {
     // location
 
@@ -30,13 +30,32 @@ CGlyphOperator.prototype.setLocation = function(loc, turn)
 
     this.loc = loc;
     this.turn = turn;
+}*/
+CGlyphOperator.prototype.init = function(props)
+{
+    // location
+
+    // 0 - up
+    // 1 - down
+    // 2 - left
+    // 3 - right
+
+    // turn
+
+    // 0 - 0
+    // 1 - Pi
+    // 2 - Pi/2
+    // 3 - 3*Pi/2
+
+    this.loc = props.location;
+    this.turn = props.turn;
 }
 CGlyphOperator.prototype.setPosition = function(pos)
 {
     this.pos = pos;
     //this.pos = {x: pos.x, y : pos.y - this.size.center};
 }
-CGlyphOperator.prototype.recalculateSize = function(measure)
+CGlyphOperator.prototype.fixSize = function(measure)
 {
     var sizeGlyph = this.calcSize(measure);
     var width, height, center;
@@ -287,7 +306,7 @@ CGlyphOperator.prototype.relate = function(parent)
 }
 CGlyphOperator.prototype.Resize = function()
 {
-    this.recalculateSize();
+    this.fixSize(); //??
 }
 CGlyphOperator.prototype.getTxtPrp = function()
 {
@@ -571,6 +590,101 @@ old_CDelimiter.prototype.Resize = function()
                 this.elements[i][j].Resize();
 
     this.recalculateSize();
+}
+
+function GetOperator(chr)
+{
+    var operator;
+
+    if(chr == null || typeof(chr) == "undefined")
+        operator = -1;
+    else if( chr.value === "(" || chr.type === PARENTHESIS_LEFT)
+    {
+        operator = new COperatorParenthesis();
+        var props =
+        {
+            location:   DELIMITER_LOCATION_LEFT,
+            turn:       DELIMITER_TURN_0
+        };
+        operator.init(props);
+    }
+    else if( chr.value === ")" || chr.type === PARENTHESIS_RIGHT)
+    {
+        operator = new COperatorParenthesis();
+        var props =
+        {
+            location:   DELIMITER_LOCATION_RIGHT,
+            turn:       DELIMITER_TURN_180
+        };
+        operator.init(props);
+    }
+    else if( chr.value == "{" || chr.type === BRACKET_CURLY_LEFT)
+    {
+        operator = new COperatorBracket();
+        var props =
+        {
+            location:   DELIMITER_LOCATION_LEFT,
+            turn:       DELIMITER_TURN_0
+        };
+        operator.init(props);
+    }
+    else if( chr.value === "}" || chr.type === BRACKET_CURLY_RIGHT)
+    {
+        operator = new COperatorBracket();
+        var props =
+        {
+            location:   DELIMITER_LOCATION_RIGHT,
+            turn:       DELIMITER_TURN_180
+        };
+        operator.init(props);
+    }
+    else if( chr.value === "[" || chr.type === BRACKET_SQUARE_LEFT)
+    {
+        operator = new CSquareBracket();
+        var props =
+        {
+            location:   DELIMITER_LOCATION_LEFT,
+            turn:       DELIMITER_TURN_0
+        };
+        operator.init(props);
+    }
+    else if( chr.value === "]" || chr.type === BRACKET_SQUARE_RIGHT)
+    {
+        operator = new CSquareBracket();
+        var props =
+        {
+            location:   DELIMITER_LOCATION_RIGHT,
+            turn:       DELIMITER_TURN_180
+        };
+        operator.init(props);
+    }
+    else if( chr.value === "<" || chr.type === BRACKET_SQUARE_LEFT)
+    {
+        operator = new CSquareBracket();
+        var props =
+        {
+            location:   DELIMITER_LOCATION_LEFT,
+            turn:       DELIMITER_TURN_0
+        };
+        operator.init(props);
+    }
+    else if( chr.value === ">" || chr.type === BRACKET_SQUARE_RIGHT)
+    {
+        operator = new CSquareBracket();
+        var props =
+        {
+            location:   DELIMITER_LOCATION_RIGHT,
+            turn:       DELIMITER_TURN_180
+        };
+        operator.init(props);
+    }
+    else if( chr.value === "" || chr.type === BRACKET_EMPTY)
+        operator = -1;
+    else
+        operator = -1;
+
+
+    return operator;
 }
 
 function CBaseDelimiter()
@@ -3234,13 +3348,13 @@ old_CSeparatorDelimiter.prototype.mouseMove = function(mCoord)
 }
 
 
-function CSeparator()
+function old_CSeparator()
 {
     this.sepChr = 0x7C; // default
     CMathBase.call(this);
 }
-extend(CSeparator, CMathBase);
-CSeparator.prototype.init = function(sepChr, column)
+extend(old_CSeparator, CMathBase);
+old_CSeparator.prototype.init = function(sepChr, column)
 {
     if(sepChr !== "undefined" && sepChr !== null)
         this.sepChr = sepChr.charCodeAt(0);
@@ -3248,17 +3362,17 @@ CSeparator.prototype.init = function(sepChr, column)
     this.setDimension(1, column);
     this.setContent();
 }
-CSeparator.prototype.setDistance = function()
+old_CSeparator.prototype.setDistance = function()
 {
     this.dW = this.getTxtPrp().FontSize/3*g_dKoef_pt_to_mm;
 }
-CSeparator.prototype.draw = function()
+old_CSeparator.prototype.draw = function()
 {
     //if(this.sepChr == )
 
-    CSeparator.superclass.draw.call(this);
+    old_CSeparator.superclass.draw.call(this);
 }
-CSeparator.prototype.drawHorLine = function()
+old_CSeparator.prototype.drawHorLine = function()
 {
     var x = this.pos.x,
         y = this.pos.y;
@@ -3295,12 +3409,21 @@ CSeparator.prototype.drawHorLine = function()
     MathControl.pGraph.SetIntegerGrid(intGrid);
 }
 
+function CSeparator()
+{
+
+}
+extend(CSeparator, CMathBase);
+
+
 function CDelimiter()
 {
     this.begOper = null;
     this.endOper = null;
     this.sepOper = null;
     this.shape   = null;
+
+    CSubMathBase.call(this);
 }
 extend(CDelimiter, CSubMathBase);
 CDelimiter.prototype.init = function(props)
@@ -3321,6 +3444,140 @@ CDelimiter.prototype.init = function(props)
         this.shape = DELIMITER_SHAPE_MATH;
     else if(props.shape == "centered")
         this.shape = DELIMITER_SHAPE_CENTERED;
+    else
+        this.shape = DELIMITER_SHAPE_CENTERED;
+
+    this.setDimension(1, props.column);
+    this.setContent();
+}
+CDelimiter.prototype.recalculateSize = function()
+{
+    var height = 0,
+        width = 0, center = 0;
+
+    if(this.shape == DELIMITER_SHAPE_CENTERED)
+    {
+        var ascent = 0,
+            descent = 0;
+
+        for(var j = 0; j < this.nCol; j++)
+        {
+            var content = this.elements[0][j].size;
+            width += content.width;
+            ascent = content.center > ascent ? content.center : ascent;
+            descent = content.height - content.center > descent ? content.height - content.center : descent;
+        }
+
+        height = ascent > descent ? 2*ascent : 2*descent;
+        center = height/2;
+
+    }
+    else
+    {
+        for(var j = 0; j < this.nCol; j++)
+        {
+            var content = this.elements[0][j].size;
+            width += content.width;
+            center = content.center > center ? content.center : center;
+            height = content.height > height ? content.height : height;
+        }
+    }
+
+    if(this.begOper !== -1)
+    {
+        this.begOper.fixSize(height);
+        width += this.begOper.size.width;
+    }
+    if(this.endOper !== -1)
+    {
+        this.endOper.fixSize(height);
+        width += this.endOper.size.width;
+    }
+    if(this.sepOper !== -1)
+    {
+        this.sepOper.fixSize(height);
+        width += (this.nCol - 1)*this.sepOper.size.width;
+    }
+
+    this.size = {width: width, height: height, center: center};
+
+}
+CDelimiter.prototype.align = function(element)
+{
+    var align = 0;
+
+    if(this.size.height > element.size.height)
+    {
+        if(this.shape == DELIMITER_SHAPE_CENTERED)
+            align = this.size.center - element.size.center;
+        else if(this.shape == DELIMITER_SHAPE_MATH)
+        {
+            var ascent = this.size.center,
+                descent = this.size.height - this.size.center;
+
+            var k = ascent/descent;
+
+            if(k < 0.2)
+                k = 0.2;
+            else if(k > 0.8)
+                k = 0.8;
+
+            align = ascent - element.size.height/2 * k;
+        }
+    }
+
+    return align;
+}
+CDelimiter.prototype.setPosition = function(pos)
+{
+    this.pos = {x: pos.x, y: pos.y - this.size.center};
 
 
+
+
+    /*if(this.begOper !== -1)
+    {
+        var position = { x: this.pos.x, y: this.pos.y + this.align(this.begOper) };
+        this.begOper.setPosition(position);
+    }
+
+    if(this.sepOper !== -1)
+    {
+        var position = { x: this.pos.x, y: this.pos.y + this.align(this.sepOper) };
+        this.sepOper.setPosition(position);
+    }
+
+    if(this.endOper !== -1)
+    {
+        var position = { x: this.pos.x, y: this.pos.y + this.align(this.endOper) };
+        this.endOper.setPosition(position);
+    }
+
+    for(var j = 0; j < this.nCol; j++)
+    {
+        var position =
+        {
+            x: this.pos.x,
+            y: this.pos.y + this.align(this.elements[0][j])
+        };
+
+        this.elements[0][j].setPosition(position);
+    }*/
+
+}
+CDelimiter.prototype.findDisposition = function(pos)
+{
+
+}
+CDelimiter.prototype.draw = function()
+{
+    if(this.begOper !== -1)
+        this.begOper.draw();
+    if(this.endOper !== -1)
+        this.endOper.draw();
+    if(this.sepOper !== -1)
+        this.sepOper.draw();
+
+    for(var j = 0; j < this.nCol; j++)
+        this.elements[0][j].draw();
 }
