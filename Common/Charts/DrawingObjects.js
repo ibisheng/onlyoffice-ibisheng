@@ -277,24 +277,24 @@ asc_CChart.prototype = {
 		var _t = this;
 		var bbox = _t.range.intervalObject.getBBox0();
 		
-		for (var i = bbox.r1; i <= bbox.r2; i++) {
+		for (var i = bbox.r1 + 1; i <= bbox.r2; i++) {
 			
 			var cell = _t.range.intervalObject.worksheet.getCell( new CellAddress(i, bbox.c1, 0) );
 			var value = cell.getValue();
 			if ( !isNumber(value) && (value != "") )
 				cntLeft++;
 		}
-		if ( (cntLeft > 0) && (cntLeft > bbox.r2 - bbox.r1) )
+		if ( (cntLeft > 0) && (cntLeft >= bbox.r2 - bbox.r1) )
 			headers.bLeft = true;
 		
-		for (var i = bbox.c1; i <= bbox.c2; i++) {
+		for (var i = bbox.c1 + 1; i <= bbox.c2; i++) {
 			
 			var cell = _t.range.intervalObject.worksheet.getCell( new CellAddress(bbox.r1, i, 0) );
 			var value = cell.getValue();
 			if ( !isNumber(value) && (value != "") )
 				cntTop++;
 		}
-		if ( (cntTop > 0) && (cntTop > bbox.c2 - bbox.c1) )
+		if ( (cntTop > 0) && (cntTop >= bbox.c2 - bbox.c1) )
 			headers.bTop = true;
 		
 		return headers;
@@ -3385,35 +3385,29 @@ function DrawingObjects() {
 					var colArray = [];
 					var rowArray = [];
 					
-					if ( graphicObject.chart.series[0].TxCache.Formula ) {
-						var range = convertFormula(graphicObject.chart.series[0].TxCache.Formula, worksheet);
-						if ( range ) {
-							colArray.push(range.bbox.c1);
-							rowArray.push(range.bbox.r1);
-						}
-					}
-					if ( graphicObject.chart.series[0].xVal.Formula ) {
-						var range = convertFormula(graphicObject.chart.series[0].xVal.Formula, worksheet);
-						if ( range ) {
-							colArray.push(range.bbox.c1);
-							rowArray.push(range.bbox.r1);
-						}
-					}
-					if ( graphicObject.chart.series[0].Val.Formula ) {
-						var range = convertFormula(graphicObject.chart.series[0].Val.Formula, worksheet);
-						if ( range ) {
-							colArray.push(range.bbox.c1);
-							rowArray.push(range.bbox.r1);
+					function parseDataFormula(data, bMinimum) {
+						if ( data && data.Formula ) {
+							var range = convertFormula(data.Formula, worksheet);
+							if ( range ) {
+								if ( bMinimum ) {
+									colArray.push(range.bbox.c1);
+									rowArray.push(range.bbox.r1);
+								}
+								else {
+									colArray.push(range.bbox.c2);
+									rowArray.push(range.bbox.r2);
+								}
+							}
 						}
 					}
 					
-					if ( graphicObject.chart.series[seriesCount - 1].Val.Formula ) {
-						var range = convertFormula(graphicObject.chart.series[seriesCount - 1].Val.Formula, worksheet);
-						if ( range ) {
-							colArray.push(range.bbox.c2);
-							rowArray.push(range.bbox.r2);
-						}
-					}
+					parseDataFormula(graphicObject.chart.series[0].Val, true);
+					parseDataFormula(graphicObject.chart.series[seriesCount - 1].Val, false);
+					
+					parseDataFormula(graphicObject.chart.series[0].TxCache, true);
+					parseDataFormula(graphicObject.chart.series[0].xVal, true);
+					parseDataFormula(graphicObject.chart.series[0].Cat, true);
+					
 					var c1 = Math.min.apply(null, colArray);
 					var r1 = Math.min.apply(null, rowArray);
 					var c2 = Math.max.apply(null, colArray);
@@ -3441,6 +3435,34 @@ function DrawingObjects() {
 				// Заполняем таблицу
 				if ( graphicObject.chart.series.length ) {
 				
+					function restoreDataRange(data, bRows) {
+						
+						if ( data && data.Formula && data.NumCache.length ) {
+							var range = convertFormula(data.Formula, worksheet);
+							if ( range ) {
+								if ( bRows ) {
+									var index = 0;
+									for (var j = range.bbox.c1; j <= range.bbox.c2; j++) {
+									
+										var cell = graphicObject.chart.range.intervalObject.worksheet.getCell(new CellAddress(range.bbox.r1, j, 0));
+										cell.setNumFormat(data.NumCache[index].numFormatStr);
+										cell.setValue(data.NumCache[index].val);
+									}
+								}
+								else {
+									var index = 0;
+									for (var j = range.bbox.r1; j <= range.bbox.r2; j++) {
+									
+										var cell = graphicObject.chart.range.intervalObject.worksheet.getCell(new CellAddress(j, range.bbox.c1, 0));
+										cell.setNumFormat(data.NumCache[index].numFormatStr);
+										cell.setValue(data.NumCache[index].val);
+										index++;
+									}
+								}
+							}
+						}
+					}
+				
 					for (var i = 0; i < seriesCount; i++) {
 						
 						if ( graphicObject.chart.series[i].TxCache.Formula ) {
@@ -3452,28 +3474,9 @@ function DrawingObjects() {
 							}
 						}
 						
-						var range = convertFormula(graphicObject.chart.series[i].Val.Formula, worksheet);
-						if ( range ) {
-							if ( graphicObject.chart.range.rows ) {
-								var index = 0;
-								for (var j = range.bbox.c1; j <= range.bbox.c2; j++) {
-								
-									var cell = graphicObject.chart.range.intervalObject.worksheet.getCell(new CellAddress(range.bbox.r1, j, 0));
-									cell.setNumFormat(graphicObject.chart.series[i].Val.NumCache[index].numFormatStr);
-									cell.setValue(graphicObject.chart.series[i].Val.NumCache[index].val);
-								}
-							}
-							else {
-								var index = 0;
-								for (var j = range.bbox.r1; j <= range.bbox.r2; j++) {
-								
-									var cell = graphicObject.chart.range.intervalObject.worksheet.getCell(new CellAddress(j, range.bbox.c1, 0));
-									cell.setNumFormat(graphicObject.chart.series[i].Val.NumCache[index].numFormatStr);
-									cell.setValue(graphicObject.chart.series[i].Val.NumCache[index].val);
-									index++;
-								}
-							}
-						}
+						restoreDataRange(graphicObject.chart.series[i].Val, graphicObject.chart.range.rows);
+						restoreDataRange(graphicObject.chart.series[i].xVal, graphicObject.chart.range.rows);
+						restoreDataRange(graphicObject.chart.series[i].Cat, graphicObject.chart.range.rows);
 					}
 				}
 				else {
