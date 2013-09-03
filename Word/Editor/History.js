@@ -679,6 +679,32 @@ CHistory.prototype =
         return this.RecalculateData;
     },
 
+    Is_SimpleChanges : function()
+    {
+        if ( this.Index >= 0 && this.Points[this.Index].Items.length > 0 )
+        {
+            // Считываем изменения, начиная с последней точки, и смотрим что надо пересчитать.
+            var Point = this.Points[this.Index];
+
+            var Class = Point.Items[0].Class;
+            var Count = Point.Items.length;
+
+            // Выполняем все действия в прямом порядке
+            for ( var Index = 1; Index < Count; Index++ )
+            {
+                var Item = Point.Items[Index];
+
+                if ( Class !== Item.Class )
+                    return null;
+            }
+
+            if ( Class instanceof Paragraph)
+                return Class;
+        }
+
+        return null;
+    },
+
     Set_Additional_ExtendDocumentToPos : function()
     {
         if ( this.Index >= 0 )

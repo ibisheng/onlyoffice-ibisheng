@@ -603,6 +603,8 @@ CDocument.prototype =
 
         // Получаем данные об произошедших изменениях
         var RecalcData = ( undefined === _RecalcData ? History.Get_RecalcData() : _RecalcData );
+        //var SimplePara = History.Is_SimpleChanges();
+        //SimplePara.Recalculate_Fast();
 
         // 1. Пересчитываем все автофигуры, которые нужно пересчитать. Изменения в них ни на что не влияют.
         for ( var GraphIndex = 0; GraphIndex < RecalcData.Flow.length; GraphIndex++ )
@@ -750,8 +752,19 @@ CDocument.prototype =
                     this.RecalcInfo.FlowObjectPage = 0;
                     this.RecalcInfo.FlowObject   = Element;
                     this.RecalcInfo.RecalcResult = Element.Recalculate_Page( PageIndex );
-                    this.DrawingObjects.addFloatTable( new CFlowTable2( Element, PageIndex ) );
-                    RecalcResult = recalcresult_CurPage;
+                    var FlowTable = new CFlowTable2( Element, PageIndex );
+                    this.DrawingObjects.addFloatTable( FlowTable );
+
+                    if ( 0 === FlowTable.PageController )
+                        RecalcResult = recalcresult_CurPage;
+                    else
+                    {
+                        RecalcResult = this.RecalcInfo.RecalcResult;
+
+                        this.RecalcInfo.FlowObjectPage = 0;
+                        this.RecalcInfo.FlowObject     = null;
+                        this.RecalcInfo.RecalcResult   = recalcresult_NextElement;
+                    }
                 }
                 else if ( Element === this.RecalcInfo.FlowObject )
                 {
@@ -6287,7 +6300,7 @@ CDocument.prototype =
                 if ( null != Para && undefined === Para.Get_FramePr() )
                 {
                     var Prev = Para.Get_DocumentPrev();
-                    if ( (null === Prev || undefined === Prev.Get_FramePr() || undefined === Prev.Get_FramePr().DropCap) && true === Para.Can_AddDropCap() )
+                    if ( (null === Prev || type_Paragraph != Prev.GetType() || undefined === Prev.Get_FramePr() || undefined === Prev.Get_FramePr().DropCap) && true === Para.Can_AddDropCap() )
                         ParaPr.CanAddDropCap = true;
                 }
             }

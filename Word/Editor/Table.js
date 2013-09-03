@@ -2870,6 +2870,55 @@ CTable.prototype =
         this.Internal_Recalculate_1();
     },
 
+    Start_FromNewPage : function()
+    {
+        this.Pages.length = 1;
+        this.Pages[0] = new CTablePage( 0, 0, 0, 0, 0, 0 );
+
+        this.HeaderInfo.Pages[0] = new Object();
+        this.HeaderInfo.Pages[0].Draw = false;
+
+        this.RowsInfo[0] = new Object();
+        this.RowsInfo[0].Pages        = 1;
+        this.RowsInfo[0].Y            = new Array();
+        this.RowsInfo[0].H            = new Array();
+        this.RowsInfo[0].TopDy        = new Array();
+        this.RowsInfo[0].MaxTopBorder = new Array();
+        this.RowsInfo[0].FirstPage    = false;
+        this.RowsInfo[0].StartPage    = 0;
+
+
+        this.RowsInfo[0].X0           = 0;
+        this.RowsInfo[0].X1           = 0;
+        this.RowsInfo[0].MaxBotBorder = 0;
+
+        this.RowsInfo[0].Y[0]            = 0.0;
+        this.RowsInfo[0].H[0]            = 0.0;
+        this.RowsInfo[0].TopDy[0]        = 0.0;
+        this.RowsInfo[0].MaxTopBorder[0] = 0.0;
+
+        // Обнуляем таблицу суммарных высот ячеек
+        for ( var Index = -1; Index < this.Content.length; Index++ )
+        {
+            this.TableRowsBottom[Index] = new Array();
+            this.TableRowsBottom[Index][0] = 0;
+        }
+
+        this.Pages[0].MaxBotBorder = 0;
+        this.Pages[0].BotBorders   = new Array();
+
+        if ( this.Content.length > 0 )
+        {
+            var CellsCount = this.Content[0].Get_CellsCount();
+            for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
+            {
+                var Cell = this.Content[0].Get_Cell( CurCell );
+                Cell.Content.Start_FromNewPage();
+                Cell.PagesCount = 2;
+            }
+        }
+    },
+
     Recalculate_Page : function(_PageIndex)
     {
         var PageIndex = _PageIndex - this.PageNum;
@@ -14635,7 +14684,7 @@ CTable.prototype =
                     Cell.PagesCount = 1;
                     Cell.Content.Set_StartPage( CurPage );
 
-                    if ( 1 === Cell.Content.Pages.length && true != this.RecalcInfo.Check_Cell( Cell ) )
+                    if (  true === this.Is_Inline() && 1 === Cell.Content.Pages.length && true != this.RecalcInfo.Check_Cell( Cell ) )
                     {
                         var X_content_start_old  = Cell.Content.Pages[0].X;
                         var X_content_end_old    = Cell.Content.Pages[0].XLimit;
@@ -14693,7 +14742,8 @@ CTable.prototype =
             //    но у которых вертикальное объединение не заканчивается на данной странице.
             if ( true === bNextPage )
             {
-                var bContentOnFirstPage = false;
+                var bContentOnFirstPage   = false;
+                var bNoContentOnFirstPage = false;
                 for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
                 {
                     var Cell   = Row.Get_Cell( CurCell );
@@ -14708,8 +14758,29 @@ CTable.prototype =
                     if ( true === Cell.Content_Is_ContentOnFirstPage() )
                     {
                         bContentOnFirstPage = true;
-                        break;
                     }
+                    else
+                        bNoContentOnFirstPage = true;
+                }
+
+                if ( true === bContentOnFirstPage && true === bNoContentOnFirstPage )
+                {
+                    for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
+                    {
+                        var Cell   = Row.Get_Cell( CurCell );
+                        var Vmerge = Cell.Get_VMerge();
+
+                        var VMergeCount = this.Internal_GetVertMergeCount( CurRow, Cell.Metrics.StartGridCol, Cell.Get_GridSpan() );
+
+                        // Проверяем только начальные ячейки вертикального объединения..
+                        if ( vmerge_Continue === Vmerge || VMergeCount > 1 )
+                            continue;
+
+                        Cell.Content.Start_FromNewPage();
+                        Cell.PagesCount = 2;
+                    }
+
+                    bContentOnFirstPage = false;
                 }
 
                 this.RowsInfo[CurRow].FirstPage = bContentOnFirstPage;

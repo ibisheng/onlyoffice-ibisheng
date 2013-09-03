@@ -1135,7 +1135,7 @@ CGraphics.prototype =
 
     SetTextPr : function(textPr)
     {
-        this.m_oTextPr = textPr.Copy();
+        this.m_oTextPr = textPr;
     },
 
     SetFontSlot : function(slot, fontSizeKoef)

@@ -163,7 +163,7 @@ Paragraph.prototype =
 
     Use_YLimit : function()
     {
-        if ( undefined != this.Get_FramePr() )
+        if ( undefined != this.Get_FramePr() && this.Parent instanceof CDocument )
             return false;
 
         return true;
@@ -3604,6 +3604,21 @@ Paragraph.prototype =
         return ClearLen;
     },
 
+    Recalculate_Fast : function()
+    {
+
+    },
+
+    Start_FromNewPage : function()
+    {
+        this.Pages.length = 1;
+
+        // Добавляем разрыв страницы
+        this.Pages[0].Set_EndLine( - 1 );
+        this.Lines[-1] = new CParaLine(0);
+        this.Lines[-1].Set_EndPos( - 1, this );
+    },
+
     Recalculate_Page : function(_PageIndex)
     {
         // Во время пересчета сбрасываем привязку курсора к строке.
@@ -3881,7 +3896,7 @@ Paragraph.prototype =
 
         // Задаем обрезку, если данный параграф является рамкой
         var FramePr = this.Get_FramePr();
-        if ( undefined != FramePr )
+        if ( undefined != FramePr && this.Parent instanceof CDocument )
         {
             var BoundsL = this.CalculatedFrame.L;
             var BoundsT = this.CalculatedFrame.T;

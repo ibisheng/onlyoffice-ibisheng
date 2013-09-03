@@ -1151,6 +1151,15 @@ CDocumentContent.prototype =
         return Element.Is_ContentOnFirstPage();
     },
 
+    Start_FromNewPage : function()
+    {
+        this.Pages.length = 1;
+        this.Pages[0] = new CDocumentPage();
+
+        var Element = this.Content[0];
+        Element.Start_FromNewPage();
+    },
+
     Is_TableBorder : function(X,Y, PageNum_Abs)
     {
         var TempPNum = PageNum_Abs - this.Get_StartPage_Absolute();

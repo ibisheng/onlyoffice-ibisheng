@@ -105,6 +105,10 @@ function ParaText(value)
     this.TextHeight  = 0;
     this.TextAscent2 = 0;
     this.YOffset     = 0;
+
+    this.CurPage  = 0;
+    this.CurLines = 0;
+    this.CurRange = 0;
 }
 ParaText.prototype =
 {
@@ -236,6 +240,10 @@ function ParaSpace(Count)
     this.TextHeight  = 0;
     this.TextAscent2 = 0;
     this.YOffset     = 0;
+
+    this.CurPage  = 0;
+    this.CurLines = 0;
+    this.CurRange = 0;
 }
 ParaSpace.prototype =
 {
