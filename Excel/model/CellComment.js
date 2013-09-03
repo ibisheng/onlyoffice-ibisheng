@@ -1480,6 +1480,7 @@ asc_CCellCommentator.prototype = {
 								break;
 							}
 						}
+						_this.worksheet.draw();
 					}
 					_this.drawCommentCells();
 					_this.worksheet.model.workbook.handlers.trigger("asc_onRemoveComment", id);

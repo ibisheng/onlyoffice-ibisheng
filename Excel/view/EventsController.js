@@ -951,6 +951,16 @@
 
 			/** @param event {jQuery.Event} */
 			_onWindowMouseUp: function (event) {
+			
+				// Shapes
+				var coord = this._getCoordinates(event);
+				if ( this.isGraphicObjectMode ) {
+					this.handlers.trigger("graphicObjectMouseUp", event, coord.x, coord.y);
+					this._changeSelectionDone(event);
+					this.isGraphicObjectMode = false;
+					return true;
+				}
+			
 				if (this.isSelectMode) {
 					this.isSelectMode = false;
 					this._changeSelectionDone(event);
