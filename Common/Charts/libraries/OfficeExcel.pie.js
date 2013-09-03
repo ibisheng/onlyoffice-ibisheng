@@ -559,6 +559,15 @@
         var context  = this.context;
         var canvas   = this.canvas;
         var subTotal = this.subTotal;
+		
+		var centerx = this.centerx;
+		if(this._otherProps._key_halign == 'right')
+			centerx  = (this.canvas.width - this._chartGutter._right)/2;
+		else if(this._otherProps._key_halign == 'left')
+			centerx  = (this.canvas.width + this._chartGutter._left)/2;
+		if(centerx <= (this.radius + 14) || (this.canvas.width - (this.radius*2) - this._chartGutter._left) <= 14)
+			centerx = this.centerx;
+			
             radians  = radians * this._otherProps._effect_roundrobin_multiplier;
 
         context.beginPath();
@@ -582,7 +591,7 @@
                 var x         = (Math.cos(t) * explosion);
                 var y         = (Math.sin(t) * explosion);
             
-                this.context.moveTo(this.centerx + x, this.centery + y);
+                this.context.moveTo(centerx + x, this.centery + y);
             } else {
                 var x = 0;
                 var y = 0;
@@ -595,7 +604,7 @@
             var endAngle   = (((subTotal + radians))) - 1.57;
 			if(this.radius < 0)
 				this.radius = 0;
-            context.arc(this.centerx + x,
+            context.arc(centerx + x,
                         this.centery + y,
                         this.radius,
                         startAngle,
@@ -604,21 +613,21 @@
 
             if (this._otherProps._variant == 'donut') {
     
-                context.arc(this.centerx + x,
+                context.arc(centerx + x,
                             this.centery + y,
                             (this.radius / 2),
                             endAngle,
                             startAngle,
                             true);
             } else {
-                context.lineTo(this.centerx + x, this.centery + y);
+                context.lineTo(centerx + x, this.centery + y);
             }
 
         this.context.closePath();
 
 
         // Keep hold of the angles
-        this.angles.push([subTotal - (Math.PI / 2), subTotal + radians - (Math.PI / 2), this.centerx + x, this.centery + y]);
+        this.angles.push([subTotal - (Math.PI / 2), subTotal + radians - (Math.PI / 2), centerx + x, this.centery + y]);
 
 
         
@@ -649,6 +658,14 @@
 			italic: this._otherProps._labels_above_italic
 		}	
 		
+		var centerx = this.centerx;
+		if(this._otherProps._key_halign == 'right')
+			centerx  = (this.canvas.width - this._chartGutter._right)/2;
+		else if(this._otherProps._key_halign == 'left')
+			centerx  = (this.canvas.width + this._chartGutter._left)/2;
+		if(centerx <= (this.radius + 14) || (this.canvas.width - (this.radius*2) - this._chartGutter._left) <= 14)
+			centerx = this.centerx;
+		
         /**
         * Turn the shadow off
         */
@@ -676,7 +693,7 @@
                 }
 
                 // Move to the centre
-                context.moveTo(this.centerx,this.centery);
+                context.moveTo(centerx,this.centery);
                 
                 var a = this.angles[i][0] + ((this.angles[i][1] - this.angles[i][0]) / 2);
 
@@ -729,7 +746,7 @@
                 OfficeExcel.Text(context,
                             this._otherProps._text_font,
                             text_size,
-                            this.centerx + explosion_offsetx + ((this.radius + 10)* Math.cos(a)) + (this._otherProps._labels_sticks ? (a < 1.57 || a > 4.71 ? 2 : -2) : 0),
+                            centerx + explosion_offsetx + ((this.radius + 10)* Math.cos(a)) + (this._otherProps._labels_sticks ? (a < 1.57 || a > 4.71 ? 2 : -2) : 0),
                             this.centery + explosion_offsety + (((this.radius + 10) * Math.sin(a))),
                             OfficeExcel.numToFormatText(labels[i],isFormatCellTrue),
                             vAlignment,
