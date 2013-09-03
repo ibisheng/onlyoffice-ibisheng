@@ -165,8 +165,8 @@
         * Now draw the segments again with shadow turned off. This is always performed,
         * not just if the shadow is on.
         */
-
-        for (var i=0; i<this.angles.length; i++) {
+		//TODO граница между секторами круговой диаграммы - в следующей версии нужно зачитывать из xml
+        /*for (var i=0; i<this.angles.length; i++) {
     
             this.context.beginPath();
                 this.context.strokeStyle = this._otherProps._strokecolor;
@@ -192,7 +192,7 @@
             this.context.closePath();
             this.context.fill();
             this.context.stroke();
-        }
+        }*/
 
 
         /**
