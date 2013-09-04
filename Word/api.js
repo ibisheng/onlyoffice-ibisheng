@@ -610,6 +610,54 @@ function asc_docs_api(name)
 		window.addEventListener("message", function(){
 			oThis.OnHandleMessage.apply(oThis, arguments);
 		}, false);
+	if (window.FileReader !== undefined && window.FormData !== undefined) {
+		//var element = document.body;
+		var element = document.getElementById(this.HtmlElementName);
+		if(null != element)
+		{
+			element.ondragover = function(e) {
+				e.preventDefault();
+				if(CanDropFiles(e))
+					e.dataTransfer.dropEffect = 'copy';
+				else
+					e.dataTransfer.dropEffect = 'none';
+				return false;
+			};
+			element.ondrop = function(e) {
+				e.preventDefault();
+				var files = e.dataTransfer.files;
+				var nError = ValidateUploadImage(files);
+				if(c_oAscServerError.NoError == nError)
+				{
+					oThis.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+					var file = files[0];
+					var xhr = new XMLHttpRequest();
+					var fd = new FormData();
+					fd.append('file', file);
+					xhr.open('POST', g_sUploadServiceLocalUrl+'?key='+documentId);
+					xhr.onreadystatechange = function(){
+						if(4 == this.readyState)
+						{
+							if((this.status == 200 || this.status == 1223))
+							{
+								var frameWindow = GetUploadIFrame();
+								var content = this.responseText;
+								frameWindow.document.open();
+								frameWindow.document.write(content);
+								frameWindow.document.close();
+							}
+							else
+								oThis.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
+							oThis.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+						}
+					};
+					xhr.send(fd);
+				}
+				else
+					oThis.asc_fireCallback("asc_onError",_mapAscServerErrorToAscError(nError),c_oAscError.Level.NoCritical);
+			};
+		}
+	}
 }
 
 asc_docs_api.prototype.LoadFontsFromServer = function(_fonts)
@@ -4585,16 +4633,7 @@ asc_docs_api.prototype.AddImage = function(){
 	}
 	else
 	{
-		var oImageUploader = document.getElementById("apiImageUpload");
-		if(!oImageUploader)
-		{
-			var frame = document.createElement("iframe");
-			frame.name = "apiImageUpload";
-			frame.id = "apiImageUpload";
-			frame.setAttribute("style", "position:absolute;left:-2px;top:-2px;width:1px;height:1px;z-index:-1000;");
-			document.body.appendChild(frame);
-		}
-		var frameWindow = window.frames["apiImageUpload"];
+		var frameWindow = GetUploadIFrame();
 		var content = '<html><head></head><body><form action="'+g_sUploadServiceLocalUrl+'?key='+documentId+'" method="POST" enctype="multipart/form-data"><input id="apiiuFile" name="apiiuFile" type="file" size="1"><input id="apiiuSubmit" name="apiiuSubmit" type="submit" style="display:none;"></form></body></html>';
 		frameWindow.document.open();
 		frameWindow.document.write(content);
@@ -4608,43 +4647,15 @@ asc_docs_api.prototype.AddImage = function(){
 			if(e && e.target && e.target.files)
 			{
 				var files = e.target.files;
-				if(files.length > 0)
+				var nError = ValidateUploadImage(files);
+				if(c_oAscServerError.NoError == nError)
 				{
-					var file = files[0];
-					//проверяем расширение файла
-					var sName = file.fileName || file.name;
-					if(sName)
-					{
-						var bSupported = false;
-						var nIndex = sName.lastIndexOf(".");
-						if(-1 != nIndex)
-						{
-							var ext = sName.substring(nIndex + 1).toLowerCase();
-							for(var i = 0, length = c_oAscImageUploadProp.SupportedFormats.length; i < length; i++)
-							{
-								if(c_oAscImageUploadProp.SupportedFormats[i] == ext)
-								{
-									bSupported = true;
-									break;
-								}
-							}
-						}
-						if(false == bSupported)
-						{
-							oThis.asc_fireCallback("asc_onError",c_oAscError.ID.UplImageExt,c_oAscError.Level.NoCritical);
-							return;
-						}
-					}
-					var nSize = file.fileSize || file.size;
-					if(nSize && c_oAscImageUploadProp.MaxFileSize < nSize)
-					{
-						oThis.asc_fireCallback("asc_onError",c_oAscError.ID.UplImageSize,c_oAscError.Level.NoCritical);
-						return;
-					}
+					oThis.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+					fileSubmit.click();
 				}
+				else
+					oThis.asc_fireCallback("asc_onError",_mapAscServerErrorToAscError(nError),c_oAscError.Level.NoCritical);
 			}
-			oThis.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-			fileSubmit.click();
 		};
 		//todo пересмотреть opera
 		if (window.opera != undefined)

@@ -150,6 +150,62 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			
 			// Использовать ли обрезанные шрифты
 			this.isUseEmbeddedCutFonts = ("true" == ASC_DOCS_API_USE_EMBEDDED_FONTS.toLowerCase());
+			
+			var oThis = this;
+			if (window.FileReader !== undefined && window.FormData !== undefined) {
+				//var element = document.body;
+				var element = document.getElementById(this.HtmlElementName);
+				if(null != element)
+				{
+					element.ondragover = function(e) {
+						e.preventDefault();
+						if(CanDropFiles(e))
+							e.dataTransfer.dropEffect = 'copy';
+						else
+							e.dataTransfer.dropEffect = 'none';
+						return false;
+					};
+					element.ondrop = function(e) {
+						e.preventDefault();
+						var files = e.dataTransfer.files;
+						var nError = ValidateUploadImage(files);
+						if(c_oAscServerError.NoError == nError)
+						{
+							var worksheet = null;
+							if(null != oThis.wbModel)
+								worksheet = oThis.wbModel.getWorksheet(oThis.wbModel.getActive());
+							if(null != worksheet)
+							{
+								oThis.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+								var file = files[0];
+								var xhr = new XMLHttpRequest();
+								var fd = new FormData();
+								fd.append('file', file);
+								xhr.open('POST', g_sUploadServiceLocalUrl+'?key=' + oThis.documentId + '&sheetId=' + worksheet.getId());
+								xhr.onreadystatechange = function(){
+									if(4 == this.readyState)
+									{
+										if((this.status == 200 || this.status == 1223))
+										{
+											var frameWindow = GetUploadIFrame();
+											var content = this.responseText;
+											frameWindow.document.open();
+											frameWindow.document.write(content);
+											frameWindow.document.close();
+										}
+										else
+											oThis.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+										oThis.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+									}
+								};
+								xhr.send(fd);
+							}
+						}
+						else
+							oThis.handlers.trigger("asc_onError", oThis.asc_mapAscServerErrorToAscError(nError), c_oAscError.Level.NoCritical);
+					}
+				}
+			}
 		}
 
 		spreadsheet_api.prototype = {

@@ -4551,15 +4551,7 @@ function DrawingObjects() {
 		if ( _this.isViewerMode() )
 			return;
 
-		var oImageUploader = document.getElementById("apiImageUpload");
-		if (!oImageUploader) {
-			var frame = document.createElement("iframe");
-			frame.name = "apiImageUpload";
-			frame.id = "apiImageUpload";
-			frame.setAttribute("style", "position:absolute;left:-2px;top:-2px;width:1px;height:1px;z-index:-1000;");
-			document.body.appendChild(frame);
-		}
-		var frameWindow = window.frames["apiImageUpload"];
+		var frameWindow = GetUploadIFrame();
 		var content = '<html><head></head><body><form action="' + g_sUploadServiceLocalUrl + '?sheetId=' + worksheet.model.getId() + '&key=' + documentId + '" method="POST" enctype="multipart/form-data"><input id="apiiuFile" name="apiiuFile" type="file" size="1"><input id="apiiuSubmit" name="apiiuSubmit" type="submit" style="display:none;"></form></body></html>';
 		frameWindow.document.open();
 		frameWindow.document.write(content);
@@ -4572,43 +4564,15 @@ function DrawingObjects() {
 			if(e && e.target && e.target.files)
 			{
 				var files = e.target.files;
-				if(files.length > 0)
+				var nError = ValidateUploadImage(files);
+				if(c_oAscServerError.NoError == nError)
 				{
-					var file = files[0];
-					//проверяем расширение файла
-					var sName = file.fileName || file.name;
-					if(sName)
-					{
-						var bSupported = false;
-						var nIndex = sName.lastIndexOf(".");
-						if(-1 != nIndex)
-						{
-							var ext = sName.substring(nIndex + 1).toLowerCase();
-							for(var i = 0, length = c_oAscImageUploadProp.SupportedFormats.length; i < length; i++)
-							{
-								if(c_oAscImageUploadProp.SupportedFormats[i] == ext)
-								{
-									bSupported = true;
-									break;
-								}
-							}
-						}
-						if(false == bSupported)
-						{
-							worksheet.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.UplImageExt, c_oAscError.Level.NoCritical);
-							return;
-						}
-					}
-					var nSize = file.fileSize || file.size;
-					if(nSize && c_oAscImageUploadProp.MaxFileSize < nSize)
-					{
-						worksheet.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.UplImageSize, c_oAscError.Level.NoCritical);
-						return;
-					}
+					worksheet.model.workbook.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+					fileSubmit.click();
 				}
+				else
+					worksheet.model.workbook.handlers.trigger("asc_onError", api.asc_mapAscServerErrorToAscError(nError), c_oAscError.Level.NoCritical);
 			}
-			fileSubmit.click();
-			worksheet.model.workbook.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 		}
 
 		if (window.opera != undefined)
