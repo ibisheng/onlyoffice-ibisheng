@@ -528,6 +528,18 @@ prop:get_background
 prop:put_background
 prop:get_timing
 prop:put_timing
+prop:get_LockDelete
+prop:put_LockDelete
+prop:get_LockLayout
+prop:put_LockLayout
+prop:get_LockTiming
+prop:put_LockTiming
+prop:get_LockBackground
+prop:put_LockBackground
+prop:get_LockTranzition
+prop:put_LockTranzition
+prop:get_LockRemove
+prop:put_LockRemove
 ---
 var:CAscStroke
 prop:get_type
@@ -563,6 +575,12 @@ prop:get_fill
 prop:put_fill
 prop:get_stroke
 prop:put_stroke
+prop:get_Width
+prop:put_Width
+prop:get_Height
+prop:put_Height
+prop:get_paddings
+prop:put_paddings
 ---
 var:CreateAscShapeProp
 ---
@@ -835,6 +853,7 @@ prop:get_Color
 prop:put_Color
 ---
 var:CParagraphProp
+prop:get_Locked
 prop:get_ContextualSpacing
 prop:put_ContextualSpacing
 prop:get_Ind
@@ -1396,6 +1415,18 @@ CAscSlideProps.prototype['get_background'] = CAscSlideProps.prototype.get_backgr
 CAscSlideProps.prototype['put_background'] = CAscSlideProps.prototype.put_background;
 CAscSlideProps.prototype['get_timing'] = CAscSlideProps.prototype.get_timing;
 CAscSlideProps.prototype['put_timing'] = CAscSlideProps.prototype.put_timing;
+CAscSlideProps.prototype['get_LockDelete'] = CAscSlideProps.prototype.get_LockDelete;
+CAscSlideProps.prototype['put_LockDelete'] = CAscSlideProps.prototype.put_LockDelete;
+CAscSlideProps.prototype['get_LockLayout'] = CAscSlideProps.prototype.get_LockLayout;
+CAscSlideProps.prototype['put_LockLayout'] = CAscSlideProps.prototype.put_LockLayout;
+CAscSlideProps.prototype['get_LockTiming'] = CAscSlideProps.prototype.get_LockTiming;
+CAscSlideProps.prototype['put_LockTiming'] = CAscSlideProps.prototype.put_LockTiming;
+CAscSlideProps.prototype['get_LockBackground'] = CAscSlideProps.prototype.get_LockBackground;
+CAscSlideProps.prototype['put_LockBackground'] = CAscSlideProps.prototype.put_LockBackground;
+CAscSlideProps.prototype['get_LockTranzition'] = CAscSlideProps.prototype.get_LockTranzition;
+CAscSlideProps.prototype['put_LockTranzition'] = CAscSlideProps.prototype.put_LockTranzition;
+CAscSlideProps.prototype['get_LockRemove'] = CAscSlideProps.prototype.get_LockRemove;
+CAscSlideProps.prototype['put_LockRemove'] = CAscSlideProps.prototype.put_LockRemove;
 window['CAscStroke'] = CAscStroke;
 CAscStroke.prototype['get_type'] = CAscStroke.prototype.get_type;
 CAscStroke.prototype['put_type'] = CAscStroke.prototype.put_type;
@@ -1427,6 +1458,12 @@ CAscShapeProp.prototype['get_fill'] = CAscShapeProp.prototype.get_fill;
 CAscShapeProp.prototype['put_fill'] = CAscShapeProp.prototype.put_fill;
 CAscShapeProp.prototype['get_stroke'] = CAscShapeProp.prototype.get_stroke;
 CAscShapeProp.prototype['put_stroke'] = CAscShapeProp.prototype.put_stroke;
+CAscShapeProp.prototype['get_Width'] = CAscShapeProp.prototype.get_Width;
+CAscShapeProp.prototype['put_Width'] = CAscShapeProp.prototype.put_Width;
+CAscShapeProp.prototype['get_Height'] = CAscShapeProp.prototype.get_Height;
+CAscShapeProp.prototype['put_Height'] = CAscShapeProp.prototype.put_Height;
+CAscShapeProp.prototype['get_paddings'] = CAscShapeProp.prototype.get_paddings;
+CAscShapeProp.prototype['put_paddings'] = CAscShapeProp.prototype.put_paddings;
 window['CreateAscShapeProp'] = CreateAscShapeProp;
 window['CorrectShapeProp'] = CorrectShapeProp;
 window['CAscThemeInfo'] = CAscThemeInfo;
@@ -1670,6 +1707,7 @@ CParagraphShd.prototype['put_Value'] = CParagraphShd.prototype.put_Value;
 CParagraphShd.prototype['get_Color'] = CParagraphShd.prototype.get_Color;
 CParagraphShd.prototype['put_Color'] = CParagraphShd.prototype.put_Color;
 window['CParagraphProp'] = CParagraphProp;
+CParagraphProp.prototype['get_Locked'] = CParagraphProp.prototype.get_Locked;
 CParagraphProp.prototype['get_ContextualSpacing'] = CParagraphProp.prototype.get_ContextualSpacing;
 CParagraphProp.prototype['put_ContextualSpacing'] = CParagraphProp.prototype.put_ContextualSpacing;
 CParagraphProp.prototype['get_Ind'] = CParagraphProp.prototype.get_Ind;
