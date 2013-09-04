@@ -626,7 +626,7 @@ function BinaryFileWriter(doc)
 		if(null != sParaStyle)
 			this.copyParams.oUsedStyleMap[sParaStyle] = 1;
 		var oNumPr = Item.Numbering_Get();
-		if(null != oNumPr && 0 != oNumPr.NumId)
+		if(null != oNumPr && null != oNumPr.NumId && 0 != oNumPr.NumId)
 		{
 			if(null == this.copyParams.oUsedNumIdMap[oNumPr.NumId])
 			{
