@@ -5,8 +5,6 @@
 * Date:   13/08/2012
 */
 
-var CLASS_TYPE_CHART_DATA = 1000;
-
 if ( !window["Asc"] ) {		// Для вставки диаграмм в Word
 	window["Asc"] = {};
 }
@@ -306,8 +304,6 @@ asc_CChart.prototype = {
 		var nameIndex = 1;
 		var api = window["Asc"]["editor"];
 		
-		//var revSeries = _t.getReverseSeries();
-		
 		// Save old series colors
 		var oldSeriaData = [];
 		for ( var i = 0; i < _t.series.length; i++ ) {
@@ -394,7 +390,7 @@ asc_CChart.prototype = {
 				}
 				
 				if ( parsedHeaders.bLeft ) {
-					var formulaCell = new CellAddress(i, bbox.c1 + (parsedHeaders.bLeft ? 1 : 0));
+					var formulaCell = new CellAddress( i, bbox.c1, 0 );
 					ser.TxCache.Formula = ( !rx_test_ws_name.test(_t.range.intervalObject.worksheet.sName) ? "'" +_t.range.intervalObject.worksheet.sName+ "'" : _t.range.intervalObject.worksheet.sName )
 											+ "!" + formulaCell.getID();
 				}
@@ -447,7 +443,7 @@ asc_CChart.prototype = {
 				}
 				
 				if ( parsedHeaders.bTop ) {
-					var formulaCell = new CellAddress(bbox.r1 + (parsedHeaders.bTop ? 1 : 0), i);
+					var formulaCell = new CellAddress( bbox.r1, i, 0 );
 					ser.TxCache.Formula = ( !rx_test_ws_name.test(_t.range.intervalObject.worksheet.sName) ? "'" +_t.range.intervalObject.worksheet.sName+ "'" : _t.range.intervalObject.worksheet.sName )
 											+ "!" + formulaCell.getID();
 				}
@@ -524,6 +520,22 @@ asc_CChart.prototype = {
 			var rgbColor = new RGBColor(colors[i]);
 			
 			var uniColor = CreateUniColorRGB(rgbColor.r, rgbColor.g, rgbColor.b);
+			
+			/*var theme, colorMap;
+			RGBA = {R: 0, G: 0, B: 0, A: 255};
+			
+			if ( api_sheet ) {
+				theme = api_sheet.wbModel.theme;
+				colorMap = GenerateDefaultColorMap().color_map;
+			}
+			else {
+				theme  = api_doc.WordControl.m_oLogicDocument.theme;
+				colorMap = api_doc.WordControl.m_oLogicDocument.clrSchemeMap.color_map;
+				if ( colorMap == null )
+					colorMap = GenerateDefaultColorMap().color_map;
+			}
+			uniColor.Calculate(theme, colorMap, RGBA);*/
+			
 			uniColors.push(uniColor);
 		}
 		return uniColors;
