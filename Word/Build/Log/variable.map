@@ -314,7 +314,7 @@ STATES_ID_MOVE_INLINE_OBJECT:MD
 asc_CParagraphInd:io
 c_oSerProp_rPrType$HighLight:kY
 NumComporationOperators$equal:yg
-FT_Load_Glyph:WB
+FT_Load_Glyph:VB
 CDocumentShd:$c
 t1_cmap_standard_class_rec:As
 EWmlColorSchemeIndex$wmlcolorschemeindexLight2:S0
@@ -400,7 +400,7 @@ Ins_SFVTCA:Hx
 WriteObjectString:fN
 FONT_TYPE_EMBEDDED:WC
 search_HdrFtr_Odd_no_First:GT
-CRasterHeapTotal:AC
+CRasterHeapTotal:wC
 button_eventHandlers:U3
 JSCompiler_StaticMethods_shapeApply:KF
 c_oAscTableSelectionType$Table:CV
@@ -490,7 +490,7 @@ JSCompiler_StaticMethods_getHdrFtrObjectsByPageIndex:PD
 c_oSer_ChartSeriesMarkerType$Symbol:El
 ResizeGroupedShapes:uH
 global_hatch_brushes:N2
-numFormat_MonthMinute:lg
+numFormat_MonthMinute:kg
 CompareShapeProperties:TF
 tt_face_load_kern:Gt
 JSCompiler_StaticMethods_getSelectionState:CF
@@ -604,7 +604,7 @@ CTextFit:zi
 CreateControl:n4
 JSCompiler_StaticMethods_Set_EndPos:JR
 pararecalc_0_All:Ne
-CRasterHeapChuck:zC
+CRasterHeapChuck:vC
 asc_CBorder:wo
 handleChart:KG
 JSCompiler_StaticMethods_WriteRowPr:o1
@@ -804,7 +804,7 @@ CFF_SubFontRec:vz
 c_oSerProp_pPrType$numPr_id:SX
 isRealNumber:UI
 FT_Outline_Copy:Ap
-b64_decode:lh
+b64_decode:jh
 historyitem_CalculateAfterPaste:HI
 c_oSerTableTypes$HdrFtr:fW
 CHeader:B6
@@ -1536,7 +1536,7 @@ FILL_TYPE_NOFILL:Yh
 JSCompiler_StaticMethods_Internal_FindWordEnd:NS
 tt_face_load_hdmx_stub:qv
 g_tabtype_clear:Z0
-nSldLtTTxAndObj:RL
+nSldLtTTxAndObj:SL
 Ins_MIRP:gy
 CCore:ph
 CreateNullArray:Tr
@@ -1675,7 +1675,7 @@ wrap_None:WP
 JSCompiler_StaticMethods_getGradientPoints:T2
 fntStyleInd_none:fL
 historyitem_SetBodyPr:NJ
-TT_CallRec:Iw
+TT_CallRec:Cw
 JSCompiler_StaticMethods_RGB2HSL:CK
 CalculateAhXYList:dN
 FT_ENCODING_NONE:lC
@@ -2047,7 +2047,7 @@ asc_CChartSeria:ym
 CBodyPr:Ai
 c_oSerNumTypes$lvl_PStyle:PW
 ParaNewLineRendered:NN
-historyitem_SetSizes:rJ
+historyitem_SetSizes:sJ
 ft_mac_names:wr
 ft_get_adobe_glyph_index:Br
 _weight_title:iM
@@ -2399,7 +2399,7 @@ c_oSer_DrawingType$Chart:zk
 ChangeWrapContour:GH
 historyitem_RemoveHdr:YF
 c_oSer_sts$Style_TblStylePr:oX
-_weight_subTitle:fM
+_weight_subTitle:gM
 tt_service_truetype_glyf:Ry
 ft_bitmap_glyph_done:wp
 lastColor:c7
@@ -2501,7 +2501,7 @@ JSCompiler_StaticMethods_Internal_CheckMerge:ZV
 MATRIX_ORDER_APPEND:PF
 PS_BlendRec:Sr
 asc_CParagraphTabs:so
-FormatObjDecimalFrac:Ig
+FormatObjDecimalFrac:Hg
 JSCompiler_StaticMethods__Commit_Br:Rc
 JSCompiler_StaticMethods_Clear_Formatting:ES
 moveTo:Ej
@@ -2546,7 +2546,7 @@ JSCompiler_StaticMethods_Select:a2
 g_sErrorCharCountMessage:$0
 c_oAscAsyncActionType$Information:i5
 nSldLtTTwoObjAndTx:LL
-FormatObjDateVal:Mg
+FormatObjDateVal:Jg
 c_oSerTableTypes$Other:iW
 asc_CChartStyle:yn
 JSCompiler_StaticMethods__AddDigItem:Vg
@@ -2652,8 +2652,8 @@ TRaster:bw
 cff_index_init:Oz
 L 124:ut
 c_oSer_CommentsType$UserId:J_
-L 123:xC
-L 122:wC
+L 123:zC
+L 122:yC
 L 121:xm
 L 120:iO
 JSCompiler_StaticMethods__BordersToStyle:Xa
@@ -2666,7 +2666,7 @@ L 116:Q4
 L 117:R4
 L 114:O4
 L 115:P4
-FT_Set_Transform:$B
+FT_Set_Transform:YB
 CAscTableStyle:K3
 cff_parse_fixed:Ez
 TT_CMapRec:qu
@@ -2674,7 +2674,7 @@ CParaLineRange:VS
 DecodeBase64:pD
 recalcresult2_NextPage:iJ
 _fakeHeaders:C6
-L 125:yC
+L 125:AC
 c_oSer_ClrSchemeMappingType$FollowedHyperlink:c0
 CParaLine:GR
 JSCompiler_StaticMethods_Internal_Copy_Grid:TU
@@ -2700,18 +2700,18 @@ c_oSerNumTypes$lvl_TextPr:KW
 historyitem_ChangeDiagram2:UJ
 heightrule_Exact:wP
 ShapeForResizeInGroup:oK
-L 111:vC
+L 111:xC
 L 110:ft
 L 113:xo
 L 112:N4
 bIsSupportOriginalFormatFonts:RC
-L 103:Gw
+L 103:Iw
 L 104:lm
 CAutoshapeTrack:I2
 L 105:Uh
 historyitem_AddToSpTree:kK
-L 106:Hw
-L 107:YB
+L 106:Jw
+L 107:$B
 L 108:oo
 L 109:po
 FT_Service_PsFontNameRec:Eo
@@ -2786,7 +2786,7 @@ JSCompiler_StaticMethods_Internal_OnContentRecalculate:IV
 FormatObjBracket:Og
 BULLET_TYPE_SIZE_TX:Ji
 EChartLegendPos$chartlegendposLeft:Ql
-FT_Render_Glyph:ZB
+FT_Render_Glyph:WB
 c_oSerHdrFtrTypes$HdrFtr_Even:pW
 c_oAscYAlign$Top:$T
 _t1_read_binary_data:wB
@@ -2817,7 +2817,7 @@ postLoadScript:TC
 c_oAscAsyncAction$UploadImage:l5
 IS_PS_TOKEN:cs
 c_oMainTables$SlideMasters:fj
-SPH_TweakRule:Jw
+SPH_TweakRule:Dw
 PS_TableRec:jt
 drawing_Anchor:pF
 c_oSerImageType2$WrapTight:OZ
@@ -2964,7 +2964,7 @@ TRACK_CIRCLE_RADIUS:vJ
 T1_Loader:rB
 L 59:hm
 nSldLtTClipArtAndTx:uL
-L 58:VB
+L 58:XB
 L 57:at
 L 56:$s
 L 55:lo
@@ -2981,7 +2981,7 @@ JSCompiler_StaticMethods_Internal_CalculateAutoSpacing:fS
 FontStyle$FontStyleRegular:FC
 Binary_tblPrWriter:k1
 GX_BlendRec:uy
-L 49:jh
+L 49:kh
 L 48:sj
 L 45:Hb
 L 44:me
@@ -2991,9 +2991,9 @@ L 41:le
 TT_Post_NamesRec:Gq
 ft_bitmap_glyph_init:sp
 JSCompiler_StaticMethods__read_rPr:Nd
-L 40:Hg
+L 40:Ig
 L 43:Jd
-L 42:kh
+L 42:lh
 HSLToRGB:x2
 changestype_Paragraph_Content:vE
 nbsp_string:pQ
@@ -3012,7 +3012,7 @@ read_pfb_tag:cB
 Direct_Move_Orig_X:nx
 _weight_dgm:bM
 Direct_Move_Orig_Y:px
-CApp:oh
+CApp:mh
 FT_Set_Charmap:WA
 c_oMainTables$FontMap:nj
 cff_size_done:fA
@@ -3113,10 +3113,10 @@ L 75:jl
 JSCompiler_StaticMethods_rebuildSeries:Qn
 L 76:tj
 _ph_summ__sec_head:uM
-L 77:Lg
+L 77:Mg
 L 78:hf
 t1_args_count:et
-L 79:Cw
+L 79:Ew
 g_spellCheckLanguages:Ve
 CHorRulerRepaintChecker:o4
 c_oSerRunType$linebreak:cZ
@@ -3130,13 +3130,13 @@ c_oSerExtent$Cx:WZ
 c_oSerExtent$Cy:XZ
 L 70:hl
 FT_PEEK_USHORT:Xo
-L 72:nh
-L 71:mh
-L 64:kg
+L 72:oh
+L 71:nh
+L 64:lg
 L 65:xe
 L 62:Di
 c_oSer_SettingsType$ClrSchemeMapping:T_
-L 63:Jg
+L 63:Kg
 CUniFill:zh
 BULLET_TYPE_TYPEFACE_BUFONT:Li
 L 68:Ei
@@ -3144,7 +3144,7 @@ L 69:Th
 c_oSerProp_rPrType$LangBidi:zY
 Ins_MSIRP:Sx
 L 66:ye
-L 67:Kg
+L 67:Lg
 JSCompiler_StaticMethods_getSrc:ub
 FontProperties:Em
 JSCompiler_StaticMethods_Internal_UpdateParagraphState:e2
@@ -3161,8 +3161,8 @@ STATES_ID_PRE_RESIZE:iG
 c_oSerImageType2$WrapSquare:MZ
 ParaPresentationNumbering:WN
 SPH_ScaleRule:Kw
-L 92:Fw
-L 91:XB
+L 92:Hw
+L 91:ZB
 L 94:ct
 nSldLtTObjTx:DL
 L 93:dk
@@ -3173,14 +3173,14 @@ L 90:kl
 tt_name_entry_ascii_from_utf16:Ev
 ret$$inline_772:Bt
 Editor_Copy_GetElem:na
-L 88:Ew
+L 88:Gw
 L 89:uj
 L 86:qq
 CHART_TITLE_TYPE_V_AXIS:xN
 L 87:rq
 L 84:ne
 CFlowParagraph:mQ
-L 85:Dw
+L 85:Fw
 tt_size_request:hz
 c_oSerOtherTableTypes$DocxTheme:TW
 g_bIsAppleDevices:oC
