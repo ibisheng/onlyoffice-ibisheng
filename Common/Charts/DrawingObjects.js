@@ -230,6 +230,7 @@ asc_CChart.prototype = {
 	
 	initDefault: function() {
 	
+		// Обновлены тестовые данные для новой диаграммы
 		function createItem(value) {
 			return { numFormatStr: "General", isDateTimeFormat: false, val: value, isHidden: false };
 		}
@@ -237,33 +238,46 @@ asc_CChart.prototype = {
 		var api_doc = window["editor"];
 		var api_sheet = window["Asc"]["editor"];
 		var api = api_sheet ? api_sheet : api_doc;
-		this.range.interval = "Sheet1!A1:C3";
+		this.range.interval = "Sheet1!A1:D7";
+		var Cat = { Formula: "Sheet1!A2:A7", NumCache: [createItem("USA"), createItem("CHN"), createItem("RUS"), createItem("GBR"), createItem("GER"), createItem("JPN")] };
 		
 		this.series = [];
 		var uniColors = this.generateUniColors(3);
 		
 		var seria = new asc_CChartSeria();
-		seria.Val.Formula = "Sheet1!A2:A3";
-		seria.Val.NumCache = [ createItem(1), createItem(4) ];
+		seria.Val.Formula = "Sheet1!B2:B7";
+		seria.Val.NumCache = [ createItem(46), createItem(38), createItem(24), createItem(29), createItem(11), createItem(7) ];
 		seria.OutlineColor = uniColors[0];
-		seria.TxCache.Formula = "Sheet1!A1";
-		seria.TxCache.Tx = api.chartTranslate.series + " 1";
-		this.series.push(seria);
-		
-		seria = new asc_CChartSeria();
-		seria.Val.Formula = "Sheet1!B2:B3";
-		seria.Val.NumCache = [ createItem(2), createItem(5) ];
-		seria.OutlineColor = uniColors[1];
 		seria.TxCache.Formula = "Sheet1!B1";
-		seria.TxCache.Tx = api.chartTranslate.series + " 2";
+		seria.TxCache.Tx = "Gold";
+		if ( this.type != c_oAscChartType.scatter )
+			seria.Cat = Cat;
+		else
+			seria.xVal = Cat;
 		this.series.push(seria);
 		
 		seria = new asc_CChartSeria();
-		seria.Val.Formula = "Sheet1!C2:C3";
-		seria.Val.NumCache = [ createItem(3), createItem(6) ];
-		seria.OutlineColor = uniColors[2];
+		seria.Val.Formula = "Sheet1!C2:C7";
+		seria.Val.NumCache = [ createItem(29), createItem(27), createItem(26), createItem(17), createItem(19), createItem(14) ];
+		seria.OutlineColor = uniColors[1];
 		seria.TxCache.Formula = "Sheet1!C1";
-		seria.TxCache.Tx = api.chartTranslate.series + " 3";
+		seria.TxCache.Tx = "Silver";
+		if ( this.type != c_oAscChartType.scatter )
+			seria.Cat = Cat;
+		else
+			seria.xVal = Cat;
+		this.series.push(seria);
+		
+		seria = new asc_CChartSeria();
+		seria.Val.Formula = "Sheet1!D2:D7";
+		seria.Val.NumCache = [ createItem(29), createItem(23), createItem(32), createItem(19), createItem(14), createItem(17) ];
+		seria.OutlineColor = uniColors[2];
+		seria.TxCache.Formula = "Sheet1!D1";
+		seria.TxCache.Tx = "Bronze";
+		if ( this.type != c_oAscChartType.scatter )
+			seria.Cat = Cat;
+		else
+			seria.xVal = Cat;
 		this.series.push(seria);
 	},
 	
