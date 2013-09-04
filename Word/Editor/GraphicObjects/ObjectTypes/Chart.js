@@ -1832,7 +1832,39 @@ CChartAsGroup.prototype =
         }
         this.init();
         this.recalculate();
-    }
+    },
+
+
+    setParent: function(paraDrawing)
+    {
+        var data = {Type: historyitem_SetParent};
+        if(isRealObject(this.parent))
+        {
+            data.oldParent = this.parent.Get_Id();
+        }
+        else
+        {
+            data.oldParent = null;
+        }
+
+        if(isRealObject(paraDrawing))
+        {
+            data.newParent = paraDrawing.Get_Id();
+        }
+        else
+        {
+            data.newParent = null;
+        }
+        History.Add(this, data);
+        this.parent = paraDrawing;
+    },
+
+    Write_ToBinary2: function()
+    {},
+
+    Read_FromBinary2: function()
+    {}
+
 };
 
 window["Asc"].CChartAsGroup = CChartAsGroup;
