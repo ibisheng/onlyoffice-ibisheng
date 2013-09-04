@@ -3917,6 +3917,35 @@
 							result[m] = true;
 					}
 				}
+				else if(filter && filter.Filters && filter.Filters.Dates && filter.Filters.Dates.length)
+				{
+					var customFilter = filter.Filters.Dates;
+					var isBlank  = filter.Filters.Blank;
+					//для головных мерженных ячеек
+					if(filter.ShowButton == false)
+					{
+						var isMerged = ws.model.getCell( new CellAddress(startCell.r1, startCell.c1, 0)).hasMerged();
+						if(isMerged)
+						{
+							startCell.c1 = isMerged.c1;
+						}
+					}
+					for(var m = startCell.r1 + 1; m <= endCell.r1; m++)
+					{
+						var val = ws.model.getCell( new CellAddress(m, startCell.c1, 0)).getValue();
+						var isVis = false;
+						var dataVal = NumFormat.prototype.parseDate(val);
+						for(var k = 0; k < customFilter.length;k++)
+						{
+							if(dataVal.d == customFilter[k].Day && dataVal.month + 1 == customFilter[k].Month && dataVal.year == customFilter[k].Year)
+								isVis = true;
+						}
+						if(val == '' && isBlank == true)
+							isVis = true;
+						if(!isVis)
+							result[m] = true;
+					}
+				}
 				else if(filter && filter.Filters)
 				{
 					var customFilter = filter.Filters.Values;
