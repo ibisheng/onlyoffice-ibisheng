@@ -3,6 +3,7 @@ function CMathMatrix()
     this.lineGapColumn = 1.5;
     this.lineGapRow = 1;
     this.gaps = null;
+    this.plcHide = false;
 
     this.spaceRow =
     {
@@ -18,6 +19,7 @@ function CMathMatrix()
         minGap: 0       // minGap / 20 pt
     };
 
+    this.plcHide = false;
     this.baseJc = 0;
     this.gaps =
     {
@@ -28,15 +30,125 @@ function CMathMatrix()
     CMathBase.call(this);
 }
 extend(CMathMatrix, CMathBase);
-CMathMatrix.prototype.init = function(countRow, countCol)
+CMathMatrix.prototype.old_init = function(countRow, countCol)
 {
     this.setDimension(countRow, countCol);
     this.setContent();
 }
-CMathMatrix.prototype.setProperties = function(nRow, nCol)
+CMathMatrix.prototype.init = function(props)
 {
-    this.nRow = nRow;
-    this.nCol = nCol;
+    this.setDimension(props.row, props.column);
+    this.setContent();
+
+    if(typeof(props.baseJc) !== "undefined" && props.baseJc !== null)
+    {
+        if(props.baseJc === "center")
+            this.baseJc = MATRIX_CENTER;
+        else if(props.baseJc === "top")
+            this.baseJc = MATRIX_TOP;
+        else if(props.baseJc === "bottom")
+            this.baseJc = MATRIX_BOTTOM;
+    }
+
+    this.setRuleGap(this.spaceColumn, props.cGpRule, props.cGp, props.cSp);
+    this.setRuleGap(this.spaceRow, props.rSpRule, props.rSp);
+
+    if(props.plcHide === true)
+    {
+        this.plcHide = true;
+        this.hidePlaceholder(true);
+    }
+
+    //if(props.)
+
+
+    /*if(props.cGpRule !== "undefined" && props.cGpRule !== null)
+    {
+        this.setRuleGap(this.spaceColumn, props.cGpRule, props.cGp);
+
+
+        *//*this.spaceColumn.value = 0;
+
+        if(props.cGpRule == 0)
+            this.spaceColumn.rule = 0;
+        else if(props.cGpRule == 1)
+            this.spaceColumn.rule = 1;
+        else if(props.cGpRule == 2)
+            this.spaceColumn.rule = 2;
+        else if(props.cGpRule == 3)
+        {
+            this.spaceColumn.rule = 3;
+
+            if(props.cGp !== "undefined" || props.cGp !== null)
+                this.spaceColumn.value = props.cGp;
+        }
+        else if(props.cGpRule == 4)
+        {
+            this.spaceColumn.rule = 4;
+
+            if(props.cGp !== "undefined" || props.cGp !== null)
+                this.spaceColumn.value = props.cGp;
+        }
+        else
+            this.spaceColumn.rule = 0;*//*
+    }
+
+    if(props.rSpRule !== "undefined" && props.rSpRule !== null)
+    {
+        // если rSpRule не выставлено, то какое выставлено rSp не имеет значение
+        this.setRuleGap(this.spaceRow, props.rSpRule, props.rSp);
+    }*/
+}
+CMathMatrix.prototype.setRuleGap = function(space, rule, gap, minGap)
+{
+    var bInt  =  rule == rule - 0 && rule == rule^ 0,
+        bRule =  rule >= 0 && rule <= 4;
+
+    if(bInt && bRule)
+        space.rule = rule;
+    else
+        space.rule = 0;
+
+
+    if(gap == gap - 0 && gap == gap^0)
+        space.value = gap;
+    else
+        space.value = 0;
+
+    if(minGap == minGap - 0 && minGap == minGap^0)
+        space.minGap = gap;
+    else
+        space.minGap = 0;
+
+
+    /*var Value = 0, Rule;
+
+    if(rule == 0)
+        Rule = 0;
+    else if(rule == 1)
+        Rule = 1;
+    else if(rule == 2)
+        Rule = 2;
+    else if(rule == 3)
+    {
+        Rule = 3;
+
+        if(gap !== "undefined" || gap !== null)
+            Value = gap;
+    }
+    else if(rule == 4)
+    {
+        Rule = 4;
+
+        if(gap !== "undefined" || gap !== null)
+            Value = gap;
+    }
+    else
+        Rule = 0;
+
+    space.rule = Rule;
+    space.value = Value;*/
+
 }
 CMathMatrix.prototype.recalculateSize = function()
 {
@@ -302,17 +414,17 @@ CMathMatrix.prototype.getRowSpace = function(txtPrp)
     var spLine;
 
     if(this.spaceRow.rule == 0)
-        spLine = 7 /6;                 //em
+        spLine = 7/6;                 //em
     else if(this.spaceRow.rule == 1)
-        spLine = 7 /6 *1.5;            //em
+        spLine = 7/6 *1.5;            //em
     else if(this.spaceRow.rule == 2)
-        spLine = 7 /6 *2;              //em
+        spLine = 7/6 *2;              //em
     else if(this.spaceRow.rule == 3)
         spLine = this.spaceRow.gap/20;         //pt
     else if(this.spaceRow.rule == 4)
         spLine = 7/6 * this.spaceRow.gap/2;    //em
     else
-        spLine = 7 /6;
+        spLine = 7/6;
 
     var lineGap;
 

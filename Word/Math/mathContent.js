@@ -4106,43 +4106,83 @@ CMathContent.prototype =
                     base.addTxt("∆");
                     break;
                 case 207:
-                    var matrix = this.addMComponent(21);
-                    matrix.init(1, 2);
+                    var matrix = this.addMComponent(MATH_MATRIX);
+                    var props =
+                    {
+                        row :       1,
+                        column:     2
+                    };
+                    matrix.init(props);
                     matrix.fillPlaceholders();
                     break;
                 case 208:
-                    var matrix = this.addMComponent(21);
-                    matrix.init(2, 1);
+                    var matrix = this.addMComponent(MATH_MATRIX);
+                    var props =
+                    {
+                        row :       2,
+                        column:     1
+                    };
+                    matrix.init(props);
                     matrix.fillPlaceholders();
                     break;
                 case 209:
-                    var matrix = this.addMComponent(21);
-                    matrix.init(1, 3);
+                    var matrix = this.addMComponent(MATH_MATRIX);
+                    var props =
+                    {
+                        row :       1,
+                        column:     3
+                    };
+                    matrix.init(props);
                     matrix.fillPlaceholders();
                     break;
                 case 210:
-                    var matrix = this.addMComponent(21);
-                    matrix.init(3, 1);
+                    var matrix = this.addMComponent(MATH_MATRIX);
+                    var props =
+                    {
+                        row :       3,
+                        column:     1
+                    };
+                    matrix.init(props);
                     matrix.fillPlaceholders();
                     break;
                 case 211:
-                    var matrix = this.addMComponent(21);
-                    matrix.init(2, 2);
+                    var matrix = this.addMComponent(MATH_MATRIX);
+                    var props =
+                    {
+                        row :       2,
+                        column:     2
+                    };
+                    matrix.init(props);
                     matrix.fillPlaceholders();
                     break;
                 case 212:
-                    var matrix = this.addMComponent(21);
-                    matrix.init(2, 3);
+                    var matrix = this.addMComponent(MATH_MATRIX);
+                    var props =
+                    {
+                        row :       2,
+                        column:     3
+                    };
+                    matrix.init(props);
                     matrix.fillPlaceholders();
                     break;
                 case 213:
-                    var matrix = this.addMComponent(21);
-                    matrix.init(3, 2);
+                    var matrix = this.addMComponent(MATH_MATRIX);
+                    var props =
+                    {
+                        row :       3,
+                        column:     2
+                    };
+                    matrix.init(props);
                     matrix.fillPlaceholders();
                     break;
                 case 214:
-                    var matrix = this.addMComponent(21);
-                    matrix.init(3, 3);
+                    var matrix = this.addMComponent(MATH_MATRIX);
+                    var props =
+                    {
+                        row :       3,
+                        column:     3
+                    };
+                    matrix.init(props);
                     matrix.fillPlaceholders();
                     break;
                 case 215:
@@ -4158,8 +4198,13 @@ CMathContent.prototype =
                     this.addTxt("⋱");
                     break;
                 case 219:
-                    var matrix = this.addMComponent(21);
-                    matrix.init(2, 2);
+                    var matrix = this.addMComponent(MATH_MATRIX);
+                    var props =
+                    {
+                        row :       2,
+                        column:     2
+                    };
+                    matrix.init(props);
                     elem1 = matrix.getElement(0,0);
                     elem1.addTxt("1");
 
@@ -4173,9 +4218,14 @@ CMathContent.prototype =
                     elem4.addTxt("1");
                     break;
                 case 220:
-                    var matrix = this.addMComponent(21);
-                    matrix.init(2, 2);
-                    matrix.hidePlaceholder(true);
+                    var matrix = this.addMComponent(MATH_MATRIX);
+                    var props =
+                    {
+                        row :       2,
+                        column:     2,
+                        plcHide:    true
+                    };
+                    matrix.init(props);
 
                     elem1 = matrix.getElement(0,0);
                     elem1.addTxt("1");
@@ -4190,8 +4240,13 @@ CMathContent.prototype =
                     elem4.addTxt("1");
                     break;
                 case 221:
-                    var matrix  = this.addMComponent(21);
-                    matrix.init(3, 3);
+                    var matrix  = this.addMComponent(MATH_MATRIX);
+                    var props =
+                    {
+                        row :       3,
+                        column:     3
+                    };
+                    matrix.init(props);
 
                     elem1 = matrix.getElement(0,0);
                     elem1.addTxt("1");
@@ -4223,9 +4278,15 @@ CMathContent.prototype =
                     break;
                 case 222:
                     var matrix  = this.addMComponent(21);
-                    matrix.init(3, 3);
+                    var matrix  = this.addMComponent(MATH_MATRIX);
+                    var props =
+                    {
+                        row :       3,
+                        column:     3,
+                        plcHide:    true
+                    };
+                    matrix.init(props);
 
-                    matrix.hidePlaceholder(true);
                     elem1 = matrix.getElement(0,0);
                     elem1.addTxt("1");
 

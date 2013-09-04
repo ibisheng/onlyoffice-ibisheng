@@ -79,6 +79,9 @@ var DELIMITER_TURN_MIRROR_180   =  3;
 var DELIMITER_SHAPE_MATH        =  0;
 var DELIMITER_SHAPE_CENTERED    =  1;
 
-
 var LIMIT_LOW               	=  0;
 var LIMIT_UP                	=  1;
+
+var MATRIX_CENTER               =  0;
+var MATRIX_TOP                  =  1;
+var MATRIX_BOTTOM               =  2;
