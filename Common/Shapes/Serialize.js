@@ -4241,6 +4241,11 @@ function BinaryPPTYLoader()
                     _table = this.ReadTable(_xfrm, _graphic_frame);
                     break;
                 }
+                case 3:
+                {
+                    // TODO: chartData
+                    break;
+                }
                 default:
                 {
                     break;

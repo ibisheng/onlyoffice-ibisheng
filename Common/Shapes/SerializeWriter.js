@@ -948,6 +948,7 @@ function CBinaryFileWriter()
                 {
                     oThis.WriteTable(spTree[i]);
                 }
+                // TODO: WriteChart
 
                 oThis.EndRecord();
             }
@@ -2068,6 +2069,20 @@ function CBinaryFileWriter()
         oThis.EndRecord();
     }
 
+    this.WriteChart = function(grObj)
+    {
+        oThis.StartRecord(5);
+
+        oThis.WriteUChar(g_nodeAttributeStart);
+        oThis.WriteUChar(g_nodeAttributeEnd);
+
+        oThis.WriteRecord1(0, grObj.nvGraphicFramePr, oThis.WriteUniNvPr);
+        oThis.WriteRecord2(1, grObj.getXfrm(), oThis.WriteXfrm);
+        oThis.WriteRecord2(3, grObj.graphicObject, oThis.WriteChart2);
+
+        oThis.EndRecord();
+    }
+
     this.WriteTable2 = function(table)
     {
         var obj = new Object();
@@ -2364,6 +2379,7 @@ function CBinaryFileWriter()
                 {
                     oThis.WriteTable(spTree[i]);
                 }
+                // TODO: WriteChart
 
                 oThis.EndRecord(0);
             }
