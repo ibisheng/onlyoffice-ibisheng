@@ -3252,7 +3252,7 @@ CDocumentContent.prototype =
                 for ( var Index = 0; Index < Count; Index++ )
                 {
                     this.Content[Index].Set_ApplyToAll(true);
-                    ResultText += this.Content[Index].Get_SelectedText( true );
+                    ResultText += this.Content[Index].Get_SelectedText( false );
                     this.Content[Index].Set_ApplyToAll(false);
                 }
 

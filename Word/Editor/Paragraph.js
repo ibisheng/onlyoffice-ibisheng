@@ -8343,6 +8343,38 @@ Paragraph.prototype =
     // Возвращаем выделенный текст
     Get_SelectedText : function(bClearText)
     {
+        if ( true === this.ApplyToAll )
+        {
+            var Str = "";
+
+            var Count = this.Content.length;
+            for ( var Pos = 0; Pos < Count; Pos++ )
+            {
+                var Item = this.Content[Pos];
+
+                switch ( Item.Type )
+                {
+                    case para_Drawing:
+                    case para_End:
+                    case para_Numbering:
+                    case para_PresentationNumbering:
+                    case para_PageNum:
+                    {
+                        if ( true === bClearText )
+                            return null;
+
+                        break;
+                    }
+
+                    case para_Text : Str += Item.Value; break;
+                    case para_Space:
+                    case para_Tab  : Str += " "; break;
+                }
+            }
+
+            return Str;
+        }
+
         if ( true === this.Selection.Use )
         {
             var StartPos = this.Selection.StartPos;
