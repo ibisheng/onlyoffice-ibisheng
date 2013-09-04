@@ -265,7 +265,7 @@ asc_CChart.prototype = {
 		seria.Val.NumCache = [ createItem(3), createItem(6) ];
 		seria.OutlineColor = uniColors[2];
 		seria.TxCache.Formula = "Sheet1!C1";
-		seria.TxCache.Tx = api.chartTranslate.series + " 2";
+		seria.TxCache.Tx = api.chartTranslate.series + " 3";
 		this.series.push(seria);
 	},
 	
@@ -522,10 +522,10 @@ asc_CChart.prototype = {
 		}
 		for ( var i = 0; i < colors.length; i++ ) {
 			var rgbColor = new RGBColor(colors[i]);
+			
 			var uniColor = CreateUniColorRGB(rgbColor.r, rgbColor.g, rgbColor.b);
 			uniColors.push(uniColor);
 		}
-		
 		return uniColors;
 	},
 	
@@ -686,8 +686,8 @@ asc_CChart.prototype = {
 		for (var i = 0; i < seriesCount; i++) {
 		
 			var seria = new asc_CChartSeria();
-			seria.Val.Formula = Reader.GetString2();
 			
+			seria.Val.Formula = Reader.GetString2();
 			var numCacheCount = Reader.GetLong();
 			for (var j = 0; j < numCacheCount; j++) {
 				var item = {};

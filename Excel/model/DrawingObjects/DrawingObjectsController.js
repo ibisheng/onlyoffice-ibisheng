@@ -784,11 +784,6 @@ DrawingObjectsController.prototype =
                 }
                 if(c_obj.isChart())
                 {
-					/*if ( !api.chartStyleManager.isReady() )
-						api.chartStyleManager.init();
-					if ( !api.chartPreviewManager.isReady() )
-						api.chartPreviewManager.init();*/
-				
                     if(!isRealObject(chart_props))
                     {
                         chart_props = new asc_CImgProperty();
@@ -900,11 +895,6 @@ DrawingObjectsController.prototype =
                     }
                     if (c_obj.isChart())
                     {
-						/*if ( !api.chartStyleManager.isReady() )
-							api.chartStyleManager.init();
-						if ( !api.chartPreviewManager.isReady() )
-							api.chartPreviewManager.init();*/
-					
                         if (!isRealObject(chart_props))
                         {
                             chart_props = new asc_CImgProperty();
@@ -1009,6 +999,12 @@ DrawingObjectsController.prototype =
         }
 		
 		for (var i = 0; i < ret.length; i++) {
+		
+			if ( (!api.chartStyleManager.isReady() || !api.chartPreviewManager.isReady()) && ret[i].ChartProperties ) {
+				api.chartStyleManager.init();
+				api.chartPreviewManager.init();
+				this.drawingObjects.callTrigger("asc_onUpdateChartStyles");
+			}
 			ascSelectedObjects.push(new asc_CSelectedObject( c_oAscTypeSelectElement.Image, new asc_CImgProperty(ret[i]) ));
 		}
 		

@@ -8102,6 +8102,7 @@
 					if (isUpdateCols) { t._updateVisibleColsCount(); }
 					if (isUpdateRows) { t._updateVisibleRowsCount(); }
 
+					t.objectRender.rebuildChartGraphicObjects();
 					t.objectRender.showDrawingObjects(true);
 				};
 
