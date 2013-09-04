@@ -3631,6 +3631,12 @@ asc_docs_api.prototype.sync_slidePropCallback = function(slide)
     obj.lockTiming = !(slide.timingLock.Type === locktype_Mine || slide.timingLock.Type === locktype_None);
     obj.lockTranzition = !(slide.transitionLock.Type === locktype_Mine || slide.transitionLock.Type === locktype_None);
     obj.lockBackground = !(slide.backgroundLock.Type === locktype_Mine || slide.backgroundLock.Type === locktype_None);
+    obj.lockRemove = obj.lockDelete ||
+    obj.lockLayout ||
+    obj.lockTiming ||
+    obj.lockTranzition ||
+        obj.lockBackground ||slide.isLockedObject() ;
+
 
     var _len = this.SelectedObjectsStack.length;
     if (_len > 0)

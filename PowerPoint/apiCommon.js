@@ -689,6 +689,7 @@ function CAscSlideProps()
     this.lockTiming = null;
     this.lockBackground = null;
     this.lockTranzition = null;
+    this.lockRemove = null;
 }
 
 CAscSlideProps.prototype.get_background = function(){return this.Background;}
@@ -705,6 +706,8 @@ CAscSlideProps.prototype.get_LockBackground = function(){return this.lockBackgro
 CAscSlideProps.prototype.put_LockBackground = function(v){this.lockBackground = v;}
 CAscSlideProps.prototype.get_LockTranzition = function(){return this.lockTranzition;}
 CAscSlideProps.prototype.put_LockTranzition = function(v){this.lockTranzition = v;}
+CAscSlideProps.prototype.get_LockRemove = function(){return this.lockRemove;}
+CAscSlideProps.prototype.put_LockRemove = function(v){this.lockRemove = v;}
 
 // ---------------------------------------------------------------
 

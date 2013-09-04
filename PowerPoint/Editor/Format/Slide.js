@@ -975,6 +975,10 @@ Slide.prototype =
             transitionLock: transitionLock.Get_Id(), layoutLock: layoutLock.Get_Id()})
     },
 
+    isLockRemove: function()
+    {
+        //for(var i = 0)
+    },
     recalcAll: function()
     {
         this.recalcInfo =
