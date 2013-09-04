@@ -12150,6 +12150,20 @@ CTable.prototype =
                         this.TableGridCalc[CurCol] = MinMargin[CurCol] + MinContent[CurCol] + (MaxTableW - SumMin) * MaxContent2[CurCol] / SumMaxContent2;
                     }
                 }
+
+                // Если у таблицы задана ширина, тогда ориентируемся по ширине, а если нет, тогда ориентируемся по
+                // максимальным значениям.
+                if ( tblwidth_Mm === TablePr.TableW.Type )
+                {
+                    var TableW = Math.max( SumMin, TablePr.TableW.W );
+                    var TableW2 = Math.min( SumMax, MaxTableW );
+
+                    // Если TableW > SumMax, тогда меням в соотношении максимумов, в противном случае меняем в соотношении минимумов
+                    for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
+                    {
+                        this.TableGridCalc[CurCol] *= TableW / TableW2;
+                    }
+                }
             }
             else
             {
@@ -13460,8 +13474,8 @@ CTable.prototype =
 
     Internal_Recalculate_Borders : function()
     {
-        if ( true != this.RecalcInfo.TableBorders )
-            return;
+        //if ( true != this.RecalcInfo.TableBorders )
+        //    return;
 
         // Обнуляем таблицу суммарных высот ячеек
         for ( var Index = -1; Index < this.Content.length; Index++ )
