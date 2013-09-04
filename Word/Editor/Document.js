@@ -2235,6 +2235,10 @@ CDocument.prototype =
         if ( docpostype_HdrFtr === this.CurPos.Type )
         {
             var Res = this.HdrFtr.Remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd);
+
+            this.Selection_Remove();
+            this.Selection.Use = false;
+
             this.Document_UpdateInterfaceState();
             this.Document_UpdateRulersState();
             return Res;
