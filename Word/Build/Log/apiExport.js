@@ -541,6 +541,7 @@ prop:asc_addChartDrawingObject
 prop:asc_editChartDrawingObject
 prop:asc_getChartPreviews
 prop:sync_closeChartEditor
+prop:asc_setDrawCollaborationMarks
 ---
 var:CChatMessage
 prop:get_UserId
@@ -1606,6 +1607,7 @@ asc_docs_api.prototype['asc_addChartDrawingObject'] = asc_docs_api.prototype.asc
 asc_docs_api.prototype['asc_editChartDrawingObject'] = asc_docs_api.prototype.asc_editChartDrawingObject;
 asc_docs_api.prototype['asc_getChartPreviews'] = asc_docs_api.prototype.asc_getChartPreviews;
 asc_docs_api.prototype['sync_closeChartEditor'] = asc_docs_api.prototype.sync_closeChartEditor;
+asc_docs_api.prototype['asc_setDrawCollaborationMarks'] = asc_docs_api.prototype.asc_setDrawCollaborationMarks;
 window['CChatMessage'] = CChatMessage;
 CChatMessage.prototype['get_UserId'] = CChatMessage.prototype.get_UserId;
 CChatMessage.prototype['get_Message'] = CChatMessage.prototype.get_Message;
