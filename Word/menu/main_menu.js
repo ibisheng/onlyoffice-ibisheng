@@ -1010,8 +1010,8 @@ $("#td_formatmodel,#td_info, #td_redo, #td_undo, #td_orient, #td_bold, #td_itali
             //editor.WordControl.m_oLogicDocument.Document_CreateFontMap();
 
 
-            //Menu_Hyperlink_Add();
-            editor.WordControl.m_oLogicDocument.Add_DropCap();
+            Menu_Hyperlink_Add();
+            //editor.WordControl.m_oLogicDocument.Add_DropCap();
 
             //editor.WordControl.m_oLogicDocument.Search_Start(String);
 			break;
@@ -1064,7 +1064,7 @@ $("#td_formatmodel,#td_info, #td_redo, #td_undo, #td_orient, #td_bold, #td_itali
 			if (editor.ShowParaMarks = (!editor.ShowParaMarks)) $(this).addClass("iconPressed"); else $(this).removeClass("iconPressed");
 				editor.WordControl.OnRePaintAttack();
 			break;
-		case "td_tl_superscript":
+		case"td_tl_superscript":
 			if ($(this).hasClass("iconPressed")){
 				$(this).removeClass("iconPressed");
 				editor.put_TextPrBaseline(0);

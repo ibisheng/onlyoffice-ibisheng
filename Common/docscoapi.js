@@ -30,7 +30,7 @@
 		if (this._CoAuthoringApi && this._CoAuthoringApi.isRightURL()) {
 			var t = this;
 			this._CoAuthoringApi.onAuthParticipantsChanged = function (e) {t.callback_OnAuthParticipantsChanged(e);};
-			this._CoAuthoringApi.onParticipantsChanged = function (e) {t.callback_OnParticipantsChanged(e);};
+			this._CoAuthoringApi.onParticipantsChanged = function (e, Count) {t.callback_OnParticipantsChanged(e, Count);};
 			this._CoAuthoringApi.onMessage = function (e) {t.callback_OnMessage(e);};
 			this._CoAuthoringApi.onLocksAcquired = function (e) {t.callback_OnLocksAcquired(e);};
 			this._CoAuthoringApi.onLocksReleased = function (e, bChanges) {t.callback_OnLocksReleased(e, bChanges);};
@@ -149,9 +149,9 @@
 			return this.onAuthParticipantsChanged(e);
 	};
 
-	CDocsCoApi.prototype.callback_OnParticipantsChanged = function (e) {
+	CDocsCoApi.prototype.callback_OnParticipantsChanged = function (e, Count) {
 		if (this.onParticipantsChanged)
-			return this.onParticipantsChanged (e);
+			return this.onParticipantsChanged (e, Count);
 	};
 
 	CDocsCoApi.prototype.callback_OnMessage = function (e) {
@@ -643,7 +643,7 @@
 			}
 			else {
 				if (this.onParticipantsChanged)
-					this.onParticipantsChanged (this._participants);
+					this.onParticipantsChanged (this._participants, countEditUsers);
 			}
 			
 			// Посылаем эвент о совместном редактировании

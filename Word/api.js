@@ -534,6 +534,7 @@ function asc_docs_api(name)
     this.User = undefined;
     this.CoAuthoringApi = new CDocsCoApi();
 	this.isCoAuthoringEnable = true;
+    this.isCoMarksDraw = false;
 
 	// Spell Checking
 	this.SpellCheckApi = new CSpellCheckApi();
@@ -1299,8 +1300,19 @@ asc_docs_api.prototype._coAuthoringInit = function()
 	}
 
     var t = this;
-    this.CoAuthoringApi.onParticipantsChanged   	= function (e) { t.asc_fireCallback( "asc_onParticipantsChanged", e ); };
-	this.CoAuthoringApi.onAuthParticipantsChanged  	= function (e) { t.asc_fireCallback( "asc_onAuthParticipantsChanged", e ); };
+    this.CoAuthoringApi.onParticipantsChanged   	= function (e, CountEditUsers)
+    {
+        t.asc_fireCallback( "asc_onParticipantsChanged", e );
+
+        if ( 1 >= CountEditUsers )
+            editor.asc_setDrawCollaborationMarks(false);
+        else
+            editor.asc_setDrawCollaborationMarks(true);
+    };
+	this.CoAuthoringApi.onAuthParticipantsChanged  	= function (e)
+    {
+        t.asc_fireCallback( "asc_onAuthParticipantsChanged", e );
+    };
     this.CoAuthoringApi.onMessage               	= function (e) { t.asc_fireCallback( "asc_onCoAuthoringChatReceiveMessage", e ); };
 	this.CoAuthoringApi.onConnectionStateChanged	= function (e) { t.asc_fireCallback( "asc_onConnectionStateChanged", e ); };
 	this.CoAuthoringApi.onUserStateChanged			= function (e) { t.asc_fireCallback( "asc_onUserStateChanged", e ); };
@@ -1409,6 +1421,7 @@ asc_docs_api.prototype._coAuthoringInit = function()
 	this.CoAuthoringApi.onStartCoAuthoring		= function (e)
 	{
 		CollaborativeEditing.Start_CollaborationEditing();
+        editor.asc_setDrawCollaborationMarks(true);
         editor.WordControl.m_oLogicDocument.DrawingDocument.Start_CollaborationEditing();
 
         if ( true != History.Is_Clear() )
@@ -6945,4 +6958,14 @@ asc_docs_api.prototype.asc_getChartPreviews = function(chartType, chartSubType)
 asc_docs_api.prototype.sync_closeChartEditor = function()
 {
     this.asc_fireCallback("asc_onCloseChartEditor");
+}
+
+asc_docs_api.prototype.asc_setDrawCollaborationMarks = function (bDraw)
+{
+    if ( bDraw !== this.isCoMarksDraw )
+    {
+        this.isCoMarksDraw = bDraw;
+        this.WordControl.m_oLogicDocument.DrawingDocument.ClearCachePages();
+        this.WordControl.m_oLogicDocument.DrawingDocument.FirePaint();
+    }
 }

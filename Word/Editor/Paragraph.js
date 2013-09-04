@@ -3952,7 +3952,8 @@ Paragraph.prototype =
                 var Y_top = this.Pages[CurPage].Bounds.Top;
                 var Y_bottom = this.Pages[CurPage].Bounds.Bottom;
 
-                pGraphics.DrawLockParagraph(this.Lock.Get_Type(), X_min, Y_top, Y_bottom);
+                if ( true === editor.isCoMarksDraw || locktype_Mine != this.Lock.Get_Type() )
+                    pGraphics.DrawLockParagraph(this.Lock.Get_Type(), X_min, Y_top, Y_bottom);
             }
         }
     },
