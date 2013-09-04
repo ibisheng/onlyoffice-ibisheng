@@ -5240,7 +5240,30 @@ CPresentation.prototype =
 
     Set_CurPage : function(PageNum)
     {
+
+        if (-1 == PageNum)
+        {
+            this.CurPage = -1;
+            return;
+        }
+
+        var oldCurPage = this.CurPage;
         this.CurPage = Math.min( this.Slides.length - 1, Math.max( 0, PageNum ) );
+        if(oldCurPage != this.CurPage && this.CurPage < this.Slides.length)
+        {
+            editor.sync_BeginCatchSelectedElements();
+            editor.sync_slidePropCallback(this.Slides[this.CurPage]);
+            editor.sync_EndCatchSelectedElements();
+           /* if(this.Slides[oldCurPage])
+                this.Slides[oldCurPage].elementsManipulator.resetState();       */
+            //this.Document_UpdateInterfaceState();
+        }
+        else if (this.CurPage < this.Slides.length)
+        {
+            editor.sync_BeginCatchSelectedElements();
+            editor.sync_slidePropCallback(this.Slides[this.CurPage]);
+            editor.sync_EndCatchSelectedElements();
+        }
     },
 
     Get_CurPage : function()

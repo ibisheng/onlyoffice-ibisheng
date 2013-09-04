@@ -293,6 +293,9 @@ function NullState(drawingObjectsController, drawingObjects)
         this.drawingObjectsController.resetSelection();
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
         this.drawingObjects.OnUpdateOverlay();
+        editor.sync_BeginCatchSelectedElements();
+        editor.sync_slidePropCallback(drawingObjects);
+        editor.sync_EndCatchSelectedElements();
     };
 
     this.onMouseMove = function(e, x, y)

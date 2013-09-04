@@ -684,12 +684,27 @@ function CAscSlideProps()
 {
     this.Background = null;
     this.Timing = null;
+    this.lockDelete = null;
+    this.lockLayout = null;
+    this.lockTiming = null;
+    this.lockBackground = null;
+    this.lockTranzition = null;
 }
 
 CAscSlideProps.prototype.get_background = function(){return this.Background;}
 CAscSlideProps.prototype.put_background = function(v){this.Background = v;}
 CAscSlideProps.prototype.get_timing = function(){return this.Timing;}
 CAscSlideProps.prototype.put_timing = function(v){this.Timing = v;}
+CAscSlideProps.prototype.get_LockDelete = function(){return this.lockDelete;}
+CAscSlideProps.prototype.put_LockDelete = function(v){this.lockDelete = v;}
+CAscSlideProps.prototype.get_LockLayout = function(){return this.lockLayout;}
+CAscSlideProps.prototype.put_LockLayout = function(v){this.lockLayout = v;}
+CAscSlideProps.prototype.get_LockTiming = function(){return this.lockTiming;}
+CAscSlideProps.prototype.put_LockTiming = function(v){this.lockTiming = v;}
+CAscSlideProps.prototype.get_LockBackground = function(){return this.lockBackground;}
+CAscSlideProps.prototype.put_LockBackground = function(v){this.lockBackground = v;}
+CAscSlideProps.prototype.get_LockTranzition = function(){return this.lockTranzition;}
+CAscSlideProps.prototype.put_LockTranzition = function(v){this.lockTranzition = v;}
 
 // ---------------------------------------------------------------
 
@@ -1895,6 +1910,8 @@ function CParagraphProp (obj)
         this.Spacing = (undefined != obj.Spacing && null != obj.Spacing) ? new CParagraphSpacing (obj.Spacing) : null;
         this.Brd = (undefined != obj.Brd && null != obj.Brd) ? new CParagraphBorders (obj.Brd) : null;
         this.Shd = (undefined != obj.Shd && null != obj.Shd) ? new CParagraphShd (obj.Shd) : null;
+        this.Locked            = (undefined != obj.Locked  && null != obj.Locked ) ? obj.Locked : false;
+
     }
     else
     {
@@ -1922,9 +1939,10 @@ function CParagraphProp (obj)
         this.Spacing = new CParagraphSpacing ();
         this.Brd = null;
         this.Shd = null;
+        this.Locked = false;
     }
 }
-
+CParagraphProp.prototype.get_Locked = function() { return this.Locked; }
 CParagraphProp.prototype.get_ContextualSpacing = function () { return this.ContextualSpacing; }
 CParagraphProp.prototype.put_ContextualSpacing = function (v) { this.ContextualSpacing = v; }
 CParagraphProp.prototype.get_Ind = function () { return this.Ind; }

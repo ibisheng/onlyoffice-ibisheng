@@ -6134,6 +6134,29 @@ CDocumentContent.prototype =
     {
         var ParaPr = this.Get_Paragraph_ParaPr();
 
+        if(this.Parent && this.Parent.shape)
+        {
+
+            if(this.Parent.shape.group)
+            {
+                var cucr_group = this.Parent.shape.group;
+                while(cucr_group.group)
+                {
+                    cucr_group = cucr_group.group;
+                }
+                if(cucr_group.Lock && cucr_group.Lock.Is_Locked())
+                {
+                    ParaPr.Locked = true;
+                }
+            }
+            else
+            {
+                if(this.Parent.shape.Lock && this.Parent.shape.Lock.Is_Locked())
+                {
+                    ParaPr.Locked = true;
+                }
+            }
+        }
         if ( null != ParaPr )
         {
             if ( undefined != ParaPr.Tabs )

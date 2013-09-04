@@ -3539,7 +3539,7 @@ asc_docs_api.prototype.sync_shapePropCallback = function(pr)
     obj.type = pr.type;
     obj.fill = CreateAscFill(pr.fill);
     obj.stroke = CreateAscStroke(pr.stroke, pr.canChangeArrows);
-
+    obj.Locked = pr.IsLocked;
     if (pr.fill != null && pr.fill.fill != null && pr.fill.fill.type == FILL_TYPE_BLIP)
     {
         this.WordControl.m_oDrawingDocument.DrawImageTextureFillShape(pr.fill.fill.RasterImageId);
@@ -3599,6 +3599,11 @@ asc_docs_api.prototype.sync_slidePropCallback = function(slide)
     }
 
     obj.Timing = slide.timing;
+    obj.lockDelete = !(slide.deleteLock.Type === locktype_Mine || slide.deleteLock.Type === locktype_None);
+    obj.lockLayout = !(slide.layoutLock.Type === locktype_Mine || slide.layoutLock.Type === locktype_None);
+    obj.lockTiming = !(slide.timingLock.Type === locktype_Mine || slide.timingLock.Type === locktype_None);
+    obj.lockTranzition = !(slide.transitionLock.Type === locktype_Mine || slide.transitionLock.Type === locktype_None);
+    obj.lockBackground = !(slide.backgroundLock.Type === locktype_Mine || slide.backgroundLock.Type === locktype_None);
 
     var _len = this.SelectedObjectsStack.length;
     if (_len > 0)

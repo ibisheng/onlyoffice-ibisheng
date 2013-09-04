@@ -543,6 +543,10 @@ CGraphicObjects.prototype = {
                     }
 
                     var _cur_paragraph_para_pr = _current_object.getParagraphParaPr();
+                    if(_current_object.Lock.Is_Locked())
+                    {
+                        _cur_paragraph_para_pr.Locked = true;
+                    }
                     if(_cur_paragraph_para_pr != null)
                     {
                         if(para_props === null)
