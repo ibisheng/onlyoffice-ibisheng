@@ -68,6 +68,13 @@ function CVerRulerRepaintChecker()
     this.BlitTop = 0;
 }
 
+function RulerCorrectPosition(val, mm_1_8, mm_1_4)
+{
+    if (global_keyboardEvent.AltKey)
+        return val;
+    return (((val + mm_1_8) / mm_1_4) >> 0) * mm_1_4;
+}
+
 function CHorRuler()
 {
     this.m_oPage        = null;     // текущая страница. Нужна для размеров и маргинов в режиме RULER_OBJECT_TYPE_PARAGRAPH
@@ -590,8 +597,7 @@ function CHorRuler()
             }
             case 1:
             {
-                var count = parseInt((_x + mm_1_8) / mm_1_4);
-                var newVal = count * mm_1_4;
+                var newVal = RulerCorrectPosition(_x, mm_1_8, mm_1_4);
 
                 if (newVal < 0)
                     newVal = 0;
@@ -617,8 +623,7 @@ function CHorRuler()
             }
             case 2:
             {
-                var count = parseInt((_x + mm_1_8) / mm_1_4);
-                var newVal = count * mm_1_4;
+                var newVal = RulerCorrectPosition(_x, mm_1_8, mm_1_4);
 
                 var min = this.m_dMarginLeft;
                 if ((this.m_dMarginLeft + this.m_dIndentLeft) > min)
@@ -646,8 +651,7 @@ function CHorRuler()
             }
             case 3:
             {
-                var count = parseInt((_x + mm_1_8) / mm_1_4);
-                var newVal = count * mm_1_4;
+                var newVal = RulerCorrectPosition(_x, mm_1_8, mm_1_4);
 
                 var min = 0;
                 if (this.m_dIndentLeftFirst < this.m_dIndentLeft)
@@ -679,8 +683,7 @@ function CHorRuler()
             }
             case 4:
             {
-                var count = parseInt((_x + mm_1_8) / mm_1_4);
-                var newVal = count * mm_1_4;
+                var newVal = RulerCorrectPosition(_x, mm_1_8, mm_1_4);
 
                 if (newVal < 0)
                     newVal = 0;
@@ -702,8 +705,7 @@ function CHorRuler()
             }
             case 5:
             {
-                var count = parseInt((_x + mm_1_8) / mm_1_4);
-                var newVal = count * mm_1_4;
+                var newVal = RulerCorrectPosition(_x, mm_1_8, mm_1_4);
 
                 if (newVal < 0)
                     newVal = 0;
@@ -725,8 +727,7 @@ function CHorRuler()
             }
             case 6:
             {
-                var count = parseInt((_x + mm_1_8) / mm_1_4);
-                var newVal = count * mm_1_4;
+                var newVal = RulerCorrectPosition(_x, mm_1_8, mm_1_4);
 
                 if (newVal > (this.m_oPage.width_mm))
                     newVal = this.m_oPage.width_mm;
@@ -752,8 +753,7 @@ function CHorRuler()
             }
             case 7:
             {
-                var count = parseInt((_x + mm_1_8) / mm_1_4);
-                var newVal = count * mm_1_4;
+                var newVal = RulerCorrectPosition(_x, mm_1_8, mm_1_4);
 
                 this.m_dCurrentTabNewPosition = newVal - _margin_left;
 
@@ -777,8 +777,7 @@ function CHorRuler()
             }
             case 8:
             {
-                var count = parseInt((_x + mm_1_8) / mm_1_4);
-                var newVal = count * mm_1_4;
+                var newVal = RulerCorrectPosition(_x, mm_1_8, mm_1_4);
 
                 // сначала определим граничные условия
                 var _min = 0;
@@ -1048,9 +1047,8 @@ function CHorRuler()
 
                 var mm_1_4 = 10 / 4;
                 var mm_1_8 = mm_1_4 / 2;
-                
-                var count = parseInt((_new_tab_pos + mm_1_8) / mm_1_4);
-                _new_tab_pos = count * mm_1_4;
+
+                var _new_tab_pos = RulerCorrectPosition(_new_tab_pos, mm_1_8, mm_1_4);
 
                 this.m_arrTabs[this.m_arrTabs.length] = new CTab(_new_tab_pos, word_control.m_nTabsType);
                 //this.CorrectTabs();
@@ -2060,8 +2058,7 @@ function CVerRuler()
             }
             case 1:
             {
-                var count = parseInt((_y + mm_1_8) / mm_1_4);
-                var newVal = count * mm_1_4;
+                var newVal = RulerCorrectPosition(_y, mm_1_8, mm_1_4);
 
                 if (newVal > (this.m_dMarginBottom - 30))
                     newVal = this.m_dMarginBottom - 30;
@@ -2080,8 +2077,7 @@ function CVerRuler()
             }
             case 2:
             {
-                var count = parseInt((_y + mm_1_8) / mm_1_4);
-                var newVal = count * mm_1_4;
+                var newVal = RulerCorrectPosition(_y, mm_1_8, mm_1_4);
 
                 if (newVal < (this.m_dMarginTop + 30))
                     newVal = this.m_dMarginTop + 30;
@@ -2100,8 +2096,7 @@ function CVerRuler()
             }
             case 3:
             {
-                var count = parseInt((_y + mm_1_8) / mm_1_4);
-                var newVal = count * mm_1_4;
+                var newVal = RulerCorrectPosition(_y, mm_1_8, mm_1_4);
 
                 if (newVal > this.header_bottom)
                     newVal = this.header_bottom;
@@ -2120,8 +2115,7 @@ function CVerRuler()
             }
             case 4:
             {
-                var count = parseInt((_y + mm_1_8) / mm_1_4);
-                var newVal = count * mm_1_4;
+                var newVal = RulerCorrectPosition(_y, mm_1_8, mm_1_4);
 
                 if (newVal < 0)
                     newVal = 0;
@@ -2152,8 +2146,8 @@ function CVerRuler()
                 {
                     _max = this.m_oTableMarkup.Rows[this.DragTablePos].Y + this.m_oTableMarkup.Rows[this.DragTablePos].H;
                 }
-                var count = parseInt((_y + mm_1_8) / mm_1_4);
-                var newVal = count * mm_1_4;
+
+                var newVal = RulerCorrectPosition(_y, mm_1_8, mm_1_4);
 
                 if (newVal < _min)
                     newVal = _min;

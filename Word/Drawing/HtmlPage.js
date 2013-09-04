@@ -2026,6 +2026,7 @@ function CEditorPage(api)
         var oWordControl = oThis;
         if (false === oWordControl.m_oApi.bInit_word_control || oWordControl.m_bIsMouseLock === true)
         {
+            check_KeyboardEvent2(e);
             e.preventDefault();
             return;
         }

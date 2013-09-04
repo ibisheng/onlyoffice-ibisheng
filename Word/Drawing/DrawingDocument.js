@@ -4215,6 +4215,14 @@ function CDrawingDocument()
         this.m_oWordControl.UpdateHorRuler();
     }
 
+    this.CorrectRulerPosition = function(pos)
+    {
+        if (global_keyboardEvent.AltKey)
+            return pos;
+
+        return ((pos / 2.5 + 0.5) >> 0) * 2.5;
+    }
+
     this.UpdateTableRuler = function(isCols, index, position)
     {
         var dKoef_mm_to_pix = g_dKoef_mm_to_pix * this.m_oWordControl.m_nZoomValue / 100;

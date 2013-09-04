@@ -7072,8 +7072,8 @@ CTable.prototype =
             if ( true === editor.isViewMode || this.Selection.Data2.PageNum != PageIndex - this.PageNum )
                 return;
 
-            var _X = parseInt(X / 2.5 + 0.5) * 2.5;
-            var _Y = parseInt(Y / 2.5 + 0.5) * 2.5;
+            var _X = this.DrawingDocument.CorrectRulerPosition(X);
+            var _Y = this.DrawingDocument.CorrectRulerPosition(Y);
 
             if ( true === this.Selection.Data2.bCol )
             {

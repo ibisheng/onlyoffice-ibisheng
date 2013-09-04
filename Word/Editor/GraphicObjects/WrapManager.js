@@ -405,11 +405,12 @@ CWrapPolygon.prototype =
                 if (Math.abs(transformed_x1 - polygon_point0.x) < APPROXIMATE_EPSILON && Math.abs(transformed_y1 - polygon_point0.y) < APPROXIMATE_EPSILON)
                     continue;
 
+                var _prev = polygon_point0;
+
                 polygon_point0 = new CPolygonPoint();
                 polygon_point0.x = transformed_x1;
                 polygon_point0.y = transformed_y1;
 
-                var _prev = polygon_point0;
                 arrPoints.push(polygon_point0);
                 arrEdges.push(new GraphEdge(_prev, polygon_point0));
             }

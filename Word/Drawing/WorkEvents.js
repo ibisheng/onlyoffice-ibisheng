@@ -136,6 +136,17 @@ function check_KeyboardEvent(e)
     global_keyboardEvent.KeyCode = e.keyCode;
 	global_keyboardEvent.Which = e.which;
 }
+function check_KeyboardEvent2(e)
+{
+    global_keyboardEvent.AltKey = e.altKey;
+
+    if (e.metaKey !== undefined)
+        global_keyboardEvent.CtrlKey = e.ctrlKey || e.metaKey;
+    else
+        global_keyboardEvent.CtrlKey = e.ctrlKey;
+
+    global_keyboardEvent.ShiftKey = e.shiftKey;
+}
 
 function check_MouseMoveEvent(e)
 {
