@@ -3372,7 +3372,7 @@ function DrawingObjects() {
 
 		if ( chart instanceof asc_CChart ) {
 			var _range = convertFormula(chart.range.interval, worksheet);
-			if (_range)
+			if ( _range )
 				chart.range.intervalObject = _range;
 
 			chart.rebuildSeries();
@@ -3394,7 +3394,7 @@ function DrawingObjects() {
 					var resultRef = parserHelp.parse3DRef(graphicObject.chart.series[0].Val.Formula);
 					worksheet.model.workbook.aWorksheets[0].sName = resultRef.sheet;
 					
-					var colArray = [];
+					/*var colArray = [];
 					var rowArray = [];
 					
 					function parseDataFormula(data, bMinimum) {
@@ -3428,7 +3428,11 @@ function DrawingObjects() {
 					var _range = new Range(worksheet.model, r1, c1, r2, c2 );
 					graphicObject.chart.range.intervalObject = _range;
 					
-					_this.calcChartInterval(graphicObject.chart);
+					_this.calcChartInterval(graphicObject.chart);*/
+					
+					var _range = convertFormula(graphicObject.chart.range.interval, worksheet);
+					if ( _range )
+						graphicObject.chart.range.intervalObject = _range;
 				}
 				
 				// Инжектим тему и перестраиваем превью диаграмм

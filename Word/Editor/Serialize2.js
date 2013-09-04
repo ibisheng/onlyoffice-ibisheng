@@ -5708,13 +5708,61 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 					{
 						chart.range.rows = false;
 						chart.range.columns = false;
-						if(bbox.c2 - bbox.c1 > bbox.r2 - bbox.r1)
+						if ( bbox.c2 - bbox.c1 > bbox.r2 - bbox.r1 )
 							chart.range.rows = true;
 						else
 							chart.range.columns = true;
 					}
 				}
+				
+				// Общий диапазон
+				var _this = this;
+				var colArray = [], rowArray = [];
+				var seriesCount = chart.series.length;
+				
+				function parseDataFormula(data, bMinimum) {
+					if ( data && data.Formula ) {
+						var range = _this.ParseFormula(data.Formula);
+						if ( range ) {
+							if ( bMinimum ) {
+								colArray.push(range.c1);
+								rowArray.push(range.r1);
+							}
+							else {
+								colArray.push(range.c2);
+								rowArray.push(range.r2);
+							}
+						}
+					}
+				}
+				
+				parseDataFormula(chart.series[0].Val, true);
+				parseDataFormula(chart.series[seriesCount - 1].Val, false);
+				
+				parseDataFormula(chart.series[0].TxCache, true);
+				parseDataFormula(chart.series[0].xVal, true);
+				parseDataFormula(chart.series[0].Cat, true);
+				
+				var c1 = Math.min.apply(null, colArray);
+				var r1 = Math.min.apply(null, rowArray);
+				var c2 = Math.max.apply(null, colArray);
+				var r2 = Math.max.apply(null, rowArray);
+				
+				var oCellStart = new CellAddress(r1, c1, 0);
+				var oCellEnd = new CellAddress(r2, c2, 0);
+				
+				var sheetName = "Sheet1";
+				if ( oFirstSeria.Val.Formula ) {
+					var index = oFirstSeria.Val.Formula.indexOf("!");
+					if ( -1 != index )
+						sheetName = oFirstSeria.Val.Formula.substring(0, index);
+				}
+				chart.range.interval = sheetName + "!" + oCellStart.getID() + ":" + oCellEnd.getID();
 			}
+			
+			oChartObject.chart = chart;
+			
+			/*
 			var nRowCount = 0;
 			var nColCount = 0;
 			if ( chart.range.rows ) {
@@ -5731,7 +5779,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 				chart.range.interval = "Sheet1!A1:" + oCellAddress.getID();
 				
 				oChartObject.chart = chart;
-			}
+			}*/
 		}
 		else if( c_oSerImageType2.AllowOverlap === type )
 			var AllowOverlap = this.stream.GetBool();
