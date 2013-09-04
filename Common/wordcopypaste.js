@@ -2138,7 +2138,7 @@ function PasteProcessor(api, bUploadImage, bUploadFonts, bNested)
     this.bInBlock = null;
 
     //������ �������� � ������� ��������� �������� ��� ������
-    this.dMaxWidth = Page_Width;
+    this.dMaxWidth = Page_Width - X_Left_Margin - X_Right_Margin;
     //���������� ������(�������� ��� ������� ������� �������, ������ ��� ������� ����������� ������ � ��������� � ������� ����� �������� ���� �����������)
     this.dScaleKoef = 1;
     this.bUseScaleKoef = false;
@@ -3864,6 +3864,8 @@ PasteProcessor.prototype =
     },
     _ExecuteTable : function(tableNode, node, table, aSumGrid, aColsCountByRow, pPr, bUseScaleKoef, dScaleKoef)
     {
+		//из-за проблем со вставкой больших таблиц, не вставляем tbllayout_AutoFit
+		table.Set_TableLayout(tbllayout_Fixed);
         //Pr
         var Pr = table.Pr;
         var defaultView = tableNode.ownerDocument.defaultView;
