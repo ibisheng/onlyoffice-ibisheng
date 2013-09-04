@@ -3267,7 +3267,7 @@ CDocumentContent.prototype =
             // Либо у нас нет выделения, либо выделение внутри одного элемента
             if ( docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && selectionflag_Common === this.Selection.Flag ) || false === this.Selection.Use ) )
             {
-                if ( true === bClearText && this.Selection.StartPos === this.Selection.EndPos )
+                if ( true === bClearText && (this.Selection.StartPos === this.Selection.EndPos || false === this.Selection.Use )  )
                 {
                     var Pos = ( true == this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos );
                     return this.Content[Pos].Get_SelectedText(true);
