@@ -106,7 +106,7 @@ historyitem_AddHdr:PF
 JSCompiler_StaticMethods_recalculateAfterInternalResize:oH
 recalcresult2_End:cJ
 SpellCheck_CallBack:b2
-monthShort:kg
+monthShort:jg
 MobileTouchMode$Cursor:U3
 tt_cmap14_ensure:Tu
 cff_decoder_parse_charstrings:wA
@@ -382,7 +382,7 @@ JSCompiler_StaticMethods_getNormalPoint:O2
 cff_size_select:aA
 FT_GlyphSlot:Zq
 GetMinSnapDistanceX:ZG
-CParagraphProp:B3
+CParagraphProp:y3
 c_oSer_ChartSeriesDataLabelsType$ShowVal:yl
 GetMinSnapDistanceY:$G
 JSCompiler_StaticMethods_GetCoordinates:Vm
@@ -3125,7 +3125,7 @@ L 70:gl
 FT_PEEK_USHORT:Qo
 L 72:nh
 L 71:mh
-L 64:jg
+L 64:kg
 L 65:xe
 L 62:Ci
 c_oSer_SettingsType$ClrSchemeMapping:N_
