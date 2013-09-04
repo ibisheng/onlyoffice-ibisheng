@@ -277,7 +277,7 @@ UndoRedoData_FromToCell:kO
 BULLET_TYPE_COLOR_NONE:SV
 FT_CFF_CMAP_ENCODING_CLASS_REC_GET:mt
 align_Left:UQ
-FT_Common:Vg
+FT_Common:Ug
 JSCompiler_StaticMethods_rebuild:OK
 phType_media:yT
 phType_tbl:DT
@@ -599,7 +599,7 @@ c_oSerFormat$Version:XA
 CTableStyle:kK
 cErrorType$unsupported_function:lz
 FT_Module_Class:Vj
-c_oAscFill$FILL_TYPE_BLIP:fg
+c_oAscFill$FILL_TYPE_BLIP:eg
 c_oAscAsyncAction$Save:t8
 ft_glyphslot_done:Zj
 c_oSer_ConditionalFormattingIconSet$CFVO:pH
@@ -1731,7 +1731,7 @@ nSldLtTSecHead:DU
 JSCompiler_StaticMethods_shiftFormat:Vc
 FontStyle$FontStyleItalic:Jv
 nSldLtTTxAndChart:MU
-JSCompiler_StaticMethods_TurnOn:vg
+JSCompiler_StaticMethods_TurnOn:qg
 CBg:hU
 CParaLineMetrics:H6
 BinaryChartWriter:KJ
@@ -1965,7 +1965,7 @@ T1_GlyphSlot_Done:lu
 VERTICAL_ANCHOR_TYPE_CENTER:KV
 JSCompiler_StaticMethods__foreachRow:TO
 _infos$$inline_1212:ox
-historyitem_AutoShapes_RecalculateTransformUndo:Cg
+historyitem_AutoShapes_RecalculateTransformUndo:Ag
 historyitem_Workbook_SheetRemove:WM
 JSCompiler_StaticMethods__ZeroPad:Oc
 fntStyleInd_minor:JT
@@ -2695,7 +2695,7 @@ L 137:DB
 L 136:Z7
 g_oUndoRedoCol:kL
 JSCompiler_StaticMethods_RedoPrepare:bN
-L 150:eg
+L 150:fg
 JSCompiler_StaticMethods_RedoEnd:hN
 L 151:ii
 L 152:vr
@@ -2729,7 +2729,7 @@ FONT_TYPE_ADDITIONAL_CUT:ww
 L 118:Mb
 L 119:We
 c_oSerWorksheetPropTypes$Name:iD
-L 116:Bg
+L 116:Cg
 ParaNewLine:OX
 L 117:fe
 L 114:Qu
@@ -2774,14 +2774,14 @@ ShapeForResizeInGroup:c7
 ChangeAdjInGroupState:u1
 L 111:$m
 L 110:qr
-L 113:Ug
+L 113:Vg
 bIsSupportOriginalFormatFonts:qw
 L 112:Al
 L 103:Lc
 L 104:ke
 CAutoshapeTrack:Qf
 L 105:Hj
-L 106:Ag
+L 106:Bg
 CLegendEntryGroup:V6
 L 107:Yo
 OpenColor:ZJ
@@ -3041,7 +3041,7 @@ L 59:Rc
 nSldLtTClipArtAndTx:sU
 L 58:xd
 L 57:qf
-L 56:qg
+L 56:rg
 L 55:Qc
 L 54:Fd
 L 53:wd
@@ -3236,7 +3236,7 @@ L 99:zl
 L 95:rc
 c_oSer_SheetPr$FilterMode:HH
 L 96:jk
-L 97:ug
+L 97:vg
 L 98:oh
 c_oSer_ChartCatAxType$Title:bZ
 c_oSerWorksheetColTypes$Width:qD
@@ -3245,9 +3245,9 @@ ParaPresentationNumbering:C3
 SPH_ScaleRule:yp
 EHorizontalAlignment$horizontalalignmentCenter:qI
 JSCompiler_StaticMethods_setFgColor:US
-L 92:sg
+L 92:tg
 L 91:ed
-L 94:tg
+L 94:ug
 nSldLtTObjTx:BU
 L 93:Di
 Fill:iK
@@ -3259,7 +3259,7 @@ tt_name_entry_ascii_from_utf16:so
 c_oSerStylesTypes$Border:gB
 L 88:Uh
 JSCompiler_StaticMethods_deleteAllSlaveEdges:eM
-L 89:rg
+L 89:sg
 L 86:tj
 CHART_TITLE_TYPE_V_AXIS:J_
 L 87:Od
