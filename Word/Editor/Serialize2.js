@@ -5673,45 +5673,6 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			bbox = {r1: first.getRow0(), c1: first.getCol0(), r2: last.getRow0(), c2: last.getCol0()};
 		}
 		return bbox;
-	},
-	this.PrepareSeria = function(val, chart, formula)
-	{
-		/*var bbox = this.ParseFormula(formula);
-		if(null != bbox)
-		{
-			var length = 0;
-			if(bbox.c2 - bbox.c1 > bbox.r2 - bbox.r1)
-				length = bbox.c2 - bbox.c1 + 1;
-			else
-				length = bbox.r2 - bbox.r1 + 1;
-			for(var i = 0; i < length; ++i)
-			{
-				var elem = val[i];
-				var sVal = "0";
-				if(null != elem && null != elem.val)
-					sVal = elem.val;
-				var item = {numFormatStr: "General", isDateTimeFormat: false, value: sVal};
-				if(chart.range.rows)
-				{
-					if(null == rowByRow)
-					{
-						rowByRow = new Array();
-						chart.data.push(rowByRow);
-					}
-					rowByRow.push(item);
-				}
-				else
-				{
-					var row = chart.data[i];
-					if(null == row)
-					{
-						row = new Array();
-						chart.data[i] = row;
-					}
-					row.push(item);
-				}
-			}
-		}*/
 	}
     this.ReadPptxDrawing = function(type, length, oParaDrawing, oChartObject)
 	{
@@ -5733,50 +5694,29 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 		else if( c_oSerImageType2.Chart === type )
         {
             oParaDrawing.GraphicObj = new CChartAsGroup();
-			var oBinary_ChartReader = new Binary_ChartReader(this.stream, oParaDrawing.GraphicObj.chart, oParaDrawing.GraphicObj);
-            var chart = oParaDrawing.GraphicObj.chart;
-			oBinary_ChartReader.PreRead();
-			res = this.bcr.Read1(length, function(t,l){
-					return oBinary_ChartReader.ReadChart(t,l);
-				});
-			oBinary_ChartReader.PostRead();
-			//анализируем серии заполняем data
-			for(var i = 0, length = chart.series.length; i < length; ++i)
+			var chart = oParaDrawing.GraphicObj.chart;
+			var oBinary_ChartReader = new Binary_ChartReader(this.stream, chart, oParaDrawing.GraphicObj);
+			oBinary_ChartReader.ReadExternal(length);
+			
+			if(chart.series.length > 0)
 			{
-				var seria = chart.series[i];
-				if(null != seria)
+				var oFirstSeria = chart.series[0];
+				if(null != oFirstSeria && null != oFirstSeria.Val && null != oFirstSeria.Val.Formula)
 				{
-					if(0 == i)
+					var bbox = this.ParseFormula(oFirstSeria.Val.Formula);
+					if(null != bbox)
 					{
-						if(null != seria.Val && null != seria.Val.Formula)
-						{
-							var bbox = this.ParseFormula(seria.Val.Formula);
-							if(null != bbox)
-							{
-								chart.range.rows = false;
-								chart.range.columns = false;
-								if(bbox.c2 - bbox.c1 > bbox.r2 - bbox.r1)
-									chart.range.rows = true;
-								else
-									chart.range.columns = true;
-							}
-						}
-						if(null != seria.xVal && null != seria.xVal.NumCache && null != seria.xVal.Formula)
-							this.PrepareSeria(seria.xVal.NumCache, chart, seria.xVal.Formula);
+						chart.range.rows = false;
+						chart.range.columns = false;
+						if(bbox.c2 - bbox.c1 > bbox.r2 - bbox.r1)
+							chart.range.rows = true;
+						else
+							chart.range.columns = true;
 					}
-					if(null != seria.Val && null != seria.Val.NumCache && null != seria.Val.Formula)
-						this.PrepareSeria(seria.Val.NumCache, chart, seria.Val.Formula);
 				}
 			}
-			
-			/*var nRowCount = chart.data.length;
-			var nColCount = 0;
-			if(nRowCount > 0)
-				nColCount = chart.data[0].length;*/
-				
 			var nRowCount = 0;
 			var nColCount = 0;
-			
 			if ( chart.range.rows ) {
 				nRowCount = chart.series.length;
 				nColCount = chart.series[0].Val.NumCache.length;
@@ -5785,22 +5725,11 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 				nRowCount = chart.series[0].Val.NumCache.length;
 				nColCount = chart.series.length;
 			}
-				
 			if(0 != nRowCount && 0 != nColCount)
 			{
-				var sColLetter = "";
-				var n = nColCount - 1;
-				if (n >= 702) {
-					var val = (Math.floor(n / 676) - 1) % 26;
-					sColLetter += String.fromCharCode(val + 65);
-				}
-				if (n >= 26) {
-					var val = (Math.floor(n / 26) - 1) % 26;
-					sColLetter += String.fromCharCode(val + 65);
-				}
-				sColLetter += String.fromCharCode( (n % 26) + 65);
+				var oCellAddress = new CellAddress(nRowCount, nColCount);			
+				chart.range.interval = "Sheet1!A1:" + oCellAddress.getID();
 				
-				chart.range.interval = "Sheet1!A1:" + sColLetter + nRowCount;
 				oChartObject.chart = chart;
 			}
 		}

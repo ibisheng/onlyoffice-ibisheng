@@ -1309,6 +1309,17 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 		this.PostRead();
 		return res;
 	};
+	this.ReadExternal = function(length)
+	{
+		var res = c_oSerConstants.ReadOk;
+        var oThis = this;
+		this.PreRead();
+        res = this.bcr.Read1(length, function(t,l){
+                return oThis.ReadChart(t,l);
+            });
+		this.PostRead();
+		return res;
+	};
 	this.PostRead = function()
 	{
 		if("" != this.chartType && null != this.chart.series && this.chart.series.length > 0)
