@@ -2180,17 +2180,14 @@
 							{
 								for(var s = 0; s < array.length; s++)
 								{
-									if(array[s].val == val)
+									if(array[s].val == val && array[s].visible != 'hidden')
 									{
-										if(array[s].visible != 'hidden')
-										{
-											newArray[m] = array[s].visible;
-											break;
-										}
+										newArray[m] = array[s].visible;
+										break;
 									}
-									else if(allFilterOpenElements && array[s].visible != 'hidden')
-										newArray[m] = true;
-									if(newArray[m] == undefined && s == array.length - 1)
+									/*else if(allFilterOpenElements && array[s].visible != 'hidden')
+										newArray[m] = true;*/
+									if(s == array.length - 1 && newArray[m] == undefined)
 										newArray[m] = false;
 								}
 							}
@@ -2256,6 +2253,8 @@
 					var allVis = true;
 					for(var i = 0; i < array.length ; i++)
 					{
+						if(allFilterOpenElements)
+							break;
 						var cell = ws.model.getCell( new CellAddress(activeCells.r1 + i + 1, activeCells.c1,0));
 						var valActive = cell.getValue();
 						var arrVal;
@@ -2365,8 +2364,8 @@
 				// ToDo - здесь вызывается и _updateCellsRange в _reDrawFilters, и делается changeWorksheet
 				// ToDo - от _reDrawFilters в будущем стоит избавиться, ведь она проставляет стили ячейкам, а это не нужно делать (сменить отрисовку)
 				this._reDrawFilters(ws);
-				ws.changeWorksheet("update");
-				ws.isChanged = true;
+				//ws.changeWorksheet("update");
+				//ws.isChanged = true;
 				this.drawAutoF(ws);
 			},
 			
