@@ -941,6 +941,9 @@ function CAscShapeProp()
     this.fill = null;
     this.stroke = null;
     this.Locked = null;
+    this.w = null;
+    this.h = null;
+    this.paddings = null;
 }
 CAscShapeProp.prototype.get_Locked = function(){return this.Locked}
 CAscShapeProp.prototype.put_Locked = function(v){this.Locked = v;}
@@ -950,6 +953,12 @@ CAscShapeProp.prototype.get_fill = function(){return this.fill}
 CAscShapeProp.prototype.put_fill = function(v){this.fill = v;}
 CAscShapeProp.prototype.get_stroke = function(){return this.stroke}
 CAscShapeProp.prototype.put_stroke = function(v){this.stroke = v;}
+CAscShapeProp.prototype.get_Width = function(){return this.w}
+CAscShapeProp.prototype.put_Width = function(v){this.w = v;}
+CAscShapeProp.prototype.get_Height = function(){return this.h}
+CAscShapeProp.prototype.put_Height = function(v){this.h = v;}
+CAscShapeProp.prototype.get_paddings = function(){return this.paddings}
+CAscShapeProp.prototype.put_paddings = function(v){this.paddings = v;}
 
 // эта функция ДОЛЖНА минимизироваться
 function CreateAscShapeProp(shape)

@@ -357,6 +357,37 @@ CShape.prototype =
         return this.compiledStyle;
     },
 
+    getPaddings: function()
+    {
+        var paddings = null;
+        var shape = this;
+        if(shape.txBody)
+        {
+            var body_pr = shape.txBody.bodyPr;
+            paddings = new CPaddings();
+            if(typeof body_pr.lIns === "number")
+                paddings.Left = body_pr.lIns;
+            else
+                paddings.Left = 2.54;
+
+            if(typeof body_pr.tIns === "number")
+                paddings.Top = body_pr.tIns;
+            else
+                paddings.Top = 1.27;
+
+            if(typeof body_pr.rIns === "number")
+                paddings.Right = body_pr.rIns;
+            else
+                paddings.Right = 2.54;
+
+            if(typeof body_pr.bIns === "number")
+                paddings.Bottom = body_pr.bIns;
+            else
+                paddings.Bottom = 1.27;
+        }
+        return paddings;
+    },
+
     getParentObjects: function()
     {
         var parents = {slide: null, layout: null, master: null, theme: null};
@@ -558,6 +589,46 @@ CShape.prototype =
     {
         if(this.txBody)
             this.txBody.calculateContent();
+    },
+
+    setTextVerticalAlign: function(align)
+    {
+        if(this.txBody)
+        {
+            this.txBody.bodyPr.anchor = align;
+            this.recalculateContent();
+            this.recalculateTransformText();
+        }
+    },
+    setPaddings: function(paddings)
+    {
+        if(paddings)
+        {
+            if(this.txBody)
+            {
+                if(isRealNumber(paddings.Left))
+                {
+                    this.txBody.bodyPr.lIns = paddings.Left;
+                }
+
+                if(isRealNumber(paddings.Top))
+                {
+                    this.txBody.bodyPr.tIns = paddings.Top;
+                }
+
+                if(isRealNumber(paddings.Right))
+                {
+                    this.txBody.bodyPr.rIns = paddings.Right;
+                }
+                if(isRealNumber(paddings.Bottom))
+                {
+                    this.txBody.bodyPr.bIns = paddings.Bottom;
+                }
+                this.txBody.recalcInfo.recalculateBodyPr = true;
+                this.recalculateContent();
+                this.recalculateTransformText();
+            }
+        }
     },
 
     recalculate: function()

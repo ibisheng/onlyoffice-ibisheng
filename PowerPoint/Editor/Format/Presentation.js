@@ -5157,6 +5157,16 @@ CPresentation.prototype =
         this.Document_UpdateCanAddHyperlinkState();
     },
 
+    changeBackground: function(bg, arr_ind)
+    {
+        for(var i = 0; i <arr_ind.length; ++i)
+        {
+            this.Slides[arr_ind[i]].changeBackground(bg);
+            this.DrawingDocument.OnRecalculatePage(arr_ind[i], this.Slides[arr_ind[i]]);
+        }
+        this.DrawingDocument.OnEndRecalculate(true, false);
+    },
+
     // Обновляем линейки
     Document_UpdateRulersState : function()
     {

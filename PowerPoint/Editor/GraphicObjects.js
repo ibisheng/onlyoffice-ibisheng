@@ -105,7 +105,7 @@ CGraphicObjects.prototype = {
                         if(selected_objects[0].canChangeAdjustments())
                         {
                             drawingDocument.SetCursorType("crosshair");
-                            selected_objects[0].seendMouseData();
+                            selected_objects[0].sendMouseData();
                         }
                         return;
                     }
@@ -503,6 +503,8 @@ CGraphicObjects.prototype = {
         switch(this.State.id)
         {
             case STATES_ID_NULL:
+            case STATES_ID_TEXT_ADD:
+           // case STATES_ID_TEXT_ADD_IN_GROUP:
             {
                 var images = by_types.images;
                 for(var i = 0; i < images.length; ++i)
@@ -530,7 +532,11 @@ CGraphicObjects.prototype = {
                         fill: _current_object.getFill(),
                         stroke: _current_object.getStroke(),
                         canChangeArrows: _current_object.canChangeArrows(),
-                        IsLocked: !(_current_object.Lock.Type === locktype_None || _current_object.Lock.Type === locktype_Mine)
+                        IsLocked: !(_current_object.Lock.Type === locktype_None || _current_object.Lock.Type === locktype_Mine),
+                        verticalTextAlign: _current_object.txBody ? _current_object.txBody.getCompiledBodyPr().anchor : undefined,
+                        paddings: _current_object.getPaddings(),
+                        w:_current_object.extX,
+                        h:_current_object.extY
                     };
 
                     if(shape_props === null)
@@ -540,6 +546,7 @@ CGraphicObjects.prototype = {
                     else
                     {
                         shape_props = CompareShapeProperties(shape_props, _cur_shape_prop);
+                        shape_props.verticalTextAlign = undefined;
                     }
 
                     var _cur_paragraph_para_pr = _current_object.getParagraphParaPr();
@@ -593,6 +600,7 @@ CGraphicObjects.prototype = {
                             }
                         }
                     }
+
                     var shapes = cur_group.shapes;
                     for(var i = 0; i < shapes.length; ++i)
                     {
@@ -602,7 +610,12 @@ CGraphicObjects.prototype = {
                             type: _current_object.getPresetGeom(),
                             fill: _current_object.getFill(),
                             stroke: _current_object.getStroke(),
-                            canChangeArrows: _current_object.canChangeArrows()
+                            canChangeArrows: _current_object.canChangeArrows(),
+                            IsLocked: cur_group.Lock.Is_Locked(),
+                            verticalTextAlign: _current_object.txBody ? _current_object.txBody.getCompiledBodyPr().anchor : undefined,
+                            paddings: _current_object.getPaddings(),
+                            w:_current_object.extX,
+                            h:_current_object.extY
                         };
 
                         if(shape_props === null)
@@ -612,6 +625,7 @@ CGraphicObjects.prototype = {
                         else
                         {
                             shape_props = CompareShapeProperties(shape_props, _cur_shape_prop);
+                            shape_props.verticalTextAlign = undefined;
                         }
 
                         var _cur_paragraph_para_pr = _current_object.getParagraphParaPr();
@@ -637,6 +651,28 @@ CGraphicObjects.prototype = {
                             {
                                 text_props = text_props.Compare(_cur_paragraph_text_pr)
                             }
+                        }
+                    }
+
+                    if(image_props)
+                    {
+                        if(cur_group.Lock.Is_Locked())
+                        {
+                            image_props.IsLocked = true;
+                        }
+                    }
+                    if(shape_props)
+                    {
+                        if(cur_group.Lock.Is_Locked())
+                        {
+                            shape_props.IsLocked = true;
+                        }
+                    }
+                    if(para_props)
+                    {
+                        if(cur_group.Lock.Is_Locked())
+                        {
+                            para_props.Locked = true;
                         }
                     }
                 }
@@ -673,68 +709,80 @@ CGraphicObjects.prototype = {
                 }
                 break;
             }
-            case STATES_ID_TEXT_ADD:
-            case STATES_ID_TEXT_ADD_IN_GROUP:
+        }
+
+        if(this.State.id === STATES_ID_TEXT_ADD || this.State.id === STATES_ID_TEXT_ADD_IN_GROUP)
+        {
+
+            if(image_props !== null)
             {
-                this.State.textObject.updateInterfaceTextState();
-                if(this.State.textObject.isTable && this.State.textObject.isTable())
+                editor.sync_ImgPropCallback(image_props);
+            }
+
+            if(shape_props !== null)
+            {
+                editor.sync_shapePropCallback(shape_props);
+            }
+
+            this.State.textObject.updateInterfaceTextState();
+            if(this.State.textObject.isTable && this.State.textObject.isTable())
+            {
+                editor.sync_TblPropCallback(this.State.textObject.graphicObject.Get_Props());
+                this.slide.presentation.DrawingDocument.CheckTableStyles(this.State.textObject.graphicObject.Get_TableLook(), this.State.textObject);
+            }
+        }
+        else
+        {
+            if(para_props != null)
+            {
+                editor.UpdateParagraphProp( para_props );
+
+                editor.sync_PrLineSpacingCallBack(para_props.Spacing);
+                if(selected_objects.length === 1 )
                 {
-                    editor.sync_TblPropCallback(this.State.textObject.graphicObject.Get_Props());
-                    this.slide.presentation.DrawingDocument.CheckTableStyles(this.State.textObject.graphicObject.Get_TableLook(), this.State.textObject);
+                    if ( "undefined" != typeof(para_props.Tabs) && null != para_props.Tabs )
+                        editor.Update_ParaTab( Default_Tab_Stop, para_props.Tabs );//TODO:
                 }
-                break;
             }
-        }
-
-        if(image_props !== null)
-        {
-            editor.sync_ImgPropCallback(image_props);
-        }
-
-        if(shape_props !== null)
-        {
-            editor.sync_shapePropCallback(shape_props);
-        }
-
-        if(para_props != null)
-        {
-            editor.UpdateParagraphProp( para_props );
-
-            editor.sync_PrLineSpacingCallBack(para_props.Spacing);
-            if(selected_objects.length === 1 )
+            else
             {
-                if ( "undefined" != typeof(para_props.Tabs) && null != para_props.Tabs )
-                    editor.Update_ParaTab( Default_Tab_Stop, para_props.Tabs );//TODO:
+                //editor.sync_PrLineSpacingCallBack(_empty_para_pr.Spacing);
+                //editor.UpdateParagraphProp(_empty_para_pr);
+            }
+
+            if(text_props != null)
+            {
+                if(text_props.Bold === undefined)
+                    text_props.Bold = false;
+                if(text_props.Italic === undefined)
+                    text_props.Italic = false;
+                if(text_props.Underline === undefined)
+                    text_props.Underline = false;
+                if(text_props.Strikeout === undefined)
+                    text_props.Strikeout = false;
+                if(text_props.FontFamily === undefined)
+                    text_props.FontFamily = {Index : 0, Name : ""};
+                if(text_props.FontSize === undefined)
+                    text_props.FontSize = "";
+                editor.UpdateTextPr(text_props);
+            }
+            else
+            {
+                //   editor.UpdateTextPr(_empty_text_pr);
+            }
+
+            if(image_props !== null)
+            {
+                editor.sync_ImgPropCallback(image_props);
+            }
+
+            if(shape_props !== null)
+            {
+                editor.sync_shapePropCallback(shape_props);
             }
         }
-        else
-        {
-            //editor.sync_PrLineSpacingCallBack(_empty_para_pr.Spacing);
-            //editor.UpdateParagraphProp(_empty_para_pr);
-        }
 
-        if(text_props != null)
-        {
-            if(text_props.Bold === undefined)
-                text_props.Bold = false;
-            if(text_props.Italic === undefined)
-                text_props.Italic = false;
-            if(text_props.Underline === undefined)
-                text_props.Underline = false;
-            if(text_props.Strikeout === undefined)
-                text_props.Strikeout = false;
-            if(text_props.FontFamily === undefined)
-                text_props.FontFamily = {Index : 0, Name : ""};
-            if(text_props.FontSize === undefined)
-                text_props.FontSize = "";
-            editor.UpdateTextPr(text_props);
-        }
-        else
-        {
-            //   editor.UpdateTextPr(_empty_text_pr);
-        }
-
-        editor.sync_VerticalTextAlign(this.getVerticalAlign());
+       // editor.sync_VerticalTextAlign(this.getVerticalAlign());
     },
 
     getPropsArrays: function()
@@ -1032,10 +1080,12 @@ CGraphicObjects.prototype = {
         {
             case STATES_ID_NULL:
             case STATES_ID_GROUP:
+            case STATES_ID_TEXT_ADD:
+            case STATES_ID_TEXT_ADD_IN_GROUP:
             {
 
-                var selectedObjects = this.State.id === STATES_ID_NULL ? this.selectedObjects : this.State.group.selectedObjects;
-                for(var i = 0; i < this.selectedObjects.length; ++i)
+                var selectedObjects = this.State.id === STATES_ID_NULL  || this.State.id === STATES_ID_TEXT_ADD ? this.selectedObjects : this.State.group.selectedObjects;
+                for(var i = 0; i < selectedObjects.length; ++i)
                 {
 
                     if(properties.type != undefined && properties.type != -1 && typeof selectedObjects[i].changePresetGeom === "function")
@@ -1050,10 +1100,46 @@ CGraphicObjects.prototype = {
                     {
                         selectedObjects[i].changeLine(properties.stroke);
                     }
+                    if(properties.paddings && typeof selectedObjects[i].setPaddings === "function")
+                    {
+                        selectedObjects[i].setPaddings(properties.paddings);
+                    }
+                }
+                if(typeof properties.verticalTextAlign === "number")
+                {
+
+                    if(this.State.id === STATES_ID_TEXT_ADD)
+                    {
+                        if(typeof this.State.textObject.setTextVerticalAlign === "function")
+                            this.State.textObject.GraphicObj.setTextVerticalAlign(properties.verticalTextAlign);
+                    }
+
+                    if(this.State.id === STATES_ID_TEXT_ADD_IN_GROUP)
+                    {
+                        if(typeof this.State.setTextVerticalAlign === "function")
+                            this.State.textObject.setTextVerticalAlign(properties.verticalTextAlign);
+                    }
+                }
+                if(this.State.id !==STATES_ID_GROUP && this.State.id !==STATES_ID_TEXT_ADD_IN_GROUP && isRealNumber(properties.w) && isRealNumber(properties.h))
+                {
+                    for(var i = 0; i < selectedObjects.length; ++i)
+                    {
+
+                        if(selectedObjects[i].setXfrm)
+                        {
+                            selectedObjects[i].setXfrm(null, null, properties.w, properties.h, null, null, null);
+                        }
+                    }
                 }
                 break;
             }
         }
+        editor.WordControl.m_oLogicDocument.Recalculate();
+    },
+
+    imageApply: function(props)
+    {
+
     },
 
     canGroup: function()

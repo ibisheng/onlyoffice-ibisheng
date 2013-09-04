@@ -3564,6 +3564,9 @@ asc_docs_api.prototype.sync_shapePropCallback = function(pr)
     obj.fill = CreateAscFill(pr.fill);
     obj.stroke = CreateAscStroke(pr.stroke, pr.canChangeArrows);
     obj.Locked = pr.IsLocked;
+    obj.paddings = pr.paddings;
+    obj.w = pr.w;
+    obj.h = pr.h;
     if (pr.fill != null && pr.fill.fill != null && pr.fill.fill.type == FILL_TYPE_BLIP)
     {
         this.WordControl.m_oDrawingDocument.DrawImageTextureFillShape(pr.fill.fill.RasterImageId);

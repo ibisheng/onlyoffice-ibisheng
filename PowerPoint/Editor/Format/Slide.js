@@ -958,6 +958,12 @@ function Slide(presentation, slideLayout, slideNum)
 
 Slide.prototype =
 {
+
+    changeBackground: function(bg)
+    {
+        this.cSld.Bg = bg.createFullCopy();
+        this.recalculateBackground();
+    },
     setLocks: function(deleteLock, backgroundLock, timingLock, transitionLock, layoutLock)
     {
         this.deleteLock = deleteLock;
