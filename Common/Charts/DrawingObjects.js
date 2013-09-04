@@ -3390,7 +3390,7 @@ function DrawingObjects() {
 				var seriesCount = graphicObject.chart.series.length;
 				if ( seriesCount ) {
 					
-					// Нужно переименовать лист для совместимости языков
+					// Нужно переименовать лист для дальнейшего поиска
 					var resultRef = parserHelp.parse3DRef(graphicObject.chart.series[0].Val.Formula);
 					worksheet.model.workbook.aWorksheets[0].sName = resultRef.sheet;
 					
@@ -3430,9 +3430,11 @@ function DrawingObjects() {
 					
 					_this.calcChartInterval(graphicObject.chart);*/
 					
-					var _range = convertFormula(graphicObject.chart.range.interval, worksheet);
-					if ( _range )
-						graphicObject.chart.range.intervalObject = _range;
+					if ( graphicObject.chart.range.interval ) {
+						var _range = convertFormula(graphicObject.chart.range.interval, worksheet);
+						if ( _range )
+							graphicObject.chart.range.intervalObject = _range;
+					}
 				}
 				
 				// Инжектим тему и перестраиваем превью диаграмм

@@ -5666,11 +5666,17 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			formula = formula.substring(index + 1);
 		formula = formula.replace(/\$/g,"");
 		var parts = formula.split(":");
-		if(2 == parts.length)
+		if (2 == parts.length)
 		{
 			var first = new CellAddress(parts[0]);
 			var last = new CellAddress(parts[1]);
 			bbox = {r1: first.getRow0(), c1: first.getCol0(), r2: last.getRow0(), c2: last.getCol0()};
+		}
+		else
+		{
+			var cell = new CellAddress(formula);
+			if ( cell )
+				bbox = {r1: cell.getRow0(), c1: cell.getCol0(), r2: cell.getRow0(), c2: cell.getCol0()};
 		}
 		return bbox;
 	}
