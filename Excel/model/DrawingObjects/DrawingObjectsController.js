@@ -173,15 +173,16 @@ DrawingObjectsController.prototype =
         }
     },
 
-
     insertHyperlink: function (options) {
         if(typeof this.curState.insertHyperlink === "function")
         {
             this.curState.insertHyperlink(options);
         }
     },
-
-
+	
+	canAddHyperlink: function() {
+		return true;
+	},
 
     getParagraphParaPr: function()
     {
