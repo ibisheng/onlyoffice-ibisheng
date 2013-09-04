@@ -634,11 +634,14 @@ function BinaryFileWriter(doc)
 				this.copyParams.nNumIdIndex++;
 				//проверяем PStyle уровней списка
 				var aNum = this.Document.Numbering.Get_AbstractNum(oNumPr.NumId);
-				for(var i = 0, length = aNum.Lvl.length; i < length; ++i)
+				if(null != aNum)
 				{
-					var oLvl = aNum.Lvl[i];
-					if(null != oLvl.PStyle)
-						this.copyParams.oUsedStyleMap[oLvl.PStyle] = 1;
+					for(var i = 0, length = aNum.Lvl.length; i < length; ++i)
+					{
+						var oLvl = aNum.Lvl[i];
+						if(null != oLvl.PStyle)
+							this.copyParams.oUsedStyleMap[oLvl.PStyle] = 1;
+					}
 				}
 			}
 		}
