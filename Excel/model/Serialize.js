@@ -5526,13 +5526,16 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
             res = this.bcr.Read1(length, function(t, l) {
 				return oThis.ReadDrawing(t, l, oNewDrawing, oFlags);
 			});
-			if(false != oFlags.from && false != oFlags.to)
-				oNewDrawing.Type = ECellAnchorType.cellanchorTwoCell;
-			else if(false != oFlags.from && false != oFlags.ext)
-				oNewDrawing.Type = ECellAnchorType.cellanchorOneCell;
-			else if(false != oFlags.pos && false != oFlags.ext)
-				oNewDrawing.Type = ECellAnchorType.cellanchorAbsolute;
-			aDrawings.push(oNewDrawing);
+			if(null != oNewDrawing.graphicObject)
+			{
+				if(false != oFlags.from && false != oFlags.to)
+					oNewDrawing.Type = ECellAnchorType.cellanchorTwoCell;
+				else if(false != oFlags.from && false != oFlags.ext)
+					oNewDrawing.Type = ECellAnchorType.cellanchorOneCell;
+				else if(false != oFlags.pos && false != oFlags.ext)
+					oNewDrawing.Type = ECellAnchorType.cellanchorAbsolute;
+				aDrawings.push(oNewDrawing);
+			}
         }
         else
             res = c_oSerConstants.ReadUnknown;
@@ -5584,9 +5587,11 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
         }
 		else if ( c_oSer_DrawingType.GraphicFrame == type )
         {
-            oDrawing.graphicObject = new CChartAsGroup();
-			var oBinary_ChartReader = new Binary_ChartReader(this.stream,  oDrawing.graphicObject.chart,  oDrawing.graphicObject);
+			var oNewGraphicObject = new CChartAsGroup();
+			var oBinary_ChartReader = new Binary_ChartReader(this.stream,  oNewGraphicObject.chart,  oNewGraphicObject);
 			res = oBinary_ChartReader.Read(length);
+			if(null != oNewGraphicObject.chart.range.interval)
+				oDrawing.graphicObject = oNewGraphicObject;
         }
 		else if ( c_oSer_DrawingType.pptxDrawing == type )
         {

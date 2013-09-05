@@ -1320,12 +1320,69 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 		this.PostRead();
 		return res;
 	};
+	this.ParseFormula = function(formula)
+	{
+		var oRes = {bbox: null, sheet: null};
+		if (formula) {
+			var ref3D = parserHelp.is3DRef(formula, 0);
+			var sRef = null;
+			if (!ref3D[0])
+				sRef = formula;
+			else {
+				var resultRef = parserHelp.parse3DRef(formula);
+				if (null !== resultRef) {
+					oRes.sheet = resultRef.sheet;
+					sRef = resultRef.range;
+				}
+			}
+			if(null != sRef)
+			{
+				sRef = sRef.replace(/\$/g,"");
+				var parts = sRef.split(":");
+				if (2 == parts.length)
+				{
+					var first = new CellAddress(parts[0]);
+					var last = new CellAddress(parts[1]);
+					oRes.bbox = {r1: first.getRow0(), c1: first.getCol0(), r2: last.getRow0(), c2: last.getCol0()};
+				}
+				else
+				{
+					var cell = new CellAddress(sRef);
+					oRes.bbox = {r1: cell.getRow0(), c1: cell.getCol0(), r2: cell.getRow0(), c2: cell.getCol0()};
+				}
+			}
+		}
+		return oRes;
+	}
+	this.parseDataFormula = function(data, bbox)
+	{
+		if ( data && data.Formula ) {
+			var oParsed = this.ParseFormula(data.Formula);
+			if ( oParsed.bbox ) {
+				if(null == bbox)
+					bbox = oParsed.bbox;
+				else
+				{
+					if(oParsed.bbox.r1 < bbox.r1)
+						bbox.r1 = oParsed.bbox.r1;
+					if(oParsed.bbox.r2 > bbox.r2)
+						bbox.r2 = oParsed.bbox.r2;
+					if(oParsed.bbox.c1 < bbox.c1)
+						bbox.c1 = oParsed.bbox.c1;
+					if(oParsed.bbox.c2 > bbox.c2)
+						bbox.c2 = oParsed.bbox.c2;
+				}
+			}
+		}
+		return bbox;
+	}
 	this.PostRead = function()
 	{
-		if("" != this.chartType && null != this.chart.series && this.chart.series.length > 0)
+		var chart = this.chart;
+		if("" != this.chartType && null != chart.series && chart.series.length > 0)
 		{
 			//инициализируем interval в Woorksheet.init
-			this.chart.type = this.chartType;
+			chart.type = this.chartType;
 			for(var i in this.oLegendEntries)
 			{
 				var index = i - 0;
@@ -1337,6 +1394,43 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 						seria.titleFont = legendEntries.oTxPr.font;
 				}
 			}
+		}
+		if(chart.series.length > 0)
+		{
+			var oFirstSeria = chart.series[0];
+			var sheetName = "Sheet1";
+			if(null != oFirstSeria && null != oFirstSeria.Val && null != oFirstSeria.Val.Formula)
+			{
+				var oParsed = this.ParseFormula(oFirstSeria.Val.Formula);
+				if(null != oParsed.bbox)
+				{
+					var bbox = oParsed.bbox;
+					chart.range.rows = false;
+					chart.range.columns = false;
+					if ( bbox.c2 - bbox.c1 > bbox.r2 - bbox.r1 )
+						chart.range.rows = true;
+					else
+						chart.range.columns = true;
+				}
+				if(null != oParsed.sheet)
+					sheetName = oParsed.sheet;
+			}
+			
+			// Общий диапазон
+			var bbox = null;		
+			bbox = this.parseDataFormula(oFirstSeria.Val, bbox);
+			bbox = this.parseDataFormula(chart.series[chart.series.length - 1].Val, bbox);
+			
+			bbox = this.parseDataFormula(oFirstSeria.TxCache, bbox);
+			bbox = this.parseDataFormula(oFirstSeria.xVal, bbox);
+			bbox = this.parseDataFormula(oFirstSeria.Cat, bbox);
+				
+			var oCellStart = new CellAddress(bbox.r1, bbox.c1, 0);
+			var oCellEnd = new CellAddress(bbox.r2, bbox.c2, 0);
+			
+			if(false == rx_test_ws_name.test(sheetName))
+				sheetName = "'" + sheetName + "'";
+			chart.range.interval = sheetName + "!" + oCellStart.getID() + ":" + oCellEnd.getID();
 		}
 	}
 	this.GraphicFrame = function(type, length)

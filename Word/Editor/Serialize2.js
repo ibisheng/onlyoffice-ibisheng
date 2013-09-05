@@ -3129,7 +3129,7 @@ function BinaryFileReader(doc, openParams)
 			if(e.message == g_sErrorCharCountMessage)
 				return false;
 			else
-				throw "open error";
+				throw e;
 		}
 		return true;
     };
@@ -5657,29 +5657,6 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
-	this.ParseFormula = function(formula)
-	{
-		var bbox = null;
-		//todo надо бы подключить parserHelp.parse3DRef. сейчас здесь упрошенный парсер.
-		var index = formula.indexOf("!");
-		if(-1 != index)
-			formula = formula.substring(index + 1);
-		formula = formula.replace(/\$/g,"");
-		var parts = formula.split(":");
-		if (2 == parts.length)
-		{
-			var first = new CellAddress(parts[0]);
-			var last = new CellAddress(parts[1]);
-			bbox = {r1: first.getRow0(), c1: first.getCol0(), r2: last.getRow0(), c2: last.getCol0()};
-		}
-		else
-		{
-			var cell = new CellAddress(formula);
-			if ( cell )
-				bbox = {r1: cell.getRow0(), c1: cell.getCol0(), r2: cell.getRow0(), c2: cell.getCol0()};
-		}
-		return bbox;
-	}
     this.ReadPptxDrawing = function(type, length, oParaDrawing, oChartObject)
 	{
 		var res = c_oSerConstants.ReadOk;
@@ -5703,89 +5680,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			var chart = oParaDrawing.GraphicObj.chart;
 			var oBinary_ChartReader = new Binary_ChartReader(this.stream, chart, oParaDrawing.GraphicObj);
 			oBinary_ChartReader.ReadExternal(length);
-			
-			if(chart.series.length > 0)
-			{
-				var oFirstSeria = chart.series[0];
-				if(null != oFirstSeria && null != oFirstSeria.Val && null != oFirstSeria.Val.Formula)
-				{
-					var bbox = this.ParseFormula(oFirstSeria.Val.Formula);
-					if(null != bbox)
-					{
-						chart.range.rows = false;
-						chart.range.columns = false;
-						if ( bbox.c2 - bbox.c1 > bbox.r2 - bbox.r1 )
-							chart.range.rows = true;
-						else
-							chart.range.columns = true;
-					}
-				}
-				
-				// Общий диапазон
-				var _this = this;
-				var colArray = [], rowArray = [];
-				var seriesCount = chart.series.length;
-				
-				function parseDataFormula(data, bMinimum) {
-					if ( data && data.Formula ) {
-						var range = _this.ParseFormula(data.Formula);
-						if ( range ) {
-							if ( bMinimum ) {
-								colArray.push(range.c1);
-								rowArray.push(range.r1);
-							}
-							else {
-								colArray.push(range.c2);
-								rowArray.push(range.r2);
-							}
-						}
-					}
-				}
-				
-				parseDataFormula(chart.series[0].Val, true);
-				parseDataFormula(chart.series[seriesCount - 1].Val, false);
-				
-				parseDataFormula(chart.series[0].TxCache, true);
-				parseDataFormula(chart.series[0].xVal, true);
-				parseDataFormula(chart.series[0].Cat, true);
-				
-				var c1 = Math.min.apply(null, colArray);
-				var r1 = Math.min.apply(null, rowArray);
-				var c2 = Math.max.apply(null, colArray);
-				var r2 = Math.max.apply(null, rowArray);
-				
-				var oCellStart = new CellAddress(r1, c1, 0);
-				var oCellEnd = new CellAddress(r2, c2, 0);
-				
-				var sheetName = "Sheet1";
-				if ( oFirstSeria.Val.Formula ) {
-					var index = oFirstSeria.Val.Formula.indexOf("!");
-					if ( -1 != index )
-						sheetName = oFirstSeria.Val.Formula.substring(0, index);
-				}
-				chart.range.interval = sheetName + "!" + oCellStart.getID() + ":" + oCellEnd.getID();
-			}
-			
-			oChartObject.chart = chart;
-			
-			/*
-			var nRowCount = 0;
-			var nColCount = 0;
-			if ( chart.range.rows ) {
-				nRowCount = chart.series.length;
-				nColCount = chart.series[0].Val.NumCache.length;
-			}
-			else {
-				nRowCount = chart.series[0].Val.NumCache.length;
-				nColCount = chart.series.length;
-			}
-			if(0 != nRowCount && 0 != nColCount)
-			{
-				var oCellAddress = new CellAddress(nRowCount, nColCount);			
-				chart.range.interval = "Sheet1!A1:" + oCellAddress.getID();
-				
+			if(null != chart.range.interval)
 				oChartObject.chart = chart;
-			}*/
 		}
 		else if( c_oSerImageType2.AllowOverlap === type )
 			var AllowOverlap = this.stream.GetBool();

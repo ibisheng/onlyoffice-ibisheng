@@ -2318,122 +2318,22 @@ Woorksheet.prototype.initPostOpen = function(){
 	if(null != this.Drawings)
 	{
 		var oThis = this;
-		var fParseRef = function(sRef)
-		{
-			var result = null;
-			var oRefParsed = parserHelp.parse3DRef(sRef);
-			if (null !== oRefParsed) {
-				// Получаем sheet по имени
-				ws = oThis.workbook.getWorksheetByName (oRefParsed.sheet);
-				if (ws)
-				{
-					var range = ws.getRange2(oRefParsed.range);
-					if (null !== range)
-					{
-						var oBBox = range.getBBox0();
-						result = {sheet: ws, range: new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2), bbox: oBBox};
-					}
-				}
-			}
-			return result;
-		}
-		var fAddBounds = function(oBounds, oNewBounds ,chart)
-		{
-			if(null == oBounds)
-			{
-				/*chart.range.rows = false;
-				chart.range.columns = false;
-				if(oNewBounds.bbox.c2 - oNewBounds.bbox.c1 > oNewBounds.bbox.r2 - oNewBounds.bbox.r1)
-					chart.range.rows = true;
-				else
-					chart.range.columns = true;*/
-				oBounds = oNewBounds.range;
-			}
-			else
-				oBounds = oBounds.union(oNewBounds.range);
-			return oBounds;
-		}
 		for(var i = this.Drawings.length - 1; i >= 0; --i)
 		{
 			var obj = this.Drawings[i];
 			if(obj.graphicObject && obj.graphicObject.chart)
 			{
 				var chart = obj.graphicObject.chart;
-				//анализируем series
-				var oBounds = null;
-				var ws = null;
-				for(var j = 0; j < chart.series.length; ++j)
+				if(chart.range.interval)
 				{
-					var seria = chart.series[j];
-					if(0 == j && null != seria && null != seria.TxCache && null != seria.TxCache.Formula)
-					{
-						var sRef = seria.TxCache.Formula.replace(/\$/g,"");
-						var oNewBounds = fParseRef(sRef);
-						if(null != oNewBounds)
-						{
-							if(null == oBounds)
-								ws = oNewBounds.sheet;
-							oBounds = fAddBounds(oBounds, oNewBounds, chart);
-						}
-					}
-					if(0 == j && null != seria && null != seria.xVal && null != seria.xVal.Formula)
-					{
-						var sRef = seria.xVal.Formula.replace(/\$/g,"");
-						var oNewBounds = fParseRef(sRef);
-						if(null != oNewBounds)
-						{
-							if(null == oBounds)
-								ws = oNewBounds.sheet;
-							oBounds = fAddBounds(oBounds, oNewBounds, chart);
-						}
-					}
-					if(0 == j && null != seria && null != seria.Cat && null != seria.Cat.Formula)
-					{
-						var sRef = seria.Cat.Formula.replace(/\$/g,"");
-						var oNewBounds = fParseRef(sRef);
-						if(null != oNewBounds)
-						{
-							if(null == oBounds)
-								ws = oNewBounds.sheet;
-							oBounds = fAddBounds(oBounds, oNewBounds, chart);
-						}
-					}
-					if(null != seria && null != seria.Val && null != seria.Val.Formula)
-					{
-						var sRef = seria.Val.Formula.replace(/\$/g,"");
-						var oNewBounds = fParseRef(sRef);
-						if(null != oNewBounds)
-						{
-							if(null == oBounds)
-								ws = oNewBounds.sheet;
-							oBounds = fAddBounds(oBounds, oNewBounds, chart);
-						}
+					var oRefParsed = parserHelp.parse3DRef(chart.range.interval);
+					if (null !== oRefParsed) {
+						// Получаем sheet по имени
+						var ws = oThis.workbook.getWorksheetByName (oRefParsed.sheet);
+						if (ws)
+							chart.range.intervalObject = ws.getRange2(oRefParsed.range);
 					}
 				}
-				if (null != oBounds)
-				{
-					chart.range.intervalObject = ws.getRange(new CellAddress(oBounds.r1, oBounds.c1, 0), new CellAddress(oBounds.r2, oBounds.c2, 0));
-					if(null != chart.range.intervalObject)
-						chart.range.interval = chart.range.intervalObject.getName();
-						
-					if ( chart.series.length && chart.series[0].Val.Formula )	// Rows/Columns по диапазону первой серии
-					{
-						chart.range.rows = false;
-						chart.range.columns = false;
-						
-						var sRef = chart.series[0].Val.Formula.replace(/\$/g, "");
-						var bounds = fParseRef(sRef);
-						if ( null != bounds )
-						{
-							if (bounds.bbox.c2 - bounds.bbox.c1 > bounds.bbox.r2 - bounds.bbox.r1)
-								chart.range.rows = true;
-							else
-								chart.range.columns = true;
-						}
-					}
-				}
-				else
-					this.Drawings.splice(i, 1);
 			}
 		}
 	}
