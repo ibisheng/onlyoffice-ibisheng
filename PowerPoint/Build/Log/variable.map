@@ -468,7 +468,7 @@ SplineBezierState2:NC
 ft_smooth_render_generic:Rq
 nSldLtTTitleOnly:VL
 JSCompiler_StaticMethods_drawStrokeFillStyle:lN
-Move_Zp2_Point:Yr
+Move_Zp2_Point:Xr
 c_oAscServerError$ConvertDownload:Kf
 TT_Round_Super:Yq
 t1_cmap_expert_class_rec:$m
@@ -689,7 +689,7 @@ g_stringBase64:gD
 CRGBColor:Og
 pHText:$K
 ft_recompute_scaled_metrics:hw
-JSCompiler_StaticMethods_Set_TableLayout:Cd
+JSCompiler_StaticMethods_Set_TableLayout:Bd
 STATES_ID_GROUP:La
 historyitem_Table_TableStyleColBandSize:RF
 Normalize:wr
@@ -1669,7 +1669,7 @@ c_oAscSlideTransitionParams$Split_HorizontalIn:VN
 CAutoshapeTrack:ZM
 JSCompiler_StaticMethods_Internal_RecalculateGrid:bF
 L 104:ig
-L 105:Xr
+L 105:Yr
 CAscFill:HQ
 L 106:yv
 L 107:ol
@@ -2051,7 +2051,7 @@ JSCompiler_StaticMethods__read_rPr:$d
 Get_Kerning:bw
 L 43:gc
 HSLToRGB:HM
-L 42:Bd
+L 42:Cd
 STATES_ID_POLY_LINE_ADD:bC
 ft_outline_glyph_done:Zj
 JSCompiler_StaticMethods_Set_FontSize:zz
