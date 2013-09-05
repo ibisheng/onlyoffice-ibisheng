@@ -1182,8 +1182,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					var oSettings = JSON.parse(response.data);
 					
 					//Set up coauthoring and spellcheker service
-					//window.g_cAscCoAuthoringUrl = oSettings['g_cAscCoAuthoringUrl'];
-					//window.g_cAscSpellCheckUrl = oSettings['g_cAscSpellCheckUrl'];
+					window.g_cAscCoAuthoringUrl = oSettings['g_cAscCoAuthoringUrl'];
+					window.g_cAscSpellCheckUrl = oSettings['g_cAscSpellCheckUrl'];
 					
 					var oEditorPermissions = new asc_CAscEditorPermissions(oSettings);
 					
