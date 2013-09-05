@@ -867,7 +867,7 @@ function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY, chart)
 	bar._chartGutter._bottom = (bottom)*scale;
 	if(bar._otherProps._xlabels)
 		var angleText = calculateAngleText(bar._otherProps._labels);
-	if(angleText && (min >= 0) && bar.type != 'Hbar' && bar.type != 'Pie' && bar.type != 'Scatter')
+	if(angleText && (min >= 0) && bar.type != 'hbar' && bar.type != 'pie' && bar.type != 'scatter')
 	{
 		bar._chartGutter._bottom += (angleText.bottom - 25)*scale;
 		bar._otherProps._axisOxAngleOptions = angleText;
@@ -875,7 +875,7 @@ function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY, chart)
 	else if(angleText)
 		bar._otherProps._axisOxAngleOptions = angleText;
 	//пересчитываем левый маргин, если подпись по оси OX выходит за пределы диаграммы
-	if(angleText && bar._otherProps._labels.length && angleText[0] && bar.type != 'Hbar' && bar.type != 'Pie' && bar.type != 'Scatter')
+	if(angleText && bar._otherProps._labels.length && angleText[0] && bar.type != 'hbar' && bar.type != 'pie' && bar.type != 'scatter')
 	{
 		var x = chartCanvas.width - (((bar._chartGutter._left + bar._chartGutter._right))/(2*bar._otherProps._labels.length)) + bar._chartGutter._left;
 		var diff = x - bar._chartGutter._left;
