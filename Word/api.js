@@ -3232,7 +3232,11 @@ asc_docs_api.prototype.sync_InitEditorTableStyles = function(styles){
 
 asc_docs_api.prototype.paraApply = function(Props)
 {
-    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
+    var Additional = undefined;
+    if ( undefined != Props.DefaultTab )
+        Additional = { Type : changestype_2_Element_and_Type, Element : this.WordControl.m_oLogicDocument, CheckType : changestype_Document_SectPr };
+
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties, Additional) )
     {
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
 
@@ -3276,7 +3280,7 @@ asc_docs_api.prototype.paraApply = function(Props)
 
         if ( undefined != Props.DefaultTab )
         {
-            // TODO: реализовать изменения таба по умолчанию
+            this.WordControl.m_oLogicDocument.Set_DocumentDefaultTab( Props.DefaultTab );
         }
 
 

@@ -6281,6 +6281,12 @@ CDocument.prototype =
         this.Set_DocumentPageSize( Page_Height, Page_Width, bNoRecalc );
     },
 
+    Set_DocumentDefaultTab : function(DTab)
+    {
+        this.History.Add( this, { Type : historyitem_Document_DefaultTab, Old : Default_Tab_Stop, New : DTab } );
+        Default_Tab_Stop = DTab;
+    },
+
     // Обновляем данные в интерфейсе о свойствах параграфа
     Interface_Update_ParaPr : function()
     {
@@ -9935,6 +9941,13 @@ CDocument.prototype =
 
                 break;
             }
+
+            case historyitem_Document_DefaultTab:
+            {
+                Default_Tab_Stop = Data.Old;
+
+                break;
+            }
         }
     },
 
@@ -10013,6 +10026,13 @@ CDocument.prototype =
 
                 break;
             }
+
+            case historyitem_Document_DefaultTab:
+            {
+                Default_Tab_Stop = Data.New;
+
+                break;
+            }
         }
     },
 
@@ -10040,6 +10060,7 @@ CDocument.prototype =
             case historyitem_Document_Margin:
             case historyitem_Document_PageSize:
             case historyitem_Document_Orientation:
+            case historyitem_Document_DefaultTab:
             {
                 bNeedRecalcHdrFtr = true;
                 break;
@@ -10533,6 +10554,15 @@ CDocument.prototype =
 
                 break;
             }
+
+            case historyitem_Document_DefaultTab:
+            {
+                // Double : Default Tab
+
+                Writer.WriteDouble( Data.Old );
+
+                break;
+            }
         }
 
         return Writer;
@@ -10705,6 +10735,15 @@ CDocument.prototype =
 
                 editor.DocumentOrientation = this.Orientation === orientation_Portrait ? true : false;
                 editor.sync_PageOrientCallback(editor.get_DocumentOrientation());
+
+                break;
+            }
+
+            case historyitem_Document_DefaultTab:
+            {
+                // Double : Default Tab
+
+                Default_Tab_Stop = Reader.GetDouble();
 
                 break;
             }
