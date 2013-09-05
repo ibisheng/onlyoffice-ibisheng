@@ -3648,8 +3648,8 @@ Paragraph.prototype =
                 StartPos = 0;
         }
 
-        // Если параграф начинается с новой страницы
-        if ( 1 === CurPage && this.Pages[0].EndLine < 0 && this.Parent instanceof CDocument )
+        // Если параграф начинается с новой страницы, и у самого параграфа нет настройки начать с новой страницы
+        if ( 1 === CurPage && this.Pages[0].EndLine < 0 && this.Parent instanceof CDocument && false === this.Get_CompiledPr2(false).ParaPr.PageBreakBefore )
         {
             // Если у предыдущего параграфа стоит настройка "не отрывать от следующего".
             // И сам параграф не разбит на несколько страниц и не начинается с новой страницы,
