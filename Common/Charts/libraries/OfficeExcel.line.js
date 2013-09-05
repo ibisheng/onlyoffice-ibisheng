@@ -1136,6 +1136,7 @@
             this.context.fillStyle = this._otherProps._text_color;
             var numLabels = this._otherProps._labels.length;
 			
+			var axisOxAngleOptions;
 			if(this._otherProps._axisOxAngleOptions && this._otherProps._axisOxAngleOptions.angle)
 			{
 				axisOxAngleOptions = this._otherProps._axisOxAngleOptions;
