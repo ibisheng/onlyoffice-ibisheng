@@ -980,6 +980,7 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 	var formatCell = 'General';
 	var formatCellScOy = 'General';
 	var defaultFormat = 'General';
+	var isDateTimeFormat;
 	
 	var api_doc = window["editor"];
 	var api_sheet = window["Asc"]["editor"];
@@ -1027,7 +1028,7 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 		{
 			var firstCol = 0;
 			var firstRow = 0;
-			if(series[0].xVal.Formula != null && numSeries == 0 && chart.type == 'Scatter')
+			if(series[0].xVal.Formula != null && numSeries == 0 && chart.type == 'Scatter' && series[0].xVal.NumCache.length)
 			{
 				curSeria = series[numSeries].xVal.NumCache;
 			}
