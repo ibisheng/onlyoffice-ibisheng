@@ -4290,10 +4290,11 @@ function DrawingObjects() {
 
 	_this.getAscChartObject = function() {
 	
-		if ( !api.chartStyleManager.isReady() )
+		if ( !api.chartStyleManager.isReady() || !api.chartPreviewManager.isReady() ) {
 			api.chartStyleManager.init();
-		if ( !api.chartPreviewManager.isReady() )
 			api.chartPreviewManager.init();
+			_this.callTrigger("asc_onUpdateChartStyles");
+		}
 
         var chart = this.controller.getAscChartObject();
 		if ( !chart ) {
