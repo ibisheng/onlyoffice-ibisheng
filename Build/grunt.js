@@ -224,7 +224,7 @@ module.exports = function(grunt) {
 		});
 	});
 	
-	grunt.registerTask('compile_sdk', 'compile_sdk_init closureCompiler create_map_file concat replace clean');
+	grunt.registerTask('compile_sdk', 'compile_sdk_init closureCompiler concat replace clean');
 	
 	grunt.registerTask('deploy_sdk_init', function() {
         grunt.initConfig({
