@@ -1135,7 +1135,14 @@
                 yOffset = 11;
             this.context.fillStyle = this._otherProps._text_color;
             var numLabels = this._otherProps._labels.length;
-
+			
+			if(this._otherProps._axisOxAngleOptions && this._otherProps._axisOxAngleOptions.angle)
+			{
+				axisOxAngleOptions = this._otherProps._axisOxAngleOptions;
+				angle = this._otherProps._axisOxAngleOptions.angle;
+			}
+			var diffWidth;
+			var diffHeight;
             for (i=0; i<numLabels; ++i) {
 
                 // Changed 8th Nov 2010 to be not reliant on the coords
@@ -1163,12 +1170,14 @@
                     }
                     if('auto' == this._otherProps._ylabels_count)
                     {
-                        OfficeExcel.Text(context,
+                        diffWidth = axisOxAngleOptions ? (axisOxAngleOptions[i]*Math.sin(angle*Math.PI/180))/(4) : 0;
+						diffHeight = axisOxAngleOptions ? (axisOxAngleOptions[i]*Math.cos(angle*Math.PI/180)) : 0;
+						OfficeExcel.Text(context,
                                 font,
                                 text_size,
-                                labelX,
+                                labelX - diffWidth,
                                 //(this._otherProps._xaxispos == 'top') ? this._chartGutter._top - yOffset - (this._otherProps._xlabels_inside ? -22 : 0) : (this.canvas.height - this._chartGutter._bottom) + yOffset,
-                                this.nullPositionOX + yOffset*scaleFactor,
+                                this.nullPositionOX + yOffset*scaleFactor + diffHeight,
                                 String(this._otherProps._labels[i]),
                                 valign,
                                 halign,

@@ -723,6 +723,7 @@ function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY, chart)
 				var widthText = getMaxPropertiesText(context,font,bar._otherProps._key);
 				var widthKey = widthText.width/scale + 2 + widthLine;
 				//в MSExcel справа от легенды всегда остаётся такой маргин 
+				//TODO - легенду нужно сделать как автофигуру
 				var maxWidthLegendLeftOrRight = chartCanvas.width/3;//максимальный размер легенды - временно!
 				if(widthKey > maxWidthLegendLeftOrRight)//в данном случае легенду рисуем поверх
 				{
@@ -864,6 +865,15 @@ function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY, chart)
 	bar._chartGutter._right = (standartMargin + right)*scale;
 	bar._chartGutter._top = (standartMarginTop + top)*scale;
 	bar._chartGutter._bottom = (bottom)*scale;
+	if(bar._otherProps._xlabels)
+		var angleText = calculateAngleText(bar._otherProps._labels);
+	if(angleText && (min >= 0) && bar.type != 'Hbar' && bar.type != 'Pie' && bar.type != 'Scatter')
+	{
+		bar._chartGutter._bottom += (angleText.bottom - 25)*scale;
+		bar._otherProps._axisOxAngleOptions = angleText;
+	}
+	else if(angleText)
+		bar._otherProps._axisOxAngleOptions = angleText;
 }
 
 //-----------------------------------------------------------------------------------
@@ -2930,4 +2940,50 @@ function getHexColor(r,g,b)
 	if (g.length == 1) g = '0' + g;
 	if (b.length == 1) b = '0' + b;
 	return '#' + r + g + b;
+}
+
+function calculateAngleText(labels)
+{
+	var result = false;
+	var context = OfficeExcel.drawingCtxCharts;
+	if(context && labels && labels.length)
+	{
+		//если размер хотя бы одной подписи оси больше дефолтового - возвращаем наклонный текст, для этого измеряем каждую подпись
+		var widthChart = bar.canvas.width - bar._chartGutter._left  - bar._chartGutter._right;
+		var maxWidthOneTitle = widthChart/labels.length;
+		var ascFontXLabels = getFontProperties("xLabels");
+		context.setFont(ascFontXLabels);
+		var propsTextLabelsOy = getMaxPropertiesText(context, ascFontXLabels, labels);
+		//максимум длины каждой из подписей оси
+		var maxWidthAxisLabels = (bar.canvas.height - bar._chartGutter._bottom  - bar._chartGutter._top)/2;
+		if(maxWidthOneTitle <= propsTextLabelsOy.width)
+		{
+			result = [];
+			var optionText;
+			for(var i = 0; i < labels.length; i++)
+			{
+				//если больше максимума - обрезаем и ставим ...
+				if(maxWidthAxisLabels && context.measureText(labels[i],0).width > maxWidthAxisLabels)
+				{	
+					var newLabel = labels[i];
+					while(context.measureText(newLabel,0).width >= maxWidthAxisLabels && newLabel.length > 1)
+					{
+						newLabel = newLabel.substr(0,newLabel.length - 1);
+					}
+					newLabel = newLabel + "...";
+					labels[i] = newLabel;
+				}
+				optionText = context.measureText(labels[i],0);
+				result[i] = optionText.width;
+			}
+			//угол в дефолте
+			result.angle = 45;
+			//изменяем нижний отступ
+			if(maxWidthAxisLabels < propsTextLabelsOy.width)
+				result.bottom = maxWidthAxisLabels;
+			else
+				result.bottom = propsTextLabelsOy.width;
+		}
+	}
+	return result;
 }

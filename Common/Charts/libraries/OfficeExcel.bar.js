@@ -1489,13 +1489,25 @@
 			
             if('auto' == this._otherProps._ylabels_count)
                 yOffset =+ 23;
+				
+			var countLabels = 0;
+			var axisOxAngleOptions;
+			if(this._otherProps._axisOxAngleOptions && this._otherProps._axisOxAngleOptions.angle)
+			{
+				axisOxAngleOptions = this._otherProps._axisOxAngleOptions;
+				angle = this._otherProps._axisOxAngleOptions.angle;
+			}
+			var diffWidth;
+			var diffHeight;
             for (x=this._chartGutter._left + (xTickGap / 2); x<=OfficeExcel.GetWidth(this) - this._chartGutter._right; x+=xTickGap) {
                     if('auto' == this._otherProps._ylabels_count)
                     {
-                        OfficeExcel.Text(context, font,
+						diffWidth = axisOxAngleOptions ? (axisOxAngleOptions[countLabels]*Math.sin(angle*Math.PI/180))/(4) : 0;
+						diffHeight = axisOxAngleOptions ? (axisOxAngleOptions[countLabels]*Math.cos(angle*Math.PI/180)) : 0;
+						OfficeExcel.Text(context, font,
                                       text_size,
-                                      x + (this._otherProps._text_angle == 90 ? 0 : 0),
-                                      this.nullPositionOX + yOffset*scaleFactor,
+                                      x + (this._otherProps._text_angle == 90 ? 0 : 0) - diffWidth,
+                                      this.nullPositionOX + yOffset*scaleFactor + diffHeight,
                                       String(labels[i++]),
                                       (this._otherProps._text_angle == 90 ? 'center' : null),
                                       halign,
@@ -1522,7 +1534,7 @@
 									  null,
 									  textOptions);
                     }
-               
+                 countLabels++;
             }
         }
     }

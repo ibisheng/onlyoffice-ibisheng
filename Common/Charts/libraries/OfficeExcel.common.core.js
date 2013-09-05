@@ -1589,7 +1589,7 @@
 					x: x*0.75,
 					y: y*0.75
 				};
-				OfficeExcel.drawTurnedText(context,textOptions, text, 90);
+				OfficeExcel.drawTurnedText(context,textOptions, text, arguments[9]);
 			}
 			
 			if(!arguments[9])
