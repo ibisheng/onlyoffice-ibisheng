@@ -1721,12 +1721,18 @@ CSolidFill.prototype =
     Write_ToBinary2 : function(Writer)
     {
         Writer.WriteLong(this.type);
-        this.color.Write_ToBinary2(Writer);
+        Writer.WriteBool(typeof this.color === "object" && this.color !== null)
+        if(typeof this.color === "object" && this.color !== null)
+            this.color.Write_ToBinary2(Writer);
     },
 
     Read_FromBinary2 : function(Reader)
     {
-        this.color.Read_FromBinary2(Reader);
+        if(Reader.GetBool())
+        {
+            this.color = new CUniColor();
+            this.color.Read_FromBinary2(Reader);
+        }
     },
 
     IsIdentical : function(fill)
@@ -1766,10 +1772,77 @@ function CGs()
 {
     this.color = new CUniColor();
     this.pos = 0;
+    this.Id = g_oIdCounter.Get_NewId();
+    g_oTableId.Add(this, this.Id);
 }
 
 CGs.prototype =
 {
+
+    Get_Id: function()
+    {
+        return this.Id;
+    },
+
+    getObjectType: function()
+    {
+        return CLASS_TYPE_GS;
+    },
+
+    setColor: function(unicolor)
+    {
+        var oldValue = isRealObject(this.color) ? this.color.Get_Id() : null;
+        var newValue = isRealObject(unicolor) ? unicolor.Get_Id() : null;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetFType, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
+        this.color = unicolor;
+    },
+
+    setPos: function(pos)
+    {
+        var oldValue = this.pos;
+        var newValue = pos;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetXfrm, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
+        this.pos = pos;
+    },
+
+
+    Undo: function(type, data)
+    {
+        switch(type)
+        {
+            case historyitem_AutoShapes_SetFType:
+            {
+                this.color = g_oTableId.Get_ById(data.oldValue);
+                break;
+            }
+            case historyitem_AutoShapes_SetXfrm:
+            {
+                this.pos = data.oldValue;
+                break;
+            }
+        }
+    },
+
+    Redo: function(type, data)
+    {
+        switch(type)
+        {
+            case historyitem_AutoShapes_SetFType:
+            {
+                this.color = g_oTableId.Get_ById(data.newValue);
+                break;
+            }
+            case historyitem_AutoShapes_SetXfrm:
+            {
+                this.pos = data.newValue;
+                break;
+            }
+        }
+    },
+
+
     Write_ToBinary2 : function(Writer)
     {
         this.color.Write_ToBinary2(Writer);
@@ -1794,7 +1867,7 @@ CGs.prototype =
         duplicate.color = this.color.createDuplicate();
         return duplicate;
     }
-};
+}
 
 /*function CGradFill()
 {
@@ -1892,9 +1965,76 @@ function GradLin()
 {
     this.angle = 5400000;
     this.scale = true;
+
+    this.Id = g_oIdCounter.Get_NewId();
+    g_oTableId.Add(this, this.Id);
 }
 GradLin.prototype =
 {
+
+    Get_Id: function()
+    {
+        return this.Id;
+    },
+
+    getObjectType: function()
+    {
+        return CLASS_TYPE_GRAD_LIN;
+    },
+
+    setAngle: function(angle)
+    {
+        var oldValue = this.angle;
+        var newValue = angle;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetFType, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
+        this.angle = angle;
+    },
+
+    setScale: function(scale)
+    {
+        var oldValue = this.scale;
+        var newValue = scale;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetXfrm, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
+        this.scale = scale;
+    },
+
+
+    Undo: function(type, data)
+    {
+        switch(type)
+        {
+            case historyitem_AutoShapes_SetFType:
+            {
+                this.angle =data.oldValue;
+                break;
+            }
+            case historyitem_AutoShapes_SetXfrm:
+            {
+                this.scale = data.oldValue;
+                break;
+            }
+        }
+    },
+
+    Redo: function(type, data)
+    {
+        switch(type)
+        {
+            case historyitem_AutoShapes_SetFType:
+            {
+                this.angle =data.newValue;
+                break;
+            }
+            case historyitem_AutoShapes_SetXfrm:
+            {
+                this.scale = data.newValue;
+                break;
+            }
+        }
+    },
+
     IsIdentical : function(lin)
     {
         if (this.angle != lin.angle)
@@ -1954,10 +2094,99 @@ function CGradFill()
 
     this.lin = null;
     this.path = null;
+
+
+    this.Id = g_oIdCounter.Get_NewId();
+    g_oTableId.Add(this, this.Id);
 }
 
 CGradFill.prototype =
 {
+
+    Get_Id: function()
+    {
+        return this.Id;
+    },
+
+    getObjectType: function()
+    {
+        return CLASS_TYPE_GRAD_FILL;
+    },
+
+    addGS: function(gs)
+    {
+        var oldValue = isRealObject(gs) ? gs.Get_Id() : null;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetFType, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, null)));
+        this.colors.push(gs);
+    },
+
+    setLin: function(lin)
+    {
+        var oldValue = isRealObject(this.lin) ? this.lin.Get_Id() : null;
+        var newValue = isRealObject(lin) ? lin.Get_Id() : null;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetXfrm, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
+        this.lin = lin;
+    },
+
+    setPath: function(path)
+    {
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetGroup, null, null,
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(isRealObject(this.path), isRealObject(path))));
+        this.path = path;
+    },
+
+    Undo: function(type, data)
+    {
+        switch(type)
+        {
+            case historyitem_AutoShapes_SetFType:
+            {
+                this.colors.length = this.colors.length - 1;
+                break;
+            }
+            case historyitem_AutoShapes_SetXfrm:
+            {
+                this.lin = g_oTableId.Get_ById(data.oldValue);
+                break;
+            }
+            case historyitem_AutoShapes_SetGroup:
+            {
+                if(data.oldValue)
+                    this.path = new GradPath();
+                else
+                    this.path = null;
+                break;
+            }
+        }
+    },
+
+    Redo: function(type, data)
+    {
+        switch(type)
+        {
+            case historyitem_AutoShapes_SetFType:
+            {
+                this.colors.push(g_oTableId.Get_ById(data.oldValue));
+                break;
+            }
+            case historyitem_AutoShapes_SetXfrm:
+            {
+                this.lin = g_oTableId.Get_ById(data.newValue);
+                break;
+            }
+            case historyitem_AutoShapes_SetGroup:
+            {
+                if(data.newValue)
+                    this.path = new GradPath();
+                else
+                    this.path = null;
+                break;
+            }
+        }
+    },
+
     IsIdentical : function(fill)
     {
         if(fill == null)
@@ -2186,6 +2415,16 @@ function CNoFill()
 
 CNoFill.prototype =
 {
+
+    Get_Id: function()
+    {
+        return this.Id;
+    },
+
+    getObjectType: function()
+    {
+        return CLASS_TYPE_NO_FILL;
+    },
     Write_ToBinary2 : function(Writer)
     {
         Writer.WriteLong(this.type);
@@ -4027,6 +4266,11 @@ function CSpPr()
             this.ln = new CLn();
             this.ln.Read_FromBinary2(Reader);
         }
+    };
+
+    this.readFromBinaryForCopyPaste =  function(r)
+    {
+
     };
 
     this.copyFromOther = function(spPr)

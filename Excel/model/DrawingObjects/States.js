@@ -1423,7 +1423,7 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
 
     this.drawSelection = function(drawingDocument)
     {
-        drawingDocument.DrawTrack(TYPE_TRACK_TEXT, this.textObject.getTransform(), 0, 0, this.textObject.extX, this.textObject.extY, false/*, selected_objects[i].canRotate()TODO*/);
+        drawingDocument.DrawTrack(TYPE_TRACK_TEXT, this.textObject.getTransform(), 0, 0, this.textObject.extX, this.textObject.extY, false, this.textObject.canRotate ?  this.textObject.canRotate() : false);
         this.textObject.drawAdjustments(drawingDocument);
         //this.textObject.updateSelectionState(drawingDocument);
     };
@@ -5538,7 +5538,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
             {
                 if(state.id === STATES_ID_GROUP)
                     state.group.resetSelection();
-                state.resetSelectionState();
+                drawingObjectsController.resetSelectionState();
                 var drawing_bases = drawingObjectsController.drawingObjects.getDrawingObjects();
                 for(var i = 0; i < drawing_bases.length; ++i)
                 {

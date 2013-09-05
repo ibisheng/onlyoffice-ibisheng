@@ -1670,14 +1670,14 @@ function CorrectUniFillEx(asc_fill, unifill) {
         {
             case c_oAscFill.FILL_TYPE_NOFILL:
             {
-                ret.fill = new CNoFill();
+                ret.setFill(new CNoFill());
                 break;
             }
             case c_oAscFill.FILL_TYPE_BLIP:
             {
                 if (ret.fill == null || ret.fill.type != FILL_TYPE_BLIP)
                 {
-                    ret.fill = new CBlipFill();
+                    ret.setFill(new CBlipFill());
                 }
 
                 var _url = _fill.asc_getUrl();
@@ -1688,10 +1688,10 @@ function CorrectUniFillEx(asc_fill, unifill) {
                 }
 
                 if (_url != null && _url !== undefined && _url != "")
-                    ret.fill.RasterImageId = _url;
+                    ret.fill.setRasterImageId(_url);
 
                 if (ret.fill.RasterImageId == null)
-                    ret.fill.RasterImageId = "";
+                    ret.fill.setRasterImageId("");
 
                 var tile = _fill.asc_getType();
                 if (tile == c_oAscFillBlipType.STRETCH)
@@ -1705,20 +1705,20 @@ function CorrectUniFillEx(asc_fill, unifill) {
             {
                 if (ret.fill == null || ret.fill.type != FILL_TYPE_PATT)
                 {
-                    ret.fill = new CPattFill();
+                    ret.setFill(new CPattFill());
                 }
 
                 if (undefined != _fill.PatternType)
                 {
-                    ret.fill.ftype = _fill.PatternType;
+                    ret.fill.setFType(_fill.PatternType);
                 }
                 if (undefined != _fill.fgClr)
                 {
-                    ret.fill.fgClr = CorrectUniColorEx(_fill.asc_getColorFg(), ret.fill.fgClr);
+                    ret.fill.setFgColor(CorrectUniColorEx(_fill.asc_getColorFg(), ret.fill.fgClr));
                 }
                 if (undefined != _fill.bgClr)
                 {
-                    ret.fill.bgClr = CorrectUniColorEx(_fill.asc_getColorBg(), ret.fill.bgClr);
+                    ret.fill.setBgColor(CorrectUniColorEx(_fill.asc_getColorBg(), ret.fill.bgClr));
                 }
 
                 break;
@@ -1727,7 +1727,7 @@ function CorrectUniFillEx(asc_fill, unifill) {
             {
                 if (ret.fill == null || ret.fill.type != FILL_TYPE_GRAD)
                 {
-                    ret.fill = new CGradFill();
+                    ret.setFill(new CGradFill());
                 }
 
                 var _colors     = _fill.asc_getColors();
@@ -1741,10 +1741,10 @@ function CorrectUniFillEx(asc_fill, unifill) {
                         for (var i = 0; i < _colors.length; i++)
                         {
                             var _gs = new CGs();
-                            _gs.color = CorrectUniColorEx(_colors[i], _gs.color);
-                            _gs.pos = _positions[i];
+                            _gs.setColor(CorrectUniColorEx(_colors[i], _gs.color));
+                            _gs.setPos(_positions[i]);
 
-                            ret.fill.colors.push(_gs);
+                            ret.fill.addGS(_gs);
                         }
                     }
                 }
@@ -1754,7 +1754,7 @@ function CorrectUniFillEx(asc_fill, unifill) {
                     {
                         for (var i = 0; i < _colors.length; i++)
                         {
-                            ret.fill.colors[i].color = CorrectUniColorEx(_colors[i], ret.fill.colors[i].color);
+                            ret.fill.colors[i].setColor(CorrectUniColorEx(_colors[i], ret.fill.colors[i].color));
                         }
                     }
                 }
@@ -1764,7 +1764,7 @@ function CorrectUniFillEx(asc_fill, unifill) {
                     {
                         for (var i = 0; i < _positions.length; i++)
                         {
-                            ret.fill.colors[i].pos = _positions[i];
+                            ret.fill.colors[i].setPos(_positions[i]);
                         }
                     }
                 }
@@ -1777,17 +1777,17 @@ function CorrectUniFillEx(asc_fill, unifill) {
                     var _scale = _fill.asc_getLinearScale();
 
                     if (!ret.fill.lin)
-                        ret.fill.lin = new GradLin();
+                        ret.fill.setLin(new GradLin());
 
                     if (undefined != _angle)
-                        ret.fill.lin.angle = _angle;
+                        ret.fill.lin.setAngle(_angle);
                     if (undefined != _scale)
-                        ret.fill.lin.scale = _scale;
+                        ret.fill.lin.setScale(_scale);
                 }
                 else if (c_oAscFillGradType.GRAD_PATH == _grad_type)
                 {
-                    ret.fill.lin = null;
-                    ret.fill.path = new GradPath();
+                    ret.fill.setLin(null);
+                    ret.fill.setPath(new GradPath());
                 }
                 break;
             }
@@ -1795,16 +1795,16 @@ function CorrectUniFillEx(asc_fill, unifill) {
             {
                 if (ret.fill == null || ret.fill.type != FILL_TYPE_SOLID)
                 {
-                    ret.fill = new CSolidFill();
+                    ret.setFill(new CSolidFill());
                 }
-                ret.fill.color = CorrectUniColorEx(_fill.asc_getColor(), ret.fill.color);
+                ret.fill.setColor(CorrectUniColorEx(_fill.asc_getColor(), ret.fill.color));
             }
         }
     }
 
     var _alpha = asc_fill.asc_getTransparent();
     if (null != _alpha)
-        ret.transparent = _alpha;
+        ret.setTransparent(_alpha);
 
     return ret;
 }

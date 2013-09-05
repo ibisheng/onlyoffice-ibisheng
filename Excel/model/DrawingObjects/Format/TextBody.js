@@ -234,9 +234,23 @@ CTableId.prototype =
                         Class = new CLegendEntry();
                         break;
                     }
+                    case CLASS_TYPE_NO_FILL:
+                    {
+                        Class = new CNoFill();
+                        break;
+                    }
+                    case CLASS_TYPE_GS:
+                    {
+                        Class = new CGs();
+                        break;
+                    }
                 }
-                Class.Id = Id;
-                this.m_aPairs[Id] = Class;
+
+                if(isRealObject(Class))
+                {
+                    Class.Id = Id;
+                    this.m_aPairs[Id] = Class;
+                }
 
                 this.m_bTurnOff = false;
                 break;
@@ -908,12 +922,14 @@ CTextBody.prototype =
     writeToBinaryForCopyPaste: function(w)
     {
         this.bodyPr.Write_ToBinary2(w);
+        writeToBinaryDocContent(this.content, w);
     },
 
     readFromBinaryForCopyPaste: function(r, drawingDocument)
     {
         this.bodyPr.Read_FromBinary2(r);
         this.content = new CDocumentContent(this, drawingDocument, 0, 0, 0, 20000, false, false);
+        readFromBinaryDocContent(this.content, r);
     },
 
 

@@ -2703,6 +2703,22 @@ CShape.prototype =
                 this.recalculatePen();
                 break;
             }
+            case historyitem_AutoShapes_Set_AutoShapeStyle:
+            {
+                if(typeof  data.oldValue === "string")
+                {
+                    this.style = new CShapeStyle();
+                    var r = CreateBinaryReader(data.oldValue, 0, data.oldValue.length);
+                    this.style.Read_FromBinary2(r);
+                }
+                else
+                {
+                    this.style = null;
+                }
+                /*this.recalculateBrush();
+                this.recalculatePen();     */
+                break;
+            }
         }
     },
 
@@ -2812,6 +2828,22 @@ CShape.prototype =
                 this.txBody = g_oTableId.Get_ById(data.newValue);
                 break;
             }
+            case historyitem_AutoShapes_Set_AutoShapeStyle:
+            {
+                if(typeof  data.newValue === "string")
+                {
+                    this.style = new CShapeStyle();
+                    var r = CreateBinaryReader(data.newValue, 0, data.newValue.length);
+                    this.style.Read_FromBinary2(r);
+                }
+                else
+                {
+                    this.style = null;
+                }
+             /*   this.recalculateBrush();
+                this.recalculatePen();  */
+                break;
+            }
         }
     },
 
@@ -2841,21 +2873,107 @@ CShape.prototype =
     readFromBinaryForCopyPaste: function(r, group, drawingObjects, x, y)
     {
         this.group = group;
-        this.drawingObjects = drawingObjects;
-        this.spPr.Read_FromBinary2(r);
+        this.setDrawingObjects(drawingObjects);
+
+        this.spPr.bwMode = r.GetBool();
+        this.setXfrmObject(new CXfrm());
+
+        var Reader = r;
+
+
+        var offX, offY, extX, extY, flipH, flipV, rot;
+        var flag = Reader.GetBool();
+        if(flag)
+            offX = Reader.GetDouble();
+
+        flag = Reader.GetBool();
+        if(flag)
+            offY = Reader.GetDouble();
+
+
+        flag = Reader.GetBool();
+        if(flag)
+            extX = Reader.GetDouble();
+
+
+        flag = Reader.GetBool();
+        if(flag)
+            extY = Reader.GetDouble();
+
+
+        flag = Reader.GetBool();
+
+        flag = Reader.GetBool();
+
+
+        flag = Reader.GetBool();
+
+
+        flag = Reader.GetBool();
+
+
+
+        flag  = Reader.GetBool();
+        if(flag)
+            flipH = Reader.GetBool();
+
+        flag  = Reader.GetBool();
+        if(flag)
+            flipV = Reader.GetBool();
+
+        flag  = Reader.GetBool();
+        if(flag)
+            rot = Reader.GetDouble();
+
+        if(isRealNumber(offX) && isRealNumber(offY))
+            this.setPosition(offX, offY);
+
+        if(isRealNumber(extX) && isRealNumber(extY))
+            this.setExtents(extX, extY);
+
+        this.setFlips(flipH, flipV);
+
+        if(isRealNumber(rot))
+            this.setRotate(rot);
+
+        var flag = Reader.GetBool();
+        if(flag)
+        {
+            var geometry = new CGeometry();
+            geometry.Read_FromBinary2(Reader);
+            this.setPresetGeometry(geometry.preset);
+        }
+
+        flag = Reader.GetBool();
+        if(flag)
+        {
+            var Fill = new CUniFill();
+            Fill.Read_FromBinary2(Reader);
+            this.setUniFill(Fill);
+        }
+
+        flag = Reader.GetBool();
+        if(flag)
+        {
+            var ln = new CLn();
+            ln.Read_FromBinary2(Reader);
+            this.setUniLine(ln);
+        }
+
         if(isRealNumber(x) && isRealNumber(y))
         {
             this.setPosition(x, y);
         }
         if(r.GetBool())
         {
-            this.style = new CShapeStyle();
-            this.style.Read_FromBinary2(r);
+            var style = new CShapeStyle();
+            style.Read_FromBinary2(r);
+            this.setStyleBinary(style);
         }
         if(r.GetBool())
         {
             this.txBody = new CTextBody(this);
-            this.txBody.Read_FromBinary2(r);
+            this.txBody.readFromBinaryForCopyPaste(r, drawingObjects.drawingDocument);
         }
         if(!isRealObject(group))
         {
@@ -2863,7 +2981,35 @@ CShape.prototype =
             this.recalculateTransform();
             this.calculateContent();
             this.calculateTransformTextMatrix();
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateAfterInit, null, null,
+                new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
         }
+    },
+
+    setStyleBinary: function(style)
+    {
+
+        var old_style_binary = null;
+        var new_style_binary = null;
+        if(isRealObject(this.style))
+        {
+            var w = new CMemory();
+            this.style.Write_ToBinary2(w);
+            old_style_binary = w.pos + ";" + w.GetBase64Memory();
+        }
+        if(isRealObject(style))
+        {
+            var w = new CMemory();
+            style.Write_ToBinary2(w);
+            new_style_binary = w.pos + ";" + w.GetBase64Memory();
+        }
+
+        if(isRealObject(style))
+            this.style = style.createDuplicate();
+        else
+            this.style = null;
+        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Set_AutoShapeStyle, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(old_style_binary, new_style_binary)), null);
+
     }
 };
 
