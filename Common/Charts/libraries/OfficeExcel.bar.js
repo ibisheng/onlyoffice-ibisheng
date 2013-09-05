@@ -1503,7 +1503,7 @@
                     if('auto' == this._otherProps._ylabels_count)
                     {
 						diffWidth = axisOxAngleOptions ? (axisOxAngleOptions[countLabels]*Math.sin(angle*Math.PI/180))/(4) : 0;
-						diffHeight = axisOxAngleOptions ? (axisOxAngleOptions[countLabels]*Math.cos(angle*Math.PI/180)) : 0;
+						diffHeight = axisOxAngleOptions ? (axisOxAngleOptions[countLabels]*Math.cos(angle*Math.PI/180) - 10) : 0;
 						OfficeExcel.Text(context, font,
                                       text_size,
                                       x + (this._otherProps._text_angle == 90 ? 0 : 0) - diffWidth,
