@@ -2945,11 +2945,13 @@ function DrawingObjects() {
 		_this.resizeCanvas();
 				
 		_this.showDrawingObjects(true);
-		_this.rebuildChartGraphicObjects();
+		_this.rebuildChartGraphicObjects();		
 	}
 	
 	_this.resizeCanvas = function() {
-	
+		
+		shapeCtx.m_oFontManager.ClearRasterMemory();
+		
 		shapeCtx.init( drawingCtx.ctx, drawingCtx.getWidth(0), drawingCtx.getHeight(0), drawingCtx.getWidth(3), drawingCtx.getHeight(3) );
 		shapeCtx.CalculateFullTransform();
 		
@@ -3407,42 +3409,6 @@ function DrawingObjects() {
 					// Нужно переименовать лист для дальнейшего поиска
 					var resultRef = parserHelp.parse3DRef(graphicObject.chart.series[0].Val.Formula);
 					worksheet.model.workbook.aWorksheets[0].sName = resultRef.sheet;
-					
-					/*var colArray = [];
-					var rowArray = [];
-					
-					function parseDataFormula(data, bMinimum) {
-						if ( data && data.Formula ) {
-							var range = convertFormula(data.Formula, worksheet);
-							if ( range ) {
-								if ( bMinimum ) {
-									colArray.push(range.bbox.c1);
-									rowArray.push(range.bbox.r1);
-								}
-								else {
-									colArray.push(range.bbox.c2);
-									rowArray.push(range.bbox.r2);
-								}
-							}
-						}
-					}
-					
-					parseDataFormula(graphicObject.chart.series[0].Val, true);
-					parseDataFormula(graphicObject.chart.series[seriesCount - 1].Val, false);
-					
-					parseDataFormula(graphicObject.chart.series[0].TxCache, true);
-					parseDataFormula(graphicObject.chart.series[0].xVal, true);
-					parseDataFormula(graphicObject.chart.series[0].Cat, true);
-					
-					var c1 = Math.min.apply(null, colArray);
-					var r1 = Math.min.apply(null, rowArray);
-					var c2 = Math.max.apply(null, colArray);
-					var r2 = Math.max.apply(null, rowArray);
-					
-					var _range = new Range(worksheet.model, r1, c1, r2, c2 );
-					graphicObject.chart.range.intervalObject = _range;
-					
-					_this.calcChartInterval(graphicObject.chart);*/
 					
 					if ( graphicObject.chart.range.interval ) {
 						var _range = convertFormula(graphicObject.chart.range.interval, worksheet);
@@ -4409,7 +4375,7 @@ function DrawingObjects() {
 				var r2 = BB.r2 - fvr;
 				
 				if ( headers.bTop && (r1 >= 0) && (r1 != r2) ) {
-					var _c1 = (c1 >= 0) ? c1 /*+ (headers.bLeft ? 1 : 0)*/ : 0;
+					var _c1 = (c1 >= 0) ? c1 : 0;
 					var x = worksheet.getCellLeft(_c1, 1);
 					var y = worksheet.getCellTop(r1 + 1, 1);
 					var w = worksheet.getCellLeft(c2 + 1, 1);
@@ -4422,7 +4388,7 @@ function DrawingObjects() {
 					overlayCtx.stroke();
 				}
 				if ( headers.bLeft && (c1 >= 0) && (c1 != c2) ) {
-					var _r1 = (r1 >= 0) ? r1 /*+ (headers.bTop ? 1 : 0)*/ : 0;
+					var _r1 = (r1 >= 0) ? r1 : 0;
 					var x = worksheet.getCellLeft(c1 + 1, 1);
 					var y = worksheet.getCellTop(_r1, 1);
 					var w = x;
