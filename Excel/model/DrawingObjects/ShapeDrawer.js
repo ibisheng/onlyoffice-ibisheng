@@ -591,7 +591,7 @@ CShapeDrawer.prototype =
 
             this.p_width(1000 * this.StrokeWidth);
 
-            if (graphics.IsSlideBoundsCheckerType)
+            if (graphics.IsSlideBoundsCheckerType && !this.bIsNoStrokeAttack)
                 graphics.LineWidth = this.StrokeWidth;
 
             if ((this.Ln.headEnd != null && this.Ln.headEnd.type != null) || (this.Ln.tailEnd != null && this.Ln.tailEnd.type != null))
