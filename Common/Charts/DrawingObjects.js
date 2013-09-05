@@ -2950,7 +2950,9 @@ function DrawingObjects() {
 	
 	_this.resizeCanvas = function() {
 		
-		shapeCtx.m_oFontManager.ClearRasterMemory();
+		for (var i = 0; i < drawingCtx.fmgrGraphics.length; i++) {
+			drawingCtx.fmgrGraphics[i].ClearRasterMemory();
+		}
 		
 		shapeCtx.init( drawingCtx.ctx, drawingCtx.getWidth(0), drawingCtx.getHeight(0), drawingCtx.getWidth(3), drawingCtx.getHeight(3) );
 		shapeCtx.CalculateFullTransform();
