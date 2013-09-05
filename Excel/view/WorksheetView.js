@@ -5755,7 +5755,7 @@
 				cell_info.font = new asc_CFont();
 
 				if ( isGraphicObject && textPr && paraPr ) {
-					cell_info.font.name = textPr.FontFamily.Name;
+					cell_info.font.name = textPr.FontFamily ? textPr.FontFamily.Name : "";
 					cell_info.font.size = textPr.FontSize;
 					cell_info.font.bold = textPr.Bold;
 					cell_info.font.italic = textPr.Italic;

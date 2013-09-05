@@ -827,6 +827,7 @@ ParaTextPr.prototype =
             this.Set_Caps(Value.Caps);
             this.Set_SmallCaps(Value.SmallCaps);
             this.Set_Position(Value.Position);
+            this.Set_RFonts(Value.RFonts);
         }
 
         /*this.Bold       = undefined; // Жирный текст
