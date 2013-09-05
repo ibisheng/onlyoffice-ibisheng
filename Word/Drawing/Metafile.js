@@ -18,6 +18,23 @@ function CFontSetup()
 
     this.SetUpMatrix = new CMatrix();
 }
+CFontSetup.prototype =
+{
+    Clear : function()
+    {
+        this.Name   = "";
+        this.Index  = -1;
+        this.Size   = 12;
+        this.Bold   = false;
+        this.Italic = false;
+
+        this.SetUpIndex = -1;
+        this.SetUpSize = 12;
+        this.SetUpStyle = -1;
+
+        this.SetUpMatrix = new CMatrix();
+    }
+};
 
 function CGrState_Pen()
 {

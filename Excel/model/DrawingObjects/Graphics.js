@@ -525,6 +525,7 @@ CGraphics.prototype =
 		if (true == this.m_oContext.mozImageSmoothingEnabled)
 			this.m_oContext.mozImageSmoothingEnabled = false;
 
+        this.m_oLastFont.Clear();
         this.m_oContext.save();
     },
     EndDraw : function()
