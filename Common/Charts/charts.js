@@ -874,6 +874,15 @@ function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY, chart)
 	}
 	else if(angleText)
 		bar._otherProps._axisOxAngleOptions = angleText;
+	//пересчитываем левый маргин, если подпись по оси OX выходит за пределы диаграммы
+	if(angleText && bar._otherProps._labels.length && angleText[0] && bar.type != 'Hbar' && bar.type != 'Pie' && bar.type != 'Scatter')
+	{
+		var x = chartCanvas.width - (((bar._chartGutter._left + bar._chartGutter._right))/(2*bar._otherProps._labels.length)) + bar._chartGutter._left;
+		var diff = x - bar._chartGutter._left;
+		var widthDiff = angleText[0]*Math.sin(angleText.angle*Math.PI/180);
+		if(bar._chartGutter._left < widthDiff*scale)
+			bar._chartGutter._left = widthDiff;
+	}
 }
 
 //-----------------------------------------------------------------------------------
@@ -2963,10 +2972,11 @@ function calculateAngleText(labels)
 			for(var i = 0; i < labels.length; i++)
 			{
 				//если больше максимума - обрезаем и ставим ...
-				if(maxWidthAxisLabels && context.measureText(labels[i],0).width > maxWidthAxisLabels)
+				var widthPoins = context.measureText("...",0).width
+				if(maxWidthAxisLabels && context.measureText(labels[i],0).width  > maxWidthAxisLabels)
 				{	
 					var newLabel = labels[i];
-					while(context.measureText(newLabel,0).width >= maxWidthAxisLabels && newLabel.length > 1)
+					while((context.measureText(newLabel,0).width + widthPoins) >= maxWidthAxisLabels && newLabel.length > 1)
 					{
 						newLabel = newLabel.substr(0,newLabel.length - 1);
 					}
