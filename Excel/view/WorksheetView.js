@@ -7421,8 +7421,8 @@
 				rangeUnMerge.unmerge();
 				if(!isOneMerge)
 				{
-					arn.r2 = rMax2 - 1;
-					arn.c2 = cMax2 -1;
+					arn.r2 = (rMax2 - 1 > 0) ? (rMax2 - 1) : 0;
+					arn.c2 = (cMax2 - 1 > 0) ? (cMax2 - 1) : 0;
 				}
 
 				var mergeArr = [];

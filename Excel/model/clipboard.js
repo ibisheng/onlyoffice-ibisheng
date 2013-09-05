@@ -2524,7 +2524,7 @@
 			
 			_insertImages: function (ws, array, onlyFromLocalStorage) {
 				//object{images:,fromCol,fromRow}
-				if(!array || array && array.length == 0 || !onlyFromLocalStorage)
+				if(!array || array && array.length == 0)
 					return false;
 				
 				var firstRange = ws.activeRange.clone(true);
