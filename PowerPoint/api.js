@@ -2556,22 +2556,22 @@ asc_docs_api.prototype.AddImage = function(){
     var oThis = this;
     fileName.onchange = function(e)
     {
+		var bNeedSubmit = true;
         if(e && e.target && e.target.files)
         {
-            var files = e.target.files;
-            if(files.length > 0)
-            {
-                var file = files[0];
-				var nError = ValidateUploadImage(files);
-				if(c_oAscServerError.NoError == nError)
-				{
-					oThis.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-					fileSubmit.click();
-				}
-				else
-					oThis.asc_fireCallback("asc_onError",_mapAscServerErrorToAscError(nError),c_oAscError.Level.NoCritical);
-            }
+            var file = files[0];
+			var nError = ValidateUploadImage(e.target.files);
+			if(c_oAscServerError.NoError != nError)
+			{
+				bNeedSubmit = false;
+				oThis.asc_fireCallback("asc_onError",_mapAscServerErrorToAscError(nError),c_oAscError.Level.NoCritical);
+			}
         }
+		if(bNeedSubmit)
+		{
+			oThis.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
+			fileSubmit.click();
+		}
     };
     //todo пересмотреть opera
     if (window.opera != undefined)
