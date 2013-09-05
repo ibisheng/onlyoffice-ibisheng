@@ -653,7 +653,12 @@ function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY, chart)
 	}
 	else
 		tempScale = bar.scale;
-
+	
+	if(bar.type == 'hbar' && bar._otherProps._labels && bar._otherProps._labels.length)
+	{
+		tempScale = bar._otherProps._labels;
+	}
+	var hBarTempLeft;
 	if(tempScale != undefined && tempScale[tempScale.length -1] != undefined && bar._otherProps._ylabels != false)
 	{
 		//left = bar.context.measureText(bar.scale[bar.scale.length -1]).width;
@@ -671,6 +676,7 @@ function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY, chart)
 		else
 		{
 			left = Math.max.apply(null,tempArr) + 5;
+			hBarTempLeft = Math.max.apply(null,tempArr) + 5;
 			if(bar._otherProps._autoGrouping == 'stackedPer')
 				left += 12;//width '%'
 		}
@@ -865,7 +871,9 @@ function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY, chart)
 	bar._chartGutter._right = (standartMargin + right)*scale;
 	bar._chartGutter._top = (standartMarginTop + top)*scale;
 	bar._chartGutter._bottom = (bottom)*scale;
-	if(bar._otherProps._xlabels)
+	
+	
+	if(bar._otherProps._xlabels && bar.type != 'hbar' && bar.type != 'pie' && bar.type != 'scatter')
 		var angleText = calculateAngleText(bar._otherProps._labels);
 	if(angleText && (min >= 0) && bar.type != 'hbar' && bar.type != 'pie' && bar.type != 'scatter')
 	{
@@ -882,6 +890,20 @@ function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY, chart)
 		var widthDiff = angleText[0]*Math.sin(angleText.angle*Math.PI/180);
 		if(bar._chartGutter._left < widthDiff*scale)
 			bar._chartGutter._left = widthDiff;
+	}
+	if(bar.type == 'hbar' && bar._otherProps._labels && bar._otherProps._labels.length && bar._otherProps._xlabels)
+	{
+		var maxWidth = chartCanvas.width - ((bar._chartGutter._left + bar._chartGutter._right));
+		for(var i = 0; i < bar._otherProps._labels.length; i++){
+			bar._otherProps._labels[i] = cutLabels(maxWidth, bar._otherProps._labels[i]);
+		}
+		var font = getFontProperties("yLabels");
+		if(OfficeExcel.drawingCtxCharts)
+		{
+			var axisTitleProp = getMaxPropertiesText(OfficeExcel.drawingCtxCharts,font, bar._otherProps._labels);
+			bar._chartGutter._left += axisTitleProp.width - (hBarTempLeft*scale) ;
+		}
+		tempScale = bar._otherProps._labels;
 	}
 }
 
@@ -2888,18 +2910,18 @@ function getMaxPropertiesText(context, font, text)
 	if(typeof text == "object" && text.length != 0)
 	{	
 		// в данном случае ищем максимальную ширину текста
-		var maxLength = 0;
-		var maxWord;
+		var maxWord = 0;
+		var objOptions;
 		for(var i = 0; i < text.length; i++)
 		{
-			var lengthText = text[i].toString().length;
-			if(lengthText > maxLength)
+			var lengthText = context.measureText((text[i]).toString(),0);
+			if(lengthText.width > maxWord)
 			{
-				maxLength = lengthText;
-				maxWord = text[i].toString();
+				objOptions = lengthText;
+				maxWord = lengthText.width;
 			}
 		}
-		result = context.measureText(maxWord,0);
+		result = objOptions;
 	}
 	else
 	{
@@ -2972,17 +2994,7 @@ function calculateAngleText(labels)
 			for(var i = 0; i < labels.length; i++)
 			{
 				//если больше максимума - обрезаем и ставим ...
-				var widthPoins = context.measureText("...",0).width
-				if(maxWidthAxisLabels && context.measureText(labels[i],0).width  > maxWidthAxisLabels)
-				{	
-					var newLabel = labels[i];
-					while((context.measureText(newLabel,0).width + widthPoins) >= maxWidthAxisLabels && newLabel.length > 1)
-					{
-						newLabel = newLabel.substr(0,newLabel.length - 1);
-					}
-					newLabel = newLabel + "...";
-					labels[i] = newLabel;
-				}
+				labels[i] = cutLabels(maxWidthAxisLabels, labels[i]);
 				optionText = context.measureText(labels[i],0);
 				result[i] = optionText.width;
 			}
@@ -2996,4 +3008,21 @@ function calculateAngleText(labels)
 		}
 	}
 	return result;
+}
+function cutLabels(maxWidthAxisLabels, label)
+{
+	var context = OfficeExcel.drawingCtxCharts;
+	var widthPoins = context.measureText("...",0).width;
+	label = label.toString();
+	if(maxWidthAxisLabels && context.measureText(label,0).width  > maxWidthAxisLabels)
+	{	
+		var newLabel = label;
+		while((context.measureText(newLabel,0).width + widthPoins) >= maxWidthAxisLabels && newLabel.length > 1)
+		{
+			newLabel = newLabel.substr(0,newLabel.length - 1);
+		}
+		newLabel = newLabel + "...";
+		label = newLabel;
+	}
+	return label;
 }
