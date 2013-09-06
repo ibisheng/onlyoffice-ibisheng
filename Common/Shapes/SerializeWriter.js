@@ -1525,6 +1525,7 @@ function CBinaryFileWriter()
 
                     oThis.EndRecord();
                 }
+                oThis.EndRecord();
 
                 if (fill.lin)
                 {
@@ -1543,8 +1544,6 @@ function CBinaryFileWriter()
                     oThis.WriteUChar(g_nodeAttributeEnd);
                     oThis.EndRecord();
                 }
-
-                oThis.EndRecord();
 
                 oThis.EndRecord();
                 break;
