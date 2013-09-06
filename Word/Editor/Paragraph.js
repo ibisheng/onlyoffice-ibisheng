@@ -5806,7 +5806,7 @@ Paragraph.prototype =
             else
             {
                 // Выставляем настройки для символа параграфа
-                if ( undefined != typeof(this.TextPr.Value.FontSize) )
+                if ( undefined != this.TextPr.Value.FontSize )
                     this.TextPr.Set_FontSize( this.Internal_IncDecFontSize( bIncrease, this.TextPr.Value.FontSize ) );
                 else
                     this.TextPr.Set_FontSize( this.Internal_IncDecFontSize( bIncrease, StartTextPr.FontSize ) );
