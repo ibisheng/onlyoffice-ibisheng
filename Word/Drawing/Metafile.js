@@ -1688,6 +1688,10 @@ CDocumentRenderer.prototype =
         // эта функция не для печати или сохранения вообще
     },
 
+    DrawSpellingLine : function(y0, x0, x1, w)
+    {
+    },
+
     // smart methods for horizontal / vertical lines
     drawHorLine : function(align, y, x, r, penW)
     {
