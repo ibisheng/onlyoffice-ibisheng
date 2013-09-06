@@ -1816,7 +1816,7 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 }
 
 function arrReverse(arr) {
-	if(!arr)
+	if(!arr || !arr.length)
 		return;
 	var newarr = [];
 	for (i = 0; i < arr[0].length; ++i) {

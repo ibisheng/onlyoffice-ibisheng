@@ -7153,70 +7153,80 @@
 										pasteExec();
 										if(val.addImages && val.addImages.length != 0)
 										{
-											for(var im = 0; im < val.addImages.length; im++)//вставляем изображения
+											var api = asc["editor"];
+											var aImagesSync = [];
+											for(var im = 0; im < val.addImages.length; im++)
 											{
-												var src = val.addImages[im].tag.src;
-												if(src)
+												aImagesSync.push(val.addImages[im].tag.src);
+											}
+											api.ImageLoader.LoadDocumentImages(aImagesSync);
+											t.objectRender.asyncImagesDocumentEndLoaded = function() {
+											
+												for(var im = 0; im < val.addImages.length; im++)//вставляем изображения
 												{
-													var binary_shape = val.addImages[im].tag.getAttribute("alt");
-													var sub;
-													if(typeof binary_shape === "string")
-														sub = binary_shape.substr(0, 12);
-													if(typeof binary_shape === "string" &&( sub === "TeamLabShape" || sub === "TeamLabImage" /*|| sub === "TeamLabChart" */|| sub === "TeamLabGroup"))
+													var src = val.addImages[im].tag.src;
+													if(src)
 													{
-														var reader = CreateBinaryReader(binary_shape, 12, binary_shape.length);
-														reader.GetLong();
-														if(isRealObject(reader))
-															reader.oImages = this.oImages;
-														var first_string = null;
-														if(reader !== null && typeof  reader === "object")
+														var binary_shape = val.addImages[im].tag.getAttribute("alt");
+														var sub;
+														if(typeof binary_shape === "string")
+															sub = binary_shape.substr(0, 12);
+														if(typeof binary_shape === "string" &&( sub === "TeamLabShape" || sub === "TeamLabImage" /*|| sub === "TeamLabChart" */|| sub === "TeamLabGroup"))
 														{
-															first_string = sub;
+															var reader = CreateBinaryReader(binary_shape, 12, binary_shape.length);
+															reader.GetLong();
+															if(isRealObject(reader))
+																reader.oImages = this.oImages;
+															var first_string = null;
+															if(reader !== null && typeof  reader === "object")
+															{
+																first_string = sub;
+															}
+															var positionX = null
+															var positionY = null;
+															
+															if(t.cols && val.addImages[im].curCell && val.addImages[im].curCell.col != undefined && t.cols[val.addImages[im].curCell.col].left != undefined)
+																positionX = t.cols[val.addImages[im].curCell.col].left;
+															if(t.rows && val.addImages[im].curCell && val.addImages[im].curCell.row != undefined && t.rows[val.addImages[im].curCell.row].top != undefined)
+																positionY = t.rows[val.addImages[im].curCell.row].top
+															
+															var Drawing;
+															switch(first_string)
+															{
+																case "TeamLabImage":
+																{
+																	Drawing = new CImageShape();
+																	break;
+																}
+																case "TeamLabShape":
+																{
+																	Drawing = new CShape();
+																	break;
+																}
+																case "TeamLabGroup":
+																{
+																	Drawing = new CGroupShape();
+																	break;
+																}
+																default :
+																{
+																	Drawing = CreateImageFromBinary(src);
+																	break;
+																}
+															}
+															if(positionX && positionY && t.objectRender)
+																Drawing.readFromBinaryForCopyPaste(reader,null, t.objectRender,t.objectRender.convertMetric(positionX,1,3),t.objectRender.convertMetric(positionY,1,3));
+															else
+																Drawing.readFromBinaryForCopyPaste(reader,null, t.objectRender);
+															Drawing.drawingObjects = t.objectRender;
+															Drawing.addToDrawingObjects();
 														}
-														var positionX = null
-														var positionY = null;
-														
-														if(t.cols && val.addImages[im].curCell && val.addImages[im].curCell.col != undefined && t.cols[val.addImages[im].curCell.col].left != undefined)
-															positionX = t.cols[val.addImages[im].curCell.col].left;
-														if(t.rows && val.addImages[im].curCell && val.addImages[im].curCell.row != undefined && t.rows[val.addImages[im].curCell.row].top != undefined)
-															positionY = t.rows[val.addImages[im].curCell.row].top
-														
-														var Drawing;
-														switch(first_string)
+														else if(0 != src.indexOf("file://"))
 														{
-															case "TeamLabImage":
-															{
-																Drawing = new CImageShape();
-																break;
-															}
-															case "TeamLabShape":
-															{
-																Drawing = new CShape();
-																break;
-															}
-															case "TeamLabGroup":
-															{
-																Drawing = new CGroupShape();
-																break;
-															}
-															default :
-															{
-																Drawing = CreateImageFromBinary(src);
-																break;
-															}
+															t.objectRender.addImageDrawingObject(src,  { cell: val.addImages[im].curCell, width: val.addImages[im].tag.width, height: val.addImages[im].tag.height });
 														}
-														if(positionX && positionY && t.objectRender)
-															Drawing.readFromBinaryForCopyPaste(reader,null, t.objectRender,t.objectRender.convertMetric(positionX,1,3),t.objectRender.convertMetric(positionY,1,3));
-														else
-															Drawing.readFromBinaryForCopyPaste(reader,null, t.objectRender);
-														Drawing.drawingObjects = t.objectRender;
-														Drawing.addToDrawingObjects();
-													}
-													else if(0 != src.indexOf("file://"))
-													{
-														t.objectRender.addImageDrawingObject(src,  { cell: val.addImages[im].curCell, width: val.addImages[im].tag.width, height: val.addImages[im].tag.height });
-													}
-												}	
+													}	
+												}
 											}
 										}
 									});

@@ -529,29 +529,14 @@ asc_CChart.prototype = {
 				
 			var baseColors = api.chartStyleManager.getBaseColors( parseInt(this.styleId) );
 			var colors = generateColors(count, baseColors, true);
-		}
-		for ( var i = 0; i < colors.length; i++ ) {
-			var rgbColor = new RGBColor(colors[i]);
 			
-			var uniColor = CreateUniColorRGB(rgbColor.r, rgbColor.g, rgbColor.b);
-			
-			/*var theme, colorMap;
-			RGBA = {R: 0, G: 0, B: 0, A: 255};
-			
-			if ( api_sheet ) {
-				theme = api_sheet.wbModel.theme;
-				colorMap = GenerateDefaultColorMap().color_map;
+			for ( var i = 0; i < colors.length; i++ ) {
+				var rgbColor = new RGBColor(colors[i]);
+				var uniColor = CreateUniColorRGB(rgbColor.r, rgbColor.g, rgbColor.b);
+				uniColors.push(uniColor);
 			}
-			else {
-				theme  = api_doc.WordControl.m_oLogicDocument.theme;
-				colorMap = api_doc.WordControl.m_oLogicDocument.clrSchemeMap.color_map;
-				if ( colorMap == null )
-					colorMap = GenerateDefaultColorMap().color_map;
-			}
-			uniColor.Calculate(theme, colorMap, RGBA);*/
-			
-			uniColors.push(uniColor);
 		}
+		
 		return uniColors;
 	},
 	
