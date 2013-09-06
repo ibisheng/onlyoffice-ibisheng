@@ -238,6 +238,8 @@ asc_CChart.prototype = {
 		var api_doc = window["editor"];
 		var api_sheet = window["Asc"]["editor"];
 		var api = api_sheet ? api_sheet : api_doc;
+		
+		this.header.title = "2012 Olympics Medal Standings";
 		this.range.interval = "Sheet1!A1:D7";
 		var Cat = { Formula: "Sheet1!A2:A7", NumCache: [createItem("USA"), createItem("CHN"), createItem("RUS"), createItem("GBR"), createItem("GER"), createItem("JPN")] };
 		
@@ -289,25 +291,29 @@ asc_CChart.prototype = {
 		var _t = this;
 		var bbox = _t.range.intervalObject.getBBox0();
 		
-		for (var i = bbox.r1 + 1; i <= bbox.r2; i++) {
-			
-			var cell = _t.range.intervalObject.worksheet.getCell( new CellAddress(i, bbox.c1, 0) );
-			var value = cell.getValue();
-			if ( !isNumber(value) && (value != "") )
-				cntLeft++;
+		if ( bbox.c2 - bbox.c1 > 0 ) {
+			for (var i = bbox.r1 + 1; i <= bbox.r2; i++) {
+				
+				var cell = _t.range.intervalObject.worksheet.getCell( new CellAddress(i, bbox.c1, 0) );
+				var value = cell.getValue();
+				if ( !isNumber(value) && (value != "") )
+					cntLeft++;
+			}
+			if ( (cntLeft > 0) && (cntLeft >= bbox.r2 - bbox.r1) )
+				headers.bLeft = true;
 		}
-		if ( (cntLeft > 0) && (cntLeft >= bbox.r2 - bbox.r1) )
-			headers.bLeft = true;
 		
-		for (var i = bbox.c1 + 1; i <= bbox.c2; i++) {
-			
-			var cell = _t.range.intervalObject.worksheet.getCell( new CellAddress(bbox.r1, i, 0) );
-			var value = cell.getValue();
-			if ( !isNumber(value) && (value != "") )
-				cntTop++;
+		if ( bbox.r2 - bbox.r1 > 0 ) {
+			for (var i = bbox.c1 + 1; i <= bbox.c2; i++) {
+				
+				var cell = _t.range.intervalObject.worksheet.getCell( new CellAddress(bbox.r1, i, 0) );
+				var value = cell.getValue();
+				if ( !isNumber(value) && (value != "") )
+					cntTop++;
+			}
+			if ( (cntTop > 0) && (cntTop >= bbox.c2 - bbox.c1) )
+				headers.bTop = true;
 		}
-		if ( (cntTop > 0) && (cntTop >= bbox.c2 - bbox.c1) )
-			headers.bTop = true;
 		
 		return headers;
 	},
@@ -321,7 +327,8 @@ asc_CChart.prototype = {
 		// Save old series colors
 		var oldSeriaData = [];
 		for ( var i = 0; i < _t.series.length; i++ ) {
-			oldSeriaData.push( _t.series[i].OutlineColor );
+			if ( _t.series[i].OutlineColor && !_t.series[i].OutlineColor.isCustom )
+				oldSeriaData[i] = _t.series[i].OutlineColor;
 		}
 		_t.series = [];
 		
@@ -473,14 +480,12 @@ asc_CChart.prototype = {
 		var seriaUniColors = _t.generateUniColors(_t.series.length);
 		
 		if ( _t.type == c_oAscChartType.hbar )
-			seriaUniColors = OfficeExcel.array_reverse(seriaUniColors);
+			seriaUniColors = OfficeExcel.array_reverse(seriaUniColors);	
 			
 		// Restore old series colors
 		for ( var i = 0; i < _t.series.length; i++ ) {
-			
-			if ( i < oldSeriaData.length ) {
+			if ( oldSeriaData[i] )
 				_t.series[i].OutlineColor = oldSeriaData[i];
-			}
 			else
 				_t.series[i].OutlineColor = seriaUniColors[i];
 		}
@@ -533,6 +538,7 @@ asc_CChart.prototype = {
 			for ( var i = 0; i < colors.length; i++ ) {
 				var rgbColor = new RGBColor(colors[i]);
 				var uniColor = CreateUniColorRGB(rgbColor.r, rgbColor.g, rgbColor.b);
+				uniColor.isCustom = true;
 				uniColors.push(uniColor);
 			}
 		}
