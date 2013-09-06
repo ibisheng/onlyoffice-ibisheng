@@ -20,7 +20,7 @@ phType_clipArt:QJ
 FT_Bitmap:lk
 CSlideDrawer:tO
 JSCompiler_StaticMethods_Create_NewPoint:$A
-ThemeElements:bP
+ThemeElements:cP
 afm_parser_read_int:Qm
 Y_Bottom_Margin:eI
 FILL_TYPE_NOFILL:dh
@@ -86,7 +86,7 @@ c_oAscXAlign$Center:gb
 Editor_Copy_Button:la
 CFF_ParserRec:Rt
 JSCompiler_StaticMethods_changeTheme2:qJ
-c_oAscHAnchor$Margin:fE
+c_oAscHAnchor$Margin:gE
 para_HyperlinkStart:Yb
 FT_Select_Metrics:Ft
 MasterSlide:yg
@@ -1305,7 +1305,7 @@ CompareGroups:ZC
 JSCompiler_StaticMethods__ValueToMmType:be
 JSCompiler_StaticMethods_CopyTable:ab
 recalcresult_NextElement:oG
-documentTitleWithoutExtention:fQ
+documentTitleWithoutExtention:gQ
 CBoundsController:YM
 PreChangeAdjState:iC
 Spline:JC
