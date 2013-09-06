@@ -632,6 +632,27 @@ Paragraph.prototype.Restart_CheckSpelling = function()
     this.LogicDocument.Spelling.Add_ParagraphToCheck(this.Get_Id(), this);
 };
 
+Paragraph.prototype.Internal_CheckPunctuationBreak = function(_Pos)
+{
+    // В позиции Pos у нас стоит знак пунктуации, проверяем, идет ли за ним сразу текст
+
+    var Count = this.Content.length;
+    for ( var Pos = _Pos + 1; Pos < Count; Pos++ )
+    {
+        var Item = this.Content[Pos];
+
+        if ( para_Text === Item.Type &&  false === Item.Is_Punctuation() && false === Item.Is_NBSP() && false === Item.Is_Number() && false === Item.Is_SpecialSymbol() )
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+};
+
 Paragraph.prototype.Internal_CheckSpelling = function()
 {
     if ( pararecalc_0_Spell_None !== this.RecalcInfo.Recalc_0_Spell.Type )
@@ -678,7 +699,7 @@ Paragraph.prototype.Continue_CheckSpelling = function()
 
                 continue;
             }
-            else if ( para_Text === Item.Type && false === Item.Is_Punctuation() && false === Item.Is_NBSP() && false === Item.Is_Number() && false === Item.Is_SpecialSymbol() )
+            else if ( para_Text === Item.Type && ( false === Item.Is_Punctuation() || ( true === bWord && true === this.Internal_CheckPunctuationBreak( Pos ) ) ) && false === Item.Is_NBSP() && false === Item.Is_Number() && false === Item.Is_SpecialSymbol() )
             {
                 if ( false === bWord )
                 {
@@ -753,7 +774,7 @@ Paragraph.prototype.Continue_CheckSpelling = function()
 
                 continue;
             }
-            else if ( para_Text === Item.Type && false === Item.Is_Punctuation() && false === Item.Is_NBSP() )
+            else if ( para_Text === Item.Type && ( false === Item.Is_Punctuation() || ( true === bWord && true === this.Internal_CheckPunctuationBreak( Pos ) ) ) && false === Item.Is_NBSP() )
             {
                 if ( false === bWord )
                 {
