@@ -20575,22 +20575,27 @@ CTableCell.prototype =
         var TablePr = Table.Get_CompiledPr(false).TablePr;
         if ( tbllayout_AutoFit === TablePr.TableLayout )
         {
-            // Если изменение внутри ячейки влечет за собой изменение сетки таблицы, тогда
-            // пересчитывать таблицу надо с самого начала.
-            var CurCol;
-            var ColsCount = Table.TableGrid.length;
-            var TableGrid_old = new Array();
-            for ( CurCol = 0; CurCol < ColsCount; CurCol++ )
-                TableGrid_old[CurCol] = Table.TableGrid[CurCol];
-
-            Table.Internal_RecalculateGrid();
-            var TableGrid_new = Table.TableGrid;
-
-            for ( CurCol = 0; CurCol < ColsCount; CurCol++ )
+            if ( this.Row.Table.Parent.Pages.length > 0  )
             {
-                if ( Math.abs( TableGrid_old[CurCol] - TableGrid_new[CurCol] ) > 0.001 )
-                    return Table.Refresh_RecalcData2( 0, 0 );
+                // Если изменение внутри ячейки влечет за собой изменение сетки таблицы, тогда
+                // пересчитывать таблицу надо с самого начала.
+                var CurCol;
+                var ColsCount = Table.TableGrid.length;
+                var TableGrid_old = new Array();
+                for ( CurCol = 0; CurCol < ColsCount; CurCol++ )
+                    TableGrid_old[CurCol] = Table.TableGrid[CurCol];
+
+                Table.Internal_RecalculateGrid();
+                var TableGrid_new = Table.TableGrid;
+
+                for ( CurCol = 0; CurCol < ColsCount; CurCol++ )
+                {
+                    if ( Math.abs( TableGrid_old[CurCol] - TableGrid_new[CurCol] ) > 0.001 )
+                        return Table.Refresh_RecalcData2( 0, 0 );
+                }
             }
+            else
+                return Table.Refresh_RecalcData2( 0, 0 );
         }
 
         this.Row.Refresh_RecalcData2( this.Index, Page_Rel );

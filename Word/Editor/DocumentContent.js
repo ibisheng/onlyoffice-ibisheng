@@ -160,12 +160,17 @@ CDocumentContent.prototype =
     {
         if ( true === this.Parent.Is_Cell() || this.Parent instanceof WordShape )
         {
-            var Y      = this.Pages[PageIndex].Y ;
-            var YLimit = this.Pages[PageIndex].YLimit;
-            var X      = this.Pages[PageIndex].X;
-            var XLimit = this.Pages[PageIndex].XLimit;
+            if ( PageIndex < this.Pages.length && PageIndex > 0 )
+            {
+                var Y      = this.Pages[PageIndex].Y ;
+                var YLimit = this.Pages[PageIndex].YLimit;
+                var X      = this.Pages[PageIndex].X;
+                var XLimit = this.Pages[PageIndex].XLimit;
 
-            return { X : X, XLimit : XLimit, Y : Y, YLimit : YLimit }
+                return { X : X, XLimit : XLimit, Y : Y, YLimit : YLimit }
+            }
+            else
+                return { X : 0, XLimit : Page_Width, Y : 0, YLimit : Page_Height }
         }
         else
             return { X : X_Left_Field, Y : Y_Top_Field, XLimit : X_Right_Field, YLimit : Y_Bottom_Field };
