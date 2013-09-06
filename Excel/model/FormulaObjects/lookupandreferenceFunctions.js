@@ -99,10 +99,10 @@ cFormulaFunction.LookupAndReference = {
             }
             else {
                 if ( !rx_test_ws_name.test( sheetName.toString() ) ) {
-                    return this.value = "'" + sheetName.toString().replace( /'/g, "''" ) + "'" + "!" + strRef;
+                    return this.value = new cString( "'" + sheetName.toString().replace( /'/g, "''" ) + "'" + "!" + strRef );
                 }
                 else {
-                    return this.value = sheetName.toString() + "!" + strRef;
+                    return this.value = new cString( sheetName.toString() + "!" + strRef ) ;
                 }
             }
 

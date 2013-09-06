@@ -6075,9 +6075,10 @@
 
 			// Окончание выделения
 			changeSelectionDone: function () {
-				if (this.isFormulaEditMode) {
+				if (this.isFormulaEditMode && this.arrActiveFormulaRanges.length > 0) {
 					// Нормализуем range
-					this.arrActiveFormulaRanges[this.arrActiveFormulaRanges.length - 1].normalize();
+
+							this.arrActiveFormulaRanges[this.arrActiveFormulaRanges.length - 1].normalize();
 				} else {
 					// Нормализуем range
 					this.activeRange.normalize();
