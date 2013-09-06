@@ -6488,6 +6488,8 @@ GraphicPicture.prototype =
 function ParaPageNum()
 {
     this.Type = para_PageNum;
+
+    this.FontKoef = 1;
 }
 
 ParaPageNum.prototype =
@@ -6500,7 +6502,7 @@ ParaPageNum.prototype =
         var sValue = "" + (Value + 1);
 
         g_oTextMeasurer.SetTextPr( Context.GetTextPr() );
-        g_oTextMeasurer.SetFontSlot( fontslot_ASCII );
+        g_oTextMeasurer.SetFontSlot( fontslot_ASCII, this.FontKoef );
 
         var RealWidth = 0;
         for ( var Index = 0; Index < sValue.length; Index++ )
@@ -6531,6 +6533,7 @@ ParaPageNum.prototype =
             }
         }
 
+        Context.SetFontSlot( fontslot_ASCII, this.FontKoef );
         for ( var Index = 0; Index < sValue.length; Index++ )
         {
             var Char = sValue.charAt(Index);
@@ -6539,8 +6542,11 @@ ParaPageNum.prototype =
         }
     },
 
-    Measure : function (Context)
+    Measure : function (Context, TextPr)
     {
+        this.FontKoef = TextPr.Get_FontKoef();
+        Context.SetFontSlot( fontslot_ASCII, this.FontKoef );
+
         var Width = 0;
         for ( var Index = 0; Index < 10; Index++ )
         {

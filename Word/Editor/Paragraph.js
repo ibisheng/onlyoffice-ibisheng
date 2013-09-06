@@ -814,6 +814,7 @@ Paragraph.prototype =
             {
                 case para_Text:
                 case para_Space:
+                case para_PageNum:
                 {
                     Item.Measure( g_oTextMeasurer, CurTextPr);
                     break;
@@ -827,7 +828,6 @@ Paragraph.prototype =
                     Item.Measure( g_oTextMeasurer, CurTextPr);
                     break;
                 }
-                case para_PageNum:
                 case para_Tab:
                 case para_NewLine:
                 {
