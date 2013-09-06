@@ -5699,7 +5699,6 @@ CTable.prototype =
             case changestype_Paragraph_Properties:
             case changestype_Document_Content:
             case changestype_Document_Content_Add:
-            case changestype_Remove:
             case changestype_Delete:
             case changestype_Image_Properties:
             {
@@ -5720,6 +5719,12 @@ CTable.prototype =
                 }
                 else
                     this.CurCell.Content.Document_Is_SelectionLocked( CheckType );
+
+                break;
+            }
+            case changestype_Remove:
+            {
+                this.Lock.Check( this.Get_Id() );
 
                 break;
             }
