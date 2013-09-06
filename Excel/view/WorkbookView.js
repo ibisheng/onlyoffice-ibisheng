@@ -1106,7 +1106,6 @@
 
 				this.buffers.main.changeZoom(factor);
 				this.buffers.overlay.changeZoom(factor);
-
 				this.drawingCtxCharts.changeZoom(factor);
 
 				var item;
@@ -1117,9 +1116,9 @@
 						// Меняем zoom (для не активных сменим как только сделаем его активным)
 						item.changeZoom(/*isDraw*/i == activeIndex);
 						if (i == activeIndex) {
+							item.objectRender.changeZoom(this.drawingCtx.scaleFactor);
 							item.draw();
 							item.drawDepCells();
-							item.objectRender.changeZoom(this.drawingCtx.scaleFactor);
 						}
 					}
 				}

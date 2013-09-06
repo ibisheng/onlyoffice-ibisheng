@@ -2338,7 +2338,7 @@ function DrawingObjects() {
 	var userId = null;
 	var documentId = null;
 	
-	_this.zoom = 1;
+	_this.zoom = { last: 1, current: 1 };
 	_this.isViewerMode = null;
 	_this.objectLocker = null;
 	_this.drawingDocument = null;
@@ -2936,11 +2936,10 @@ function DrawingObjects() {
 
 	_this.changeZoom = function(factor) {
 		
-		_this.zoom = factor;
+		_this.zoom.last = _this.zoom.current;
+		_this.zoom.current = factor;
+		
 		_this.resizeCanvas();
-				
-		_this.showDrawingObjects(true);
-		_this.rebuildChartGraphicObjects();		
 	}
 	
 	_this.resizeCanvas = function() {
