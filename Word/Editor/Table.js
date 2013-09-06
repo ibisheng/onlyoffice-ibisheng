@@ -8734,7 +8734,13 @@ CTable.prototype =
                     CurCell = TempCell;
                 else
                 {
-                    this.Row_Add(false);
+                    if ( false == editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_Element_and_Type, Element : this, CheckType : changestype_Table_Properties }) )
+                    {
+                        History.Create_NewPoint();
+                        this.Row_Add(false);
+                    }
+                    else
+                        return;
 
                     var TempCell = this.Internal_Get_NextCell( Pos );
                     while ( null != TempCell && vmerge_Restart != TempCell.Get_VMerge() )
