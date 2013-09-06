@@ -141,7 +141,8 @@
                 "../Common/Build/Externs.js",
                 "../Word/Drawing/scrolls/jquery.min.js",
                 "../Common/3rdparty/Underscore/underscore-min.js",
-                "../Common/3rdparty/Sockjs/sockjs-0.3.min.js"
+                "../Common/3rdparty/Sockjs/sockjs-0.3.min.js",
+				"../Common/3rdparty/XRegExp/xregexp-all-min.js"
             ],
             "map": "sdk-all.js.map",
             "log": "../Word/Build/Log",
