@@ -2468,12 +2468,16 @@ function DrawingObjects() {
 		}
 		
 		// Проверяет выход за границы
-		_t.canDraw = function() {
+		_t.inVisibleArea = function() {
 			var result = true;
-
-			if ( (_t.worksheet.getCellLeft(_t.worksheet.getFirstVisibleCol(), 0) > _t.worksheet.getCellLeft(_t.to.col, 0) + mmToPx(_t.to.colOff)) ||
-				 (_t.worksheet.getCellTop(_t.worksheet.getFirstVisibleRow(), 0) > _t.worksheet.getCellTop(_t.to.row, 0) + mmToPx(_t.to.rowOff)))
-			{ result = false; }
+			
+			var fvc = _t.worksheet.getFirstVisibleCol();
+			var fvr = _t.worksheet.getFirstVisibleRow();
+			var lvc = _t.worksheet.getLastVisibleCol();
+			var lvr = _t.worksheet.getLastVisibleRow();
+			
+			if ( (fvr > _t.to.row + 1) || (lvr < _t.from.row - 1) || (fvc > _t.to.col + 1) || (lvc < _t.from.col - 1) )
+				result = false;
 
 			return result;
 		}
@@ -3037,6 +3041,8 @@ function DrawingObjects() {
 		
 		// Чистим текущие области
 		for ( var i = 0; i < aObjects.length; i++ ) {
+			if ( !aObjects[i].inVisibleArea() )
+				continue;
 			var boundsChecker = _this.getBoundsChecker(aObjects[i]);
 			restoreSheetArea(boundsChecker);
 			aBoundsCheckers.push(boundsChecker);
@@ -3128,7 +3134,7 @@ function DrawingObjects() {
 				var index = i;
 				var obj = aObjects[i];
 				
-				if ( !obj.canDraw() )
+				if ( !obj.inVisibleArea() )
 					continue;
 					
 				if ( !obj.flags.anchorUpdated )
