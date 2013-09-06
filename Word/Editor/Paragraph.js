@@ -13071,6 +13071,7 @@ Paragraph.prototype =
         }
 
         this.RecalcInfo.Set_Type_0(pararecalc_0_All);
+        this.RecalcInfo.Set_Type_0_Spell(pararecalc_0_Spell_All);
     },
 
     Write_ToBinary2 : function(Writer)

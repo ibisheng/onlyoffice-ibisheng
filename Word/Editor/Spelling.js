@@ -645,6 +645,8 @@ Paragraph.prototype.Internal_CheckPunctuationBreak = function(_Pos)
         {
             return true;
         }
+        else if ( para_CollaborativeChangesEnd === Item.Type || para_CollaborativeChangesStart === Item.Type )
+            continue;
         else
         {
             return false;
@@ -722,6 +724,8 @@ Paragraph.prototype.Continue_CheckSpelling = function()
                     nWordEnd = Pos;
                 }
             }
+            else if ( para_CollaborativeChangesEnd === Item.Type || para_CollaborativeChangesStart === Item.Type )
+                continue;
             else
             {
                 if ( true === bWord )
@@ -797,6 +801,8 @@ Paragraph.prototype.Continue_CheckSpelling = function()
                     nWordEnd = Pos;
                 }
             }
+            else if ( para_CollaborativeChangesEnd === Item.Type || para_CollaborativeChangesStart === Item.Type )
+                continue;
             else
             {
                 if ( true === bWord )
