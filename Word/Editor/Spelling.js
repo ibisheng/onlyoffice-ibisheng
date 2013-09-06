@@ -838,15 +838,16 @@ Paragraph.prototype.Continue_CheckSpelling = function()
             var Lang = this.Internal_GetLang( Element.EndPos );
             if ( CurLang != Lang.Val )
             {
-                Element.Lang    = Lang.Val;
-                Element.Checked = null;
+                Element.Lang     = Lang.Val;
+                Element.Checked  = null;
+                Element.Variants = null;
             }
         }
     }
 
     this.SpellChecker.RecalcId = this.LogicDocument.RecalcId;
     this.SpellChecker.ParaId   = this.Get_Id();
-    this.SpellChecker.Check(ParaForceRedraw);
+    this.SpellChecker.Check(ParaForceRedraw );
 
     this.RecalcInfo.Recalc_0_Spell.Type = pararecalc_0_Spell_None;
 };
