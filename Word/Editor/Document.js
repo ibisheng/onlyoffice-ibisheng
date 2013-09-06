@@ -1519,7 +1519,7 @@ CDocument.prototype =
             }
 
             // Простое добавление стиля, без дополнительных действий
-            if ( NextId === this.Styles.Get_Default_Paragraph() )
+            if ( NextId === this.Styles.Get_Default_Paragraph() || NextId === this.Styles.Get_Default_ParaList() )
                 NewParagraph.Style_Remove();
             else
                 NewParagraph.Style_Add_Open( NextId );

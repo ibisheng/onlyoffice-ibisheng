@@ -4897,7 +4897,7 @@ Paragraph.prototype =
             Element = aSpelling.Get_Next();
             while ( null != Element )
             {
-                pGraphics.drawHorLine(0, Element.y0, Element.x0, Element.x1, Element.w );
+                pGraphics.DrawSpellingLine(Element.y0, Element.x0, Element.x1, Element.w);
                 Element = aSpelling.Get_Next();
             }
         }

@@ -2025,6 +2025,11 @@ CGraphics.prototype =
             this.SetIntegerGrid(false);
     },
 
+    DrawSpellingLine : function(y0, x0, x1, w)
+    {
+        this.drawHorLine(0, y0, x0, x1, w );
+    },
+
     // smart methods for horizontal / vertical lines
     drawHorLine : function(align, y, x, r, penW)
     {
