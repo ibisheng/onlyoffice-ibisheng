@@ -599,9 +599,11 @@ CStyle.prototype =
 
     Create_Header : function()
     {
-        // TODO: Как только будут реализованы правый и центральный табы, добавить их тут
         this.uiPriority     = 99;
         this.unhideWhenUsed = true;
+
+        var RPos = Page_Width - X_Left_Margin - X_Right_Margin;
+        var CPos = RPos / 2;
 
         var ParaPr =
         {
@@ -610,12 +612,27 @@ CStyle.prototype =
                 After    : 0,
                 Line     : 1,
                 LineRule : linerule_Auto
+            },
+
+            Tabs :
+            {
+                Tabs :
+                    [
+                        {
+                            Value : tab_Center,
+                            Pos   : CPos
+                        },
+                        {
+                            Value : tab_Right,
+                            Pos   : RPos
+                        }
+                    ]
             }
         };
 
         var TextPr =
         {
-            FontSize  : 10,
+            FontSize  : 11,
             FontFamily: { Name : "Arial", Index : -1 },
             Color     : { r : 0x00, g : 0x00, b : 0x00 }
         };
@@ -626,9 +643,11 @@ CStyle.prototype =
 
     Create_Footer : function()
     {
-        // TODO: Как только будут реализованы правый и центральный табы, добавить их тут
         this.uiPriority     = 99;
         this.unhideWhenUsed = true;
+
+        var RPos = Page_Width - X_Left_Margin - X_Right_Margin;
+        var CPos = RPos / 2;
 
         var ParaPr =
         {
@@ -637,12 +656,27 @@ CStyle.prototype =
                 After    : 0,
                 Line     : 1,
                 LineRule : linerule_Auto
+            },
+
+            Tabs :
+            {
+                Tabs :
+                    [
+                        {
+                            Value : tab_Center,
+                            Pos   : CPos
+                        },
+                        {
+                            Value : tab_Right,
+                            Pos   : RPos
+                        }
+                    ]
             }
-        }
+        };
 
         var TextPr =
         {
-            FontSize  : 10,
+            FontSize  : 11,
             FontFamily: { Name : "Arial", Index : -1 },
             Color     : { r : 0x00, g : 0x00, b : 0x00 }
         };
