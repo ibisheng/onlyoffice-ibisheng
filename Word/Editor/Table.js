@@ -19797,6 +19797,12 @@ CTableCell.prototype =
 
             this.Set_Margins( Margins_new, -1 );
         }
+
+        // W
+        if ( undefined === OtherPr.TableCellW )
+            this.Set_W( undefined );
+        else
+            this.Set_W( OtherPr.TableCellW.Copy() );
     },
 
     Get_W : function()
