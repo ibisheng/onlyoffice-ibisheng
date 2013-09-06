@@ -109,7 +109,7 @@ JSCompiler_StaticMethods__moveRecalcGraph:VO
 c_oSerWorksheetsTypes$ConditionalFormatting:SD
 JSCompiler_StaticMethods_createWorksheet:AN
 c_oSer_TableColumns$TableColumn:LF
-monthShort:Gc
+monthShort:Fc
 c_oSerXfsTypes$BorderId:KC
 ETableStyleType$tablestyletypeLastTotalCell:KJ
 c_oSer_PrintOptions$Headings:wF
@@ -171,7 +171,7 @@ JSCompiler_StaticMethods_getID:zf
 c_oAscError$ID$UserCountExceed:A8
 tt_face_lookup_table:Cn
 JSCompiler_StaticMethods_Internal_IncDecFontSize:Q6
-JSCompiler_StaticMethods_setChartBinary:Kg
+JSCompiler_StaticMethods_setChartBinary:Lg
 numbering_lvltext_Text:m4
 c_oSerXfsTypes$ApplyFont:IC
 UndoRedoDataDocContentRemoveItems:fR
@@ -259,7 +259,7 @@ JSCompiler_StaticMethods_setConditionalFormattingStyle:BP
 cError:T
 CImageShape:qg
 PS_Table_FuncsRec:Zm
-JSCompiler_StaticMethods_getCells:Lg
+JSCompiler_StaticMethods_getCells:Mg
 dublicate_bbox:Jk
 X_Right_Margin:x5
 tt_cmap6_char_next:Do
@@ -430,7 +430,7 @@ nSldLtTObjOnly:uV
 c_Date1904Const:yA
 JSCompiler_StaticMethods_isTextFormat:zd
 EBorderStyle$borderstyleMediumDashDotDot:KI
-JSCompiler_StaticMethods_TurnOff:Rg
+JSCompiler_StaticMethods_TurnOff:Kg
 c_oSer_DateGroupItem$DateTimeGrouping:pG
 ps_parser_to_token:Hm
 c_oSer_SheetPr$EnableFormatConditionsCalculation:tI
@@ -440,7 +440,7 @@ JSCompiler_StaticMethods_setFormulaCA:dN
 ETableStyleType$tablestyletypeWholeTable:YJ
 tt_size_init:ht
 CAscColorScheme:K7
-TT_NameTableRec:nk
+TT_NameTableRec:lk
 FORMULA_TYPE_MULT_DIV:gX
 cErrorType$wrong_value_type:sA
 c_oSer_DynamicFilter$Val:CG
@@ -910,7 +910,7 @@ c_oSer_DateGroupItem$Minute:sG
 c_oAscColor$COLOR_TYPE_PRST:H0
 c_oSer_ColorFilter$DxfId:FG
 JSCompiler_StaticMethods_getHidden:IN
-getNumberParts:Yc
+getNumberParts:Xc
 recalcresult_NextElement:S5
 CBoundsController:A7
 Spline:f2
@@ -1192,7 +1192,7 @@ para_CommentEnd:Jh
 JSCompiler_StaticMethods_setColHidden:HO
 lcid_enUS:e4
 c_oAscTypeSelectElement$Image:P8
-CLASS_TYPE_PARAGRAPH:C3
+CLASS_TYPE_PARAGRAPH:B3
 c_oSerWorksheetsTypes$Drawings:JD
 tt_face_get_location:Vs
 JSCompiler_StaticMethods_setY:d7
@@ -1473,7 +1473,7 @@ c_oAscLockTypes$kLockTypeOther2:Pz
 c_oAscRecalcIndexTypes$RecalcIndexAdd:$z
 g_nVerticalTextAngle:TL
 CShapeColor:aY
-JSCompiler_StaticMethods_setChart:Mg
+JSCompiler_StaticMethods_setChart:Og
 BULLET_TYPE_BULLET_CHAR:YW
 ETableStyleType$tablestyletypeThirdRowSubheading:UJ
 c_oAscMouseMoveLockedObjectType$TableProperties:Zz
@@ -1683,7 +1683,7 @@ CDocumentBorder:nY
 JSCompiler_StaticMethods__setScrollerHW:DS
 getFullImageSrc:Ge
 JSCompiler_StaticMethods_onEndTriggerAction:iO
-TT_Header:Bk
+TT_Header:Ak
 cElementType$empty:fA
 TextAddInGroup:B1
 ps_table_funcs:nn
@@ -1736,7 +1736,7 @@ nSldLtTSecHead:yV
 JSCompiler_StaticMethods_shiftFormat:vd
 FontStyle$FontStyleItalic:Qw
 nSldLtTTxAndChart:HV
-JSCompiler_StaticMethods_TurnOn:Sg
+JSCompiler_StaticMethods_TurnOn:Ng
 CBg:cV
 CParaLineMetrics:S6
 BinaryChartWriter:xK
@@ -2666,7 +2666,7 @@ g_bDate1904:ka
 g_nNextWorksheetId:IM
 t1_services:Tv
 EVerticalAlignment$verticalalignmentBottom:mJ
-c_oAscInsertOptions$InsertColumns:Ng
+c_oAscInsertOptions$InsertColumns:Pg
 L 159:en
 L 158:l8
 FT_Lookup_Renderer:hw
@@ -2712,7 +2712,7 @@ c_oAscPrintDefaultSettings$PageRightField:$N
 L 154:Oi
 L 155:Xu
 L 156:dn
-L 157:Fc
+L 157:Gc
 ft_adobe_glyph_list:sl
 JSCompiler_StaticMethods__shiftCellsLeft:ZO
 cRef:XA
@@ -2771,7 +2771,7 @@ ft_sid_names:pl
 T1_Decoder_ZoneRec:ln
 L 102:Rf
 L 101:Qf
-L 100:Ak
+L 100:Bk
 c_oAscAsyncAction$Recalc:hN
 CColorModifiers:jT
 normalizeRotate:ch
@@ -2844,7 +2844,7 @@ tt_face_load_sbit_image:ko
 c_oSerStylesTypes$NumFmt:lC
 ft_smooth_transform:qq
 c_oSer_SheetPr$CodeName:sI
-c_oAscDeleteOptions$DeleteColumns:Pg
+c_oAscDeleteOptions$DeleteColumns:Rg
 Binary_OtherTableReader:qL
 CBulletType:aX
 c_oSer_DateGroupItem$Hour:rG
@@ -2898,7 +2898,7 @@ asc_CCellCommentator:pR
 JSCompiler_StaticMethods_moveRow:qB
 tt_cmap14_char_next:Zo
 Get_Interface:Uv
-c_oAscDeleteOptions$DeleteRows:Qg
+c_oAscDeleteOptions$DeleteRows:Sg
 c_oSer_ConditionalFormattingRule$ColorScale:SH
 CShapeStyle:KU
 postLoadScript:zx
@@ -3064,7 +3064,7 @@ c_oAscCellEditorState$editEnd:rS
 FontStyle$FontStyleRegular:Ow
 GX_BlendRec:As
 rgCols:Ob
-L 49:Xc
+L 49:Yc
 c_oSerHyperlinkTypes$Tooltip:iE
 L 48:Kb
 L 45:De
@@ -3218,7 +3218,7 @@ asc_CParagraphProperty:Pf
 TT_Forget_Glyph_Frame:Ps
 gray_record_cell:Sp
 cString:KA
-L 70:lk
+L 70:mk
 L 72:jl
 FT_PEEK_USHORT:Ii
 L 71:il
@@ -3233,7 +3233,7 @@ L 69:uj
 Ins_MSIRP:Xr
 L 66:Nc
 L 67:db
-c_oAscInsertOptions$InsertRows:Og
+c_oAscInsertOptions$InsertRows:Qg
 JSCompiler_StaticMethods__shiftCellsBottom:fP
 JSCompiler_StaticMethods_addSlaveEdge:QM
 JSCompiler_StaticMethods_Internal_Get_ClearPos:G5
@@ -3245,7 +3245,7 @@ JSCompiler_StaticMethods_Calculate_X_Value:Hf
 L 99:Bl
 L 95:rc
 c_oSer_SheetPr$FilterMode:uI
-L 96:mk
+L 96:nk
 L 97:vg
 L 98:qh
 c_oSer_ChartCatAxType$Title:IZ
