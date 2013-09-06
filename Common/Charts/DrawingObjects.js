@@ -141,6 +141,7 @@ function asc_CChart(object) {
 	this.type = bCopy ? object.type : null;
 	this.subType = bCopy ? object.subType : c_oAscChartSubType.normal;
 	
+	this.bChartEditor = bCopy ? object.bChartEditor : false;
 	this.bShowValue = bCopy ? object.bShowValue : false;
 	this.bShowBorder = bCopy ? object.bShowBorder : true;
 	this.styleId = bCopy ? object.styleId : c_oAscChartStyle.Standart;
@@ -239,6 +240,7 @@ asc_CChart.prototype = {
 		var api_sheet = window["Asc"]["editor"];
 		var api = api_sheet ? api_sheet : api_doc;
 		
+		this.bChartEditor = true;
 		this.header.title = "2012 Olympics Medal Standings";
 		this.range.interval = "Sheet1!A1:D7";
 		var Cat = { Formula: "Sheet1!A2:A7", NumCache: [createItem("USA"), createItem("CHN"), createItem("RUS"), createItem("GBR"), createItem("GER"), createItem("JPN")] };
@@ -580,6 +582,7 @@ asc_CChart.prototype = {
 		Writer.WriteString2( this.subType );
 		Writer.WriteLong( this.styleId );
 		
+		Writer.WriteBool( this.bChartEditor );
 		Writer.WriteBool( this.bShowValue );
 		Writer.WriteBool( this.bShowBorder );
 		
@@ -667,6 +670,7 @@ asc_CChart.prototype = {
 		this.subType = Reader.GetString2();
 		this.styleId = Reader.GetLong();
 		
+		this.bChartEditor = Reader.GetBool();
 		this.bShowValue = Reader.GetBool();
 		this.bShowBorder = Reader.GetBool();
 		
@@ -3397,6 +3401,8 @@ function DrawingObjects() {
 		else if ( isObject(chart) && chart["binary"] ) {
 			
 			//try {
+			
+				History.TurnOff();
 				var graphicObject = new CChartAsGroup(null, _this);
 				graphicObject.setChartBinary(chart["binary"]);
 				
@@ -3482,6 +3488,7 @@ function DrawingObjects() {
 					}
 				}
 				worksheet._updateCellsRange(graphicObject.chart.range.intervalObject.getBBox0());
+				History.TurnOn();
 			/*}
 			catch (e) {
 				e.message = "Error paste chart";
