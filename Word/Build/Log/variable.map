@@ -501,7 +501,7 @@ JSCompiler_StaticMethods_getSelectionState:QF
 changestype_None:mH
 TT_Set_MM_Blend:Qy
 asc_CSpellCheckProperty:c7
-TBBox:bD
+TBBox:aD
 c_oSer_sts$Style_semiHidden:zX
 JSCompiler_StaticMethods_Set_WrappingType:EF
 historyitem_ChangeLine:DJ
@@ -1459,7 +1459,7 @@ documentVKey:o6
 FT_Module:Cr
 c_oSerPoint2D$Y:J_
 c_oSerPoint2D$X:I_
-ps_parser_load_field:jt
+ps_parser_load_field:it
 ArcToOnCanvas:CN
 g_aLcidNameIdArray:s2
 JSCompiler_StaticMethods_Read_RowPr:Z1
@@ -2166,7 +2166,7 @@ c_oSer_sts$Style_Name:oX
 c_oSerTableTypes$Signature:sW
 CFF_CharsetRec:Fz
 changestype_2_Element_and_Type:JE
-ps_tofixedarray:ht
+ps_tofixedarray:ft
 c_oAscChartLegend$left:mf
 SlideLayout:Hh
 JSCompiler_StaticMethods_Supplement_FramePr:MS
@@ -2447,7 +2447,7 @@ WRAPPING_TYPE_SQUARE:xI
 CParaPr:dE
 WRAPPING_TYPE_TIGHT:AI
 DecodeGeneralFormat_Raw:hh
-T1_TokenRec:et
+T1_TokenRec:ct
 drawChart:Fn
 c_oSerProp_secPrType$pgSz:QY
 FT_Set_Char_Size:cC
@@ -2662,7 +2662,7 @@ CBounds:v4
 c_oSerProp_pPrType$Spacing_BeforeAuto:lY
 TRaster:pw
 cff_index_init:bA
-L 124:xt
+L 124:yt
 c_oSer_CommentsType$UserId:Y_
 L 123:HC
 L 122:GC
@@ -2714,7 +2714,7 @@ historyitem_ChangeDiagram2:hK
 heightrule_Exact:KP
 ShapeForResizeInGroup:CK
 L 111:FC
-L 110:it
+L 110:jt
 L 113:zo
 L 112:c5
 bIsSupportOriginalFormatFonts:fD
@@ -2830,7 +2830,7 @@ c_oAscAsyncAction$UploadImage:B5
 IS_PS_TOKEN:qs
 c_oMainTables$SlideMasters:xj
 SPH_TweakRule:Xw
-PS_TableRec:yt
+PS_TableRec:xt
 drawing_Anchor:DF
 c_oSerImageType2$WrapTight:c_
 CTableOutline:PV
@@ -2978,8 +2978,8 @@ T1_Loader:GB
 L 59:nm
 nSldLtTClipArtAndTx:IL
 L 58:eC
-L 57:dt
-L 56:ct
+L 57:et
+L 56:dt
 L 55:no
 L 54:tq
 L 53:ll
@@ -3029,7 +3029,7 @@ Direct_Move_Orig_Y:Dx
 CApp:Ch
 FT_Set_Charmap:jB
 c_oMainTables$FontMap:Fj
-cff_size_done:uA
+cff_size_done:tA
 c_oMainTables$Main:mj
 ShapeForRotateInGroup:wH
 JSCompiler_StaticMethods_CreatePlaces:MC
@@ -3172,7 +3172,7 @@ L 99:pm
 L 95:wq
 L 96:om
 L 97:xq
-L 98:gt
+L 98:ht
 c_oSer_ChartCatAxType$Title:tl
 STATES_ID_PRE_RESIZE:wG
 c_oSerImageType2$WrapSquare:a_
@@ -3180,7 +3180,7 @@ ParaPresentationNumbering:jO
 SPH_ScaleRule:Yw
 L 92:Nw
 L 91:gC
-L 94:ft
+L 94:gt
 nSldLtTObjTx:RL
 L 93:gk
 JSCompiler_StaticMethods_Document_UpdateUndoRedoState:bP
