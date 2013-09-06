@@ -935,7 +935,12 @@
                 //приведение к первому порядку для дальнейших вычислений
                 var secPart = max.toString().split('.');
                 var numPow = 1;
-                if(0 != secPart[0])
+				if(secPart[1] && secPart[1].toString().search('e+') != -1 && secPart[0] && secPart[0].toString().length == 1)
+				{
+					var expNum = secPart[1].toString().split('e+');
+					numPow = Math.pow(10, expNum[1]);
+				}
+                else if(0 != secPart[0])
                     numPow = Math.pow(10, secPart[0].toString().length - 1)
                 max = max/numPow;
 				if((min == 0 && max == 0) ||(isNaN(min) && isNaN(max)))
@@ -1016,13 +1021,14 @@
                 var arrDiffVal1 = [0,0.2,0.5,1,2]
                 if(axisXMin == 0)//если разница между min и max такая, что не нужно масштабировать
                 {
-                    for (var i=0; i<arr.length; i++) {
+                    var trueDiff = 1;
+					for (var i=0; i<arr.length; i++) {
                         if( max >= arr[i] && max <= arr[i+1])
                         {
                             var max1 = arr[i+1];
                             var trueMax;
                             var diff = max1/10;
-                            var trueDiff = diff;
+                            trueDiff = diff;
                             var maxVal;
                             //проверяем есть ли переход в следующий диапазон
                             if(max > arrMaxVal[i+1])
