@@ -5349,7 +5349,7 @@ CParaTabs.prototype =
         // Double : Pos
 
         var Count = Reader.GetLong();
-        this.Tabs = new Array( Count );
+        this.Tabs = new Array();
 
         for ( var Index = 0; Index < Count; Index++ )
         {
