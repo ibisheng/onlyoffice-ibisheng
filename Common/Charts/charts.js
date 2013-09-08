@@ -29,8 +29,11 @@ function ChartRender() {
 		
 		if ( insertChart(chart, activeWorkSheet, width, height, isNewChart) )
 			chartBase64 = chartCanvas.toDataURL();
-		
-		return chartBase64;
+
+        var ret  = chartCanvas;
+        chartCanvas = null;
+        return ret;
+		//return chartBase64;
 	}
 }
 

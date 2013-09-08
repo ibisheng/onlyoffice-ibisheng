@@ -1898,7 +1898,7 @@ function BinaryPPTYLoader()
                     {
                         if (mods[i].name == "alpha")
                         {
-                            uni_fill.transparent = (255 * mods[i].val / 100000) >> 0;
+                            uni_fill.transparent = (255 * mods[i].val / 100) >> 0;
                             mods.splice(i, 1);
                             break;
                         }
