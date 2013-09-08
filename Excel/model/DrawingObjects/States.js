@@ -2671,7 +2671,7 @@ function GroupState(drawingObjectsController, drawingObjects, group)
                                 cur_grouped_object.selectionSetStart(e, x, y);
                                 this.drawingObjectsController.changeCurrentState(new TextAddInGroup(this.drawingObjectsController, this.drawingObjects, this.group, cur_drawing));
                                 if(e.ClickCount < 2)
-                                    cur_drawing.updateSelectionState(this.drawingObjects.drawingDocument);
+                                    cur_grouped_object.updateSelectionState(this.drawingObjects.drawingDocument);
                                 return;
                             }
                         }
@@ -2887,8 +2887,8 @@ function TextAddInGroup(drawingObjectsController, drawingObjects, group, textObj
     };
     this.drawSelection = function(drawingDocument)
     {
-        drawingDocument.DrawTrack(TYPE_TRACK_GROUP_PASSIVE, this.group.getTransform(), 0, 0, this.group.extX, this.group.extY, false/*, selected_objects[i].canRotate()TODO*/);
-        drawingDocument.DrawTrack(TYPE_TRACK_TEXT, this.textObject.getTransform(), 0, 0, this.textObject.extX, this.textObject.extY, false/*, selected_objects[i].canRotate()TODO*/)
+        drawingDocument.DrawTrack(TYPE_TRACK_GROUP_PASSIVE, this.group.getTransform(), 0, 0, this.group.extX, this.group.extY, false, this.group.canRotate());
+        drawingDocument.DrawTrack(TYPE_TRACK_TEXT, this.textObject.getTransform(), 0, 0, this.textObject.extX, this.textObject.extY, false, this.textObject.canRotate());
         this.textObject.drawAdjustments(drawingDocument);
     };
 

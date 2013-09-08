@@ -653,6 +653,10 @@ CTextBody.prototype =
         }
         this.content.Reset(0, 0, _content_width, 20000);
         this.content.Recalculate_Page(0, true );
+        for(var i = 0; i < this.content.Content.length; ++i)
+        {
+            this.content.Content[i].recalculateTextPr();
+        }
     },
 
     OnEndRecalculate_Page: function()

@@ -1397,7 +1397,7 @@ CShape.prototype =
             }
             else
             {
-                this.clipRect = {x: 0, y: 0, w: this.absExtX, h: this.absExtY};
+                this.clipRect = {x: 0, y: 0, w: this.extX, h: this.extY};
             }
         }
         else
@@ -1535,8 +1535,8 @@ CShape.prototype =
             this.clipRect = {
                 x: -l_ins,
                 y: -_vertical_shift - t_ins,
-                w: this.contentWidth + (r_ins + l_ins),
-                h: this.contentHeight + (b_ins + t_ins)
+                w: this.txBody.contentWidth + (r_ins + l_ins),
+                h: this.txBody.contentHeight + (b_ins + t_ins)
             };
         }
         this.invertTransformText = global_MatrixTransformer.Invert(this.transformText);
@@ -1864,15 +1864,19 @@ CShape.prototype =
         {
             graphics.SetIntegerGrid(false);
             graphics.transform3(this.transformText);
+            var clip_rect = this.clipRect;
+            //graphics.AddClipRect(clip_rect.x, clip_rect.y, clip_rect.w, clip_rect.h);
             this.txBody.draw(graphics);
           /*  if (graphics.FreeFont !== undefined)
                 graphics.FreeFont(); */
 
 
             graphics.reset();
+          //  graphics.RestoreGrState();
             graphics.SetIntegerGrid(true);
         }
     },
+
 
     drawTextSelection: function()
     {

@@ -25,7 +25,101 @@ DrawingObjectsController.prototype =
 
     },
 
+
     setCellFontName: function (fontName) {
+        this.checkSelectedObjectsAndCallback(this.setCellFontNameCallBack, [fontName]);
+
+    },
+
+    setCellFontSize: function (fontSize) {
+        this.checkSelectedObjectsAndCallback(this.setCellFontSizeCallBack, [fontSize]);
+
+    },
+
+    setCellBold: function (isBold) {
+        this.checkSelectedObjectsAndCallback(this.setCellBoldCallBack, [isBold]);
+
+    },
+
+    setCellItalic: function (isItalic) {
+        this.checkSelectedObjectsAndCallback(this.setCellItalicCallBack, [isItalic]);
+
+    },
+
+    setCellUnderline: function (isUnderline) {
+        this.checkSelectedObjectsAndCallback(this.setCellUnderlineCallBack, [isUnderline]);
+
+    },
+
+    setCellStrikeout: function (isStrikeout) {
+        this.checkSelectedObjectsAndCallback(this.setCellStrikeoutCallBack, [isStrikeout]);
+
+    },
+
+    setCellSubscript: function (isSubscript) {
+        this.checkSelectedObjectsAndCallback(this.setCellSubscriptCallBack, [isSubscript]);
+
+    },
+
+    setCellSuperscript: function (isSuperscript) {
+        this.checkSelectedObjectsAndCallback(this.setCellSuperscriptCallBack, [isSuperscript]);
+
+    },
+
+    setCellAlign: function (align) {
+        this.checkSelectedObjectsAndCallback(this.setCellAlignCallBack, [align]);
+
+    },
+
+    setCellVertAlign: function (align) {
+        this.checkSelectedObjectsAndCallback(this.setCellVertAlignCallBack, [align]);
+
+    },
+
+    setCellTextWrap: function (isWrapped) {
+        this.checkSelectedObjectsAndCallback(this.setCellTextWrapCallBack, [isWrapped]);
+
+    },
+
+    setCellTextShrink: function (isShrinked) {
+        this.checkSelectedObjectsAndCallback(this.setCellTextShrinkCallBack, [isShrinked]);
+
+    },
+
+    setCellTextColor: function (color) {
+        this.checkSelectedObjectsAndCallback(this.setCellTextColorCallBack, [color]);
+
+    },
+
+    setCellBackgroundColor: function (color) {
+        this.checkSelectedObjectsAndCallback(this.setCellBackgroundColorCallBack, [color]);
+
+    },
+
+
+    setCellAngle: function (angle) {
+        this.checkSelectedObjectsAndCallback(this.setCellAngleCallBack, [angle]);
+
+    },
+
+    setCellStyle: function (name) {
+        this.checkSelectedObjectsAndCallback(this.setCellStyleCallBack, [name]);
+
+    },
+
+    // Увеличение размера шрифта
+    increaseFontSize: function () {
+        this.checkSelectedObjectsAndCallback(this.increaseFontSizeCallBack, []);
+
+    },
+
+    // Уменьшение размера шрифта
+    decreaseFontSize: function () {
+        this.checkSelectedObjectsAndCallback(this.decreaseFontSizeCallBack, []);
+
+    },
+
+    setCellFontNameCallBack: function (fontName) {
         if(typeof this.curState.setCellFontName === "function")
         {
             History.Create_NewPoint();
@@ -33,7 +127,7 @@ DrawingObjectsController.prototype =
         }
     },
 
-    setCellFontSize: function (fontSize) {
+    setCellFontSizeCallBack: function (fontSize) {
         if(typeof this.curState.setCellFontSize === "function")
         {
             History.Create_NewPoint();
@@ -41,7 +135,7 @@ DrawingObjectsController.prototype =
         }
     },
 
-    setCellBold: function (isBold) {
+    setCellBoldCallBack: function (isBold) {
         if(typeof this.curState.setCellBold === "function")
         {
             History.Create_NewPoint();
@@ -49,7 +143,7 @@ DrawingObjectsController.prototype =
         }
     },
 
-    setCellItalic: function (isItalic) {
+    setCellItalicCallBack: function (isItalic) {
         if(typeof this.curState.setCellItalic === "function")
         {
             History.Create_NewPoint();
@@ -57,7 +151,7 @@ DrawingObjectsController.prototype =
         }
     },
 
-    setCellUnderline: function (isUnderline) {
+    setCellUnderlineCallBack: function (isUnderline) {
         if(typeof this.curState.setCellUnderline === "function")
         {
             History.Create_NewPoint();
@@ -65,7 +159,7 @@ DrawingObjectsController.prototype =
         }
     },
 
-    setCellStrikeout: function (isStrikeout) {
+    setCellStrikeoutCallBack: function (isStrikeout) {
         if(typeof this.curState.setCellStrikeout === "function")
         {
             History.Create_NewPoint();
@@ -73,7 +167,7 @@ DrawingObjectsController.prototype =
         }
     },
 
-    setCellSubscript: function (isSubscript) {
+    setCellSubscriptCallBack: function (isSubscript) {
         if(typeof this.curState.setCellSubscript === "function")
         {
             History.Create_NewPoint();
@@ -81,7 +175,7 @@ DrawingObjectsController.prototype =
         }
     },
 
-    setCellSuperscript: function (isSuperscript) {
+    setCellSuperscriptCallBack: function (isSuperscript) {
         if(typeof this.curState.setCellSuperscript === "function")
         {
             History.Create_NewPoint();
@@ -89,7 +183,7 @@ DrawingObjectsController.prototype =
         }
     },
 
-    setCellAlign: function (align) {
+    setCellAlignCallBack: function (align) {
         if(typeof this.curState.setCellAlign === "function")
         {
             History.Create_NewPoint();
@@ -97,7 +191,7 @@ DrawingObjectsController.prototype =
         }
     },
 
-    setCellVertAlign: function (align) {
+    setCellVertAlignCallBack: function (align) {
         if(typeof this.curState.setCellVertAlign === "function")
         {
             History.Create_NewPoint();
@@ -105,7 +199,7 @@ DrawingObjectsController.prototype =
         }
     },
 
-    setCellTextWrap: function (isWrapped) {
+    setCellTextWrapCallBack: function (isWrapped) {
         if(typeof this.curState.setCellTextWrap === "function")
         {
             History.Create_NewPoint();
@@ -113,7 +207,7 @@ DrawingObjectsController.prototype =
         }
     },
 
-    setCellTextShrink: function (isShrinked) {
+    setCellTextShrinkCallBack: function (isShrinked) {
         if(typeof this.curState.setCellTextShrink === "function")
         {
             History.Create_NewPoint();
@@ -121,7 +215,7 @@ DrawingObjectsController.prototype =
         }
     },
 
-    setCellTextColor: function (color) {
+    setCellTextColorCallBack: function (color) {
         if(typeof this.curState.setCellTextColor === "function")
         {
                 History.Create_NewPoint();
@@ -130,7 +224,7 @@ DrawingObjectsController.prototype =
 
     },
 
-    setCellBackgroundColor: function (color) {
+    setCellBackgroundColorCallBack: function (color) {
         if(typeof this.curState.setCellBackgroundColor === "function")
         {
                 History.Create_NewPoint();;
@@ -139,7 +233,7 @@ DrawingObjectsController.prototype =
     },
 
 
-    setCellAngle: function (angle) {
+    setCellAngleCallBack: function (angle) {
         if(typeof this.curState.setCellAngle === "function")
         {
             History.Create_NewPoint();
@@ -147,7 +241,7 @@ DrawingObjectsController.prototype =
         }
     },
 
-    setCellStyle: function (name) {
+    setCellStyleCallBack: function (name) {
         if(typeof this.curState.setCellStyle === "function")
         {
             History.Create_NewPoint();
@@ -156,7 +250,7 @@ DrawingObjectsController.prototype =
     },
 
     // Увеличение размера шрифта
-    increaseFontSize: function () {
+    increaseFontSizeCallBack: function () {
         if(typeof this.curState.increaseFontSize === "function")
         {
             History.Create_NewPoint();
@@ -165,7 +259,7 @@ DrawingObjectsController.prototype =
     },
 
     // Уменьшение размера шрифта
-    decreaseFontSize: function () {
+    decreaseFontSizeCallBack: function () {
         if(typeof this.curState.decreaseFontSize === "function")
         {
             History.Create_NewPoint();
@@ -859,7 +953,7 @@ DrawingObjectsController.prototype =
                             shape_props.ShapeProperties.stroke = c_obj.getStroke();
                             shape_props.ShapeProperties.canChangeArrows = c_obj.canChangeArrows();
                             shape_props.ShapeProperties.paddings = c_obj.getPaddings();
-
+                            shape_props.ShapeProperties.IsLocked = !(c_obj.lockType === c_oAscLockTypes.kLockTypeNone || c_obj.lockType === c_oAscLockTypes.kLockTypeNone);
                             shape_props.verticalTextAlign = isRealObject(c_obj.txBody) ? c_obj.txBody.getBodyPr().anchor : null;
                         }
                         else
@@ -870,7 +964,7 @@ DrawingObjectsController.prototype =
                              ShapeProperties.stroke = c_obj.getStroke();
                              ShapeProperties.canChangeArrows = c_obj.canChangeArrows();
                              ShapeProperties.paddings = c_obj.getPaddings();
-
+                             ShapeProperties.IsLocked = !(c_obj.lockType === c_oAscLockTypes.kLockTypeNone || c_obj.lockType === c_oAscLockTypes.kLockTypeNone);
                              shape_props =  c_obj.Get_Props(shape_props);
                              shape_props.ShapeProperties = CompareShapeProperties(ShapeProperties, shape_props.ShapeProperties);
                              shape_props.verticalTextAlign = undefined;
@@ -884,12 +978,15 @@ DrawingObjectsController.prototype =
                             image_props.Width = c_obj.extX;
                             image_props.Height = c_obj.extY;
                             image_props.ImageUrl = c_obj.getImageUrl();
+                            image_props.IsLocked = !(c_obj.lockType === c_oAscLockTypes.kLockTypeNone || c_obj.lockType === c_oAscLockTypes.kLockTypeNone);
                         }
                         else
                         {
+                            var locked = !(c_obj.lockType === c_oAscLockTypes.kLockTypeNone|| c_obj.lockType === c_oAscLockTypes.kLockTypeNone) || image_props.IsLocked;
                              image_props = c_obj.Get_Props(image_props);
                              if (image_props.ImageUrl != null && c_obj.getImageUrl() !== image_props.ImageUrl)
                                 image_props.ImageUrl = null;
+                            image_props.IsLocked = locked;
 
                         }
                     }
@@ -1078,154 +1175,170 @@ DrawingObjectsController.prototype =
 	
 	setGraphicObjectProps: function(props)
 	{
+        this.checkSelectedObjectsAndCallback(this.setGraphicObjectPropsCallBack, [props])
+	},
+
+    checkSelectedObjectsAndCallback: function(callback, args)
+    {
+
+        var selection_state = this.getSelectionState();
+        this.drawingObjects.objectLocker.reset();
+        for(var i = 0; i < this.selectedObjects.length; ++i)
+        {
+            this.drawingObjects.objectLocker.addObjectId(this.selectedObjects[i].Get_Id());
+        }
+        var _this = this;
+        var callback2 = function(bLock)
+        {
+            if(bLock)
+            {
+                _this.setSelectionState(selection_state);
+                callback.apply(_this, args);
+            }
+        };
+        this.drawingObjects.objectLocker.checkObjects(callback2);
+    },
+
+    setGraphicObjectPropsCallBack: function(props)
+    {
+
         History.Create_NewPoint();
-		var properties;
+        var properties;
         if ( (props instanceof asc_CImgProperty) && props.ShapeProperties )
             properties = props.ShapeProperties;
         else
             properties = props;
-        
+
         if (isRealObject(properties) || isRealObject(props))
-        {		
-			if (isRealObject(props) && typeof props.verticalTextAlign === "number" && !isNaN(props.verticalTextAlign))
-			{
-				if (this.curState.id === STATES_ID_TEXT_ADD)
-				{
-					if(typeof this.curState.textObject.GraphicObj.setTextVerticalAlign === "function")
-						this.curState.textObject.GraphicObj.setTextVerticalAlign(props.verticalTextAlign);
-				}
+        {
+            if (isRealObject(props) && typeof props.verticalTextAlign === "number" && !isNaN(props.verticalTextAlign))
+            {
+                if (this.curState.id === STATES_ID_TEXT_ADD)
+                {
+                    if(typeof this.curState.textObject.GraphicObj.setTextVerticalAlign === "function")
+                        this.curState.textObject.GraphicObj.setTextVerticalAlign(props.verticalTextAlign);
+                }
 
-				if (this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP)
-				{
-					if (typeof this.curState.textObject.setTextVerticalAlign === "function")
-						this.curState.textObject.setTextVerticalAlign(props.verticalTextAlign);
-				}
-			}
-			if ( !(this.curState.id === STATES_ID_GROUP || this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP) )
-			{
-				var ArrGlyph = this.selectedObjects;
-				for (var i = 0;  i< ArrGlyph.length; ++i)
-				{
-					if ( undefined != properties.Width || undefined != properties.Height )
-					{
-						var result_width, result_height;
-						var b_is_line = ArrGlyph[i].checkLine();
-						if (properties.Width != undefined)
-							if (properties.Width >= MIN_SHAPE_SIZE || b_is_line)
-								result_width = properties.Width;
-							else
-								result_width = MIN_SHAPE_SIZE;
-						else
-							result_width = ArrGlyph[i].extX;
+                if (this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP)
+                {
+                    if (typeof this.curState.textObject.setTextVerticalAlign === "function")
+                        this.curState.textObject.setTextVerticalAlign(props.verticalTextAlign);
+                }
+            }
+            if ( !(this.curState.id === STATES_ID_GROUP || this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP) )
+            {
+                var ArrGlyph = this.selectedObjects;
+                for (var i = 0;  i< ArrGlyph.length; ++i)
+                {
+                    if ( undefined != properties.Width || undefined != properties.Height )
+                    {
+                        var result_width, result_height;
+                        var b_is_line = ArrGlyph[i].checkLine();
+                        if (properties.Width != undefined)
+                            if (properties.Width >= MIN_SHAPE_SIZE || b_is_line)
+                                result_width = properties.Width;
+                            else
+                                result_width = MIN_SHAPE_SIZE;
+                        else
+                            result_width = ArrGlyph[i].extX;
 
-						if (properties.Height != undefined)
-							if(properties.Height >= MIN_SHAPE_SIZE || b_is_line)
-								result_height = properties.Height;
-							else
-								result_height = MIN_SHAPE_SIZE;
-						else
-							result_height = ArrGlyph[i].extY;
+                        if (properties.Height != undefined)
+                            if(properties.Height >= MIN_SHAPE_SIZE || b_is_line)
+                                result_height = properties.Height;
+                            else
+                                result_height = MIN_SHAPE_SIZE;
+                        else
+                            result_height = ArrGlyph[i].extY;
 
-						if (ArrGlyph[i].isShape() || ArrGlyph[i].isImage())
-						{				
-							ArrGlyph[i].setExtents(result_width, result_height);
-							ArrGlyph[i].setXfrm(null, null, result_width, result_height, null, null, null);
-							ArrGlyph[i].recalculateTransform();
-							ArrGlyph[i].calculateContent();
-							ArrGlyph[i].calculateTransformTextMatrix();
-						}
-					}
-				
-					else if (ArrGlyph[i].isImage())
-					{
-						ArrGlyph[i].setRasterImage(props.ImageUrl);
-					}
-					
-					else if (((ArrGlyph[i].isShape()) || (ArrGlyph[i].isGroup())))
-					{
-						if (properties.type != undefined && properties.type != -1)
-						{
-							ArrGlyph[i].changePresetGeometry(properties.type);
-						}
-						if (properties.fill)
-						{
-							ArrGlyph[i].changeFill(properties.fill);
-						}
-						if (properties.stroke)
-						{
-							ArrGlyph[i].changeLine(properties.stroke);
-						}
+                        if (ArrGlyph[i].isShape() || ArrGlyph[i].isImage())
+                        {
+                            ArrGlyph[i].setExtents(result_width, result_height);
+                            ArrGlyph[i].setXfrm(null, null, result_width, result_height, null, null, null);
+                            ArrGlyph[i].recalculateTransform();
+                            ArrGlyph[i].calculateContent();
+                            ArrGlyph[i].calculateTransformTextMatrix();
+                        }
+                    }
+
+                    else if (ArrGlyph[i].isImage())
+                    {
+                        ArrGlyph[i].setRasterImage(props.ImageUrl);
+                    }
+
+                    else if (((ArrGlyph[i].isShape()) || (ArrGlyph[i].isGroup())))
+                    {
+                        if (properties.type != undefined && properties.type != -1)
+                        {
+                            ArrGlyph[i].changePresetGeometry(properties.type);
+                        }
+                        if (properties.fill)
+                        {
+                            ArrGlyph[i].changeFill(properties.fill);
+                        }
+                        if (properties.stroke)
+                        {
+                            ArrGlyph[i].changeLine(properties.stroke);
+                        }
                         if(properties.paddings)
                         {
                             ArrGlyph[i].setPaddings(properties.paddings);
                         }
-					}
+                    }
 
-					if (typeof props.verticalTextAlign === "number" && !isNaN(props.verticalTextAlign) && typeof ArrGlyph[i].setTextVerticalAlign === "function")
-					{
-						ArrGlyph[i].setTextVerticalAlign(props.verticalTextAlign);
-					}
+                    if (typeof props.verticalTextAlign === "number" && !isNaN(props.verticalTextAlign) && typeof ArrGlyph[i].setTextVerticalAlign === "function")
+                    {
+                        ArrGlyph[i].setTextVerticalAlign(props.verticalTextAlign);
+                    }
                     if(ArrGlyph[i].isChart() && isRealObject(props.ChartProperties))
                     {
                         ArrGlyph[i].setChart(props.ChartProperties, true);
                         ArrGlyph[i].recalculate();
                     }
 
-				}
-			}
-			else if (this.curState.id === STATES_ID_GROUP || this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP)
-			{
-				//if (false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : this.curState.group.parent.Parent, CheckType : changestype_Paragraph_Content} ))
-				{
-					ArrGlyph = this.curState.group.selectedObjects;
-					var b_change_diagram = false;
-					for (i = 0;  i< ArrGlyph.length; ++i)
-					{
-						if (ArrGlyph[i].isShape() && isRealObject(properties))
-						{
-							if (properties.type != undefined && properties.type != -1)
-							{
-								ArrGlyph[i].changePresetGeometry(properties.type);
-							}
-							if (properties.fill)
-							{
-								ArrGlyph[i].changeFill(properties.fill);
-							}
-							if (properties.stroke)
-							{
-								ArrGlyph[i].changeLine(properties.stroke);
-							}
+                }
+            }
+            else if (this.curState.id === STATES_ID_GROUP || this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP)
+            {
+                //if (false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : this.curState.group.parent.Parent, CheckType : changestype_Paragraph_Content} ))
+                {
+                    ArrGlyph = this.curState.group.selectedObjects;
+                    for (i = 0;  i< ArrGlyph.length; ++i)
+                    {
+                        if (ArrGlyph[i].isShape() && isRealObject(properties))
+                        {
+                            if (properties.type != undefined && properties.type != -1)
+                            {
+                                ArrGlyph[i].changePresetGeometry(properties.type);
+                            }
+                            if (properties.fill)
+                            {
+                                ArrGlyph[i].changeFill(properties.fill);
+                            }
+                            if (properties.stroke)
+                            {
+                                ArrGlyph[i].changeLine(properties.stroke);
+                            }
                             if(properties.paddings)
                             {
                                 ArrGlyph[i].setPaddings(properties.paddings);
                             }
-						}
-						else if (isRealObject(props) && typeof  props.ImageUrl === "string" && ArrGlyph[i].isImage())
-						{
-							ArrGlyph[i].setRasterImage(props.ImageUrl);
-						}
+                        }
+                        else if (isRealObject(props) && typeof  props.ImageUrl === "string" && ArrGlyph[i].isImage())
+                        {
+                            ArrGlyph[i].setRasterImage(props.ImageUrl);
+                        }
 
-						if (typeof props.verticalTextAlign === "number" && !isNaN(props.verticalTextAlign) && typeof ArrGlyph[i].setTextVerticalAlign === "function")
-						{
-							ArrGlyph[i].setCellAllVertAlign(props.verticalTextAlign);
-						}
-					}
-					if (b_change_diagram)
-					{
-						/*this.curState.group.updateSizes();
-						this.curState.group.recalculate();
-						var bounds = this.curState.group.parent.getBounds();
-						if (!this.curState.group.parent.Is_Inline())
-							this.curState.group.parent.OnEnd_ChangeFlow(this.curState.group.absOffsetX, this.curState.group.absOffsetY, this.curState.group.pageIndex, bounds.r - bounds.l, bounds.b - bounds.t, null, true, true);
-						else
-							this.curState.group.parent.OnEnd_ResizeInline(bounds.r - bounds.l, bounds.b - bounds.t);   */
-					}
-				}
-			}
-		}
-		this.drawingObjects.showDrawingObjects(true);
-		this.drawingObjects.sendGraphicObjectProps();
-	},
+                        if (typeof props.verticalTextAlign === "number" && !isNaN(props.verticalTextAlign) && typeof ArrGlyph[i].setTextVerticalAlign === "function")
+                        {
+                            ArrGlyph[i].setCellAllVertAlign(props.verticalTextAlign);
+                        }
+                    }
+                }
+            }
+        }
+        this.drawingObjects.showDrawingObjects(true);
+        this.drawingObjects.sendGraphicObjectProps();
+    },
 	
 	applyColorScheme: function()
 	{

@@ -1125,8 +1125,9 @@ CChartAsGroup.prototype =
 
         if ( !this.chart.range.intervalObject )
             this.drawingObjects.intervalToIntervalObject(this.chart);
-        this.brush.fill.RasterImageId = this.drawingObjects.getChartRender().insertChart(this.chart, null, this.drawingObjects.convertMetric(this.extX, 3, 0),this.drawingObjects.convertMetric(this.extY, 3, 0));
-        this.drawingObjects.loadImageRedraw(this.brush.fill.RasterImageId);
+        this.brush.fill.canvas= this.drawingObjects.getChartRender().insertChart(this.chart, null, this.drawingObjects.convertMetric(this.extX, 3, 0),this.drawingObjects.convertMetric(this.extY, 3, 0));
+        this.brush.fill.RasterImageId = "";
+        //this.drawingObjects.loadImageRedraw(this.brush.fill.RasterImageId);
     },
 
     getInvertTransform: function()
@@ -1470,8 +1471,9 @@ CChartAsGroup.prototype =
 
         if ( !this.chart.range.intervalObject )
             this.drawingObjects.intervalToIntervalObject(this.chart);
-        this.brush.fill.RasterImageId = this.drawingObjects.getChartRender().insertChart(this.chart, null, this.drawingObjects.convertMetric(this.extX, 3, 0),this.drawingObjects.convertMetric(this.extY, 3, 0));
-        this.drawingObjects.loadImageRedraw(this.brush.fill.RasterImageId);
+        this.brush.fill.canvas= this.drawingObjects.getChartRender().insertChart(this.chart, null, this.drawingObjects.convertMetric(this.extX, 3, 0),this.drawingObjects.convertMetric(this.extY, 3, 0));
+        this.brush.fill.RasterImageId = "";
+        //this.drawingObjects.loadImageRedraw(this.brush.fill.RasterImageId);
     },
 
     Undo: function(type, data)
@@ -1481,6 +1483,12 @@ CChartAsGroup.prototype =
             case historyitem_AutoShapes_RecalculateTransformUndo:
             {
                 this.recalculate();
+                break;
+            }
+            case historyitem_AutoShapes_Add_To_Drawing_Objects:
+            {
+                this.drawingObjects.deleteDrawingBase(this.Id);
+                break;
             }
         }
     },
@@ -1492,6 +1500,13 @@ CChartAsGroup.prototype =
             case historyitem_AutoShapes_RecalculateTransformRedo:
             {
                 this.recalculate();
+                break;
+            }
+
+            case historyitem_AutoShapes_Add_To_Drawing_Objects:
+            {
+                this.drawingObjects.addGraphicObject(this, data.oldValue);
+                break;
             }
         }
     },

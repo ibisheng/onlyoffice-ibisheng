@@ -181,6 +181,78 @@ Paragraph.prototype =
     },
 
 
+    recalculateFonts: function()
+    {
+        var theme = this.Parent.getTheme();
+        var color_map = this.Parent.getColorMap();
+        var TextPr = this.CompiledPr.Pr.TextPr;
+        if(isRealObject(TextPr.unifill) && isRealObject(TextPr.unifill.fill))
+        {
+            if(typeof TextPr.themeFont === "string")
+            {
+                var font_name = getFontInfo(TextPr.themeFont)(theme.themeElements.fontScheme);
+                TextPr.FontFamily = {Name: font_name, Index: -1};
+            }
+        }
+
+        for(var i = 0; i < this.Content.length; ++i)
+        {
+            if(this.Content[i].Type === para_TextPr)
+            {
+                TextPr = this.Content[i].Value;
+
+                if(typeof TextPr.themeFont === "string")
+                {
+                    var font_name = getFontInfo(TextPr.themeFont)(theme.themeElements.fontScheme);
+                    TextPr.FontFamily = {Name: font_name, Index: -1};
+                }
+            }
+        }
+    },
+
+    recalculateTextPr: function()
+    {
+
+        var theme = this.Parent.getTheme();
+        var color_map = this.Parent.getColorMap();
+        var TextPr = this.CompiledPr.Pr.TextPr;
+        if(isRealObject(TextPr.unifill) && isRealObject(TextPr.unifill.fill))
+        {
+            TextPr.unifill.calculate(theme, color_map, {R:0, G: 0, B: 0, A:255});
+            if(isRealObject(TextPr.unifill.fill.color))
+            {
+                var color = TextPr.unifill.fill.color.RGBA;
+                TextPr.Color = new CDocumentColor(color.R, color.G, color.B);
+            }
+            else if(Array.isArray(TextPr.unifill.fill.colors) && isRealObject(TextPr.unifill.fill.colors[0]))
+            {
+                var color = TextPr.unifill.fill.colors[0].RGBA;
+                TextPr.Color = new CDocumentColor(color.R, color.G, color.B);
+            }
+        }
+
+        for(var i = 0; i < this.Content.length; ++i)
+        {
+            if(this.Content[i].Type === para_TextPr)
+            {
+                TextPr = this.Content[i].Value;
+                if(isRealObject(TextPr.unifill) && isRealObject(TextPr.unifill.fill))
+                {
+                    TextPr.unifill.calculate(theme, color_map, {R:0, G: 0, B: 0, A:255});
+                    if(isRealObject(TextPr.unifill.fill.color))
+                    {
+                        var color = TextPr.unifill.fill.color.RGBA;
+                        TextPr.Color = new CDocumentColor(color.R, color.G, color.B);
+                    }
+                    else if(Array.isArray(TextPr.unifill.fill.colors) && isRealObject(TextPr.unifill.fill.colors[0]))
+                    {
+                        var color = TextPr.unifill.fill.colors[0].RGBA;
+                        TextPr.Color = new CDocumentColor(color.R, color.G, color.B);
+                    }
+                }
+            }
+        }
+    },
 
 
     GetType : function()
@@ -6404,10 +6476,6 @@ Paragraph.prototype =
             var font_name = getFontInfo(TextPr.themeFont)(theme.themeElements.fontScheme);
             TextPr.FontFamily = {Name: font_name, Index: -1};
         }
-
-
-
-
 
         if ( undefined != TextPr.FontFamily )
         {

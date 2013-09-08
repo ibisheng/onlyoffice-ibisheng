@@ -2587,7 +2587,12 @@ UndoRedoGraphicObjects.prototype =
                 {
                     target_object.Undo(Type, Data.drawingData);
                     if(typeof target_object.Refresh_RecalcData === "function")
-                        target_object.Refresh_RecalcData(Type, Data);
+                    {
+                        if(!(target_object instanceof CDocumentContent && (Type ===historyitem_AutoShapes_AddDrawingDocument
+                            || Type ===historyitem_AutoShapes_AddParent || Type ===historyitem_AutoShapes_AddParagraph)))
+                            target_object.Refresh_RecalcData(Type, Data);
+
+                    }
                 }
             }
             else
