@@ -972,7 +972,7 @@ function ResizeTrackShapeImageInGroup(originalObject, cardDirection)
 
         global_MatrixTransformer.TranslateAppend(_transform, this.resizedPosX, this.resizedPosY);
         global_MatrixTransformer.TranslateAppend(_transform, _horizontal_center, _vertical_center);
-        global_MatrixTransformer.MultiplyAppend(_transform, this.originalObject.group.getTransform());
+        global_MatrixTransformer.MultiplyAppend(_transform, this.originalObject.group.getTransformMatrix());
     };
 
     this.resizeRelativeCenter = function(kd1, kd2, ShiftKey)
@@ -1071,7 +1071,7 @@ function ResizeTrackShapeImageInGroup(originalObject, cardDirection)
 
         global_MatrixTransformer.TranslateAppend(_transform, this.resizedPosX, this.resizedPosY);
         global_MatrixTransformer.TranslateAppend(_transform, _horizontal_center, _vertical_center);
-        global_MatrixTransformer.MultiplyAppend(_transform, this.originalObject.group.getTransform());
+        global_MatrixTransformer.MultiplyAppend(_transform, this.originalObject.group.getTransformMatrix());
     };
 
     this.draw = function(overlay)
@@ -1118,12 +1118,9 @@ function ResizeTrackShapeImageInGroup(originalObject, cardDirection)
     {
         var scale_scale_coefficients = this.originalObject.group.getResultScaleCoefficients();
         var xfrm = this.originalObject.group.spPr.xfrm;
-        this.originalObject.setPosition(this.resizedPosX/scale_scale_coefficients.cx + xfrm.chOffX, this.resizedPosY/scale_scale_coefficients.cy + xfrm.chOffY);
+        this.originalObject.setOffset(this.resizedPosX/scale_scale_coefficients.cx + xfrm.chOffX, this.resizedPosY/scale_scale_coefficients.cy + xfrm.chOffY);
         this.originalObject.setExtents(this.resizedExtX/scale_scale_coefficients.cx, this.resizedExtY/scale_scale_coefficients.cy);
         this.originalObject.setFlips(this.resizedflipH, this.resizedflipV);
-        this.originalObject.recalculateTransform();
-        this.originalObject.calculateContent();
-        this.originalObject.calculateTransformTextMatrix();
     };
 }
 
@@ -1745,9 +1742,7 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
     this.trackEnd = function()
     {
 
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateUndo, null, null,
-            new UndoRedoDataGraphicObjects(this.originalObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
-        this.original.setPosition(this.x, this.y);
+        this.original.setOffset(this.x, this.y);
         this.original.setExtents(this.extX, this.extY);
         this.original.setChildExtents(this.extX, this.extY);
         this.original.setFlips(this.flipH, this.flipV);
@@ -1755,11 +1750,7 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
         {
             this.childs[i].trackEnd();
         }
-        if(this.parentTrack == null)
-            this.original.recalculate();
 
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateRedo, null, null,
-            new UndoRedoDataGraphicObjects(this.originalObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
     };
 
 
@@ -1842,7 +1833,7 @@ function ShapeForResizeInGroup(originalObject, parentTrack)
 
     this.trackEnd = function()
     {
-        this.originalObject.setPosition(this.x, this.y);
+        this.originalObject.setOffset(this.x, this.y);
         this.originalObject.setExtents(this.extX, this.extY);
         if(this.originalObject.spPr.geometry !== null)
             this.originalObject.spPr.geometry.Recalculate(this.extX, this.extY);
@@ -2413,34 +2404,12 @@ function ResizeTrackChart(originalObject, cardDirection)
 
     this.trackEnd = function()
     {
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(this.originalObject.Id, new UndoRedoDataShapeRecalc()), null);
-
         this.originalObject.x = this.resizedPosX;
         this.originalObject.y = this.resizedPosY;
         this.originalObject.extX = this.resizedExtX;
         this.originalObject.extY = this.resizedExtY;
-        this.originalObject.setPosition(this.resizedPosX, this.resizedPosY);
+        this.originalObject.setOffset(this.resizedPosX, this.resizedPosY);
         this.originalObject.setExtents(this.resizedExtX, this.resizedExtY);
-        this.originalObject.updateDrawingBaseCoordinates();
-        //  this.originalObject.setFlips(this.resizedflipH, this.resizedflipV);
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(this.originalObject.Id, new UndoRedoDataShapeRecalc()), null);
 
-        this.originalObject.recalculate();
-
-        /*this.originalObject.recalculateTransform();
-        this.originalObject.calculateContent();
-        this.originalObject.calculateTransformTextMatrix();
-       */ var bounds_rect = this.originalObject.getRectBounds();
-        var check_position = this.originalObject.drawingObjects.checkGraphicObjectPosition(bounds_rect.minX, bounds_rect.minY, bounds_rect.maxX - bounds_rect.minX, bounds_rect.maxY - bounds_rect.minY);
-        if(!check_position.result)
-        {
-            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(this.originalObject.Id, new UndoRedoDataShapeRecalc()), null);
-            this.originalObject.setPosition(this.resizedPosX + check_position.x, this.resizedPosY + check_position.y);
-            this.originalObject.x = this.resizedPosX+ check_position.x;
-            this.originalObject.y = this.resizedPosY+ check_position.y;
-            this.originalObject.updateDrawingBaseCoordinates();
-            this.originalObject.recalculate();
-            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(this.originalObject.Id, new UndoRedoDataShapeRecalc()), null);
-        }
     };
 }

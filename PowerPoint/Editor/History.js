@@ -265,6 +265,8 @@ var historyitem_SetShapeOffset = 1;
 var historyitem_SetShapeExtents = 2;
 var historyitem_SetShapeFlips = 3;
 var historyitem_SetShapeParent = 4;
+var historyitem_SetShapeChildOffset = 5;
+var historyitem_SetShapeChildExtents = 6;
 
 
 

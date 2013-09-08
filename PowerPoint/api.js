@@ -3626,11 +3626,11 @@ asc_docs_api.prototype.sync_slidePropCallback = function(slide)
     }
 
     obj.Timing = slide.timing;
-    obj.lockDelete = !(slide.deleteLock.Type === locktype_Mine || slide.deleteLock.Type === locktype_None);
-    obj.lockLayout = !(slide.layoutLock.Type === locktype_Mine || slide.layoutLock.Type === locktype_None);
-    obj.lockTiming = !(slide.timingLock.Type === locktype_Mine || slide.timingLock.Type === locktype_None);
-    obj.lockTranzition = !(slide.transitionLock.Type === locktype_Mine || slide.transitionLock.Type === locktype_None);
-    obj.lockBackground = !(slide.backgroundLock.Type === locktype_Mine || slide.backgroundLock.Type === locktype_None);
+    obj.lockDelete = !(slide.deleteLock.Lock.Type === locktype_Mine || slide.deleteLock.Lock.Type === locktype_None);
+    obj.lockLayout = !(slide.layoutLock.Lock.Type === locktype_Mine || slide.layoutLock.Lock.Type === locktype_None);
+    obj.lockTiming = !(slide.timingLock.Lock.Type === locktype_Mine || slide.timingLock.Lock.Type === locktype_None);
+    obj.lockTranzition = !(slide.transitionLock.Lock.Type === locktype_Mine || slide.transitionLock.Lock.Type === locktype_None);
+    obj.lockBackground = !(slide.backgroundLock.Lock.Type === locktype_Mine || slide.backgroundLock.Lock.Type === locktype_None);
     obj.lockRemove = obj.lockDelete ||
     obj.lockLayout ||
     obj.lockTiming ||

@@ -93,16 +93,14 @@ function MoveShapeImageTrackInGroup(originalObject)
         }
         global_MatrixTransformer.RotateRadAppend(t, -this.originalObject.rot);
         global_MatrixTransformer.TranslateAppend(t, this.x + this.originalObject.extX*0.5, this.y + this.originalObject.extY*0.5);
-        global_MatrixTransformer.MultiplyAppend(t, this.originalObject.group.getTransform());
+        global_MatrixTransformer.MultiplyAppend(t, this.originalObject.group.getTransformMatrix());
     };
 
     this.trackEnd = function()
     {
         var scale_scale_coefficients = this.originalObject.group.getResultScaleCoefficients();
         var xfrm = this.originalObject.group.spPr.xfrm;
-        this.originalObject.setPosition(this.x/scale_scale_coefficients.cx + xfrm.chOffX, this.y/scale_scale_coefficients.cy + xfrm.chOffY);
-        this.originalObject.recalculateTransform();
-        this.originalObject.calculateTransformTextMatrix();
+        this.originalObject.setOffset(this.x/scale_scale_coefficients.cx + xfrm.chOffX, this.y/scale_scale_coefficients.cy + xfrm.chOffY);
     }
 }
 
@@ -120,7 +118,7 @@ function MoveGroupTrack(originalObject)
     var group_invert_transform = originalObject.getInvertTransform();
     for(var i = 0; i < arr_graphic_objects.length; ++i)
     {
-        var gr_obj_transform_copy = arr_graphic_objects[i].getTransform().CreateDublicate();
+        var gr_obj_transform_copy = arr_graphic_objects[i].getTransformMatrix().CreateDublicate();
         global_MatrixTransformer.MultiplyAppend(gr_obj_transform_copy, group_invert_transform);
         this.arrTransforms2[i] = gr_obj_transform_copy;
         this.overlayObjects[i] = new OverlayObject(arr_graphic_objects[i].spPr.geometry, arr_graphic_objects[i].extX, arr_graphic_objects[i].extY,
@@ -168,13 +166,7 @@ function MoveGroupTrack(originalObject)
 
     this.trackEnd = function()
     {
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateUndo, null, null,
-            new UndoRedoDataGraphicObjects(this.originalObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
-        this.originalObject.setPosition(this.x, this.y);
-        this.originalObject.recalculate();
-        this.originalObject.updateDrawingBaseCoordinates();
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateRedo, null, null,
-            new UndoRedoDataGraphicObjects(this.originalObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+        this.originalObject.setXfrm(this.x, this.y, null, null, null, null, null);
     };
 }
 
@@ -230,7 +222,7 @@ function MoveTitleInChart(originalObject)
         t.Reset();
         global_MatrixTransformer.TranslateAppend(t, -this.originalObject.extX*0.5, -this.originalObject.extY*0.5);
         global_MatrixTransformer.TranslateAppend(t, this.x + this.originalObject.extX*0.5, this.y + this.originalObject.extY*0.5);
-        global_MatrixTransformer.MultiplyAppend(t, this.originalObject.chartGroup.getTransform());
+        global_MatrixTransformer.MultiplyAppend(t, this.originalObject.chartGroup.getTransformMatrix());
     };
 
     this.trackEnd = function()

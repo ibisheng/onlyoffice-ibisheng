@@ -57,6 +57,34 @@ function CImageShape(parent)
 CImageShape.prototype =
 {
 
+    isSimpleObject: function()
+    {
+        return true;
+    },
+
+    normalize: function()
+    {
+        var new_off_x, new_off_y, new_ext_x, new_ext_y;
+        var xfrm = this.spPr.xfrm;
+        if(!isRealObject(this.group))
+        {
+            new_off_x = xfrm.offX;
+            new_off_y = xfrm.offY;
+            new_ext_x = xfrm.extX;
+            new_ext_y = xfrm.extY;
+        }
+        else
+        {
+            var scale_scale_coefficients = this.group.getResultScaleCoefficients();
+            new_off_x = scale_scale_coefficients.cx*(xfrm.offX - this.group.spPr.xfrm.chOffX);
+            new_off_y = scale_scale_coefficients.cy*(xfrm.offY - this.group.spPr.xfrm.chOffY);
+            new_ext_x = scale_scale_coefficients.cx*xfrm.extX;
+            new_ext_y = scale_scale_coefficients.cy*xfrm.extY;
+        }
+        this.setOffset(new_off_x, new_off_y);
+        this.setExtents(new_ext_x, new_ext_y);
+    },
+
     sendMouseData: function()
     {
 
@@ -825,49 +853,63 @@ CImageShape.prototype =
 
     hitToHandles: function(x, y)
     {
-        var px = this.invertTransform.TransformPointX(x, y);
-        var py = this.invertTransform.TransformPointY(x, y);
-        var distance = this.drawingDocument.GetMMPerDot(TRACK_CIRCLE_RADIUS);
-        var dx, dy;
-        dx = px;
-        dy = py;
-        if(Math.sqrt(dx*dx + dy*dy) < distance)
+        var invert_transform = this.getInvertTransform();
+        var t_x, t_y;
+        t_x = invert_transform.TransformPointX(x, y);
+        t_y = invert_transform.TransformPointY(x, y);
+        var radius = this.getParentObjects().presentation.DrawingDocument.GetMMPerDot(TRACK_CIRCLE_RADIUS);
+
+        var sqr_x = t_x*t_y, sqr_y = t_y*t_y;
+        if(Math.sqrt(sqr_x + sqr_y) < radius)
             return 0;
 
-        var width = this.extX;
-        var height = this.extY;
-        var hc = width*0.5;
-        var vc = height*0.5;
-
-        dx = px - hc;
-        if(Math.sqrt(dx*dx + dy*dy) < distance)
+        var hc = this.extX*0.5;
+        var dist_x = t_x - hc;
+        sqr_x = dist_x*dist_x;
+        if(Math.sqrt(sqr_x + sqr_y) < radius)
             return 1;
 
-        dx = px - width;
-        if(Math.sqrt(dx*dx + dy*dy) < distance)
+        dist_x = t_x - this.extX;
+        sqr_x = dist_x*dist_x;
+        if(Math.sqrt(sqr_x + sqr_y) < radius)
             return 2;
 
-        dy = py - vc;
-        if(Math.sqrt(dx*dx + dy*dy) < distance)
+        var vc = this.extY*0.5;
+        var dist_y = t_y - vc;
+        sqr_y = dist_y*dist_y;
+        if(Math.sqrt(sqr_x + sqr_y) < radius)
             return 3;
 
-        dy = py - height;
-        if(Math.sqrt(dx*dx + dy*dy) < distance)
+        dist_y = t_y - this.extY;
+        sqr_y = dist_y*dist_y;
+        if(Math.sqrt(sqr_x + sqr_y) < radius)
             return 4;
 
-        dx = px - hc;
-        if(Math.sqrt(dx*dx + dy*dy) < distance)
+        dist_x = t_x - hc;
+        sqr_x = dist_x*dist_x;
+        if(Math.sqrt(sqr_x + sqr_y) < radius)
             return 5;
 
-        dx = px;
-        if(Math.sqrt(dx*dx + dy*dy) < distance)
+        dist_x = t_x;
+        sqr_x = dist_x*dist_x;
+        if(Math.sqrt(sqr_x + sqr_y) < radius)
             return 6;
 
-        dy = py - vc;
-        if(Math.sqrt(dx*dx + dy*dy) < distance)
+        dist_y = t_y - vc;
+        sqr_y = dist_y*dist_y;
+        if(Math.sqrt(sqr_x + sqr_y) < radius)
             return 7;
 
+        var rotate_distance = this.getParentObjects().presentation.DrawingDocument.GetMMPerDot(TRACK_DISTANCE_ROTATE);;
+        dist_y = t_y + rotate_distance;
+        sqr_y = dist_y*dist_y;
+        dist_x = t_x - hc;
+        sqr_x = dist_x*dist_x;
+        if(Math.sqrt(sqr_x + sqr_y) < radius)
+            return 8;
+
         return -1;
+
     },
 
 

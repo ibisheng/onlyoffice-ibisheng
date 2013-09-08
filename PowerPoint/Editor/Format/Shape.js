@@ -1933,6 +1933,29 @@ CShape.prototype =
         }
     },
 
+    normalize: function()
+    {
+        var new_off_x, new_off_y, new_ext_x, new_ext_y;
+        var xfrm = this.spPr.xfrm;
+        if(!isRealObject(this.group))
+        {
+            new_off_x = xfrm.offX;
+            new_off_y = xfrm.offY;
+            new_ext_x = xfrm.extX;
+            new_ext_y = xfrm.extY;
+        }
+        else
+        {
+            var scale_scale_coefficients = this.group.getResultScaleCoefficients();
+            new_off_x = scale_scale_coefficients.cx*(xfrm.offX - this.group.spPr.xfrm.chOffX);
+            new_off_y = scale_scale_coefficients.cy*(xfrm.offY - this.group.spPr.xfrm.chOffY);
+            new_ext_x = scale_scale_coefficients.cx*xfrm.extX;
+            new_ext_y = scale_scale_coefficients.cy*xfrm.extY;
+        }
+        this.setOffset(new_off_x, new_off_y);
+        this.setExtents(new_ext_x, new_ext_y);
+    },
+
     setRotate: function(rot)
     {
         var xfrm = this.spPr.xfrm;
@@ -1988,9 +2011,9 @@ CShape.prototype =
         {
             checker._s();
             checker._m(0, 0);
-            checker._l(this.absExtX, 0);
-            checker._l(this.absExtX, this.absExtY);
-            checker._l(0, this.absExtY);
+            checker._l(this.extX, 0);
+            checker._l(this.extX, this.extY);
+            checker._l(0, this.extY);
             checker._z();
             checker._e();
         }
@@ -2243,6 +2266,11 @@ CShape.prototype =
         this.recalcInfo.recalculateContent = true;
         this.recalcInfo.recalculateTransformText = true;
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+    },
+
+    isSimpleObject: function()
+    {
+        return true;
     },
 
     draw: function(graphics)

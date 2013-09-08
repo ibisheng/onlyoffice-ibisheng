@@ -205,15 +205,12 @@ function RotateTrackShapeImageInGroup(originalObject)
             global_MatrixTransformer.ScaleAppend(this.transform, 1, -1);
         global_MatrixTransformer.RotateRadAppend(this.transform, -this.angle);
         global_MatrixTransformer.TranslateAppend(this.transform, this.originalObject.x + hc, this.originalObject.y + vc);
-        global_MatrixTransformer.MultiplyAppend(this.transform, this.originalObject.group.getTransform());
+        global_MatrixTransformer.MultiplyAppend(this.transform, this.originalObject.group.getTransformMatrix());
     };
 
     this.trackEnd = function()
     {
         this.originalObject.setRotate(this.angle);
-        this.originalObject.recalculateTransform();
-        this.originalObject.calculateContent();
-        this.originalObject.calculateTransformTextMatrix();
     }
 }
 
@@ -232,7 +229,7 @@ function RotateTrackGroup(originalObject)
     var group_invert_transform = originalObject.getInvertTransform();
     for(var i = 0; i < arr_graphic_objects.length; ++i)
     {
-        var gr_obj_transform_copy = arr_graphic_objects[i].getTransform().CreateDublicate();
+        var gr_obj_transform_copy = arr_graphic_objects[i].getTransformMatrix().CreateDublicate();
         global_MatrixTransformer.MultiplyAppend(gr_obj_transform_copy, group_invert_transform);
         this.arrTransforms2[i] = gr_obj_transform_copy;
         this.overlayObjects[i] = new OverlayObject(arr_graphic_objects[i].spPr.geometry, arr_graphic_objects[i].extX, arr_graphic_objects[i].extY,
@@ -295,11 +292,6 @@ function RotateTrackGroup(originalObject)
 
     this.trackEnd = function()
     {
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateUndo, null, null,
-            new UndoRedoDataGraphicObjects(this.originalObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
         this.originalObject.setRotate(this.angle);
-        this.originalObject.recalculate();
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateRedo, null, null,
-            new UndoRedoDataGraphicObjects(this.originalObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
     }
 }

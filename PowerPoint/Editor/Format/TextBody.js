@@ -154,11 +154,11 @@ CTextBody.prototype =
     {
         var Doc = this.content;
         if ( true === Doc.Is_SelectionUse() && !Doc.Selection_IsEmpty()) {
-            drawingDocument.UpdateTargetTransform(this.shape.transformText);
+           drawingDocument.UpdateTargetTransform(this.shape.transformText);
             drawingDocument.TargetEnd();
             drawingDocument.SelectEnabled(true);
             drawingDocument.SelectClear();
-            Doc.Selection_Draw();
+            this.content.Selection_Draw_Page(this.shape.parent.num);
             drawingDocument.SelectShow();
         }
         else /*if(this.parent.elementsManipulator.Document.CurPos.Type == docpostype_FlowObjects ) */
@@ -276,6 +276,16 @@ CTextBody.prototype =
         }
         this.content.Reset(0, 0, _content_width, 20000);
         this.content.Recalculate_Page(0, true);
+    },
+
+    updateCursorType: function(x, y, e)
+    {
+        if(this.shape && this.shape.invertTransformText)
+        {
+            var tx = this.shape.invertTransformText.TransformPointX(x, y);
+            var ty = this.shape.invertTransformText.TransformPointY(x, y);
+            this.content.Update_CursorType(tx, ty, 0);
+        }
     },
 
     Get_StartPage_Absolute: function()

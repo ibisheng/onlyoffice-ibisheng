@@ -3862,7 +3862,7 @@ CPresentation.prototype =
     {
         this.CurPage = PageIndex;
         this.Slides[this.CurPage].onMouseMove(e, X, Y);
-        this.Update_CursorType( X, Y, PageIndex, e );
+        //this.Update_CursorType( X, Y, PageIndex, e );
         return;
         return;
         if ( PageIndex < 0 )

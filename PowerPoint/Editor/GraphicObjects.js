@@ -474,7 +474,7 @@ CGraphicObjects.prototype = {
             {
                 shapes.push(selected_object);
             }
-            else if(typeof  selected_object.isImage())
+            else if(selected_object.isImage())
             {
                 images.push(selected_object);
             }
@@ -584,7 +584,7 @@ CGraphicObjects.prototype = {
                 {
                     var cur_group = groups[i];
                     var arr_by_types = cur_group.getArraysByTypes();
-                    var images = cur_group.images;
+                    var images = arr_by_types.images;
                     for(var i = 0; i < images.length; ++i)
                     {
                         var _cur_image_prop = images[i].getImageProps();
@@ -601,7 +601,7 @@ CGraphicObjects.prototype = {
                         }
                     }
 
-                    var shapes = cur_group.shapes;
+                    var shapes = arr_by_types.shapes;
                     for(var i = 0; i < shapes.length; ++i)
                     {
                         var _current_object = shapes[i];
