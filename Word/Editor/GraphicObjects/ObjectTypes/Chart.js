@@ -1834,6 +1834,14 @@ CChartAsGroup.prototype =
         this.recalculate();
     },
 
+    copy: function(parent, group)
+    {
+        var _group = isRealObject(group) ? group : null;
+        var c = new CChartAsGroup(parent, editor.WordControl.m_oLogicDocument, editor.WordControl.m_oLogicDocument.DrawingDocument, _group);
+        c.setChartBinary(this.getChartBinary());
+        return c;
+    },
+
 
     setParent: function(paraDrawing)
     {
@@ -1899,4 +1907,4 @@ var CLASS_TYPE_CHART_LEGEND = 22;
 var CLASS_TYPE_CHART_TITLE = 23;
 var CLASS_TYPE_COLOR_MOD = 24;
 var CLASS_TYPE_LEGEND_ENTRY = 22;
-var CLASS_TYPE_CHART_DATA = 23;
+//var CLASS_TYPE_CHART_DATA = 23;

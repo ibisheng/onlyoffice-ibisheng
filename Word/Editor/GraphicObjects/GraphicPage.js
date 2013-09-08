@@ -34,6 +34,19 @@ function CGraphicPage(pageIndex, graphicObjects)
 CGraphicPage.prototype =
 {
 
+    redrawCharts: function()
+    {
+        var arr = [this.inlineObjects, this.behindDocObjects, this.wrappingObjects, this.beforeTextObjects];
+        for(var i = 0; i < arr.length; ++i)
+        {
+            var cur_arr = arr[i];
+            for(var j  = 0; j < cur_arr.length; ++j)
+            {
+                if(cur_arr[j] instanceof CChartAsGroup)
+                    cur_arr[j].recalculate();
+            }
+        }
+    },
 
     addFloatTable: function(table)
     {

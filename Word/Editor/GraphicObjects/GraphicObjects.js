@@ -1384,6 +1384,15 @@ CGraphicObjects.prototype =
         this.urlMap = [];
     },
 
+    redrawCharts: function()
+    {
+        for(var i = 0; i <this.graphicPages.length; ++i)
+        {
+            this.graphicPages[i].redrawCharts();
+        }
+        this.updateCharts();
+    },
+
     drawOnOverlay: function(overlay)
     {
         var _track_objects = this.arrTrackObjects;
