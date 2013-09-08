@@ -5,8 +5,8 @@ function CGraphicObjects(document, drawingDocument, api, documentContent)
     this.drawingDocument = drawingDocument;
 
     this.graphicPages = [];
-    for(var _page_index = 0; _page_index < /*document.Pages.length*/100; ++_page_index)//TODO:
-        this.graphicPages[_page_index] = new CGraphicPage(_page_index, this);
+   // for(var _page_index = 0; _page_index < /*document.Pages.length*/100; ++_page_index)//TODO:
+     //   this.graphicPages[_page_index] = new CGraphicPage(_page_index, this); */
 
     this.startTrackPos =
     {
