@@ -6371,6 +6371,15 @@ ParaDrawing.prototype =
                 this.Set_GraphicObject(g);
                 break;
             }
+            case historyitem_type_ChartGroup:
+            {
+                g = new CChartAsGroup(this, editor.WordControl.m_oLogicDocument, editor.WordControl.m_oLogicDocument.DrawingDocument, null);
+                g.readFromBinaryForCopyPaste(r, bNoRecalc);
+                if(bNoRecalc !== true)
+                    g.recalculate();
+                this.Set_GraphicObject(g);
+                break;
+            }
         }
         if(bNoRecalc !== true)
         {

@@ -1,4 +1,5 @@
 
+var CLASS_TYPE_CHART_DATA = 9999;
 function CChartAsGroup(parent/*(WordGraphicObject)*/, document, drawingDocument, group)
 {
     this.parent = parent;
@@ -1019,9 +1020,15 @@ CChartAsGroup.prototype =
             this.drawingObjects.intervalToIntervalObject(this.chart);           */
         if(!(updateImage === false))
         {
-            this.brush.fill.RasterImageId = (new ChartRender()).insertChart(this.chart, null, this.drawingDocument.GetDotsPerMM(this.absExtX), this.drawingDocument.GetDotsPerMM(this.absExtY));
-            editor.WordControl.m_oLogicDocument.DrawingObjects.urlMap.push(this.brush.fill.RasterImageId);
+            this.brush.fill.canvas = (new ChartRender()).insertChart(this.chart, null, this.drawingDocument.GetDotsPerMM(this.absExtX), this.drawingDocument.GetDotsPerMM(this.absExtY));
+            this.brush.fill.RasterImageId = "";
+            //editor.WordControl.m_oLogicDocument.DrawingObjects.urlMap.push(this.brush.fill.RasterImageId);
         }
+    },
+
+    getBase64Img: function()
+    {
+        return this.brush.fill.canvas.toDataURL();
     },
 
     initFromBinary: function(binary)
@@ -1801,6 +1808,59 @@ CChartAsGroup.prototype =
         this.chart.Write_ToBinary2(w);
         this.spPr.Write_ToBinary2(w);
         return w.pos + ";" + w.GetBase64Memory();
+    },
+
+    writeToBinaryForCopyPaste: function(w)
+    {
+        w.WriteLong(historyitem_type_ChartGroup);
+        w.WriteBool(isRealObject(this.chartTitle));
+        if(isRealObject(this.chartTitle))
+        {
+            this.chartTitle.writeToBinary(w);
+        }
+
+        w.WriteBool(isRealObject(this.vAxisTitle));
+        if(isRealObject(this.vAxisTitle))
+        {
+            this.vAxisTitle.writeToBinary(w);
+        }
+
+        w.WriteBool(isRealObject(this.hAxisTitle));
+        if(isRealObject(this.hAxisTitle))
+        {
+            this.hAxisTitle.writeToBinary(w);
+        }
+
+        this.chart.Write_ToBinary2(w);
+        this.spPr.Write_ToBinary2(w);
+    },
+
+    readFromBinaryForCopyPaste: function(r)
+    {
+        if(r.GetBool())
+        {
+            this.chartTitle = new CChartTitle(this, CHART_TITLE_TYPE_TITLE);
+            this.chartTitle.readFromBinary(r);
+        }
+
+        if(r.GetBool())
+        {
+            this.vAxisTitle = new CChartTitle(this, CHART_TITLE_TYPE_V_AXIS);
+            this.vAxisTitle.readFromBinary(r);
+        }
+        if(r.GetBool())
+        {
+            this.hAxisTitle = new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS);
+            this.hAxisTitle.readFromBinary(r);
+        }
+        this.chart.Read_FromBinary2(r);
+        this.spPr.Read_FromBinary2(r);
+        if(isRealObject(this.parent))
+        {
+            this.parent.Extent.W = this.spPr.xfrm.extX;
+            this.parent.Extent.H = this.spPr.xfrm.extY;
+        }
+        this.init();
     },
 
     setChartBinary: function(binary)

@@ -314,6 +314,9 @@ var historyitem_type_Chart			  = 24;
 var historyitem_type_HdrFtrGrObjects  = 25;
 var historyitem_type_GrObjects        = 26;
 var historyitem_type_Hyperlink        = 27;
+var historyitem_type_ChartGroup       = 28;
+
+
 
 
 function CHistory(Document)
