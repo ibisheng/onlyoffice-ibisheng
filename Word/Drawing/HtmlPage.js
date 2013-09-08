@@ -905,7 +905,7 @@ function CEditorPage(api)
         {
             oWordControl.m_oLogicDocument.DrawingObjects.redrawCharts();
         }
-        
+
         oWordControl.OnScroll();
     }
 
@@ -2927,7 +2927,35 @@ function CEditorPage(api)
         var context = canvas.getContext("2d");
         context.fillStyle = "#B0B0B0";
 
-        this.m_oBoundsController.Clear(context);
+        //this.m_oBoundsController.Clear(context);
+        // сначала посморим, изменились ли ректы страниц
+        var rectsPages = [];
+        for (var i = this.m_oDrawingDocument.m_lDrawingFirst; i <= this.m_oDrawingDocument.m_lDrawingEnd; i++)
+        {
+            var drawPage = this.m_oDrawingDocument.m_arrPages[i].drawingPage;
+
+            if (!this.bIsRetinaSupport)
+            {
+                var _cur_page_rect = new _rect();
+                _cur_page_rect.x = drawPage.left;
+                _cur_page_rect.y = drawPage.top;
+                _cur_page_rect.w = drawPage.right - drawPage.left;
+                _cur_page_rect.h = drawPage.bottom - drawPage.top;
+
+                rectsPages.push(_cur_page_rect);
+            }
+            else
+            {
+                var _cur_page_rect = new _rect();
+                _cur_page_rect.x = drawPage.left << 1;
+                _cur_page_rect.y = drawPage.top << 1;
+                _cur_page_rect.w = (drawPage.right << 1) - _cur_page_rect.x;
+                _cur_page_rect.h = (drawPage.bottom << 1) - _cur_page_rect.y;
+
+                rectsPages.push(_cur_page_rect);
+            }
+        }
+        this.m_oBoundsController.CheckPageRects(rectsPages, context);
 
         if (this.m_oDrawingDocument.m_bIsSelection)
         {
@@ -2948,7 +2976,7 @@ function CEditorPage(api)
                 if (!this.bIsRetinaSupport)
                 {
                     this.m_oDrawingDocument.m_arrPages[i].Draw(context, drawPage.left, drawPage.top, drawPage.right - drawPage.left, drawPage.bottom - drawPage.top);
-                    this.m_oBoundsController.CheckRect(drawPage.left, drawPage.top, drawPage.right - drawPage.left, drawPage.bottom - drawPage.top);
+                    //this.m_oBoundsController.CheckRect(drawPage.left, drawPage.top, drawPage.right - drawPage.left, drawPage.bottom - drawPage.top);
                 }
                 else
                 {
@@ -2957,7 +2985,7 @@ function CEditorPage(api)
                     var __w = (drawPage.right << 1) - __x;
                     var __h = (drawPage.bottom << 1) - __y;
                     this.m_oDrawingDocument.m_arrPages[i].Draw(context, __x, __y, __w, __h);
-                    this.m_oBoundsController.CheckRect(__x, __y, __w, __h);
+                    //this.m_oBoundsController.CheckRect(__x, __y, __w, __h);
                 }
             }
         }
@@ -2986,7 +3014,7 @@ function CEditorPage(api)
                 if (!this.bIsRetinaSupport)
                 {
                     this.m_oDrawingDocument.m_arrPages[i].Draw(context, drawPage.left, drawPage.top, drawPage.right - drawPage.left, drawPage.bottom - drawPage.top);
-                    this.m_oBoundsController.CheckRect(drawPage.left, drawPage.top, drawPage.right - drawPage.left, drawPage.bottom - drawPage.top);
+                    //this.m_oBoundsController.CheckRect(drawPage.left, drawPage.top, drawPage.right - drawPage.left, drawPage.bottom - drawPage.top);
                 }
                 else
                 {
@@ -2995,7 +3023,7 @@ function CEditorPage(api)
                     var __w = (drawPage.right << 1) - __x;
                     var __h = (drawPage.bottom << 1) - __y;
                     this.m_oDrawingDocument.m_arrPages[i].Draw(context, __x, __y, __w, __h);
-                    this.m_oBoundsController.CheckRect(__x, __y, __w, __h);
+                    //this.m_oBoundsController.CheckRect(__x, __y, __w, __h);
                 }
             }
         }

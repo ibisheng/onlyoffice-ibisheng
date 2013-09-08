@@ -345,6 +345,8 @@ function CBoundsController()
     this.min_y = 0xFFFF;
     this.max_x = -0xFFFF;
     this.max_y = -0xFFFF;
+
+    this.Rects = [];
 }
 
 CBoundsController.prototype =
@@ -355,6 +357,44 @@ CBoundsController.prototype =
         this.min_y = 0xFFFF;
         this.max_x = -0xFFFF;
         this.max_y = -0xFFFF;
+
+        if (0 != this.Rects.length)
+             this.Rects.splice(0, this.Rects.length);
+    },
+
+    CheckPageRects : function(rects, ctx)
+    {
+        var _bIsUpdate = false;
+        if (rects.length != this.Rects.length)
+        {
+            _bIsUpdate = true;
+        }
+        else
+        {
+            for (var i = 0; i < rects.length; i++)
+            {
+                var _1 = this.Rects[i];
+                var _2 = rects[i];
+
+                if (_1.x != _2.x || _1.y != _2.y || _1.w != _2.w || _1.h != _2.h)
+                    _bIsUpdate = true;
+            }
+        }
+
+        if (!_bIsUpdate)
+            return;
+
+        this.Clear(ctx);
+
+        if (0 != this.Rects.length)
+            this.Rects.splice(0, this.Rects.length);
+
+        for (var i = 0; i < rects.length; i++)
+        {
+            var _r = rects[i];
+            this.CheckRect(_r.x, _r.y, _r.w, _r.h);
+            this.Rects.push(_r);
+        }
     },
 
     Clear : function(ctx)
