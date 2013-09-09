@@ -4460,6 +4460,9 @@ CTable.prototype =
 
     Is_InnerTable : function()
     {
+        if ( this.Content.length <= 0 )
+            return false;
+
         if ( false === this.Selection.Use || ( true === this.Selection.Use && table_Selection_Text === this.Selection.Type ) )
             return this.CurCell.Content.Is_CurrentElementTable();
 
