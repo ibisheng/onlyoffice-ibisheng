@@ -1638,6 +1638,11 @@ CChartAsGroup.prototype =
             this.spPr.xfrm.setPosition(x, y);
         this.init();
         this.recalculate();
+    },
+
+    getBase64Image: function()
+    {
+        return this.brush.fill.canvas.toDataURL();
     }
 };
 
