@@ -272,6 +272,38 @@ var historyitem_MovePoint   = 2;
 var historyitem_UpdateWrapSizes = 3;
 var historyitem_ChangePolygon = 4;
 
+// Типы изменений в классе CStyle
+var historyitem_Style_TextPr          = 1;  // Изменяем TextPr
+var historyitem_Style_ParaPr          = 2;  // Изменяем ParaPr
+var historyitem_Style_TablePr         = 3;  // Изменяем TablePr
+var historyitem_Style_TableRowPr      = 4;  // Изменяем TableRowPr
+var historyitem_Style_TableCellPr     = 5;  // Изменяем TableCellPr
+var historyitem_Style_TableBand1Horz  = 6;  // Изменяем TableBand1Horz
+var historyitem_Style_TableBand1Vert  = 7;  // Изменяем TableBand1Vert
+var historyitem_Style_TableBand2Horz  = 8;  // Изменяем TableBand2Horz
+var historyitem_Style_TableBand2Vert  = 9;  // Изменяем TableBand2Vert
+var historyitem_Style_TableFirstCol   = 10; // Изменяем TableFirstCol
+var historyitem_Style_TableFirstRow   = 11; // Изменяем TableFirstRow
+var historyitem_Style_TableLastCol    = 12; // Изменяем TableLastCol
+var historyitem_Style_TableLastRow    = 13; // Изменяем TableLastRow
+var historyitem_Style_TableTLCell     = 14; // Изменяем TableTLCell
+var historyitem_Style_TableTRCell     = 15; // Изменяем TableTRCell
+var historyitem_Style_TableBLCell     = 16; // Изменяем TableBLCell
+var historyitem_Style_TableBRCell     = 17; // Изменяем TableBRCell
+var historyitem_Style_TableWholeTable = 18; // Изменяем TableWholeTable
+var historyitem_Style_Name            = 101; // Изменяем Name
+var historyitem_Style_BasedOn         = 102; // Изменяем BasedOn
+var historyitem_Style_Next            = 103; // Изменяем Next
+var historyitem_Style_Type            = 104; // Изменяем Type
+var historyitem_Style_QFormat         = 105; // Изменяем QFormat
+var historyitem_Style_UiPriority      = 106; // Изменяем UiPriority
+var historyitem_Style_Hidden          = 107; // Изменяем Hidden
+var historyitem_Style_SemiHidden      = 108; // Изменяем SemiHidden
+var historyitem_Style_UnhideWhenUsed  = 109; // Изменяем UnhideWhenUsed
+
+// Типы изменений в классе CStyles
+var historyitem_Styles_Add    = 1; // Добавляем стиль
+var historyitem_Styles_Remove = 2; // Удаляем стиль
 
 // Тип класса, к которому относится данный элемент истории
 var historyitem_State_Unknown         = 0;
@@ -315,9 +347,8 @@ var historyitem_type_HdrFtrGrObjects  = 25;
 var historyitem_type_GrObjects        = 26;
 var historyitem_type_Hyperlink        = 27;
 var historyitem_type_ChartGroup       = 28;
-
-
-
+var historyitem_type_Style            = 29;
+var historyitem_type_Styles           = 30;
 
 function CHistory(Document)
 {

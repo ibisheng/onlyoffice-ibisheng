@@ -5645,14 +5645,12 @@ CTable.prototype =
             case historyitem_Table_TableBorder_InsideH:
             case historyitem_Table_TableBorder_InsideV:
             case historyitem_Table_Inline:
-            case historyitem_Table_TableLook:
             case historyitem_Table_AllowOverlap:
             case historyitem_Table_PositionH:
             case historyitem_Table_PositionV:
             case historyitem_Table_Distance:
             case historyitem_Table_TableStyleColBandSize:
             case historyitem_Table_TableStyleRowBandSize:
-            case historyitem_Table_TableStyle:
             case historyitem_Table_Pr:
             {
                 bNeedRecalc = true;
@@ -5667,6 +5665,25 @@ CTable.prototype =
             }
             case historyitem_Table_TableGrid:
             {
+                bNeedRecalc = true;
+                break;
+            }
+            case historyitem_Table_TableStyle:
+            case historyitem_Table_TableLook:
+            {
+                var Count = this.Content.length;
+                for ( var CurRow = 0; CurRow < Count; CurRow++ )
+                {
+                    var Row = this.Content[CurRow];
+                    var Cells_Count = Row.Get_CellsCount();
+                    for ( var CurCell = 0; CurCell < Cells_Count; CurCell++ )
+                    {
+                        var Cell = Row.Get_Cell(CurCell);
+                        Cell.Recalc_CompiledPr();
+                    }
+                    Row.Recalc_CompiledPr();
+                }
+                this.Recalc_CompiledPr();
                 bNeedRecalc = true;
                 break;
             }

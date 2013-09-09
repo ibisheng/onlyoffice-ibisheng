@@ -152,6 +152,7 @@ function CTableId()
 			case historyitem_type_Chart		       : Element = new CChartData(true); break;
             case historyitem_type_WrapPolygon      : Element = new CWrapPolygon(); break;
             case historyitem_type_HdrFtrGrObjects  : Element = new HeaderFooterGraphicObjects(); break;
+            case historyitem_type_Style            : Element = new CStyle(); break;
         }
 
         Element.Read_FromBinary2(Reader);

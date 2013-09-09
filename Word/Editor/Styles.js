@@ -93,11 +93,49 @@ CTableStylePr.prototype =
         TableStylePr.TableRowPr  = this.TableRowPr.Copy();
         TableStylePr.TableCellPr = this.TableCellPr.Copy();
         return TableStylePr;
+    },
+
+    Set_FromObject : function(Obj)
+    {
+        if ( undefined != Obj.TextPr )
+            this.TextPr.Set_FromObject( Obj.TextPr );
+
+        if ( undefined != Obj.ParaPr )
+            this.ParaPr.Set_FromObject( Obj.ParaPr );
+
+        if ( undefined != Obj.TablePr )
+            this.TablePr.Set_FromObject( Obj.TablePr );
+
+        if ( undefined != Obj.TableRowPr )
+            this.TableRowPr.Set_FromObject( Obj.TableRowPr );
+
+        if ( undefined != Obj.TableCellPr )
+            this.TableCellPr.Set_FromObject( Obj.TableCellPr );
+    },
+
+    Write_ToBinary : function(Writer)
+    {
+        this.TextPr.Write_ToBinary( Writer );
+        this.ParaPr.Write_ToBinary( Writer );
+        this.TablePr.Write_ToBinary( Writer );
+        this.TableRowPr.Write_ToBinary( Writer );
+        this.TableCellPr.Write_ToBinary( Writer );
+    },
+
+    Load_FromBinary : function(Reader)
+    {
+        this.TextPr.Read_FromBinary( Reader );
+        this.ParaPr.Read_FromBinary( Reader );
+        this.TablePr.Read_FromBinary( Reader );
+        this.TableRowPr.Read_FromBinary( Reader );
+        this.TableCellPr.Read_FromBinary( Reader );
     }
 }
 
 function CStyle(Name, BasedOnId, NextId, type)
 {
+    this.Id = g_oIdCounter.Get_NewId();
+
     this.Name    = Name;
     this.BasedOn = BasedOnId;
     this.Next    = NextId;
@@ -115,76 +153,312 @@ function CStyle(Name, BasedOnId, NextId, type)
     this.TextPr = new CTextPr();
     this.ParaPr = new CParaPr();
 
-    if ( styletype_Table === this.Type )
-    {
-        this.TablePr     = new CTablePr();
-        this.TableRowPr  = new CTableRowPr();
-        this.TableCellPr = new CTableCellPr();
+    this.TablePr     = new CTablePr();
+    this.TableRowPr  = new CTableRowPr();
+    this.TableCellPr = new CTableCellPr();
 
-        // Условные типы форматирования стилей таблицы
-        this.TableBand1Horz  = new CTableStylePr();
-        this.TableBand1Vert  = new CTableStylePr();
-        this.TableBand2Horz  = new CTableStylePr();
-        this.TableBand2Vert  = new CTableStylePr();
-        this.TableFirstCol   = new CTableStylePr();
-        this.TableFirstRow   = new CTableStylePr();
-        this.TableLastCol    = new CTableStylePr();
-        this.TableLastRow    = new CTableStylePr();
-        this.TableTLCell     = new CTableStylePr();
-        this.TableTRCell     = new CTableStylePr();
-        this.TableBLCell     = new CTableStylePr();
-        this.TableBRCell     = new CTableStylePr();
-        this.TableWholeTable = new CTableStylePr();
-    }
+    // Условные типы форматирования стилей таблицы
+    this.TableBand1Horz  = new CTableStylePr();
+    this.TableBand1Vert  = new CTableStylePr();
+    this.TableBand2Horz  = new CTableStylePr();
+    this.TableBand2Vert  = new CTableStylePr();
+    this.TableFirstCol   = new CTableStylePr();
+    this.TableFirstRow   = new CTableStylePr();
+    this.TableLastCol    = new CTableStylePr();
+    this.TableLastRow    = new CTableStylePr();
+    this.TableTLCell     = new CTableStylePr();
+    this.TableTRCell     = new CTableStylePr();
+    this.TableBLCell     = new CTableStylePr();
+    this.TableBRCell     = new CTableStylePr();
+    this.TableWholeTable = new CTableStylePr();
+
+    // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
+    g_oTableId.Add( this, this.Id );
 }
 
 CStyle.prototype =
 {
-    Set_Type : function(Type)
+//-----------------------------------------------------------------------------------
+// Работаем с Id данного объекта
+//-----------------------------------------------------------------------------------
+    GetId : function()
     {
-        this.Type = Type;
-
-        if ( styletype_Table === this.Type )
-        {
-            if ( undefined === this.TablePr )
-                this.TablePr     = new CTablePr();
-
-            if ( undefined === this.TableRowPr )
-                this.TableRowPr  = new CTableRowPr();
-
-            if ( undefined === this.TableCellPr )
-                this.TableCellPr = new CTableCellPr();
-
-            // Условные типы форматирования стилей таблицы
-            if ( undefined === this.TableBand1Horz )
-                this.TableBand1Horz  = new CTableStylePr();
-            if ( undefined === this.TableBand1Vert )
-                this.TableBand1Vert  = new CTableStylePr();
-            if ( undefined === this.TableBand2Horz )
-                this.TableBand2Horz  = new CTableStylePr();
-            if ( undefined === this.TableBand2Vert )
-                this.TableBand2Vert  = new CTableStylePr();
-            if ( undefined === this.TableFirstCol )
-                this.TableFirstCol   = new CTableStylePr();
-            if ( undefined === this.TableFirstRow )
-                this.TableFirstRow   = new CTableStylePr();
-            if ( undefined === this.TableLastCol )
-                this.TableLastCol    = new CTableStylePr();
-            if ( undefined === this.TableLastRow )
-                this.TableLastRow    = new CTableStylePr();
-            if ( undefined === this.TableTLCell )
-                this.TableTLCell     = new CTableStylePr();
-            if ( undefined === this.TableTRCell )
-                this.TableTRCell     = new CTableStylePr();
-            if ( undefined === this.TableBLCell )
-                this.TableBLCell     = new CTableStylePr();
-            if ( undefined === this.TableBRCell )
-                this.TableBRCell     = new CTableStylePr();
-            if ( undefined === this.TableWholeTable )
-                this.TableWholeTable = new CTableStylePr();
-        }
+        return this.Id;
     },
 
+    SetId : function(newId)
+    {
+        g_oTableId.Reset_Id( this, newId, this.Id );
+        this.Id = newId;
+    },
+
+    Get_Id : function()
+    {
+        return this.GetId();
+    },
+
+    Set_Id : function(newId)
+    {
+        return this.SetId( newId );
+    },
+
+//-----------------------------------------------------------------------------------
+// Базовые функции для работы со стилем
+//-----------------------------------------------------------------------------------
+    Set_TextPr : function(Value)
+    {
+        var Old = this.TextPr;
+        var New = new CTextPr();
+        New.Set_FromObject(Value);
+
+        this.TextPr = New;
+
+        History.Add( this, { Type : historyitem_Style_TextPr, Old : Old, New : New } );
+    },
+
+    Set_ParaPr : function(Value)
+    {
+        var Old = this.ParaPr;
+        var New = new CParaPr();
+        New.Set_FromObject(Value);
+
+        this.ParaPr = New;
+
+        History.Add( this, { Type : historyitem_Style_ParaPr, Old : Old, New : New } );
+    },
+
+    Set_TablePr : function(Value)
+    {
+        var Old = this.TablePr;
+        var New = new CTablePr();
+        New.Set_FromObject(Value);
+
+        this.TablePr = New;
+
+        History.Add( this, { Type : historyitem_Style_TablePr, Old : Old, New : New } );
+    },
+
+    Set_TableRowPr : function(Value)
+    {
+        var Old = this.TableRowPr;
+        var New = new CTableRowPr();
+        New.Set_FromObject(Value);
+
+        this.TableRowPr = New;
+
+        History.Add( this, { Type : historyitem_Style_TableRowPr, Old : Old, New : New } );
+    },
+
+    Set_TableCellPr : function(Value)
+    {
+        var Old = this.TableCellPr;
+        var New = new CTableCellPr();
+        New.Set_FromObject(Value);
+
+        this.TableCellPr = New;
+
+        History.Add( this, { Type : historyitem_Style_TableCellPr, Old : Old, New : New } );
+    },
+
+    Set_TableBand1Horz : function(Value)
+    {
+        var Old = this.TableBand1Horz;
+        var New = new CTableStylePr();
+        New.Set_FromObject(Value);
+
+        this.TableBand1Horz = New;
+
+        History.Add( this, { Type : historyitem_Style_TableBand1Horz, Old : Old, New : New } );
+    },
+
+    Set_TableBand1Vert : function(Value)
+    {
+        var Old = this.TableBand1Vert;
+        var New = new CTableStylePr();
+        New.Set_FromObject(Value);
+
+        this.TableBand1Vert = New;
+
+        History.Add( this, { Type : historyitem_Style_TableBand1Vert, Old : Old, New : New } );
+    },
+
+    Set_TableBand2Horz : function(Value)
+    {
+        var Old = this.TableBand2Horz;
+        var New = new CTableStylePr();
+        New.Set_FromObject(Value);
+
+        this.TableBand2Horz = New;
+
+        History.Add( this, { Type : historyitem_Style_TableBand2Horz, Old : Old, New : New } );
+    },
+
+    Set_TableBand2Vert : function(Value)
+    {
+        var Old = this.TableBand2Vert;
+        var New = new CTableStylePr();
+        New.Set_FromObject(Value);
+
+        this.TableBand2Vert = New;
+
+        History.Add( this, { Type : historyitem_Style_TableBand2Vert, Old : Old, New : New } );
+    },
+
+    Set_TableFirstCol : function(Value)
+    {
+        var Old = this.TableFirstCol;
+        var New = new CTableStylePr();
+        New.Set_FromObject(Value);
+
+        this.TableFirstCol = New;
+
+        History.Add( this, { Type : historyitem_Style_TableFirstCol, Old : Old, New : New } );
+    },
+
+    Set_TableFirstRow : function(Value)
+    {
+        var Old = this.TableFirstRow;
+        var New = new CTableStylePr();
+        New.Set_FromObject(Value);
+
+        this.TableFirstRow = New;
+
+        History.Add( this, { Type : historyitem_Style_TableFirstRow, Old : Old, New : New } );
+    },
+
+    Set_TableLastCol : function(Value)
+    {
+        var Old = this.TableLastCol;
+        var New = new CTableStylePr();
+        New.Set_FromObject(Value);
+
+        this.TableLastCol = New;
+
+        History.Add( this, { Type : historyitem_Style_TableLastCol, Old : Old, New : New } );
+    },
+
+    Set_TableLastRow : function(Value)
+    {
+        var Old = this.TableLastRow;
+        var New = new CTableStylePr();
+        New.Set_FromObject(Value);
+
+        this.TableLastRow = New;
+
+        History.Add( this, { Type : historyitem_Style_TableLastRow, Old : Old, New : New } );
+    },
+
+    Set_TableTLCell : function(Value)
+    {
+        var Old = this.TableTLCell;
+        var New = new CTableStylePr();
+        New.Set_FromObject(Value);
+
+        this.TableTLCell = New;
+
+        History.Add( this, { Type : historyitem_Style_TableTLCell, Old : Old, New : New } );
+    },
+
+    Set_TableTRCell : function(Value)
+    {
+        var Old = this.TableTRCell;
+        var New = new CTableStylePr();
+        New.Set_FromObject(Value);
+
+        this.TableTRCell = New;
+
+        History.Add( this, { Type : historyitem_Style_TableTRCell, Old : Old, New : New } );
+    },
+
+    Set_TableBLCell : function(Value)
+    {
+        var Old = this.TableBLCell;
+        var New = new CTableStylePr();
+        New.Set_FromObject(Value);
+
+        this.TableBLCell = New;
+
+        History.Add( this, { Type : historyitem_Style_TableBLCell, Old : Old, New : New } );
+    },
+
+    Set_TableBRCell : function(Value)
+    {
+        var Old = this.TableBRCell;
+        var New = new CTableStylePr();
+        New.Set_FromObject(Value);
+
+        this.TableBRCell = New;
+
+        History.Add( this, { Type : historyitem_Style_TableBRCell, Old : Old, New : New } );
+    },
+
+    Set_TableWholeTable : function(Value)
+    {
+        var Old = this.TableWholeTable;
+        var New = new CTableStylePr();
+        New.Set_FromObject(Value);
+
+        this.TableWholeTable = New;
+
+        History.Add( this, { Type : historyitem_Style_TableWholeTable, Old : Old, New : New } );
+    },
+
+    Set_Name : function(Value)
+    {
+        History.Add( this, { Type : historyitem_Style_Name, Old : this.Name, New : Value } );
+        this.Name = Value;
+    },
+
+    Set_BasedOn : function(Value)
+    {
+        History.Add( this, { Type : historyitem_Style_BasedOn, Old : this.BasedOn, New : Value } );
+        this.BasedOn = Value;
+    },
+
+    Set_Next : function(Value)
+    {
+        History.Add( this, { Type : historyitem_Style_Next, Old : this.Next, New : Value } );
+        this.Next = Value;
+    },
+
+    Set_Type : function(Value)
+    {
+        History.Add( this, { Type : historyitem_Style_Type, Old : this.Type, New : Value } );
+        this.Type = Value;
+    },
+
+    Set_QFormat : function(Value)
+    {
+        History.Add( this, { Type : historyitem_Style_QFormat, Old : this.qFormat, New : Value } );
+        this.qFormat = Value;
+    },
+
+    Set_UiPriority : function(Value)
+    {
+        History.Add( this, { Type : historyitem_Style_UiPriority, Old : this.uiPriority, New : Value } );
+        this.uiPriority = Value;
+    },
+
+    Set_Hidden : function(Value)
+    {
+        History.Add( this, { Type : historyitem_Style_Hidden, Old : this.hidden, New : Value } );
+        this.hidden = Value;
+    },
+
+    Set_SemiHidden : function(Value)
+    {
+        History.Add( this, { Type : historyitem_Style_SemiHidden, Old : this.semiHidden, New : Value } );
+        this.semiHidden = Value;
+    },
+
+    Set_UnhideWhenUsed : function(Value)
+    {
+        History.Add( this, { Type : historyitem_Style_UnhideWhenUsed, Old : this.unhideWhenUsed, New : Value } );
+        this.unhideWhenUsed = Value;
+    },
+//-----------------------------------------------------------------------------------
+//
+//-----------------------------------------------------------------------------------
     Document_Get_AllFontNames : function(AllFonts)
     {
         if ( undefined != this.TextPr )
@@ -193,36 +467,32 @@ CStyle.prototype =
 
     Create_Default_Paragraph : function()
     {
-        this.qFormat = true;
-
         var TextPr =
         {
             FontFamily: { Name : "Arial", Index : -1 },
             Color     : { r : 0, g : 0, b : 0 }
         };
 
-        this.TextPr.Set_FromObject( TextPr );
+        this.Set_QFormat( true );
+        this.Set_TextPr( TextPr );
     },
 
     Create_Default_Character : function()
     {
-        this.uiPriority     = 1;
-        this.semiHidden     = true;
-        this.unhideWhenUsed = true;
+        this.Set_UiPriority( 1 );
+        this.Set_SemiHidden( true );
+        this.Set_UnhideWhenUsed( true );
     },
 
     Create_Default_Numbering : function()
     {
-        this.uiPriority     = 99;
-        this.semiHidden     = true;
-        this.unhideWhenUsed = true;
+        this.Set_UiPriority( 99 );
+        this.Set_SemiHidden( true );
+        this.Set_UnhideWhenUsed( true );
     },
 
     Create_Heading1 : function()
     {
-        this.qFormat    = true;
-        this.uiPriority = 9;
-
         var ParaPr =
         {
             KeepNext : true,
@@ -250,16 +520,14 @@ CStyle.prototype =
             }
         };
 
-        this.ParaPr.Set_FromObject(ParaPr);
-        this.TextPr.Set_FromObject(TextPr);
+        this.Set_QFormat( true );
+        this.Set_UiPriority( 9 );
+        this.Set_ParaPr( ParaPr );
+        this.Set_TextPr( TextPr );
     },
 
     Create_Heading2 : function()
     {
-        this.qFormat        = true;
-        this.uiPriority     = 9;
-        this.unhideWhenUsed = true;
-
         var ParaPr =
         {
             KeepNext : true,
@@ -287,16 +555,15 @@ CStyle.prototype =
             }
         };
 
-        this.ParaPr.Set_FromObject(ParaPr);
-        this.TextPr.Set_FromObject(TextPr);
+        this.Set_QFormat( true );
+        this.Set_UiPriority( 9 );
+        this.Set_UnhideWhenUsed( true );
+        this.Set_TextPr( TextPr );
+        this.Set_ParaPr( ParaPr );
     },
 
     Create_Heading3 : function()
     {
-        this.qFormat        = true;
-        this.uiPriority     = 9;
-        this.unhideWhenUsed = true;
-
         var ParaPr =
         {
             KeepNext : true,
@@ -325,16 +592,15 @@ CStyle.prototype =
             }
         };
 
-        this.ParaPr.Set_FromObject(ParaPr);
-        this.TextPr.Set_FromObject(TextPr);
+        this.Set_QFormat( true );
+        this.Set_UiPriority( 9 );
+        this.Set_UnhideWhenUsed( true );
+        this.Set_TextPr( TextPr );
+        this.Set_ParaPr( ParaPr );
     },
 
     Create_Heading4 : function()
     {
-        this.qFormat        = true;
-        this.uiPriority     = 9;
-        this.unhideWhenUsed = true;
-
         var ParaPr =
         {
             KeepNext : true,
@@ -361,16 +627,15 @@ CStyle.prototype =
             }
         };
 
-        this.ParaPr.Set_FromObject(ParaPr);
-        this.TextPr.Set_FromObject(TextPr);
+        this.Set_QFormat( true );
+        this.Set_UiPriority( 9 );
+        this.Set_UnhideWhenUsed( true );
+        this.Set_TextPr( TextPr );
+        this.Set_ParaPr( ParaPr );
     },
 
     Create_Heading5 : function()
     {
-        this.qFormat        = true;
-        this.uiPriority     = 9;
-        this.unhideWhenUsed = true;
-
         var ParaPr =
         {
             KeepNext : true,
@@ -398,16 +663,15 @@ CStyle.prototype =
             }
         };
 
-        this.ParaPr.Set_FromObject(ParaPr);
-        this.TextPr.Set_FromObject(TextPr);
+        this.Set_QFormat( true );
+        this.Set_UiPriority( 9 );
+        this.Set_UnhideWhenUsed( true );
+        this.Set_TextPr( TextPr );
+        this.Set_ParaPr( ParaPr );
     },
 
     Create_Heading6 : function()
     {
-        this.qFormat        = true;
-        this.uiPriority     = 9;
-        this.unhideWhenUsed = true;
-
         var ParaPr =
         {
             KeepNext : true,
@@ -435,16 +699,15 @@ CStyle.prototype =
             }
         };
 
-        this.ParaPr.Set_FromObject(ParaPr);
-        this.TextPr.Set_FromObject(TextPr);
+        this.Set_QFormat( true );
+        this.Set_UiPriority( 9 );
+        this.Set_UnhideWhenUsed( true );
+        this.Set_TextPr( TextPr );
+        this.Set_ParaPr( ParaPr );
     },
 
     Create_Heading7 : function()
     {
-        this.qFormat        = true;
-        this.uiPriority     = 9;
-        this.unhideWhenUsed = true;
-
         var ParaPr =
         {
             KeepNext : true,
@@ -472,16 +735,15 @@ CStyle.prototype =
             }
         };
 
-        this.ParaPr.Set_FromObject(ParaPr);
-        this.TextPr.Set_FromObject(TextPr);
+        this.Set_QFormat( true );
+        this.Set_UiPriority( 9 );
+        this.Set_UnhideWhenUsed( true );
+        this.Set_TextPr( TextPr );
+        this.Set_ParaPr( ParaPr );
     },
 
     Create_Heading8 : function()
     {
-        this.qFormat        = true;
-        this.uiPriority     = 9;
-        this.unhideWhenUsed = true;
-
         var ParaPr =
         {
             KeepNext : true,
@@ -508,16 +770,15 @@ CStyle.prototype =
             }
         };
 
-        this.ParaPr.Set_FromObject(ParaPr);
-        this.TextPr.Set_FromObject(TextPr);
+        this.Set_QFormat( true );
+        this.Set_UiPriority( 9 );
+        this.Set_UnhideWhenUsed( true );
+        this.Set_TextPr( TextPr );
+        this.Set_ParaPr( ParaPr );
     },
 
     Create_Heading9 : function()
     {
-        this.qFormat        = true;
-        this.uiPriority     = 9;
-        this.unhideWhenUsed = true;
-
         var ParaPr =
         {
             KeepNext : true,
@@ -545,15 +806,15 @@ CStyle.prototype =
             }
         };
 
-        this.ParaPr.Set_FromObject(ParaPr);
-        this.TextPr.Set_FromObject(TextPr);
+        this.Set_QFormat( true );
+        this.Set_UiPriority( 9 );
+        this.Set_UnhideWhenUsed( true );
+        this.Set_TextPr( TextPr );
+        this.Set_ParaPr( ParaPr );
     },
 
     Create_ListParagraph : function()
     {
-        this.uiPriority = 34;
-        this.qFormat    = true;
-
         var ParaPr =
         {
             Ind :
@@ -564,7 +825,9 @@ CStyle.prototype =
             ContextualSpacing : true
         };
 
-        this.ParaPr.Set_FromObject(ParaPr);
+        this.Set_QFormat( true );
+        this.Set_UiPriority( 34 );
+        this.Set_ParaPr( ParaPr );
     },
 
     Create_NoSpacing : function()
@@ -593,15 +856,14 @@ CStyle.prototype =
             }
         };
 
-        this.ParaPr.Set_FromObject(ParaPr);
-        this.TextPr.Set_FromObject(TextPr);
+        this.Set_QFormat( true );
+        this.Set_UiPriority( 1 );
+        this.Set_TextPr( TextPr );
+        this.Set_ParaPr( ParaPr );
     },
 
     Create_Header : function()
     {
-        this.uiPriority     = 99;
-        this.unhideWhenUsed = true;
-
         var RPos = Page_Width - X_Left_Margin - X_Right_Margin;
         var CPos = RPos / 2;
 
@@ -637,15 +899,14 @@ CStyle.prototype =
             Color     : { r : 0x00, g : 0x00, b : 0x00 }
         };
 
-        this.ParaPr.Set_FromObject(ParaPr);
-        this.TextPr.Set_FromObject(TextPr);
+        this.Set_UiPriority( 99 );
+        this.Set_UnhideWhenUsed( true );
+        this.Set_TextPr( TextPr );
+        this.Set_ParaPr( ParaPr );
     },
 
     Create_Footer : function()
     {
-        this.uiPriority     = 99;
-        this.unhideWhenUsed = true;
-
         var RPos = Page_Width - X_Left_Margin - X_Right_Margin;
         var CPos = RPos / 2;
 
@@ -681,16 +942,14 @@ CStyle.prototype =
             Color     : { r : 0x00, g : 0x00, b : 0x00 }
         };
 
-        this.ParaPr.Set_FromObject(ParaPr);
-        this.TextPr.Set_FromObject(TextPr);
+        this.Set_UiPriority( 99 );
+        this.Set_UnhideWhenUsed( true );
+        this.Set_TextPr( TextPr );
+        this.Set_ParaPr( ParaPr );
     },
 
     Create_NormalTable : function()
     {
-        this.uiPriority       = 99;
-        this.semiHidden       = true;
-        this.unhideWhenUsed   = true;
-
         var TablePr =
         {
             TableInd :
@@ -726,13 +985,14 @@ CStyle.prototype =
             }
         };
 
-        this.TablePr.Set_FromObject(TablePr);
+        this.Set_UiPriority( 99 );
+        this.Set_SemiHidden( true );
+        this.Set_UnhideWhenUsed( true );
+        this.Set_TablePr( TablePr );
     },
 
     Create_TableGrid : function()
     {
-        this.uiPriority       = 59;
-
         var ParaPr =
         {
             Spacing :
@@ -826,15 +1086,13 @@ CStyle.prototype =
             }
         };
 
-        this.TablePr.Set_FromObject(TablePr);
-        this.ParaPr.Set_FromObject(ParaPr);
+        this.Set_UiPriority( 59 );
+        this.Set_TablePr( TablePr );
+        this.Set_ParaPr( ParaPr );
     },
 
     Create_Quote : function()
     {
-        this.uiPriority = 29;
-        this.qFormat    = true;
-
         var ParaPr =
         {
             Ind :
@@ -875,8 +1133,10 @@ CStyle.prototype =
             }
         };
 
-        this.ParaPr.Set_FromObject(ParaPr);
-        this.TextPr.Set_FromObject(TextPr);
+        this.Set_QFormat( true );
+        this.Set_UiPriority( 29 );
+        this.Set_TextPr( TextPr );
+        this.Set_ParaPr( ParaPr );
     },
 
     Create_Subtitle : function()
@@ -908,15 +1168,14 @@ CStyle.prototype =
             }
         };
 
-        this.ParaPr.Set_FromObject(ParaPr);
-        this.TextPr.Set_FromObject(TextPr);
+        this.Set_QFormat( true );
+        this.Set_UiPriority( 11 );
+        this.Set_TextPr( TextPr );
+        this.Set_ParaPr( ParaPr );
     },
 
     Create_IntenseQuote : function()
     {
-        this.uiPriority = 30;
-        this.qFormat    = true;
-
         var ParaPr =
         {
             Ind :
@@ -985,8 +1244,10 @@ CStyle.prototype =
             }
         };
 
-        this.ParaPr.Set_FromObject(ParaPr);
-        this.TextPr.Set_FromObject(TextPr);
+        this.Set_QFormat( true );
+        this.Set_UiPriority( 30 );
+        this.Set_TextPr( TextPr );
+        this.Set_ParaPr( ParaPr );
     },
 
     Create_Title : function()
@@ -1031,8 +1292,10 @@ CStyle.prototype =
             }
         };
 
-        this.ParaPr.Set_FromObject(ParaPr);
-        this.TextPr.Set_FromObject(TextPr);
+        this.Set_QFormat( true );
+        this.Set_UiPriority( 10 );
+        this.Set_TextPr( TextPr );
+        this.Set_ParaPr( ParaPr );
     },
 
     Create_Table_LightShading : function()
@@ -1048,8 +1311,6 @@ CStyle.prototype =
                 LineRule : linerule_Auto
             }
         };
-
-        this.ParaPr.Set_FromObject(ParaPr);
 
         var TablePr =
         {
@@ -1102,8 +1363,6 @@ CStyle.prototype =
                 }
             }
         };
-
-        this.TablePr.Set_FromObject(TablePr);
 
         var TableFirstRow =
         {
@@ -1173,10 +1432,6 @@ CStyle.prototype =
             }
         };
 
-        this.TableFirstRow.TextPr.Set_FromObject(TableFirstRow.TextPr);
-        this.TableFirstRow.ParaPr.Set_FromObject(TableFirstRow.ParaPr);
-        this.TableFirstRow.TableCellPr.Set_FromObject(TableFirstRow.TableCellPr);
-
         var TableLastRow =
         {
             TextPr :
@@ -1232,9 +1487,6 @@ CStyle.prototype =
                 }
             }
         };
-
-        this.TableLastRow.TextPr.Set_FromObject(TableLastRow.TextPr);
-        this.TableLastRow.TableCellPr.Set_FromObject(TableLastRow.TableCellPr);
 
         var TableFirstCol =
         {
@@ -1302,10 +1554,6 @@ CStyle.prototype =
 
         };
 
-        this.TableFirstCol.TextPr.Set_FromObject(TableFirstCol.TextPr);
-        this.TableFirstCol.ParaPr.Set_FromObject(TableFirstCol.ParaPr);
-        this.TableFirstCol.TableCellPr.Set_FromObject(TableFirstCol.TableCellPr);
-
         var TableLastCol =
         {
             TextPr :
@@ -1347,9 +1595,6 @@ CStyle.prototype =
             }
         };
 
-        this.TableLastCol.TextPr.Set_FromObject(TableLastCol.TextPr);
-        this.TableLastCol.TableCellPr.Set_FromObject(TableLastCol.TableCellPr);
-
         var TableBand1Vert =
         {
             TableCellPr :
@@ -1380,8 +1625,6 @@ CStyle.prototype =
             }
         };
 
-        this.TableBand1Vert.TableCellPr.Set_FromObject(TableBand1Vert.TableCellPr);
-
         var TableBand1Horz =
         {
             TableCellPr :
@@ -1398,8 +1641,6 @@ CStyle.prototype =
                 }
             }
         };
-
-        this.TableBand1Horz.TableCellPr.Set_FromObject(TableBand1Horz.TableCellPr);
 
         var TableTRCell =
         {
@@ -1446,8 +1687,6 @@ CStyle.prototype =
                 }
             }
         };
-
-        this.TableTRCell.TableCellPr.Set_FromObject(TableTRCell.TableCellPr);
 
         var TableTLCell =
         {
@@ -1505,8 +1744,17 @@ CStyle.prototype =
             }
         };
 
-        this.TableTLCell.TextPr.Set_FromObject(TableTLCell.TextPr);
-        this.TableTLCell.TableCellPr.Set_FromObject(TableTLCell.TableCellPr);
+        this.Set_UiPriority( 60 );
+        this.Set_ParaPr( ParaPr );
+        this.Set_TablePr( TablePr );
+        this.Set_TableFirstRow( TableFirstRow );
+        this.Set_TableLastRow( TableLastRow );
+        this.Set_TableFirstCol( TableFirstCol );
+        this.Set_TableLastCol( TableLastCol );
+        this.Set_TableBand1Horz( TableBand1Horz );
+        this.Set_TableBand1Vert( TableBand1Vert );
+        this.Set_TableTRCell( TableTRCell );
+        this.Set_TableTLCell( TableTLCell );
     },
 
     Create_Table_ColorfulListAccent6 : function()
@@ -1523,14 +1771,10 @@ CStyle.prototype =
             }
         };
 
-        this.ParaPr.Set_FromObject(ParaPr);
-
         var TextPr =
         {
             Color : { r : 0, g : 0, b : 0 }
         };
-
-        this.TextPr.Set_FromObject(TextPr);
 
         var TablePr =
         {
@@ -1568,8 +1812,6 @@ CStyle.prototype =
             }
         };
 
-        this.TablePr.Set_FromObject(TablePr);
-
         var TableCellPr =
         {
             Shd :
@@ -1578,8 +1820,6 @@ CStyle.prototype =
                 Color : { r : 0xFE, g : 0xF4, b : 0xEC }
             }
         };
-
-        this.TableCellPr.Set_FromObject(TableCellPr);
 
         var TableFirstRow =
         {
@@ -1610,9 +1850,6 @@ CStyle.prototype =
             }
         };
 
-        this.TableFirstRow.TextPr.Set_FromObject(TableFirstRow.TextPr);
-        this.TableFirstRow.TableCellPr.Set_FromObject(TableFirstRow.TableCellPr);
-
         var TableLastRow =
         {
             TextPr :
@@ -1642,9 +1879,6 @@ CStyle.prototype =
             }
         };
 
-        this.TableLastRow.TextPr.Set_FromObject(TableLastRow.TextPr);
-        this.TableLastRow.TableCellPr.Set_FromObject(TableLastRow.TableCellPr);
-
         var TableFirstCol =
         {
             TextPr :
@@ -1653,8 +1887,6 @@ CStyle.prototype =
             }
         };
 
-        this.TableFirstCol.TextPr.Set_FromObject(TableFirstCol.TextPr);
-
         var TableLastCol =
         {
             TextPr :
@@ -1662,8 +1894,6 @@ CStyle.prototype =
                 Bold : true
             }
         };
-
-        this.TableLastCol.TextPr.Set_FromObject(TableLastCol.TextPr);
 
         var TableBand1Vert =
         {
@@ -1687,8 +1917,6 @@ CStyle.prototype =
             }
         };
 
-        this.TableBand1Vert.TableCellPr.Set_FromObject(TableBand1Vert.TableCellPr);
-
         var TableBand1Horz =
         {
             TableCellPr :
@@ -1701,7 +1929,17 @@ CStyle.prototype =
             }
         };
 
-        this.TableBand1Horz.TableCellPr.Set_FromObject(TableBand1Horz.TableCellPr);
+        this.Set_UiPriority( 72 );
+        this.Set_ParaPr( ParaPr );
+        this.Set_TextPr( TextPr );
+        this.Set_TablePr( TablePr );
+        this.Set_TableCellPr( TableCellPr );
+        this.Set_TableFirstRow( TableFirstRow );
+        this.Set_TableLastRow( TableLastRow );
+        this.Set_TableFirstCol( TableFirstCol );
+        this.Set_TableLastCol( TableLastCol );
+        this.Set_TableBand1Horz( TableBand1Horz );
+        this.Set_TableBand1Vert( TableBand1Vert );
     },
 
     Create_Table_Lined : function(Color1, Color2)
@@ -1709,130 +1947,279 @@ CStyle.prototype =
         this.uiPriority = 99;
 
         // ParaPr
-        this.ParaPr.Spacing.After    = 0;
-        this.ParaPr.Spacing.Line     = 1;
-        this.ParaPr.Spacing.LineRule = linerule_Auto;
+        var ParaPr =
+        {
+            Spacing :
+            {
+                After    : 0,
+                Line     : 1,
+                LineRule : linerule_Auto
+            }
+        };
 
         // TablePr
-        this.TablePr.TableStyleColBandSize = 1;
-        this.TablePr.TableStyleRowBandSize = 1;
-        this.TablePr.TableInd = 0;
-        this.TablePr.TableCellMar.Top    = new CTableMeasurement( tblwidth_Auto, 0 );
-        this.TablePr.TableCellMar.Left   = new CTableMeasurement( tblwidth_Auto, 5.4 * g_dKoef_pt_to_mm );
-        this.TablePr.TableCellMar.Bottom = new CTableMeasurement( tblwidth_Auto, 0 );
-        this.TablePr.TableCellMar.Right  = new CTableMeasurement( tblwidth_Auto, 5.4 * g_dKoef_pt_to_mm );
+        var TablePr =
+        {
+
+            TableStyleColBandSize : 1,
+            TableStyleRowBandSize : 1,
+            TableInd : 0,
+
+            TableCellMar :
+            {
+                Top    : new CTableMeasurement( tblwidth_Auto, 0 ),
+                Left   : new CTableMeasurement( tblwidth_Auto, 5.4 * g_dKoef_pt_to_mm ),
+                Bottom : new CTableMeasurement( tblwidth_Auto, 0 ),
+                Right  : new CTableMeasurement( tblwidth_Auto, 5.4 * g_dKoef_pt_to_mm )
+            }
+        };
 
         // TableFirstRow
-        this.TableFirstRow.TableCellPr.Shd = new CDocumentShd();
-        this.TableFirstRow.TableCellPr.Shd.Value = shd_Clear;
-        this.TableFirstRow.TableCellPr.Shd.Color.Set( Color1.r, Color1.g, Color1.b );
+        var TableFirstRow =
+        {
+            TableCellPr :
+            {
+                Shd :
+                {
+                    Value : shd_Clear,
+                    Color : { r : Color1.r, g : Color1.g, b : Color1.b}
+                }
+            }
+        };
 
         // TableLastRow
-        this.TableLastRow.TableCellPr.Shd = new CDocumentShd();
-        this.TableLastRow.TableCellPr.Shd.Value = shd_Clear;
-        this.TableLastRow.TableCellPr.Shd.Color.Set( Color1.r, Color1.g, Color1.b );
+        var TableLastRow =
+        {
+            TableCellPr :
+            {
+                Shd :
+                {
+                    Value : shd_Clear,
+                    Color : { r : Color1.r, g : Color1.g, b : Color1.b}
+                }
+            }
+        };
 
         // TableFirstCol
-        this.TableFirstCol.TableCellPr.Shd = new CDocumentShd();
-        this.TableFirstCol.TableCellPr.Shd.Value = shd_Clear;
-        this.TableFirstCol.TableCellPr.Shd.Color.Set( Color1.r, Color1.g, Color1.b );
+        var TableFirstCol =
+        {
+            TableCellPr :
+            {
+                Shd :
+                {
+                    Value : shd_Clear,
+                    Color : { r : Color1.r, g : Color1.g, b : Color1.b}
+                }
+            }
+        };
 
         // TableLastCol
-        this.TableLastCol.TableCellPr.Shd = new CDocumentShd();
-        this.TableLastCol.TableCellPr.Shd.Value = shd_Clear;
-        this.TableLastCol.TableCellPr.Shd.Color.Set( Color1.r, Color1.g, Color1.b );
+        var TableLastCol =
+        {
+            TableCellPr :
+            {
+                Shd :
+                {
+                    Value : shd_Clear,
+                    Color : { r : Color1.r, g : Color1.g, b : Color1.b}
+                }
+            }
+        };
 
         // TableBand2Vert
-        this.TableBand2Vert.TableCellPr.Shd = new CDocumentShd();
-        this.TableBand2Vert.TableCellPr.Shd.Value = shd_Clear;
-        this.TableBand2Vert.TableCellPr.Shd.Color.Set( Color2.r, Color2.g, Color2.b );
+        var TableBand2Vert =
+        {
+            TableCellPr :
+            {
+                Shd :
+                {
+                    Value : shd_Clear,
+                    Color : { r : Color2.r, g : Color2.g, b : Color2.b}
+                }
+            }
+        };
 
         // TableBand2Horz
-        this.TableBand2Horz.TableCellPr.Shd = new CDocumentShd();
-        this.TableBand2Horz.TableCellPr.Shd.Value = shd_Clear;
-        this.TableBand2Horz.TableCellPr.Shd.Color.Set( Color2.r, Color2.g, Color2.b );
+        var TableBand2Horz =
+        {
+            TableCellPr :
+            {
+                Shd :
+                {
+                    Value : shd_Clear,
+                    Color : { r : Color2.r, g : Color2.g, b : Color2.b}
+                }
+            }
+        };
+
+        this.Set_UiPriority( 99 );
+        this.Set_ParaPr( ParaPr );
+        this.Set_TablePr( TablePr );
+        this.Set_TableFirstRow( TableFirstRow );
+        this.Set_TableLastRow( TableLastRow );
+        this.Set_TableFirstCol( TableFirstCol );
+        this.Set_TableLastCol( TableLastCol );
+        this.Set_TableBand2Horz( TableBand2Horz );
+        this.Set_TableBand2Vert( TableBand2Vert );
     },
 
     Create_Table_Bordered : function(Color1, Color2)
     {
-        this.uiPriority = 99;
-
         // ParaPr
-        this.ParaPr.Spacing.After    = 0;
-        this.ParaPr.Spacing.Line     = 1;
-        this.ParaPr.Spacing.LineRule = linerule_Auto;
+        var ParaPr =
+        {
+            Spacing :
+            {
+                After    : 0,
+                Line     : 1,
+                LineRule : linerule_Auto
+            }
+        };
 
         // TablePr
-        this.TablePr.TableInd = 0;
+        var TablePr =
+        {
+            TableInd : 0,
 
-        this.TablePr.TableBorders.Top = new CDocumentBorder();
-        this.TablePr.TableBorders.Top.Color.Set( Color1.r, Color1.g, Color1.b );
-        this.TablePr.TableBorders.Top.Value = border_Single;
-        this.TablePr.TableBorders.Top.Size  = 0.5 * g_dKoef_pt_to_mm;
-        this.TablePr.TableBorders.Top.Space = 0;
+            TableBorders :
+            {
+                Top :
+                {
+                    Color : { r : Color1.r, g : Color1.g, b : Color1.b },
+                    Value : border_Single,
+                    Size  : 0.5 * g_dKoef_pt_to_mm,
+                    Space : 0
+                },
 
-        this.TablePr.TableBorders.Left = new CDocumentBorder();
-        this.TablePr.TableBorders.Left.Color.Set( Color1.r, Color1.g, Color1.b );
-        this.TablePr.TableBorders.Left.Value = border_Single;
-        this.TablePr.TableBorders.Left.Size  = 0.5 * g_dKoef_pt_to_mm;
-        this.TablePr.TableBorders.Left.Space = 0;
+                Left :
+                {
+                    Color : { r : Color1.r, g : Color1.g, b : Color1.b },
+                    Value : border_Single,
+                    Size  : 0.5 * g_dKoef_pt_to_mm,
+                    Space : 0
+                },
 
-        this.TablePr.TableBorders.Bottom = new CDocumentBorder();
-        this.TablePr.TableBorders.Bottom.Color.Set( Color1.r, Color1.g, Color1.b );
-        this.TablePr.TableBorders.Bottom.Value = border_Single;
-        this.TablePr.TableBorders.Bottom.Size  = 0.5 * g_dKoef_pt_to_mm;
-        this.TablePr.TableBorders.Bottom.Space = 0;
+                Bottom :
+                {
+                    Color : { r : Color1.r, g : Color1.g, b : Color1.b },
+                    Value : border_Single,
+                    Size  : 0.5 * g_dKoef_pt_to_mm,
+                    Space : 0
+                },
 
-        this.TablePr.TableBorders.Right = new CDocumentBorder();
-        this.TablePr.TableBorders.Right.Color.Set( Color1.r, Color1.g, Color1.b );
-        this.TablePr.TableBorders.Right.Value = border_Single;
-        this.TablePr.TableBorders.Right.Size  = 0.5 * g_dKoef_pt_to_mm;
-        this.TablePr.TableBorders.Right.Space = 0;
+                Right :
+                {
+                    Color : { r : Color1.r, g : Color1.g, b : Color1.b },
+                    Value : border_Single,
+                    Size  : 0.5 * g_dKoef_pt_to_mm,
+                    Space : 0
+                },
 
-        this.TablePr.TableBorders.InsideH = new CDocumentBorder();
-        this.TablePr.TableBorders.InsideH.Color.Set( Color1.r, Color1.g, Color1.b );
-        this.TablePr.TableBorders.InsideH.Value = border_Single;
-        this.TablePr.TableBorders.InsideH.Size  = 0.5 * g_dKoef_pt_to_mm;
-        this.TablePr.TableBorders.InsideH.Space = 0;
+                InsideH :
+                {
+                    Color : { r : Color1.r, g : Color1.g, b : Color1.b },
+                    Value : border_Single,
+                    Size  : 0.5 * g_dKoef_pt_to_mm,
+                    Space : 0
+                },
 
-        this.TablePr.TableBorders.InsideV = new CDocumentBorder();
-        this.TablePr.TableBorders.InsideV.Color.Set( Color1.r, Color1.g, Color1.b );
-        this.TablePr.TableBorders.InsideV.Value = border_Single;
-        this.TablePr.TableBorders.InsideV.Size  = 0.5 * g_dKoef_pt_to_mm;
-        this.TablePr.TableBorders.InsideV.Space = 0;
+                InsideV :
+                {
+                    Color : { r : Color1.r, g : Color1.g, b : Color1.b },
+                    Value : border_Single,
+                    Size  : 0.5 * g_dKoef_pt_to_mm,
+                    Space : 0
+                }
+            },
 
-        this.TablePr.TableCellMar.Top    = new CTableMeasurement( tblwidth_Auto, 0 );
-        this.TablePr.TableCellMar.Left   = new CTableMeasurement( tblwidth_Auto, 5.4 * g_dKoef_pt_to_mm );
-        this.TablePr.TableCellMar.Bottom = new CTableMeasurement( tblwidth_Auto, 0 );
-        this.TablePr.TableCellMar.Right  = new CTableMeasurement( tblwidth_Auto, 5.4 * g_dKoef_pt_to_mm );
+            TableCellMar :
+            {
+                Top    : new CTableMeasurement( tblwidth_Auto, 0 ),
+                Left   : new CTableMeasurement( tblwidth_Auto, 5.4 * g_dKoef_pt_to_mm ),
+                Bottom : new CTableMeasurement( tblwidth_Auto, 0 ),
+                Right  : new CTableMeasurement( tblwidth_Auto, 5.4 * g_dKoef_pt_to_mm )
+            }
+        };
 
         // TableFirstRow
-        this.TableFirstRow.TableCellPr.TableCellBorders.Bottom = new CDocumentBorder();
-        this.TableFirstRow.TableCellPr.TableCellBorders.Bottom.Color.Set( Color2.r, Color2.g, Color2.b );
-        this.TableFirstRow.TableCellPr.TableCellBorders.Bottom.Value = border_Single;
-        this.TableFirstRow.TableCellPr.TableCellBorders.Bottom.Size  = 2.25 * g_dKoef_pt_to_mm;
-        this.TableFirstRow.TableCellPr.TableCellBorders.Bottom.Space = 0;
+        var TableFirstRow =
+        {
+            TableCellPr :
+            {
+                TableCellBorders :
+                {
+                    Bottom :
+                    {
+                        Color : { r : Color2.r, g : Color2.g, b : Color2.b },
+                        Value : border_Single,
+                        Size  : 2.25 * g_dKoef_pt_to_mm,
+                        Space : 0
+                    }
+                }
+            }
+        };
 
         // TableLastRow
-        this.TableLastRow.TableCellPr.TableCellBorders.Top = new CDocumentBorder();
-        this.TableLastRow.TableCellPr.TableCellBorders.Top.Color.Set( Color2.r, Color2.g, Color2.b );
-        this.TableLastRow.TableCellPr.TableCellBorders.Top.Value = border_Single;
-        this.TableLastRow.TableCellPr.TableCellBorders.Top.Size  = 2.25 * g_dKoef_pt_to_mm;
-        this.TableLastRow.TableCellPr.TableCellBorders.Top.Space = 0;
+        var TableLastRow =
+        {
+            TableCellPr :
+            {
+                TableCellBorders :
+                {
+                    Top :
+                    {
+                        Color : { r : Color2.r, g : Color2.g, b : Color2.b },
+                        Value : border_Single,
+                        Size  : 2.25 * g_dKoef_pt_to_mm,
+                        Space : 0
+                    }
+                }
+            }
+        };
 
         // TableFirstCol
-        this.TableFirstCol.TableCellPr.TableCellBorders.Right = new CDocumentBorder();
-        this.TableFirstCol.TableCellPr.TableCellBorders.Right.Color.Set( Color2.r, Color2.g, Color2.b );
-        this.TableFirstCol.TableCellPr.TableCellBorders.Right.Value = border_Single;
-        this.TableFirstCol.TableCellPr.TableCellBorders.Right.Size  = 2.25 * g_dKoef_pt_to_mm;
-        this.TableFirstCol.TableCellPr.TableCellBorders.Right.Space = 0;
+        var TableFirstCol =
+        {
+            TableCellPr :
+            {
+                TableCellBorders :
+                {
+                    Right :
+                    {
+                        Color : { r : Color2.r, g : Color2.g, b : Color2.b },
+                        Value : border_Single,
+                        Size  : 2.25 * g_dKoef_pt_to_mm,
+                        Space : 0
+                    }
+                }
+            }
+        };
 
         // TableLastCol
-        this.TableLastCol.TableCellPr.TableCellBorders.Left = new CDocumentBorder();
-        this.TableLastCol.TableCellPr.TableCellBorders.Left.Color.Set( Color2.r, Color2.g, Color2.b );
-        this.TableLastCol.TableCellPr.TableCellBorders.Left.Value = border_Single;
-        this.TableLastCol.TableCellPr.TableCellBorders.Left.Size  = 2.25 * g_dKoef_pt_to_mm;
-        this.TableLastCol.TableCellPr.TableCellBorders.Left.Space = 0;
+        var TableLastCol =
+        {
+            TableCellPr :
+            {
+                TableCellBorders :
+                {
+                    Left :
+                    {
+                        Color : { r : Color2.r, g : Color2.g, b : Color2.b },
+                        Value : border_Single,
+                        Size  : 2.25 * g_dKoef_pt_to_mm,
+                        Space : 0
+                    }
+                }
+            }
+        };
+
+        this.Set_UiPriority( 99 );
+        this.Set_ParaPr( ParaPr );
+        this.Set_TablePr( TablePr );
+        this.Set_TableFirstRow( TableFirstRow );
+        this.Set_TableLastRow( TableLastRow );
+        this.Set_TableFirstCol( TableFirstCol );
+        this.Set_TableLastCol( TableLastCol );
     },
 
     Create_Table_BorderedAndLined : function(Color1, Color2, Color3)
@@ -1840,84 +2227,170 @@ CStyle.prototype =
         this.uiPriority = 99;
 
         // ParaPr
-        this.ParaPr.Spacing.After    = 0;
-        this.ParaPr.Spacing.Line     = 1;
-        this.ParaPr.Spacing.LineRule = linerule_Auto;
+        var ParaPr =
+        {
+            Spacing :
+            {
+                After    : 0,
+                Line     : 1,
+                LineRule : linerule_Auto
+            }
+        };
 
         // TablePr
-        this.TablePr.TableStyleColBandSize = 1;
-        this.TablePr.TableStyleRowBandSize = 1;
-        this.TablePr.TableInd = 0;
-        this.TablePr.TableCellMar.Top    = new CTableMeasurement( tblwidth_Auto, 0 );
-        this.TablePr.TableCellMar.Left   = new CTableMeasurement( tblwidth_Auto, 5.4 * g_dKoef_pt_to_mm );
-        this.TablePr.TableCellMar.Bottom = new CTableMeasurement( tblwidth_Auto, 0 );
-        this.TablePr.TableCellMar.Right  = new CTableMeasurement( tblwidth_Auto, 5.4 * g_dKoef_pt_to_mm );
+        var TablePr =
+        {
+            TableStyleColBandSize : 1,
+            TableStyleRowBandSize : 1,
+            TableInd : 0,
 
-        this.TablePr.TableBorders.Top = new CDocumentBorder();
-        this.TablePr.TableBorders.Top.Color.Set( Color1.r, Color1.g, Color1.b );
-        this.TablePr.TableBorders.Top.Value = border_Single;
-        this.TablePr.TableBorders.Top.Size  = 0.5 * g_dKoef_pt_to_mm;
-        this.TablePr.TableBorders.Top.Space = 0;
+            TableCellMar :
+            {
+                Top    : new CTableMeasurement( tblwidth_Auto, 0 ),
+                Left   : new CTableMeasurement( tblwidth_Auto, 5.4 * g_dKoef_pt_to_mm ),
+                Bottom : new CTableMeasurement( tblwidth_Auto, 0 ),
+                Right  : new CTableMeasurement( tblwidth_Auto, 5.4 * g_dKoef_pt_to_mm )
+            },
 
-        this.TablePr.TableBorders.Left = new CDocumentBorder();
-        this.TablePr.TableBorders.Left.Color.Set( Color1.r, Color1.g, Color1.b );
-        this.TablePr.TableBorders.Left.Value = border_Single;
-        this.TablePr.TableBorders.Left.Size  = 0.5 * g_dKoef_pt_to_mm;
-        this.TablePr.TableBorders.Left.Space = 0;
+            TableBorders :
+            {
+                Top :
+                {
+                    Color : { r : Color1.r, g : Color1.g, b : Color1.b },
+                    Value : border_Single,
+                    Size  : 0.5 * g_dKoef_pt_to_mm,
+                    Space : 0
+                },
 
-        this.TablePr.TableBorders.Bottom = new CDocumentBorder();
-        this.TablePr.TableBorders.Bottom.Color.Set( Color1.r, Color1.g, Color1.b );
-        this.TablePr.TableBorders.Bottom.Value = border_Single;
-        this.TablePr.TableBorders.Bottom.Size  = 0.5 * g_dKoef_pt_to_mm;
-        this.TablePr.TableBorders.Bottom.Space = 0;
+                Left :
+                {
+                    Color : { r : Color1.r, g : Color1.g, b : Color1.b },
+                    Value : border_Single,
+                    Size  : 0.5 * g_dKoef_pt_to_mm,
+                    Space : 0
+                },
 
-        this.TablePr.TableBorders.Right = new CDocumentBorder();
-        this.TablePr.TableBorders.Right.Color.Set( Color1.r, Color1.g, Color1.b );
-        this.TablePr.TableBorders.Right.Value = border_Single;
-        this.TablePr.TableBorders.Right.Size  = 0.5 * g_dKoef_pt_to_mm;
-        this.TablePr.TableBorders.Right.Space = 0;
+                Bottom :
+                {
+                    Color : { r : Color1.r, g : Color1.g, b : Color1.b },
+                    Value : border_Single,
+                    Size  : 0.5 * g_dKoef_pt_to_mm,
+                    Space : 0
+                },
 
-        this.TablePr.TableBorders.InsideH = new CDocumentBorder();
-        this.TablePr.TableBorders.InsideH.Color.Set( Color1.r, Color1.g, Color1.b );
-        this.TablePr.TableBorders.InsideH.Value = border_Single;
-        this.TablePr.TableBorders.InsideH.Size  = 0.5 * g_dKoef_pt_to_mm;
-        this.TablePr.TableBorders.InsideH.Space = 0;
+                Right :
+                {
+                    Color : { r : Color1.r, g : Color1.g, b : Color1.b },
+                    Value : border_Single,
+                    Size  : 0.5 * g_dKoef_pt_to_mm,
+                    Space : 0
+                },
 
-        this.TablePr.TableBorders.InsideV = new CDocumentBorder();
-        this.TablePr.TableBorders.InsideV.Color.Set( Color1.r, Color1.g, Color1.b );
-        this.TablePr.TableBorders.InsideV.Value = border_Single;
-        this.TablePr.TableBorders.InsideV.Size  = 0.5 * g_dKoef_pt_to_mm;
-        this.TablePr.TableBorders.InsideV.Space = 0;
+                InsideH :
+                {
+                    Color : { r : Color1.r, g : Color1.g, b : Color1.b },
+                    Value : border_Single,
+                    Size  : 0.5 * g_dKoef_pt_to_mm,
+                    Space : 0
+                },
+
+                InsideV :
+                {
+                    Color : { r : Color1.r, g : Color1.g, b : Color1.b },
+                    Value : border_Single,
+                    Size  : 0.5 * g_dKoef_pt_to_mm,
+                    Space : 0
+                }
+            }
+        };
 
         // TableFirstRow
-        this.TableFirstRow.TableCellPr.Shd = new CDocumentShd();
-        this.TableFirstRow.TableCellPr.Shd.Value = shd_Clear;
-        this.TableFirstRow.TableCellPr.Shd.Color.Set( Color2.r, Color2.g, Color2.b );
+        var TableFirstRow =
+        {
+            TableCellPr :
+            {
+                Shd :
+                {
+                    Value : shd_Clear,
+                    Color : { r : Color2.r, g : Color2.g, b : Color2.b}
+                }
+            }
+        };
 
         // TableLastRow
-        this.TableLastRow.TableCellPr.Shd = new CDocumentShd();
-        this.TableLastRow.TableCellPr.Shd.Value = shd_Clear;
-        this.TableLastRow.TableCellPr.Shd.Color.Set( Color2.r, Color2.g, Color2.b );
+        var TableLastRow =
+        {
+            TableCellPr :
+            {
+                Shd :
+                {
+                    Value : shd_Clear,
+                    Color : { r : Color2.r, g : Color2.g, b : Color2.b}
+                }
+            }
+        };
 
         // TableFirstCol
-        this.TableFirstCol.TableCellPr.Shd = new CDocumentShd();
-        this.TableFirstCol.TableCellPr.Shd.Value = shd_Clear;
-        this.TableFirstCol.TableCellPr.Shd.Color.Set( Color2.r, Color2.g, Color2.b );
+        var TableFirstCol =
+        {
+            TableCellPr :
+            {
+                Shd :
+                {
+                    Value : shd_Clear,
+                    Color : { r : Color2.r, g : Color2.g, b : Color2.b}
+                }
+            }
+        };
 
         // TableLastCol
-        this.TableLastCol.TableCellPr.Shd = new CDocumentShd();
-        this.TableLastCol.TableCellPr.Shd.Value = shd_Clear;
-        this.TableLastCol.TableCellPr.Shd.Color.Set( Color2.r, Color2.g, Color2.b );
+        var TableLastCol =
+        {
+            TableCellPr :
+            {
+                Shd :
+                {
+                    Value : shd_Clear,
+                    Color : { r : Color2.r, g : Color2.g, b : Color2.b}
+                }
+            }
+        };
 
         // TableBand2Vert
-        this.TableBand2Vert.TableCellPr.Shd = new CDocumentShd();
-        this.TableBand2Vert.TableCellPr.Shd.Value = shd_Clear;
-        this.TableBand2Vert.TableCellPr.Shd.Color.Set( Color3.r, Color3.g, Color3.b );
+        var TableBand2Vert =
+        {
+            TableCellPr :
+            {
+                Shd :
+                {
+                    Value : shd_Clear,
+                    Color : { r : Color3.r, g : Color3.g, b : Color3.b}
+                }
+            }
+        };
 
         // TableBand2Horz
-        this.TableBand2Horz.TableCellPr.Shd = new CDocumentShd();
-        this.TableBand2Horz.TableCellPr.Shd.Value = shd_Clear;
-        this.TableBand2Horz.TableCellPr.Shd.Color.Set( Color3.r, Color3.g, Color3.b );
+        var TableBand2Horz =
+        {
+            TableCellPr :
+            {
+                Shd :
+                {
+                    Value : shd_Clear,
+                    Color : { r : Color3.r, g : Color3.g, b : Color3.b}
+                }
+            }
+        };
+
+        this.Set_UiPriority( 99 );
+        this.Set_ParaPr( ParaPr );
+        this.Set_TablePr( TablePr );
+        this.Set_TableFirstRow( TableFirstRow );
+        this.Set_TableLastRow( TableLastRow );
+        this.Set_TableFirstCol( TableFirstCol );
+        this.Set_TableLastCol( TableLastCol );
+        this.Set_TableBand2Horz( TableBand2Horz );
+        this.Set_TableBand2Vert( TableBand2Vert );
     },
 	
 	isEqual: function(cStyles)
@@ -1934,11 +2407,1141 @@ CStyle.prototype =
 			}
 		}
 		return result;
-	}
+	},
+
+//-----------------------------------------------------------------------------------
+// Undo/Redo функции
+//-----------------------------------------------------------------------------------
+    Undo : function(Data)
+    {
+        var Type = Data.Type;
+
+        switch ( Type )
+        {
+            case historyitem_Style_TextPr:
+            {
+                this.TextPr = Data.Old;
+                break;
+            }
+
+            case historyitem_Style_ParaPr:
+            {
+                this.ParaPr = Data.Old;
+                break;
+            }
+
+            case historyitem_Style_TablePr:
+            {
+                this.TablePr = Data.Old;
+                break;
+            }
+
+            case historyitem_Style_TableRowPr:
+            {
+                this.TableRowPr = Data.Old;
+                break;
+            }
+
+            case historyitem_Style_TableCellPr:
+            {
+                this.TableCellPr = Data.Old;
+                break;
+            }
+
+            case historyitem_Style_TableBand1Horz:
+            {
+                this.TableBand1Horz = Data.Old;
+                break;
+            }
+
+            case historyitem_Style_TableBand1Vert:
+            {
+                this.TableBand1Vert = Data.Old;
+                break;
+            }
+
+            case historyitem_Style_TableBand2Horz:
+            {
+                this.TableBand2Horz = Data.Old;
+                break;
+            }
+
+            case historyitem_Style_TableBand2Vert:
+            {
+                this.TableBand2Vert = Data.Old;
+                break;
+            }
+
+            case historyitem_Style_TableFirstCol:
+            {
+                this.TableFirstCol = Data.Old;
+                break;
+            }
+
+            case historyitem_Style_TableFirstRow:
+            {
+                this.TableFirstRow = Data.Old;
+                break;
+            }
+
+            case historyitem_Style_TableLastCol:
+            {
+                this.TableLastCol = Data.Old;
+                break;
+            }
+
+            case historyitem_Style_TableLastRow:
+            {
+                this.TableLastRow = Data.Old;
+                break;
+            }
+
+            case historyitem_Style_TableTLCell:
+            {
+                this.TableTLCell = Data.Old;
+                break;
+            }
+
+            case historyitem_Style_TableTRCell:
+            {
+                this.TableTRCell = Data.Old;
+                break;
+            }
+
+            case historyitem_Style_TableBLCell:
+            {
+                this.TableBLCell = Data.Old;
+                break;
+            }
+
+            case historyitem_Style_TableBRCell:
+            {
+                this.TableBRCell = Data.Old;
+                break;
+            }
+
+            case historyitem_Style_TableWholeTable:
+            {
+                this.TableWholeTable = Data.Old;
+                break;
+            }
+
+            case historyitem_Style_Name:
+            {
+                this.Name = Data.Old;
+                break;
+            }
+
+            case historyitem_Style_BasedOn:
+            {
+                this.BasedOn = Data.Old;
+                break;
+            }
+
+            case historyitem_Style_Next:
+            {
+                this.Next = Data.Old;
+                break;
+            }
+
+            case historyitem_Style_Type:
+            {
+                this.Type = Data.Old;
+                break;
+            }
+
+            case historyitem_Style_QFormat:
+            {
+                this.qFormat = Data.Old;
+                break;
+            }
+
+            case historyitem_Style_UiPriority:
+            {
+                this.uiPriority = Data.Old;
+                break;
+            }
+
+            case historyitem_Style_Hidden:
+            {
+                this.hidden = Data.Old;
+                break;
+            }
+
+            case historyitem_Style_SemiHidden:
+            {
+                this.semiHidden = Data.Old;
+                break;
+            }
+
+            case historyitem_Style_UnhideWhenUsed:
+            {
+                this.unhideWhenUsed = Data.Old;
+                break;
+            }
+        }
+    },
+
+    Redo : function(Data)
+    {
+        var Type = Data.Type;
+
+        switch ( Type )
+        {
+            case historyitem_Style_TextPr:
+            {
+                this.TextPr = Data.New;
+                break;
+            }
+
+            case historyitem_Style_ParaPr:
+            {
+                this.ParaPr = Data.New;
+                break;
+            }
+
+            case historyitem_Style_TablePr:
+            {
+                this.TablePr = Data.New;
+                break;
+            }
+
+            case historyitem_Style_TableRowPr:
+            {
+                this.TableRowPr = Data.New;
+                break;
+            }
+
+            case historyitem_Style_TableCellPr:
+            {
+                this.TableCellPr = Data.New;
+                break;
+            }
+
+            case historyitem_Style_TableBand1Horz:
+            {
+                this.TableBand1Horz = Data.New;
+                break;
+            }
+
+            case historyitem_Style_TableBand1Vert:
+            {
+                this.TableBand1Vert = Data.New;
+                break;
+            }
+
+            case historyitem_Style_TableBand2Horz:
+            {
+                this.TableBand2Horz = Data.New;
+                break;
+            }
+
+            case historyitem_Style_TableBand2Vert:
+            {
+                this.TableBand2Vert = Data.New;
+                break;
+            }
+
+            case historyitem_Style_TableFirstCol:
+            {
+                this.TableFirstCol = Data.New;
+                break;
+            }
+
+            case historyitem_Style_TableFirstRow:
+            {
+                this.TableFirstRow = Data.New;
+                break;
+            }
+
+            case historyitem_Style_TableLastCol:
+            {
+                this.TableLastCol = Data.New;
+                break;
+            }
+
+            case historyitem_Style_TableLastRow:
+            {
+                this.TableLastRow = Data.New;
+                break;
+            }
+
+            case historyitem_Style_TableTLCell:
+            {
+                this.TableTLCell = Data.New;
+                break;
+            }
+
+            case historyitem_Style_TableTRCell:
+            {
+                this.TableTRCell = Data.New;
+                break;
+            }
+
+            case historyitem_Style_TableBLCell:
+            {
+                this.TableBLCell = Data.New;
+                break;
+            }
+
+            case historyitem_Style_TableBRCell:
+            {
+                this.TableBRCell = Data.New;
+                break;
+            }
+
+            case historyitem_Style_TableWholeTable:
+            {
+                this.TableWholeTable = Data.New;
+                break;
+            }
+
+            case historyitem_Style_Name:
+            {
+                this.Name = Data.New;
+                break;
+            }
+
+            case historyitem_Style_BasedOn:
+            {
+                this.BasedOn = Data.New;
+                break;
+            }
+
+            case historyitem_Style_Next:
+            {
+                this.Next = Data.New;
+                break;
+            }
+
+            case historyitem_Style_Type:
+            {
+                this.Type = Data.New;
+                break;
+            }
+
+            case historyitem_Style_QFormat:
+            {
+                this.qFormat = Data.New;
+                break;
+            }
+
+            case historyitem_Style_UiPriority:
+            {
+                this.uiPriority = Data.New;
+                break;
+            }
+
+            case historyitem_Style_Hidden:
+            {
+                this.hidden = Data.New;
+                break;
+            }
+
+            case historyitem_Style_SemiHidden:
+            {
+                this.semiHidden = Data.New;
+                break;
+            }
+
+            case historyitem_Style_UnhideWhenUsed:
+            {
+                this.unhideWhenUsed = Data.New;
+                break;
+            }
+        }
+    },
+
+    Get_SelectionState : function()
+    {
+    },
+
+    Set_SelectionState : function(State, StateIndex)
+    {
+    },
+
+    Get_ParentObject_or_DocumentPos : function()
+    {
+        return { Type : historyrecalctype_Inline, Data : 0 };
+    },
+
+    Refresh_RecalcData : function(Data)
+    {
+        var Type = Data.Type;
+
+        var bNeedRecalc = false;
+
+        switch ( Type )
+        {
+            case historyitem_Style_TextPr          :
+            case historyitem_Style_ParaPr          :
+            case historyitem_Style_TablePr         :
+            case historyitem_Style_TableRowPr      :
+            case historyitem_Style_TableCellPr     :
+            case historyitem_Style_TableBand1Horz  :
+            case historyitem_Style_TableBand1Vert  :
+            case historyitem_Style_TableBand2Horz  :
+            case historyitem_Style_TableBand2Vert  :
+            case historyitem_Style_TableFirstCol   :
+            case historyitem_Style_TableFirstRow   :
+            case historyitem_Style_TableLastCol    :
+            case historyitem_Style_TableLastRow    :
+            case historyitem_Style_TableTLCell     :
+            case historyitem_Style_TableTRCell     :
+            case historyitem_Style_TableBLCell     :
+            case historyitem_Style_TableBRCell     :
+            case historyitem_Style_TableWholeTable :
+            case historyitem_Style_Name            :
+            case historyitem_Style_BasedOn         :
+            case historyitem_Style_Next            :
+            case historyitem_Style_Type            :
+            case historyitem_Style_QFormat         :
+            case historyitem_Style_UiPriority      :
+            case historyitem_Style_Hidden          :
+            case historyitem_Style_SemiHidden      :
+            case historyitem_Style_UnhideWhenUsed  :
+            {
+                break;
+            }
+        }
+
+        if ( true === bNeedRecalc )
+        {
+            // Сообщаем родительскому классу, что изменения произошли в элементе с номером this.Index и на странице this.PageNum
+            return this.Refresh_RecalcData2();
+        }
+    },
+
+    Refresh_RecalcData2 : function()
+    {
+        //editor.WordControl.m_oLogicDocument.Refresh_RecalcData2( 0, 0 );
+    },
+//-----------------------------------------------------------------------------------
+// Функции для совместного редактирования
+//-----------------------------------------------------------------------------------
+    Document_Is_SelectionLocked : function(CheckType)
+    {
+        switch ( CheckType )
+        {
+            case changestype_Paragraph_Content:
+            case changestype_Paragraph_Properties:
+            case changestype_Document_Content:
+            case changestype_Document_Content_Add:
+            case changestype_Image_Properties:
+            case changestype_Remove:
+            case changestype_Delete:
+            case changestype_Document_SectPr:
+            case changestype_Table_Properties:
+            case changestype_Table_RemoveCells:
+            case changestype_HdrFtr:
+            {
+                CollaborativeEditing.Add_CheckLock(true);
+                break;
+            }
+        }
+    },
+
+    Save_Changes : function(Data, Writer)
+    {
+        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
+        // Long : тип класса
+        // Long : тип изменений
+
+        Writer.WriteLong( historyitem_type_Style );
+
+        var Type = Data.Type;
+
+        // Пишем тип
+        Writer.WriteLong( Type );
+
+        switch ( Type )
+        {
+            case historyitem_Style_TextPr:
+            case historyitem_Style_ParaPr:
+            case historyitem_Style_TablePr:
+            case historyitem_Style_TableRowPr:
+            case historyitem_Style_TableCellPr:
+            case historyitem_Style_TableBand1Horz:
+            case historyitem_Style_TableBand1Vert:
+            case historyitem_Style_TableBand2Horz:
+            case historyitem_Style_TableBand2Vert:
+            case historyitem_Style_TableFirstCol:
+            case historyitem_Style_TableFirstRow:
+            case historyitem_Style_TableLastCol:
+            case historyitem_Style_TableLastRow:
+            case historyitem_Style_TableTLCell:
+            case historyitem_Style_TableTRCell:
+            case historyitem_Style_TableBLCell:
+            case historyitem_Style_TableBRCell:
+            case historyitem_Style_TableWholeTable:
+            {
+                // Variable
+                Data.New.Write_ToBinary( Writer );
+                break;
+            }
+
+            case historyitem_Style_Name:
+            case historyitem_Style_BasedOn:
+            case historyitem_Style_Next:
+            {
+                // Bool : is undefined
+                // (false)
+                //   Bool : is null
+                //   (false)
+                //     String : value
+
+                if ( undefined === Data.New )
+                    Writer.WriteBool( true );
+                else
+                {
+                    Writer.WriteBool( false );
+                    if ( null === Data.New )
+                        Writer.WriteBool( true );
+                    else
+                    {
+                        Writer.WriteBool( false );
+                        Writer.WriteString2( Data.New );
+                    }
+                }
+
+                break;
+            }
+
+
+            case historyitem_Style_Type:
+            {
+                // Long : value
+                Writer.WriteLong( Data.New );
+
+                break;
+            }
+
+            case historyitem_Style_QFormat:
+            case historyitem_Style_Hidden:
+            case historyitem_Style_SemiHidden:
+            case historyitem_Style_UnhideWhenUsed:
+            {
+                // Bool : is undefined
+                // (false)
+                //   Bool : is null
+                //   (false)
+                //     Bool : value
+
+                if ( undefined === Data.New )
+                    Writer.WriteBool( true );
+                else
+                {
+                    Writer.WriteBool( false );
+                    if ( null === Data.New )
+                        Writer.WriteBool( true );
+                    else
+                    {
+                        Writer.WriteBool( false );
+                        Writer.WriteBool( Data.New );
+                    }
+                }
+
+                break;
+            }
+
+            case historyitem_Style_UiPriority:
+            {
+                // Bool : is undefined
+                // (false)
+                //   Bool : is null
+                //   (false)
+                //     Long : value
+
+                if ( undefined === Data.New )
+                    Writer.WriteBool( true );
+                else
+                {
+                    Writer.WriteBool( false );
+                    if ( null === Data.New )
+                        Writer.WriteBool( true );
+                    else
+                    {
+                        Writer.WriteBool( false );
+                        Writer.WriteLong( Data.New );
+                    }
+                }
+
+                break;
+            }
+        }
+
+        return Writer;
+    },
+
+    Load_Changes : function(Reader)
+    {
+        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
+        // Long : тип класса
+        // Long : тип изменений
+
+        var ClassType = Reader.GetLong();
+        if ( historyitem_type_Style != ClassType )
+            return;
+
+        var Type = Reader.GetLong();
+
+        switch ( Type )
+        {
+            case historyitem_Style_TextPr:
+            {
+                // Variable
+                this.TextPr = new CTextPr();
+                this.TextPr.Read_FromBinary( Reader );
+                break;
+            }
+            case historyitem_Style_ParaPr:
+            {
+                // Variable
+                this.ParaPr = new CParaPr();
+                this.ParaPr.Read_FromBinary( Reader );
+                break;
+            }
+            case historyitem_Style_TablePr:
+            {
+                // Variable
+                this.TablePr = new CTablePr();
+                this.TablePr.Read_FromBinary( Reader );
+                break;
+            }
+            case historyitem_Style_TableRowPr:
+            {
+                // Variable
+                this.TableRowPr = new CTableRowPr();
+                this.TableRowPr.Read_FromBinary( Reader );
+                break;
+            }
+            case historyitem_Style_TableCellPr:
+            {
+                // Variable
+                this.TableCellPr = new CTableCellPr();
+                this.TableCellPr.Read_FromBinary( Reader );
+                break;
+            }
+            case historyitem_Style_TableBand1Horz:
+            {
+                // Variable
+                this.TableBand1Horz = new CTableStylePr();
+                this.TableBand1Horz.Read_FromBinary( Reader );
+                break;
+            }
+            case historyitem_Style_TableBand1Vert:
+            {
+                // Variable
+                this.TableBand1Vert = new CTableStylePr();
+                this.TableBand1Vert.Read_FromBinary( Reader );
+                break;
+            }
+            case historyitem_Style_TableBand2Horz:
+            {
+                // Variable
+                this.TableBand2Horz = new CTableStylePr();
+                this.TableBand2Horz.Read_FromBinary( Reader );
+                break;
+            }
+            case historyitem_Style_TableBand2Vert:
+            {
+                // Variable
+                this.TableBand2Vert = new CTableStylePr();
+                this.TableBand2Vert.Read_FromBinary( Reader );
+                break;
+            }
+            case historyitem_Style_TableFirstCol:
+            {
+                // Variable
+                this.TableFirstCol = new CTableStylePr();
+                this.TableFirstCol.Read_FromBinary( Reader );
+                break;
+            }
+            case historyitem_Style_TableFirstRow:
+            {
+                // Variable
+                this.TableFirstRow = new CTableStylePr();
+                this.TableFirstRow.Read_FromBinary( Reader );
+                break;
+            }
+            case historyitem_Style_TableLastCol:
+            {
+                // Variable
+                this.TableLastCol = new CTableStylePr();
+                this.TableLastCol.Read_FromBinary( Reader );
+                break;
+            }
+            case historyitem_Style_TableLastRow:
+            {
+                // Variable
+                this.TableLastRow = new CTableStylePr();
+                this.TableLastRow.Read_FromBinary( Reader );
+                break;
+            }
+            case historyitem_Style_TableTLCell:
+            {
+                // Variable
+                this.TableTLCell = new CTableStylePr();
+                this.TableTLCell.Read_FromBinary( Reader );
+                break;
+            }
+            case historyitem_Style_TableTRCell:
+            {
+                // Variable
+                this.TableTRCell = new CTableStylePr();
+                this.TableTRCell.Read_FromBinary( Reader );
+                break;
+            }
+            case historyitem_Style_TableBLCell:
+            {
+                // Variable
+                this.TableBLCell = new CTableStylePr();
+                this.TableBLCell.Read_FromBinary( Reader );
+                break;
+            }
+            case historyitem_Style_TableBRCell:
+            {
+                // Variable
+                this.TableBRCell = new CTableStylePr();
+                this.TableBRCell.Read_FromBinary( Reader );
+                break;
+            }
+            case historyitem_Style_TableWholeTable:
+            {
+                // Variable
+                this.TableWholeTable = new CTableStylePr();
+                this.TableWholeTable.Read_FromBinary( Reader );
+                break;
+            }
+
+            case historyitem_Style_Name:
+            {
+                // Bool : is undefined
+                // (false)
+                //   Bool : is null
+                //   (false)
+                //     String : value
+
+                if ( true === Reader.GetBool() )
+                    this.Name = undefined;
+                else if ( true === Reader.GetBool() )
+                    this.Name = null;
+                else
+                    this.Name = Reader.GetString2();
+
+                break;
+            }
+
+            case historyitem_Style_BasedOn:
+            {
+                // Bool : is undefined
+                // (false)
+                //   Bool : is null
+                //   (false)
+                //     String : value
+
+                if ( true === Reader.GetBool() )
+                    this.BasedOn = undefined;
+                else if ( true === Reader.GetBool() )
+                    this.BasedOn = null;
+                else
+                    this.BasedOn = Reader.GetString2();
+
+                break;
+            }
+
+            case historyitem_Style_Next:
+            {
+                // Bool : is undefined
+                // (false)
+                //   Bool : is null
+                //   (false)
+                //     String : value
+
+                if ( true === Reader.GetBool() )
+                    this.Next = undefined;
+                else if ( true === Reader.GetBool() )
+                    this.Next = null;
+                else
+                    this.Next = Reader.GetString2();
+
+                break;
+            }
+
+
+            case historyitem_Style_Type:
+            {
+                // Long : value
+                this.Type = Reader.GetLong();
+
+                break;
+            }
+
+            case historyitem_Style_QFormat:
+            {
+                // Bool : is undefined
+                // (false)
+                //   Bool : is null
+                //   (false)
+                //     Bool : value
+
+                if ( true === Reader.GetBool() )
+                    this.qFormat = undefined;
+                else if ( true === Reader.GetBool() )
+                    this.qFormat = null;
+                else
+                    this.qFormat = Reader.GetBool();
+
+                break;
+            }
+
+            case historyitem_Style_Hidden:
+            {
+                // Bool : is undefined
+                // (false)
+                //   Bool : is null
+                //   (false)
+                //     Bool : value
+
+                if ( true === Reader.GetBool() )
+                    this.hidden = undefined;
+                else if ( true === Reader.GetBool() )
+                    this.hidden = null;
+                else
+                    this.hidden = Reader.GetBool();
+
+                break;
+            }
+
+            case historyitem_Style_SemiHidden:
+            {
+                // Bool : is undefined
+                // (false)
+                //   Bool : is null
+                //   (false)
+                //     Bool : value
+
+                if ( true === Reader.GetBool() )
+                    this.semiHidden = undefined;
+                else if ( true === Reader.GetBool() )
+                    this.semiHidden = null;
+                else
+                    this.semiHidden = Reader.GetBool();
+
+                break;
+            }
+
+            case historyitem_Style_UnhideWhenUsed:
+            {
+                // Bool : is undefined
+                // (false)
+                //   Bool : is null
+                //   (false)
+                //     Bool : value
+
+                if ( true === Reader.GetBool() )
+                    this.unhideWhenUsed = undefined;
+                else if ( true === Reader.GetBool() )
+                    this.unhideWhenUsed = null;
+                else
+                    this.unhideWhenUsed = Reader.GetBool();
+
+                break;
+            }
+            case historyitem_Style_UiPriority:
+            {
+                // Bool : is undefined
+                // (false)
+                //   Bool : is null
+                //   (false)
+                //     Long : value
+
+                if ( true === Reader.GetBool() )
+                    this.uiPriority = undefined;
+                else if ( true === Reader.GetBool() )
+                    this.uiPriority = null;
+                else
+                    this.uiPriority = Reader.GetLong();
+
+                break;
+            }
+
+
+        }
+    },
+
+    Write_ToBinary2 : function(Writer)
+    {
+        Writer.WriteLong( historyitem_type_Style );
+
+        // String   : Id
+        // Bool(und) -> Bool(null) -> String : Name
+        // Bool(und) -> Bool(null) -> String : BasedOn
+        // Bool(und) -> Bool(null) -> String : Next
+        // Long : Type
+        // Bool(und) -> Bool(null) -> Long : uiPriority
+        // Bool(und) -> Bool(null) -> Bool : qFormat
+        // Bool(und) -> Bool(null) -> Bool : hidden
+        // Bool(und) -> Bool(null) -> Bool : semiHidden
+        // Bool(und) -> Bool(null) -> Bool : unhideWhenUsed
+        // Variable(CTextPr)      : TextPr
+        // Variable(CParaPr)      : ParaPr
+        // Variable(CTablePr)     : TablePr
+        // Variable(CTableRowPr)  : TableRowPr
+        // Variable(CTableCellPr) : TableCellPr
+        // Variable(CTableStylePr) : TableBand1Horz
+        // Variable(CTableStylePr) : TableBand1Vert
+        // Variable(CTableStylePr) : TableBand2Horz
+        // Variable(CTableStylePr) : TableBand2Vert
+        // Variable(CTableStylePr) : TableFirstCol
+        // Variable(CTableStylePr) : TableFirstRow
+        // Variable(CTableStylePr) : TableLastCol
+        // Variable(CTableStylePr) : TableLastRow
+        // Variable(CTableStylePr) : TableTLCell
+        // Variable(CTableStylePr) : TableTRCell
+        // Variable(CTableStylePr) : TableBLCell
+        // Variable(CTableStylePr) : TableBRCell
+        // Variable(CTableStylePr) : TableWholeTable
+
+        Writer.WriteString2( this.Id );
+
+        if ( undefined === this.Name )
+            Writer.WriteBool( true );
+        else
+        {
+            Writer.WriteBool( false );
+            if ( null === this.Name )
+                Writer.WriteBool( true );
+            else
+                Writer.WriteString2( this.Name );
+        }
+
+
+        if ( undefined === this.BasedOn )
+            Writer.WriteBool( true );
+        else
+        {
+            Writer.WriteBool( false );
+            if ( null === this.BasedOn )
+                Writer.WriteBool( true );
+            else
+                Writer.WriteString2( this.BasedOn );
+        }
+
+        if ( undefined === this.Next )
+            Writer.WriteBool( true );
+        else
+        {
+            Writer.WriteBool( false );
+            if ( null === this.Next )
+                Writer.WriteBool( true );
+            else
+                Writer.WriteString2( this.Next );
+        }
+
+        Writer.WriteLong( this.Type );
+
+        if ( undefined === this.uiPriority )
+            Writer.WriteBool( true );
+        else
+        {
+            Writer.WriteBool( false );
+            if ( null === this.uiPriority )
+                Writer.WriteBool( true );
+            else
+                Writer.WriteLong( this.uiPriority );
+        }
+
+        if ( undefined === this.qFormat )
+            Writer.WriteBool( true );
+        else
+        {
+            Writer.WriteBool( false );
+            if ( null === this.qFormat )
+                Writer.WriteBool( true );
+            else
+                Writer.WriteBool( this.qFormat );
+        }
+
+        if ( undefined === this.hidden )
+            Writer.WriteBool( true );
+        else
+        {
+            Writer.WriteBool( false );
+            if ( null === this.hidden )
+                Writer.WriteBool( true );
+            else
+                Writer.WriteBool( this.hidden );
+        }
+
+        if ( undefined === this.semiHidden )
+            Writer.WriteBool( true );
+        else
+        {
+            Writer.WriteBool( false );
+            if ( null === this.semiHidden )
+                Writer.WriteBool( true );
+            else
+                Writer.WriteBool( this.semiHidden );
+        }
+
+        if ( undefined === this.unhideWhenUsed )
+            Writer.WriteBool( true );
+        else
+        {
+            Writer.WriteBool( false );
+            if ( null === this.unhideWhenUsed )
+                Writer.WriteBool( true );
+            else
+                Writer.WriteBool( this.unhideWhenUsed );
+        }
+
+
+        this.TextPr.Write_ToBinary(Writer);
+        this.ParaPr.Write_ToBinary(Writer);
+
+        this.TablePr.Write_ToBinary(Writer);
+        this.TableRowPr.Write_ToBinary(Writer);
+        this.TableCellPr.Write_ToBinary(Writer);
+
+        this.TableBand1Horz.Write_ToBinary(Writer);
+        this.TableBand1Vert.Write_ToBinary(Writer);
+        this.TableBand2Horz.Write_ToBinary(Writer);
+        this.TableBand2Vert.Write_ToBinary(Writer);
+        this.TableFirstCol.Write_ToBinary(Writer);
+        this.TableFirstRow.Write_ToBinary(Writer);
+        this.TableLastCol.Write_ToBinary(Writer);
+        this.TableLastRow.Write_ToBinary(Writer);
+        this.TableTLCell.Write_ToBinary(Writer);
+        this.TableTRCell.Write_ToBinary(Writer);
+        this.TableBLCell.Write_ToBinary(Writer);
+        this.TableBRCell.Write_ToBinary(Writer);
+        this.TableWholeTable.Write_ToBinary(Writer);
+    },
+
+    Read_FromBinary2 : function(Reader)
+    {
+        // String   : Id
+        // Bool(und) -> Bool(null) -> String : Name
+        // Bool(und) -> Bool(null) -> String : BasedOn
+        // Bool(und) -> Bool(null) -> String : Next
+        // Long : Type
+        // Bool(und) -> Bool(null) -> Long : uiPriority
+        // Bool(und) -> Bool(null) -> Bool : qFormat
+        // Bool(und) -> Bool(null) -> Bool : hidden
+        // Bool(und) -> Bool(null) -> Bool : semiHidden
+        // Bool(und) -> Bool(null) -> Bool : unhideWhenUsed
+        // Variable(CTextPr)      : TextPr
+        // Variable(CParaPr)      : ParaPr
+        // Variable(CTablePr)     : TablePr
+        // Variable(CTableRowPr)  : TableRowPr
+        // Variable(CTableCellPr) : TableCellPr
+        // Variable(CTableStylePr) : TableBand1Horz
+        // Variable(CTableStylePr) : TableBand1Vert
+        // Variable(CTableStylePr) : TableBand2Horz
+        // Variable(CTableStylePr) : TableBand2Vert
+        // Variable(CTableStylePr) : TableFirstCol
+        // Variable(CTableStylePr) : TableFirstRow
+        // Variable(CTableStylePr) : TableLastCol
+        // Variable(CTableStylePr) : TableLastRow
+        // Variable(CTableStylePr) : TableTLCell
+        // Variable(CTableStylePr) : TableTRCell
+        // Variable(CTableStylePr) : TableBLCell
+        // Variable(CTableStylePr) : TableBRCell
+        // Variable(CTableStylePr) : TableWholeTable
+
+        this.Id = Reader.GetString2();
+
+        if ( true === Reader.GetBool() )
+            this.Name = undefined;
+        else if ( true === Reader.GetBool() )
+            this.Name = null;
+        else
+            this.Name = Reader.GetString2();
+
+        if ( true === Reader.GetBool() )
+            this.BasedOn = undefined;
+        else if ( true === Reader.GetBool() )
+            this.BasedOn = null;
+        else
+            this.BasedOn = Reader.GetString2();
+
+
+        if ( true === Reader.GetBool() )
+            this.Next = undefined;
+        else if ( true === Reader.GetBool() )
+            this.Next = null;
+        else
+            this.Next = Reader.GetString2();
+
+        this.Type = Reader.GetLong();
+
+        if ( true === Reader.GetBool() )
+            this.uiPriority = undefined;
+        else if ( true === Reader.GetBool() )
+            this.uiPriority = null;
+        else
+            this.uiPriority = Reader.GetLong();
+
+        if ( true === Reader.GetBool() )
+            this.qFormat = undefined;
+        else if ( true === Reader.GetBool() )
+            this.qFormat = null;
+        else
+            this.qFormat = Reader.GetBool();
+
+        if ( true === Reader.GetBool() )
+            this.hidden = undefined;
+        else if ( true === Reader.GetBool() )
+            this.hidden = null;
+        else
+            this.hidden = Reader.GetBool();
+
+        if ( true === Reader.GetBool() )
+            this.semiHidden = undefined;
+        else if ( true === Reader.GetBool() )
+            this.semiHidden = null;
+        else
+            this.semiHidden = Reader.GetBool();
+
+        if ( true === Reader.GetBool() )
+            this.unhideWhenUsed = undefined;
+        else if ( true === Reader.GetBool() )
+            this.unhideWhenUsed = null;
+        else
+            this.unhideWhenUsed = Reader.GetBool();
+
+        this.TextPr.Read_FromBinary(Reader);
+        this.ParaPr.Read_FromBinary(Reader);
+
+        this.TablePr.Read_FromBinary(Reader);
+        this.TableRowPr.Read_FromBinary(Reader);
+        this.TableCellPr.Read_FromBinary(Reader);
+
+        this.TableBand1Horz.Read_FromBinary(Reader);
+        this.TableBand1Vert.Read_FromBinary(Reader);
+        this.TableBand2Horz.Read_FromBinary(Reader);
+        this.TableBand2Vert.Read_FromBinary(Reader);
+        this.TableFirstCol.Read_FromBinary(Reader);
+        this.TableFirstRow.Read_FromBinary(Reader);
+        this.TableLastCol.Read_FromBinary(Reader);
+        this.TableLastRow.Read_FromBinary(Reader);
+        this.TableTLCell.Read_FromBinary(Reader);
+        this.TableTRCell.Read_FromBinary(Reader);
+        this.TableBLCell.Read_FromBinary(Reader);
+        this.TableBRCell.Read_FromBinary(Reader);
+        this.TableWholeTable.Read_FromBinary(Reader);
+    },
+
+    Load_LinkData : function(LinkData)
+    {
+    }
 };
 
 function CStyles()
 {
+    this.Id = g_oIdCounter.Get_NewId();
+
     this.Default =
     {
         ParaPr      : new CParaPr(),
@@ -1964,7 +3567,6 @@ function CStyles()
     this.Default.TableRowPr.Init_Default();
     this.Default.TableCellPr.Init_Default();
 
-    this.Id = 0;
     this.Style = new Array();
 
     // Создадим стандартные стили
@@ -1972,302 +3574,261 @@ function CStyles()
     // Дефолтовый стиль для параграфа
     var Style_Para_Def = new CStyle( "Normal", null, null, styletype_Paragraph );
     Style_Para_Def.Create_Default_Paragraph();
-    this.Style[this.Id] = Style_Para_Def;
-    this.Default.Paragraph = this.Id;
+    this.Default.Paragraph = this.Add( Style_Para_Def );
 
-    this.Id++;
     // Дефолтовый стиль для текста
     var Style_Char_Def = new CStyle( "Default Paragraph Font", null, null, styletype_Character );
     Style_Char_Def.Create_Default_Character();
-    this.Style[this.Id] = Style_Char_Def;
-    this.Default.Character = this.Id;
+    this.Default.Character = this.Add( Style_Char_Def );
 
-    this.Id++;
     // Дефолтовый стиль для нумерации в списках
     var Style_Num_Def = new CStyle( "No List", null, null, styletype_Numbering );
     Style_Num_Def.Create_Default_Numbering();
-    this.Style[this.Id] = Style_Num_Def;
-    this.Default.Numbering = this.Id;
+    this.Default.Numbering = this.Add( Style_Num_Def );
 
-    this.Id++;
     // Создаем стандартные стили для заголовков
     var Style_H1 = new CStyle("Heading 1", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
     Style_H1.Create_Heading1();
-    this.Style[this.Id] = Style_H1;
-    this.Default.Headings[0] = this.Id;
+    this.Default.Headings[0] = this.Add( Style_H1 );
 
-    this.Id++;
     // Создаем стандартные стили для заголовков
     var Style_H2 = new CStyle("Heading 2", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
     Style_H2.Create_Heading2();
-    this.Style[this.Id] = Style_H2;
-    this.Default.Headings[1] = this.Id;
+    this.Default.Headings[1] = this.Add( Style_H2 );
 
-    this.Id++;
     // Создаем стандартные стили для заголовков
     var Style_H3 = new CStyle("Heading 3", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
     Style_H3.Create_Heading3();
-    this.Style[this.Id] = Style_H3;
-    this.Default.Headings[2] = this.Id;
+    this.Default.Headings[2] = this.Add( Style_H3 );
 
-    this.Id++;
     // Создаем стандартные стили для заголовков
     var Style_H4 = new CStyle("Heading 4", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
     Style_H4.Create_Heading4();
-    this.Style[this.Id] = Style_H4;
-    this.Default.Headings[3] = this.Id;
+    this.Default.Headings[3] = this.Add( Style_H4 );
 
-    this.Id++;
     // Создаем стандартные стили для заголовков
     var Style_H5 = new CStyle("Heading 5", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
     Style_H5.Create_Heading5();
-    this.Style[this.Id] = Style_H5;
-    this.Default.Headings[4] = this.Id;
+    this.Default.Headings[4] = this.Add( Style_H5 );
 
-    this.Id++;
     // Создаем стандартные стили для заголовков
     var Style_H6 = new CStyle("Heading 6", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
     Style_H6.Create_Heading6();
-    this.Style[this.Id] = Style_H6;
-    this.Default.Headings[5] = this.Id;
+    this.Default.Headings[5] = this.Add( Style_H6 );
 
-    this.Id++;
     // Создаем стандартные стили для заголовков
     var Style_H7 = new CStyle("Heading 7", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
     Style_H7.Create_Heading7();
-    this.Style[this.Id] = Style_H7;
-    this.Default.Headings[6] = this.Id;
+    this.Default.Headings[6] = this.Add( Style_H7 );
 
-    this.Id++;
     // Создаем стандартные стили для заголовков
     var Style_H8 = new CStyle("Heading 8", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
     Style_H8.Create_Heading8();
-    this.Style[this.Id] = Style_H8;
-    this.Default.Headings[7] = this.Id;
+    this.Default.Headings[7] = this.Add( Style_H8 );
 
-    this.Id++;
     // Создаем стандартные стили для заголовков
     var Style_H9 = new CStyle("Heading 9", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
     Style_H9.Create_Heading9();
-    this.Style[this.Id] = Style_H9;
-    this.Default.Headings[8] = this.Id;
+    this.Default.Headings[8] = this.Add( Style_H9 );
 
-    this.Id++;
     // Создаем стандартный стиль для нумерованных параграфов
     var Style_Para_List = new CStyle("List Paragraph", this.Default.Paragraph, null, styletype_Paragraph );
     Style_Para_List.Create_ListParagraph();
-    this.Style[this.Id] = Style_Para_List;
-    this.Default.ParaList = this.Id;
-
-    this.Id++;
+    this.Default.ParaList = this.Add( Style_Para_List );
 
     // Создаем стандартный стиль для таблиц
     var Style_Table = new CStyle("Normal Table", null, null, styletype_Table );
     Style_Table.Create_NormalTable();
-    this.Style[this.Id] = Style_Table;
-    this.Default.Table = this.Id;
+    this.Default.Table = this.Add( Style_Table );
 
-    this.Id++;
     // Создаем стиль "Без интервала"
     var Style_NoSpacing = new CStyle("No Spacing", null, null, styletype_Paragraph );
     Style_NoSpacing.Create_NoSpacing();
-    this.Style[this.Id] = Style_NoSpacing;
-
-    this.Id++;
+    this.Add( Style_NoSpacing );
 
     // Создаем стиль "Заголовок"
     var Style_Title = new CStyle("Title", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
     Style_Title.Create_Title();
-    this.Style[this.Id] = Style_Title;
+    this.Add( Style_Title );
 
-    this.Id++;
     // Создаем стиль "Подзаголовок"
     var Style_Subtitle = new CStyle("Subtitle", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
     Style_Subtitle.Create_Subtitle();
-    this.Style[this.Id] = Style_Subtitle;
+    this.Add( Style_Subtitle );
 
-    this.Id++;
     // Создаем стиль "Цитата"
     var Style_Quote = new CStyle("Quote", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
     Style_Quote.Create_Quote();
-    this.Style[this.Id] = Style_Quote;
+    this.Add( Style_Quote );
 
-    this.Id++;
     // Создаем стиль "Выделенная цитата"
     var Style_IntenseQuote = new CStyle("Intense Quote", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
     Style_IntenseQuote.Create_IntenseQuote();
-    this.Style[this.Id] = Style_IntenseQuote;
-
-    this.Id++;
+    this.Add( Style_IntenseQuote );
 
     // Создаем стандартный стиль верхнего колонтитула
     var Style_Header = new CStyle("Header", this.Default.Paragraph, null, styletype_Paragraph );
     Style_Header.Create_Header();
-    this.Style[this.Id] = Style_Header;
-    this.Default.Header = this.Id;
-
-    this.Id++;
+    this.Default.Header = this.Add( Style_Header );
 
     // Создаем стандартный стиль нижнего колонтитула
     var Style_Footer = new CStyle("Footer", this.Default.Paragraph, null, styletype_Paragraph );
     Style_Footer.Create_Footer();
-    this.Style[this.Id] = Style_Footer;
-    this.Default.Footer = this.Id;
+    this.Default.Footer = this.Add( Style_Footer );
 
-    this.Id++;
     // Создаем стиль для таблиц, который будет применяться к новым таблицам
     var Style_TableGrid = new CStyle("Table Grid", this.Default.Table, null, styletype_Table );
     Style_TableGrid.Create_TableGrid();
-    this.Style[this.Id] = Style_TableGrid;
-    this.Default.TableGrid = this.Id;
+    this.Default.TableGrid = this.Add( Style_TableGrid );
 
-    this.Id++;
     /*
     // Создаем стандартный стиль для таблиц
     var Style_Table = new CStyle("LightShading", this.Default.Table, null, styletype_Table );
     Style_Table.Create_Table_LightShading();
-    this.Style[this.Id] = Style_Table;
-
-    this.Id++;
+    this.Add( Style_Table );
 
     // Создаем стандартный стиль для таблиц
     var Style_Table = new CStyle("ColorfulListAccent6", this.Default.Table, null, styletype_Table );
     Style_Table.Create_Table_ColorfulListAccent6();
-    this.Style[this.Id] = Style_Table;
-
-    this.Id++;
+    this.Add( Style_Table );
     */
 
     // Стандартные стили таблиц
     var Style_Table_Lined = new CStyle("Lined", this.Default.Table, null, styletype_Table );
     Style_Table_Lined.Create_Table_Lined( new CDocumentColor( 0xA6, 0xA6, 0xA6 ), new CDocumentColor( 0xD9, 0xD9, 0xD9 ) );
-    this.Style[this.Id] = Style_Table_Lined;
-
-    this.Id++;
+    this.Add( Style_Table_Lined );
 
     var Style_Table_Lined_Accent1 = new CStyle("Lined - Accent 1", this.Default.Table, null, styletype_Table );
     Style_Table_Lined_Accent1.Create_Table_Lined( new CDocumentColor( 0x95, 0xB3, 0xD7 ), new CDocumentColor( 0xDB, 0xE5, 0xF1 ) );
-    this.Style[this.Id] = Style_Table_Lined_Accent1;
-
-    this.Id++;
+    this.Add( Style_Table_Lined_Accent1 );
 
     var Style_Table_Lined_Accent2 = new CStyle("Lined - Accent 2", this.Default.Table, null, styletype_Table );
     Style_Table_Lined_Accent2.Create_Table_Lined( new CDocumentColor( 0xD9, 0x95, 0x94 ), new CDocumentColor( 0xF2, 0xDB, 0xDB ) );
-    this.Style[this.Id] = Style_Table_Lined_Accent2;
-
-    this.Id++;
+    this.Add( Style_Table_Lined_Accent2 );
 
     var Style_Table_Lined_Accent3 = new CStyle("Lined - Accent 3", this.Default.Table, null, styletype_Table );
     Style_Table_Lined_Accent3.Create_Table_Lined( new CDocumentColor( 0xC2, 0xD6, 0x9B ), new CDocumentColor( 0xEA, 0xF1, 0xDD ) );
-    this.Style[this.Id] = Style_Table_Lined_Accent3;
-
-    this.Id++;
+    this.Add( Style_Table_Lined_Accent3 );
 
     var Style_Table_Lined_Accent4 = new CStyle("Lined - Accent 4", this.Default.Table, null, styletype_Table );
     Style_Table_Lined_Accent4.Create_Table_Lined( new CDocumentColor( 0xB2, 0xA1, 0xC7 ), new CDocumentColor( 0xE5, 0xDF, 0xEC ) );
-    this.Style[this.Id] = Style_Table_Lined_Accent4;
-
-    this.Id++;
+    this.Add( Style_Table_Lined_Accent4 );
 
     var Style_Table_Lined_Accent5 = new CStyle("Lined - Accent 5", this.Default.Table, null, styletype_Table );
     Style_Table_Lined_Accent5.Create_Table_Lined( new CDocumentColor( 0x92, 0xCD, 0xDC ), new CDocumentColor( 0xDA, 0xEE, 0xF3 ) );
-    this.Style[this.Id] = Style_Table_Lined_Accent5;
-
-    this.Id++;
+    this.Add( Style_Table_Lined_Accent5 );
 
     var Style_Table_Lined_Accent6 = new CStyle("Lined - Accent 6", this.Default.Table, null, styletype_Table );
     Style_Table_Lined_Accent6.Create_Table_Lined( new CDocumentColor( 0xFA, 0xBF, 0x8F ), new CDocumentColor( 0xFD, 0xE9, 0xE9 ) );
-    this.Style[this.Id] = Style_Table_Lined_Accent6;
-
-    this.Id++;
+    this.Add( Style_Table_Lined_Accent6 );
 
     var Style_Table_Bordered = new CStyle("Bordered", this.Default.Table, null, styletype_Table );
     Style_Table_Bordered.Create_Table_Bordered( new CDocumentColor( 0xBF, 0xBF, 0xBF ), new CDocumentColor( 0x00, 0x00, 0x00 ) );
-    this.Style[this.Id] = Style_Table_Bordered;
-
-    this.Id++;
+    this.Add( Style_Table_Bordered );
 
     var Style_Table_Bordered_Accent_1 = new CStyle("Bordered - Accent 1", this.Default.Table, null, styletype_Table );
     Style_Table_Bordered_Accent_1.Create_Table_Bordered( new CDocumentColor( 0xB8, 0xCC, 0xE4 ), new CDocumentColor( 0x36, 0x5F, 0x91 ) );
-    this.Style[this.Id] = Style_Table_Bordered_Accent_1;
-
-    this.Id++;
+    this.Add( Style_Table_Bordered_Accent_1 );
 
     var Style_Table_Bordered_Accent_2 = new CStyle("Bordered - Accent 2", this.Default.Table, null, styletype_Table );
     Style_Table_Bordered_Accent_2.Create_Table_Bordered( new CDocumentColor( 0xE5, 0xB8, 0xB7 ), new CDocumentColor( 0x94, 0x36, 0x34 ) );
-    this.Style[this.Id] = Style_Table_Bordered_Accent_2;
-
-    this.Id++;
+    this.Add( Style_Table_Bordered_Accent_2 );
 
     var Style_Table_Bordered_Accent_3 = new CStyle("Bordered - Accent 3", this.Default.Table, null, styletype_Table );
     Style_Table_Bordered_Accent_3.Create_Table_Bordered( new CDocumentColor( 0xD6, 0xE3, 0xBC ), new CDocumentColor( 0x76, 0x92, 0x3C ) );
-    this.Style[this.Id] = Style_Table_Bordered_Accent_3;
-
-    this.Id++;
+    this.Add( Style_Table_Bordered_Accent_3 );
 
     var Style_Table_Bordered_Accent_4 = new CStyle("Bordered - Accent 4", this.Default.Table, null, styletype_Table );
     Style_Table_Bordered_Accent_4.Create_Table_Bordered( new CDocumentColor( 0xCC, 0xC0, 0xD9 ), new CDocumentColor( 0x5F, 0x49, 0x7A ) );
-    this.Style[this.Id] = Style_Table_Bordered_Accent_4;
-
-    this.Id++;
+    this.Add( Style_Table_Bordered_Accent_4 );
 
     var Style_Table_Bordered_Accent_5 = new CStyle("Bordered - Accent 5", this.Default.Table, null, styletype_Table );
     Style_Table_Bordered_Accent_5.Create_Table_Bordered( new CDocumentColor( 0xB6, 0xDD, 0xE8 ), new CDocumentColor( 0x31, 0x84, 0x9B ) );
-    this.Style[this.Id] = Style_Table_Bordered_Accent_5;
-
-    this.Id++;
+    this.Add( Style_Table_Bordered_Accent_5 );
 
     var Style_Table_Bordered_Accent_6 = new CStyle("Bordered - Accent 6", this.Default.Table, null, styletype_Table );
     Style_Table_Bordered_Accent_6.Create_Table_Bordered( new CDocumentColor( 0xFB, 0xD4, 0xB4 ), new CDocumentColor( 0xE3, 0x6C, 0x0A ) );
-    this.Style[this.Id] = Style_Table_Bordered_Accent_6;
-
-    this.Id++;
+    this.Add( Style_Table_Bordered_Accent_6 );
 
     var Style_Table_BorderedLined = new CStyle("Bordered & Lined", this.Default.Table, null, styletype_Table );
     Style_Table_BorderedLined.Create_Table_BorderedAndLined( new CDocumentColor( 0x00, 0x00, 0x00 ), new CDocumentColor( 0xA6, 0xA6, 0xA6 ), new CDocumentColor( 0xD9, 0xD9, 0xD9 ) );
-    this.Style[this.Id] = Style_Table_BorderedLined;
-
-    this.Id++;
+    this.Add( Style_Table_BorderedLined );
 
     var Style_Table_BorderedLined_Accent1 = new CStyle("Bordered & Lined - Accent 1", this.Default.Table, null, styletype_Table );
     Style_Table_BorderedLined_Accent1.Create_Table_BorderedAndLined( new CDocumentColor( 0x17, 0x36, 0x5D ), new CDocumentColor( 0x8D, 0xB3, 0xE2 ), new CDocumentColor( 0xDB, 0xE5, 0xF1 ) );
-    this.Style[this.Id] = Style_Table_BorderedLined_Accent1;
-
-    this.Id++;
+    this.Add( Style_Table_BorderedLined_Accent1 );
 
     var Style_Table_BorderedLined_Accent2 = new CStyle("Bordered & Lined - Accent 2", this.Default.Table, null, styletype_Table );
     Style_Table_BorderedLined_Accent2.Create_Table_BorderedAndLined( new CDocumentColor( 0x94, 0x36, 0x34 ), new CDocumentColor( 0xD9, 0x95, 0x94 ), new CDocumentColor( 0xF2, 0xDB, 0xDB ) );
-    this.Style[this.Id] = Style_Table_BorderedLined_Accent2;
-
-    this.Id++;
+    this.Add( Style_Table_BorderedLined_Accent2 );
 
     var Style_Table_BorderedLined_Accent3 = new CStyle("Bordered & Lined - Accent 3", this.Default.Table, null, styletype_Table );
     Style_Table_BorderedLined_Accent3.Create_Table_BorderedAndLined( new CDocumentColor( 0x76, 0x92, 0x3C ), new CDocumentColor( 0xC2, 0xD6, 0x9B ), new CDocumentColor( 0xEA, 0xF1, 0xDD ) );
-    this.Style[this.Id] = Style_Table_BorderedLined_Accent3;
-
-    this.Id++;
+    this.Add( Style_Table_BorderedLined_Accent3 );
 
     var Style_Table_BorderedLined_Accent4 = new CStyle("Bordered & Lined - Accent 4", this.Default.Table, null, styletype_Table );
     Style_Table_BorderedLined_Accent4.Create_Table_BorderedAndLined( new CDocumentColor( 0x5F, 0x49, 0x7A ), new CDocumentColor( 0xB2, 0xA1, 0xC7 ), new CDocumentColor( 0xE5, 0xDF, 0xEC ) );
-    this.Style[this.Id] = Style_Table_BorderedLined_Accent4;
-
-    this.Id++;
+    this.Add( Style_Table_BorderedLined_Accent4 );
 
     var Style_Table_BorderedLined_Accent5 = new CStyle("Bordered & Lined - Accent 5", this.Default.Table, null, styletype_Table );
     Style_Table_BorderedLined_Accent5.Create_Table_BorderedAndLined( new CDocumentColor( 0x31, 0x84, 0x9B ), new CDocumentColor( 0x92, 0xCD, 0xDC ), new CDocumentColor( 0xDA, 0xEE, 0xF3 ) );
-    this.Style[this.Id] = Style_Table_BorderedLined_Accent5;
-
-    this.Id++;
+    this.Add( Style_Table_BorderedLined_Accent5 );
 
     var Style_Table_BorderedLined_Accent6 = new CStyle("Bordered & Lined - Accent 6", this.Default.Table, null, styletype_Table );
     Style_Table_BorderedLined_Accent6.Create_Table_BorderedAndLined( new CDocumentColor( 0xE3, 0x6C, 0x0A ), new CDocumentColor( 0xFA, 0xBF, 0x8F ), new CDocumentColor( 0xFD, 0xE9, 0xD9 ) );
-    this.Style[this.Id] = Style_Table_BorderedLined_Accent6;
+    this.Add( Style_Table_BorderedLined_Accent6 );
 
-    this.Id++;
+    // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
+    g_oTableId.Add( this, this.Id );
 }
 
 CStyles.prototype =
 {
+//-----------------------------------------------------------------------------------
+// Работаем с Id данного объекта
+//-----------------------------------------------------------------------------------
+    GetId : function()
+    {
+        return this.Id;
+    },
+
+    SetId : function(newId)
+    {
+        g_oTableId.Reset_Id( this, newId, this.Id );
+        this.Id = newId;
+    },
+
+    Get_Id : function()
+    {
+        return this.GetId();
+    },
+
+    Set_Id : function(newId)
+    {
+        return this.SetId( newId );
+    },
+
+//-----------------------------------------------------------------------------------
+// Базовые функции для работы со стилем
+//-----------------------------------------------------------------------------------
+    Add : function(Style)
+    {
+        var Id = Style.Get_Id();
+
+        History.Add( this, { Type : historyitem_Styles_Add, Id : Id, Style : Style } );
+        this.Style[Id] = Style;
+
+        return Id;
+    },
+
+    Remove : function(Id)
+    {
+        History.Add( this, { Type : historyitem_Styles_Remove, Id : Id, Style : this.Style[Id] } );
+        delete this.Style[Id];
+    },
+//-----------------------------------------------------------------------------------
+//
+//-----------------------------------------------------------------------------------
     Get_Pr : function(StyleId, Type, TableStyle)
     {
         var Pr = {};
@@ -2651,6 +4212,203 @@ CStyles.prototype =
         }
 
         return TableStyles;
+    },
+//-----------------------------------------------------------------------------------
+// Undo/Redo функции
+//-----------------------------------------------------------------------------------
+    Undo : function(Data)
+    {
+        var Type = Data.Type;
+
+        switch ( Type )
+        {
+            case historyitem_Styles_Add:
+            {
+                delete this.Style[Data.Id];
+                break;
+            }
+
+            case historyitem_Styles_Remove:
+            {
+                this.Style[Data.Id] = Data.Style;
+                break;
+            }
+        }
+    },
+
+    Redo : function(Data)
+    {
+        var Type = Data.Type;
+
+        switch ( Type )
+        {
+            case historyitem_Styles_Add:
+            {
+                this.Style[Data.Id] = Data.Style;
+                break;
+            }
+
+            case historyitem_Styles_Remove:
+            {
+                delete this.Style[Data.Id];
+                break;
+            }
+        }
+    },
+
+    Get_SelectionState : function()
+    {
+    },
+
+    Set_SelectionState : function(State, StateIndex)
+    {
+    },
+
+    Get_ParentObject_or_DocumentPos : function()
+    {
+        return { Type : historyrecalctype_Inline, Data : 0 };
+    },
+
+    Refresh_RecalcData : function(Data)
+    {
+        var Type = Data.Type;
+
+        var bNeedRecalc = false;
+
+        switch ( Type )
+        {
+            case historyitem_Style_TextPr          :
+            case historyitem_Style_ParaPr          :
+            case historyitem_Style_TablePr         :
+            case historyitem_Style_TableRowPr      :
+            case historyitem_Style_TableCellPr     :
+            case historyitem_Style_TableBand1Horz  :
+            case historyitem_Style_TableBand1Vert  :
+            case historyitem_Style_TableBand2Horz  :
+            case historyitem_Style_TableBand2Vert  :
+            case historyitem_Style_TableFirstCol   :
+            case historyitem_Style_TableFirstRow   :
+            case historyitem_Style_TableLastCol    :
+            case historyitem_Style_TableLastRow    :
+            case historyitem_Style_TableTLCell     :
+            case historyitem_Style_TableTRCell     :
+            case historyitem_Style_TableBLCell     :
+            case historyitem_Style_TableBRCell     :
+            case historyitem_Style_TableWholeTable :
+            case historyitem_Style_Name            :
+            case historyitem_Style_BasedOn         :
+            case historyitem_Style_Next            :
+            case historyitem_Style_Type            :
+            case historyitem_Style_QFormat         :
+            case historyitem_Style_UiPriority      :
+            case historyitem_Style_Hidden          :
+            case historyitem_Style_SemiHidden      :
+            case historyitem_Style_UnhideWhenUsed  :
+            {
+                break;
+            }
+        }
+
+        if ( true === bNeedRecalc )
+        {
+            // Сообщаем родительскому классу, что изменения произошли в элементе с номером this.Index и на странице this.PageNum
+            return this.Refresh_RecalcData2();
+        }
+    },
+
+    Refresh_RecalcData2 : function()
+    {
+        //editor.WordControl.m_oLogicDocument.Refresh_RecalcData2( 0, 0 );
+    },
+//-----------------------------------------------------------------------------------
+// Функции для совместного редактирования
+//-----------------------------------------------------------------------------------
+    Document_Is_SelectionLocked : function(CheckType)
+    {
+        switch ( CheckType )
+        {
+            case changestype_Paragraph_Content:
+            case changestype_Paragraph_Properties:
+            case changestype_Document_Content:
+            case changestype_Document_Content_Add:
+            case changestype_Image_Properties:
+            case changestype_Remove:
+            case changestype_Delete:
+            case changestype_Document_SectPr:
+            case changestype_Table_Properties:
+            case changestype_Table_RemoveCells:
+            case changestype_HdrFtr:
+            {
+                CollaborativeEditing.Add_CheckLock(true);
+                break;
+            }
+        }
+    },
+
+    Save_Changes : function(Data, Writer)
+    {
+        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
+        // Long : тип класса
+        // Long : тип изменений
+
+        Writer.WriteLong( historyitem_type_Styles );
+
+        var Type = Data.Type;
+
+        // Пишем тип
+        Writer.WriteLong( Type );
+
+        switch ( Type )
+        {
+            case historyitem_Styles_Add:
+            case historyitem_Styles_Remove:
+            {
+                // String : Id стиля
+
+                Writer.WriteString2( Data.Id );
+
+                break;
+            }
+        }
+
+        return Writer;
+    },
+
+    Load_Changes : function(Reader)
+    {
+        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
+        // Long : тип класса
+        // Long : тип изменений
+
+        var ClassType = Reader.GetLong();
+        if ( historyitem_type_Styles != ClassType )
+            return;
+
+        var Type = Reader.GetLong();
+
+        switch ( Type )
+        {
+            case historyitem_Styles_Add:
+            {
+                // String : Id стиля
+                // Спокойно добавляем стиль по Id, т.к. сначала стиль создается и только
+                // потом он добавляется в список стилей.
+
+                var Id = Reader.GetString2();
+                this.Style[Id] = g_oTableId.Get_ById( Id );
+
+                break;
+            }
+            case historyitem_Styles_Remove:
+            {
+                // String : Id стиля
+
+                var Id = Reader.GetString2();
+                delete this.Style[Id];
+
+                break;
+            }
+        }
     }
 };
 
