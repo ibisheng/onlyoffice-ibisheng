@@ -536,8 +536,8 @@ CShape.prototype =
         if(this.recalcInfo.recalculateTransparent)
         {
             this.compiledTransparent = null;
-            if(isRealObject(this.spPr) && isRealObject(this.spPr.Fill) && isRealNumber(this.spPr.transparent))
-                this.compiledTransparent = this.spPr.transparent;
+            if(isRealObject(this.spPr) && isRealObject(this.spPr.Fill) && isRealNumber(this.spPr.Fill.transparent))
+                this.compiledTransparent = this.spPr.Fill.transparent;
             else if(isRealObject(this.group))
             {
                 var group_transparent = this.group.getCompiledTransparent();
@@ -550,9 +550,9 @@ CShape.prototype =
                     var hierarchy = this.getHierarchy();
                     for(var i = 0; i < hierarchy.length; ++i)
                     {
-                        if(isRealObject(hierarchy[i]) && isRealObject(hierarchy[i].spPr) && isRealObject(hierarchy[i].spPr.Fill) && isRealNumber(hierarchy[i].spPr.transparent))
+                        if(isRealObject(hierarchy[i]) && isRealObject(hierarchy[i].spPr) && isRealObject(hierarchy[i].spPr.Fill) && isRealNumber(hierarchy[i].spPr.Fill.transparent))
                         {
-                            this.compiledTransparent = this.spPr.transparent;
+                            this.compiledTransparent = this.spPr.Fill.transparent;
                             break;
                         }
 
@@ -564,9 +564,9 @@ CShape.prototype =
                 var hierarchy = this.getHierarchy();
                 for(var i = 0; i < hierarchy.length; ++i)
                 {
-                    if(isRealObject(hierarchy[i]) && isRealObject(hierarchy[i].spPr) && isRealObject(hierarchy[i].spPr.Fill) && isRealNumber(hierarchy[i].spPr.transparent))
+                    if(isRealObject(hierarchy[i]) && isRealObject(hierarchy[i].spPr) && isRealObject(hierarchy[i].spPr.Fill) && isRealNumber(hierarchy[i].spPr.Fill.transparent))
                     {
-                        this.compiledTransparent = this.spPr.transparent;
+                        this.compiledTransparent = this.spPr.Fill.transparent;
                         break;
                     }
 
@@ -2105,6 +2105,18 @@ CShape.prototype =
         }
     },
 
+    setParagraphTabs: function(val)
+    {
+        if(isRealObject(this.txBody))
+        {
+            this.txBody.content.Set_ParagraphTabs(val);
+            this.txBody.content.RecalculateCurPos();
+            this.recalcInfo.recalculateContent = true;
+            this.recalcInfo.recalculateTransformText = true;
+            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+        }
+    },
+
     applyAllSpacing: function(val)
     {
         if(isRealObject(this.txBody))
@@ -2683,6 +2695,7 @@ CShape.prototype =
 
         this.recalcInfo.recalculateFill = true;
         this.recalcInfo.recalculateBrush = true;
+        this.recalcInfo.recalculateTransparent = true;
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 

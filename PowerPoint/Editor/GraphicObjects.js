@@ -331,6 +331,40 @@ CGraphicObjects.prototype = {
         }
     },
 
+
+    setParagraphTabs: function(val)
+
+    {
+        switch (this.State.id)
+        {
+            case STATES_ID_TEXT_ADD:
+            case STATES_ID_TEXT_ADD_IN_GROUP:
+            {
+                if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+                {
+                    this.State.textObject.setParagraphTabs(val);
+                    //this.State.textObject.recalculate();
+                    //this.updateSelectionState();
+                }
+                break;
+            }
+            case STATES_ID_NULL:
+            {
+                if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Text_Props) === false)
+                {
+                    for(var i = 0; i < this.selectedObjects.length; ++i)
+                    {
+                        if(typeof this.selectedObjects[i].applyAllSpacing === "function")
+                        {
+                            this.selectedObjects[i].applyAllSpacing(val);
+                        }
+                    }
+                }
+                break;
+            }
+        }
+    },
+
     setParagraphSpacing: function(val)
     {
         switch (this.State.id)

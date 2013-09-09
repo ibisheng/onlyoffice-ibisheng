@@ -73,6 +73,7 @@ function asc_docs_api(name)
 	// ASC_DOCS_API_USE_EMBEDDED_FONTS, кроме "true"(написание от регистра не зависит).
     this.isUseEmbeddedCutFonts = ("true" == ASC_DOCS_API_USE_EMBEDDED_FONTS.toLowerCase());
 
+    this.noCreatePoint = false;
     this.pasteCallback = null;
     this.pasteImageMap = null;
     this.EndActionLoadImages = 0;
@@ -1614,35 +1615,102 @@ asc_docs_api.prototype.onSaveCallback = function (e) {
 
 asc_docs_api.prototype.paraApply = function(Props)
 {
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+    var Additional = undefined;
 
-    // TODO: Сделать так, чтобы пересчет был всего 1 здесь
-    if ( "undefined" != typeof(Props.ContextualSpacing) && null != Props.ContextualSpacing )
-        this.WordControl.m_oLogicDocument.Set_ParagraphContextualSpacing( Props.ContextualSpacing );
 
-    if ( "undefined" != typeof(Props.Ind) && null != Props.Ind )
-        this.WordControl.m_oLogicDocument.Set_ParagraphIndent( Props.Ind );
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Text_Props, Additional) )
+    {
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
 
-    if ( "undefined" != typeof(Props.Jc) && null != Props.Jc )
-        this.WordControl.m_oLogicDocument.Set_ParagraphAlign( Props.Jc );
+        // TODO: Сделать так, чтобы пересчет был всего 1 здесь
+        if ( "undefined" != typeof(Props.ContextualSpacing) && null != Props.ContextualSpacing )
+            this.WordControl.m_oLogicDocument.Set_ParagraphContextualSpacing( Props.ContextualSpacing );
 
-    if ( "undefined" != typeof(Props.KeepLines) && null != Props.KeepLines )
-        this.WordControl.m_oLogicDocument.Set_ParagraphKeepLines( Props.KeepLines );
+        if ( "undefined" != typeof(Props.Ind) && null != Props.Ind )
+            this.WordControl.m_oLogicDocument.Set_ParagraphIndent( Props.Ind );
 
-    //if ( "undefined" != typeof(Props.KeepNext) && null != Props.KeepNext )
-    //    this.WordControl.m_oLogicDocument.Set_ParagraphKeepNext( Props.KeepNext );
+        if ( "undefined" != typeof(Props.Jc) && null != Props.Jc )
+            this.WordControl.m_oLogicDocument.Set_ParagraphAlign( Props.Jc );
 
-    if ( "undefined" != typeof(Props.PageBreakBefore) && null != Props.PageBreakBefore )
-        this.WordControl.m_oLogicDocument.Set_ParagraphPageBreakBefore( Props.PageBreakBefore );
+        if ( "undefined" != typeof(Props.KeepLines) && null != Props.KeepLines )
+            this.WordControl.m_oLogicDocument.Set_ParagraphKeepLines( Props.KeepLines );
 
-    if ( "undefined" != typeof(Props.Spacing) && null != Props.Spacing )
-        this.WordControl.m_oLogicDocument.Set_ParagraphSpacing( Props.Spacing );
+        if ( undefined != Props.KeepNext && null != Props.KeepNext )
+            this.WordControl.m_oLogicDocument.Set_ParagraphKeepNext( Props.KeepNext );
 
-    if ( "undefined" != typeof(Props.Shd) && null != Props.Shd )
-        this.WordControl.m_oLogicDocument.Set_ParagraphShd( Props.Shd );
+        if ( undefined != Props.WidowControl && null != Props.WidowControl )
+            this.WordControl.m_oLogicDocument.Set_ParagraphWidowControl( Props.WidowControl );
 
-    if ( "undefined" != typeof(Props.Brd) && null != Props.Brd )
-        this.WordControl.m_oLogicDocument.Set_ParagraphBorders( Props.Brd );
+        if ( "undefined" != typeof(Props.PageBreakBefore) && null != Props.PageBreakBefore )
+            this.WordControl.m_oLogicDocument.Set_ParagraphPageBreakBefore( Props.PageBreakBefore );
+
+        if ( "undefined" != typeof(Props.Spacing) && null != Props.Spacing )
+            this.WordControl.m_oLogicDocument.Set_ParagraphSpacing( Props.Spacing );
+
+        if ( "undefined" != typeof(Props.Shd) && null != Props.Shd )
+            this.WordControl.m_oLogicDocument.Set_ParagraphShd( Props.Shd );
+
+        if ( "undefined" != typeof(Props.Brd) && null != Props.Brd )
+            this.WordControl.m_oLogicDocument.Set_ParagraphBorders( Props.Brd );
+
+        if ( undefined != Props.Tabs )
+        {
+            var Tabs = new CParaTabs();
+            Tabs.Set_FromObject( Props.Tabs.Tabs );
+            this.WordControl.m_oLogicDocument.Set_ParagraphTabs( Tabs );
+        }
+
+        if ( undefined != Props.DefaultTab )
+        {
+            this.WordControl.m_oLogicDocument.Set_DocumentDefaultTab( Props.DefaultTab );
+        }
+
+
+        // TODO: как только разъединят настройки параграфа и текста переделать тут
+        var TextPr = new CTextPr();
+
+        if ( true === Props.Subscript )
+            TextPr.VertAlign = vertalign_SubScript;
+        else if ( true === Props.Superscript )
+            TextPr.VertAlign = vertalign_SuperScript;
+        else if ( false === Props.Superscript || false === Props.Subscript )
+            TextPr.VertAlign = vertalign_Baseline;
+
+        if ( undefined != Props.Strikeout )
+        {
+            TextPr.Strikeout  = Props.Strikeout;
+            TextPr.DStrikeout = false;
+        }
+
+        if ( undefined != Props.DStrikeout )
+        {
+            TextPr.DStrikeout = Props.DStrikeout;
+            if ( true === TextPr.DStrikeout )
+                TextPr.Strikeout = false;
+        }
+
+        if ( undefined != Props.SmallCaps )
+        {
+            TextPr.SmallCaps = Props.SmallCaps;
+            TextPr.AllCaps   = false;
+        }
+
+        if ( undefined != Props.AllCaps )
+        {
+            TextPr.Caps = Props.AllCaps;
+            if ( true === TextPr.AllCaps )
+                TextPr.SmallCaps = false;
+        }
+
+        if ( undefined != Props.TextSpacing )
+            TextPr.Spacing = Props.TextSpacing;
+
+        if ( undefined != Props.Position )
+            TextPr.Position = Props.Position;
+
+        this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr(TextPr) );
+        this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
+    }
 }
 
 asc_docs_api.prototype.put_PrAlign = function(value)
@@ -1793,7 +1861,8 @@ asc_docs_api.prototype.ShapeApply = function(prop)
             var oProp = prop;
             this.asyncImageEndLoaded2 = function(_image)
             {
-                this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+                if(!(this.noCreatePoint === true))
+                    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
                 this.WordControl.m_oLogicDocument.ShapeApply(oProp);
 
                 this.WordControl.m_oDrawingDocument.DrawImageTextureFillShape(image_url);
@@ -1810,6 +1879,8 @@ asc_docs_api.prototype.ShapeApply = function(prop)
     }
 }
 
+asc_docs_api.prototype.setStartPointHistory = function(){this.noCreatePoint = true; History.Create_NewPoint();};
+asc_docs_api.prototype.setEndPointHistory   = function(){this.noCreatePoint = false;};
 asc_docs_api.prototype.SetSlideProps = function(prop)
 {
     if (null == prop)

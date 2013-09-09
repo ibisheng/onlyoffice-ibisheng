@@ -5774,9 +5774,59 @@ function CParaTabs()
 
 CParaTabs.prototype =
 {
-    Add : function(Tab)
+    Add : function(_Tab)
     {
-        this.Tabs.push( Tab );
+        var Index = 0;
+        for (Index = 0; Index < this.Tabs.length; Index++ )
+        {
+            var Tab = this.Tabs[Index];
+
+            if ( Math.abs( Tab.Pos - _Tab.Pos ) < 0.001 )
+            {
+                this.Tabs.splice( Index, 1, _Tab );
+                break;
+            }
+
+            if ( Tab.Pos > _Tab.Pos )
+                break;
+        }
+
+        if ( -1 != Index )
+            this.Tabs.splice( Index, 0, _Tab );
+    },
+
+    Merge : function(Tabs)
+    {
+        var _Tabs = Tabs.Tabs;
+
+        for ( var Index = 0; Index < _Tabs.length; Index++ )
+        {
+            var _Tab = _Tabs[Index];
+
+            var Index2 = 0;
+            for (Index2 = 0; Index2 < this.Tabs.length; Index2++ )
+            {
+                var Tab = this.Tabs[Index2];
+
+                if ( Math.abs(  Tab.Pos - _Tab.Pos ) < 0.001 )
+                {
+                    if ( tab_Clear === _Tab.Value )
+                        Index2 = -2; // таб нужно удалить
+                    else
+                        Index2 = -1; // табы совпали, не надо новый добавлять
+
+                    break;
+                }
+
+                if ( Tab.Pos > _Tab.Pos )
+                    break;
+            }
+
+            if ( -2 === Index2 )
+                this.Tabs.splice( Index2, 1 );
+            else if ( -1 != Index2 )
+                this.Tabs.splice( Index2, 0, _Tab );
+        }
     },
 
     Copy : function()
@@ -5810,6 +5860,19 @@ CParaTabs.prototype =
         return this.Tabs[Index];
     },
 
+    Get_Value : function(Pos)
+    {
+        var Count = this.Tabs.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            var Tab = this.Tabs[Index];
+            if ( Math.abs(Tab.Pos - Pos) < 0.001 )
+                return Tab.Value;
+        }
+
+        return -1;
+    },
+
     Write_ToBinary : function(Writer)
     {
         // Long : количество (если 0, удаляем элемент)
@@ -5835,7 +5898,7 @@ CParaTabs.prototype =
         // Double : Pos
 
         var Count = Reader.GetLong();
-        this.Tabs = new Array( Count );
+        this.Tabs = new Array();
 
         for ( var Index = 0; Index < Count; Index++ )
         {
@@ -5845,6 +5908,7 @@ CParaTabs.prototype =
         }
     }
 }
+
 
 function CParaInd()
 {

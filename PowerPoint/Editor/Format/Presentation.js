@@ -575,7 +575,7 @@ CPresentation.prototype =
         {
 
         }
-
+        this.RecalculateCurPos();
         this.DrawingDocument.OnRecalculatePage( this.CurPage, this.Slides[this.CurPage] );
         this.DrawingDocument.OnEndRecalculate();
     },

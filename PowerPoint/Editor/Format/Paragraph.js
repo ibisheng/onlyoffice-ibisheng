@@ -108,6 +108,8 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit)
         NeedRecalc : true
     };
 
+
+
     this.SearchResults = new Object();
 
     this.SpellChecker = new CParaSpellChecker();
@@ -9249,9 +9251,13 @@ Paragraph.prototype =
         // Считываем свойства для текущего стиля
         var Pr = Styles.Get_Pr( StyleId, styles_Paragraph, TableStyle );
 
+
+        // Копируем прямые настройки параграфа.
         // Копируем прямые настройки параграфа.
         Pr.ParaPr.Merge( this.Pr );
         Pr.TextPr.Merge( this.rPr );
+
+        Pr.ParaPr.StyleTabs = ( undefined != Pr.ParaPr.Tabs ? Pr.ParaPr.Tabs.Copy() : new CParaTabs() );
         return Pr;
     },
 
