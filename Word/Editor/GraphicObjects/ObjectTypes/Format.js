@@ -3124,7 +3124,9 @@ function CSpPr()
         var boolBWMode = this.bwMode == 1;
         Writer.WriteBool(boolBWMode);
 
-        this.xfrm.Write_ToBinary2(Writer);
+        Writer.WriteBool(isRealObject(this.xfrm));
+        if(isRealObject(this.xfrm))
+            this.xfrm.Write_ToBinary2(Writer);
         var flag = this.geometry != null;
         Writer.WriteBool(flag);
         if(flag)
@@ -3148,7 +3150,8 @@ function CSpPr()
         var boolBWMode = Reader.GetBool();
 
         this.bwMode = boolBWMode ? 1 : 0;
-        this.xfrm.Read_FromBinary2(Reader);
+        if(Reader.GetBool())
+            this.xfrm.Read_FromBinary2(Reader);
         var flag = Reader.GetBool();
         if(flag)
         {

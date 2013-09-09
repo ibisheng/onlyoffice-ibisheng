@@ -56,7 +56,12 @@ CChartAsGroup.prototype =
 	{
 		return this.chart;
 	},
-	
+
+    calculateAfterChangeTheme: function()
+    {
+        this.recalculate();
+    },
+
     calculateAfterOpen10: function()
     {
         this.init();
