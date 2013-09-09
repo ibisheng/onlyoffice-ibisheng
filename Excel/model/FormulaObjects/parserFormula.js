@@ -2235,6 +2235,7 @@ function parserFormula( formula, _cellId, _ws ) {
     this.operand_str = null;
     this.error = [];
     this.Formula = formula;
+    this.undoParser = {formula:null,outStack:[]};
 }
 parserFormula.prototype = {
 
@@ -2543,7 +2544,15 @@ parserFormula.prototype = {
 
                 /* Numbers*/
                 else if ( parserHelp.isNumber.call( this, this.Formula, this.pCurrPos ) ) {
-                    found_operand = new cNumber( parseFloat( this.operand_str ) );
+                    if ( this.operand_str != "." ) {
+                        found_operand = new cNumber( parseFloat( this.operand_str ) );
+                    }
+                    else {
+                        this.error.push( c_oAscError.ID.FrmlAnotherParsingError );
+                        this.outStack = [];
+                        this.elemArr = [];
+                        return false;
+                    }
                 }
 
                 /* Function*/
@@ -2770,6 +2779,11 @@ parserFormula.prototype = {
      */
     shiftCells:function ( offset, oBBox, node, wsId, toDelete ) {
 
+        this.undoParser.formula = this.Formula
+        for( var i = 0; i < this.outStack.length; i++ ) {
+            this.undoParser.outStack[i] = this.outStack[i];
+        }
+
         for ( var i = 0; i < this.outStack.length; i++ ) {
             if ( this.outStack[i] instanceof cRef ) {
                 if ( this.ws.Id != wsId ) {
@@ -2797,6 +2811,12 @@ parserFormula.prototype = {
             }
             else if ( this.outStack[i] instanceof cRef3D ) {
                 if ( node.nodeId == this.outStack[i].node.nodeId /*_cells.replace( /\$/ig, "" ) && this.outStack[i].ws == node.sheetId*/ ) {
+
+                    if ( toDelete ) {
+                        this.outStack[i] = new cError( cErrorType.bad_reference )
+                        continue;
+                    }
+
                     if ( this.outStack[i].isAbsolute ) {
                         this._changeOffsetHelper( this.outStack[i], offset );
                     }
