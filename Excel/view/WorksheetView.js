@@ -4830,6 +4830,7 @@
 				this._updateHyperlinksCache();
 				this.cellCommentator.updateCommentPosition();
 				this.drawDepCells();
+				this._drawGraphic();
 				this.objectRender.showDrawingObjects(true);
 				return this;
 			},
@@ -4895,6 +4896,7 @@
 				this.cellCommentator.updateCommentPosition();
 				this._updateHyperlinksCache();
 				this.drawDepCells();
+				this._drawGraphic();
 				this.objectRender.showDrawingObjects(true);
 				return this;
 			},
