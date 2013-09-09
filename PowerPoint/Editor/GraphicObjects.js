@@ -711,6 +711,7 @@ CGraphicObjects.prototype = {
             }
         }
 
+        editor.sync_slidePropCallback(this.slide);
         if(this.State.id === STATES_ID_TEXT_ADD || this.State.id === STATES_ID_TEXT_ADD_IN_GROUP)
         {
 
@@ -1110,14 +1111,14 @@ CGraphicObjects.prototype = {
 
                     if(this.State.id === STATES_ID_TEXT_ADD)
                     {
-                        if(typeof this.State.textObject.setTextVerticalAlign === "function")
-                            this.State.textObject.GraphicObj.setTextVerticalAlign(properties.verticalTextAlign);
+                        if(typeof this.State.textObject.setVerticalAlign === "function")
+                            this.State.textObject.setVerticalAlign(properties.verticalTextAlign);
                     }
 
                     if(this.State.id === STATES_ID_TEXT_ADD_IN_GROUP)
                     {
-                        if(typeof this.State.setTextVerticalAlign === "function")
-                            this.State.textObject.setTextVerticalAlign(properties.verticalTextAlign);
+                        if(typeof this.State.setVerticalAlign === "function")
+                            this.State.textObject.setVerticalAlign(properties.verticalTextAlign);
                     }
                 }
                 if(this.State.id !==STATES_ID_GROUP && this.State.id !==STATES_ID_TEXT_ADD_IN_GROUP && isRealNumber(properties.w) && isRealNumber(properties.h))
@@ -1428,8 +1429,8 @@ CGraphicObjects.prototype = {
     {
         this.State.onMouseUp(e, x, y);
         this.slide.presentation.Document_UpdateInterfaceState();
-        if(this.State.id === STATES_ID_NULL)
-        {
+       /* if(this.State.id === STATES_ID_NULL)
+        { */
             if(this.selectedObjects.length > 0)
             {
                 var _data = new CContextMenuData();
@@ -1438,7 +1439,7 @@ CGraphicObjects.prototype = {
                 _data.Y_abs = e.Y;
                 editor.sync_ContextMenuCallback(_data);
             }
-        }
+        //}
     },
 
     updateCursorType: function(e, x, y)

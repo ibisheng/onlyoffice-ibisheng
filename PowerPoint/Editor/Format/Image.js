@@ -62,6 +62,11 @@ CImageShape.prototype =
         return true;
     },
 
+    recalcAllColors: function()
+    {
+
+    },
+
     normalize: function()
     {
         var new_off_x, new_off_y, new_ext_x, new_ext_y;

@@ -128,6 +128,11 @@ CTextBody.prototype =
 
     },
 
+    recalcColors: function()
+    {
+        this.content.recalcColors();
+    },
+
     recalculateBodyPr: function()
     {
         if(this.recalcInfo.recalculateBodyPr)

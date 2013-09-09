@@ -146,6 +146,7 @@ Paragraph.prototype =
 
     Use_Wrap : function()
     {
+        return false;
         if ( undefined != this.Get_FramePr() )
             return false;
 
@@ -9140,7 +9141,7 @@ Paragraph.prototype =
                 parents = this.Parent.Parent.shape.getParentObjects();
             else if(this.Parent.Parent instanceof CTableCell)
                 parents = this.Parent.Parent.Row.Table.Parent.getParentObjects();
-            if(isRealObject(TextPr.unifill) && isRealObject(TextPr.unifill.fill) && TextPr.unifill.fill.type === FILL_TYPE_SOLID && isRealObject(TextPr.unifill.fill.color))
+            if(parents && isRealObject(TextPr.unifill) && isRealObject(TextPr.unifill.fill) && TextPr.unifill.fill.type === FILL_TYPE_SOLID && isRealObject(TextPr.unifill.fill.color))
             {
                 TextPr.unifill.fill.color.Calculate(parents.theme, parents.slide, parents.layout, parents.master, {R:0, G:0, B:0, A:255});
                 TextPr.Color =
@@ -9151,7 +9152,7 @@ Paragraph.prototype =
                         A:TextPr.unifill.fill.color.RGBA.A
                     };
             }
-            if(isRealObject(TextPr.FontFamily) && typeof TextPr.FontFamily.Name === "string" && isThemeFont(TextPr.FontFamily.Name))
+            if(parents && isRealObject(TextPr.FontFamily) && typeof TextPr.FontFamily.Name === "string" && isThemeFont(TextPr.FontFamily.Name))
             {
                 if(this.Parent.Parent.shape instanceof CShape)
                 {

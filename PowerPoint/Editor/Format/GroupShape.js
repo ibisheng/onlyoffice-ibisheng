@@ -70,6 +70,24 @@ CGroupShape.prototype =
             recalculateScaleCoefficients: true
         };
     },
+
+    recalcAllColors: function()
+    {
+        this.recalcInfo =
+        {
+            recalculateBrush: true,
+            recalculatePen: true,
+            recalculateTransform: true,
+            recalculateSpTree: true,
+            recalculateCursorTypes: true,
+            recalculateScaleCoefficients: true
+        };
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(this.spTree[i].recalcAllColors)
+                this.spTree[i].recalcAllColors();
+        }
+    },
     Get_Id: function()
     {
         return this.Id;

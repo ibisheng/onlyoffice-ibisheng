@@ -1772,8 +1772,6 @@ $(document).ready(function(){
                     NewElement.style.backgroundColor = "red";
                     NewElement.style.zIndex = 100;
 
-                    if ( Data.LockedObjectType === c_oAscMouseMoveLockedObjectType.Footer )
-                        sTop = (Y - 20) + "px";
 
                     NewElement.style.top  = sTop;
                     NewElement.style.left = sLeft;

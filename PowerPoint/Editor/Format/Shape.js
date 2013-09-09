@@ -174,6 +174,24 @@ CShape.prototype =
             recalculateTextStyles: [true, true, true, true, true, true, true, true, true]
         };
     },
+
+    recalcAllColors: function()
+    {
+        this.recalcInfo =
+        {
+            recalculateContent: true,
+            recalculateBrush: true,
+            recalculatePen: true,
+            recalculateStyle: true,
+            recalculateFill: true,
+            recalculateLine: true
+        };
+        if(this.txBody)
+        {
+            this.txBody.recalcColors();
+        }
+    },
+
     Get_Id: function()
     {
         return this.Id;

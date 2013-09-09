@@ -947,6 +947,7 @@ function CAscShapeProp()
     this.w = null;
     this.h = null;
     this.paddings = null;
+    this.verticalTextAlign = null;
 }
 CAscShapeProp.prototype.get_Locked = function(){return this.Locked}
 CAscShapeProp.prototype.put_Locked = function(v){this.Locked = v;}
@@ -962,6 +963,9 @@ CAscShapeProp.prototype.get_Height = function(){return this.h}
 CAscShapeProp.prototype.put_Height = function(v){this.h = v;}
 CAscShapeProp.prototype.get_paddings = function(){return this.paddings}
 CAscShapeProp.prototype.put_paddings = function(v){this.paddings = v;}
+
+CAscShapeProp.prototype.get_VerticalTextAlign = function(){return this.verticalTextAlign}
+CAscShapeProp.prototype.put_VerticalTextAlign = function(v){this.verticalTextAlign = v;}
 
 // эта функция ДОЛЖНА минимизироваться
 function CreateAscShapeProp(shape)
@@ -1911,19 +1915,62 @@ CParagraphShd.prototype.put_Value = function (v){ this.Value = v; }
 CParagraphShd.prototype.get_Color = function (){ return this.Color; }
 CParagraphShd.prototype.put_Color = function (v){ this.Color = (v) ? new CColor (v.r, v.g, v.b): null; }
 
+
+function CParagraphTab(Pos, Value)
+{
+    this.Pos   = Pos;
+    this.Value = Value;
+}
+CParagraphTab.prototype.get_Value = function (){ return this.Value; }
+CParagraphTab.prototype.put_Value = function (v){ this.Value = v; }
+CParagraphTab.prototype.get_Pos = function (){ return this.Pos; }
+CParagraphTab.prototype.put_Pos = function (v){ this.Pos = v; }
+
+function CParagraphTabs (obj)
+{
+    this.Tabs = new Array();
+
+    if ( undefined != obj )
+    {
+        var Count = obj.Tabs.length;
+        for (var Index = 0; Index < Count; Index++)
+        {
+            this.Tabs.push( new CParagraphTab(obj.Tabs[Index].Pos, obj.Tabs[Index].Value) );
+        }
+    }
+}
+CParagraphTabs.prototype.get_Count = function (){ return this.Tabs.length; }
+CParagraphTabs.prototype.get_Tab = function (Index){ return this.Tabs[Index]; }
+CParagraphTabs.prototype.add_Tab = function (Tab){ this.Tabs.push(Tab) }
+CParagraphTabs.prototype.clear = function (){ this.Tabs.length = 0; }
 function CParagraphProp (obj)
 {
     if (obj)
     {
-        this.ContextualSpacing = (undefined != obj.ContextualSpacing) ? obj.ContextualSpacing : null;
-        this.Ind = (undefined != obj.Ind && null != obj.Ind) ? new CParagraphInd (obj.Ind) : null;
-        this.KeepLines = (undefined != obj.KeepLines) ? obj.KeepLines : null;
-        this.PageBreakBefore = (undefined != obj.PageBreakBefore) ? obj.PageBreakBefore : null;
-        this.Spacing = (undefined != obj.Spacing && null != obj.Spacing) ? new CParagraphSpacing (obj.Spacing) : null;
-        this.Brd = (undefined != obj.Brd && null != obj.Brd) ? new CParagraphBorders (obj.Brd) : null;
-        this.Shd = (undefined != obj.Shd && null != obj.Shd) ? new CParagraphShd (obj.Shd) : null;
+        this.ContextualSpacing = (undefined != obj.ContextualSpacing)              ? obj.ContextualSpacing : null;
+        this.Ind               = (undefined != obj.Ind     && null != obj.Ind)     ? new CParagraphInd (obj.Ind) : null;
+        this.KeepLines         = (undefined != obj.KeepLines)                      ? obj.KeepLines : null;
+        this.KeepNext          = (undefined != obj.KeepNext)                       ? obj.KeepNext  : undefined;
+        this.WidowControl      = (undefined != obj.WidowControl                    ? obj.WidowControl : undefined );
+        this.PageBreakBefore   = (undefined != obj.PageBreakBefore)                ? obj.PageBreakBefore : null;
+        this.Spacing           = (undefined != obj.Spacing && null != obj.Spacing) ? new CParagraphSpacing (obj.Spacing) : null;
+        this.Brd               = (undefined != obj.Brd     && null != obj.Brd)     ? new CParagraphBorders (obj.Brd) : null;
+        this.Shd               = (undefined != obj.Shd     && null != obj.Shd)     ? new CParagraphShd (obj.Shd) : null;
+        this.Tabs              = (undefined != obj.Tabs)                           ? new CParagraphTabs(obj.Tabs) : undefined;
+        this.DefaultTab        = Default_Tab_Stop;
         this.Locked            = (undefined != obj.Locked  && null != obj.Locked ) ? obj.Locked : false;
+        this.CanAddTable       = (undefined != obj.CanAddTable )                   ? obj.CanAddTable : true;
+        this.FramePr           = (undefined != obj.FramePr )                       ? new CParagraphFrame( obj.FramePr ) : undefined;
+        this.CanAddDropCap     = (undefined != obj.CanAddDropCap )                 ? obj.CanAddDropCap : false;
 
+        this.Subscript         = (undefined != obj.Subscript)                      ? obj.Subscript   : undefined;
+        this.Superscript       = (undefined != obj.Superscript)                    ? obj.Superscript : undefined;
+        this.SmallCaps         = (undefined != obj.SmallCaps)                      ? obj.SmallCaps   : undefined;
+        this.AllCaps           = (undefined != obj.AllCaps)                        ? obj.AllCaps     : undefined;
+        this.Strikeout         = (undefined != obj.Strikeout)                      ? obj.Strikeout   : undefined;
+        this.DStrikeout        = (undefined != obj.DStrikeout)                     ? obj.DStrikeout  : undefined;
+        this.TextSpacing       = (undefined != obj.TextSpacing)                    ? obj.TextSpacing     : undefined;
+        this.Position          = (undefined != obj.Position)                       ? obj.Position    : undefined;
     }
     else
     {
@@ -1944,31 +1991,158 @@ function CParagraphProp (obj)
         //
         //    PageBreakBefore : false,              // начинать параграф с новой страницы
 
-        this.ContextualSpacing = false;
-        this.Ind = new CParagraphInd ();
-        this.KeepLines = false;
-        this.PageBreakBefore = false;
-        this.Spacing = new CParagraphSpacing ();
-        this.Brd = null;
-        this.Shd = null;
-        this.Locked = false;
+        this.ContextualSpacing = undefined;
+        this.Ind               = new CParagraphInd ();
+        this.KeepLines         = undefined;
+        this.KeepNext          = undefined;
+        this.WidowControl      = undefined;
+        this.PageBreakBefore   = undefined;
+        this.Spacing           = new CParagraphSpacing ();
+        this.Brd               = undefined;
+        this.Shd               = undefined;
+        this.Locked            = false;
+        this.CanAddTable       = true;
+        this.Tabs              = undefined;
+        this.CanAddDropCap     = false;
+
+        this.Subscript         = undefined;
+        this.Superscript       = undefined;
+        this.SmallCaps         = undefined;
+        this.AllCaps           = undefined;
+        this.Strikeout         = undefined;
+        this.DStrikeout        = undefined;
+        this.TextSpacing       = undefined;
+        this.Position          = undefined;
     }
 }
-CParagraphProp.prototype.get_Locked = function() { return this.Locked; }
+
 CParagraphProp.prototype.get_ContextualSpacing = function () { return this.ContextualSpacing; }
 CParagraphProp.prototype.put_ContextualSpacing = function (v) { this.ContextualSpacing = v; }
 CParagraphProp.prototype.get_Ind = function () { return this.Ind; }
 CParagraphProp.prototype.put_Ind = function (v) { this.Ind = v; }
 CParagraphProp.prototype.get_KeepLines = function () { return this.KeepLines; }
 CParagraphProp.prototype.put_KeepLines = function (v) { this.KeepLines = v; }
+CParagraphProp.prototype.get_KeepNext = function () { return this.KeepNext; }
+CParagraphProp.prototype.put_KeepNext = function (v) { this.KeepNext = v; }
 CParagraphProp.prototype.get_PageBreakBefore = function (){ return this.PageBreakBefore; }
 CParagraphProp.prototype.put_PageBreakBefore = function (v){ this.PageBreakBefore = v; }
+CParagraphProp.prototype.get_WidowControl = function (){ return this.WidowControl; }
+CParagraphProp.prototype.put_WidowControl = function (v){ this.WidowControl = v; }
 CParagraphProp.prototype.get_Spacing = function () { return this.Spacing; }
 CParagraphProp.prototype.put_Spacing = function (v) { this.Spacing = v; }
 CParagraphProp.prototype.get_Borders = function () { return this.Brd; }
 CParagraphProp.prototype.put_Borders = function (v) { this.Brd = v; }
 CParagraphProp.prototype.get_Shade = function () { return this.Shd; }
 CParagraphProp.prototype.put_Shade = function (v) { this.Shd = v; }
+CParagraphProp.prototype.get_Locked = function() { return this.Locked; }
+CParagraphProp.prototype.get_CanAddTable = function() { return this.CanAddTable; }
+CParagraphProp.prototype.get_Subscript = function () { return this.Subscript; }
+CParagraphProp.prototype.put_Subscript = function (v) { this.Subscript = v; }
+CParagraphProp.prototype.get_Superscript = function () { return this.Superscript; }
+CParagraphProp.prototype.put_Superscript = function (v) { this.Superscript = v; }
+CParagraphProp.prototype.get_SmallCaps = function () { return this.SmallCaps; }
+CParagraphProp.prototype.put_SmallCaps = function (v) { this.SmallCaps = v; }
+CParagraphProp.prototype.get_AllCaps = function () { return this.AllCaps; }
+CParagraphProp.prototype.put_AllCaps = function (v) { this.AllCaps = v; }
+CParagraphProp.prototype.get_Strikeout = function () { return this.Strikeout; }
+CParagraphProp.prototype.put_Strikeout = function (v) { this.Strikeout = v; }
+CParagraphProp.prototype.get_DStrikeout = function () { return this.DStrikeout; }
+CParagraphProp.prototype.put_DStrikeout = function (v) { this.DStrikeout = v; }
+CParagraphProp.prototype.get_TextSpacing = function () { return this.TextSpacing; }
+CParagraphProp.prototype.put_TextSpacing = function (v) { this.TextSpacing = v; }
+CParagraphProp.prototype.get_Position = function () { return this.Position; }
+CParagraphProp.prototype.put_Position = function (v) { this.Position = v; }
+CParagraphProp.prototype.get_Tabs = function () { return this.Tabs; }
+CParagraphProp.prototype.put_Tabs = function (v) { this.Tabs = v; }
+CParagraphProp.prototype.get_DefaultTab = function () { return this.DefaultTab; }
+CParagraphProp.prototype.put_DefaultTab = function (v) { this.DefaultTab = v; }
+CParagraphProp.prototype.get_FramePr = function () { return this.FramePr; }
+CParagraphProp.prototype.put_FramePr = function (v) { this.FramePr = v; }
+CParagraphProp.prototype.get_CanAddDropCap = function() { return this.CanAddDropCap; }
+
+function CParagraphFrame(obj)
+{
+    if ( obj )
+    {
+        this.FromDropCapMenu = false;
+
+        this.DropCap = ( dropcap_None === obj.DropCap ? c_oAscDropCap.None : ( dropcap_Drop === obj.DropCap ? c_oAscDropCap.Drop : ( dropcap_Margin === obj.DropCap ? c_oAscDropCap.Margin : undefined ) ) );
+        this.H       = obj.H;
+        this.HAnchor = obj.HAnchor;
+        this.HRule   = ( heightrule_AtLeast ===  obj.HRule ? linerule_AtLeast : ( heightrule_Auto === obj.HRule  ? linerule_Auto : ( heightrule_Exact === obj.HRule ? linerule_Exact : undefined ) ) );
+        this.HSpace  = obj.HSpace;
+        this.Lines   = obj.Lines;
+        this.VAnchor = obj.VAnchor;
+        this.VSpace  = obj.VSpace;
+        this.W       = obj.W;
+        this.Wrap    = ( wrap_Around === obj.Wrap ? true : ( wrap_None === obj.Wrap ? false : undefined ) );
+        this.X       = obj.X;
+        this.XAlign  = obj.XAlign;
+        this.Y       = obj.Y;
+        this.YAlign  = obj.YAlign;
+        this.Brd     = (undefined != obj.Brd     && null != obj.Brd) ? new CParagraphBorders (obj.Brd) : null;
+        this.Shd     = (undefined != obj.Shd     && null != obj.Shd)     ? new CParagraphShd (obj.Shd) : null;
+        this.FontFamily = (undefined != obj.FontFamily && null != obj.FontFamily) ? new CTextFontFamily (obj.FontFamily) : null;
+    }
+    else
+    {
+        this.FromDropCapMenu = false;
+
+        this.DropCap = undefined;
+        this.H       = undefined;
+        this.HAnchor = undefined;
+        this.HRule   = undefined;
+        this.HSpace  = undefined;
+        this.Lines   = undefined;
+        this.VAnchor = undefined;
+        this.VSpace  = undefined;
+        this.W       = undefined;
+        this.Wrap    = undefined;
+        this.X       = undefined;
+        this.XAlign  = undefined;
+        this.Y       = undefined;
+        this.YAlign  = undefined;
+        this.Shd     = null;
+        this.Brd     = null;
+        this.FontFamily = null;
+    }
+}
+
+CParagraphFrame.prototype.get_DropCap = function () { return this.DropCap; }
+CParagraphFrame.prototype.put_DropCap = function (v) { this.DropCap = v; }
+CParagraphFrame.prototype.get_H = function () { return this.H; }
+CParagraphFrame.prototype.put_H = function (v) { this.H = v; }
+CParagraphFrame.prototype.get_HAnchor = function () { return this.HAnchor; }
+CParagraphFrame.prototype.put_HAnchor = function (v) { this.HAnchor = v; }
+CParagraphFrame.prototype.get_HRule = function () { return this.HRule; }
+CParagraphFrame.prototype.put_HRule = function (v) { this.HRule = v; }
+CParagraphFrame.prototype.get_HSpace = function () { return this.HSpace; }
+CParagraphFrame.prototype.put_HSpace = function (v) { this.HSpace = v; }
+CParagraphFrame.prototype.get_Lines = function () { return this.Lines; }
+CParagraphFrame.prototype.put_Lines = function (v) { this.Lines = v; }
+CParagraphFrame.prototype.get_VAnchor = function () { return this.VAnchor; }
+CParagraphFrame.prototype.put_VAnchor = function (v) { this.VAnchor = v; }
+CParagraphFrame.prototype.get_VSpace = function () { return this.VSpace; }
+CParagraphFrame.prototype.put_VSpace = function (v) { this.VSpace = v; }
+CParagraphFrame.prototype.get_W = function () { return this.W; }
+CParagraphFrame.prototype.put_W = function (v) { this.W = v; }
+CParagraphFrame.prototype.get_Wrap = function () { return this.Wrap; }
+CParagraphFrame.prototype.put_Wrap = function (v) { this.Wrap = v; }
+CParagraphFrame.prototype.get_X = function () { return this.X; }
+CParagraphFrame.prototype.put_X = function (v) { this.X = v; }
+CParagraphFrame.prototype.get_XAlign = function () { return this.XAlign; }
+CParagraphFrame.prototype.put_XAlign = function (v) { this.XAlign = v; }
+CParagraphFrame.prototype.get_Y = function () { return this.Y; }
+CParagraphFrame.prototype.put_Y = function (v) { this.Y = v; }
+CParagraphFrame.prototype.get_YAlign = function () { return this.YAlign; }
+CParagraphFrame.prototype.put_YAlign = function (v) { this.YAlign = v; }
+CParagraphFrame.prototype.get_Borders = function () { return this.Brd; }
+CParagraphFrame.prototype.put_Borders = function (v) { this.Brd = v; }
+CParagraphFrame.prototype.get_Shade = function () { return this.Shd; }
+CParagraphFrame.prototype.put_Shade = function (v) { this.Shd = v; }
+CParagraphFrame.prototype.get_FontFamily = function () { return this.FontFamily; }
+CParagraphFrame.prototype.put_FontFamily = function (v) { this.FontFamily = v; }
+CParagraphFrame.prototype.put_FromDropCapMenu = function (v) { this.FromDropCapMenu = v; }
 
 // Paragraph properties
 function CParagraphPropEx (obj)

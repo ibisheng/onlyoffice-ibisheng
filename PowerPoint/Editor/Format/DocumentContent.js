@@ -201,6 +201,27 @@ CDocumentContent.prototype =
         return this.Parent.Get_Numbering();
     },
 
+
+    recalcColors: function()
+    {
+        if(this.Parent instanceof  CTextBody)
+        {
+            for(var i = 0; i < this.Content.length; ++i)
+            {
+                var  p = this.Content[i];
+                if(p.CompiledPr.Pr.TextPr)
+                    this.Parent.textPropsForRecalc.push({Value:p.CompiledPr.Pr.TextPr});
+                for(var j = 0; j < p.Content.length; ++j)
+                {
+                    if(p.Content[j].Type === para_TextPr && p.Content[j].Value.unifill)
+                    {
+                        this.Parent.textPropsForRecalc.push(p.Content[j]);
+                    }
+                }
+            }
+        }
+    },
+
     Internal_GetNumInfo : function(ParaId, NumPr)
     {
         this.NumInfoCounter++;

@@ -649,6 +649,27 @@ function CCollaborativeEditing()
                     editor.sync_UnLockComment( this.m_aNeedUnlock[Index].Get_Id() );
                 else if ( this.m_aNeedUnlock[Index] instanceof CGraphicObjects )
                     editor.sync_UnLockDocumentSchema();   */
+
+                var Class =  this.m_aNeedUnlock[Index];
+                if ( Class instanceof PropLocker )
+                {
+                    var object = g_oTableId.Get_ById(Class.objectId);
+                    if(object instanceof CPresentation)
+                    {
+                        if(Class === editor.WordControl.m_oLogicDocument.themeLock)
+                        {
+                            editor.asc_fireCallback("asc_onUnLockDocumentTheme");
+                        }
+                        else if(Class === editor.WordControl.m_oLogicDocument.schemeLock)
+                        {
+                            editor.asc_fireCallback("asc_onUnLockDocumentSchema");
+                        }
+                        else if(Class === editor.WordControl.m_oLogicDocument.slideSizeLock)
+                        {
+                            editor.asc_fireCallback("asc_onUnLockDocumentProps");
+                        }
+                    }
+                }
             }
             else if ( locktype_Other3 === CurLockType )
             {
@@ -1085,6 +1106,11 @@ var changestype_ColorScheme          = 60; // Изменение свойств 
 var changestype_Text_Props           = 61; // Изменение свойств фигуры
 var changestype_RemoveSlide          = 62; // Изменение свойств фигуры
 var changestype_PresentationProps    = 63; // Изменение темы, цветовой схемы, размера слайда;
+var changestype_Theme                = 64; // Изменение темы;
+var changestype_ColorScheme          = 65; // Изменение цветовой схемы;
+var changestype_SlideSize            = 66; // Изменение цветовой схемы;
+
+
 
 
 

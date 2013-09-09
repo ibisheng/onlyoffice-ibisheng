@@ -992,6 +992,19 @@ Slide.prototype =
         }
     },
 
+    recalcAllColors: function()
+    {
+        this.recalcInfo =
+        {
+            recalculateBackground: true,
+            recalculateSpTree: true
+        };
+        for(var i = 0; i < this.cSld.spTree.length; ++i)
+        {
+            this.cSld.spTree[i].recalcAllColors();
+        }
+    },
+
     Get_Id: function()
     {
         return this.Id;
@@ -1522,12 +1535,13 @@ Slide.prototype =
     }
 };
 
-function PropLocker()
+function PropLocker(objectId)
 {
     this.Lock = new CLock();
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 
+    this.objectId = objectId;
 
 }
 

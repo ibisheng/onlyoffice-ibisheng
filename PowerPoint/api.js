@@ -241,14 +241,25 @@ asc_docs_api.prototype._coAuthoringInit = function (docId, user) {
                     // Выставляем ID пользователя, залочившего данный элемент
                     Lock.Set_UserId( e["user"] );
 
-                    /* if ( Class instanceof CHeaderFooterController )
-                     editor.sync_LockHeaderFooters();
-                     else if ( Class instanceof CDocument )
-                     editor.sync_LockDocumentProps();
-                     else if ( Class instanceof CComment )
-                     editor.sync_LockComment(Class.Get_Id(), e["user"]);
-                     else if ( Class instanceof CGraphicObjects )
-                     editor.sync_LockDocumentSchema();          */
+                     if ( Class instanceof PropLocker )
+                     {
+                         var object = g_oTableId.Get_ById(Class.objectId);
+                         if(object instanceof CPresentation)
+                         {
+                             if(Class === editor.WordControl.m_oLogicDocument.themeLock)
+                             {
+                                     editor.asc_fireCallback("asc_onLockDocumentTheme");
+                             }
+                             else if(Class === editor.WordControl.m_oLogicDocument.schemeLock)
+                             {
+                                 editor.asc_fireCallback("asc_onLockDocumentSchema");
+                             }
+                             else if(Class === editor.WordControl.m_oLogicDocument.slideSizeLock)
+                             {
+                                 editor.asc_fireCallback("asc_onLockDocumentProps");
+                             }
+                         }
+                     }
 
                     // TODO: Здесь для ускорения надо сделать проверку, является ли текущим элемент с
                     //       заданным Id. Если нет, тогда и не надо обновлять состояние.
@@ -691,7 +702,7 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
         this.DocInfo.put_OfflineApp(true);
 
         // For test create unique id
-        documentId = "qwerty123";
+        documentId = "safsfsdfsdfsdfsdf3";
         this.OfflineAppDocumentStartLoad();
 
         this.sync_zoomChangeCallback(this.WordControl.m_nZoomValue, this.WordControl.m_nZoomType);
@@ -2052,6 +2063,12 @@ asc_docs_api.prototype.sync_PrPropCallback = function(prProp){
     }
 
     this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new CSelectedObject( c_oAscTypeSelectElement.Paragraph, new CParagraphProp( prProp ) );
+}
+
+asc_docs_api.prototype.SetDrawImagePlaceParagraph = function(element_id, props)
+{
+    this.WordControl.m_oDrawingDocument.InitGuiCanvasTextProps(element_id);
+    this.WordControl.m_oDrawingDocument.DrawGuiCanvasTextProps(props);
 }
 
 /*----------------------------------------------------------------*/

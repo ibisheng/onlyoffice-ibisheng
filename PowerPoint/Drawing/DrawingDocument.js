@@ -1228,6 +1228,230 @@ function CDrawingDocument()
         }
     }
 
+    this.InitGuiCanvasTextProps = function(div_id)
+    {
+        var _div_elem = document.getElementById(div_id);
+        if (null != this.GuiCanvasTextProps)
+        {
+            var elem = _div_elem.getElementsByTagName('canvas');
+            if (elem.length == 0)
+            {
+                _div_elem.appendChild(this.GuiCanvasTextProps);
+            }
+            else
+            {
+                var _width = parseInt(_div_elem.offsetWidth);
+                var _height = parseInt(_div_elem.offsetHeight);
+                if (0 == _width)
+                    _width = 300;
+                if (0 == _height)
+                    _height = 80;
+
+                if (this.GuiCanvasTextProps.width != _width || this.GuiCanvasTextProps.height != _height)
+                {
+                    this.GuiCanvasTextProps.width = _width;
+                    this.GuiCanvasTextProps.height = _height;
+                }
+            }
+        }
+        else
+        {
+            this.GuiCanvasTextProps = document.createElement('canvas');
+            this.GuiCanvasTextProps.style = "position:absolute;left:0;top:0;";
+            this.GuiCanvasTextProps.id = this.GuiCanvasTextPropsId;
+
+            var _width = parseInt(_div_elem.offsetWidth);
+            var _height = parseInt(_div_elem.offsetHeight);
+            if (0 == _width)
+                _width = 300;
+            if (0 == _height)
+                _height = 80;
+
+            this.GuiCanvasTextProps.width = _width;
+            this.GuiCanvasTextProps.height = _height;
+
+            _div_elem.appendChild(this.GuiCanvasTextProps);
+        }
+    }
+
+    this.DrawGuiCanvasTextProps = function(props)
+    {
+        var bIsChange = false;
+        if (null == this.GuiLastTextProps)
+        {
+            bIsChange = true;
+
+            this.GuiLastTextProps = new CParagraphProp();
+
+            this.GuiLastTextProps.Subscript     = props.Subscript;
+            this.GuiLastTextProps.Superscript   = props.Superscript;
+            this.GuiLastTextProps.SmallCaps     = props.SmallCaps;
+            this.GuiLastTextProps.AllCaps       = props.AllCaps;
+            this.GuiLastTextProps.Strikeout     = props.Strikeout;
+            this.GuiLastTextProps.DStrikeout    = props.DStrikeout;
+
+            this.GuiLastTextProps.TextSpacing   = props.TextSpacing;
+            this.GuiLastTextProps.Position      = props.Position;
+        }
+        else
+        {
+            if (this.GuiLastTextProps.Subscript != props.Subscript)
+            {
+                this.GuiLastTextProps.Subscript = props.Subscript;
+                bIsChange = true;
+            }
+            if (this.GuiLastTextProps.Superscript != props.Superscript)
+            {
+                this.GuiLastTextProps.Superscript = props.Superscript;
+                bIsChange = true;
+            }
+            if (this.GuiLastTextProps.SmallCaps != props.SmallCaps)
+            {
+                this.GuiLastTextProps.SmallCaps = props.SmallCaps;
+                bIsChange = true;
+            }
+            if (this.GuiLastTextProps.AllCaps != props.AllCaps)
+            {
+                this.GuiLastTextProps.AllCaps = props.AllCaps;
+                bIsChange = true;
+            }
+            if (this.GuiLastTextProps.Strikeout != props.Strikeout)
+            {
+                this.GuiLastTextProps.Strikeout = props.Strikeout;
+                bIsChange = true;
+            }
+            if (this.GuiLastTextProps.DStrikeout != props.DStrikeout)
+            {
+                this.GuiLastTextProps.DStrikeout = props.DStrikeout;
+                bIsChange = true;
+            }
+            if (this.GuiLastTextProps.TextSpacing != props.TextSpacing)
+            {
+                this.GuiLastTextProps.TextSpacing = props.TextSpacing;
+                bIsChange = true;
+            }
+            if (this.GuiLastTextProps.Position != props.Position)
+            {
+                this.GuiLastTextProps.Position = props.Position;
+                bIsChange = true;
+            }
+        }
+
+        if (undefined !== this.GuiLastTextProps.Position && isNaN(this.GuiLastTextProps.Position))
+            this.GuiLastTextProps.Position = undefined;
+        if (undefined !== this.GuiLastTextProps.TextSpacing && isNaN(this.GuiLastTextProps.TextSpacing))
+            this.GuiLastTextProps.TextSpacing = undefined;
+
+        if (!bIsChange)
+            return;
+
+        History.TurnOff();
+        var _oldTurn = editor.isViewMode;
+        editor.isViewMode = true;
+
+        var par = new Paragraph(this, this.m_oWordControl.m_oLogicDocument, 0, 0, 0, 1000, 1000);
+
+        par.Cursor_MoveToStartPos();
+
+        var _paraPr = new CParaPr();
+        par.Pr = _paraPr;
+        var _textPr = new CTextPr();
+        _textPr.FontFamily = { Name : "Arial", Index : -1 };
+
+        _textPr.Strikeout  = this.GuiLastTextProps.Strikeout;
+
+        if (true === this.GuiLastTextProps.Subscript)
+            _textPr.VertAlign  = vertalign_SubScript;
+        else if (true === this.GuiLastTextProps.Superscript)
+            _textPr.VertAlign  = vertalign_SuperScript;
+        else
+            _textPr.VertAlign = vertalign_Baseline;
+
+        _textPr.DStrikeout = this.GuiLastTextProps.DStrikeout;
+        _textPr.Caps       = this.GuiLastTextProps.AllCaps;
+        _textPr.SmallCaps  = this.GuiLastTextProps.SmallCaps;
+
+        _textPr.Spacing    = this.GuiLastTextProps.TextSpacing;
+        _textPr.Position   = this.GuiLastTextProps.Position;
+
+        par.Add(new ParaTextPr(_textPr));
+        par.Add(new ParaText("H"));
+        par.Add(new ParaText("e"));
+        par.Add(new ParaText("l"));
+        par.Add(new ParaText("l"));
+        par.Add(new ParaText("o"));
+        par.Add(new ParaSpace(1));
+        par.Add(new ParaText("W"));
+        par.Add(new ParaText("o"));
+        par.Add(new ParaText("r"));
+        par.Add(new ParaText("l"));
+        par.Add(new ParaText("d"));
+
+        par.Recalculate_Page(0);
+
+        var baseLineOffset = par.Lines[0].Y;
+        var _bounds = par.Get_PageBounds(0);
+
+        var ctx = this.GuiCanvasTextProps.getContext('2d');
+        var _wPx = this.GuiCanvasTextProps.width;
+        var _hPx = this.GuiCanvasTextProps.height;
+
+        var _wMm = _wPx * g_dKoef_pix_to_mm;
+        var _hMm = _hPx * g_dKoef_pix_to_mm;
+
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fillRect(0, 0, _wPx, _hPx);
+
+        var _pxBoundsW = par.Lines[0].W * g_dKoef_mm_to_pix;//(_bounds.Right - _bounds.Left) * g_dKoef_mm_to_pix;
+        var _pxBoundsH = (_bounds.Bottom - _bounds.Top) * g_dKoef_mm_to_pix;
+
+        if (this.GuiLastTextProps.Position !== undefined && this.GuiLastTextProps.Position != null && this.GuiLastTextProps.Position != 0)
+        {
+            // TODO: нужна высота без учета Position
+            // _pxBoundsH -= (this.GuiLastTextProps.Position * g_dKoef_mm_to_pix);
+        }
+
+        if (_pxBoundsH < _hPx && _pxBoundsW < _wPx)
+        {
+            // рисуем линию
+            var _lineY = (((_hPx + _pxBoundsH) / 2) >> 0) + 0.5;
+            var _lineW = (((_wPx - _pxBoundsW) / 4) >> 0);
+
+            ctx.strokeStyle = "#000000";
+            ctx.lineWidth = 1;
+
+            ctx.beginPath();
+            ctx.moveTo(0, _lineY);
+            ctx.lineTo(_lineW, _lineY);
+
+            ctx.moveTo(_wPx - _lineW, _lineY);
+            ctx.lineTo(_wPx, _lineY);
+
+            ctx.stroke();
+            ctx.beginPath();
+        }
+
+        var _yOffset = (((_hPx + _pxBoundsH) / 2) - baseLineOffset * g_dKoef_mm_to_pix) >> 0;
+        var _xOffset = ((_wPx - _pxBoundsW) / 2) >> 0;
+
+        var graphics = new CGraphics();
+        graphics.init(ctx, _wPx, _hPx, _wMm, _hMm);
+        graphics.m_oFontManager = g_fontManager;
+
+        graphics.m_oCoordTransform.tx = _xOffset;
+        graphics.m_oCoordTransform.ty = _yOffset;
+
+        graphics.transform(1,0,0,1,0,0);
+
+        var old_marks = this.m_oWordControl.m_oApi.ShowParaMarks;
+        this.m_oWordControl.m_oApi.ShowParaMarks = false;
+        par.Draw(0, graphics);
+        this.m_oWordControl.m_oApi.ShowParaMarks = old_marks;
+
+        History.TurnOn();
+        editor.isViewMode = _oldTurn;
+    }
+
     this.DrawSelection = function(overlay)
     {
         var xDst = this.SlideCurrectRect.left;

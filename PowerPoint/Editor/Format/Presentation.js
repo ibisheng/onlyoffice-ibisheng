@@ -356,6 +356,10 @@ function CPresentation(DrawingDocument)
     this.startChangeThemeTimeOutId = null;
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
+
+    this.themeLock = new PropLocker(this.Id);
+    //this.schemeLock = new PropLocker(this.Id);
+    this.slideSizeLock = new PropLocker(this.Id);
 }
 
 var selected_None              = -1;
@@ -5917,6 +5921,9 @@ CPresentation.prototype =
         {
             return;
         }
+
+        if(!(this.Document_Is_SelectionLocked(changestype_Theme) === false))
+            return;
         if(this.startChangeThemeTimeOutId != null)
         {
             clearTimeout(this.startChangeThemeTimeOutId);
@@ -5989,6 +5996,57 @@ CPresentation.prototype =
         this.startChangeThemeTimeOutId = setTimeout(function(){redrawSlide(_current_slide, _presentation, _arr_new_layouts, 0, _slides_array)}, 30);
 
 
+        this.Document_UpdateUndoRedoState();
+    },
+
+    changeSlideSize: function()
+    {
+
+    },
+
+    changeColorScheme: function(colorScheme)
+    {
+        if(this.viewMode === true)
+        {
+            return;
+        }
+
+
+        if(!(this.Document_Is_SelectionLocked(changestype_Theme) === false))
+            return;
+
+        if(!(colorScheme instanceof ClrScheme))
+        {
+            return;
+        }
+        History.Create_NewPoint();
+
+
+
+        var _slides_array = [];
+        for(var _index = 0; _index < this.Slides.length; ++_index)
+        {
+            _slides_array.push(this.Slides[_index]);
+        }
+        var _slides = this.Slides;
+        var _slide_index;
+        var _slide_count = _slides.length;
+        var _cur_slide;
+        var _cur_theme;
+        var _old_color_scheme;
+        for(_slide_index = 0; _slide_index < _slide_count; ++_slide_index)
+        {
+            _cur_slide =_slides[_slide_index];
+            _cur_theme = _cur_slide.Layout.Master.Theme;
+            if(!_cur_theme.themeElements.clrScheme.isIdentical(colorScheme))
+            {
+                _old_color_scheme = _cur_theme.themeElements.clrScheme;
+                _cur_theme.themeElements.clrScheme = colorScheme.createDuplicate();
+            }
+        }
+        var _start_slide = this.Slides[this.CurPage];
+        var _presentation = this;
+        setTimeout(function(){recalculateSlideAfterChangeThemeColors(_start_slide, _presentation, 0, _slides_array)},30);
         this.Document_UpdateUndoRedoState();
     },
 
@@ -6293,6 +6351,40 @@ CPresentation.prototype =
                 this.Slides[selected_slides[i]].deleteLock.Lock.Check(check_obj);
             }
         }
+
+        if(CheckType === changestype_Theme)
+        {
+            var check_obj =
+            {
+                "type": c_oAscLockTypeElemPresentation.Slide,
+                "val": this.themeLock.Get_Id(),
+                "guid": this.themeLock.Get_Id()
+            };
+            this.themeLock.Lock.Check(check_obj);
+        }
+
+        if(CheckType === changestype_ColorScheme)
+        {
+            var check_obj =
+            {
+                "type": c_oAscLockTypeElemPresentation.Slide,
+                "val": this.schemeLock.Get_Id(),
+                "guid": this.schemeLock.Get_Id()
+            };
+            this.schemeLock.Lock.Check(check_obj);
+        }
+
+        if(CheckType === changestype_SlideSize)
+        {
+            var check_obj =
+            {
+                "type": c_oAscLockTypeElemPresentation.Slide,
+                "val": this.slideSizeLock.Get_Id(),
+                "guid": this.slideSizeLock.Get_Id()
+            };
+            this.slideSizeLock.Lock.Check(check_obj);
+        }
+
         var bResult = CollaborativeEditing.OnEnd_CheckLock();
 
         if ( true === bResult )

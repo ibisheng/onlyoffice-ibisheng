@@ -1445,6 +1445,16 @@ function CompareShapeProperties(shapeProp1, shapeProp2)
     {
         _result_shape_prop.stroke = shapeProp1.stroke.compare(shapeProp2.stroke)
     }
+
+    if(shapeProp1.verticalTextAlign === shapeProp2.verticalTextAlign)
+    {
+        _result_shape_prop.verticalTextAlign = shapeProp1.verticalTextAlign;
+    }
+    else
+    {
+        _result_shape_prop.verticalTextAlign = null;
+    }
+
     if(shapeProp1.canChangeArrows !== true || shapeProp2.canChangeArrows !== true)
         _result_shape_prop.canChangeArrows = false;
     else
@@ -3399,14 +3409,10 @@ function redrawSlide2(slide, presentation, arrInd, pos,  arr_layouts, direction,
 function recalculateSlideAfterChangeThemeColors(slide, presentation, direction, arr_slides)
 {
     var _history_is_on = History.Is_On();
-    if(_history_is_on)
-    {
-        History.TurnOff();
-    }
 
-    slide.calculateColors();
-    slide.Layout.calculateColors();
-    slide.Layout.Master.calculateColors();
+
+    slide.recalcAllColors();
+    slide.recalculate();
     presentation.DrawingDocument.OnRecalculatePage(slide.num, slide);
     if(presentation.CurPos.Type === docpostype_FlowObjects)
     {
@@ -3415,10 +3421,7 @@ function recalculateSlideAfterChangeThemeColors(slide, presentation, direction, 
             presentation.RecalculateCurPos();
         }
     }
-    if(_history_is_on)
-    {
-        History.TurnOn();
-    }
+
     if(direction == 0)
     {
         if(slide.num > 0)
