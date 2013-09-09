@@ -7171,7 +7171,7 @@
 														var sub;
 														if(typeof binary_shape === "string")
 															sub = binary_shape.substr(0, 12);
-														if(typeof binary_shape === "string" &&( sub === "TeamLabShape" || sub === "TeamLabImage" /*|| sub === "TeamLabChart" */|| sub === "TeamLabGroup"))
+														if(typeof binary_shape === "string" &&( sub === "TeamLabShape" || sub === "TeamLabImage" || sub === "TeamLabChart" || sub === "TeamLabGroup"))
 														{
 															var reader = CreateBinaryReader(binary_shape, 12, binary_shape.length);
 															reader.GetLong();
@@ -7206,6 +7206,11 @@
 																case "TeamLabGroup":
 																{
 																	Drawing = new CGroupShape();
+																	break;
+																}
+																case "TeamLabChart":
+																{
+																	Drawing = new CChartAsGroup();
 																	break;
 																}
 																default :

@@ -2086,23 +2086,12 @@
 						table.appendChild(curImage);
 						
 						//add image or chart in local buffer
-						if(image.graphicObject.isChart())
-						{
-							isChart = {};
-							isChart.chart = cloneImg.chart;
-							isChart.src = cloneImg.src;
-							isChart.height = curImage.height;
-							isChart.width = curImage.width;
-						}
-						else
-						{
 							t.lStorage[nLoc] = {};
 							t.lStorage[nLoc].image = curImage;
 							t.lStorage[nLoc].fromCol = cloneImg.from.col;
 							t.lStorage[nLoc].fromRow = cloneImg.from.row;
 							nLoc++;
 							isImage = true;
-						}
 						
 						t._addLocalStorage(isImage,isChart,range.worksheet.getCell( new CellAddress(row, col, 0) ),bbox.r1,bbox.c1, image.from.row, image.from.col);
 					}
@@ -2530,76 +2519,64 @@
 				var firstRange = ws.activeRange.clone(true);
 				for(i=0;i < array.length;i++)
 				{
-					if(typeof array[i].isChart == 'object')
+					var binary_shape = array[i].image.getAttribute("alt");
+					var sub;
+					if(typeof binary_shape === "string")
+						sub = binary_shape.substr(0, 12);
+					if(typeof binary_shape === "string" &&( sub === "TeamLabShape" || sub === "TeamLabImage" || sub === "TeamLabChart" || sub === "TeamLabGroup"))
 					{
-						var activeRange = ws.activeRange;
-						var left = ws.cols[activeRange.c1].left;
-						var top =  ws.rows[activeRange.r1].top;
-						var options = 
+						var reader = CreateBinaryReader(binary_shape, 12, binary_shape.length);
+						reader.GetLong();
+						if(isRealObject(reader))
+							reader.oImages = this.oImages;
+						var first_string = null;
+						if(reader !== null && typeof  reader === "object")
 						{
-							height: array[i].isChart.height,
-							width: array[i].isChart.width,
-							left: left,
-							top: top
+							first_string = sub;
 						}
-						ws.objectRender.addChartDrawingObject(array[i].isChart.chart,null,options);
-					}
-					else
-					{
-						var binary_shape = array[i].image.getAttribute("alt");
-						var sub;
-						if(typeof binary_shape === "string")
-							sub = binary_shape.substr(0, 12);
-						if(typeof binary_shape === "string" &&( sub === "TeamLabShape" || sub === "TeamLabImage" /*|| sub === "TeamLabChart" */|| sub === "TeamLabGroup"))
+						var positionX = null
+						var positionY = null;
+						
+						if(ws.cols && firstRange && firstRange.c1 != undefined && ws.cols[firstRange.c1].left != undefined)
+							positionX = ws.cols[firstRange.c1].left;
+						if(ws.rows && firstRange && firstRange.r1 != undefined && ws.rows[firstRange.r1].top != undefined)
+							positionY = ws.rows[firstRange.r1].top
+						
+						var Drawing;
+						switch(first_string)
 						{
-							var reader = CreateBinaryReader(binary_shape, 12, binary_shape.length);
-							reader.GetLong();
-							if(isRealObject(reader))
-								reader.oImages = this.oImages;
-							var first_string = null;
-							if(reader !== null && typeof  reader === "object")
+							case "TeamLabImage":
 							{
-								first_string = sub;
+								Drawing = new CImageShape();
+								break;
 							}
-							var positionX = null
-							var positionY = null;
-							
-							if(ws.cols && firstRange && firstRange.c1 != undefined && ws.cols[firstRange.c1].left != undefined)
-								positionX = ws.cols[firstRange.c1].left;
-							if(ws.rows && firstRange && firstRange.r1 != undefined && ws.rows[firstRange.r1].top != undefined)
-								positionY = ws.rows[firstRange.r1].top
-							
-							var Drawing;
-							switch(first_string)
+							case "TeamLabShape":
 							{
-								case "TeamLabImage":
-								{
-									Drawing = new CImageShape();
-									break;
-								}
-								case "TeamLabShape":
-								{
-									Drawing = new CShape();
-									break;
-								}
-								case "TeamLabGroup":
-								{
-									Drawing = new CGroupShape();
-									break;
-								}
-								default :
-								{
-									Drawing = CreateImageFromBinary(src);
-									break;
-								}
+								Drawing = new CShape();
+								break;
 							}
-							if(positionX && positionY && ws.objectRender)
-								Drawing.readFromBinaryForCopyPaste(reader,null, ws.objectRender,ws.objectRender.convertMetric(positionX,1,3),ws.objectRender.convertMetric(positionY,1,3));
-							else
-								Drawing.readFromBinaryForCopyPaste(reader,null, ws.objectRender);
-							Drawing.drawingObjects = ws.objectRender;
-							Drawing.addToDrawingObjects();
+							case "TeamLabGroup":
+							{
+								Drawing = new CGroupShape();
+								break;
+							}
+							case "TeamLabChart":
+							{
+								Drawing = new CChartAsGroup();
+								break;
+							}
+							default :
+							{
+								Drawing = CreateImageFromBinary(src);
+								break;
+							}
 						}
+						if(positionX && positionY && ws.objectRender)
+							Drawing.readFromBinaryForCopyPaste(reader,null, ws.objectRender,ws.objectRender.convertMetric(positionX,1,3),ws.objectRender.convertMetric(positionY,1,3));
+						else
+							Drawing.readFromBinaryForCopyPaste(reader,null, ws.objectRender);
+						Drawing.drawingObjects = ws.objectRender;
+						Drawing.addToDrawingObjects();
 					}
 				}
 				return true;
