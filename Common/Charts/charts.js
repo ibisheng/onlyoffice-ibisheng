@@ -27,13 +27,15 @@ function ChartRender() {
 		$(chartCanvas)[0].height = height;
 		$(chartCanvas)[0].width = width;
 		
-		if ( insertChart(chart, activeWorkSheet, width, height, isNewChart) )
-			chartBase64 = chartCanvas.toDataURL();
+		//if ( insertChart(chart, activeWorkSheet, width, height, isNewChart) )
+		//	chartBase64 = chartCanvas.toDataURL();
+		
+		//return chartBase64;
 
+		insertChart(chart, activeWorkSheet, width, height, isNewChart);
         var ret  = chartCanvas;
         chartCanvas = null;
         return ret;
-		//return chartBase64;
 	}
 }
 
@@ -457,17 +459,17 @@ function ChartPreviewManager() {
 						
 						chart.subType = c_oAscChartSubType.normal;
 						fillChartData(chart);
-						var chartBase64 = chartRender.insertChart( chart, null, preview_w, preview_h, false, true );
+						var chartBase64 = chartRender.insertChart( chart, null, preview_w, preview_h, false, true ).toDataURL();
 						previewGroups[chartType][c_oAscChartSubType.normal][style] = chartBase64;
 						
 						chart.subType = c_oAscChartSubType.stacked;
 						fillChartData(chart);
-						var chartBase64 = chartRender.insertChart( chart, null, preview_w, preview_h, false, true );
+						var chartBase64 = chartRender.insertChart( chart, null, preview_w, preview_h, false, true ).toDataURL();
 						previewGroups[chartType][c_oAscChartSubType.stacked][style] = chartBase64;
 						
 						chart.subType = c_oAscChartSubType.stackedPer;
 						fillChartData(chart);
-						var chartBase64 = chartRender.insertChart( chart, null, preview_w, preview_h, false, true );
+						var chartBase64 = chartRender.insertChart( chart, null, preview_w, preview_h, false, true ).toDataURL();
 						previewGroups[chartType][c_oAscChartSubType.stackedPer][style] = chartBase64;
 					
 						break;
@@ -478,7 +480,7 @@ function ChartPreviewManager() {
 					
 						chart.subType = c_oAscChartSubType.normal;
 						fillChartData(chart);
-						var chartBase64 = chartRender.insertChart( chart, null, preview_w, preview_h, false, true );
+						var chartBase64 = chartRender.insertChart( chart, null, preview_w, preview_h, false, true ).toDataURL();
 						previewGroups[chartType][c_oAscChartSubType.normal][style] = chartBase64;
 						
 						break;
