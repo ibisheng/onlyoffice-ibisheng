@@ -1066,11 +1066,11 @@ function CPage()
             {
                 if (undefined === place.Ex)
                 {
-                    var _x = parseInt(xDst + dKoefX * place.X) - 0.5;
-                    var _y = parseInt(yDst + dKoefY * place.Y) - 0.5;
+                    var _x = ((xDst + dKoefX * place.X) >> 0) - 0.5;
+                    var _y = ((yDst + dKoefY * place.Y) >> 0) - 0.5;
 
-                    var _w = parseInt(dKoefX * place.W) + 1;
-                    var _h = parseInt(dKoefY * place.H) + 1;
+                    var _w = ((dKoefX * place.W) >> 0) + 1;
+                    var _h = ((dKoefY * place.H) >> 0) + 1;
 
                     if (_x < overlay.min_x)
                         overlay.min_x = _x;
@@ -1086,23 +1086,23 @@ function CPage()
                 }
                 else
                 {
-                    var _x1 = parseInt(xDst + dKoefX * place.X);
-                    var _y1 = parseInt(yDst + dKoefY * place.Y);
+                    var _x1 = (xDst + dKoefX * place.X) >> 0;
+                    var _y1 = (yDst + dKoefY * place.Y) >> 0;
 
                     var x2 = place.X + place.W * place.Ex;
                     var y2 = place.Y + place.W * place.Ey;
-                    var _x2 = parseInt(xDst + dKoefX * x2);
-                    var _y2 = parseInt(yDst + dKoefY * y2);
+                    var _x2 = (xDst + dKoefX * x2) >> 0;
+                    var _y2 = (yDst + dKoefY * y2) >> 0;
 
                     var x3 = x2 - place.H * place.Ey;
                     var y3 = y2 + place.H * place.Ex;
-                    var _x3 = parseInt(xDst + dKoefX * x3);
-                    var _y3 = parseInt(yDst + dKoefY * y3);
+                    var _x3 = (xDst + dKoefX * x3) >> 0;
+                    var _y3 = (yDst + dKoefY * y3) >> 0;
 
                     var x4 = place.X - place.H * place.Ey;
                     var y4 = place.Y + place.H * place.Ex;
-                    var _x4 = parseInt(xDst + dKoefX * x4);
-                    var _y4 = parseInt(yDst + dKoefY * y4);
+                    var _x4 = (xDst + dKoefX * x4) >> 0;
+                    var _y4 = (yDst + dKoefY * y4) >> 0;
 
                     overlay.CheckPoint(_x1, _y1);
                     overlay.CheckPoint(_x2, _y2);
@@ -1197,11 +1197,11 @@ function CPage()
             {
                 if (undefined === place.Ex)
                 {
-                    var _x = parseInt(xDst + dKoefX * place.X) - 0.5;
-                    var _y = parseInt(yDst + dKoefY * place.Y) - 0.5;
+                    var _x = ((xDst + dKoefX * place.X) >> 0) - 0.5;
+                    var _y = ((yDst + dKoefY * place.Y) >> 0) - 0.5;
 
-                    var _w = parseInt(dKoefX * place.W) + 1;
-                    var _h = parseInt(dKoefY * place.H) + 1;
+                    var _w = ((dKoefX * place.W) >> 0) + 1;
+                    var _h = ((dKoefY * place.H) >> 0) + 1;
 
                     if (_x < overlay.min_x)
                         overlay.min_x = _x;
@@ -1217,23 +1217,23 @@ function CPage()
                 }
                 else
                 {
-                    var _x1 = parseInt(xDst + dKoefX * place.X);
-                    var _y1 = parseInt(yDst + dKoefY * place.Y);
+                    var _x1 = (xDst + dKoefX * place.X) >> 0;
+                    var _y1 = (yDst + dKoefY * place.Y) >> 0;
 
                     var x2 = place.X + place.W * place.Ex;
                     var y2 = place.Y + place.W * place.Ey;
-                    var _x2 = parseInt(xDst + dKoefX * x2);
-                    var _y2 = parseInt(yDst + dKoefY * y2);
+                    var _x2 = (xDst + dKoefX * x2) >> 0;
+                    var _y2 = (yDst + dKoefY * y2) >> 0;
 
                     var x3 = x2 - place.H * place.Ey;
                     var y3 = y2 + place.H * place.Ex;
-                    var _x3 = parseInt(xDst + dKoefX * x3);
-                    var _y3 = parseInt(yDst + dKoefY * y3);
+                    var _x3 = (xDst + dKoefX * x3) >> 0;
+                    var _y3 = (yDst + dKoefY * y3) >> 0;
 
                     var x4 = place.X - place.H * place.Ey;
                     var y4 = place.Y + place.H * place.Ex;
-                    var _x4 = parseInt(xDst + dKoefX * x4);
-                    var _y4 = parseInt(yDst + dKoefY * y4);
+                    var _x4 = (xDst + dKoefX * x4) >> 0;
+                    var _y4 = (yDst + dKoefY * y4) >> 0;
 
                     overlay.CheckPoint(_x1, _y1);
                     overlay.CheckPoint(_x2, _y2);
@@ -1325,11 +1325,11 @@ function CPage()
         {
             if (undefined === place.Ex)
             {
-                var _x = parseInt(xDst + dKoefX * place.X) - 0.5;
-                var _y = parseInt(yDst + dKoefY * place.Y) - 0.5;
+                var _x = ((xDst + dKoefX * place.X) >> 0) - 0.5;
+                var _y = ((yDst + dKoefY * place.Y) >> 0) - 0.5;
 
-                var _w = parseInt(dKoefX * place.W) + 1;
-                var _h = parseInt(dKoefY * place.H) + 1;
+                var _w = ((dKoefX * place.W) >> 0) + 1;
+                var _h = ((dKoefY * place.H) >> 0) + 1;
 
                 if (_x < overlay.min_x)
                     overlay.min_x = _x;
@@ -1345,23 +1345,23 @@ function CPage()
             }
             else
             {
-                var _x1 = parseInt(xDst + dKoefX * place.X);
-                var _y1 = parseInt(yDst + dKoefY * place.Y);
+                var _x1 = (xDst + dKoefX * place.X) >> 0;
+                var _y1 = (yDst + dKoefY * place.Y) >> 0;
 
                 var x2 = place.X + place.W * place.Ex;
                 var y2 = place.Y + place.W * place.Ey;
-                var _x2 = parseInt(xDst + dKoefX * x2);
-                var _y2 = parseInt(yDst + dKoefY * y2);
+                var _x2 = (xDst + dKoefX * x2) >> 0;
+                var _y2 = (yDst + dKoefY * y2) >> 0;
 
                 var x3 = x2 - place.H * place.Ey;
                 var y3 = y2 + place.H * place.Ex;
-                var _x3 = parseInt(xDst + dKoefX * x3);
-                var _y3 = parseInt(yDst + dKoefY * y3);
+                var _x3 = (xDst + dKoefX * x3) >> 0;
+                var _y3 = (yDst + dKoefY * y3) >> 0;
 
                 var x4 = place.X - place.H * place.Ey;
                 var y4 = place.Y + place.H * place.Ex;
-                var _x4 = parseInt(xDst + dKoefX * x4);
-                var _y4 = parseInt(yDst + dKoefY * y4);
+                var _x4 = (xDst + dKoefX * x4) >> 0;
+                var _y4 = (yDst + dKoefY * y4) >> 0;
 
                 overlay.CheckPoint(_x1, _y1);
                 overlay.CheckPoint(_x2, _y2);
@@ -1458,11 +1458,11 @@ function CPage()
             var place = places[i];
             if (undefined === place.Ex)
             {
-                var _x = parseInt(xDst + dKoefX * place.X) - 0.5;
-                var _y = parseInt(yDst + dKoefY * place.Y) - 0.5;
+                var _x = ((xDst + dKoefX * place.X) >> 0) - 0.5;
+                var _y = ((yDst + dKoefY * place.Y) >> 0) - 0.5;
 
-                var _w = parseInt(dKoefX * place.W) + 1;
-                var _h = parseInt(dKoefY * place.H) + 1;
+                var _w = ((dKoefX * place.W) >> 0) + 1;
+                var _h = ((dKoefY * place.H) >> 0) + 1;
 
                 if (_x < overlay.min_x)
                     overlay.min_x = _x;
@@ -1478,23 +1478,23 @@ function CPage()
             }
             else
             {
-                var _x1 = parseInt(xDst + dKoefX * place.X);
-                var _y1 = parseInt(yDst + dKoefY * place.Y);
+                var _x1 = (xDst + dKoefX * place.X) >> 0;
+                var _y1 = (yDst + dKoefY * place.Y) >> 0;
 
                 var x2 = place.X + place.W * place.Ex;
                 var y2 = place.Y + place.W * place.Ey;
-                var _x2 = parseInt(xDst + dKoefX * x2);
-                var _y2 = parseInt(yDst + dKoefY * y2);
+                var _x2 = (xDst + dKoefX * x2) >> 0;
+                var _y2 = (yDst + dKoefY * y2) >> 0;
 
                 var x3 = x2 - place.H * place.Ey;
                 var y3 = y2 + place.H * place.Ex;
-                var _x3 = parseInt(xDst + dKoefX * x3);
-                var _y3 = parseInt(yDst + dKoefY * y3);
+                var _x3 = (xDst + dKoefX * x3) >> 0;
+                var _y3 = (yDst + dKoefY * y3) >> 0;
 
                 var x4 = place.X - place.H * place.Ey;
                 var y4 = place.Y + place.H * place.Ex;
-                var _x4 = parseInt(xDst + dKoefX * x4);
-                var _y4 = parseInt(yDst + dKoefY * y4);
+                var _x4 = (xDst + dKoefX * x4) >> 0;
+                var _y4 = (yDst + dKoefY * y4) >> 0;
 
                 overlay.CheckPoint(_x1, _y1);
                 overlay.CheckPoint(_x2, _y2);
@@ -1530,27 +1530,27 @@ function CPage()
             {
                 case 1:
                 {
-                    _x = parseInt(xDst + dKoefX * (table_outline_dr.TableOutline.X + table_outline_dr.TableOutline.W + _offX));
-                    _y = parseInt(yDst + dKoefY * (table_outline_dr.TableOutline.Y + _offY)) - 13;
+                    _x = (xDst + dKoefX * (table_outline_dr.TableOutline.X + table_outline_dr.TableOutline.W + _offX)) >> 0;
+                    _y = ((yDst + dKoefY * (table_outline_dr.TableOutline.Y + _offY)) >> 0) - 13;
                     break;
                 }
                 case 2:
                 {
-                    _x = parseInt(xDst + dKoefX * (table_outline_dr.TableOutline.X + table_outline_dr.TableOutline.W + _offX));
-                    _y = parseInt(yDst + dKoefY * (table_outline_dr.TableOutline.Y + table_outline_dr.TableOutline.H + _offY));
+                    _x = (xDst + dKoefX * (table_outline_dr.TableOutline.X + table_outline_dr.TableOutline.W + _offX)) >> 0;
+                    _y = (yDst + dKoefY * (table_outline_dr.TableOutline.Y + table_outline_dr.TableOutline.H + _offY)) >> 0;
                     break;
                 }
                 case 3:
                 {
-                    _x = parseInt(xDst + dKoefX * (table_outline_dr.TableOutline.X + _offX)) - 13;
-                    _y = parseInt(yDst + dKoefY * (table_outline_dr.TableOutline.Y + table_outline_dr.TableOutline.H + _offY));
+                    _x = ((xDst + dKoefX * (table_outline_dr.TableOutline.X + _offX)) >> 0) - 13;
+                    _y = (yDst + dKoefY * (table_outline_dr.TableOutline.Y + table_outline_dr.TableOutline.H + _offY)) >> 0;
                     break;
                 }
                 case 0:
                 default:
                 {
-                    _x = parseInt(xDst + dKoefX * (table_outline_dr.TableOutline.X + _offX)) - 13;
-                    _y = parseInt(yDst + dKoefY * (table_outline_dr.TableOutline.Y + _offY)) - 13;
+                    _x = ((xDst + dKoefX * (table_outline_dr.TableOutline.X + _offX)) >> 0) - 13;
+                    _y = ((yDst + dKoefY * (table_outline_dr.TableOutline.Y + _offY)) >> 0) - 13;
                     break;
                 }
             }
@@ -2095,8 +2095,8 @@ function CDrawingDocument()
 
         var page = this.m_arrPages[pageIndex];
 
-        var w = parseInt(this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix * page.width_mm / 100);
-        var h = parseInt(this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix * page.height_mm / 100);
+        var w = (this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix * page.width_mm / 100) >> 0;
+        var h = (this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix * page.height_mm / 100) >> 0;
 
         if (this.m_oWordControl.bIsRetinaSupport)
         {
@@ -2112,12 +2112,12 @@ function CDrawingDocument()
             {
                 if (w > h)
                 {
-                    h = parseInt(h * _mobile_max / w);
+                    h = (h * _mobile_max / w) >> 0;
                     w = _mobile_max;
                 }
                 else
                 {
-                    w = parseInt(w * _mobile_max / h);
+                    w = (w * _mobile_max / h) >> 0;
                     h = _mobile_max;
                 }
             }
@@ -2579,8 +2579,8 @@ function CDrawingDocument()
             __y = transform.TransformPointY(x, y);
         }
 
-        var x_pix = parseInt(this.m_arrPages[pageIndex].drawingPage.left + __x * dKoef + _x);
-        var y_pix = parseInt(this.m_arrPages[pageIndex].drawingPage.top  + __y * dKoef + _y);
+        var x_pix = (this.m_arrPages[pageIndex].drawingPage.left + __x * dKoef + _x) >> 0;
+        var y_pix = (this.m_arrPages[pageIndex].drawingPage.top  + __y * dKoef + _y) >> 0;
 
         return { X : x_pix, Y : y_pix, Error: false };
     }
@@ -2606,8 +2606,8 @@ function CDrawingDocument()
             return { X : 0, Y : 0, Error: true };
         }
 
-        var x_pix = parseInt(this.m_arrPages[pageIndex].drawingPage.left + x * dKoef + _x);
-        var y_pix = parseInt(this.m_arrPages[pageIndex].drawingPage.top  + y * dKoef + _y);
+        var x_pix = (this.m_arrPages[pageIndex].drawingPage.left + x * dKoef + _x) >> 0;
+        var y_pix = (this.m_arrPages[pageIndex].drawingPage.top  + y * dKoef + _y) >> 0;
 
         return { X : x_pix, Y : y_pix, Error: false };
 
@@ -2618,8 +2618,8 @@ function CDrawingDocument()
 
             if (this.m_arrPages[i].pageIndex == pageIndex)
             {
-                var x_pix = parseInt(rect.left + x * dKoef + _x);
-                var y_pix = parseInt(rect.top + y * dKoef + _y);
+                var x_pix = (rect.left + x * dKoef + _x) >> 0;
+                var y_pix = (rect.top + y * dKoef + _y) >> 0;
 
                 return { X : x_pix, Y : y_pix, Error: false };
             }
@@ -2648,8 +2648,8 @@ function CDrawingDocument()
             return { X : 0, Y : 0, Error: true };
         }
 
-        var x_pix = parseInt(this.m_arrPages[pageIndex].drawingPage.left + x * dKoef + _x - 0.5);
-        var y_pix = parseInt(this.m_arrPages[pageIndex].drawingPage.top  + y * dKoef + _y - 0.5);
+        var x_pix = (this.m_arrPages[pageIndex].drawingPage.left + x * dKoef + _x - 0.5) >> 0;
+        var y_pix = (this.m_arrPages[pageIndex].drawingPage.top  + y * dKoef + _y - 0.5) >> 0;
 
         return { X : x_pix, Y : y_pix, Error: false };
     }
@@ -2666,8 +2666,8 @@ function CDrawingDocument()
         var _x = this.m_oWordControl.X;
         var _y = this.m_oWordControl.Y;
 
-        var x_pix = parseInt(this.m_arrPages[pageIndex].drawingPage.left + x * dKoef + _x + 0.5);
-        var y_pix = parseInt(this.m_arrPages[pageIndex].drawingPage.top  + y * dKoef + _y + 0.5);
+        var x_pix = (this.m_arrPages[pageIndex].drawingPage.left + x * dKoef + _x + 0.5) >> 0;
+        var y_pix = (this.m_arrPages[pageIndex].drawingPage.top  + y * dKoef + _y + 0.5) >> 0;
 
         return { X : x_pix, Y : y_pix, Error: false };
     }
@@ -3402,11 +3402,11 @@ function CDrawingDocument()
 
             if (!this.TableOutlineDr.TableMatrix || global_MatrixTransformer.IsIdentity(this.TableOutlineDr.TableMatrix))
             {
-                var _x = parseInt(drPage.left + dKoefX * (this.TableOutlineDr.CurPos.X/* + _table.Get_TableOffsetCorrection()*/)) + 0.5;
-                var _y = parseInt(drPage.top + dKoefY * this.TableOutlineDr.CurPos.Y) + 0.5;
+                var _x = ((drPage.left + dKoefX * this.TableOutlineDr.CurPos.X) >> 0) + 0.5;
+                var _y = ((drPage.top + dKoefY * this.TableOutlineDr.CurPos.Y) >> 0) + 0.5;
 
-                var _r = _x + parseInt(dKoefX * this.TableOutlineDr.TableOutline.W);
-                var _b = _y + parseInt(dKoefY * this.TableOutlineDr.TableOutline.H);
+                var _r = _x + ((dKoefX * this.TableOutlineDr.TableOutline.W) >> 0);
+                var _b = _y + ((dKoefY * this.TableOutlineDr.TableOutline.H) >> 0);
 
                 if (_x < overlay.min_x)
                     overlay.min_x = _x;
@@ -5844,7 +5844,7 @@ function CStylesPainter()
         var _b = (index + 1) * this.STYLE_THUMBNAIL_HEIGHT - 1.5;
         var _x = 2;
         var _w = this.STYLE_THUMBNAIL_WIDTH - 4;
-        var _h = parseInt(this.STYLE_THUMBNAIL_HEIGHT / 3);
+        var _h = (this.STYLE_THUMBNAIL_HEIGHT / 3) >> 0;
         ctx.beginPath();
         ctx.moveTo(_x, _b - _h);
         ctx.lineTo(_x + _w, _b - _h);

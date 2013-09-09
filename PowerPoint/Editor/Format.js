@@ -436,42 +436,42 @@ CColorModifiers.prototype =
             }
             else if (colorMod.name == "blueMod")
             {
-                RGBA.B = Math.max(0, parseInt(RGBA.B * val));
+                RGBA.B = Math.max(0, (RGBA.B * val) >> 0);
             }
             else if (colorMod.name == "blueOff")
             {
-                RGBA.B = Math.max(0, parseInt(RGBA.B + val * 255));
+                RGBA.B = Math.max(0, (RGBA.B + val * 255)) >> 0;
             }
             else if (colorMod.name == "green")
             {
-                RGBA.G = Math.min(255, Math.max(0, 255 * val));
+                RGBA.G = Math.min(255, Math.max(0, 255 * val)) >> 0;
             }
             else if (colorMod.name == "greenMod")
             {
-                RGBA.G = Math.max(0, parseInt(RGBA.G * val));
+                RGBA.G = Math.max(0, (RGBA.G * val) >> 0);
             }
             else if (colorMod.name == "greenOff")
             {
-                RGBA.G = Math.max(0, parseInt(RGBA.G + val * 255));
+                RGBA.G = Math.max(0, (RGBA.G + val * 255)) >> 0;
             }
             else if (colorMod.name == "red")
             {
-                RGBA.R = Math.min(255, Math.max(0, 255 * val));
+                RGBA.R = Math.min(255, Math.max(0, 255 * val)) >> 0;
             }
             else if (colorMod.name == "redMod")
             {
-                RGBA.R = Math.max(0, parseInt(RGBA.R * val));
+                RGBA.R = Math.max(0, (RGBA.R * val) >> 0);
             }
             else if (colorMod.name == "redOff")
             {
-                RGBA.R = Math.max(0, parseInt(RGBA.R + val * 255));
+                RGBA.R = Math.max(0, (RGBA.R + val * 255) >> 0);
             }
             else if (colorMod.name == "hueOff")
             {
                 var HSL = {H: 0, S: 0, L: 0};
                 this.RGB2HSL(RGBA.R, RGBA.G, RGBA.B, HSL);
 
-                var res = parseInt(HSL.H + (val * 10.0) / 9.0);
+                var res = (HSL.H + (val * 10.0) / 9.0) >> 0;
                 while(res > 240)
                     res = res - 240;
                 while(res < 0)
@@ -494,7 +494,7 @@ CColorModifiers.prototype =
                 if(HSL.L*val > 240)
                     HSL.L = 240;
                 else
-                    HSL.L = Math.max(0, parseInt(HSL.L * val));
+                    HSL.L = Math.max(0, (HSL.L * val) >> 0);
                 this.HSL2RGB(HSL, RGBA);
             }
             else if (colorMod.name == "lumOff")
@@ -502,7 +502,7 @@ CColorModifiers.prototype =
                 var HSL = {H: 0, S: 0, L: 0};
                 this.RGB2HSL(RGBA.R, RGBA.G, RGBA.B, HSL);
 
-                var res = parseInt(HSL.L + val * 240);
+                var res = (HSL.L + val * 240) >> 0;
                 while(res > 240)
                     res = res - 240;
                 while(res < 0)
@@ -519,7 +519,7 @@ CColorModifiers.prototype =
                 if(HSL.S*val > 240)
                     HSL.S = 240;
                 else
-                    HSL.S = Math.max(0, parseInt(HSL.S * val));
+                    HSL.S = Math.max(0, (HSL.S * val) >> 0);
                 this.HSL2RGB(HSL, RGBA);
             }
             else if (colorMod.name == "satOff")
@@ -527,7 +527,7 @@ CColorModifiers.prototype =
                 var HSL = {H: 0, S: 0, L: 0};
                 this.RGB2HSL(RGBA.R, RGBA.G, RGBA.B, HSL);
 
-                var res = parseInt(HSL.S + val * 240);
+                var res = (HSL.S + val * 240) >> 0;
                 while(res > 240)
                     res = res - 240;
                 while(res < 0)
@@ -538,15 +538,15 @@ CColorModifiers.prototype =
             }
             else if (colorMod.name == "shade")
             {
-                RGBA.R = Math.max(0, parseInt(RGBA.R * val));
-                RGBA.G = Math.max(0, parseInt(RGBA.G * val));
-                RGBA.B = Math.max(0, parseInt(RGBA.B * val));
+                RGBA.R = Math.max(0, (RGBA.R * val) >> 0);
+                RGBA.G = Math.max(0, (RGBA.G * val) >> 0);
+                RGBA.B = Math.max(0, (RGBA.B * val) >> 0);
             }
             else if (colorMod.name == "tint")
             {
-                RGBA.R = Math.max(0, parseInt(255 - (255 - RGBA.R) * val));
-                RGBA.G = Math.max(0, parseInt(255 - (255 - RGBA.G) * val));
-                RGBA.B = Math.max(0, parseInt(255 - (255 - RGBA.B) * val));
+                RGBA.R = Math.max(0, (255 - (255 - RGBA.R) * val) >> 0);
+                RGBA.G = Math.max(0, (255 - (255 - RGBA.G) * val) >> 0);
+                RGBA.B = Math.max(0, (255 - (255 - RGBA.B) * val) >> 0);
             }
         }
     }

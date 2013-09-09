@@ -81,7 +81,7 @@ COverlay.prototype =
 
         this.m_oContext.lineWidth = 1;
 
-        var x = parseInt(position + 0.5) + 0.5;
+        var x = ((position + 0.5) >> 0) + 0.5;
         var y = 0;
 
         this.m_oContext.strokeStyle = "#000000";
@@ -144,7 +144,7 @@ COverlay.prototype =
 
         this.m_oContext.lineWidth = 1;
 
-        var y = parseInt(position + 0.5) + 0.5;
+        var y = ((position + 0.5) >> 0) + 0.5;
         var x = 0;
 
         this.m_oContext.strokeStyle = "#000000";

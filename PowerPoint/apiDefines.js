@@ -144,7 +144,7 @@ var c_oAscTableBordersType = {
 	OUTSIDE:7,
 	ALL:8
 };
-var FONT_THUMBNAIL_HEIGHT = parseInt(7 * 96.0 / 25.4);
+var FONT_THUMBNAIL_HEIGHT = (7 * 96.0 / 25.4) >> 0;
 
 var THEME_THUMBNAIL_WIDTH = 180;
 var THEME_THUMBNAIL_HEIGHT = 135;

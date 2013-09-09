@@ -370,8 +370,8 @@ function Base64Encode(srcData, nSrcLen, nOffset)
         nOffset = 0;
 
     var nWritten = 0;
-    var nLen1 = (parseInt(nSrcLen / 3) * 4);
-    var nLen2 = parseInt(nLen1 / 76);
+    var nLen1 = (((nSrcLen / 3) >> 0) * 4);
+    var nLen2 = (nLen1 / 76) >> 0;
     var nLen3 = 19;
     var srcInd = 0;
     var dstStr = "";
@@ -379,7 +379,7 @@ function Base64Encode(srcData, nSrcLen, nOffset)
     for (var i=0; i<=nLen2; i++)
     {
         if (i == nLen2)
-            nLen3 = parseInt((nLen1%76)/4);
+            nLen3 = ((nLen1%76)/4) >> 0;
 
         for (var j=0;j<nLen3;j++)
         {
@@ -521,7 +521,7 @@ function CMemory(bIsNoInit)
     this.WriteDouble = function(val)
     {
         this.CheckSize(4);
-        var lval = parseInt(val * 100000) & 0xFFFFFFFF; // спасаем пять знаков после запятой.
+        var lval = ((val * 100000) >> 0) & 0xFFFFFFFF; // спасаем пять знаков после запятой.
         this.data[this.pos++] = (lval)&0xFF;
         this.data[this.pos++] = (lval >>> 8)&0xFF;
         this.data[this.pos++] = (lval >>> 16)&0xFF;

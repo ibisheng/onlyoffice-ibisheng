@@ -1327,11 +1327,11 @@ function CDrawingDocument()
 
             if (undefined === place.Ex)
             {
-                var _x = parseInt(xDst + dKoefX * place.X) - 0.5;
-                var _y = parseInt(yDst + dKoefY * place.Y) - 0.5;
+                var _x = ((xDst + dKoefX * place.X) >> 0) - 0.5;
+                var _y = ((yDst + dKoefY * place.Y) >> 0) - 0.5;
 
-                var _w = parseInt(dKoefX * place.W) + 1;
-                var _h = parseInt(dKoefY * place.H) + 1;
+                var _w = ((dKoefX * place.W) >> 0) + 1;
+                var _h = ((dKoefY * place.H) >> 0) + 1;
 
                 if (_x < overlay.min_x)
                     overlay.min_x = _x;
@@ -1347,23 +1347,23 @@ function CDrawingDocument()
             }
             else
             {
-                var _x1 = parseInt(xDst + dKoefX * place.X);
-                var _y1 = parseInt(yDst + dKoefY * place.Y);
+                var _x1 = (xDst + dKoefX * place.X) >> 0;
+                var _y1 = (yDst + dKoefY * place.Y) >> 0;
 
                 var x2 = place.X + place.W * place.Ex;
                 var y2 = place.Y + place.W * place.Ey;
-                var _x2 = parseInt(xDst + dKoefX * x2);
-                var _y2 = parseInt(yDst + dKoefY * y2);
+                var _x2 = (xDst + dKoefX * x2) >> 0;
+                var _y2 = (yDst + dKoefY * y2) >> 0;
 
                 var x3 = x2 - place.H * place.Ey;
                 var y3 = y2 + place.H * place.Ex;
-                var _x3 = parseInt(xDst + dKoefX * x3);
-                var _y3 = parseInt(yDst + dKoefY * y3);
+                var _x3 = (xDst + dKoefX * x3) >> 0;
+                var _y3 = (yDst + dKoefY * y3) >> 0;
 
                 var x4 = place.X - place.H * place.Ey;
                 var y4 = place.Y + place.H * place.Ex;
-                var _x4 = parseInt(xDst + dKoefX * x4);
-                var _y4 = parseInt(yDst + dKoefY * y4);
+                var _x4 = (xDst + dKoefX * x4) >> 0;
+                var _y4 = (yDst + dKoefY * y4) >> 0;
 
                 overlay.CheckPoint(_x1, _y1);
                 overlay.CheckPoint(_x2, _y2);
@@ -1393,11 +1393,11 @@ function CDrawingDocument()
 
         if (undefined === place.Ex)
         {
-            var _x = parseInt(xDst + dKoefX * place.X) - 0.5;
-            var _y = parseInt(yDst + dKoefY * place.Y) - 0.5;
+            var _x = ((xDst + dKoefX * place.X) >> 0) - 0.5;
+            var _y = ((yDst + dKoefY * place.Y) >> 0) - 0.5;
 
-            var _w = parseInt(dKoefX * place.W) + 1;
-            var _h = parseInt(dKoefY * place.H) + 1;
+            var _w = ((dKoefX * place.W) >> 0) + 1;
+            var _h = ((dKoefY * place.H) >> 0) + 1;
 
             if (_x < overlay.min_x)
                 overlay.min_x = _x;
@@ -1413,23 +1413,23 @@ function CDrawingDocument()
         }
         else
         {
-            var _x1 = parseInt(xDst + dKoefX * place.X);
-            var _y1 = parseInt(yDst + dKoefY * place.Y);
+            var _x1 = (xDst + dKoefX * place.X) >> 0;
+            var _y1 = (yDst + dKoefY * place.Y) >> 0;
 
             var x2 = place.X + place.W * place.Ex;
             var y2 = place.Y + place.W * place.Ey;
-            var _x2 = parseInt(xDst + dKoefX * x2);
-            var _y2 = parseInt(yDst + dKoefY * y2);
+            var _x2 = (xDst + dKoefX * x2) >> 0;
+            var _y2 = (yDst + dKoefY * y2) >> 0;
 
             var x3 = x2 - place.H * place.Ey;
             var y3 = y2 + place.H * place.Ex;
-            var _x3 = parseInt(xDst + dKoefX * x3);
-            var _y3 = parseInt(yDst + dKoefY * y3);
+            var _x3 = (xDst + dKoefX * x3) >> 0;
+            var _y3 = (yDst + dKoefY * y3) >> 0;
 
             var x4 = place.X - place.H * place.Ey;
             var y4 = place.Y + place.H * place.Ex;
-            var _x4 = parseInt(xDst + dKoefX * x4);
-            var _y4 = parseInt(yDst + dKoefY * y4);
+            var _x4 = (xDst + dKoefX * x4) >> 0;
+            var _y4 = (yDst + dKoefY * y4) >> 0;
 
             overlay.CheckPoint(_x1, _y1);
             overlay.CheckPoint(_x2, _y2);
