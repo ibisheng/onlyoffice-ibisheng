@@ -627,6 +627,34 @@ function asc_CCellCommentator(currentSheet) {
 		}
 	}
 
+	_this.moveRangeComments = function(rangeFrom, rangeTo) {
+		if ( rangeFrom && rangeTo ) {
+			var colOffset = rangeTo.c1 - rangeFrom.c1;
+			var rowOffset = rangeTo.r1 - rangeFrom.r1;
+			
+			for (var i = 0; i < _this.aComments.length; i++) {
+				var comment = _this.aComments[i];
+				
+				if ( (comment.nCol >= rangeFrom.c1) && (comment.nCol <= rangeFrom.c2) && (comment.nRow >= rangeFrom.r1) && (comment.nRow <= rangeFrom.r2) ) {
+
+					var commentBefore = new asc_CCommentData(comment);
+				
+					comment.nCol += colOffset;
+					comment.nRow += rowOffset;
+					
+					var commentAfter = new asc_CCommentData(comment);
+					
+					var compositeComment = new CompositeCommentData();
+					compositeComment.commentBefore = commentBefore;
+					compositeComment.commentAfter = commentAfter;
+
+					History.Create_NewPoint();
+					History.Add(g_oUndoRedoComment, historyitem_Comment_Change, _this.worksheet.model.getId(), null, compositeComment);
+				}
+			}
+		}
+	}
+	
 	_this.addCommentSerialize = function(oComment) {
 
 		var _this = this;
@@ -1234,7 +1262,7 @@ asc_CCellCommentator.prototype = {
 
 	// Main
 
-	asc_showComment: function(id) {
+	asc_showComment: function(id, bNew) {
 
 		var _this = this;
 		var comment = _this.asc_findComment(id);
@@ -1261,7 +1289,7 @@ asc_CCellCommentator.prototype = {
 					if ( _this.lastSelectedId != id )
 						_this.worksheet.model.workbook.handlers.trigger("asc_onHideComment");
 					
-					_this.worksheet.model.workbook.handlers.trigger("asc_onShowComment", indexes, coords.asc_getLeftPX(), coords.asc_getTopPX(), coords.asc_getReverseLeftPX());
+					_this.worksheet.model.workbook.handlers.trigger("asc_onShowComment", indexes, coords.asc_getLeftPX(), coords.asc_getTopPX(), coords.asc_getReverseLeftPX(), bNew);
 					_this.drawCommentCells();
 				}
 				_this.lastSelectedId = id;

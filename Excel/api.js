@@ -2218,9 +2218,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				ws.cellCommentator.asc_selectComment(id);
 			},
 			
-			asc_showComment: function(id) {
+			asc_showComment: function(id, bNew) {
 				var ws = this.wb.getWorksheet();
-				ws.cellCommentator.asc_showComment(id);
+				ws.cellCommentator.asc_showComment(id, bNew);
 			},
 			
 			asc_findComment: function(id) {

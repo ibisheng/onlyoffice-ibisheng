@@ -6890,6 +6890,7 @@
 						t.activeRange = arnTo.clone(true);
 						t.activeRange.startRow = t.activeRange.r1;
 						t.activeRange.startCol = t.activeRange.c1;
+						t.cellCommentator.moveRangeComments(arnFrom, arnTo);
 						t.objectRender.moveRangeDrawingObject(arnFrom, arnTo, false);
 						// Вызываем функцию пересчета для заголовков форматированной таблицы
 						t.autoFilters._renameTableColumn(t, arnFrom);
