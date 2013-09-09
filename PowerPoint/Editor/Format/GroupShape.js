@@ -666,7 +666,7 @@ CGroupShape.prototype =
 
     setChildOffset: function(offX, offY)
     {
-        History.Add(this, {Type: historyitem_SetShapeChildOffset, oldOffsetX: this.spPr.xfrm.offX, newOffsetX: offX, oldOffsetY: this.spPr.xfrm.offY, newOffsetY: offY});
+        History.Add(this, {Type: historyitem_SetShapeChildOffset, oldOffsetX: this.spPr.xfrm.chOffX, newOffsetX: offX, oldOffsetY: this.spPr.xfrm.chOffY, newOffsetY: offY});
         this.spPr.xfrm.chOffX = offX;
         this.spPr.xfrm.chOffY = offY;
         this.recalcTransform();
@@ -677,7 +677,7 @@ CGroupShape.prototype =
 
     setChildExtents: function(extX, extY)
     {
-        History.Add(this, {Type: historyitem_SetShapeChildExtents, oldExtentX: this.spPr.xfrm.extX, newExtentX: extX, oldExtentY: this.spPr.xfrm.extY, newExtentY: extY});
+        History.Add(this, {Type: historyitem_SetShapeChildExtents, oldExtentX: this.spPr.xfrm.chExtX, newExtentX: extX, oldExtentY: this.spPr.xfrm.chExtY, newExtentY: extY});
         this.spPr.xfrm.chExtX = extX;
         this.spPr.xfrm.chExtY = extY;
         this.recalcTransform();
@@ -1168,11 +1168,208 @@ CGroupShape.prototype =
         var angle =  rel_x > this.extX*0.5 ? Math.atan2( Math.abs(v1_x*v2_y - v1_y*v2_x), v1_x*v2_x + v1_y*v2_y) : -Math.atan2( Math.abs(v1_x*v2_y - v1_y*v2_x), v1_x*v2_x + v1_y*v2_y);
         return same_flip ? angle : -angle;
     },
-    Save_Changes: function(data, w)
+
+
+    Undo: function(data)
+    {
+        switch(data.Type)
+        {
+            case historyitem_SetShapeRot:
+            {
+                this.spPr.xfrm.rot = data.oldRot;
+                this.recalcTransform();
+                break;
+            }
+            case historyitem_SetShapeOffset:
+            {
+                this.spPr.xfrm.offX = data.oldOffsetX;
+                this.spPr.xfrm.offY = data.oldOffsetY;
+                this.recalcTransform();
+
+                break;
+            }
+
+            case historyitem_SetShapeExtents:
+            {
+                this.spPr.xfrm.extX = data.oldExtentX;
+                this.spPr.xfrm.extY = data.oldExtentY;
+                this.recalcTransform();
+
+                break;
+            }
+
+            case historyitem_SetShapeChildOffset:
+            {
+                this.spPr.xfrm.chOffX = data.oldOffsetX;
+                this.spPr.xfrm.chOffY = data.oldOffsetY;
+                this.recalcTransform();
+
+                break;
+            }
+
+            case historyitem_SetShapeChildExtents:
+            {
+                this.spPr.xfrm.chExtX = data.oldExtentX;
+                this.spPr.xfrm.chExtY = data.oldExtentY;
+                this.recalcTransform();
+
+                break;
+            }
+
+            case historyitem_SetShapeFlips:
+            {
+                this.spPr.xfrm.flipH = data.oldFlipH;
+                this.spPr.xfrm.flipV = data.oldFlipV;
+                this.recalcTransform();
+
+            }
+        }
+        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+    },
+
+    Redo: function(data)
+    {
+
+        switch(data.Type)
+        {
+            case historyitem_SetShapeRot:
+            {
+                this.spPr.xfrm.rot = data.newRot;
+                this.recalcTransform();
+
+                break;
+            }
+            case historyitem_SetShapeOffset:
+            {
+                this.spPr.xfrm.offX = data.newOffsetX;
+                this.spPr.xfrm.offY = data.newOffsetY;
+                this.recalcTransform();
+
+                break;
+            }
+
+            case historyitem_SetShapeExtents:
+            {
+                this.spPr.xfrm.extX = data.newExtentX;
+                this.spPr.xfrm.extY = data.newExtentY;
+                this.recalcTransform();
+
+                break;
+            }
+
+            case historyitem_SetShapeChildOffset:
+            {
+                this.spPr.xfrm.chOffX = data.newOffsetX;
+                this.spPr.xfrm.chOffY = data.newOffsetY;
+                this.recalcTransform();
+
+                break;
+            }
+
+            case historyitem_SetShapeChildExtents:
+            {
+                this.spPr.xfrm.chExtX = data.newExtentX;
+                this.spPr.xfrm.chExtY = data.newExtentY;
+                this.recalcTransform();
+
+                break;
+            }
+
+            case historyitem_SetShapeFlips:
+            {
+                this.spPr.xfrm.flipH = data.newFlipH;
+                this.spPr.xfrm.flipV = data.newFlipV;
+                this.recalcTransform();
+
+            }
+        }
+        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+    },
+
+
+
+
+    Refresh_RecalcData: function()
     {},
 
+    Save_Changes: function(data, w)
+    {
+        w.WriteLong(historyitem_type_Shape);
+        w.WriteLong(data.Type);
+        var bool;
+        switch(data.Type)
+        {
+            case historyitem_SetShapeRot:
+            {
+                w.WriteDouble(data.newRot);
+                break;
+            }
+            case historyitem_SetShapeOffset:
+            {
+                w.WriteDouble(data.newOffsetX);
+                w.WriteDouble(data.newOffsetY);
+                break;
+            }
+
+            case historyitem_SetShapeExtents:
+            {
+                w.WriteDouble(data.newExtentX);
+                w.WriteDouble(data.newExtentY);
+                break;
+            }
+            case historyitem_SetShapeFlips:
+            {
+                w.WriteBool(data.newFlipH);
+                w.WriteBool(data.newFlipV);
+            }
+        }
+    },
+
     Load_Changes: function(r)
-    {},
+    {
+        if(r.GetLong() === historyitem_type_Shape)
+        {
+            switch(r.GetLong())
+            {
+                case historyitem_SetShapeRot:
+                {
+                    this.spPr.xfrm.rot = r.GetDouble();
+                    this.recalcInfo.recalculateTransform = true;
+                    this.recalcInfo.recalculateTransformText = true;
+                    break;
+                }
+                case historyitem_SetShapeOffset:
+                {
+                    this.spPr.xfrm.offX = r.GetDouble();
+                    this.spPr.xfrm.offY = r.GetDouble();
+                    this.recalcInfo.recalculateTransform = true;
+                    this.recalcInfo.recalculateTransformText = true;
+                    break;
+                }
+
+                case historyitem_SetShapeExtents:
+                {
+                    this.spPr.xfrm.extX = r.GetDouble();
+                    this.spPr.xfrm.extY = r.GetDouble();
+                    this.recalcInfo.recalculateTransform = true;
+                    this.recalcInfo.recalculateTransformText = true;
+                    this.recalcInfo.recalculateContent = true;
+                    this.recalcInfo.recalculateGeometry = true;
+
+                    break;
+                }
+                case historyitem_SetShapeFlips:
+                {
+                    this.spPr.xfrm.flipH = r.GetBool();
+                    this.spPr.xfrm.flipV = r.GetBool();
+                    this.recalcInfo.recalculateTransform = true;
+                    this.recalcInfo.recalculateTransformText = true;
+                    this.recalcInfo.recalculateContent = true;
+                }
+            }
+            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+        }
+    },
 
     Write_ToBinary2: function(w)
     {},

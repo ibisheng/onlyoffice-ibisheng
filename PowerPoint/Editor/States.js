@@ -152,6 +152,7 @@ function NullState(drawingObjectsController, drawingObjects)
                 }
                 else if(hit_in_text_rect)
                 {
+                    this.drawingObjectsController.resetSelection();
                     cur_drawing.select(this.drawingObjectsController);
                     cur_drawing.selectionSetStart(e, x, y);
                     this.drawingObjectsController.changeCurrentState(new TextAddState(this.drawingObjectsController, this.drawingObjects, cur_drawing));
