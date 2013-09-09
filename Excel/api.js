@@ -493,6 +493,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					var t = this;
 					var v = {};
 					v["c"] = "getsettings";	
+					v["id"] = this.DocInfo["Id"];
 					v["format"] = this.DocInfo["Format"];
 					v["vkey"] = this.DocInfo["VKey"];
 					v["editorid"] = c_oEditorId.Excel;
@@ -846,7 +847,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 									setTimeout(function(){oThis._asc_sendCommand(callback, JSON.stringify(rData));}, 3000);
 									break;
 								case "waitsave":
-									var rData = {"id": oThis.documentId, "title": oThis.documentTitleWithoutExtention, "c": "chsave", "data": incomeObject.data};
+									var rData = {"id": oThis.documentId, "vkey": oThis.documentVKey, "title": oThis.documentTitleWithoutExtention, "c": "chsave", "data": incomeObject.data};
 									setTimeout(function(){oThis._asc_sendCommand(callback, JSON.stringify(rData));}, 3000);
 									break;
 								case "savepart":
@@ -959,7 +960,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						}
 					}
 				} else if (c_oAscFileType.CSV === sFormat && !options) {
-					var v = {"id":this.documentId, "c":"getcodepage"};
+					var v = {"id":this.documentId, "vkey": this.documentVKey, "c":"getcodepage"};
 					return this._asc_sendCommand (fCallback, JSON.stringify(v));
 				} else {
 					this.wb._initCommentsToSave();
@@ -2145,7 +2146,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 
 			asc_addImageDrawingObject: function(imageUrl) {
-				var rData = {"id":this.documentId, "c":"imgurl", "data": imageUrl};
+				var rData = {"id":this.documentId, "vkey": this.documentVKey, "c":"imgurl", "data": imageUrl};
 				var oThis = this;
 				this.handlers.trigger("asc_onStartAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 				this._asc_sendCommand( function(incomeObject){
