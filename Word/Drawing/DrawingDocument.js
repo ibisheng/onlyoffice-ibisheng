@@ -1936,10 +1936,6 @@ function CDrawingDocument()
             this.SearchClear();
             this.m_oWordControl.OnUpdateOverlay();
         }
-        if (true === this.m_oWordControl.m_oApi.isMarkerFormat)
-        {
-            this.m_oWordControl.m_oApi.sync_MarkerFormatCallback(false);
-        }
 
         if (this.m_bIsBreakRecalculate)
         {

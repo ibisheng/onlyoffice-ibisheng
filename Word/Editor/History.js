@@ -731,6 +731,9 @@ CHistory.prototype =
         {
             this.Points[this.Index].Additional = new Object();
         }
+
+        if ( true === editor.isMarkerFormat)
+            editor.sync_MarkerFormatCallback(false);
     },
 
     Get_EditingTime : function(dTime)

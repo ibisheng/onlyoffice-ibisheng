@@ -8374,7 +8374,7 @@ CDocument.prototype =
                     this.Cursor_MoveLeft(false, false);
                     this.Document_UpdateSelectionState();
 
-                    editor.sync_MarkerFormatCallback( false );
+                    editor.sync_MarkerFormatCallback( true );
                 }
             }
         }
