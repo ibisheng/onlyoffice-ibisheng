@@ -2060,7 +2060,7 @@
 
 						if(cloneImg.graphicObject.isChart() && cloneImg.graphicObject.brush.fill.RasterImageId)
 							url = cloneImg.graphicObject.brush.fill.RasterImageId;
-						else if(cloneImg.graphicObject && (cloneImg.graphicObject.isShape() || cloneImg.graphicObject.isImage() || cloneImg.graphicObject.isGroup()))
+						else if(cloneImg.graphicObject && (cloneImg.graphicObject.isShape() || cloneImg.graphicObject.isImage() || cloneImg.graphicObject.isGroup() || cloneImg.graphicObject.isChart()))
 						{
 							var cMemory = new CMemory();
 							var altAttr = cloneImg.graphicObject.writeToBinaryForCopyPaste(cMemory);
