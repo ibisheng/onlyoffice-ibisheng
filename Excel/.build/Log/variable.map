@@ -737,7 +737,7 @@ CLASS_TYPE_TABLE_ID:K3
 c_oSerAligmentTypes$TextRotation:WC
 Pop_Push_Count:$q
 skip_comment:Bm
-PostMessageType$UploadImage:Ta
+PostMessageType$UploadImage:Sa
 EVerticalAlignRun$verticalalignrunBaseline:YI
 c_oSer_ChartTitlePptxType$TxPptx:uZ
 STATES_ID_NULL:E0
@@ -3015,7 +3015,7 @@ L 32:Lb
 PS_PrivateRec:Ll
 L 31:Xa
 cff_standard_encoding:St
-L 30:Sa
+L 30:Ta
 L 36:ob
 L 35:gb
 L 34:Jb
