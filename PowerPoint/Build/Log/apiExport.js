@@ -169,6 +169,7 @@ prop:sync_KeepLinesCallback
 prop:sync_ShowParaMarksCallback
 prop:sync_SpaceBetweenPrgCallback
 prop:sync_PrPropCallback
+prop:SetDrawImagePlaceParagraph
 prop:change_PageOrient
 prop:get_DocumentOrientation
 prop:change_DocSize
@@ -581,6 +582,8 @@ prop:get_Height
 prop:put_Height
 prop:get_paddings
 prop:put_paddings
+prop:get_VerticalTextAlign
+prop:put_VerticalTextAlign
 ---
 var:CreateAscShapeProp
 ---
@@ -852,22 +855,99 @@ prop:put_Value
 prop:get_Color
 prop:put_Color
 ---
+var:CParagraphTab
+prop:get_Value
+prop:put_Value
+prop:get_Pos
+prop:put_Pos
+---
+var:CParagraphTabs
+prop:get_Count
+prop:get_Tab
+prop:add_Tab
+prop:clear
+---
 var:CParagraphProp
-prop:get_Locked
 prop:get_ContextualSpacing
 prop:put_ContextualSpacing
 prop:get_Ind
 prop:put_Ind
 prop:get_KeepLines
 prop:put_KeepLines
+prop:get_KeepNext
+prop:put_KeepNext
 prop:get_PageBreakBefore
 prop:put_PageBreakBefore
+prop:get_WidowControl
+prop:put_WidowControl
 prop:get_Spacing
 prop:put_Spacing
 prop:get_Borders
 prop:put_Borders
 prop:get_Shade
 prop:put_Shade
+prop:get_Locked
+prop:get_CanAddTable
+prop:get_Subscript
+prop:put_Subscript
+prop:get_Superscript
+prop:put_Superscript
+prop:get_SmallCaps
+prop:put_SmallCaps
+prop:get_AllCaps
+prop:put_AllCaps
+prop:get_Strikeout
+prop:put_Strikeout
+prop:get_DStrikeout
+prop:put_DStrikeout
+prop:get_TextSpacing
+prop:put_TextSpacing
+prop:get_Position
+prop:put_Position
+prop:get_Tabs
+prop:put_Tabs
+prop:get_DefaultTab
+prop:put_DefaultTab
+prop:get_FramePr
+prop:put_FramePr
+prop:get_CanAddDropCap
+---
+var:CParagraphFrame
+prop:get_DropCap
+prop:put_DropCap
+prop:get_H
+prop:put_H
+prop:get_HAnchor
+prop:put_HAnchor
+prop:get_HRule
+prop:put_HRule
+prop:get_HSpace
+prop:put_HSpace
+prop:get_Lines
+prop:put_Lines
+prop:get_VAnchor
+prop:put_VAnchor
+prop:get_VSpace
+prop:put_VSpace
+prop:get_W
+prop:put_W
+prop:get_Wrap
+prop:put_Wrap
+prop:get_X
+prop:put_X
+prop:get_XAlign
+prop:put_XAlign
+prop:get_Y
+prop:put_Y
+prop:get_YAlign
+prop:put_YAlign
+prop:get_Borders
+prop:put_Borders
+prop:get_Shade
+prop:put_Shade
+prop:get_FontFamily
+prop:put_FontFamily
+prop:put_FromDropCapMenu
 ---
 var:CParagraphPropEx
 prop:get_ContextualSpacing
@@ -1082,6 +1162,7 @@ asc_docs_api.prototype['sync_KeepLinesCallback'] = asc_docs_api.prototype.sync_K
 asc_docs_api.prototype['sync_ShowParaMarksCallback'] = asc_docs_api.prototype.sync_ShowParaMarksCallback;
 asc_docs_api.prototype['sync_SpaceBetweenPrgCallback'] = asc_docs_api.prototype.sync_SpaceBetweenPrgCallback;
 asc_docs_api.prototype['sync_PrPropCallback'] = asc_docs_api.prototype.sync_PrPropCallback;
+asc_docs_api.prototype['SetDrawImagePlaceParagraph'] = asc_docs_api.prototype.SetDrawImagePlaceParagraph;
 asc_docs_api.prototype['change_PageOrient'] = asc_docs_api.prototype.change_PageOrient;
 asc_docs_api.prototype['get_DocumentOrientation'] = asc_docs_api.prototype.get_DocumentOrientation;
 asc_docs_api.prototype['change_DocSize'] = asc_docs_api.prototype.change_DocSize;
@@ -1464,6 +1545,8 @@ CAscShapeProp.prototype['get_Height'] = CAscShapeProp.prototype.get_Height;
 CAscShapeProp.prototype['put_Height'] = CAscShapeProp.prototype.put_Height;
 CAscShapeProp.prototype['get_paddings'] = CAscShapeProp.prototype.get_paddings;
 CAscShapeProp.prototype['put_paddings'] = CAscShapeProp.prototype.put_paddings;
+CAscShapeProp.prototype['get_VerticalTextAlign'] = CAscShapeProp.prototype.get_VerticalTextAlign;
+CAscShapeProp.prototype['put_VerticalTextAlign'] = CAscShapeProp.prototype.put_VerticalTextAlign;
 window['CreateAscShapeProp'] = CreateAscShapeProp;
 window['CorrectShapeProp'] = CorrectShapeProp;
 window['CAscThemeInfo'] = CAscThemeInfo;
@@ -1706,22 +1789,96 @@ CParagraphShd.prototype['get_Value'] = CParagraphShd.prototype.get_Value;
 CParagraphShd.prototype['put_Value'] = CParagraphShd.prototype.put_Value;
 CParagraphShd.prototype['get_Color'] = CParagraphShd.prototype.get_Color;
 CParagraphShd.prototype['put_Color'] = CParagraphShd.prototype.put_Color;
+window['CParagraphTab'] = CParagraphTab;
+CParagraphTab.prototype['get_Value'] = CParagraphTab.prototype.get_Value;
+CParagraphTab.prototype['put_Value'] = CParagraphTab.prototype.put_Value;
+CParagraphTab.prototype['get_Pos'] = CParagraphTab.prototype.get_Pos;
+CParagraphTab.prototype['put_Pos'] = CParagraphTab.prototype.put_Pos;
+window['CParagraphTabs'] = CParagraphTabs;
+CParagraphTabs.prototype['get_Count'] = CParagraphTabs.prototype.get_Count;
+CParagraphTabs.prototype['get_Tab'] = CParagraphTabs.prototype.get_Tab;
+CParagraphTabs.prototype['add_Tab'] = CParagraphTabs.prototype.add_Tab;
+CParagraphTabs.prototype['clear'] = CParagraphTabs.prototype.clear;
 window['CParagraphProp'] = CParagraphProp;
-CParagraphProp.prototype['get_Locked'] = CParagraphProp.prototype.get_Locked;
 CParagraphProp.prototype['get_ContextualSpacing'] = CParagraphProp.prototype.get_ContextualSpacing;
 CParagraphProp.prototype['put_ContextualSpacing'] = CParagraphProp.prototype.put_ContextualSpacing;
 CParagraphProp.prototype['get_Ind'] = CParagraphProp.prototype.get_Ind;
 CParagraphProp.prototype['put_Ind'] = CParagraphProp.prototype.put_Ind;
 CParagraphProp.prototype['get_KeepLines'] = CParagraphProp.prototype.get_KeepLines;
 CParagraphProp.prototype['put_KeepLines'] = CParagraphProp.prototype.put_KeepLines;
+CParagraphProp.prototype['get_KeepNext'] = CParagraphProp.prototype.get_KeepNext;
+CParagraphProp.prototype['put_KeepNext'] = CParagraphProp.prototype.put_KeepNext;
 CParagraphProp.prototype['get_PageBreakBefore'] = CParagraphProp.prototype.get_PageBreakBefore;
 CParagraphProp.prototype['put_PageBreakBefore'] = CParagraphProp.prototype.put_PageBreakBefore;
+CParagraphProp.prototype['get_WidowControl'] = CParagraphProp.prototype.get_WidowControl;
+CParagraphProp.prototype['put_WidowControl'] = CParagraphProp.prototype.put_WidowControl;
 CParagraphProp.prototype['get_Spacing'] = CParagraphProp.prototype.get_Spacing;
 CParagraphProp.prototype['put_Spacing'] = CParagraphProp.prototype.put_Spacing;
 CParagraphProp.prototype['get_Borders'] = CParagraphProp.prototype.get_Borders;
 CParagraphProp.prototype['put_Borders'] = CParagraphProp.prototype.put_Borders;
 CParagraphProp.prototype['get_Shade'] = CParagraphProp.prototype.get_Shade;
 CParagraphProp.prototype['put_Shade'] = CParagraphProp.prototype.put_Shade;
+CParagraphProp.prototype['get_Locked'] = CParagraphProp.prototype.get_Locked;
+CParagraphProp.prototype['get_CanAddTable'] = CParagraphProp.prototype.get_CanAddTable;
+CParagraphProp.prototype['get_Subscript'] = CParagraphProp.prototype.get_Subscript;
+CParagraphProp.prototype['put_Subscript'] = CParagraphProp.prototype.put_Subscript;
+CParagraphProp.prototype['get_Superscript'] = CParagraphProp.prototype.get_Superscript;
+CParagraphProp.prototype['put_Superscript'] = CParagraphProp.prototype.put_Superscript;
+CParagraphProp.prototype['get_SmallCaps'] = CParagraphProp.prototype.get_SmallCaps;
+CParagraphProp.prototype['put_SmallCaps'] = CParagraphProp.prototype.put_SmallCaps;
+CParagraphProp.prototype['get_AllCaps'] = CParagraphProp.prototype.get_AllCaps;
+CParagraphProp.prototype['put_AllCaps'] = CParagraphProp.prototype.put_AllCaps;
+CParagraphProp.prototype['get_Strikeout'] = CParagraphProp.prototype.get_Strikeout;
+CParagraphProp.prototype['put_Strikeout'] = CParagraphProp.prototype.put_Strikeout;
+CParagraphProp.prototype['get_DStrikeout'] = CParagraphProp.prototype.get_DStrikeout;
+CParagraphProp.prototype['put_DStrikeout'] = CParagraphProp.prototype.put_DStrikeout;
+CParagraphProp.prototype['get_TextSpacing'] = CParagraphProp.prototype.get_TextSpacing;
+CParagraphProp.prototype['put_TextSpacing'] = CParagraphProp.prototype.put_TextSpacing;
+CParagraphProp.prototype['get_Position'] = CParagraphProp.prototype.get_Position;
+CParagraphProp.prototype['put_Position'] = CParagraphProp.prototype.put_Position;
+CParagraphProp.prototype['get_Tabs'] = CParagraphProp.prototype.get_Tabs;
+CParagraphProp.prototype['put_Tabs'] = CParagraphProp.prototype.put_Tabs;
+CParagraphProp.prototype['get_DefaultTab'] = CParagraphProp.prototype.get_DefaultTab;
+CParagraphProp.prototype['put_DefaultTab'] = CParagraphProp.prototype.put_DefaultTab;
+CParagraphProp.prototype['get_FramePr'] = CParagraphProp.prototype.get_FramePr;
+CParagraphProp.prototype['put_FramePr'] = CParagraphProp.prototype.put_FramePr;
+CParagraphProp.prototype['get_CanAddDropCap'] = CParagraphProp.prototype.get_CanAddDropCap;
+window['CParagraphFrame'] = CParagraphFrame;
+CParagraphFrame.prototype['get_DropCap'] = CParagraphFrame.prototype.get_DropCap;
+CParagraphFrame.prototype['put_DropCap'] = CParagraphFrame.prototype.put_DropCap;
+CParagraphFrame.prototype['get_H'] = CParagraphFrame.prototype.get_H;
+CParagraphFrame.prototype['put_H'] = CParagraphFrame.prototype.put_H;
+CParagraphFrame.prototype['get_HAnchor'] = CParagraphFrame.prototype.get_HAnchor;
+CParagraphFrame.prototype['put_HAnchor'] = CParagraphFrame.prototype.put_HAnchor;
+CParagraphFrame.prototype['get_HRule'] = CParagraphFrame.prototype.get_HRule;
+CParagraphFrame.prototype['put_HRule'] = CParagraphFrame.prototype.put_HRule;
+CParagraphFrame.prototype['get_HSpace'] = CParagraphFrame.prototype.get_HSpace;
+CParagraphFrame.prototype['put_HSpace'] = CParagraphFrame.prototype.put_HSpace;
+CParagraphFrame.prototype['get_Lines'] = CParagraphFrame.prototype.get_Lines;
+CParagraphFrame.prototype['put_Lines'] = CParagraphFrame.prototype.put_Lines;
+CParagraphFrame.prototype['get_VAnchor'] = CParagraphFrame.prototype.get_VAnchor;
+CParagraphFrame.prototype['put_VAnchor'] = CParagraphFrame.prototype.put_VAnchor;
+CParagraphFrame.prototype['get_VSpace'] = CParagraphFrame.prototype.get_VSpace;
+CParagraphFrame.prototype['put_VSpace'] = CParagraphFrame.prototype.put_VSpace;
+CParagraphFrame.prototype['get_W'] = CParagraphFrame.prototype.get_W;
+CParagraphFrame.prototype['put_W'] = CParagraphFrame.prototype.put_W;
+CParagraphFrame.prototype['get_Wrap'] = CParagraphFrame.prototype.get_Wrap;
+CParagraphFrame.prototype['put_Wrap'] = CParagraphFrame.prototype.put_Wrap;
+CParagraphFrame.prototype['get_X'] = CParagraphFrame.prototype.get_X;
+CParagraphFrame.prototype['put_X'] = CParagraphFrame.prototype.put_X;
+CParagraphFrame.prototype['get_XAlign'] = CParagraphFrame.prototype.get_XAlign;
+CParagraphFrame.prototype['put_XAlign'] = CParagraphFrame.prototype.put_XAlign;
+CParagraphFrame.prototype['get_Y'] = CParagraphFrame.prototype.get_Y;
+CParagraphFrame.prototype['put_Y'] = CParagraphFrame.prototype.put_Y;
+CParagraphFrame.prototype['get_YAlign'] = CParagraphFrame.prototype.get_YAlign;
+CParagraphFrame.prototype['put_YAlign'] = CParagraphFrame.prototype.put_YAlign;
+CParagraphFrame.prototype['get_Borders'] = CParagraphFrame.prototype.get_Borders;
+CParagraphFrame.prototype['put_Borders'] = CParagraphFrame.prototype.put_Borders;
+CParagraphFrame.prototype['get_Shade'] = CParagraphFrame.prototype.get_Shade;
+CParagraphFrame.prototype['put_Shade'] = CParagraphFrame.prototype.put_Shade;
+CParagraphFrame.prototype['get_FontFamily'] = CParagraphFrame.prototype.get_FontFamily;
+CParagraphFrame.prototype['put_FontFamily'] = CParagraphFrame.prototype.put_FontFamily;
+CParagraphFrame.prototype['put_FromDropCapMenu'] = CParagraphFrame.prototype.put_FromDropCapMenu;
 window['CParagraphPropEx'] = CParagraphPropEx;
 CParagraphPropEx.prototype['get_ContextualSpacing'] = CParagraphPropEx.prototype.get_ContextualSpacing;
 CParagraphPropEx.prototype['get_Ind'] = CParagraphPropEx.prototype.get_Ind;
