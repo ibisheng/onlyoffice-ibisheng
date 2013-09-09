@@ -8783,7 +8783,7 @@
 						findResult = t.findCellText(optionsFind);
 						if (undefined === findResult)
 							break;
-						index = findResult.c1 + findResult.r1;
+						index = findResult.c1 + '-' + findResult.r1;
 						if (aReplaceCellsIndex[index])
 							break;
 						aReplaceCellsIndex[index] = true;
