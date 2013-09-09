@@ -598,6 +598,7 @@ asc_docs_api.prototype.asc_getEditorPermissions = function()
 	{
 		var rData = {};
 		rData["c"] = "getsettings";	
+		rData["id"] = this.DocInfo.get_Id();
 		rData["format"] = this.DocInfo.get_Format();
 		rData["vkey"] = this.DocInfo.get_VKey();
 		rData["editorid"] = c_oEditorId.Presentation;
@@ -1216,7 +1217,7 @@ asc_docs_api.prototype.Help = function(){
 
 }
 asc_docs_api.prototype.ClearCache = function(){
-	var rData = {"id":documentId, "format": documentFormat, "c":"cc"};
+	var rData = {"id":documentId, "vkey": documentVKey, "format": documentFormat, "c":"cc"};
 	sendCommand(editor, function(){}, JSON.stringify(rData));
 }
 asc_docs_api.prototype.startGetDocInfo = function(){
@@ -2608,7 +2609,7 @@ asc_docs_api.prototype.AddImageUrl = function(url){
 	}
 	else
 	{
-		var rData = {"id":documentId, "c":"imgurl", "data": url};
+		var rData = {"id":documentId, "vkey": documentVKey, "c":"imgurl", "data": url};
 		var oThis = this;
 		this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
 		sendCommand(this,  function(incomeObject){
@@ -4190,7 +4191,7 @@ function sendCommand(editor, fCallback, rdata){
 						fCallback(incomeObject);
                 break;
                 case "waitsave":
-					var rData = {"id":documentId, "title": documentTitleWithoutExtention, "c":"chsave", "data": incomeObject.data};
+					var rData = {"id":documentId, "vkey": documentVKey, "title": documentTitleWithoutExtention, "c":"chsave", "data": incomeObject.data};
                     setTimeout( function(){sendCommand(editor, fCallback, JSON.stringify(rData))}, 3000);
                 break;
 				case "savepart":
