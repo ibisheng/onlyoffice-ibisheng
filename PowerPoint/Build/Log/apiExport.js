@@ -139,6 +139,8 @@ prop:put_KeepLines
 prop:put_AddSpaceBetweenPrg
 prop:put_ShapeFillColor
 prop:ShapeApply
+prop:setStartPointHistory
+prop:setEndPointHistory
 prop:SetSlideProps
 prop:put_LineCap
 prop:put_LineJoin
@@ -1132,6 +1134,8 @@ asc_docs_api.prototype['put_KeepLines'] = asc_docs_api.prototype.put_KeepLines;
 asc_docs_api.prototype['put_AddSpaceBetweenPrg'] = asc_docs_api.prototype.put_AddSpaceBetweenPrg;
 asc_docs_api.prototype['put_ShapeFillColor'] = asc_docs_api.prototype.put_ShapeFillColor;
 asc_docs_api.prototype['ShapeApply'] = asc_docs_api.prototype.ShapeApply;
+asc_docs_api.prototype['setStartPointHistory'] = asc_docs_api.prototype.setStartPointHistory;
+asc_docs_api.prototype['setEndPointHistory'] = asc_docs_api.prototype.setEndPointHistory;
 asc_docs_api.prototype['SetSlideProps'] = asc_docs_api.prototype.SetSlideProps;
 asc_docs_api.prototype['put_LineCap'] = asc_docs_api.prototype.put_LineCap;
 asc_docs_api.prototype['put_LineJoin'] = asc_docs_api.prototype.put_LineJoin;
