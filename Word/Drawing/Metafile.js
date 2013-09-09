@@ -424,7 +424,7 @@ function Base64Encode(srcData, nSrcLen, nOffset)
     return dstStr;
 }
 
-function CMemory()
+function CMemory(bIsNoInit)
 {
     this.Init = function()
     {
@@ -442,7 +442,9 @@ function CMemory()
     this.data = null;
     this.len = 0;
     this.pos = 0;
-    this.Init();
+
+    if (true !== bIsNoInit)
+        this.Init();
 
     this.Copy = function(oMemory, nPos, nLen)
     {

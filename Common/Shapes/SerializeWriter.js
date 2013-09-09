@@ -2075,11 +2075,33 @@ function CBinaryFileWriter()
         oThis.WriteUChar(g_nodeAttributeStart);
         oThis.WriteUChar(g_nodeAttributeEnd);
 
-        oThis.WriteRecord1(0, grObj.nvGraphicFramePr, oThis.WriteUniNvPr);
         oThis.WriteRecord2(1, grObj.getXfrm(), oThis.WriteXfrm);
-        oThis.WriteRecord2(3, grObj.graphicObject, oThis.WriteChart2);
+        oThis.WriteRecord2(3, grObj, oThis.WriteChart2);
 
         oThis.EndRecord();
+    }
+
+    this.WriteChart2 = function(grObj)
+    {
+        var _memory = new CMemory(true);
+        _memory.ImData = oThis.ImData;
+        _memory.data = oThis.data;
+        _memory.len = oThis.len;
+        _memory.pos = oThis.pos;
+
+        _memory.WriteByte(c_oSerImageType2.Chart);
+        _memory.WriteByte(c_oSerPropLenType.Variable);
+
+        var oBinaryChartWriter = new BinaryChartWriter(_memory);
+        oBinaryChartWriter.WriteChartContent(grObj.chart);
+
+        oThis.ImData = _memory.ImData;
+        oThis.data = _memory.data;
+        oThis.len = _memory.len;
+        oThis.pos = _memory.pos;
+
+        _memory.ImData = null;
+        _memory.data = null;
     }
 
     this.WriteTable2 = function(table)
@@ -2378,7 +2400,10 @@ function CBinaryFileWriter()
                 {
                     oThis.WriteTable(spTree[i]);
                 }
-                // TODO: WriteChart
+                else if (spTree[i] instanceof CChartAsGroup)
+                {
+                    oThis.WriteChart(spTree[i]);
+                }
 
                 oThis.EndRecord(0);
             }

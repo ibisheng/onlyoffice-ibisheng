@@ -1059,7 +1059,8 @@ CChartAsGroup.prototype =
         if(isRealObject(this.chartTitle))
         {
             this.chartTitle.setType(CHART_TITLE_TYPE_TITLE);
-            this.chartTitle.txBody.content.Styles = this.chartTitle.getStyles();
+            if (this.chartTitle.txBody)
+                this.chartTitle.txBody.content.Styles = this.chartTitle.getStyles();
            //this.chartTitle.drawingObjects = this.drawingObjects;
             if(this.chartTitle.isEmpty())
             {

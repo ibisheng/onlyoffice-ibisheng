@@ -4220,6 +4220,7 @@ function BinaryPPTYLoader()
         var _nvGraphicFramePr = null;
         var _xfrm = null;
         var _table = null;
+        var _chart = null;
 
         while (s.cur < _end_rec)
         {
@@ -4243,7 +4244,19 @@ function BinaryPPTYLoader()
                 }
                 case 3:
                 {
-                    // TODO: chartData
+                    var _length = s.GetLong();
+                    var _pos = s.cur;
+
+                    _chart = new CChartAsGroup();
+                    var _stream = new FT_Stream2();
+                    _stream.data = s.data;
+                    _stream.pos = s.pos;
+                    _stream.cur = s.cur;
+                    _stream.size = s.size;
+                    var oBinary_ChartReader = new Binary_ChartReader(_stream, _chart.chart, _chart);
+                    oBinary_ChartReader.ReadExternal(_length);
+
+                    s.Seek2(_pos + _length);
                     break;
                 }
                 default:
@@ -4256,12 +4269,21 @@ function BinaryPPTYLoader()
         s.Seek2(_end_rec);
 
         this.TempGroupObject = null;
-        if (_table == null)
+        if (_table == null && _chart == null)
             return null;
 
-        _graphic_frame.spPr.xfrm = _xfrm;
-        _graphic_frame.nvGraphicFramePr = _nvGraphicFramePr;
-        _graphic_frame.graphicObject = _table;
+        if (_table != null)
+        {
+            _graphic_frame.spPr.xfrm = _xfrm;
+            _graphic_frame.nvGraphicFramePr = _nvGraphicFramePr;
+            _graphic_frame.graphicObject = _table;
+        }
+        else if (_chart != null)
+        {
+            _chart.spPr.xfrm = _xfrm;
+            return _chart;
+        }
+
         return _graphic_frame;
     }
 
