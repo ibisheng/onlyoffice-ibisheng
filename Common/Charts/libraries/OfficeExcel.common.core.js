@@ -523,13 +523,14 @@
                 var arrDiffVal1 = [0,0.2,0.5,1,2]
                 if(axisXMin == 0 && undefined == greaterNull)//если разница между min и max такая, что не нужно масштабировать
                 {
-                    for (var i=0; i<arr.length; i++) {
+                    var trueDiff = 1;
+					for (var i=0; i<arr.length; i++) {
                         if( max >= arr[i] && max <= arr[i+1])
                         {
                             var max1 = arr[i+1];
                             var trueMax;
                             var diff = max1/10;
-                            var trueDiff = diff;
+                            trueDiff = diff;
                             var maxVal;
                             //проверяем есть ли переход в следующий диапазон
                             if(max > arrMaxVal[i+1])
