@@ -1862,17 +1862,34 @@ CShape.prototype =
         graphics.SetIntegerGrid(true);
         if ( this.txBody )
         {
-            graphics.SetIntegerGrid(false);
-            graphics.transform3(this.transformText);
             var clip_rect = this.clipRect;
-            //graphics.AddClipRect(clip_rect.x, clip_rect.y, clip_rect.w, clip_rect.h);
+            if(!this.txBody.bodyPr.upright)
+            {
+                graphics.SaveGrState();
+
+                graphics.SetIntegerGrid(false);
+                graphics.transform3(this.transform);
+                graphics.AddClipRect(clip_rect.x, clip_rect.y, clip_rect.w, clip_rect.h);
+
+                graphics.SetIntegerGrid(false);
+                graphics.transform3(this.transformText, true);
+
+            }
+            else
+            {
+                graphics.SaveGrState();
+                graphics.SetIntegerGrid(false);
+                graphics.transform3(this.transformText, true);
+                graphics.AddClipRect(clip_rect.x, clip_rect.y, clip_rect.w, clip_rect.h);
+            }
+
             this.txBody.draw(graphics);
           /*  if (graphics.FreeFont !== undefined)
                 graphics.FreeFont(); */
 
 
             graphics.reset();
-          //  graphics.RestoreGrState();
+            graphics.RestoreGrState();
             graphics.SetIntegerGrid(true);
         }
     },
