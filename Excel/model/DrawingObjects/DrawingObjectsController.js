@@ -1258,6 +1258,11 @@ DrawingObjectsController.prototype =
                             ArrGlyph[i].calculateContent();
                             ArrGlyph[i].calculateTransformTextMatrix();
                         }
+						else if (ArrGlyph[i].isChart())
+						{
+							ArrGlyph[i].setExtents(result_width, result_height);
+							ArrGlyph[i].recalculate();
+						}
                     }
 
                     else if (ArrGlyph[i].isImage())

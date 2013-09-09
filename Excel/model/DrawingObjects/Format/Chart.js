@@ -54,6 +54,10 @@ CChartAsGroup.prototype =
         return this.Id;
     },
 
+	checkLine: function()
+    {
+        return false;
+    },
 
     setDrawingObjects: function(drawingObjects)
     {
