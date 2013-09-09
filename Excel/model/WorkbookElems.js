@@ -313,21 +313,7 @@ g_oColorManager = new ColorManager();
 function Font(val)
 {
 	if(null == val)
-	{
-		val = {
-			fn : "Calibri",
-			scheme : null,
-			fs : 11,
-			b : false,
-			i : false,
-			u : "none",
-			s : false,
-			c : g_oColorManager.getThemeColor(g_nColorTextDefault),
-			va : "baseline",
-			skip : false,
-			repeat : false
-		};
-	}
+		val = g_oDefaultFontAbs;
 	this.Properties = {
 		fn: 0,
 		scheme: 1,
@@ -364,22 +350,21 @@ Font.prototype =
 	merge : function(font)
 	{
 		var oRes = new Font();
-		oRes.fn = this._mergeProperty(this.fn, font.fn, g_oDefaultFont.fn);
-		oRes.fs = this._mergeProperty(this.fs, font.fs, g_oDefaultFont.fs);
-		oRes.b = this._mergeProperty(this.b, font.b, g_oDefaultFont.b);
-		oRes.i = this._mergeProperty(this.i, font.i, g_oDefaultFont.i);
-		oRes.u = this._mergeProperty(this.u, font.u, g_oDefaultFont.u);
-		oRes.s = this._mergeProperty(this.s, font.s, g_oDefaultFont.s);
+		oRes.fn = this._mergeProperty(this.fn, font.fn, g_oDefaultFontAbs.fn);
+		oRes.scheme = this._mergeProperty(this.scheme, font.scheme, g_oDefaultFontAbs.scheme);
+		oRes.fs = this._mergeProperty(this.fs, font.fs, g_oDefaultFontAbs.fs);
+		oRes.b = this._mergeProperty(this.b, font.b, g_oDefaultFontAbs.b);
+		oRes.i = this._mergeProperty(this.i, font.i, g_oDefaultFontAbs.i);
+		oRes.u = this._mergeProperty(this.u, font.u, g_oDefaultFontAbs.u);
+		oRes.s = this._mergeProperty(this.s, font.s, g_oDefaultFontAbs.s);
 		//заглушка excel при merge стилей игнорирует default цвет
 		if(this.c instanceof ThemeColor && g_nColorTextDefault == this.c.theme && null == this.c.tint)
-			oRes.c = this._mergeProperty(font.c, this.c, g_oDefaultFont.c);
+			oRes.c = this._mergeProperty(font.c, this.c, g_oDefaultFontAbs.c);
 		else
-			oRes.c = this._mergeProperty(this.c, font.c, g_oDefaultFont.c);
-		oRes.themeColor = this._mergeProperty(this.themeColor, font.themeColor, g_oDefaultFont.themeColor);
-		oRes.themeTint = this._mergeProperty(this.themeTint, font.themeTint, g_oDefaultFont.themeTint);
-		oRes.va = this._mergeProperty(this.va, font.va, g_oDefaultFont.va);
-		oRes.skip = this._mergeProperty(this.skip, font.skip, g_oDefaultFont.skip);
-		oRes.repeat = this._mergeProperty(this.repeat, font.repeat, g_oDefaultFont.repeat);
+			oRes.c = this._mergeProperty(this.c, font.c, g_oDefaultFontAbs.c);
+		oRes.va = this._mergeProperty(this.va, font.va, g_oDefaultFontAbs.va);
+		oRes.skip = this._mergeProperty(this.skip, font.skip, g_oDefaultFontAbs.skip);
+		oRes.repeat = this._mergeProperty(this.repeat, font.repeat, g_oDefaultFontAbs.repeat);
 		return oRes;
 	},
 	getRgbOrNull : function()
@@ -488,27 +473,27 @@ Font.prototype =
 	intersect : function(oFont, oDefVal)
 	{
 		if(this.fn != oFont.fn)
-            this.fn = g_oDefaultFont.fn;
+            this.fn = oDefVal.fn;
 		if(this.scheme != oFont.scheme)
-            this.scheme = g_oDefaultFont.scheme;
+            this.scheme = oDefVal.scheme;
         if(this.fs != oFont.fs)
-            this.fs = g_oDefaultFont.fs;
+            this.fs = oDefVal.fs;
 		if(this.b != oFont.b)
-            this.b = g_oDefaultFont.b;
+            this.b = oDefVal.b;
 		if(this.i != oFont.i)
-            this.i = g_oDefaultFont.i;
+            this.i = oDefVal.i;
 		if(this.u != oFont.u)
-            this.u = g_oDefaultFont.u;
+            this.u = oDefVal.u;
 		if(this.s != oFont.s)
-            this.s = g_oDefaultFont.s;
+            this.s = oDefVal.s;
 		if(false == g_oColorManager.isEqual(this.c, oFont.c))
-            this.c = g_oDefaultFont.c;
+            this.c = oDefVal.c;
 		if(this.va != oFont.va)
-            this.va = g_oDefaultFont.va;
+            this.va = oDefVal.va;
 		if(this.skip != oFont.skip)
-            this.skip = g_oDefaultFont.skip;
+            this.skip = oDefVal.skip;
 		if(this.repeat != oFont.repeat)
-            this.repeat = g_oDefaultFont.repeat;
+            this.repeat = oDefVal.repeat;
 	},
 	getType : function()
 	{
@@ -553,11 +538,7 @@ Font.prototype =
 function Fill(val)
 {
 	if(null == val)
-	{
-		val = {
-			bg : null
-		};
-	}
+		val = g_oDefaultFillAbs;
 	this.Properties = {
 		bg: 0
 	};
@@ -576,8 +557,6 @@ Fill.prototype =
 	{
 		var oRes = new Fill();
 		oRes.bg = this._mergeProperty(this.bg, fill.bg, g_oDefaultFill.bg);
-		oRes.themeColor = this._mergeProperty(this.themeColor, fill.themeColor, g_oDefaultFill.themeColor);
-		oRes.themeTint = this._mergeProperty(this.themeTint, fill.themeTint, g_oDefaultFill.themeTint);
 		return oRes;
 	},
 	getRgbOrNull : function()
@@ -699,19 +678,7 @@ BorderProp.prototype = {
 function Border(val)
 {
 	if(null == val)
-	{
-		val = {
-			l : new BorderProp(),
-			t : new BorderProp(),
-			r : new BorderProp(),
-			b : new BorderProp(),
-			d : new BorderProp(),
-			ih : new BorderProp(),
-			iv : new BorderProp(),
-			dd : false,
-			du : false
-		};
-	}
+		val = g_oDefaultBorderAbs;
 	this.Properties = {
 		l: 0,
 		t: 1,
@@ -891,11 +858,7 @@ Border.prototype =
 function Num(val)
 {
 	if(null == val)
-	{
-		val = {
-			f : "General"
-		};
-	}
+		val = g_oDefaultNumAbs;
 	this.Properties = {
 		f: 0
 	};
@@ -1082,17 +1045,7 @@ CellXfs.prototype =
 function Align(val)
 {
 	if(null == val)
-	{
-		val = {
-			hor : "none",
-			indent : 0,
-			RelativeIndent : 0,
-			shrink : false,
-			angle : 0,
-			ver : "bottom",
-			wrap : false
-		};
-	}
+		val = g_oDefaultAlignAbs;
 	this.Properties = {
 		hor: 0,
 		indent: 1,
@@ -3181,7 +3134,7 @@ CCellValue.prototype =
 			var aVal = this.multiText;
 			var oIntersectFont = aVal[0].format.clone();
 			for(var i = 1, length = aVal.length; i < length; i++)
-				oIntersectFont.intersect(aVal[i].format);
+				oIntersectFont.intersect(aVal[i].format, g_oDefaultFont);
 			if(bSetCellFont)
 			{
 				if(oIntersectFont.isEqual(g_oDefaultFont))

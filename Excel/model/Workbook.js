@@ -6305,8 +6305,13 @@ Range.prototype.getAlignVertical=function(){
 	if(null != cell)
     {
 		var xfs = cell.getStyle();
-        if(null != xfs && null != xfs.align)
-            return xfs.align.ver;
+        if(null != xfs)
+		{
+			if(null != xfs.align)
+				return xfs.align.ver;
+			else
+				return g_oDefaultAlignAbs.ver;
+		}
     }
 	else
 	{
@@ -6327,8 +6332,13 @@ Range.prototype.getAlignHorizontal=function(){
 	if(null != cell)
     {
 		var xfs = cell.getStyle();
-        if(null != xfs && null != xfs.align)
-            return xfs.align.hor;
+        if(null != xfs)
+		{
+			if(null != xfs.align)
+				return xfs.align.hor;
+			else
+				return g_oDefaultAlignAbs.hor;
+		}
     }
 	else
 	{
@@ -6487,8 +6497,13 @@ Range.prototype.getShrinkToFit=function(){
 	if(null != cell)
     {
 		var xfs = cell.getStyle();
-        if(null != xfs && null != xfs.align)
-            return xfs.align.shrink;
+        if(null != xfs)
+		{
+			if(null != xfs.align)
+				return xfs.align.shrink;
+			else
+				return g_oDefaultAlignAbs.shrink;
+		}
     }
 	else
 	{
@@ -6509,8 +6524,13 @@ Range.prototype.getWrap=function(){
 	if(null != cell)
     {
 		var xfs = cell.getStyle();
-        if(null != xfs && null != xfs.align)
-            return xfs.align.wrap;
+        if(null != xfs)
+		{
+			if(null != xfs.align)
+				return xfs.align.wrap;
+			else
+				return g_oDefaultAlignAbs.wrap;
+		}
     }
 	else
 	{
@@ -6532,8 +6552,13 @@ Range.prototype.getAngle=function(){
 	if(null != cell)
     {
 		var xfs = cell.getStyle();
-        if(null != xfs && null != xfs.align)
-            return angleFormatToInterface(xfs.align.angle);
+        if(null != xfs)
+		{
+			if(null != xfs.align)
+				return angleFormatToInterface(xfs.align.angle);
+			else
+				return angleFormatToInterface(g_oDefaultAlignAbs.angle);
+		}
     }
 	else
 	{
@@ -6554,8 +6579,13 @@ Range.prototype.getVerticalText=function(){
 	if(null != cell)
     {
 		var xfs = cell.getStyle();
-        if(null != xfs && null != xfs.align)
-            return g_nVerticalTextAngle == xfs.align.angle;
+        if(null != xfs)
+		{
+			if(null != xfs.align)
+				return g_nVerticalTextAngle == xfs.align.angle;
+			else
+				return g_nVerticalTextAngle == g_oDefaultAlignAbs.angle;
+		}
     }
 	else
 	{
