@@ -795,6 +795,7 @@ asc_docs_api.prototype.asc_getEditorPermissions = function()
 	{
 		var rData = {};
 		rData["c"] = "getsettings";	
+		rData["id"] = this.DocInfo.get_Id();
 		rData["format"] = this.DocInfo.get_Format();
 		rData["vkey"] = this.DocInfo.get_VKey();
 		rData["editorid"] = c_oEditorId.Word;
@@ -2385,7 +2386,7 @@ asc_docs_api.prototype.asc_Print = function()
 		var editor = this;
 		if(null == this.WordControl.m_oLogicDocument)
 		{
-			var rData = {"id":documentId, "format": documentFormat, "c":"savefromorigin"};
+			var rData = {"id":documentId, "vkey": documentVKey, "format": documentFormat, "c":"savefromorigin"};
 			sendCommand(editor, function(){editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Print);}, JSON.stringify(rData));
 		}
 		else
@@ -2541,7 +2542,7 @@ asc_docs_api.prototype.Help = function(){
 
 }
 asc_docs_api.prototype.ClearCache = function(){
-	var rData = {"id":documentId, "format": documentFormat, "c":"cc"};
+	var rData = {"id":documentId, "vkey": documentVKey, "format": documentFormat, "c":"cc"};
 	sendCommand(editor, function(){}, JSON.stringify(rData));
 }
 
@@ -4700,7 +4701,7 @@ asc_docs_api.prototype.AddImageUrl = function(url, imgProp)
 		}
 		else
 		{
-			var rData = {"id":documentId, "c":"imgurl", "data": url};
+			var rData = {"id":documentId, "vkey": documentVKey, "c":"imgurl", "data": url};
 			var oThis = this;
 			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
 			sendCommand( oThis, function(incomeObject){
@@ -6669,7 +6670,7 @@ function sendCommand(editor, fCallback, rdata){
                 break;
                 case "waitsave":
 				{
-					var rData = {"id":documentId, "title": documentTitleWithoutExtention, "c":"chsave", "data": incomeObject.data};
+					var rData = {"id":documentId, "vkey": documentVKey, "title": documentTitleWithoutExtention, "c":"chsave", "data": incomeObject.data};
                     setTimeout( function(){sendCommand(editor, fCallback, JSON.stringify(rData))}, 3000);
 				}
                 break;
