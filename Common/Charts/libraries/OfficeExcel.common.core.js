@@ -439,7 +439,12 @@
                 //приводим к первому порядку для дальнейших вычислений
                 var secPart = max.toString().split('.');
                 var numPow = 1;
-                if(0 != secPart[0])
+				if(secPart[1] && secPart[1].toString().search('e+') != -1 && secPart[0] && secPart[0].toString().length == 1)
+				{
+					var expNum = secPart[1].toString().split('e+');
+					numPow = Math.pow(10, expNum[1]);
+				}
+                else if(0 != secPart[0])
                     numPow = Math.pow(10, secPart[0].toString().length - 1)
                 max = max/numPow;
                 if(0 == max.toString().split('.')[0])
@@ -497,6 +502,12 @@
                             num--;
                         }
                     }
+					else if(greaterNull.toString().indexOf("e+") > -1)
+					{
+						var splitString = greaterNull.toString().split("e+");
+						if(splitString[1])
+							greaterNullNum = Math.pow(10, parseFloat(splitString[1]));
+					}
                     
                     greaterNull = greaterNull/greaterNullNum;
                     //if(axisXMin == 0)
@@ -1042,6 +1053,7 @@
                 }
                 
                 
+                stepOY = OfficeExcel.num_round(stepOY);
                 
                 
                 
@@ -1307,6 +1319,7 @@
     {
 		var maxDig = 1000000000;
 		var minDig = 0.000000001;
+		var floatKoff = 100000000000;
 		
 		if(typeof(arr) == 'number')
 		{
@@ -1351,6 +1364,7 @@
 						exp += 1;
 						tmp /= 10;
 					}
+					tmp = Math.round(tmp*floatKoff)/floatKoff
 					if(arr[i] < 0)
 						tmp *= -1; 
 					arr[i] = tmp + "E+" + exp;
@@ -1374,28 +1388,14 @@
 	
 	OfficeExcel.num_round = function (num)
 	{
-		/*var partNum = num.toString().split('.');
-		var len;
-		
-		
-		if(partNum == undefined ||  num.toString().split('e-')[1] != undefined)
-		{
-			partNum = num.toString().split('e-');
-			len = partNum[1] + 1;
-		}
-			
-		if(partNum[1] != undefined && partNum[1])
-		{
-			if(!len)
-				len = partNum[1].length;
-			if(len)
-			{
-				var floatKoff = Math.pow(10, (len - 1))
-				if(floatKoff > 1)
-					num =  Math.round(num*floatKoff)/floatKoff ;
-			}		
-		}*/
 		var floatKoff = 100000000000;
+		if(num.toString() && num.toString().indexOf('e+') > -1)
+		{
+			var parseVal = num.toString().split("e+");
+			var roundVal = Math.round(parseFloat(parseVal[0])*floatKoff)/floatKoff;
+			var changeSymbol = roundVal.toString() + "e+" + parseVal[1];
+			num = parseFloat(changeSymbol);
+		}
 		num =  Math.round(num*floatKoff)/floatKoff ;
 		return num;
 	}
