@@ -2868,7 +2868,6 @@ CShape.prototype =
         }
     },
 
-
     getBase64Image: function()
     {
         return ShapeToImageConverter(this, this.pageIndex).ImageUrl;
@@ -2897,6 +2896,7 @@ CShape.prototype =
         this.setDrawingObjects(drawingObjects);
 
         this.spPr.bwMode = r.GetBool();
+        r.GetBool();
         this.setXfrmObject(new CXfrm());
 
         var Reader = r;
