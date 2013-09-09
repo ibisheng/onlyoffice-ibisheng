@@ -5757,6 +5757,7 @@ asc_docs_api.prototype.ChangeColorScheme = function(index_scheme)
         {
             var _obj = g_oUserColorScheme[index_scheme];
             var scheme = new ClrScheme();
+			scheme.name = _obj["name"];
             var _c = null;
 
             _c = _obj["dk1"];

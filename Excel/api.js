@@ -2692,6 +2692,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						if (index_scheme < _count_defaults) {
 							var _obj = g_oUserColorScheme[index_scheme];
 							var scheme = new ClrScheme();
+							scheme.name = _obj["name"];
 							var _c;
 
 							_c = _obj["dk1"];
