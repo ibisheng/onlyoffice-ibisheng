@@ -52,7 +52,7 @@ function ChartStyleManager() {
 	// Methods
 	//-----------------------------------------------------------------------------------
 	
-	_this.init = function() {
+	_this.init = function(theme, colorScheme) {
 		
 		_this.colorMap = [];		
 		var api_doc = window["editor"];
@@ -64,8 +64,8 @@ function ChartStyleManager() {
 			themeColors = getDocColors(api_doc);
 		
 		function getDocColors(api) {
-			var _theme  = api.WordControl.m_oLogicDocument.theme;
-			var _clrMap = api.WordControl.m_oLogicDocument.clrSchemeMap.color_map;
+			var _theme  = theme ? theme : api.WordControl.m_oLogicDocument.theme;
+			var _clrMap = colorScheme ? colorScheme : api.WordControl.m_oLogicDocument.clrSchemeMap.color_map;
 
 			var arr_colors = new Array(10);
 			var rgba = {R:0, G:0, B:0, A:255};
