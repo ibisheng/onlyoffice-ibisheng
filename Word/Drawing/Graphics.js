@@ -2670,5 +2670,15 @@ CGraphics.prototype =
     UncheckUseFonts2 : function()
     {
         this.IsUseFonts2 = false;
+    },
+
+    Drawing_StartCheckBounds : function(x, y, w, h)
+    {
+
+    },
+
+    Drawing_EndCheckBounds : function()
+    {
+
     }
 };
