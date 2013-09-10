@@ -3025,7 +3025,7 @@ function DrawingObjects() {
 			boundsChecker.CorrectBounds();
 			
 			// Коррекция для селекта при блокировке
-			var delta = (drawingObject.graphicObject.lockType == c_oAscLockTypes.kLockTypeNone) ? 0 : 6;
+			var delta = 6;
 			boundsChecker.Bounds.min_x -= delta;
 			boundsChecker.Bounds.min_y -= delta;
 			boundsChecker.Bounds.max_x += delta;
@@ -4079,6 +4079,7 @@ function DrawingObjects() {
 		
 		for (var i = 0; i < aObjects.length; i++) {
 			aObjects[i].graphicObject.lockType = c_oAscLockTypes.kLockTypeNone;
+			//shapeCtx.DrawLockObjectRect(aObjects[i].graphicObject.lockType, aObjects[i].graphicObject.x, aObjects[i].graphicObject.y, aObjects[i].graphicObject.extX, aObjects[i].graphicObject.extY );
 		}
 		_this.showDrawingObjects(true);
 	}
