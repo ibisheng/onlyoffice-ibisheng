@@ -106,6 +106,8 @@ function asc_docs_api(name)
 
 	this.canSave = true;				//Флаг нужен чтобы не происходило сохранение пока не завершится предыдущее сохранение
 
+    this.chartStyleManager = new ChartStyleManager();
+    this.chartPreviewManager = new ChartPreviewManager();
     // объекты, нужные для отправки в тулбар (шрифты, стили)
     this._gui_fonts = null;
     this._gui_editor_themes = null;
@@ -532,6 +534,22 @@ asc_docs_api.prototype.syncCollaborativeChanges = function () {
 	this.asc_fireCallback("asc_onCollaborativeChanges");
 };
 
+
+asc_docs_api.prototype.SetCollaborativeMarksShowType = function(Type)
+{
+    this.CollaborativeMarksShowType = Type;
+}
+
+asc_docs_api.prototype.GetCollaborativeMarksShowType = function(Type)
+{
+    return this.CollaborativeMarksShowType;
+}
+
+asc_docs_api.prototype.Clear_CollaborativeMarks = function()
+{
+    CollaborativeEditing.Clear_CollaborativeMarks(true);
+}
+
 ///////////////////////////////////////////
 asc_docs_api.prototype.SetUnchangedDocument = function()
 {
@@ -553,6 +571,20 @@ asc_docs_api.prototype.sync_BeginCatchSelectedElements = function()
 }
 asc_docs_api.prototype.sync_EndCatchSelectedElements = function()
 {
+
+    if ( !this.chartStyleManager.isReady() || !this.chartPreviewManager.isReady() )
+    {
+        for ( var i = 0; i < this.SelectedObjectsStack.length; i++ )
+        {
+            if ( this.SelectedObjectsStack[i].Value.ChartProperties )
+            {
+                this.chartStyleManager.init();
+                this.chartPreviewManager.init();
+                this.asc_fireCallback("asc_onUpdateChartStyles");
+                break;
+            }
+        }
+    }
     this.asc_fireCallback("asc_onFocusObject", this.SelectedObjectsStack);
 }
 asc_docs_api.prototype.getSelectedElements = function()
