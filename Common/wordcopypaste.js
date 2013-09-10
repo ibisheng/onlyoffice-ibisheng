@@ -3368,13 +3368,11 @@ PasteProcessor.prototype =
                     if(node != oFirstTextChild)
                     {
                         var oLvl = AbstractNum.Lvl[0];
-                        var sFontFamily = null;
-                        if(numbering_numfmt_Bullet == num)
-                            sFontFamily = oLvl.TextPr.FontFamily;
+						var oTextPr = this._read_rPr(oFirstTextChild);
+						if(numbering_numfmt_Bullet == num)
+                            oTextPr.RFonts = oLvl.TextPr.RFonts.Copy();
                         //�������� ��������� �� node
-                        oLvl.TextPr = this._read_rPr(oFirstTextChild);
-                        if(null != sFontFamily)
-                            oLvl.TextPr.FontFamily = sFontFamily;
+						AbstractNum.Apply_TextPr(0, oTextPr);
                     }
                 }
                 Para.Numbering_Add( NumId, 0 );
@@ -3487,7 +3485,6 @@ PasteProcessor.prototype =
                 var oFontItem = this.oFonts[font_family];
                 if(null != oFontItem && null != oFontItem.Name)
 				{
-                    rPr.FontFamily = {Name: oFontItem.Name, Index: oFontItem.Index};
 					rPr.RFonts.Ascii = {Name: oFontItem.Name, Index: oFontItem.Index};
 					rPr.RFonts.HAnsi = {Name: oFontItem.Name, Index: oFontItem.Index};
 					rPr.RFonts.CS = {Name: oFontItem.Name, Index: oFontItem.Index};
