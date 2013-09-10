@@ -851,6 +851,9 @@ function CEditorPage(api)
         // нужно проверить режим и сбросить кеш грамотно (ie version)
         g_fontManager.ClearRasterMemory();
 
+        if (window.g_fontManager2 !== undefined && window.g_fontManager2 !== null)
+            window.g_fontManager2.ClearRasterMemory();
+
         var oWordControl = oThis;
 
         oWordControl.m_bIsRePaintOnScroll = false;
@@ -3117,6 +3120,9 @@ function CEditorPage(api)
         {
             this.m_oDrawingDocument.ClearCachePages();
             g_fontManager.ClearFontsRasterCache();
+
+            if (window.g_fontManager2 !== undefined && window.g_fontManager2 !== null)
+                window.g_fontManager2.ClearFontsRasterCache();
         }
 
         return bFlag;

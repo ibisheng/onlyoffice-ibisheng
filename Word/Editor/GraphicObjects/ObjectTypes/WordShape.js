@@ -1982,7 +1982,6 @@ WordShape.prototype =
 
                 graphics.SetIntegerGrid(false);
                 graphics.transform3(this.transformText, true);
-
             }
             else
             {
@@ -1991,7 +1990,8 @@ WordShape.prototype =
                 graphics.transform3(this.transformText, true);
                 graphics.AddClipRect(clip_rect.x, clip_rect.y, clip_rect.w, clip_rect.h);
             }
-           /* if (_rect != null)
+            /*
+            if (_rect != null)
             {
                 graphics.SaveGrState();
                 // TODO: !!!
@@ -1999,9 +1999,17 @@ WordShape.prototype =
                 var l_ins = typeof body_pr.lIns === "number" ? body_pr.lIns : 2.54;
                 var t_ins = typeof body_pr.tIns === "number" ? body_pr.tIns : 1.27;
                 graphics.AddClipRect(-(l_ins), -(t_ins ), _rect.w, _rect.h );
-            }            */
+            }
+            */
             var result_page_index = typeof pageIndex === "number" ? pageIndex : this.pageIndex;
+
+            if (graphics.CheckUseFonts2 !== undefined)
+                graphics.CheckUseFonts2(this.transformText);
+
             this.textBoxContent.Draw(result_page_index, graphics);
+
+            if (graphics.UncheckUseFonts2 !== undefined)
+                graphics.UncheckUseFonts2();
 
             if(typeof pageIndex === "number")
             {

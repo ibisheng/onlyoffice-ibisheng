@@ -2564,6 +2564,9 @@ asc_docs_api.prototype.SetFontRenderingMode = function(mode)
     this.WordControl.m_oDrawingDocument.ClearCachePages();
     g_fontManager.ClearFontsRasterCache();
 
+    if (window.g_fontManager2 !== undefined && window.g_fontManager2 !== null)
+        window.g_fontManager2.ClearFontsRasterCache();
+
     if (this.bInit_word_control)
         this.WordControl.OnScroll();
 }
