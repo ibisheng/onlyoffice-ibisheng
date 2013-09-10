@@ -1,9 +1,16 @@
+var BEGINNING_CHR = 0;
+var SEPARATOR_CHR = 1;
+var ENDING_CHR    = 2;
+
+var TOP_CHR       = 3;
+var BOTTOM_CHR    = 4;
+
+
 function CGlyphOperator()
 {
     this.loc = null;
     this.turn = null;
 
-    this.coord = null;
     this.size = null;
     this.measure = 0;
 
@@ -12,25 +19,6 @@ function CGlyphOperator()
     this.TxtPrp = new CMathTextPrp();
 
 }
-/*CGlyphOperator.prototype.setLocation = function(loc, turn)
-{
-    // location
-
-    // 0 - up
-    // 1 - down
-    // 2 - left
-    // 3 - right
-
-    // turn
-
-    // 0 - 0
-    // 1 - Pi
-    // 2 - Pi/2
-    // 3 - 3*Pi/2
-
-    this.loc = loc;
-    this.turn = turn;
-}*/
 CGlyphOperator.prototype.init = function(props)
 {
     // location
@@ -50,17 +38,12 @@ CGlyphOperator.prototype.init = function(props)
     this.loc = props.location;
     this.turn = props.turn;
 }
-CGlyphOperator.prototype.setPosition = function(pos)
-{
-    this.pos = pos;
-    //this.pos = {x: pos.x, y : pos.y - this.size.center};
-}
 CGlyphOperator.prototype.fixSize = function(measure)
 {
     var sizeGlyph = this.calcSize(measure);
     var width, height, center;
 
-    var betta = this.getTxtPrp().FontSize/36;
+    //var betta = this.getTxtPrp().FontSize/36;
     var bHor = this.loc == 0 || this.loc  == 1;
 
     if(bHor)
@@ -78,14 +61,336 @@ CGlyphOperator.prototype.fixSize = function(measure)
 
         // baseLine смещен чуть вверх, чтобы текст при вставке в скобки располагался по центру, относительно высоты скобок
         // плейсхолдер из-за этого располагается чуть выше, как в Ворде
-        center = height/2 - 1.234722222222222*betta;
-        //center = height/2;
+        //center = height/2 - 1.234722222222222*betta;
+        center = height/2;
         this.measure = measure > height ? measure : height;
     }
 
     this.size = {width: width, height: height, center: center};
 }
 CGlyphOperator.prototype.draw_other = function() //  с выравниванием к краю (относительно аргумента)
+{
+    var coord = this.calcCoord(this.measure);
+
+    var X = coord.XX, Y = coord.YY,
+        W =  this.size.width, H =  this.size.height,
+        glW, glH;
+
+    var bHor = this.loc == 0 || this.loc  == 1;
+
+    if(bHor)
+    {
+        glW = coord.W;
+        glH = coord.H;
+    }
+    else
+    {
+        glW = coord.H;
+        glH = coord.W;
+    }
+
+    var shW =  (W - glW)/ 2, // выравниваем глиф по длине
+        shH =  (H - glH)/2; // при повороте на 90 градусовы
+
+    if(this.loc == 0)
+    {
+        a1 = 1; b1 = 0; c1 = shW;
+        a2 = 0; b2 = 1; c2 = 0;
+    }
+    else if(this.loc == 1)
+    {
+        a1 = 1; b1 = 0; c1 = shW;
+        a2 = 0; b2 = 1; c2 = H - glH;
+    }
+    else if(this.loc == 2)
+    {
+        a1 = 0; b1 = 1; c1 = 0;
+        a2 = 1; b2 = 0; c2 = shH;
+    }
+    else
+    {
+        a1 = 0; b1 = 1; c1 = W - glW;
+        a2 = 1; b2 = 0; c2 = shH;
+    }
+
+    if(this.turn == 1)
+    {
+        a1 *= -1; b1 *= -1; c1 += glW;
+    }
+    else if(this.turn == 2)
+    {
+        a2 *= -1; b2 *= -1; c2 += glH;
+    }
+    else if(this.turn == 3)
+    {
+        a1 *= -1; b1 *= -1; c1 += glW;
+        a2 *= -1; b2 *= -1; c2 += glH;
+    }
+
+    var shW =  (W - glW)/ 2, // выравниваем глиф по длине
+        shH =  (H - glH)/2; // при повороте на 90 градусовы
+
+    // A*x + B*y + C = 0
+
+    if(bHor)
+    {
+        a1 = 1; b1 = 0; c1 = shW;
+        a2 = 0; b2 = 1; c2 = 0;
+    }
+    else
+    {
+        a1 = 0; b1 = 1; c1 = 0;
+        a2 = 1; b2 = 0; c2 = shH;
+    }
+
+    if(this.turn == 1)
+    {
+        a1 *= -1; b1 *= -1; c1 = W;
+    }
+    else if(this.turn == 2)
+    {
+        a2 *= -1; b2 *= -1; c2 = H;
+    }
+    else if(this.turn == 3)
+    {
+        a1 *= -1; b1 *= -1; c1 = W;
+        a2 *= -1; b2 *= -1; c2 = H;
+    }
+
+    // смещение
+
+    var gpX = 0,
+        gpY = 0;
+
+    if(this.loc == 1)
+        gpY = this.penW*25.4/96;
+    if(this.loc == 3)
+        gpX = - this.penW*25.4/96;
+
+    var XX = new Array(),
+        YY = new Array();
+
+    var x = this.pos.x;
+    y = this.pos.y;
+
+    for(var i = 0; i < X.length; i++)
+    {
+        XX[i] = x + X[i]*a1 + Y[i]*b1 + c1 + gpX;
+        YY[i] = y + X[i]*a2 + Y[i]*b2 + c2 + gpY;
+    }
+
+    for(var i = 0; i < YY.length; i++)
+    {
+        console.log("YY["+ i + "] = "+ YY[i]);
+    }
+
+    var intGrid = MathControl.pGraph.GetIntegerGrid();
+    MathControl.pGraph.SetIntegerGrid(false);
+
+    MathControl.pGraph.p_width(this.penW*1000);
+    MathControl.pGraph.b_color1(0,0,0, 255);
+    MathControl.pGraph._s();
+
+    this.drawPath(XX,YY);
+
+    MathControl.pGraph.df();
+    MathControl.pGraph.SetIntegerGrid(intGrid);
+
+}
+CGlyphOperator.prototype.getCoordinateGlyph = function()
+{
+    var coord = this.calcCoord(this.measure);
+
+    var X = coord.XX, Y = coord.YY,
+        W =  this.size.width, H =  this.size.height;
+
+    var bHor = this.loc == 0 || this.loc  == 1;
+
+    var glW = 0, glH = 0;
+
+     if(bHor)
+     {
+         glW = coord.W;
+         glH = coord.H;
+     }
+     else
+     {
+         glW = coord.H;
+         glH = coord.W;
+     }
+
+     var shW =  (W - glW)/ 2, // выравниваем глиф по длине
+         shH =  (H - glH)/2; // при повороте на 90 градусовы
+
+    // A*x + B*y + C = 0
+
+    if(bHor)
+    {
+        a1 = 1; b1 = 0; c1 = 0;
+        a2 = 0; b2 = 1; c2 = shH;
+    }
+    else
+    {
+        a1 = 0; b1 = 1; c1 = shW;
+        a2 = 1; b2 = 0; c2 = 0;
+    }
+
+    /*var shW = 0,
+        shH = 0;
+
+    if(bHor)
+    {
+        a1 = 1; b1 = 0; c1 = 0;
+        a2 = 0; b2 = 1; c2 = 0;
+    }
+    else
+    {
+        a1 = 0; b1 = 1; c1 = 0;
+        a2 = 1; b2 = 0; c2 = 0;
+    }*/
+
+    if(this.turn == 1)
+    {
+        a1 *= -1; b1 *= -1; c1 = W - c1; //c1 = W - c1;
+    }
+    else if(this.turn == 2)
+    {
+        a2 *= -1; b2 *= -1; c2 = H - c2;
+    }
+    else if(this.turn == 3)
+    {
+        a1 *= -1; b1 *= -1; c1 = W - c1;
+        a2 *= -1; b2 *= -1; c2 = H - c2;
+    }
+
+    var gpX = 0,
+        gpY = 0;
+
+    if(this.loc == 3)
+        gpX = - this.penW*25.4/96;
+
+    var XX = new Array(),
+        YY = new Array();
+
+    for(var i = 0; i < X.length; i++)
+    {
+        XX[i] = X[i]*a1 + Y[i]*b1 + c1 + gpX;
+        YY[i] = X[i]*a2 + Y[i]*b2 + c2 + gpY;
+    }
+
+    return {XX: XX, YY: YY, Width: glW, Height: glH};
+}
+CGlyphOperator.prototype.draw = function(XX, YY)
+{
+    var intGrid = MathControl.pGraph.GetIntegerGrid();
+    MathControl.pGraph.SetIntegerGrid(false);
+
+    MathControl.pGraph.p_width(this.penW*1000);
+    MathControl.pGraph.b_color1(0,0,0, 255);
+    MathControl.pGraph._s();
+
+    this.drawPath(XX,YY);
+
+    MathControl.pGraph.df();
+    MathControl.pGraph.SetIntegerGrid(intGrid);
+}
+CGlyphOperator.prototype.getTxtPrp = function()
+{
+    return this.TxtPrp;
+}
+CGlyphOperator.prototype.setTxtPrp = function(txtPrp)
+{
+    this.TxtPrp.Merge(txtPrp);
+}
+
+function old_CGlyphOperator()
+{
+    this.loc = null;
+    this.turn = null;
+
+    this.coord = null;
+    this.size = null;
+    this.measure = 0;
+
+    this.penW = 1; // px
+
+    this.TxtPrp = new CMathTextPrp();
+
+}
+/*old_CGlyphOperator.prototype.setLocation = function(loc, turn)
+{
+    // location
+
+    // 0 - up
+    // 1 - down
+    // 2 - left
+    // 3 - right
+
+    // turn
+
+    // 0 - 0
+    // 1 - Pi
+    // 2 - Pi/2
+    // 3 - 3*Pi/2
+
+    this.loc = loc;
+    this.turn = turn;
+}*/
+old_CGlyphOperator.prototype.init = function(props)
+{
+    // location
+
+    // 0 - up
+    // 1 - down
+    // 2 - left
+    // 3 - right
+
+    // turn
+
+    // 0 - 0
+    // 1 - Pi
+    // 2 - Pi/2
+    // 3 - 3*Pi/2
+
+    this.loc = props.location;
+    this.turn = props.turn;
+}
+old_CGlyphOperator.prototype.setPosition = function(pos)
+{
+    this.pos = pos;
+    //this.pos = {x: pos.x, y : pos.y - this.size.center};
+}
+old_CGlyphOperator.prototype.fixSize = function(measure)
+{
+    var sizeGlyph = this.calcSize(measure);
+    var width, height, center;
+
+    //var betta = this.getTxtPrp().FontSize/36;
+    var bHor = this.loc == 0 || this.loc  == 1;
+
+    if(bHor)
+    {
+        width = sizeGlyph.width;
+        height = sizeGlyph.height;
+
+        center = height/2;
+        this.measure = measure > width ? measure : width;
+    }
+    else
+    {
+        width = sizeGlyph.height;
+        height = sizeGlyph.width;
+
+        // baseLine смещен чуть вверх, чтобы текст при вставке в скобки располагался по центру, относительно высоты скобок
+        // плейсхолдер из-за этого располагается чуть выше, как в Ворде
+        //center = height/2 - 1.234722222222222*betta;
+        center = height/2;
+        this.measure = measure > height ? measure : height;
+    }
+
+    this.size = {width: width, height: height, center: center};
+}
+old_CGlyphOperator.prototype.draw_other = function() //  с выравниванием к краю (относительно аргумента)
 {
     var coord = this.calcCoord(this.measure);
 
@@ -214,7 +519,7 @@ CGlyphOperator.prototype.draw_other = function() //  с выравнивание
     MathControl.pGraph.SetIntegerGrid(intGrid);
 
 }
-CGlyphOperator.prototype.draw = function()
+old_CGlyphOperator.prototype.old_draw = function()
 {
     var coord = this.calcCoord(this.measure);
 
@@ -296,26 +601,113 @@ CGlyphOperator.prototype.draw = function()
     MathControl.pGraph.SetIntegerGrid(intGrid);
 
 }
-CGlyphOperator.prototype.IsJustDraw = function()
+old_CGlyphOperator.prototype.getCoordinateGlyph = function()
+{
+    var coord = this.calcCoord(this.measure);
+
+    var X = coord.XX, Y = coord.YY,
+        W =  this.size.width, H =  this.size.height;
+
+    var bHor = this.loc == 0 || this.loc  == 1;
+
+    /*var glW = 0, glH = 0;
+
+    if(bHor)
+    {
+        glW = coord.W;
+        glH = coord.H;
+    }
+    else
+    {
+        glW = coord.H;
+        glH = coord.W;
+    }
+
+    var shW =  (W - glW)/ 2, // выравниваем глиф по длине
+        shH =  (H - glH)/2; // при повороте на 90 градусовы*/
+
+    var shW = 0,
+        shH = 0;
+
+    // A*x + B*y + C = 0
+
+    if(bHor)
+    {
+        a1 = 1; b1 = 0; c1 = shW;
+        a2 = 0; b2 = 1; c2 = 0;
+    }
+    else
+    {
+        a1 = 0; b1 = 1; c1 = 0;
+        a2 = 1; b2 = 0; c2 = shH;
+    }
+
+    if(this.turn == 1)
+    {
+        a1 *= -1; b1 *= -1; c1 = W - c1;
+    }
+    else if(this.turn == 2)
+    {
+        a2 *= -1; b2 *= -1; c2 = H - c2;
+    }
+    else if(this.turn == 3)
+    {
+        a1 *= -1; b1 *= -1; c1 = W - c1;
+        a2 *= -1; b2 *= -1; c2 = H - c2;
+    }
+
+    var gpX = 0,
+        gpY = 0;
+
+    if(this.loc == 3)
+        gpX = - this.penW*25.4/96;
+
+    var XX = new Array(),
+        YY = new Array();
+
+    for(var i = 0; i < X.length; i++)
+    {
+        XX[i] = X[i]*a1 + Y[i]*b1 + c1 + gpX;
+        YY[i] = X[i]*a2 + Y[i]*b2 + c2 + gpY;
+    }
+
+    return {XX: XX, YY: YY, Width: coord.W, Height: coord.H};
+}
+old_CGlyphOperator.prototype.drawGlyph = function(XX, YY)
+{
+    var intGrid = MathControl.pGraph.GetIntegerGrid();
+    MathControl.pGraph.SetIntegerGrid(false);
+
+    MathControl.pGraph.p_width(this.penW*1000);
+    MathControl.pGraph.b_color1(0,0,0, 255);
+    MathControl.pGraph._s();
+
+    this.drawPath(XX,YY);
+
+    MathControl.pGraph.df();
+    MathControl.pGraph.SetIntegerGrid(intGrid);
+}
+old_CGlyphOperator.prototype.IsJustDraw = function()
 {
     return true;
 }
-CGlyphOperator.prototype.relate = function(parent)
+old_CGlyphOperator.prototype.relate = function(parent)
 {
     this.Parent = parent;
 }
-CGlyphOperator.prototype.Resize = function()
+old_CGlyphOperator.prototype.Resize = function()
 {
     this.fixSize(); //??
 }
-CGlyphOperator.prototype.getTxtPrp = function()
+old_CGlyphOperator.prototype.getTxtPrp = function()
 {
     return this.TxtPrp;
 }
-CGlyphOperator.prototype.setTxtPrp = function(txtPrp)
+old_CGlyphOperator.prototype.setTxtPrp = function(txtPrp)
 {
     this.TxtPrp.Merge(txtPrp);
 }
+
 
 function old_CDelimiter() /// ECMA: group characters
 {
@@ -592,7 +984,7 @@ old_CDelimiter.prototype.Resize = function()
     this.recalculateSize();
 }
 
-function GetOperator(chr)
+function GetGlyph(chr, location)
 {
     var operator;
 
@@ -644,6 +1036,7 @@ function GetOperator(chr)
         var props =
         {
             location:   DELIMITER_LOCATION_LEFT,
+            //location:   location,
             turn:       DELIMITER_TURN_0
         };
         operator.init(props);
@@ -654,13 +1047,14 @@ function GetOperator(chr)
         var props =
         {
             location:   DELIMITER_LOCATION_RIGHT,
+            //location:   location,
             turn:       DELIMITER_TURN_180
         };
         operator.init(props);
     }
-    else if( chr.value === "<" || chr.type === BRACKET_SQUARE_LEFT)
+    else if( chr.value === "<" || chr.type === BRACKET_ANGLE_LEFT)
     {
-        operator = new CSquareBracket();
+        operator = new COperatorAngleBracket();
         var props =
         {
             location:   DELIMITER_LOCATION_LEFT,
@@ -668,12 +1062,92 @@ function GetOperator(chr)
         };
         operator.init(props);
     }
-    else if( chr.value === ">" || chr.type === BRACKET_SQUARE_RIGHT)
+    else if( chr.value === ">" || chr.type === BRACKET_ANGLE_RIGHT)
     {
-        operator = new CSquareBracket();
+        operator = new COperatorAngleBracket();
         var props =
         {
             location:   DELIMITER_LOCATION_RIGHT,
+            turn:       DELIMITER_TURN_180
+        };
+        operator.init(props);
+    }
+    else if(chr.value === "|" || chr.type === DELIMITER_LINE)
+    {
+        operator = new COperatorLine();
+        var props =
+        {
+            location:   DELIMITER_LOCATION_LEFT,
+            turn:       DELIMITER_TURN_0
+        };
+        operator.init(props);
+    }
+    else if(chr.value === "⌊" || chr.type === HALF_SQUARE_LEFT)
+    {
+        operator = new CHalfSquareBracket();
+        var props =
+        {
+            location:   DELIMITER_LOCATION_LEFT,
+            turn:       DELIMITER_TURN_0
+        };
+        operator.init(props);
+    }
+    else if(chr.value === "⌋" || chr.type == HALF_SQUARE_RIGHT)
+    {
+        operator = new CHalfSquareBracket();
+        var props =
+        {
+            location:   DELIMITER_LOCATION_LEFT,
+            turn:       DELIMITER_TURN_180
+        };
+        operator.init(props);
+    }
+    else if(chr.value === "⌈" || chr.type == HALF_SQUARE_LEFT_UPPER)
+    {
+        operator = new CHalfSquareBracket();
+        var props =
+        {
+            location:   DELIMITER_LOCATION_LEFT,
+            turn:       DELIMITER_TURN_MIRROR_0
+        };
+        operator.init(props);
+    }
+    else if(chr.value === "⌉" || chr.type == HALF_SQUARE_RIGHT_UPPER)
+    {
+        operator = new CHalfSquareBracket();
+        var props =
+        {
+            location:   DELIMITER_LOCATION_LEFT,
+            turn:       DELIMITER_TURN_MIRROR_180
+        };
+        operator.init(props);
+    }
+    else if(chr.value === "‖" || chr.type == DELIMITER_DOUBLE_LINE)
+    {
+        operator = new COperatorDoubleLine();
+        var props =
+        {
+            location:   DELIMITER_LOCATION_LEFT,
+            turn:       DELIMITER_TURN_MIRROR_180
+        };
+        operator.init(props);
+    }
+    else if(chr.value === "⟦" || chr.type == WHITE_SQUARE_LEFT)
+    {
+        operator = new CWhiteSquareBracket();
+        var props =
+        {
+            location:   DELIMITER_LOCATION_LEFT,
+            turn:       DELIMITER_TURN_0
+        };
+        operator.init(props);
+    }
+    else if(chr.value === "⟧" || chr.type == WHITE_SQUARE_RIGHT)
+    {
+        operator = new CWhiteSquareBracket();
+        var props =
+        {
+            location:   DELIMITER_LOCATION_LEFT,
             turn:       DELIMITER_TURN_180
         };
         operator.init(props);
@@ -3435,14 +3909,18 @@ CDelimiter.prototype.init = function(props)
     else
         this.grow = true;
 
-    this.begOper = GetOperator(props.begChr);
-    this.endOper = GetOperator(props.endChr);
+    this.begOper = new COperator ( GetGlyph(props.begChr, BEGINNING_CHR) );
+    this.endOper = new COperator ( GetGlyph(props.endChr, ENDING_CHR) );
+    this.sepOper = new COperator ( GetGlyph(props.sepChr, SEPARATOR_CHR) );
 
-    this.sepOper = GetOperator(props.sepChr);
+    var tPrp = this.getTxtPrp();
+    this.begOper.setTxtPrp(tPrp);
+    this.sepOper.setTxtPrp(tPrp);
+    this.endOper.setTxtPrp(tPrp);
 
-    if(props.shape == "match")
+    if(props.shape == "match" || props.shapeType == DELIMITER_SHAPE_MATH)
         this.shape = DELIMITER_SHAPE_MATH;
-    else if(props.shape == "centered")
+    else if(props.shape == "centered" || props.shapeType == DELIMITER_SHAPE_CENTERED)
         this.shape = DELIMITER_SHAPE_CENTERED;
     else
         this.shape = DELIMITER_SHAPE_CENTERED;
@@ -3483,37 +3961,73 @@ CDelimiter.prototype.recalculateSize = function()
         }
     }
 
-    if(this.begOper !== -1)
+    this.begOper.fixSize(height);
+    width += this.begOper.size.width;
+    height = (height < this.begOper.size.height) ? this.begOper.size.height : height;
+
+    this.endOper.fixSize(height);
+    width += this.endOper.size.width;
+    height = (height < this.endOper.size.height) ? this.endOper.size.height : height;
+
+    this.sepOper.fixSize(height);
+    width += (this.nCol - 1)*this.sepOper.size.width;
+    height = (height < this.sepOper.size.height) ? this.sepOper.size.height : height;
+
+
+    /*if(this.begOper !== -1)
     {
         this.begOper.fixSize(height);
         width += this.begOper.size.width;
+
+        if(height < this.begOper.size.height)
+        {
+            center = this.begOper.size.center;
+            height = this.begOper.size.height;
+
+        }
+
+        //height = (height < this.begOper.size.height) ? this.begOper.size.height : height;
+        //center = (center < this.begOper.size.center) ? this.begOper.size.center : center;
     }
     if(this.endOper !== -1)
     {
         this.endOper.fixSize(height);
         width += this.endOper.size.width;
+
+        //height = (height < this.endOper.size.height) ? this.endOper.size.height : height;
+        //center = (center < this.endOper.size.center) ? this.endOper.size.center : center;
+
+        if(height < this.endOper.size.height)
+        {
+            center = this.endOper.size.center;
+            height = this.endOper.size.height;
+
+        }
     }
     if(this.sepOper !== -1)
     {
         this.sepOper.fixSize(height);
         width += (this.nCol - 1)*this.sepOper.size.width;
-    }
+
+        height = (height < this.sepOper.size.height) ? this.sepOper.size.height : height;
+        center = (center < this.sepOper.size.center) ? this.sepOper.size.center : center;
+    }*/
 
     this.size = {width: width, height: height, center: center};
 
 }
-CDelimiter.prototype.align = function(element)
+CDelimiter.prototype.alignOperator = function(height)
 {
     var align = 0;
 
-    if(this.size.height > element.size.height)
+    if(this.size.height > height)
     {
         if(this.shape == DELIMITER_SHAPE_CENTERED)
-            align = this.size.center - element.size.center;
+            align = this.size.center - height/2;
         else if(this.shape == DELIMITER_SHAPE_MATH)
         {
             var ascent = this.size.center,
-                descent = this.size.height - this.size.center;
+                descent = this.size.height - height/2;
 
             var k = ascent/descent;
 
@@ -3522,48 +4036,60 @@ CDelimiter.prototype.align = function(element)
             else if(k > 0.8)
                 k = 0.8;
 
-            align = ascent - element.size.height/2 * k;
+            align = this.size.center - height*k;
         }
     }
 
     return align;
 }
-CDelimiter.prototype.setPosition = function(pos)
+CDelimiter.prototype.setPosition = function(position)
 {
-    this.pos = {x: pos.x, y: pos.y - this.size.center};
+    this.pos = {x: position.x, y: position.y - this.size.center};
 
+    var x = this.pos.x,
+        y = this.pos.y;
 
+    var pos = {x: x, y: y + this.align(this.begOper)};
+    this.begOper.setPosition([pos]);
+    x += this.begOper.size.width;
 
+    var content = this.elements[0][0];
+    pos = {x: x, y: y + this.align(content)};
+    content.setPosition(pos);
 
-    /*if(this.begOper !== -1)
+    x += content.size.width;
+
+    var Positions = new Array();
+    for(var j = 1 ; j < this.nCol; j++)
     {
-        var position = { x: this.pos.x, y: this.pos.y + this.align(this.begOper) };
-        this.begOper.setPosition(position);
+        pos = {x: x, y: y + this.align(this.sepOper)};
+        Positions.push(pos);
+        x += this.sepOper.size.width;
+
+        content = this.elements[0][j];
+        pos = {x: x, y: y + this.align(content)};
+        content.setPosition(pos);
+        x += content.size.width;
     }
 
-    if(this.sepOper !== -1)
-    {
-        var position = { x: this.pos.x, y: this.pos.y + this.align(this.sepOper) };
-        this.sepOper.setPosition(position);
-    }
+    this.sepOper.setPosition(Positions);
 
-    if(this.endOper !== -1)
-    {
-        var position = { x: this.pos.x, y: this.pos.y + this.align(this.endOper) };
-        this.endOper.setPosition(position);
-    }
+    pos = {x: x, y: y + this.align(this.endOper)};
+    this.endOper.setPosition([pos]);
 
-    for(var j = 0; j < this.nCol; j++)
-    {
-        var position =
-        {
-            x: this.pos.x,
-            y: this.pos.y + this.align(this.elements[0][j])
-        };
 
+    /*for(var j = 0; j < this.nCol; j++)
+    {
+        var align = this.size.center - this.elements[0][j].size.center;
+        var position = { x: x1, y: y1 + align};
+        //var position = { x: x1, y: y1 };
         this.elements[0][j].setPosition(position);
-    }*/
 
+        x1 += this.elements[0][j].size.width;
+
+        if(this.sepOper !== -1)
+            x1 += this.sepOper.size.width;
+    }*/
 }
 CDelimiter.prototype.findDisposition = function(pos)
 {
@@ -3571,13 +4097,148 @@ CDelimiter.prototype.findDisposition = function(pos)
 }
 CDelimiter.prototype.draw = function()
 {
+
+    /*
+     var x1 = this.pos.x,
+     y1 = this.pos.y;
+
     if(this.begOper !== -1)
-        this.begOper.draw();
-    if(this.endOper !== -1)
-        this.endOper.draw();
+    {
+        var begCoord = this.begOper.getCoordinateGlyph();
+        var begPos = {x: x1, y: y1 + this.alignOperator(begCoord.H)};
+
+        this.drawOperator(begPos, begCoord, this.begOper);
+
+        x1 += this.begOper.size.width;
+    }
+
     if(this.sepOper !== -1)
-        this.sepOper.draw();
+    {
+        var sepCoord = this.sepOper.getCoordinateGlyph();
+
+        for(var j = 0; j < this.nCol-1; j++)
+        {
+            var sepPos = {x: x1 + this.elements[0][j].size.width, y: y1};
+            this.drawOperator(sepPos, sepCoord, this.sepOper);
+            x1 += this.sepOper.size.width + this.elements[0][j].size.width;
+        }
+        x1 += this.elements[0][this.nCol-1].size.width;
+    }
+    else
+    {
+        for(var j = 0; j < this.nCol; j++)
+            x1 += this.elements[0][j].size.width;
+    }
+
+    if(this.endOper !== -1)
+    {
+        var endCoord = this.endOper.getCoordinateGlyph();
+        var endPos = {x: x1, y: y1};
+
+        this.drawOperator(endPos, endCoord, this.endOper);
+    }*/
+
+    this.begOper.draw();
+    this.sepOper.draw();
+    this.endOper.draw();
 
     for(var j = 0; j < this.nCol; j++)
         this.elements[0][j].draw();
+}
+CDelimiter.prototype.drawOperator = function(pos, coord, glyph)
+{
+    var X = new Array(),
+        Y = new Array();
+    
+    for(var i = 0; i < coord.XX.length; i++)
+    {
+        X[i] = pos.x + coord.XX[i];
+        Y[i] = pos.y + coord.YY[i];
+    }
+    
+    glyph.drawGlyph(X, Y);
+}
+CDelimiter.prototype.align = function(element)
+{
+    var align = 0;
+    if(!element.IsJustDraw())
+        align = this.size.center - element.size.center;
+    else
+        align = (this.size.height - element.size.height)/2;
+
+    return align;
+}
+
+
+function COperator(glyph)
+{
+    this.glyph = glyph;
+
+    this.positions = null;
+    this.coordGlyph = null;
+    this.size = {width: 0, height: 0};
+}
+COperator.prototype.draw = function()
+{
+    if(this.glyph !== -1)
+    {
+        var lng = this.coordGlyph.XX.length;
+
+        for(var i = 0; i < this.positions.length; i++)
+        {
+            var X = new Array(),
+                Y = new Array();
+            for(var j = 0; j < lng; j++)
+            {
+                X.push(this.positions[i].x + this.coordGlyph.XX[j]);
+                Y.push(this.positions[i].y + this.coordGlyph.YY[j]);
+            }
+
+            this.glyph.draw(X, Y);
+        }
+    }
+}
+COperator.prototype.fixSize = function(measure)
+{
+    if(this.glyph !== -1)
+    {
+        this.glyph.fixSize(measure);
+        var dims = this.glyph.getCoordinateGlyph();
+
+        this.coordGlyph = {XX: dims.XX, YY: dims.YY};
+
+        var width = this.glyph.size.width > dims.Width ? this.glyph.size.width : dims.Width,
+            height = this.glyph.size.height > dims.Height ? this.glyph.size.height : dims.Height;
+
+        this.size = { width: width, height: height, center: height/2};
+    }
+}
+COperator.prototype.setPosition = function(positions)
+{
+    this.positions = positions;
+}
+COperator.prototype.IsJustDraw = function()
+{
+    return true;
+}
+COperator.prototype.Resize = function()
+{
+    if(this.glyph !== -1)
+    {
+        var bHor = this.glyph.loc == 0 || this.glyph.loc  == 1;
+
+        if(bHor)
+            this.fixSize(this.size.width);
+        else
+            this.fixSize(this.size.height);
+    }
+}
+COperator.prototype.relate = function(parent)
+{
+    this.Parent = parent;
+}
+COperator.prototype.setTxtPrp = function(txtPrp)
+{
+    if(this.glyph !== -1)
+        this.glyph.setTxtPrp(txtPrp);
 }

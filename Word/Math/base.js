@@ -106,9 +106,10 @@ CMathBase.prototype =
         //this.TxtPrp  = new CMathTextPrp();
         this.TxtPrp.Merge(txtPrp);
 
+        var tPrp = this.getTxtPrp();
         for(var i=0; i < this.nRow; i++)
             for(var j = 0; j < this.nCol; j++)
-                this.elements[i][j].setTxtPrp(this.getTxtPrp());
+                this.elements[i][j].setTxtPrp(tPrp);
     },
     setOwnTPrp: function(txtPrp)
     {
