@@ -522,12 +522,19 @@ CopyProcessor.prototype =
     {
         var oPropMap =
         {
-            FontFamily: function( oThis, val )
+            RFonts: function( oThis, val )
             {
-                var sFontName = val.Name;
-                if (sFontName == "" && 0 <= val.Index)
-                    sFontName = oThis.fontsArray[val.Index].Name;
-                oThis.orPr["font-family"] = "'" + sFontName + "'";
+                var sFontName = null;
+				if(null != val.Ascii)
+					sFontName = val.Ascii.Name;
+				else if(null != val.HAnsi)
+					sFontName = val.HAnsi.Name;
+				else if(null != val.EastAsia)
+					sFontName = val.EastAsia.Name;
+				else if(null != val.CS)
+					sFontName = val.CS.Name;
+				if(null != sFontName)
+					oThis.orPr["font-family"] = "'" + sFontName + "'";
             },
 
             FontSize: function( oThis, val )
@@ -3440,11 +3447,25 @@ PasteProcessor.prototype =
                 Italic     : false,
                 Underline  : false,
                 Strikeout  : false,
-                FontFamily :
-                {
-                    Name  : "Arial",
-                    Index : -1
-                },
+				RFonts :
+				{
+					Ascii: {
+						Name  : "Arial",
+						Index : -1
+					},
+					EastAsia: {
+						Name  : "Arial",
+						Index : -1
+					},
+					HAnsi: {
+						Name  : "Arial",
+						Index : -1
+					},
+					CS: {
+						Name  : "Arial",
+						Index : -1
+					}
+				},
                 FontSize   : 11,
                 Color      :
                 {
@@ -3465,7 +3486,13 @@ PasteProcessor.prototype =
             {
                 var oFontItem = this.oFonts[font_family];
                 if(null != oFontItem && null != oFontItem.Name)
+				{
                     rPr.FontFamily = {Name: oFontItem.Name, Index: oFontItem.Index};
+					rPr.RFonts.Ascii = {Name: oFontItem.Name, Index: oFontItem.Index};
+					rPr.RFonts.HAnsi = {Name: oFontItem.Name, Index: oFontItem.Index};
+					rPr.RFonts.CS = {Name: oFontItem.Name, Index: oFontItem.Index};
+					rPr.RFonts.EastAsia = {Name: oFontItem.Name, Index: oFontItem.Index};
+				}
             }
             var font_size = node.style.fontSize;
             if(!font_size)
