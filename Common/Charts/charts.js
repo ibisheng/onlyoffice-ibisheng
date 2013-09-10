@@ -1278,7 +1278,7 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart, options)
 	if(newArr != undefined)
 	{
 		chart.arrFormatAdobeLabels = newAdobeLabels;
-		drawChart(chart, newArr, width, height);
+		drawChart(chart, newArr, width, height, options);
 	}	
 	else
 	{
@@ -1290,12 +1290,12 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart, options)
 				//надо перевернуть массив
 				arrValuesRev = arrReverse(arrValues);
 				chart.arrFormatAdobeLabels = arrReverse(arrFormatAdobeLabels);
-				drawChart(chart, arrValuesRev, width, height);
+				drawChart(chart, arrValuesRev, width, height, options);
 			}
 			else
 			{
 				chart.arrFormatAdobeLabels = arrFormatAdobeLabels;
-				drawChart(chart, arrValues, width, height);
+				drawChart(chart, arrValues, width, height, options);
 			}
 		}
 		else
@@ -1312,7 +1312,7 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart, options)
 				{
 					chart.isSkip = isSkip;
 					chart.arrFormatAdobeLabels = arrFormatAdobeLabels;
-					drawChart(chart, arrValues, width, height);
+					drawChart(chart, arrValues, width, height, options);
 				}
 			}
 			else
@@ -1321,14 +1321,14 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart, options)
 				{
 					chart.isSkip = isSkip;
 					chart.arrFormatAdobeLabels = arrFormatAdobeLabels;
-					drawChart(chart, arrValues, width, height);
+					drawChart(chart, arrValues, width, height, options);
 				}
 				else
 				{
 					//chart.isSkip = isSkipRev;
 					chart.isSkip = isSkip;
 					chart.arrFormatAdobeLabels = arrFormatAdobeLabelsRev;
-					drawChart(chart, arrValuesRev, width, height);
+					drawChart(chart, arrValuesRev, width, height, options);
 				}
 			}
 		}
@@ -1350,7 +1350,7 @@ function arrReverse(arr) {
 	return newarr;
 }
 
-function drawChart(chart, arrValues, width, height) {
+function drawChart(chart, arrValues, width, height, options) {
 
 	var data = arrValues;
 	var api_doc = window["editor"];
@@ -1442,7 +1442,19 @@ function drawChart(chart, arrValues, width, height) {
 	var theme;
 	var colorMap;
 	var RGBA;
-	if(api_sheet)
+	var slide;
+	var layout;
+	var masterSlide;
+	
+	if(options)
+	{
+		theme  = options.theme;
+		slide = options.slide;
+		layout = options.layout;
+		masterSlide = options.masterSlide;
+		RGBA = {R: 0, G: 0, B: 0, A: 255};
+	}
+	else if(api_sheet)
 	{
 		var wb = api_sheet.wbModel;
 		theme = wb.theme;
@@ -1467,7 +1479,10 @@ function drawChart(chart, arrValues, width, height) {
 				bar._otherProps._key[j] = chart.reSeries[j].TxCache.Tx;
 			if(chart.reSeries[j].OutlineColor)
 			{
-				chart.reSeries[j].OutlineColor.Calculate(theme, colorMap, RGBA);
+				if(options)
+					chart.reSeries[j].OutlineColor.Calculate(theme, colorMap, RGBA);
+				else
+					chart.reSeries[j].OutlineColor.Calculate(theme, slide, layout, masterSlide, RGBA)
 				rgba = chart.reSeries[j].OutlineColor.RGBA;
 				curColor = getHexColor(rgba.R, rgba.G, rgba.B);
 				bar._otherProps._colors[j] = curColor;
