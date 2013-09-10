@@ -4247,7 +4247,7 @@ function BinaryPPTYLoader()
                     var _length = s.GetLong();
                     var _pos = s.cur;
 
-                    _chart = new CChartAsGroup();
+                    _chart = new CChartAsGroup(this.TempMainObject);
                     var _stream = new FT_Stream2();
                     _stream.data = s.data;
                     _stream.pos = s.pos;

@@ -2,7 +2,9 @@
 var chartCanvas = null;
 var g_bChartPreview = false;
 
-function ChartRender() {
+function ChartRender(options) {
+
+    this.options = options;
 	
 	this.insertChart = function(chart, activeWorkSheet, width, height, isNewChart, bChartPreview) {
 	
@@ -31,8 +33,7 @@ function ChartRender() {
 		//	chartBase64 = chartCanvas.toDataURL();
 		
 		//return chartBase64;
-
-		insertChart(chart, activeWorkSheet, width, height, isNewChart);
+		insertChart(chart, activeWorkSheet, width, height, isNewChart, this.options);
         var ret  = chartCanvas;
         chartCanvas = null;
         return ret;
@@ -153,14 +154,14 @@ function ChartPreviewManager() {
 	previewGroups[c_oAscChartType.stock] = [];
 	previewGroups[c_oAscChartType.stock][c_oAscChartSubType.normal] = [];
 	
-	_this.init = function() {
+	_this.init = function(options) {
 	
 		var startTime = new Date();
 	
 		var api_doc = window["editor"];
 		var api_sheet = window["Asc"]["editor"];
 		var styleManager = api_doc ? api_doc.chartStyleManager : api_sheet.chartStyleManager;
-		var chartRender = new ChartRender();
+		var chartRender = new ChartRender(options);
 		
 		var preview_w = 50, preview_h = 50;
 		
@@ -980,7 +981,7 @@ function formulaToRange(formula, worksheet) {
 	return range;
 }
 
-function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
+function insertChart(chart, activeWorkSheet, width, height, isNewChart, options) {
 	var isSeries = false;
 	var formatCell = 'General';
 	var formatCellScOy = 'General';

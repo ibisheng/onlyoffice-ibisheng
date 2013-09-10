@@ -936,11 +936,11 @@ function CBinaryFileWriter()
                 {
                     oThis.WriteShape(spTree[i]);
                 }
-                else if(spTree[i] instanceof CImage2)
+                else if(spTree[i] instanceof CImageShape)
                 {
                     oThis.WriteImage(spTree[i]);
                 }
-                else if (spTree[i] instanceof GroupShape)
+                else if (spTree[i] instanceof CGroupShape)
                 {
                     oThis.WriteGroupShape(spTree[i]);
                 }
@@ -1995,7 +1995,7 @@ function CBinaryFileWriter()
         oThis._WriteBool2(0, shape.attrUseBgFill);
         oThis.WriteUChar(g_nodeAttributeEnd);
 
-        shape.spPr.WriteXfrm = shape.getXfrm();
+        shape.spPr.WriteXfrm = shape.spPr.xfrm;
 
         var tmpGeom = shape.spPr.Geometry;
         shape.spPr.Geometry = shape.geometry;
@@ -2037,7 +2037,7 @@ function CBinaryFileWriter()
 
         oThis.WriteRecord1(0, image.nvPicPr, this.WriteUniNvPr);
 
-        image.spPr.WriteXfrm = image.getXfrm();
+        image.spPr.WriteXfrm = image.spPr.xfrm;
 
         if (image.spPr.Geometry === undefined || image.spPr.Geometry == null)
         {
@@ -2062,7 +2062,7 @@ function CBinaryFileWriter()
         oThis.WriteUChar(g_nodeAttributeEnd);
 
         oThis.WriteRecord1(0, grObj.nvGraphicFramePr, oThis.WriteUniNvPr);
-        oThis.WriteRecord2(1, grObj.getXfrm(), oThis.WriteXfrm);
+        oThis.WriteRecord2(1, grObj.spPr.xfrm, oThis.WriteXfrm);
         oThis.WriteRecord2(2, grObj.graphicObject, oThis.WriteTable2);
 
         oThis.EndRecord();
@@ -2075,7 +2075,7 @@ function CBinaryFileWriter()
         oThis.WriteUChar(g_nodeAttributeStart);
         oThis.WriteUChar(g_nodeAttributeEnd);
 
-        oThis.WriteRecord2(1, grObj.getXfrm(), oThis.WriteXfrm);
+        oThis.WriteRecord2(1, grObj.spPr.xfrm, oThis.WriteXfrm);
         oThis.WriteRecord2(3, grObj, oThis.WriteChart2);
 
         oThis.EndRecord();
@@ -2366,14 +2366,14 @@ function CBinaryFileWriter()
     {
         oThis.StartRecord(4);
 
-        group.grpSpPr.WriteXfrm = group.getXfrm();
+        group.spPr.WriteXfrm = group.spPr.xfrm;
 
         oThis.WriteRecord1(0, group.nvGrpSpPr, oThis.WriteUniNvPr);
-        oThis.WriteRecord1(1, group.grpSpPr, oThis.WriteGrpSpPr);
+        oThis.WriteRecord1(1, group.spPr, oThis.WriteGrpSpPr);
 
-        group.grpSpPr.WriteXfrm = null;
+        group.spPr.WriteXfrm = null;
 
-        var spTree = group.ArrGlyph;
+        var spTree = group.spTree;
         var _len = spTree.length;
         if (0 != _len)
         {
