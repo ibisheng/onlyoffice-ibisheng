@@ -191,7 +191,9 @@
                         "../Fonts/native/*.otf",
                         "../Fonts/native/*.TTF",
                         "../Fonts/native/*.TTC",
-                        "../Fonts/native/*.OTF"
+                        "../Fonts/native/*.OTF",
+						"../Fonts/native/*.bin",
+						"../Fonts/native/*.BIN"
                     ]
                 }
             },
