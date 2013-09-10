@@ -3834,11 +3834,14 @@ function CDrawingDocument()
 
         if (!this.IsTextMatrixUse)
         {
-            var _x = ((drawPage.left + dKoefX * x) >> 0) - 0.5;
-            var _y = ((drawPage.top + dKoefY * y) >> 0) - 0.5;
+            var _x = ((drawPage.left + dKoefX * x) >> 0);
+            var _y = ((drawPage.top + dKoefY * y) >> 0);
 
-            var _w = (dKoefX * w + 1) >> 0;
-            var _h = (dKoefY * h + 1) >> 0;
+            var _r = ((drawPage.left + dKoefX * (x + w)) >> 0);
+            var _b = ((drawPage.top + dKoefY * (y + h)) >> 0);
+
+            var _w = _r - _x + 1;
+            var _h = _b - _y + 1;
 
             this.Overlay.CheckRect(_x, _y, _w, _h);
             this.Overlay.m_oContext.rect(_x,_y,_w,_h);
