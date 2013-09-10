@@ -16,6 +16,9 @@ prop:autoSaveInit
 prop:asyncServerIdStartLoaded
 prop:asyncServerIdEndLoaded
 prop:syncCollaborativeChanges
+prop:SetCollaborativeMarksShowType
+prop:GetCollaborativeMarksShowType
+prop:Clear_CollaborativeMarks
 prop:SetUnchangedDocument
 prop:isDocumentModified
 prop:sync_BeginCatchSelectedElements
@@ -1011,6 +1014,9 @@ asc_docs_api.prototype['autoSaveInit'] = asc_docs_api.prototype.autoSaveInit;
 asc_docs_api.prototype['asyncServerIdStartLoaded'] = asc_docs_api.prototype.asyncServerIdStartLoaded;
 asc_docs_api.prototype['asyncServerIdEndLoaded'] = asc_docs_api.prototype.asyncServerIdEndLoaded;
 asc_docs_api.prototype['syncCollaborativeChanges'] = asc_docs_api.prototype.syncCollaborativeChanges;
+asc_docs_api.prototype['SetCollaborativeMarksShowType'] = asc_docs_api.prototype.SetCollaborativeMarksShowType;
+asc_docs_api.prototype['GetCollaborativeMarksShowType'] = asc_docs_api.prototype.GetCollaborativeMarksShowType;
+asc_docs_api.prototype['Clear_CollaborativeMarks'] = asc_docs_api.prototype.Clear_CollaborativeMarks;
 asc_docs_api.prototype['SetUnchangedDocument'] = asc_docs_api.prototype.SetUnchangedDocument;
 asc_docs_api.prototype['isDocumentModified'] = asc_docs_api.prototype.isDocumentModified;
 asc_docs_api.prototype['sync_BeginCatchSelectedElements'] = asc_docs_api.prototype.sync_BeginCatchSelectedElements;

@@ -806,7 +806,7 @@ STATES_ID_MOVE_IN_GROUP:YB
 check_MouseDownEvent:FD
 TT_SBit_StrikeRec:Zk
 historyitem_TextPr_Strikeout:zz
-ft_module_get_service:fj
+ft_module_get_service:ej
 c_oAscWrapStyle$Flow:NE
 JSCompiler_StaticMethods__CalcMaxWidthByCell:kd
 CParagraphShd:oR
@@ -944,7 +944,7 @@ g_clr_MIN:lP
 FORMULA_TYPE_MIN:FM
 power_tens:Tt
 CGrState_State:iD
-ft_stub_set_char_sizes:Jk
+ft_stub_set_char_sizes:Ek
 nSldLtTFourObj:RL
 JSCompiler_StaticMethods__set_pPr:Wd
 JSCompiler_StaticMethods_Internal_Check_Ranges:aI
@@ -952,7 +952,7 @@ SetErrorAndReturn:Gs
 JSCompiler_StaticMethods_Search_Stop:IJ
 T1_Read_PFM:lv
 isThemeFont:KI
-CAscFillBlip:VQ
+CAscFillBlip:UQ
 Common_CmpObj2:$d
 FontRef:sh
 JSCompiler_StaticMethods_Internal_RecalculateFrom:eG
@@ -1020,7 +1020,7 @@ TT_GlyphZoneRec:bl
 JSCompiler_StaticMethods_Internal_FindForward:dI
 c_oAscLineDrawingRule$Top:qF
 recalcresult_NextPage:rG
-_message_update:JO
+_message_update:IO
 create_cmap_class_rec:Il
 tt_cmap4_init:Uo
 g_sMainServiceLocalUrl:qf
@@ -1351,7 +1351,7 @@ FT_Face_Internal:Jl
 compare_kern_pairs:kv
 STATES_ID_CHANGE_ADJ_IN_GROUP:SB
 DrawGroupSelection:FC
-MIN_ANGLE:eL
+MIN_ANGLE:dL
 __FT_CMapRec:Fl
 tt_cmap14_get_nondef_chars:Ip
 JSCompiler_StaticMethods_removeSlide:wJ
@@ -1609,7 +1609,7 @@ FT_Stream:jj
 CParagraphInd:nR
 TRaster:zq
 cff_index_init:fu
-L 121:Mj
+L 121:Nj
 L 120:hP
 JSCompiler_StaticMethods_removeSelectedObjects:oB
 JSCompiler_StaticMethods__BordersToStyle:qb
@@ -1653,7 +1653,7 @@ Sort_Ranges_X0:ZI
 ft_sid_names:Ul
 historyitem_TableId_Reset:Jx
 historyitem_type_Comment:cy
-L 102:Ji
+L 102:Ki
 T1_Decoder_ZoneRec:Ln
 T1_Size_Request:Av
 L 101:vl
@@ -1977,7 +1977,7 @@ L 33:fa
 T1_DecoderRec:Mn
 FT_Service_PsInfoRec:Zi
 CHistory:KH
-FT_ServiceCache:ij
+FT_ServiceCache:gj
 _weight_clipArt:xL
 JSCompiler_StaticMethods_Set_DocumentPageSize:QJ
 tt_services:kt
@@ -2019,11 +2019,11 @@ tt_face_load_bhed:io
 T1_Loader:Mv
 JSCompiler_StaticMethods_changeCurrentState:wB
 nSldLtTClipArtAndTx:NL
-L 59:Gk
-L 58:ej
+L 59:Hk
+L 58:fj
 L 57:Cf
-L 56:Fk
-L 55:Ek
+L 56:Gk
+L 55:Fk
 TT_Round_Super_45:Yq
 L 54:Re
 tt_cmap10_char_index:ep
@@ -2057,7 +2057,7 @@ L 47:zg
 L 46:Ub
 L 41:Tc
 TT_Post_NamesRec:$k
-ft_bitmap_glyph_init:Nj
+ft_bitmap_glyph_init:Mj
 L 40:Fe
 JSCompiler_StaticMethods__read_rPr:Xd
 Get_Kerning:aw
@@ -2078,7 +2078,7 @@ JSCompiler_StaticMethods_Set_RangeStartPos:XH
 isRealObject:F
 _weight_pic:CL
 historyitem_TableCell_W:eH
-BULLET_TYPE_TYPEFACE_TX:Ki
+BULLET_TYPE_TYPEFACE_TX:Ji
 tt_cmap14_get_def_chars:Hp
 JSCompiler_StaticMethods_Internal_UpdateCellW:vG
 CGraphics:$M
@@ -2229,7 +2229,7 @@ _ph_summ__sec_head:BP
 L 76:kf
 tt_face_load_bdf_props:Xn
 L 77:Oc
-L 78:gj
+L 78:hj
 dublicate_matrix:rl
 L 79:ce
 t1_args_count:An
@@ -2275,10 +2275,10 @@ L 61:hf
 L 60:Vb
 L 99:hg
 L 95:gi
-L 96:hj
+L 96:ij
 L 97:Eg
 JSCompiler_StaticMethods_Set_TableBorder_Top:Od
-L 98:Ik
+L 98:Jk
 CFF_Driver:hv
 STATES_ID_PRE_RESIZE:IB
 sfnt_open_font:dq
@@ -2305,7 +2305,7 @@ JSCompiler_StaticMethods_Set_TableBorder_InsideV:Gd
 L 88:fg
 L 89:dh
 JSCompiler_StaticMethods_Set_Inline:XE
-L 86:Hk
+L 86:Ik
 L 87:Dg
 L 84:Cg
 L 85:Ef
