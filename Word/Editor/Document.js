@@ -7762,7 +7762,22 @@ CDocument.prototype =
                 if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
                 {
                     this.Create_NewHistoryPoint();
-                    Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
+
+                    if (!window.USER_AGENT_SAFARI_MACOS)
+                    {
+                        Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
+                        //не возвращаем true чтобы не было preventDefault
+                    }
+                    else
+                    {
+                        SafariIntervalFocus();
+
+                        if (0 === window.GlobalPasteFlagCounter)
+                        {
+                            Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
+                            //не возвращаем true чтобы не было preventDefault
+                        }
+                    }
                 }
                 //не возвращаем true чтобы не было preventDefault
             }
@@ -7995,8 +8010,21 @@ CDocument.prototype =
                 }
                 else // Ctrl + V - paste
                 {
-                    Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
-                    //не возвращаем true чтобы не было preventDefault
+                    if (!window.USER_AGENT_SAFARI_MACOS)
+                    {
+                        Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
+                        //не возвращаем true чтобы не было preventDefault
+                    }
+                    else
+                    {
+                        SafariIntervalFocus();
+
+                        if (0 === window.GlobalPasteFlagCounter)
+                        {
+                            Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
+                            //не возвращаем true чтобы не было preventDefault
+                        }
+                    }
                 }
             }
         }

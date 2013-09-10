@@ -329,6 +329,18 @@ var ASC_DOCS_API_USE_OPEN_SOURCE_FONTS_ONLY = false;
             this._LoadFonts();
         }
 
+        this.CheckFontsNeedLoading = function(_fonts)
+        {
+            for (var i in _fonts)
+            {
+                var info = this.fontInfos[this.map_font_index[_fonts[i].name]];
+                var _isNeed = info.CheckFontLoadStylesNoLoad(this);
+                if (_isNeed === true)
+                    return true;
+            }
+            return false;
+        }
+
         this.LoadDocumentFonts2 = function(_fonts)
         {
             // сначала заполняем массив this.fonts_loading объекстами fontinfo

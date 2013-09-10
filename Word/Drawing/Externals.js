@@ -525,6 +525,30 @@ function CFontInfo(sName, thumbnail, type, indexR, faceIndexR, indexI, faceIndex
         return isNeed;
     }
 
+    this.CheckFontLoadStylesNoLoad = function(global_loader)
+    {
+        var fonts = (FONT_TYPE_EMBEDDED == this.Type) ? global_loader.embeddedFontFiles : global_loader.fontFiles;
+        var _isNeed = false;
+        if ((-1 != this.indexR) && (fonts[this.indexR].CheckLoaded() === false))
+        {
+            _isNeed = true;
+        }
+        if ((-1 != this.indexI) && (fonts[this.indexI].CheckLoaded() === false))
+        {
+            _isNeed = true;
+        }
+        if ((-1 != this.indexB) && (fonts[this.indexB].CheckLoaded() === false))
+        {
+            _isNeed = true;
+        }
+        if ((-1 != this.indexBI) && (fonts[this.indexBI].CheckLoaded() === false))
+        {
+            _isNeed = true;
+        }
+
+        return _isNeed;
+    }
+
     this.LoadFontsFromServer = function(global_loader)
     {
         var fonts = global_loader.fontFiles;

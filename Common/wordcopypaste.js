@@ -22,6 +22,7 @@
 }
 
 window.USER_AGENT_SAFARI_MACOS = (navigator.userAgent.toLowerCase().indexOf('safari') > -1 && navigator.userAgent.toLowerCase().indexOf('mac') > -1) ? true : false;
+window.GlobalPasteFlagCounter = 0;
 
 var COPY_ELEMENT_ID = "SelectId";
 var PASTE_ELEMENT_ID = "wrd_pastebin";
@@ -1890,6 +1891,8 @@ function CanPaste(oDocument)
 };
 function Editor_Paste(api, bClean)
 {
+    window.GlobalPasteFlagCounter = 1;
+
     var oWordControl = api.WordControl;
     oWordControl.bIsEventPaste = false;
     var oDocument = oWordControl.m_oLogicDocument;
@@ -1932,8 +1935,18 @@ function Editor_Paste(api, bClean)
         }
     }
     //���� ���������� paste
-    window.setTimeout( function()
-    {
+
+    var func_timeout = function() {
+
+        if (window.USER_AGENT_SAFARI_MACOS)
+        {
+            if (window.GlobalPasteFlagCounter != 2)
+            {
+                window.setTimeout(func_timeout, 10);
+                return;
+            }
+        }
+
         document.body.style.MozUserSelect = "none";
         document.body.style["-khtml-user-select"] = "none";
         document.body.style["-o-user-select"] = "none";
@@ -1941,10 +1954,13 @@ function Editor_Paste(api, bClean)
         document.body.style["-webkit-user-select"] = "none";
 
         if(!oWordControl.bIsEventPaste)
+        {
             Editor_Paste_Exec(api, pastebin);
+        }
         else
             pastebin.style.display  = ELEMENT_DISPAY_STYLE;
-    }, 0 );
+    };
+    window.setTimeout( func_timeout, 0 );
 };
 function CopyPasteCorrectString(str)
 {
@@ -2301,6 +2317,8 @@ PasteProcessor.prototype =
             this.oRecalcDocument.Recalculate();
             this.oLogicDocument.Document_UpdateInterfaceState();
         }
+
+        window.GlobalPasteFlagCounter = 0;
     },
     InsertInPlace : function(oDoc, aNewContent)
     {
@@ -4679,7 +4697,11 @@ function Editor_CopyPaste_Create(api)
 
     ElemToSelect.onpaste = function(e){
         //Editor_Paste(api, true);
-        Body_Paste(api,e);
+        if (window.GlobalPasteFlagCounter == 1)
+        {
+            Body_Paste(api,e);
+            window.GlobalPasteFlagCounter = 2;
+        }
     };
 
     var TIME_PREVIOS_ONBEFORE_EVENTS = new Date().getTime();
