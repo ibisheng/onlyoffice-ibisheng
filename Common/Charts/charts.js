@@ -1040,7 +1040,7 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 			else
 				curSeria = series[l].Val.NumCache;
 			var lastCol = curSeria.length;
-			skipSeries[numSeries] = true;
+			skipSeries[l] = true;
 			var isRow = false;
 			if(firstCol == lastCol)
 				isRow  = true;
@@ -1049,9 +1049,13 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 			{
 				continue;
 			}
+			if(!curSeria.length)
+			{
+				continue;
+			}
 			if(series[0].xVal.Formula != null && numSeries == 0 && chart.type == 'Scatter')
 				l--;
-			skipSeries[numSeries] = false;
+			skipSeries[l] = false;
 			arrValues[numSeries] = [];
 			arrFormatAdobeLabels[numSeries] = [];
 			isSkip[numSeries] = true;
