@@ -863,7 +863,7 @@ c_oAscServerError$StorageRead:Df
 JSCompiler_StaticMethods_Create_Default_Bullet:ie
 c_oMainTables$Themes:vj
 c_oSerProp_rPrType$RStyle:TY
-bar:R
+bar:S
 cff_slot_init:AA
 tt_cmap_init:Hu
 Y_Bottom_Field:hd
@@ -2608,7 +2608,7 @@ c_oSerImageType2$SimplePos:q_
 FT_BitmapGlyphRec:$p
 historyitem_type_WrapPolygon:xI
 nSldLtTVertTitleAndTx:lM
-global_MatrixTransformer:X
+global_MatrixTransformer:W
 CreateControlContainer:T4
 c_oSerImageType2$BehindDoc:c_
 CClipManager:P2
@@ -2966,10 +2966,10 @@ sfnt_load_face:Xv
 numbering_numfmt_LowerLetter:Aa
 arcTo:dk
 nSldLtTChartAndTx:KL
-L 21:T
+L 21:U
 L 20:O
-L 23:U
-L 22:V
+L 23:R
+L 22:X
 c_oSerSimplePos$Y:H_
 L 25:ka
 c_oSerSimplePos$X:G_
@@ -3143,7 +3143,7 @@ Int64:yp
 L 75:yl
 JSCompiler_StaticMethods_rebuildSeries:go
 L 76:Cj
-_files$$inline_1358:W
+_files$$inline_1358:V
 _ph_summ__sec_head:LM
 L 77:Rg
 L 78:mf
@@ -3201,7 +3201,7 @@ nSldLtTObjTx:UL
 L 93:mk
 JSCompiler_StaticMethods_Document_UpdateUndoRedoState:gP
 FT_RoundFix:xp
-CFontFileLoader:S
+CFontFileLoader:T
 L 90:zl
 tt_name_entry_ascii_from_utf16:Tv
 Editor_Copy_GetElem:ma
