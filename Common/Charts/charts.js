@@ -1060,7 +1060,11 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart) {
 			var n = 0;
 			for(col = firstCol; col < lastCol; ++col)
 			{
-				if(curSeria[col].isHidden == true)
+				if(!curSeria[col])
+				{
+					curSeria[col] = {val:0};
+				}
+				else if(curSeria[col].isHidden == true)
 				{
 					continue;
 				}
