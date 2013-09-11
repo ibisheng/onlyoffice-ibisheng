@@ -194,6 +194,10 @@ function Editor_Copy(api, bCut)
     delete document.body.style["user-select"];
     document.body.style["-webkit-user-select"] = "text";
 
+    // не убирать!!! это для ие. чтобы не селектились элементы
+    document.onselectstart= function() {
+    }
+
     if (null != api.WordControl.m_oLogicDocument)
     {
         var oCopyProcessor = new CopyProcessor(api, ElemToSelect);
@@ -267,6 +271,12 @@ function Editor_Copy(api, bCut)
         document.body.style["-o-user-select"] = "none";
         document.body.style["user-select"] = "none";
         document.body.style["-webkit-user-select"] = "none";
+
+        // не убирать!!! это для ие. чтобы не селектились элементы
+        document.onselectstart= function() {
+             return false;
+        }
+
         if(true == bCut)
         {
             //������� ���������� ��������
@@ -1769,7 +1779,9 @@ function Editor_Paste_GetElem(api, bClean)
         pastebin.style["-webkit-user-select"] = "text";
         pastebin.setAttribute("contentEditable", true);
 
-        pastebin.onpaste = function(e){Body_Paste(api,e);};
+        pastebin.onpaste = function(e){
+            Body_Paste(api,e);
+        };
         document.body.appendChild( pastebin );
     }
     else if(bClean){
@@ -1919,6 +1931,10 @@ function Editor_Paste(api, bClean)
     delete document.body.style["user-select"];
     document.body.style["-webkit-user-select"] = "text";
 
+    // не убирать!!! это для ие. чтобы не селектились элементы
+    document.onselectstart= function() {
+    }
+
     var Text;
     var pastebin = Editor_Paste_GetElem(api, bClean);
     pastebin.style.display  = "block";
@@ -1959,6 +1975,11 @@ function Editor_Paste(api, bClean)
         document.body.style["-o-user-select"] = "none";
         document.body.style["user-select"] = "none";
         document.body.style["-webkit-user-select"] = "none";
+
+        // не убирать!!! это для ие. чтобы не селектились элементы
+        document.onselectstart= function() {
+            return false;
+        }
 
         if(!oWordControl.bIsEventPaste)
         {
