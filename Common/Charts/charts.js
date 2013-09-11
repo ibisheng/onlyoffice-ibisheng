@@ -1480,9 +1480,9 @@ function drawChart(chart, arrValues, width, height, options) {
 			if(chart.reSeries[j].OutlineColor)
 			{
 				if(options)
-					chart.reSeries[j].OutlineColor.Calculate(theme, colorMap, RGBA);
-				else
 					chart.reSeries[j].OutlineColor.Calculate(theme, slide, layout, masterSlide, RGBA)
+				else
+					chart.reSeries[j].OutlineColor.Calculate(theme, colorMap, RGBA);
 				rgba = chart.reSeries[j].OutlineColor.RGBA;
 				curColor = getHexColor(rgba.R, rgba.G, rgba.B);
 				bar._otherProps._colors[j] = curColor;
