@@ -267,6 +267,14 @@ var historyitem_SetShapeFlips = 3;
 var historyitem_SetShapeParent = 4;
 var historyitem_SetShapeChildOffset = 5;
 var historyitem_SetShapeChildExtents = 6;
+var historyitem_SetShapeSetFill = 7;
+var historyitem_SetShapeSetLine= 8;
+var historyitem_SetShapeSetGeometry = 9;
+var historyitem_SetShapeBodyPr = 10;
+
+
+
+
 
 
 

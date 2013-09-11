@@ -1530,6 +1530,7 @@ CPresentation.prototype =
     {
         this.Slides[this.CurPage].graphicObjects.shapeApply(shapeProps);
         this.Recalculate();
+        this.Document_UpdateInterfaceState();
     },
 
     changeShapeType : function(shapeType)

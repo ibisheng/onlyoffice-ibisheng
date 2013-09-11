@@ -42,6 +42,7 @@ function CChartAsGroup(parent/*(WordGraphicObject)*/, document, drawingDocument,
         [];
     this.selected = false;
     this.mainGroup = null;
+    this.Lock = new CLock();
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 
@@ -356,32 +357,114 @@ CChartAsGroup.prototype =
 
     recalculatePosExt: function()
     {
-        var xfrm;
-        xfrm = this.spPr.xfrm;
         if(!isRealObject(this.group))
         {
-            /*    if(isRealObject(this.parent))
-             {
-             var ext = this.parent.Extent;
-             this.extX = ext.W;
-             this.extY = ext.H;
-             }
-             else
-             {     */
-            //this.x = 0;
-            //this.y = 0;
-            this.extX = xfrm.extX;
-            this.extY = xfrm.extY;
-            //}
+            if(this.spPr.xfrm.isNotNull())
+            {
+                var xfrm = this.spPr.xfrm;
+                this.x = xfrm.offX;
+                this.y = xfrm.offY;
+                this.extX = xfrm.extX;
+                this.extY = xfrm.extY;
+                this.rot = isRealNumber(xfrm.rot) ? xfrm.rot : 0;
+                this.flipH = xfrm.flipH === true;
+                this.flipV = xfrm.flipV === true;
+            }
+            else
+            {
+                if(this.isPlaceholder())
+                {
+                    var hierarchy = this.getHierarchy();
+                    for(var i = 0; i < hierarchy.length; ++i)
+                    {
+                        var hierarchy_sp = hierarchy[i];
+                        if(isRealObject(hierarchy_sp) && hierarchy_sp.spPr.xfrm.isNotNull())
+                        {
+                            var xfrm = hierarchy_sp.spPr.xfrm;
+                            this.x = xfrm.offX;
+                            this.y = xfrm.offY;
+                            this.extX = xfrm.extX;
+                            this.extY = xfrm.extY;
+                            this.rot = isRealNumber(xfrm.rot) ? xfrm.rot : 0;
+                            this.flipH = xfrm.flipH === true;
+                            this.flipV = xfrm.flipV === true;
+                            break;
+                        }
+                    }
+                    if(i === hierarchy.length)
+                    {
+                        this.x = 0;
+                        this.y = 0;
+                        this.extX = 5;
+                        this.extY = 5;
+                        this.rot = 0;
+                        this.flipH = false;
+                        this.flipV = false;
+                    }
+                }
+                else
+                {
+                    this.x = 0;
+                    this.y = 0;
+                    this.extX = 5;
+                    this.extY = 5;
+                    this.rot = 0;
+                    this.flipH = false;
+                    this.flipV = false;
+                }
+            }
         }
         else
         {
+            var xfrm;
+            if(this.spPr.xfrm.isNotNull())
+            {
+                xfrm = this.spPr.xfrm;
+            }
+            else
+            {
+                if(this.isPlaceholder())
+                {
+                    var hierarchy = this.getHierarchy();
+                    for(var i = 0; i < hierarchy.length; ++i)
+                    {
+                        var hierarchy_sp = hierarchy[i];
+                        if(isRealObject(hierarchy_sp) && hierarchy_sp.spPr.xfrm.isNotNull())
+                        {
+                            xfrm = hierarchy_sp.spPr.xfrm;
+                            break;
+                        }
+                    }
+                    if(i === hierarchy.length)
+                    {
+                        xfrm = new CXfrm();
+                        xfrm.offX = 0;
+                        xfrm.offX = 0;
+                        xfrm.extX = 5;
+                        xfrm.extY = 5;
+                    }
+                }
+                else
+                {
+                    xfrm = new CXfrm();
+                    xfrm.offX = 0;
+                    xfrm.offY = 0;
+                    xfrm.extX = 5;
+                    xfrm.extY = 5;
+                }
+            }
             var scale_scale_coefficients = this.group.getResultScaleCoefficients();
             this.x = scale_scale_coefficients.cx*(xfrm.offX - this.group.spPr.xfrm.chOffX);
             this.y = scale_scale_coefficients.cy*(xfrm.offY - this.group.spPr.xfrm.chOffY);
             this.extX = scale_scale_coefficients.cx*xfrm.extX;
             this.extY = scale_scale_coefficients.cy*xfrm.extY;
+            this.rot = isRealNumber(xfrm.rot) ? xfrm.rot : 0;
+            this.flipH = xfrm.flipH === true;
+            this.flipV = xfrm.flipV === true;
         }
+        this.transform.Reset();
+        var hc = this.extX*0.5;
+        var vc = this.extY*0.5;
         this.spPr.geometry.Recalculate(this.extX, this.extY);
     },
 
@@ -396,19 +479,24 @@ CChartAsGroup.prototype =
         return this.transform;
     },
 
+
+
     recalculateMatrix: function()
     {
-        this.transform.Reset();
-        var hc, vc;
-        hc = this.extX*0.5;
-        vc = this.extY*0.5;
-        this.spPr.geometry.Recalculate(this.extX, this.extY);
-        global_MatrixTransformer.TranslateAppend(this.transform, -hc, -vc);
 
+        this.transform.Reset();
+        var hc = this.extX*0.5;
+        var vc = this.extY*0.5;
+        global_MatrixTransformer.TranslateAppend(this.transform, -hc, -vc);
+        if(this.flipH)
+            global_MatrixTransformer.ScaleAppend(this.transform, -1, 1);
+        if(this.flipV)
+            global_MatrixTransformer.ScaleAppend(this.transform, 1, -1);
+        global_MatrixTransformer.RotateRadAppend(this.transform, -this.rot);
         global_MatrixTransformer.TranslateAppend(this.transform, this.x + hc, this.y + vc);
         if(isRealObject(this.group))
         {
-            global_MatrixTransformer.MultiplyAppend(this.transform, this.group.getTransform());
+            global_MatrixTransformer.MultiplyAppend(this.transform, this.group.getTransformMatrix());
         }
         this.invertTransform = global_MatrixTransformer.Invert(this.transform);
 
@@ -1061,7 +1149,7 @@ CChartAsGroup.prototype =
         {
 
             var options = {theme: parents.theme, slide: parents.slide, layout: parents.layout, master: parents.master};
-            this.brush.fill.canvas = (new ChartRender(options)).insertChart(this.chart, null, editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.extX), editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.extY), undefined, undefined, parents.theme, colorMap);
+            this.brush.fill.canvas = (new ChartRender(options)).insertChart(this.chart, null, editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.extX), editor.WordControl.m_oDrawingDocument.GetDotsPerMM(this.extY), undefined, undefined, options);
             this.brush.fill.RasterImageId = "";
             //editor.WordControl.m_oLogicDocument.DrawingObjects.urlMap.push(this.brush.fill.RasterImageId);
         }

@@ -389,5 +389,37 @@ CTextBody.prototype =
     {},
 
     Refresh_RecalcData2: function()
-    {}
+    {},
+    getRectWidth: function(maxWidth)
+    {
+        var body_pr = this.getBodyPr();
+        var r_ins = body_pr.rIns;
+        var l_ins = body_pr.lIns;
+        var max_content_width = maxWidth - r_ins - l_ins;
+        this.content.Reset(0, 0, max_content_width, 20000);
+        this.content.Recalculate_Page(0, true);
+        var max_width = 0;
+        for(var i = 0; i < this.content.Content.length; ++i)
+        {
+            var par = this.content.Content[i];
+            for(var j = 0; j < par.Lines.length; ++j)
+            {
+                if(par.Lines[j].Ranges[0].W + 1> max_width)
+                {
+                    max_width = par.Lines[j].Ranges[0].W;
+                }
+            }
+        }
+        return max_width + r_ins + l_ins;
+    },
+
+    getRectHeight: function(maxHeight, width)
+    {
+        this.content.Reset(0, 0, width, 20000);
+        this.content.Recalculate_Page(0, true);
+        var content_height = this.getSummaryHeight();
+        var t_ins = isRealNumber(this.bodyPr.tIns) ? this.bodyPr.tIns : 1.27;
+        var b_ins = isRealNumber(this.bodyPr.bIns) ? this.bodyPr.bIns : 1.27;
+        return content_height + t_ins + b_ins;
+    }
 };

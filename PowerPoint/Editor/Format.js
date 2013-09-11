@@ -269,6 +269,33 @@ function CColorModifiers()
 
 CColorModifiers.prototype =
 {
+
+    Write_ToBinary2 : function(Writer)
+    {
+        var count = this.Mods.length;
+        Writer.WriteLong(count);
+        for(var i = 0; i < count; ++i)
+        {
+            var cur_mod = this.Mods[i];
+            Writer.WriteString2(cur_mod.name);
+            Writer.WriteLong(cur_mod.val);
+        }
+    },
+
+    Read_FromBinary2 : function(Reader)
+    {
+        var count = Reader.GetLong();
+        for(var i = 0; i < count; ++i)
+        {
+            var cur_mod = {};
+            cur_mod.name = Reader.GetString2();
+            cur_mod.val = Reader.GetLong();
+            this.Mods.push(cur_mod);
+        }
+        return  this;
+    },
+
+
     IsIdentical : function(mods)
     {
         if(mods == null)
@@ -561,6 +588,20 @@ function CSysColor()
 
 CSysColor.prototype =
 {
+
+    Write_ToBinary2 : function(Writer)
+    {
+        Writer.WriteLong(this.type);
+        Writer.WriteString2(this.id);
+        WriteObjectLong(Writer, this.RGBA);
+    },
+
+    Read_FromBinary2 : function(Reader)
+    {
+        this.id = Reader.GetString2();
+        this.RGBA = ReadObjectLong(Reader);
+    },
+
     IsIdentical :  function(color)
     {
         return color && color.type == COLOR_TYPE_SYS && color.id == this.id;
@@ -589,6 +630,18 @@ function CPrstColor()
 
 CPrstColor.prototype =
 {
+    Write_ToBinary2 : function(Writer)
+    {
+        Writer.WriteLong(this.type);
+        Writer.WriteString2(this.id);
+        WriteObjectLong(Writer, this.RGBA);
+    },
+
+    Read_FromBinary2 : function(Reader)
+    {
+        this.id = Reader.GetString2();
+        this.RGBA = ReadObjectLong(Reader);
+    },
     IsIdentical : function(color)
     {
         return color && color.type == COLOR_TYPE_PRST && color.id == this.id;
@@ -621,6 +674,18 @@ function CRGBColor()
 
 CRGBColor.prototype =
 {
+
+    Write_ToBinary2 : function(Writer)
+    {
+        Writer.WriteLong(this.type);
+        WriteObjectLong(Writer, this.RGBA);
+    },
+
+    Read_FromBinary2 : function(Reader)
+    {
+        this.RGBA = ReadObjectLong(Reader);
+    },
+
     IsIdentical : function(color)
     {
         return color && color.type == COLOR_TYPE_SRGB && color.RGBA.R == this.RGBA.R && color.RGBA.G == this.RGBA.G && color.RGBA.B == this.RGBA.B && color.RGBA.A == this.RGBA.A;
@@ -651,6 +716,19 @@ function CSchemeColor()
 
 CSchemeColor.prototype =
 {
+
+    Write_ToBinary2 : function(Writer)
+    {
+        Writer.WriteLong(this.type);
+        Writer.WriteLong(this.id);
+        WriteObjectLong(Writer, this.RGBA);
+    },
+
+    Read_FromBinary2 : function(Reader)
+    {
+        this.id = Reader.GetLong();
+        this.RGBA = ReadObjectLong(Reader);
+    },
     IsIdentical : function(color)
     {
         return color && color.type == COLOR_TYPE_SCHEME && color.id == this.id;
@@ -709,6 +787,55 @@ function CUniColor()
 
 CUniColor.prototype =
 {
+
+
+    Write_ToBinary2 : function(Writer)
+    {
+        var flag = this.color != null;
+        Writer.WriteBool(flag);
+        if(flag)
+            this.color.Write_ToBinary2(Writer);
+        this.Mods.Write_ToBinary2(Writer);
+        WriteObjectLong(Writer, this.RGBA);
+    },
+
+    Read_FromBinary2 : function(Reader)
+    {
+        var flag =  Reader.GetBool();
+        if(flag)
+        {
+            var color_type = Reader.GetLong();
+            switch(color_type)
+            {
+                case COLOR_TYPE_SCHEME:
+                {
+                    this.color = new CSchemeColor();
+                    this.color.Read_FromBinary2(Reader);
+                    break;
+                }
+                case COLOR_TYPE_SRGB:
+                {
+                    this.color = new CRGBColor();
+                    this.color.Read_FromBinary2(Reader);
+                    break;
+                }
+                case COLOR_TYPE_PRST:
+                {
+                    this.color = new CPrstColor();
+                    this.color.Read_FromBinary2(Reader);
+                    break;
+                }
+                case COLOR_TYPE_SYS:
+                {
+                    this.color = new CSysColor();
+                    this.color.Read_FromBinary2(Reader);
+                    break;
+                }
+            }
+        }
+        this.Mods.Read_FromBinary2(Reader);
+        this.RGBA = ReadObjectLong(Reader);
+    },
     createDuplicate : function()
     {
         var duplicate = new CUniColor();
@@ -929,6 +1056,75 @@ function CBlipFill()
 
 CBlipFill.prototype =
 {
+
+    Write_ToBinary2 : function(Writer)
+    {
+        Writer.WriteLong(this.type);
+        var flag = typeof this.RasterImageId === "string";
+        Writer.WriteBool(flag);
+        if(flag)
+        {
+            var string_to_write =  _getFullImageSrc(this.RasterImageId);
+            if(string_to_write.indexOf(documentOrigin) !== 0
+                && string_to_write.indexOf("http:") !== 0
+                && string_to_write.indexOf("https:") !== 0
+                && string_to_write.indexOf("ftp:") !== 0
+                && string_to_write.indexOf("data:") !== 0)
+            {
+                string_to_write = documentOrigin + string_to_write;
+            }
+            Writer.WriteString2(string_to_write);
+        }
+
+        flag = this.stretch !== null;
+        Writer.WriteBool(flag);
+        if(flag)
+        {
+            Writer.WriteBool(this.stretch);
+        }
+
+        flag = this.tile !== null;
+        Writer.WriteBool(flag);
+        if(flag)
+        {
+            Writer.WriteBool(this.tile);
+        }
+
+        Writer.WriteBool(this.rotWithShape);
+    },
+
+    Read_FromBinary2 : function(Reader)
+    {
+        var flag = Reader.GetBool();
+        if(flag)
+        {
+            var imageId = Reader.GetString2();
+            if(typeof imageId === "string" && isRealObject(Reader.oImages) && typeof Reader.oImages[imageId] === "string" && Reader.oImages[imageId] !== "error")
+                this.RasterImageId = Reader.oImages[imageId];
+            else
+                this.RasterImageId = imageId;
+
+            if(typeof this.RasterImageId === "string" && isRealObject(Reader.oImages))
+            {
+                editor.WordControl.m_oLogicDocument.DrawingObjects.urlMap.push(this.RasterImageId);
+            }
+        }
+
+        flag = Reader.GetBool();
+        if(flag)
+        {
+            this.stretch = Reader.GetBool();
+        }
+
+        flag = Reader.GetBool();
+        if(flag)
+        {
+            this.tile =  Reader.GetBool();
+        }
+
+        this.rotWithShape = Reader.GetBool();
+    },
+
     createDuplicate : function()
     {
         var duplicate = new CBlipFill();
@@ -1021,6 +1217,18 @@ function CSolidFill()
 
 CSolidFill.prototype =
 {
+
+    Write_ToBinary2 : function(Writer)
+    {
+        Writer.WriteLong(this.type);
+        this.color.Write_ToBinary2(Writer);
+    },
+
+    Read_FromBinary2 : function(Reader)
+    {
+        this.color.Read_FromBinary2(Reader);
+    },
+
     IsIdentical : function(fill)
     {
         if(fill == null)
@@ -1063,6 +1271,22 @@ function CGs()
 
 CGs.prototype =
 {
+
+
+    Write_ToBinary2 : function(Writer)
+    {
+        this.color.Write_ToBinary2(Writer);
+        Writer.WriteLong(this.pos);
+    },
+
+    Read_FromBinary2 : function(Reader)
+    {
+        this.color = new CUniColor();
+        this.color.Read_FromBinary2(Reader);
+        this.pos = Reader.GetLong();
+
+    },
+
     IsIdentical : function(fill)
     {
         return false;
@@ -1084,6 +1308,20 @@ function GradLin()
 }
 GradLin.prototype =
 {
+
+    Write_ToBinary2 : function(Writer)
+    {
+        Writer.WriteLong(this.angle);
+        Writer.WriteBool(this.scale);
+    },
+
+    Read_FromBinary2 : function(Reader)
+    {
+        this.angle = Reader.GetLong();
+        this.scale = Reader.GetBool();
+
+    },
+
     IsIdentical : function(lin)
     {
         if (this.angle != lin.angle)
@@ -1115,6 +1353,17 @@ function GradPath()
 }
 GradPath.prototype =
 {
+
+
+    Write_ToBinary2 : function(Writer)
+    {
+    },
+
+    Read_FromBinary2 : function(Reader)
+    {
+
+    },
+
     IsIdentical : function(path)
     {
         if (this.path != path.path)
@@ -1147,6 +1396,51 @@ function CGradFill()
 
 CGradFill.prototype =
 {
+
+    Write_ToBinary2 : function(Writer)
+    {
+        Writer.WriteLong(this.type);
+        var colors_count = this.colors.length;
+        Writer.WriteLong(colors_count);
+        for(var i = 0;  i < colors_count; ++i)
+        {
+            this.colors[i].Write_ToBinary2(Writer);
+        }
+        Writer.WriteBool(isRealObject(this.lin));
+        if(isRealObject(this.lin))
+        {
+            this.lin.Write_ToBinary2(Writer);
+        }
+
+        Writer.WriteBool(isRealObject(this.path));
+        if(isRealObject(this.path))
+        {
+            this.path.Write_ToBinary2(Writer);
+        }
+    },
+
+    Read_FromBinary2 : function(Reader)
+    {
+        var colors_count = Reader.GetLong();
+        for(var i = 0; i< colors_count; ++i)
+        {
+            this.colors[i] = new CGs();
+            this.colors[i].Read_FromBinary2(Reader);
+        }
+
+        if(Reader.GetBool())
+        {
+            this.lin = new GradLin();
+            this.lin.Read_FromBinary2(Reader);
+        }
+
+        if(Reader.GetBool())
+        {
+            this.path = new GradPath();
+            this.path.Read_FromBinary2(Reader);
+        }
+    },
+
     IsIdentical : function(fill)
     {
         if(fill == null)
@@ -1209,6 +1503,22 @@ function CPattFill()
 
 CPattFill.prototype =
 {
+
+    Write_ToBinary2 : function(Writer)
+    {
+        Writer.WriteLong(this.type);
+        Writer.WriteString2(this.ftype);
+        this.fgClr.Write_ToBinary2(Writer);
+        this.bgClr.Write_ToBinary2(Writer);
+    },
+
+    Read_FromBinary2 : function(Reader)
+    {
+        this.ftype = Reader.GetString2();
+        this.fgClr.Read_FromBinary2(Reader);
+        this.bgClr.Read_FromBinary2(Reader);
+    },
+
     IsIdentical : function(fill)
     {
         if(fill == null)
@@ -1259,6 +1569,16 @@ function CNoFill()
 
 CNoFill.prototype =
 {
+
+    Write_ToBinary2 : function(Writer)
+    {
+        Writer.WriteLong(this.type);
+    },
+
+    Read_FromBinary2 : function(Reader)
+    {
+    },
+
     createDuplicate : function()
     {
         return new CNoFill();
@@ -1295,6 +1615,73 @@ function CUniFill()
 
 CUniFill.prototype =
 {
+
+    Write_ToBinary2 : function(Writer)
+    {
+        var flag = isRealObject(this.fill);
+        Writer.WriteBool(flag);
+        if(flag)
+        {
+            this.fill.Write_ToBinary2(Writer);
+        }
+        flag = this.transparent != null;
+        Writer.WriteBool(flag);
+        if(flag)
+            Writer.WriteDouble(this.transparent);
+    },
+
+    Read_FromBinary2 : function(reader)
+    {
+        var flag = reader.GetBool();
+        if(flag)
+        {
+            var fill_type = reader.GetLong();
+            switch (fill_type)
+            {
+                case FILL_TYPE_SOLID:
+                {
+                    this.fill = new CSolidFill();
+                    this.fill.Read_FromBinary2(reader);
+                    break;
+                }
+
+                case FILL_TYPE_GRAD:
+                {
+                    this.fill = new CGradFill();
+                    this.fill.Read_FromBinary2(reader);
+                    break;
+                }
+
+                case FILL_TYPE_BLIP:
+                {
+                    this.fill = new CBlipFill();
+                    this.fill.Read_FromBinary2(reader);
+                    break;
+                }
+
+                case FILL_TYPE_NOFILL:
+                {
+                    this.fill = new CNoFill();
+                    this.fill.Read_FromBinary2(reader);
+                    break;
+                }
+
+                case FILL_TYPE_PATT:
+                {
+                    this.fill = new CPattFill();
+                    this.fill.Read_FromBinary2(reader);
+                    break;
+                }
+            }
+        }
+
+        flag = reader.GetBool();
+        if(flag)
+        {
+            this.transparent = reader.GetDouble();
+        }
+    },
+
     calculate : function(theme, slide, layout, masterSlide, RGBA)
     {
         if(this.fill )
@@ -1499,6 +1886,48 @@ function EndArrow()
     this.len = null;
     this.w = null;
 
+
+    this.Write_ToBinary2 =  function(Writer)
+    {
+        var flag = this.type != null;
+        Writer.WriteBool(flag);
+        if(flag)
+            Writer.WriteLong(this.type);
+
+        flag = this.len != null;
+        Writer.WriteBool(flag);
+        if(flag)
+            Writer.WriteLong(this.len);
+
+        flag = this.w != null;
+        Writer.WriteBool(flag);
+        if(flag)
+            Writer.WriteLong(this.w);
+    };
+
+    this.Read_FromBinary2 = function(Reader)
+    {
+        var flag = Reader.GetBool();
+        if(flag)
+        {
+            this.type = Reader.GetLong();
+        }
+
+        flag = Reader.GetBool();
+        if(flag)
+        {
+            this.len = Reader.GetLong();
+        }
+
+
+        flag = Reader.GetBool();
+        if(flag)
+        {
+            this.w = Reader.GetLong();
+        }
+    };
+
+
     this.compare = function(end_arrow)
     {
         if(end_arrow == null)
@@ -1595,6 +2024,38 @@ function LineJoin()
     this.type = null;
     this.limit = null;
 
+    this.Write_ToBinary2 = function(Writer)
+    {
+        var flag = this.type != null;
+        Writer.WriteBool(flag);
+        if(flag)
+        {
+            Writer.WriteLong(this.type);
+        }
+        flag = this.limit != null;
+        Writer.WriteBool(flag);
+        if(flag)
+        {
+            Writer.WriteLong(this.limit);
+        }
+    };
+
+    this.Read_FromBinary2 = function(Reader)
+    {
+        var flag = Reader.GetBool();
+        if(flag)
+        {
+            this.type = Reader.GetLong();
+        }
+        flag = Reader.GetBool();
+        if(flag)
+        {
+            this.limit = Reader.GetLong();
+        }
+        return this;
+
+    };
+
     this.createDuplicate = function()
     {
         var duplicate =  new LineJoin();
@@ -1617,6 +2078,121 @@ function CLn()
     this.cap = null;
     this.cmpd = null;
     this.w = null;
+
+
+    this.Write_ToBinary2 = function(Writer)
+    {
+        var flag = this.Fill != null;
+        Writer.WriteBool(flag);
+        if(flag)
+        {
+            this.Fill.Write_ToBinary2(Writer);
+        }
+        //TODO: PRST DASH
+        flag = this.Join != null;
+        Writer.WriteBool(flag);
+        if(flag)
+        {
+            this.Join.Write_ToBinary2(Writer);
+        }
+
+        flag = this.headEnd != null;
+        Writer.WriteBool(flag);
+        if(flag)
+        {
+            this.headEnd.Write_ToBinary2(Writer);
+        }
+
+        flag = this.tailEnd != null;
+        Writer.WriteBool(flag);
+        if(flag)
+        {
+            this.tailEnd.Write_ToBinary2(Writer);
+        }
+
+        flag = this.algn != null;
+        Writer.WriteBool(flag);
+        if(flag)
+        {
+            Writer.WriteLong(this.algn);
+        }
+
+        flag = this.cap != null;
+        Writer.WriteBool(flag);
+        if(flag)
+        {
+            Writer.WriteLong(this.cap);
+        }
+
+        flag = this.cmpd!= null;
+        Writer.WriteBool(flag);
+        if(flag)
+        {
+            Writer.WriteLong(this.cmpd);
+        }
+
+        flag = this.w != null;
+        Writer.WriteBool(flag);
+        if(flag)
+        {
+            Writer.WriteLong(this.w);
+        }
+    };
+
+    this.Read_FromBinary2 = function(Reader)
+    {
+        var flag = Reader.GetBool();
+        if(flag)
+        {
+            this.Fill = new  CUniFill();
+            this.Fill.Read_FromBinary2(Reader);
+        }
+        //TODO: PRST DASH
+        flag = Reader.GetBool();
+        if(flag)
+        {
+            this.Join = new LineJoin();
+            this.Join.Read_FromBinary2(Reader);
+        }
+
+        flag = Reader.GetBool();
+        if(flag)
+        {
+            this.headEnd = new EndArrow();
+            this.headEnd.Read_FromBinary2(Reader);
+        }
+
+        flag = Reader.GetBool();
+        if(flag)
+        {
+            this.tailEnd = new EndArrow();
+            this.tailEnd.Read_FromBinary2(Reader);
+        }
+
+        flag = Reader.GetBool();
+        if(flag)
+        {
+            this.algn = Reader.GetLong();
+        }
+
+        flag = Reader.GetBool();
+        if(flag)
+        {
+            this.cap = Reader.GetLong();
+        }
+
+        flag = Reader.GetBool();
+        if(flag)
+        {
+            this.cmpd = Reader.GetLong();
+        }
+
+        flag = Reader.GetBool();
+        if(flag)
+        {
+            this.w = Reader.GetLong();
+        }
+    };
 
     this.compare = function(line)
     {
@@ -3501,6 +4077,296 @@ function CBodyPr()
 
     this.textFit        = null;
 
+
+    this.Write_ToBinary2 = function(w)
+    {
+        var flag = this.flatTx != null;
+        w.WriteBool(flag);
+        if(flag)
+        {
+            w.WriteLong(this.flatTx);
+        }
+
+        flag = this.anchor != null;
+        w.WriteBool(flag);
+        if(flag)
+        {
+            w.WriteLong(this.anchor);
+        }
+
+        flag = this.anchorCtr != null;
+        w.WriteBool(flag);
+        if(flag)
+        {
+            w.WriteBool(this.anchorCtr);
+        }
+
+        flag = this.bIns != null;
+        w.WriteBool(flag);
+        if(flag)
+        {
+            w.WriteDouble(this.bIns);
+        }
+
+        flag = this.compatLnSpc != null;
+        w.WriteBool(flag);
+        if(flag)
+        {
+            w.WriteBool(this.compatLnSpc);
+        }
+
+        flag = this.forceAA != null;
+        w.WriteBool(flag);
+        if(flag)
+        {
+            w.WriteBool(this.forceAA);
+        }
+
+        flag = this.fromWordArt != null;
+        w.WriteBool(flag);
+        if(flag)
+        {
+            w.WriteBool(this.fromWordArt);
+        }
+
+        flag = this.horzOverflow != null;
+        w.WriteBool(flag);
+        if(flag)
+        {
+            w.WriteLong(this.horzOverflow);
+        }
+
+        flag = this.lIns != null;
+        w.WriteBool(flag);
+        if(flag)
+        {
+            w.WriteDouble(this.lIns);
+        }
+
+        flag = this.numCol != null;
+        w.WriteBool(flag);
+        if(flag)
+        {
+            w.WriteLong(this.numCol);
+        }
+
+        flag = this.rIns != null;
+        w.WriteBool(flag);
+        if(flag)
+        {
+            w.WriteDouble(this.rIns);
+        }
+
+
+        flag = this.rot != null;
+        w.WriteBool(flag);
+        if(flag)
+        {
+            w.WriteDouble(this.rot);
+        }
+
+        flag = this.rtlCol != null;
+        w.WriteBool(flag);
+        if(flag)
+        {
+            w.WriteBool(this.rtlCol);
+        }
+
+        flag = this.spcCol != null;
+        w.WriteBool(flag);
+        if(flag)
+        {
+            w.WriteBool(this.spcCol);
+        }
+
+        flag = this.spcFirstLastPara != null;
+        w.WriteBool(flag);
+        if(flag)
+        {
+            w.WriteBool(this.spcFirstLastPara);
+        }
+
+        flag = this.tIns != null;
+        w.WriteBool(flag);
+        if(flag)
+        {
+            w.WriteDouble(this.tIns);
+        }
+
+        flag = this.upright != null;
+        w.WriteBool(flag);
+        if(flag)
+        {
+            w.WriteBool(this.upright);
+        }
+
+        flag = this.vert != null;
+        w.WriteBool(flag);
+        if(flag)
+        {
+            w.WriteLong(this.vert);
+        }
+
+
+        flag = this.vertOverflow != null;
+        w.WriteBool(flag);
+        if(flag)
+        {
+            w.WriteLong(this.vertOverflow);
+        }
+
+        flag = this.wrap != null;
+        w.WriteBool(flag);
+        if(flag)
+        {
+            w.WriteLong(this.wrap);
+        }
+    };
+
+    this.Read_FromBinary2 = function(r)
+    {
+        var flag = r.GetBool();
+        if(flag)
+        {
+            this.flatTx = r.GetLong();
+        }
+
+        flag = r.GetBool();
+        if(flag)
+        {
+            this.anchor = r.GetLong();
+        }
+
+
+        flag = r.GetBool();
+        if(flag)
+        {
+            this.anchorCtr = r.GetBool();
+        }
+
+
+        flag = r.GetBool();
+        if(flag)
+        {
+            this.bIns = r.GetDouble();
+        }
+
+
+        flag = r.GetBool();
+        if(flag)
+        {
+            this.compatLnSpc = r.GetBool();
+        }
+
+
+        flag = r.GetBool();
+        if(flag)
+        {
+            this.forceAA = r.GetBool();
+        }
+
+
+        flag = r.GetBool();
+        if(flag)
+        {
+            this.fromWordArt = r.GetBool();
+        }
+
+
+        flag = r.GetBool();
+        if(flag)
+        {
+            this.horzOverflow = r.GetLong();
+        }
+
+
+
+        flag = r.GetBool();
+        if(flag)
+        {
+            this.lIns = r.GetDouble();
+        }
+
+
+        flag = r.GetBool();
+        if(flag)
+        {
+            this.numCol = r.GetLong();
+        }
+
+
+        flag = r.GetBool();
+        if(flag)
+        {
+            this.rIns = r.GetDouble();
+        }
+
+
+
+        flag = r.GetBool();
+        if(flag)
+        {
+            this.rot = r.GetDouble();
+        }
+
+
+        flag = r.GetBool();
+        if(flag)
+        {
+            this.rtlCol = r.GetBool();
+        }
+
+        flag = r.GetBool();
+        if(flag)
+        {
+            this.spcCol = r.GetBool();
+        }
+
+        flag = r.GetBool();
+        if(flag)
+        {
+            this.spcFirstLastPara = r.GetBool();
+        }
+
+
+
+        flag = r.GetBool();
+        if(flag)
+        {
+            this.tIns = r.GetDouble();
+        }
+
+
+
+        flag = r.GetBool();
+        if(flag)
+        {
+            this.upright = r.GetBool();
+        }
+
+
+
+        flag = r.GetBool();
+        if(flag)
+        {
+            this.vert = r.GetLong();
+        }
+
+
+        flag = r.GetBool();
+        if(flag)
+        {
+            this.vertOverflow = r.GetLong();
+        }
+
+
+
+        flag = r.GetBool();
+        if(flag)
+        {
+            this.wrap = r.GetLong();
+        }
+    };
 
     this.setDefault =  function()
     {

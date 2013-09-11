@@ -67,8 +67,8 @@ function asc_docs_api(name)
     this.isPasteFonts_Images = false;
 
     this.isLoadNoCutFonts = false;
-	
-	// На этапе сборки значение переменной ASC_DOCS_API_USE_EMBEDDED_FONTS может менятся.
+
+    // На этапе сборки значение переменной ASC_DOCS_API_USE_EMBEDDED_FONTS может менятся.
 	// По дефолту встроенные шрифты использоваться не будут, как и при любом значении
 	// ASC_DOCS_API_USE_EMBEDDED_FONTS, кроме "true"(написание от регистра не зависит).
     this.isUseEmbeddedCutFonts = ("true" == ASC_DOCS_API_USE_EMBEDDED_FONTS.toLowerCase());
@@ -108,6 +108,8 @@ function asc_docs_api(name)
 
     this.chartStyleManager = new ChartStyleManager();
     this.chartPreviewManager = new ChartPreviewManager();
+    this.chartTranslate = new asc_CChartTranslate();
+
     // объекты, нужные для отправки в тулбар (шрифты, стили)
     this._gui_fonts = null;
     this._gui_editor_themes = null;
@@ -1906,13 +1908,14 @@ asc_docs_api.prototype.ShapeApply = function(prop)
     }
     else
     {
-        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        if(!this.noCreatePoint)
+            this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.ShapeApply(prop);
     }
 }
 
 asc_docs_api.prototype.setStartPointHistory = function(){this.noCreatePoint = true; History.Create_NewPoint();};
-asc_docs_api.prototype.setEndPointHistory   = function(){this.noCreatePoint = false;};
+asc_docs_api.prototype.setEndPointHistory   = function(){this.noCreatePoint = false; };
 asc_docs_api.prototype.SetSlideProps = function(prop)
 {
     if (null == prop)
@@ -3509,6 +3512,7 @@ asc_docs_api.prototype.AddShape = function(shapetype)
 }
 asc_docs_api.prototype.ChangeShapeType = function(shapetype)
 {
+    History.Create_NewPoint();
     this.WordControl.m_oLogicDocument.changeShapeType(shapetype);
 }
 asc_docs_api.prototype.AddText = function()
@@ -3517,16 +3521,19 @@ asc_docs_api.prototype.AddText = function()
 
 asc_docs_api.prototype.groupShapes = function()
 {
+    History.Create_NewPoint();
     this.WordControl.m_oLogicDocument.groupShapes();
 }
 
 asc_docs_api.prototype.unGroupShapes = function()
 {
+    History.Create_NewPoint();
     this.WordControl.m_oLogicDocument.unGroupShapes();
 }
 
 asc_docs_api.prototype.setVerticalAlign = function(align)
 {
+    History.Create_NewPoint();
     this.WordControl.m_oLogicDocument.setVerticalAlign(align);
 }
 

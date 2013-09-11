@@ -76,6 +76,17 @@ CChartTitle.prototype =
             return CHART_TITLE_TYPE_V_AXIS;
     },
 
+
+    getParentObjects: function()
+    {
+        return this.chartGroup.getParentObjects();
+    },
+
+    isPlaceholder: function()
+    {
+        return false;
+    },
+
     isEmpty: function()
     {
         return isRealObject(this.txBody) ? this.txBody.isEmpty() : true;
