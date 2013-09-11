@@ -6578,7 +6578,7 @@ Paragraph.prototype =
         if ( CurPos <= 0 )
         {
             CurPos = 0;
-            while ( para_TextPr === this.Content[CurPos].Type )
+            while ( para_TextPr === this.Content[CurPos].Type || para_CollaborativeChangesEnd === this.Content[CurPos].Type || para_CollaborativeChangesStart === this.Content[CurPos].Type )
                 CurPos++;
 
             this.CurPos.ContentPos = CurPos;
