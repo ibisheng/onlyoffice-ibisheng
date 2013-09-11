@@ -10847,6 +10847,9 @@ Paragraph.prototype =
         if ( Pos >= Count )
             return null;
 
+        var ParaPr = this.Get_CompiledPr2(false).ParaPr;
+        //NewParagraph.Set_Ind( { FirstLine : ParaPr. } );
+
         var TextPr = this.Internal_CalculateTextPr(Pos);
 
         var DropCap = this.Content[Pos];
@@ -10932,8 +10935,9 @@ Paragraph.prototype =
             TNewHeight = -TNewDescent + TNewAscent;
 
         var Descent = g_oTextMeasurer.GetDescender();
+        var Ascent  = g_oTextMeasurer.GetAscender();
 
-        var Dy = Descent + TNewHeight - TNewAscent + LineTD;
+        var Dy = Descent * (LineH * Count) / ( Ascent - Descent ) + TNewHeight - TNewAscent + LineTD;
 
         var PTextPr = new ParaTextPr( { RFonts : { Ascii : { Name : TextPr.RFonts.Ascii.Name, Index : -1 } }, FontSize : FontSize * Koef, Position : Dy } );
 
@@ -11021,7 +11025,7 @@ Paragraph.prototype =
 
         var Descent = g_oTextMeasurer.GetDescender();
 
-        var Dy = Descent + TNewHeight - TNewAscent + LineTD;
+        var Dy = Descent * (LineH * Count) / ( Ascent - Descent ) + TNewHeight - TNewAscent + LineTD;
 
         var PTextPr = new ParaTextPr( { RFonts : { Ascii : { Name : TextPr.RFonts.Ascii.Name, Index : -1 } }, FontSize : TextPr.FontSize, Position : Dy } );
         this.Select_All();
@@ -13549,51 +13553,61 @@ CParaLineMetrics.prototype =
                 var ExactValue = Math.max( 1, ParaPr.Spacing.Line );
                 LineGap = ExactValue - ( TextAscent + TextDescent );
 
-                // TODO: пересмотреть тут
+                var Gap = this.Ascent + this.Descent - ExactValue;
 
-//                if ( LineGap < 0 )
-//                {
-//                    var Ascent_old  = this.Ascent;
-//                    var Descent_old = this.Descent;
-//                    var TextDescent_old = this.TextDescent;
-//                    var TextAscent_old  = this.TextAscent;
-//
-//                    var DiffAsc = Ascent_old  - TextAscent_old;
-//                    var DiffDes = Descent_old - TextDescent_old;
-//
-//                    LineGap += DiffAsc + DiffDes;
-//
-//                    Ascent_old  = TextAscent_old;
-//                    Descent_old = TextDescent_old;
-//
-//                    this.Ascent  = ExactValue * Ascent_old  / ( Ascent_old + Descent_old );
-//                    this.Descent = ExactValue * Descent_old / ( Ascent_old + Descent_old );
-//
-//                    LineGap = 0;
-//                }
-//                else
-//                {
-                    var Gap = this.Ascent + this.Descent - ExactValue;
+                if ( Gap > 0 )
+                {
+                    var DescentDiff = this.Descent - this.TextDescent;
 
-                    if ( Gap > 0 )
+                    if ( DescentDiff > 0 )
                     {
-                        if ( this.Ascent < Gap )
+                        if ( DescentDiff < Gap )
                         {
-                            this.Ascent  = 0;
-                            this.Descent = ExactValue;
+                            this.Descent = this.TextDescent;
+                            Gap -= DescentDiff;
                         }
                         else
                         {
-                            this.Ascent -= Gap; // уменьшаем Ascent
+                            this.Descent -= Gap;
+                            Gap = 0;
                         }
                     }
-                    else
+
+                    var AscentDiff = this.Ascent - this.TextAscent;
+
+                    if ( AscentDiff > 0 )
                     {
-                        this.Ascent -= Gap; // все в Ascent
+                        if ( AscentDiff < Gap )
+                        {
+                            this.Ascent = this.TextAscent;
+                            Gap -= AscentDiff;
+                        }
+                        else
+                        {
+                            this.Ascent -= Gap;
+                            Gap = 0;
+                        }
                     }
 
-                    LineGap = 0;
-//                }
+                    if ( Gap > 0 )
+                    {
+                        // Уменьшаем пропорционально TextAscent и TextDescent
+                        var OldTA = this.TextAscent;
+                        var OldTD = this.TextDescent;
+
+                        var Sum = OldTA + OldTD;
+
+                        this.Ascent  = OldTA * (Sum - Gap) / Sum;
+                        this.Descent = OldTD * (Sum - Gap) / Sum;
+                    }
+                }
+                else
+                {
+                    this.Ascent -= Gap; // все в Ascent
+                }
+
+                LineGap = 0;
+
 
                 break;
             }

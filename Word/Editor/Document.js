@@ -1835,8 +1835,11 @@ CDocument.prototype =
             NewParagraph.Update_DropCapByLines( TextPr, NewParagraph.Pr.FramePr.Lines, LineH, LineTA, LineTD );
 
             this.Internal_Content_Add( Pos, NewParagraph );
-            NewParagraph.Cursor_MoveToStartPos();
-            NewParagraph.Document_SetThisElementCurrent();
+            OldParagraph.Cursor_MoveToStartPos();
+
+            this.Selection_Remove();
+            this.CurPos.ContentPos = Pos + 1;
+            this.CurPos.Type       = docpostype_Content;
 
             this.Recalculate();
         }
@@ -5941,6 +5944,16 @@ CDocument.prototype =
                 // Если мы находимся в рамке, тогда дополняем ее свойства настройками границы и настройкой текста (если это буквица)
                 if ( undefined != Result_ParaPr.FramePr )
                     this.Content[StartPos].Supplement_FramePr( Result_ParaPr.FramePr );
+                else if ( StartPos === EndPos && StartPos > 0 && type_Paragraph === this.Content[StartPos - 1].GetType()  )
+                {
+                    var PrevFrame = this.Content[StartPos - 1].Get_FramePr();
+                    if ( undefined != PrevFrame && undefined != PrevFrame.DropCap )
+                    {
+                        Result_ParaPr.FramePr = PrevFrame.Copy();
+                        this.Content[this.CurPos.ContentPos - 1].Supplement_FramePr( Result_ParaPr.FramePr );
+                    }
+                }
+
             }
             else
             {
@@ -5957,6 +5970,16 @@ CDocument.prototype =
                     // Если мы находимся в рамке, тогда дополняем ее свойства настройками границы и настройкой текста (если это буквица)
                     if ( undefined != Result_ParaPr.FramePr )
                         Item.Supplement_FramePr( Result_ParaPr.FramePr );
+                    else if ( this.CurPos.ContentPos > 0 && type_Paragraph === this.Content[this.CurPos.ContentPos - 1].GetType()  )
+                    {
+                        var PrevFrame = this.Content[this.CurPos.ContentPos - 1].Get_FramePr();
+                        if ( undefined != PrevFrame && undefined != PrevFrame.DropCap )
+                        {
+                            Result_ParaPr.FramePr = PrevFrame.Copy();
+                            this.Content[this.CurPos.ContentPos - 1].Supplement_FramePr( Result_ParaPr.FramePr );
+                        }
+                    }
+
                 }
                 else if ( type_Table == Item.GetType() )
                 {
