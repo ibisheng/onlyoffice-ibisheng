@@ -9652,6 +9652,17 @@ CTable.prototype =
         }
     },
 
+    Set_TableStyle2 : function(StyleId)
+    {
+        if ( this.TableStyle != StyleId )
+        {
+            History.Add( this, { Type : historyitem_Table_TableStyle, Old : this.TableStyle, New : StyleId } );
+            this.TableStyle = StyleId;
+
+            this.Recalc_CompiledPr();
+        }
+    },
+
     Get_TableStyle : function()
     {
         return this.TableStyle;
@@ -19692,6 +19703,13 @@ CTableCell.prototype =
         }
     },
 
+    Set_Pr : function(CellPr)
+    {
+        History.Add( this, { Type : historyitem_TableCell_Pr, Old : this.Pr, New : RowPr } );
+        this.Pr = CellPr;
+        this.Recalc_CompiledPr();
+    },
+
     Copy_Pr : function(OtherPr, bCopyOnlyVisualProps)
     {
         if ( true != bCopyOnlyVisualProps )
@@ -20429,6 +20447,13 @@ CTableCell.prototype =
                 this.Recalc_CompiledPr();
                 break;
             }
+
+            case historyitem_TableCell_Pr:
+            {
+                this.Pr = Data.Old;
+                this.Recalc_CompiledPr();
+                break;
+            }
         }
     },
 
@@ -20547,6 +20572,13 @@ CTableCell.prototype =
                 this.Recalc_CompiledPr();
                 break;
             }
+
+            case historyitem_TableCell_Pr:
+            {
+                this.Pr = Data.New;
+                this.Recalc_CompiledPr();
+                break;
+            }
         }
     },
 
@@ -20571,6 +20603,7 @@ CTableCell.prototype =
             case historyitem_TableCell_Border_Bottom:
             case historyitem_TableCell_VAlign:
             case historyitem_TableCell_W:
+            case historyitem_TableCell_Pr:
             {
                 bNeedRecalc = true;
                 break;
@@ -20785,6 +20818,13 @@ CTableCell.prototype =
                     Data.New.Write_ToBinary(Writer);
                 }
 
+                break;
+            }
+
+            case historyitem_TableCell_Pr:
+            {
+                // CTableCellPr
+                Data.New.Write_ToBinary( Writer );
                 break;
             }
         }
@@ -21048,6 +21088,17 @@ CTableCell.prototype =
                     this.Pr.TableCellW.Read_FromBinary( Reader );
                 }
 
+                break;
+            }
+
+            case historyitem_TableCell_Pr:
+            {
+                // CTableCellPr
+
+                this.Pr = new CTableCellPr();
+                this.Pr.Read_FromBinary( Reader );
+
+                this.Recalc_CompiledPr();
                 break;
             }
         }

@@ -1010,8 +1010,8 @@ $("#td_formatmodel,#td_info, #td_redo, #td_undo, #td_orient, #td_bold, #td_itali
             //editor.WordControl.m_oLogicDocument.Document_CreateFontMap();
 
 
-            Menu_Hyperlink_Add();
-            //editor.WordControl.m_oLogicDocument.Add_DropCap();
+            //Menu_Hyperlink_Add();
+            editor.WordControl.m_oLogicDocument.Add_DropCap();
 
             //editor.WordControl.m_oLogicDocument.Search_Start(String);
 			break;

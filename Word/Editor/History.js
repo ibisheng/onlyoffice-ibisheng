@@ -162,6 +162,7 @@ var historyitem_TableCell_Border_Top    =  7; // Изменяем верхнюю
 var historyitem_TableCell_Border_Bottom =  8; // Изменяем нижнюю границу ячейки
 var historyitem_TableCell_VAlign        =  9; // Изменяем вертикальное выравнивание ячейки
 var historyitem_TableCell_W             = 10; // Изменяем ширину ячейки
+var historyitem_TableCell_Pr            = 11; // Изменяем настройки целиком
 
 // Типы изменений в классе CDocumentContent
 var historyitem_DocumentContent_AddItem     = 1; // Добавляем элемент в документ
