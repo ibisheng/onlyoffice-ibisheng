@@ -442,12 +442,12 @@ Paragraph.prototype =
             if ( this.Selection.StartPos > Pos )
                 this.Selection.StartPos--;
 
-            if ( this.Selection.EndPos >= Pos )
+            if ( this.Selection.EndPos > Pos )
                 this.Selection.EndPos--;
         }
         else
         {
-            if ( this.Selection.StartPos >= Pos )
+            if ( this.Selection.StartPos > Pos )
                 this.Selection.StartPos--;
 
             if ( this.Selection.EndPos > Pos )
@@ -561,7 +561,7 @@ Paragraph.prototype =
                     this.Selection.StartPos = Pos;
             }
 
-            if ( this.Selection.EndPos >= Pos )
+            if ( this.Selection.EndPos > Pos )
             {
                 if ( this.Selection.EndPos >= Pos + Count )
                     this.Selection.EndPos -= Count;
@@ -571,7 +571,7 @@ Paragraph.prototype =
         }
         else
         {
-            if ( this.Selection.StartPos >= Pos )
+            if ( this.Selection.StartPos > Pos )
             {
                 if ( this.Selection.StartPos >= Pos + Count )
                     this.Selection.StartPos -= Count;
