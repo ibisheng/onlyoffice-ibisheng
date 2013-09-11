@@ -93,6 +93,12 @@ var historyitem_Drawing_BehindDoc         = 10; // Изменяем положе
 var historyitem_Drawing_SetZIndex         = 11;
 var historyitem_Drawing_SetGraphicObject  = 12;
 var historyitem_CalculateAfterPaste       = 13;
+var historyitem_SetSimplePos              = 14;
+var historyitem_SetExtent                 = 15;
+var historyitem_SetWrapPolygon            = 16;
+
+
+
 
 
 // Типы изменений в классе CDrawingObjects

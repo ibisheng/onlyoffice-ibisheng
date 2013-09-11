@@ -4552,6 +4552,26 @@ ParaDrawing.prototype =
                 }
                 if(isRealObject(this.GraphicObj))
                     this.GraphicObj.parent = this;
+                break;
+            }
+
+            case historyitem_SetSimplePos:
+            {
+                this.SimplePos.Use = Data.oldUse;
+                this.SimplePos.X = Data.oldX;
+                this.SimplePos.Y = Data.oldY;
+                break;
+            }
+            case historyitem_SetExtent:
+            {
+                this.Extent.W = Data.oldW;
+                this.Extent.H = Data.oldH;
+                break;
+            }
+            case historyitem_SetWrapPolygon:
+            {
+                this.wrappingPolygon = Data.oldW;
+                break;
             }
         }
     },
@@ -4675,6 +4695,26 @@ ParaDrawing.prototype =
                 }
                 if(isRealObject(this.GraphicObj))
                     this.GraphicObj.parent = this;
+                break;
+            }
+            case historyitem_SetSimplePos:
+            {
+                this.SimplePos.Use = Data.newUse;
+                this.SimplePos.X = Data.newX;
+                this.SimplePos.Y = Data.newY;
+                break;
+            }
+            case historyitem_SetExtent:
+            {
+                this.Extent.W = Data.newW;
+                this.Extent.H = Data.newH;
+                break;
+            }
+
+            case historyitem_SetWrapPolygon:
+            {
+                this.wrappingPolygon = Data.newW;
+                break;
             }
         }
     },
@@ -5042,6 +5082,45 @@ ParaDrawing.prototype =
                 {
                     Writer.WriteString2(Data.newId);
                 }
+                break;
+            }
+            case  historyitem_SetSimplePos:
+            {
+                Writer.WriteBool(Data.newUse);
+                Writer.WriteBool(typeof Data.newX === "number");
+                if(typeof Data.newX === "number")
+                {
+                    Writer.WriteDouble(Data.newX);
+                }
+                Writer.WriteBool(typeof Data.newY === "number");
+                if(typeof Data.newY === "number")
+                {
+                    Writer.WriteDouble(Data.newY);
+                }
+                break;
+            }
+            case historyitem_SetExtent:
+            {
+                Writer.WriteBool(typeof Data.newW === "number");
+                if(typeof Data.newW === "number")
+                {
+                    Writer.WriteDouble(Data.newW);
+                }
+                Writer.WriteBool(typeof Data.newH === "number");
+                if(typeof Data.newH === "number")
+                {
+                    Writer.WriteDouble(Data.newH);
+                }
+                break;
+            }
+            case historyitem_SetWrapPolygon:
+            {
+                Writer.WriteBool(Data.newW !== null && typeof Data.newW === "object");
+                if(Data.newW !== null && typeof Data.newW === "object")
+                {
+                    Writer.WriteString2(Data.newW);
+                }
+                break;
             }
         }
 
@@ -5244,6 +5323,43 @@ ParaDrawing.prototype =
                     {
                         this.GraphicObj.calculateAfterOpen();
                     }
+                }
+                break;
+            }
+            case  historyitem_SetSimplePos:
+            {
+                this.SimplePos.Use = Reader.GetBool();
+                if(Reader.GetBool())
+                {
+                    this.SimplePos.X = Reader.GetDouble();
+                }
+                if(Reader.GetBool())
+                {
+                    this.SimplePos.Y = Reader.GetDouble();
+                }
+                break;
+            }
+            case  historyitem_SetExtent:
+            {
+                if(Reader.GetBool())
+                {
+                    this.Extent.W = Reader.GetDouble();
+                }
+                if(Reader.GetBool())
+                {
+                    this.Extent.H = Reader.GetDouble();
+                }
+                break;
+            }
+            case historyitem_SetWrapPolygon:
+            {
+                if(Reader.GetBool())
+                {
+                    this.wrappingPolygon = g_oTableId.Get_ById(Reader.GetString2());
+                }
+                else
+                {
+                    this.wrapPolygon = null;
                 }
                 break;
             }
@@ -6419,6 +6535,27 @@ ParaDrawing.prototype =
            // this.wrappingPolygon.readFromBinaryForCopyPaste(r);
             History.Add(this, {Type: historyitem_CalculateAfterPaste});
         }
+    },
+
+    setSimplePos: function(use, x, y)
+    {
+        History.Add(this,  {Type: historyitem_SetSimplePos, oldX: this.SimplePos.X, oldY: this.SimplePos.Y, oldUse: this.SimplePos.Use, newX:x, newY: y, newUse: use});
+        this.SimplePos.Use = use;
+        this.SimplePos.X = x;
+        this.SimplePos.Y = y;
+    },
+
+    setExtent: function(extX, extY)
+    {
+       History.Add(this,  {Type: historyitem_SetExtent, oldW: this.Extent.W, oldH: this.Extent.H, newW: extX, newH: extY});
+       this.Extent.W = extX;
+       this.Extent.H = extY;
+    },
+
+    addWrapPolygon: function(wrapPolygon)
+    {
+        History.Add(this,  {Type: historyitem_SetExtent, oldW: this.wrappingPolygon, newW: wrapPolygon});
+        this.wrappingPolygon = wrapPolygon;
     },
 
     copy: function()
