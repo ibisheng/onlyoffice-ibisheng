@@ -8330,11 +8330,12 @@
 								functionModelAction = function () {
 									fullRecalc = true;
 									History.Create_NewPoint();
+									History.SetSelection(new asc_Range(_updateRangeDel.c1, 0, _updateRangeDel.c2, gc_nMaxRow0));
 									History.StartTransaction();
 									t.autoFilters.insertColumn(t, prop,_updateRangeDel, arn);
 									t.model.removeCols(_updateRangeDel.c1, _updateRangeDel.c2);
 									History.EndTransaction();
-									
+
 									t.objectRender.updateDrawingObject(false, val, _updateRangeDel);
 									t.cellCommentator.updateCommentsDependencies(false, val, _updateRangeDel);
 								};
@@ -8349,11 +8350,12 @@
 								functionModelAction = function () {
 									fullRecalc = true;
 									History.Create_NewPoint();
+									History.SetSelection(new asc_Range(0, _updateRangeDel.r1, gc_nMaxCol0, _updateRangeDel.r2));
 									History.StartTransaction();
 									t.autoFilters.insertRows(t, prop,_updateRangeDel, arn);
 									t.model.removeRows(_updateRangeDel.r1, _updateRangeDel.r2);
 									History.EndTransaction();
-									
+
 									t.objectRender.updateDrawingObject(false, val, _updateRangeDel);
 									t.cellCommentator.updateCommentsDependencies(false, val, _updateRangeDel);
 								};
