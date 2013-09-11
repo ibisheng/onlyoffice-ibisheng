@@ -5744,7 +5744,7 @@
 				cell_info.flags = new asc_CCellFlag();
 				cell_info.flags.merge = !!this._getMergedCellsRange(c1, r1);
 				cell_info.flags.shrinkToFit = c.getShrinkToFit();
-				cell_info.flags.wrapText = c.getWrap();
+				cell_info.flags.wrapText = (khaJustify === cell_info.halign) ? true : c.getWrap(); // Для khaJustify - всегда true
 				
 				var graphicObjects = this.objectRender.getSelectedGraphicObjects();
 				if ( graphicObjects.length == 1 )
