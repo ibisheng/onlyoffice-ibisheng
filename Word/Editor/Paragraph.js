@@ -5075,11 +5075,7 @@ Paragraph.prototype =
         }
     },
 
-    // Удаляем элементы параграфа
-    // nCount - количество удаляемых элементов, > 0 удаляем элементы после курсора
-    //                                          < 0 удаляем элементы до курсора
-    // bOnlyText - true: удаляем только текст и пробелы, false - Удаляем любые элементы
-    Remove : function(nCount, bOnlyText)
+    Internal_Remove_CollaborativeMarks : function()
     {
         for ( var Pos = 0; Pos < this.Content.length; Pos++ )
         {
@@ -5090,6 +5086,15 @@ Paragraph.prototype =
                 Pos--;
             }
         }
+    },
+
+    // Удаляем элементы параграфа
+    // nCount - количество удаляемых элементов, > 0 удаляем элементы после курсора
+    //                                          < 0 удаляем элементы до курсора
+    // bOnlyText - true: удаляем только текст и пробелы, false - Удаляем любые элементы
+    Remove : function(nCount, bOnlyText)
+    {
+        this.Internal_Remove_CollaborativeMarks();
 
         this.RecalcInfo.Set_Type_0(pararecalc_0_All);
 
@@ -10513,6 +10518,7 @@ Paragraph.prototype =
         // Кроме этого, если тут начинались или заканчивались комметарии, то их тоже
         // удаляем.
 
+        this.Internal_Remove_CollaborativeMarks();
 
         for ( var Index = 0; Index < this.Content.length; Index++ )
         {
