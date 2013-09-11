@@ -173,7 +173,7 @@ Paragraph.prototype =
 	{
         var Pr_old = this.Pr;
         var Pr_new = oNewPr;
-        History.Add( Para, { Type : historyitem_Paragraph_Pr, Old : Pr_old, New : Pr_new } );
+        History.Add( this, { Type : historyitem_Paragraph_Pr, Old : Pr_old, New : Pr_new } );
 
         this.Pr = oNewPr;
 	},
@@ -2068,7 +2068,7 @@ Paragraph.prototype =
                 // убирается в промежутках.
 
                 var TempDy = this.Lines[this.Pages[CurPage].FirstLine].Metrics.Ascent;
-                if ( 0 === this.Pages[CurPage].FirstLine && ( 0 === CurPage || true === this.Parent.Is_TableCellContent() ) )
+                if ( 0 === this.Pages[CurPage].FirstLine && ( 0 === CurPage || true === this.Parent.Is_TableCellContent() || true === ParaPr.PageBreakBefore ) )
                     TempDy += ParaPr.Spacing.Before;
 
                 if ( 0 === this.Pages[CurPage].FirstLine )
@@ -2235,7 +2235,7 @@ Paragraph.prototype =
                         Top  = Y;
                         Top2 = Y;
 
-                        if ( 0 === CurPage || true === this.Parent.Is_TableCellContent() )
+                        if ( 0 === CurPage || true === this.Parent.Is_TableCellContent() || true === ParaPr.PageBreakBefore )
                         {
                             Top2    = Top + ParaPr.Spacing.Before;
                             Bottom  = Top + ParaPr.Spacing.Before + this.Lines[0].Metrics.Ascent + this.Lines[0].Metrics.Descent + this.Lines[0].Metrics.LineGap;
@@ -2773,7 +2773,7 @@ Paragraph.prototype =
         var EndLine   = this.Lines.length - 1;
 
         var TempDy = this.Lines[this.Pages[CurPage].FirstLine].Metrics.Ascent;
-        if ( 0 === StartLine && ( 0 === CurPage || true === this.Parent.Is_TableCellContent() ) )
+        if ( 0 === StartLine && ( 0 === CurPage || true === this.Parent.Is_TableCellContent() || true === ParaPr.PageBreakBefore ) )
             TempDy += ParaPr.Spacing.Before;
 
         if ( 0 === StartLine )
