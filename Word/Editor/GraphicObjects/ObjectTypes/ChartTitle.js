@@ -52,6 +52,14 @@ CChartTitle.prototype =
         return CLASS_TYPE_CHART_TITLE;
     },
 
+    getAllFonts: function(AllFonts)
+    {
+        if(this.txBody && this.txBody.content)
+        {
+            this.txBody.content.Document_Get_AllFontNames(AllFonts);
+        }
+    },
+
     Get_Id: function()
     {
         return this.Id;

@@ -119,6 +119,46 @@ CChartAsGroup.prototype =
         }
     },
 
+    documentGetAllFontNames: function(AllFonts)
+    {
+        if(isRealObject(this.chartTitle))
+        {
+            this.chartTitle.getAllFonts(AllFonts);
+        }
+
+        if(isRealObject(this.vAxisTitle))
+        {
+            this.vAxisTitle.getAllFonts(AllFonts);
+        }
+
+        if(isRealObject(this.hAxisTitle))
+        {
+            this.hAxisTitle.getAllFonts(AllFonts);
+        }
+        this.chart.legend && this.chart.legend.font && typeof  this.chart.legend.font.name === "string"
+            && this.chart.legend.font.name !== "" && (AllFonts[this.chart.legend.font.name] = true);
+    },
+
+    documentCreateFontMap: function(AllFonts)
+    {
+        if(isRealObject(this.chartTitle))
+        {
+            this.chartTitle.getAllFonts(AllFonts);
+        }
+
+        if(isRealObject(this.vAxisTitle))
+        {
+            this.vAxisTitle.getAllFonts(AllFonts);
+        }
+
+        if(isRealObject(this.hAxisTitle))
+        {
+            this.hAxisTitle.getAllFonts(AllFonts);
+        }
+        this.chart.legend && this.chart.legend.font && typeof  this.chart.legend.font.name === "string"
+            && this.chart.legend.font.name !== "" && (AllFonts[this.chart.legend.font.name] = true);
+    },
+
     setSizes: function(posX, posY, w, h, flipH, flipV)
     {
         var data = {};

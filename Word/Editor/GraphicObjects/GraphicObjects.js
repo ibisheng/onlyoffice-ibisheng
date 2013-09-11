@@ -1475,6 +1475,8 @@ CGraphicObjects.prototype =
         if(!docContent.Is_HdrFtr())
         {
 
+            if(!page)
+                return ret;
             a = [page.behindDocObjects, page.wrappingObjects, page.beforeTextObjects];
 
         }
@@ -3268,6 +3270,15 @@ CGraphicObjects.prototype =
     {
         if(!object.DocumentContent.Is_HdrFtr())
         {
+            if(!this.graphicPages[pageIndex])
+            {
+                this.graphicPages[pageIndex] = new CGraphicPage(pageIndex, this);
+                for(var z = 0; z < pageIndex; ++z)
+                {
+                    if(this.graphicPages[z])
+                        this.graphicPages[z] = new CGraphicPage(z, this);
+                }
+            }
             var page = this.graphicPages[pageIndex];
             var array_type = object.getDrawingArrayType();
             switch(array_type)
