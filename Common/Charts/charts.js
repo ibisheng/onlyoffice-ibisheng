@@ -53,7 +53,7 @@ function ChartStyleManager() {
 	// Methods
 	//-----------------------------------------------------------------------------------
 	
-	_this.init = function(theme, colorScheme) {
+	_this.init = function(options) {
 		
 		_this.colorMap = [];		
 		var api_doc = window["editor"];
@@ -62,11 +62,11 @@ function ChartStyleManager() {
 		if ( api_sheet )
 			themeColors = api_sheet.GuiControlColorsMap;
 		else
-			themeColors = getDocColors(api_doc);
+			themeColors = getDocColors(api_doc, options);
 		
-		function getDocColors(api) {
-			var _theme  = theme ? theme : api.WordControl.m_oLogicDocument.theme;
-			var _clrMap = colorScheme ? colorScheme : api.WordControl.m_oLogicDocument.clrSchemeMap.color_map;
+		function getDocColors(api, options) {
+			var _theme  = api.WordControl.m_oLogicDocument.theme;
+			var _clrMap = api.WordControl.m_oLogicDocument.clrSchemeMap ? api.WordControl.m_oLogicDocument.clrSchemeMap.color_map : undefined;
 
 			var arr_colors = new Array(10);
 			var rgba = {R:0, G:0, B:0, A:255};
@@ -79,7 +79,10 @@ function ChartStyleManager() {
 			for (var i = 0; i < _count; ++i)
 			{
 				color.color.id = array_colors_types[i];
-				color.Calculate(_theme, _clrMap, rgba);
+                if(!options)
+				    color.Calculate(_theme, _clrMap, rgba);
+                else
+                    color.Calculate(options.theme, options.slide, options.layout, options.master, {R:0, G:0, B:0, A:255});
 
 				var _rgba = color.RGBA;
 				arr_colors[i] = new CColor(_rgba.R, _rgba.G, _rgba.B);
@@ -992,7 +995,7 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart, options)
 	var api_sheet = window["Asc"]["editor"];
 	var styleManager = api_doc ? api_doc.chartStyleManager : api_sheet.chartStyleManager;
 	if ( !styleManager.isReady() )
-		styleManager.init();
+		styleManager.init(options);
 	
 	arrBaseColors = styleManager.getBaseColors( parseInt(chart.styleId) );
 	var arrFormatAdobeLabels = [];
