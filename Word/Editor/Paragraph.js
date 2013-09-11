@@ -8787,7 +8787,7 @@ Paragraph.prototype =
 
             if ( undefined === this.Pr.Ind.FirstLine || Math.abs( this.Pr.Ind.FirstLine ) < 0.001 )
             {
-                if ( undefined != OldNumPr )
+                if ( undefined != OldNumPr && undefined != OldNumPr.NumId )
                 {
                     var Lvl = this.Parent.Get_Numbering().Get_AbstractNum(OldNumPr.NumId).Lvl[OldNumPr.Lvl];
                     if ( undefined != Lvl && undefined != Lvl.ParaPr.Ind && undefined != Lvl.ParaPr.Ind.Left )
