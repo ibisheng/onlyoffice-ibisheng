@@ -1660,7 +1660,7 @@
 						if (!t.hasFocus) {t.setFocus(true);}
 						if (!(event.altKey && event.shiftKey)) {
 							if (event.altKey)
-								t._addNewLine()
+								t._addNewLine();
 							else {
 								if (false === t.handlers.trigger("isGlobalLockEditCell"))
 									tryCloseEditor()

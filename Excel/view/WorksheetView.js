@@ -5542,14 +5542,10 @@
 				}
 				var arn = ar.clone(true);
 				var isMC = this._isMergedCells(arn);
-				// var adjustRight = ar.c2 >= vr.c2 || ar.c1 >= vr.c2 && isMC;
-				var adjustRight = ar.startCol >= vr.c2;
-				// var adjustBottom = ar.r2 >= vr.r2 || ar.r1 >= vr.r2 && isMC;
-				var adjustBottom = ar.startRow >= vr.r2;
-				// var incX = ar.c1 < vr.c1 && isMC ? arn.c1 - vr.c1 : ar.c2 < vr.c1 ? ar.c2 - vr.c1 : 0;
-				var incX = ar.startCol < vr.c1 && isMC ? arn.c1 - vr.c1 : ar.startCol < vr.c1 ? ar.startCol - vr.c1 : 0;
-				// var incY = ar.r1 < vr.r1 && isMC ? arn.r1 - vr.r1 : ar.r2 < vr.r1 ? ar.r2 - vr.r1 : 0;
-				var incY = ar.startRow < vr.r1 && isMC ? arn.r1 - vr.r1 : ar.startRow < vr.r1 ? ar.startRow - vr.r1 : 0;
+				var adjustRight = ar.c2 >= vr.c2 || ar.c1 >= vr.c2 && isMC;
+				var adjustBottom = ar.r2 >= vr.r2 || ar.r1 >= vr.r2 && isMC;
+				var incX = ar.c1 < vr.c1 && isMC ? arn.c1 - vr.c1 : ar.c2 < vr.c1 ? ar.c2 - vr.c1 : 0;
+				var incY = ar.r1 < vr.r1 && isMC ? arn.r1 - vr.r1 : ar.r2 < vr.r1 ? ar.r2 - vr.r1 : 0;
 
 				if (adjustRight) {
 					while ( this._isColDrawnPartially(isMC ? arn.c2 : ar.c2, vr.c1 + incX) ) {++incX;}
@@ -5732,8 +5728,7 @@
 					
 					cell_info.halign = horAlign;
 					cell_info.valign = vertAlign;
-				}
-				else {
+				} else {
 					cell_info.halign = c.getAlignHorizontalByValue().toLowerCase();
 					cell_info.valign = c.getAlignVertical().toLowerCase();
 				}
@@ -5898,7 +5893,7 @@
 				this._trigger("selectionNameChanged", this.getSelectionName(/*bRangeText*/false));
 				this._trigger("selectionChanged", this.getSelectionInfo());
 
-				return this._calcActiveRangeOffset();
+				return this._calcActiveCellOffset();
 			},
 
 			changeSelectionStartPoint: function (x, y, isCoord, isSelectMode) {

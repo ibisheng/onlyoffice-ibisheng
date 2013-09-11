@@ -243,7 +243,7 @@
 				});
 				this.model.handlers.add("showWorksheet", function (wsId) {
 					self.showWorksheetById(wsId);
-					var ws = self.getWorksheetById(wsId)
+					var ws = self.getWorksheetById(wsId);
 					self.handlers.trigger("asc_onActiveSheetChanged", ws.model.getIndex());
 				});
 				this.model.handlers.add("setSelection", function () {
