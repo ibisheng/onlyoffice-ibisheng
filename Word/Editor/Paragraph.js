@@ -7576,9 +7576,12 @@ Paragraph.prototype =
         return null;
     },
 
-    Check_Hyperlink2 : function(Pos, bCheckEnd)
+    Check_Hyperlink2 : function(Pos, bCheckEnd, bNoSelectCheck)
     {
-        if ( "undefined" === typeof(bCheckEnd) )
+        if ( undefined === bNoSelectCheck )
+            bNoSelectCheck = false;
+
+        if ( undefined === bCheckEnd )
             bCheckEnd = true;
 
         // TODO : Специальная заглушка, для конца селекта. Неплохо бы переделать.
@@ -7593,11 +7596,33 @@ Paragraph.prototype =
             }
         }
 
+        // TODO: специальная заглушка, для случая, когда курсор стоит перед гиперссылкой, чтобы мы определяли данную ситуацию как попадание в гиперссылку
+        if ( true === bNoSelectCheck )
+        {
+            Pos = this.Internal_Correct_HyperlinkPos(Pos);
+        }
+
         var Find = this.Internal_FindBackward( Pos - 1, [para_HyperlinkStart, para_HyperlinkEnd] );
         if ( true === Find.Found && para_HyperlinkStart === Find.Type )
             return this.Content[Find.LetterPos];
 
         return null;
+    },
+
+    Internal_Correct_HyperlinkPos : function(_Pos)
+    {
+        var Pos = _Pos;
+        var Count = this.Content.length;
+        while ( Pos < Count )
+        {
+            var TempType = this.Content[Pos].Type;
+            if ( para_HyperlinkStart === TempType || para_TextPr === TempType || para_CollaborativeChangesEnd === TempType || para_CollaborativeChangesStart === TempType  )
+                Pos++;
+            else
+                break;
+        }
+
+        return Pos;
     },
 
     Hyperlink_Add : function(HyperProps)
@@ -7657,8 +7682,8 @@ Paragraph.prototype =
         }
         else
         {
-            Hyperlink = this.Check_Hyperlink2( this.CurPos.ContentPos );
-            Pos       = this.CurPos.ContentPos;
+            Hyperlink = this.Check_Hyperlink2( this.CurPos.ContentPos, false, true );
+            Pos       = this.Internal_Correct_HyperlinkPos(this.CurPos.ContentPos);
         }
 
         if ( null != Hyperlink )
@@ -7731,9 +7756,9 @@ Paragraph.prototype =
         }
         else
         {
-            var Hyper_cur = this.Check_Hyperlink2( this.CurPos.ContentPos );
+            var Hyper_cur = this.Check_Hyperlink2( this.CurPos.ContentPos, false, true );
             if ( null != Hyper_cur )
-                Pos = this.CurPos.ContentPos;
+                Pos = this.Internal_Correct_HyperlinkPos( this.CurPos.ContentPos );
         }
 
         if ( -1 != Pos )
@@ -10412,7 +10437,7 @@ Paragraph.prototype =
         }
         else
         {
-            var Hyper_cur = this.Check_Hyperlink2( this.CurPos.ContentPos, false );
+            var Hyper_cur = this.Check_Hyperlink2( this.CurPos.ContentPos, false, true );
             if ( null != Hyper_cur )
             {
                 // Вычислим строку
