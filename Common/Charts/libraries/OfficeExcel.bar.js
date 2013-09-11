@@ -129,7 +129,7 @@
         this.halfTextHeight = this._otherProps._text_size / 2;
         
         //Draw Area
-        this.DrawArea();
+        OfficeExcel.background.DrawArea(this);
         
         // Progressively Draw the chart
         OfficeExcel.background.Draw(this);
@@ -253,34 +253,6 @@
         OfficeExcel.FireCustomEvent(this, 'ondraw');
     }
 
-    
-    OfficeExcel.Bar.prototype.DrawArea = function ()
-    {
-        // Don't draw the axes?
-        if (this._otherProps._noaxes)
-            return;
-
-        // Turn any shadow off
-        OfficeExcel.NoShadow(this);
-
-        this.context.lineWidth   = 1;
-        this.context.lineCap = 'butt';
-        this.context.strokeStyle = this._otherProps._axis_color;
-        this.context.fillStyle = 'yellow';
-        this.context.beginPath();
-        this.context.fillStyle = "white";
-        this.context.fillRect(0,0,this.canvas.width,this.canvas.height);
-		
-		// border
-		if ( !g_bChartPreview && this._otherProps._area_border ) {
-			this.context.beginPath();
-			this.context.rect(0, 0, this.canvas.width,this.canvas.height);
-			this.context.strokeStyle = "black";
-		}
-		
-        //this.context.strokeRect(10,10,this.canvas.width-150,this.canvas.height-150)
-        this.context.stroke();
-    }
     
     /**
     * Draws the charts axes

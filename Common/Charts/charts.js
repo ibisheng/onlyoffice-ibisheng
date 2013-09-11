@@ -1363,6 +1363,9 @@ function drawChart(chart, arrValues, width, height, options) {
 	var defaultYTitle = api_sheet ? api_sheet.chartTranslate.yAxis : api_doc.chartTranslate.yAxis;
 	var defaultTitle = api_sheet ? api_sheet.chartTranslate.title : api_doc.chartTranslate.title;
 	
+	var inheritColor = "inherit";
+	var defaultColor  = "white";
+	
 	if(OfficeExcel.drawingCtxCharts)
 		OfficeExcel.drawingCtxCharts.setCanvas(chartCanvas);
 	// По типу
@@ -1637,6 +1640,15 @@ function drawChart(chart, arrValues, width, height, options) {
 	setFontChart(chart);
 	calcAllMargin(chart.isFormatCell,chart.isformatCellScOy,chart.min,chart.max,chart.ymin,chart.ymax, chart);
 	calcWidthGraph();	
+	if(options)
+	{
+		bar._otherProps._background_barcolor1 = inheritColor;
+		bar._otherProps._background_barcolor2 = inheritColor;
+		bar._otherProps._background_image_color = inheritColor;
+	}
+	else
+		bar._otherProps._background_image_color = defaultColor;
+
 	bar.Draw(chart.min,chart.max,chart.ymin,chart.ymax,chart.isSkip,chart.isFormatCell,chart.isformatCellScOy);
 }
 

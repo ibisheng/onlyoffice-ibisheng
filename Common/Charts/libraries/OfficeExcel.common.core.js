@@ -3985,3 +3985,33 @@ if (typeof(obj._otherProps._scale_formatter) == 'function') {
             OfficeExcel.AddEventListener(obj.id, 'mousemove', UserMousemoveHandler);
         }
     }
+	OfficeExcel.background.DrawArea = function (obj)
+    {
+        // Don't draw the axes?
+        if (obj._otherProps._noaxes)
+            return;
+
+        // Turn any shadow off
+        OfficeExcel.NoShadow(obj);
+
+        obj.context.lineWidth   = 1;
+        obj.context.lineCap = 'butt';
+        obj.context.strokeStyle = obj._otherProps._axis_color;
+        obj.context.fillStyle = 'yellow';
+        obj.context.beginPath();
+        if (typeof(obj._otherProps._background_image) == 'string')
+            obj.context.fillStyle = "inherit";
+        else
+            obj.context.fillStyle = obj._otherProps._background_image_color;
+	
+			obj.context.fillRect(0,0,obj.canvas.width,obj.canvas.height)
+		
+		// border
+		if ( !g_bChartPreview && obj._otherProps._area_border ) {
+			obj.context.beginPath();
+			obj.context.rect(0, 0, obj.canvas.width,obj.canvas.height);
+			obj.context.strokeStyle = "black";
+		}
+		
+        obj.context.stroke();
+    }

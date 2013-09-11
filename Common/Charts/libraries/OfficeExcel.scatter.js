@@ -210,7 +210,7 @@
         this.grapharea = this.canvas.height - this._chartGutter._top - this._chartGutter._bottom;
         
         //Draw Area
-        this.DrawArea();
+        OfficeExcel.background.DrawArea(this);
         
         // Progressively Draw the chart
         OfficeExcel.background.Draw(this);
@@ -435,60 +435,6 @@
         OfficeExcel.FireCustomEvent(this, 'ondraw');
     }
 
-
-     OfficeExcel.Scatter.prototype.DrawArea = function ()
-    {
-        // Don't draw the axes?
-        if (this._otherProps._noaxes)
-            return;
-
-        // Turn any shadow off
-        OfficeExcel.NoShadow(this);
-
-        this.context.lineWidth   = 1;
-        this.context.lineCap = 'butt';
-        this.context.strokeStyle = this._otherProps._axis_color;
-        this.context.fillStyle = 'yellow';
-        this.context.beginPath();
-
-        // Draw the X axis
-        /*if (this._otherProps._noxaxis == false) {
-            if (this._otherProps._xaxispos == 'center') {
-                this.context.moveTo(this._chartGutter._left, AA(this, (this.grapharea / 2) + this._chartGutter._top));
-                this.context.lineTo(this.canvas.width - this._chartGutter._right, AA(this, (this.grapharea / 2) + this._chartGutter._top));
-            } else if (this._otherProps._xaxispos == 'top') {
-                this.context.moveTo(this._chartGutter._left, AA(this, this._chartGutter._top));
-                this.context.lineTo(this.canvas.width - this._chartGutter._right, AA(this, this._chartGutter._top));
-            } else {
-                
-                this.context.moveTo(0, AA(this, this.canvas.height));
-                this.context.lineTo(this.canvas.width, AA(this, this.canvas.height));
-            }
-        }
-
-        // Draw the Y axis
-        if (this._otherProps._noyaxis == false) {
-            if (this._otherProps._yaxispos == 'left') {
-                this.context.moveTo(AA(this, this._chartGutter._left), this._chartGutter._top);
-                this.context.lineTo(AA(this, this._chartGutter._left), this.canvas.height - this._chartGutter._bottom );
-            } else {
-                this.context.moveTo(AA(this, this.canvas.width - this._chartGutter._right), this._chartGutter._top);
-                this.context.lineTo(AA(this, this.canvas.width - this._chartGutter._right), this.canvas.height - this._chartGutter._bottom);
-            }
-        }*/
-        this.context.fillStyle = "white";
-        this.context.fillRect(0,0,this.canvas.width,this.canvas.height)
-        //this.context.strokeRect(10,10,this.canvas.width-150,this.canvas.height-150)
-		
-		// border
-		if ( !g_bChartPreview && this._otherProps._area_border ) {
-			this.context.beginPath();
-			this.context.rect(0, 0, this.canvas.width,this.canvas.height);
-			this.context.strokeStyle = "black";
-		}
-		
-        this.context.stroke();
-    }
     /**
     * Draws the axes of the scatter graph
     */

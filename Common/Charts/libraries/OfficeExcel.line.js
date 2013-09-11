@@ -213,7 +213,7 @@
         }
         
         //Draw Area
-        this.DrawArea();
+		OfficeExcel.background.DrawArea(this);
         
         // Draw 3D
         if (this._otherProps._variant == '3d')
@@ -453,40 +453,6 @@
     }
 
     
-    
-    
-    
-
-    OfficeExcel.Line.prototype.DrawArea = function ()
-    {
-        // Don't draw the axes?
-        if (this._otherProps._noaxes)
-            return;
-
-        // Turn any shadow off
-        OfficeExcel.NoShadow(this);
-
-        this.context.lineWidth   = 1;
-        this.context.lineCap = 'butt';
-        this.context.strokeStyle = this._otherProps._axis_color;
-        this.context.fillStyle = 'yellow';
-        this.context.beginPath();
-        if (typeof(this._otherProps._background_image) == 'string')
-            this.context.fillStyle = "inherit";
-        else
-            this.context.fillStyle = "white";
-        this.context.fillRect(0,0,this.canvas.width,this.canvas.height)
-        //this.context.strokeRect(10,10,this.canvas.width-150,this.canvas.height-150)
-		
-		// border
-		if ( !g_bChartPreview && this._otherProps._area_border ) {
-			this.context.beginPath();
-			this.context.rect(0, 0, this.canvas.width,this.canvas.height);
-			this.context.strokeStyle = "black";
-		}
-		
-        this.context.stroke();
-    }
     
     // Draws the axes
     OfficeExcel.Line.prototype.DrawAxes = function (min,max)
