@@ -1476,7 +1476,7 @@ function drawChart(chart, arrValues, width, height, options) {
 			colorMap = GenerateDefaultColorMap().color_map;
 	}
 	
-	if(chart.reSeries && chart.reSeries.length != 0 && (chart.reSeries[0].TxCache.Tx || chart.reSeries[0].OutlineColor) && (theme && colorMap))
+	if(chart.reSeries && chart.reSeries.length != 0 && (chart.reSeries[0].TxCache.Tx || chart.reSeries[0].OutlineColor) && theme)
 	{
 		var uniColors;
 		bar._otherProps._colors = [];
