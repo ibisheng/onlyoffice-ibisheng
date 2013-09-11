@@ -22,6 +22,14 @@
 }
 
 window.USER_AGENT_SAFARI_MACOS = (navigator.userAgent.toLowerCase().indexOf('safari') > -1 && navigator.userAgent.toLowerCase().indexOf('mac') > -1) ? true : false;
+if (window.USER_AGENT_SAFARI_MACOS)
+{
+    // браузеры под мак все определяются как сафари
+    // проверим на дополнительные параметры
+    if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1)
+        window.USER_AGENT_SAFARI_MACOS = false;
+}
+
 window.GlobalPasteFlagCounter = 0;
 
 var COPY_ELEMENT_ID = "SelectId";
