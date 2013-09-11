@@ -5508,15 +5508,6 @@ Paragraph.prototype =
         if ( true === Pos.Found )
         {
             var CurTextPr = this.Content[Pos.LetterPos].Value;
-
-            // Копируем настройки из символьного стиля
-            if ( undefined != CurTextPr.RStyle )
-            {
-                var Styles = this.Parent.Get_Styles();
-                var StyleTextPr = Styles.Get_Pr( CurTextPr.RStyle, styletype_Character).TextPr;
-                TextPr.Merge( StyleTextPr );
-            }
-
             TextPr.Merge( CurTextPr );
         }
         // Если ничего не нашли, то TextPr будет пустым, что тоже нормально
@@ -6564,8 +6555,16 @@ Paragraph.prototype =
             var Item = this.Content[CurPos];
             var ItemType = Item.Type;
 
-            if ( para_Text === ItemType || para_Space === ItemType || para_End === ItemType || para_Tab === ItemType || (para_Drawing === ItemType && true === Item.Is_Inline() ) || para_PageNum === ItemType || para_NewLine === ItemType || para_HyperlinkEnd === ItemType )
+            if ( para_Text === ItemType || para_Space === ItemType || para_End === ItemType || para_Tab === ItemType || (para_Drawing === ItemType && true === Item.Is_Inline() ) || para_PageNum === ItemType || para_NewLine === ItemType )
             {
+                this.CurPos.ContentPos = CurPos + 1;
+                return;
+            }
+            else if ( para_HyperlinkEnd === ItemType )
+            {
+                while ( CurPos < Count - 1 && para_TextPr === this.Content[CurPos + 1].Type )
+                    CurPos++;
+
                 this.CurPos.ContentPos = CurPos + 1;
                 return;
             }
@@ -7172,13 +7171,7 @@ Paragraph.prototype =
     {
         // Создаем текстовую настройку для гиперссылки
         var Hyperlink_end = new ParaHyperlinkEnd();
-        var TextPrObj =
-        {
-            Color      : { r : 0, g : 0, b : 255 },
-            Underline  : true
-        };
-        var TextPr = new CTextPr();
-        TextPr.Set_FromObject( TextPrObj );
+        var RStyle = editor.WordControl.m_oLogicDocument.Get_Styles().Get_Default_Hyperlink();
 
         if ( true === this.ApplyToAll )
         {
@@ -7206,7 +7199,10 @@ Paragraph.prototype =
 
             var TextPr_end   = this.Internal_GetTextPr( EndPos );
             var TextPr_start = this.Internal_GetTextPr( StartPos );
-            TextPr_start.Merge( TextPr );
+
+            TextPr_start.RStyle    = RStyle;
+            TextPr_start.Underline = undefined;
+            TextPr_start.Color     = undefined;
 
             this.Internal_Content_Add( EndPos, new ParaTextPr( TextPr_end ) );
             this.Internal_Content_Add( EndPos, Hyperlink_end );
@@ -7218,7 +7214,12 @@ Paragraph.prototype =
             for ( var Pos = StartPos + 2; Pos < EndPos + 1; Pos++ )
             {
                 if ( this.Content[Pos].Type == para_TextPr )
-                    this.Content[Pos].Apply_TextPr( TextPr );
+                {
+                    var Item = this.Content[Pos];
+                    Item.Set_RStyle( RStyle );
+                    Item.Set_Underline( undefined );
+                    Item.Set_Color( undefined );
+                }
             }
 
             return;
@@ -7640,8 +7641,10 @@ Paragraph.prototype =
         else if ( null != HyperProps.Text && "" != HyperProps.Text ) // добавлять ссылку, без селекта и с пустым текстом нельзя
         {
             var TextPr_hyper = this.Internal_GetTextPr(this.CurPos.ContentPos);
-            TextPr_hyper.Color     = new CDocumentColor( 0, 0, 255 );
-            TextPr_hyper.Underline = true;
+            var Styles = editor.WordControl.m_oLogicDocument.Get_Styles();
+            TextPr_hyper.RStyle    = Styles.Get_Default_Hyperlink();
+            TextPr_hyper.Color     = undefined;
+            TextPr_hyper.Underline = undefined;
 
             var TextPr_old = this.Internal_GetTextPr(this.CurPos.ContentPos);
 
@@ -7709,8 +7712,9 @@ Paragraph.prototype =
                 var End = Find.LetterPos;
 
                 var TextPr = this.Internal_GetTextPr(End);
-                TextPr.Color     = new CDocumentColor( 0, 0, 255 );
-                TextPr.Underline = true;
+                TextPr.RStyle    = editor.WordControl.m_oLogicDocument.Get_Styles().Get_Default_Hyperlink();
+                TextPr.Color     = undefined;
+                TextPr.Underline = undefined;
 
                 // TODO: тут не должно быть картинок, но все-таки если будет такая ситуация,
                 //       тогда надо будет убрать записи о картинках.
@@ -7774,18 +7778,23 @@ Paragraph.prototype =
                 this.Internal_Content_Remove( Find.LetterPos );
 
             var StartPos = Find.LetterPos;
+            var RStyle = editor.WordControl.m_oLogicDocument.Get_Styles().Get_Default_Hyperlink();
 
             // TODO: когда появятся стили текста, тут надо будет переделать
             for ( var Index = StartPos; Index <= EndPos; Index++ )
             {
                 var Item = this.Content[Index];
-                if ( para_TextPr === Item.Type )
+                if ( para_TextPr === Item.Type && Item.Value.RStyle === RStyle )
                 {
-                    Item.Set_Color( undefined );
-                    Item.Set_Underline( undefined );
+                    Item.Set_RStyle( undefined );
                 }
             }
 
+            // Пересчитаем TextPr
+            this.RecalcInfo.Set_Type_0( pararecalc_0_All );
+            this.Internal_Recalculate_0();
+
+            // Запускаем перерисовку
             this.ReDraw();
             return true;
         }

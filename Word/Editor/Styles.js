@@ -2392,6 +2392,19 @@ CStyle.prototype =
         this.Set_TableBand2Horz( TableBand2Horz );
         this.Set_TableBand2Vert( TableBand2Vert );
     },
+
+    Create_Character_Hyperlink : function()
+    {
+        var TextPr =
+        {
+            Color     : { r : 0x00, g : 0x00, b : 0xFF },
+            Underline : true
+        };
+
+        this.Set_UiPriority( 99 );
+        this.Set_UnhideWhenUsed( true );
+        this.Set_TextPr( TextPr );
+    },
 	
 	isEqual: function(cStyles)
 	{
@@ -3557,7 +3570,8 @@ function CStyles()
         Headings  : [],
         ParaList  : null,
         Header    : null,
-        Footer    : null
+        Footer    : null,
+        Hyperlink : null
     };
 
     // Заполняем значения по умолчанию
@@ -3778,6 +3792,11 @@ function CStyles()
     Style_Table_BorderedLined_Accent6.Create_Table_BorderedAndLined( new CDocumentColor( 0xE3, 0x6C, 0x0A ), new CDocumentColor( 0xFA, 0xBF, 0x8F ), new CDocumentColor( 0xFD, 0xE9, 0xD9 ) );
     this.Add( Style_Table_BorderedLined_Accent6 );
 
+    // Создаем стиль гиперссылки
+    var Style_Hyperlink = new CStyle("Hyperlink", null, null, styletype_Character );
+    Style_Hyperlink.Create_Character_Hyperlink();
+    this.Default.Hyperlink = this.Add( Style_Hyperlink );
+
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
 }
@@ -3973,6 +3992,11 @@ CStyles.prototype =
     Get_Default_Footer : function()
     {
         return this.Default.Footer;
+    },
+
+    Get_Default_Hyperlink : function()
+    {
+        return this.Default.Hyperlink;
     },
 
     Get_StyleIdByName : function (Name)
