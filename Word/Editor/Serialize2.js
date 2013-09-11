@@ -2151,7 +2151,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap)
 					break;
 			}
 		}
-        for ( var i = ParaStart; i <= ParaEnd; ++i )
+        for ( var i = ParaStart; i < ParaEnd; ++i )
         {
             var item = Content[i];
 			//если параграф копируется не сначала, то вычисляем текстовые настройки
