@@ -839,11 +839,14 @@
 				this.controller.setCellEditMode(false);
 				this.controller.setStrictClose(false);
 				this.controller.setFormulaEditMode(false);
-				this.getWorksheet().setCellEditMode(false);
-				this.getWorksheet().setFormulaEditMode(false);
-				this.getWorksheet().updateSelection();
+				var ws = this.getWorksheet();
+				var isCellEditMode = ws.getCellEditMode();
+				ws.setCellEditMode(false);
+				ws.setFormulaEditMode(false);
+				ws.updateSelection();
 				this.Api.lastFocused = null;
-				this.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editEnd);
+				if (isCellEditMode)
+					this.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editEnd);
 				// Обновляем состояние Undo/Redo
 				History._sendCanUndoRedo();
 			},
