@@ -8502,6 +8502,8 @@
 
 					var width = null;
 					var row, ct, c, fl, str, maxW, tm, range;
+					var oldWidth;
+					var lastHeight = null;
 					var filterButton = null;
 
 					for (row = 0; row < t.rows.length; ++row) {
@@ -8523,6 +8525,9 @@
 						ct = t._getCellTextCache(col, row);
 
 						if (ct.metrics.height > t.maxRowHeight) {
+							// Запоминаем старую ширину (в случае, если у нас по высоте не уберется)
+							oldWidth = ct.metrics.width;
+							lastHeight = null;
 							// вычисление новой ширины столбца, чтобы высота текста была меньше maxRowHeight
 							c = t._getCell(col, row);
 							fl = t._getCellFlags(c);
@@ -8532,6 +8537,12 @@
 							while (1) {
 								tm = t._roundTextMetrics( t.stringRender.measureString(str, fl, maxW) );
 								if (tm.height <= t.maxRowHeight) {break;}
+								if (lastHeight === tm.height) {
+									// Ситуация, когда у нас текст не уберется по высоте (http://bugzserver/show_bug.cgi?id=19974)
+									tm.width = oldWidth;
+									break;
+								}
+								lastHeight = tm.height;
 								maxW += t.maxDigitWidth;
 							}
 							width = Math.max(width, tm.width);
