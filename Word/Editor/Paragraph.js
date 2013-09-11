@@ -9078,7 +9078,7 @@ Paragraph.prototype =
                 var AbstractNum = Numbering.Get_AbstractNum( Pr.ParaPr.NumPr.NumId );
                 Lvl = AbstractNum.Get_LvlByStyle( StyleId );
                 if ( -1 != Lvl )
-                    Pr.ParaPr.Merge( Numbering.Get_ParaPr( Pr.ParaPr.NumPr.NumId, Lvl ) );
+                {}
                 else
                     Pr.ParaPr.NumPr = undefined;
             }

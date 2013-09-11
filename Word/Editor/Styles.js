@@ -4162,6 +4162,21 @@ CStyles.prototype =
             // Копируем свойства родительского стиля
             this.Internal_Get_Pr( Pr, Style.BasedOn, Type );
 
+            // Копируем свойства из стиля нумерации, если она задана
+            if ( (styletype_Paragraph === Type || styletype_Table === Type) && ( undefined != Style.ParaPr.NumPr ) )
+            {
+                var Numbering = editor.WordControl.m_oLogicDocument.Get_Numbering();
+                if ( undefined != Style.ParaPr.NumPr.NumId && 0 != Style.ParaPr.NumPr.NumId )
+                {
+                    var AbstractNum = Numbering.Get_AbstractNum( Style.ParaPr.NumPr.NumId );
+                    var Lvl = AbstractNum.Get_LvlByStyle( StyleId );
+                    if ( -1 != Lvl )
+                        Pr.ParaPr.Merge( Numbering.Get_ParaPr( Style.ParaPr.NumPr.NumId, Lvl ) );
+                    else
+                        Pr.ParaPr.NumPr = undefined;
+                }
+            }
+
             // Копируем свойства текущего стиля
             switch ( Type )
             {
