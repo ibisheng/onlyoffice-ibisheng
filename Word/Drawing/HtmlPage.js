@@ -2189,6 +2189,9 @@ function CEditorPage(api)
             e.preventDefault();
             return false;
         }
+
+        if (global_keyboardEvent.CtrlKey == true && (global_keyboardEvent.KeyCode == 86 || global_keyboardEvent.KeyCode == 67))
+            oWordControl.bIsUseKeyPress = false;
     }
 
     this.onKeyUp = function(e)

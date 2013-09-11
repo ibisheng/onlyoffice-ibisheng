@@ -4695,7 +4695,7 @@ PasteProcessor.prototype =
 
 function SafariIntervalFocus()
 {
-    if (window.editor && window.editor.WordControl && window.editor.WordControl.IsFocus && !window.editor.WordControl.TextBoxInputMode)
+    if (window.editor && window.editor.WordControl && window.editor.WordControl.IsFocus && (!window.editor.WordControl.TextBoxInputFocus))
     {
         var pastebin = document.getElementById(COPY_ELEMENT_ID);
         if (pastebin)
