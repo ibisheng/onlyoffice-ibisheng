@@ -307,7 +307,17 @@ CAbstractNum.prototype =
 
         return this.Lvl[Lvl];
     },
+	
+    Set_Lvl : function(iLvl, Lvl_new)
+    {
+        if ( "number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9 )
+            return;
 
+        var Lvl_old = this.Lvl[iLvl];
+
+        History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new } );
+    },
+	
     // Определяем многоуровненый список по умолчанию
     Create_Default_Numbered : function()
     {

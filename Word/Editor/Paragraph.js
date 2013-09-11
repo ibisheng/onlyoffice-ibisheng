@@ -169,17 +169,21 @@ Paragraph.prototype =
         return true;
     },
 
+	Set_Pr : function(oNewPr)
+	{
+        var Pr_old = this.Pr;
+        var Pr_new = oNewPr;
+        History.Add( Para, { Type : historyitem_Paragraph_Pr, Old : Pr_old, New : Pr_new } );
+
+        this.Pr = oNewPr;
+	},
+	
     Copy : function(Parent)
     {
         var Para = new Paragraph(this.DrawingDocument, Parent, 0, 0, 0, 0, 0);
 
         // Копируем настройки
-
-        var Pr_old = Para.Pr;
-        var Pr_new = this.Pr.Copy();
-        History.Add( Para, { Type : historyitem_Paragraph_Pr, Old : Pr_old, New : Pr_new } );
-
-        Para.Pr = Pr_new;
+		Para.Set_Pr(this.Pr.Copy());
 
         Para.TextPr.Set_Value( this.TextPr.Value );
 
