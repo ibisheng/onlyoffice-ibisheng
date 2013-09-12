@@ -4558,7 +4558,7 @@ function CThumbnailsManager()
     }
 }
 
-function DrawBackground(graphics, unifill, x, y, w, h)
+function DrawBackground(graphics, unifill, w, h)
 {
     // первым делом рисуем белый рект!
     if (true)
@@ -4566,10 +4566,10 @@ function DrawBackground(graphics, unifill, x, y, w, h)
         // ну какой-то бэкграунд должен быть
         graphics.SetIntegerGrid(false);
 
-        var _l = x;
-        var _t = y;
-        var _r = (x + w);
-        var _b = (y + h);
+        var _l = 0;
+        var _t = 0;
+        var _r = (0 + w);
+        var _b = (0 + h);
 
         graphics._s();
         graphics._m(_l, _t);
@@ -4588,153 +4588,27 @@ function DrawBackground(graphics, unifill, x, y, w, h)
 
     graphics.SetIntegerGrid(false);
 
-    var _fill = unifill.fill;
+    var _shape = new Object();
 
-    switch (_fill.type)
+    _shape.brush = unifill;
+    _shape.pen = null;
+    _shape.TransformMatrix = new CMatrix();
+    _shape.extX = w;
+    _shape.extY = h;
+    _shape.check_bounds = function(checker)
     {
-        case FILL_TYPE_BLIP:
-        {
-            if (graphics.RENDERER_PDF_FLAG !== undefined)
-            {
-                if (null == unifill.fill.tile)
-                {
-                    graphics.drawImage(_getFullImageSrc(unifill.fill.RasterImageId), x, y, w, h);
-                }
-                else
-                {
-                    graphics.put_TextureBoundsEnabled(true);
-                    graphics.put_TextureBounds(0, 0, w, h);
-
-                    graphics._s();
-                    graphics._m(0, 0);
-                    graphics._l(w, 0);
-                    graphics._l(w, h);
-                    graphics._l(0, h);
-                    graphics._z();
-
-                    graphics.put_brushTexture(_getFullImageSrc(unifill.fill.RasterImageId), 1);
-                    graphics.df();
-
-                    graphics._e();
-                }
-            }
-            else
-            {
-                if (null == unifill.fill.tile || graphics.m_oContext == null || graphics.m_oContext === undefined)
-                {
-                    graphics.drawImage(_getFullImageSrc(unifill.fill.RasterImageId), x, y, w, h);
-                }
-                else
-                {
-                    var _img = editor.ImageLoader.map_image_index[_getFullImageSrc(unifill.fill.RasterImageId)];
-                    if (_img == undefined || _img.Image == null || _img.Status == ImageLoadStatus.Loading)
-                    {
-                        graphics.drawImage(_getFullImageSrc(unifill.fill.RasterImageId), x, y, w, h);
-                    }
-                    else
-                    {
-                        var _ctx = graphics.m_oContext;
-                        _ctx = graphics.m_oContext;
-
-                        var patt = _ctx.createPattern(_img.Image, "repeat");
-
-                        _ctx.save();
-
-                        var koefX = editor.WordControl.m_nZoomValue / 100;
-                        var koefY = editor.WordControl.m_nZoomValue / 100;
-
-                        _ctx.rect(x, y, w, h);
-
-                        _ctx.translate(x, y);
-                        _ctx.scale(koefX * graphics.TextureFillTransformScaleX, koefY * graphics.TextureFillTransformScaleY);
-
-                        _ctx.fillStyle = patt;
-                        _ctx.fill();
-
-                        _ctx.restore();
-                    }
-                }
-            }
-
-            //graphics.drawImage(_getFullImageSrc(_fill.RasterImageId), x, y, w, h);
-            break;
-        }
-        case FILL_TYPE_SOLID:
-        {
-            var _l = x;
-            var _t = y;
-            var _r = (x + w);
-            var _b = (y + h);
-
-            graphics._s();
-            graphics._m(_l, _t);
-            graphics._l(_r, _t);
-            graphics._l(_r, _b);
-            graphics._l(_l, _b);
-            graphics._z();
-
-            var _c = _fill.color.RGBA;
-            graphics.b_color1(_c.R, _c.G, _c.B, _c.A);
-            graphics.df();
-            break;
-        }
-        case FILL_TYPE_GRAD:
-        {
-            var _l = x;
-            var _t = y;
-            var _r = (x + w);
-            var _b = (y + h);
-
-            var __c = _fill.colors;
-            var _c = null;
-
-            if (__c.length == 0)
-                _c = new CUniColor().RGBA;
-            else
-                _c = _fill.colors[0].color.RGBA;
-
-            graphics._s();
-            graphics._m(_l, _t);
-            graphics._l(_r, _t);
-            graphics._l(_r, _b);
-            graphics._l(_l, _b);
-            graphics._z();
-
-            graphics.b_color1(_c.R, _c.G, _c.B, _c.A);
-            graphics.df();
-
-            break;
-        }
-        case FILL_TYPE_PATT:
-        {
-            var _c = _fill.fgClr.RGBA;
-
-            var _l = x;
-            var _t = y;
-            var _r = (x + w);
-            var _b = (y + h);
-
-            graphics._s();
-            graphics._m(_l, _t);
-            graphics._l(_r, _t);
-            graphics._l(_r, _b);
-            graphics._l(_l, _b);
-            graphics._z();
-
-            graphics.b_color1(_c.R, _c.G, _c.B, _c.A);
-            graphics.df();
-
-            break;
-        }
-        case FILL_TYPE_NOFILL:
-        {
-            break;
-        }
-        default:
-        {
-            break;
-        }
+        checker._s();
+        checker._m(0, 0);
+        checker._l(this.extX, 0);
+        checker._l(this.extX, this.extY);
+        checker._l(0, this.extY);
+        checker._z();
+        checker._e();
     }
+
+    var shape_drawer = new CShapeDrawer();
+    shape_drawer.fromShape2(_shape, graphics, null);
+    shape_drawer.draw(null);
 }
 
 function CSlideDrawer()
