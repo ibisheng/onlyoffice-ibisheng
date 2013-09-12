@@ -5361,6 +5361,8 @@ function BinaryPPTYLoader()
                 case 17:
                 {
                     bodyPr.vert = s.GetUChar();
+                    if(bodyPr.vert === nVertTTwordArtVert)
+                        bodyPr.vert = nVertTTvert270;
                     break;
                 }
                 case 18:
@@ -6118,6 +6120,8 @@ function BinaryPPTYLoader()
                                     {
                                         var unifill = new CUniFill();
                                         unifill.fill = new CSolidFill();
+                                        if(!unifill.fill.color)
+                                            unifill.fill.color = new CUniColor();
                                         unifill.fill.color.color = new CSchemeColor();
                                         unifill.fill.color.color.id = 11;
 
