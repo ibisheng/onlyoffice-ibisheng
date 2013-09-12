@@ -569,7 +569,7 @@ CChartAsGroup.prototype =
         {
             var title_string;
             if(this.chart.header.bDefaultTitle || !(typeof this.chart.header.title === "string"))
-                title_string = "Chart Title";
+                title_string = this.chart.header.title;
             else
                 title_string = this.chart.header.title;
 
@@ -582,7 +582,7 @@ CChartAsGroup.prototype =
         if(isRealObject(this.chart.xAxis) && this.chart.xAxis.bShow)
         {
             if(this.chart.xAxis.bDefaultTitle || !(typeof this.chart.xAxis.title === "string"))
-                title_string = "X Axis";
+                title_string = this.chart.xAxis.title;
             else
                 title_string = this.chart.xAxis.title;
 
@@ -600,7 +600,7 @@ CChartAsGroup.prototype =
         if(isRealObject(this.chart.yAxis) && this.chart.yAxis.bShow)
         {
             if(this.chart.yAxis.bDefaultTitle || !(typeof this.chart.yAxis.title === "string"))
-                title_string = "Y Axis";
+                title_string = this.chart.yAxis.title;
             else
                 title_string = this.chart.yAxis.title;
 
