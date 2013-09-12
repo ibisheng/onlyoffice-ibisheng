@@ -615,7 +615,6 @@ CMathBase.prototype =
          var mouseCoord = {x: null, y: null},
              posCurs =    {x: null, y: null};
 
-
          var sumWidth = 0;
          var sumHeight = 0;
 

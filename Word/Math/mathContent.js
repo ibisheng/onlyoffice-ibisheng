@@ -454,8 +454,8 @@ CMathContent.prototype =
                 case MATH_DELIMITER:
                     mathElem = new CDelimiter();
                     break;
-                case MATH_SEPARATOR_DELIMITER:
-                    mathElem = new CSeparatorDelimiter();
+                case MATH_GROUP_CHARACTER:
+                    mathElem = new CGroupCharacter();
                     break;
                 case MATH_FUNCTION:
                     mathElem = new CMathFunc();
@@ -3325,12 +3325,20 @@ CMathContent.prototype =
                     break;
                 case 96:
                     var delim = this.addMComponent(MATH_DELIMITER);
-                    var props =
+                   /* var props =
                     {
                         begChr:    {type: PARENTHESIS_LEFT},
                         sepChr:    {type: BRACKET_ANGLE_LEFT},
                         endChr:    {type: BRACKET_CURLY_RIGHT},
                         column:    2
+                    };*/
+                    var props =
+                    {
+                        begChr:        {type: PARENTHESIS_LEFT},
+                        sepChr:        {type: DELIMITER_LINE},
+                        endChr:        {type: PARENTHESIS_RIGHT},
+                        shapeType:     DELIMITER_SHAPE_MATH,
+                        column:        2
                     };
                     delim.init(props);
                     delim.fillPlaceholders();
@@ -3339,153 +3347,313 @@ CMathContent.prototype =
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        begChr:    {type: PARENTHESIS_LEFT},
-                        sepChr:    {type: BRACKET_ANGLE_LEFT},
-                        endChr:    {type: BRACKET_CURLY_RIGHT},
-                        column:    5
+                        begChr:        {type: BRACKET_CURLY_LEFT},
+                        sepChr:        {type: DELIMITER_LINE},
+                        endChr:        {type: BRACKET_CURLY_RIGHT},
+                        shapeType:     DELIMITER_SHAPE_MATH,
+                        column:        2
                     };
                     delim.init(props);
                     delim.fillPlaceholders();
                     break;
                     break;
                 case 98:
-                    var delim = this.addMComponent(10);
-                    delim.init(3, 2);
+                    var delim = this.addMComponent(MATH_DELIMITER);
+                    var props =
+                    {
+                        begChr:        {type: BRACKET_ANGLE_LEFT},
+                        sepChr:        {type: DELIMITER_LINE},
+                        endChr:        {type: BRACKET_ANGLE_RIGHT},
+                        shapeType:     DELIMITER_SHAPE_MATH,
+                        column:         2
+                    };
+                    delim.init(props);
                     delim.fillPlaceholders();
                     break;
                 case 99:
-                    var delim = this.addMComponent(10);
-                    delim.init(3, 3);
+                    var delim = this.addMComponent(MATH_DELIMITER);
+                    var props =
+                    {
+                        begChr:        {type: BRACKET_ANGLE_LEFT},
+                        sepChr:        {type: DELIMITER_LINE},
+                        endChr:        {type: BRACKET_ANGLE_RIGHT},
+                        shapeType:     DELIMITER_SHAPE_MATH,
+                        column:        3
+                    };
+                    delim.init(props);
                     delim.fillPlaceholders();
                     break;
                 case 100:
-                    var delim = this.addMComponent(9);
-                    delim.init(0,2,0);
+                    var delim = this.addMComponent(MATH_DELIMITER);
+                    var props =
+                    {
+                        begChr:        {type: PARENTHESIS_LEFT},
+                        shapeType:     DELIMITER_SHAPE_MATH,
+                        column:        1
+                    };
+                    delim.init(props);
                     delim.fillPlaceholders();
                     break;
                 case 101:
-                    var delim = this.addMComponent(9);
-                    delim.init(0,3,1);
+                    var delim = this.addMComponent(MATH_DELIMITER);
+                    var props =
+                    {
+                        endChr:        {type: PARENTHESIS_RIGHT},
+                        shapeType:     DELIMITER_SHAPE_MATH,
+                        column:        1
+                    };
+                    delim.init(props);
                     delim.fillPlaceholders();
                     break;
                 case 102:
-                    var delim = this.addMComponent(9);
-                    delim.init(2,2,0);
+                    var delim = this.addMComponent(MATH_DELIMITER);
+                    var props =
+                    {
+                        begChr:        {type: BRACKET_SQUARE_LEFT},
+                        shapeType:     DELIMITER_SHAPE_MATH,
+                        column:        1
+                    };
+                    delim.init(props);
                     delim.fillPlaceholders();
                     break;
                 case 103:
-                    var delim = this.addMComponent(9);
-                    delim.init(2,3,1);
+                    var delim = this.addMComponent(MATH_DELIMITER);
+                    var props =
+                    {
+                        endChr:        {type: BRACKET_SQUARE_RIGHT},
+                        shapeType:     DELIMITER_SHAPE_MATH,
+                        column:        1
+                    };
+                    delim.init(props);
                     delim.fillPlaceholders();
                     break;
                 case 104:
-                    var delim = this.addMComponent(9);
-                    delim.init(1,2,0);
+                    var delim = this.addMComponent(MATH_DELIMITER);
+                    var props =
+                    {
+                        begChr:        {type: BRACKET_CURLY_LEFT},
+                        shapeType:     DELIMITER_SHAPE_MATH,
+                        column:        1
+                    };
+                    delim.init(props);
                     delim.fillPlaceholders();
                     break;
                 case 105:
-                    var delim = this.addMComponent(9);
-                    delim.init(1,3,1);
+                    var delim = this.addMComponent(MATH_DELIMITER);
+                    var props =
+                    {
+                        endChr:        {type: BRACKET_CURLY_RIGHT},
+                        shapeType:     DELIMITER_SHAPE_MATH,
+                        column:        1
+                    };
+                    delim.init(props);
                     delim.fillPlaceholders();
                     break;
                 case 106:
-                    var delim = this.addMComponent(9);
-                    delim.init(3,2,0);
+                    var delim = this.addMComponent(MATH_DELIMITER);
+                    var props =
+                    {
+                        begChr:        {type: BRACKET_ANGLE_LEFT},
+                        shapeType:     DELIMITER_SHAPE_MATH,
+                        column:        1
+                    };
+                    delim.init(props);
                     delim.fillPlaceholders();
                     break;
                 case 107:
-                    var delim = this.addMComponent(9);
-                    delim.init(3,3,1);
+                    var delim = this.addMComponent(MATH_DELIMITER);
+                    var props =
+                    {
+                        endChr:        {type: BRACKET_ANGLE_RIGHT},
+                        shapeType:     DELIMITER_SHAPE_MATH,
+                        column:        1
+                    };
+                    delim.init(props);
                     delim.fillPlaceholders();
                     break;
                 case 108:
-                    var delim = this.addMComponent(9);
-                    delim.init(4,2,0);
+                    var delim = this.addMComponent(MATH_DELIMITER);
+                    var props =
+                    {
+                        begChr:        {type: HALF_SQUARE_LEFT},
+                        shapeType:     DELIMITER_SHAPE_MATH,
+                        column:        1
+                    };
+                    delim.init(props);
                     delim.fillPlaceholders();
                     break;
                 case 109:
-                    var delim = this.addMComponent(9);
-                    delim.init(4,3,1);
+                    var delim = this.addMComponent(MATH_DELIMITER);
+                    var props =
+                    {
+                        endChr:        {type: HALF_SQUARE_RIGHT},
+                        shapeType:     DELIMITER_SHAPE_MATH,
+                        column:        1
+                    };
+                    delim.init(props);
                     delim.fillPlaceholders();
                     break;
                 case 110:
-                    var delim = this.addMComponent(9);
-                    delim.init(4,2,2);
+                    var delim = this.addMComponent(MATH_DELIMITER);
+                    var props =
+                    {
+                        begChr:        {type: HALF_SQUARE_LEFT_UPPER},
+                        shapeType:     DELIMITER_SHAPE_MATH,
+                        column:        1
+                    };
+                    delim.init(props);
                     delim.fillPlaceholders();
                     break;
                 case 111:
-                    var delim = this.addMComponent(9);
-                    delim.init(4,3,3);
+                    var delim = this.addMComponent(MATH_DELIMITER);
+                    var props =
+                    {
+                        endChr:        {type: HALF_SQUARE_RIGHT_UPPER},
+                        shapeType:     DELIMITER_SHAPE_MATH,
+                        column:        1
+                    };
+                    delim.init(props);
                     delim.fillPlaceholders();
                     break;
                 case 112:
-                    var delim = this.addMComponent(9);
-                    delim.init(5,2,0);
+                    var delim = this.addMComponent(MATH_DELIMITER);
+                    var props =
+                    {
+                        begChr:        {type: DELIMITER_LINE},
+                        shapeType:     DELIMITER_SHAPE_MATH,
+                        column:        1
+                    };
+                    delim.init(props);
                     delim.fillPlaceholders();
                     break;
                 case 113:
-                    var delim = this.addMComponent(9);
-                    delim.init(5,3,1);
+                    var delim = this.addMComponent(MATH_DELIMITER);
+                    var props =
+                    {
+                        endChr:        {type: DELIMITER_LINE},
+                        shapeType:     DELIMITER_SHAPE_MATH,
+                        column:        1
+                    };
+                    delim.init(props);
                     delim.fillPlaceholders();
                     break;
                 case 114:
-                    var delim = this.addMComponent(9);
-                    delim.init(6,2,0);
+                    var delim = this.addMComponent(MATH_DELIMITER);
+                    var props =
+                    {
+                        begChr:        {type: DELIMITER_DOUBLE_LINE},
+                        shapeType:     DELIMITER_SHAPE_MATH,
+                        column:        1
+                    };
+                    delim.init(props);
                     delim.fillPlaceholders();
                     break;
                 case 115:
-                    var delim = this.addMComponent(9);
-                    delim.init(6,3,1);
+                    var delim = this.addMComponent(MATH_DELIMITER);
+                    var props =
+                    {
+                        endChr:        {type: DELIMITER_DOUBLE_LINE},
+                        shapeType:     DELIMITER_SHAPE_MATH,
+                        column:        1
+                    };
+                    delim.init(props);
                     delim.fillPlaceholders();
                     break;
                 case 116:
-                    var delim = this.addMComponent(9);
-                    delim.init(7,2,0);
+                    var delim = this.addMComponent(MATH_DELIMITER);
+                    var props =
+                    {
+                        begChr:        {type: WHITE_SQUARE_LEFT},
+                        shapeType:     DELIMITER_SHAPE_MATH,
+                        column:        1
+                    };
+                    delim.init(props);
                     delim.fillPlaceholders();
                     break;
                 case 117:
-                    var delim = this.addMComponent(9);
-                    delim.init(7,3,1);
+                    var delim = this.addMComponent(MATH_DELIMITER);
+                    var props =
+                    {
+                        endChr:        {type:  WHITE_SQUARE_RIGHT},
+                        shapeType:     DELIMITER_SHAPE_MATH,
+                        column:        1
+                    };
+                    delim.init(props);
                     delim.fillPlaceholders();
                     break;
                 case 118:
-                    var delim = this.addMComponent(9);
-                    delim.init(1,2,0);
+                    var delim = this.addMComponent(MATH_DELIMITER);
+                    var props =
+                    {
+                        begChr:        {type: BRACKET_CURLY_LEFT},
+                        shapeType:     DELIMITER_SHAPE_MATH,
+                        column:        1
+                    };
+                    delim.init(props);
                     var base = delim.getBase();
-                    var matrix = base.addMComponent(21);
-                    matrix.init(2, 1);
+                    var matrix = base.addMComponent(MATH_MATRIX);
+                    var props =
+                    {
+                        row :       2,
+                        column:     1
+                    };
+                    matrix.init(props);
                     matrix.fillPlaceholders();
                     break;
                 case 119:
-                    var delim = this.addMComponent(9);
-                    delim.init(1,2,0);
+                    var delim = this.addMComponent(MATH_DELIMITER);
+                    var props =
+                    {
+                        begChr:        {type: BRACKET_CURLY_LEFT},
+                        shapeType:     DELIMITER_SHAPE_MATH,
+                        column:        1
+                    };
+                    delim.init(props);
                     var base = delim.getBase();
-                    var matrix = base.addMComponent(21);
-                    matrix.init(3, 1);
+                    var matrix = base.addMComponent(MATH_MATRIX);
+                    var props =
+                    {
+                        row :       3,
+                        column:     1
+                    };
+                    matrix.init(props);
                     matrix.fillPlaceholders();
                     break;
                 case 120:
-                    var fract = this.addMComponent(0);
-                    fract.init();
-                    fract.hideBar(true);
+                    var fract = this.addMComponent(MATH_FRACTION);
+                    fract.init({type: NO_BAR_FRACTION});
                     fract.fillPlaceholders();
                     break;
                 case 121:
-                    var delim = this.addMComponent(9);
-                    delim.init(0, 4, 0, 1);
-                    var fract = delim.getBase().addMComponent(0);
-                    fract.init();
-                    fract.hideBar(true);
+                    var delim = this.addMComponent(MATH_DELIMITER);
+                    var props =
+                    {
+                        begChr:        {type: PARENTHESIS_LEFT},
+                        endChr:        {type: PARENTHESIS_RIGHT},
+                        shapeType:     DELIMITER_SHAPE_MATH,
+                        column:        1
+                    };
+                    delim.init(props);
+                    var base = delim.getBase();
+                    var fract = base.addMComponent(MATH_FRACTION);
+                    fract.init({type: NO_BAR_FRACTION});
                     fract.fillPlaceholders();
                     break;
                 case 122:
                     break;
                 case 123:
-                    var delim = this.addMComponent(9);
-                    delim.init(0, 4, 0, 1);
-                    var fract = delim.getBase().addMComponent(0);
-                    fract.init();
-                    fract.hideBar(true);
+                    var delim = this.addMComponent(MATH_DELIMITER);
+                    var props =
+                    {
+                        begChr:        {type: PARENTHESIS_LEFT},
+                        endChr:        {type: PARENTHESIS_RIGHT},
+                        shapeType:     DELIMITER_SHAPE_MATH,
+                        column:        1
+                    };
+                    delim.init(props);
+                    var base = delim.getBase();
+                    var fract = base.addMComponent(MATH_FRACTION);
+                    fract.init({type: NO_BAR_FRACTION});
                     var num = fract.getNumerator();
                     num.addTxt("n");
 
@@ -3493,11 +3661,18 @@ CMathContent.prototype =
                     den.addTxt("k");
                     break;
                 case 124:
-                    var delim = this.addMComponent(9);
-                    delim.init(3, 4, 0, 1);
-                    var fract = delim.getBase().addMComponent(0);
-                    fract.init();
-                    fract.hideBar(true);
+                    var delim = this.addMComponent(MATH_DELIMITER);
+                    var props =
+                    {
+                        begChr:        {type: BRACKET_ANGLE_LEFT},
+                        endChr:        {type: BRACKET_ANGLE_RIGHT},
+                        shapeType:     DELIMITER_SHAPE_MATH,
+                        column:        1
+                    };
+                    delim.init(props);
+                    var base = delim.getBase();
+                    var fract = base.addMComponent(MATH_FRACTION);
+                    fract.init({type: NO_BAR_FRACTION});
                     var num = fract.getNumerator();
                     num.addTxt("n");
 
@@ -3861,50 +4036,87 @@ CMathContent.prototype =
                     line.fillPlaceholders();
                     break;
                 case 163:
-                    var delim = this.addMComponent(9);
+                    /*var delim = this.addMComponent(9);
                     delim.init(1,0,1);
+                    delim.fillPlaceholders();*/
+                    var delim = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var props =
+                    {
+                        chr:            {type: BRACKET_CURLY_TOP},
+                        location:       LOCATION_TOP,
+                        justif:         VJUST_BOT
+                    };
+                    delim.init(props);
                     delim.fillPlaceholders();
                     break;
                 case 164:
-                    var delim = this.addMComponent(9);
-                    delim.init(1,1,2);
+                    var delim = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var props =
+                    {
+                        location:       LOCATION_BOT,
+                        justif:         VJUST_TOP
+                    };
+                    delim.init(props);
                     delim.fillPlaceholders();
                     break;
                 case 165:
-                    var groupDelim = this.addMComponent(16);
-                    groupDelim.init(1);
-                    groupDelim.fillPlaceholders();
                     break;
                 case 166:
-                    var groupDelim = this.addMComponent(16);
-                    groupDelim.init(-1);
-                    groupDelim.fillPlaceholders();
                     break;
                 case 167:
-                    var arrow = this.addMComponent(17);
-                    arrow.init(1, 0, 0); // left arrow  top
-                    arrow.fillPlaceholders();
+                    var delim = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var props =
+                    {
+                        chr:            {type:  ARROW_LEFT},
+                        location:       LOCATION_TOP,
+                        justif:         VJUST_BOT
+                    };
+                    delim.init(props);
+                    delim.fillPlaceholders();
                     break;
                 case 168:
-                    var arrow = this.addMComponent(17);
-                    arrow.init(1, 0, 1); // right arrow  top
-                    arrow.fillPlaceholders();
+                    var delim = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var props =
+                    {
+                        chr:            {type:  ARROW_RIGHT},
+                        location:       LOCATION_TOP,
+                        justif:         VJUST_BOT
+                    };
+                    delim.init(props);
+                    delim.fillPlaceholders();
                     break;
                 case 169:
-                    var arrow = this.addMComponent(17);
-                    arrow.init(2, 0, 0);
-                    arrow.fillPlaceholders();
+                    var delim = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var props =
+                    {
+                        chr:            {type:  ARROW_LR},
+                        location:       LOCATION_TOP,
+                        justif:         VJUST_BOT
+                    };
+                    delim.init(props);
+                    delim.fillPlaceholders();
                     break;
                 case 170:
-                    var arrow = this.addMComponent(17);
-                    arrow.init(0, 0, 0);
-                    arrow.fillPlaceholders();
+                    var delim = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var props =
+                    {
+                        chr:            {type:  HALF_ARROW_LEFT},
+                        location:       LOCATION_TOP,
+                        justif:         VJUST_BOT
+                    };
+                    delim.init(props);
+                    delim.fillPlaceholders();
                     break;
                 case 171:
-                    var arrow = this.addMComponent(17);
-                    arrow.init(0, 0, 1);
-                    arrow.fillPlaceholders();
-                    break;
+                    var delim = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var props =
+                    {
+                        chr:            {type:  HALF_ARROW_RIGHT},
+                        location:       LOCATION_TOP,
+                        justif:         VJUST_BOT
+                    };
+                    delim.init(props);
+                    delim.fillPlaceholders();
                 case 172:
                     break;
                 case 173:
