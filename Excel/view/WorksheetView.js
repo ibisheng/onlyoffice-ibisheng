@@ -7060,6 +7060,8 @@
 							t.autoFilters.isEmptyAutoFilters(t, arn);
 							// Вызываем функцию пересчета для заголовков форматированной таблицы
 							t.autoFilters._renameTableColumn(t, arn);
+							//удаляем выделенные графичекие объекты
+							t.objectRender.controller.deleteSelectedObjects();
 
 							/* возвращаем отрисовку. и перерисовываем ячейки с предварительным пересчетом */
 							buildRecalc(t.model.workbook);
