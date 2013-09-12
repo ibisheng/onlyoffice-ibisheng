@@ -181,8 +181,6 @@
 				return new WorksheetViewSettings();
 			}
 			this.header = {
-				fontName: "Calibri",
-				fontSize: 11,
 				style: [
 				// Old header colors
 				/*{ // kHeaderDefault
@@ -403,6 +401,7 @@
 			this.headersTop = 0;
 			this.headersWidth = 0;
 			this.headersHeight = 0;
+			this.headersHeightByFont = 0;	// Размер по шрифту (размер без скрытия заголовков)
 			this.cellsLeft = 0;
 			this.cellsTop = 0;
 			this.cols = [];
@@ -1141,6 +1140,12 @@
 				this.defaultRowDescender = this._calcRowDescender(this.settings.cells.fontSize);
 				this.defaultRowHeight = asc_calcnpt(this.settings.cells.fontSize * this.vspRatio, this._getPPIY()) + this.height_1px;
 				gc_dDefaultRowHeightAttribute = this.model.getDefaultHeight() || this.defaultRowHeight;
+
+				var cells = this.settings.cells;
+				this._setFont(undefined, cells.fontName, cells.fontSize);
+				var sr = this.stringRender;
+				var tm = this._roundTextMetrics(sr.measureString("A"));
+				this.headersHeightByFont = tm.height;
 			},
 			_initConstValues: function () {
 				var ppiX = this._getPPIX();
@@ -1254,7 +1259,8 @@
 				if (false === this.model.sheetViews[0].asc_getShowRowColHeaders())
 					this.headersHeight = 0;
 				else
-					this.headersHeight = this.model.getDefaultHeight() || this.defaultRowHeight;
+					//this.headersHeight = this.model.getDefaultHeight() || this.defaultRowHeight;
+					this.headersHeight = this.headersHeightByFont + this.height_1px;
 
 				//this.headersHeight = asc_calcnpt( this.settings.header.fontSize * this.vspRatio, this._getPPIY() );
 				this.cellsTop = this.headersTop + this.headersHeight;
@@ -2001,7 +2007,6 @@
 			_drawColumnHeaders: function (drawingCtx, start, end, style, offsetXForDraw, offsetYForDraw) {
 				if (undefined === drawingCtx && false === this.model.sheetViews[0].asc_getShowRowColHeaders())
 					return;
-				var hdr = this.settings.header;
 				var cells = this.settings.cells;
 				var vr  = this.visibleRange;
 				var offsetX = (offsetXForDraw) ? offsetXForDraw : this.cols[vr.c1].left - this.cellsLeft;
@@ -2011,8 +2016,7 @@
 				if (asc_typeof(end) !== "number") {end = vr.c2;}
 				if (style === undefined) {style = kHeaderDefault;}
 
-				this._setFont(drawingCtx, hdr.fontName, hdr.fontSize);
-				this.stringRender.setDefaultFont(new asc_FP(hdr.fontName, hdr.fontSize));
+				this._setFont(drawingCtx, cells.fontName, cells.fontSize);
 
 				// draw column headers
 				for (var i = start; i <= end; ++i) {
@@ -2020,15 +2024,12 @@
 						this.cols[i].left - offsetX, offsetY, this.cols[i].width, this.headersHeight,
 						style, true, i);
 				}
-
-				this.stringRender.setDefaultFont(new asc_FP(cells.fontName, cells.fontSize));
 			},
 
 			/** Рисует заголовки видимых строк */
 			_drawRowHeaders: function (drawingCtx, start, end, style, offsetXForDraw, offsetYForDraw) {
 				if (undefined === drawingCtx && false === this.model.sheetViews[0].asc_getShowRowColHeaders())
 					return;
-				var hdr = this.settings.header;
 				var cells = this.settings.cells;
 				var vr  = this.visibleRange;
 				var offsetX = (offsetXForDraw) ? offsetXForDraw : this.headersLeft;
@@ -2038,8 +2039,7 @@
 				if (asc_typeof(end) !== "number") {end = vr.r2;}
 				if (style === undefined) {style = kHeaderDefault;}
 
-				this._setFont(drawingCtx, hdr.fontName, hdr.fontSize);
-				this.stringRender.setDefaultFont(new asc_FP(hdr.fontName, hdr.fontSize));
+				this._setFont(drawingCtx, cells.fontName, cells.fontSize);
 
 				// draw row headers
 				for (var i = start; i <= end; ++i) {
@@ -2047,8 +2047,6 @@
 						offsetX, this.rows[i].top - offsetY, this.headersWidth, this.rows[i].height,
 						style, false, i);
 				}
-
-				this.stringRender.setDefaultFont(new asc_FP(cells.fontName, cells.fontSize));
 			},
 
 			/**

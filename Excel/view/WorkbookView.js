@@ -1557,7 +1557,6 @@
 
 				var ppiX = 96; // Мерить только с 96
 				var ptConvToPx = asc_getcvt(1/*pt*/, 0/*px*/, ppiX);
-				var pxConvToPt = asc_getcvt(0/*px*/, 1/*pt*/, ppiX);
 
 				// Максимальная ширина в Pt
 				var maxWidthInPt = this.stringRender.getWidestCharWidth();
