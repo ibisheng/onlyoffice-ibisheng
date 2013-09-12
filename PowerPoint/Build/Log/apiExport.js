@@ -366,6 +366,11 @@ prop:SetTextBoxInputMode
 prop:GetTextBoxInputMode
 prop:asc_setCoAuthoringEnable
 prop:sync_EndAddShape
+prop:asc_getChartObject
+prop:asc_addChartDrawingObject
+prop:asc_editChartDrawingObject
+prop:asc_getChartPreviews
+prop:sync_closeChartEditor
 prop:sync_ContextMenuCallback
 ---
 var:CChatMessage
@@ -1364,6 +1369,11 @@ asc_docs_api.prototype['SetTextBoxInputMode'] = asc_docs_api.prototype.SetTextBo
 asc_docs_api.prototype['GetTextBoxInputMode'] = asc_docs_api.prototype.GetTextBoxInputMode;
 asc_docs_api.prototype['asc_setCoAuthoringEnable'] = asc_docs_api.prototype.asc_setCoAuthoringEnable;
 asc_docs_api.prototype['sync_EndAddShape'] = asc_docs_api.prototype.sync_EndAddShape;
+asc_docs_api.prototype['asc_getChartObject'] = asc_docs_api.prototype.asc_getChartObject;
+asc_docs_api.prototype['asc_addChartDrawingObject'] = asc_docs_api.prototype.asc_addChartDrawingObject;
+asc_docs_api.prototype['asc_editChartDrawingObject'] = asc_docs_api.prototype.asc_editChartDrawingObject;
+asc_docs_api.prototype['asc_getChartPreviews'] = asc_docs_api.prototype.asc_getChartPreviews;
+asc_docs_api.prototype['sync_closeChartEditor'] = asc_docs_api.prototype.sync_closeChartEditor;
 asc_docs_api.prototype['sync_ContextMenuCallback'] = asc_docs_api.prototype.sync_ContextMenuCallback;
 window['CChatMessage'] = CChatMessage;
 CChatMessage.prototype['get_UserId'] = CChatMessage.prototype.get_UserId;
