@@ -2047,7 +2047,7 @@
 				{
 					if(this.Api && this.Api.isChartEditor)
 						return false;
-						
+					worksheet.objectRender.preCopy();
 					var nLoc = 0;
 					var table = document.createElement('span');
 					var drawings = worksheet.model.Drawings;
