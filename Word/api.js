@@ -6140,7 +6140,6 @@ asc_docs_api.prototype.sync_SendProgress = function(Percents)
 
 asc_docs_api.prototype.pre_Paste = function(_fonts, _images, callback)
 {
-    this.isPasteFonts_Images = true;
     this.pasteCallback = callback;
     this.pasteImageMap = _images;
 
@@ -6155,6 +6154,7 @@ asc_docs_api.prototype.pre_Paste = function(_fonts, _images, callback)
         return;
     }
 
+    this.isPasteFonts_Images = true;
     this.FontLoader.LoadDocumentFonts2(_fonts);
 }
 
