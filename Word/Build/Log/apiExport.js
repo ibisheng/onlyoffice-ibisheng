@@ -210,6 +210,7 @@ prop:_coSpellCheckInit
 prop:asc_getSpellCheckLanguages
 prop:autoSaveInit
 prop:put_FramePr
+prop:asyncFontEndLoaded_DropCap
 prop:asc_addDropCap
 prop:removeDropcap
 prop:get_TextProps
@@ -1276,6 +1277,7 @@ asc_docs_api.prototype['_coSpellCheckInit'] = asc_docs_api.prototype._coSpellChe
 asc_docs_api.prototype['asc_getSpellCheckLanguages'] = asc_docs_api.prototype.asc_getSpellCheckLanguages;
 asc_docs_api.prototype['autoSaveInit'] = asc_docs_api.prototype.autoSaveInit;
 asc_docs_api.prototype['put_FramePr'] = asc_docs_api.prototype.put_FramePr;
+asc_docs_api.prototype['asyncFontEndLoaded_DropCap'] = asc_docs_api.prototype.asyncFontEndLoaded_DropCap;
 asc_docs_api.prototype['asc_addDropCap'] = asc_docs_api.prototype.asc_addDropCap;
 asc_docs_api.prototype['removeDropcap'] = asc_docs_api.prototype.removeDropcap;
 asc_docs_api.prototype['get_TextProps'] = asc_docs_api.prototype.get_TextProps;
