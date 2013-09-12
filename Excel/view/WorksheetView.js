@@ -7062,7 +7062,7 @@
 							t.autoFilters._renameTableColumn(t, arn);
 
 							/* возвращаем отрисовку. и перерисовываем ячейки с предварительным пересчетом */
-							helpFunction(t.model.workbook);
+							buildRecalc(t.model.workbook);
 							unLockDraw(t.model.workbook);
 
 							// Должны обновить больший range, т.к. мы продолжаем строки в ячейках...
@@ -7123,7 +7123,7 @@
 										t.model._getCell(oBBox.r1, oBBox.c1).setValue(valF);
 									}
 								}
-								helpFunction(t.model.workbook);
+								buildRecalc(t.model.workbook);
 								unLockDraw(t.model.workbook);
 								arn = selectData[0];
 								selectionRange = arn.clone(true);

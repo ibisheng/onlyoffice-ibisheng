@@ -400,7 +400,7 @@ CHistory.prototype =
 		this.workbook.handlers.trigger("drawWS");
 		
 		/* возвращаем отрисовку. и перерисовываем ячейки с предварительным пересчетом */
-		helpFunction(this.workbook);
+		buildRecalc(this.workbook);
 		unLockDraw(this.workbook);
 		if(bIsOn)
 			this.TurnOn();
@@ -490,7 +490,7 @@ CHistory.prototype =
 		this.workbook.handlers.trigger("drawWS");
 		
 		/* возвращаем отрисовку. и перерисовываем ячейки с предварительным пересчетом */
-		helpFunction(this.workbook);
+		buildRecalc(this.workbook);
 		unLockDraw(this.workbook);
 		if(oRedoObjectParam.bIsOn)
 			this.TurnOn();

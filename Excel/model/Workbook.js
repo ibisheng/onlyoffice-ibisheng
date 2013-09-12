@@ -10,7 +10,7 @@ var g_nAllColIndex = -1;
 var History;
 var aStandartNumFormats;
 var aStandartNumFormatsId;
-var start, end, dep, cCharDelimiter = String.fromCharCode(5), arrRecalc = {}, lc = 0;
+var start, end, cCharDelimiter = String.fromCharCode(5), arrRecalc = {}, lc = 0;
 
 var c_oRangeType =
 {
@@ -1109,8 +1109,8 @@ function unLockDraw(wb){
         arrRecalc = {};
     }
 }
-function helpFunction(_wb){
-	var wb = _wb, dep, sr1, sr2, sr, ws, ar;
+function buildRecalc(_wb){
+	var wb = _wb, ws, ar;
 
 	for( var id in arrRecalc ){
 		ws = wb.getWorksheetById(id);
@@ -1122,7 +1122,7 @@ function helpFunction(_wb){
 	recalc(wb)
 
 }
-function helpMinMax(o1,o2){
+function searchCleenCacheArea(o1,o2){
 	var o3 = {};
 	for (var _item in o2){
 		if (o1 && o1.hasOwnProperty(_item)){
@@ -1177,47 +1177,22 @@ function helpRecalc(dep1, nR, calculatedCells, wb){
 			nR.length--;
 		}
 	}
-	sr1 = recalcDependency.call(wb, dep1.badF,true);
-	
+	sr1 = wb.recalcDependency(dep1.badF,true);
+
 	for(var k = 0; k < dep1.depF.length; k++){
 		if(dep1.depF[k].nodeId in calculatedCells){
 			dep1.depF.splice(k,1);
 			k--;
 		}
 	}
-	sr2 = recalcDependency.call(wb, dep1.depF,false);
-	
+	sr2 = wb.recalcDependency(dep1.depF,false);
+
 	for(var k = 0; k < dep1.depF.length; k++){
 		calculatedCells[dep1.depF[k].nodeId] = dep1.depF[k].nodeId
 	}
-	return helpMinMax(sr1,sr2);
+	return searchCleenCacheArea(sr1,sr2);
 }
-function recalcDependency(f,bad,notRecalc){
-	if(f.length > 0){
-	
-		var max, min, sr = {}, _ws = this.getWorksheetById( f[0].sheetId );
 
-		for(var i = 0; i < f.length; i++){
-			if( f[i].cellId.indexOf(":") > -1 ) continue;
-			if( !(f[i].sheetId in sr) ){
-				sr[f[i].sheetId] = {max:new CellAddress(f[i].cellId),min:new CellAddress(f[i].cellId)}
-			}
-			
-			var l = new CellAddress(f[i].cellId);
-				
-			if(sr[f[i].sheetId].min.getRow() > l.getRow()) sr[f[i].sheetId].min = new CellAddress(l.getRow(),sr[f[i].sheetId].min.getCol());
-			if(sr[f[i].sheetId].min.getCol() > l.getCol()) sr[f[i].sheetId].min = new CellAddress(sr[f[i].sheetId].min.getRow(),l.getCol());
-			
-			if(sr[f[i].sheetId].max.getRow() < l.getRow()) sr[f[i].sheetId].max = new CellAddress(l.getRow(),sr[f[i].sheetId].max.getCol());
-			if(sr[f[i].sheetId].max.getCol() < l.getCol()) sr[f[i].sheetId].max = new CellAddress(sr[f[i].sheetId].max.getRow(),l.getCol());
-
-			if( !notRecalc )
-				this.getWorksheetById( f[i].sheetId )._RecalculatedFunctions( f[i].cellId, bad );
-		}
-		
-		return sr;
-	}
-}
 function sortDependency(ws, ar){
 	var wb = ws.workbook, dep, sr1, sr2, sr;
 	/*
@@ -1235,9 +1210,9 @@ function sortDependency(ws, ar){
 				}
 			}
 		}
-		sr1 = recalcDependency.call(wb,dep.badF,true);
-		sr2 = recalcDependency.call(wb,dep.depF,false);
-		sr = helpMinMax( sr, helpMinMax( sr1, sr2 ) );
+        sr1 = wb.recalcDependency(dep.badF,true);
+		sr2 = wb.recalcDependency(dep.depF,false);
+		sr = searchCleenCacheArea( sr, searchCleenCacheArea( sr1, sr2 ) );
 	}
 	
 	for(var _item in sr){
@@ -1246,7 +1221,8 @@ function sortDependency(ws, ar){
 }
 function recalc(wb){
 	
-	var nR = wb.needRecalc, thas = wb, calculatedCells = {}, nRLength = nR.length, first = true, startActionOn = false, timerID, timeStart, timeEnd, timeCurrent, timeCount = 0, timeoutID1, timeoutID2, sr = {};
+	var nR = wb.needRecalc, thas = wb, calculatedCells = {}, nRLength = nR.length, first = true,
+        startActionOn = false, timerID, timeStart, timeEnd, timeCount = 0, timeoutID1, timeoutID2, sr = {};
 
 	function R(){
 		if( nR.length > 0 ){
@@ -1263,14 +1239,14 @@ function recalc(wb){
 			if( id === undefined ) nR.length = 0;
 			
 			if( id in nR){
-				var nRId0 = nR[id][0], nRId1 = nR[id][1], sr1,sr2,sr4;
+				var nRId0 = nR[id][0], nRId1 = nR[id][1], sr1,sr2;
 				dep1 = thas.dependencyFormulas.t_sort_master( nRId0, nRId1 );
 				sr1 = helpRecalc(dep1, nR, calculatedCells, thas);
 
 				dep1 = thas.dependencyFormulas.t_sort_slave( nRId0, nRId1 );
 				sr2 = helpRecalc(dep1, nR, calculatedCells, thas);
 				
-				sr = helpMinMax(sr,helpMinMax(sr1,sr2));
+				sr = searchCleenCacheArea(sr,searchCleenCacheArea(sr1,sr2));
 				if( nR[id] ){
 					delete nR[id];
 				nR.length--;
@@ -1479,20 +1455,20 @@ Workbook.prototype.init=function(){
 						nR.length--;
 					}
 				}
-				sr1 = recalcDependency.call(thas, dep1.badF,true,true);
-				
+				sr1 = thas.recalcDependency(dep1.badF,true,true);
+
 				for(var k = 0; k < dep1.depF.length; k++){
 					if(dep1.depF[k].nodeId in calculatedCells){
 						dep1.depF.splice(k,1);
 						k--;
 					}
 				}
-				sr2 = recalcDependency.call(thas, dep1.depF,false);
+				sr2 = thas.recalcDependency(dep1.depF,false);
 				
 				for(var k = 0; k < dep1.depF.length; k++){
 					calculatedCells[dep1.depF[k].nodeId] = dep1.depF[k].nodeId
 				}
-				sr = helpMinMax( sr, helpMinMax(sr1,sr2) );
+				sr = searchCleenCacheArea( sr, searchCleenCacheArea(sr1,sr2) );
 			}
 			
 			clearTimeout(timerID);
@@ -1753,7 +1729,7 @@ Workbook.prototype.replaceWorksheet=function(indexFrom, indexTo){
 		History.TurnOn();
 		History.Create_NewPoint();
 		History.Add(g_oUndoRedoWorkbook, historyitem_Workbook_SheetMove, null, null, new UndoRedoData_FromTo(indexFrom, indexTo), true);
-		helpFunction(this);
+		buildRecalc(this);
 		unLockDraw(this);
 	}
 };
@@ -1838,7 +1814,7 @@ Workbook.prototype.removeWorksheet=function(nIndex, outputParams){
 		}
 		this._updateWorksheetIndexes();
 		this.nActive = nNewActive;
-		helpFunction(this);
+		buildRecalc(this);
 		unLockDraw(this);
 		return nNewActive;
 	}
@@ -1923,7 +1899,7 @@ Workbook.prototype.generateFontMap=function(){
 		aRes.push(i);
 	return aRes;
 };
-Workbook.prototype.recalc = function(is3D){
+Workbook.prototype.recalcWB = function(is3D){
 	var dep1, thas = this, sr, sr1, sr2;
 	if( this.dependencyFormulas.getNodesLength() > 0){
 		if(is3D){
@@ -1933,18 +1909,18 @@ Workbook.prototype.recalc = function(is3D){
 					var c = new CellAddress(id);
 					if( __ws._getCellNoEmpty(c.getRow0(),c.getCol0()).formulaParsed.is3D ){
 						dep1 = this.dependencyFormulas.t_sort_slave( __ws.Id, id );
-						sr1 = recalcDependency.call(thas,dep1.badF,true);
-						sr2 = recalcDependency.call(thas,dep1.depF,false);
-						sr = helpMinMax( sr, helpMinMax( sr1, sr2 ) );
+						sr1 = thas.recalcDependency(dep1.badF,true);
+						sr2 = thas.recalcDependency(dep1.depF,false);
+						sr = searchCleenCacheArea( sr, searchCleenCacheArea( sr1, sr2 ) );
 					}
 				}
 			}
 		}
 		else{
-			dep = this.dependencyFormulas.t_sort();
-			sr1 = recalcDependency.call(thas,dep.badF,true);
-			sr2 = recalcDependency.call(thas,dep.depF,false);
-			sr = helpMinMax( sr, helpMinMax( sr1, sr2 ) );
+            dep1 = this.dependencyFormulas.t_sort();
+			sr1 = thas.recalcDependency(dep1.badF,true);
+			sr2 = thas.recalcDependency(dep1.depF,false);
+			sr = searchCleenCacheArea( sr, searchCleenCacheArea( sr1, sr2 ) );
 		}
 		for(var _item in sr){
 			this.handlers.trigger("cleanCellCache",_item,new Asc.Range(0, sr[_item].min.getRow0(),  this.getWorksheetById(_item).getColsCount()-1, sr[_item].max.getRow0()), c_oAscCanChangeColWidth.numbers);
@@ -1998,6 +1974,39 @@ Workbook.prototype.buildDependency = function(){
 	for(var i in this.cwf){
 		this.getWorksheetById(i)._BuildDependencies(this.cwf[i].cells);
 	}
+}
+Workbook.prototype.recalcDependency = function(f,bad,notRecalc){
+    if(f.length > 0){
+
+        var sr = {};
+
+        for(var i = 0; i < f.length; i++){
+            if( f[i].cellId.indexOf(":") > -1 ) continue;
+
+            var l = new CellAddress(f[i].cellId);
+
+            if( !(f[i].sheetId in sr) ){
+                sr[f[i].sheetId] = {max:new CellAddress(f[i].cellId),min:new CellAddress(f[i].cellId)}
+            }
+
+            if ( sr[f[i].sheetId].min.getRow() > l.getRow() )
+                sr[f[i].sheetId].min = new CellAddress( l.getRow(), sr[f[i].sheetId].min.getCol() );
+
+            if ( sr[f[i].sheetId].min.getCol() > l.getCol() )
+                sr[f[i].sheetId].min = new CellAddress( sr[f[i].sheetId].min.getRow(), l.getCol() );
+
+            if ( sr[f[i].sheetId].max.getRow() < l.getRow() )
+                sr[f[i].sheetId].max = new CellAddress( l.getRow(), sr[f[i].sheetId].max.getCol() );
+
+            if ( sr[f[i].sheetId].max.getCol() < l.getCol() )
+                sr[f[i].sheetId].max = new CellAddress( sr[f[i].sheetId].max.getRow(), l.getCol() );
+
+            if( !notRecalc )
+                this.getWorksheetById( f[i].sheetId )._RecalculatedFunctions( f[i].cellId, bad );
+        }
+
+        return sr;
+    }
 }
 Workbook.prototype.SerializeHistory = function(){
 	var aRes = new Array();
@@ -2438,7 +2447,6 @@ Woorksheet.prototype.setName=function(name){
 		History.Create_NewPoint();
 		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_Rename, this.getId(), null, new UndoRedoData_FromTo(lastName, name));
 
-		dep = null;
 		//перестраиваем формулы, если у них были ссылки на лист со старым именем.
 		for(var id in this.workbook.cwf) {
 			this.workbook.getWorksheetById(id)._ReBuildFormulas(this.workbook.cwf[id].cells,lastName,this.sName);
@@ -2606,7 +2614,7 @@ Woorksheet.prototype._removeRows=function(start, stop){
 	}
 	var oActualRange = {r1: start, c1: 0, r2: stop, c2: gc_nMaxCol0};
 	var res = this.renameDependencyNodes( {offsetRow:nDif,offsetCol:0}, oActualRange );
-	helpFunction(this.workbook);
+	buildRecalc(this.workbook);
 	unLockDraw(this.workbook);
 		
 //	for(var id  in res)
@@ -2661,7 +2669,7 @@ Woorksheet.prototype._insertRowsBefore=function(index, count){
         }
     }
 	var res = this.renameDependencyNodes({offsetRow:count,offsetCol:0},oActualRange);
-	helpFunction(this.workbook);
+	buildRecalc(this.workbook);
 	unLockDraw(this.workbook);
 	
 	this.nRowsCount += count;
@@ -2718,7 +2726,7 @@ Woorksheet.prototype._removeCols=function(start, stop){
 	}
 	var oActualRange = {r1: 0, c1: start, r2: gc_nMaxRow0, c2: stop};
 	var res = this.renameDependencyNodes( {offsetRow:0,offsetCol:nDif}, oActualRange );
-	helpFunction(this.workbook);
+	buildRecalc(this.workbook);
 	unLockDraw(this.workbook);
 	
 	this.aCols.splice(start, stop - start + 1);
@@ -2762,7 +2770,7 @@ Woorksheet.prototype._insertColsBefore=function(index, count){
 	}
 	
 	var res = this.renameDependencyNodes({offsetRow:0,offsetCol:count},oActualRange);
-	helpFunction(this.workbook);
+	buildRecalc(this.workbook);
 	unLockDraw(this.workbook);
 	
     var oPrevCol = null;
@@ -3522,7 +3530,7 @@ Woorksheet.prototype._shiftCellsLeft=function(oBBox){
 	}
 	
 	var res = this.renameDependencyNodes( {offsetRow:0,offsetCol:dif}, oBBox );
-	helpFunction(this.workbook);
+	buildRecalc(this.workbook);
 	unLockDraw(this.workbook);
 	
 	//todo проверить не уменьшились ли границы таблицы
@@ -3568,7 +3576,7 @@ Woorksheet.prototype._shiftCellsUp=function(oBBox){
 	}
 	
 	var res = this.renameDependencyNodes({offsetRow:dif,offsetCol:0}, oBBox );
-	helpFunction(this.workbook);
+	buildRecalc(this.workbook);
 	unLockDraw(this.workbook);
 	
 	//todo проверить не уменьшились ли границы таблицы
@@ -3611,7 +3619,7 @@ Woorksheet.prototype._shiftCellsRight=function(oBBox){
 	}
 	
 	var res = this.renameDependencyNodes({offsetRow:0,offsetCol:dif}, oBBox);;
-	helpFunction(this.workbook);
+	buildRecalc(this.workbook);
 	unLockDraw(this.workbook);
 		
 //	for(var id  in res)
@@ -3650,7 +3658,7 @@ Woorksheet.prototype._shiftCellsBottom=function(oBBox){
 	}
 
 	var res = this.renameDependencyNodes({offsetRow:dif,offsetCol:0}, oBBox);
-	helpFunction(this.workbook);
+	buildRecalc(this.workbook);
 	unLockDraw(this.workbook);
 		
 //	for(var id  in res)
@@ -3754,7 +3762,7 @@ Woorksheet.prototype._RecalculatedFunctions=function(cell,bad){
 		}
 	}
 }
-Woorksheet.prototype._ReBuildFormulas=function(cellRange,lastSheetName,newSheetName){
+Woorksheet.prototype._ReBuildFormulas=function(cellRange){
 	/*
 		Если существуют трехмерные ссылки на ячейки, то у них необходимо поменять имя листа на новое после переименования листа.
 	*/
@@ -3778,14 +3786,14 @@ Woorksheet.prototype.renameDependencyNodes = function(offset,oBBox,rec, noDelete
 			var cell = _sn[_id].returnCell(), cellName = cell.getName();
 			if( undefined == cell ) { continue; }
 			if( cell.formulaParsed ){
-				var oUndoRedoData_CellData = new UndoRedoData_CellData(cell.getValueData(), null);
+				/*var oUndoRedoData_CellData = new UndoRedoData_CellData(cell.getValueData(), null);
 				if(null != cell.xfs)
 					oUndoRedoData_CellData.style = cell.xfs.clone();
 				ret[cellName] = {};
 				ret[cellName].data = oUndoRedoData_CellData;
 				ret[cellName].id = this.getId();
 				ret[cellName].nRow = cell.getCellAddress().getRow0();
-				ret[cellName].nCol = cell.getCellAddress().getCol0();
+				ret[cellName].nCol = cell.getCellAddress().getCol0();*/
 				
 				cell.formulaParsed.shiftCells( objForRebuldFormula.move[id].offset, oBBox, n, this.Id, objForRebuldFormula.move[id].toDelete );
 				cell.setFormula(cell.formulaParsed.assemble());
@@ -3811,7 +3819,7 @@ Woorksheet.prototype.renameDependencyNodes = function(offset,oBBox,rec, noDelete
 		for( var _id in _sn ){
 			var cell = _sn[_id].returnCell(), cellName = cell.getName();
 			if( cell && cell.formulaParsed ){
-				if( !(cell.getName() in ret) ){
+				/*if( !(cell.getName() in ret) ){
 					var oUndoRedoData_CellData = new UndoRedoData_CellData(cell.getValueData(), null);
 					if(null != cell.xfs)
 						oUndoRedoData_CellData.style = cell.xfs.clone();
@@ -3820,7 +3828,7 @@ Woorksheet.prototype.renameDependencyNodes = function(offset,oBBox,rec, noDelete
 					ret[cellName].id = this.getId();
 					ret[cellName].nRow = cell.getCellAddress().getRow0();
 					ret[cellName].nCol = cell.getCellAddress().getCol0();
-				}
+				}*/
 				cell.formulaParsed.stretchArea( objForRebuldFormula.stretch[id].offset, oBBox, n, this.Id );
 				cell.setFormula(cell.formulaParsed.assemble());
 				c[cellName] = cell;
@@ -3836,12 +3844,15 @@ Woorksheet.prototype.renameDependencyNodes = function(offset,oBBox,rec, noDelete
 	}
 	
 	for( var i in c ){
-		var n = c[i].getName();
-		c[i].formulaParsed.setCellId(n);
-		this.workbook.cwf[c[i].ws.Id].cells[n] = n;
-		c[i].formulaParsed.buildDependencies();
-		this.workbook.needRecalc[ getVertexId(c[i].ws.Id,n) ] = [ c[i].ws.Id, n ];
-		this.workbook.needRecalc.length++;
+        var ws = c[i].ws;
+        if( ws.getCell2(c[i].getName()).getCells()[0].formulaParsed ){
+            var n = c[i].getName();
+            c[i].formulaParsed.setCellId( n );
+            this.workbook.cwf[c[i].ws.Id].cells[n] = n;
+            c[i].formulaParsed.buildDependencies();
+            this.workbook.needRecalc[ getVertexId( c[i].ws.Id, n ) ] = [ c[i].ws.Id, n ];
+            this.workbook.needRecalc.length++;
+        }
 		c[i] = null;
 		delete c[i];
 	}
@@ -3860,9 +3871,9 @@ Woorksheet.prototype.renameDependencyNodes = function(offset,oBBox,rec, noDelete
 	if ( false !== rec )
 		recalc(this.workbook);
 	
-	return ret;
+//	return ret;
 }
-Woorksheet.prototype.helperRebuildFormulas = function(cell,lastName,newName){
+Woorksheet.prototype.helperRebuildFormulas = function(cell,lastName){
 	if( cell.sFormula ){
 		this.workbook.cwf[this.Id].cells[lastName] = null;
 		delete this.workbook.cwf[this.Id].cells[lastName];
@@ -7799,7 +7810,7 @@ Range.prototype.cleanAll=function(){
 	},function(cell, nRow0, nCol0, nRowStart, nColStart){
 		oThis.worksheet._removeCell(nRow0, nCol0);
 	});
-	helpFunction(this.worksheet.workbook);
+	buildRecalc(this.worksheet.workbook);
 	History.EndTransaction();
 }
 Range.prototype.sort=function(nOption, nStartCol){
@@ -8517,7 +8528,7 @@ Range.prototype.promote=function(bCtrl, bVertical, nIndex){
 		}
 	}
 	History.EndTransaction();
-	helpFunction(this.worksheet.workbook);
+	buildRecalc(this.worksheet.workbook);
 	unLockDraw(this.worksheet.workbook);
 }
 Range.prototype.createCellOnRowColCross=function(){
