@@ -36,10 +36,11 @@ var orientation_Landscape = 0x01;
 
 var tableSpacingMinValue = 0.02;//0.02мм
 
-if (/MSIE/g.test(navigator.userAgent))
+if ((/MSIE/g.test(navigator.userAgent)) || window.opera)
 {
     // не убирать!!! это для ие. чтобы не селектились элементы
     document.onselectstart= function() {
+        return false;
     }
 }
 
@@ -69,7 +70,7 @@ function CEditorPage(api)
     this.ReaderModeDiv      = null;
 
     this.m_oOverlayApi      = new COverlay();
-    this.m_bIsIE            = (/MSIE/g.test(navigator.userAgent)) ? true : false;
+    this.m_bIsIE            = ((/MSIE/g.test(navigator.userAgent)) || window.opera) ? true : false;
 
     this.m_oPanelRight_buttonRulers    = null;
     this.m_oPanelRight_vertScroll      = null;

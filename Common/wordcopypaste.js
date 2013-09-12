@@ -29,7 +29,7 @@ if (window.USER_AGENT_SAFARI_MACOS)
     if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1)
         window.USER_AGENT_SAFARI_MACOS = false;
 }
-window.USER_AGENT_IE = (/MSIE/g.test(navigator.userAgent)) ? true : false;
+window.USER_AGENT_IE = ((/MSIE/g.test(navigator.userAgent)) || window.opera) ? true : false;
 
 window.GlobalPasteFlagCounter = 0;
 
