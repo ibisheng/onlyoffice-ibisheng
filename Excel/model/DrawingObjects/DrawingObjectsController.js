@@ -183,6 +183,16 @@ DrawingObjectsController.prototype =
         }
     },
 
+    deleteSelectedObjects: function()
+    {
+        var drawingObjectsController = this;
+        for(var i = 0; i < drawingObjectsController.selectedObjects.length; ++i)
+        {
+            drawingObjectsController.selectedObjects[i].deleteDrawingBase();
+        }
+        drawingObjectsController.resetSelectionState();
+    },
+
     setCellAlignCallBack: function (align) {
         if(typeof this.curState.setCellAlign === "function")
         {
