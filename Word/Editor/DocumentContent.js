@@ -160,7 +160,7 @@ CDocumentContent.prototype =
     {
         if ( true === this.Parent.Is_Cell() || this.Parent instanceof WordShape )
         {
-            if ( PageIndex < this.Pages.length && PageIndex > 0 )
+            if ( PageIndex < this.Pages.length && PageIndex >= 0 )
             {
                 var Y      = this.Pages[PageIndex].Y ;
                 var YLimit = this.Pages[PageIndex].YLimit;
