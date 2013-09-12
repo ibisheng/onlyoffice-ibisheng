@@ -5623,7 +5623,7 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 			var oNewGraphicObject = new CChartAsGroup();
 			var oBinary_ChartReader = new Binary_ChartReader(this.stream,  oNewGraphicObject.chart,  oNewGraphicObject);
 			res = oBinary_ChartReader.Read(length);
-			if(null != oNewGraphicObject.chart.range.interval)
+			if(null != oNewGraphicObject.chart.range.interval && oNewGraphicObject.chart.range.interval.length > 0)
 				oDrawing.graphicObject = oNewGraphicObject;
         }
 		else if ( c_oSer_DrawingType.pptxDrawing == type )

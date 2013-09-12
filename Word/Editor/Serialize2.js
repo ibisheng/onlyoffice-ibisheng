@@ -5651,7 +5651,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			var chart = new asc_CChart();;
 			var oBinary_ChartReader = new Binary_ChartReader(this.stream, chart, oNewGraphicObj);
 			oBinary_ChartReader.ReadExternal(length);
-			if(null != chart.range.interval)
+			if(null != chart.range.interval && chart.range.interval.length > 0)
 			{
 				oNewGraphicObj.chart = chart;
 				//oNewGraphicObj.setChart(chart, true);

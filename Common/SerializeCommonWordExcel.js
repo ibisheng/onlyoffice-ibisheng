@@ -1343,12 +1343,14 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 				{
 					var first = new CellAddress(parts[0]);
 					var last = new CellAddress(parts[1]);
-					oRes.bbox = {r1: first.getRow0(), c1: first.getCol0(), r2: last.getRow0(), c2: last.getCol0()};
+					if(first.isValid() && last.isValid())
+						oRes.bbox = {r1: first.getRow0(), c1: first.getCol0(), r2: last.getRow0(), c2: last.getCol0()};
 				}
 				else
 				{
 					var cell = new CellAddress(sRef);
-					oRes.bbox = {r1: cell.getRow0(), c1: cell.getCol0(), r2: cell.getRow0(), c2: cell.getCol0()};
+					if(cell.isValid())
+						oRes.bbox = {r1: cell.getRow0(), c1: cell.getCol0(), r2: cell.getRow0(), c2: cell.getCol0()};
 				}
 			}
 		}
@@ -1424,13 +1426,15 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 			bbox = this.parseDataFormula(oFirstSeria.TxCache, bbox);
 			bbox = this.parseDataFormula(oFirstSeria.xVal, bbox);
 			bbox = this.parseDataFormula(oFirstSeria.Cat, bbox);
+			if(null != bbox)
+			{
+				var oCellStart = new CellAddress(bbox.r1, bbox.c1, 0);
+				var oCellEnd = new CellAddress(bbox.r2, bbox.c2, 0);
 				
-			var oCellStart = new CellAddress(bbox.r1, bbox.c1, 0);
-			var oCellEnd = new CellAddress(bbox.r2, bbox.c2, 0);
-			
-			if(false == rx_test_ws_name.test(sheetName))
-				sheetName = "'" + sheetName + "'";
-			chart.range.interval = sheetName + "!" + oCellStart.getID() + ":" + oCellEnd.getID();
+				if(false == rx_test_ws_name.test(sheetName))
+					sheetName = "'" + sheetName + "'";
+				chart.range.interval = sheetName + "!" + oCellStart.getID() + ":" + oCellEnd.getID();
+			}
 		}
 	}
 	this.GraphicFrame = function(type, length)
