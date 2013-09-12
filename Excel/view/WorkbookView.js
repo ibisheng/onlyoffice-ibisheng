@@ -1264,6 +1264,7 @@
 				} else {
 					v = t.cellEditor.copySelection();
 					if (v) {return t.clipboard.copyCellValueButton(v, t.cellEditor.hasBackground ? t.cellEditor.background : null);}
+					else {return true;}
 				}
 			},
 
@@ -1321,6 +1322,7 @@
 				} else {
 					v = t.cellEditor.cutSelection();
 					if (v) {return t.clipboard.copyCellValueButton(v, t.cellEditor.hasBackground ? t.cellEditor.background : null);}
+					else {return true;}
 				}
 			},
 
