@@ -3096,8 +3096,8 @@ function DrawingObjects() {
 		var _w = checker.Bounds.max_x - checker.Bounds.min_x;
 		var _h = checker.Bounds.max_y - checker.Bounds.min_y;
 		
-		overlayCtx.clearRect( mmToPt(checker.Bounds.min_x + pxToMm(scrollOffset.x)), mmToPt(checker.Bounds.min_y + pxToMm(scrollOffset.y)), mmToPt(_w), mmToPt(_h) );
-		drawingCtx.clearRect( mmToPt(checker.Bounds.min_x + pxToMm(scrollOffset.x)), mmToPt(checker.Bounds.min_y + pxToMm(scrollOffset.y)), mmToPt(_w), mmToPt(_h) );
+		//overlayCtx.clearRect( mmToPt(checker.Bounds.min_x + pxToMm(scrollOffset.x)), mmToPt(checker.Bounds.min_y + pxToMm(scrollOffset.y)), mmToPt(_w), mmToPt(_h) );
+		//drawingCtx.clearRect( mmToPt(checker.Bounds.min_x + pxToMm(scrollOffset.x)), mmToPt(checker.Bounds.min_y + pxToMm(scrollOffset.y)), mmToPt(_w), mmToPt(_h) );
 	
 		// Top left
 		var foundRow = worksheet._findRowUnderCursor( mmToPt(checker.Bounds.min_y + pxToMm(scrollOffset.y)), true);
@@ -3129,14 +3129,32 @@ function DrawingObjects() {
 
 	_this.raiseLayerDrawingObjects = function() {
 		
-		for ( var i = 0; i < aObjects.length; i++ ) {
-			/*var boundsChecker = _this.getBoundsChecker(aObjects[i]);
-			var _w = boundsChecker.Bounds.max_x - boundsChecker.Bounds.min_x;
-			var _h = boundsChecker.Bounds.max_y - boundsChecker.Bounds.min_y;
-			overlayCtx.clearRect( mmToPt(boundsChecker.Bounds.min_x + pxToMm(scrollOffset.x)), mmToPt(boundsChecker.Bounds.min_y + pxToMm(scrollOffset.y)), mmToPt(_w), mmToPt(_h) );*/
-			
-			aObjects[i].graphicObject.draw(shapeOverlayCtx);
+		var bRedraw = false;
+		var selection = worksheet.activeRange;
+		
+		if ( selection ) {
+			for ( var i = 0; i < aObjects.length; i++ ) {
+				var drawingObject = aObjects[i];
+				
+				// Объекты не пересекаются
+				if ( (selection.c2 < drawingObject.from.col) || (selection.c1 > drawingObject.to.col) || (selection.r2 < drawingObject.from.row) || (selection.r1 > drawingObject.to.row) )
+					continue;
+				else {
+					bRedraw = true;
+					break;
+				}
+			}
 		}
+		if ( bRedraw ) {
+			for ( var i = 0; i < aObjects.length; i++ ) {
+				var boundsChecker = _this.getBoundsChecker(aObjects[i]);
+				restoreSheetArea(boundsChecker);
+			}
+			for ( var i = 0; i < aObjects.length; i++ ) {
+				aObjects[i].graphicObject.draw(shapeCtx);
+			}
+		}
+		
 		if ( aObjects.length )
 			_this.drawWorksheetHeaders();
 	}	
@@ -3175,37 +3193,44 @@ function DrawingObjects() {
 			if ( clearCanvas )
 				_this.clearDrawingObjects();
 
-			if ( !aObjects.length )
-				return;
+			if ( aObjects.length ) {
 			
-			worksheet._drawGraphic();
-			worksheet.model.Drawings = aObjects;
-			
-			for (var i = 0; i < aObjects.length; i++) {
+				worksheet._drawGraphic();
+				worksheet.model.Drawings = aObjects;
+				
+				for (var i = 0; i < aObjects.length; i++) {
 
-				var index = i;
-				var obj = aObjects[i];
-				
-				if ( !obj.inVisibleArea() )
-					continue;
+					var index = i;
+					var drawingObject = aObjects[i];
 					
-				if ( !obj.flags.anchorUpdated )
-					obj.updateAnchorPosition();
-				
-				// Shape render
-				if ( obj.isGraphicObject() ) {
-					obj.graphicObject.draw( printOptions ? printOptions.ctx.DocumentRenderer : shapeCtx);
-					continue;
+					if ( !drawingObject.inVisibleArea() )
+						continue;
+						
+					if ( !drawingObject.flags.anchorUpdated )
+						drawingObject.updateAnchorPosition();
+					
+					// Shape render
+					if ( drawingObject.isGraphicObject() ) {
+						drawingObject.graphicObject.draw( printOptions ? printOptions.ctx.DocumentRenderer : shapeCtx );
+						continue;
+					}
 				}
 			}
 		}
 		
 		if ( !printOptions ) {
-			if ( _this.controller.selectedObjects.length )
-				_this.OnUpdateOverlay();
-			else
-				_this.raiseLayerDrawingObjects();
-
+		
+			if ( aObjects.length ) {
+				if ( _this.controller.selectedObjects.length )
+					_this.OnUpdateOverlay();
+				else
+					_this.raiseLayerDrawingObjects();
+			}
+			else {
+				worksheet.cleanSelection();
+				worksheet._drawSelection();
+			}
+				
 			_this.drawWorksheetHeaders();
 		}		
 	}
@@ -3274,7 +3299,7 @@ function DrawingObjects() {
 	_this.addImageDrawingObject = function(imageUrl, options) {
 
 		if ( imageUrl && !_this.isViewerMode() ) {
-						
+			
 			var _image = api.ImageLoader.LoadImage(imageUrl, 1);
 			var isOption = options && options.cell;
 
@@ -3330,7 +3355,6 @@ function DrawingObjects() {
 					worksheet.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.UplImageUrl, c_oAscError.Level.NoCritical);
 				}
 				else {
-					History.Create_NewPoint();
 					
 					var obj = _this.createDrawingObject();
 					obj.worksheet = worksheet;
@@ -3363,20 +3387,8 @@ function DrawingObjects() {
 					obj.graphicObject = new CImageShape(obj, _this);
 					obj.graphicObject.initDefault( x, y, w, h, _image.src );
 					obj.graphicObject.select(_this.controller);
-					aObjects.push(obj);
 					
-					obj.setGraphicObjectCoords();
-					obj.setActive();
-					
-					_this.showDrawingObjects(false);
-					_this.sendGraphicObjectProps();
-					
-					var boundsChecker = _this.getBoundsChecker(obj);
-					aBoundsCheckers.push(boundsChecker);
-					
-					_this.objectLocker.reset();
-					_this.objectLocker.addObjectId(obj.id);
-					_this.objectLocker.checkObjects( function(result){ return result; } );
+					obj.graphicObject.addToDrawingObjects();
 				}
 				
 				worksheet.model.workbook.handlers.trigger("asc_onEndAction", c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
@@ -3451,7 +3463,6 @@ function DrawingObjects() {
 			chart.rebuildSeries();
 			chart.worksheet = worksheet; 	// Для формул серий
 			
-			History.Create_NewPoint();
 			return this.controller.addChartDrawingObject(chart, options);
 		}
 		else if ( isObject(chart) && chart["binary"] ) {

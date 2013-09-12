@@ -1494,6 +1494,11 @@ CChartAsGroup.prototype =
                 this.drawingObjects.deleteDrawingBase(this.Id);
                 break;
             }
+			case historyitem_AutoShapes_DeleteDrawingBase:
+            {
+                this.drawingObjects.addGraphicObject(this, data.oldValue);
+                break;
+            }
         }
     },
 
@@ -1506,10 +1511,14 @@ CChartAsGroup.prototype =
                 this.recalculate();
                 break;
             }
-
             case historyitem_AutoShapes_Add_To_Drawing_Objects:
             {
                 this.drawingObjects.addGraphicObject(this, data.oldValue);
+                break;
+            }
+			case historyitem_AutoShapes_DeleteDrawingBase:
+            {
+                this.drawingObjects.deleteDrawingBase(this.Id);
                 break;
             }
         }
