@@ -20,96 +20,129 @@ function CChartLayout()
     this.y = null;
     this.w = null;
     this.h = null;
-    this.Id = g_oIdCounter.Get_NewId();
-    g_oTableId.Add(this, this.Id, null)
 }
 
 CChartLayout.prototype =
 {
+
+    createDuplicate: function()
+    {
+        var ret = new CChartLayout();
+
+        this.isManual = false;
+
+        ret.layoutTarget = this.layoutTarget;
+        ret.xMode = this.xMode;
+        ret.yMode = this.yMode;
+        ret.wMode = this.wMode;
+        ret.hMode = this.hMode;
+
+        ret.x = this.x;
+        ret.y = this.y;
+        ret.w = this.w;
+        ret.h = this.h;
+        return ret;
+    },
+
+    Write_ToBinary2: function(w)
+    {
+        w.WriteBool(isRealNumber(this.layoutTarget));
+        if(isRealNumber(this.layoutTarget))
+            w.WriteLong(this.layoutTarget);
+
+        w.WriteBool(isRealNumber(this.xMode));
+        if(isRealNumber(this.xMode))
+            w.WriteLong(this.xMode);
+
+        w.WriteBool(isRealNumber(this.yMode));
+        if(isRealNumber(this.yMode))
+            w.WriteLong(this.yMode);
+
+
+        w.WriteBool(isRealNumber(this.wMode));
+        if(isRealNumber(this.wMode))
+            w.WriteLong(this.wMode);
+
+        w.WriteBool(isRealNumber(this.hMode));
+        if(isRealNumber(this.hMode))
+            w.WriteLong(this.hMode);
+
+        w.WriteBool(isRealNumber(this.x));
+        if(isRealNumber(this.x))
+            w.WriteLong(this.x);
+
+        w.WriteBool(isRealNumber(this.y));
+        if(isRealNumber(this.y))
+            w.WriteLong(this.y);
+
+        w.WriteBool(isRealNumber(this.w));
+        if(isRealNumber(this.w))
+            w.WriteLong(this.w);
+
+        w.WriteBool(isRealNumber(this.h));
+        if(isRealNumber(this.h))
+            w.WriteLong(this.h);
+    },
+
+
+    Read_FromBinary2: function(r)
+    {
+        if(r.GetBool())
+           (this.layoutTarget) = r.GetLong();
+
+        if(r.GetBool())
+            (this.xMode) = r.GetLong();
+
+        if(r.GetBool())
+            (this.yMode) = r.GetLong();
+
+
+        if(r.GetBool())
+            (this.wMode) = r.GetLong();
+
+        if(r.GetBool())
+            (this.hMode) = r.GetLong();
+
+
+        if(r.GetBool())
+            (this.x) = r.GetLong();
+
+
+        if(r.GetBool())
+            (this.y) = r.GetLong();
+
+        if(r.GetBool())
+            (this.w) = r.GetLong();
+
+        if(r.GetBool())
+            (this.h) = r.GetLong();
+    },
+
     setXMode: function(mode)
     {
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Layout_Set_X_Mode, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(this.xMode, mode)), null);
         this.xMode = mode;
     },
 
     setYMode: function(mode)
     {
 
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Layout_Set_Y_Mode, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(this.yMode, mode)), null);
         this.yMode = mode;
     },
 
 
     setX: function(x)
     {
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Layout_Set_X, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(this.x, x)), null);
 
         this.x = x;
     },
 
     setY: function(y)
     {
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Layout_Set_Y, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(this.y, y)), null);
         this.y = y;
     },
 
     setIsManual: function(isManual)
     {
         this.isManual = isManual;
-    },
-
-    Undo: function(type, data)
-    {
-        switch(type)
-        {
-            case  historyitem_AutoShapes_Layout_Set_X_Mode:
-            {
-                this.xMode = data.oldValue;
-                break;
-            }
-            case  historyitem_AutoShapes_Layout_Set_Y_Mode:
-            {
-                this.yMode = data.oldValue;
-                break;
-            }
-            case  historyitem_AutoShapes_Layout_Set_X:
-            {
-                this.x = data.oldValue;
-                break;
-            }
-            case  historyitem_AutoShapes_Layout_Set_Y:
-            {
-                this.y = data.oldValue;
-                break;
-            }
-        }
-    },
-
-    Redo: function(type, data)
-    {
-        switch(type)
-        {
-            case  historyitem_AutoShapes_Layout_Set_X_Mode:
-            {
-                this.xMode = data.newValue;
-                break;
-            }
-            case  historyitem_AutoShapes_Layout_Set_Y_Mode:
-            {
-                this.yMode = data.newValue;
-                break;
-            }
-            case  historyitem_AutoShapes_Layout_Set_X:
-            {
-                this.x = data.newValue;
-                break;
-            }
-            case  historyitem_AutoShapes_Layout_Set_Y:
-            {
-                this.y = data.newValue;
-                break;
-            }
-        }
     }
-
 };

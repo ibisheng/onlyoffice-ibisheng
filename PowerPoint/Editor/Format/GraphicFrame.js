@@ -405,7 +405,7 @@ CGraphicFrame.prototype =
                 drawingDocument.TargetEnd();
                 drawingDocument.SelectEnabled(true);
                 drawingDocument.SelectClear();
-                Doc.Selection_Draw();
+                Doc.Selection_Draw_Page(this.parent.num);
                 drawingDocument.SelectShow();
             }
             else /*if(this.parent.elementsManipulator.Document.CurPos.Type == docpostype_FlowObjects ) */

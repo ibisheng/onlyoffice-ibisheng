@@ -2600,6 +2600,126 @@ function CXfrm()
     this.flipV = null;
     this.rot = null;
 
+    this.Write_ToBinary2 =  function(Writer)
+    {
+
+        var flag;
+        flag = this.offX != null;
+        Writer.WriteBool(flag);
+        if(flag === true)
+            Writer.WriteDouble(this.offX);
+
+
+        flag = this.offY != null;
+        Writer.WriteBool(flag);
+        if(flag === true)
+            Writer.WriteDouble(this.offY);
+
+
+        flag = this.extX != null;
+        Writer.WriteBool(flag);
+        if(flag === true)
+            Writer.WriteDouble(this.extX);
+
+
+        flag = this.extY != null;
+        Writer.WriteBool(flag);
+        if(flag === true)
+            Writer.WriteDouble(this.extY);
+
+
+        flag = this.chOffX != null;
+        Writer.WriteBool(flag);
+        if(flag === true)
+            Writer.WriteDouble(this.chOffX);
+
+
+        flag = this.chOffY != null;
+        Writer.WriteBool(flag);
+        if(flag === true)
+            Writer.WriteDouble(this.chOffY);
+
+
+        flag = this.chExtX != null;
+        Writer.WriteBool(flag);
+        if(flag === true)
+            Writer.WriteDouble(this.chExtX);
+
+
+        flag = this.chExtY !== null;
+        Writer.WriteBool(flag);
+        if(flag === true)
+            Writer.WriteDouble(this.chExtY);
+
+
+        flag = this.flipH !== null;
+        Writer.WriteBool(flag);
+        if(flag)
+            Writer.WriteBool(this.flipH);
+
+
+        flag = this.flipV !== null;
+        Writer.WriteBool(flag);
+        if(flag)
+            Writer.WriteBool(this.flipV);
+
+        flag = this.rot !== null;
+        Writer.WriteBool(flag);
+        if(flag)
+            Writer.WriteDouble(this.rot);
+    };
+
+    this.Read_FromBinary2 =  function(Reader)
+    {
+        var flag = Reader.GetBool();
+        if(flag)
+            this.offX = Reader.GetDouble();
+
+        flag = Reader.GetBool();
+        if(flag)
+            this.offY = Reader.GetDouble();
+
+
+        flag = Reader.GetBool();
+        if(flag)
+            this.extX = Reader.GetDouble();
+
+
+        flag = Reader.GetBool();
+        if(flag)
+            this.extY = Reader.GetDouble();
+
+        flag = Reader.GetBool();
+        if(flag)
+            this.chOffX = Reader.GetDouble();
+
+        flag = Reader.GetBool();
+        if(flag)
+            this.chOffY = Reader.GetDouble();
+
+
+        flag = Reader.GetBool();
+        if(flag)
+            this.chExtX = Reader.GetDouble();
+
+
+        flag = Reader.GetBool();
+        if(flag)
+            this.chExtY = Reader.GetDouble();
+
+        flag  = Reader.GetBool();
+        if(flag)
+            this.flipH = Reader.GetBool();
+
+        flag  = Reader.GetBool();
+        if(flag)
+            this.flipV = Reader.GetBool();
+
+        flag  = Reader.GetBool();
+        if(flag)
+            this.rot = Reader.GetDouble();
+    };
+
     this.isNotNull = function()
     {
         return isRealNumber(this.offX) && isRealNumber(this.offY) && isRealNumber(this.extX) && isRealNumber(this.extY);
@@ -2730,7 +2850,7 @@ function CSpPr()
                 this.ln = new CLn();
             this.ln.merge(spPr.ln);
         }  */
-    }
+    };
 
     this.createDuplicate = function()
     {
@@ -2748,7 +2868,62 @@ function CSpPr()
             duplicate.ln = this.ln.createDuplicate();
         }
         return duplicate;
-    }
+    };
+    this.Write_ToBinary2 = function(Writer)
+    {
+        var boolBWMode = this.bwMode == 1;
+        Writer.WriteBool(boolBWMode);
+
+        Writer.WriteBool(isRealObject(this.xfrm));
+        if(isRealObject(this.xfrm))
+            this.xfrm.Write_ToBinary2(Writer);
+        var flag = this.geometry != null;
+        Writer.WriteBool(flag);
+        if(flag)
+            this.geometry.Write_ToBinary2(Writer);
+
+        flag = this.Fill != null;
+        Writer.WriteBool(flag);
+        if(flag)
+            this.Fill.Write_ToBinary2(Writer);
+
+        flag = this.ln != null;
+        Writer.WriteBool(flag);
+        if(flag)
+        {
+            this.ln.Write_ToBinary2(Writer);
+        }
+    };
+
+    this.Read_FromBinary2 = function(Reader)
+    {
+        var boolBWMode = Reader.GetBool();
+
+        this.bwMode = boolBWMode ? 1 : 0;
+        if(Reader.GetBool())
+            this.xfrm.Read_FromBinary2(Reader);
+        var flag = Reader.GetBool();
+        if(flag)
+        {
+            this.geometry = new Geometry();
+            this.geometry.Read_FromBinary2(Reader);
+        }
+
+        flag = Reader.GetBool();
+        if(flag)
+        {
+            this.Fill = new CUniFill();
+            this.Fill.Read_FromBinary2(Reader);
+        }
+
+        flag = Reader.GetBool();
+        if(flag)
+        {
+            this.ln = new CLn();
+            this.ln.Read_FromBinary2(Reader);
+        }
+    };
+
 }
 
 function CGrSpPr()

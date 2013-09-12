@@ -570,11 +570,6 @@ CPresentation.prototype =
 
 
         this.recalcMap = {};
-
-        if(this.updateSlideIndex)
-        {
-
-        }
         this.RecalculateCurPos();
         this.DrawingDocument.OnRecalculatePage( this.CurPage, this.Slides[this.CurPage] );
         this.DrawingDocument.OnEndRecalculate();
@@ -1011,6 +1006,12 @@ CPresentation.prototype =
         this.Recalculate();
     },
 
+    addChart: function(binary)
+    {
+        this.Slides[this.CurPage].graphicObjects.addChart(binary);
+        this.Recalculate();
+    },
+
     Add_InlineImage : function(W, H, Img, Chart, bFlow)
     {
         if ( undefined === bFlow )
@@ -1071,7 +1072,7 @@ CPresentation.prototype =
 
     Get_ChartObject: function()
     {
-        return this.DrawingObjects.getChartObject();
+        return this.Slides[this.CurPage].graphicObjects.getChartObject();
     },
 
     Add_FlowTable : function(Cols, Rows)
@@ -1504,24 +1505,7 @@ CPresentation.prototype =
 
     Set_ImageProps : function(Props)
     {
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-        {
-            this.HdrFtr.Set_ImageProps(Props);
-        }
-        else if ( docpostype_DrawingObjects === this.CurPos.Type )
-        {
-            this.DrawingObjects.setProps( Props );
-        }
-        else if ( docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType() ) ) )
-        {
-            this.Interface_Update_TablePr();
-            if ( true == this.Selection.Use )
-                this.Content[this.Selection.StartPos].Set_ImageProps(Props);
-            else
-                this.Content[this.CurPos.ContentPos].Set_ImageProps(Props);
-        }
-
+        this.Slides[this.CurPage].graphicObjects.setImageProps(Props);
         this.Recalculate();
         this.Document_UpdateInterfaceState();
     },
@@ -6397,6 +6381,7 @@ CPresentation.prototype =
 
         return bResult;
     },
+
 
     Save_Changes : function(Data, Writer)
     {

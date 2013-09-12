@@ -227,10 +227,8 @@ function MoveTitleInChart(originalObject)
 
     this.trackEnd = function()
     {
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(this.originalObject.chartGroup.Id, new UndoRedoDataShapeRecalc()), null);
         this.originalObject.setPosition(this.x, this.y);
         this.originalObject.chartGroup.recalculate();
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(this.originalObject.chartGroup.Id, new UndoRedoDataShapeRecalc()), null);
     }
 }
 
@@ -283,15 +281,7 @@ function MoveTrackChart(originalObject)
 
     this.trackEnd = function()
     {
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(this.originalObject.Id, new UndoRedoDataShapeRecalc()), null);
-        this.originalObject.x = this.x;
-        this.originalObject.y = this.y;
-        this.originalObject.updateDrawingBaseCoordinates();
-        this.originalObject.setPosition(this.x, this.y);
-
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(this.originalObject.Id, new UndoRedoDataShapeRecalc()), null);
-        this.originalObject.recalculateTransform();
-        this.originalObject.calculateTransformTextMatrix();
+        this.originalObject.setXfrm(this.x, this.y, null, null, null, null, null);
     };
 }
 

@@ -22,16 +22,6 @@ function CChartTitle(chartGroup, type)
     this.extX = null;
     this.extY = null;
 
-  /*  this.pen = new CLn();
-    this.pen.w = 90000;
-    this.pen.Fill = new CUniFill();
-    this.pen.Fill.fill = new CSolidFill();
-    this.pen.Fill.fill.color.color = new CRGBColor();
-
-    this.brush = new CUniFill();
-    this.brush.fill = new CSolidFill();
-    this.brush.fill.color.color = new CRGBColor();  */
-
     this.brush = null;
     this.pen = null;
     this.spPr.geometry = CreateGeometry("rect");
@@ -148,14 +138,6 @@ CChartTitle.prototype =
         this.textBody.initFromString(title);
     },
 
-    //recalculate
-
-    /*recalculateTransform: function()
-    {
-        this.recalculateAfterTextAdd();
-        this.transform.Reset();
-        global_MatrixTransformer.TranslateAppend(this.transform, this.x, this.y);
-    },*/
 
 
     setDefaultText: function(val)
@@ -209,7 +191,8 @@ CChartTitle.prototype =
     {
         if(!isRealObject(this.txBody))
             this.txBody = new CTextBody(this);
-        this.txBody.paragraphAdd(paraItem);
+        this.txBody.content.Paragraph_Add(paraItem, false);
+        this.txBody.content.RecalculateCurPos();
 
         var old_cx = this.x + this.extX*0.5;
         var old_cy = this.y + this.extY*0.5;
@@ -390,15 +373,17 @@ CChartTitle.prototype =
         } */
     },
 
-    updateSelectionState: function(drawingDocument)
+    updateSelectionState: function()
     {
-        this.txBody.updateSelectionState(drawingDocument);
+        this.txBody.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
     },
 
     recalculateCurPos: function()
     {
-        if(this.txBody)
-            this.txBody.recalculateCurPos();
+        if(isRealObject(this.txBody))
+        {
+            this.txBody.content.RecalculateCurPos();
+        }
     },
 
     drawTextSelection: function()
@@ -858,41 +843,48 @@ CChartTitle.prototype =
     },
 
 
-    selectionSetStart: function(e, x, y)
+
+    selectionSetStart: function(e, x, y, slideIndex)
     {
-        var t_x, t_y;
-        t_x = this.invertTransformText.TransformPointX(x, y);
-        t_y = this.invertTransformText.TransformPointY(x, y);
-        var event =  new CMouseEventHandler();
-        event.fromJQueryEvent(e);
-        this.txBody.selectionSetStart(e, t_x, t_y);
+        if(isRealObject(this.txBody))
+        {
+            var tx, ty;
+            tx = this.invertTransformText.TransformPointX(x, y);
+            ty = this.invertTransformText.TransformPointY(x, y);
+            this.txBody.content.Selection_SetStart(tx, ty, 0, e);
+        }
     },
 
-    selectionSetEnd: function(e, x, y)
+    selectionSetEnd: function(e, x, y, slideIndex)
     {
-        var t_x, t_y;
-        t_x = this.invertTransformText.TransformPointX(x, y);
-        t_y = this.invertTransformText.TransformPointY(x, y);
-        var event =  new CMouseEventHandler();
-        event.fromJQueryEvent(e);
-        this.txBody.selectionSetEnd(e, t_x, t_y);
+        if(isRealObject(this.txBody))
+        {
+            var tx, ty;
+            tx = this.invertTransformText.TransformPointX(x, y);
+            ty = this.invertTransformText.TransformPointY(x, y);
+            this.txBody.content.Selection_SetEnd(tx, ty, 0, e);
+        }
     },
 
     setPosition: function(x, y)
     {
-        if(!isRealObject(this.layout))
-            this.setLayout(new CChartLayout());
-
-        this.layout.setIsManual(true);
-        this.layout.setXMode(LAYOUT_MODE_EDGE);
-        this.layout.setX(x/this.chartGroup.extX);
-        this.layout.setYMode(LAYOUT_MODE_EDGE);
-        this.layout.setY(y/this.chartGroup.extY);
+        var layout = new CChartLayout();
+        layout.setIsManual(true);
+        layout.setXMode(LAYOUT_MODE_EDGE);
+        layout.setX(x/this.chartGroup.extX);
+        layout.setYMode(LAYOUT_MODE_EDGE);
+        layout.setY(y/this.chartGroup.extY);
+        this.setLayout(layout);
     },
 
     setLayout: function(layout)
     {
+
+        var oldLayout = this.layout ? this.layout.createDuplicate() : null;
+        var newLayout = layout ? layout.createDuplicate() : null;
+        History.Add(this, {Type: historyitem_SetCahrtLayout, oldLayout: oldLayout, newLayout: newLayout});
         this.layout = layout;
+        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this.chartGroup;
     },
 
 
@@ -908,7 +900,7 @@ CChartTitle.prototype =
         var x_t = invert_transform.TransformPointX(x, y);
         var y_t = invert_transform.TransformPointY(x, y);
         if(isRealObject(this.spPr.geometry))
-            return this.spPr.geometry.hitInPath(this.drawingObjects.getCanvasContext(), x_t, y_t);
+            return this.spPr.geometry.hitInPath(editor.WordControl.m_oDrawingDocument.CanvasHitContext, x_t, y_t);
         return false;
     },
 
@@ -918,7 +910,7 @@ CChartTitle.prototype =
         var x_t = invert_transform.TransformPointX(x, y);
         var y_t = invert_transform.TransformPointY(x, y);
         if(isRealObject(this.spPr.geometry))
-            return this.spPr.geometry.hitInInnerArea(this.drawingObjects.getCanvasContext(), x_t, y_t);
+            return this.spPr.geometry.hitInInnerArea(editor.WordControl.m_oDrawingDocument.CanvasHitContext, x_t, y_t);
         return x_t > 0 && x_t < this.extX && y_t > 0 && y_t < this.extY;
     },
 
@@ -940,7 +932,7 @@ CChartTitle.prototype =
         var x_t = invert_transform.TransformPointX(x, y);
         var y_t = invert_transform.TransformPointY(x, y);
 
-        var _hit_context = this.drawingObjects.getCanvasContext();
+        var _hit_context = editor.WordControl.m_oDrawingDocument.CanvasHitContext;
 
         return (HitInLine(_hit_context, x_t, y_t, 0, 0, this.extX, 0) ||
             HitInLine(_hit_context, x_t, y_t, this.extX, 0, this.extX, this.extY)||
@@ -952,5 +944,137 @@ CChartTitle.prototype =
     getInvertTransform: function()
     {
         return this.invertTransform;
+    },
+
+    recalcAll: function()
+    {},
+
+    recalcAllColors: function()
+    {},
+
+    writeToBinary: function(w)
+    {
+        w.WriteBool(isRealObject(this.layout));
+        if(isRealObject(this.layout))
+            this.layout.writeToBinary(w);
+        w.WriteBool(this.overlay);
+        this.spPr.Write_ToBinary2(w);
+        w.WriteBool(isRealObject(this.txPr));
+        if(isRealObject(this.txPr))
+            this.txPr.writeToBinary(w);
+
+        w.WriteBool(isRealObject(this.txBody));
+        if(isRealObject(this.txBody))
+            this.txBody.writeToBinary(w);
+    },
+
+    readFromBinary: function(r)
+    {
+        if(r.GetBool())
+        {
+            this.layout = new CChartLayout();
+            this.layout.readFromBinary(r);
+        }
+        this.overlay = r.GetBool();
+        this.spPr.Read_FromBinary2(r);
+        if(r.GetBool())
+        {
+            this.txPr = new CTextBody(this);
+            this.txPr.readFromBinary(r);
+        }
+
+        if(r.GetBool())
+        {
+            this.txBody = new CTextBody(this);
+            this.txBody.readFromBinary(r);
+        }
+
+    },
+
+    Undo: function(data)
+    {
+        switch(data.Type)
+        {
+            case historyitem_SetCahrtLayout:
+            {
+                if(isRealObject(data.oldLayout))
+                {
+                    this.layout = data.oldLayout.createDuplicate();
+                }
+                else
+                {
+                    this.layout = null;
+                }
+                break;
+            }
+        }
+        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this.chartGroup;
+    },
+
+    Redo: function(data)
+    {
+        switch(data.Type)
+        {
+            case historyitem_SetCahrtLayout:
+            {
+                if(isRealObject(data.newLayout))
+                {
+                    this.layout = data.newLayout.createDuplicate();
+                }
+                else
+                {
+                    this.layout = null;
+                }
+                break;
+            }
+        }
+        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this.chartGroup;
+    },
+
+    Refresh_RecalcData: function()
+    {},
+
+    Save_Changes: function(data, w)
+    {
+        w.WriteLong(historyitem_type_ChartTitle);
+        w.WriteLong(data.Type);
+        switch(data.Type)
+        {
+            case historyitem_SetCahrtLayout:
+            {
+                w.WriteBool(isRealObject(data.newLayout));
+                if(isRealObject(data.newLayout))
+                {
+                    data.newLayout.Write_ToBinary2(w);
+                }
+                break;
+            }
+        }
+    },
+
+
+    Load_Changes: function(r)
+    {
+
+        if(r.GetLong() === historyitem_type_Shape)
+        {
+            switch(r.GetLong())
+            {
+                case historyitem_SetCahrtLayout:
+                {
+                    if(r.GetBool())
+                    {
+                        this.layout = new CChartLayout();
+                        this.layout.Read_FromBinary2(r);
+                    }
+                    else
+                    {
+                        this.layout = null;
+                    }
+                    break;
+                }
+            }
+            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this.chartGroup;
+        }
     }
 };

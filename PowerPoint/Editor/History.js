@@ -273,6 +273,11 @@ var historyitem_SetShapeSetGeometry = 9;
 var historyitem_SetShapeBodyPr = 10;
 
 
+//Типы изменений в классе CChartAsGroup
+var historyitem_SetCahrtLayout = 0;
+
+
+
 
 
 
@@ -345,6 +350,7 @@ var historyitem_type_Chart			  = 24;
 var historyitem_type_HdrFtrGrObjects  = 25;
 var historyitem_type_GrObjects        = 26;
 var historyitem_type_Hyperlink        = 27;
+var historyitem_type_ChartTitle 	  = 28;
 
 
 function CHistory(Document)

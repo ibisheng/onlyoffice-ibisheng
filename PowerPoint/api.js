@@ -3718,7 +3718,7 @@ asc_docs_api.prototype.sync_slidePropCallback = function(slide)
 {
     var bg = slide.cSld.Bg;
     var obj = new CAscSlideProps();
-    if (null == bg)
+/*    if (null == bg)
     {
         obj.Background = new CAscFill();
         obj.Background.type = c_oAscFill.FILL_TYPE_NOFILL;
@@ -3751,6 +3751,22 @@ asc_docs_api.prototype.sync_slidePropCallback = function(slide)
         if (_back_fill != null && _back_fill.fill != null && _back_fill.fill.type == FILL_TYPE_BLIP)
         {
             this.WordControl.m_oDrawingDocument.DrawImageTextureFillSlide(_back_fill.fill.RasterImageId);
+        }
+    }   */
+
+    var bgFill = slide.backgroundFill;
+    if(!bgFill)
+    {
+        obj.Background = new CAscFill();
+        obj.Background.type = c_oAscFill.FILL_TYPE_NOFILL;
+    }
+    else
+    {
+        obj.Background = CreateAscFill(bgFill);
+
+        if (bgFill != null && bgFill.fill != null && bgFill.fill.type == FILL_TYPE_BLIP)
+        {
+            this.WordControl.m_oDrawingDocument.DrawImageTextureFillSlide(bgFill.fill.RasterImageId);
         }
     }
 
@@ -4228,6 +4244,63 @@ asc_docs_api.prototype.sync_EndAddShape = function()
         this.WordControl.m_oDrawingDocument.UnlockCursorType();
     }
 }
+
+// Вставка диаграмм
+asc_docs_api.prototype.asc_getChartObject = function()
+{
+    this.isChartEditor = true;		// Для совместного редактирования
+
+    var graphicObject = this.WordControl.m_oLogicDocument.Get_ChartObject();
+    for (var i = 0; i < this.WordControl.m_oDrawingDocument.GuiControlColorsMap.length; i++) {
+        graphicObject.chart.themeColors.push( this.WordControl.m_oDrawingDocument.GuiControlColorsMap[i].get_hex() );
+    }
+    return graphicObject;
+}
+
+asc_docs_api.prototype.asc_addChartDrawingObject = function(chartBinary)
+{
+    /**/
+
+    // Приводим бинарик к объекту типа CChartAsGroup и добавляем объект
+    if ( isObject(chartBinary) )
+    {
+        var binary = chartBinary["binary"];
+        if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) )
+        {
+            History.Create_NewPoint();
+            this.WordControl.m_oLogicDocument.addChart(binary);
+        }
+    }
+}
+
+asc_docs_api.prototype.asc_editChartDrawingObject = function(chartBinary)
+{
+    /**/
+
+    // Находим выделенную диаграмму и накатываем бинарник
+    if ( isObject(chartBinary) )
+    {
+        var binary = chartBinary["binary"];
+        if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
+        {
+            History.Create_NewPoint();
+            this.WordControl.m_oLogicDocument.Edit_Chart(binary);
+        }
+    }
+}
+
+asc_docs_api.prototype.asc_getChartPreviews = function(chartType, chartSubType)
+{
+    if ( this.chartPreviewManager.isReady() ) {
+        return this.chartPreviewManager.getChartPreviews(chartType, chartSubType);
+    }
+}
+
+asc_docs_api.prototype.sync_closeChartEditor = function()
+{
+    this.asc_fireCallback("asc_onCloseChartEditor");
+}
+
 
 
 //-----------------------------------------------------------------

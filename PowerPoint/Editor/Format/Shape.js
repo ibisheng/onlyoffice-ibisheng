@@ -3348,3 +3348,97 @@ CShape.prototype =
         this.parent = g_oTableId.Get_ById(linkData.parent);
     }
 };
+
+function CreateBinaryReader(szSrc, offset, srcLen)
+{
+    var nWritten = 0;
+
+    var index =  -1 + offset;
+    var dst_len = "";
+
+    for( ; index < srcLen; )
+    {
+        index++;
+        var _c = szSrc.charCodeAt(index);
+        if (_c == ";".charCodeAt(0))
+        {
+            index++;
+            break;
+        }
+
+        dst_len += String.fromCharCode(_c);
+    }
+
+    var dstLen = parseInt(dst_len);
+    if(isNaN(dstLen))
+        return null;
+    var pointer = g_memory.Alloc(dstLen);
+    var stream = new FT_Stream2(pointer.data, dstLen);
+    stream.obj = pointer.obj;
+
+    var dstPx = stream.data;
+
+    if (window.chrome)
+    {
+        while (index < srcLen)
+        {
+            var dwCurr = 0;
+            var i;
+            var nBits = 0;
+            for (i=0; i<4; i++)
+            {
+                if (index >= srcLen)
+                    break;
+                var nCh = DecodeBase64Char(szSrc.charCodeAt(index++));
+                if (nCh == -1)
+                {
+                    i--;
+                    continue;
+                }
+                dwCurr <<= 6;
+                dwCurr |= nCh;
+                nBits += 6;
+            }
+
+            dwCurr <<= 24-nBits;
+            for (i=0; i<nBits/8; i++)
+            {
+                dstPx[nWritten++] = ((dwCurr & 0x00ff0000) >>> 16);
+                dwCurr <<= 8;
+            }
+        }
+    }
+    else
+    {
+        var p = b64_decode;
+        while (index < srcLen)
+        {
+            var dwCurr = 0;
+            var i;
+            var nBits = 0;
+            for (i=0; i<4; i++)
+            {
+                if (index >= srcLen)
+                    break;
+                var nCh = p[szSrc.charCodeAt(index++)];
+                if (nCh == undefined)
+                {
+                    i--;
+                    continue;
+                }
+                dwCurr <<= 6;
+                dwCurr |= nCh;
+                nBits += 6;
+            }
+
+            dwCurr <<= 24-nBits;
+            for (i=0; i<nBits/8; i++)
+            {
+                dstPx[nWritten++] = ((dwCurr & 0x00ff0000) >>> 16);
+                dwCurr <<= 8;
+            }
+        }
+    }
+
+    return stream;
+}

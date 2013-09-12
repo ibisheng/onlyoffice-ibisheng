@@ -37,6 +37,8 @@ CGraphicObjects.prototype = {
         {
             case STATES_ID_TEXT_ADD:
             case STATES_ID_TEXT_ADD_IN_GROUP:
+            case STATES_ID_CHART_TEXT_ADD:
+
             {
                 if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
                 {
@@ -81,6 +83,7 @@ CGraphicObjects.prototype = {
                 break;
             }
         }
+        editor.WordControl.m_oLogicDocument.Recalculate();
     },
 
 
@@ -487,6 +490,11 @@ CGraphicObjects.prototype = {
                 break;
             }
         }
+    },
+
+    Set_ImageProps: function(Props)
+    {
+
     },
 
     getSelectedArraysByTypes: function()
@@ -1108,6 +1116,24 @@ CGraphicObjects.prototype = {
 
     },
 
+    getChartObject: function()
+    {
+        var selected_arr = this.selectedObjects;
+        for(var  i = 0;  i < selected_arr.length; ++i)
+        {
+            if(selected_arr[i].chart != null)
+                return selected_arr[i];
+        }
+
+        var ret = new CChartAsGroup();
+        ret.chart.initDefault();
+        ret.spPr.xfrm.offX = 0;
+        ret.spPr.xfrm.offY = 0;
+        ret.spPr.xfrm.extX = this.slide.Width*2/3;//ditor.WordControl.m_oDrawingDocument.GetMMPerDot(c_oAscChartDefines.defaultChartWidth);
+        ret.spPr.xfrm.extY = 0.593*this.slide.Height;//ditor.WordControl.m_oDrawingDocument.GetMMPerDot(c_oAscChartDefines.defaultChartHeight);
+        return ret;
+    },
+
     shapeApply: function(properties)
     {
 
@@ -1215,6 +1241,15 @@ CGraphicObjects.prototype = {
         image.spPr.xfrm.extY = H;
         this.slide.addSp(image);
         editor.WordControl.m_oLogicDocument.recalcMap[image.Id] = image;
+    },
+
+    addChart: function(binary)
+    {
+        var chart = new CChartAsGroup(this.slide);
+        chart.initFromBinary(binary);
+        this.slide.addSp(chart);
+        editor.WordControl.m_oLogicDocument.recalcMap[chart.Id] = chart;
+
     },
 
 

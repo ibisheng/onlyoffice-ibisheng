@@ -157,7 +157,7 @@ function NullState(drawingObjectsController, drawingObjects)
                     cur_drawing.selectionSetStart(e, x, y);
                     this.drawingObjectsController.changeCurrentState(new TextAddState(this.drawingObjectsController, this.drawingObjects, cur_drawing));
                     if(e.ClickCount < 2)
-                        this.drawingObjectsController.updateSelectionState(this.drawingObjects.drawingDocument);
+                        this.drawingObjectsController.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
                     return;
                 }
             }
@@ -193,7 +193,7 @@ function NullState(drawingObjectsController, drawingObjects)
                         grouped_objects[j].selectionSetStart(e, x, y);
                         this.drawingObjectsController.changeCurrentState(new TextAddInGroup(this.drawingObjectsController, this.drawingObjects, cur_drawing, grouped_objects[j]));
                         if(e.ClickCount < 2)
-                            grouped_objects[j].updateSelectionState(this.drawingObjects.drawingDocument);
+                            grouped_objects[j].updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
                         return;
                     }
                 }
@@ -705,7 +705,7 @@ function NullState(drawingObjectsController, drawingObjects)
      if(typeof this.textObject.setCellBackgroundColor === "function")
      {
      this.textObject.setCellBackgroundColor(color);
-     this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+     this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
      }
      };    */
 
@@ -753,7 +753,7 @@ function NullState(drawingObjectsController, drawingObjects)
         if(typeof this.textObject.insertHyperlink === "function")
         {
             this.textObject.insertHyperlink(options);
-            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+            this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
         }
     }
 }
@@ -832,9 +832,10 @@ function MoveInternalChartObjectState(drawingObjectsController, drawingObjects, 
         History.Create_NewPoint();
         this.drawingObjectsController.trackEnd();
         this.drawingObjectsController.clearTrackObjects();
+        editor.WordControl.m_oLogicDocument.Recalculate();
         this.drawingObjects.OnUpdateOverlay();
         this.drawingObjectsController.changeCurrentState(new ChartState(this.drawingObjectsController, this.drawingObjects, this.chartElement.chartGroup));
-       
+
     };
 
     this.onKeyDown = function(e)
@@ -934,112 +935,182 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
         for(var i = drawing_bases.length - 1; i > -1; --i)
         {
             var cur_drawing_base = drawing_bases[i];
-            if(cur_drawing_base.isGraphicObject())
+
+            var cur_drawing = cur_drawing_base;
+            if(cur_drawing.isShape() || cur_drawing.isImage())
             {
-                var cur_drawing = cur_drawing_base.graphicObject;
-                if(cur_drawing.isShape() || cur_drawing.isImage())
+                var hit_in_inner_area = cur_drawing.hitInInnerArea(x, y);
+                var hit_in_path = cur_drawing.hitInPath(x, y);
+                var hit_in_text_rect = cur_drawing.hitInTextRect(x, y);
+                if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
                 {
-                    var hit_in_inner_area = cur_drawing.hitInInnerArea(x, y);
-                    var hit_in_path = cur_drawing.hitInPath(x, y);
-                    var hit_in_text_rect = cur_drawing.hitInTextRect(x, y);
+                    this.chart.resetSelection(this.drawingObjectsController);
+                    if(!(e.CtrlKey || e.ShiftKey))
+                        this.drawingObjectsController.resetSelection();
+                    cur_drawing.select(this.drawingObjectsController);
+                    for(var j = 0; j < selected_objects.length; ++j)
+                    {
+                        this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
+                    }
+                    this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects,x, y, e.ShiftKey, e.ctrl, cur_drawing, false, true));
+                    this.drawingObjects.OnUpdateOverlay();
+                    return;
+                }
+                else if(hit_in_text_rect)
+                {
+                    //TODO
+                }
+            }
+            if(cur_drawing.isGroup())
+            {
+                var grouped_objects = cur_drawing.getArrGraphicObjects();
+                for(var j = grouped_objects.length - 1; j > -1; --j)
+                {
+                    var cur_grouped_object = grouped_objects[j];
+                    var hit_in_inner_area = cur_grouped_object.hitInInnerArea(x, y);
+                    var hit_in_path = cur_grouped_object.hitInPath(x, y);
+                    var hit_in_text_rect = cur_grouped_object.hitInTextRect(x, y);
                     if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
                     {
-                        this.chart.resetSelection(this.drawingObjectsController);
+                        this.drawingObjectsController.clearPreTrackObjects();
+                        var is_selected = cur_drawing.selected;
                         if(!(e.CtrlKey || e.ShiftKey))
                             this.drawingObjectsController.resetSelection();
                         cur_drawing.select(this.drawingObjectsController);
+                        this.drawingObjects.OnUpdateOverlay();
                         for(var j = 0; j < selected_objects.length; ++j)
                         {
                             this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
                         }
-                        this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects,x, y, e.ShiftKey, e.ctrl, cur_drawing, false, true));
-                        this.drawingObjects.OnUpdateOverlay();
+                        this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects,x, y, e.ShiftKey, e.ctrl, cur_drawing, is_selected, true));
                         return;
                     }
                     else if(hit_in_text_rect)
                     {
-                        //TODO
+                        this.drawingObjectsController.resetSelection();
+                        cur_grouped_object.select(this.drawingObjectsController);
+                        grouped_objects[j].select(cur_grouped_object);
+                        grouped_objects[j].selectionSetStart(e, x, y);
+                        this.drawingObjectsController.changeCurrentState(new TextAddInGroup(this.drawingObjectsController, this.drawingObjects, cur_drawing, grouped_objects[j]));
+                        if(e.ClickCount < 2)
+                            grouped_objects[j].updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
+                        return;
                     }
                 }
-                else if(cur_drawing.isGroup())
+            }
+            else if(cur_drawing.isChart())
+            {
+                if(cur_drawing === this.chart)
                 {
-                    var grouped_objects = cur_drawing.getArrGraphicObjects();
-                    for(var j = grouped_objects.length - 1; j > -1; --j)
+                    for(var j = 0; j < titles.length; ++j)
                     {
-                        var cur_grouped_object = grouped_objects[j];
-                        var hit_in_inner_area = cur_grouped_object.hitInInnerArea(x, y);
-                        var hit_in_path = cur_grouped_object.hitInPath(x, y);
-                        var hit_in_text_rect = cur_grouped_object.hitInTextRect(x, y);
-                        if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
+                        title = titles[j];
+                        if(isRealObject(title))
                         {
-                            this.chart.resetSelection(this.drawingObjectsController);
-                            if(!(e.CtrlKey || e.ShiftKey))
-                                this.drawingObjectsController.resetSelection();
-                            cur_drawing.select(this.drawingObjectsController);
-                            this.drawingObjects.OnUpdateOverlay();
-                            for(var j = 0; j < selected_objects.length; ++j)
+                            if(!title.selected)
                             {
-                                this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
-                            }
-                            this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects,x, y, e.ShiftKey, e.ctrl, cur_drawing, false, true));
-                            this.drawingObjectsController.OnUpdateOverlay();
-                            return;
-                        }
-                        else if(hit_in_text_rect)
-                        {
-                            //TODO
-                        }
-                    }
-                }
-                else if(cur_drawing.isChart())
-                {
-                    if(cur_drawing === this.chart)
-                    {
-                        for(var j = 0; j < titles.length; ++j)
-                        {
-                            title = titles[j];
-                            if(isRealObject(title))
-                            {
-                                if(!title.selected)
+                                if(title.hit(x, y))
                                 {
-                                    if(title.hit(x, y))
+                                    this.chart.resetSelection();
+                                    title.select();
+                                    this.drawingObjectsController.clearPreTrackObjects();
+                                    this.drawingObjectsController.addPreTrackObject(new MoveTitleInChart(title));
+                                    this.drawingObjectsController.changeCurrentState(new PreMoveInternalChartObjectState(this.drawingObjectsController, this.drawingObjects, x, y, title));
+                                    this.drawingObjects.OnUpdateOverlay();
+                                    return;
+                                }
+                            }
+                            else
+                            {
+                                if(title.hit(x, y))
+                                {
+                                    if(title.hitInTextRect(x, y))
                                     {
-                                        this.chart.resetSelection();
-                                        title.select();
+                                        title.selectionSetStart(e, x, y);
+                                        this.drawingObjectsController.changeCurrentState(new ChartTextAdd(this.drawingObjectsController, this.drawingObjects,  this.chart, title));
+                                        if(e.ClickCount < 2)
+                                            title.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
+                                        return;
+                                    }
+                                    else
+                                    {
+
                                         this.drawingObjectsController.clearPreTrackObjects();
                                         this.drawingObjectsController.addPreTrackObject(new MoveTitleInChart(title));
                                         this.drawingObjectsController.changeCurrentState(new PreMoveInternalChartObjectState(this.drawingObjectsController, this.drawingObjects, x, y, title));
                                         this.drawingObjects.OnUpdateOverlay();
-                                        return;
                                     }
-                                }
-                                else
-                                {
-                                    if(title.hit(x, y))
-                                    {
-                                        if(title.hitInTextRect(x, y))
-                                        {
-                                            title.selectionSetStart(e, x, y);
-                                            this.drawingObjectsController.changeCurrentState(new ChartTextAdd(this.drawingObjectsController, this.drawingObjects,  this.chart, title));
-                                            if(e.ClickCount < 2)
-                                                title.updateSelectionState(this.drawingObjects.drawingDocument);
-                                            return;
-                                        }
-                                        else
-                                        {
-
-                                            this.drawingObjectsController.clearPreTrackObjects();
-                                            this.drawingObjectsController.addPreTrackObject(new MoveTitleInChart(title));
-                                            this.drawingObjectsController.changeCurrentState(new PreMoveInternalChartObjectState(this.drawingObjectsController, this.drawingObjects, x, y, title));
-                                            this.drawingObjects.OnUpdateOverlay();
-                                        }
-                                        return;
-                                    }
+                                    return;
                                 }
                             }
                         }
-                        if(cur_drawing.hitInWorkArea(x, y))
+                    }
+                    if(cur_drawing.hitInWorkArea(x, y))
+                    {
+                        this.drawingObjectsController.clearPreTrackObjects();
+                        var is_selected = cur_drawing.selected;
+                        this.chart.resetSelection();
+                        if(!(e.CtrlKey || e.ShiftKey) && !is_selected)
+                            this.drawingObjectsController.resetSelection();
+                        cur_drawing.select(this.drawingObjectsController);
+                        this.drawingObjects.OnUpdateOverlay();
+                        for(var j = 0; j < selected_objects.length; ++j)
                         {
+                            this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
+                        }
+                        this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects,x, y, e.ShiftKey, e.ctrl, cur_drawing, is_selected, true));
+                        return;
+                    }
+                }
+                else
+                {
+                    if(cur_drawing.hitInWorkArea(x, y))
+                    {
+
+                        if(!e.ShiftKey && !e.CtrlKey)
+                        {
+
+                            if(isRealObject(cur_drawing.chartLegend))
+                            {
+                                //TODO
+                            }
+
+                            var object_for_move_in_chart = null;
+                            if(isRealObject(cur_drawing.chartTitle))
+                            {
+                                if(cur_drawing.chartTitle.hit(x, y))
+                                {
+                                    object_for_move_in_chart = cur_drawing.chartTitle;
+                                }
+                            }
+
+                            if(isRealObject(cur_drawing.hAxisTitle) && !isRealObject(object_for_move_in_chart))
+                            {
+                                if(cur_drawing.hAxisTitle.hit(x, y))
+                                {
+                                    object_for_move_in_chart = cur_drawing.hAxisTitle;
+                                }
+                            }
+
+                            if(isRealObject(cur_drawing.vAxisTitle) && !isRealObject(object_for_move_in_chart))
+                            {
+                                if(cur_drawing.vAxisTitle.hit(x, y))
+                                {
+                                    object_for_move_in_chart = cur_drawing.vAxisTitle;
+                                }
+                            }
+                            if(isRealObject(object_for_move_in_chart))
+                            {
+                                this.chart.resetSelection();
+                                this.drawingObjectsController.resetSelection();
+                                cur_drawing.select(this.drawingObjectsController);
+                                object_for_move_in_chart.select();
+                                this.drawingObjectsController.clearPreTrackObjects();
+                                this.drawingObjectsController.addPreTrackObject(new MoveTitleInChart(object_for_move_in_chart));
+                                this.drawingObjectsController.changeCurrentState(new PreMoveInternalChartObjectState(this.drawingObjectsController, this.drawingObjects, x, y, object_for_move_in_chart));
+                                this.drawingObjects.OnUpdateOverlay();
+                                return;
+                            }
                             this.drawingObjectsController.clearPreTrackObjects();
                             var is_selected = cur_drawing.selected;
                             this.chart.resetSelection();
@@ -1054,77 +1125,13 @@ function ChartState(drawingObjectsController, drawingObjects, chart)
                             this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects,x, y, e.ShiftKey, e.ctrl, cur_drawing, is_selected, true));
                             return;
                         }
-                    }
-                    else
-                    {
-                        if(cur_drawing.hitInWorkArea(x, y))
-                        {
-
-                            if(!e.ShiftKey && !e.CtrlKey)
-                            {
-
-                                if(isRealObject(cur_drawing.chartLegend))
-                                {
-                                    //TODO
-                                }
-
-                                var object_for_move_in_chart = null;
-                                if(isRealObject(cur_drawing.chartTitle))
-                                {
-                                    if(cur_drawing.chartTitle.hit(x, y))
-                                    {
-                                        object_for_move_in_chart = cur_drawing.chartTitle;
-                                    }
-                                }
-
-                                if(isRealObject(cur_drawing.hAxisTitle) && !isRealObject(object_for_move_in_chart))
-                                {
-                                    if(cur_drawing.hAxisTitle.hit(x, y))
-                                    {
-                                        object_for_move_in_chart = cur_drawing.hAxisTitle;
-                                    }
-                                }
-
-                                if(isRealObject(cur_drawing.vAxisTitle) && !isRealObject(object_for_move_in_chart))
-                                {
-                                    if(cur_drawing.vAxisTitle.hit(x, y))
-                                    {
-                                        object_for_move_in_chart = cur_drawing.vAxisTitle;
-                                    }
-                                }
-                                if(isRealObject(object_for_move_in_chart))
-                                {
-                                    this.chart.resetSelection();
-                                    this.drawingObjectsController.resetSelection();
-                                    cur_drawing.select(this.drawingObjectsController);
-                                    object_for_move_in_chart.select();
-                                    this.drawingObjectsController.clearPreTrackObjects();
-                                    this.drawingObjectsController.addPreTrackObject(new MoveTitleInChart(object_for_move_in_chart));
-                                    this.drawingObjectsController.changeCurrentState(new PreMoveInternalChartObjectState(this.drawingObjectsController, this.drawingObjects, x, y, object_for_move_in_chart));
-                                    this.drawingObjects.OnUpdateOverlay();
-                                    return;
-                                }
-                                this.drawingObjectsController.clearPreTrackObjects();
-                                var is_selected = cur_drawing.selected;
-                                this.chart.resetSelection();
-                                if(!(e.CtrlKey || e.ShiftKey) && !is_selected)
-                                    this.drawingObjectsController.resetSelection();
-                                cur_drawing.select(this.drawingObjectsController);
-                                this.drawingObjects.OnUpdateOverlay();
-                                for(var j = 0; j < selected_objects.length; ++j)
-                                {
-                                    this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
-                                }
-                                this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects,x, y, e.ShiftKey, e.ctrl, cur_drawing, is_selected, true));
-                                return;
-                            }
 
 
 
-                        }
                     }
                 }
             }
+
         }
         this.chart.resetSelection(this.drawingObjectsController);
         this.drawingObjectsController.resetSelection();
@@ -1341,17 +1348,17 @@ function ChartTextAdd(drawingObjectsController, drawingObjects, chart, textObjec
 
     this.onMouseMove = function(e, x, y)
     {
-        if(e.which > 0 && e.type === "mousemove")
+        if(e.IsLocked)
         {
             this.textObject.selectionSetEnd(e, x, y);
-            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+            this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
         }
     };
 
     this.onMouseUp = function(e, x, y)
     {
         this.textObject.selectionSetEnd(e, x, y);
-        this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+        this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
     };
 
     this.onKeyDown = function(e)
@@ -1399,7 +1406,7 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
         this.nullState.onMouseDown(e, x, y);
         if(this.drawingObjectsController.State.id !== STATES_ID_TEXT_ADD || this.drawingObjectsController.State.id !== STATES_ID_TEXT_ADD_IN_GROUP)
         {
-            this.drawingObjectsController.updateSelectionState(this.drawingObjects.drawingDocument);
+            this.drawingObjectsController.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
 
         }
     };
@@ -1449,7 +1456,7 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
         this.drawingObjects.objectLocker.checkObjects(callback);
         // this.textObject.paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
         // this.drawingObjects.showDrawingObjects(true);
-        // this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+        // this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
     };
 
     this.drawSelection = function(drawingDocument)
@@ -1470,7 +1477,7 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
         {
             this.textObject.setCellFontName(fontName);
             this.drawingObjects.showDrawingObjects(true);
-            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+            this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
         }
     };
 
@@ -1480,7 +1487,7 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
         {
             this.textObject.setCellFontSize(fontSize);
             this.drawingObjects.showDrawingObjects(true);
-            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+            this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
         }
     };
 
@@ -1490,7 +1497,7 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
         {
             this.textObject.setCellBold(isBold);
             this.drawingObjects.showDrawingObjects(true);
-            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+            this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
         }
     };
 
@@ -1500,7 +1507,7 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
         {
             this.textObject.setCellItalic(isItalic);
             this.drawingObjects.showDrawingObjects(true);
-            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+            this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
         }
     };
 
@@ -1510,7 +1517,7 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
         {
             this.textObject.setCellUnderline(isUnderline);
             this.drawingObjects.showDrawingObjects(true);
-            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+            this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
         }
     };
 
@@ -1520,7 +1527,7 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
         {
             this.textObject.setCellStrikeout(isStrikeout);
             this.drawingObjects.showDrawingObjects(true);
-            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+            this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
         }
     };
 
@@ -1530,7 +1537,7 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
         {
             this.textObject.setCellSubscript(isSubscript);
             this.drawingObjects.showDrawingObjects(true);
-            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+            this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
         }
     };
 
@@ -1540,7 +1547,7 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
         {
             this.textObject.setCellSuperscript(isSuperscript);
             this.drawingObjects.showDrawingObjects(true);
-            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+            this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
         }
     };
 
@@ -1550,7 +1557,7 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
         {
             this.textObject.setCellAlign(align);
             this.drawingObjects.showDrawingObjects(true);
-            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+            this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
         }
     };
 
@@ -1560,7 +1567,7 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
         {
             this.textObject.setCellVertAlign(align);
             this.drawingObjects.showDrawingObjects(true);
-            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+            this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
         }
     };
 
@@ -1570,7 +1577,7 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
         {
             this.textObject.setCellTextColor(color);
             this.drawingObjects.showDrawingObjects(true);
-            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+            this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
         }
 
     };
@@ -1590,7 +1597,7 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
         {
             this.textObject.setCellAngle(angle);
             this.drawingObjects.showDrawingObjects(true);
-            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+            this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
         }
     };
 
@@ -1601,7 +1608,7 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
         {
             this.textObject.increaseFontSize();
             this.drawingObjects.showDrawingObjects(true);
-            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+            this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
         }
     };
 
@@ -1611,7 +1618,7 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
         {
             this.textObject.decreaseFontSize();
             this.drawingObjects.showDrawingObjects(true);
-            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+            this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
         }
     };
 
@@ -1620,7 +1627,7 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
         if(typeof this.textObject.insertHyperlink === "function")
         {
             this.textObject.insertHyperlink(options);
-            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+            this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
         }
     }
 
@@ -2018,20 +2025,27 @@ function TrackNewShapeState(drawingObjectsController, drawingObjects, presetGeom
         this.drawingObjectsController.resetSelection();
 
 
-
-        History.Create_NewPoint();
-        this.drawingObjectsController.trackEnd();
-        this.drawingObjectsController.clearTrackObjects();
-        if(this.presetGeom != "textRect")
+        if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+        {
+            History.Create_NewPoint();
+            this.drawingObjectsController.trackEnd();
+            if(this.presetGeom != "textRect")
+            {
+                this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
+            }
+            else if(isRealObject(this.resultObject))
+            {
+                this.drawingObjectsController.changeCurrentState(new TextAddState(this.drawingObjectsController, this.drawingObjects, this.resultObject));
+            }
+            this.drawingObjects.presentation.Recalculate();
+            this.drawingObjects.presentation.DrawingDocument.OnRecalculatePage(this.drawingObjects.num, this.drawingObjects);
+        }
+        else
         {
             this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
         }
-        else if(isRealObject(this.resultObject))
-        {
-            this.drawingObjectsController.changeCurrentState(new TextAddState(this.drawingObjectsController, this.drawingObjects, this.resultObject));
-        }
-        this.drawingObjects.presentation.Recalculate();
-        this.drawingObjects.presentation.DrawingDocument.OnRecalculatePage(this.drawingObjects.num, this.drawingObjects);
+        editor.sync_EndAddShape();
+        this.drawingObjectsController.clearTrackObjects();
         this.drawingObjects.OnUpdateOverlay();
     };
 
@@ -2106,22 +2120,20 @@ function PreMoveState(drawingObjectsController, drawingObjects, startX, startY, 
 
         if(!this.ctrl && !this.shift)
         {
-            //if(e.ClickCount > 1)
+
+            if(e.ClickCount > 1)
             {
                 var gr_obj = this.majorObject;
-                if(gr_obj.isChart())
+                if(gr_obj.chart)
                 {
-                    this.drawingObjectsController.changeCurrentState(new ExtpectDoubleClickState(this.drawingObjectsController, this.drawingObjects));
-                   
-                    return;
-                    /* if(false === this.graphicObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : gr_obj.Parent, CheckType : changestype_Paragraph_Content} )) {
-                     var chart = this.graphicObjects.majorGraphicObject.GraphicObj.chart.serializeChart();
-                     chart["themeColors"] = [];
-                     for (var i = 0; i < this.graphicObjects.drawingDocument.GuiControlColorsMap.length; i++) {
-                     chart["themeColors"].push( this.graphicObjects.drawingDocument.GuiControlColorsMap[i].get_hex() );
-                     }
-                     editor.asc_fireCallback("asc_doubleClickOnChart", chart);
-                     }      */
+                    if(false === editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props, undefined )) {
+                        var graphicObject = gr_obj;
+                        graphicObject.chart.themeColors = [];
+                        for (var i = 0; i < editor.WordControl.m_oDrawingDocument.GuiControlColorsMap.length; i++) {
+                            graphicObject.chart.themeColors.push( editor.WordControl.m_oDrawingDocument.GuiControlColorsMap[i].get_hex() );
+                        }
+                        editor.asc_fireCallback("asc_doubleClickOnChart", graphicObject);
+                    }
                 }
             }
         }
@@ -2548,7 +2560,7 @@ function GroupState(drawingObjectsController, drawingObjects, group)
                             cur_drawing.selectionSetStart(e, x, y);
                             this.drawingObjectsController.changeCurrentState(new TextAddInGroup(this.drawingObjectsController, this.drawingObjects, this.group, cur_drawing));
                             if(e.ClickCount < 2)
-                                cur_drawing.updateSelectionState(this.drawingObjects.drawingDocument);
+                                cur_drawing.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
                             return;
                         }
                     }
@@ -2585,7 +2597,7 @@ function GroupState(drawingObjectsController, drawingObjects, group)
                             cur_grouped_object.selectionSetStart(e, x, y);
                             this.drawingObjectsController.changeCurrentState(new TextAddInGroup(this.drawingObjectsController, this.drawingObjects, this.group, cur_drawing));
                             if(e.ClickCount < 2)
-                                cur_drawing.updateSelectionState(this.drawingObjects.drawingDocument);
+                                cur_drawing.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
                             return;
                         }
                     }
@@ -2780,7 +2792,7 @@ function TextAddInGroup(drawingObjectsController, drawingObjects, group, textObj
         this.groupState.onMouseDown(e, x, y);
         if(this.drawingObjectsController.State.id !== STATES_ID_TEXT_ADD || this.drawingObjectsController.State.id !== STATES_ID_TEXT_ADD_IN_GROUP)
         {
-            this.drawingObjectsController.updateSelectionState(this.drawingObjects.drawingDocument);
+            this.drawingObjectsController.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
 
         }
     };
@@ -2790,14 +2802,14 @@ function TextAddInGroup(drawingObjectsController, drawingObjects, group, textObj
         if(e.IsLocked)
         {
             this.textObject.selectionSetEnd(e, x, y);
-            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+            this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
         }
     };
 
     this.onMouseUp = function(e, x, y)
     {
         this.textObject.selectionSetEnd(e, x, y);
-        this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+        this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
     };
     this.drawSelection = function(drawingDocument)
     {
@@ -2833,9 +2845,9 @@ function TextAddInGroup(drawingObjectsController, drawingObjects, group, textObj
         this.drawingObjects.objectLocker.checkObjects(callback);
         // this.textObject.paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
         // this.drawingObjects.showDrawingObjects(true);
-        // this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+        // this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
         //this.textObject.paragraphAdd(new ParaText(String.fromCharCode(e.charCode)));
-        //this.drawingObjectsController.updateSelectionState(this.drawingObjects.drawingDocument);
+        //this.drawingObjectsController.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
         //this.drawingObjects.showDrawingObjects(true);
         //this.drawingObjects.OnUpdateOverlay();
     };
@@ -2850,7 +2862,7 @@ function TextAddInGroup(drawingObjectsController, drawingObjects, group, textObj
         {
             this.textObject.setCellFontName(fontName);
             this.drawingObjects.showDrawingObjects(true);
-            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+            this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
         }
     };
 
@@ -2860,7 +2872,7 @@ function TextAddInGroup(drawingObjectsController, drawingObjects, group, textObj
         {
             this.textObject.setCellFontSize(fontSize);
             this.drawingObjects.showDrawingObjects(true);
-            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+            this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
         }
     };
 
@@ -2870,7 +2882,7 @@ function TextAddInGroup(drawingObjectsController, drawingObjects, group, textObj
         {
             this.textObject.setCellBold(isBold);
             this.drawingObjects.showDrawingObjects(true);
-            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+            this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
         }
     };
 
@@ -2880,7 +2892,7 @@ function TextAddInGroup(drawingObjectsController, drawingObjects, group, textObj
         {
             this.textObject.setCellItalic(isItalic);
             this.drawingObjects.showDrawingObjects(true);
-            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+            this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
         }
     };
 
@@ -2890,7 +2902,7 @@ function TextAddInGroup(drawingObjectsController, drawingObjects, group, textObj
         {
             this.textObject.setCellUnderline(isUnderline);
             this.drawingObjects.showDrawingObjects(true);
-            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+            this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
         }
     };
 
@@ -2900,7 +2912,7 @@ function TextAddInGroup(drawingObjectsController, drawingObjects, group, textObj
         {
             this.textObject.setCellStrikeout(isStrikeout);
             this.drawingObjects.showDrawingObjects(true);
-            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+            this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
         }
     };
 
@@ -2910,7 +2922,7 @@ function TextAddInGroup(drawingObjectsController, drawingObjects, group, textObj
         {
             this.textObject.setCellSubscript(isSubscript);
             this.drawingObjects.showDrawingObjects(true);
-            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+            this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
         }
     };
 
@@ -2920,7 +2932,7 @@ function TextAddInGroup(drawingObjectsController, drawingObjects, group, textObj
         {
             this.textObject.setCellSuperscript(isSuperscript);
             this.drawingObjects.showDrawingObjects(true);
-            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+            this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
         }
     };
 
@@ -2930,7 +2942,7 @@ function TextAddInGroup(drawingObjectsController, drawingObjects, group, textObj
         {
             this.textObject.setCellAlign(align);
             this.drawingObjects.showDrawingObjects(true);
-            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+            this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
         }
     };
 
@@ -2940,7 +2952,7 @@ function TextAddInGroup(drawingObjectsController, drawingObjects, group, textObj
         {
             this.textObject.setCellVertAlign(align);
             this.drawingObjects.showDrawingObjects(true);
-            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+            this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
         }
     };
 
@@ -2950,7 +2962,7 @@ function TextAddInGroup(drawingObjectsController, drawingObjects, group, textObj
         {
             this.textObject.setCellTextColor(color);
             this.drawingObjects.showDrawingObjects(true);
-            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+            this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
         }
 
     };
@@ -2970,7 +2982,7 @@ function TextAddInGroup(drawingObjectsController, drawingObjects, group, textObj
         {
             this.textObject.setCellAngle(angle);
             this.drawingObjects.showDrawingObjects(true);
-            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+            this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
         }
     };
 
@@ -2981,7 +2993,7 @@ function TextAddInGroup(drawingObjectsController, drawingObjects, group, textObj
         {
             this.textObject.increaseFontSize();
             this.drawingObjects.showDrawingObjects(true);
-            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+            this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
         }
     };
 
@@ -2991,7 +3003,7 @@ function TextAddInGroup(drawingObjectsController, drawingObjects, group, textObj
         {
             this.textObject.decreaseFontSize();
             this.drawingObjects.showDrawingObjects(true);
-            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+            this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
         }
     };
 
@@ -3000,7 +3012,7 @@ function TextAddInGroup(drawingObjectsController, drawingObjects, group, textObj
         if(typeof this.textObject.insertHyperlink === "function")
         {
             this.textObject.insertHyperlink(options);
-            this.textObject.updateSelectionState(this.drawingObjects.drawingDocument);
+            this.textObject.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
         }
     };
 }

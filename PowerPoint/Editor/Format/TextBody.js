@@ -163,7 +163,7 @@ CTextBody.prototype =
             drawingDocument.TargetEnd();
             drawingDocument.SelectEnabled(true);
             drawingDocument.SelectClear();
-            this.content.Selection_Draw_Page(this.shape.parent.num);
+            this.content.Selection_Draw_Page(this.shape.parent ? this.shape.parent.num : this.shape.chartGroup.parent.num);
             drawingDocument.SelectShow();
         }
         else /*if(this.parent.elementsManipulator.Document.CurPos.Type == docpostype_FlowObjects ) */
@@ -295,7 +295,7 @@ CTextBody.prototype =
 
     Get_StartPage_Absolute: function()
     {
-        return isRealObject(this.shape) && isRealObject(this.shape.parent) && isRealNumber(this.shape.parent.num) ? this.shape.parent.num : 0;
+        return isRealObject(this.shape) && isRealObject(this.shape.parent) && isRealNumber(this.shape.parent.num) ? this.shape.parent.num : (this.shape.chartGroup ? this.shape.chartGroup.parent.num : 0);
     },
 
     Is_HdrFtr: function()
@@ -369,6 +369,18 @@ CTextBody.prototype =
     OnContentRecalculate: function()
     {},
 
+    writeToBinary: function(w)
+    {
+        this.bodyPr.Write_ToBinary2(w);
+        writeToBinaryDocContent(this.content, w);
+    },
+
+
+    readFromBinary: function(r,  drawingDocument)
+    {
+        this.bodyPr.Read_FromBinary2(r);
+        readFromBinaryDocContent(this.content, r);
+    },
 
     Undo: function()
     {},
