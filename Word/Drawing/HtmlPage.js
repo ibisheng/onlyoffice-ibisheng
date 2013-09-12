@@ -36,9 +36,11 @@ var orientation_Landscape = 0x01;
 
 var tableSpacingMinValue = 0.02;//0.02мм
 
-// не убирать!!! это для ие. чтобы не селектились элементы
-document.onselectstart= function() {
-    return false;
+if (/MSIE/g.test(navigator.userAgent))
+{
+    // не убирать!!! это для ие. чтобы не селектились элементы
+    document.onselectstart= function() {
+    }
 }
 
 function CEditorPage(api)

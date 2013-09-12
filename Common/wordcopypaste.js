@@ -29,6 +29,7 @@ if (window.USER_AGENT_SAFARI_MACOS)
     if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1)
         window.USER_AGENT_SAFARI_MACOS = false;
 }
+window.USER_AGENT_IE = (/MSIE/g.test(navigator.userAgent)) ? true : false;
 
 window.GlobalPasteFlagCounter = 0;
 
@@ -202,8 +203,11 @@ function Editor_Copy(api, bCut)
     delete document.body.style["user-select"];
     document.body.style["-webkit-user-select"] = "text";
 
-    // не убирать!!! это для ие. чтобы не селектились элементы
-    document.onselectstart= function() {
+    if (window.USER_AGENT_IE)
+    {
+        // не убирать!!! это для ие. чтобы не селектились элементы
+        document.onselectstart= function() {
+        }
     }
 
     if (null != api.WordControl.m_oLogicDocument)
@@ -280,9 +284,12 @@ function Editor_Copy(api, bCut)
         document.body.style["user-select"] = "none";
         document.body.style["-webkit-user-select"] = "none";
 
-        // не убирать!!! это для ие. чтобы не селектились элементы
-        document.onselectstart= function() {
-             return false;
+        if (window.USER_AGENT_IE)
+        {
+            // не убирать!!! это для ие. чтобы не селектились элементы
+            document.onselectstart= function() {
+                return false;
+            }
         }
 
         if(true == bCut)
@@ -1939,8 +1946,11 @@ function Editor_Paste(api, bClean)
     delete document.body.style["user-select"];
     document.body.style["-webkit-user-select"] = "text";
 
-    // не убирать!!! это для ие. чтобы не селектились элементы
-    document.onselectstart= function() {
+    if (window.USER_AGENT_IE)
+    {
+        // не убирать!!! это для ие. чтобы не селектились элементы
+        document.onselectstart= function() {
+        }
     }
 
     var Text;
@@ -1984,9 +1994,12 @@ function Editor_Paste(api, bClean)
         document.body.style["user-select"] = "none";
         document.body.style["-webkit-user-select"] = "none";
 
-        // не убирать!!! это для ие. чтобы не селектились элементы
-        document.onselectstart= function() {
-            return false;
+        if (window.USER_AGENT_IE)
+        {
+            // не убирать!!! это для ие. чтобы не селектились элементы
+            document.onselectstart= function() {
+                return false;
+            }
         }
 
         if(!oWordControl.bIsEventPaste)
@@ -2066,6 +2079,8 @@ function Body_Paste(api, e)
         }
 		var fTest = function(types, sPattern)
 		{
+            if (!types)
+                return false;
 			for(var i = 0, length = types.length; i < length; ++i)
 			{
 				if(sPattern == types[i])
