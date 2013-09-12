@@ -1768,7 +1768,12 @@ function Editor_Paste_GetElem(api, bClean)
     if(!pastebin){
         pastebin = document.createElement("div");
         pastebin.setAttribute( 'id', PASTE_ELEMENT_ID );
-        pastebin.style.position = 'absolute';
+
+        if (/MSIE/g.test(navigator.userAgent))
+            pastebin.style.position = 'fixed';
+        else
+            pastebin.style.position = 'absolute';
+
         pastebin.style.top = '-100px';
         pastebin.style.left = '0px';
         pastebin.style.width = '10000px';
