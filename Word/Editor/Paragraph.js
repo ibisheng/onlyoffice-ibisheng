@@ -2322,7 +2322,7 @@ Paragraph.prototype =
                 if ( true === this.Use_YLimit() && (Top > this.YLimit || Bottom2 > this.YLimit ) && ( CurLine != this.Pages[CurPage].FirstLine || ( 0 === CurPage && ( null != this.Get_DocumentPrev() || true === this.Parent.Is_TableCellContent() ) ) ) && false === bBreakPageLineEmpty )
                 {
                     // Проверим висячую строку
-                    if ( this.Parent instanceof CDocument && true === ParaPr.WidowControl && CurLine - this.Pages[CurPage].StartLine <= 1 && CurLine >= 1 && true != bBreakPageLine )
+                    if ( this.Parent instanceof CDocument && true === ParaPr.WidowControl && CurLine - this.Pages[CurPage].StartLine <= 1 && CurLine >= 1 && true != bBreakPageLine && ( 0 === CurPage && null != this.Get_DocumentPrev() ) )
                     {
                         this.Parent.RecalcInfo.WidowControlParagraph = this;
                         this.Parent.RecalcInfo.WidowControlLine      = CurLine - 1;
@@ -2667,7 +2667,7 @@ Paragraph.prototype =
                                 }
                             }
 
-                            if ( this.Parent instanceof CDocument && false === bBreakPagePrevLine )
+                            if ( this.Parent instanceof CDocument && false === bBreakPagePrevLine && ( 1 === CurPage && null != this.Get_DocumentPrev() ) )
                             {
                                 this.Parent.RecalcInfo.WidowControlParagraph = this;
                                 this.Parent.RecalcInfo.WidowControlLine      = ( CurLine > 2 ? CurLine - 1 : 0 ); // Если у нас в параграфе 3 строки, тогда сразу начинаем параграф с новой строки
