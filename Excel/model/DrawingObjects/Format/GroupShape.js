@@ -1640,6 +1640,12 @@ CGroupShape.prototype =
     {
         w.WriteLong(CLASS_TYPE_GROUP);
         this.spPr.Write_ToBinary2(w);
+        w.WriteBool(isRealObject(this.drawingObjects.shiftMap[this.Id]));
+        if(isRealObject(this.drawingObjects.shiftMap[this.Id]))
+        {
+            w.WriteDouble(this.drawingObjects.shiftMap[this.Id].x);
+            w.WriteDouble(this.drawingObjects.shiftMap[this.Id].y);
+        }
         w.WriteLong(this.spTree.length);
         for(var i = 0; i < this.spTree.length; ++i)
         {
@@ -1660,9 +1666,15 @@ CGroupShape.prototype =
         this.group = group;
         this.drawingObjects = drawingObjects;
         this.spPr.Read_FromBinary2(r);
+        var dx = 0, dy = 0;
+        if(r.GetBool())
+        {
+            dx = r.GetDouble();
+            dy = r.GetDouble();
+        }
         if(isRealNumber(x) && isRealNumber(y))
         {
-            this.setPosition(x, y);
+            this.setPosition(x + dx, y + dy);
         }
         var l = r.GetLong();
         for(var i = 0; i < l;++i)

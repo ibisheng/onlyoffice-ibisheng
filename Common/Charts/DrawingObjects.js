@@ -2843,11 +2843,38 @@ function DrawingObjects() {
 				window.attachEvent("onmessage", this._uploadMessage);
 			}
 		}
+        _this.shiftMap = {};
 	}
+
+
+    _this.preCopy = function()
+    {
+        _this.shiftMap = {};
+        var selected_objects = _this.controller.selectedObjects;
+        if(selected_objects.length > 0)
+        {
+            var min_x, min_y;
+            min_x = selected_objects[0].x;
+            min_y = selected_objects[0].y;
+            for(var i = 1; i < selected_objects.length; ++i)
+            {
+                if(selected_objects[i].x < min_x)
+                    min_x = selected_objects[i].x;
+
+                if(selected_objects[i].y < min_y)
+                    min_y = selected_objects[i].y;
+            }
+            for(var i = 0; i < selected_objects.length; ++i)
+            {
+                _this.shiftMap[selected_objects[i].Get_Id()] = {x: selected_objects[i].x - min_x, y: selected_objects[i].y - min_y};
+            }
+        }
+
+    };
 
     _this.getAllFonts = function(AllFonts) {
 
-    },
+    };
 
     _this.getChartRender = function() {
         return chartRender;

@@ -1644,6 +1644,7 @@ CChartAsGroup.prototype =
         this.recalculate();
     },
 
+
     getBase64Image: function()
     {
         return this.brush.fill.canvas.toDataURL();

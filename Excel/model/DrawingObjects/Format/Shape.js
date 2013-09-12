@@ -2876,6 +2876,12 @@ CShape.prototype =
     writeToBinaryForCopyPaste: function(w)
     {
         w.WriteLong(CLASS_TYPE_SHAPE);
+        w.WriteBool(isRealObject(this.drawingObjects.shiftMap[this.Id]));
+        if(isRealObject(this.drawingObjects.shiftMap[this.Id]))
+        {
+            w.WriteDouble(this.drawingObjects.shiftMap[this.Id].x);
+            w.WriteDouble(this.drawingObjects.shiftMap[this.Id].y);
+        }
         this.spPr.Write_ToBinary2(w);
         w.WriteBool(isRealObject(this.style));
         if(isRealObject(this.style))
@@ -2895,6 +2901,12 @@ CShape.prototype =
         this.group = group;
         this.setDrawingObjects(drawingObjects);
 
+        var dx = 0, dy = 0;
+        if(r.GetBool())
+        {
+            dx = r.GetDouble();
+            dy = r.GetDouble();
+        }
         this.spPr.bwMode = r.GetBool();
         r.GetBool();
         this.setXfrmObject(new CXfrm());
@@ -2983,7 +2995,7 @@ CShape.prototype =
 
         if(isRealNumber(x) && isRealNumber(y))
         {
-            this.setPosition(x, y);
+            this.setPosition(x + dx, y + dy);
         }
         if(r.GetBool())
         {

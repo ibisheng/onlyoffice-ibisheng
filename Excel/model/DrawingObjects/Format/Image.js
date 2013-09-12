@@ -1084,6 +1084,12 @@ CImageShape.prototype =
     {
         w.WriteLong(CLASS_TYPE_IMAGE);
         this.blipFill.Write_ToBinary2(w);
+        w.WriteBool(isRealObject(this.drawingObjects.shiftMap[this.Id]));
+        if(isRealObject(this.drawingObjects.shiftMap[this.Id]))
+        {
+            w.WriteDouble(this.drawingObjects.shiftMap[this.Id].x);
+            w.WriteDouble(this.drawingObjects.shiftMap[this.Id].y);
+        }
         this.spPr.Write_ToBinary2(w);
         return  "TeamLabImage" + w.pos + ";" + w.GetBase64Memory();
 
@@ -1094,10 +1100,16 @@ CImageShape.prototype =
         this.group = group;
         this.drawingObjects = drawingObjects;
         this.blipFill.Read_FromBinary2(r);
+        var dx = 0, dy = 0;
+        if(r.GetBool())
+        {
+            dx = r.GetDouble();
+            dy = r.GetDouble();
+        }
         this.spPr.Read_FromBinary2(r);
         if(isRealNumber(x) && isRealNumber(y))
         {
-            this.setPosition(x, y);
+            this.setPosition(x + dx, y + dy);
         }
 
         if(!isRealObject(group))
