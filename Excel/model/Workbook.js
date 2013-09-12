@@ -2682,7 +2682,7 @@ Woorksheet.prototype.getColsCount=function(){
 Woorksheet.prototype.removeCols=function(start, stop){
 	var oRange = this.getRange(new CellAddress(0, start, 0), new CellAddress(gc_nMaxRow0, stop, 0));
 	oRange.deleteCellsShiftLeft();
-}
+};
 Woorksheet.prototype._removeCols=function(start, stop){
 	lockDraw(this.workbook);
 	History.Create_NewPoint();
@@ -7310,7 +7310,7 @@ Range.prototype.addCellsShiftBottom=function(){
 };
 Range.prototype.addCellsShiftRight=function(){
 	return this._shiftLeftRight(false);
-}
+};
 Range.prototype.deleteCellsShiftLeft=function(){
 	return this._shiftLeftRight(true);
 };

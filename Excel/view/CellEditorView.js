@@ -139,7 +139,7 @@
 			defaults: {
 				background  : "#fff",
 				font        : new asc_FP("Calibri", 11),
-				padding     : {left: 2, right: 4},
+				padding     : 2,
 				selectColor : "rgba(190,190,255,.5)",
 				textAlign   : kLeftAlign,
 				textColor   : "#000",
@@ -1069,7 +1069,7 @@
 				var h = t.canvas.innerHeight();
 				var y = - t.textRender.calcLineOffset(t.topLineIndex);
 				var cur = t.textRender.calcCharOffset(t.cursorPos);
-				var curLeft = asc_round((cur !== null && cur.left !== null ? cur.left : t._getContentPosition()) * t.kx);
+				var curLeft = asc_round((kRightAlign !== t.textFlags.textAlign && cur !== null && cur.left !== null ? cur.left : t._getContentPosition()) * t.kx);
 				var curTop  = asc_round(((cur !== null ? cur.top : 0) + y) * t.ky);
 				var curHeight = asc_round((cur !== null ? cur.height : t.options.font.FontSize) * 1.275 * t.ky);
 				var i, dy;
@@ -1203,12 +1203,12 @@
 
 			_getContentLeft: function () {
 				var t = this, opt = t.options;
-				return asc_calcnpt(0, t.drawingCtx.getPPIX(), opt.padding.left/*px*/);
+				return asc_calcnpt(0, t.drawingCtx.getPPIX(), opt.padding/*px*/);
 			},
 
 			_getContentWidth: function () {
 				var t = this, opt = t.options;
-				return t.right - t.left - asc_calcnpt(0, t.drawingCtx.getPPIX(), opt.padding.left + opt.padding.right - 1/*px*/);
+				return t.right - t.left - asc_calcnpt(0, t.drawingCtx.getPPIX(), opt.padding + opt.padding + 1/*px*/);
 			},
 
 			_getContentHeight: function () {
@@ -1221,11 +1221,11 @@
 
 				switch (t.textFlags.textAlign) {
 					case kRightAlign:
-						return asc_calcnpt(t.right - t.left, ppix, -opt.padding.right - 1);
+						return asc_calcnpt(t.right - t.left, ppix, -opt.padding - 1);
 					case kCenterAlign:
 						return asc_calcnpt(0.5 * (t.right - t.left), ppix, 0);
 				}
-				return asc_calcnpt(0, ppix, opt.padding.left);
+				return asc_calcnpt(0, ppix, opt.padding);
 			},
 
 			_wrapFragments: function (frag) {
