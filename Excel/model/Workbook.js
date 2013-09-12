@@ -3893,7 +3893,7 @@ function Cell(worksheet){
 	this.formulaParsed = null;
 	this.merged = null;
 	this.hyperlinks = new Array();
-};
+}
 Cell.prototype.getStyle=function(){
 	if(this.bNeedCompileXfs)
 	{
@@ -3901,7 +3901,7 @@ Cell.prototype.getStyle=function(){
 		this.compileXfs();
 	}
 	return this.compiledXfs;
-}
+};
 Cell.prototype.compileXfs=function(){
 	this.compiledXfs = null;
 	if(null != this.xfs || null != this.tableXfs || null != this.conditionalFormattingXfs)
@@ -3923,7 +3923,7 @@ Cell.prototype.compileXfs=function(){
 				this.compiledXfs = this.xfs;
 		}
 	}
-}
+};
 Cell.prototype.clone=function(){
 	var oNewCell = new Cell(this.ws);
 	oNewCell.oId = new CellAddress(this.oId.getRow(), this.oId.getCol());
@@ -6517,32 +6517,32 @@ Range.prototype.getShrinkToFit=function(){
 	}
     return g_oDefaultAlign.shrink;
 };
+Range.prototype.getWrapByAlign = function (align) {
+	// Для justify wrap всегда true
+	return "justify" === align.hor ? true : align.wrap;
+};
 Range.prototype.getWrap=function(){
 	var nRow = this.bbox.r1;
 	var nCol = this.bbox.c1;
 	var cell = this.worksheet._getCellNoEmpty(nRow, nCol);
-	if(null != cell)
-    {
+	if(null != cell) {
 		var xfs = cell.getStyle();
-        if(null != xfs)
-		{
+        if(null != xfs) {
 			if(null != xfs.align)
-				return xfs.align.wrap;
+				return this.getWrapByAlign(xfs.align);
 			else
-				return g_oDefaultAlignAbs.wrap;
+				return this.getWrapByAlign(g_oDefaultAlignAbs);
 		}
-    }
-	else
-	{
+    } else {
 		//стили столбов и колонок
 		var row = this.worksheet._getRowNoEmpty(nRow);
 		if(null != row && null != row.xfs && null != row.xfs.align)
-			return row.xfs.align.wrap;
+			return this.getWrapByAlign(row.xfs.align);
 		var col = this.worksheet._getColNoEmptyWithAll(nCol);
 		if(null != col && null != col.xfs && null != col.xfs.align)
-			return col.xfs.align.wrap;
+			return this.getWrapByAlign(col.xfs.align);
 	}
-    return g_oDefaultAlign.wrap;
+    return this.getWrapByAlign(g_oDefaultAlign);
 };
 Range.prototype.getAngle=function(){
 	//угол от -90 до 90 против часовой стрелки от оси OX
