@@ -2057,6 +2057,33 @@ CChartAsGroup.prototype =
         this.init();
     },
 
+
+    isPlaceholder: function()
+    {
+        return isRealObject(this.nvSpPr) && isRealObject(this.nvSpPr.nvPr) && isRealObject(this.nvSpPr.nvPr.ph);
+    },
+
+    getPlaceholderType: function()
+    {
+        return this.isPlaceholder() ? this.nvSpPr.nvPr.ph.type : null;
+    },
+
+    getPlaceholderIndex: function()
+    {
+        return this.isPlaceholder() ? this.nvSpPr.nvPr.ph.idx : null;
+    },
+
+    getPhType: function()
+    {
+        return this.isPlaceholder() ? this.nvSpPr.nvPr.ph.type : null;
+    },
+
+    getPhIndex: function()
+    {
+        return this.isPlaceholder() ? this.nvSpPr.nvPr.ph.idx : null;
+    },
+
+
     setChartBinary: function(binary)
     {
         // Приводим бинарник к внутренней структуре

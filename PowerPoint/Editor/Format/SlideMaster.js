@@ -332,15 +332,13 @@ function MasterSlide(presentation, theme)
 
     this.recalculate = function()
     {
-        if(!this.calculated)
-            return;
         var _shapes = this.cSld.spTree;
         var _shape_index;
         var _shape_count = _shapes.length;
         for(_shape_index = 0; _shape_index < _shape_count; ++_shape_index)
         {
             if(!_shapes[_shape_index].isPlaceholder())
-                _shapes[_shape_index].Recalculate();
+                _shapes[_shape_index].recalculate();
         }
     };
 

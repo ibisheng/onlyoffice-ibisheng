@@ -49,66 +49,6 @@ function Slide(presentation, slideLayout, slideNum)
 
     this.changeLayout = function(layout)
     {
-        /* if(!(layout instanceof SlideLayout))
-         {
-         return;
-         }
-         var historyData;
-         for(var i=0; i<this.cSld.spTree.length; ++i)
-         {
-         if(this.cSld.spTree[i].isPlaceholder())
-         {
-         historyData = {};
-         historyData.shape  = this.cSld.spTree[i];
-         historyData.old_SpPrXfrm = clone(this.cSld.spTree[i].spPr.xfrm);
-         historyData.old_pH = this.cSld.spTree[i].pH;
-         historyData.old_pV = this.cSld.spTree[i].pV;
-         historyData.old_ext = clone(this.cSld.spTree[i].ext);
-         historyData.old_rot = this.cSld.spTree[i].rot;
-         historyData.undo_function = function(data)
-         {
-         data.shape.spPr.xfrm.extX = data.old_SpPrXfrm.extX;
-         data.shape.spPr.xfrm.extY = data.old_SpPrXfrm.extY;
-         data.shape.spPr.xfrm.offX = data.old_SpPrXfrm.offX;
-         data.shape.spPr.xfrm.offY = data.old_SpPrXfrm.offY;
-
-         data.shape.spPr.xfrm.chExtX = data.old_SpPrXfrm.chExtX;
-         data.shape.spPr.xfrm.chExtY = data.old_SpPrXfrm.chExtY;
-         data.shape.spPr.xfrm.chOffX = data.old_SpPrXfrm.chOffX;
-         data.shape.spPr.xfrm.chOffY = data.old_SpPrXfrm.chOffY;
-
-         data.shape.pH = data.old_pH;
-         data.shape.pV = data.old_pV;
-
-         data.shape.ext = clone(data.old_ext);
-         data.shape.rot = data.old_rot;
-         data.shape.Recalculate();
-         };
-         historyData.redo_function = function(data)
-         {
-
-         };
-         History.Add(this, historyData);
-         }
-
-         }
-
-         historyData = { old_layout : this.Layout, new_layout : layout};
-         historyData.undo_function = function(data)
-         {
-         this.Layout = data.old_layout;
-         this.calculate2();
-
-         };
-         historyData.redo_function = function(data)
-         {
-         this.Layout = data.new_layout;
-         };
-         History.Add(this, historyData);
-
-         this.prepareToChangeTheme(layout);
-         this.Layout = layout;
-         this.calculateAfterChangeLayout();               */
 
         var _slide_shapes = this.cSld.spTree;
         var _slide_shape;

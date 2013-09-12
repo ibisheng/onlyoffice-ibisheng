@@ -1058,16 +1058,10 @@ CPresentation.prototype =
         }
     },
 
-    Edit_Chart : function(Chart)
+    Edit_Chart : function(binary)
     {
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-        {
-            return this.HdrFtr.Edit_Chart(Chart);
-        }
-        else if ( docpostype_DrawingObjects === this.CurPos.Type )
-        {
-            return this.DrawingObjects.editChart( Chart );
-        }
+        this.Slides[this.CurPage].graphicObjects.editChart(binary);
+        this.Recalculate();
     },
 
     Get_ChartObject: function()

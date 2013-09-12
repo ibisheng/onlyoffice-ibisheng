@@ -1252,6 +1252,25 @@ CGraphicObjects.prototype = {
 
     },
 
+    editChart: function(binary)
+    {
+        switch(this.State.id)
+        {
+            case STATES_ID_GROUP:
+            {
+                break;
+            }
+            case STATES_ID_NULL:
+            {
+                if(this.selectedObjects.length === 1 && this.selectedObjects[0].chart)
+                {
+                    this.selectedObjects[0].initFromBinary(binary);
+                    editor.WordControl.m_oLogicDocument.recalcMap[this.selectedObjects[0].Id] = this.selectedObjects[0];
+                }
+                break;
+            }
+        }
+    },
 
     addNewParagraph: function(bRecalc)
     {

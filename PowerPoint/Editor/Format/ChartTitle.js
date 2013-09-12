@@ -952,6 +952,11 @@ CChartTitle.prototype =
     recalcAllColors: function()
     {},
 
+    onParagraphChanged: function()
+    {
+        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this.chartGroup;
+    },
+
     writeToBinary: function(w)
     {
         w.WriteBool(isRealObject(this.layout));
