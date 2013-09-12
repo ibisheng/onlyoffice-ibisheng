@@ -1796,11 +1796,44 @@ CParagraphFrame.prototype.put_FromDropCapMenu = function (v) { this.FromDropCapM
 
 asc_docs_api.prototype.put_FramePr = function(Obj)
 {
+    if ( undefined != Obj.FontFamily )
+    {
+        var name     = Obj.FontFamily;
+        Obj.FontFamily = new CTextFontFamily( { Name : Obj.FontFamily, Index : -1 } );
+
+        var loader   = window.g_font_loader;
+        var nIndex   = loader.map_font_index[name];
+        var fontinfo = loader.fontInfos[nIndex];
+        var isasync  = loader.LoadFont(fontinfo, editor.asyncFontEndLoaded_DropCap, Obj);
+
+        if (false === isasync)
+        {
+            if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
+            {
+                this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+                this.WordControl.m_oLogicDocument.Set_ParagraphFramePr( Obj );
+            }
+        }
+    }
+    else
+    {
+        if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
+        {
+            this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+            this.WordControl.m_oLogicDocument.Set_ParagraphFramePr( Obj );
+        }
+    }
+}
+
+asc_docs_api.prototype.asyncFontEndLoaded_DropCap = function(Obj)
+{
+    this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
     {
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Set_ParagraphFramePr( Obj );
     }
+    // отжать заморозку меню
 }
 
 asc_docs_api.prototype.asc_addDropCap = function(bInText)

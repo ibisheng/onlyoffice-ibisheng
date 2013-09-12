@@ -138,6 +138,9 @@ var ASC_DOCS_API_USE_OPEN_SOURCE_FONTS_ONLY = false;
         this.bIsLoadDocumentFirst = false;
         this.currentInfoLoaded = null;
 
+        this.loadFontCallBack     = null;
+        this.loadFontCallBackArgs = null;
+
         // embedded_cut_fonts
         this.embedded_cut_manager = new CEmbeddedCutFontsLoader();
 
@@ -437,7 +440,7 @@ var ASC_DOCS_API_USE_OPEN_SOURCE_FONTS_ONLY = false;
             }
         }
 
-        this.LoadFont = function(fontinfo)
+        this.LoadFont = function(fontinfo, loadFontCallBack, loadFontCallBackArgs)
         {
             this.currentInfoLoaded = fontinfo;
 
@@ -445,6 +448,17 @@ var ASC_DOCS_API_USE_OPEN_SOURCE_FONTS_ONLY = false;
             this.currentInfoLoaded.NeedStyles = 15; // все стили
 
             var IsNeed = this.currentInfoLoaded.CheckFontLoadStyles(this);
+
+            if ( undefined === loadFontCallBack )
+            {
+                this.loadFontCallBack     = this.Api.asyncFontEndLoaded;
+                this.loadFontCallBackArgs = this.currentInfoLoaded;
+            }
+            else
+            {
+                this.loadFontCallBack     = loadFontCallBack;
+                this.loadFontCallBackArgs = loadFontCallBackArgs;
+            }
 
             if (IsNeed)
             {
@@ -472,7 +486,7 @@ var ASC_DOCS_API_USE_OPEN_SOURCE_FONTS_ONLY = false;
             }
             else
             {
-                oThis.Api.asyncFontEndLoaded(oThis.currentInfoLoaded);
+                oThis.loadFontCallBack.call( oThis.Api, oThis.loadFontCallBackArgs );
                 oThis.currentInfoLoaded = null;
             }
         }
