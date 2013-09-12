@@ -1484,19 +1484,19 @@ CopyProcessor.prototype =
 								elem.before = elem.gridStart - nMinGrid;
 								elem.after = nMaxGrid - elem.gridEnd;
 							}
-							this.oBinaryFileWriter.CopyTable(Item, aSelectedRows, nMinGrid, nMaxGrid);
 							this.oBinaryFileWriter.copyParams.bLockCopyElems++;
 							this.CopyTable(oDomTarget, Item, aSelectedRows);
 							this.oBinaryFileWriter.copyParams.bLockCopyElems--;
+							this.oBinaryFileWriter.CopyTable(Item, aSelectedRows, nMinGrid, nMaxGrid);
 						}
                     }
                 }
                 else
 				{
-					this.oBinaryFileWriter.CopyTable(Item, null);
 					this.oBinaryFileWriter.copyParams.bLockCopyElems++;
                     this.CopyTable(oDomTarget, Item, null);
 					this.oBinaryFileWriter.copyParams.bLockCopyElems--;
+					this.oBinaryFileWriter.CopyTable(Item, null);
 				}
             }
             else if ( type_Paragraph === Item.GetType() )
@@ -2525,7 +2525,6 @@ PasteProcessor.prototype =
 		}
 		//обрабатываем стили
 		var isAlreadyContainsStyle;
-		var addStyles = [];
 		var api = this.api;
 		var oStyleTypes = {par: 1, table: 2, lvl: 3};
 		var addNewStyles = false;
@@ -2540,9 +2539,9 @@ PasteProcessor.prototype =
 				var isEqualName = null;
 				if(null != stylePaste && null != stylePaste.style)
 				{
-					for(var j in oDocumentStyles)
+					for(var j in oDocumentStyles.Style)
 					{
-						var styleDoc = oDocumentStyles[j];
+						var styleDoc = oDocumentStyles.Style[j];
 						isAlreadyContainsStyle = styleDoc.isEqual(stylePaste.style);
 						if(styleDoc.Name == stylePaste.style.Name)
 							isEqualName = j;
@@ -2551,7 +2550,7 @@ PasteProcessor.prototype =
 							if(oStyleTypes.par == nStyleType)
 								elem.pPr.PStyle = j;
 							else if(oStyleTypes.table == nStyleType)
-								elem.pPr.TableStyle = j;
+								elem.pPr.Set_TableStyle2(j);
 							else
 								elem.pPr.PStyle = j;
 							break;
@@ -2562,58 +2561,36 @@ PasteProcessor.prototype =
 						if(nStyleType == oStyleTypes.par || nStyleType == oStyleTypes.lvl)
 							elem.pPr.PStyle = isEqualName;
 						else if (nStyleType == oStyleTypes.table)
-							elem.pPr.TableStyle = isEqualName;
-						addStyles[addStyles.length] = isEqualName;
+							elem.pPr.Set_TableStyle2(isEqualName);
 					}
 					else if(!isAlreadyContainsStyle && isEqualName == null)//нужно добавить новый стиль
 					{
-						oDocumentStyles[stylePaste.style.Name] = stylePaste.style;
+						//todo править и BaseOn
+						var nStyleId = oDocumentStyles.Add(stylePaste.style);
 						if(nStyleType == oStyleTypes.par || nStyleType == oStyleTypes.lvl)
-							elem.pPr.PStyle = stylePaste.style.Name;
+							elem.pPr.PStyle = nStyleId;
 						else if (nStyleType == oStyleTypes.table)
-							elem.pPr.TableStyle = stylePaste.style.Name;
-						addStyles[addStyles.length] = stylePaste.style.Name;
+							elem.pPr.Set_TableStyle2(nStyleId);
 						addNewStyles = true;
 					}
 				}
 			}
-			//добавляем картинки стилей в меню
-			if(addNewStyles)
-				api.GenerateStyles();
 		}
 		
-		fParseStyle(oBinaryFileReader.oReadResult.paraStyles, this.oDocument.Styles.Style, oBinaryFileReader.oReadResult, oStyleTypes.par);
-		fParseStyle(oBinaryFileReader.oReadResult.tableStyles, this.oDocument.Styles.Style, oBinaryFileReader.oReadResult, oStyleTypes.table);
-		fParseStyle(oBinaryFileReader.oReadResult.lvlStyles, this.oDocument.Styles.Style, oBinaryFileReader.oReadResult, oStyleTypes.lvl);
+		fParseStyle(oBinaryFileReader.oReadResult.paraStyles, this.oDocument.Styles, oBinaryFileReader.oReadResult, oStyleTypes.par);
+		fParseStyle(oBinaryFileReader.oReadResult.tableStyles, this.oDocument.Styles, oBinaryFileReader.oReadResult, oStyleTypes.table);
+		fParseStyle(oBinaryFileReader.oReadResult.lvlStyles, this.oDocument.Styles, oBinaryFileReader.oReadResult, oStyleTypes.lvl);
 		var aContent = oBinaryFileReader.oReadResult.DocumentContent;
-		//добавляем во вставляемые параграфы стили(если уже данные стили присутcтвуют)
-		var styleName;
-		if(addStyles && addStyles.length != 0)
-		{
-			for(var i in aContent)
-			{
-				if(aContent[i].GetType() != oStyleTypes.table)
-				{
-					styleName = aContent[i].Style_Get();
-					for(var k = 0; k < addStyles.length; k++)
-					{
-						if(styleName == addStyles[k])
-						{
-							aContent[i].Style_Add(styleName);
-							break;
-						}
-					}
-				}
-				
-			}
-		}
-		
+		for(var i = 0, length = oBinaryFileReader.oReadResult.aPostOpenStyleNumCallbacks.length; i < length; ++i)
+			oBinaryFileReader.oReadResult.aPostOpenStyleNumCallbacks[i].call();
 		if(oReadResult.bLastRun)
 			this.bInBlock = false;
 		else
 			this.bInBlock = true;
 		//создаем список используемых шрифтов
 		var AllFonts = new Object();
+		this.oDocument.Numbering.Document_Get_AllFontNames(AllFonts);
+		this.oDocument.Styles.Document_Get_AllFontNames(AllFonts);
         for ( var Index = 0, Count = aContent.length; Index < Count; Index++ )
             aContent[Index].Document_Get_AllFontNames( AllFonts );
 		var aPrepeareFonts = [];
@@ -2623,7 +2600,7 @@ PasteProcessor.prototype =
 		var aPrepeareImages = [];
 		for(var i in window.global_pptx_content_loader.ImageMapChecker)
 			aPrepeareImages.push(i);
-		return {content: aContent, fonts: aPrepeareFonts, images: aPrepeareImages};
+		return {content: aContent, fonts: aPrepeareFonts, images: aPrepeareImages, bAddNewStyles: addNewStyles};
 	},
 	Start : function(node)
     {
@@ -2671,6 +2648,8 @@ PasteProcessor.prototype =
 						oThis.InsertInDocument();
 						node.blur();
 						node.style.display  = ELEMENT_DISPAY_STYLE;
+						if(aContent.bAddNewStyles)
+							oThis.api.GenerateStyles();
 					}
 				});
 				return;

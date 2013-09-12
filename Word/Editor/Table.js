@@ -19705,7 +19705,7 @@ CTableCell.prototype =
 
     Set_Pr : function(CellPr)
     {
-        History.Add( this, { Type : historyitem_TableCell_Pr, Old : this.Pr, New : RowPr } );
+        History.Add( this, { Type : historyitem_TableCell_Pr, Old : this.Pr, New : CellPr } );
         this.Pr = CellPr;
         this.Recalc_CompiledPr();
     },
