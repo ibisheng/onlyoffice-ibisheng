@@ -732,8 +732,8 @@
 			_cleanElement: function () {
 				if(!window.USER_AGENT_SAFARI_MACOS)
 				{
-					this.element.style.left = doc.body.offsetWidth + "px";
-					this.element.style.top = doc.body.offsetHeight + "px";
+					this.element.style.left = "0px";
+					this.element.style.top = "-100px";
 				}
 				
 				this.element.style.display = "block";
