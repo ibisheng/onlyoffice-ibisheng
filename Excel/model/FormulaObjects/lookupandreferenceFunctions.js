@@ -363,7 +363,11 @@ cFormulaFunction.LookupAndReference = {
 
             var c = new CellAddress( bb.r1 + numberRow, resC, 0 );
 
-            var v = arg1.getWS()._getCellNoEmpty( c.getRow0(), c.getCol0() ).getValueWithoutFormat();
+            var v = arg1.getWS()._getCellNoEmpty( c.getRow0(), c.getCol0() )
+            if( v )
+                v = v.getValueWithoutFormat();
+            else
+                v = "";
 
             return this.value = checkTypeCell( v );
         }
@@ -818,7 +822,11 @@ cFormulaFunction.LookupAndReference = {
 
             var c = new CellAddress( resR, bb.c1 + numberCol, 0 );
 
-            var v = arg1.getWS()._getCellNoEmpty( c.getRow0(), c.getCol0() ).getValueWithoutFormat();
+            var v = arg1.getWS()._getCellNoEmpty( c.getRow0(), c.getCol0() )
+            if( v )
+                v = v.getValueWithoutFormat();
+            else
+                v = "";
 
             return this.value = checkTypeCell( v );
         }
