@@ -2271,12 +2271,11 @@ Row.prototype =
 	{
 		if(null != otherRow.xfs)
 			this.xfs = otherRow.xfs.clone();
-		if(null != otherRow.h)
-			this.h = otherRow.h;
-		if(null != otherRow.CustomHeight)
-			this.CustomHeight = otherRow.CustomHeight;
-		if(null != otherRow.hd)
-			this.hd = otherRow.hd;
+		else
+			this.xfs = null;
+		this.h = otherRow.h;
+		this.CustomHeight = otherRow.CustomHeight;
+		this.hd = otherRow.hd;
 	},
 	getMerged : function()
 	{

@@ -2571,7 +2571,7 @@ Woorksheet.prototype.getRowsCount=function(){
 Woorksheet.prototype.removeRows=function(start, stop){
 	var oRange = this.getRange(new CellAddress(start, 0, 0), new CellAddress(stop, gc_nMaxCol0, 0));
 	oRange.deleteCellsShiftUp();
-}
+};
 Woorksheet.prototype._removeRows=function(start, stop){
 	lockDraw(this.workbook);
 	History.Create_NewPoint();
@@ -2626,7 +2626,7 @@ Woorksheet.prototype._removeRows=function(start, stop){
 Woorksheet.prototype.insertRowsBefore=function(index, count){
 	var oRange = this.getRange(new CellAddress(index, 0, 0), new CellAddress(index + count - 1, gc_nMaxCol0, 0));
 	oRange.addCellsShiftBottom();
-}
+};
 Woorksheet.prototype._insertRowsBefore=function(index, count){
 	lockDraw(this.workbook);
 	var oActualRange = {r1: index, c1: 0, r2: index + count - 1, c2: gc_nMaxCol0};
