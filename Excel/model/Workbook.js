@@ -3201,9 +3201,11 @@ Woorksheet.prototype._removeCell=function(nRow, nCol, cell){
 				arrRecalc[this.getId()] = {};
 			}
 			arrRecalc[this.getId()][cell.getName()] = cell.getName();
-			this.workbook.needRecalc[ getVertexId(this.getId(),cell.getName()) ] = [ this.getId(),cell.getName() ];
-			if( this.workbook.needRecalc.length < 0) this.workbook.needRecalc.length = 0;
-			this.workbook.needRecalc.length++;
+            if( ws.workbook.dependencyFormulas.getNode(this.ws.getId(),this.getName()) && !this.workbook.needRecalc[ getVertexId(this.getId(),cell.getName()) ] ){
+                this.workbook.needRecalc[ getVertexId(this.getId(),cell.getName()) ] = [ this.getId(),cell.getName() ];
+                if( this.workbook.needRecalc.length < 0) this.workbook.needRecalc.length = 0;
+                this.workbook.needRecalc.length++;
+            }
 			
 			delete row.c[nCol];
 			if(row.isEmpty())
@@ -3243,7 +3245,7 @@ Woorksheet.prototype._getCellNoEmpty=function(row, col){
 	var oCurCell;
 	var oCurRow = this.aGCells[row];
 	if(oCurRow)
-		return oCurRow.c[col];
+		return oCurRow.c[col] ? oCurRow.c[col] : null;
 	return null;
 };
 Woorksheet.prototype._getRowNoEmpty=function(row){
@@ -3790,7 +3792,7 @@ Woorksheet.prototype._ReBuildFormulas=function(cellRange){
 }
 Woorksheet.prototype.renameDependencyNodes = function(offset,oBBox,rec, noDelete){
 	var objForRebuldFormula = this.workbook.dependencyFormulas.checkOffset(oBBox, offset, this.Id, noDelete);
-	var c = {}, ret = {};
+	var c = {};
 	for ( var id in objForRebuldFormula.move ){
 		var n = objForRebuldFormula.move[id].node;
 		var _sn = n.getSlaveEdges2();
@@ -3798,15 +3800,6 @@ Woorksheet.prototype.renameDependencyNodes = function(offset,oBBox,rec, noDelete
 			var cell = _sn[_id].returnCell(), cellName = cell.getName();
 			if( undefined == cell ) { continue; }
 			if( cell.formulaParsed ){
-				/*var oUndoRedoData_CellData = new UndoRedoData_CellData(cell.getValueData(), null);
-				if(null != cell.xfs)
-					oUndoRedoData_CellData.style = cell.xfs.clone();
-				ret[cellName] = {};
-				ret[cellName].data = oUndoRedoData_CellData;
-				ret[cellName].id = this.getId();
-				ret[cellName].nRow = cell.getCellAddress().getRow0();
-				ret[cellName].nCol = cell.getCellAddress().getCol0();*/
-				
 				cell.formulaParsed.shiftCells( objForRebuldFormula.move[id].offset, oBBox, n, this.Id, objForRebuldFormula.move[id].toDelete );
 				cell.setFormula(cell.formulaParsed.assemble());
 				c[cellName] = cell;
@@ -3831,16 +3824,6 @@ Woorksheet.prototype.renameDependencyNodes = function(offset,oBBox,rec, noDelete
 		for( var _id in _sn ){
 			var cell = _sn[_id].returnCell(), cellName = cell.getName();
 			if( cell && cell.formulaParsed ){
-				/*if( !(cell.getName() in ret) ){
-					var oUndoRedoData_CellData = new UndoRedoData_CellData(cell.getValueData(), null);
-					if(null != cell.xfs)
-						oUndoRedoData_CellData.style = cell.xfs.clone();
-					ret[cellName] = {};
-					ret[cellName].data = oUndoRedoData_CellData;
-					ret[cellName].id = this.getId();
-					ret[cellName].nRow = cell.getCellAddress().getRow0();
-					ret[cellName].nCol = cell.getCellAddress().getCol0();
-				}*/
 				cell.formulaParsed.stretchArea( objForRebuldFormula.stretch[id].offset, oBBox, n, this.Id );
 				cell.setFormula(cell.formulaParsed.assemble());
 				c[cellName] = cell;
@@ -3883,7 +3866,6 @@ Woorksheet.prototype.renameDependencyNodes = function(offset,oBBox,rec, noDelete
 	if ( false !== rec )
 		recalc(this.workbook);
 	
-//	return ret;
 }
 Woorksheet.prototype.helperRebuildFormulas = function(cell,lastName){
 	if( cell.sFormula ){
@@ -4085,12 +4067,14 @@ Cell.prototype.setValue=function(val,callback){
 		sortDependency(this.ws, ar);
 	}
 	else if( this.ws.workbook.isNeedCacheClean == false ){
-		if( !arrRecalc[this.ws.getId()] ){
-			arrRecalc[this.ws.getId()] = {};
-		}
-		arrRecalc[this.ws.getId()][this.oId.getID()] = this.oId.getID();
-		wb.needRecalc[ getVertexId(this.ws.getId(),this.oId.getID()) ] = [ this.ws.getId(),this.oId.getID() ];
-		wb.needRecalc.length++;
+        if( ws.workbook.dependencyFormulas.getNode(this.ws.getId(),this.getName()) ){
+            if( !arrRecalc[this.ws.getId()] ){
+                arrRecalc[this.ws.getId()] = {};
+            }
+            arrRecalc[this.ws.getId()][this.oId.getID()] = this.oId.getID();
+            wb.needRecalc[ getVertexId(this.ws.getId(),this.oId.getID()) ] = [ this.ws.getId(),this.oId.getID() ];
+            wb.needRecalc.length++;
+        }
 	}
 	var DataNew = null;
 	if(History.Is_On())
