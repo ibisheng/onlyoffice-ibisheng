@@ -993,9 +993,13 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 
 			asc_isDocumentModified: function () {
-				if (History && History.Is_Modified) {
+				if (!this.canSave) {
+					// Пока идет сохранение, мы не закрываем документ
+					return true;
+				} else if (History && History.Is_Modified) {
 					return History.Is_Modified();
 				}
+				return false;
 			},
 
 

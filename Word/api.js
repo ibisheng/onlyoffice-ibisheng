@@ -712,6 +712,10 @@ asc_docs_api.prototype.SetUnchangedDocument = function()
 
 asc_docs_api.prototype.isDocumentModified = function()
 {
+	if (!this.canSave) {
+		// Пока идет сохранение, мы не закрываем документ
+		return true;
+	}
     return this.isDocumentModify;
 }
 
