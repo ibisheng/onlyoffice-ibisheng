@@ -122,7 +122,7 @@ CTableStylePr.prototype =
         this.TableCellPr.Write_ToBinary( Writer );
     },
 
-    Load_FromBinary : function(Reader)
+    Read_FromBinary : function(Reader)
     {
         this.TextPr.Read_FromBinary( Reader );
         this.ParaPr.Read_FromBinary( Reader );
