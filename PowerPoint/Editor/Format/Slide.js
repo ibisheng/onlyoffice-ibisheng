@@ -25,6 +25,10 @@ function Slide(presentation, slideLayout, slideNum)
 
     this.backgroundFill = null;
 
+
+    this.timing = new CAscSlideTiming();
+    this.timing.setDefaultParams();
+
     this.recalcInfo =
     {
         recalculateBackground: true,
@@ -35,6 +39,7 @@ function Slide(presentation, slideLayout, slideNum)
 
     this.searchingArray = new Array();  // массив объектов для селекта
     this.selectionArray = new Array();  // массив объектов для поиска
+
 
     this.changeProportions = function(kW, kH)
     {
@@ -901,6 +906,7 @@ Slide.prototype =
 
     changeBackground: function(bg)
     {
+        History.Add(this, {Type: historyitem_ChangeBg, oldBg: this.cSld.Bg ? this.cSld.Bg.createFullCopy() : null, newBg: bg});
         this.cSld.Bg = bg.createFullCopy();
         this.recalculateBackground();
     },
@@ -1382,6 +1388,14 @@ Slide.prototype =
                 this.layoutLock    = null;
                 break;
             }
+            case historyitem_ChangeBg:
+            {
+                this.cSld.Bg = data.oldBg;
+                this.recalcInfo.recalculateBackground = true;
+                editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+
+                break;
+            }
         }
     },
 
@@ -1406,6 +1420,14 @@ Slide.prototype =
                 this.timingLock     = g_oTableId.Get_ById(data.timingLock);
                 this.transitionLock = g_oTableId.Get_ById(data.transitionLock);
                 this.layoutLock     = g_oTableId.Get_ById(data.layoutLock);
+                break;
+            }
+            case historyitem_ChangeBg:
+            {
+                this.cSld.Bg = data.newBg;
+                this.recalcInfo.recalculateBackground = true;
+                editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+
                 break;
             }
         }

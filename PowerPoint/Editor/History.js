@@ -210,6 +210,7 @@ var historyitem_SetAdjustmentValue = 1;
 var historyitem_RemoveFromSpTree = 0;
 var historyitem_AddToSlideSpTree = 1;
 var historyitem_AddSlideLocks = 2;
+var historyitem_ChangeBg = 3;
 
 
 

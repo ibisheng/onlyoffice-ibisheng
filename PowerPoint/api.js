@@ -1928,7 +1928,11 @@ asc_docs_api.prototype.SetSlideProps = function(prop)
     {
         if (_back_fill.get_type() == c_oAscFill.FILL_TYPE_NOFILL)
         {
-            this.WordControl.m_oLogicDocument.changeBackground(null, arr_ind);
+            var bg = new CBg();
+            bg.bgPr = new CBgPr();
+            bg.bgPr.Fill = CorrectUniFill(_back_fill, null);
+
+            this.WordControl.m_oLogicDocument.changeBackground(bg, arr_ind);
             return;
         }
 

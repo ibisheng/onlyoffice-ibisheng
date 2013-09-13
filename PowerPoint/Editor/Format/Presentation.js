@@ -354,6 +354,9 @@ function CPresentation(DrawingDocument)
     this.forwardChangeThemeTimeOutId = null;
     this.backChangeThemeTimeOutId = null;
     this.startChangeThemeTimeOutId = null;
+
+    this.DefaultSlideTiming = new CAscSlideTiming();
+    this.DefaultSlideTiming.setDefaultParams();
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
 
@@ -5142,12 +5145,17 @@ CPresentation.prototype =
 
     changeBackground: function(bg, arr_ind)
     {
-        for(var i = 0; i <arr_ind.length; ++i)
+        if(this.Document_Is_SelectionLocked(changestype_SlideBg) === false)
         {
-            this.Slides[arr_ind[i]].changeBackground(bg);
-            this.DrawingDocument.OnRecalculatePage(arr_ind[i], this.Slides[arr_ind[i]]);
+            History.Create_NewPoint();
+            for(var i = 0; i <arr_ind.length; ++i)
+            {
+                this.Slides[arr_ind[i]].changeBackground(bg);
+                this.DrawingDocument.OnRecalculatePage(arr_ind[i], this.Slides[arr_ind[i]]);
+            }
+            this.DrawingDocument.OnEndRecalculate(true, false);
+            this.Document_UpdateInterfaceState();
         }
-        this.DrawingDocument.OnEndRecalculate(true, false);
     },
 
     // Обновляем линейки
@@ -6287,6 +6295,21 @@ CPresentation.prototype =
                     "guid": selected_objects[i].Get_Id()
                 };
                 selected_objects[i].Lock.Check(check_obj);
+            }
+        }
+
+        if(CheckType === changestype_SlideBg)
+        {
+            var selected_slides = editor.WordControl.Thumbnails.GetSelectedArray();
+            for(var i = 0; i < selected_slides.length; ++i)
+            {
+                var check_obj =
+                {
+                    "type": c_oAscLockTypeElemPresentation.Slide,
+                    "val": this.Slides[selected_slides[i]].backgroundLock.Get_Id(),
+                    "guid": this.Slides[selected_slides[i]].backgroundLock.Get_Id()
+                };
+                this.Slides[selected_slides[i]].backgroundLock.Lock.Check(check_obj);
             }
         }
 
