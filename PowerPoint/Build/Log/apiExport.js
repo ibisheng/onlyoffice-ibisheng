@@ -455,6 +455,8 @@ prop:createDuplicate
 prop:makeDuplicate
 prop:setUndefinedOptions
 prop:setDefaultParams
+prop:Write_ToBinary2
+prop:Read_FromBinary2
 ---
 var:CAscTexture
 prop:get_id
@@ -1445,6 +1447,8 @@ CAscSlideTiming.prototype['createDuplicate'] = CAscSlideTiming.prototype.createD
 CAscSlideTiming.prototype['makeDuplicate'] = CAscSlideTiming.prototype.makeDuplicate;
 CAscSlideTiming.prototype['setUndefinedOptions'] = CAscSlideTiming.prototype.setUndefinedOptions;
 CAscSlideTiming.prototype['setDefaultParams'] = CAscSlideTiming.prototype.setDefaultParams;
+CAscSlideTiming.prototype['Write_ToBinary2'] = CAscSlideTiming.prototype.Write_ToBinary2;
+CAscSlideTiming.prototype['Read_FromBinary2'] = CAscSlideTiming.prototype.Read_FromBinary2;
 window['CAscTexture'] = CAscTexture;
 CAscTexture.prototype['get_id'] = CAscTexture.prototype.get_id;
 CAscTexture.prototype['get_image'] = CAscTexture.prototype.get_image;
