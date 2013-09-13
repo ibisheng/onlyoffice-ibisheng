@@ -1859,7 +1859,7 @@ y2:sq
 formatCache:tla
 y3:tq
 UpdateVerRulerBack:qhb
-ws:yc
+ws:Ac
 mozImageSmoothingEnabled:pna
 WidthG:xPa
 nHeight:Dw
@@ -4930,7 +4930,7 @@ bl2:cX
 _initConditionalFormatting:JTa
 aCommentsCoords:n9
 Geometry:Uw
-Draw:zc
+Draw:yc
 NewLine:Bfa
 asc_getValue_Y:N_a
 asc_getValue_X:M_a
@@ -5105,7 +5105,7 @@ leftRowBand1:aEa
 _onApplyChanges:xUa
 severalChartStyles:uz
 Italic:ld
-Effects:Ac
+Effects:zc
 decreaseFontSizeCallBack:d5a
 storeSize:Ida
 GetULong:Ra
