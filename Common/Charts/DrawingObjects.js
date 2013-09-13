@@ -3132,6 +3132,30 @@ function DrawingObjects() {
 		var bRedraw = false;
 		var selection = worksheet.activeRange.normalize();
 		
+		function isRangeInObject(range) {
+			var result = false;
+			if ( range ) {
+				
+				var x1 = worksheet.getCellLeft(range.c1, 3);
+				var y1 = worksheet.getCellTop(range.r1, 3);
+				
+				var x2 = worksheet.getCellLeft(range.c2 + 1, 3);
+				var y2 = worksheet.getCellTop(range.r1, 3);
+				
+				var x3 = worksheet.getCellLeft(range.c2 + 1, 3);
+				var y3 = worksheet.getCellTop(range.r2 + 1, 3);
+				
+				var x4 = worksheet.getCellLeft(range.c1, 3);
+				var y4 = worksheet.getCellTop(range.r2 + 1, 3);
+				
+				result = (_this.controller.isPointInDrawingObjects(x1, y1) != null) || 
+						 (_this.controller.isPointInDrawingObjects(x2, y2) != null) || 
+						 (_this.controller.isPointInDrawingObjects(x3, y3) != null) || 
+						 (_this.controller.isPointInDrawingObjects(x4, y4) != null);
+			}
+			return result;
+		}
+		
 		if ( selection ) {
 			for ( var i = 0; i < aObjects.length; i++ ) {
 				var drawingObject = aObjects[i];
@@ -3151,6 +3175,20 @@ function DrawingObjects() {
 				else {
 					bRedraw = true;
 					break;
+				}
+			}
+			// Проверяем по четырём точкам (x1, y1) (x2, y2) (x3, y3) (x4, y4)
+ 			if ( !bRedraw ) {			
+				if (isRangeInObject(selection))
+					bRedraw = true;
+				else {
+					// Проверяем диапазоны диаграмм
+					for (var j = 0; j < worksheet.arrActiveChartsRanges.length; j++) {
+						if (isRangeInObject(selection)) {
+							bRedraw = true;
+							break;
+						}
+					}
 				}
 			}
 		}
