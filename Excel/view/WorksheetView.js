@@ -2209,15 +2209,20 @@
 						.fillRect(x1, y1, x2 - x1, y2 - y1)
 						.setStrokeStyle(this.settings.cells.defaultState.border)
 						.setLineWidth(1);
-						
-				if ( true === this.model.sheetViews[0].asc_getShowGridLines() ) {
+
+				var w, h;
+				if (true === this.model.sheetViews[0].asc_getShowGridLines()) {
 					for (var i = range.c1, x = x1; i <= range.c2 && x <= x2; ++i) {
-						x += this.cols[i].width;
-						ctx.beginPath().moveTo(x, y1, -0.5, 0).lineTo(x, y2, -0.5, 0).stroke();
+						w = this.cols[i].width;
+						x += w;
+						if (w >= this.width_1px)
+							ctx.beginPath().moveTo(x, y1, -0.5, 0).lineTo(x, y2, -0.5, 0).stroke();
 					}
 					for (var j = range.r1, y = y1; j <= range.r2 && y <= y2; ++j) {
-						y += this.rows[j].height;
-						ctx.beginPath().moveTo(x1, y, 0, -0.5).lineTo(x2, y, 0, -0.5).stroke();
+						h = this.rows[j].height;
+						y += h;
+						if (h >= this.height_1px)
+							ctx.beginPath().moveTo(x1, y, 0, -0.5).lineTo(x2, y, 0, -0.5).stroke();
 					}
 				}
 			},
@@ -2587,6 +2592,7 @@
 				}
 
 				for (var row = range.r1; row <= range.r2 && row < this.nRowsCount; ++row) {
+					if (this.rows[row].height < this.height_1px) {continue;}
 					var isFirstRow = row === range.r1,
 					isLastRow  = row === range.r2,
 					y1 = this.rows[row].top - offsetY,
@@ -2594,6 +2600,7 @@
 					mc = undefined;
 
 					for (var isMerged = false, col = range.c1; col <= range.c2 && col < this.nColsCount; ++col, isMerged = false) {
+						if (this.cols[col].width < this.width_1px) {continue;}
 						var isFirstCol = col === range.c1;
 
 						if (!mergedCellsStage) {
@@ -3540,7 +3547,9 @@
 					range = asc_Range(0, 0, this.cols.length - 1, this.rows.length - 1);
 				}
 				for (var row = range.r1; row <= range.r2; ++row) {
+					if (this.height_1px > this.rows[row].height) {continue;}
 					for (var col = range.c1; col <= range.c2; ++col) {
+						if (this.width_1px > this.cols[col].width) {continue;}
 						col = this._addCellTextToCache(col, row);
 					}
 				}
@@ -9259,7 +9268,9 @@
 				}
 
 				for (r = range.r1; r <= range.r2; ++r) {
+					if (t.height_1px > t.rows[r].height) {continue;}
 					for (c = range.c1; c <= range.c2; ++c) {
+						if (t.width_1px > t.cols[c].width) {continue;}
 						c = t._addCellTextToCache(c, r, canChangeColWidth); // may change member 'this.isChanged'
 					}
 					for (h = t.defaultRowHeight, d = t.defaultRowDescender, c = 0; c < t.cols.length; ++c) {
