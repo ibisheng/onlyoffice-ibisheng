@@ -203,7 +203,7 @@ CGlyphOperator.prototype.draw_other = function() //  с выравнивание
     MathControl.pGraph.SetIntegerGrid(intGrid);
 
 }
-CGlyphOperator.prototype.new_getCoordinateGlyph = function()
+CGlyphOperator.prototype.getCoordinateGlyph = function()
 {
     var coord = this.calcCoord(this.measure);
 
@@ -224,21 +224,37 @@ CGlyphOperator.prototype.new_getCoordinateGlyph = function()
          glH = coord.W;
      }
 
-     var shW = (W - glW)/ 2, // выравниваем глиф по длине
-         shH = (H - glH)/2; // при повороте на 90 градусовы
+     /*var shW = (W - glW)/ 2, // выравниваем глиф по длине
+         shH = (H - glH)/2; // при повороте на 90 градусовы*/
 
     // A*x + B*y + C = 0
 
-    if(bHor)
+    if(this.loc == 0)
     {
         a1 = 1; b1 = 0; c1 = 0;
         a2 = 0; b2 = 1; c2 = 0;
     }
-    else
+    else if(this.loc == 1)
+    {
+        a1 = 1; b1 = 0; c1 = 0;
+        a2 = 0; b2 = 1; c2 = H - glH;
+    }
+    else if(this.loc == 2)
     {
         a1 = 0; b1 = 1; c1 = 0;
         a2 = 1; b2 = 0; c2 = 0;
     }
+    else if(this.loc == 3)
+    {
+        a1 = 0; b1 = 1; c1 = W - glW;
+        a2 = 1; b2 = 0; c2 = 0;
+    }
+    else if(this.loc == 4)
+    {
+        a1 = 0; b1 = 1; c1 = 0;
+        a2 = 1; b2 = 0; c2 = 0;
+    }
+
 
     /*var shW = 0,
         shH = 0;
@@ -256,99 +272,16 @@ CGlyphOperator.prototype.new_getCoordinateGlyph = function()
 
     if(this.turn == 1)
     {
-        a1 *= -1; b1 *= -1; c1 = glW;
+        a1 *= -1; b1 *= -1; c1 += glW;
     }
     else if(this.turn == 2)
     {
-        a2 *= -1; b2 *= -1; c2 = H;
+        a2 *= -1; b2 *= -1; c2 += glH;
     }
     else if(this.turn == 3)
     {
-        a1 *= -1; b1 *= -1; c1 = glW;
-        a2 *= -1; b2 *= -1; c2 = H;
-    }
-
-    var gpX = 0,
-        gpY = 0;
-
-    if(this.loc == 3)
-        gpX = - this.penW*25.4/96;
-
-    var XX = new Array(),
-        YY = new Array();
-
-    for(var i = 0; i < X.length; i++)
-    {
-        XX[i] = X[i]*a1 + Y[i]*b1 + c1 + gpX;
-        YY[i] = X[i]*a2 + Y[i]*b2 + c2 + gpY;
-    }
-
-    return {XX: XX, YY: YY, Width: glW, Height: glH};
-}
-CGlyphOperator.prototype.getCoordinateGlyph = function()
-{
-    var coord = this.calcCoord(this.measure);
-
-    var X = coord.XX, Y = coord.YY,
-        W =  this.size.width, H =  this.size.height;
-
-    var bHor = this.loc == 0 || this.loc  == 1;
-
-    var glW = 0, glH = 0;
-
-    if(bHor)
-    {
-        glW = coord.W;
-        glH = coord.H;
-    }
-    else
-    {
-        glW = coord.H;
-        glH = coord.W;
-    }
-
-    var shW =  (W - glW)/ 2, // выравниваем глиф по длине
-        shH =  (H - glH)/2; // при повороте на 90 градусовы
-
-    // A*x + B*y + C = 0
-
-    if(bHor)
-    {
-        a1 = 1; b1 = 0; c1 = 0;
-        a2 = 0; b2 = 1; c2 = shH;
-    }
-    else
-    {
-        a1 = 0; b1 = 1; c1 = shW;
-        a2 = 1; b2 = 0; c2 = 0;
-    }
-
-    /*var shW = 0,
-     shH = 0;
-
-     if(bHor)
-     {
-     a1 = 1; b1 = 0; c1 = 0;
-     a2 = 0; b2 = 1; c2 = 0;
-     }
-     else
-     {
-     a1 = 0; b1 = 1; c1 = 0;
-     a2 = 1; b2 = 0; c2 = 0;
-     }*/
-
-    if(this.turn == 1)
-    {
-        a1 *= -1; b1 *= -1; c1 = W - c1; //c1 = W - c1;
-    }
-    else if(this.turn == 2)
-    {
-        a2 *= -1; b2 *= -1; c2 = H - c2;
-    }
-    else if(this.turn == 3)
-    {
-        a1 *= -1; b1 *= -1; c1 = W - c1;
-        a2 *= -1; b2 *= -1; c2 = H - c2;
+        a1 *= -1; b1 *= -1; c1 += glW;
+        a2 *= -1; b2 *= -1; c2 += glH;
     }
 
     var gpX = 0,
@@ -4372,6 +4305,8 @@ CDelimiter.prototype.align = function(element)
     else
         align = (this.size.height - element.size.height)/2;
 
+    //align = (this.size.height - element.size.height)/2;
+
     return align;
 }
 CDelimiter.prototype.getBase = function(numb)
@@ -4424,13 +4359,16 @@ COperator.prototype.fixSize = function(measure)
 
         if(this.glyph.loc == 0 || this.glyph.loc == 1)
         {
-            width = measure > this.glyph.size.width ? measure : this.glyph.size.width;
+            //width = measure > this.glyph.size.width ? measure : this.glyph.size.width;
+            width = dims.Width;
             height = this.glyph.size.height;
         }
         else
         {
-            height = measure > this.glyph.size.height ? measure : this.glyph.size.height;
             width = this.glyph.size.width;
+            //height = measure > this.glyph.size.height ? measure : this.glyph.size.height;
+            //height = dims.Height;
+            height = dims.Height > measure ? measure : dims.Height;
         }
 
         var betta = this.TxtPrp.FontSize/36;
