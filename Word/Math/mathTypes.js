@@ -74,16 +74,29 @@ var ARROW_LR                    = 20;
 var HALF_ARROW_LEFT             = 21;
 var HALF_ARROW_RIGHT            = 22;
 
-var DELIMITER_TURN_0            =  0;
-var DELIMITER_TURN_180          =  1;
-var DELIMITER_TURN_MIRROR_0     =  2;
-var DELIMITER_TURN_MIRROR_180   =  3;
+var TURN_0                      =  0;
+var TURN_180                    =  1;
+var TURN_MIRROR_0               =  2;
+var TURN_MIRROR_180             =  3;
 
 var DELIMITER_SHAPE_MATH        =  0;
 var DELIMITER_SHAPE_CENTERED    =  1;
 
 var LIMIT_LOW               	=  0;
 var LIMIT_UP                	=  1;
+
+var ACCENT_ONE_DOT              =  0;
+var ACCENT_TWO_DOTS             =  1;
+var ACCENT_THREE_DOTS           =  2;
+var ACCENT_GRAVE                =  3;
+var ACCENT_ACUTE                =  4;
+var ACCENT_CIRCUMFLEX           =  5;
+var ACCENT_COMB_CARON           =  6;
+var ACCENT_LINE                 =  7;
+var ACCENT_DOUBLE_LINE          =  8;
+var SINGLE_LINE                 =  9;
+var DOUBLE_LINE                 = 10;
+var MATH_TEXT                   = 11;
 
 var MATRIX_CENTER               =  0;
 var MATRIX_TOP                  =  1;

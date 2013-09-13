@@ -17,7 +17,6 @@ CLogarithm.prototype.setContent = function()
     oBase.addText("log");
     //oBase.setContent.apply(oBase, NameFunctions.minimax[3] );
 
-
     var oFunc = new CDegreeOrdinary(-1);
     oFunc.init(this.params);
     oFunc.relate(this);

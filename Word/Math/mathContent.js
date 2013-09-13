@@ -42,8 +42,6 @@ function mathElem(_val)
 //TODO
 //переделать/продумать DotIndef, т.к. при перетаскивании из одного места в другое флаг DotIndef может измениться для другого контента
 
-//TODO
-//сделать более понятным индефикатор bMText
 
 //TODO
 //пересмотреть this.dW и this.dH
@@ -56,36 +54,15 @@ function mathElem(_val)
 //в качетве позиции для контента передавать положение baseLine для него
 
 //TODO
-//indefSize убрать
-
-//TODO
-//переделать CDegree
-
-//TODO
-//убрать CSymbol
-
-//TODO
 //пересмотреть/убрать CSubMathBase
 
-//TODO
-//переделать степень для случая с 2-мя итераторами : посмотреть как сделано для n-арного оператора
-
-//TODO
-//сделать у радикала степень
 
 
 
 // TODO Refactoring
 
-// 1. переделать mouseMove (вызов из this.SelectContent, а не из this.Root, далее если state == false, подниматься наверх)
-// 1. (!!) повтор IsIncline, IsHighElement
-// 2. (!!) переделать add / add_mathComponent / addText / addLetter
-// 3. home/end if( IsTarget() )
-// 4. relate => сделать 2 функции : одну установить базовый контент корнем(Root) и функцию установить родительский класс (setParent)
-// 5. update_widthContent добавить в recalculateSize (убрать recalculate в CMathContent)
-// 6. (скорее всего) убрать coordWOGaps
-// 7. убрать getMetricsLetter
-// 8. setFont и updateTextPrp переделать (сделать, чтобы font менялся для заселекченной части контента)
+// 1.
+// 2. (!!) повтор IsIncline, IsHighElement
 
 
 function CMathContent()
@@ -134,6 +111,12 @@ CMathContent.prototype =
     {
         this.g_mContext = new dist(0,0,0,0);
         this.content.push( new mathElem(new CEmpty(), new dist(0,0,0,0), 0) );
+    },
+    setPrp: function(prp) //текстовые настройки
+    {
+        this.OwnTPrp.Merge(prp);
+        for(var i = 0; i < this.content.length; i++)
+            this.content[i].value.setOwnTPrp(prp);
     },
     setTxtPrp: function(txtPrp)
     {
@@ -3975,9 +3958,18 @@ CMathContent.prototype =
                     arg2.addTxt("θ");
                     break;
                 case 152:
-                    var diac = this.addMComponent(15);
+                    /*var diac = this.addMComponent(15);
                     diac.init(3);
-                    diac.fillPlaceholders();
+                    diac.fillPlaceholders();*/
+                    var delim = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var props =
+                    {
+                        chr:            {value: "."},
+                        location:       LOCATION_TOP,
+                        justif:         VJUST_BOT
+                    };
+                    delim.init(props);
+                    delim.fillPlaceholders();
                     break;
                 case 153:
                     var diac = this.addMComponent(15);
@@ -4060,8 +4052,46 @@ CMathContent.prototype =
                     delim.fillPlaceholders();
                     break;
                 case 165:
+                    var lim = this.addMComponent(MATH_LIMIT);
+                    var props =
+                    {
+                        type:   LIMIT_UP
+                    };
+                    lim.init(props);
+                    var iter = lim.getIterator();
+                    iter.fillPlaceholders();
+                    var func = lim.getFName();
+                    func.setPrp({Italic: true});
+                    var grCh = func.addMComponent(MATH_GROUP_CHARACTER);
+                    var props2 =
+                    {
+                        chr:            {type: BRACKET_CURLY_TOP},
+                        location:       LOCATION_TOP,
+                        justif:         VJUST_BOT
+                    };
+                    grCh.init(props2);
+                    grCh.fillPlaceholders();
                     break;
                 case 166:
+                    var lim = this.addMComponent(MATH_LIMIT);
+                    var props =
+                    {
+                        type:   LIMIT_LOW
+                    };
+                    lim.init(props);
+                    var iter = lim.getIterator();
+                    iter.fillPlaceholders();
+                    var func = lim.getFName();
+                    func.setPrp({Italic: true});
+                    var grCh = func.addMComponent(MATH_GROUP_CHARACTER);
+                    var props2 =
+                    {
+                        chr:            {type: BRACKET_CURLY_BOTTOM},
+                        location:       LOCATION_BOT,
+                        justif:         VJUST_TOP
+                    };
+                    grCh.init(props2);
+                    grCh.fillPlaceholders();
                     break;
                 case 167:
                     var delim = this.addMComponent(MATH_GROUP_CHARACTER);

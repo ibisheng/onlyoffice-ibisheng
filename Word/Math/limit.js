@@ -57,6 +57,7 @@ CLimit.prototype.init = function(props)
     this.setDimension(2, 1);
 
     var oBase = new CMathContent();
+
     oBase.setOwnTPrp({Italic: false});
 
     var oIter = new CMathContent();
@@ -73,7 +74,7 @@ CLimit.prototype.getCenter = function()
     if(this.type == LIMIT_LOW)
         center = this.elements[0][0].size.center;
     else if(this.type == LIMIT_UP)
-        center = this.elements[0][0].size.height + this.elements[1][0].size.center;
+        center = this.elements[0][0].size.height + this.dH + this.elements[1][0].size.center;
 
     return center;
 }

@@ -18,6 +18,7 @@ function CGlyphOperator()
     this.penW = 1; // px
 
     this.TxtPrp = new CMathTextPrp();
+    this.bGlyph = true;
 
 }
 CGlyphOperator.prototype.init = function(props)
@@ -1017,7 +1018,7 @@ function GetGlyph(chr, location)
         var props =
         {
             location:   location,
-            turn:       DELIMITER_TURN_0
+            turn:       TURN_0
         };
         operator.init(props);
     }
@@ -1027,7 +1028,7 @@ function GetGlyph(chr, location)
         var props =
         {
             location:   location,
-            turn:       DELIMITER_TURN_180
+            turn:       TURN_180
         };
         operator.init(props);
     }
@@ -1037,7 +1038,7 @@ function GetGlyph(chr, location)
         var props =
         {
             location:   location,
-            turn:       DELIMITER_TURN_0
+            turn:       TURN_0
         };
         operator.init(props);
     }
@@ -1047,7 +1048,7 @@ function GetGlyph(chr, location)
         var props =
         {
             location:   location,
-            turn:       DELIMITER_TURN_180
+            turn:       TURN_180
         };
         operator.init(props);
     }
@@ -1057,7 +1058,7 @@ function GetGlyph(chr, location)
         var props =
         {
             location:   location,
-            turn:       DELIMITER_TURN_0
+            turn:       TURN_0
         };
         operator.init(props);
     }
@@ -1067,7 +1068,7 @@ function GetGlyph(chr, location)
         var props =
         {
             location:   location,
-            turn:       DELIMITER_TURN_180
+            turn:       TURN_180
         };
         operator.init(props);
     }
@@ -1078,7 +1079,7 @@ function GetGlyph(chr, location)
         {
             location:   location,
             //location:   DELIMITER_LOCATION_LEFT,
-            turn:       DELIMITER_TURN_0
+            turn:       TURN_0
         };
         operator.init(props);
     }
@@ -1089,7 +1090,7 @@ function GetGlyph(chr, location)
         {
             //location:   DELIMITER_LOCATION_RIGHT,
             location:   location,
-            turn:       DELIMITER_TURN_180
+            turn:       TURN_180
         };
         operator.init(props);
     }
@@ -1100,7 +1101,7 @@ function GetGlyph(chr, location)
         {
             location:   location,
             //location:   DELIMITER_LOCATION_LEFT,
-            turn:       DELIMITER_TURN_0
+            turn:       TURN_0
         };
         operator.init(props);
     }
@@ -1111,7 +1112,7 @@ function GetGlyph(chr, location)
         {
             //location:   DELIMITER_LOCATION_LEFT,
             location:   location,
-            turn:       DELIMITER_TURN_0
+            turn:       TURN_0
         };
         operator.init(props);
     }
@@ -1122,7 +1123,7 @@ function GetGlyph(chr, location)
         {
             //location:   DELIMITER_LOCATION_LEFT,
             location:   location,
-            turn:       DELIMITER_TURN_180
+            turn:       TURN_180
         };
         operator.init(props);
     }
@@ -1133,7 +1134,7 @@ function GetGlyph(chr, location)
         {
             //location:   DELIMITER_LOCATION_LEFT,
             location:   location,
-            turn:       DELIMITER_TURN_MIRROR_0
+            turn:       TURN_MIRROR_0
         };
         operator.init(props);
     }
@@ -1144,7 +1145,7 @@ function GetGlyph(chr, location)
         {
             //location:   DELIMITER_LOCATION_LEFT,
             location:   location,
-            turn:       DELIMITER_TURN_MIRROR_180
+            turn:       TURN_MIRROR_180
         };
         operator.init(props);
     }
@@ -1155,7 +1156,7 @@ function GetGlyph(chr, location)
         {
             location:   location,
             //location:   DELIMITER_LOCATION_LEFT,
-            turn:       DELIMITER_TURN_0
+            turn:       TURN_0
         };
         operator.init(props);
     }
@@ -1166,7 +1167,7 @@ function GetGlyph(chr, location)
         {
             //location:   DELIMITER_LOCATION_LEFT,
             location:   location,
-            turn:       DELIMITER_TURN_0
+            turn:       TURN_0
         };
         operator.init(props);
     }
@@ -1177,14 +1178,17 @@ function GetGlyph(chr, location)
         {
             //location:   DELIMITER_LOCATION_LEFT,
             location:   location,
-            turn:       DELIMITER_TURN_180
+            turn:       TURN_180
         };
         operator.init(props);
     }
     else if( chr.value === "" || chr.type === BRACKET_EMPTY)
         operator = -1;
     else
-        operator = -1;
+    {
+        operator = new CMathText();
+        operator.add(chr.value.charCodeAt(0));
+    }
 
 
     return operator;
@@ -1201,7 +1205,7 @@ function GetGlyph_GrChr(chr, location)
             var props =
             {
                 location:   LOCATION_BOT,
-                turn:       DELIMITER_TURN_MIRROR_0
+                turn:       TURN_MIRROR_0
             };
             operator.init(props);
         }
@@ -1212,7 +1216,7 @@ function GetGlyph_GrChr(chr, location)
         var props =
         {
             location:   location,
-            turn:       DELIMITER_TURN_0
+            turn:       TURN_0
         };
         operator.init(props);
     }
@@ -1222,7 +1226,7 @@ function GetGlyph_GrChr(chr, location)
         var props =
         {
             location:   location,
-            turn:       DELIMITER_TURN_MIRROR_0
+            turn:       TURN_MIRROR_0
         };
         operator.init(props);
     }
@@ -1232,7 +1236,7 @@ function GetGlyph_GrChr(chr, location)
         var props =
         {
             location:   location,
-            turn:       DELIMITER_TURN_0
+            turn:       TURN_0
         };
         operator.init(props);
     }
@@ -1242,7 +1246,7 @@ function GetGlyph_GrChr(chr, location)
         var props =
         {
             location:   location,
-            turn:       DELIMITER_TURN_180
+            turn:       TURN_180
         };
         operator.init(props);
     }
@@ -1252,7 +1256,7 @@ function GetGlyph_GrChr(chr, location)
         var props =
         {
             location:   location,
-            turn:       DELIMITER_TURN_0
+            turn:       TURN_0
         };
         operator.init(props);
     }
@@ -1262,7 +1266,7 @@ function GetGlyph_GrChr(chr, location)
         var props =
         {
             location:   location,
-            turn:       DELIMITER_TURN_0
+            turn:       TURN_0
         };
         operator.init(props);
     }
@@ -1272,9 +1276,14 @@ function GetGlyph_GrChr(chr, location)
         var props =
         {
             location:   location,
-            turn:       DELIMITER_TURN_180
+            turn:       TURN_180
         };
         operator.init(props);
+    }
+    else
+    {
+        operator = new CMathText();
+        operator.add(chr.value.charCodeAt(0));
     }
 
     return operator;
@@ -1575,7 +1584,7 @@ CBaseDelimiter.prototype.getOperator = function(chr)
         var props =
         {
             location:   DELIMITER_LOCATION_LEFT,
-            turn:       DELIMITER_TURN_0
+            turn:       TURN_0
         };
         operator.ini(props);
     }
@@ -1585,7 +1594,7 @@ CBaseDelimiter.prototype.getOperator = function(chr)
         var props =
         {
             location:   DELIMITER_LOCATION_RIGHT,
-            turn:       DELIMITER_TURN_180
+            turn:       TURN_180
         };
         operator.ini(props);
     }
@@ -1595,7 +1604,7 @@ CBaseDelimiter.prototype.getOperator = function(chr)
         var props =
         {
             location:   DELIMITER_LOCATION_LEFT,
-            turn:       DELIMITER_TURN_0
+            turn:       TURN_0
         };
         operator.ini(props);
     }
@@ -1605,7 +1614,7 @@ CBaseDelimiter.prototype.getOperator = function(chr)
         var props =
         {
             location:   DELIMITER_LOCATION_RIGHT,
-            turn:       DELIMITER_TURN_180
+            turn:       TURN_180
         };
         operator.ini(props);
     }
@@ -1615,7 +1624,7 @@ CBaseDelimiter.prototype.getOperator = function(chr)
         var props =
         {
             location:   DELIMITER_LOCATION_LEFT,
-            turn:       DELIMITER_TURN_0
+            turn:       TURN_0
         };
         operator.ini(props);
     }
@@ -1625,7 +1634,7 @@ CBaseDelimiter.prototype.getOperator = function(chr)
         var props =
         {
             location:   DELIMITER_LOCATION_RIGHT,
-            turn:       DELIMITER_TURN_180
+            turn:       TURN_180
         };
         operator.ini(props);
     }
@@ -1635,7 +1644,7 @@ CBaseDelimiter.prototype.getOperator = function(chr)
         var props =
         {
             location:   DELIMITER_LOCATION_LEFT,
-            turn:       DELIMITER_TURN_0
+            turn:       TURN_0
         };
         operator.ini(props);
     }
@@ -1645,7 +1654,7 @@ CBaseDelimiter.prototype.getOperator = function(chr)
         var props =
         {
             location:   DELIMITER_LOCATION_RIGHT,
-            turn:       DELIMITER_TURN_180
+            turn:       TURN_180
         };
         operator.ini(props);
     }
@@ -4349,6 +4358,7 @@ COperator.prototype.draw = function()
 }
 COperator.prototype.fixSize = function(measure)
 {
+
     if(this.glyph !== -1)
     {
         this.glyph.fixSize(measure);

@@ -89,7 +89,7 @@ CBaseDiacritic.prototype.getBase = function()
     return this.elements[0][0];
 }
 
-function CCircumflex()
+function old_CCircumflex()
 {
     this.AUG = 5;
     this.ANGLE =  0.1;
@@ -98,12 +98,12 @@ function CCircumflex()
 
     CBaseDiacritic.call(this);
 }
-extend(CCircumflex, CBaseDiacritic);
-CCircumflex.prototype.setIndex = function(index)
+extend(old_CCircumflex, CBaseDiacritic);
+old_CCircumflex.prototype.setIndex = function(index)
 {
     this.index = index;
 }
-CCircumflex.prototype.recalculateSize = function()
+old_CCircumflex.prototype.recalculateSize = function()
 {
     var alpha = this.getTxtPrp().FontSize/36;
 
@@ -144,7 +144,7 @@ CCircumflex.prototype.recalculateSize = function()
     this.size = {width: _width, height: _height, center: _center};
 
 }
-CCircumflex.prototype.draw = function()
+old_CCircumflex.prototype.draw = function()
 {
     this.elements[0][0].draw();
 
@@ -220,6 +220,173 @@ CCircumflex.prototype.draw = function()
     else
     {
         a = YY[1]; // height
+        b = -1;
+    }
+
+    for(var i = 0; i < XX.length; i++)
+    {
+        XX[i] = x + XX[i]*alpha ;
+        YY[i] = y + (a + b*YY[i])*alpha;
+    }
+
+    var intGrid = MathControl.pGraph.GetIntegerGrid();
+    MathControl.pGraph.SetIntegerGrid(false);
+
+    MathControl.pGraph.p_width(penW*1000);
+    MathControl.pGraph.b_color1(0,0,0, 255);
+    MathControl.pGraph._s();
+
+    MathControl.pGraph._m(XX[0], YY[0]);
+    MathControl.pGraph._l(XX[1], YY[1]);
+    MathControl.pGraph._l(XX[2], YY[2]);
+    MathControl.pGraph._l(XX[3], YY[3]);
+    MathControl.pGraph._l(XX[4], YY[4]);
+    MathControl.pGraph._l(XX[5], YY[5]);
+    MathControl.pGraph._l(XX[6], YY[6]);
+    MathControl.pGraph._l(XX[7], YY[7]);
+    MathControl.pGraph._l(XX[8], YY[8]);
+    MathControl.pGraph._l(XX[9], YY[9]);
+    MathControl.pGraph._l(XX[10], YY[10]);
+    MathControl.pGraph._l(XX[11], YY[11]);
+
+    MathControl.pGraph.df();
+
+    MathControl.pGraph.SetIntegerGrid(intGrid);
+
+}
+
+function CCircumflex()
+{
+    this.incline = 0;
+    this.turn = 0;
+
+    CBaseDiacritic.call(this);
+}
+extend(CCircumflex, CBaseDiacritic);
+CCircumflex.prototype.setTurn = function(turn)
+{
+    this.turn = turn;
+}
+CCircumflex.prototype.recalculateSize = function(mSize, bIncl)
+{
+    var alpha = this.getTxtPrp().FontSize/36;
+
+    this.accentSize.width = 3.88*alpha;
+    this.accentSize.height = 3.175*alpha;
+
+    var augm = 0.9*mSize.width/this.accentSize.width;
+
+    if(augm < 1)
+        augm = 1;
+    else if (augm > 5)
+        augm = 5;
+
+    var angle = 0.1;
+
+    if( bIncl )
+        this.incline = mSize.height*angle;
+
+    var width = augm*this.accentSize.width,
+        height = augm*this.accentSize.height,
+        center = height/2;
+
+    /*var Arg = this.elements[0][0].size,
+        Accent = {width: augm*this.accentSize.width, height: this.accentSize.height};
+
+    var _height = Arg.height + Accent.height;
+    var _center = Arg.center + Accent.height;
+
+    var incline = 0;
+    if( this.IsIncline() )
+        incline = Arg.height*this.ANGLE;
+
+    if(Arg.width < Accent.width)
+    {
+        this.shiftAccent = incline;
+        this.shiftArg = (Arg.width - Accent.width)/2;
+
+        _width = Accent.width + incline;
+    }
+    else
+    {
+        var align = (Arg.width - Accent.width)/2 + incline;
+        _width = Arg.width > Accent.width + align ? Arg.width : Accent.width + align ;
+        this.shiftAccent = align;
+        this.shiftArg = 0;
+    }*/
+
+    this.size = {width: width, height: height, center: center};
+
+}
+CCircumflex.prototype.draw = function()
+{
+    this.elements[0][0].draw();
+
+    var x = this.pos.x + this.shiftAccent,
+        y = this.pos.y;
+
+    var fontSize = this.getTxtPrp().FontSize;
+
+    var penW = fontSize*g_dKoef_pt_to_mm*this.PEN_W;
+    penW *= 96/25.4;
+
+    // g_dKoef_px_to_mm = 25.4/96
+
+    var textScale = fontSize/1000, // 1000 pt
+        alpha = textScale*25.4/96 /64;
+
+    var X = new Array(),
+        Y = new Array();
+
+    X[0] = 0; Y[0] = 2373;
+    X[1] = 9331; Y[1] = 15494;
+    X[2] = 14913; Y[2] = 15494;
+    X[3] = 23869; Y[3] = 2373;
+    X[4] = 20953; Y[4] = 0;
+    X[5] = 12122; Y[5] = 10118;
+    X[6] = 11664; Y[6] = 10118;
+    X[7] = 2833; Y[7] = 0;
+    X[8] = 0; Y[8] = 2373;
+
+
+    var XX = new Array(),
+        YY = new Array();
+
+    var W = this.size.width/alpha;
+
+    var a1 = X[3] - X[0], b1 = W,            c1 = X[2] - X[1],
+        a2 = X[4] - X[7], b2 = W - 2*X[7],   c2 = X[5] - X[6] ; //X[8] = 0
+
+
+    var RX = new Array();
+    for(var i = 0; i < X.length; i++)
+        RX[i] = 1;
+
+    RX[0] = RX[2] = (b1 - c1)/(a1-c1);
+    RX[4] = RX[6] =  (b2 - c2)/(a2-c2);
+
+
+    XX[0] = XX[8] = X[0];
+    YY[0] = YY[8] = Y[0];
+
+    for(var i = 0; i< 4; i++)
+    {
+        XX[1 + i] = XX[i] + RX[i]*(X[1+i] - X[i]);
+        XX[7-i]   = XX[8 - i] + RX[7-i]*(X[7-i] - X[8-i]);
+        YY[1+i] = Y[1+i];
+        YY[7-i] = Y[7-i];
+    }
+
+    var a,b;
+
+    if(this.turn == TURN_0) // вверх
+    {
+        a = 0;
+        b = 1;
+    }
+    else if(this.turn == TURN_MIRROR_0)
+    {
+        a = YY[1];
         b = -1;
     }
 
@@ -355,7 +522,7 @@ CLine.prototype.draw_doubleLine = function()
 
 }
 
-// TODO: установить смещение в зависимости от наклона буквы (как в CAccent)
+// TODO: установить смещение в зависимости от наклона буквы (как в old_CAccent)
 function CSign()
 {
     this.index = null;
@@ -596,7 +763,111 @@ CSign.prototype.draw_breve = function(up)
 
 }
 
-function CAccent()
+function CTilde()
+{
+    CBaseDiacritic.call(this);
+}
+extend(CTilde, CBaseDiacritic);
+CTilde.prototype.recalculateSize = function()
+{
+    var betta = this.getTxtPrp().FontSize/36;
+
+    var width = 9.047509765625*betta; // реальная на отрисовке width 7.495282031249999
+    var height = 2.469444444444444*betta;
+
+    this.size = {width: width, heigth: height};
+}
+CTilde.prototype.draw = function()
+{
+    var X = new Array(),
+        Y = new Array();
+
+    X[0] = 0; Y[0] = 3066;
+    X[1] = 2125; Y[1] = 7984;
+    X[2] = 5624; Y[2] = 11256;
+    X[3] = 9123; Y[3] = 14528;
+    X[4] = 13913; Y[4] = 14528;
+    X[5] = 18912; Y[5] = 14528;
+    X[6] = 25827; Y[6] = 10144;
+    X[7] = 32742; Y[7] = 5760;
+    X[8] = 36324; Y[8] = 5760;
+    X[9] = 39865; Y[9] = 5760;
+    X[10] = 42239; Y[10] = 7641;
+    X[11] = 44614; Y[11] = 9522;
+    X[12] = 47030; Y[12] = 13492;
+    X[13] = 50362; Y[13] = 11254;
+    X[14] = 48571; Y[14] = 7544;
+    X[15] = 44697; Y[15] = 3772;
+    X[16] = 40823; Y[16] = 0;
+    X[17] = 35283; Y[17] = 0;
+    X[18] = 29951; Y[18] = 0;
+    X[19] = 23098; Y[19] = 4384;
+    X[20] = 16246; Y[20] = 8768;
+    X[21] = 12622; Y[21] = 8768;
+    X[22] = 9581; Y[22] = 8768;
+    X[23] = 7290; Y[23] = 6845;
+    X[24] = 4999; Y[24] = 4922;
+    X[25] = 3249; Y[25] = 1243;
+    X[26] = 0; Y[26] = 3066;
+
+
+    var XX = new Array(),
+        YY = new Array();
+
+    var fontSize = this.getTxtPrp().FontSize;
+
+    var textScale = fontSize/1000, // 1000 pt
+        alpha = textScale*25.4/96 /64 ; // g_dKoef_px_to_mm = 25.4/96
+
+
+    var align = this.size.width - X[13]*alpha;
+    var x = this.pos.x + align/2,
+        y = this.pos.y;
+
+    for(var i = 0; i < X.length; i++)
+    {
+        XX[i] = x + X[i]*alpha;
+        YY[i] = y + (Y[5] - Y[i])*alpha*0.65; // сжали !
+    }
+
+
+    var penW = fontSize*g_dKoef_pt_to_mm*this.PEN_W;
+    penW *= 96/25.4;
+
+    var intGrid = MathControl.pGraph.GetIntegerGrid();
+    MathControl.pGraph.SetIntegerGrid(false);
+
+    MathControl.pGraph.p_width(penW*1000);
+    MathControl.pGraph.b_color1(0,0,0, 255);
+    MathControl.pGraph._s();
+
+    MathControl.pGraph._m(XX[0], YY[0]);
+    MathControl.pGraph._c(XX[0], YY[0], XX[1], YY[1], XX[2], YY[2] );
+    MathControl.pGraph._c(XX[2], YY[2], XX[3], YY[3], XX[4], YY[4] );
+    MathControl.pGraph._c(XX[4], YY[4], XX[5], YY[5], XX[6], YY[6] );
+    MathControl.pGraph._c(XX[6], YY[6], XX[7], YY[7], XX[8], YY[8] );
+    MathControl.pGraph._c(XX[8], YY[8], XX[9], YY[9], XX[10], YY[10] );
+    MathControl.pGraph._c(XX[10], YY[10], XX[11], YY[11], XX[12], YY[12] );
+    MathControl.pGraph._l(XX[13], YY[13]);
+    MathControl.pGraph._c(XX[13], YY[13], XX[14], YY[14], XX[15], YY[15] );
+    MathControl.pGraph._c(XX[15], YY[15], XX[16], YY[16], XX[17], YY[17] );
+    MathControl.pGraph._c(XX[17], YY[17], XX[18], YY[18], XX[19], YY[19] );
+    MathControl.pGraph._c(XX[19], YY[19], XX[20], YY[20], XX[21], YY[21] );
+    MathControl.pGraph._c(XX[21], YY[21], XX[22], YY[22], XX[23], YY[23] );
+    MathControl.pGraph._c(XX[23], YY[23], XX[24], YY[24], XX[25], YY[25] );
+    MathControl.pGraph._l(XX[26], YY[26]);
+
+    MathControl.pGraph.df();
+
+    MathControl.pGraph.SetIntegerGrid(intGrid);
+}
+CTilde.prototype.setPosition = function(pos)
+{
+    this.pos = pos;
+}
+
+
+function old_CAccent()
 {
     this.index = null;
     this.DIACR_ANGLE = 0.1;
@@ -604,8 +875,8 @@ function CAccent()
     CMathBase.call(this);
 }
 // посмотреть смещение у диакритических знаков
-extend(CAccent, CMathBase);
-CAccent.prototype.init = function(index)
+extend(old_CAccent, CMathBase);
+old_CAccent.prototype.init = function(index)
 {
     this.index = index;
     this.setDimension(2, 1);
@@ -629,7 +900,7 @@ CAccent.prototype.init = function(index)
 
     this.addMCToContent(oAccent, oBase);
 }
-CAccent.prototype.recalculateSize = function()
+old_CAccent.prototype.recalculateSize = function()
 {
     var first = this.elements[0][0].size,
         second = this.elements[1][0].size;
@@ -660,11 +931,11 @@ CAccent.prototype.recalculateSize = function()
 
     this.size = {width: width, height: height, center: center};
 }
-CAccent.prototype.getCenter = function()
+old_CAccent.prototype.getCenter = function()
 {
     return this.elements[0][0].size.height + this.elements[1][0].size.center + this.dH;
 }
-CAccent.prototype.setPosition = function(pos)
+old_CAccent.prototype.setPosition = function(pos)
 {
     this.pos = {x: pos.x, y: pos.y - this.size.center};
 
@@ -714,11 +985,102 @@ CAccent.prototype.setPosition = function(pos)
     this.elements[1][0].setPosition(pos2);
 
 }
-CAccent.prototype.IsIncline = function()
+old_CAccent.prototype.IsIncline = function()
 {
     return this.elements[1][0].IsIncline();
 }
-CAccent.prototype.setDistance = function()
+old_CAccent.prototype.setDistance = function()
 {
     this.dH = 0.7*this.getTxtPrp().FontSize/36;
+}
+
+function CAccent()
+{
+    this.bDiacritic = true;
+    this.type = null;
+    this.accent   = null;
+    CMathBase.call(this);
+}
+extend(old_CAccent, CMathBase);
+CAccent.prototype.init = function(props)
+{
+    var code = props.chr.value.charCodeAt(0);
+
+    var bDot        = code === 0x307 || props.chr.type === ACCENT_ONE_DOT,
+        b2Dots      = code === 0x308 || props.chr.type === ACCENT_TWO_DOTS,
+        b3Dots      = code === 0x20DB || props.chr.type === ACCENT_THREE_DOTS,
+        bAccGrave   = code === 0x300 || props.chr.type === ACCENT_GRAVE,
+        bAccAcute   = code === 0x301 || props.chr.type === ACCENT_ACUTE;
+
+    if(bDot || b2Dots || b3Dots || bAccGrave || bAccAcute)
+    {
+        this.accent = new CMathText();
+        this.accent.add(code);
+        this.type = props.chr.type;
+    }
+    else if(code === 0x302 || props.chr.type === ACCENT_CIRCUMFLEX)
+    {
+        this.accent = new CCircumflex();
+        this.accent.setTurn(TURN_0);
+    }
+    else if(code === 0x30C || props.chr.type === ACCENT_COMB_CARON)
+    {
+        this.accent = new CCircumflex();
+        this.accent.setTurn(TURN_MIRROR_0);
+    }
+    else if(code === 0x332 || props.chr.type === ACCENT_LINE)
+    {
+        this.accent = new CLine();
+        this.accent.setPrp(SINGLE_LINE);
+    }
+    else if(code === 0x333 || props.chr.type === ACCENT_DOUBLE_LINE)
+    {
+        this.accent = new CLine();
+        this.accent.setPrp(DOUBLE_LINE);
+    }
+    else
+    {
+        this.accent = new CMathText();
+        this.accent.add(code);
+        this.type = MATH_TEXT;
+        this.bDiacritic = false;
+    }
+
+
+    this.setDimension(1, 1);
+    this.setContent();
+}
+CAccent.prototype.recalculateSize = function()
+{
+    var content = this.elements[0][0];
+
+    this.dH = 0.7*this.getTxtPrp().FontSize/36;
+
+    if(this.bDiacritic)
+        this.accent.fixSize(content.size.width, content.Incline());
+
+    var height = this.accent.size.height + content.size.height,
+        center = this.accent.size.height + content.size.center;
+
+    var accW;
+    if(this.bDiacritic)
+        accW = this.accent.size.width + this.accent.incline;
+    else
+        accW = this.accent.size.width;
+
+    var width = accW > content.size.width ? accW : content.size.width;
+
+    this.size = {width: width, height: height, center: center};
+    //var height = first.height + second.height + this.dH;
+    //var center = this.elements[0][0].size.height + this.elements[1][0].size.center + this.dH;
+}
+CAccent.prototype.setPosition = function(pos)
+{
+    this.pos = {x: pos.x, y: pos.y - this.size.center};
+    var pos = 
+        {
+            x: this.pos.x + (this.size.width - this.elements[0][0].size.width)/2;
+        };
+
+    this.elements[0][0].setPosition()
 }
