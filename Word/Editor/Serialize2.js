@@ -3342,7 +3342,9 @@ function BinaryFileReader(doc, openParams)
                     if(stDefault.Header == stId)
                         stDefault.Header = oNewId.id;
                     if(stDefault.Footer == stId)
-                        stDefault.Footer = oNewId.id;                        
+                        stDefault.Footer = oNewId.id;
+					if(stDefault.Hyperlink == stId)
+                        stDefault.Hyperlink = oNewId.id;
                     delete styles[stId];
 
                     break;
@@ -3352,6 +3354,8 @@ function BinaryFileReader(doc, openParams)
                 stDefault.Header = oNewId.id;
             if("Footer" == oNewStyle.Name)
                 stDefault.Footer = oNewId.id;
+			if("Hyperlink" == oNewStyle.Name)
+                stDefault.Hyperlink = oNewId.id;
             if(true == oNewId.def)
             {
                 switch(oNewStyle.Type)
