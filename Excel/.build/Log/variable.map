@@ -236,7 +236,7 @@ c_oSer_FilterColumn$ColId:fG
 sfnt_done_face:Pp
 gray_render_scanline:hq
 historyitem_Worksheet_MoveRange:cP
-ps_get_standard_strings:Hl
+ps_get_standard_strings:Fl
 UndoRedoClassTypes:XN
 JSCompiler_StaticMethods_getRow0:Cz
 xhrSupported$$inline_1214:Ax
@@ -2029,7 +2029,7 @@ JSCompiler_StaticMethods_Internal_Get_RealPos:D6
 FONT_TYPE_STANDART:Dx
 ChartStyleManager:Ud
 cExcelSignificantDigits:wA
-ft_standard_glyph_names:pl
+ft_standard_glyph_names:nl
 JSCompiler_StaticMethods_trackAdjObject:I0
 phType_ftr:EU
 tt_get_metrics_incr_overrides:Ps
@@ -2311,7 +2311,7 @@ sfnt_find_encoding:Op
 JSCompiler_StaticMethods_DrawTicks:e0
 c_oSerFormulaTypes$Ref:KE
 TT_Access_Glyph_Frame:Qs
-asc_CListType:hg
+asc_CListType:ig
 TT_CodeRange:Nq
 c_oAscBorderOptions$DiagU:aS
 rx_name:ec
@@ -2713,7 +2713,7 @@ L 137:LB
 L 136:v8
 g_oUndoRedoCol:eM
 JSCompiler_StaticMethods_RedoPrepare:VN
-L 150:ig
+L 150:hg
 JSCompiler_StaticMethods_RedoEnd:aO
 L 151:oi
 L 152:Cr
@@ -2795,7 +2795,7 @@ L 111:jn
 L 110:xr
 L 113:Zg
 bIsSupportOriginalFormatFonts:zx
-L 112:Gl
+L 112:Hl
 L 103:Mc
 L 104:le
 CAutoshapeTrack:og
@@ -3231,9 +3231,9 @@ TT_Forget_Glyph_Frame:Rs
 gray_record_cell:Up
 cString:LA
 L 70:qk
-L 72:ol
+L 72:pl
 FT_PEEK_USHORT:Ii
-L 71:nl
+L 71:ol
 L 64:zf
 L 65:$h
 L 62:nc
@@ -3254,7 +3254,7 @@ L 61:Xb
 L 60:yf
 c_oSer_ColorType$Auto:oF
 JSCompiler_StaticMethods_Calculate_X_Value:Jf
-L 99:Fl
+L 99:Gl
 L 95:rc
 c_oSer_SheetPr$FilterMode:wI
 L 96:rk
