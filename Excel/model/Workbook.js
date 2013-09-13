@@ -3245,7 +3245,10 @@ Woorksheet.prototype._getCellNoEmpty=function(row, col){
 	var oCurCell;
 	var oCurRow = this.aGCells[row];
 	if(oCurRow)
-		return oCurRow.c[col] ? oCurRow.c[col] : null;
+	{
+		var cell = oCurRow.c[col];
+		return cell ? cell : null;
+	}
 	return null;
 };
 Woorksheet.prototype._getRowNoEmpty=function(row){
