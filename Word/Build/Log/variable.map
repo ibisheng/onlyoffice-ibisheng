@@ -347,7 +347,7 @@ changestype_Table_Properties:oP
 TTC_HeaderRec:Lq
 CNumbering:XN
 JSCompiler_StaticMethods_Is_CurrentElementTable:pJ
-c_oSerProp_pPrType$Spacing_After:FY
+c_oSerProp_pPrType$Spacing_After:EY
 BULLET_TYPE_SIZE_NONE:Tj
 c_oSerOtherTableTypes$EmbeddedFonts:NX
 CArrowDrawer:G5
@@ -591,7 +591,7 @@ JSCompiler_StaticMethods_GetNewMargin:I2
 CAscShapeProp:D7
 numFormat_Scientific:tg
 TrackNewShape:qH
-c_oSerProp_pPrType$pPr_rPr:RY
+c_oSerProp_pPrType$pPr_rPr:QY
 c_oSerParType$Par:CZ
 TT_SBit_MetricsRec:Uq
 c_oSerPosHV$PosOffset:U_
@@ -944,7 +944,7 @@ historyitem_SetGuideValue:CN
 JSCompiler_StaticMethods_Set_VAlign:iW
 c_oAscHAnchor:y6
 STATES_ID_TRACK_NEW_SHAPE:HG
-c_oSer_sts$Style_CellPr:iY
+c_oSer_sts$Style_CellPr:hY
 JSCompiler_StaticMethods_AddLineDash:XI
 JSCompiler_StaticMethods_private_FillGlyph:m3
 JSCompiler_StaticMethods_AddEllipse:w3
@@ -1924,7 +1924,7 @@ historyitem_type_GrObjects:cF
 map_prst_color:QK
 Binary_rPrReader:A2
 tt_cmap13_next:lv
-JSCompiler_StaticMethods_Internal_CalculateTextPr:Za
+JSCompiler_StaticMethods_Internal_CalculateTextPr:Ya
 c_oSerImageType$Type:i_
 g_oCellAddressUtils:qg
 SplineCommandLineTo:dI
@@ -2483,7 +2483,7 @@ dublicate_pointer:jp
 JSCompiler_StaticMethods_removeById:qF
 c_oAscError$Level$Critical:j6
 JSCompiler_StaticMethods_setParagraphIndent:lF
-CompareGroups:WE
+CompareGroups:VE
 c_oAscTableSelectionType$Row:yW
 documentTitleWithoutExtention:R6
 PreChangeAdjState:XG
@@ -2556,7 +2556,7 @@ CAscThemes:U7
 _weight_ctrTitle:uM
 c_oAscVAnchor$Text:QQ
 GroupForResize:uK
-STATES_ID_PRE_CHANGE_ADJ:yG
+STATES_ID_PRE_CHANGE_ADJ:xG
 cff_Load_Glyph:YA
 locktype_Mine:kP
 ft_smooth_get_cbox:Hw
@@ -2706,7 +2706,7 @@ cff_parse_fixed:Wz
 TT_CMapRec:Iu
 CParaLineRange:ST
 DecodeBase64:HD
-recalcresult2_NextPage:CJ
+recalcresult2_NextPage:BJ
 _fakeHeaders:w7
 L 125:fD
 JSCompiler_StaticMethods_Internal_CheckPunctuationBreak:c3
@@ -2960,7 +2960,7 @@ cff_standard_encoding:cA
 L 30:Ga
 L 36:Fc
 L 35:cb
-L 34:Ya
+L 34:Za
 FT_Data:qr
 L 33:wa
 g_oLcidIdToNameMap:m2
