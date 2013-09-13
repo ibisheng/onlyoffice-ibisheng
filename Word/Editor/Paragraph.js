@@ -11068,8 +11068,9 @@ Paragraph.prototype =
             TNewHeight = -TNewDescent + TNewAscent;
 
         var Descent = g_oTextMeasurer.GetDescender();
+        var Ascent  = g_oTextMeasurer.GetAscender();
 
-        var Dy = Descent * (LineH * Count) / ( Ascent - Descent ) + TNewHeight - TNewAscent + LineTD;
+        var Dy = Descent * (Height) / ( Ascent - Descent ) + TNewHeight - TNewAscent + LineTD;
 
         var PTextPr = new ParaTextPr( { RFonts : { Ascii : { Name : TextPr.RFonts.Ascii.Name, Index : -1 } }, FontSize : TextPr.FontSize, Position : Dy } );
         this.Select_All();
