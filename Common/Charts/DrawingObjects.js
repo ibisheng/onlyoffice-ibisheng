@@ -3130,15 +3130,24 @@ function DrawingObjects() {
 	_this.raiseLayerDrawingObjects = function() {
 		
 		var bRedraw = false;
-		var selection = worksheet.activeRange;
+		var selection = worksheet.activeRange.normalize();
 		
 		if ( selection ) {
 			for ( var i = 0; i < aObjects.length; i++ ) {
 				var drawingObject = aObjects[i];
 				
 				// Объекты не пересекаются
-				if ( (selection.c2 < drawingObject.from.col) || (selection.c1 > drawingObject.to.col) || (selection.r2 < drawingObject.from.row) || (selection.r1 > drawingObject.to.row) )					
+				if ( (selection.c2 < drawingObject.from.col) || (selection.c1 > drawingObject.to.col) || (selection.r2 < drawingObject.from.row) || (selection.r1 > drawingObject.to.row) ) {
+					// Проверяем диапазоны диаграмм
+					for (var j = 0; j < worksheet.arrActiveChartsRanges.length; j++) {
+						var range = worksheet.arrActiveChartsRanges[j];
+						if ( (range.c2 < drawingObject.from.col) || (range.c1 > drawingObject.to.col) || (range.r2 < drawingObject.from.row) || (range.r1 > drawingObject.to.row) ) {
+							bRedraw = true;
+							break;
+						}
+					}
 					continue;
+				}
 				else {
 					bRedraw = true;
 					break;
@@ -3146,21 +3155,12 @@ function DrawingObjects() {
 			}
 		}
 		if ( bRedraw ) {
-			/*for ( var i = 0; i < aObjects.length; i++ ) {
-				var boundsChecker = _this.getBoundsChecker(aObjects[i]);
-				restoreSheetArea(boundsChecker);
-			}
-			for ( var i = 0; i < aObjects.length; i++ ) {
-				aObjects[i].graphicObject.draw(shapeCtx);
-			}*/
-			
 			shapeOverlayCtx.ClearMode = true;
 			for ( var i = 0; i < aObjects.length; i++ ) {
 				aObjects[i].graphicObject.draw(shapeOverlayCtx);
 			}
 			shapeOverlayCtx.ClearMode = false;
 		}
-		
 		if ( aObjects.length )
 			_this.drawWorksheetHeaders();
 	}	
@@ -4434,6 +4434,7 @@ function DrawingObjects() {
 			return "rgb(" + r() + "," + r() + "," + r() + ")";
 		}
 		
+		var bRaise = false;
 		for (var i = 0; i < aObjects.length; i++) {
 
 			var drawingObject = aObjects[i].graphicObject;
@@ -4488,8 +4489,11 @@ function DrawingObjects() {
 				worksheet.arrActiveChartsRanges.push(range);
 				worksheet.isChartAreaEditMode = true;
 				worksheet._drawFormulaRange(worksheet.arrActiveChartsRanges);
+				bRaise = true;
 			}
 		}
+		if ( bRaise )
+			_this.raiseLayerDrawingObjects();
 	}
 
 	_this.unselectDrawingObjects = function() {
