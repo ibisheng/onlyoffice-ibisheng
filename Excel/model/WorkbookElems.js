@@ -1993,22 +1993,25 @@ Col.prototype =
 	},
 	setWidthProp : function(prop)
 	{
-		if(null != prop.width)
-			this.width = prop.width;
-		else
-			this.width = null;
-		if(null != prop.hd)
-			this.hd = prop.hd;
-		else
-			this.hd = null;
-		if(null != prop.CustomWidth)
-			this.CustomWidth = prop.CustomWidth;
-		else
-			this.CustomWidth = null;
-		if(null != prop.BestFit)
-			this.BestFit = prop.BestFit;
-		else
-			this.BestFit = null;
+		if(null != prop)
+		{
+			if(null != prop.width)
+				this.width = prop.width;
+			else
+				this.width = null;
+			if(null != prop.hd)
+				this.hd = prop.hd;
+			else
+				this.hd = null;
+			if(null != prop.CustomWidth)
+				this.CustomWidth = prop.CustomWidth;
+			else
+				this.CustomWidth = null;
+			if(null != prop.BestFit)
+				this.BestFit = prop.BestFit;
+			else
+				this.BestFit = null;
+		}
 	},
 	getMerged : function()
 	{
@@ -2258,18 +2261,21 @@ Row.prototype =
 	},
 	setHeightProp : function(prop)
 	{
-		if(null != prop.h)
-			this.h = prop.h;
-		else
-			this.h = null;
-		if(null != prop.hd)
-			this.hd = prop.hd;
-		else
-			this.hd = null;
-		if(null != prop.CustomHeight)
-			this.CustomHeight = prop.CustomHeight;
-		else
-			this.CustomHeight = null;
+		if(null != prop)
+		{
+			if(null != prop.h)
+				this.h = prop.h;
+			else
+				this.h = null;
+			if(null != prop.hd)
+				this.hd = prop.hd;
+			else
+				this.hd = null;
+			if(null != prop.CustomHeight)
+				this.CustomHeight = prop.CustomHeight;
+			else
+				this.CustomHeight = null;
+		}
 	},
 	copyProperty : function(otherRow)
 	{
