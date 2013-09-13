@@ -1923,6 +1923,10 @@ Col.prototype =
 	{
 		return this.id;
 	},
+	moveHor : function(nDif)
+	{
+		this.index += nDif;
+	},
 	isEqual : function(obj)
 	{
 		var bRes = this.BestFit == obj.BestFit && this.hd == obj.hd && this.width == obj.width && this.CustomWidth == obj.CustomWidth && this.merged == obj.merged && this.hyperlinks.length == obj.hyperlinks.length;

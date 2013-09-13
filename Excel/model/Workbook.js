@@ -2730,6 +2730,12 @@ Woorksheet.prototype._removeCols=function(start, stop){
 	unLockDraw(this.workbook);
 	
 	this.aCols.splice(start, stop - start + 1);
+	for(var i = start, length = this.aCols.length; i < length; ++i)
+	{
+		var elem = this.aCols[i];
+		if(null != elem)
+			elem.moveHor(nDif);
+	}
 	
 //	for(var id  in res)
 //		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, this.getId(), new Asc.Range(0, res[id].nRow, gc_nMaxCol0, res[id].nRow), new UndoRedoData_CellSimpleData(res[id].nRow, res[id].nCol, res[id].data, null));
@@ -2789,6 +2795,12 @@ Woorksheet.prototype._insertColsBefore=function(index, count){
         }
 		this.aCols.splice(index, 0, oNewCol);
     }
+	for(var i = index + count, length = this.aCols.length; i < length; ++i)
+	{
+		var elem = this.aCols[i];
+		if(null != elem)
+			elem.moveHor(count);
+	}
 	this.nColsCount += count;
 	
 //	for(var id  in res)
