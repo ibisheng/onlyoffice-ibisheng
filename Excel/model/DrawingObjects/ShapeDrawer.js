@@ -495,6 +495,30 @@ CShapeDrawer.prototype =
 
         var bIsCheckBounds = false;
 
+        if (graphics.ClearMode === true)
+        {
+            if (this.UniFill == null || this.UniFill.fill == null)
+                this.bIsNoFillAttack = true;
+            else
+            {
+                this.FillUniColor = { R : 0, G : 0, B : 0, A : 0 };
+            }
+
+            if (this.Ln == null || this.Ln.Fill == null || this.Ln.Fill.fill == null)
+                this.bIsNoStrokeAttack = true;
+            else
+            {
+                this.StrokeUniColor = { R : 0, G : 0, B : 0, A : 0 };
+
+                this.StrokeWidth = (this.Ln.w == null) ? 12700 : parseInt(this.Ln.w);
+                this.StrokeWidth /= 36000.0;
+
+                this.p_width(1000 * this.StrokeWidth);
+            }
+
+            return;
+        }
+
         if (this.UniFill == null || this.UniFill.fill == null)
             this.bIsNoFillAttack = true;
         else
@@ -632,6 +656,13 @@ CShapeDrawer.prototype =
             this.Graphics.put_TextureBounds(this.min_x, this.min_y, this.max_x - this.min_x, this.max_y - this.min_y);
         }
 
+        var _old_composite = null;
+        if (this.Graphics.ClearMode === true)
+        {
+            _old_composite = this.Graphics.m_oContext.globalCompositeOperation;
+            this.Graphics.m_oContext.globalCompositeOperation = "copy";
+        }
+
         if(geom)
         {
             geom.draw(this);
@@ -657,6 +688,11 @@ CShapeDrawer.prototype =
         if (this.Graphics.IsSlideBoundsCheckerType && this.Graphics.AutoCheckLineWidth)
         {
             this.Graphics.CorrectBounds2();
+        }
+
+        if (this.Graphics.ClearMode === true)
+        {
+            this.Graphics.m_oContext.globalCompositeOperation = _old_composite;
         }
     },
 
@@ -1019,7 +1055,7 @@ CShapeDrawer.prototype =
         }
         if(rgba)
         {
-            if (this.UniFill != null && this.UniFill.transparent != null)
+            if (this.UniFill != null && this.UniFill.transparent != null && this.Graphics.ClearMode !== true)
                 rgba.A = this.UniFill.transparent;
             this.Graphics.b_color1(rgba.R, rgba.G, rgba.B, rgba.A);
         }

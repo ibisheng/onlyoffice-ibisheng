@@ -497,6 +497,8 @@ function CGraphics()
 
     this.TextClipRect = null;
     this.IsClipContext = false;
+
+    this.ClearMode = false;
 }
 
 CGraphics.prototype =
