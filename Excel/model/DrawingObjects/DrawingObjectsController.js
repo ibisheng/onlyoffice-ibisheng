@@ -237,7 +237,7 @@ DrawingObjectsController.prototype =
     setCellBackgroundColorCallBack: function (color) {
         if(typeof this.curState.setCellBackgroundColor === "function")
         {
-                History.Create_NewPoint();;
+                History.Create_NewPoint();
                 this.curState.setCellBackgroundColor(color);
         }
     },

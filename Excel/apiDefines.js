@@ -387,7 +387,9 @@ var c_oAscTypeSelectElement = {
 	Image      : 2,
 	Header     : 3,
     Hyperlink  : 4,
-    SpellCheck : 5
+    SpellCheck : 5,
+    Shape:6,
+    Slide:7
 };
 
 var c_oAscFillGradType  = {
