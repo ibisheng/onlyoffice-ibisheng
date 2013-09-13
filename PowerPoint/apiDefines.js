@@ -121,11 +121,14 @@ var c_oAscError = {
 	}
 };
 var c_oAscTypeSelectElement = {
-	Paragraph: 0,
-	Table:1,
-	Image:2,
-	Shape:3,
-    Slide:4
+    Paragraph  : 0,
+    Table      : 1,
+    Image      : 2,
+    Header     : 3,
+    Hyperlink  : 4,
+    SpellCheck : 5,
+    Shape:6,
+    Slide:7
 };
 
 var c_oAscContextMenuTypes = {
