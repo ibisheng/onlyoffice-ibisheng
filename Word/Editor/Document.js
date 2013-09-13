@@ -2010,6 +2010,7 @@ CDocument.prototype =
                     case para_Text:
                     case para_Space:
                     case para_Tab:
+                    case para_PageNum:
                     {
                         // Если у нас что-то заселекчено и мы вводим текст или пробел
                         // и т.д., тогда сначала удаляем весь селект.
