@@ -495,6 +495,8 @@ CShapeDrawer.prototype =
 
         var bIsCheckBounds = false;
 
+        /*
+        // чуть подольше, но зато с полной поддержкой прозрачности
         if (graphics.ClearMode === true)
         {
             if (this.UniFill == null || this.UniFill.fill == null)
@@ -518,6 +520,7 @@ CShapeDrawer.prototype =
 
             return;
         }
+        */
 
         if (this.UniFill == null || this.UniFill.fill == null)
             this.bIsNoFillAttack = true;
