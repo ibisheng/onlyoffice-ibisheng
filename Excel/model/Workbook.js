@@ -3201,7 +3201,7 @@ Woorksheet.prototype._removeCell=function(nRow, nCol, cell){
 				arrRecalc[this.getId()] = {};
 			}
 			arrRecalc[this.getId()][cell.getName()] = cell.getName();
-            if( ws.workbook.dependencyFormulas.getNode(this.ws.getId(),this.getName()) && !this.workbook.needRecalc[ getVertexId(this.getId(),cell.getName()) ] ){
+            if( this.workbook.dependencyFormulas.getNode(this.getId(),this.getName()) && !this.workbook.needRecalc[ getVertexId(this.getId(),cell.getName()) ] ){
                 this.workbook.needRecalc[ getVertexId(this.getId(),cell.getName()) ] = [ this.getId(),cell.getName() ];
                 if( this.workbook.needRecalc.length < 0) this.workbook.needRecalc.length = 0;
                 this.workbook.needRecalc.length++;
