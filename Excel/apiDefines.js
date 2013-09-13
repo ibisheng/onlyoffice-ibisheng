@@ -369,6 +369,18 @@ var c_oAscLineBeginType = {
     Triangle: 5
 };
 
+var c_oAscTypeSelectElement = {
+    Paragraph  : 0,
+    Table      : 1,
+    Image      : 2,
+    Header     : 3,
+    Hyperlink  : 4,
+    SpellCheck : 5,
+    Shape:6,
+    Slide:7,
+    Chart: 8
+};
+
 var c_oAscLineBeginSize = {
     small_small : 0,
     small_mid : 1,
@@ -393,6 +405,35 @@ var c_oAscVerticalTextAlign = {
     TEXT_ALIGN_DIST : 2,// (Text Anchor Enum ( Distributed ))
     TEXT_ALIGN_JUST : 3,// (Text Anchor Enum ( Justified ))
     TEXT_ALIGN_TOP : 4// Top
+};
+
+
+// Chart defines
+var c_oAscChartType = {
+    line: "Line",
+    bar: "Bar",
+    hbar: "HBar",
+    area: "Area",
+    pie: "Pie",
+    scatter: "Scatter",
+    stock: "Stock"
+};
+
+var c_oAscChartSubType = {
+    normal: "normal",
+    stacked: "stacked",
+    stackedPer: "stackedPer"
+};
+
+var c_oAscChartStyle = {
+    Dark: 1,
+    Standart: 2,
+    Accent1: 3,
+    Accent2: 4,
+    Accent3: 5,
+    Accent4: 6,
+    Accent5: 7,
+    Accent6: 8
 };
  
 var c_oAscCoAuthoringMeBorderColor					= "rgba(22,156,0,1)";

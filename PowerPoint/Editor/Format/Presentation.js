@@ -6313,6 +6313,21 @@ CPresentation.prototype =
             }
         }
 
+        if(CheckType === changestype_SlideTiming)
+        {
+            var selected_slides = editor.WordControl.Thumbnails.GetSelectedArray();
+            for(var i = 0; i < selected_slides.length; ++i)
+            {
+                var check_obj =
+                {
+                    "type": c_oAscLockTypeElemPresentation.Slide,
+                    "val": this.Slides[selected_slides[i]].timingLock.Get_Id(),
+                    "guid": this.Slides[selected_slides[i]].timingLock.Get_Id()
+                };
+                this.Slides[selected_slides[i]].timingLock.Lock.Check(check_obj);
+            }
+        }
+
         if(CheckType === changestype_Text_Props)
         {
             if(cur_slide.deleteLock.Lock.Type !== locktype_Mine && cur_slide.deleteLock.Lock.Type !== locktype_None)

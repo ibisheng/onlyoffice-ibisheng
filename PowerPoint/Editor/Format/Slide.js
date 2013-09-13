@@ -906,7 +906,7 @@ Slide.prototype =
     applyTiming: function(timing)
     {
         var oldTiming = this.timing.createDuplicate();
-        this.timing.applyProps(oTiming);
+        this.timing.applyProps(timing);
         History.Add(this, {Type: historyitem_ChangeTiming, oldTiming: oldTiming, newTiming: this.timing.createDuplicate()});
 
     },

@@ -4180,16 +4180,17 @@ asc_docs_api.prototype.DemonstrationGoToSlide = function(slideNum)
 
 asc_docs_api.prototype.ApplySlideTiming = function(oTiming)
 {
-    var _count = this.WordControl.m_oDrawingDocument.SlidesCount;
-    var _cur = this.WordControl.m_oDrawingDocument.SlideCurrent;
-    if (_cur < 0 || _cur >= _count)
-        return;
-    var _curSlide = this.WordControl.m_oLogicDocument.Slides[_cur];
-    _curSlide.timing.applyProps(oTiming);
-
-    this.sync_BeginCatchSelectedElements();
-    this.sync_slidePropCallback(_curSlide);
-    this.sync_EndCatchSelectedElements();
+    if(this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_SlideTiming) === false)
+    {
+        History.Create_NewPoint();
+        var _count = this.WordControl.m_oDrawingDocument.SlidesCount;
+        var _cur = this.WordControl.m_oDrawingDocument.SlideCurrent;
+        if (_cur < 0 || _cur >= _count)
+            return;
+        var _curSlide = this.WordControl.m_oLogicDocument.Slides[_cur];
+        _curSlide.applyTiming(oTiming);
+    }
+    this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
 }
 asc_docs_api.prototype.SlideTimingApplyToAll = function()
 {

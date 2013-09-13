@@ -102,6 +102,17 @@ var c_oAscError = {
 	}
 };
 
+var c_oAscTypeSelectElement = {
+    Paragraph  : 0,
+    Table      : 1,
+    Image      : 2,
+    Header     : 3,
+    Hyperlink  : 4,
+    SpellCheck : 5,
+    Shape:6,
+    Slide:7,
+    Chart: 8
+};
 
 var c_oAscTableBordersType = {
 	LEFT:0,
@@ -127,6 +138,34 @@ var c_oAscLineDrawingRule = {
     Right  : 2,
     Top    : 0,
     Bottom : 2
+};
+
+// Chart defines
+var c_oAscChartType = {
+    line: "Line",
+    bar: "Bar",
+    hbar: "HBar",
+    area: "Area",
+    pie: "Pie",
+    scatter: "Scatter",
+    stock: "Stock"
+};
+
+var c_oAscChartSubType = {
+    normal: "normal",
+    stacked: "stacked",
+    stackedPer: "stackedPer"
+};
+
+var c_oAscChartStyle = {
+    Dark: 1,
+    Standart: 2,
+    Accent1: 3,
+    Accent2: 4,
+    Accent3: 5,
+    Accent4: 6,
+    Accent5: 7,
+    Accent6: 8
 };
 
 var align_Right   = 0;

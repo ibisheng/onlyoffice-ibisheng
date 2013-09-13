@@ -24,22 +24,7 @@ var c_oAscNumFormatType = {
 	Fraction : 10
 }
 
-// Chart defines
-var c_oAscChartType = {
-	line: "Line",
-	bar: "Bar",
-	hbar: "HBar",
-	area: "Area",
-	pie: "Pie",
-	scatter: "Scatter",
-	stock: "Stock"
- };
 
- var c_oAscChartSubType = {
-	normal: "normal",
-	stacked: "stacked",
-	stackedPer: "stackedPer"
- };
 
  var c_oAscChartLegend = {
 	left: "left",
@@ -61,16 +46,7 @@ var c_oAscChartType = {
 	SendBackward: 3
  };
  
- var c_oAscChartStyle = {
-	Dark: 1,
-	Standart: 2,
-	Accent1: 3,
-	Accent2: 4,
-	Accent3: 5,
-	Accent4: 6,
-	Accent5: 7,
-	Accent6: 8
-};
+
 
 var	c_oAscTransactionState = { 
 	No: -1,
@@ -97,15 +73,3 @@ var c_oAscLineDrawingRule = {
     Bottom : 2
 };
 
-
-var c_oAscTypeSelectElement = {
-    Paragraph  : 0,
-    Table      : 1,
-    Image      : 2,
-    Header     : 3,
-    Hyperlink  : 4,
-    SpellCheck : 5,
-    Shape:6,
-    Slide:7,
-    Chart: 8
-};
