@@ -501,14 +501,14 @@ CShapeDrawer.prototype =
                 this.bIsNoFillAttack = true;
             else
             {
-                this.FillUniColor = { R : 0, G : 0, B : 0, A : 0 };
+                this.FillUniColor = { R : 0, G : 0, B : 0, A : 255 };
             }
 
             if (this.Ln == null || this.Ln.Fill == null || this.Ln.Fill.fill == null)
                 this.bIsNoStrokeAttack = true;
             else
             {
-                this.StrokeUniColor = { R : 0, G : 0, B : 0, A : 0 };
+                this.StrokeUniColor = { R : 0, G : 0, B : 0, A : 255 };
 
                 this.StrokeWidth = (this.Ln.w == null) ? 12700 : parseInt(this.Ln.w);
                 this.StrokeWidth /= 36000.0;
@@ -660,7 +660,7 @@ CShapeDrawer.prototype =
         if (this.Graphics.ClearMode === true)
         {
             _old_composite = this.Graphics.m_oContext.globalCompositeOperation;
-            this.Graphics.m_oContext.globalCompositeOperation = "copy";
+            this.Graphics.m_oContext.globalCompositeOperation = "destination-out";
         }
 
         if(geom)
