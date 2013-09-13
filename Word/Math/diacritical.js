@@ -765,17 +765,18 @@ CSign.prototype.draw_breve = function(up)
 
 function CTilde()
 {
+    this.incline = 0;
     CBaseDiacritic.call(this);
 }
 extend(CTilde, CBaseDiacritic);
-CTilde.prototype.recalculateSize = function()
+CTilde.prototype.fixSize = function()
 {
     var betta = this.getTxtPrp().FontSize/36;
 
     var width = 9.047509765625*betta; // реальная на отрисовке width 7.495282031249999
     var height = 2.469444444444444*betta;
 
-    this.size = {width: width, heigth: height};
+    this.size = {width: width, height: height};
 }
 CTilde.prototype.draw = function()
 {
@@ -1001,10 +1002,15 @@ function CAccent()
     this.accent   = null;
     CMathBase.call(this);
 }
-extend(old_CAccent, CMathBase);
+extend(CAccent, CMathBase);
 CAccent.prototype.init = function(props)
 {
-    var code = props.chr.value.charCodeAt(0);
+    var code;
+
+    if(typeof(props.chr.value) === "string")
+        code = props.chr.value.charCodeAt(0);
+
+    // var code = props.chr.value.charCodeAt(0);
 
     var bDot        = code === 0x307 || props.chr.type === ACCENT_ONE_DOT,
         b2Dots      = code === 0x308 || props.chr.type === ACCENT_TWO_DOTS,
@@ -1038,6 +1044,10 @@ CAccent.prototype.init = function(props)
         this.accent = new CLine();
         this.accent.setPrp(DOUBLE_LINE);
     }
+    else if(code === 0x303 || props.chr.type === ACCENT_TILDE)
+    {
+        this.accent = new CTilde();
+    }
     else
     {
         this.accent = new CMathText();
@@ -1046,6 +1056,8 @@ CAccent.prototype.init = function(props)
         this.bDiacritic = false;
     }
 
+    var tPrp = this.getTxtPrp();
+    this.accent.setTxtPrp(tPrp);
 
     this.setDimension(1, 1);
     this.setContent();
@@ -1057,7 +1069,7 @@ CAccent.prototype.recalculateSize = function()
     this.dH = 0.7*this.getTxtPrp().FontSize/36;
 
     if(this.bDiacritic)
-        this.accent.fixSize(content.size.width, content.Incline());
+        this.accent.fixSize(content.size.width, content.IsIncline());
 
     var height = this.accent.size.height + content.size.height,
         center = this.accent.size.height + content.size.center;
@@ -1077,10 +1089,26 @@ CAccent.prototype.recalculateSize = function()
 CAccent.prototype.setPosition = function(pos)
 {
     this.pos = {x: pos.x, y: pos.y - this.size.center};
-    var pos = 
-        {
-            x: this.pos.x + (this.size.width - this.elements[0][0].size.width)/2;
-        };
 
-    this.elements[0][0].setPosition()
+    var pos =
+    {
+        x: this.pos.x + (this.size.width - this.accent.size.width)/2,
+        y: this.pos.y
+    };
+
+    this.accent.setPosition(pos);
+
+    var content = this.elements[0][0];
+    pos =
+    {
+        x: this.pos.x + (this.size.width - content.size.width)/2,
+        y: this.pos.y + this.accent.size.height
+    };
+
+    this.elements[0][0].setPosition(pos);
+}
+CAccent.prototype.draw = function()
+{
+    this.accent.draw();
+    this.elements[0][0].draw();
 }

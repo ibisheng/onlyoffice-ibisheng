@@ -96,7 +96,8 @@ var ACCENT_LINE                 =  7;
 var ACCENT_DOUBLE_LINE          =  8;
 var SINGLE_LINE                 =  9;
 var DOUBLE_LINE                 = 10;
-var MATH_TEXT                   = 11;
+var ACCENT_TILDE                = 11;
+var MATH_TEXT                   = 12;
 
 var MATRIX_CENTER               =  0;
 var MATRIX_TOP                  =  1;

@@ -38,10 +38,11 @@ function mathElem(_val)
 }
 
 
+//TODO
+// доделать GroupCharacter / Delimiter в качестве cheracter может быть любой символ
 
 //TODO
 //переделать/продумать DotIndef, т.к. при перетаскивании из одного места в другое флаг DotIndef может измениться для другого контента
-
 
 //TODO
 //пересмотреть this.dW и this.dH
@@ -61,8 +62,7 @@ function mathElem(_val)
 
 // TODO Refactoring
 
-// 1.
-// 2. (!!) повтор IsIncline, IsHighElement
+// 1. (!!) повтор IsIncline, IsHighElement
 
 
 function CMathContent()
@@ -3961,15 +3961,7 @@ CMathContent.prototype =
                     /*var diac = this.addMComponent(15);
                     diac.init(3);
                     diac.fillPlaceholders();*/
-                    var delim = this.addMComponent(MATH_GROUP_CHARACTER);
-                    var props =
-                    {
-                        chr:            {value: "."},
-                        location:       LOCATION_TOP,
-                        justif:         VJUST_BOT
-                    };
-                    delim.init(props);
-                    delim.fillPlaceholders();
+
                     break;
                 case 153:
                     var diac = this.addMComponent(15);
@@ -4010,10 +4002,13 @@ CMathContent.prototype =
                     diac.fillPlaceholders();
                     break;
                 case 160:
-                    var diac = this.addMComponent(13);
-                    diac.init();
-                    diac.setIndex(2);
-                    diac.fillPlaceholders();
+                    var accent = this.addMComponent(MATH_ACCENT);
+                    var props =
+                    {
+                        chr:            {type:      ACCENT_TILDE}
+                    };
+                    accent.init(props);
+                    accent.fillPlaceholders();
                     break;
                 case 161:
                     var line = this.addMComponent(14);
