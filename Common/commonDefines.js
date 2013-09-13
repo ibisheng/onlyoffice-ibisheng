@@ -96,3 +96,16 @@ var c_oAscLineDrawingRule = {
     Top    : 0,
     Bottom : 2
 };
+
+
+var c_oAscTypeSelectElement = {
+    Paragraph  : 0,
+    Table      : 1,
+    Image      : 2,
+    Header     : 3,
+    Hyperlink  : 4,
+    SpellCheck : 5,
+    Shape:6,
+    Slide:7,
+    Chart: 8
+};

@@ -903,6 +903,13 @@ function Slide(presentation, slideLayout, slideNum)
 
 Slide.prototype =
 {
+    applyTiming: function(timing)
+    {
+        var oldTiming = this.timing.createDuplicate();
+        this.timing.applyProps(oTiming);
+        History.Add(this, {Type: historyitem_ChangeTiming, oldTiming: oldTiming, newTiming: this.timing.createDuplicate()});
+
+    },
 
     changeBackground: function(bg)
     {
@@ -1396,6 +1403,11 @@ Slide.prototype =
 
                 break;
             }
+            case historyitem_ChangeTiming:
+            {
+                this.timing = data.oldTiming.createDuplicate();
+                break;
+            }
         }
     },
 
@@ -1428,6 +1440,11 @@ Slide.prototype =
                 this.recalcInfo.recalculateBackground = true;
                 editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
 
+                break;
+            }
+            case historyitem_ChangeTiming:
+            {
+                this.timing = data.newTiming.createDuplicate();
                 break;
             }
         }
@@ -1464,6 +1481,12 @@ Slide.prototype =
                 w.WriteString2(data.layoutLock);
                 break;
             }
+
+            case historyitem_ChangeTiming:
+            {
+                data.newTiming.Write_ToBinary2(w);
+                break;
+            }
         }
     },
 
@@ -1491,6 +1514,12 @@ Slide.prototype =
                 this.timingLock     = g_oTableId.Get_ById(r.GetString2());
                 this.transitionLock = g_oTableId.Get_ById(r.GetString2());
                 this.layoutLock     = g_oTableId.Get_ById(r.GetString2());
+                break;
+            }
+            case historyitem_ChangeTiming:
+            {
+                this.timing = new CAscSlideTiming();
+                this.timing.Read_FromBinary2(r);
                 break;
             }
         }

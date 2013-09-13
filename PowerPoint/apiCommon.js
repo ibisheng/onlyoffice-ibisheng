@@ -172,6 +172,59 @@ CAscSlideTiming.prototype.setDefaultParams = function()
     this.SlideAdvanceDuration       = 10000;
 }
 
+CAscSlideTiming.prototype.Write_ToBinary2 = function(w)
+{
+    w.WriteBool(isRealNumber(this.TransitionType));
+    if(isRealNumber(this.TransitionType))
+        w.WriteLong(this.TransitionType);
+
+    w.WriteBool(isRealNumber(this.TransitionOption));
+    if(isRealNumber(this.TransitionOption))
+        w.WriteLong(this.TransitionOption);
+
+    w.WriteBool(isRealNumber(this.TransitionDuration));
+    if(isRealNumber(this.TransitionDuration))
+        w.WriteLong(this.TransitionDuration);
+
+
+    w.WriteBool(isRealBool(this.SlideAdvanceOnMouseClick));
+    if(isRealBool(this.SlideAdvanceOnMouseClick))
+        w.WriteBool(this.SlideAdvanceOnMouseClick);
+
+    w.WriteBool(isRealBool(this.SlideAdvanceAfter));
+    if(isRealBool(this.SlideAdvanceAfter))
+        w.WriteBool(this.SlideAdvanceAfter);
+
+    w.WriteBool(isRealNumber(this.SlideAdvanceDuration));
+    if(isRealNumber(this.SlideAdvanceDuration))
+        w.WriteLong(this.SlideAdvanceDuration);
+};
+
+CAscSlideTiming.prototype.Read_FromBinary2 = function(r)
+{
+
+    if(r.GetBool())
+        this.TransitionType = r.GetLong();
+
+    if(r.GetBool())
+        this.TransitionOption = r.GetLong();
+
+
+    if(r.GetBool())
+        this.TransitionDuration = r.GetLong();
+
+
+    if(r.GetBool())
+        this.SlideAdvanceOnMouseClick = r.GetBool();
+
+
+    if(r.GetBool())
+        this.SlideAdvanceAfter = r.GetBool();
+
+    if(r.GetBool())
+        this.SlideAdvanceDuration = r.GetLong();
+};
+
 // ---------------------------------------------------------------
 
 function CAscTexture()

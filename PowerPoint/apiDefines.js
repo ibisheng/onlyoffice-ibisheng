@@ -120,16 +120,6 @@ var c_oAscError = {
 		UserCountExceed: 		-22
 	}
 };
-var c_oAscTypeSelectElement = {
-    Paragraph  : 0,
-    Table      : 1,
-    Image      : 2,
-    Header     : 3,
-    Hyperlink  : 4,
-    SpellCheck : 5,
-    Shape:6,
-    Slide:7
-};
 
 var c_oAscContextMenuTypes = {
     Main       : 0,

@@ -381,16 +381,6 @@ var c_oAscLineBeginSize = {
     large_large : 8
 };
 
-var c_oAscTypeSelectElement = {
-	Paragraph  : 0,
-	Table      : 1,
-	Image      : 2,
-	Header     : 3,
-    Hyperlink  : 4,
-    SpellCheck : 5,
-    Shape:6,
-    Slide:7
-};
 
 var c_oAscFillGradType  = {
     GRAD_LINEAR : 1,
