@@ -1451,6 +1451,31 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
             res = c_oSerConstants.ReadUnknown;
 		return res;
 	}
+	this.InitOldChartTitle = function(chartTitle, sTitle)
+	{
+		//todo если изменится открытие презентаций с историей, то переделать здесь.
+		var txBody = new CTextBody(chartTitle);
+		var oCurParagraph = new Paragraph(null, txBody.content, 0, 0, 0, 0, 0);
+		var nCurPos = 0;
+		txBody.content.Internal_Content_Add(txBody.content.Content.length, oCurParagraph);
+		for(var i = 0, length = sTitle.length; i < length; ++i)
+		{
+			var nChart = sTitle[i];
+			if(' ' == nChart)
+				oCurParagraph.Internal_Content_Add(nCurPos++, new ParaSpace());
+			else if('\n' == nChart)
+			{
+				oCurParagraph = new Paragraph(null, txBody.content, 0, 0, 0, 0, 0);
+				nCurPos = 0;
+				txBody.content.Internal_Content_Add(txBody.content.Content.length, oCurParagraph);
+			}
+			else if('\r' == nChart)
+				;
+			else
+				oCurParagraph.Internal_Content_Add(nCurPos++, new ParaText(nChart));
+		}
+		chartTitle.setTextBody(txBody);
+	}
 	this.ReadChart = function(type, length)
 	{
         var res = c_oSerConstants.ReadOk;
@@ -1468,6 +1493,12 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 			var sTitle = this.stream.GetString2LE(length);
 			if("" == sTitle)
 				this.chart.header.bDefaultTitle = true;
+			else
+			{
+				if(!isRealObject(this.chartAsGroup.chartTitle))
+					this.chartAsGroup.chartTitle = new CChartTitle(this.chartAsGroup, CHART_TITLE_TYPE_TITLE);
+				this.InitOldChartTitle(this.chartAsGroup.chartTitle, sTitle);
+			}
 		}
 		else if ( c_oSer_ChartType.PlotArea === type )
 		{
@@ -1680,14 +1711,14 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
         {
 			oAxis.CatAx = {title: null, bDefaultTitle: null, bGrid: null, bShow: null, axPos: null, titlefont: null, lablefont: null};
 			res = this.bcr.Read1(length, function(t,l){
-					return oThis.ReadAx(t,l, oAxis.CatAx);
+					return oThis.ReadAx(t,l, oAxis.CatAx, false);
 				});
 		}
 		else if ( c_oSer_ChartPlotAreaType.ValAx === type )
         {
 			var oNewValAx = {title: null, bDefaultTitle: null, bGrid: null, bShow: null, axPos: null, titlefont: null, lablefont: null};
 			res = this.bcr.Read1(length, function(t,l){
-					return oThis.ReadAx(t,l, oNewValAx);
+					return oThis.ReadAx(t,l, oNewValAx, true);
 				});
 			oAxis.aValAx.push(oNewValAx);
 		}
@@ -1710,7 +1741,7 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
             res = c_oSerConstants.ReadUnknown;
 		return res;
 	}
-	this.ReadAx = function(type, length, oAx)
+	this.ReadAx = function(type, length, oAx, bValAx)
 	{
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
@@ -1720,6 +1751,18 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 			var sTitle = this.stream.GetString2LE(length);
 			if("" == sTitle)
 				oAx.bDefaultTitle = true;
+			else
+			{
+				if(!isRealObject(oAx.chartTitle))
+					oAx.chartTitle = new CChartTitle(this.chartAsGroup, CHART_TITLE_TYPE_TITLE);
+				this.InitOldChartTitle(oAx.chartTitle, sTitle);
+				if(bValAx && null != oAx.chartTitle && null != oAx.chartTitle.txBody && null != oAx.chartTitle.txBody.bodyPr)
+				{
+					var bodyPr = oAx.chartTitle.txBody.bodyPr;
+					bodyPr.rot = -5400000;
+					bodyPr.vert = nVertTThorz;
+				}
+			}
 		}
 		else if ( c_oSer_ChartCatAxType.MajorGridlines === type )
 			oAx.bGrid = this.stream.GetBool();
