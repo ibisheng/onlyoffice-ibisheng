@@ -449,6 +449,7 @@ CStylesPainter.prototype.get_DocStylesImage = function() { return this.docStyles
 CStylesPainter.prototype.get_MergedStyles = function() { return this.mergedStyles; }
 CStylesPainter.prototype.get_STYLE_THUMBNAIL_WIDTH = function() { return this.STYLE_THUMBNAIL_WIDTH; }
 CStylesPainter.prototype.get_STYLE_THUMBNAIL_HEIGHT = function() { return this.STYLE_THUMBNAIL_HEIGHT; }
+CStylesPainter.prototype.get_IsRetinaEnabled = function() { return this.IsRetinaEnabled; }
 
 CStyleImage.prototype.get_ThumbnailOffset = function() { return this.ThumbnailOffset; }
 CStyleImage.prototype.get_Type = function() { return this.Type; }
@@ -3242,8 +3243,8 @@ asc_docs_api.prototype.sync_InitEditorStyles = function(styles_painter){
     if (ret)
         this._gui_styles = null;
 }
-asc_docs_api.prototype.sync_InitEditorTableStyles = function(styles){
-    this.asc_fireCallback("asc_onInitTableTemplates",styles);
+asc_docs_api.prototype.sync_InitEditorTableStyles = function(styles, is_retina_enabled){
+    this.asc_fireCallback("asc_onInitTableTemplates",styles, is_retina_enabled);
 }
 
 

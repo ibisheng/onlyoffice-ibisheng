@@ -2036,11 +2036,27 @@ function CEditorPage(api)
         }
 
         var oWordControl = oThis;
-        if (false === oWordControl.m_oApi.bInit_word_control || oWordControl.m_bIsMouseLock === true)
+        if (false === oWordControl.m_oApi.bInit_word_control)
         {
             check_KeyboardEvent2(e);
             e.preventDefault();
             return;
+        }
+
+        if (oWordControl.m_bIsMouseLock === true)
+        {
+            if (!window.USER_AGENT_MACOS)
+            {
+                check_KeyboardEvent2(e);
+                e.preventDefault();
+                return;
+            }
+
+            // на масОс есть мега выделение на трекпаде. там моусАп приходит с задержкой.
+            // нужно лдибо копить команды клавиатуры, либо насильно заранее сделать моусАп самому.
+            // мы выбараем второе
+
+            oWordControl.onMouseUpExternal(global_mouseEvent.X, global_mouseEvent.Y);
         }
 
         check_KeyboardEvent(e);
@@ -3062,7 +3078,7 @@ function CEditorPage(api)
     {
         if (this.bIsRetinaSupport)
         {
-            if (htmlElem.id == "id_viewer")
+            if (htmlElem.id == "id_viewer" || htmlElem.id == "id_hor_ruler" || htmlElem.id == "id_vert_ruler")
                 return true;
         }
         return false;

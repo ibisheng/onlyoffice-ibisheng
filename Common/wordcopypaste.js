@@ -21,7 +21,8 @@
     }
 }
 
-window.USER_AGENT_SAFARI_MACOS = (navigator.userAgent.toLowerCase().indexOf('safari') > -1 && navigator.userAgent.toLowerCase().indexOf('mac') > -1) ? true : false;
+window.USER_AGENT_MACOS = (navigator.userAgent.toLowerCase().indexOf('mac') > -1) ? true : false;
+window.USER_AGENT_SAFARI_MACOS = (navigator.userAgent.toLowerCase().indexOf('safari') > -1 && window.USER_AGENT_MACOS) ? true : false;
 if (window.USER_AGENT_SAFARI_MACOS)
 {
     // браузеры под мак все определяются как сафари
@@ -30,6 +31,7 @@ if (window.USER_AGENT_SAFARI_MACOS)
         window.USER_AGENT_SAFARI_MACOS = false;
 }
 window.USER_AGENT_IE = ((/MSIE/g.test(navigator.userAgent)) || window.opera) ? true : false;
+window.USER_AGENT_WEBKIT = (navigator.userAgent.toLowerCase().indexOf('webkit') > -1) ? true : false;
 
 window.GlobalPasteFlagCounter = 0;
 
@@ -239,8 +241,7 @@ function Editor_Copy(api, bCut)
         {
             //�������� � webkit: ���� ���������� ����� ���� ��������, �� ���������� ������ ��� ������������
             //������ ��� docs.google ����������� ��� � ��� <b>
-            var is_webkit = navigator.userAgent.toLowerCase().indexOf('webkit') > -1;
-            if(is_webkit && (true !== window.USER_AGENT_SAFARI_MACOS))
+            if(window.USER_AGENT_WEBKIT && (true !== window.USER_AGENT_SAFARI_MACOS))
             {
                 var aChildNodes = ElemToSelect.childNodes;
                 if(aChildNodes.length == 1)

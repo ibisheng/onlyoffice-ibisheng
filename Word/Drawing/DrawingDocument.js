@@ -2784,7 +2784,7 @@ function CDrawingDocument()
                 ctx.stroke();
             }
 
-            if (!oThis.m_oWordControl.MobileTouchManager)
+            if ((!oThis.m_oWordControl.MobileTouchManager && !window.USER_AGENT_SAFARI_MACOS) || !window.USER_AGENT_WEBKIT)
             {
                 this.TargetHtmlElement.style.left = Math.min(pos1.X, pos2.X) + "px";
                 this.TargetHtmlElement.style.top = Math.min(pos1.Y, pos2.Y) + "px";
@@ -2795,7 +2795,6 @@ function CDrawingDocument()
                 var __y =  Math.min(pos1.Y, pos2.Y);
                 oThis.TargetHtmlElement.style.left = "0px";
                 oThis.TargetHtmlElement.style.top  = "0px";
-                //oThis.TargetHtmlElement.style.webkitTransform = "translate(" + __x + "px," + __y + "px)";
                 oThis.TargetHtmlElement.style["webkitTransform"] = "matrix(1, 0, 0, 1, " +__x + "," + __y + ")";
             }
         }
@@ -2828,7 +2827,7 @@ function CDrawingDocument()
 
             var pos = this.ConvertCoordsToCursor2(x, y, this.m_lCurrentPage);
 
-            if (!oThis.m_oWordControl.MobileTouchManager)
+            if (!oThis.m_oWordControl.MobileTouchManager && !window.USER_AGENT_SAFARI_MACOS)
             {
                 this.TargetHtmlElement.style.left = pos.X + "px";
                 this.TargetHtmlElement.style.top = pos.Y + "px";
@@ -2837,7 +2836,6 @@ function CDrawingDocument()
             {
                 oThis.TargetHtmlElement.style.left = "0px";
                 oThis.TargetHtmlElement.style.top  = "0px";
-                //oThis.TargetHtmlElement.style.webkitTransform = "translate(" + pos.X + "px," + pos.Y + "px)";
                 oThis.TargetHtmlElement.style["webkitTransform"] = "matrix(1, 0, 0, 1, " + pos.X + "," + pos.Y + ")";
             }
 
@@ -5095,8 +5093,17 @@ function CDrawingDocument()
             Grid[i] = W / Cols;
 
         var _canvas = document.createElement('canvas');
-        _canvas.width = TABLE_STYLE_WIDTH_PIX;
-        _canvas.height = TABLE_STYLE_HEIGHT_PIX;
+
+        if (!this.m_oWordControl.bIsRetinaSupport)
+        {
+            _canvas.width = TABLE_STYLE_WIDTH_PIX;
+            _canvas.height = TABLE_STYLE_HEIGHT_PIX;
+        }
+        else
+        {
+            _canvas.width = (TABLE_STYLE_WIDTH_PIX << 1);
+            _canvas.height = (TABLE_STYLE_HEIGHT_PIX << 1);
+        }
         var ctx = _canvas.getContext('2d');
 
         History.TurnOff();
@@ -5133,7 +5140,7 @@ function CDrawingDocument()
         }
         History.TurnOn();
 
-        this.m_oWordControl.m_oApi.sync_InitEditorTableStyles(_dst_styles);
+        this.m_oWordControl.m_oApi.sync_InitEditorTableStyles(_dst_styles, this.m_oWordControl.bIsRetinaSupport);
     }
 
     this.IsMobileVersion = function()
@@ -5607,9 +5614,17 @@ function CStylesPainter()
     this.STYLE_THUMBNAIL_HEIGHT = 40;
 
     this.CurrentTranslate = null;
+    this.IsRetinaEnabled = false;
 
     this.GenerateStyles = function(_api, ds)
     {
+        if (_api.WordControl.bIsRetinaSupport)
+        {
+            this.STYLE_THUMBNAIL_WIDTH  <<= 1;
+            this.STYLE_THUMBNAIL_HEIGHT <<= 1;
+            this.IsRetinaEnabled = true;
+        }
+
         this.CurrentTranslate = _api.CurrentTranslate;
 
         this.GenerateDefaultStyles(_api, ds);

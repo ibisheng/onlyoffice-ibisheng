@@ -948,7 +948,10 @@ function CBinaryFileWriter()
                 {
                     oThis.WriteTable(spTree[i]);
                 }
-                // TODO: WriteChart
+                else if (spTree[i] instanceof CChartAsGroup)
+                {
+                    oThis.WriteChart(spTree[i]);
+                }
 
                 oThis.EndRecord();
             }
@@ -1997,9 +2000,6 @@ function CBinaryFileWriter()
 
         shape.spPr.WriteXfrm = shape.spPr.xfrm;
 
-        var tmpGeom = shape.spPr.Geometry;
-        shape.spPr.Geometry = shape.geometry;
-
         var tmpFill = shape.spPr.Fill;
         var isUseTmpFill = false;
         if (tmpFill !== undefined && tmpFill != null)
@@ -2020,7 +2020,6 @@ function CBinaryFileWriter()
         oThis.WriteRecord2(2, shape.style, oThis.WriteShapeStyle);
         oThis.WriteRecord2(3, shape.txBody, oThis.WriteTxBody);
 
-        shape.spPr.Geometry = tmpGeom;
         if (isUseTmpFill)
         {
             shape.spPr.Fill = tmpFill;
@@ -2039,10 +2038,10 @@ function CBinaryFileWriter()
 
         image.spPr.WriteXfrm = image.spPr.xfrm;
 
-        if (image.spPr.Geometry === undefined || image.spPr.Geometry == null)
+        if (image.spPr.geometry === undefined || image.spPr.geometry == null)
         {
             // powerpoint!
-            image.spPr.Geometry = CreateGeometry("rect");
+            image.spPr.geometry = CreateGeometry("rect");
         }
 
         oThis.WriteRecord1(1, image.blipFill, oThis.WriteUniFill);
@@ -2444,9 +2443,9 @@ function CBinaryFileWriter()
         }
 
         oThis.WriteRecord2(0, spPr.WriteXfrm, oThis.WriteXfrm);
-        oThis.WriteRecord1(1, spPr.Geometry, oThis.WriteGeometry);
+        oThis.WriteRecord2(1, spPr.geometry, oThis.WriteGeometry);
 
-        if (spPr.Geometry === undefined || spPr.Geometry == null)
+        if (spPr.geometry === undefined || spPr.geometry == null)
         {
             if (bIsExistFill || bIsExistLn)
             {

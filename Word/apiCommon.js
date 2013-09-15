@@ -924,8 +924,16 @@ function GenerateTableStyles(drawingDoc, logicDoc, tableLook)
         Grid[i] = W / Cols;
 
     var _canvas = document.createElement('canvas');
-    _canvas.width = TABLE_STYLE_WIDTH_PIX;
-    _canvas.height = TABLE_STYLE_HEIGHT_PIX;
+    if (!this.m_oWordControl.bIsRetinaSupport)
+    {
+        _canvas.width = TABLE_STYLE_WIDTH_PIX;
+        _canvas.height = TABLE_STYLE_HEIGHT_PIX;
+    }
+    else
+    {
+        _canvas.width = (TABLE_STYLE_WIDTH_PIX << 1);
+        _canvas.height = (TABLE_STYLE_HEIGHT_PIX << 1);
+    }
     var ctx = _canvas.getContext('2d');
 
     History.TurnOff();
