@@ -2542,15 +2542,18 @@ function CVerRuler()
         htmlElement.width = htmlElement.width;
         var context = htmlElement.getContext('2d');
 
-        if (!this.IsRetina && null != this.m_oCanvas)
+        if (null != this.m_oCanvas)
         {
-            context.drawImage(this.m_oCanvas, 0, 0, this.m_oCanvas.width, this.m_oCanvas.height,
-                0, top - 5, this.m_oCanvas.width, this.m_oCanvas.height);
-        }
-        else
-        {
-            context.drawImage(this.m_oCanvas, 0, 0, this.m_oCanvas.width, this.m_oCanvas.height,
-                0, (top - 5) << 1, this.m_oCanvas.width, this.m_oCanvas.height);
+            if (!this.IsRetina)
+            {
+                context.drawImage(this.m_oCanvas, 0, 0, this.m_oCanvas.width, this.m_oCanvas.height,
+                    0, top - 5, this.m_oCanvas.width, this.m_oCanvas.height);
+            }
+            else
+            {
+                context.drawImage(this.m_oCanvas, 0, 0, this.m_oCanvas.width, this.m_oCanvas.height,
+                    0, (top - 5) << 1, this.m_oCanvas.width, this.m_oCanvas.height);
+            }
         }
     }
 

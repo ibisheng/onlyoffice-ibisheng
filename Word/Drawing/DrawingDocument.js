@@ -4207,6 +4207,11 @@ function CDrawingDocument()
                 _ar[i] = new CTab(__tabs[i].Pos, g_tabtype_center);
             else if (__tabs[i].Value == tab_Right)
                 _ar[i] = new CTab(__tabs[i].Pos, g_tabtype_right);
+            else
+            {
+                // не должно такого быть. но приходит
+                _ar[i] = new CTab(__tabs[i].Pos, g_tabtype_left);
+            }
         }
 
         hor_ruler.CorrectTabs();

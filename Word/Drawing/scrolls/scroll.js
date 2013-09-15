@@ -42,7 +42,7 @@ function CArrowDrawer()
         if (size == this.Size && is_retina == this.IsRetina && null != this.ImageLeft)
             return;
 
-        this.Size = size;
+        this.Size = Math.max(size, 1);
         this.IsRetina = is_retina;
 
         if (this.IsRetina)
