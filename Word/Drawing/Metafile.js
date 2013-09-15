@@ -878,9 +878,13 @@ CMetafile.prototype =
         this.Memory.WriteByte(CommandType.ctBrushTexturePath);
 
         var _src = src;
-        var _search = editor.DocumentUrl;
-        if (0 == _src.indexOf(_search))
-            _src = _src.substring(_search.length);
+
+        if (window.editor)
+        {
+            var _search = window.editor.DocumentUrl;
+            if (0 == _src.indexOf(_search))
+                _src = _src.substring(_search.length);
+        }
 
         this.Memory.WriteString(_src);
         this.Memory.WriteByte(CommandType.ctBrushTextureMode);
@@ -1087,20 +1091,32 @@ CMetafile.prototype =
     // images
     drawImage : function(img,x,y,w,h)
     {
-        var _img = editor.ImageLoader.map_image_index[img];
+        if (!window.editor)
+        {
+            // excel
+            this.Memory.WriteByte(CommandType.ctDrawImageFromFile);
+            this.Memory.WriteString2(img);
+            this.Memory.WriteDouble(x);
+            this.Memory.WriteDouble(y);
+            this.Memory.WriteDouble(w);
+            this.Memory.WriteDouble(h);
+            return;
+        }
+
+        var _img = window.editor.ImageLoader.map_image_index[img];
         if (_img == undefined || _img.Image == null)
             return;
 
         var _src = _img.src;
-        var _search = editor.DocumentUrl;
+        var _search = window.editor.DocumentUrl;
         if (0 == _src.indexOf(_search))
             _src = _src.substring(_search.length);
         else
         {
-            if (editor.ThemeLoader !== undefined && editor.ThemeLoader != null)
+            if (window.editor.ThemeLoader !== undefined && window.editor.ThemeLoader != null)
             {
-                if (0 == _src.indexOf(editor.ThemeLoader.ThemesUrl))
-                    _src = _src.substring(editor.ThemeLoader.ThemesUrl.length);
+                if (0 == _src.indexOf(window.editor.ThemeLoader.ThemesUrl))
+                    _src = _src.substring(window.editor.ThemeLoader.ThemesUrl.length);
             }
         }
 
@@ -1530,7 +1546,10 @@ CDocumentRenderer.prototype =
                 this.m_arrayPages[this.m_lPagesCount - 1].drawImage(img,x,y,w,h);
             else
             {
-                var _img = editor.ImageLoader.map_image_index[img];
+                if (!window.editor)
+                    this.m_arrayPages[this.m_lPagesCount - 1].drawImage(img,x,y,w,h);
+
+                var _img = window.editor.ImageLoader.map_image_index[img];
                 var w0 = 0;
                 var h0 = 0;
                 if (_img != undefined && _img.Image != null)

@@ -1239,7 +1239,14 @@ CShapeDrawer.prototype =
                             }
                             else
                             {
-                                this.Graphics.put_brushTexture(getFullImageSrc(this.UniFill.fill.RasterImageId), 0);
+                                if (this.UniFill.fill.canvas)
+                                {
+                                    this.Graphics.put_brushTexture(this.UniFill.fill.canvas.toDataURL("image/png"), 0);
+                                }
+                                else
+                                {
+                                    this.Graphics.put_brushTexture(getFullImageSrc(this.UniFill.fill.RasterImageId), 0);
+                                }
                             }
                         }
                         else
@@ -1260,7 +1267,14 @@ CShapeDrawer.prototype =
                     }
                     else
                     {
-                        this.Graphics.put_brushTexture(getFullImageSrc(this.UniFill.fill.RasterImageId), 1);
+                        if (this.UniFill.fill.canvas)
+                        {
+                            this.Graphics.put_brushTexture(this.UniFill.fill.canvas.toDataURL("image/png"), 1);
+                        }
+                        else
+                        {
+                            this.Graphics.put_brushTexture(getFullImageSrc(this.UniFill.fill.RasterImageId), 1);
+                        }
                     }
                     this.Graphics.put_BrushTextureAlpha(this.UniFill.transparent);
                 }

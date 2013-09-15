@@ -609,7 +609,7 @@ function CHorRuler()
                         __xID = ((2.5 + _offset * dKoef_mm_to_pix) * 2) >> 0;
 
                     var __yID = this.m_nBottom - 10;
-                    if (this.IsRetina);
+                    if (this.IsRetina)
                         __yID <<= 1;
 
                     if (0 == i)
