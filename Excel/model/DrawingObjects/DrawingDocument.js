@@ -3312,7 +3312,7 @@ function CDrawingDocument(drawingObjects)
         {
             this.SelectClear();
             //this.m_oWordControl.CheckUnShowOverlay();
-            this.drawingObjects.OnUpdateOverlay();
+            //this.drawingObjects.OnUpdateOverlay();
             this.drawingObjects.getOverlay().m_oContext.globalAlpha = 1.0;
         }
     }
@@ -3704,7 +3704,7 @@ function CDrawingDocument(drawingObjects)
     }
     this.SelectShow = function()
     {
-        this.drawingObjects.OnUpdateOverlay();
+        //this.drawingObjects.OnUpdateOverlay();
     }
 
     this.Set_RulerState_Table = function(markup, transform)

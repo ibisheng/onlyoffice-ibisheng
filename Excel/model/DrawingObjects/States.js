@@ -146,7 +146,7 @@ function NullState(drawingObjectsController, drawingObjects)
                         if(!(e.ctrlKey || e.shiftKey) && !is_selected)
                             this.drawingObjectsController.resetSelection();
                         cur_drawing.select(this.drawingObjectsController);
-                        this.drawingObjects.OnUpdateOverlay();
+                        //this.drawingObjects.OnUpdateOverlay();
                         for(var j = 0; j < selected_objects.length; ++j)
                         {
                             this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
@@ -4452,7 +4452,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                         state.textObject.remove(-1, true);
                         drawingObjectsController.drawingObjects.showDrawingObjects(true);
                         state.textObject.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
-                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                        //drawingObjectsController.drawingObjects.OnUpdateOverlay();
                     }
                 };
                 drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
@@ -4584,7 +4584,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                         drawingObjectsController.resetSelectionState();
                         drawingObjectsController.drawingObjects.showDrawingObjects(true);
                         drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
-                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                        //drawingObjectsController.drawingObjects.OnUpdateOverlay();
                     }
                 };
                 drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
@@ -4694,7 +4694,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                         }
                     }
                 }
-                drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                //drawingObjectsController.drawingObjects.OnUpdateOverlay();
                 break;
             }
             case STATES_ID_GROUP:
@@ -4756,7 +4756,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                         group.select(drawingObjectsController);
                     }
                 }
-                drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                //drawingObjectsController.drawingObjects.OnUpdateOverlay();
                 break;
             }
         }
@@ -4823,7 +4823,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                                 sp.calculateTransformTextMatrix();
                             }
                             sp.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
-                            drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                            //drawingObjectsController.drawingObjects.OnUpdateOverlay();
                         }
                     };
                     drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
@@ -4852,7 +4852,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                         state.textObject.calculateTransformTextMatrix();
                         drawingObjectsController.drawingObjects.showDrawingObjects(true);
                         state.textObject.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
-                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                        //drawingObjectsController.drawingObjects.OnUpdateOverlay();
                     }
                 };
                 drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
@@ -4881,7 +4881,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                 state.textObject.txBody.content.Selection_Remove();
                 drawingObjectsController.changeCurrentState(new NullState(drawingObjectsController, drawingObjectsController.drawingObjects));
                 drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
-                drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                //drawingObjectsController.drawingObjects.OnUpdateOverlay();
                 bRetValue = true;
                 break;
             }
@@ -4914,7 +4914,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                             state.textObject.paragraphAdd(new ParaSpace(1));
                             drawingObjectsController.drawingObjects.showDrawingObjects(true);
                             state.textObject.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
-                            drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                            //drawingObjectsController.drawingObjects.OnUpdateOverlay();
                         }
                     };
                     drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
@@ -4965,7 +4965,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                             drawingObjectsController.curState.textObject.paragraphAdd(new ParaSpace(1));
                             drawingObjectsController.drawingObjects.showDrawingObjects(true);
                             drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
-                            drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                            //drawingObjectsController.drawingObjects.OnUpdateOverlay();
                         }
                     };
                     drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
@@ -5064,7 +5064,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                         }
 
                         drawingObjectsController.drawingObjects.showDrawingObjects(true);
-                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                        //drawingObjectsController.drawingObjects.OnUpdateOverlay();
                     }
                 };
                 drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
@@ -5096,7 +5096,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                         state.group.recalculate();
                         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(state.group.Id, new UndoRedoDataShapeRecalc()), null);
                         drawingObjectsController.drawingObjects.showDrawingObjects(true);
-                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                        //drawingObjectsController.drawingObjects.OnUpdateOverlay();
                     }
                 };
                 drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
@@ -5145,7 +5145,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                         }
 
                         drawingObjectsController.drawingObjects.showDrawingObjects(true);
-                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                        //drawingObjectsController.drawingObjects.OnUpdateOverlay();
                     }
                 };
                 drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
@@ -5177,7 +5177,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                         state.group.recalculate();
                         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(state.group.Id, new UndoRedoDataShapeRecalc()), null);
                         drawingObjectsController.drawingObjects.showDrawingObjects(true);
-                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                        //drawingObjectsController.drawingObjects.OnUpdateOverlay();
                     }
                 };
                 drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
@@ -5226,7 +5226,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                         }
 
                         drawingObjectsController.drawingObjects.showDrawingObjects(true);
-                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                        //drawingObjectsController.drawingObjects.OnUpdateOverlay();
                     }
                 };
                 drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
@@ -5258,7 +5258,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                         state.group.recalculate();
                         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(state.group.Id, new UndoRedoDataShapeRecalc()), null);
                         drawingObjectsController.drawingObjects.showDrawingObjects(true);
-                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                        //drawingObjectsController.drawingObjects.OnUpdateOverlay();
                     }
                 };
                 drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
@@ -5307,7 +5307,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                         }
 
                         drawingObjectsController.drawingObjects.showDrawingObjects(true);
-                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                        //drawingObjectsController.drawingObjects.OnUpdateOverlay();
                     }
                 };
                 drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
@@ -5339,7 +5339,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                         state.group.recalculate();
                         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(state.group.Id, new UndoRedoDataShapeRecalc()), null);
                         drawingObjectsController.drawingObjects.showDrawingObjects(true);
-                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                        //drawingObjectsController.drawingObjects.OnUpdateOverlay();
                     }
                 };
                 drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
@@ -5385,7 +5385,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                         state.textObject.remove(1, true);
                         drawingObjectsController.drawingObjects.showDrawingObjects(true);
                         state.textObject.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
-                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                        //drawingObjectsController.drawingObjects.OnUpdateOverlay();
                     }
                 };
                 drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
@@ -5524,7 +5524,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                         drawingObjectsController.resetSelectionState();
                         drawingObjectsController.drawingObjects.showDrawingObjects(true);
                         drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
-                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                        //drawingObjectsController.drawingObjects.OnUpdateOverlay();
                     }
                 };
                 drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
@@ -5553,7 +5553,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                 {
                     drawing_bases[i].graphicObject.select(drawingObjectsController);
                 }
-                drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                //drawingObjectsController.drawingObjects.OnUpdateOverlay();
                 break;
             }
             case STATES_ID_TEXT_ADD:
@@ -5768,7 +5768,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                         state.textObject.paragraphAdd(Item);
                         drawingObjectsController.drawingObjects.showDrawingObjects(true);
                         state.textObject.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
-                        drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                        //drawingObjectsController.drawingObjects.OnUpdateOverlay();
                     }
                 };
                 drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
@@ -5819,7 +5819,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                             drawingObjectsController.curState.textObject.paragraphAdd(Item);
                             drawingObjectsController.drawingObjects.showDrawingObjects(true);
                             drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
-                            drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                            //drawingObjectsController.drawingObjects.OnUpdateOverlay();
                         }
                     };
                     drawingObjectsController.drawingObjects.objectLocker.checkObjects(callback);
