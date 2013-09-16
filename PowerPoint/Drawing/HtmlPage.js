@@ -1565,13 +1565,57 @@ function CEditorPage(api)
         }
 
         var delta = 0;
+        var deltaX = 0;
+        var deltaY = 0;
 
-        if (undefined != e.wheelDelta)
-            delta = (e.wheelDelta > 0) ? -45 : 45;
-        else
-            delta = (e.detail > 0) ? 45 : -45;
+        if (undefined != e.wheelDelta && e.wheelDelta != 0)
+        {
+            //delta = (e.wheelDelta > 0) ? -45 : 45;
+            delta = -45 * e.wheelDelta / 120;
+        }
+        else if (undefined != e.detail && e.detail != 0)
+        {
+            //delta = (e.detail > 0) ? 45 : -45;
+            delta = 45 * e.detail / 3;
+        }
 
-        oThis.m_oScrollVerApi.scrollBy(0, delta, false);
+        // New school multidimensional scroll (touchpads) deltas
+        deltaY = delta;
+
+        if (oThis.m_bIsHorScrollVisible)
+        {
+            if (e.axis !== undefined && e.axis === e.HORIZONTAL_AXIS)
+            {
+                deltaY = 0;
+                deltaX = delta;
+            }
+
+            // Webkit
+            if (e.wheelDeltaY !== undefined)
+            {
+                if (e.wheelDelta != 0)
+                {
+                    //deltaY = (e.wheelDeltaY > 0) ? -45 : 45;
+                    deltaY = -45 * e.wheelDeltaY / 120;
+                }
+            }
+            if (e.wheelDeltaX !== undefined)
+            {
+                if (e.wheelDeltaX != 0)
+                {
+                    //deltaX = (e.wheelDeltaX > 0) ? -45 : 45;
+                    deltaX = -45 * e.wheelDeltaX / 120;
+                }
+            }
+        }
+
+        deltaX >>= 0;
+        deltaY >>= 0;
+
+        if (0 != deltaX)
+            oThis.m_oScrollHorApi.scrollBy(deltaX, 0, false);
+        else if (0 != deltaY)
+            oThis.m_oScrollVerApi.scrollBy(0, deltaY, false);
 
         if (e.preventDefault)
             e.preventDefault();

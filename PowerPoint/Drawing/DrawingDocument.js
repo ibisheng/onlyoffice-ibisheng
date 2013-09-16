@@ -3523,11 +3523,17 @@ function CThumbnailsManager()
             return;
 
         var delta = 0;
-
-        if (undefined != e.wheelDelta)
-            delta = (e.wheelDelta > 0) ? -45 : 45;
-        else
-            delta = (e.detail > 0) ? 45 : -45;
+        if (undefined != e.wheelDelta && e.wheelDelta != 0)
+        {
+            //delta = (e.wheelDelta > 0) ? -45 : 45;
+            delta = -45 * e.wheelDelta / 120;
+        }
+        else if (undefined != e.detail && e.detail != 0)
+        {
+            //delta = (e.detail > 0) ? 45 : -45;
+            delta = 45 * e.detail / 3;
+        }
+        delta >>= 0;
 
         oThis.m_oWordControl.m_oScrollThumbApi.scrollBy(0, delta, false);
 
