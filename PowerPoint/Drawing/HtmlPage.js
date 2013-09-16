@@ -216,6 +216,9 @@ function CEditorPage(api)
     this.VerticalScrollOnMouseUp = { SlideNum : 0, ScrollY : 0, ScrollY_max : 0};
     this.IsGoToPageMAXPosition = false;
 
+    this.bIsRetinaSupport = true;
+    this.bIsRetinaNoSupportAttack = false;
+
     this.MasterLayouts = null; // мастер, от которого посылались в меню последние шаблоны
 
     // demonstrationMode
@@ -427,6 +430,37 @@ function CEditorPage(api)
         this.OnResize(true);
     }
 
+    this.CheckRetinaDisplay = function()
+    {
+        var old = this.bIsRetinaSupport;
+        if (!this.bIsRetinaNoSupportAttack)
+        {
+            if (window.devicePixelRatio != 2)
+                this.bIsRetinaSupport = false;
+            else
+                this.bIsRetinaSupport = true;
+        }
+        else
+        {
+            this.bIsRetinaSupport = false;
+        }
+
+        if (old != this.bIsRetinaSupport)
+        {
+            // сбросить кэш страниц
+        }
+    }
+
+    this.CheckRetinaElement = function(htmlElem)
+    {
+        if (this.bIsRetinaSupport)
+        {
+            if (htmlElem.id == "id_viewer" || htmlElem.id == "id_hor_ruler" || htmlElem.id == "id_vert_ruler")
+                return true;
+        }
+        return false;
+    }
+
     this.ShowOverlay = function()
     {
         this.m_oOverlayApi.Show();
@@ -588,6 +622,8 @@ function CEditorPage(api)
         }
 
         var w = this.m_oEditor.HtmlElement.width;
+        if (this.bIsRetinaSupport)
+            w >>= 1;
 
         var Zoom = 100;
         var _pageWidth = this.m_oLogicDocument.Width * g_dKoef_mm_to_pix;
@@ -618,6 +654,9 @@ function CEditorPage(api)
         }
 
         var w = this.m_oEditor.HtmlElement.width;
+        if (this.bIsRetinaSupport)
+            w >>= 1;
+
         var h = (((this.m_oBody.AbsolutePosition.B - this.m_oBody.AbsolutePosition.T) -
             (this.m_oTopRuler.AbsolutePosition.B - this.m_oTopRuler.AbsolutePosition.T)) * g_dKoef_mm_to_pix) >> 0;
 
@@ -787,8 +826,16 @@ function CEditorPage(api)
 
         var boxX = 0;
         var boxY = 0;
-        var boxR = this.m_oEditor.HtmlElement.width - 2;
-        var boxB = this.m_oEditor.HtmlElement.height - rectSize;
+
+        var w = this.m_oEditor.HtmlElement.width;
+        if (this.bIsRetinaSupport)
+            w >>= 1;
+        var h = this.m_oEditor.HtmlElement.height;
+        if (this.bIsRetinaSupport)
+            h >>= 1;
+
+        var boxR = w - 2;
+        var boxB = h - rectSize;
 
         var nValueScrollHor = 0;
         if (pos.X < boxX)
@@ -796,7 +843,7 @@ function CEditorPage(api)
 
         if (pos.X > boxR)
         {
-            var _mem = x - g_dKoef_pix_to_mm * this.m_oEditor.HtmlElement.width * 100 / this.m_nZoomValue;
+            var _mem = x - g_dKoef_pix_to_mm * w * 100 / this.m_nZoomValue;
             nValueScrollHor = this.GetHorizontalScrollTo(_mem, navi.PageNum);
         }
 
@@ -806,7 +853,7 @@ function CEditorPage(api)
 
         if (pos.Y > boxB)
         {
-            var _mem = y + navi.H + 10 - g_dKoef_pix_to_mm * this.m_oEditor.HtmlElement.height * 100 / this.m_nZoomValue;
+            var _mem = y + navi.H + 10 - g_dKoef_pix_to_mm * h * 100 / this.m_nZoomValue;
             nValueScrollVer = this.GetVerticalScrollTo(_mem, navi.PageNum);
         }
 
@@ -815,14 +862,14 @@ function CEditorPage(api)
         {
             isNeedScroll = true;
             this.m_bIsUpdateTargetNoAttack = true;
-            var temp = nValueScrollHor * this.m_dScrollX_max / (this.m_dDocumentWidth - this.m_oEditor.HtmlElement.width);
+            var temp = nValueScrollHor * this.m_dScrollX_max / (this.m_dDocumentWidth - w);
             this.m_oScrollHorApi.scrollToX(parseInt(temp), false);
         }
         if (0 != nValueScrollVer)
         {
             isNeedScroll = true;
             this.m_bIsUpdateTargetNoAttack = true;
-            var temp = nValueScrollVer * this.m_dScrollY_max / (this.m_dDocumentHeight - this.m_oEditor.HtmlElement.height);
+            var temp = nValueScrollVer * this.m_dScrollY_max / (this.m_dDocumentHeight - h);
             this.m_oScrollVerApi.scrollToY(parseInt(temp), false);
         }
 
@@ -1845,6 +1892,12 @@ function CEditorPage(api)
             hsscrollStep: 45
         };
 
+        if (this.bIsRetinaSupport)
+        {
+            settings.screenW >>= 1;
+            settings.screenH >>= 1;
+        }
+
         if (this.m_bIsHorScrollVisible)
         {
             if (this.m_oScrollHor_)
@@ -1938,7 +1991,8 @@ function CEditorPage(api)
         }
 
         //console.log("resize");
-        this.m_oBody.Resize(this.Width * g_dKoef_pix_to_mm, this.Height * g_dKoef_pix_to_mm);
+        this.CheckRetinaDisplay();
+        this.m_oBody.Resize(this.Width * g_dKoef_pix_to_mm, this.Height * g_dKoef_pix_to_mm, this);
         this.DemonstrationManager.Resize();
 
         if (this.checkNeedHorScroll())
@@ -1985,7 +2039,7 @@ function CEditorPage(api)
 
     this.OnResize2 = function(isAttack)
     {
-        this.m_oBody.Resize(this.Width * g_dKoef_pix_to_mm, this.Height * g_dKoef_pix_to_mm);
+        this.m_oBody.Resize(this.Width * g_dKoef_pix_to_mm, this.Height * g_dKoef_pix_to_mm, this);
         this.DemonstrationManager.Resize();
 
         if (this.checkNeedHorScroll())
@@ -2051,8 +2105,12 @@ function CEditorPage(api)
     }
     this.checkNeedHorScroll = function()
     {
+        var w = this.m_oEditor.HtmlElement.width;
+        if (this.bIsRetinaSupport)
+            w >>= 1;
+
         var oldVisible = this.m_bIsHorScrollVisible;
-        if (this.m_dDocumentWidth <= this.m_oEditor.HtmlElement.width)
+        if (this.m_dDocumentWidth <= w)
         {
             this.m_bIsHorScrollVisible = false;
         }
@@ -2227,15 +2285,30 @@ function CEditorPage(api)
         var _slideW = (dKoef * this.m_oLogicDocument.Width) >> 0;
         var _slideH = (dKoef * this.m_oLogicDocument.Height) >> 0;
 
-        var _centerX = (this.m_oEditor.HtmlElement.width / 2) >> 0;
+        var _srcW = this.m_oEditor.HtmlElement.width;
+        var _srcH = this.m_oEditor.HtmlElement.height;
+        if (this.bIsRetinaSupport)
+        {
+            _srcW >>= 1;
+            _srcH >>= 1;
+
+            _bounds_slide = {
+                min_x : _bounds_slide.min_x >> 1,
+                min_y : _bounds_slide.min_y >> 1,
+                max_x : _bounds_slide.max_x >> 1,
+                max_y : _bounds_slide.max_y >> 1
+            };
+        }
+
+        var _centerX = (_srcW / 2) >> 0;
         var _centerSlideX = (dKoef * this.m_oLogicDocument.Width / 2) >> 0;
         var _hor_width_left = Math.min(0, _centerX - (_centerSlideX - _bounds_slide.min_x) - this.SlideDrawer.CONST_BORDER);
-        var _hor_width_right = Math.max(this.m_oEditor.HtmlElement.width - 1, _centerX + (_bounds_slide.max_x - _centerSlideX) + this.SlideDrawer.CONST_BORDER);
+        var _hor_width_right = Math.max(_srcW - 1, _centerX + (_bounds_slide.max_x - _centerSlideX) + this.SlideDrawer.CONST_BORDER);
 
-        var _centerY = (this.m_oEditor.HtmlElement.height / 2) >> 0;
+        var _centerY = (_srcH / 2) >> 0;
         var _centerSlideY = (dKoef * this.m_oLogicDocument.Height / 2) >> 0;
         var _ver_height_top = Math.min(0, _centerY - (_centerSlideY - _bounds_slide.min_y) - this.SlideDrawer.CONST_BORDER);
-        var _ver_height_bottom = Math.max(this.m_oEditor.HtmlElement.height - 1, _centerX + (_bounds_slide.max_y - _centerSlideY) + this.SlideDrawer.CONST_BORDER);
+        var _ver_height_bottom = Math.max(_srcH - 1, _centerX + (_bounds_slide.max_y - _centerSlideY) + this.SlideDrawer.CONST_BORDER);
 
         if (this.m_dScrollY <= this.SlideScrollMIN)
             this.m_dScrollY = this.SlideScrollMIN;
@@ -2334,21 +2407,36 @@ function CEditorPage(api)
 
         var _bounds_slide = this.SlideDrawer.BoundsChecker.Bounds;
 
-        var _centerX = (this.m_oEditor.HtmlElement.width / 2) >> 0;
+        var _srcW = this.m_oEditor.HtmlElement.width;
+        var _srcH = this.m_oEditor.HtmlElement.height;
+        if (this.bIsRetinaSupport)
+        {
+            _srcW >>= 1;
+            _srcH >>= 1;
+
+            _bounds_slide = {
+                min_x : _bounds_slide.min_x >> 1,
+                min_y : _bounds_slide.min_y >> 1,
+                max_x : _bounds_slide.max_x >> 1,
+                max_y : _bounds_slide.max_y >> 1
+            };
+        }
+
+        var _centerX = (_srcW / 2) >> 0;
         var _centerSlideX = (dKoef * this.m_oLogicDocument.Width / 2) >> 0;
         var _hor_width_left = Math.min(0, _centerX - (_centerSlideX - _bounds_slide.min_x) - this.SlideDrawer.CONST_BORDER);
-        var _hor_width_right = Math.max(this.m_oEditor.HtmlElement.width - 1, _centerX + (_bounds_slide.max_x - _centerSlideX) + this.SlideDrawer.CONST_BORDER);
+        var _hor_width_right = Math.max(_srcW - 1, _centerX + (_bounds_slide.max_x - _centerSlideX) + this.SlideDrawer.CONST_BORDER);
 
-        var _centerY = (this.m_oEditor.HtmlElement.height / 2) >> 0;
+        var _centerY = (_srcH / 2) >> 0;
         var _centerSlideY = (dKoef * this.m_oLogicDocument.Height / 2) >> 0;
         var _ver_height_top = Math.min(0, _centerY - (_centerSlideY - _bounds_slide.min_y) - this.SlideDrawer.CONST_BORDER);
-        var _ver_height_bottom = Math.max(this.m_oEditor.HtmlElement.height - 1, _centerY + (_bounds_slide.max_y - _centerSlideY) + this.SlideDrawer.CONST_BORDER);
+        var _ver_height_bottom = Math.max(_srcH - 1, _centerY + (_bounds_slide.max_y - _centerSlideY) + this.SlideDrawer.CONST_BORDER);
 
         var lWSlide = _hor_width_right - _hor_width_left + 1;
         var lHSlide = _ver_height_bottom - _ver_height_top + 1;
 
         var one_slide_width = lWSlide;
-        var one_slide_height = Math.max(lHSlide, this.m_oEditor.HtmlElement.height);
+        var one_slide_height = Math.max(lHSlide, _srcH);
 
         this.m_dDocumentPageWidth = one_slide_width;
         this.m_dDocumentPageHeight = one_slide_height;
@@ -2374,12 +2462,12 @@ function CEditorPage(api)
         this.OldDocumentHeight = this.m_dDocumentHeight;
 
         this.SlideScrollMIN = this.m_oDrawingDocument.SlideCurrent * one_slide_height;
-        this.SlideScrollMAX = this.SlideScrollMIN + one_slide_height - this.m_oEditor.HtmlElement.height;
+        this.SlideScrollMAX = this.SlideScrollMIN + one_slide_height - _srcH;
 
         if (0 == this.m_oDrawingDocument.SlidesCount)
         {
             this.SlideScrollMIN = 0;
-            this.SlideScrollMAX = this.SlideScrollMIN + one_slide_height - this.m_oEditor.HtmlElement.height;
+            this.SlideScrollMAX = this.SlideScrollMIN + one_slide_height - _srcH;
         }
 
         // теперь проверим необходимость перезуммирования

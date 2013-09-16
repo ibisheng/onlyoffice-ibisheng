@@ -1766,9 +1766,15 @@ function CEditorPage(api)
         var deltaY = 0;
 
         if (undefined != e.wheelDelta && e.wheelDelta != 0)
-            delta = (e.wheelDelta > 0) ? -45 : 45;
+        {
+            //delta = (e.wheelDelta > 0) ? -45 : 45;
+            delta = -45 * e.wheelDelta / 120;
+        }
         else if (undefined != e.detail && e.detail != 0)
-            delta = (e.detail > 0) ? 45 : -45;
+        {
+            //delta = (e.detail > 0) ? 45 : -45;
+            delta = 45 * e.detail / 3;
+        }
 
         // New school multidimensional scroll (touchpads) deltas
         deltaY = delta;
@@ -1785,14 +1791,23 @@ function CEditorPage(api)
             if (e.wheelDeltaY !== undefined)
             {
                 if (e.wheelDelta != 0)
-                    deltaY = (e.wheelDeltaY > 0) ? -45 : 45;
+                {
+                    //deltaY = (e.wheelDeltaY > 0) ? -45 : 45;
+                    deltaY = -45 * e.wheelDeltaY / 120;
+                }
             }
             if (e.wheelDeltaX !== undefined)
             {
                 if (e.wheelDeltaX != 0)
-                    deltaX = (e.wheelDeltaX > 0) ? -45 : 45;
+                {
+                    //deltaX = (e.wheelDeltaX > 0) ? -45 : 45;
+                    deltaX = -45 * e.wheelDeltaX / 120;
+                }
             }
         }
+
+        deltaX >>= 0;
+        deltaY >>= 0;
 
         if (0 != deltaX)
             oThis.m_oScrollHorApi.scrollBy(deltaX, 0, false);

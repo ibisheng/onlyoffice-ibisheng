@@ -4632,6 +4632,9 @@ function CSlideDrawer()
             this.bIsEmptyPresentation = true;
 
         var dKoef = this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100;
+        if (this.m_oWordControl.bIsRetinaSupport)
+            dKoef *= 2;
+
         var w_mm = this.m_oWordControl.m_oLogicDocument.Width;
         var h_mm = this.m_oWordControl.m_oLogicDocument.Height;
         var w_px = (w_mm * dKoef) >> 0;
@@ -4720,8 +4723,15 @@ function CSlideDrawer()
     {
         var _rect = this.m_oWordControl.m_oDrawingDocument.SlideCurrectRect;
         var _bounds = this.BoundsChecker.Bounds;
+
         var _x = _rect.left + _bounds.min_x;
         var _y = _rect.top + _bounds.min_y;
+
+        if (this.m_oWordControl.bIsRetinaSupport)
+        {
+            _x = (_rect.left << 1) + _bounds.min_x;
+            _y = (_rect.top << 1) + _bounds.min_y;
+        }
 
         if (this.bIsEmptyPresentation)
         {
@@ -4749,6 +4759,9 @@ function CSlideDrawer()
         else
         {
             var dKoef = this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100;
+            if (this.m_oWordControl.bIsRetinaSupport)
+                dKoef *= 2;
+
             var w_mm = this.m_oWordControl.m_oLogicDocument.Width;
             var h_mm = this.m_oWordControl.m_oLogicDocument.Height;
             var w_px = (w_mm * dKoef) >> 0;

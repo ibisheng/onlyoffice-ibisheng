@@ -508,11 +508,6 @@ var ETblLayoutType = {
 var g_nodeAttributeStart = 0xFA;
 var g_nodeAttributeEnd	= 0xFB;
 
-var g_tabtype_left = 0;
-var g_tabtype_right = 1;
-var g_tabtype_center = 2;
-var g_tabtype_clear = 3;
-
 var g_sErrorCharCountMessage = "g_sErrorCharCountMessage";
 var g_nErrorCharCount = 30000;
 var g_nErrorParagraphCount = 1000;

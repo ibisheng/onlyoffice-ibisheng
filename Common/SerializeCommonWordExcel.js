@@ -21,6 +21,12 @@ var c_oSerPropLenType = {
     Double:5,
     Variable:6
 };
+
+var g_tabtype_left = 0;
+var g_tabtype_right = 1;
+var g_tabtype_center = 2;
+var g_tabtype_clear = 3;
+
 function OpenColor() {
 	this.rgb = null;
 	this.auto = null;

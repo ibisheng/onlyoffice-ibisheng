@@ -1026,7 +1026,7 @@ function CHorRuler()
             {
                 if ((y > (_top - 1)) && (y < (_top + 1.68)))
                 {
-                    if (0 == this.m_dIndentLeftFirst && 0 == this.m_dIndentLeft && this.CurrentObjectType == RULER_OBJECT_TYPE_PARAGRAPH)
+                    if (0 == this.m_dIndentLeftFirst && 0 == this.m_dIndentLeft && this.CurrentObjectType == RULER_OBJECT_TYPE_PARAGRAPH && this.IsCanMoveMargins)
                     {
                         if (y > (_top + 1))
                             return 1;
