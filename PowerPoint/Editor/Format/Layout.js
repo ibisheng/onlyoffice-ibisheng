@@ -485,4 +485,38 @@ function SlideLayout(slideMaster)
                 _shapes[_shape_index].recalculate();
         }
     };
+
+    this.Id = g_oIdCounter.Get_NewId();
+    g_oTableId.Add(this, this.Id);
 }
+
+SlideLayout.prototype =
+{
+
+    Get_Id: function()
+    {
+        return this.Id;
+    },
+    Write_ToBinary2: function(w)
+    {
+        w.WriteLong(historyitem_type_Layout);
+        w.WriteString2(this.Id);
+    },
+
+    Read_FromBinary2: function(r)
+    {
+        this.Id = r.GetString2();
+    },
+
+    Save_Changes: function(data, w)
+    {
+
+    },
+
+    Load_Changes: function(r)
+    {
+
+    }
+};
+
+

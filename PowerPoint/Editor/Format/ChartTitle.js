@@ -15,7 +15,7 @@ function CChartTitle(chartGroup, type)
 
     this.txPr = null;
     this.isDefaultText = false;
-    this.txBody = null;
+    this.txBody = new CTextBody(this);
 
     this.x = null;
     this.y = null;
@@ -996,6 +996,16 @@ CChartTitle.prototype =
 
     },
 
+
+    setBodyPr: function(bodyPr)
+    {
+        var old_body_pr = this.txBody.bodyPr;
+        this.txBody.bodyPr = bodyPr;
+        var new_body_pr = this.txBody.bodyPr.createDuplicate();
+        History.Add(this, {Type: historyitem_SetShapeBodyPr, oldBodyPr: old_body_pr, newBodyPr: new_body_pr});
+        this.txBody.recalcInfo.recalculateBodyPr = true;
+    },
+
     Undo: function(data)
     {
         switch(data.Type)
@@ -1010,6 +1020,14 @@ CChartTitle.prototype =
                 {
                     this.layout = null;
                 }
+                break;
+            }
+            case historyitem_SetShapeBodyPr:
+            {
+                this.txBody.bodyPr = data.oldBodyPr.createDuplicate();
+                this.txBody.recalcInfo.recalculateBodyPr = true;
+                this.recalcInfo.recalculateContent = true;
+                this.recalcInfo.recalculateTransformText = true;
                 break;
             }
         }
@@ -1032,6 +1050,14 @@ CChartTitle.prototype =
                 }
                 break;
             }
+            case historyitem_SetShapeBodyPr:
+            {
+                this.txBody.bodyPr = data.newBodyPr.createDuplicate();
+                this.txBody.recalcInfo.recalculateBodyPr = true;
+                this.recalcInfo.recalculateContent = true;
+                this.recalcInfo.recalculateTransformText = true;
+                break;
+            }
         }
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this.chartGroup;
     },
@@ -1052,6 +1078,11 @@ CChartTitle.prototype =
                 {
                     data.newLayout.Write_ToBinary2(w);
                 }
+                break;
+            }
+            case historyitem_SetShapeBodyPr:
+            {
+                data.newBodyPr.Write_ToBinary2(w);
                 break;
             }
         }
@@ -1078,6 +1109,16 @@ CChartTitle.prototype =
                     }
                     break;
                 }
+                case historyitem_SetShapeBodyPr:
+                {
+                    this.txBody.bodyPr = new CBodyPr();
+                    this.txBody.bodyPr.Read_FromBinary2(r);
+                    this.txBody.recalcInfo.recalculateBodyPr = true;
+                    this.recalcInfo.recalculateContent = true;
+                    this.recalcInfo.recalculateTransformText = true;
+                    break;
+                }
+
             }
             editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this.chartGroup;
         }

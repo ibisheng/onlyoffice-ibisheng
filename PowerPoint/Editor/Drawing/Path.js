@@ -47,9 +47,6 @@ function Path(extrusionOk, fill, stroke, w, h)
          }  */
         return duplicate;
     };
-
-    this.Id = g_oIdCounter.Get_NewId();
-    g_oTableId.Add(this, this.Id);
 }
 
 Path.prototype = {

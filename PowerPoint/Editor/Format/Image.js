@@ -1,6 +1,5 @@
 function CImageShape(parent)
 {
-    this.parent = parent;
     this.group = null;
     this.drawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
 
@@ -51,6 +50,10 @@ function CImageShape(parent)
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add( this, this.Id );
+    if(isRealObject(parent))
+    {
+        this.setParent(parent);
+    }
 }
 
 
@@ -1002,6 +1005,44 @@ CImageShape.prototype =
         return (north_number - cardDirection + 8)%8;
     },
 
+
+    setNvSpPr: function(pr)
+    {
+        History.Add(this, {Type: historyitem_SetSetNvSpPr, oldPr: this.nvPicPr, newPr: pr});
+        this.nvPicPr = pr;
+    },
+
+
+    setSpPr: function(spPr)
+    {
+        History.Add(this, {Type:historyitem_SetSetSpPr, oldPr: this.spPr, newPr: spPr});
+        this.spPr = spPr;
+    },
+
+    setStyle: function(style)
+    {
+        History.Add(this, {Type:historyitem_SetSetStyle, oldPr: this.style, newPr:style});
+        this.style = style;
+    },
+
+    setBlipFill: function(blipFill)
+    {
+        History.Add(this, {Type:historyitem_SetBlipFill, oldPr: this.blipFill, newPr:blipFill});
+        this.blipFill = blipFill;
+    },
+
+    setGroup: function(group)
+    {
+        History.Add(this, {Type: historyitem_SetSpGroup, oldPr: this.group, newPr: group});
+        this.group = group;
+    },
+
+    setParent: function(parent)
+    {
+        History.Add(this, {Type:historyitem_SetShapeParent, Old: this.parent, New: parent});
+        this.parent = parent;
+    },
+
     Undo: function(data)
     {
         switch(data.Type)
@@ -1041,6 +1082,37 @@ CImageShape.prototype =
                 this.recalcInfo.recalculateTransformText = true;
                 this.recalcInfo.recalculateContent = true;
                 this.recalcInfo.recalculateGeometry = true;
+                break;
+            }
+            case historyitem_SetSetNvSpPr:
+            {
+                this.nvPicPr = data.oldPr;
+                break;
+            }
+            case historyitem_SetSetSpPr:
+            {
+                this.spPr = data.oldPr;
+                break;
+            }
+            case historyitem_SetSetStyle:
+            {
+                this.style = data.oldPr;
+                break;
+            }
+            case historyitem_SetBlipFill:
+            {
+                this.blipFill = data.oldPr;
+                break;
+            }
+            case historyitem_SetSpGroup:
+            {
+                this.group = data.oldPr;
+                break;
+            }
+            case historyitem_SetShapeParent:
+            {
+                this.parent = data.New;
+                break;
             }
         }
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
@@ -1084,6 +1156,38 @@ CImageShape.prototype =
                 this.recalcInfo.recalculateTransform = true;
                 this.recalcInfo.recalculateTransformText = true;
                 this.recalcInfo.recalculateContent = true;
+                break;
+            }
+            case historyitem_SetSetNvSpPr:
+            {
+                this.nvPicPr = data.newPr;
+                break;
+            }
+            case historyitem_SetSetSpPr:
+            {
+                this.spPr = data.newPr;
+                break;
+            }
+            case historyitem_SetSetStyle:
+            {
+                this.style = data.newPr;
+                break;
+            }
+
+            case historyitem_SetBlipFill:
+            {
+                this.blipFill = data.newPr;
+                break;
+            }
+            case historyitem_SetSpGroup:
+            {
+                this.group = data.newPr;
+                break;
+            }
+            case historyitem_SetShapeParent:
+            {
+                this.parent = data.New;
+                break;
             }
         }
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
@@ -1118,6 +1222,64 @@ CImageShape.prototype =
             {
                 w.WriteBool(data.newFlipH);
                 w.WriteBool(data.newFlipV);
+                break;
+            }
+
+            case historyitem_SetSetNvSpPr:
+            {
+                w.WriteBool(isRealObject(data.newPr));
+                if(isRealObject(data.newPr))
+                {
+                    data.newPr.Write_ToBinary2(w);
+                }
+                break;
+            }
+
+            case historyitem_SetSetSpPr:
+            {
+                w.WriteBool(isRealObject(data.newPr));
+                if(isRealObject(data.newPr))
+                {
+                    data.newPr.Write_ToBinary2(w);
+                }
+                break;
+            }
+            case historyitem_SetSetStyle:
+            {
+                w.WriteBool(isRealObject(data.newPr));
+                if(isRealObject(data.newPr))
+                {
+                    data.newPr.Write_ToBinary2(w);
+                }
+                break;
+            }
+
+            case historyitem_SetBlipFill:
+            {
+                w.WriteBool(isRealObject(data.newPr));
+                if(isRealObject(data.newPr))
+                {
+                    data.newPr.Write_ToBinary2(w);
+                }
+                break;
+            }
+            case historyitem_SetSpGroup:
+            {
+                w.WriteBool(isRealObject(data.newPr));
+                if(isRealObject(data.newPr))
+                {
+                    w.WriteSring2(data.newPr.Get_Id());
+                }
+                break;
+            }
+            case historyitem_SetShapeParent:
+            {
+                w.WriteBool(isRealObject(data.New));
+                if(isRealObject(data.New))
+                {
+                    w.WriteString2(data.New.Id);
+                }
+                break;
             }
         }
     },
@@ -1161,6 +1323,78 @@ CImageShape.prototype =
                     this.recalcInfo.recalculateTransform = true;
                     this.recalcInfo.recalculateTransformText = true;
                     this.recalcInfo.recalculateContent = true;
+                    break;
+                }
+                case historyitem_SetSetNvSpPr:
+                {
+                    if(r.GetBool())
+                    {
+                        this.nvPicPr = new UniNvPr();
+                        this.nvPicPr.Read_FromBinary2(r);
+                    }
+                    else
+                    {
+                        this.nvPicPr = null;
+                    }
+                    break;
+                }
+                case historyitem_SetSetSpPr:
+                {
+
+                    this.spPr = new CSpPr();
+                    if(r.GetBool())
+                    {
+                        this.spPr.Read_FromBinary2(r);
+                    }
+                    break;
+                }
+                case historyitem_SetSetStyle:
+                {
+                    if(r.GetBool())
+                    {
+                        this.style = new CShapeStyle();
+                        this.style.Read_FromBinary2(r);
+                    }
+                    else
+                    {
+                        this.style = null;
+                    }
+                    break;
+                }
+
+                case historyitem_SetBlipFill:
+                {
+                    if(r.GetBool())
+                    {
+                        this.blipFill = new CUniFill();
+                        this.blipFill.Read_FromBinary2(r);
+                    }
+                    else
+                    {
+                        this.blipFill = null;
+                    }
+                    break;
+                }
+                case historyitem_SetSpGroup:
+                {
+                    if(r.GetBool())
+                    {
+                        this.group = g_oTableId.Get_ById(r.GetString2());
+                    }
+                    else
+                    {
+                        this.group = null;
+                    }
+                    break;
+                }
+
+                case historyitem_SetShapeParent:
+                {
+                    if(r.GetBool())
+                    {
+                        this.parent = g_oTableId.Get_ById(r.GetString2());
+                    }
+                    break;
                 }
             }
             editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;

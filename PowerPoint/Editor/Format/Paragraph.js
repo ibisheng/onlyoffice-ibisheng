@@ -120,6 +120,12 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit)
 
 Paragraph.prototype =
 {
+    setPresentationBullet: function(bullet)
+    {
+        History.Add(this, {Type:historyitem_Paragraph_PresentationBullet, oldPr: this.bullet, newPr: bullet});
+        this.bullet = bullet;
+    },
+
     GetType : function()
     {
         return type_Paragraph;
@@ -333,6 +339,15 @@ Paragraph.prototype =
         History.Add( OtherParagraph, { Type : historyitem_Paragraph_Pr, Old : oOldPr, New : OtherParagraph.Pr } );
 
         OtherParagraph.Style_Add( this.Style_Get(), true );
+    },
+
+    Set_Pr : function(oNewPr)
+    {
+        var Pr_old = this.Pr;
+        var Pr_new = oNewPr;
+        History.Add( this, { Type : historyitem_Paragraph_Pr, Old : Pr_old, New : Pr_new } );
+
+        this.Pr = oNewPr;
     },
 
     // Добавляем элемент в содержимое параграфа. (Здесь передвигаются все позиции
@@ -11169,6 +11184,12 @@ Paragraph.prototype =
                 this.CompiledPr.NeedRecalc = true;
                 break;
             }
+
+            case historyitem_Paragraph_PresentationBullet:
+            {
+                this.bullet = Data.oldPr;
+                break;
+            }
         }
 
         this.RecalcInfo.Set_Type_0(pararecalc_0_All);
@@ -11521,6 +11542,12 @@ Paragraph.prototype =
             {
                 this.Pr.FramePr = Data.New;
                 this.CompiledPr.NeedRecalc = true;
+                break;
+            }
+
+            case historyitem_Paragraph_PresentationBullet:
+            {
+                this.bullet = Data.newPr;
                 break;
             }
         }
@@ -12118,6 +12145,15 @@ Paragraph.prototype =
                     Data.New.Write_ToBinary( Writer );
                 }
 
+                break;
+            }
+            case historyitem_Paragraph_PresentationBullet:
+            {
+                w.WriteBool(isRealObject(Data.newPr));
+                if(isRealObject(Data.newPr))
+                {
+                    Data.newPr.Write_ToBinary2(Writer);
+                }
                 break;
             }
         }
@@ -12760,6 +12796,20 @@ Paragraph.prototype =
 
                 this.CompiledPr.NeedRecalc = true;
 
+                break;
+            }
+
+            case historyitem_Paragraph_PresentationBullet:
+            {
+                if(Reader.GetBool())
+                {
+                    this.bullet = new CBullet();
+                    this.bullet.Read_FromBinary2(Reader);
+                }
+                else
+                {
+                    this.bullet = undefined;
+                }
                 break;
             }
         }

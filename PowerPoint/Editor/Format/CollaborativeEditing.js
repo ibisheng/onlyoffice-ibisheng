@@ -150,6 +150,14 @@ function CTableId()
             case historyitem_type_Image            : Element = new CImageShape(); break;
             case historyitem_type_GroupShapes      : Element = new CGroupShape(); break;
 			case historyitem_type_Chart		       : Element = new CChartData(true); break;
+            case historyitem_type_Slide		       : Element = new Slide(); break;
+            case historyitem_type_PropLocker       : Element = new PropLocker(); break;
+            case historyitem_type_Layout           : Element = new SlideLayout(); break;
+            case historyitem_type_TextBody         : Element = new CTextBody(); break;
+            case historyitem_type_GraphicFrame     : Element = new CGraphicFrame(); break;
+
+
+
         }
 
         Element.Read_FromBinary2(Reader);

@@ -592,7 +592,7 @@ CGraphicObjects.prototype = {
                     }
 
                     var _cur_paragraph_para_pr = _current_object.getParagraphParaPr();
-                    if(_current_object.Lock.Is_Locked())
+                    if(_current_object.Lock.Is_Locked() && _cur_paragraph_para_pr)
                     {
                         _cur_paragraph_para_pr.Locked = true;
                     }
@@ -826,6 +826,276 @@ CGraphicObjects.prototype = {
         }
 
        // editor.sync_VerticalTextAlign(this.getVerticalAlign());
+    },
+
+
+    Get_Paragraph_ParaPr : function()
+    {
+
+        var text_props = null, para_props = null, shape_props = null, image_props = null, chart_props = null, table_props = null;
+        var selected_objects = this.selectedObjects;
+        var by_types = this.getSelectedArraysByTypes();
+        switch(this.State.id)
+        {
+            case STATES_ID_NULL:
+            //case STATES_ID_TEXT_ADD:
+                // case STATES_ID_TEXT_ADD_IN_GROUP:
+            {
+                var shapes = by_types.shapes;
+                for(var i = 0; i < shapes.length; ++i)
+                {
+                    var _current_object = shapes[i];
+                    var _cur_paragraph_para_pr = _current_object.getParagraphParaPr();
+                    if(_current_object.Lock.Is_Locked() && _cur_paragraph_para_pr)
+                    {
+                        _cur_paragraph_para_pr.Locked = true;
+                    }
+                    if(_cur_paragraph_para_pr != null)
+                    {
+                        if(para_props === null)
+                        {
+                            para_props = _cur_paragraph_para_pr;
+                        }
+                        else
+                        {
+                            para_props = para_props.Compare(_cur_paragraph_para_pr)
+                        }
+                    }
+                    var _cur_paragraph_text_pr = _current_object.getParagraphTextPr();
+                    if(_cur_paragraph_text_pr != null)
+                    {
+                        if(text_props === null)
+                        {
+                            text_props = _cur_paragraph_text_pr;
+                        }
+                        else
+                        {
+                            text_props = text_props.Compare(_cur_paragraph_text_pr)
+                        }
+                    }
+                }
+
+                var groups = by_types.groups;
+                for(var i = 0; i < groups.length; ++i)
+                {
+                    var cur_group = groups[i];
+                    var arr_by_types = cur_group.getArraysByTypes();
+
+
+                    var shapes = arr_by_types.shapes;
+                    for(var i = 0; i < shapes.length; ++i)
+                    {
+                        var _current_object = shapes[i];
+
+
+                        var _cur_paragraph_para_pr = _current_object.getParagraphParaPr();
+                        if(_cur_paragraph_para_pr != null)
+                        {
+                            if(para_props === null)
+                            {
+                                para_props = _cur_paragraph_para_pr;
+                            }
+                            else
+                            {
+                                para_props = para_props.Compare(_cur_paragraph_para_pr)
+                            }
+                        }
+                        var _cur_paragraph_text_pr = _current_object.getParagraphTextPr();
+                        if(_cur_paragraph_text_pr != null)
+                        {
+                            if(text_props === null)
+                            {
+                                text_props = _cur_paragraph_text_pr;
+                            }
+                            else
+                            {
+                                text_props = text_props.Compare(_cur_paragraph_text_pr)
+                            }
+                        }
+                    }
+
+
+                    if(para_props)
+                    {
+                        if(cur_group.Lock.Is_Locked())
+                        {
+                            para_props.Locked = true;
+                        }
+                    }
+                }
+
+                var tables = by_types.tables;
+                if(tables.length === 1)
+                {
+                    this.slide.presentation.DrawingDocument.CheckTableStyles(tables[0].graphicObject.Get_TableLook(), tables[0]);
+                    var _cur_paragraph_para_pr = tables[0].getParagraphParaPr();
+                    if(_cur_paragraph_para_pr != null)
+                    {
+                        if(para_props === null)
+                        {
+                            para_props = _cur_paragraph_para_pr;
+                        }
+                        else
+                        {
+                            para_props = para_props.Compare(_cur_paragraph_para_pr)
+                        }
+                    }
+                    var _cur_paragraph_text_pr = tables[0].getParagraphTextPr();
+                    if(_cur_paragraph_text_pr != null)
+                    {
+                        if(text_props === null)
+                        {
+                            text_props = _cur_paragraph_text_pr;
+                        }
+                        else
+                        {
+                            text_props = text_props.Compare(_cur_paragraph_text_pr)
+                        }
+                    }
+                }
+                break;
+            }
+            case STATES_ID_TEXT_ADD:
+            {
+                return this.State.textObject.getParaPr();
+                break;
+            }
+        }
+        return para_props ? para_props : new CParaPr();
+
+    },
+
+    Get_Paragraph_TextPr : function()
+    {
+        var text_props = null, para_props = null, shape_props = null, image_props = null, chart_props = null, table_props = null;
+        var selected_objects = this.selectedObjects;
+        var by_types = this.getSelectedArraysByTypes();
+        switch(this.State.id)
+        {
+            case STATES_ID_NULL:
+                // case STATES_ID_TEXT_ADD_IN_GROUP:
+            {
+                var shapes = by_types.shapes;
+                for(var i = 0; i < shapes.length; ++i)
+                {
+                    var _current_object = shapes[i];
+                    var _cur_paragraph_para_pr = _current_object.getParagraphParaPr();
+                    if(_current_object.Lock.Is_Locked() && _cur_paragraph_para_pr)
+                    {
+                        _cur_paragraph_para_pr.Locked = true;
+                    }
+                    if(_cur_paragraph_para_pr != null)
+                    {
+                        if(para_props === null)
+                        {
+                            para_props = _cur_paragraph_para_pr;
+                        }
+                        else
+                        {
+                            para_props = para_props.Compare(_cur_paragraph_para_pr)
+                        }
+                    }
+                    var _cur_paragraph_text_pr = _current_object.getParagraphTextPr();
+                    if(_cur_paragraph_text_pr != null)
+                    {
+                        if(text_props === null)
+                        {
+                            text_props = _cur_paragraph_text_pr;
+                        }
+                        else
+                        {
+                            text_props = text_props.Compare(_cur_paragraph_text_pr)
+                        }
+                    }
+                }
+
+                var groups = by_types.groups;
+                for(var i = 0; i < groups.length; ++i)
+                {
+                    var cur_group = groups[i];
+                    var arr_by_types = cur_group.getArraysByTypes();
+
+
+                    var shapes = arr_by_types.shapes;
+                    for(var i = 0; i < shapes.length; ++i)
+                    {
+                        var _current_object = shapes[i];
+
+
+                        var _cur_paragraph_para_pr = _current_object.getParagraphParaPr();
+                        if(_cur_paragraph_para_pr != null)
+                        {
+                            if(para_props === null)
+                            {
+                                para_props = _cur_paragraph_para_pr;
+                            }
+                            else
+                            {
+                                para_props = para_props.Compare(_cur_paragraph_para_pr)
+                            }
+                        }
+                        var _cur_paragraph_text_pr = _current_object.getParagraphTextPr();
+                        if(_cur_paragraph_text_pr != null)
+                        {
+                            if(text_props === null)
+                            {
+                                text_props = _cur_paragraph_text_pr;
+                            }
+                            else
+                            {
+                                text_props = text_props.Compare(_cur_paragraph_text_pr)
+                            }
+                        }
+                    }
+
+
+                    if(para_props)
+                    {
+                        if(cur_group.Lock.Is_Locked())
+                        {
+                            para_props.Locked = true;
+                        }
+                    }
+                }
+
+                var tables = by_types.tables;
+                if(tables.length === 1)
+                {
+                    this.slide.presentation.DrawingDocument.CheckTableStyles(tables[0].graphicObject.Get_TableLook(), tables[0]);
+                    var _cur_paragraph_para_pr = tables[0].getParagraphParaPr();
+                    if(_cur_paragraph_para_pr != null)
+                    {
+                        if(para_props === null)
+                        {
+                            para_props = _cur_paragraph_para_pr;
+                        }
+                        else
+                        {
+                            para_props = para_props.Compare(_cur_paragraph_para_pr)
+                        }
+                    }
+                    var _cur_paragraph_text_pr = tables[0].getParagraphTextPr();
+                    if(_cur_paragraph_text_pr != null)
+                    {
+                        if(text_props === null)
+                        {
+                            text_props = _cur_paragraph_text_pr;
+                        }
+                        else
+                        {
+                            text_props = text_props.Compare(_cur_paragraph_text_pr)
+                        }
+                    }
+                }
+                break;
+            }
+            case STATES_ID_TEXT_ADD:
+            {
+                return this.State.textObject.getTextPr();
+                break;
+            }
+        }
+        return text_props ? text_props : new CParaPr();
     },
 
     getPropsArrays: function()
@@ -1132,12 +1402,65 @@ CGraphicObjects.prototype = {
         options.master = this.slide.Layout.Master;
         options.theme = this.slide.Layout.Master.Theme;
         editor.chartStyleManager.init(options);
+
         ret.chart.initDefault();
         ret.spPr.xfrm.offX = 0;
         ret.spPr.xfrm.offY = 0;
         ret.spPr.xfrm.extX = this.slide.Width*2/3;//ditor.WordControl.m_oDrawingDocument.GetMMPerDot(c_oAscChartDefines.defaultChartWidth);
         ret.spPr.xfrm.extY = 0.593*this.slide.Height;//ditor.WordControl.m_oDrawingDocument.GetMMPerDot(c_oAscChartDefines.defaultChartHeight);
         return ret;
+    },
+
+    Hyperlink_CanAdd: function(bCheck)
+    {
+        if(this.State.textObject && this.State.textObject.Hyperlink_CanAdd)
+        {
+            return this.State.textObject.Hyperlink_CanAdd(bCheck);
+        }
+        return  false;
+    },
+
+    Hyperlink_Check : function(bCheck)
+    {
+        if(this.State.textObject && this.State.textObject.Hyperlink_Check)
+        {
+            return this.State.textObject.Hyperlink_Check(bCheck);
+        }
+        return  false;
+    },
+
+
+    Hyperlink_Add : function(HyperProps)
+    {
+        if(this.State.textObject && this.State.textObject.Hyperlink_Add)
+        {
+            this.State.textObject.Hyperlink_Add(HyperProps);
+        }
+    },
+
+    Hyperlink_Modify : function(HyperProps)
+    {
+        if(this.State.textObject && this.State.textObject.Hyperlink_Modify)
+        {
+            this.State.textObject.Hyperlink_Modify(HyperProps);
+        }
+    },
+
+    Hyperlink_Remove : function()
+    {
+        if(this.State.textObject && this.State.textObject.Hyperlink_Remove)
+        {
+            this.State.textObject.Hyperlink_Remove();
+        }
+    },
+
+    Get_SelectedText: function(bClearText)
+    {
+        if(this.State.textObject && this.State.textObject.Get_SelectedText)
+        {
+            return this.State.textObject.Get_SelectedText(bClearText);
+        }
+        return null;
     },
 
     shapeApply: function(properties)

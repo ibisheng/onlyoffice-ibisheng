@@ -2,7 +2,6 @@
 var CLASS_TYPE_CHART_DATA = 9999;
 function CChartAsGroup(parent/*(WordGraphicObject)*/, document, drawingDocument, group)
 {
-    this.parent = parent;
     this.document = document;
     this.group = isRealObject(group) ? group : null;
 
@@ -50,6 +49,10 @@ function CChartAsGroup(parent/*(WordGraphicObject)*/, document, drawingDocument,
     g_oTableId.Add(this, this.Id);
 
     this.bFirstRecalc = true;
+    if(isRealObject(parent))
+    {
+        this.setParent(parent);
+    }
 }
 
 
@@ -272,14 +275,6 @@ CChartAsGroup.prototype =
         return false;
     },
 
-    setGroup: function(group)
-    {
-        var oldId = isRealObject(this.group) ? this.group.Get_Id() : null;
-        var newId = isRealObject(group) ? group.Get_Id() : null;
-        History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetGroup, null, null,
-            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldId, newId)));
-        this.group = group;
-    },
 
 
     hitInInnerArea: function(x, y)
@@ -2119,29 +2114,20 @@ CChartAsGroup.prototype =
     },
 
 
-    setParent: function(paraDrawing)
+    setParent: function(parent)
     {
-        var data = {Type: historyitem_SetParent};
-        if(isRealObject(this.parent))
-        {
-            data.oldParent = this.parent.Get_Id();
-        }
-        else
-        {
-            data.oldParent = null;
-        }
-
-        if(isRealObject(paraDrawing))
-        {
-            data.newParent = paraDrawing.Get_Id();
-        }
-        else
-        {
-            data.newParent = null;
-        }
-        History.Add(this, data);
-        this.parent = paraDrawing;
+        History.Add(this, {Type:historyitem_SetShapeParent, Old: this.parent, New: parent});
+        this.parent = parent;
     },
+
+
+
+    setGroup: function(group)
+    {
+        History.Add(this, {Type: historyitem_SetSpGroup, oldPr: this.group, newPr: group});
+        this.group = group;
+    },
+
 
 
     Undo: function(data)
@@ -2237,6 +2223,16 @@ CChartAsGroup.prototype =
                 this.recalcInfo.recalculateTransformText = true;
                 break;
             }
+            case historyitem_SetSpGroup:
+            {
+                this.group = data.oldPr;
+                break;
+            }
+            case historyitem_SetShapeParent:
+            {
+                this.parent = data.Old;
+                break;
+            }
         }
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
@@ -2330,6 +2326,16 @@ CChartAsGroup.prototype =
                 this.recalcInfo.recalculateTransformText = true;
                 break;
             }
+            case historyitem_SetSpGroup:
+            {
+                this.group = data.newPr;
+                break;
+            }
+            case historyitem_SetShapeParent:
+            {
+                this.parent = data.New;
+                break;
+            }
         }
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
@@ -2397,6 +2403,24 @@ CChartAsGroup.prototype =
             case historyitem_SetShapeBodyPr:
             {
                 data.newBodyPr.Write_ToBinary2(w);
+                break;
+            }
+            case historyitem_SetSpGroup:
+            {
+                w.WriteBool(isRealObject(data.newPr));
+                if(isRealObject(data.newPr))
+                {
+                    w.WriteSring2(data.newPr.Get_Id());
+                }
+                break;
+            }
+            case historyitem_SetShapeParent:
+            {
+                w.WriteBool(isRealObject(data.New));
+                if(isRealObject(data.New))
+                {
+                    w.WriteString2(data.New.Id);
+                }
                 break;
             }
         }
@@ -2490,6 +2514,27 @@ CChartAsGroup.prototype =
                     this.txBody.recalcInfo.recalculateBodyPr = true;
                     this.recalcInfo.recalculateContent = true;
                     this.recalcInfo.recalculateTransformText = true;
+                    break;
+                }
+
+                case historyitem_SetSpGroup:
+                {
+                    if(r.GetBool())
+                    {
+                        this.group = g_oTableId.Get_ById(r.GetString2());
+                    }
+                    else
+                    {
+                        this.group = null;
+                    }
+                    break;
+                }
+                case historyitem_SetShapeParent:
+                {
+                    if(r.GetBool())
+                    {
+                        this.parent = g_oTableId.Get_ById(r.GetString2());
+                    }
                     break;
                 }
 

@@ -90,13 +90,12 @@ CURSOR_TYPES_BY_CARD_DIRECTION[CARD_DIRECTION_NW] = "nw-resize";
 
 function CShape(parent)
 {
-    this.parent = parent;
     this.group = null;
     this.drawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
 
     this.spLocks = null;
     this.useBgFill = null;
-    this.nvSpPr = null;
+    this.nvSpPr = new UniNvPr();
     this.spPr = new CSpPr();
     this.style = null;
     this.txBody = null;
@@ -149,6 +148,11 @@ function CShape(parent)
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add( this, this.Id );
+
+    if(isRealObject(parent))
+    {
+        this.setParent(parent);
+    }
 }
 
 CShape.prototype =
@@ -210,6 +214,94 @@ CShape.prototype =
         this.setDefaultStyle();
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
+
+    Hyperlink_CanAdd: function(bCheck)
+    {
+        if(this.txBody)
+            return this.txBody.content.Hyperlink_CanAdd(bCheck);
+        return false;
+    },
+
+    Hyperlink_Check: function(bCheck)
+    {
+        if(this.txBody)
+            return this.txBody.content.Hyperlink_Check(bCheck);
+        return false;
+    },
+
+
+    Hyperlink_Add : function(HyperProps)
+    {
+        if(this.txBody)
+        {
+            this.txBody.content.Hyperlink_Add(HyperProps);
+            this.recalcInfo.recalculateContent = true;
+            this.recalcInfo.recalculateTransformText = true;
+            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+        }
+    },
+
+    Hyperlink_Modify : function(HyperProps)
+    {
+        if(this.txBody)
+        {
+            this.txBody.content.Hyperlink_Modify(HyperProps);
+            this.recalcInfo.recalculateContent = true;
+            this.recalcInfo.recalculateTransformText = true;
+            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+        }
+    },
+
+    Hyperlink_Remove : function()
+    {
+        if(this.txBody)
+        {
+            this.txBody.content.Hyperlink_Remove();
+            this.recalcInfo.recalculateContent = true;
+            this.recalcInfo.recalculateTransformText = true;
+            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+        }
+    },
+
+
+    Get_SelectedText: function(bClearText)
+    {
+        if(this.txBody)
+        {
+            return this.txBody.content.Get_SelectedText(bClearText);
+        }
+        return null;
+    },
+
+    pointInSelectedText: function(x, y)
+    {
+        if(this.txBody)
+        {
+            var tx = this.invertTransformText.TransformPointX(x, y);
+            var ty = this.invertTransformText.TransformPointY(x, y);
+            return this.txBody.content.Selection_Check(tx, ty, this.parent.num);
+        }
+        return false;
+    },
+
+    getTextPr: function()
+    {
+        if(this.txBody)
+        {
+            return this.txBody.content.Get_Paragraph_TextPr();
+        }
+        return new CTextPr();
+    },
+
+    getParaPr: function()
+    {
+        if(this.txBody)
+        {
+            return this.txBody.content.Get_Paragraph_ParPr();
+        }
+        return new CParaPr();
+    },
+
 
 
     initDefaultTextRect: function(x, y, extX, extY, flipH, flipV)
@@ -582,6 +674,36 @@ CShape.prototype =
         return isRealObject(this.nvSpPr) && isRealObject(this.nvSpPr.nvPr) && isRealObject(this.nvSpPr.nvPr.ph);
     },
 
+    setNvSpPr: function(pr)
+    {
+        History.Add(this, {Type: historyitem_SetSetNvSpPr, oldPr: this.nvSpPr, newPr: pr});
+        this.nvSpPr = pr;
+    },
+
+    setTextBody: function(txBody)
+    {
+        History.Add(this, {Type: historyitem_SetTextBody, oldPr: this.txBody, newPr: txBody});
+        this.txBody = txBody;
+    },
+
+    setSpPr: function(spPr)
+    {
+        History.Add(this, {Type:historyitem_SetSetSpPr, oldPr: this.spPr, newPr: spPr});
+        this.spPr = spPr;
+    },
+
+    setStyle: function(style)
+    {
+        History.Add(this, {Type:historyitem_SetSetStyle, oldPr: this.style, newPr:style});
+        this.style = style;
+    },
+
+    setGroup: function(group)
+    {
+        History.Add(this, {Type: historyitem_SetSpGroup, oldPr: this.group, newPr: group});
+        this.group = group;
+    },
+
     getPlaceholderType: function()
     {
         return this.isPlaceholder() ? this.nvSpPr.nvPr.ph.type : null;
@@ -650,6 +772,15 @@ CShape.prototype =
                 this.recalculateTransformText();
             }
         }
+    },
+
+    setBodyPr: function(bodyPr)
+    {
+        var old_body_pr = this.txBody.bodyPr;
+        this.txBody.bodyPr = bodyPr;
+        var new_body_pr = this.txBody.bodyPr.createDuplicate();
+        History.Add(this, {Type: historyitem_SetShapeBodyPr, oldBodyPr: old_body_pr, newBodyPr: new_body_pr});
+        this.txBody.recalcInfo.recalculateBodyPr = true;
     },
 
     recalculate: function()
@@ -1052,10 +1183,9 @@ CShape.prototype =
 
     copy: function(sp)
     {
-        sp.spPr = this.spPr.createDuplicate();
-        sp.setXfrm(null, null, null, null, null, null, null);
-        if(this.style)
-            sp.style = this.style.createDublicate();
+        sp.setSpPr(this.spPr.createDuplicate());
+        sp.setStyle(this.style);
+        sp.setNvSpPr(this.nvSpPr);
     },
 
     Get_Styles: function(level)
@@ -3071,6 +3201,36 @@ CShape.prototype =
                 this.recalcInfo.recalculateTransformText = true;
                 break;
             }
+            case historyitem_SetSetNvSpPr:
+            {
+                this.nvSpPr = data.oldPr;
+                break;
+            }
+            case historyitem_SetSetSpPr:
+            {
+                this.spPr = data.oldPr;
+                break;
+            }
+            case historyitem_SetSetStyle:
+            {
+                this.style = data.oldPr;
+                break;
+            }
+            case historyitem_SetTextBody:
+            {
+                this.txBody = data.oldPr;
+                break;
+            }
+            case historyitem_SetSpGroup:
+            {
+                this.group = data.oldPr;
+                break;
+            }
+            case historyitem_SetShapeParent:
+            {
+                this.parent = data.Old;
+                break;
+            }
         }
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
@@ -3164,6 +3324,39 @@ CShape.prototype =
                 this.recalcInfo.recalculateTransformText = true;
                 break;
             }
+            case historyitem_SetSetNvSpPr:
+            {
+                this.nvSpPr = data.newPr;
+                break;
+            }
+
+            case historyitem_SetSetSpPr:
+            {
+                this.spPr = data.newPr;
+                break;
+            }
+            case historyitem_SetSetStyle:
+            {
+                this.style = data.newPr;
+                break;
+            }
+
+            case historyitem_SetTextBody:
+            {
+                this.txBody = data.newPr;
+                break;
+            }
+
+            case historyitem_SetSpGroup:
+            {
+                this.group = data.newPr;
+                break;
+            }
+            case historyitem_SetShapeParent:
+            {
+                this.parent = data.New;
+                break;
+            }
         }
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
@@ -3231,6 +3424,63 @@ CShape.prototype =
             case historyitem_SetShapeBodyPr:
             {
                 data.newBodyPr.Write_ToBinary2(w);
+                break;
+            }
+
+            case historyitem_SetSetNvSpPr:
+            {
+                w.WriteBool(isRealObject(data.newPr));
+                if(isRealObject(data.newPr))
+                {
+                    data.newPr.Write_ToBinary2(w);
+                }
+                break;
+            }
+
+            case historyitem_SetSetSpPr:
+            {
+                w.WriteBool(isRealObject(data.newPr));
+                if(isRealObject(data.newPr))
+                {
+                    data.newPr.Write_ToBinary2(w);
+                }
+                break;
+            }
+            case historyitem_SetSetStyle:
+            {
+                w.WriteBool(isRealObject(data.newPr));
+                if(isRealObject(data.newPr))
+                {
+                    data.newPr.Write_ToBinary2(w);
+                }
+                break;
+            }
+
+            case historyitem_SetTextBody:
+            {
+                w.WriteBool(isRealObject(data.newPr));
+                if(isRealObject(data.newPr))
+                {
+                    w.WriteSring2(data.newPr.Get_Id());
+                }
+                break;
+            }
+            case historyitem_SetSpGroup:
+            {
+                w.WriteBool(isRealObject(data.newPr));
+                if(isRealObject(data.newPr))
+                {
+                    w.WriteSring2(data.newPr.Get_Id());
+                }
+                break;
+            }
+            case historyitem_SetShapeParent:
+            {
+                w.WriteBool(isRealObject(data.New));
+                if(isRealObject(data.New))
+                {
+                    w.WriteString2(data.New.Id);
+                }
                 break;
             }
         }
@@ -3324,6 +3574,77 @@ CShape.prototype =
                     this.txBody.recalcInfo.recalculateBodyPr = true;
                     this.recalcInfo.recalculateContent = true;
                     this.recalcInfo.recalculateTransformText = true;
+                    break;
+                }
+
+                case historyitem_SetSetNvSpPr:
+                {
+                    if(r.GetBool())
+                    {
+                        this.nvSpPr = new UniNvPr();
+                        this.nvSpPr.Read_FromBinary2(r);
+                    }
+                    else
+                    {
+                        this.nvSpPr = null;
+                    }
+                    break;
+                }
+                case historyitem_SetSetSpPr:
+                {
+
+                    this.spPr = new CSpPr();
+                    if(r.GetBool())
+                    {
+                        this.spPr.Read_FromBinary2(r);
+                    }
+                    break;
+                }
+                case historyitem_SetSetStyle:
+                {
+                    if(r.GetBool())
+                    {
+                        this.style = new CShapeStyle();
+                        this.style.Read_FromBinary2(r);
+                    }
+                    else
+                    {
+                        this.style = null;
+                    }
+                    break;
+                }
+
+                case historyitem_SetTextBody:
+                {
+                    if(r.GetBool())
+                    {
+                        this.txBody = g_oTableId.Get_ById(r.GetString2());
+                    }
+                    else
+                    {
+                        this.txBody = null;
+                    }
+                    break;
+                }
+                case historyitem_SetSpGroup:
+                {
+                    if(r.GetBool())
+                    {
+                        this.group = g_oTableId.Get_ById(r.GetString2());
+                    }
+                    else
+                    {
+                        this.group = null;
+                    }
+                    break;
+                }
+
+                case historyitem_SetShapeParent:
+                {
+                    if(r.GetBool())
+                    {
+                        this.parent = g_oTableId.Get_ById(r.GetString2());
+                    }
                     break;
                 }
 

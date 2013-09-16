@@ -9,9 +9,9 @@ function Slide(presentation, slideLayout, slideNum)
 {
     this.kind = SLIDE_KIND;
 
-    this.presentation = presentation;
-    this.Layout = slideLayout;
-    this.num = slideNum;
+    this.presentation = editor.WordControl.m_oLogicDocument;
+    //this.Layout = slideLayout;
+    //this.num = slideNum;
 
     this.graphicObjects = new CGraphicObjects(this);
 
@@ -40,6 +40,10 @@ function Slide(presentation, slideLayout, slideNum)
     this.searchingArray = new Array();  // массив объектов для селекта
     this.selectionArray = new Array();  // массив объектов для поиска
 
+
+    this.show = true;
+    this.showMasterPhAnim = false;
+    this.showMasterSp = false;
 
     this.changeProportions = function(kW, kH)
     {
@@ -411,8 +415,6 @@ function Slide(presentation, slideLayout, slideNum)
     };
 
 
-    this.Save_Changes = function()
-    {};
 
     this.getMatchingShape =  function(type, idx)
     {
@@ -897,12 +899,55 @@ function Slide(presentation, slideLayout, slideNum)
 
     if(presentation)
     {
-        this.setLocks(new PropLocker(), new PropLocker(), new PropLocker(), new PropLocker(), new PropLocker());
+        this.setLocks(new PropLocker(this.Id), new PropLocker(this.Id), new PropLocker(this.Id), new PropLocker(this.Id), new PropLocker(this.Id));
+    }
+
+    if(slideLayout)
+    {
+        this.setLayout(slideLayout);
+    }
+    if(typeof slideNum === "number")
+    {
+        this.setSlideNum(slideNum);
     }
 }
 
 Slide.prototype =
 {
+
+    setShow: function(bShow)
+    {
+        History.Add(this, {Type:historyitem_SetShow, oldPr: this.show, newPr: bShow});
+        this.show = bShow;
+    },
+
+    setShowPhAnim: function(bShow)
+    {
+
+        History.Add(this, {Type: historyitem_SetShowPhAnim, oldPr: this.showMasterPhAnim, newPr: bShow});
+        this.showMasterPhAnim = bShow;
+    },
+
+    setShowMasterSp: function(bShow)
+    {
+        History.Add(this, {Type: historyitem_SetShowMasterSp, oldPr: this.showMasterSp, newPr: bShow});
+        this.showMasterSp = bShow;
+
+    },
+
+    setLayout: function(layout)
+    {
+        History.Add(this, {Type: historyitem_SetLayout, oldLayout: this.Layout, newLayout: layout});
+        this.Layout = layout;
+    },
+
+    setSlideNum: function(num)
+    {
+        History.Add(this, {Type: historyitem_SetSlideNum, oldNum: this.num, newNum: num});
+        this.num = num;
+    },
+
+
     applyTiming: function(timing)
     {
         var oldTiming = this.timing.createDuplicate();
@@ -915,7 +960,8 @@ Slide.prototype =
     {
         History.Add(this, {Type: historyitem_ChangeBg, oldBg: this.cSld.Bg ? this.cSld.Bg.createFullCopy() : null, newBg: bg});
         this.cSld.Bg = bg.createFullCopy();
-        this.recalculateBackground();
+        this.recalcInfo.recalculateBackground = true;
+        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
     setLocks: function(deleteLock, backgroundLock, timingLock, transitionLock, layoutLock)
     {
@@ -1125,7 +1171,11 @@ Slide.prototype =
     },
 
 
-
+    shapeAdd: function(pos, item)
+    {
+        History.Add(this, {Type: historyitem_ShapeAdd, pos: pos, item: item});
+        this.cSld.spTree.splice(pos, 0, item);
+    },
 
     alignLeft : function()
     {
@@ -1372,6 +1422,18 @@ Slide.prototype =
     Refresh_RecalcData: function()
     {},
 
+    setCSldName: function(name)
+    {
+        History.Add(this, {Type: historyitem_SetCSldName,oldName: this.cSld.name, newName: name});
+        this.cSld.name = name;
+    },
+
+    setClMapOverride: function(clrMap)
+    {
+        History.Add(this, {Type: historyitem_SetClrMapOverride, oldClrMap: this.clrMap, newClrMap: clrMap});
+        this.clrMap = clrMap;
+    },
+
     Undo: function(data)
     {
         switch(data.Type)
@@ -1408,6 +1470,53 @@ Slide.prototype =
                 this.timing = data.oldTiming.createDuplicate();
                 break;
             }
+            case historyitem_SetLayout:
+            {
+                this.Layout = data.oldLayout;
+                break;
+            }
+            case historyitem_SetSlideNum:
+            {
+                this.num = data.oldNum;
+                break;
+            }
+            case historyitem_ShapeAdd:
+            {
+                this.cSld.spTree.splice(data.pos, 1);
+                break;
+            }
+            case historyitem_SetCSldName:
+            {
+                this.cSld.name = data.oldName;
+                break;
+            }
+            case historyitem_SetClrMapOverride:
+            {
+                this.clrMap = data.oldClrMap;
+                break;
+            }
+            case historyitem_SetShow:
+            {
+                this.show = data.oldPr;
+                break;
+            }
+
+
+            case historyitem_SetShowPhAnim:
+            {
+                this.showMasterPhAnim = data.oldPr;
+                break;
+            }
+
+
+            case historyitem_SetShowMasterSp:
+            {
+                this.showMasterSp = data.oldPr;
+                break;
+            }
+
+
+
         }
     },
 
@@ -1447,14 +1556,65 @@ Slide.prototype =
                 this.timing = data.newTiming.createDuplicate();
                 break;
             }
+            case historyitem_SetLayout:
+            {
+                this.Layout = data.newLayout;
+                break;
+            }
+            case historyitem_SetSlideNum:
+            {
+                this.num = data.newNum;
+                break;
+            }
+            case historyitem_ShapeAdd:
+            {
+                this.cSld.spTree.splice(data.pos, 0, data.item);
+                break;
+            }
+
+            case historyitem_SetCSldName:
+            {
+                this.cSld.name = data.newName;
+                break;
+            }
+
+            case historyitem_SetClrMapOverride:
+            {
+                this.clrMap = data.newClrMap;
+                break;
+            }
+            case historyitem_SetShow:
+            {
+                this.show = data.newPr;
+                break;
+            }
+
+
+            case historyitem_SetShowPhAnim:
+            {
+                this.showMasterPhAnim = data.newPr;
+                break;
+            }
+
+
+            case historyitem_SetShowMasterSp:
+            {
+                this.showMasterSp = data.newPr;
+                break;
+            }
         }
     },
 
     Write_ToBinary2: function(w)
-    {},
+    {
+        w.WriteLong(historyitem_type_Slide);
+        w.WriteString2(this.Id);
+    },
 
     Read_FromBinary2: function(r)
-    {},
+    {
+        this.Id = r.GetString2();
+    },
 
     Save_Changes: function(data, w)
     {
@@ -1482,9 +1642,79 @@ Slide.prototype =
                 break;
             }
 
+            case historyitem_ChangeBg:
+            {
+                data.newBg.Write_ToBinary2(w);
+
+                break;
+            }
             case historyitem_ChangeTiming:
             {
                 data.newTiming.Write_ToBinary2(w);
+                break;
+            }
+            case historyitem_SetLayout:
+            {
+                w.WriteBool(isRealObject(data.newLayout));
+                if(isRealObject(data.newLayout))
+                {
+                    w.WriteString2(data.newLayout.Get_Id());
+                }
+                break;
+            }
+            case historyitem_SetSlideNum:
+            {
+                w.WriteBool(isRealNumber(data.newNum));
+                if(isRealNumber(data.newNum))
+                {
+                    w.WriteLong(data.newNum);
+                }
+                break;
+            }
+            case historyitem_ShapeAdd:
+            {
+                w.WriteLong(data.pos);
+                w.WriteString2(data.item.Get_Id());
+                break;
+            }
+
+            case historyitem_SetCSldName:
+            {
+                w.WriteBool(typeof data.newName === "string");
+                if(typeof data.newName === "string")
+                {
+                    w.WriteString2(data.newName);
+                }
+                break;
+            }
+
+            case historyitem_SetClrMapOverride:
+            {
+                w.WriteBool(isRealObject(data.newClrMap));
+                if(isRealObject(data.newClrMap))
+                {
+                    data.newClrMap.Write_ToBinary2(w);
+                }
+                break;
+            }
+
+            case historyitem_SetShow:
+            {
+                w.WriteBool(data.newPr);
+                break;
+            }
+
+
+            case historyitem_SetShowPhAnim:
+            {
+                w.WriteBool( data.newPr);
+                break;
+            }
+
+
+            case historyitem_SetShowMasterSp:
+            {
+                w.WriteBool( data.newPr);
                 break;
             }
         }
@@ -1504,7 +1734,7 @@ Slide.prototype =
             {
                 var pos = r.GetLong();
                 var id = r.GetString2();
-                this.cSld.spTree.splice(pos, 0, id);
+                this.cSld.spTree.splice(pos, 0,  g_oTableId.Get_ById(id));
                 break;
             }
             case historyitem_AddSlideLocks:
@@ -1516,10 +1746,93 @@ Slide.prototype =
                 this.layoutLock     = g_oTableId.Get_ById(r.GetString2());
                 break;
             }
+            case historyitem_ChangeBg:
+            {
+                this.cSld.Bg = new CBg();
+                this.cSld.Bg.Read_FromBinary2(r);
+                this.recalcInfo.recalculateBackground = true;
+                editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+
+                break;
+            }
             case historyitem_ChangeTiming:
             {
                 this.timing = new CAscSlideTiming();
                 this.timing.Read_FromBinary2(r);
+                break;
+            }
+            case historyitem_SetLayout:
+            {
+                if(r.GetBool())
+                {
+                    this.Layout = g_oTableId.Get_ById(r.GetString2());
+                }
+                else
+                {
+                    this.Layout = null;
+                }
+                break;
+            }
+            case historyitem_SetSlideNum:
+            {
+                if(r.GetBool())
+                {
+                    this.num = r.GetLong();
+                }
+                else
+                {
+                    this.num = null;
+                }
+                break;
+            }
+
+            case historyitem_ShapeAdd:
+            {
+                var pos = r.GetLong();
+                var item  = g_oTableId.Get_ById(r.GetString2());
+                this.cSld.spTree.splice(pos, 0, item);
+                break;
+            }
+            case historyitem_SetCSldName:
+            {
+                if(r.GetBool())
+                {
+                   this.cSld.name = r.GetString2();
+                }
+                else
+                {
+                    this.cSld.name = null;
+                }
+                break;
+            }
+
+
+            case historyitem_SetClrMapOverride:
+            {
+                if(r.GetBool())
+                {
+                    this.clrMap = new ClrMap();
+                    this.clrMap.Read_FromBinary2(r);
+                }
+                break;
+            }
+            case historyitem_SetShow:
+            {
+                this.show = r.GetBool();
+                break;
+            }
+
+
+            case historyitem_SetShowPhAnim:
+            {
+                this.showMasterPhAnim = r.GetBool();
+                break;
+            }
+
+
+            case historyitem_SetShowMasterSp:
+            {
+                this.showMasterSp = r.GetBool();
                 break;
             }
         }
@@ -1528,17 +1841,104 @@ Slide.prototype =
 
 function PropLocker(objectId)
 {
+    this.objectId = null;
     this.Lock = new CLock();
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 
-    this.objectId = objectId;
+
+    if(typeof  objectId === "string")
+    {
+        this.setObjectId(objectId);
+    }
 
 }
 
 PropLocker.prototype = {
+
+    setObjectId: function(id)
+    {
+        History.Add(this, {Type: historyitem_PropLockerSetId, oldId: this.objectId, newId: id});
+        this.objectId = id;
+    },
     Get_Id: function()
     {
         return this.Id;
-    }
-}
+    },
+    Write_ToBinary2: function(w)
+    {
+        w.WriteLong(historyitem_type_PropLocker);
+        w.WriteString2(this.Id);
+    },
+
+    Read_FromBinary2: function(r)
+    {
+        this.Id = r.GetString2();
+    },
+
+    Undo: function(data)
+    {
+        switch(data.Type)
+        {
+            case historyitem_PropLockerSetId:
+            {
+                this.objectId = data.oldId;
+                break;
+            }
+        }
+    },
+
+    Redo: function(data)
+    {
+        switch(data.Type)
+        {
+            case historyitem_PropLockerSetId:
+            {
+                this.objectId = data.newId;
+                break;
+            }
+        }
+    },
+
+    Save_Changes: function(data, w)
+    {
+        w.WriteLong(data.Type);
+        switch(data.Type)
+        {
+            case historyitem_PropLockerSetId:
+            {
+                w.WriteBool(typeof data.newId === "string");
+                if(typeof data.newId === "string")
+                {
+                    w.WriteString2(data.newId);
+                }
+                break;
+            }
+        }
+    },
+
+    Load_Changes: function(r)
+    {
+        var type = r.GetLong();
+        switch(type)
+        {
+            case historyitem_PropLockerSetId:
+            {
+                if(r.GetBool())
+                {
+                    this.objectId = r.GetString2();
+                }
+                else
+                {
+                    this.objectId = null;
+                }
+                break;
+            }
+        }
+    },
+
+
+    Refresh_RecalcData: function()
+    {}
+
+};

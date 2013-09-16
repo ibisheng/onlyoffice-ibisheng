@@ -1056,16 +1056,24 @@ asc_docs_api.prototype.UpdateTextPr = function(TextPr)
 {
 	if ( "undefined" != typeof(TextPr) )
 	{
-		var oTextPrMap = {
-			Bold: function(oThis, v){ oThis.sync_BoldCallBack(v); },
-			Italic: function(oThis, v){oThis.sync_ItalicCallBack(v); },
-			Underline: function(oThis, v){ oThis.sync_UnderlineCallBack(v); },
-			Strikeout: function(oThis, v){ oThis.sync_StrikeoutCallBack(v); },
-			FontSize: function(oThis, v){ oThis.sync_TextPrFontSizeCallBack(v); },
-			FontFamily: function(oThis, v){ oThis.sync_TextPrFontFamilyCallBack(v); },
-			VertAlign: function(oThis, v){ oThis.sync_VerticalAlign(v); },
-			HighLight: function(oThis, v){ oThis.sync_TextHighLight(v); }
-		}
+        var oTextPrMap =
+        {
+            Bold       : function(oThis, v){ oThis.sync_BoldCallBack(v); },
+            Italic     : function(oThis, v){ oThis.sync_ItalicCallBack(v); },
+            Underline  : function(oThis, v){ oThis.sync_UnderlineCallBack(v); },
+            Strikeout  : function(oThis, v){ oThis.sync_StrikeoutCallBack(v); },
+            FontSize   : function(oThis, v){ oThis.sync_TextPrFontSizeCallBack(v); },
+            FontFamily : function(oThis, v){ oThis.sync_TextPrFontFamilyCallBack(v); },
+            VertAlign  : function(oThis, v){ oThis.sync_VerticalAlign(v); },
+          //  Color      : function(oThis, v){ oThis.sync_TextColor(v); },
+            //HighLight  : function(oThis, v){ oThis.sync_TextHighLight(v); },
+            Spacing    : function(oThis, v){ oThis.sync_TextSpacing(v); },
+            DStrikeout : function(oThis, v){ oThis.sync_TextDStrikeout(v); },
+            Caps       : function(oThis, v){ oThis.sync_TextCaps(v); },
+            SmallCaps  : function(oThis, v){ oThis.sync_TextSmallCaps(v); },
+            Position   : function(oThis, v){ oThis.sync_TextPosition(v); },
+            Lang       : function(oThis, v){ oThis.sync_TextLangCallBack(v);}
+        } ;
 
         if (TextPr.Color !== undefined)
         {
@@ -1098,6 +1106,32 @@ asc_docs_api.prototype.UpdateTextPr = function(TextPr)
         }
 	}
 }
+
+asc_docs_api.prototype.sync_TextSpacing = function(Spacing)
+{
+    this.asc_fireCallback("asc_onTextSpacing", Spacing );
+}
+asc_docs_api.prototype.sync_TextDStrikeout = function(Value)
+{
+    this.asc_fireCallback("asc_onTextDStrikeout", Value );
+}
+asc_docs_api.prototype.sync_TextCaps = function(Value)
+{
+    this.asc_fireCallback("asc_onTextCaps", Value );
+}
+asc_docs_api.prototype.sync_TextSmallCaps = function(Value)
+{
+    this.asc_fireCallback("asc_onTextSmallCaps", Value );
+}
+asc_docs_api.prototype.sync_TextPosition = function(Value)
+{
+    this.asc_fireCallback("asc_onTextPosition", Value );
+}
+asc_docs_api.prototype.sync_TextLangCallBack = function(Lang)
+{
+    this.asc_fireCallback("asc_onTextLanguage", Lang.Val );
+}
+
 asc_docs_api.prototype.sync_VerticalTextAlign = function(align)
 {
     this.asc_fireCallback("asc_onVerticalTextAlign", align);
@@ -1172,6 +1206,16 @@ asc_docs_api.prototype.UpdateParagraphProp = function(ParaPr){
     {
         ParaPr.ListType = { Type: -1, SubType: -1};
     }  */
+
+    var TextPr = editor.WordControl.m_oLogicDocument.Get_Paragraph_TextPr();
+    ParaPr.Subscript   = ( TextPr.VertAlign === vertalign_SubScript   ? true : false );
+    ParaPr.Superscript = ( TextPr.VertAlign === vertalign_SuperScript ? true : false );
+    ParaPr.Strikeout   = TextPr.Strikeout;
+    ParaPr.DStrikeout  = TextPr.DStrikeout;
+    ParaPr.AllCaps     = TextPr.Caps;
+    ParaPr.SmallCaps   = TextPr.SmallCaps;
+    ParaPr.TextSpacing = TextPr.Spacing;
+    ParaPr.Position    = TextPr.Position;
 	this.sync_ParaSpacingLine( ParaPr.Spacing );
 	this.Update_ParaInd(ParaPr.Ind);
 	this.sync_PrAlignCallBack(ParaPr.Jc);
@@ -1490,10 +1534,6 @@ asc_docs_api.prototype.put_PrLineSpacing = function(Type, Value)
 {
     this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
 	this.WordControl.m_oLogicDocument.Set_ParagraphSpacing( { LineRule : Type,  Line : Value } );
-
-    var ParaPr = this.get_TextProps().ParaPr;
-    if ( null != ParaPr )
-	    this.sync_ParaSpacingLine( ParaPr.Spacing );
 }
 asc_docs_api.prototype.put_LineSpacingBeforeAfter = function(type,value)//"type == 0" means "Before", "type == 1" means "After"
 {
@@ -1571,7 +1611,7 @@ asc_docs_api.prototype.onSaveCallback = function (e) {
 		}
 
 		// Принимаем чужие изменения (ToDo)
-		//CollaborativeEditing.Apply_Changes();
+		CollaborativeEditing.Apply_Changes();
 
 		// Сохраняем файл на сервер
 		var data = this.WordControl.SaveDocument();
@@ -1589,7 +1629,7 @@ asc_docs_api.prototype.onSaveCallback = function (e) {
 		}, sData);
 
 		// Пересылаем свои изменения (ToDo)
-		//CollaborativeEditing.Send_Changes();
+		CollaborativeEditing.Send_Changes();
 		//Обратно выставляем, что документ не модифицирован
 		t.SetUnchangedDocument();
 
@@ -1887,10 +1927,13 @@ asc_docs_api.prototype.ShapeApply = function(prop)
 
         if (null != _image)
         {
-            this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-
-            this.WordControl.m_oLogicDocument.ShapeApply(prop);
-            this.WordControl.m_oDrawingDocument.DrawImageTextureFillShape(image_url);
+            var doc = this.WordControl.m_oLogicDocument;
+            if(doc.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+            {
+                this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+                this.WordControl.m_oLogicDocument.ShapeApply(prop);
+                this.WordControl.m_oDrawingDocument.DrawImageTextureFillShape(image_url);
+            }
         }
         else
         {
@@ -1900,21 +1943,46 @@ asc_docs_api.prototype.ShapeApply = function(prop)
             this.asyncImageEndLoaded2 = function(_image)
             {
                 if(!(this.noCreatePoint === true))
-                    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-                this.WordControl.m_oLogicDocument.ShapeApply(oProp);
+                {
+                    var doc = this.WordControl.m_oLogicDocument;
+                    if(doc.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+                    {
 
-                this.WordControl.m_oDrawingDocument.DrawImageTextureFillShape(image_url);
+                        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+                        this.WordControl.m_oLogicDocument.ShapeApply(oProp);
 
-                this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
-                this.asyncImageEndLoaded2 = null;
+                        this.WordControl.m_oDrawingDocument.DrawImageTextureFillShape(image_url);
+
+                        this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
+                        this.asyncImageEndLoaded2 = null;
+                    }
+                }
+                else
+                {
+                    this.WordControl.m_oLogicDocument.ShapeApply(oProp);
+                    this.WordControl.m_oDrawingDocument.DrawImageTextureFillShape(image_url);
+                    this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
+                    this.asyncImageEndLoaded2 = null;
+                }
             }
         }
     }
     else
     {
         if(!this.noCreatePoint)
+        {
+            var doc = this.WordControl.m_oLogicDocument;
+            if(doc.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+            {
+                this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+                this.WordControl.m_oLogicDocument.ShapeApply(prop);
+            }
+        }
+        else
+        {
             this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-        this.WordControl.m_oLogicDocument.ShapeApply(prop);
+            this.WordControl.m_oLogicDocument.ShapeApply(prop);
+        }
     }
 }
 

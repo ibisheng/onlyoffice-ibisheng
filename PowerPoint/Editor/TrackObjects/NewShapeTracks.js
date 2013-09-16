@@ -271,7 +271,7 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
         else
             shape.initDefaultTextRect(this.x, this.y, this.extX, this.extY, false, false);
         shape.select(this.drawingObjects.graphicObjects);
-        drawingObjects.addSp(shape);
+        drawingObjects.shapeAdd(drawingObjects.cSld.spTree.length, shape);
         this.drawingObjects.graphicObjects.State.resultObject = shape;
     };
 }

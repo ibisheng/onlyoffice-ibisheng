@@ -358,4 +358,27 @@ function MasterSlide(presentation, theme)
         }
 
     };
+
+    this.Id = g_oIdCounter.Get_NewId();
+    g_oTableId.Add(this, this.Id);
 }
+
+MasterSlide.prototype =
+{
+    Get_Id: function()
+    {
+        return this.Id;
+    },
+
+    Write_ToBinary2: function(w)
+    {},
+
+    Read_FromBinary2: function(r)
+    {},
+
+    Save_Changes: function()
+    {},
+
+    Load_Changes: function()
+    {}
+};

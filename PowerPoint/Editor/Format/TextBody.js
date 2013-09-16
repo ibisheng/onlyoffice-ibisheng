@@ -93,13 +93,10 @@ var nTWTSquare = 1;
 
 function CTextBody(shape)
 {
-    this.shape = shape;
-
     this.bodyPr = new CBodyPr();
     this.lstStyle = new TextListStyle();
 
 
-    this.content = new CDocumentContent(this, editor.WordControl.m_oLogicDocument.DrawingDocument, 0, 0, 0, 20000, false, false);
     this.content2 = null;
     this.compiledBodyPr = new CBodyPr();
     this.recalcInfo =
@@ -111,6 +108,12 @@ function CTextBody(shape)
     this.bRecalculateNumbering = true;
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
+
+    if(isRealObject(shape))
+    {
+        this.setShape(shape);
+        this.setDocContent(new CDocumentContent(this, editor.WordControl.m_oLogicDocument.DrawingDocument, 0, 0, 0, 20000, false, false));
+    }
 }
 
 CTextBody.prototype =
@@ -121,7 +124,36 @@ CTextBody.prototype =
         return this.Id;
     },
 
+    setLstStyle: function(lstStyle)
+    {
+        History.Add(this, {Type:historyitem_SetLstStyle, oldPr: this.lstStyle, newPr: lstStyle});
+        this.lstStyle = lstStyle;
+    },
 
+    setShape: function(shape)
+    {
+        History.Add(this, {Type:historyitem_SetShape, oldPr: this.shape, newPr: shape});
+        this.shape = shape;
+    },
+
+    setDocContent: function(docContent)
+    {
+        History.Add(this, {Type:historyitem_SetDocContent, oldPr: this.content, newPr: docContent});
+        this.content = docContent;
+
+    },
+
+    Write_ToBinary2: function(w)
+    {
+        w.WriteLong(historyitem_type_TextBody);
+        w.WriteString2(this.Id);
+    },
+
+
+    Read_FromBinary2: function(r)
+    {
+        this.Id = r.GetString2();
+    },
 
     recalculate: function()
     {
@@ -382,23 +414,134 @@ CTextBody.prototype =
         readFromBinaryDocContent(this.content, r);
     },
 
-    Undo: function()
-    {},
+    Undo: function(data)
+    {
+        switch(data.Type)
+        {
+            case historyitem_SetShape:
+            {
+                this.shape = data.oldPr;
+                break;
+            }
 
-    Redo: function()
-    {},
+            case historyitem_SetDocContent:
+            {
+                this.content = data.oldPr;
+                break;
+            }
+            case historyitem_SetLstStyle:
+            {
+                this.lstStyle = data.oldPr;
+                break;
+            }
 
-    Write_ToBinary2: function()
-    {},
+        }
+    },
 
-    Read_FromBinary2: function()
-    {},
+    Redo: function(data)
+    {
+        switch(data.Type)
+        {
+            case historyitem_SetShape:
+            {
+                this.shape = data.newPr;
+                break;
+            }
 
-    Save_Changes: function()
-    {},
+            case historyitem_SetDocContent:
+            {
+                this.content = data.newPr;
+                break;
+            }
 
-    Load_Changes: function()
-    {},
+            case historyitem_SetLstStyle:
+            {
+                this.lstStyle = data.newPr;
+                break;
+            }
+
+        }
+    },
+    Save_Changes: function(data, w)
+    {
+        w.WriteLong(historyitem_type_TextBody);
+        w.WriteLong(data.Type);
+        switch(data.Type)
+        {
+            case historyitem_SetShape:
+            {
+                w.WriteBool(typeof  data.newPr === "string");
+                if(typeof  data.newPr === "string")
+                {
+                    w.WriteString2(data.newPr)
+                }
+                break;
+            }
+
+            case historyitem_SetDocContent:
+            {
+                w.WriteBool(typeof  data.newPr === "string");
+                if(typeof  data.newPr === "string")
+                {
+                    w.WriteString2(data.newPr)
+                }
+                break;
+            }
+
+            case historyitem_SetLstStyle:
+            {
+                w.WriteBool(isRealObject(data.newPr));
+                if(isRealObject(data.newPr))
+                {
+                    data.newPr.Write_ToBinary2(w);
+                }
+                break;
+            }
+
+        }
+    },
+
+    Load_Changes: function(r)
+    {
+        if(r.GetLong() === historyitem_type_TextBody)
+        {
+            var type = r.GetLong();
+            switch(type)
+            {
+                case historyitem_SetShape:
+                {
+                    if(r.GetBool())
+                    {
+                        this.shape = g_oTableId.Get_ById(r.GetString2());
+                    }
+                    break;
+                }
+
+                case historyitem_SetDocContent:
+                {
+                    if(r.GetBool())
+                    {
+                        this.content = g_oTableId.Get_ById(r.GetString2());
+                    }
+                    break;
+                }
+                case historyitem_SetLstStyle:
+                {
+                    if(r.GetBool())
+                    {
+                        this.lstStyle = new TextListStyle();
+                        this.lstStyle.Read_FromBinary2(r);
+                    }
+                    else
+                    {
+                        this.lstStyle = null;
+                    }
+                    break;
+                }
+
+            }
+        }
+    },
 
     Refresh_RecalcData2: function()
     {},

@@ -152,12 +152,27 @@ function NullState(drawingObjectsController, drawingObjects)
                 }
                 else if(hit_in_text_rect)
                 {
-                    this.drawingObjectsController.resetSelection();
-                    cur_drawing.select(this.drawingObjectsController);
-                    cur_drawing.selectionSetStart(e, x, y);
-                    this.drawingObjectsController.changeCurrentState(new TextAddState(this.drawingObjectsController, this.drawingObjects, cur_drawing));
-                    if(e.ClickCount < 2)
-                        this.drawingObjectsController.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
+                    if(e.Button !== g_mouse_button_right || this.drawingObjectsController.State === this || (this.drawingObjectsController.State.textObject !== cur_drawing))
+                    {
+                        this.drawingObjectsController.resetSelection();
+                        cur_drawing.select(this.drawingObjectsController);
+                        cur_drawing.selectionSetStart(e, x, y);
+                        this.drawingObjectsController.changeCurrentState(new TextAddState(this.drawingObjectsController, this.drawingObjects, cur_drawing));
+                        if(e.ClickCount < 2)
+                            this.drawingObjectsController.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
+                    }
+                    else
+                    {
+                        if(e.Button === g_mouse_button_right && this.drawingObjectsController.State.textObject && this.drawingObjectsController.State.textObject === cur_drawing && !(cur_drawing.pointInSelectedText(x, y)))
+                        {
+                            this.drawingObjectsController.resetSelection();
+                            cur_drawing.select(this.drawingObjectsController);
+                            cur_drawing.selectionSetStart(e, x, y);
+                            this.drawingObjectsController.changeCurrentState(new TextAddState(this.drawingObjectsController, this.drawingObjects, cur_drawing));
+                            if(e.ClickCount < 2)
+                                this.drawingObjectsController.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
+                        }
+                    }
                     return;
                 }
             }
@@ -1423,8 +1438,11 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
 
     this.onMouseUp = function(e, x, y)
     {
-        this.textObject.selectionSetEnd(e, x, y);
-        this.drawingObjectsController.updateSelectionState();
+        if(!(e.Button === g_mouse_button_right && this.textObject.pointInSelectedText(x, y)))
+        {
+            this.textObject.selectionSetEnd(e, x, y);
+            this.drawingObjectsController.updateSelectionState();
+        }
     };
 
     this.onKeyDown = function(e)

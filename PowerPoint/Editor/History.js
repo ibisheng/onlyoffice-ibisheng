@@ -53,6 +53,9 @@ var historyitem_Paragraph_Borders_Top               = 30; // Изменяем н
 var historyitem_Paragraph_Pr                        = 31; // Изменяем свойства полностью
 var historyitem_Paragraph_PresentationPr_Bullet     = 32; // Изменяем свойства нумерации у параграфа в презентации
 var historyitem_Paragraph_PresentationPr_Level      = 33; // Изменяем уровень параграфа в презентациях
+var historyitem_Paragraph_FramePr                   = 34; // Изменяем настройки рамки
+var historyitem_Paragraph_PresentationBullet        = 35; // Изменяем уровень параграфа в презентациях
+
 
 // Типы изменений в классе ParaTextPr
 var historyitem_TextPr_Change     =  1; // Изменяем настройку
@@ -212,6 +215,23 @@ var historyitem_AddToSlideSpTree = 1;
 var historyitem_AddSlideLocks = 2;
 var historyitem_ChangeBg = 3;
 var historyitem_ChangeTiming = 4;
+var historyitem_SetLayout = 5;
+var historyitem_SetSlideNum = 6;
+var historyitem_ShapeAdd = 7;
+var historyitem_SetCSldName = 8;
+var historyitem_SetClrMapOverride = 9;
+var historyitem_SetShow = 10;
+var historyitem_SetShowPhAnim = 11;
+var historyitem_SetShowMasterSp = 12;
+
+
+
+
+
+
+
+//Изменения в классе PropLocker
+var historyitem_PropLockerSetId = 0;
 
 
 
@@ -274,10 +294,32 @@ var historyitem_SetShapeSetFill = 7;
 var historyitem_SetShapeSetLine= 8;
 var historyitem_SetShapeSetGeometry = 9;
 var historyitem_SetShapeBodyPr = 10;
+var historyitem_SetSetNvSpPr = 11;
+var historyitem_SetSetSpPr = 12;
+var historyitem_SetSetStyle = 13;
+var historyitem_SetTextBody = 14;
+var historyitem_SetBlipFill = 15;
+var historyitem_AddToGroupSpTree = 16;
+var historyitem_SetSpGroup = 17;
+var historyitem_SetSpParent = 18;
+
+
+
+
+
+
+
+
 
 
 //Типы изменений в классе CChartAsGroup
-var historyitem_SetCahrtLayout = 0;
+var historyitem_SetCahrtLayout = 1000;
+
+//Типы изменений в классе TexBody
+var historyitem_SetShape = 0;
+var historyitem_SetDocContent = 1;
+var historyitem_SetLstStyle = 2;
+
 
 
 
@@ -354,6 +396,17 @@ var historyitem_type_HdrFtrGrObjects  = 25;
 var historyitem_type_GrObjects        = 26;
 var historyitem_type_Hyperlink        = 27;
 var historyitem_type_ChartTitle 	  = 28;
+var historyitem_type_PropLocker 	  = 29;
+var historyitem_type_Slide      	  = 30;
+var historyitem_type_Layout      	  = 31;
+var historyitem_type_TextBody      	  = 32;
+var historyitem_type_GraphicFrame  	  = 33;
+
+
+
+
+
+
 
 
 function CHistory(Document)

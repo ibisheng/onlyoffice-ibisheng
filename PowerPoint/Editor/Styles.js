@@ -5098,6 +5098,12 @@ CTextPr.prototype =
             Flags |= 2097152;
         }
 
+        Writer.WriteBool(isRealObject(this.unifill));
+        if(isRealObject(this.unifill))
+        {
+            this.unifill.Write_ToBinary2(Writer);
+        }
+
         var EndPos = Writer.GetCurPosition();
         Writer.Seek( StartPos );
         Writer.WriteLong( Flags );
@@ -5207,6 +5213,12 @@ CTextPr.prototype =
         // Lang
         if ( Flags & 2097152 )
             this.Lang.Read_FromBinary( Reader );
+
+        if(Reader.GetBool())
+        {
+            this.unifill = new CUniFill();
+            this.unifill.Read_FromBinary2(Reader);
+        }
     },
 
     Check_NeedRecalc : function()

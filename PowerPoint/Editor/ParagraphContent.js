@@ -254,13 +254,14 @@ function ParaTextPr(Props)
     this.Value  = new CTextPr();
     this.Parent = null;
 
-    if ( Props !== null && "object" === typeof Props )
-    {
-        this.Value.Set_FromObject(Props)
-    }
+
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
 
+    if ( Props !== null && "object" === typeof Props )
+    {
+        this.Apply_TextPr(Props)
+    }
     this.createDuplicate = function()
     {
         return new ParaTextPr(this.Value);
@@ -808,20 +809,70 @@ ParaTextPr.prototype =
 
         switch ( Type )
         {
+            case historyitem_TextPr_Unifill:
+            {
+                if ( undefined != Data.New )
+                {
+                    Writer.WriteBool( false );
+                    Data.New.Write_ToBinary2(Writer);
+                }
+                else
+                    Writer.WriteBool( true );
+                break;
+            }
+
             case historyitem_TextPr_Change:
             {
                 // Variable : TextPr
-                Styles_Write_TextPr_ToBinary( Data.New, Writer );
+
+                var TextPr = new CTextPr();
+                TextPr[Data.Prop] = Data.New;
+                TextPr.Write_ToBinary( Writer );
+
+                break;
+            }
+
+            case historyitem_TextPr_Bold:
+            case historyitem_TextPr_Italic:
+            case historyitem_TextPr_Strikeout:
+            case historyitem_TextPr_Underline:
+            {
+                // Bool : IsUndefined
+                // Bool : Value
+
+                if ( undefined != Data.New )
+                {
+                    Writer.WriteBool( false );
+                    Writer.WriteBool( Data.New );
+                }
+                else
+                    Writer.WriteBool( true );
+
+                break;
+            }
+
+            case historyitem_TextPr_FontFamily:
+            {
+                // Bool   : IsUndefined
+                // String : FontName
+
+                if ( undefined != Data.New )
+                {
+                    Writer.WriteBool(false);
+                    Writer.WriteString2( Data.New.Name );
+                }
+                else
+                    Writer.WriteBool(true);
 
                 break;
             }
 
             case historyitem_TextPr_FontSize:
             {
-                // Bool   : null?
+                // Bool   : IsUndefined
                 // Double : FontSize
 
-                if ( null != Data.New )
+                if ( undefined != Data.New )
                 {
                     Writer.WriteBool(false);
                     Writer.WriteDouble( Data.New );
@@ -834,17 +885,13 @@ ParaTextPr.prototype =
 
             case historyitem_TextPr_Color:
             {
-                // Bool : null?
-                // Byte : Color.r
-                // Byte : Color.g
-                // Byte : Color.b
+                // Bool     : IsUndefined
+                // Variable : Color (CDocumentColor)
 
-                if ( null != Data.New )
+                if ( undefined != Data.New )
                 {
                     Writer.WriteBool(false);
-                    Writer.WriteByte(Data.New.r);
-                    Writer.WriteByte(Data.New.g);
-                    Writer.WriteByte(Data.New.b);
+                    Data.New.Write_ToBinary( Writer );
                 }
                 else
                     Writer.WriteBool(true);
@@ -852,18 +899,187 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Underline:
+            case historyitem_TextPr_VertAlign:
             {
-                // Bool   : null?
-                // Bool   : Underline
+                // Bool  : IsUndefined
+                // Long  : VertAlign
 
-                if ( null != Data.New )
+                if ( undefined != Data.New )
                 {
                     Writer.WriteBool(false);
-                    Writer.WriteBool(Data.New);
+                    Writer.WriteLong(Data.New);
                 }
                 else
                     Writer.WriteBool(true);
+
+                break;
+            }
+
+            case historyitem_TextPr_HighLight:
+            {
+                // Bool  : IsUndefined
+                // Если false
+                //   Bool  : IsNone
+                //   Если false
+                //     Variable : Color (CDocumentColor)
+
+                if ( undefined != Data.New )
+                {
+                    Writer.WriteBool(false);
+                    if ( highlight_None != Data.New )
+                    {
+                        Writer.WriteBool( false );
+                        Data.New.Write_ToBinary( Writer );
+                    }
+                    else
+                        Writer.WriteBool( true );
+                }
+                else
+                    Writer.WriteBool(true);
+
+                break;
+            }
+
+            case historyitem_TextPr_RStyle:
+            {
+                // Bool : IsUndefined
+                // Если false
+                //   String : RStyle
+
+                if ( undefined != Data.New )
+                {
+                    Writer.WriteBool( false );
+                    Writer.WriteString2( Data.New );
+                }
+                else
+                    Writer.WriteBool( true );
+
+                break;
+            }
+
+            case historyitem_TextPr_Spacing:
+            case historyitem_TextPr_Position:
+            {
+                // Bool : IsUndefined
+                // Если false
+                //   Double : Spacing
+
+                if ( undefined != Data.New )
+                {
+                    Writer.WriteBool( false );
+                    Writer.WriteDouble( Data.New );
+                }
+                else
+                    Writer.WriteBool( true );
+
+                break;
+            }
+
+            case historyitem_TextPr_DStrikeout:
+            case historyitem_TextPr_Caps:
+            case historyitem_TextPr_SmallCaps:
+            {
+                // Bool : IsUndefined
+                // Если false
+                //   Bool : value
+
+                if ( undefined != Data.New )
+                {
+                    Writer.WriteBool( false );
+                    Writer.WriteBool( Data.New );
+                }
+                else
+                    Writer.WriteBool( true );
+
+                break;
+            }
+
+            case historyitem_TextPr_Value:
+            {
+                // CTextPr
+                Data.New.Write_ToBinary(Writer)
+
+                break;
+            }
+
+            case historyitem_TextPr_RFonts:
+            {
+                // Bool : undefined ?
+                // false -> CRFonts
+                if ( undefined != Data.Old )
+                {
+                    Writer.WriteBool( false );
+                    Data.New.Write_ToBinary( Writer );
+                }
+                else
+                    Writer.WriteBool( true );
+
+                break;
+            }
+
+            case historyitem_TextPr_Lang:
+            {
+                // Bool : undefined ?
+                // false -> CLang
+                if ( undefined != Data.Old )
+                {
+                    Writer.WriteBool( false );
+                    Data.New.Write_ToBinary( Writer );
+                }
+                else
+                    Writer.WriteBool( true );
+
+                break;
+            }
+
+            case historyitem_TextPr_RFonts_Ascii:
+            case historyitem_TextPr_RFonts_HAnsi:
+            case historyitem_TextPr_RFonts_CS:
+            case historyitem_TextPr_RFonts_EastAsia:
+            {
+                // Bool : undefined?
+                // false -> String
+
+                if ( undefined != Data.Old )
+                {
+                    Writer.WriteBool( false );
+                    Writer.WriteString2( Data.Old.Name );
+                }
+                else
+                    Writer.WriteBool( true );
+
+                break;
+            }
+
+            case historyitem_TextPr_RFonts_Hint:
+            {
+                // Bool : undefined?
+                // false -> Long
+
+                if ( undefined != Data.Old )
+                {
+                    Writer.WriteBool( false );
+                    Writer.WriteLong( Data.Old );
+                }
+                else
+                    Writer.WriteBool( true );
+
+                break;
+            }
+
+            case historyitem_TextPr_Lang_Bidi:
+            case historyitem_TextPr_Lang_EastAsia:
+            case historyitem_TextPr_Lang_Val:
+            {
+                // Bool : undefined ?
+                // false -> Long
+                if ( undefined != Data.Old )
+                {
+                    Writer.WriteBool( false );
+                    Writer.WriteLong( Data.Old );
+                }
+                else
+                    Writer.WriteBool( true );
 
                 break;
             }
@@ -886,61 +1102,411 @@ ParaTextPr.prototype =
 
         switch ( Type )
         {
+            case historyitem_TextPr_Unifill:
+            {
+                if ( true === Reader.GetBool() )
+                    this.Value.unifill = undefined;
+                else
+                {
+                    this.Value.unifill = new CUniFill();
+                    this.Value.unifill.Read_FromBinary2(Reader);
+                }
+
+                break;
+            }
+
             case historyitem_TextPr_Change:
             {
                 // Variable : TextPr
-                this.Value = new Object();
-                Styles_Read_TextPr_FromBinary( this.Value, Reader );
+
+                var TextPr = new CTextPr();
+                TextPr.Read_FromBinary( Reader );
+                this.Value.Merge( TextPr );
 
                 break;
             }
 
-            case historyitem_TextPr_FontSize:
+            case historyitem_TextPr_Bold:
             {
-                // Bool   : null?
-                // Double : FontSize
+                // Bool : IsUndefined
+                // Bool : Bold
 
-                var bNull = Reader.GetBool();
-
-                if ( true != bNull )
-                    this.Value.FontSize = Reader.GetDouble();
+                if ( true === Reader.GetBool() )
+                    this.Value.Bold = undefined;
                 else
-                    delete this.Value.FontSize;
+                    this.Value.Bold = Reader.GetBool();
 
                 break;
             }
 
-            case historyitem_TextPr_Color:
+            case historyitem_TextPr_Italic:
             {
-                // Bool : null?
-                // Byte : Color.r
-                // Byte : Color.g
-                // Byte : Color.b
+                // Bool : IsUndefined
+                // Bool : Italic
 
-                var bNull = Reader.GetBool();
-                if ( true != bNull )
-                {
-                    this.Value.Color = new Object();
-                    this.Value.Color.r = Reader.GetByte();
-                    this.Value.Color.g = Reader.GetByte();
-                    this.Value.Color.b = Reader.GetByte();
-                }
+                if ( true === Reader.GetBool() )
+                    this.Value.Italic = undefined;
                 else
-                    delete this.Value.Color;
+                    this.Value.Italic = Reader.GetBool();
+
+                break;
+            }
+
+            case historyitem_TextPr_Strikeout:
+            {
+                // Bool : IsUndefined
+                // Bool : Strikeout
+
+                if ( true === Reader.GetBool() )
+                    this.Value.Strikeout = undefined;
+                else
+                    this.Value.Strikeout = Reader.GetBool();
 
                 break;
             }
 
             case historyitem_TextPr_Underline:
             {
-                // Bool   : null?
+                // Bool   : IsUndefined?
                 // Bool   : Underline
 
-                var bNull = Reader.GetBool();
-                if ( true != bNull )
+                if ( true != Reader.GetBool() )
                     this.Value.Underline = Reader.GetBool();
                 else
-                    delete this.Value.Underline;
+                    this.Value.Underline = undefined;
+
+                break;
+            }
+
+            case historyitem_TextPr_FontFamily:
+            {
+                // Bool   : IsUndefined
+                // String : FontName
+
+                if ( true != Reader.GetBool() )
+                {
+                    this.Value.FontFamily =
+                    {
+                        Name  : Reader.GetString2(),
+                        Index : -1
+                    };
+                }
+                else
+                    this.Value.FontFamily = undefined;
+
+                break;
+            }
+
+            case historyitem_TextPr_FontSize:
+            {
+                // Bool   : IsUndefined
+                // Double : FontSize
+
+                if ( true != Reader.GetBool() )
+                    this.Value.FontSize = Reader.GetDouble();
+                else
+                    this.Value.FontSize = undefined;
+
+                break;
+            }
+
+            case historyitem_TextPr_Color:
+            {
+                // Bool     : IsUndefined
+                // Variable : Color (CDocumentColor)
+
+                if ( true != Reader.GetBool() )
+                {
+                    var r = Reader.GetByte();
+                    var g = Reader.GetByte();
+                    var b = Reader.GetByte();
+                    this.Value.Color = new CDocumentColor( r, g, b );
+                }
+                else
+                    this.Value.Color = undefined;
+
+                break;
+            }
+
+            case historyitem_TextPr_VertAlign:
+            {
+                // Bool  : IsUndefined
+                // Long  : VertAlign
+
+                if ( true != Reader.GetBool() )
+                    this.Value.VertAlign = Reader.GetLong();
+                else
+                    this.Value.VertAlign = undefined;
+
+                break;
+            }
+
+            case historyitem_TextPr_HighLight:
+            {
+                // Bool  : IsUndefined
+                // Если false
+                //   Bool  : IsNull
+                //   Если false
+                //     Variable : Color (CDocumentColor)
+
+                if ( true != Reader.GetBool() )
+                {
+                    if ( true != Reader.GetBool() )
+                    {
+                        this.Value.HighLight = new CDocumentColor(0,0,0);
+                        this.Value.HighLight.Read_FromBinary(Reader);
+                    }
+                    else
+                        this.Value.HighLight = highlight_None;
+                }
+                else
+                    this.Value.HighLight = undefined;
+
+                break;
+            }
+
+            case historyitem_TextPr_RStyle:
+            {
+                // Bool : IsUndefined
+                // Если false
+                //   String : RStyle
+
+                if ( true != Reader.GetBool() )
+                    this.Value.RStyle = Reader.GetString2();
+                else
+                    this.Value.RStyle = undefined;
+
+                break;
+            }
+
+            case historyitem_TextPr_Spacing:
+            {
+                // Bool : IsUndefined
+                // Если false
+                //   Double : Spacing
+
+                if ( true != Reader.GetBool() )
+                    this.Value.Spacing = Reader.GetDouble();
+                else
+                    this.Value.Spacing = undefined;
+
+                break;
+            }
+
+            case historyitem_TextPr_DStrikeout:
+            {
+                // Bool : IsUndefined
+                // Если false
+                //   Bool : DStrikeout
+
+                if ( true != Reader.GetBool() )
+                    this.Value.DStrikeout = Reader.GetBool();
+                else
+                    this.Value.DStrikeout = undefined;
+
+                break;
+            }
+
+            case historyitem_TextPr_Caps:
+            {
+                // Bool : IsUndefined
+                // Если false
+                //   Bool : Caps
+
+                if ( true != Reader.GetBool() )
+                    this.Value.Caps = Reader.GetBool();
+                else
+                    this.Value.Caps = undefined;
+
+                break;
+            }
+
+            case historyitem_TextPr_SmallCaps:
+            {
+                // Bool : IsUndefined
+                // Если false
+                //   Bool : SmallCaps
+
+                if ( true != Reader.GetBool() )
+                    this.Value.SmallCaps = Reader.GetBool();
+                else
+                    this.Value.SmallCaps = undefined;
+
+                break;
+            }
+
+            case historyitem_TextPr_Position:
+            {
+                // Bool : IsUndefined
+                // Если false
+                //   Double : Position
+
+                if ( true != Reader.GetBool() )
+                    this.Value.Position = Reader.GetDouble();
+                else
+                    this.Value.Position = undefined;
+
+                break;
+            }
+
+            case historyitem_TextPr_Value:
+            {
+                // CTextPr
+                this.Value = new CTextPr();
+                this.Value.Read_FromBinary( Reader );
+
+                break;
+            }
+
+            case historyitem_TextPr_RFonts:
+            {
+                // Bool : undefined ?
+                // false -> CRFonts
+                if ( false === Reader.GetBool() )
+                {
+                    this.Value.RFonts = new CRFonts();
+                    this.Value.RFonts.Read_FromBinary( Reader );
+                }
+                else
+                    this.Value.RFonts = new CRFonts();
+
+                break;
+            }
+
+            case historyitem_TextPr_Lang:
+            {
+                // Bool : undefined ?
+                // false -> Lang
+                if ( false === Reader.GetBool() )
+                {
+                    this.Value.Lang = new CLang();
+                    this.Value.Lang.Read_FromBinary( Reader );
+                }
+                else
+                    this.Value.Lang = new CLang();
+
+                break;
+            }
+
+            case historyitem_TextPr_RFonts_Ascii:
+            {
+                // Bool : undefined ?
+                // false -> String
+                if ( false === Reader.GetBool() )
+                {
+                    this.Value.RFonts.Ascii =
+                    {
+                        Name  : Reader.GetString2(),
+                        Index : -1
+                    };
+                }
+                else
+                    this.Value.RFonts.Ascii = undefined;
+
+                break;
+            }
+
+            case historyitem_TextPr_RFonts_HAnsi:
+            {
+                // Bool : undefined ?
+                // false -> String
+                if ( false === Reader.GetBool() )
+                {
+                    this.Value.RFonts.HAnsi =
+                    {
+                        Name  : Reader.GetString2(),
+                        Index : -1
+                    };
+                }
+                else
+                    this.Value.RFonts.HAnsi = undefined;
+
+                break;
+            }
+
+            case historyitem_TextPr_RFonts_CS:
+            {
+                // Bool : undefined ?
+                // false -> String
+                if ( false === Reader.GetBool() )
+                {
+                    this.Value.RFonts.CS =
+                    {
+                        Name  : Reader.GetString2(),
+                        Index : -1
+                    };
+                }
+                else
+                    this.Value.RFonts.CS = undefined;
+
+                break;
+            }
+
+            case historyitem_TextPr_RFonts_EastAsia:
+            {
+                // Bool : undefined ?
+                // false -> String
+                if ( false === Reader.GetBool() )
+                {
+                    this.Value.RFonts.EastAsia =
+                    {
+                        Name  : Reader.GetString2(),
+                        Index : -1
+                    };
+                }
+                else
+                    this.Value.RFonts.Ascii = undefined;
+
+                break;
+            }
+
+            case historyitem_TextPr_RFonts_Hint:
+            {
+                // Bool : undefined ?
+                // false -> Long
+                if ( false === Reader.GetBool() )
+                    this.Value.RFonts.Hint = Reader.GetLong();
+                else
+                    this.Value.RFonts.Hint = undefined;
+
+                break;
+            }
+
+            case historyitem_TextPr_Lang_Bidi:
+            {
+                // Bool : undefined ?
+                // false -> Long
+
+                if ( false === Reader.GetBool() )
+                    this.Value.Lang.Bidi = Reader.GetLong();
+                else
+                    this.Value.Lang.Bidi = undefined;
+
+                break;
+            }
+
+            case historyitem_TextPr_Lang_EastAsia:
+            {
+                // Bool : undefined ?
+                // false -> Long
+
+                if ( false === Reader.GetBool() )
+                    this.Value.Lang.EastAsia = Reader.GetLong();
+                else
+                    this.Value.Lang.EastAsia = undefined;
+
+                break;
+            }
+
+            case historyitem_TextPr_Lang_Val:
+            {
+                // Bool : undefined ?
+                // false -> Long
+
+                if ( false === Reader.GetBool() )
+                    this.Value.Lang.Val = Reader.GetLong();
+                else
+                    this.Value.Lang.Val = undefined;
 
                 break;
             }

@@ -1984,7 +1984,7 @@ function CDrawingDocument()
     }
 	this.SelectClear = function()
     {
-        for (var i = 0; i < this.SlidesCount; i++)
+        for (var i = 0; i < this.m_oLogicDocument.Slides.length; i++)
         {
             this.m_oLogicDocument.Slides[i].selectionArray.splice(0, this.m_oLogicDocument.Slides[i].selectionArray.length);
         }
