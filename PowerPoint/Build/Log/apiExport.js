@@ -50,6 +50,12 @@ prop:get_TextProps
 prop:get_ContentCount
 prop:select_Element
 prop:UpdateTextPr
+prop:sync_TextSpacing
+prop:sync_TextDStrikeout
+prop:sync_TextCaps
+prop:sync_TextSmallCaps
+prop:sync_TextPosition
+prop:sync_TextLangCallBack
 prop:sync_VerticalTextAlign
 prop:UpdateParagraphProp
 prop:asc_Print
@@ -1055,6 +1061,12 @@ asc_docs_api.prototype['get_TextProps'] = asc_docs_api.prototype.get_TextProps;
 asc_docs_api.prototype['get_ContentCount'] = asc_docs_api.prototype.get_ContentCount;
 asc_docs_api.prototype['select_Element'] = asc_docs_api.prototype.select_Element;
 asc_docs_api.prototype['UpdateTextPr'] = asc_docs_api.prototype.UpdateTextPr;
+asc_docs_api.prototype['sync_TextSpacing'] = asc_docs_api.prototype.sync_TextSpacing;
+asc_docs_api.prototype['sync_TextDStrikeout'] = asc_docs_api.prototype.sync_TextDStrikeout;
+asc_docs_api.prototype['sync_TextCaps'] = asc_docs_api.prototype.sync_TextCaps;
+asc_docs_api.prototype['sync_TextSmallCaps'] = asc_docs_api.prototype.sync_TextSmallCaps;
+asc_docs_api.prototype['sync_TextPosition'] = asc_docs_api.prototype.sync_TextPosition;
+asc_docs_api.prototype['sync_TextLangCallBack'] = asc_docs_api.prototype.sync_TextLangCallBack;
 asc_docs_api.prototype['sync_VerticalTextAlign'] = asc_docs_api.prototype.sync_VerticalTextAlign;
 asc_docs_api.prototype['UpdateParagraphProp'] = asc_docs_api.prototype.UpdateParagraphProp;
 asc_docs_api.prototype['asc_Print'] = asc_docs_api.prototype.asc_Print;
