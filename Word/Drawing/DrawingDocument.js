@@ -5135,7 +5135,11 @@ function CDrawingDocument()
             graphics.transform(1,0,0,1,0,0);
 
             table.Recalculate_Page(0);
+
+            var _old_mode = editor.isViewMode;
+            editor.isViewMode = true;
             table.Draw(0, graphics);
+            editor.isViewMode = _old_mode;
 
             var _styleD = new CAscTableStyle();
             _styleD.Type = 0;
@@ -5724,7 +5728,10 @@ function CStylesPainter()
         ctx.fillRect(0, 0, _canvas.width, _canvas.height);
 
         var graphics = new CGraphics();
-        graphics.init(ctx, _canvas.width, _canvas.height, _canvas.width * g_dKoef_pix_to_mm, _canvas.height * g_dKoef_pix_to_mm);
+        if (!this.IsRetinaEnabled)
+            graphics.init(ctx, _canvas.width, _canvas.height, _canvas.width * g_dKoef_pix_to_mm, _canvas.height * g_dKoef_pix_to_mm);
+        else
+            graphics.init(ctx, _canvas.width, _canvas.height, _canvas.width * g_dKoef_pix_to_mm / 2, _canvas.height * g_dKoef_pix_to_mm / 2);
         graphics.m_oFontManager = g_fontManager;
 
         this.defaultStyles = [];
@@ -5770,7 +5777,10 @@ function CStylesPainter()
         ctx.fillRect(0, 0, _canvas.width, _canvas.height);
 
         var graphics = new CGraphics();
-        graphics.init(ctx, _canvas.width, _canvas.height, _canvas.width * g_dKoef_pix_to_mm, _canvas.height * g_dKoef_pix_to_mm);
+        if (!this.IsRetinaEnabled)
+            graphics.init(ctx, _canvas.width, _canvas.height, _canvas.width * g_dKoef_pix_to_mm, _canvas.height * g_dKoef_pix_to_mm);
+        else
+            graphics.init(ctx, _canvas.width, _canvas.height, _canvas.width * g_dKoef_pix_to_mm / 2, _canvas.height * g_dKoef_pix_to_mm / 2);
         graphics.m_oFontManager = g_fontManager;
 
         this.docStyles = [];
@@ -5844,9 +5854,13 @@ function CStylesPainter()
         else
             graphics.b_color1(textPr.Color.r, textPr.Color.g, textPr.Color.b, 255);
 
-        var y = index * g_dKoef_pix_to_mm * this.STYLE_THUMBNAIL_HEIGHT;
-        var b = (index + 1) * g_dKoef_pix_to_mm * this.STYLE_THUMBNAIL_HEIGHT;
-        var w = g_dKoef_mm_to_pix * this.STYLE_THUMBNAIL_WIDTH;
+        var dKoefToMM = g_dKoef_pix_to_mm;
+        if (this.IsRetinaEnabled)
+            dKoefToMM /= 2;
+
+        var y = index * dKoefToMM * this.STYLE_THUMBNAIL_HEIGHT;
+        var b = (index + 1) * dKoefToMM * this.STYLE_THUMBNAIL_HEIGHT;
+        var w = dKoefToMM * this.STYLE_THUMBNAIL_WIDTH;
 
         graphics.transform(1,0,0,1,0,0);
         graphics.save();
