@@ -1933,8 +1933,9 @@
 					if (format.s) {res.push("line-through");}
 					return res.length > 0 ? res.join(",") : "";
 				}
-
-				var hyperlink = cell.getHyperlink();
+				var hyperlink;
+				if(cell)
+					hyperlink = cell.getHyperlink()
 				for (res = [], i = 0; i < val.length; ++i) {
 					if(val[i] && val[i].format && val[i].format.skip)
 						continue;
