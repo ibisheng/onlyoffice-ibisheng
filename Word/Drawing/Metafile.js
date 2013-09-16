@@ -1108,7 +1108,6 @@ CMetafile.prototype =
                 this.Memory.WriteString2(img);
             }
 
-            this.Memory.WriteString2(_src);
             this.Memory.WriteDouble(x);
             this.Memory.WriteDouble(y);
             this.Memory.WriteDouble(w);
