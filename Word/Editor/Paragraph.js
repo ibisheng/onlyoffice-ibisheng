@@ -11114,6 +11114,7 @@ Paragraph.prototype =
 
         // Удаляем все элементы после текущей позиции и добавляем признак окончания параграфа.
         this.DeleteCommentOnRemove = false;
+        this.Internal_Remove_CollaborativeMarks();
         this.Internal_Content_Remove2( Pos, this.Content.length - Pos );
         this.DeleteCommentOnRemove = true;
 
