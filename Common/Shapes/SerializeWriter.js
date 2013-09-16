@@ -2391,7 +2391,7 @@ function CBinaryFileWriter()
                 {
                     oThis.WriteImage(spTree[i]);
                 }
-                else if (spTree[i] instanceof GroupShape)
+                else if (spTree[i] instanceof CGroupShape)
                 {
                     oThis.WriteGroupShape(spTree[i]);
                 }
