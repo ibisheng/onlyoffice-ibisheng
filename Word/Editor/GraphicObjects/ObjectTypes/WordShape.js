@@ -1713,6 +1713,13 @@ WordShape.prototype =
             editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
     },
 
+    addDocContent: function(docContent)
+    {
+        this.textBoxContent = docContent;
+        this.transformText = new CMatrix();
+        History.Add(this, {Type: historyitem_AddDocContent, contentId: this.textBoxContent.Get_Id()});
+    },
+
     documentGetAllFontNames: function(AllFonts)
     {
         if(isRealObject(this.textBoxContent) && typeof this.textBoxContent.Document_Get_AllFontNames === "function")
@@ -3982,6 +3989,12 @@ WordShape.prototype =
         }
         switch(data.Type)
         {
+
+            case historyitem_SetBlipFill:
+            {
+                this.blipFill = data.oldPr;
+                break;
+            }
             case historyitem_SetAbsoluteTransform:
             {
                 if(data.oldOffsetX != null)
@@ -4249,6 +4262,11 @@ WordShape.prototype =
         }
         switch(data.Type)
         {
+            case historyitem_SetBlipFill:
+            {
+                this.blipFill = data.newPr;
+                break;
+            }
             case historyitem_SetAbsoluteTransform:
             {
                 if(data.newOffsetX != null)
@@ -4467,7 +4485,7 @@ WordShape.prototype =
 
             case historyitem_SetStyle:
             {
-                this.style = null;
+                this.style = data.style;
                 break;
             }
 
@@ -4509,6 +4527,15 @@ WordShape.prototype =
         var bool;
         switch(data.Type)
         {
+            case historyitem_SetBlipFill:
+            {
+                w.WriteBool(isRealObject(data.newPr));
+                if(isRealObject(data.newPr))
+                {
+                    data.newPr.Write_ToBinary2(w);
+                }
+                break;
+            }
             case historyitem_SetAbsoluteTransform:
             {
                 bool = data.newOffsetX != null;
@@ -4826,6 +4853,19 @@ WordShape.prototype =
         var type = reader.GetLong();
         switch(type)
         {
+            case historyitem_SetBlipFill:
+            {
+                if(r.GetBool())
+                {
+                    this.blipFill = new CBlipFill();
+                    this.blipFill.Read_FromBinary2(r);
+                }
+                else
+                {
+                    this.blipFill = null;
+                }
+                break;
+            }
             case historyitem_CalculateAfterCopyInGroup:
             {
                 this.calculateAfterOpenInGroup2();

@@ -104,6 +104,12 @@ CChartTitle.prototype =
         this.selectStartPage = -1;
     },
 
+
+    setBodyPr: function(bodyPr)
+    {
+        this.bodyPr = bodyPr;
+    },
+
     getStyles: function()
     {
         var styles = new CStyles();

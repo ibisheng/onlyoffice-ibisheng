@@ -339,6 +339,12 @@ WordImage.prototype =
         this.brush = this.spPr.Fill;
     },
 
+    setBlipFill: function(blipFill)
+    {
+        History.Add(this, {Type:historyitem_SetBlipFill, oldPr: this.blipFill, newPr:blipFill});
+        this.blipFill = blipFill;
+    },
+
     setRasterImage2: function(img)
     {
         History.Add(this, {Type: historyitem_SetRasterImage2, oldImage: isRealObject(this.blipFill) ? this.blipFill.RasterImageId : null, newImage: img});
@@ -2214,6 +2220,11 @@ WordImage.prototype =
                     this.parent = g_oTableId.Get_ById(data.oldParent);
                 break;
             }
+            case historyitem_SetStyle:
+            {
+                this.style = null;
+                break;
+            }
 
 
         }
@@ -2414,6 +2425,11 @@ WordImage.prototype =
                     this.parent = null;
                 else
                     this.parent = g_oTableId.Get_ById(data.newParent);
+                break;
+            }
+            case historyitem_SetStyle:
+            {
+                this.style = data.style;
                 break;
             }
         }
@@ -2645,6 +2661,12 @@ WordImage.prototype =
                 {
                     writer.WriteString2(data.newParent);
                 }
+                break;
+            }
+
+            case historyitem_SetStyle:
+            {
+                data.style.Write_ToBinary2(writer);
                 break;
             }
 
@@ -3005,6 +3027,12 @@ WordImage.prototype =
                 break;
             }
 
+            case historyitem_SetStyle:
+            {
+                this.style = new CShapeStyle();
+                this.style.Read_FromBinary2(reader);
+                break;
+            }
 
         }
         if(b_history_is_on)
@@ -3156,6 +3184,13 @@ WordImage.prototype =
         {
             this.setRasterImage(this.spPr.Fill.fill.RasterImageId);
         }
+    },
+
+    setStyle: function(style)
+    {
+        var data = {Type: historyitem_SetStyle, style: style};
+        History.Add(this, data);
+        this.style = style;
     },
 
     Read_FromBinary2: function(Reader)

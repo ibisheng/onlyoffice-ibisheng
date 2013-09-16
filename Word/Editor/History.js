@@ -253,6 +253,7 @@ var historyitem_SetRasterImage2 = 32;
 var historyitem_CalculateAfterCopyInGroup = 33;
 var historyitem_SetVerticalShapeAlign = 34;
 var historyitem_SetParent = 35;
+var historyitem_SetBlipFill = 36;
 
 //Типы изменений в классе GraphicObjects
 var historyitem_AddHdrFtrGrObjects = 0;
@@ -356,6 +357,18 @@ var historyitem_type_Hyperlink        = 27;
 var historyitem_type_ChartGroup       = 28;
 var historyitem_type_Style            = 29;
 var historyitem_type_Styles           = 30;
+var historyitem_type_TextBody         = 31;
+
+
+//Типы изменений в классе CChartAsGroup
+var historyitem_SetCahrtLayout = 1000;
+
+//Типы изменений в классе TexBody
+var historyitem_SetShape = 0;
+var historyitem_SetDocContent = 1;
+var historyitem_SetLstStyle = 2;
+
+
 
 function CHistory(Document)
 {

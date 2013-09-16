@@ -119,6 +119,12 @@ CChartAsGroup.prototype =
         }
     },
 
+    recalcAllColors: function()
+    {},
+
+    recalcAll: function()
+    {},
+
     documentGetAllFontNames: function(AllFonts)
     {
         if(isRealObject(this.chartTitle))

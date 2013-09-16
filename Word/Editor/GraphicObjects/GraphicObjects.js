@@ -1041,6 +1041,7 @@ CGraphicObjects.prototype =
                     para_drawing.GraphicObj.setXfrm(null, null, this.drawingDocument.GetMMPerDot(chart.width), this.drawingDocument.GetMMPerDot(chart.height), null, false, false);
                     para_drawing.GraphicObj.calculateAfterResize();      */
                     para_drawing.GraphicObj.chartModify(chart);
+                    para_drawing.GraphicObj.setPageIndex(para_drawing.PageNum);
                     if(para_drawing.Is_Inline())
                     {
                         para_drawing.OnEnd_ResizeInline(para_drawing.GraphicObj.absExtX, para_drawing.GraphicObj.absExtY);

@@ -26,7 +26,7 @@ function CTextBody(shape)
     if(isRealObject(shape))
     {
         this.setShape(shape);
-        this.addDocumentContent(new CDocumentContent(this, editor.WordControl.m_oLogicDocument.DrawingDocument, 0, 0, 200, 20000, false, false));
+        this.setDocContent(new CDocumentContent(this, editor.WordControl.m_oLogicDocument.DrawingDocument, 0, 0, 0, 20000, false, false));
     }
 
 }
@@ -47,6 +47,8 @@ CTextBody.prototype =
         return this.Id;
     },
 
+
+
     getType: function()
     {
         return CLASS_TYPE_TEXT_BODY;
@@ -58,19 +60,28 @@ CTextBody.prototype =
     },
 
 
-    setShape: function(shape)
+    setLstStyle: function(lstStyle)
     {
-        var oldId = isRealObject(this.shape) ? this.shape.Get_Id() : null;
-        var newId = isRealObject(shape) ? shape.Get_Id() : null;
-        this.shape  = shape;
+        History.Add(this, {Type:historyitem_SetLstStyle, oldPr: this.lstStyle, newPr: lstStyle});
+        this.lstStyle = lstStyle;
     },
 
-    addDocumentContent: function(docContent)
+    setShape: function(shape)
     {
-        var oldId = isRealObject(this.content) ? this.content.Get_Id() : null;
-        var newId = isRealObject(docContent) ? docContent.Get_Id() : null;
-        this.content = docContent;
+        History.Add(this, {Type:historyitem_SetShape, oldPr: this.shape, newPr: shape});
+        this.shape = shape;
     },
+
+    setDocContent: function(docContent)
+    {
+        History.Add(this, {Type:historyitem_SetDocContent, oldPr: this.content, newPr: docContent});
+        this.content = docContent;
+
+    },
+
+    Refresh_RecalcData: function()
+    {},
+
 
     draw: function(graphics, pageIndex)
     {
@@ -482,58 +493,131 @@ CTextBody.prototype =
             this.content.Recalculate_Page(0, true);
     },
 
-    Undo: function(type, data)
+    Undo: function(data)
     {
-        switch(type)
+        switch(data.Type)
         {
-            case historyitem_AutoShapes_AddDocContent:
+            case historyitem_SetShape:
             {
-                this.content = g_oTableId.Get_ById(data.oldValue);
+                this.shape = data.oldPr;
                 break;
             }
-            case historyitem_AutoShapes_SetShape:
+
+            case historyitem_SetDocContent:
             {
-                this.shape = g_oTableId.Get_ById(data.oldValue);
+                this.content = data.oldPr;
                 break;
             }
-            case historyitem_AutoShapes_VerticalAlign:
+            case historyitem_SetLstStyle:
             {
-                this.bodyPr.anchor = data.oldValue;
+                this.lstStyle = data.oldPr;
                 break;
             }
-            case historyitem_AutoShapes_Vert:
-            {
-                this.bodyPr.vert = data.oldValue;
-                break;
-            }
+
         }
     },
 
-    Redo: function(type, data)
+    Redo: function(data)
     {
-        switch(type)
+        switch(data.Type)
         {
-            case historyitem_AutoShapes_AddDocContent:
+            case historyitem_SetShape:
             {
-                this.content = g_oTableId.Get_ById(data.newValue);
+                this.shape = data.newPr;
                 break;
             }
 
-            case historyitem_AutoShapes_SetShape:
+            case historyitem_SetDocContent:
             {
-                this.shape = g_oTableId.Get_ById(data.newValue);
+                this.content = data.newPr;
                 break;
             }
 
-            case historyitem_AutoShapes_VerticalAlign:
+            case historyitem_SetLstStyle:
             {
-                this.bodyPr.anchor = data.newValue;
+                this.lstStyle = data.newPr;
                 break;
             }
-            case historyitem_AutoShapes_Vert:
+
+        }
+    },
+    Save_Changes: function(data, w)
+    {
+        w.WriteLong(historyitem_type_TextBody);
+        w.WriteLong(data.Type);
+        switch(data.Type)
+        {
+            case historyitem_SetShape:
             {
-                this.bodyPr.vert = data.newValue;
+                w.WriteBool(typeof  data.newPr === "string");
+                if(typeof  data.newPr === "string")
+                {
+                    w.WriteString2(data.newPr)
+                }
                 break;
+            }
+
+            case historyitem_SetDocContent:
+            {
+                w.WriteBool(typeof  data.newPr === "string");
+                if(typeof  data.newPr === "string")
+                {
+                    w.WriteString2(data.newPr)
+                }
+                break;
+            }
+
+            case historyitem_SetLstStyle:
+            {
+                w.WriteBool(isRealObject(data.newPr));
+                if(isRealObject(data.newPr))
+                {
+                    data.newPr.Write_ToBinary2(w);
+                }
+                break;
+            }
+
+        }
+    },
+
+    Load_Changes: function(r)
+    {
+        if(r.GetLong() === historyitem_type_TextBody)
+        {
+            var type = r.GetLong();
+            switch(type)
+            {
+                case historyitem_SetShape:
+                {
+                    if(r.GetBool())
+                    {
+                        this.shape = g_oTableId.Get_ById(r.GetString2());
+                    }
+                    break;
+                }
+
+                case historyitem_SetDocContent:
+                {
+                    if(r.GetBool())
+                    {
+                        this.content = g_oTableId.Get_ById(r.GetString2());
+                    }
+                    break;
+                }
+                case historyitem_SetLstStyle:
+                {
+                    if(r.GetBool())
+                    {
+                        this.lstStyle = new TextListStyle();
+                        this.lstStyle.Read_FromBinary2(r);
+                    }
+                    else
+                    {
+                        this.lstStyle = null;
+                    }
+                    break;
+                }
+
             }
         }
     },

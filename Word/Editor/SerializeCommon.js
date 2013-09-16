@@ -236,12 +236,14 @@ function CPPTXContentLoader()
                 }
                 case 1:
                 {
-                    this.ReadSpPr(shape.spPr);
+                    var spPr = new CSpPr();
+                    this.ReadSpPr(spPr);
+                    shape.setSpPr(spPr);
                     break;
                 }
                 case 2:
                 {
-                    shape.style = this.Reader.ReadShapeStyle();
+                    shape.setStyle(this.Reader.ReadShapeStyle());
                     break;
                 }
                 case 3:
@@ -253,11 +255,11 @@ function CPPTXContentLoader()
                 {
                     var oThis = this.BaseReader;
 
-                    shape.textBoxContent = new CDocumentContent(shape, this.LogicDocument.DrawingDocument, 0, 0, 0, 0, false, false);
+                    shape.addDocContent(new CDocumentContent(shape, this.LogicDocument.DrawingDocument, 0, 0, 0, 0, false, false));
 
                     var _old_cont = shape.textBoxContent.Content[0];
 
-                    shape.textBoxContent.Content.splice(0, 1);
+                    shape.textBoxContent.Internal_Content_RemoveAll();
 
                     s.Skip2(4); // rec len
 
@@ -274,13 +276,15 @@ function CPPTXContentLoader()
                     s.cur = oThis.stream.cur;
 
                     if (shape.textBoxContent.Content.length == 0)
-                        shape.textBoxContent.Content[0] = _old_cont;
+                        shape.textBoxContent.Internal_Content_Add(0, _old_cont);
 
                     break;
                 }
                 case 5:
                 {
-                    this.Reader.CorrectBodyPr(shape.bodyPr);
+                    var bodyPr = new CBodyPr();
+                    this.Reader.CorrectBodyPr(bodyPr);
+                    shape.setBodyPr(bodyPr);
                 }
                 default:
                 {
@@ -297,8 +301,8 @@ function CPPTXContentLoader()
     {
         var s = this.stream;
 
-        var shape = new WordShape(this.TempMainObject == null ? this.ParaDrawing : null, this.LogicDocument, this.LogicDocument.DrawingDocument, this.TempMainObject);
-
+        var shape = new WordShape( null, this.LogicDocument, this.LogicDocument.DrawingDocument, this.TempMainObject);
+        shape.setParent(this.TempMainObject == null ? this.ParaDrawing : null);
         var _rec_start = s.cur;
         var _end_rec = _rec_start + s.GetULong() + 4;
 
@@ -334,12 +338,14 @@ function CPPTXContentLoader()
                 }
                 case 1:
                 {
-                    this.ReadSpPr(shape.spPr);
+                    var spPr = new CSpPr();
+                    this.ReadSpPr(spPr);
+                    shape.setSpPr(spPr);
                     break;
                 }
                 case 2:
                 {
-                    shape.style = this.Reader.ReadShapeStyle();
+                    shape.setStyle(this.Reader.ReadShapeStyle());
                     break;
                 }
                 default:
@@ -356,7 +362,8 @@ function CPPTXContentLoader()
     {
         var s = this.stream;
 
-        var pic = new WordImage(this.TempMainObject == null ? this.ParaDrawing : null, this.LogicDocument, this.LogicDocument.DrawingDocument, this.TempMainObject);
+        var pic = new WordImage(null, this.LogicDocument, this.LogicDocument.DrawingDocument, this.TempMainObject);
+        pic.setParent(this.TempMainObject == null ? this.ParaDrawing : null);
 
         var _rec_start = s.cur;
         var _end_rec = _rec_start + s.GetULong() + 4;
@@ -374,7 +381,7 @@ function CPPTXContentLoader()
                 case 1:
                 {
                     var unifill = this.Reader.ReadUniFill();
-                    pic.blipFill = unifill.fill;//this.Reader.ReadUniFill();
+                    pic.setBlipFill(unifill.fill);//this.Reader.ReadUniFill();
 
                     pic.spPr.Fill = new CUniFill();
                     pic.spPr.Fill.fill = pic.blipFill;
@@ -384,12 +391,14 @@ function CPPTXContentLoader()
                 }
                 case 2:
                 {
-                    this.ReadSpPr(pic.spPr);
+                    var spPr = new CSpPr();
+                    this.ReadSpPr(spPr);
+                    pic.setSpPr(spPr);
                     break;
                 }
                 case 3:
                 {
-                    pic.style = this.Reader.ReadShapeStyle();
+                    pic.setStyle(this.Reader.ReadShapeStyle());
                     break;
                 }
                 default:
@@ -406,7 +415,8 @@ function CPPTXContentLoader()
     {
         var s = this.stream;
 
-        var shape = new WordGroupShapes(this.TempMainObject == null ? this.ParaDrawing : null, this.LogicDocument, this.LogicDocument.DrawingDocument, this.TempMainObject);
+        var shape = new WordGroupShapes(null, this.LogicDocument, this.LogicDocument.DrawingDocument, this.TempMainObject);
+        shape.setParent(this.TempMainObject == null ? this.ParaDrawing : null);
         this.TempGroupObject = shape;
 
         var arrGraphicObjects = shape.arrGraphicObjects;
@@ -426,7 +436,9 @@ function CPPTXContentLoader()
                 }
                 case 1:
                 {
-                    this.ReadSpPr(shape.spPr);
+                    var spPr = new CSpPr();
+                    this.ReadSpPr(spPr);
+                    shape.setSpPr(spPr);
                     break;
                 }
                 case 2:
@@ -446,22 +458,22 @@ function CPPTXContentLoader()
                         {
                             case 1:
                             {
-                                arrGraphicObjects[arrGraphicObjects.length] = this.ReadShape();
+                                shape.addGraphicObject(this.ReadShape());
                                 break;
                             }
                             case 2:
                             {
-                                arrGraphicObjects[arrGraphicObjects.length] = this.ReadPic();
+                                shape.addGraphicObject(this.ReadPic());
                                 break;
                             }
                             case 3:
                             {
-                                arrGraphicObjects[arrGraphicObjects.length] = this.ReadCxn();
+                                shape.addGraphicObject(this.ReadCxn());
                                 break;
                             }
                             case 4:
                             {
-                                arrGraphicObjects[arrGraphicObjects.length] = this.ReadGroupShape();
+                                shape.addGraphicObject( this.ReadGroupShape());
                                 this.TempGroupObject = shape;
                                 break;
                             }

@@ -5916,7 +5916,15 @@ function BinaryPPTYLoader()
 
     this.ReadTextBody = function(shape)
     {
-        var txbody = shape.txBody;
+        var txbody;
+
+        if(shape.txBody)
+            txbody = shape.txBody;
+        else
+        {
+            shape.setTextBody(new CTextBody(shape));
+            txbody = shape.txBody;
+        }
         var s = this.stream;
 
         var _rec_start = s.cur;
@@ -6075,7 +6083,8 @@ function BinaryPPTYLoader()
 
                     if(textProperties.bullet)
                     {
-                        par.setPresentationBullet(textProperties.bullet);
+                        if(par.setPresentationBullet)
+                            par.setPresentationBullet(textProperties.bullet);
                     }
                     if(textProperties.lvl!=undefined)
                     {
