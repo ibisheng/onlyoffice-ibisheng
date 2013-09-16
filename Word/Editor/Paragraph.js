@@ -9698,8 +9698,13 @@ Paragraph.prototype =
     {
         for ( var Index = 0; Index < this.Content.length; Index++ )
         {
-            if ( para_Drawing === this.Content[Index].Type && Id === this.Content[Index].Get_Id() )
+            var Item = this.Content[Index];
+            if ( para_Drawing === Item.Type && Id === Item.Get_Id() )
             {
+                var HdrFtr = this.Parent.Is_HdrFtr(true);
+                if ( null != HdrFtr && true != Item.Is_Inline() )
+                    HdrFtr.RecalcInfo.NeedRecalc = true;
+
                 this.Internal_Content_Remove( Index );
                 return Index;
             }
