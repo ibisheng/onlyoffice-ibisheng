@@ -30,12 +30,7 @@ function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, 
 
     this.Pages = new Array();
 
-    this.RecalcInfo =
-    {
-        FlowObject                : null,   // Текущий float-объект, который мы пересчитываем
-        FlowObjectPageBreakBefore : false,  // Нужно ли перед float-объектом поставить pagebreak
-        FlowObjectPage            : 0
-    };
+    this.RecalcInfo = new CDocumentRecalcInfo();
 
     this.Split = Split; // Разделяем ли на страницы
 
@@ -458,6 +453,15 @@ CDocumentContent.prototype =
         editor.WordControl.m_oLogicDocument.recalcDocumentConten = this;
         editor.WordControl.m_oLogicDocument.Recalculate();
 
+    },
+
+    Reset_RecalculateCache : function()
+    {
+        var Count = this.Content.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            this.Content[Index].Reset_RecalculateCache();
+        }
     },
 
     Recalculate_ : function(bForceRecalc, LastChangeIndex)

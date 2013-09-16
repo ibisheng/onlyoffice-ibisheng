@@ -220,6 +220,103 @@ CStatistics.prototype =
     }
 };
 
+function CDocumentRecalcInfo()
+{
+    this.FlowObject                = null;   // Текущий float-объект, который мы пересчитываем
+    this.FlowObjectPageBreakBefore = false;  // Нужно ли перед float-объектом поставить pagebreak
+    this.FlowObjectPage            = 0;      // Количество обработанных страниц
+    this.RecalcResult              = recalcresult_NextElement;
+
+    this.WidowControlParagraph     = null;   // Параграф, который мы пересчитываем из-за висячих строк
+    this.WidowControlLine          = -1;     // Номер строки, перед которой надо поставить разрыв страницы
+    this.WidowControlReset         = false;  //
+
+    this.KeepNextParagraph         = null;    // Параграф, который надо пересчитать из-за того, что следующий начался с новой страницы
+}
+
+CDocumentRecalcInfo.prototype =
+{
+    Reset : function()
+    {
+        this.FlowObject                = null;
+        this.FlowObjectPageBreakBefore = false;
+        this.FlowObjectPage            = 0;
+        this.RecalcResult              = recalcresult_NextElement;
+
+        this.WidowControlParagraph     = null;
+        this.WidowControlLine          = -1;
+        this.WidowControlReset         = false;
+
+        this.KeepNextParagraph         = null;
+    },
+
+    // Проверяем, можно ли начать пересчет какого-либо элемента
+    Can_RecalcObject : function()
+    {
+        if ( null === this.FlowObject && null === this.WidowControlParagraph && null === this.KeepNextParagraph )
+            return true;
+
+        return false;
+    },
+
+    Set_FlowObject : function(Object, RelPage, RecalcResult)
+    {
+        this.FlowObject     = Object;
+        this.FlowObjectPage = RelPage;
+        this.RecalcResult   = RecalcResult;
+    },
+
+    Check_FlowObject : function(FlowObject)
+    {
+        if ( FlowObject === this.FlowObject )
+            return true;
+
+        return false;
+    },
+
+    Set_PageBreakBefore : function(Value)
+    {
+        this.FlowObjectPageBreakBefore = Value;
+    },
+
+    Is_PageBreakBefore : function()
+    {
+        return this.FlowObjectPageBreakBefore;
+    },
+
+    Set_WidowControl : function(Paragraph, Line)
+    {
+        this.WidowControlParagraph = Paragraph;
+        this.WidowControlLine      = Line;
+    },
+
+    Check_WidowControl : function(Paragraph, Line)
+    {
+        if ( Paragraph === this.WidowControlParagraph && Line === this.WidowControlLine )
+            return true;
+
+        return false;
+    },
+
+    Set_KeepNext : function(Paragraph)
+    {
+        this.KeepNextParagraph = Paragraph;
+    },
+
+    Check_KeepNext : function(Paragraph)
+    {
+        if ( Paragraph === this.KeepNextParagraph )
+            return true;
+
+        return false;
+    },
+
+    Reset_WidowControl : function()
+    {
+        this.WidowControlReset = true;
+    }
+};
+
 function CDocument(DrawingDocument)
 {
     this.History = new CHistory(this);
@@ -280,17 +377,8 @@ function CDocument(DrawingDocument)
     // Здесь мы храним инфрмацию, связанную с разбивкой на страницы и самими страницами
     this.Pages = new Array();
 
-    this.RecalcInfo =
-    {
-        FlowObject                : null,   // Текущий float-объект, который мы пересчитываем
-        FlowObjectPageBreakBefore : false,  // Нужно ли перед float-объектом поставить pagebreak
-        FlowObjectPage            : 0,      // Количество обработанных страниц
+    this.RecalcInfo = new CDocumentRecalcInfo();
 
-        WidowControlParagraph     : null,   // Параграф, который мы пересчитываем из-за висячих строк
-        WidowControlLine          : -1,     // Номер строки, перед которой надо поставить разрыв страницы
-
-        KeepNextParagraph         : null    // Параграф, который надо пересчитать из-за того, что следующий начался с новой страницы
-    };
     this.RecalcId   = 0; // Номер пересчета
     this.FullRecalc = new Object();
     this.FullRecalc.Id = null;
@@ -592,12 +680,7 @@ CDocument.prototype =
         this.RecalcId++;
 
         // Очищаем данные пересчета
-        this.RecalcInfo.FlowObject                = null;
-        this.RecalcInfo.FlowObjectPageBreakBefore = false;
-        this.RecalcInfo.FlowObjectPage            = 0;
-        this.RecalcInfo.WidowControlParagraph     = null;
-        this.RecalcInfo.WidowControlLine          = -1;
-        this.RecalcInfo.KeepNextParagraph         = null;
+        this.RecalcInfo.Reset();
 
         var ChangeIndex = 0;//( false === bRecalcContentLast ? this.ContentLastChangePos + 1 : this.ContentLastChangePos );
 
@@ -671,9 +754,6 @@ CDocument.prototype =
                 StartPage = RecalcData.Inline.PageNum - 1;
         }
 
-        this.RecalcInfo.FlowObject = null;
-        this.RecalcInfo.FlowObjectPageBreakBefore = false;
-
         if ( null != this.FullRecalc.Id )
         {
             clearTimeout( this.FullRecalc.Id );
@@ -741,7 +821,7 @@ CDocument.prototype =
             if ( type_Table === Element.GetType() && true != Element.Is_Inline() )
             {
                 bFlow = true;
-                if ( null === this.RecalcInfo.FlowObject )
+                if ( true === this.RecalcInfo.Can_RecalcObject() )
                 {
                     if ( ( 0 === Index && 0 === PageIndex ) || Index != StartIndex )
                     {
@@ -749,9 +829,9 @@ CDocument.prototype =
                         Element.Reset( X, Y, XLimit, YLimit, PageIndex );
                     }
 
-                    this.RecalcInfo.FlowObjectPage = 0;
-                    this.RecalcInfo.FlowObject   = Element;
-                    this.RecalcInfo.RecalcResult = Element.Recalculate_Page( PageIndex );
+                    var TempRecalcResult = Element.Recalculate_Page( PageIndex );
+                    this.RecalcInfo.Set_FlowObject( Element, 0, Element.Recalculate_Page( PageIndex ) );
+
                     var FlowTable = new CFlowTable2( Element, PageIndex );
                     this.DrawingObjects.addFloatTable( FlowTable );
 
@@ -759,25 +839,22 @@ CDocument.prototype =
                         RecalcResult = recalcresult_CurPage;
                     else
                     {
-                        RecalcResult = this.RecalcInfo.RecalcResult;
-
-                        this.RecalcInfo.FlowObjectPage = 0;
-                        this.RecalcInfo.FlowObject     = null;
-                        this.RecalcInfo.RecalcResult   = recalcresult_NextElement;
+                        RecalcResult = TempRecalcResult;
+                        this.RecalcInfo.Reset();
                     }
                 }
-                else if ( Element === this.RecalcInfo.FlowObject )
+                else if ( true === this.RecalcInfo.Check_FlowObject(Element) )
                 {
                     // Если у нас текущая страница совпадает с той, которая указана в таблице, тогда пересчитываем дальше
                     if ( Element.PageNum > PageIndex || ( this.RecalcInfo.FlowObjectPage <= 0 && Element.PageNum < PageIndex ) )
                     {
                         this.DrawingObjects.removeFloatTableById(PageIndex - 1, Element.Get_Id());
-                        this.RecalcInfo.FlowObjectPageBreakBefore = true;
+                        this.RecalcInfo.Set_PageBreakBefore(true);
                         RecalcResult = recalcresult_PrevPage;
                     }
                     else if ( Element.PageNum === PageIndex )
                     {
-                        if ( true === this.RecalcInfo.FlowObjectPageBreakBefore )
+                        if ( true === this.RecalcInfo.Is_PageBreakBefore() )
                         {
                             // Добавляем начало таблицы в конец страницы так, чтобы не убралось ничего
                             Element.Set_DocumentIndex( Index );
@@ -799,7 +876,7 @@ CDocument.prototype =
                             if ( (( 0 === Index && 0 === PageIndex ) || Index != StartIndex) && true != Element.Is_ContentOnFirstPage()  )
                             {
                                 this.DrawingObjects.removeFloatTableById(PageIndex, Element.Get_Id());
-                                this.RecalcInfo.FlowObjectPageBreakBefore = true;
+                                this.RecalcInfo.Set_PageBreakBefore(true);
                                 RecalcResult = recalcresult_CurPage;
                             }
                             else
@@ -807,12 +884,7 @@ CDocument.prototype =
                                 this.RecalcInfo.FlowObjectPage++;
 
                                 if ( recalcresult_NextElement === RecalcResult )
-                                {
-                                    this.RecalcInfo.FlowObject                = null;
-                                    this.RecalcInfo.FlowObjectPageBreakBefore = false;
-                                    this.RecalcInfo.FlowObjectPage            = 0;
-                                    this.RecalcInfo.RecalcResult              = recalcresult_NextElement;
-                                }
+                                    this.RecalcInfo.Reset();
                             }
                         }
                     }
@@ -822,11 +894,7 @@ CDocument.prototype =
                         this.DrawingObjects.addFloatTable( new CFlowTable2( Element, PageIndex ) );
 
                         if ( recalcresult_NextElement === RecalcResult )
-                        {
-                            this.RecalcInfo.FlowObject                = null;
-                            this.RecalcInfo.FlowObjectPageBreakBefore = false;
-                            this.RecalcInfo.RecalcResult              = recalcresult_NextElement;
-                        }
+                            this.RecalcInfo.Reset();
                     }
                 }
                 else
@@ -839,7 +907,7 @@ CDocument.prototype =
             {
                 bFlow = true;
 
-                if ( null === this.RecalcInfo.FlowObject )
+                if ( true === this.RecalcInfo.Can_RecalcObject() )
                 {
                     var FramePr = Element.Get_FramePr();
 
@@ -1053,20 +1121,15 @@ CDocument.prototype =
                         RecalcResult = recalcresult_NextElement;
                     else
                     {
-                        this.RecalcInfo.FlowObjectPage            = FlowCount;
-                        this.RecalcInfo.FlowObjectPageBreakBefore = false;
-                        this.RecalcInfo.FlowObject                = Element;
+                        this.RecalcInfo.Set_FlowObject(Element, FlowCount, recalcresult_NextElement);
                         RecalcResult = recalcresult_CurPage;
                     }
                 }
-                else if ( Element === this.RecalcInfo.FlowObject )
+                else if ( true === this.RecalcInfo.Check_FlowObject(Element) )
                 {
                     Index += this.RecalcInfo.FlowObjectPage - 1;
-
-                    this.RecalcInfo.FlowObject                = null;
-                    this.RecalcInfo.FlowObjectPageBreakBefore = false;
-                    this.RecalcInfo.FlowObjectPage            = 0;
-                    RecalcResult              = recalcresult_NextElement;
+                    this.RecalcInfo.Reset();
+                    RecalcResult = recalcresult_NextElement;
                 }
                 else
                 {
@@ -1182,6 +1245,17 @@ CDocument.prototype =
             else
                 this.Recalculate_Page( _PageIndex, _bStart, _StartIndex );
 
+        }
+    },
+
+    Reset_RecalculateCache : function()
+    {
+        this.HdrFtr.Reset_RecalculateCache();
+
+        var Count = this.Content.length;
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            this.Content[Index].Reset_RecalculateCache();
         }
     },
 

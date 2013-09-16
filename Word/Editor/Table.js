@@ -456,11 +456,11 @@ CTableRecalcInfo.prototype =
         this.CellsAll = true;
     },
 
-    Reset : function()
+    Reset : function(bCellsAll)
     {
         this.TableGrid     = false;
         this.TableBorders  = false;
-        this.CellsAll      = false;
+        this.CellsAll      = bCellsAll;
         this.CellsToRecalc = new Object();
     }
 };
@@ -2919,6 +2919,11 @@ CTable.prototype =
         }
     },
 
+    Reset_RecalculateCache : function()
+    {
+        this.RecalcInfo.Reset(true);
+    },
+
     Recalculate_Page : function(_PageIndex)
     {
         var PageIndex = _PageIndex - this.PageNum;
@@ -2940,7 +2945,7 @@ CTable.prototype =
         this.Internal_Recalculate_Position_2(PageIndex);
 
         if ( recalcresult_NextElement === Result )
-            this.RecalcInfo.Reset();
+            this.RecalcInfo.Reset(false);
 
         return Result;
     },

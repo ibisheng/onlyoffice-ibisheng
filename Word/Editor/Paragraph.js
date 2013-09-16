@@ -260,8 +260,8 @@ Paragraph.prototype =
 
         this.PageNum = PageNum;
 
-        // При первом пересчете параграфа this.Parent.RecalcInfo.FlowObject всегда будет null, а вот при повторных уже нет
-        if ( null === this.Parent.RecalcInfo.FlowObject && ( this.Parent instanceof CDocumentContent || ( null === this.Parent.RecalcInfo.WidowControlParagraph && null === this.Parent.RecalcInfo.KeepNextParagraph ) ) )
+        // При первом пересчете параграфа this.Parent.RecalcInfo.Can_RecalcObject() всегда будет true, а вот при повторных уже нет
+        if ( true === this.Parent.RecalcInfo.Can_RecalcObject() )
         {
             var Ranges = this.Parent.CheckRange( X, Y, XLimit, Y, Y, Y, X, XLimit, this.PageNum, true );
             if ( Ranges.length > 0 )
@@ -1028,11 +1028,9 @@ Paragraph.prototype =
                     return recalcresult_NextPage;
                 }
             }
-            else if  ( this === this.Parent.RecalcInfo.WidowControlParagraph && CurLine === this.Parent.RecalcInfo.WidowControlLine )
+            else if  ( true === this.Parent.RecalcInfo.Check_WidowControl( this, CurLine ) )
             {
-                this.Parent.RecalcInfo.FlowObject            = null;
-                this.Parent.RecalcInfo.WidowControlParagraph = null;
-                this.Parent.RecalcInfo.WidowControlLine      = -1;
+                this.Parent.RecalcInfo.Reset_WidowControl();
 
                 this.Pages[CurPage].Set_EndLine( CurLine - 1 );
                 if ( 0 === CurLine )
@@ -1043,9 +1041,9 @@ Paragraph.prototype =
 
                 return recalcresult_NextPage;
             }
-            else if ( this === this.Parent.RecalcInfo.KeepNextParagraph && 0 === CurPage && null != this.Get_DocumentPrev() )
+            else if ( true === this.Parent.RecalcInfo.Check_KeepNext(this) && 0 === CurPage && null != this.Get_DocumentPrev() )
             {
-                this.Parent.RecalcInfo.KeepNextParagraph = null;
+                this.Parent.RecalcInfo.Reset();
 
                 this.Pages[CurPage].Set_EndLine( CurLine - 1 );
                 if ( 0 === CurLine )
@@ -1568,12 +1566,12 @@ Paragraph.prototype =
                             // идет картинка ушло на следующую страницу. В этом случае мы ставим перенос страницы перед картинкой.
 
                             var LogicDocument  = this.Parent;
+                            var LDRecalcInfo   = LogicDocument.RecalcInfo;
                             var DrawingObjects = LogicDocument.DrawingObjects;
 
-                            if ( Item === LogicDocument.RecalcInfo.FlowObject && true === LogicDocument.RecalcInfo.FlowObjectPageBreakBefore )
+                            if ( true === LDRecalcInfo.Check_FlowObject(Item) && true === LDRecalcInfo.Is_PageBreakBefore() )
                             {
-                                LogicDocument.RecalcInfo.FlowObjectPageBreakBefore = false;
-                                LogicDocument.RecalcInfo.FlowObject                = null;
+                                LDRecalcInfo.Reset();
 
                                 // Добавляем разрыв страницы. Если это первая страница, тогда ставим разрыв страницы в начале параграфа,
                                 // если нет, тогда в начале текущей строки.
@@ -1636,13 +1634,6 @@ Paragraph.prototype =
                                     // Не надо проверять убирается ли слово, мы это проверяем при добавленнии букв
                                     X += nWordLen;
 
-                                    // Пробелы перед первым словом в строке не считаем
-                                    //if ( this.Lines[CurLine].Words > 1 )
-                                    //    this.Lines[CurLine].Spaces += nSpacesCount;
-
-                                    //if ( this.Lines[CurLine].Ranges[CurRange].Words > 1 )
-                                    //    this.Lines[CurLine].Ranges[CurRange].Spaces += nSpacesCount;
-
                                     bWord        = false;
                                     nSpaceLen    = 0;
                                     nSpacesCount = 0;
@@ -1665,13 +1656,6 @@ Paragraph.prototype =
 
                             // Не надо проверять убирается ли слово, мы это проверяем при добавленнии букв
                             X += nWordLen;
-
-                            // Пробелы перед первым словом в строке не считаем
-                           // if ( this.Lines[CurLine].Words > 1 )
-                            //    this.Lines[CurLine].Spaces += nSpacesCount;
-
-                            //if ( this.Lines[CurLine].Ranges[CurRange].Words > 1 )
-                            //    this.Lines[CurLine].Ranges[CurRange].Spaces += nSpacesCount;
 
                             bWord        = false;
                             nSpaceLen    = 0;
@@ -1730,16 +1714,6 @@ Paragraph.prototype =
                             X += Item.Width;
                             bFirstItemOnLine = false;
                             bEmptyLine       = false;
-
-                            //this.Lines[CurLine].Words++;
-                            //this.Lines[CurLine].Ranges[CurRange].Words++;
-
-                            // Пробелы перед первым словом в строке не считаем
-                            //if ( this.Lines[CurLine].Words > 1 )
-                            //    this.Lines[CurLine].Spaces += nSpacesCount;
-
-                            //if ( this.Lines[CurLine].Ranges[CurRange].Words > 1 )
-                            //    this.Lines[CurLine].Ranges[CurRange].Spaces += nSpacesCount;
                         }
 
                         nSpaceLen    = 0;
@@ -2322,10 +2296,9 @@ Paragraph.prototype =
                 if ( true === this.Use_YLimit() && (Top > this.YLimit || Bottom2 > this.YLimit ) && ( CurLine != this.Pages[CurPage].FirstLine || ( 0 === CurPage && ( null != this.Get_DocumentPrev() || true === this.Parent.Is_TableCellContent() ) ) ) && false === bBreakPageLineEmpty )
                 {
                     // Проверим висячую строку
-                    if ( this.Parent instanceof CDocument && true === ParaPr.WidowControl && CurLine - this.Pages[CurPage].StartLine <= 1 && CurLine >= 1 && true != bBreakPageLine && ( 0 === CurPage && null != this.Get_DocumentPrev() ) )
+                    if ( this.Parent instanceof CDocument && true === this.Parent.RecalcInfo.Can_RecalcObject() && true === ParaPr.WidowControl && CurLine - this.Pages[CurPage].StartLine <= 1 && CurLine >= 1 && true != bBreakPageLine && ( 0 === CurPage && null != this.Get_DocumentPrev() ) )
                     {
-                        this.Parent.RecalcInfo.WidowControlParagraph = this;
-                        this.Parent.RecalcInfo.WidowControlLine      = CurLine - 1;
+                        this.Parent.RecalcInfo.Set_WidowControl(this, CurLine - 1);
                         RecalcResult = recalcresult_CurPage;
                         break;
                     }
@@ -2552,10 +2525,9 @@ Paragraph.prototype =
                             this.Lines[CurLine].Set_EndPos( Pos, this );
                             CurLine++;
 
-                            if ( this.Parent instanceof CDocument && this === this.Parent.RecalcInfo.WidowControlParagraph && CurLine === this.Parent.RecalcInfo.WidowControlLine )
+                            if ( this.Parent instanceof CDocument && true === this.Parent.RecalcInfo.Check_WidowControl(this, CurLine) )
                             {
-                                this.Parent.RecalcInfo.WidowControlParagraph = null;
-                                this.Parent.RecalcInfo.WidowControlLine      = -1;
+                                this.Parent.RecalcInfo.Reset_WidowControl();
 
                                 this.Pages[CurPage].Set_EndLine( CurLine - 1 );
                                 if ( 0 === CurLine )
@@ -2667,10 +2639,9 @@ Paragraph.prototype =
                                 }
                             }
 
-                            if ( this.Parent instanceof CDocument && false === bBreakPagePrevLine && ( 1 === CurPage && null != this.Get_DocumentPrev() ) )
+                            if ( this.Parent instanceof CDocument && true === this.Parent.RecalcInfo.Can_RecalcObject() && false === bBreakPagePrevLine && ( 1 === CurPage && null != this.Get_DocumentPrev() ) )
                             {
-                                this.Parent.RecalcInfo.WidowControlParagraph = this;
-                                this.Parent.RecalcInfo.WidowControlLine      = ( CurLine > 2 ? CurLine - 1 : 0 ); // Если у нас в параграфе 3 строки, тогда сразу начинаем параграф с новой строки
+                                this.Parent.RecalcInfo.Set_WidowControl(this, ( CurLine > 2 ? CurLine - 1 : 0 ) ); // Если у нас в параграфе 3 строки, тогда сразу начинаем параграф с новой строки
                                 RecalcResult = recalcresult_PrevPage;
                                 break;
                             }
@@ -3190,17 +3161,17 @@ Paragraph.prototype =
                         if ( true === Item.Use_TextWrap() )
                         {
                             var LogicDocument = this.Parent;
+                            var LDRecalcInfo  = this.Parent.RecalcInfo;
                             var Page_abs      = this.Get_StartPage_Absolute() + CurPage;
 
-                            if ( null === LogicDocument.RecalcInfo.FlowObject )
+                            if ( true === LDRecalcInfo.Can_RecalcObject() )
                             {
                                 // Обновляем позицию объекта
                                 Item.Update_Position( X, Y , this.Get_StartPage_Absolute() + CurPage, LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent, this.Pages[CurPage].Y, PageLimits);
-
-                                LogicDocument.RecalcInfo.FlowObject = Item;
+                                LDRecalcInfo.Set_FlowObject( Item, 0, recalcresult_NextElement );
                                 return recalcresult_CurPage;
                             }
-                            else if ( Item === LogicDocument.RecalcInfo.FlowObject )
+                            else if ( true === LDRecalcInfo.Check_FlowObject(Item) )
                             {
                                 // Если мы находимся с таблице, тогда делаем как Word, не пересчитываем предыдущую страницу,
                                 // даже если это необходимо. Такое поведение нужно для точного определения рассчиталась ли
@@ -3211,8 +3182,7 @@ Paragraph.prototype =
                                 if ( Item.PageNum === Page_abs )
                                 {
                                     // Все нормально, можно продолжить пересчет
-                                    LogicDocument.RecalcInfo.FlowObject = null;
-                                    LogicDocument.RecalcInfo.FlowObjectPageBreakBefore = false;
+                                    LDRecalcInfo.Reset();
                                 }
                                 else if ( true === this.Parent.Is_TableCellContent() )
                                 {
@@ -3222,13 +3192,13 @@ Paragraph.prototype =
                                     // Обновляем позицию объекта
                                     Item.Update_Position( X, Y , this.Get_StartPage_Absolute() + CurPage, LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent, this.Pages[CurPage].Y, PageLimits);
 
-                                    LogicDocument.RecalcInfo.FlowObject = Item;
-                                    LogicDocument.RecalcInfo.FlowObjectPageBreakBefore = false;
+                                    LDRecalcInfo.Set_FlowObject( Item, 0, recalcresult_NextElement );
+                                    LDRecalcInfo.Set_PageBreakBefore( false );
                                     return recalcresult_CurPage;
                                 }
                                 else
                                 {
-                                    LogicDocument.RecalcInfo.FlowObjectPageBreakBefore = true;
+                                    LDRecalcInfo.Set_PageBreakBefore( true );
                                     DrawingObjects.removeById( Item.PageNum, Item.Get_Id() );
                                     return recalcresult_PrevPage;
                                 }
@@ -3623,6 +3593,11 @@ Paragraph.prototype =
         this.Lines[-1].Set_EndPos( - 1, this );
     },
 
+    Reset_RecalculateCache : function()
+    {
+
+    },
+
     Recalculate_Page : function(_PageIndex)
     {
         // Во время пересчета сбрасываем привязку курсора к строке.
@@ -3676,8 +3651,13 @@ Paragraph.prototype =
                     var PrevKeepNext = Prev.Get_CompiledPr2(false).ParaPr.KeepNext;
                     if ( false === PrevKeepNext )
                     {
-                        this.Parent.RecalcInfo.KeepNextParagraph = Curr;
-                        return recalcresult_PrevPage;
+                        if ( true === this.Parent.RecalcInfo.Can_RecalcObject() )
+                        {
+                            this.Parent.RecalcInfo.Set_KeepNext(Curr);
+                            return recalcresult_PrevPage;
+                        }
+                        else
+                            break;
                     }
                     else
                         Curr = Prev;
@@ -3698,6 +3678,9 @@ Paragraph.prototype =
 
         var RecalcResult_1 = this.Internal_Recalculate_1_(StartPos, CurPage, CurLine);
         var RecalcResult_2 = this.Internal_Recalculate_2_(StartPos, CurPage, CurLine);
+
+        if ( true === this.Parent.RecalcInfo.WidowControlReset )
+            this.Parent.RecalcInfo.Reset();
 
         var RecalcResult = ( recalcresult_NextElement != RecalcResult_2 ? RecalcResult_2 : RecalcResult_1 );
 
@@ -9501,7 +9484,7 @@ Paragraph.prototype =
         // 1. Ищем табы, которые уже есть в стиле (такие добавлять не надо)
         for ( var Index = 0; Index < Tabs.Tabs.length; Index++ )
         {
-            var Value = StyleTabs.Get_Value( Tabs.Tabs[Index] );
+            var Value = StyleTabs.Get_Value( Tabs.Tabs[Index].Pos );
             if ( -1 === Value )
                 _Tabs.Add( Tabs.Tabs[Index] );
         }
@@ -9509,7 +9492,7 @@ Paragraph.prototype =
         // 2. Ищем табы в стиле, которые нужно отменить
         for ( var Index = 0; Index < StyleTabs.Tabs.length; Index++ )
         {
-            var Value = _Tabs.Get_Value( StyleTabs.Tabs[Index] );
+            var Value = _Tabs.Get_Value( StyleTabs.Tabs[Index].Pos );
             if ( tab_Clear != StyleTabs.Tabs[Index] && -1 === Value )
                 _Tabs.Add( new CParaTab(tab_Clear, StyleTabs.Tabs[Index].Pos ) );
         }

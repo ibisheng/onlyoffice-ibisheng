@@ -719,6 +719,7 @@ function CCollaborativeEditing()
         if ( null != HdrFtr_Content.Footer.Odd )
             RecalculateData.HdrFtr.push( HdrFtr_Content.Footer.Odd );
 
+        LogicDocument.Reset_RecalculateCache();
         LogicDocument.Recalculate( false, false, RecalculateData );
         LogicDocument.Document_UpdateSelectionState();
         LogicDocument.Document_UpdateInterfaceState();

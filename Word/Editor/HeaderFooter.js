@@ -180,6 +180,11 @@ CHeaderFooter.prototype =
         return bChanges;
     },
 
+    Reset_RecalculateCache : function()
+    {
+        this.Content.Reset_RecalculateCache();
+    },
+
     Internal_RecalculateBounds : function()
     {
         // Если это верхний колонтитул и его нижняя граница выше верхнего поля, тогда
@@ -1833,6 +1838,39 @@ CHeaderFooterController.prototype =
         if ( null != this.Content[0].Footer.Even && this.Content[0].Footer.Even !== this.Content[0].Footer.Odd && this.Content[0].Footer.Even != this.Content[0].Footer.First )
         {
             this.Content[0].Footer.Even.Recalculate();
+        }
+    },
+
+    Reset_RecalculateCache : function()
+    {
+        if ( null != this.Content[0].Header.First )
+        {
+            this.Content[0].Header.First.Reset_RecalculateCache();
+        }
+
+        if ( null != this.Content[0].Header.Odd && this.Content[0].Header.Odd !== this.Content[0].Header.First )
+        {
+            this.Content[0].Header.Odd.Reset_RecalculateCache();
+        }
+
+        if ( null != this.Content[0].Header.Even && this.Content[0].Header.Even !== this.Content[0].Header.Odd && this.Content[0].Header.Even != this.Content[0].Header.First )
+        {
+            this.Content[0].Header.Even.Reset_RecalculateCache();
+        }
+
+        if ( null != this.Content[0].Footer.First )
+        {
+            this.Content[0].Footer.First.Reset_RecalculateCache();
+        }
+
+        if ( null != this.Content[0].Footer.Odd && this.Content[0].Footer.Odd !== this.Content[0].Footer.First )
+        {
+            this.Content[0].Footer.Odd.Reset_RecalculateCache();
+        }
+
+        if ( null != this.Content[0].Footer.Even && this.Content[0].Footer.Even !== this.Content[0].Footer.Odd && this.Content[0].Footer.Even != this.Content[0].Footer.First )
+        {
+            this.Content[0].Footer.Even.Reset_RecalculateCache();
         }
     },
 
