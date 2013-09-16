@@ -2467,6 +2467,8 @@ function getMaxPropertiesText(context, font, text)
 		var objOptions;
 		for(var i = 0; i < text.length; i++)
 		{
+			if((text[i]).toString() == '')
+				continue;
 			var lengthText = context.measureText((text[i]).toString(),0);
 			if(lengthText.width > maxWord)
 			{
@@ -2547,9 +2549,14 @@ function calculateAngleText(labels)
 			for(var i = 0; i < labels.length; i++)
 			{
 				//если больше максимума - обрезаем и ставим ...
-				labels[i] = cutLabels(maxWidthAxisLabels, labels[i]);
-				optionText = context.measureText(labels[i],0);
-				result[i] = optionText.width;
+				if(labels[i] == "")
+					result[i] = 0;
+				else
+				{
+					labels[i] = cutLabels(maxWidthAxisLabels, labels[i]);
+					optionText = context.measureText(labels[i],0);
+					result[i] = optionText.width;
+				}
 			}
 			//угол в дефолте
 			result.angle = 45;
@@ -2567,7 +2574,7 @@ function cutLabels(maxWidthAxisLabels, label)
 	var context = OfficeExcel.drawingCtxCharts;
 	var widthPoins = context.measureText("...",0).width;
 	label = label.toString();
-	if(maxWidthAxisLabels && context.measureText(label,0).width  > maxWidthAxisLabels)
+	if(maxWidthAxisLabels && label != "" && context.measureText(label,0).width  > maxWidthAxisLabels)
 	{	
 		var newLabel = label;
 		while((context.measureText(newLabel,0).width + widthPoins) >= maxWidthAxisLabels && newLabel.length > 1)
