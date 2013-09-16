@@ -1748,6 +1748,9 @@
 						this._applyMainFilter(data.activeCells, data.worksheet, data.autoFiltersObject,
 							/*customFilter*/undefined, /*array*/undefined);
 						break;
+					case historyitem_AutoFilter_Move:
+						this._moveAutoFilters(data.worksheet, data.moveTo, data.moveFrom);
+						break;
 				}
 				History.TurnOn();
 			},
@@ -1756,6 +1759,8 @@
 			Undo: function (type, data) {
 				var ws  = data.worksheet;
 				var aWs = this._getCurrentWS(ws);
+				var moveTo = data.moveTo ? data.moveTo : null;
+				var moveFrom = data.moveFrom ? data.moveFrom : null;
 				data = data.undo;
 				var cloneData = Asc.clone(data);
 				if(!cloneData)
@@ -1774,7 +1779,11 @@
 						}
 					}
 				}
-				if(cloneData.FilterColumns || cloneData.AutoFilter || cloneData.result)
+				if(type == 6)
+				{
+					this._moveAutoFilters(ws, moveFrom, moveTo, data);
+				}
+				else if(cloneData.FilterColumns || cloneData.AutoFilter || cloneData.result)
 				{
 					if(cloneData.Ref)
 					{
@@ -5210,6 +5219,8 @@
 				oHistoryObject.cellId				= redoObject.cellId;
 				oHistoryObject.autoFiltersObject	= redoObject.autoFiltersObject;
 				oHistoryObject.addFormatTableOptionsObj = redoObject.addFormatTableOptionsObj;
+				oHistoryObject.moveFrom             = redoObject.arnFrom;
+				oHistoryObject.moveTo               = redoObject.arnTo;
 
 				History.Add(g_oUndoRedoAutoFilters, type, ws.model.getId(), null, oHistoryObject);
 			},
@@ -5436,6 +5447,60 @@
 				}
 			},
 			
+			_moveAutoFilters: function(ws, arnTo, arnFrom, data)
+			{
+				//проверяем покрывает ли диапазон хотя бы один автофильтр
+				var aWs = this._getCurrentWS(ws);
+				var findFilters = this._searchFiltersInRange(arnFrom , aWs);
+				if(findFilters)
+				{
+					var diffCol = arnTo.c1 - arnFrom.c1;
+					var diffRow = arnTo.r1 - arnFrom.r1;
+					var ref;
+					var parseRef;
+					var range;
+					var newRange;
+					var newRef;
+					var oCurFilter;
+					//у найденных фильтров меняем Ref + скрытые строчки открываем
+					for(var i = 0; i < findFilters.length; i++)
+					{
+						oCurFilter = Asc.clone(findFilters[i])
+						ref = findFilters[i].Ref;
+						range = this._refToRange(ref);
+						newRange = Asc.Range(range.c1 + diffCol, range.r1 + diffRow, range.c2 + diffCol, range.r2 + diffRow);
+						newRef = this._rangeToRef(newRange);
+						findFilters[i].Ref = newRef;
+						if(findFilters[i].AutoFilter)
+							findFilters[i].AutoFilter.Ref = newRef;
+							
+						if(!data && findFilters[i].AutoFilter && findFilters[i].AutoFilter.FilterColumns)
+							delete findFilters[i].AutoFilter.FilterColumns;
+						else if(data && data.AutoFilter && data.AutoFilter.FilterColumns)
+							findFilters[i].AutoFilter.FilterColumns = data.AutoFilter.FilterColumns;
+							
+						//при перемещении меняем массив кнопок
+						if(this.allButtonAF)
+						{
+							var buttons = this.allButtonAF;
+							for(var n = 0; n < buttons.length; n++)
+							{
+								if(buttons[n].inFilter == ref)
+								{
+									buttons[n].inFilter = newRef;
+									buttons[n].id = this._shiftId(buttons[n].id, diffCol, diffRow);
+									buttons[n].idNext = this._shiftId(buttons[n].idNext, diffCol, diffRow);
+								}
+							}
+						}
+						if(!data)
+							this._addHistoryObj(ws, oCurFilter, historyitem_AutoFilter_Move, {worksheet: ws, arnTo: arnTo, arnFrom: arnFrom, activeCells: ws.activeRange})
+					}
+					this._reDrawFilters(ws);
+					this.drawAutoF(ws);
+				}
+			},
+			
 			_refToRange: function(ref)
 			{
 				if(typeof ref != 'string')
@@ -5450,6 +5515,18 @@
 					var endRange = this._idToRange(parseRef[1]);
 					var range = Asc.Range(startRange.c1, startRange.r1, endRange.c1, endRange.r1);
 					return range;
+				}
+				return false;
+			},
+			
+			_rangeToRef: function(range)
+			{
+				if(range)
+				{
+					var startId = this._rangeToId({r1: range.r1, c1: range.c1});
+					var endId = this._rangeToId({r1: range.r2, c1: range.c2});
+					var ref = startId + ":" + endId;
+					return ref;
 				}
 				return false;
 			},
@@ -5808,6 +5885,51 @@
 					}
 					return result;
 				}	
+			},
+			
+			_searchFiltersInRange: function(range, aWs)//находим фильтры, находящиеся в данном range
+			{
+				var result = [];
+				var rangeFilter;
+				//var range  = this._getAscRange(range);
+				if(aWs.AutoFilter)
+				{
+					rangeFilter = this._refToRange(aWs.AutoFilter.Ref);
+					if(range.c1 <= rangeFilter.c1 && range.r1 <= rangeFilter.r1 && range.c2 >= rangeFilter.c2 && range.r2 >= rangeFilter.r2)
+					{
+						result[result.length] = aWs.AutoFilter
+					}
+				}
+				if(aWs.TableParts)
+				{
+					for(var k = 0; k < aWs.TableParts.length; k++)
+					{
+						if(aWs.TableParts[k])
+						{
+							rangeFilter = this._refToRange(aWs.TableParts[k].Ref);
+							if(range.c1 <= rangeFilter.c1 && range.r1 <= rangeFilter.r1 && range.c2 >= rangeFilter.c2 && range.r2 >= rangeFilter.r2)
+							{
+								result[result.length] = aWs.TableParts[k];
+							}
+						}
+					}
+				}
+				if(!result.length)
+					result = false;
+				return result;
+			},
+			
+			_shiftId: function(id, colShift, rowShift)
+			{
+				var result = false;
+				if(id)
+				{	
+					var range = this._idToRange(id);
+					range.r1 = range.r1 + rowShift;
+					range.c1 = range.c1 + colShift;
+					result = this._rangeToId(range);
+				}
+				return result;
 			}
 		};
 

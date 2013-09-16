@@ -222,6 +222,7 @@ var historyitem_AutoFilter_Sort		= 2;
 var historyitem_AutoFilter_Empty	= 3;
 var historyitem_AutoFilter_ApplyDF	= 4;
 var historyitem_AutoFilter_ApplyMF	= 5;
+var historyitem_AutoFilter_Move     = 6;
 
 
 // Типы изменений в классе CDocumentContent

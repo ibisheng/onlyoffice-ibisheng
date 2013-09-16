@@ -1571,7 +1571,9 @@ function UndoRedoData_AutoFilter() {
 		type				: 2,
 		cellId				: 3,
 		autoFiltersObject	: 4,
-		addFormatTableOptionsObj: 5
+		addFormatTableOptionsObj: 5,
+		moveFrom            : 6,
+		moveTo              : 7
 	};
 
 	this.undo				= null;
@@ -1582,6 +1584,8 @@ function UndoRedoData_AutoFilter() {
 	this.cellId				= null;
 	this.autoFiltersObject	= null;
 	this.addFormatTableOptionsObj = null;
+	this.moveFrom           = null;
+	this.moveTo             = null;
 }
 UndoRedoData_AutoFilter.prototype = {
 	getType : function ()
@@ -1602,6 +1606,8 @@ UndoRedoData_AutoFilter.prototype = {
 			case this.Properties.cellId: return this.cellId; break;
 			case this.Properties.autoFiltersObject: return this.autoFiltersObject; break;
 			case this.Properties.addFormatTableOptionsObj: return this.addFormatTableOptionsObj; break;
+			case this.Properties.moveFrom: return new UndoRedoData_BBox(this.moveFrom); break;
+			case this.Properties.moveTo: return new UndoRedoData_BBox(this.moveTo); break;
 		}
 
 		return null;
@@ -1616,6 +1622,8 @@ UndoRedoData_AutoFilter.prototype = {
 			case this.Properties.cellId: this.cellId = value;break;
 			case this.Properties.autoFiltersObject: this.autoFiltersObject = value;break;
 			case this.Properties.addFormatTableOptionsObj: return this.addFormatTableOptionsObj = value; break;
+			case this.Properties.moveFrom: this.moveFrom = value;break;
+			case this.Properties.moveTo: this.moveTo = value;break;
 		}
 	},
 	applyCollaborative : function (nSheetId, collaborativeEditing) {
