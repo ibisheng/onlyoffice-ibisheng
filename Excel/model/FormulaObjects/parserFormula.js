@@ -2200,6 +2200,8 @@ cArray.prototype.toString = function () {
     return "{" + ret + "}";
 };
 cArray.prototype.isValidArray = function () {
+    if( this.countElement < 1 )
+    return false;
     for ( var i = 0; i < this.rowCount - 1; i++ ) {
         if ( this.countElementInRow[i] - this.countElementInRow[i + 1] == 0 )
             continue;
