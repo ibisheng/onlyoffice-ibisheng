@@ -1589,8 +1589,8 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 		}
 		else if ( c_oSer_ChartType.SpPr === type )
 		{
-            var oPresentationSimpleSerializer = new CPPTXContentLoader();
-			var oNewSpPr = oPresentationSimpleSerializer.ReadShapeProperty(this.stream);
+            var oPPTXContentLoader = new CPPTXContentLoader();
+			var oNewSpPr = oPPTXContentLoader.ReadShapeProperty(this.stream);
 			if(null != oNewSpPr && null != oNewSpPr.ln && null != oNewSpPr.ln.Fill && null != oNewSpPr.ln.Fill.fill && FILL_TYPE_NOFILL == oNewSpPr.ln.Fill.fill.type)
 				this.chart.bShowBorder = false;
 			else
@@ -1605,8 +1605,8 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 		var res = c_oSerConstants.ReadOk;
 		if ( c_oSer_ChartTitlePptxType.TxPptx === type || c_oSer_ChartTitlePptxType.TxPrPptx === type)
 		{
-            var oPresentationSimpleSerializer = new CPPTXContentLoader();
-            var textBody = oPresentationSimpleSerializer.ReadTextBody(null, this.stream,  chartTitlePptx);
+            var oPPTXContentLoader = new CPPTXContentLoader();
+            var textBody = oPPTXContentLoader.ReadTextBody(null, this.stream,  chartTitlePptx);
             if(c_oSer_ChartTitlePptxType.TxPptx === type)
 			{
                 chartTitlePptx.txBody = textBody;
@@ -1646,11 +1646,12 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
             this.chart.legend.bOverlay = this.stream.GetBool();
         else if ( c_oSer_ChartLegendType.TxPrPptx === type )
         {
-            var oPresentationSimpleSerializer = new PresentationSimpleSerializer();
-            var textBody = oPresentationSimpleSerializer.ReadTextBody(this.stream);
-            var params = this.ParsePptxParagraph(textBody);
-            if(null != params.font)
-                this.chart.legend.font = params.font;
+			var oTempTitle = new CChartTitle(this.chartAsGroup, CHART_TITLE_TYPE_TITLE);
+			var oPPTXContentLoader = new CPPTXContentLoader();
+            var textBody = oPPTXContentLoader.ReadTextBody(null, this.stream,  oTempTitle);
+            // var font = this.ParsePptxParagraph(textBody);
+            // if(null != font)
+                // this.chart.legend.font = font;
         }
         else if ( c_oSer_ChartLegendType.LegendEntry === type )
         {
@@ -1675,9 +1676,10 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
             oLegendEntry.bDelete = this.stream.GetBool();
         else if(c_oSer_ChartLegendEntryType.TxPrPptx === type)
         {
-            var oPresentationSimpleSerializer = new PresentationSimpleSerializer();
-            var textBody = oPresentationSimpleSerializer.ReadTextBody(this.stream);
-            oLegendEntry.oTxPr = this.ParsePptxParagraph(textBody);
+            var oTempTitle = new CChartTitle(this.chartAsGroup, CHART_TITLE_TYPE_TITLE);
+			var oPPTXContentLoader = new CPPTXContentLoader();
+            var textBody = oPPTXContentLoader.ReadTextBody(null, this.stream,  oTempTitle);
+            //oLegendEntry.oTxPr = this.ParsePptxParagraph(textBody);
         }
         else
             res = c_oSerConstants.ReadUnknown;
@@ -1788,13 +1790,10 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 		}
 		else if ( c_oSer_ChartCatAxType.TxPrPptx === type )
 		{
-			/*var oPresentationSimpleSerializer = new PresentationSimpleSerializer();
-			var textBody = oPresentationSimpleSerializer.ReadTextBody(this.stream);
-			var params = this.ParsePptxParagraph(textBody);
-			if(null != params.font)
-				oAx.lablefont = params.font;               */
-            var oPresentationSimpleSerializer = new CPPTXContentLoader();
-            var textBody = oPresentationSimpleSerializer.ReadTextBody(null, this.stream,  oAx.chartTitle);
+			//настройки цифр линейки.
+            var oTxPr = new CChartTitle(this.chartAsGroup, CHART_TITLE_TYPE_TITLE);
+            var oPPTXContentLoader = new CPPTXContentLoader();
+            var textBody = oPPTXContentLoader.ReadTextBody(null, this.stream,  oTxPr);
 		}
 		else
             res = c_oSerConstants.ReadUnknown;
@@ -1934,8 +1933,8 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 		}
 		else if ( c_oSer_ChartSeriesType.SpPr === type )
 		{
-            var oPresentationSimpleSerializer = new CPPTXContentLoader();
-			var oNewSpPr = oPresentationSimpleSerializer.ReadShapeProperty(this.stream);
+            var oPPTXContentLoader = new CPPTXContentLoader();
+			var oNewSpPr = oPPTXContentLoader.ReadShapeProperty(this.stream);
 			if(null != oNewSpPr.Fill && null != oNewSpPr.Fill.fill && null != oNewSpPr.Fill.fill.color)
 				seria.OutlineColor = oNewSpPr.Fill.fill.color;
 		}
@@ -2033,129 +2032,15 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 			oOutput.ShowVal = this.stream.GetBool();
 		else if ( c_oSer_ChartSeriesDataLabelsType.TxPrPptx === type )
 		{
-			var oPresentationSimpleSerializer = new PresentationSimpleSerializer();
-			var textBody = oPresentationSimpleSerializer.ReadTextBody(this.stream);
-			oOutput.TxPrPptx = this.ParsePptxParagraph(textBody);
+			var oTempTitle = new CChartTitle(this.chartAsGroup, CHART_TITLE_TYPE_TITLE);
+			var oPPTXContentLoader = new CPPTXContentLoader();
+            var textBody = oPPTXContentLoader.ReadTextBody(null, this.stream,  oTempTitle);
+			//oOutput.TxPrPptx = this.ParsePptxParagraph(textBody);
 		}
 		else
             res = c_oSerConstants.ReadUnknown;
 		return res;
 	};
-	this.ParsePptxParagraph = function(textbody, oDefFont)
-	{
-		var res = {text: "", font: null};
-		for(var i = 0, length = textbody.content.length; i < length; ++i)
-		{
-			var par = textbody.content[i];
-			if(0 != i)
-				res.text += "\r\n";
-			else
-			{
-				if(null != par.rPr)
-				{
-					var api_doc = window["editor"];
-					var api_sheet = window["Asc"];
-					var theme = null;
-					var clrSchemeMap = null;
-					if(api_doc)
-					{
-						if(null != api_doc.WordControl && null != api_doc.WordControl.m_oLogicDocument && null != api_doc.WordControl.m_oLogicDocument)
-						{
-							theme = api_doc.WordControl.m_oLogicDocument.theme;
-							clrSchemeMap = api_doc.WordControl.m_oLogicDocument.clrSchemeMap;
-						}
-					}
-					else if(api_sheet)
-					{
-						var editor = api_sheet["editor"];
-						if(null != editor.wbModel)
-						{
-							theme = editor.wbModel.theme;
-							clrSchemeMap = editor.wbModel.clrSchemeMap;
-						}
-					}
-					if(oDefFont)
-						res.font = oDefFont;
-					else
-						res.font = new asc_CChartFont();
-					if(null != par.rPr.Bold)
-						res.font.bold = par.rPr.Bold ? 1 : 0;
-					if(null != par.rPr.Italic)
-						res.font.italic = par.rPr.Italic ? 1 : 0;
-					if(null != par.rPr.Underline)
-						res.font.underline = par.rPr.Underline ? 1 : 0;
-					if(null != par.rPr.FontSize)
-						res.font.size = par.rPr.FontSize;
-					if(null != par.rPr.FontFamily && null != par.rPr.FontFamily.Name && "" != par.rPr.FontFamily.Name)
-					{
-						var sName = par.rPr.FontFamily.Name;
-						if("+mj-lt" == sName || "+mn-lt" == sName || "+mj-ea" == sName || "+mn-ea" == sName || "+mj-cs" == sName || "+mn-cs" == sName)
-						{
-							if(null != theme)
-							{
-								var fontScheme = theme.themeElements.fontScheme;
-								switch(sName)
-								{
-									case "+mj-lt": sName = fontScheme.majorFont.latin;break;
-									case "+mj-ea": sName = fontScheme.majorFont.ea;break;
-									case "+mj-cs": sName = fontScheme.majorFont.cs;break;
-									case "+mn-lt": sName = fontScheme.minorFont.latin;break;
-									case "+mn-ea": sName = fontScheme.minorFont.ea;break;
-									case "+mn-cs": sName = fontScheme.minorFont.cs;break;
-									default:sName = null;break;
-								}
-							}
-							else
-								sName = null;
-						}
-						//проверка на пустую строку нужна, потому что до AVSOfficeDocxFile2 2,0,0,134 в темы не подбирались шрифты, а возвращалась пустая строка.
-						if(null != sName && "" != sName)
-							res.font.name = sName;
-					}
-					if(null != par.rPr.unifill)
-					{
-						var fill = par.rPr.unifill.fill;
-						if(null != fill && FILL_TYPE_SOLID == fill.type)
-						{
-							var color = fill.color;
-							if(null != color)
-							{
-								color = color.color;
-								if(null != color)
-								{
-									var rgba = {R:0, G:0, B:0, A:255};
-									if(COLOR_TYPE_SRGB == color.type)
-									{
-										rgba.R = color.RGBA.R;
-										rgba.G = color.RGBA.G;
-										rgba.B = color.RGBA.B;
-									}
-									else if(COLOR_TYPE_SCHEME == color.type && null != theme && null != clrSchemeMap)
-									{
-										color.Calculate(theme, clrSchemeMap.color_map, rgba);
-										if(null != fill.color.Mods)
-										{
-											var _rgba = {R: color.RGBA.R, G: color.RGBA.G, B: color.RGBA.B, A: color.RGBA.A};
-											fill.color.Mods.Apply(_rgba);
-											rgba = _rgba;
-										}
-										else
-											rgba = color.RGBA;
-									}
-									var num = rgba.R << 16 | rgba.G << 8 | rgba.B;
-									var c = num.toString(16);
-									while (c.length < 6) {c = "0" + c;}
-									res.font.color = "#" + c;	
-								}
-							}
-						}
-					}
-				}
-			}
-			res.text += par.text;
-		}
-		return res;
-	}
 }
 
 function isRealObject(obj)

@@ -83,7 +83,6 @@
                 "../.Common/Charts/libraries/hsv.js",
                 "../.Common/Charts/libraries/rgbcolor.js",
 
-                "../Common/PresentationSerializeAdapter.js",
                 "../Word/Editor/SerializeCommon.js",
 
 
