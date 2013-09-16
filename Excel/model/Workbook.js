@@ -1393,6 +1393,7 @@ function Workbook(sUrlPath, eventsHandlers, oApi){
 	this.startActionOn = false;
 	this.aCollaborativeActions = new Array();
 	this.bCollaborativeChanges = false;
+	this.bUndoRedoChanges = false;
 	this.aCollaborativeChangeElements = new Array();
 };
 Workbook.prototype.initGlobalObjects=function(){
@@ -2658,19 +2659,20 @@ Woorksheet.prototype._insertRowsBefore=function(index, count){
 		var row = this.aGCells[nIndex];
 		if(false == row.isEmpty())
 		{
-			var oTargetRow = this._getRow(nIndex + count - 1);
+			var oTargetRow = this._getRow(nIndex + count);
 			oTargetRow.copyProperty(row);
 		}
 		for(var j in row.c)
 			this._moveCellVer(nIndex, j - 0, count);
         delete this.aGCells[nIndex];
 	}
-    if(null != oPrevRow)
+    if(null != oPrevRow && false == this.workbook.bUndoRedoChanges)
     {
         for(var i = 0; i < count; ++i)
         {
             var row = this._getRow(index + i);
             row.copyProperty(oPrevRow);
+			row.hd = null;
         }
     }
 	var res = this.renameDependencyNodes({offsetRow:count,offsetCol:0},oActualRange);
@@ -2804,9 +2806,10 @@ Woorksheet.prototype._insertColsBefore=function(index, count){
 	for(var i = 0; i < count; ++i)
     {
         var oNewCol = null;
-        if(null != oPrevCol)
+        if(null != oPrevCol && false == this.workbook.bUndoRedoChanges)
         {
            oNewCol = oPrevCol.clone();
+		   oNewCol.hd = null;
            oNewCol.BestFit = null;
            oNewCol.index = index + i; 
         }
