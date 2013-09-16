@@ -1934,20 +1934,21 @@
 					return res.length > 0 ? res.join(",") : "";
 				}
 
+				var hyperlink = cell.getHyperlink();
 				for (res = [], i = 0; i < val.length; ++i) {
 					if(val[i] && val[i].format && val[i].format.skip)
 						continue;
-					if(cell == undefined || (cell != undefined && (cell.getHyperlink() == null || (cell.getHyperlink() != null && cell.getHyperlink().Location != null))))
+					if(cell == undefined || (cell != undefined && (hyperlink == null || (hyperlink != null && hyperlink.Location != null))))
 						span = doc.createElement("SPAN");
 					else
 					{
 						span = doc.createElement("A");
-						if(cell.getHyperlink().Hyperlink != null)
-							span.href = cell.getHyperlink().Hyperlink;
-						else if(cell.getHyperlink().Location != null)
-							span.href = "#" + cell.getHyperlink().Location;
-						if(cell.getHyperlink().Tooltip != null)
-							span.title = cell.getHyperlink().Tooltip;
+						if(hyperlink.Hyperlink != null)
+							span.href = hyperlink.Hyperlink;
+						else if(hyperlink.Location != null)
+							span.href = "#" + hyperlink.Location;
+						if(hyperlink.Tooltip != null)
+							span.title = hyperlink.Tooltip;
 					}
 					if( val[i].sFormula ){
 						span.textContent = "="+val[i].sFormula;
