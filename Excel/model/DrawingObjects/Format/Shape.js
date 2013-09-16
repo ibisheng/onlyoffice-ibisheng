@@ -2868,6 +2868,27 @@ CShape.prototype =
         }
     },
 
+    setNvSpPr: function(pr)
+    {
+        this.nvSpPr = pr;
+    },
+
+    setSpPr: function(pr)
+    {
+        this.spPr = pr;
+    },
+
+    setTextBody: function(txBody)
+    {
+        this.txBody = txBody;
+    },
+
+    setBodyPr: function(bodyPr)
+    {
+        this.txBody.bodyPr = bodyPr;
+    },
+
+
     getBase64Image: function()
     {
         return ShapeToImageConverter(this, this.pageIndex).ImageUrl;

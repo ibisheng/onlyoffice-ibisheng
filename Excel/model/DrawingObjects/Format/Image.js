@@ -1095,6 +1095,17 @@ CImageShape.prototype =
         }
     },
 
+
+    setNvSpPr: function(pr)
+    {
+        this.nvSpPr = pr;
+    },
+
+    setSpPr: function(pr)
+    {
+        this.spPr = pr;
+    },
+
     getBase64Image: function()
     {
         return ShapeToImageConverter(this, this.pageIndex).ImageUrl;

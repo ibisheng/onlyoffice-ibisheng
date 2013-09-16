@@ -216,9 +216,14 @@ CGroupShape.prototype =
 
     addToSpTree: function(grObject)
     {
+        var obj;
+        if(isRealObject(grObject))
+            obj = grObject;
+        else
+            obj = arguments[1];
         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_AddToSpTree, null, null,
-            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(grObject.Get_Id(), null)));
-        this.spTree.push(grObject);
+            new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(obj.Get_Id(), null)));
+        this.spTree.push(obj);
         this.recalcInfo.recalculateArrGraphicObjects = true;
     },
 
@@ -1658,6 +1663,17 @@ CGroupShape.prototype =
     getBase64Image: function()
     {
         return ShapeToImageConverter(this, this.pageIndex).ImageUrl;
+    },
+
+
+    setNvSpPr: function(pr)
+    {
+        this.nvSpPr = pr;
+    },
+
+    setSpPr: function(pr)
+    {
+        this.spPr = pr;
     },
 
     readFromBinaryForCopyPaste: function(r, group, drawingObjects, x, y)

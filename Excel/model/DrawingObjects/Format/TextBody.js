@@ -434,6 +434,19 @@ CTextBody.prototype =
     },
 
 
+
+    setLstStyle: function(lstStyle)
+    {
+        this.lstStyle = lstStyle;
+    },
+
+
+    setDocContent: function(docContent)
+    {
+        this.content = docContent;
+
+    },
+
     setShape: function(shape)
     {
         var oldId = isRealObject(this.shape) ? this.shape.Get_Id() : null;
