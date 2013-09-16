@@ -1095,7 +1095,20 @@ CMetafile.prototype =
         {
             // excel
             this.Memory.WriteByte(CommandType.ctDrawImageFromFile);
-            this.Memory.WriteString2(img);
+
+            var _api = window["Asc"]["editor"];
+            var _mask = g_sResourceServiceLocalUrl + _api.documentId + "/";
+            if (0 == img.indexOf(_mask))
+            {
+                var _src = img.substring(_mask.length);
+                this.Memory.WriteString2(_src);
+            }
+            else
+            {
+                this.Memory.WriteString2(img);
+            }
+
+            this.Memory.WriteString2(_src);
             this.Memory.WriteDouble(x);
             this.Memory.WriteDouble(y);
             this.Memory.WriteDouble(w);
