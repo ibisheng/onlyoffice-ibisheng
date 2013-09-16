@@ -1721,6 +1721,8 @@ function CSlideBoundsChecker()
 
 CSlideBoundsChecker.prototype =
 {
+    DrawLockParagraph: function()
+    {},
 
     drawCollaborativeChanges: function()
     {},
