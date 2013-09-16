@@ -7100,7 +7100,7 @@ Range.prototype.unmerge=function(bOnlyInRange){
 		}
 	}
 };
-Range.prototype._getHyperlinks=function(bStopOnFirst){
+Range.prototype._getHyperlinks=function(bStopOnFirst, bAvoidHiddenRow){
 	var nRangeType = this._getRangeType();
 	var result = [];
 	var oAllCol = this.worksheet.oAllCol;
@@ -7125,49 +7125,60 @@ Range.prototype._getHyperlinks=function(bStopOnFirst){
 			oRow[nCol] = hyperlink;
 		};
 		var oProcessedMerged = new Object();
-		this._foreachIndex(function(nRow, nCol){
-			var cell = oThis.worksheet._getCellNoEmpty(nRow, nCol);
-			if(null != cell && cell.hyperlinks.length > 0)
+		var oBBox = this.bbox;
+		for(var nRow = oBBox.r1; nRow <= oBBox.r2; nRow++){
+			var row = this.worksheet._getRowNoEmpty(nRow);
+			if(null != row)
 			{
-				var oCurHyperlink = cell.hyperlinks[cell.hyperlinks.length - 1];
-				if(bStopOnFirst)
-				{
-					result.push({hyperlink: oCurHyperlink, col: nCol, row: nRow});
-					return;
-				}
-				else
-				{
-					fAddToTemp(oTempRows, oCurHyperlink, nRow, nCol);
-					//расширяем гиперссылки в замерженых ячейках
-					if(null != cell.merged)
+				if(true == row.hd && bAvoidHiddenRow)
+					continue;
+				for(var nCol = oBBox.c1; nCol <= oBBox.c2; nCol++){
+					var cell = oThis.worksheet._getCellNoEmpty(nRow, nCol);
+					if(null != cell && cell.hyperlinks.length > 0)
 					{
-						var sId = cell.merged.getName();
-						if(null == oProcessedMerged[sId])
+						var oCurHyperlink = cell.hyperlinks[cell.hyperlinks.length - 1];
+						if(bStopOnFirst)
 						{
-							var intersect = oThis.intersect(cell.merged);
-							if(null != intersect)
+							result.push({hyperlink: oCurHyperlink, col: nCol, row: nRow});
+							break;
+						}
+						else
+						{
+							fAddToTemp(oTempRows, oCurHyperlink, nRow, nCol);
+							//расширяем гиперссылки в замерженых ячейках
+							if(null != cell.merged)
 							{
-								intersect._foreach(function(cell, nRow, nCol, nRowStart, nColStart){
-									fAddToTemp(oTempRows, oCurHyperlink, nRow, nCol);
-								});
+								var sId = cell.merged.getName();
+								if(null == oProcessedMerged[sId])
+								{
+									var intersect = oThis.intersect(cell.merged);
+									if(null != intersect)
+									{
+										intersect._foreach(function(cell, nRow, nCol, nRowStart, nColStart){
+											fAddToTemp(oTempRows, oCurHyperlink, nRow, nCol);
+										});
+									}
+									oProcessedMerged[sId] = cell.merged;
+								}
 							}
-							oProcessedMerged[sId] = cell.merged;
 						}
 					}
+					else
+					{
+						var row = aRows[nRow];
+						var col = aCols[nCol];
+						if(null != row && row.hyperlinks.lengh > 0)
+							fAddToTemp(oTempRows, row.hyperlinks[row.hyperlinks.length - 1], nRow, nCol);
+						if(null != col && col.hyperlinks.length > 0)
+							fAddToTemp(oTempRows, col.hyperlinks[col.hyperlinks.length - 1], nRow, nCol);
+						else if(null != oAllCol && oAllCol.hyperlinks.length > 0)
+							fAddToTemp(oTempRows, oAllCol.hyperlinks[oAllCol.hyperlinks.length - 1], nRow, nCol);
+					}
 				}
+				if(bStopOnFirst && result.length > 0)
+					break;
 			}
-			else
-			{
-				var row = aRows[nRow];
-				var col = aCols[nCol];
-				if(null != row && row.hyperlinks.lengh > 0)
-					fAddToTemp(oTempRows, row.hyperlinks[row.hyperlinks.length - 1], nRow, nCol);
-				if(null != col && col.hyperlinks.length > 0)
-					fAddToTemp(oTempRows, col.hyperlinks[col.hyperlinks.length - 1], nRow, nCol);
-				else if(null != oAllCol && oAllCol.hyperlinks.length > 0)
-					fAddToTemp(oTempRows, oAllCol.hyperlinks[oAllCol.hyperlinks.length - 1], nRow, nCol);
-			}
-		});
+		}
 		//формируем результат
 		for(var i in oTempRows)
 		{
@@ -7184,13 +7195,13 @@ Range.prototype._getHyperlinks=function(bStopOnFirst){
 	return result;
 }
 Range.prototype.getHyperlink=function(){
-	var aHyperlinks = this._getHyperlinks(true);
+	var aHyperlinks = this._getHyperlinks(true, false);
 	if(null != aHyperlinks && aHyperlinks.length > 0)
 		return aHyperlinks[0].hyperlink;
 	return null;
 };
 Range.prototype.getHyperlinks=function(){
-	return this._getHyperlinks(false);
+	return this._getHyperlinks(false, true);
 };
 Range.prototype.setHyperlink=function(val, bWithoutStyle){
 	if(null != val && false == val.isValid())
