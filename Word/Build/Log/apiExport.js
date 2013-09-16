@@ -146,6 +146,7 @@ prop:get_DocStylesImage
 prop:get_MergedStyles
 prop:get_STYLE_THUMBNAIL_WIDTH
 prop:get_STYLE_THUMBNAIL_HEIGHT
+prop:get_IsRetinaEnabled
 ---
 var:CStyleImage
 prop:get_ThumbnailOffset
@@ -1216,6 +1217,7 @@ CStylesPainter.prototype['get_DocStylesImage'] = CStylesPainter.prototype.get_Do
 CStylesPainter.prototype['get_MergedStyles'] = CStylesPainter.prototype.get_MergedStyles;
 CStylesPainter.prototype['get_STYLE_THUMBNAIL_WIDTH'] = CStylesPainter.prototype.get_STYLE_THUMBNAIL_WIDTH;
 CStylesPainter.prototype['get_STYLE_THUMBNAIL_HEIGHT'] = CStylesPainter.prototype.get_STYLE_THUMBNAIL_HEIGHT;
+CStylesPainter.prototype['get_IsRetinaEnabled'] = CStylesPainter.prototype.get_IsRetinaEnabled;
 window['CStyleImage'] = CStyleImage;
 CStyleImage.prototype['get_ThumbnailOffset'] = CStyleImage.prototype.get_ThumbnailOffset;
 CStyleImage.prototype['get_Type'] = CStyleImage.prototype.get_Type;
