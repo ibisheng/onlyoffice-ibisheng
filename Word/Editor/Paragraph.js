@@ -10219,9 +10219,10 @@ Paragraph.prototype =
         else
             this.DrawingDocument.SetCursorType( "default", MMData );
 
-        if ( true === this.Lock.Is_Locked() )
+        var PNum = Math.max( 0, Math.min( PageIndex - this.PageNum, this.Pages.length - 1 ) );
+        var Bounds = this.Pages[PNum].Bounds;
+        if ( true === this.Lock.Is_Locked() && X < Bounds.Right && X > Bounds.Left && Y > Bounds.Top && Y < Bounds.Bottom )
         {
-            var PNum = Math.max( 0, Math.min( PageIndex - this.PageNum, this.Pages.length - 1 ) );
             var _X = this.Pages[PNum].X;
             var _Y = this.Pages[PNum].Y;
 
