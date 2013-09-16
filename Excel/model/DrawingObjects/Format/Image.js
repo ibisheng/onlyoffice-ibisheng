@@ -1110,6 +1110,10 @@ CImageShape.prototype =
     {
         return ShapeToImageConverter(this, this.pageIndex).ImageUrl;
     },
+    setBlipFill: function(blipFill)
+    {
+        this.blipFill = blipFill;
+    },
 
     writeToBinaryForCopyPaste: function(w)
     {

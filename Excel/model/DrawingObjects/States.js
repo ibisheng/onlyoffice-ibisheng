@@ -2896,7 +2896,7 @@ function TextAddInGroup(drawingObjectsController, drawingObjects, group, textObj
 
     this.onKeyDown = function(e)
     {
-
+        return DefaultKeyDownHandle(drawingObjectsController, e);
     };
 
     this.onKeyPress = function(e)
@@ -5551,9 +5551,16 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                 var drawing_bases = drawingObjectsController.drawingObjects.getDrawingObjects();
                 for(var i = 0; i < drawing_bases.length; ++i)
                 {
-                    drawing_bases.graphicObject.select(drawingObjectsController);
+                    drawing_bases[i].graphicObject.select(drawingObjectsController);
                 }
                 drawingObjectsController.drawingObjects.OnUpdateOverlay();
+                break;
+            }
+            case STATES_ID_TEXT_ADD:
+            case STATES_ID_TEXT_ADD_IN_GROUP:
+            {
+                state.textObject.txBody.content.Select_All();
+                state.drawingObjectsController.updateSelectionState();
                 break;
             }
         }
