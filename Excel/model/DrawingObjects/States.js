@@ -1812,6 +1812,7 @@ function ResizeState(drawingObjectsController, drawingObjects, majorObject, card
                 for(var i = 0; i < track_objects2.length; ++i)
                     track_objects2[i].trackEnd();
                 drawingObjects.showDrawingObjects(true);
+				drawingObjects.sendGraphicObjectProps();
 
             }
         };

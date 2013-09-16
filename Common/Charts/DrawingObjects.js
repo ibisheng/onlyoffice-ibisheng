@@ -2349,6 +2349,8 @@ function DrawingObjects() {
 	_this.asyncImageEndLoaded = null;
 	_this.asyncImagesDocumentEndLoaded = null;
 	
+	var wsCellCache = { cols: null, rows: null, isInit: false };
+	
 	// Task timer
 	var aDrawTasks = [];
 	var drawTaskTimerId = null;
@@ -2741,6 +2743,7 @@ function DrawingObjects() {
 		for (var i = 0; currentSheet.model.Drawings && (i < currentSheet.model.Drawings.length); i++) {
 			
 			var drawingObject = _this.cloneDrawingObject(currentSheet.model.Drawings[i]);
+			drawingObject.updateAnchorPosition();
 			
 			if ( !worksheet.cols[drawingObject.to.col] ) {
 				while ( !worksheet.cols[drawingObject.to.col] ) {
@@ -2846,9 +2849,7 @@ function DrawingObjects() {
         _this.shiftMap = {};
 	}
 
-
-    _this.preCopy = function()
-    {
+    _this.preCopy = function() {
         _this.shiftMap = {};
         var selected_objects = _this.controller.selectedObjects;
         if(selected_objects.length > 0)
@@ -3507,6 +3508,7 @@ function DrawingObjects() {
 			chart.rebuildSeries();
 			chart.worksheet = worksheet; 	// Для формул серий
 			
+			History.Create_NewPoint();
 			return this.controller.addChartDrawingObject(chart, options);
 		}
 		else if ( isObject(chart) && chart["binary"] ) {
@@ -3544,6 +3546,22 @@ function DrawingObjects() {
 					api.chartStyleManager.init();
 					api.chartPreviewManager.init();
 				}			
+				
+				if ( !wsCellCache.isInit ) {
+				
+					wsCellCache.cols = [];
+					wsCellCache.rows = [];
+					var colsCount = worksheet.cols.length;		//worksheet.model.getColsCount();
+					var rowsCount = worksheet.rows.length;		//worksheet.model.getRowsCount();
+					
+					for (var i = 0; i < colsCount; i++) {
+						wsCellCache.cols.push(worksheet.model.getColWidth(i));
+					}
+					for (var i = 0; i < rowsCount; i++) {
+						wsCellCache.rows.push(worksheet.model.getRowHeight(i));
+					}
+					wsCellCache.isInit = true;
+				}
 				
 				// Заполняем таблицу
 				if ( graphicObject.chart.series.length ) {
@@ -4127,11 +4145,14 @@ function DrawingObjects() {
 		for (var i = 0; i < aObjects.length; i++) {
 			if ( aObjects[i].graphicObject.Id == graphicId ) {
 				aObjects[i].graphicObject.deselect(_this.controller);
+				if ( aObjects[i].isChart() )
+					worksheet.arrActiveChartsRanges = [];
 				aObjects.splice(i, 1);
 				bRedraw = true;
                 return i;
 			}
 		}
+		
 		if ( bRedraw )
 			_this.showDrawingObjects(true);
 		
@@ -4382,6 +4403,19 @@ function DrawingObjects() {
 	//-----------------------------------------------------------------------------------
 	
 	_this.cleanWorksheet = function() {
+		
+		// Восстанавливаем ячейки
+		if ( wsCellCache.isInit ) {
+			for (var i = 0; i < wsCellCache.cols.length; i++) {
+				worksheet.model.setColWidth( wsCellCache.cols[i], i, i );		// Default
+			}
+			for (var i = 0; i < wsCellCache.rows.length; i++) {
+				worksheet.model.setRowHeight( wsCellCache.rows[i], i, i );		// Default
+			}
+			//worksheet._initCellsArea(true);
+			worksheet.changeWorksheet("update");
+		}
+	
 		aObjects = [];
 		worksheet._clean();			
 		var listRange = new Range(worksheet.model, 0, 0, worksheet.nRowsCount - 1, worksheet.nColsCount - 1);
@@ -4413,6 +4447,11 @@ function DrawingObjects() {
 			api.chartStyleManager.init();
 			api.chartPreviewManager.init();
 			_this.callTrigger("asc_onUpdateChartStyles");
+		}
+		
+		if ( api.isChartEditor ) {
+			if ( aObjects.length && aObjects[0].isChart() )
+				return new asc_CChart(aObjects[0].graphicObject.chart);
 		}
 
         var chart = this.controller.getAscChartObject();
