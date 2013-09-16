@@ -4072,6 +4072,12 @@ Cell.prototype.setValue=function(val,callback){
 		needRecalc = true;
 		wb.cwf[ws.Id].cells[this.oId.getID()] = this.oId.getID();
 		ar[this.oId.getID()] = this.oId.getID();
+        if( !arrRecalc[this.ws.getId()] ){
+            arrRecalc[this.ws.getId()] = {};
+        }
+        arrRecalc[this.ws.getId()][this.oId.getID()] = this.oId.getID();
+        wb.needRecalc[ getVertexId(this.ws.getId(),this.oId.getID()) ] = [ this.ws.getId(),this.oId.getID() ];
+        wb.needRecalc.length++;
 	}
 	this.sFormula = null;
 	this.setFormulaCA(false);
