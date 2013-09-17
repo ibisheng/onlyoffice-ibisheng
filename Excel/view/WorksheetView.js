@@ -5054,11 +5054,6 @@
 						var aFormulaIntersection = arFormulaTmp.intersection(this.visibleRange);
 						
 						if (aFormulaIntersection) {
-							var drawLeftSideFormula   = aFormulaIntersection.c1 === arFormulaTmp.c1;
-							var drawRightSideFormula  = aFormulaIntersection.c2 === arFormulaTmp.c2;
-							var drawTopSideFormula    = aFormulaIntersection.r1 === arFormulaTmp.r1;
-							var drawBottomSideFormula = aFormulaIntersection.r2 === arFormulaTmp.r2;
-
 							var xFormula1 = this.cols[aFormulaIntersection.c1].left - offsetX;
 							var xFormula2 = this.cols[aFormulaIntersection.c2].left + this.cols[aFormulaIntersection.c2].width - offsetX;
 							var yFormula1 = this.rows[aFormulaIntersection.r1].top - offsetY;

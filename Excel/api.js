@@ -212,7 +212,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		
 			asc_CheckGuiControlColors : function() {
 				// потом реализовать проверку на то, что нужно ли посылать
-				var _theme  = this.wbModel.theme;
 
 				var arr_colors = new Array(10);
 				var _count = arr_colors.length;
