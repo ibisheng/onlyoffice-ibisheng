@@ -4195,7 +4195,7 @@ CDelimiter.prototype.setPosition = function(position)
         y = this.pos.y;
 
     var pos = {x: x, y: y + this.align(this.begOper)};
-    this.begOper.setPosition([pos]);
+    this.begOper.setPosition(pos);
     x += this.begOper.size.width;
 
     var content = this.elements[0][0];
@@ -4220,7 +4220,7 @@ CDelimiter.prototype.setPosition = function(position)
     this.sepOper.setPosition(Positions);
 
     pos = {x: x, y: y + this.align(this.endOper)};
-    this.endOper.setPosition([pos]);
+    this.endOper.setPosition(pos);
 }
 CDelimiter.prototype.findDisposition = function(pos)
 {
@@ -4332,13 +4332,13 @@ function COperator(glyph)
 {
     this.glyph = glyph;
 
-    this.positions = null;
+    this.pos = null;
     this.coordGlyph = null;
     this.size = {width: 0, height: 0};
 }
 COperator.prototype.draw = function()
 {
-    if(this.glyph !== -1)
+    /*if(this.glyph !== -1)
     {
         var lng = this.coordGlyph.XX.length;
 
@@ -4354,7 +4354,23 @@ COperator.prototype.draw = function()
 
             this.glyph.draw(X, Y);
         }
+    }*/
+
+    if(this.glyph !== -1)
+    {
+        var lng = this.coordGlyph.XX.length;
+
+            var X = new Array(),
+                Y = new Array();
+            for(var j = 0; j < lng; j++)
+            {
+                X.push(this.pos.x + this.coordGlyph.XX[j]);
+                Y.push(this.pos.y + this.coordGlyph.YY[j]);
+            }
+
+            this.glyph.draw(X, Y);
     }
+
 }
 COperator.prototype.fixSize = function(measure)
 {
@@ -4387,9 +4403,10 @@ COperator.prototype.fixSize = function(measure)
         this.size = { width: width, height: height, center: center};
     }
 }
-COperator.prototype.setPosition = function(positions)
+COperator.prototype.setPosition = function(pos)
 {
-    this.positions = positions;
+    this.pos = pos;
+    //this.positions = positions;
 }
 COperator.prototype.IsJustDraw = function()
 {
@@ -4418,7 +4435,8 @@ COperator.prototype.setTxtPrp = function(txtPrp)
         this.glyph.setTxtPrp(txtPrp);
 }
 
-function CGroupCharacter()
+
+function old_CGroupCharacter()
 {
     this.operator = null;
     this.vertJust = VJUST_TOP;
@@ -4426,8 +4444,8 @@ function CGroupCharacter()
 
     CSubMathBase.call(this);
 }
-extend(CGroupCharacter, CSubMathBase);
-CGroupCharacter.prototype.init = function(props)
+extend(old_CGroupCharacter, CSubMathBase);
+old_CGroupCharacter.prototype.init = function(props)
 {
     if(props.pos === "top" || props.location === LOCATION_TOP)
         this.loc = LOCATION_TOP;
@@ -4446,7 +4464,7 @@ CGroupCharacter.prototype.init = function(props)
     this.setDimension(1, 1);
     this.setContent();
 }
-CGroupCharacter.prototype.recalculateSize = function()
+old_CGroupCharacter.prototype.recalculateSize = function()
 {
     var content = this.elements[0][0];
 
@@ -4467,12 +4485,12 @@ CGroupCharacter.prototype.recalculateSize = function()
 
     this.size = {height: height, width: width, center: center};
 }
-CGroupCharacter.prototype.draw = function()
+old_CGroupCharacter.prototype.draw = function()
 {
     this.elements[0][0].draw();
     this.operator.draw();
 }
-CGroupCharacter.prototype.setPosition = function(pos)
+old_CGroupCharacter.prototype.setPosition = function(pos)
 {
     this.pos = {x: pos.x, y: pos.y - this.size.center};
 
@@ -4496,11 +4514,11 @@ CGroupCharacter.prototype.setPosition = function(pos)
         this.operator.setPosition([pos]);
     }
 }
-CGroupCharacter.prototype.align = function(element)
+old_CGroupCharacter.prototype.align = function(element)
 {
     return (this.size.width - element.size.width)/2;
 }
-CGroupCharacter.prototype.findDisposition = function(pos)
+old_CGroupCharacter.prototype.findDisposition = function(pos)
 {
     var curs_X = 0,
         curs_Y = 0;
@@ -4549,4 +4567,156 @@ CGroupCharacter.prototype.findDisposition = function(pos)
         posCurs =    {x: curs_X, y: curs_Y};
 
     return {pos: posCurs, mCoord: mouseCoord, inside_flag: inside_flag};
+}
+
+
+function CCharacter()
+{
+    this.operator = null;
+    CSubMathBase.call(this);
+}
+extend(CCharacter, CSubMathBase);
+CCharacter.prototype.setOperator = function(operator)
+{
+    this.operator = operator;
+    var tPrp = this.getTxtPrp();
+    this.operator.setTxtPrp(tPrp);
+
+    this.setDimension(1, 1);
+    this.setContent();
+}
+CCharacter.prototype.recalculateSize = function()
+{
+    var content = this.elements[0][0];
+
+    this.operator.fixSize(this.elements[0][0].size.width);
+
+    var width = content.size.width > this.operator.size.width ? content.size.width : this.operator.size.width,
+        height = content.size.height + this.operator.size.height,
+        center = this.getCenter();
+
+    this.size = {height: height, width: width, center: center};
+}
+CCharacter.prototype.setPosition = function(pos)
+{
+    this.pos = {x: pos.x, y: pos.y - this.size.center};
+
+    var alignOp  =  this.align(this.operator),
+        alignCnt = this.align(this.elements[0][0]);
+
+    if(this.loc === LOCATION_TOP)
+    {
+        var pos = {x: this.pos.x + alignOp, y: this.pos.y};
+        this.operator.setPosition(pos);
+
+        pos = {x: this.pos.x + alignCnt, y: this.pos.y + this.operator.size.height};
+        this.elements[0][0].setPosition(pos);
+    }
+    else if(this.loc === LOCATION_BOT)
+    {
+        var pos = {x: this.pos.x + alignCnt, y: this.pos.y};
+        this.elements[0][0].setPosition(pos);
+
+        pos = {x: this.pos.x + alignOp, y: this.pos.y + this.elements[0][0].size.height};
+        this.operator.setPosition(pos);
+    }
+}
+CCharacter.prototype.align = function(element)
+{
+    return (this.size.width - element.size.width)/2;
+}
+CCharacter.prototype.draw = function()
+{
+    this.elements[0][0].draw();
+    this.operator.draw();
+}
+CCharacter.prototype.findDisposition = function(pos)
+{
+    var curs_X = 0,
+        curs_Y = 0;
+    var X, Y;
+
+    var inside_flag = -1;
+
+    var content = this.elements[0][0],
+        align = this.align(content);
+
+    if(pos.x < align)
+    {
+        X = 0;
+        inside_flag = 0;
+    }
+    else if(pos.x > align + content.size.width)
+    {
+        X = content.size.width;
+        inside_flag = 1;
+    }
+    else
+        X = pos.x - align;
+
+    if(this.loc === LOCATION_TOP)
+    {
+        if(pos.y < this.operator.size.height)
+        {
+            Y = 0;
+            inside_flag = 2;
+        }
+        else
+            Y = pos.y - this.operator.size.height;
+    }
+    else if(this.loc === LOCATION_BOT)
+    {
+        if(pos.y > content.size.height)
+        {
+            Y = content.size.height;
+            inside_flag = 2;
+        }
+        else
+            Y = pos.y;
+    }
+
+    var mouseCoord = {x: X, y: Y},
+        posCurs =    {x: curs_X, y: curs_Y};
+
+    return {pos: posCurs, mCoord: mouseCoord, inside_flag: inside_flag};
+}
+
+
+function CGroupCharacter()
+{
+    this.vertJust = VJUST_TOP;
+    this.loc = LOCATION_BOT;
+
+    CCharacter.call(this);
+}
+extend(CGroupCharacter, CCharacter);
+CGroupCharacter.prototype.init = function(props)
+{
+    if(props.vertJust === "top" || props.justif == VJUST_TOP)
+        this.vertJust = VJUST_TOP;
+    else if(props.vertJust === "bottom"|| props.justif == VJUST_BOT)
+        this.vertJust = VJUST_BOT;
+
+    if(props.pos === "top" || props.location === LOCATION_TOP)
+        this.loc = LOCATION_TOP;
+    else if(props.pos === "bot" || props.location === LOCATION_BOT)
+        this.loc = LOCATION_BOT;
+
+    var operator = new COperator ( GetGlyph_GrChr(props.chr, this.loc) );
+    this.setOperator(operator);
+}
+CGroupCharacter.prototype.getCenter = function()
+{
+    var center;
+
+    if(this.vertJust === VJUST_TOP && this.loc === LOCATION_TOP)
+        center =  this.operator.size.height/2;
+    else if(this.vertJust === VJUST_BOT && this.loc === LOCATION_TOP )
+        center = this.operator.size.height + this.elements[0][0].size.center;
+    else if(this.vertJust === VJUST_TOP && this.loc === LOCATION_BOT )
+        center = this.elements[0][0].size.center;
+    else if(this.vertJust === VJUST_BOT && this.loc === LOCATION_BOT )
+        center = this.operator.size.height/2 + this.elements[0][0].size.height;
+
+    return center;
 }

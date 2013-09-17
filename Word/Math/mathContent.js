@@ -3958,48 +3958,70 @@ CMathContent.prototype =
                     arg2.addTxt("θ");
                     break;
                 case 152:
-                    /*var diac = this.addMComponent(15);
-                    diac.init(3);
-                    diac.fillPlaceholders();*/
-
+                    var accent = this.addMComponent(MATH_ACCENT);
+                    var props =
+                    {
+                        chr:            {type:      ACCENT_ONE_DOT}
+                    };
+                    accent.init(props);
+                    accent.fillPlaceholders();
                     break;
                 case 153:
-                    var diac = this.addMComponent(15);
-                    diac.init(4);
-                    diac.fillPlaceholders();
+                    var accent = this.addMComponent(MATH_ACCENT);
+                    var props =
+                    {
+                        chr:            {type:      ACCENT_TWO_DOTS}
+                    };
+                    accent.init(props);
+                    accent.fillPlaceholders();
                     break;
                 case 154:
-                    var diac = this.addMComponent(15);
-                    diac.init(5);
-                    diac.fillPlaceholders();
+
+                    var accent = this.addMComponent(MATH_ACCENT);
+                    var props =
+                    {
+                        chr:            {type:      ACCENT_THREE_DOTS}
+                    };
+                    accent.init(props);
+                    accent.fillPlaceholders();
                     break;
                 case 155:
-                    var diac = this.addMComponent(12);
-                    diac.init();
-                    diac.setIndex(-1);
-                    diac.fillPlaceholders();
                     break;
                 case 156:
-                    var diac = this.addMComponent(12);
-                    diac.init();
-                    diac.setIndex(1);
-                    diac.fillPlaceholders();
+                    var accent = this.addMComponent(MATH_ACCENT);
+                    var props =
+                    {
+                        chr:            {type:      ACCENT_CIRCUMFLEX}
+                    };
+                    accent.init(props);
+                    accent.fillPlaceholders();
                     break;
                 case 157:
-                    var diac = this.addMComponent(15);
-                    diac.init(2);
-                    diac.fillPlaceholders();
+                    var accent = this.addMComponent(MATH_ACCENT);
+                    var props =
+                    {
+                        chr:            {type:      ACCENT_ACUTE}
+                    };
+                    accent.init(props);
+                    accent.fillPlaceholders();
                     break;
                 case 158:
-                    var diac = this.addMComponent(15);
-                    diac.init(1);
-                    diac.fillPlaceholders();
+                    var accent = this.addMComponent(MATH_ACCENT);
+                    var props =
+                    {
+                        chr:            {type:      ACCENT_GRAVE}
+                    };
+                    accent.init(props);
+                    accent.fillPlaceholders();
                     break;
                 case 159:
-                    var diac = this.addMComponent(13);
-                    diac.init();
-                    diac.setIndex(1);
-                    diac.fillPlaceholders();
+                    var accent = this.addMComponent(MATH_ACCENT);
+                    var props =
+                    {
+                        chr:            {type:      ACCENT_BREVE}
+                    };
+                    accent.init(props);
+                    accent.fillPlaceholders();
                     break;
                 case 160:
                     var accent = this.addMComponent(MATH_ACCENT);
