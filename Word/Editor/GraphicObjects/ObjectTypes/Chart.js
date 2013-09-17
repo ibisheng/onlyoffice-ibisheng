@@ -1117,7 +1117,7 @@ CChartAsGroup.prototype =
             {
                 var title_str = "Chart Title";
                 this.chartTitle.setTextBody(new CTextBody(this.chartTitle));
-
+                this.chartTitle.txBody.content.Styles = this.chartTitle.getStyles();
                 for(var i in title_str)
                     this.chartTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
             }
@@ -1148,17 +1148,18 @@ CChartAsGroup.prototype =
         {
             this.hAxisTitle.setType(CHART_TITLE_TYPE_H_AXIS);
 
-            this.hAxisTitle.txBody.content.Styles = this.hAxisTitle.getStyles();
             //this.hAxisTitle.drawingObjects = this.drawingObjects;
             if(this.hAxisTitle.isEmpty())
             {
                 var title_str = "X Axis";
                 this.hAxisTitle.setTextBody(new CTextBody(this.hAxisTitle));
+                this.hAxisTitle.txBody.content.Styles = this.hAxisTitle.getStyles();
                 for(var i in title_str)
                     this.hAxisTitle.txBody.content.Paragraph_Add(new ParaText(title_str[i]), false);
             }
             else
             {
+                this.hAxisTitle.txBody.content.Styles = this.hAxisTitle.getStyles();
                 var content = this.hAxisTitle.txBody.content;
                 content.Parent = this.hAxisTitle.txBody;
                 content.DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
@@ -1185,13 +1186,13 @@ CChartAsGroup.prototype =
         {
             this.chart.xAxis.title = "";
             this.vAxisTitle.setType(CHART_TITLE_TYPE_V_AXIS);
-            this.vAxisTitle.txBody.content.Styles = this.vAxisTitle.getStyles();
 
             //  this.vAxisTitle.drawingObjects = this.drawingObjects;
             if(this.vAxisTitle.isEmpty())
             {
                 var title_str = "Y Axis";
                 this.vAxisTitle.setTextBody(new CTextBody(this.vAxisTitle));
+                this.vAxisTitle.txBody.content.Styles = this.vAxisTitle.getStyles();
                 this.vAxisTitle.txBody.bodyPr.vert = (nVertTTvert270);
 
                 for(var i in title_str)
@@ -1201,6 +1202,9 @@ CChartAsGroup.prototype =
             {
                 this.vAxisTitle.txBody.bodyPr.setVert(nVertTTvert270);
                 var content = this.vAxisTitle.txBody.content;
+
+                this.vAxisTitle.txBody.content.Styles = this.vAxisTitle.getStyles();
+
                 content.Parent = this.vAxisTitle.txBody;
                 content.DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
                 for(var i = 0; i < content.Content.length; ++i)
