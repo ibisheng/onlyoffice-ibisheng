@@ -1904,8 +1904,9 @@ CDocument.prototype =
             var LineTA = OldParagraph.Lines[0].Metrics.TextAscent2;
             var LineTD = OldParagraph.Lines[0].Metrics.TextDescent + OldParagraph.Lines[0].Metrics.LineGap;
 
-            NewParagraph.Pr.FramePr = new CFramePr();
-            NewParagraph.Pr.FramePr.Init_Default_DropCap( bInText );
+            var FramePr = new CFramePr();
+            FramePr.Init_Default_DropCap( bInText );
+            NewParagraph.Set_FramePr2( FramePr );
             NewParagraph.Update_DropCapByLines( TextPr, NewParagraph.Pr.FramePr.Lines, LineH, LineTA, LineTD );
 
             this.Internal_Content_Add( Pos, NewParagraph );

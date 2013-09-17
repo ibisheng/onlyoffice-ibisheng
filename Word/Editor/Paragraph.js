@@ -10703,6 +10703,13 @@ Paragraph.prototype =
         this.CompiledPr.NeedRecalc = true;
     },
 
+    Set_FramePr2 : function(FramePr)
+    {
+        History.Add( this, { Type : historyitem_Paragraph_FramePr, Old : this.Pr.FramePr, New : FramePr } );
+        this.Pr.FramePr = FramePr;
+        this.CompiledPr.NeedRecalc = true;
+    },
+
     Set_CalculatedFrame : function(L, T, W, H, PageIndex)
     {
         this.CalculatedFrame.T = T;
