@@ -50,6 +50,7 @@
                 "../Common/Charts/DrawingObjects.js",
                 "../Common/commonDefines.js",
                 "../Common/SerializeCommonWordExcel.js",
+                "../Word/Editor/Serialize2.js",
                 "../Common/Charts/charts.js",
                 "../Excel/graphics/DrawingContextWord.js",
 
@@ -176,7 +177,8 @@
             "src": [
                 "../Common/Shapes/EditorSettings.js",
                 "../PowerPoint/themes/Themes.js",
-                "../PowerPoint/apiDefines.js"
+                "../PowerPoint/apiDefines.js",
+                "../Common/commonDefines.js"
             ],
             "dst": "apiDefines.min.js"
         },
