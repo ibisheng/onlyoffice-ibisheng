@@ -2652,6 +2652,7 @@ PasteProcessor.prototype =
 						if(aContent.bAddNewStyles)
 							oThis.api.GenerateStyles();
 					}
+					editor.WordControl.m_oLogicDocument.DrawingObjects.calculateAfterOpen();
 				});
 				return;
 			}
