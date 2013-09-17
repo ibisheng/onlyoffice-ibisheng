@@ -83,6 +83,7 @@ CGraphicObjects.prototype =
                     }
                 }
             }
+            this.arrForCalculateAfterOpen = [];
         }
     },
 
@@ -1389,7 +1390,8 @@ CGraphicObjects.prototype =
     {
         for(var i = 0; i <this.graphicPages.length; ++i)
         {
-            this.graphicPages[i].redrawCharts();
+            if(isRealObject(this.graphicPages[i]))
+                this.graphicPages[i].redrawCharts();
         }
         this.updateCharts();
     },
