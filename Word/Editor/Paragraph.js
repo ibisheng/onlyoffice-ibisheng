@@ -10910,7 +10910,7 @@ Paragraph.prototype =
         var TextPr = this.Internal_CalculateTextPr(Pos);
 
         var DropCap = this.Content[Pos];
-        this.Internal_Content_Remove2( 0, Pos + 1 );
+        this.Internal_Content_Remove( Pos );
 
         if ( null != PTextPr )
             this.Internal_Content_Add( 0, PTextPr );
