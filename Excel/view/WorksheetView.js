@@ -5140,63 +5140,65 @@
 						var lockAllPosTop = undefined;
 						var userIdAllProps = undefined;
 						var userIdAllSheet = undefined;
-						var c1Recalc = null, r1Recalc = null;
-						var selectRangeRecalc = asc_Range(c.col, r.row, c.col, r.row);
-						// Пересчет для входящих ячеек в добавленные строки/столбцы
-						var isIntersection = this._recalcRangeByInsertRowsAndColumns(sheetId, selectRangeRecalc);
-						if (false === isIntersection) {
-							lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/null,
-								sheetId, new asc_CCollaborativeRange(selectRangeRecalc.c1, selectRangeRecalc.r1,
-									selectRangeRecalc.c2, selectRangeRecalc.r2));
-							isLocked = this.collaborativeEditing.getLockIntersection(lockInfo,
-								c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false);
-							if (false !== isLocked) {
-								// Кто-то сделал lock
-								userId = isLocked.UserId;
-								lockRange = isLocked.Element["rangeOrObjectId"];
+						if (this.collaborativeEditing.getCollaborativeEditing()) {
+							var c1Recalc = null, r1Recalc = null;
+							var selectRangeRecalc = asc_Range(c.col, r.row, c.col, r.row);
+							// Пересчет для входящих ячеек в добавленные строки/столбцы
+							var isIntersection = this._recalcRangeByInsertRowsAndColumns(sheetId, selectRangeRecalc);
+							if (false === isIntersection) {
+								lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/null,
+									sheetId, new asc_CCollaborativeRange(selectRangeRecalc.c1, selectRangeRecalc.r1,
+										selectRangeRecalc.c2, selectRangeRecalc.r2));
+								isLocked = this.collaborativeEditing.getLockIntersection(lockInfo,
+									c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false);
+								if (false !== isLocked) {
+									// Кто-то сделал lock
+									userId = isLocked.UserId;
+									lockRange = isLocked.Element["rangeOrObjectId"];
 
-								c1Recalc = this.collaborativeEditing.m_oRecalcIndexColumns[sheetId].getLockOther(
-									lockRange["c1"], c_oAscLockTypes.kLockTypeOther);
-								r1Recalc = this.collaborativeEditing.m_oRecalcIndexRows[sheetId].getLockOther(
-									lockRange["r1"], c_oAscLockTypes.kLockTypeOther);
-								if (null !== c1Recalc && null !== r1Recalc) {
-									lockRangePosLeft = this.getCellLeft(c1Recalc, /*pt*/1);
-									lockRangePosTop = this.getCellTop(r1Recalc, /*pt*/1);
-									// Пересчитываем X и Y относительно видимой области
-									lockRangePosLeft -= (this.cols[this.visibleRange.c1].left - this.cellsLeft);
-									lockRangePosTop -= (this.rows[this.visibleRange.r1].top - this.cellsTop);
-									// Пересчитываем в px
-									lockRangePosLeft *= asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIX());
-									lockRangePosTop *= asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIY());
+									c1Recalc = this.collaborativeEditing.m_oRecalcIndexColumns[sheetId].getLockOther(
+										lockRange["c1"], c_oAscLockTypes.kLockTypeOther);
+									r1Recalc = this.collaborativeEditing.m_oRecalcIndexRows[sheetId].getLockOther(
+										lockRange["r1"], c_oAscLockTypes.kLockTypeOther);
+									if (null !== c1Recalc && null !== r1Recalc) {
+										lockRangePosLeft = this.getCellLeft(c1Recalc, /*pt*/1);
+										lockRangePosTop = this.getCellTop(r1Recalc, /*pt*/1);
+										// Пересчитываем X и Y относительно видимой области
+										lockRangePosLeft -= (this.cols[this.visibleRange.c1].left - this.cellsLeft);
+										lockRangePosTop -= (this.rows[this.visibleRange.r1].top - this.cellsTop);
+										// Пересчитываем в px
+										lockRangePosLeft *= asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIX());
+										lockRangePosTop *= asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIY());
+									}
 								}
+							} else {
+								lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/null,
+									sheetId, null);
 							}
-						} else {
-							lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/null,
-								sheetId, null);
-						}
-						// Проверим не удален ли весь лист (именно удален, т.к. если просто залочен, то не рисуем рамку вокруг)
-						lockInfo["type"] = c_oAscLockTypeElem.Sheet;
-						isLocked = this.collaborativeEditing.getLockIntersection(lockInfo,
-							c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/true);
-						if (false !== isLocked) {
-							// Кто-то сделал lock
-							userIdAllSheet = isLocked.UserId;
-							lockAllPosLeft = this.cellsLeft * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIX());
-							lockAllPosTop = this.cellsTop * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIY());
-						}
-
-						// Проверим не залочены ли все свойства листа (только если не удален весь лист)
-						if (undefined === userIdAllSheet) {
-							lockInfo["type"] = c_oAscLockTypeElem.Range;
-							lockInfo["subType"] = c_oAscLockTypeElemSubType.InsertRows;
+							// Проверим не удален ли весь лист (именно удален, т.к. если просто залочен, то не рисуем рамку вокруг)
+							lockInfo["type"] = c_oAscLockTypeElem.Sheet;
 							isLocked = this.collaborativeEditing.getLockIntersection(lockInfo,
 								c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/true);
 							if (false !== isLocked) {
 								// Кто-то сделал lock
-								userIdAllProps = isLocked.UserId;
-
+								userIdAllSheet = isLocked.UserId;
 								lockAllPosLeft = this.cellsLeft * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIX());
 								lockAllPosTop = this.cellsTop * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIY());
+							}
+
+							// Проверим не залочены ли все свойства листа (только если не удален весь лист)
+							if (undefined === userIdAllSheet) {
+								lockInfo["type"] = c_oAscLockTypeElem.Range;
+								lockInfo["subType"] = c_oAscLockTypeElemSubType.InsertRows;
+								isLocked = this.collaborativeEditing.getLockIntersection(lockInfo,
+									c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/true);
+								if (false !== isLocked) {
+									// Кто-то сделал lock
+									userIdAllProps = isLocked.UserId;
+
+									lockAllPosLeft = this.cellsLeft * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIX());
+									lockAllPosTop = this.cellsTop * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIY());
+								}
 							}
 						}
 						
