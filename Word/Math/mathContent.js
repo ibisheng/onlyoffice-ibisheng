@@ -3986,6 +3986,13 @@ CMathContent.prototype =
                     accent.fillPlaceholders();
                     break;
                 case 155:
+                    var accent = this.addMComponent(MATH_ACCENT);
+                    var props =
+                    {
+                        chr:            {type:      ACCENT_COMB_CARON}
+                    };
+                    accent.init(props);
+                    accent.fillPlaceholders();
                     break;
                 case 156:
                     var accent = this.addMComponent(MATH_ACCENT);
@@ -4033,15 +4040,21 @@ CMathContent.prototype =
                     accent.fillPlaceholders();
                     break;
                 case 161:
-                    var line = this.addMComponent(14);
-                    line.init();
-                    line.setIndex(1);
+                    var line = this.addMComponent(MATH_ACCENT);
+                    var props =
+                    {
+                        chr:            {type:      ACCENT_LINE}
+                    };
+                    line.init(props);
                     line.fillPlaceholders();
                     break;
                 case 162:
-                    var line = this.addMComponent(14);
-                    line.init();
-                    line.setIndex(2);
+                    var line = this.addMComponent(MATH_ACCENT);
+                    var props =
+                    {
+                        chr:            {type:      ACCENT_DOUBLE_LINE}
+                    };
+                    line.init(props);
                     line.fillPlaceholders();
                     break;
                 case 163:

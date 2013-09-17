@@ -257,38 +257,33 @@ old_CCircumflex.prototype.draw = function()
 
 function CCircumflex()
 {
-    this.incline = 0;
-    this.turn = 0;
-
-    CBaseDiacritic.call(this);
+    //this.incline = 0;
+    this.turn = TURN_0;
 }
-extend(CCircumflex, CBaseDiacritic);
 CCircumflex.prototype.setTurn = function(turn)
 {
     this.turn = turn;
 }
-CCircumflex.prototype.recalculateSize = function(mSize, bIncl)
+CCircumflex.prototype.fixSize = function(mesure, bIncl)
 {
-    var alpha = this.getTxtPrp().FontSize/36;
+    var alpha = this.txtPrp.FontSize/36;
 
-    this.accentSize.width = 3.88*alpha;
-    this.accentSize.height = 3.175*alpha;
+    var width = 3.88*alpha;
+    var height = 3.175*alpha;
 
-    var augm = 0.9*mSize.width/this.accentSize.width;
+    var augm = 0.9*mesure/width;
 
     if(augm < 1)
         augm = 1;
     else if (augm > 5)
         augm = 5;
 
-    var angle = 0.1;
+    /*var angle = 0.1;
 
     if( bIncl )
-        this.incline = mSize.height*angle;
+        this.incline = mSize.height*angle;*/
 
-    var width = augm*this.accentSize.width,
-        height = augm*this.accentSize.height,
-        center = height/2;
+    width *= augm;
 
     /*var Arg = this.elements[0][0].size,
         Accent = {width: augm*this.accentSize.width, height: this.accentSize.height};
@@ -315,17 +310,15 @@ CCircumflex.prototype.recalculateSize = function(mSize, bIncl)
         this.shiftArg = 0;
     }*/
 
-    this.size = {width: width, height: height, center: center};
+    this.size = {width: width, height: height};
 
 }
 CCircumflex.prototype.draw = function()
 {
-    this.elements[0][0].draw();
-
-    var x = this.pos.x + this.shiftAccent,
+    var x = this.pos.x,
         y = this.pos.y;
 
-    var fontSize = this.getTxtPrp().FontSize;
+    var fontSize = this.txtPrp.FontSize;
 
     var penW = fontSize*g_dKoef_pt_to_mm*this.PEN_W;
     penW *= 96/25.4;
@@ -421,19 +414,27 @@ CCircumflex.prototype.draw = function()
     MathControl.pGraph.SetIntegerGrid(intGrid);
 
 }
+CCircumflex.prototype.setTxtPrp = function(txtPrp)
+{
+    this.txtPrp = txtPrp;
+}
+CCircumflex.prototype.setPosition = function(pos)
+{
+    this.pos = pos;
+}
 
-function CLine()
+function old_CLine()
 {
     //0x302, 0x333
     this.index = null; // одинарная, двойная, стрелки и т.п.
     CBaseDiacritic.call(this);
 }
-extend(CLine, CBaseDiacritic);
-CLine.prototype.setIndex = function(index)
+extend(old_CLine, CBaseDiacritic);
+old_CLine.prototype.setIndex = function(index)
 {
     this.index = index;
 }
-CLine.prototype.recalculateSize = function()
+old_CLine.prototype.recalculateSize = function()
 {
     var alpha = this.getTxtPrp().FontSize/36;
     var argSize = this.elements[0][0].size;
@@ -458,7 +459,7 @@ CLine.prototype.recalculateSize = function()
 
     this.size = {width: _width, height: _height, center: _center};
 }
-CLine.prototype.draw = function()
+old_CLine.prototype.draw = function()
 {
     this.elements[0][0].draw();
 
@@ -467,7 +468,7 @@ CLine.prototype.draw = function()
     else
         this.draw_doubleLine();
 }
-CLine.prototype.draw_singleLine = function()
+old_CLine.prototype.draw_singleLine = function()
 {
     var penW = this.getTxtPrp().FontSize*g_dKoef_pt_to_mm*this.PEN_W;
     //penW *= 96/25.4;
@@ -493,7 +494,7 @@ CLine.prototype.draw_singleLine = function()
     MathControl.pGraph.ds();
 
 }
-CLine.prototype.draw_doubleLine = function()
+old_CLine.prototype.draw_doubleLine = function()
 {
     var penW = this.getTxtPrp().FontSize*g_dKoef_pt_to_mm*this.PEN_W;
     //penW *= 96/25.4;
@@ -763,6 +764,107 @@ CSign.prototype.draw_breve = function(up)
 
 }*/
 
+
+function CLine()
+{
+    this.PEN_W = 0.04;
+}
+CLine.prototype.fixSize = function(measure)
+{
+    var alpha = this.txtPrp.FontSize/36;
+
+    var height = 1.68*alpha;
+    var width  = 4.938*alpha;
+
+    width = measure > width ? measure : width;
+
+    this.size = {width: width, height: height}
+}
+CLine.prototype.draw = function()
+{
+    var penW = this.txtPrp.FontSize*g_dKoef_pt_to_mm*this.PEN_W;
+    //penW *= 96/25.4;
+
+    //var penY = penW/2*25.4/96; //для того чтобы линии совпадали (для одинарной и двойной черты)
+    var penY = penW/2; //для того чтобы линии совпадали (для одинарной и двойной черты)
+
+    // g_dKoef_px_to_mm = 25.4/96
+
+    var shY = this.size.height * 0.15386904761904763; // чтобы линии совпадали
+
+    var x1 = this.pos.x,
+        y1 = this.pos.y + penY + shY,
+        x2 = x1 + this.size.width,
+        y2 = y1;
+
+    MathControl.pGraph.p_width(penW*1000);
+    MathControl.pGraph.p_color(0,0,0, 255);
+    MathControl.pGraph._s();
+    MathControl.pGraph._m(x1, y1);
+    MathControl.pGraph._l(x2, y2);
+    MathControl.pGraph.ds();
+
+}
+CLine.prototype.setPosition = function(pos)
+{
+    this.pos = pos;
+}
+CLine.prototype.setTxtPrp = function(txtPrp)
+{
+    this.txtPrp = txtPrp;
+}
+
+function CDoubleLine()
+{
+    this.PEN_W = 0.04;
+}
+CDoubleLine.prototype.fixSize = function(measure)
+{
+    var alpha = this.txtPrp.FontSize/36;
+
+    var height = 2.843*alpha;
+    var width  = 4.938*alpha;
+
+    width = measure > width ? measure : width;
+
+    this.size = {width: width, height: height}
+}
+CDoubleLine.prototype.setPosition = function(pos)
+{
+    this.pos = pos;
+}
+CDoubleLine.prototype.setTxtPrp = function(txtPrp)
+{
+    this.txtPrp = txtPrp;
+}
+CDoubleLine.prototype.draw = function()
+{
+    var penW = this.txtPrp.FontSize*g_dKoef_pt_to_mm*this.PEN_W;
+    //penW *= 96/25.4;
+
+    //var penY = penW/2*25.4/96; //для того чтобы линии совпадали (для одинарной и двойной черты)
+    var penY = penW/2; //для того чтобы линии совпадали (для одинарной и двойной черты)
+
+    var x1 = this.pos.x,
+        y1 = this.pos.y + penY,
+        x2 = x1 + this.size.width,
+        y2 = y1,
+        x3 = x1,
+        y3 = y1 + this.size.height/2,
+        x4 = x2,
+        y4 = y3;
+
+    MathControl.pGraph.p_width(penW*1000);
+    MathControl.pGraph.p_color(0,0,0, 255);
+    MathControl.pGraph._s();
+    MathControl.pGraph._m(x1, y1);
+    MathControl.pGraph._l(x2, y2);
+    MathControl.pGraph._m(x3, y3);
+    MathControl.pGraph._l(x4, y4);
+    MathControl.pGraph.ds();
+
+}
+
 function CTilde()
 {
 }
@@ -870,7 +972,7 @@ CTilde.prototype.setTxtPrp = function(txtPrp)
 
 function CBreve()
 {
-    this.turn = null;
+    this.turn = TURN_MIRROR_0;
 }
 CBreve.prototype.setTurn = function(tturn)
 {
@@ -1054,7 +1156,10 @@ CSign.prototype.setPosition = function(pos)
 CSign.prototype.fixSize = function(bIncline)
 {
     this.sign.recalculateSize();
-    var height = this.sign.size.height,
+
+    this.dH = 0.7*this.txtPrp.FontSize/36;
+
+    var height = this.sign.size.height + this.dH,
         width = this.sign.size.widthG;
 
     if(bIncline)
@@ -1068,6 +1173,7 @@ CSign.prototype.draw = function()
 }
 CSign.prototype.setTxtPrp = function(txtPrp)
 {
+    this.txtPrp = txtPrp;
     this.sign.setTxtPrp(txtPrp);
 }
 
@@ -1356,12 +1462,10 @@ CAccent.prototype.init = function(props)
     else if(code === 0x332 || props.chr.type === ACCENT_LINE)
     {
         accent = new CLine();
-        accent.setPrp(SINGLE_LINE);
     }
     else if(code === 0x333 || props.chr.type === ACCENT_DOUBLE_LINE)
     {
-        accent = new CLine();
-        accent.setPrp(DOUBLE_LINE);
+        accent = new CDoubleLine();
     }
     else if(code === 0x303 || props.chr.type === ACCENT_TILDE)
     {
@@ -1389,4 +1493,16 @@ CAccent.prototype.init = function(props)
     }
 
     this.setOperator(accent);
+    this.elements[0][0].SetDot(true);
+}
+CAccent.prototype.getCenter = function()
+{
+    var center;
+
+   if(this.loc === LOCATION_TOP )
+        center = this.operator.size.height + this.elements[0][0].size.center;
+    else if(this.loc === LOCATION_BOT )
+        center = this.elements[0][0].size.center;
+
+    return center;
 }
