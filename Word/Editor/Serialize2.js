@@ -2320,7 +2320,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap)
 				this.memory.WriteByte(c_oSerPropLenType.Variable);
 				
 				var oBinaryChartWriter = new BinaryChartWriter(this.memory);
-				this.bs.WriteItemWithLength(function(){oBinaryChartWriter.WriteChartContent(img.GraphicObj.chart);});
+				this.bs.WriteItemWithLength(function(){oBinaryChartWriter.WriteChartContent(img.GraphicObj);});
 			
 				var chartSrc = img.GraphicObj.chart.img;
 				if(null != chartSrc && "" != chartSrc)
@@ -2454,7 +2454,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap)
 				this.memory.WriteByte(c_oSerPropLenType.Variable);
 				
 				var oBinaryChartWriter = new BinaryChartWriter(this.memory);
-				this.bs.WriteItemWithLength(function(){oBinaryChartWriter.WriteChartContent(img.GraphicObj.chart);});
+				this.bs.WriteItemWithLength(function(){oBinaryChartWriter.WriteChartContent(img.GraphicObj);});
 				
 				var chartSrc = img.GraphicObj.chart.img;
 				if(null != chartSrc && "" != chartSrc)

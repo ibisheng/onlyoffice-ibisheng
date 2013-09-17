@@ -2655,7 +2655,7 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, oDrawings, aDxf
 		if (oDrawing.isChart())
 		{
 			var oBinaryChartWriter = new BinaryChartWriter(this.memory);
-			this.bs.WriteItem(c_oSer_DrawingType.GraphicFrame, function(){oBinaryChartWriter.Write(oDrawing.graphicObject.chart);});
+			this.bs.WriteItem(c_oSer_DrawingType.GraphicFrame, function(){oBinaryChartWriter.Write(oDrawing.graphicObject);});
 		}
 		else if (oDrawing.isImage())
 		{

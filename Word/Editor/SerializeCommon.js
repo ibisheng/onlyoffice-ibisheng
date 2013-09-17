@@ -670,7 +670,26 @@ function CPPTXContentWriter()
     {
         this.ShapeTextBoxContent = null;
     }
-
+	this.WriteTextBody = function(memory, textBody)
+    {
+        this.BinaryFileWriter.pos = 0;
+        var _writer = this.BinaryFileWriter;
+        _writer.StartRecord(0);
+        _writer.WriteTxBody(textBody);
+        _writer.EndRecord();
+        memory.WriteBuffer(this.BinaryFileWriter.data, 0, this.BinaryFileWriter.pos);
+        this.BinaryFileWriter.pos = 0;
+    }
+	this.WriteSpPr = function(memory, spPr)
+    {
+        this.BinaryFileWriter.pos = 0;
+        var _writer = this.BinaryFileWriter;
+        _writer.StartRecord(0);
+        _writer.WriteSpPr(spPr);
+        _writer.EndRecord();
+        memory.WriteBuffer(this.BinaryFileWriter.data, 0, this.BinaryFileWriter.pos);
+        this.BinaryFileWriter.pos = 0;
+    }
     this.WriteDrawing = function(memory, grObject, Document, oMapCommentId, oNumIdMap)
     {
         this.TreeDrawingIndex++;

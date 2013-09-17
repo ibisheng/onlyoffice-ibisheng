@@ -2092,7 +2092,7 @@ function CBinaryFileWriter()
         _memory.WriteByte(c_oSerPropLenType.Variable);
 
         var oBinaryChartWriter = new BinaryChartWriter(_memory);
-        oBinaryChartWriter.WriteChartContent(grObj.chart);
+        oBinaryChartWriter.WriteChartContent(grObj);
 
         oThis.ImData = _memory.ImData;
         oThis.data = _memory.data;
