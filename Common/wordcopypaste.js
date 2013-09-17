@@ -1626,7 +1626,7 @@ CopyProcessor.prototype =
 										tempParagraph.Content[index].wrappingType = wrappingType;
 										tempParagraph.Content[index].DrawingType = DrawingType;
 										tempParagraph.Content[index].GraphicObj = cur_element
-										tempParagraph.Selection.EndPos = index;
+										tempParagraph.Selection.EndPos = index + 1;
 										tempParagraph.Selection.StartPos = index;
 										tempParagraph.Selection.Use = true;
 										
@@ -1692,7 +1692,7 @@ CopyProcessor.prototype =
 										}
 									}
 									//меняем Selection
-									oDocument.Content[index].Selection.EndPos = inIndex;
+									oDocument.Content[index].Selection.EndPos = inIndex + 1;
 									oDocument.Content[index].Selection.StartPos = inIndex;
 									oDocument.Content[index].Selection.Use = true;
 									
