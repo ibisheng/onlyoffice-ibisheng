@@ -756,6 +756,9 @@ Paragraph.prototype.Search = function(Str, Props, SearchEngine, Type)
         if ( para_Numbering === Item.Type || para_PresentationNumbering === Item.Type || para_TextPr === Item.Type )
             continue;
 
+        if ( para_Drawing === Item.Type )
+            Item.Search(Str, Props, SearchEngine, Type);
+
         if ( (" " === Str[0] && para_Space === Item.Type) || ( para_Text === Item.Type && (  ( true != bMatchCase && (Item.Value).toLowerCase() === Str[0].toLowerCase() ) || ( true === bMatchCase && Item.Value === Str[0] ) ) ) )
         {
             if ( 1 === Str.length )

@@ -3675,6 +3675,10 @@ ParaDrawing.prototype =
         return 0;
     },
 
+    Search : function(Str, Props, SearchEngine, Type)
+    {
+
+    },
 
     Set_Props : function(Props)
     {
