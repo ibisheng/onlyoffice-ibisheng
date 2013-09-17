@@ -1338,17 +1338,20 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						}
 
 						if (t.wb) {
-							// Шлем update для toolbar-а, т.к. когда select в lock ячейке нужно сбросить блокировку toolbar
-							t.wb._onWSSelectionChanged(/*info*/null);
-
 							// Шлем update для листов
 							t._onUpdateSheetsLock(lockElem);
-
-							var worksheet = t.wb.getWorksheet();
-							worksheet._drawSelection();
-							worksheet.objectRender.showDrawingObjects(true);
-							worksheet.cellCommentator.unlockComments();
 						}
+					}
+				};
+				this.CoAuthoringApi.onLocksReleasedEnd			= function () {
+					if (t.wb) {
+						// Шлем update для toolbar-а, т.к. когда select в lock ячейке нужно сбросить блокировку toolbar
+						t.wb._onWSSelectionChanged(/*info*/null);
+
+						var worksheet = t.wb.getWorksheet();
+						worksheet._drawSelection();
+						worksheet.objectRender.showDrawingObjects(true);
+						worksheet.cellCommentator.unlockComments();
 					}
 				};
 				this.CoAuthoringApi.onSaveChanges				= function (e, bSendEvent) {

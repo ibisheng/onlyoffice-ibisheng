@@ -16,6 +16,7 @@
 			this.onMessage = options.onMessage;
 			this.onLocksAcquired = options.onLocksAcquired;
 			this.onLocksReleased = options.onLocksReleased;
+			this.onLocksReleasedEnd = options.onLocksReleasedEnd; // ToDo переделать на массив release locks
 			this.onDisconnect = options.onDisconnect;
 			this.onFirstLoadChanges = options.onFirstLoadChanges;
 			this.onConnectionStateChanged = options.onConnectionStateChanged;
@@ -34,6 +35,7 @@
 			this._CoAuthoringApi.onMessage = function (e) {t.callback_OnMessage(e);};
 			this._CoAuthoringApi.onLocksAcquired = function (e) {t.callback_OnLocksAcquired(e);};
 			this._CoAuthoringApi.onLocksReleased = function (e, bChanges) {t.callback_OnLocksReleased(e, bChanges);};
+			this._CoAuthoringApi.onLocksReleasedEnd = function () {t.callback_OnLocksReleasedEnd();};
 			this._CoAuthoringApi.onDisconnect = function (e, isDisconnectAtAll, isCloseCoAuthoring) {t.callback_OnDisconnect(e, isDisconnectAtAll, isCloseCoAuthoring);};
 			this._CoAuthoringApi.onFirstLoadChanges = function (e) {t.callback_OnFirstLoadChanges(e);};
 			this._CoAuthoringApi.onConnectionStateChanged = function (e) {t.callback_OnConnectionStateChanged(e);};
@@ -169,6 +171,11 @@
 			return this.onLocksReleased (e, bChanges);
 	};
 
+	CDocsCoApi.prototype.callback_OnLocksReleasedEnd = function () {
+		if (this.onLocksReleasedEnd)
+			return this.onLocksReleasedEnd ();
+	};
+
 	/**
 	 * Event об отсоединении от сервера
 	 * @param {jQuery} e  event об отсоединении с причиной
@@ -224,6 +231,7 @@
 			this.onMessage = options.onMessage;
 			this.onLocksAcquired = options.onLocksAcquired;
 			this.onLocksReleased = options.onLocksReleased;
+			this.onLocksReleasedEnd = options.onLocksReleasedEnd; // ToDo переделать на массив release locks
 			this.onRelockFailed = options.onRelockFailed;
 			this.onDisconnect = options.onDisconnect;
 			this.onConnect = options.onConnect;
@@ -498,6 +506,7 @@
 
     DocsCoApi.prototype._onReleaseLock = function (data) {
         if (data["locks"]) {
+			var bSendEnd = false;
             for (var block in data["locks"]) {
                 if (data["locks"].hasOwnProperty(block)) {
                     var lock = data["locks"][block],
@@ -507,15 +516,19 @@
                         if (this.onLocksReleased) {
 							// false - user not save changes
                             this.onLocksReleased(this._locks[blockTmp], false);
+							bSendEnd = true;
                         }
                     }
                 }
             }
+			if (bSendEnd && this.onLocksReleasedEnd)
+				this.onLocksReleasedEnd();
         }
     };
 	
 	DocsCoApi.prototype._onSaveChanges = function (data) {
         if (data["locks"]) {
+			var bSendEnd = false;
             for (var block in data["locks"]) {
                 if (data["locks"].hasOwnProperty(block)) {
                     var lock = data["locks"][block],
@@ -525,10 +538,13 @@
                         if (this.onLocksReleased) {
 							// true - lock with save
                             this.onLocksReleased(this._locks[blockTmp], true);
+							bSendEnd = true;
                         }
                     }
                 }
             }
+			if (bSendEnd && this.onLocksReleasedEnd)
+				this.onLocksReleasedEnd();
         }
 		if (data["changes"]) {
 			if (this.onSaveChanges) {
