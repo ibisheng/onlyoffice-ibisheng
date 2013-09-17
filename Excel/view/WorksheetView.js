@@ -3205,8 +3205,6 @@
 						if (drawLeftSideFormula)	{ctx.dashLine(xFormula1, yFormula1, xFormula1, yFormula2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
 						if (drawRightSideFormula)	{ctx.dashLine(xFormula2, yFormula1, xFormula2, yFormula2, c_oAscCoAuthoringDottedWidth, c_oAscCoAuthoringDottedDistance);}
 					}
-					if ( c_oAscLockTypes.kLockTypeOther == type )
-						this.cellCommentator.callLockComments(arrayCells[i]);
 				}
 
 				ctx.stroke();

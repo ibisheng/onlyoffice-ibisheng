@@ -520,8 +520,10 @@ function asc_CCellCommentator(currentSheet) {
 	// Public methods
 	//-----------------------------------------------------------------------------------
 	
-	_this.lockComment = function(oComment, callbackFunc) {
-		
+	
+	
+	_this.isLockedComment = function(oComment, lockByDefault, callbackFunc) {
+	
 		var _this = this;
 		var c1, r1, c2, r2, lockInfo;
 
@@ -533,40 +535,7 @@ function asc_CCellCommentator(currentSheet) {
 		c2 = mergedRange ? mergedRange.c2 : oComment.asc_getCol();
 		r2 = mergedRange ? mergedRange.r2 : oComment.asc_getRow();
 
-		// Комментарий к документу блокируем как Range
-		if ( !oComment.asc_getDocumentFlag() ) {
-			
-			/*
-			if (false === _this.worksheet.collaborativeEditing.isCoAuthoringExcellEnable()) {
-				// Запрещено совместное редактирование
-				if ($.isFunction(callbackFunc)) { callbackFunc(true); }
-				return;
-			}
-			
-			_this.worksheet.collaborativeEditing.onStartCheckLock();
-			lockInfo = _this.worksheet.collaborativeEditing.getLockInfo( c_oAscLockTypeElem.Range, null, sheetId,  new asc_CCollaborativeRange(c1, r1, c2, r2) );
-			
-			if ( false === _this.worksheet.collaborativeEditing.getCollaborativeEditing() ) {
-				// Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
-				if ($.isFunction(callbackFunc)) { callbackFunc(true); }
-				callbackFunc = undefined;
-			}
-			else if (false !== _this.worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine, false)) {
-				// Редактируем сами
-				if ($.isFunction(callbackFunc)) { callbackFunc(true); }
-				return;
-			}
-			else if (false !== _this.worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, false)) {
-				// Уже ячейку кто-то редактирует
-				if ($.isFunction(callbackFunc)) { callbackFunc(false); }
-				return;
-			}*/
-			
-			// Блокируем
-			_this.worksheet._isLockedCells(new asc_Range(c1, r1, c2, r2), null, callbackFunc);
-		}
-		else {
-		
+		{
 			var objectGuid = oComment.asc_getId();
 			if (objectGuid) {
 			
@@ -576,8 +545,14 @@ function asc_CCellCommentator(currentSheet) {
 					return;
 				}
 
-				_this.worksheet.collaborativeEditing.onStartCheckLock();
-				lockInfo = _this.worksheet.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, /*subType*/null, sheetId, objectGuid);
+				if ( lockByDefault )
+					_this.worksheet.collaborativeEditing.onStartCheckLock();
+				
+				// Комментарий к документу блокируем как Range
+				if ( !oComment.asc_getDocumentFlag() )
+					lockInfo = _this.worksheet.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/null, sheetId, new asc_CCollaborativeRange(c1, r1, c2, r2));
+				else
+					lockInfo = _this.worksheet.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, /*subType*/null, sheetId, objectGuid);
 
 				if (false === _this.worksheet.collaborativeEditing.getCollaborativeEditing()) {
 					// Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
@@ -596,18 +571,13 @@ function asc_CCellCommentator(currentSheet) {
 				}
 				
 				// Блокируем
-				_this.worksheet.collaborativeEditing.addCheckLock(lockInfo);
-				_this.worksheet.collaborativeEditing.onEndCheckLock(callbackFunc);
-				
+				if ( lockByDefault ) {
+					_this.worksheet.collaborativeEditing.addCheckLock(lockInfo);
+					_this.worksheet.collaborativeEditing.onEndCheckLock(callbackFunc);
+				}
+				else if ($.isFunction(callbackFunc)) { callbackFunc(true); }
 			}
 		}
-	}
-
-	_this.isLockedComment = function(oComment, callbackFunc) {
-	
-		var _this = this;
-		_this.lockComment(oComment, callbackFunc);
-		return;
 	}
 	
 	_this.callLockComments = function(range) {
@@ -1295,7 +1265,7 @@ asc_CCellCommentator.prototype = {
 				_this.lastSelectedId = id;
 			}
 			
-			_this.isLockedComment(comment, callbackFunc);
+			_this.isLockedComment(comment, false, callbackFunc);
 		}
 		else
 			_this.lastSelectedId = null;
@@ -1404,7 +1374,7 @@ asc_CCellCommentator.prototype = {
 			}
 		}
 		
-		_this.isLockedComment(oComment, callbackFunc);
+		_this.isLockedComment(oComment, true, callbackFunc);
 	},
 
 	asc_changeComment: function(id, oComment, bChangeCoords) {
@@ -1462,7 +1432,7 @@ asc_CCellCommentator.prototype = {
 			}
 		}
 
-		_this.isLockedComment(comment, callbackFunc);
+		_this.isLockedComment(comment, true, callbackFunc);
 	},
 
 	asc_removeComment: function(id) {
@@ -1516,7 +1486,7 @@ asc_CCellCommentator.prototype = {
 			}
 		}
 
-		_this.isLockedComment(comment, callbackFunc);
+		_this.isLockedComment(comment, true, callbackFunc);
 	},
 
 	// Extra functions
