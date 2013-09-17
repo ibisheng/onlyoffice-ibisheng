@@ -3494,9 +3494,9 @@ Paragraph.prototype =
             var Range0 = Ranges[0];
             var Range1 = Ranges[1];
 
-            if ( Math.abs( Range0.X - Range0.XEnd ) < 0.001 && 1 === CurRange )
+            if ( Range0.XEnd - Range0.X < 0.001 && 1 === CurRange && Range1.XEnd - Range1.X >= 0.001 )
                 return true;
-            else if ( Math.abs( Range1.X - Range1.XEnd ) < 0.001 && 0 === CurRange )
+            else if ( Range1.XEnd - Range1.X < 0.001 && 0 === CurRange && Range0.XEnd - Range0.X >= 0.001 )
                 return true;
             else
                 return false
@@ -3506,8 +3506,10 @@ Paragraph.prototype =
             var Range0 = Ranges[0];
             var Range2 = Ranges[2];
 
-            if ( Math.abs( Range0.X - Range0.XEnd ) < 0.001 && Math.abs( Range2.X - Range2.XEnd ) )
+            if ( Range0.XEnd - Range0.X < 0.001 && Range2.XEnd - Range2.X < 0.001 )
                 return true;
+            else
+                return false;
         }
         else
             return false;
