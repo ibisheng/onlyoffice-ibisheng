@@ -1531,13 +1531,12 @@ asc_CCellCommentator.prototype = {
 		if (!this.bShow)
 			return comments;
 
-		if ((_col == null) || (_col == undefined) || (_row == null) || (_row == undefined)) {
+		if (null == _col || null == _row) {
 			var selectedCell = _this.worksheet.getSelectedRange();
 			var oFirst = selectedCell.getFirst();
 			_col = oFirst.col - 1;
 			_row = oFirst.row - 1;
-		}
-		else
+		} else
 			mergedRange = _this.worksheet._getMergedCellsRange(col, row);
 
 		for (var i = 0; i < _this.aComments.length; i++) {

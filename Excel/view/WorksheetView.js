@@ -5203,18 +5203,16 @@
 						}
 						
 						// Проверим есть ли комменты
-						var mergedRande = this._getMergedCellsRange(c.col, r.row);
-						
-						var comments = this.cellCommentator.asc_getComments(mergedRande ? mergedRande.c1 : c.col, mergedRande ? mergedRande.r1 : r.row);
-						var coords = this.cellCommentator.getCommentsCoords(comments);
-						var indexes = [];
-						for (var i = 0; i < comments.length; i++) {
-							indexes.push(comments[i].asc_getId());
-						}
+						var comments = this.cellCommentator.asc_getComments(c.col, r.row);
+						var coords = undefined;
+						var indexes = undefined;
 
-						if (indexes.length <= 0) {
-							coords = undefined;
-							indexes = undefined;
+						if (0 < comments.length) {
+							indexes = [];
+							for (var i = 0; i < comments.length; ++i) {
+								indexes.push(comments[i].asc_getId());
+							}
+							coords = this.cellCommentator.getCommentsCoords(comments);
 						}
 
 						// Проверим, может мы в гиперлинке
