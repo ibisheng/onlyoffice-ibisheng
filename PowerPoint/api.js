@@ -241,8 +241,14 @@ asc_docs_api.prototype._coAuthoringInit = function (docId, user) {
                         Lock.Set_Type( locktype_Other3, true );
                     else
                         Lock.Set_Type( locktype_Other, true );
-                    if(Class instanceof Slide)
-                        editor.WordControl.m_oLogicDocument.DrawingDocument.LockSlide(Class.num);
+                    if ( Class instanceof PropLocker )
+                    {
+                        var object = g_oTableId.Get_ById(Class.objectId);
+                        if(object instanceof Slide && Class === object.deleteLock)
+                        {
+                            editor.WordControl.m_oLogicDocument.DrawingDocument.LockSlide(object.num);
+                        }
+                    }
                     // Выставляем ID пользователя, залочившего данный элемент
                     Lock.Set_UserId( e["user"] );
 
@@ -333,12 +339,16 @@ asc_docs_api.prototype._coAuthoringInit = function (docId, user) {
                         NewType = locktype_Other2;
 
                     Lock.Set_Type( NewType, true );
-                    if(Class instanceof Slide )
+                    if(Class instanceof PropLocker )
                     {
-                        if(NewType !== locktype_Mine && NewType !== locktype_None)
-                            editor.WordControl.m_oLogicDocument.DrawingDocument.LockSlide(Class.num);
-                        else
-                            editor.WordControl.m_oLogicDocument.DrawingDocument.UnLockSlide(Class.num);
+                        var object = g_oTableId.Get_ById(Class.objectId);
+                        if(object instanceof Slide && Class === object.deleteLock)
+                        {
+                            if(NewType !== locktype_Mine && NewType !== locktype_None)
+                                editor.WordControl.m_oLogicDocument.DrawingDocument.LockSlide(Class.num);
+                            else
+                                editor.WordControl.m_oLogicDocument.DrawingDocument.UnLockSlide(Class.num);
+                        }
 
                     }
 
