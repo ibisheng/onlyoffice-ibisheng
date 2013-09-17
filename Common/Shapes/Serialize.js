@@ -1642,6 +1642,13 @@ function BinaryPPTYLoader()
                                             s.Skip2(4);
                                             break;
                                         }
+                                        case 10:
+                                        case 11:
+                                        {
+                                            // id. embed / link
+                                            s.GetString2();
+                                            break;
+                                        }
                                         case 2:
                                         {
                                             s.Skip2(4);
