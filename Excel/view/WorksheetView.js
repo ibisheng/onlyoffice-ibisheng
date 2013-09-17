@@ -5744,7 +5744,6 @@
 				cell_info.styleName = c.getStyleName();
 
 				cell_info.flags = new asc_CCellFlag();
-				cell_info.flags.merge = !!this._getMergedCellsRange(c1, r1);
 				cell_info.flags.shrinkToFit = c.getShrinkToFit();
 				cell_info.flags.wrapText = c.getWrap();
 				
@@ -5758,19 +5757,18 @@
 
 				cell_info.font = new asc_CFont();
 
-				if ( isGraphicObject && textPr && paraPr ) {
+				if (isGraphicObject && textPr && paraPr) {
 					cell_info.font.name = textPr.FontFamily ? textPr.FontFamily.Name : "";
 					cell_info.font.size = textPr.FontSize;
 					cell_info.font.bold = textPr.Bold;
 					cell_info.font.italic = textPr.Italic;
 					cell_info.font.underline = textPr.Underline;
 					cell_info.font.strikeout = textPr.Strikeout;
-					cell_info.font.subscript = (textPr.VertAlign == vertalign_SubScript) ? true : false;
-					cell_info.font.superscript = (textPr.VertAlign == vertalign_SuperScript) ? true : false;
-					if ( textPr.Color )
+					cell_info.font.subscript = textPr.VertAlign == vertalign_SubScript;
+					cell_info.font.superscript = textPr.VertAlign == vertalign_SuperScript;
+					if (textPr.Color)
 						cell_info.font.color = CreateAscColorCustom(textPr.Color.r, textPr.Color.g, textPr.Color.b);
-				}
-				else {
+				} else {
 					cell_info.font.name = c.getFontname();
 					cell_info.font.size = c.getFontsize();
 					cell_info.font.bold = c.getBold();
@@ -5821,9 +5819,10 @@
 
 					cell_info.hyperlink = oHyperlink;
 					cell_info.hyperlink.asc_setText (cell_info.text);
-				}
-				else
+				} else
 					cell_info.hyperlink = null;
+
+				cell_info.flags.merge = null !== range.hasMerged();
 
 				if(bExt)
 				{

@@ -6634,7 +6634,7 @@ Range.prototype.getVerticalText=function(){
 			return g_nVerticalTextAngle == col.xfs.align.angle;
 	}
     return g_nVerticalTextAngle == g_oDefaultAlign.angle;
-}
+};
 Range.prototype.hasMerged=function(){
 	var oThis = this;
 	var oRes = null;
