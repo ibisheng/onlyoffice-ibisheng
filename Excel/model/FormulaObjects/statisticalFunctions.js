@@ -149,6 +149,12 @@ cFormulaFunction.Statistical = {
                         sum = _func[sum.type][_argV.type]( sum, _argV, "+" );
                         count++;
                     }
+                    else if( _argV instanceof cString ){
+                        if( parseNum(_argV.getValue()) ){
+                            sum = _func[sum.type][_argV.type]( sum, _argV.tocNumber(), "+" );
+                        }
+                        count++;
+                    }
                 }
                 else if ( _arg instanceof cArea || _arg instanceof cArea3D ) {
                     var _argAreaValue = _arg.getValue();
@@ -156,6 +162,12 @@ cFormulaFunction.Statistical = {
                         var __arg = _argAreaValue[j];
                         if ( __arg instanceof cNumber || __arg instanceof  cBool ) {
                             sum = _func[sum.type][__arg.type]( sum, __arg, "+" );
+                            count++;
+                        }
+                        else if( __arg instanceof cString ){
+                            if( parseNum(__arg.getValue()) ){
+                                sum = _func[sum.type][__arg.type]( sum, __arg.tocNumber(), "+" );
+                            }
                             count++;
                         }
                     }
