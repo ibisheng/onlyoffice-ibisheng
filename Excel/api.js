@@ -1252,6 +1252,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					"applyChanges":						function () {t._onApplyChanges.apply(t, arguments);},
 					"updateAfterApplyChanges":			function () {t._onUpdateAfterApplyChanges.apply(t, arguments);},
 					"drawSelection":					function () {t._onDrawSelection.apply(t, arguments);},
+					"updateAllSheetsLock":				function () {t._onUpdateAllSheetsLock.apply(t, arguments);},
 					"showDrawingObjects":				function () {t._onShowDrawingObjects.apply(t, arguments);},
 					"resetLockedGraphicObjects":		function () {t._onResetLockedGraphicObjects.apply(t, arguments);},
 					"showComments":						function () {t._onShowComments.apply(t, arguments);},
@@ -1500,6 +1501,20 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			_onDrawSelection: function () {
 				if (this.wb)
 					this.wb.getWorksheet()._drawSelection();
+			},
+
+			_onUpdateAllSheetsLock: function () {
+				var t = this;
+				if (t.wbModel) {
+					// Шлем update для листов
+					t.handlers.trigger("asc_onWorkbookLocked", t.asc_isWorkbookLocked());
+					var i, length, wsModel, wsIndex;
+					for (i = 0, length = t.wbModel.getWorksheetCount(); i < length; ++i) {
+						wsModel = t.wbModel.getWorksheet(i);
+						wsIndex = wsModel.getIndex();
+						t.handlers.trigger("asc_onWorksheetLocked", wsIndex, t.asc_isWorksheetLockedOrDeleted(wsIndex));
+					}
+				}
 			},
 			
 			_onShowDrawingObjects: function () {
