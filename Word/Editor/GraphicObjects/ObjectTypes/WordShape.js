@@ -499,6 +499,14 @@ WordShape.prototype =
             this.textBoxContent.Set_ParagraphStyle(style);
     },
 
+    Search : function(Str, Props, SearchEngine, Type)
+    {
+        if(isRealObject(this.textBoxContent))
+        {
+            this.textBoxContent.Search(Str, Props, SearchEngine, Type)
+        }
+    },
+
     Get_PageContentStartPos: function(pageNum)
     {
         if(this.textBoxContent)

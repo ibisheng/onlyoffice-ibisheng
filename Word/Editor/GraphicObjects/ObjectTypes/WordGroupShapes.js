@@ -1460,6 +1460,17 @@ WordGroupShapes.prototype =
         }
     },
 
+    Search : function(Str, Props, SearchEngine, Type)
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(typeof this.spTree[i].Search === "function")
+            {
+                this.spTree[i].Search(Str, Props, SearchEngine, Type);
+            }
+        }
+    },
+
     fromArrayGraphicObjects: function(arrGrObj)
     {
         for(var i = 0; i < arrGrObj.length; ++i)

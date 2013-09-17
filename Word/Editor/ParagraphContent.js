@@ -3677,7 +3677,10 @@ ParaDrawing.prototype =
 
     Search : function(Str, Props, SearchEngine, Type)
     {
-
+        if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.Search === "function")
+        {
+            this.GraphicObj.Search(Str, Props, SearchEngine, Type)
+        }
     },
 
     Set_Props : function(Props)
