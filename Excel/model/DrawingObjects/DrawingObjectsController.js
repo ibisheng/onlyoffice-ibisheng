@@ -1549,6 +1549,7 @@ function CorrectUniColorEx(asc_color, unicolor) {
                 ret.setColor(new CRGBColor());
             }
             ret.color.setColor(((asc_color.asc_getR() << 16) & 0xFF0000) + ((asc_color.asc_getG() << 8) & 0xFF00) + asc_color.asc_getB());
+            ret.clearMods();
         }
     }
     return ret;

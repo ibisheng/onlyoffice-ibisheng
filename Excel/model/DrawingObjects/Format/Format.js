@@ -1102,6 +1102,11 @@ CUniColor.prototype =
         this.Mods.Mods.push(mod);
     },
 
+    clearMods: function()
+    {
+        this.Mods.clearMods();
+    },
+
     Get_Id: function()
     {
         return this.Id;

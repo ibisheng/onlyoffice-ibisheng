@@ -362,6 +362,10 @@ function CorrectUniColor(asc_color, unicolor)
                 ret.color = new CPrstColor();
             }
             ret.color.id = asc_color.get_value();
+
+            if (ret.Mods.Mods.length != 0)
+                ret.Mods.Mods.splice(0, ret.Mods.Mods.length);
+
             break;
         }
         case c_oAscColor.COLOR_TYPE_SCHEME:
@@ -423,6 +427,9 @@ function CorrectUniColor(asc_color, unicolor)
             ret.color.RGBA.G = asc_color.get_g();
             ret.color.RGBA.B = asc_color.get_b();
             ret.color.RGBA.A = asc_color.get_a();
+
+            if (ret.Mods.Mods.length != 0)
+                ret.Mods.Mods.splice(0, ret.Mods.Mods.length);
         }
     }
     return ret;
