@@ -866,11 +866,13 @@ function CBinaryFileWriter()
                         {
                             oThis._WriteString2(1, "thruBlk");
                             oThis._WriteString2(2, "0");
+                            break;
                         }
                         case c_oAscSlideTransitionParams.Fade_Through_Black:
                         {
                             oThis._WriteString2(1, "thruBlk");
                             oThis._WriteString2(2, "1");
+                            break;
                         }
                         default:
                             break;
@@ -886,21 +888,25 @@ function CBinaryFileWriter()
                         {
                             oThis._WriteString2(1, "dir");
                             oThis._WriteString2(2, "r");
+                            break;
                         }
                         case c_oAscSlideTransitionParams.Param_Right:
                         {
                             oThis._WriteString2(1, "dir");
                             oThis._WriteString2(2, "l");
+                            break;
                         }
                         case c_oAscSlideTransitionParams.Param_Top:
                         {
                             oThis._WriteString2(1, "dir");
                             oThis._WriteString2(2, "d");
+                            break;
                         }
                         case c_oAscSlideTransitionParams.Param_Bottom:
                         {
                             oThis._WriteString2(1, "dir");
                             oThis._WriteString2(2, "u");
+                            break;
                         }
                         default:
                             break;
@@ -916,48 +922,56 @@ function CBinaryFileWriter()
                             oThis._WriteString2(0, "p:wipe");
                             oThis._WriteString2(1, "dir");
                             oThis._WriteString2(2, "r");
+                            break;
                         }
                         case c_oAscSlideTransitionParams.Param_Right:
                         {
                             oThis._WriteString2(0, "p:wipe");
                             oThis._WriteString2(1, "dir");
                             oThis._WriteString2(2, "l");
+                            break;
                         }
                         case c_oAscSlideTransitionParams.Param_Top:
                         {
                             oThis._WriteString2(0, "p:wipe");
                             oThis._WriteString2(1, "dir");
                             oThis._WriteString2(2, "d");
+                            break;
                         }
                         case c_oAscSlideTransitionParams.Param_Bottom:
                         {
                             oThis._WriteString2(0, "p:wipe");
                             oThis._WriteString2(1, "dir");
                             oThis._WriteString2(2, "u");
+                            break;
                         }
                         case c_oAscSlideTransitionParams.Param_TopLeft:
                         {
                             oThis._WriteString2(0, "p:strips");
                             oThis._WriteString2(1, "dir");
                             oThis._WriteString2(2, "rd");
+                            break;
                         }
                         case c_oAscSlideTransitionParams.Param_TopRight:
                         {
                             oThis._WriteString2(0, "p:strips");
                             oThis._WriteString2(1, "dir");
                             oThis._WriteString2(2, "ld");
+                            break;
                         }
                         case c_oAscSlideTransitionParams.Param_BottomLeft:
                         {
                             oThis._WriteString2(0, "p:strips");
                             oThis._WriteString2(1, "dir");
                             oThis._WriteString2(2, "ru");
+                            break;
                         }
                         case c_oAscSlideTransitionParams.Param_BottomRight:
                         {
                             oThis._WriteString2(0, "p:strips");
                             oThis._WriteString2(1, "dir");
                             oThis._WriteString2(2, "lu");
+                            break;
                         }
                         default:
                             break;
@@ -975,6 +989,7 @@ function CBinaryFileWriter()
                             oThis._WriteString2(1, "dir");
                             oThis._WriteString2(2, "horz");
                             oThis._WriteString2(2, "in");
+                            break;
                         }
                         case c_oAscSlideTransitionParams.Split_HorizontalOut:
                         {
@@ -982,6 +997,7 @@ function CBinaryFileWriter()
                             oThis._WriteString2(1, "dir");
                             oThis._WriteString2(2, "horz");
                             oThis._WriteString2(2, "out");
+                            break;
                         }
                         case c_oAscSlideTransitionParams.Split_VerticalIn:
                         {
@@ -989,6 +1005,7 @@ function CBinaryFileWriter()
                             oThis._WriteString2(1, "dir");
                             oThis._WriteString2(2, "vert");
                             oThis._WriteString2(2, "in");
+                            break;
                         }
                         case c_oAscSlideTransitionParams.Split_VerticalOut:
                         {
@@ -996,6 +1013,7 @@ function CBinaryFileWriter()
                             oThis._WriteString2(1, "dir");
                             oThis._WriteString2(2, "vert");
                             oThis._WriteString2(2, "out");
+                            break;
                         }
                         default:
                             break;
@@ -1016,41 +1034,49 @@ function CBinaryFileWriter()
                         {
                             oThis._WriteString2(1, "dir");
                             oThis._WriteString2(2, "r");
+                            break;
                         }
                         case c_oAscSlideTransitionParams.Param_Right:
                         {
                             oThis._WriteString2(1, "dir");
                             oThis._WriteString2(2, "l");
+                            break;
                         }
                         case c_oAscSlideTransitionParams.Param_Top:
                         {
                             oThis._WriteString2(1, "dir");
                             oThis._WriteString2(2, "d");
+                            break;
                         }
                         case c_oAscSlideTransitionParams.Param_Bottom:
                         {
                             oThis._WriteString2(1, "dir");
                             oThis._WriteString2(2, "u");
+                            break;
                         }
                         case c_oAscSlideTransitionParams.Param_TopLeft:
                         {
                             oThis._WriteString2(1, "dir");
                             oThis._WriteString2(2, "rd");
+                            break;
                         }
                         case c_oAscSlideTransitionParams.Param_TopRight:
                         {
                             oThis._WriteString2(1, "dir");
                             oThis._WriteString2(2, "ld");
+                            break;
                         }
                         case c_oAscSlideTransitionParams.Param_BottomLeft:
                         {
                             oThis._WriteString2(1, "dir");
                             oThis._WriteString2(2, "ru");
+                            break;
                         }
                         case c_oAscSlideTransitionParams.Param_BottomRight:
                         {
                             oThis._WriteString2(1, "dir");
                             oThis._WriteString2(2, "lu");
+                            break;
                         }
                         default:
                             break;
@@ -1066,16 +1092,19 @@ function CBinaryFileWriter()
                             oThis._WriteString2(0, "p:wheel");
                             oThis._WriteString2(1, "spokes");
                             oThis._WriteString2(2, "1");
+                            break;
                         }
                         case c_oAscSlideTransitionParams.Clock_Counterclockwise:
                         {
                             oThis._WriteString2(0, "p14:wheelReverse");
                             oThis._WriteString2(1, "spokes");
                             oThis._WriteString2(2, "1");
+                            break;
                         }
                         case c_oAscSlideTransitionParams.Clock_Wedge:
                         {
                             oThis._WriteString2(0, "p:wedge");
+                            break;
                         }
                         default:
                             break;
@@ -1091,16 +1120,19 @@ function CBinaryFileWriter()
                             oThis._WriteString2(0, "p14:warp");
                             oThis._WriteString2(1, "dir");
                             oThis._WriteString2(2, "in");
+                            break;
                         }
                         case c_oAscSlideTransitionParams.Zoom_Out:
                         {
                             oThis._WriteString2(0, "p14:warp");
                             oThis._WriteString2(1, "dir");
                             oThis._WriteString2(2, "out");
+                            break;
                         }
                         case c_oAscSlideTransitionParams.Zoom_AndRotate:
                         {
                             oThis._WriteString2(0, "p:newsflash");
+                            break;
                         }
                         default:
                             break;
