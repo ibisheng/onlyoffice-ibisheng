@@ -4200,7 +4200,6 @@ function CThumbnailsManager()
         }
 
         check_KeyboardEvent(e);
-        var b_no_prevent_default = false;
         switch (global_keyboardEvent.KeyCode)
         {
             case 13:    // enter
@@ -4404,7 +4403,7 @@ function CThumbnailsManager()
                 if(global_keyboardEvent.CtrlKey)
                 {
                     Editor_Paste(editor, true);
-                    b_no_prevent_default = true;
+                    return undefined;
                 }
                 break;
 
@@ -4414,8 +4413,8 @@ function CThumbnailsManager()
             {
                 if(global_keyboardEvent.CtrlKey)
                 {
-                    return Editor_Copy(editor);
-                    b_no_prevent_default = true;
+                    Editor_Copy(editor);
+                    return undefined;
                 }
                 break;
             }
@@ -4560,9 +4559,8 @@ function CThumbnailsManager()
                 break;
         }
 
-       /* if(!(b_no_prevent_default === true))
-            e.preventDefault();      */
-        //return false;
+        e.preventDefault();
+        return false;
     }
 }
 

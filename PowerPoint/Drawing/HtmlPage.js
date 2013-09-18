@@ -1647,8 +1647,10 @@ function CEditorPage(api)
         if (oWordControl.Thumbnails.FocusObjType == FOCUS_OBJECT_THUMBNAILS)
         {
             var ret = oWordControl.Thumbnails.onKeyDown(e);
-            if (!ret)
+            if (false === ret)
                 return false;
+            if (undefined === ret)
+                return;
         }
 
         if (oThis.TextBoxInputMode)
