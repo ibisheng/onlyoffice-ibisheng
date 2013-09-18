@@ -5278,6 +5278,7 @@
 				var t = this;
 
 				function checkRange(range) {
+					// ToDo ускорить эту функцию через model (баг http://bugzserver/show_bug.cgi?id=20388)
 					var c, r, res;
 					for (r = range.r1; r <= range.r2 && r < t.nRowsCount; ++r) {
 						for (c = range.c1; c <= range.c2 && c < t.nColsCount; ++c) {
