@@ -2617,6 +2617,7 @@ PasteProcessor.prototype =
 	{
 		//надо сбросить то, что остался после открытия документа
 		window.global_pptx_content_loader.Clear();
+		window.global_pptx_content_loader.Start_UseFullUrl();
 		
 		var openParams = {checkFileSize: false, charCount: 0, parCount: 0};
 		var oBinaryFileReader = new BinaryFileReader(this.oDocument, openParams);
@@ -2730,10 +2731,17 @@ PasteProcessor.prototype =
 		for(var i in AllFonts)
 			aPrepeareFonts.push(new CFont(i, 0, "", 0));
 		//создаем список используемых картинок
+		var oPastedImagesUnique = {};
+		var aPastedImages = window.global_pptx_content_loader.End_UseFullUrl();
+		for(var i = 0, length = aPastedImages.length; i < length; ++i)
+		{
+			var elem = aPastedImages[i];
+			oPastedImagesUnique[elem.Url] = 1;
+		}
 		var aPrepeareImages = [];
-		for(var i in window.global_pptx_content_loader.ImageMapChecker)
+		for(var i in oPastedImagesUnique)
 			aPrepeareImages.push(i);
-		return {content: aContent, fonts: aPrepeareFonts, images: aPrepeareImages, bAddNewStyles: addNewStyles};
+		return {content: aContent, fonts: aPrepeareFonts, images: aPrepeareImages, bAddNewStyles: addNewStyles, aPastedImages: aPastedImages};
 	},
 	Start : function(node)
     {
@@ -2773,9 +2781,7 @@ PasteProcessor.prototype =
 				aContent = this.ReadFromBinary(base64);
 			if(aContent)
 			{
-				this.aContent = aContent.content;
-				this.api.pre_Paste(aContent.fonts, aContent.images, 
-				function() {
+				var fPrepasteCallback = function(){
 					if(false == oThis.bNested)
 					{
 						editor.WordControl.m_oLogicDocument.DrawingObjects.calculateAfterOpen();
@@ -2785,7 +2791,41 @@ PasteProcessor.prototype =
 						if(aContent.bAddNewStyles)
 							oThis.api.GenerateStyles();
 					}
-				});
+				}
+				this.aContent = aContent.content;
+				if(aContent.aPastedImages.length > 0)
+				{
+					var rData = {"id":documentId, "c":"imgurls", "data": JSON.stringify(aContent.images)};
+					sendCommand( this.api, function(incomeObject){
+						if(incomeObject && "imgurls" == incomeObject.type)
+						{
+							var aImages = JSON.parse(incomeObject.data);
+							var oFromTo = {};
+							for(var i = 0, length1 = aImages.length, length2 = aContent.images.length; i < length1 && i < length2; ++i)
+							{
+								var sFrom = aContent.images[i];
+								var sTo = aImages[i];
+								if(0 == sTo.indexOf(oThis.api.DocumentUrl + "media/"))
+									sTo = sTo.substring((oThis.api.DocumentUrl + "media/").length);
+								oFromTo[sFrom] = sTo;
+								aContent.images[i] = sTo;
+							}
+							for(var i = 0, length = aContent.aPastedImages.length; i < length; ++i)
+							{
+								var imageElem = aContent.aPastedImages[i];
+								if(null != imageElem)
+								{
+									var sNewSrc = oFromTo[imageElem.Url];
+									if(null != sNewSrc)
+										imageElem.SetUrl(sNewSrc);
+								}
+							}
+						}
+						oThis.api.pre_Paste(aContent.fonts, aContent.images, fPrepasteCallback);
+					}, JSON.stringify(rData) );
+				}
+				else
+					oThis.api.pre_Paste(aContent.fonts, aContent.images, fPrepasteCallback);
 				return;
 			}
 		}
@@ -2853,7 +2893,7 @@ PasteProcessor.prototype =
 							for(var i = 0, length1 = aImages.length, length2 = aImagesToDownload.length; i < length1 && i < length2; ++i)
 							{
 								var sNewSrc = aImages[i];
-								oThis.oImages[aImagesToDownload[i]] = sNewSrc
+								oThis.oImages[aImagesToDownload[i]] = sNewSrc;
 								oPrepeareImages[i] = sNewSrc;
 							}
 						}

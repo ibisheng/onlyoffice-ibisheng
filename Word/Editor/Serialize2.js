@@ -597,6 +597,8 @@ function BinaryFileWriter(doc)
     }
 	this.CopyStart = function()
     {
+		var api = this.Document.DrawingDocument.m_oWordControl.m_oApi;
+		window.global_pptx_content_writer.Start_UseFullUrl(documentOrigin + api.DocumentUrl);
 		window.global_pptx_content_writer._Start();
 		this.copyParams.bLockCopyElems = 0;
 		this.copyParams.itemCount = 0;
@@ -669,6 +671,7 @@ function BinaryFileWriter(doc)
 		
 		this.WriteMainTableEnd();
 		window.global_pptx_content_writer._End();
+		window.global_pptx_content_writer.End_UseFullUrl();
 	}
     this.WriteTable = function(type, oTableSer)
     {

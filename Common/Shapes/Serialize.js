@@ -170,8 +170,8 @@ var g_nodeAttributeEnd	= 0xFB;
 
 function CBuilderImages(blip_fill, full_url)
 {
-    this.Url = "";
-    this.BlipFill = null;
+    this.Url = full_url;
+    this.BlipFill = blip_fill;
 }
 CBuilderImages.prototype =
 {
