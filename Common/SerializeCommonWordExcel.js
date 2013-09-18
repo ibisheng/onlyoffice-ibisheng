@@ -1166,7 +1166,7 @@ function BinaryChartWriter(memory)
 	this.WriteSeriesNumCacheValues = function(NumCache)
     {
 		var oThis = this;
-		for(var i = 0 in NumCache)
+		for(var i in NumCache)
 		{
 			var elem = NumCache[i];
 			if(null != elem)
