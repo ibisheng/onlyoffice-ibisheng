@@ -275,11 +275,11 @@
 
     <script type="text/javascript">
         var isBrowserSupported = function() {
-            return !((Ext.isIE6 || Ext.isIE7 || Ext.isIE8) ||
-                    (Ext.isSafari2 || Ext.isSafari3 || Ext.isSafari4) ||
-                    (Ext.isGecko && Ext.firefoxVersion < 4.0) ||
-                    (Ext.isChrome && Ext.chromeVersion < 7.0) ||
-                    (Ext.isOpera && Ext.operaVersion < 10.5));
+            return !((Ext.ieVersion != 0 && Ext.ieVersion < 9.0) ||
+                    (Ext.safariVersion != 0 && Ext.safariVersion < 5.0) ||
+                    (Ext.firefoxVersion != 0 && Ext.firefoxVersion < 4.0) ||
+                    (Ext.chromeVersion != 0 && Ext.chromeVersion < 7.0) ||
+                    (Ext.operaVersion != 0 && Ext.operaVersion < 10.5));
         };
 
         if (!isBrowserSupported()){
