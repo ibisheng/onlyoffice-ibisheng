@@ -3584,6 +3584,7 @@ function DrawingObjects() {
 										var cell = graphicObject.chart.range.intervalObject.worksheet.getCell(new CellAddress(range.bbox.r1, j, 0));
 										cell.setNumFormat(data.NumCache[index].numFormatStr);
 										cell.setValue(data.NumCache[index].val);
+										index++;
 									}
 								}
 								else {
