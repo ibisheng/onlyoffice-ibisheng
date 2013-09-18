@@ -2069,6 +2069,14 @@ CGraphics.prototype =
     {
         if (!this.m_bIntegerGrid)
         {
+            if (global_MatrixTransformer.IsIdentity2(this.m_oTransform))
+            {
+                this.SetIntegerGrid(true);
+                this.drawHorLine(align, y, x, r, penW);
+                this.SetIntegerGrid(false);
+                return;
+            }
+
             this.p_width(penW * 1000);
             this._s();
             this._m(x, y);
@@ -2142,6 +2150,14 @@ CGraphics.prototype =
     {
         if (!this.m_bIntegerGrid)
         {
+            if (global_MatrixTransformer.IsIdentity2(this.m_oTransform))
+            {
+                this.SetIntegerGrid(true);
+                this.drawHorLine2(align, y, x, r, penW);
+                this.SetIntegerGrid(false);
+                return;
+            }
+
             var _y1 = y - penW / 2;
             var _y2 = _y1 + 2 * penW;
 
@@ -2210,6 +2226,14 @@ CGraphics.prototype =
     {
         if (!this.m_bIntegerGrid)
         {
+            if (global_MatrixTransformer.IsIdentity2(this.m_oTransform))
+            {
+                this.SetIntegerGrid(true);
+                this.drawVerLine(align, x, y, b, penW);
+                this.SetIntegerGrid(false);
+                return;
+            }
+
             this.p_width(penW * 1000);
             this._s();
             this._m(x, y);
@@ -2282,6 +2306,14 @@ CGraphics.prototype =
     {
         if (!this.m_bIntegerGrid)
         {
+            if (global_MatrixTransformer.IsIdentity2(this.m_oTransform))
+            {
+                this.SetIntegerGrid(true);
+                this.drawHorLineExt(align, y, x, r, penW, leftMW, rightMW);
+                this.SetIntegerGrid(false);
+                return;
+            }
+
             this.p_width(penW * 1000);
             this._s();
             this._m(x, y);

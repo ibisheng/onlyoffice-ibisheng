@@ -168,6 +168,19 @@ function FileStream(data, size)
 var g_nodeAttributeStart = 0xFA;
 var g_nodeAttributeEnd	= 0xFB;
 
+function CBuilderImages(blip_fill, full_url)
+{
+    this.Url = "";
+    this.BlipFill = null;
+}
+CBuilderImages.prototype =
+{
+    SetUrl : function(url)
+    {
+        this.BlipFill.RasterImageId = url;
+    }
+};
+
 function BinaryPPTYLoader()
 {
     this.stream = null;
@@ -183,6 +196,24 @@ function BinaryPPTYLoader()
     this.NextTableStyleId = 0;
 
     this.ImageMapChecker = null;
+
+    this.IsUseFullSrc = false;
+    this.RebuildImages = [];
+
+    this.Start_UseFullUrl = function()
+    {
+        this.IsUseFullUrl = true;
+    };
+
+    this.End_UseFullUrl = function()
+    {
+        var _result = this.RebuildImages;
+
+        this.IsUseFullUrl = false;
+        this.RebuildImages = [];
+
+        return _result;
+    };
 
     this.Load = function(base64_ppty, presentation)
     {
@@ -1716,6 +1747,9 @@ function BinaryPPTYLoader()
 
                                             if (this.ImageMapChecker != null)
                                                 this.ImageMapChecker[uni_fill.fill.RasterImageId] = true;
+
+                                            if (this.IsUseFullUrl)
+                                                this.RebuildImages.push(new CBuilderImages(uni_fill.fill, uni_fill.fill.RasterImageId));
 
                                             s.Skip2(1); // end attribute
                                             break;

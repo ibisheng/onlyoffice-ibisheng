@@ -74,7 +74,21 @@ function CBinaryFileWriter()
     this.pos = 0;
     this.Init();
 
+    this.IsUseFullUrl = false;
+    this.DocumentOrigin = "";
+
     var oThis = this;
+
+    this.Start_UseFullUrl = function(origin)
+    {
+        this.IsUseFullUrl = true;
+        this.DocumentOrigin = origin;
+    };
+
+    this.End_UseFullUrl = function()
+    {
+        this.IsUseFullUrl = false;
+    };
 
     this.Copy = function(oMemory, nPos, nLen)
     {
@@ -1913,6 +1927,14 @@ function CBinaryFileWriter()
                     _src = _src.substring(sFindString.length);
 
                 oThis.image_map[_src] = true;
+
+                if (oThis.IsUseFullUrl)
+                {
+                    if ((0 == _src.indexOf("theme")) && window.editor)
+                        _src = window.editor.ThemeLoader.ThemesUrl + _src;
+                    if (0 != _src.indexOf("http:") && 0 != _src.indexOf("data:") && 0 != _src.indexOf("https:") && 0 != _src.indexOf("ftp:") && 0 != _src.indexOf("file:"))
+                        _src = oThis.DocumentOrigin + "media/" + _src;
+                }
 
                 oThis.StartRecord(0);
                 oThis.WriteUChar(g_nodeAttributeStart);

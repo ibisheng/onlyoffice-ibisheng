@@ -316,7 +316,7 @@ function CTransitionAnimation(htmlpage)
 
         var ctx1 = this.HtmlPage.m_oEditor.HtmlElement.getContext('2d');
         ctx1.setTransform(1, 0, 0, 1, 0, 0);
-        
+
         this.HtmlPage.OnScroll();
     }
 

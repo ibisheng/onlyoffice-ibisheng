@@ -1,6 +1,6 @@
 function CPPTXContentLoader()
 {
-    this.Reader = null;
+    this.Reader = new BinaryPPTYLoader();
     this.Writer = null;
 
     this.stream = null;
@@ -10,6 +10,15 @@ function CPPTXContentLoader()
     this.BaseReader = null;
 
     this.ImageMapChecker = new Object();
+
+    this.Start_UseFullUrl = function()
+    {
+        this.Reader.Start_UseFullUrl();
+    }
+    this.End_UseFullUrl = function()
+    {
+        return this.Reader.End_UseFullUrl();
+    }
 
     this.ReadDrawing = function(reader, stream, logicDocument, paraDrawing)
     {
@@ -659,6 +668,15 @@ function CPPTXContentWriter()
     this.arrayStackStartsTextBoxContent = [];
 
     this.arrayStackStarts = [];
+
+    this.Start_UseFullUrl = function(origin)
+    {
+        this.BinaryFileWriter.Start_UseFullUrl(origin);
+    }
+    this.End_UseFullUrl = function()
+    {
+        return this.BinaryFileWriter.End_UseFullUrl();
+    }
 
     this._Start = function()
     {
