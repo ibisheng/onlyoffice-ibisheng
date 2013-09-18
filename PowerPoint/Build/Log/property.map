@@ -552,7 +552,7 @@ _centerx:Noa
 _centery:Ooa
 ParaList:o3
 ReadNote:n2a
-CurrentObjectType:ej
+CurrentObjectType:fj
 LoadDocumentImages:IK
 oRecalcDocument:YM
 Char:JC
@@ -878,7 +878,7 @@ Add_CheckLock:KN
 font_map:f6
 setCellAllBold:gYa
 CopyEnd:P9
-left_bearing:cj
+left_bearing:dj
 objects:kw
 drawHorLine2:Zda
 getWorkbook:cQa
@@ -1343,7 +1343,7 @@ m_nMinX:HJ
 control_len:NP
 psnames:Gr
 FirstRow:pj
-array_sum:aj
+array_sum:bj
 ReadLegendLayout:jDa
 getBBox0:LPa
 asc_getIndex:CLa
@@ -1730,7 +1730,7 @@ put_Ind:nVa
 get_HighLight:PQa
 asc_setInterval:INa
 find_sbit_image:r7a
-TableRowsBottom:Zi
+TableRowsBottom:$i
 BulletNum:wja
 hscrollStep:ita
 m_oDocumentRenderer:B7
@@ -1896,7 +1896,7 @@ LoadScriptAsync:z1a
 FontMap:PA
 SymbolsWSCount:oY
 TT_CONFIG_OPTION_SUBPIXEL_HINTING:iq
-TableWholeTable:$i
+TableWholeTable:aj
 Content:e
 num_instruction_defs:h8
 _xlabels_underline:CL
@@ -2548,7 +2548,7 @@ NeedToDelete:i3
 shapeDrawer:Fva
 Row:P
 load_glyph:Ifa
-Internal_Content_Remove:fj
+Internal_Content_Remove:gj
 IsDrawBorderInNoneMode:WAa
 _xlabels:GB
 memcpy_p2:uua
@@ -3113,7 +3113,7 @@ get_LockTiming:kRa
 SearchClear:Saa
 AutoFilterDataRangeError:P_a
 oldRot:SE
-Is_Inline:Xi
+Is_Inline:Yi
 extra_points2:eJ
 initEvents:qfa
 x_ppem:wk
@@ -3242,7 +3242,7 @@ wbModel:Eab
 TxPrPptx:g4
 load_mac_face:F8a
 txBody:ja
-m_nBottom:dj
+m_nBottom:ej
 raster_done:e$a
 cursorGetPos:M5
 SetMetrics:lFa
@@ -3828,7 +3828,7 @@ WriteClrMapOvr:wba
 CanAddDropCap:U1
 Parent:ia
 ReadSlide:ODa
-b_color1:bj
+b_color1:cj
 glyph:ui
 put_SmallCaps:gWa
 TransformPointY:Ra
@@ -4311,7 +4311,7 @@ dict:eU
 Wave_inner_iterator:EGa
 WriteTblStyleProperty:jIa
 ReadViewProps:t2a
-Is_SelectionUse:Yi
+Is_SelectionUse:Zi
 isLoadNoCutFonts:wfa
 Reset_NeedLock:CEa
 ReadHyperlink:dDa
@@ -6297,7 +6297,7 @@ get_Italic:WQa
 glyphCount:Osa
 m_bBand_Hor:Hy
 fsType:FPa
-IsLocked:gj
+IsLocked:Xi
 to_fixed_array:bxa
 sfnt_id:gh
 ReadExtraColorScheme:OCa
