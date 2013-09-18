@@ -1096,7 +1096,7 @@ Slide.prototype =
     draw: function(graphics)
     {
         DrawBackground(graphics, this.backgroundFill, this.Width, this.Height);
-        if(this.showMasterSp === true || (!(this.showMasterSp === false) && (this.Layout.showMasterSp===undefined || this.Layout.showMasterSp)))
+        if(this.showMasterSp === true || (!(this.showMasterSp === false) && (this.Layout.showMasterSp == undefined || this.Layout.showMasterSp)))
         {
             if (graphics.IsSlideBoundsCheckerType === undefined)
                 this.Layout.Master.draw(graphics);
