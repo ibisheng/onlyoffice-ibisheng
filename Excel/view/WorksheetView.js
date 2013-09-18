@@ -1364,7 +1364,7 @@
 				this.visibleRange.c2 = i - (f ? 1 : 0);
 			},
 
-			/** Вычисляет диапазон индексов видимых колонок */
+			/** Вычисляет диапазон индексов видимых строк */
 			_calcVisibleRows: function () {
 				var l = this.rows.length;
 				var h = this.drawingCtx.getHeight();
@@ -3522,17 +3522,26 @@
 			 * @param {Asc.Range} range  Диапазон кэширования текта
 			 */
 			_prepareCellTextMetricsCache: function (range) {
-				var self = this, s = this.cache.sectors;
+				var self = this;
+				var s = this.cache.sectors;
+				var isUpdateRows = false;
 
 				if (s.length < 1) {return;}
 
 				for (var i = 0; i < s.length; ) {
-					if ( s[i].intersection(range) !== null ) {
+					if (s[i].intersection(range) !== null) {
 						self._calcCellsTextMetrics(s[i]);
 						s.splice(i, 1);
+						isUpdateRows = true;
 						continue;
 					}
 					++i;
+				}
+				if (isUpdateRows) {
+					// Убрал это из _calcCellsTextMetrics, т.к. вызов был для каждого сектора(добавляло тормоза: баг 20388)
+					// Код нужен для бага http://bugzserver/show_bug.cgi?id=13875
+					this._updateRowPositions();
+					this._calcVisibleRows();
 				}
 			},
 
@@ -3550,10 +3559,6 @@
 						if (this.width_1px > this.cols[col].width) {continue;}
 						col = this._addCellTextToCache(col, row);
 					}
-				}
-				if (range.r1 <= range.r2) {
-					this._updateRowPositions();
-					this._calcVisibleRows();
 				}
 				this.isChanged = false;
 			},
