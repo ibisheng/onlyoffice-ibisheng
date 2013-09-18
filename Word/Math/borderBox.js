@@ -5,24 +5,34 @@ function CBorderBox()
     this.bLeft = true;
     this.bRight = true;
     this.bTop = true;
-    this.bDown = true;
+    this.bBot = true;
 
     this.bLDiag = false;
     this.bRDiag = false;
 
-//    this.bLeft = false;
-//    this.bRight = false;
-//    this.bDown = false;
-//    this.bTop = false;
-
-    /*this.bLDiag = true;
-    this.bRDiag = true;*/
-
     CMathBase.call(this);
 }
 extend(CBorderBox, CMathBase);
-CBorderBox.prototype.init = function()
+CBorderBox.prototype.init = function(props)
 {
+    if(typeof(props) !== "undefined" && props !== null)
+    {
+        if(props.hideLeft === true || props.hideLeft === 1)
+            this.bLeft = false;
+        if(props.hideRight === true || props.hideRight === 1)
+            this.bRight = false;
+        if(props.hideTop === true || props.hideTop === 1)
+            this.bTop = false;
+        if(props.hideBot === true || props.hideBot === 1)
+            this.bBot = false;
+
+        if(props.strikeBLTR === true || props.strikeBLTR === 1)
+            this.bLDiag = true;
+
+        if(props.strikeTLBR === true || props.strikeTLBR === 1)
+            this.bRDiag = true;
+    }
+    
     this.setDimension(1, 1);
     this.setContent();
 }
@@ -41,7 +51,7 @@ CBorderBox.prototype.recalculateSize = function()
         height += this.gapBrd;
         center += this.gapBrd;
     }
-    if(this.bDown)
+    if(this.bBot)
         height += this.gapBrd;
 
     if(this.bLeft)
@@ -68,7 +78,7 @@ CBorderBox.prototype.draw = function()
          MathControl.pGraph.drawHorLine(0, y1, x1, x2, penW);
     }
 
-    if(this.bDown)
+    if(this.bBot)
     {
         var x1 = this.pos.x,
             x2 = this.pos.x + this.size.width - 25.4/96,
@@ -223,18 +233,31 @@ CBorderBox.prototype.getElement = function()
 
 function CBox()
 {
-    this.type = null;
+    this.opEmu = false;
+    this.diff = false;
+    this.noBreak = false;
+
     CMathBase.call(this);
 }
 extend(CBox, CMathBase);
 CBox.prototype.init = function(props)
 {
-    this.type   = props.type;
-    this.bSpacing  = ( props.spacing === 1 || props.spacing === true ) ? true : false;
+    if( typeof(props) !== "undefined" && (props !== null) )
+    {
+        if(props.opEmu === true || props.opEmu === 1)
+            this.opEmu = true;
+
+        if(props.diff === true || props.diff === 1)
+            this.diff = true;
+
+        if(props.noBreak === true || props.noBreak === 1)
+            this.noBreak = true;
+    }
+
     this.setDimension(1, 1);
     this.setContent();
 }
-CBox.prototype.getElement = function()
+CBox.prototype.getBase = function()
 {
     return this.elements[0][0];
 }

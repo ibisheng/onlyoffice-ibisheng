@@ -472,4 +472,3 @@ CEqArray.prototype.init = function(props)
 
     CEqArray.superclass.init.call(this, prps);
 }
-

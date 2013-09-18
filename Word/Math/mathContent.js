@@ -4255,18 +4255,19 @@ CMathContent.prototype =
                 case 173:
                     break;
                 case 174:
-                    var box = this.addMComponent(18);
-                    box.init();
-                    box.fillPlaceholders();
+                    var borderBox = this.addMComponent(MATH_BORDER_BOX);
+                    borderBox.init();
+                    borderBox.fillPlaceholders();
                     break;
                 case 175:
-                    var box = this.addMComponent(18);
-                    box.init();
-                    var arg = box.getElement();
+                    var borderBox = this.addMComponent(MATH_BORDER_BOX);
+                    borderBox.init(props);
 
-                    var degrA = arg.addMComponent(3);
-                    degrA.init();
-                    degrA.setIndex(1);
+                    var arg = borderBox.getElement();
+
+                    var degrA = arg.addMComponent(MATH_DEGREE);
+                    var props = {type:   DEGREE_SUPERSCRIPT};
+                    degrA.init(props);
                     var baseA = degrA.getBase();
                     baseA.addTxt("a");
                     var iterA = degrA.getIterator();
@@ -4274,9 +4275,8 @@ CMathContent.prototype =
 
                     arg.addTxt("=");
 
-                    var degrB = arg.addMComponent(3);
-                    degrB.init();
-                    degrB.setIndex(1);
+                    var degrB = arg.addMComponent(MATH_DEGREE);
+                    degrB.init(props);
                     var baseB = degrB.getBase();
                     baseB.addTxt("b");
                     var iterB = degrB.getIterator();
@@ -4284,9 +4284,8 @@ CMathContent.prototype =
 
                     arg.addTxt("+");
 
-                    var degrC = arg.addMComponent(3);
-                    degrC.init();
-                    degrC.setIndex(1);
+                    var degrC = arg.addMComponent(MATH_DEGREE);
+                    degrC.init(props);
                     var baseC = degrC.getBase();
                     baseC.addTxt("c");
                     var iterC = degrC.getIterator();
@@ -4463,79 +4462,39 @@ CMathContent.prototype =
                     base2.addTxt("x");
                     var iter3 = degr2.getIterator();
                     iter3.addTxt("2");
-
-
-                    /*var minimax = this.addMComponent(19);
-                    minimax.init();
-                    var base = minimax.getFunction();
-                    base.addTxt("max");
-                    var iter = minimax.getIterator();
-                    iter.addTxt("0≤x≤1");
-                    var arg = minimax.getArgument();
-                    arg.addTxt("x");
-                    var degr1 = arg.addMComponent(3);
-                    degr1.init();
-                    degr1.setIndex(1);
-                    var base1 = degr1.getBase();
-                    base1.addTxt("e");
-                    var iter1 = degr1.getIterator();
-                    iter1.addTxt("-");
-                    var degr2 = iter1.addMComponent(3);
-                    degr2.init();
-                    degr2.setIndex(1);
-                    var base2 = degr2.getBase();
-                    base2.addTxt("x");
-                    var iter2 = degr2.getIterator();
-                    iter2.addTxt("2");*/
                     break;
                 case 186:
-                    var base = this.addMComponent(22);
-                    base.setDimension(1,1);
-                    base.setContent();
-                    var arg = base.getElement(0,0);
+                    var box = this.addMComponent(MATH_BOX);
+                    box.init();
+                    var arg = box.getBase();
                     arg.addTxt("∶=");
                     break;
                 case 187:
-                    var base = this.addMComponent(22);
-                    base.setDimension(1,1);
-                    base.setContent();
-                    var arg = base.getElement(0,0);
+                    var box = this.addMComponent(MATH_BOX);
+                    box.init();
+                    var arg = box.getBase();
                     arg.addTxt("==");
                     break;
                 case 188:
-                    var base = this.addMComponent(22);
-                    base.setDimension(1,1);
-                    base.setContent();
-                    var arg = base.getElement(0,0);
+                    var box = this.addMComponent(MATH_BOX);
+                    box.init();
+                    var arg = box.getBase();
                     arg.addTxt("+=");
                     break;
                 case 189:
-                    var base = this.addMComponent(22);
-                    base.setDimension(1,1);
-                    base.setContent();
-                    var arg = base.getElement(0,0);
+                    var box = this.addMComponent(MATH_BOX);
+                    box.init();
+                    var arg = box.getBase();
                     arg.addTxt("-=");
                     break;
                 case 190:
-                    var base = this.addMComponent(22);
-                    base.setDimension(1,1);
-                    base.setContent();
-                    var arg = base.getElement(0,0);
-                    arg.addTxt("≝");
+                    this.addTxt("≝");
                     break;
                 case 191:
-                    var base = this.addMComponent(22);
-                    base.setDimension(1,1);
-                    base.setContent();
-                    var arg = base.getElement(0,0);
-                    arg.addTxt("≞");
+                    this.addTxt("≞");
                     break;
                 case 192:
-                    var base = this.addMComponent(22);
-                    base.setDimension(1,1);
-                    base.setContent();
-                    var arg = base.getElement(0,0);
-                    arg.addTxt("≜");
+                    this.addTxt("≜");
                     break;
                 case 193:
                     var arrow = this.addMComponent(20);
