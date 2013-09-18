@@ -1285,18 +1285,19 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart, options)
 	}	
 	else
 	{
-		chart.isSkip = isSkip;
 		if(isSeries)
 		{
 			if(chart.type == 'HBar' || chart.type == 'Bar' || chart.type == 'Stock' || chart.type == 'Pie')
 			{
 				//надо перевернуть массив
+				chart.isSkip = arrReverse(isSkip);
 				arrValuesRev = arrReverse(arrValues);
 				chart.arrFormatAdobeLabels = arrReverse(arrFormatAdobeLabels);
 				drawChart(chart, arrValuesRev, width, height, options);
 			}
 			else
 			{
+				chart.isSkip = isSkip;
 				chart.arrFormatAdobeLabels = arrFormatAdobeLabels;
 				drawChart(chart, arrValues, width, height, options);
 			}
