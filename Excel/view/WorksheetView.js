@@ -5967,7 +5967,9 @@
 
 				// Выделяем объект
 				var graphicCursorInfo = this.objectRender.checkCursorDrawingObject(x, y);
-				if ( !graphicCursorInfo )
+				if ( graphicCursorInfo && graphicCursorInfo.isGraphicObject )
+					return;
+				else
 					this.objectRender.unselectDrawingObjects();
 
 				var ar = this.activeRange;

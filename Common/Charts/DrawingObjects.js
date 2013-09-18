@@ -2918,7 +2918,9 @@ function DrawingObjects() {
 		for ( var i = 0; i < _this.controller.selectedObjects.length; i++ ) {
 			if ( _this.controller.selectedObjects[i].isChart() ) {
 				_this.selectDrawingObjectRange(_this.controller.selectedObjects[i].Id);
+				shapeOverlayCtx.ClearMode = true;
 				_this.controller.selectedObjects[i].draw(shapeOverlayCtx);
+				shapeOverlayCtx.ClearMode = false;
 			}
 		}
 
