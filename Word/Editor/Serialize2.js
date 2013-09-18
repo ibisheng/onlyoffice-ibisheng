@@ -971,7 +971,7 @@ function Binary_pPrWriter(memory, oNumIdMap)
             this.bs.WriteItemWithLength(function(){oThis.WriteSpacing(pPr.Spacing);});
         }
         //Shd
-        if(null != pPr.Shd && shd_Nil != pPr.Shd.Value)
+        if(null != pPr.Shd)
         {
             this.memory.WriteByte(c_oSerProp_pPrType.Shd);
             this.memory.WriteByte(c_oSerPropLenType.Variable);
