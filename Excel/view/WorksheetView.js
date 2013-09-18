@@ -2175,6 +2175,8 @@
 				rowStart = Math.max(this.visibleRange.r1, rowStart);
 				rowEnd = Math.min(this.visibleRange.r2, rowEnd);
 				for (var i = rowStart; i <= rowEnd; ++i) {
+					if (this.height_1px > this.rows[i].height)
+						continue;
 					this.drawingCtx.clearRect(
 						this.headersLeft, this.rows[i].top - offsetY - this.height_1px,
 						this.headersWidth, this.rows[i].height + this.height_1px);
