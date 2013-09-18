@@ -1905,7 +1905,7 @@ function BinaryPPTYLoader()
                     {
                         if (mods[i].name == "alpha")
                         {
-                            uni_fill.transparent = (255 * mods[i].val / 100) >> 0;
+                            uni_fill.transparent = (255 * mods[i].val / 100000) >> 0;
                             mods.splice(i, 1);
                             break;
                         }
@@ -2457,6 +2457,12 @@ function BinaryPPTYLoader()
                     slide.setClMapOverride(this.ReadClrOverride());
                     break;
                 }
+                case 2:
+                {
+                    var _timing = this.ReadTransition();
+                    slide.applyTiming(_timing);
+                    break;
+                }
                 default:
                 {
                     var _len = s.GetULong();
@@ -2469,6 +2475,285 @@ function BinaryPPTYLoader()
         s.Seek2(end);
         this.TempMainObject = null;
         return slide;
+    }
+
+    this.ReadTransition = function()
+    {
+        var _timing = new CAscSlideTiming();
+        _timing.setDefaultParams();
+
+        var s = this.stream;
+        var end = s.cur + s.GetULong() + 4;
+
+        s.Skip2(1); // attribute start
+        var _presentDuration = false;
+        while (true)
+        {
+            var _at = s.GetUChar();
+            if (_at == g_nodeAttributeEnd)
+                break;
+
+            if (0 == _at)
+            {
+                _timing.SlideAdvanceOnMouseClick = s.GetBool();
+            }
+            else if (1 == _at)
+            {
+                _timing.SlideAdvanceAfter = true;
+                _timing.SlideAdvanceDuration = s.GetULong();
+            }
+            else if (2 == _at)
+            {
+                _timing.TransitionDuration = s.GetULong();
+                _presentDuration = true;
+            }
+            else if (3 == _at)
+            {
+                if (!_presentDuration)
+                {
+                    _timing.TransitionDuration = 250;
+                    var _spd = s.GetUChar();
+                    if (_spd == 1)
+                        _timing.TransitionDuration = 500;
+                    else if (_spd == 2)
+                        _timing.TransitionDuration = 750;
+                }
+            }
+        }
+
+        while (s.cur < end)
+        {
+            var _rec = s.GetUChar();
+
+            switch (_rec)
+            {
+                case 0:
+                {
+                    var _type = "";
+                    var _paramNames = [];
+                    var _paramValues = [];
+
+                    var _end_rec2 = s.cur + s.GetULong() + 4;
+
+                    s.Skip2(1); // start attributes
+                    while (true)
+                    {
+                        var _at2 = s.GetUChar();
+                        if (_at2 == g_nodeAttributeEnd)
+                            break;
+
+                        switch (_at2)
+                        {
+                            case 0:
+                            {
+                                _type = s.GetString2();
+                                break;
+                            }
+                            case 1:
+                            {
+                                _paramNames.push(s.GetString2());
+                                break;
+                            }
+                            case 2:
+                            {
+                                _paramValues.push(s.GetString2());
+                                break;
+                            }
+                            default:
+                                break;
+                        }
+                    }
+
+                    if (_paramNames.length == _paramValues.length)
+                    {
+                        var _len = _paramNames.length;
+                        // тут все поддерживаемые переходы
+                        if ("p:fade" == _type)
+                        {
+                            _timing.TransitionType = c_oAscSlideTransitionTypes.Fade;
+                            _timing.TransitionOption = c_oAscSlideTransitionParams.Fade_Smoothly;
+
+                            if (1 == _len && _paramNames[0] == "thruBlk" && _paramValues[0] == "1")
+                            {
+                                _timing.TransitionOption = c_oAscSlideTransitionParams.Fade_Through_Black;
+                            }
+                        }
+                        else if ("p:push" == _type)
+                        {
+                            _timing.TransitionType = c_oAscSlideTransitionTypes.Push;
+                            _timing.TransitionOption = c_oAscSlideTransitionParams.Param_Bottom;
+
+                            if (1 == _len && _paramNames[0] == "dir")
+                            {
+                                if ("l" == _paramValues[0])
+                                    _timing.TransitionOption = c_oAscSlideTransitionParams.Param_Right;
+                                if ("r" == _paramValues[0])
+                                    _timing.TransitionOption = c_oAscSlideTransitionParams.Param_Left;
+                                if ("d" == _paramValues[0])
+                                    _timing.TransitionOption = c_oAscSlideTransitionParams.Param_Top;
+                            }
+                        }
+                        else if ("p:wipe" == _type)
+                        {
+                            _timing.TransitionType = c_oAscSlideTransitionTypes.Wipe;
+                            _timing.TransitionOption = c_oAscSlideTransitionParams.Param_Right;
+
+                            if (1 == _len && _paramNames[0] == "dir")
+                            {
+                                if ("u" == _paramValues[0])
+                                    _timing.TransitionOption = c_oAscSlideTransitionParams.Param_Bottom;
+                                if ("r" == _paramValues[0])
+                                    _timing.TransitionOption = c_oAscSlideTransitionParams.Param_Left;
+                                if ("d" == _paramValues[0])
+                                    _timing.TransitionOption = c_oAscSlideTransitionParams.Param_Top;
+                            }
+                        }
+                        else if ("p:strips" == _type)
+                        {
+                            _timing.TransitionType = c_oAscSlideTransitionTypes.Wipe;
+                            _timing.TransitionOption = c_oAscSlideTransitionParams.Param_TopRight;
+
+                            if (1 == _len && _paramNames[0] == "dir")
+                            {
+                                if ("rd" == _paramValues[0])
+                                    _timing.TransitionOption = c_oAscSlideTransitionParams.Param_TopLeft;
+                                if ("ru" == _paramValues[0])
+                                    _timing.TransitionOption = c_oAscSlideTransitionParams.Param_BottomLeft;
+                                if ("lu" == _paramValues[0])
+                                    _timing.TransitionOption = c_oAscSlideTransitionParams.Param_BottomRight;
+                            }
+                        }
+                        else if ("p:cover" == _type)
+                        {
+                            _timing.TransitionType = c_oAscSlideTransitionTypes.Cover;
+                            _timing.TransitionOption = c_oAscSlideTransitionParams.Param_Right;
+
+                            if (1 == _len && _paramNames[0] == "dir")
+                            {
+                                if ("u" == _paramValues[0])
+                                    _timing.TransitionOption = c_oAscSlideTransitionParams.Param_Bottom;
+                                if ("r" == _paramValues[0])
+                                    _timing.TransitionOption = c_oAscSlideTransitionParams.Param_Left;
+                                if ("d" == _paramValues[0])
+                                    _timing.TransitionOption = c_oAscSlideTransitionParams.Param_Top;
+                                if ("rd" == _paramValues[0])
+                                    _timing.TransitionOption = c_oAscSlideTransitionParams.Param_TopLeft;
+                                if ("ru" == _paramValues[0])
+                                    _timing.TransitionOption = c_oAscSlideTransitionParams.Param_BottomLeft;
+                                if ("lu" == _paramValues[0])
+                                    _timing.TransitionOption = c_oAscSlideTransitionParams.Param_BottomRight;
+                                if ("ld" == _paramValues[0])
+                                    _timing.TransitionOption = c_oAscSlideTransitionParams.Param_TopRight;
+                            }
+                        }
+                        else if ("p:pull" == _type)
+                        {
+                            _timing.TransitionType = c_oAscSlideTransitionTypes.UnCover;
+                            _timing.TransitionOption = c_oAscSlideTransitionParams.Param_Right;
+
+                            if (1 == _len && _paramNames[0] == "dir")
+                            {
+                                if ("u" == _paramValues[0])
+                                    _timing.TransitionOption = c_oAscSlideTransitionParams.Param_Bottom;
+                                if ("r" == _paramValues[0])
+                                    _timing.TransitionOption = c_oAscSlideTransitionParams.Param_Left;
+                                if ("d" == _paramValues[0])
+                                    _timing.TransitionOption = c_oAscSlideTransitionParams.Param_Top;
+                                if ("rd" == _paramValues[0])
+                                    _timing.TransitionOption = c_oAscSlideTransitionParams.Param_TopLeft;
+                                if ("ru" == _paramValues[0])
+                                    _timing.TransitionOption = c_oAscSlideTransitionParams.Param_BottomLeft;
+                                if ("lu" == _paramValues[0])
+                                    _timing.TransitionOption = c_oAscSlideTransitionParams.Param_BottomRight;
+                                if ("ld" == _paramValues[0])
+                                    _timing.TransitionOption = c_oAscSlideTransitionParams.Param_TopRight;
+                            }
+                        }
+                        else if ("p:split" == _type)
+                        {
+                            _timing.TransitionType = c_oAscSlideTransitionTypes.Split;
+
+                            var _is_vert = true;
+                            var _is_out = true;
+
+                            for (var i = 0; i < _len; i++)
+                            {
+                                if (_paramNames[i] == "orient")
+                                {
+                                    _is_vert = (_paramValues[i] == "vert") ? true : false;
+                                }
+                                else if (_paramNames[i] == "dir")
+                                {
+                                    _is_out = (_paramValues[i] == "out") ? true : false;
+                                }
+                            }
+
+                            if (_is_vert)
+                            {
+                                if (_is_out)
+                                    _timing.TransitionOption = c_oAscSlideTransitionParams.Split_VerticalOut;
+                                else
+                                    _timing.TransitionOption = c_oAscSlideTransitionParams.Split_VerticalIn;
+                            }
+                            else
+                            {
+                                if (_is_out)
+                                    _timing.TransitionOption = c_oAscSlideTransitionParams.Split_HorizontalOut;
+                                else
+                                    _timing.TransitionOption = c_oAscSlideTransitionParams.Split_HorizontalIn;
+                            }
+                        }
+                        else if ("p:wheel" == _type)
+                        {
+                            _timing.TransitionType = c_oAscSlideTransitionTypes.Clock;
+                            _timing.TransitionOption = c_oAscSlideTransitionParams.Clock_Clockwise;
+                        }
+                        else if ("p14:wheelReverse" == _type)
+                        {
+                            _timing.TransitionType = c_oAscSlideTransitionTypes.Clock;
+                            _timing.TransitionOption = c_oAscSlideTransitionParams.Clock_Counterclockwise;
+                        }
+                        else if ("p:wedge" == _type)
+                        {
+                            _timing.TransitionType = c_oAscSlideTransitionTypes.Clock;
+                            _timing.TransitionOption = c_oAscSlideTransitionParams.Clock_Wedge;
+                        }
+                        else if ("p14:warp" == _type)
+                        {
+                            _timing.TransitionType = c_oAscSlideTransitionTypes.Zoom;
+                            _timing.TransitionOption = c_oAscSlideTransitionParams.Zoom_Out;
+
+                            if (1 == _len && _paramNames[0] == "dir")
+                            {
+                                if ("in" == _paramValues[0])
+                                    _timing.TransitionOption = c_oAscSlideTransitionParams.Zoom_In;
+                            }
+                        }
+                        else if ("p:newsflash" == _type)
+                        {
+                            _timing.TransitionType = c_oAscSlideTransitionTypes.Zoom;
+                            _timing.TransitionOption = c_oAscSlideTransitionParams.Zoom_AndRotate;
+                        }
+                        else if ("p:none" != _type)
+                        {
+                            _timing.TransitionType = c_oAscSlideTransitionTypes.Fade;
+                            _timing.TransitionOption = c_oAscSlideTransitionParams.Fade_Smoothly;
+                        }
+                    }
+
+                    s.Seek2(_end_rec2);
+                    break;
+                }
+                default:
+                {
+                    s.SkipRecord();
+                    break;
+                }
+            }
+        }
+
+        s.Seek2(end);
+        return _timing;
     }
 
     this.ReadHF = function()

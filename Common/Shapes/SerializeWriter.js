@@ -814,8 +814,311 @@ function CBinaryFileWriter()
 
         this.WriteRecord1(0, _slide.cSld, this.WriteCSld);
         this.WriteRecord2(1, _slide.clrMap, this.WriteClrMapOvr);
+        this.WriteRecord1(2, _slide.timing, this.WriteSlideTransition);
 
         this.EndRecord();
+    }
+
+    this.WriteSlideTransition = function(_timing)
+    {
+        oThis.WriteUChar(g_nodeAttributeStart);
+        oThis._WriteBool1(0, _timing.SlideAdvanceOnMouseClick);
+
+        if (_timing.SlideAdvanceAfter)
+        {
+            oThis._WriteInt1(1, _timing.SlideAdvanceDuration);
+
+            if (_timing.TransitionType == c_oAscSlideTransitionTypes.None)
+            {
+                oThis._WriteInt1(2, 0);
+            }
+        }
+        else if (_timing.TransitionType == c_oAscSlideTransitionTypes.None)
+        {
+            oThis._WriteInt1(2, 10);
+        }
+
+        if (_timing.TransitionType != c_oAscSlideTransitionTypes.None)
+        {
+            oThis._WriteInt1(2, _timing.TransitionDuration);
+
+            if (_timing.TransitionDuration < 250)
+                oThis._WriteUChar1(3, 0);
+            else if (_timing.TransitionDuration > 1000)
+                oThis._WriteUChar1(3, 2);
+            else
+                oThis._WriteUChar1(3, 1);
+
+            oThis.WriteUChar(g_nodeAttributeEnd);
+
+            oThis.StartRecord(0);
+
+            oThis.WriteUChar(g_nodeAttributeStart);
+
+            switch (_timing.TransitionType)
+            {
+                case c_oAscSlideTransitionTypes.Fade:
+                {
+                    oThis._WriteString2(0, "p:fade");
+                    switch (_timing.TransitionOption)
+                    {
+                        case c_oAscSlideTransitionParams.Fade_Smoothly:
+                        {
+                            oThis._WriteString2(1, "thruBlk");
+                            oThis._WriteString2(2, "0");
+                        }
+                        case c_oAscSlideTransitionParams.Fade_Through_Black:
+                        {
+                            oThis._WriteString2(1, "thruBlk");
+                            oThis._WriteString2(2, "1");
+                        }
+                        default:
+                            break;
+                    }
+                    break;
+                }
+                case c_oAscSlideTransitionTypes.Push:
+                {
+                    this._WriteString2(0, "p:push");
+                    switch (_timing.TransitionOption)
+                    {
+                        case c_oAscSlideTransitionParams.Param_Left:
+                        {
+                            oThis._WriteString2(1, "dir");
+                            oThis._WriteString2(2, "r");
+                        }
+                        case c_oAscSlideTransitionParams.Param_Right:
+                        {
+                            oThis._WriteString2(1, "dir");
+                            oThis._WriteString2(2, "l");
+                        }
+                        case c_oAscSlideTransitionParams.Param_Top:
+                        {
+                            oThis._WriteString2(1, "dir");
+                            oThis._WriteString2(2, "d");
+                        }
+                        case c_oAscSlideTransitionParams.Param_Bottom:
+                        {
+                            oThis._WriteString2(1, "dir");
+                            oThis._WriteString2(2, "u");
+                        }
+                        default:
+                            break;
+                    }
+                    break;
+                }
+                case c_oAscSlideTransitionTypes.Wipe:
+                {
+                    switch (_timing.TransitionOption)
+                    {
+                        case c_oAscSlideTransitionParams.Param_Left:
+                        {
+                            oThis._WriteString2(0, "p:wipe");
+                            oThis._WriteString2(1, "dir");
+                            oThis._WriteString2(2, "r");
+                        }
+                        case c_oAscSlideTransitionParams.Param_Right:
+                        {
+                            oThis._WriteString2(0, "p:wipe");
+                            oThis._WriteString2(1, "dir");
+                            oThis._WriteString2(2, "l");
+                        }
+                        case c_oAscSlideTransitionParams.Param_Top:
+                        {
+                            oThis._WriteString2(0, "p:wipe");
+                            oThis._WriteString2(1, "dir");
+                            oThis._WriteString2(2, "d");
+                        }
+                        case c_oAscSlideTransitionParams.Param_Bottom:
+                        {
+                            oThis._WriteString2(0, "p:wipe");
+                            oThis._WriteString2(1, "dir");
+                            oThis._WriteString2(2, "u");
+                        }
+                        case c_oAscSlideTransitionParams.Param_TopLeft:
+                        {
+                            oThis._WriteString2(0, "p:strips");
+                            oThis._WriteString2(1, "dir");
+                            oThis._WriteString2(2, "rd");
+                        }
+                        case c_oAscSlideTransitionParams.Param_TopRight:
+                        {
+                            oThis._WriteString2(0, "p:strips");
+                            oThis._WriteString2(1, "dir");
+                            oThis._WriteString2(2, "ld");
+                        }
+                        case c_oAscSlideTransitionParams.Param_BottomLeft:
+                        {
+                            oThis._WriteString2(0, "p:strips");
+                            oThis._WriteString2(1, "dir");
+                            oThis._WriteString2(2, "ru");
+                        }
+                        case c_oAscSlideTransitionParams.Param_BottomRight:
+                        {
+                            oThis._WriteString2(0, "p:strips");
+                            oThis._WriteString2(1, "dir");
+                            oThis._WriteString2(2, "lu");
+                        }
+                        default:
+                            break;
+                    }
+                    break;
+                }
+                case c_oAscSlideTransitionTypes.Split:
+                {
+                    oThis._WriteString2(0, "p:split");
+                    switch (_timing.TransitionOption)
+                    {
+                        case c_oAscSlideTransitionParams.Split_HorizontalIn:
+                        {
+                            oThis._WriteString2(1, "orient");
+                            oThis._WriteString2(1, "dir");
+                            oThis._WriteString2(2, "horz");
+                            oThis._WriteString2(2, "in");
+                        }
+                        case c_oAscSlideTransitionParams.Split_HorizontalOut:
+                        {
+                            oThis._WriteString2(1, "orient");
+                            oThis._WriteString2(1, "dir");
+                            oThis._WriteString2(2, "horz");
+                            oThis._WriteString2(2, "out");
+                        }
+                        case c_oAscSlideTransitionParams.Split_VerticalIn:
+                        {
+                            oThis._WriteString2(1, "orient");
+                            oThis._WriteString2(1, "dir");
+                            oThis._WriteString2(2, "vert");
+                            oThis._WriteString2(2, "in");
+                        }
+                        case c_oAscSlideTransitionParams.Split_VerticalOut:
+                        {
+                            oThis._WriteString2(1, "orient");
+                            oThis._WriteString2(1, "dir");
+                            oThis._WriteString2(2, "vert");
+                            oThis._WriteString2(2, "out");
+                        }
+                        default:
+                            break;
+                    }
+                    break;
+                }
+                case c_oAscSlideTransitionTypes.UnCover:
+                case c_oAscSlideTransitionTypes.Cover:
+                {
+                    if (_timing.TransitionType == c_oAscSlideTransitionTypes.Cover)
+                        oThis._WriteString2(0, "p:cover");
+                    else
+                        oThis._WriteString2(0, "p:pull");
+
+                    switch (_timing.TransitionOption)
+                    {
+                        case c_oAscSlideTransitionParams.Param_Left:
+                        {
+                            oThis._WriteString2(1, "dir");
+                            oThis._WriteString2(2, "r");
+                        }
+                        case c_oAscSlideTransitionParams.Param_Right:
+                        {
+                            oThis._WriteString2(1, "dir");
+                            oThis._WriteString2(2, "l");
+                        }
+                        case c_oAscSlideTransitionParams.Param_Top:
+                        {
+                            oThis._WriteString2(1, "dir");
+                            oThis._WriteString2(2, "d");
+                        }
+                        case c_oAscSlideTransitionParams.Param_Bottom:
+                        {
+                            oThis._WriteString2(1, "dir");
+                            oThis._WriteString2(2, "u");
+                        }
+                        case c_oAscSlideTransitionParams.Param_TopLeft:
+                        {
+                            oThis._WriteString2(1, "dir");
+                            oThis._WriteString2(2, "rd");
+                        }
+                        case c_oAscSlideTransitionParams.Param_TopRight:
+                        {
+                            oThis._WriteString2(1, "dir");
+                            oThis._WriteString2(2, "ld");
+                        }
+                        case c_oAscSlideTransitionParams.Param_BottomLeft:
+                        {
+                            oThis._WriteString2(1, "dir");
+                            oThis._WriteString2(2, "ru");
+                        }
+                        case c_oAscSlideTransitionParams.Param_BottomRight:
+                        {
+                            oThis._WriteString2(1, "dir");
+                            oThis._WriteString2(2, "lu");
+                        }
+                        default:
+                            break;
+                    }
+                    break;
+                }
+                case c_oAscSlideTransitionTypes.Clock:
+                {
+                    switch (_timing.TransitionOption)
+                    {
+                        case c_oAscSlideTransitionParams.Clock_Clockwise:
+                        {
+                            oThis._WriteString2(0, "p:wheel");
+                            oThis._WriteString2(1, "spokes");
+                            oThis._WriteString2(2, "1");
+                        }
+                        case c_oAscSlideTransitionParams.Clock_Counterclockwise:
+                        {
+                            oThis._WriteString2(0, "p14:wheelReverse");
+                            oThis._WriteString2(1, "spokes");
+                            oThis._WriteString2(2, "1");
+                        }
+                        case c_oAscSlideTransitionParams.Clock_Wedge:
+                        {
+                            oThis._WriteString2(0, "p:wedge");
+                        }
+                        default:
+                            break;
+                    }
+                    break;
+                }
+                case c_oAscSlideTransitionTypes.Zoom:
+                {
+                    switch (_timing.TransitionOption)
+                    {
+                        case c_oAscSlideTransitionParams.Zoom_In:
+                        {
+                            oThis._WriteString2(0, "p14:warp");
+                            oThis._WriteString2(1, "dir");
+                            oThis._WriteString2(2, "in");
+                        }
+                        case c_oAscSlideTransitionParams.Zoom_Out:
+                        {
+                            oThis._WriteString2(0, "p14:warp");
+                            oThis._WriteString2(1, "dir");
+                            oThis._WriteString2(2, "out");
+                        }
+                        case c_oAscSlideTransitionParams.Zoom_AndRotate:
+                        {
+                            oThis._WriteString2(0, "p:newsflash");
+                        }
+                        default:
+                            break;
+                    }
+                    break;
+                }
+                default:
+                    break;
+            }
+
+            oThis.WriteUChar(g_nodeAttributeEnd);
+
+            oThis.EndRecord();
+        }
+        else
+        {
+            oThis.WriteUChar(g_nodeAttributeEnd);
+        }
     }
 
     this.WriteSlideNote = function(_note)
@@ -2061,7 +2364,10 @@ function CBinaryFileWriter()
         oThis.WriteUChar(g_nodeAttributeEnd);
 
         oThis.WriteRecord1(0, grObj.nvGraphicFramePr, oThis.WriteUniNvPr);
-        oThis.WriteRecord2(1, grObj.spPr.xfrm, oThis.WriteXfrm);
+
+        if (grObj.spPr.xfrm && grObj.spPr.xfrm.isNotNull())
+            oThis.WriteRecord2(1, grObj.spPr.xfrm, oThis.WriteXfrm);
+
         oThis.WriteRecord2(2, grObj.graphicObject, oThis.WriteTable2);
 
         oThis.EndRecord();
@@ -2074,7 +2380,9 @@ function CBinaryFileWriter()
         oThis.WriteUChar(g_nodeAttributeStart);
         oThis.WriteUChar(g_nodeAttributeEnd);
 
-        oThis.WriteRecord2(1, grObj.spPr.xfrm, oThis.WriteXfrm);
+        if (grObj.spPr.xfrm && grObj.spPr.xfrm.isNotNull())
+            oThis.WriteRecord2(1, grObj.spPr.xfrm, oThis.WriteXfrm);
+
         oThis.WriteRecord2(3, grObj, oThis.WriteChart2);
 
         oThis.EndRecord();
@@ -2419,7 +2727,8 @@ function CBinaryFileWriter()
         oThis._WriteLimit2(0, grpSpPr.bwMode);
         oThis.WriteUChar(g_nodeAttributeEnd);
 
-        oThis.WriteRecord2(0, grpSpPr.WriteXfrm, oThis.WriteXfrm);
+        if (grpSpPr.WriteXfrm && grpSpPr.WriteXfrm.isNotNull())
+            oThis.WriteRecord2(0, grpSpPr.WriteXfrm, oThis.WriteXfrm);
         oThis.WriteRecord1(1, grpSpPr.Fill, oThis.WriteUniFill);
     }
 
@@ -2442,7 +2751,9 @@ function CBinaryFileWriter()
                 bIsExistLn = true;
         }
 
-        oThis.WriteRecord2(0, spPr.WriteXfrm, oThis.WriteXfrm);
+        if (spPr.WriteXfrm && spPr.WriteXfrm.isNotNull())
+            oThis.WriteRecord2(0, spPr.WriteXfrm, oThis.WriteXfrm);
+
         oThis.WriteRecord2(1, spPr.geometry, oThis.WriteGeometry);
 
         if (spPr.geometry === undefined || spPr.geometry == null)

@@ -1460,7 +1460,7 @@ CGroupShape.prototype =
                 w.WriteBool(isRealObject(data.newPr));
                 if(isRealObject(data.newPr))
                 {
-                    w.WriteSring2(data.newPr.Get_Id());
+                    w.WriteString2(data.newPr.Get_Id());
                 }
                 break;
             }
