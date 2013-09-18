@@ -2354,6 +2354,7 @@ function DrawingObjects() {
 	// Task timer
 	var aDrawTasks = [];
 	var drawTaskTimerId = null;
+	
 	function drawTaskFunction() {
 	
 		var taskLen = aDrawTasks.length;
@@ -2574,15 +2575,15 @@ function DrawingObjects() {
 		}
 
 		// Ширина по координатам
-		_t.getWidthFromTo = function(withoutRound) {
+		_t.getWidthFromTo = function() {
 			var val = _t.worksheet.getCellLeft(_t.to.col, 0) + mmToPx(_t.to.colOff) - _t.worksheet.getCellLeft(_t.from.col, 0) - mmToPx(_t.from.colOff);
-			return withoutRound ? val : asc.round(val);
+			return val;
 		}
 
 		// Высота по координатам
-		_t.getHeightFromTo = function(withoutRound) {
+		_t.getHeightFromTo = function() {
 			var val = _t.worksheet.getCellTop(_t.to.row, 0) + mmToPx(_t.to.rowOff) - _t.worksheet.getCellTop(_t.from.row, 0) - mmToPx(_t.from.rowOff);
-			return withoutRound ? val : asc.round(val);
+			return val;
 		}
 
 		// Видимая ширина при скролах
@@ -2623,24 +2624,14 @@ function DrawingObjects() {
 		_t.getInnerOffsetTop = function() {
 			var fvr = _t.worksheet.getCellTop(_t.worksheet.getFirstVisibleRow(), 0);
 			var off = _t.getRealTopOffset() - fvr;
-			return (off > 0) ? 0 : asc.round(Math.abs(off) * _t.getHeightCoeff());
+			return (off > 0) ? 0 : asc.round( Math.abs(off) );
 		}
 
 		// смещение по ширине внутри объекта
 		_t.getInnerOffsetLeft = function() {
 			var fvc = _t.worksheet.getCellLeft(_t.worksheet.getFirstVisibleCol(), 0);
 			var off = _t.getRealLeftOffset() - fvc;
-			return (off > 0) ? 0 : asc.round(Math.abs(off) * _t.getWidthCoeff());
-		}
-
-		// коэффициент по ширине если несоответствие с реальным размером
-		_t.getWidthCoeff = function() {
-			return _t.image.width / _t.getWidthFromTo();
-		}
-
-		// коэффициент по высоте если несоответствие с реальным размером
-		_t.getHeightCoeff = function() {
-			return _t.image.height / _t.getHeightFromTo();
+			return (off > 0) ? 0 : asc.round( Math.abs(off) );
 		}
 		
 		_t.getDrawingObjects = function() {	
@@ -2735,10 +2726,25 @@ function DrawingObjects() {
 				
 		_this.isViewerMode =  function() { return worksheet._trigger("getViewerMode"); };
 
-
 		aObjects = [];
 		aImagesSync = [];
 		aObjectsSync = [];
+		
+		// Смещаем 0,0
+		/*var _x = worksheet.getCellLeft(0, 0);
+		var _y = worksheet.getCellTop(0, 0);
+		
+		shapeCtx.m_oCoordTransform.tx -= _x;
+		shapeCtx.m_oCoordTransform.ty -= _y;
+		shapeCtx.CalculateFullTransform();
+		
+		shapeOverlayCtx.m_oCoordTransform.tx -= _x;
+		shapeOverlayCtx.m_oCoordTransform.ty -= _y;
+		shapeOverlayCtx.CalculateFullTransform();
+		
+		autoShapeTrack.Graphics.m_oCoordTransform.tx -= _x;
+		autoShapeTrack.Graphics.m_oCoordTransform.ty -= _y;
+		autoShapeTrack.Graphics.CalculateFullTransform();*/
 		
 		for (var i = 0; currentSheet.model.Drawings && (i < currentSheet.model.Drawings.length); i++) {
 			
@@ -4211,7 +4217,7 @@ function DrawingObjects() {
 		}
 	}
 	
-	_this.reseltLockedGraphicObjects = function() {
+	_this.resetLockedGraphicObjects = function() {
 		
 		for (var i = 0; i < aObjects.length; i++) {
 			aObjects[i].graphicObject.lockType = c_oAscLockTypes.kLockTypeNone;
@@ -4222,21 +4228,24 @@ function DrawingObjects() {
 	
 	_this.setScrollOffset = function(x_px, y_px) {
 		
-		if ( shapeCtx || shapeOverlayCtx ) {
+		var _x_px = x_px;
+		var _y_px = y_px;
 		
-			scrollOffset.x -= x_px;
-			scrollOffset.y -= y_px;
+		if ( shapeCtx && shapeOverlayCtx && autoShapeTrack ) {
+		
+			scrollOffset.x -= _x_px;
+			scrollOffset.y -= _y_px;
 
-			shapeCtx.m_oCoordTransform.tx -= x_px;
-			shapeCtx.m_oCoordTransform.ty -= y_px;
+			shapeCtx.m_oCoordTransform.tx -= _x_px;
+			shapeCtx.m_oCoordTransform.ty -= _y_px;
 			shapeCtx.CalculateFullTransform();
 			
-			shapeOverlayCtx.m_oCoordTransform.tx -= x_px;
-			shapeOverlayCtx.m_oCoordTransform.ty -= y_px;
+			shapeOverlayCtx.m_oCoordTransform.tx -= _x_px;
+			shapeOverlayCtx.m_oCoordTransform.ty -= _y_px;
 			shapeOverlayCtx.CalculateFullTransform();
 			
-			autoShapeTrack.Graphics.m_oCoordTransform.tx -= x_px;
-			autoShapeTrack.Graphics.m_oCoordTransform.ty -= y_px;
+			autoShapeTrack.Graphics.m_oCoordTransform.tx -= _x_px;
+			autoShapeTrack.Graphics.m_oCoordTransform.ty -= _y_px;
 			autoShapeTrack.Graphics.CalculateFullTransform();
 		}
 	}

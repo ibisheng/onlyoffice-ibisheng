@@ -1527,7 +1527,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			
 			_onResetLockedGraphicObjects: function () {
 				if (this.wb) {
-					this.wb.getWorksheet().objectRender.reseltLockedGraphicObjects();
+					this.wb.getWorksheet().objectRender.resetLockedGraphicObjects();
 				}
 			},
 			
