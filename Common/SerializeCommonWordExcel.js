@@ -1169,8 +1169,9 @@ function BinaryChartWriter(memory)
 		for(var i in NumCache)
 		{
 			var elem = NumCache[i];
+			var nIndex = i - 0;
 			if(null != elem)
-				this.bs.WriteItem(c_oSer_ChartSeriesNumCacheType.NumCacheItem, function(){oThis.WriteSeriesNumCacheValue(elem.val, elem.index);});
+				this.bs.WriteItem(c_oSer_ChartSeriesNumCacheType.NumCacheItem, function(){oThis.WriteSeriesNumCacheValue(elem.val, nIndex);});
 		}
 	}
 	this.WriteSeriesNumCacheValue = function(val, index)
@@ -1814,12 +1815,14 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 			res = this.bcr.Read1(length, function(t,l){
 					return oThis.ReadSeriesNumCache(t,l, seria.xVal);
 				});
+			this.PrepareNumCachePost(seria.xVal, "0");
 		}
 		else if ( c_oSer_ChartSeriesType.Val === type )
 		{
 			res = this.bcr.Read1(length, function(t,l){
 					return oThis.ReadSeriesNumCache(t,l, seria.Val);
 				});
+			this.PrepareNumCachePost(seria.Val, "0");
 		}
 		else if ( c_oSer_ChartSeriesType.Tx === type )
 			seria.TxCache.Tx = this.stream.GetString2LE(length);
@@ -1872,11 +1875,28 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
             res = this.bcr.Read1(length, function(t,l){
 					return oThis.ReadSeriesNumCache(t,l, seria.Cat);
 				});
+			this.PrepareNumCachePost(seria.Cat, "");
 		}
 		else
             res = c_oSerConstants.ReadUnknown;
 		return res;
 	};
+	this.PrepareNumCachePost = function(val, sDefVal)
+	{
+		var bbox = this.parseDataFormula(val);
+		var oNumCache = val.NumCache;
+		if(null != bbox && null != oNumCache)
+		{
+			var width = bbox.r2 - bbox.r1 + 1;
+			var height = bbox.c2 - bbox.c1 + 1;
+			var nLength = Math.max(width, height);
+			for(var i = 0; i < nLength; i++)
+			{
+				if(null == oNumCache[i])
+					oNumCache[i] = { numFormatStr: "General", isDateTimeFormat: false, val: sDefVal, isHidden: false };
+			}
+		}
+	}
 	this.ReadSeriesNumCache = function(type, length, Val)
 	{
         var res = c_oSerConstants.ReadOk;
@@ -1905,7 +1925,7 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
         var oThis = this;
         if ( c_oSer_ChartSeriesNumCacheType.NumCacheVal === type )
 		{
-			var oNewVal = {val: this.stream.GetString2LE(length), index: aValues.length};
+			var oNewVal = { numFormatStr: "General", isDateTimeFormat: false, val: this.stream.GetString2LE(length), isHidden: false };
 			aValues.push(oNewVal);
 		}
 		else
@@ -1923,7 +1943,7 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 					return oThis.ReadSeriesNumCacheValuesItem(t,l, oNewVal);
 				});
 			if(null != oNewVal.index)
-				aValues[oNewVal.index] = oNewVal;
+				aValues[oNewVal.index] = { numFormatStr: "General", isDateTimeFormat: false, val: oNewVal.val, isHidden: false };
 		}
 		else
             res = c_oSerConstants.ReadUnknown;
