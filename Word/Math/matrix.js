@@ -117,8 +117,8 @@ CMathMatrix.prototype.setRuleGap = function(space, rule, gap, minGap)
 
     if(minGap == minGap - 0 && minGap == minGap^0)
         space.minGap = gap;
-    else
-        space.minGap = 0;
+    /*else
+        space.minGap = 0;*/
 
 
     /*var Value = 0, Rule;
@@ -450,4 +450,26 @@ CMathMatrix.prototype.baseJustification = function(type)
 
 }
 ////
+
+
+////
+function CEqArray()
+{
+    CMathMatrix.call(this);
+}
+extend(CEqArray, CMathMatrix);
+CEqArray.prototype.init = function(props)
+{
+    var prps =
+    {
+        column:     props.column,
+        row:        props.row,
+        baseJc:     "center",
+        rSpRule:    4,
+        rSp:        0
+
+    };
+
+    CEqArray.superclass.init.call(this, prps);
+}
 

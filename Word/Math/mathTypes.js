@@ -11,6 +11,7 @@ var MATH_BORDER_BOX         	=  9;
 var MATH_LIMIT              	= 10;
 var MATH_MATRIX             	= 11;
 var MATH_BOX                	= 12;
+var MATH_EQ_ARRAY              = 13;
 
 var BAR_FRACTION            	=  0;
 var SKEWED_FRACTION         	=  1;

@@ -458,6 +458,9 @@ CMathContent.prototype =
                 case MATH_BOX:
                     mathElem = new CBox();
                     break;
+                case MATH_EQ_ARRAY:
+                    mathElem = new CEqArray()
+                    break;
 
             }
 
@@ -3067,21 +3070,42 @@ CMathContent.prototype =
                     break;
 
                 case 79:
-                    var sigma = this.addMComponent(8);
-                    sigma.init(6,0,2);
-                    var iter = sigma.getLowerIterator();
-                    iter.addTxt("k");
-                    var delim = sigma.getBase().addMComponent(9);
-                    delim.init(0, 4, 0, 1);
-                    var fract = delim.getBase().addMComponent(0);
-                    fract.init();
-                    fract.hideBar(true);
+                    var sigma = this.addMComponent(MATH_NARY);
+                    var props =
+                    {
+                        signType:       NARY_SIGMA,
+                        limLocType:     NARY_UndOvr,
+                        subHide:        true
+                    };
+                    sigma.init(props);
+                    var iterLow = sigma.getLowerIterator();
+                    iterLow.addTxt("k");
+
+                    var base = sigma.getBase();
+                    var delim = base.addMComponent(MATH_DELIMITER);
+                    props =
+                    {
+                        begChr:        {type:  PARENTHESIS_LEFT},
+                        endChr:        {type:  PARENTHESIS_RIGHT},
+                        shapeType:     DELIMITER_SHAPE_MATH,
+                        column:        1
+
+                    };
+                    delim.init(props);
+
+                    var base2 = delim.getBase();
+                    var fract = base2.addMComponent(MATH_FRACTION);
+                    props =
+                    {
+                        type:   NO_BAR_FRACTION
+                    };
+                    fract.init(props);
                     var num = fract.getNumerator();
                     num.addTxt("n");
+
                     var den = fract.getDenominator();
                     den.addTxt("k");
                     break;
-
                 case 80:
                     var sigma = this.addMComponent(MATH_NARY);
                     var props =
@@ -3119,10 +3143,50 @@ CMathContent.prototype =
                     iter.addTxt("k");
                     break;
                 case 82:
+                    var nary = this.addMComponent(MATH_NARY);
+                    var props =
+                    {
+                        signType:       NARY_SIGMA,
+                        limLocType:     NARY_UndOvr,
+                        subHide:        true
+                    };
+                    nary.init(props);
+                    var base = nary.getBase();
+                    base.addTxt("P");
+                    var delim = base.addMComponent(MATH_DELIMITER);
+                    props =
+                    {
+                        begChr:     {type:  PARENTHESIS_LEFT},
+                        endChr:     {type:  PARENTHESIS_RIGHT},
+                        shapeType:  DELIMITER_SHAPE_MATH,
+                        column:     1
+                    };
+                    delim.init(props);
+                    var base2 = delim.getBase();
+                    base2.addTxt("i, j");
+
+                    var iter = nary.getLowerIterator();
+                    var eqqArray = iter.addMComponent(MATH_EQ_ARRAY);
+                    props =
+                    {
+                        column:     1,
+                        row:        2
+                    };
+                    eqqArray.init(props);
+                    var upArr = eqqArray.getElement(0, 0);
+                    upArr.addTxt("0≤ i ≤ m");
+                    var lowArr = eqqArray.getElement(1, 0);
+                    lowArr.addTxt("0<j<n");
+
                     break;
                 case 83:
-                    var union = this.addMComponent(8);
-                    union.init(9,0,3);
+                    var union = this.addMComponent(MATH_NARY);
+                    var props =
+                    {
+                        signType:       NARY_UNION,
+                        limLocType:     NARY_UndOvr
+                    };
+                    union.init(props);
 
                     var iterUp = union.getUpperIterator();
                     iterUp.addTxt("m");
@@ -3130,13 +3194,23 @@ CMathContent.prototype =
                     iterLow.addTxt("n=1");
 
                     var base = union.getBase();
-                    var delim = base.addMComponent(9);
-                    delim.init(0, 4, 0, 1);
+                    var delim = base.addMComponent(MATH_DELIMITER);
+                    props =
+                    {
+                        begChr:        {type:  PARENTHESIS_LEFT},
+                        endChr:        {type:  PARENTHESIS_RIGHT},
+                        shapeType:     DELIMITER_SHAPE_MATH,
+                        column:        1
+                    };
+                    delim.init(props);
                     var base2 = delim.getBase();
 
-                    var degrX = base2.addMComponent(3);
-                    degrX.init();
-                    degrX.setIndex(-1);
+                    var degrX = base2.addMComponent(MATH_DEGREE);
+                    props =
+                    {
+                        type:   DEGREE_SUBSCRIPT
+                    };
+                    degrX.init(props);
 
                     var baseX = degrX.getBase();
                     baseX.addTxt("X");
@@ -3145,9 +3219,8 @@ CMathContent.prototype =
 
                     base2.addTxt("∩");
 
-                    var degrY = base2.addMComponent(3);
-                    degrY.init();
-                    degrY.setIndex(-1);
+                    var degrY = base2.addMComponent(MATH_DEGREE);
+                    degrY.init(props);
 
                     var baseY = degrY.getBase();
                     baseY.addTxt("Y");
@@ -4225,21 +4298,23 @@ CMathContent.prototype =
                 case 177:
                     break;
                 case 178:
-                    var struct = this.addMComponent(22); // logaithm
-                    struct.setDimension(1,2);
-                    struct.setContent();
-                    var first = struct.getElement(0,0);
-                    var degr = first.addMComponent(3);
-                    degr.init();
-                    degr.setIndex(-1);
+                    var func = this.addMComponent(MATH_FUNCTION);
+                    func.init();
+
+                    var arg = func.getArgument();
+                    arg.fillPlaceholders();
+                    var log = func.getFName();
+                    var degr = log.addMComponent(MATH_DEGREE);
+                    var props =
+                    {
+                        type:   DEGREE_SUBSCRIPT
+                    };
+                    degr.init(props);
+
                     var base = degr.getBase();
-                    base.setOwnTPrp({Italic: false});
                     base.addTxt("log");
                     var iter = degr.getIterator();
                     iter.fillPlaceholders();
-
-                    var second = struct.getElement(0,1);
-                    second.fillPlaceholders();
                     break;
                 case 179:
                     var log = this.addMComponent(MATH_FUNCTION);
@@ -4303,34 +4378,94 @@ CMathContent.prototype =
                     arg.fillPlaceholders();
                     break;
                 case 184:
-                    var minimax = this.addMComponent(19);
-                    minimax.init();
-                    var base = minimax.getFunction();
-                    base.addTxt("lim");
-                    var iter = minimax.getIterator();
+                    var func = this.addMComponent(MATH_FUNCTION);
+                    func.init();
+                    var fName = func.getFName();
+                    var limit = fName.addMComponent(MATH_LIMIT);
+                    var props =
+                    {
+                        type:   LIMIT_LOW
+                    };
+                    limit.init(props);
+                    var iter = limit.getIterator();
                     iter.addTxt("n→∞");
-                    var arg = minimax.getArgument();
-                    var degr = arg.addMComponent(3);
-                    degr.init();
-                    degr.setIndex(1);
+                    var fName2 = limit.getFName();
+                    fName2.addTxt("lim");
 
+                    var arg = func.getArgument();
+                    var degr = arg.addMComponent(MATH_DEGREE);
+                    props =
+                    {
+                        type:   DEGREE_SUPERSCRIPT
+                    };
+                    degr.init(props);
+                    var iter2 = degr.getIterator();
+                    iter2.addTxt("n");
                     var base = degr.getBase();
-                    var delim = base.addMComponent(9);
-                    delim.init(0, 4, 0, 1);
-                    var separ = delim.getBase();
-                    separ.addTxt("1+");
-                    var fract = separ.addMComponent(0);
-                    fract.init();
-                    var num = fract.getNumerator();
+                    var delim = base.addMComponent(MATH_DELIMITER);
+                    props =
+                    {
+                        begChr:        {type:  PARENTHESIS_LEFT},
+                        endChr:        {type:  PARENTHESIS_RIGHT},
+                        shapeType:     DELIMITER_SHAPE_MATH,
+                        column:        1
+                    };
+                    delim.init(props);
+                    base2 = delim.getBase();
+                    base2.addTxt("1+");
+                    var frac = base2.addMComponent(MATH_FRACTION);
+                    props =
+                    {
+                        type:   BAR_FRACTION
+                    };
+                    frac.init(props);
+                    var num = frac.getNumerator();
                     num.addTxt("1");
-                    var den = fract.getDenominator();
-                    den.addTxt("n");
 
-                    var dgIter = degr.getIterator();
-                    dgIter.addTxt("n");
+                    var den = frac.getDenominator();
+                    den.addTxt("n");
                     break;
                 case 185:
-                    var minimax = this.addMComponent(19);
+                    var func = this.addMComponent(MATH_FUNCTION);
+                    func.init();
+                    var fName = func.getFName();
+                    var max = fName.addMComponent(MATH_LIMIT);
+                    var props =
+                    {
+                        type:   LIMIT_LOW
+                    };
+                    max.init(props);
+                    var fName2 = max.getFName();
+                    fName2.addTxt("max");
+                    var iter = max.getIterator();
+                    iter.addTxt("0≤x≤1");
+
+                    var arg = func.getArgument();
+                    arg.addTxt("x");
+                    var degr = arg.addMComponent(MATH_DEGREE);
+                    props =
+                    {
+                        type:   DEGREE_SUPERSCRIPT
+                    };
+                    degr.init(props);
+                    var base = degr.getBase();
+                    base.addTxt("e");
+
+                    var iter2 = degr.getIterator();
+                    iter2.addTxt("-");
+                    var degr2 = iter2.addMComponent(MATH_DEGREE);
+                    props =
+                    {
+                        type:   DEGREE_SUPERSCRIPT
+                    };
+                    degr2.init(props);
+                    var base2 = degr2.getBase();
+                    base2.addTxt("x");
+                    var iter3 = degr2.getIterator();
+                    iter3.addTxt("2");
+
+
+                    /*var minimax = this.addMComponent(19);
                     minimax.init();
                     var base = minimax.getFunction();
                     base.addTxt("max");
@@ -4351,7 +4486,7 @@ CMathContent.prototype =
                     var base2 = degr2.getBase();
                     base2.addTxt("x");
                     var iter2 = degr2.getIterator();
-                    iter2.addTxt("2");
+                    iter2.addTxt("2");*/
                     break;
                 case 186:
                     var base = this.addMComponent(22);
