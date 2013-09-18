@@ -1332,10 +1332,7 @@
 			
 				// shapes
 				var graphicsInfo = t.handlers.trigger("getGraphicsInfo", coord.x, coord.y);
-				if ( graphicsInfo && graphicsInfo.isGraphicObject )
-					asc["editor"].isStartAddShape = true;
-				
-				if ( asc["editor"].isStartAddShape ) {
+				if ( graphicsInfo && graphicsInfo.isGraphicObject ) {
 					event.ClickCount = 2;
 					t.handlers.trigger("graphicObjectMouseDown", event, coord.x, coord.y);
 					return;
