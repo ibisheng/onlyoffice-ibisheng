@@ -1577,7 +1577,7 @@ CGroupShape.prototype =
 
     Write_ToBinary2: function(w)
     {
-        w.WriteLng(historyitem_type_GroupShapes);
+        w.WriteLong(historyitem_type_GroupShapes);
         w.WriteString2(this.Id);
     },
 
