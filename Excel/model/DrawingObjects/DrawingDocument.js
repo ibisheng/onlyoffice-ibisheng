@@ -3704,7 +3704,7 @@ function CDrawingDocument(drawingObjects)
     }
     this.SelectShow = function()
     {
-        //this.drawingObjects.OnUpdateOverlay();
+        this.drawingObjects.OnUpdateOverlay();
     }
 
     this.Set_RulerState_Table = function(markup, transform)
