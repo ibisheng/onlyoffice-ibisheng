@@ -6889,6 +6889,7 @@
 						History.SetSelection(arnFrom.clone());
 						History.SetSelectionRedo(arnTo.clone());
 						History.StartTransaction();
+						t.autoFilters._preMoveAutoFilters(t, arnFrom);
 						t.model._moveRange(arnFrom, arnTo, copyRange);
 						t._updateCellsRange(arnTo);
 						t.cleanSelection();

@@ -1759,8 +1759,6 @@
 			Undo: function (type, data) {
 				var ws  = data.worksheet;
 				var aWs = this._getCurrentWS(ws);
-				var moveTo = data.moveTo ? data.moveTo : null;
-				var moveFrom = data.moveFrom ? data.moveFrom : null;
 				data = data.undo;
 				var cloneData = Asc.clone(data);
 				if(!cloneData)
@@ -1779,11 +1777,8 @@
 						}
 					}
 				}
-				if(type == 6)
-				{
-					this._moveAutoFilters(ws, moveFrom, moveTo, data);
-				}
-				else if(cloneData.FilterColumns || cloneData.AutoFilter || cloneData.result)
+
+				if(cloneData.FilterColumns || cloneData.AutoFilter || cloneData.result)
 				{
 					if(cloneData.Ref)
 					{
@@ -5451,6 +5446,15 @@
 			{
 				//проверяем покрывает ли диапазон хотя бы один автофильтр
 				var aWs = this._getCurrentWS(ws);
+				if(arnTo == null && arnFrom == null && data)
+				{
+					arnTo = data.moveFrom ? data.moveFrom : null;
+					arnFrom = data.moveTo ? data.moveTo : null;
+					data = data.undo;
+					if(arnTo == null || arnFrom == null)
+						return;
+				}
+				
 				var findFilters = this._searchFiltersInRange(arnFrom , aWs);
 				if(findFilters)
 				{
@@ -5465,7 +5469,9 @@
 					//у найденных фильтров меняем Ref + скрытые строчки открываем
 					for(var i = 0; i < findFilters.length; i++)
 					{
-						oCurFilter = Asc.clone(findFilters[i])
+						if(!oCurFilter)
+							oCurFilter = [];
+						oCurFilter[i] = Asc.clone(findFilters[i])
 						ref = findFilters[i].Ref;
 						range = this._refToRange(ref);
 						newRange = Asc.Range(range.c1 + diffCol, range.r1 + diffRow, range.c2 + diffCol, range.r2 + diffRow);
@@ -5476,8 +5482,12 @@
 							
 						if(!data && findFilters[i].AutoFilter && findFilters[i].AutoFilter.FilterColumns)
 							delete findFilters[i].AutoFilter.FilterColumns;
-						else if(data && data.AutoFilter && data.AutoFilter.FilterColumns)
-							findFilters[i].AutoFilter.FilterColumns = data.AutoFilter.FilterColumns;
+						else if(!data && findFilters[i] && findFilters[i].FilterColumns)
+							delete findFilters[i].FilterColumns;
+						else if(data && data[i] && data[i].AutoFilter && data[i].AutoFilter.FilterColumns)
+							findFilters[i].AutoFilter.FilterColumns = data[i].AutoFilter.FilterColumns;
+						else if(data && data[i] && data[i].FilterColumns)
+							findFilters[i].FilterColumns = data[i].FilterColumns;
 							
 						//при перемещении меняем массив кнопок
 						if(this.allButtonAF)
@@ -5930,6 +5940,43 @@
 					result = this._rangeToId(range);
 				}
 				return result;
+			},
+			
+			_preMoveAutoFilters: function(ws, arnFrom)
+			{
+				var aWs = this._getCurrentWS(ws);
+				var findFilters = this._searchFiltersInRange(arnFrom , aWs);
+				if(findFilters)
+				{
+					for(var i = 0; i < findFilters.length; i++)
+					{
+						this._openHiddenRows(ws,findFilters[i]);
+					}
+				}
+				this._reDrawFilters(ws);
+			},
+			//открываем строки скрытые данным фильтром
+			_openHiddenRows: function(ws, filter)
+			{
+				if(filter && this.allButtonAF)
+				{
+					var buttons = this.allButtonAF;
+					for(var n = 0; n < buttons.length; n++)
+					{
+						if(((filter.AutoFilter && buttons[n].inFilter == filter.AutoFilter.Ref) || buttons[n].inFilter == filter.Ref) && buttons[n].hiddenRows.length)
+						{
+							
+							var arrHiddens = buttons[n].hiddenRows;
+							for(var row = 0; row < arrHiddens.length; row++)
+							{
+								if(arrHiddens[row] != undefined && arrHiddens[row] == true)
+								{
+									ws.model.setRowHidden(/*bHidden*/false, row, row);
+								}
+							}
+						}
+					}
+				}
 			}
 		};
 

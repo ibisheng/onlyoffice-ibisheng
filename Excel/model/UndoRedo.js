@@ -3218,7 +3218,12 @@ UndoRedoWoorksheet.prototype = {
                 }
 				this.wb.needRecalc = rec;
 				recalc(this.wb);
-			
+				if(g_oUndoRedoAutoFiltersMoveData)
+				{
+					var worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
+					worksheetView.autoFilters._moveAutoFilters(worksheetView ,null, null, g_oUndoRedoAutoFiltersMoveData);
+					g_oUndoRedoAutoFiltersMoveData = null;
+				}
 			}
 			else{
 					
@@ -3509,6 +3514,7 @@ UndoRedoComment.prototype = {
 }
 
 var g_oUndoRedoAutoFilters = null;
+var g_oUndoRedoAutoFiltersMoveData = null;
 function UndoRedoAutoFilters(wb){
 	this.wb = wb;
 	this.nType = UndoRedoClassTypes.Add(function(){return g_oUndoRedoAutoFilters;});
@@ -3527,6 +3533,11 @@ UndoRedoAutoFilters.prototype = {
 		var api = window["Asc"]["editor"];
 		if (!api.wb)
 			return;
+		if(bUndo && Type == 6)
+		{
+			g_oUndoRedoAutoFiltersMoveData = Data;
+			return;
+		}
 		var ws = api.wb.getWorksheetById(nSheetId);
 		Data.worksheet = ws;
 		var autoFilters = ws.autoFilters;
