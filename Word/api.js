@@ -4801,7 +4801,7 @@ asc_docs_api.prototype.AddImageUrlAction = function(url, imgProp)
     }
     else
     {
-        this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
+        this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
         this.asyncImageEndLoaded2 = function(_image)
         {
             var _w = Math.max(1, Page_Width - (X_Left_Margin + X_Right_Margin));
@@ -4846,7 +4846,7 @@ asc_docs_api.prototype.AddImageUrlAction = function(url, imgProp)
                     this.WordControl.m_oLogicDocument.Add_InlineImage(_w, _h, src, null, true);
             }
 
-            this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
+            this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 
             this.asyncImageEndLoaded2 = null;
         }
@@ -4999,7 +4999,7 @@ asc_docs_api.prototype.ShapeApply = function(shapeProps)
         }
         else
         {
-            this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
+            this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 
             var oProp = shapeProps;
             this.asyncImageEndLoaded2 = function(_image)
@@ -5007,7 +5007,7 @@ asc_docs_api.prototype.ShapeApply = function(shapeProps)
                 this.WordControl.m_oLogicDocument.ShapeApply(oProp);
                 this.WordControl.m_oDrawingDocument.DrawImageTextureFillShape(image_url);
 
-                this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
+                this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
                 this.asyncImageEndLoaded2 = null;
             }
         }
@@ -5626,7 +5626,7 @@ asc_docs_api.prototype.asyncFontsDocumentStartLoaded = function()
 	// здесь прокинуть евент о заморозке меню
 	// и нужно вывести информацию в статус бар
     if (this.isPasteFonts_Images)
-        this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
+        this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadFont);
     else if (this.isSaveFonts_Images)
         this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
     else
@@ -5667,7 +5667,7 @@ asc_docs_api.prototype.asyncFontsDocumentEndLoaded = function()
 {
     // все, шрифты загружены. Теперь нужно подгрузить картинки
     if (this.isPasteFonts_Images)
-        this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
+        this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadFont);
     else if (this.isSaveFonts_Images)
         this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
     else
@@ -5683,7 +5683,7 @@ asc_docs_api.prototype.asyncFontsDocumentEndLoaded = function()
         if (_count > 0)
         {
             this.EndActionLoadImages = 2;
-            this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
+            this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
         }
 
         var _oldAsyncLoadImages = this.ImageLoader.bIsAsyncLoadDocumentImages;
@@ -5888,7 +5888,10 @@ asc_docs_api.prototype.asyncImagesDocumentEndLoaded = function()
     }
     else if (this.EndActionLoadImages == 2)
     {
-        this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
+        if (this.isPasteFonts_Images)
+            this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+        else
+            this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadImage);
     }
 
     this.EndActionLoadImages = 0;

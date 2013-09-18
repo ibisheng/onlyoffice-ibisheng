@@ -1451,6 +1451,8 @@ function CEditorPage(api)
         //    return;
 
         var oWordControl = oThis;
+        if (!global_mouseEvent.IsLocked)
+            return;
 
         if (oWordControl.DemonstrationManager.Mode)
         {

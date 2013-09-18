@@ -1610,6 +1610,8 @@ function CEditorPage(api)
         //    return;
 
         var oWordControl = oThis;
+        if (!global_mouseEvent.IsLocked)
+            return;
 
         if (this.id == "id_viewer" && oThis.m_oOverlay.HtmlElement.style.display == "block" && undefined == bIsWindow)
             return;
