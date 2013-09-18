@@ -1850,27 +1850,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				var hideWorksheetCallback = function (res) {
 					if (res) {
 						t.wbModel.getWorksheet(activeWorksheet).setHidden(true);
-						// Покажем следующий лист или предыдущий (если больше нет)
-						var i, ws;
-						for (i = activeWorksheet + 1; i < countWorksheets; ++i) {
-							ws = model.getWorksheet(i);
-							if (false === ws.getHidden()) {
-								t.asc_showWorksheet (i);
-								// Посылаем callback об изменении списка листов
-								t.sheetsChanged();
-								return;
-							}
-						}
-						// Не нашли справа, ищем слева от текущего
-						for (i = activeWorksheet - 1; i >= 0; --i) {
-							ws = model.getWorksheet(i);
-							if (false === ws.getHidden()) {
-								t.asc_showWorksheet (i);
-								// Посылаем callback об изменении списка листов
-								t.sheetsChanged();
-								return;
-							}
-						}
 					}
 				};
 

@@ -2533,21 +2533,21 @@ Woorksheet.prototype.setHidden=function(hidden){
 	{
 		//выбираем новый активный
 		var activeWorksheet = this.getIndex();
-		var countWorksheets = this.workbook.getWorksheetCount()
-		for (var i = activeWorksheet + 1; i < countWorksheets; ++i) {
-			var ws = this.workbook.getWorksheet(i);
-			if (false === ws.getHidden())
-			{
-				this.workbook.setActive(i);
+		var countWorksheets = this.workbook.getWorksheetCount();
+		// Покажем следующий лист или предыдущий (если больше нет)
+		var i, ws;
+		for (i = activeWorksheet + 1; i < countWorksheets; ++i) {
+			ws = this.workbook.getWorksheet(i);
+			if (false === ws.getHidden()) {
+				this.workbook.handlers.trigger("undoRedoHideSheet", i);
 				return;
 			}
 		}
 		// Не нашли справа, ищем слева от текущего
-		for (var i = activeWorksheet - 1; i >= 0; --i) {
-			var ws = this.workbook.getWorksheet(i);
-			if (false === ws.getHidden())
-			{
-				this.workbook.setActive(i);
+		for (i = activeWorksheet - 1; i >= 0; --i) {
+			ws = this.workbook.getWorksheet(i);
+			if (false === ws.getHidden()) {
+				this.workbook.handlers.trigger("undoRedoHideSheet", i);
 				return;
 			}
 		}

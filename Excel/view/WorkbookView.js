@@ -319,6 +319,11 @@
 						}
 					}
 				});
+				this.model.handlers.add("undoRedoHideSheet", function (sheetId) {
+					self.showWorksheet(sheetId);
+					// Посылаем callback об изменении списка листов
+					self.handlers.trigger("asc_onSheetsChanged");
+				});
 				
 
 				this.input
