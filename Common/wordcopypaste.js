@@ -2535,6 +2535,7 @@ PasteProcessor.prototype =
                     Item.Internal_Content_Add(nContentPos, new ParaTextPr(TextPr));
                 }
 				Item.RecalcInfo.Set_Type_0(pararecalc_0_All);
+				Item.RecalcInfo.Set_Type_0_Spell(pararecalc_0_Spell_All);
                 this.oRecalcDocument.ContentLastChangePos = this.oRecalcDocument.CurPos.ContentPos;
             }
             else
@@ -2605,6 +2606,8 @@ PasteProcessor.prototype =
                     LastPosCurDoc--;
                 }
                 this.oRecalcDocument.ContentLastChangePos = LastPos;
+				Item.RecalcInfo.Set_Type_0(pararecalc_0_All);
+				Item.RecalcInfo.Set_Type_0_Spell(pararecalc_0_Spell_All);
                 oDoc.CurPos.ContentPos = LastPosCurDoc;
             }
         }
@@ -2775,13 +2778,13 @@ PasteProcessor.prototype =
 				function() {
 					if(false == oThis.bNested)
 					{
+						editor.WordControl.m_oLogicDocument.DrawingObjects.calculateAfterOpen();
 						oThis.InsertInDocument();
 						node.blur();
 						node.style.display  = ELEMENT_DISPAY_STYLE;
 						if(aContent.bAddNewStyles)
 							oThis.api.GenerateStyles();
 					}
-					editor.WordControl.m_oLogicDocument.DrawingObjects.calculateAfterOpen();
 				});
 				return;
 			}
