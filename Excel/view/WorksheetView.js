@@ -4055,11 +4055,12 @@
 							isActive !== undefined ? isActive : false);
 				}
 
-				var cc = self._fetchCellCache(col, row),
-				cb = cc.borders = ( cc.borders || {} ),
-				mc = this._getMergedCellsRange(col, row);
+				var cc = self._fetchCellCache(col, row);
+				var cb = cc.borders = ( cc.borders || {} );
+				var mc;
 
 				if (!cb.l || !cb.r || !cb.t || !cb.b || !cb.dd || !cb.du) {
+					mc = this._getMergedCellsRange(col, row);
 					var b = self._getVisibleCell(col, row).getBorder();
 					if (!cb.l) {cb.l = !mc || col === mc.c1 ? makeBorder(b, kcbidLeft) : new CellBorder();}
 					if (!cb.r) {cb.r = !mc || col === mc.c2 ? makeBorder(b, kcbidRight) : new CellBorder();}
