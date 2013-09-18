@@ -192,7 +192,7 @@ function NullState(drawingObjectsController, drawingObjects)
                         else if(hit_in_text_rect)
                         {
                             this.drawingObjectsController.resetSelection();
-                            cur_grouped_object.select(this.drawingObjectsController);
+                            cur_drawing.select(this.drawingObjectsController);
                             grouped_objects[j].select(cur_grouped_object);
                             grouped_objects[j].selectionSetStart(e, x, y);
                             this.drawingObjectsController.changeCurrentState(new TextAddInGroup(this.drawingObjectsController, this.drawingObjects, cur_drawing, grouped_objects[j]));

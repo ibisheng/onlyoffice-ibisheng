@@ -1225,14 +1225,14 @@ DrawingObjectsController.prototype =
             {
                 if (this.curState.id === STATES_ID_TEXT_ADD)
                 {
-                    if(typeof this.curState.textObject.GraphicObj.setTextVerticalAlign === "function")
-                        this.curState.textObject.GraphicObj.setTextVerticalAlign(props.verticalTextAlign);
+                    if(typeof this.curState.textObject.setCellVertAlign === "function")
+                        this.curState.textObject.setCellVertAlign(props.verticalTextAlign);
                 }
 
                 if (this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP)
                 {
-                    if (typeof this.curState.textObject.setTextVerticalAlign === "function")
-                        this.curState.textObject.setTextVerticalAlign(props.verticalTextAlign);
+                    if (typeof this.curState.textObject.setCellVertAlign === "function")
+                        this.curState.textObject.setCellVertAlign(props.verticalTextAlign);
                 }
             }
             if ( !(this.curState.id === STATES_ID_GROUP || this.curState.id === STATES_ID_TEXT_ADD_IN_GROUP) )

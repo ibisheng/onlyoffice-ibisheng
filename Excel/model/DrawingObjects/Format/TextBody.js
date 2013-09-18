@@ -723,24 +723,31 @@ CTextBody.prototype =
     setVerticalAlign: function(align)
     {
         var anchor_num = null;
-        switch(align)
+        if(typeof align === "string")
         {
-            case "top":
+            switch(align)
             {
-                anchor_num = VERTICAL_ANCHOR_TYPE_TOP;
-                break;
-            }
-            case "center":
-            {
-                anchor_num = VERTICAL_ANCHOR_TYPE_CENTER;
-                break;
-            }
+                case "top":
+                {
+                    anchor_num = VERTICAL_ANCHOR_TYPE_TOP;
+                    break;
+                }
+                case "center":
+                {
+                    anchor_num = VERTICAL_ANCHOR_TYPE_CENTER;
+                    break;
+                }
 
-            case "bottom":
-            {
-                anchor_num = VERTICAL_ANCHOR_TYPE_BOTTOM;
-                break;
+                case "bottom":
+                {
+                    anchor_num = VERTICAL_ANCHOR_TYPE_BOTTOM;
+                    break;
+                }
             }
+        }
+        else
+        {
+            anchor_num = align;
         }
         if(isRealNumber(anchor_num))
         {
