@@ -54,6 +54,13 @@ function CTransitionAnimation(htmlpage)
         var _page = this.HtmlPage;
 
         var w = _page.m_oEditor.HtmlElement.width;
+        var _px_h = _page.m_oEditor.HtmlElement.height;
+        if (this.HtmlPage.bIsRetinaSupport)
+        {
+            w >>= 1;
+            _px_h >>= 1;
+        }
+
         var h = (((_page.m_oBody.AbsolutePosition.B - _page.m_oBody.AbsolutePosition.T) -
             (_page.m_oTopRuler.AbsolutePosition.B - _page.m_oTopRuler.AbsolutePosition.T)) * g_dKoef_mm_to_pix) >> 0;
 
@@ -82,10 +89,10 @@ function CTransitionAnimation(htmlpage)
         var _hor_width_left = Math.min(0, _centerX - (_centerSlideX) - _page.SlideDrawer.CONST_BORDER);
         var _hor_width_right = Math.max(w - 1, _centerX + (_slideW - _centerSlideX) + _page.SlideDrawer.CONST_BORDER);
 
-        var _centerY = (_page.m_oEditor.HtmlElement.height / 2) >> 0;
+        var _centerY = (_px_h / 2) >> 0;
         var _centerSlideY = (dKoef * _page.m_oLogicDocument.Height / 2) >> 0;
         var _ver_height_top = Math.min(0, _centerY - _centerSlideY - _page.SlideDrawer.CONST_BORDER);
-        var _ver_height_bottom = Math.max(_page.m_oEditor.HtmlElement.height - 1, _centerX + (_slideH - _centerSlideY) + _page.SlideDrawer.CONST_BORDER);
+        var _ver_height_bottom = Math.max(_px_h - 1, _centerX + (_slideH - _centerSlideY) + _page.SlideDrawer.CONST_BORDER);
 
         this.Rect.x = _centerX - _centerSlideX - _hor_width_left;
         this.Rect.y = _centerY - _centerSlideY - _ver_height_top;
@@ -234,6 +241,12 @@ function CTransitionAnimation(htmlpage)
         this.StartTime = new Date().getTime();
         this.EndTime = this.StartTime + this.Duration;
 
+        if (this.HtmlPage.bIsRetinaSupport)
+        {
+            var ctx1 = oThis.HtmlPage.m_oEditor.HtmlElement.getContext('2d');
+            ctx1.setTransform(2, 0, 0, 2, 0, 0);
+        }
+
         switch (this.Type)
         {
             case c_oAscSlideTransitionTypes.Fade:
@@ -300,6 +313,10 @@ function CTransitionAnimation(htmlpage)
 
         this.CacheImage1.Image = null;
         this.CacheImage2.Image = null;
+
+        var ctx1 = this.HtmlPage.m_oEditor.HtmlElement.getContext('2d');
+        ctx1.setTransform(1, 0, 0, 1, 0, 0);
+        
         this.HtmlPage.OnScroll();
     }
 
