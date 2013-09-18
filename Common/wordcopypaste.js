@@ -339,6 +339,7 @@ function CopyProcessor(api, ElemToSelect)
     this.bOccurEndPar;
     this.oCurHyperlink = null;
     this.oCurHyperlinkElem = null;
+    this.oPresentationWriter = new CBinaryFileWriter();
 };
 CopyProcessor.prototype =
 {
@@ -1577,7 +1578,7 @@ CopyProcessor.prototype =
                         {
                             var s_arr = oDocument.DrawingObjects.curState.group.selectionInfo.selectionArray;
 
-                            this.Para = document.createElement( "span" );
+                            this.Para = document.createElement( "p" );
                             this.InitRun();
 							
 							if(copyPasteUseBinery)
@@ -1728,29 +1729,64 @@ CopyProcessor.prototype =
         }
         else
         {
-            if ( oDocument.CurPos.Type == docpostype_FlowObjects )
+            var presentation = editor.WordControl.m_oLogicDocument;
+            var pasteString = "";
+            switch(editor.WordControl.Thumbnails.FocusObjType)
             {
-                var _cur_slide_elements = oDocument.Slides[oDocument.CurPage].elementsManipulator;
-                if(_cur_slide_elements.obj != undefined && _cur_slide_elements.obj.txBody && _cur_slide_elements.obj.txBody.content)
+                case FOCUS_OBJECT_MAIN:
                 {
-                    oDocument = _cur_slide_elements.obj.txBody.content;
-                    if ( true === oDocument.Selection.Use )
+                    var slide = presentation.Slides[presentation.CurPage];
+                    var graphicObjects = slide.graphicObjects;
+
+                    switch(graphicObjects.State.id)
                     {
-                        this.CopyDocument(this.ElemToSelect, oDocument, true);
-                    }
-                }
-                else
-                {
-                    if(_cur_slide_elements.obj != undefined && _cur_slide_elements.obj.graphicObject && _cur_slide_elements.obj.graphicObject.CurCell && _cur_slide_elements.obj.graphicObject.CurCell.Content)
-                    {
-                        oDocument = _cur_slide_elements.obj.graphicObject.CurCell.Content;
-                        if ( true === oDocument.Selection.Use )
+                        case STATES_ID_TEXT_ADD:
+                        case STATES_ID_TEXT_ADD_IN_GROUP:
                         {
-                            this.CopyDocument(this.ElemToSelect, oDocument, true);
+                            this.oPresentationWriter.WriteString2("TeamLab2");
+                            this.CopyPresentationText(this.ElemToSelect, graphicObjects.State.textObject.txBody.content, true);
+                            break;
+                        }
+                        default :
+                        {
+                            if(graphicObjects.selectedObjects.length > 0)
+                            {
+                                this.aInnerHtml = [];
+                                this.Para = document.createElement("p");
+                                this.oPresentationWriter.WriteString2("TeamLab2");
+                                this.oPresentationWriter.WriteULong(graphicObjects.selectedObjects.length);
+                                for(var i = 0; i < graphicObjects.selectedObjects.length; ++i)
+                                    this.CopyGraphicObject(this.ElemToSelect, graphicObjects.selectedObjects[i]);
+                                this.CommitSpan(false);
+                                for(var i = 0; i < this.Para.childNodes.length; i++)
+                                    this.ElemToSelect.appendChild( this.Para.childNodes[i].cloneNode(true));
+                            }
+                            break;
                         }
                     }
+                    break;
+                }
+                case FOCUS_OBJECT_THUMBNAILS :
+                {
+                    var selected_slides = editor.WordControl.Thumbnails.GetSelectedArray();
+                    if(selected_slides.length > 0)
+                    {
+                        this.aInnerHtml = [];
+                        this.Para = document.createElement( "p" );
+                        this.oPresentationWriter.WriteString2("TeamLab3");
+                        this.oPresentationWriter.WriteULong(selected_slides.length);
+                        for(var i = 0; i < selected_slides.length; ++i)
+                            this.CopySlide(this.ElemToSelect, editor.WordControl.m_oLogicDocument.Slides[selected_slides[i]]);
+                        this.CommitSpan(false);
+                        for(var i = 0; i < this.Para.childNodes.length; i++)
+                            this.ElemToSelect.appendChild( this.Para.childNodes[i].cloneNode(true) );
+                    }
+                    break;
                 }
             }
+            var sBase64 = this.oPresentationWriter.GetBase64Memory();
+            if(this.ElemToSelect.children[0])
+                $(this.ElemToSelect.children[0]).addClass("docData;" + sBase64);
         }
 		this.oBinaryFileWriter.CopyEnd();
 		if(copyPasteUseBinery && this.oBinaryFileWriter.copyParams.itemCount > 0)
@@ -1759,6 +1795,97 @@ CopyProcessor.prototype =
 			if(this.ElemToSelect.children[0])
 				$(this.ElemToSelect.children[0]).addClass("docData;" + sBase64);
 		}
+    },
+
+
+    CopySlide: function(oDomTarget, slide)
+    {
+        var sSrc = slide.getBase64Img();
+        if(sSrc.length > 0)
+        {
+            sSrc = this.getSrc(sSrc);
+            var _bounds_cheker = new CSlideBoundsChecker();
+            slide.draw(_bounds_cheker, 0);
+            this.aInnerHtml.push("<img width=\""+Math.round((_bounds_cheker.Bounds.max_x - _bounds_cheker.Bounds.min_x + 1) * g_dKoef_mm_to_pix)+"\" height=\""+Math.round((_bounds_cheker.Bounds.max_y - _bounds_cheker.Bounds.min_y + 1) * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />");
+            this.oPresentationWriter.WriteSlide(slide);
+        }
+    },
+
+    CopyPresentationText : function(oDomTarget, oDocument, bUseSelection)
+    {
+        var Start = 0;
+        var End = 0;
+        if(bUseSelection)
+        {
+            if ( true === oDocument.Selection.Use)
+            {
+                if ( selectionflag_DrawingObject === oDocument.Selection.Flag )
+                {
+                    this.Para = document.createElement( "p" );
+                    //������ ���� �������� ������ ���� ��������
+                    this.InitRun();
+                    this.ParseItem(oDocument.Selection.Data.DrawingObject);
+                    this.CommitSpan(false);
+
+                    for(var i = 0; i < this.Para.childNodes.length; i++)
+                        this.ElemToSelect.appendChild( this.Para.childNodes[i].cloneNode(true) );
+                }
+                else
+                {
+                    Start = oDocument.Selection.StartPos;
+                    End = oDocument.Selection.EndPos;
+                    if ( Start > End )
+                    {
+                        var Temp = End;
+                        End = Start;
+                        Start = Temp;
+                    }
+                }
+            }
+        }
+        else
+        {
+            Start = 0;
+            End = oDocument.Content.length - 1;
+        }
+        // HtmlText
+        for ( var Index = Start; Index <= End; Index++ )
+        {
+            var Item = oDocument.Content[Index];
+            if (type_Paragraph === Item.GetType())
+            {
+                var selectStart = Item.Selection.Use ? Item.Selection.StartPos : 0;
+                var selectEnd = Item.Selection.Use ? Item.Selection.EndPos : Item.Content.length;
+                this.oPresentationWriter.WriteParagraph(Item, selectStart, selectEnd);
+                this.CopyParagraph(oDomTarget, Item, Index == End, bUseSelection, oDocument.Content, Index);
+            }
+        }
+        this.CommitList(oDomTarget);
+    },
+
+
+    CopyGraphicObject: function(oDomTarget, oGraphicObj)
+    {
+        var sSrc = oGraphicObj.getBase64Img();
+        if(sSrc.length > 0)
+        {
+            sSrc = this.getSrc(sSrc);
+            var _bounds_cheker = new CSlideBoundsChecker();
+            oGraphicObj.draw(_bounds_cheker, 0);
+            this.aInnerHtml.push("<img width=\""+Math.round((_bounds_cheker.Bounds.max_x - _bounds_cheker.Bounds.min_x + 1) * g_dKoef_mm_to_pix)+"\" height=\""+Math.round((_bounds_cheker.Bounds.max_y - _bounds_cheker.Bounds.min_y + 1) * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />");
+            if(oGraphicObj instanceof CShape)
+            {
+                this.oPresentationWriter.WriteShape(oGraphicObj);
+            }
+            else if(oGraphicObj instanceof CImageShape)
+            {
+                this.oPresentationWriter.WriteImage(oGraphicObj);
+            }
+            else if(oGraphicObj instanceof CGroupShape)
+            {
+                this.oPresentationWriter.WriteGroupShape(oGraphicObj);
+            }
+        }
     }
 };
 
@@ -2379,6 +2506,8 @@ PasteProcessor.prototype =
     },
     InsertInPlace : function(oDoc, aNewContent)
     {
+        if(!g_bIsDocumentCopyPaste)
+            return;
         var nNewContentLength = aNewContent.length;
         //����� ���� �� Document.Add_NewParagraph
         var Item = oDoc.Content[oDoc.CurPos.ContentPos];

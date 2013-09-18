@@ -190,7 +190,8 @@ CTextBody.prototype =
     updateSelectionState: function(drawingDocument)
     {
         var Doc = this.content;
-        if ( true === Doc.Is_SelectionUse() && !Doc.Selection_IsEmpty()) {
+        if ( true === Doc.Is_SelectionUse() && !Doc.Selection_IsEmpty())
+        {
            drawingDocument.UpdateTargetTransform(this.shape.transformText);
             drawingDocument.TargetEnd();
             drawingDocument.SelectEnabled(true);

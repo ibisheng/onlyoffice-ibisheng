@@ -1660,38 +1660,45 @@ function RotateState(drawingObjectsController, drawingObjects, majorObject)
     this.onMouseUp = function(e, x, y)
     {
 
+        var isViewMode = this.drawingObjectsController.drawingObjects.isViewerMode();
+
         var arr_track_objects = [];
         for(var i = 0; i < this.drawingObjectsController.arrTrackObjects.length; ++i)
         {
             arr_track_objects.push(this.drawingObjectsController.arrTrackObjects[i]);
         }
 
-        var worksheet = this.drawingObjects.getWorksheet();        
-		this.drawingObjects.objectLocker.reset();
-        var track_objects = this.drawingObjectsController.arrTrackObjects;
-        for(i =0; i < track_objects.length; ++i)
+        if(!isViewMode)
         {
-			this.drawingObjects.objectLocker.addObjectId(track_objects[i].originalObject.Get_Id());
-        }
-        var track_objects2 = [];
-        for(i = 0; i < track_objects.length; ++i)
-        {
-            track_objects2.push(track_objects[i]);
-        }
+            var worksheet = this.drawingObjects.getWorksheet();
+            this.drawingObjects.objectLocker.reset();
+            var track_objects = this.drawingObjectsController.arrTrackObjects;
 
-        var drawingObjects = this.drawingObjects;
-        var callback = function(bLock)
-        {
-            if(bLock)
+
+            for(i =0; i < track_objects.length; ++i)
             {
-                History.Create_NewPoint();
-                for(var i = 0; i < track_objects2.length; ++i)
-                    track_objects2[i].trackEnd();
-                drawingObjects.showDrawingObjects(true);
-
+                this.drawingObjects.objectLocker.addObjectId(track_objects[i].originalObject.Get_Id());
             }
-        };        
-		this.drawingObjects.objectLocker.checkObjects(callback);
+            var track_objects2 = [];
+            for(i = 0; i < track_objects.length; ++i)
+            {
+                track_objects2.push(track_objects[i]);
+            }
+
+            var drawingObjects = this.drawingObjects;
+            var callback = function(bLock)
+            {
+                if(bLock)
+                {
+                    History.Create_NewPoint();
+                    for(var i = 0; i < track_objects2.length; ++i)
+                        track_objects2[i].trackEnd();
+                    drawingObjects.showDrawingObjects(true);
+
+                }
+            };
+            this.drawingObjects.objectLocker.checkObjects(callback);
+        }
 		
         //History.Create_NewPoint();
         //this.drawingObjectsController.trackEnd();

@@ -57,6 +57,13 @@ function CGroupShape(parent)
 CGroupShape.prototype =
 {
 
+
+    getBase64Img: function()
+    {
+        return ShapeToImageConverter(this, this.pageIndex).ImageUrl;
+    },
+
+
     setParent: function(parent)
     {
         History.Add(this, {Type:historyitem_SetShapeParent, Old: this.parent, New: parent});

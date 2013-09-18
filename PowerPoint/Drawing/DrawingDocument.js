@@ -4200,7 +4200,7 @@ function CThumbnailsManager()
         }
 
         check_KeyboardEvent(e);
-
+        var b_no_prevent_default = false;
         switch (global_keyboardEvent.KeyCode)
         {
             case 13:    // enter
@@ -4403,8 +4403,8 @@ function CThumbnailsManager()
             {
                 if(global_keyboardEvent.CtrlKey)
                 {
-                    var selectionArray = this.GetSelectedArray();
-                    return  this.m_oWordControl.m_oLogicDocument.slidesPaste(selectionArray[selectionArray.length -1]);
+                    Editor_Paste(editor, true);
+                    b_no_prevent_default = true;
                 }
                 break;
 
@@ -4414,7 +4414,8 @@ function CThumbnailsManager()
             {
                 if(global_keyboardEvent.CtrlKey)
                 {
-                    return  this.m_oWordControl.m_oLogicDocument.slidesCopy(this.GetSelectedArray());
+                    return Editor_Copy(editor);
+                    b_no_prevent_default = true;
                 }
                 break;
             }
@@ -4559,8 +4560,9 @@ function CThumbnailsManager()
                 break;
         }
 
-        e.preventDefault();
-        return false;
+       /* if(!(b_no_prevent_default === true))
+            e.preventDefault();      */
+        //return false;
     }
 }
 

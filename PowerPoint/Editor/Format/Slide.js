@@ -1434,6 +1434,11 @@ Slide.prototype =
         this.clrMap = clrMap;
     },
 
+    getBase64Img: function()
+    {
+        return ShapeToImageConverter(this, 0).ImageUrl;
+    },
+
     Undo: function(data)
     {
         switch(data.Type)

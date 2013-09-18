@@ -76,6 +76,14 @@ CChartTitle.prototype =
             return CHART_TITLE_TYPE_V_AXIS;
     },
 
+    setBodyPr: function(bodyPr)
+    {
+        if(isRealObject(this.txBody))
+        {
+            this.txBody.bodyPr = bodyPr;
+        }
+    },
+
     isEmpty: function()
     {
         return isRealObject(this.txBody) ? this.txBody.isEmpty() : true;

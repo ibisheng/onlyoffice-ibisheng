@@ -1610,6 +1610,8 @@ CChartAsGroup.prototype =
         }
     },
 
+
+
     getInvertTransform: function()
     {
         return this.invertTransform;

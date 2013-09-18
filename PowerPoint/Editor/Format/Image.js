@@ -421,6 +421,12 @@ CImageShape.prototype =
         return DRAWING_OBJECT_TYPE_IMAGE;
     },
 
+
+    getBase64Img: function()
+    {
+        return ShapeToImageConverter(this, this.pageIndex).ImageUrl;
+    },
+
     recalculateBrush: function()
     {
         this.brush = this.blipFill;
@@ -1117,6 +1123,8 @@ CImageShape.prototype =
         }
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
+
+
 
     Redo: function(data)
     {

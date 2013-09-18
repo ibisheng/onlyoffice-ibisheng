@@ -2055,7 +2055,7 @@ function CBinaryFileWriter()
         oThis.WriteRecordArray(2, 0, _content, oThis.WriteParagraph);
     };
 
-    this.WriteParagraph = function(paragraph)
+    this.WriteParagraph = function(paragraph, startPos, endPos)
     {
         var tPr = new CTextParagraphPr();
         if(paragraph.bullet)
@@ -2074,6 +2074,11 @@ function CBinaryFileWriter()
         oThis.WriteULong(0); // temp length
         var _count = 0;
 
+        var _par_content = paragraph.Content;
+
+        var start_pos = startPos != null ? startPos : 0;
+        var end_pos = endPos != undefined ? endPos : _par_content.length;
+
         if(paragraph.f_id != undefined || paragraph.f_type != undefined || paragraph.f_text!= undefined)
         {
             oThis.StartRecord(0); // subtype
@@ -2083,15 +2088,14 @@ function CBinaryFileWriter()
             _count++;
         }
         var _content_index;
-        var _par_content = paragraph.Content;
         var _cur_run_text = "";
 
-        _content_index = 0;
+        _content_index = start_pos;
         var _cur_run_text_pr = null;
 
         var hlinkObj = null;
 
-        while(_content_index < _par_content.length)
+        while(_content_index < end_pos)
         {
             switch (_par_content[_content_index].Type)
             {

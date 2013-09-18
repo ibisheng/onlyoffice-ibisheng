@@ -2170,6 +2170,12 @@ CShape.prototype =
         }
     },
 
+
+    getBase64Img: function()
+    {
+        return ShapeToImageConverter(this, this.pageIndex).ImageUrl;
+    },
+
     paragraphAdd: function(paraItem, bRecalculate)
     {
         if(!isRealObject(this.txBody))
