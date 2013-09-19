@@ -2246,8 +2246,6 @@ parserFormula.prototype = {
 
     setFormula:function ( formula ) {
         this.Formula = formula;
-        this.cellId = _cellId;
-        this.ws = _ws;
         this.value = null;
         this.pCurrPos = 0;
         this.elemArr = [];

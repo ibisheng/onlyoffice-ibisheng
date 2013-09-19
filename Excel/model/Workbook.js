@@ -1110,17 +1110,15 @@ function unLockDraw(wb){
     }
 }
 function buildRecalc(_wb){
-	var wb = _wb, ws, ar;
-
+	var ws;
+    if( lc > 1 ) return;
 	for( var id in arrRecalc ){
-		ws = wb.getWorksheetById(id);
+		ws = _wb.getWorksheetById(id);
 		if (ws) {
-			ar = arrRecalc[id];
-			ws._BuildDependencies(ar);
+			ws._BuildDependencies(arrRecalc[id]);
 		}
 	}
-	recalc(wb)
-
+	recalc(_wb)
 }
 function searchCleenCacheArea(o1,o2){
 	var o3 = {};
@@ -1220,9 +1218,8 @@ function sortDependency(ws, ar){
 	}
 }
 function recalc(wb){
-	
-	var nR = wb.needRecalc, thas = wb, calculatedCells = {}, nRLength = nR.length, first = true,
-        startActionOn = false, timerID, timeStart, timeEnd, timeCount = 0, timeoutID1, timeoutID2, sr = {};
+	var nR = wb.needRecalc, thas = wb, calculatedCells = new Object(), nRLength = nR.length, first = true,
+        startActionOn = false, timerID, timeStart, timeEnd, timeCount = 0, timeoutID1, timeoutID2, sr = new Object();
 
 	function R(){
 		if( nR.length > 0 ){
@@ -1247,10 +1244,11 @@ function recalc(wb){
 				sr2 = helpRecalc(dep1, nR, calculatedCells, thas);
 				
 				sr = searchCleenCacheArea(sr,searchCleenCacheArea(sr1,sr2));
-				if( nR[id] ){
-					delete nR[id];
-				nR.length--;
-			}
+                if ( nR[id] ) {
+                    delete nR[id];
+                    nR.length--;
+                }
+                id = undefined;
 			}
 			clearTimeout(timerID);
 			timeEnd = (new Date()).getTime();
@@ -3216,7 +3214,23 @@ Woorksheet.prototype._removeCell=function(nRow, nCol, cell){
 			}
 			
 			this.helperRebuildFormulas(cell,cell.getName(),cell.getName());
-			
+
+            var node = this.workbook.dependencyFormulas.getNodeByNodeId( getVertexId( this.Id, cell.getName() ) )
+            if ( node ) {
+                node = node.getSlaveEdges();
+                if ( node ) {
+                    for ( var id in node ) {
+                        if ( node[id].cell && node[id].cell.sFormula ){
+                            History.Add(g_oUndoRedoWorksheet,
+                                        historyitem_Worksheet_RemoveCellFormula,
+                                        node[id].sheetId,
+                                        new Asc.Range(node[id].cell.oId.getCol0(), node[id].cell.oId.getRow0(), node[id].cell.oId.getCol0(), node[id].cell.oId.getRow0()),
+                                        new UndoRedoData_CellSimpleData(node[id].cell.oId.getRow0(), node[id].cell.oId.getCol0(), null, null, node[id].cell.sFormula));
+                        }
+                    }
+                }
+            }
+
 			if( !arrRecalc[this.getId()] ){
 				arrRecalc[this.getId()] = {};
 			}
@@ -3886,7 +3900,7 @@ Woorksheet.prototype.renameDependencyNodes = function(offset,oBBox,rec, noDelete
 		}
 	}
 	
-	if ( false !== rec )
+	if ( false !== rec && lc <= 1 )
 		recalc(this.workbook);
 	
 }
@@ -4191,7 +4205,13 @@ Cell.prototype.setCellStyle=function(val){
 	this.oValue.cleanCache();
 };
 Cell.prototype.setNumFormat=function(val){
-	var oRes = this.sm.setNumFormat(this, val);
+	var oRes;
+    if( val == aStandartNumFormats[0] &&
+        this.formulaParsed && this.formulaParsed.value && this.formulaParsed.value.numFormat !== null &&
+        this.formulaParsed.value.numFormat !== undefined && aStandartNumFormats[this.formulaParsed.value.numFormat] )
+        oRes = this.sm.setNumFormat(this, aStandartNumFormats[this.formulaParsed.value.numFormat]);
+    else
+        oRes = this.sm.setNumFormat(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
         History.Add(g_oUndoRedoCell, historyitem_Cell_Numformat, this.ws.getId(), new Asc.Range(0, this.oId.getRow0(), gc_nMaxCol0, this.oId.getRow0()), new UndoRedoData_CellSimpleData(this.oId.getRow0(), this.oId.getCol0(), oRes.oldVal, oRes.newVal));
 	this.bNeedCompileXfs = true;

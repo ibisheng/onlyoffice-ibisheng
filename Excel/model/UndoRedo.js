@@ -365,7 +365,7 @@ var UndoRedoDataTypes = new function() {
 			case this.ValueMultiTextElem: return new CCellValueMultiText();break;
 			case this.CellValue:return new CCellValue();break;
 			case this.CellValueData: return new UndoRedoData_CellValueData();break;
-			case this.CellData: return new UndoRedoData_CellData();break;			
+			case this.CellData: return new UndoRedoData_CellData();break;
 			case this.CellSimpleData: return new UndoRedoData_CellSimpleData();break;
 			case this.FromTo: return new UndoRedoData_FromTo();break;
 			case this.FromToRowCol: return new UndoRedoData_FromToRowCol();break;
@@ -432,7 +432,7 @@ var UndoRedoDataTypes = new function() {
 	};
 };
 
-function UndoRedoData_CellSimpleData(nRow, nCol, oOldVal, oNewVal){
+function UndoRedoData_CellSimpleData(nRow, nCol, oOldVal, oNewVal, sFormula){
 	this.Properties = {
 		Row: 0,
 		Col: 1,
@@ -442,6 +442,7 @@ function UndoRedoData_CellSimpleData(nRow, nCol, oOldVal, oNewVal){
 	this.nCol = nCol;
 	this.oOldVal = oOldVal;
 	this.oNewVal = oNewVal;
+	this.sFormula = sFormula;
 }
 UndoRedoData_CellSimpleData.prototype = {
 	getType : function()
@@ -682,7 +683,7 @@ UndoRedoData_FromToCell.prototype = {
 		this.from.r2 = collaborativeEditing.getLockMeRow2(nSheetId, this.from.r2);
 		this.from.c1 = collaborativeEditing.getLockMeColumn2(nSheetId, this.from.c1);
 		this.from.c2 = collaborativeEditing.getLockMeColumn2(nSheetId, this.from.c2);
-		
+
 		this.to.r1 = collaborativeEditing.getLockMeRow2(nSheetId, this.to.r1);
 		this.to.r2 = collaborativeEditing.getLockMeRow2(nSheetId, this.to.r2);
 		this.to.c1 = collaborativeEditing.getLockMeColumn2(nSheetId, this.to.c1);
@@ -759,7 +760,7 @@ function UndoRedoData_ColProp(col){
 UndoRedoData_ColProp.prototype = {
 	isEqual : function(val)
 	{
-		return this.hd == val.hd && this.CustomWidth == val.CustomWidth && ((this.BestFit == val.BestFit && this.width == val.width) || 
+		return this.hd == val.hd && this.CustomWidth == val.CustomWidth && ((this.BestFit == val.BestFit && this.width == val.width) ||
 			((null == this.width || gc_dDefaultColWidthCharsAttribute == this.width) && (null == this.BestFit || true == this.BestFit) &&
 			(null == val.width || gc_dDefaultColWidthCharsAttribute == val.width) && (null == val.BestFit || true == val.BestFit)));
 	},
@@ -815,7 +816,7 @@ function UndoRedoData_RowProp(row){
 UndoRedoData_RowProp.prototype = {
 	isEqual : function(val)
 	{
-		return this.hd == val.hd && ((this.CustomHeight == val.CustomHeight && this.h == val.h) || 
+		return this.hd == val.hd && ((this.CustomHeight == val.CustomHeight && this.h == val.h) ||
 			((null == this.h || gc_dDefaultRowHeightAttribute == this.h) && (null == this.CustomHeight || false == this.CustomHeight) &&
 			(null == val.h || gc_dDefaultRowHeightAttribute == val.h) && (null == val.CustomHeight || false == val.CustomHeight)));
 	},
@@ -2964,6 +2965,24 @@ UndoRedoWoorksheet.prototype = {
 			else
 				ws._removeCell(nRow, nCol);
 		}
+        else if(historyitem_Worksheet_RemoveCellFormula == Type){
+            var nRow = Data.nRow;
+            var nCol = Data.nCol;
+            if(bUndo)
+            {
+                var sFormula = Data.sFormula
+                var cell = ws._getCell(nRow, nCol);
+                cell.setFormula(sFormula);
+                cell.formulaParsed.setFormula(sFormula);
+                if( !arrRecalc[ws.getId()] ){
+                    arrRecalc[ws.getId()] = {};
+                }
+                arrRecalc[ws.getId()][cell.getName()] = cell.getName();
+                ws.workbook.needRecalc[ getVertexId(ws.getId(),cell.getName()) ] = [ ws.getId(),cell.getName() ];
+                if( ws.workbook.needRecalc.length < 0) ws.workbook.needRecalc.length = 0;
+                ws.workbook.needRecalc.length++;
+            }
+        }
 		else if(historyitem_Worksheet_ColProp == Type)
 		{
 			var index = Data.index;
@@ -3136,21 +3155,21 @@ UndoRedoWoorksheet.prototype = {
 		else if(historyitem_Worksheet_MoveRange == Type)
 		{
 			if( bUndo ){
-			
+
 				var rec = {length:0}, rec2;
 				for(var ind = 0; ind < Data.arr.to.length; ind++ ){
 					var nRow = Data.arr.to[ind].getCellAddress().getRow0(),
 						nCol = Data.arr.to[ind].getCellAddress().getCol0();
-					
+
 					var c = ws._getCell(nRow, nCol)
-					
+
 					if( c.sFormula ){
 						this.wb.cwf[ws.Id].cells[c.getName()] = null;
 						delete this.wb.cwf[ws.Id].cells[ c.getName()];
 					}
-					
+
 					var oTargetRow = ws._getRow(nRow);
-				
+
 					if(Data.arr.to[ind].isEmpty()){
 						delete oTargetRow.c[nCol];
 						continue;
@@ -3171,20 +3190,20 @@ UndoRedoWoorksheet.prototype = {
 						}
 					}
 				}
-				
+
 				for(var ind = 0; ind < Data.arr.from.length; ind++ ){
 					var nRow = Data.arr.from[ind].getCellAddress().getRow0(),
 						nCol = Data.arr.from[ind].getCellAddress().getCol0();
-					
+
 					var c = ws._getCell(nRow, nCol)
-					
+
 					if( c.sFormula ){
 						this.wb.cwf[ws.Id].cells[c.getName()] = null;
 						delete this.wb.cwf[ws.Id].cells[ c.getName()];
 					}
-					
+
 					var oTargetRow = ws._getRow(nRow);
-				
+
 					if(Data.arr.from[ind].isEmpty()){
 						delete oTargetRow.c[nCol];
 						continue;
@@ -3223,14 +3242,14 @@ UndoRedoWoorksheet.prototype = {
 					var worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
 					worksheetView.autoFilters._moveAutoFilters(worksheetView ,null, null, g_oUndoRedoAutoFiltersMoveData);
 					g_oUndoRedoAutoFiltersMoveData = null;
-				}
+			}
 			}
 			else{
-					
+
 				if(false != this.wb.bCollaborativeChanges)
 				{
 					var collaborativeEditing = this.wb.oApi.collaborativeEditing,
-						nSheetId = ws.getId(), 
+						nSheetId = ws.getId(),
 						coBBoxTo 	= {r1:0,c1:0,r2:0,c2:0 },
 						coBBoxFrom 	= {r1:0,c1:0,r2:0,c2:0 };
 
@@ -3238,12 +3257,12 @@ UndoRedoWoorksheet.prototype = {
 					coBBoxTo.c1 = collaborativeEditing.getLockOtherColumn2(	nSheetId, Data.to.c1);
 					coBBoxTo.r2 = collaborativeEditing.getLockOtherRow2(	nSheetId, Data.to.r2);
 					coBBoxTo.c2 = collaborativeEditing.getLockOtherColumn2(	nSheetId, Data.to.c2);
-					
+
 					coBBoxFrom.r1 = collaborativeEditing.getLockOtherRow2(		nSheetId, Data.from.r1);
 					coBBoxFrom.c1 = collaborativeEditing.getLockOtherColumn2(	nSheetId, Data.from.c1);
 					coBBoxFrom.r2 = collaborativeEditing.getLockOtherRow2(		nSheetId, Data.from.r2);
 					coBBoxFrom.c2 = collaborativeEditing.getLockOtherColumn2(	nSheetId, Data.from.c2);
-					
+
 					ws._moveRange(coBBoxFrom, coBBoxTo);
 				}
 				else{
@@ -3484,7 +3503,7 @@ UndoRedoComment.prototype = {
 		var cellCommentator = ws.cellCommentator;
 		if ( bUndo == true )
 			cellCommentator.Undo(Type, Data);
-		
+
 		else {
 			// CCommentData
 			if ( (Data.commentBefore == undefined) && (Data.commentAfter == undefined) ) {
@@ -3501,13 +3520,13 @@ UndoRedoComment.prototype = {
 				if ( !Data.commentAfter.bDocument ) {
 					if ( false != this.wb.bCollaborativeChanges ) {
 						var collaborativeEditing = this.wb.oApi.collaborativeEditing;
-						
+
 						Data.commentAfter.nRow = collaborativeEditing.getLockOtherRow2(nSheetId, Data.commentAfter.nRow);
 						Data.commentAfter.nCol = collaborativeEditing.getLockOtherColumn2(nSheetId, Data.commentAfter.nCol);
 					}
 				}
 			}
-			
+
 			cellCommentator.Redo(Type, Data);
 		}
 	}
