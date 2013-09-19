@@ -3809,6 +3809,21 @@ function CXfrm()
     this.rot = null;
 
 
+
+    this.isNotNull = function()
+    {
+        return isRealNumber(this.offX) && isRealNumber(this.offY) && isRealNumber(this.extX) && isRealNumber(this.extY);
+    };
+
+
+    this.isNotNullForGroup = function()
+    {
+        return isRealNumber(this.offX) && isRealNumber(this.offY)
+            && isRealNumber(this.chOffX) && isRealNumber(this.chOffY)
+            && isRealNumber(this.extX) && isRealNumber(this.extY)
+            && isRealNumber(this.chExtX) && isRealNumber(this.chExtY);
+    };
+
     this.Write_ToBinary2 =  function(Writer)
     {
 

@@ -331,6 +331,8 @@ CImageShape.prototype =
     {
         if(this.recalcInfo.recalculateTransform)
         {
+
+
             this.recalculateTransform();
             this.recalcInfo.recalculateTransform = false;
         }
@@ -355,6 +357,7 @@ CImageShape.prototype =
     recalculateTransform: function()
     {
         var xfrm = this.spPr.xfrm;
+
         if(!isRealObject(this.group))
         {
             this.x = xfrm.offX;
