@@ -7110,11 +7110,10 @@
 							range.setCellStyle(val); canChangeColWidth = c_oAscCanChangeColWidth.numbers; break;
 							break;
 						case "paste":
-							var pasteExec = function()
-							{
+							var pasteLocal = function () {
 								if (isLargeRange) { callTrigger = true; t._trigger("slowOperation", true); }
 								var selectData;
-								if(isLocal)
+								if (isLocal)
 									selectData = t._pasteFromLS(val);
 								else
 									selectData = t._setInfoAfterPaste(val,onlyActive);
@@ -7134,8 +7133,7 @@
 									var valF = arrFormula[i].val;
 									if(rangeF.isOneCell())
 										rangeF.setValue(valF);
-									else
-									{
+									else {
 										var oBBox = rangeF.getBBox0();
 										t.model._getCell(oBBox.r1, oBBox.c1).setValue(valF);
 									}
@@ -7159,129 +7157,84 @@
 								History.SetSelection(selectionRange);
 								t.model.onEndTriggerAction();
 							};
-							
-							//загрузка шрифтов, в случае удачи на callback вставляем текст
-							var callbackFunc = function(res) {
-								if (res) {
-									//t._drawCollaborativeElements(true);
-									t._loadFonts(val.fontsNew, function () {
-										pasteExec();
-										if(val.addImages && val.addImages.length != 0)
-										{
-											var api = asc["editor"];
-											var aImagesSync = [];
-											for(var im = 0; im < val.addImages.length; im++)
-											{
-												aImagesSync.push(val.addImages[im].tag.src);
-											}
-											api.ImageLoader.LoadDocumentImages(aImagesSync);
-											t.objectRender.asyncImagesDocumentEndLoaded = function() {
-											
-												for(var im = 0; im < val.addImages.length; im++)//вставляем изображения
-												{
-													var src = val.addImages[im].tag.src;
-													if(src)
-													{
-														var binary_shape = val.addImages[im].tag.getAttribute("alt");
-														var sub;
-														if(typeof binary_shape === "string")
-															sub = binary_shape.substr(0, 12);
-														if(typeof binary_shape === "string" &&( sub === "TeamLabShape" || sub === "TeamLabImage" || sub === "TeamLabChart" || sub === "TeamLabGroup"))
-														{
-															var reader = CreateBinaryReader(binary_shape, 12, binary_shape.length);
-															reader.GetLong();
-															if(isRealObject(reader))
-																reader.oImages = this.oImages;
-															var first_string = null;
-															if(reader !== null && typeof  reader === "object")
-															{
-																first_string = sub;
-															}
-															var positionX = null
-															var positionY = null;
-															
-															if(t.cols && val.addImages[im].curCell && val.addImages[im].curCell.col != undefined && t.cols[val.addImages[im].curCell.col].left != undefined)
-																positionX = t.cols[val.addImages[im].curCell.col].left;
-															if(t.rows && val.addImages[im].curCell && val.addImages[im].curCell.row != undefined && t.rows[val.addImages[im].curCell.row].top != undefined)
-																positionY = t.rows[val.addImages[im].curCell.row].top
-															
-															var Drawing;
-															switch(first_string)
-															{
-																case "TeamLabImage":
-																{
-																	Drawing = new CImageShape();
-																	break;
-																}
-																case "TeamLabShape":
-																{
-																	Drawing = new CShape();
-																	break;
-																}
-																case "TeamLabGroup":
-																{
-																	Drawing = new CGroupShape();
-																	break;
-																}
-																case "TeamLabChart":
-																{
-																	Drawing = new CChartAsGroup();
-																	break;
-																}
-																default :
-																{
-																	Drawing = CreateImageFromBinary(src);
-																	break;
-																}
-															}
-															if(positionX && positionY && t.objectRender)
-																Drawing.readFromBinaryForCopyPaste(reader,null, t.objectRender,t.objectRender.convertMetric(positionX,1,3),t.objectRender.convertMetric(positionY,1,3));
-															else
-																Drawing.readFromBinaryForCopyPaste(reader,null, t.objectRender);
-															Drawing.drawingObjects = t.objectRender;
-															Drawing.addToDrawingObjects();
+
+							var pasteNoLocal = function () {
+								//загрузка шрифтов, в случае удачи на callback вставляем текст
+								t._loadFonts(val.fontsNew, function () {
+									pasteLocal();
+									if (val.addImages && val.addImages.length != 0) {
+										var api = asc["editor"];
+										var aImagesSync = [];
+										for (var im = 0; im < val.addImages.length; im++) {
+											aImagesSync.push(val.addImages[im].tag.src);
+										}
+										t.objectRender.asyncImagesDocumentEndLoaded = function() {
+											//вставляем изображения
+											for (var im = 0; im < val.addImages.length; im++) {
+												var src = val.addImages[im].tag.src;
+												if (src) {
+													var binary_shape = val.addImages[im].tag.getAttribute("alt");
+													var sub;
+													if (typeof binary_shape === "string")
+														sub = binary_shape.substr(0, 12);
+													if (typeof binary_shape === "string" &&( sub === "TeamLabShape" || sub === "TeamLabImage" || sub === "TeamLabChart" || sub === "TeamLabGroup")) {
+														var reader = CreateBinaryReader(binary_shape, 12, binary_shape.length);
+														reader.GetLong();
+														if (isRealObject(reader))
+															reader.oImages = this.oImages;
+														var first_string = null;
+														if (reader !== null && typeof  reader === "object") {
+															first_string = sub;
 														}
-														else if(0 != src.indexOf("file://"))
-														{
-															t.objectRender.addImageDrawingObject(src,  { cell: val.addImages[im].curCell, width: val.addImages[im].tag.width, height: val.addImages[im].tag.height });
+														var positionX = null;
+														var positionY = null;
+															
+														if (t.cols && val.addImages[im].curCell && val.addImages[im].curCell.col != undefined && t.cols[val.addImages[im].curCell.col].left != undefined)
+															positionX = t.cols[val.addImages[im].curCell.col].left;
+														if (t.rows && val.addImages[im].curCell && val.addImages[im].curCell.row != undefined && t.rows[val.addImages[im].curCell.row].top != undefined)
+															positionY = t.rows[val.addImages[im].curCell.row].top
+															
+														var Drawing;
+														switch(first_string) {
+															case "TeamLabImage": {
+																Drawing = new CImageShape();
+																break;
+															}
+															case "TeamLabShape": {
+																Drawing = new CShape();
+																break;
+															}
+															case "TeamLabGroup": {
+																Drawing = new CGroupShape();
+																break;
+															}
+															case "TeamLabChart": {
+																Drawing = new CChartAsGroup();
+																break;
+															}
+															default : {
+																Drawing = CreateImageFromBinary(src);
+																break;
+															}
 														}
-													}	
+														if (positionX && positionY && t.objectRender)
+															Drawing.readFromBinaryForCopyPaste(reader,null, t.objectRender,t.objectRender.convertMetric(positionX,1,3),t.objectRender.convertMetric(positionY,1,3));
+														else
+															Drawing.readFromBinaryForCopyPaste(reader,null, t.objectRender);
+														Drawing.drawingObjects = t.objectRender;
+														Drawing.addToDrawingObjects();
+													} else if (0 != src.indexOf("file://")) {
+														t.objectRender.addImageDrawingObject(src,  { cell: val.addImages[im].curCell, width: val.addImages[im].tag.width, height: val.addImages[im].tag.height });
+													}
 												}
 											}
-										}
-									});
-								}
-								else
-								{
-									History.EndTransaction();
-									t.model.onEndTriggerAction();
-								}
-							};
-							var api = window["Asc"]["editor"];
-							if(isLocal)//вставляем текст из локального буфера
-								pasteExec();
-							else
-							{
-								if(val.addImages == null || api.isChartEditor)//нет изображений
-								{
-									callbackFunc(true);
-								}
-								else//присутвуют изображения
-								{
-									t.collaborativeEditing.onStartCheckLock();
-									
-									//на callback грузим шрифты и осуществляем вставку текста
-									if (false === t.collaborativeEditing.getCollaborativeEditing()) {
-										// Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
-										callbackFunc(true);
-										
-										callbackFunc = undefined;
-										return;
+										};
+										api.ImageLoader.LoadDocumentImages(aImagesSync);
 									}
-
-									t.collaborativeEditing.onEndCheckLock(callbackFunc);
-								}
-							}
+								});
+							};
+							// Вставляем текст из локального буфера или нет
+							isLocal ? pasteLocal() : pasteNoLocal();
 							return;
 						case "hyperlink":
 							if (val) {
