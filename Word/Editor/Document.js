@@ -2571,24 +2571,30 @@ CDocument.prototype =
                         {
                             if ( this.CurPos.ContentPos > 0 && type_Paragraph == this.Content[this.CurPos.ContentPos - 1].GetType() )
                             {
-                                if ( true === this.Content[this.CurPos.ContentPos - 1].IsEmpty() )
-                                {
-                                    // Просто удаляем предыдущий параграф
-                                    this.Internal_Content_Remove( this.CurPos.ContentPos - 1, 1 );
-                                    this.CurPos.ContentPos--;
-                                    this.Content[this.CurPos.ContentPos].Cursor_MoveToStartPos();
-                                }
-                                else
-                                {
-                                    // Соединяем текущий и предыдущий параграфы
-                                    var Prev = this.Content[this.CurPos.ContentPos - 1];
+                                var CurrFramePr = this.Content[this.CurPos.ContentPos].Get_FramePr();
+                                var PrevFramePr = this.Content[this.CurPos.ContentPos - 1].Get_FramePr();
 
-                                    // Запоминаем новую позицию курсора, после совмещения параграфов
-                                    var NewPos = Prev.Content.length - 2;
-                                    Prev.Concat( this.Content[this.CurPos.ContentPos] );
-                                    this.Internal_Content_Remove( this.CurPos.ContentPos, 1 );
-                                    this.CurPos.ContentPos--;
-                                    this.Content[this.CurPos.ContentPos].CurPos.ContentPos = NewPos;
+                                if ( (undefined === CurrFramePr && undefined === PrevFramePr) || ( undefined !== CurrFramePr && undefined !== PrevFramePr && true === CurrFramePr.Compare( PrevFramePr ) ) )
+                                {
+                                    if ( true === this.Content[this.CurPos.ContentPos - 1].IsEmpty() )
+                                    {
+                                        // Просто удаляем предыдущий параграф
+                                        this.Internal_Content_Remove( this.CurPos.ContentPos - 1, 1 );
+                                        this.CurPos.ContentPos--;
+                                        this.Content[this.CurPos.ContentPos].Cursor_MoveToStartPos();
+                                    }
+                                    else
+                                    {
+                                        // Соединяем текущий и предыдущий параграфы
+                                        var Prev = this.Content[this.CurPos.ContentPos - 1];
+
+                                        // Запоминаем новую позицию курсора, после совмещения параграфов
+                                        var NewPos = Prev.Content.length - 2;
+                                        Prev.Concat( this.Content[this.CurPos.ContentPos] );
+                                        this.Internal_Content_Remove( this.CurPos.ContentPos, 1 );
+                                        this.CurPos.ContentPos--;
+                                        this.Content[this.CurPos.ContentPos].CurPos.ContentPos = NewPos;
+                                    }
                                 }
                             }
                         }
@@ -2596,18 +2602,24 @@ CDocument.prototype =
                         {
                             if ( this.CurPos.ContentPos < this.Content.length - 1 && type_Paragraph == this.Content[this.CurPos.ContentPos + 1].GetType() )
                             {
-                                if ( true === this.Content[this.CurPos.ContentPos].IsEmpty() )
+                                var CurrFramePr = this.Content[this.CurPos.ContentPos].Get_FramePr();
+                                var NextFramePr = this.Content[this.CurPos.ContentPos + 1].Get_FramePr();
+
+                                if ( (undefined === CurrFramePr && undefined === NextFramePr) || ( undefined !== CurrFramePr && undefined !== NextFramePr && true === CurrFramePr.Compare( NextFramePr ) ) )
                                 {
-                                    // Просто удаляем текущий параграф
-                                    this.Internal_Content_Remove( this.CurPos.ContentPos, 1 );
-                                    this.Content[this.CurPos.ContentPos].Cursor_MoveToStartPos();
-                                }
-                                else
-                                {
-                                    // Соединяем текущий и следующий параграфы
-                                    var Cur = this.Content[this.CurPos.ContentPos];
-                                    Cur.Concat( this.Content[this.CurPos.ContentPos + 1] );
-                                    this.Internal_Content_Remove( this.CurPos.ContentPos + 1, 1 );
+                                    if ( true === this.Content[this.CurPos.ContentPos].IsEmpty() )
+                                    {
+                                        // Просто удаляем текущий параграф
+                                        this.Internal_Content_Remove( this.CurPos.ContentPos, 1 );
+                                        this.Content[this.CurPos.ContentPos].Cursor_MoveToStartPos();
+                                    }
+                                    else
+                                    {
+                                        // Соединяем текущий и следующий параграфы
+                                        var Cur = this.Content[this.CurPos.ContentPos];
+                                        Cur.Concat( this.Content[this.CurPos.ContentPos + 1] );
+                                        this.Internal_Content_Remove( this.CurPos.ContentPos + 1, 1 );
+                                    }
                                 }
                             }
                             else if ( true == this.Content[this.CurPos.ContentPos].IsEmpty() && this.CurPos.ContentPos == this.Content.length - 1 && this.CurPos.ContentPos != 0 && type_Table != this.Content[this.CurPos.ContentPos - 1].GetType() )
