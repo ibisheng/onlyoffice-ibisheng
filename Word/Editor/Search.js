@@ -668,6 +668,9 @@ CTable.prototype.Search_GetId = function(bNext, bCurrent)
         else
         {
             Id = this.CurCell.Content.Search_GetId(bNext, true);
+            if ( Id != null )
+                return Id;
+
             CurRow  = this.CurCell.Row.Index;
             CurCell = this.CurCell.Index;
         }
@@ -699,7 +702,7 @@ CTable.prototype.Search_GetId = function(bNext, bCurrent)
                 for ( var _CurCell = StartCell; _CurCell >= 0; _CurCell-- )
                 {
                     var Cell = Row.Get_Cell(_CurCell);
-                    Id = Cell.Content.Search_GetId( true, false );
+                    Id = Cell.Content.Search_GetId( false, false );
                     if ( null != Id )
                         return Id;
                 }
@@ -734,7 +737,7 @@ CTable.prototype.Search_GetId = function(bNext, bCurrent)
                 for ( var _CurCell = Cells_Count - 1; _CurCell >= 0; _CurCell-- )
                 {
                     var Cell = Row.Get_Cell(_CurCell);
-                    Id = Cell.Content.Search_GetId( true, false );
+                    Id = Cell.Content.Search_GetId( false, false );
                     if ( null != Id )
                         return Id;
                 }
