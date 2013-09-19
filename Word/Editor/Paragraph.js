@@ -10849,6 +10849,7 @@ Paragraph.prototype =
             }
 
             LogicDocument.Recalculate();
+            LogicDocument.Document_UpdateInterfaceState();
         }
     },
 

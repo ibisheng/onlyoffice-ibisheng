@@ -1917,6 +1917,7 @@ CDocument.prototype =
             this.CurPos.Type       = docpostype_Content;
 
             this.Recalculate();
+            this.Document_UpdateInterfaceState();
         }
     },
 
