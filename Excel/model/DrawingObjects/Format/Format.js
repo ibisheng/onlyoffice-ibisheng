@@ -1477,6 +1477,7 @@ CBlipFill.prototype =
         var newValue = rasterImageId;
         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_SetFType, null, null,
             new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
+        this.RasterImageId = rasterImageId;
     },
 
     Copy: function()
