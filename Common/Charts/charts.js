@@ -914,6 +914,8 @@ function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY, chart)
 		}
 		tempScale = bar._otherProps._labels;
 	}
+	if((bar._chartGutter._left + bar._chartGutter._right) >= (chartCanvas.width + 5))
+		bar._chartGutter._right += (chartCanvas.width + 5) - (bar._chartGutter._left + bar._chartGutter._right);
 }
 
 //-----------------------------------------------------------------------------------
