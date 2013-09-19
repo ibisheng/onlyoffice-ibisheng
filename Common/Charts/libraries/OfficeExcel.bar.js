@@ -153,6 +153,9 @@
             this.Drawbars(isSkip,isFormatCell);
             
         }
+		
+		if(this._otherProps._grouping == 'grouped')
+			this.DrawAboveLabels(isFormatCell);
 
         this.DrawLabels(isFormatCell);
 
@@ -1295,55 +1298,16 @@
                             this.context.fillStyle   = prevFillStyle;
                         }
 
-                        this.coords.push([startX, startY, individualBarWidth, height]);
-
+						
+						var formatCellTrue = formatCell;
+						if(this.arrFormatAdobeLabels && this.arrFormatAdobeLabels[i] && this.arrFormatAdobeLabels[i][j])
+							formatCellTrue = this.arrFormatAdobeLabels[i][j];
+						this.coords.push([startX, startY, individualBarWidth, height, formatCellTrue, this.firstData[i][j]]);
+							
                         // Facilitate shadows going to the left
                         if (this._shadow._visible) {
                             redrawCoords.push([startX, startY, individualBarWidth, height, this.context.fillStyle]);
                         }
-						// This bit draws the text labels that appear above the bars if requested
-						if (this._otherProps._labels_above) {
-
-							this.context.strokeStyle = 'rgba(0,0,0,0)';
-
-							// Turn off any shadow
-							if (shadow) {
-								OfficeExcel.NoShadow(this);
-							}
-
-							var yPos = y - 3;
-
-							// Account for negative bars
-							if (this.data[i][j] < 0) {
-								yPos += height + 6 + (this._otherProps._text_size - 4);
-							}
-							var formatCellTrue = formatCell;
-							if(this.arrFormatAdobeLabels && this.arrFormatAdobeLabels[i] && this.arrFormatAdobeLabels[i][j])
-								formatCellTrue = this.arrFormatAdobeLabels[i][j];
-							this.context.fillStyle = this._otherProps._text_color;
-							OfficeExcel.Text(this.context,
-										this._otherProps._labels_above_font,
-										typeof(this._otherProps._labels_above_size) == 'number' ? this._otherProps._labels_above_size : this._otherProps._text_size - 3,startX + (individualBarWidth / 2),
-										startY - 2 - (this._otherProps._variant == '3d' ? 5 : 0),
-										//OfficeExcel.number_format(this, OfficeExcel.num_round(this.data[i][j]),this._otherProps._units_pre,this._otherProps._units_post),
-										OfficeExcel.numToFormatText(OfficeExcel.num_round(this.firstData[i][j]),formatCellTrue),
-										null,
-										this._otherProps._labels_above_angle ? (this._otherProps._labels_above_angle > 0 ? 'right' : 'left') : 'center',
-										null,
-										this._otherProps._labels_above_angle,
-										null,
-										bold,
-										null,
-										textOptions);
-						  
-							// Turn any shadow back on
-							if (shadow) {
-								this.context.shadowColor   = shadowColor;
-								this.context.shadowBlur    = shadowBlur;
-								this.context.shadowOffsetX = shadowOffsetX;
-								this.context.shadowOffsetY = shadowOffsetY;
-							}
-						}
                     }
                     
                     /**
@@ -2053,7 +2017,80 @@
 
         return value;
     }
+	
+	OfficeExcel.Bar.prototype.DrawAboveLabels = function (isFormatCell)
+    {
+		// This bit draws the text labels that appear above the bars if requested
+		if (this._otherProps._labels_above && this.coords) {
 
+			  // Get these variables outside of the loop
+			var xaxispos      = this._otherProps._xaxispos;
+			var width         = (this.canvas.width - this._chartGutter._left - this._chartGutter._right ) / this.data.length;
+			var hmargin       = this._otherProps._hmargin;
+			var shadow        = this._shadow._visible;
+			var shadowColor   = this._shadow._color;
+			var shadowBlur    = this._shadow._blur;
+			var shadowOffsetX = this._shadow._offset_x;
+			var shadowOffsetY = this._shadow._offset_y;
+			var strokeStyle   = this._otherProps._strokecolor;
+			var colors        = this._otherProps._colors;
+			var sequentialColorIndex = 0;
+			var startX;
+			var startY;
+			var individualBarWidth;
+			var value = 0;
+			
+			var bold = this._otherProps._labels_above_bold;
+			var textOptions = 
+			{
+				color: this._otherProps._labels_above_color,
+				italic: this._otherProps._labels_above_italic,
+				underline: this._otherProps._labels_above_underline
+			};
+			for(var i = 0; i < this.coords.length; i ++)
+			{
+				
+				this.context.strokeStyle = 'rgba(0,0,0,0)';
+				// Turn off any shadow
+				if (shadow) {
+					OfficeExcel.NoShadow(this);
+				}
+				startX = this.coords[i][0];
+				startY = this.coords[i][1];
+				individualBarWidth = this.coords[i][2];
+				
+				//this._otherProps._labels_above_coords
+				var formatCellTrue = isFormatCell;
+				if(this.coords[i][4])
+					formatCellTrue = this.coords[i][4];
+				if(this.coords[i][5])
+					value = this.coords[i][5];
+				this.context.fillStyle = this._otherProps._text_color;
+				OfficeExcel.Text(this.context,
+							this._otherProps._labels_above_font,
+							typeof(this._otherProps._labels_above_size) == 'number' ? this._otherProps._labels_above_size : this._otherProps._text_size - 3,startX + (individualBarWidth / 2),
+							startY - 2 - (this._otherProps._variant == '3d' ? 5 : 0),
+							//OfficeExcel.number_format(this, OfficeExcel.num_round(this.data[i][j]),this._otherProps._units_pre,this._otherProps._units_post),
+							OfficeExcel.numToFormatText(OfficeExcel.num_round(value),formatCellTrue),
+							null,
+							this._otherProps._labels_above_angle ? (this._otherProps._labels_above_angle > 0 ? 'right' : 'left') : 'center',
+							null,
+							this._otherProps._labels_above_angle,
+							null,
+							bold,
+							null,
+							textOptions);
+			  
+				// Turn any shadow back on
+				if (shadow) {
+					this.context.shadowColor   = shadowColor;
+					this.context.shadowBlur    = shadowBlur;
+					this.context.shadowOffsetX = shadowOffsetX;
+					this.context.shadowOffsetY = shadowOffsetY;
+				}
+			}
+		}
+	}
 
     /**
     * This function can be used when the canvas is clicked on (or similar - depending on the event)
