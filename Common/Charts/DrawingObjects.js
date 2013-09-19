@@ -2779,6 +2779,18 @@ function DrawingObjects() {
 				drawingObject.graphicObject.drawingBase = drawingObject;
                 drawingObject.graphicObject.drawingObjects = _this;
                 drawingObject.graphicObject.setDrawingDocument(this.drawingDocument);
+                var xfrm = drawingObject.graphicObject.spPr.xfrm;
+
+                if(!xfrm || !xfrm.isNotNull())
+                {
+                    if(isRealObject(drawingObject.graphicObject.drawingBase))
+                    {
+                        var metrics = drawingObject.graphicObject.drawingBase.getGraphicObjectMetrics();
+                        drawingObject.graphicObject.setXfrmObject(new CXfrm());
+                        drawingObject.graphicObject.spPr.xfrm.setPosition(metrics.x, metrics.y);
+                        drawingObject.graphicObject.spPr.xfrm.setExtents(metrics.extX, metrics.extY);
+                    }
+                }
 				drawingObject.graphicObject.recalculate();
 				aObjects.push( drawingObject );
 			}
@@ -2787,6 +2799,18 @@ function DrawingObjects() {
 				aObjectsSync[aObjectsSync.length] = drawingObject;
                 drawingObject.graphicObject.drawingBase = drawingObject;
                 drawingObject.graphicObject.drawingObjects = _this;
+                var xfrm = drawingObject.graphicObject.spPr.xfrm;
+
+                if(!xfrm || !xfrm.isNotNull())
+                {
+                    if(isRealObject(drawingObject.graphicObject.drawingBase))
+                    {
+                        var metrics = drawingObject.graphicObject.drawingBase.getGraphicObjectMetrics();
+                        drawingObject.graphicObject.setXfrmObject(new CXfrm());
+                        drawingObject.graphicObject.spPr.xfrm.setPosition(metrics.x, metrics.y);
+                        drawingObject.graphicObject.spPr.xfrm.setExtents(metrics.extX, metrics.extY);
+                    }
+                }
                 drawingObject.graphicObject.recalculate(aImagesSync);
 			}
 
@@ -2794,6 +2818,18 @@ function DrawingObjects() {
 
                 drawingObject.graphicObject.drawingBase = drawingObject;
                 drawingObject.graphicObject.drawingObjects = _this;
+                var xfrm = drawingObject.graphicObject.spPr.xfrm;
+
+                if(!xfrm || !xfrm.isNotNull())
+                {
+                    if(isRealObject(drawingObject.graphicObject.drawingBase))
+                    {
+                        var metrics = drawingObject.graphicObject.drawingBase.getGraphicObjectMetrics();
+                        drawingObject.graphicObject.setXfrmObject(new CXfrm());
+                        drawingObject.graphicObject.spPr.xfrm.setPosition(metrics.x, metrics.y);
+                        drawingObject.graphicObject.spPr.xfrm.setExtents(metrics.extX, metrics.extY);
+                    }
+                }
                 drawingObject.graphicObject.setDrawingDocument(this.drawingDocument);
                 drawingObject.graphicObject.recalculate(aImagesSync);
                 aObjects.push( drawingObject );
