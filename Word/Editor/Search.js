@@ -925,7 +925,7 @@ Paragraph.prototype.Search_GetId = function(bNext, bCurrent)
         for ( var ElemId in this.SearchResults )
         {
             var Element = this.SearchResults[ElemId];
-            if ( Pos < Element.StartPos && ( -1 === NearElementPos || NearElementPos > Element.StartPos ) )
+            if ( Pos <= Element.StartPos && ( -1 === NearElementPos || NearElementPos > Element.StartPos ) )
             {
                 NearElementPos = Element.StartPos;
                 NearElementId  = ElemId;
