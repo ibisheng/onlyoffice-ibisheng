@@ -81,8 +81,8 @@
                 "../Common/Charts/libraries/OfficeExcel.waterfall.js",
                 "../Common/Charts/libraries/OfficeExcel.chartProperties.js",
 
-                "../.Common/Charts/libraries/hsv.js",
-                "../.Common/Charts/libraries/rgbcolor.js",
+                "../Common/Charts/libraries/hsv.js",
+                "../Common/Charts/libraries/rgbcolor.js",
 
                 "../Word/Editor/SerializeCommon.js",
 
