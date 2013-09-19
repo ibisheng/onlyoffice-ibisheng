@@ -1845,9 +1845,9 @@ CopyProcessor.prototype =
     CopySlide: function(oDomTarget, slide)
     {
         var sSrc = slide.getBase64Img();
-        if(sSrc.length > 0)
+        //if(sSrc.length > 0)
         {
-            sSrc = this.getSrc(sSrc);
+           // sSrc = this.getSrc(sSrc);
             var _bounds_cheker = new CSlideBoundsChecker();
             slide.draw(_bounds_cheker, 0);
             this.aInnerHtml.push("<img width=\""+Math.round((_bounds_cheker.Bounds.max_x - _bounds_cheker.Bounds.min_x + 1) * g_dKoef_mm_to_pix)+"\" height=\""+Math.round((_bounds_cheker.Bounds.max_y - _bounds_cheker.Bounds.min_y + 1) * g_dKoef_mm_to_pix)+"\" src=\""+sSrc+"\" />");
@@ -3152,7 +3152,6 @@ PasteProcessor.prototype =
                         }
                         case "TeamLab3":
                         {
-
                             var arr_layouts_id = [];
                             var arr_slides = [];
                             var loader = new BinaryPPTYLoader();
@@ -3166,6 +3165,7 @@ PasteProcessor.prototype =
                             }
 
                             var arr_layouts = [];
+                            var master = presentation.Slides[presentation.CurPage].Layout.Master;
                             if(editor.DocumentUrl !== p_url)
                             {
                                 var layouts_count = stream.GetULong();
@@ -3178,22 +3178,86 @@ PasteProcessor.prototype =
                                 {
                                     arr_indexes.push(stream.GetULong());
                                 }
-                                var master = presentation.Slides[presentation.CurPage].Layout.Master;
+
                                 for(var i = 0; i < layouts_count; ++i)
                                 {
                                     arr_layouts[i].setMaster(master);
                                     arr_layouts[i].changeSize(kw, kh);
+                                    arr_layouts[i].Width = presentation.Width;
+                                    arr_layouts[i].Height = presentation.Height;
                                     master.addLayout(arr_layouts[i]);
                                 }
                                 for(var i =0; i < slide_count; ++i)
                                 {
                                     arr_slides[i].changeSize(kw, kh);
                                     arr_slides[i].setLayout(arr_layouts[arr_indexes[i]]);
+                                    arr_slides[i].Width = presentation.Width;
+                                    arr_slides[i].Height = presentation.Height;
                                 }
                             }
                             else
                             {
+                                var arr_matched_layout = [];
+                                var b_read_layouts = false;
+                                for(var i = 0; i < arr_layouts_id.length; ++i)
+                                {
+                                    if(!isRealObject(g_oTableId.Get_ById(arr_layouts_id[i])))
+                                    {
+                                        b_read_layouts = true;
+                                        break;
+                                    }
+                                }
+                                if(b_read_layouts)
+                                {
+                                    var layouts_count = stream.GetULong();
+                                    for(var i = 0; i < layouts_count; ++i)
+                                    {
+                                        arr_layouts[i] = loader.ReadSlideLayout()
+                                    }
+                                    var arr_indexes = [];
+                                    for(var i = 0; i < slide_count; ++i)
+                                    {
+                                        arr_indexes.push(stream.GetULong());
+                                    }
 
+                                    var addedLayouts = [];
+                                    for(var i = 0; i < slide_count; ++i)
+                                    {
+                                        if(isRealObject(g_oTableId.Get_ById(arr_layouts_id[i])))
+                                        {
+                                            arr_slides[i].changeSize(kw, kh);
+                                            arr_slides[i].setLayout(g_oTableId.Get_ById(arr_layouts_id[i]));
+                                        }
+                                        else
+                                        {
+                                            arr_slides[i].changeSize(kw, kh);
+                                            arr_slides[i].setLayout(arr_layouts[arr_indexes[i]]);
+                                            for(var j = 0; j < addedLayouts.length; ++j)
+                                            {
+                                                if(addedLayouts[j] === arr_layouts[arr_indexes[i]])
+                                                    break;
+                                            }
+                                            if(j === addedLayouts.length)
+                                            {
+                                                addedLayouts.push(arr_layouts[arr_indexes[i]]);
+                                                arr_layouts[arr_indexes[i]].setMaster(master);
+                                                arr_layouts[arr_indexes[i]].changeSize(kw, kh);
+                                                arr_layouts[arr_indexes[i]].Width = presentation.Width;
+                                                arr_layouts[arr_indexes[i]].Height = presentation.Height;
+                                            }
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    for(var i =0; i < slide_count; ++i)
+                                    {
+                                        arr_slides[i].changeSize(kw, kh);
+                                        arr_slides[i].setLayout(g_oTableId.Get_ById(arr_layouts_id[i]));
+                                        arr_slides[i].Width = presentation.Width;
+                                        arr_slides[i].Height = presentation.Height;
+                                    }
+                                }
                             }
 
 
