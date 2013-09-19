@@ -985,7 +985,7 @@
 					this._moveRangeHandleDone(event);
 				}
 				
-				if (this.isMoveResizeChartsRange) {
+				if (this.isMoveResizeRange) {
 					this.isMoveResizeRange = false;
 					this.isMoveResizeChartsRange = false;
 					this.handlers.trigger("moveResizeRangeHandleDone", this.targetInfo);
@@ -1024,7 +1024,7 @@
 					this.handlers.trigger("moveRangeHandleDone");
 				}
 				
-				if (this.isMoveResizeChartsRange) {
+				if (this.isMoveResizeRange) {
 					this.isMoveResizeRange = false;
 					this.isMoveResizeChartsRange = false;
 					this.handlers.trigger("moveResizeRangeHandleDone", this.targetInfo);
