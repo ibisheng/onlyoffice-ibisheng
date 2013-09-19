@@ -1002,6 +1002,17 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart, options)
 	arrBaseColors = styleManager.getBaseColors( parseInt(chart.styleId) );
 	var arrFormatAdobeLabels = [];
 	
+	//просматриваем bShowValue для каждой из серий 
+	//TODO позже отрисовывать значения для каждой серии индивидуально
+	if ( !chart.bShowValue ) {
+		for (var n = 0; n < chart.series.length; n++) {
+			if ( chart.series[n].bShowValue ) {
+				chart.bShowValue = true;
+				break;
+			}
+		}
+	}
+				
 	if(chart.series && chart.series.length != 0 /*&& !chart.range.intervalObject*/)//берём данные из NumCache
 	{
 		isSeries = true;
