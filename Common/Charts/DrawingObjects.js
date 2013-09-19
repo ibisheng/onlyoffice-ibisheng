@@ -2437,8 +2437,8 @@ function DrawingObjects() {
 		// GraphicObject: x, y, extX, extY
 		_t.getGraphicObjectMetrics = function() {
 			
-			return { x: pxToMm(_t.getRealLeftOffset()),
-					 y: pxToMm(_t.getRealTopOffset()),
+			return { x: pxToMm(_t.getRealLeftOffset() - worksheet.getCellLeft(0, 0)),
+					 y: pxToMm(_t.getRealTopOffset() - worksheet.getCellTop(0, 0)),
 					 extX: pxToMm(_t.getWidthFromTo()),
 					 extY: pxToMm(_t.getHeightFromTo()) };
 		}
@@ -2731,20 +2731,8 @@ function DrawingObjects() {
 		aObjectsSync = [];
 		
 		// Смещаем 0,0
-		/*var _x = worksheet.getCellLeft(0, 0);
-		var _y = worksheet.getCellTop(0, 0);
-		
-		shapeCtx.m_oCoordTransform.tx -= _x;
-		shapeCtx.m_oCoordTransform.ty -= _y;
-		shapeCtx.CalculateFullTransform();
-		
-		shapeOverlayCtx.m_oCoordTransform.tx -= _x;
-		shapeOverlayCtx.m_oCoordTransform.ty -= _y;
-		shapeOverlayCtx.CalculateFullTransform();
-		
-		autoShapeTrack.Graphics.m_oCoordTransform.tx -= _x;
-		autoShapeTrack.Graphics.m_oCoordTransform.ty -= _y;
-		autoShapeTrack.Graphics.CalculateFullTransform();*/
+		scrollOffset.x = worksheet.getCellLeft(0, 0);
+		scrollOffset.y = worksheet.getCellTop(0, 0);
 		
 		for (var i = 0; currentSheet.model.Drawings && (i < currentSheet.model.Drawings.length); i++) {
 			
@@ -2819,12 +2807,9 @@ function DrawingObjects() {
 				var image = api.ImageLoader.LoadImage(aImagesSync[i], 1);	// Должна быть в мапе
 				
 				if ( image != null ) {
-				
-					var headerTop = worksheet.getCellTop(0, 0);
-					var headerLeft = worksheet.getCellLeft(0, 0);
 									
-					var x = pxToMm(drawingObject.getVisibleLeftOffset() + headerLeft);
-					var y = pxToMm(drawingObject.getVisibleTopOffset() + headerTop);
+					var x = pxToMm(drawingObject.getVisibleLeftOffset());
+					var y = pxToMm(drawingObject.getVisibleTopOffset());
 					var w = pxToMm(drawingObject.getWidthFromTo());
 					var h = pxToMm(drawingObject.getHeightFromTo());
 					
@@ -4181,13 +4166,13 @@ function DrawingObjects() {
 		var left = worksheet.getCellLeft(0, 3) + pxToMm(1);
 		
 		// выход за границу слева или сверху
-		if ( y < top ) {
+		if ( y < 0 ) {
 			response.result = false;
-			response.y = top - y;
+			response.y = Math.abs(y);
 		}
-		if ( x < left ) {
+		if ( x < 0 ) {
 			response.result = false;
-			response.x = left - x;
+			response.x = Math.abs(x);
 		}
 		
 		// выход за границу справа
@@ -4231,29 +4216,27 @@ function DrawingObjects() {
 	
 	_this.setScrollOffset = function(x_px, y_px) {
 		
-		var _x_px = x_px;
-		var _y_px = y_px;
-		
 		if ( shapeCtx && shapeOverlayCtx && autoShapeTrack ) {
 		
-			scrollOffset.x -= _x_px;
-			scrollOffset.y -= _y_px;
+			scrollOffset.x -= x_px;
+			scrollOffset.y -= y_px;
 
-			shapeCtx.m_oCoordTransform.tx -= _x_px;
-			shapeCtx.m_oCoordTransform.ty -= _y_px;
+			shapeCtx.m_oCoordTransform.tx = scrollOffset.x;
+			shapeCtx.m_oCoordTransform.ty = scrollOffset.y;
 			shapeCtx.CalculateFullTransform();
 			
-			shapeOverlayCtx.m_oCoordTransform.tx -= _x_px;
-			shapeOverlayCtx.m_oCoordTransform.ty -= _y_px;
+			shapeOverlayCtx.m_oCoordTransform.tx = scrollOffset.x;
+			shapeOverlayCtx.m_oCoordTransform.ty = scrollOffset.y;
 			shapeOverlayCtx.CalculateFullTransform();
 			
-			autoShapeTrack.Graphics.m_oCoordTransform.tx -= _x_px;
-			autoShapeTrack.Graphics.m_oCoordTransform.ty -= _y_px;
+			autoShapeTrack.Graphics.m_oCoordTransform.tx = scrollOffset.x;
+			autoShapeTrack.Graphics.m_oCoordTransform.ty = scrollOffset.y;
 			autoShapeTrack.Graphics.CalculateFullTransform();
 		}
 	}
 	
 	_this.restoreScrollOffset = function() {
+	
 		shapeCtx.m_oCoordTransform.tx = scrollOffset.x;
 		shapeCtx.m_oCoordTransform.ty = scrollOffset.y;
 		shapeCtx.CalculateFullTransform();
