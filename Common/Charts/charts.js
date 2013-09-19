@@ -1278,7 +1278,7 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart, options)
 				}
 			}
 			//меняем форматы осей для отдельных случаев точечных диаграмм
-			if(scatterArr[0] && scatter[0].length == 1)
+			if(scatterArr[0] && scatterArr[0].length == 1)
 			{
 				formatCellScOy = formatCell;
 				formatCell = "General";
