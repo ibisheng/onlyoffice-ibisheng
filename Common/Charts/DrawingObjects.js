@@ -4886,7 +4886,7 @@ function ObjectLocker(ws) {
 				if ($.isFunction(callback)) { callbackEx(true); }
 				callback = undefined;
 			}
-			else if ( false !== worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine) ) {
+			if ( false !== worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine) ) {
 				// Редактируем сами, проверяем дальше
 				continue;
 			}

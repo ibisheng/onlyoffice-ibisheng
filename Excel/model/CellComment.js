@@ -559,7 +559,7 @@ function asc_CCellCommentator(currentSheet) {
 					if ($.isFunction(callbackFunc)) { callbackFunc(true); }
 					callbackFunc = undefined;
 				}
-				else if (false !== _this.worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/false)) {
+				if (false !== _this.worksheet.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/false)) {
 					// Редактируем сами
 					if ($.isFunction(callbackFunc)) { callbackFunc(true); }
 					return;

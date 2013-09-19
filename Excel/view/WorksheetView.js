@@ -7894,7 +7894,8 @@
 					// Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
 					if ($.isFunction(callback)) {callback(true);}
 					callback = undefined;
-				} else if (false !== this.collaborativeEditing.getLockIntersection(lockInfo,
+				}
+				if (false !== this.collaborativeEditing.getLockIntersection(lockInfo,
 					c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/true)) {
 					// Редактируем сами
 					if ($.isFunction(callback)) {callback(true);}
