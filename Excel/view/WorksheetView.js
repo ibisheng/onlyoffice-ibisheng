@@ -5014,8 +5014,8 @@
 				return null;
 			},
 
-			getCursorTypeFromXY: function (x, y) {
-				var c, r, f;
+			getCursorTypeFromXY: function (x, y, isViewerMode) {
+				var c, r, f, i, offsetX, offsetY;
 				var left, top, right, bottom;
 				var sheetId = this.model.getId();
 				var userId = undefined;
@@ -5024,7 +5024,7 @@
 				var lockInfo = undefined;
 				var isLocked = false;
 				
-				if ( asc["editor"].isStartAddShape )
+				if (asc["editor"].isStartAddShape)
 					return {cursor: kCurFillHandle, target: "shape", col: -1, row: -1};
 				
 				var drawingInfo = this.objectRender.checkCursorDrawingObject(x, y);
@@ -5039,23 +5039,25 @@
 						lockRangePosTop = drawingInfo.object.getVisibleTopOffset(true);
 					}
 
-					return {cursor: drawingInfo.cursor, target: "shape", drawingId: drawingInfo.id, col: -1, row: -1, userId: userId, lockRangePosLeft: lockRangePosLeft, lockRangePosTop: lockRangePosTop};
+					return {cursor: drawingInfo.cursor, target: "shape", drawingId: drawingInfo.id, col: -1, row: -1,
+						userId: userId, lockRangePosLeft: lockRangePosLeft, lockRangePosTop: lockRangePosTop};
 				}
 					
-				var autoFilterCursor = this.autoFilters.isButtonAFClick(x,y,this);
-				if(autoFilterCursor)
+				var autoFilterCursor = this.autoFilters.isButtonAFClick(x, y, this);
+				if (autoFilterCursor)
 					return {cursor: autoFilterCursor, target: "aFilterObject", col: -1, row: -1};
 
-				x *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIX() );
-				y *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIY() );
+				x *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
+				y *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIY());
 					
-				if (this.isFormulaEditMode || this.isChartAreaEditMode)
-				{
-					var offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
-					var offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
+				if (this.isFormulaEditMode || this.isChartAreaEditMode) {
+					offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
+					offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
 					var arr = this.isFormulaEditMode ? this.arrActiveFormulaRanges : this.arrActiveChartsRanges,
 						targetArr = this.isFormulaEditMode ? 0 : -1;
-					for (var i in arr) {
+					for (i in arr) {
+						if (!arr.hasOwnProperty(i))
+							continue;
 						var arFormulaTmp = arr[i].clone(true);
 						var aFormulaIntersection = arFormulaTmp.intersection(this.visibleRange);
 						
@@ -5065,7 +5067,7 @@
 							var yFormula1 = this.rows[aFormulaIntersection.r1].top - offsetY;
 							var yFormula2 = this.rows[aFormulaIntersection.r2].top + this.rows[aFormulaIntersection.r2].height - offsetY;
 							
-							if(
+							if (
 								(x >= xFormula1 + 5 && x <= xFormula2 - 5) && ((y >= yFormula1 - this.height_2px && y <= yFormula1 + this.height_2px) || (y >= yFormula2 - this.height_2px && y <= yFormula2 + this.height_2px))
 								||
 								(y >= yFormula1 + 5 && y <= yFormula2 - 5) && ((x >= xFormula1 - this.width_2px && x <= xFormula1 + this.width_2px) || (x >= xFormula2 - this.width_2px && x <= xFormula2 + this.width_2px))
@@ -5075,29 +5077,25 @@
 												row: -1,
 												formulaRange: arFormulaTmp, indexFormulaRange:i,
 												targetArr: targetArr};
-							}
-							else if( x >= xFormula1 && x < xFormula1 + 5 && y >= yFormula1 && y < yFormula1 + 5 ){
+							} else if( x >= xFormula1 && x < xFormula1 + 5 && y >= yFormula1 && y < yFormula1 + 5 ){
 								return {cursor: kCurSEResize, target: "moveResizeRange",
 												col: aFormulaIntersection.c2,
 												row: aFormulaIntersection.r2, 
 												formulaRange: arFormulaTmp, indexFormulaRange:i,
 												targetArr: targetArr};
-							}
-							else if ( x > xFormula2 - 5 && x <= xFormula2 && y > yFormula2 - 5 && y <= yFormula2 ){
+							} else if ( x > xFormula2 - 5 && x <= xFormula2 && y > yFormula2 - 5 && y <= yFormula2 ){
 								return {cursor: kCurSEResize, target: "moveResizeRange",
 												col: aFormulaIntersection.c1,
 												row: aFormulaIntersection.r1, 
 												formulaRange: arFormulaTmp, indexFormulaRange:i,
 												targetArr: targetArr};
-							}
-							else if( x > xFormula2 - 5 && x <= xFormula2 && y >= yFormula1 && y < yFormula1 + 5 ){
+							} else if( x > xFormula2 - 5 && x <= xFormula2 && y >= yFormula1 && y < yFormula1 + 5 ){
 								return {cursor: kCurNEResize, target: "moveResizeRange",
 												col: aFormulaIntersection.c1,
 												row: aFormulaIntersection.r2, 
 												formulaRange: arFormulaTmp, indexFormulaRange:i,
 												targetArr: targetArr};
-							}
-							else if( x >= xFormula1 && x < xFormula1 + 5 && y > yFormula2 - 5 && y <= yFormula2 ){
+							} else if( x >= xFormula1 && x < xFormula1 + 5 && y > yFormula2 - 5 && y <= yFormula2 ){
 								return {cursor: kCurNEResize, target: "moveResizeRange",
 												col: aFormulaIntersection.c2,
 												row: aFormulaIntersection.r1, 
@@ -5111,14 +5109,15 @@
 				do {
 					// Эпсилон для fillHandle
 					var fillHandleEpsilon = this.width_1px;
-					if (x >= (this.fillHandleL - fillHandleEpsilon) && x <= (this.fillHandleR + fillHandleEpsilon) &&
-						y >= (this.fillHandleT - fillHandleEpsilon) && y <= (this.fillHandleB + fillHandleEpsilon) && !this.isChartAreaEditMode) {
+					if (!isViewerMode && !this.isChartAreaEditMode &&
+						x >= (this.fillHandleL - fillHandleEpsilon) && x <= (this.fillHandleR + fillHandleEpsilon) &&
+						y >= (this.fillHandleT - fillHandleEpsilon) && y <= (this.fillHandleB + fillHandleEpsilon)) {
 						// Мы на "квадрате" для автозаполнения
 						return {cursor: kCurFillHandle, target: "fillhandle", col: -1, row: -1};
 					}
 
-					var offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
-					var offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
+					offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
+					offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
 					var xWithOffset = x + offsetX;
 					var yWithOffset = y + offsetY;
 					
@@ -5127,8 +5126,12 @@
 					right = this.cols[this.activeRange.c2].left + this.cols[this.activeRange.c2].width;
 					top = this.rows[this.activeRange.r1].top;
 					bottom = this.rows[this.activeRange.r2].top + this.rows[this.activeRange.r2].height;
-					if ((((xWithOffset >= left - this.width_2px && xWithOffset <= left + this.width_2px) || (xWithOffset >= right - this.width_2px && xWithOffset <= right + this.width_2px)) && yWithOffset >= top - this.height_2px && yWithOffset <= bottom + this.height_2px) ||
-						(((yWithOffset >= top - this.height_2px && yWithOffset <= top + this.height_2px) || (yWithOffset >= bottom - this.height_2px && yWithOffset <= bottom + this.height_2px)) && xWithOffset >= left - this.width_2px && xWithOffset <= right + this.width_2px)) {
+					if (!isViewerMode && ((((xWithOffset >= left - this.width_2px && xWithOffset <= left + this.width_2px) ||
+						(xWithOffset >= right - this.width_2px && xWithOffset <= right + this.width_2px)) &&
+						yWithOffset >= top - this.height_2px && yWithOffset <= bottom + this.height_2px) ||
+						(((yWithOffset >= top - this.height_2px && yWithOffset <= top + this.height_2px) ||
+						(yWithOffset >= bottom - this.height_2px && yWithOffset <= bottom + this.height_2px)) &&
+						xWithOffset >= left - this.width_2px && xWithOffset <= right + this.width_2px))) {
 						// Мы навели на границу выделения
 						return {cursor: kCurMove, target: "moveRange", col: -1, row: -1};
 					}
@@ -5148,7 +5151,7 @@
 						var lockAllPosTop = undefined;
 						var userIdAllProps = undefined;
 						var userIdAllSheet = undefined;
-						if (this.collaborativeEditing.getCollaborativeEditing()) {
+						if (!isViewerMode && this.collaborativeEditing.getCollaborativeEditing()) {
 							var c1Recalc = null, r1Recalc = null;
 							var selectRangeRecalc = asc_Range(c.col, r.row, c.col, r.row);
 							// Пересчет для входящих ячеек в добавленные строки/столбцы
@@ -5217,7 +5220,7 @@
 
 						if (0 < comments.length) {
 							indexes = [];
-							for (var i = 0; i < comments.length; ++i) {
+							for (i = 0; i < comments.length; ++i) {
 								indexes.push(comments[i].asc_getId());
 							}
 							coords = this.cellCommentator.getCommentsCoords(comments);
@@ -5245,7 +5248,7 @@
 					if (x <= this.cellsLeft && y >= this.cellsTop) {
 						r = this._findRowUnderCursor(y, true);
 						if (r === null) {break;}
-						f = r.row !== this.visibleRange.r1 && y < r.top + 3 || y >= r.bottom - 3;
+						f = !isViewerMode && (r.row !== this.visibleRange.r1 && y < r.top + 3 || y >= r.bottom - 3);
 						// ToDo В Excel зависимость epsilon от размера ячейки (у нас фиксированный 3)
 						return {
 							cursor: f ? kCurRowResize : kCurRowSelect,
@@ -5259,7 +5262,7 @@
 					if (y <= this.cellsTop && x >= this.cellsLeft) {
 						c = this._findColUnderCursor(x, true);
 						if (c === null) {break;}
-						f = c.col !== this.visibleRange.c1 && x < c.left + 3 || x >= c.right - 3;
+						f = !isViewerMode && (c.col !== this.visibleRange.c1 && x < c.left + 3 || x >= c.right - 3);
 						// ToDo В Excel зависимость epsilon от размера ячейки (у нас фиксированный 3)
 						return {
 							cursor: f ? kCurColResize : kCurColSelect,

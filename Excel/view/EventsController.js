@@ -1306,15 +1306,14 @@
 					this.targetInfo = undefined;
 					this.handlers.trigger("updateWorksheet", this.element[0]);
 				}
-				if( this.isMoveRangeMode ){
-					var t = this;
-					t.moveRangeTimerId = window.setTimeout(function(){t._moveRangeHandle2(event)},0)
+				if (this.isMoveRangeMode) {
+					t.moveRangeTimerId = window.setTimeout(function(){t._moveRangeHandle2(event)},0);
 				}
-				if( this.isMoveResizeRange ){
-					t.moveResizeRangeTimerId = window.setTimeout(function(){t._moveResizeRangeHandle2(event)},0)
+				if (this.isMoveResizeRange) {
+					t.moveResizeRangeTimerId = window.setTimeout(function(){t._moveResizeRangeHandle2(event)},0);
 				}
-				if (this.isFillHandleMode){
-					t.fillHandleModeTimerId = window.setTimeout(function(){t._changeFillHandle2(event)},0)
+				if (this.isFillHandleMode) {
+					t.fillHandleModeTimerId = window.setTimeout(function(){t._changeFillHandle2(event)},0);
 				}
 				return true;
 			},

@@ -500,7 +500,7 @@
 					this._onWSSelectionChanged(ws.getSelectionInfo());
 				}
 
-				var ct = ws.getCursorTypeFromXY(x, y);
+				var ct = ws.getCursorTypeFromXY(x, y, this.controller.settings.isViewerMode);
 				
 				if ("hyperlink" === ct.target) {
 					// Проверим замерженность
@@ -558,7 +558,7 @@
 				} else if (x === undefined && y === undefined) {
 					ws.cleanHighlightedHeaders();
 				} else {
-					ct = ws.getCursorTypeFromXY(x, y);
+					ct = ws.getCursorTypeFromXY(x, y, this.controller.settings.isViewerMode);
 
 					// Отправление эвента об удалении всего листа (именно удалении, т.к. если просто залочен, то не рисуем рамку вокруг)
 					if (undefined !== ct.userIdAllSheet) {
@@ -740,7 +740,7 @@
 			_onMouseDblClick: function (x, y, isHideCursor, isCoord, callback) {
 				var res = false;
 				var ws = this.getWorksheet();
-				var ct = ws.getCursorTypeFromXY(x, y);
+				var ct = ws.getCursorTypeFromXY(x, y, this.controller.settings.isViewerMode);
 
 				if (ct.target === "colresize" || ct.target === "rowresize") {
 					res = true;
