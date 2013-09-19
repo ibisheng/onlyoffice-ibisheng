@@ -1137,8 +1137,8 @@ function BinaryChartWriter(memory)
 			this.bs.WriteItem(c_oSer_ChartSeriesType.Marker, function(){oThis.WriteSeriesMarkers(seria.Marker);});
 		if(null != nIndex)
 			this.bs.WriteItem(c_oSer_ChartSeriesType.Index, function(){oThis.memory.WriteLong(nIndex);});
-		if(null != nIndex)
-			this.bs.WriteItem(c_oSer_ChartSeriesType.Index, function(){oThis.memory.WriteLong(nIndex);});
+		if(null != seria.bShowValue)
+			this.bs.WriteItem(c_oSer_ChartSeriesType.DataLabels, function(){oThis.memory.WriteDataLabels(seria);});
 		if(null != seria.OutlineColor)
 		{
 			var oSolidFill = new CSolidFill();
@@ -1862,6 +1862,8 @@ function Binary_ChartReader(stream, chart, chartAsGroup)
 				});
 			if(null != oOutput.TxPrPptx && null != oOutput.TxPrPptx.font)
 				seria.LabelFont = oOutput.TxPrPptx.font;
+			if(null != oOutput.ShowVal)
+				seria.bShowValue = oOutput.ShowVal;
 		}
 		else if ( c_oSer_ChartSeriesType.SpPr === type )
 		{
