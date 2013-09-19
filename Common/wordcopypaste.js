@@ -2793,22 +2793,43 @@ PasteProcessor.prototype =
 					}
 				}
 				this.aContent = aContent.content;
+				var oImagesToDownload = {};
 				if(aContent.aPastedImages.length > 0)
 				{
-					var rData = {"id":documentId, "c":"imgurls", "data": JSON.stringify(aContent.images)};
+					for(var i = 0, length = aContent.aPastedImages.length; i < length; ++i)
+					{
+						var imageElem = aContent.aPastedImages[i];
+						var src = imageElem.Url;
+						if(false == (0 == src.indexOf("data:") || 0 == src.indexOf(documentOrigin + this.api.DocumentUrl) || 0 == src.indexOf(this.api.DocumentUrl)))
+						{
+							oImagesToDownload[src] = 1;
+							//для svg надо еще скопировать wmf и emf
+							var nExtIndex = src.lastIndexOf(".");
+							if(-1 != nExtIndex && ".svg" == src.substring(nExtIndex))
+							{
+								var sStart = src.substring(0, nExtIndex)
+								oImagesToDownload[sStart + ".wmf"] = 1;
+								oImagesToDownload[sStart + ".emf"] = 1;
+							}
+						}
+					}
+				}
+				var aImagesToDownload = [];
+				for(var i in oImagesToDownload)
+					aImagesToDownload.push(i);
+				if(aImagesToDownload.length > 0)
+				{
+					var rData = {"id":documentId, "c":"imgurls", "data": JSON.stringify(aImagesToDownload)};
 					sendCommand( this.api, function(incomeObject){
 						if(incomeObject && "imgurls" == incomeObject.type)
 						{
-							var aImages = JSON.parse(incomeObject.data);
-							var oFromTo = {};
-							for(var i = 0, length1 = aImages.length, length2 = aContent.images.length; i < length1 && i < length2; ++i)
+							var oFromTo = JSON.parse(incomeObject.data);
+							for(var i = 0, length = aContent.images.length; i < length; ++i)
 							{
 								var sFrom = aContent.images[i];
-								var sTo = aImages[i];
-								if(0 == sTo.indexOf(oThis.api.DocumentUrl + "media/"))
-									sTo = sTo.substring((oThis.api.DocumentUrl + "media/").length);
-								oFromTo[sFrom] = sTo;
-								aContent.images[i] = sTo;
+								var sTo = oFromTo[sFrom];
+								if(sTo)
+									aContent.images[i] = sTo;
 							}
 							for(var i = 0, length = aContent.aPastedImages.length; i < length; ++i)
 							{
@@ -2879,7 +2900,7 @@ PasteProcessor.prototype =
 				var src = this.oImages[image];
 				if(0 == src.indexOf("file:"))
 					this.oImages[image] = "local";
-				else if(false == (0 == src.indexOf("data:") ||  0 == src.indexOf(documentOrigin + this.api.DocumentUrl) && 0 == src.indexOf(this.api.DocumentUrl)))
+				else if(false == (0 == src.indexOf("data:") || 0 == src.indexOf(documentOrigin + this.api.DocumentUrl) || 0 == src.indexOf(this.api.DocumentUrl)))
 					aImagesToDownload.push(src);
 			}
 			var oPrepeareImages = new Object();
@@ -2889,12 +2910,16 @@ PasteProcessor.prototype =
 				sendCommand( this.api, function(incomeObject){
 						if(incomeObject && "imgurls" == incomeObject.type)
 						{
-							var aImages = JSON.parse(incomeObject.data);
-							for(var i = 0, length1 = aImages.length, length2 = aImagesToDownload.length; i < length1 && i < length2; ++i)
+							var oFromTo = JSON.parse(incomeObject.data);
+							for(var i = 0, length = aImagesToDownload.length; i < length; ++i)
 							{
-								var sNewSrc = aImages[i];
-								oThis.oImages[aImagesToDownload[i]] = sNewSrc;
-								oPrepeareImages[i] = sNewSrc;
+								var sFrom = aImagesToDownload[i];
+								var sTo = oFromTo[sFrom];
+								if(sTo)
+								{
+									oThis.oImages[sFrom] = sTo;
+									oPrepeareImages[i] = sTo;
+								}
 							}
 						}
 						oThis.api.pre_Paste(aPrepeareFonts, oPrepeareImages, fCallback);
