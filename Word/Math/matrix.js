@@ -462,7 +462,7 @@ CEqArray.prototype.init = function(props)
 {
     var prps =
     {
-        column:     props.column,
+        column:     1,
         row:        props.row,
         baseJc:     "center",
         rSpRule:    4,

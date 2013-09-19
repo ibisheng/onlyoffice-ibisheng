@@ -459,7 +459,7 @@ CMathContent.prototype =
                     mathElem = new CBox();
                     break;
                 case MATH_EQ_ARRAY:
-                    mathElem = new CEqArray()
+                    mathElem = new CEqArray();
                     break;
 
             }
@@ -3085,9 +3085,9 @@ CMathContent.prototype =
                     var delim = base.addMComponent(MATH_DELIMITER);
                     props =
                     {
-                        begChr:        {type:  PARENTHESIS_LEFT},
-                        endChr:        {type:  PARENTHESIS_RIGHT},
-                        shapeType:     DELIMITER_SHAPE_MATH,
+                        begChrType:      PARENTHESIS_LEFT,
+                        endChrType:      PARENTHESIS_RIGHT,
+                        shapeType:      DELIMITER_SHAPE_MATH,
                         column:        1
 
                     };
@@ -3156,10 +3156,10 @@ CMathContent.prototype =
                     var delim = base.addMComponent(MATH_DELIMITER);
                     props =
                     {
-                        begChr:     {type:  PARENTHESIS_LEFT},
-                        endChr:     {type:  PARENTHESIS_RIGHT},
-                        shapeType:  DELIMITER_SHAPE_MATH,
-                        column:     1
+                        begChrType:     PARENTHESIS_LEFT,
+                        endChrType:     PARENTHESIS_RIGHT,
+                        shapeType:      DELIMITER_SHAPE_MATH,
+                        column:         1
                     };
                     delim.init(props);
                     var base2 = delim.getBase();
@@ -3169,7 +3169,6 @@ CMathContent.prototype =
                     var eqqArray = iter.addMComponent(MATH_EQ_ARRAY);
                     props =
                     {
-                        column:     1,
                         row:        2
                     };
                     eqqArray.init(props);
@@ -3197,8 +3196,8 @@ CMathContent.prototype =
                     var delim = base.addMComponent(MATH_DELIMITER);
                     props =
                     {
-                        begChr:        {type:  PARENTHESIS_LEFT},
-                        endChr:        {type:  PARENTHESIS_RIGHT},
+                        begChrType:    PARENTHESIS_LEFT,
+                        endChrType:    PARENTHESIS_RIGHT,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        1
                     };
@@ -3239,8 +3238,8 @@ CMathContent.prototype =
                     };*/
                     var props =
                      {
-                     begChr:        {type: PARENTHESIS_LEFT},
-                     endChr:        {type: PARENTHESIS_RIGHT},
+                     begChrType:    PARENTHESIS_LEFT,
+                     endChrType:    PARENTHESIS_RIGHT,
                      shapeType:     DELIMITER_SHAPE_MATH,
                      column:        1
                      };
@@ -3251,8 +3250,8 @@ CMathContent.prototype =
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        begChr:        {type: BRACKET_SQUARE_LEFT},
-                        endChr:        {type: BRACKET_SQUARE_RIGHT},
+                        begChrType:    BRACKET_SQUARE_LEFT,
+                        endChrType:    BRACKET_SQUARE_RIGHT,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        1
                     };
@@ -3263,8 +3262,8 @@ CMathContent.prototype =
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        begChr:        {type: BRACKET_CURLY_LEFT},
-                        endChr:        {type: BRACKET_CURLY_RIGHT},
+                        begChrType:    BRACKET_CURLY_LEFT,
+                        endChrType:    BRACKET_CURLY_RIGHT,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        1
                     };
@@ -3275,8 +3274,8 @@ CMathContent.prototype =
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        begChr:        {type: BRACKET_ANGLE_LEFT},
-                        endChr:        {type: BRACKET_ANGLE_RIGHT},
+                        begChrType:    BRACKET_ANGLE_LEFT,
+                        endChrType:    BRACKET_ANGLE_RIGHT,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        1
                     };
@@ -3287,8 +3286,8 @@ CMathContent.prototype =
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        begChr:        {type: HALF_SQUARE_LEFT},
-                        endChr:        {type: HALF_SQUARE_RIGHT},
+                        begChrType:    HALF_SQUARE_LEFT,
+                        endChrType:    HALF_SQUARE_RIGHT,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        1
                     };
@@ -3299,8 +3298,8 @@ CMathContent.prototype =
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        begChr:        {type: HALF_SQUARE_LEFT_UPPER},
-                        endChr:        {type: HALF_SQUARE_RIGHT_UPPER},
+                        begChrType:    HALF_SQUARE_LEFT_UPPER,
+                        endChrType:    HALF_SQUARE_RIGHT_UPPER,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        1
                     };
@@ -3311,8 +3310,8 @@ CMathContent.prototype =
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        begChr:        {type: DELIMITER_LINE},
-                        endChr:        {type: DELIMITER_LINE},
+                        begChrType:    DELIMITER_LINE,
+                        endChrType:    DELIMITER_LINE,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        1
                     };
@@ -3323,8 +3322,8 @@ CMathContent.prototype =
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        begChr:        {type: DELIMITER_DOUBLE_LINE},
-                        endChr:        {type: DELIMITER_DOUBLE_LINE},
+                        begChrType:    DELIMITER_DOUBLE_LINE,
+                        endChrType:     DELIMITER_DOUBLE_LINE,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        1
                     };
@@ -3335,8 +3334,8 @@ CMathContent.prototype =
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        begChr:        {type: BRACKET_SQUARE_LEFT},
-                        endChr:        {type: BRACKET_SQUARE_LEFT},
+                        begChrType:    BRACKET_SQUARE_LEFT,
+                        endChrType:     BRACKET_SQUARE_LEFT,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        1
                     };
@@ -3347,8 +3346,8 @@ CMathContent.prototype =
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        begChr:        {type: BRACKET_SQUARE_RIGHT},
-                        endChr:        {type: BRACKET_SQUARE_RIGHT},
+                        begChrType:    BRACKET_SQUARE_RIGHT,
+                        endChrType:     BRACKET_SQUARE_RIGHT,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        1
                     };
@@ -3359,8 +3358,8 @@ CMathContent.prototype =
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        begChr:        {type: BRACKET_SQUARE_RIGHT},
-                        endChr:        {type: BRACKET_SQUARE_LEFT},
+                        begChrType:    BRACKET_SQUARE_RIGHT,
+                        endChrType:     BRACKET_SQUARE_LEFT,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        1
                     };
@@ -3371,8 +3370,8 @@ CMathContent.prototype =
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        begChr:        {type: WHITE_SQUARE_LEFT},
-                        endChr:        {type: WHITE_SQUARE_RIGHT},
+                        begChrType:    WHITE_SQUARE_LEFT,
+                        endChrType:     WHITE_SQUARE_RIGHT,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        1
                     };
@@ -3381,7 +3380,7 @@ CMathContent.prototype =
                     break;
                 case 96:
                     var delim = this.addMComponent(MATH_DELIMITER);
-                   /* var props =
+                    /*var props =
                     {
                         begChr:    {type: PARENTHESIS_LEFT},
                         sepChr:    {type: BRACKET_ANGLE_LEFT},
@@ -3390,9 +3389,9 @@ CMathContent.prototype =
                     };*/
                     var props =
                     {
-                        begChr:        {type: PARENTHESIS_LEFT},
-                        sepChr:        {type: DELIMITER_LINE},
-                        endChr:        {type: PARENTHESIS_RIGHT},
+                        begChrType:    PARENTHESIS_LEFT,
+                        sepChrType:    DELIMITER_LINE,
+                        endChrType:    PARENTHESIS_RIGHT,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        2
                     };
@@ -3403,9 +3402,9 @@ CMathContent.prototype =
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        begChr:        {type: BRACKET_CURLY_LEFT},
-                        sepChr:        {type: DELIMITER_LINE},
-                        endChr:        {type: BRACKET_CURLY_RIGHT},
+                        begChrType:    BRACKET_CURLY_LEFT,
+                        sepChrType:    DELIMITER_LINE,
+                        endChrType:    BRACKET_CURLY_RIGHT,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        2
                     };
@@ -3417,9 +3416,9 @@ CMathContent.prototype =
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        begChr:        {type: BRACKET_ANGLE_LEFT},
-                        sepChr:        {type: DELIMITER_LINE},
-                        endChr:        {type: BRACKET_ANGLE_RIGHT},
+                        begChrType:    BRACKET_ANGLE_LEFT,
+                        sepChrType:    DELIMITER_LINE,
+                        endChrType:    BRACKET_ANGLE_RIGHT,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:         2
                     };
@@ -3430,9 +3429,9 @@ CMathContent.prototype =
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        begChr:        {type: BRACKET_ANGLE_LEFT},
-                        sepChr:        {type: DELIMITER_LINE},
-                        endChr:        {type: BRACKET_ANGLE_RIGHT},
+                        begChrType:    BRACKET_ANGLE_LEFT,
+                        sepChrType:    DELIMITER_LINE,
+                        endChrType:    BRACKET_ANGLE_RIGHT,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        3
                     };
@@ -3443,7 +3442,7 @@ CMathContent.prototype =
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        begChr:        {type: PARENTHESIS_LEFT},
+                        begChrType:    PARENTHESIS_LEFT,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        1
                     };
@@ -3454,7 +3453,7 @@ CMathContent.prototype =
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        endChr:        {type: PARENTHESIS_RIGHT},
+                        endChrType:    PARENTHESIS_RIGHT,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        1
                     };
@@ -3465,7 +3464,7 @@ CMathContent.prototype =
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        begChr:        {type: BRACKET_SQUARE_LEFT},
+                        begChrType:    BRACKET_SQUARE_LEFT,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        1
                     };
@@ -3476,7 +3475,7 @@ CMathContent.prototype =
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        endChr:        {type: BRACKET_SQUARE_RIGHT},
+                        endChrType:    BRACKET_SQUARE_RIGHT,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        1
                     };
@@ -3487,7 +3486,7 @@ CMathContent.prototype =
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        begChr:        {type: BRACKET_CURLY_LEFT},
+                        begChrType:    BRACKET_CURLY_LEFT,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        1
                     };
@@ -3498,7 +3497,7 @@ CMathContent.prototype =
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        endChr:        {type: BRACKET_CURLY_RIGHT},
+                        endChrType:    BRACKET_CURLY_RIGHT,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        1
                     };
@@ -3509,7 +3508,7 @@ CMathContent.prototype =
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        begChr:        {type: BRACKET_ANGLE_LEFT},
+                        begChrType:    BRACKET_ANGLE_LEFT,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        1
                     };
@@ -3520,7 +3519,7 @@ CMathContent.prototype =
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        endChr:        {type: BRACKET_ANGLE_RIGHT},
+                        endChrType:    BRACKET_ANGLE_RIGHT,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        1
                     };
@@ -3531,7 +3530,7 @@ CMathContent.prototype =
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        begChr:        {type: HALF_SQUARE_LEFT},
+                        begChrType:    HALF_SQUARE_LEFT,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        1
                     };
@@ -3542,7 +3541,7 @@ CMathContent.prototype =
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        endChr:        {type: HALF_SQUARE_RIGHT},
+                        endChrType:    HALF_SQUARE_RIGHT,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        1
                     };
@@ -3553,7 +3552,7 @@ CMathContent.prototype =
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        begChr:        {type: HALF_SQUARE_LEFT_UPPER},
+                        begChrType:    HALF_SQUARE_LEFT_UPPER,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        1
                     };
@@ -3564,7 +3563,7 @@ CMathContent.prototype =
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        endChr:        {type: HALF_SQUARE_RIGHT_UPPER},
+                        endChrType:    HALF_SQUARE_RIGHT_UPPER,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        1
                     };
@@ -3575,7 +3574,7 @@ CMathContent.prototype =
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        begChr:        {type: DELIMITER_LINE},
+                        begChrType:    DELIMITER_LINE,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        1
                     };
@@ -3586,7 +3585,7 @@ CMathContent.prototype =
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        endChr:        {type: DELIMITER_LINE},
+                        endChrType:    DELIMITER_LINE,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        1
                     };
@@ -3597,7 +3596,7 @@ CMathContent.prototype =
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        begChr:        {type: DELIMITER_DOUBLE_LINE},
+                        begChrType:    DELIMITER_DOUBLE_LINE,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        1
                     };
@@ -3608,7 +3607,7 @@ CMathContent.prototype =
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        endChr:        {type: DELIMITER_DOUBLE_LINE},
+                        endChrType:    DELIMITER_DOUBLE_LINE,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        1
                     };
@@ -3619,7 +3618,7 @@ CMathContent.prototype =
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        begChr:        {type: WHITE_SQUARE_LEFT},
+                        begChrType:    WHITE_SQUARE_LEFT,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        1
                     };
@@ -3630,7 +3629,7 @@ CMathContent.prototype =
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        endChr:        {type:  WHITE_SQUARE_RIGHT},
+                        endChrType:    WHITE_SQUARE_RIGHT,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        1
                     };
@@ -3641,7 +3640,7 @@ CMathContent.prototype =
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        begChr:        {type: BRACKET_CURLY_LEFT},
+                        begChrType:    BRACKET_CURLY_LEFT,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        1
                     };
@@ -3660,7 +3659,7 @@ CMathContent.prototype =
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        begChr:        {type: BRACKET_CURLY_LEFT},
+                        begChrType:    BRACKET_CURLY_LEFT,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        1
                     };
@@ -3684,8 +3683,8 @@ CMathContent.prototype =
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        begChr:        {type: PARENTHESIS_LEFT},
-                        endChr:        {type: PARENTHESIS_RIGHT},
+                        begChrType:    PARENTHESIS_LEFT,
+                        endChrType:     PARENTHESIS_RIGHT,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        1
                     };
@@ -3696,13 +3695,44 @@ CMathContent.prototype =
                     fract.fillPlaceholders();
                     break;
                 case 122:
+                    this.addTxt("f");
+                    var delim = this.addMComponent(MATH_DELIMITER);
+                    var props =
+                    {
+                        begChrType:     PARENTHESIS_LEFT,
+                        endChrType:     PARENTHESIS_RIGHT,
+                        column:         1
+                    };
+                    delim.init(props);
+                    var base = delim.getBase();
+                    base.addTxt("x");
+                    this.addTxt("=");
+                    var bracket = this.addMComponent(MATH_DELIMITER);
+                    props =
+                    {
+                        begChrType:     BRACKET_CURLY_LEFT,
+                        column:         1
+                    };
+                    bracket.init(props);
+                    var base2 = bracket.getBase();
+                    var eqArr = base2.addMComponent(MATH_EQ_ARRAY);
+                    props =
+                    {
+                        row:    2
+                    };
+                    eqArr.init(props);
+                    var firstRow = eqArr.getElement(0, 0);
+                    firstRow.addTxt("-x,        x<0");
+                    var secRow = eqArr.getElement(1, 0);
+                    secRow.addTxt("   x,        x≥0");
+
                     break;
                 case 123:
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        begChr:        {type: PARENTHESIS_LEFT},
-                        endChr:        {type: PARENTHESIS_RIGHT},
+                        begChrType:    PARENTHESIS_LEFT,
+                        endChrType:     PARENTHESIS_RIGHT,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        1
                     };
@@ -3720,8 +3750,8 @@ CMathContent.prototype =
                     var delim = this.addMComponent(MATH_DELIMITER);
                     var props =
                     {
-                        begChr:        {type: BRACKET_ANGLE_LEFT},
-                        endChr:        {type: BRACKET_ANGLE_RIGHT},
+                        begChrType:    BRACKET_ANGLE_LEFT,
+                        endChrType:     BRACKET_ANGLE_RIGHT,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        1
                     };
@@ -4401,8 +4431,8 @@ CMathContent.prototype =
                     var delim = base.addMComponent(MATH_DELIMITER);
                     props =
                     {
-                        begChr:        {type:  PARENTHESIS_LEFT},
-                        endChr:        {type:  PARENTHESIS_RIGHT},
+                        begChrType:        PARENTHESIS_LEFT,
+                        endChrType:    PARENTHESIS_RIGHT,
                         shapeType:     DELIMITER_SHAPE_MATH,
                         column:        1
                     };
@@ -4807,7 +4837,6 @@ CMathContent.prototype =
 
                     break;
                 case 222:
-                    var matrix  = this.addMComponent(21);
                     var matrix  = this.addMComponent(MATH_MATRIX);
                     var props =
                     {
@@ -4845,43 +4874,98 @@ CMathContent.prototype =
                     elem9.addTxt("1");
                     break;
                 case 223:
-                    var delim = this.addMComponent(9);
-                    delim.init(0, 4, 0, 1);
-                    base = delim.getBase();
-                    var matrix = base.addMComponent(21);
-                    matrix.init(2, 2);
+                    var delim = this.addMComponent(MATH_DELIMITER);
+                    var props =
+                    {
+                        begChrType:     PARENTHESIS_LEFT,
+                        endChrType:     PARENTHESIS_RIGHT,
+                        column:         1
+                    };
+                    delim.init(props);
+                    var base = delim.getBase();
+                    var matrix = base.addMComponent(MATH_MATRIX);
+                    props =
+                    {
+                        row :       2,
+                        column:     2
+                    };
+                    matrix.init(props);
                     matrix.fillPlaceholders();
                     break;
                 case 224:
-                    var delim = this.addMComponent(9);
-                    delim.init(2, 4, 0, 1);
-                    base = delim.getBase();
-                    var matrix = base.addMComponent(21);
-                    matrix.init(2, 2);
+                    var delim = this.addMComponent(MATH_DELIMITER);
+                    var props =
+                    {
+                        begChrType:     BRACKET_SQUARE_LEFT,
+                        endChrType:     BRACKET_SQUARE_RIGHT,
+                        column:         1
+                    };
+                    delim.init(props);
+                    var base = delim.getBase();
+                    var matrix = base.addMComponent(MATH_MATRIX);
+                    props =
+                    {
+                        row :       2,
+                        column:     2
+                    };
+                    matrix.init(props);
                     matrix.fillPlaceholders();
                     break;
                 case 225:
-                    var delim = this.addMComponent(9);
-                    delim.init(5, 4, 0, 1);
-                    base = delim.getBase();
-                    var matrix = base.addMComponent(21);
-                    matrix.init(2, 2);
+                    var delim = this.addMComponent(MATH_DELIMITER);
+                    var props =
+                    {
+                        begChrType:     DELIMITER_LINE,
+                        endChrType:     DELIMITER_LINE,
+                        column:         1
+                    };
+                    delim.init(props);
+                    var base = delim.getBase();
+                    var matrix = base.addMComponent(MATH_MATRIX);
+                    props =
+                    {
+                        row :       2,
+                        column:     2
+                    };
+                    matrix.init(props);
                     matrix.fillPlaceholders();
                     break;
                 case 226:
-                    var delim = this.addMComponent(9);
-                    delim.init(6, 4, 0, 1);
-                    base = delim.getBase();
-                    var matrix = base.addMComponent(21);
-                    matrix.init(2, 2);
+                    var delim = this.addMComponent(MATH_DELIMITER);
+                    var props =
+                    {
+                        begChrType:     DELIMITER_DOUBLE_LINE,
+                        endChrType:     DELIMITER_DOUBLE_LINE,
+                        column:         1
+                    };
+                    delim.init(props);
+                    var base = delim.getBase();
+                    var matrix = base.addMComponent(MATH_MATRIX);
+                    props =
+                    {
+                        row :       2,
+                        column:     2
+                    };
+                    matrix.init(props);
                     matrix.fillPlaceholders();
                     break;
                 case 227:
-                    var delim = this.addMComponent(9);
-                    delim.init(0, 4, 0, 1);
-                    base = delim.getBase();
-                    var matrix  = base.addMComponent(21);
-                    matrix.init(3, 3);
+                    var delim = this.addMComponent(MATH_DELIMITER);
+                    var props =
+                    {
+                        begChrType:     PARENTHESIS_LEFT,
+                        endChrType:     PARENTHESIS_RIGHT,
+                        column:         1
+                    };
+                    delim.init(props);
+                    var base = delim.getBase();
+                    var matrix = base.addMComponent(MATH_MATRIX);
+                    props =
+                    {
+                        row :       3,
+                        column:     3
+                    };
+                    matrix.init(props);
 
                     elem1 = matrix.getElement(0,0);
                     elem1.fillPlaceholders();
@@ -4912,11 +4996,22 @@ CMathContent.prototype =
 
                     break;
                 case 228:
-                    var delim = this.addMComponent(9);
-                    delim.init(2, 4, 0, 1);
-                    base = delim.getBase();
-                    var matrix  = base.addMComponent(21);
-                    matrix.init(3, 3);
+                    var delim = this.addMComponent(MATH_DELIMITER);
+                    var props =
+                    {
+                        begChrType:     BRACKET_SQUARE_LEFT,
+                        endChrType:     BRACKET_SQUARE_RIGHT,
+                        column:         1
+                    };
+                    delim.init(props);
+                    var base = delim.getBase();
+                    var matrix = base.addMComponent(MATH_MATRIX);
+                    props =
+                    {
+                        row :       3,
+                        column:     3
+                    };
+                    matrix.init(props);
 
                     elem1 = matrix.getElement(0,0);
                     elem1.fillPlaceholders();

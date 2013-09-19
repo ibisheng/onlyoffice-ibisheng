@@ -72,11 +72,9 @@ var BRACKET_CURLY_BOTTOM        = 17;
 var ARROW_LEFT                  = 18;
 var ARROW_RIGHT                 = 19;
 var ARROW_LR                    = 20;
-var HALF_ARROW_LEFT             = 21;
-var HALF_ARROW_RIGHT            = 22;
-var DOUBLE_LEFT_ARROW           = 23;
-var DOUBLE_RIGHT_ARROW          = 24;
-var DOUBLE_ARROW_LR             = 25;
+var DOUBLE_LEFT_ARROW           = 21;
+var DOUBLE_RIGHT_ARROW          = 22;
+var DOUBLE_ARROW_LR             = 23;
 
 var TURN_0                      =  0;
 var TURN_180                    =  1;
