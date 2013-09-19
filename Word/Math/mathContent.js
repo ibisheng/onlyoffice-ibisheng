@@ -4034,7 +4034,7 @@ CMathContent.prototype =
                     var accent = this.addMComponent(MATH_ACCENT);
                     var props =
                     {
-                        chr:            {type:      ACCENT_ONE_DOT}
+                        chrType:      ACCENT_ONE_DOT
                     };
                     accent.init(props);
                     accent.fillPlaceholders();
@@ -4043,7 +4043,7 @@ CMathContent.prototype =
                     var accent = this.addMComponent(MATH_ACCENT);
                     var props =
                     {
-                        chr:            {type:      ACCENT_TWO_DOTS}
+                        chrType:      ACCENT_TWO_DOTS
                     };
                     accent.init(props);
                     accent.fillPlaceholders();
@@ -4053,7 +4053,7 @@ CMathContent.prototype =
                     var accent = this.addMComponent(MATH_ACCENT);
                     var props =
                     {
-                        chr:            {type:      ACCENT_THREE_DOTS}
+                        chrType:      ACCENT_THREE_DOTS
                     };
                     accent.init(props);
                     accent.fillPlaceholders();
@@ -4062,7 +4062,7 @@ CMathContent.prototype =
                     var accent = this.addMComponent(MATH_ACCENT);
                     var props =
                     {
-                        chr:            {type:      ACCENT_COMB_CARON}
+                        chrType:      ACCENT_COMB_CARON
                     };
                     accent.init(props);
                     accent.fillPlaceholders();
@@ -4071,7 +4071,7 @@ CMathContent.prototype =
                     var accent = this.addMComponent(MATH_ACCENT);
                     var props =
                     {
-                        chr:            {type:      ACCENT_CIRCUMFLEX}
+                        chrType:      ACCENT_CIRCUMFLEX
                     };
                     accent.init(props);
                     accent.fillPlaceholders();
@@ -4080,7 +4080,7 @@ CMathContent.prototype =
                     var accent = this.addMComponent(MATH_ACCENT);
                     var props =
                     {
-                        chr:            {type:      ACCENT_ACUTE}
+                        chrType:      ACCENT_ACUTE
                     };
                     accent.init(props);
                     accent.fillPlaceholders();
@@ -4089,7 +4089,7 @@ CMathContent.prototype =
                     var accent = this.addMComponent(MATH_ACCENT);
                     var props =
                     {
-                        chr:            {type:      ACCENT_GRAVE}
+                        chrType:      ACCENT_GRAVE
                     };
                     accent.init(props);
                     accent.fillPlaceholders();
@@ -4098,7 +4098,7 @@ CMathContent.prototype =
                     var accent = this.addMComponent(MATH_ACCENT);
                     var props =
                     {
-                        chr:            {type:      ACCENT_BREVE}
+                        chrType:      ACCENT_BREVE
                     };
                     accent.init(props);
                     accent.fillPlaceholders();
@@ -4107,7 +4107,7 @@ CMathContent.prototype =
                     var accent = this.addMComponent(MATH_ACCENT);
                     var props =
                     {
-                        chr:            {type:      ACCENT_TILDE}
+                        chrType:      ACCENT_TILDE
                     };
                     accent.init(props);
                     accent.fillPlaceholders();
@@ -4116,7 +4116,7 @@ CMathContent.prototype =
                     var line = this.addMComponent(MATH_ACCENT);
                     var props =
                     {
-                        chr:            {type:      ACCENT_LINE}
+                        chrType:      ACCENT_LINE
                     };
                     line.init(props);
                     line.fillPlaceholders();
@@ -4125,19 +4125,16 @@ CMathContent.prototype =
                     var line = this.addMComponent(MATH_ACCENT);
                     var props =
                     {
-                        chr:            {type:      ACCENT_DOUBLE_LINE}
+                        chrType:      ACCENT_DOUBLE_LINE
                     };
                     line.init(props);
                     line.fillPlaceholders();
                     break;
                 case 163:
-                    /*var delim = this.addMComponent(9);
-                    delim.init(1,0,1);
-                    delim.fillPlaceholders();*/
                     var delim = this.addMComponent(MATH_GROUP_CHARACTER);
                     var props =
                     {
-                        chr:            {type: BRACKET_CURLY_TOP},
+                        chrType:        BRACKET_CURLY_TOP,
                         location:       LOCATION_TOP,
                         justif:         VJUST_BOT
                     };
@@ -4168,7 +4165,7 @@ CMathContent.prototype =
                     var grCh = func.addMComponent(MATH_GROUP_CHARACTER);
                     var props2 =
                     {
-                        chr:            {type: BRACKET_CURLY_TOP},
+                        chrType:        BRACKET_CURLY_TOP,
                         location:       LOCATION_TOP,
                         justif:         VJUST_BOT
                     };
@@ -4189,7 +4186,7 @@ CMathContent.prototype =
                     var grCh = func.addMComponent(MATH_GROUP_CHARACTER);
                     var props2 =
                     {
-                        chr:            {type: BRACKET_CURLY_BOTTOM},
+                        chrType:        BRACKET_CURLY_BOTTOM,
                         location:       LOCATION_BOT,
                         justif:         VJUST_TOP
                     };
@@ -4197,59 +4194,59 @@ CMathContent.prototype =
                     grCh.fillPlaceholders();
                     break;
                 case 167:
-                    var delim = this.addMComponent(MATH_GROUP_CHARACTER);
+                    /*var delim = this.addMComponent(MATH_GROUP_CHARACTER);
                     var props =
                     {
-                        chr:            {type:  ARROW_LEFT},
+                        chrType:        ARROW_LEFT,
                         location:       LOCATION_TOP,
                         justif:         VJUST_BOT
                     };
                     delim.init(props);
-                    delim.fillPlaceholders();
+                    delim.fillPlaceholders();*/
+                    var accent = this.addMComponent(MATH_ACCENT);
+                    var props =
+                    {
+                        chrType:        ACCENT_ARROW_LEFT
+                    };
+                    accent.init(props);
+                    accent.fillPlaceholders();
                     break;
                 case 168:
-                    var delim = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var accent = this.addMComponent(MATH_ACCENT);
                     var props =
                     {
-                        chr:            {type:  ARROW_RIGHT},
-                        location:       LOCATION_TOP,
-                        justif:         VJUST_BOT
+                        chrType:        ACCENT_ARROW_RIGHT
                     };
-                    delim.init(props);
-                    delim.fillPlaceholders();
+                    accent.init(props);
+                    accent.fillPlaceholders();
                     break;
                 case 169:
-                    var delim = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var accent = this.addMComponent(MATH_ACCENT);
                     var props =
                     {
-                        chr:            {type:  ARROW_LR},
-                        location:       LOCATION_TOP,
-                        justif:         VJUST_BOT
+                        chrType:        ACCENT_ARROW_LR
                     };
-                    delim.init(props);
-                    delim.fillPlaceholders();
+                    accent.init(props);
+                    accent.fillPlaceholders();
                     break;
                 case 170:
-                    var delim = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var accent = this.addMComponent(MATH_ACCENT);
                     var props =
                     {
-                        chr:            {type:  HALF_ARROW_LEFT},
-                        location:       LOCATION_TOP,
-                        justif:         VJUST_BOT
+                        chrType:        ACCENT_HALF_ARROW_LEFT
                     };
-                    delim.init(props);
-                    delim.fillPlaceholders();
+                    accent.init(props);
+                    accent.fillPlaceholders();
                     break;
                 case 171:
-                    var delim = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var accent = this.addMComponent(MATH_ACCENT);
                     var props =
                     {
-                        chr:            {type:  HALF_ARROW_RIGHT},
-                        location:       LOCATION_TOP,
-                        justif:         VJUST_BOT
+                        chrType:        ACCENT_HALF_ARROW_RIGHT
                     };
-                    delim.init(props);
-                    delim.fillPlaceholders();
+                    accent.init(props);
+                    accent.fillPlaceholders();
+                    break;
                 case 172:
                     break;
                 case 173:
@@ -4497,74 +4494,144 @@ CMathContent.prototype =
                     this.addTxt("≜");
                     break;
                 case 193:
-                    var arrow = this.addMComponent(20);
-                    arrow.init(1, 0, 0);
+                    var arrow = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var props =
+                    {
+                        chrType:        ARROW_LEFT,
+                        location:       LOCATION_TOP
+                    };
+                    arrow.init(props);
                     arrow.fillPlaceholders();
                     break;
                 case 194:
-                    var arrow = this.addMComponent(20);
-                    arrow.init(1, 0, 1);
+                    var arrow = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var props =
+                    {
+                        chrType:        ARROW_RIGHT,
+                        location:       LOCATION_TOP
+                    };
+                    arrow.init(props);
                     arrow.fillPlaceholders();
                     break;
                 case 195:
-                    var arrow = this.addMComponent(20);
-                    arrow.init(1, 1, 0);
+                    var arrow = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var props =
+                    {
+                        chrType:        ARROW_LEFT,
+                        justif:         VJUST_BOT
+                    };
+                    arrow.init(props);
                     arrow.fillPlaceholders();
                     break;
                 case 196:
-                    var arrow = this.addMComponent(20);
-                    arrow.init(1, 1, 1);
+                    var arrow = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var props =
+                    {
+                        chrType:        ARROW_RIGHT,
+                        justif:         VJUST_BOT
+                    };
+                    arrow.init(props);
                     arrow.fillPlaceholders();
                     break;
                 case 197:
-                    var arrow = this.addMComponent(20);
-                    arrow.init(3, 0, 0);
+                    var arrow = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var props =
+                    {
+                        chrType:        DOUBLE_LEFT_ARROW,
+                        location:       LOCATION_TOP
+                    };
+                    arrow.init(props);
                     arrow.fillPlaceholders();
                     break;
                 case 198:
-                    var arrow = this.addMComponent(20);
-                    arrow.init(3, 0, 1);
+                    var arrow = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var props =
+                    {
+                        chrType:        DOUBLE_RIGHT_ARROW,
+                        location:       LOCATION_TOP
+                    };
+                    arrow.init(props);
                     arrow.fillPlaceholders();
                     break;
                 case 199:
-                    var arrow = this.addMComponent(20);
-                    arrow.init(3, 1, 0);
+                    var arrow = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var props =
+                    {
+                        chrType:        DOUBLE_LEFT_ARROW,
+                        justif:         VJUST_BOT
+                    };
+                    arrow.init(props);
                     arrow.fillPlaceholders();
                     break;
                 case 200:
-                    var arrow = this.addMComponent(20);
-                    arrow.init(3, 1, 1);
+                    var arrow = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var props =
+                    {
+                        chrType:        DOUBLE_RIGHT_ARROW,
+                        justif:         VJUST_BOT
+                    };
+                    arrow.init(props);
                     arrow.fillPlaceholders();
                     break;
                 case 201:
-                    var arrow = this.addMComponent(20);
-                    arrow.init(2, 0, 0);
+                    var arrow = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var props =
+                    {
+                        chrType:        ARROW_LR,
+                        location:       LOCATION_TOP
+                    };
+                    arrow.init(props);
                     arrow.fillPlaceholders();
                     break;
                 case 202:
-                    var arrow = this.addMComponent(20);
-                    arrow.init(2, 1, 0);
+                    var arrow = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var props =
+                    {
+                        chrType:        ARROW_LR,
+                        justif:         VJUST_BOT
+                    };
+                    arrow.init(props);
                     arrow.fillPlaceholders();
                     break;
                 case 203:
-                    var arrow = this.addMComponent(20);
-                    arrow.init(4, 0, 0);
+                    var arrow = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var props =
+                    {
+                        chrType:        DOUBLE_ARROW_LR,
+                        location:       LOCATION_TOP
+                    };
+                    arrow.init(props);
                     arrow.fillPlaceholders();
                     break;
                 case 204:
-                    var arrow = this.addMComponent(20);
-                    arrow.init(4, 1, 0);
+                    var arrow = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var props =
+                    {
+                        chrType:        DOUBLE_ARROW_LR,
+                        justif:         VJUST_BOT
+                    };
+                    arrow.init(props);
                     arrow.fillPlaceholders();
                     break;
                 case 205:
-                    var arrow = this.addMComponent(20);
-                    arrow.init(1, 1, 1);
+                    var arrow = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var props =
+                    {
+                        chrType:        ARROW_RIGHT,
+                        justif:         VJUST_BOT
+                    };
+                    arrow.init(props);
                     var base = arrow.getBase();
                     base.addTxt("yields");
                     break;
                 case 206:
-                    var arrow = this.addMComponent(20);
-                    arrow.init(1, 1, 1);
+                    var arrow = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var props =
+                    {
+                        chrType:        ARROW_RIGHT,
+                        justif:         VJUST_BOT
+                    };
+                    arrow.init(props);
                     var base = arrow.getBase();
                     base.addTxt("∆");
                     break;

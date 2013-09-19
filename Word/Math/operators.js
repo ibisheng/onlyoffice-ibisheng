@@ -3142,7 +3142,7 @@ COperatorDoubleLine.prototype.drawPath = function(XX, YY)
     MathControl.pGraph._l(XX[9], YY[9]);
 }
 
-function CStructArrow()
+/*function CStructArrow()
 {
     // location
     // 0 - up
@@ -3159,8 +3159,6 @@ CStructArrow.prototype.init = function(type, loc, turn)
 
     var operator;
 
-    /*if(type == 0)
-        operator = new CHalfArrow();*/
     if(type == 1)
         operator = new CSingleArrow();
     else if(type == 2)
@@ -3224,10 +3222,11 @@ CStructArrow.prototype.getBase = function()
         res = this.elements[0][0];
 
     return res;
-}
+}*/
 
 function CSingleArrow()
 {
+    this.bArrow = true;
     CGlyphOperator.call(this);
 }
 extend(CSingleArrow, CGlyphOperator);
@@ -3297,7 +3296,7 @@ CSingleArrow.prototype.drawPath = function(XX, YY)
     MathControl.pGraph._l(XX[9], YY[9]);
     MathControl.pGraph._l(XX[10], YY[10]);
 }
-CSingleArrow.prototype.getSizeGlyph = function()
+/*CSingleArrow.prototype.getSizeGlyph = function()
 {
     var textScale = this.getTxtPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64;
@@ -3307,10 +3306,11 @@ CSingleArrow.prototype.getSizeGlyph = function()
     var center = 14944*alpha; // (Y[5] + Y[4])/2
 
     return {width : width, height : height, center : center};
-}
+}*/
 
 function CLeftRightArrow()
 {
+    this.bArrow = true;
     CGlyphOperator.call(this);
 }
 extend(CLeftRightArrow, CGlyphOperator);
@@ -3393,7 +3393,7 @@ CLeftRightArrow.prototype.drawPath = function(XX, YY)
     MathControl.pGraph._l(XX[16], YY[16]);
 
 }
-CLeftRightArrow.prototype.getSizeGlyph = function()
+/*CLeftRightArrow.prototype.getSizeGlyph = function()
 {
     var textScale = this.getTxtPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64;
@@ -3403,10 +3403,11 @@ CLeftRightArrow.prototype.getSizeGlyph = function()
     var center = 15487*alpha; // (Y[11] + Y[10])/2
 
     return {width : width, height : height, center : center};
-}
+}*/
 
 function CDoubleArrow()
 {
+    this.bArrow = true;
     CGlyphOperator.call(this);
 }
 extend(CDoubleArrow, CGlyphOperator);
@@ -3499,7 +3500,7 @@ CDoubleArrow.prototype.drawPath = function(XX, YY)
     MathControl.pGraph._m(XX[16], YY[16]);
     MathControl.pGraph._l(XX[17], YY[17]);
 }
-CDoubleArrow.prototype.getSizeGlyph = function()
+/*CDoubleArrow.prototype.getSizeGlyph = function()
 {
     var textScale = this.getTxtPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64;
@@ -3509,10 +3510,11 @@ CDoubleArrow.prototype.getSizeGlyph = function()
     var center = 19532.5*alpha;
 
     return {width : width, height : height, center : center}
-}
+}*/
 
 function CLR_DoubleArrow()
 {
+    this.bArrow = true;
     CGlyphOperator.call(this);
 }
 extend(CLR_DoubleArrow, CGlyphOperator);
@@ -3615,7 +3617,7 @@ CLR_DoubleArrow.prototype.drawPath = function(XX, YY)
     MathControl.pGraph._l(XX[22], YY[22]);
     MathControl.pGraph._l(XX[23], YY[23]);
 }
-CLR_DoubleArrow.prototype.getSizeGlyph = function()
+/*CLR_DoubleArrow.prototype.getSizeGlyph = function()
 {
     var textScale = this.getTxtPrp().FontSize/1000; // 1000 pt
     var alpha = textScale*25.4/96 /64;
@@ -3625,9 +3627,9 @@ CLR_DoubleArrow.prototype.getSizeGlyph = function()
     var center = 19532.5*alpha;
 
     return {width : width, height : height, center : center}
-}
+}*/
 
-function CStructCombiningArrow()
+/*function CStructCombiningArrow()
 {
     // location
     // 0 - up
@@ -3649,7 +3651,7 @@ CStructCombiningArrow.prototype.init = function(type, loc, turn)
     else if(type == 1)
         operator = new CCombiningArrow();
     else
-        operator = new CCombiningDoubleArrow();
+        operator = new CCombining_LR_Arrow();
 
     operator.setLocation(loc, turn);
 
@@ -3687,7 +3689,7 @@ CStructCombiningArrow.prototype.recalculateSize = function()
     }
 
     CStructArrow.superclass.recalculateSize.call(this);
-}
+}*/
 
 
 function CCombiningArrow()
@@ -3826,12 +3828,12 @@ CCombiningHalfArrow.prototype.calcCoord = function(measure)
     return {XX: XX, YY: YY, W: W, H: H};
 }
 
-function CCombiningDoubleArrow()
+function CCombining_LR_Arrow()
 {
     CGlyphOperator.call(this);
 }
-extend(CCombiningDoubleArrow, CGlyphOperator);
-CCombiningDoubleArrow.prototype.calcSize = function()
+extend(CCombining_LR_Arrow, CGlyphOperator);
+CCombining_LR_Arrow.prototype.calcSize = function()
 {
     var betta = this.getTxtPrp().FontSize/36;
 
@@ -3840,7 +3842,7 @@ CCombiningDoubleArrow.prototype.calcSize = function()
 
     return {width: width, height: height};
 }
-CCombiningDoubleArrow.prototype.drawPath = function(XX, YY)
+CCombining_LR_Arrow.prototype.drawPath = function(XX, YY)
 {
     MathControl.pGraph._m(XX[0], YY[0]);
     MathControl.pGraph._l(XX[1], YY[1]);
@@ -3861,7 +3863,7 @@ CCombiningDoubleArrow.prototype.drawPath = function(XX, YY)
     MathControl.pGraph._l(XX[16], YY[16]);
 
 }
-CCombiningDoubleArrow.prototype.calcCoord = function(measure)
+CCombining_LR_Arrow.prototype.calcCoord = function(measure)
 {
     var X = new Array(),
         Y = new Array();
@@ -4680,6 +4682,10 @@ CCharacter.prototype.findDisposition = function(pos)
 
     return {pos: posCurs, mCoord: mouseCoord, inside_flag: inside_flag};
 }
+CCharacter.prototype.getBase = function()
+{
+    return this.elements[0][0];
+}
 
 
 function CGroupCharacter()
@@ -4702,8 +4708,16 @@ CGroupCharacter.prototype.init = function(props)
     else if(props.pos === "bot" || props.location === LOCATION_BOT)
         this.loc = LOCATION_BOT;
 
-    var operator = new COperator ( GetGlyph_GrChr(props.chr, this.loc) );
-    this.setOperator(operator);
+    var type = props.chrType;
+    var code = typeof(props.chr) === "string" ? props.chr.charCodeAt(0) : null;
+
+    var glyph = this.getGlyph(code, type);
+
+    if(glyph.bArrow)
+        this.setReduct(DEGR_REDUCT);
+
+    this.setOperator( new COperator(glyph) );
+
 }
 CGroupCharacter.prototype.getCenter = function()
 {
@@ -4719,4 +4733,164 @@ CGroupCharacter.prototype.getCenter = function()
         center = this.operator.size.height/2 + this.elements[0][0].size.height;
 
     return center;
+}
+CGroupCharacter.prototype.getGlyph = function(code, type)
+{
+    var glyph, props;
+
+    if(code === 0x23DE || type == BRACKET_CURLY_TOP)
+    {
+        glyph = new COperatorBracket();
+        props =
+        {
+            location:   this.loc,
+            turn:       TURN_0
+        };
+        glyph.init(props);
+    }
+    else if(code === 0x23DF || type === BRACKET_CURLY_BOTTOM  )
+    {
+        glyph = new COperatorBracket();
+        props =
+        {
+            location:   this.loc,
+            turn:       TURN_MIRROR_0
+        };
+        glyph.init(props);
+    }
+    else if(code === 0x2190 || type === ARROW_LEFT)
+    {
+        glyph = new CSingleArrow();
+
+        props =
+        {
+            location:   this.loc,
+            turn:       TURN_0
+        };
+        glyph.init(props);
+    }
+    else if(code === 0x2192 || type === ARROW_RIGHT)
+    {
+        glyph = new CSingleArrow();
+        props =
+        {
+            location:   this.loc,
+            turn:       TURN_180
+        };
+        glyph.init(props);
+    }
+    else if(code === 0x2194 || type === ARROW_LR)
+    {
+        glyph = new CLeftRightArrow();
+        props =
+        {
+            location:   this.loc,
+            turn:       TURN_0
+        };
+        glyph.init(props);
+    }
+    else if(code === 0x21D0 || type === DOUBLE_LEFT_ARROW)
+    {
+        glyph = new CDoubleArrow();
+        props =
+        {
+            location:   this.loc,
+            turn:       TURN_0
+        };
+        glyph.init(props);
+    }
+    else if(code === 0x21D2 || type === DOUBLE_RIGHT_ARROW)
+    {
+        glyph = new CDoubleArrow();
+        props =
+        {
+            location:   this.loc,
+            turn:       TURN_180
+        };
+        glyph.init(props);
+    }
+    else if(code === 0x21D4 || type === DOUBLE_ARROW_LR)
+    {
+        glyph = new CLR_DoubleArrow();
+        props =
+        {
+            location:   this.loc,
+            turn:       TURN_0
+        };
+        glyph.init(props);
+    }
+    /////    accents     /////
+    else if(code === 0x20D6 || type === ACCENT_ARROW_LEFT)
+    {
+        glyph = new CCombiningArrow();
+        props =
+        {
+            location:   LOCATION_TOP,
+            turn:       TURN_0
+        };
+        glyph.init(props);
+        accent = new COperator(glyph);
+    }
+    else if(code === 0x20D7 || type === ACCENT_ARROW_RIGHT)
+    {
+        glyph = new CCombiningArrow();
+        props =
+        {
+            location:   LOCATION_TOP,
+            turn:       TURN_180
+        };
+        glyph.init(props);
+        accent = new COperator(glyph);
+    }
+    else if(code === 0x20E1 || type === ACCENT_ARROW_LR)
+    {
+        glyph = new CCombining_LR_Arrow();
+        props =
+        {
+            location:   LOCATION_TOP,
+            turn:       TURN_0
+        };
+        glyph.init(props);
+        accent = new COperator(glyph);
+    }
+    else if(code === 0x20D0 || type === ACCENT_HALF_ARROW_LEFT)
+    {
+        glyph = new CCombiningHalfArrow();
+        props =
+        {
+            location:   LOCATION_TOP,
+            turn:       TURN_0
+        };
+        glyph.init(props);
+        accent = new COperator(glyph);
+    }
+    else if(code === 0x20D1 || type ===  ACCENT_HALF_ARROW_RIGHT)
+    {
+        glyph = new CCombiningHalfArrow();
+        props =
+        {
+            location:   LOCATION_TOP,
+            turn:       TURN_180
+        };
+        glyph.init(props);
+        accent = new COperator(glyph);
+    }
+    /////
+    else if(typeof(code) !=="undefined" && code !== null)
+    {
+        glyph = new CMathText();
+        glyph.add(code);
+    }
+    else
+    {
+        glyph = new COperatorBracket();
+        props =
+        {
+            location:   LOCATION_BOT,
+            turn:       TURN_MIRROR_0
+        };
+        glyph.init(props);
+    }
+
+    return glyph;
 }
