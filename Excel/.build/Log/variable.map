@@ -1,4 +1,4 @@
-CSlideBoundsChecker:Dg
+CSlideBoundsChecker:Eg
 JSCompiler_StaticMethods_getFontAlign:QP
 ft_div64by32:cj
 ETableStyleType$tablestyletypeLastColumn:zJ
@@ -174,7 +174,7 @@ JSCompiler_StaticMethods_getID:xf
 c_oAscError$ID$UserCountExceed:U8
 tt_face_lookup_table:Hn
 JSCompiler_StaticMethods_Internal_IncDecFontSize:k7
-JSCompiler_StaticMethods_setChartBinary:Ng
+JSCompiler_StaticMethods_setChartBinary:Og
 numbering_lvltext_Text:I4
 c_oSerXfsTypes$ApplyFont:xC
 UndoRedoDataDocContentRemoveItems:bR
@@ -197,7 +197,7 @@ JSCompiler_StaticMethods_getRange2:ze
 EUnderline$underlineDoubleAccounting:II
 T1_Face_Done:Gv
 JSCompiler_StaticMethods_createCellOnRowColCross:FP
-asc_CFillBlip:Kg
+asc_CFillBlip:Lg
 PS_Conv_ToInt:dm
 c_oAscFillBlipType$TILE:M3
 c_oSerXfsTypes$ApplyAlignment:uC
@@ -262,9 +262,9 @@ FT_Vector_Length:dq
 PreResizeState:U1
 JSCompiler_StaticMethods_setConditionalFormattingStyle:wP
 cError:T
-CImageShape:rg
+CImageShape:xg
 PS_Table_FuncsRec:dn
-JSCompiler_StaticMethods_getCells:Pg
+JSCompiler_StaticMethods_getCells:Qg
 dublicate_bbox:Nk
 X_Right_Margin:S5
 tt_cmap6_char_next:Io
@@ -293,7 +293,7 @@ tt_face_load_gasp:Vn
 JSCompiler_StaticMethods_AddPathCommand:Y
 JSCompiler_StaticMethods_Paragraph_IncDecFontSize:D3
 ft_smooth_init:tq
-CXfrm:Xg
+CXfrm:rg
 CPresentationBullet:Z4
 afm_parse_kern_data:tm
 c_oSer_TableStyleInfo$ShowRowStripes:zF
@@ -372,7 +372,7 @@ cff_builder_add_point1:Lu
 c_oMainTables$Presentation:ZY
 MATRIX_ORDER_PREPEND:Dx
 historyitem_Chart_SubType:Pe
-JSCompiler_StaticMethods_isGeneralFormat:kd
+JSCompiler_StaticMethods_isGeneralFormat:ld
 TT_CMapInfo:ui
 isNeedEmptyAfterCut:Py
 JSCompiler_StaticMethods__checkCurPoint:yQ
@@ -433,9 +433,9 @@ GetHatchBrush:jx
 JSCompiler_StaticMethods__generateFontMap:HL
 nSldLtTObjOnly:FV
 c_Date1904Const:nA
-JSCompiler_StaticMethods_isTextFormat:ld
+JSCompiler_StaticMethods_isTextFormat:md
 EBorderStyle$borderstyleMediumDashDotDot:BI
-JSCompiler_StaticMethods_TurnOff:Mg
+JSCompiler_StaticMethods_TurnOff:Ng
 c_oSer_DateGroupItem$DateTimeGrouping:gG
 ps_parser_to_token:Mm
 c_oSer_SheetPr$EnableFormatConditionsCalculation:kI
@@ -458,7 +458,7 @@ TGlyphBitmap:yw
 Round_To_Double_Grid:yr
 UndoRedoDataShapeRecalc:KQ
 CStyle:zY
-CLASS_TYPE_CHART_TITLE:d4
+CLASS_TYPE_CHART_TITLE:e4
 JSCompiler_StaticMethods_Update_Position:Q5
 EVisibleType$visibleHidden:TI
 JSCompiler_StaticMethods_SerializeDataInner:BQ
@@ -587,7 +587,7 @@ _ph_summ__title_only:yW
 Vertex:dB
 c_oSer_ConditionalFormattingRule$StdDev:EH
 JSCompiler_StaticMethods_getAllCol:IO
-c_oAscServerError$ConvertUnknownFormat:Ya
+c_oAscServerError$ConvertUnknownFormat:Xa
 c_oSerWorksheetsTypes$WorksheetProp:pD
 JSCompiler_StaticMethods_Set_DrawingType:F5
 global_SubpixHintingHacks:Bs
@@ -607,7 +607,7 @@ c_oSerFormat$Version:zB
 CTableStyle:TK
 cErrorType$unsupported_function:iA
 FT_Module_Class:jl
-c_oAscFill$FILL_TYPE_BLIP:Jg
+c_oAscFill$FILL_TYPE_BLIP:Kg
 c_oAscAsyncAction$Save:Y8
 ft_glyphslot_done:pl
 c_oSer_ConditionalFormattingIconSet$CFVO:UH
@@ -849,7 +849,7 @@ c_oSer_CalcChainType$DependencyLevel:WE
 JSCompiler_StaticMethods__MouseHoverOnArrowUp:HS
 CLASS_TYPE_PRST_COLOR:yT
 CFF_SubFontRec:Gt
-isRealNumber:Wg
+isRealNumber:Xg
 ETableStyleType$tablestyletypePageFieldValues:DJ
 b64_decode:vy
 FT_Outline_Copy:sj
@@ -969,7 +969,7 @@ FT_ValidatorRec:jk
 FT_GlyphLoader_Add:Zj
 searchCleenCacheArea:VM
 c_oSerFontTypes$Underline:VC
-JSCompiler_StaticMethods_getColWidth:Og
+JSCompiler_StaticMethods_getColWidth:Pg
 STATES_ID_TRACK_NEW_SHAPE:p1
 historyitem_Cell_ChangeValue:zM
 ECellTypeType$celltypeNumber:kJ
@@ -1034,7 +1034,7 @@ asc_CCommentData:SN
 TRANSLATE_HANDLE_FLIP_H_AND_FLIP_V:D7
 tt_size_done_bytecode:Wq
 CLASS_TYPE_DOCUMENT_CONTENT:Z3
-c_oAscAsyncActionType$BlockInteraction:Bg
+c_oAscAsyncActionType$BlockInteraction:Cg
 FT_Matrix:Qj
 STATES_ID_PRE_ROTATE:k1
 taylor:nB
@@ -1105,7 +1105,7 @@ c_oMainTables$SlideRels:hZ
 c_oSer_ChartPlotAreaType$CatAx:$Z
 cElementType$string:Sz
 TT_SBit_RangeRec:xk
-c_oAscLegendMarkerType$Line:pf
+c_oAscLegendMarkerType$Line:of
 FT_CFF_CMAP_UNICODE_CLASS_REC_GET:Au
 UndoRedoData_GTableIdAdd:IQ
 c_oSerRowTypes$Cell:iE
@@ -1210,7 +1210,7 @@ tt_face_get_location:$s
 JSCompiler_StaticMethods_setY:x7
 BULLET_TYPE_COLOR_CLR:$W
 JSCompiler_StaticMethods_setX:y7
-STATES_ID_TEXT_ADD_IN_GROUP:zg
+STATES_ID_TEXT_ADD_IN_GROUP:Ag
 SplineCommandMoveTo:B2
 checkTypeCell:AA
 JSCompiler_StaticMethods_setW:uU
@@ -1301,7 +1301,7 @@ _ph_summ__obj:rW
 c_oSerFormulaTypes$Del2:tE
 gauss:oB
 c_oSerFormulaTypes$Del1:sE
-JSCompiler_StaticMethods_Show:Ag
+JSCompiler_StaticMethods_Show:Bg
 EHorizontalAlignment$horizontalalignmentDistributed:XI
 UndoRedoData_ColProp:zO
 TT_SizeRec:Cs
@@ -1426,7 +1426,7 @@ JSCompiler_StaticMethods_DrawBorders:t0
 JSCompiler_StaticMethods_Set_FontSize:r3
 para_Text:zh
 c_oSer_ConditionalFormattingRuleColorScale$Color:OH
-c_oAscError$ID$UplImageUrl:Hg
+c_oAscError$ID$UplImageUrl:Ig
 JSCompiler_StaticMethods_Set_RangeStartPos:j6
 isRealObject:L
 _weight_pic:hW
@@ -1467,7 +1467,7 @@ _ph_summ__tx:CW
 asc_CTextFontFamily:hg
 JSCompiler_alias_THROW:aa
 TT_Gasp:tk
-CGroupShape:xg
+CGroupShape:yg
 FT_UnitVector:Mq
 Woorksheet:ZK
 historyitem_RowCol_SetFont:$L
@@ -1481,13 +1481,13 @@ FT_Service_GlyphDictRec:oi
 asc:bO
 c_oAscStrokeType$STROKE_NONE:R3
 JSCompiler_StaticMethods_Get_Paragraph_ParaPr:J3
-historyitem_Chart_xAxisIsShow:df
+historyitem_Chart_xAxisIsShow:bf
 c_oAscLockTypes$kLockTypeOther3:g9
 c_oAscLockTypes$kLockTypeOther2:Ez
 c_oAscRecalcIndexTypes$RecalcIndexAdd:Pz
 g_nVerticalTextAngle:PL
 CShapeColor:qY
-JSCompiler_StaticMethods_setChart:Rg
+JSCompiler_StaticMethods_setChart:Sg
 BULLET_TYPE_BULLET_CHAR:lX
 ETableStyleType$tablestyletypeThirdRowSubheading:LJ
 c_oAscMouseMoveLockedObjectType$TableProperties:Oz
@@ -1509,12 +1509,12 @@ CGlyphString:bx
 JSCompiler_StaticMethods_removeHyperlink:cP
 CAscStroke:u8
 DrawLineEnd:f8
-JSCompiler_StaticMethods_setAdjustmentValue:T3
+JSCompiler_StaticMethods_setAdjustmentValue:U3
 tt_face_load_bdf_props:Cn
 dublicate_matrix:Sk
 c_oSer_ConditionalFormattingRule$DataBar:KH
 ChartPreviewManager:Md
-STATES_ID_TEXT_ADD:yg
+STATES_ID_TEXT_ADD:zg
 AFM_StreamRec:gm
 JSCompiler_StaticMethods_Internal_Is_NullBorders:x6
 Y_Top_Margin:s6
@@ -1572,7 +1572,7 @@ c_oSerXfsTypes$ApplyBorder:vC
 sfnt_service_ps_name:Ep
 phType_clipArt:CU
 JSCompiler_StaticMethods_setTheme:nL
-JSCompiler_StaticMethods_Create_NewPoint:Lg
+JSCompiler_StaticMethods_Create_NewPoint:Mg
 afm_parser_read_int:pm
 historyitem_Worksheet_ShiftCellsTop:YO
 FILL_TYPE_NOFILL:FT
@@ -1644,7 +1644,7 @@ historyitem_Worksheet_RemoveRows:rO
 c_oSerSharedStringTypes$Text:cD
 CreateAscColor:k8
 FT_ENCODING_UNICODE:Aw
-asc_CFillHatch:f1
+asc_CFillHatch:g1
 g_fontManager:Y7
 UndoRedoData_SortData:dQ
 JSCompiler_StaticMethods_Select_DrawingObject:B6
@@ -1748,7 +1748,7 @@ nSldLtTSecHead:JV
 JSCompiler_StaticMethods_shiftFormat:jd
 FontStyle$FontStyleItalic:Vw
 nSldLtTTxAndChart:SV
-JSCompiler_StaticMethods_TurnOn:Qg
+JSCompiler_StaticMethods_TurnOn:Rg
 CBg:nV
 CParaLineMetrics:m7
 BinaryChartWriter:sK
@@ -1886,9 +1886,9 @@ c_oSer_ChartCatAxType$Delete:e_
 CHART_TITLE_TYPE_TITLE:i0
 FONT_ITALIC_ANGLE:sw
 numFormat_Second:fc
-asc_CChartBinary:Bf
+asc_CChartBinary:yf
 JSCompiler_StaticMethods_getCol0:rz
-historyitem_Chart_xAxisTitle:$e
+historyitem_Chart_xAxisTitle:Ze
 EVerticalAlignment$verticalalignmentCenter:eJ
 ExtraClrScheme:fV
 numFormat_Bracket:$b
@@ -2090,7 +2090,7 @@ cff_parser_run:Rt
 c_oAscError$ID$CannotMoveRange:NR
 FormatObjScientific:Kc
 g_oDefaultAlignAbs:eK
-c_oAscAsyncAction$LoadImage:Cg
+c_oAscAsyncAction$LoadImage:Dg
 lcl_getLanczosSum:rB
 TT_OS2:Ik
 para_PageBreakRendered:Fh
@@ -2246,7 +2246,7 @@ FT_CreateVectorArray:Mj
 JSCompiler_StaticMethods_handleEvents:LS
 JSCompiler_StaticMethods_moveCol:gB
 JSCompiler_StaticMethods_Internal_CompileParaPr:J6
-asc_CShapeFill:Ig
+asc_CShapeFill:Jg
 ParaCommentStart:ii
 FT_Outline_New_Internal:rj
 CellValueType$String:na
@@ -2428,7 +2428,7 @@ _ph_summ__media_and_tx:qW
 TT_GraphicsState:Nq
 TT_SBit_LineMetricsRec:wk
 JSCompiler_StaticMethods_makeSimpleText:CM
-c_oSerWorksheetsTypes$TableParts:GD
+c_oSerWorksheetsTypes$TableParts:FD
 getVertexId:PM
 JSCompiler_StaticMethods_getFontsize:KP
 CBrush:Cx
@@ -2554,7 +2554,7 @@ afm_tokenize:om
 c_oSerBorderTypes$Horizontal:kC
 UndoRedoDataQuadBezTo:UQ
 c_oAscError$ID$FrmlOperandExpected:XA
-JSCompiler_StaticMethods_CorrectBounds:Eg
+JSCompiler_StaticMethods_CorrectBounds:Hg
 _arr_lt_types_weight:EW
 historyitem_RowCol_Strikeout:gM
 c_oSer_ConditionalFormattingRule$Priority:CH
@@ -2680,7 +2680,7 @@ g_bDate1904:ka
 g_nNextWorksheetId:EM
 t1_services:Yv
 EVerticalAlignment$verticalalignmentBottom:dJ
-c_oAscInsertOptions$InsertColumns:Sg
+c_oAscInsertOptions$InsertColumns:Tg
 L 159:ln
 L 158:F8
 FT_Lookup_Renderer:mw
@@ -2748,7 +2748,7 @@ L 120:A8
 c_oAscAdvancedOptionsAction$None:H8
 FONT_TYPE_ADDITIONAL_CUT:rx
 L 118:Kb
-L 119:Ze
+L 119:$e
 c_oSerWorksheetPropTypes$Name:ND
 L 116:Gg
 ParaNewLine:Zh
@@ -2763,7 +2763,7 @@ cff_parse_fixed:Pt
 TT_CMapRec:qo
 L 133:lp
 L 132:C8
-L 135:of
+L 135:pf
 gc_nMaxRow:ce
 L 134:vU
 CParaLineRange:i6
@@ -2859,7 +2859,7 @@ tt_face_load_sbit_image:po
 c_oSerStylesTypes$NumFmt:aC
 ft_smooth_transform:vq
 c_oSer_SheetPr$CodeName:jI
-c_oAscDeleteOptions$DeleteColumns:Ug
+c_oAscDeleteOptions$DeleteColumns:Vg
 Binary_OtherTableReader:lL
 CBulletType:oX
 c_oSer_DateGroupItem$Hour:iG
@@ -2915,7 +2915,7 @@ asc_CCellCommentator:nR
 JSCompiler_StaticMethods_moveRow:fB
 tt_cmap14_char_next:dp
 Get_Interface:Zv
-c_oAscDeleteOptions$DeleteRows:Vg
+c_oAscDeleteOptions$DeleteRows:Wg
 c_oSer_ConditionalFormattingRule$ColorScale:JH
 CShapeStyle:VU
 postLoadScript:nx
@@ -3017,11 +3017,11 @@ pararecalc_0_None:b6
 L 39:Kd
 L 38:uc
 c_oAscMergeOptions$Unmerge:XR
-L 37:md
+L 37:kd
 g_o_event_map:o3
 L 32:Lb
 PS_PrivateRec:Ol
-L 31:Xa
+L 31:Ya
 cff_standard_encoding:Wt
 L 30:Ta
 L 36:ob
@@ -3066,7 +3066,7 @@ JSCompiler_StaticMethods_changeCurrentState:Y0
 L 59:Sc
 nSldLtTClipArtAndTx:yV
 L 58:zd
-L 57:yf
+L 57:zf
 L 56:sg
 L 55:Rc
 L 54:Id
@@ -3086,7 +3086,7 @@ c_oSerHyperlinkTypes$Tooltip:$D
 L 48:Gb
 L 45:Fe
 L 44:Ob
-L 47:bf
+L 47:df
 L 46:Zb
 L 41:xc
 L 40:hc
@@ -3227,7 +3227,7 @@ L 77:Fj
 L 78:Rf
 t1_args_count:an
 L 79:qb
-c_oAscSelectionType$RangeShape:rh
+c_oAscSelectionType$RangeShape:th
 UndoRedoData_IndexSimpleProp:XL
 GetDiffDate360:vB
 numbering_presentationnumfrmt_ArabicPeriod:R4
@@ -3240,7 +3240,7 @@ L 70:qk
 L 72:nl
 FT_PEEK_USHORT:Mi
 L 71:ml
-L 64:Af
+L 64:Bf
 L 65:Xh
 L 62:nc
 L 63:$a
@@ -3251,13 +3251,13 @@ L 69:Dj
 Ins_MSIRP:bs
 L 66:Oc
 L 67:eb
-c_oAscInsertOptions$InsertRows:Tg
+c_oAscInsertOptions$InsertRows:Ug
 JSCompiler_StaticMethods__shiftCellsBottom:aP
 JSCompiler_StaticMethods_addSlaveEdge:LM
 JSCompiler_StaticMethods_Internal_Get_ClearPos:a6
 RotateTrackGroup:Y2
 L 61:Xb
-L 60:zf
+L 60:Af
 c_oSer_ColorType$Auto:dF
 JSCompiler_StaticMethods_Calculate_X_Value:If
 L 99:Fl
@@ -3265,7 +3265,7 @@ L 95:rc
 c_oSer_SheetPr$FilterMode:lI
 L 96:rk
 L 97:wg
-L 98:th
+L 98:sh
 c_oSer_ChartCatAxType$Title:c_
 c_oSerWorksheetColTypes$Width:VD
 STATES_ID_PRE_RESIZE:m1
@@ -3299,7 +3299,7 @@ c_oSer_SheetPr$SyncRef:oI
 c_oEditorId$Speadsheet:ga
 c_oSer_BasicChartType$Series:m_
 CellValueType$Number:ma
-L 83:sh
+L 83:rh
 L 82:hu
 c_oSerPropLenType$Byte:WJ
 L 81:Qf
