@@ -652,6 +652,7 @@ asc_CChart.prototype = {
 			
 			Writer.WriteString2(this.series[i].FormatCode);
 			Writer.WriteBool(this.series[i].isHidden);
+			Writer.WriteBool(this.series[i].bShowValue);
 		}
 		
 		// Theme Colors
@@ -749,6 +750,7 @@ asc_CChart.prototype = {
 			
 			seria.FormatCode = Reader.GetString2();
 			seria.isHidden = Reader.GetBool();
+			seria.bShowValue = Reader.GetBool();
 			
 			this.series.push(seria);
 		}		
@@ -1406,6 +1408,7 @@ function asc_CChartSeria() {
 	this.Cat = { Formula: null, NumCache: [] };
 	this.TxCache = { Formula: null, Tx: null };
 	this.Marker = { Size: null, Symbol: null };
+	this.bShowValue = false;
 	this.OutlineColor = null;
 	this.FormatCode = "";
 	this.isHidden = false;
@@ -2391,7 +2394,6 @@ function DrawingObjects() {
 			anchorUpdated: false,
 			lockState: c_oAscObjectLockState.No
 		};
-
 
         _t.getAllFonts = function(AllFonts) {
             _t.graphicObject && _t.graphicObject.getAllFonts && _t.graphicObject.getAllFonts(AllFonts);
