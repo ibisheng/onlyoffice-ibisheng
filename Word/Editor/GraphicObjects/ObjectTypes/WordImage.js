@@ -3180,10 +3180,10 @@ WordImage.prototype =
         var data = {Type: historyitem_SetSpPr, spPr: spPr};
         History.Add(this, data);
         this.spPr = spPr;
-        if(this.spPr.Fill && this.spPr.Fill.fill && this.spPr.Fill.fill instanceof CBlipFill)
+        /*if(this.spPr.Fill && this.spPr.Fill.fill && this.spPr.Fill.fill instanceof CBlipFill)
         {
             this.setRasterImage(this.spPr.Fill.fill.RasterImageId);
-        }
+        }*/
     },
 
     setStyle: function(style)
