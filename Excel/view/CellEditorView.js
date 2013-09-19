@@ -1505,7 +1505,7 @@
 						var nextFr = opt.fragments[i + 1];
 					    if(t._isEqualFormats(fr.format, nextFr.format) && fr.theme == nextFr.theme && fr.tint == nextFr.tint) {
 							opt.fragments.splice(i, 2,
-									{format: fr.format, text: fr.text + fr.text, theme: fr.theme, tint: fr.tint});
+									{format: fr.format, text: fr.text + nextFr.text, theme: fr.theme, tint: fr.tint});
 							continue;
 						}
 					}
