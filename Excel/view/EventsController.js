@@ -984,6 +984,12 @@
 					this.isMoveRangeMode = false;
 					this._moveRangeHandleDone(event);
 				}
+				
+				if (this.isMoveResizeChartsRange) {
+					this.isMoveResizeRange = false;
+					this.isMoveResizeChartsRange = false;
+					this.handlers.trigger("moveResizeRangeHandleDone", this.targetInfo);
+				}
 
 				// Мы можем dblClick и не отработать, если вышли из области и отпустили кнопку мыши, нужно отработать
 				this.showCellEditorCursor();
@@ -1016,6 +1022,12 @@
 					// Закончили перемещение диапазона
 					this.isMoveRangeMode = false;
 					this.handlers.trigger("moveRangeHandleDone");
+				}
+				
+				if (this.isMoveResizeChartsRange) {
+					this.isMoveResizeRange = false;
+					this.isMoveResizeChartsRange = false;
+					this.handlers.trigger("moveResizeRangeHandleDone", this.targetInfo);
 				}
 
 				// Мы можем dblClick и не отработать, если вышли из области и отпустили кнопку мыши, нужно отработать
