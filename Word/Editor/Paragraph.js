@@ -10984,7 +10984,8 @@ Paragraph.prototype =
         var NewEmHeight = (Count - 1) * LineH + LineTA;
         var Koef = NewEmHeight / EmHeight;
 
-        TextPr.FontSize *= Koef;
+        var NewFontSize = TextPr.FontSize * Koef;
+        TextPr.FontSize = parseInt(NewFontSize * 2) / 2;
 
         g_oTextMeasurer.SetTextPr(TextPr);
         g_oTextMeasurer.SetFontSlot(fontslot_ASCII, 1);
@@ -11019,7 +11020,7 @@ Paragraph.prototype =
 
         var Dy = Descent * (LineH * Count) / ( Ascent - Descent ) + TNewHeight - TNewAscent + LineTD;
 
-        var PTextPr = new ParaTextPr( { RFonts : { Ascii : { Name : TextPr.RFonts.Ascii.Name, Index : -1 } }, FontSize : FontSize * Koef, Position : Dy } );
+        var PTextPr = new ParaTextPr( { RFonts : { Ascii : { Name : TextPr.RFonts.Ascii.Name, Index : -1 } }, FontSize : TextPr.FontSize, Position : Dy } );
 
         this.Select_All();
         this.Add( PTextPr );
@@ -11074,7 +11075,9 @@ Paragraph.prototype =
 
         var Koef = (Height - LineTD) / THeight;
 
-        TextPr.FontSize *= Koef;
+        var NewFontSize = TextPr.FontSize * Koef;
+        TextPr.FontSize = parseInt(NewFontSize * 2) / 2;
+
         g_oTextMeasurer.SetTextPr(TextPr);
         g_oTextMeasurer.SetFontSlot(fontslot_ASCII, 1);
 
