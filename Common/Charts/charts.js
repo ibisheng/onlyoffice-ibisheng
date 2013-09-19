@@ -1224,6 +1224,10 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart, options)
 				if(maxY < newArr[0][j][1] && newArr[0][j][1] != '')
 					maxY = newArr[0][j][1]
 			}
+			//меняем форматы осей для отдельных случаев точечных диаграмм
+			if(scatterArr[0] && scatter[0].length == 1)
+			formatCellScOy = formatCell;
+			formatCell = "General";
 		}
 		else
 		{
@@ -1261,6 +1265,12 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart, options)
 					if(maxY < newArr[i-1][j][1] && newArr[i-1][j][1] != '')
 						maxY = newArr[i-1][j][1]
 				}
+			}
+			//меняем форматы осей для отдельных случаев точечных диаграмм
+			if(scatterArr[0] && scatter[0].length == 1)
+			{
+				formatCellScOy = formatCell;
+				formatCell = "General";
 			}
 		}
 		chart.ymin = minY;
