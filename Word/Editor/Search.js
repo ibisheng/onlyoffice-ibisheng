@@ -103,6 +103,7 @@ CDocumentSearch.prototype =
 
     Replace : function(NewStr, Id)
     {
+        //var _NewStr =
         var Para = this.Elements[Id];
         if ( undefined != Para )
         {
@@ -119,13 +120,15 @@ CDocumentSearch.prototype =
                         Para.Internal_Content_Remove(Pos);
                 }
 
+
                 var Len = NewStr.length;
                 for ( var Pos = 0; Pos < Len; Pos++ )
                 {
-                    Para.Internal_Content_Add( StartPos + Pos, new ParaText( NewStr[Pos] ) );
+                    Para.Internal_Content_Add2( StartPos + Pos, new ParaText( NewStr[Pos] ) );
                 }
 
                 Para.RecalcInfo.Set_Type_0( pararecalc_0_All );
+                Para.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
 
                 // Удаляем запись о данном элементе
                 this.Count--;

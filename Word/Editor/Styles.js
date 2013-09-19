@@ -7086,6 +7086,7 @@ CParaTabs.prototype =
             var _Tab = _Tabs[Index];
 
             var Index2 = 0;
+            var Flag   = 0;
             for (Index2 = 0; Index2 < this.Tabs.length; Index2++ )
             {
                 var Tab = this.Tabs[Index2];
@@ -7093,9 +7094,9 @@ CParaTabs.prototype =
                 if ( Math.abs(  Tab.Pos - _Tab.Pos ) < 0.001 )
                 {
                     if ( tab_Clear === _Tab.Value )
-                        Index2 = -2; // таб нужно удалить
+                        Flag = -2; // таб нужно удалить
                     else
-                        Index2 = -1; // табы совпали, не надо новый добавлять
+                        Flag = -1; // табы совпали, не надо новый добавлять
 
                     break;
                 }
@@ -7104,9 +7105,9 @@ CParaTabs.prototype =
                     break;
             }
 
-            if ( -2 === Index2 )
+            if ( -2 === Flag )
                 this.Tabs.splice( Index2, 1 );
-            else if ( -1 != Index2 )
+            else if ( -1 != Flag )
                 this.Tabs.splice( Index2, 0, _Tab );
         }
     },

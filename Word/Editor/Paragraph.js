@@ -392,15 +392,36 @@ Paragraph.prototype =
         // Передвинем все метки поиска
         for ( var CurSearch in this.SearchResults )
         {
-            if ( this.SearchResults[CurSearch].StartPos > Pos )
+            if ( this.SearchResults[CurSearch].StartPos >= Pos )
                 this.SearchResults[CurSearch].StartPos++;
 
-            if ( this.SearchResults[CurSearch].EndPos > Pos )
+            if ( this.SearchResults[CurSearch].EndPos >= Pos )
                 this.SearchResults[CurSearch].EndPos++;
         }
 
         // Передвинем все метки слов для проверки орфографии
         this.SpellChecker.Update_OnAdd( this, Pos, Item );
+    },
+
+    Internal_Content_Add2 : function (Pos, Item, bCorrectPos)
+    {
+        if ( true === Item.Is_RealContent() )
+        {
+            var ClearPos = this.Internal_Get_ClearPos( Pos );
+            History.Add( this, { Type : historyitem_Paragraph_AddItem, Pos : ClearPos, EndPos : ClearPos, Items : [ Item ] } );
+        }
+
+        this.Content.splice( Pos, 0, Item );
+
+        // Передвинем все метки поиска
+        for ( var CurSearch in this.SearchResults )
+        {
+            if ( this.SearchResults[CurSearch].StartPos >= Pos )
+                this.SearchResults[CurSearch].StartPos++;
+
+            if ( this.SearchResults[CurSearch].EndPos >= Pos )
+                this.SearchResults[CurSearch].EndPos++;
+        }
     },
 
     // Добавляем несколько элементов в конец параграфа.
