@@ -580,7 +580,7 @@ CGeometry.prototype=
                 w.WriteString2(o.posY);
         }
 
-        for(index = 0; index < ah_xy_count; ++index)
+       /* for(index = 0; index < ah_xy_count; ++index)
         {
             o = this.ahXYLst[index];
             bool = typeof  o.gdRefX === "string";
@@ -625,7 +625,7 @@ CGeometry.prototype=
             w.WriteBool(bool);
             if(bool)
                 w.WriteLong(o.posY);
-        }
+        }   */
 
         var ah_polar_count = this.ahPolarLstInfo.length;
         Writer.WriteLong(ah_polar_count);
@@ -676,7 +676,7 @@ CGeometry.prototype=
                 w.WriteString2(o.posY);
         }
 
-        for(index = 0; index < ah_polar_count; ++index)
+        /*for(index = 0; index < ah_polar_count; ++index)
         {
             o = this.ahPolarLst[index];
             bool = typeof  o.gdRefR === "string";
@@ -721,7 +721,7 @@ CGeometry.prototype=
             w.WriteBool(bool);
             if(bool)
                 w.WriteLong(o.posY);
-        }
+        }     */
 
         var path_count = this.pathLst.length;
         Writer.WriteLong(path_count);
