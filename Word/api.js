@@ -607,6 +607,9 @@ function asc_docs_api(name)
 
     this.IsLongActionCurrent = false;
 
+    this.ParcedDocument = false;
+    this.OpenLocks = [];
+
 	var oThis = this;
 	if(window.addEventListener)
 		window.addEventListener("message", function(){
@@ -876,6 +879,7 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
     if (this.DocInfo.get_OfflineApp() === true)
     {
         this.OfflineAppDocumentStartLoad();
+        this.asyncServerIdStartLoaded();
         return;
     }
 
@@ -895,9 +899,10 @@ asc_docs_api.prototype.LoadDocument = function(c_DocInfo)
         // For test create unique id
         documentId = "0123456789";
         this.OfflineAppDocumentStartLoad();
-
         this.sync_zoomChangeCallback(this.WordControl.m_nZoomValue, 0);
     }
+
+    this.asyncServerIdStartLoaded();
 }
 
 asc_docs_api.prototype.SetFontsPath = function(path)
@@ -1069,30 +1074,6 @@ asc_docs_api.prototype.LoadDocumentFromDisk = function()
 	}
 }
 
-asc_docs_api.prototype.OpenEmptyDocument = function()
-{
-	editor.InitEditor();
-	this.LoadedObject = null;
-	this.DocumentType = 0;
-	this.WordControl.m_oLogicDocument.Fonts = [];
-	this.asyncServerIdStartLoaded();
-	this.FontLoader.LoadDocumentFonts(new Array(), true);
-}
-
-asc_docs_api.prototype.OpenTestDocument = function()
-{
-    // For test create unique id
-    documentId = "0123456789";
-
-    editor.InitEditor();
-	this.LoadedObject = null;
-	this.DocumentType = 1;
-	this.WordControl.m_oLogicDocument.Fonts = [];
-	this.WordControl.m_oLogicDocument.ImageMap = {};
-	this.asyncServerIdStartLoaded();
-	this.FontLoader.LoadDocumentFonts(new Array(), true);
-}
-
 asc_docs_api.prototype.OpenTestDocumentViewer = function()
 {
 	this.LoadedObject = null;
@@ -1145,6 +1126,7 @@ asc_docs_api.prototype.OpenDocument2 = function(url, gObject)
 	else
 		editor.asc_fireCallback("asc_onError",c_oAscError.ID.MobileUnexpectedCharCount,c_oAscError.Level.Critical);
 
+    this.ParcedDocument = true;
 
     if (window.USER_AGENT_SAFARI_MACOS)
         setInterval(SafariIntervalFocus, 10);
@@ -1324,6 +1306,12 @@ asc_docs_api.prototype._coAuthoringInit = function()
 	this.CoAuthoringApi.onUserStateChanged			= function (e) { t.asc_fireCallback( "asc_onUserStateChanged", e ); };
 	this.CoAuthoringApi.onLocksAcquired				= function (e)
     {
+        if (!t.ParcedDocument)
+        {
+            t.OpenLocks.push(e);
+            return;
+        }
+
         if ( 2 != e["state"] )
         {
             var Id = e["block"];
@@ -1417,7 +1405,7 @@ asc_docs_api.prototype._coAuthoringInit = function()
 	this.CoAuthoringApi.onFirstLoadChanges			= function (e)
 	{
         t.CoAuthoringApi.onSaveChanges(e,false);
-        CollaborativeEditing.Apply_Changes();
+        //CollaborativeEditing.Apply_Changes();
 	};
 	this.CoAuthoringApi.onSetIndexUser			= function (e)
 	{
@@ -5929,7 +5917,7 @@ asc_docs_api.prototype.asyncImagesDocumentEndLoaded = function()
         if (this.isViewMode)
             this.SetViewMode(true, /*isNotSendOnCoAuthoringServer*/ true);
 
-        this.asyncServerIdStartLoaded();
+        //this.asyncServerIdStartLoaded();
         return;
     }
 
@@ -5940,7 +5928,7 @@ asc_docs_api.prototype.asyncImagesDocumentEndLoaded = function()
         if (true == this.ServerIdWaitComplete)
             this.OpenDocumentEndCallback();
 
-        this.asyncServerIdStartLoaded();
+        //this.asyncServerIdStartLoaded();
     }
     else
     {
@@ -5993,6 +5981,13 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
             else
             {
                 var Document = this.WordControl.m_oLogicDocument;
+
+                CollaborativeEditing.Apply_Changes();
+                for (var i = 0; i < this.OpenLocks.length; i++)
+                {
+                    this.CoAuthoringApi.onLocksAcquired(this.OpenLocks[i]);
+                }
+                this.OpenLocks = [];
 
                 //Recalculate HdrFtr
                 if(Document.HdrFtr && Document.HdrFtr.Content && Document.HdrFtr.Content.length > 0 && Document.HdrFtr.Content[0].Header)
