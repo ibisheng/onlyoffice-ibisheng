@@ -241,21 +241,6 @@ var ASC_DOCS_API_USE_OPEN_SOURCE_FONTS_ONLY = false;
             }
         }
 
-        this.CheckFontsPaste = function(_fonts)
-        {
-            for (var i in _fonts)
-            {
-                var info_ind = this.map_font_index[_fonts[i]];
-                if (info_ind != undefined)
-                {
-                    this.fonts_loading[this.fonts_loading.length] = this.fontInfos[info_ind];
-                }
-            }
-
-            this.Api.asyncFontsDocumentStartLoaded();
-            this._LoadFonts();
-        }
-
         this.AddLoadFonts = function(info, need_styles)
         {
             this.fonts_loading[this.fonts_loading.length] = info;
@@ -329,7 +314,23 @@ var ASC_DOCS_API_USE_OPEN_SOURCE_FONTS_ONLY = false;
             this.Api.asyncFontsDocumentStartLoaded();
 
             this.bIsLoadDocumentFirst = true;
+
+            this.CheckFontsNeedLoadingLoad();
             this._LoadFonts();
+        }
+
+        this.CheckFontsNeedLoadingLoad = function()
+        {
+            var _fonts = this.fonts_loading;
+            var _fonts_len = _fonts.length;
+
+            var _need = false;
+            for (var i = 0; i < _fonts_len; i++)
+            {
+                if (true == _fonts[i].CheckFontLoadStyles(this))
+                    _need = true;
+            }
+            return _need;
         }
 
         this.CheckFontsNeedLoading = function(_fonts)
@@ -358,6 +359,7 @@ var ASC_DOCS_API_USE_OPEN_SOURCE_FONTS_ONLY = false;
             else
                 this.ThemeLoader.asyncFontsStartLoaded();
 
+            this.CheckFontsNeedLoadingLoad();
             this._LoadFonts();
         }
 

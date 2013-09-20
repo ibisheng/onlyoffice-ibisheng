@@ -1,5 +1,5 @@
 /** @define {boolean} */
-var ASC_DOCS_API_USE_FONTS_ORIGINAL_FORMAT = false;
+var ASC_DOCS_API_USE_FONTS_ORIGINAL_FORMAT = true;
 
 var bIsLocalFontsUse = false;
 
@@ -392,8 +392,11 @@ function CFontInfo(sName, thumbnail, type, indexR, faceIndexR, indexI, faceIndex
     this.indexBI    = indexBI;
     this.faceIndexBI= faceIndexBI;
     this.needBI     = false;
+}
 
-    this.CheckFontLoadStyles = function(global_loader)
+CFontInfo.prototype =
+{
+    CheckFontLoadStyles : function(global_loader)
     {
         if ((this.NeedStyles & 0x0F) == 0x0F)
         {
@@ -523,9 +526,9 @@ function CFontInfo(sName, thumbnail, type, indexR, faceIndexR, indexI, faceIndex
         }
 
         return isNeed;
-    }
+    },
 
-    this.CheckFontLoadStylesNoLoad = function(global_loader)
+    CheckFontLoadStylesNoLoad : function(global_loader)
     {
         var fonts = (FONT_TYPE_EMBEDDED == this.Type) ? global_loader.embeddedFontFiles : global_loader.fontFiles;
         var _isNeed = false;
@@ -547,9 +550,9 @@ function CFontInfo(sName, thumbnail, type, indexR, faceIndexR, indexI, faceIndex
         }
 
         return _isNeed;
-    }
+    },
 
-    this.LoadFontsFromServer = function(global_loader)
+    LoadFontsFromServer : function(global_loader)
     {
         var fonts = global_loader.fontFiles;
         var basePath = global_loader.fontFilesPath;
@@ -569,33 +572,9 @@ function CFontInfo(sName, thumbnail, type, indexR, faceIndexR, indexI, faceIndex
         {
             fonts[this.indexBI].LoadFontAsync(basePath, null);
         }
-    }
+    },
 
-    this.check_fonts_loaded_sync = function(global_loader)
-    {
-        var fonts = global_loader.fontFiles;
-        var isNeed = false;
-        if ((this.needR === true) && (-1 != this.indexR) && (fonts[this.indexR].CheckLoaded() === false))
-        {
-            isNeed = true;
-        }
-        if ((this.needI === true) && (-1 != this.indexI) && (fonts[this.indexI].CheckLoaded() === false))
-        {
-            isNeed = true;
-        }
-        if ((this.needB === true) && (-1 != this.indexB) && (fonts[this.indexB].CheckLoaded() === false))
-        {
-            isNeed = true;
-        }
-        if ((this.needBI === true) && (-1 != this.indexBI) && (fonts[this.indexBI].CheckLoaded() === false))
-        {
-            isNeed = true;
-        }
-
-        return isNeed;
-    }
-
-    this.LoadFont = function(font_loader, fontManager, fEmSize, lStyle, dHorDpi, dVerDpi, transform)
+    LoadFont : function(font_loader, fontManager, fEmSize, lStyle, dHorDpi, dVerDpi, transform)
     {
         // сначала нужно проверить на обрезанный шрифт
         var _embedded_cur = g_font_loader.embedded_cut_manager;
@@ -800,9 +779,9 @@ function CFontInfo(sName, thumbnail, type, indexR, faceIndexR, indexI, faceIndex
         }
 
         fontManager.AfterLoad();
-    }
+    },
 
-    this.GetFontID = function(font_loader, lStyle)
+    GetFontID : function(font_loader, lStyle)
     {
         // подбираем шрифт по стилю
         var sReturnName = this.Name;
