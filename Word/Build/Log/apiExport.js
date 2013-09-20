@@ -192,8 +192,6 @@ prop:SetInterfaceDrawImagePlaceShape
 prop:InitViewer
 prop:OpenNewDocument
 prop:LoadDocumentFromDisk
-prop:OpenEmptyDocument
-prop:OpenTestDocument
 prop:OpenTestDocumentViewer
 prop:OpenDocument
 prop:OpenDocument2
@@ -1260,8 +1258,6 @@ asc_docs_api.prototype['SetInterfaceDrawImagePlaceShape'] = asc_docs_api.prototy
 asc_docs_api.prototype['InitViewer'] = asc_docs_api.prototype.InitViewer;
 asc_docs_api.prototype['OpenNewDocument'] = asc_docs_api.prototype.OpenNewDocument;
 asc_docs_api.prototype['LoadDocumentFromDisk'] = asc_docs_api.prototype.LoadDocumentFromDisk;
-asc_docs_api.prototype['OpenEmptyDocument'] = asc_docs_api.prototype.OpenEmptyDocument;
-asc_docs_api.prototype['OpenTestDocument'] = asc_docs_api.prototype.OpenTestDocument;
 asc_docs_api.prototype['OpenTestDocumentViewer'] = asc_docs_api.prototype.OpenTestDocumentViewer;
 asc_docs_api.prototype['OpenDocument'] = asc_docs_api.prototype.OpenDocument;
 asc_docs_api.prototype['OpenDocument2'] = asc_docs_api.prototype.OpenDocument2;

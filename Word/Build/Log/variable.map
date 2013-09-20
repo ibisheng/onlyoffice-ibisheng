@@ -15,7 +15,7 @@ Y_Bottom_Margin:RG
 sfnt_init_face:uw
 MobileTouchMode$Scroll:d5
 para_HyperlinkEnd:ic
-Numbering_Number_To_Alpha:oU
+Numbering_Number_To_Alpha:pU
 numbering_presentationnumfrmt_RomanUcPeriod:Ja
 dropcap_Drop:fR
 docpostype_DrawingObjects:xb
@@ -200,7 +200,7 @@ StartTrackTextRect:QH
 DRAWING_ARRAY_TYPE_WRAPPING:TF
 ft_qsort:qs
 JSCompiler_StaticMethods_Remove_FromDocument:uF
-CGrState_Pen:h4
+CGrState_Pen:j4
 PS_Conv_Strtol:Rs
 tableSpacingMinValue:Md
 SHAPE_ASPECTS:OH
@@ -295,7 +295,7 @@ c_oAscAsyncAction$PrepareToSave:t6
 JSCompiler_StaticMethods_Set_TableAlign:ae
 tt_face_set_sbit_strike:Xu
 ParaInlineBreak:EO
-gr_state_state:g4
+gr_state_state:i4
 Numbering_Number_To_Roman:qU
 phType_dgm:ML
 asc_CParagraphSpacing:dp
@@ -624,7 +624,7 @@ handleChart:AH
 JSCompiler_StaticMethods_WriteRowPr:v2
 TextAddState:xF
 JSCompiler_StaticMethods_fromArrayGraphicObjects:gG
-JSCompiler_StaticMethods_Get_SummaryHeight:TJ
+JSCompiler_StaticMethods_Get_SummaryHeight:UJ
 JSCompiler_StaticMethods_getMax:yn
 JSCompiler_StaticMethods_Internal_SetLvl:YT
 STATES_ID_RESIZE_GROUPED:RE
@@ -816,7 +816,7 @@ flowobject_Table:wb
 c_oAscMouseMoveLockedObjectType$Footer:KU
 JSCompiler_StaticMethods__MouseHoverOnArrowUp:d6
 CFF_SubFontRec:iA
-c_oSerProp_pPrType$numPr_id:eZ
+c_oSerProp_pPrType$numPr_id:fZ
 isRealNumber:JJ
 FT_Outline_Copy:oq
 b64_decode:Ih
@@ -1333,7 +1333,7 @@ linerule_AtLeast:Ta
 JSCompiler_StaticMethods_normalizeXfrm:OK
 CParaPage:US
 tt_cmap13_char_index:Kv
-JSCompiler_StaticMethods_Clear_TextFormatting:ST
+JSCompiler_StaticMethods_Clear_TextFormatting:TT
 cff_index_read_offset:AA
 hdrftr_Even:uE
 CTable:ne
@@ -2219,7 +2219,7 @@ g_clr_MIN:ZL
 CGrState_State:l4
 JSCompiler_StaticMethods__checkCoord:cl
 c_oSerImageType2$DistB:K_
-c_oSerProp_pPrType$Ind:JY
+c_oSerProp_pPrType$Ind:KY
 c_oSerImageType2$DistL:L_
 JSCompiler_StaticMethods_Set_Lvl_Numbered_6:Te
 c_oSerImageType2$DistT:N_
@@ -2515,7 +2515,7 @@ c_oSerWrapTopBottom$DistT:x0
 JSCompiler_StaticMethods_calculateAfterOpen3:eL
 c_oSer_CommentsType$UserName:T0
 JSCompiler_StaticMethods_CopySlide:Hb
-c_oSerProp_pPrType$WidowControl:fZ
+c_oSerProp_pPrType$WidowControl:gZ
 c_oAscContextMenuTypes$Common:zV
 ASC_DOCS_API_USE_EMBEDDED_FONTS:b7
 T1_Driver_Class:wC
@@ -2768,7 +2768,7 @@ historyitem_type_HdrFtr:hP
 FORMULA_TYPE_TAN:LN
 JSCompiler_StaticMethods_InsertInDocument:Ac
 TT_CMap12Rec:Av
-AFM_GETC:Ws
+AFM_GETC:Xs
 CTrackMoveObjectInGroup:gI
 UniNvPr:Vi
 afm_parse_track_kern:ft
@@ -2780,7 +2780,7 @@ historyitem_ChangePresetGeom:fK
 _infos$$inline_1407:YD
 JSCompiler_StaticMethods_RGBToCSS:Xa
 c_oSer_ChartCatAxType$MajorGridlines:Pl
-c_oSerProp_pPrType$contextualSpacing:IY
+c_oSerProp_pPrType$contextualSpacing:JY
 t1_builder_done:Nt
 c_oAscWrapStyle2$Behind:uS
 c_oSerProp_rPrType$FontSizeCs:IZ
