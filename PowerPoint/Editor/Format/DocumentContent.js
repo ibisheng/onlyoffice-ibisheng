@@ -2324,7 +2324,7 @@ CDocumentContent.prototype =
 
     onParagraphChanged: function()
     {
-        if(this.Parent.onParagraphChanged)
+        if(this.Parent && this.Parent.onParagraphChanged)
             this.Parent.onParagraphChanged();
     },
 

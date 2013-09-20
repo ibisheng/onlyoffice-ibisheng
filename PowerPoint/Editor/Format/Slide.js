@@ -5,6 +5,10 @@
  * Time: 11:38 AM
  * To change this template use File | Settings | File Templates.
  */
+
+var COMMENT_WIDTH = 7;
+var COMMENT_HEIGHT = 5;
+
 function Slide(presentation, slideLayout, slideNum)
 {
     this.kind = SLIDE_KIND;
@@ -40,6 +44,8 @@ function Slide(presentation, slideLayout, slideNum)
     this.searchingArray = new Array();  // массив объектов для селекта
     this.selectionArray = new Array();  // массив объектов для поиска
 
+
+    this.comments = [];
 
     this.show = true;
     this.showMasterPhAnim = false;
@@ -893,6 +899,9 @@ function Slide(presentation, slideLayout, slideNum)
     };
 
 
+    this.commentX = 0;
+    this.commentY = 0;
+
     this.Lock = new CLock();
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
@@ -914,6 +923,38 @@ function Slide(presentation, slideLayout, slideNum)
 
 Slide.prototype =
 {
+
+    addComment: function(comment)
+    {
+        History.Add(this, {Type: historyitem_AddComment, objectId: comment.Get_Id(), pos:this.comments.length});
+        this.comments.splice(this.comments.length, 0, comment);
+        this.comments.push(comment);
+    },
+
+    changeComment: function(id, commentData)
+    {
+        for(var i = 0; i < this.comments.length; ++i)
+        {
+            if(this.comments[i].Get_Id() === id)
+            {
+                this.comments[i].Set_CommentData(commentData);
+                return;
+            }
+        }
+    },
+
+    removeComment: function(id)
+    {
+        for(var i = 0; i < this.comments.length; ++i)
+        {
+            if(this.comments[i].Get_Id() === id)
+            {
+                History.Add(this, {Type: historyitem_RemoveComment, index: i, id: id});
+                this.comments.splice(i, 1);
+                return;
+            }
+        }
+    },
 
     setShow: function(bShow)
     {
@@ -954,6 +995,29 @@ Slide.prototype =
         this.timing.applyProps(timing);
         History.Add(this, {Type: historyitem_ChangeTiming, oldTiming: oldTiming, newTiming: this.timing.createDuplicate()});
 
+    },
+
+    getAllFonts: function(fonts)
+    {
+        for(var i = 0; i < this.cSld.spTree.length; ++i)
+        {
+            if(typeof  this.cSld.spTree[i].getAllFonts === "function")
+                this.cSld.spTree[i].getAllFonts(fonts);
+        }
+    },
+
+    getAllImages: function(images)
+    {},
+
+    changeSize: function(kw, kh)
+    {
+        this.Width *= kw;
+        this.Height *= kh;
+        for(var i = 0; i < this.cSld.spTree.length; ++i)
+        {
+            this.cSld.spTree[i].changeSize(kw, kh);
+        }
+        this.recalcAll();
     },
 
     changeBackground: function(bg)
@@ -1406,6 +1470,8 @@ Slide.prototype =
     {
         History.Add(this, {Type: historyitem_AddToSlideSpTree, objectId: obj.Get_Id(), pos:pos});
         this.cSld.spTree.splice(pos, 0, obj);
+        editor.WordControl.m_oLogicDocument.recalcMap[obj.Id] = obj;
+
     },
 
     isLockedObject: function()

@@ -169,6 +169,9 @@ function CComment(Parent, Data)
     this.Parent = Parent;
     this.Data   = Data;
 
+    this.x = null;
+    this.y = null;
+
     this.m_oTypeInfo =
     {
         Type : comment_type_Common,
@@ -199,6 +202,20 @@ function CComment(Parent, Data)
         this.Lock.Set_Type( locktype_Mine, false );
         CollaborativeEditing.Add_Unlock2( this );
     }
+
+
+    this.hit = function(x, y)
+    {
+        return x > this.x && x < this.x + COMMENT_WIDTH
+        && y > this.y && y < this.y + COMMENT_HEIGHT;
+    };
+
+    this.setPosition = function(x, y)
+    {
+        History.Add(this, {Type: historyitem_Comment_Position, oldOffsetX: this.x, newOffsetX: x, oldOffsetY: this.y, newOffsetY: y});
+        this.x = x;
+        this.y = y;
+    };
 
     this.Set_StartInfo = function(PageNum, X, Y, H, ParaId)
     {
@@ -331,6 +348,13 @@ function CComment(Parent, Data)
                 this.m_oTypeInfo = Data.Old;
                 break;
             }
+
+            case historyitem_Comment_Position:
+            {
+                this.x = Data.oldOffsetX;
+                this.y = Data.oldOffsetY;
+                break;
+            }
         }
     };
 
@@ -350,6 +374,13 @@ function CComment(Parent, Data)
             case historyitem_Comment_TypeInfo:
             {
                 this.m_oTypeInfo = Data.New;
+                break;
+            }
+
+            case historyitem_Comment_Position:
+            {
+                this.x = Data.newOffsetX;
+                this.y = Data.newOffsetY;
                 break;
             }
         }
@@ -400,6 +431,16 @@ function CComment(Parent, Data)
                     Writer.WriteString2( HdrFtr.Get_Id() );
                 }
 
+                break;
+            }
+            case historyitem_Comment_Position:
+            {
+                Writer.WriteBool(isRealNumber(Data.newOffsetX) && isRealNumber(Data.newOffsetY));
+                if(isRealNumber(Data.newOffsetX) && isRealNumber(Data.newOffsetY))
+                {
+                    Writer.WriteDouble(Data.newOffsetX);
+                    Writer.WriteDouble(Data.newOffsetY);
+                }
                 break;
             }
         }
@@ -463,6 +504,21 @@ function CComment(Parent, Data)
                     this.m_oTypeInfo.Data = g_oTableId.Get_ById( HdrFtrId );
                 }
 
+                break;
+            }
+
+            case historyitem_Comment_Position:
+            {
+                if(Reader.GetBool())
+                {
+                    this.x = Reader.GetDouble();
+                    this.y = Reader.GetDouble();
+                }
+                else
+                {
+                    this.x = null;
+                    this.y = null;
+                }
                 break;
             }
         }

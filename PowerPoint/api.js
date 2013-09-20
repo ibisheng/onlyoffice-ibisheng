@@ -3196,6 +3196,189 @@ asc_docs_api.prototype.asc_enableKeyEvents = function(value){
 	}
 }
 
+
+//-----------------------------------------------------------------
+// Функции для работы с комментариями
+//-----------------------------------------------------------------
+function asc_CCommentData( obj )
+{
+    if( obj )
+    {
+        this.m_sText      = (undefined != obj.m_sText     ) ? obj.m_sText      : "";
+        this.m_sTime      = (undefined != obj.m_sTime     ) ? obj.m_sTime      : "";
+        this.m_sUserId    = (undefined != obj.m_sUserId   ) ? obj.m_sUserId    : "";
+        this.m_sQuoteText = (undefined != obj.m_sQuoteText) ? obj.m_sQuoteText : null;
+        this.m_bSolved    = (undefined != obj.m_bSolved   ) ? obj.m_bSolved    : false;
+        this.m_sUserName  = (undefined != obj.m_sUserName ) ? obj.m_sUserName  : "";
+        this.m_aReplies   = new Array();
+        if ( undefined != obj.m_aReplies )
+        {
+            var Count = obj.m_aReplies.length;
+            for ( var Index = 0; Index < Count; Index++ )
+            {
+                var Reply = new asc_CCommentData( obj.m_aReplies[Index] );
+                this.m_aReplies.push( Reply );
+            }
+        }
+    }
+    else
+    {
+        this.m_sText      = "";
+        this.m_sTime      = "";
+        this.m_sUserId    = "";
+        this.m_sQuoteText = null;
+        this.m_bSolved    = false;
+        this.m_sUserName  = "";
+        this.m_aReplies   = new Array();
+    }
+}
+
+asc_CCommentData.prototype.asc_getText         = function()  { return this.m_sText; }
+asc_CCommentData.prototype.asc_putText         = function(v) { this.m_sText = v; }
+asc_CCommentData.prototype.asc_getTime         = function()  { return this.m_sTime; }
+asc_CCommentData.prototype.asc_putTime         = function(v) { this.m_sTime = v; }
+asc_CCommentData.prototype.asc_getUserId       = function()  { return this.m_sUserId; }
+asc_CCommentData.prototype.asc_putUserId       = function(v) { this.m_sUserId = v; }
+asc_CCommentData.prototype.asc_getUserName     = function()  { return this.m_sUserName; }
+asc_CCommentData.prototype.asc_putUserName     = function(v) { this.m_sUserName = v; }
+asc_CCommentData.prototype.asc_getQuoteText    = function()  { return this.m_sQuoteText; };
+asc_CCommentData.prototype.asc_putQuoteText    = function(v) { this.m_sQuoteText = v; };
+asc_CCommentData.prototype.asc_getSolved       = function()  { return this.m_bSolved; };
+asc_CCommentData.prototype.asc_putSolved       = function(v) { this.m_bSolved = v; };
+asc_CCommentData.prototype.asc_getReply        = function(i) { return this.m_aReplies[i]; }
+asc_CCommentData.prototype.asc_addReply        = function(v) { this.m_aReplies.push( v ); }
+asc_CCommentData.prototype.asc_getRepliesCount = function(v) { return this.m_aReplies.length; }
+
+
+asc_docs_api.prototype.asc_showComments = function()
+{
+    if (null == this.WordControl.m_oLogicDocument)
+        return;
+
+    this.WordControl.m_oLogicDocument.Show_Comments();
+}
+
+asc_docs_api.prototype.asc_hideComments = function()
+{
+    if (null == this.WordControl.m_oLogicDocument)
+        return;
+
+    this.WordControl.m_oLogicDocument.Hide_Comments();
+    editor.sync_HideComment();
+}
+
+asc_docs_api.prototype.asc_addComment = function(AscCommentData)
+{
+    //if ( true === CollaborativeEditing.Get_GlobalLock() )
+    //   return;
+
+    if (null == this.WordControl.m_oLogicDocument)
+        return;
+
+    var CommentData = new CCommentData();
+    CommentData.Read_FromAscCommentData(AscCommentData);
+
+    // Добавлять комментарии можно всегда
+    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+    var Comment = this.WordControl.m_oLogicDocument.Add_Comment( CommentData );
+    if ( null != Comment )
+        this.sync_AddComment( Comment.Get_Id(), CommentData );
+}
+
+asc_docs_api.prototype.asc_removeComment = function(Id)
+{
+    if (null == this.WordControl.m_oLogicDocument)
+        return;
+
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_Comment, Id : Id } ) )
+    {
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        this.WordControl.m_oLogicDocument.Remove_Comment( Id, true );
+    }
+}
+
+asc_docs_api.prototype.asc_changeComment = function(Id, AscCommentData)
+{
+    if (null == this.WordControl.m_oLogicDocument)
+        return;
+
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_Comment, Id : Id } ) )
+    {
+        var CommentData = new CCommentData();
+        CommentData.Read_FromAscCommentData(AscCommentData);
+
+        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+        this.WordControl.m_oLogicDocument.Change_Comment( Id, CommentData );
+
+        this.sync_ChangeCommentData( Id, CommentData );
+    }
+}
+
+asc_docs_api.prototype.asc_selectComment = function(Id)
+{
+    if (null == this.WordControl.m_oLogicDocument)
+        return;
+
+    this.WordControl.m_oLogicDocument.Select_Comment(Id);
+}
+
+asc_docs_api.prototype.asc_showComment = function(Id)
+{
+    this.WordControl.m_oLogicDocument.Show_Comment(Id);
+}
+
+asc_docs_api.prototype.can_AddQuotedComment = function()
+{
+    //if ( true === CollaborativeEditing.Get_GlobalLock() )
+    //    return false;
+
+    return this.WordControl.m_oLogicDocument.CanAdd_Comment();
+}
+
+asc_docs_api.prototype.sync_RemoveComment = function(Id)
+{
+    this.asc_fireCallback("asc_onRemoveComment", Id);
+}
+
+asc_docs_api.prototype.sync_AddComment = function(Id, CommentData)
+{
+    var AscCommentData = new asc_CCommentData(CommentData);
+    this.asc_fireCallback("asc_onAddComment", Id, AscCommentData);
+}
+
+asc_docs_api.prototype.sync_ShowComment = function(Id, X, Y)
+{
+    // TODO: Переделать на нормальный массив
+    this.asc_fireCallback("asc_onShowComment", [ Id ], X, Y);
+}
+
+asc_docs_api.prototype.sync_HideComment = function()
+{
+    this.asc_fireCallback("asc_onHideComment");
+}
+
+asc_docs_api.prototype.sync_UpdateCommentPosition = function(Id, X, Y)
+{
+    // TODO: Переделать на нормальный массив
+    this.asc_fireCallback("asc_onUpdateCommentPosition", [ Id ], X, Y);
+}
+
+asc_docs_api.prototype.sync_ChangeCommentData = function(Id, CommentData)
+{
+    var AscCommentData = new asc_CCommentData(CommentData);
+    this.asc_fireCallback("asc_onChangeCommentData", Id, AscCommentData);
+}
+
+asc_docs_api.prototype.sync_LockComment = function(Id, UserId)
+{
+    this.asc_fireCallback("asc_onLockComment", Id, UserId);
+}
+
+asc_docs_api.prototype.sync_UnLockComment = function(Id)
+{
+    this.asc_fireCallback("asc_onUnLockComment", Id);
+}
+
 // работа с шрифтами
 asc_docs_api.prototype.asyncFontsDocumentStartLoaded = function()
 {

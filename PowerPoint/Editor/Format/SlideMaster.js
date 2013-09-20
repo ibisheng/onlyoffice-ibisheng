@@ -365,6 +365,22 @@ function MasterSlide(presentation, theme)
 
 MasterSlide.prototype =
 {
+    addLayout: function(layout)
+    {
+        this.sldLayoutLst.push(layout);
+    },
+
+    changeSize: function(kw, kh)
+    {
+        this.Width *= kw;
+        this.Height *= kh;
+        for(var i = 0; i < this.cSld.spTree.length; ++i)
+        {
+            this.cSld.spTree[i].changeSize(kw, kh);
+        }
+        this.recalcAll();
+    },
+
     Get_Id: function()
     {
         return this.Id;

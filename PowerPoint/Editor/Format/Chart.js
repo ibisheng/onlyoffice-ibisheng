@@ -64,6 +64,18 @@ CChartAsGroup.prototype =
     },
 
 
+    changeSize: function(kw, kh)
+    {
+        if(this.spPr.xfrm.isNotNull())
+        {
+            var xfrm = this.spPr.xfrm;
+            xfrm.offX*=kw;
+            xfrm.offY*=kh;
+            xfrm.extX*=kw;
+            xfrm.extY*=kh;
+        }
+    },
+
     recalcAll: function()
     {},
 

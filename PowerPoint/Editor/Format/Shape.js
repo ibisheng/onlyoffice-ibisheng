@@ -206,6 +206,14 @@ CShape.prototype =
         return DRAWING_OBJECT_TYPE_SHAPE;
     },
 
+    getAllFonts: function(fonts)
+    {
+        if(this.txBody)
+        {
+            this.txBody.content.Document_Get_AllFontNames(fonts);
+        }
+    },
+
 
     initDefault: function(x, y, extX, extY, flipH, flipV, presetGeom)
     {
@@ -1488,6 +1496,18 @@ CShape.prototype =
         }
     },
 
+
+    changeSize: function(kw, kh)
+    {
+        if(this.spPr.xfrm.isNotNull())
+        {
+            var xfrm = this.spPr.xfrm;
+            xfrm.offX*=kw;
+            xfrm.offY*=kh;
+            xfrm.extX*=kw;
+            xfrm.extY*=kh;
+        }
+    },
 
     recalculateTransform: function()
     {

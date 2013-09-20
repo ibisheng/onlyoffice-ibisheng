@@ -285,3 +285,31 @@ function MoveTrackChart(originalObject)
     };
 }
 
+
+function MoveComment(comment)
+{
+    this.comment = comment;
+    this.x = comment.x;
+    this.y = comment.y;
+
+    this.getOriginalBoundsRect = function()
+    {
+    };
+
+    this.track = function(dx, dy)
+    {
+        var original = this.comment;
+        this.x = original.x + dx;
+        this.y = original.y + dy;
+    };
+
+    this.draw = function(overlay)
+    {
+    };
+
+    this.trackEnd = function()
+    {
+        this.comment.setPosition(this.x, this.y);
+    };
+}
+

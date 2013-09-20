@@ -1118,6 +1118,7 @@ var changestype_Theme                = 64; // Изменение темы;
 var changestype_SlideSize            = 65; // Изменение цветовой схемы;
 var changestype_SlideBg              = 66; // Изменение цветовой схемы;
 var changestype_SlideTiming          = 67; // Изменение цветовой схемы;
+var changestype_MoveComment          = 68;
 
 
 

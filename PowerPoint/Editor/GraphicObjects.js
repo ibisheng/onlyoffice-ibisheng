@@ -6,9 +6,21 @@ function CGraphicObjects(slide)
     this.selectedObjects = [];
     this.arrPreTrackObjects = [];
     this.arrTrackObjects = [];
+    this.bShowComment = false;
 }
 
 CGraphicObjects.prototype = {
+
+    showComment: function(id, x, y)
+    {
+        editor.sync_HideComment();
+        editor.sync_ShowComment(id, x, y );
+    },
+
+    hideComment: function()
+    {
+        editor.sync_HideComment();
+    },
 
     resetSelectionState: function()
     {

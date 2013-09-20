@@ -186,6 +186,9 @@ CTextBody.prototype =
         }
     },
 
+    Refresh_RecalcData: function()
+    {},
+
 
     updateSelectionState: function(drawingDocument)
     {
@@ -470,21 +473,12 @@ CTextBody.prototype =
         switch(data.Type)
         {
             case historyitem_SetShape:
-            {
-                w.WriteBool(typeof  data.newPr === "string");
-                if(typeof  data.newPr === "string")
-                {
-                    w.WriteString2(data.newPr)
-                }
-                break;
-            }
-
             case historyitem_SetDocContent:
             {
-                w.WriteBool(typeof  data.newPr === "string");
-                if(typeof  data.newPr === "string")
+                w.WriteBool(isRealObject(data.newPr));
+                if(isRealObject(data.newPr))
                 {
-                    w.WriteString2(data.newPr)
+                    w.WriteString2(data.newPr.Get_Id())
                 }
                 break;
             }

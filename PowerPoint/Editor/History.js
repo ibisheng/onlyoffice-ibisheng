@@ -195,6 +195,8 @@ var historyitem_Comments_Remove = 2; // Удалили комментарий
 // Типы изменений в классе СComment
 var historyitem_Comment_Change   = 1; // Изменили комментарий
 var historyitem_Comment_TypeInfo = 2; // Изменили информацию о типе комментария
+var historyitem_Comment_Position = 3; // Изменили информацию о типе комментария
+
 
 // Типы изменений в классе CParaHyperlinkStart
 var historyitem_Hyperlink_Value   = 1; // Изменяем значение гиперссылки
@@ -223,6 +225,9 @@ var historyitem_SetClrMapOverride = 9;
 var historyitem_SetShow = 10;
 var historyitem_SetShowPhAnim = 11;
 var historyitem_SetShowMasterSp = 12;
+var historyitem_AddComment = 13;
+var historyitem_RemoveComment = 14;
+var historyitem_MoveComment = 15;
 
 
 

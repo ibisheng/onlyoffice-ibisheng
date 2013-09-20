@@ -234,6 +234,18 @@ CImageShape.prototype =
         return x_t > 0 && x_t < this.extX && y_t > 0 && y_t < this.extY;
     },
 
+    changeSize: function(kw, kh)
+    {
+        if(this.spPr.xfrm.isNotNull())
+        {
+            var xfrm = this.spPr.xfrm;
+            xfrm.offX*=kw;
+            xfrm.offY*=kh;
+            xfrm.extX*=kw;
+            xfrm.extY*=kh;
+        }
+    },
+
 
     getRotateAngle: function(x, y)
     {
@@ -1413,7 +1425,6 @@ CImageShape.prototype =
     {
         w.WriteLong(historyitem_type_Shape);
         w.WriteString2(this.Id);
-        w.WriteString2(this.parent.Get_Id());
     },
 
     Read_FromBinary2: function(r)

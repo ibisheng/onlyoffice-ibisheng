@@ -8938,7 +8938,7 @@ Paragraph.prototype =
         // При удалении проверяем стиль. Если данный стиль является стилем по умолчанию
         // для параграфов с нумерацией, тогда удаляем запись и о стиле.
         var StyleId = this.Style_Get();
-        var NumStyleId = this.Parent.Get_Styles().Get_Default_ParaList();
+        var NumStyleId = this.Parent.Get_Styles(0).Get_Default_ParaList();
         if ( StyleId === NumStyleId )
             this.Style_Remove();
 
@@ -11194,7 +11194,8 @@ Paragraph.prototype =
 
         this.RecalcInfo.Set_Type_0(pararecalc_0_All);
         this.RecalcInfo.Set_Type_0_Spell(pararecalc_0_Spell_All);
-        this.Parent.onParagraphChanged();
+        if(this.Parent)
+            this.Parent.onParagraphChanged();
 
     },
 
@@ -11554,6 +11555,7 @@ Paragraph.prototype =
 
         this.RecalcInfo.Set_Type_0(pararecalc_0_All);
         this.RecalcInfo.Set_Type_0_Spell(pararecalc_0_Spell_All);
+        if(this.Parent)
         this.Parent.onParagraphChanged();
 
     },
@@ -12149,7 +12151,7 @@ Paragraph.prototype =
             }
             case historyitem_Paragraph_PresentationBullet:
             {
-                w.WriteBool(isRealObject(Data.newPr));
+                Writer.WriteBool(isRealObject(Data.newPr));
                 if(isRealObject(Data.newPr))
                 {
                     Data.newPr.Write_ToBinary2(Writer);
@@ -12815,6 +12817,7 @@ Paragraph.prototype =
         }
 
         this.RecalcInfo.Set_Type_0(pararecalc_0_All);
+        if(this.Parent)
         this.Parent.onParagraphChanged();
 
     },

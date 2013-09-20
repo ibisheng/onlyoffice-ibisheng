@@ -573,6 +573,7 @@ CPresentation.prototype =
 
 
         this.recalcMap = {};
+        this.updateSlideIndexes();
         this.RecalculateCurPos();
         for(var i = 0; i < this.Slides.length; ++i)
         {
@@ -5831,6 +5832,8 @@ CPresentation.prototype =
     {
         History.Add(this, {Type: historyitem_Presenattion_AddSlide, Pos: pos, Id: slide.Get_Id()});
         this.Slides.splice(pos, 0, slide);
+        editor.WordControl.m_oLogicDocument.recalcMap[slide.Id] = slide;
+
     },
 
 
@@ -6075,6 +6078,21 @@ CPresentation.prototype =
                 };
                 selected_objects[i].Lock.Check(check_obj);
             }
+        }
+
+        if(CheckType === changestype_MoveComment)
+        {
+            if(cur_slide.deleteLock.Lock.Type !== locktype_Mine && cur_slide.deleteLock.Lock.Type !== locktype_None)
+                return true;
+            var selected_objects = cur_slide.graphicObjects.selectedObjects;
+            var check_obj =
+            {
+                "type": c_oAscLockTypeElemPresentation.Object,
+                "slideId": slide_id,
+                "objId": AdditionalData.Get_Id(),
+                "guid": AdditionalData.Get_Id()
+            };
+            selected_objects[i].Lock.Check(check_obj);
         }
 
         if(CheckType === changestype_SlideBg)
@@ -6497,31 +6515,7 @@ CPresentation.prototype =
 
     CanAdd_Comment : function()
     {
-        // Проверим можно ли добавлять гиперссылку
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-            return this.HdrFtr.CanAdd_Comment();
-        else if ( docpostype_DrawingObjects == this.CurPos.Type )
-            return this.DrawingObjects.canAddComment();
-        else //if ( docpostype_Content === this.CurPos.Type )
-        {
-            switch( this.Selection.Flag )
-            {
-                case selectionflag_Numbering:     return false;
-                case selectionflag_Common:
-                {
-                    if ( true === this.Selection.Use && this.Selection.StartPos != this.Selection.EndPos )
-                        return true;
-                    else
-                    {
-                        var Pos = ( this.Selection.Use === true ? this.Selection.StartPos : this.CurPos.ContentPos );
-                        var Element = this.Content[Pos];
-                        return Element.CanAdd_Comment();
-                    }
-                }
-            }
-        }
-
-        return false;
+        return true;
     },
 
     Select_Comment : function(Id)

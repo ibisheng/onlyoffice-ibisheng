@@ -493,6 +493,35 @@ function SlideLayout(slideMaster)
 SlideLayout.prototype =
 {
 
+    setMaster: function(master)
+    {
+        this.Master = master;
+    },
+
+    changeSize: function(kw, kh)
+    {
+        this.Width *= kw;
+        this.Height *= kh;
+        for(var i = 0; i < this.cSld.spTree.length; ++i)
+        {
+            this.cSld.spTree[i].changeSize(kw, kh);
+        }
+        this.recalcAll();
+    },
+
+    recalcAll: function()
+    {
+        this.recalcInfo =
+        {
+            recalculateBackground: true,
+            recalculateSpTree: true
+        };
+        for(var i = 0; i < this.cSld.spTree.length; ++i)
+        {
+            this.cSld.spTree[i].recalcAll();
+        }
+    },
+
     Get_Id: function()
     {
         return this.Id;

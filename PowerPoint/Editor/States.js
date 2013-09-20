@@ -44,6 +44,9 @@ var STATES_ID_MOVE_INTERNAL_CHART_OBJECT = 0x34;
 var STATES_ID_CHART = 0x35;
 var STATES_ID_CHART_TEXT_ADD = 0x36;
 var STATES_ID_TEXT_ADD_IN_GROUP = 0x37;
+var STATES_ID_PRE_MOVE_COMMENT = 0x38;
+var STATES_ID_MOVE_COMMENT = 0x39;
+
 
 function NullState(drawingObjectsController, drawingObjects)
 {
@@ -53,6 +56,15 @@ function NullState(drawingObjectsController, drawingObjects)
 
     this.onMouseDown = function(e, x, y)
     {
+        for(var i = drawingObjects.comments.length - 1; i > -1; --i)
+        {
+            if(drawingObjects.comments[i].hit(x, y))
+            {
+                this.drawingObjectsController.changeCurrentState(new PreMoveCommentState(this.drawingObjectsController, this.drawingObjects, x, y));
+                return;
+            }
+        }
+        this.drawingObjectsController.hideComment();
         var selected_objects = this.drawingObjectsController.selectedObjects;
         if(selected_objects.length === 1)
         {
@@ -772,6 +784,111 @@ function NullState(drawingObjectsController, drawingObjects)
         }
     }
 }
+
+function PreMoveCommentState(drawingObjectsController, drawingObjects, startX, startY)
+{
+    this.id = STATES_ID_PRE_MOVE_COMMENT;
+    this.drawingObjectsController = drawingObjectsController;
+    this.drawingObjects = drawingObjects;
+    this.startX = startX;
+    this.startY = startY;
+
+    this.onMouseDown = function(e, x, y)
+    {
+
+    };
+
+    this.onMouseMove = function(e, x, y)
+    {
+        if(this.startX === x && this.startY === y)
+            return;
+        this.drawingObjectsController.swapTrackObjects();
+        this.drawingObjectsController.changeCurrentState(new MoveCommentState(this.drawingObjectsController, this.drawingObjects, this.startX, this.startY));
+        this.drawingObjectsController.onMouseMove(e, x, y);
+    };
+
+    this.onMouseUp = function(e, x, y)
+    {
+        var Coords = editor.WordControl.m_oDrawingDocument.ConvertCoordsToCursorWR( x, Y, this.drawingObjects.num);
+        this.drawingObjectsController.showComment(this.drawingObjectsController.arrTrackObjects[0].comment.Get_Id(), Coords.X, Coords.Y);
+        this.drawingObjectsController.clearPreTrackObjects();
+        this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
+    };
+
+    this.onKeyDown = function(e)
+    {
+
+    };
+
+    this.onKeyPress = function(e)
+    {
+    };
+
+    this.drawSelection = function(drawingDocument)
+    {
+        DrawDefaultSelection(this.drawingObjectsController, drawingDocument);
+    };
+
+    this.isPointInDrawingObjects = function(x, y)
+    {
+        return {objectId:this.majorObject.Id, cursorType: "move"}
+    };
+}
+
+function MoveCommentState(drawingObjectsController, drawingObjects, startX, startY)
+{
+    this.id = STATES_ID_MOVE_COMMENT;
+    this.drawingObjectsController = drawingObjectsController;
+    this.drawingObjects = drawingObjects;
+    this.startX = startX;
+    this.startY = startY;
+    this.onMouseDown = function(e, x, y)
+    {
+
+    };
+
+    this.onMouseMove = function(e, x, y)
+    {
+        var dx = x - this.startX;
+        var dy = y - this.startY;
+        this.drawingObjectsController.trackMoveObjects(dx, dy);
+        this.drawingObjects.OnUpdateOverlay();
+    };
+
+    this.onMouseUp = function(e, x, y)
+    {
+        if(this.drawingObjects.presentation.Document_Is_SelectionLocked(changestype_Drawing_Props, this.drawingObjectsController.arrTrackObjects[0].comment) === false)
+        {
+            History.Create_NewPoint();
+            this.drawingObjectsController.trackEnd();
+            this.drawingObjects.presentation.Recalculate();
+            this.drawingObjects.presentation.DrawingDocument.OnRecalculatePage(this.drawingObjects.num, this.drawingObjects);
+        }
+        this.drawingObjectsController.clearTrackObjects();
+        this.drawingObjects.OnUpdateOverlay();
+        this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
+    };
+
+    this.onKeyDown = function(e)
+    {
+
+    };
+
+    this.onKeyPress = function(e)
+    {
+    };
+
+    this.drawSelection = function(drawingDocument)
+    {
+        DrawDefaultSelection(this.drawingObjectsController, drawingDocument);
+    };
+
+    this.isPointInDrawingObjects = function(x, y)
+    {
+        return {objectId:this.majorObject.Id, cursorType: "move"}
+    };
+}
+
 
 function PreMoveInternalChartObjectState(drawingObjectsController, drawingObjects, startX, startY, chartElement)
 {

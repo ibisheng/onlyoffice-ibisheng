@@ -110,6 +110,15 @@ CGroupShape.prototype =
         return this.Id;
     },
 
+    getAllFonts: function(fonts)
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(typeof  this.spTree[i].getAllFonts === "function")
+                this.spTree[i].getAllFonts(fonts);
+        }
+    },
+
     sendMouseData: function()
     {
         if ( true === this.Lock.Is_Locked() )
@@ -421,6 +430,28 @@ CGroupShape.prototype =
         {
             if(typeof this.spTree[i].applyAllTextProps === "function")
                 this.spTree[i].applyAllTextProps(textPr);
+        }
+    },
+
+
+    changeSize: function(kw, kh)
+    {
+
+        if(this.spPr.xfrm.isNotNullForGroup())
+        {
+            var xfrm = this.spPr.xfrm;
+            xfrm.offX *= kw;
+            xfrm.offY *= kh;
+            xfrm.extX *= kw;
+            xfrm.extY *= kh;
+            xfrm.chOffX *= kw;
+            xfrm.chOffY *= kh;
+            xfrm.chExtX *= kw;
+            xfrm.chExtY *= kh;
+        }
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            this.spTree[i].changeSize(kw, kh);
         }
     },
 
