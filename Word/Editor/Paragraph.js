@@ -10913,35 +10913,77 @@ Paragraph.prototype =
 
     Split_DropCap : function(NewParagraph)
     {
-        var Count = this.Content.length;
-        var Pos = 0;
-        var PTextPr = null;
-        for (; Pos < Count; Pos++ )
+        // Если есть выделение, тогда мы проверяем элементы, идущие до конца выделения, если есть что-то кроме текста
+        // тогда мы добавляем в буквицу только первый текстовый элемент, иначе добавляем все от начала параграфа и до
+        // конца выделения.
+
+        var Count      = this.Content.length;
+        var EndPos     = this.Selection.StartPos > this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos;
+        var bSelection = false;
+        var LastTextPr = null;
+
+        if ( true === this.Selection.Use )
         {
-            var Type = this.Content[Pos].Type;
-            if ( para_TextPr === Type )
-                PTextPr = this.Content[Pos];
-            if ( para_Text === Type )
-                break;
+            var EndPos = Math.min( this.Selection.StartPos > this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos, this.Content.length );
+
+            bSelection = true;
+            for (var Pos = 0; Pos < EndPos; Pos++ )
+            {
+                var Type = this.Content[Pos].Type;
+                if ( para_Text != Type && para_TextPr != Type )
+                {
+                    bSelection = false;
+                    break;
+                }
+                else if ( para_TextPr === Type )
+                    LastTextPr = this.Content[Pos];
+            }
+
         }
 
-        if ( Pos >= Count )
-            return null;
+        if ( false === bSelection )
+        {
+            var Pos = 0;
+            var PTextPr = null;
 
-        var ParaPr = this.Get_CompiledPr2(false).ParaPr;
-        //NewParagraph.Set_Ind( { FirstLine : ParaPr. } );
+            for (; Pos < Count; Pos++ )
+            {
+                var Type = this.Content[Pos].Type;
+                if ( para_TextPr === Type )
+                    PTextPr = this.Content[Pos];
+                if ( para_Text === Type )
+                    break;
+            }
 
-        var TextPr = this.Internal_CalculateTextPr(Pos);
+            if ( Pos >= Count )
+                return null;
 
-        var DropCap = this.Content[Pos];
-        this.Internal_Content_Remove( Pos );
+            var TextPr = this.Internal_CalculateTextPr(Pos);
 
-        if ( null != PTextPr )
-            this.Internal_Content_Add( 0, PTextPr );
+            var DropCap = this.Content[Pos];
+            this.Internal_Content_Remove( Pos );
 
-        NewParagraph.Internal_Content_Add( 0, DropCap );
+            if ( null != PTextPr )
+                this.Internal_Content_Add( 0, PTextPr );
 
-        return TextPr;
+            NewParagraph.Internal_Content_Add( 0, DropCap );
+            return TextPr;
+        }
+        else
+        {
+            for ( var Pos = 0; Pos < EndPos; Pos++ )
+            {
+                NewParagraph.Internal_Content_Add(Pos, this.Content[Pos]);
+            }
+
+            var TextPr = this.Internal_CalculateTextPr(EndPos);
+            this.Internal_Content_Remove2( 0, EndPos );
+
+            if ( null != LastTextPr )
+                this.Internal_Content_Add( 0, new ParaTextPr(LastTextPr.Value) );
+
+            return TextPr;
+        }
     },
 
     Update_DropCapByLines : function(TextPr, Count, LineH, LineTA, LineTD)
