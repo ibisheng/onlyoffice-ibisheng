@@ -7873,21 +7873,27 @@ CDocument.prototype =
             {
                 if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
                 {
-                    this.Create_NewHistoryPoint();
-
-                    if (!window.USER_AGENT_SAFARI_MACOS)
+                    if (!window.GlobalPasteFlag)
                     {
-                        Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
-                        //не возвращаем true чтобы не было preventDefault
-                    }
-                    else
-                    {
-                        SafariIntervalFocus();
-
-                        if (0 === window.GlobalPasteFlagCounter)
+                        if (!window.USER_AGENT_SAFARI_MACOS)
                         {
+                            this.Create_NewHistoryPoint();
+
+                            window.GlobalPasteFlag = true;
                             Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
                             //не возвращаем true чтобы не было preventDefault
+                        }
+                        else
+                        {
+                            if (0 === window.GlobalPasteFlagCounter)
+                            {
+                                this.Create_NewHistoryPoint();
+
+                                SafariIntervalFocus();
+                                window.GlobalPasteFlag = true;
+                                Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
+                                //не возвращаем true чтобы не было preventDefault
+                            }
                         }
                     }
                 }
@@ -8114,28 +8120,41 @@ CDocument.prototype =
         {
             if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
             {
-                this.Create_NewHistoryPoint();
                 if ( true === e.ShiftKey ) // Ctrl + Shift + V - вставляем по образцу
                 {
+                    this.Create_NewHistoryPoint();
                     this.Document_Format_Paste();
                     bRetValue = true;
                 }
                 else // Ctrl + V - paste
                 {
-                    if (!window.USER_AGENT_SAFARI_MACOS)
+                    if (!window.GlobalPasteFlag)
                     {
-                        Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
-                        //не возвращаем true чтобы не было preventDefault
-                    }
-                    else
-                    {
-                        SafariIntervalFocus();
-
-                        if (0 === window.GlobalPasteFlagCounter)
+                        if (!window.USER_AGENT_SAFARI_MACOS)
                         {
+                            this.Create_NewHistoryPoint();
+
+                            window.GlobalPasteFlag = true;
                             Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
                             //не возвращаем true чтобы не было preventDefault
                         }
+                        else
+                        {
+                            if (0 === window.GlobalPasteFlagCounter)
+                            {
+                                this.Create_NewHistoryPoint();
+
+                                SafariIntervalFocus();
+                                window.GlobalPasteFlag = true;
+                                Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
+                                //не возвращаем true чтобы не было preventDefault
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (!window.USER_AGENT_SAFARI_MACOS)
+                            bRetValue = true;
                     }
                 }
             }

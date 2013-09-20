@@ -34,6 +34,7 @@ window.USER_AGENT_IE = ((/MSIE/g.test(navigator.userAgent)) || window.opera) ? t
 window.USER_AGENT_WEBKIT = (navigator.userAgent.toLowerCase().indexOf('webkit') > -1) ? true : false;
 
 window.GlobalPasteFlagCounter = 0;
+window.GlobalPasteFlag = false;
 
 var COPY_ELEMENT_ID = "SelectId";
 var PASTE_ELEMENT_ID = "wrd_pastebin";
@@ -271,7 +272,7 @@ function Editor_Copy(api, bCut)
     }
 
     //���� ���������� copy
-    var time_interval = 0;
+    var time_interval = 200;
     if (window.USER_AGENT_SAFARI_MACOS)
         time_interval = 200;
 
@@ -1986,9 +1987,6 @@ function Editor_Paste_GetElem(api, bClean)
         pastebin.style["-webkit-user-select"] = "text";
         pastebin.setAttribute("contentEditable", true);
 
-        pastebin.onpaste = function(e){
-            Body_Paste(api,e);
-        };
         document.body.appendChild( pastebin );
     }
     else if(bClean){
@@ -1999,31 +1997,22 @@ function Editor_Paste_GetElem(api, bClean)
             pastebin.removeChild(aChildNodes[i]);
         }
     }
+
+    if (!window.USER_AGENT_SAFARI_MACOS)
+    {
+        pastebin.onpaste = function(e){
+            if (!window.GlobalPasteFlag)
+                return;
+
+            Body_Paste(api,e);
+            pastebin.onpaste = null;
+        };
+    }
+
     return pastebin;
 }
 function Editor_Paste_Button(api)
 {
-    if(false == g_bIsDocumentCopyPaste)
-    {
-        var _logic_document = api.WordControl.m_oLogicDocument;
-        switch(api.WordControl.Thumbnails.FocusObjType)
-        {
-            case FOCUS_OBJECT_MAIN:
-            {
-                if(_logic_document && _logic_document.CurPos.Type != docpostype_FlowObjects )
-                {
-                    _logic_document.Slides[_logic_document.CurPage].elementsManipulator.glyphsPaste();
-                    return true;
-                }
-                break;
-            }
-            case FOCUS_OBJECT_THUMBNAILS :
-            {
-                _logic_document.slidesPaste(_logic_document.CurPage);
-                return true;
-            }
-        }
-    }
     if(/MSIE/g.test(navigator.userAgent))
     {
         document.body.style.MozUserSelect = "text";
@@ -2118,7 +2107,6 @@ function CanPaste(oDocument)
 function Editor_Paste(api, bClean)
 {
     window.GlobalPasteFlagCounter = 1;
-
     var oWordControl = api.WordControl;
     oWordControl.bIsEventPaste = false;
     var oDocument = oWordControl.m_oLogicDocument;
@@ -2168,7 +2156,6 @@ function Editor_Paste(api, bClean)
         }
     }
     //���� ���������� paste
-
     var func_timeout = function() {
 
         if (window.USER_AGENT_SAFARI_MACOS)
@@ -2194,6 +2181,9 @@ function Editor_Paste(api, bClean)
             }
         }
 
+        if (!window.USER_AGENT_SAFARI_MACOS)
+            pastebin.onpaste = null;
+
         if(!oWordControl.bIsEventPaste)
         {
             Editor_Paste_Exec(api, pastebin);
@@ -2201,7 +2191,9 @@ function Editor_Paste(api, bClean)
         else
             pastebin.style.display  = ELEMENT_DISPAY_STYLE;
     };
-    window.setTimeout( func_timeout, 0 );
+
+    var _interval_time = window.USER_AGENT_MACOS ? 200 : 0;
+    window.setTimeout( func_timeout, _interval_time );
 };
 function CopyPasteCorrectString(str)
 {
@@ -5424,7 +5416,10 @@ function Editor_CopyPaste_Create(api)
     ElemToSelect.style.lineHeight = "1px";
 
     ElemToSelect.onpaste = function(e){
-        //Editor_Paste(api, true);
+        if (!window.GlobalPasteFlag)
+            return;
+
+        // тут onpaste не обрубаем, так как он в сафари под macos приходить должен
         if (window.GlobalPasteFlagCounter == 1)
         {
             Body_Paste(api,e);

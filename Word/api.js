@@ -2455,7 +2455,23 @@ asc_docs_api.prototype.Cut = function()
 }
 asc_docs_api.prototype.Paste = function()
 {
-	return Editor_Paste_Button(this);
+    if (!window.GlobalPasteFlag)
+    {
+        if (!window.USER_AGENT_SAFARI_MACOS)
+        {
+            window.GlobalPasteFlag = true;
+            return Editor_Paste_Button(this);
+        }
+        else
+        {
+            if (0 === window.GlobalPasteFlagCounter)
+            {
+                SafariIntervalFocus();
+                window.GlobalPasteFlag = true;
+                return Editor_Paste_Button(this);
+            }
+        }
+    }
 }
 asc_docs_api.prototype.Share = function(){
 
@@ -5933,6 +5949,7 @@ asc_docs_api.prototype.asyncImagesDocumentEndLoaded = function()
             this.isPasteFonts_Images = false;
             this.pasteImageMap = null;
             this.pasteCallback();
+            window.GlobalPasteFlag = false;
             this.pasteCallback = null;
         }
         else if (this.isSaveFonts_Images)
@@ -6159,6 +6176,8 @@ asc_docs_api.prototype.pre_Paste = function(_fonts, _images, callback)
         // никаких евентов. ничего грузить не нужно. сделано для сафари под макОс.
         // там при LongActions теряется фокус и вставляются пробелы
         this.pasteCallback();
+        window.GlobalPasteFlag = false;
+        this.pasteCallback = null;
         return;
     }
 
