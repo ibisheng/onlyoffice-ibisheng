@@ -269,6 +269,22 @@ prop:sync_SendThemeColors
 prop:sync_SendThemeColorSchemes
 prop:ChangeColorScheme
 prop:asc_enableKeyEvents
+prop:asc_showComments
+prop:asc_hideComments
+prop:asc_addComment
+prop:asc_removeComment
+prop:asc_changeComment
+prop:asc_selectComment
+prop:asc_showComment
+prop:can_AddQuotedComment
+prop:sync_RemoveComment
+prop:sync_AddComment
+prop:sync_ShowComment
+prop:sync_HideComment
+prop:sync_UpdateCommentPosition
+prop:sync_ChangeCommentData
+prop:sync_LockComment
+prop:sync_UnLockComment
 prop:asyncFontsDocumentStartLoaded
 prop:GenerateStyles
 prop:asyncFontsDocumentEndLoaded
@@ -382,6 +398,23 @@ prop:sync_ContextMenuCallback
 var:CChatMessage
 prop:get_UserId
 prop:get_Message
+---
+var:asc_CCommentData
+prop:asc_getText
+prop:asc_putText
+prop:asc_getTime
+prop:asc_putTime
+prop:asc_getUserId
+prop:asc_putUserId
+prop:asc_getUserName
+prop:asc_putUserName
+prop:asc_getQuoteText
+prop:asc_putQuoteText
+prop:asc_getSolved
+prop:asc_putSolved
+prop:asc_getReply
+prop:asc_addReply
+prop:asc_getRepliesCount
 ---
 var:CHyperlinkProperty
 prop:get_Value
@@ -1280,6 +1313,22 @@ asc_docs_api.prototype['sync_SendThemeColors'] = asc_docs_api.prototype.sync_Sen
 asc_docs_api.prototype['sync_SendThemeColorSchemes'] = asc_docs_api.prototype.sync_SendThemeColorSchemes;
 asc_docs_api.prototype['ChangeColorScheme'] = asc_docs_api.prototype.ChangeColorScheme;
 asc_docs_api.prototype['asc_enableKeyEvents'] = asc_docs_api.prototype.asc_enableKeyEvents;
+asc_docs_api.prototype['asc_showComments'] = asc_docs_api.prototype.asc_showComments;
+asc_docs_api.prototype['asc_hideComments'] = asc_docs_api.prototype.asc_hideComments;
+asc_docs_api.prototype['asc_addComment'] = asc_docs_api.prototype.asc_addComment;
+asc_docs_api.prototype['asc_removeComment'] = asc_docs_api.prototype.asc_removeComment;
+asc_docs_api.prototype['asc_changeComment'] = asc_docs_api.prototype.asc_changeComment;
+asc_docs_api.prototype['asc_selectComment'] = asc_docs_api.prototype.asc_selectComment;
+asc_docs_api.prototype['asc_showComment'] = asc_docs_api.prototype.asc_showComment;
+asc_docs_api.prototype['can_AddQuotedComment'] = asc_docs_api.prototype.can_AddQuotedComment;
+asc_docs_api.prototype['sync_RemoveComment'] = asc_docs_api.prototype.sync_RemoveComment;
+asc_docs_api.prototype['sync_AddComment'] = asc_docs_api.prototype.sync_AddComment;
+asc_docs_api.prototype['sync_ShowComment'] = asc_docs_api.prototype.sync_ShowComment;
+asc_docs_api.prototype['sync_HideComment'] = asc_docs_api.prototype.sync_HideComment;
+asc_docs_api.prototype['sync_UpdateCommentPosition'] = asc_docs_api.prototype.sync_UpdateCommentPosition;
+asc_docs_api.prototype['sync_ChangeCommentData'] = asc_docs_api.prototype.sync_ChangeCommentData;
+asc_docs_api.prototype['sync_LockComment'] = asc_docs_api.prototype.sync_LockComment;
+asc_docs_api.prototype['sync_UnLockComment'] = asc_docs_api.prototype.sync_UnLockComment;
 asc_docs_api.prototype['asyncFontsDocumentStartLoaded'] = asc_docs_api.prototype.asyncFontsDocumentStartLoaded;
 asc_docs_api.prototype['GenerateStyles'] = asc_docs_api.prototype.GenerateStyles;
 asc_docs_api.prototype['asyncFontsDocumentEndLoaded'] = asc_docs_api.prototype.asyncFontsDocumentEndLoaded;
@@ -1392,6 +1441,22 @@ asc_docs_api.prototype['sync_ContextMenuCallback'] = asc_docs_api.prototype.sync
 window['CChatMessage'] = CChatMessage;
 CChatMessage.prototype['get_UserId'] = CChatMessage.prototype.get_UserId;
 CChatMessage.prototype['get_Message'] = CChatMessage.prototype.get_Message;
+window['asc_CCommentData'] = asc_CCommentData;
+asc_CCommentData.prototype['asc_getText'] = asc_CCommentData.prototype.asc_getText;
+asc_CCommentData.prototype['asc_putText'] = asc_CCommentData.prototype.asc_putText;
+asc_CCommentData.prototype['asc_getTime'] = asc_CCommentData.prototype.asc_getTime;
+asc_CCommentData.prototype['asc_putTime'] = asc_CCommentData.prototype.asc_putTime;
+asc_CCommentData.prototype['asc_getUserId'] = asc_CCommentData.prototype.asc_getUserId;
+asc_CCommentData.prototype['asc_putUserId'] = asc_CCommentData.prototype.asc_putUserId;
+asc_CCommentData.prototype['asc_getUserName'] = asc_CCommentData.prototype.asc_getUserName;
+asc_CCommentData.prototype['asc_putUserName'] = asc_CCommentData.prototype.asc_putUserName;
+asc_CCommentData.prototype['asc_getQuoteText'] = asc_CCommentData.prototype.asc_getQuoteText;
+asc_CCommentData.prototype['asc_putQuoteText'] = asc_CCommentData.prototype.asc_putQuoteText;
+asc_CCommentData.prototype['asc_getSolved'] = asc_CCommentData.prototype.asc_getSolved;
+asc_CCommentData.prototype['asc_putSolved'] = asc_CCommentData.prototype.asc_putSolved;
+asc_CCommentData.prototype['asc_getReply'] = asc_CCommentData.prototype.asc_getReply;
+asc_CCommentData.prototype['asc_addReply'] = asc_CCommentData.prototype.asc_addReply;
+asc_CCommentData.prototype['asc_getRepliesCount'] = asc_CCommentData.prototype.asc_getRepliesCount;
 window['CHyperlinkProperty'] = CHyperlinkProperty;
 CHyperlinkProperty.prototype['get_Value'] = CHyperlinkProperty.prototype.get_Value;
 CHyperlinkProperty.prototype['put_Value'] = CHyperlinkProperty.prototype.put_Value;
