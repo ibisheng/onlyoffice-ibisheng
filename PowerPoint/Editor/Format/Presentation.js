@@ -6434,68 +6434,17 @@ CPresentation.prototype =
 //-----------------------------------------------------------------------------------
     Add_Comment : function(CommentData)
     {
-        if ( true != this.CanAdd_Comment() )
-        {
-            CommentData.Set_QuoteText(null);
-            var Comment = new CComment( this.Comments, CommentData );
-            this.Comments.Add( Comment );
-        }
-        else
-        {
-            var QuotedText = this.Get_SelectedText(false);
-            if ( null === QuotedText )
-                QuotedText = "";
-            CommentData.Set_QuoteText( QuotedText );
-
-            var Comment = new CComment( this.Comments, CommentData );
-            this.Comments.Add( Comment );
-
-            if ( docpostype_HdrFtr === this.CurPos.Type )
-            {
-                this.HdrFtr.Add_Comment( Comment );
-            }
-            else if ( docpostype_DrawingObjects === this.CurPos.Type )
-            {
-                this.DrawingObjects.addComment( Comment );
-            }
-            else // if ( docpostype_Content === this.CurPos.Type )
-            {
-                if ( selectionflag_Numbering === this.Selection.Flag )
-                    return;
-
-                if ( true === this.Selection.Use )
-                {
-                    var StartPos, EndPos;
-                    if ( this.Selection.StartPos < this.Selection.EndPos )
-                    {
-                        StartPos = this.Selection.StartPos;
-                        EndPos   = this.Selection.EndPos;
-                    }
-                    else
-                    {
-                        StartPos = this.Selection.EndPos;
-                        EndPos   = this.Selection.StartPos;
-                    }
-
-                    this.Content[StartPos].Add_Comment( Comment, true, false );
-                    this.Content[EndPos].Add_Comment( Comment, false, true );
-                }
-                else
-                {
-                    this.Content[this.CurPos.ContentPos].Add_Comment( Comment, true, true );
-                }
-            }
-
-            this.DrawingDocument.ClearCachePages();
-            this.DrawingDocument.FirePaint();
-        }
-
+        var Comment = new CComment( this.Comments, CommentData );
+        Comment.setPosition(this.Slides[this.CurPage].commentX, this.Slides[this.CurPage].commentY);
+        this.Slides[this.CurPage].commentX += COMMENT_WIDTH;
+        this.Slides[this.CurPage].commentY += COMMENT_HEIGHT;
+        this.Slides[this.CurPage].addComment(Comment);
         return Comment;
     },
 
     Change_Comment : function(Id, CommentData)
     {
-        this.Comments.Set_CommentData( Id, CommentData );
+        this.Slides[this.CurPage].changeComment( Id, CommentData );
     },
 
     Remove_Comment : function(Id, bSendEvent)
@@ -6520,56 +6469,37 @@ CPresentation.prototype =
 
     Select_Comment : function(Id)
     {
-        var OldId = this.Comments.Get_CurrentId();
-        this.Comments.Set_Current( Id );
 
-        var Comment = this.Comments.Get_ById( Id );
-        if ( null != Comment )
-        {
-            var Comment_PageNum = Comment.m_oStartInfo.PageNum;
-            var Comment_Y       = Comment.m_oStartInfo.Y;
-            var Comment_X       = Comment.m_oStartInfo.X;
-            this.DrawingDocument.m_oWordControl.ScrollToPosition( Comment_X, Comment_Y, Comment_PageNum );
-        }
-
-        if ( OldId != Id )
-        {
-            this.DrawingDocument.ClearCachePages();
-            this.DrawingDocument.FirePaint();
-        }
     },
 
     Show_Comment : function(Id)
     {
-        var Comment = this.Comments.Get_ById( Id );
-        if ( null != Comment && null != Comment.m_oStartInfo.ParaId && null != Comment.m_oEndInfo.ParaId )
-        {
-            var Comment_PageNum = Comment.m_oStartInfo.PageNum;
-            var Comment_Y       = Comment.m_oStartInfo.Y;
-            var Comment_X       = Page_Width;
 
-            var Coords = this.DrawingDocument.ConvertCoordsToCursorWR( Comment_X, Comment_Y, Comment_PageNum );
-            editor.sync_ShowComment( Comment.Get_Id(), Coords.X, Coords.Y );
-        }
-        else
+        for(var i = 0; i < this.Slides.length; ++i)
         {
-            editor.sync_HideComment();
+            var comments =   this.Slides[i].comments;
+            for(var j = 0; j < comments.length; ++j)
+            {
+                if(comments[j].Id === Id)
+                {
+                    this.Set_CurPage(i);
+
+                    var Coords = this.DrawingDocument.ConvertCoordsToCursorWR(comments[j].x, comments[j].y, i);
+                    this.Slides[i].graphicObjects.showComment(Id, Coords.X, Coords.Y);
+                    return;
+                }
+            }
         }
+        editor.sync_HideComment();
     },
 
     Show_Comments : function()
     {
-        this.Comments.Set_Use(true);
-        this.DrawingDocument.ClearCachePages();
-        this.DrawingDocument.FirePaint();
     },
 
     Hide_Comments : function()
     {
-        this.Comments.Set_Use(false);
-        this.Comments.Set_Current(null);
-        this.DrawingDocument.ClearCachePages();
-        this.DrawingDocument.FirePaint();
+        this.Slides[this.CurPage].graphicObjects.hideComment();
     },
 //-----------------------------------------------------------------------------------
 // Функции для работы с textbox
