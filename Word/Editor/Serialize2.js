@@ -2156,9 +2156,9 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap)
 				for ( var j = ParaStart - 1; j >= 0; --j )
 				{
 					var oCurElem = Content[j];
-					if(para_TextPr != oCurElem.Type)
+					if(para_TextPr == oCurElem.Type)
 					{
-						this.oCur_rPr = oCurElem;
+						this.oCur_rPr = oCurElem.Value;
 						break;
 					}
 				}
