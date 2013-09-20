@@ -520,6 +520,17 @@ DrawingObjectsController.prototype =
         this.updateSelectionState();
     },
 
+    resetSelectionState2: function()
+    {
+        var count = this.selectedObjects.length;
+        while(count > 0)
+        {
+            this.selectedObjects[0].deselect(this);
+            --count;
+        }
+        this.changeCurrentState(new NullState(this, this.drawingObjects));
+    },
+
     resetSelection: function()
     {
         var count = this.selectedObjects.length;
@@ -796,7 +807,7 @@ DrawingObjectsController.prototype =
 
     setSelectionState: function(state)
     {
-        this.resetSelectionState();
+        this.resetSelectionState2();
         switch(state.id)
         {
             case STATES_ID_TEXT_ADD:
