@@ -4402,8 +4402,36 @@ function CThumbnailsManager()
             {
                 if(global_keyboardEvent.CtrlKey)
                 {
-                    Editor_Paste(editor, true);
-                    return undefined;
+                    if (!window.GlobalPasteFlag)
+                    {
+                        if (!window.USER_AGENT_SAFARI_MACOS)
+                        {
+                            this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint();
+
+                            window.GlobalPasteFlag = true;
+                            Editor_Paste(this.m_oWordControl.m_oApi, true);
+                            return undefined;
+                            //не возвращаем true чтобы не было preventDefault
+                        }
+                        else
+                        {
+                            if (0 === window.GlobalPasteFlagCounter)
+                            {
+                                this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint();
+
+                                SafariIntervalFocus();
+                                window.GlobalPasteFlag = true;
+                                Editor_Paste(this.m_oWordControl.m_oApi, true);
+                                return undefined;
+                                //не возвращаем true чтобы не было preventDefault
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (window.USER_AGENT_SAFARI_MACOS)
+                            return undefined;
+                    }
                 }
                 break;
 

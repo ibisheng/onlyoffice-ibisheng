@@ -1260,7 +1260,23 @@ asc_docs_api.prototype.Cut = function(){
 	return Editor_Copy_Button(this, true)
 }
 asc_docs_api.prototype.Paste = function(){
-	return Editor_Paste_Button(this);
+    if (!window.GlobalPasteFlag)
+    {
+        if (!window.USER_AGENT_SAFARI_MACOS)
+        {
+            window.GlobalPasteFlag = true;
+            return Editor_Paste_Button(this);
+        }
+        else
+        {
+            if (0 === window.GlobalPasteFlagCounter)
+            {
+                SafariIntervalFocus();
+                window.GlobalPasteFlag = true;
+                return Editor_Paste_Button(this);
+            }
+        }
+    }
 }
 asc_docs_api.prototype.Share = function(){
 
