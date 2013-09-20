@@ -217,6 +217,23 @@ function CComment(Parent, Data)
         this.y = y;
     };
 
+    this.draw = function(graphics)
+    {
+        graphics.SetIntegerGrid(false);
+        graphics.p_width(500);
+        graphics.transform3(new CMatrix(), false);
+        graphics.p_color(0,0,0,255);
+        graphics._s();
+        graphics._m(0 + this.x, 0 + this.y);
+        graphics._l(COMMENT_WIDTH + this.x, 0 + this.y);
+        graphics._l(COMMENT_WIDTH + this.x, COMMENT_HEIGHT + this.y);
+        graphics._l(0 + this.x, COMMENT_HEIGHT + this.y);
+        graphics._z();
+        graphics.ds();
+
+        graphics.SetIntegerGrid(true);
+    }
+
     this.Set_StartInfo = function(PageNum, X, Y, H, ParaId)
     {
         this.m_oStartInfo.X       = X;

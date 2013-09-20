@@ -1089,11 +1089,7 @@ CPresentation.prototype =
 
         var _cur_slide = this.Slides[this.CurPage];
         var _graphic_frame = new CGraphicFrame(_cur_slide);
-        _graphic_frame.spPr.xfrm = new CXfrm();
-        _graphic_frame.spPr.xfrm.offX = (this.Width - W)/2;
-        _graphic_frame.spPr.xfrm.offY = this.Height/5;
-        _graphic_frame.spPr.xfrm.extX = W;
-        _graphic_frame.spPr.xfrm.extY =  7.478268771701388 * Rows;
+        _graphic_frame.setXfrm((this.Width - W)/2, this.Height/5, W, 7.478268771701388 * Rows, null, null, null);
         _graphic_frame.setParent(_cur_slide);
         _graphic_frame.nvGraphicFramePr = new UniNvPr();
 
@@ -1101,10 +1097,11 @@ CPresentation.prototype =
             this.globalTableStyles[0] = CreateDefaultStylesForTables();
 
         var _table = new CTable(this.DrawingDocument, _graphic_frame/*Parent*/, false/*Inline*/, 0/*PageNum*/, 0/*X*/, 0/*Y*/, W/*XLimit*/, 100/*YLimit*/, Rows, Cols, Grid);
+        _table.Set_Inline(true);
         _table.styleIndex = 0;
         _graphic_frame.graphicObject = _table;
         _graphic_frame.selected = true;
-        this.Slides[this.CurPage].addSp(_graphic_frame);
+        this.Slides[this.CurPage].addToSpTreeToPos(this.Slides[this.CurPage].cSld.spTree.length, _graphic_frame);
         editor.WordControl.m_oLogicDocument.recalcMap[_graphic_frame.Id] = _graphic_frame;
 
         this.Recalculate();
@@ -5140,19 +5137,15 @@ CPresentation.prototype =
         this.CurPage = Math.min( this.Slides.length - 1, Math.max( 0, PageNum ) );
         if(oldCurPage != this.CurPage && this.CurPage < this.Slides.length)
         {
-            editor.sync_BeginCatchSelectedElements();
-            editor.sync_slidePropCallback(this.Slides[this.CurPage]);
-            editor.sync_EndCatchSelectedElements();
-           /* if(this.Slides[oldCurPage])
-                this.Slides[oldCurPage].elementsManipulator.resetState();       */
-            //this.Document_UpdateInterfaceState();
+            this.Document_UpdateInterfaceState();
+            editor.asc_hideComments();
         }
-        else if (this.CurPage < this.Slides.length)
+       /* else if (this.CurPage < this.Slides.length)
         {
             editor.sync_BeginCatchSelectedElements();
             editor.sync_slidePropCallback(this.Slides[this.CurPage]);
             editor.sync_EndCatchSelectedElements();
-        }
+        }    */
     },
 
     Get_CurPage : function()
@@ -6127,19 +6120,36 @@ CPresentation.prototype =
             }
         }
 
-        if(CheckType === changestype_MoveComment)
+        if(CheckType === changestype_AddSp || CheckType === changestype_AddComment)
         {
             if(cur_slide.deleteLock.Lock.Type !== locktype_Mine && cur_slide.deleteLock.Lock.Type !== locktype_None)
                 return true;
-            var selected_objects = cur_slide.graphicObjects.selectedObjects;
+            var generated_id = (new Date().getTime()) + editor.User.id;
             var check_obj =
             {
                 "type": c_oAscLockTypeElemPresentation.Object,
                 "slideId": slide_id,
-                "objId": AdditionalData.Get_Id(),
-                "guid": AdditionalData.Get_Id()
+                "objId": generated_id,
+                "guid": generated_id
             };
-            selected_objects[i].Lock.Check(check_obj);
+            CollaborativeEditing.Add_CheckLock( check_obj );
+        }
+
+        if(CheckType === changestype_MoveComment)
+        {
+            if(cur_slide.deleteLock.Lock.Type !== locktype_Mine && cur_slide.deleteLock.Lock.Type !== locktype_None)
+                return true;
+            if(isRealObject(AdditionalData))
+            {
+                var check_obj =
+                {
+                    "type": c_oAscLockTypeElemPresentation.Object,
+                    "slideId": slide_id,
+                    "objId": AdditionalData.Get_Id(),
+                    "guid": AdditionalData.Get_Id()
+                };
+                AdditionalData.Lock.Check(check_obj);
+            }
         }
 
         if(CheckType === changestype_SlideBg)
@@ -6481,17 +6491,28 @@ CPresentation.prototype =
 //-----------------------------------------------------------------------------------
     Add_Comment : function(CommentData)
     {
-        var Comment = new CComment( this.Comments, CommentData );
-        Comment.setPosition(this.Slides[this.CurPage].commentX, this.Slides[this.CurPage].commentY);
-        this.Slides[this.CurPage].commentX += COMMENT_WIDTH;
-        this.Slides[this.CurPage].commentY += COMMENT_HEIGHT;
-        this.Slides[this.CurPage].addComment(Comment);
-        return Comment;
+        if(this.Document_Is_SelectionLocked(changestype_AddComment) === false)
+        {
+            History.Create_NewPoint();
+            var Comment = new CComment( this.Comments, CommentData );
+            Comment.setPosition(this.Slides[this.CurPage].commentX, this.Slides[this.CurPage].commentY);
+            this.Slides[this.CurPage].commentX += COMMENT_WIDTH;
+            this.Slides[this.CurPage].commentY += COMMENT_HEIGHT;
+            this.Slides[this.CurPage].addComment(Comment);
+            this.DrawingDocument.OnRecalculatePage(this.CurPage, this.Slides[this.CurPage]);
+            this.DrawingDocument.OnEndRecalculate();
+            return Comment;
+        }
     },
 
     Change_Comment : function(Id, CommentData)
     {
-        this.Slides[this.CurPage].changeComment( Id, CommentData );
+        if(this.Document_Is_SelectionLocked(changestype_MoveComment) === false)
+        {
+            History.Create_NewPoint();
+            this.Slides[this.CurPage].changeComment( Id, CommentData );
+        }
+
     },
 
     Remove_Comment : function(Id, bSendEvent)
@@ -6499,14 +6520,23 @@ CPresentation.prototype =
         if ( null === Id )
             return;
 
-        if ( true === this.Comments.Remove_ById( Id ) )
+        for(var i = 0; i < this.Slides.length; ++i)
         {
-            this.DrawingDocument.ClearCachePages();
-            this.DrawingDocument.FirePaint();
+            var comments =   this.Slides[i].comments;
+            for(var j = 0; j < comments.length; ++j)
+            {
+                if(comments[j].Id === Id)
+                {
+                    this.Set_CurPage(i);
 
-            if ( true === bSendEvent )
-                editor.sync_RemoveComment( Id );
+                    this.Slides[i].removeComment(Id);
+                    if ( true === bSendEvent )
+                        editor.sync_RemoveComment( Id );
+                    return;
+                }
+            }
         }
+        editor.sync_HideComment();
     },
 
     CanAdd_Comment : function()

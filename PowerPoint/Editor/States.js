@@ -56,15 +56,16 @@ function NullState(drawingObjectsController, drawingObjects)
 
     this.onMouseDown = function(e, x, y)
     {
+        this.drawingObjectsController.hideComment();
         for(var i = drawingObjects.comments.length - 1; i > -1; --i)
         {
             if(drawingObjects.comments[i].hit(x, y))
             {
+                this.drawingObjectsController.addPreTrackObject(new MoveComment(drawingObjects.comments[i]));
                 this.drawingObjectsController.changeCurrentState(new PreMoveCommentState(this.drawingObjectsController, this.drawingObjects, x, y));
                 return;
             }
         }
-        this.drawingObjectsController.hideComment();
         var selected_objects = this.drawingObjectsController.selectedObjects;
         if(selected_objects.length === 1)
         {
@@ -809,8 +810,9 @@ function PreMoveCommentState(drawingObjectsController, drawingObjects, startX, s
 
     this.onMouseUp = function(e, x, y)
     {
-        var Coords = editor.WordControl.m_oDrawingDocument.ConvertCoordsToCursorWR( x, Y, this.drawingObjects.num);
-        this.drawingObjectsController.showComment(this.drawingObjectsController.arrTrackObjects[0].comment.Get_Id(), Coords.X, Coords.Y);
+        var Coords = editor.WordControl.m_oDrawingDocument.ConvertCoordsToCursorWR( this.drawingObjectsController.arrPreTrackObjects[0].comment.x, this.drawingObjectsController.arrPreTrackObjects[0].comment.y,
+            this.drawingObjects.num);
+        this.drawingObjectsController.showComment(this.drawingObjectsController.arrPreTrackObjects[0].comment.Get_Id(), Coords.X, Coords.Y);
         this.drawingObjectsController.clearPreTrackObjects();
         this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
     };
@@ -2160,7 +2162,7 @@ function TrackNewShapeState(drawingObjectsController, drawingObjects, presetGeom
         this.drawingObjectsController.resetSelection();
 
 
-        if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+        if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_AddSp) === false)
         {
             History.Create_NewPoint();
             this.drawingObjectsController.trackEnd();

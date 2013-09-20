@@ -355,18 +355,22 @@ CShape.prototype =
 
     setPresetGeometry: function(preset)
     {
+        var old_geometry = this.spPr.geometry;
         this.spPr.geometry = CreateGeometry(preset);
         this.spPr.geometry.Init(5, 5);
+        History.Add(this, {Type: historyitem_SetShapeSetGeometry, oldGeometry: old_geometry, newGeometry: this.spPr.geometry});
+
     },
 
     setDefaultStyle: function()
     {
-        this.style = CreateDefaultShapeStyle();
+
+        this.setStyle(CreateDefaultShapeStyle());
     },
 
     setDefaultTextRectStyle: function()
     {
-        this.style = CreateDefaultTextRectStyle();
+        this.setStyle(CreateDefaultTextRectStyle());
     },
 
     isShape: function()

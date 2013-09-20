@@ -2963,43 +2963,7 @@ CTable.prototype =
     // Вычисляем небольшое смещение по X
     Get_TableOffsetCorrection : function()
     {
-        var X = 0;
-
-        if ( true === this.Parent.Is_TableCellContent() )
-            return 0;
-
-        var Row = this.Content[0];
-        var Cell = Row.Get_Cell( 0 );
-        var Margins = Cell.Get_Margins();
-
-        var CellSpacing = Row.Get_CellSpacing();
-        if ( null != CellSpacing )
-        {
-            var TableBorder_Left = this.Get_Borders().Left;
-            if ( border_None != TableBorder_Left.Value )
-                X += TableBorder_Left.Size / 2;
-
-            X += CellSpacing;
-
-            var CellBorder_Left = Cell.Get_Borders().Left;
-            if ( border_None != CellBorder_Left.Value )
-                X += CellBorder_Left.Size;
-
-            X += Margins.Left.W;
-        }
-        else
-        {
-            var TableBorder_Left = this.Get_Borders().Left;
-            var CellBorder_Left  = Cell.Get_Borders().Left;
-            var Result_Border = this.Internal_CompareBorders( TableBorder_Left, CellBorder_Left, true, false );
-
-            if ( border_None != Result_Border.Value )
-                X += Math.max( Result_Border.Size / 2, Margins.Left.W );
-            else
-                X += Margins.Left.W;
-        }
-
-        return -X;
+        return 0;
     },
 
     // Получаем первый параграф первой ячейки. (Нужно для контроля ContextualSpacing)

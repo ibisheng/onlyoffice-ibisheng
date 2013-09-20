@@ -3294,8 +3294,6 @@ asc_docs_api.prototype.asc_addComment = function(AscCommentData)
     var CommentData = new CCommentData();
     CommentData.Read_FromAscCommentData(AscCommentData);
 
-    // Добавлять комментарии можно всегда
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
     var Comment = this.WordControl.m_oLogicDocument.Add_Comment( CommentData );
     if ( null != Comment )
         this.sync_AddComment( Comment.Get_Id(), CommentData );
@@ -3323,7 +3321,6 @@ asc_docs_api.prototype.asc_changeComment = function(Id, AscCommentData)
         var CommentData = new CCommentData();
         CommentData.Read_FromAscCommentData(AscCommentData);
 
-        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Change_Comment( Id, CommentData );
 
         this.sync_ChangeCommentData( Id, CommentData );

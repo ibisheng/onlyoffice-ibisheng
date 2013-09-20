@@ -33,6 +33,12 @@ function CGraphicFrame(parent)
 CGraphicFrame.prototype =
 {
 
+    setGraphicObject: function(graphicObject)
+    {
+        History.Add(this, {Type: historyitem_SetGraphicObject, oldPr: this.graphicObject, newPr: graphicObject});
+        this.graphicObject = graphicObject;
+    },
+
     Get_Id: function()
     {
         return this.Id;
@@ -147,6 +153,16 @@ CGraphicFrame.prototype =
         return {minX: min_x, maxX: max_x, minY: min_y, maxY: max_y};
     },
 
+    getTransform: function()
+    {
+        if(this.recalcInfo.recalculateTransform)
+        {
+            this.recalculateTransform();
+            this.recalcInfo.recalculateTransform = false;
+        }
+        return {x: this.x, y: this.y, extX: this.extX, extY: this.extY, rot: this.rot, flipH: this.flipH, flipV: this.flipV};
+    },
+
     setXfrm: function(offX, offY, extX, extY, rot, flipH, flipV)
     {
         if(this.spPr.xfrm.isNotNull())
@@ -228,7 +244,7 @@ CGraphicFrame.prototype =
 
     canRotate: function()
     {
-        return true;
+        return false;
     },
 
     canResize: function()
@@ -1012,7 +1028,7 @@ CGraphicFrame.prototype =
 
     isPlaceholder: function()
     {
-        return this.nvGraphicFramePr.nvPr.ph !== null;
+        return this.nvGraphicFramePr &&  this.nvGraphicFramePr.nvPr && this.nvGraphicFramePr.nvPr.ph !== null;
     },
 
     getPhType: function()
@@ -1808,10 +1824,14 @@ CGraphicFrame.prototype =
     },
 
     getTextPr: function()
-    {},
+    {
+        return this.graphicObject.Get_Paragraph_TextPr();
+    },
 
     getParaPr: function()
-    {},
+    {
+        return this.graphicObject.Get_Paragraph_ParaPr();
+    },
 
     hitToHandles: function()
     {
@@ -1830,10 +1850,20 @@ CGraphicFrame.prototype =
     },
 
 
+    Refresh_RecalcData: function()
+    {
+    },
+
     Undo: function(data)
     {
         switch(data.Type)
         {
+            case historyitem_SetGraphicObject:
+            {
+                this.graphicObject = data.oldPr;
+                break;
+            }
+
             case historyitem_SetShapeRot:
             {
                 this.spPr.xfrm.rot = data.oldRot;
@@ -1942,6 +1972,11 @@ CGraphicFrame.prototype =
 
         switch(data.Type)
         {
+            case historyitem_SetGraphicObject:
+            {
+                this.graphicObject = data.newPr;
+                break;
+            }
             case historyitem_SetShapeRot:
             {
                 this.spPr.xfrm.rot = data.newRot;
@@ -2047,6 +2082,15 @@ CGraphicFrame.prototype =
         var bool;
         switch(data.Type)
         {
+            case historyitem_SetGraphicObject:
+            {
+                w.WriteBool(isRealObject(data.newPr));
+                if(isRealObject(data.newPr))
+                {
+                    w.WriteString2(data.newPr.Get_Id());
+                }
+                break;
+            }
             case historyitem_SetShapeRot:
             {
                 w.WriteDouble(data.newRot);
@@ -2132,6 +2176,18 @@ CGraphicFrame.prototype =
         {
             switch(r.GetLong())
             {
+                case historyitem_SetGraphicObject:
+                {
+                    if(r.GetBool())
+                    {
+                        this.graphicObject = g_oTableId.Get_ById(r.GetString2());
+                    }
+                    else
+                    {
+                        this.graphicObject = null;
+                    }
+                    break;
+                }
                 case historyitem_SetShapeRot:
                 {
                     this.spPr.xfrm.rot = r.GetDouble();

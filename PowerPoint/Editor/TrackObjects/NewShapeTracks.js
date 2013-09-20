@@ -71,7 +71,7 @@ function NewShapeTrack(drawingObjects, presetGeom, startX, startY)
 
 
     this.overlayObject = new OverlayObject(geometry, 5, 5, brush, pen, this.transform);
-
+    this.shape = null;
     this.track = function(e, x, y)
     {
         var real_dist_x = x - this.startX;

@@ -1119,6 +1119,8 @@ var changestype_SlideSize            = 65; // Изменение цветово�
 var changestype_SlideBg              = 66; // Изменение цветовой схемы;
 var changestype_SlideTiming          = 67; // Изменение цветовой схемы;
 var changestype_MoveComment          = 68;
+var changestype_AddSp                = 69;
+var changestype_AddComment           = 70;
 
 
 

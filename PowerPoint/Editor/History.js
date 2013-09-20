@@ -307,6 +307,8 @@ var historyitem_SetBlipFill = 15;
 var historyitem_AddToGroupSpTree = 16;
 var historyitem_SetSpGroup = 17;
 var historyitem_SetSpParent = 18;
+var historyitem_SetGraphicObject = 19;
+
 
 
 

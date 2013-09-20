@@ -6,8 +6,8 @@
  * To change this template use File | Settings | File Templates.
  */
 
-var COMMENT_WIDTH = 7;
-var COMMENT_HEIGHT = 5;
+var COMMENT_WIDTH = 30;
+var COMMENT_HEIGHT = 25;
 
 function Slide(presentation, slideLayout, slideNum)
 {
@@ -928,7 +928,6 @@ Slide.prototype =
     {
         History.Add(this, {Type: historyitem_AddComment, objectId: comment.Get_Id(), pos:this.comments.length});
         this.comments.splice(this.comments.length, 0, comment);
-        this.comments.push(comment);
     },
 
     changeComment: function(id, commentData)
@@ -937,7 +936,7 @@ Slide.prototype =
         {
             if(this.comments[i].Get_Id() === id)
             {
-                this.comments[i].Set_CommentData(commentData);
+                this.comments[i].Set_Data(commentData);
                 return;
             }
         }
@@ -1171,6 +1170,10 @@ Slide.prototype =
         for(var i=0; i < this.cSld.spTree.length; ++i)
         {
             this.cSld.spTree[i].draw(graphics);
+        }
+        for(var i=0; i < this.comments.length; ++i)
+        {
+            this.comments[i].draw(graphics);
         }
     },
 
@@ -1509,6 +1512,21 @@ Slide.prototype =
     {
         switch(data.Type)
         {
+            case historyitem_AddComment:
+            {
+                this.comments.splice(data.pos, 1);
+                editor.sync_RemoveComment( data.objectId );
+
+                break;
+            }
+
+            case historyitem_RemoveComment:
+            {
+                this.comments.splice(data.index, 0, g_oTableId.Get_ById(data.id));
+                editor.sync_AddComment( this.comments[data.index].Get_Id(), this.comments[data.index].Data);
+                break;
+            }
+
             case historyitem_RemoveFromSpTree:
             {
                 this.cSld.spTree.splice(data.index, 0, g_oTableId.Get_ById(data.id));
@@ -1595,6 +1613,20 @@ Slide.prototype =
     {
         switch(data.Type)
         {
+
+            case historyitem_AddComment:
+            {
+                this.comments.splice(data.pos, 0, g_oTableId.Get_ById(data.objectId));
+                editor.sync_AddComment( data.objectId, this.comments[data.pos].Data);
+
+                break;
+            }
+            case historyitem_RemoveComment:
+            {
+                this.comments.splice(data.index, 1);
+                editor.sync_RemoveComment(data.id);
+                break;
+            }
             case historyitem_RemoveFromSpTree:
             {
                 this.cSld.spTree.splice(data.index, 1);
@@ -1692,6 +1724,18 @@ Slide.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
+
+            case historyitem_AddComment:
+            {
+                w.WriteLong(data.pos);
+                w.WriteString2(data.objectId);
+                break;
+            }
+            case historyitem_RemoveComment:
+            {
+                w.WriteLong(data.index);
+                break;
+            }
             case historyitem_RemoveFromSpTree:
             {
                 w.WriteLong(data.index);
@@ -1796,6 +1840,21 @@ Slide.prototype =
         var type = r.GetLong();
         switch(type)
         {
+            case historyitem_AddComment:
+            {
+                var pos = r.GetLong();
+                var id = r.GetString2();
+                this.comments.splice(pos, 0,  g_oTableId.Get_ById(id));
+                editor.sync_AddComment( id, this.comments[pos].Data);
+                break;
+            }
+            case historyitem_RemoveComment:
+            {
+
+                var comment = this.comments.splice(r.GetLong(), 1)[0];
+                editor.sync_RemoveComment(comment.Id);
+                break;
+            }
             case historyitem_RemoveFromSpTree:
             {
                 this.cSld.spTree.splice(r.GetLong(), 1);
