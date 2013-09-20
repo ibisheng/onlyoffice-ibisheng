@@ -3752,8 +3752,8 @@ function handleMessage(event)
         }
     }
 }
-if(window.addEventListener)
-    window.addEventListener("message", handleMessage, true);
+//if(window.addEventListener)
+//    window.addEventListener("message", handleMessage, true);
 
 function sendStatus(Message)
 {
