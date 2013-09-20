@@ -230,27 +230,27 @@ CGlyphOperator.prototype.getCoordinateGlyph = function()
 
     // A*x + B*y + C = 0
 
-    if(this.loc == 0)
+    if(this.loc == LOCATION_TOP)
     {
         a1 = 1; b1 = 0; c1 = 0;
         a2 = 0; b2 = 1; c2 = 0;
     }
-    else if(this.loc == 1)
+    else if(this.loc == LOCATION_BOT)
     {
         a1 = 1; b1 = 0; c1 = 0;
         a2 = 0; b2 = 1; c2 = H - glH;
     }
-    else if(this.loc == 2)
+    else if(this.loc == LOCATION_LEFT)
     {
         a1 = 0; b1 = 1; c1 = 0;
         a2 = 1; b2 = 0; c2 = 0;
     }
-    else if(this.loc == 3)
+    else if(this.loc == LOCATION_RIGHT)
     {
         a1 = 0; b1 = 1; c1 = W - glW;
         a2 = 1; b2 = 0; c2 = 0;
     }
-    else if(this.loc == 4)
+    else if(this.loc == LOCATION_SEP)
     {
         a1 = 0; b1 = 1; c1 = 0;
         a2 = 1; b2 = 0; c2 = 0;
@@ -2661,7 +2661,7 @@ COperatorLine.prototype.calcCoord = function(measure)
 
 
     var W = XX[2],
-        H = YY[2];
+        H = YY[2] + shY;
 
     return {XX: XX, YY: YY, W: W, H: H};
 

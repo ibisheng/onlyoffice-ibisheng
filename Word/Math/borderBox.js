@@ -261,3 +261,50 @@ CBox.prototype.getBase = function()
 {
     return this.elements[0][0];
 }
+
+function CBar()
+{
+    this.loc = LOCATION_BOT;
+    CCharacter.call(this);
+}
+extend(CBar, CCharacter);
+CBar.prototype.init = function(props)
+{
+    if(props.pos === "top" || props.location === LOCATION_TOP)
+        this.loc = LOCATION_TOP;
+    else if(props.pos === "bot" || props.location === LOCATION_BOT)
+        this.loc = LOCATION_BOT;
+
+    var glyph = new COperatorLine();
+    var props =
+    {
+        location:    this.loc,
+        turn:       TURN_0
+    };
+    glyph.init(props);
+
+    this.setOperator( new COperator(glyph) );
+}
+CBar.prototype.getCenter = function()
+{
+    var center;
+
+    if(this.loc === LOCATION_TOP )
+        center = this.operator.size.height + this.elements[0][0].size.center;
+    else if(this.loc === LOCATION_BOT )
+        center = this.elements[0][0].size.center;
+
+    return center;
+}
+
+function CPhantom()
+{
+    CMathBase.call(this);
+}
+extend(CPhantom, CMathBase);
+CPhantom.prototype.init = function(props)
+{
+
+    this.setDimension(1, 1);
+    this.setContent();
+}

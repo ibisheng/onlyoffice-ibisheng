@@ -461,6 +461,9 @@ CMathContent.prototype =
                 case MATH_EQ_ARRAY:
                     mathElem = new CEqArray();
                     break;
+                case MATH_BAR:
+                    mathElem = new CBar();
+                    break;
 
             }
 
@@ -4234,7 +4237,7 @@ CMathContent.prototype =
                     delim.init(props);
                     delim.fillPlaceholders();*/
                     var accent = this.addMComponent(MATH_ACCENT);
-                    var props =
+                    props =
                     {
                         chrType:        ACCENT_ARROW_LEFT
                     };
@@ -4278,8 +4281,22 @@ CMathContent.prototype =
                     accent.fillPlaceholders();
                     break;
                 case 172:
+                    var bar = this.addMComponent(MATH_BAR);
+                    var props =
+                    {
+                        location:    LOCATION_TOP
+                    };
+                    bar.init(props);
+                    bar.fillPlaceholders();
                     break;
                 case 173:
+                    var bar = this.addMComponent(MATH_BAR);
+                    var props =
+                    {
+                        location:    LOCATION_BOT
+                    };
+                    bar.init(props);
+                    bar.fillPlaceholders();
                     break;
                 case 174:
                     var borderBox = this.addMComponent(MATH_BORDER_BOX);
@@ -4320,8 +4337,24 @@ CMathContent.prototype =
 
                     break;
                 case 176:
+                    var bar = this.addMComponent(MATH_BAR);
+                    var props =
+                    {
+                        location:    LOCATION_TOP
+                    };
+                    bar.init(props);
+                    var base = bar.getBase();
+                    base.addTxt("A");
                     break;
                 case 177:
+                    var bar = this.addMComponent(MATH_BAR);
+                    var props =
+                    {
+                        location:    LOCATION_TOP
+                    };
+                    bar.init(props);
+                    var base = bar.getBase();
+                    base.addTxt("ABC");
                     break;
                 case 178:
                     var func = this.addMComponent(MATH_FUNCTION);
@@ -4524,7 +4557,14 @@ CMathContent.prototype =
                     this.addTxt("≜");
                     break;
                 case 193:
-                    var arrow = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var box = this.addMComponent(MATH_BOX);
+                    var props =
+                    {
+                        opEmu:      true
+                    };
+                    box.init(props);
+                    var base = box.getBase();
+                    var arrow = base.addMComponent(MATH_GROUP_CHARACTER);
                     var props =
                     {
                         chrType:        ARROW_LEFT,
@@ -4534,7 +4574,14 @@ CMathContent.prototype =
                     arrow.fillPlaceholders();
                     break;
                 case 194:
-                    var arrow = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var box = this.addMComponent(MATH_BOX);
+                    var props =
+                    {
+                        opEmu:      true
+                    };
+                    box.init(props);
+                    var base = box.getBase();
+                    var arrow = base.addMComponent(MATH_GROUP_CHARACTER);
                     var props =
                     {
                         chrType:        ARROW_RIGHT,
@@ -4544,7 +4591,14 @@ CMathContent.prototype =
                     arrow.fillPlaceholders();
                     break;
                 case 195:
-                    var arrow = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var box = this.addMComponent(MATH_BOX);
+                    var props =
+                    {
+                        opEmu:      true
+                    };
+                    box.init(props);
+                    var base = box.getBase();
+                    var arrow = base.addMComponent(MATH_GROUP_CHARACTER);
                     var props =
                     {
                         chrType:        ARROW_LEFT,
@@ -4554,7 +4608,14 @@ CMathContent.prototype =
                     arrow.fillPlaceholders();
                     break;
                 case 196:
-                    var arrow = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var box = this.addMComponent(MATH_BOX);
+                    var props =
+                    {
+                        opEmu:      true
+                    };
+                    box.init(props);
+                    var base = box.getBase();
+                    var arrow = base.addMComponent(MATH_GROUP_CHARACTER);
                     var props =
                     {
                         chrType:        ARROW_RIGHT,
@@ -4574,7 +4635,14 @@ CMathContent.prototype =
                     arrow.fillPlaceholders();
                     break;
                 case 198:
-                    var arrow = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var box = this.addMComponent(MATH_BOX);
+                    var props =
+                    {
+                        opEmu:      true
+                    };
+                    box.init(props);
+                    var base = box.getBase();
+                    var arrow = base.addMComponent(MATH_GROUP_CHARACTER);
                     var props =
                     {
                         chrType:        DOUBLE_RIGHT_ARROW,
@@ -4584,7 +4652,14 @@ CMathContent.prototype =
                     arrow.fillPlaceholders();
                     break;
                 case 199:
-                    var arrow = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var box = this.addMComponent(MATH_BOX);
+                    var props =
+                    {
+                        opEmu:      true
+                    };
+                    box.init(props);
+                    var base = box.getBase();
+                    var arrow = base.addMComponent(MATH_GROUP_CHARACTER);
                     var props =
                     {
                         chrType:        DOUBLE_LEFT_ARROW,
@@ -4594,7 +4669,14 @@ CMathContent.prototype =
                     arrow.fillPlaceholders();
                     break;
                 case 200:
-                    var arrow = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var box = this.addMComponent(MATH_BOX);
+                    var props =
+                    {
+                        opEmu:      true
+                    };
+                    box.init(props);
+                    var base = box.getBase();
+                    var arrow = base.addMComponent(MATH_GROUP_CHARACTER);
                     var props =
                     {
                         chrType:        DOUBLE_RIGHT_ARROW,
@@ -4604,7 +4686,14 @@ CMathContent.prototype =
                     arrow.fillPlaceholders();
                     break;
                 case 201:
-                    var arrow = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var box = this.addMComponent(MATH_BOX);
+                    var props =
+                    {
+                        opEmu:      true
+                    };
+                    box.init(props);
+                    var base = box.getBase();
+                    var arrow = base.addMComponent(MATH_GROUP_CHARACTER);
                     var props =
                     {
                         chrType:        ARROW_LR,
@@ -4614,7 +4703,14 @@ CMathContent.prototype =
                     arrow.fillPlaceholders();
                     break;
                 case 202:
-                    var arrow = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var box = this.addMComponent(MATH_BOX);
+                    var props =
+                    {
+                        opEmu:      true
+                    };
+                    box.init(props);
+                    var base = box.getBase();
+                    var arrow = base.addMComponent(MATH_GROUP_CHARACTER);
                     var props =
                     {
                         chrType:        ARROW_LR,
@@ -4624,7 +4720,14 @@ CMathContent.prototype =
                     arrow.fillPlaceholders();
                     break;
                 case 203:
-                    var arrow = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var box = this.addMComponent(MATH_BOX);
+                    var props =
+                    {
+                        opEmu:      true
+                    };
+                    box.init(props);
+                    var base = box.getBase();
+                    var arrow = base.addMComponent(MATH_GROUP_CHARACTER);
                     var props =
                     {
                         chrType:        DOUBLE_ARROW_LR,
@@ -4634,7 +4737,14 @@ CMathContent.prototype =
                     arrow.fillPlaceholders();
                     break;
                 case 204:
-                    var arrow = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var box = this.addMComponent(MATH_BOX);
+                    var props =
+                    {
+                        opEmu:      true
+                    };
+                    box.init(props);
+                    var base = box.getBase();
+                    var arrow = base.addMComponent(MATH_GROUP_CHARACTER);
                     var props =
                     {
                         chrType:        DOUBLE_ARROW_LR,
@@ -4644,7 +4754,14 @@ CMathContent.prototype =
                     arrow.fillPlaceholders();
                     break;
                 case 205:
-                    var arrow = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var box = this.addMComponent(MATH_BOX);
+                    var props =
+                    {
+                        opEmu:      true
+                    };
+                    box.init(props);
+                    var base = box.getBase();
+                    var arrow = base.addMComponent(MATH_GROUP_CHARACTER);
                     var props =
                     {
                         chrType:        ARROW_RIGHT,
@@ -4655,7 +4772,14 @@ CMathContent.prototype =
                     base.addTxt("yields");
                     break;
                 case 206:
-                    var arrow = this.addMComponent(MATH_GROUP_CHARACTER);
+                    var box = this.addMComponent(MATH_BOX);
+                    var props =
+                    {
+                        opEmu:      true
+                    };
+                    box.init(props);
+                    var base = box.getBase();
+                    var arrow = base.addMComponent(MATH_GROUP_CHARACTER);
                     var props =
                     {
                         chrType:        ARROW_RIGHT,
@@ -6511,6 +6635,13 @@ CMathComposition.prototype =
         }
 
         this.Root.draw();
+    },
+    Draw_2: function()
+    {
+        this.Resize();
+        this.UpdatePosition();
+        this.CheckTarget();
+        this.Draw();
     },
     Cursor_MoveRight: function()
     {
