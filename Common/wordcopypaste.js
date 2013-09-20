@@ -2963,17 +2963,7 @@ PasteProcessor.prototype =
                             var imageElem = aContent.aPastedImages[i];
                             var src = imageElem.Url;
                             if(false == (0 == src.indexOf("data:") || 0 == src.indexOf(documentOrigin + this.api.DocumentUrl) || 0 == src.indexOf(this.api.DocumentUrl)))
-                            {
                                 oImagesToDownload[src] = 1;
-                                //для svg надо еще скопировать wmf и emf
-                                var nExtIndex = src.lastIndexOf(".");
-                                if(-1 != nExtIndex && ".svg" == src.substring(nExtIndex))
-                                {
-                                    var sStart = src.substring(0, nExtIndex)
-                                    oImagesToDownload[sStart + ".wmf"] = 1;
-                                    oImagesToDownload[sStart + ".emf"] = 1;
-                                }
-                            }
                         }
                     }
                     var aImagesToDownload = [];
