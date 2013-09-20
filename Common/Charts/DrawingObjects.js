@@ -4253,7 +4253,7 @@ function DrawingObjects() {
 		for (var i = 0; i < aObjects.length; i++) {
 			if ( id == aObjects[i].graphicObject.Id ) {
 				aObjects[i].graphicObject.lockType = state;
-				shapeCtx.DrawLockObjectRect(aObjects[i].graphicObject.lockType, aObjects[i].graphicObject.x, aObjects[i].graphicObject.y, aObjects[i].graphicObject.extX, aObjects[i].graphicObject.extY );
+				//shapeCtx.DrawLockObjectRect(aObjects[i].graphicObject.lockType, aObjects[i].graphicObject.x, aObjects[i].graphicObject.y, aObjects[i].graphicObject.extX, aObjects[i].graphicObject.extY );
 				break;
 			}
 		}
@@ -4555,10 +4555,11 @@ function DrawingObjects() {
 
 	_this.selectDrawingObjectRange = function(id) {
 
+		var strokeColor = "#ff0000";
 		worksheet.arrActiveChartsRanges = [];
 		
 		function getRandomColor() {
-			var r = function () { return Math.floor(Math.random()*256) };
+			var r = function () { return Math.floor(Math.random() * 256) };
 			return "rgb(" + r() + "," + r() + "," + r() + ")";
 		}
 		
@@ -4582,35 +4583,38 @@ function DrawingObjects() {
 				var fvc = worksheet.getFirstVisibleCol();
 				var headers = drawingObject.chart.parseSeriesHeaders();
 				
-				var c1 = BB.c1 - fvc;
-				var c2 = BB.c2 - fvc;
-				var r1 = BB.r1 - fvr;
-				var r2 = BB.r2 - fvr;
+				var bbox = BB.clone();
 				
-				if ( headers.bTop && (r1 >= 0) && (r1 != r2) ) {
-					var _c1 = (c1 >= 0) ? c1 : 0;
-					var x = worksheet.getCellLeft(_c1, 1);
-					var y = worksheet.getCellTop(r1 + 1, 1);
-					var w = worksheet.getCellLeft(c2 + 1, 1);
+				// Top
+				if ( headers.bTop && (bbox.r1 + 1 - fvr > 0) && (bbox.c2 + 1 - fvc > 0) && (bbox.r1 != bbox.r2) ) {
+					
+					var y = worksheet.getCellTop(bbox.r1 + 1, 1) - worksheet.getCellTop(fvr, 1) + worksheet.getCellTop(0, 1);
 					var h = y;
 					
-					overlayCtx.setStrokeStyle("#ff0000");
+					var bHide = bbox.c1 - fvc < 0;
+					var x = ( bHide ? 0 : worksheet.getCellLeft(bbox.c1, 1) - worksheet.getCellLeft(fvc, 1) ) + worksheet.getCellLeft(0, 1);
+					var w = worksheet.getCellLeft(bbox.c2 + 1, 1) - ( bHide ? worksheet.getCellLeft(fvc, 1) : worksheet.getCellLeft(bbox.c1, 1) );
+					
+					overlayCtx.setStrokeStyle(strokeColor);
 					overlayCtx.beginPath();
 					overlayCtx.moveTo(x, y, -0.5, -0.5);
-					overlayCtx.lineTo(w, h, -0.5, -0.5);
+					overlayCtx.lineTo(x + w, h, -0.5, -0.5);
 					overlayCtx.stroke();
 				}
-				if ( headers.bLeft && (c1 >= 0) && (c1 != c2) ) {
-					var _r1 = (r1 >= 0) ? r1 : 0;
-					var x = worksheet.getCellLeft(c1 + 1, 1);
-					var y = worksheet.getCellTop(_r1, 1);
-					var w = x;
-					var h = worksheet.getCellTop(r2 + 1, 1);
+				// Left
+				if ( headers.bLeft && (bbox.c1 + 1 - fvc > 0) && (bbox.r2 + 1 - fvr > 0) && (bbox.c1 != bbox.c2) ) {
 					
-					overlayCtx.setStrokeStyle("#ff0000");
+					var x = worksheet.getCellLeft(bbox.c1 + 1, 1) - worksheet.getCellLeft(fvc, 1) + worksheet.getCellLeft(0, 1);
+					var w = x;
+					
+					var bHide = bbox.r1 - fvr < 0;
+					var y = ( bHide ? 0 : worksheet.getCellTop(bbox.r1, 1) - worksheet.getCellTop(fvr, 1) ) + worksheet.getCellTop(0, 1);
+					var h = worksheet.getCellTop(bbox.r2 + 1, 1) - ( bHide ? worksheet.getCellTop(fvr, 1) : worksheet.getCellTop(bbox.r1, 1) );
+					
+					overlayCtx.setStrokeStyle(strokeColor);
 					overlayCtx.beginPath();
 					overlayCtx.moveTo(x, y, -0.5, -0.5);
-					overlayCtx.lineTo(w, h, -0.5, -0.5);
+					overlayCtx.lineTo(w, y + h, -0.5, -0.5);
 					overlayCtx.stroke();
 				}
 					
