@@ -3120,6 +3120,7 @@ PasteProcessor.prototype =
                                         History.Create_NewPoint();
                                         for(var i = 0; i < arr_shapes.length; ++i)
                                         {
+                                            arr_shapes[i].changeSize(kw, kh);
                                             slide.addToSpTreeToPos(slide.cSld.spTree.length, arr_shapes[i]);
                                         }
                                     }
@@ -3272,12 +3273,8 @@ PasteProcessor.prototype =
                         }
                     }
                 }
-
             }
-            else
-            {
 
-            }
         }
     },
 
