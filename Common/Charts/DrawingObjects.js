@@ -2337,7 +2337,7 @@ function DrawingObjects() {
 	
 	var trackOverlay = null;
 	var autoShapeTrack = null;
-	var scrollOffset = { x: 0, y: 0 };
+	var scrollOffset = { x: 0, y: 0, x0: 0, y0: 0 };
 	
 	var aObjects = null;
 	var aBoundsCheckers = [];
@@ -2491,8 +2491,12 @@ function DrawingObjects() {
 			var lvc = _t.worksheet.getLastVisibleCol();
 			var lvr = _t.worksheet.getLastVisibleRow();
 			
-			if ( (fvr > _t.to.row + 1) || (lvr < _t.from.row - 1) || (fvc > _t.to.col + 1) || (lvc < _t.from.col - 1) )
-				result = false;
+			var checker = _this.getBoundsChecker(_t);
+			var coords = _this.getBoundsCheckerCoords(checker);
+			if ( coords ) {
+				if ( (fvr > coords.r2 + 1) || (lvr < coords.r1 - 1) || (fvc > coords.c2 + 1) || (lvc < coords.c1 - 1) )
+					result = false;
+			}
 
 			return result;
 		}
@@ -2770,8 +2774,7 @@ function DrawingObjects() {
 					drawingObject.graphicObject.chart.rebuildSeries();
 				}
 				
-                drawingObject.graphicObject.init();	
-				
+                drawingObject.graphicObject.init();
                 aObjects.push( drawingObject );
             }
 			if (drawingObject.graphicObject instanceof  CShape) {
@@ -3094,6 +3097,46 @@ function DrawingObjects() {
 		return null;
 	}
 	
+	_this.getBoundsCheckerCoords = function(checker) {
+		
+		if ( checker ) {
+			var coords = { c1: 0, r1: 0, c2: 0, r2: 0, min_x: 0, min_y: 0, max_x: 0, max_y: 0, w: 0, h: 0 };
+			
+			coords.min_x = checker.Bounds.min_x;
+			coords.min_y = checker.Bounds.min_y;
+			coords.max_x = checker.Bounds.max_x;
+			coords.max_y = checker.Bounds.max_y;
+			
+			coords.w = checker.Bounds.max_x - checker.Bounds.min_x;
+			coords.h = checker.Bounds.max_y - checker.Bounds.min_y;
+			
+			// Top left
+			var foundRow = worksheet._findRowUnderCursor( mmToPt(checker.Bounds.min_y + pxToMm(scrollOffset.y)), true);
+			coords.r1 = foundRow ? foundRow.row : 0;
+			
+			var foundCol = worksheet._findColUnderCursor( mmToPt(checker.Bounds.min_x + pxToMm(scrollOffset.x)), true);
+			coords.c1 = foundCol ? foundCol.col : 0;
+			
+			// Right bottom
+			foundRow = worksheet._findRowUnderCursor( mmToPt(checker.Bounds.max_y + pxToMm(scrollOffset.y)), true);
+			while ( !foundRow ) {
+				worksheet.expandRowsOnScroll(true);
+				foundRow = worksheet._findRowUnderCursor( mmToPt(checker.Bounds.max_y + pxToMm(scrollOffset.y)), true);
+			}
+			coords.r2 = foundRow.row;
+			
+			foundCol = worksheet._findColUnderCursor( mmToPt(checker.Bounds.max_x + pxToMm(scrollOffset.x)), true);
+			while ( !foundCol ) {
+				worksheet.expandColsOnScroll(true);
+				foundCol = worksheet._findColUnderCursor( mmToPt(checker.Bounds.max_x + pxToMm(scrollOffset.x)), true);
+			}
+			coords.c2 = foundCol.col;
+			
+			return coords;
+		}
+		return null;
+	}
+	
 	_this.clearDrawingObjects = function() {
 		
 		// Чистим предыдущие области
@@ -3101,7 +3144,7 @@ function DrawingObjects() {
 		var _top = worksheet.getCellTop(worksheet.getFirstVisibleRow(), 3);
 		var _left = worksheet.getCellLeft(worksheet.getFirstVisibleCol(), 3);
 		for (var i = 0; i < aBoundsCheckers.length; i++) {
-			restoreSheetArea(aBoundsCheckers[i]);
+			_this.restoreSheetArea(aBoundsCheckers[i]);
 			if ( (_top >= aBoundsCheckers[i].Bounds.min_y) || (_left >= aBoundsCheckers[i].Bounds.min_x) )
 				bHeaders = true;
 		}
@@ -3112,7 +3155,7 @@ function DrawingObjects() {
 			if ( !aObjects[i].inVisibleArea() )
 				continue;
 			var boundsChecker = _this.getBoundsChecker(aObjects[i]);
-			restoreSheetArea(boundsChecker);
+			_this.restoreSheetArea(boundsChecker);
 			aBoundsCheckers.push(boundsChecker);
 			
 			if ( (_top >= boundsChecker.Bounds.min_y) || (_left >= boundsChecker.Bounds.min_x) )
@@ -3123,40 +3166,19 @@ function DrawingObjects() {
 			_this.drawWorksheetHeaders(true);
 	}
 	
-	function restoreSheetArea(checker) {
+	_this.restoreSheetArea = function(checker) {
 	
-		var _w = checker.Bounds.max_x - checker.Bounds.min_x;
-		var _h = checker.Bounds.max_y - checker.Bounds.min_y;
+		var coords = _this.getBoundsCheckerCoords(checker);
+		if ( coords ) {
 		
-		//overlayCtx.clearRect( mmToPt(checker.Bounds.min_x + pxToMm(scrollOffset.x)), mmToPt(checker.Bounds.min_y + pxToMm(scrollOffset.y)), mmToPt(_w), mmToPt(_h) );
-		//drawingCtx.clearRect( mmToPt(checker.Bounds.min_x + pxToMm(scrollOffset.x)), mmToPt(checker.Bounds.min_y + pxToMm(scrollOffset.y)), mmToPt(_w), mmToPt(_h) );
-	
-		// Top left
-		var foundRow = worksheet._findRowUnderCursor( mmToPt(checker.Bounds.min_y + pxToMm(scrollOffset.y)), true);
-		var topRow = foundRow ? foundRow.row : 0;
-		
-		var foundCol = worksheet._findColUnderCursor( mmToPt(checker.Bounds.min_x + pxToMm(scrollOffset.x)), true);
-		var leftCol = foundCol ? foundCol.col : 0;
-		
-		// Right bottom
-		foundRow = worksheet._findRowUnderCursor( mmToPt(checker.Bounds.max_y + pxToMm(scrollOffset.y)), true);
-		while ( !foundRow ) {
-			worksheet.expandRowsOnScroll(true);
-			foundRow = worksheet._findRowUnderCursor( mmToPt(checker.Bounds.max_y + pxToMm(scrollOffset.y)), true);
+			overlayCtx.clearRect( mmToPt(coords.min_x + pxToMm(scrollOffset.x)), mmToPt(coords.min_y + pxToMm(scrollOffset.y)), mmToPt(coords.w), mmToPt(coords.h) );
+			drawingCtx.clearRect( mmToPt(coords.min_x + pxToMm(scrollOffset.x)) , mmToPt(coords.min_y + pxToMm(scrollOffset.y)), mmToPt(coords.w), mmToPt(coords.h) );
+			
+			var r_ = asc_Range( coords.c1, coords.r1, coords.c2, coords.r2 );
+			worksheet._drawGrid( drawingCtx, r_);
+			worksheet._drawCells(r_);
+			worksheet._drawCellsBorders(undefined, r_);
 		}
-		var bottomRow = foundRow.row;
-		
-		foundCol = worksheet._findColUnderCursor( mmToPt(checker.Bounds.max_x + pxToMm(scrollOffset.x)), true);
-		while ( !foundCol ) {
-			worksheet.expandColsOnScroll(true);
-			foundCol = worksheet._findColUnderCursor( mmToPt(checker.Bounds.max_x + pxToMm(scrollOffset.x)), true);
-		}
-		var rightcol = foundCol.col;
-		
-		var r_ = asc_Range( leftCol, topRow, rightcol, bottomRow );
-		worksheet._drawGrid( drawingCtx, r_);
-		worksheet._drawCells(r_);
-		worksheet._drawCellsBorders(undefined, r_);
 	}
 
 	_this.raiseLayerDrawingObjects = function() {
@@ -3337,9 +3359,6 @@ function DrawingObjects() {
 		var fvr = worksheet.getFirstVisibleRow();
 		var fvc = worksheet.getFirstVisibleCol();
 		
-		var top = worksheet.getCellTop(0, 3) + pxToMm(1);
-		var left = worksheet.getCellLeft(0, 3) + pxToMm(1);
-		
 		function updateHeaders() {
 			worksheet._drawColumnHeaders();
 			worksheet._drawRowHeaders();
@@ -3355,10 +3374,14 @@ function DrawingObjects() {
 		else {
 			var bRedraw = false;
 			for (var i = 0; i < aObjects.length; i++) {
-				var obj = aObjects[i];
-				if ( (obj.from.col < fvc) || (obj.from.row < fvr) ) {
-					bRedraw = true;
-					break;
+				
+				var checker = _this.getBoundsChecker(aObjects[i]);
+				var coords = _this.getBoundsCheckerCoords(checker);
+				if ( coords ) {
+					if ( (coords.c1 < fvc) || (coords.r1 < fvr) ) {
+						bRedraw = true;
+						break;
+					}
 				}
 			}
 			if ( bRedraw )
@@ -3544,117 +3567,110 @@ function DrawingObjects() {
 		}
 		else if ( isObject(chart) && chart["binary"] ) {
 			
-			//try {
+			History.TurnOff();
+			var graphicObject = new CChartAsGroup(null, _this);
+			graphicObject.setChartBinary(chart["binary"]);
 			
-				History.TurnOff();
-				var graphicObject = new CChartAsGroup(null, _this);
-				graphicObject.setChartBinary(chart["binary"]);
+			// Формируем общий диапазон по сериям
+			var seriesCount = graphicObject.chart.series.length;
+			if ( seriesCount ) {
 				
-				// Формируем общий диапазон по сериям
-				var seriesCount = graphicObject.chart.series.length;
-				if ( seriesCount ) {
-					
-					// Нужно переименовать лист для дальнейшего поиска
-					var resultRef = parserHelp.parse3DRef(graphicObject.chart.series[0].Val.Formula);
-					worksheet.model.workbook.aWorksheets[0].sName = resultRef.sheet;
-					
-					if ( graphicObject.chart.range.interval ) {
-						var _range = convertFormula(graphicObject.chart.range.interval, worksheet);
-						if ( _range )
-							graphicObject.chart.range.intervalObject = _range;
-					}
+				// Нужно переименовать лист для дальнейшего поиска
+				var resultRef = parserHelp.parse3DRef(graphicObject.chart.series[0].Val.Formula);
+				worksheet.model.workbook.aWorksheets[0].sName = resultRef.sheet;
+				
+				if ( graphicObject.chart.range.interval ) {
+					var _range = convertFormula(graphicObject.chart.range.interval, worksheet);
+					if ( _range )
+						graphicObject.chart.range.intervalObject = _range;
 				}
+			}
+			
+			// Инжектим тему и перестраиваем превью диаграмм
+			if ( graphicObject.chart.themeColors ) {
 				
-				// Инжектим тему и перестраиваем превью диаграмм
-				if ( graphicObject.chart.themeColors ) {
+				api.GuiControlColorsMap = [];
+				for (var i = 0; i < graphicObject.chart.themeColors.length; i++) {
 					
-					api.GuiControlColorsMap = [];
-					for (var i = 0; i < graphicObject.chart.themeColors.length; i++) {
-						
-						var color = new RGBColor( graphicObject.chart.themeColors[i] );
-						api.GuiControlColorsMap.push(new CColor(color.r, color.g, color.b));
-					}
-					api.chartStyleManager.init();
-					api.chartPreviewManager.init();
-				}			
-				
-				if ( !wsCellCache.isInit ) {
-				
-					wsCellCache.cols = [];
-					wsCellCache.rows = [];
-					var colsCount = worksheet.cols.length;		//worksheet.model.getColsCount();
-					var rowsCount = worksheet.rows.length;		//worksheet.model.getRowsCount();
-					
-					for (var i = 0; i < colsCount; i++) {
-						wsCellCache.cols.push(worksheet.model.getColWidth(i));
-					}
-					for (var i = 0; i < rowsCount; i++) {
-						wsCellCache.rows.push(worksheet.model.getRowHeight(i));
-					}
-					wsCellCache.isInit = true;
+					var color = new RGBColor( graphicObject.chart.themeColors[i] );
+					api.GuiControlColorsMap.push(new CColor(color.r, color.g, color.b));
 				}
+				api.chartStyleManager.init();
+				api.chartPreviewManager.init();
+			}			
+			
+			if ( !wsCellCache.isInit ) {
+			
+				wsCellCache.cols = [];
+				wsCellCache.rows = [];
+				var colsCount = worksheet.cols.length;		//worksheet.model.getColsCount();
+				var rowsCount = worksheet.rows.length;		//worksheet.model.getRowsCount();
 				
-				// Заполняем таблицу
-				if ( graphicObject.chart.series.length ) {
-				
-					function restoreDataRange(data, bRows) {
-						
-						if ( data && data.Formula && data.NumCache.length ) {
-							var range = convertFormula(data.Formula, worksheet);
-							if ( range ) {
-								if ( bRows ) {
-									var index = 0;
-									for (var j = range.bbox.c1; j <= range.bbox.c2; j++) {
-									
-										var cell = graphicObject.chart.range.intervalObject.worksheet.getCell(new CellAddress(range.bbox.r1, j, 0));
-										cell.setNumFormat(data.NumCache[index].numFormatStr);
-										cell.setValue(data.NumCache[index].val);
-										index++;
-									}
+				for (var i = 0; i < colsCount; i++) {
+					wsCellCache.cols.push(worksheet.model.getColWidth(i));
+				}
+				for (var i = 0; i < rowsCount; i++) {
+					wsCellCache.rows.push(worksheet.model.getRowHeight(i));
+				}
+				wsCellCache.isInit = true;
+			}
+			
+			// Заполняем таблицу
+			if ( graphicObject.chart.series.length ) {
+			
+				function restoreDataRange(data, bRows) {
+					
+					if ( data && data.Formula && data.NumCache.length ) {
+						var range = convertFormula(data.Formula, worksheet);
+						if ( range ) {
+							if ( bRows ) {
+								var index = 0;
+								for (var j = range.bbox.c1; j <= range.bbox.c2; j++) {
+								
+									var cell = graphicObject.chart.range.intervalObject.worksheet.getCell(new CellAddress(range.bbox.r1, j, 0));
+									cell.setNumFormat(data.NumCache[index].numFormatStr);
+									cell.setValue(data.NumCache[index].val);
+									index++;
 								}
-								else {
-									var index = 0;
-									for (var j = range.bbox.r1; j <= range.bbox.r2; j++) {
-									
-										var cell = graphicObject.chart.range.intervalObject.worksheet.getCell(new CellAddress(j, range.bbox.c1, 0));
-										cell.setNumFormat(data.NumCache[index].numFormatStr);
-										cell.setValue(data.NumCache[index].val);
-										index++;
-									}
+							}
+							else {
+								var index = 0;
+								for (var j = range.bbox.r1; j <= range.bbox.r2; j++) {
+								
+									var cell = graphicObject.chart.range.intervalObject.worksheet.getCell(new CellAddress(j, range.bbox.c1, 0));
+									cell.setNumFormat(data.NumCache[index].numFormatStr);
+									cell.setValue(data.NumCache[index].val);
+									index++;
 								}
 							}
 						}
 					}
-				
-					for (var i = 0; i < seriesCount; i++) {
-						
-						if ( graphicObject.chart.series[i].TxCache.Formula ) {
-							var range = convertFormula(graphicObject.chart.series[i].TxCache.Formula, worksheet);
-							if ( range ) {
-								var cell = graphicObject.chart.range.intervalObject.worksheet.getCell(new CellAddress(range.bbox.r1, range.bbox.c1, 0));
-								cell.setNumFormat("General");
-								cell.setValue(graphicObject.chart.series[i].TxCache.Tx);
-							}
+				}
+			
+				for (var i = 0; i < seriesCount; i++) {
+					
+					if ( graphicObject.chart.series[i].TxCache.Formula ) {
+						var range = convertFormula(graphicObject.chart.series[i].TxCache.Formula, worksheet);
+						if ( range ) {
+							var cell = graphicObject.chart.range.intervalObject.worksheet.getCell(new CellAddress(range.bbox.r1, range.bbox.c1, 0));
+							cell.setNumFormat("General");
+							cell.setValue(graphicObject.chart.series[i].TxCache.Tx);
 						}
-						
-						restoreDataRange(graphicObject.chart.series[i].Val, graphicObject.chart.range.rows);
-						restoreDataRange(graphicObject.chart.series[i].xVal, graphicObject.chart.range.rows);
-						restoreDataRange(graphicObject.chart.series[i].Cat, graphicObject.chart.range.rows);
 					}
+					
+					restoreDataRange(graphicObject.chart.series[i].Val, graphicObject.chart.range.rows);
+					restoreDataRange(graphicObject.chart.series[i].xVal, graphicObject.chart.range.rows);
+					restoreDataRange(graphicObject.chart.series[i].Cat, graphicObject.chart.range.rows);
 				}
-				else {
-					var aCells = graphicObject.chart.range.intervalObject.getCells();
-					for ( var i = 0; i < aCells.length; i++ ) {
-						aCells[i].setValue( (i + 1).toString() );
-					}
+			}
+			else {
+				var aCells = graphicObject.chart.range.intervalObject.getCells();
+				for ( var i = 0; i < aCells.length; i++ ) {
+					aCells[i].setValue( (i + 1).toString() );
 				}
-				worksheet._updateCellsRange(graphicObject.chart.range.intervalObject.getBBox0());
-				History.TurnOn();
-			/*}
-			catch (e) {
-				e.message = "Error paste chart";
-				Exception(e);
-			}*/	
+			}
+			worksheet._updateCellsRange(graphicObject.chart.range.intervalObject.getBBox0());
+			History.TurnOn();
 		}
 	}
 
@@ -4258,6 +4274,8 @@ function DrawingObjects() {
 		
 			scrollOffset.x -= x_px;
 			scrollOffset.y -= y_px;
+			scrollOffset.x0 -= x_px;
+			scrollOffset.y0 -= y_px;
 
 			shapeCtx.m_oCoordTransform.tx = scrollOffset.x;
 			shapeCtx.m_oCoordTransform.ty = scrollOffset.y;
