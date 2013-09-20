@@ -1138,7 +1138,7 @@ function BinaryChartWriter(memory)
 		if(null != nIndex)
 			this.bs.WriteItem(c_oSer_ChartSeriesType.Index, function(){oThis.memory.WriteLong(nIndex);});
 		if(null != seria.bShowValue)
-			this.bs.WriteItem(c_oSer_ChartSeriesType.DataLabels, function(){oThis.memory.WriteDataLabels(seria);});
+			this.bs.WriteItem(c_oSer_ChartSeriesType.DataLabels, function(){oThis.WriteDataLabels(seria);});
 		if(null != seria.OutlineColor)
 		{
 			var oSolidFill = new CSolidFill();
