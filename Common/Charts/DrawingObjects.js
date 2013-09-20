@@ -3397,6 +3397,7 @@ function DrawingObjects() {
 	
 	_this.addImageDrawingObject = function(imageUrl, options) {
 
+		_this.controller.resetSelection();
 		if ( imageUrl && !_this.isViewerMode() ) {
 			
 			var _image = api.ImageLoader.LoadImage(imageUrl, 1);
@@ -4589,7 +4590,6 @@ function DrawingObjects() {
 				if ( headers.bTop && (bbox.r1 + 1 - fvr > 0) && (bbox.c2 + 1 - fvc > 0) && (bbox.r1 != bbox.r2) ) {
 					
 					var y = worksheet.getCellTop(bbox.r1 + 1, 1) - worksheet.getCellTop(fvr, 1) + worksheet.getCellTop(0, 1);
-					var h = y;
 					
 					var bHide = bbox.c1 - fvc < 0;
 					var x = ( bHide ? 0 : worksheet.getCellLeft(bbox.c1, 1) - worksheet.getCellLeft(fvc, 1) ) + worksheet.getCellLeft(0, 1);
@@ -4598,14 +4598,13 @@ function DrawingObjects() {
 					overlayCtx.setStrokeStyle(strokeColor);
 					overlayCtx.beginPath();
 					overlayCtx.moveTo(x, y, -0.5, -0.5);
-					overlayCtx.lineTo(x + w, h, -0.5, -0.5);
+					overlayCtx.lineTo(x + w, y, -0.5, -0.5);
 					overlayCtx.stroke();
 				}
 				// Left
 				if ( headers.bLeft && (bbox.c1 + 1 - fvc > 0) && (bbox.r2 + 1 - fvr > 0) && (bbox.c1 != bbox.c2) ) {
 					
 					var x = worksheet.getCellLeft(bbox.c1 + 1, 1) - worksheet.getCellLeft(fvc, 1) + worksheet.getCellLeft(0, 1);
-					var w = x;
 					
 					var bHide = bbox.r1 - fvr < 0;
 					var y = ( bHide ? 0 : worksheet.getCellTop(bbox.r1, 1) - worksheet.getCellTop(fvr, 1) ) + worksheet.getCellTop(0, 1);
@@ -4614,7 +4613,7 @@ function DrawingObjects() {
 					overlayCtx.setStrokeStyle(strokeColor);
 					overlayCtx.beginPath();
 					overlayCtx.moveTo(x, y, -0.5, -0.5);
-					overlayCtx.lineTo(w, y + h, -0.5, -0.5);
+					overlayCtx.lineTo(x, y + h, -0.5, -0.5);
 					overlayCtx.stroke();
 				}
 					
