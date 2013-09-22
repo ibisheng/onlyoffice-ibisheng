@@ -2671,7 +2671,7 @@ function CBinaryFileWriter()
         oThis.WriteUChar(g_nodeAttributeStart);
 
         var _marg = cell.Pr.TableCellMar;
-        if (_marg !== undefined && null != _marg)
+        if (_marg !== undefined && null != _marg && null != _marg.Left && null != _marg.Top && null != _marg.Right && null != _marg.Bottom)
         {
             oThis._WriteInt1(0, (_marg.Left.W * 36000) >> 0);
             oThis._WriteInt1(1, (_marg.Top.W * 36000) >> 0);

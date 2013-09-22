@@ -1562,6 +1562,7 @@ Slide.prototype =
             case historyitem_SetLayout:
             {
                 this.Layout = data.oldLayout;
+                this.recalcAll();
                 break;
             }
             case historyitem_SetSlideNum:
@@ -1662,6 +1663,7 @@ Slide.prototype =
             case historyitem_SetLayout:
             {
                 this.Layout = data.newLayout;
+                this.recalcAll();
                 break;
             }
             case historyitem_SetSlideNum:
@@ -1901,6 +1903,7 @@ Slide.prototype =
                 {
                     this.Layout = null;
                 }
+                this.recalcAll();
                 break;
             }
             case historyitem_SetSlideNum:

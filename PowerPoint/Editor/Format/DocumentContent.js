@@ -2083,23 +2083,11 @@ CDocumentContent.prototype =
         }
     },
 
-    Document_UpdateRulersState : function(CurPage)
+    Document_UpdateRulersState : function(CurPage, margins)
     {
-        if ( docpostype_DrawingObjects === this.CurPos.Type )
-            this.LogicDocument.DrawingObjects.documentUpdateRulersState(CurPage);
-        else //if ( docpostype_Content === this.CurPos.Type )
+        if ( docpostype_Content == this.CurPos.Type )
         {
-            if ( true === this.Selection.Use )
-            {
-                if ( this.Selection.StartPos == this.Selection.EndPos && type_Table === this.Content[this.Selection.StartPos].GetType() )
-                    this.Content[this.Selection.StartPos].Document_UpdateRulersState(CurPage);
-            }
-            else
-            {
-                var Item = this.Content[this.CurPos.ContentPos];
-                if ( type_Table === Item.GetType() )
-                    Item.Document_UpdateRulersState(CurPage);
-            }
+            return this.DrawingDocument.Set_RulerState_Paragraph( null , margins);
         }
     },
 

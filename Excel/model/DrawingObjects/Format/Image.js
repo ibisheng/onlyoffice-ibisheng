@@ -634,8 +634,8 @@ CImageShape.prototype =
 
 	getImageUrl: function()
     {
-        if(isRealObject(this.blipFill))
-            return this.blipFill.RasterImageId;
+        if(isRealObject(this.blipFill) && this.blipFill.fill instanceof CBlipFill && typeof this.blipFill.fill.RasterImageId === "string" )
+            return this.blipFill.fill.RasterImageId;
         return null;
     },
 

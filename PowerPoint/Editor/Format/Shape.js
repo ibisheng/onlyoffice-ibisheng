@@ -589,6 +589,26 @@ CShape.prototype =
         return this.compiledFill;
     },
 
+    getMargins :  function()
+    {
+        if(this.txBody)
+        {
+            return this.txBody.getMargins()
+        }
+        else
+        {
+            return null;
+        }
+    },
+
+    Document_UpdateRulersState : function(margins)
+    {
+        if(this.txBody && this.txBody.content)
+        {
+            this.txBody.content.Document_UpdateRulersState(this.parent.num, this.getMargins());
+        }
+    },
+
     getCompiledLine: function()
     {
         if(this.recalcInfo.recalculateLine)
@@ -2204,8 +2224,9 @@ CShape.prototype =
     {
         if(!isRealObject(this.txBody))
         {
-            this.addTextBody(new CTextBody(this));
+            this.setTextBody(new CTextBody(this));
             this.recalculateContent();
+
         }
         this.txBody.content.Paragraph_Add(paraItem, false);
         this.txBody.content.RecalculateCurPos();
@@ -2443,7 +2464,6 @@ CShape.prototype =
 
     addTextBody: function(txBody)
     {
-        this.txBody = txBody;
     },
 
     recalculateCurPos: function()
@@ -3263,6 +3283,10 @@ CShape.prototype =
             }
         }
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+        if(!this.parent)
+        {
+            delete editor.WordControl.m_oLogicDocument.recalcMap[this.Id];
+        }
     },
 
     Redo: function(data)
@@ -3389,6 +3413,10 @@ CShape.prototype =
             }
         }
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+        if(!this.parent)
+        {
+            delete editor.WordControl.m_oLogicDocument.recalcMap[this.Id];
+        }
     },
 
     Save_Changes: function(data, w)
@@ -3680,6 +3708,10 @@ CShape.prototype =
 
             }
             editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+            if(!this.parent)
+            {
+                delete editor.WordControl.m_oLogicDocument.recalcMap[this.Id];
+            }
         }
     },
 

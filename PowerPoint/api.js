@@ -230,7 +230,6 @@ asc_docs_api.prototype._coAuthoringInit = function (docId, user) {
 
             for(var i = 0; i < classes.length; ++i)
             {
-
                 var Class = g_oTableId.Get_ById(classes[i]);// g_oTableId.Get_ById( Id );
                 if ( null != Class )
                 {
@@ -278,8 +277,31 @@ asc_docs_api.prototype._coAuthoringInit = function (docId, user) {
                 }
                 else
                 {
-                    CollaborativeEditing.Add_NeedLock(classes[i], e["user"]);
+                    if(classes[i].indexOf("new_object") > -1 && block_value["type"] === c_oAscLockTypeElemPresentation.Object)
+                    {
+                        var slide_id = block_value["slideId"];
+                        var delete_lock = g_oTableId.Get_ById(slide_id);
+                        if(isRealObject(delete_lock))
+                        {
+                            var Lock = delete_lock.Lock;
+                            var OldType = Lock.Get_Type();
+                            if ( locktype_Other2 === OldType || locktype_Other3 === OldType )
+                                Lock.Set_Type( locktype_Other3, true );
+                            else
+                                Lock.Set_Type( locktype_Other, true );
+                            editor.WordControl.m_oLogicDocument.DrawingDocument.LockSlide(g_oTableId.Get_ById(delete_lock.objectId).num);
+                        }
+                        else
+                        {
+                            CollaborativeEditing.Add_NeedLock(slide_id, e["user"]);
+                        }
+                    }
+                    else
+                    {
+                        CollaborativeEditing.Add_NeedLock(classes[i], e["user"]);
+                    }
                 }
+
                 // TODO: эвент о пришедших lock-ах
             }
 		}

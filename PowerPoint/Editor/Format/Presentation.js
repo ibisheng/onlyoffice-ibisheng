@@ -1078,38 +1078,41 @@ CPresentation.prototype =
 
     Add_FlowTable : function(Cols, Rows)
     {
-        var X = 0;
-        var Y = 0;
+        if(this.Document_Is_SelectionLocked(changestype_AddSp) === false)
+        {
+            var X = 0;
+            var Y = 0;
 
-        var W = this.Width*2/3;
-        var Grid = [];
+            var W = this.Width*2/3;
+            var Grid = [];
 
-        for ( var Index = 0; Index < Cols; Index++ )
-            Grid[Index] = W / Cols;
+            for ( var Index = 0; Index < Cols; Index++ )
+                Grid[Index] = W / Cols;
 
-        var _cur_slide = this.Slides[this.CurPage];
-        var _graphic_frame = new CGraphicFrame(_cur_slide);
-        _graphic_frame.setXfrm((this.Width - W)/2, this.Height/5, W, 7.478268771701388 * Rows, null, null, null);
-        _graphic_frame.setParent(_cur_slide);
-        _graphic_frame.nvGraphicFramePr = new UniNvPr();
+            var _cur_slide = this.Slides[this.CurPage];
+            var _graphic_frame = new CGraphicFrame(_cur_slide);
+            _graphic_frame.setXfrm((this.Width - W)/2, this.Height/5, W, 7.478268771701388 * Rows, null, null, null);
+            _graphic_frame.setParent(_cur_slide);
+            _graphic_frame.setNvSpPr(new UniNvPr());
 
-        if (this.globalTableStyles.length == 0)
-            this.globalTableStyles[0] = CreateDefaultStylesForTables();
+            if (this.globalTableStyles.length == 0)
+                this.globalTableStyles[0] = CreateDefaultStylesForTables();
 
-        var _table = new CTable(this.DrawingDocument, _graphic_frame/*Parent*/, false/*Inline*/, 0/*PageNum*/, 0/*X*/, 0/*Y*/, W/*XLimit*/, 100/*YLimit*/, Rows, Cols, Grid);
-        _table.Set_Inline(true);
-        _table.styleIndex = 0;
-        _graphic_frame.graphicObject = _table;
-        _graphic_frame.selected = true;
-        this.Slides[this.CurPage].addToSpTreeToPos(this.Slides[this.CurPage].cSld.spTree.length, _graphic_frame);
-        editor.WordControl.m_oLogicDocument.recalcMap[_graphic_frame.Id] = _graphic_frame;
+            var _table = new CTable(this.DrawingDocument, _graphic_frame/*Parent*/, false/*Inline*/, 0/*PageNum*/, 0/*X*/, 0/*Y*/, W/*XLimit*/, 100/*YLimit*/, Rows, Cols, Grid);
+            _table.Set_Inline(true);
+            _table.setStyleIndex(0);
+            _graphic_frame.setGraphicObject(_table);
+            _graphic_frame.selected = true;
+            this.Slides[this.CurPage].addToSpTreeToPos(this.Slides[this.CurPage].cSld.spTree.length, _graphic_frame);
+            editor.WordControl.m_oLogicDocument.recalcMap[_graphic_frame.Id] = _graphic_frame;
 
-        this.Recalculate();
-        this.DrawingDocument.OnRecalculatePage(this.CurPage, _cur_slide);
-        this.DrawingDocument.UpdateTargetTransform(_graphic_frame.TransformMatrix);
-        this.Document_UpdateInterfaceState();
-        this.Document_UpdateRulersState();
-        this.Document_UpdateSelectionState();
+            this.Recalculate();
+            this.DrawingDocument.OnRecalculatePage(this.CurPage, _cur_slide);
+            this.DrawingDocument.UpdateTargetTransform(_graphic_frame.TransformMatrix);
+            this.Document_UpdateInterfaceState();
+            this.Document_UpdateRulersState();
+            this.Document_UpdateSelectionState();
+        }
     },
 
     Add_InlineTable : function(Cols, Rows)
@@ -3761,6 +3764,7 @@ CPresentation.prototype =
     {
         this.CurPage = PageIndex;
         this.Slides[this.CurPage].onMouseMove(e, X, Y);
+        this.Slides[this.CurPage].graphicObjects.Update_CursorType(X, Y,  e );
         //this.Update_CursorType( X, Y, PageIndex, e );
         return;
         return;
@@ -4394,34 +4398,53 @@ CPresentation.prototype =
 //-----------------------------------------------------------------------------------
     Table_AddRow : function(bBefore)
     {
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
+        if( this.Slides[this.CurPage].graphicObjects.State.textObject instanceof CGraphicFrame)
         {
-            this.HdrFtr.Table_AddRow(bBefore);
-        }
-        else if ( docpostype_DrawingObjects === this.CurPos.Type )
-        {
-            this.DrawingObjects.tableAddRow(bBefore);
-        }
-        else if ( docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType() ) ) )
-        {
-            var Pos = 0;
-            if ( true === this.Selection.Use )
-                Pos = this.Selection.StartPos;
-            else
-                Pos = this.CurPos.ContentPos;
-
-            this.Content[Pos].Row_Add( bBefore );
-
-            if ( false === this.Selection.Use && true === this.Content[Pos].Is_SelectionUse() )
+            var _cur_object = this.Slides[this.CurPage].graphicObjects.State.textObject;
+            if(_cur_object instanceof  CGraphicFrame && _cur_object.graphicObject instanceof CTable)
             {
-                this.Selection.Use      = true;
-                this.Selection.StartPos = Pos;
-                this.Selection.EndPos   = Pos;
+                _cur_object.graphicObject.Row_Add(bBefore);
+                this.Recalculate();
+                this.DrawingDocument.OnRecalculatePage(this.CurPage, this.Slides[this.CurPage]);
             }
-
-            this.ContentLastChangePos = Pos;
-            this.Recalculate();
+        }
+        else
+        {
+            var _elements = this.Slides[this.CurPage].graphicObjects;
+            if(_elements.State.id === STATES_ID_NULL)
+            {
+                var _shapes = this.Slides[this.CurPage].cSld.spTree;
+                var _shape_index;
+                var _shape_count = _shapes.length;
+                var _selected_count = 0;
+                var _target_table = null;
+                for(_shape_index = 0; _shape_index < _shape_count; ++_shape_index)
+                {
+                    if(_shapes[_shape_index].selected)
+                    {
+                        ++_selected_count;
+                        if(_selected_count > 1)
+                        {
+                            return;
+                        }
+                        if(_shapes[_shape_index] instanceof  CGraphicFrame && _shapes[_shape_index].graphicObject instanceof  CTable)
+                        {
+                            _target_table = _shapes[_shape_index].graphicObject;
+                        }
+                        else
+                        {
+                            return;
+                        }
+                    }
+                }
+                if(_target_table !== null)
+                {
+                    _elements.changeCurrentState(new TextAddState(_elements, this.Slides[this.CurPage], _target_table.Parent));
+                    _target_table.Row_Add(bBefore);
+                    this.Recalculate();
+                    this.DrawingDocument.OnRecalculatePage(this.CurPage, this.Slides[this.CurPage]);
+                }
+            }
         }
         this.Document_UpdateSelectionState();
         this.Document_UpdateInterfaceState();
@@ -4429,65 +4452,71 @@ CPresentation.prototype =
 
     Table_AddCol : function(bBefore)
     {
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
+        if( this.Slides[this.CurPage].graphicObjects.State.textObject instanceof CGraphicFrame)
         {
-            this.HdrFtr.Table_AddCol(bBefore);
-        }
-        else if ( docpostype_DrawingObjects === this.CurPos.Type )
-        {
-            this.DrawingObjects.tableAddCol(bBefore);
-        }
-        else if ( docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType() ) ) )
-        {
-            var Pos = 0;
-            if ( true === this.Selection.Use )
-                Pos = this.Selection.StartPos;
-            else
-                Pos = this.CurPos.ContentPos;
-
-            this.Content[Pos].Col_Add( bBefore );
-
-            if ( false === this.Selection.Use && true === this.Content[Pos].Is_SelectionUse() )
+            var _cur_object = this.Slides[this.CurPage].graphicObjects.State.textObject;
+            if(_cur_object instanceof  CGraphicFrame && _cur_object.graphicObject instanceof CTable)
             {
-                this.Selection.Use      = true;
-                this.Selection.StartPos = Pos;
-                this.Selection.EndPos   = Pos;
+                _cur_object.graphicObject.Col_Add(bBefore);
+                this.Recalculate();
+                this.DrawingDocument.OnRecalculatePage(this.CurPage, this.Slides[this.CurPage]);
             }
-
-            this.ContentLastChangePos = Pos;
-            this.Recalculate();
         }
-
+        else
+        {
+            var _elements = this.Slides[this.CurPage].graphicObjects;
+            if(_elements.State.id === STATES_ID_NULL)
+            {
+                var _shapes = this.Slides[this.CurPage].cSld.spTree;
+                var _shape_index;
+                var _shape_count = _shapes.length;
+                var _selected_count = 0;
+                var _target_table = null;
+                for(_shape_index = 0; _shape_index < _shape_count; ++_shape_index)
+                {
+                    if(_shapes[_shape_index].selected)
+                    {
+                        ++_selected_count;
+                        if(_selected_count > 1)
+                        {
+                            return;
+                        }
+                        if(_shapes[_shape_index] instanceof  CGraphicFrame && _shapes[_shape_index].graphicObject instanceof  CTable)
+                        {
+                            _target_table = _shapes[_shape_index].graphicObject;
+                        }
+                        else
+                        {
+                            return;
+                        }
+                    }
+                }
+                if(_target_table !== null)
+                {
+                    _elements.changeCurrentState(new TextAddState(_elements, this.Slides[this.CurPage], _target_table.Parent));
+                    _target_table.Col_Add(bBefore);
+                    this.Recalculate();
+                    this.DrawingDocument.OnRecalculatePage(this.CurPage, this.Slides[this.CurPage]);
+                }
+            }
+        }
         this.Document_UpdateSelectionState();
         this.Document_UpdateInterfaceState();
     },
 
     Table_RemoveRow : function()
     {
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
+        var _cur_object = this.Slides[this.CurPage].graphicObjects.State.textObject;
+        if(_cur_object instanceof  CGraphicFrame && _cur_object.graphicObject instanceof CTable)
         {
-            this.HdrFtr.Table_RemoveRow();
-        }
-        else if ( docpostype_DrawingObjects == this.CurPos.Type )
-        {
-            this.DrawingObjects.tableRemoveRow();
-        }
-        else if ( docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType() ) ) )
-        {
-            var Pos = 0;
-            if ( true === this.Selection.Use )
-                Pos = this.Selection.StartPos;
-            else
-                Pos = this.CurPos.ContentPos;
-
-            if ( false === this.Content[Pos].Row_Remove() )
-                this.Table_RemoveTable();
+            if(_cur_object.graphicObject.Row_Remove() === false)
+            {
+                this.Table_RemoveTable(true);
+            }
             else
             {
-                this.ContentLastChangePos = Pos;
                 this.Recalculate();
+                this.DrawingDocument.OnRecalculatePage(this.CurPage, this.Slides[this.CurPage]);
             }
         }
         this.Document_UpdateSelectionState();
@@ -4496,209 +4525,139 @@ CPresentation.prototype =
 
     Table_RemoveCol : function()
     {
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
+        var _cur_object = this.Slides[this.CurPage].graphicObjects.State.textObject;
+        if(_cur_object instanceof  CGraphicFrame && _cur_object.graphicObject instanceof CTable)
         {
-            this.HdrFtr.Table_RemoveCol();
-        }
-        else if ( docpostype_DrawingObjects === this.CurPos.Type )
-        {
-            this.DrawingObjects.tableRemoveCol();
-        }
-        else if ( docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType() ) ) )
-        {
-            var Pos = 0;
-            if ( true === this.Selection.Use )
-                Pos = this.Selection.StartPos;
-            else
-                Pos = this.CurPos.ContentPos;
-
-            if ( false === this.Content[Pos].Col_Remove() )
-                this.Table_RemoveTable();
+            if(_cur_object.graphicObject.Col_Remove() === false)
+            {
+                this.Table_RemoveTable(true);
+            }
             else
             {
-                this.ContentLastChangePos = Pos;
                 this.Recalculate();
+                this.DrawingDocument.OnRecalculatePage(this.CurPage, this.Slides[this.CurPage]);
             }
         }
+
         this.Document_UpdateSelectionState();
         this.Document_UpdateInterfaceState();
     },
 
     Table_MergeCells : function()
     {
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
+        var _cur_object = this.Slides[this.CurPage].graphicObjects.State.textObject;
+        if(_cur_object instanceof CGraphicFrame)
         {
-            this.HdrFtr.Table_MergeCells()
-        }
-        else if ( docpostype_DrawingObjects === this.CurPos.Type )
-        {
-            this.DrawingObjects.tableMergeCells();
-        }
-        else if ( docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType() ) ) )
-        {
-            var Pos = 0;
-            if ( true === this.Selection.Use )
-                Pos = this.Selection.StartPos;
-            else
-                Pos = this.CurPos.ContentPos;
+            if(_cur_object.graphicObject !== null && typeof _cur_object.graphicObject === "object" && typeof _cur_object.graphicObject.Cell_Merge === "function")
+            {
+                _cur_object.graphicObject.Cell_Merge();
+                this.Recalculate(0);
+                this.DrawingDocument.OnRecalculatePage(this.CurPage, this.Slides[this.CurPage]);
+                this.Document_UpdateSelectionState();
 
-            this.Content[Pos].Cell_Merge();
-            this.ContentLastChangePos = Pos;
-            this.Recalculate();
+            }
         }
-
-        this.Document_UpdateSelectionState();
-        this.Document_UpdateInterfaceState();
     },
 
     Table_SplitCell : function( Cols, Rows )
     {
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
+        var _cur_object = this.Slides[this.CurPage].graphicObjects.State.textObject;
+        if(_cur_object.graphicObject !== null && typeof _cur_object.graphicObject === "object" && typeof _cur_object.graphicObject.Cell_Split === "function")
         {
-            this.HdrFtr.Table_SplitCell(Cols, Rows);
-        }
-        else if ( docpostype_DrawingObjects === this.CurPos.Type )
-        {
-            this.DrawingObjects.tableSplitCell(Cols, Rows);
-        }
-        else if ( docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType() ) ) )
-        {
-            var Pos = 0;
-            if ( true === this.Selection.Use )
-                Pos = this.Selection.StartPos;
-            else
-                Pos = this.CurPos.ContentPos;
 
-            this.Content[Pos].Cell_Split(Rows, Cols);
-            this.ContentLastChangePos = Pos;
+            _cur_object.graphicObject.Cell_Split( Cols, Rows);
             this.Recalculate();
-        }
-
-        this.Document_UpdateSelectionState();
-        this.Document_UpdateInterfaceState();
-    },
-
-    Table_RemoveTable : function()
-    {
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-            return this.HdrFtr.Table_RemoveTable();
-        else if ( docpostype_DrawingObjects === this.CurPos.Type )
-            return this.DrawingObjects.tableRemoveTable();
-        else if ( docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType() ) ) )
-        {
-            var Pos;
-            if ( true === this.Selection.Use )
-                Pos = this.Selection.StartPos;
-            else
-                Pos = this.CurPos.ContentPos;
-
-            var Table = this.Content[Pos];
-            if ( true === Table.Is_InnerTable() )
-                Table.Remove_InnerTable();
-            else
-            {
-                this.Selection_Remove();
-                Table.PreDelete();
-                this.Internal_Content_Remove( Pos, 1 );
-
-                if ( Pos >= this.Content.length - 1 )
-                    Pos--;
-
-                if ( Pos < 0 )
-                    Pos = 0;
-
-                this.CurPos.Type = docpostype_Content;
-                this.CurPos.ContentPos = Pos;
-                this.Content[Pos].Cursor_MoveToStartPos();
-
-                this.ContentLastChangePos = Pos;
-                this.Recalculate();
-            }
-
+            this.DrawingDocument.OnRecalculatePage(this.CurPage, this.Slides[this.CurPage]);
             this.Document_UpdateSelectionState();
             this.Document_UpdateInterfaceState();
-            this.Document_UpdateRulersState();
+            return;
         }
+        else
+        {
+            return;
+        }
+
+    },
+
+    Table_RemoveTable : function(bHistoryFlag)
+    {
+        if(this.Slides[this.CurPage].graphicObjects.State.textObject instanceof CGraphicFrame)
+        {
+            var gr_fr = this.Slides[this.CurPage].graphicObjects.State.textObject;
+            this.Slides[this.CurPage].graphicObjects.resetSelectionState();
+            gr_fr.select(this.Slides[this.CurPage].graphicObjects);
+            this.Remove(-1);
+        }
+        this.Document_UpdateSelectionState();
+        this.Document_UpdateUndoRedoState();
+        this.Document_UpdateInterfaceState();
     },
 
     Table_Select : function(Type)
     {
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
+        if(this.Slides[this.CurPage].graphicObjects.State.textObject && this.Slides[this.CurPage].graphicObjects.State.textObject instanceof CGraphicFrame)
         {
-            this.HdrFtr.Table_Select(Type);
+            this.Slides[this.CurPage].graphicObjects.State.textObject.graphicObject.Table_Select(Type);
+            this.Document_UpdateSelectionState();
+            this.Document_UpdateInterfaceState();
         }
-        else if ( docpostype_DrawingObjects == this.CurPos.Type )
-        {
-            this.DrawingObjects.tableSelect( Type );
-        }
-        else if ( docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType() ) ) )
-        {
-            var Pos = 0;
-            if ( true === this.Selection.Use )
-                Pos = this.Selection.StartPos;
-            else
-                Pos = this.CurPos.ContentPos;
-
-            this.Content[Pos].Table_Select(Type);
-            if ( false === this.Selection.Use && true === this.Content[Pos].Is_SelectionUse() )
-            {
-                this.Selection.Use      = true;
-                this.Selection.StartPos = Pos;
-                this.Selection.EndPos   = Pos;
-            }
-        }
-        this.Document_UpdateSelectionState();
-        this.Document_UpdateInterfaceState();
         //this.Document_UpdateRulersState();
     },
 
     Table_CheckMerge : function()
     {
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-            return this.HdrFtr.Table_CheckMerge();
-        else if ( docpostype_DrawingObjects == this.CurPos.Type )
+        if(this.Slides[this.CurPage].graphicObjects.State.textObject && this.Slides[this.CurPage].graphicObjects.State.textObject instanceof CGraphicFrame)
         {
-            return this.DrawingObjects.tableCheckMerge();
+            return this.Slides[this.CurPage].graphicObjects.State.textObject.graphicObject.Check_Merge();
         }
-        else if ( docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType() ) ) )
-        {
-            var Pos = 0;
-            if ( true === this.Selection.Use )
-                Pos = this.Selection.StartPos;
-            else
-                Pos = this.CurPos.ContentPos;
-
-            return this.Content[Pos].Check_Merge();
-        }
-
         return false;
     },
 
     Table_CheckSplit : function()
     {
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-            return this.HdrFtr.Table_CheckSplit();
-        else if ( docpostype_DrawingObjects === this.CurPos.Type )
-            return this.DrawingObjects.tableCheckSplit();
-        else if ( docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType() ) ) )
+        if(this.Slides[this.CurPage].graphicObjects.State.textObject && this.Slides[this.CurPage].graphicObjects.State.textObject instanceof CGraphicFrame)
         {
-            var Pos = 0;
-            if ( true === this.Selection.Use )
-                Pos = this.Selection.StartPos;
-            else
-                Pos = this.CurPos.ContentPos;
-
-            return this.Content[Pos].Check_Split();
+            return this.Slides[this.CurPage].graphicObjects.State.textObject.graphicObject.Check_Merge();
         }
-
-        return false;
+        else
+        {
+            var _elements = this.Slides[this.CurPage].graphicObjects;
+            if(_elements.State.id === STATES_ID_NULL)
+            {
+                var _selected_count = 0;
+                var _shapes = _elements.cSld.spTree;
+                var _shapes_count = _shapes.length;
+                var _shape_index;
+                var _check_split_table = null;
+                for(_shape_index = 0; _shape_index < _shapes_count; ++_shape_index)
+                {
+                    if(_shapes[_shape_index].selected )
+                    {
+                        ++_selected_count;
+                        if(_selected_count > 1)
+                        {
+                            return false;
+                        }
+                        if(_shapes[_shape_index] instanceof CGraphicFrame && _shapes[_shape_index].graphicObject instanceof CTable)
+                        {
+                            _check_split_table = _shapes[_shape_index].graphicObject;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                }
+                if(_check_split_table !== null && typeof _check_split_table === "object" && typeof _check_split_table.Check_Split === "function")
+                {
+                    return _check_split_table.Check_Split();
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
     },
 
     Check_TableCoincidence : function(Table)
@@ -5020,6 +4979,7 @@ CPresentation.prototype =
         }  */
 
         editor.sync_EndCatchSelectedElements();
+        this.Document_UpdateRulersState();
         this.Document_UpdateUndoRedoState();
         this.Document_UpdateCanAddHyperlinkState();
     },
@@ -5048,6 +5008,32 @@ CPresentation.prototype =
     // Обновляем линейки
     Document_UpdateRulersState : function()
     {
+        var g_o = this.Slides[this.CurPage].graphicObjects;
+        switch(g_o.State.id)
+        {
+            case STATES_ID_NULL:
+            {
+                if(g_o.selectedObjects.length === 1 && g_o.selectedObjects[0].Document_UpdateRulersState)
+                {
+                    g_o.selectedObjects[0].Document_UpdateRulersState();
+                    return;
+                }
+                break;
+            }
+            case STATES_ID_TEXT_ADD:
+            case STATES_ID_TEXT_ADD_IN_GROUP:
+            {
+                if(g_o.selectedObjects.length === 1 && g_o.selectedObjects[0].Document_UpdateRulersState)
+                {
+                    g_o.selectedObjects[0].Document_UpdateRulersState();
+                    return;
+                }
+                break;
+            }
+
+
+        }
+        this.DrawingDocument.Set_RulerState_Paragraph( null );
         return;
         // Работаем с колонтитулом
         if ( docpostype_HdrFtr === this.CurPos.Type )
@@ -5722,6 +5708,22 @@ CPresentation.prototype =
         }
     },
 
+    changeLayout: function(_array, MasterLayouts, layout_index)
+    {
+        if(this.Document_Is_SelectionLocked(changestype_Layout) === false)
+        {
+            var layout = MasterLayouts.sldLayoutLst[layout_index];
+            for(var i = 0; i < _array.length; ++i)
+            {
+                this.Slides[_array[i]].setLayout(layout);
+                this.Slides[_array[i]].recalcAll();
+                this.Slides[_array[i]].recalculate();
+                this.DrawingDocument.OnRecalculatePage(_array[i], this.Slides[_array[i]]);
+            }
+            this.DrawingDocument.OnEndRecalculate();
+        }
+    },
+
     changeTheme : function(themeInfo)
     {
         if(this.viewMode === true)
@@ -5794,7 +5796,7 @@ CPresentation.prototype =
             }
             _arr_new_layouts.push(_new_layout);
 
-            this.Slides[_slide_index].Layout = _new_layout;
+            this.Slides[_slide_index].setLayout(_new_layout);
         }
 
 
@@ -6124,7 +6126,7 @@ CPresentation.prototype =
         {
             if(cur_slide.deleteLock.Lock.Type !== locktype_Mine && cur_slide.deleteLock.Lock.Type !== locktype_None)
                 return true;
-            var generated_id = (new Date().getTime()) + editor.User.id;
+            /*var generated_id = "new_object" + (new Date().getTime()) + editor.User.id;
             var check_obj =
             {
                 "type": c_oAscLockTypeElemPresentation.Object,
@@ -6132,7 +6134,7 @@ CPresentation.prototype =
                 "objId": generated_id,
                 "guid": generated_id
             };
-            CollaborativeEditing.Add_CheckLock( check_obj );
+            CollaborativeEditing.Add_CheckLock( check_obj );*/
         }
 
         if(CheckType === changestype_MoveComment)
@@ -6234,6 +6236,20 @@ CPresentation.prototype =
             this.themeLock.Lock.Check(check_obj);
         }
 
+        if(CheckType === changestype_Layout)
+        {
+            var selected_slides = editor.WordControl.Thumbnails.GetSelectedArray();
+            for(var i = 0; i < selected_slides.length; ++i)
+            {
+                var check_obj =
+                {
+                    "type": c_oAscLockTypeElemPresentation.Slide,
+                    "val": this.Slides[selected_slides[i]].layoutLock.Get_Id(),
+                    "guid": this.Slides[selected_slides[i]].layoutLock.Get_Id()
+                };
+                this.Slides[selected_slides[i]].layoutLock.Lock.Check(check_obj);
+            }
+        }
         if(CheckType === changestype_ColorScheme)
         {
             var check_obj =

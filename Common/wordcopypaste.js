@@ -2464,21 +2464,7 @@ PasteProcessor.prototype =
         }
         else
         {
-            if ( docpostype_FlowObjects == oDocument.CurPos.Type )
-            {
-                var _cur_lide_elements = oDocument.Slides[oDocument.CurPage].elementsManipulator;
-                if(_cur_lide_elements.obj && _cur_lide_elements.obj.txBody && _cur_lide_elements.obj.txBody.content)
-                {
-                    oDocument = _cur_lide_elements.obj.txBody.content;
-                }
-                else
-                {
-                    if(_cur_lide_elements.obj && _cur_lide_elements.obj.graphicObject && _cur_lide_elements.obj.graphicObject.CurCell && _cur_lide_elements.obj.graphicObject.CurCell.Content)
-                    {
-                        oDocument = _cur_lide_elements.obj.graphicObject.CurCell.Content;
-                    }
-                }
-            }
+
         }
         return oDocument;
     },
@@ -2995,6 +2981,7 @@ PasteProcessor.prototype =
                 }
             }
 
+            var presentation = editor.WordControl.m_oLogicDocument;
             this.oRootNode = node;
             this._Prepeare(node,
                 function(){
@@ -3274,6 +3261,25 @@ PasteProcessor.prototype =
                     }
                 }
             }
+
+            this.oRootNode = node;
+            this._Prepeare(node,
+                function(){
+                     oThis.aContent = new Array();
+                     //�� ����� ���������� �������� ��� ������� ��������� �������
+                     oThis._Execute(node, {}, true, true, false);
+
+
+                     oThis._AddNextPrevToContent(oThis.oDocument);
+                     if(false == oThis.bNested)
+                     {
+                         oThis.InsertInDocument();
+                     }
+
+                     node.blur();
+                     node.style.display  = ELEMENT_DISPAY_STYLE;
+
+                });
 
         }
     },

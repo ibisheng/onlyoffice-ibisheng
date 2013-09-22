@@ -320,7 +320,10 @@ function NullState(drawingObjectsController, drawingObjects)
             }
         }
         this.drawingObjectsController.resetSelection();
-        this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
+        this.drawingObjectsController.stX = x;
+        this.drawingObjectsController.stY = y;
+        this.drawingObjectsController.selectionRect = {x : x, y : y, w: 0, h: 0};
+        this.drawingObjectsController.changeCurrentState(new TrackSelectionRect(this.drawingObjectsController, this.drawingObjects));
         this.drawingObjects.OnUpdateOverlay();
         editor.sync_BeginCatchSelectedElements();
         editor.sync_slidePropCallback(drawingObjects);
@@ -785,6 +788,70 @@ function NullState(drawingObjectsController, drawingObjects)
         }
     }
 }
+
+function TrackSelectionRect(drawingObjectsController, drawingObjects)
+{
+    this.drawingObjectsController = drawingObjectsController;
+    this.drawingObjects = drawingObjects;
+    this.onMouseDown = function(e, x, y)
+    {
+        return;
+    };
+    this.onMouseMove = function(e, x, y)
+    {
+        drawingObjectsController.selectionRect = {x : drawingObjectsController.stX, y : drawingObjectsController.stY, w : x - drawingObjectsController.stX, h : y - drawingObjectsController.stY};
+        editor.WordControl.m_oDrawingDocument.m_oWordControl.OnUpdateOverlay(true);
+    };
+    this.onMouseUp = function(e, x, y)
+    {
+        var _glyph_index;
+        var _glyphs_array = this.drawingObjects.cSld.spTree;
+        var _glyph, _glyph_transform;
+        var _xlt, _ylt, _xrt, _yrt, _xrb, _yrb, _xlb, _ylb;
+
+        var _rect_l = Math.min(this.drawingObjectsController.selectionRect.x, this.drawingObjectsController.selectionRect.x + this.drawingObjectsController.selectionRect.w);
+        var _rect_r = Math.max(this.drawingObjectsController.selectionRect.x, this.drawingObjectsController.selectionRect.x + this.drawingObjectsController.selectionRect.w);
+        var _rect_t = Math.min(this.drawingObjectsController.selectionRect.y, this.drawingObjectsController.selectionRect.y + this.drawingObjectsController.selectionRect.h);
+        var _rect_b = Math.max(this.drawingObjectsController.selectionRect.y, this.drawingObjectsController.selectionRect.y + this.drawingObjectsController.selectionRect.h);
+        for(_glyph_index = 0; _glyph_index < _glyphs_array.length; ++_glyph_index)
+        {
+            _glyph = _glyphs_array[_glyph_index];
+            _glyph_transform = _glyph.transform;
+
+            _xlt = _glyph_transform.TransformPointX(0, 0);
+            _ylt = _glyph_transform.TransformPointY(0, 0);
+
+            _xrt = _glyph_transform.TransformPointX( _glyph.extX, 0);
+            _yrt = _glyph_transform.TransformPointY( _glyph.extX, 0);
+
+            _xrb = _glyph_transform.TransformPointX( _glyph.extX, _glyph.extY);
+            _yrb = _glyph_transform.TransformPointY( _glyph.extX, _glyph.extY);
+
+            _xlb = _glyph_transform.TransformPointX(0, _glyph.extY);
+            _ylb = _glyph_transform.TransformPointY(0, _glyph.extY);
+
+            if((_xlb >= _rect_l && _xlb <= _rect_r) && (_xrb >= _rect_l && _xrb <= _rect_r)
+                && (_xlt >= _rect_l && _xlt <= _rect_r) && (_xrt >= _rect_l && _xrt <= _rect_r) &&
+                (_ylb >= _rect_t && _ylb <= _rect_b) && (_yrb >= _rect_t && _yrb <= _rect_b)
+                && (_ylt >= _rect_t && _ylt <= _rect_b) && (_yrt >= _rect_t && _yrt <= _rect_b))
+            {
+                _glyph.select(this.drawingObjectsController);
+            }
+        }
+        this.drawingObjectsController.selectionRect = null;
+        this.drawingObjectsController.changeCurrentState(new NullState(this.drawingObjectsController, this.drawingObjects));
+        editor.WordControl.m_oDrawingDocument.m_oWordControl.OnUpdateOverlay(true);
+        editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
+    };
+
+    this.drawSelection = function(drawingDocument)
+    {
+        var rect = this.drawingObjectsController.selectionRect;
+        drawingDocument.DrawTrackSelectShapes(rect.x, rect.y, rect.w, rect.h);
+    };
+
+}
+
 
 function PreMoveCommentState(drawingObjectsController, drawingObjects, startX, startY)
 {

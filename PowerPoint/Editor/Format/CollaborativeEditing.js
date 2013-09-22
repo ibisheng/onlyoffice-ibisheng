@@ -1121,6 +1121,8 @@ var changestype_SlideTiming          = 67; // Изменение цветово�
 var changestype_MoveComment          = 68;
 var changestype_AddSp                = 69;
 var changestype_AddComment           = 70;
+var changestype_Layout               = 71;
+
 
 
 

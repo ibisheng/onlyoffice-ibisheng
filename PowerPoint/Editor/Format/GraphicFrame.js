@@ -15,7 +15,7 @@ function CGraphicFrame(parent)
     this.recalcInfo =
     {
         recalculateTransform: true,
-        recalculateSizes: false
+        recalculateSizes: true
 };
 
     this.x = null;
@@ -39,6 +39,44 @@ CGraphicFrame.prototype =
         this.graphicObject = graphicObject;
     },
 
+    setNvSpPr: function(pr)
+    {
+        History.Add(this, {Type: historyitem_SetSetNvSpPr, oldPr: this.nvGraphicFramePr, newPr: pr});
+        this.nvGraphicFramePr = pr;
+    },
+
+
+    Set_Props: function(props)
+    {
+        if(this.graphicObject)
+        {
+            this.graphicObject.Set_Props(props);
+            this.OnContentRecalculate();
+            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+        }
+    },
+
+
+    pointInSelectedText: function(x, y)
+    {
+        if(this.graphicObject)
+        {
+            var tx = this.invertTransform.TransformPointX(x, y);
+            var ty = this.invertTransform.TransformPointY(x, y);
+            return this.graphicObject.Selection_Check(tx, ty, this.parent.num);
+        }
+        return false;
+    },
+
+    updateCursorType: function(x, y, e)
+    {
+        var tx = this.invertTransform.TransformPointX(x, y);
+        var ty = this.invertTransform.TransformPointY(x, y);
+        this.graphicObject.Update_CursorType(tx, ty, 0)
+    },
+    sendMouseData: function()
+    {},
+
     Get_Id: function()
     {
         return this.Id;
@@ -47,10 +85,12 @@ CGraphicFrame.prototype =
     {
         if(isRealObject(this.graphicObject))
         {
-            this.graphicObject.Recalculate_Page(0);
             this.graphicObject.X = 0;
             this.graphicObject.Y = 0;
+            this.graphicObject.PageNum = 0;
+            this.graphicObject.Recalculate_Page(0);
         }
+
         if(this.recalcInfo.recalculateSizes)
         {
             this.recalculateSizes();
@@ -64,12 +104,20 @@ CGraphicFrame.prototype =
 
     },
 
+    onParagraphChanged: function()
+    {
+        this.recalcInfo.recalculateSizes = true;
+        this.recalcInfo.recalculateTransform = true;
+        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+    },
+
     recalculateSizes: function()
     {
         this.graphicObject.XLimit -= this.graphicObject.X;
         this.graphicObject.YLimit -= this.graphicObject.Y;
         this.graphicObject.X = 0;
         this.graphicObject.Y = 0;
+        this.graphicObject.X_origin = 0;
         var _page_bounds = this.graphicObject.Get_PageBounds(0);
         this.spPr.xfrm.extY = _page_bounds.Bottom - _page_bounds.Top;
         this.spPr.xfrm.extX = _page_bounds.Right - _page_bounds.Left;
@@ -114,8 +162,24 @@ CGraphicFrame.prototype =
         return this.graphicObject instanceof CTable;
     },
 
+    recalcAllColors: function()
+    {
+        this.graphicObject.Recalc_CompiledPr();
+    },
+
+    recalcAll: function()
+    {
+        this.recalcInfo =
+        {
+            recalculateTransform: true,
+            recalculateSizes: true
+        };
+        this.graphicObject.Recalc_CompiledPr();
+    },
+
     getTransformMatrix: function()
     {
+        return this.transform;
         if(this.recalcInfo.recalculateTransform)
         {
             this.recalculateTransform();
@@ -329,7 +393,13 @@ CGraphicFrame.prototype =
             HitInLine(_hit_context, x_t, y_t, 0, this.extY, 0, 0));
     },
 
-
+    Document_UpdateRulersState : function(margins)
+    {
+        if(this.graphicObject)
+        {
+            this.graphicObject.Document_UpdateRulersState(this.parent.num);
+        }
+    },
 
     Get_PageLimits : function(PageIndex)
     {
@@ -394,6 +464,15 @@ CGraphicFrame.prototype =
             tx = this.invertTransform.TransformPointX(x, y);
             ty = this.invertTransform.TransformPointY(x, y);
             this.graphicObject.Selection_SetStart(tx, ty, 0, e);
+            if(g_mouse_event_type_down === e.Type)
+            {
+                if(this.graphicObject.Is_TableBorder( tx, ty, 0))
+                {
+                    History.Create_NewPoint();
+                }
+            }
+            return
+
         }
     },
 
@@ -405,9 +484,9 @@ CGraphicFrame.prototype =
             tx = this.invertTransform.TransformPointX(x, y);
             ty = this.invertTransform.TransformPointY(x, y);
             this.graphicObject.Selection_SetEnd(tx, ty, 0, e);
-            this.recalcInfo.recalculateTransform = true;
-            this.recalcInfo.recalculateSizes = true;
-            this.recalculate();
+            if(g_mouse_event_type_up === e.Type)
+                editor.WordControl.m_oLogicDocument.Recalculate();
+          //  this.recalculate();
         }
     },
 
@@ -629,9 +708,14 @@ CGraphicFrame.prototype =
     Select: function()
     {},
 
+
+    Set_CurrentElement: function()
+    {},
+
     OnContentRecalculate: function()
     {
         this.recalcInfo.recalculateSizes = true;
+        this.recalcInfo.recalculateTransform = true;
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 
@@ -1164,10 +1248,7 @@ CGraphicFrame.prototype =
         if(isRealObject(this.graphicObject))
         {
             this.graphicObject.Set_ParagraphIndent(val);
-            this.txBody.bRecalculateNumbering = true;
             this.graphicObject.RecalculateCurPos();
-            this.recalcInfo.recalculateContent = true;
-            this.recalcInfo.recalculateTransformText = true;
             editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         }
     },
@@ -1858,6 +1939,12 @@ CGraphicFrame.prototype =
     {
         switch(data.Type)
         {
+
+            case historyitem_SetSetNvSpPr:
+            {
+                this.nvGraphicFramePr = data.oldPr;
+                break;
+            }
             case historyitem_SetGraphicObject:
             {
                 this.graphicObject = data.oldPr;
@@ -1964,7 +2051,12 @@ CGraphicFrame.prototype =
                 break;
             }
         }
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+
+
+        if(isRealObject(this.graphicObject))
+            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+        else
+            delete editor.WordControl.m_oLogicDocument.recalcMap[this.Id];
     },
 
     Redo: function(data)
@@ -1972,6 +2064,12 @@ CGraphicFrame.prototype =
 
         switch(data.Type)
         {
+
+            case historyitem_SetSetNvSpPr:
+            {
+                this.nvGraphicFramePr = data.newPr;
+                break;
+            }
             case historyitem_SetGraphicObject:
             {
                 this.graphicObject = data.newPr;
@@ -2072,16 +2170,29 @@ CGraphicFrame.prototype =
                 break;
             }
         }
-        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+
+        if(isRealObject(this.graphicObject))
+            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+        else
+            delete editor.WordControl.m_oLogicDocument.recalcMap[this.Id];
     },
 
     Save_Changes: function(data, w)
     {
-        w.WriteLong(historyitem_type_Shape);
+        w.WriteLong(historyitem_type_GraphicFrame);
         w.WriteLong(data.Type);
         var bool;
         switch(data.Type)
         {
+            case historyitem_SetSetNvSpPr:
+            {
+                w.WriteBool(isRealObject(data.newPr));
+                if(isRealObject(data.newPr))
+                {
+                    data.newPr.Write_ToBinary2(w);
+                }
+                break;
+            }
             case historyitem_SetGraphicObject:
             {
                 w.WriteBool(isRealObject(data.newPr));
@@ -2172,10 +2283,23 @@ CGraphicFrame.prototype =
 
     Load_Changes: function(r)
     {
-        if(r.GetLong() === historyitem_type_Shape)
+        if(r.GetLong() === historyitem_type_GraphicFrame)
         {
             switch(r.GetLong())
             {
+                case historyitem_SetSetNvSpPr:
+                {
+                    if(r.GetBool())
+                    {
+                        this.nvGraphicFramePr = new UniNvPr();
+                        this.nvGraphicFramePr.Read_FromBinary2(r);
+                    }
+                    else
+                    {
+                        this.nvGraphicFramePr = null;
+                    }
+                    break;
+                }
                 case historyitem_SetGraphicObject:
                 {
                     if(r.GetBool())
@@ -2301,7 +2425,7 @@ CGraphicFrame.prototype =
 
     Write_ToBinary2: function(w)
     {
-        w.WriteLong(historyitem_type_Chart);
+        w.WriteLong(historyitem_type_GraphicFrame);
         w.WriteString2(this.Id);
     },
 

@@ -412,6 +412,50 @@ CTextBody.prototype =
     },
 
 
+    getMargins: function ()
+    {
+        var _parent_transform = this.shape.transform;
+        var _l;
+        var _r;
+        var _b;
+        var _t;
+        var _body_pr = this.getBodyPr();
+        var sp = this.shape;
+        if(isRealObject(sp.spPr.geometry) && isRealObject(sp.spPr.geometry.rect))
+        {
+            var _rect = sp.spPr.geometry.rect;
+            _l = _rect.l + _body_pr.lIns;
+            _t = _rect.t + _body_pr.tIns;
+            _r = _rect.r - _body_pr.rIns;
+            _b = _rect.b - _body_pr.bIns;
+        }
+        else
+        {
+            _l = _body_pr.lIns;
+            _t = _body_pr.tIns;
+            _r = sp.extX - _body_pr.rIns;
+            _b = sp.extY - _body_pr.bIns;
+        }
+
+        var x_lt, y_lt, x_rb, y_rb;
+
+        x_lt = _parent_transform.TransformPointX(_l, _t);
+        y_lt = _parent_transform.TransformPointY(_l, _t);
+
+        x_rb = _parent_transform.TransformPointX(_r, _b);
+        y_rb = _parent_transform.TransformPointY(_r, _b);
+
+        var hc = (_r - _l)/2;
+        var vc = (_b - _t)/2;
+
+        var xc = (x_lt + x_rb)/2;
+        var yc = (y_lt + y_rb)/2;
+
+        var tx = xc-hc;
+        var ty = yc-vc;
+        return {L : xc - hc , T: yc - vc , R : xc + hc , B : yc + vc, textMatrix : this.shape.transform};
+    },
+
     readFromBinary: function(r,  drawingDocument)
     {
         this.bodyPr.Read_FromBinary2(r);

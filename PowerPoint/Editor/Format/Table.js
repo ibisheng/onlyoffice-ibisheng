@@ -535,7 +535,7 @@ function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, 
     this.Next = null;
 
     this.Index  = -1;
-    this.Inline = Inline;
+    this.Inline = true;
 
     this.Lock = new CLock();
     if ( false === g_oIdCounter.m_bLoad )
@@ -688,6 +688,12 @@ CTable.prototype =
 // Общие функции
 //-----------------------------------------------------------------------------------
 
+
+    setStyleIndex: function(index)
+    {
+        History.Add(this, {Type:historyitem_Table_SetStyleIndex, oldPr: this.styleIndex, newPr: index})
+        this.styleIndex = index;
+    },
     // Получаем настройки для интерфейса
     /*Get_Props : function()
     {
@@ -4944,20 +4950,8 @@ CTable.prototype =
             var Bounds = this.Get_PageBounds(1);
             NewOutline = new CTableOutline( this, this.Get_StartPage_Absolute() + 1, Bounds.Left, Bounds.Top, Bounds.Right - Bounds.Left, Bounds.Bottom - Bounds.Top );
         }
-        var transform = null;
+        var transform = this.Parent.transform;
         var cur_doc_content = this.Parent;
-        if(cur_doc_content instanceof  CDocumentContent)
-        {
-            while(cur_doc_content.Is_TableCellContent())
-            {
-                cur_doc_content = cur_doc_content.Parent.Row.Table.Parent;
-            }
-            if(cur_doc_content.Parent && cur_doc_content.Parent instanceof WordShape)
-            {
-                transform = cur_doc_content.Parent.transformText;
-            }
-        }
-        this.DrawingDocument.StartTrackTable( NewOutline , transform);
 
         var Result = this.Internal_CheckBorders( X, Y, PageNum );
         switch ( Result.Border )
@@ -5107,7 +5101,7 @@ CTable.prototype =
         else
         {
             this.Internal_Update_TableMarkup( this.CurCell.Row.Index, this.CurCell.Index, PageNum );
-            this.CurCell.Content.Document_UpdateRulersState( this.Get_StartPage_Absolute() + PageNum );
+           // this.CurCell.Content.Document_UpdateRulersState( this.Get_StartPage_Absolute() + PageNum );
         }
     },
 
@@ -5354,6 +5348,11 @@ CTable.prototype =
 
         switch ( Type )
         {
+            case historyitem_Table_SetStyleIndex:
+            {
+                this.styleIndex =Data.oldPr;
+                break;
+            }
             case historyitem_Table_DocNext:
             {
                 this.Next = Data.Old;
@@ -5633,6 +5632,9 @@ CTable.prototype =
                 break;
             }
         }
+
+        if( this.Parent)
+        this.Parent.onParagraphChanged();
     },
 
     Redo : function(Data)
@@ -5641,6 +5643,12 @@ CTable.prototype =
 
         switch ( Type )
         {
+
+            case historyitem_Table_SetStyleIndex:
+            {
+                this.styleIndex =Data.newPr;
+                break;
+            }
             case  historyitem_Table_DocNext:
             {
                 this.Next = Data.New;
@@ -5919,6 +5927,8 @@ CTable.prototype =
                 break;
             }
         }
+        if( this.Parent)
+            this.Parent.onParagraphChanged();
     },
 
     Get_SelectionState : function()
@@ -6180,6 +6190,15 @@ CTable.prototype =
 
         switch ( Type )
         {
+            case historyitem_Table_SetStyleIndex:
+            {
+                Writer.WriteBool(isRealNumber(Data.newPr));
+                if(isRealNumber(Data.newPr))
+                {
+                    Writer.WriteLong(Data.newPr);
+                }
+                break;
+            }
             case historyitem_Table_DocNext:
             case historyitem_Table_DocPrev:
             case historyitem_Table_Parent:
@@ -6572,6 +6591,18 @@ CTable.prototype =
 
         switch ( Type )
         {
+            case historyitem_Table_SetStyleIndex:
+            {
+                if(Reader.GetBool())
+                {
+                    this.styleIndex = Reader.GetLong();
+                }
+                else
+                {
+                    this.styleIndex = null;
+                }
+                break;
+            }
             case historyitem_Table_DocNext:
             {
                 // String : Id элемента
@@ -7017,6 +7048,9 @@ CTable.prototype =
             }
         }
 
+
+        if( this.Parent)
+            this.Parent.onParagraphChanged();
         return true;
     },
 
@@ -7471,28 +7505,39 @@ CTable.prototype =
 
             var _X = parseInt(X / 2.5 + 0.5) * 2.5;
             var _Y = parseInt(Y / 2.5 + 0.5) * 2.5;
-
+            var _pos_x = parseInt(this.Parent.transform.TransformPointX(X, Y) / 2.5 + 0.5) * 2.5;
+            var _pos_y = parseInt(this.Parent.transform.TransformPointY(X, Y) / 2.5 + 0.5) * 2.5;
             if ( true === this.Selection.Data2.bCol )
             {
                 if ( null != this.Selection.Data2.Min )
+                {
                     _X = Math.max( _X, this.Selection.Data2.Min );
+                    _pos_x = Math.max(_pos_x, parseInt(this.Parent.transform.TransformPointX(this.Selection.Data2.Min, Y)/2.5 + 0.5)*2.5);
+                }
 
                 if ( null != this.Selection.Data2.Max )
+                {
                     _X = Math.min( _X, this.Selection.Data2.Max );
-
-                this.DrawingDocument.UpdateTableRuler( this.Selection.Data2.bCol, this.Selection.Data2.Index, _X );
+                    _pos_x = Math.min(_pos_x, parseInt(this.Parent.transform.TransformPointX(this.Selection.Data2.Max, Y)/2.5 + 0.5)*2.5);
+                }
+                this.DrawingDocument.UpdateTableRuler( this.Selection.Data2.bCol, this.Selection.Data2.Index, _pos_x );
             }
             else
             {
                 if ( null != this.Selection.Data2.Min )
+                {
                     _Y = Math.max( _Y, this.Selection.Data2.Min );
+                    _pos_y = Math.max(_pos_y, parseInt(this.Parent.transform.TransformPointY(X, this.Selection.Data2.Min)/2.5 +0.5)*2.5);
+
+                }
 
                 if ( null != this.Selection.Data2.Max )
+                {
                     _Y = Math.min( _Y, this.Selection.Data2.Max );
-
-                this.DrawingDocument.UpdateTableRuler( this.Selection.Data2.bCol, this.Selection.Data2.Index, _Y );
+                    _pos_y = Math.min(_pos_y, parseInt(this.Parent.transform.TransformPointY(X, this.Selection.Data2.Max)/2.5 + 0.5)*2.5);
+                }
+                this.DrawingDocument.UpdateTableRuler( this.Selection.Data2.bCol, this.Selection.Data2.Index, _pos_y );
             }
-
             this.Selection.Data2.X = _X;
             this.Selection.Data2.Y = _Y;
 
@@ -7946,7 +7991,22 @@ CTable.prototype =
         {
             case table_Selection_Cell:
             {
+                var StartPage_Abs = this.Get_StartPage_Absolute();
+
+                // Найдем стартовую страницу
+                var CurPage = 0;
+                var Row_start = this.Selection.Data[0].Row;
+                for ( var Index = 1; Index < this.Pages.length; Index++ )
+                {
+                    if ( Row_start <= this.Pages[Index].FirstRow )
+                        break;
+
+                    CurPage++;
+                }
+
                 var Row_prev_index = -1;
+                var Row_pages      =  1;
+
                 for ( var Index = 0; Index < this.Selection.Data.length; Index++ )
                 {
                     var Pos = this.Selection.Data[Index];
@@ -7955,29 +8015,82 @@ CTable.prototype =
                     var CellInfo = Row.Get_CellInfo( Pos.Cell );
                     var CellMar = Cell.Get_Margins();
 
+                    var VMergeCount = this.Internal_GetVertMergeCount( Row.Index, CellInfo.StartGridCol, Cell.Get_GridSpan() );
+                    var BottomMargin = this.MaxBotMargin[Row.Index + VMergeCount - 1];
+
                     if ( -1 === Row_prev_index || Row_prev_index != Pos.Row )
+                    {
+                        CurPage += Row_pages - 1;
+
+                        if ( -1 != Row_prev_index )
+                        {
+                            for ( var Index2 = Row_prev_index + 1; Index2 < Pos.Row; Index2++ )
+                                CurPage += this.RowsInfo[Index2].Pages - 1;
+                        }
+
                         Row_prev_index = Pos.Row;
-
-                    var X_start = ( 0 === Pos.Cell ? CellInfo.X_content_start : CellInfo.X_cell_start );
-                    var X_end   = CellInfo.X_cell_end;
-
-                    var Cell_Pages   = Cell.Content_Get_PagesCount();
-                    var Cell_PageRel = Page_abs - Cell.Content.Get_StartPage_Absolute();
-                    if ( Cell_PageRel < 0 || Cell_PageRel >= Cell_Pages )
-                        continue;
-
-                    var Bounds = Cell.Content_Get_PageBounds( Cell_PageRel );
-                    var Y_offset = Cell.Temp.Y_VAlign_offset[Cell_PageRel];
-
-                    if ( 0 != Cell_PageRel )
-                    {
-                        // мы должны определить ряд, на котором случился перенос на новую страницу
-                        var TempRowIndex = this.Pages[CurPage].FirstRow;
-                        this.DrawingDocument.AddPageSelection( Page_abs, X_start, this.RowsInfo[TempRowIndex].Y[CurPage] + this.RowsInfo[TempRowIndex].TopDy[CurPage] + CellMar.Top.W + Y_offset, X_end - X_start, Bounds.Bottom - Bounds.Top );
+                        Row_pages      = this.RowsInfo[Pos.Row].Pages;
                     }
-                    else
+
+                    var X_start = CellInfo.X_cell_start;//( 0 === Pos.Cell ? CellInfo.X_content_start : CellInfo.X_cell_start );
+                    var X_end   = CellInfo.X_cell_end;
+                    var Cell_pages = Cell.Content_Get_PagesCount();
+                    for ( var PageId = 0; PageId < Cell_pages; PageId++ )
                     {
-                        this.DrawingDocument.AddPageSelection( Page_abs, X_start, this.RowsInfo[Pos.Row].Y[CurPage] + this.RowsInfo[Pos.Row].TopDy[CurPage] + CellMar.Top.W + Y_offset, X_end - X_start, Bounds.Bottom - Bounds.Top );
+                        var Bounds = Cell.Content_Get_PageBounds( PageId );
+
+                        if ( 0 != PageId )
+                        {
+                            // мы должны определить ряд, на котором случился перенос на новую страницу
+                            var TempRowIndex = this.Pages[CurPage + PageId].FirstRow;
+                            var _merge_cell_count = this.Internal_GetVertMergeCount( TempRowIndex, CellInfo.StartGridCol, Cell.Get_GridSpan());
+                            var _height_merge_cells = 0;
+                            var _merge_cell_index;
+                            for(_merge_cell_index = 0; _merge_cell_index < _merge_cell_count; ++_merge_cell_index)
+                            {
+                                var _cur_rows_info = this.RowsInfo[TempRowIndex + _merge_cell_index];
+                                if(_cur_rows_info !== null && typeof _cur_rows_info === "object"
+                                    && _cur_rows_info.H !== null && typeof _cur_rows_info.H === "object"
+                                    && typeof _cur_rows_info.H[CurPage + PageId] === "number")
+                                {
+                                    _height_merge_cells +=  _cur_rows_info.H[CurPage + PageId];
+                                }
+
+                            }
+
+                            this.DrawingDocument.AddPageSelection( StartPage_Abs + CurPage + PageId, X_start, this.RowsInfo[TempRowIndex].Y[CurPage + PageId], X_end - X_start, _height_merge_cells/*this.RowsInfo[TempRowIndex].H[CurPage + PageId] */);
+                        }
+                        else
+                        {
+                            var bDrawSelectionBlock = true;
+                            if ( Cell_pages > 1 )
+                            {
+                                // Можно не проверять наличие страницы CurPage + 1, это мы сделали
+                                // проверкой Cell_pages > 1
+                                var TempRowIndex = this.Pages[CurPage + 1].FirstRow;
+                                if ( TempRowIndex === Pos.Row && false === this.RowsInfo[TempRowIndex].FirstPage )
+                                    bDrawSelectionBlock = false;
+                            }
+
+                            if ( true === bDrawSelectionBlock )
+                            {
+                                var _merge_cell_count = this.Internal_GetVertMergeCount(Pos.Row, CellInfo.StartGridCol, Cell.Get_GridSpan());
+                                var _height_merge_cells = 0;
+                                var _merge_cell_index;
+                                for(_merge_cell_index = 0; _merge_cell_index < _merge_cell_count; ++_merge_cell_index)
+                                {
+                                    var _cur_rows_info = this.RowsInfo[Pos.Row + _merge_cell_index];
+                                    if(_cur_rows_info !== null && typeof _cur_rows_info === "object"
+                                        && _cur_rows_info.H !== null && typeof _cur_rows_info.H === "object"
+                                        && typeof _cur_rows_info.H[CurPage + PageId] === "number")
+                                    {
+                                        _height_merge_cells +=  _cur_rows_info.H[CurPage + PageId];
+                                    }
+
+                                }
+                            }
+                            this.DrawingDocument.AddPageSelection( StartPage_Abs + CurPage + PageId, X_start, this.RowsInfo[Pos.Row].Y[CurPage + PageId], X_end - X_start, _height_merge_cells/*this.RowsInfo[Pos.Row].H[CurPage + PageId]*/  );
+                        }
                     }
                 }
                 break;
@@ -10015,6 +10128,10 @@ CTable.prototype =
     Recalc_CompiledPr : function()
     {
         this.CompiledPr.NeedRecalc = true;
+        for(var i = 0; i < this.Content.length; ++i)
+        {
+            this.Content[i].Recalc_CompiledPr();
+        }
     },
 
     // Формируем конечные свойства параграфа на основе стиля и прямых настроек.
@@ -12378,15 +12495,7 @@ CTable.prototype =
             if ( 0 === Col )
             {
                 Dx = this.Markup.X - NewMarkup.X;
-                this.X -= Dx;
-
-                if ( true === this.Is_Inline() )
-                {
-                    this.Set_TableAlign( align_Left );
-                    this.Set_TableInd( TablePr.TableInd - Dx );
-                }
-                else
-                    this.Internal_UpdateFlowPosition( this.X, this.Y );
+                this.Parent.setXfrm(- Dx, this.Parent.y, null, null, null, null, null)
             }
             else
             {
@@ -12514,6 +12623,8 @@ CTable.prototype =
             {
                 if ( true === this.Is_Inline() )
                 {
+                    var Dy = this.Markup.Rows[0].Y - NewMarkup.Rows[0].Y;
+                    this.Parent.setXfrm(this.Parent.x , - Dy, null, null, null, null, null)
                     // ничего не делаем, позиция по Y в инлайновой таблице изменить нельзя таким способом
                 }
                 else
@@ -13027,6 +13138,7 @@ CTable.prototype =
 
     Internal_Recalculate_1 : function()
     {
+        this.Parent.OnContentRecalculate();
         return editor.WordControl.m_oLogicDocument.Recalculate();
         if ( true === this.TurnOffRecalc )
             return;
@@ -17966,6 +18078,8 @@ CTable.prototype =
             PageNum :   PageNum
         };
 
+        var _x = this.Parent.transform.TransformPointX(0, 0);
+        var _y = this.Parent.transform.TransformPointY(0, 0);
         this.Markup.X = this.X;
 
         var Row = this.Content[RowIndex];
@@ -18027,20 +18141,13 @@ CTable.prototype =
         this.Markup.CurCol = CellIndex;
         this.Markup.CurRow = RowIndex - Row_start;
 
-        var transform = null;
-        var cur_doc_content = this.Parent;
-        if(cur_doc_content instanceof  CDocumentContent)
+        var _markup = this.Markup.CreateDublicate();
+        _markup.X += _x;
+        for ( CurRow = Row_start; CurRow <= Row_last; CurRow++ )
         {
-            while(cur_doc_content.Is_TableCellContent())
-            {
-                cur_doc_content = cur_doc_content.Parent.Row.Table.Parent;
-            }
-            if(cur_doc_content.Parent && cur_doc_content.Parent instanceof WordShape)
-            {
-                transform = cur_doc_content.Parent.transformText;
-            }
+            _markup.Rows[CurRow].Y += _y;
         }
-        this.DrawingDocument.Set_RulerState_Table( this.Markup, transform );
+        this.DrawingDocument.Set_RulerState_Table( _markup);
     },
 
     // Проверяем попалили мы в какую либо границу.
@@ -18709,6 +18816,10 @@ CTableRow.prototype =
     Recalc_CompiledPr : function()
     {
         this.CompiledPr.NeedRecalc = true;
+        for(var i = 0; i < this.Content.length; ++i)
+        {
+            this.Content[i].Recalc_CompiledPr();
+        }
     },
 
     // Формируем конечные свойства параграфа на основе стиля и прямых настроек.
@@ -19260,6 +19371,9 @@ CTableRow.prototype =
                 break;
             }
         }
+        if(this.Table && this.Table.Parent)
+        this.Table.Parent.onParagraphChanged();
+
     },
 
     Redo : function(Data)
@@ -19361,6 +19475,10 @@ CTableRow.prototype =
                 break;
             }
         }
+
+        if(this.Table && this.Table.Parent)
+        this.Table.Parent.onParagraphChanged();
+
     },
 
     Get_ParentObject_or_DocumentPos : function()
@@ -19815,6 +19933,9 @@ CTableRow.prototype =
             }
         }
 
+
+        if(this.Table && this.Table.Parent)
+        this.Table.Parent.onParagraphChanged();
         return true;
     },
 
@@ -19942,6 +20063,10 @@ function CTableCell(Row, ColW)
 
 CTableCell.prototype =
 {
+    onParagraphChanged: function()
+    {
+        this.Row.Table.Parent.onParagraphChanged();
+    },
 
     getUnifill: function()
     {
@@ -21296,6 +21421,9 @@ CTableCell.prototype =
                 break;
             }
         }
+
+        if(this.Row && this.Row.Table && this.Row.Table.Parent)
+         this.Row.Table.Parent.onParagraphChanged();
     },
 
     Redo : function(Data)
@@ -21414,6 +21542,8 @@ CTableCell.prototype =
                 break;
             }
         }
+        if(this.Row && this.Row.Table && this.Row.Table.Parent)
+        this.Row.Table.Parent.onParagraphChanged();
     },
 
     Get_ParentObject_or_DocumentPos : function()
@@ -21908,6 +22038,8 @@ CTableCell.prototype =
                 break;
             }
         }
+        if(this.Row && this.Row.Table && this.Row.Table.Parent)
+        this.Row.Table.Parent.onParagraphChanged();
     },
 
     Write_ToBinary2 : function(Writer)

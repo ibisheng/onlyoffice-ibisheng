@@ -6,7 +6,7 @@ function CGraphicObjects(slide)
     this.selectedObjects = [];
     this.arrPreTrackObjects = [];
     this.arrTrackObjects = [];
-    this.bShowComment = false;
+    this.selectionRect = null;
 }
 
 CGraphicObjects.prototype = {
@@ -45,6 +45,7 @@ CGraphicObjects.prototype = {
 
     paragraphAdd: function(paraItem, bRecalculate)
     {
+        var b_rulers = false;
         switch (this.State.id)
         {
             case STATES_ID_TEXT_ADD:
@@ -67,6 +68,7 @@ CGraphicObjects.prototype = {
                 {
                     if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Text_Props) === false)
                     {
+                        History.Create_NewPoint();
                         for(var i = 0; i < this.selectedObjects.length; ++i)
                         {
                             if(typeof this.selectedObjects[i].applyAllTextProps === "function")
@@ -84,9 +86,11 @@ CGraphicObjects.prototype = {
                         {
                             if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
                             {
+                                History.Create_NewPoint();
                                 this.selectedObjects[0].paragraphAdd(paraItem, bRecalculate);
                                 //this.selectedObjects[0].recalculate();
                                 this.changeCurrentState(new TextAddState(this, this.slide, this.selectedObjects[0]));
+                                b_rulers = true;
                                 //this.updateSelectionState();
                             }
                         }
@@ -96,6 +100,10 @@ CGraphicObjects.prototype = {
             }
         }
         editor.WordControl.m_oLogicDocument.Recalculate();
+        if(b_rulers)
+        {
+            editor.WordControl.m_oLogicDocument.Document_UpdateRulersState();
+        }
     },
 
 
@@ -276,35 +284,24 @@ CGraphicObjects.prototype = {
                     }
                     else if(cur_drawing.isTable && cur_drawing.isTable())
                     {
-                        /*var hit_in_inner_area = cur_drawing.hitInInnerArea(x, y);
+                        var hit_in_inner_area = cur_drawing.hitInInnerArea(x, y);
                         var hit_in_bounding_rect = cur_drawing.hitInBoundingRect(x, y);
                         if(hit_in_bounding_rect || hit_in_inner_area)
                         {
-                            if(e.CtrlKey && this.drawingObjectsController.selectedObjects.length > 0)
+                            if(hit_in_bounding_rect)
                             {
-                                var b_selected = cur_drawing.selected;
-                                cur_drawing.select(this.drawingObjectsController);
-                                for(var j = 0; j < this.drawingObjectsController.selectedObjects.length; ++j)
-                                {
-                                    this.drawingObjectsController.addPreTrackObject(this.drawingObjectsController.selectedObjects[j].createMoveTrack());
-                                }
-                                this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects, x, y, e.ShiftKey, e.CtrlKey, cur_drawing, b_selected, true));
-                                this.drawingObjects.OnUpdateOverlay();
+                                cur_drawing.sendMouseData();
+
+                                drawingDocument.SetCursorType("move");
                                 return;
                             }
                             else
                             {
-                                this.drawingObjectsController.resetSelection();
-                                cur_drawing.select(this.drawingObjectsController);
-                                cur_drawing.selectionSetStart(e, x, y);
-                                this.drawingObjectsController.changeCurrentState(new TextAddState(this.drawingObjectsController, this.drawingObjects, cur_drawing));
-                                this.drawingObjects.presentation.Document_UpdateSelectionState();
-                                this.drawingObjects.OnUpdateOverlay();
+                                cur_drawing.updateCursorType(x, y, e);
                                 return;
 
                             }
-                        }     */
-
+                        }
                     }
                 }
                 drawingDocument.SetCursorType("default");
@@ -545,7 +542,7 @@ CGraphicObjects.prototype = {
     {
         if(this.selectedObjects.length ===1 && this.selectedObjects[0].isTable && this.selectedObjects[0].isTable())
         {
-            this.selectedObjects[0].graphicObject.Set_Props(props);
+            this.selectedObjects[0].Set_Props(props);
         }
     },
 
