@@ -717,6 +717,8 @@ function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY, chart)
 		{
 			var widthText;
 			var widthLine = 28;
+			if(bar.type == 'hbar' || bar.type == 'bar' || chart.type == 'Area')
+				widthLine = 7;
 			//+ высота легенды
 			if(bar._otherProps._key_halign == 'top' || bar._otherProps._key_halign == 'bottom')
 			{
