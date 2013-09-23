@@ -760,7 +760,7 @@ function CBinaryFileWriter()
         this.EndRecord();
 
         var _countAuthors = 0;
-        for (var i in pres.CommentAuthors)
+        for (var i in presentation.CommentAuthors)
             ++_countAuthors;
 
         if (_countAuthors > 0)
@@ -770,9 +770,9 @@ function CBinaryFileWriter()
 
             this.WriteULong(_countAuthors);
 
-            for (var i in pres.CommentAuthors)
+            for (var i in presentation.CommentAuthors)
             {
-                var _author = pres.CommentAuthors[i];
+                var _author = presentation.CommentAuthors[i];
 
                 this.StartRecord(0);
 

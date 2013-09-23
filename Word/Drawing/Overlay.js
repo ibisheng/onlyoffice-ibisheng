@@ -1724,7 +1724,7 @@ CAutoshapeTrack.prototype =
 
         var ctx = overlay.m_oContext;
         var _oldAlpha = ctx.globalAlpha;
-        ctx.globalAlpha = 1;
+        ctx.globalAlpha = 0.5;
 
         ctx.setTransform(1,0,0,1,0,0);
 

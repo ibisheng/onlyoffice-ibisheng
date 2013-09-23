@@ -6788,7 +6788,7 @@ CPresentation.prototype =
                 _new_data.x = _comments[i].x;
                 _new_data.y = _comments[i].y;
 
-                _new_data.CalculateInitials();
+                _new_data.Calculate();
                 this.Slides[_sldIdx].writecomments.push(_new_data);
 
                 var _comments2 = _data.m_aReplies;
@@ -6813,14 +6813,14 @@ CPresentation.prototype =
                     _author2.LastId++;
 
                     var _new_data2 = new CWriteCommentData();
-                    _new_data2.Data = _data;
+                    _new_data2.Data = _data2;
                     _new_data2.WriteAuthorId = _author2.Id;
                     _new_data2.WriteCommentId = _author2.LastId;
                     _new_data2.WriteParentAuthorId = _author.Id;
                     _new_data2.WriteParentCommentId = _commId;
                     _new_data2.x = _new_data.x;
                     _new_data2.y = _new_data.y + 136 * (j + 1); // так уж делает микрософт
-                    _new_data2.CalculateInitials();
+                    _new_data2.Calculate();
                     this.Slides[_sldIdx].writecomments.push(_new_data2);
                 }
             }
