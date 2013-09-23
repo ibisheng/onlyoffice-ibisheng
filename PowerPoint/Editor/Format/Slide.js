@@ -1053,6 +1053,8 @@ Slide.prototype =
         {
             this.cSld.spTree[i].recalcAll();
         }
+
+        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 
     recalcAllColors: function()
@@ -1259,67 +1261,70 @@ Slide.prototype =
 
     alignLeft : function()
     {
-        for(var i = 0; i < this.selectedObjects.length; ++i)
+        var selected_objects = this.graphicObjects.selectedObjects;
+        for(var i = 0; i < selected_objects.length; ++i)
         {
-            this.selectedObjects[i].setXfrm(0, this.selectedObjects[i].y, null, null, null, null, null);
+            selected_objects[i].setXfrm(0, selected_objects[i].y, null, null, null, null, null);
         }
     },
 
     alignRight : function()
     {
-        for(var i = 0; i < this.selectedObjects.length; ++i)
+        var selected_objects = this.graphicObjects.selectedObjects;
+
+        for(var i = 0; i < selected_objects.length; ++i)
         {
-            this.selectedObjects[i].setXfrm(this.Width - this.selectedObjects[i].extX, this.selectedObjects[i].y, null, null, null, null, null);
+            selected_objects[i].setXfrm(this.Width - selected_objects[i].extX, selected_objects[i].y, null, null, null, null, null);
         }
     },
 
 
     alignTop : function()
     {
-        for(var i = 0; i < this.selectedObjects.length; ++i)
+        for(var i = 0; i < this.graphicObjects.selectedObjects.length; ++i)
         {
-            this.selectedObjects[i].setXfrm(this.selectedObjects[i].x, 0, null, null, null, null, null);
+            this.graphicObjects.selectedObjects[i].setXfrm(this.graphicObjects.selectedObjects[i].x, 0, null, null, null, null, null);
         }
     },
 
 
     alignBottom : function()
     {
-        for(var i = 0; i < this.selectedObjects.length; ++i)
+        for(var i = 0; i < this.graphicObjects.selectedObjects.length; ++i)
         {
-            this.selectedObjects[i].setXfrm(this.selectedObjects[i].x, this.Height - this.selectedObjects[i].extY, null, null, null, null, null);
+            this.graphicObjects.selectedObjects[i].setXfrm(this.graphicObjects.selectedObjects[i].x, this.Height - this.graphicObjects.selectedObjects[i].extY, null, null, null, null, null);
         }
     },
 
 
     alignCenter : function()
     {
-        for(var i = 0; i < this.selectedObjects.length; ++i)
+        for(var i = 0; i < this.graphicObjects.selectedObjects.length; ++i)
         {
-            this.selectedObjects[i].setXfrm((this.Width - this.selectedObjects[i].extX)*0.5, this.selectedObjects[i].y, null, null, null, null, null);
+            this.graphicObjects.selectedObjects[i].setXfrm((this.Width - this.graphicObjects.selectedObjects[i].extX)*0.5, this.graphicObjects.selectedObjects[i].y, null, null, null, null, null);
         }
     },
 
     alignMiddle : function()
     {
-        for(var i = 0; i < this.selectedObjects.length; ++i)
+        for(var i = 0; i < this.graphicObjects.selectedObjects.length; ++i)
         {
-            this.selectedObjects[i].setXfrm( this.selectedObjects[i].x, (this.Height - this.selectedObjects[i].extY)*0.5, null, null, null, null, null);
+            this.graphicObjects.selectedObjects[i].setXfrm(this.graphicObjects.selectedObjects[i].x, (this.Height - this.graphicObjects.selectedObjects[i].extY)*0.5, null, null, null, null, null);
         }
     },
 
     distributeHor : function()
     {
-        for(var i = 0; i < this.selectedObjects.length; ++i)
+        for(var i = 0; i < this.graphicObjects.selectedObjects.length; ++i)
         {
-            this.selectedObjects[i].setXfrm((this.Width - this.selectedObjects[i].extX)*0.5, this.selectedObjects[i].y, null, null, null, null, null);
+            this.graphicObjects.selectedObjects[i].setXfrm((this.Width - this.graphicObjects.selectedObjects[i].extX)*0.5, this.graphicObjects.selectedObjects[i].y, null, null, null, null, null);
         }
     },
     distributeVer : function()
     {
-        for(var i = 0; i < this.selectedObjects.length; ++i)
+        for(var i = 0; i < this.graphicObjects.selectedObjects.length; ++i)
         {
-            this.selectedObjects[i].setXfrm( this.selectedObjects[i].x, (this.Height - this.selectedObjects[i].extY)*0.5, null, null, null, null, null);
+            this.graphicObjects.selectedObjects[i].setXfrm( this.graphicObjects.selectedObjects[i].x, (this.Height - this.graphicObjects.selectedObjects[i].extY)*0.5, null, null, null, null, null);
         }
     },
 
@@ -1342,7 +1347,7 @@ Slide.prototype =
                 this.removeSelectedObjects();
                 for(i = 0; i < selected.length; ++i)
                 {
-                    this.addSp(selected[i]);
+                    this.addToSpTreeToPos(sp_tree.length, selected[i]);
                 }
                 break;
             }

@@ -181,6 +181,7 @@ CShape.prototype =
             recalculateGroupHierarchy: true,
             recalculateTextStyles: [true, true, true, true, true, true, true, true, true]
         };
+        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 
     recalcAllColors: function()

@@ -1617,9 +1617,8 @@ CGraphicObjects.prototype = {
     {
         var chart = new CChartAsGroup(this.slide);
         chart.initFromBinary(binary);
-        this.slide.addSp(chart);
+        this.slide.addToSpTreeToPos(this.slide.cSld.spTree, chart);
         editor.WordControl.m_oLogicDocument.recalcMap[chart.Id] = chart;
-
     },
 
     editChart: function(binary)

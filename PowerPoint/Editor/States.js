@@ -2806,7 +2806,7 @@ function GroupState(drawingObjectsController, drawingObjects, group)
                                 this.drawingObjectsController.addPreTrackObject(selected_objects[j].createMoveTrack());
                             }
                             this.drawingObjectsController.changeCurrentState(new PreMoveState(this.drawingObjectsController, this.drawingObjects,x, y, e.ShiftKey, e.ctrl, cur_drawing, false, true));
-                            this.drawingObjectsController.OnUpdateOverlay();
+                            editor.WordControl.OnUpdateOverlay();
                             return;
                         }
                         else if(hit_in_text_rect)

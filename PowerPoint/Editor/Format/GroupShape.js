@@ -86,6 +86,10 @@ CGroupShape.prototype =
             recalculateCursorTypes: true,
             recalculateScaleCoefficients: true
         };
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            this.spTree[i].recalcAll();
+        }
     },
 
     recalcAllColors: function()

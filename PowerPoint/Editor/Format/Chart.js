@@ -2249,6 +2249,10 @@ CChartAsGroup.prototype =
             }
         }
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+        if(!this.parent)
+        {
+            delete editor.WordControl.m_oLogicDocument.recalcMap[this.Id];
+        }
     },
 
     Redo: function(data)
