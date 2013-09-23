@@ -408,6 +408,7 @@
 									if(addNameColumn && rangeShift && !isTurnOffHistory)
 									{
 										rangeShift.addCellsShiftBottom();
+										ws.cellCommentator.updateCommentsDependencies(true, 4, rangeShift.bbox);
 									}
 									//добавляем название колонок
 									for(var col = activeCells.c1; col <= activeCells.c2; col++)
@@ -598,7 +599,10 @@
 								case "addTableFilterOneCell":
 								{
 									if(!isTurnOffHistory && addNameColumn)
+									{
 										rangeShift.addCellsShiftBottom();
+										ws.cellCommentator.updateCommentsDependencies(true, 4, rangeShift.bbox);
+									}
 									if(lTable)
 									{
 										if(addNameColumn && !isTurnOffHistory)
@@ -634,7 +638,10 @@
 								case "addTableFilterManyCells":
 								{
 									if(!isTurnOffHistory && addNameColumn)
+									{
 										rangeShift.addCellsShiftBottom();
+										ws.cellCommentator.updateCommentsDependencies(true, 4, rangeShift.bbox);
+									}
 									if(lTable)
 									{
 										if(addNameColumn && !isTurnOffHistory)
@@ -1274,7 +1281,7 @@
 						//проверяем , применен ли фильтр
 						var activeCells = this._idToRange(buttons[i].id);
 						var indexFilter = this._findArrayFromAllFilter3(activeCells,ws,buttons[i].id);
-						if(indexFilter != undefined)
+						if(indexFilter != undefined && indexFilter.toString().search(":") > -1)
 						{
 							newButtons[l] = buttons[i];
 							l++;
