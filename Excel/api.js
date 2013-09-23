@@ -1,7 +1,4 @@
 ﻿/** @define {boolean} */
-var ASC_DOCS_API_LOAD_COAUTHORING_SETTINGS = true;
-
-/** @define {boolean} */
 var ASC_SPREADSHEET_API_CO_AUTHORING_ENABLE = true;
 
 var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
@@ -1197,15 +1194,8 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 			// Стартуем соединение с сервером для совместного редактирования
 			asyncServerIdStartLoaded: function() {
-				//Загружаем скрипт с настройками, по окончанию инициализируем контрол для совместного редактирования
-				//TODO: Вынести шрифты в коммоны, SetFontPath заменить на SetCommonPath,
-				//пердаваемый путь использовать для загрузки шрифтов и настороек.
-				if(true == ASC_DOCS_API_LOAD_COAUTHORING_SETTINGS){
-					this.ScriptLoader.LoadScriptAsync( this.FontLoader.fontFilesPath + "../Common/docscoapisettings.js", this._onLoadCoAuthoringSetings, this);
-				}
-				else{
-					this._onLoadCoAuthoringSetings(this);
-				}
+				//Инициализируем контрол для совместного редактирования
+				this._coAuthoringInit();
 			},
 
 			// Соединились с сервером
@@ -1241,8 +1231,27 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			/////////////////////////////////////////////////////////////////////////
 			///////////////////CoAuthoring and Chat api//////////////////////////////
 			/////////////////////////////////////////////////////////////////////////
-			_coAuthoringInit: function(docId, user) {
+			_coAuthoringInit: function() {
 				var t = this;
+
+				if (undefined !== window['g_cAscCoAuthoringUrl'])
+					window.g_cAscCoAuthoringUrl = window['g_cAscCoAuthoringUrl'];
+				if (undefined !== window.g_cAscCoAuthoringUrl) {
+					//Turn off CoAuthoring feature if it disabled
+					if(!t.isCoAuthoringEnable)
+						window.g_cAscCoAuthoringUrl = "";
+
+					// Если есть в настройках сервер, то выставляем его для соединения
+					t._coAuthoringSetServerUrl(window.g_cAscCoAuthoringUrl);
+				}
+
+				//Если User не задан, отключаем коавторинг.
+				if (null == t.User || null == t.User.asc_getId()) {
+					t.User = new asc_user();
+					t.User.asc_setId("Unknown");
+					t.User.asc_setUserName("Unknown");
+					t._coAuthoringSetServerUrl("");
+				}
 
 				this.collaborativeEditing = new asc_CCollaborativeEditing(/*handlers*/{
 					"askLock":							function () {t.CoAuthoringApi.askLock.apply(t.CoAuthoringApi, arguments);},
@@ -1427,7 +1436,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					}
 				};
 
-				this.CoAuthoringApi.init (user, docId, this.asc_getViewerMode(), 'fghhfgsjdgfjs', window.location.host, g_sMainServiceLocalUrl, function(){
+				this.CoAuthoringApi.init (t.User, t.documentId, this.asc_getViewerMode(), 'fghhfgsjdgfjs', window.location.host, g_sMainServiceLocalUrl, function(){
 				}, c_oEditorId.Speadsheet);
 			},
 
@@ -1437,33 +1446,6 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					return; // Error
 
 				this.CoAuthoringApi.set_url(url);
-			},
-
-			// End load settings coAuthoring
-			_onLoadCoAuthoringSetings : function(that){
-				if(undefined !== window['g_cAscCoAuthoringUrl'])
-					window.g_cAscCoAuthoringUrl = window['g_cAscCoAuthoringUrl'];
-					
-				if(undefined !== window.g_cAscCoAuthoringUrl)
-				{
-					//Turn off CoAuthoring feature if it disabled
-					if(!that.isCoAuthoringEnable)
-						window.g_cAscCoAuthoringUrl = "";
-
-					// Если есть в настройках сервер, то выставляем его для соединения
-					that._coAuthoringSetServerUrl(window.g_cAscCoAuthoringUrl);
-				}
-				
-				//Если User не задан, отключаем коавторинг.
-				if (undefined === that.User || null === that.User ||
-					undefined === that.User.asc_getId() || null === that.User.asc_getId()) {
-					that.User = new asc_user();
-					that.User.asc_setId("Unknown");
-					that.User.asc_setUserName("Unknown");
-					that._coAuthoringSetServerUrl("");
-				}
-				
-				that._coAuthoringInit(that.documentId, that.User);
 			},
 
 			_onSaveChanges: function (recalcIndexColumns, recalcIndexRows) {
