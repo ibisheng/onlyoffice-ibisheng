@@ -1698,7 +1698,38 @@ CAutoshapeTrack.prototype =
 
     DrawPresentationComment : function(type, x, y, w, h)
     {
+        if (!window.g_comment_image || !window.g_comment_image.asc_complete)
+            return;
 
+        var overlay = this.m_oOverlay;
+        this.CurrentPageInfo = overlay.m_oHtmlPage.GetDrawingPageInfo(this.PageIndex);
+
+        var drPage = this.CurrentPageInfo.drawingPage;
+
+        var xDst = drPage.left;
+        var yDst = drPage.top;
+        var wDst = drPage.right - drPage.left;
+        var hDst = drPage.bottom - drPage.top;
+
+        var dKoefX = wDst / this.CurrentPageInfo.width_mm;
+        var dKoefY = hDst / this.CurrentPageInfo.height_mm;
+
+        var __x = (xDst + dKoefX * x) >> 0;
+        var __y = (yDst + dKoefY * y) >> 0;
+
+        var __w = (window.COMMENT_WIDTH === undefined) ? 30 : window.COMMENT_WIDTH;
+        var __h = (window.COMMENT_HEIGHT === undefined) ? 30 : window.COMMENT_HEIGHT;
+
+        overlay.CheckRect(__x, __y, __w, __h);
+
+        var ctx = overlay.m_oContext;
+        var _oldAlpha = ctx.globalAlpha;
+        ctx.globalAlpha = 1;
+
+        ctx.setTransform(1,0,0,1,0,0);
+
+        ctx.drawImage(window.g_comment_image, __x, __y);
+        ctx.globalAlpha = _oldAlpha;
     }
 };
 
