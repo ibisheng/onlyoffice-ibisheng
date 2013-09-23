@@ -1709,16 +1709,16 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 				if (false === this.collaborativeEditing.getCollaborativeEditing()) {
 					// Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
-					callback(true);
+					if ($.isFunction(callback)) {callback(true);}
 					callback = undefined;
 				}
 				if (false !== this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/false)) {
 					// Редактируем сами
-					callback(true);
+					if ($.isFunction(callback)) {callback(true);}
 					return;
 				} else if (false !== this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false)) {
 					// Уже ячейку кто-то редактирует
-					callback(false);
+					if ($.isFunction(callback)) {callback(false);}
 					return;
 				}
 
