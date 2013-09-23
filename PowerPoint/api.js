@@ -1,9 +1,6 @@
 /** @define {boolean} */
 var ASC_DOCS_API_DEBUG = true;
 
-/** @define {boolean} */
-var ASC_DOCS_API_LOAD_COAUTHORING_SETTINGS = true;
-
 var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 var documentId = undefined;
 var documentUrl = 'null';
@@ -191,18 +188,37 @@ CChatMessage.prototype.get_Message = function() { return this.Message; }
  ToDo Register Callback OnCoAuthoringDisconnectUser возвращается userId
  */
 // Init CoAuthoring
-asc_docs_api.prototype._coAuthoringInit = function (docId, user) {
+asc_docs_api.prototype._coAuthoringInit = function () {
     if (!this.CoAuthoringApi) {
         g_oIdCounter.Set_Load(false);
         this.asyncServerIdEndLoaded ();
         return; // Error
     }
-    var oThis = this;
-    this.CoAuthoringApi.onParticipantsChanged   	= function (e) { oThis.asc_fireCallback( "asc_onParticipantsChanged", e ); };
-    this.CoAuthoringApi.onAuthParticipantsChanged  	= function (e) { oThis.asc_fireCallback( "asc_onAuthParticipantsChanged", e ); };
-    this.CoAuthoringApi.onMessage               	= function (e) { oThis.asc_fireCallback( "asc_onCoAuthoringChatReceiveMessage", e ); };
-    this.CoAuthoringApi.onConnectionStateChanged	= function (e) { oThis.asc_fireCallback( "asc_onConnectionStateChanged", e ); };
-    this.CoAuthoringApi.onUserStateChanged			= function (e) { oThis.asc_fireCallback( "asc_onUserStateChanged", e ); };
+
+	if(undefined !== window['g_cAscCoAuthoringUrl'])
+		window.g_cAscCoAuthoringUrl = window['g_cAscCoAuthoringUrl'];
+	if (undefined !== window.g_cAscCoAuthoringUrl) {
+		//Turn off CoAuthoring feature if it disabled
+		if(!this.isCoAuthoringEnable)
+			window.g_cAscCoAuthoringUrl = "";
+
+		this._coAuthoringSetServerUrl(window.g_cAscCoAuthoringUrl);
+	}
+	if (null == this.User || null == this.User.asc_getId()) {
+		var asc_user = window["Asc"].asc_CUser;
+		this.User = new asc_user();
+		this.User.asc_setId("Unknown");
+		this.User.asc_setUserName("Unknown");
+
+		this._coAuthoringSetServerUrl("");
+	}
+
+    var t = this;
+    this.CoAuthoringApi.onParticipantsChanged   	= function (e) { t.asc_fireCallback( "asc_onParticipantsChanged", e ); };
+    this.CoAuthoringApi.onAuthParticipantsChanged  	= function (e) { t.asc_fireCallback( "asc_onAuthParticipantsChanged", e ); };
+    this.CoAuthoringApi.onMessage               	= function (e) { t.asc_fireCallback( "asc_onCoAuthoringChatReceiveMessage", e ); };
+    this.CoAuthoringApi.onConnectionStateChanged	= function (e) { t.asc_fireCallback( "asc_onConnectionStateChanged", e ); };
+    this.CoAuthoringApi.onUserStateChanged			= function (e) { t.asc_fireCallback( "asc_onUserStateChanged", e ); };
     this.CoAuthoringApi.onLocksAcquired				= function (e) {
 		if (2 != e["state"]) {
 
@@ -404,16 +420,16 @@ asc_docs_api.prototype._coAuthoringInit = function (docId, user) {
 
 		// т.е. если bSendEvent не задан, то посылаем  сообщение
 		if (true === bAddChanges && false !== bSendEvent)
-			oThis.syncCollaborativeChanges();
+			t.syncCollaborativeChanges();
     };
     this.CoAuthoringApi.onFirstLoadChanges			= function (e) {
-        oThis.CoAuthoringApi.onSaveChanges(e,false);
+        t.CoAuthoringApi.onSaveChanges(e,false);
         CollaborativeEditing.Apply_Changes();
         // TODO: Загружаем изменения от других пользователей при открытии
     };
     this.CoAuthoringApi.onSetIndexUser			= function (e) {
         g_oIdCounter.Set_UserId("" + e);
-        oThis.asyncServerIdEndLoaded ();
+        t.asyncServerIdEndLoaded ();
     };
     this.CoAuthoringApi.onStartCoAuthoring		= function (isStartEvent) {
 
@@ -434,7 +450,6 @@ asc_docs_api.prototype._coAuthoringInit = function (docId, user) {
 	 * @param {Bool} isCloseCoAuthoring
 	 */
 	this.CoAuthoringApi.onDisconnect				= function (e, isDisconnectAtAll, isCloseCoAuthoring) {
-        var t = oThis;
         if (0 === t.CoAuthoringApi.get_state())
             t.asyncServerIdEndLoaded();
         if (isDisconnectAtAll) {
@@ -447,11 +462,11 @@ asc_docs_api.prototype._coAuthoringInit = function (docId, user) {
         }
 	};
 
-    this.CoAuthoringApi.init (user, docId, this.isViewMode, 'fghhfgsjdgfjs', window.location.host, g_sMainServiceLocalUrl, function(){
+    this.CoAuthoringApi.init (editor.User, documentId, this.isViewMode, 'fghhfgsjdgfjs', window.location.host, g_sMainServiceLocalUrl, function(){
     }, c_oEditorId.Presentation);
 
     // ToDo init other callbacks
-}
+};
 
 
 asc_docs_api.prototype.pre_Save = function(_images)
@@ -467,29 +482,6 @@ asc_docs_api.prototype.sync_CollaborativeChanges = function()
     this.asc_fireCallback("asc_onCollaborativeChanges");
 }
 
-asc_docs_api.prototype._coAuthoringInitCallBack = function(_this)
-{
-	if(undefined !== window['g_cAscCoAuthoringUrl'])
-		window.g_cAscCoAuthoringUrl = window['g_cAscCoAuthoringUrl'];
-
-    if (undefined !== window.g_cAscCoAuthoringUrl) {
-        //Turn off CoAuthoring feature if it disabled
-        if(!_this.isCoAuthoringEnable)
-            window.g_cAscCoAuthoringUrl = "";
-
-        _this._coAuthoringSetServerUrl(window.g_cAscCoAuthoringUrl);
-    }
-    if (undefined === editor.User || null === editor.User ||
-		undefined === editor.User.asc_getId() || null === editor.User.asc_getId()) {
-		var asc_user = window["Asc"].asc_CUser;
-		editor.User = new asc_user();
-		editor.User.asc_setId("Unknown");
-		editor.User.asc_setUserName("Unknown");
-
-        _this._coAuthoringSetServerUrl("");
-    }
-    _this._coAuthoringInit(documentId, editor.User);
-};
 // Set CoAuthoring server url
 asc_docs_api.prototype._coAuthoringSetServerUrl = function (url) {
     if (!this.CoAuthoringApi)
@@ -546,15 +538,8 @@ asc_docs_api.prototype.autoSaveInit = function (autoSaveGap) {
 };
 
 asc_docs_api.prototype.asyncServerIdStartLoaded = function () {
-    //Загружаем скрипт с настройками, по окончанию инициализируем контрол для совместного редактирования
-    //TODO: Вынести шрифты в коммоны, SetFontPath заменить на SetCommonPath,
-    //пердаваемый путь использовать для загрузки шрифтов и настороек.
-	if(true == ASC_DOCS_API_LOAD_COAUTHORING_SETTINGS) {
-		// ToDo убрать зависимость от this.FontLoader.fontFilesPath
-    	this.ScriptLoader.LoadScriptAsync( this.FontLoader.fontFilesPath + "../Common/docscoapisettings.js", this._coAuthoringInitCallBack, this);
-	} else {
-		this._coAuthoringInitCallBack(this);
-	}
+	//Инициализируем контрол для совместного редактирования
+	this._coAuthoringInit();
 };
 
 asc_docs_api.prototype.asyncServerIdEndLoaded = function () {
