@@ -760,6 +760,7 @@
 			
             _editorPaste: function (worksheet,callback) {
                 var t = this;
+				window.GlobalPasteFlagCounter = 1;
                 var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
                 document.body.style.MozUserSelect = "text";
                 delete document.body.style["-khtml-user-select"];
@@ -834,7 +835,14 @@
                     pastebin.style.lineHeight = "1px";//todo FF всегда возвращает computedStyle в px, поэтому лучше явно указать default значнение
                     pastebin.setAttribute("contentEditable", true);
                     
-                    pastebin.onpaste = function(e){t._bodyPaste(worksheet,e);};
+                    pastebin.onpaste = function(e){
+						// тут onpaste не обрубаем, так как он в сафари под macos приходить должен
+						if (window.GlobalPasteFlagCounter == 1)
+						{
+							t._bodyPaste(worksheet,e);
+							window.GlobalPasteFlagCounter = 2;
+						}
+					};
                     document.body.appendChild( pastebin );
                 }
                 else if(bClean){
@@ -844,7 +852,14 @@
                     {
                         pastebin.removeChild(aChildNodes[i]);
                     }
-					pastebin.onpaste = function(e){t._bodyPaste(worksheet,e);};
+					 pastebin.onpaste = function(e){
+						// тут onpaste не обрубаем, так как он в сафари под macos приходить должен
+						if (window.GlobalPasteFlagCounter == 1)
+						{
+							t._bodyPaste(worksheet,e);
+							window.GlobalPasteFlagCounter = 2;
+						}
+					};
                 }
                 return pastebin;
             },
@@ -1451,13 +1466,19 @@
 							if(t.copyText && t.copyText.isImage)
 							{
 								if(t._insertImages(worksheet,t.lStorage,onlyFromLocalStorage))
+								{
+									window.GlobalPasteFlag = false;
+									window.GlobalPasteFlagCounter = 0;
 									return;
+								}
 							}
 							else
 							{
 								worksheet.setSelectionInfo('paste',t,false,true);
 							}	
 						}
+						window.GlobalPasteFlag = false;
+						window.GlobalPasteFlagCounter = 0;
 						return;
 					}
 					
@@ -1468,11 +1489,17 @@
 						if(t.copyText.isImage)
 						{
 							if(t._insertImages(worksheet,t.lStorage,onlyFromLocalStorage))
+							{
+								window.GlobalPasteFlag = false;
+								window.GlobalPasteFlagCounter = 0;
 								return;
+							}
 						}
 						else
 						{
 							worksheet.setSelectionInfo('paste',t,false,true);
+							window.GlobalPasteFlag = false;
+							window.GlobalPasteFlagCounter = 0;
 							return;
 						}	
 					}
@@ -1845,6 +1872,8 @@
 				aResult.addImages = addImages;
 				aResult.fontsNew = fontsNew;
 				worksheet.setSelectionInfo('paste',aResult,t);
+				window.GlobalPasteFlagCounter = 0;
+				window.GlobalPasteFlag = false;
             },
 			
 			_isEqualText: function(node, table){
@@ -2594,7 +2623,17 @@
 	}
 )(jQuery, window);
 
-window.USER_AGENT_SAFARI_MACOS = (navigator.userAgent.toLowerCase().indexOf('safari') > -1 && navigator.userAgent.toLowerCase().indexOf('mac') > -1) ? true : false;
+window.USER_AGENT_MACOS = (navigator.userAgent.toLowerCase().indexOf('mac') > -1) ? true : false;
+window.USER_AGENT_SAFARI_MACOS = (navigator.userAgent.toLowerCase().indexOf('safari') > -1 && window.USER_AGENT_MACOS) ? true : false;
+if (window.USER_AGENT_SAFARI_MACOS)
+{
+    // браузеры под мак все определяются как сафари
+    // проверим на дополнительные параметры
+    if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1)
+        window.USER_AGENT_SAFARI_MACOS = false;
+}
+window.GlobalPasteFlag = false;
+window.GlobalPasteFlagCounter = 0;
 var COPY_ELEMENT_ID = "clipboard-helper";
 var PASTE_ELEMENT_ID = "wrd_pastebin";
 var ELEMENT_DISPAY_STYLE = "none";
@@ -2651,7 +2690,15 @@ function Editor_CopyPaste_Create(api)
     ElemToSelect.style.lineHeight = "1px";
 
     ElemToSelect["onpaste"] = function(e){
-        api.wb.clipboard._bodyPaste(api.wb.getWorksheet(), e);
+		if (!window.GlobalPasteFlag)
+				return;
+
+        // тут onpaste не обрубаем, так как он в сафари под macos приходить должен
+        if (window.GlobalPasteFlagCounter == 1)
+        {
+            api.wb.clipboard._bodyPaste(api.wb.getWorksheet(), e);
+            window.GlobalPasteFlagCounter = 2;
+        }
     };
 
     ElemToSelect["onbeforecopy"] = function(e){
@@ -2708,10 +2755,6 @@ function Editor_CopyPaste_Create(api)
 		else
 			isNeedEmptyAfterCut = true;		
     };
-	
-	/*elementText["onpaste"] = function(e){
-		api.wb.clipboard.pasteAsText();
-    };*/
 
 	document.body.appendChild(elementText);
 }

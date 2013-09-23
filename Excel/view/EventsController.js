@@ -818,7 +818,30 @@
 								80: function () {stop(); t.handlers.trigger("print");},
 								83: function () {stop(); t.handlers.trigger("save");},
 								67: function () {t.handlers.trigger("copy");},
-								86: function () {t.handlers.trigger("paste");},
+								86: function () {
+									if (!window.GlobalPasteFlag)
+									{
+										if (!window.USER_AGENT_SAFARI_MACOS)
+										{
+											window.GlobalPasteFlag = true;
+											t.handlers.trigger("paste");
+										}
+										else
+										{
+											if (0 === window.GlobalPasteFlagCounter)
+											{
+												//SafariIntervalFocus();
+												window.GlobalPasteFlag = true;
+												t.handlers.trigger("paste");
+											}
+										}
+									}
+									else
+									{
+										if (!window.USER_AGENT_SAFARI_MACOS)
+											stop();
+									}
+								},
 								88: function () {t.handlers.trigger("cut");},
 								89: function () {stop(); t.handlers.trigger("redo");},
 								90: function () {stop(); t.handlers.trigger("undo");}
