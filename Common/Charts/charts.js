@@ -715,27 +715,55 @@ function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY, chart)
 		
 		if(!chart.margins.key || (chart.margins.key && (!chart.margins.key.h && !chart.margins.key.w)))
 		{
+			var widthText;
+			var widthLine = 28;
 			//+ высота легенды
 			if(bar._otherProps._key_halign == 'top' || bar._otherProps._key_halign == 'bottom')
 			{
 				var font = getFontProperties("key");
 				var props = getMaxPropertiesText(context,font,bar._otherProps._key);
+				//длинные подписи, или их большое количество разделяем на несколько строк
+				var maxWidthOneLineKey = 0.9*chartCanvas.width;
+				var widthRow = 0;
+				var level = 0;
+				var levelKey = [];
+				var n = 0;
+				for(var i = 0; i < bar._otherProps._key.length; i++)
+				{					
+					widthText = getMaxPropertiesText(context,font,bar._otherProps._key[i]).width/scale;
+					widthRow += widthText + 2 + widthLine;
+					if(!levelKey[level])
+						levelKey[level] = [];
+					if(widthRow > maxWidthOneLineKey)
+					{
+						level++;
+						widthRow = 0;
+						n = 0;
+						i--;
+					}
+					else
+					{
+						levelKey[level][n] = bar._otherProps._key[i];
+						n++;
+					}
+				}
+				bar._otherProps._key_levels = levelKey;
+				bar._otherProps._key_width = maxWidthOneLineKey;
 				var heigthTextKey = (context.getHeightText()/0.75);
 				var kF = 1;
 				if(bar.type == 'pie')
 					kF = 2;
 				if(bar._otherProps._key_halign == 'top')
-					top += (heigthTextKey + 7)*kF;
+					top += (heigthTextKey*kF)*(level + 1) + 7;
 				else
-					bottom += (heigthTextKey + 7)*kF;
+					bottom += (heigthTextKey*kF)*(level + 1) + 7;
 			}
 			//+ ширина легенды
 			if (bar._otherProps._key_halign == 'left' || bar._otherProps._key_halign == 'right')
 			{
-				var widthLine = 28;
 				//находим ширину текста легенды(то есть её максимального элемента), в дальнейшем будем возвращать ширину автофигуры
 				var font = getFontProperties("key");
-				var widthText = getMaxPropertiesText(context,font,bar._otherProps._key);
+				widthText = getMaxPropertiesText(context,font,bar._otherProps._key);
 				var widthKey = widthText.width/scale + 2 + widthLine;
 				//в MSExcel справа от легенды всегда остаётся такой маргин 
 				//TODO - легенду нужно сделать как автофигуру
@@ -1609,7 +1637,14 @@ function drawChart(chart, arrValues, width, height, options) {
 		bar._chartTitle._vpos = 32;
 		bar._chartTitle._hpos = 0.5;
 	}
-
+	
+	if(chart.header.title != "")
+	{
+		bar._chartTitle._visibleTitle = chart.header.title;
+		if(chart.margins.title.h)
+			bar._chartTitle._marginTopTitle = chart.margins.title.h;
+	}
+	
 	if (chart.xAxis.title && !chart.margins) {
 		var legendTop = 0;
 		var widthXtitle =  bar.context.measureText(chart.xAxis.title).width;
@@ -2398,10 +2433,17 @@ function calculatePosiitionObjects(type)
 				var font = getFontProperties("key");
 				var props = getMaxPropertiesText(context,font,bar._otherProps._key);
 				var heigthTextKey = (context.getHeightText()/0.75)*scale;
-				if(typeof(bar._chartTitle._text) == 'string' && bar._chartTitle._text != '')
+				if(bar._chartTitle._marginTopTitle)
+				{
+					return 7*scale + heigthTextKey + bar._chartTitle._marginTopTitle;
+				}
+				else if(typeof(bar._chartTitle._text) == 'string' && bar._chartTitle._text != '' || bar._chartTitle._visibleTitle != "")
 				{
 					var font = getFontProperties("title");
-					var axisTitleProp = getMaxPropertiesText(context,font, bar._chartTitle._text);
+					var text = bar._chartTitle._text;
+					if(bar._chartTitle._visibleTitle != "")
+						text = bar._chartTitle._visibleTitle;
+					var axisTitleProp = getMaxPropertiesText(context,font, text);
 					var hpos = (bar.canvas.width)/2 - axisTitleProp.width/2;
 					var heigthText = (context.getHeightText()/0.75)*scale;
 					return 7*scale + heigthTextKey + 7*scale + heigthText;

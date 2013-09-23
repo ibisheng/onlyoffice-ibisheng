@@ -265,48 +265,111 @@
            
             if(obj._otherProps._key_halign == 'bottom' || obj._otherProps._key_halign == 'top')
             {
-                 for (var i=0; i<key.length; i++) {
-                // Draw the blob of color
-                    var leftDiff = 0;
-					for(var n = 0 ; n < i; n++)
-					{
-						leftDiff += widthEveryElemKey[n];
-					}
+                 
+				var levels;
+				if(obj._otherProps._key_levels)
+					levels = obj._otherProps._key_levels;
+				var gVpos = vpos;
+				//если не умещается легенда, делаем её в несколько строк	
+				if(levels && levels.length)
+				{
 					
-                
-                    if (obj._otherProps._key_color_shape == 'circle') {
-                        context.beginPath();
-                            context.strokeStyle = 'rgba(0,0,0,0)';
-                            context.fillStyle = colors[i];
-                            context.arc(hpos + 5 + (blob_size / 2), vpos + (5 * j) + (text_size * j) - text_size + (blob_size / 2), blob_size / 2, 0, 6.26, 0);
-                        context.fill();
-                    
-                    } else if (obj._otherProps._key_color_shape == 'line') {
-                        context.beginPath();
-                            context.strokeStyle = colors[i];
-                            context.lineWidth = '2.7'
+					var widthCurKey = 0;
+					for(var i = 0; i < levels[0].length; i++)
+					{
+						widthCurKey += widthEveryElemKey[i];
+					}
+					hpos = (canvas.width - widthCurKey)/2;
+					var startLevelNum = 0;
+					var elemeNum = 0;;
+					for (var i = 0; i < levels.length; i++) {
+						startLevelNum = elemeNum;
+						for(var j = 0; j < levels[i].length; j++)
+						{
+							// Draw the blob of color
+							var leftDiff = 0;
+							for(var n = startLevelNum ; n < elemeNum; n++)
+							{
+								leftDiff += widthEveryElemKey[n];
+							}
+							if(obj._otherProps._key_halign == 'top')
+								vpos = gVpos + props.height*(i);
+							else
+								vpos = gVpos - props.height*(levels.length - i - 1);
+							if (obj._otherProps._key_color_shape == 'line') {
+								context.beginPath();
+									context.strokeStyle = colors[elemeNum];
+									context.lineWidth = '2.7'
+										
+										context.moveTo(hpos + leftDiff + 2*scale,vpos - props.height/2);
+										context.lineTo(hpos + leftDiff + sizeLine + 2*scale, vpos - props.height/2);
 
-                                context.moveTo(hpos + leftDiff + 2*scale,vpos - props.height/2);
-                                context.lineTo(hpos + leftDiff + sizeLine + 2*scale, vpos - props.height/2);
+								context.stroke();
 
-                        context.stroke();
+							} else {
+								context.fillStyle =  colors[elemeNum];
+								context.fillRect(hpos + leftDiff + 2*scale, vpos - 7*scale, 7*scale, 7*scale);
+							}
 
-                    } else {
-                        context.fillStyle =  colors[i];
-                        context.fillRect(hpos + leftDiff + 2*scale, vpos - 7*scale, 7*scale, 7*scale);
-                        //context.fillRect(hpos, vpos + (10 * j) + (text_size * j) - text_size, 22, obj._otherProps._linewidth);
-                    }
+							context.beginPath();
+						
+							context.fillStyle = 'black';
+							OfficeExcel.Text(context,
+									text_font,
+									text_size,
+									hpos + leftDiff + sizeLine + 3*scale,
+									vpos,
+									levels[i][j]);
+									
+							elemeNum++;
+						}
+					}
+				}				
+				else
+				{
+					for (var i=0; i<key.length; i++) {
+						// Draw the blob of color
+						var leftDiff = 0;
+						for(var n = 0 ; n < i; n++)
+						{
+							leftDiff += widthEveryElemKey[n];
+						}
+						
+						
+						if (obj._otherProps._key_color_shape == 'circle') {
+							context.beginPath();
+								context.strokeStyle = 'rgba(0,0,0,0)';
+								context.fillStyle = colors[i];
+								context.arc(hpos + 5 + (blob_size / 2), vpos + (5 * j) + (text_size * j) - text_size + (blob_size / 2), blob_size / 2, 0, 6.26, 0);
+							context.fill();
+						
+						} else if (obj._otherProps._key_color_shape == 'line') {
+							context.beginPath();
+								context.strokeStyle = colors[i];
+								context.lineWidth = '2.7'
 
-                    context.beginPath();
-                
-                    context.fillStyle = 'black';
-                     OfficeExcel.Text(context,
-                            text_font,
-                            text_size,
-                            hpos + leftDiff + sizeLine + 3*scale,
-                            vpos,
-                            key[i]);
-                }
+									context.moveTo(hpos + leftDiff + 2*scale,vpos - props.height/2);
+									context.lineTo(hpos + leftDiff + sizeLine + 2*scale, vpos - props.height/2);
+
+							context.stroke();
+
+						} else {
+							context.fillStyle =  colors[i];
+							context.fillRect(hpos + leftDiff + 2*scale, vpos - 7*scale, 7*scale, 7*scale);
+							//context.fillRect(hpos, vpos + (10 * j) + (text_size * j) - text_size, 22, obj._otherProps._linewidth);
+						}
+
+						context.beginPath();
+					
+						context.fillStyle = 'black';
+						OfficeExcel.Text(context,
+								text_font,
+								text_size,
+								hpos + leftDiff + sizeLine + 3*scale,
+								vpos,
+								key[i]);
+					}
+				}	
             }
             else
             {
