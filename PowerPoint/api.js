@@ -3530,6 +3530,7 @@ asc_docs_api.prototype.asyncImagesDocumentEndLoaded = function()
         this.isPasteFonts_Images = false;
         this.pasteImageMap = null;
         this.pasteCallback();
+        window.GlobalPasteFlag = false;
         this.pasteCallback = null;
     }
     else if (this.isSaveFonts_Images)
@@ -3677,9 +3678,23 @@ asc_docs_api.prototype.sync_SendProgress = function(Percents)
 
 asc_docs_api.prototype.pre_Paste = function(_fonts, _images, callback)
 {
-    this.isPasteFonts_Images = true;
     this.pasteCallback = callback;
     this.pasteImageMap = _images;
+
+    var _count = 0;
+    for (var i in this.pasteImageMap)
+        ++_count;
+    if (0 == _count && false === this.FontLoader.CheckFontsNeedLoading(_fonts))
+    {
+        // никаких евентов. ничего грузить не нужно. сделано для сафари под макОс.
+        // там при LongActions теряется фокус и вставляются пробелы
+        this.pasteCallback();
+        window.GlobalPasteFlag = false;
+        this.pasteCallback = null;
+        return;
+    }
+
+    this.isPasteFonts_Images = true;
     this.FontLoader.LoadDocumentFonts2(_fonts);
 }
 
