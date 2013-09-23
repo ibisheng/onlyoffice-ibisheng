@@ -2497,6 +2497,84 @@ function BinaryPPTYLoader()
                     slide.applyTiming(_timing);
                     break;
                 }
+                case 4:
+                {
+                    var end2 = s.cur + s.GetLong() + 4;
+                    while (s.cur < end2)
+                    {
+                        var _rec2 = s.GetUChar();
+                        switch (_rec2)
+                        {
+                            case 0:
+                            {
+                                s.Skip2(4); // len
+                                var lCount = s.GetULong();
+
+                                for (var i = 0; i < lCount; i++)
+                                {
+                                    s.Skip2(1);
+
+                                    var _comment = new CWriteCommentData();
+
+                                    var _end_rec3 = s.cur + s.GetLong() + 4;
+
+                                    s.Skip2(1); // start attributes
+                                    while (true)
+                                    {
+                                        var _at3 = s.GetUChar();
+                                        if (_at3 == g_nodeAttributeEnd)
+                                            break;
+
+                                        switch (_at3)
+                                        {
+                                            case 0:
+                                                _comment.WriteAuthorId = s.GetLong();
+                                                break;
+                                            case 1:
+                                                _comment.WriteTime = s.GetString2();
+                                                break;
+                                            case 2:
+                                                _comment.WriteCommentId = s.GetLong();
+                                                break;
+                                            case 3:
+                                                _comment.x = s.GetLong();
+                                                break;
+                                            case 4:
+                                                _comment.y = s.GetLong();
+                                                break;
+                                            case 5:
+                                                _comment.WriteText = s.GetString2();
+                                                break;
+                                            case 6:
+                                                _comment.WriteParentAuthorId = s.GetLong();
+                                                break;
+                                            case 7:
+                                                _comment.WriteParentCommentId = s.GetLong();
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                    }
+
+                                    s.Seek2(_end_rec3);
+
+                                    _comment.Calculate2();
+                                    slide.writecomments.push(_comment);
+                                }
+
+                                break;
+                            }
+                            default:
+                            {
+                                s.SkipRecord();
+                                break;
+                            }
+                        }
+                    }
+
+                    s.Seek2(end2);
+                    break;
+                }
                 default:
                 {
                     var _len = s.GetULong();
@@ -2505,6 +2583,8 @@ function BinaryPPTYLoader()
                 }
             }
         }
+
+        slide.Load_Comments(this.presentation.CommentAuthors);
 
         s.Seek2(end);
         this.TempMainObject = null;
@@ -6855,6 +6935,75 @@ function CPres()
                         }
                     }
 
+                    break;
+                }
+                case 6:
+                {
+                    var _end_rec2 = s.cur + s.GetULong() + 4;
+                    while (s.cur < _end_rec2)
+                    {
+                        var _rec = s.GetUChar();
+
+                        switch (_rec)
+                        {
+                            case 0:
+                            {
+                                s.Skip2(4); // len
+                                var lCount = s.GetULong();
+
+                                for (var i = 0; i < lCount; i++)
+                                {
+                                    s.Skip2(1);
+
+                                    var _author = new CCommentAuthor();
+
+                                    var _end_rec3 = s.cur + s.GetLong() + 4;
+                                    s.Skip2(1); // start attributes
+
+                                    while (true)
+                                    {
+                                        var _at2 = s.GetUChar();
+                                        if (_at2 == g_nodeAttributeEnd)
+                                            break;
+
+                                        switch (_at2)
+                                        {
+                                            case 0:
+                                                _author.Id = s.GetLong();
+                                                break;
+                                            case 1:
+                                                _author.LastId = s.GetLong();
+                                                break;
+                                            case 2:
+                                                var _clr_idx = s.GetLong();
+                                                break;
+                                            case 3:
+                                                _author.Name = s.GetString2();
+                                                break;
+                                            case 4:
+                                                _author.Initials = s.GetString2();
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                    }
+
+                                    s.Seek2(_end_rec3);
+
+                                    reader.presentation.CommentAuthors[_author.Name] = _author;
+                                }
+
+                                break;
+                            }
+                            default:
+                            {
+                                s.SkipRecord();
+                                break;
+                            }
+                        }
+                    }
+
+                    s.Seek2(_end_rec2);
                     break;
                 }
                 default:

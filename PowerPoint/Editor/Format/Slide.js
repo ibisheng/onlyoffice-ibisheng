@@ -1970,6 +1970,91 @@ Slide.prototype =
                 break;
             }
         }
+    },
+
+    Load_Comments : function(authors)
+    {
+        var _comments_count = this.writecomments.length;
+        var _comments_id = [];
+        var _comments_data = [];
+        var _comments = [];
+
+        for (var i = 0; i < _comments_count; i++)
+        {
+            var _wc = this.writecomments[i];
+
+            if (0 == _wc.WriteParentAuthorId || 0 == _wc.WriteParentCommentId)
+            {
+                var commentData = new CCommentData();
+
+                commentData.m_sText = _wc.WriteText;
+                commentData.m_sUserId = ("" + _wc.WriteAuthorId);
+                commentData.m_sUserName = "";
+                commentData.m_sTime = _wc.WriteTime;
+
+                for (var k in authors)
+                {
+                    if (_wc.WriteAuthorId == authors[k].Id)
+                    {
+                        commentData.m_sUserName = authors[k].Name;
+                        break;
+                    }
+                }
+
+                if ("" != commentData.m_sUserName)
+                {
+                    _comments_id.push(_wc.WriteCommentId);
+                    _comments_data.push(commentData);
+
+                    var comment = new CComment(undefined, null);
+                    comment.setPosition(_wc.x / 25.4, _wc.y / 25.4);
+                    _comments.push(comment);
+                }
+            }
+            else
+            {
+                var commentData = new CCommentData();
+
+                commentData.m_sText = _wc.WriteText;
+                commentData.m_sUserId = ("" + _wc.WriteAuthorId);
+                commentData.m_sUserName = "";
+                commentData.m_sTime = _wc.WriteTime;
+
+                for (var k in authors)
+                {
+                    if (_wc.WriteAuthorId == authors[k].Id)
+                    {
+                        commentData.m_sUserName = authors[k].Name;
+                        break;
+                    }
+                }
+
+                var _parent = null;
+                for (var j = 0; j < _comments_data.length; j++)
+                {
+                    if ((("" + _wc.WriteParentAuthorId) == _comments_data[j].m_sUserId) && (_wc.WriteParentCommentId == _comments_id[j]))
+                    {
+                        _parent = _comments_data[j];
+                        break;
+                    }
+                }
+
+                if (null != _parent)
+                {
+                    _parent.m_aReplies.push(commentData);
+                }
+            }
+        }
+
+        for (var i = 0; i < _comments.length; i++)
+        {
+            _comments[i].Set_Data(_comments_data[i]);
+            this.addComment(_comments[i]);
+
+            editor.sync_AddComment(_comments[i].Get_Id(), _comments_data[i] );
+        }
+
+        this.writecomments = [];
     }
 };
 
