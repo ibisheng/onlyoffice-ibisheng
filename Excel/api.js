@@ -730,7 +730,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 			_asc_sendCommand: function (callback, rdata) {
 				var oThis = this;
-				$.ajax({
+				asc_ajax({
 					type: 'POST',
 					url: g_sMainServiceLocalUrl,
 					data: rdata,
@@ -2645,7 +2645,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 			},
 
 			asc_recalc : function(){
-				this.wbModel.recalc();
+				this.wbModel.recalcWB();
 				// this.wb.getWorksheet().changeWorksheet("update");
 			},
 
