@@ -2546,7 +2546,7 @@ c_oSer_TableColumns$TotalsRowFormula:JF
 JSCompiler_StaticMethods_Set_CurrentElement:w7
 MATRIX_ORDER_APPEND:Gx
 c_oAscBorderOptions$InnerV:WR
-asc_CParagraphTabs:lg
+asc_CParagraphTabs:ng
 PS_BlendRec:Yl
 FormatObjDecimalFrac:Vc
 JSCompiler_StaticMethods_Clear_Formatting:e7
@@ -3225,7 +3225,7 @@ Int64:tj
 L 76:Le
 JSCompiler_StaticMethods_rebuildSeries:jf
 _ph_summ__sec_head:AW
-L 77:Yf
+L 77:Xf
 L 78:Jd
 t1_args_count:gn
 L 79:ib
@@ -3261,11 +3261,11 @@ RotateTrackGroup:b3
 L 61:vb
 L 60:Dc
 c_oSer_ColorType$Auto:fF
-JSCompiler_StaticMethods_Calculate_X_Value:Xf
+JSCompiler_StaticMethods_Calculate_X_Value:$f
 L 99:Zh
 L 95:mc
 c_oSer_SheetPr$FilterMode:nI
-L 96:ng
+L 96:mg
 L 97:Kf
 L 98:Ae
 c_oSer_ChartCatAxType$Title:g_
@@ -3290,18 +3290,18 @@ c_oSerStylesTypes$Border:VB
 L 88:dh
 JSCompiler_StaticMethods_deleteAllSlaveEdges:RM
 L 89:Hf
-L 86:$f
+L 86:Zf
 CHART_TITLE_TYPE_V_AXIS:O0
 L 87:td
 L 84:ld
-L 85:Zf
+L 85:Yf
 tt_size_request:wt
 g_bIsAppleDevices:Fw
 c_oSer_SheetPr$SyncRef:qI
 c_oEditorId$Speadsheet:ha
 c_oSer_BasicChartType$Series:q_
 CellValueType$Number:na
-L 83:mg
+L 83:lg
 L 82:oj
 c_oSerPropLenType$Byte:YJ
 L 81:ff
