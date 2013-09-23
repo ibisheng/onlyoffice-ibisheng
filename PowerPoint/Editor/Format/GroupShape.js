@@ -283,6 +283,7 @@ CGroupShape.prototype =
     recalcTransform:function()
     {
         this.recalcInfo.recalculateTransform = true;
+        this.recalcInfo.recalculateScaleCoefficients = true;
         for(var i = 0; i < this.spTree.length; ++i)
         {
             if(this.spTree[i].recalcTransform)
@@ -715,6 +716,7 @@ CGroupShape.prototype =
         this.spPr.xfrm.offY = offY;
         this.recalcTransform();
         this.recalcInfo.recalculateTransformText = true;
+        this.recalcInfo.recalculateScaleCoefficients = true;
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 
@@ -727,6 +729,7 @@ CGroupShape.prototype =
         this.recalcTransform();
         this.recalcInfo.recalculateTransformText = true;
         this.recalcInfo.recalculateGeometry = true;
+        this.recalcInfo.recalculateScaleCoefficients = true;
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 
@@ -737,6 +740,7 @@ CGroupShape.prototype =
         this.spPr.xfrm.chOffY = offY;
         this.recalcTransform();
         this.recalcInfo.recalculateTransformText = true;
+        this.recalcInfo.recalculateScaleCoefficients = true;
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 

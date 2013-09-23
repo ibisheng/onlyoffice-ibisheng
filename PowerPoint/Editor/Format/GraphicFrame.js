@@ -1,4 +1,5 @@
 /**
+/**
  * Created with JetBrains WebStorm.
  * User: Sergey.Luzyanin
  * Date: 8/20/13
@@ -50,7 +51,12 @@ CGraphicFrame.prototype =
     {
         if(this.graphicObject)
         {
-            this.graphicObject.Set_Props(props);
+            var bApplyToAll = this.parent.graphicObjects.State.textObject !== this;
+           // if(bApplyToAll)
+           //     this.graphicObject.Set_ApplyToAll(true);
+            this.graphicObject.Set_Props(props, bApplyToAll);
+            //if(bApplyToAll)
+            //    this.graphicObject.Set_ApplyToAll(false);
             this.OnContentRecalculate();
             editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         }
@@ -463,7 +469,6 @@ CGraphicFrame.prototype =
             var tx, ty;
             tx = this.invertTransform.TransformPointX(x, y);
             ty = this.invertTransform.TransformPointY(x, y);
-            this.graphicObject.Selection_SetStart(tx, ty, 0, e);
             if(g_mouse_event_type_down === e.Type)
             {
                 if(this.graphicObject.Is_TableBorder( tx, ty, 0))
@@ -471,9 +476,19 @@ CGraphicFrame.prototype =
                     History.Create_NewPoint();
                 }
             }
+            this.graphicObject.Selection_SetStart(tx, ty, 0, e);
+
             return
 
         }
+    },
+
+    isTableBorder: function(x, y)
+    {
+        var tx, ty;
+        tx = this.invertTransform.TransformPointX(x, y);
+        ty = this.invertTransform.TransformPointY(x, y);
+        return this.graphicObject.Is_TableBorder( tx, ty, 0) != null;
     },
 
     selectionSetEnd: function(e, x, y, slideIndex)
@@ -691,6 +706,8 @@ CGraphicFrame.prototype =
                 break;
             }
         }
+        if(this.graphicObject)
+            this.graphicObject.Selection_Remove();
     },
 
     draw: function(graphics)
@@ -700,6 +717,8 @@ CGraphicFrame.prototype =
             graphics.transform3(this.transform);
             graphics.SetIntegerGrid(true);
             this.graphicObject.Draw(0, graphics);
+            if(locktype_None != this.Lock.Get_Type())
+                graphics.DrawLockObjectRect(this.Lock.Get_Type() , 0, 0, this.extX, this.extY);
             graphics.SetIntegerGrid(true);
             graphics.reset();
         }

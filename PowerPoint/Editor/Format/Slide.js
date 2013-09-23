@@ -48,9 +48,9 @@ function Slide(presentation, slideLayout, slideNum)
     this.comments = [];
     this.writecomments = [];
 
-    this.show = true;
-    this.showMasterPhAnim = false;
-    this.showMasterSp = false;
+    //this.show = true;
+    //this.showMasterPhAnim = false;
+    //this.showMasterSp = false;
 
     this.changeProportions = function(kW, kH)
     {
@@ -1066,6 +1066,7 @@ Slide.prototype =
         {
             this.cSld.spTree[i].recalcAllColors();
         }
+        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
     },
 
     Get_Id: function()
@@ -1232,7 +1233,18 @@ Slide.prototype =
             if(spTree[i].selected)
             {
                 History.Add(this, {Type: historyitem_RemoveFromSpTree, index: i, id: spTree[i].Get_Id()});
-                spTree.splice(i, 1);
+                var obj = spTree.splice(i, 1)[0];
+                if(obj.isPlaceholder() && !(obj.isEmptyPlaceholder && obj.isEmptyPlaceholder()))
+                {
+                    var m_s = this.Layout.getMatchingShape(obj.getPlaceholderType(), obj.getPlaceholderIndex());
+                    if(m_s)
+                    {
+                        var shape = new CShape(this);
+                        m_s.copy2(shape);
+                        this.addToSpTreeToPos(i, shape);
+                    }
+                }
+
             }
         }
         this.graphicObjects.resetSelectionState();
@@ -1563,7 +1575,8 @@ Slide.prototype =
             case historyitem_SetLayout:
             {
                 this.Layout = data.oldLayout;
-                this.recalcAll();
+                if(this.Layout != null)
+                    this.recalcAll();
                 break;
             }
             case historyitem_SetSlideNum:

@@ -1695,7 +1695,7 @@ CTable.prototype =
         return this.Parent.getStylesForParagraph(level);
     },
 
-    Set_Props : function(Props)
+    Set_Props : function(Props, bAllTable)
     {
         var TablePr = this.Get_CompiledPr(false).TablePr;
         var bApplyToInnerTable = false;
@@ -1714,7 +1714,7 @@ CTable.prototype =
         // TableStyle (стиль таблицы)
         if ( "undefined" != typeof(Props.TableStyle) )
         {
-            if ( this.TableStyle != Props.TableStyle )
+            if ( this.styleIndex != Props.TableStyle )
             {
                 this.Set_TableStyle( Props.TableStyle );
                 bRecalc_All = true;
@@ -1724,29 +1724,16 @@ CTable.prototype =
         // TableLook
         if ( "undefined" != typeof(Props.TableLook) )
         {
-            var NewLook = new CTableLook( Props.TableLook.FirstCol, Props.TableLook.FirstRow, Props.TableLook.LastCol, Props.TableLook.LastRow, Props.TableLook.BandHor, Props.TableLook.BandVer );
+            var table_look = this.TableLook;
+            var first_col = Props.TableLook.FirstCol !== undefined ? Props.TableLook.FirstCol : table_look.m_bFirst_Col;
+            var first_row = Props.TableLook.FirstRow !== undefined ? Props.TableLook.FirstRow : table_look.m_bFirst_Row;
+            var last_col = Props.TableLook.LastCol !== undefined ? Props.TableLook.LastCol : table_look.m_bLast_Col;
+            var last_row = Props.TableLook.LastRow !== undefined ? Props.TableLook.LastRow : table_look.m_bLast_Row;
+            var band_ver = Props.TableLook.BandVer !== undefined ? Props.TableLook.BandVer : table_look.m_bBand_Ver;
+            var band_hor = Props.TableLook.BandHor !== undefined ? Props.TableLook.BandHor : table_look.m_bBand_Hor;
+            var NewLook = new CTableLook( first_col, first_row, last_col, last_row, band_hor, band_ver );
             this.Set_TableLook( NewLook );
             bRecalc_All = true;
-        }
-
-        // AllowOverlap
-        if ( undefined != Props.AllowOverlap )
-        {
-            this.Set_AllowOverlap( Props.AllowOverlap );
-            bRecalc_All = true;
-        }
-
-        // RowsInHeader
-        if ( undefined != Props.RowsInHeader )
-        {
-            var RowsInHeader = Props.RowsInHeader
-            for ( var Index = 0; Index < this.Content.length; Index++ )
-            {
-                if ( Index < RowsInHeader && true != this.Content[Index].Is_Header() )
-                    this.Content[Index].Set_Header( true );
-                else if ( Index >= RowsInHeader && true === this.Content[Index].Is_Header() )
-                    this.Content[Index].Set_Header( false );
-            }
         }
 
         // TableSpacing (расстояние между ячейками)
@@ -1774,8 +1761,7 @@ CTable.prototype =
 
                 // При изменении Spacing мы должны изменить сетку таблицы
                 var GridKoeff = new Array();
-                var ColsCount = this.TableGridCalc.length;
-                for ( var Index = 0; Index < ColsCount; Index++ )
+                for ( var Index = 0; Index < this.TableGrid.length; Index++ )
                     GridKoeff.push(1);
 
                 for ( var CurRow = 0; CurRow < this.Content.length; CurRow++ )
@@ -1791,9 +1777,9 @@ CTable.prototype =
                 var TableGrid_old = this.TableGrid;
                 this.TableGrid = new Array();
 
-                for ( var Index = 0; Index < ColsCount; Index++ )
+                for ( var Index = 0; Index < TableGrid_old.length; Index++ )
                 {
-                    this.TableGrid[Index] = this.TableGridCalc[Index] + GridKoeff[Index] * Diff;
+                    this.TableGrid[Index] = TableGrid_old[Index] + GridKoeff[Index] * Diff;
                 }
 
                 History.Add( this, { Type : historyitem_Table_TableGrid, Old : TableGrid_old, New : this.TableGrid } );
@@ -1951,7 +1937,7 @@ CTable.prototype =
 
                         NeedChange = true;
                     }
-                   
+
                     break;
                 }
                 case 2:
@@ -2046,7 +2032,7 @@ CTable.prototype =
 
                         NeedChange = true;
                     }
-                    
+
                     break;
                 }
             }
@@ -2073,36 +2059,21 @@ CTable.prototype =
             }
         }
 
-        // TableLayout
-        if ( undefined != Props.TableLayout )
-        {
-            this.Set_TableLayout( ( Props.TableLayout === c_oAscTableLayout.AutoFit ? tbllayout_AutoFit : tbllayout_Fixed ) );
-            bRecalc_All = true;
-        }
-
         // TableWrappingStyle
-        if ( undefined != Props.TableWrappingStyle )
+        if ( "undefined" != typeof(Props.TableWrappingStyle) )
         {
             // При изменении flow на inline или наоборот, пересчет таблицы будет запущен позже
             if ( 0 === Props.TableWrappingStyle && true != this.Inline )
             {
                 this.Set_Inline( true );
-                bRecalc_All = true;
+                bRecalc_All = false;
+                bRedraw     = false;
             }
             else if ( 1 === Props.TableWrappingStyle && false != this.Inline )
             {
                 this.Set_Inline( false );
-
-                if ( undefined === Props.PositionH )
-                    this.Set_PositionH( c_oAscHAnchor.Page, false, this.AnchorPosition.Calculate_X_Value(c_oAscHAnchor.Page)  );
-
-                if ( undefined === Props.PositionV )
-                    this.Set_PositionV( c_oAscVAnchor.Page, false, this.AnchorPosition.Calculate_Y_Value(c_oAscVAnchor.Page)  );
-
-                if ( undefined === Props.TablePaddings )
-                    this.Set_Distance( 3.2, 0, 3.2, 0 );
-
-                bRecalc_All = true;
+                bRecalc_All = false;
+                bRedraw     = false;
             }
         }
 
@@ -2130,46 +2101,35 @@ CTable.prototype =
         }
 
         // Position
-        if ( undefined != Props.Position )
+        if ( "undefined" != typeof(Props.Position) && true != this.Is_Inline() )
         {
-            this.PositionH.RelativeFrom = c_oAscHAnchor.Page;
-            this.PositionH.Align        = true;
-            this.PositionV.RelativeFrom = c_oAscVAnchor.Page;
-            this.PositionH.Align        = true;
+            var X_new = ( "undefined" != typeof(Props.Position.X) ? ( null != Props.Position.X ? Props.Position.X : this.X ) : this.X );
+            var Y_new = ( "undefined" != typeof(Props.Position.Y) ? ( null != Props.Position.Y ? Props.Position.Y : this.Y ) : this.Y );
 
-            this.PositionH.Value        = c_oAscXAlign.Center;
-            this.PositionV.Value        = c_oAscYAlign.Center;
+            if ( Math.abs( this.X - X_new ) > 0.001 || Math.abs( this.Y - Y_new ) > 0.001 )
+            {
+                this.X = X_new;
+                this.Y = Y_new;
 
-            //this.PositionH.Value        = ( "undefined" != typeof(Props.Position.X) ? ( null != Props.Position.X ? Props.Position.X : this.X ) : this.X );
-            //this.PositionV.Value        = ( "undefined" != typeof(Props.Position.Y) ? ( null != Props.Position.Y ? Props.Position.Y : this.Y ) : this.Y );
-
-            bRecalc_All = true;
-        }
-
-        if ( undefined != Props.PositionH )
-        {
-            this.Set_PositionH( Props.PositionH.RelativeFrom, Props.PositionH.UseAlign, (true === Props.PositionH.UseAlign) ? Props.PositionH.Align : Props.PositionH.Value );
-        }
-
-        if ( undefined != Props.PositionV )
-        {
-            this.Set_PositionV( Props.PositionV.RelativeFrom, Props.PositionV.UseAlign, (true === Props.PositionV.UseAlign) ? Props.PositionV.Align : Props.PositionV.Value );
+                this.Parent.Set_Position( this.X, this.Y );
+                bRecalc_All = true;
+            }
         }
 
         // TablePaddings
-        if ( undefined != Props.TablePaddings )
+        if ( "undefined" != typeof(Props.TablePaddings) && true != this.Is_Inline() )
         {
             var TP = Props.TablePaddings;
-            var CurPaddings = this.Distance;
+            var CurPaddings = this.Parent.Paddings;
 
-            var NewPaggings_left   = ( undefined != TP.Left   ? ( null != TP.Left   ? TP.Left   : CurPaddings.L ) : CurPaddings.L );
-            var NewPaggings_right  = ( undefined != TP.Right  ? ( null != TP.Right  ? TP.Right  : CurPaddings.R ) : CurPaddings.R );
-            var NewPaggings_top    = ( undefined != TP.Top    ? ( null != TP.Top    ? TP.Top    : CurPaddings.T ) : CurPaddings.T );
-            var NewPaggings_bottom = ( undefined != TP.Bottom ? ( null != TP.Bottom ? TP.Bottom : CurPaddings.B ) : CurPaddings.B );
+            var NewPaggings_left   = ( "undefined" != typeof(TP.Left)   ? ( null != TP.Left   ? TP.Left   : CurPaddings.Left   ) : CurPaddings.Left   );
+            var NewPaggings_right  = ( "undefined" != typeof(TP.Right)  ? ( null != TP.Right  ? TP.Right  : CurPaddings.Right  ) : CurPaddings.Right  );
+            var NewPaggings_top    = ( "undefined" != typeof(TP.Top)    ? ( null != TP.Top    ? TP.Top    : CurPaddings.Top    ) : CurPaddings.Top    );
+            var NewPaggings_bottom = ( "undefined" != typeof(TP.Bottom) ? ( null != TP.Bottom ? TP.Bottom : CurPaddings.Bottom ) : CurPaddings.Bottom );
 
-            if ( Math.abs( CurPaddings.L - NewPaggings_left ) > 0.001 || Math.abs( CurPaddings.R - NewPaggings_right ) > 0.001 || Math.abs( CurPaddings.T - NewPaggings_top ) > 0.001 || Math.abs( CurPaddings.B - NewPaggings_bottom ) > 0.001 )
+            if ( Math.abs( CurPaddings.Left - NewPaggings_left ) > 0.001 || Math.abs( CurPaddings.Right - NewPaggings_right ) > 0.001 || Math.abs( CurPaddings.Top - NewPaggings_top ) > 0.001 || Math.abs( CurPaddings.Bottom - NewPaggings_bottom ) > 0.001 )
             {
-                this.Set_Distance( NewPaggings_left, NewPaggings_top, NewPaggings_right, NewPaggings_bottom );
+                this.Parent.Set_Paddings( NewPaggings_left, NewPaggings_right, NewPaggings_top, NewPaggings_bottom );
                 bRecalc_All = true;
             }
         }
@@ -2293,38 +2253,60 @@ CTable.prototype =
             var Cells_array = null;
 
             // Переделаем идеальный вариант, на новый
-            if ( true === bSpacing )
+            /* */
+
+
+            if(bAllTable)
             {
-                if ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type )
-                    Cells_array = this.Selection.Data;
-                else if ( false === Props.CellSelect )
+                Cells_array = new Array();
+                for ( var CurRow = 0; CurRow < this.Content.length; CurRow++ )
                 {
-                    Cells_array = new Array();
-                    for ( var CurRow = 0; CurRow < this.Content.length; CurRow++ )
+                    var Row = this.Content[CurRow];
+                    var Cells_count = Row.Get_CellsCount();
+                    for ( var CurCell = 0; CurCell < Cells_count; CurCell++ )
                     {
-                        var Row = this.Content[CurRow];
-                        var Cells_count = Row.Get_CellsCount();
-                        for ( var CurCell = 0; CurCell < Cells_count; CurCell++ )
-                        {
-                            var Cell = Row.Get_Cell( CurCell );
-                            if ( vmerge_Continue === Cell.Get_VMerge() )
-                                continue;
-                            Cells_array.push( { Cell : CurCell, Row : CurRow } );
-                        }
+                        var Cell = Row.Get_Cell( CurCell );
+                        if ( vmerge_Continue === Cell.Get_VMerge() )
+                            continue;
+                        Cells_array.push( { Cell : CurCell, Row : CurRow } );
                     }
                 }
-                else
-                    Cells_array = [ { Row : this.CurCell.Row.Index, Cell : this.CurCell.Index } ];
             }
             else
             {
-                if ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type )
-                    Cells_array = this.Selection.Data;
+                if ( true === bSpacing )
+                {
+                    if ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type )
+                        Cells_array = this.Selection.Data;
+                    else if ( false === Props.CellSelect )
+                    {
+                        Cells_array = new Array();
+                        for ( var CurRow = 0; CurRow < this.Content.length; CurRow++ )
+                        {
+                            var Row = this.Content[CurRow];
+                            var Cells_count = Row.Get_CellsCount();
+                            for ( var CurCell = 0; CurCell < Cells_count; CurCell++ )
+                            {
+                                var Cell = Row.Get_Cell( CurCell );
+                                if ( vmerge_Continue === Cell.Get_VMerge() )
+                                    continue;
+                                Cells_array.push( { Cell : CurCell, Row : CurRow } );
+                            }
+                        }
+                    }
+                    else
+                        Cells_array = [ { Row : this.CurCell.Row.Index, Cell : this.CurCell.Index } ];
+                }
                 else
                 {
-                    // TODO: Если данная ячейка имеет вертикальное объединение, тогда нам надо добавить
-                    //       все ячейки в него попадающие
-                    Cells_array = [ { Row : this.CurCell.Row.Index, Cell : this.CurCell.Index } ];
+                    if ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type )
+                        Cells_array = this.Selection.Data;
+                    else
+                    {
+                        // TODO: Если данная ячейка имеет вертикальное объединение, тогда нам надо добавить
+                        //       все ячейки в него попадающие
+                        Cells_array = [ { Row : this.CurCell.Row.Index, Cell : this.CurCell.Index } ];
+                    }
                 }
             }
 
@@ -2684,7 +2666,7 @@ CTable.prototype =
         // CellsBackground (заливка ячеек)
         if ( "undefined" != typeof(Props.CellsBackground) && null != Props.CellsBackground )
         {
-            if ( false === Props.CellSelect && true === bSpacing )
+            if ( bAllTable === true )
             {
                 for ( var CurRow = 0; CurRow < this.Content.length; CurRow++ )
                 {
@@ -2692,16 +2674,19 @@ CTable.prototype =
                     for ( var  CurCell = 0; CurCell < Row.Get_CellsCount(); CurCell++ )
                     {
                         var Cell = Row.Get_Cell( CurCell );
-                        var NewShd =
-                        {
+                        var NewShd = new CDocumentShd();
+                        NewShd.Set_FromObject({
                             Value : Props.CellsBackground.Value,
                             Color :
                             {
                                 r : Props.CellsBackground.Color.r,
                                 g : Props.CellsBackground.Color.g,
                                 b : Props.CellsBackground.Color.b
-                            }
-                        };
+                            },
+
+                            unifill: CorrectUniFill(Props.CellsBackground.fill, new CUniFill())
+                        });
+
 
                         Cell.Set_Shd( NewShd );
 
@@ -2709,26 +2694,55 @@ CTable.prototype =
                     }
                 }
             }
-            else if ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type )
+            else
             {
-                for ( var Index = 0; Index < this.Selection.Data.length; Index++ )
+                if ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type )
                 {
-                    var Pos = this.Selection.Data[Index];
-                    var Cell = this.Content[Pos.Row].Get_Cell( Pos.Cell );
+                    for ( var Index = 0; Index < this.Selection.Data.length; Index++ )
+                    {
+                        var Pos = this.Selection.Data[Index];
+                        var Cell = this.Content[Pos.Row].Get_Cell( Pos.Cell );
+                        var Cell_shd = Cell.Get_Shd();
+
+                        if ( Props.CellsBackground.Value != Cell_shd.Value || Props.CellsBackground.Color.r != Cell_shd.Color.r || Props.CellsBackground.Color.g != Cell_shd.Color.g || Props.CellsBackground.Color.b != Cell_shd.Color.b )
+                        {
+                            var NewShd = new CDocumentShd();
+                            NewShd.Set_FromObject({
+                                Value : Props.CellsBackground.Value,
+                                Color :
+                                {
+                                    r : Props.CellsBackground.Color.r,
+                                    g : Props.CellsBackground.Color.g,
+                                    b : Props.CellsBackground.Color.b
+                                },
+
+                                unifill: CorrectUniFill(Props.CellsBackground.fill, new CUniFill())
+                            });
+                            Cell.Set_Shd( NewShd );
+
+                            bRedraw = true;
+                        }
+                    }
+                }
+                else
+                {
+                    var Cell = this.CurCell;
                     var Cell_shd = Cell.Get_Shd();
 
                     if ( Props.CellsBackground.Value != Cell_shd.Value || Props.CellsBackground.Color.r != Cell_shd.Color.r || Props.CellsBackground.Color.g != Cell_shd.Color.g || Props.CellsBackground.Color.b != Cell_shd.Color.b )
                     {
-                        var NewShd =
-                        {
+                        var NewShd = new CDocumentShd();
+                        NewShd.Set_FromObject({
                             Value : Props.CellsBackground.Value,
                             Color :
                             {
                                 r : Props.CellsBackground.Color.r,
                                 g : Props.CellsBackground.Color.g,
                                 b : Props.CellsBackground.Color.b
-                            }
-                        };
+                            },
+
+                            unifill: CorrectUniFill(Props.CellsBackground.fill, new CUniFill())
+                        });
 
                         Cell.Set_Shd( NewShd );
 
@@ -2736,50 +2750,28 @@ CTable.prototype =
                     }
                 }
             }
-            else
-            {
-                var Cell = this.CurCell;
-                var Cell_shd = Cell.Get_Shd();
 
-                if ( Props.CellsBackground.Value != Cell_shd.Value || Props.CellsBackground.Color.r != Cell_shd.Color.r || Props.CellsBackground.Color.g != Cell_shd.Color.g || Props.CellsBackground.Color.b != Cell_shd.Color.b )
-                {
-                    var NewShd =
-                    {
-                        Value : Props.CellsBackground.Value,
-                        Color :
-                        {
-                            r : Props.CellsBackground.Color.r,
-                            g : Props.CellsBackground.Color.g,
-                            b : Props.CellsBackground.Color.b
-                        }
-                    };
-
-                    Cell.Set_Shd( NewShd );
-
-                    bRedraw = true;
-                }
-            }
         }
 
-        // CellsVAlign (вертикальное выравнивание ячеек)
-        if ( undefined != Props.CellsVAlign && null != Props.CellsVAlign )
+        if ( true === bRecalc_All )
         {
-            if ( this.Selection.Use === true && table_Selection_Cell === this.Selection.Type )
+            this.Internal_RecalculateGrid();
+            this.Internal_Recalculate_1();
+
+            this.Parent.OnContentRecalculate( true, 0, this.Index, null, this  );
+
+            if ( true === this.Selection.Use )
             {
-                var Count = this.Selection.Data.length;
-                for ( var Index = 0; Index < Count; Index++ )
-                {
-                    var Pos  = this.Selection.Data[Index];
-                    var Cell = this.Content[Pos.Row].Get_Cell( Pos.Cell );
-                    Cell.Set_VAlign( Props.CellsVAlign );
-                }
-            }
-            else
-            {
-                this.CurCell.Set_VAlign( Props.CellsVAlign );
+                this.DrawingDocument.SelectClear();
+                this.Selection_Draw();
+                this.DrawingDocument.SelectShow();
             }
 
-            bRecalc_All = true;
+        }
+        else if ( true === bRedraw )
+        {
+           // this.Recalculate();
+            this.Parent.OnContentRecalculate( false, 0, this.Index, null, this );
         }
 
         return true;
@@ -3533,7 +3525,7 @@ CTable.prototype =
         var LockType = this.Lock.Get_Type();
         if ( locktype_None != LockType )
         {
-            pGraphics.DrawLockObjectRect(this.Lock.Get_Type(), this.Pages[PNum].Bounds.Left, this.Pages[PNum].Bounds.Top, this.Pages[PNum].Bounds.Right - this.Pages[PNum].Bounds.Left, this.Pages[PNum].Bounds.Bottom - this.Pages[PNum].Bounds.Top );
+           // pGraphics.DrawLockObjectRect(this.Lock.Get_Type(), this.Pages[PNum].Bounds.Left, this.Pages[PNum].Bounds.Top, this.Pages[PNum].Bounds.Right - this.Pages[PNum].Bounds.Left, this.Pages[PNum].Bounds.Bottom - this.Pages[PNum].Bounds.Top );
         }
 
         var TableBorders = this.Get_Borders();
@@ -21034,7 +21026,7 @@ CTableCell.prototype =
 
             this.Recalc_CompiledPr();
         }
-        else if ( undefined === this.Pr.Shd || false === this.Pr.Shd.Compare(Shd) )
+        else if ( undefined === this.Pr.Shd || false === Shd.Compare(this.Pr.Shd) )
         {
             var _Shd = new CDocumentShd();
             _Shd.Set_FromObject( Shd );

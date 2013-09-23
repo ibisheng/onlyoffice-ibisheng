@@ -3422,12 +3422,17 @@ CShape.prototype =
 
     hitInInnerArea: function(x, y)
     {
-        var invert_transform = this.getInvertTransform();
-        var x_t = invert_transform.TransformPointX(x, y);
-        var y_t = invert_transform.TransformPointY(x, y);
-        if(isRealObject(this.spPr.geometry))
-            return this.spPr.geometry.hitInInnerArea(this.getParentObjects().presentation.DrawingDocument.CanvasHitContext, x_t, y_t);
-        return x_t > 0 && x_t < this.extX && y_t > 0 && y_t < this.extY;
+        if(this.brush!=null && this.brush.fill!=null
+            && this.brush.fill.type!=FILL_TYPE_NOFILL)
+        {
+            var invert_transform = this.getInvertTransform();
+            var x_t = invert_transform.TransformPointX(x, y);
+            var y_t = invert_transform.TransformPointY(x, y);
+            if(isRealObject(this.spPr.geometry))
+                return this.spPr.geometry.hitInInnerArea(this.getParentObjects().presentation.DrawingDocument.CanvasHitContext, x_t, y_t);
+            return x_t > 0 && x_t < this.extX && y_t > 0 && y_t < this.extY;
+        }
+        return false;
     },
 
 

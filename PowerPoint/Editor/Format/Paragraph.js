@@ -3856,7 +3856,7 @@ Paragraph.prototype =
     Internal_Draw_1 : function(CurPage, pGraphics, Pr)
     {
         // Если данный параграф зажат другим пользователем, рисуем соответствующий знак
-        if ( locktype_None != this.Lock.Get_Type() )
+       /* if ( locktype_None != this.Lock.Get_Type() )
         {
             if ( ( CurPage > 0 || false === this.Is_StartFromNewPage() || null === this.Get_DocumentPrev() ) )
             {
@@ -3866,7 +3866,7 @@ Paragraph.prototype =
 
                 pGraphics.DrawLockParagraph(this.Lock.Get_Type(), X_min, Y_top, Y_bottom);
             }
-        }
+        }    */
     },
 
     Internal_Draw_2 : function(CurPage, pGraphics, Pr)

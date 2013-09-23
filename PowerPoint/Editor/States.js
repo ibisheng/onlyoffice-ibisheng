@@ -312,8 +312,12 @@ function NullState(drawingObjectsController, drawingObjects)
                     {
                         this.drawingObjectsController.resetSelection();
                         cur_drawing.select(this.drawingObjectsController);
-                        cur_drawing.selectionSetStart(e, x, y);
-                        this.drawingObjectsController.changeCurrentState(new TextAddState(this.drawingObjectsController, this.drawingObjects, cur_drawing));
+                        if(!cur_drawing.isTableBorder(x, y)
+                            || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+                        {
+                            cur_drawing.selectionSetStart(e, x, y);
+                            this.drawingObjectsController.changeCurrentState(new TextAddState(this.drawingObjectsController, this.drawingObjects, cur_drawing));
+                        }
                         this.drawingObjects.presentation.Document_UpdateSelectionState();
                         this.drawingObjects.OnUpdateOverlay();
                         return;
@@ -1615,6 +1619,10 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
         if(this.drawingObjectsController.State.id !== STATES_ID_TEXT_ADD || this.drawingObjectsController.State.id !== STATES_ID_TEXT_ADD_IN_GROUP)
         {
             this.textObject.addTextFlag = false;
+            if(this.textObject instanceof CGraphicFrame)
+            {
+                this.textObject.graphicObject.Selection_Remove();
+            }
             this.drawingObjectsController.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
 
         }

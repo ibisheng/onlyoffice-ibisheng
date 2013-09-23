@@ -3216,12 +3216,40 @@ function ClrScheme()
     this.createDuplicate = function()
     {
         var _duplicate = new ClrScheme();
+        _duplicate.name = this.name;
         for(var _clr_index = 0; _clr_index <= this.colors.length; ++_clr_index)
         {
             _duplicate.colors[_clr_index] = this.colors[_clr_index];
         }
         return _duplicate;
     };
+
+    this.Write_ToBinary2 = function(w)
+    {
+        w.WriteLong(this.colors.length);
+        for(var i = 0; i < this.colors.length; ++i )
+        {
+            var bool = isRealObject(this.colors[i]) && typeof this.colors[i].Write_ToBinary2 === "function";
+            w.WriteBool(bool);
+            if(bool)
+            {
+                this.colors[i].Write_ToBinary2(w);
+            }
+        }
+    } ;
+    this.Read_FromBinary2 = function(r)
+    {
+        var count = r.GetLong();
+        for(var i = 0; i < count; ++i )
+        {
+
+            if(r.GetBool())
+            {
+                this.colors[i]= new CUniColor();
+                this.colors[i].Read_FromBinary2(r);
+            }
+        }
+    }
 }
 
 function ClrMap()
@@ -3356,7 +3384,111 @@ function CTheme()
             return this.themeElements.fmtScheme.lnStyleLst[idx-1].createDuplicate();
         }
         return new CLn();
-    }
+    };
+
+
+    this.changeColorScheme = function(clrScheme)
+    {
+        History.Add(this, {Type: historyitem_ChangeColorScheme, oldPr: this.themeElements.clrScheme, newPr: clrScheme});
+        this.themeElements.clrScheme = clrScheme;
+    };
+
+    this.Refresh_RecalcData= function()
+    {
+        var slides = editor.WordControl.m_oLogicDocument.Slides;
+        for(var  i = 0; i < slides.length; ++i)
+        {
+            var slide = slides[i];
+            if(slide.Layout && slide.Layout.Master && slide.Layout.Master.Theme === this)
+            {
+                slide.recalcAllColors();
+            }
+        }
+
+    };
+
+
+    this.Undo = function(data)
+    {
+        switch(data.Type)
+        {
+            case historyitem_ChangeColorScheme:
+            {
+                this.themeElements.clrScheme = data.oldPr;
+                break;
+            }
+        }
+    };
+
+    this.Redo = function(data)
+    {
+        switch(data.Type)
+        {
+            case historyitem_ChangeColorScheme:
+            {
+                this.themeElements.clrScheme = data.newPr;
+                break;
+            }
+        }
+    };
+
+    this.Write_ToBinary2 = function(w)
+    {
+        w.WriteLong(historyitem_type_Theme);
+        w.WriteString2(this.Id);
+    };
+
+    this.Read_FromBinary2 = function(r)
+    {
+        this.Id = r.GetString2();
+    };
+
+    this.Save_Changes = function(data, w)
+    {
+        w.WriteLong(historyitem_type_Theme);
+        w.WriteLong(data.Type);
+        switch(data.Type)
+        {
+            case historyitem_ChangeColorScheme:
+            {
+                data.newPr.Write_ToBinary2(w);
+                break;
+            }
+        }
+    };
+
+    this.Load_Changes = function(r)
+    {
+        if(r.GetLong() === historyitem_type_Theme)
+        {
+            var type = r.GetLong();
+            switch(type)
+            {
+                case historyitem_ChangeColorScheme:
+                {
+                    this.themeElements.clrScheme = new ClrScheme();
+                    this.themeElements.clrScheme.Read_FromBinary2(r);
+                    var slides = editor.WordControl.m_oLogicDocument.Slides;
+                    for(var  i = 0; i < slides.length; ++i)
+                    {
+                        var slide = slides[i];
+                        if(slide.Layout && slide.Layout.Master && slide.Layout.Master.Theme === this)
+                        {
+                            slide.recalcAllColors();
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+    this.Get_Id = function()
+    {
+        return this.Id;
+    };
+
+    this.Id = g_oIdCounter.Get_NewId();
+    g_oTableId.Add(this, this.Id);
 }
 // ----------------------------------
 

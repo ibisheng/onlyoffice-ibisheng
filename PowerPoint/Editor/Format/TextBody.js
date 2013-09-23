@@ -318,6 +318,7 @@ CTextBody.prototype =
         }
         this.content.Reset(0, 0, _content_width, 20000);
         this.content.Recalculate_Page(0, true);
+        this.contentHeight = this.getSummaryHeight();
 
         if(this.recalcInfo.recalculateContent2)
         {
@@ -408,7 +409,7 @@ CTextBody.prototype =
                 }
                 this.content2.Reset(0, 0, _content_width, 20000);
                 this.content2.Recalculate_Page(0, true);
-
+                this.contentHeight2 = this.getSummaryHeight2();
             }
 
 

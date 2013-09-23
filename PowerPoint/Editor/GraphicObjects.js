@@ -43,6 +43,38 @@ CGraphicObjects.prototype = {
         }
     },
 
+    Select_All : function()
+    {
+        switch (this.State.id)
+        {
+            case STATES_ID_TEXT_ADD:
+            case STATES_ID_TEXT_ADD_IN_GROUP:
+            case STATES_ID_CHART_TEXT_ADD:
+
+            {
+                if(this.State.textObject.txBody)
+                {
+                    this.State.textObject.txBody.content.Select_All();
+                }
+                else if(this.State.textObject instanceof  CGraphicFrame)
+                {
+                    this.State.textObject.graphicObject.Select_All();
+                }
+                break;
+            }
+            case STATES_ID_NULL:
+            {
+                this.resetSelection();
+                for(var i = 0; i < this.slide.cSld.spTree.length; ++i)
+                {
+                    this.slide.cSld.spTree[i].select(this);
+                }
+                break;
+            }
+        }
+        editor.WordControl.OnUpdateOverlay();
+    },
+
     paragraphAdd: function(paraItem, bRecalculate)
     {
         var b_rulers = false;
@@ -1794,6 +1826,7 @@ CGraphicObjects.prototype = {
             case STATES_ID_TEXT_ADD:
             {
                 s.textObject.select(this);
+                s.textObject.addTextFlag = true;
                 s.textObject.setTextSelectionState(s.textSelectionState);
                 this.changeCurrentState(new TextAddState(this, this.slide, s.textObject));
                 break;
@@ -1801,6 +1834,7 @@ CGraphicObjects.prototype = {
             case STATES_ID_TEXT_ADD_IN_GROUP:
             {
                 s.group.select(this);
+                s.textObject.addTextFlag = true;
                 s.textObject.select(s.group);
                 s.textObject.setTextSelectionState(s.textSelectionState);
                 this.changeCurrentState(new TextAddInGroup(this, this.slide, s.group, s.textObject));

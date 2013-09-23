@@ -44,6 +44,8 @@ var STATES_ID_MOVE_INTERNAL_CHART_OBJECT = 0x34;
 var STATES_ID_CHART = 0x35;
 var STATES_ID_CHART_TEXT_ADD = 0x36;
 var STATES_ID_TEXT_ADD_IN_GROUP = 0x37;
+var STATES_ID_EXPECT_DOUBLE_CLICK = 0x38;
+
 
 var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
 
@@ -2222,7 +2224,7 @@ function PreMoveState(drawingObjectsController, drawingObjects, startX, startY, 
 
 function ExtpectDoubleClickState(drawingObjectsController, drawingObjects)
 {
-    this.id = null;
+    this.id = STATES_ID_EXPECT_DOUBLE_CLICK;
     this.drawingObjects = drawingObjects;
     this.drawingObjectsController = drawingObjectsController;
     this.nullState = new NullState(drawingObjectsController, drawingObjects);
@@ -2256,7 +2258,7 @@ function ExtpectDoubleClickState(drawingObjectsController, drawingObjects)
 
     this.onKeyDown = function(e)
     {
-
+        return  DefaultKeyDownHandle(this.drawingObjectsController, e);
     };
 
     this.onKeyPress = function(e)
@@ -5532,6 +5534,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                 break;
             }
             case STATES_ID_NULL:
+            case STATES_ID_EXPECT_DOUBLE_CLICK:
             {
 				// Если открыт iframe, то нельзя удалить диаграмму
 				if ( drawingObjectsController.selectedObjects.length == 1 )

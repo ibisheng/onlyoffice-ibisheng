@@ -331,7 +331,8 @@ var historyitem_SetLstStyle = 2;
 
 
 
-
+//Типы изменений в классе CTheme
+var historyitem_ChangeColorScheme = 0;
 
 
 
@@ -410,6 +411,8 @@ var historyitem_type_Slide      	  = 30;
 var historyitem_type_Layout      	  = 31;
 var historyitem_type_TextBody      	  = 32;
 var historyitem_type_GraphicFrame  	  = 33;
+var historyitem_type_Theme  	      = 34;
+
 
 
 

@@ -601,6 +601,8 @@ CPresentation.prototype =
             var slide = this.Slides[i];
             slide.Width = this.Width;
             slide.Height = this.Height;
+
+            slide.Load_Comments();
             slide.recalculate();
             var layout = slide.Layout;
             var master = layout.Master;
@@ -1304,6 +1306,7 @@ CPresentation.prototype =
 
 
         this.Slides[this.CurPage].graphicObjects.remove(Count, bOnlyText, bRemoveOnlySelection);
+        this.Recalculate();
         this.DrawingDocument.OnRecalculatePage(this.CurPage, this.Slides[this.CurPage]);
         return true;
     },
@@ -2656,6 +2659,8 @@ CPresentation.prototype =
     // Селектим весь параграф
     Select_All : function()
     {
+        this.Slides[this.CurPage].graphicObjects.Select_All();
+        return;
         // Работаем с колонтитулом
         if ( docpostype_HdrFtr === this.CurPos.Type )
         {
@@ -5125,6 +5130,12 @@ CPresentation.prototype =
         this.CurPage = Math.min( this.Slides.length - 1, Math.max( 0, PageNum ) );
         if(oldCurPage != this.CurPage && this.CurPage < this.Slides.length)
         {
+            if(this.Slides[oldCurPage])
+            {
+                this.Slides[oldCurPage].graphicObjects.resetSelectionState();
+            }
+            this.DrawingDocument.m_oWordControl.GoToPage(this.CurPage);
+            this.Document_UpdateSelectionState();
             this.Document_UpdateInterfaceState();
             editor.asc_hideComments();
         }
@@ -5259,7 +5270,7 @@ CPresentation.prototype =
 
     Set_SelectionState : function(State)
     {
-        this.CurPage = State.CurPage;
+        this.Set_CurPage(State.CurPage);
         this.Slides[this.CurPage].graphicObjects.setSelectionState(State.slideSelection);
         return ;
         if ( docpostype_DrawingObjects === this.CurPos.Type )
@@ -5788,6 +5799,7 @@ CPresentation.prototype =
          //   _new_master.setSize(this.Width, this.Height);
         }
 
+        _new_master.recalculate();
         var _arr_slides = this.Slides;
         var _slides_array = [];
         for(var _index = 0; _index < this.Slides.length; ++_index)
@@ -5877,7 +5889,7 @@ CPresentation.prototype =
             if(!_cur_theme.themeElements.clrScheme.isIdentical(colorScheme))
             {
                 _old_color_scheme = _cur_theme.themeElements.clrScheme;
-                _cur_theme.themeElements.clrScheme = colorScheme.createDuplicate();
+                _cur_theme.changeColorScheme(colorScheme.createDuplicate());
             }
         }
         var _start_slide = this.Slides[this.CurPage];
