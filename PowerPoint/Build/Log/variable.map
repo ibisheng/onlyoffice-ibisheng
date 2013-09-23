@@ -857,7 +857,7 @@ JSCompiler_StaticMethods_Internal_CheckAddNumbering:vV
 PreMoveCommentState:lE
 FORMULA_TYPE_AT2:RZ
 skip_literal_string:Ko
-EChartBasicTypes$chartbasicPieChart:yI
+EChartBasicTypes$chartbasicPieChart:zI
 tt_cmap14_variants:fr
 historyitem_Table_PositionV:tT
 g_stringBase64:fR
@@ -1339,7 +1339,7 @@ JSCompiler_StaticMethods_Set_TableCellMar:De
 heightrule_Auto:$b
 JSCompiler_StaticMethods_Set_KeepNext:cW
 JSCompiler_StaticMethods_VertLine:VR
-c_oSer_ChartLegendEntryType$Delete:pH
+c_oSer_ChartLegendEntryType$Delete:qH
 tt_face_load_loca:Pu
 tt_cmap4_next:yq
 JSCompiler_StaticMethods_Read_tblpPr:GP
@@ -2336,7 +2336,7 @@ EChartBasicTypes$chartbasicAreaChart:xI
 c_oSer_ChartLegendLayoutType$WMode:xH
 Ins_IUP:Ht
 t1_service_ps_info:vx
-JSCompiler_StaticMethods_Repos:cV
+JSCompiler_StaticMethods_Repos:dV
 linerule_Exact:ab
 CFF_CMapStdRec:Tv
 EGlyphState$glyphstateMiss:Wx

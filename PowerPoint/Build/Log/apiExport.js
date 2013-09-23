@@ -6,7 +6,6 @@ var:asc_docs_api
 prop:_coAuthoringInit
 prop:pre_Save
 prop:sync_CollaborativeChanges
-prop:_coAuthoringInitCallBack
 prop:_coAuthoringSetServerUrl
 prop:asc_coAuthoringDisconnect
 prop:asc_coAuthoringChatSendMessage
@@ -1050,7 +1049,6 @@ window['asc_docs_api'] = asc_docs_api;
 asc_docs_api.prototype['_coAuthoringInit'] = asc_docs_api.prototype._coAuthoringInit;
 asc_docs_api.prototype['pre_Save'] = asc_docs_api.prototype.pre_Save;
 asc_docs_api.prototype['sync_CollaborativeChanges'] = asc_docs_api.prototype.sync_CollaborativeChanges;
-asc_docs_api.prototype['_coAuthoringInitCallBack'] = asc_docs_api.prototype._coAuthoringInitCallBack;
 asc_docs_api.prototype['_coAuthoringSetServerUrl'] = asc_docs_api.prototype._coAuthoringSetServerUrl;
 asc_docs_api.prototype['asc_coAuthoringDisconnect'] = asc_docs_api.prototype.asc_coAuthoringDisconnect;
 asc_docs_api.prototype['asc_coAuthoringChatSendMessage'] = asc_docs_api.prototype.asc_coAuthoringChatSendMessage;
