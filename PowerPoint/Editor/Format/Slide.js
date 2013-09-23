@@ -46,6 +46,7 @@ function Slide(presentation, slideLayout, slideNum)
 
 
     this.comments = [];
+    this.writecomments = [];
 
     this.show = true;
     this.showMasterPhAnim = false;

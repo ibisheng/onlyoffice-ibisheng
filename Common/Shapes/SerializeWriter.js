@@ -759,6 +759,40 @@ function CBinaryFileWriter()
         this.WriteUChar(g_nodeAttributeEnd);
         this.EndRecord();
 
+        var _countAuthors = 0;
+        for (var i in pres.CommentAuthors)
+            ++_countAuthors;
+
+        if (_countAuthors > 0)
+        {
+            this.StartRecord(6);
+            this.StartRecord(0);
+
+            this.WriteULong(_countAuthors);
+
+            for (var i in pres.CommentAuthors)
+            {
+                var _author = pres.CommentAuthors[i];
+
+                this.StartRecord(0);
+
+                this.WriteUChar(g_nodeAttributeStart);
+
+                this._WriteInt1(0, _author.Id);
+                this._WriteInt1(1, _author.LastId);
+                this._WriteInt1(2, _author.Id - 1);
+                this._WriteString1(3, _author.Name);
+                this._WriteString1(4, _author.Initials);
+
+                this.WriteUChar(g_nodeAttributeEnd);
+
+                this.EndRecord();
+            }
+
+            this.EndRecord();
+            this.EndRecord();
+        }
+
         this.EndRecord();
     }
 
@@ -829,6 +863,47 @@ function CBinaryFileWriter()
         this.WriteRecord1(0, _slide.cSld, this.WriteCSld);
         this.WriteRecord2(1, _slide.clrMap, this.WriteClrMapOvr);
         this.WriteRecord1(2, _slide.timing, this.WriteSlideTransition);
+
+        var _countComments = 0;
+        for (var i in _slide.writecomments)
+            ++_countComments;
+
+        if (_countComments > 0)
+        {
+            this.StartRecord(4);
+            this.StartRecord(0);
+
+            this.WriteULong(_countComments);
+
+            for (var i in _slide.writecomments)
+            {
+                var _comment = _slide.writecomments[i];
+
+                this.StartRecord(0);
+
+                this.WriteUChar(g_nodeAttributeStart);
+
+                this._WriteInt1(0, _comment.WriteAuthorId);
+                this._WriteString1(1, _comment.WriteTime);
+                this._WriteInt1(2, _comment.WriteCommentId);
+                this._WriteInt1(3, (_comment.x * 25.4) >> 0);
+                this._WriteInt1(4, (_comment.y * 25.4) >> 0);
+                this._WriteString1(5, _comment.Data.m_sText);
+
+                if (0 != _comment.WriteParentAuthorId)
+                {
+                    this._WriteInt1(6, _comment.WriteParentAuthorId);
+                    this._WriteInt1(7, _comment.WriteParentCommentId);
+                }
+
+                this.WriteUChar(g_nodeAttributeEnd);
+
+                this.EndRecord();
+            }
+
+            this.EndRecord();
+            this.EndRecord();
+        }
 
         this.EndRecord();
     }

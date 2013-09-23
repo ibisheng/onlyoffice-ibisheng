@@ -4,6 +4,58 @@
  * Time: 10:38
  */
 
+function CWriteCommentData()
+{
+    this.Data = null; // CCommentData
+
+    this.WriteAuthorId = 0;
+    this.WriteCommentId = 0;
+    this.WriteParentAuthorId = 0;
+    this.WriteParentCommentId = 0;
+    this.WriteTime = "";
+
+    this.x = 0;
+    this.y = 0;
+}
+CWriteCommentData.prototype =
+{
+    DateToISO8601 : function(d)
+    {
+        function pad(n){return n < 10 ? '0' + n : n;}
+        return d.getUTCFullYear() + '-' + pad(d.getUTCMonth() + 1) + '-' +
+            pad(d.getUTCDate()) + 'T' + pad(d.getUTCHours()) + ':' +
+            pad(d.getUTCMinutes()) + ':' + pad(d.getUTCSeconds())+'Z';
+    },
+
+    Calculate : function()
+    {
+        var d = new Date(this.Data.m_sTime - 0);
+        this.WriteTime = this.DateToISO8601(d);
+    }
+};
+
+function CCommentAuthor()
+{
+    this.Name = "";
+    this.Id = 0;
+    this.LastId = 0;
+    this.Initials = "";
+}
+CCommentAuthor.prototype =
+{
+    Calculate : function()
+    {
+        var arr = this.Name.split(" ");
+        this.Initials = "";
+        for (var i = 0; i < arr.length; i++)
+        {
+            if (arr[i].length > 0)
+                this.Initials += (arr[i].substring(0, 1));
+        }
+    }
+};
+
+
 function CCommentData()
 {
     this.m_sText      = "";

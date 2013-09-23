@@ -2,9 +2,15 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 	<title>DocumentViewer</title>
-	<meta http-equiv="X-UA-Compatible" content="IE=9">
-    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, target-densitydpi=device-dpi"/>
-	
+    <meta name="viewport" content="user-scalable=no, width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, target-densitydpi=device-dpi">
+    <meta name="apple-touch-fullscreen" content="yes">
+	<style>
+	html {
+		-ms-touch-action: none;
+        -ms-zoom: 100%;
+	}
+	</style>
+
 	<script type="text/javascript" src="../../OfficeWeb/Word/menu/js/jquery-1.6.1.min.js"></script>
 	<!-- SDK -->
 	<script type="text/javascript" src="../../OfficeWeb/Common/downloaderfiles.js"></script>
@@ -209,10 +215,11 @@
 			
 			var isViewMode = "true" == getURLParameter("isViewMode");
 			editor.SetViewMode(isViewMode);
+            editor.zoomFitToWidth();
 			
 			editor.LoadDocument(c_DocInfo);
 			
-			window.onresize = function()
+			window.onorientationchange = window.onresize = function()
 			{
 				if (false === editor.bInit_word_control)
 					return;

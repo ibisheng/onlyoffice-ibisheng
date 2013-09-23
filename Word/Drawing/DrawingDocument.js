@@ -2827,7 +2827,7 @@ function CDrawingDocument()
 
             var pos = this.ConvertCoordsToCursor2(x, y, this.m_lCurrentPage);
 
-            if (!oThis.m_oWordControl.MobileTouchManager && !window.USER_AGENT_SAFARI_MACOS)
+            if ((!oThis.m_oWordControl.MobileTouchManager && !window.USER_AGENT_SAFARI_MACOS) || !window.USER_AGENT_WEBKIT)
             {
                 this.TargetHtmlElement.style.left = pos.X + "px";
                 this.TargetHtmlElement.style.top = pos.Y + "px";

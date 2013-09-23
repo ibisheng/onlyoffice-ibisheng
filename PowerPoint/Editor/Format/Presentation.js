@@ -363,6 +363,8 @@ function CPresentation(DrawingDocument)
     this.themeLock = new PropLocker(this.Id);
     //this.schemeLock = new PropLocker(this.Id);
     this.slideSizeLock = new PropLocker(this.Id);
+
+    this.CommentAuthors = {};
 }
 
 var selected_None              = -1;
@@ -6718,5 +6720,85 @@ CPresentation.prototype =
 
 
         this.CurPos.Type = docpostype_Content;
+    },
+
+    CalculateComments : function()
+    {
+        this.CommentAuthors = {};
+        var _AuthorId = 0;
+        var _slidesCount = this.Slides.length;
+        for (var _sldIdx = 0; _sldIdx < _slidesCount; _sldIdx++)
+        {
+            this.Slides[_sldIdx].writecomments = [];
+
+            var _comments = this.Slides[_sldIdx].comments;
+            var _commentsCount = _comments.length;
+
+            for (var i = 0; i < _commentsCount; i++)
+            {
+                var _data = _comments[i].Data;
+                var _commId = 0;
+
+                var _author = this.CommentAuthors[_data.m_sUserName];
+                if (!_author)
+                {
+                    this.CommentAuthors[_data.m_sUserName] = new CCommentAuthor();
+                    _author = this.CommentAuthors[_data.m_sUserName];
+                    _author.Name = _data.m_sUserName;
+                    _author.Calculate();
+
+                    _AuthorId++;
+                    _author.Id = _AuthorId;
+                }
+
+                _author.LastId++;
+                _commId = _author.LastId;
+
+                var _new_data = new CWriteCommentData();
+                _new_data.Data = _data;
+                _new_data.WriteAuthorId = _author.Id;
+                _new_data.WriteCommentId = _commId;
+                _new_data.WriteParentAuthorId = 0;
+                _new_data.WriteParentCommentId = 0;
+                _new_data.x = _comments[i].x;
+                _new_data.y = _comments[i].y;
+
+                _new_data.CalculateInitials();
+                this.Slides[_sldIdx].writecomments.push(_new_data);
+
+                var _comments2 = _data.m_aReplies;
+                var _commentsCount2 = _comments2.length;
+
+                for (var j = 0; j < _commentsCount2; j++)
+                {
+                    var _data2 = _comments2[j];
+
+                    var _author2 = this.CommentAuthors[_data2.m_sUserName];
+                    if (!_author2)
+                    {
+                        this.CommentAuthors[_data2.m_sUserName] = new CCommentAuthor();
+                        _author2 = this.CommentAuthors[_data2.m_sUserName];
+                        _author2.Name = _data2.m_sUserName;
+                        _anchor2.Calculate();
+
+                        _AuthorId++;
+                        _author2.Id = _AuthorId;
+                    }
+
+                    _author2.LastId++;
+
+                    var _new_data2 = new CWriteCommentData();
+                    _new_data2.Data = _data;
+                    _new_data2.WriteAuthorId = _author2.Id;
+                    _new_data2.WriteCommentId = _author2.LastId;
+                    _new_data2.WriteParentAuthorId = _author.Id;
+                    _new_data2.WriteParentCommentId = _commId;
+                    _new_data2.x = _new_data.x;
+                    _new_data2.y = _new_data.y + 136 * (j + 1); // так уж делает микрософт
+                    _new_data2.CalculateInitials();
+                    this.Slides[_sldIdx].writecomments.push(_new_data2);
+                }
+            }
+        }
     }
 };
