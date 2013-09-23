@@ -2050,8 +2050,6 @@ Slide.prototype =
         {
             _comments[i].Set_Data(_comments_data[i]);
             this.addComment(_comments[i]);
-
-            editor.sync_AddComment(_comments[i].Get_Id(), _comments_data[i] );
         }
 
         this.writecomments = [];
