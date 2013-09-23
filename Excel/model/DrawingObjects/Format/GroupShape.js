@@ -1133,7 +1133,7 @@ CGroupShape.prototype =
 
     addToDrawingObjects: function(pos)
     {
-        var position = this.drawingObjects.addGraphicObject(this, pos);
+        var position = this.drawingObjects.addGraphicObject(this, pos, true);
         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_Add_To_Drawing_Objects, null, null, new UndoRedoDataGraphicObjects(this.Id, new UndoRedoDataGOSingleProp(position, null)), null);
     },
 

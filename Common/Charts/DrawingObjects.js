@@ -4100,35 +4100,37 @@ function DrawingObjects() {
 	// Graphic object
 	//-----------------------------------------------------------------------------------
 	
-	_this.addGraphicObject = function(graphic, position) {
+	_this.addGraphicObject = function(graphic, position, lockByDefault) {
 		
-		var obj = _this.createDrawingObject();
-		obj.graphicObject = graphic;
-        graphic.setDrawingBase(obj);
+		var drawingObject = _this.createDrawingObject();
+		drawingObject.graphicObject = graphic;
+        graphic.setDrawingBase(drawingObject);
 				
         var ret;
         if (isRealNumber(position)) {
-            aObjects.splice(position, 0, obj);
+            aObjects.splice(position, 0, drawingObject);
             ret = position;
         }
         else {
             ret = aObjects.length;
-            aObjects.push(obj);
+            aObjects.push(drawingObject);
         }
 
-		obj.setGraphicObjectCoords();
-		obj.setActive();
+		drawingObject.setGraphicObjectCoords();
+		drawingObject.setActive();
 		
 		_this.showDrawingObjects(false);
 		_this.sendGraphicObjectProps();
 		
 		worksheet.model.workbook.handlers.trigger("asc_onEndAddShape");
 		
-		_this.objectLocker.reset();
-		_this.objectLocker.addObjectId(obj.graphicObject.Id);
-		_this.objectLocker.checkObjects( function(result) {} );
+		if ( lockByDefault ) {
+			_this.objectLocker.reset();
+			_this.objectLocker.addObjectId(drawingObject.graphicObject.Id);
+			_this.objectLocker.checkObjects( function(result) {} );
+		}
 		
-		var boundsChecker = _this.getBoundsChecker(obj);
+		var boundsChecker = _this.getBoundsChecker(drawingObject);
 		aBoundsCheckers.push(boundsChecker);
 		
         return ret;
