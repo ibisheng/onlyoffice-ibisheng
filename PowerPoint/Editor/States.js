@@ -171,6 +171,8 @@ function NullState(drawingObjectsController, drawingObjects)
                         cur_drawing.select(this.drawingObjectsController);
                         cur_drawing.selectionSetStart(e, x, y);
                         this.drawingObjectsController.changeCurrentState(new TextAddState(this.drawingObjectsController, this.drawingObjects, cur_drawing));
+                        editor.WordControl.m_oDrawingDocument.OnRecalculatePage(this.drawingObjects.num, this.drawingObjects);
+                        editor.WordControl.m_oDrawingDocument.OnEndRecalculate();
                         if(e.ClickCount < 2)
                             this.drawingObjectsController.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
                     }
@@ -182,6 +184,8 @@ function NullState(drawingObjectsController, drawingObjects)
                             cur_drawing.select(this.drawingObjectsController);
                             cur_drawing.selectionSetStart(e, x, y);
                             this.drawingObjectsController.changeCurrentState(new TextAddState(this.drawingObjectsController, this.drawingObjects, cur_drawing));
+                            editor.WordControl.m_oDrawingDocument.OnRecalculatePage(this.drawingObjects.num, this.drawingObjects);
+                            editor.WordControl.m_oDrawingDocument.OnEndRecalculate();
                             if(e.ClickCount < 2)
                                 this.drawingObjectsController.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
                         }
@@ -324,6 +328,8 @@ function NullState(drawingObjectsController, drawingObjects)
         this.drawingObjectsController.stY = y;
         this.drawingObjectsController.selectionRect = {x : x, y : y, w: 0, h: 0};
         this.drawingObjectsController.changeCurrentState(new TrackSelectionRect(this.drawingObjectsController, this.drawingObjects));
+        editor.WordControl.m_oDrawingDocument.OnRecalculatePage(this.drawingObjects.num, this.drawingObjects);
+        editor.WordControl.m_oDrawingDocument.OnEndRecalculate();
         this.drawingObjects.OnUpdateOverlay();
         editor.sync_BeginCatchSelectedElements();
         editor.sync_slidePropCallback(drawingObjects);
@@ -1605,8 +1611,10 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
     this.onMouseDown = function(e, x, y)
     {
         this.nullState.onMouseDown(e, x, y);
+
         if(this.drawingObjectsController.State.id !== STATES_ID_TEXT_ADD || this.drawingObjectsController.State.id !== STATES_ID_TEXT_ADD_IN_GROUP)
         {
+            this.textObject.addTextFlag = false;
             this.drawingObjectsController.updateSelectionState(editor.WordControl.m_oLogicDocument.DrawingDocument);
 
         }

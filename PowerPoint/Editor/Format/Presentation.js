@@ -5619,19 +5619,19 @@ CPresentation.prototype =
     },
 
 
-    addNextSlide: function()
+    addNextSlide: function(layoutIndex)
     {
         History.Create_NewPoint();
         var cur_slide = this.Slides[this.CurPage];
         var new_slide = new Slide(this, cur_slide.Layout, this.CurPage + 1);
-        var layout = cur_slide.Layout;
+        var layout = isRealNumber(layoutIndex) ? (cur_slide.Layout.Master.sldLayoutLst[layoutIndex] ?  cur_slide.Layout.Master.sldLayoutLst[layoutIndex]:  cur_slide.Layout) : cur_slide.Layout;
         for(var i = 0; i < layout.cSld.spTree.length; ++i)
         {
             if(layout.cSld.spTree[i].isPlaceholder())
             {
                 var sp = new CShape(new_slide);
-                layout.cSld.spTree[i].copy(sp);
-                new_slide.shapeAdd(new_slide.cSld.spTree.length, sp);
+                layout.cSld.spTree[i].copy2(sp);
+                new_slide.addToSpTreeToPos(new_slide.cSld.spTree.length, sp);
             }
         }
         new_slide.setSlideNum(this.CurPage + 1);
@@ -5731,10 +5731,10 @@ CPresentation.prototype =
                     if(layout.cSld.spTree[j].isPlaceholder())
                     {
                         var matching_shape =  slide.getMatchingShape(layout.cSld.spTree[j].getPlaceholderType(), layout.cSld.spTree[j].getPlaceholderIndex());
-                        if(matching_shape == null && layout.cSld.spTree[j].copy)
+                        if(matching_shape == null && layout.cSld.spTree[j].copy2)
                         {
                             var sp = new CShape(slide);
-                            layout.cSld.spTree[j].copy(sp);
+                            layout.cSld.spTree[j].copy2(sp);
                             slide.addToSpTreeToPos(slide.cSld.spTree.length, sp)
                         }
                     }

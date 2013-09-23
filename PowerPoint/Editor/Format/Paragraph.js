@@ -6546,10 +6546,10 @@ Paragraph.prototype =
         }
 
         // 3. Если мы попали в начало параграфа, тогда пропускаем все TextPr
-        if ( CurPos <= 0 )
+        if ( CurPos <= 0  )
         {
             CurPos = 0;
-            while ( para_TextPr === this.Content[CurPos].Type )
+            while (CurPos < this.Content.length && para_TextPr === this.Content[CurPos].Type  )
                 CurPos++;
 
             this.CurPos.ContentPos = CurPos;

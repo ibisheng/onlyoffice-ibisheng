@@ -101,7 +101,8 @@ function CTextBody(shape)
     this.compiledBodyPr = new CBodyPr();
     this.recalcInfo =
     {
-        recalculateBodyPr: true
+        recalculateBodyPr: true,
+        recalculateContent2: true
     };
 
     this.textPropsForRecalc = [];
@@ -317,6 +318,113 @@ CTextBody.prototype =
         }
         this.content.Reset(0, 0, _content_width, 20000);
         this.content.Recalculate_Page(0, true);
+
+        if(this.recalcInfo.recalculateContent2)
+        {
+
+            var _history_is_on = History.Is_On();
+            if(_history_is_on)
+            {
+                History.TurnOff();
+            }
+            if(this.shape.isPlaceholder())
+            {
+                var text = pHText[0][this.shape.nvSpPr.nvPr.ph.type] != undefined ?  pHText[0][this.shape.nvSpPr.nvPr.ph.type] : pHText[0][phType_body];
+                this.content2 = new CDocumentContent(this, editor.WordControl.m_oDrawingDocument, 0, 0, 0, 0, false, false);
+                this.content2.Content.length = 0;
+                var par = new Paragraph(editor.WordControl.m_oDrawingDocument, this.content2, 0, 0, 0, 0, 0);
+                var EndPos = 0;
+                for(var key = 0 ; key <  text.length; ++key)
+                {
+                    par.Internal_Content_Add( EndPos++, new ParaText(text[key]));
+                }
+                if(this.content && this.content.Content[0] )
+                {
+                    if(this.content.Content[0].Pr)
+                    {
+                        par.Pr = this.content.Content[0].Pr.Copy();
+                    }
+                    if(this.content.Content[0].rPr)
+                    {
+                        par.rPr = clone(this.content.Content[0].rPr);
+                    }
+                }
+                this.content2.Internal_Content_Add( 0, par);
+
+                this.content2.RecalculateNumbering();
+                this.content2.Set_StartPage(/*isRealNumber(this.shape.parent.num) ? this.shape.parent.num : */0);
+                if(_body_pr.upright === false)
+                {
+                    var _content_width;
+                    if(!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270))
+                    {
+                        _content_width = _r - _l;
+                        this.contentWidth2 = _content_width;
+                        this.contentHeight2 = _b - _t;
+                    }
+                    else
+                    {
+                        _content_width = _b - _t;
+                        this.contentWidth2 = _content_width;
+                        this.contentHeight2 = _r - _l;
+                    }
+
+                }
+                else
+                {
+                    var _full_rotate = sp.getFullRotate();
+                    if((_full_rotate >= 0 && _full_rotate < Math.PI*0.25)
+                        || (_full_rotate > 3*Math.PI*0.25 && _full_rotate < 5*Math.PI*0.25)
+                        || (_full_rotate > 7*Math.PI*0.25 && _full_rotate < 2*Math.PI))
+                    {
+                        if(!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270))
+                        {
+                            _content_width = _r - _l;
+                            this.contentWidth2 = _content_width;
+                            this.contentHeight2 = _b - _t;
+                        }
+                        else
+                        {
+                            _content_width = _b - _t;
+                            this.contentWidth2 = _content_width;
+                            this.contentHeight2 = _r - _l;
+                        }
+                    }
+                    else
+                    {
+                        if(!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270))
+                        {
+                            _content_width = _b - _t;
+                            this.contentWidth2 = _content_width;
+                            this.contentHeight2 = _r - _l;
+                        }
+                        else
+                        {
+                            _content_width = _r - _l;
+                            this.contentWidth2  = _content_width;
+                            this.contentHeight2 = _b - _t;
+                        }
+                    }
+                }
+                this.content2.Reset(0, 0, _content_width, 20000);
+                this.content2.Recalculate_Page(0, true);
+
+            }
+
+
+
+
+            if(_history_is_on)
+            {
+                History.TurnOn();
+            }
+            this.recalcInfo.recalculateContent2 = false;
+        }
+    },
+
+    copy: function(txBody)
+    {
+        txBody.setDocContent(this.content.Copy(txBody));
     },
 
     updateCursorType: function(x, y, e)
@@ -371,6 +479,12 @@ CTextBody.prototype =
         return this.content.Get_SummaryHeight();
     },
 
+
+    getSummaryHeight2: function()
+    {
+        return this.content2 ? this.content2.Get_SummaryHeight() : 0;
+    },
+
     getCompiledBodyPr: function()
     {
         this.recalculateBodyPr();
@@ -387,10 +501,38 @@ CTextBody.prototype =
 
     draw: function(graphics)
     {
-        if(this.content.Is_Empty() && isRealObject(this.phContent))
+        /*if(this.content.Is_Empty() && isRealObject(this.phContent))
             this.content2.Draw(graphics);
         else
+            this.content.Draw(0, graphics);  */
+
+        if((!this.content || this.content.Is_Empty()) && this.content2!=null && !this.shape.addTextFlag && (this.shape.isEmptyPlaceholder ? this.shape.isEmptyPlaceholder() : false))
+        {
+            if (graphics.IsNoDrawingEmptyPlaceholder !== true && graphics.IsNoDrawingEmptyPlaceholderText !== true)
+            {
+                if(graphics.IsNoSupportTextDraw)
+                {
+                    var _h2 = this.b2 - this.t2;
+                    var _w2 = this.r2 - this.l2;
+                    graphics.rect(this.content2.X, this.content2.Y, _w2, _h2);
+                }
+
+                this.content2.Draw(0, graphics);
+
+            }
+        }
+        else if(this.content)
+        {
+            if(graphics.IsNoSupportTextDraw)
+            {
+                var _h = this.b - this.t;
+                var _w = this.r - this.l;
+                graphics.rect(this.content.X, this.content.Y, _w, _h);
+            }
+
             this.content.Draw(0, graphics);
+
+        }
     },
 
     Get_Styles: function(level)
