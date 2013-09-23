@@ -607,8 +607,6 @@ function asc_docs_api(name)
 
     this.IsLongActionCurrent = false;
 
-    this.ParcedDocument = false;
-
 	var oThis = this;
 	if(window.addEventListener)
 		window.addEventListener("message", function(){
@@ -1124,8 +1122,6 @@ asc_docs_api.prototype.OpenDocument2 = function(url, gObject)
 	}
 	else
 		editor.asc_fireCallback("asc_onError",c_oAscError.ID.MobileUnexpectedCharCount,c_oAscError.Level.Critical);
-
-    this.ParcedDocument = true;
 
     if (window.USER_AGENT_SAFARI_MACOS)
         setInterval(SafariIntervalFocus, 10);
