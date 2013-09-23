@@ -2534,7 +2534,7 @@
 		var idColumn = $('#MenuAutoFilter').attr('idcolumn');
 		var autoFilterObject = new Asc.AutoFiltersOptions();
 		autoFilterObject.asc_setCellId(idColumn);
-		api.asc_sortColFilter(true,autoFilterObject); 
+		api.asc_sortColFilter(true, autoFilterObject.cellId); 
 	});
 	$("#sortDescending").click(function() {
 		$('#MenuAutoFilter').hide();
@@ -2542,7 +2542,7 @@
 		var idColumn = $('#MenuAutoFilter').attr('idcolumn');
 		var autoFilterObject = new Asc.AutoFiltersOptions();
 		autoFilterObject.asc_setCellId(idColumn);
-		api.asc_sortColFilter(false,autoFilterObject); 
+		api.asc_sortColFilter(false, autoFilterObject.cellId); 
 	});
 	$("#selectAllElements").click(function() {
 		var elements = $(".AutoFilterItem ");
