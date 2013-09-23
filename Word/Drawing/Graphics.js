@@ -2714,5 +2714,25 @@ CGraphics.prototype =
     Drawing_EndCheckBounds : function()
     {
 
+    },
+
+    DrawPresentationComment : function(type, x, y, w, h)
+    {
+        if (!this.m_bIntegerGrid)
+        {
+            if (window.g_comment_image && window.g_comment_image.asc_complete === true)
+            {
+                var _x = (this.m_oFullTransform.TransformPointX(x,y) >> 0);
+                var _y = (this.m_oFullTransform.TransformPointY(x,y) >> 0);
+
+                this.m_oContext.drawImage(window.g_comment_image, _x, _y);
+            }
+        }
+        else
+        {
+            this.SetIntegerGrid(true);
+            this.DrawPresentationComment(type, x, y, w, h);
+            this.SetIntegerGrid(false);
+        }
     }
 };

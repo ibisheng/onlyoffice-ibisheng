@@ -2023,5 +2023,10 @@ CDocumentRenderer.prototype =
         if (0 != this.m_lPagesCount)
             return this.m_arrayPages[this.m_lPagesCount - 1].m_oTextPr;
         return null;
+    },
+
+    DrawPresentationComment : function(type, x, y, w, h)
+    {
+
     }
 };

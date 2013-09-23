@@ -1628,6 +1628,10 @@ CShapeDrawer.prototype =
         }
         // никогда сюда не зайдем
         return points;
+    },
+
+    DrawPresentationComment : function(type, x, y, w, h)
+    {
     }
 };
 

@@ -11,6 +11,9 @@ var FOCUS_OBJECT_THUMBNAILS     = 0;
 var FOCUS_OBJECT_MAIN           = 1;
 var FOCUS_OBJECT_NOTES          = 2;
 
+var COMMENT_WIDTH   = 24;
+var COMMENT_HEIGHT  = 22;
+
 function CTableMarkup(Table)
 {
     this.Internal =
@@ -2938,6 +2941,16 @@ function CDrawingDocument()
 
     this.OnSelectEnd = function()
     {
+    },
+
+    this.GetCommentWidth = function()
+    {
+        return COMMENT_WIDTH * g_dKoef_pix_to_mm * 100 / this.m_oWordControl.m_nZoomValue;
+    },
+
+    this.GetCommentHeight = function()
+    {
+        return COMMENT_HEIGHT * g_dKoef_pix_to_mm * 100 / this.m_oWordControl.m_nZoomValue;
     }
 }
 
@@ -4816,3 +4829,10 @@ function CSlideDrawer()
         }
     }
 }
+
+window.g_comment_image = new Image();
+window.g_comment_image.asc_complete = false;
+window.g_comment_image.onload = function(){
+    window.g_comment_image.asc_complete = true;
+};
+window.g_comment_image.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAWCAYAAADafVyIAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAABp0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjUuMTAw9HKhAAABUUlEQVRIS2P4//8/w993rw9/nV73/2NhwP8PSXYUYZAZILNAZgLNZmT4+/zhio8Ffv+/za77//vQyv9/zm6jCIPMAJkFMvPv0/tHGb5Orfn/bW4jVsWUYJCZXyZV/Wf4mOXx//eRNVgVUYJBZn7IcP3PAAo3bAqogUFmj1qAF49aQBAPEwtonpNB5QVNyqJ5zZCyCFjivQeXpgta/v8+vBqrYlIwyAyQWdDStB9RHwBLVZAgKNyIwciGfl/aCRcHmQEyC2hmP7g+AFkAxYxQjCyGLA6TY0G24NfO+f8/Znv8//Pw5gqgnAyaWgZkg4jGMAt+H10HrMH8/v86vhNUe2FVi1UQC4a7CITBFpzZ+v9zU9L/70v6LwLFhKFyKOpAGIVDJGYCWfBtRvX/L21Z/////WsIFWcFYjYoG45ROERiGXBkFgX+//fpPYaBqPg/AwCrw7lwhcB17AAAAABJRU5ErkJggg==";

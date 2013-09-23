@@ -1694,6 +1694,11 @@ CAutoshapeTrack.prototype =
 
         ctx.drawImage(window.g_flow_anchor, __x, __y);
         ctx.globalAlpha = _oldAlpha;
+    },
+
+    DrawPresentationComment : function(type, x, y, w, h)
+    {
+
     }
 };
 
@@ -2171,5 +2176,10 @@ CSlideBoundsChecker.prototype =
 
     DrawLockObjectRect : function()
     {
+    },
+
+    DrawPresentationComment : function(type, x, y, w, h)
+    {
+        this.rect(x, y, w, h);
     }
 };
