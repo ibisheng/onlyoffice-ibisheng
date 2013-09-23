@@ -5714,15 +5714,40 @@ CPresentation.prototype =
     {
         if(this.Document_Is_SelectionLocked(changestype_Layout) === false)
         {
+            History.Create_NewPoint();
             var layout = MasterLayouts.sldLayoutLst[layout_index];
             for(var i = 0; i < _array.length; ++i)
             {
-                this.Slides[_array[i]].setLayout(layout);
-                this.Slides[_array[i]].recalcAll();
-                this.Slides[_array[i]].recalculate();
+                var slide = this.Slides[_array[i]];
+                for(var j = slide.cSld.spTree.length-1; j  > -1 ; --j)
+                {
+                    if(slide.cSld.spTree[j].isEmptyPlaceholder && slide.cSld.spTree[j].isEmptyPlaceholder())
+                    {
+                        slide.removeFromSpTreeById(slide.cSld.spTree[j].Get_Id());
+                    }
+                }
+                for(var j = 0; j < layout.cSld.spTree.length; ++j)
+                {
+                    if(layout.cSld.spTree[j].isPlaceholder())
+                    {
+                        var matching_shape =  slide.getMatchingShape(layout.cSld.spTree[j].getPlaceholderType(), layout.cSld.spTree[j].getPlaceholderIndex());
+                        if(matching_shape == null && layout.cSld.spTree[j].copy)
+                        {
+                            var sp = new CShape(slide);
+                            layout.cSld.spTree[j].copy(sp);
+                            slide.addToSpTreeToPos(slide.cSld.spTree.length, sp)
+                        }
+                    }
+                }
+                slide.setLayout(layout);
+                slide.recalcAll();
+                slide.recalculate();
                 this.DrawingDocument.OnRecalculatePage(_array[i], this.Slides[_array[i]]);
             }
             this.DrawingDocument.OnEndRecalculate();
+
+
+
         }
     },
 

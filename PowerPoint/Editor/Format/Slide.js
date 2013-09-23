@@ -175,7 +175,7 @@ function Slide(presentation, slideLayout, slideNum)
                     _ph_idx = _slide_shape.nvSpPr.nvPr.ph.idx;
                     _ph_type = _slide_shape.nvSpPr.nvPr.ph.type;
                 }
-                if(_slide_shape instanceof  CImage2)
+                if(_slide_shape instanceof  CImageShape)
                 {
                     _ph_idx = _slide_shape.nvPicPr.nvPr.ph.idx;
                     _ph_type = _slide_shape.nvPicPr.nvPr.ph.type;
@@ -259,7 +259,7 @@ function Slide(presentation, slideLayout, slideNum)
                     _ph_idx = _layout_shape.nvSpPr.nvPr.ph.idx;
                     _ph_type = _layout_shape.nvSpPr.nvPr.ph.type;
                 }
-                if(_layout_shape instanceof  CImage2)
+                if(_layout_shape instanceof  CImageShape)
                 {
                     _ph_idx = _layout_shape.nvPicPr.nvPr.ph.idx;
                     _ph_type = _layout_shape.nvPicPr.nvPr.ph.type;
@@ -468,12 +468,12 @@ function Slide(presentation, slideLayout, slideNum)
                     _index = _glyph.nvSpPr.nvPr.ph.idx;
                     _type = _glyph.nvSpPr.nvPr.ph.type;
                 }
-                if(_glyph instanceof CImage2)
+                if(_glyph instanceof CImageShape)
                 {
                     _index = _glyph.nvPicPr.nvPr.ph.idx;
                     _type = _glyph.nvPicPr.nvPr.ph.type;
                 }
-                if(_glyph instanceof  GroupShape)
+                if(_glyph instanceof  CGroupShape)
                 {
                     _index = _glyph.nvGrpSpPr.nvPr.ph.idx;
                     _type = _glyph.nvGrpSpPr.nvPr.ph.type;
@@ -521,11 +521,11 @@ function Slide(presentation, slideLayout, slideNum)
                     {
                         _type = _glyph.nvSpPr.nvPr.ph.type;
                     }
-                    if(_glyph instanceof CImage2)
+                    if(_glyph instanceof CImageShape)
                     {
                         _type = _glyph.nvPicPr.nvPr.ph.type;
                     }
-                    if(_glyph instanceof  GroupShape)
+                    if(_glyph instanceof  CGroupShape)
                     {
                         _type = _glyph.nvGrpSpPr.nvPr.ph.type;
                     }

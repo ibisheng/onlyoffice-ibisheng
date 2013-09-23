@@ -258,8 +258,9 @@ function CComment(Parent, Data)
 
     this.hit = function(x, y)
     {
-        return x > this.x && x < this.x + COMMENT_WIDTH
-        && y > this.y && y < this.y + COMMENT_HEIGHT;
+        var dd = editor.WordControl.m_oDrawingDocument;
+        return x > this.x && x < this.x + dd.GetCommentWidth()
+        && y > this.y && y < this.y + dd.GetCommentHeight();
     };
 
     this.setPosition = function(x, y)
