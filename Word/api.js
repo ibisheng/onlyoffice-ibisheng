@@ -3766,6 +3766,11 @@ asc_docs_api.prototype.sync_EndAddShape = function()
     }
 }
 
+asc_docs_api.prototype.SetDrawingFreeze = function(bIsFreeze)
+{
+    this.WordControl.DrawingFreeze = bIsFreeze;
+}
+
 /*----------------------------------------------------------------*/
 /*functions for working with page*/
 asc_docs_api.prototype.change_PageOrient = function(isPortrait)

@@ -133,6 +133,7 @@ function CEditorPage(api)
     this.m_bIsMouseLock = false;
 
     this.m_nTimeDrawingLast = 0;
+    this.DrawingFreeze = false;
 
     this.m_oHorRuler.m_oWordControl = this;
     this.m_oVerRuler.m_oWordControl = this;
@@ -2960,6 +2961,8 @@ function CEditorPage(api)
 
     this.OnPaint = function()
     {
+        if (this.DrawingFreeze)
+            return;
         //console.log("paint");
 
         var canvas = this.m_oEditor.HtmlElement;
