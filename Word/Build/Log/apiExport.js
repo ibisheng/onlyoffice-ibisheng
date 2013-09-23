@@ -346,6 +346,7 @@ prop:sync_ShowParaMarksCallback
 prop:sync_SpaceBetweenPrgCallback
 prop:sync_PrPropCallback
 prop:sync_EndAddShape
+prop:SetDrawingFreeze
 prop:change_PageOrient
 prop:get_DocumentOrientation
 prop:change_DocSize
@@ -1412,6 +1413,7 @@ asc_docs_api.prototype['sync_ShowParaMarksCallback'] = asc_docs_api.prototype.sy
 asc_docs_api.prototype['sync_SpaceBetweenPrgCallback'] = asc_docs_api.prototype.sync_SpaceBetweenPrgCallback;
 asc_docs_api.prototype['sync_PrPropCallback'] = asc_docs_api.prototype.sync_PrPropCallback;
 asc_docs_api.prototype['sync_EndAddShape'] = asc_docs_api.prototype.sync_EndAddShape;
+asc_docs_api.prototype['SetDrawingFreeze'] = asc_docs_api.prototype.SetDrawingFreeze;
 asc_docs_api.prototype['change_PageOrient'] = asc_docs_api.prototype.change_PageOrient;
 asc_docs_api.prototype['get_DocumentOrientation'] = asc_docs_api.prototype.get_DocumentOrientation;
 asc_docs_api.prototype['change_DocSize'] = asc_docs_api.prototype.change_DocSize;
