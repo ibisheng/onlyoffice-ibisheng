@@ -4075,7 +4075,16 @@ function CDrawingDocument()
         }
         else
         {
-            this.FrameRect.IsActive = false;
+            if (this.FrameRect.IsActive)
+            {
+                if (this.m_oWordControl.m_oOverlay.HtmlElement.style.display != "block")
+                    this.m_oWordControl.ShowOverlay();
+
+                this.FrameRect.IsActive = false;
+                this.m_oWordControl.OnUpdateOverlay();
+            }
+            else
+                this.FrameRect.IsActive = false;
         }
 
         var hor_ruler = this.m_oWordControl.m_oHorRuler;
