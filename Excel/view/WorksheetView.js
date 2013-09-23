@@ -642,9 +642,9 @@
 
 				var offsetX = t.cols[t.visibleRange.c1].left - t.cellsLeft;
 				var x1 = t.cols[col].left - offsetX - this.width_1px;
-				var w = Math.max(x2 - x1 - this.width_1px, 0);
+				var w = Math.max(x2 - x1, 0);
 				var cc = Math.min(t._colWidthToCharCount(w), /*max col width*/255);
-				var cw = t._charCountToModelColWidth(cc, true, /*noPad*/true);
+				var cw = t._charCountToModelColWidth(cc);
 
 				var onChangeWidthCallback = function (isSuccess) {
 					if (false === isSuccess)
@@ -1181,13 +1181,12 @@
 			 * Вычисляет ширину столбца для заданного количества символов
 			 * @param {Number} count  Количество символов
 			 * @param {Boolean} displayWidth  При расчете использовать целое число пикселов
-			 * @param {Boolean} noPad  При расчете не учитывать отступ 5px в ячейке
 			 * @returns {Number}      Ширина столбца в символах
 			 */
-			_charCountToModelColWidth: function (count, displayWidth, noPad) {
+			_charCountToModelColWidth: function (count, displayWidth) {
 				if (count <= 0) { return 0; }
 				var maxw = displayWidth ? asc_round(this.maxDigitWidth) : this.maxDigitWidth;
-				return asc_floor( ( count * maxw + (!noPad ? 5 : 0) ) / maxw * 256 ) / 256;
+				return asc_floor((count * maxw + 5) / maxw * 256) / 256; // 5 - Это padding + border
 			},
 
 			/**
