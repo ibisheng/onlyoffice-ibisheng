@@ -601,7 +601,7 @@ function CCollaborativeEditing()
 
         this.Apply_OtherChanges();
 
-        // После того как мы приняли чужие изменения, мы должны залочить новые объекты, которые били залочены
+        // После того как мы приняли чужие изменения, мы должны залочить новые объекты, которые были залочены
         this.Lock_NeedLock();
 
         LogicDocument.Set_SelectionState2( DocState );

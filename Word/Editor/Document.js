@@ -1918,6 +1918,7 @@ CDocument.prototype =
 
             this.Recalculate();
             this.Document_UpdateInterfaceState();
+            this.Document_UpdateRulersState();
         }
     },
 
@@ -1974,6 +1975,7 @@ CDocument.prototype =
                 }
 
                 this.Recalculate();
+                this.Document_UpdateRulersState();
             }
         }
         else
@@ -2025,6 +2027,7 @@ CDocument.prototype =
                     Last.Document_SetThisElementCurrent();
 
                     this.Recalculate();
+                    this.Document_UpdateRulersState();
                 }
             }
             else
@@ -2039,6 +2042,7 @@ CDocument.prototype =
                     }
 
                     this.Recalculate();
+                    this.Document_UpdateRulersState();
                 }
             }
         }
@@ -5682,6 +5686,8 @@ CDocument.prototype =
         }
 
         this.Recalculate();
+        this.Document_UpdateSelectionState();
+        this.Document_UpdateRulersState();
     },
 
     Paragraph_IncDecFontSize : function(bIncrease)

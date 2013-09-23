@@ -608,7 +608,6 @@ function asc_docs_api(name)
     this.IsLongActionCurrent = false;
 
     this.ParcedDocument = false;
-    this.OpenLocks = [];
 
 	var oThis = this;
 	if(window.addEventListener)
@@ -1306,12 +1305,6 @@ asc_docs_api.prototype._coAuthoringInit = function()
 	this.CoAuthoringApi.onUserStateChanged			= function (e) { t.asc_fireCallback( "asc_onUserStateChanged", e ); };
 	this.CoAuthoringApi.onLocksAcquired				= function (e)
     {
-        if (!t.ParcedDocument)
-        {
-            t.OpenLocks.push(e);
-            return;
-        }
-
         if ( 2 != e["state"] )
         {
             var Id = e["block"];
@@ -5983,11 +5976,6 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
                 var Document = this.WordControl.m_oLogicDocument;
 
                 CollaborativeEditing.Apply_Changes();
-                for (var i = 0; i < this.OpenLocks.length; i++)
-                {
-                    this.CoAuthoringApi.onLocksAcquired(this.OpenLocks[i]);
-                }
-                this.OpenLocks = [];
 
                 //Recalculate HdrFtr
                 if(Document.HdrFtr && Document.HdrFtr.Content && Document.HdrFtr.Content.length > 0 && Document.HdrFtr.Content[0].Header)
