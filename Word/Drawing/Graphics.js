@@ -2718,7 +2718,7 @@ CGraphics.prototype =
 
     DrawPresentationComment : function(type, x, y, w, h)
     {
-        if (!this.m_bIntegerGrid)
+        if (this.m_bIntegerGrid)
         {
             if (window.g_comment_image && window.g_comment_image.asc_complete === true)
             {
