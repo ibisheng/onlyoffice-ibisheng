@@ -4219,8 +4219,8 @@ function DrawingObjects() {
 		
 		var response = { result: true, x: 0, y: 0 };
 		
-		var top = worksheet.getCellTop(0, 3) + pxToMm(1);
-		var left = worksheet.getCellLeft(0, 3) + pxToMm(1);
+		var top = worksheet.getCellTop(0, 3);
+		var left = worksheet.getCellLeft(0, 3);
 		
 		// выход за границу слева или сверху
 		if ( y < 0 ) {
@@ -4233,19 +4233,22 @@ function DrawingObjects() {
 		}
 		
 		// выход за границу справа
-		var foundCol = worksheet._findColUnderCursor(mmToPt(x + w), true);
-		while ( foundCol == null ) {
-			worksheet.expandColsOnScroll(true);
-			worksheet._trigger("reinitializeScrollX");
-			foundCol = worksheet._findColUnderCursor(mmToPt(x + w), true);
+		if ( x + w > left ) {
+			var foundCol = worksheet._findColUnderCursor(mmToPt(x + w), true);
+			while ( foundCol == null ) {
+				worksheet.expandColsOnScroll(true);
+				worksheet._trigger("reinitializeScrollX");
+				foundCol = worksheet._findColUnderCursor(mmToPt(x + w), true);
+			}
 		}
-
 		// выход за границу снизу
-		var foundRow = worksheet._findRowUnderCursor(mmToPt(y + h), true);
-		while ( foundRow == null ) {
-			worksheet.expandRowsOnScroll(true);
-			worksheet._trigger("reinitializeScrollY");
-			foundRow = worksheet._findRowUnderCursor(mmToPt(y + h), true);
+		if ( y + h > top ) {
+			var foundRow = worksheet._findRowUnderCursor(mmToPt(y + h), true);
+			while ( foundRow == null ) {
+				worksheet.expandRowsOnScroll(true);
+				worksheet._trigger("reinitializeScrollY");
+				foundRow = worksheet._findRowUnderCursor(mmToPt(y + h), true);
+			}
 		}
 		
 		return response;
