@@ -2930,12 +2930,17 @@ parserFormula.prototype = {
                 elemArr.push( currentElement.Assemble( arg ) );
             }
             else {
-                if ( currentElement instanceof cString )
+                if ( currentElement instanceof cString ){
                     currentElement = new cString( "\"" + currentElement.toString() + "\"" );
+                }
                 elemArr.push( currentElement );
             }
         }
-        return elemArr.pop().toString();
+        var res = elemArr.pop()
+        if( res != undefined && res != null )
+            return res.toString();
+        else
+            return this.Formula;
     },
 
     _changeOffsetHelper:function ( ref, offset ) {

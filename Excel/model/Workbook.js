@@ -1109,7 +1109,7 @@ function unLockDraw(wb){
         arrRecalc = {};
     }
 }
-function buildRecalc(_wb){
+function buildRecalc(_wb,notrec){
 	var ws;
     if( lc > 1 ) return;
 	for( var id in arrRecalc ){
@@ -1118,7 +1118,8 @@ function buildRecalc(_wb){
 			ws._BuildDependencies(arrRecalc[id]);
 		}
 	}
-	recalc(_wb)
+    if(!notrec)
+	    recalc(_wb)
 }
 function searchCleenCacheArea(o1,o2){
 	var o3 = {};
@@ -1493,6 +1494,7 @@ Workbook.prototype.init=function(){
 		thas.handlers.trigger("cleanCellCache", ws.getId(), new Asc.Range( 0, 0, ws.getColsCount()-1, ws.getRowsCount()-1 ), c_oAscCanChangeColWidth.numbers);
 		thas.startActionOn = false;
 		thas.handlers.trigger("asc_onEndAction",c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Recalc);
+        console.log("timeCount " + timeCount);
 	}
 	
 	if( nR.length > 0 ){
@@ -7872,6 +7874,7 @@ Range.prototype.cleanAll=function(){
 Range.prototype.sort=function(nOption, nStartCol){
 	//todo sort с замержеными ячейками.
 	//todo горизонтальная сортировка
+    lockDraw(this.worksheet.workbook);
 	if(null != this.hasMerged())
 		return null;
 	var oRes = null;
@@ -8033,6 +8036,8 @@ Range.prototype.sort=function(nOption, nStartCol){
 		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_Sort, this.worksheet.getId(), new Asc.Range(0, nRowFirst0, gc_nMaxCol0, nLastRow0), oRes);
 		this._sortByArray(oUndoRedoBBox, aSortData, false);
 	}
+    buildRecalc(this.worksheet.workbook,true);
+    unLockDraw(this.worksheet.workbook);
 	return oRes;
 }
 Range.prototype._sortByArray=function(oBBox, aSortData, bUndo){
@@ -8098,13 +8103,18 @@ Range.prototype._sortByArray=function(oBBox, aSortData, bUndo){
 					oCurCell.setFormula(oCurCell.formulaParsed.changeOffset({offsetCol:0, offsetRow:shift}).assemble());//получаем новую формулу, путем сдвига входящих в нее ссылок на ячейки на offsetCol и offsetRow. не путать с shiftCells - меняет одну конкретную ячейку в формуле, changeOffset - меняет оффсет для всех входящих в формулу ячеек.
 					this.worksheet.workbook.dependencyFormulas.deleteMasterNodes( this.worksheet.Id, lastName );//разрываем ссылки между старой ячейкой и ведущими ячейками для нее.
 					delete this.worksheet.workbook.cwf[this.worksheet.Id].cells[lastName];
-					this.worksheet._BuildDependencies({sNewName:sNewName})// строим новые зависимости для новой ячейки.
-                    rec[sNewName] = [ this.worksheet.getId(), sNewName ];
-                    rec.length++;
-//					this.worksheet._RecalculatedFunctions(sNewName);// пересчитываем новую ячейку.
+
+                    if( !arrRecalc[this.worksheet.getId()] ){
+                        arrRecalc[this.worksheet.getId()] = {};
+                    }
+                    arrRecalc[this.worksheet.getId()][sNewName] = sNewName;
+                    this.worksheet.workbook.needRecalc[ getVertexId(this.worksheet.getId(),sNewName) ] = [ this.worksheet.getId(),sNewName ];
+                    if( this.worksheet.workbook.needRecalc.length < 0) this.worksheet.workbook.needRecalc.length = 0;
+                    this.worksheet.workbook.needRecalc.length++;
+
 				}
 				else{
-					sortDependency(this.worksheet, {sNewName:sNewName});
+//					sortDependency(this.worksheet, {sNewName:sNewName});
 				}
 			}
 			else
@@ -8114,7 +8124,14 @@ Range.prototype._sortByArray=function(oBBox, aSortData, bUndo){
 					//здесь достаточно простого delete, потому что на самом деле в функции ячейки только меняются местами, удаления не происходит
 					delete rowTo.c[i];
 					var sNewName = (new CellAddress(nIndexTo, i, 0)).getID();
-					sortDependency(this.worksheet, {sNewName:sNewName});
+                    if( !arrRecalc[this.worksheet.getId()] ){
+                        arrRecalc[this.worksheet.getId()] = {};
+                    }
+                    arrRecalc[this.worksheet.getId()][sNewName] = sNewName;
+                    this.worksheet.workbook.needRecalc[ getVertexId(this.worksheet.getId(),sNewName) ] = [ this.worksheet.getId(),sNewName ];
+                    if( this.worksheet.workbook.needRecalc.length < 0) this.worksheet.workbook.needRecalc.length = 0;
+                    this.worksheet.workbook.needRecalc.length++;
+//					sortDependency(this.worksheet, {sNewName:sNewName});
 				}
 			}
 		}
@@ -8126,9 +8143,9 @@ Range.prototype._sortByArray=function(oBBox, aSortData, bUndo){
 	}
 
 //    this.worksheet.workbook.buildDependency();
-    this.worksheet.workbook.needRecalc = rec;
+//    this.worksheet.workbook.needRecalc = rec;
 
-    recalc(this.worksheet.workbook);
+//    recalc(this.worksheet.workbook);
 
 };
 Range.prototype.promote=function(bCtrl, bVertical, nIndex){
