@@ -4112,7 +4112,7 @@ Cell.prototype.setValue=function(val,callback){
 		sortDependency(this.ws, ar);
 	}
 	else if( this.ws.workbook.isNeedCacheClean == false ){
-        if( ws.workbook.dependencyFormulas.getNode(this.ws.getId(),this.getName()) ){
+        if( ws.workbook.dependencyFormulas.nodeExist2(this.ws.getId(),this.getName()) ){
             if( !arrRecalc[this.ws.getId()] ){
                 arrRecalc[this.ws.getId()] = {};
             }
@@ -8108,9 +8108,9 @@ Range.prototype._sortByArray=function(oBBox, aSortData, bUndo){
                         arrRecalc[this.worksheet.getId()] = {};
                     }
                     arrRecalc[this.worksheet.getId()][sNewName] = sNewName;
-                    this.worksheet.workbook.needRecalc[ getVertexId(this.worksheet.getId(),sNewName) ] = [ this.worksheet.getId(),sNewName ];
+                    /*this.worksheet.workbook.needRecalc[ getVertexId(this.worksheet.getId(),sNewName) ] = [ this.worksheet.getId(),sNewName ];
                     if( this.worksheet.workbook.needRecalc.length < 0) this.worksheet.workbook.needRecalc.length = 0;
-                    this.worksheet.workbook.needRecalc.length++;
+                    this.worksheet.workbook.needRecalc.length++;*/
 
 				}
 				else{
@@ -8128,9 +8128,9 @@ Range.prototype._sortByArray=function(oBBox, aSortData, bUndo){
                         arrRecalc[this.worksheet.getId()] = {};
                     }
                     arrRecalc[this.worksheet.getId()][sNewName] = sNewName;
-                    this.worksheet.workbook.needRecalc[ getVertexId(this.worksheet.getId(),sNewName) ] = [ this.worksheet.getId(),sNewName ];
+                    /*this.worksheet.workbook.needRecalc[ getVertexId(this.worksheet.getId(),sNewName) ] = [ this.worksheet.getId(),sNewName ];
                     if( this.worksheet.workbook.needRecalc.length < 0) this.worksheet.workbook.needRecalc.length = 0;
-                    this.worksheet.workbook.needRecalc.length++;
+                    this.worksheet.workbook.needRecalc.length++;*/
 //					sortDependency(this.worksheet, {sNewName:sNewName});
 				}
 			}
