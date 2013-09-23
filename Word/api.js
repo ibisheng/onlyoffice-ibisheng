@@ -1259,25 +1259,21 @@ asc_docs_api.prototype._coAuthoringInit = function()
         return; // Error
 	}
 
-	if(undefined !== window['g_cAscCoAuthoringUrl'])
+	if (undefined !== window['g_cAscCoAuthoringUrl'])
 		window.g_cAscCoAuthoringUrl = window['g_cAscCoAuthoringUrl'];
-		
-	if(undefined !== window.g_cAscCoAuthoringUrl)
-	{
+	if (undefined !== window.g_cAscCoAuthoringUrl) {
 		//Turn off CoAuthoring feature if it disabled
-		if(!this.isCoAuthoringEnable)
+		if (!this.isCoAuthoringEnable)
 			window.g_cAscCoAuthoringUrl = "";
 			
 		this.CoAuthoringApi.set_url(window.g_cAscCoAuthoringUrl);
 	}
-	//���� ������ ����������� ������������, ����� ������� ��� ����������� ������������� ���.
-	if(undefined === editor.User || null === editor.User ||
-		undefined === editor.User.asc_getId() || null === editor.User.asc_getId())
-	{
+	//Если User не задан, отключаем коавторинг.
+	if (null == this.User || null == this.User.asc_getId()) {
 		var asc_user = window["Asc"].asc_CUser;
-		editor.User = new asc_user();
-		editor.User.asc_setId("Unknown");
-		editor.User.asc_setUserName("Unknown");
+		this.User = new asc_user();
+		this.User.asc_setId("Unknown");
+		this.User.asc_setUserName("Unknown");
 
 		this.CoAuthoringApi.set_url("");
 	}
