@@ -305,6 +305,9 @@ function MoveComment(comment)
 
     this.draw = function(overlay)
     {
+
+        var dd = editor.WordControl.m_oDrawingDocument;
+        overlay.DrawPresentationComment(0, this.x, this.y, dd.GetCommentWidth(), dd.GetCommentHeight())
     };
 
     this.trackEnd = function()
