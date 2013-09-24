@@ -994,7 +994,7 @@ function CCollaborativeEditing()
 
 }
 
-var CollaborativeEditing = null;
+var CollaborativeEditing = new CCollaborativeEditing();
 
 var changestype_None                 =  0; // Ничего не происходит с выделенным элементом (проверка идет через дополнительный параметр)
 var changestype_Paragraph_Content    =  1; // Добавление/удаление элементов в параграф
