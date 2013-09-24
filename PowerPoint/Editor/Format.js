@@ -3501,13 +3501,13 @@ function CTheme()
 
     this.setFontScheme = function(fontScheme)
     {
-        History.Add(this, {Type: historyitem_ChangeFontScheme, oldPr: this.themeElements.clrScheme, newPr: clrScheme});
+        History.Add(this, {Type: historyitem_ChangeFontScheme, oldPr: this.themeElements.fontScheme, newPr: fontScheme});
         this.themeElements.fontScheme = fontScheme;
     };
 
     this.setFormatScheme = function(fmtScheme)
     {
-        History.Add(this, {Type: historyitem_ChangeFmtScheme, oldPr: this.themeElements.clrScheme, newPr: clrScheme});
+        History.Add(this, {Type: historyitem_ChangeFmtScheme, oldPr: this.themeElements.fmtScheme, newPr: fmtScheme});
         this.themeElements.fmtScheme = fmtScheme;
     };
 
@@ -3833,6 +3833,64 @@ function CTextStyles()
     this.titleStyle = null;
     this.bodyStyle = null;
     this.otherStyle = null;
+
+    this.Write_ToBinary2 = function(w)
+    {
+        w.WriteBool(isRealObject(this.titleStyle));
+        if(isRealObject(this.titleStyle))
+        {
+            this.titleStyle.Write_ToBinary2(w);
+        }
+
+
+        w.WriteBool(isRealObject(this.bodyStyle));
+        if(isRealObject(this.bodyStyle))
+        {
+            this.bodyStyle.Write_ToBinary2(w);
+        }
+
+        w.WriteBool(isRealObject(this.otherStyle));
+        if(isRealObject(this.otherStyle))
+        {
+            this.otherStyle.Write_ToBinary2(w);
+        }
+        w.WriteString2("test");
+    };
+
+    this.Read_FromBinary2 = function(r)
+    {
+        if(r.GetBool())
+        {
+            this.titleStyle = new TextListStyle();
+            this.titleStyle.Read_FromBinary2(r);
+        }
+        else
+        {
+            this.titleStyle = null;
+        }
+
+
+        if(r.GetBool())
+        {
+            this.bodyStyle = new TextListStyle();
+            this.bodyStyle.Read_FromBinary2(r);
+        }
+        else
+        {
+            this.bodyStyle = null;
+        }
+
+        if(r.GetBool())
+        {
+            this.otherStyle = new TextListStyle();
+            this.otherStyle.Read_FromBinary2(r);
+        }
+        else
+        {
+            this.otherStyle = null;
+        }
+        var s = r.GetString2();
+    };
 }
 
 //---------------------------
@@ -5297,6 +5355,13 @@ function CTextParagraphPr()
         {
             this.pPr.Write_ToBinary(w);
         }
+
+
+        w.WriteBool(isRealObject(this.rPr));
+        if(isRealObject(this.rPr))
+        {
+            this.rPr.Write_ToBinary(w);
+        }
     };
 
     this.Read_FromBinary2 = function(r)
@@ -5305,7 +5370,6 @@ function CTextParagraphPr()
         {
             this.bullet = new CBullet();
             this.bullet.Read_FromBinary2(r);
-
         }
         else
         {
@@ -5324,6 +5388,12 @@ function CTextParagraphPr()
         if(r.GetBool())
         {
             this.pPr.Read_FromBinary(r);
+        }
+
+        this.rPr = new CTextPr();
+        if(r.GetBool())
+        {
+            this.rPr.Read_FromBinary(r);
         }
     };
 }
@@ -5380,11 +5450,15 @@ function CBullet()
             this.bulletSize.Write_ToBinary2(w);
         }
 
+
+        w.WriteString2("dssdf");
+
         w.WriteBool(isRealObject(this.bulletTypeface));
         if(isRealObject(this.bulletTypeface))
         {
             this.bulletTypeface.Write_ToBinary2(w);
         }
+
 
         w.WriteBool(isRealObject(this.bulletType));
         if(isRealObject(this.bulletType))
@@ -5396,6 +5470,7 @@ function CBullet()
 
     this.Read_FromBinary2 = function(r)
     {
+
         if(r.GetBool())
         {
             this.bulletColor = new CBulletColor();
@@ -5408,6 +5483,7 @@ function CBullet()
             this.bulletSize.Read_FromBinary2(r);
         }
 
+        var s = r.GetString2();
         if(r.GetBool())
         {
             this.bulletTypeface = new CBulletTypeface();
@@ -5545,7 +5621,7 @@ function CBulletTypeface()
         w.WriteBool(typeof this.typeface === "string");
         if(typeof this.typeface === "string")
         {
-            w.WriteString(this.typeface);
+            w.WriteString2(this.typeface);
         }
 
     };
@@ -5596,7 +5672,7 @@ function CBulletType()
         w.WriteBool(typeof this.Char === "string");
         if(typeof this.Char === "string")
         {
-            w.WriteString(this.Char);
+            w.WriteString2(this.Char);
         }
 
         w.WriteBool(isRealNumber(this.AutoNumType));
@@ -5660,6 +5736,8 @@ function TextListStyle()
 
     this.Write_ToBinary2 = function(w)
     {
+        w.WriteBool(MASTER_STYLES);
+
         for(var i = 0; i < 10; ++i)
         {
             w.WriteBool(isRealObject(this.levels[i]));
@@ -5672,6 +5750,8 @@ function TextListStyle()
 
     this.Read_FromBinary2 = function(r)
     {
+        var b = r.GetBool();
+
         for(var i = 0; i < 10; ++i)
         {
             if(r.GetBool())

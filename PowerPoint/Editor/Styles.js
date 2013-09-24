@@ -6761,7 +6761,7 @@ CParaPr.prototype =
         if ( Flags & 256 )
         {
             this.Brd.Between = new CDocumentBorder();
-            this.Brd.Bottom.Read_FromBinary( Reader );
+            this.Brd.Between.Read_FromBinary( Reader );
         }
 
         if ( Flags & 512 )

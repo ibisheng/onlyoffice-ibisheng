@@ -228,6 +228,8 @@ CStatistics.prototype =
     }
 };
 
+var MASTER_STYLES = false;
+
 function CPresentation(DrawingDocument)
 {
     this.History = new CHistory(this);
@@ -399,6 +401,8 @@ function CSelectedElementsInfo()
         return ( this.m_nDrawing === selected_DrawingObject ? true : false );
     };
 
+
+
     this.Set_MixedSelection = function()
     {
         this.m_bMixedSelection = true;
@@ -421,6 +425,12 @@ CPresentation.prototype =
     Init : function()
     {
 
+    },
+
+    addSlideMaster: function(pos, master)
+    {
+        History.Add(this, {Type:historyitem_Presenattion_AddSlideMaster, pos: pos, master: master});
+        this.slideMasters.splice(pos, 0, master);
     },
 
     Get_Id : function()
@@ -5397,6 +5407,11 @@ CPresentation.prototype =
                 }
                 break;
             }
+            case historyitem_Presenattion_AddSlideMaster:
+            {
+                this.slideMasters.splice(Data.pos, 1);
+                break;
+            }
         }
     },
 
@@ -5452,6 +5467,11 @@ CPresentation.prototype =
                 {
                     History.TurnOn();
                 }
+                break;
+            }
+            case historyitem_Presenattion_AddSlideMaster:
+            {
+                this.slideMasters.splice(Data.pos, 0, Data.master);
                 break;
             }
         }
@@ -5876,9 +5896,6 @@ CPresentation.prototype =
                 this.DrawingDocument.OnRecalculatePage(_array[i], this.Slides[_array[i]]);
             }
             this.DrawingDocument.OnEndRecalculate();
-
-
-
         }
     },
 
@@ -5891,8 +5908,8 @@ CPresentation.prototype =
             return;
         }
 
-        if(!(this.Document_Is_SelectionLocked(changestype_Theme) === false))
-            return;
+        //if(!(this.Document_Is_SelectionLocked(changestype_Theme) === false))
+        //    return;
         if(this.startChangeThemeTimeOutId != null)
         {
             clearTimeout(this.startChangeThemeTimeOutId);
@@ -5905,9 +5922,9 @@ CPresentation.prototype =
         {
             clearTimeout(this.forwardChangeThemeTimeOutId);
         }
-        this.themes.push(themeInfo.Theme);
-        this.slideMasters.push(themeInfo.Master);
-        this.slideLayouts = this.slideLayouts.concat(themeInfo.Layouts);
+        //this.themes.push(themeInfo.Theme);
+        this.addSlideMaster(this.slideMasters.length, themeInfo.Master);
+        //this.slideLayouts = this.slideLayouts.concat(themeInfo.Layouts);
 
         var _new_master = themeInfo.Master;
         _new_master.presentation = this;
@@ -5938,12 +5955,10 @@ CPresentation.prototype =
             _arr_old_layouts[_slide_index] = _arr_slides[_slide_index].Layout;
         }
 
-        History.Create_NewPoint();
+       // History.Create_NewPoint();
 
         var _arr_new_layouts = [];
         var _new_layout;
-        var _history_data;
-        var _shape;
         for(_slide_index = 0; _slide_index < this.Slides.length; ++_slide_index)
         {
             if(_arr_slides[_slide_index].Layout.calculatedType == null)
@@ -6504,6 +6519,12 @@ CPresentation.prototype =
                 Writer.WriteDouble(Data.newH);
                 break;
             }
+            case historyitem_Presenattion_AddSlideMaster:
+            {
+                Writer.WriteLong(Data.pos);
+                Writer.WriteString2(Data.master.Get_Id());
+                break;
+            }
         }
 
         return Writer;
@@ -6615,6 +6636,14 @@ CPresentation.prototype =
                 {
                     History.TurnOn();
                 }
+                break;
+            }
+            case historyitem_Presenattion_AddSlideMaster:
+            {
+                var pos = Reader.GetLong();
+                var id = Reader.GetString2();
+                this.slideMasters.splice(pos, 0, g_oTableId.Get_ById(id));
+                break;
             }
         }
         return true;

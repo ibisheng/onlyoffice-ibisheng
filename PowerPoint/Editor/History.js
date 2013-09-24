@@ -230,6 +230,17 @@ var historyitem_SetShowMasterSp = 12;
 var historyitem_AddComment = 13;
 var historyitem_RemoveComment = 14;
 var historyitem_MoveComment = 15;
+var historyitem_SetTxStyles = 16;
+var historyitem_AddLayout = 17;
+var historyitem_SetLayoutMatchingName = 18;
+var historyitem_SetLayoutMaster = 19;
+var historyitem_SetLayoutType = 20;
+var historyitem_SetMasterTheme = 21;
+
+
+
+
+
 
 
 
@@ -248,6 +259,8 @@ var historyitem_PropLockerSetId = 0;
 var historyitem_Presenattion_AddSlide     = 1; // Добавляем слайд
 var historyitem_Presenattion_RemoveSlide  = 2; // Удаляем слайд
 var historyitem_Presenattion_SlideSize    = 3; // Меняем размер слайда
+var historyitem_Presenattion_AddSlideMaster = 4; // Меняем размер слайда
+
 
 
 
@@ -414,6 +427,8 @@ var historyitem_type_Layout      	  = 31;
 var historyitem_type_TextBody      	  = 32;
 var historyitem_type_GraphicFrame  	  = 33;
 var historyitem_type_Theme  	      = 34;
+var historyitem_type_SlideMaster      = 35;
+
 
 
 

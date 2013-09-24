@@ -155,10 +155,9 @@ function CTableId()
             case historyitem_type_Layout           : Element = new SlideLayout(); break;
             case historyitem_type_TextBody         : Element = new CTextBody(); break;
             case historyitem_type_GraphicFrame     : Element = new CGraphicFrame(); break;
-
-
-
-        }
+            case historyitem_type_SlideMaster      : Element = new MasterSlide(); break;
+            case historyitem_type_Theme            : Element = new CTheme(); break;
+         }
 
         Element.Read_FromBinary2(Reader);
 

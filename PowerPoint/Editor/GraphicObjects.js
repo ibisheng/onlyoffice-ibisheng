@@ -1609,7 +1609,7 @@ CGraphicObjects.prototype = {
         image.spPr.xfrm.offY = (this.slide.presentation.Height - H)/2;
         image.spPr.xfrm.extX = W;
         image.spPr.xfrm.extY = H;
-        this.slide.addSp(image);
+        this.slide.addToSpTreeToPos(this.slide.cSld.spTree.length, image);
         editor.WordControl.m_oLogicDocument.recalcMap[image.Id] = image;
     },
 
