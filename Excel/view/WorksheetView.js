@@ -1858,7 +1858,8 @@
 							top: printPagesData.topFieldInPt - this.cellsTop,
 							right: printPagesData.rightFieldInPt,
 							bottom: printPagesData.bottomFieldInPt
-						}
+						},
+						pageRange: printPagesData.pageRange
 					};
 					this.objectRender.showDrawingObjectsEx(false, drawingPrintOptions);
 					this.visibleRange = tmpVisibleRange.clone(true);

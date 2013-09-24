@@ -3280,13 +3280,14 @@ function DrawingObjects() {
 
 		/*********** Print Options ***************
 		printOptions : {
-		ctx,
-		margin : {
-		left: 0,	// pt
-		right: 0,	// pt
-		top: 0,		// pt
-		button: 0	// pt
-		}
+			ctx,
+			margin : {
+				left: 0,	// pt
+				right: 0,	// pt
+				top: 0,		// pt
+				button: 0	// pt
+			},
+			pageRange		// c1, r1, c2, r2
 		}
 		*****************************************/
 		
@@ -3305,16 +3306,35 @@ function DrawingObjects() {
 					var index = i;
 					var drawingObject = aObjects[i];
 					
-					if ( !drawingObject.inVisibleArea() )
-						continue;
+					if ( !printOptions ) {
+						if ( !drawingObject.inVisibleArea() )
+							continue;
+					}
 						
 					if ( !drawingObject.flags.anchorUpdated )
 						drawingObject.updateAnchorPosition();
 					
 					// Shape render
 					if ( drawingObject.isGraphicObject() ) {
-						drawingObject.graphicObject.draw( printOptions ? printOptions.ctx.DocumentRenderer : shapeCtx );
-						continue;
+						if ( printOptions ) {
+						
+							var left = worksheet.getCellLeft(printOptions.pageRange.c1, 3) - worksheet.getCellLeft(0, 3);
+							var top = worksheet.getCellTop(printOptions.pageRange.r1, 3) - worksheet.getCellTop(0, 3);
+						
+							var tx = drawingObject.graphicObject.transform.tx;
+							var ty = drawingObject.graphicObject.transform.ty;
+						
+							drawingObject.graphicObject.transform.tx -= left;
+							drawingObject.graphicObject.transform.ty -= top;
+							
+							drawingObject.graphicObject.draw( printOptions.ctx.DocumentRenderer );
+							
+							// Restore
+							drawingObject.graphicObject.transform.tx = tx;
+							drawingObject.graphicObject.transform.ty = ty;
+						}
+						else
+							drawingObject.graphicObject.draw( shapeCtx );
 					}
 				}
 			}
