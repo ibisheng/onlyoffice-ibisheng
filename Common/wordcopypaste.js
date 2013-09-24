@@ -3002,6 +3002,7 @@ PasteProcessor.prototype =
         }
         else
         {
+            var oThis = this;
             var presentation = editor.WordControl.m_oLogicDocument;
             if(copyPasteUseBinery)
             {
