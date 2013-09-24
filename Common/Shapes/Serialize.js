@@ -721,7 +721,7 @@ function BinaryPPTYLoader()
                 case 0:
                 {
                     var indexTh = s.GetULong();
-                    master.Theme = this.presentation.themes[indexTh];
+                    master.setTheme(this.presentation.themes[indexTh]);
                     break;
                 }
                 case 1:
@@ -750,8 +750,8 @@ function BinaryPPTYLoader()
                     case 0:
                     {
                         var indexL = s.GetULong();
-                        master.sldLayoutLst[master.sldLayoutLst.length] = this.presentation.slideLayouts[indexL];
-                        this.presentation.slideLayouts[indexL].Master = master;
+                        master.addToSldLayoutLstToPos(master.sldLayoutLst.length, this.presentation.slideLayouts[indexL]);
+                        this.presentation.slideLayouts[indexL].setMaster( master);
                         break;
                     }
                     case 1:
@@ -2270,12 +2270,24 @@ function BinaryPPTYLoader()
             {
                 case 0:
                 {
-                    this.ReadCSld(master.cSld);
+                    var cSld = new CSld();
+                    this.ReadCSld(cSld);
+                    for(var i = 0; i < cSld.spTree.length; ++i)
+                    {
+                        master.shapeAdd(i, cSld.spTree[i]);
+                    }
+                    if(cSld.Bg)
+                    {
+                        master.changeBackground(cSld.Bg);
+                    }
+                    master.setCSldName(cSld.name);
                     break;
                 }
                 case 1:
                 {
-                    this.ReadClrMap(master.clrMap);
+                    var clrMap = new ClrMap();
+                    this.ReadClrMap(clrMap);
+                    master.setClMapOverride(clrMap);
                     break;
                 }
                 case 2:
@@ -2293,7 +2305,7 @@ function BinaryPPTYLoader()
                 }
                 case 6:
                 {
-                    master.txStyles = this.ReadTxStyles();
+                    master.setTxStyles(this.ReadTxStyles());
                     break;
                 }
                 default:
@@ -2368,7 +2380,7 @@ function BinaryPPTYLoader()
             {
                 case 0:
                 {
-                    layout.matchingName = s.GetString2();
+                    layout.setMatchingName(s.GetString2());
                     break;
                 }
                 case 1:
@@ -2378,12 +2390,12 @@ function BinaryPPTYLoader()
                 }
                 case 2:
                 {
-                    layout.showMasterPhAnim = s.GetBool();
+                    layout.setShowPhAnim(s.GetBool());
                     break;
                 }
                 case 3:
                 {
-                    layout.showMasterSp = s.GetBool();
+                    layout.setShowMasterSp(s.GetBool());
                     break;
                 }
                 case 4:
@@ -2393,7 +2405,7 @@ function BinaryPPTYLoader()
                 }
                 case 5:
                 {
-                    layout.type = s.GetUChar();
+                    layout.setType(s.GetUChar());
                     break;
                 }
                 default:
@@ -2409,12 +2421,22 @@ function BinaryPPTYLoader()
             {
                 case 0:
                 {
-                    this.ReadCSld(layout.cSld);
+                    var cSld = new CSld();
+                    this.ReadCSld(cSld);
+                    for(var i = 0; i < cSld.spTree.length; ++i)
+                    {
+                        layout.shapeAdd(i, cSld.spTree[i]);
+                    }
+                    if(cSld.Bg)
+                    {
+                        layout.changeBackground(cSld.Bg);
+                    }
+                    layout.setCSldName(cSld.name);
                     break;
                 }
                 case 1:
                 {
-                    layout.clrMap = this.ReadClrOverride();
+                    layout.setClMapOverride(this.ReadClrOverride());
                     break;
                 }
                 case 4:
@@ -2458,11 +2480,11 @@ function BinaryPPTYLoader()
                 break;
 
             if (0 == _at)
-                slide.show = s.GetBool();
+                slide.setShow(s.GetBool());
             else if (1 == _at)
-                slide.showMasterPhAnim = s.GetBool();
+                slide.setShowPhAnim(s.GetBool());
             else if (2 == _at)
-                slide.showMasterSp = s.GetBool();
+                slide.setShowMasterSp(s.GetBool());
         }
 
         while (s.cur < end)
@@ -3174,7 +3196,12 @@ function BinaryPPTYLoader()
                 case 0:
                 {
                     // themeElements
-                    this.ReadThemeElements(theme.themeElements);
+                    var themeElements = new ThemeElements()
+                    this.ReadThemeElements(themeElements);
+                    theme.setFontScheme(themeElements.fontScheme);
+                    theme.setFormatScheme(themeElements.fmtScheme);
+                    theme.changeColorScheme(themeElements.clrScheme);
+
                     break;
                 }
                 case 1:
@@ -5791,7 +5818,7 @@ function BinaryPPTYLoader()
                 {
                     bodyPr.vert = s.GetUChar();
                     if(bodyPr.vert === nVertTTwordArtVert)
-                        bodyPr.vert = nVertTTvert270;
+                        bodyPr.vert = nVertTTvert;
                     break;
                 }
                 case 18:
@@ -6355,10 +6382,10 @@ function BinaryPPTYLoader()
                 {
                     s.Skip2(4);
                     var _c = s.GetULong();
-                    if(History != null)
+                    /*if(History != null)
                     {
                         History.TurnOff();
-                    }
+                    }*/
                     if(!txbody.content)
                         txbody.content = new CDocumentContent(shape, this.presentation ? this.presentation.DrawingDocument : null, 0, 0, 0, 0, 0, 0);
                     if(_c>0)
@@ -6383,10 +6410,10 @@ function BinaryPPTYLoader()
                     {
                         txbody.textFieldFlag = true;
                     }
-                    if(History != null)
+                    /*if(History != null)
                     {
                         History.TurnOn();
-                    }
+                    }*/
                     break;
                 }
                 default:
@@ -6427,10 +6454,10 @@ function BinaryPPTYLoader()
                     s.Skip2(4);
                     var _c = s.GetULong();
 
-                    if(History != null)
+                    /*if(History != null)
                     {
                         History.TurnOff();
-                    }
+                    }*/
 
                     for (var i = 0; i < _c; i++)
                     {
@@ -6439,10 +6466,10 @@ function BinaryPPTYLoader()
                         content.Internal_Content_Add(content.Content.length, _paragraph);
                     }
 
-                    if(History != null)
+                    /*if(History != null)
                     {
                         History.TurnOn();
-                    }
+                    }*/
                     break;
                 }
                 default:
