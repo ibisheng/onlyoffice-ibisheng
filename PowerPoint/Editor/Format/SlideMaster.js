@@ -381,6 +381,26 @@ MasterSlide.prototype =
         this.recalcAll();
     },
 
+    shapeAdd: function(pos, item)
+    {
+        History.Add(this, {Type: historyitem_ShapeAdd, pos: pos, item: item});
+        this.cSld.spTree.splice(pos, 0, item);
+    },
+
+    changeBackground: function(bg)
+    {
+        History.Add(this, {Type: historyitem_ChangeBg, oldBg: this.cSld.Bg ? this.cSld.Bg.createFullCopy() : null, newBg: bg});
+        this.cSld.Bg = bg.createFullCopy();
+        this.recalcInfo.recalculateBackground = true;
+        editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+    },
+
+    setCSldName: function(name)
+    {
+        History.Add(this, {Type: historyitem_SetCSldName,oldName: this.cSld.name, newName: name});
+        this.cSld.name = name;
+    },
+
     recalcAll: function()
     {
         for(var i = 0; i < this.cSld.spTree.length; ++i)

@@ -333,6 +333,9 @@ var historyitem_SetLstStyle = 2;
 
 //Типы изменений в классе CTheme
 var historyitem_ChangeColorScheme = 0;
+var historyitem_ChangeFontScheme = 1;
+var historyitem_ChangeFmtScheme = 2;
+
 
 
 
@@ -340,7 +343,6 @@ var historyitem_ChangeColorScheme = 0;
 
 //Типы изменений в классе GraphicObjects
 var historyitem_AddHdrFtrGrObjects = 0;
-var historyitem_ChangeColorScheme = 1;
 
 //Типы изменений в классе HeaderFooterGraphicObjects
 var historyitem_AddHdr = 0;

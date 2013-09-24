@@ -3309,6 +3309,55 @@ function FontCollection()
     this.latin = null;
     this.ea = null;
     this.cs = null;
+
+    this.Write_ToBinary2 = function(w)
+    {
+        w.WriteBool((typeof this.latin === "string"));
+        if((typeof this.latin === "string"))
+        {
+            w.WriteString2(this.latin);
+        }
+        w.WriteBool((typeof this.ea === "string"));
+        if((typeof this.ea === "string"))
+        {
+            w.WriteString2(this.ea);
+        }
+        w.WriteBool((typeof this.cs === "string"));
+        if((typeof this.cs === "string"))
+        {
+            w.WriteString2(this.cs);
+        }
+    };
+
+    this.Read_FromBinary2 = function(r)
+    {
+        if(r.GetBool())
+        {
+            this.latin = r.GetString2();
+        }
+        else
+        {
+            this.latin = null;
+        }
+
+        if(r.GetBool())
+        {
+            this.ea = r.GetString2();
+        }
+        else
+        {
+            this.ea = null;
+        }
+
+        if(r.GetBool())
+        {
+            this.cs = r.GetString2();
+        }
+        else
+        {
+            this.cs = null;
+        }
+    };
 }
 
 function FontScheme()
@@ -3317,6 +3366,18 @@ function FontScheme()
 
     this.majorFont = new FontCollection();
     this.minorFont = new FontCollection();
+
+    this.Write_ToBinary2 = function(w)
+    {
+        this.majorFont.Write_ToBinary2(w);
+        this.minorFont.Write_ToBinary2(w);
+    };
+
+    this.Read_FromBinary2 = function(r)
+    {
+        this.majorFont.Read_FromBinary2(r);
+        this.minorFont.Read_FromBinary2(r);
+    };
 }
 
 function FmtScheme()
@@ -3346,6 +3407,51 @@ function FmtScheme()
 
         return null;
     }
+
+    this.Write_ToBinary2 = function(w)
+    {
+        w.WriteString2(this.name);
+        w.WriteLong(this.fillStyleLst.length);
+        for(var i = 0; i < this.fillStyleLst.length; ++i)
+        {
+            this.fillStyleLst[i].Write_ToBinary2(w);
+        }
+        w.WriteLong(this.lnStyleLst.length);
+        for(var i = 0; i < this.lnStyleLst.length; ++i)
+        {
+            this.lnStyleLst[i].Write_ToBinary2(w);
+        }
+
+        w.WriteLong(this.bgFillStyleLst.length);
+        for(var i = 0; i < this.bgFillStyleLst.length; ++i)
+        {
+            this.bgFillStyleLst[i].Write_ToBinary2(w);
+        }
+    };
+
+    this.Read_FromBinary2 = function(r)
+    {
+        this.name = r.GetString2();
+        var c = r.GetLong();
+        for(var i = 0; i < c; ++i)
+        {
+            this.fillStyleLst[i] = new CUniFill();
+            this.fillStyleLst[i].Read_FromBinary2(r);
+        }
+        c = r.GetLong();
+        for(i = 0; i < c; ++i)
+        {
+            this.lnStyleLst[i] = new CLn();
+            this.lnStyleLst[i].Read_FromBinary2(r);
+        }
+
+        c = r.GetLong();
+        for(i = 0; i < c; ++i)
+        {
+            this.bgFillStyleLst[i] = new CUniFill();
+            this.bgFillStyleLst[i].Read_FromBinary2(r);
+        }
+    };
 }
 
 function ThemeElements()
@@ -3393,6 +3499,18 @@ function CTheme()
         this.themeElements.clrScheme = clrScheme;
     };
 
+    this.setFontScheme = function(fontScheme)
+    {
+        History.Add(this, {Type: historyitem_ChangeFontScheme, oldPr: this.themeElements.clrScheme, newPr: clrScheme});
+        this.themeElements.fontScheme = fontScheme;
+    };
+
+    this.setFormatScheme = function(fmtScheme)
+    {
+        History.Add(this, {Type: historyitem_ChangeFmtScheme, oldPr: this.themeElements.clrScheme, newPr: clrScheme});
+        this.themeElements.fmtScheme = fmtScheme;
+    };
+
     this.Refresh_RecalcData= function()
     {
         var slides = editor.WordControl.m_oLogicDocument.Slides;
@@ -3417,6 +3535,17 @@ function CTheme()
                 this.themeElements.clrScheme = data.oldPr;
                 break;
             }
+            case historyitem_ChangeFontScheme:
+            {
+                this.themeElements.fontScheme = data.oldPr;
+                break;
+            }
+
+            case historyitem_ChangeFmtScheme:
+            {
+                this.themeElements.fmtScheme = data.oldPr;
+                break;
+            }
         }
     };
 
@@ -3427,6 +3556,17 @@ function CTheme()
             case historyitem_ChangeColorScheme:
             {
                 this.themeElements.clrScheme = data.newPr;
+                break;
+            }
+            case historyitem_ChangeFontScheme:
+            {
+                this.themeElements.fontScheme = data.newPr;
+                break;
+            }
+
+            case historyitem_ChangeFmtScheme:
+            {
+                this.themeElements.fmtScheme = data.newPr;
                 break;
             }
         }
@@ -3450,6 +3590,8 @@ function CTheme()
         switch(data.Type)
         {
             case historyitem_ChangeColorScheme:
+            case historyitem_ChangeFontScheme:
+            case historyitem_ChangeFmtScheme:
             {
                 data.newPr.Write_ToBinary2(w);
                 break;
@@ -3477,6 +3619,37 @@ function CTheme()
                             slide.recalcAllColors();
                         }
                     }
+                    break;
+                }
+                case historyitem_ChangeFontScheme:
+                {
+                    this.themeElements.fontScheme = new FontScheme();
+                    this.themeElements.fontScheme.Read_FromBinary2(r);
+                    var slides = editor.WordControl.m_oLogicDocument.Slides;
+                    for(var  i = 0; i < slides.length; ++i)
+                    {
+                        var slide = slides[i];
+                        if(slide.Layout && slide.Layout.Master && slide.Layout.Master.Theme === this)
+                        {
+                            slide.recalcAllColors();
+                        }
+                    }
+                    break;
+                }
+                case historyitem_ChangeFmtScheme:
+                {
+                    this.themeElements.fmtScheme = new FmtScheme();
+                    this.themeElements.fmtScheme.Read_FromBinary2(r);
+                    var slides = editor.WordControl.m_oLogicDocument.Slides;
+                    for(var  i = 0; i < slides.length; ++i)
+                    {
+                        var slide = slides[i];
+                        if(slide.Layout && slide.Layout.Master && slide.Layout.Master.Theme === this)
+                        {
+                            slide.recalcAllColors();
+                        }
+                    }
+                    break;
                 }
             }
         }

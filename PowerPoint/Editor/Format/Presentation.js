@@ -239,8 +239,7 @@ function CPresentation(DrawingDocument)
     this.TableId = new CTableId();
     g_oTableId = this.TableId;
 
-    this.CollaborativeEditing = new CCollaborativeEditing();
-    CollaborativeEditing = this.CollaborativeEditing;
+    this.CollaborativeEditing = CollaborativeEditing;
     //------------------------------------------------------------------------
 
     this.Id = g_oIdCounter.Get_NewId();
@@ -5882,6 +5881,8 @@ CPresentation.prototype =
 
         }
     },
+
+
 
     changeTheme : function(themeInfo)
     {
