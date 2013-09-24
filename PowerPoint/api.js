@@ -387,6 +387,23 @@ asc_docs_api.prototype._coAuthoringInit = function () {
                             else
                                 editor.WordControl.m_oLogicDocument.DrawingDocument.UnLockSlide(Class.num);
                         }
+                        if(object instanceof CPresentation)
+                        {
+                            if(Class === object.themeLock)
+                            {
+                                if(NewType !== locktype_Mine && NewType !== locktype_None)
+                                    editor.asc_fireCallback("asc_onLockDocumentTheme");
+                                else
+                                    editor.asc_fireCallback("asc_onUnLockDocumentTheme");
+                            }
+                            if(Class === object.slideSizeLock)
+                            {
+                                if(NewType !== locktype_Mine && NewType !== locktype_None)
+                                    editor.asc_fireCallback("asc_onLockDocumentProps");
+                                else
+                                    editor.asc_fireCallback("asc_onUnLockDocumentProps");
+                            }
+                        }
 
                     }
 
@@ -2792,7 +2809,7 @@ asc_docs_api.prototype.AddImage = function(){
 		var bNeedSubmit = true;
         if(e && e.target && e.target.files)
         {
-            var file = files[0];
+            var file = e.target.files[0];
 			var nError = ValidateUploadImage(e.target.files);
 			if(c_oAscServerError.NoError != nError)
 			{
