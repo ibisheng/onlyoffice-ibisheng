@@ -3168,8 +3168,7 @@
 					arrayCells = arrayCells.concat(this.collaborativeEditing.getArrayInsertRowsBySheetId(currentSheetId));
 				}
 
-				if (bIsDrawObjects) {
-					var objectState = (c_oAscLockTypes.kLockTypeMine === type) ? c_oAscObjectLockState.Off : c_oAscObjectLockState.On;
+				if ( bIsDrawObjects ) {
 					var arrayObjects = (c_oAscLockTypes.kLockTypeMine === type) ? this.collaborativeEditing.getLockObjectsMe(currentSheetId) : this.collaborativeEditing.getLockObjectsOther(currentSheetId);
 						
 					for (i = 0; i < arrayObjects.length; ++i) {

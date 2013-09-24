@@ -32,12 +32,6 @@ var c_oAscNumFormatType = {
 	top: "top",
 	bottom: "bottom"
  };
-
- var c_oAscObjectLockState = {
-	No: 1,
-	On: 2,
-	Off: 3
- };
  
  var c_oAscDrawingLayerType = {
 	BringToFront: 0,

@@ -2392,7 +2392,7 @@ function DrawingObjects() {
 
 		_t.flags = {
 			anchorUpdated: false,
-			lockState: c_oAscObjectLockState.No
+			lockState: c_oAscLockTypes.kLockTypeNone
 		};
 
         _t.getAllFonts = function(AllFonts) {
@@ -2479,6 +2479,10 @@ function DrawingObjects() {
 				}
 				_t.to.row = foundRow.row;
 				_t.to.rowOff = _t.graphicObject.y + _t.graphicObject.extY - _t.worksheet.getCellTop(_t.to.row, 3);
+				
+				console.log("col: " + _t.from.col + "  colOff: " + _t.from.colOff + " row: " + _t.from.row + "  rowOff: " + _t.from.rowOff);
+				console.log("col: " + _t.to.col + "  colOff: " + _t.to.colOff + " row: " + _t.to.row + "  rowOff: " + _t.to.rowOff);
+				console.log("---");
 			}
 		}
 		
@@ -4259,7 +4263,13 @@ function DrawingObjects() {
 		for (var i = 0; i < aObjects.length; i++) {
 			if ( id == aObjects[i].graphicObject.Id ) {
 				aObjects[i].graphicObject.lockType = state;
-				//shapeCtx.DrawLockObjectRect(aObjects[i].graphicObject.lockType, aObjects[i].graphicObject.x, aObjects[i].graphicObject.y, aObjects[i].graphicObject.extX, aObjects[i].graphicObject.extY );
+				
+				shapeCtx.SetIntegerGrid(false);
+				shapeCtx.transform3(aObjects[i].graphicObject.transform, false);		
+				shapeCtx.DrawLockObjectRect(aObjects[i].graphicObject.lockType, 0, 0, aObjects[i].graphicObject.extX, aObjects[i].graphicObject.extY );
+				shapeCtx.reset();
+				shapeCtx.SetIntegerGrid(true);
+				
 				break;
 			}
 		}
@@ -4269,9 +4279,17 @@ function DrawingObjects() {
 		
 		for (var i = 0; i < aObjects.length; i++) {
 			aObjects[i].graphicObject.lockType = c_oAscLockTypes.kLockTypeNone;
-			//shapeCtx.DrawLockObjectRect(aObjects[i].graphicObject.lockType, aObjects[i].graphicObject.x, aObjects[i].graphicObject.y, aObjects[i].graphicObject.extX, aObjects[i].graphicObject.extY );
 		}
-		//_this.showDrawingObjects(true);
+	}
+	
+	_this.tryResetLockedGraphicObject = function(id) {
+		
+		for (var i = 0; i < aObjects.length; i++) {
+			if ( aObjects[i].graphicObject.Id == id ) {
+				aObjects[i].graphicObject.lockType = c_oAscLockTypes.kLockTypeNone;
+				break;
+			}
+		}
 	}
 	
 	_this.setScrollOffset = function(x_px, y_px) {

@@ -596,6 +596,15 @@ function asc_CCellCommentator(currentSheet) {
 			_this.worksheet.model.workbook.handlers.trigger("asc_onUnLockComment", _this.aComments[i].asc_getId());
 		}
 	}
+	
+	_this.tryUnlockComment = function(id) {
+		for (var i = 0; i < _this.aComments.length; i++) {
+			if ( _this.aComments[i].asc_getId() == id ) {
+				_this.worksheet.model.workbook.handlers.trigger("asc_onUnLockComment", id);
+				break;
+			}
+		}
+	}
 
 	_this.moveRangeComments = function(rangeFrom, rangeTo) {
 		if ( rangeFrom && rangeTo ) {

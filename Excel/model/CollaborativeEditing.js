@@ -205,7 +205,7 @@
 				while (0 < this.m_arrNeedUnlock2.length) {
 					oLock = this.m_arrNeedUnlock2.shift();
 					oLock.setType(c_oAscLockTypes.kLockTypeNone, false);
-
+					this.handlers.trigger("tryResetLockedGraphicObject", oLock.Element.rangeOrObjectId);
 					this.handlers.trigger("releaseLocks", oLock.Element["guid"]);
 				}
 				// Очищаем примененные чужие изменения
@@ -214,7 +214,7 @@
 				for (; nIndex < nCount; ++nIndex) {
 					oLock = this.m_arrNeedUnlock[nIndex];
 					if (c_oAscLockTypes.kLockTypeOther2 === oLock.getType()) {
-						
+						this.handlers.trigger("tryResetLockedGraphicObject", oLock.Element.rangeOrObjectId);
 						this.m_arrNeedUnlock.splice(nIndex, 1);
 						--nIndex;
 						--nCount;
@@ -244,7 +244,6 @@
 					this.handlers.trigger("updateAllSheetsLock");
 					this.handlers.trigger("unlockComments");
 					this.handlers.trigger("showComments");
-					this.handlers.trigger("resetLockedGraphicObjects");
 					this.handlers.trigger("showDrawingObjects");
 				}
 			},
