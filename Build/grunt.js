@@ -106,9 +106,18 @@ module.exports = function(grunt) {
 	grunt.registerTask('update_sources', 'update_sources_webword update_sources_webexcel update_sources_webpowerpoint');
 
 	grunt.registerTask('commit_logs_init', function() {
+		var build_num = packageFile['info']['build'];
+		var svn_rev = packageFile['update_src']['revision'];
+		
+		if(undefined !== process.env['BUILD_NUMBER'])
+			build_num = parseInt(process.env['BUILD_NUMBER']);
+			
+		if(undefined !== process.env['SVN_REVISION'])
+			svn_rev = parseInt(process.env['SVN_REVISION']);
+			
 		var commit_message ='\"Version: '+ packageFile['info']['version'] + 
-							' (build:' + packageFile['info']['build'] + ')' +
-							' from svn rev: ' + packageFile['update_src']['revision'] + '\"';
+							' (build:' + build_num + ')' +
+							' from svn rev: ' + svn_rev + '\"';
         grunt.initConfig({
 			exec: {
 				store_log: {
