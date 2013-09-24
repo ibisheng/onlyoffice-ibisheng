@@ -1270,8 +1270,8 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart, options)
 					maxY = newArr[0][j][1]
 			}
 			//меняем форматы осей для отдельных случаев точечных диаграмм
-			if(scatterArr[0] && scatter[0].length == 1)
-			formatCellScOy = formatCell;
+			if(scatterArr[0] && scatterArr[0].length == 1)
+				formatCellScOy = formatCell;
 			formatCell = "General";
 		}
 		else
