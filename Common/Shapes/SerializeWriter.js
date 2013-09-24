@@ -970,7 +970,7 @@ function CBinaryFileWriter()
                 }
                 case c_oAscSlideTransitionTypes.Push:
                 {
-                    this._WriteString2(0, "p:push");
+                    oThis._WriteString2(0, "p:push");
                     switch (_timing.TransitionOption)
                     {
                         case c_oAscSlideTransitionParams.Param_Left:
