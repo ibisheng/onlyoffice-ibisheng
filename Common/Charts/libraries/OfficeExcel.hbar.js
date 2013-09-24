@@ -1079,13 +1079,18 @@
 				if(this.coords[i][8])
 					textLabel = this.coords[i][8];
 					
+				if(this.coords[i][7] == null && !textLabel)
+					textLabel = "";
+				if(textLabel != '')
+					textLabel = OfficeExcel.numToFormatText(OfficeExcel.num_round(textLabel),formatLabel);
+					
                 OfficeExcel.Text(this.context,
                             font,
                             size,
                             coords[i][0] + coords[i][2] + (border ? -5 : 5),
                             coords[i][1] + (coords[i][3] / 2),
 							//OfficeExcel.number_format(this, OfficeExcel.num_round(this.coords[i][5]), this._otherProps._units_pre, this._otherProps._units_post),
-							OfficeExcel.numToFormatText(OfficeExcel.num_round(textLabel),formatLabel),
+							textLabel,
                             'center',
                             border ? 'right' : 'left',
                             null,

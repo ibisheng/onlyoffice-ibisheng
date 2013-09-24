@@ -1300,7 +1300,7 @@
 
 						
 						var formatCellTrue = formatCell;
-						if(this.arrFormatAdobeLabels && this.arrFormatAdobeLabels[i] && this.arrFormatAdobeLabels[i][j])
+						if(this.arrFormatAdobeLabels && this.arrFormatAdobeLabels[i])
 							formatCellTrue = this.arrFormatAdobeLabels[i][j];
 						this.coords.push([startX, startY, individualBarWidth, height, formatCellTrue, this.firstData[i][j]]);
 							
@@ -2063,15 +2063,20 @@
 				var formatCellTrue = isFormatCell;
 				if(this.coords[i][4])
 					formatCellTrue = this.coords[i][4];
-				if(this.coords[i][5])
+				if(this.coords[i][4] == null && !this.coords[i][5])
+					value = "";
+				else if(this.coords[i][5] != undefined)
 					value = this.coords[i][5];
+				if(value != '')
+					value = OfficeExcel.numToFormatText(OfficeExcel.num_round(value),formatCellTrue);
+			
 				this.context.fillStyle = this._otherProps._text_color;
 				OfficeExcel.Text(this.context,
 							this._otherProps._labels_above_font,
 							typeof(this._otherProps._labels_above_size) == 'number' ? this._otherProps._labels_above_size : this._otherProps._text_size - 3,startX + (individualBarWidth / 2),
 							startY - 2 - (this._otherProps._variant == '3d' ? 5 : 0),
 							//OfficeExcel.number_format(this, OfficeExcel.num_round(this.data[i][j]),this._otherProps._units_pre,this._otherProps._units_post),
-							OfficeExcel.numToFormatText(OfficeExcel.num_round(value),formatCellTrue),
+							value,
 							null,
 							this._otherProps._labels_above_angle ? (this._otherProps._labels_above_angle > 0 ? 'right' : 'left') : 'center',
 							null,

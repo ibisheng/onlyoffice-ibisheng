@@ -1163,7 +1163,11 @@ function insertChart(chart, activeWorkSheet, width, height, isNewChart, options)
 					value = '';
 				}
 				else if (isNaN(value))
+				{
+					if(chart.type == "Bar" || chart.type == "HBar")
+						formatAdobeLabel = null;
 					value = 0;
+				}
 				if(chart.type == 'Pie')
 					arrValues[numSeries][n] = Math.abs(value);
 				else
