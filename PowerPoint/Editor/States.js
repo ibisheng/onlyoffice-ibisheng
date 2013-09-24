@@ -887,7 +887,7 @@ function PreMoveCommentState(drawingObjectsController, drawingObjects, startX, s
 
     this.onMouseUp = function(e, x, y)
     {
-        var Coords = editor.WordControl.m_oDrawingDocument.ConvertCoordsToCursorWR( this.drawingObjectsController.arrPreTrackObjects[0].comment.x, this.drawingObjectsController.arrPreTrackObjects[0].comment.y,
+        var Coords = editor.WordControl.m_oDrawingDocument.ConvertCoordsToCursorWR_Comment( this.drawingObjectsController.arrPreTrackObjects[0].comment.x, this.drawingObjectsController.arrPreTrackObjects[0].comment.y,
             this.drawingObjects.num);
         this.drawingObjectsController.showComment(this.drawingObjectsController.arrPreTrackObjects[0].comment.Get_Id(), Coords.X, Coords.Y);
         this.drawingObjectsController.clearPreTrackObjects();

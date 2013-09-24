@@ -6811,7 +6811,7 @@ CPresentation.prototype =
                 {
                     this.Set_CurPage(i);
 
-                    var Coords = this.DrawingDocument.ConvertCoordsToCursorWR(comments[j].x, comments[j].y, i);
+                    var Coords = this.DrawingDocument.ConvertCoordsToCursorWR_Comment(comments[j].x, comments[j].y, i);
                     this.Slides[i].graphicObjects.showComment(Id, Coords.X, Coords.Y);
                     return;
                 }

@@ -1762,6 +1762,20 @@ function CDrawingDocument()
         return { X : x_pix, Y : y_pix, Error: false };
     }
 
+    this.ConvertCoordsToCursorWR_Comment = function(x, y)
+    {
+        var _word_control = this.m_oWordControl;
+        var dKoef = (this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100);
+
+        var x_pix = (this.SlideCurrectRect.left + x * dKoef + _word_control.m_oMainContent.AbsolutePosition.L * g_dKoef_mm_to_pix) >> 0;
+        var y_pix = (this.SlideCurrectRect.top  + y * dKoef + _word_control.m_oMainContent.AbsolutePosition.T * g_dKoef_mm_to_pix) >> 0;
+
+        x_pix += COMMENT_WIDTH;
+        y_pix += ((COMMENT_HEIGHT / 3) >> 0);
+
+        return { X : x_pix, Y : y_pix, Error: false };
+    }
+
     this.ConvertCoordsToCursor = function(x, y)
     {
         var _word_control = this.m_oWordControl;
