@@ -2769,12 +2769,12 @@ function CDemonstrationManager(htmlpage)
         if (is_transition_use)
         {
             _timing = _slides[oThis.SlideNum].timing;
-        }
 
-        if (_timing.TransitionType != c_oAscSlideTransitionTypes.None && _timing.TransitionDuration > 0)
-        {
-            oThis.StartTransition(_timing, is_first_play, false);
-            return;
+            if (_timing.TransitionType != c_oAscSlideTransitionTypes.None && _timing.TransitionDuration > 0)
+            {
+                oThis.StartTransition(_timing, is_first_play, false);
+                return;
+            }
         }
 
         oThis.OnPaintSlide(false);
