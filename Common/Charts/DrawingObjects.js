@@ -2480,9 +2480,9 @@ function DrawingObjects() {
 				_t.to.row = foundRow.row;
 				_t.to.rowOff = _t.graphicObject.y + _t.graphicObject.extY - _t.worksheet.getCellTop(_t.to.row, 3);
 				
-				console.log("col: " + _t.from.col + "  colOff: " + _t.from.colOff + " row: " + _t.from.row + "  rowOff: " + _t.from.rowOff);
-				console.log("col: " + _t.to.col + "  colOff: " + _t.to.colOff + " row: " + _t.to.row + "  rowOff: " + _t.to.rowOff);
-				console.log("---");
+				//console.log("col: " + _t.from.col + "  colOff: " + _t.from.colOff + " row: " + _t.from.row + "  rowOff: " + _t.from.rowOff);
+				//console.log("col: " + _t.to.col + "  colOff: " + _t.to.colOff + " row: " + _t.to.row + "  rowOff: " + _t.to.rowOff);
+				//console.log("---");
 			}
 		}
 		
