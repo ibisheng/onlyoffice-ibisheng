@@ -1345,6 +1345,9 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						else {
 							// Удаляем из lock-ов, тот, кто правил ушел и не сохранил
 							t.collaborativeEditing.removeUnlock (lockElem);
+							
+							if ( lockElem.Element["type"] == c_oAscLockTypeElem.Object )
+								t._onTryResetLockedGraphicObject(lockElem.Element["rangeOrObjectId"]);
 						}
 
 						if (t.wb) {
