@@ -420,7 +420,9 @@ CChartAsGroup.prototype =
 				return;
 		
 			History.Create_NewPoint();
-			
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+
+
 			// type, subType, styleId
 			if ( this.chart.type != chart.type ) {
 				History.Add(g_oUndoRedoGraphicObjects, historyitem_Chart_Type, null, null, new UndoRedoDataGraphicObjects(this.chart.Get_Id(), new UndoRedoDataGOSingleProp(this.chart.type, chart.type)));
@@ -536,7 +538,9 @@ CChartAsGroup.prototype =
 				this.chart.legend.bOverlay = chart.legend.bOverlay;
 			}
 			this.chart.rebuildSeries();
-		}
+            History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformRedo, null, null, new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+
+        }
 		else
 			this.chart = chart;
     },
@@ -1648,7 +1652,7 @@ CChartAsGroup.prototype =
             this.hAxisTitle = new CChartTitle(this, CHART_TITLE_TYPE_H_AXIS);
             this.hAxisTitle.readFromBinary(r);
         }
-        this.chart.Read_FromBinary2(r);
+        this.chart.Read_FromBinary2(r, false);
         this.spPr.Read_FromBinary2(r);
         if(isRealNumber(x) && isRealNumber(y))
             this.spPr.xfrm.setPosition(x, y);

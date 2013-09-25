@@ -676,10 +676,13 @@ asc_CChart.prototype = {
 		}
 	},
 	
-	Read_FromBinary2: function(Reader) {
+	Read_FromBinary2: function(Reader, noReadId) {
 		
 		Reader.GetLong();
-		this.Id = Reader.GetString2();
+
+        var Id = Reader.GetString2();
+        if(!(noReadId === false))
+		    this.Id = Id;
 		
 		this.type = Reader.GetString2();
 		this.subType = Reader.GetString2();
