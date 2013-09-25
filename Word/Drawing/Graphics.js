@@ -506,6 +506,7 @@ function CGraphics()
     this.m_oLastFont2       = null;
 
     this.ClearMode          = false;
+    this.IsRetina           = false;
 }
 
 CGraphics.prototype =
@@ -2729,7 +2730,17 @@ CGraphics.prototype =
                 var _x = (this.m_oFullTransform.TransformPointX(x,y) >> 0);
                 var _y = (this.m_oFullTransform.TransformPointY(x,y) >> 0);
 
-                this.m_oContext.drawImage(window.g_comment_image, _x, _y);
+                var _index = 0;
+                if ((type & 0x02) == 0x02)
+                    _index = 2;
+                if ((type & 0x01) == 0x01)
+                    _index += 1;
+
+                if (this.IsRetina)
+                    _index += 4;
+
+                var _offset = g_comment_image_offsets[_index];
+                this.m_oContext.drawImage(window.g_comment_image, _offset[0], _offset[1], _offset[2], _offset[3], _x, _y, _offset[2], _offset[3]);
             }
         }
         else

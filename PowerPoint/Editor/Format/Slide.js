@@ -6,9 +6,6 @@
  * To change this template use File | Settings | File Templates.
  */
 
-var COMMENT_WIDTH = 30;
-var COMMENT_HEIGHT = 25;
-
 function Slide(presentation, slideLayout, slideNum)
 {
     this.kind = SLIDE_KIND;

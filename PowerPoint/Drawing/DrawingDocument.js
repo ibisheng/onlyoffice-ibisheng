@@ -11,8 +11,8 @@ var FOCUS_OBJECT_THUMBNAILS     = 0;
 var FOCUS_OBJECT_MAIN           = 1;
 var FOCUS_OBJECT_NOTES          = 2;
 
-var COMMENT_WIDTH   = 24;
-var COMMENT_HEIGHT  = 22;
+var COMMENT_WIDTH   = 18;
+var COMMENT_HEIGHT  = 16;
 
 function CTableMarkup(Table)
 {
@@ -2957,14 +2957,26 @@ function CDrawingDocument()
     {
     },
 
-    this.GetCommentWidth = function()
+    this.GetCommentWidth = function(type)
     {
-        return COMMENT_WIDTH * g_dKoef_pix_to_mm * 100 / this.m_oWordControl.m_nZoomValue;
+        var _index = 0;
+        if ((type & 0x02) == 0x02)
+            _index = 2;
+        if ((type & 0x01) == 0x01)
+            _index += 1;
+
+        return g_comment_image_offsets[_index][2] * g_dKoef_pix_to_mm * 100 / this.m_oWordControl.m_nZoomValue;
     },
 
-    this.GetCommentHeight = function()
+    this.GetCommentHeight = function(type)
     {
-        return COMMENT_HEIGHT * g_dKoef_pix_to_mm * 100 / this.m_oWordControl.m_nZoomValue;
+        var _index = 0;
+        if ((type & 0x02) == 0x02)
+            _index = 2;
+        if ((type & 0x01) == 0x01)
+            _index += 1;
+
+        return g_comment_image_offsets[_index][3] * g_dKoef_pix_to_mm * 100 / this.m_oWordControl.m_nZoomValue;
     }
 }
 
@@ -3911,7 +3923,7 @@ function CThumbnailsManager()
             {
                 if (page.IsSelected && page.IsFocused)
                 {
-                    context.fillStyle = "#FF00FF";
+                    context.fillStyle = "#CA2B1F";
                     this.FocusRectDraw(context, _border, page.top - _border, page.right + _border, page.bottom + _border);
                     context.fill();
                     context.beginPath();
@@ -3919,7 +3931,7 @@ function CThumbnailsManager()
                 }
                 else if (page.IsSelected)
                 {
-                    context.fillStyle = "#ED9870";
+                    context.fillStyle = "#9F1F15";
                     this.FocusRectDraw(context, _border, page.top - _border, page.right + _border, page.bottom + _border);
                     context.fill();
                     context.beginPath();
@@ -3927,7 +3939,7 @@ function CThumbnailsManager()
                 }
                 else if (page.IsFocused)
                 {
-                    context.fillStyle = "#8080FF";
+                    context.fillStyle = "#FF5E52";
                     this.FocusRectDraw(context, _border, page.top - _border, page.right + _border, page.bottom + _border);
                     context.fill();
                     context.beginPath();
@@ -4761,6 +4773,9 @@ function CSlideDrawer()
             g.init(this.CachedCanvasCtx, w_px, h_px, w_mm, h_mm);
             g.m_oFontManager = g_fontManager;
 
+            if (this.m_oWordControl.bIsRetinaSupport)
+                g.IsRetina = 2;
+
             g.m_oCoordTransform.tx = -this.BoundsChecker.Bounds.min_x;
             g.m_oCoordTransform.ty = -this.BoundsChecker.Bounds.min_y;
             g.transform(1,0,0,1,0,0);
@@ -4832,6 +4847,9 @@ function CSlideDrawer()
             g.init(outputCtx, w_px, h_px, w_mm, h_mm);
             g.m_oFontManager = g_fontManager;
 
+            if (this.m_oWordControl.bIsRetinaSupport)
+                g.IsRetina = 2;
+
             g.m_oCoordTransform.tx = _x;
             g.m_oCoordTransform.ty = _y;
             g.transform(1,0,0,1,0,0);
@@ -4849,4 +4867,15 @@ window.g_comment_image.asc_complete = false;
 window.g_comment_image.onload = function(){
     window.g_comment_image.asc_complete = true;
 };
-window.g_comment_image.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAWCAYAAADafVyIAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAABp0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjUuMTAw9HKhAAABUUlEQVRIS2P4//8/w993rw9/nV73/2NhwP8PSXYUYZAZILNAZgLNZmT4+/zhio8Ffv+/za77//vQyv9/zm6jCIPMAJkFMvPv0/tHGb5Orfn/bW4jVsWUYJCZXyZV/Wf4mOXx//eRNVgVUYJBZn7IcP3PAAo3bAqogUFmj1qAF49aQBAPEwtonpNB5QVNyqJ5zZCyCFjivQeXpgta/v8+vBqrYlIwyAyQWdDStB9RHwBLVZAgKNyIwciGfl/aCRcHmQEyC2hmP7g+AFkAxYxQjCyGLA6TY0G24NfO+f8/Znv8//Pw5gqgnAyaWgZkg4jGMAt+H10HrMH8/v86vhNUe2FVi1UQC4a7CITBFpzZ+v9zU9L/70v6LwLFhKFyKOpAGIVDJGYCWfBtRvX/L21Z/////WsIFWcFYjYoG45ROERiGXBkFgX+//fpPYaBqPg/AwCrw7lwhcB17AAAAABJRU5ErkJggg==";
+window.g_comment_image.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAR0AAAAlCAMAAABI6s09AAAABGdBTUEAALGPC/xhBQAAAMBQTFRF2Ypk03pP0nZJ1oNb68Ku03hL1X9U7MWy1X9V9d7T3JNv5bCW0nZJ9uXc////8dPE+vDq5rSb5a6U4aOF5K6T2Idg////1HxR6r6o03lN0nZJ6Lef+u7p8NDA0ndK////78++0nZJ8dPE////0nZJ1HtP2Ihh////03hM////////3JVy0nZJ0nZJ9+Xc0nZJ////3JVy3JVx////////AAAA3Zh38tbJ3ZZ08dXH4qaJ5a6U9N3R+/Tw////0nZJQeZHfgAAADZ0Uk5TZJaoUk+v3lzdEi9hDlIbKVN8eY54xTTnc/NKegRg9EJm8WQz7+3EFPYoSKborlkmCqeoJ00ATKvZ0wAAA3tJREFUaN7dmOdi2jAUhelukjaQkkGCGIHYbDAYNYOh93+r2mZIsq6WwVHD+RfukWx93OtjUsCxHoaE0fAB7yWvHFCcjB6JRI+jCc7kzMVfSEzD5zWj5yFdPuSXDLm9C7/nVOMyX5SvnDwRhZ4mWZz5+Dd0yJoToevTK7jNLxHzByryRYZcqemzK0fkbbWWaPVGRqxTqVH6tJ8/XbBfGPPVjVtlT/Tr9t/ToZ+l6bR2l2hxdITJQfLil6/syjqRwonwkDrrVKqePu15fy5XWfTr9s/eO+I0EvlYnRFuz7VCRHF1ZSdHavfOEIaEUHBZE/0XJbjTmuWfyf7Ze0ckqjgWeh86AVaoKPrlrVb6ztGx7h2RKLesRa8UUcUiHei0MJ2KePMVgY4+rQJj/7fzy0YZ6h2AzuacTYCOee8cRKcq0qmm78YgrZCNH/1w2zvHnSyTHOT9mjQsUjreK7vbq0d38fhVnqp3PFXvePnSMclB3q9Jw4DS+XNHFvHuq0X82d013SWqMGIrwjSia6B3dgPJrczhuWNC3Io7onQ6jfk0wrNazOJLNzp0l7iS2IWK0Duoo+gdbmUOz52j08GUTqQwwrOYhkAShjEesSKfRuVA5jRZJsTTO1fgMK8AdHA4+AvCiSsAHMU0KgfyP6JThelUITo4rIaS9yiwIp/GTXGW3NsUKEInUdGpAE+cd56s+EjS10xJRT6N8oHMQOdqzOjKFR17yadxgwcufsTnTjY80mlUFD/kcyeTOhmKXfWbW5d1KtW1nKyu5WR1D6WTRb76rd9nnUr5lnR8Szq+Czq1+/j6L0t698sXel/3tbRTJtZp8KT/5dWUz51Kmo5Xc0Gn3bxJRmaPZ8kMy02zLTrBseKcJnRabZ4Ol4VCGnp+q+2CTpD802m2x7Pc/k7ZqB8ATiqJ02CyEO/XTVa8vws6OLjtM3g4OP3bAHSKcHinCR3er6PTbwfYCZ1EvS2eBE5P69zB6R2agzZp6I7OFo8eDoNH7jTPQZs0dEgnOvRUfWQLp3kO2qShSzo4jA89nYdHcJrnoE0aOqUTHXpgBEfvNM9B1j9goQxEv1s60aHN4Oid5jnI+gcQHOp3TAeH4TGd5jm470gKB9jfNR1nOZjCA8I5NToWOcjhgeGcHB2LHGTwSOCcHh2LHNz7ZXBOkI5FDmr9J0jHIgd1/n8LiumvxDAoYwAAAABJRU5ErkJggg==";
+var g_comment_image_offsets = [
+    [5, 0, 16, 15],
+    [31, 0, 16, 15],
+    [57, 0, 19, 18],
+    [86, 0, 19, 18],
+    [115, 0, 32, 30],
+    [157, 0, 32, 30],
+    [199, 0, 38, 36],
+    [247, 0, 38, 36]
+];
+

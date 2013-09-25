@@ -1717,18 +1717,23 @@ CAutoshapeTrack.prototype =
         var __x = (xDst + dKoefX * x) >> 0;
         var __y = (yDst + dKoefY * y) >> 0;
 
-        var __w = (window.COMMENT_WIDTH === undefined) ? 30 : window.COMMENT_WIDTH;
-        var __h = (window.COMMENT_HEIGHT === undefined) ? 30 : window.COMMENT_HEIGHT;
-
-        overlay.CheckRect(__x, __y, __w, __h);
-
         var ctx = overlay.m_oContext;
         var _oldAlpha = ctx.globalAlpha;
         ctx.globalAlpha = 0.5;
 
         ctx.setTransform(1,0,0,1,0,0);
 
-        ctx.drawImage(window.g_comment_image, __x, __y);
+        var _index = 0;
+        if ((type & 0x02) == 0x02)
+            _index = 2;
+        if ((type & 0x01) == 0x01)
+            _index += 1;
+
+        var _offset = g_comment_image_offsets[_index];
+        overlay.CheckRect(__x, __y, _offset[2], _offset[3]);
+
+        this.m_oContext.drawImage(window.g_comment_image, _offset[0], _offset[1], _offset[2], _offset[3], __x, __y, _offset[2], _offset[3]);
+
         ctx.globalAlpha = _oldAlpha;
     }
 };
