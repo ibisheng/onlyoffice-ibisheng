@@ -731,14 +731,14 @@ function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY, chart)
 				if(bar._otherProps._key_levels && bar._otherProps._key_levels.length)
 					level = bar._otherProps._key_levels.length;
 				
-				var heigthTextKey = (context.getHeightText()/0.75);
+				var heigthTextKey = context.getHeightText();
 				var kF = 1;
 				if(bar.type == 'pie')
 					kF = 2;
 				if(bar._otherProps._key_halign == 'top')
-					top += (heigthTextKey*kF)*(level + 1) + 7;
+					top += (heigthTextKey*kF)*(level) + 7;
 				else
-					bottom += (heigthTextKey*kF)*(level + 1) + 7;
+					bottom += (heigthTextKey*kF)*(level) + 7;
 			}
 			//+ ширина легенды
 			if (bar._otherProps._key_halign == 'left' || bar._otherProps._key_halign == 'right')
