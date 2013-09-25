@@ -1874,7 +1874,7 @@ CGraphics.prototype =
         var ctx = this.m_oContext;
 
         var _m = this.m_oTransform;
-        if (_m.sx != 1.0 || _m.shx != 0.0 || _m.shy != 0.0 && _m.sy != 1.0)
+        if (_m.sx != 1.0 || _m.shx != 0.0 || _m.shy != 0.0 || _m.sy != 1.0)
         {
             // значит какой-то трансформ
             var dKoefMMToPx = 1 / Math.max(this.m_oCoordTransform.sx, 0.001);
