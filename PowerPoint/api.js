@@ -83,6 +83,7 @@ function asc_docs_api(name)
     this.ServerImagesWaitComplete = false;
 
     this.ParcedDocument = false;
+	this.isStartCoAuthoringOnEndLoad = false;	// Подсоединились раньше, чем документ загрузился
 
     this.DocumentOrientation = orientation_Portrait ? true : false;
 
@@ -451,16 +452,16 @@ asc_docs_api.prototype._coAuthoringInit = function () {
         t.asyncServerIdEndLoaded ();
     };
     this.CoAuthoringApi.onStartCoAuthoring		= function (isStartEvent) {
+		if (t.ParcedDocument) {
+			CollaborativeEditing.Start_CollaborationEditing();
+			editor.WordControl.m_oLogicDocument.DrawingDocument.Start_CollaborationEditing();
 
-
-        CollaborativeEditing.Start_CollaborationEditing();
-        editor.WordControl.m_oLogicDocument.DrawingDocument.Start_CollaborationEditing();
-
-        if ( true != History.Is_Clear() )
-        {
-            CollaborativeEditing.Apply_Changes();
-            CollaborativeEditing.Send_Changes();
-        }
+			if (true != History.Is_Clear()) {
+				CollaborativeEditing.Apply_Changes();
+				CollaborativeEditing.Send_Changes();
+			}
+		} else
+			t.isStartCoAuthoringOnEndLoad = true;
     };
 	/**
 	 * Event об отсоединении от сервера
@@ -922,6 +923,10 @@ asc_docs_api.prototype.OpenDocument2 = function(url, gObject)
 	this.FontLoader.LoadDocumentFonts(this.WordControl.m_oLogicDocument.Fonts, false);
 
     this.ParcedDocument = true;
+	if (this.isStartCoAuthoringOnEndLoad) {
+		this.CoAuthoringApi.onStartCoAuthoring(true);
+		this.isStartCoAuthoringOnEndLoad = false;
+	}
 
     if (window.USER_AGENT_SAFARI_MACOS)
         setInterval(SafariIntervalFocus, 10);
