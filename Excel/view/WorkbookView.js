@@ -68,7 +68,7 @@
 			this.wsActive = -1;
 			this.wsViews = [];
 			this.cellEditor = undefined;
-			this.fontRenderingMode = c_oAscFontRenderingModeType.noHinting;
+			this.fontRenderingMode = c_oAscFontRenderingModeType.hintingAndSubpixeling;
 
 			this._lockDraw = false;
 
@@ -113,7 +113,7 @@
 				var self = this;
 
 				// Init font managers rendering
-				// Изначально мы инициализируем c_oAscFontRenderingModeType.noHinting
+				// Изначально мы инициализируем c_oAscFontRenderingModeType.hintingAndSubpixeling
 				this.setFontRenderingMode(fontRenderingMode, /*isInit*/true);
 
                 var _head = document.getElementsByTagName('head')[0];
