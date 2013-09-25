@@ -293,9 +293,18 @@ function CComment(Parent, Data)
 
     this.hit = function(x, y)
     {
+        var Flags = 0;
+        if(this.selected)
+        {
+            Flags |= 1;
+        }
+        if(this.Data.m_aReplies.length > 0)
+        {
+            Flags |= 2;
+        }
         var dd = editor.WordControl.m_oDrawingDocument;
-        return x > this.x && x < this.x + dd.GetCommentWidth()
-        && y > this.y && y < this.y + dd.GetCommentHeight();
+        return x > this.x && x < this.x + dd.GetCommentWidth(Flags)
+        && y > this.y && y < this.y + dd.GetCommentHeight(Flags);
     };
 
     this.setPosition = function(x, y)

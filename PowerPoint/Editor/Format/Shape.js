@@ -2880,6 +2880,14 @@ CShape.prototype =
         return true;
     },
 
+    getCurDocumentContent: function()
+    {
+        if(this.txBody)
+        {
+            return this.txBody.content;
+        }
+    },
+
     getSearchResults : function(str, ownNum)//возвращает массив SelectionState'ов
     {
         var documentContentSelectionStates = this.txBody ? this.txBody.getSearchResults(str) : [];

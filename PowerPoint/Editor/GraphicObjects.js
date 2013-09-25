@@ -1910,10 +1910,6 @@ CGraphicObjects.prototype = {
                 }
             }
         }
-        else if(this.State.id == 20)
-        {
-            return null;//TODO: доделать;
-        }
         return null;
     },
 
