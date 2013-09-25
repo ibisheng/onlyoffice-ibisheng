@@ -2375,7 +2375,7 @@ function PreMoveState(drawingObjectsController, drawingObjects, startX, startY, 
         }
         else
         {
-            if(this.majorObjectIsSelected)
+            if(this.majorObjectIsSelected && !(e.Button === g_mouse_button_right))
             {
                 this.drawingObjectsController.changeCurrentState(new GroupState(this.drawingObjectsController, this.drawingObjects, this.majorObject));
                 this.drawingObjectsController.onMouseDown(e, x, y);

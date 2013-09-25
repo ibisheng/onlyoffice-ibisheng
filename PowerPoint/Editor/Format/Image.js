@@ -59,6 +59,13 @@ function CImageShape(parent)
 
 CImageShape.prototype =
 {
+
+    getImageUrl: function()
+    {
+        if(isRealObject(this.blipFill) && isRealObject(this.blipFill.fill))
+            return this.blipFill.fill.RasterImageId;
+        return null;
+    },
     getSearchResults: function()
     {
         return null;

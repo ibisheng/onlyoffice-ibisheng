@@ -130,6 +130,42 @@ CGraphicObjects.prototype = {
                 }
                 break;
             }
+            case STATES_ID_GROUP:
+            {
+                if(paraItem.Type === para_TextPr)
+                {
+                    if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Text_Props) === false)
+                    {
+                        History.Create_NewPoint();
+                        for(var i = 0; i < this.State.group.selectedObjects.length; ++i)
+                        {
+                            if(typeof this.State.group.selectedObjects[i].applyAllTextProps === "function")
+                            {
+                                this.State.group.selectedObjects[i].applyAllTextProps(paraItem);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if(this.State.group.selectedObjects.length === 1)
+                    {
+                        if(typeof this.State.group.selectedObjects[0].paragraphAdd === "function")
+                        {
+                            if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+                            {
+                                History.Create_NewPoint();
+                                this.State.group.selectedObjects[0].paragraphAdd(paraItem, bRecalculate);
+                                //this.selectedObjects[0].recalculate();
+                                this.changeCurrentState(new TextAddInGroup(this, this.slide,this.State.group, this.State.group.selectedObjects[0]));
+                                b_rulers = true;
+                                //this.updateSelectionState();
+                            }
+                        }
+                    }
+                }
+                break;
+            }
         }
         editor.WordControl.m_oLogicDocument.Recalculate();
         if(b_rulers)
@@ -587,8 +623,14 @@ CGraphicObjects.prototype = {
         {
             case STATES_ID_NULL:
             case STATES_ID_TEXT_ADD:
+            case STATES_ID_GROUP:
+            case STATES_ID_TEXT_ADD_IN_GROUP:
            // case STATES_ID_TEXT_ADD_IN_GROUP:
             {
+                if(this.State.id === STATES_ID_GROUP || this.State.id === STATES_ID_TEXT_ADD_IN_GROUP)
+                {
+                    by_types = this.State.group.getSelectedArraysByTypes();
+                }
                 var images = by_types.images;
                 for(var i = 0; i < images.length; ++i)
                 {

@@ -74,6 +74,38 @@ CGroupShape.prototype =
         return commonSearchResults.length > 0 ? commonSearchResults : null;
     },
 
+
+    getSelectedArraysByTypes: function()
+    {
+        var selected_objects = this.selectedObjects;
+        var tables = [], charts = [], shapes = [], images = [], groups = [];
+        for(var i = 0; i < selected_objects.length; ++i)
+        {
+            var selected_object = selected_objects[i];
+            if(typeof  selected_object.isTable === "function" && selected_object.isTable())
+            {
+                tables.push(selected_object);
+            }
+            else if(typeof  selected_object.isChart === "function" && selected_object.isChart())
+            {
+                charts.push(selected_object);
+            }
+            else if(selected_object.isShape())
+            {
+                shapes.push(selected_object);
+            }
+            else if(selected_object.isImage())
+            {
+                images.push(selected_object);
+            }
+            else if(typeof  selected_object.isGroup())
+            {
+                groups.push(selected_object);
+            }
+        }
+        return {tables: tables, charts: charts, shapes: shapes, images: images, groups: groups};
+    },
+
     getCurDocumentContent: function()
     {
         if(this.parent.graphicObjects.State instanceof TextAddInGroup && this.parent.graphicObjects.State.group === this)
