@@ -1323,17 +1323,13 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 						if (curType === c_oAscLockTypes.kLockTypeOther) {
 							if (true != bChanges) {
 								newType = c_oAscLockTypes.kLockTypeNone;
-							}
-							else
-							{
+							} else {
 								newType = c_oAscLockTypes.kLockTypeOther2;
 							}
-						}
-						else if (curType === c_oAscLockTypes.kLockTypeMine){
+						} else if (curType === c_oAscLockTypes.kLockTypeMine) {
 							// Такого быть не должно
 							newType = c_oAscLockTypes.kLockTypeMine;
-						}
-						else if (curType === c_oAscLockTypes.kLockTypeOther2 || curType === c_oAscLockTypes.kLockTypeOther3)
+						} else if (curType === c_oAscLockTypes.kLockTypeOther2 || curType === c_oAscLockTypes.kLockTypeOther3)
 							newType = c_oAscLockTypes.kLockTypeOther2;
 
 						if (t.wb) {
@@ -2049,7 +2045,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 			asc_getRowHeight: function () {
 				var ws = this.wb.getWorksheet();
-				return ws.getRowHeight(ws.getSelectedRowIndex(), 1/*pt*/);
+				return ws.getRowHeight(ws.getSelectedRowIndex(), 1/*pt*/, /*isHeightReal*/true);
 			},
 
 			asc_setRowHeight: function (height) {

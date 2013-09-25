@@ -572,10 +572,11 @@
 				return null;
 			},
 
-			getRowHeight: function (index, units) {
+			getRowHeight: function (index, units, isHeightReal) {
 				if (index >= 0 && index < this.rows.length) {
 					var u = units >= 0 && units <= 3 ? units : 0;
-					return this.rows[index].height * asc_getcvt( 1/*pt*/, u, this._getPPIY() );
+					var h = isHeightReal ? this.rows[index].heightReal : this.rows[index].height;
+					return h * asc_getcvt(1/*pt*/, u, this._getPPIY());
 				}
 				return null;
 			},
@@ -1318,7 +1319,7 @@
 				var obr = this.objectRender ? this.objectRender.getDrawingAreaMetrics() : {maxCol: 0, maxRow: 0};
 				var l = Math.max(this.model.getRowsCount() , this.nRowsCount, obr.maxRow);
 				var defaultH = this.model.getDefaultHeight() || this.defaultRowHeight;
-				var i = 0, h, isCustomHeight, row, hiddenH = 0;
+				var i = 0, h, hR, isCustomHeight, row, hiddenH = 0;
 
 				if (1 === fullRecalc) {
 					this.rows = [];
@@ -1332,17 +1333,23 @@
 						h = -1; // Будет использоваться дефолтная высота строки
 						isCustomHeight = false;
 					} else if (row.hd) {
-						h = 0;  // Скрытая строка, высоту выставляем 0
+						hR = h = 0;  // Скрытая строка, высоту выставляем 0
 						isCustomHeight = true;
 						hiddenH += row.h > 0 ? row.h - this.height_1px : defaultH;
 					} else {
 						isCustomHeight = !!row.CustomHeight;
-						h = (row.h > 0 && isCustomHeight) ? row.h : -1; // Берем высоту из модели, если она custom(баг 15618), либо дефолтную
+						// Берем высоту из модели, если она custom(баг 15618), либо дефолтную
+						if (row.h > 0 && isCustomHeight) {
+							hR = row.h;
+							h = hR / 0.75; h = (h | h) * 0.75;			// 0.75 - это размер 1px в pt
+						} else
+							h = -1;
 					}
-					h = h < 0 ? defaultH : h;
+					h = h < 0 ? (hR = defaultH) : h;
 					this.rows[i] = {
 						top: y,
-						height: h,
+						height: h,												// Высота с точностью до 1 px
+						heightReal: hR,											// Реальная высота из файла (может быть не кратна 1 px, в Excel можно выставить через меню строки)
 						descender: this.defaultRowDescender,
 						isCustomHeight: isCustomHeight,
 						isDefaultHeight: !(row && row.h > 0 && isCustomHeight)  // Высота строки, вычисленная на основе текста
@@ -3809,7 +3816,7 @@
 				if (!this.rows[row].isCustomHeight) {
 					// Замерженная ячейка (с 2-мя или более строками) не влияет на высоту строк!
 					if (!fMergedRows) {
-						this.rows[row].height = Math.min(this.maxRowHeight, Math.max(this.rows[row].height, tm.height));
+						this.rows[row].heightReal = this.rows[row].height = Math.min(this.maxRowHeight, Math.max(this.rows[row].height, tm.height));
 						if (!this.rows[row].isDefaultHeight) {
 							this.model.setRowHeight(this.rows[row].height + this.height_1px, row, row);
 						}
@@ -3824,7 +3831,7 @@
                     if (this.isChanged) {
                         if (textBound) {
                             if (this.rows[row].height < textBound.height) {
-                                this.rows[row].height = Math.max(this.rows[row].height, textBound.height);
+								this.rows[row].heightReal = this.rows[row].height = Math.max(this.rows[row].height, textBound.height);
 
                                 if (!this.rows[row].isDefaultHeight) {
                                     this.model.setRowHeight(this.rows[row].height + this.height_1px, row, row);
@@ -5810,7 +5817,7 @@
 					var type = (null !== hyperlink.Hyperlink) ? c_oAscHyperlinkType.WebLink : c_oAscHyperlinkType.RangeLink;
 					oHyperlink.asc_setType (type);
 					if (c_oAscHyperlinkType.RangeLink === type) {
-						// // ToDo переделать это место (парсить должны в момент открытия и добавления ссылки)
+						// ToDo переделать это место (парсить должны в момент открытия и добавления ссылки)
 						var result = parserHelp.parse3DRef (hyperlink.Location);
 						if (null !== result) {
 							oHyperlink.asc_setSheet (result.sheet);
@@ -9256,7 +9263,7 @@
 						}
 					}
 					if (Math.abs(h - t.rows[r].height) > 0.000001 && !t.rows[r].isCustomHeight) {
-						t.rows[r].height = Math.min(h, t.maxRowHeight);
+						t.rows[r].heightReal = t.rows[r].height = Math.min(h, t.maxRowHeight);
 						if (!t.rows[r].isDefaultHeight) {
 							t.model.setRowHeight(t.rows[r].height + this.height_1px, r, r);
 						}
