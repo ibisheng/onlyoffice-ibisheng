@@ -82,6 +82,8 @@ function asc_docs_api(name)
     this.ServerIdWaitComplete = false;
     this.ServerImagesWaitComplete = false;
 
+    this.ParcedDocument = false;
+
     this.DocumentOrientation = orientation_Portrait ? true : false;
 
     this.SelectedObjectsStack = new Array();
@@ -918,6 +920,8 @@ asc_docs_api.prototype.OpenDocument2 = function(url, gObject)
 
 	this.FontLoader.LoadEmbeddedFonts(this.DocumentUrl, this.WordControl.m_oLogicDocument.EmbeddedFonts);
 	this.FontLoader.LoadDocumentFonts(this.WordControl.m_oLogicDocument.Fonts, false);
+
+    this.ParcedDocument = true;
 
     if (window.USER_AGENT_SAFARI_MACOS)
         setInterval(SafariIntervalFocus, 10);
