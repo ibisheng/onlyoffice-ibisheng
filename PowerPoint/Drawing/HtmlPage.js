@@ -124,6 +124,9 @@ function CEditorPage(api)
     this.m_dScrollX         = 0;
     this.m_dScrollY_max     = 1;
     this.m_dScrollX_max     = 1;
+
+    this.m_dScrollX_Central = 0;
+    this.m_dScrollY_Central = 0;
     this.m_bIsRePaintOnScroll = true;
 
     this.m_dDocumentWidth   = 0;
@@ -2366,6 +2369,12 @@ function CEditorPage(api)
         var _x = -this.m_dScrollX + _centerX - _centerSlideX - _hor_width_left;
         var _y = -(this.m_dScrollY - this.SlideScrollMIN) + _centerY - _centerSlideY - _ver_height_top;
 
+        // теперь расчитаем какие нужны позиции, чтобы слайд находился по центру
+        var _x_c = _centerX - _centerSlideX;
+        var _y_c = _centerY - _centerSlideY;
+        this.m_dScrollX_Central = _centerX - _centerSlideX - _hor_width_left - _x_c;
+        this.m_dScrollY_Central = this.SlideScrollMIN + _centerY - _centerSlideY - _ver_height_top - _y_c;
+
         this.m_oDrawingDocument.SlideCurrectRect.left = _x;
         this.m_oDrawingDocument.SlideCurrectRect.top = _y;
         this.m_oDrawingDocument.SlideCurrectRect.right = _x + _slideW;
@@ -2825,6 +2834,8 @@ function CEditorPage(api)
         this.m_bIsUpdateHorRuler = true;
         this.m_bIsUpdateVerRuler = true;
 
+        this.OnCalculatePagesPlace();
+
         //this.m_oScrollVerApi.scrollTo(0, drDoc.SlideCurrent * this.m_dDocumentPageHeight);
         if (this.IsGoToPageMAXPosition)
         {
@@ -2833,7 +2844,13 @@ function CEditorPage(api)
         }
         else
         {
-            this.m_oScrollVerApi.scrollToY(this.SlideScrollMIN);
+            //this.m_oScrollVerApi.scrollToY(this.SlideScrollMIN);
+            this.m_oScrollVerApi.scrollToY(this.m_dScrollY_Central);
+        }
+
+        if (this.m_bIsHorScrollVisible)
+        {
+            this.m_oScrollHorApi.scrollToX(this.m_dScrollX_Central);
         }
 
         if (this.m_oApi.isViewMode === false && null != this.m_oLogicDocument)

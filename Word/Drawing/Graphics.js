@@ -2061,7 +2061,8 @@ CGraphics.prototype =
 
     DrawSpellingLine : function(y0, x0, x1, w)
     {
-        this.drawHorLine(0, y0, x0, x1, w );
+        if (!editor.isViewMode)
+            this.drawHorLine(0, y0, x0, x1, w );
     },
 
     // smart methods for horizontal / vertical lines
