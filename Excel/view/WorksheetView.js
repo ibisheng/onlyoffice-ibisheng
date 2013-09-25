@@ -1341,7 +1341,7 @@
 						// Берем высоту из модели, если она custom(баг 15618), либо дефолтную
 						if (row.h > 0 && isCustomHeight) {
 							hR = row.h;
-							h = hR / 0.75; h = (h | h) * 0.75;			// 0.75 - это размер 1px в pt
+							h = hR / 0.75; h = (h | h) * 0.75;			// 0.75 - это размер 1px в pt (можно было 96/72)
 						} else
 							h = -1;
 					}
@@ -3420,6 +3420,10 @@
 				var x1 = t.cols[col].left - offsetX - this.width_1px;
 				var h = ctx.getHeight();
 
+				// ToDo для вывода при смене мышкой
+				//var test = t._colWidthToCharCount(x - x1);
+				//console.log("width = " + ((x - x1) * 96 / 72) + "px; widthS = " + test  + "; val = " + (x * 96 / 72) + "px");
+
 				ctx.clear();
 				t._drawSelection();
 				ctx.setFillPattern(t.ptrnLineDotted1)
@@ -3439,6 +3443,9 @@
 				var offsetY = t.rows[t.visibleRange.r1].top - t.cellsTop;
 				var y1 = t.rows[row].top - offsetY - this.height_1px;
 				var w = ctx.getWidth();
+
+				// ToDo для вывода при смене мышкой
+				//console.log("height = " + ((y - y1) * 96 / 72) + "px; heightPt: " + (y - y1) + "; val = " + (y * 96 / 72) + "px");
 
 				ctx.clear();
 				t._drawSelection();
@@ -8144,7 +8151,9 @@
 
 					case "rowHeight":
 						functionModelAction = function () {
-							t.model.setRowHeight(Math.min(val + t.height_1px, t.maxRowHeight), arn.r1, arn.r2);
+							// Приводим к px (чтобы было ровно)
+							val = val / 0.75; val = (val | val) * 0.75;		// 0.75 - это размер 1px в pt (можно было 96/72)
+							t.model.setRowHeight(Math.min(val, t.maxRowHeight), arn.r1, arn.r2);
 							isUpdateRows = true;
 							fullRecalc = true;
 						};
