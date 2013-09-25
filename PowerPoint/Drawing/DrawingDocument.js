@@ -3463,17 +3463,28 @@ function CThumbnailsManager()
         }
 
         var pos = oThis.ConvertCoords(global_mouseEvent.X, global_mouseEvent.Y, true, true);
-        if (pos.Page == -1)
-            return;
+
+        var _is_old_focused = false;
 
         var pages_count = oThis.m_arrPages.length;
         for (var i = 0; i < pages_count; i++)
         {
-            oThis.m_arrPages[i].IsFocused = false;
+            if (oThis.m_arrPages[i].IsFocused)
+            {
+                _is_old_focused = true;
+                oThis.m_arrPages[i].IsFocused = false;
+            }
         }
 
-        oThis.m_arrPages[pos.Page].IsFocused = true;
-        oThis.OnUpdateOverlay();
+        if (pos.Page != -1)
+        {
+            oThis.m_arrPages[pos.Page].IsFocused = true;
+            oThis.OnUpdateOverlay();
+        }
+        else if (_is_old_focused)
+        {
+            oThis.OnUpdateOverlay();
+        }
     }
 
     this.OnScrollTrackTop = function()
