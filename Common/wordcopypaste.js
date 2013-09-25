@@ -2180,7 +2180,7 @@ function Editor_Paste(api, bClean)
 
         if (window.USER_AGENT_SAFARI_MACOS)
         {
-            if (window.GlobalPasteFlagCounter != 2)
+            if (window.GlobalPasteFlagCounter != 2 && !window.GlobalPasteFlag)
             {
                 window.setTimeout(func_timeout, 10);
                 return;
@@ -5447,7 +5447,9 @@ function Editor_CopyPaste_Create(api)
         if (window.GlobalPasteFlagCounter == 1)
         {
             Body_Paste(api,e);
-            window.GlobalPasteFlagCounter = 2;
+
+            if (window.GlobalPasteFlag)
+                window.GlobalPasteFlagCounter = 2;
         }
     };
 
