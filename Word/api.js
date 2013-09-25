@@ -607,6 +607,7 @@ function asc_docs_api(name)
 
     this.IsLongActionCurrent = false;
     this.ParcedDocument = false;
+	this.isStartCoAuthoringOnEndLoad = false;	// Подсоединились раньше, чем документ загрузился
 
 	var oThis = this;
 	if(window.addEventListener)
@@ -1125,6 +1126,10 @@ asc_docs_api.prototype.OpenDocument2 = function(url, gObject)
 		editor.asc_fireCallback("asc_onError",c_oAscError.ID.MobileUnexpectedCharCount,c_oAscError.Level.Critical);
 
     this.ParcedDocument = true;
+	if (this.isStartCoAuthoringOnEndLoad) {
+		this.CoAuthoringApi.onStartCoAuthoring(true);
+		this.isStartCoAuthoringOnEndLoad = false;
+	}
 
     if (window.USER_AGENT_SAFARI_MACOS)
         setInterval(SafariIntervalFocus, 10);
@@ -1400,17 +1405,18 @@ asc_docs_api.prototype._coAuthoringInit = function()
 		g_oIdCounter.Set_UserId("" + e);
 		t.asyncServerIdEndLoaded ();
 	};
-	this.CoAuthoringApi.onStartCoAuthoring		= function (e)
-	{
-		CollaborativeEditing.Start_CollaborationEditing();
-        editor.asc_setDrawCollaborationMarks(true);
-        editor.WordControl.m_oLogicDocument.DrawingDocument.Start_CollaborationEditing();
+	this.CoAuthoringApi.onStartCoAuthoring		= function (isStartEvent) {
+		if (t.ParcedDocument) {
+			CollaborativeEditing.Start_CollaborationEditing();
+			editor.asc_setDrawCollaborationMarks(true);
+			editor.WordControl.m_oLogicDocument.DrawingDocument.Start_CollaborationEditing();
 
-        if ( true != History.Is_Clear() )
-        {
-            CollaborativeEditing.Apply_Changes();
-            CollaborativeEditing.Send_Changes();
-        }
+			if (true != History.Is_Clear()) {
+				CollaborativeEditing.Apply_Changes();
+				CollaborativeEditing.Send_Changes();
+			}
+		} else
+			t.isStartCoAuthoringOnEndLoad = true;
 	};
 	/**
 	 * Event об отсоединении от сервера
