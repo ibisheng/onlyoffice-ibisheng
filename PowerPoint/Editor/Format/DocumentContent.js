@@ -181,6 +181,69 @@ CDocumentContent.prototype =
             return 0;
     },
 
+    getSearchResults : function(str)
+    {
+        var arrSelectionStates = [];
+        for(var i = 0; i < this.Content.length; ++i)
+        {
+            var paragraphSearchResults;
+            if((paragraphSearchResults = this.Content[i].DocumentSearch(str)).length > 0)
+            {
+                for(var j = 0; j < paragraphSearchResults.length; ++j)
+                {
+                    var curSelectionState = [];
+                    var DocState = {};
+                    DocState.CurPage = this.CurPage;
+                    DocState.CurPos =
+                    {
+                        X          : this.CurPos.X,
+                        Y          : this.CurPos.Y,
+                        ContentPos : i,
+                        RealX      : this.CurPos.RealX,
+                        RealY      : this.CurPos.RealY,
+                        Type       : this.CurPos.Type
+                    };
+
+                    DocState.Selection =
+                    {
+                        Start    : true,
+                        Use      : true,
+                        StartPos : i,
+                        EndPos   : i,
+                        Flag     : selectionflag_Common,
+                        Data     : null
+                    };
+
+                    var ParaState = {};
+                    ParaState.CurPos  =
+                    {
+                        X          : this.Content[i].CurPos.X,
+                        Y          : this.Content[i].CurPos.Y,
+                        Line       : this.Content[i].CurPos.Line,
+                        ContentPos : this.Content[i].Internal_Get_ClearPos(this.Content[i].CurPos.ContentPos),
+                        RealX      : this.Content[i].CurPos.RealX,
+                        RealY      : this.Content[i].CurPos.RealY,
+                        PagesPos   : this.Content[i].CurPos.PagesPos
+                    };
+
+                    ParaState.Selection =
+                    {
+                        Start    : true,
+                        Use      : true,
+                        StartPos : this.Content[i].Internal_Get_ClearPos(paragraphSearchResults[j].StartPos),
+                        EndPos   : this.Content[i].Internal_Get_ClearPos(paragraphSearchResults[j].EndPos),
+                        Flag     : selectionflag_Common
+                    };
+
+                    curSelectionState.push([[ParaState]]);
+                    curSelectionState.push(DocState);
+                    arrSelectionStates.push(curSelectionState);
+                }
+            }
+        }
+        return arrSelectionStates;
+    },
+
     // Inner = true  - запрос пришел из содержимого,
     //         false - запрос пришел от родительского класса
     // Запрос от родительского класса нужен, например, для колонтитулов, потому

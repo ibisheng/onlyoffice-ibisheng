@@ -61,10 +61,15 @@ function NullState(drawingObjectsController, drawingObjects)
         {
             if(drawingObjects.comments[i].hit(x, y))
             {
+                drawingObjects.comments[i].selected = true;
                 this.drawingObjectsController.addPreTrackObject(new MoveComment(drawingObjects.comments[i]));
                 this.drawingObjectsController.changeCurrentState(new PreMoveCommentState(this.drawingObjectsController, this.drawingObjects, x, y));
                 return;
             }
+        }
+        for(var i = drawingObjects.comments.length - 1; i > -1; --i)
+        {
+            drawingObjects.comments[i].selected = false;
         }
         var selected_objects = this.drawingObjectsController.selectedObjects;
         if(selected_objects.length === 1)

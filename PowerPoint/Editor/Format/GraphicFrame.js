@@ -33,7 +33,10 @@ function CGraphicFrame(parent)
 
 CGraphicFrame.prototype =
 {
-
+    getSearchResults: function()
+    {
+        return null;
+    },
     setGraphicObject: function(graphicObject)
     {
         History.Add(this, {Type: historyitem_SetGraphicObject, oldPr: this.graphicObject, newPr: graphicObject});

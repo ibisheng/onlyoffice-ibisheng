@@ -258,7 +258,7 @@ function CComment(Parent, Data)
 
     this.x = null;
     this.y = null;
-
+    this.selected = false;
     this.m_oTypeInfo =
     {
         Type : comment_type_Common,
@@ -307,8 +307,17 @@ function CComment(Parent, Data)
 
     this.draw = function(graphics)
     {
+        var Flags = 0;
+        if(this.selected)
+        {
+            Flags |= 1;
+        }
+        if(this.Data.m_aReplies.length > 0)
+        {
+            Flags |= 2;
+        }
         var dd = editor.WordControl.m_oDrawingDocument;
-        graphics.DrawPresentationComment(0, this.x, this.y, dd.GetCommentWidth(), dd.GetCommentHeight())
+        graphics.DrawPresentationComment(Flags, this.x, this.y, dd.GetCommentWidth(), dd.GetCommentHeight())
     }
 
     this.Set_StartInfo = function(PageNum, X, Y, H, ParaId)

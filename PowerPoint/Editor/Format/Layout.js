@@ -639,7 +639,6 @@ SlideLayout.prototype =
             case historyitem_ChangeBg:
             {
                 this.cSld.Bg = data.oldBg;
-                this.recalcInfo.recalculateBackground = true;
                 editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
 
                 break;
@@ -755,7 +754,6 @@ SlideLayout.prototype =
             case historyitem_ChangeBg:
             {
                 this.cSld.Bg = data.newBg;
-                this.recalcInfo.recalculateBackground = true;
                 editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
 
                 break;
@@ -1021,7 +1019,6 @@ SlideLayout.prototype =
             {
                 this.cSld.Bg = new CBg();
                 this.cSld.Bg.Read_FromBinary2(r);
-                this.recalcInfo.recalculateBackground = true;
                 editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
 
                 break;

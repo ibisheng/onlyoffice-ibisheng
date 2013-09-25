@@ -59,7 +59,10 @@ function CImageShape(parent)
 
 CImageShape.prototype =
 {
-
+    getSearchResults: function()
+    {
+        return null;
+    },
     isSimpleObject: function()
     {
         return true;
@@ -68,6 +71,25 @@ CImageShape.prototype =
     recalcAllColors: function()
     {
 
+    },
+
+    getBoundsInGroup: function()
+    {
+        var r = this.rot;
+        if((r >= 0 && r < Math.PI*0.25)
+            || (r > 3*Math.PI*0.25 && r < 5*Math.PI*0.25)
+            || (r > 7*Math.PI*0.25 && r < 2*Math.PI))
+        {
+            return {minX: this.x, minY: this.y, maxX: this.x + this.extX, maxY: this.y + this.extY};
+        }
+        else
+        {
+            var hc = this.extX*0.5;
+            var vc = this.extY*0.5;
+            var xc = this.x + hc;
+            var yc = this.y + vc;
+            return {minX: xc - vc, minY: yc - hc, maxX: xc + vc, maxY: yc + hc};
+        }
     },
 
     normalize: function()

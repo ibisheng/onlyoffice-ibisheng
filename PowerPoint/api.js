@@ -1527,6 +1527,11 @@ asc_docs_api.prototype.findText = function(text, scanForward){
     return this.WordControl.m_oLogicDocument.findText(text, scanForward);
 }
 
+
+asc_docs_api.prototype.asc_findText = function(text, isNext, isMatchCase)
+{
+    return this.WordControl.m_oLogicDocument.findText(text, isNext === true);
+}
 // returns: CSearchResult
 asc_docs_api.prototype.sync_SearchFoundCallback = function(obj){
 	this.asc_fireCallback("asc_onSearchFound", new CSearchResult(obj));
@@ -3858,13 +3863,11 @@ asc_docs_api.prototype.AddText = function()
 
 asc_docs_api.prototype.groupShapes = function()
 {
-    History.Create_NewPoint();
     this.WordControl.m_oLogicDocument.groupShapes();
 }
 
 asc_docs_api.prototype.unGroupShapes = function()
 {
-    History.Create_NewPoint();
     this.WordControl.m_oLogicDocument.unGroupShapes();
 }
 

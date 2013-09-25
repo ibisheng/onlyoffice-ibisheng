@@ -2880,6 +2880,39 @@ CShape.prototype =
         return true;
     },
 
+    getSearchResults : function(str, ownNum)//возвращает массив SelectionState'ов
+    {
+        var documentContentSelectionStates = this.txBody ? this.txBody.getSearchResults(str) : [];
+        if(documentContentSelectionStates.length > 0)
+        {
+            var arrSelSt = [];
+            for(var i = 0; i < documentContentSelectionStates.length; ++i)
+            {
+
+                var s = {};
+                if(!isRealObject(this.group))
+                {
+                    s.id = STATES_ID_TEXT_ADD;
+                    s.textObject = this;
+                    s.textSelectionState = documentContentSelectionStates[i];
+                }
+                else
+                {
+                    s.id = STATES_ID_TEXT_ADD_IN_GROUP;
+                    s.group = this.group;
+                    s.textObject = this;
+                    s.textSelectionState = documentContentSelectionStates[i];
+                }
+                arrSelSt.push(s);
+            }
+            return arrSelSt;
+        }
+        else
+        {
+            return null;
+        }
+    },
+
     draw: function(graphics)
     {
         /*graphics.SetIntegerGrid(false);
@@ -3472,6 +3505,25 @@ CShape.prototype =
         return !this.isPlaceholder();//TODO
     },
 
+    getBoundsInGroup: function()
+    {
+        var r = this.rot;
+        if((r >= 0 && r < Math.PI*0.25)
+            || (r > 3*Math.PI*0.25 && r < 5*Math.PI*0.25)
+            || (r > 7*Math.PI*0.25 && r < 2*Math.PI))
+        {
+            return {minX: this.x, minY: this.y, maxX: this.x + this.extX, maxY: this.y + this.extY};
+        }
+        else
+        {
+            var hc = this.extX*0.5;
+            var vc = this.extY*0.5;
+            var xc = this.x + hc;
+            var yc = this.y + vc;
+            return {minX: xc - vc, minY: yc - hc, maxX: xc + vc, maxY: yc + hc};
+        }
+    },
+
 
     canChangeAdjustments: function()
     {
@@ -3492,6 +3544,8 @@ CShape.prototype =
     {
         return new MoveShapeImageTrack(this);
     },
+
+
 
 
     createRotateInGroupTrack: function()

@@ -1020,11 +1020,89 @@ CPresentation.prototype =
         return this.DrawingObjects.canUnGroup();
     },
 
+
+    findText: function(text, scanForward)
+    {
+        if(typeof(text) != "string")
+        {
+            return;
+        }
+        if(scanForward === undefined)
+        {
+            scanForward = true;
+        }
+
+        var slide_num;
+        var search_select_data = null;
+        if(scanForward)
+        {
+            for(slide_num = this.CurPage; slide_num < this.Slides.length; ++slide_num)
+            {
+                search_select_data = this.Slides[slide_num].graphicObjects.startSearchText(text, scanForward);
+                if(search_select_data != null)
+                {
+                    this.DrawingDocument.m_oWordControl.GoToPage(slide_num);
+                    this.Slides[slide_num].graphicObjects.setSelectionState(search_select_data);
+                    this.Document_UpdateSelectionState();
+                    return true;
+                }
+            }
+            for(slide_num = 0; slide_num < this.CurPage; ++slide_num)
+            {
+                search_select_data = this.Slides[slide_num].graphicObjects.startSearchText(text, scanForward);
+                if(search_select_data != null)
+                {
+                    this.DrawingDocument.m_oWordControl.GoToPage(slide_num);
+                    this.Slides[slide_num].graphicObjects.setSelectionState(search_select_data);
+                    this.Document_UpdateSelectionState();
+                    return true;
+                }
+            }
+        }
+        else
+        {
+            for(slide_num = this.CurPage; slide_num > -1; --slide_num)
+            {
+                search_select_data = this.Slides[slide_num].graphicObjects.startSearchText(text, scanForward);
+                if(search_select_data != null)
+                {
+                    this.DrawingDocument.m_oWordControl.GoToPage(slide_num);
+                    this.Slides[slide_num].graphicObjects.setSelectionState(search_select_data);
+                    this.Document_UpdateSelectionState();
+                    return true;
+                }
+            }
+            for(slide_num = this.Slides.length - 1; slide_num > this.CurPage; --slide_num)
+            {
+                search_select_data = this.Slides[slide_num].graphicObjects.startSearchText(text, scanForward);
+                if(search_select_data != null)
+                {
+                    this.DrawingDocument.m_oWordControl.GoToPage(slide_num);
+                    this.Slides[slide_num].graphicObjects.setSelectionState(search_select_data);
+                    this.Document_UpdateSelectionState();
+                    return true;
+                }
+            }
+        }
+        return false;
+    },
+
     groupShapes: function()
     {
-        if(this.Document_Is_SelectionLocked(changestype_DrawingProps) === false)
+        if(this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
         {
+            History.Create_NewPoint();
             this.Slides[this.CurPage].graphicObjects.groupShapes();
+            this.Recalculate();
+        }
+    },
+
+    unGroupShapes: function()
+    {
+        if(this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+        {
+            History.Create_NewPoint();
+            this.Slides[this.CurPage].graphicObjects.unGroup();
             this.Recalculate();
         }
     },

@@ -120,6 +120,11 @@ function CTextBody(shape)
 CTextBody.prototype =
 {
 
+    getSearchResults : function(str)
+    {
+        return this.content != null ? this.content.getSearchResults(str) : [];
+    },
+
     Get_Id: function()
     {
         return this.Id;

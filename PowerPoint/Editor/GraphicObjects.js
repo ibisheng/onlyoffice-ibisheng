@@ -1613,25 +1613,309 @@ CGraphicObjects.prototype = {
         editor.WordControl.m_oLogicDocument.recalcMap[image.Id] = image;
     },
 
-
-    groupShapes: function()
+    groupShapes: function(drawingBase)
     {
-        var objects_for_group = [];
-        var spTree = this.slide.cSld.spTree;
-        for(var i = 0;  i < spTree.length; ++i)
+        History.Create_NewPoint();
+        var sp_tree = this.slide.cSld.spTree;
+        var grouped_objects = [];
+        for(var i =0; i < sp_tree.length; ++i)
         {
-            if(spTree[i].selected)
+            if(sp_tree[i].selected)
             {
-                objects_for_group.push(spTree[i]);
+                grouped_objects.push(sp_tree[i]);
             }
         }
         this.slide.removeSelectedObjects();
-        for(var i = 0; i < objects_for_group.length; ++i)
-        {
 
+        var max_x, min_x, max_y, min_y;
+        var bounds = grouped_objects[0].getBoundsInGroup();
+        max_x = bounds.maxX;
+        max_y = bounds.maxY;
+        min_x = bounds.minX;
+        min_y = bounds.minY;
+        for(i = 1; i < grouped_objects.length; ++i)
+        {
+            bounds = grouped_objects[i].getBoundsInGroup();
+            if(max_x < bounds.maxX)
+                max_x = bounds.maxX;
+            if(max_y < bounds.maxY)
+                max_y = bounds.maxY;
+            if(min_x > bounds.minX)
+                min_x = bounds.minX;
+            if(min_y > bounds.minY)
+                min_y = bounds.minY;
         }
+        var group = new CGroupShape(this.slide);
+        group.setOffset(min_x, min_y);
+        group.setExtents(max_x - min_x, max_y - min_y);
+        group.setChildExtents(max_x - min_x, max_y - min_y);
+        group.setChildOffset(0, 0);
+        for(i = 0; i < grouped_objects.length; ++i)
+        {
+            group.addToSpTree(group.spTree.length, grouped_objects[i]);
+            grouped_objects[i].setOffset(grouped_objects[i].x - min_x, grouped_objects[i].y - min_y);
+            grouped_objects[i].setGroup(group);
+        }
+        group.setNvSpPr(new UniNvPr());
+        group.recalcAll();
+        group.select(this);
+        this.slide.addToSpTreeToPos(this.slide.cSld.spTree.length, group);
     },
 
+    unGroup: function()
+    {
+        var selected_objects = this.selectedObjects;
+        var ungrouped_objects = [];
+        for(var i = 0; i < selected_objects.length; ++i)
+        {
+            if(selected_objects[i].isGroup() && selected_objects[i].canUnGroup())
+            {
+                ungrouped_objects.push(selected_objects[i]);
+
+            }
+        }
+
+        var drawing_bases = this.slide.cSld.spTree;
+        for(i = 0; i < ungrouped_objects.length; ++i)
+        {
+            var cur_group = ungrouped_objects[i];
+            var start_position = null;
+            for(var j = 0; j < drawing_bases.length; ++j)
+            {
+                if(drawing_bases[j] === cur_group)
+                {
+                    start_position = j;
+                    break;
+                }
+            }
+
+            var ungrouped_sp_tree = ungrouped_objects[i].getUnGroupedSpTree();
+
+            for(var j = 0; j < ungrouped_sp_tree.length; ++j)
+            {
+                ungrouped_sp_tree[j].recalcAll();
+                this.slide.addToSpTreeToPos(start_position + j, ungrouped_sp_tree[j]);
+            }
+        }
+        this.slide.removeSelectedObjects();
+        this.resetSelectionState();
+    },
+
+    startSearchText : function(str, scanForward) //
+    {
+        if(typeof(str) != "string")
+            return null;
+        if(scanForward === undefined)
+        {
+            scanForward = true;
+        }
+
+        var _cur_glyph_num;
+        var _arr_sel_states = null;
+        var NumSelected = this.selectedObjects.length;
+        var ArrGlyph = this.slide.cSld.spTree;
+        if(this.State.id == STATES_ID_NULL)
+        {
+            if(NumSelected == 0 || NumSelected == ArrGlyph.length)
+            {
+                if(scanForward == true)
+                {
+                    for(_cur_glyph_num = 0; _cur_glyph_num < ArrGlyph.length; ++_cur_glyph_num)
+                    {
+                        if((_arr_sel_states = ArrGlyph[_cur_glyph_num].getSearchResults(str, _cur_glyph_num))!= null)
+                        {
+                            return _arr_sel_states[0];
+                        }
+                    }
+                }
+                else
+                {
+                    for(_cur_glyph_num = ArrGlyph.length - 1; _cur_glyph_num > -1; --_cur_glyph_num)
+                    {
+                        if((_arr_sel_states = ArrGlyph[_cur_glyph_num].getSearchResults(str, _cur_glyph_num))!= null)
+                        {
+                            return _arr_sel_states[_arr_sel_states.length-1];
+                        }
+                    }
+                }
+                return null;
+            }
+            else
+            {
+                if(scanForward == true)
+                {
+                    for(_cur_glyph_num = 0; _cur_glyph_num < ArrGlyph.length; ++_cur_glyph_num)
+                    {
+                        if(ArrGlyph[_cur_glyph_num].selected && (_arr_sel_states = ArrGlyph[_cur_glyph_num].getSearchResults(str, _cur_glyph_num))!= null)
+                        {
+                            return _arr_sel_states[0];
+                        }
+                    }
+                    for(_cur_glyph_num = 0; _cur_glyph_num < ArrGlyph.length; ++_cur_glyph_num)
+                    {
+                        if(!ArrGlyph[_cur_glyph_num].selected && (_arr_sel_states = ArrGlyph[_cur_glyph_num].getSearchResults(str, _cur_glyph_num))!= null)
+                        {
+                            return _arr_sel_states[0];
+                        }
+                    }
+                }
+                else
+                {
+                    for(_cur_glyph_num = ArrGlyph.length - 1; _cur_glyph_num > -1; --_cur_glyph_num)
+                    {
+                        if(ArrGlyph[_cur_glyph_num].selected && (_arr_sel_states = ArrGlyph[_cur_glyph_num].getSearchResults(str, _cur_glyph_num)) != null)
+                        {
+                            return _arr_sel_states[_arr_sel_states.length - 1];
+                        }
+                    }
+                    for(_cur_glyph_num = ArrGlyph.length - 1; _cur_glyph_num > -1; --_cur_glyph_num)
+                    {
+                        if(!ArrGlyph[_cur_glyph_num].selected && (_arr_sel_states = ArrGlyph[_cur_glyph_num].getSearchResults(str, _cur_glyph_num)) != null)
+                        {
+                            return _arr_sel_states[_arr_sel_states.length - 1];
+                        }
+                    }
+                }
+
+                return null;
+            }
+        }
+        else if(this.State.id == STATES_ID_TEXT_ADD)
+        {
+            var _cur_doc_content;
+            _cur_glyph_num = 0;
+            var obj = this.State.textObject;
+            if( obj && (_cur_doc_content = obj.getCurDocumentContent()) != null )
+            {
+                for(_cur_glyph_num = 0; _cur_glyph_num < ArrGlyph.length; ++_cur_glyph_num)
+                {
+                    if(ArrGlyph[_cur_glyph_num] == obj)
+                    {
+                        break;
+                    }
+                }
+                if(_cur_glyph_num < ArrGlyph.length)
+                {
+                    if((_arr_sel_states = obj.getSearchResults(str, _cur_glyph_num)) != null)
+                    {
+                        var _cur_pos_doc, _cur_pos_par;
+                        var _pos_sel_state;
+                        var _tmp_sel_state;
+                        var _prev_sel_state;
+                        if(scanForward == true)
+                        {
+                            if(!_cur_doc_content.Selection.Use)
+                            {
+                                _cur_pos_doc = _cur_doc_content.CurPos.ContentPos;
+                                _cur_pos_par = _cur_doc_content.Content[_cur_pos_doc].CurPos.ContentPos;
+                            }
+                            else
+                            {
+                                _cur_pos_doc = _cur_doc_content.Selection.EndPos;
+                                _cur_pos_par = _cur_doc_content.Content[_cur_pos_doc].Selection.EndPos;
+                            }
+
+                            for(_pos_sel_state = 0; _pos_sel_state < _arr_sel_states.length; ++_pos_sel_state)
+                            {
+                                _tmp_sel_state = _arr_sel_states[_pos_sel_state];
+
+                                if(_tmp_sel_state.textSelectionState != undefined)
+                                {
+                                    if(_prev_sel_state != undefined && _tmp_sel_state.obj != _prev_sel_state.obj)
+                                    {
+                                        return _arr_sel_states[_pos_sel_state];
+                                    }
+                                    var _text_sel_state = _tmp_sel_state.textSelectionState;
+                                    if(_text_sel_state[_text_sel_state.length - 1].Selection.StartPos > _cur_pos_doc)
+                                    {
+                                        return _arr_sel_states[_pos_sel_state];
+                                    }
+                                    if(_text_sel_state[_text_sel_state.length - 1].Selection.StartPos == _cur_pos_doc)
+                                    {
+                                        if(_text_sel_state[_text_sel_state.length -2][0][0].Selection.StartPos >= _cur_pos_par)
+                                        {
+                                            return _arr_sel_states[_pos_sel_state];
+                                        }
+                                    }
+                                }
+                                _prev_sel_state = _tmp_sel_state;
+                            }
+                            for(++_cur_glyph_num; _cur_glyph_num < ArrGlyph.length; ++_cur_glyph_num)
+                            {
+                                if((_arr_sel_states = ArrGlyph[_cur_glyph_num].getSearchResults(str, _cur_glyph_num))!= null)
+                                {
+                                    return _arr_sel_states[0];
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if(!_cur_doc_content.Selection.Use)
+                            {
+                                _cur_pos_doc = _cur_doc_content.CurPos.ContentPos;
+                                _cur_pos_par = _cur_doc_content.Content[_cur_pos_doc].CurPos.ContentPos;
+                            }
+                            else
+                            {
+                                _cur_pos_doc = _cur_doc_content.Selection.StartPos;
+                                _cur_pos_par = _cur_doc_content.Content[_cur_pos_doc].Selection.StartPos;
+                            }
+
+                            for(_pos_sel_state = _arr_sel_states.length - 1; _pos_sel_state > -1; --_pos_sel_state)
+                            {
+                                _tmp_sel_state = _arr_sel_states[_pos_sel_state];
+                                while(true)
+                                {
+                                    if(_tmp_sel_state.textSelectionState == undefined && _tmp_sel_state.groupSelection != undefined)
+                                    {
+                                        _tmp_sel_state = _tmp_sel_state.groupSelection;
+                                    }
+                                    else
+                                    {
+                                        break;
+                                    }
+                                }
+
+                                if(_tmp_sel_state.textSelectionState != undefined)
+                                {
+                                    if(_prev_sel_state != undefined && _tmp_sel_state.obj != _prev_sel_state.obj)
+                                    {
+                                        return _arr_sel_states[_pos_sel_state];
+                                    }
+                                    _text_sel_state = _tmp_sel_state.textSelectionState;
+                                    if(_text_sel_state[_text_sel_state.length - 1].Selection.EndPos < _cur_pos_doc)
+                                    {
+                                        return _arr_sel_states[_pos_sel_state];
+                                    }
+                                    if(_text_sel_state[_text_sel_state.length - 1].Selection.EndPos == _cur_pos_doc)
+                                    {
+                                        if(_text_sel_state[_text_sel_state.length -2][0][0].Selection.EndPos <= _cur_pos_par)
+                                        {
+                                            return _arr_sel_states[_pos_sel_state];
+                                        }
+                                    }
+                                }
+                                _prev_sel_state = _tmp_sel_state;
+                            }
+                            for(--_cur_glyph_num; _cur_glyph_num > -1; --_cur_glyph_num)
+                            {
+                                if((_arr_sel_states = ArrGlyph[_cur_glyph_num].getSearchResults(str, _cur_glyph_num))!= null)
+                                {
+                                    return _arr_sel_states[_arr_sel_states.length - 1];
+                                }
+                            }
+                        }
+                    }
+                    return null;
+                }
+            }
+        }
+        else if(this.State.id == 20)
+        {
+            return null;//TODO: доделать;
+        }
+        return null;
+    },
 
     addChart: function(binary)
     {

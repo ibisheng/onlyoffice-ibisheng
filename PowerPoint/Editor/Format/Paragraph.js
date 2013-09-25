@@ -10072,7 +10072,7 @@ Paragraph.prototype =
         for ( var Pos = 0; Pos < this.Content.length; Pos++ )
         {
             var Item = this.Content[Pos];
-            if ( para_Numbering === Item.Type || para_PresentationNumbering === Item.Type || para_TextPr === Item.Type )
+            if ( para_Numbering === Item.Type || para_PresentationNumbering === Item.Type || para_TextPr === Item.Type || para_NewLineRendered === Item.Type || para_PageBreakRendered === Item.Type )
                 continue;
 
             if ( (" " === Str[0] && para_Space === Item.Type) || ( para_Text === Item.Type && (Item.Value).toLowerCase() === Str[0].toLowerCase() ) )
@@ -10087,7 +10087,7 @@ Paragraph.prototype =
                     for ( var Index = 1; Index < Str.length; Index++ )
                     {
                         // Пропускаем записи TextPr
-                        while ( Pos2 < this.Content.length && ( para_TextPr === this.Content[Pos2].Type ) )
+                        while ( Pos2 < this.Content.length && ( para_TextPr === this.Content[Pos2].Type || para_NewLineRendered === this.Content[Pos2].Type || para_PageBreakRendered === this.Content[Pos2].Type ) )
                             Pos2++;
 
                         if ( ( Pos2 >= this.Content.length ) || (" " === Str[Index] && para_Space != this.Content[Pos2].Type) || ( " " != Str[Index] && ( ( para_Text != this.Content[Pos2].Type ) || ( para_Text === this.Content[Pos2].Type && this.Content[Pos2].Value.toLowerCase() != Str[Index].toLowerCase() ) ) ) )
@@ -10106,192 +10106,7 @@ Paragraph.prototype =
                 }
             }
         }
-
-        var MaxShowValue = 100;
-        for ( var FoundIndex = 0; FoundIndex < SearchResults.length; FoundIndex++ )
-        {
-            var Rects = new Array();
-
-            // Делаем подсветку
-            var StartPos = SearchResults[FoundIndex].StartPos;
-            var EndPos   = SearchResults[FoundIndex].EndPos;
-
-
-            // Найдем линию, с которой начинается селект
-            var StartParaPos = this.Internal_Get_ParaPos_By_Pos( StartPos );
-            var CurLine  = StartParaPos.Line;
-            var CurRange = StartParaPos.Range;
-            var PNum     = StartParaPos.Page;
-
-            // Найдем начальный сдвиг в данном отрезке
-            var StartX = this.Lines[CurLine].Ranges[CurRange].XVisible;
-            var Pos, Item;
-            for ( Pos = this.Lines[CurLine].Ranges[CurRange].StartPos; Pos <= StartPos - 1; Pos++ )
-            {
-                Item = this.Content[Pos];
-
-                if ( Pos === this.Numbering.Pos )
-                    StartX += this.Numbering.WidthVisible;
-                if ( undefined != Item.WidthVisible && ( para_Drawing != Item.Type || drawing_Inline === Item.DrawingType  ) )
-                    StartX += Item.WidthVisible;
-            }
-
-            if ( this.Pages[PNum].StartLine > CurLine )
-            {
-                CurLine = this.Pages[PNum].StartLine;
-                CurRange = 0;
-                StartX   = this.Lines[CurLine].Ranges[CurRange].XVisible;
-                StartPos = this.Lines[this.Pages[PNum].StartLine].StartPos;
-            }
-
-            var StartY = (this.Pages[PNum].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent);
-            var EndY   = (this.Pages[PNum].Y + this.Lines[CurLine].Y + this.Lines[CurLine].Metrics.Descent);
-            if ( this.Lines[CurLine].Metrics.LineGap < 0 )
-                EndY += this.Lines[CurLine].Metrics.LineGap;
-
-            var W = 0;
-
-
-            for ( Pos = StartPos; Pos < EndPos; Pos++ )
-            {
-                Item = this.Content[Pos];
-
-                if ( undefined != Item.CurPage )
-                {
-                    if ( Item.CurPage > PNum )
-                        PNum = Item.CurPage;
-
-                    if ( CurLine < Item.CurLine )
-                    {
-                        Rects.push( { PageNum : StartPage + PNum, X : StartX, Y : StartY, W : W, H : EndY - StartY } );
-
-                        CurLine  = Item.CurLine;
-                        CurRange = Item.CurRange;
-
-                        StartX = this.Lines[CurLine].Ranges[CurRange].XVisible;
-
-                        StartY = (this.Pages[PNum].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent);
-                        EndY   = (this.Pages[PNum].Y + this.Lines[CurLine].Y + this.Lines[CurLine].Metrics.Descent);
-
-                        if ( this.Lines[CurLine].Metrics.LineGap < 0 )
-                            EndY += this.Lines[CurLine].Metrics.LineGap;
-
-                        W = 0;
-                    }
-                    else if ( CurRange < Item.CurRange )
-                    {
-                        Rects.push( { PageNum : StartPage + PNum, X : StartX, Y : StartY, W : W, H : EndY - StartY } );
-
-                        CurRange = Item.CurRange;
-
-                        StartX = this.Lines[CurLine].Ranges[CurRange].XVisible;
-
-                        W = 0;
-                    }
-                }
-
-                if ( undefined != Item.WidthVisible )
-                    W += Item.WidthVisible;
-
-                if ( Pos == EndPos - 1 )
-                    Rects.push( { PageNum : StartPage + PNum, X : StartX, Y : StartY, W : W, H : EndY - StartY } );
-            }
-
-            var ResultStr = new String();
-
-            var _Str = "";
-            for ( var Pos = StartPos; Pos < EndPos; Pos++ )
-            {
-                Item = this.Content[Pos];
-
-                if ( para_Text === Item.Type )
-                    _Str += Item.Value;
-                else if ( para_Space === Item.Type )
-                    _Str += " ";
-            }
-
-            // Теперь мы должны сформировать строку
-            if ( _Str.length >= MaxShowValue )
-            {
-                ResultStr = "\<b\>";
-                for ( var Index = 0; Index < MaxShowValue - 1; Index++ )
-                    ResultStr += _Str[Index];
-
-                ResultStr += "\</b\>...";
-            }
-            else
-            {
-                ResultStr = "\<b\>" + _Str + "\</b\>";
-
-                var Pos_before = StartPos - 1;
-                var Pos_after  = EndPos;
-                var LeaveCount = MaxShowValue - _Str.length;
-
-                var bAfter = true;
-                while ( LeaveCount > 0 && ( Pos_before >= 0 || Pos_after < this.Content.length ) )
-                {
-                    var TempPos = ( true === bAfter ? Pos_after : Pos_before );
-                    var Flag = 0;
-                    while ( ( ( TempPos >= 0 && false === bAfter ) || ( TempPos < this.Content.length && true === bAfter ) ) && para_Text != this.Content[TempPos].Type && para_Space != this.Content[TempPos].Type )
-                    {
-                        if ( true === bAfter )
-                        {
-                            TempPos++;
-                            if ( TempPos >= this.Content.length )
-                            {
-                                TempPos = Pos_before;
-                                bAfter = false;
-                                Flag++;
-                            }
-                        }
-                        else
-                        {
-                            TempPos--;
-                            if ( TempPos < 0 )
-                            {
-                                TempPos = Pos_after;
-                                bAfter = true;
-                                Flag++;
-                            }
-                        }
-
-                        // Дошли до обоих концов параграфа
-                        if ( Flag >= 2 )
-                            break;
-                    }
-
-                    if ( Flag >= 2 || !( ( TempPos >= 0 && false === bAfter ) || ( TempPos < this.Content.length && true === bAfter ) ) )
-                        break;
-
-                    if ( true === bAfter )
-                    {
-                        ResultStr += (para_Space === this.Content[TempPos].Type ? " " : this.Content[TempPos].Value);
-                        Pos_after = TempPos + 1;
-                        LeaveCount--;
-
-                        if ( Pos_before >= 0 )
-                            bAfter = false;
-
-                        if ( Pos_after >= this.Content.length )
-                            bAfter = false;
-                    }
-                    else
-                    {
-                        ResultStr = (para_Space === this.Content[TempPos].Type ? " " : this.Content[TempPos].Value) + ResultStr;
-                        Pos_before = TempPos - 1;
-                        LeaveCount--;
-
-                        if ( Pos_after < this.Content.length )
-                            bAfter = true;
-
-                        if ( Pos_before < 0 )
-                            bAfter = true;
-                    }
-                }
-            }
-
-            this.DrawingDocument.AddPageSearch( ResultStr, Rects, ElementType );
-        }
+        return SearchResults;
     },
 
     DocumentStatistics : function(Stats)

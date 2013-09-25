@@ -64,6 +64,8 @@ GroupShape.prototype=
         return false;
     },
 
+
+
     calculateCompiledVerticalAlign: function()
     {
         var _shapes = this.ArrGlyph;

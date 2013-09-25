@@ -58,6 +58,11 @@ function CChartAsGroup(parent/*(WordGraphicObject)*/, document, drawingDocument,
 
 CChartAsGroup.prototype =
 {
+
+    getSearchResults: function()
+    {
+        return null;
+    },
     asc_getChart: function()
     {
         return this.chart;
@@ -252,6 +257,34 @@ CChartAsGroup.prototype =
             new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataGOSingleProp(oldValue, newValue)));
         this.drawingObjects = drawingObjects;
 
+    },
+
+
+    getFullFlipH: function()
+    {
+        if(!isRealObject(this.group))
+            return this.flipH;
+        return this.group.getFullFlipH() ? !this.flipH : this.flipH;
+    },
+
+
+    getFullFlipV: function()
+    {
+        if(!isRealObject(this.group))
+            return this.flipV;
+        return this.group.getFullFlipV() ? !this.flipV : this.flipV;
+    },
+
+    getAspect: function(num)
+    {
+        var _tmp_x = this.extX != 0 ? this.extX : 0.1;
+        var _tmp_y = this.extY != 0 ? this.extY : 0.1;
+        return num === 0 || num === 4 ? _tmp_x/_tmp_y : _tmp_y/_tmp_x;
+    },
+
+    getFullRotate: function()
+    {
+        return !isRealObject(this.group) ? this.rot : this.rot + this.group.getFullRotate();
     },
 
     getBoundsInGroup: function()

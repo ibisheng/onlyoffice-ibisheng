@@ -56,7 +56,38 @@ function CGroupShape(parent)
 
 CGroupShape.prototype =
 {
+    getSearchResults : function(str, num)
+    {
+        var commonSearchResults = [];
+        for(var i = 0; i< this.arrGraphicObjects.length; ++i)
+        {
+            var searchResults;
+            if((searchResults = this.arrGraphicObjects[i].getSearchResults(str, i))!=null)
+            {
+                commonSearchResults.push(searchResults)
+            }
+        }
+        return commonSearchResults.length > 0 ? commonSearchResults : null;
+    },
 
+    getBoundsInGroup: function()
+    {
+        var r = this.rot;
+        if((r >= 0 && r < Math.PI*0.25)
+            || (r > 3*Math.PI*0.25 && r < 5*Math.PI*0.25)
+            || (r > 7*Math.PI*0.25 && r < 2*Math.PI))
+        {
+            return {minX: this.x, minY: this.y, maxX: this.x + this.extX, maxY: this.y + this.extY};
+        }
+        else
+        {
+            var hc = this.extX*0.5;
+            var vc = this.extY*0.5;
+            var xc = this.x + hc;
+            var yc = this.y + vc;
+            return {minX: xc - vc, minY: yc - hc, maxX: xc + vc, maxY: yc + hc};
+        }
+    },
 
     getBase64Img: function()
     {
@@ -84,7 +115,8 @@ CGroupShape.prototype =
             recalculateTransform: true,
             recalculateSpTree: true,
             recalculateCursorTypes: true,
-            recalculateScaleCoefficients: true
+            recalculateScaleCoefficients: true,
+            recalculateArrGraphicObjects: true
         };
         for(var i = 0; i < this.spTree.length; ++i)
         {
@@ -813,6 +845,36 @@ CGroupShape.prototype =
         return this.group.getMainGroup();
     },
 
+    canUnGroup: function()
+    {
+        return true;
+    },
+
+    getUnGroupedSpTree: function()
+    {
+        this.normalize();
+        this.recalculateTransform();
+        var sp_tree = this.spTree;
+        var ret = [];
+        for(var i = 0; i < sp_tree.length; ++i)
+        {
+            var sp = sp_tree[i];
+            var full_flip_h = sp.getFullFlipH();
+            var full_flip_v = sp.getFullFlipV();
+            var full_rotate = sp.getFullRotate();
+            var hc = sp.spPr.xfrm.extX*0.5;
+            var vc = sp.spPr.xfrm.extY*0.5;
+            var xc = sp.transform.TransformPointX(hc, vc);
+            var yc = sp.transform.TransformPointY(hc, vc);
+            sp.setGroup(null);
+            sp.setOffset(xc - hc, yc - vc);
+            sp.setFlips(full_flip_h, full_flip_v);
+            sp.setRotate(normalizeRotate(sp.getFullRotate()));
+            ret.push(sp);
+        }
+        return ret;
+    },
+
     normalize: function()
     {
         for(var i = 0; i < this.spTree.length; ++i)
@@ -1470,6 +1532,20 @@ CGroupShape.prototype =
                 w.WriteDouble(data.newExtentY);
                 break;
             }
+
+            case historyitem_SetShapeChildOffset:
+            {
+                w.WriteDouble(data.newOffsetX);
+                w.WriteDouble(data.newOffsetY);
+                break;
+            }
+
+            case historyitem_SetShapeChildExtents:
+            {
+                w.WriteDouble(data.newExtentX);
+                w.WriteDouble(data.newExtentY);
+                break;
+            }
             case historyitem_SetShapeFlips:
             {
                 w.WriteBool(data.newFlipH);
@@ -1556,6 +1632,27 @@ CGroupShape.prototype =
 
                     break;
                 }
+
+                case historyitem_SetShapeChildOffset:
+                {
+                    this.spPr.xfrm.chOffX = r.GetDouble();
+                    this.spPr.xfrm.chOffY = r.GetDouble();
+                    this.recalcInfo.recalculateTransform = true;
+                    this.recalcInfo.recalculateTransformText = true;
+
+                    break;
+                }
+
+                case historyitem_SetShapeChildExtents:
+                {
+                    this.spPr.xfrm.chExtX = r.GetDouble();
+                    this.spPr.xfrm.chExtY = r.GetDouble();
+                    this.recalcInfo.recalculateTransform = true;
+                    this.recalcInfo.recalculateTransformText = true;
+                    this.recalcInfo.recalculateContent = true;
+                    this.recalcInfo.recalculateGeometry = true;
+                    break;
+                }
                 case historyitem_SetShapeFlips:
                 {
                     this.spPr.xfrm.flipH = r.GetBool();
@@ -1593,6 +1690,7 @@ CGroupShape.prototype =
                     var pos = r.GetLong();
                     var item  = g_oTableId.Get_ById(r.GetString2());
                     this.spTree.splice(pos, 0, item);
+                    this.recalcAll();
                     break;
                 }
                 case historyitem_SetSpGroup:
@@ -1632,3 +1730,17 @@ CGroupShape.prototype =
         this.Id = r.GetString2();
     }
 };
+
+function normalizeRotate(rot)
+{
+    var new_rot = rot;
+    if(isRealNumber(new_rot))
+    {
+        while(new_rot >= 2*Math.PI)
+            new_rot -= Math.PI;
+        while(new_rot < 0)
+            new_rot += Math.PI;
+        return new_rot;
+    }
+    return new_rot;
+}
