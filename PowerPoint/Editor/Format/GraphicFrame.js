@@ -722,8 +722,8 @@ CGraphicFrame.prototype =
             this.graphicObject.Draw(0, graphics);
             if(locktype_None != this.Lock.Get_Type())
                 graphics.DrawLockObjectRect(this.Lock.Get_Type() , 0, 0, this.extX, this.extY);
-            graphics.SetIntegerGrid(true);
             graphics.reset();
+            graphics.SetIntegerGrid(true);
         }
     },
 

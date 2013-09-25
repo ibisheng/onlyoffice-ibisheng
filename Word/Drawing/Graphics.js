@@ -795,7 +795,9 @@ CGraphics.prototype =
     {
         this.m_oTransform.Reset();
         this.CalculateFullTransform(false);
-        this.m_oContext.setTransform(this.m_oCoordTransform.sx,0,0,this.m_oCoordTransform.sy,0, 0);
+
+        if (!this.m_bIntegerGrid)
+            this.m_oContext.setTransform(this.m_oCoordTransform.sx,0,0,this.m_oCoordTransform.sy,0, 0);
     },
 
     transform3 : function(m, isNeedInvert)
