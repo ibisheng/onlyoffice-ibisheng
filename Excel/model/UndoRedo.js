@@ -3154,119 +3154,44 @@ UndoRedoWoorksheet.prototype = {
 		}
 		else if(historyitem_Worksheet_MoveRange == Type)
 		{
-			if( bUndo ){
+			//todo worksheetView.autoFilters._moveAutoFilters(worksheetView ,null, null, g_oUndoRedoAutoFiltersMoveData);
+			var from = Data.from;
+			var to = Data.to;
+			if(bUndo)
+			{
+				var temp = from;
+				from = to;
+				to = temp;
+			}
+			if(false != this.wb.bCollaborativeChanges)
+			{
+				var collaborativeEditing = this.wb.oApi.collaborativeEditing,
+					nSheetId = ws.getId(),
+					coBBoxTo 	= {r1:0,c1:0,r2:0,c2:0 },
+					coBBoxFrom 	= {r1:0,c1:0,r2:0,c2:0 };
 
-				var rec = {length:0}, rec2;
-				for(var ind = 0; ind < Data.arr.to.length; ind++ ){
-					var nRow = Data.arr.to[ind].getCellAddress().getRow0(),
-						nCol = Data.arr.to[ind].getCellAddress().getCol0();
+				coBBoxTo.r1 = collaborativeEditing.getLockOtherRow2(	nSheetId, to.r1);
+				coBBoxTo.c1 = collaborativeEditing.getLockOtherColumn2(	nSheetId, to.c1);
+				coBBoxTo.r2 = collaborativeEditing.getLockOtherRow2(	nSheetId, to.r2);
+				coBBoxTo.c2 = collaborativeEditing.getLockOtherColumn2(	nSheetId, to.c2);
 
-					var c = ws._getCell(nRow, nCol)
+				coBBoxFrom.r1 = collaborativeEditing.getLockOtherRow2(		nSheetId, from.r1);
+				coBBoxFrom.c1 = collaborativeEditing.getLockOtherColumn2(	nSheetId, from.c1);
+				coBBoxFrom.r2 = collaborativeEditing.getLockOtherRow2(		nSheetId, from.r2);
+				coBBoxFrom.c2 = collaborativeEditing.getLockOtherColumn2(	nSheetId, from.c2);
 
-					if( c.sFormula ){
-						this.wb.cwf[ws.Id].cells[c.getName()] = null;
-						delete this.wb.cwf[ws.Id].cells[ c.getName()];
-					}
-
-					var oTargetRow = ws._getRow(nRow);
-
-					if(Data.arr.to[ind].isEmpty()){
-						delete oTargetRow.c[nCol];
-						continue;
-					}
-					else{
-						var sn = ws.workbook.dependencyFormulas.getSlaveNodes(ws.Id,Data.arr.to[ind].getName())
-						if( sn ){
-							for( var _id in sn){
-								rec[_id] = [ sn[_id].sheetId, sn[_id].cellId ];
-								rec.length++;
-							}
-						}
-						oTargetRow.c[nCol] = Data.arr.to[ind];
-						if( oTargetRow.c[nCol].sFormula ){
-							this.wb.cwf[ws.Id].cells[ oTargetRow.c[nCol].getName() ] = oTargetRow.c[nCol].getName();
-							rec[ getVertexId(ws.Id,oTargetRow.c[nCol].getName()) ] = [ ws.Id, oTargetRow.c[nCol].getName() ];
-							rec.length++;
-						}
-					}
-				}
-
-				for(var ind = 0; ind < Data.arr.from.length; ind++ ){
-					var nRow = Data.arr.from[ind].getCellAddress().getRow0(),
-						nCol = Data.arr.from[ind].getCellAddress().getCol0();
-
-					var c = ws._getCell(nRow, nCol)
-
-					if( c.sFormula ){
-						this.wb.cwf[ws.Id].cells[c.getName()] = null;
-						delete this.wb.cwf[ws.Id].cells[ c.getName()];
-					}
-
-					var oTargetRow = ws._getRow(nRow);
-
-					if(Data.arr.from[ind].isEmpty()){
-						delete oTargetRow.c[nCol];
-						continue;
-					}
-					else{
-						var sn = ws.workbook.dependencyFormulas.getSlaveNodes(ws.Id,Data.arr.from[ind].getName())
-						if( sn ){
-							for( var _id in sn){
-								rec[_id] = [ sn[_id].sheetId, sn[_id].cellId ];
-								rec.length++;
-							}
-						}
-						oTargetRow.c[nCol] = Data.arr.from[ind];
-						if( oTargetRow.c[nCol].sFormula ){
-							this.wb.cwf[ws.Id].cells[ oTargetRow.c[nCol].getName() ] = oTargetRow.c[nCol].getName();
-							rec[ getVertexId(ws.Id,oTargetRow.c[nCol].getName()) ] = [ ws.Id, oTargetRow.c[nCol].getName() ];
-							rec.length++;
-						}
-					}
-				}
-
-                var offset = { offsetRow : Data.from.r1 - Data.to.r1, offsetCol : Data.from.c1 - Data.to.c1 }
-
-                rec2 = ws._moveRecalcGraph(Data.to, offset);
-
-				this.wb.buildDependency();
-                rec.length += rec2.length;
-                for( var id in rec2 ){
-                    if( id == "length" ) continue;
-                    rec[id] = rec2[id];
-                }
-				this.wb.needRecalc = rec;
-				recalc(this.wb);
+				ws._moveRange(coBBoxFrom, coBBoxTo);
+			}
+			else{
+				ws._moveRange(from, to);
+			}
+			if(bUndo)
+			{
 				if(g_oUndoRedoAutoFiltersMoveData)
 				{
 					var worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
 					worksheetView.autoFilters._moveAutoFilters(worksheetView ,null, null, g_oUndoRedoAutoFiltersMoveData);
 					g_oUndoRedoAutoFiltersMoveData = null;
-			}
-			}
-			else{
-
-				if(false != this.wb.bCollaborativeChanges)
-				{
-					var collaborativeEditing = this.wb.oApi.collaborativeEditing,
-						nSheetId = ws.getId(),
-						coBBoxTo 	= {r1:0,c1:0,r2:0,c2:0 },
-						coBBoxFrom 	= {r1:0,c1:0,r2:0,c2:0 };
-
-					coBBoxTo.r1 = collaborativeEditing.getLockOtherRow2(	nSheetId, Data.to.r1);
-					coBBoxTo.c1 = collaborativeEditing.getLockOtherColumn2(	nSheetId, Data.to.c1);
-					coBBoxTo.r2 = collaborativeEditing.getLockOtherRow2(	nSheetId, Data.to.r2);
-					coBBoxTo.c2 = collaborativeEditing.getLockOtherColumn2(	nSheetId, Data.to.c2);
-
-					coBBoxFrom.r1 = collaborativeEditing.getLockOtherRow2(		nSheetId, Data.from.r1);
-					coBBoxFrom.c1 = collaborativeEditing.getLockOtherColumn2(	nSheetId, Data.from.c1);
-					coBBoxFrom.r2 = collaborativeEditing.getLockOtherRow2(		nSheetId, Data.from.r2);
-					coBBoxFrom.c2 = collaborativeEditing.getLockOtherColumn2(	nSheetId, Data.from.c2);
-
-					ws._moveRange(coBBoxFrom, coBBoxTo);
-				}
-				else{
-					ws._moveRange(Data.from, Data.to);
 				}
 			}
 		}
@@ -3309,7 +3234,7 @@ UndoRedoWoorksheet.prototype = {
 			if(bUndo)
 				Ref.removeHyperlink(Data);
 			else
-				Ref.setHyperlink(Data);
+				Ref.setHyperlink(Data, true);
 		}
 		else if(historyitem_Worksheet_Rename == Type)
 		{

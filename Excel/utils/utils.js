@@ -225,6 +225,10 @@
 			contains: function (c, r) {
 				return this.c1 <= c && c <= this.c2 && this.r1 <= r && r <= this.r2;
 			},
+			
+			containsRange: function (range) {
+				return this.contains(range.c1, range.r1) && this.contains(range.c2, range.r2);
+			},
 
 			intersection: function (range) {
 				var s1 = this.clone(true),
@@ -238,6 +242,17 @@
 						s2.r1 >= s1.r1 && s2.r1 <= s1.r2 ? s2.r1 : s1.r1,
 						Math.min(s1.c2, s2.c2),
 						Math.min(s1.r2, s2.r2));
+			},
+			
+			intersectionSimple: function (range) {
+				var oRes = null;
+				var r1 = Math.max(this.r1, range.r1);
+				var c1 = Math.max(this.c1, range.c1);
+				var r2 = Math.min(this.r2, range.r2);
+				var c2 = Math.min(this.c2, range.c2);
+				if(r1 <= r2 && c1 <= c2)
+					oRes = new Range(c1, r1, c2, r2);
+				return oRes;
 			},
 
 			union: function (range) {
@@ -255,6 +270,29 @@
 				this.c2 = Math.max(this.c2, range.c2);
 				this.r1 = Math.min(this.r1, range.r1);
 				this.r2 = Math.max(this.r2, range.r2);
+			},
+			
+			setOffset : function(offset){
+				this.setOffsetFirst(offset);
+				this.setOffsetLast(offset);
+			},
+
+			setOffsetFirst : function(offset){
+				this.c1 += offset.offsetCol;
+				if( this.c1 < 0 )
+					this.c1 = 0;
+				this.r1 += offset.offsetRow;
+				if( this.r1 < 0 )
+					this.r1 = 0;
+			},
+
+			setOffsetLast : function(offset){
+				this.c2 += offset.offsetCol;
+				if( this.c2 < 0 )
+					this.c2 = 0;
+				this.r2 += offset.offsetRow;
+				if( this.r2 < 0 )
+					this.r2 = 0;
 			}
 
 		};

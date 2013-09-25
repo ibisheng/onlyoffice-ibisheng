@@ -2152,8 +2152,6 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, oDrawings, aDxf
 	this.nBorderMapIndex = 0;
 	this.oNumMap = new Object();
 	this.nNumMapIndex = 0;
-	this.oMerged = new Object();
-	this.oHyperlinks = new Object();
 	this.idWorksheet = idWorksheet;
 	this.oAllColXfsId = null;
 	this._getCrc32FromObjWithProperty = function(val)
@@ -2207,8 +2205,6 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, oDrawings, aDxf
         for(var i = 0, length = this.wb.aWorksheets.length; i < length; ++i)
         {
             var ws = this.wb.aWorksheets[i];
-			this.oMerged = new Object();
-			this.oHyperlinks = new Object();
 			if(null == this.idWorksheet || this.idWorksheet == ws.getId())
 				this.bs.WriteItem(c_oSerWorksheetsTypes.Worksheet, function(){oThis.WriteWorksheet(ws, i);});
         }
@@ -2239,9 +2235,9 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, oDrawings, aDxf
                
         this.bs.WriteItem(c_oSerWorksheetsTypes.SheetData, function(){oThis.WriteSheetData(ws);});
 		
-        this.bs.WriteItem(c_oSerWorksheetsTypes.Hyperlinks, function(){oThis.WriteHyperlinks();});
+        this.bs.WriteItem(c_oSerWorksheetsTypes.Hyperlinks, function(){oThis.WriteHyperlinks(ws);});
         
-        this.bs.WriteItem(c_oSerWorksheetsTypes.MergeCells, function(){oThis.WriteMergeCells();});
+        this.bs.WriteItem(c_oSerWorksheetsTypes.MergeCells, function(){oThis.WriteMergeCells(ws);});
         
 		if ( ws.Drawings && (ws.Drawings.length) )
 			this.bs.WriteItem(c_oSerWorksheetsTypes.Drawings, function(){oThis.WriteDrawings(ws.Drawings);});
@@ -2294,7 +2290,6 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, oDrawings, aDxf
 			aIndexes.push(i - 0);
 		aIndexes.sort(fSortAscending);
 		var fInitCol = function(col, nMin, nMax){
-			oThis.AddToMergedAndHyperlink(col);
 			var oRes = {BestFit: col.BestFit, hd: col.hd, Max: nMax, Min: nMin, xfsid: null, width: col.width, CustomWidth: col.CustomWidth};
 			if(null == oRes.width)
 			{
@@ -2591,13 +2586,15 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, oDrawings, aDxf
             this.memory.WriteBool(bHeadings);
 		}
     };
-    this.WriteHyperlinks = function()
+    this.WriteHyperlinks = function(ws)
     {
         var oThis = this;
-        for(var i in this.oHyperlinks)
+		var oHyperlinks = ws.hyperlinkManager.getAll();
+		//todo sort
+        for(var i in oHyperlinks)
         {
-            var hyp = this.oHyperlinks[i];
-            this.bs.WriteItem(c_oSerWorksheetsTypes.Hyperlink, function(){oThis.WriteHyperlink(hyp);});
+            var elem = oHyperlinks[i];
+            this.bs.WriteItem(c_oSerWorksheetsTypes.Hyperlink, function(){oThis.WriteHyperlink(elem.data);});
         }
     };
     this.WriteHyperlink = function(oHyperlink)
@@ -2623,13 +2620,21 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, oDrawings, aDxf
             this.memory.WriteString2(oHyperlink.Tooltip);
         }
     };
-    this.WriteMergeCells = function()
+    this.WriteMergeCells = function(ws)
     {
         var oThis = this;
-        for(var i in this.oMerged)
+		var oMerged = ws.mergeManager.getAll();
+        for(var i in oMerged)
 		{
-            this.memory.WriteByte(c_oSerWorksheetsTypes.MergeCell);
-            this.memory.WriteString2(i);
+			var elem = oMerged[i];
+			var bbox = elem.bbox;
+			if(bbox.r1 != bbox.r2 || bbox.c1 != bbox.c2)
+			{
+				var oFirst = new CellAddress(bbox.r1, bbox.c1, 0);
+				var oLast = new CellAddress(bbox.r2, bbox.c2, 0);
+				this.memory.WriteByte(c_oSerWorksheetsTypes.MergeCell);
+				this.memory.WriteString2(oFirst.getID() + ":" + oLast.getID());
+			}
 		}
     };
     this.WriteDrawings = function(aDrawings)
@@ -2744,7 +2749,6 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, oDrawings, aDxf
             var row = ws.aGCells[aIndexes[i]];
 			if(null != row)
 			{ 
-				this.AddToMergedAndHyperlink(row);
 				if(false == row.isEmptyToSave())
 					this.bs.WriteItem(c_oSerWorksheetsTypes.Row, function(){oThis.WriteRow(row);});
 			}
@@ -2801,8 +2805,7 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, oDrawings, aDxf
             var cell = aCells[aIndexes[i]];
 			//готовим ячейку к записи
 			var nXfsId = this.prepareXfs(cell.xfs);
-			this.AddToMergedAndHyperlink(cell);
-			if(0 != nXfsId || false == cell.isEmptyText() || null != cell.merged || cell.hyperlinks.length > 0)
+			if(0 != nXfsId || false == cell.isEmptyText())
 				this.bs.WriteItem(c_oSerRowTypes.Cell, function(){oThis.WriteCell(cell, nXfsId);});
         }
     };
@@ -2921,19 +2924,6 @@ function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, oDrawings, aDxf
 		}
 		return nXfsId;
 	};
-	this.AddToMergedAndHyperlink = function(container)
-	{
-		if(null != container.merged)
-			this.oMerged[container.merged.getName()] = 1;
-		if(null != container.hyperlinks)
-		{
-			for(var i = 0, length = container.hyperlinks.length; i < length; ++i)
-			{
-				var hyperlink = container.hyperlinks[i];
-				this.oHyperlinks[hyperlink.Ref.getName()] = hyperlink;
-			}
-		}
-	}
     this.WriteCell = function(cell, nXfsId)
     {
 		var oThis = this;
@@ -5020,7 +5010,7 @@ function Binary_WorksheetTableReader(stream, wb, aSharedStrings, aCellXfs, Dxfs,
 			{
 				var hyperlink = this.aHyperlinks[i];
 				if (null !== hyperlink.Ref)
-					hyperlink.Ref.setHyperlink(hyperlink, true);
+					hyperlink.Ref.setHyperlinkOpen(hyperlink);
 			}
             oNewWorksheet.init();
             this.wb.aWorksheets.push(oNewWorksheet);

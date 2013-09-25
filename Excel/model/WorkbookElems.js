@@ -1914,8 +1914,6 @@ function Col(worksheet, index)
     this.CustomWidth = null;
     this.width = null;
     this.xfs = null;
-	this.merged = null;
-	this.hyperlinks = new Array();
 };
 Col.prototype =
 {
@@ -1929,24 +1927,13 @@ Col.prototype =
 	},
 	isEqual : function(obj)
 	{
-		var bRes = this.BestFit == obj.BestFit && this.hd == obj.hd && this.width == obj.width && this.CustomWidth == obj.CustomWidth && this.merged == obj.merged && this.hyperlinks.length == obj.hyperlinks.length;
+		var bRes = this.BestFit == obj.BestFit && this.hd == obj.hd && this.width == obj.width && this.CustomWidth == obj.CustomWidth;
 		if(bRes)
 		{
 			if(null != this.xfs && null != obj.xfs)
 				bRes = this.xfs.isEqual(obj.xfs);
 			else if(null != this.xfs || null != obj.xfs)
 				bRes = false;
-		}
-		if(bRes)
-		{
-			for(var i = 0, length = this.hyperlinks.length; i < length; ++i)
-			{
-				if(false == this.hyperlinks[i].isEqual(obj.hyperlinks[i]))
-				{
-					bRes = false;
-					break;
-				}
-			}
 		}
 		return bRes;
 	},
@@ -1956,7 +1943,7 @@ Col.prototype =
 	},
 	isEmpty : function()
 	{
-		return this.isEmptyToSave() && null == this.merged && 0 == this.hyperlinks.length;
+		return this.isEmptyToSave();
 	},
 	Remove : function()
 	{
@@ -1975,16 +1962,6 @@ Col.prototype =
             oNewCol.CustomWidth = this.CustomWidth;
         if(null != this.xfs)
             oNewCol.xfs = this.xfs.clone();
-		//надо быть осторожнее, пока clone используется только с oAllCol
-		if(null != this.merged)
-            oNewCol.merged = this.merged;
-		if(null != this.hyperlinks)
-		{
-            oNewCol.hyperlinks = new Array();
-			for(var i = 0, length = this.hyperlinks.length; i < length; ++i)
-				oNewCol.hyperlinks.push(this.hyperlinks[i]);
-		}
-		//todo hyperlink
         return oNewCol;
     },
 	getWidthProp : function()
@@ -2012,10 +1989,6 @@ Col.prototype =
 			else
 				this.BestFit = null;
 		}
-	},
-	getMerged : function()
-	{
-		return this.merged;
 	},
 	setStyle : function(xfs)
 	{
@@ -2197,8 +2170,6 @@ function Row(worksheet)
     this.h = null;
     this.hd = null;
     this.CustomHeight = null;
-	this.merged = null;
-	this.hyperlinks = new Array();
 };
 Row.prototype =
 {
@@ -2232,7 +2203,7 @@ Row.prototype =
 	},
 	isEmpty : function()
 	{
-		return this.isEmptyToSave() && null == this.merged && 0 == this.hyperlinks.length;
+		return this.isEmptyToSave();
 	},
 	Remove : function()
 	{
@@ -2252,7 +2223,6 @@ Row.prototype =
 			oNewRow.hd = this.hd;
 		for(var i in this.c)
 			oNewRow.c[i] = this.c[i].clone();
-		//todo hyperlink
 		return oNewRow;
 	},
 	getHeightProp : function()
@@ -2286,10 +2256,6 @@ Row.prototype =
 		this.h = otherRow.h;
 		this.CustomHeight = otherRow.CustomHeight;
 		this.hd = otherRow.hd;
-	},
-	getMerged : function()
-	{
-		return this.merged;
 	},
 	setStyle : function(xfs)
 	{
@@ -2901,15 +2867,13 @@ CCellValue.prototype =
 				//для посещенных гиперссылок
 				if(g_nColorHyperlink == oNewItem.theme && null == oNewItem.tint)
 				{
-					var aHyperlinks = this.cell.getHyperlinks();
-					if(aHyperlinks.length > 0)
+					var nRow = this.cell.oId.getRow0();
+					var nCol = this.cell.oId.getCol0();
+					var hyperlink = this.cell.ws.hyperlinkManager.getByCell(nRow, nCol);
+					if(null != hyperlink && hyperlink.data.getVisited())
 					{
-						var hyperlink = aHyperlinks[aHyperlinks.length - 1];
-						if(hyperlink.getVisited())
-						{
-							oNewItem.format.c = g_oColorManager.getThemeColor(g_nColorHyperlinkVisited, null);
-							oNewItem.theme = g_nColorHyperlinkVisited;
-						}
+						oNewItem.format.c = g_oColorManager.getThemeColor(g_nColorHyperlinkVisited, null);
+						oNewItem.theme = g_nColorHyperlinkVisited;
 					}
 				}
 			}
@@ -2939,15 +2903,13 @@ CCellValue.prototype =
 						//для посещенных гиперссылок
 						if(g_nColorHyperlink == oNewItem.theme && null == oNewItem.tint)
 						{
-							var aHyperlinks = this.cell.getHyperlinks();
-							if(aHyperlinks.length > 0)
+							var nRow = this.cell.oId.getRow0();
+							var nCol = this.cell.oId.getCol0();
+							var hyperlink = this.cell.ws.hyperlinkManager.getByCell(nRow, nCol);
+							if(null != hyperlink && hyperlink.data.getVisited())
 							{
-								var hyperlink = aHyperlinks[aHyperlinks.length - 1];
-								if(hyperlink.getVisited())
-								{
-									oNewItem.format.c = g_oColorManager.getThemeColor(g_nColorHyperlinkVisited, null);
-									oNewItem.theme = g_nColorHyperlinkVisited;
-								}
+								oNewItem.format.c = g_oColorManager.getThemeColor(g_nColorHyperlinkVisited, null);
+								oNewItem.theme = g_nColorHyperlinkVisited;
 							}
 						}
 					}
@@ -3048,7 +3010,9 @@ CCellValue.prototype =
 		for(var i = 0, length = aVal.length; i < length; ++i)
 			sSimpleText += aVal[i].text;
 		this.setValue(sSimpleText);
-		if(CellValueType.String == this.type && 0 == this.cell.getHyperlinks().length)
+		var nRow = this.cell.oId.getRow0();
+		var nCol = this.cell.oId.getCol0();
+		if(CellValueType.String == this.type && null != this.cell.ws.hyperlinkManager.getByCell(nRow, nCol))
 		{
 			this.clean();
 			this.type = CellValueType.String;
@@ -3264,6 +3228,542 @@ CCellValue.prototype =
 			case this.Properties.multiText: this.multiText = value;break;
 			case this.Properties.number: this.number = value;break;
 			case this.Properties.type: this.type = value;break;
+		}
+	}
+};
+function RangeDataManagerElem(bbox, data)
+{
+	this.bbox = bbox;
+	this.data = data;
+	this.id = 0;
+}
+function RangeDataManager(bAllowIntersect, fChange)
+{
+	this.oGCells = {};
+	this.oRows = {};
+	this.oCols = {};
+	this.oAll = null;
+	this.oElements = {};
+	this.nElementsCount = 0;
+	this.bbox = null;
+	this.nStopRecalculate = 0;
+	
+	this.idGen = 0;
+	
+	this.oDependenceManager = null;
+	this.bAllowIntersect = bAllowIntersect;
+	this.fChange = fChange;
+}
+RangeDataManager.prototype = {
+	add : function(bbox, data)
+	{
+		var oNewElem = new RangeDataManagerElem(new Asc.Range(bbox.c1, bbox.r1, bbox.c2, bbox.r2), data);
+		oNewElem.id = this.idGen++;
+		var nRangeType = getRangeType(bbox);
+		if(c_oRangeType.Range == nRangeType)
+		{
+			for(var i = bbox.r1; i <= bbox.r2; i++)
+			{
+				var row = this.oGCells[i];
+				if(null == row)
+				{
+					row = {};
+					this.oGCells[i] = row;
+				}
+				for(var j = bbox.c1; j <= bbox.c2; j++)
+				{
+					if(this.bAllowIntersect)
+					{
+						var elem = row[j];
+						if(null == elem)
+						{
+							elem = [];
+							row[j] = elem;
+						}
+						elem.push(oNewElem);
+					}
+					else
+						row[j] = oNewElem;
+				}
+			}
+		}
+		else if(c_oRangeType.Col == nRangeType)
+		{
+			for(var i = bbox.c1; i <= bbox.c2; i++)
+			{
+				if(this.bAllowIntersect)
+				{
+					var elem = this.oCols[i];
+					if(null == elem)
+					{
+						elem = [];
+						this.oCols[i] = elem;
+					}
+					elem.push(oNewElem);
+				}
+				else
+					this.oCols[i] = oNewElem;
+			}
+		}
+		else if(c_oRangeType.Row == nRangeType)
+		{
+			for(var i = bbox.r1; i <= bbox.r2; i++)
+			{
+				if(this.bAllowIntersect)
+				{
+					var elem = this.oRows[i];
+					if(null == elem)
+					{
+						elem = [];
+						this.oRows[i] = elem;
+					}
+					elem.push(oNewElem);
+				}
+				else
+					this.oRows[i] = oNewElem;
+			}
+		}
+		else if(c_oRangeType.All == nRangeType)
+		{
+			if(this.bAllowIntersect)
+				this.oAll = [oNewElem];
+			else
+				this.oAll = oNewElem;
+		}
+		this.oElements[this._getBBoxIndex(bbox)] = oNewElem;
+		this._recalculate();
+	},
+	_getExecElem : function(elem, oFindElems)
+	{
+		if(null != elem)
+		{
+			if(this.bAllowIntersect)
+			{
+				for(var i = 0, length = elem.length; i < length; ++i)
+				{
+					var item = elem[i];
+					oFindElems[item.id] = item;
+				}
+			}
+			else
+				oFindElems[elem.id] = elem;
+		}		
+	},
+	get : function(bbox)
+	{
+		var oRes = {all: [], inner: [], outer: []};
+		if(null != this.bbox)
+			bbox = this.bbox.intersectionSimple(bbox);
+		else
+			bbox = null;
+		if(null != bbox)
+		{
+			var oFindElems = {};
+			//todo подумать, может в некоторых случаях можно пускать полный перебор
+			// if(this.nElementsCount < 100)
+			// {
+				// for(var i in this.oElements)
+				// {
+					// var elem = this.oElements[i];
+					// if(null != elem.bbox.intersectionSimple(bbox))
+						// this._getExecElem(elem, oFindElems);
+				// }
+			// }
+			// else
+			{
+				var nRangeType = getRangeType(bbox);
+				if(bbox.r2 < gc_nMaxRow0 / 4)
+				{
+					for(var i = bbox.r1; i <= bbox.r2; i++)
+					{
+						var row = this.oGCells[i];
+						if(null != row)
+						{
+							if(bbox.c2 < gc_nMaxCol0 / 4)
+							{
+								for(var j = bbox.c1; j <= bbox.c2; j++)
+								{
+									var cell = row[j];
+									if(null != cell)
+										this._getExecElem(cell, oFindElems);
+								}
+							}
+							else
+							{
+								for(var j in row)
+								{
+									var nIndexJ = j - 0;
+									if(bbox.c1 <= nIndexJ && nIndexJ <= bbox.c2)
+										this._getExecElem(row[j], oFindElems);
+								}
+							}
+						}
+					}
+				}
+				else
+				{
+					for(var i in this.oGCells)
+					{
+						var nIndexI = i - 0;
+						if(bbox.r1 <= nIndexI && nIndexI <= bbox.r2)
+						{
+							var row = this.oGCells[i];
+							if(null != row)
+							{
+								if(bbox.c2 < gc_nMaxCol0 / 4)
+								{
+									for(var j = bbox.c1; j <= bbox.c2; j++)
+									{
+										var cell = row[j];
+										if(null != cell)
+											this._getExecElem(cell, oFindElems);
+									}
+								}
+								else
+								{
+									for(var j in row)
+									{
+										var nIndexJ = j - 0;
+										if(bbox.c1 <= nIndexJ && nIndexJ <= bbox.c2)
+											this._getExecElem(row[j], oFindElems);
+									}
+								}
+							}
+						}
+					}
+				}
+				if(bbox.c2 < gc_nMaxCol0 / 4)
+				{
+					for(var i = bbox.c1; i <= bbox.c2; i++)
+							this._getExecElem(this.oCols[i], oFindElems);
+				}
+				else
+				{
+					for(var i in this.oCols)
+					{
+						var nIndex = i - 0;
+						if(bbox.c1 <= nIndex && nIndex <= bbox.c2)
+							this._getExecElem(this.oCols[i], oFindElems);
+					}
+				}
+				if(bbox.r2 < gc_nMaxRow0 / 4)
+				{
+					for(var i = bbox.r1; i <= bbox.r2; i++)
+						this._getExecElem(this.oRows[i], oFindElems);
+				}
+				else
+				{
+					for(var i in this.oRows)
+					{
+						var nIndex = i - 0;
+						if(bbox.r1 <= nIndex && nIndex <= bbox.r2)
+							this._getExecElem(this.oRows[i], oFindElems);
+					}
+				}
+				this._getExecElem(this.oAll, oFindElems);
+			}
+			for(var i in oFindElems)
+			{
+				var elem = oFindElems[i];
+				oRes.all.push(elem);
+				if(bbox.containsRange(elem.bbox))
+					oRes.inner.push(elem);
+				else
+					oRes.outer.push(elem);
+			}
+		}
+		return oRes;
+	},
+	_getByCellExecElem : function(elem)
+	{
+		var oRes = null;
+		if(null != elem)
+		{
+			if(this.bAllowIntersect)
+			{
+				if(elem.length > 0)
+					oRes = elem[0];
+			}
+			else
+				oRes = elem;
+		}
+		return oRes;
+	},
+	_getByCell : function(nRow, nCol)
+	{
+		var oRes = null;
+		var row = this.oGCells[nRow];
+		if(null != row)
+			oRes = this._getByCellExecElem(row[nCol]);
+		if(null == oRes)
+		{
+			oRes = this._getByCellExecElem(this.oRows[nRow]);
+			if(null == oRes)
+			{
+				oRes = this._getByCellExecElem(this.oCols[nCol]);
+				if(null == oRes)
+					oRes = this._getByCellExecElem(this.oAll);
+			}
+		}
+		return oRes;
+	},
+	getByCell : function(nRow, nCol)
+	{
+		var oRes = null;
+		if(null != this.bbox)
+		{
+			if(this.bbox.contains(nCol, nRow))
+				oRes = this._getByCell(nRow, nCol);
+			if(null == oRes && null != this.oDependenceManager)
+			{
+				var oDependence = this.oDependenceManager._getByCell(nRow, nCol);
+				if(null != oDependence)
+				{
+					var oTempRes = this.get(oDependence.bbox);
+					if(oTempRes.all.length > 0)
+						oRes = oTempRes.all[0];
+				}
+			}
+		}
+		return oRes;
+	},
+	_removeExecElem : function(container, index, elemToDelete)
+	{
+		var elem = null;
+		if(null != index)
+			elem = container[index];
+		else
+			elem = container;
+		if(null != elem)
+		{
+			if(this.bAllowIntersect)
+			{
+				for(var i = 0, length = elem.length; i < length; ++i)
+				{
+					var item = elem[i];
+					if(elemToDelete.data == item.data)
+					{
+						elem.splice(i, 1);
+						break;
+					}
+				}
+				if(0 == elem.length)
+				{
+					if(null != index)
+						delete container[index];
+					else
+						container = null;
+				}
+			}
+			else
+			{
+				if(elemToDelete.data == elem.data)
+				{
+					if(null != index)
+						delete container[index];
+					else
+						container = null;
+				}
+			}
+		}
+		return container;
+	},
+	remove : function(bbox, elemToDelete, bTriggerEvent)
+	{
+		if(null != elemToDelete)
+		{
+			var nRangeType = getRangeType(bbox);
+			if(c_oRangeType.Range == nRangeType)
+			{
+				for(var i = bbox.r1; i <= bbox.r2; i++)
+				{
+					var row = this.oGCells[i];
+					if(null != row)
+					{
+						for(var j = bbox.c1; j <= bbox.c2; j++)
+							this._removeExecElem(row, j, elemToDelete);
+					}
+				}
+			}
+			else if(c_oRangeType.Col == nRangeType)
+			{
+				for(var i = bbox.c1; i <= bbox.c2; i++)
+					this._removeExecElem(this.oCols, i, elemToDelete);
+			}
+			else if(c_oRangeType.Row == nRangeType)
+			{
+				for(var i = bbox.r1; i <= bbox.r2; i++)
+					this._removeExecElem(this.oRows, i, elemToDelete);
+			}
+			else if(c_oRangeType.All == nRangeType)
+				this._removeExecElem(this.oAll, null, elemToDelete);
+			if(false != bTriggerEvent)
+				this.fChange.call(this, elemToDelete.data, elemToDelete.bbox, null);
+			delete this.oElements[this._getBBoxIndex(elemToDelete.bbox)];
+			this._recalculate();
+		}
+		else
+		{
+			this.nStopRecalculate++;
+			var aElems = this.get(bbox);
+			for(var i = 0, length = aElems.all.length; i < length; ++i)
+			{
+				var elem = aElems.all[i];
+				this.remove(elem.bbox, elem, bTriggerEvent);
+			}
+			this.nStopRecalculate--;
+			this._recalculate();
+		}
+	},
+	shiftGet : function(bbox, bHor)
+	{
+		var bboxGet = null;
+		if(bHor)
+			bboxGet = {r1: bbox.r1, c1: bbox.c1, r2: bbox.r2, c2: gc_nMaxCol0};
+		else
+			bboxGet = {r1: bbox.r1, c1: bbox.c1, r2: gc_nMaxRow0, c2: bbox.c2};
+		return {bbox: bboxGet, elems: this.get(bboxGet)};
+	},
+	shift : function(bbox, bAdd, bHor, oGetRes)
+	{
+		this.nStopRecalculate++;
+		if(null == oGetRes)
+			oGetRes = this.shiftGet(bbox, bHor);
+		var elems = oGetRes.elems;
+		//сдвигаем inner
+		if(elems.inner.length > 0)
+		{
+			var offset = null;
+			if(bHor)
+				offset = {offsetRow: 0, offsetCol: bbox.c2 - bbox.c1 + 1};
+			else
+				offset = {offsetRow: bbox.r2 - bbox.r1 + 1, offsetCol: 0};
+			for(var i = 0, length = elems.inner.length; i < length; i++)
+			{
+				var elem = elems.inner[i];
+				this.remove(elem.bbox, elem, false);
+			}
+			for(var i = 0, length = elems.inner.length; i < length; i++)
+			{
+				var elem = elems.inner[i];
+				var from = elem.bbox;
+				var to = null;
+				if(bAdd)
+				{
+					to = elem.bbox.clone();
+					to.setOffset(offset);
+				}
+				else
+				{
+					if(!from.containsRange(bbox))
+					{
+						to = elem.bbox.clone();
+						if(bHor)
+						{
+							if(to.c1 <= bbox.c2)
+								to.setOffsetFirst({offsetRow: 0, offsetCol: bbox.c2 - to.c1 + 1});
+						}
+						else
+						{
+							if(to.r1 <= bbox.r2)
+								to.setOffsetFirst({offsetRow: bbox.r2 - to.r1 + 1, offsetCol: 0});
+						}
+						to.setOffset(offset);
+					}
+				}
+				if(null != to)
+					this.add(to, elem.data);
+				if(null != this.fChange)
+					this.fChange.call(this, elem.data, from, to);
+			}
+		}
+		//меняем outer
+		if(elems.outer.length > 0)
+		{
+			for(var i = 0, length = elems.outer.length; i < length; i++)
+			{
+				var elem = elems.outer[i];
+				var from = elem.bbox;
+				var to = null;
+				if(bHor)
+				{
+					if(from.c1 < bbox.c1 && bbox.r1 <= from.r1 && from.r2 <= bbox.r2)
+					{
+						if(bAdd)
+						{
+							to = from.clone();
+							to.setOffsetLast({offsetRow: 0, offsetCol: bbox.c2 - bbox.c1 + 1});
+						}
+						else
+						{
+							to = from.clone();
+							var nTemp1 = from.c2 - bbox.c1 + 1;
+							var nTemp2 = bbox.c2 - bbox.c1 + 1;
+							to.setOffsetLast({offsetRow: 0, offsetCol: -Math.min(nTemp1, nTemp2)});
+						}
+					}
+				}
+				else
+				{
+					if(from.r1 < bbox.r1 && bbox.c1 <= from.c1 && from.c2 <= bbox.c2)
+					{
+						if(bAdd)
+						{
+							to = from.clone();
+							to.setOffsetLast({offsetRow: bbox.r2 - bbox.r1 + 1, offsetCol: 0});
+						}
+						else
+						{
+							to = from.clone();
+							var nTemp1 = from.r2 - bbox.r1 + 1;
+							var nTemp2 = bbox.r2 - bbox.r1 + 1;
+							to.setOffsetLast({offsetRow: -Math.min(nTemp1, nTemp2), offsetCol: 0});
+						}
+					}
+				}
+				if(null != to)
+				{
+					if(null != this.fChange)
+						this.fChange.call(this, elem.data, from, to);
+					elem.bbox = to;
+					delete this.oElements[this._getBBoxIndex(from)];
+					this.oElements[this._getBBoxIndex(to)] = elem;
+				}
+			}
+		}
+		this.nStopRecalculate--;
+		this._recalculate();
+	},
+	getAll : function()
+	{
+		return this.oElements;
+	},
+	setDependenceManager : function(oDependenceManager)
+	{
+		this.oDependenceManager = oDependenceManager;
+	},
+	_getBBoxIndex : function(bbox)
+	{
+		return bbox.r1 + "-" + bbox.c1 + "-" + bbox.r2 + "-" + bbox.c2;
+	},
+	_recalculate : function()
+	{
+		if(0 == this.nStopRecalculate)
+		{
+			this.nElementsCount = 0;
+			this.bbox = null;
+			for(var i in this.oElements)
+			{
+				var elem = this.oElements[i];
+				if(null != elem)
+				{
+					this.nElementsCount++;
+					if(null == this.bbox)
+						this.bbox = elem.bbox.clone();
+					else
+						this.bbox.union2(elem.bbox);
+				}
+			}
 		}
 	}
 };
