@@ -64,6 +64,8 @@ function NullState(drawingObjectsController, drawingObjects)
                 drawingObjects.comments[i].selected = true;
                 this.drawingObjectsController.addPreTrackObject(new MoveComment(drawingObjects.comments[i]));
                 this.drawingObjectsController.changeCurrentState(new PreMoveCommentState(this.drawingObjectsController, this.drawingObjects, x, y));
+                editor.WordControl.m_oDrawingDocument.OnRecalculatePage(this.drawingObjects.num, this.drawingObjects);
+                editor.WordControl.m_oDrawingDocument.OnEndRecalculate();
                 return;
             }
         }

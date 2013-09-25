@@ -6863,6 +6863,7 @@ CPresentation.prototype =
         {
             History.Create_NewPoint();
             var Comment = new CComment( this.Comments, CommentData );
+            Comment.selected = true;
             Comment.setPosition(this.Slides[this.CurPage].commentX, this.Slides[this.CurPage].commentY);
             this.Slides[this.CurPage].commentX += COMMENT_WIDTH;
             this.Slides[this.CurPage].commentY += COMMENT_HEIGHT;
@@ -6879,6 +6880,7 @@ CPresentation.prototype =
         {
             History.Create_NewPoint();
             this.Slides[this.CurPage].changeComment( Id, CommentData );
+            this.Recalculate()
         }
 
     },

@@ -306,8 +306,14 @@ function MoveComment(comment)
     this.draw = function(overlay)
     {
 
+        var Flags = 0;
+        Flags |= 1;
+        if(this.comment.Data.m_aReplies.length > 0)
+        {
+            Flags |= 2;
+        }
         var dd = editor.WordControl.m_oDrawingDocument;
-        overlay.DrawPresentationComment(0, this.x, this.y, dd.GetCommentWidth(), dd.GetCommentHeight())
+        overlay.DrawPresentationComment(Flags, this.x, this.y, dd.GetCommentWidth(Flags), dd.GetCommentHeight(Flags))
     };
 
     this.trackEnd = function()
