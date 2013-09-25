@@ -958,20 +958,8 @@
 		window["Asc"].trim = trim;
 
 		window["Asc"].Range = Range;
-		prot = Range.prototype;
-		prot.assign = prot.assign;
-		prot.clone = prot.clone;
-		prot.normalize = prot.normalize;
-		prot.isEqual = prot.isEqual;
-		prot.contains = prot.contains;
-		prot.intersection = prot.intersection;
-		prot.union = prot.union;
 
 		window["Asc"].HandlersList = HandlersList;
-		prot = HandlersList.prototype;
-		prot.trigger = prot.trigger;
-		prot.add = prot.add;
-		prot.remove = prot.remove;
 
 		window["Asc"].RedoObjectParam = RedoObjectParam;
 
