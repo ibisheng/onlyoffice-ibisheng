@@ -1579,6 +1579,8 @@ CShape.prototype =
 
     copy: function(sp)
     {
+        if(!sp)
+            sp = new CShape();
         sp.setSpPr(this.spPr.createDuplicate());
         sp.setStyle(this.style);
         sp.setNvSpPr(this.nvSpPr);
@@ -1589,6 +1591,7 @@ CShape.prototype =
             sp.setTextBody(txBody);
             sp.setBodyPr(this.txBody.bodyPr);
         }
+        return sp;
     },
 
     copy2: function(sp)
@@ -2907,7 +2910,10 @@ CShape.prototype =
                 else
                 {
                     s.id = STATES_ID_TEXT_ADD_IN_GROUP;
-                    s.group = this.group;
+                    var group = this.group;
+                    while(group.group)
+                        group = group.group;
+                    s.group = group;
                     s.textObject = this;
                     s.textSelectionState = documentContentSelectionStates[i];
                 }

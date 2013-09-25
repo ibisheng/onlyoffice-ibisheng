@@ -2489,12 +2489,34 @@ function MoveState(drawingObjectsController, drawingObjects, startX, startY, rec
 
     this.onMouseUp = function(e, x, y)
     {
-        if(this.drawingObjects.presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+        if(!e.CtrlKey)
+        {
+            if(this.drawingObjects.presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+            {
+                History.Create_NewPoint();
+                this.drawingObjectsController.trackEnd();
+                this.drawingObjects.presentation.Recalculate();
+                this.drawingObjects.presentation.DrawingDocument.OnRecalculatePage(this.drawingObjects.num, this.drawingObjects);
+            }
+        }
+        else
         {
             History.Create_NewPoint();
-            this.drawingObjectsController.trackEnd();
+            var t_o = this.drawingObjectsController.arrTrackObjects;
+            for(var i = 0; i < t_o.length; ++i)
+            {
+                if(t_o[i].originalObject.copy)
+                {
+                    var copy = t_o[i].originalObject.copy();
+                    copy.setParent(this.drawingObjects);
+                    copy.setXfrm(t_o[i].x, t_o[i].y, null, null, null, null, null);
+                    this.drawingObjects.addToSpTreeToPos(this.drawingObjects.cSld.spTree.length, copy);
+                }
+            }
+
             this.drawingObjects.presentation.Recalculate();
             this.drawingObjects.presentation.DrawingDocument.OnRecalculatePage(this.drawingObjects.num, this.drawingObjects);
+            this.drawingObjects.presentation.DrawingDocument.OnEndRecalculate();
         }
         this.drawingObjectsController.clearTrackObjects();
         this.drawingObjects.OnUpdateOverlay();

@@ -64,10 +64,29 @@ CGroupShape.prototype =
             var searchResults;
             if((searchResults = this.arrGraphicObjects[i].getSearchResults(str, i))!=null)
             {
-                commonSearchResults.push(searchResults)
+                for(var j = 0; j < searchResults.length; ++j)
+                {
+                    searchResults[j].shapeIndex = i;
+                }
+                commonSearchResults = commonSearchResults.concat(searchResults)
             }
         }
         return commonSearchResults.length > 0 ? commonSearchResults : null;
+    },
+
+    getCurDocumentContent: function()
+    {
+        if(this.parent.graphicObjects.State instanceof TextAddInGroup && this.parent.graphicObjects.State.group === this)
+        {
+            for(var i = 0; i < this.arrGraphicObjects.length; ++i)
+            {
+                if(this.arrGraphicObjects[i] === this.parent.graphicObjects.State.textObject)
+                {
+                    return this.arrGraphicObjects[i].getCurDocumentContent();
+                }
+            }
+        }
+        return null;
     },
 
     getBoundsInGroup: function()

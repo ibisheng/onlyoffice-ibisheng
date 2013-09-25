@@ -3061,6 +3061,8 @@ function CSpPr()
         duplicate.xfrm = this.xfrm.createDuplicate();
         if(this.Geometry!=null)
             duplicate.Geometry = this.Geometry.createDuplicate();
+        if(this.geometry!=null)
+            duplicate.geometry = this.geometry.createDuplicate();
         if(this.Fill!=null)
         {
             duplicate.Fill = this.Fill.createDuplicate();

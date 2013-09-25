@@ -1780,11 +1780,11 @@ CGraphicObjects.prototype = {
                 return null;
             }
         }
-        else if(this.State.id == STATES_ID_TEXT_ADD)
+        else if(this.State.id == STATES_ID_TEXT_ADD || this.State.id === STATES_ID_TEXT_ADD_IN_GROUP)
         {
             var _cur_doc_content;
             _cur_glyph_num = 0;
-            var obj = this.State.textObject;
+            var obj = this.State.id == STATES_ID_TEXT_ADD ? this.State.textObject : this.State.group;
             if( obj && (_cur_doc_content = obj.getCurDocumentContent()) != null )
             {
                 for(_cur_glyph_num = 0; _cur_glyph_num < ArrGlyph.length; ++_cur_glyph_num)
@@ -1798,7 +1798,9 @@ CGraphicObjects.prototype = {
                 {
                     if((_arr_sel_states = obj.getSearchResults(str, _cur_glyph_num)) != null)
                     {
-                        var _cur_pos_doc, _cur_pos_par;
+                        var b_table = obj instanceof CGraphicFrame;
+                        var b_group = obj instanceof CGroupShape;
+                        var _cur_pos_doc, _cur_pos_par, cur_row, cur_cell, cur_shape;
                         var _pos_sel_state;
                         var _tmp_sel_state;
                         var _prev_sel_state;
@@ -1815,28 +1817,113 @@ CGraphicObjects.prototype = {
                                 _cur_pos_par = _cur_doc_content.Content[_cur_pos_doc].Selection.EndPos;
                             }
 
+                            if(obj instanceof CGraphicFrame && obj.graphicObject instanceof  CTable)
+                            {
+                                var  table = obj.graphicObject;
+                                for(var i = 0; i < table.Content.length; ++i)
+                                {
+                                    var row = table.Content[i];
+                                    for(var j = 0; j < row.Content.length; ++j)
+                                    {
+                                        if(table.CurCell === row.Content[j])
+                                        {
+                                            cur_row = i;
+                                            cur_cell = j;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            if(b_group)
+                            {
+                                for(var t = 0; t < obj.arrGraphicObjects.length; ++t)
+                                {
+                                    if(obj.arrGraphicObjects[t] === this.State.textObject)
+                                    {
+                                        cur_shape = t;
+                                        break;
+                                    }
+                                }
+                            }
+
                             for(_pos_sel_state = 0; _pos_sel_state < _arr_sel_states.length; ++_pos_sel_state)
                             {
                                 _tmp_sel_state = _arr_sel_states[_pos_sel_state];
 
+
                                 if(_tmp_sel_state.textSelectionState != undefined)
                                 {
-                                    if(_prev_sel_state != undefined && _tmp_sel_state.obj != _prev_sel_state.obj)
+                                    /*if(_prev_sel_state != undefined && _tmp_sel_state.textObject != _prev_sel_state.textObject)
                                     {
                                         return _arr_sel_states[_pos_sel_state];
-                                    }
+                                    }*/
                                     var _text_sel_state = _tmp_sel_state.textSelectionState;
-                                    if(_text_sel_state[_text_sel_state.length - 1].Selection.StartPos > _cur_pos_doc)
+                                    if(b_table && isRealNumber(cur_row) && isRealNumber(cur_cell))
                                     {
-                                        return _arr_sel_states[_pos_sel_state];
-                                    }
-                                    if(_text_sel_state[_text_sel_state.length - 1].Selection.StartPos == _cur_pos_doc)
-                                    {
-                                        if(_text_sel_state[_text_sel_state.length -2][0][0].Selection.StartPos >= _cur_pos_par)
+                                        if(_text_sel_state[_text_sel_state.length - 1].CurCell.Row > cur_row)
                                         {
                                             return _arr_sel_states[_pos_sel_state];
                                         }
+                                        if(_text_sel_state[_text_sel_state.length - 1].CurCell.Row === cur_row)
+                                        {
+                                            if(_text_sel_state[_text_sel_state.length - 1].CurCell.Cell > cur_cell)
+                                                return _arr_sel_states[_pos_sel_state];
+                                            if(_text_sel_state[_text_sel_state.length - 1].CurCell.Cell === cur_cell)
+                                            {
+                                                var ind1 = 2;
+                                                if(_text_sel_state[_text_sel_state.length - ind1].Selection.StartPos > _cur_pos_doc)
+                                                {
+                                                    return _arr_sel_states[_pos_sel_state];
+                                                }
+                                                if(_text_sel_state[_text_sel_state.length - ind1].Selection.StartPos == _cur_pos_doc)
+                                                {
+                                                    if(_text_sel_state[_text_sel_state.length -ind1 -1][0][0].Selection.StartPos >= _cur_pos_par)
+                                                    {
+                                                        return _arr_sel_states[_pos_sel_state];
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
+                                    else if(b_group && isRealNumber(cur_shape))
+                                    {
+                                        if(_tmp_sel_state.shapeIndex > cur_shape)
+                                        {
+                                            return _arr_sel_states[_pos_sel_state];
+                                        }
+                                        if(_tmp_sel_state.shapeIndex === cur_shape)
+                                        {
+                                            var ind1 =  1;
+                                            if(_text_sel_state[_text_sel_state.length - ind1].Selection.StartPos > _cur_pos_doc)
+                                            {
+                                                return _arr_sel_states[_pos_sel_state];
+                                            }
+                                            if(_text_sel_state[_text_sel_state.length - ind1].Selection.StartPos == _cur_pos_doc)
+                                            {
+                                                if(_text_sel_state[_text_sel_state.length -ind1 -1][0][0].Selection.StartPos >= _cur_pos_par)
+                                                {
+                                                    return _arr_sel_states[_pos_sel_state];
+                                                }
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        var ind1 =  1;
+                                        if(_text_sel_state[_text_sel_state.length - ind1].Selection.StartPos > _cur_pos_doc)
+                                        {
+                                            return _arr_sel_states[_pos_sel_state];
+                                        }
+                                        if(_text_sel_state[_text_sel_state.length - ind1].Selection.StartPos == _cur_pos_doc)
+                                        {
+                                            if(_text_sel_state[_text_sel_state.length -ind1 -1][0][0].Selection.StartPos >= _cur_pos_par)
+                                            {
+                                                return _arr_sel_states[_pos_sel_state];
+                                            }
+                                        }
+                                    }
+
+
                                 }
                                 _prev_sel_state = _tmp_sel_state;
                             }
@@ -1850,6 +1937,35 @@ CGraphicObjects.prototype = {
                         }
                         else
                         {
+                            if(obj instanceof CGraphicFrame && obj.graphicObject instanceof  CTable)
+                            {
+                                var  table = obj.graphicObject;
+                                for(var i = 0; i < table.Content.length; ++i)
+                                {
+                                    var row = table.Content[i];
+                                    for(var j = 0; j < row.Content.length; ++j)
+                                    {
+                                        if(table.CurCell === row.Content[j])
+                                        {
+                                            cur_row = i;
+                                            cur_cell = j;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            if(b_group)
+                            {
+                                for(var t = 0; t < obj.arrGraphicObjects.length; ++t)
+                                {
+                                    if(obj.arrGraphicObjects[t] === this.State.textObject)
+                                    {
+                                        cur_shape = t;
+                                        break;
+                                    }
+                                }
+                            }
+
                             if(!_cur_doc_content.Selection.Use)
                             {
                                 _cur_pos_doc = _cur_doc_content.CurPos.ContentPos;
@@ -1864,37 +1980,76 @@ CGraphicObjects.prototype = {
                             for(_pos_sel_state = _arr_sel_states.length - 1; _pos_sel_state > -1; --_pos_sel_state)
                             {
                                 _tmp_sel_state = _arr_sel_states[_pos_sel_state];
-                                while(true)
-                                {
-                                    if(_tmp_sel_state.textSelectionState == undefined && _tmp_sel_state.groupSelection != undefined)
-                                    {
-                                        _tmp_sel_state = _tmp_sel_state.groupSelection;
-                                    }
-                                    else
-                                    {
-                                        break;
-                                    }
-                                }
-
                                 if(_tmp_sel_state.textSelectionState != undefined)
                                 {
-                                    if(_prev_sel_state != undefined && _tmp_sel_state.obj != _prev_sel_state.obj)
-                                    {
-                                        return _arr_sel_states[_pos_sel_state];
-                                    }
+
                                     _text_sel_state = _tmp_sel_state.textSelectionState;
-                                    if(_text_sel_state[_text_sel_state.length - 1].Selection.EndPos < _cur_pos_doc)
+                                    if(b_table && isRealNumber(cur_row) && isRealNumber(cur_cell))
                                     {
-                                        return _arr_sel_states[_pos_sel_state];
-                                    }
-                                    if(_text_sel_state[_text_sel_state.length - 1].Selection.EndPos == _cur_pos_doc)
-                                    {
-                                        if(_text_sel_state[_text_sel_state.length -2][0][0].Selection.EndPos <= _cur_pos_par)
+                                        if(_text_sel_state[_text_sel_state.length - 1].CurCell.Row < cur_row)
                                         {
                                             return _arr_sel_states[_pos_sel_state];
                                         }
+                                        if(_text_sel_state[_text_sel_state.length - 1].CurCell.Row === cur_row)
+                                        {
+                                            if(_text_sel_state[_text_sel_state.length - 1].CurCell.Cell < cur_cell)
+                                                return _arr_sel_states[_pos_sel_state];
+                                            if(_text_sel_state[_text_sel_state.length - 1].CurCell.Cell === cur_cell)
+                                            {
+                                                var ind1 = 2;
+                                                if(_text_sel_state[_text_sel_state.length - ind1].Selection.EndPos < _cur_pos_doc)
+                                                {
+                                                    return _arr_sel_states[_pos_sel_state];
+                                                }
+                                                if(_text_sel_state[_text_sel_state.length - ind1].Selection.EndPos == _cur_pos_doc)
+                                                {
+                                                    if(_text_sel_state[_text_sel_state.length -ind1 -1][0][0].Selection.EndPos <= _cur_pos_par)
+                                                    {
+                                                        return _arr_sel_states[_pos_sel_state];
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
-                                }
+                                    else if(b_group && isRealNumber(cur_shape))
+                                    {
+                                        if(_tmp_sel_state.shapeIndex < cur_shape)
+                                        {
+                                            return _arr_sel_states[_pos_sel_state];
+                                        }
+                                        if(_tmp_sel_state.shapeIndex === cur_shape)
+                                        {
+                                            var ind1 =  1;
+                                            if(_text_sel_state[_text_sel_state.length - ind1].Selection.EndPos < _cur_pos_doc)
+                                            {
+                                                return _arr_sel_states[_pos_sel_state];
+                                            }
+                                            if(_text_sel_state[_text_sel_state.length - ind1].Selection.EndPos == _cur_pos_doc)
+                                            {
+                                                if(_text_sel_state[_text_sel_state.length -ind1 -1][0][0].Selection.EndPos <= _cur_pos_par)
+                                                {
+                                                    return _arr_sel_states[_pos_sel_state];
+                                                }
+                                            }
+                                        }
+                                    }
+                                    else{
+
+                                        if(_text_sel_state[_text_sel_state.length - 1].Selection.EndPos < _cur_pos_doc)
+                                        {
+                                            return _arr_sel_states[_pos_sel_state];
+                                        }
+                                        if(_text_sel_state[_text_sel_state.length - 1].Selection.EndPos == _cur_pos_doc)
+                                        {
+                                            if(_text_sel_state[_text_sel_state.length -2][0][0].Selection.EndPos <= _cur_pos_par)
+                                            {
+                                                return _arr_sel_states[_pos_sel_state];
+                                            }
+                                        }
+                                    }
+                                    }
+
+
                                 _prev_sel_state = _tmp_sel_state;
                             }
                             for(--_cur_glyph_num; _cur_glyph_num > -1; --_cur_glyph_num)

@@ -33,9 +33,74 @@ function CGraphicFrame(parent)
 
 CGraphicFrame.prototype =
 {
-    getSearchResults: function()
+    getCurDocumentContent: function()
     {
-        return null;
+        return this.graphicObject.CurCell ? this.graphicObject.CurCell.Content : null;
+    },
+
+    isSimpleObject: function()
+    {
+        return true;
+    },
+    getSearchResults: function(str)
+    {
+        if(this.graphicObject instanceof CTable)
+        {
+            var ret = [];
+            var rows = this.graphicObject.Content;
+            for(var i = 0; i < rows.length; ++i)
+            {
+                var cells = rows[i].Content;
+                for(var j = 0; j < cells.length; ++j)
+                {
+                    var cell = cells[j];
+                    var s_arr = cell.Content.getSearchResults(str);
+                    if(Array.isArray(s_arr) && s_arr.length > 0)
+                    {
+                        for(var t = 0; t < s_arr.length; ++t)
+                        {
+
+                            var s = {};
+                            s.id = STATES_ID_TEXT_ADD;
+                            s.textObject = this;
+
+
+
+                            var TableState = new Object();
+                            TableState.Selection =
+                            {
+                                Start    : true,
+                                Use      : true,
+                                StartPos :
+                                {
+                                    Pos : { Row : i, Cell : j },
+                                    X   : this.graphicObject.Selection.StartPos.X,
+                                    Y   : this.graphicObject.Selection.StartPos.Y
+                                },
+                                EndPos   :
+                                {
+                                    Pos : { Row : i, Cell : j },
+                                    X   : this.graphicObject.Selection.EndPos.X,
+                                    Y   : this.graphicObject.Selection.EndPos.Y
+                                },
+                                Type     : table_Selection_Text,
+                                Data     : null,
+                                Type2    : table_Selection_Common,
+                                Data2    : null
+                            };
+                            TableState.Selection.Data = new Array();
+                            TableState.CurCell = { Row : i, Cell : j};
+                            s_arr[t].push( TableState );
+                            s.textSelectionState = s_arr[t];
+                            ret.push(s);
+                        }
+                    }
+
+                }
+            }
+            return ret;
+        }
+        return [];
     },
     setGraphicObject: function(graphicObject)
     {
