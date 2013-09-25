@@ -2529,9 +2529,6 @@ function CBinaryFileWriter()
         _memory.len = oThis.len;
         _memory.pos = oThis.pos;
 
-        _memory.WriteByte(c_oSerImageType2.Chart);
-        _memory.WriteByte(c_oSerPropLenType.Variable);
-
         var oBinaryChartWriter = new BinaryChartWriter(_memory);
         oBinaryChartWriter.WriteChartContent(grObj);
 
