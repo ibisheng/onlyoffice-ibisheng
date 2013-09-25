@@ -415,6 +415,9 @@ CChartAsGroup.prototype =
     setChart: function(chart, bEdit)
     {
 		if ( bEdit ) {
+			
+			if ( this.chart.isEqual(chart) )
+				return;
 		
 			History.Create_NewPoint();
 			

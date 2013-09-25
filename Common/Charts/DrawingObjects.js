@@ -195,6 +195,20 @@ function asc_CChart(object) {
 
 asc_CChart.prototype = {
 
+	isEqual: function(chart) {
+		return ( this.type == chart.type &&
+				 this.subType == chart.subType &&
+				 this.styleId == chart.styleId &&
+				 this.bShowValue == chart.bShowValue &&
+				 this.bShowBorder == chart.bShowBorder &&
+				 this.header.isEqual(chart.header) &&
+				 this.range.isEqual(chart.range) &&
+				 this.xAxis.isEqual(chart.xAxis) &&
+				 this.yAxis.isEqual(chart.yAxis) &&
+				 this.legend.isEqual(chart.legend) &&
+				 this.series.length == chart.series.length);
+	},
+
 	asc_getType: function() { return this.type; },
 	asc_setType: function(type) { this.type = type; },
 
