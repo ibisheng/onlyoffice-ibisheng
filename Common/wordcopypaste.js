@@ -1650,6 +1650,11 @@ CopyProcessor.prototype =
 							{
 								this.oBinaryFileWriter.CopyEnd();
 								var sBase64 = this.oBinaryFileWriter.GetResult();
+								if(this.ElemToSelect.children && this.ElemToSelect.children.length == 1 && window.USER_AGENT_SAFARI_MACOS)
+								{
+									$(this.ElemToSelect.children[0]).css("font-weight", "normal");;
+									$(this.ElemToSelect.children[0]).wrap(document.createElement("b"));
+								}
 								if(this.ElemToSelect.children[0])
 									$(this.ElemToSelect.children[0]).addClass("docData;" + sBase64);
 							}
@@ -1712,6 +1717,11 @@ CopyProcessor.prototype =
 							{
 								this.oBinaryFileWriter.CopyEnd();
 								var sBase64 = this.oBinaryFileWriter.GetResult();
+								if(this.ElemToSelect.children && this.ElemToSelect.children.length == 1 && window.USER_AGENT_SAFARI_MACOS)
+								{
+									$(this.ElemToSelect.children[0]).css("font-weight", "normal");;
+									$(this.ElemToSelect.children[0]).wrap(document.createElement("b"));
+								}
 								if(this.ElemToSelect.children[0])
 									$(this.ElemToSelect.children[0]).addClass("docData;" + sBase64);
 							}
@@ -1830,6 +1840,11 @@ CopyProcessor.prototype =
             }
             var sBase64 = this.oPresentationWriter.GetBase64Memory();
             sBase64 = "" + this.oPresentationWriter.pos + ";" + sBase64;
+			if(this.ElemToSelect.children && this.ElemToSelect.children.length == 1 && window.USER_AGENT_SAFARI_MACOS)
+			{
+				$(this.ElemToSelect.children[0]).css("font-weight", "normal");;
+				$(this.ElemToSelect.children[0]).wrap(document.createElement("b"));
+			}
             if(this.ElemToSelect.children[0])
                 $(this.ElemToSelect.children[0]).addClass("docData;" + sBase64);
         }
@@ -1837,6 +1852,11 @@ CopyProcessor.prototype =
 		if(copyPasteUseBinery && this.oBinaryFileWriter.copyParams.itemCount > 0)
 		{
 			var sBase64 = this.oBinaryFileWriter.GetResult();
+			if(this.ElemToSelect.children && this.ElemToSelect.children.length == 1 && window.USER_AGENT_SAFARI_MACOS)
+			{
+				$(this.ElemToSelect.children[0]).css("font-weight", "normal");;
+				$(this.ElemToSelect.children[0]).wrap(document.createElement("b"));
+			}
 			if(this.ElemToSelect.children[0])
 				$(this.ElemToSelect.children[0]).addClass("docData;" + sBase64);
 		}
