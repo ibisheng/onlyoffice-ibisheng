@@ -717,40 +717,20 @@ function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY, chart)
 		{
 			var widthText;
 			var widthLine = 28;
-			if(bar.type == 'hbar' || bar.type == 'bar' || chart.type == 'Area')
-				widthLine = 7;
+			if(bar.type == 'bar' || bar.type == 'hbar' || bar.type == 'hbar' || (bar.type == 'line' && bar._otherProps_filled) || bar.type == 'pie')
+				widthLine = 8;
 			//+ высота легенды
 			if(bar._otherProps._key_halign == 'top' || bar._otherProps._key_halign == 'bottom')
 			{
 				var font = getFontProperties("key");
 				var props = getMaxPropertiesText(context,font,bar._otherProps._key);
 				//длинные подписи, или их большое количество разделяем на несколько строк
-				var maxWidthOneLineKey = 0.9*chartCanvas.width;
-				var widthRow = 0;
+				bar._otherProps._key_levels = getLevelsKey(chartCanvas, context, font, scale);
+				
 				var level = 0;
-				var levelKey = [];
-				var n = 0;
-				for(var i = 0; i < bar._otherProps._key.length; i++)
-				{					
-					widthText = getMaxPropertiesText(context,font,bar._otherProps._key[i]).width/scale;
-					widthRow += widthText + 2 + widthLine;
-					if(!levelKey[level])
-						levelKey[level] = [];
-					if(widthRow > maxWidthOneLineKey)
-					{
-						level++;
-						widthRow = 0;
-						n = 0;
-						i--;
-					}
-					else
-					{
-						levelKey[level][n] = bar._otherProps._key[i];
-						n++;
-					}
-				}
-				bar._otherProps._key_levels = levelKey;
-				bar._otherProps._key_width = maxWidthOneLineKey;
+				if(bar._otherProps._key_levels && bar._otherProps._key_levels.length)
+					level = bar._otherProps._key_levels.length;
+				
 				var heigthTextKey = (context.getHeightText()/0.75);
 				var kF = 1;
 				if(bar.type == 'pie')
@@ -2657,4 +2637,65 @@ function cutLabels(maxWidthAxisLabels, label)
 		label = newLabel;
 	}
 	return label;
+}
+
+function getLevelsKey(chartCanvas, context, font, scale)
+{
+	var widthLine = 28;
+	if(bar.type == 'bar' || bar.type == 'hbar' || bar.type == 'hbar' || (bar.type == 'line' && bar._otherProps_filled) || bar.type == 'pie')
+		widthLine = 8;
+	var maxWidthOneLineKey = 0.9*chartCanvas.width;
+	var widthRow = 0;
+	var level = 0;
+	var levelKey = [];
+	var n = 0;
+	
+	var allWidthKeys = 0;
+	for(var i = 0; i < bar._otherProps._key.length; i++)
+	{					
+		widthText = getMaxPropertiesText(context,font,bar._otherProps._key[i]).width/scale;
+		allWidthKeys += widthText + 2 + widthLine;
+	}
+	
+	if(allWidthKeys > maxWidthOneLineKey)
+	{
+		var tempLevel = Math.ceil(allWidthKeys/maxWidthOneLineKey);
+		var realMaxLine = allWidthKeys/tempLevel;
+		if(tempLevel >= bar._otherProps._key.length)
+		{
+			for(var i = 0; i < bar._otherProps._key.length; i++)
+			{
+				if(!levelKey[i])
+					levelKey[i] = [];
+				levelKey[i][0] = bar._otherProps._key[i];
+			}
+		}
+		else
+		{
+			var keyOnOneLevel = Math.floor(bar._otherProps._key.length/tempLevel);
+			for(var i = 0; i < bar._otherProps._key.length; i++)
+			{					
+				widthText = getMaxPropertiesText(context,font,bar._otherProps._key[i]).width/scale;
+				widthRow += widthText + 2 + widthLine;
+				if(!levelKey[level])
+					levelKey[level] = [];
+				if(level > tempLevel)
+					break;
+				if(widthRow > maxWidthOneLineKey || n > keyOnOneLevel)
+				{
+					level++;
+					widthRow = 0;
+					n = 0;
+					i--;
+				}
+				else
+				{
+					levelKey[level][n] = bar._otherProps._key[i];
+					n++;
+				}
+			}
+		}
+		
+	}
+	return levelKey;
 }
