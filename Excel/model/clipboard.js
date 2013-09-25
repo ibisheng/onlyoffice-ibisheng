@@ -840,7 +840,8 @@
 						if (window.GlobalPasteFlagCounter == 1)
 						{
 							t._bodyPaste(worksheet,e);
-							window.GlobalPasteFlagCounter = 2;
+							if (window.GlobalPasteFlag)
+								window.GlobalPasteFlagCounter = 2;
 						}
 					};
                     document.body.appendChild( pastebin );
@@ -857,7 +858,8 @@
 						if (window.GlobalPasteFlagCounter == 1)
 						{
 							t._bodyPaste(worksheet,e);
-							window.GlobalPasteFlagCounter = 2;
+							if (window.GlobalPasteFlag)
+								window.GlobalPasteFlagCounter = 2;
 						}
 					};
                 }
@@ -2697,7 +2699,8 @@ function Editor_CopyPaste_Create(api)
         if (window.GlobalPasteFlagCounter == 1)
         {
             api.wb.clipboard._bodyPaste(api.wb.getWorksheet(), e);
-            window.GlobalPasteFlagCounter = 2;
+			if (window.GlobalPasteFlag)
+				window.GlobalPasteFlagCounter = 2;
         }
     };
 
