@@ -1613,6 +1613,26 @@ CGraphicObjects.prototype = {
         editor.WordControl.m_oLogicDocument.recalcMap[image.Id] = image;
     },
 
+
+    groupShapes: function()
+    {
+        var objects_for_group = [];
+        var spTree = this.slide.cSld.spTree;
+        for(var i = 0;  i < spTree.length; ++i)
+        {
+            if(spTree[i].selected)
+            {
+                objects_for_group.push(spTree[i]);
+            }
+        }
+        this.slide.removeSelectedObjects();
+        for(var i = 0; i < objects_for_group.length; ++i)
+        {
+
+        }
+    },
+
+
     addChart: function(binary)
     {
         var chart = new CChartAsGroup(this.slide);

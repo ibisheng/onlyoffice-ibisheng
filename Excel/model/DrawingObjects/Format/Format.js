@@ -4575,6 +4575,21 @@ function CTheme()
         }
         return new CLn();
     }
+
+    this.changeColorScheme = function(clrScheme)
+    {
+        this.themeElements.clrScheme = clrScheme;
+    };
+
+    this.setFontScheme = function(fontScheme)
+    {
+        this.themeElements.fontScheme = fontScheme;
+    };
+
+    this.setFormatScheme = function(fmtScheme)
+    {
+        this.themeElements.fmtScheme = fmtScheme;
+    };
 }
 // ----------------------------------
 

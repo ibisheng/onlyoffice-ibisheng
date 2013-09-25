@@ -3469,7 +3469,7 @@ CShape.prototype =
 
     canGroup: function()
     {
-        return true;//TODO
+        return !this.isPlaceholder();//TODO
     },
 
 

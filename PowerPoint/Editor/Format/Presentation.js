@@ -1020,6 +1020,17 @@ CPresentation.prototype =
         return this.DrawingObjects.canUnGroup();
     },
 
+    groupShapes: function()
+    {
+        if(this.Document_Is_SelectionLocked(changestype_DrawingProps) === false)
+        {
+            this.Slides[this.CurPage].graphicObjects.groupShapes();
+            this.Recalculate();
+        }
+    },
+
+
+
     Add_FlowImage : function(W, H, Img)
     {
         this.Slides[this.CurPage].graphicObjects.Add_FlowImage(W, H, Img);
