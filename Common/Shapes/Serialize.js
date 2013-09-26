@@ -1452,7 +1452,7 @@ function BinaryPPTYLoader()
 
     // UNIFILL ----------------------------------
 
-    this.ReadRect = function()
+    this.ReadRect = function(bIsMain)
     {
         var _ret = new CSrcRect();
 
@@ -1509,6 +1509,17 @@ function BinaryPPTYLoader()
             _ret.r = 0;
         if (_ret.b == null)
             _ret.b = 0;
+
+        if (!bIsMain)
+        {
+            var _absW = Math.abs(_ret.l) + Math.abs(_ret.r) + 100;
+            var _absH = Math.abs(_ret.t) + Math.abs(_ret.b) + 100;
+
+            _ret.l = -100 * _ret.l / _absW;
+            _ret.t = -100 * _ret.t / _absH;
+            _ret.r = -100 * _ret.r / _absW;
+            _ret.b = -100 * _ret.b / _absH;
+        }
 
         _ret.r = 100 - _ret.r;
         _ret.b = 100 - _ret.b;
@@ -1767,13 +1778,39 @@ function BinaryPPTYLoader()
                             }
                             case 1:
                             {
-                                uni_fill.fill.srcRect = this.ReadRect();
+                                uni_fill.fill.srcRect = this.ReadRect(true);
                                 break;
                             }
                             case 2:
                             {
                                 uni_fill.fill.tile = true;
                                 s.SkipRecord();
+                                break;
+                            }
+                            case 3:
+                            {
+                                var _e2 = s.cur + s.GetLong() + 4;
+
+                                while (s.cur < _e2)
+                                {
+                                    var _t = s.GetUChar();
+
+                                    switch (_t)
+                                    {
+                                        case 0:
+                                        {
+                                            uni_fill.fill.srcRect = this.ReadRect(false);
+                                            break;
+                                        }
+                                        default:
+                                        {
+                                            s.SkipRecord();
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                s.Seek2(_e2);
                                 break;
                             }
                             default:
