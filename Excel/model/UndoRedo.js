@@ -3155,8 +3155,9 @@ UndoRedoWoorksheet.prototype = {
 		else if(historyitem_Worksheet_MoveRange == Type)
 		{
 			//todo worksheetView.autoFilters._moveAutoFilters(worksheetView ,null, null, g_oUndoRedoAutoFiltersMoveData);
-			var from = Data.from;
-			var to = Data.to;
+			var from = Asc.Range(Data.from.c1, Data.from.r1, Data.from.c2, Data.from.r2);
+			var to = Asc.Range(Data.to.c1, Data.to.r1, Data.to.c2, Data.to.r2);
+
 			if(bUndo)
 			{
 				var temp = from;
@@ -3167,8 +3168,8 @@ UndoRedoWoorksheet.prototype = {
 			{
 				var collaborativeEditing = this.wb.oApi.collaborativeEditing,
 					nSheetId = ws.getId(),
-					coBBoxTo 	= {r1:0,c1:0,r2:0,c2:0 },
-					coBBoxFrom 	= {r1:0,c1:0,r2:0,c2:0 };
+					coBBoxTo 	= Asc.Range(0, 0, 0, 0),
+					coBBoxFrom 	= Asc.Range(0, 0, 0, 0);
 
 				coBBoxTo.r1 = collaborativeEditing.getLockOtherRow2(	nSheetId, to.r1);
 				coBBoxTo.c1 = collaborativeEditing.getLockOtherColumn2(	nSheetId, to.c1);

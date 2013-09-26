@@ -3636,7 +3636,7 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo){
 	
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_MoveRange,
 				this.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0),
-				new UndoRedoData_FromTo(oBBoxFrom, oBBoxTo));
+				new UndoRedoData_FromTo(new UndoRedoData_BBox(oBBoxFrom), new UndoRedoData_BBox(oBBoxTo)));
 	History.EndTransaction();
 	return true;
 }
