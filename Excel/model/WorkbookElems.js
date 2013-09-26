@@ -3366,7 +3366,12 @@ RangeDataManager.prototype = {
 				// {
 					// var elem = this.oElements[i];
 					// if(null != elem.bbox.intersectionSimple(bbox))
-						// this._getExecElem(elem, oFindElems);
+					// {
+						// if(this.bAllowIntersect)
+							// this._getExecElem([elem], oFindElems);
+						// else
+							// this._getExecElem(elem, oFindElems);
+					// }
 				// }
 			// }
 			// else
