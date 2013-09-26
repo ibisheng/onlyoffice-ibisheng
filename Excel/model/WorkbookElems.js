@@ -3012,7 +3012,7 @@ CCellValue.prototype =
 		this.setValue(sSimpleText);
 		var nRow = this.cell.oId.getRow0();
 		var nCol = this.cell.oId.getCol0();
-		if(CellValueType.String == this.type && null != this.cell.ws.hyperlinkManager.getByCell(nRow, nCol))
+		if(CellValueType.String == this.type && null == this.cell.ws.hyperlinkManager.getByCell(nRow, nCol))
 		{
 			this.clean();
 			this.type = CellValueType.String;
