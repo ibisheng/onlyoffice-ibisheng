@@ -979,7 +979,18 @@
                     var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
                     var sHtml = null;
 					var isText = false;
-                    if (/text\/html/.test(e.clipboardData.types))
+					var fTest = function(types, sPattern)
+					{
+						if (!types)
+							return false;
+						for(var i = 0, length = types.length; i < length; ++i)
+						{
+							if(sPattern == types[i])
+								return true;
+						}
+						return false;
+					}
+                    if (fTest(e.clipboardData.types, "text/html"))
                     {
                         var sHtml = e.clipboardData.getData('text/html');
                         //Иногда при выделении одной строки из Word в chrome добавляем непонятные символы после </html>, обрезаем их.
@@ -987,7 +998,7 @@
                         if(-1 != nIndex)
                             sHtml = sHtml.substring(0, nIndex + "</html>".length);
                     }
-                    else if (is_chrome && /text\/plain/.test(e.clipboardData.types))
+                    else if (is_chrome && fTest(e.clipboardData.types, "text/plain"))
                     {
                         bExist = true;
                         var sText = e.clipboardData.getData('text/plain');
