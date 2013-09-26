@@ -674,6 +674,12 @@ DrawingObjectsController.prototype =
 
     unGroup: function()
     {
+        this.checkSelectedObjectsAndCallback(this.unGroupCallback, null)
+    },
+
+    unGroupCallback: function()
+    {
+        History.Create_NewPoint();
 		if(isRealObject(this.curState.group) )
 		{
 			this.curState.group.resetSelection();

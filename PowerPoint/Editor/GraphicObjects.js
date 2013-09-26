@@ -175,6 +175,13 @@ CGraphicObjects.prototype = {
     },
 
 
+    Paragraph_ClearFormatting: function()
+    {
+        if(this.State.textObject && this.State.textObject.Paragraph_ClearFormatting)
+        {
+            this.State.textObject.Paragraph_ClearFormatting();
+        }
+    },
     Update_CursorType: function(x, y,  e )
     {
         switch(this.State.id)
@@ -832,6 +839,31 @@ CGraphicObjects.prototype = {
                         }
                     }
                 }
+
+                var charts = by_types.charts;
+                for(var i = 0; i < charts.length; ++i)
+                {
+                    if(!isRealObject(chart_props))
+                    {
+                        chart_props = {fromGroup: this.State.id === STATES_ID_GROUP || this.State.id === STATES_ID_TEXT_ADD_IN_GROUP};
+                        chart_props.ChartProperties = charts[i].chart;
+                    }
+                    else
+                    {
+                        chart_props.chart = null;
+                        chart_props.severalCharts = true;
+                        if(chart_props.severalChartTypes !== true)
+                        {
+                            if(!(chart_props.ChartProperties.type === charts[i].chart.type && chart_props.ChartProperties.subType === charts[i].chart.subType) )
+                                chart_props.severalChartTypes = true;
+                        }
+                        if(chart_props.severalChartStyles !== true)
+                        {
+                            if(chart_props.ChartProperties.styleId !== charts[i].chart.styleId )
+                                chart_props.severalChartStyles = true;
+                        }
+                    }
+                }
                 break;
             }
         }
@@ -848,6 +880,12 @@ CGraphicObjects.prototype = {
             if(shape_props !== null)
             {
                 editor.sync_shapePropCallback(shape_props);
+            }
+
+            if(chart_props)
+            {
+
+                editor.sync_ImgPropCallback(chart_props);
             }
 
             this.State.textObject.updateInterfaceTextState();
@@ -905,6 +943,12 @@ CGraphicObjects.prototype = {
             if(shape_props !== null)
             {
                 editor.sync_shapePropCallback(shape_props);
+            }
+
+            if(chart_props)
+            {
+
+                editor.sync_ImgPropCallback(chart_props);
             }
         }
 

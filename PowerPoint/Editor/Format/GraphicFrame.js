@@ -114,6 +114,31 @@ CGraphicFrame.prototype =
         this.nvGraphicFramePr = pr;
     },
 
+    paragraphFormatPaste: function(CopyTextPr, CopyParaPr, Bool)
+    {
+        if(isRealObject(this.graphicObject))
+        {
+            this.graphicObject.Paragraph_Format_Paste(CopyTextPr, CopyParaPr, Bool);
+
+            this.recalcInfo.recalculateContent = true;
+            this.recalcInfo.recalculateTransformText = true;
+            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+        }
+
+    },
+
+    Paragraph_ClearFormatting: function()
+    {
+        if(isRealObject(this.graphicObject))
+        {
+            this.graphicObject.Paragraph_ClearFormatting();
+
+            this.recalcInfo.recalculateContent = true;
+            this.recalcInfo.recalculateTransformText = true;
+            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+        }
+
+    },
 
     Set_Props: function(props)
     {

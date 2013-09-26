@@ -1742,6 +1742,10 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
     this.trackEnd = function()
     {
 
+        if(!isRealObject(this.original.group))
+        {
+            this.original.normalize();
+        }
         this.original.setOffset(this.x, this.y);
         this.original.setExtents(this.extX, this.extY);
         this.original.setChildExtents(this.extX, this.extY);

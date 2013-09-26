@@ -213,7 +213,7 @@ function NullState(drawingObjectsController, drawingObjects)
                     {
                         this.drawingObjectsController.clearPreTrackObjects();
                         var is_selected = cur_drawing.selected;
-                        if(!(e.CtrlKey || e.ShiftKey))
+                        if(!(e.CtrlKey || e.ShiftKey) && !is_selected)
                             this.drawingObjectsController.resetSelection();
                         cur_drawing.select(this.drawingObjectsController);
                         this.drawingObjects.OnUpdateOverlay();
@@ -1651,6 +1651,17 @@ function TextAddState(drawingObjectsController, drawingObjects, textObject)
         {
             this.textObject.selectionSetEnd(e, x, y);
             this.drawingObjectsController.updateSelectionState();
+            if(editor.isPaintFormat)
+            {
+                var doc = editor.WordControl.m_oLogicDocument;
+                if(this.textObject.paragraphFormatPaste && doc.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+                {
+                    History.Create_NewPoint();
+                    this.textObject.paragraphFormatPaste(doc.CopyTextPr, doc.CopyParaPr, false);
+                    editor.sync_PaintFormatCallback( false );
+                    doc.Recalculate();
+                }
+            }
         }
     };
 

@@ -591,6 +591,7 @@ CPresentation.prototype =
             this.DrawingDocument.OnRecalculatePage(i, this.Slides[i]);
         }
         this.DrawingDocument.OnEndRecalculate();
+        this.Slides[this.CurPage].graphicObjects.updateSelectionState();
     },
 
     updateSlideIndexes: function()
@@ -1334,66 +1335,11 @@ CPresentation.prototype =
 
     Paragraph_ClearFormatting : function()
     {
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-            return this.HdrFtr.Paragraph_ClearFormatting();
-        else if ( docpostype_DrawingObjects === this.CurPos.Type )
-            return this.DrawingObjects.paragraphClearFormatting();
-        else //if ( docpostype_Content === this.CurPos.Type )
+        if(this.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
         {
-            if ( true === this.Selection.Use )
-            {
-                if ( selectionflag_Common === this.Selection.Flag )
-                {
-                    var StartPos = this.Selection.StartPos;
-                    var EndPos  = this.Selection.EndPos;
-                    if ( StartPos > EndPos )
-                    {
-                        var Temp = StartPos;
-                        StartPos = EndPos;
-                        EndPos = Temp;
-                    }
-
-                    for ( var Index = StartPos; Index <= EndPos; Index++ )
-                    {
-                        var Item = this.Content[Index];
-                        if ( type_Table === Item.GetType() )
-                            Item.Paragraph_ClearFormatting();
-                        else if ( type_Paragraph === Item.GetType() )
-                        {
-                            Item.Clear_Formatting();
-                            Item.Clear_TextFormatting();
-                        }
-                    }
-
-                    // Нам нужно пересчитать все изменения, начиная с первого элемента,
-                    // попавшего в селект.
-                    this.ContentLastChangePos = StartPos;
-
-                    this.Recalculate();
-
-                    this.Document_UpdateSelectionState();
-                    this.Document_UpdateInterfaceState();
-                }
-            }
-            else
-            {
-                var Item = this.Content[this.CurPos.ContentPos];
-                if ( type_Table === Item.GetType() )
-                    Item.Paragraph_ClearFormatting();
-                else if ( type_Paragraph === Item.GetType() )
-                {
-                    Item.Clear_Formatting();
-                    Item.Clear_TextFormatting();
-
-                    // Нам нужно пересчитать все изменения, начиная с текущего элемента
-                    this.ContentLastChangePos = this.CurPos.ContentPos;
-                    this.Recalculate();
-                }
-
-                this.Document_UpdateSelectionState();
-                this.Document_UpdateInterfaceState();
-            }
+            History.Create_NewPoint();
+            this.Slides[this.CurPage].graphicObjects.Paragraph_ClearFormatting();
+            this.Recalculate();
         }
     },
 
@@ -1681,119 +1627,12 @@ CPresentation.prototype =
 
     Get_Paragraph_TextPr_Copy : function()
     {
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-            return this.HdrFtr.Get_Paragraph_TextPr_Copy();
-        else if ( docpostype_DrawingObjects === this.CurPos.Type )
-            return this.DrawingObjects.getParagraphTextPrCopy();
-        else //if ( docpostype_Content === this.CurPos.Type )
-        {
-            var Result_TextPr = null;
-
-            if ( true === this.Selection.Use )
-            {
-                var VisTextPr;
-                switch ( this.Selection.Flag )
-                {
-                    case selectionflag_Common:
-                    {
-                        var StartPos = this.Selection.StartPos;
-                        if ( this.Selection.EndPos < StartPos )
-                            StartPos = this.Selection.EndPos;
-
-                        var Item = this.Content[StartPos];
-                        if ( type_Paragraph == Item.GetType() )
-                        {
-                            var StartPos_item = Item.Selection.StartPos;
-                            if ( Item.Selection.EndPos < StartPos_item )
-                                StartPos_item = Item.Selection.EndPos;
-
-                            VisTextPr = Item.Internal_CalculateTextPr( StartPos_item - 1 );
-                        }
-                        else if ( type_Table == Item.GetType() )
-                            VisTextPr = Item.Get_Paragraph_TextPr_Copy();
-
-                        break;
-                    }
-                    case selectionflag_Numbering:
-                    {
-                        // Текстовые настройки применяем к конкретной нумерации
-                        if ( null == this.Selection.Data || this.Selection.Data.length <= 0 )
-                            break;
-
-                        var NumPr = this.Content[this.Selection.Data[0]].Numbering_Get();
-                        VisTextPr = this.Numbering.Get_AbstractNum( NumPr.NumId ).Lvl[NumPr.Lvl].TextPr;
-
-                        break;
-                    }
-                }
-
-                Result_TextPr = VisTextPr;
-            }
-            else
-            {
-                var Item = this.Content[this.CurPos.ContentPos];
-                if ( type_Paragraph == Item.GetType() )
-                {
-                    Result_TextPr = Item.Internal_CalculateTextPr( Item.CurPos.ContentPos - 1 );
-                }
-                else if ( type_Table == Item.GetType() )
-                {
-                    Result_TextPr = Item.Get_Paragraph_TextPr_Copy();
-                }
-            }
-
-            return Result_TextPr;
-        }
+        return this.Slides[this.CurPage].graphicObjects.Get_Paragraph_TextPr().Copy();
     },
 
     Get_Paragraph_ParaPr_Copy : function()
     {
-        // Работаем с колонтитулом
-        if ( docpostype_HdrFtr === this.CurPos.Type )
-            return this.HdrFtr.Get_Paragraph_ParaPr_Copy();
-        else if ( docpostype_DrawingObjects === this.CurPos.Type )
-            return this.DrawingObjects.getParagraphParaPrCopy();
-        else //if ( docpostype_Content === this.CurPos.Type )
-        {
-            var Result_ParaPr = null;
-
-            if ( true === this.Selection.Use )
-            {
-                switch ( this.Selection.Flag )
-                {
-                    case selectionflag_Common:
-                    {
-                        var StartPos = this.Selection.StartPos;
-                        if ( this.Selection.EndPos < StartPos )
-                            StartPos = this.Selection.EndPos;
-
-                        var Item = this.Content[StartPos];
-                        Result_ParaPr = Item.Get_Paragraph_ParaPr_Copy();
-
-                        break;
-                    }
-                    case selectionflag_Numbering:
-                    {
-                        // Текстовые настройки применяем к конкретной нумерации
-                        if ( null == this.Selection.Data || this.Selection.Data.length <= 0 )
-                            break;
-
-                        var NumPr = this.Content[this.Selection.Data[0]].Numbering_Get();
-                        Result_ParaPr = this.Numbering.Get_AbstractNum( NumPr.NumId ).Lvl[NumPr.Lvl].ParaPr;
-
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                var Item = this.Content[this.CurPos.ContentPos];
-                Result_ParaPr = Item.Get_Paragraph_ParaPr_Copy();
-            }
-
-            return Result_ParaPr;
-        }
+        return this.Slides[this.CurPage].graphicObjects.Get_Paragraph_ParaPr().Copy();
     },
 
     Get_AllParagraphs_ByNumbering : function(NumPr)
@@ -5083,7 +4922,8 @@ CPresentation.prototype =
             }
         }  */
 
-        editor.sync_EndCatchSelectedElements();
+        var slide = this.Slides[this.CurPage];
+        editor.sync_EndCatchSelectedElements({theme:slide.Layout.Master.Theme,slide: slide, layout:slide.Layout, master:slide.Layout.Master});
         this.Document_UpdateRulersState();
         this.Document_UpdateUndoRedoState();
         this.Document_UpdateCanAddHyperlinkState();

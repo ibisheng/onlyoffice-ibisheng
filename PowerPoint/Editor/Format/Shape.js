@@ -310,11 +310,19 @@ CShape.prototype =
     {
         if(this.txBody)
         {
-            return this.txBody.content.Get_Paragraph_ParPr();
+            return this.txBody.content.Get_Paragraph_ParaPr();
         }
         return new CParaPr();
     },
 
+
+    Paragraph_ClearFormatting: function()
+    {
+        if(this.txBody)
+        {
+            return this.txBody.content.Paragraph_ClearFormatting();
+        }
+    },
 
 
     initDefaultTextRect: function(x, y, extX, extY, flipH, flipV)
@@ -2647,6 +2655,19 @@ CShape.prototype =
             this.recalcInfo.recalculateTransformText = true;
             editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
         }
+    },
+
+    paragraphFormatPaste: function(CopyTextPr, CopyParaPr, Bool)
+    {
+        if(isRealObject(this.txBody))
+        {
+            this.txBody.content.Paragraph_Format_Paste(CopyTextPr, CopyParaPr, Bool);
+
+            this.recalcInfo.recalculateContent = true;
+            this.recalcInfo.recalculateTransformText = true;
+            editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
+        }
+
     },
 
     setParagraphAlign: function(val)

@@ -1148,36 +1148,73 @@ function CImageSize( width, height )
 CImageSize.prototype.get_ImageWidth = function() { return this.Width; }
 CImageSize.prototype.get_ImageHeight = function() { return this.Height; }
 
+
 function CImgProperty( obj )
 {
     if( obj )
     {
-        this.Width = (undefined != obj.Width) ? obj.Width : null;
-        this.Height = (undefined != obj.Height) ? obj.Height : null;
-        this.WrappingStyle = (undefined != obj.WrappingStyle) ? obj.WrappingStyle : null;
+        this.CanBeFlow = (undefined != obj.CanBeFlow) ? obj.CanBeFlow : true;
 
-        this.Paddings = (undefined != obj.Paddings && null != obj.Paddings) ? new CPaddings (obj.Paddings) : null;
-        this.Position = (undefined != obj.Position && null != obj.Position) ? new CPosition (obj.Position) : null;
+        this.Width         = (undefined != obj.Width        ) ? obj.Width                          : undefined;
+        this.Height        = (undefined != obj.Height       ) ? obj.Height                         : undefined;
+        this.WrappingStyle = (undefined != obj.WrappingStyle) ? obj.WrappingStyle                  : undefined;
+        this.Paddings      = (undefined != obj.Paddings     ) ? new CPaddings (obj.Paddings)       : undefined;
+        this.Position      = (undefined != obj.Position     ) ? new CPosition (obj.Position)       : undefined;
+        this.AllowOverlap  = (undefined != obj.AllowOverlap ) ? obj.AllowOverlap                   : undefined;
+        this.PositionH     = (undefined != obj.PositionH    ) ? new CImagePositionH(obj.PositionH) : undefined;
+        this.PositionV     = (undefined != obj.PositionV    ) ? new CImagePositionV(obj.PositionV) : undefined;
+
+        this.Internal_Position = (undefined != obj.Internal_Position) ? obj.Internal_Position : null;
 
         this.ImageUrl = (undefined != obj.ImageUrl) ? obj.ImageUrl : null;
-        this.IsLocked = obj.IsLocked === true || obj.IsLocked === false ? obj.IsLocked : false;
+        this.Locked   = (undefined != obj.Locked) ? obj.Locked : false;
+
+
+        this.ChartProperties = (undefined != obj.ChartProperties) ? obj.ChartProperties : null;
+        this.ShapeProperties = (undefined != obj.ShapeProperties) ? /*CreateAscShapePropFromProp*/(obj.ShapeProperties) : null;
+
+        this.ChangeLevel = (undefined != obj.ChangeLevel) ? obj.ChangeLevel : null;
+        this.Group = (obj.Group != undefined) ? obj.Group : null;
+
+        this.fromGroup = obj.fromGroup != undefined ? obj.fromGroup : null;
+        this.severalCharts = obj.severalCharts != undefined ? obj.severalCharts : false;
+        this.severalChartTypes = obj.severalChartTypes != undefined ? obj.severalChartTypes : undefined;
+        this.severalChartStyles = obj.severalChartStyles != undefined ? obj.severalChartStyles : undefined;
+        this.verticalTextAlign = obj.verticalTextAlign != undefined ? obj.verticalTextAlign : undefined;
     }
     else
     {
-        this.Width = null;
-        this.Height = null;
-        this.WrappingStyle = null;
-        this.Paddings = new CPaddings ();	// default values
-        this.Position = new CPosition ();	// default values
+        this.CanBeFlow = true;
+        this.Width         = undefined;
+        this.Height        = undefined;
+        this.WrappingStyle = undefined;
+        this.Paddings      = undefined;
+        this.Position      = undefined;
+        this.PositionH     = undefined;
+        this.PositionV     = undefined;
+        this.Internal_Position = null;
         this.ImageUrl = null;
-        this.IsLocked = false;
+        this.Locked   = false;
+
+        this.ChartProperties = null;
+        this.ShapeProperties = null;
+        this.ImageProperties = null;
+
+        this.ChangeLevel = null;
+        this.Group = null;
+        this.fromGroup = null;
+        this.severalCharts = false;
+        this.severalChartTypes = undefined;
+        this.severalChartStyles = undefined;
+        this.verticalTextAlign = undefined;
     }
 }
+CImgProperty.prototype.get_ChangeLevel = function() { return this.ChangeLevel; };
+CImgProperty.prototype.put_ChangeLevel = function(v) { this.ChangeLevel = v; };
 
+CImgProperty.prototype.get_CanBeFlow = function() { return this.CanBeFlow; }
 CImgProperty.prototype.get_Width = function() { return this.Width; }
 CImgProperty.prototype.put_Width = function(v) { this.Width = v; }
-CImgProperty.prototype.get_Locked = function() { return this.IsLocked; }
-CImgProperty.prototype.put_Locked = function(v) { this.IsLocked = v; }
 CImgProperty.prototype.get_Height = function() { return this.Height; }
 CImgProperty.prototype.put_Height = function(v) { this.Height = v; }
 CImgProperty.prototype.get_WrappingStyle = function() { return this.WrappingStyle; }
@@ -1186,32 +1223,95 @@ CImgProperty.prototype.put_WrappingStyle = function(v) { this.WrappingStyle = v;
 CImgProperty.prototype.get_Paddings = function() { return this.Paddings; }
 // Аргумент объект класса CPaddings
 CImgProperty.prototype.put_Paddings = function(v) { this.Paddings = v; }
+CImgProperty.prototype.get_AllowOverlap = function() {return this.AllowOverlap;}
+CImgProperty.prototype.put_AllowOverlap = function(v) {this.AllowOverlap = v;}
 // Возвращается объект класса CPosition
 CImgProperty.prototype.get_Position = function() { return this.Position; }
 // Аргумент объект класса CPosition
 CImgProperty.prototype.put_Position = function(v) { this.Position = v; }
+CImgProperty.prototype.get_PositionH = function()  { return this.PositionH; }
+CImgProperty.prototype.put_PositionH = function(v) { this.PositionH = v; }
+CImgProperty.prototype.get_PositionV = function()  { return this.PositionV; }
+CImgProperty.prototype.put_PositionV = function(v) { this.PositionV = v; }
+CImgProperty.prototype.get_Value_X = function(RelativeFrom) { if ( null != this.Internal_Position ) return this.Internal_Position.Calculate_X_Value(RelativeFrom);  return 0; }
+CImgProperty.prototype.get_Value_Y = function(RelativeFrom) { if ( null != this.Internal_Position ) return this.Internal_Position.Calculate_Y_Value(RelativeFrom);  return 0; }
+
 CImgProperty.prototype.get_ImageUrl = function() { return this.ImageUrl; }
 CImgProperty.prototype.put_ImageUrl = function(v) { this.ImageUrl = v; }
+CImgProperty.prototype.get_Group = function() { return this.Group; }
+CImgProperty.prototype.put_Group = function(v) { this.Group = v; }
+CImgProperty.prototype.get_FromGroup = function() { return this.fromGroup; }
+CImgProperty.prototype.put_FromGroup = function(v) { this.fromGroup = v; }
+
+CImgProperty.prototype.get_isChartProps = function() { return this.isChartProps; }
+CImgProperty.prototype.put_isChartPross = function(v) { this.isChartProps = v; }
+
+
+CImgProperty.prototype.get_SeveralCharts = function() { return this.severalCharts; }
+CImgProperty.prototype.put_SeveralCharts = function(v) { this.severalCharts = v; }
+CImgProperty.prototype.get_SeveralChartTypes = function() { return this.severalChartTypes; }
+CImgProperty.prototype.put_SeveralChartTypes = function(v) { this.severalChartTypes = v; }
+
+CImgProperty.prototype.get_SeveralChartStyles = function() { return this.severalChartStyles; }
+CImgProperty.prototype.put_SeveralChartStyles = function(v) { this.severalChartStyles = v; }
+
+CImgProperty.prototype.get_VerticalTextAlign = function() { return this.verticalTextAlign; };
+CImgProperty.prototype.put_VerticalTextAlign = function(v) { this.verticalTextAlign = v; };
+
 CImgProperty.prototype.get_OriginSize = function(api)
 {
-    var _img = api.ImageLoader.map_image_index[_getFullImageSrc(this.ImageUrl)];
-    if (_img != undefined && _img.Image != null || _img.Status == ImageLoadStatus.Loading)
+    var _image = api.ImageLoader.map_image_index[_getFullImageSrc(this.ImageUrl)];
+    if (_image != undefined && _image.Image != null && _image.Status == ImageLoadStatus.Complete)
     {
-        var _w = _img.Image.width;
-        var _h = _img.Image.height;
+        var _w = Math.max(1, Page_Width - (X_Left_Margin + X_Right_Margin));
+        var _h = Math.max(1, Page_Height - (Y_Top_Margin + Y_Bottom_Margin));
 
-        var _max = Math.min(api.WordControl.m_oLogicDocument.Width, api.WordControl.m_oLogicDocument.Height) * g_dKoef_mm_to_pix;
-        if (_w > _max || _h > _max)
+        var bIsCorrect = false;
+        if (_image.Image != null)
         {
-            var _koef = _max / Math.max(1, Math.max(_w, _h));
+            var __w = Math.max(parseInt(_image.Image.width * g_dKoef_pix_to_mm), 1);
+            var __h = Math.max(parseInt(_image.Image.height * g_dKoef_pix_to_mm), 1);
 
-            _w = (_koef * _w) >> 0;
-            _h = (_koef * _h) >> 0;
+            var dKoef = Math.max(__w / _w, __h / _h);
+            if (dKoef > 1)
+            {
+                _w = Math.max(5, __w / dKoef);
+                _h = Math.max(5, __h / dKoef);
+
+                bIsCorrect = true;
+            }
+            else
+            {
+                _w = __w;
+                _h = __h;
+            }
         }
-        return new CImageSize((_w * g_dKoef_pix_to_mm) >> 0, (_h * g_dKoef_pix_to_mm) >> 0);
+
+        return new CImageSize( parseInt(_w), parseInt(_h), bIsCorrect);
     }
-    return new CImageSize( 50, 50 );
+    return new CImageSize( 50, 50, false );
 }
+CImgProperty.prototype.get_Locked = function() { return this.Locked; }
+
+CImgProperty.prototype.get_ChartProperties = function()
+{
+    return this.ChartProperties;
+};
+
+CImgProperty.prototype.put_ChartProperties = function(v)
+{
+    this.ChartProperties = v;
+};
+
+CImgProperty.prototype.get_ShapeProperties = function()
+{
+    return this.ShapeProperties;
+};
+
+CImgProperty.prototype.put_ShapeProperties = function(v)
+{
+    this.ShapeProperties = v;
+};
 
 function CHeaderProp( obj )
 {

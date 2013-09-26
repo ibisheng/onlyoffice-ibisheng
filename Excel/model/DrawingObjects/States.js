@@ -180,7 +180,7 @@ function NullState(drawingObjectsController, drawingObjects)
                         {
                             this.drawingObjectsController.clearPreTrackObjects();
                             var is_selected = cur_drawing.selected;
-                            if(!(e.ctrlKey || e.shiftKey))
+                            if(!(e.ctrlKey || e.shiftKey) && !is_selected)
                                 this.drawingObjectsController.resetSelection();
                             cur_drawing.select(this.drawingObjectsController);
                             this.drawingObjects.OnUpdateOverlay();
@@ -2189,7 +2189,7 @@ function PreMoveState(drawingObjectsController, drawingObjects, startX, startY, 
         }
         else
         {
-            if(this.majorObjectIsSelected)
+            if(this.majorObjectIsSelected && e.button !== 2)
             {
                 this.drawingObjectsController.changeCurrentState(new GroupState(this.drawingObjectsController, this.drawingObjects, this.majorObject));
                 this.drawingObjectsController.onMouseDown(e, x, y);

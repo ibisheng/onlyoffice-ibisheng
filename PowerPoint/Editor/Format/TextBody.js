@@ -553,6 +553,9 @@ CTextBody.prototype =
     OnContentRecalculate: function()
     {},
 
+
+    Set_CurrentElement: function()
+    {},
     writeToBinary: function(w)
     {
         this.bodyPr.Write_ToBinary2(w);

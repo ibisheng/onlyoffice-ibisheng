@@ -612,7 +612,7 @@ asc_docs_api.prototype.sync_BeginCatchSelectedElements = function()
     if (0 != this.SelectedObjectsStack.length)
         this.SelectedObjectsStack.splice(0, this.SelectedObjectsStack.length);
 }
-asc_docs_api.prototype.sync_EndCatchSelectedElements = function()
+asc_docs_api.prototype.sync_EndCatchSelectedElements = function(options)
 {
 
     if ( !this.chartStyleManager.isReady() || !this.chartPreviewManager.isReady() )
@@ -621,8 +621,8 @@ asc_docs_api.prototype.sync_EndCatchSelectedElements = function()
         {
             if ( this.SelectedObjectsStack[i].Value.ChartProperties )
             {
-                this.chartStyleManager.init();
-                this.chartPreviewManager.init();
+                this.chartStyleManager.init(options);
+                this.chartPreviewManager.init(options);
                 this.asc_fireCallback("asc_onUpdateChartStyles");
                 break;
             }
@@ -3113,7 +3113,8 @@ asc_docs_api.prototype.sync_AddImageCallback = function(){
 	this.asc_fireCallback("asc_onAddImage");
 }
 asc_docs_api.prototype.sync_ImgPropCallback = function(imgProp){
-    this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new CSelectedObject( c_oAscTypeSelectElement.Image, new CImgProperty( imgProp ) );
+    var type = imgProp.ChartProperties ? c_oAscTypeSelectElement.Chart : c_oAscTypeSelectElement.Image;
+    this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new CSelectedObject( type, new CImgProperty( imgProp ) );
 }
 asc_docs_api.prototype.sync_ImgWrapStyleChangedCallback = function(style){
 	this.asc_fireCallback("asc_onImgWrapStyleChanged",style);
@@ -3827,23 +3828,11 @@ asc_docs_api.prototype.DublicateSlide = function()
     var selectionArray = this.WordControl.Thumbnails.GetSelectedArray();
     var _presentation = this.WordControl.m_oLogicDocument;
 
-    var _old_slides_buffer = [];
-    for(var _buffer_index = 0; _buffer_index < _presentation.slidesBuffer.length; ++_buffer_index)
-    {
-        _old_slides_buffer.push(_presentation.slidesBuffer[_buffer_index]);
-    }
-
-    var _old_glyphs_buffer = [];
-    for(_buffer_index = 0; _buffer_index < _presentation.glyphsBuffer.length; ++_buffer_index)
-    {
-        _old_glyphs_buffer.push(_presentation.glyphsBuffer[_buffer_index]);
-    }
-
-    History.Create_NewPoint();
-    _presentation.slidesCopy(selectionArray);
-    _presentation.slidesPaste(selectionArray[selectionArray.length -1], true);
-    _presentation.slidesBuffer = _old_slides_buffer;
-    _presentation.glyphsBuffer = _old_glyphs_buffer;
+    var div = document.createElement("div");
+    var copy_processor = new CopyProcessor(editor, div);
+    copy_processor.Start();
+    var oPasteProcessor = new PasteProcessor(this, true, true, false);
+    oPasteProcessor.Start(copy_processor.ElemToSelect);
 }
 
 asc_docs_api.prototype.SelectAllSlides = function(layoutType)
