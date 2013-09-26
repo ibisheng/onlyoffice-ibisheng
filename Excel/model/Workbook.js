@@ -3428,10 +3428,7 @@ Woorksheet.prototype._moveCellVer=function(nRow, nCol, dif){
 		this.helperRebuildFormulas(cell,lastName,cell.getName());
 	}
 };
-Woorksheet.prototype._prepareMoveRange=function(oBBoxFrom, oBBoxTo){
-	var res = 0;
-	if(oBBoxFrom.isEqual(oBBoxTo))
-		return res;
+Woorksheet.prototype._prepareMoveRangeGetCleanRanges=function(oBBoxFrom, oBBoxTo){
 	var intersection = oBBoxFrom.intersectionSimple(oBBoxTo);
 	var aRangesToCheck = [];
 	if(null != intersection)
@@ -3465,6 +3462,13 @@ Woorksheet.prototype._prepareMoveRange=function(oBBoxFrom, oBBoxTo){
 	}
 	else
 		aRangesToCheck.push(this.getRange3(oBBoxTo.r1, oBBoxTo.c1, oBBoxTo.r2, oBBoxTo.c2));
+	return aRangesToCheck;
+}
+Woorksheet.prototype._prepareMoveRange=function(oBBoxFrom, oBBoxTo){
+	var res = 0;
+	if(oBBoxFrom.isEqual(oBBoxTo))
+		return res;
+	var aRangesToCheck = this._prepareMoveRangeGetCleanRanges(oBBoxFrom, oBBoxTo);
 	for(var i = 0, length = aRangesToCheck.length; i < length; i++)
 	{
 		var range = aRangesToCheck[i];
@@ -3560,8 +3564,9 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo){
 		}
 	}
 	//удаляем to через историю, для undo
-	var oRangeTo = this.getRange3(oBBoxTo.r1, oBBoxTo.c1, oBBoxTo.r2, oBBoxTo.c2);
-	oRangeTo.cleanAll();
+	var aRangesToCheck = this._prepareMoveRangeGetCleanRanges(oBBoxFrom, oBBoxTo);
+	for(var i = 0, length = aRangesToCheck.length; i < length; i++)
+		aRangesToCheck[i].cleanAll();
 	//перемещаем без истории
 	History.TurnOff();
 	//удаляем from без истории, потому что эти данные не терются а перемещаются
@@ -3569,7 +3574,7 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo){
 	oRangeFrom._setPropertyNoEmpty(null, null, function(cell, nRow0, nCol0, nRowStart, nColStart){
 		var row = oThis._getRowNoEmpty(nRow0);
 		if(null != row)
-			delete row.c[nCol0]
+			delete row.c[nCol0];
 	});
 	//lockDraw(this.workbook);
 	for(var i in aTempObj.cells)
