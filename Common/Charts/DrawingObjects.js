@@ -2354,7 +2354,7 @@ function DrawingObjects() {
 	
 	var trackOverlay = null;
 	var autoShapeTrack = null;
-	var scrollOffset = { x: 0, y: 0, x0: 0, y0: 0 };
+	var scrollOffset = { x: 0, y: 0 };
 	
 	var aObjects = null;
 	var aBoundsCheckers = [];
@@ -2869,15 +2869,8 @@ function DrawingObjects() {
 				var image = api.ImageLoader.LoadImage(aImagesSync[i], 1);	// Должна быть в мапе
 				
 				if ( image != null ) {
-									
-					var x = pxToMm(drawingObject.getVisibleLeftOffset());
-					var y = pxToMm(drawingObject.getVisibleTopOffset());
-					var w = pxToMm(drawingObject.getWidthFromTo());
-					var h = pxToMm(drawingObject.getHeightFromTo());
 					
-					// CImage
-					drawingObject.graphicObject = new CImageShape(drawingObject, _this);
-					drawingObject.graphicObject.initDefault( x, y, w, h, image.src );
+					drawingObject.graphicObject.recalculate();
 					drawingObject.setGraphicObjectCoords();
 					drawingObject.graphicObject.draw(shapeCtx);
 					aObjects.push(drawingObject);
@@ -4335,8 +4328,6 @@ function DrawingObjects() {
 		
 			scrollOffset.x -= x_px;
 			scrollOffset.y -= y_px;
-			scrollOffset.x0 -= x_px;
-			scrollOffset.y0 -= y_px;
 
 			shapeCtx.m_oCoordTransform.tx = scrollOffset.x;
 			shapeCtx.m_oCoordTransform.ty = scrollOffset.y;
