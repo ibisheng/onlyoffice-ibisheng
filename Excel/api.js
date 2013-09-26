@@ -2278,6 +2278,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 				return this.isStartAddShape;
 			},
 			
+			asc_canAddShapeHyperlink: function() {
+				var ws = this.wb.getWorksheet();
+				return ws.objectRender.controller.canAddHyperlink();
+			},
+			
 			asc_canGroupGraphicsObjects: function() {
 				var ws = this.wb.getWorksheet();
 				return ws.objectRender.controller.canGroup();
@@ -3254,6 +3259,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 		prot["asc_startAddShape"] = prot.asc_startAddShape;
 		prot["asc_endAddShape"] = prot.asc_endAddShape;
 		prot["asc_isAddAutoshape"] = prot.asc_isAddAutoshape;
+		prot["asc_canAddShapeHyperlink"] = prot.asc_canAddShapeHyperlink;
 		prot["asc_canGroupGraphicsObjects"] = prot.asc_canGroupGraphicsObjects;
 		prot["asc_groupGraphicsObjects"] = prot.asc_groupGraphicsObjects;
 		prot["asc_canUnGroupGraphicsObjects"] = prot.asc_canUnGroupGraphicsObjects;
