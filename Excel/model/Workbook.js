@@ -4013,18 +4013,42 @@ Woorksheet.prototype.getHyperlinkByCell = function(row, col){
 Woorksheet.prototype.getMergedByCell = function(row, col){
 	return this.mergeManager.getByCell(row, col);
 }
+Woorksheet.prototype._expandRangeByMergedAddToOuter = function(aOuter, range, aMerged){
+	for(var i = 0, length = aMerged.all.length; i < length; i++)
+	{
+		var elem = aMerged.all[i];
+		if(!range.containsRange(elem.bbox))
+			aOuter.push(elem);
+	}
+}
+Woorksheet.prototype._expandRangeByMergedGetOuter = function(range){
+	var aOuter = [];
+	//смотрим только границы
+	this._expandRangeByMergedAddToOuter(aOuter, range, this.mergeManager.get({r1: range.r1, c1: range.c1, r2: range.r2, c2: range.c1}));
+	if(range.c1 != range.c2)
+	{
+		this._expandRangeByMergedAddToOuter(aOuter, range, this.mergeManager.get({r1: range.r1, c1: range.c2, r2: range.r2, c2: range.c2}));
+		if(range.c2 - range.c1 > 1)
+		{
+			this._expandRangeByMergedAddToOuter(aOuter, range, this.mergeManager.get({r1: range.r1, c1: range.c1 + 1, r2: range.r1, c2: range.c2 - 1}));
+			if(range.r1 != range.r2)
+				this._expandRangeByMergedAddToOuter(aOuter, range, this.mergeManager.get({r1: range.r2, c1: range.c1 + 1, r2: range.r2, c2: range.c2 - 1}));
+		}
+	}
+	return aOuter;
+}
 Woorksheet.prototype.expandRangeByMerged = function(range){
 	if(null != range)
 	{
-		var aMerged = this.mergeManager.get(range);
-		if(aMerged.outer.length > 0)
+		var aOuter = this._expandRangeByMergedGetOuter(range);
+		if(aOuter.length > 0)
 		{
 			range = range.clone();
-			while(aMerged.outer.length > 0)
+			while(aOuter.length > 0)
 			{
-				for(var i = 0, length = aMerged.outer.length; i < length; i++)
-					range.union2(aMerged.outer[i].bbox);
-				aMerged = this.mergeManager.get(range);
+				for(var i = 0, length = aOuter.length; i < length; i++)
+					range.union2(aOuter[i].bbox);
+				aOuter = this._expandRangeByMergedGetOuter(range);
 			}
 		}
 	}
