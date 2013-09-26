@@ -293,9 +293,9 @@
 								leftDiff += widthEveryElemKey[n];
 							}
 							if(obj._otherProps._key_halign == 'top')
-								vpos = gVpos + props.height*(i);
+								vpos = gVpos + props.height*(i)*scale;
 							else
-								vpos = gVpos - props.height*(levels.length - i - 1);
+								vpos = gVpos - props.height*(levels.length - i - 1)*scale;
 							if (obj._otherProps._key_color_shape == 'line') {
 								context.beginPath();
 									context.strokeStyle = colors[elemeNum];

@@ -727,7 +727,7 @@ function calcAllMargin(isFormatCell,isformatCellScOy,minX,maxX,minY,maxY, chart)
 				//длинные подписи, или их большое количество разделяем на несколько строк
 				bar._otherProps._key_levels = getLevelsKey(chartCanvas, context, font, scale);
 				
-				var level = 0;
+				var level = 1;
 				if(bar._otherProps._key_levels && bar._otherProps._key_levels.length)
 					level = bar._otherProps._key_levels.length;
 				
@@ -2644,7 +2644,7 @@ function getLevelsKey(chartCanvas, context, font, scale)
 	var widthLine = 28;
 	if(bar.type == 'bar' || bar.type == 'hbar' || bar.type == 'hbar' || (bar.type == 'line' && bar._otherProps_filled) || bar.type == 'pie')
 		widthLine = 8;
-	var maxWidthOneLineKey = 0.9*chartCanvas.width;
+	var maxWidthOneLineKey = 0.9*chartCanvas.width*scale;
 	var widthRow = 0;
 	var level = 0;
 	var levelKey = [];
@@ -2653,8 +2653,8 @@ function getLevelsKey(chartCanvas, context, font, scale)
 	var allWidthKeys = 0;
 	for(var i = 0; i < bar._otherProps._key.length; i++)
 	{					
-		widthText = getMaxPropertiesText(context,font,bar._otherProps._key[i]).width/scale;
-		allWidthKeys += widthText + 2 + widthLine;
+		widthText = getMaxPropertiesText(context,font,bar._otherProps._key[i]).width;
+		allWidthKeys += (widthText + 2 + widthLine)*scale;
 	}
 	
 	if(allWidthKeys > maxWidthOneLineKey)
@@ -2675,8 +2675,8 @@ function getLevelsKey(chartCanvas, context, font, scale)
 			var keyOnOneLevel = Math.floor(bar._otherProps._key.length/tempLevel);
 			for(var i = 0; i < bar._otherProps._key.length; i++)
 			{					
-				widthText = getMaxPropertiesText(context,font,bar._otherProps._key[i]).width/scale;
-				widthRow += widthText + 2 + widthLine;
+				widthText = getMaxPropertiesText(context,font,bar._otherProps._key[i]).width;
+				widthRow += (widthText + 2 + widthLine)*scale;
 				if(!levelKey[level])
 					levelKey[level] = [];
 				if(level > tempLevel)
