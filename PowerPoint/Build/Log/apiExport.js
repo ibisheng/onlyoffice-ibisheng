@@ -675,21 +675,49 @@ prop:get_ImageWidth
 prop:get_ImageHeight
 ---
 var:CImgProperty
+prop:get_ChangeLevel
+prop:put_ChangeLevel
+prop:get_CanBeFlow
 prop:get_Width
 prop:put_Width
-prop:get_Locked
-prop:put_Locked
 prop:get_Height
 prop:put_Height
 prop:get_WrappingStyle
 prop:put_WrappingStyle
 prop:get_Paddings
 prop:put_Paddings
+prop:get_AllowOverlap
+prop:put_AllowOverlap
 prop:get_Position
 prop:put_Position
+prop:get_PositionH
+prop:put_PositionH
+prop:get_PositionV
+prop:put_PositionV
+prop:get_Value_X
+prop:get_Value_Y
 prop:get_ImageUrl
 prop:put_ImageUrl
+prop:get_Group
+prop:put_Group
+prop:get_FromGroup
+prop:put_FromGroup
+prop:get_isChartProps
+prop:put_isChartPross
+prop:get_SeveralCharts
+prop:put_SeveralCharts
+prop:get_SeveralChartTypes
+prop:put_SeveralChartTypes
+prop:get_SeveralChartStyles
+prop:put_SeveralChartStyles
+prop:get_VerticalTextAlign
+prop:put_VerticalTextAlign
 prop:get_OriginSize
+prop:get_Locked
+prop:get_ChartProperties
+prop:put_ChartProperties
+prop:get_ShapeProperties
+prop:put_ShapeProperties
 ---
 var:CHeaderProp
 prop:get_Type
@@ -1679,21 +1707,49 @@ window['CImageSize'] = CImageSize;
 CImageSize.prototype['get_ImageWidth'] = CImageSize.prototype.get_ImageWidth;
 CImageSize.prototype['get_ImageHeight'] = CImageSize.prototype.get_ImageHeight;
 window['CImgProperty'] = CImgProperty;
+CImgProperty.prototype['get_ChangeLevel'] = CImgProperty.prototype.get_ChangeLevel;
+CImgProperty.prototype['put_ChangeLevel'] = CImgProperty.prototype.put_ChangeLevel;
+CImgProperty.prototype['get_CanBeFlow'] = CImgProperty.prototype.get_CanBeFlow;
 CImgProperty.prototype['get_Width'] = CImgProperty.prototype.get_Width;
 CImgProperty.prototype['put_Width'] = CImgProperty.prototype.put_Width;
-CImgProperty.prototype['get_Locked'] = CImgProperty.prototype.get_Locked;
-CImgProperty.prototype['put_Locked'] = CImgProperty.prototype.put_Locked;
 CImgProperty.prototype['get_Height'] = CImgProperty.prototype.get_Height;
 CImgProperty.prototype['put_Height'] = CImgProperty.prototype.put_Height;
 CImgProperty.prototype['get_WrappingStyle'] = CImgProperty.prototype.get_WrappingStyle;
 CImgProperty.prototype['put_WrappingStyle'] = CImgProperty.prototype.put_WrappingStyle;
 CImgProperty.prototype['get_Paddings'] = CImgProperty.prototype.get_Paddings;
 CImgProperty.prototype['put_Paddings'] = CImgProperty.prototype.put_Paddings;
+CImgProperty.prototype['get_AllowOverlap'] = CImgProperty.prototype.get_AllowOverlap;
+CImgProperty.prototype['put_AllowOverlap'] = CImgProperty.prototype.put_AllowOverlap;
 CImgProperty.prototype['get_Position'] = CImgProperty.prototype.get_Position;
 CImgProperty.prototype['put_Position'] = CImgProperty.prototype.put_Position;
+CImgProperty.prototype['get_PositionH'] = CImgProperty.prototype.get_PositionH;
+CImgProperty.prototype['put_PositionH'] = CImgProperty.prototype.put_PositionH;
+CImgProperty.prototype['get_PositionV'] = CImgProperty.prototype.get_PositionV;
+CImgProperty.prototype['put_PositionV'] = CImgProperty.prototype.put_PositionV;
+CImgProperty.prototype['get_Value_X'] = CImgProperty.prototype.get_Value_X;
+CImgProperty.prototype['get_Value_Y'] = CImgProperty.prototype.get_Value_Y;
 CImgProperty.prototype['get_ImageUrl'] = CImgProperty.prototype.get_ImageUrl;
 CImgProperty.prototype['put_ImageUrl'] = CImgProperty.prototype.put_ImageUrl;
+CImgProperty.prototype['get_Group'] = CImgProperty.prototype.get_Group;
+CImgProperty.prototype['put_Group'] = CImgProperty.prototype.put_Group;
+CImgProperty.prototype['get_FromGroup'] = CImgProperty.prototype.get_FromGroup;
+CImgProperty.prototype['put_FromGroup'] = CImgProperty.prototype.put_FromGroup;
+CImgProperty.prototype['get_isChartProps'] = CImgProperty.prototype.get_isChartProps;
+CImgProperty.prototype['put_isChartPross'] = CImgProperty.prototype.put_isChartPross;
+CImgProperty.prototype['get_SeveralCharts'] = CImgProperty.prototype.get_SeveralCharts;
+CImgProperty.prototype['put_SeveralCharts'] = CImgProperty.prototype.put_SeveralCharts;
+CImgProperty.prototype['get_SeveralChartTypes'] = CImgProperty.prototype.get_SeveralChartTypes;
+CImgProperty.prototype['put_SeveralChartTypes'] = CImgProperty.prototype.put_SeveralChartTypes;
+CImgProperty.prototype['get_SeveralChartStyles'] = CImgProperty.prototype.get_SeveralChartStyles;
+CImgProperty.prototype['put_SeveralChartStyles'] = CImgProperty.prototype.put_SeveralChartStyles;
+CImgProperty.prototype['get_VerticalTextAlign'] = CImgProperty.prototype.get_VerticalTextAlign;
+CImgProperty.prototype['put_VerticalTextAlign'] = CImgProperty.prototype.put_VerticalTextAlign;
 CImgProperty.prototype['get_OriginSize'] = CImgProperty.prototype.get_OriginSize;
+CImgProperty.prototype['get_Locked'] = CImgProperty.prototype.get_Locked;
+CImgProperty.prototype['get_ChartProperties'] = CImgProperty.prototype.get_ChartProperties;
+CImgProperty.prototype['put_ChartProperties'] = CImgProperty.prototype.put_ChartProperties;
+CImgProperty.prototype['get_ShapeProperties'] = CImgProperty.prototype.get_ShapeProperties;
+CImgProperty.prototype['put_ShapeProperties'] = CImgProperty.prototype.put_ShapeProperties;
 window['CHeaderProp'] = CHeaderProp;
 CHeaderProp.prototype['get_Type'] = CHeaderProp.prototype.get_Type;
 CHeaderProp.prototype['put_Type'] = CHeaderProp.prototype.put_Type;
