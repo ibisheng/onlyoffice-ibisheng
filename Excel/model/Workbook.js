@@ -4029,7 +4029,7 @@ Woorksheet.prototype.expandRangeByMerged = function(range){
 		}
 	}
 	return range;
-}
+};
 //-------------------------------------------------------------------------------------------------
 /**
  * @constructor

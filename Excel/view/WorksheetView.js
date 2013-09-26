@@ -5294,29 +5294,14 @@
 			_fixSelectionOfMergedCells: function (fixedRange) {
 				var t = this;
 
-				function checkRange(range) {
-					// ToDo ускорить эту функцию через model (баг http://bugzserver/show_bug.cgi?id=20388)
-					var c, r, res;
-					for (r = range.r1; r <= range.r2 && r < t.nRowsCount; ++r) {
-						for (c = range.c1; c <= range.c2 && c < t.nColsCount; ++c) {
-							res = t._getMergedCellsRange(c, r);
-							if (res === undefined) {continue;}
-							res = range.union(res);
-							if ( !range.isEqual(res) ) {return checkRange(res);}
-						}
-					}
-					return range;
-				}
-
 				var ar = fixedRange ? fixedRange : ((this.isFormulaEditMode) ?
 					t.arrActiveFormulaRanges[t.arrActiveFormulaRanges.length - 1].clone(true) : t.activeRange);
 
-				if( !ar ) { return; }
+				if (!ar) { return; }
 
 				if (ar.type && ar.type !== c_oAscSelectionType.RangeCells) { return; }
 
-				var res = checkRange(ar.clone(true));
-
+				var res = this.model.expandRangeByMerged(ar.clone(true));
 				if (ar.c1 !== res.c1 && ar.c1 !== res.c2) {
 					ar.c1 = ar.c1 <= ar.c2 ? res.c1 : Math.min(res.c2, this.nColsCount - 1);
 				}
