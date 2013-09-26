@@ -13521,8 +13521,8 @@ CTable.prototype =
 
     Internal_Recalculate_Borders : function()
     {
-        //if ( true != this.RecalcInfo.TableBorders )
-        //    return;
+        if ( true != this.RecalcInfo.TableBorders )
+            return;
 
         // Обнуляем таблицу суммарных высот ячеек
         for ( var Index = -1; Index < this.Content.length; Index++ )
@@ -20638,18 +20638,21 @@ CTableCell.prototype =
                 // Если изменение внутри ячейки влечет за собой изменение сетки таблицы, тогда
                 // пересчитывать таблицу надо с самого начала.
                 var CurCol;
-                var ColsCount = Table.TableGrid.length;
+                var ColsCount = Table.TableGridCalc.length;
                 var TableGrid_old = new Array();
                 for ( CurCol = 0; CurCol < ColsCount; CurCol++ )
-                    TableGrid_old[CurCol] = Table.TableGrid[CurCol];
+                    TableGrid_old[CurCol] = Table.TableGridCalc[CurCol];
 
                 Table.Internal_RecalculateGrid();
-                var TableGrid_new = Table.TableGrid;
+                var TableGrid_new = Table.TableGridCalc;
 
                 for ( CurCol = 0; CurCol < ColsCount; CurCol++ )
                 {
                     if ( Math.abs( TableGrid_old[CurCol] - TableGrid_new[CurCol] ) > 0.001 )
+                    {
+                        Table.RecalcInfo.TableBorders = true;
                         return Table.Refresh_RecalcData2( 0, 0 );
+                    }
                 }
             }
             else

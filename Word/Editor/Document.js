@@ -1102,17 +1102,20 @@ CDocument.prototype =
                     if ( FrameY < 0 )
                         FrameY = 0;
 
+                    var FrameBounds = this.Content[Index].Get_FrameBounds(FrameX, FrameY, FrameW, FrameH);
+                    var FrameX2 = FrameBounds.X, FrameY2 = FrameBounds.Y, FrameW2 = FrameBounds.W, FrameH2 = FrameBounds.H;
+
                     for ( var TempIndex = Index; TempIndex < Index + FlowCount; TempIndex++ )
                     {
                         var TempElement = this.Content[TempIndex];
                         TempElement.Shift( 0, FrameX, FrameY );
-                        TempElement.Set_CalculatedFrame( FrameX, FrameY, FrameW, FrameH, PageIndex );
+                        TempElement.Set_CalculatedFrame( FrameX, FrameY, FrameW, FrameH, FrameX2, FrameY2, FrameW2, FrameH2, PageIndex );
                     }
 
                     var FrameDx = ( undefined === FramePr.HSpace ? 0 : FramePr.HSpace );
                     var FrameDy = ( undefined === FramePr.VSpace ? 0 : FramePr.VSpace );
 
-                    this.DrawingObjects.addFloatTable( new CFlowParagraph( Element, FrameX, FrameY, FrameW, FrameH, FrameDx, FrameDy, Index, FlowCount ) );
+                    this.DrawingObjects.addFloatTable( new CFlowParagraph( Element, FrameX2, FrameY2, FrameW2, FrameH2, FrameDx, FrameDy, Index, FlowCount ) );
 
                     Index += FlowCount - 1;
 

@@ -37,10 +37,14 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit)
     // Рассчитанное положение рамки
     this.CalculatedFrame =
     {
-        L : 0,
+        L : 0,       // Внутренний рект, по которому идет рассчет
         T : 0,
         W : 0,
         H : 0,
+        L2 : 0,      // Внешний рект, с учетом границ
+        T2 : 0,
+        W2 : 0,
+        H2 : 0,
         PageIndex : 0
     };
 
@@ -3908,10 +3912,29 @@ Paragraph.prototype =
         var FramePr = this.Get_FramePr();
         if ( undefined != FramePr && this.Parent instanceof CDocument )
         {
-            var BoundsL = this.CalculatedFrame.L;
-            var BoundsT = this.CalculatedFrame.T;
-            var BoundsH = this.CalculatedFrame.H;
-            var BoundsW = this.CalculatedFrame.W;
+            var PixelError = editor.WordControl.m_oLogicDocument.DrawingDocument.GetMMPerDot(1);
+            var BoundsL = this.CalculatedFrame.L2 - PixelError;
+            var BoundsT = this.CalculatedFrame.T2 - PixelError;
+            var BoundsH = this.CalculatedFrame.H2 + 2 * PixelError;
+            var BoundsW = this.CalculatedFrame.W2 + 2 * PixelError;
+
+            /*
+            var Brd = Pr.ParaPr.Brd;
+            var BorderBottom = Brd.Bottom;
+            if ( undefined != Brd.Bottom )
+                BoundsH += BorderBottom.Size + BorderBottom.Space;
+
+            var BorderLeft = Brd.Left;
+            if ( undefined != Brd.Left )
+            {
+                BoundsL -= BorderLeft.Size + BorderLeft.Space;
+                BoundsW += BorderLeft.Size + BorderLeft.Space;
+            }
+
+            var BorderRight = Brd.Right;
+            if ( undefined != Brd.Right )
+                BoundsW += BorderRight.Size + BorderRight.Space;
+                */
 
             pGraphics.SaveGrState();
             pGraphics.AddClipRect( BoundsL, BoundsT, BoundsW, BoundsH );
@@ -4380,6 +4403,11 @@ Paragraph.prototype =
             {
                 var TempX0 = Math.min( this.Lines[CurLine].Ranges[0].X, this.Pages[CurPage].X + Pr.ParaPr.Ind.Left, this.Pages[CurPage].X + Pr.ParaPr.Ind.Left + Pr.ParaPr.Ind.FirstLine);
                 var TempX1 = this.Lines[CurLine].Ranges[this.Lines[CurLine].Ranges.length - 1].XEnd;
+
+                if ( true === this.Is_LineDropCap() )
+                {
+                    TempX1 = TempX0 + this.Get_LineDropCapWidth();
+                }
 
                 var TempTop    = this.Lines[CurLine].Top;
                 var TempBottom = this.Lines[CurLine].Bottom;
@@ -4918,6 +4946,9 @@ Paragraph.prototype =
         var bEmpty  = this.IsEmpty();
         var X_left  = Math.min( this.Pages[CurPage].X + Pr.ParaPr.Ind.Left, this.Pages[CurPage].X + Pr.ParaPr.Ind.Left + Pr.ParaPr.Ind.FirstLine );
         var X_right = this.Pages[CurPage].XLimit - Pr.ParaPr.Ind.Right;
+
+        if ( true === this.Is_LineDropCap() )
+            X_right = X_left + this.Get_LineDropCapWidth();
 
         if ( Pr.ParaPr.Brd.Left.Value === border_Single )
             X_left -= 1 + Pr.ParaPr.Brd.Left.Space;
@@ -10733,12 +10764,61 @@ Paragraph.prototype =
         this.CompiledPr.NeedRecalc = true;
     },
 
-    Set_CalculatedFrame : function(L, T, W, H, PageIndex)
+    Get_FrameBounds : function(FrameX, FrameY, FrameW, FrameH)
+    {
+        var X0 = FrameX, Y0 = FrameY, X1 = FrameX + FrameW, Y1 = FrameY + FrameH;
+
+        var Paras = this.Internal_Get_FrameParagraphs();
+        var Count = Paras.length;
+        var FramePr = this.Get_FramePr();
+
+        if ( 0 >= Count )
+            return { X : X0, Y : Y0, W : X1 - X0, H : Y1 - Y0 };
+
+        for ( var Index = 0; Index < Count; Index++ )
+        {
+            var Para   = Paras[Index];
+            var ParaPr = Para.Get_CompiledPr2(false).ParaPr;
+            var Brd    = ParaPr.Brd;
+
+            var _X0 = X0 + ParaPr.Ind.Left + ParaPr.Ind.FirstLine;
+
+            if ( undefined != Brd.Left && border_None != Brd.Left.Value )
+                _X0 -= Brd.Left.Size + Brd.Left.Space + 1;
+
+            if ( _X0 < X0 )
+                X0 = _X0
+
+            var _X1 = X1 - ParaPr.Ind.Right;
+
+            if ( undefined != Brd.Right && border_None != Brd.Right.Value )
+                _X1 += Brd.Right.Size + Brd.Right.Space + 1;
+
+            if ( _X1 > X1 )
+                X1 = _X1;
+        }
+
+        var _Y1 = Y1;
+        var BottomBorder = Paras[Count - 1].Get_CompiledPr2(false).ParaPr.Brd.Bottom;
+        if ( undefined != BottomBorder && border_None != BottomBorder.Value )
+            _Y1 += BottomBorder.Size + BottomBorder.Space;
+
+        if ( _Y1 > Y1 && ( heightrule_Auto === FramePr.HRule || ( heightrule_AtLeast === FramePr.HRule && FrameH >= FramePr.H ) ) )
+            Y1 = _Y1;
+
+        return { X : X0, Y : Y0, W : X1 - X0, H : Y1 - Y0 };
+    },
+
+    Set_CalculatedFrame : function(L, T, W, H, L2, T2, W2, H2, PageIndex)
     {
         this.CalculatedFrame.T = T;
         this.CalculatedFrame.L = L;
         this.CalculatedFrame.W = W;
         this.CalculatedFrame.H = H;
+        this.CalculatedFrame.T2 = T2;
+        this.CalculatedFrame.L2 = L2;
+        this.CalculatedFrame.W2 = W2;
+        this.CalculatedFrame.H2 = H2;
         this.CalculatedFrame.PageIndex = PageIndex;
     },
 
@@ -10789,6 +10869,24 @@ Paragraph.prototype =
         }
 
         return FrameParas;
+    },
+
+    Is_LineDropCap : function()
+    {
+        var FrameParas = this.Internal_Get_FrameParagraphs();
+        if ( 1 !== FrameParas.length || 1 !== this.Lines.length )
+            return false;
+
+        return true;
+    },
+
+    Get_LineDropCapWidth : function()
+    {
+        var W = this.Lines[0].Ranges[0].W;
+        var ParaPr = this.Get_CompiledPr2(false).ParaPr;
+        W += ParaPr.Ind.Left + ParaPr.Ind.FirstLine;
+
+        return W;
     },
 
     Change_Frame : function(X, Y, W, H, PageIndex)

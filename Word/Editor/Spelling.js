@@ -66,7 +66,7 @@ CDocumentSpelling.prototype =
             delete this.CheckPara[Id];
             Counter++;
 
-            if ( Counter > 20 )
+            if ( Counter > 200 )
                 break;
         }
 
