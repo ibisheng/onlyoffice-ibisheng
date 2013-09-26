@@ -1861,6 +1861,7 @@ CGs.prototype =
         this.pos = Reader.GetLong();
     },
 
+
     IsIdentical : function(fill)
     {
         return false;
@@ -1978,6 +1979,19 @@ function GradLin()
 GradLin.prototype =
 {
 
+
+    Write_ToBinary2 : function(Writer)
+    {
+        Writer.WriteLong(this.angle);
+        Writer.WriteBool(this.scale);
+    },
+
+    Read_FromBinary2 : function(Reader)
+    {
+        this.angle = Reader.GetLong();
+        this.scale = Reader.GetBool();
+
+    },
     Get_Id: function()
     {
         return this.Id;
@@ -2072,6 +2086,15 @@ function GradPath()
 }
 GradPath.prototype =
 {
+
+    Write_ToBinary2 : function(Writer)
+    {
+    },
+
+    Read_FromBinary2 : function(Reader)
+    {
+
+    },
     IsIdentical : function(path)
     {
         if (this.path != path.path)
@@ -2109,6 +2132,50 @@ function CGradFill()
 CGradFill.prototype =
 {
 
+
+    Write_ToBinary2 : function(Writer)
+    {
+        Writer.WriteLong(this.type);
+        var colors_count = this.colors.length;
+        Writer.WriteLong(colors_count);
+        for(var i = 0;  i < colors_count; ++i)
+        {
+            this.colors[i].Write_ToBinary2(Writer);
+        }
+        Writer.WriteBool(isRealObject(this.lin));
+        if(isRealObject(this.lin))
+        {
+            this.lin.Write_ToBinary2(Writer);
+        }
+
+        Writer.WriteBool(isRealObject(this.path));
+        if(isRealObject(this.path))
+        {
+            this.path.Write_ToBinary2(Writer);
+        }
+    },
+
+    Read_FromBinary2 : function(Reader)
+    {
+        var colors_count = Reader.GetLong();
+        for(var i = 0; i< colors_count; ++i)
+        {
+            this.colors[i] = new CGs();
+            this.colors[i].Read_FromBinary2(Reader);
+        }
+
+        if(Reader.GetBool())
+        {
+            this.lin = new GradLin();
+            this.lin.Read_FromBinary2(Reader);
+        }
+
+        if(Reader.GetBool())
+        {
+            this.path = new GradPath();
+            this.path.Read_FromBinary2(Reader);
+        }
+    },
     Get_Id: function()
     {
         return this.Id;

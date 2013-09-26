@@ -1765,6 +1765,7 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
 
         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateUndo, null, null,
             new UndoRedoDataGraphicObjects(this.originalObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));
+        this.original.normalize();
         this.original.setPosition(this.x, this.y);
         this.original.setExtents(this.extX, this.extY);
         this.original.setChildExtents(this.extX, this.extY);
@@ -1774,7 +1775,7 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
             this.childs[i].trackEnd();
         }
         if(this.parentTrack == null)
-            this.original.recalculate();
+            this.original.recalculateTransform();
 
         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateRedo, null, null,
             new UndoRedoDataGraphicObjects(this.originalObject.Get_Id(), new UndoRedoDataGOSingleProp(null, null)));

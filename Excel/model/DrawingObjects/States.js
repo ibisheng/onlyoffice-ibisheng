@@ -4486,7 +4486,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                     if(bLock)
                     {
                         History.Create_NewPoint();
-                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.resetSelectionState2();
                         drawingObjectsController.setSelectionState(selection_state);
                         var state = drawingObjectsController.curState;
                         state.textObject.remove(-1, true);
@@ -4509,7 +4509,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                     if(bLock)
                     {
                         History.Create_NewPoint();
-                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.resetSelectionState2();
                         drawingObjectsController.setSelectionState(selection_state);
 
                         var state = drawingObjectsController.curState;
@@ -4520,7 +4520,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                             selected_objects.push(group.selectedObjects[i]);
                         }
                         group.resetSelection();
-                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.resetSelectionState2();
                         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateUndo, null, null,
                             new UndoRedoDataGraphicObjects(group.Id, new UndoRedoDataGOSingleProp(null, null)), null);
                         var groups = [];
@@ -4614,14 +4614,14 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                     if(bLock)
                     {
                         History.Create_NewPoint();
-                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.resetSelectionState2();
                         drawingObjectsController.setSelectionState(selection_state);
 
-                        for(var i = 0; i < drawingObjectsController.selectedObjects.length; ++i)
+                        for(var i = drawingObjectsController.selectedObjects.length-1; i > -1 ; --i)
                         {
                             drawingObjectsController.selectedObjects[i].deleteDrawingBase();
                         }
-                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.resetSelectionState2();
                         drawingObjectsController.drawingObjects.showDrawingObjects(true);
                         drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
                         //drawingObjectsController.drawingObjects.OnUpdateOverlay();
@@ -4659,7 +4659,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                     if(bLock)
                     {
                         History.Create_NewPoint();
-                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.resetSelectionState2();
                         drawingObjectsController.setSelectionState(selection_state);
                         state.textObject.paragraphAdd( new ParaTab() );
                         drawingObjectsController.drawingObjects.showDrawingObjects(true);
@@ -4848,7 +4848,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                         if(bLock)
                         {
                             History.Create_NewPoint();
-                            drawingObjectsController.resetSelectionState();
+                            drawingObjectsController.resetSelectionState2();
                             drawingObjectsController.setSelectionState(selection_state);
                             var sp = drawingObjectsController.selectedObjects[0];
                             drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, drawingObjectsController.drawingObjects, sp));
@@ -4884,7 +4884,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                     if(bLock)
                     {
                         History.Create_NewPoint();
-                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.resetSelectionState2();
                         drawingObjectsController.setSelectionState(selection_state);
                         var state = drawingObjectsController.curState;
                         state.textObject.addNewParagraph();
@@ -4948,7 +4948,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                         if(bLock)
                         {
                             History.Create_NewPoint();
-                            drawingObjectsController.resetSelectionState();
+                            drawingObjectsController.resetSelectionState2();
                             drawingObjectsController.setSelectionState(selection_state);
                             var state = drawingObjectsController.curState;
                             state.textObject.paragraphAdd(new ParaSpace(1));
@@ -4974,7 +4974,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                         if(bLock)
                         {
                             History.Create_NewPoint();
-                            drawingObjectsController.resetSelectionState();
+                            drawingObjectsController.resetSelectionState2();
                             drawingObjectsController.setSelectionState(selection_state);
                             var state = drawingObjectsController.curState;
                             drawingObjectsController.changeCurrentState(new TextAddInGroup(drawingObjectsController, drawingObjectsController.drawingObjects, state.group, state.group.selectedObjects[0]));
@@ -4999,7 +4999,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                         if(bLock)
                         {
                             History.Create_NewPoint();
-                            drawingObjectsController.resetSelectionState();
+                            drawingObjectsController.resetSelectionState2();
                             drawingObjectsController.setSelectionState(selection_state);
                             drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, drawingObjectsController.drawingObjects, drawingObjectsController.selectedObjects[0]));
                             drawingObjectsController.curState.textObject.paragraphAdd(new ParaSpace(1));
@@ -5090,7 +5090,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                     if(bLock)
                     {
                         History.Create_NewPoint();
-                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.resetSelectionState2();
                         drawingObjectsController.setSelectionState(selection_state);
                         var state = drawingObjectsController.curState;
                         for(var i = 0; i < drawingObjectsController.selectedObjects.length; ++i)
@@ -5122,7 +5122,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                     if(bLock)
                     {
                         History.Create_NewPoint();
-                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.resetSelectionState2();
                         drawingObjectsController.setSelectionState(selection_state);
                         var state = drawingObjectsController.curState;
                         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(state.group.Id, new UndoRedoDataShapeRecalc()), null);
@@ -5171,7 +5171,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                     if(bLock)
                     {
                         History.Create_NewPoint();
-                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.resetSelectionState2();
                         drawingObjectsController.setSelectionState(selection_state);
                         var state = drawingObjectsController.curState;
                         for(var i = 0; i < drawingObjectsController.selectedObjects.length; ++i)
@@ -5203,7 +5203,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                     if(bLock)
                     {
                         History.Create_NewPoint();
-                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.resetSelectionState2();
                         drawingObjectsController.setSelectionState(selection_state);
                         var state = drawingObjectsController.curState;
                         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(state.group.Id, new UndoRedoDataShapeRecalc()), null);
@@ -5252,7 +5252,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                     if(bLock)
                     {
                         History.Create_NewPoint();
-                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.resetSelectionState2();
                         drawingObjectsController.setSelectionState(selection_state);
                         var state = drawingObjectsController.curState;
                         for(var i = 0; i < drawingObjectsController.selectedObjects.length; ++i)
@@ -5284,7 +5284,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                     if(bLock)
                     {
                         History.Create_NewPoint();
-                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.resetSelectionState2();
                         drawingObjectsController.setSelectionState(selection_state);
                         var state = drawingObjectsController.curState;
                         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(state.group.Id, new UndoRedoDataShapeRecalc()), null);
@@ -5333,7 +5333,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                     if(bLock)
                     {
                         History.Create_NewPoint();
-                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.resetSelectionState2();
                         drawingObjectsController.setSelectionState(selection_state);
                         var state = drawingObjectsController.curState;
                         for(var i = 0; i < drawingObjectsController.selectedObjects.length; ++i)
@@ -5365,7 +5365,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                     if(bLock)
                     {
                         History.Create_NewPoint();
-                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.resetSelectionState2();
                         drawingObjectsController.setSelectionState(selection_state);
                         var state = drawingObjectsController.curState;
                         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_RecalculateTransformUndo, null, null, new UndoRedoDataGraphicObjects(state.group.Id, new UndoRedoDataShapeRecalc()), null);
@@ -5419,7 +5419,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                     if(bLock)
                     {
                         History.Create_NewPoint();
-                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.resetSelectionState2();
                         drawingObjectsController.setSelectionState(selection_state);
                         var state = drawingObjectsController.curState;
                         state.textObject.remove(1, true);
@@ -5442,7 +5442,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                     if(bLock)
                     {
                         History.Create_NewPoint();
-                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.resetSelectionState2();
                         drawingObjectsController.setSelectionState(selection_state);
 
                         var state = drawingObjectsController.curState;
@@ -5453,7 +5453,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                             selected_objects.push(group.selectedObjects[i]);
                         }
                         group.resetSelection();
-                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.resetSelectionState2();
                         History.Add(g_oUndoRedoGraphicObjects, historyitem_AutoShapes_GroupRecalculateUndo, null, null,
                             new UndoRedoDataGraphicObjects(group.Id, new UndoRedoDataGOSingleProp(null, null)), null);
                         var groups = [];
@@ -5555,14 +5555,14 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                     if(bLock)
                     {
                         History.Create_NewPoint();
-                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.resetSelectionState2();
                         drawingObjectsController.setSelectionState(selection_state);
 
-                        for(var i = 0; i < drawingObjectsController.selectedObjects.length; ++i)
+                        for(var i = drawingObjectsController.selectedObjects.length-1; i >-1 ; --i)
                         {
                             drawingObjectsController.selectedObjects[i].deleteDrawingBase();
                         }
-                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.resetSelectionState2();
                         drawingObjectsController.drawingObjects.showDrawingObjects(true);
                         drawingObjectsController.updateSelectionState(drawingObjectsController.drawingObjects.drawingDocument);
                         //drawingObjectsController.drawingObjects.OnUpdateOverlay();
@@ -5803,7 +5803,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                     if(bLock)
                     {
                         History.Create_NewPoint();
-                        drawingObjectsController.resetSelectionState();
+                        drawingObjectsController.resetSelectionState2();
                         drawingObjectsController.setSelectionState(selection_state);
                         var state = drawingObjectsController.curState;
                         state.textObject.paragraphAdd(Item);
@@ -5829,7 +5829,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                         if(bLock)
                         {
                             History.Create_NewPoint();
-                            drawingObjectsController.resetSelectionState();
+                            drawingObjectsController.resetSelectionState2();
                             drawingObjectsController.setSelectionState(selection_state);
                             var state = drawingObjectsController.curState;
                             drawingObjectsController.changeCurrentState(new TextAddInGroup(drawingObjectsController, drawingObjectsController.drawingObjects, state.group, state.group.selectedObjects[0]));
@@ -5854,7 +5854,7 @@ function DefaultKeyDownHandle(drawingObjectsController, e)
                         if(bLock)
                         {
                             History.Create_NewPoint();
-                            drawingObjectsController.resetSelectionState();
+                            drawingObjectsController.resetSelectionState2();
                             drawingObjectsController.setSelectionState(selection_state);
                             drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, drawingObjectsController.drawingObjects, drawingObjectsController.selectedObjects[0]));
                             drawingObjectsController.curState.textObject.paragraphAdd(Item);

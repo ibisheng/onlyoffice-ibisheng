@@ -2810,6 +2810,8 @@ CShape.prototype =
             case historyitem_AutoShapes_RecalculateAfterInit:
             {
                 this.recalculateTransform();
+                this.calculateContent();
+                this.calculateTransformTextMatrix();
                 this.recalculateBrush();
                 this.recalculatePen();
                 break;

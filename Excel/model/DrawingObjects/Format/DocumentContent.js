@@ -6732,7 +6732,7 @@ CDocumentContent.prototype =
         History.Add(g_oUndoRedoGraphicObjects, historyitem_DocumentContent_AddItem, null, null, new UndoRedoDataGraphicObjects(this.Get_Id(), new UndoRedoDataDocContentAddItem(Position, NewObject.Get_Id())));
 
         this.Content.splice( Position, 0, NewObject );
-        NewObject.Set_Parent( this );
+        NewObject.setParent( this );
         NewObject.Set_DocumentNext( NextObj );
         NewObject.Set_DocumentPrev( PrevObj );
 

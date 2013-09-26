@@ -8463,11 +8463,11 @@ Paragraph.prototype =
             return;
 
         // Если стиль является стилем по умолчанию для параграфа, тогда не надо его записывать.
-        if ( Id != this.Parent.Get_Styles().Get_Default_Paragraph() )
+        /*if ( Id != this.Parent.Get_Styles().Get_Default_Paragraph() )
         {
             History.Add( this, { Type : historyitem_Paragraph_PStyle, Old : Id_old, New : Id } );
             this.Pr.PStyle = Id;
-        }
+        }           */
 
         // Надо пересчитать конечный стиль
         this.CompiledPr.NeedRecalc = true;
@@ -8526,7 +8526,7 @@ Paragraph.prototype =
     {
         if ( undefined != this.Pr.PStyle )
         {
-            History.Add( this, { Type : historyitem_Paragraph_PStyle, Old : this.Pr.PStyle, New : undefined } );
+            //History.Add( this, { Type : historyitem_Paragraph_PStyle, Old : this.Pr.PStyle, New : undefined } );
             this.Pr.PStyle = undefined;
         }
 
