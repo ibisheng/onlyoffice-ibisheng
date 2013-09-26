@@ -3577,6 +3577,7 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo){
 			delete row.c[nCol0];
 	});
 	//lockDraw(this.workbook);
+    var rec = this._moveRecalcGraph(oBBoxFrom, offset);
 	for(var i in aTempObj.cells)
 	{
 		var oTempRow = aTempObj.cells[i];
@@ -3592,10 +3593,16 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo){
 				// var sFormula = oTempCell.getFormula();
 				// if("" != sFormula)
 					// oTempCell.setValue("=" + sFormula);
+
+                if( oTempCell.sFormula ){
+                    this.workbook.cwf[this.Id].cells[oTempCell.getName()] = oTempCell.getName();
+                    rec[ oTempCell.getName() ] = [ this.Id, oTempCell.getName() ];
+                    rec.length++;
+                }
 			}
 		}
 	}
-	var rec = this._moveRecalcGraph(oBBoxFrom, offset);
+
 	this.workbook.buildDependency();
 	this.workbook.needRecalc = rec;
 	recalc(this.workbook);
@@ -3919,7 +3926,7 @@ Woorksheet.prototype._ReBuildFormulas=function(cellRange){
 		}
 	}
 }
-Woorksheet.prototype.renameDependencyNodes = function(offset,oBBox,rec, noDelete){
+Woorksheet.prototype.renameDependencyNodes = function(offset, oBBox, rec, noDelete){
 	var objForRebuldFormula = this.workbook.dependencyFormulas.checkOffset(oBBox, offset, this.Id, noDelete);
 	var c = {};
 	for ( var id in objForRebuldFormula.move ){
