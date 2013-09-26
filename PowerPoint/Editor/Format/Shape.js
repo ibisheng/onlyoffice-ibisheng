@@ -2626,7 +2626,7 @@ CShape.prototype =
         }
         this.addTextFlag = true;
         this.txBody.content.Paragraph_Add(paraItem, false);
-        this.txBody.content.RecalculateCurPos();
+        //this.txBody.content.RecalculateCurPos();
         this.recalcInfo.recalculateContent = true;
         this.recalcInfo.recalculateTransformText = true;
         editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
@@ -2642,7 +2642,7 @@ CShape.prototype =
         else
         {
             this.txBody.content.Add_NewParagraph(false);
-            this.txBody.content.RecalculateCurPos();
+            //this.txBody.content.RecalculateCurPos();
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;
             editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;
@@ -2654,7 +2654,7 @@ CShape.prototype =
         if(isRealObject(this.txBody))
         {
             this.txBody.content.Set_ParagraphAlign(val);
-            this.txBody.content.RecalculateCurPos();
+            //this.txBody.content.RecalculateCurPos();
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;
             editor.WordControl.m_oLogicDocument.recalcMap[this.Id] = this;

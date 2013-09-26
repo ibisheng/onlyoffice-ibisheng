@@ -1839,7 +1839,7 @@ Paragraph.prototype =
                         if ( break_Page === Item.BreakType )
                         {
                             // PageBreak вне самого верхнего документа не надо учитывать, поэтому мы его с радостью удаляем
-                            if ( !(this.Parent instanceof CDocument) )
+                            //if ( !(this.Parent instanceof CDocument) )
                             {
                                 this.Internal_Content_Remove( Pos );
                                 Pos--;
@@ -2240,14 +2240,14 @@ Paragraph.prototype =
                 if ( true === this.Use_YLimit() && (Top > this.YLimit || Bottom2 > this.YLimit ) && ( CurLine != this.Pages[CurPage].FirstLine || ( 0 === CurPage && ( null != this.Get_DocumentPrev() || true === this.Parent.Is_TableCellContent() ) ) ) && false === bBreakPageLineEmpty )
                 {
                     // Проверим висячую строку
-                    if ( this.Parent instanceof CDocument && true === ParaPr.WidowControl && CurLine - this.Pages[CurPage].StartLine <= 1 && CurLine >= 1 && true != bBreakPageLine )
+                    /*if ( this.Parent instanceof CDocument && true === ParaPr.WidowControl && CurLine - this.Pages[CurPage].StartLine <= 1 && CurLine >= 1 && true != bBreakPageLine )
                     {
                         this.Parent.RecalcInfo.WidowControlParagraph = this;
                         this.Parent.RecalcInfo.WidowControlLine      = CurLine - 1;
                         RecalcResult = recalcresult_CurPage;
                         break;
                     }
-                    else
+                    else*/
                     {
                         // Неразрывные абзацы не учитываются в таблицах
                         if ( true === ParaPr.KeepLines && null != this.Get_DocumentPrev() && true != this.Parent.Is_TableCellContent() && 0 === CurPage )
@@ -2569,13 +2569,13 @@ Paragraph.prototype =
                                 }
                             }
 
-                            if ( this.Parent instanceof CDocument && false === bBreakPagePrevLine )
+                            /*if ( this.Parent instanceof CDocument && false === bBreakPagePrevLine )
                             {
                                 this.Parent.RecalcInfo.WidowControlParagraph = this;
                                 this.Parent.RecalcInfo.WidowControlLine      = ( CurLine > 2 ? CurLine - 1 : 0 ); // Если у нас в параграфе 3 строки, тогда сразу начинаем параграф с новой строки
                                 RecalcResult = recalcresult_PrevPage;
                                 break;
-                            }
+                            }  */
                         }
 
                         if ( true === bEnd && true === bExtendBoundToBottom )
@@ -3537,7 +3537,7 @@ Paragraph.prototype =
         }
 
         // Если параграф начинается с новой страницы
-        if ( 1 === CurPage && this.Pages[0].EndLine < 0 && this.Parent instanceof CDocument )
+       /* if ( 1 === CurPage && this.Pages[0].EndLine < 0 && this.Parent instanceof CDocument )
         {
             // Если у предыдущего параграфа стоит настройка "не отрывать от следующего".
             // И сам параграф не разбит на несколько страниц и не начинается с новой страницы,
@@ -3567,7 +3567,7 @@ Paragraph.prototype =
                         Curr = Prev;
                 }
             }
-        }
+        }     */
 
         // Пересчет параграфа:
         //  1. Сначала рассчитаем новые переносы строк, при этом подсчитав количество

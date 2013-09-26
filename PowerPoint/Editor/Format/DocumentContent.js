@@ -535,6 +535,7 @@ CDocumentContent.prototype =
 
     Recalculate : function()
     {
+        return;
         editor.WordControl.m_oLogicDocument.bRecalcDocContent = true;
         editor.WordControl.m_oLogicDocument.recalcDocumentConten = this;
         editor.WordControl.m_oLogicDocument.Recalculate();
