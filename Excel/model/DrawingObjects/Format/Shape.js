@@ -1186,6 +1186,12 @@ CShape.prototype =
             this.txBody.calculateContent();
     },
 
+    Get_SelectedText: function()
+    {
+        if(this.txBody)
+            return this.txBody.content.Get_SelectedText();
+    },
+
     calculateTransformTextMatrix: function()
     {
         if(this.txBody === null)

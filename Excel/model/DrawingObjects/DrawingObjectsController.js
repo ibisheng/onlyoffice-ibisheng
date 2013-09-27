@@ -285,7 +285,11 @@ DrawingObjectsController.prototype =
     },
 	
 	canAddHyperlink: function() {
-		return true;
+        if(this.State.textObject)
+        {
+            return this.State.textObject.textBody.content.Hyperlink_CanAdd();
+        }
+        return false;
 	},
 
     getParagraphParaPr: function()
@@ -1191,6 +1195,14 @@ DrawingObjectsController.prototype =
 		
 		ascSelectedObjects.push(new asc_CSelectedObject( c_oAscTypeSelectElement.Paragraph, new asc_CParagraphProperty( ParaPr ) ));
 	},
+
+    Get_SelectedText: function()
+    {
+        if(this.State.textObject && this.State.textObject.Get_SelectedText)
+        {
+            return this.State.textObject.Get_SelectedText();
+        }
+    },
 	
 	putPrLineSpacing: function(type, value)
 	{
