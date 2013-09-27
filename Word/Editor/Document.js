@@ -1111,6 +1111,11 @@ CDocument.prototype =
                     if ( FrameH + FrameY > Page_Height )
                         FrameY = Page_Height - FrameH;
 
+                    // TODO: Пересмотреть, почему эти погрешности возникают
+                    // Избавляемся от погрешности
+                    FrameY += 0.001;
+                    FrameH -= 0.002;
+
                     if ( FrameY < 0 )
                         FrameY = 0;
 
