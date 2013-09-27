@@ -43,7 +43,7 @@
                 "../PowerPoint/Editor/Format/ParagraphContent.js",
                 "../PowerPoint/Editor/Format/FontClassification.js",
                 "../PowerPoint/Editor/Format/Spelling.js",
-                "../PowerPoint/Editor/Comments.js",
+                "../PowerPoint/Editor/Format/Comments.js",
                 "../PowerPoint/Editor/GraphicObjects.js",
                 "../PowerPoint/Editor/States.js",
 
