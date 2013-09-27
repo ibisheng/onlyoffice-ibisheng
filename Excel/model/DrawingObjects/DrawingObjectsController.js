@@ -284,6 +284,10 @@ DrawingObjectsController.prototype =
         }
     },
 	
+	removeHyperlink: function () {
+        // TODO
+    },
+	
 	canAddHyperlink: function() {
         if(this.State.textObject)
         {
@@ -1198,9 +1202,9 @@ DrawingObjectsController.prototype =
 
     Get_SelectedText: function()
     {
-        if(this.State.textObject && this.State.textObject.Get_SelectedText)
+        if(this.curState.textObject && this.curState.textObject.Get_SelectedText)
         {
-            return this.State.textObject.Get_SelectedText();
+            return this.curState.textObject.Get_SelectedText();
         }
     },
 	

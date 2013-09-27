@@ -5660,7 +5660,11 @@
 				var cell_info = new asc_CCellInfo();
 				cell_info.name =  this._getColumnTitle(c1) + this._getRowTitle(r1);
 				cell_info.formula = c.getFormula();
-				cell_info.text = c.getValueForEdit();
+				
+				if ( isGraphicObject && textPr && paraPr )
+					cell_info.text = this.objectRender.controller.Get_SelectedText();
+				else
+					cell_info.text = c.getValueForEdit();
 				
 				this.isUpdateSelection = false;
 				if ( isGraphicObject && textPr && paraPr ) {

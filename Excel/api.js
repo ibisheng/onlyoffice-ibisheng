@@ -2635,6 +2635,11 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 					this.wb.restoreFocus();
 				}
 			},
+			
+			asc_removeHyperlink: function () {
+				if ( ws.objectRender.selectedGraphicObjectsExists() )
+					ws.objectRender.controller.removeHyperlink();
+			},
 
 			asc_insertFormula: function (functionName, autoComplet) {
 				this.wb.insertFormulaInEditor(functionName, autoComplet);
@@ -3307,6 +3312,7 @@ var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 		prot["asc_selectFunction"] = prot.asc_selectFunction;
 		prot["asc_insertHyperlink"] = prot.asc_insertHyperlink;
+		prot["asc_removeHyperlink"] = prot.asc_removeHyperlink;
 		prot["asc_insertFormula"] = prot.asc_insertFormula;
 		prot["asc_getFormulasInfo"] = prot.asc_getFormulasInfo;
 		prot["asc_setFontRenderingMode"] = prot.asc_setFontRenderingMode;
