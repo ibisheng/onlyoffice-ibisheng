@@ -6911,7 +6911,7 @@ Range.prototype.merge=function(type){
 				oFirstCellHyperlink = oCurHyp.data;
 			}
 		}
-		if(nRow0 == nRowStart || nCol0 == nColStart)
+		if(nRow0 == nRowStart && nCol0 == nColStart)
 			oLeftTopCellStyle = cell.getStyle();
 		
 		cell.setValue("");
