@@ -5899,6 +5899,7 @@
 					this.objectRender.unselectDrawingObjects();
 
 				var ar = this.activeRange;
+				this.model.workbook.handlers.trigger("asc_onHideComment");
 
 				// Получаем координаты левого верхнего угла выделения
 				var xL = this.getCellLeft(ar.c1, /*pt*/1);

@@ -520,8 +520,6 @@ function asc_CCellCommentator(currentSheet) {
 	// Public methods
 	//-----------------------------------------------------------------------------------
 	
-	
-	
 	_this.isLockedComment = function(oComment, lockByDefault, callbackFunc) {
 	
 		var _this = this;
